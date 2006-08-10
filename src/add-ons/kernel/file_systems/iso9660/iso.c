@@ -537,6 +537,8 @@ InitNode(vnode *rec, char *buffer, int *_bytesRead, uint8 joliet_level)
 
 	TRACE(("InitNode - ENTER, bufstart is %p, record length is %d bytes\n", buffer, recLen));
 
+	rec->cache = NULL;
+
 	if (recLen > 0) {
 		rec->extAttrRecLen = *(uint8 *)buffer++;
 

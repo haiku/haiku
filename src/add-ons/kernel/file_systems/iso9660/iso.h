@@ -89,6 +89,7 @@ typedef struct vnode
 	/* Most drivers will probably want the first things defined here. */
 	vnode_id	id; 
 	vnode_id 	parID;		// parent vnode ID.
+	void		*cache;		// for file cache
 	
 	// End of members other drivers will definitely want.
 	

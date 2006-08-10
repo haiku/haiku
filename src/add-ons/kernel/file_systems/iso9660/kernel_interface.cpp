@@ -57,6 +57,8 @@ static status_t		fs_walk(void *_ns, void *_base, const char *file,
 
 static status_t		fs_read_vnode(void *_ns, vnode_id vnid, void **node, bool reenter);
 static status_t		fs_release_vnode(void *_ns, void *_node, bool reenter);
+static status_t		fs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
+				struct file_io_vec *vecs, size_t *_count);
 static status_t		fs_read_stat(void *_ns, void *_node, struct stat *st);
 static status_t		fs_open(void *_ns, void *_node, int omode, void **cookie);
 static status_t		fs_read(void *_ns, void *_node, void *cookie, off_t pos,
@@ -236,7 +238,7 @@ fs_read_fs_stat(void *_ns, struct fs_info *fss)
 	nspace *ns = (nspace *)_ns;
 	int i;
 	
-	TRACE(("fs_rfsstat - ENTER\n"));
+	TRACE(("fs_read_fs_stat - ENTER\n"));
 	
 	// Fill in device id.
 	//fss->dev = ns->fd;
@@ -275,7 +277,7 @@ fs_read_fs_stat(void *_ns, struct fs_info *fss)
 	// File system name
 	strcpy(fss->fsh_name, "iso9660");
 	
-	TRACE(("fs_rfsstat - EXIT\n"));
+	TRACE(("fs_read_fs_stat - EXIT\n"));
 	return 0;
 }
 
@@ -457,6 +459,10 @@ fs_read_vnode(void *_ns, vnode_id vnid, void **node, bool reenter)
 	} else
 		result = ENOMEM;
 
+	if (result == B_OK && !(newNode->flags & ISO_ISDIR)) {
+		newNode->cache = file_cache_create(ns->id, vnid, newNode->dataLen[FS_DATA_FORMAT], ns->fdOfSession);
+	}
+
 	TRACE(("fs_read_vnode - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
@@ -471,7 +477,7 @@ fs_release_vnode(void *ns, void *_node, bool reenter)
 	(void)ns;
 	(void)reenter;
 
-	TRACE(("fs_write_vnode - ENTER (0x%x)\n", node));
+	TRACE(("fs_release_vnode - ENTER (0x%x)\n", node));
 
 	if (node != NULL) { 
 		if (node->id != ISO_ROOTNODE_ID) {
@@ -479,13 +485,110 @@ fs_release_vnode(void *ns, void *_node, bool reenter)
 				free (node->fileIDString);
 			if (node->attr.slName != NULL)
 				free (node->attr.slName);
+			if (node->cache != NULL)
+				file_cache_delete(node->cache);
 
 			free(node);
 		}
 	}
 
-	TRACE(("fs_write_vnode - EXIT\n"));
+	TRACE(("fs_release_vnode - EXIT\n"));
 	return result;
+}
+
+
+static status_t
+fs_get_file_map(fs_volume _fs, fs_vnode _node, off_t pos, size_t reqLen,
+	struct file_io_vec *vecs, size_t *_count)
+{
+	nspace *ns = (nspace *)_fs;			// global stuff
+	vnode *node = (vnode *)_node;		// The read file vnode.
+	uint16 blockSize = ns->logicalBlkSize[FS_DATA_FORMAT];
+	uint32 startBlock = node->startLBN[FS_DATA_FORMAT] + (pos / blockSize);
+	off_t blockPos = pos % blockSize;
+	off_t numBlocks = 0;
+	uint32 dataLen = node->dataLen[FS_DATA_FORMAT];
+	size_t endLen = 0;
+	size_t startLen =  0;
+	size_t index = 0, max = *_count;
+
+	TRACE(("fs_get_file_map - ENTER (0x%x)\n", node));
+
+	// Allow an open to work on a dir, but no reads
+	if (node->flags & ISO_ISDIR)
+		return EISDIR;
+
+	if (pos < 0)
+		pos = 0;
+	*_count = 0;
+
+	// If passed-in requested length is bigger than file size, change it to
+	// file size.
+	if (reqLen + pos > dataLen)
+		reqLen = dataLen - pos;
+
+	// Compute the length of the partial start-block read, if any.
+	if (reqLen + blockPos <= blockSize)
+		startLen = reqLen;
+	else if (blockPos > 0)
+		startLen = blockSize - blockPos;
+
+	if (blockPos == 0 && reqLen >= blockSize) {
+		TRACE(("Setting startLen to 0\n"));
+		startLen = 0;
+	}
+
+	// Compute the length of the partial end-block read, if any.
+	if (reqLen + blockPos > blockSize)
+		endLen = (reqLen + blockPos) % blockSize;
+
+	// Compute the number of middle blocks to read.
+	numBlocks = ((reqLen - endLen - startLen) /  blockSize);
+	
+	if (pos >= dataLen) {
+		// If pos >= file length, return
+		return B_OK;
+	}
+
+	// Read in the first, potentially partial, block.
+	if (startLen > 0) {
+		vecs[index].offset = startBlock * blockSize + blockPos;
+		vecs[index].length = startLen;
+		startBlock++;	
+		index++;
+		if (index >= max) {
+			// we're out of file_io_vecs; let's bail out
+			*_count = index;
+			return B_BUFFER_OVERFLOW;
+		}
+	}
+
+	// Read in the middle blocks.
+	if (numBlocks > 0) {
+		for (int32 i=startBlock; i<startBlock+numBlocks; i++) {
+			vecs[index].offset = i * blockSize;
+			vecs[index].length = blockSize;
+			index++;
+			if (index >= max) {
+				// we're out of file_io_vecs; let's bail out
+				*_count = index;
+				return B_BUFFER_OVERFLOW;
+			}
+		}
+	}
+
+	// Read in the last partial block.
+	if (endLen > 0) {
+		off_t endBlock = startBlock + numBlocks;
+		vecs[index].offset = endBlock * blockSize;
+		vecs[index].length = endLen;
+		index++;
+	}
+
+	*_count = index;
+
+	TRACE(("fs_get_file_map - EXIT\n"));
+	return B_OK;
 }
 
 
@@ -539,6 +642,7 @@ fs_open(void *_ns, void *_node, int omode, void **cookie)
 static status_t
 fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len)
 {
+#if 0
 	nspace *ns = (nspace *)_ns;			// global stuff
 	vnode *node = (vnode *)_node;		// The read file vnode.
 	uint16 blockSize = ns->logicalBlkSize[FS_DATA_FORMAT];
@@ -644,6 +748,21 @@ fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len)
 
 	TRACE(("fs_read - EXIT, result is %s\n", strerror(result)));
 	return result;
+#else
+	vnode *node = (vnode *)_node;           // The read file vnode.
+	uint32 dataLen = node->dataLen[FS_DATA_FORMAT];
+
+	// set/check boundaries for pos/length
+	if (pos < 0) {
+		return B_BAD_VALUE;
+	}
+	if (pos >= dataLen) {
+		// If pos >= file length, return length of 0.
+		*len = 0;
+		return B_OK;
+        }
+	return file_cache_read(node->cache, pos, buf, len);
+#endif
 }
 
 
@@ -722,7 +841,7 @@ fs_open_dir(void *_ns, void *_node, void **cookie)
 
 	(void)_ns;
 
-	TRACE(("fs_opendir - ENTER, node is 0x%x\n", _node));
+	TRACE(("fs_open_dir - ENTER, node is 0x%x\n", _node));
 
 	if (!(node->flags & ISO_ISDIR))
 		result = EMFILE;
@@ -737,7 +856,7 @@ fs_open_dir(void *_ns, void *_node, void **cookie)
 	} else
 		result = ENOMEM;
 
-	TRACE(("fs_opendir - EXIT\n"));
+	TRACE(("fs_open_dir - EXIT\n"));
 	return result;
 }
 
@@ -752,7 +871,7 @@ fs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *buffer,
 
 	(void)_node;
 
-	TRACE(("fs_readdir - ENTER\n"));
+	TRACE(("fs_read_dir - ENTER\n"));
 
 	result = ISOReadDirEnt(ns, dirCookie, buffer, bufferSize);
 
@@ -768,7 +887,7 @@ fs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *buffer,
 	if (result == ENOENT)
 		result = B_NO_ERROR;
 
-	TRACE(("fs_readdir - EXIT, result is %s\n", strerror(result)));
+	TRACE(("fs_read_dir - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
 			
@@ -782,13 +901,13 @@ fs_rewind_dir(void *ns, void *node, void* _cookie)
 	(void)ns;
 	(void)node;
 
-	//dprintf("fs_rewinddir - ENTER\n");
+	//dprintf("fs_rewind_dir - ENTER\n");
 	if (cookie != NULL) {
 		cookie->block = cookie->startBlock;
 		cookie->pos = 0;
 		result = B_NO_ERROR;
 	}
-	//dprintf("fs_rewinddir - EXIT, result is %s\n", strerror(result));
+	//dprintf("fs_rewind_dir - EXIT, result is %s\n", strerror(result));
 	return result;
 }
 
@@ -803,8 +922,8 @@ fs_close_dir(void *ns, void *node, void *cookie)
 	// ns 		- global, fs-specific struct for device
 	// node		- directory to close
 	// cookie	- current cookie for directory.	
-	//dprintf("fs_closedir - ENTER\n");
-	//dprintf("fs_closedir - EXIT\n");
+	//dprintf("fs_close_dir - ENTER\n");
+	//dprintf("fs_close_dir - EXIT\n");
 	return B_OK;
 }
 
@@ -818,11 +937,11 @@ fs_free_dir_cookie(void *ns, void *node, void *cookie)
 	// ns 		- global, fs-specific struct for device
 	// node		- directory related to cookie
 	// cookie	- current cookie for directory, to free.	
-	//dprintf("fs_free_dircookie - ENTER\n");
+	//dprintf("fs_free_dir_cookie - ENTER\n");
 	if (cookie != NULL)
 		free(cookie);
 
-	//dprintf("fs_free_dircookie - EXIT\n");
+	//dprintf("fs_free_dir_cookie - EXIT\n");
 	return B_OK;
 }
 
@@ -876,7 +995,7 @@ static file_system_module_info sISO660FileSystem = {
 	NULL,	// &fs_read_pages
 	NULL, 	// &fs_write_pages
 
-	NULL,	// &fs_get_file_map
+	&fs_get_file_map,
 
 	NULL, 	// &fs_ioctl
 	NULL, 	// &fs_set_flags
