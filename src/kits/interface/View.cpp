@@ -90,6 +90,16 @@ static property_info sViewPropInfo[] = {
 //	#pragma mark -
 
 
+static inline uint32
+get_uint32_color(rgb_color color)
+{
+	return *(uint32 *)&color;
+}
+
+
+//	#pragma mark -
+
+
 namespace BPrivate {
 
 ViewState::ViewState()
@@ -451,13 +461,13 @@ BView::Archive(BMessage *data, bool deep) const
 
 	// colors
 	if (ret == B_OK)
-		ret = data->AddInt32("_color", (const uint32 &)HighColor());
+		ret = data->AddInt32("_color", get_uint32_color(HighColor()));
 
 	if (ret == B_OK)
-		ret = data->AddInt32("_color", (const uint32 &)LowColor());
+		ret = data->AddInt32("_color", get_uint32_color(LowColor()));
 
 	if (ret == B_OK)
-		ret = data->AddInt32("_color", (const uint32 &)ViewColor());
+		ret = data->AddInt32("_color", get_uint32_color(ViewColor()));
 
 //	NOTE: we do not use this flag any more
 //	if ( 1 ){
@@ -3562,18 +3572,18 @@ BView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 			return BHandler::ResolveSpecifier(msg, index, specifier, what, property);		
 	}
 
-	if (err == B_BAD_SCRIPT_SYNTAX) {
+	if (err < B_OK) {
 		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-		replyMsg.AddString("message", "Didn't understand the specifier(s)");
-	} else if (err < B_OK) {
-		replyMsg.what = B_ERROR;
-		replyMsg.AddString("message", strerror(err));			
+		replyMsg.AddInt32("error", err);
+
+		if (err == B_BAD_SCRIPT_SYNTAX)
+			replyMsg.AddString("message", "Didn't understand the specifier(s)");
+		else
+			replyMsg.AddString("message", strerror(err));			
 	}
-		
-	replyMsg.AddInt32("error", err);
+
 	msg->SendReply(&replyMsg);
 	return NULL;
-	
 }
 
 
@@ -3642,16 +3652,18 @@ BView::MessageReceived(BMessage *msg)
 		return;
 	}
 
+	// Scripting message
+
 	BMessage replyMsg(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
 	int32 index;
 	BMessage specifier;
 	int32 what;
 	const char *prop;
-	
+
 	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
 		return BHandler::MessageReceived(msg);
-		
+
 	BPropertyInfo propertyInfo(sViewPropInfo);
 	switch (propertyInfo.FindMatch(msg, index, &specifier, what, prop)) {
 		case 0:
@@ -3686,15 +3698,16 @@ BView::MessageReceived(BMessage *msg)
 			return BHandler::MessageReceived(msg);
 	}
 		
-	if (err == B_BAD_SCRIPT_SYNTAX) {
+	if (err < B_OK) {
 		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-		replyMsg.AddString("message", "Didn't understand the specifier(s)");
-	} else if (err < B_OK) {
-		replyMsg.what = B_ERROR;
-		replyMsg.AddString("message", strerror(err));			
+		replyMsg.AddInt32("error", err);
+
+		if (err == B_BAD_SCRIPT_SYNTAX)
+			replyMsg.AddString("message", "Didn't understand the specifier(s)");
+		else
+			replyMsg.AddString("message", strerror(err));			
 	}
-		
-	replyMsg.AddInt32("error", err);
+
 	msg->SendReply(&replyMsg);
 } 
 
