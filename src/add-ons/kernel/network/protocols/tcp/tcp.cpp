@@ -42,7 +42,7 @@
 
 static net_domain *sDomain;
 static net_address_module_info *sAddressModule;
-//static net_buffer_module_info *sBufferModule;
+net_buffer_module_info *sBufferModule;
 static net_datalink_module_info *sDatalinkModule;
 static net_stack_module_info *sStackModule;
 static hash_table *sTCPHash;
@@ -223,22 +223,23 @@ tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 
 //	#pragma mark -
 
+
 static status_t
 tcp_init()
 {
 	status_t status;
 
+#if 0
 	sDomain = sStackModule->get_domain(AF_INET);
 	sAddressModule = sDomain->address_module;
+#endif
 
 	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
 		return status;
-
-/*	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
 	if (status < B_OK)
-		goto err1;*/
-
+		goto err1;
 	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);
 	if (status < B_OK)
 		goto err2;
@@ -280,14 +281,14 @@ err4:
 err3:
 	put_module(NET_DATALINK_MODULE_NAME);
 err2:
-/*	put_module(NET_BUFFER_MODULE_NAME);
-err1:*/
+	put_module(NET_BUFFER_MODULE_NAME);
+err1:
 	put_module(NET_STACK_MODULE_NAME);
 
 	TRACE(("init_tcp() fails with %lx (%s)\n", status, strerror(status)));
 	return status;
-
 }
+
 
 static status_t
 tcp_uninit()
@@ -300,6 +301,7 @@ tcp_uninit()
 
 	return B_OK;
 }
+
 
 static status_t
 tcp_std_ops(int32 op, ...)
