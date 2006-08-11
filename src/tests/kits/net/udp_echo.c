@@ -4,11 +4,13 @@
  *
  * Authors:
  *		Oliver Tappe, zooey@hirschkaefer.de
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
 #include <arpa/inet.h>
 #include <ctype.h>
+#include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,18 +35,48 @@ printf("trying to send %u bytes...\n", len);
 		status = sendto(sockFD, buf, len, 0, 
 			(struct sockaddr*)serverAddr, sizeof(struct sockaddr_in));
 		if (status < 0) {
-			printf("sendto(): %lx (%s)\n", status, strerror(status));
+			printf("sendto(): %x (%s)\n", errno, strerror(errno));
 			exit(5);
 		}
 		len = 0;
 		status = recvfrom(sockFD, buf, MAXLEN-1, 0, NULL, NULL);
 		if (status < 0) {
-			printf("recvfrom(): %lx (%s)\n", status, strerror(status));
+			printf("recvfrom(): %x (%s)\n", errno, strerror(errno));
 			exit(5);
 		}
 		buf[status] = 0;
 		printf("-> %s\n", buf);
 	}
+}
+
+
+static void
+udp_broadcast(int sockFD, const struct sockaddr_in* serverAddr)
+{
+	char buf[MAXLEN];
+	int option = 1;
+	int len;
+	int status;
+
+	strcpy(buf, "broadcast");
+	len = strlen(buf);
+
+	setsockopt(sockFD, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
+
+	status = sendto(sockFD, buf, len, 0, 
+		(struct sockaddr*)serverAddr, sizeof(struct sockaddr_in));
+	if (status < 0) {
+		printf("sendto(): %s\n", strerror(errno));
+		exit(5);
+	}
+
+	status = recvfrom(sockFD, buf, MAXLEN-1, 0, NULL, NULL);
+	if (status < 0) {
+		printf("recvfrom(): %x (%s)\n", errno, strerror(errno));
+		exit(5);
+	}
+	buf[status] = 0;
+	printf("-> %s\n", buf);
 }
 
 
@@ -61,7 +93,7 @@ udp_echo_server(int sockFD)
 		len = sizeof(clientAddr);
 		status = recvfrom(sockFD, buf, MAXLEN-1, 0, (struct sockaddr*)&clientAddr, &len);
 		if (status < 0) {
-			printf("recvfrom(): %lx (%s)\n", status, strerror(status));
+			printf("recvfrom(): %x (%s)\n", errno, strerror(errno));
 			exit(5);
 		}
 		buf[status] = 0;
@@ -76,7 +108,7 @@ udp_echo_server(int sockFD)
 		status = sendto(sockFD, buf, status, 0, 
 			(struct sockaddr*)&clientAddr, sizeof(clientAddr));
 		if (status < 0) {
-			printf("sendto(): %lx (%s)\n", status, strerror(status));
+			printf("sendto(): %x (%s)\n", errno, strerror(errno));
 			exit(5);
 		}
 	}
@@ -86,20 +118,25 @@ udp_echo_server(int sockFD)
 int
 main(int argc, char** argv)
 {
-	long status;
+	unsigned long status;
 	int sockFD;
 	struct sockaddr_in serverAddr, localAddr;
-	int clientMode;
+	enum {
+		CLIENT_MODE,
+		BROADCAST_MODE,
+		SERVER_MODE,
+	} mode;
 	unsigned short bindPort = 0;
 
 	if (argc < 2) {
 		printf("usage: %s client <IP-address> <port> [local-port]\n", argv[0]);
+		printf("or     %s broadcast <port> <local-port>\n", argv[0]);
 		printf("or     %s server <local-port>\n", argv[0]);
 		exit(5);
 	}
 
 	if (!strcmp(argv[1], "client")) {
-		clientMode = 1;
+		mode = CLIENT_MODE;
 		if (argc < 4) {
 			printf("usage: %s client <IP-address> <port> [local-port]\n", argv[0]);
 			exit(5);
@@ -112,8 +149,22 @@ main(int argc, char** argv)
 			bindPort = atoi(argv[4]);
 		printf("client connected to server(%lx:%u)\n", serverAddr.sin_addr.s_addr, 
 			ntohs(serverAddr.sin_port));
+	} else if (!strcmp(argv[1], "broadcast")) {
+		mode = BROADCAST_MODE;
+		if (argc < 3) {
+			printf("usage: %s broadcast <port> [local-port]\n", argv[0]);
+			exit(5);
+		}
+
+		memset(&serverAddr, 0, sizeof(struct sockaddr_in));
+		serverAddr.sin_family = AF_INET;
+		serverAddr.sin_port = htons(atoi(argv[2]));
+		serverAddr.sin_addr.s_addr = INADDR_BROADCAST;
+
+		if (argc > 3)
+			bindPort = atoi(argv[3]);
 	} else if (!strcmp(argv[1], "server")) {
-		clientMode = 0;
+		mode = SERVER_MODE;
 		if (argc < 3) {
 			printf("usage: %s server <local-port>\n", argv[0]);
 			exit(5);
@@ -130,15 +181,22 @@ main(int argc, char** argv)
 		printf("binding to port %u\n", bindPort);
 		status = bind(sockFD, (struct sockaddr *)&localAddr, sizeof(localAddr));
 		if (status < 0) {
-			printf("bind(): %lx (%s)\n", status, strerror(status));
+			printf("bind(): %x (%s)\n", errno, strerror(errno));
 			exit(5);
 		}
 	}
 
-	if (clientMode)
-		udp_echo_client(sockFD, &serverAddr);
-	else
-		udp_echo_server(sockFD);
+	switch (mode) {
+		case CLIENT_MODE:
+			udp_echo_client(sockFD, &serverAddr);
+			break;
+		case BROADCAST_MODE:
+			udp_broadcast(sockFD, &serverAddr);
+			break;
+		case SERVER_MODE:
+			udp_echo_server(sockFD);
+			break;
+	}
 
 	return 0;
 }
