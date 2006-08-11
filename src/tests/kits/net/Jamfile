@@ -10,7 +10,9 @@ SubDir HAIKU_TOP src tests kits net ;
 #UsePrivateHeaders kernel ;
 #UseArchHeaders $(TARGET_ARCH) ;
 
-# SimpleTest at_client : at_client.c : ;
+SimpleTest udp_client : udp_client.c : $(NETWORK_LIBS) ;
+SimpleTest udp_echo : udp_echo.c : $(NETWORK_LIBS) ;
+SimpleTest udp_server : udp_server.c : $(NETWORK_LIBS) ;
 
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
