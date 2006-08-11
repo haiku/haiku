@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#include <new.h>
+#include <new>
 
 #include <OS.h>
 #include <assert.h>
