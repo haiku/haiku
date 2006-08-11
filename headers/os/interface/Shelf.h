@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SHELF_H
@@ -14,8 +14,11 @@ class BView;
 class BEntry;
 struct entry_ref;
 
-class _rep_data_;
-class _TContainerViewFilter_;
+namespace BPrivate {
+	class replicant_data;
+	class ShelfContainerViewFilter;
+};
+
 
 class BShelf : public BHandler {
 	public:
@@ -76,7 +79,7 @@ class BShelf : public BHandler {
 								const BView *replicant);
 
 	private:
-		friend class _TContainerViewFilter_;
+		friend class BPrivate::ShelfContainerViewFilter;
 
 		virtual	void		_ReservedShelf2();
 		virtual	void		_ReservedShelf3();
@@ -92,7 +95,7 @@ class BShelf : public BHandler {
 		status_t			_Archive(BMessage* data) const;
 		void				_InitData(BEntry* entry, BDataIO* stream,
 								BView* view, bool allowDrags);
-		status_t			_DeleteReplicant(_rep_data_* replicant);
+		status_t			_DeleteReplicant(BPrivate::replicant_data* replicant);
 		status_t			_AddReplicant(BMessage* data,
 								BPoint* location, uint32 uniqueID);
 		status_t			_GetProperty(BMessage* message, BMessage* reply);
@@ -102,7 +105,7 @@ class BShelf : public BHandler {
 		BDataIO*			fStream;
 		BEntry*				fEntry;
 		BList				fReplicants;
-		_TContainerViewFilter_* fFilter;
+		BPrivate::ShelfContainerViewFilter* fFilter;
 		uint32				fGenCount;
 		bool				fAllowDragging;
 		bool				fDirty;
