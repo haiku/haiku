@@ -402,8 +402,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 
 	uint32 buttons;
 	if (!(Window()->CurrentMessage())
- 		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) < B_OK)
- 		buttons = 0;
+		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) < B_OK)
+		buttons = 0;
 
 	switch (code) {
 		case B_ENTERED_VIEW:
@@ -438,13 +438,13 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
 		TBarWindow *window = dynamic_cast<TBarWindow*>(Window());
 		if (window) {
 			if (TBeMenu *bemenu = window->BeMenu()) {
- 				bool inBeMenu = false;
- 				if (bemenu->LockLooper()) {
- 					inBeMenu = bemenu->Frame().Contains(loc);
- 					bemenu->UnlockLooper();
- 				}
- 				return inBeMenu;
- 			}
+				bool inBeMenu = false;
+				if (bemenu->LockLooper()) {
+					inBeMenu = bemenu->Frame().Contains(loc);
+					bemenu->UnlockLooper();
+				}
+				return inBeMenu;
+			}
 		}					
 	}
 

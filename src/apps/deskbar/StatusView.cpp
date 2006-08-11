@@ -300,8 +300,7 @@ TReplicantTray::AdjustPlacement()
 {
 	// called when an add-on has been added or removed
 	// need to resize the parent of this accordingly
-	//		
-	// call to Parent will call ResizeToPreferred
+
 	BRect bounds = Bounds();
 	float width, height;
 	GetPreferredSize(&width, &height);
@@ -348,7 +347,7 @@ TReplicantTray::MessageReceived(BMessage *message)
 			AdjustPlacement();
 			break;
 
-		case 'trfm':
+		case 'Trfm':
 			// time string reformat -> realign
 			DealWithClock(fBarView->ShowingClock());
 			RealignReplicants();
@@ -1065,21 +1064,32 @@ TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 	if (icon->what == B_ARCHIVED_OBJECT)
 		icon->what = 0;
 
+	BRect originalBounds = icon->FindRect("_frame");
+		// this is a work-around for buggy replicants that change their
+		// size in AttachedToWindow() (such as "SVM")
+
 	// !! check for name collisions?
 	status = fShelf->AddReplicant(icon, BPoint(1, 1));
 	if (status != B_OK)
 		return status;
 
+	int32 count = fShelf->CountReplicants();
+	BView *view;
+	fShelf->ReplicantAt(count - 1, &view, (uint32 *)id, NULL);
+
+	if (originalBounds != view->Bounds()) {
+		// The replicant changed its size when added to the window, so we need
+		// to recompute all over again (it's already done once via BShelf::AddReplicant()
+		// and TReplicantShelf::CanAcceptReplicantView())
+		RealignReplicants();
+	}
+
 	float oldWidth = Bounds().Width();
 	float oldHeight = Bounds().Height();
 	float width, height;
 	GetPreferredSize(&width, &height);
-	if (oldWidth != width || oldHeight != height) 
+	if (oldWidth != width || oldHeight != height)
 		AdjustPlacement();
-
-	int32 count = fShelf->CountReplicants();
-	BView *view;
-	fShelf->ReplicantAt(count-1, &view, (uint32 *)id, NULL);
 
 	// add the item to the add-on list
 

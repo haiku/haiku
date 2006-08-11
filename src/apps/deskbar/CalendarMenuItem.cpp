@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,7 +13,7 @@
 #include <time.h>
 
 
-static const int32 kDaysPerMonth[] = {31, 28, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31};
+static const int32 kDaysPerMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	//								  Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 
 static const int32 kTitleFontSize = 9;

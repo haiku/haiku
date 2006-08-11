@@ -49,6 +49,11 @@ All rights reserved.
 #include <string.h>
 
 
+const char *kShortDateFormat = "%m/%d/%y";
+const char *kShortEuroDateFormat = "%d/%m/%y";
+const char *kLongDateFormat = "%a, %B %d, %Y";
+const char *kLongEuroDateFormat = "%a, %d %B, %Y";
+
 static const char * const kMinString = "99:99 AM";
 
 
@@ -263,12 +268,6 @@ TTimeView::GetCurrentTime()
 }
 
 
-const char *kShortDateFormat = "%m/%d/%y";
-const char *kShortEuroDateFormat = "%d/%m/%y";
-const char *kLongDateFormat = "%a, %B %d, %Y";
-const char *kLongEuroDateFormat = "%a, %d %B, %Y";
-
-
 void
 TTimeView::GetCurrentDate()
 {
@@ -477,7 +476,8 @@ TTimeView::Update()
 	CalculateTextPlacement();
 
 	if (fParent) {
-		fParent->MessageReceived(new BMessage('trfm'));
+		BMessage reformat('Trfm');
+		fParent->MessageReceived(&reformat);
 			// time string format realign
 		fParent->Invalidate();
 	}

@@ -174,7 +174,7 @@ TWindowMenu::AttachedToWindow()
 
 		// if an application has no windows, this feature makes it easy to quit it.
  		// (but we only add this option if the application is not Tracker.)
- 		if (fApplicationSignature.Compare(kTrackerSignature) != 0) {
+ 		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
 			AddSeparatorItem();
 			AddItem(new TShowHideMenuItem("Quit Application", fTeam, B_QUIT_REQUESTED));
  		}
