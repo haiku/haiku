@@ -103,30 +103,27 @@ extern "C" void  _ReservedShelf1__6BShelfFv(BShelf *const, int32,
 
 namespace BPrivate {
 
-class replicant_data {
-	private:
-		friend class BShelf;
+struct replicant_data {
+	replicant_data(BMessage *message, BView *view, BDragger *dragger,
+		BDragger::relation relation, unsigned long id, image_id image);
+	replicant_data();
 
-		replicant_data(BMessage *message, BView *view, BDragger *dragger,
-			BDragger::relation relation, unsigned long id, image_id image);
-		replicant_data();
+	static replicant_data* Find(BList const *list, BMessage const *msg);
+	static replicant_data* Find(BList const *list, BView const *view, bool allowZombie);
+	static replicant_data* Find(BList const *list, unsigned long id);
 
-		static replicant_data* find(BList const *list, BMessage const *msg);
-		static replicant_data* find(BList const *list, BView const *view, bool allowZombie);
-		static replicant_data* find(BList const *list, unsigned long id);
+	static int32 IndexOf(BList const *list, BMessage const *msg);
+	static int32 IndexOf(BList const *list, BView const *view, bool allowZombie);
+	static int32 IndexOf(BList const *list, unsigned long id);
 
-		static int32 index_of(BList const *list, BMessage const *msg);
-		static int32 index_of(BList const *list, BView const *view, bool allowZombie);
-		static int32 index_of(BList const *list, unsigned long id);
-
-		BMessage			*fMessage;
-		BView				*fView;
-		BDragger			*fDragger;
-		BDragger::relation	fRelation;
-		unsigned long		fId;
-		image_id			fImage;
-		status_t			fError;
-		BView				*fZombieView;
+	BMessage*			message;
+	BView*				view;
+	BDragger*			dragger;
+	BDragger::relation	relation;
+	unsigned long		id;
+	image_id			image;
+	status_t			error;
+	BView*				zombie_view;
 };
 
 class ShelfContainerViewFilter : public BMessageFilter {
@@ -183,43 +180,43 @@ send_reply(BMessage* message, status_t status, uint32 uniqueID)
 //	#pragma mark -
 
 
-replicant_data::replicant_data(BMessage *message, BView *view, BDragger *dragger,
-	BDragger::relation relation, unsigned long id, image_id image)
+replicant_data::replicant_data(BMessage *_message, BView *_view, BDragger *_dragger,
+	BDragger::relation _relation, unsigned long _id, image_id _image)
 	:
-	fMessage(message),
-	fView(view),
-	fDragger(NULL),
-	fRelation(relation),
-	fId(id),
-	fImage(image),
-	fError(B_OK),
-	fZombieView(NULL)
+	message(_message),
+	view(_view),
+	dragger(NULL),
+	relation(_relation),
+	id(_id),
+	image(_image),
+	error(B_OK),
+	zombie_view(NULL)
 {
 }
 
 
 replicant_data::replicant_data()
 	:
-	fMessage(NULL),
-	fView(NULL),
-	fDragger(NULL),
-	fRelation(BDragger::TARGET_UNKNOWN),
-	fId(0),
-	fImage(-1),
-	fError(B_ERROR),
-	fZombieView(NULL)
+	message(NULL),
+	view(NULL),
+	dragger(NULL),
+	relation(BDragger::TARGET_UNKNOWN),
+	id(0),
+	image(-1),
+	error(B_ERROR),
+	zombie_view(NULL)
 {
 }
 
 
 //static
 replicant_data *
-replicant_data::find(BList const *list, BMessage const *msg)
+replicant_data::Find(BList const *list, BMessage const *msg)
 {
 	int32 i = 0;
 	replicant_data *item;
 	while ((item = (replicant_data*)list->ItemAt(i++)) != NULL) {
-		if (item->fMessage == msg)
+		if (item->message == msg)
 			return item;
 	}
 
@@ -229,15 +226,15 @@ replicant_data::find(BList const *list, BMessage const *msg)
 
 //static
 replicant_data *
-replicant_data::find(BList const *list, BView const *view, bool allowZombie)
+replicant_data::Find(BList const *list, BView const *view, bool allowZombie)
 {
 	int32 i = 0;
 	replicant_data *item;
 	while ((item = (replicant_data*)list->ItemAt(i++)) != NULL) {
-		if (item->fView == view)
+		if (item->view == view)
 			return item;
 
-		if (allowZombie && item->fZombieView == view)
+		if (allowZombie && item->zombie_view == view)
 			return item;
 	}
 
@@ -247,12 +244,12 @@ replicant_data::find(BList const *list, BView const *view, bool allowZombie)
 
 //static
 replicant_data *
-replicant_data::find(BList const *list, unsigned long id)
+replicant_data::Find(BList const *list, unsigned long id)
 {
 	int32 i = 0;
 	replicant_data *item;
 	while ((item = (replicant_data*)list->ItemAt(i++)) != NULL) {
-		if (item->fId == id)
+		if (item->id == id)
 			return item;
 	}
 
@@ -262,12 +259,12 @@ replicant_data::find(BList const *list, unsigned long id)
 
 //static
 int32
-replicant_data::index_of(BList const *list, BMessage const *msg)
+replicant_data::IndexOf(BList const *list, BMessage const *msg)
 {
 	int32 i = 0;
 	replicant_data *item;
 	while ((item = (replicant_data*)list->ItemAt(i)) != NULL) {
-		if (item->fMessage == msg)
+		if (item->message == msg)
 			return i;
 		i++;
 	}
@@ -278,15 +275,15 @@ replicant_data::index_of(BList const *list, BMessage const *msg)
 
 //static
 int32
-replicant_data::index_of(BList const *list, BView const *view, bool allowZombie)
+replicant_data::IndexOf(BList const *list, BView const *view, bool allowZombie)
 {
 	int32 i = 0;
 	replicant_data *item;
 	while ((item = (replicant_data*)list->ItemAt(i)) != NULL) {
-		if (item->fView == view)
+		if (item->view == view)
 			return i;
 
-		if (allowZombie && item->fZombieView == view)
+		if (allowZombie && item->zombie_view == view)
 			return i;
 		i++;
 	}
@@ -297,12 +294,12 @@ replicant_data::index_of(BList const *list, BView const *view, bool allowZombie)
 
 //static
 int32
-replicant_data::index_of(BList const *list, unsigned long id)
+replicant_data::IndexOf(BList const *list, unsigned long id)
 {
 	int32 i = 0;
 	replicant_data *item;
 	while ((item = (replicant_data*)list->ItemAt(i)) != NULL) {
-		if (item->fId == id)
+		if (item->id == id)
 			return i;
 		i++;
 	}
@@ -482,14 +479,14 @@ BShelf::MessageReceived(BMessage *msg)
 
 	BMessage replyMsg(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
-	
+
 	BMessage specifier;
 	int32 what;
 	const char *prop;
 	int32 index;
 	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
 		return BHandler::MessageReceived(msg);
-	
+
 	switch (msg->what) {
 		case B_DELETE_PROPERTY:
 		case B_GET_PROPERTY:
@@ -560,17 +557,18 @@ BShelf::MessageReceived(BMessage *msg)
 				break;
 			}
 			return BHandler::MessageReceived(msg);
-	};
-
-	if (err == B_BAD_SCRIPT_SYNTAX) {
-		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-		replyMsg.AddString("message", "Didn't understand the specifier(s)");
-	} else if (err < B_OK) {
-		replyMsg.what = B_ERROR;
-		replyMsg.AddString("message", strerror(err));			
 	}
-		
-	replyMsg.AddInt32("error", err);
+
+	if (err < B_OK) {
+		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
+		replyMsg.AddInt32("error", err);
+
+		if (err == B_BAD_SCRIPT_SYNTAX)
+			replyMsg.AddString("message", "Didn't understand the specifier(s)");
+		else
+			replyMsg.AddString("message", strerror(err));			
+	}
+
 	msg->SendReply(&replyMsg);
 }
 
@@ -664,7 +662,7 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	int32 repIndex;
 	status_t err = msg->GetCurrentSpecifier(&repIndex, specifier, &form, &property);
 	if (err) {
-		BMessage reply(B_ERROR);
+		BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
 		reply.AddInt32("error", err);
 		msg->SendReply(&reply);
 		return NULL;
@@ -839,7 +837,7 @@ BShelf::AddReplicant(BMessage *data, BPoint location)
 status_t
 BShelf::DeleteReplicant(BView *replicant)
 {
-	int32 index = replicant_data::index_of(&fReplicants, replicant, true);
+	int32 index = replicant_data::IndexOf(&fReplicants, replicant, true);
 
 	replicant_data *item = (replicant_data*)fReplicants.ItemAt(index);
 	if (item == NULL)
@@ -852,7 +850,7 @@ BShelf::DeleteReplicant(BView *replicant)
 status_t
 BShelf::DeleteReplicant(BMessage *data)
 {
-	int32 index = replicant_data::index_of(&fReplicants, data);
+	int32 index = replicant_data::IndexOf(&fReplicants, data);
 
 	replicant_data *item = (replicant_data*)fReplicants.ItemAt(index);
 	if (!item)
@@ -898,34 +896,34 @@ BShelf::ReplicantAt(int32 index, BView **_view, uint32 *_uniqueID,
 	}
 
 	if (_view)
-		*_view = item->fView;
+		*_view = item->view;
 	if (_uniqueID)
-		*_uniqueID = item->fId;
+		*_uniqueID = item->id;
 	if (_error)
-		*_error = item->fError;
+		*_error = item->error;
 
-	return item->fMessage;
+	return item->message;
 }
 
 
 int32
-BShelf::IndexOf(const BView *replicant_view) const
+BShelf::IndexOf(const BView* replicantView) const
 {
-	return replicant_data::index_of(&fReplicants, replicant_view, false);
+	return replicant_data::IndexOf(&fReplicants, replicantView, false);
 }
 
 
 int32
 BShelf::IndexOf(const BMessage *archive) const
 {
-	return replicant_data::index_of(&fReplicants, archive);
+	return replicant_data::IndexOf(&fReplicants, archive);
 }
 
 
 int32
 BShelf::IndexOf(uint32 id) const
 {
-	return replicant_data::index_of(&fReplicants, id);
+	return replicant_data::IndexOf(&fReplicants, id);
 }
 
 
@@ -1054,27 +1052,27 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 status_t
 BShelf::_DeleteReplicant(replicant_data* item)
 {
-	bool loadedImage = item->fMessage->FindBool("");
+	bool loadedImage = item->message->FindBool("");
 
-	BView *view = item->fView;
+	BView *view = item->view;
 	if (view == NULL)
-		view = item->fZombieView;
+		view = item->zombie_view;
 
 	if (view)
 		view->RemoveSelf();
 
-	if (item->fDragger)
-		item->fDragger->RemoveSelf();
+	if (item->dragger)
+		item->dragger->RemoveSelf();
 
-	int32 index = replicant_data::index_of(&fReplicants, item->fMessage);
-	
+	int32 index = replicant_data::IndexOf(&fReplicants, item->message);
+
 	// TODO: Test if it's ok here
-	ReplicantDeleted(index, item->fMessage, view);
-	
+	ReplicantDeleted(index, item->message, view);
+
 	fReplicants.RemoveItem(item);
 
-	if (loadedImage && item->fImage >= 0)
-		unload_add_on(item->fImage);
+	if (loadedImage && item->image >= 0)
+		unload_add_on(item->image);
 
 	delete item;
 
@@ -1110,23 +1108,24 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 	// Check if we can create multiple instances
 	if (data->FindBool("be:load_each_time")) {
-		const char *_class = NULL;
-		const char *add_on = NULL;
+		const char *className = NULL;
+		const char *addOn = NULL;
 
-		if (data->FindString("class", &_class) == B_OK
-			&& data->FindString("add_on", &add_on) == B_OK) {
+		if (data->FindString("class", &className) == B_OK
+			&& data->FindString("add_on", &addOn) == B_OK) {
 			int32 i = 0;
 			replicant_data *item;
-			const char *rep_class = NULL;
-			const char *rep_add_on = NULL;
-			
+			const char *replicantClassName = NULL;
+			const char *replicantAddOn = NULL;
+
 			while ((item = (replicant_data*)fReplicants.ItemAt(i++)) != NULL) {
-				if (item->fMessage->FindString("class", &rep_class) == B_OK
-					&& item->fMessage->FindString("add_on", &rep_add_on) == B_OK
-					&& !strcmp(_class, rep_class) && add_on && rep_add_on
-					&& !strcmp(add_on, rep_add_on)) {
+				if (item->message->FindString("class", &replicantClassName) == B_OK
+					&& item->message->FindString("add_on", &replicantAddOn) == B_OK
+					&& !strcmp(className, replicantClassName)
+					&& addOn != NULL && replicantAddOn != NULL
+					&& !strcmp(addOn, replicantAddOn)) {
 					printf("Replicant was rejected. Unique replicant already exists. class=%s, signature=%s",
-						rep_class, rep_add_on);
+						replicantClassName, replicantAddOn);
 					return send_reply(data, B_ERROR, uniqueID);
 				}
 			}
@@ -1249,8 +1248,8 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	replicant_data *item = new replicant_data(data, replicant, dragger, relation,
 		uniqueID, image);
 
-	item->fError = B_OK;
-	item->fZombieView = zombie;
+	item->error = B_OK;
+	item->zombie_view = zombie;
 
 	fReplicants.AddItem(item);
 
