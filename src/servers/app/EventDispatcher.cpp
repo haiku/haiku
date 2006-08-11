@@ -352,6 +352,11 @@ EventDispatcher::_AddListener(EventTarget& target, int32 token,
 {
 	BAutolock _(this);
 
+	if (temporary && fLastButtons == 0) {
+		// only allow to add temporary listeners in case a buttons is pressed
+		return false;
+	}
+
 	if (!fTargets.HasItem(&target))
 		fTargets.AddItem(&target);
 
@@ -746,7 +751,7 @@ EventDispatcher::_EventLoop()
 						fNextLatestMouseMoved) == B_SKIP_MESSAGE) {
 					// this is a work-around if the wrong B_MOUSE_UP
 					// event is filtered out
-					if (event->what == B_MOUSE_UP) {
+					if (event->what == B_MOUSE_UP && event->FindInt32("buttons") == 0) {
 						fSuspendFocus = false;
 						_RemoveTemporaryListeners();
 					}
@@ -874,7 +879,8 @@ EventDispatcher::_EventLoop()
 				}
 			}
 
-			if (event->what == B_MOUSE_UP) {
+			if (event->what == B_MOUSE_UP && fLastButtons == 0) {
+				// no buttons are pressed anymore
 				fSuspendFocus = false;
 				_RemoveTemporaryListeners();
 				if (fDraggingMessage)
