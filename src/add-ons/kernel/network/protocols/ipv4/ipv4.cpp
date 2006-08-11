@@ -1043,12 +1043,20 @@ init_ipv4()
 		// so we have to do it here, manually
 		// TODO: for modules, this shouldn't be required
 
-	sStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
+	status = sStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
 		"network/protocols/ipv4/v1", NULL);
+	if (status < B_OK)
+		goto err6;
 
-	return sStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
+	status = sStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
 		&gIPv4AddressModule, &sDomain);
+	if (status < B_OK)
+		goto err6;
 
+	return B_OK;
+
+err6:
+	hash_uninit(sFragmentHash);
 err5:
 	benaphore_destroy(&sFragmentLock);
 err4:
