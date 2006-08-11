@@ -7,6 +7,8 @@
  */
 
 
+#include <net_buffer.h>
+#include <net_datalink.h>
 #include <net_protocol.h>
 #include <net_stack.h>
 
@@ -14,22 +16,51 @@
 #include <util/list.h>
 
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <new>
 #include <stdlib.h>
+#include <string.h>
+
+#include <lock.h>
+#include <util/AutoLock.h>
+#include <util/khash.h>
+
+#include <NetBufferUtilities.h>
+#include <NetUtilities.h>
+
+#define TRACE_TCP
+#ifdef TRACE_TCP
+#	define TRACE(x) dprintf x
+#	define TRACE_BLOCK(x) dump_block x
+#else
+#	define TRACE(x)
+#	define TRACE_BLOCK(x)
+#endif
+
+
+#define MAX_HASH_TCP	64
+
+static net_domain *sDomain;
+static net_address_module_info *sAddressModule;
+//static net_buffer_module_info *sBufferModule;
+static net_datalink_module_info *sDatalinkModule;
+static net_stack_module_info *sStackModule;
+static hash_table *sTCPHash;
+static benaphore sTCPLock;
 
 #include "tcp.h"
-
-struct tcp_protocol : net_protocol {
-};
+#include "TCPConnection.h"
 
 
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
-	tcp_protocol *protocol = new (std::nothrow) tcp_protocol;
+	socket->protocol = IPPROTO_TCP;
+	TCPConnection *protocol = new (std::nothrow) TCPConnection(socket);
 	if (protocol == NULL)
 		return NULL;
 
+	TRACE(("Created new TCPConnection %p\n", protocol));
 	return protocol;
 }
 
@@ -37,7 +68,7 @@ tcp_init_protocol(net_socket *socket)
 status_t
 tcp_uninit_protocol(net_protocol *protocol)
 {
-	delete protocol;
+	delete (TCPConnection *)protocol;
 	return B_OK;
 }
 
@@ -45,35 +76,35 @@ tcp_uninit_protocol(net_protocol *protocol)
 status_t
 tcp_open(net_protocol *protocol)
 {
-	return B_OK;
+	return ((TCPConnection *)protocol)->Open();
 }
 
 
 status_t
 tcp_close(net_protocol *protocol)
 {
-	return B_OK;
+	return ((TCPConnection *)protocol)->Close();
 }
 
 
 status_t
 tcp_free(net_protocol *protocol)
 {
-	return B_OK;
+	return ((TCPConnection *)protocol)->Free();
 }
 
 
 status_t
 tcp_connect(net_protocol *protocol, const struct sockaddr *address)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->Connect(address);
 }
 
 
 status_t
 tcp_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->Accept(_acceptedSocket);
 }
 
 
@@ -89,28 +120,31 @@ tcp_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 tcp_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	return B_ERROR;
+	TRACE(("tcp_bind(%p) on address %s\n", protocol,
+		AddressString(sDomain, address, true).Data()));
+	TCPConnection *connection = (TCPConnection *)protocol;
+	return connection->Bind(address);
 }
 
 
 status_t
 tcp_unbind(net_protocol *protocol, struct sockaddr *address)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->Unbind(address);
 }
 
 
 status_t
 tcp_listen(net_protocol *protocol, int count)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->Listen(count);
 }
 
 
 status_t
 tcp_shutdown(net_protocol *protocol, int direction)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->Shutdown(direction);
 }
 
 
@@ -132,7 +166,7 @@ tcp_send_routed_data(net_protocol *protocol, struct net_route *route,
 ssize_t
 tcp_send_avail(net_protocol *protocol)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->SendAvailable();
 }
 
 
@@ -140,14 +174,14 @@ status_t
 tcp_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->ReadData(numBytes, flags, _buffer);
 }
 
 
 ssize_t
 tcp_read_avail(net_protocol *protocol)
 {
-	return B_ERROR;
+	return ((TCPConnection *)protocol)->ReadAvailable();
 }
 
 
@@ -189,36 +223,93 @@ tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 
 //	#pragma mark -
 
+static status_t
+tcp_init()
+{
+	status_t status;
+
+	sDomain = sStackModule->get_domain(AF_INET);
+	sAddressModule = sDomain->address_module;
+
+	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
+	if (status < B_OK)
+		return status;
+
+/*	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	if (status < B_OK)
+		goto err1;*/
+
+	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);
+	if (status < B_OK)
+		goto err2;
+
+	sTCPHash = hash_init(MAX_HASH_TCP, TCPConnection::HashOffset(),
+		&TCPConnection::Compare, &TCPConnection::Hash);
+	if (sTCPHash == NULL)
+		goto err3;
+
+	status = benaphore_init(&sTCPLock, "TCP Hash Lock");
+	if (status < B_OK)
+		goto err4;
+
+	status = sStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_IP,
+		"network/protocols/tcp/v1",
+		"network/protocols/ipv4/v1",
+		NULL);
+	if (status < B_OK)
+		goto err5;
+
+	status = sStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+		"network/protocols/tcp/v1",
+		"network/protocols/ipv4/v1",
+		NULL);
+	if (status < B_OK)
+		goto err5;
+
+	status = sStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
+		"network/protocols/tcp/v1");
+	if (status < B_OK)
+		goto err5;
+
+	return B_OK;
+
+err5:
+	benaphore_destroy(&sTCPLock);
+err4:
+	hash_uninit(sTCPHash);
+err3:
+	put_module(NET_DATALINK_MODULE_NAME);
+err2:
+/*	put_module(NET_BUFFER_MODULE_NAME);
+err1:*/
+	put_module(NET_STACK_MODULE_NAME);
+
+	TRACE(("init_tcp() fails with %lx (%s)\n", status, strerror(status)));
+	return status;
+
+}
+
+static status_t
+tcp_uninit()
+{
+	benaphore_destroy(&sTCPLock);
+	hash_uninit(sTCPHash);
+	put_module(NET_DATALINK_MODULE_NAME);
+	put_module(NET_BUFFER_MODULE_NAME);
+	put_module(NET_STACK_MODULE_NAME);
+
+	return B_OK;
+}
 
 static status_t
 tcp_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-		{
-			net_stack_module_info *stack;
-			status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&stack);
-			if (status < B_OK)
-				return status;
-
-			stack->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_IP,
-				"network/protocols/tcp/v1",
-				"network/protocols/ipv4/v1",
-				NULL);
-			stack->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
-				"network/protocols/tcp/v1",
-				"network/protocols/ipv4/v1",
-				NULL);
-
-			stack->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
-				"network/protocols/tcp/v1");
-
-			put_module(NET_STACK_MODULE_NAME);
-			return B_OK;
-		}
+			return tcp_init();
 
 		case B_MODULE_UNINIT:
-			return B_OK;
+			return tcp_uninit();
 
 		default:
 			return B_ERROR;
