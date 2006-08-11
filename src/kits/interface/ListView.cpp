@@ -365,72 +365,66 @@ BListView::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
 		return;
 }
 
-// KeyDown
+
 void
 BListView::KeyDown(const char *bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
 		case B_UP_ARROW:
 		{
-			if (fFirstSelected == -1)
-				break;
-				
-			bool extend = false;
+			if (fFirstSelected == -1) {
+				// if nothing is selected yet, always select the first item
+				Select(0);
+			} else {
+				bool extend = false;
+				if (fListType == B_MULTIPLE_SELECTION_LIST
+					&& (modifiers() & B_SHIFT_KEY) != 0)
+					extend = true;
 
-			if (fListType == B_MULTIPLE_SELECTION_LIST && (modifiers() & B_SHIFT_KEY))
-				extend = true;
+				Select(fFirstSelected - 1, extend);
+			}
 
-			Select (fFirstSelected - 1, extend);
-
-			ScrollToSelection ();
-
+			ScrollToSelection();
 			break;
 		}
 		case B_DOWN_ARROW:
 		{
-			if (fFirstSelected == -1)
-				break;
-				
-			bool extend = false;
+			if (fFirstSelected == -1) {
+				// if nothing is selected yet, always select the first item
+				Select(0);
+			} else {
+				bool extend = false;
+				if (fListType == B_MULTIPLE_SELECTION_LIST
+					&& (modifiers() & B_SHIFT_KEY) != 0)
+					extend = true;
 
-			if (fListType == B_MULTIPLE_SELECTION_LIST && (modifiers() & B_SHIFT_KEY))
-				extend = true;
+				Select(fLastSelected + 1, extend);
+			}
 
-			Select (fLastSelected + 1, extend);
-
-			ScrollToSelection ();
-
+			ScrollToSelection();
 			break;
 		}
+
 		case B_HOME:
-		{
-			Select ( 0, fListType == B_MULTIPLE_SELECTION_LIST );
-
-			ScrollToSelection ();
-
+			Select(0, fListType == B_MULTIPLE_SELECTION_LIST);
+			ScrollToSelection();
 			break;
-		}
 		case B_END:
-		{
-			Select ( CountItems () - 1, fListType == B_MULTIPLE_SELECTION_LIST );
-
-			ScrollToSelection ();
-
+			Select(CountItems() - 1, fListType == B_MULTIPLE_SELECTION_LIST);
+			ScrollToSelection();
 			break;
-		}
+
 		case B_RETURN:
 		case B_SPACE:
-		{
-			Invoke ();
-
+			Invoke();
 			break;
-		}
+
 		default:
-			BView::KeyDown ( bytes, numBytes );
+			BView::KeyDown(bytes, numBytes);
 	}
 }
 
-// MakeFocus
+
 void
 BListView::MakeFocus(bool focused)
 {
