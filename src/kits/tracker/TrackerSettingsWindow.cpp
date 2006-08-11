@@ -75,7 +75,7 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 
 	rect.InsetBy(10, 10);
 	rect.right = rect.left + be_plain_font->StringWidth("Volume Icons")
-		+ B_V_SCROLL_BAR_WIDTH + 40.0f;
+		+ (float)B_V_SCROLL_BAR_WIDTH + 40.0f;
 	fSettingsTypeListView = new BListView(rect, "List View", B_SINGLE_SELECTION_LIST,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
 	BScrollView* scrollView = new BScrollView("scrollview", fSettingsTypeListView,

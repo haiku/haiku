@@ -32,6 +32,21 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
+#include "Attributes.h"
+#include "AutoLock.h"
+#include "Commands.h"
+#include "DialogPane.h"
+#include "FSUtils.h"
+#include "IconCache.h"
+#include "IconMenuItem.h"
+#include "InfoWindow.h"
+#include "Model.h"
+#include "NavMenu.h"
+#include "PoseView.h"
+#include "Tracker.h"
+#include "WidgetAttributeText.h"
+
 #include <Alert.h>
 #include <Debug.h>
 #include <Directory.h>
@@ -56,18 +71,6 @@ All rights reserved.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Attributes.h"
-#include "AutoLock.h"
-#include "Commands.h"
-#include "FSUtils.h"
-#include "IconCache.h"
-#include "IconMenuItem.h"
-#include "InfoWindow.h"
-#include "Model.h"
-#include "NavMenu.h"
-#include "PoseView.h"
-#include "Tracker.h"
-#include "WidgetAttributeText.h"
 
 namespace BPrivate {
 

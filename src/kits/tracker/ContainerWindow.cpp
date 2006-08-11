@@ -471,7 +471,7 @@ DraggableContainerIcon::FrameMoved(BPoint /*newLocation*/)
 	// This is a trick to get the actual width of all menu items
 	// (BMenuBar may not have set the item coordinates yet...)
 	float width, height;
-	int32 resizingMode = bar->ResizingMode();
+	uint32 resizingMode = bar->ResizingMode();
 	bar->SetResizingMode(B_FOLLOW_NONE);
 	bar->GetPreferredSize(&width, &height);
 	bar->SetResizingMode(resizingMode);
@@ -1068,11 +1068,23 @@ BContainerWindow::UpdateBackgroundImage()
 void
 BContainerWindow::FrameResized(float, float)
 {
-	if (PoseView()) {
+	if (PoseView() && dynamic_cast<BDeskWindow *>(this) == NULL) {
+		BRect extent = PoseView()->Extent();
+		if (extent.bottom < PoseView()->Bounds().bottom
+			&& fPreviousBounds.Height() < Bounds().Height()) {
+			PoseView()->ScrollBy(0, max_c(extent.bottom - PoseView()->Bounds().bottom,
+				fPreviousBounds.Height() - Bounds().Height()));
+		}
+		if (extent.right < PoseView()->Bounds().right
+			&& fPreviousBounds.Width() < Bounds().Width()) {
+			PoseView()->ScrollBy(max_c(extent.right - PoseView()->Bounds().right,
+				fPreviousBounds.Width() - Bounds().Width()), 0);
+		}
 		PoseView()->UpdateScrollRange();
 		PoseView()->ResetPosePlacementHint();
 	}
-	
+
+	fPreviousBounds = Bounds();
 	fStateNeedsSaving = true;
 }
 
@@ -1288,47 +1300,31 @@ BContainerWindow::ResizeToFit()
 
 	BRect frame(Frame());
 
+	float widthDiff = frame.Width() - PoseView()->Frame().Width();
+	float heightDiff = frame.Height() - PoseView()->Frame().Height();
+
 	// move frame left top on screen
 	BPoint leftTop(frame.LeftTop());
 	leftTop.ConstrainTo(screenFrame);
 	frame.OffsetTo(leftTop);
 
 	// resize to extent size
-	float menuHeight;
-	if (KeyMenuBar())
-		menuHeight = KeyMenuBar()->Bounds().Height();
-	else
-		menuHeight = 0;
-
 	BRect extent(PoseView()->Extent());
-	frame.right = frame.left + extent.Width() + (float)B_V_SCROLL_BAR_WIDTH + 1.0f;
-	frame.bottom = frame.top + extent.Height() + (float)B_H_SCROLL_BAR_HEIGHT + 1.0f
-		+ menuHeight;
+	frame.right = frame.left + extent.Width() + widthDiff;
+	frame.bottom = frame.top + extent.Height() + heightDiff;
 
-	if (PoseView()->ViewMode() == kListMode)
-		frame.bottom += kTitleViewHeight + 1;  // account for list titles
-	
-	TrackerSettings settings;
-	if (settings.SingleWindowBrowse()
-		&& settings.ShowNavigator()
-		&& Navigator())
-		frame.bottom += fNavigator->Bounds().bottom + 1;
-
-	// ToDo:
-	// clean this up, move each special case to respective class
-
-	if (!TargetModel())
-		frame.bottom += 60;						// Open with window
-	else if (TargetModel()->IsQuery())
-		frame.bottom += 15;						// account for query string
-	
 	// make sure entire window fits on screen
 	frame = frame & screenFrame;
 
 	ResizeTo(frame.Width(), frame.Height());
 	MoveTo(frame.LeftTop());
 	PoseView()->DisableScrollBars();
-	PoseView()->ScrollTo(extent.LeftTop());
+
+	if (PoseView()->Bounds().bottom > extent.bottom)
+		PoseView()->ScrollBy(0, extent.bottom - PoseView()->Bounds().bottom);
+	if (PoseView()->Bounds().right > extent.right)
+		PoseView()->ScrollBy(extent.right - PoseView()->Bounds().right, 0);
+
 	PoseView()->UpdateScrollRange();
 	PoseView()->EnableScrollBars();
 }
@@ -1501,6 +1497,16 @@ BContainerWindow::MessageReceived(BMessage *message)
 					TrackerSettings settings;
 					if (settings.ShowNavigator() || settings.ShowFullPathInTitleBar())
 						SetPathWatchingEnabled(true);
+
+					// Update draggable folder icon
+					BView *view = FindView("MenuBar");
+					if (view != NULL) {
+						view = view->FindView("ThisContainer");
+						if (view != NULL) {
+							IconCache::sIconCache->IconChanged(TargetModel());
+							view->Invalidate();
+						}
+					}
 
 					// Update window title
 					UpdateTitle();
@@ -3349,6 +3355,8 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode *node)
 		ResizeTo(frame.Width(), frame.Height());
 	} else
 		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+
+	fPreviousBounds = Bounds();
 
 	uint32 workspace;
 	if ((fContainerWindowFlags & kRestoreWorkspace)

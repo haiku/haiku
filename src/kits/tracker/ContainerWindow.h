@@ -274,6 +274,7 @@ class BContainerWindow : public BWindow {
 
 	private:
 		BRect fSavedZoomRect;
+		BRect fPreviousBounds;
 
 		static BRect sNewWindRect;
 

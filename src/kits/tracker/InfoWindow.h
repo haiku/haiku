@@ -31,18 +31,18 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef INFO_WINDOW_H
 #define INFO_WINDOW_H
+
 
 #include <String.h>
 #include <Window.h>
 #include <MessageFilter.h>
 
-#include "DialogPane.h"
 #include "FilePermissionsView.h"
 #include "LockingList.h"
 #include "Utilities.h"
+
 
 class BMenuField;
 

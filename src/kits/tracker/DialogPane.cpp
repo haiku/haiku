@@ -77,6 +77,7 @@ DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, int32 initialMode,
 	fMode2Frame(mode2Frame),
 	fMode3Frame(mode2Frame)
 {
+	SetMode(fMode, true);
 }
 
 
@@ -89,6 +90,7 @@ DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, BRect mode3Frame,
 	fMode2Frame(mode2Frame),
 	fMode3Frame(mode3Frame)
 {
+	SetMode(fMode, true);
 }
 
 
@@ -196,8 +198,6 @@ DialogPane::AttachedToWindow()
 		SetViewColor(parent->ViewColor());
 		SetLowColor(parent->LowColor());
 	}
-
-	SetMode(fMode, true);
 }
 
 
