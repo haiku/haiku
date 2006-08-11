@@ -25,15 +25,15 @@
 #ifndef _MOV_ATOM_H
 #define _MOV_ATOM_H
 
+#include "QTStructs.h"
+
 #include <File.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <SupportDefs.h>
 
-// Std Headers
-#include <map.h>
+#include <map>
 
-#include "QTStructs.h"
 
 /*
 AtomBase

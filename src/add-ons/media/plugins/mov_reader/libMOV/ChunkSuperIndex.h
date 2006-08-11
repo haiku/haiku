@@ -25,10 +25,11 @@
 #ifndef _CHUNK_INDEX_H
 #define _CHUNK_INDEX_H
 
+
 #include <SupportDefs.h>
 
-// Std Headers
-#include <map.h>
+#include <map>
+
 
 struct ChunkIndex {
 	uint32	stream;

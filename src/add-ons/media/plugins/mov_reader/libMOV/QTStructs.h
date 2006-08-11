@@ -22,6 +22,13 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef QT_STRUCTS_H
+#define QT_STRUCTS_H
+
+
+#include <SupportDefs.h>
+
+
 struct xxxx {
 	uint8	Version;
 	uint8	Flags1;
@@ -340,3 +347,6 @@ struct VideoDescriptionV0 {
 	uint8	*theVOL;
 	size_t VOLSize;
 };
+
+#endif	// QT_STRUCTS_H
+

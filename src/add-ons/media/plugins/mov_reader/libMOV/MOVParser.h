@@ -25,15 +25,16 @@
 #ifndef _MOV_PARSER_H
 #define _MOV_PARSER_H
 
+
+#include "MOVAtom.h"
+
 #include <File.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <SupportDefs.h>
 
-// Std Headers
-#include <map.h>
+#include <map>
 
-#include "MOVAtom.h"
 
 typedef SoundDescriptionV1* SoundDescPtr;
 typedef std::map<uint32, SoundDescPtr, std::less<uint32> > SoundDescArray;

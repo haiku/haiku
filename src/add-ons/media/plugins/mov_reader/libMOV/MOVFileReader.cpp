@@ -22,15 +22,19 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <iostream.h>
 
-#include <DataIO.h>
-#include <SupportKit.h>
 
 #include "MOVParser.h"
 #include "MOVFileReader.h"
 
+#include <DataIO.h>
+#include <SupportKit.h>
+
+#include <iostream>
+
+
 extern AtomBase *getAtom(BPositionIO *pStream);
+
 
 MOVFileReader::MOVFileReader(BPositionIO *pStream)
 {
@@ -549,36 +553,36 @@ const 	mov_stream_header	*MOVFileReader::StreamFormat(uint32 stream_index)
 	return &theStreamHeader;
 }
 
-uint32	MOVFileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
+
+uint32
+MOVFileReader::getChunkSize(uint32 streamIndex, uint32 frameNumber)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
-	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
+	if (aAtomBase == NULL)
+		return 0;
 
-		if (IsAudio(stream_index)) {
+	TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
-			// We read audio in chunk by chunk so chunk size is chunk size
-			uint32	ChunkNo 	= pFrameNo;
-			off_t	Chunk_Start = aTrakAtom->getOffsetForChunk(ChunkNo);
-			uint32	ChunkSize 	= ChunkSize = theChunkSuperIndex.getChunkSize(stream_index,ChunkNo,Chunk_Start);
-			
-			return ChunkSize;
+	if (IsAudio(streamIndex)) {
+		// We read audio in chunk by chunk so chunk size is chunk size
+		off_t chunkStart = aTrakAtom->getOffsetForChunk(frameNumber);
+		return theChunkSuperIndex.getChunkSize(streamIndex, frameNumber, chunkStart);
+	}
+
+	if (IsVideo(streamIndex)) {
+		if (frameNumber < aTrakAtom->FrameCount()) {
+			// We read video in Sample by Sample so chunk size is Sample Size
+			uint32 sampleNumber = aTrakAtom->getSampleForFrame(frameNumber);
+			return aTrakAtom->getSizeForSample(sampleNumber);
 		}
-		
-		if (IsVideo(stream_index)) {
-			if (pFrameNo < aTrakAtom->FrameCount()) {
-				// We read video in Sample by Sample so chunk size is Sample Size
-				uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-				return aTrakAtom->getSizeForSample(SampleNo);
-			}
-		}
-
 	}
 
 	return 0;
 }
 
-bool	MOVFileReader::IsKeyFrame(uint32 stream_index, uint32 pFrameNo)
+
+bool
+MOVFileReader::IsKeyFrame(uint32 stream_index, uint32 pFrameNo)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
 	if (aAtomBase) {
