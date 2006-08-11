@@ -170,3 +170,9 @@ FUNCTION(reset_dbats):
 	mtdbatl 3, %r3
 	blr
 
+/* void __eieio(void)
+ */
+FUNCTION(__eieio):
+	eieio
+	blr
+
