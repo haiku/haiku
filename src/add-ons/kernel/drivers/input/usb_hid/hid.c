@@ -717,6 +717,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	desc_len = hid_desc->descriptor_info[0].descriptor_length;
 	free(hid_desc);
+
 	rep_desc = malloc(desc_len);
 	if (rep_desc == NULL)
 		return B_NO_MEMORY;
@@ -754,7 +755,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	if ((status = usb->set_configuration (dev, conf)) != B_OK) {
 		DPRINTF_ERR((MY_ID "set_configuration() failed %d\n", (int)status));
-		free (rep_desc);
+		free(rep_desc);
 		return B_ERROR;
 	}
 
@@ -770,9 +771,9 @@ hid_device_added(const usb_device *dev, void **cookie)
 	num_items = desc_len;	/* XXX */
 	items = malloc(sizeof (decomp_item) * num_items);
 	if (items == NULL) {
-		// TODO: free device
+		remove_device(device);
 		free(rep_desc);
-		return B_ERROR;
+		return B_NO_MEMORY;
 	}
 
 	decompose_report_descriptor(rep_desc, desc_len, items, &num_items);
@@ -782,12 +783,23 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	device->num_insns = num_items;	/* XXX */
 	device->insns = malloc (sizeof (report_insn) * device->num_insns);
-	assert (device->insns != NULL);
+	if (device->insns == NULL) {
+		remove_device(device);
+		free(items);
+		return B_NO_MEMORY;
+	}
+
 	parse_report_descriptor (items, num_items, device->insns, 
 		&device->num_insns, &device->total_report_size, &report_id);
 	free(items);
+
 	device->insns = realloc(device->insns, sizeof (report_insn)
 		* device->num_insns);
+	if (device->insns == NULL) {
+		remove_device(device);
+		return B_NO_MEMORY;
+	}
+
 	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n", 
 		(int)num_items, (int)device->num_insns, (int)device->total_report_size));
 
