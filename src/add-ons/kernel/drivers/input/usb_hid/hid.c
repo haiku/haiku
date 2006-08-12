@@ -786,7 +786,8 @@ hid_device_added(const usb_device *dev, void **cookie)
 	parse_report_descriptor (items, num_items, device->insns, 
 		&device->num_insns, &device->total_report_size, &report_id);
 	free(items);
-	realloc(device->insns, sizeof (report_insn) * device->num_insns);
+	device->insns = realloc(device->insns, sizeof (report_insn)
+		* device->num_insns);
 	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n", 
 		(int)num_items, (int)device->num_insns, (int)device->total_report_size));
 
