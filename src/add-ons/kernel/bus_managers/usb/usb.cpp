@@ -19,6 +19,9 @@
 #endif
 
 
+Stack *gUSBStack = NULL;
+
+
 static int32
 bus_std_ops(int32 op, ...)
 {
@@ -28,20 +31,25 @@ bus_std_ops(int32 op, ...)
 			set_dprintf_enabled(true);
 			load_driver_symbols("usb");
 #endif
-			TRACE(("usb_nielx: bus module: init\n"));
+			TRACE(("usb_module: init\n"));
 
-			Stack *stack = new Stack();
+			Stack *stack = new(std::nothrow) Stack();
+			if (!stack)
+				return B_NO_MEMORY;
+
 			if (stack->InitCheck() != B_OK) {
 				delete stack;
 				return ENODEV;
 			}
 
+			gUSBStack = stack;
 			break;
 		}
 
 		case B_MODULE_UNINIT:
-			TRACE(("usb_nielx: bus module: uninit\n"));
-			delete usb_stack;
+			TRACE(("usb_module: bus module: uninit\n"));
+			delete gUSBStack;
+			gUSBStack = NULL;
 			break;
 
 		default:
@@ -52,6 +60,207 @@ bus_std_ops(int32 op, ...)
 }
 
 
+status_t
+register_driver(const char *driverName,
+	const usb_support_descriptor *descriptors,
+	size_t count, const char *optionalRepublishDriverName)
+{
+	return gUSBStack->RegisterDriver(driverName, descriptors, count,
+		optionalRepublishDriverName);
+}
+
+
+status_t
+install_notify(const char *driverName, const usb_notify_hooks *hooks)
+{
+	return gUSBStack->InstallNotify(driverName, hooks);
+}
+
+
+status_t
+uninstall_notify(const char *driverName)
+{
+	return gUSBStack->UninstallNotify(driverName);
+}
+
+
+const usb_device_descriptor *
+get_device_descriptor(const usb_device *device)
+{
+	if (!device)
+		return NULL;
+
+	return ((const Device *)device)->DeviceDescriptor();
+}
+
+
+const usb_configuration_info *
+get_nth_configuration(const usb_device *device, uint index)
+{
+	if (!device)
+		return NULL;
+
+	return ((const Device *)device)->ConfigurationAt((int32)index);
+}
+
+
+
+const usb_configuration_info *
+get_configuration(const usb_device *device)
+{
+	if (!device)
+		return NULL;
+
+	return ((const Device *)device)->Configuration();
+}
+
+
+status_t
+set_configuration(const usb_device *device,
+	const usb_configuration_info *configuration)
+{
+	if (!device)
+		return B_BAD_VALUE;
+
+	return ((Device *)device)->SetConfiguration(configuration);
+}
+
+
+status_t
+set_alt_interface(const usb_device *device,
+	const usb_interface_info *interface)
+{
+	return B_ERROR;
+}
+
+
+status_t
+set_feature(const void *object, uint16 selector)
+{
+	if (!object)
+		return B_BAD_VALUE;
+
+	return ((ControlPipe *)object)->SetFeature(selector);
+}
+
+
+status_t
+clear_feature(const void *object, uint16 selector)
+{
+	if (!object)
+		return B_BAD_VALUE;
+
+	return ((ControlPipe *)object)->ClearFeature(selector);
+}
+
+
+status_t
+get_status(const void *object, uint16 *status)
+{
+	if (!object || !status)
+		return B_BAD_VALUE;
+
+	return ((ControlPipe *)object)->GetStatus(status);
+}
+
+
+status_t
+get_descriptor(const usb_device *device, uint8 type, uint8 index,
+	uint16 languageID, void *data, size_t dataLength, size_t *actualLength)
+{
+	if (!device || !data)
+		return B_BAD_VALUE;
+
+	return ((Device *)device)->GetDescriptor(type, index, languageID,
+		data, dataLength, actualLength);
+}
+
+
+status_t
+send_request(const usb_device *device, uint8 requestType, uint8 request,
+	uint16 value, uint16 index, uint16 length, void *data, size_t dataLength,
+	size_t *actualLength)
+{
+	if (!device)
+		return B_BAD_VALUE;
+
+	return ((Device *)device)->SendRequest(requestType, request, value, index,
+		length, data, dataLength, actualLength);
+}
+
+
+status_t
+queue_request(const usb_device *device, uint8 requestType, uint8 request,
+	uint16 value, uint16 index, uint16 length, void *data, size_t dataLength,
+	usb_callback_func callback, void *callbackCookie)
+{
+	if (!device)
+		return B_BAD_VALUE;
+
+	return ((Device *)device)->QueueRequest(requestType, request, value, index,
+		length, data, dataLength, callback, callbackCookie);
+}
+
+
+status_t
+queue_interrupt(const usb_pipe *pipe, void *data, size_t dataLength,
+	usb_callback_func callback, void *callbackCookie)
+{
+	if (((Pipe *)pipe)->Type() != Pipe::Interrupt)
+		return B_BAD_VALUE;
+
+	return ((InterruptPipe *)pipe)->QueueInterrupt(data, dataLength, callback,
+		callbackCookie);
+}
+
+
+status_t
+queue_bulk(const usb_pipe *pipe, void *data, size_t dataLength,
+	usb_callback_func callback, void *callbackCookie)
+{
+	if (((Pipe *)pipe)->Type() != Pipe::Bulk)
+		return B_BAD_VALUE;
+
+	return ((BulkPipe *)pipe)->QueueBulk(data, dataLength, callback,
+		callbackCookie);
+}
+
+
+status_t
+queue_isochronous(const usb_pipe *pipe, void *data, size_t dataLength,
+	rlea *rleArray, uint16 bufferDurationMS, usb_callback_func callback,
+	void *callbackCookie)
+{
+	if (((Pipe *)pipe)->Type() != Pipe::Isochronous)
+		return B_BAD_VALUE;
+
+	return ((IsochronousPipe *)pipe)->QueueIsochronous(data, dataLength,
+		rleArray, bufferDurationMS, callback, callbackCookie);
+}
+
+
+status_t
+set_pipe_policy(const usb_pipe *pipe, uint8 maxQueuedPackets,
+	uint16 maxBufferDurationMS, uint16 sampleSize)
+{
+	return B_ERROR;
+}
+
+
+status_t
+cancel_queued_transfers(const usb_pipe *pipe)
+{
+	return ((Pipe *)pipe)->CancelQueuedTransfers();
+}
+
+
+status_t
+usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
 /*
 	This module exports the USB API 
 */
@@ -59,33 +268,33 @@ struct usb_module_info gModuleInfo = {
 	// First the bus_manager_info:
 	{
 		{
-			"bus_managers/usb/nielx",
+			B_USB_MODULE_NAME,
 			B_KEEP_LOADED,				// Keep loaded, even if no driver requires it
 			bus_std_ops
 		},
-		NULL 							// the rescan function
+		NULL							// the rescan function
 	},
 
-	NULL,								// register_driver
-	NULL,								// install_notify
-	NULL,								// uninstall_notify
-	NULL,								// get_device_descriptor
-	NULL,								// get_nth_configuration_info
-	NULL,								// get_configuration
-	NULL,								// set_configuration
-	NULL,								// set_alt_interface
-	NULL, 								// set_feature
-	NULL, 								// clear_feature
-	NULL, 								// get_status
-	NULL,								// get_descriptor
-	NULL,								// send_request
-	NULL,								// queue_interrupt
-	NULL,								// queue_bulk
-	NULL,								// queue_isochronous
-	NULL,								// queue_request
-	NULL,								// set_pipe_policy
-	NULL,								// cancel_queued_transfers
-	NULL 								// usb_ioctl
+	register_driver,					// register_driver
+	install_notify,						// install_notify
+	uninstall_notify,					// uninstall_notify
+	get_device_descriptor,				// get_device_descriptor
+	get_nth_configuration,				// get_nth_configuration
+	get_configuration,					// get_configuration
+	set_configuration,					// set_configuration
+	set_alt_interface,					// set_alt_interface
+	set_feature,						// set_feature
+	clear_feature, 						// clear_feature
+	get_status, 						// get_status
+	get_descriptor,						// get_descriptor
+	send_request,						// send_request
+	queue_interrupt,					// queue_interrupt
+	queue_bulk,							// queue_bulk
+	queue_isochronous,					// queue_isochronous
+	queue_request,						// queue_request
+	set_pipe_policy,					// set_pipe_policy
+	cancel_queued_transfers,			// cancel_queued_transfers
+	usb_ioctl							// usb_ioctl
 };
 
 

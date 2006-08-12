@@ -20,6 +20,7 @@
 
 
 Stack::Stack()
+	:	fDriverList(NULL)
 {
 	TRACE(("usb stack: stack init\n"));
 
@@ -30,9 +31,6 @@ Stack::Stack()
 	// Create the data lock
 	fDataLock = create_sem(1, "usb data lock");
 	set_sem_owner(fDataLock, B_SYSTEM_TEAM);
-
-	// Set the global "data" variable to this
-	usb_stack = this;
 
 	// Initialise the memory chunks: create 8, 16 and 32 byte-heaps
 	// NOTE: This is probably the most ugly code you will see in the
@@ -103,6 +101,27 @@ Stack::Stack()
 			chunk->next_item = NULL;
 	}
 
+	// 64-byte heap
+	fAreaFreeCount[3] = 0;
+	fAreas[3] = AllocateArea(&fLogical[3], &fPhysical[3], B_PAGE_SIZE,
+		"64-byte chunk area");
+
+	if (fAreas[3] < B_OK) {
+		TRACE(("usb stack: 64-byte chunk area failed to initialise\n"));
+		return;
+	}
+
+	fListhead64 = (addr_t)fLogical[3];
+	for (int32 i = 0; i < B_PAGE_SIZE / 64; i++) {
+		memory_chunk *chunk = (memory_chunk *)((addr_t)fLogical[3] + 64 * i);
+		chunk->physical = (addr_t)fPhysical[3] + 64 * i;
+
+		if (i < B_PAGE_SIZE / 64 - 1)
+			chunk->next_item = (addr_t)fLogical[3] + 64 * (i + 1);
+		else
+			chunk->next_item = NULL;
+	}
+
 	// Check for host controller modules
 	void *moduleList = open_module_list("busses/usb");
 	char moduleName[B_PATH_NAME_LENGTH];
@@ -152,10 +171,10 @@ Stack::InitCheck()
 }
 
 
-void
+bool
 Stack::Lock()
 {
-	acquire_sem(fMasterLock);
+	return (acquire_sem(fMasterLock) == B_OK);
 }
 
 
@@ -185,6 +204,8 @@ Stack::AllocateChunk(void **logicalAddress, void **physicalAddress, uint8 size)
 		listhead = fListhead16;
 	else if (size <= 32)
 		listhead = fListhead32;
+	else if (size <= 64)
+		listhead = fListhead64;
 	else {
 		TRACE(("usb stack: Chunk size %d to big\n", size));
 		Unlock();
@@ -215,6 +236,8 @@ Stack::AllocateChunk(void **logicalAddress, void **physicalAddress, uint8 size)
 		fListhead16 = listhead;
 	else if (size <= 32)
 		fListhead32 = listhead;
+	else if (size <= 64)
+		fListhead64 = listhead;
 
 	Unlock();
 	//TRACE(("usb stack: allocated a new chunk with size %u\n", size));
@@ -234,6 +257,8 @@ Stack::FreeChunk(void *logicalAddress, void *physicalAddress, uint8 size)
 		listhead = fListhead16;
 	else if (size <= 32)
 		listhead = fListhead32;
+	else if (size <= 64)
+		listhead = fListhead64;
 	else {
 		TRACE(("usb stack: Chunk size %d invalid\n", size));
 		Unlock();
@@ -250,6 +275,8 @@ Stack::FreeChunk(void *logicalAddress, void *physicalAddress, uint8 size)
 		fListhead16 = (addr_t)logicalAddress;
 	else if (size <= 32)
 		fListhead32 = (addr_t)logicalAddress;
+	else if (size <= 64)
+		fListhead64 = (addr_t)logicalAddress;
 
 	Unlock();
 	return B_OK;
@@ -293,4 +320,112 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 }
 
 
-Stack *usb_stack = NULL;
+void
+Stack::NotifyDeviceChange(Device *device, bool added)
+{
+	TRACE(("usb stack: device %s\n", added ? "added" : "removed"));
+
+	usb_driver_info *element = fDriverList;
+	while (element) {
+		if ((added && element->notify_hooks.device_added != NULL)
+			|| (!added && element->notify_hooks.device_removed != NULL)) {
+			device->ReportDevice(element->support_descriptors,
+				element->support_descriptor_count,
+				&element->notify_hooks, added);
+		}
+
+		element = element->link;
+	}
+}
+
+
+status_t
+Stack::RegisterDriver(const char *driverName,
+	const usb_support_descriptor *descriptors,
+	size_t descriptorCount, const char *republishDriverName)
+{
+	TRACE(("usb stack: register driver \"%s\"\n", driverName));
+	usb_driver_info *info = new(std::nothrow) usb_driver_info;
+	if (!info)
+		return B_NO_MEMORY;
+
+	info->driver_name = strdup(driverName);
+	info->republish_driver_name = strdup(republishDriverName);
+
+	size_t descriptorsSize = descriptorCount * sizeof(usb_support_descriptor);
+	info->support_descriptors = (usb_support_descriptor *)malloc(descriptorsSize);
+	memcpy(info->support_descriptors, descriptors, descriptorsSize);
+	info->support_descriptor_count = descriptorCount;
+
+	info->notify_hooks.device_added = NULL;
+	info->notify_hooks.device_removed = NULL;
+	info->link = NULL;
+
+	if (!Lock()) {
+		delete info;
+		return B_ERROR;
+	}
+
+	if (fDriverList) {
+		usb_driver_info *element = fDriverList;
+		while (element->link)
+			element = element->link;
+
+		element->link = info;
+	} else
+		fDriverList = info;
+
+	Unlock();
+	return B_OK;
+}
+
+
+status_t
+Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
+{
+	TRACE(("usb stack: installing notify hooks for driver \"%s\"\n", driverName));
+	usb_driver_info *element = fDriverList;
+	while (element) {
+		if (strcmp(element->driver_name, driverName) == 0) {
+			// inform driver about any already present devices
+			for (int32 i = 0; i < fBusManagers.Count(); i++) {
+				Hub *rootHub = fBusManagers.ElementAt(i)->GetRootHub();
+				if (rootHub) {
+					// Ensure that all devices are already recognized
+					rootHub->Explore();
+
+					// Report device will recurse down the whole tree
+					rootHub->ReportDevice(element->support_descriptors,
+						element->support_descriptor_count, hooks, true);
+				}
+			}
+
+			element->notify_hooks.device_added = hooks->device_added;
+			element->notify_hooks.device_removed = hooks->device_removed;
+			return B_OK;
+		}
+
+		element = element->link;
+	}
+
+	return B_NAME_NOT_FOUND;
+}
+
+
+status_t
+Stack::UninstallNotify(const char *driverName)
+{
+	TRACE(("usb stack: uninstalling notify hooks for driver \"%s\"\n", driverName));
+	usb_driver_info *element = fDriverList;
+	while (element) {
+		if (strcmp(element->driver_name, driverName) == 0) {
+			element->notify_hooks.device_added = NULL;
+			element->notify_hooks.device_removed = NULL;
+			return B_OK;
+		}
+
+		element = element->link;
+	}
+
+	return B_NAME_NOT_FOUND;
+}

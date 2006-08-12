@@ -19,75 +19,114 @@
 #endif
 
 
-usb_device_descriptor uhci_devd =
+static usb_device_descriptor sUHCIRootHubDevice =
 {
-	0x12,					//Descriptor size
-	USB_DESCRIPTOR_DEVICE,	//Type of descriptor
-	0x110,					//USB 1.1
-	0x09,					//Hub type
-	0,						//Subclass
-	0,						//Protocol
-	64,						//Max packet size
-	0,						//Vendor
-	0,						//Product
-	0x110,					//Version
-	1, 2, 0,				//Other data
-	1						//Number of configurations
+	18,								// Descriptor length
+	USB_DESCRIPTOR_DEVICE,			// Descriptor type
+	0x110,							// USB 1.1
+	0x09,							// Class (9 = Hub)
+	0,								// Subclass
+	0,								// Protocol
+	64,								// Max packet size on endpoint 0
+	0,								// Vendor ID
+	0,								// Product ID
+	0x110,							// Version
+	1,								// Index of manufacturer string
+	2,								// Index of product string
+	0,								// Index of serial number string
+	1								// Number of configurations
 };
 
 
-usb_configuration_descriptor uhci_confd =
+struct uhci_root_hub_configuration_s {
+	usb_configuration_descriptor	configuration;
+	usb_interface_descriptor		interface;
+	usb_endpoint_descriptor			endpoint;
+	usb_hub_descriptor				hub;
+} _PACKED;
+
+
+static uhci_root_hub_configuration_s sUHCIRootHubConfig =
 {
-	0x09,					//Size
-	USB_DESCRIPTOR_CONFIGURATION,
-	25,						//Total size (taken from BSD source)
-	1,						//Number interfaces
-	1,						//Value of configuration
-	0,						//Number of configuration
-	0x40,					//Self powered
-	0						//Max power (0, because of self power)
+	{ // configuration descriptor
+		9,								// Descriptor length
+		USB_DESCRIPTOR_CONFIGURATION,	// Descriptor type
+		34,								// Total length of configuration (including
+										// interface, endpoint and hub descriptors)
+		1,								// Number of interfaces
+		1,								// Value of this configuration
+		0,								// Index of configuration string
+		0x40,							// Attributes (0x40 = self powered)
+		0								// Max power (0, since self powered)
+	},
+
+	{ // interface descriptor
+		9,								// Descriptor length
+		USB_DESCRIPTOR_INTERFACE,		// Descriptor type
+		0,								// Interface number
+		0,								// Alternate setting
+		1,								// Number of endpoints
+		0x09,							// Interface class (9 = Hub)
+		0,								// Interface subclass
+		0,								// Interface protocol
+		0,								// Index of interface string
+	},
+
+	{ // endpoint descriptor
+		7,								// Descriptor length
+		USB_DESCRIPTOR_ENDPOINT,		// Descriptor type
+		USB_REQTYPE_DEVICE_IN | 1,		// Endpoint address (first in IN endpoint)
+		0x03,							// Attributes (0x03 = interrupt endpoint)
+		8,								// Max packet size
+		0xFF							// Interval
+	},
+
+	{ // hub descriptor
+		9,								// Descriptor length (including
+										// deprecated power control mask)
+		USB_DESCRIPTOR_HUB,				// Descriptor type
+		2,								// Number of ports
+		0x0000,							// Hub characteristics
+		50,								// Power on to power good (in 2ms units)
+		0,								// Maximum current (in mA)
+		0x00,							// Both ports are removable
+		0xff							// Depricated power control mask
+	}
 };
 
 
-usb_interface_descriptor uhci_intd =
-{
-	0x09,					//Size
-	USB_DESCRIPTOR_INTERFACE,
-	0,						//Interface number
-	0,						//Alternate setting
-	1,						//Num endpoints
-	0x09,					//Interface class
-	0,						//Interface subclass
-	0,						//Interface protocol
-	0,						//Interface
+struct uhci_root_hub_string_s {
+	uint8	length;
+	uint8	descriptor_type;
+	uint16	unicode_string[12];
 };
 
 
-usb_endpoint_descriptor uhci_endd =
-{
-	0x07,					//Size
-	USB_DESCRIPTOR_ENDPOINT,
-	USB_REQTYPE_DEVICE_IN | 1, //1 from freebsd driver
-	0x3,					// Interrupt
-	8,						// Max packet size
-	0xFF					// Interval 256
-};
+static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
+	{
+		4,								// Descriptor length
+		USB_DESCRIPTOR_STRING,			// Descriptor type
+		0x0409							// Supported language IDs (English US)
+	},
 
+	{
+		12,								// Descriptor length
+		USB_DESCRIPTOR_STRING,			// Descriptor type
+		'H', 'A', 'I', 'K', 'U', ' ',	// Characters
+		'I', 'n', 'c', '.'
+	},
 
-usb_hub_descriptor uhci_hubd =
-{
-	0x09,					//Including deprecated powerctrlmask
-	USB_DESCRIPTOR_HUB,
-	2,						//Number of ports
-	0x02 | 0x01,			//Hub characteristics FIXME
-	50,						//Power on to power good
-	0,						// Current
-	0x00					//Both ports are removable
+	{
+		26,								// Descriptor length
+		USB_DESCRIPTOR_STRING,			// Descriptor type
+		'U', 'H', 'C', 'I', ' ', 'R',	// Characters
+		'o', 'o', 't', 'H', 'u', 'b'
+	}
 };
 
 
 UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 devicenum)
-	:	Hub(uhci, NULL, uhci_devd, devicenum, false)
+	:	Hub(uhci, NULL, sUHCIRootHubDevice, devicenum, false)
 {
 	fUHCI = uhci;
 }
@@ -100,14 +139,14 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 	TRACE(("usb_uhci_roothub: rh_submit_packet called. request: %u\n", request->Request));
 
 	status_t result = B_ERROR;
-	switch(request->Request) {
+	switch (request->Request) {
 		case RH_GET_STATUS:
 			if (request->Index == 0) {
 				// Get the hub status -- everything as 0 means all-right
-				memset(transfer->Buffer(), 0, sizeof(get_status_buffer));
+				memset(transfer->Data(), 0, sizeof(get_status_buffer));
 				result = B_OK;
 				break;
-			} else if (request->Index > uhci_hubd.bNbrPorts) {
+			} else if (request->Index > sUHCIRootHubConfig.hub.bNbrPorts) {
 				// This port doesn't exist
 				result = EINVAL;
 				break;
@@ -115,11 +154,11 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 
 			// Get port status
 			UpdatePortStatus();
-			memcpy(transfer->Buffer(),
+			memcpy(transfer->Data(),
 				(void *)&fPortStatus[request->Index - 1],
-				transfer->BufferLength());
+				transfer->DataLength());
 
-			*(transfer->ActualLength()) = transfer->BufferLength();
+			*(transfer->ActualLength()) = transfer->DataLength();
 			result = B_OK;
 			break;
 
@@ -136,37 +175,54 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 		case RH_GET_DESCRIPTOR:
 			TRACE(("usb_uhci_roothub: rh_submit_packet GET_DESC: %d\n", request->Value));
 
-			switch (request->Value) {
-				case RH_DEVICE_DESCRIPTOR:
-					memcpy(transfer->Buffer(), (void *)&uhci_devd,
-						transfer->BufferLength());
-					*(transfer->ActualLength()) = transfer->BufferLength(); 
+			switch (request->Value & 0xff00) {
+				case RH_DEVICE_DESCRIPTOR: {
+					size_t length = MIN(sizeof(usb_device_descriptor),
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sUHCIRootHubDevice,
+						length);
+					*(transfer->ActualLength()) = length; 
 					result = B_OK;
 					break;
-				case RH_CONFIG_DESCRIPTOR:
-					memcpy(transfer->Buffer(), (void *)&uhci_confd,
-						transfer->BufferLength());
-					*(transfer->ActualLength()) = transfer->BufferLength();
+				}
+
+				case RH_CONFIG_DESCRIPTOR: {
+					size_t length = MIN(sizeof(uhci_root_hub_configuration_s),
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sUHCIRootHubConfig,
+						length);
+					*(transfer->ActualLength()) = length;
 					result =  B_OK;
 					break;
-				case RH_INTERFACE_DESCRIPTOR:
-					memcpy(transfer->Buffer(), (void *)&uhci_intd,
-						transfer->BufferLength());
-					*(transfer->ActualLength()) = transfer->BufferLength();
-					result = B_OK ;
-					break;
-				case RH_ENDPOINT_DESCRIPTOR:
-					memcpy(transfer->Buffer(), (void *)&uhci_endd,
-						transfer->BufferLength());
-					*(transfer->ActualLength()) = transfer->BufferLength();
-					result = B_OK ;
-					break;
-				case RH_HUB_DESCRIPTOR:
-					memcpy(transfer->Buffer(), (void *)&uhci_hubd,
-						transfer->BufferLength());
-					*(transfer->ActualLength()) = transfer->BufferLength();
+				}
+
+				case RH_STRING_DESCRIPTOR: {
+					uint8 index = request->Value & 0x00ff;
+					if (index > 2) {
+						*(transfer->ActualLength()) = 0;
+						result = EINVAL;
+						break;
+					}
+
+					size_t length = MIN(sUHCIRootHubStrings[index].length,
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sUHCIRootHubStrings[index],
+						length);
+					*(transfer->ActualLength()) = length;
 					result = B_OK;
 					break;
+				}
+
+				case RH_HUB_DESCRIPTOR: {
+					size_t length = MIN(sizeof(usb_hub_descriptor),
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sUHCIRootHubConfig.hub,
+						length);
+					*(transfer->ActualLength()) = length;
+					result = B_OK;
+					break;
+				}
+
 				default:
 					result = EINVAL;
 					break;
@@ -183,7 +239,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE no hub changes!\n"));
 				result = EINVAL;
 				break;
-			} else if (request->Index > uhci_hubd.bNbrPorts) {
+			} else if (request->Index > sUHCIRootHubConfig.hub.bNbrPorts) {
 				// Invalid port number
 				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE invalid port!\n"));
 				result = EINVAL;
@@ -217,7 +273,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 				TRACE(("usb_uhci_roothub: RH_SET_FEATURE no hub changes!\n"));
 				result = EINVAL;
 				break;
-			} else if (request->Index > uhci_hubd.bNbrPorts) {
+			} else if (request->Index > sUHCIRootHubConfig.hub.bNbrPorts) {
 				// Invalid port number
 				TRACE(("usb_uhci_roothub: RH_SET_FEATURE invalid port!\n"));
 				result = EINVAL;
@@ -256,7 +312,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 void
 UHCIRootHub::UpdatePortStatus()
 {
-	for (int32 i = 0; i < uhci_hubd.bNbrPorts; i++) {
+	for (int32 i = 0; i < sUHCIRootHubConfig.hub.bNbrPorts; i++) {
 		uint16 newStatus = 0;
 		uint16 newChange = 0;
 

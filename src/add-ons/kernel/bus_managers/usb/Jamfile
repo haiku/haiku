@@ -12,6 +12,7 @@ KernelStaticLibrary libusb.a :
 	BusManager.cpp
 	Transfer.cpp
 	Pipe.cpp
+	Interface.cpp
 	: -fno-pic
 ;	
 

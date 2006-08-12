@@ -12,6 +12,7 @@
 
 #include "usb_p.h"
 #include "uhci_hardware.h"
+#include <lock.h>
 
 struct pci_info;
 struct pci_module_info;
@@ -45,10 +46,7 @@ private:
 		uhci_qh						*fQueueHead;
 		uhci_td						*fStrayDescriptor;
 		uhci_td						*fQueueTop;
-
-		// Benaphore locking
-		sem_id						fLockSem;
-		int32						fLockAtom;
+		benaphore					fLock;
 };
 
 
@@ -133,10 +131,7 @@ static	pci_module_info				*sPCIModule;
 		uint32						fRegisterBase;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
-
-		// Benaphore locking
-		sem_id						fLockSem;
-		int32						fLockAtom;
+		benaphore					fUHCILock;
 
 		// Frame list memory
 		area_id						fFrameArea;

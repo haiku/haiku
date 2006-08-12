@@ -35,10 +35,13 @@ BusManager::BusManager()
 		fDeviceMap[i] = false;
 
 	// Set up the default pipes
-	fDefaultPipe = new ControlPipe(this, 0, Pipe::Default, Pipe::NormalSpeed,
-		0, 8);
-	fDefaultPipeLowSpeed = new ControlPipe(this, 0, Pipe::Default,
-		Pipe::LowSpeed, 0, 8);
+	fDefaultPipe = new(std::nothrow) ControlPipe(this, 0, Pipe::NormalSpeed, 0, 8);
+	if (!fDefaultPipe)
+		return;
+
+	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(this, 0, Pipe::LowSpeed, 0, 8);
+	if (!fDefaultPipeLowSpeed)
+		return;
 
 	fExploreThread = -1; 
 	fInitOK = true;
@@ -97,7 +100,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 
 	// Set the address of the device USB 1.1 spec p202
 	status_t result = defaultPipe->SendRequest(
-		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
+		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,		// type
 		USB_REQUEST_SET_ADDRESS,							// request
 		deviceAddress,										// value
 		0,													// index
@@ -115,7 +118,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	snooze(10000);
 
 	// Create a temporary pipe with the new address
-	ControlPipe pipe(this, deviceAddress, Pipe::Default,
+	ControlPipe pipe(this, deviceAddress,
 		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 0, 8);
 
 	// Get the device descriptor
@@ -153,19 +156,42 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("usb BusManager::AllocateNewDevice(): creating new hub\n"));
-		Device *ret = new Hub(this, parent, deviceDescriptor, deviceAddress,
-			lowSpeed);
+		Hub *hub = new(std::nothrow) Hub(this, parent, deviceDescriptor,
+			deviceAddress, lowSpeed);
+		if (!hub) {
+			TRACE(("usb BusManager::AllocateNewDevice(): no memory to allocate hub\n"));
+			return NULL;
+		}
+
+		if (hub->InitCheck() < B_OK) {
+			TRACE(("usb BusManager::AllocateNewDevice(): hub failed init check\n"));
+			delete hub;
+			return NULL;
+		}
 
 		if (parent == NULL) {
 			// root hub
-			fRootHub = ret;
+			fRootHub = hub;
 		}
 
-		return ret;
+		return (Device *)hub;
 	}
 
 	TRACE(("usb BusManager::AllocateNewDevice(): creating new device\n"));
-	return new Device(this, parent, deviceDescriptor, deviceAddress, lowSpeed);
+	Device *device = new(std::nothrow) Device(this, parent, deviceDescriptor,
+		deviceAddress, lowSpeed);
+	if (!device) {
+		TRACE(("usb BusManager::AllocateNewDevice(): no memory to allocate device\n"));
+		return NULL;
+	}
+
+	if (device->InitCheck() < B_OK) {
+		TRACE(("usb BusManager::AllocateNewDevice(): device failed init check\n"));
+		delete device;
+		return NULL;
+	}
+
+	return device;
 }
 
 

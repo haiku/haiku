@@ -115,6 +115,7 @@ typedef struct
 #define TD_DEPTH_FIRST			0x4
 #define TD_TERMINATE			0x1
 #define TD_ERROR_MASK			0x7e0000
+#define	TD_LINK_MASK			0xfffffff0
 
 //Represents a Queue Head (QH)
 
@@ -126,7 +127,6 @@ typedef struct
 	// Software part
 	addr_t this_phy;		//The physical pointer to this address
 	void * link_log;		//Link to the next TD/QH logical
-	void * element_log;		//
 } uhci_qh;
 
 #define QH_TERMINATE    0x1
@@ -143,11 +143,10 @@ typedef struct
 #define RH_SET_CONFIG 9
 
 //Descriptors (in usb_request_data->Value)
-#define RH_DEVICE_DESCRIPTOR ( 1 << 8 )
-#define RH_CONFIG_DESCRIPTOR ( 2 << 8 )
-#define RH_INTERFACE_DESCRIPTOR ( 4 << 8 )
-#define RH_ENDPOINT_DESCRIPTOR ( 5 << 8 )
-#define RH_HUB_DESCRIPTOR ( 0x29 << 8 )
+#define RH_DEVICE_DESCRIPTOR	(0x01 << 8)
+#define RH_CONFIG_DESCRIPTOR	(0x02 << 8)
+#define	RH_STRING_DESCRIPTOR	(0x03 << 8)
+#define RH_HUB_DESCRIPTOR		(0x29 << 8)
 
 //Hub/Portstatus buffer
 typedef struct

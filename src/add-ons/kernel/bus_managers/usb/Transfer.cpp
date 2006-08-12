@@ -10,16 +10,19 @@
 
 
 Transfer::Transfer(Pipe *pipe, bool synchronous)
+	:	fPipe(pipe),
+		fData(NULL),
+		fDataLength(0),
+		fActualLength(NULL),
+		fOwnActualLength(0),
+		fStatus(B_NO_INIT),
+		fCallback(NULL),
+		fCallbackCookie(NULL),
+		fSem(-1),
+		fHostPrivate(NULL),
+		fRequestData(NULL)
 {
-	fPipe = pipe;
-	fBuffer = NULL;
-	fBufferLength = 0;
-	fActualLength = NULL;
-	fStatus = B_NO_INIT;
-	fSem = -1;
-	fHostPrivate = NULL;
-	fCallback = NULL;
-
+	fActualLength = &fOwnActualLength;
 	if (synchronous) {
 		fSem = create_sem(0, "USB Transfer");
 		set_sem_owner(fSem, B_SYSTEM_TEAM);
@@ -37,21 +40,15 @@ Transfer::~Transfer()
 void
 Transfer::SetRequestData(usb_request_data *data)
 {
-	fRequest = data;
+	fRequestData = data;
 }
 
 
 void
-Transfer::SetBuffer(uint8 *buffer)
+Transfer::SetData(uint8 *data, size_t dataLength)
 {
-	fBuffer = buffer;
-}
-
-
-void
-Transfer::SetBufferLength(size_t length)
-{
-	fBufferLength = length;
+	fData = data;
+	fDataLength = dataLength;
 }
 
 
@@ -63,7 +60,7 @@ Transfer::SetActualLength(size_t *actualLength)
 
 
 void
-Transfer::SetCallbackFunction(usb_callback_func callback, void *cookie)
+Transfer::SetCallback(usb_callback_func callback, void *cookie)
 {
 	fCallback = callback;
 	fCallbackCookie = cookie;
@@ -98,11 +95,15 @@ Transfer::Finished(status_t result)
 {
 	fStatus = result;
 
-	// If we are synchronous, release the sem
-	if (fSem > B_OK)
-		release_sem(fSem);
+	// Call the callback function ...
+	if (fCallback) {
+		fCallback(fCallbackCookie, fStatus, fData, *fActualLength);
+		return;
+	}
 
-	// ToDo: implement callback correctly
-	if (fCallback)
-		fCallback(fCallbackCookie, fStatus, fBuffer, 0);
+	// ... or release the sem
+	if (fSem > B_OK) {
+		release_sem(fSem);
+		return;
+	}
 }

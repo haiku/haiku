@@ -31,50 +31,45 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	// Set to false again for the hub init.
 	fInitOK = false; 
 
-	if (fDeviceDescriptor.device_subclass != 0
+	for (int32 i = 0; i < 8; i++)
+		fChildren[i] = NULL;
+
+	if (fDeviceDescriptor.device_class != 9
+		|| fDeviceDescriptor.device_subclass != 0
 		|| fDeviceDescriptor.device_protocol != 0) {
 		TRACE(("USB Hub: wrong class/subclass/protocol! Bailing out\n"));
 		return;
 	}
 
-	if (fCurrentConfiguration->number_interfaces > 1) {
+	if (Configuration()->descr->number_interfaces > 1) {
 		TRACE(("USB Hub: too many interfaces\n"));
 		return;
 	}
 
-	size_t actualLength;
-	if (GetDescriptor(USB_DESCRIPTOR_INTERFACE, 0, (void *)&fInterruptInterface,
-		sizeof(usb_interface_descriptor)) != sizeof(usb_interface_descriptor)) {
-		TRACE(("USB Hub: error getting the interrupt interface\n"));
-		return;
-	}
-
-	if (fInterruptInterface.num_endpoints > 1) {
+	fInterruptInterface = Configuration()->interface->active->descr;
+	if (fInterruptInterface->num_endpoints > 1) {
 		TRACE(("USB Hub: too many endpoints\n"));
 		return;
 	}
 
-	if (GetDescriptor(USB_DESCRIPTOR_ENDPOINT, 0, (void *)&fInterruptEndpoint,
-		sizeof(usb_endpoint_descriptor)) != sizeof(usb_endpoint_descriptor)) {
-		TRACE(("USB Hub: Error getting the endpoint\n"));
-		return;
-	}
-
-	if (fInterruptEndpoint.attributes != 0x03) { // interrupt transfer
+	fInterruptEndpoint = Configuration()->interface->active->endpoint[0].descr;
+	if (fInterruptEndpoint->attributes != 0x03) { // interrupt endpoint
 		TRACE(("USB Hub: Not an interrupt endpoint\n"));
 		return;
 	}
 
 	TRACE(("USB Hub: Getting hub descriptor...\n"));
-	if (GetDescriptor(USB_DESCRIPTOR_HUB, 0, (void *)&fHubDescriptor,
-		sizeof(usb_hub_descriptor)) != sizeof(usb_hub_descriptor)) {
+	size_t actualLength;
+	status_t status = GetDescriptor(USB_DESCRIPTOR_HUB, 0, 0,
+		(void *)&fHubDescriptor, sizeof(usb_hub_descriptor), &actualLength);
+	if (status < B_OK || actualLength != sizeof(usb_hub_descriptor)) {
 		TRACE(("USB Hub: Error getting hub descriptor\n"));
 		return;
 	}
 
 	// Enable port power on all ports
 	for (int32 i = 0; i < fHubDescriptor.bNbrPorts; i++) {
-		fDefaultPipe->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+		SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 			USB_REQUEST_SET_FEATURE,
 			PORT_POWER, 
 			i + 1,
@@ -85,7 +80,7 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	}
 
 	// Wait for power to stabilize
-	snooze(fHubDescriptor.bPwrOn2PwrGood * 2);
+	snooze(fHubDescriptor.bPwrOn2PwrGood * 2000);
 
 	fInitOK = true;
 	TRACE(("USB Hub: initialised ok\n"));
@@ -99,7 +94,7 @@ Hub::Explore()
 		size_t actualLength;
 
 		// Get the current port status
-		fDefaultPipe->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN,
+		SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN,
 			USB_REQUEST_GET_STATUS,
 			0,
 			i + 1,
@@ -117,7 +112,7 @@ Hub::Explore()
 
 		// We need to test the port change against a number of things
 		if (fPortStatus[i].status & PORT_RESET) {
-			fDefaultPipe->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+			SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE,
 				PORT_RESET,
 				i + 1,
@@ -133,7 +128,7 @@ Hub::Explore()
 
 				if ((fPortStatus[i].status & PORT_STATUS_ENABLE) == 0) {
 					// enable the port if it isn't
-					fDefaultPipe->SendRequest(
+					SendRequest(
 						USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 						USB_REQUEST_SET_FEATURE,
 						PORT_ENABLE, 
@@ -146,22 +141,25 @@ Hub::Explore()
 
 				TRACE(("USB Hub: Explore(): New device connected\n"));
 
-				Device *newDevice;
-				if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
-					newDevice = fBus->AllocateNewDevice(this, true);
-				else
-					newDevice = fBus->AllocateNewDevice(this, false);
+				Device *newDevice = fBus->AllocateNewDevice(this,
+					(fPortStatus[i].status & PORT_STATUS_LOW_SPEED) > 0);
 
-				if (newDevice)
+				if (newDevice) {
 					fChildren[i] = newDevice;
+					Manager()->GetStack()->NotifyDeviceChange(fChildren[i], true);
+				}
 			} else {
 				// Device removed...
-				// ToDo: do something
 				TRACE(("USB Hub Explore(): Device removed\n"));
+				if (fChildren[i]) {
+					Manager()->GetStack()->NotifyDeviceChange(fChildren[i], false);
+					delete fChildren[i];
+					fChildren[i] = NULL;
+				}
 			}
 
 			// Clear status change
-			fDefaultPipe->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+			SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE,
 				C_PORT_CONNECTION, 
 				i + 1,
@@ -170,5 +168,41 @@ Hub::Explore()
 				0,
 				NULL);
 		}
+	}
+}
+
+
+status_t
+Hub::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
+	void *data, size_t dataLength, size_t *actualLength)
+{
+	return SendRequest(
+		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_CLASS,			// type
+		USB_REQUEST_GET_DESCRIPTOR,							// request
+		(descriptorType << 8) | index,						// value
+		languageID,											// index
+		dataLength,											// length										
+		data,												// buffer
+		dataLength,											// buffer length
+		actualLength);										// actual length
+}			
+
+
+void
+Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
+	uint32 supportDescriptorCount, const usb_notify_hooks *hooks, bool added)
+{
+	TRACE(("USB Hub ReportDevice\n"));
+
+	// Report ourselfs first
+	Device::ReportDevice(supportDescriptors, supportDescriptorCount, hooks, added);
+
+	// Then report all of our children
+	for (int32 i = 0; i < fHubDescriptor.bNbrPorts; i++) {
+		if (!fChildren[i])
+			continue;
+
+		fChildren[i]->ReportDevice(supportDescriptors,
+				supportDescriptorCount, hooks, added);
 	}
 }
