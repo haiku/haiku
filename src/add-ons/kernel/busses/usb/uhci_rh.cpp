@@ -140,13 +140,13 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 
 	status_t result = B_ERROR;
 	switch (request->Request) {
-		case RH_GET_STATUS:
+		case RH_GET_STATUS: {
 			if (request->Index == 0) {
 				// Get the hub status -- everything as 0 means all-right
 				memset(transfer->Data(), 0, sizeof(get_status_buffer));
 				result = B_OK;
 				break;
-			} else if (request->Index > sUHCIRootHubConfig.hub.bNbrPorts) {
+			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
 				// This port doesn't exist
 				result = EINVAL;
 				break;
@@ -154,13 +154,15 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 
 			// Get port status
 			UpdatePortStatus();
-			memcpy(transfer->Data(),
-				(void *)&fPortStatus[request->Index - 1],
-				transfer->DataLength());
 
-			*(transfer->ActualLength()) = transfer->DataLength();
+			size_t length = MIN(4, transfer->DataLength());
+			memcpy(transfer->Data(),
+				(void *)&fPortStatus[request->Index - 1], length);
+
+			*(transfer->ActualLength()) = length;
 			result = B_OK;
 			break;
+		}
 
 		case RH_SET_ADDRESS:
 			if (request->Value >= 128) {
@@ -239,7 +241,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE no hub changes!\n"));
 				result = EINVAL;
 				break;
-			} else if (request->Index > sUHCIRootHubConfig.hub.bNbrPorts) {
+			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
 				// Invalid port number
 				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE invalid port!\n"));
 				result = EINVAL;
@@ -249,10 +251,9 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE called. Feature: %u!\n", request->Value));
 			uint16 status;
 			switch(request->Value) {
-				case PORT_RESET:
-					status = fUHCI->PortStatus(request->Index - 1);
-					result = fUHCI->SetPortStatus(request->Index - 1,
-						status & UHCI_PORTSC_DATAMASK & ~UHCI_PORTSC_RESET);
+				case C_PORT_RESET:
+					fUHCI->SetPortResetChange(request->Index - 1, false);
+					result = B_OK;
 					break;
 
 				case C_PORT_CONNECTION:
@@ -273,7 +274,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 				TRACE(("usb_uhci_roothub: RH_SET_FEATURE no hub changes!\n"));
 				result = EINVAL;
 				break;
-			} else if (request->Index > sUHCIRootHubConfig.hub.bNbrPorts) {
+			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
 				// Invalid port number
 				TRACE(("usb_uhci_roothub: RH_SET_FEATURE invalid port!\n"));
 				result = EINVAL;
@@ -281,17 +282,16 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			}
 
 			TRACE(("usb_uhci_roothub: RH_SET_FEATURE called. Feature: %u!\n", request->Value));
-			uint16 status;
 			switch(request->Value) {
 				case PORT_RESET:
 					result = fUHCI->ResetPort(request->Index - 1);
 					break;
 
-				case PORT_ENABLE:
-					status = fUHCI->PortStatus(request->Index - 1);
-					result = fUHCI->SetPortStatus(request->Index - 1,
-						(status & UHCI_PORTSC_DATAMASK) | UHCI_PORTSC_ENABLED);
+				case PORT_POWER:
+					// the ports are automatically powered
+					result = B_OK;
 					break;
+
 				default:
 					result = EINVAL;
 					break;
@@ -312,7 +312,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 void
 UHCIRootHub::UpdatePortStatus()
 {
-	for (int32 i = 0; i < sUHCIRootHubConfig.hub.bNbrPorts; i++) {
+	for (int32 i = 0; i < sUHCIRootHubConfig.hub.num_ports; i++) {
 		uint16 newStatus = 0;
 		uint16 newChange = 0;
 
@@ -336,8 +336,8 @@ UHCIRootHub::UpdatePortStatus()
 
 		if (portStatus & UHCI_PORTSC_RESET)
 			newStatus |= PORT_STATUS_RESET;
-
-		//TODO: work out reset change...
+		if (fUHCI->PortResetChange(i))
+			newChange |= PORT_STATUS_RESET;
 
 		//The port is automagically powered on
 		newStatus |= PORT_POWER;

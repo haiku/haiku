@@ -10,6 +10,7 @@
 #ifndef _USB_P_
 #define _USB_P_
 
+#include <lock.h>
 #include "usbspec_p.h"
 
 
@@ -76,9 +77,7 @@ public:
 private:
 		Vector<BusManager *>			fBusManagers;
 
-		sem_id							fMasterLock;
-		sem_id							fDataLock;
-
+		benaphore						fLock;
 		area_id							fAreas[USB_MAX_AREAS];
 		void							*fLogical[USB_MAX_AREAS];
 		void							*fPhysical[USB_MAX_AREAS];
@@ -359,6 +358,8 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 											void *data, size_t dataLength,
 											size_t *actualLength);
 
+		status_t						UpdatePortStatus(uint8 index);
+		status_t						ResetPort(uint8 index);
 		void							Explore();
 
 virtual	void							ReportDevice(
@@ -413,7 +414,7 @@ public:
 										void *cookie);
 
 		status_t					WaitForFinish();
-		void						Finished(status_t result);
+		void						Finished(uint32 status);
 
 private:
 		// Data that is related to the transfer
@@ -422,7 +423,7 @@ private:
 		size_t						fDataLength;
 		size_t						*fActualLength;
 		size_t						fOwnActualLength;
-		status_t					fStatus;
+		uint32						fStatus;
 
 		usb_callback_func			fCallback;
 		void						*fCallbackCookie;

@@ -62,84 +62,132 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	size_t actualLength;
 	status_t status = GetDescriptor(USB_DESCRIPTOR_HUB, 0, 0,
 		(void *)&fHubDescriptor, sizeof(usb_hub_descriptor), &actualLength);
-	if (status < B_OK || actualLength != sizeof(usb_hub_descriptor)) {
+
+	// we need at least 8 bytes
+	if (status < B_OK || actualLength < 8) {
 		TRACE(("USB Hub: Error getting hub descriptor\n"));
 		return;
 	}
 
+	TRACE(("USB Hub: Hub descriptor (%d bytes):\n", actualLength));
+	TRACE(("\tlength:..............%d\n", fHubDescriptor.length));
+	TRACE(("\tdescriptor_type:.....0x%02x\n", fHubDescriptor.descriptor_type));
+	TRACE(("\tnum_ports:...........%d\n", fHubDescriptor.num_ports));
+	TRACE(("\tcharacteristics:.....0x%04x\n", fHubDescriptor.characteristics));
+	TRACE(("\tpower_on_to_power_g:.%d\n", fHubDescriptor.power_on_to_power_good));
+	TRACE(("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable));
+	TRACE(("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask));
+
 	// Enable port power on all ports
-	for (int32 i = 0; i < fHubDescriptor.bNbrPorts; i++) {
-		SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
-			USB_REQUEST_SET_FEATURE,
-			PORT_POWER, 
-			i + 1,
-			0,
-			NULL,
-			0,
-			&actualLength);
+	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+		status = SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+			USB_REQUEST_SET_FEATURE, PORT_POWER, i + 1, 0, NULL, 0, NULL);
+
+		if (status < B_OK)
+			TRACE(("USB Hub: power up failed on port %d\n", i));
 	}
 
 	// Wait for power to stabilize
-	snooze(fHubDescriptor.bPwrOn2PwrGood * 2000);
+	snooze(fHubDescriptor.power_on_to_power_good * 2000);
 
 	fInitOK = true;
 	TRACE(("USB Hub: initialised ok\n"));
 }
 
 
+status_t
+Hub::UpdatePortStatus(uint8 index)
+{
+	// get the current port status
+	size_t actualLength = 0;
+	status_t result = SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN,
+		USB_REQUEST_GET_STATUS, 0, index + 1, 4, (void *)&fPortStatus[index],
+		4, &actualLength);
+
+	if (result < B_OK || actualLength < 4) {
+		TRACE(("USB Hub: error updating port status\n"));
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Hub::ResetPort(uint8 index)
+{
+	status_t result = SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+		USB_REQUEST_SET_FEATURE, PORT_RESET, index + 1, 0, NULL, 0, NULL);
+
+	if (result < B_OK)
+		return result;
+
+	for (int32 i = 0; i < 10; i++) {
+		snooze(USB_DELAY_PORT_RESET);
+
+		result = UpdatePortStatus(index);
+		if (result < B_OK)
+			return result;
+
+		if ((fPortStatus[index].status & PORT_STATUS_CONNECTION) == 0) {
+			// device disappeared, this is no error
+			TRACE(("USB Hub: device disappeared on reset\n"));
+			return B_OK;
+		}
+
+		if (fPortStatus[index].change & C_PORT_RESET) {
+			// reset is done
+			break;
+		}
+	}
+
+	if ((fPortStatus[index].change & C_PORT_RESET) == 0) {
+		TRACE(("USB Hub: port %d won't reset\n", index));
+		return B_ERROR;
+	}
+
+	// clear the reset change
+	result = SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+		USB_REQUEST_CLEAR_FEATURE, C_PORT_RESET, index + 1, 0, NULL, 0, NULL);
+	if (result < B_OK)
+		return result;
+
+	// wait for reset recovery
+	snooze(USB_DELAY_PORT_RESET_RECOVERY);
+	TRACE(("USB Hub: port %d was reset successfully\n", index));
+	return B_OK;
+}
+
+
 void
 Hub::Explore()
 {
-	for (int32 i = 0; i < fHubDescriptor.bNbrPorts; i++) {
-		size_t actualLength;
-
-		// Get the current port status
-		SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN,
-			USB_REQUEST_GET_STATUS,
-			0,
-			i + 1,
-			4,
-			(void *)&fPortStatus[i],
-			4,
-			&actualLength);
-
-		if (actualLength < 4) {
-			TRACE(("USB Hub: error getting port status\n"));
-			return;
-		}
-
-		//TRACE(("status: 0x%04x; change: 0x%04x\n", fPortStatus[i].status, fPortStatus[i].change));
-
-		// We need to test the port change against a number of things
-		if (fPortStatus[i].status & PORT_RESET) {
-			SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
-				USB_REQUEST_CLEAR_FEATURE,
-				PORT_RESET,
-				i + 1,
-				0,
-				NULL,
-				0,
-				&actualLength);
-		}
+	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+		status_t result = UpdatePortStatus(i);
+		if (result < B_OK)
+			continue;
 
 		if (fPortStatus[i].change & PORT_STATUS_CONNECTION) {
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
-				// New device attached!
-
-				if ((fPortStatus[i].status & PORT_STATUS_ENABLE) == 0) {
-					// enable the port if it isn't
-					SendRequest(
-						USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
-						USB_REQUEST_SET_FEATURE,
-						PORT_ENABLE, 
-						i + 1,
-						0,
-						NULL,
-						0,
-						NULL);
-		        }
-
+				// new device attached!
 				TRACE(("USB Hub: Explore(): New device connected\n"));
+
+				// wait some time for the device to power up
+				snooze(USB_DELAY_DEVICE_POWER_UP);
+
+				// reset the port, this will also enable it
+				result = ResetPort(i);
+				if (result < B_OK)
+					continue;
+
+				result = UpdatePortStatus(i);
+				if (result < B_OK)
+					continue;
+
+				if ((fPortStatus[i].status & PORT_STATUS_CONNECTION) == 0) {
+					// device has vanished after reset, ignore
+					continue;
+				}
 
 				Device *newDevice = fBus->AllocateNewDevice(this,
 					(fPortStatus[i].status & PORT_STATUS_LOW_SPEED) > 0);
@@ -147,6 +195,13 @@ Hub::Explore()
 				if (newDevice) {
 					fChildren[i] = newDevice;
 					Manager()->GetStack()->NotifyDeviceChange(fChildren[i], true);
+				} else {
+					// the device failed to setup correctly, disable the port
+					// so that the device doesn't get in the way of future
+					// addressing.
+					SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+						USB_REQUEST_CLEAR_FEATURE, PORT_ENABLE, i + 1,
+						0, NULL, 0, NULL);
 				}
 			} else {
 				// Device removed...
@@ -158,16 +213,19 @@ Hub::Explore()
 				}
 			}
 
-			// Clear status change
+			// clear status change
 			SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
-				USB_REQUEST_CLEAR_FEATURE,
-				C_PORT_CONNECTION, 
-				i + 1,
-				0,
-				NULL,
-				0,
-				NULL);
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_CONNECTION, i + 1,
+				0, NULL, 0, NULL);
 		}
+	}
+
+	// explore down the tree if we have hubs connected
+	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+		if (!fChildren[i] || !fChildren[i]->IsHub())
+			continue;
+
+		((Hub *)fChildren[i])->Explore();
 	}
 }
 
@@ -198,7 +256,7 @@ Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
 	Device::ReportDevice(supportDescriptors, supportDescriptorCount, hooks, added);
 
 	// Then report all of our children
-	for (int32 i = 0; i < fHubDescriptor.bNbrPorts; i++) {
+	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
 		if (!fChildren[i])
 			continue;
 

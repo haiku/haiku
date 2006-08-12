@@ -15,7 +15,7 @@ Transfer::Transfer(Pipe *pipe, bool synchronous)
 		fDataLength(0),
 		fActualLength(NULL),
 		fOwnActualLength(0),
-		fStatus(B_NO_INIT),
+		fStatus(B_USB_STATUS_DRIVER_INTERNAL_ERROR),
 		fCallback(NULL),
 		fCallbackCookie(NULL),
 		fSem(-1),
@@ -78,22 +78,23 @@ status_t
 Transfer::WaitForFinish()
 {
 	if (fSem < B_OK)
-		return fStatus;
+		return fSem;
 
-	status_t result = B_OK;
-	result = acquire_sem(fSem);
-
+	status_t result = acquire_sem(fSem);
 	if (result < B_OK)
 		return result;
 
-	return fStatus;
+	if (fStatus == B_USB_STATUS_SUCCESS)
+		return B_OK;
+
+	return B_ERROR;
 }
 
 
 void
-Transfer::Finished(status_t result)
+Transfer::Finished(uint32 status)
 {
-	fStatus = result;
+	fStatus = status;
 
 	// Call the callback function ...
 	if (fCallback) {

@@ -32,8 +32,9 @@ public:
 		status_t					LinkTo(Queue *other);
 		status_t					TerminateByStrayDescriptor();
 
-		status_t					AppendDescriptor(uhci_td *descriptor);
-		status_t					RemoveDescriptors(uhci_td *firstDescriptor,
+		status_t					AppendDescriptorChain(uhci_td *descriptor);
+		status_t					RemoveDescriptorChain(
+										uhci_td *firstDescriptor,
 										uhci_td *lastDescriptor);
 
 		addr_t						PhysicalAddress();
@@ -79,6 +80,8 @@ static	bool						AddTo(Stack &stack);
 		uint16						PortStatus(int32 index);
 		status_t					SetPortStatus(int32 index, uint16 status);
 		status_t					ResetPort(int32 index);
+		bool						PortResetChange(int32 index);
+		void						SetPortResetChange(int32 index, bool value);
 
 private:
 		// Controller resets
@@ -151,6 +154,7 @@ static	pci_module_info				*sPCIModule;
 		// Root hub
 		UHCIRootHub					*fRootHub;
 		uint8						fRootHubAddress;
+		bool						fPortResetChange[2];
 };
 
 

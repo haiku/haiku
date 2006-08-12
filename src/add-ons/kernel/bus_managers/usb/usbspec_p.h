@@ -14,9 +14,16 @@
 #include <USB.h>
 #include <util/kernel_cpp.h>
 
-#define USB_MAX_AREAS 8
-#define POWER_DELAY 
+#define USB_MAX_AREAS					8
 
+#define USB_DELAY_DEVICE_POWER_UP		300000
+#define USB_DELAY_PORT_RESET			50000
+#define USB_DELAY_PORT_RESET_RECOVERY	250000
+#define USB_DELAY_SET_ADDRESS_RETRY		200000
+#define USB_DELAY_SET_ADDRESS			10000
+#define USB_DELAY_SET_CONFIGURATION		50000
+#define USB_DELAY_FIRST_EXPLORE			5000000
+#define USB_DELAY_HUB_EXPLORE			1000000
 
 /*
 	Important data from the USB spec (not interesting for drivers)
@@ -41,15 +48,15 @@ struct usb_request_data
 
 struct usb_hub_descriptor
 {
-	uint8 bDescLength;
-	uint8 bDescriptorType;
-	uint8 bNbrPorts;
-	uint16 wHubCharacteristics;
-	uint8 bPwrOn2PwrGood;
-	uint8 bHucContrCurrent;
-	uint8 DeviceRemovable; //Should be variable!!!
-	uint8 PortPwrCtrlMask;  //Deprecated
-};
+	uint8 length;
+	uint8 descriptor_type;
+	uint8 num_ports;
+	uint16 characteristics;
+	uint8 power_on_to_power_good;
+	uint8 max_power;
+	uint8 device_removeable; //Should be variable!!!
+	uint8 power_control_mask;  //Deprecated
+} _PACKED;
 
 #define USB_DESCRIPTOR_HUB 0x29
 

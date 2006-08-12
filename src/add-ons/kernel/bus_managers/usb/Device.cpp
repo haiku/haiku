@@ -339,7 +339,7 @@ Device::SetConfigurationAt(uint8 index)
 	fCurrentConfiguration = &fConfigurations[index];
 
 	// Wait some for the configuration being finished
-	snooze(10000);
+	snooze(USB_DELAY_SET_CONFIGURATION);
 	return B_OK;
 }
 

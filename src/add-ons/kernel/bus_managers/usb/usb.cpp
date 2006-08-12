@@ -87,6 +87,7 @@ uninstall_notify(const char *driverName)
 const usb_device_descriptor *
 get_device_descriptor(const usb_device *device)
 {
+	TRACE(("usb_module: get_device_descriptor(0x%08x)\n", device));
 	if (!device)
 		return NULL;
 
@@ -97,6 +98,7 @@ get_device_descriptor(const usb_device *device)
 const usb_configuration_info *
 get_nth_configuration(const usb_device *device, uint index)
 {
+	TRACE(("usb_module: get_nth_configuration(0x%08x, %d)\n", device, index));
 	if (!device)
 		return NULL;
 
@@ -108,6 +110,7 @@ get_nth_configuration(const usb_device *device, uint index)
 const usb_configuration_info *
 get_configuration(const usb_device *device)
 {
+	TRACE(("usb_module: get_configuration(0x%08x)\n", device));
 	if (!device)
 		return NULL;
 
@@ -119,6 +122,7 @@ status_t
 set_configuration(const usb_device *device,
 	const usb_configuration_info *configuration)
 {
+	TRACE(("usb_module: set_configuration(0x%08x, 0x%08x)\n", device, configuration));
 	if (!device)
 		return B_BAD_VALUE;
 
@@ -130,6 +134,7 @@ status_t
 set_alt_interface(const usb_device *device,
 	const usb_interface_info *interface)
 {
+	TRACE(("usb_module: set_alt_interface(0x%08x, 0x%08x)\n", device, interface));
 	return B_ERROR;
 }
 
@@ -137,6 +142,7 @@ set_alt_interface(const usb_device *device,
 status_t
 set_feature(const void *object, uint16 selector)
 {
+	TRACE(("usb_module: set_feature(0x%08x, %d)\n", object, selector));
 	if (!object)
 		return B_BAD_VALUE;
 
@@ -147,6 +153,7 @@ set_feature(const void *object, uint16 selector)
 status_t
 clear_feature(const void *object, uint16 selector)
 {
+	TRACE(("usb_module: clear_feature(0x%08x, %d)\n", object, selector));
 	if (!object)
 		return B_BAD_VALUE;
 
@@ -157,6 +164,7 @@ clear_feature(const void *object, uint16 selector)
 status_t
 get_status(const void *object, uint16 *status)
 {
+	TRACE(("usb_module: get_status(0x%08x, 0x%08x)\n", object, status));
 	if (!object || !status)
 		return B_BAD_VALUE;
 
@@ -168,6 +176,7 @@ status_t
 get_descriptor(const usb_device *device, uint8 type, uint8 index,
 	uint16 languageID, void *data, size_t dataLength, size_t *actualLength)
 {
+	TRACE(("usb_module: get_descriptor(0x%08x, 0x%02x, 0x%02x, 0x%04x, 0x%08x, %d, 0x%08x)\n", device, type, index, languageID, data, dataLength, actualLength));
 	if (!device || !data)
 		return B_BAD_VALUE;
 
@@ -181,6 +190,7 @@ send_request(const usb_device *device, uint8 requestType, uint8 request,
 	uint16 value, uint16 index, uint16 length, void *data, size_t dataLength,
 	size_t *actualLength)
 {
+	TRACE(("usb_module: send_request(0x%08x, 0x%02x, 0x%02x, 0x%04x, 0x%04x, %d, 0x%08x, %d, 0x%08x)\n", device, requestType, request, value, index, length, data, dataLength, actualLength));
 	if (!device)
 		return B_BAD_VALUE;
 
@@ -194,6 +204,7 @@ queue_request(const usb_device *device, uint8 requestType, uint8 request,
 	uint16 value, uint16 index, uint16 length, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
+	TRACE(("usb_module: queue_request(0x%08x, 0x%02x, 0x%02x, 0x%04x, 0x%04x, %d, 0x%08x, %d, 0x%08x, 0x%08x)\n", device, requestType, request, value, index, length, data, dataLength, callback, callbackCookie));
 	if (!device)
 		return B_BAD_VALUE;
 
@@ -206,6 +217,7 @@ status_t
 queue_interrupt(const usb_pipe *pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
+	TRACE(("usb_module: queue_interrupt(0x%08x, 0x%08x, %d, 0x%08x, 0x%08x)\n", pipe, data, dataLength, callback, callbackCookie));
 	if (((Pipe *)pipe)->Type() != Pipe::Interrupt)
 		return B_BAD_VALUE;
 
@@ -218,6 +230,7 @@ status_t
 queue_bulk(const usb_pipe *pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
+	TRACE(("usb_module: queue_bulk(0x%08x, 0x%08x, %d, 0x%08x, 0x%08x)\n", pipe, data, dataLength, callback, callbackCookie));
 	if (((Pipe *)pipe)->Type() != Pipe::Bulk)
 		return B_BAD_VALUE;
 
@@ -231,6 +244,7 @@ queue_isochronous(const usb_pipe *pipe, void *data, size_t dataLength,
 	rlea *rleArray, uint16 bufferDurationMS, usb_callback_func callback,
 	void *callbackCookie)
 {
+	TRACE(("usb_module: queue_isochronous(0x%08x, 0x%08x, %d, 0x%08x, %d, 0x%08x, 0x%08x)\n", pipe, data, dataLength, rleArray, bufferDurationMS, callback, callbackCookie));
 	if (((Pipe *)pipe)->Type() != Pipe::Isochronous)
 		return B_BAD_VALUE;
 
@@ -243,6 +257,7 @@ status_t
 set_pipe_policy(const usb_pipe *pipe, uint8 maxQueuedPackets,
 	uint16 maxBufferDurationMS, uint16 sampleSize)
 {
+	TRACE(("usb_module: set_pipe_policy(0x%08x, %d, %d, %d)\n", pipe, maxQueuedPackets, maxBufferDurationMS, sampleSize));
 	return B_ERROR;
 }
 
@@ -250,6 +265,7 @@ set_pipe_policy(const usb_pipe *pipe, uint8 maxQueuedPackets,
 status_t
 cancel_queued_transfers(const usb_pipe *pipe)
 {
+	TRACE(("usb_module: cancel_queued_transfers(0x%08x)\n", pipe));
 	return ((Pipe *)pipe)->CancelQueuedTransfers();
 }
 
@@ -257,6 +273,7 @@ cancel_queued_transfers(const usb_pipe *pipe)
 status_t
 usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 {
+	TRACE(("usb_module: usb_ioctl(0x%08x, 0x%08x, %d)\n", opcode, buffer, bufferSize));
 	return B_ERROR;
 }
 

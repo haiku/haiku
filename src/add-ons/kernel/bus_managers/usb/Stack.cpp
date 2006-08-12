@@ -24,13 +24,10 @@ Stack::Stack()
 {
 	TRACE(("usb stack: stack init\n"));
 
-	// Create the master lock
-	fMasterLock = create_sem(1, "usb master lock");
-	set_sem_owner(fMasterLock, B_SYSTEM_TEAM);
-
-	// Create the data lock
-	fDataLock = create_sem(1, "usb data lock");
-	set_sem_owner(fDataLock, B_SYSTEM_TEAM);
+	if (benaphore_init(&fLock, "USB Stack Master Lock") < B_OK) {
+		TRACE(("usb stack: failed to create benaphore lock\n"));
+		return;
+	}
 
 	// Initialise the memory chunks: create 8, 16 and 32 byte-heaps
 	// NOTE: This is probably the most ugly code you will see in the
@@ -149,6 +146,9 @@ Stack::Stack()
 
 Stack::~Stack()
 {
+	Lock();
+	benaphore_destroy(&fLock);
+
 	//Release the bus modules
 	for (Vector<BusManager *>::Iterator i = fBusManagers.Begin();
 		i != fBusManagers.End(); i++) {
@@ -174,14 +174,14 @@ Stack::InitCheck()
 bool
 Stack::Lock()
 {
-	return (acquire_sem(fMasterLock) == B_OK);
+	return (benaphore_lock(&fLock) == B_OK);
 }
 
 
 void
 Stack::Unlock()
 {
-	release_sem(fMasterLock);
+	benaphore_unlock(&fLock);
 }
 
 

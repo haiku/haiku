@@ -74,10 +74,10 @@ BusManager::ExploreThread(void *data)
 	if (!rootHub)
 		return B_ERROR;
 
-	snooze(3000000);
+	snooze(USB_DELAY_FIRST_EXPLORE);
 	while (true) {
 		rootHub->Explore();
-		snooze(1000000);
+		snooze(USB_DELAY_HUB_EXPLORE);
 	}
 
 	return B_OK;
@@ -98,16 +98,24 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 
 	ControlPipe *defaultPipe = (lowSpeed ? fDefaultPipeLowSpeed : fDefaultPipe);
 
-	// Set the address of the device USB 1.1 spec p202
-	status_t result = defaultPipe->SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,		// type
-		USB_REQUEST_SET_ADDRESS,							// request
-		deviceAddress,										// value
-		0,													// index
-		0,													// length
-		NULL,												// buffer
-		0,													// buffer length
-		NULL);												// actual length
+	status_t result = B_ERROR;
+	for (int32 i = 0; i < 15; i++) {
+		// Set the address of the device USB 1.1 spec p202
+		result = defaultPipe->SendRequest(
+			USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,	// type
+			USB_REQUEST_SET_ADDRESS,						// request
+			deviceAddress,									// value
+			0,												// index
+			0,												// length
+			NULL,											// buffer
+			0,												// buffer length
+			NULL);											// actual length
+
+		if (result >= B_OK)
+			break;
+
+		snooze(USB_DELAY_SET_ADDRESS_RETRY);
+	}
 
 	if (result < B_OK) {
 		TRACE(("usb BusManager::AllocateNewDevice(): error while setting device address\n"));
@@ -115,7 +123,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	}
 
 	// Wait a bit for the device to complete addressing
-	snooze(10000);
+	snooze(USB_DELAY_SET_ADDRESS);
 
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(this, deviceAddress,

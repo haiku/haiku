@@ -14,7 +14,6 @@
  * The Registers                                            *
  ************************************************************/
 
-
 // R/W -- Read/Write
 // R/WC -- Read/Write Clear
 // ** -- Only writable with words!
@@ -80,75 +79,91 @@
 #define FRAMELIST_NEXT_IS_QH   0x2
 
 
-//Represents a Transfer Descriptor (TD)
-
+// Represents a Transfer Descriptor (TD)
 typedef struct
 {
 	//Hardware part
-	addr_t link_phy;		// Link to the next TD/QH
-	uint32 status;			// Status field
-	uint32 token;			// Contains the packet header (where it needs to be sent)
-	void * buffer_phy;		// A pointer to the buffer with the actual packet
+	addr_t	link_phy;		// Link to the next TD/QH
+	uint32	status;			// Status field
+	uint32	token;			// Contains the packet header (where it needs to be sent)
+	void	*buffer_phy;	// A pointer to the buffer with the actual packet
 	// Software part
-	addr_t this_phy;		// A physical pointer to this address
-	void * link_log;		// Link to the next logical TD/QT
-	void * buffer_log;		// Link to the buffer
-	int32  buffer_size;		// Size of the buffer
+	addr_t	this_phy;		// A physical pointer to this address
+	void	*link_log;		// Pointer to the next logical TD/QT
+	void	*buffer_log;	// Pointer to the logical buffer
+	int32	buffer_size;	// Size of the buffer
 } uhci_td;
 
-#define TD_STATUS_3_ERRORS		(3 << 27)
-#define TD_STATUS_LOWSPEED		(1 << 26)
-#define TD_STATUS_IOS			(1 << 25)
-#define TD_STATUS_IOC			(1 << 24)
-#define TD_STATUS_ACTIVE		(1 << 23)
-#define TD_STATUS_ACTLEN_MASK	0x3ff
-#define TD_STATUS_ACTLEN_NULL	0x7ff
+// Control and Status
+#define TD_CONTROL_SHORT_PACKET		(1 << 29)
+#define TD_CONTROL_3_ERRORS			(3 << 27)
+#define TD_CONTROL_LOWSPEED			(1 << 26)
+#define TD_CONTROL_ISOCHRONOUS		(1 << 25)
+#define TD_CONTROL_IOC				(1 << 24)
 
-#define TD_TOKEN_DATA1			(1 << 19)
-#define TD_TOKEN_NULL			(0x7ff << 21) 
+#define TD_STATUS_ACTIVE			(1 << 23)
+#define TD_STATUS_ERROR_STALLED		(1 << 22)
+#define TD_STATUS_ERROR_BUFFER		(1 << 21)
+#define TD_STATUS_ERROR_BABBLE		(1 << 20)
+#define TD_STATUS_ERROR_NAK			(1 << 19)
+#define TD_STATUS_ERROR_CRC			(1 << 18)
+#define TD_STATUS_ERROR_TIMEOUT		(1 << 18)
+#define TD_STATUS_ERROR_BITSTUFF	(1 << 17)
 
-#define TD_TOKEN_SETUP			0x2d
-#define TD_TOKEN_IN				0x69
-#define TD_TOKEN_OUT			0xe1
+#define TD_STATUS_ACTLEN_MASK		0x03ff
+#define TD_STATUS_ACTLEN_NULL		0x07ff
 
-#define TD_TOKEN_DEVADDR_SHIFT	8
-#define TD_DEPTH_FIRST			0x4
-#define TD_TERMINATE			0x1
-#define TD_ERROR_MASK			0x7e0000
-#define	TD_LINK_MASK			0xfffffff0
+// Token
+#define TD_TOKEN_MAXLEN_SHIFT		21
+#define TD_TOKEN_NULL_DATA			(0x07ff << TD_TOKEN_MAXLEN_SHIFT)
+#define TD_TOKEN_DATA1				(1 << 19)
 
-//Represents a Queue Head (QH)
+#define TD_TOKEN_SETUP				0x2d
+#define TD_TOKEN_IN					0x69
+#define TD_TOKEN_OUT				0xe1
 
+#define TD_TOKEN_ENDPTADDR_SHIFT	15
+#define TD_TOKEN_DEVADDR_SHIFT		8
+
+#define TD_DEPTH_FIRST				0x04
+#define TD_TERMINATE				0x01
+#define TD_ERROR_MASK				0x7e0000
+#define TD_LINK_MASK				0xfffffff0
+
+
+// Represents a Queue Head (QH)
 typedef struct
 {
 	// Hardware part
-	addr_t link_phy;		//Link to the next TD/QH
-	addr_t element_phy;		//Link to the first element pointer in the queue
+	addr_t	link_phy;		// Link to the next TD/QH
+	addr_t	element_phy;	// Pointer to the first element in the queue
 	// Software part
-	addr_t this_phy;		//The physical pointer to this address
-	void * link_log;		//Link to the next TD/QH logical
+	addr_t	this_phy;		// The physical pointer to this address
+	void	*link_log;		// Pointer to the next logical TD/QH
 } uhci_qh;
 
-#define QH_TERMINATE    0x1
-#define QH_NEXT_IS_QH   0x2
+#define QH_TERMINATE			0x01
+#define QH_NEXT_IS_QH  			0x02
+#define QH_LINK_MASK			0xfffffff0
+
 
 /************************************************************
  * Roothub Emulation                                        *
  ************************************************************/
-#define RH_GET_STATUS 0
-#define RH_CLEAR_FEATURE 1
-#define RH_SET_FEATURE 3
-#define RH_SET_ADDRESS 5
-#define RH_GET_DESCRIPTOR 6
-#define RH_SET_CONFIG 9
+#define RH_GET_STATUS			0
+#define RH_CLEAR_FEATURE		1
+#define RH_SET_FEATURE			3
+#define RH_SET_ADDRESS			5
+#define RH_GET_DESCRIPTOR		6
+#define RH_SET_CONFIG			9
 
-//Descriptors (in usb_request_data->Value)
+// Descriptors (in usb_request_data->Value)
 #define RH_DEVICE_DESCRIPTOR	(0x01 << 8)
 #define RH_CONFIG_DESCRIPTOR	(0x02 << 8)
-#define	RH_STRING_DESCRIPTOR	(0x03 << 8)
+#define RH_STRING_DESCRIPTOR	(0x03 << 8)
 #define RH_HUB_DESCRIPTOR		(0x29 << 8)
 
-//Hub/Portstatus buffer
+// Hub/Portstatus buffer
 typedef struct
 {
 	uint16 status;
