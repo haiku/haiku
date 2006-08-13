@@ -1524,7 +1524,9 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	BRect frame(0, 0, 0, 0);
 	float iWidth, iHeight;
 	BMenuItem *item = NULL;
-
+	
+	BFont font;
+	GetFont(&font);
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
 		{
@@ -1534,9 +1536,9 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 					item->GetContentSize(&iWidth, &iHeight);
 
 					if (item->fModifiers && item->fShortcutChar)
-						iWidth += 25.0f;
+						iWidth += 2 * font.Size();
 					if (item->fSubmenu != NULL)
-						iWidth += 20.0f;
+						iWidth += 2 * font.Size();
 
 					item->fBounds.left = 0.0f;
 					item->fBounds.top = frame.bottom;
