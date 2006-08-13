@@ -64,7 +64,7 @@ typedef struct supported_device {
 	global data
 ----- */
 static pci_info *gFoundDevices[RTL_MAX_CARDS];
-static pci_module_info *gPCIModule = 0;	//To call methods of pci
+static pci_module_info *gPCIModule = NULL;	//To call methods of pci
 static char *gDeviceNames[RTL_MAX_CARDS +1];
 static int32 gDeviceOpenMask = 0;					//Is the thing already opened?
 
@@ -201,7 +201,7 @@ init_driver (void)
 	TRACE(("rtl8139_nielx: init_driver()\n"));
 	
 	// Try if the PCI module is loaded (it would be weird if it wouldn't, but alas)
-	if((status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCIModule)) != B_OK) {
+	if ((status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCIModule)) != B_OK) {
 		TRACE(("rtl8139_nielx init_driver(): Get PCI module failed! %lu \n", status));
 		return status;
 	}
@@ -209,7 +209,7 @@ init_driver (void)
 	// 
 	i = 0;
 	item = (pci_info *)malloc(sizeof(pci_info));
-	for (i = found = 0 ; gPCIModule->get_nth_pci_info(i, item) == B_OK ; i++) {
+	for (i = found = 0; gPCIModule->get_nth_pci_info(i, item) == B_OK; i++) {
 		supported_device_t *supported;
 		
 		for (supported  = m_supported_devices; supported->name; supported++) {
@@ -347,8 +347,6 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	
 	if (temp32 == 0xFFFFFF) {
 		TRACE(("rtl8139_nielx open_hook(): Faulty chip\n"));
-		free_hook(cookie);
-		put_module(B_PCI_MODULE_NAME);
 		return EIO;
 	}
 	
@@ -385,7 +383,6 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	
 	if (temp16 == 0) {
 		TRACE(("rtl8139_nielx open_hook(): Reset failed... Bailing out\n"));
-		free_hook(cookie);
 		return EIO;
 	}
 	TRACE(("rtl8139_nielx open_hook(): Chip reset: %u \n", temp16));
@@ -430,7 +427,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	//Allocate the ring buffer for the receiver. 
 	// Size is set above: as 16k + 16 bytes + 1.5 kB--- 16 bytes for last CRC (a
 	data->receivebuffer = alloc_mem(&(data->receivebufferlog), &(data->receivebufferphy), 1024 * 64 + 16, "rx buffer");
-	if(data->receivebuffer == B_ERROR) {
+	if (data->receivebuffer == B_ERROR) {
 		TRACE(("rtl8139_nielx open_hook(): memory allocation for ringbuffer failed\n"));
 		return B_ERROR;
 	}
@@ -453,7 +450,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	data->transmitbufferphy[3] = (void *)((uint32)data->transmitbufferphy[2] + 2048);
 	WRITE_32(TSAD3, (int32)data->transmitbufferphy[3]);
 	
-	if(data->transmitbuffer == B_ERROR) {
+	if (data->transmitbuffer == B_ERROR) {
 		TRACE(("rtl8139_nielx open_hook(): memory allocation for transmitbuffer failed\n"));
 		return B_ERROR;
 	}
@@ -462,7 +459,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	data->finished_packets = 0;
 		
 	// Receive hardware MAC address
-	for(temp8 = 0 ; temp8 < 6; temp8++)
+	for(temp8 = 0; temp8 < 6; temp8++)
 		data->address.ebyte[ temp8 ] = READ_8(IDR0 + temp8 );
 		
 	TRACE(("rlt8139_nielx open_hook(): MAC address: %x:%x:%x:%x:%x:%x\n",
@@ -494,7 +491,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	WRITE_8(Command, EnableReceive | EnableTransmit);
 	
 	//Check if Tx and Rx are enabled
-	if(!(READ_8(Command) & EnableReceive) || !(READ_8(Command) & EnableTransmit))
+	if (!(READ_8(Command) & EnableReceive) || !(READ_8(Command) & EnableTransmit))
 		TRACE(("TRANSMIT AND RECEIVE NOT ENABLED!!!\n"));
 	else
 		TRACE(("TRANSMIT AND RECEIVE ENABLED!!!\n"));
@@ -548,7 +545,7 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 
 restart:
 	// Acquire the sem if we are allowed to block
-	if((status = acquire_sem_etc(data->input_wait , 1 , B_CAN_INTERRUPT | data->nonblocking , 0)) != B_NO_ERROR) {
+	if ((status = acquire_sem_etc(data->input_wait , 1 , B_CAN_INTERRUPT | data->nonblocking , 0)) != B_NO_ERROR) {
 		TRACE(("rtl8139_nielx read_hook: Cannot acquire sem: %lx , %s\n" , status , strerror(status)));
 		return status;
 	}
@@ -768,7 +765,7 @@ rtl8139_interrupt(void *cookie)
 			break;
 			
 		TRACE(("NIELX INTERRUPT: %u \n", isr_contents));
-		if(isr_contents & ReceiveOk) {
+		if (isr_contents & ReceiveOk) {
 			TRACE(("rtl8139_nielx interrupt ReceiveOk\n"));
 			release_sem_etc(data->input_wait, 1, B_DO_NOT_RESCHEDULE);
 			retval = B_INVOKE_SCHEDULER;
@@ -785,7 +782,7 @@ rtl8139_interrupt(void *cookie)
 			// Check each status descriptor
 			while(checks > 0) {
 				// If a register isn't used, continue next run
-				temp8 = data->finished_packets % 4 ;
+				temp8 = data->finished_packets % 4;
 				txstatus = READ_32(TSD0 + temp8 * sizeof(int32));
 				TRACE(("run: %u txstatus: %lu Register: %lx\n", temp8, txstatus, TSD0 + temp8 * sizeof(int32)));
 				
@@ -820,18 +817,18 @@ rtl8139_interrupt(void *cookie)
 			retval = B_HANDLED_INTERRUPT;
 		}
 	
-		if(isr_contents & TransmitError) {
+		if (isr_contents & TransmitError) {
 			//
 			;
 		}
 	
-		if(isr_contents & ReceiveOverflow) {
+		if (isr_contents & ReceiveOverflow) {
 			// Discard all the current packages to be processed -- newos driver
 			WRITE_16(CAPR, (READ_16(CBR) + 16) % 0x1000);
 			retval = B_HANDLED_INTERRUPT;
 		}
 	
-		if(isr_contents & ReceiveUnderflow) {
+		if (isr_contents & ReceiveUnderflow) {
 			// Most probably a link change -> TODO CHECK!
 			TRACE(("rtl8139_nielx interrupt(): BMCR: 0x%x BMSR: 0x%x\n", 
 				READ_16(BMCR), READ_16(BMSR)));
@@ -868,9 +865,19 @@ static status_t
 close_hook (void* cookie)
 {
 	rtl8139_properties_t * data = (rtl8139_properties_t *) cookie;
+	TRACE(("rtl8139_nielx close_hook()\n"));
+
 	//Stop Rx and Tx process
 	WRITE_8(Command, 0);
 	WRITE_16(IMR, 0);
+
+	//Remove interrupt handler
+	remove_io_interrupt_handler(data->pcii->u.h0.interrupt_line, 
+		rtl8139_interrupt, cookie);
+	
+	delete_sem(data->lock);
+	delete_sem(data->input_wait);
+	delete_sem(data->output_wait);
 
 	return B_OK;
 }
@@ -884,12 +891,7 @@ static status_t
 free_hook (void* cookie)
 {
 	rtl8139_properties_t *data = (rtl8139_properties_t *) cookie;
-
 	TRACE(("rtl8139_nielx free_hook()\n"));
-	
-	//Remove interrupt handler
-	remove_io_interrupt_handler(data->pcii->u.h0.interrupt_line, 
-	                             rtl8139_interrupt, cookie);
 	
 	//Free Rx and Tx buffers
 	delete_area(data->receivebuffer);
@@ -901,9 +903,6 @@ free_hook (void* cookie)
 	
 	//Finally, free the cookie
 	free(data);
-	
-	//Put the pci module
-	put_module(B_PCI_MODULE_NAME);
 	
 	return B_OK;
 }
