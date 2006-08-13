@@ -1404,7 +1404,7 @@ bool
 BMenu::_AddItem(BMenuItem *item, int32 index)
 {
 	ASSERT(item != NULL);
-	if (index < 0 || index > CountItems())
+	if (index < 0 || index > fItems.CountItems())
 		return false;
 	
 	if (!fItems.AddItem(item, index))
@@ -1689,7 +1689,7 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 
 	// TODO: Horrible hack:
 	// When added to a BMenuField, a BPopUpMenu is the child of
-	// a _BMCItem_ inside a _BMCMenuBar_ to "fake" the menu hierarchy
+	// a _BMCMenuBar_ to "fake" the menu hierarchy
 	if (superMenu == NULL || superItem == NULL
 		|| dynamic_cast<_BMCMenuBar_ *>(superMenu) != NULL) {
 		// just move the window on screen
@@ -2108,14 +2108,18 @@ BMenu::OkToProceed(BMenuItem* item)
 	BPoint where;
 	ulong buttons;
 	GetMouse(&where, &buttons, false);
-	// Quit if user releases the mouse button (in nonsticky mode)
-	// or click the mouse button (in sticky mode)
+	bool stickyMode = IsStickyMode();
+	// Quit if user clicks the mouse button in sticky mode
+	// or releases the mouse button in nonsticky mode
 	// or moves the pointer over another item
-	if ((buttons == 0 && !IsStickyMode())
-		|| (buttons != 0 && IsStickyMode())
-		|| HitTestItems(where) != item)
+	// TODO: I added the check for BMenuBar to solve a problem with Deskbar.
+	// Beos seems to do something similar. This could also be a bug in Deskbar, though.
+	if ((buttons != 0 && stickyMode)
+		|| (dynamic_cast<BMenuBar *>(this) == NULL && (buttons == 0 && !stickyMode)
+		|| HitTestItems(where) != item))
 		proceed = false;
 	
+
 	return proceed;
 }
 
@@ -2142,7 +2146,7 @@ BMenu::ParseMsg(BMessage *msg, int32 *sindex, BMessage *spec,
 
 
 status_t
-BMenu::DoMenuMsg(BMenuItem **next, BMenu *tar, BMessage *m,
+BMenu::DoMenuMsg(BMenuItem **next, BMenu *menu, BMessage *message,
 						  BMessage *r, BMessage *spec, int32 f) const
 {
 	return B_ERROR;
@@ -2150,7 +2154,7 @@ BMenu::DoMenuMsg(BMenuItem **next, BMenu *tar, BMessage *m,
 
 
 status_t
-BMenu::DoMenuItemMsg(BMenuItem **next, BMenu *tar, BMessage *m,
+BMenu::DoMenuItemMsg(BMenuItem **next, BMenu *menu, BMessage *message,
 							  BMessage *r, BMessage *spec, int32 f) const
 {
 	return B_ERROR;
