@@ -34,27 +34,8 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	for (int32 i = 0; i < 8; i++)
 		fChildren[i] = NULL;
 
-	if (fDeviceDescriptor.device_class != 9
-		|| fDeviceDescriptor.device_subclass != 0
-		|| fDeviceDescriptor.device_protocol != 0) {
-		TRACE(("USB Hub: wrong class/subclass/protocol! Bailing out\n"));
-		return;
-	}
-
-	if (Configuration()->descr->number_interfaces > 1) {
-		TRACE(("USB Hub: too many interfaces\n"));
-		return;
-	}
-
-	fInterruptInterface = Configuration()->interface->active->descr;
-	if (fInterruptInterface->num_endpoints > 1) {
-		TRACE(("USB Hub: too many endpoints\n"));
-		return;
-	}
-
-	fInterruptEndpoint = Configuration()->interface->active->endpoint[0].descr;
-	if (fInterruptEndpoint->attributes != 0x03) { // interrupt endpoint
-		TRACE(("USB Hub: Not an interrupt endpoint\n"));
+	if (fDeviceDescriptor.device_class != 9) {
+		TRACE(("USB Hub: wrong class! Bailing out\n"));
 		return;
 	}
 
@@ -77,6 +58,19 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	TRACE(("\tpower_on_to_power_g:.%d\n", fHubDescriptor.power_on_to_power_good));
 	TRACE(("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable));
 	TRACE(("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask));
+
+	Pipe *pipe = (Pipe *)Configuration()->interface->active->endpoint[0].handle;
+	if (!pipe || pipe->Type() != Pipe::Interrupt) {
+		TRACE(("USB Hub: no interrupt pipe found\n"));
+		return;
+	}
+
+	fInterruptPipe = (InterruptPipe *)pipe;
+	fInterruptPipe->QueueInterrupt(fInterruptStatus, sizeof(fInterruptStatus),
+		InterruptCallback, this);
+
+	// Wait some time before powering up the ports
+	snooze(USB_DELAY_HUB_POWER_UP);
 
 	// Enable port power on all ports
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
@@ -167,6 +161,9 @@ Hub::Explore()
 		if (result < B_OK)
 			continue;
 
+		if (DeviceAddress() > 1)
+			TRACE(("USB Hub (%d): port %d: status: 0x%04x; change: 0x%04x\n", DeviceAddress(), i, fPortStatus[i].status, fPortStatus[i].change));
+
 		if (fPortStatus[i].change & PORT_STATUS_CONNECTION) {
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
 				// new device attached!
@@ -227,6 +224,14 @@ Hub::Explore()
 
 		((Hub *)fChildren[i])->Explore();
 	}
+}
+
+
+void
+Hub::InterruptCallback(void *cookie, uint32 status, void *data,
+	uint32 actualLength)
+{
+	TRACE(("USB Hub: interrupt callback!\n"));
 }
 
 

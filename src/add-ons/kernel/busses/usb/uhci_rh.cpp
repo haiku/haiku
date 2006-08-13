@@ -135,9 +135,13 @@ UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 devicenum)
 status_t
 UHCIRootHub::SubmitTransfer(Transfer *transfer)
 {
+	if (transfer->TransferPipe()->Type() != Pipe::Control)
+		return B_ERROR;
+
 	usb_request_data *request = transfer->RequestData();
 	TRACE(("usb_uhci_roothub: rh_submit_packet called. request: %u\n", request->Request));
 
+	size_t actualLength = 0;
 	status_t result = B_ERROR;
 	switch (request->Request) {
 		case RH_GET_STATUS: {
@@ -155,11 +159,9 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			// Get port status
 			UpdatePortStatus();
 
-			size_t length = MIN(4, transfer->DataLength());
+			actualLength = MIN(4, transfer->DataLength());
 			memcpy(transfer->Data(),
-				(void *)&fPortStatus[request->Index - 1], length);
-
-			*(transfer->ActualLength()) = length;
+				(void *)&fPortStatus[request->Index - 1], actualLength);
 			result = B_OK;
 			break;
 		}
@@ -179,21 +181,19 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 
 			switch (request->Value & 0xff00) {
 				case RH_DEVICE_DESCRIPTOR: {
-					size_t length = MIN(sizeof(usb_device_descriptor),
+					actualLength = MIN(sizeof(usb_device_descriptor),
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubDevice,
-						length);
-					*(transfer->ActualLength()) = length; 
+						actualLength);
 					result = B_OK;
 					break;
 				}
 
 				case RH_CONFIG_DESCRIPTOR: {
-					size_t length = MIN(sizeof(uhci_root_hub_configuration_s),
+					actualLength = MIN(sizeof(uhci_root_hub_configuration_s),
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubConfig,
-						length);
-					*(transfer->ActualLength()) = length;
+						actualLength);
 					result =  B_OK;
 					break;
 				}
@@ -201,26 +201,23 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 				case RH_STRING_DESCRIPTOR: {
 					uint8 index = request->Value & 0x00ff;
 					if (index > 2) {
-						*(transfer->ActualLength()) = 0;
 						result = EINVAL;
 						break;
 					}
 
-					size_t length = MIN(sUHCIRootHubStrings[index].length,
+					actualLength = MIN(sUHCIRootHubStrings[index].length,
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubStrings[index],
-						length);
-					*(transfer->ActualLength()) = length;
+						actualLength);
 					result = B_OK;
 					break;
 				}
 
 				case RH_HUB_DESCRIPTOR: {
-					size_t length = MIN(sizeof(usb_hub_descriptor),
+					actualLength = MIN(sizeof(usb_hub_descriptor),
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubConfig.hub,
-						length);
-					*(transfer->ActualLength()) = length;
+						actualLength);
 					result = B_OK;
 					break;
 				}
@@ -304,7 +301,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			break;
 	}
 
-	transfer->Finished(result);
+	transfer->Finished(result, actualLength);
 	return result;
 }
 
@@ -340,7 +337,7 @@ UHCIRootHub::UpdatePortStatus()
 			newChange |= PORT_STATUS_RESET;
 
 		//The port is automagically powered on
-		newStatus |= PORT_POWER;
+		newStatus |= PORT_STATUS_POWER;
 
 		if (portStatus & UHCI_PORTSC_LOWSPEED)
 			newStatus |= PORT_STATUS_LOW_SPEED;

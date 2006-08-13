@@ -751,31 +751,37 @@ UHCI::FinishTransfers()
 					transfer->queue->RemoveDescriptorChain(
 						transfer->first_descriptor,
 						transfer->last_descriptor);
+
 					FreeDescriptorChain(transfer->first_descriptor);
-					transfer->transfer->Finished(callbackStatus);
+					transfer->transfer->Finished(callbackStatus, 0);
 					transferDone = true;
 					break;
 				}
 
-				if (descriptor == transfer->last_descriptor) {
+				// either all descriptors are done, or we have a short packet
+				if (descriptor == transfer->last_descriptor
+					|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
+					< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
 					TRACE(("usb_uhci: td (0x%08x) ok\n", descriptor->this_phy));
 					// we got through without errors so we are finished
 					transfer->queue->RemoveDescriptorChain(
 						transfer->first_descriptor,
 						transfer->last_descriptor);
 
+					size_t length = 0;
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
-						size_t length = ReadDescriptorChain(
+						length = ReadDescriptorChain(
 							transfer->data_descriptor,
 							transfer->transfer->Data(),
 							transfer->transfer->DataLength());
-
-						*(transfer->transfer->ActualLength()) = length;
+					} else {
+						// read the actual length that was sent
+						length = ReadActualLength(transfer->first_descriptor);
 					}
 
 					FreeDescriptorChain(transfer->first_descriptor);
-					transfer->transfer->Finished(B_OK);
+					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, length);
 					transferDone = true;
 					break;
 				}
@@ -813,10 +819,14 @@ UHCI::FinishTransfers()
 void
 UHCI::GlobalReset()
 {
+	uint8 sofValue = ReadReg8(UHCI_SOFMOD);
+
 	WriteReg16(UHCI_USBCMD, UHCI_USBCMD_GRESET);
 	snooze(100000);
 	WriteReg16(UHCI_USBCMD, 0);
 	snooze(10000);
+
+	WriteReg8(UHCI_SOFMOD, sofValue);
 }
 
 
@@ -1077,7 +1087,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, int32 bufferSize)
 	}
 
 	result->this_phy = (addr_t)physicalAddress;
-	result->status = TD_STATUS_ACTIVE | TD_CONTROL_3_ERRORS;
+	result->status = TD_STATUS_ACTIVE | TD_CONTROL_3_ERRORS | TD_CONTROL_SPD;
 	if (pipe->Speed() == Pipe::LowSpeed)
 		result->status |= TD_CONTROL_LOWSPEED;
 
@@ -1188,20 +1198,20 @@ UHCI::LinkDescriptors(uhci_td *first, uhci_td *second)
 
 size_t
 UHCI::WriteDescriptorChain(uhci_td *topDescriptor, const uint8 *buffer,
-	int32 bufferSize)
+	size_t bufferLength)
 {
-	size_t actualSize = 0;
+	size_t actualLength = 0;
 	uhci_td *current = topDescriptor;
 
 	while (current) {
 		if (!current->buffer_log)
 			break;
 
-		int32 length = min_c(current->buffer_size, bufferSize);
+		size_t length = min_c(current->buffer_size, bufferLength);
 		memcpy(current->buffer_log, buffer, length);
 
-		bufferSize -= length;
-		actualSize += length;
+		bufferLength -= length;
+		actualLength += length;
 		buffer += length;
 
 		if (current->link_phy & TD_TERMINATE)
@@ -1210,31 +1220,31 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, const uint8 *buffer,
 		current = (uhci_td *)current->link_log;
 	}
 
-	TRACE(("usb_uhci: wrote descriptor chain (%d bytes)\n", actualSize));
-	return actualSize;
+	TRACE(("usb_uhci: wrote descriptor chain (%d bytes)\n", actualLength));
+	return actualLength;
 }
 
 
 size_t
 UHCI::ReadDescriptorChain(uhci_td *topDescriptor, uint8 *buffer,
-	int32 bufferSize)
+	size_t bufferLength)
 {
-	size_t actualSize = 0;
+	size_t actualLength = 0;
 	uhci_td *current = topDescriptor;
 
-	while (current) {
+	while (current && (current->status & TD_STATUS_ACTIVE) == 0) {
 		if (!current->buffer_log)
 			break;
 
-		int32 length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
+		size_t length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
 		if (length == TD_STATUS_ACTLEN_NULL + 1)
 			length = 0;
 
-		length = min_c(length, bufferSize);
+		length = min_c(length, bufferLength);
 		memcpy(buffer, current->buffer_log, length);
 
-		bufferSize -= length;
-		actualSize += length;
+		bufferLength -= length;
+		actualLength += length;
 		buffer += length;
 
 		if (current->link_phy & TD_TERMINATE)
@@ -1243,8 +1253,39 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, uint8 *buffer,
 		current = (uhci_td *)current->link_log;
 	}
 
-	TRACE(("usb_uhci: read descriptor chain (%d bytes)\n", actualSize));
-	return actualSize;
+	TRACE(("usb_uhci: read descriptor chain (%d bytes)\n", actualLength));
+	return actualLength;
+}
+
+
+size_t
+UHCI::ReadActualLength(uhci_td *topDescriptor)
+{
+	size_t actualLength = 0;
+	uhci_td *current = topDescriptor;
+
+	while (current && (current->status & TD_STATUS_ACTIVE) == 0) {
+		TRACE(("usb_uhci: reading actual length from status 0x%08x\n", current->status));
+		size_t length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
+		if (length == TD_STATUS_ACTLEN_NULL + 1)
+			length = 0;
+
+		actualLength += length;
+		if (current->link_phy & TD_TERMINATE)
+			break;
+
+		current = (uhci_td *)current->link_log;
+	}
+
+	TRACE(("usb_uhci: read actual length (%d bytes)\n", actualLength));
+	return actualLength;
+}
+
+
+inline void
+UHCI::WriteReg8(uint32 reg, uint8 value)
+{
+	sPCIModule->write_io_8(fRegisterBase + reg, value);
 }
 
 
@@ -1259,6 +1300,13 @@ inline void
 UHCI::WriteReg32(uint32 reg, uint32 value)
 {
 	sPCIModule->write_io_32(fRegisterBase + reg, value);
+}
+
+
+inline uint8
+UHCI::ReadReg8(uint32 reg)
+{
+	return sPCIModule->read_io_8(fRegisterBase + reg);
 }
 
 

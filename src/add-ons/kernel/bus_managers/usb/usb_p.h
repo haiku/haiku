@@ -361,6 +361,9 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 		status_t						UpdatePortStatus(uint8 index);
 		status_t						ResetPort(uint8 index);
 		void							Explore();
+static	void							InterruptCallback(void *cookie,
+											uint32 status, void *data,
+											uint32 actualLength);
 
 virtual	void							ReportDevice(
 											usb_support_descriptor *supportDescriptors,
@@ -369,10 +372,10 @@ virtual	void							ReportDevice(
 											bool added);
 
 private:
-		usb_interface_descriptor		*fInterruptInterface;
-		usb_endpoint_descriptor			*fInterruptEndpoint;
+		InterruptPipe					*fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 
+		usb_port_status					fInterruptStatus[8];
 		usb_port_status					fPortStatus[8];
 		Device							*fChildren[8];
 };
@@ -405,7 +408,7 @@ public:
 		size_t						DataLength() { return fDataLength; };
 
 		void						SetActualLength(size_t *actualLength);
-		size_t						*ActualLength() { return fActualLength; };
+		size_t						*ActualLength() { return fActualLengthPointer; };
 
 		void						SetHostPrivate(hostcontroller_priv *priv);
 		hostcontroller_priv			*HostPrivate() { return fHostPrivate; };
@@ -414,15 +417,15 @@ public:
 										void *cookie);
 
 		status_t					WaitForFinish();
-		void						Finished(uint32 status);
+		void						Finished(uint32 status, size_t actualLength);
 
 private:
 		// Data that is related to the transfer
 		Pipe						*fPipe;
 		uint8						*fData;
 		size_t						fDataLength;
-		size_t						*fActualLength;
-		size_t						fOwnActualLength;
+		size_t						*fActualLengthPointer;
+		size_t						fActualLength;
 		uint32						fStatus;
 
 		usb_callback_func			fCallback;

@@ -13,8 +13,8 @@ Transfer::Transfer(Pipe *pipe, bool synchronous)
 	:	fPipe(pipe),
 		fData(NULL),
 		fDataLength(0),
-		fActualLength(NULL),
-		fOwnActualLength(0),
+		fActualLengthPointer(NULL),
+		fActualLength(0),
 		fStatus(B_USB_STATUS_DRIVER_INTERNAL_ERROR),
 		fCallback(NULL),
 		fCallbackCookie(NULL),
@@ -22,7 +22,6 @@ Transfer::Transfer(Pipe *pipe, bool synchronous)
 		fHostPrivate(NULL),
 		fRequestData(NULL)
 {
-	fActualLength = &fOwnActualLength;
 	if (synchronous) {
 		fSem = create_sem(0, "USB Transfer");
 		set_sem_owner(fSem, B_SYSTEM_TEAM);
@@ -55,7 +54,7 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 void
 Transfer::SetActualLength(size_t *actualLength)
 {
-	fActualLength = actualLength;
+	fActualLengthPointer = actualLength;
 }
 
 
@@ -92,13 +91,16 @@ Transfer::WaitForFinish()
 
 
 void
-Transfer::Finished(uint32 status)
+Transfer::Finished(uint32 status, size_t actualLength)
 {
 	fStatus = status;
+	fActualLength = actualLength;
+	if (fActualLengthPointer)
+		*fActualLengthPointer = actualLength;
 
 	// Call the callback function ...
 	if (fCallback) {
-		fCallback(fCallbackCookie, fStatus, fData, *fActualLength);
+		fCallback(fCallbackCookie, fStatus, fData, fActualLength);
 		return;
 	}
 

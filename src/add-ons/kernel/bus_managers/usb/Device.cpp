@@ -325,7 +325,7 @@ Device::SetConfigurationAt(uint8 index)
 	status_t result = SendRequest(
 		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_SET_CONFIGURATION,						// request
-		index,												// value
+		fConfigurations[index].descr->configuration_value,	// value
 		0,													// index
 		0,													// length										
 		NULL,												// buffer

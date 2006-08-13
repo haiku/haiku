@@ -95,7 +95,7 @@ typedef struct
 } uhci_td;
 
 // Control and Status
-#define TD_CONTROL_SHORT_PACKET		(1 << 29)
+#define TD_CONTROL_SPD				(1 << 29)
 #define TD_CONTROL_3_ERRORS			(3 << 27)
 #define TD_CONTROL_LOWSPEED			(1 << 26)
 #define TD_CONTROL_ISOCHRONOUS		(1 << 25)
@@ -110,7 +110,7 @@ typedef struct
 #define TD_STATUS_ERROR_TIMEOUT		(1 << 18)
 #define TD_STATUS_ERROR_BITSTUFF	(1 << 17)
 
-#define TD_STATUS_ACTLEN_MASK		0x03ff
+#define TD_STATUS_ACTLEN_MASK		0x07ff
 #define TD_STATUS_ACTLEN_NULL		0x07ff
 
 // Token
