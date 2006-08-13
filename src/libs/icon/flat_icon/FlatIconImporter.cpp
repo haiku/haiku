@@ -170,18 +170,31 @@ _ReadTranslation(LittleEndianBuffer& buffer, Transformable* transformable)
 
 // _ReadColorStyle
 static Style*
-_ReadColorStyle(LittleEndianBuffer& buffer, bool alpha)
+_ReadColorStyle(LittleEndianBuffer& buffer, bool alpha, bool gray)
 {
 	rgb_color color;
 	if (alpha) {
-		if (!buffer.Read((uint32&)color))
-			return NULL;
+		if (gray) {
+			if (!buffer.Read(color.red)
+				|| !buffer.Read(color.alpha))
+				return NULL;
+			color.green = color.blue = color.red;
+		} else {
+			if (!buffer.Read((uint32&)color))
+				return NULL;
+		}
 	} else {
 		color.alpha = 255;
-		if (!buffer.Read(color.red)
-			|| !buffer.Read(color.green)
-			|| !buffer.Read(color.blue))
-			return NULL;
+		if (gray) {
+			if (!buffer.Read(color.red))
+				return NULL;
+			color.green = color.blue = color.red;
+		} else {
+			if (!buffer.Read(color.red)
+				|| !buffer.Read(color.green)
+				|| !buffer.Read(color.blue))
+				return NULL;
+		}
 	}
 	return new (nothrow) Style(color);
 }
@@ -217,6 +230,7 @@ _ReadGradientStyle(LittleEndianBuffer& buffer)
 	}
 
 	bool alpha = !(gradientFlags & GRADIENT_FLAG_NO_ALPHA);
+	bool gray = gradientFlags & GRADIENT_FLAG_GRAYS;
 
 	for (int32 i = 0; i < gradientStopCount; i++) {
 		uint8 stopOffset;
@@ -226,14 +240,27 @@ _ReadGradientStyle(LittleEndianBuffer& buffer)
 			return NULL;
 		
 		if (alpha) {
-			if (!buffer.Read((uint32&)color))
-				return NULL;
+			if (gray) {
+				if (!buffer.Read(color.red)
+					|| !buffer.Read(color.alpha))
+					return NULL;
+				color.green = color.blue = color.red;
+			} else {
+				if (!buffer.Read((uint32&)color))
+					return NULL;
+			}
 		} else {
 			color.alpha = 255;
-			if (!buffer.Read(color.red)
-				|| !buffer.Read(color.green)
-				|| !buffer.Read(color.blue)) {
-				return NULL;
+			if (gray) {
+				if (!buffer.Read(color.red))
+					return NULL;
+				color.green = color.blue = color.red;
+			} else {
+				if (!buffer.Read(color.red)
+					|| !buffer.Read(color.green)
+					|| !buffer.Read(color.blue)) {
+					return NULL;
+				}
 			}
 		}
 
@@ -262,12 +289,22 @@ FlatIconImporter::_ParseStyles(LittleEndianBuffer& buffer,
 		Style* style = NULL;
 		if (styleType == STYLE_TYPE_SOLID_COLOR) {
 			// solid color
-			style = _ReadColorStyle(buffer, true);
+			style = _ReadColorStyle(buffer, true, false);
 			if (!style)
 				return B_NO_MEMORY;
 		} else if (styleType == STYLE_TYPE_SOLID_COLOR_NO_ALPHA) {
 			// solid color without alpha
-			style = _ReadColorStyle(buffer, false);
+			style = _ReadColorStyle(buffer, false, false);
+			if (!style)
+				return B_NO_MEMORY;
+		} else if (styleType == STYLE_TYPE_SOLID_GRAY) {
+			// solid gray plus alpha
+			style = _ReadColorStyle(buffer, true, true);
+			if (!style)
+				return B_NO_MEMORY;
+		} else if (styleType == STYLE_TYPE_SOLID_GRAY_NO_ALPHA) {
+			// solid gray without alpha
+			style = _ReadColorStyle(buffer, false, true);
 			if (!style)
 				return B_NO_MEMORY;
 		} else if (styleType == STYLE_TYPE_GRADIENT) {
@@ -452,20 +489,20 @@ _ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
 			StrokeTransformer* stroke
 				= new (nothrow) StrokeTransformer(source);
 			uint8 width;
-			uint8 lineJoin;
-			uint8 lineCap;
+			uint8 lineOptions;
 			uint8 miterLimit;
 //			uint8 shorten;
 			if (!stroke
 				|| !buffer.Read(width)
-				|| !buffer.Read(lineJoin)
-				|| !buffer.Read(lineCap)
+				|| !buffer.Read(lineOptions)
 				|| !buffer.Read(miterLimit)) {
 				delete stroke;
 				return NULL;
 			}
 			stroke->width(width - 128.0);
+			uint8 lineJoin = lineOptions & 15;
 			stroke->line_join((agg::line_join_e)lineJoin);
+			uint8 lineCap = lineOptions >> 4;
 			stroke->line_cap((agg::line_cap_e)lineCap);
 			stroke->miter_limit(miterLimit);
 			return stroke;
@@ -554,8 +591,8 @@ FlatIconImporter::_ReadPathSourceShape(LittleEndianBuffer& buffer,
 		uint8 maxScale;
 		if (!buffer.Read(minScale) || !buffer.Read(maxScale))
 			return NULL;
-		shape->SetMinVisibilityScale((float)minScale);
-		shape->SetMaxVisibilityScale((float)maxScale);
+		shape->SetMinVisibilityScale(minScale / 63.75);
+		shape->SetMaxVisibilityScale(maxScale / 63.75);
 	}
 
 	// transformers

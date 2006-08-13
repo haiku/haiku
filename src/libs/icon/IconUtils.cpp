@@ -23,7 +23,7 @@
 using std::nothrow;
 
 
-// TODO: put into HaikuCompatibility.h
+// TODO: put into HaikuBuildCompatibility.h
 #ifndef __HAIKU__
 # define B_BITMAP_NO_SERVER_LINK 0
 # define B_BAD_DATA B_ERROR

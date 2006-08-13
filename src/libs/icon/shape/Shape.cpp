@@ -63,7 +63,7 @@ Shape::Shape(::Style* style)
 
 	  fHinting(false),
 	  fMinVisibilityScale(0.0),
-	  fMaxVisibilityScale(255.0)
+	  fMaxVisibilityScale(4.0)
 
 #ifdef ICON_O_MATIC
 	, fListeners(8)
@@ -203,16 +203,16 @@ Shape::Unarchive(const BMessage* archive)
 	// max visibility scale
 	if (archive->FindFloat("max visibility scale",
 						   &fMaxVisibilityScale) < B_OK)
-		fMaxVisibilityScale = 255.0;
+		fMaxVisibilityScale = 4.0;
 
 	if (fMinVisibilityScale < 0.0)
 		fMinVisibilityScale = 0.0;
-	if (fMinVisibilityScale > 255.0)
-		fMinVisibilityScale = 255.0;
+	if (fMinVisibilityScale > 4.0)
+		fMinVisibilityScale = 4.0;
 	if (fMaxVisibilityScale < 0.0)
 		fMaxVisibilityScale = 0.0;
-	if (fMaxVisibilityScale > 255.0)
-		fMaxVisibilityScale = 255.0;
+	if (fMaxVisibilityScale > 4.0)
+		fMaxVisibilityScale = 4.0;
 
 	return B_OK;
 }
@@ -274,10 +274,10 @@ Shape::MakePropertyObject() const
 	object->AddProperty(new BoolProperty(PROPERTY_HINTING, fHinting));
 
 	object->AddProperty(new FloatProperty(PROPERTY_MIN_VISIBILITY_SCALE,
-										  fMinVisibilityScale, 0, 255));
+										  fMinVisibilityScale, 0, 4));
 
 	object->AddProperty(new FloatProperty(PROPERTY_MAX_VISIBILITY_SCALE,
-										  fMaxVisibilityScale, 0, 255));
+										  fMaxVisibilityScale, 0, 4));
 
 	return object;
 }

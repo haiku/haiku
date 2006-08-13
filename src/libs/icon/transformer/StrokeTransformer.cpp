@@ -193,9 +193,9 @@ StrokeTransformer::MakePropertyObject() const
 											  miter_limit()));
 	}
 
-	// shorten
-	object->AddProperty(new FloatProperty(PROPERTY_STROKE_SHORTEN,
-										  shorten()));
+//	// shorten
+//	object->AddProperty(new FloatProperty(PROPERTY_STROKE_SHORTEN,
+//										  shorten()));
 
 	return object;
 }
