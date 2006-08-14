@@ -266,6 +266,9 @@ virtual	void							SetDataToggle(bool toggle) {};
 											uint16 index, uint16 length,
 											void *data, size_t dataLength,
 											size_t *actualLength);
+static	void							SendRequestCallback(void *cookie,
+											uint32 status, void *data,
+											size_t actualLength);
 
 		status_t						QueueRequest(uint8 requestType,
 											uint8 request, uint16 value,
@@ -382,20 +385,19 @@ private:
 
 
 /*
- * This is a forward definition of a struct that is defined in the individual
- * host controller modules
- */
-struct hostcontroller_priv;
-
-
-/*
- * This class is more like an utility class that performs all functions on
- * packets. The class is only used in the bus_manager: the host controllers
- * receive the internal data structures.
+ * A Transfer is allocated on the heap and passed to the Host Controller in
+ * SubmitTransfer(). It is generated for all queued transfers. If queuing
+ * succeds (SubmitTransfer() returns with >= B_OK) the Host Controller takes
+ * ownership of the Transfer and will delete it as soon as it has called the
+ * set callback function. If SubmitTransfer() failes, the calling function is
+ * responsible for deleting the Transfer.
+ * Also, the transfer takes ownership of the usb_request_data passed to it in
+ * SetRequestData(), but does not take ownership of the data buffer set by
+ * SetData().
  */
 class Transfer {
 public:
-									Transfer(Pipe *pipe, bool synchronous);
+									Transfer(Pipe *pipe);
 									~Transfer();
 
 		Pipe						*TransferPipe() { return fPipe; };
@@ -407,16 +409,9 @@ public:
 		uint8						*Data() { return fData; };
 		size_t						DataLength() { return fDataLength; };
 
-		void						SetActualLength(size_t *actualLength);
-		size_t						*ActualLength() { return fActualLengthPointer; };
-
-		void						SetHostPrivate(hostcontroller_priv *priv);
-		hostcontroller_priv			*HostPrivate() { return fHostPrivate; };
-
 		void						SetCallback(usb_callback_func callback,
 										void *cookie);
 
-		status_t					WaitForFinish();
 		void						Finished(uint32 status, size_t actualLength);
 
 private:
@@ -424,15 +419,8 @@ private:
 		Pipe						*fPipe;
 		uint8						*fData;
 		size_t						fDataLength;
-		size_t						*fActualLengthPointer;
-		size_t						fActualLength;
-		uint32						fStatus;
-
 		usb_callback_func			fCallback;
 		void						*fCallbackCookie;
-
-		sem_id						fSem;
-		hostcontroller_priv			*fHostPrivate;
 
 		// For control transfers
 		usb_request_data			*fRequestData;

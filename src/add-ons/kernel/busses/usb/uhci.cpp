@@ -583,7 +583,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 		return result;
 	}
 
-	return EINPROGRESS;
+	return B_OK;
 }
 
 
@@ -655,7 +655,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 		return result;
 	}
 
-	return EINPROGRESS;
+	return B_OK;
 }
 
 
@@ -804,6 +804,7 @@ UHCI::FinishTransfers()
 						fLastTransfer = lastTransfer;
 
 					transfer_data *next = transfer->link;
+					delete transfer->transfer;
 					delete transfer;
 					transfer = next;
 

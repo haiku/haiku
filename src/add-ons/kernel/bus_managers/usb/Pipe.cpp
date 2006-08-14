@@ -125,7 +125,7 @@ status_t
 InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
-	Transfer *transfer = new(std::nothrow) Transfer(this, false);
+	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
 
@@ -133,10 +133,8 @@ InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 	transfer->SetCallback(callback, callbackCookie);
 
 	status_t result = SubmitTransfer(transfer);
-	if (result == B_OK || result == EINPROGRESS)
-		return B_OK;
-
-	delete transfer;
+	if (result < B_OK)
+		delete transfer;
 	return result;
 }
 
@@ -157,7 +155,7 @@ status_t
 BulkPipe::QueueBulk(void *data, size_t dataLength, usb_callback_func callback,
 	void *callbackCookie)
 {
-	Transfer *transfer = new(std::nothrow) Transfer(this, false);
+	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
 
@@ -165,10 +163,8 @@ BulkPipe::QueueBulk(void *data, size_t dataLength, usb_callback_func callback,
 	transfer->SetCallback(callback, callbackCookie);
 
 	status_t result = SubmitTransfer(transfer);
-	if (result == B_OK || result == EINPROGRESS)
-		return B_OK;
-
-	delete transfer;
+	if (result < B_OK)
+		delete transfer;
 	return result;
 }
 
@@ -197,6 +193,13 @@ IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
 //
 // #pragma mark -
 //
+
+
+struct transfer_result_data {
+	sem_id	notify_sem;
+	uint32	status;
+	size_t	actual_length;
+};
 
 
 ControlPipe::ControlPipe(Device *device, pipeSpeed speed,
@@ -230,28 +233,41 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,
 	size_t *actualLength)
 {
-	usb_request_data requestData;
-	requestData.RequestType = requestType;
-	requestData.Request = request;
-	requestData.Value = value;
-	requestData.Index = index;
-	requestData.Length = length;
+	transfer_result_data transferResult;
+	transferResult.notify_sem = create_sem(0, "Send Request Notify Sem");
+	if (transferResult.notify_sem < B_OK)
+		return B_NO_MORE_SEMS;
 
-	Transfer *transfer = new(std::nothrow) Transfer(this, true);
-	if (!transfer)
-		return B_NO_MEMORY;
+	status_t result = QueueRequest(requestType, request, value, index, length,
+		data, dataLength, SendRequestCallback, &transferResult);
+	if (result < B_OK) {
+		delete_sem(transferResult.notify_sem);
+		return result;
+	}
 
-	transfer->SetRequestData(&requestData);
-	transfer->SetData((uint8 *)data, dataLength);
-	transfer->SetActualLength(actualLength);
+	// the sem will be released in the callback after
+	// the result data was filled into the provided struct
+	acquire_sem(transferResult.notify_sem);
+	delete_sem(transferResult.notify_sem);
 
-	status_t result = SubmitTransfer(transfer);
-	if (result == EINPROGRESS)
-		return transfer->WaitForFinish();
+	if (actualLength)
+		*actualLength = transferResult.actual_length;
 
-	if (result < B_OK)
-		delete transfer;
-	return result;
+	if (transferResult.status == B_USB_STATUS_SUCCESS)
+		return B_OK;
+
+	return B_ERROR;
+}
+
+
+void
+ControlPipe::SendRequestCallback(void *cookie, uint32 status, void *data,
+	size_t actualLength)
+{
+	transfer_result_data *transferResult = (transfer_result_data *)cookie;
+	transferResult->status = status;
+	transferResult->actual_length = actualLength;
+	release_sem(transferResult->notify_sem);
 }
 
 
@@ -270,7 +286,7 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	requestData->Index = index;
 	requestData->Length = length;
 
-	Transfer *transfer = new(std::nothrow) Transfer(this, false);
+	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer) {
 		delete requestData;
 		return B_NO_MEMORY;
@@ -281,9 +297,7 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	transfer->SetCallback(callback, callbackCookie);
 
 	status_t result = SubmitTransfer(transfer);
-	if (result == B_OK || result == EINPROGRESS)
-		return B_OK;
-
-	delete transfer;
+	if (result < B_OK)
+		delete transfer;
 	return result;
 }
