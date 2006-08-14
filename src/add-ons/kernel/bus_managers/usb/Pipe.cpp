@@ -55,6 +55,60 @@ Pipe::CancelQueuedTransfers()
 }
 
 
+status_t
+Pipe::SetFeature(uint16 selector)
+{
+	if (!fDevice)
+		return B_ERROR;
+
+	return fDevice->SendRequest(
+		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
+		USB_REQUEST_SET_FEATURE,
+		selector,
+		0,
+		0,
+		NULL,
+		0,
+		NULL);
+}
+
+
+status_t
+Pipe::ClearFeature(uint16 selector)
+{
+	if (!fDevice)
+		return B_ERROR;
+
+	return fDevice->SendRequest(
+		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
+		USB_REQUEST_CLEAR_FEATURE,
+		selector,
+		0,
+		0,
+		NULL,
+		0,
+		NULL);
+}
+
+
+status_t
+Pipe::GetStatus(uint16 *status)
+{
+	if (!fDevice)
+		return B_ERROR;
+
+	return fDevice->SendRequest(
+		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
+		USB_REQUEST_GET_STATUS,
+		0,
+		0,
+		2,
+		(void *)status,
+		2,
+		NULL);
+}
+
+
 //
 // #pragma mark -
 //
@@ -232,49 +286,4 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 
 	delete transfer;
 	return result;
-}
-
-
-status_t
-ControlPipe::SetFeature(uint16 selector)
-{
-	return SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
-		USB_REQUEST_SET_FEATURE,
-		selector,
-		0,
-		0,
-		NULL,
-		0,
-		NULL);
-}
-
-
-status_t
-ControlPipe::ClearFeature(uint16 selector)
-{
-	return SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
-		USB_REQUEST_CLEAR_FEATURE,
-		selector,
-		0,
-		0,
-		NULL,
-		0,
-		NULL);
-}
-
-
-status_t
-ControlPipe::GetStatus(uint16 *status)
-{
-	return SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
-		USB_REQUEST_GET_STATUS,
-		0,
-		0,
-		2,
-		(void *)status,
-		2,
-		NULL);
 }

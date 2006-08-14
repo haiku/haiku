@@ -768,20 +768,24 @@ UHCI::FinishTransfers()
 						transfer->first_descriptor,
 						transfer->last_descriptor);
 
-					size_t length = 0;
+					size_t actualLength = 0;
+					uint8 lastDataToggle = 0;
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
-						length = ReadDescriptorChain(
+						actualLength = ReadDescriptorChain(
 							transfer->data_descriptor,
 							transfer->transfer->Data(),
-							transfer->transfer->DataLength());
+							transfer->transfer->DataLength(),
+							&lastDataToggle);
 					} else {
 						// read the actual length that was sent
-						length = ReadActualLength(transfer->first_descriptor);
+						actualLength = ReadActualLength(
+							transfer->first_descriptor, &lastDataToggle);
 					}
 
 					FreeDescriptorChain(transfer->first_descriptor);
-					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, length);
+					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
+					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, actualLength);
 					transferDone = true;
 					break;
 				}
@@ -1152,7 +1156,6 @@ UHCI::CreateDescriptorChain(Pipe *pipe, uhci_td **_firstDescriptor,
 			firstDescriptor = descriptor;
 	}
 
-	pipe->SetDataToggle(dataToggle);
 	*_firstDescriptor = firstDescriptor;
 	*_lastDescriptor = lastDescriptor;
 	return B_OK;
@@ -1227,10 +1230,11 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, const uint8 *buffer,
 
 size_t
 UHCI::ReadDescriptorChain(uhci_td *topDescriptor, uint8 *buffer,
-	size_t bufferLength)
+	size_t bufferLength, uint8 *lastDataToggle)
 {
 	size_t actualLength = 0;
 	uhci_td *current = topDescriptor;
+	uint8 dataToggle = 0;
 
 	while (current && (current->status & TD_STATUS_ACTIVE) == 0) {
 		if (!current->buffer_log)
@@ -1243,15 +1247,19 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, uint8 *buffer,
 		length = min_c(length, bufferLength);
 		memcpy(buffer, current->buffer_log, length);
 
+		buffer += length;
 		bufferLength -= length;
 		actualLength += length;
-		buffer += length;
+		dataToggle = (current->token >> TD_TOKEN_DATA_TOGGLE_SHIFT) & 0x01;
 
 		if (current->link_phy & TD_TERMINATE)
 			break;
 
 		current = (uhci_td *)current->link_log;
 	}
+
+	if (lastDataToggle)
+		*lastDataToggle = dataToggle;
 
 	TRACE(("usb_uhci: read descriptor chain (%d bytes)\n", actualLength));
 	return actualLength;
@@ -1259,23 +1267,28 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, uint8 *buffer,
 
 
 size_t
-UHCI::ReadActualLength(uhci_td *topDescriptor)
+UHCI::ReadActualLength(uhci_td *topDescriptor, uint8 *lastDataToggle)
 {
 	size_t actualLength = 0;
 	uhci_td *current = topDescriptor;
+	uint8 dataToggle = 0;
 
 	while (current && (current->status & TD_STATUS_ACTIVE) == 0) {
-		TRACE(("usb_uhci: reading actual length from status 0x%08x\n", current->status));
 		size_t length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
 		if (length == TD_STATUS_ACTLEN_NULL + 1)
 			length = 0;
 
 		actualLength += length;
+		dataToggle = (current->token >> TD_TOKEN_DATA_TOGGLE_SHIFT) & 0x01;
+
 		if (current->link_phy & TD_TERMINATE)
 			break;
 
 		current = (uhci_td *)current->link_log;
 	}
+
+	if (lastDataToggle)
+		*lastDataToggle = dataToggle;
 
 	TRACE(("usb_uhci: read actual length (%d bytes)\n", actualLength));
 	return actualLength;

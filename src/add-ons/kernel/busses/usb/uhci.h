@@ -121,8 +121,10 @@ static	int32						FinishThread(void *data);
 		size_t						WriteDescriptorChain(uhci_td *topDescriptor,
 										const uint8 *buffer, size_t bufferLength);
 		size_t						ReadDescriptorChain(uhci_td *topDescriptor,
-										uint8 *buffer, size_t bufferLength);
-		size_t						ReadActualLength(uhci_td *topDescriptor);
+										uint8 *buffer, size_t bufferLength,
+										uint8 *lastDataToggle);
+		size_t						ReadActualLength(uhci_td *topDescriptor,
+										uint8 *lastDataToggle);
 
 		// Register functions
 inline	void						WriteReg8(uint32 reg, uint8 value);

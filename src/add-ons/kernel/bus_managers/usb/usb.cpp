@@ -146,7 +146,7 @@ set_feature(const void *object, uint16 selector)
 	if (!object)
 		return B_BAD_VALUE;
 
-	return ((ControlPipe *)object)->SetFeature(selector);
+	return ((Pipe *)object)->SetFeature(selector);
 }
 
 
@@ -157,7 +157,7 @@ clear_feature(const void *object, uint16 selector)
 	if (!object)
 		return B_BAD_VALUE;
 
-	return ((ControlPipe *)object)->ClearFeature(selector);
+	return ((Pipe *)object)->ClearFeature(selector);
 }
 
 
@@ -168,7 +168,7 @@ get_status(const void *object, uint16 *status)
 	if (!object || !status)
 		return B_BAD_VALUE;
 
-	return ((ControlPipe *)object)->GetStatus(status);
+	return ((Pipe *)object)->GetStatus(status);
 }
 
 

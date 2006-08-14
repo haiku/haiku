@@ -167,6 +167,11 @@ virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
 		status_t						SubmitTransfer(Transfer *transfer);
 		status_t						CancelQueuedTransfers();
 
+		// Convenience functions for standard requests
+virtual	status_t						SetFeature(uint16 selector);
+virtual	status_t						ClearFeature(uint16 selector);
+virtual	status_t						GetStatus(uint16 *status);
+
 protected:
 		Device							*fDevice;
 		BusManager						*fBus;
@@ -268,11 +273,6 @@ virtual	void							SetDataToggle(bool toggle) {};
 											void *data, size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
-
-		// Convenience functions for standard requests
-virtual	status_t						SetFeature(uint16 selector);
-virtual	status_t						ClearFeature(uint16 selector);
-virtual	status_t						GetStatus(uint16 *status);
 
 private:
 		int8							fDeviceAddress;

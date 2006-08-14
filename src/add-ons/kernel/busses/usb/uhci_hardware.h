@@ -116,7 +116,8 @@ typedef struct
 // Token
 #define TD_TOKEN_MAXLEN_SHIFT		21
 #define TD_TOKEN_NULL_DATA			(0x07ff << TD_TOKEN_MAXLEN_SHIFT)
-#define TD_TOKEN_DATA1				(1 << 19)
+#define TD_TOKEN_DATA_TOGGLE_SHIFT	19
+#define TD_TOKEN_DATA1				(1 << TD_TOKEN_DATA_TOGGLE_SHIFT)
 
 #define TD_TOKEN_SETUP				0x2d
 #define TD_TOKEN_IN					0x69
