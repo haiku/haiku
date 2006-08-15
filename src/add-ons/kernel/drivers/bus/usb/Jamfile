@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src add-ons kernel drivers bus usb ;
+
+KernelAddon usb_raw : kernel drivers bus usb :
+	usb_raw.cpp
+	;
