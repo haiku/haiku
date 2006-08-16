@@ -19,11 +19,16 @@
 #include <string.h>
 
 Prefs::Prefs()
+: fatalerror(false)
 {
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("Pulse_settings");
 	file = new BFile(path.Path(), B_READ_WRITE | B_CREATE_FILE);
+	if (file->InitCheck() != B_OK) {
+		fatalerror = true;
+		return;
+	}
 
 	int i = NORMAL_WINDOW_MODE;
 	if (!GetInt("window_mode", &window_mode, &i)) {
@@ -248,6 +253,9 @@ Prefs::PutRect(char *name, BRect *value)
 bool
 Prefs::Save()
 {
+	if (fatalerror)
+		return false;
+
 	if (!PutInt("window_mode", &window_mode)
 		|| !PutRect("normal_window_rect", &normal_window_rect)
 		|| !PutRect("mini_window_rect", &mini_window_rect)
