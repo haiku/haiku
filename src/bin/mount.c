@@ -45,16 +45,23 @@ main(int argc, char **argv)
 
 	while (*++argv) {
 		char *arg = *argv;
+		argc--;
 		if (*arg != '-')
 			break;
 
 		if (!strcmp(++arg, "ro") && (flags & B_MOUNT_READ_ONLY) == 0)
 			flags |= B_MOUNT_READ_ONLY;
-		else if (!strcmp(arg, "t") && fs == NULL)
+		else if (!strcmp(arg, "t") && fs == NULL) {
+			if (argc <= 1)
+				break;
 			fs = *++argv;
-		else if (!strcmp(arg, "p") && parameter == NULL)
+			argc--;
+		} else if (!strcmp(arg, "p") && parameter == NULL) {
+			if (argc <= 1)
+				break;
 			parameter = *++argv;
-		else
+			argc--;
+		} else
 			usage(programName);
 	}
 
