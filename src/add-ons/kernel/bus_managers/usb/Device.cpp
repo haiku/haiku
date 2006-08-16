@@ -411,6 +411,18 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 
 
 status_t
+Device::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
+	Device *device)
+{
+	if (!fParent)
+		return B_ERROR;
+
+	fParent->BuildDeviceName(string, index, bufferSize, this);		
+	return B_OK;
+}
+
+
+status_t
 Device::SetFeature(uint16 selector)
 {
 	return SendRequest(

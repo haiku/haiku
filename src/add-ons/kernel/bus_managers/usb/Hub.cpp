@@ -3,10 +3,12 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
 #include "usb_p.h"
+#include <stdio.h>
 
 
 #define TRACE_HUB
@@ -268,4 +270,32 @@ Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
 		fChildren[i]->ReportDevice(supportDescriptors,
 				supportDescriptorCount, hooks, added);
 	}
+}
+
+
+status_t
+Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
+	Device *device)
+{
+	status_t result = Device::BuildDeviceName(string, index, bufferSize, device);
+	if (result < B_OK) {
+		// recursion to parent failed, we're at the root(hub)
+		int32 managerIndex = Manager()->GetStack()->IndexOfBusManager(Manager());
+		*index += snprintf(string + *index, bufferSize - *index, "%d", managerIndex);
+	}
+
+	if (!device) {
+		// no device was specified - report the hub
+		*index += snprintf(string + *index, bufferSize - *index, "/hub");
+	} else {
+		// find out where the requested device sitts
+		for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+			if (fChildren[i] == device) {
+				*index += snprintf(string + *index, bufferSize - *index, "/%d", i);
+				break;
+			}
+		}
+	}
+
+	return B_OK;
 }

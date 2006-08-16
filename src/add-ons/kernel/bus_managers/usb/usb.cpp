@@ -274,7 +274,16 @@ status_t
 usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 {
 	TRACE(("usb_module: usb_ioctl(0x%08x, 0x%08x, %d)\n", opcode, buffer, bufferSize));
-	return B_ERROR;
+
+	switch (opcode) {
+		case 'DNAM': {
+			uint32 index = 0;
+			Device *device = *(Device **)buffer;
+			return device->BuildDeviceName((char *)buffer, &index, bufferSize, NULL);
+		}
+	}
+
+	return B_DEV_INVALID_IOCTL;
 }
 
 

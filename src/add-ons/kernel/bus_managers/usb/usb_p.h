@@ -51,6 +51,7 @@ public:
 		void							Unlock();
 
 		void							AddBusManager(BusManager *bus);
+		int32							IndexOfBusManager(BusManager *bus);
 
 		status_t						AllocateChunk(void **logicalAddress,
 											void **physicalAddress, uint8 size);
@@ -326,6 +327,9 @@ virtual	void							ReportDevice(
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
 											bool added);
+virtual	status_t						BuildDeviceName(char *string,
+											uint32 *index, size_t bufferSize,
+											Device *device);
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -373,6 +377,9 @@ virtual	void							ReportDevice(
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
 											bool added);
+virtual	status_t						BuildDeviceName(char *string,
+											uint32 *index, size_t bufferSize,
+											Device *device);
 
 private:
 		InterruptPipe					*fInterruptPipe;
