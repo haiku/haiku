@@ -32,10 +32,6 @@ raw_device *gDeviceList = NULL;
 uint32 gDeviceCount = 0;
 benaphore gDeviceListLock;
 
-// ToDo: replace with proper device name getter (ioctl to bus manager)
-uint8 gDeviceLevel;
-uint8 gDeviceCounters[7];
-
 static status_t
 usb_raw_device_added(const usb_device *newDevice, void **cookie)
 {
@@ -55,30 +51,12 @@ usb_raw_device_added(const usb_device *newDevice, void **cookie)
 		return B_NO_MORE_SEMS;
 	}
 
-	// ToDo: replace with proper device name getter (ioctl to bus manager)
-	char devicePathString[32];
-	char *devicePath = &devicePathString[0];
-	memset(devicePath, 0, sizeof(devicePath));
-
-	const usb_device_descriptor *deviceDescriptor =
-		gUSBModule->get_device_descriptor(newDevice);
-	if (deviceDescriptor->device_class == 0x09
-		&& deviceDescriptor->vendor_id == 0x0000
-		&& deviceDescriptor->product_id == 0x000) {
-		// root hub
-		memset(gDeviceCounters + 1, 0, sizeof(gDeviceCounters) - 1);
-		gDeviceLevel = 0;
-	}
-
-	for (uint8 i = 0; i <= gDeviceLevel; i++)
-		devicePath += sprintf(devicePath, "/%d", gDeviceCounters[i]);
-
-	gDeviceCounters[gDeviceLevel]++;
-	if (deviceDescriptor->device_class == 0x09) {
-		sprintf(device->name, "bus/usb%s/hub", devicePathString);
-		gDeviceLevel++;
+	char deviceName[32];
+	memcpy(deviceName, &newDevice, sizeof(usb_device *));
+	if (gUSBModule->usb_ioctl('DNAM', deviceName, sizeof(deviceName)) >= B_OK) {
+		sprintf(device->name, "bus/usb/%s", deviceName);
 	} else {
-		sprintf(device->name, "bus/usb%s", devicePathString);
+		sprintf(device->name, "bus/usb/%08x", newDevice);
 	}
 
 	device->device = newDevice;
@@ -582,9 +560,6 @@ init_driver()
 		&usb_raw_device_added,
 		&usb_raw_device_removed
 	};
-
-	gDeviceLevel = 0;
-	memset(gDeviceCounters, 0, sizeof(gDeviceCounters));
 
 	gDeviceList = NULL;
 	gDeviceCount = 0;
