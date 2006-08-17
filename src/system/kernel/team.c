@@ -1669,6 +1669,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	status_t status = B_OK;
 	sem_id waitSem;
 	cpu_status state;
+	bool childExists = false;
 
 	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
 
@@ -1685,18 +1686,35 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	}
 
 	while (true) {
-		if (child > 0) {
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		if (child > 0 && !childExists) {
 			// wait for the specified child
 
-			if (thread_get_thread_struct(child) != NULL) {
+			struct thread *childThread = thread_get_thread_struct_locked(child);
+			if (childThread != NULL) {
 				// team is still running, so we would need to block
-				return B_WOULD_BLOCK;
+				if ((flags & WNOHANG) != 0)
+					status = B_WOULD_BLOCK;
+
+				// TODO: check if this check is correct
+				if (childThread->team->group_id != team->group_id)
+					status = ECHILD;
+
+				childExists = true;
 			}
+		}
+
+		RELEASE_THREAD_LOCK();
+
+		if (status != B_OK) {
+			restore_interrupts(state);
+			return status;
 		}
 
 		// see if there is any death entry for us already
 
-		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
 
 		status = get_death_entry(team, child, &death, &waitSem, &freeDeath);
@@ -1709,15 +1727,21 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 			break;
 
 		// there was no matching group/child we could wait for
-		if (status == B_BAD_THREAD_ID)
-			goto err;
+		if (status == B_BAD_THREAD_ID) {
+			if (child <= 0 || !childExists) {
+				status = ECHILD;
+				goto err;
+			}
+
+			// the specific child we're waiting for is still running
+		}
 
 		if ((flags & WNOHANG) != 0) {
 			status = B_WOULD_BLOCK;
 			goto err;
 		}
 
-		status = acquire_sem(waitSem);
+		status = acquire_sem_etc(waitSem, 1, B_CAN_INTERRUPT, 0);
 		if (status == B_INTERRUPTED)
 			goto err;
 	}
