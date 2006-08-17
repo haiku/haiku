@@ -7,8 +7,6 @@ if $(TARGET_PLATFORM) != haiku {
                 # We need the public pcmcia headers also when not compiling for Haiku.
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os support ] : true ;
                 # We need Errors.h also when not compiling for Haiku.
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-                # We need errno.h also when not compiling for Haiku.
 }
 
 StdBinCommands 
