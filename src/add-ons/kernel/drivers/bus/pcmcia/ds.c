@@ -6,11 +6,12 @@
 #include <Drivers.h>
 #include <OS.h>
 #include <bus_manager.h>
-#include <module.h>
-#include <string.h>
-#include <sys/ioctl.h>
 #include <malloc.h>
+#include <module.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/ioccom.h>
+#include <sys/ioctl.h>
 
 #define __KERNEL__
 #include <pcmcia/cs_types.h>
