@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot loader file_systems amiga_ffs ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders kernel storage ;
 
 #SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems amiga_ffs ;
 

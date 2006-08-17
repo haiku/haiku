@@ -1,7 +1,7 @@
 
 rule SetupKernel
 {
-	# Usage SetupKernel <sources_or_objects> : <extra_cc_flags>;
+	# Usage SetupKernel <sources_or_objects> : <extra_cc_flags> : <include_private_headers> ;
 	#
 	# <sources_or_objects> - Ideally sources, otherwise HDRSEARCH can not be
 	#                        set for the sources and the sources some header
@@ -11,7 +11,9 @@ rule SetupKernel
 	local objects = $(sources:S=$(SUFOBJ)) ;
 
 	# add private kernel headers
-	SourceSysHdrs $(sources) : $(TARGET_PRIVATE_KERNEL_HEADERS) ;
+	if $(3) != false {
+		SourceSysHdrs $(sources) : $(TARGET_PRIVATE_KERNEL_HEADERS) ;
+	}
 
 	local object ;
 	for object in $(objects) {
@@ -103,7 +105,7 @@ rule KernelAddon
 	Depends $(target) : $(beginGlue) $(endGlue) ;
 
 	# compile and link
-	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) ;
+	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) : false ;
 	local linkFlags = -nostdlib -Xlinker -soname=\"$(target)\" ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
 	Main $(target) : $(sources) ;
@@ -132,7 +134,7 @@ rule KernelStaticLibrary
 	# This is designed to take a set of sources and libraries and create
 	# a file called lib<name>.a
 
-	SetupKernel $(2) : $(3) ;
+	SetupKernel $(2) : $(3) : false ;
 	Library $(1) : $(2) ;
 }
 

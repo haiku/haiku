@@ -4,7 +4,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers libs zlib ] ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders shared storage ;
+UsePrivateHeaders kernel shared storage ;
 SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
 
 SubDirC++Flags -fno-rtti ;

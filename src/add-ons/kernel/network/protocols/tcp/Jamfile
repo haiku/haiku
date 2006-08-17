@@ -10,7 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UsePrivateHeaders net ;
+UsePrivateHeaders kernel net ;
 
 KernelAddon tcp : kernel haiku_network protocols :
 	tcp.cpp

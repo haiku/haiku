@@ -9,6 +9,8 @@ oldOPTIM = $(OPTIM) ;
 	SubDirC++Flags -Wall -Wno-multichar -fno-rtti ;
 }
 
+UsePrivateHeaders kernel ;
+
 KernelAddon iso9660 : kernel file_systems :
 	iso.c
 	iso9660.cpp

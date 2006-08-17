@@ -1,10 +1,10 @@
 SubDir HAIKU_TOP src system boot loader net ;
 
-UsePrivateHeaders kernel ;
+UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
 SubDirC++Flags -fno-rtti ;
 
-KernelStaticLibrary boot_net.a :
+KernelStaticLibrary boot_net :
 	ARP.cpp
 	ChainBuffer.cpp
 	Ethernet.cpp

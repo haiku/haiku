@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers config_manager ;
 
+UsePrivateHeaders kernel ;
+
 KernelAddon config_manager : kernel bus_managers :
 	config_manager.c
 	;

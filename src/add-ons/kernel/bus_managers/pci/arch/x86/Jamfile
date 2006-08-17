@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers pci arch x86 ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
+UsePrivateHeaders kernel [ FDirName kernel arch x86 ] ;
+
 KernelStaticLibrary pci_arch_bus_manager : 
 	pci_bios.c
 	pci_controller.c

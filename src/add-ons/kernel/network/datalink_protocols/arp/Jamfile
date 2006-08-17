@@ -10,7 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UsePrivateHeaders net ;
+UsePrivateHeaders kernel net ;
 
 KernelAddon <module>arp : kernel haiku_network datalink_protocols :
 	arp.cpp

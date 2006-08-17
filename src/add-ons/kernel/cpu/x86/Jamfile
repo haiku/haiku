@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel cpu x86 ;
 
-UsePrivateHeaders kernel ;
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] ;
 
 KernelAddon generic_x86 : kernel cpu :
 	generic_x86.cpp

@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <fs_interface.h>
-#include <lock.h>
+#include "lock.h"
 #include <time.h>
 #include <endian.h>
 

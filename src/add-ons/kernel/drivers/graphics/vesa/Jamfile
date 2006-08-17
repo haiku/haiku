@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 
-UsePrivateHeaders graphics ;
-UsePrivateHeaders [ FDirName graphics vesa ] ;
+UsePrivateHeaders kernel graphics [ FDirName graphics vesa ] ;
 
 KernelAddon vesa : kernel drivers bin :
 	device.cpp

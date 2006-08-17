@@ -5,9 +5,8 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders [ FDirName shared ] ;
-UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders [ FDirName kernel util ] [ FDirName kernel arch $(TARGET_ARCH) ] ;
+UsePrivateHeaders kernel shared storage ;
 
 {
 	local defines =

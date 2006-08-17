@@ -15,7 +15,6 @@
 #include <sys/stat.h>
 #include <Drivers.h>
 #include <OS.h>
-#include <lock.h>
 #include <KernelExport.h> 
 #include <string.h>
 #include <dirent.h>
@@ -24,6 +23,7 @@
 #include <ByteOrder.h>
 #include <fs_cache.h>
 
+#include "lock.h"
 #include "rock.h"
 #include "iso.h"
 

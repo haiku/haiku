@@ -18,7 +18,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <lock.h>
 #include <malloc.h>
 
 #include <KernelExport.h>
@@ -34,6 +33,7 @@
 
 #include <util/kernel_cpp.h>
 
+#include "lock.h"
 #include "iso.h"
 #include "iso9660.h"
 

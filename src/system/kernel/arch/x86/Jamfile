@@ -5,6 +5,9 @@ SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers ps2 ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] 
+	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelStaticLibrary libx86 :
