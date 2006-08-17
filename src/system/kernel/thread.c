@@ -855,6 +855,7 @@ thread_exit2(void *_args)
 	remove_thread_from_team(team_get_kernel_team(), args.thread);
 	RELEASE_TEAM_LOCK();
 
+	// TODO: this needs to be done earlier, so that this thread cannot be found on its last trip
 	GRAB_THREAD_LOCK();
 	hash_remove(sThreadHash, args.thread);
 	sUsedThreads--;
@@ -905,7 +906,7 @@ thread_exit(void)
 	struct death_entry *death = NULL;
 	thread_id mainParentThread = -1;
 	bool deleteTeam = false;
-	sem_id cachedDeathSem = -1, parentDeadSem = -1, groupDeadSem = -1;
+	sem_id cachedDeathSem = -1;
 	status_t status;
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
@@ -1005,8 +1006,13 @@ thread_exit(void)
 				} else
 					death = NULL;
 
-				parentDeadSem = parent->dead_children.sem;
-				groupDeadSem = team->group->dead_child_sem;
+				// notify listeners that a new death entry is available
+				// TODO: should that be moved to handle_signal() (for SIGCHLD)?
+				// TODO: B_RELEASE_ALL opens up a race condition with wait_for_child().
+				release_sem_etc(parent->dead_children.sem, 0,
+					B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
+				release_sem_etc(team->group->dead_child_sem, 0,
+					B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
 			}
 
 			team_remove_team(team, &freeGroup);
@@ -1021,11 +1027,6 @@ thread_exit(void)
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
-		// notify listeners that a new death entry is available
-		// ToDo: should that be moved to handle_signal() (for SIGCHLD)?
-		release_sem_etc(parentDeadSem, 0, B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
-		release_sem_etc(groupDeadSem, 0, B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
-
 		team_delete_process_group(freeGroup);
 		team_delete_team(team);
 
