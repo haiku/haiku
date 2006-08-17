@@ -122,8 +122,7 @@ int main(int argc, char * argv[])
 		output("Kill returned %d (%d: %s)\n", ret, errno, strerror(errno));
 		FAILED("A process group with the same PID as the child exists");
 	}
-	
-	
+
 	/* Test passed */
 	#if VERBOSE > 0
 	output("Test passed\n");
@@ -131,5 +130,4 @@ int main(int argc, char * argv[])
 
 	PASSED;
 }
-
 

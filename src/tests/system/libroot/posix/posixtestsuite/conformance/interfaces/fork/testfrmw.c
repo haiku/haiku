@@ -68,4 +68,3 @@ void output_fini()
 	return;
 }
 #endif
-
