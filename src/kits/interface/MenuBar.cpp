@@ -391,7 +391,14 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	// TODO: Cleanup, merge some "if" blocks if possible
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
-	int localAction = fState = MENU_STATE_TRACKING;
+	fState = MENU_STATE_TRACKING;
+
+	if (startIndex != -1) {
+		be_app->ObscureCursor();
+		window->Lock();
+		SelectItem(ItemAt(startIndex), 0, true);
+		window->Unlock();
+	}
 	while (true) {
 		bigtime_t snoozeAmount = 40000;
 		bool locked = window->Lock();//WithTimeout(200000)
@@ -421,7 +428,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					} else {
 						// Menu was already opened, close it and bail
 						SelectItem(NULL);
-						localAction = MENU_STATE_CLOSED;
+						fState = MENU_STATE_CLOSED;
 						resultItem = NULL;
 					}
 				} else {
@@ -441,9 +448,14 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				snoozeAmount = 30000;
 				if (IsStickyMode())
 					menu->SetStickyMode(true);
+				int localAction;
 				resultItem = menu->_track(&localAction, system_time());
+				//menu->Window()->Activate();
+				if (localAction == MENU_STATE_CLOSED)
+					fState = MENU_STATE_CLOSED;
 			}
-		} else if (menuItem == NULL && !IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
+		} else if (menuItem == NULL && !IsStickyMode()
+				&& fState != MENU_STATE_TRACKING_SUBMENU) {
 			SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
@@ -451,10 +463,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		if (locked)
 			window->Unlock();
 
-		if (fState == MENU_STATE_CLOSED)
-			break;
-
-		if (localAction == MENU_STATE_CLOSED || (buttons != 0 && IsStickyMode() && menuItem == NULL))
+		if (fState == MENU_STATE_CLOSED 
+			|| (buttons != 0 && IsStickyMode() && menuItem == NULL))
 			break;
 		else if (buttons == 0 && !IsStickyMode()) {
 			// On an item without a submenu
@@ -484,7 +494,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	DeleteMenuWindow();
 
 	if (action != NULL)
-		*action = static_cast<int32>(localAction);
+		*action = fState;
 
 	return resultItem;
 }

@@ -781,68 +781,35 @@ BMenu::MessageReceived(BMessage *msg)
 void
 BMenu::KeyDown(const char *bytes, int32 numBytes)
 {
+	// TODO: Test how it works on beos and implement it correctly
 	switch (bytes[0]) {
-		/*case B_UP_ARROW:
-		{
-			if (fSelected) 	{
-				fSelected->fSelected = false;
-
-				if (fSelected == fItems.FirstItem())
-					fSelected = static_cast<BMenuItem *>(fItems.LastItem());
-				else
-					fSelected = ItemAt(IndexOf(fSelected) - 1);
-			} else
-				fSelected = static_cast<BMenuItem *>(fItems.LastItem());
-
-			fSelected->fSelected = true;
-
+		case B_UP_ARROW:
+			if (fLayout == B_ITEMS_IN_COLUMN)
+				SelectNextItem(fSelected, false);
 			break;
-		}
+
 		case B_DOWN_ARROW:
-		{
-			if (fSelected) {
-				fSelected->fSelected = false;
-
-				if (fSelected == fItems.LastItem())
-					fSelected = static_cast<BMenuItem *>(fItems.FirstItem());
-				else
-					fSelected = ItemAt(IndexOf(fSelected) + 1);
-			} else
-				fSelected = static_cast<BMenuItem *>(fItems.FirstItem());
-
-			fSelected->fSelected = true;
-
+			if (fLayout == B_ITEMS_IN_COLUMN)
+				SelectNextItem(fSelected, true);
 			break;
-		}
-		case B_HOME:
-		{
-			if (fSelected)
-				fSelected->fSelected = false;
 
-			fSelected = static_cast<BMenuItem *>(fItems.FirstItem());
-			fSelected->fSelected = true;
-
+		case B_LEFT_ARROW:
+			if (fLayout == B_ITEMS_IN_ROW)
+				SelectNextItem(fSelected, false);
 			break;
-		}
-		case B_END:
-		{
-			if (fSelected)
-				fSelected->fSelected = false;
 
-			fSelected = static_cast<BMenuItem *>(fItems.LastItem());
-			fSelected->fSelected = true;
-
+		case B_RIGHT_ARROW:
+			if (fLayout == B_ITEMS_IN_ROW)
+				SelectNextItem(fSelected, true);
 			break;
-		}
+
 		case B_ENTER:
 		case B_SPACE:
-		{
 			if (fSelected)
 				InvokeItem(fSelected);
 
 			break;
-		}
-		*/
+		
 		case B_ESCAPE:
 			QuitTracking();
 			break;
@@ -1330,6 +1297,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			if (IsStickyMode())
 				submenu->SetStickyMode(true);
 			BMenuItem *submenuItem = submenu->_track(&submenuAction, trackTime);
+			//submenu->Window()->Activate();
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
 				fState = submenuAction;
@@ -1910,9 +1878,7 @@ BMenu::Uninstall()
 
 void
 BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
-{
-	// TODO: make use of "selectFirstItem"
-		
+{	
 	// Avoid deselecting and then reselecting the same item
 	// which would cause flickering
 	if (menuItem != fSelected) {	
@@ -1930,8 +1896,10 @@ BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 	
 	if (fSelected != NULL && showSubmenu == 0) {
 		BMenu *subMenu = fSelected->Submenu();
-		if (subMenu != NULL && subMenu->Window() == NULL)
-			subMenu->_show();
+		if (subMenu != NULL && subMenu->Window() == NULL) {
+			subMenu->_show(selectFirstItem);
+			subMenu->Window()->Activate();
+		}
 	}
 }
 
@@ -1958,6 +1926,13 @@ BMenu::SelectNextItem(BMenuItem *item, bool forward)
 BMenuItem *
 BMenu::NextItem(BMenuItem *item, bool forward) const
 {
+	if (item == NULL) {
+		if (forward)
+			return ItemAt(CountItems() - 1);
+		else
+			return ItemAt(0);
+	}
+
 	int32 index = fItems.IndexOf(item);
 	if (forward)
 		index++;
@@ -2133,6 +2108,7 @@ BMenu::QuitTracking()
 	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
 		menuBar->RestoreFocus();
 
+	fChosenItem = NULL;
 	fState = MENU_STATE_CLOSED;
 }
 
