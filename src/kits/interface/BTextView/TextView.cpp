@@ -3561,15 +3561,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		// erase only to the right of startOffset
 		startEraseLine++;
 		long startErase = startOffset;
-		// TODO ? What is this for ?
-		/*if (startErase > line->offset) {
-			for ( ; ((*fText)[startErase] != B_SPACE) && ((*fText)[startErase] != B_TAB); startErase--) {
-				if (startErase <= line->offset)
-					break;	
-			}
-			if (startErase > line->offset)
-				startErase--;
-		}*/
 
 		BPoint erasePoint = PointAt(startErase);
 		eraseRect.left = erasePoint.x;
@@ -3578,8 +3569,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 
 		view->FillRect(eraseRect, B_SOLID_LOW);
 
-		eraseRect = clipRect;
-		startOffset = -1;
+		eraseRect = clipRect;		
 	}
 
 	BRegion inputRegion;
@@ -3587,9 +3577,14 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
 
 	float startLeft = fTextRect.left;
-	if (startOffset != -1)
+	if (startOffset != -1) {
 		startLeft = PointAt(startOffset).x;
-
+		if (ByteAt(startOffset) == B_ENTER) {
+			// StartOffset is a newline
+			startLeft = PointAt((*fLines)[startLine]->offset).x;
+		}
+	}
+	
 	BPoint leftTop(startLeft, line->origin);
 	for (long i = startLine; i <= endLine; i++) {
 		long length = (line + 1)->offset;
@@ -3670,7 +3665,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 						
 						view->PopState();
 					}
-							
+					
 					view->DrawString(fText->GetString(offset, tabChars), tabChars);
 					
 					if (foundTab) {
