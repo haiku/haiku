@@ -27,7 +27,7 @@ signal(int sig, sig_func_t signalHandler)
 	// the current thread (the original is copied into the last param)
 	err = sigaction(sig, &newAction, &oldAction);
 	if (err < B_OK) {
-		errno = 1;
+		errno = err;
 		return SIG_ERR;
 	}
 
