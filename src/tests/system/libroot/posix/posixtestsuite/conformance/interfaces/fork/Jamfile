@@ -4,3 +4,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
 
 SimpleTest fork_3-1 : 3-1.c ;
 SimpleTest fork_4-1 : 4-1.c ;
+SimpleTest fork_6-1 : 6-1.c ;
+SimpleTest fork_8-1 : 8-1.c ;
+SimpleTest fork_9-1 : 9-1.c ;
+SimpleTest fork_12-1 : 12-1.c ;
