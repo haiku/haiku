@@ -385,26 +385,25 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 	struct thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
+	if (set != NULL) {
+		switch (how) {
+			case SIG_BLOCK:
+				atomic_or(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
+				break;
+			case SIG_UNBLOCK:
+				atomic_and(&thread->sig_block_mask, ~*set);
+				break;
+			case SIG_SETMASK:
+				atomic_set(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
+				break;
+			default:
+				return B_BAD_VALUE;
+		}
+	}
+
 	if (oldSet != NULL)
 		*oldSet = oldMask;
 
-	if (set == NULL)
-		return B_OK;
-	
-	switch (how) {
-		case SIG_BLOCK:
-			atomic_or(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
-			break;
-		case SIG_UNBLOCK:
-			atomic_and(&thread->sig_block_mask, ~*set);
-			break;
-		case SIG_SETMASK:
-			atomic_set(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
-	
 	return B_OK;
 }
 
