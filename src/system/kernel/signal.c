@@ -385,6 +385,12 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 	struct thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
+	if (oldSet != NULL)
+		*oldSet = oldMask;
+
+	if (set == NULL)
+		return B_OK;
+	
 	switch (how) {
 		case SIG_BLOCK:
 			atomic_or(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
@@ -395,14 +401,10 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 		case SIG_SETMASK:
 			atomic_set(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
 			break;
-
 		default:
 			return B_BAD_VALUE;
 	}
-
-	if (oldSet != NULL)
-		*oldSet = oldMask;
-
+	
 	return B_OK;
 }
 
@@ -591,14 +593,11 @@ _user_sigprocmask(int how, const sigset_t *userSet, sigset_t *userOldSet)
 	sigset_t set, oldSet;
 	status_t status;
 
-	if (userSet == NULL)
-		return B_BAD_VALUE;
-
-	if (user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK
+	if ((userSet != NULL && user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK)
 		|| (userOldSet != NULL && user_memcpy(&oldSet, userOldSet, sizeof(sigset_t)) < B_OK))
 		return B_BAD_ADDRESS;
 
-	status = sigprocmask(how, &set, userOldSet ? &oldSet : NULL);
+	status = sigprocmask(how, userSet ? &set : NULL, userOldSet ? &oldSet : NULL);
 
 	// copy old set if asked for
 	if (status >= B_OK && userOldSet != NULL && user_memcpy(userOldSet, &oldSet, sizeof(sigset_t)) < B_OK)
