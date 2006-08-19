@@ -11,7 +11,7 @@
 
 #include <KernelExport.h>
 #include <util/Vector.h>
-#include <USB.h>
+#include <USB3.h>
 #include <util/kernel_cpp.h>
 
 #define USB_MAX_AREAS					8

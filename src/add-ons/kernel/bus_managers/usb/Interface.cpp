@@ -10,8 +10,7 @@
 
 
 Interface::Interface(Device *device)
-	:	ControlPipe(device,
-			device->LowSpeed() ? Pipe::LowSpeed : Pipe::NormalSpeed, 0, 8)
+	:	ControlPipe(device, device->Speed(), 0, 8)
 {
 }
 

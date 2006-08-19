@@ -61,13 +61,13 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	TRACE(("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable));
 	TRACE(("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask));
 
-	Pipe *pipe = (Pipe *)Configuration()->interface->active->endpoint[0].handle;
-	if (!pipe || pipe->Type() != Pipe::Interrupt) {
+	Object *object = GetStack()->GetObject(Configuration()->interface->active->endpoint[0].handle);
+	if (!object || (object->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0) {
 		TRACE(("USB Hub: no interrupt pipe found\n"));
 		return;
 	}
 
-	fInterruptPipe = (InterruptPipe *)pipe;
+	fInterruptPipe = (InterruptPipe *)object;
 	fInterruptPipe->QueueInterrupt(fInterruptStatus, sizeof(fInterruptStatus),
 		InterruptCallback, this);
 
@@ -193,7 +193,7 @@ Hub::Explore()
 
 				if (newDevice) {
 					fChildren[i] = newDevice;
-					Manager()->GetStack()->NotifyDeviceChange(fChildren[i], true);
+					GetStack()->NotifyDeviceChange(fChildren[i], true);
 				} else {
 					// the device failed to setup correctly, disable the port
 					// so that the device doesn't get in the way of future
@@ -206,7 +206,7 @@ Hub::Explore()
 				// Device removed...
 				TRACE(("USB Hub Explore(): Device removed\n"));
 				if (fChildren[i]) {
-					Manager()->GetStack()->NotifyDeviceChange(fChildren[i], false);
+					GetStack()->NotifyDeviceChange(fChildren[i], false);
 					delete fChildren[i];
 					fChildren[i] = NULL;
 				}
@@ -221,7 +221,7 @@ Hub::Explore()
 
 	// explore down the tree if we have hubs connected
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
-		if (!fChildren[i] || !fChildren[i]->IsHub())
+		if (!fChildren[i] || (fChildren[i]->Type() & USB_OBJECT_HUB) == 0)
 			continue;
 
 		((Hub *)fChildren[i])->Explore();
@@ -280,7 +280,7 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 	status_t result = Device::BuildDeviceName(string, index, bufferSize, device);
 	if (result < B_OK) {
 		// recursion to parent failed, we're at the root(hub)
-		int32 managerIndex = Manager()->GetStack()->IndexOfBusManager(Manager());
+		int32 managerIndex = GetStack()->IndexOfBusManager(Manager());
 		*index += snprintf(string + *index, bufferSize - *index, "%d", managerIndex);
 	}
 

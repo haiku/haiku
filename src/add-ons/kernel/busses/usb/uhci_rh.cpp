@@ -135,7 +135,7 @@ UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 devicenum)
 status_t
 UHCIRootHub::SubmitTransfer(Transfer *transfer)
 {
-	if (transfer->TransferPipe()->Type() != Pipe::Control)
+	if ((transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();

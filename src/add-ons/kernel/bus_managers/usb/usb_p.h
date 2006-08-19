@@ -16,12 +16,12 @@
 
 
 class Hub;
-class Device;
 class Stack;
 class Device;
 class Transfer;
 class BusManager;
 class ControlPipe;
+class Object;
 
 
 struct host_controller_info {
@@ -41,6 +41,17 @@ struct usb_driver_info {
 };
 
 
+#define USB_OBJECT_NONE					0x00000000
+#define USB_OBJECT_PIPE					0x00000001
+#define USB_OBJECT_CONTROL_PIPE			0x00000002
+#define USB_OBJECT_INTERRUPT_PIPE		0x00000004
+#define USB_OBJECT_BULK_PIPE			0x00000008
+#define USB_OBJECT_ISO_PIPE				0x00000010
+#define USB_OBJECT_INTERFACE			0x00000020
+#define USB_OBJECT_DEVICE				0x00000040
+#define USB_OBJECT_HUB					0x00000080
+
+
 class Stack {
 public:
 										Stack();
@@ -50,6 +61,10 @@ public:
 
 		bool							Lock();
 		void							Unlock();
+
+		usb_id							GetUSBID(Object *object);
+		void							PutUSBID(usb_id id);
+		Object							*GetObject(usb_id id);
 
 		void							AddBusManager(BusManager *bus);
 		int32							IndexOfBusManager(BusManager *bus);
@@ -90,6 +105,10 @@ private:
 		addr_t							fListhead32;
 		addr_t							fListhead64;
 
+		uint32							fObjectIndex;
+		uint32							fObjectMaxCount;
+		Object							**fObjectArray;
+
 		usb_driver_info					*fDriverList;
 };
 
@@ -101,10 +120,13 @@ private:
  */
 class BusManager {
 public:
-										BusManager();
+										BusManager(Stack *stack);
 virtual									~BusManager();
 
 virtual	status_t						InitCheck();
+
+		bool							Lock();
+		void							Unlock();
 
 		Device							*AllocateNewDevice(Device *parent,
 											bool lowSpeed);
@@ -129,7 +151,7 @@ protected:
 private:
 static	int32							ExploreThread(void *data);
 
-		sem_id 							fLock;
+		benaphore						fLock;
 		bool							fDeviceMap[128];
 		ControlPipe						*fDefaultPipe;
 		ControlPipe						*fDefaultPipeLowSpeed;
@@ -139,29 +161,48 @@ static	int32							ExploreThread(void *data);
 };
 
 
+class Object {
+public:
+										Object(BusManager *bus);
+
+		Stack							*GetStack() { return fStack; };
+
+		usb_id							USBID() { return fUSBID; };
+virtual	uint32							Type() { return USB_OBJECT_NONE; };
+
+private:
+		Stack							*fStack;
+		usb_id							fUSBID;
+};
+
+
 /*
  * The Pipe class is the communication management between the hardware and
  * the stack. It creates packets, manages these and performs callbacks.
  */
-class Pipe {
+class Pipe : public Object {
 public:
 enum	pipeDirection 	{ In, Out, Default };
 enum	pipeSpeed		{ LowSpeed, NormalSpeed };
-enum	pipeType		{ Control, Bulk, Isochronous, Interrupt, Invalid };
 
 										Pipe(Device *device,
 											pipeDirection direction,
 											pipeSpeed speed,
 											uint8 endpointAddress,
 											uint32 maxPacketSize);
+										Pipe(BusManager *bus,
+											int8 deviceAddress,
+											pipeSpeed speed,
+											uint32 maxPacketSize);
 virtual									~Pipe();
 
-virtual	int8							DeviceAddress();
-virtual	pipeType						Type() { return Invalid; };
-virtual	pipeSpeed						Speed() { return fSpeed; };
-virtual	pipeDirection					Direction() { return fDirection; };
-virtual	int8							EndpointAddress() { return fEndpoint; };
-virtual	uint32							MaxPacketSize() { return fMaxPacketSize; };
+virtual	uint32							Type() { return USB_OBJECT_PIPE; };
+
+		int8							DeviceAddress();
+		pipeSpeed						Speed() { return fSpeed; };
+		pipeDirection					Direction() { return fDirection; };
+		int8							EndpointAddress() { return fEndpoint; };
+		uint32							MaxPacketSize() { return fMaxPacketSize; };
 
 virtual	bool							DataToggle() { return fDataToggle; };
 virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
@@ -176,65 +217,14 @@ virtual	status_t						GetStatus(uint16 *status);
 
 protected:
 		Device							*fDevice;
+		int8							fDeviceAddress;
 		BusManager						*fBus;
+		usb_id							fUSBID;
 		pipeDirection					fDirection;
 		pipeSpeed						fSpeed;
 		uint8							fEndpoint;
 		uint32							fMaxPacketSize;
 		bool							fDataToggle;
-};
-
-
-class InterruptPipe : public Pipe {
-public:
-										InterruptPipe(Device *device,
-											pipeDirection direction,
-											pipeSpeed speed,
-											uint8 endpointAddress,
-											uint32 maxPacketSize);
-
-virtual	pipeType						Type() { return Interrupt; };
-
-		status_t						QueueInterrupt(void *data,
-											size_t dataLength,
-											usb_callback_func callback,
-											void *callbackCookie);
-};
-
-
-class BulkPipe : public Pipe {
-public:
-										BulkPipe(Device *device,
-											pipeDirection direction,
-											pipeSpeed speed,
-											uint8 endpointAddress,
-											uint32 maxPacketSize);
-
-virtual	pipeType						Type() { return Bulk; };
-
-		status_t						QueueBulk(void *data,
-											size_t dataLength,
-											usb_callback_func callback,
-											void *callbackCookie);
-};
-
-
-class IsochronousPipe : public Pipe {
-public:
-										IsochronousPipe(Device *device,
-											pipeDirection direction,
-											pipeSpeed speed,
-											uint8 endpointAddress,
-											uint32 maxPacketSize);
-
-virtual	pipeType						Type() { return Isochronous; };
-
-		status_t						QueueIsochronous(void *data,
-											size_t dataLength,
-											rlea *rleArray,
-											uint16 bufferDurationMS,
-											usb_callback_func callback,
-											void *callbackCookie);
 };
 
 
@@ -249,11 +239,9 @@ public:
 										ControlPipe(BusManager *bus,
 											int8 deviceAddress,
 											pipeSpeed speed,
-											uint8 endpointAddress,
 											uint32 maxPacketSize);
 
-virtual	int8							DeviceAddress();
-virtual	pipeType						Type() { return Control; };
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE; };
 
 										// The data toggle is not relevant
 										// for control transfers, as they are
@@ -278,9 +266,59 @@ static	void							SendRequestCallback(void *cookie,
 											void *data, size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
+};
 
-private:
-		int8							fDeviceAddress;
+
+class InterruptPipe : public Pipe {
+public:
+										InterruptPipe(Device *device,
+											pipeDirection direction,
+											pipeSpeed speed,
+											uint8 endpointAddress,
+											uint32 maxPacketSize);
+
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE; };
+
+		status_t						QueueInterrupt(void *data,
+											size_t dataLength,
+											usb_callback_func callback,
+											void *callbackCookie);
+};
+
+
+class BulkPipe : public Pipe {
+public:
+										BulkPipe(Device *device,
+											pipeDirection direction,
+											pipeSpeed speed,
+											uint8 endpointAddress,
+											uint32 maxPacketSize);
+
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
+
+		status_t						QueueBulk(void *data,
+											size_t dataLength,
+											usb_callback_func callback,
+											void *callbackCookie);
+};
+
+
+class IsochronousPipe : public Pipe {
+public:
+										IsochronousPipe(Device *device,
+											pipeDirection direction,
+											pipeSpeed speed,
+											uint8 endpointAddress,
+											uint32 maxPacketSize);
+
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
+
+		status_t						QueueIsochronous(void *data,
+											size_t dataLength,
+											rlea *rleArray,
+											uint16 bufferDurationMS,
+											usb_callback_func callback,
+											void *callbackCookie);
 };
 
 
@@ -288,13 +326,12 @@ class Interface : public ControlPipe {
 public:
 										Interface(Device *device);
 
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE | USB_OBJECT_INTERFACE; };
+
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
-
-private:
-		Device							*fDevice;
 };
 
 
@@ -306,10 +343,10 @@ public:
 
 		status_t						InitCheck();
 
-virtual	bool							IsHub()	{ return false; };
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE | USB_OBJECT_DEVICE; };
+
 		int8							Address() { return fDeviceAddress; };
 		BusManager						*Manager() { return fBus; };
-		bool							LowSpeed() { return fLowSpeed; };
 
 virtual	status_t						GetDescriptor(uint8 descriptorType,
 											uint8 index, uint16 languageID,
@@ -359,7 +396,7 @@ public:
 											usb_device_descriptor &desc,
 											int8 deviceAddress, bool lowSpeed);
 
-virtual	bool							IsHub()	{ return true; };
+virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE | USB_OBJECT_DEVICE | USB_OBJECT_HUB; };
 
 virtual	status_t						GetDescriptor(uint8 descriptorType,
 											uint8 index, uint16 languageID,

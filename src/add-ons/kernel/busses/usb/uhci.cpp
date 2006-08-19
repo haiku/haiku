@@ -9,7 +9,7 @@
 
 #include <module.h>
 #include <PCI.h>
-#include <USB.h>
+#include <USB3.h>
 #include <KernelExport.h>
 #include <stdlib.h>
 
@@ -323,7 +323,7 @@ Queue::PrintToStream()
 
 
 UHCI::UHCI(pci_info *info, Stack *stack)
-	:	BusManager(),
+	:	BusManager(stack),
 		fPCIInfo(info),
 		fStack(stack),
 		fFrameArea(-1),
@@ -338,13 +338,13 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fRootHub(NULL),
 		fRootHubAddress(0)
 {
-	TRACE(("usb_uhci: constructing new UHCI Host Controller Driver\n"));
-	fInitOK = false;
-
-	if (benaphore_init(&fUHCILock, "usb uhci lock") < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to create busmanager lock\n"));
+	if (!fInitOK) {
+		TRACE(("usb_uhci: bus manager failed to init\n"));
 		return;
 	}
+
+	TRACE(("usb_uhci: constructing new UHCI Host Controller Driver\n"));
+	fInitOK = false;
 
 	fRegisterBase = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_memory_base, 4);
@@ -454,23 +454,9 @@ UHCI::~UHCI()
 	delete [] fQueues;
 	delete fRootHub;
 	delete_area(fFrameArea);
-	benaphore_destroy(&fUHCILock);
 
 	put_module(B_PCI_MODULE_NAME);
-}
-
-
-bool
-UHCI::Lock()
-{
-	return (benaphore_lock(&fUHCILock) == B_OK);
-}
-
-
-void
-UHCI::Unlock()
-{
-	benaphore_unlock(&fUHCILock);
+	Unlock();
 }
 
 
@@ -518,7 +504,6 @@ UHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
-	SetStack(fStack);
 
 	TRACE(("usb_uhci: controller is started. status: %u curframe: %u\n",
 		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM)));
@@ -535,7 +520,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->SubmitTransfer(transfer);
 
-	if (transfer->TransferPipe()->Type() == Pipe::Control)
+	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
 	if (!transfer->Data() || transfer->DataLength() == 0)
@@ -565,7 +550,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	}
 
 	Queue *queue = fQueues[3];
-	if (pipe->Type() == Pipe::Interrupt)
+	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
 		queue = fQueues[2];
 
 	result = AddPendingTransfer(transfer, queue, firstDescriptor,

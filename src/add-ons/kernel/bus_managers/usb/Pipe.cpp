@@ -12,16 +12,31 @@
 
 Pipe::Pipe(Device *device, pipeDirection direction, pipeSpeed speed,
 	uint8 endpointAddress, uint32 maxPacketSize)
-	:	fDevice(device),
-		fBus(NULL),
+	:	Object(device->Manager()),
+		fDevice(device),
+		fDeviceAddress(device->Address()),
+		fBus(device->Manager()),
 		fDirection(direction),
 		fSpeed(speed),
 		fEndpoint(endpointAddress),
 		fMaxPacketSize(maxPacketSize),
 		fDataToggle(false)
 {
-	if (fDevice)
-		fBus = fDevice->Manager();
+}
+
+
+Pipe::Pipe(BusManager *bus, int8 deviceAddress, pipeSpeed speed,
+	uint32 maxPacketSize)
+	:	Object(bus),
+		fDevice(NULL),
+		fDeviceAddress(deviceAddress),
+		fBus(bus),
+		fDirection(Default),
+		fSpeed(speed),
+		fEndpoint(0),
+		fMaxPacketSize(maxPacketSize),
+		fDataToggle(true)
+{
 }
 
 
@@ -34,7 +49,7 @@ int8
 Pipe::DeviceAddress()
 {
 	if (!fDevice)
-		return -1;
+		return fDeviceAddress;
 
 	return fDevice->Address();
 }
@@ -210,21 +225,9 @@ ControlPipe::ControlPipe(Device *device, pipeSpeed speed,
 
 
 ControlPipe::ControlPipe(BusManager *bus, int8 deviceAddress, pipeSpeed speed,
-	uint8 endpointAddress, uint32 maxPacketSize)
-	:	Pipe(NULL, Pipe::Default, speed, endpointAddress, maxPacketSize),
-		fDeviceAddress(deviceAddress)
+	uint32 maxPacketSize)
+	:	Pipe(bus, deviceAddress, speed, maxPacketSize)
 {
-	fBus = bus;
-}
-
-
-int8
-ControlPipe::DeviceAddress()
-{
-	if (!fDevice)
-		return fDeviceAddress;
-
-	return fDevice->Address();
 }
 
 

@@ -15,6 +15,7 @@ KernelStaticLibrary libusb.a :
 	Transfer.cpp
 	Pipe.cpp
 	Interface.cpp
+	Object.cpp
 	: -fno-pic
 ;	
 

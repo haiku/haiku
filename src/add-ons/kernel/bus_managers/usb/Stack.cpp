@@ -20,7 +20,10 @@
 
 
 Stack::Stack()
-	:	fDriverList(NULL)
+	:	fObjectIndex(1),
+		fObjectMaxCount(1024),
+		fObjectArray(NULL),
+		fDriverList(NULL)
 {
 	TRACE(("usb stack: stack init\n"));
 
@@ -28,6 +31,10 @@ Stack::Stack()
 		TRACE(("usb stack: failed to create benaphore lock\n"));
 		return;
 	}
+
+	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
+	fObjectArray = (Object **)malloc(objectArraySize);
+	memset(fObjectArray, 0, objectArraySize);
 
 	// Initialise the memory chunks: create 8, 16 and 32 byte-heaps
 	// NOTE: This is probably the most ugly code you will see in the
@@ -182,6 +189,61 @@ void
 Stack::Unlock()
 {
 	benaphore_unlock(&fLock);
+}
+
+
+usb_id
+Stack::GetUSBID(Object *object)
+{
+	if (!Lock())
+		return 0;
+
+	if (fObjectIndex >= fObjectMaxCount) {
+		Unlock();
+		return 0;
+	}
+
+	uint32 id = fObjectIndex++;
+	fObjectArray[id] = object;
+	Unlock();
+
+	return (usb_id)id;
+}
+
+
+void
+Stack::PutUSBID(usb_id id)
+{
+	if (!Lock())
+		return;
+
+	if (id >= fObjectMaxCount) {
+		TRACE(("usb stack: tried to put invalid usb_id!\n"));
+		Unlock();
+		return;
+	}
+
+	fObjectArray[id] = NULL;
+	Unlock();
+}
+
+
+Object *
+Stack::GetObject(usb_id id)
+{
+	if (!Lock())
+		return NULL;
+
+	if (id >= fObjectMaxCount) {
+		TRACE(("usb stack: tried to get object with invalid id\n"));
+		Unlock();
+		return NULL;
+	}
+
+	Object *result = fObjectArray[id];
+	Unlock();
+
+	return result;
 }
 
 

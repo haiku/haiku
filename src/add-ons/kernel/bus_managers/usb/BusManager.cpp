@@ -18,38 +18,40 @@
 #endif
 
 
-BusManager::BusManager()
+BusManager::BusManager(Stack *stack)
+	:	fInitOK(false),
+		fDefaultPipe(NULL),
+		fDefaultPipeLowSpeed(NULL),
+		fRootHub(NULL),
+		fStack(stack),
+		fExploreThread(-1)
 {
-	fInitOK = false;
-	fRootHub = NULL;
-
-	// Set up the semaphore
-	fLock = create_sem(1, "bus manager lock");
-	if (fLock < B_OK)
+	if (benaphore_init(&fLock, "usb busmanager lock") < B_OK) {
+		TRACE(("usb BusManager: failed to create busmanager lock\n"));
 		return;
-
-	set_sem_owner(B_SYSTEM_TEAM, fLock);
+	}
 
 	// Clear the device map
 	for (int32 i = 0; i < 128; i++)
 		fDeviceMap[i] = false;
 
 	// Set up the default pipes
-	fDefaultPipe = new(std::nothrow) ControlPipe(this, 0, Pipe::NormalSpeed, 0, 8);
+	fDefaultPipe = new(std::nothrow) ControlPipe(this, 0, Pipe::NormalSpeed, 8);
 	if (!fDefaultPipe)
 		return;
 
-	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(this, 0, Pipe::LowSpeed, 0, 8);
+	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(this, 0, Pipe::LowSpeed, 8);
 	if (!fDefaultPipeLowSpeed)
 		return;
 
-	fExploreThread = -1; 
 	fInitOK = true;
 }
 
 
 BusManager::~BusManager()
 {
+	Lock();
+	benaphore_destroy(&fLock);
 }
 
 
@@ -60,6 +62,20 @@ BusManager::InitCheck()
 		return B_OK;
 
 	return B_ERROR;
+}
+
+
+bool
+BusManager::Lock()
+{
+	return (benaphore_lock(&fLock) == B_OK);
+}
+
+
+void
+BusManager::Unlock()
+{
+	benaphore_unlock(&fLock);
 }
 
 
@@ -127,7 +143,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(this, deviceAddress,
-		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 0, 8);
+		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 8);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -206,7 +222,8 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 int8
 BusManager::AllocateAddress()
 {
-	acquire_sem_etc(fLock, 1, B_CAN_INTERRUPT, 0);
+	if (!Lock())
+		return -1;
 
 	int8 deviceAddress = -1;
 	for (int32 i = 1; i < 128; i++) {
@@ -217,7 +234,7 @@ BusManager::AllocateAddress()
 		}
 	}
 
-	release_sem(fLock);
+	Unlock();
 	return deviceAddress;
 }
 

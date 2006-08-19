@@ -67,9 +67,6 @@ public:
 									UHCI(pci_info *info, Stack *stack);
 									~UHCI();
 
-		bool						Lock();
-		void						Unlock();
-
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual	status_t					SubmitRequest(Transfer *transfer);
@@ -139,7 +136,6 @@ static	pci_module_info				*sPCIModule;
 		uint32						fRegisterBase;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
-		benaphore					fUHCILock;
 
 		// Frame list memory
 		area_id						fFrameArea;

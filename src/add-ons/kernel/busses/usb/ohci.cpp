@@ -33,7 +33,7 @@
 //	---------------------------
 #include <module.h>
 #include <PCI.h>
-#include <USB.h>
+#include <USB3.h>
 #include <KernelExport.h>
 #include <stdlib.h>
 
@@ -187,6 +187,7 @@ module_info *modules[] =
 //------------------------------------------------------------------------
 
 OHCI::OHCI( pci_info *info , Stack *stack )
+	:	BusManager(stack)
 {
 	m_pcii = info;
 	m_stack = stack;
