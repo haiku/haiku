@@ -12,6 +12,7 @@
 
 #include <lock.h>
 #include "usbspec_p.h"
+#include "BeOSCompatibility.h"
 
 
 class Hub;
