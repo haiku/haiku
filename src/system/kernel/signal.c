@@ -493,11 +493,17 @@ alarm_event(timer *t)
 }
 
 
+/** Sets the alarm timer for the current thread. The timer fires at the
+ *	specified time in the future, periodically or just once, as determined
+ *	by \a mode.
+ *	\return the time left until a previous set alarm would have fired.
+ */
+
 bigtime_t
 set_alarm(bigtime_t time, uint32 mode)
 {
 	struct thread *thread = thread_get_current_thread();
-	bigtime_t rv = 0;
+	bigtime_t remainingTime = 0;
 
 	ASSERT(B_ONE_SHOT_RELATIVE_ALARM == B_ONE_SHOT_RELATIVE_TIMER);
 		// just to be sure no one changes the headers some day
@@ -505,14 +511,18 @@ set_alarm(bigtime_t time, uint32 mode)
 	TRACE(("set_alarm: thread = %p\n", thread));
 
 	if (thread->alarm.period)
-		rv = (bigtime_t)thread->alarm.entry.key - system_time();
+		remainingTime = (bigtime_t)thread->alarm.entry.key - system_time();
 
 	cancel_timer(&thread->alarm);
 
 	if (time != B_INFINITE_TIMEOUT)
 		add_timer(&thread->alarm, &alarm_event, time, mode);
+	else {
+		// this marks the alarm as canceled (for returning the remaining time)
+		thread->alarm.period = 0;
+	}
 
-	return rv;
+	return remainingTime;
 }
 
 

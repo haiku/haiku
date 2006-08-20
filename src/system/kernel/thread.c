@@ -209,6 +209,7 @@ create_thread_struct(const char *name, thread_id threadID)
 	thread->queue_next = NULL;
 	thread->priority = thread->next_priority = -1;
 	thread->args1 = NULL;  thread->args2 = NULL;
+	thread->alarm.period = 0;
 	thread->sig_pending = 0;
 	thread->sig_block_mask = 0;
 	memset(thread->sig_action, 0, 32 * sizeof(struct sigaction));
