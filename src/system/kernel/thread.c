@@ -850,17 +850,11 @@ thread_exit2(void *_args)
 	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n", args.thread->id));
 
 	disable_interrupts();
-
 	GRAB_TEAM_LOCK();
+
 	remove_thread_from_team(team_get_kernel_team(), args.thread);
+
 	RELEASE_TEAM_LOCK();
-
-	// TODO: this needs to be done earlier, so that this thread cannot be found on its last trip
-	GRAB_THREAD_LOCK();
-	hash_remove(sThreadHash, args.thread);
-	sUsedThreads--;
-	RELEASE_THREAD_LOCK();
-
 	enable_interrupts();
 		// needed for the debugger notification below
 
@@ -921,12 +915,15 @@ thread_exit(void)
 	// boost our priority to get this over with
 	thread->priority = thread->next_priority = B_URGENT_DISPLAY_PRIORITY;
 
-	// stop debugging for this thread
+	// Stop debugging for this thread, and remove it from the hashtable, so it
+	// cannot be found afterwards anymore
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
 	debugInfo = thread->debug_info;
 	clear_thread_debug_info(&thread->debug_info, true);
+	hash_remove(sThreadHash, thread);
+	sUsedThreads--;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
