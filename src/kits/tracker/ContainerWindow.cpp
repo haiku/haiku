@@ -1106,6 +1106,14 @@ BContainerWindow::WorkspacesChanged(uint32, uint32)
 void 
 BContainerWindow::ViewModeChanged(uint32 oldMode, uint32 newMode)
 {
+	BView *view = FindView("MenuBar");
+	if (view != NULL) {
+		// make sure the draggable icon hides if it doesn't have space left anymore
+		view = view->FindView("ThisContainer");
+		if (view != NULL)
+			view->FrameMoved(view->Frame().LeftTop());
+	}
+
 	if (!fBackgroundImage)
 		return;
 
