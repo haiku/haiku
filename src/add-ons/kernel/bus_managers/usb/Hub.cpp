@@ -207,6 +207,7 @@ Hub::Explore()
 				TRACE(("USB Hub Explore(): Device removed\n"));
 				if (fChildren[i]) {
 					GetStack()->NotifyDeviceChange(fChildren[i], false);
+					GetStack()->PutUSBID(fChildren[i]->USBID());
 					delete fChildren[i];
 					fChildren[i] = NULL;
 				}

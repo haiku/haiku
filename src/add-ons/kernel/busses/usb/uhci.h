@@ -116,9 +116,9 @@ static	int32						FinishThread(void *data);
 										uhci_td *second);
 
 		size_t						WriteDescriptorChain(uhci_td *topDescriptor,
-										const uint8 *buffer, size_t bufferLength);
+										iovec *vector, size_t vectorCount);
 		size_t						ReadDescriptorChain(uhci_td *topDescriptor,
-										uint8 *buffer, size_t bufferLength,
+										iovec *vector, size_t vectorCount,
 										uint8 *lastDataToggle);
 		size_t						ReadActualLength(uhci_td *topDescriptor,
 										uint8 *lastDataToggle);

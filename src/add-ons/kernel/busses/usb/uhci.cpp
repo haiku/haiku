@@ -523,7 +523,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
-	if (!transfer->Data() || transfer->DataLength() == 0)
+	if (transfer->VectorCount() == 0)
 		return B_BAD_VALUE;
 
 	Pipe *pipe = transfer->TransferPipe();
@@ -533,7 +533,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	uhci_td *lastDescriptor = NULL;
 	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
 		&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-		transfer->DataLength());
+		transfer->VectorLength());
 
 	if (result < B_OK)
 		return result;
@@ -545,8 +545,8 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	lastDescriptor->link_log = 0;
 
 	if (!directionIn) {
-		WriteDescriptorChain(firstDescriptor, transfer->Data(),
-			transfer->DataLength());
+		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
+			transfer->VectorCount());
 	}
 
 	Queue *queue = fQueues[3];
@@ -592,8 +592,10 @@ UHCI::SubmitRequest(Transfer *transfer)
 		return B_NO_MEMORY;
 	}
 
-	WriteDescriptorChain(setupDescriptor, (const uint8 *)requestData,
-		sizeof(usb_request_data));
+	iovec vector;
+	vector.iov_base = requestData;
+	vector.iov_len = sizeof(usb_request_data);
+	WriteDescriptorChain(setupDescriptor, &vector, 1);
 
 	statusDescriptor->status |= TD_CONTROL_IOC;
 	statusDescriptor->token |= TD_TOKEN_DATA1;
@@ -601,11 +603,11 @@ UHCI::SubmitRequest(Transfer *transfer)
 	statusDescriptor->link_log = NULL;
 
 	uhci_td *dataDescriptor = NULL;
-	if (transfer->Data() && transfer->DataLength() > 0) {
+	if (transfer->VectorCount() > 0) {
 		uhci_td *lastDescriptor = NULL;
 		status_t result = CreateDescriptorChain(pipe, &dataDescriptor,
 			&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-			transfer->DataLength());
+			transfer->VectorLength());
 
 		if (result < B_OK) {
 			FreeDescriptor(setupDescriptor);
@@ -614,8 +616,8 @@ UHCI::SubmitRequest(Transfer *transfer)
 		}
 
 		if (!directionIn) {
-			WriteDescriptorChain(dataDescriptor, transfer->Data(),
-				transfer->DataLength());
+			WriteDescriptorChain(dataDescriptor, transfer->Vector(),
+				transfer->VectorCount());
 		}
 
 		LinkDescriptors(setupDescriptor, dataDescriptor);
@@ -759,8 +761,8 @@ UHCI::FinishTransfers()
 						// data to read out
 						actualLength = ReadDescriptorChain(
 							transfer->data_descriptor,
-							transfer->transfer->Data(),
-							transfer->transfer->DataLength(),
+							transfer->transfer->Vector(),
+							transfer->transfer->VectorCount(),
 							&lastDataToggle);
 					} else {
 						// read the actual length that was sent
@@ -1186,22 +1188,45 @@ UHCI::LinkDescriptors(uhci_td *first, uhci_td *second)
 
 
 size_t
-UHCI::WriteDescriptorChain(uhci_td *topDescriptor, const uint8 *buffer,
-	size_t bufferLength)
+UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
+	size_t vectorCount)
 {
-	size_t actualLength = 0;
 	uhci_td *current = topDescriptor;
+	size_t actualLength = 0;
+	size_t vectorIndex = 0;
+	size_t vectorOffset = 0;
+	size_t bufferOffset = 0;
 
 	while (current) {
 		if (!current->buffer_log)
 			break;
 
-		size_t length = min_c(current->buffer_size, bufferLength);
-		memcpy(current->buffer_log, buffer, length);
+		while (true) {
+			size_t length = min_c(current->buffer_size - bufferOffset,
+				vector[vectorIndex].iov_len - vectorOffset);
 
-		bufferLength -= length;
-		actualLength += length;
-		buffer += length;
+			TRACE(("usb_uhci: copying %d bytes to bufferOffset %d from vectorOffset %d at index %d of %d\n", length, bufferOffset, vectorOffset, vectorIndex, vectorCount));
+			memcpy((uint8 *)current->buffer_log + bufferOffset,
+				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
+
+			actualLength += length;
+			vectorOffset += length;
+			bufferOffset += length;
+
+			if (vectorOffset >= vector[vectorIndex].iov_len) {
+				if (++vectorIndex >= vectorCount) {
+					TRACE(("usb_uhci: wrote descriptor chain (%d bytes, no more vectors)\n", actualLength));
+					return actualLength;
+				}
+
+				vectorOffset = 0;
+			}
+
+			if (bufferOffset >= current->buffer_size) {
+				bufferOffset = 0;
+				break;
+			}
+		}
 
 		if (current->link_phy & TD_TERMINATE)
 			break;
@@ -1215,28 +1240,53 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, const uint8 *buffer,
 
 
 size_t
-UHCI::ReadDescriptorChain(uhci_td *topDescriptor, uint8 *buffer,
-	size_t bufferLength, uint8 *lastDataToggle)
+UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
+	size_t vectorCount, uint8 *lastDataToggle)
 {
-	size_t actualLength = 0;
-	uhci_td *current = topDescriptor;
 	uint8 dataToggle = 0;
+	uhci_td *current = topDescriptor;
+	size_t actualLength = 0;
+	size_t vectorIndex = 0;
+	size_t vectorOffset = 0;
+	size_t bufferOffset = 0;
 
 	while (current && (current->status & TD_STATUS_ACTIVE) == 0) {
 		if (!current->buffer_log)
 			break;
 
-		size_t length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
-		if (length == TD_STATUS_ACTLEN_NULL + 1)
-			length = 0;
-
-		length = min_c(length, bufferLength);
-		memcpy(buffer, current->buffer_log, length);
-
-		buffer += length;
-		bufferLength -= length;
-		actualLength += length;
 		dataToggle = (current->token >> TD_TOKEN_DATA_TOGGLE_SHIFT) & 0x01;
+		size_t bufferSize = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
+		if (bufferSize == TD_STATUS_ACTLEN_NULL + 1)
+			bufferSize = 0;
+
+		while (true) {
+			size_t length = min_c(bufferSize - bufferOffset,
+				vector[vectorIndex].iov_len - vectorOffset);
+
+			TRACE(("usb_uhci: copying %d bytes to vectorOffset %d from bufferOffset %d at index %d of %d\n", length, vectorOffset, bufferOffset, vectorIndex, vectorCount));
+			memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
+				(uint8 *)current->buffer_log + bufferOffset, length);
+
+			actualLength += length;
+			vectorOffset += length;
+			bufferOffset += length;
+
+			if (vectorOffset >= vector[vectorIndex].iov_len) {
+				if (++vectorIndex >= vectorCount) {
+					TRACE(("usb_uhci: read descriptor chain (%d bytes, no more vectors)\n", actualLength));
+					if (lastDataToggle)
+						*lastDataToggle = dataToggle;
+					return actualLength;
+				}
+
+				vectorOffset = 0;
+			}
+
+			if (bufferOffset >= bufferSize) {
+				bufferOffset = 0;
+				break;
+			}
+		}
 
 		if (current->link_phy & TD_TERMINATE)
 			break;

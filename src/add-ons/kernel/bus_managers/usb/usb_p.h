@@ -300,6 +300,10 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
 											size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
+		status_t						QueueBulkV(iovec *vector,
+											size_t vectorCount,
+											usb_callback_func callback,
+											void *callbackCookie);
 };
 
 
@@ -451,8 +455,13 @@ public:
 		usb_request_data			*RequestData() { return fRequestData; };
 
 		void						SetData(uint8 *buffer, size_t length);
-		uint8						*Data() { return fData; };
-		size_t						DataLength() { return fDataLength; };
+		uint8						*Data() { return (uint8 *)fData.iov_base; };
+		size_t						DataLength() { return fData.iov_len; };
+
+		void						SetVector(iovec *vector, size_t vectorCount);
+		iovec						*Vector() { return fVector; };
+		size_t						VectorCount() { return fVectorCount; };
+		size_t						VectorLength();
 
 		void						SetCallback(usb_callback_func callback,
 										void *cookie);
@@ -462,8 +471,10 @@ public:
 private:
 		// Data that is related to the transfer
 		Pipe						*fPipe;
-		uint8						*fData;
-		size_t						fDataLength;
+		iovec						fData;
+		iovec						*fVector;
+		size_t						fVectorCount;
+
 		usb_callback_func			fCallback;
 		void						*fCallbackCookie;
 

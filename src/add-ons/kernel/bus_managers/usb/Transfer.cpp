@@ -11,8 +11,8 @@
 
 Transfer::Transfer(Pipe *pipe)
 	:	fPipe(pipe),
-		fData(NULL),
-		fDataLength(0),
+		fVector(&fData),
+		fVectorCount(0),
 		fCallback(NULL),
 		fCallbackCookie(NULL),
 		fRequestData(NULL)
@@ -38,8 +38,29 @@ Transfer::SetRequestData(usb_request_data *data)
 void
 Transfer::SetData(uint8 *data, size_t dataLength)
 {
-	fData = data;
-	fDataLength = dataLength;
+	fData.iov_base = data;
+	fData.iov_len = dataLength;
+
+	if (data && dataLength > 0)
+		fVectorCount = 1;
+}
+
+
+void
+Transfer::SetVector(iovec *vector, size_t vectorCount)
+{
+	fVector = vector;
+	fVectorCount = vectorCount;
+}
+
+
+size_t
+Transfer::VectorLength()
+{
+	size_t length = 0;
+	for (int32 i = 0; i < fVectorCount; i++)
+		length += fVector[i].iov_len;
+	return length;
 }
 
 
@@ -55,5 +76,5 @@ void
 Transfer::Finished(uint32 status, size_t actualLength)
 {
 	if (fCallback)
-		fCallback(fCallbackCookie, status, fData, actualLength);
+		fCallback(fCallbackCookie, status, fVector[0].iov_base, actualLength);
 }

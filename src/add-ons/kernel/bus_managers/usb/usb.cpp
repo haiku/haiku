@@ -267,7 +267,8 @@ queue_bulk_v(usb_pipe pipe, iovec *vector, size_t vectorCount,
 	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
 		return B_BAD_VALUE;
 
-	return B_ERROR;
+	return ((BulkPipe *)object)->QueueBulkV(vector, vectorCount, callback,
+		callbackCookie);
 }
 
 
