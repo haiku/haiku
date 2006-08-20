@@ -1105,6 +1105,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
+	case 0x039310de: /* Nvidia GeForce 7300 GT */
+		si->ps.card_type = G73;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7300 GT");
+		sprintf(si->adi.chipset, "G73");
+		status = nvxx_general_powerup();
+		break;
 	/* Vendor Elsa GmbH */
 	case 0x0c601048: /* Elsa Gladiac Geforce2 MX */
 		si->ps.card_type = NV11;

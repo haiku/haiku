@@ -304,6 +304,7 @@ static uint16 nvidia_device_list[] = {
 	0x034e, /* Nvidia Quadro FX 1100 */
 	0x034f, /* Nvidia unknown FX */
 	0x0391, /* Nvidia GeForce 7600 GT */
+	0x0393, /* Nvidia GeForce 7300 GT */
 	0
 };
 /*
