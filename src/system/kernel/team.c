@@ -618,6 +618,7 @@ create_process_group(pid_t id)
 	group->session = NULL;
 	group->teams = NULL;
 	group->wait_for_any = 0;
+	group->dead_child_waiters++;
 
 	return group;
 }
@@ -720,6 +721,7 @@ create_team_struct(const char *name, bool kernel)
 	list_init(&team->dead_children.list);
 	team->dead_children.count = 0;
 	team->dead_children.wait_for_any = 0;
+	team->dead_children.waiters = 0;
 	team->dead_children.kernel_time = 0;
 	team->dead_children.user_time = 0;
 	team->dead_children.sem = create_sem(0, "dead children");
@@ -1628,7 +1630,7 @@ get_team_death_entry(struct team *team, thread_id child, struct death_entry *dea
 
 static status_t
 get_death_entry(struct team *team, pid_t child, struct death_entry *death,
-	sem_id *_waitSem, struct death_entry **_freeDeath)
+	sem_id *_waitSem, int32 **_waitCount, struct death_entry **_freeDeath)
 {
 	struct process_group *group;
 	status_t status;
@@ -1636,6 +1638,7 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 	if (child == -1 || child > 0) {
 		// wait for any children or a specific child of this team to die
 		*_waitSem = team->dead_children.sem;
+		*_waitCount = &team->dead_children.waiters;
 		return get_team_death_entry(team, child, death, _freeDeath);
 	} else if (child < 0) {
 		// we wait for all children of the specified process group
@@ -1656,6 +1659,7 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 	}
 
 	*_waitSem = group->dead_child_sem;
+	*_waitCount = &group->dead_child_waiters;
 	return B_WOULD_BLOCK;
 }
 
@@ -1670,8 +1674,6 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	struct team *team = thread_get_current_thread()->team;
 	struct death_entry death, *freeDeath = NULL;
 	status_t status = B_OK;
-	sem_id waitSem;
-	cpu_status state;
 	bool childExists = false;
 
 	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
@@ -1689,7 +1691,10 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	}
 
 	while (true) {
-		state = disable_interrupts();
+		int32 *waitCount;
+		sem_id waitSem;
+
+		cpu_status state = disable_interrupts();
 		GRAB_THREAD_LOCK();
 
 		if (child > 0 && !childExists) {
@@ -1720,7 +1725,23 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 
 		GRAB_TEAM_LOCK();
 
-		status = get_death_entry(team, child, &death, &waitSem, &freeDeath);
+		status = get_death_entry(team, child, &death, &waitSem, &waitCount, &freeDeath);
+
+		// there was no matching group/child we could wait for
+		if (status == B_BAD_THREAD_ID) {
+			if (child <= 0 || !childExists) {
+				status = ECHILD;
+				goto err;
+			} else {
+				// the specific child we're waiting for is still running
+				status = B_WOULD_BLOCK;
+			}
+		}
+		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0) {
+			// We need to hold the team lock when changing this counter,
+			// but of course only if we really will wait later
+			(*waitCount)++;
+		}
 
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
@@ -1728,16 +1749,8 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		// we got our death entry and can return to our caller
 		if (status == B_OK)
 			break;
-
-		// there was no matching group/child we could wait for
-		if (status == B_BAD_THREAD_ID) {
-			if (child <= 0 || !childExists) {
-				status = ECHILD;
-				goto err;
-			}
-
-			// the specific child we're waiting for is still running
-		}
+		if (status != B_WOULD_BLOCK)
+			goto err;
 
 		if ((flags & WNOHANG) != 0) {
 			status = B_WOULD_BLOCK;

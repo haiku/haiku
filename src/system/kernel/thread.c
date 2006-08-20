@@ -1008,11 +1008,13 @@ thread_exit(void)
 
 				// notify listeners that a new death entry is available
 				// TODO: should that be moved to handle_signal() (for SIGCHLD)?
-				// TODO: B_RELEASE_ALL opens up a race condition with wait_for_child().
-				release_sem_etc(parent->dead_children.sem, 0,
-					B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
-				release_sem_etc(team->group->dead_child_sem, 0,
-					B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
+				release_sem_etc(parent->dead_children.sem,
+					parent->dead_children.waiters, B_DO_NOT_RESCHEDULE);
+				release_sem_etc(team->group->dead_child_sem,
+					team->group->dead_child_waiters, B_DO_NOT_RESCHEDULE);
+
+				parent->dead_children.waiters = 0;
+				team->group->dead_child_waiters = 0;
 			}
 
 			team_remove_team(team, &freeGroup);

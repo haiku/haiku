@@ -66,6 +66,7 @@ struct process_group {
 	pid_t				id;
 	sem_id				dead_child_sem;
 	int32				wait_for_any;
+	int32				dead_child_waiters;	// count of threads waiting for sem
 	struct team			*teams;
 };
 
@@ -96,16 +97,17 @@ struct team {
 	struct process_group *group;
 	char			name[B_OS_NAME_LENGTH];
 	char			args[64];		// contents for the team_info::args field
-	int				num_threads;	/* number of threads in this team */
-	int				state;			/* current team state, see above */
+	int				num_threads;	// number of threads in this team
+	int				state;			// current team state, see above
 	int				pending_signals;
 	void			*io_context;
-	sem_id			death_sem;		/* semaphore to wait on for dying threads */
+	sem_id			death_sem;		// semaphore to wait on for dying threads
 	struct {
-		sem_id		sem;			/* wait for dead child entries */
+		sem_id		sem;			// wait for dead child entries
 		struct list	list;
 		uint32		count;
-		int32		wait_for_any;	/* count of wait_for_child() that wait for any child */
+		vint32		wait_for_any;	// count of wait_for_child() that wait for any child
+		int32		waiters;		// count of all threads waiting for dead children sem
 		bigtime_t	kernel_time;
 		bigtime_t	user_time;
 	} dead_children;
