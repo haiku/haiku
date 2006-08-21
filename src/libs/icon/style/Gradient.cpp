@@ -551,6 +551,21 @@ Gradient::MakeGradient(uint32* colors, int32 count) const
 	}
 }
 
+// FitToBounds
+void
+Gradient::FitToBounds(const BRect& bounds)
+{
+	double parl[6];
+	parl[0] = bounds.left;
+	parl[1] = bounds.top;
+	parl[2] = bounds.right;
+	parl[3] = bounds.top;
+	parl[4] = bounds.right;
+	parl[5] = bounds.bottom;
+	agg::trans_affine transform(-200.0, -200.0, 200.0, 200.0, parl);
+	multiply(transform);
+}
+
 // string_for_type
 static const char*
 string_for_type(gradient_type type)
@@ -589,7 +604,7 @@ string_for_interpolation(interpolation_type type)
 BRect
 Gradient::GradientArea() const
 {
-	BRect area(0, 0, 63, 63);
+	BRect area(0, 0, 64, 64);
 	switch (fType) {
 		case GRADIENT_LINEAR:
 		case GRADIENT_CIRCULAR:

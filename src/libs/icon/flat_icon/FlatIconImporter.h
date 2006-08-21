@@ -33,11 +33,10 @@ class FlatIconImporter {
 								FlatIconImporter();
 	virtual						~FlatIconImporter();
 
-	// Importer interface (Importer base not yet written)
-	virtual	status_t			Import(Icon* icon,
+	// FlatIconImporter
+			status_t			Import(Icon* icon,
 									   BPositionIO* stream);
 
-	// FlatIconImporter
 			status_t			Import(Icon* icon,
 									   uint8* buffer, size_t size);
 

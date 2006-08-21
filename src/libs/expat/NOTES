@@ -1,0 +1,3 @@
+This is straight from the source of expat release 1.95.8. I configured to obtain "expat_config.h" and put that together with "expat.h" and "expat_external.h" into the libs/expat/ headers. Then I created a Jamefile that builds the same sources as the generated Makefile and removed all stuff but the sources and license. The existance of expat in the Haiku tree should be temporary only, until better a SVG parsing engine for Icon-O-Matic is written...
+
+-stippi

@@ -106,6 +106,7 @@ class Gradient : public Transformable {
 			void				MakeGradient(uint32* colors,
 											 int32 count) const;
 
+			void				FitToBounds(const BRect& bounds);
 			BRect				GradientArea() const;
 	virtual	void				TransformationChanged();
 
