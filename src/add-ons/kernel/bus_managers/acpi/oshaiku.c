@@ -852,6 +852,7 @@ AcpiOsExecute (
 		case OSL_DEBUGGER_THREAD:
 		case OSL_EC_POLL_HANDLER:
 		case OSL_EC_BURST_HANDLER:
+			break;
 	}
 	
 	#ifndef _KERNEL_MODE
