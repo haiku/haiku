@@ -563,7 +563,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 
 		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
-		if (((flags & B_CAN_INTERRUPT) && thread->sig_pending)
+		if (((flags & B_CAN_INTERRUPT) && (thread->sig_pending & ~thread->sig_block_mask) != 0)
 			|| ((flags & B_KILL_CAN_INTERRUPT)
 				&& (thread->sig_pending & KILL_SIGNALS))) {
 			sSems[slot].u.used.count += count;
@@ -607,7 +607,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		GRAB_THREAD_LOCK();
 		// check again to see if a signal is pending.
 		// it may have been delivered while setting up the sem, though it's pretty unlikely
-		if (((flags & B_CAN_INTERRUPT) && thread->sig_pending)
+		if (((flags & B_CAN_INTERRUPT)
+				&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
 			|| ((flags & B_KILL_CAN_INTERRUPT)
 				&& (thread->sig_pending & KILL_SIGNALS))) {
 			struct thread_queue wakeupQueue;
