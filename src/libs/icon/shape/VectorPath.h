@@ -24,6 +24,7 @@
 class BBitmap;
 class BMessage;
 class BView;
+class Transformable;
 
 struct control_point {
 	BPoint		point;		// actual point on path
@@ -154,6 +155,7 @@ class VectorPath {
 
 			void				CleanUp();
 			void				Reverse();
+			void				ApplyTransform(const Transformable& transform);
 
 			void				PrintToStream() const;
 

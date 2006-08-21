@@ -31,6 +31,7 @@
 # include "Icons.h"
 # include "Property.h"
 # include "PropertyObject.h"
+# include "Transformable.h"
 #endif // ICON_O_MATIC
 
 #define obj_new(type, n)		((type *)malloc ((n) * sizeof(type)))
@@ -919,6 +920,22 @@ VectorPath::Reverse()
 	*this = temp;
 
 	_NotifyPathReversed();
+}
+
+// ApplyTransform
+void
+VectorPath::ApplyTransform(const Transformable& transform)
+{
+	if (transform.IsIdentity())
+		return;
+
+	for (int32 i = 0; i < fPointCount; i++) {
+		transform.Transform(&(fPath[i].point));
+		transform.Transform(&(fPath[i].point_out));
+		transform.Transform(&(fPath[i].point_in));
+	}
+
+	_NotifyPathChanged();
 }
 
 // PrintToStream
