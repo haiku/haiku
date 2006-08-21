@@ -1135,7 +1135,7 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	fSelEnd += inLength;
 
 	// recalc line breaks and draw the text
-	Refresh(saveStart, fSelEnd, true, true);
+	Refresh(saveStart, fSelEnd, true, false);
 }
 
 
