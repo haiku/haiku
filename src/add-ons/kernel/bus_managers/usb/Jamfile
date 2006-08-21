@@ -6,6 +6,9 @@ SubDirC++Flags -fno-rtti ;
 
 SubDirSysHdrs $(SUBDIR) ;
 UsePrivateHeaders [ FDirName kernel ] ;
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders [ FDirName drivers ] ;
+}
 
 KernelStaticLibrary libusb.a :
 	Stack.cpp

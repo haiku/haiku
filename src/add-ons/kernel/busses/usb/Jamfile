@@ -6,6 +6,9 @@ SubDirC++Flags -fno-rtti ;
 
 UsePrivateHeaders [ FDirName kernel ] ; 
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers usb ] ;
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders [ FDirName drivers ] ;
+}
 
 KernelAddon <usb>uhci : [ FDirName kernel busses usb ] :
 	uhci.cpp
