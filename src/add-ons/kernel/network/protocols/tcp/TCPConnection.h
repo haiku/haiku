@@ -6,12 +6,16 @@
  *		Andrew Galante, haiku.galante@gmail.com
  */
 
+// Initial estimate for packet round trip time (RTT)
+#define	TCP_INITIAL_RTT	120000000LL
+
+// keep maximum buffer sizes < max net_buffer size for now
+#define	TCP_MAX_SEND_BUF 1024
+#define TCP_MAX_RECV_BUF TCP_MAX_SEND_BUF
 
 typedef struct {
-	in_addr_t	source;
-	in_addr_t	destination;
-	uint16		source_port;
-	uint16		destination_port;
+	const sockaddr	*local;
+	const sockaddr	*peer;
 } tcp_connection_key;
 
 
@@ -35,20 +39,71 @@ public:
 	status_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
 	status_t ReadAvailable();
 
+	status_t ReceiveData(net_buffer *buffer);
+
+	static void ResendSegment(struct net_timer *timer, void *data);
 	static int Compare(void *_packet, const void *_key);
 	static uint32 Hash(void *_packet, const void *_key, uint32 range);
 	static int32 HashOffset() { return offsetof(TCPConnection, fHashLink); }
 private:
+
+	class TCPSegment {
+	public:
+		TCPSegment(net_buffer *_buffer, uint32 _sequenceNumber, bigtime_t timeout);
+		~TCPSegment();
+
+		net_buffer	*fBuffer;
+		bigtime_t	fTime;
+		uint32		fSequenceNumber;
+		uint32		fAcknowledgementNumber;
+		net_timer	fTimeout;
+	};
+
+	status_t Send(uint8 flags);
+
+	uint32	fLastByteSent;
+	uint32	fLastByteAckd;
+	uint32	fLastByteWritten;
+
+	uint32	fLastByteRead;
+	uint32	fNextByteExpected;
+	uint32	fLastByteReceived;
+
+	uint32	fEffectiveWindow;
+	
+	bigtime_t	fAvgRTT;
+
+	TCPSegment	*fSent;
+	TCPSegment	*fReceived;
+
 	TCPConnection	*fHashLink;
 	tcp_state		fState;
 	benaphore		fLock;
-public:
-	tcp_connection_key	fKey;
 };
+
+
+TCPConnection::TCPSegment::TCPSegment(net_buffer *_buffer, uint32 _sequenceNumber, bigtime_t timeout)
+	:
+	fBuffer(_buffer),
+	fSequenceNumber(_sequenceNumber)
+{
+	sStackModule->init_timer(&fTimeout, &TCPConnection::ResendSegment, this);
+}
+
+
+TCPConnection::TCPSegment::~TCPSegment()
+{
+	sStackModule->set_timer(&fTimeout, -1);
+	sBufferModule->free(fBuffer);
+}
 
 
 TCPConnection::TCPConnection(net_socket *socket)
 	:
+	fLastByteSent(0),//system_time()),
+	fLastByteAckd(0),//fLastByteSent),
+	fLastByteWritten(0),//fLastByteSent),
+	fAvgRTT(TCP_INITIAL_RTT),
 	fState(CLOSED)
 {
 	benaphore_init(&fLock, "TCPConnection");
@@ -64,6 +119,16 @@ TCPConnection::~TCPConnection()
 status_t
 TCPConnection::Open()
 {
+	TRACE(("%p.Open()\n", this));
+	if (sAddressModule == NULL)
+		return B_ERROR;
+	TRACE(("Using Address Module %p\n", sAddressModule));
+
+	BenaphoreLocker lock(&fLock);
+	sAddressModule->set_to_empty_address((sockaddr *)&socket->address);
+	sAddressModule->set_port((sockaddr *)&socket->address, 0);
+	sAddressModule->set_to_empty_address((sockaddr *)&socket->peer);
+	sAddressModule->set_port((sockaddr *)&socket->peer, 0);
 	return B_OK;
 }
 
@@ -71,6 +136,16 @@ TCPConnection::Open()
 status_t
 TCPConnection::Close()
 {
+	TRACE(("%p.Close()\n", this));
+
+	BenaphoreLocker hashLock(&sTCPLock);
+	BenaphoreLocker lock(&fLock);
+	tcp_connection_key key;
+	key.local = (sockaddr *)&socket->address;
+	key.peer = (sockaddr *)&socket->peer;
+	if (hash_lookup(sTCPHash, &key) != NULL) {
+		return hash_remove(sTCPHash, (void *)this);
+	}
 	return B_OK;
 }
 
@@ -78,13 +153,75 @@ TCPConnection::Close()
 status_t
 TCPConnection::Free()
 {
+	TRACE(("%p.Free()\n", this));
 	return B_OK;
 }
 
-
+/*!
+	Creates and sends a SYN packet to /a address
+*/
 status_t
 TCPConnection::Connect(const struct sockaddr *address)
 {
+	TRACE(("TCP:%p.Connect() on address %s\n", this,
+		AddressString(sDomain, address, true).Data()));
+
+	if (address->sa_family != AF_INET)
+		return EAFNOSUPPORT;
+
+	benaphore_lock(&sTCPLock); // want to release lock later, so no autolock
+	BenaphoreLocker lock(&fLock);
+
+	// Can only call Connect from CLOSED or LISTEN states
+	// otherwise connection is considered already connected
+	if (fState != CLOSED && fState != LISTEN) {
+		benaphore_unlock(&sTCPLock);
+		return EISCONN;
+	}
+	TRACE(("TCP: Connect(): in state %d\n", fState));
+
+	// make sure connection does not already exist
+	tcp_connection_key key;
+	key.local = (sockaddr *)&socket->address;
+	key.peer = address;
+	if (hash_lookup(sTCPHash, &key) != NULL) {
+		benaphore_unlock(&sTCPLock);
+		return EADDRINUSE;
+	}
+	TRACE(("TCP: Connect(): connecting...\n"));
+
+	status_t status;
+	// update the hash with the new key values
+	key.peer = (sockaddr *)&socket->peer;
+	if (hash_lookup(sTCPHash, &key) != NULL) {
+		status = hash_remove(sTCPHash, (void *)this);
+		if (status != B_OK) {
+			TRACE(("TCP: Hash Error: %s\n", strerror(status)));
+			benaphore_unlock(&sTCPLock);
+			return status;
+		}
+	} else
+		TRACE(("TCP: Connect(): Connection not in hash yet!\n"));
+	sAddressModule->set_to((sockaddr *)&socket->peer, address);
+	status = hash_insert(sTCPHash, (void *)this);
+	if (status != B_OK) {
+		TRACE(("TCP: Connect(): Error inserting connection into hash!\n"));
+		benaphore_unlock(&sTCPLock);
+		return status;
+	}
+
+	// done manipulating the hash, release the lock
+	benaphore_unlock(&sTCPLock);
+
+	TRACE(("TCP: Connect(): starting 3-way handshake...\n"));
+	// send SYN
+	status = Send(TCP_FLG_SYN);
+	if (status != B_OK)
+		return status;
+	fState=SYN_SENT;
+
+	// TODO: Should Connect() not return until 3-way handshake is complete?
+	TRACE(("TCP: Connect(): Connection complete\n"));
 	return B_OK;
 }
 
@@ -92,16 +229,21 @@ TCPConnection::Connect(const struct sockaddr *address)
 status_t
 TCPConnection::Accept(struct net_socket **_acceptedSocket)
 {
-	return B_OK;
+	TRACE(("%p.Accept()\n", this));
+	return B_ERROR;
 }
 
 
 status_t
 TCPConnection::Bind(sockaddr *address)
 {
+	TRACE(("TCP:%p.Bind() on address %s\n", this,
+		AddressString(sDomain, address, true).Data()));
+
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
 
+	BenaphoreLocker hashLock(&sTCPLock);
 	BenaphoreLocker lock(&fLock);
 
 	// let IP check whether there is an interface that supports the given address:
@@ -109,11 +251,20 @@ TCPConnection::Bind(sockaddr *address)
 	if (status < B_OK)
 		return status;
 
-	//TODO: clean this up
-/*	fKey.source = ((struct sockaddr_in *)address)->sin_addr;
-	fKey.source_port = sAddressModule->get_port(address);
-	fKey.destination = INADDR_ANY;
-	fKey.destination_port = 0;*/
+	sAddressModule->set_to((sockaddr *)&socket->address, address);
+	// for now, leave port=0.  TCP should still work 1 connection at a time
+	if (0) { //sAddressModule->get_port((sockaddr *)&socket->address) == 0) {
+		//assign ephemeral port
+	} else {
+		//TODO:Check for Socket flags
+		tcp_connection_key key;
+		key.peer = (sockaddr *)&socket->peer;
+		key.local = (sockaddr *)&socket->address;
+		if (hash_lookup(sTCPHash, &key) == NULL) {
+			hash_insert(sTCPHash, (void *)this);
+		} else
+			return EADDRINUSE;
+	}
 
 	return B_OK;
 }
@@ -122,6 +273,17 @@ TCPConnection::Bind(sockaddr *address)
 status_t
 TCPConnection::Unbind(struct sockaddr *address)
 {
+	TRACE(("TCP:%p.Unbind()\n", this ));
+
+	BenaphoreLocker hashLock(&sTCPLock);
+	BenaphoreLocker lock(&fLock);
+
+	status_t status = hash_remove(sTCPHash, (void *)this);
+	if (status != B_OK)
+		return status;
+
+	sAddressModule->set_to_empty_address((sockaddr *)&socket->address);
+	sAddressModule->set_port((sockaddr *)&socket->address, 0);
 	return B_OK;
 }
 
@@ -129,20 +291,23 @@ TCPConnection::Unbind(struct sockaddr *address)
 status_t
 TCPConnection::Listen(int count)
 {
-	return B_OK;
+	TRACE(("%p.Listen()\n", this));
+	return B_ERROR;
 }
 
 
 status_t
 TCPConnection::Shutdown(int direction)
 {
-	return B_OK;
+	TRACE(("%p.Shutdown()\n", this));
+	return B_ERROR;
 }
 
 
 status_t
 TCPConnection::SendData(net_buffer *buffer)
 {
+	TRACE(("%p.SendData()\n", this));
 	return B_ERROR;
 }
 
@@ -150,6 +315,7 @@ TCPConnection::SendData(net_buffer *buffer)
 status_t
 TCPConnection::SendRoutedData(net_route *route, net_buffer *buffer)
 {
+	TRACE(("%p.SendRoutedData()\n", this));
 	return B_ERROR;
 }
 
@@ -157,6 +323,7 @@ TCPConnection::SendRoutedData(net_route *route, net_buffer *buffer)
 status_t
 TCPConnection::SendAvailable()
 {
+	TRACE(("%p.SendAvailable()\n", this));
 	return B_ERROR;
 }
 
@@ -164,6 +331,7 @@ TCPConnection::SendAvailable()
 status_t
 TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
+	TRACE(("%p.ReadData()\n", this));
 	return B_ERROR;
 }
 
@@ -171,20 +339,54 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 status_t
 TCPConnection::ReadAvailable()
 {
+	TRACE(("%p.ReadAvailable()\n", this));
 	return B_ERROR;
 }
 
 
+status_t
+TCPConnection::ReceiveData(net_buffer *buffer)
+{
+	TRACE(("%p.ReceiveData()\n", this));
+	return B_ERROR;
+}
+
+
+/*!
+ 	Resends a sent segment (\a data) if the segment's ACK wasn't received
+	before the timeout (eg \a timer expired)
+*/
+void
+TCPConnection::ResendSegment(struct net_timer *timer, void *data)
+{
+	TRACE(("ResendSegment(%p)\n", data));
+}
+
+
+/*!
+	Sends a TCP packet with the specified \a flags.  If there is any data in
+	the send buffer, fEffectiveWindow bytes or less of it are sent as well.
+	Sequence and Acknowledgement numbers are filled in accordingly.
+	The fLock benaphore must be held before calling.
+*/
+status_t
+TCPConnection::Send(uint8 flags)
+{
+	TRACE(("%p.Send()\n", this));
+	return B_OK;
+}
+
+
 int
-TCPConnection::Compare(void *_packet, const void *_key)
+TCPConnection::Compare(void *_connection, const void *_key)
 {
 	const tcp_connection_key *key = (tcp_connection_key *)_key;
-	tcp_connection_key *packetKey = &((TCPConnection *)_packet)->fKey;
+	TCPConnection *connection= ((TCPConnection *)_connection);
 
-	if (key->source == packetKey->source
-		&& key->destination == packetKey->destination
-		&& key->source_port == packetKey->source_port
-		&& key->destination_port == packetKey->destination_port)
+	if (sAddressModule->equal_addresses_and_ports(
+			key->local, (sockaddr *)&connection->socket->address)
+		&& sAddressModule->equal_addresses_and_ports(
+			key->peer, (sockaddr *)&connection->socket->peer))
 		return 0;
 
 	return 1;
@@ -192,12 +394,15 @@ TCPConnection::Compare(void *_packet, const void *_key)
 
 
 uint32
-TCPConnection::Hash(void *_packet, const void *_key, uint32 range)
+TCPConnection::Hash(void *_connection, const void *_key, uint32 range)
 {
-	const tcp_connection_key *key = (tcp_connection_key *)_key;
-	if (_packet != NULL)
-		key = &((TCPConnection *)_packet)->fKey;
+	if (_connection != NULL) {
+		TCPConnection *connection = (TCPConnection *)_connection;
+		return sAddressModule->hash_address_pair(
+			(sockaddr *)&connection->socket->address, (sockaddr *)&connection->socket->peer) % range;
+	}
 
-	return ((uint32)key->source_port << 16 ^ (uint32)key->destination_port
-			^ key->source ^ key->destination) % range;
+	const tcp_connection_key *key = (tcp_connection_key *)_key;
+	return sAddressModule->hash_address_pair( 
+			key->local, key->peer) % range;
 }

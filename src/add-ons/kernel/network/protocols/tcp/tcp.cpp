@@ -48,19 +48,45 @@ static net_stack_module_info *sStackModule;
 static hash_table *sTCPHash;
 static benaphore sTCPLock;
 
+
 #include "tcp.h"
 #include "TCPConnection.h"
+
+
+#ifdef TRACE_TCP
+#	define DUMP_HASH tcp_dump_hash()
+// Dumps the TCP Connection hash.  sTCPLock must NOT be held when calling
+void
+tcp_dump_hash(){
+	BenaphoreLocker lock(&sTCPLock);
+	if (sDomain == NULL) {
+		TRACE(("Unable to dump TCP Connections!\n"));
+		return;
+	}
+	struct hash_iterator iterator;
+	hash_open(sTCPHash, &iterator);
+	TCPConnection *connection;
+	hash_rewind(sTCPHash, &iterator);
+	TRACE(("Active TCP Connections:\n"));
+	while ((connection = (TCPConnection *)hash_next(sTCPHash, &iterator)) != NULL) {
+		TRACE(("  TCPConnection %p: %s, %s\n", connection,
+		AddressString(sDomain, (sockaddr *)&connection->socket->address, true).Data(),
+		AddressString(sDomain, (sockaddr *)&connection->socket->peer, true).Data()));
+	}
+	hash_close(sTCPHash, &iterator, false);
+}
+#else
+#	define DUMP_HASH
+#endif
 
 
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
+	DUMP_HASH;
 	socket->protocol = IPPROTO_TCP;
 	TCPConnection *protocol = new (std::nothrow) TCPConnection(socket);
-	if (protocol == NULL)
-		return NULL;
-
-	TRACE(("Created new TCPConnection %p\n", protocol));
+	TRACE(("Creating new TCPConnection: %p\n", protocol));
 	return protocol;
 }
 
@@ -68,6 +94,8 @@ tcp_init_protocol(net_socket *socket)
 status_t
 tcp_uninit_protocol(net_protocol *protocol)
 {
+	DUMP_HASH;
+	TRACE(("Deleting TCPConnection: %p\n", protocol));
 	delete (TCPConnection *)protocol;
 	return B_OK;
 }
@@ -76,6 +104,12 @@ tcp_uninit_protocol(net_protocol *protocol)
 status_t
 tcp_open(net_protocol *protocol)
 {
+	if (!sDomain)
+		sDomain = sStackModule->get_domain(AF_INET);
+	if (!sAddressModule)
+		sAddressModule = sDomain->address_module;
+	DUMP_HASH;
+
 	return ((TCPConnection *)protocol)->Open();
 }
 
@@ -83,6 +117,7 @@ tcp_open(net_protocol *protocol)
 status_t
 tcp_close(net_protocol *protocol)
 {
+	DUMP_HASH;
 	return ((TCPConnection *)protocol)->Close();
 }
 
@@ -90,6 +125,7 @@ tcp_close(net_protocol *protocol)
 status_t
 tcp_free(net_protocol *protocol)
 {
+	DUMP_HASH;
 	return ((TCPConnection *)protocol)->Free();
 }
 
@@ -97,6 +133,7 @@ tcp_free(net_protocol *protocol)
 status_t
 tcp_connect(net_protocol *protocol, const struct sockaddr *address)
 {
+	DUMP_HASH;
 	return ((TCPConnection *)protocol)->Connect(address);
 }
 
@@ -120,16 +157,15 @@ tcp_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 tcp_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	TRACE(("tcp_bind(%p) on address %s\n", protocol,
-		AddressString(sDomain, address, true).Data()));
-	TCPConnection *connection = (TCPConnection *)protocol;
-	return connection->Bind(address);
+	DUMP_HASH;
+	return ((TCPConnection *)protocol)->Bind(address);
 }
 
 
 status_t
 tcp_unbind(net_protocol *protocol, struct sockaddr *address)
 {
+	DUMP_HASH;
 	return ((TCPConnection *)protocol)->Unbind(address);
 }
 
@@ -199,6 +235,17 @@ tcp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 }
 
 
+/*!
+	Constructs a TCP header on \a buffer with the specified values
+	for \a flags, \a seq and \a ack.  The packet is then sent on \a route
+*/
+status_t
+tcp_send_segment(net_buffer *buffer, net_route *route, uint16 flags, uint32 seq, uint32 ack)
+{
+	return B_ERROR;
+}
+
+
 status_t
 tcp_receive_data(net_buffer *buffer)
 {
@@ -229,10 +276,8 @@ tcp_init()
 {
 	status_t status;
 
-#if 0
-	sDomain = sStackModule->get_domain(AF_INET);
-	sAddressModule = sDomain->address_module;
-#endif
+	sDomain = NULL;
+	sAddressModule = NULL;
 
 	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
