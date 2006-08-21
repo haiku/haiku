@@ -1,4 +1,4 @@
-/* Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+/* Copyright (C) 1996,1997,1998,1999,2000,2003,2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Ulrich Drepper, <drepper@cygnus.com>.
 
@@ -18,7 +18,8 @@
    02111-1307 USA.  */
 
 /* Find index of weight.  */
-static inline int32_t
+auto inline int32_t
+__attribute ((always_inline))
 findidx (const unsigned char **cpp)
 {
   int_fast32_t i = table[*(*cpp)++];

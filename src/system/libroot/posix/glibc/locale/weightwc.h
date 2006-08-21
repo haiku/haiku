@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2000, 2001 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2000, 2001,2003,2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Ulrich Drepper, <drepper@cygnus.com>.
 
@@ -18,7 +18,8 @@
    02111-1307 USA.  */
 
 /* Find index of weight.  */
-static inline int32_t
+auto inline int32_t
+__attribute ((always_inline))
 findidx (const wint_t **cpp)
 {
   int32_t i;
@@ -26,7 +27,7 @@ findidx (const wint_t **cpp)
   wint_t ch;
 
   ch = *(*cpp)++;
-  i = collidx_table_lookup ((const char *) table, ch);
+  i = __collidx_table_lookup ((const char *) table, ch);
 
   if (i >= 0)
     /* This is an index into the weight table.  Cool.  */

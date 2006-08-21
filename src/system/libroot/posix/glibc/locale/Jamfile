@@ -23,6 +23,7 @@ MergeObject posix_gnu_locale.o :
 	C-telephone.c
 	C-time.c
 	C_name.c
+	coll-lookup.c
 #	findlocale.c
 	lc-address.c
 	lc-collate.c
