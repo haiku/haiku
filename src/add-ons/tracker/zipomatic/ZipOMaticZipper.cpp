@@ -250,50 +250,66 @@ thread_id
 ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 	int& err, const char** envp)
 {
-	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
-	// and published in the BeDevTalk FAQ 
+	// This function was originally written by Peter Folk <pfolk@uni.uiuc.edu>
+	// and published in the BeDevTalk FAQ
 	// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
 
-	// Save current FDs 
-	int old_in = dup(0); 
-	int old_out = dup(1); 
-	int old_err = dup(2); 
+	thread_id thread;
 
-	int filedes[2]; 
+	// Save current FDs
+	int oldIn = dup(STDIN_FILENO);
+	int oldOut = dup(STDOUT_FILENO);
+	int oldErr = dup(STDERR_FILENO);
 
-	/* Create new pipe FDs as stdin, stdout, stderr */ 
-	pipe(filedes);
-	dup2(filedes[0], 0);
-	close(filedes[0]); 
-	in = filedes[1];  // Write to in, appears on cmd's stdin 
-	pipe(filedes);
-	dup2(filedes[1], 1);
-	close(filedes[1]); 
-	out = filedes[0]; // Read from out, taken from cmd's stdout 
-	pipe(filedes);
-	dup2(filedes[1], 2);
-	close(filedes[1]); 
-	err = filedes[0]; // Read from err, taken from cmd's stderr 
+	int inPipe[2], outPipe[2], errPipe[2];
 
-	// "load" command. 
-	thread_id ret = load_image(argc, argv, envp); 
-	// thread ret is now suspended. 
+	// Create new pipe FDs as stdin, stdout, stderr
+	if (pipe(inPipe) < 0)
+		goto err1;
+	if (pipe(outPipe) < 0)
+		goto err2;
+	if (pipe(errPipe) < 0)
+		goto err3;
 
-	PRINT(("load_image() thread_id: %ld\n", ret));
+	errno = 0;
 
-	// Restore old FDs 
-	close(0); dup(old_in); close(old_in); 
-	close(1); dup(old_out); close(old_out); 
-	close(2); dup(old_err); close(old_err); 
+	// replace old stdin/stderr/stdout
+	dup2(inPipe[0], STDIN_FILENO);
+	close(inPipe[0]);
+	dup2(outPipe[1], STDOUT_FILENO);
+	close(outPipe[1]);
+	dup2(errPipe[1], STDERR_FILENO);
+	close(errPipe[1]);
 
-	// TODO:
-	/*
-	Theoretically I should do loads of error checking, but 
-	the calls aren't very likely to fail, and that would 
-	muddy up the example quite a bit.  YMMV.
-	*/ 
+	if (errno == 0) {
+		in = inPipe[1];		// Write to in, appears on cmd's stdin 
+		out = outPipe[0];	// Read from out, taken from cmd's stdout 
+		err = errPipe[0];	// Read from err, taken from cmd's stderr 
 
-    return ret;
+		// execute command
+		thread = load_image(argc, argv, envp);
+
+		PRINT(("load_image() thread_id: %ld\n", ret));
+	} else
+		thread = errno;
+
+	// Restore old FDs
+	close(STDIN_FILENO); dup(oldIn); close(oldIn);
+	close(STDOUT_FILENO); dup(oldOut); close(oldOut);
+	close(STDERR_FILENO); dup(oldErr); close(oldErr);
+	return thread;
+
+err3:
+	close(outPipe[0]);
+	close(outPipe[1]);
+err2:
+	close(inPipe[0]);
+	close(inPipe[1]);
+err1:
+	close(oldIn);
+	close(oldOut);
+	close(oldErr);
+	return errno;
 }
 
 
