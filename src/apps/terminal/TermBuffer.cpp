@@ -103,6 +103,9 @@ TermBuffer::TermBuffer(int rows, int cols)
 	mRowSize = rows;
 
 	mRowOffset = 0;
+	
+	mSelStart.Set(-1,-1);
+	mSelEnd.Set(-1,-1);
 
 	buffer_size = gTermPref->getInt32(PREF_HISTORY_SIZE);
 	if (buffer_size < 1000)
@@ -544,3 +547,14 @@ TermBuffer::GetStringFromRegion(BString &str)
 	}
 }
 
+//Returns the complete internal buffer as a BString
+void
+TermBuffer::ToString(BString &str)
+{
+	for (int y = 0; y < mRowSize; y++) {
+		for (int x = 0; x < mNowColSize; x++) {
+			GetCharFromRegion(x, y, str);
+		}
+	}
+	AvoidWaste(str);
+}

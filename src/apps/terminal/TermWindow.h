@@ -87,6 +87,12 @@ private:
   BMenuItem *item;
   BRect		fSavedFrame;
   window_look	fSavedLook;
+  //Saved search parameters
+  BString	fFindString;
+  BMenuItem	*fFindForwardMenuItem;
+  BMenuItem *fFindBackwardMenuItem;
+  bool		fMatchCase;
+  bool		fMatchWord;
 };
 
 #endif // TERMWIN_H

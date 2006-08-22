@@ -33,29 +33,42 @@
 #include <Window.h>
 #include <TextView.h>
 
-#include "CurPos.h"
-
+const ulong MSG_FIND = 'msgf';
 const ulong MSG_FIND_START = 'msac';
+const ulong MSG_FIND_CLOSED = 'mfcl';
 
 class BRect;
 class BBitmap;
 class BMessage;
 class TermWindow;
+class BTextControl;
+class BRadioButton;
+class BCheckBox;
 
 class FindDlg : public BWindow
 {
 public:
-  FindDlg(BRect frame, TermWindow *win);
-  ~FindDlg ();
+	FindDlg (BRect frame, TermWindow *win);
+	~FindDlg ();
 
-  void		Find (CurPos *start, CurPos *end);
+private:
+	virtual void	Quit (void);
+	void			MessageReceived (BMessage *msg);
 
- private:
-  virtual void	Quit (void);
-  
-  BString	*fFindString;
-  TermWindow	*fWindow;
+	void			SendFindMessage (void);
 
+	BView 			*fFindView;
+	BTextControl 	*fFindLabel;
+	BRadioButton 	*fTextRadio;
+	BRadioButton 	*fSelectionRadio;
+	BBox 			*fSeparator;
+	BCheckBox		*fForwardSearchBox;
+	BCheckBox		*fMatchCaseBox;
+	BCheckBox		*fMatchWordBox;
+	BButton			*fFindButton;
+
+	BString	*fFindString;
+	TermWindow	*fWindow;
 };
 
 

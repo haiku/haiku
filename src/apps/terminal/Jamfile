@@ -3,10 +3,13 @@ SubDir HAIKU_TOP src apps terminal ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
+
 Application Terminal : 
 	AppearPrefView.cpp
 	CodeConv.cpp
 	CurPos.cpp
+	FindDlg.cpp
 	MenuUtil.cpp
 	Terminal.cpp
 	PrefDlg.cpp

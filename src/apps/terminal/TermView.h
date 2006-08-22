@@ -184,6 +184,9 @@ public:
   void	ScrollScreenDraw (void);
   void  GetFrameSize (float *width, float *height);
   void  GetFontInfo (int *, int*);
+  bool  Find (const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
+  void  GetSelection (BString &str);
+  
 
   /*
    *	PRIVATE MEMBER.

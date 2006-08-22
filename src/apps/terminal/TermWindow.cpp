@@ -27,6 +27,7 @@
 #include "CodeConv.h"
 #include "ColorWindow.h"
 #include "MenuUtil.h"
+#include "FindDlg.h"
 #include "PrefDlg.h"
 #include "PrefView.h"
 #include "PrefHandler.h"
@@ -173,6 +174,10 @@ TermWindow::InitWindow(void)
 	fTermParse->InitTermParse(fTermView, fCodeConv);
 
 	// Set Coding.
+	
+	// Init find parameters
+	fMatchCase = false;
+	fMatchWord = false;
 
 	// Initialize MessageRunner.
 	fWindowUpdate = new BMessageRunner(BMessenger(this),
@@ -219,13 +224,16 @@ TermWindow::SetupMenu(void)
 	fEditmenu->AddSeparatorItem ();
 	fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
 	fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
+	fEditmenu->AddSeparatorItem ();
+	fEditmenu->AddItem (new BMenuItem ("Find", new BMessage (MENU_FIND_STRING),'F'));
+	fFindBackwardMenuItem = new BMenuItem ("Find Backward", new BMessage (MENU_FIND_BACKWARD), '[');
+	fEditmenu->AddItem (fFindBackwardMenuItem);
+	fFindBackwardMenuItem->SetEnabled(false);
+	fFindForwardMenuItem = new BMenuItem ("Find Forward", new BMessage (MENU_FIND_FORWARD), ']');
+	fEditmenu->AddItem (fFindForwardMenuItem);
+	fFindForwardMenuItem->SetEnabled(false);
+	
 
-/*
-  // TODO: Implement Finding
-  fEditmenu->AddSeparatorItem ();
-  fEditmenu->AddItem (new BMenuItem ("Find", new BMessage (MENU_FIND_STRING),'F'));
-  fEditmenu->AddItem (new BMenuItem ("Find Again", new BMessage (MENU_FIND_AGAIN), ']'));
-*/
 	fMenubar->AddItem (fEditmenu);
   
 	// Make Help Menu.
@@ -277,6 +285,7 @@ TermWindow::MessageReceived(BMessage *message)
   BRect r;
   BFont halfFont;
   BFont fullFont;
+  bool findselection, forwardsearch, findresult;
   
 	switch (message->what) {
 		case MENU_SWITCH_TERM: {
@@ -301,6 +310,77 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 		case MSG_PREF_CLOSED: {
 			fPrefWindow = NULL;
+			break;
+		}
+		case MENU_FIND_STRING: {
+			if (!fFindPanel) {
+				BRect r = Frame();
+				r.left += 20;
+				r.top += 20;
+				r.right = r.left + 260;
+				r.bottom = r.top + 190;
+				fFindPanel = new FindDlg(r, this);
+			}
+			else
+				fFindPanel->Activate();
+			break;
+		}
+		case MSG_FIND: {
+			fFindPanel->PostMessage(B_QUIT_REQUESTED);
+			message->FindBool("findselection", &findselection);
+			if (!findselection) 
+				message->FindString("findstring", &fFindString);
+			else 
+				fTermView->GetSelection(fFindString);
+
+			if (fFindString.Length() == 0) {
+				BAlert *alert = new BAlert("find failed", "No search string.", "Okay", NULL, 
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->Go();
+				fFindBackwardMenuItem->SetEnabled(false);
+				fFindForwardMenuItem->SetEnabled(false);
+				break;
+			}
+
+			message->FindBool("forwardsearch", &forwardsearch);
+			message->FindBool("matchcase", &fMatchCase);
+			message->FindBool("matchword", &fMatchWord);
+			findresult = fTermView->Find(fFindString, forwardsearch, fMatchCase, fMatchWord);
+				
+			if (!findresult) {
+				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->Go();
+				fFindBackwardMenuItem->SetEnabled(false);
+				fFindForwardMenuItem->SetEnabled(false);
+				break;
+			}
+			
+			//Enable the menu items Find Forward and Find Backward
+			fFindBackwardMenuItem->SetEnabled(true);
+			fFindForwardMenuItem->SetEnabled(true);
+			break;
+		}
+		case MENU_FIND_FORWARD: {
+			findresult = fTermView->Find(fFindString, true, fMatchCase, fMatchWord);
+			if (!findresult) {
+				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->Go();
+			}
+			break;
+		}
+		case MENU_FIND_BACKWARD: {
+			findresult = fTermView->Find(fFindString, false, fMatchCase, fMatchWord);
+			if (!findresult) {
+				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->Go();
+			}
+			break;
+		}
+		case MSG_FIND_CLOSED: {
+			fFindPanel = NULL;
 			break;
 		}
 		case MENU_FILE_QUIT: {
@@ -522,8 +602,10 @@ TermWindow::Quit(void)
 {
 	delete fTermParse;
 	delete fCodeConv;
-	if(fPrefWindow) fPrefWindow->PostMessage (B_QUIT_REQUESTED);
-		be_app->PostMessage (B_QUIT_REQUESTED, be_app);
+	if (fPrefWindow) fPrefWindow->PostMessage (B_QUIT_REQUESTED);
+	if (fFindPanel) fFindPanel->PostMessage(B_QUIT_REQUESTED);
+	
+	be_app->PostMessage (B_QUIT_REQUESTED, be_app);
 	BWindow::Quit ();
 }
 

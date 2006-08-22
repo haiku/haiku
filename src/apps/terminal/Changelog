@@ -13,10 +13,7 @@ Stuff already done thats better than R5:
 Terminal window supports scrolling
 
 TODO:
-Make a Jamfile
-Make Find work
 Fix titling (-t works already, its the Terminal 1, 2, 3, etc...)
 Fix the Colour menu
 Move Fonts and font sizes to the "Right Place"
 Kill the Preferences Panel
-Move to .rdef source resources

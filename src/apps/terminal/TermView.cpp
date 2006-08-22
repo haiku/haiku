@@ -22,6 +22,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "TermView.h"
 #include "TermWindow.h"
@@ -2246,6 +2247,99 @@ TermView::GetFontInfo(int *width, int *height)
 {
 	 *width = fFontWidth;
 	 *height = fFontHeight;
+}
+
+// Find a string, and select it if found
+bool
+TermView::Find (const BString &str, bool forwardSearch, bool matchCase, bool matchWord)
+{
+	BString buffer;
+	CurPos selectionstart, selectionend;
+	int offset = 0;
+	int initialresult = -1;
+	int result = B_ERROR;
+
+	//Get the buffer contents
+	fTextBuffer->ToString(buffer);
+
+	selectionstart = fTextBuffer->GetSelectionStart();
+	selectionend = fTextBuffer->GetSelectionEnd();
+
+	if (selectionstart.x >= 0 || selectionstart.y >= 0) {
+		if (forwardSearch)
+			//Set the offset to the end of the selection
+			offset = (selectionend.y) * fTermColumns + selectionend.x;
+		else
+			offset = (selectionstart.y) * fTermColumns + selectionstart.x;
+	}
+
+restart:		
+	//Actual search
+	if (forwardSearch) {
+		if (matchCase) {
+			result = buffer.FindFirst(str, offset);
+		} else {
+			result = buffer.IFindFirst(str, offset);
+		}
+	} else {
+		if (matchCase) {
+			result = buffer.FindLast(str, offset);
+		} else {
+			result = buffer.IFindLast(str, offset);
+		}
+	}
+	if (result == B_ERROR) { //Wrap search like Be's Terminal
+		if (forwardSearch) {
+			if (matchCase) {
+				result = buffer.FindFirst(str, 0);
+			} else {
+				result = buffer.IFindFirst(str, 0);
+			}
+		} else {
+			if (matchCase) {
+				result = buffer.FindLast(str, buffer.Length());
+			} else {
+				result = buffer.IFindLast(str, buffer.Length());
+			}
+		}
+	}
+	
+	if (result < 0)
+		return false;
+	
+	if (matchWord) {
+		if (isalnum(buffer.ByteAt(result - 1)) || isalnum(buffer.ByteAt(result + str.Length()))) {
+			if (initialresult == -1) //Set the initial offset to the first result to aid word matching
+				initialresult = result;
+			else if (initialresult == result) //We went round the buffer, nothing found
+				return false;
+			if (forwardSearch)
+				offset = result + str.Length();
+			else
+				offset = result;
+			goto restart;
+		}
+	}
+	
+	//Select the found text
+	selectionstart.y = result / fTermColumns;
+	selectionstart.x = result % fTermColumns;
+	//Length -1 since it seems to count the \0 as well
+	selectionend.y = (result + str.Length() - 1) / fTermColumns;
+	selectionend.x = (result + str.Length() - 1) % fTermColumns;
+	//Update the contents of the view
+	DeSelect();
+	Select(selectionstart, selectionend);
+ 
+	return true;
+}
+
+//! Get the selected text and copy to str
+void
+TermView::GetSelection(BString &str)
+{
+	str.SetTo("");
+	fTextBuffer->GetStringFromRegion(str);
 }
 
 // Send DrawRect data to Draw Engine thread.

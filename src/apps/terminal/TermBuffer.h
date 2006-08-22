@@ -95,15 +95,26 @@ public:
   //
   void	ClearAll (void);
 
-  // Set / Unset Selection
+  //
+  // Selection Methods
+  //
   void	Select (const CurPos &start, const CurPos &end);
   void	DeSelect (void);
+  
+  const CurPos &GetSelectionStart (void) { return mSelStart; };
+  const CurPos &GetSelectionEnd (void)   { return mSelEnd; };
 
   int	CheckSelectedRegion (const CurPos &pos);
+  
+  //
+  // Other methods
+  //
   bool	FindWord (const CurPos &pos, CurPos *start, CurPos *end);
 
   void	GetCharFromRegion (int x, int y, BString &str);
   void	AvoidWaste (BString &str);
+  
+  void  ToString (BString &str);
 
   int32 GetArraySize (void);
   

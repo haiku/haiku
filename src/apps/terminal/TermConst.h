@@ -63,7 +63,8 @@ const uint32 MENU_ENCODING      = 'Menc';
 const uint32 MENU_PAGE_SETUP    = 'Mpst';
 const uint32 MENU_PRINT         = 'Mpnt';
 const uint32 MENU_FIND_STRING   = 'Mfnd';
-const uint32 MENU_FIND_AGAIN    = 'Mfag';
+const uint32 MENU_FIND_FORWARD  = 'Mffw';
+const uint32 MENU_FIND_BACKWARD = 'Mfbw';
 const uint32 MENU_SHOW_COLOR	= 'Mcol';
 
 const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
