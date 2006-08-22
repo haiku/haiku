@@ -17,10 +17,6 @@
 #include <Path.h>
 #include <Volume.h>
 
-#include <String.h>
-#include <Window.h>
-#include <OS.h>
-
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
@@ -32,7 +28,7 @@ const char* kZipperThreadName = "ZipperThread";
 ZipperThread::ZipperThread (BMessage* refsMessage, BWindow* window)
 	: GenericThread(kZipperThreadName, B_NORMAL_PRIORITY, refsMessage),
 	fWindowMessenger(window),
-	m_zip_process_thread_id(-1),
+	fZipProcess(-1),
 	m_std_in(-1),
 	m_std_out(-1),
 	m_std_err(-1),
@@ -57,46 +53,43 @@ ZipperThread::ThreadStartup()
 {
 	PRINT(("ZipperThread::ThreadStartup()\n"));
 
-	// init
-	status_t status	= B_OK;
-	entry_ref ref;
-	entry_ref last_ref;
-	bool same_folder = true;
-
-	BString zip_archive_filename = "Archive.zip";
+	BString archiveName = "Archive.zip";
 
 	// do all refs have the same parent dir?
-	type_code ref_type = B_REF_TYPE;
-	int32 ref_count = 0;
+	type_code type = B_REF_TYPE;
+	int32 refCount = 0;
+	entry_ref ref;
+	entry_ref lastRef;
+	bool sameFolder = true;
 
-	status = m_thread_data_store->GetInfo("refs", &ref_type, &ref_count);
+	status_t status = m_thread_data_store->GetInfo("refs", &type, &refCount);
 	if (status != B_OK)
 		return status;
 
-	for (int index = 0;	index < ref_count ;	index++) {
-		m_thread_data_store->FindRef("refs", index, & ref);
-		
+	for (int index = 0;	index < refCount; index++) {
+		m_thread_data_store->FindRef("refs", index, &ref);
+
 		if (index > 0) {
 			BEntry entry(&ref);
 			if (entry.IsSymLink()) {
-				entry.SetTo(& ref, true);
-				entry_ref  target;
-				entry.GetRef(& target);
-				if (last_ref.directory != target.directory) {
-					same_folder = false;
+				entry.SetTo(&ref, true);
+				entry_ref target;
+				entry.GetRef(&target);
+				if (lastRef.directory != target.directory) {
+					sameFolder = false;
 					break;
 				}
-			} else if (last_ref.directory != ref.directory) {
-				same_folder = false;
+			} else if (lastRef.directory != ref.directory) {
+				sameFolder = false;
 				break;
 			}
 		}
-		last_ref = ref;
+		lastRef = ref;
 	}
 
 	// change active dir
-	if (same_folder) {
-		BEntry entry(&last_ref);
+	if (sameFolder) {
+		BEntry entry(&lastRef);
 		BPath path;
 		entry.GetParent(&entry);
 		entry.GetPath(&path);
@@ -108,48 +101,52 @@ ZipperThread::ThreadStartup()
 	}
 
 	// archive filename
-	if (ref_count == 1) {
-		zip_archive_filename = last_ref.name;
-		zip_archive_filename += ".zip";			
+	if (refCount == 1) {
+		archiveName = lastRef.name;
+		archiveName += ".zip";			
 	}
 
-	int32 argc = ref_count + 3;
+	int32 argc = refCount + 3;
 	const char** argv = new const char* [argc + 1];
 
 	argv[0] = strdup("/bin/zip");
 	argv[1] = strdup("-ry");
-	argv[2] = strdup(zip_archive_filename.String());
+	argv[2] = strdup(archiveName.String());
 
 	// files to zip
-	for (int ref_index = 0;  ref_index < ref_count ;  ref_index++) {
-		m_thread_data_store->FindRef("refs", ref_index, &ref);
+	for (int index = 0;  index < refCount ;  index++) {
+		m_thread_data_store->FindRef("refs", index, &ref);
 
-		if (same_folder) {
-			argv[3 + ref_index]	= strdup(ref.name);	// just the file name
+		if (sameFolder) {
+			// just the file name
+			argv[3 + index]	= strdup(ref.name);
 		} else {
+			// full path
 			BPath path(&ref);
 			BString file = path.Path();
-			argv[3 + ref_index]	= strdup(path.Path());	// full path
+			argv[3 + index]	= strdup(path.Path());
 		}
 	}
 
 	argv[argc] = NULL;
 
-	m_zip_process_thread_id = PipeCommand(argc, argv, m_std_in, m_std_out, m_std_err); 
+	fZipProcess = _PipeCommand(argc, argv, m_std_in, m_std_out, m_std_err); 
 
 	delete [] argv;
 
-	if (m_zip_process_thread_id < 0)
-		return m_zip_process_thread_id;
+	if (fZipProcess < 0)
+		return fZipProcess;
 
-	resume_thread(m_zip_process_thread_id);
+	resume_thread(fZipProcess);
 
-	fOutputFile = fdopen(m_std_out, "r");	
+	fOutputFile = fdopen(m_std_out, "r");
+	if (fOutputFile == NULL)
+		return errno;
 
-	zip_archive_filename.Prepend("Creating archive: ");
+	archiveName.Prepend("Creating archive: ");
 
-	SendMessageToWindow ('strt', "archive_filename", zip_archive_filename.String());
-	SendMessageToWindow ('outp', "zip_output", "Preparing to archive"); 
+	_SendMessageToWindow('strt', "archive_filename", archiveName.String());
+	_SendMessageToWindow('outp', "zip_output", "Preparing to archive"); 
 
 	PRINT(("\n"));
 
@@ -176,12 +173,12 @@ ZipperThread::ExecuteUnit()
 
 	if (!strncmp("  a", output, 3)) {
 		output[2] = 'A';
-		SendMessageToWindow('outp', "zip_output", output + 2);
+		_SendMessageToWindow('outp', "zip_output", output + 2);
 	} else if (!strncmp("up", output, 2)) {
 		output[0] = 'U';
-		SendMessageToWindow('outp', "zip_output", output);
+		_SendMessageToWindow('outp', "zip_output", output);
 	} else {
-		SendMessageToWindow('outp', "zip_output", output);
+		_SendMessageToWindow('outp', "zip_output", output);
 	}
 
 	return B_OK;
@@ -216,10 +213,10 @@ ZipperThread::ExecuteUnitFailed(status_t status)
 
 	if (status == EOF) {
 		// thread has finished, been quit or killed, we don't know
-		SendMessageToWindow('exit');
+		_SendMessageToWindow('exit');
 	} else {
 		// explicit error - communicate error to Window
-		SendMessageToWindow('exrr');
+		_SendMessageToWindow('exrr');
 	}
 
 	Quit();
@@ -234,7 +231,7 @@ ZipperThread::ThreadShutdownFailed(status_t status)
 
 
 void
-ZipperThread::MakeShellSafe(BString* string)
+ZipperThread::_MakeShellSafe(BString* string)
 {
 	string->CharacterEscape("\"$`", '\\');
 	string->Prepend("\""); 
@@ -250,7 +247,7 @@ ZipperThread::ProcessRefs(BMessage* msg)
 
 
 thread_id
-ZipperThread::PipeCommand(int argc, const char** argv, int& in, int& out,
+ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 	int& err, const char** envp)
 {
 	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
@@ -301,7 +298,7 @@ ZipperThread::PipeCommand(int argc, const char** argv, int& in, int& out,
 
 
 void
-ZipperThread::SendMessageToWindow(uint32 what, const char* name, const char* value)
+ZipperThread::_SendMessageToWindow(uint32 what, const char* name, const char* value)
 {
 	BMessage msg(what);
 	if (name != NULL && value != NULL)
@@ -316,13 +313,11 @@ ZipperThread::SuspendExternalZip()
 {
 	PRINT(("ZipperThread::SuspendExternalZip()\n"));
 
-	status_t status = B_OK;
-	thread_info zip_thread_info;
-	status = get_thread_info(m_zip_process_thread_id, &zip_thread_info);
-	BString	thread_name = zip_thread_info.name;
+	thread_info info;
+	status_t status = get_thread_info(fZipProcess, &info);
 
-	if (status == B_OK && thread_name == "zip")
-		return suspend_thread (m_zip_process_thread_id);
+	if (status == B_OK && !strcmp(info.name, "zip"))
+		return suspend_thread(fZipProcess);
 
 	return status;
 }
@@ -333,13 +328,11 @@ ZipperThread::ResumeExternalZip()
 {
 	PRINT(("ZipperThread::ResumeExternalZip()\n"));
 
-	status_t status = B_OK;
-	thread_info zip_thread_info;
-	status = get_thread_info(m_zip_process_thread_id, &zip_thread_info);
-	BString	thread_name = zip_thread_info.name;
+	thread_info info;
+	status_t status = get_thread_info(fZipProcess, &info);
 
-	if (status == B_OK && thread_name == "zip")
-		return resume_thread(m_zip_process_thread_id);
+	if (status == B_OK && !strcmp(info.name, "zip"))
+		return resume_thread(fZipProcess);
 
 	return status;
 }
@@ -350,14 +343,12 @@ ZipperThread::InterruptExternalZip()
 {
 	PRINT(("ZipperThread::InterruptExternalZip()\n"));
 	
-	status_t status = B_OK;
-	thread_info zip_thread_info;
-	status = get_thread_info(m_zip_process_thread_id, &zip_thread_info);
-	BString	thread_name = zip_thread_info.name;
+	thread_info info;
+	status_t status = get_thread_info(fZipProcess, &info);
 
-	if (status == B_OK && thread_name == "zip") {
+	if (status == B_OK && !strcmp(info.name, "zip")) {
 		status = B_OK;
-		status = send_signal(m_zip_process_thread_id, SIGINT);
+		status = send_signal(fZipProcess, SIGINT);
 		WaitOnExternalZip();
 		return status;
 	}
@@ -371,13 +362,11 @@ ZipperThread::WaitOnExternalZip()
 {
 	PRINT(("ZipperThread::WaitOnExternalZip()\n"));
 
-	status_t status = B_OK;
-	thread_info zip_thread_info;
-	status = get_thread_info(m_zip_process_thread_id, &zip_thread_info);
-	BString	thread_name = zip_thread_info.name;
+	thread_info info;
+	status_t status = get_thread_info(fZipProcess, &info);
 
-	if (status == B_OK && thread_name == "zip")
-		return wait_for_thread(m_zip_process_thread_id, &status);
+	if (status == B_OK && !strcmp(info.name, "zip"))
+		return wait_for_thread(fZipProcess, &status);
 
 	return status;
 }

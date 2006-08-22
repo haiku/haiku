@@ -39,17 +39,17 @@ class ZipperThread : public GenericThread {
 		virtual void		ThreadShutdownFailed(status_t a_status);
 
 				status_t	ProcessRefs(BMessage* msg);
-				void		MakeShellSafe(BString* string);
+				void		_MakeShellSafe(BString* string);
 
-				thread_id	PipeCommand(int argc, const char **argv, 
-								int & in, int & out, int & err,
-								const char **envp = (const char **)environ);
+				thread_id	_PipeCommand(int argc, const char** argv, 
+								int& in, int& out, int& err,
+								const char** envp = (const char**)environ);
 
-				void		SendMessageToWindow(uint32 what,
+				void		_SendMessageToWindow(uint32 what,
 								const char* name  =  NULL, const char* value = NULL);
 
 				BMessenger	fWindowMessenger;
-				int32		m_zip_process_thread_id;
+				thread_id	fZipProcess;
 				int			m_std_in;
 				int			m_std_out;
 				int			m_std_err;
