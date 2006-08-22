@@ -1,5 +1,11 @@
-// license: public domain
-// authors: jonas.sundstrom@kirilla.com
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jonas Sundström, jonas.sundstrom@kirilla.com
+ */
+
 
 #include <Debug.h>
 
@@ -20,7 +26,8 @@
 #include "ZipOMaticMisc.h"
 #include "ZipOMaticView.h"
 #include "ZipOMaticWindow.h"
-#include "ZipOMaticZipper.h"
+#include "ZipperThread.h"
+
 
 ZippoWindow::ZippoWindow(BMessage * a_message)
 : BWindow(BRect(200,200,430,310), "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE), // | B_NOT_ZOOMABLE),

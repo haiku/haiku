@@ -7,7 +7,7 @@
  */
 
 
-#include "ZipOMaticZipper.h"
+#include "ZipperThread.h"
 #include "ZipOMaticWindow.h"
 #include "ZipOMaticMisc.h"
 
