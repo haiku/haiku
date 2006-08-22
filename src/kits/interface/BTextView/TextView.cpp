@@ -2152,7 +2152,12 @@ BTextView::MakeEditable(bool editable)
 		return;
 		
 	fEditable = editable;
-	
+	// TextControls change the color of the text when
+	// they are made editable, so we need to invalidate
+	// the NULL style here
+	// TODO: it works well, but it could be caused by a bug somewhere else
+	if (fEditable)
+		fStyles->InvalidateNullStyle();
 	if (Window() != NULL && fActive) {	
 		if (!fEditable) {
 			if (fCaretVisible)
