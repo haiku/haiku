@@ -34,27 +34,7 @@
 #include <USB.h>
 #include <usb/USB_midi.h>
 
-/* Undocumented kernel cbuf_* functions */
-struct cbuffer_t;
-typedef struct cbuffer_t cbuffer;
-
-size_t cbuf_getn_no_lock(cbuffer *, char *, size_t);
-size_t cbuf_putn_no_lock(cbuffer *, char *, size_t);
-cbuffer *cbuf_init(size_t size);
-void cbuf_delete(cbuffer *buffer);
-char cbuf_get(cbuffer *);
-bool cbuf_mt(cbuffer *);
-bool cbuf_full(cbuffer *);
-status_t cbuf_put(cbuffer *, char);
-status_t cbuf_unput(cbuffer *);
-void cbuf_flush(cbuffer *);
-size_t cbuf_size(cbuffer *);
-size_t cbuf_avail(cbuffer *);
-size_t cbuf_free(cbuffer *);
-size_t cbuf_putn(cbuffer *, void *, size_t num_bytes);
-size_t cbuf_getn(cbuffer *, void *, size_t num_bytes);
-cpu_status cbuf_lock(cbuffer *);
-void cbuf_unlock(cbuffer *, cpu_status);
+#include "ring_buffer.h"
 
 #define DEBUG 1
 #if DEBUG
@@ -97,7 +77,7 @@ typedef struct my_device_info
 	uint16 ifno;
 	char name[30];
 	
-	cbuffer *cbuf;
+	struct ring_buffer *rbuf;
 
 	bool active;
 	int open;

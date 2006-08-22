@@ -6,6 +6,7 @@ if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
                 # We need the public usb headers also when not compiling for Haiku.
 }
+UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelAddon usb_midi : kernel drivers bin :
 	usb_midi.c

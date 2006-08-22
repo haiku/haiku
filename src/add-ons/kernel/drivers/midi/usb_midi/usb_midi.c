@@ -93,7 +93,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii, uint16 ifno)
 	my_dev->open_fds = NULL;
 	my_dev->active = true;
 	my_dev->flags = 0;
-	my_dev->cbuf = cbuf_init(384);
+	my_dev->rbuf = create_ring_buffer(384);
 	my_dev->total_report_size = sizeof(usb_midi_event_packet);
 	  	
 	return my_dev;
@@ -103,9 +103,9 @@ void
 remove_device (my_device_info *my_dev)
 {
 	assert (my_dev != NULL);
-	if (my_dev->cbuf != NULL) {
-		cbuf_delete(my_dev->cbuf);
-		my_dev->cbuf = NULL;
+	if (my_dev->rbuf != NULL) {
+		delete_ring_buffer(my_dev->rbuf);
+		my_dev->rbuf = NULL;
 	}
   
 	delete_area (my_dev->buffer_area);
@@ -136,7 +136,7 @@ interpret_midi_buffer(my_device_info *my_dev)
 {
 	usb_midi_event_packet *packet = my_dev->buffer;
 	
-	cbuf_putn(my_dev->cbuf, packet->midi, sizeof(packet->midi));
+	ring_buffer_write(my_dev->rbuf, packet->midi, sizeof(packet->midi));
 	release_sem_etc(my_dev->sem_cb, 3, B_DO_NOT_RESCHEDULE);
 }
 
@@ -389,7 +389,9 @@ usb_midi_read(driver_cookie *cookie, off_t position,
 	err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	if (err != B_OK)
 		return err;
-	cbuf_getn(my_dev->cbuf, buf, 1);
+	acquire_sem (my_dev->sem_lock);
+	ring_buffer_user_read(my_dev->rbuf, buf, 1);
+	release_sem (my_dev->sem_lock);
 	*num_bytes = 1;
 	return err;
 }
