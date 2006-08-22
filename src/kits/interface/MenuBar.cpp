@@ -467,8 +467,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			|| (buttons != 0 && IsStickyMode() && menuItem == NULL))
 			break;
 		else if (buttons == 0 && !IsStickyMode()) {
-			// On an item without a submenu
-			if (fSelected != NULL && fSelected->Submenu() == NULL) {
+			if ((fSelected != NULL && fSelected->Submenu() == NULL) || menuItem == NULL) {
 				resultItem = fSelected;
 				break;
 			} else
