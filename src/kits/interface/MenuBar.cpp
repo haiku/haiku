@@ -389,7 +389,8 @@ BMenuItem *
 BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 {	
 	// TODO: Cleanup, merge some "if" blocks if possible
-	BMenuItem *resultItem = NULL;
+	fChosenItem = NULL;
+	
 	BWindow *window = Window();
 	fState = MENU_STATE_TRACKING;
 
@@ -429,7 +430,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 						// Menu was already opened, close it and bail
 						SelectItem(NULL);
 						fState = MENU_STATE_CLOSED;
-						resultItem = NULL;
+						fChosenItem = NULL;
 					}
 				} else {
 					// No submenu, just select the item
@@ -449,7 +450,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				if (IsStickyMode())
 					menu->SetStickyMode(true);
 				int localAction;
-				resultItem = menu->_track(&localAction, system_time());
+				fChosenItem = menu->_track(&localAction, system_time());
 				//menu->Window()->Activate();
 				if (localAction == MENU_STATE_CLOSED)
 					fState = MENU_STATE_CLOSED;
@@ -468,7 +469,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			break;
 		else if (buttons == 0 && !IsStickyMode()) {
 			if ((fSelected != NULL && fSelected->Submenu() == NULL) || menuItem == NULL) {
-				resultItem = fSelected;
+				fChosenItem = fSelected;
 				break;
 			} else
 				SetStickyMode(true);
@@ -481,8 +482,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	if (window->Lock()) {
 		if (fSelected != NULL)
 			SelectItem(NULL);
-		if (resultItem != NULL)
-			resultItem->Invoke();
+		if (fChosenItem != NULL)
+			fChosenItem->Invoke();
 		RestoreFocus();
 		window->Unlock();
 	}
@@ -495,7 +496,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	if (action != NULL)
 		*action = fState;
 
-	return resultItem;
+	return fChosenItem;
 }
 
 
