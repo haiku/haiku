@@ -163,8 +163,12 @@ Icon::ObjectChanged(const Observable* object)
 bool
 Icon::AddListener(IconListener* listener)
 {
-	if (listener && !fListeners.HasItem((void*)listener))
-		return fListeners.AddItem((void*)listener);
+	if (listener && !fListeners.HasItem((void*)listener)) {
+		if (fListeners.AddItem((void*)listener)) {
+			listener->AreaInvalidated(BRect(0, 0, 63, 63));
+			return true;
+		}
+	}
 	return false;
 }
 

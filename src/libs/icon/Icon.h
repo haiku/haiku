@@ -13,6 +13,7 @@
 #include <List.h>
 
 # include "Observer.h"
+# include "Referenceable.h"
 #else
 # include <SupportDefs.h>
 #endif
@@ -34,7 +35,8 @@ class IconListener {
 
 #ifdef ICON_O_MATIC
 class Icon : public ShapeContainerListener,
-			 public Observer {
+			 public Observer,
+			 public Referenceable {
 #else
 class Icon {
 #endif
