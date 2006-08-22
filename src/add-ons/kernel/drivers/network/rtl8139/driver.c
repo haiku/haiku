@@ -46,13 +46,15 @@
 #include "registers.h"
 
 #define RTL_MAX_CARDS 4
+#define DRIVER_NAME "rtl8139"
 
-#define TRACE_RTL8139
+//#define TRACE_RTL8139
 #ifdef TRACE_RTL8139
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(DRIVER_NAME x)
 #else
-#	define TRACE(x)
+#	define TRACE(x...)
 #endif
+#define ERROR(x...) dprintf(DRIVER_NAME x)
 
 typedef struct supported_device {
 	uint16 vendor_id;
@@ -167,7 +169,7 @@ static status_t close_hook(void *);
 		size += offset;
 		size = (size +(B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
 
-		TRACE(("rtl8139_nielx _open_hook(): PCI base=%lx size=%lx offset=%lx\n", base, size, offset));
+		TRACE(" open_hook(): PCI base=%lx size=%lx offset=%lx\n", base, size, offset);
 		
 		data->ioarea = map_physical_memory("rtl8139_regs", (void *)base, size, B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (void **)&data->reg_base);
 
@@ -182,7 +184,7 @@ status_t
 init_hardware (void)
 {
 	// Nielx: no special requirements here...
-	TRACE(("rtl8139_nielx: init_hardware\n"));
+	TRACE(" init_hardware\n");
 	return B_OK;
 }
 
@@ -198,11 +200,11 @@ init_driver (void)
 	pci_info *item;			//Storage used while looking through pci
 	int32 i, found;			//Counter
 
-	TRACE(("rtl8139_nielx: init_driver()\n"));
+	TRACE(" init_driver()\n");
 	
 	// Try if the PCI module is loaded (it would be weird if it wouldn't, but alas)
 	if ((status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCIModule)) != B_OK) {
-		TRACE(("rtl8139_nielx init_driver(): Get PCI module failed! %lu \n", status));
+		ERROR(" init_driver(): Get PCI module failed! %s (%lu) \n", strerror(status), status);
 		return status;
 	}
 	
@@ -217,11 +219,11 @@ init_driver (void)
 			     (item->device_id == supported->device_id)) {
 				//Also done in etherpci sample code
 				if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF)) {
-					TRACE(("rtl8139_nielx init_driver(): found %s with invalid IRQ - check IRQ assignement\n", supported->name));
+					ERROR(" init_driver(): found %s with invalid IRQ - check IRQ assignement\n", supported->name);
 					continue;
 				}
 				
-				TRACE(("rtl8139_nielx init_driver(): found %s at IRQ %u \n", supported->name, item->u.h0.interrupt_line));
+				TRACE(" init_driver(): found %s at IRQ %u \n", supported->name, item->u.h0.interrupt_line);
 				gFoundDevices[found] = item;
 				item = (pci_info *)malloc(sizeof(pci_info));
 				found++;
@@ -233,7 +235,7 @@ init_driver (void)
 	
 	//Check if we have found any devices:
 	if (found == 0) {
-		TRACE(("rtl8139_nielx init_driver(): no device found\n"));
+		ERROR(" init_driver(): no device found\n");
 		put_module(B_PCI_MODULE_NAME); //dereference module
 		return ENODEV;
 	}
@@ -261,7 +263,7 @@ uninit_driver (void)
 {
 	int index;
 	void *item;
-	TRACE(("rtl8139_nielx: uninit_driver()\n"));
+	TRACE(" uninit_driver()\n");
 	
 	for (index = 0; (item = gDeviceNames[index]) != NULL; index++) {
 		free(item);
@@ -289,7 +291,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	uint32 temp32;
 	unsigned char cmd;
 
-	TRACE(("rtl8139_nielx open_hook()\n"));
+	TRACE(" open_hook()\n");
 	
 	// verify device access
 	{
@@ -312,7 +314,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	
 	//Create a structure that contains the internals
 	if (!(*cookie = data = (rtl8139_properties_t *)malloc(sizeof(rtl8139_properties_t)))) {
-		TRACE(("rtl8139_nielx open_hook(): Out of memory\n"));
+		ERROR(" open_hook(): Out of memory\n");
 		gDeviceOpenMask &= ~(1L << id);
 		return B_NO_MEMORY;
 	}
@@ -346,7 +348,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	temp32 = READ_32(TxConfig);
 	
 	if (temp32 == 0xFFFFFF) {
-		TRACE(("rtl8139_nielx open_hook(): Faulty chip\n"));
+		ERROR(" open_hook(): Faulty chip\n");
 		return EIO;
 	}
 	
@@ -354,22 +356,22 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 
 	switch(temp32) {
 	case 0x74000000:
-		TRACE(("rtl8139_nielx open_hook(): Chip is the 8139 C\n"));
+		TRACE(" open_hook(): Chip is the 8139 C\n");
 		data->chip_type = RTL_8139_C;
 		break;
 	
 	case 0x74400000:
-		TRACE(("rtl8139_niels open_hook(): Chip is the 8139 D\n"));
+		TRACE(" open_hook(): Chip is the 8139 D\n");
 		data->chip_type = RTL_8139_D;
 		break;
 	
 	case 0x74C00000:
-		TRACE(("rtl8139_nielx open_hook(): Chip is the 8101L\n"));
+		TRACE(" open_hook(): Chip is the 8101L\n");
 		data->chip_type = RTL_8101_L;
 		break;
 	
 	default:
-		TRACE(("rtl8139_nielx open_hook(): Unknown chip, assuming 8139 C\n"));
+		TRACE(" open_hook(): Unknown chip, assuming 8139 C\n");
 		data->chip_type = RTL_8139_C;
 	}
 
@@ -382,10 +384,10 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 		temp16--;
 	
 	if (temp16 == 0) {
-		TRACE(("rtl8139_nielx open_hook(): Reset failed... Bailing out\n"));
+		ERROR(" open_hook(): Reset failed... Bailing out\n");
 		return EIO;
 	}
-	TRACE(("rtl8139_nielx open_hook(): Chip reset: %u \n", temp16));
+	TRACE(" open_hook(): Chip reset: %u \n", temp16);
 	
 	/* Enable writing to the configuration registers */
 	WRITE_8(_9346CR, 0xc0);
@@ -428,7 +430,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	// Size is set above: as 16k + 16 bytes + 1.5 kB--- 16 bytes for last CRC (a
 	data->receivebuffer = alloc_mem(&(data->receivebufferlog), &(data->receivebufferphy), 1024 * 64 + 16, "rx buffer");
 	if (data->receivebuffer == B_ERROR) {
-		TRACE(("rtl8139_nielx open_hook(): memory allocation for ringbuffer failed\n"));
+		ERROR(" open_hook(): memory allocation for ringbuffer failed\n");
 		return B_ERROR;
 	}
 	WRITE_32(RBSTART, (int32) data->receivebufferphy);
@@ -451,7 +453,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	WRITE_32(TSAD3, (int32)data->transmitbufferphy[3]);
 	
 	if (data->transmitbuffer == B_ERROR) {
-		TRACE(("rtl8139_nielx open_hook(): memory allocation for transmitbuffer failed\n"));
+		ERROR(" open_hook(): memory allocation for transmitbuffer failed\n");
 		return B_ERROR;
 	}
 
@@ -462,9 +464,9 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	for(temp8 = 0; temp8 < 6; temp8++)
 		data->address.ebyte[ temp8 ] = READ_8(IDR0 + temp8 );
 		
-	TRACE(("rlt8139_nielx open_hook(): MAC address: %x:%x:%x:%x:%x:%x\n",
+	TRACE(" open_hook(): MAC address: %x:%x:%x:%x:%x:%x\n",
 		data->address.ebyte[0], data->address.ebyte[1], data->address.ebyte[2],
-		data->address.ebyte[3], data->address.ebyte[4], data->address.ebyte[5]));
+		data->address.ebyte[3], data->address.ebyte[4], data->address.ebyte[5]);
 	
 	/* Receive physical match packets and broadcast packets */
 	WRITE_32(RxConfig,
@@ -477,7 +479,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 
 	/* We want interrupts! */
 	if (install_io_interrupt_handler(data->pcii->u.h0.interrupt_line, rtl8139_interrupt, data, 0) != B_OK) {
-		TRACE(("rtl8139_nielx open_hook(): Error installing interrupt handler\n"));
+		ERROR(" open_hook(): Error installing interrupt handler\n");
 		return B_ERROR;
 	}
 
@@ -492,12 +494,12 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	
 	//Check if Tx and Rx are enabled
 	if (!(READ_8(Command) & EnableReceive) || !(READ_8(Command) & EnableTransmit))
-		TRACE(("TRANSMIT AND RECEIVE NOT ENABLED!!!\n"));
+		ERROR(" TRANSMIT AND RECEIVE NOT ENABLED!!!\n");
 	else
-		TRACE(("TRANSMIT AND RECEIVE ENABLED!!!\n"));
+		TRACE(" TRANSMIT AND RECEIVE ENABLED!!!\n");
 		
-	TRACE(("rtl8139_nielx open_hook(): Basic Mode Status Register: 0x%x ESRS: 0x%x\n",
-		READ_16(BMSR), READ_8(ESRS)));
+	TRACE(" open_hook(): Basic Mode Status Register: 0x%x ESRS: 0x%x\n",
+		READ_16(BMSR), READ_8(ESRS));
 		
 	return B_OK;
 }
@@ -541,12 +543,12 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 	status_t status = B_ERROR;
 	uint16 length = 0;
 	
-	TRACE(("rtl8139_nielx: read_hook()\n"));
+	TRACE(" read_hook()\n");
 
 restart:
 	// Acquire the sem if we are allowed to block
 	if ((status = acquire_sem_etc(data->input_wait , 1 , B_CAN_INTERRUPT | data->nonblocking , 0)) != B_NO_ERROR) {
-		TRACE(("rtl8139_nielx read_hook: Cannot acquire sem: %lx , %s\n" , status , strerror(status)));
+		ERROR(" read_hook: Cannot acquire sem: %lx , %s\n" , status , strerror(status));
 		return status;
 	}
 	
@@ -555,7 +557,7 @@ restart:
 	
 	//Next: check in command register if there's actually anything to be read
 	if (READ_8(Command) & BUFE ) {
-		TRACE(("rtl8139_nielx read_hook: Nothing to read!!!\n"));
+		ERROR(" read_hook: Nothing to read!!!\n");
 		unlock(former);
 		return B_IO_ERROR;
 	}
@@ -565,20 +567,20 @@ restart:
 	
 	// Check if the transfer is already done: EarlyRX
 	if (packet_header->length == 0xfff0) {
-		TRACE(("rtl8139_nielx read_hook: The transfer is not yet finished!!!\n"));
+		ERROR(" read_hook: The transfer is not yet finished!!!\n");
 		unlock(former);
 		goto restart;
 	}
 	
 	//Check for an error: if needed: resetrx, length may not be bigger than 1514 + 4 CRC
 	if (!(packet_header->bits & 0x1) || packet_header->length > 1518) {
-		TRACE(("rtl8139_nielx read_hook: Error in package reception: bits: %u length %u!!!\n", packet_header->bits, packet_header->length));
+		ERROR(" read_hook: Error in package reception: bits: %u length %u!!!\n", packet_header->bits, packet_header->length);
 		unlock (former);
 		rtl8139_reset(data);
 		goto restart;
 	}
 	
-	TRACE(("rtl8139_nielx read_hook(): Packet size: %u Receiveheader: %u Buffer size: %lu\n", packet_header->length, packet_header->bits, *num_bytes));
+	TRACE(" read_hook(): Packet size: %u Receiveheader: %u Buffer size: %lu\n", packet_header->length, packet_header->bits, *num_bytes);
 	
 	//Copy the packet
 	length = packet_header->length - 4;
@@ -588,7 +590,7 @@ restart:
 		memcpy(buf, (void *)((uint32)data->receivebufferlog + data->receivebufferoffset + 4), 0x10000 - (data->receivebufferoffset + 4)); 
 		//copy remaining bytes from the beginning
 		memcpy((void *)((uint32)buf + 0x10000 - (data->receivebufferoffset + 4)), data->receivebufferlog, length - (0x10000 - (data->receivebufferoffset + 4 )));
-		TRACE(("rtl8139_nielx read_hook: Wrapping around end of buffer\n"));
+		TRACE(" read_hook: Wrapping around end of buffer\n");
 	}
 	else
 		memcpy(buf, (void *) ((uint32)data->receivebufferlog + data->receivebufferoffset + 4), length);  //length-4 because we don't want to copy the 4 bytes CRC
@@ -599,7 +601,7 @@ restart:
 	data->receivebufferoffset = (data->receivebufferoffset + packet_header->length + 4 + 3) & ~3;
 			
 	WRITE_16(CAPR, data->receivebufferoffset - 16); //-16, avoid overflow
-	TRACE(("rtl8139_nielx read_hook(): CBP %u CAPR %u \n", READ_16(CBR), READ_16(CAPR)));
+	TRACE(" read_hook(): CBP %u CAPR %u \n", READ_16(CBR), READ_16(CAPR));
 	
 	unlock(former);
 	
@@ -620,7 +622,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	uint32 transmitdescription = 0;
 	cpu_status former;
 
-	TRACE(("rtl8139_nielx write_hook()\n"));
+	TRACE(" write_hook()\n");
 	
 	acquire_sem(data->lock);
 	acquire_sem_etc(data->output_wait, 1, B_CAN_INTERRUPT, 0);
@@ -637,7 +639,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 
 	if (buflen > 1792) {
 		// Maximum of 1792 bytes
-		TRACE(("rtl8139_nielx write_hook(): packet is too long\n"));
+		ERROR(" write_hook(): packet is too long\n");
 		unlock(former);
 		release_sem_etc(data->lock, 1, B_DO_NOT_RESCHEDULE);
 		return B_IO_ERROR;
@@ -652,7 +654,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 		return B_IO_ERROR;
 	}
 	
-	TRACE(("rtl8139_nielx write_hook(): TransmitID: %u Packagelen: %u Register: %lx\n", transmitid, buflen, TSD0 + (sizeof(uint32) * transmitid)));
+	TRACE(" write_hook(): TransmitID: %u Packagelen: %u Register: %lx\n", transmitid, buflen, TSD0 + (sizeof(uint32) * transmitid));
 	
 	data->writes++;
 	// Set the buffer as used
@@ -666,10 +668,10 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	
 	//Clear OWN and start transfer Create transmit description with early Tx FIFO, size
 	transmitdescription = (buflen | 0x80000 | transmitdescription) ^OWN; //0x80000 = early tx treshold
-	TRACE(("rtl8139_nielx write: transmitdescription = %lu\n", transmitdescription));
+	TRACE(" write: transmitdescription = %lu\n", transmitdescription);
 	WRITE_32(TSD0 + (sizeof(uint32) * transmitid), transmitdescription);
 
-	TRACE(("rtl8139_nielx write: TSAD: %u\n", READ_16(TSAD)));
+	TRACE(" write: TSAD: %u\n", READ_16(TSAD));
 	data->queued_packets++;
 	
 	unlock(former);
@@ -690,19 +692,19 @@ control_hook (void* cookie, uint32 op, void* arg, size_t len)
 {
 	rtl8139_properties_t *data = (rtl8139_properties_t *)cookie;
 	ether_address_t address;
-	TRACE(("rtl8139_nielx control_hook()\n"));
+	TRACE(" control_hook()\n");
 	
 	
 	switch (op) {
 	case ETHER_INIT:
-		TRACE(("rtl8139_nielx control_hook(): Wants us to init... ;-)\n"));
+		TRACE(" control_hook(): Wants us to init... ;-)\n");
 		return B_NO_ERROR;
 		
 	case ETHER_GETADDR:
 		if (data == NULL)
 			return B_ERROR;
 			
-		TRACE(("rtl8139_nielx control_hook(): Wants our address...\n"));
+		TRACE(" control_hook(): Wants our address...\n");
 		memcpy(arg, (void *) &(data->address), sizeof(ether_address_t));
 		return B_OK;
 	
@@ -713,31 +715,31 @@ control_hook (void* cookie, uint32 op, void* arg, size_t len)
 		if (data->multiset == 8)
 			return B_ERROR;
 			
-		TRACE(("rtl8139_nielx control_hook(): Add multicast...\n"));
+		TRACE(" control_hook(): Add multicast...\n");
 		memcpy(&address, arg, sizeof(address));
-		TRACE(("Multicast address: %i %i %i %i %i %i \n", address.ebyte[0],
+		TRACE(" Multicast address: %i %i %i %i %i %i \n", address.ebyte[0],
 			address.ebyte[1], address.ebyte[2], address.ebyte[3], address.ebyte[4],
-			address.ebyte[5]));
+			address.ebyte[5]);
 		return B_OK;
 
 	case ETHER_NONBLOCK:
 		if (data == NULL)
 			return B_ERROR;
 		
-		TRACE(("rtl8139_nielx control_hook(): Wants to set block/nonblock\n"));
+		TRACE(" control_hook(): Wants to set block/nonblock\n");
 		memcpy(&data->nonblocking, arg, sizeof(data->nonblocking));
 		return B_NO_ERROR;
 		
 	case ETHER_REMMULTI:
-		TRACE(("rtl8139_nielx control_hook(): Wants REMMULTI\n"));
+		TRACE(" control_hook(): Wants REMMULTI\n");
 		return B_OK;
 		
 	case ETHER_SETPROMISC:
-		TRACE(("rtl8139_nielx control_hook(): Wants PROMISC\n"));
+		TRACE(" control_hook(): Wants PROMISC\n");
 		return B_OK;
 	
 	case ETHER_GETFRAMESIZE:
-		TRACE(("rtl8139_nielx control_hook(): Wants GETFRAMESIZE\n"));
+		TRACE(" control_hook(): Wants GETFRAMESIZE\n");
 		*((unsigned int *)arg) = 1514;
 		return B_OK;
 	}
@@ -764,9 +766,9 @@ rtl8139_interrupt(void *cookie)
 		if (isr_contents == 0)
 			break;
 			
-		TRACE(("NIELX INTERRUPT: %u \n", isr_contents));
+		TRACE(" INTERRUPT: %u \n", isr_contents);
 		if (isr_contents & ReceiveOk) {
-			TRACE(("rtl8139_nielx interrupt ReceiveOk\n"));
+			TRACE(" interrupt ReceiveOk\n");
 			release_sem_etc(data->input_wait, 1, B_DO_NOT_RESCHEDULE);
 			retval = B_INVOKE_SCHEDULER;
 		}
@@ -784,26 +786,26 @@ rtl8139_interrupt(void *cookie)
 				// If a register isn't used, continue next run
 				temp8 = data->finished_packets % 4;
 				txstatus = READ_32(TSD0 + temp8 * sizeof(int32));
-				TRACE(("run: %u txstatus: %lu Register: %lx\n", temp8, txstatus, TSD0 + temp8 * sizeof(int32)));
+				TRACE(" run: %u txstatus: %lu Register: %lx\n", temp8, txstatus, TSD0 + temp8 * sizeof(int32));
 				
 				if (!(txstatus & (TOK | TUN | TABT))) {
-					TRACE(("NOT FINISHED\n"));
+					TRACE(" NOT FINISHED\n");
 					break;
 				}
 				
 				if (txstatus & (TABT | OWC)) {
-					TRACE(("MAJOR ERROR\n"));
+					TRACE(" MAJOR ERROR\n");
 					continue;
 				} 
 
 				if (txstatus &(TUN))  {
-					TRACE(("TRANSMIT UNDERRUN\n"));
+					TRACE(" TRANSMIT UNDERRUN\n");
 					continue;
 				}
 				
 				if ((txstatus & TOK)) {
 					//this one is the one!
-					TRACE(("NIELX INTERRUPT: TXOK, clearing register %u\n", temp8));
+					TRACE(" INTERRUPT: TXOK, clearing register %u\n", temp8);
 					data->transmitstatus[temp8] = 0; //That's all there is to it
 					data->writes--;
 					data->finished_packets++;
@@ -830,8 +832,8 @@ rtl8139_interrupt(void *cookie)
 	
 		if (isr_contents & ReceiveUnderflow) {
 			// Most probably a link change -> TODO CHECK!
-			TRACE(("rtl8139_nielx interrupt(): BMCR: 0x%x BMSR: 0x%x\n", 
-				READ_16(BMCR), READ_16(BMSR)));
+			TRACE(" interrupt(): BMCR: 0x%x BMSR: 0x%x\n", 
+				READ_16(BMCR), READ_16(BMSR));
 			retval = B_HANDLED_INTERRUPT;
 		}
 	
@@ -865,7 +867,7 @@ static status_t
 close_hook (void* cookie)
 {
 	rtl8139_properties_t * data = (rtl8139_properties_t *) cookie;
-	TRACE(("rtl8139_nielx close_hook()\n"));
+	TRACE(" close_hook()\n");
 
 	//Stop Rx and Tx process
 	WRITE_8(Command, 0);
@@ -891,7 +893,7 @@ static status_t
 free_hook (void* cookie)
 {
 	rtl8139_properties_t *data = (rtl8139_properties_t *) cookie;
-	TRACE(("rtl8139_nielx free_hook()\n"));
+	TRACE(" free_hook()\n");
 	
 	//Free Rx and Tx buffers
 	delete_area(data->receivebuffer);
