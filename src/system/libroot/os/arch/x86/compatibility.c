@@ -3,7 +3,10 @@
  * Distributed under the terms of the MIT License.
  */
 
-#if __GNUC__ < 3
+// TODO: temporary measurement to fix the build with GCC 4 - in the end, these
+//	private syscalls shouldn't be used anywhere in the Haiku tree, at the very
+//	least they should only be used when compiling for GCC 2.95.3, though.
+#if __GNUC__ < 30
 
 // This file includes some known R5 syscalls
 // ToDo: maybe they should indeed do something...
