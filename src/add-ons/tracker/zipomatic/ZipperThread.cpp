@@ -294,9 +294,12 @@ ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 		thread = errno;
 
 	// Restore old FDs
-	close(STDIN_FILENO); dup(oldIn); close(oldIn);
-	close(STDOUT_FILENO); dup(oldOut); close(oldOut);
-	close(STDERR_FILENO); dup(oldErr); close(oldErr);
+	dup2(oldIn, STDIN_FILENO);
+	close(oldIn);
+	dup2(oldOut, STDOUT_FILENO);
+	close(oldOut);
+	dup2(oldErr, STDERR_FILENO);
+	close(oldErr);
 	return thread;
 
 err3:

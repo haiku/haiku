@@ -1,9 +1,5 @@
 SubDir HAIKU_TOP src add-ons tracker zipomatic ;
 
-AddResources ZipOMatic-Z :
-	ZipOMatic.rdef ZipOMatic.icons.rdef ZipOMatic.version.rdef
-	;
-
 Application ZipOMatic-Z : 
 	GenericThread.cpp
 	ZipOMatic.cpp
@@ -12,7 +8,8 @@ Application ZipOMatic-Z :
 	ZipOMaticSettings.cpp
 	ZipOMaticView.cpp
 	ZipOMaticWindow.cpp
-	ZipOMaticZipper.cpp
-	;
+	ZipperThread.cpp
 
-LinkAgainst ZipOMatic-Z : be tracker ;
+	: be tracker
+	: ZipOMatic.rdef
+;
