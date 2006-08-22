@@ -1,36 +1,42 @@
-#ifndef __ZIPPO_SETTINGS_H__
-#define __ZIPPO_SETTINGS_H__
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jonas Sundström, jonas.sundstrom@kirilla.com
+ */
+#ifndef ZIPOMATIC_SETTINGS_H
+#define ZIPOMATIC_SETTINGS_H
 
+
+#include <FindDirectory.h>
 #include <Message.h>
-#include <Volume.h>
 #include <String.h>
+#include <Volume.h>
 
-class ZippoSettings : public BMessage
-{
-public:
-					ZippoSettings		();
-					ZippoSettings		(BMessage a_message);
-					~ZippoSettings		();
-	
-	status_t		SetTo		(const char * a_settings_filename, 
-								 BVolume * a_volume				=	NULL,
-								 directory_which a_base_dir		=	B_USER_SETTINGS_DIRECTORY,
-								 const char * a_relative_path	=	NULL);
 
-	status_t		InitCheck	(void);
-	
-	status_t		ReadSettings		();
-	status_t		WriteSettings		();
-			
-private:
+class ZippoSettings : public BMessage {
+	public:
+					ZippoSettings();
+					ZippoSettings(BMessage& message);
+					~ZippoSettings();
 
-	status_t		GetSettingsFile		(BFile * a_settings_file, uint32 a_openmode);
+		status_t	SetTo(const char* filename, BVolume* volume = NULL,
+						directory_which baseDir = B_USER_SETTINGS_DIRECTORY,
+						const char* relativePath = NULL);
 
-	BVolume				m_volume;
-	directory_which		m_base_dir;
-	BString				m_relative_path;
-	BString				m_settings_filename;
+		status_t	InitCheck();
 
+		status_t	ReadSettings();
+		status_t	WriteSettings();
+
+	private:
+		status_t	_GetSettingsFile(BFile* file, uint32 openMode);
+
+		BVolume		fVolume;
+		directory_which	fBaseDir;
+		BString		fRelativePath;
+		BString		fFilename;
 };
 
-#endif // __ZIPPO_SETTINGS_H__
+#endif	// ZIPOMATIC_SETTINGS_H
