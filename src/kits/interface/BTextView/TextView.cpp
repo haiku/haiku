@@ -1991,6 +1991,11 @@ BTextView::ScrollToOffset(int32 inOffset)
 	float lineHeight = 0.0;
         BPoint point = PointAt(inOffset, &lineHeight);
 
+	// TODO: We should do the following, since otherwise the textview
+	// won't scroll unless it's attached to a scrollview.
+	/*if (!bounds.Contains(point))
+		ScrollTo(point); */
+
 	if (ScrollBar(B_HORIZONTAL) != NULL) {
 		if (point.x < bounds.left || point.x >= bounds.right)
 			ScrollBar(B_HORIZONTAL)->SetValue(point.x - (bounds.IntegerWidth() / 2));
@@ -4016,7 +4021,7 @@ BTextView::AutoResize(bool redraw)
 		for (int32 i = 0; i < CountLines(); i++)
 			newWidth += LineWidth(i);
 			
-		BRect newRect(0, 0, ceilf(newWidth), ceilf(TextHeight(0, 0)) + 1);
+		BRect newRect(0, 0, ceilf(newWidth) + 1, ceilf(TextHeight(0, 0)) + 1);
 		
 		if (fContainerView != NULL) {
 			fContainerView->ResizeTo(newRect.Width(), newRect.Height());	
