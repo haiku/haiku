@@ -4,6 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel bus_managers usb ;
 UsePrivateHeaders kernel ;
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders [ FDirName drivers ] ;
+}
 
 KernelAddon usb_raw : kernel drivers bus usb :
 	usb_raw.cpp
