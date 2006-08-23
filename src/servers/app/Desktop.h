@@ -199,7 +199,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					_SetBackground(BRegion& background);
 
 		void					_UpdateFloating(int32 previousWorkspace = -1,
-									int32 nextWorkspace = -1);
+									int32 nextWorkspace = -1,
+									WindowLayer* mouseEventWindow = NULL);
 		void					_UpdateBack();
 		void					_UpdateFront(bool updateFloating = true);
 		void					_UpdateFronts(bool updateFloating = true);

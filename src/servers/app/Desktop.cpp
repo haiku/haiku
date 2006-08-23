@@ -739,6 +739,7 @@ Desktop::SetWorkspace(int32 index)
 
 	int32 previousIndex = fCurrentWorkspace;
 	RGBColor previousColor = fWorkspaces[fCurrentWorkspace].Color();
+	bool movedMouseEventWindow = false;
 
 	if (fMouseEventWindow != NULL) {
 		if (fMouseEventWindow->IsNormal()) {
@@ -752,6 +753,7 @@ Desktop::SetWorkspace(int32 index)
 				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
 
 				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex, index);
+				movedMouseEventWindow = true;
 
 				// send B_WORKSPACES_CHANGED message
 				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
@@ -829,6 +831,10 @@ Desktop::SetWorkspace(int32 index)
 		}
 	}
 
+	_UpdateFronts(false);
+	_UpdateFloating(previousIndex, index,
+		movedMouseEventWindow ? fMouseEventWindow : NULL);
+
 	BRegion stillAvailableOnScreen;
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
@@ -840,16 +846,13 @@ Desktop::SetWorkspace(int32 index)
 
 		if (window->InWorkspace(previousIndex)
 			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
-			|| (!window->IsFloating() && !window->IsNormal() && window->HasInSubset(fMouseEventWindow))) {
+			|| (!window->IsNormal() && window->HasInSubset(fMouseEventWindow))) {
 			// this window was visible before, and is already handled in the above loop
 			continue;
 		}
 
 		dirty.Include(&window->VisibleRegion());
 	}
-
-	_UpdateFronts(false);
-	_UpdateFloating(previousIndex, index);
 
 	// Set new focus to the front window, but keep focus to a floating
 	// window if still visible
@@ -933,7 +936,8 @@ Desktop::_Windows(int32 index)
 
 
 void
-Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace)
+Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
+	WindowLayer* mouseEventWindow)
 {
 	if (previousWorkspace == -1)
 		previousWorkspace = fCurrentWorkspace;
@@ -960,7 +964,8 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace)
 				_Windows(nextWorkspace).AddWindow(floating,
 					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(), nextWorkspace));
 				floating->SetCurrentWorkspace(nextWorkspace);
-				_ShowWindow(floating);
+				if (mouseEventWindow != fFront)
+					_ShowWindow(floating);
 
 				// TODO:
 				// put the floating last in the floating window list to preserve
