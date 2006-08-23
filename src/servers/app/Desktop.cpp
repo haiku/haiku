@@ -751,6 +751,8 @@ Desktop::SetWorkspace(int32 index)
 				_Windows(index).AddWindow(fMouseEventWindow);
 				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
 
+				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex, index);
+
 				// send B_WORKSPACES_CHANGED message
 				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
 					fMouseEventWindow->Workspaces());
@@ -837,7 +839,8 @@ Desktop::SetWorkspace(int32 index)
 		window->WorkspaceActivated(index, true);
 
 		if (window->InWorkspace(previousIndex)
-			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())) {
+			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
+			|| (!window->IsFloating() && !window->IsNormal() && window->HasInSubset(fMouseEventWindow))) {
 			// this window was visible before, and is already handled in the above loop
 			continue;
 		}
@@ -1647,9 +1650,13 @@ Desktop::SetWindowDecoratorSettings(WindowLayer* window,
 /*!
 	Updates the workspaces of all subset windows with regard to the
 	specifed window.
+	If newIndex is not -1, it will move all subset windows that belong to
+	the specifed window to the new workspace; this form is only called by
+	SetWorkspace().
 */
 void
-Desktop::_UpdateSubsetWorkspaces(WindowLayer* window)
+Desktop::_UpdateSubsetWorkspaces(WindowLayer* window, int32 previousIndex,
+	int32 newIndex)
 {
 	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window, window->Title()));
 
@@ -1675,7 +1682,11 @@ Desktop::_UpdateSubsetWorkspaces(WindowLayer* window)
 
 		if (subset->HasInSubset(window)) {
 			// adopt the workspace change
-			SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
+			if (newIndex != -1) {
+				_Windows(newIndex).AddWindow(subset);
+				_Windows(previousIndex).RemoveWindow(subset);
+			} else
+				SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
 		}
 	}
 }

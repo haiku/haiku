@@ -184,7 +184,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									bool affectsOtherWindows = true);
 		void					_HideWindow(WindowLayer* window);
 
-		void					_UpdateSubsetWorkspaces(WindowLayer* window);
+		void					_UpdateSubsetWorkspaces(WindowLayer* window,
+									int32 previousIndex = -1,
+									int32 newIndex = -1);
 		void					_ChangeWindowWorkspaces(WindowLayer* window,
 									uint32 oldWorkspaces, uint32 newWorkspaces);
 		void					_BringWindowsToFront(WindowList& windows,
