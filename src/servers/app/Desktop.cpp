@@ -741,11 +741,11 @@ Desktop::SetWorkspace(int32 index)
 	RGBColor previousColor = fWorkspaces[fCurrentWorkspace].Color();
 
 	if (fMouseEventWindow != NULL) {
-		if (!fMouseEventWindow->InWorkspace(index)) {
-			// the window currently being dragged will follow us to this workspace
-			// if it's not already on it
-			if (fMouseEventWindow->IsNormal()) {
-				// but only normal windows are following
+		if (fMouseEventWindow->IsNormal()) {
+			if (!fMouseEventWindow->InWorkspace(index)) {
+				// The window currently being dragged will follow us to this
+				// workspace if it's not already on it.
+				// But only normal windows are following
 				uint32 oldWorkspaces = fMouseEventWindow->Workspaces();
 
 				_Windows(index).AddWindow(fMouseEventWindow);
@@ -754,12 +754,12 @@ Desktop::SetWorkspace(int32 index)
 				// send B_WORKSPACES_CHANGED message
 				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
 					fMouseEventWindow->Workspaces());
+			} else {
+				// make sure it's frontmost
+				_Windows(index).RemoveWindow(fMouseEventWindow);
+				_Windows(index).AddWindow(fMouseEventWindow,
+					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(), index));
 			}
-		} else {
-			// make sure it's frontmost
-			_Windows(index).RemoveWindow(fMouseEventWindow);
-			_Windows(index).AddWindow(fMouseEventWindow,
-				fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(), index));
 		}
 
 		fMouseEventWindow->Anchor(index).position = fMouseEventWindow->Frame().LeftTop();
