@@ -32,13 +32,41 @@ typedef struct {
 #define kSupported		"supported"
 
 
+static void
+sizeAsString(off_t size, char *string)
+{
+	double kb = size / 1024.0;
+	float mb, gb, tb;
+	if (kb < 1.0) {
+		sprintf(string, "%Ld B", size);
+		return;
+	}
+	mb = kb / 1024.0;
+	if (mb < 1.0) {
+		sprintf(string, "%3.1f KB", kb);
+		return;
+	}
+	gb = mb / 1024.0;
+	if (gb < 1.0) {
+		sprintf(string, "%3.1f MB", mb);
+		return;
+	}
+	tb = gb / 1024.0;
+	if (tb < 1.0) {
+		sprintf(string, "%3.1f GB", gb);
+		return;
+	}
+	sprintf(string, "%.1f TB", tb);
+}
+
+
 int
 main(int argc, char **argv)
 {
 	int fd;
 	ide_device_infoblock ide_info;
-	float capacity = 0;
-	bool use_GB_units = true;
+	off_t capacity = 0;
+	char capacityString[20];
 	bool removable;
 
 	if (argc < 2) {
@@ -63,19 +91,16 @@ main(int argc, char **argv)
 	printf("\n");
 
  	if (ide_info._48_bit_addresses_supported) {
-		capacity = (float) ide_info.LBA48_total_sectors *
-					512 / (1024 * 1024 * 1024);
+		capacity = ide_info.LBA48_total_sectors * 512LL;
 	} else if (ide_info.LBA_supported) {
-		capacity = (float) ide_info.LBA_total_sectors *
-					512 / (1024 * 1024 * 1024);
+		capacity = ide_info.LBA_total_sectors * 512LL;
 	} else {
-		use_GB_units = false;
-
-		capacity = (float) (ide_info.cylinders * ide_info.heads *
-					ide_info.sectors) * 512 / (1024 * 1024);
+		capacity = (ide_info.cylinders * ide_info.heads *
+					ide_info.sectors) * 512LL;
 	}
 
-	printf("Capacity: %.2f %s\n", capacity, use_GB_units ? "GB" : "MB");
+	sizeAsString(capacity, capacityString);
+	printf("Capacity: %s\n", capacityString);
 	printf("LBA supported: %s\n", ide_info.LBA_supported ? "yes" : "no");
 	printf("\n");
 
