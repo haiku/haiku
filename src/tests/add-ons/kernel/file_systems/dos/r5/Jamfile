@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems dos ;
+
+KernelAddon dos : kernel file_systems :
+	attr.c
+	dir.c
+	dlist.c
+	dosfs.c
+	encodings.cpp
+	fat.c
+	file.c
+	iter.c
+	mime_table.c
+	util.c
+	vcache.c
+	version.c 
+;
