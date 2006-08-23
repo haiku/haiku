@@ -836,7 +836,8 @@ Desktop::SetWorkspace(int32 index)
 		// send B_WORKSPACE_ACTIVATED message
 		window->WorkspaceActivated(index, true);
 
-		if (window->InWorkspace(previousIndex) || window == fMouseEventWindow) {
+		if (window->InWorkspace(previousIndex)
+			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())) {
 			// this window was visible before, and is already handled in the above loop
 			continue;
 		}
