@@ -2,7 +2,7 @@
  * ZipOMatic.rdef
  */
 
-resource app_signature "application/x-vnd.obos.zip-o-matic";
+resource app_signature "application/x-vnd.haiku.zip-o-matic";
 
 resource app_flags B_SINGLE_LAUNCH;
 

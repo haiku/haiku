@@ -1,24 +1,28 @@
-#ifndef __ZIPOMATIC_MISC__
-#define __ZIPOMATIC_MISC__
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jonas Sundström, jonas.sundstrom@kirilla.com
+ */
+#ifndef ZIPOMATIC_MISC_H
+#define ZIPOMATIC_MISC_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <String.h>
 
-#include <SupportDefs.h>
-#include <Volume.h>
-#include <Path.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 
-#define ZIPOMATIC_APP_SIG		"application/x-vnd.obos.zip-o-matic"
+class BPath;
+class BVolume;
+
+
+#define ZIPOMATIC_APP_SIG		"application/x-vnd.haiku.zip-o-matic"
 #define ZIPOMATIC_APP_NAME		"ZipOMatic"
 
-#define ZIPPO_WINDOW_QUIT			'winq'
+#define ZIPPO_WINDOW_QUIT		'winq'
 
-status_t  	find_and_create_directory	(directory_which a_which, BVolume * a_volume = NULL, const char * a_relative_path = NULL, BPath * a_full_path = NULL);
+status_t find_and_create_directory(directory_which which, BVolume* volume = NULL,
+	const char* relativePath = NULL, BPath* fullPath = NULL);
+void error_message(const char* text, int32 status);
 
-void 		error_message	(const char * a_text, int32 a_status);
-
-#endif // __ZIPOMATIC_MISC__
-
+#endif	// ZIPOMATIC_MISC_H
