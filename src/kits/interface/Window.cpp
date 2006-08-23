@@ -357,7 +357,10 @@ BWindow::~BWindow()
 	// The BWindow is locked when the destructor is called,
 	// we need to unlock because the menubar thread tries
 	// to post a message, which will deadlock otherwise.
-	Unlock();
+	// TODO: I replaced Unlock() with UnlockFully() because the window
+	// was kept locked after that in case it was closed using ALT-W.
+	// There might be an extra Lock() somewhere in the quitting path...
+	UnlockFully();
 
 	// Wait if a menu is still tracking
 	if (fMenuSem > 0) {
