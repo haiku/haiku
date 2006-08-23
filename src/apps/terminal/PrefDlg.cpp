@@ -177,7 +177,6 @@ PrefDlg::doRevert()
 
 	messenger.SendMessage(MSG_HALF_FONT_CHANGED);
 	messenger.SendMessage(MSG_COLOR_CHANGED);
-	messenger.SendMessage(MSG_ROWS_CHANGED);
 	messenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
 
 	fDirty = false;
