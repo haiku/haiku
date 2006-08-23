@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "usb_raw.h"
+#include "BeOSCompatibility.h"
 
 
 #define TRACE_USB_RAW
@@ -33,7 +34,7 @@ uint32 gDeviceCount = 0;
 benaphore gDeviceListLock;
 
 static status_t
-usb_raw_device_added(const usb_device *newDevice, void **cookie)
+usb_raw_device_added(usb_device newDevice, void **cookie)
 {
 	TRACE((DRIVER_NAME": device_added()\n"));
 	raw_device *device = (raw_device *)malloc(sizeof(raw_device));
@@ -52,7 +53,7 @@ usb_raw_device_added(const usb_device *newDevice, void **cookie)
 	}
 
 	char deviceName[32];
-	memcpy(deviceName, &newDevice, sizeof(usb_device *));
+	memcpy(deviceName, &newDevice, sizeof(usb_device));
 	if (gUSBModule->usb_ioctl('DNAM', deviceName, sizeof(deviceName)) >= B_OK) {
 		sprintf(device->name, "bus/usb/%s", deviceName);
 	} else {
@@ -433,8 +434,8 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (gUSBModule->queue_request(device->device,
 				command->control.request_type, command->control.request,
 				command->control.value, command->control.index,
-				command->control.length, device->buffer, command->control.length,
-				usb_raw_callback, device) < B_OK) {
+				command->control.length, device->buffer, usb_raw_callback,
+				device) < B_OK) {
 				command->control.status = RAW_STATUS_FAILED;
 				command->control.length = 0;
 				benaphore_unlock(&device->lock);

@@ -11,7 +11,7 @@
 
 
 #include <lock.h>
-#include <USB.h>
+#include <USB3.h>
 
 
 typedef enum {
@@ -131,7 +131,7 @@ typedef union {
 
 
 typedef struct {
-	const usb_device	*device;
+	usb_device			device;
 	benaphore			lock;
 
 	char				name[32];
