@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <ByteOrder.h>
 #include <Drivers.h>
 #include <OS.h>
+#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -152,7 +153,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 
 	int fd = open(device, O_RDWR);
 	if (fd < 0) {
-		fprintf(stderr,"Error: couldn't open file for device %s %s\n",device, strerror(fd));
+		fprintf(stderr, "Error: couldn't open file for device %s (%s)\n", device, strerror(errno));
 		return B_ERROR;
 	}
 
