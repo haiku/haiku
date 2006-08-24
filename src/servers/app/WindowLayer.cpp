@@ -1516,7 +1516,7 @@ WindowLayer::RemoveFromSubset(WindowLayer* window)
 bool
 WindowLayer::HasInSubset(const WindowLayer* window) const
 {
-	if (fFeel == window->Feel() || fFeel == B_NORMAL_WINDOW_FEEL)
+	if (window == NULL || fFeel == window->Feel() || fFeel == B_NORMAL_WINDOW_FEEL)
 		return false;
 
 	// we have a few special feels that have a fixed order
