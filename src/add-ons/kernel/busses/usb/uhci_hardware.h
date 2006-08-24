@@ -91,7 +91,7 @@ typedef struct
 	addr_t	this_phy;		// A physical pointer to this address
 	void	*link_log;		// Pointer to the next logical TD/QT
 	void	*buffer_log;	// Pointer to the logical buffer
-	int32	buffer_size;	// Size of the buffer
+	size_t	buffer_size;	// Size of the buffer
 } uhci_td;
 
 // Control and Status

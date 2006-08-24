@@ -18,16 +18,6 @@
 #include "usb_p.h"
 
 
-#define TRACE_UHCI
-#ifdef TRACE_UHCI
-#define TRACE(x) dprintf x
-#define TRACE_ERROR(x) dprintf x
-#else
-#define TRACE(x) /* nothing */
-#define TRACE_ERROR(x) dprintf x
-#endif
-
-
 pci_module_info *UHCI::sPCIModule = NULL;
 
 
@@ -71,7 +61,7 @@ module_info *modules[] = {
 //
 
 
-#ifdef TRACE_UHCI
+#ifdef TRACE_USB
 
 void
 print_descriptor_chain(uhci_td *descriptor)
@@ -91,7 +81,7 @@ print_descriptor_chain(uhci_td *descriptor)
 	}
 }
 
-#endif // TRACE_UHCI
+#endif // TRACE_USB
 
 
 //
@@ -217,7 +207,7 @@ Queue::AppendDescriptorChain(uhci_td *descriptor)
 	if (!Lock())
 		return B_ERROR;
 
-#ifdef TRACE_UHCI
+#ifdef TRACE_USB
 	print_descriptor_chain(descriptor);
 #endif
 
@@ -288,7 +278,7 @@ Queue::RemoveDescriptorChain(uhci_td *firstDescriptor, uhci_td *lastDescriptor)
 	lastDescriptor->link_log = NULL;
 	lastDescriptor->link_phy = TD_TERMINATE;
 
-#ifdef TRACE_UHCI
+#ifdef TRACE_USB
 	print_descriptor_chain(firstDescriptor);
 #endif
 
@@ -307,7 +297,7 @@ Queue::PhysicalAddress()
 void
 Queue::PrintToStream()
 {
-#ifdef TRACE_UHCI
+#ifdef TRACE_USB
 	dprintf("USB UHCI Queue:\n");
 	dprintf("link phy: 0x%08x; link type: %s; terminate: %s\n", fQueueHead->link_phy & 0xfff0, fQueueHead->link_phy & 0x0002 ? "QH" : "TD", fQueueHead->link_phy & 0x0001 ? "yes" : "no");
 	dprintf("elem phy: 0x%08x; elem type: %s; terminate: %s\n", fQueueHead->element_phy & 0xfff0, fQueueHead->element_phy & 0x0002 ? "QH" : "TD", fQueueHead->element_phy & 0x0001 ? "yes" : "no");
@@ -339,7 +329,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fRootHubAddress(0)
 {
 	if (!fInitOK) {
-		TRACE(("usb_uhci: bus manager failed to init\n"));
+		TRACE_ERROR(("usb_uhci: bus manager failed to init\n"));
 		return;
 	}
 
@@ -514,7 +504,7 @@ UHCI::Start()
 status_t
 UHCI::SubmitTransfer(Transfer *transfer)
 {
-	//TRACE(("usb_uhci: submit transfer called for device %d\n", transfer->TransferPipe()->DeviceAddress()));
+	TRACE(("usb_uhci: submit transfer called for device %d\n", transfer->TransferPipe()->DeviceAddress()));
 
 	// Short circuit the root hub
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
@@ -721,7 +711,7 @@ UHCI::FinishTransfers()
 				}
 
 				if (status & TD_ERROR_MASK) {
-					TRACE_ERROR(("usb_uhci: td (0x%08x) error: 0x%08x\n", descriptor->this_phy, status));
+					TRACE_ERROR(("usb_uhci: td (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status));
 					// an error occured. we have to remove the
 					// transfer from the queue and clean up
 
@@ -986,6 +976,7 @@ UHCI::Interrupt()
 
 	if (status & UHCI_USBSTS_HCHALT) {
 		TRACE(("usb_uhci: host controller halted\n"));
+		// ToDo: cancel all transfers and reset the host controller
 		// acknowledge not needed
 	}
 
@@ -1000,7 +991,7 @@ UHCI::Interrupt()
 bool
 UHCI::AddTo(Stack &stack)
 {
-#ifdef TRACE_UHCI
+#ifdef TRACE_USB
 	set_dprintf_enabled(true); 
 	load_driver_symbols("uhci");
 #endif
@@ -1008,7 +999,7 @@ UHCI::AddTo(Stack &stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_ERROR(("usb_uhci: AddTo(): getting pci module failed! 0x%08x\n",
+			TRACE_ERROR(("usb_uhci: AddTo(): getting pci module failed! 0x%08lx\n",
 				status));
 			return status;
 		}
@@ -1044,7 +1035,7 @@ UHCI::AddTo(Stack &stack)
 			}
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_ERROR(("usb_uhci: AddTo(): InitCheck() failed 0x%08x\n", bus->InitCheck()));
+				TRACE_ERROR(("usb_uhci: AddTo(): InitCheck() failed 0x%08lx\n", bus->InitCheck()));
 				delete bus;
 				continue;
 			}
@@ -1056,7 +1047,7 @@ UHCI::AddTo(Stack &stack)
 	}
 
 	if (!found) {
-		TRACE(("usb_uhci: AddTo(): no devices found\n"));
+		TRACE_ERROR(("usb_uhci: no devices found\n"));
 		delete item;
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
@@ -1068,7 +1059,7 @@ UHCI::AddTo(Stack &stack)
 
 
 uhci_td *
-UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, int32 bufferSize)
+UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 {
 	uhci_td *result;
 	void *physicalAddress;
@@ -1113,9 +1104,9 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, int32 bufferSize)
 
 status_t
 UHCI::CreateDescriptorChain(Pipe *pipe, uhci_td **_firstDescriptor,
-	uhci_td **_lastDescriptor, uint8 direction, int32 bufferSize)
+	uhci_td **_lastDescriptor, uint8 direction, size_t bufferSize)
 {
-	int32 packetSize = pipe->MaxPacketSize();
+	size_t packetSize = pipe->MaxPacketSize();
 	int32 descriptorCount = (bufferSize + packetSize - 1) / packetSize;
 
 	bool dataToggle = pipe->DataToggle();

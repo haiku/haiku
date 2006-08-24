@@ -3,20 +3,13 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
 #include <module.h>
 #include <util/kernel_cpp.h>
 #include "usb_p.h"
-
-
-#define TRACE_STACK
-#ifdef TRACE_STACK
-#define TRACE(x)	dprintf x
-#else
-#define TRACE(x)	/* nothing */
-#endif
 
 
 Stack::Stack()
@@ -28,7 +21,7 @@ Stack::Stack()
 	TRACE(("usb stack: stack init\n"));
 
 	if (benaphore_init(&fLock, "USB Stack Master Lock") < B_OK) {
-		TRACE(("usb stack: failed to create benaphore lock\n"));
+		TRACE_ERROR(("usb stack: failed to create benaphore lock\n"));
 		return;
 	}
 
@@ -48,7 +41,7 @@ Stack::Stack()
 		"8-byte chunk area");
 
 	if (fAreas[0] < B_OK) {
-		TRACE(("usb stack: 8-byte chunk area failed to initialise\n"));
+		TRACE_ERROR(("usb stack: 8-byte chunk area failed to initialise\n"));
 		return;
 	}
 
@@ -60,7 +53,7 @@ Stack::Stack()
 		if (i < B_PAGE_SIZE / 8 - 1)
 			chunk->next_item = (addr_t)fLogical[0] + 8 * (i + 1);
 		else
-			chunk->next_item = NULL;
+			chunk->next_item = 0;
 	}
 
 	// 16-byte heap
@@ -69,7 +62,7 @@ Stack::Stack()
 		"16-byte chunk area");
 
 	if (fAreas[1] < B_OK) {
-		TRACE(("usb stack: 16-byte chunk area failed to initialise\n"));
+		TRACE_ERROR(("usb stack: 16-byte chunk area failed to initialise\n"));
 		return;
 	}
 
@@ -81,7 +74,7 @@ Stack::Stack()
 		if (i < B_PAGE_SIZE / 16 - 1)
 			chunk->next_item = (addr_t)fLogical[1] + 16 * (i + 1);
 		else
-			chunk->next_item = NULL;
+			chunk->next_item = 0;
 	}
 
 	// 32-byte heap
@@ -90,7 +83,7 @@ Stack::Stack()
 		"32-byte chunk area");
 
 	if (fAreas[2] < B_OK) {
-		TRACE(("usb stack: 32-byte chunk area failed to initialise\n"));
+		TRACE_ERROR(("usb stack: 32-byte chunk area failed to initialise\n"));
 		return;
 	}
 
@@ -102,7 +95,7 @@ Stack::Stack()
 		if (i < B_PAGE_SIZE / 32 - 1)
 			chunk->next_item = (addr_t)fLogical[2] + 32 * (i + 1);
 		else
-			chunk->next_item = NULL;
+			chunk->next_item = 0;
 	}
 
 	// 64-byte heap
@@ -111,7 +104,7 @@ Stack::Stack()
 		"64-byte chunk area");
 
 	if (fAreas[3] < B_OK) {
-		TRACE(("usb stack: 64-byte chunk area failed to initialise\n"));
+		TRACE_ERROR(("usb stack: 64-byte chunk area failed to initialise\n"));
 		return;
 	}
 
@@ -123,7 +116,7 @@ Stack::Stack()
 		if (i < B_PAGE_SIZE / 64 - 1)
 			chunk->next_item = (addr_t)fLogical[3] + 64 * (i + 1);
 		else
-			chunk->next_item = NULL;
+			chunk->next_item = 0;
 	}
 
 	// Check for host controller modules
@@ -218,7 +211,7 @@ Stack::PutUSBID(usb_id id)
 		return;
 
 	if (id >= fObjectMaxCount) {
-		TRACE(("usb stack: tried to put invalid usb_id!\n"));
+		TRACE_ERROR(("usb stack: tried to put invalid usb_id!\n"));
 		Unlock();
 		return;
 	}
@@ -235,7 +228,7 @@ Stack::GetObject(usb_id id)
 		return NULL;
 
 	if (id >= fObjectMaxCount) {
-		TRACE(("usb stack: tried to get object with invalid id\n"));
+		TRACE_ERROR(("usb stack: tried to get object with invalid id\n"));
 		Unlock();
 		return NULL;
 	}
@@ -276,24 +269,24 @@ Stack::AllocateChunk(void **logicalAddress, void **physicalAddress, uint8 size)
 	else if (size <= 64)
 		listhead = fListhead64;
 	else {
-		TRACE(("usb stack: Chunk size %d to big\n", size));
+		TRACE_ERROR(("usb stack: Chunk size %d to big\n", size));
 		Unlock();
 		return B_ERROR;
 	}
 
-	if (listhead == NULL) {
-		TRACE(("usb stack: Out of memory on this list\n"));
+	if (listhead == 0) {
+		TRACE_ERROR(("usb stack: Out of memory on this list\n"));
 		Unlock();
 		return B_ERROR;
 	}
 
-	//TRACE(("usb stack: Stack::Allocate() listhead: 0x%08x\n", listhead));
+	TRACE(("usb stack: Stack::Allocate() listhead: 0x%08x\n", listhead));
 	memory_chunk *chunk = (memory_chunk *)listhead;
 	*logicalAddress = (void *)listhead;
 	*physicalAddress = (void *)chunk->physical;
-	if (chunk->next_item == NULL) {
+	if (chunk->next_item == 0) {
 		//TODO: allocate more memory
-		listhead = NULL;
+		listhead = 0;
 	} else {
 		listhead = chunk->next_item;
 	}
@@ -309,7 +302,7 @@ Stack::AllocateChunk(void **logicalAddress, void **physicalAddress, uint8 size)
 		fListhead64 = listhead;
 
 	Unlock();
-	//TRACE(("usb stack: allocated a new chunk with size %u\n", size));
+	TRACE(("usb stack: allocated a new chunk with size %u\n", size));
 	return B_OK;
 }
 
@@ -329,7 +322,7 @@ Stack::FreeChunk(void *logicalAddress, void *physicalAddress, uint8 size)
 	else if (size <= 64)
 		listhead = fListhead64;
 	else {
-		TRACE(("usb stack: Chunk size %d invalid\n", size));
+		TRACE_ERROR(("usb stack: Chunk size %d invalid\n", size));
 		Unlock();
 		return B_ERROR;
 	}
@@ -364,7 +357,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 		B_FULL_LOCK | B_CONTIGUOUS, 0);
 
 	if (area < B_OK) {
-		TRACE(("usb stack: couldn't allocate area %s\n", name));
+		TRACE_ERROR(("usb stack: couldn't allocate area %s\n", name));
 		return B_ERROR;
 	}
 
@@ -372,7 +365,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 	status_t result = get_memory_map(logAddress, size, &physicalEntry, 1);
 	if (result < B_OK) {
 		delete_area(area);
-		TRACE(("usb stack: couldn't map area %s\n", name));
+		TRACE_ERROR(("usb stack: couldn't map area %s\n", name));
 		return B_ERROR;
 	}
 

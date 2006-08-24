@@ -102,12 +102,12 @@ static	int32						FinishThread(void *data);
 		// Descriptor functions
 		uhci_td						*CreateDescriptor(Pipe *pipe,
 										uint8 direction,
-										int32 bufferSizeToAllocate);
+										size_t bufferSizeToAllocate);
 		status_t					CreateDescriptorChain(Pipe *pipe,
 										uhci_td **firstDescriptor,
 										uhci_td **lastDescriptor,
 										uint8 direction,
-										int32 bufferSizeToAllocate);
+										size_t bufferSizeToAllocate);
 
 		void						FreeDescriptor(uhci_td *descriptor);
 		void						FreeDescriptorChain(uhci_td *topDescriptor);

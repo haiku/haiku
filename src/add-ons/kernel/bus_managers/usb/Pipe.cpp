@@ -11,7 +11,7 @@
 
 
 Pipe::Pipe(Device *device, pipeDirection direction, pipeSpeed speed,
-	uint8 endpointAddress, uint32 maxPacketSize)
+	uint8 endpointAddress, size_t maxPacketSize)
 	:	Object(device->Manager()),
 		fDevice(device),
 		fDeviceAddress(device->Address()),
@@ -26,7 +26,7 @@ Pipe::Pipe(Device *device, pipeDirection direction, pipeSpeed speed,
 
 
 Pipe::Pipe(BusManager *bus, int8 deviceAddress, pipeSpeed speed,
-	uint32 maxPacketSize)
+	size_t maxPacketSize)
 	:	Object(bus),
 		fDevice(NULL),
 		fDeviceAddress(deviceAddress),
@@ -130,7 +130,7 @@ Pipe::GetStatus(uint16 *status)
 
 
 InterruptPipe::InterruptPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress, uint32 maxPacketSize)
+	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
 	:	Pipe(device, direction, speed, endpointAddress, maxPacketSize)
 {
 }
@@ -160,7 +160,7 @@ InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 
 
 BulkPipe::BulkPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress, uint32 maxPacketSize)
+	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
 	:	Pipe(device, direction, speed, endpointAddress, maxPacketSize)
 {
 }
@@ -208,7 +208,7 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 
 
 IsochronousPipe::IsochronousPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress, uint32 maxPacketSize)
+	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
 	:	Pipe(device, direction, speed, endpointAddress, maxPacketSize)
 {
 }
@@ -236,14 +236,14 @@ struct transfer_result_data {
 
 
 ControlPipe::ControlPipe(Device *device, pipeSpeed speed,
-	uint8 endpointAddress, uint32 maxPacketSize)
+	uint8 endpointAddress, size_t maxPacketSize)
 	:	Pipe(device, Pipe::Default, speed, endpointAddress, maxPacketSize)
 {
 }
 
 
 ControlPipe::ControlPipe(BusManager *bus, int8 deviceAddress, pipeSpeed speed,
-	uint32 maxPacketSize)
+	size_t maxPacketSize)
 	:	Pipe(bus, deviceAddress, speed, maxPacketSize)
 {
 }

@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
@@ -58,7 +59,7 @@ size_t
 Transfer::VectorLength()
 {
 	size_t length = 0;
-	for (int32 i = 0; i < fVectorCount; i++)
+	for (size_t i = 0; i < fVectorCount; i++)
 		length += fVector[i].iov_len;
 	return length;
 }

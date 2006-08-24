@@ -1,7 +1,6 @@
 /*
-** uhci.rdef
-**
-*/
+ * uhci.rdef
+ */
 
 resource app_signature "application/x-vnd.haiku-uhci";
 
@@ -12,5 +11,5 @@ resource app_version {
 	variety = 0,
 	internal = 0,
 	short_info = "UHCI host controller driver",
-	long_info = "OpenBeOS - This driver is (c) 2003-2005 Niels Sascha Reedijk"
+	long_info = "Haiku UHCI HCD - Copyright 2003-2006, Haiku Inc."
 };

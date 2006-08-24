@@ -11,14 +11,6 @@
 #include "usb_p.h"
 
 
-#define TRACE_USB
-#ifdef TRACE_USB
-#define TRACE(x)	dprintf x
-#else
-#define TRACE(x)	/* nothing */
-#endif
-
-
 Stack *gUSBStack = NULL;
 
 
@@ -33,8 +25,8 @@ bus_std_ops(int32 op, ...)
 #ifdef TRACE_USB
 			set_dprintf_enabled(true);
 			load_driver_symbols("usb");
-#endif
 			TRACE(("usb_module: init\n"));
+#endif
 
 			Stack *stack = new(std::nothrow) Stack();
 			if (!stack)

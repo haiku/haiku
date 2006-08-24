@@ -11,14 +11,6 @@
 #include <stdio.h>
 
 
-#define TRACE_HUB
-#ifdef TRACE_HUB
-#define TRACE(x)	dprintf	x
-#else
-#define TRACE(x)	/* nothing */
-#endif
-
-
 Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	int8 deviceAddress, bool lowSpeed)
 	:	Device(bus, parent, desc, deviceAddress, lowSpeed)
@@ -26,7 +18,7 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	TRACE(("USB Hub is being initialised\n"));
 
 	if (!fInitOK) {
-		TRACE(("USB Hub: Device failed to initialize\n"));
+		TRACE_ERROR(("USB Hub: Device failed to initialize\n"));
 		return;
 	}
 
@@ -37,7 +29,7 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 		fChildren[i] = NULL;
 
 	if (fDeviceDescriptor.device_class != 9) {
-		TRACE(("USB Hub: wrong class! Bailing out\n"));
+		TRACE_ERROR(("USB Hub: wrong class! Bailing out\n"));
 		return;
 	}
 
@@ -48,7 +40,7 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 
 	// we need at least 8 bytes
 	if (status < B_OK || actualLength < 8) {
-		TRACE(("USB Hub: Error getting hub descriptor\n"));
+		TRACE_ERROR(("USB Hub: Error getting hub descriptor\n"));
 		return;
 	}
 
@@ -63,7 +55,7 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 
 	Object *object = GetStack()->GetObject(Configuration()->interface->active->endpoint[0].handle);
 	if (!object || (object->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0) {
-		TRACE(("USB Hub: no interrupt pipe found\n"));
+		TRACE_ERROR(("USB Hub: no interrupt pipe found\n"));
 		return;
 	}
 
@@ -80,7 +72,7 @@ Hub::Hub(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 			USB_REQUEST_SET_FEATURE, PORT_POWER, i + 1, 0, NULL, 0, NULL);
 
 		if (status < B_OK)
-			TRACE(("USB Hub: power up failed on port %d\n", i));
+			TRACE_ERROR(("USB Hub: power up failed on port %ld\n", i));
 	}
 
 	// Wait for power to stabilize
@@ -101,7 +93,7 @@ Hub::UpdatePortStatus(uint8 index)
 		4, &actualLength);
 
 	if (result < B_OK || actualLength < 4) {
-		TRACE(("USB Hub: error updating port status\n"));
+		TRACE_ERROR(("USB Hub: error updating port status\n"));
 		return B_ERROR;
 	}
 
@@ -138,7 +130,7 @@ Hub::ResetPort(uint8 index)
 	}
 
 	if ((fPortStatus[index].change & C_PORT_RESET) == 0) {
-		TRACE(("USB Hub: port %d won't reset\n", index));
+		TRACE_ERROR(("USB Hub: port %d won't reset\n", index));
 		return B_ERROR;
 	}
 
@@ -282,7 +274,7 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 	if (result < B_OK) {
 		// recursion to parent failed, we're at the root(hub)
 		int32 managerIndex = GetStack()->IndexOfBusManager(Manager());
-		*index += snprintf(string + *index, bufferSize - *index, "%d", managerIndex);
+		*index += snprintf(string + *index, bufferSize - *index, "%ld", managerIndex);
 	}
 
 	if (!device) {
@@ -292,7 +284,7 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 		// find out where the requested device sitts
 		for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
 			if (fChildren[i] == device) {
-				*index += snprintf(string + *index, bufferSize - *index, "/%d", i);
+				*index += snprintf(string + *index, bufferSize - *index, "/%ld", i);
 				break;
 			}
 		}

@@ -3,18 +3,11 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
 #include "usb_p.h"
-
-
-#define TRACE_USB_DEVICE
-#ifdef TRACE_USB_DEVICE
-#define TRACE(x)	dprintf	x
-#else
-#define TRACE(x)	/* nothing */
-#endif
 
 
 Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
@@ -37,7 +30,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 
 	fLock = create_sem(1, "USB Device Lock");
 	if (fLock < B_OK) {
-		TRACE(("USB Device: could not create semaphore\n"));
+		TRACE_ERROR(("USB Device: could not create locking semaphore\n"));
 		return;
 	}
 
@@ -52,7 +45,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 		(void *)&fDeviceDescriptor, sizeof(fDeviceDescriptor), &actualLength);
 
 	if (status < B_OK || actualLength != sizeof(fDeviceDescriptor)) {
-		TRACE(("USB Device: error while getting the device descriptor\n"));
+		TRACE_ERROR(("USB Device: error while getting the device descriptor\n"));
 		return;
 	}
 
@@ -76,7 +69,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	fConfigurations = (usb_configuration_info *)malloc(
 		fDeviceDescriptor.num_configurations * sizeof(usb_configuration_info));
 	if (fConfigurations == NULL) {
-		TRACE(("USB Device: out of memory during config creations!\n"));
+		TRACE_ERROR(("USB Device: out of memory during config creations!\n"));
 		return;
 	}
 
@@ -87,7 +80,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 			&actualLength);
 
 		if (status < B_OK || actualLength != sizeof(usb_configuration_descriptor)) {
-			TRACE(("USB Device %d: error fetching configuration %d\n", fDeviceAddress, i));
+			TRACE_ERROR(("USB Device %d: error fetching configuration %ld\n", fDeviceAddress, i));
 			return;
 		}
 
@@ -106,7 +99,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 			(void *)configData, configDescriptor.total_length, &actualLength);
 
 		if (status < B_OK || actualLength != configDescriptor.total_length) {
-			TRACE(("USB Device %d: error fetching full configuration descriptor %d\n", fDeviceAddress, i));
+			TRACE_ERROR(("USB Device %d: error fetching full configuration descriptor %ld\n", fDeviceAddress, i));
 			return;
 		}
 
@@ -253,7 +246,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	// Set default configuration
 	TRACE(("USB Device %d: setting default configuration\n", fDeviceAddress));
 	if (SetConfigurationAt(0) < B_OK) {
-		TRACE(("USB Device %d: failed to set default configuration\n", fDeviceAddress));
+		TRACE_ERROR(("USB Device %d: failed to set default configuration\n", fDeviceAddress));
 		return;
 	}
 

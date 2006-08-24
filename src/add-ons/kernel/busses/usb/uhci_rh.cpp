@@ -11,14 +11,6 @@
 #include <PCI.h>
 
 
-//#define TRACE_UHCI_ROOT_HUB
-#ifdef TRACE_UHCI_ROOT_HUB
-#define TRACE(x) dprintf x
-#else
-#define TRACE(x) /* nothing */
-#endif
-
-
 static usb_device_descriptor sUHCIRootHubDevice =
 {
 	18,								// Descriptor length
@@ -231,11 +223,11 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 		case RH_CLEAR_FEATURE: {
 			if (request->Index == 0) {
 				// We don't support any hub changes
-				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE no hub changes!\n"));
+				TRACE_ERROR(("usb_uhci_roothub: RH_CLEAR_FEATURE no hub changes!\n"));
 				break;
 			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
 				// Invalid port number
-				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE invalid port!\n"));
+				TRACE_ERROR(("usb_uhci_roothub: RH_CLEAR_FEATURE invalid port!\n"));
 				break;
 			}
 
@@ -261,11 +253,11 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 		case RH_SET_FEATURE: {
 			if (request->Index == 0) {
 				// We don't support any hub changes
-				TRACE(("usb_uhci_roothub: RH_SET_FEATURE no hub changes!\n"));
+				TRACE_ERROR(("usb_uhci_roothub: RH_SET_FEATURE no hub changes!\n"));
 				break;
 			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
 				// Invalid port number
-				TRACE(("usb_uhci_roothub: RH_SET_FEATURE invalid port!\n"));
+				TRACE_ERROR(("usb_uhci_roothub: RH_SET_FEATURE invalid port!\n"));
 				break;
 			}
 

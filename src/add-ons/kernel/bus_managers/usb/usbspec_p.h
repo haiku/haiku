@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
@@ -55,8 +56,8 @@ struct usb_hub_descriptor
 	uint16 characteristics;
 	uint8 power_on_to_power_good;
 	uint8 max_power;
-	uint8 device_removeable; //Should be variable!!!
-	uint8 power_control_mask;  //Deprecated
+	uint8 device_removeable;	//Should be variable!!!
+	uint8 power_control_mask;	//Deprecated
 } _PACKED;
 
 #define USB_DESCRIPTOR_HUB 0x29

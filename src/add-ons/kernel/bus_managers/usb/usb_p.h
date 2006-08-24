@@ -15,6 +15,16 @@
 #include "BeOSCompatibility.h"
 
 
+//#define TRACE_USB
+#ifdef TRACE_USB
+#define TRACE(x)		dprintf x
+#define TRACE_ERROR(x)	dprintf x
+#else
+#define TRACE(x)		/* nothing */
+#define TRACE_ERROR(x)	dprintf x
+#endif
+
+
 class Hub;
 class Stack;
 class Device;
@@ -189,11 +199,11 @@ enum	pipeSpeed		{ LowSpeed, NormalSpeed };
 											pipeDirection direction,
 											pipeSpeed speed,
 											uint8 endpointAddress,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 										Pipe(BusManager *bus,
 											int8 deviceAddress,
 											pipeSpeed speed,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 virtual									~Pipe();
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE; };
@@ -202,7 +212,7 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE; };
 		pipeSpeed						Speed() { return fSpeed; };
 		pipeDirection					Direction() { return fDirection; };
 		int8							EndpointAddress() { return fEndpoint; };
-		uint32							MaxPacketSize() { return fMaxPacketSize; };
+		size_t							MaxPacketSize() { return fMaxPacketSize; };
 
 virtual	bool							DataToggle() { return fDataToggle; };
 virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
@@ -223,7 +233,7 @@ protected:
 		pipeDirection					fDirection;
 		pipeSpeed						fSpeed;
 		uint8							fEndpoint;
-		uint32							fMaxPacketSize;
+		size_t							fMaxPacketSize;
 		bool							fDataToggle;
 };
 
@@ -233,13 +243,13 @@ public:
 										ControlPipe(Device *device,
 											pipeSpeed speed,
 											uint8 endpointAddress,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 
 										// Constructor for default control pipe
 										ControlPipe(BusManager *bus,
 											int8 deviceAddress,
 											pipeSpeed speed,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE; };
 
@@ -275,7 +285,7 @@ public:
 											pipeDirection direction,
 											pipeSpeed speed,
 											uint8 endpointAddress,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE; };
 
@@ -292,7 +302,7 @@ public:
 											pipeDirection direction,
 											pipeSpeed speed,
 											uint8 endpointAddress,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
 
@@ -313,7 +323,7 @@ public:
 											pipeDirection direction,
 											pipeSpeed speed,
 											uint8 endpointAddress,
-											uint32 maxPacketSize);
+											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
 
@@ -387,8 +397,8 @@ protected:
 		BusManager						*fBus;
 		Device							*fParent;
 		int8							fDeviceAddress;
-		uint32							fMaxPacketIn[16];
-		uint32							fMaxPacketOut[16];
+		size_t							fMaxPacketIn[16];
+		size_t							fMaxPacketOut[16];
 		sem_id							fLock;
 		void							*fNotifyCookie;
 };

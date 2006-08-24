@@ -1,7 +1,6 @@
 /*
-** usb.rdef
-**
-*/
+ * usb.rdef
+ */
 
 resource app_signature "application/x-vnd.haiku-usb";
 
@@ -12,5 +11,5 @@ resource app_version {
 	variety = 0,
 	internal = 1,
 	short_info = "USB bus manager",
-	long_info = "Haiku - This driver is (c) 2003-2004 Niels Sascha Reedijk"
+	long_info = "Haiku USB bus manager - Copyright 2003-2006, Haiku Inc."
 };

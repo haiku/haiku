@@ -10,14 +10,6 @@
 #include "usb_p.h"
 
 
-#define TRACE_BUSMANAGER
-#ifdef TRACE_BUSMANAGER
-#define TRACE(x)	dprintf x
-#else
-#define TRACE(x)	/* nothing */
-#endif
-
-
 BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
 		fDefaultPipe(NULL),
@@ -27,7 +19,7 @@ BusManager::BusManager(Stack *stack)
 		fExploreThread(-1)
 {
 	if (benaphore_init(&fLock, "usb busmanager lock") < B_OK) {
-		TRACE(("usb BusManager: failed to create busmanager lock\n"));
+		TRACE_ERROR(("usb BusManager: failed to create busmanager lock\n"));
 		return;
 	}
 
@@ -106,7 +98,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	// Check if there is a free entry in the device map (for the device number)
 	int8 deviceAddress = AllocateAddress();
 	if (deviceAddress < 0) {
-		TRACE(("usb BusManager::AllocateNewDevice(): could not get a new address\n"));
+		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): could not get a new address\n"));
 		return NULL;
 	}
 
@@ -134,7 +126,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	}
 
 	if (result < B_OK) {
-		TRACE(("usb BusManager::AllocateNewDevice(): error while setting device address\n"));
+		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): error while setting device address\n"));
 		return NULL;
 	}
 
@@ -164,7 +156,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 		&actualLength);										// actual length
 
 	if (actualLength != 8) {
-		TRACE(("usb BusManager::AllocateNewDevice(): error while getting the device descriptor\n"));
+		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): error while getting the device descriptor\n"));
 		return NULL;
 	}
 
@@ -183,12 +175,12 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 		Hub *hub = new(std::nothrow) Hub(this, parent, deviceDescriptor,
 			deviceAddress, lowSpeed);
 		if (!hub) {
-			TRACE(("usb BusManager::AllocateNewDevice(): no memory to allocate hub\n"));
+			TRACE_ERROR(("usb BusManager::AllocateNewDevice(): no memory to allocate hub\n"));
 			return NULL;
 		}
 
 		if (hub->InitCheck() < B_OK) {
-			TRACE(("usb BusManager::AllocateNewDevice(): hub failed init check\n"));
+			TRACE_ERROR(("usb BusManager::AllocateNewDevice(): hub failed init check\n"));
 			delete hub;
 			return NULL;
 		}
@@ -205,12 +197,12 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	Device *device = new(std::nothrow) Device(this, parent, deviceDescriptor,
 		deviceAddress, lowSpeed);
 	if (!device) {
-		TRACE(("usb BusManager::AllocateNewDevice(): no memory to allocate device\n"));
+		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): no memory to allocate device\n"));
 		return NULL;
 	}
 
 	if (device->InitCheck() < B_OK) {
-		TRACE(("usb BusManager::AllocateNewDevice(): device failed init check\n"));
+		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): device failed init check\n"));
 		delete device;
 		return NULL;
 	}
