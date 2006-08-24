@@ -366,7 +366,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		bootsector32 *bs = (bootsector32 *)bootsector;
 		uint16 temp16;
 		uint32 temp32;
-		memcpy(bs->BS_OEMName,"OpenBeOS",8);
+		memcpy(bs->BS_OEMName,"Haiku   ",8);
 		bs->BPB_BytsPerSec = B_HOST_TO_LENDIAN_INT16(sectorSize);
 		bs->BPB_SecPerClus = sectorPerCluster;
 		bs->BPB_RsvdSecCnt = B_HOST_TO_LENDIAN_INT16(reservedSectorCount);
