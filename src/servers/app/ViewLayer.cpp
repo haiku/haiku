@@ -231,17 +231,17 @@ ViewLayer::AddChild(ViewLayer* layer)
 	if (fWindow) {
 		layer->AttachedToWindow(fWindow);
 
-//		if (layer->IsVisible()) {
-//			// trigger redraw
-//			BRect clippedFrame = layer->Frame();
-//			ConvertToVisibleInTopView(&clippedFrame);
-//			BRegion* dirty = fWindow->GetRegion();
-//			if (dirty) {
-//				dirty->Set(clippedFrame);
-//				fWindow->MarkContentDirtyAsync(*dirty);
-//				fWindow->RecycleRegion(dirty);
-//			}
-//		}
+		if (layer->IsVisible()) {
+			// trigger redraw
+			BRect clippedFrame = layer->Frame();
+			ConvertToVisibleInTopView(&clippedFrame);
+			BRegion* dirty = fWindow->GetRegion();
+			if (dirty) {
+				dirty->Set(clippedFrame);
+				fWindow->MarkContentDirtyAsync(*dirty);
+				fWindow->RecycleRegion(dirty);
+			}
+		}
 	}
 }
 
@@ -286,17 +286,17 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	if (fWindow) {
 		layer->DetachedFromWindow();
 
-//		if (fVisible && layer->IsVisible()) {
-//			// trigger redraw
-//			BRect clippedFrame = layer->Frame();
-//			ConvertToVisibleInTopView(&clippedFrame);
-//			BRegion* dirty = fWindow->GetRegion();
-//			if (dirty) {
-//				dirty->Set(clippedFrame);
-//				fWindow->MarkContentDirtyAsync(*dirty);
-//				fWindow->RecycleRegion(dirty);
-//			}
-//		}
+		if (fVisible && layer->IsVisible()) {
+			// trigger redraw
+			BRect clippedFrame = layer->Frame();
+			ConvertToVisibleInTopView(&clippedFrame);
+			BRegion* dirty = fWindow->GetRegion();
+			if (dirty) {
+				dirty->Set(clippedFrame);
+				fWindow->MarkContentDirtyAsync(*dirty);
+				fWindow->RecycleRegion(dirty);
+			}
+		}
 	}
 
 	return true;
