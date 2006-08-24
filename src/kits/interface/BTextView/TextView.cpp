@@ -676,7 +676,7 @@ BTextView::WindowActivated(bool state)
 	
 	BPoint where;
 	ulong buttons;
-	GetMouse(&where, &buttons, true);
+	GetMouse(&where, &buttons, false);
 	
 	if (Bounds().Contains(where))
 		TrackMouse(where, NULL); 
