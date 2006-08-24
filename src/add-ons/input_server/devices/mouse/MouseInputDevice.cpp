@@ -337,20 +337,20 @@ MouseDevice::_ComputeAcceleration(const mouse_movement& movements,
 	// acceleration
 	double acceleration = 1;
 	if (fSettings.accel.accel_factor) {
-		acceleration = sqrt(deltaX * deltaX + deltaY * deltaY)
+		acceleration = 1 + sqrt(deltaX * deltaX + deltaY * deltaY)
 			* fSettings.accel.accel_factor / 524288.0;
 	}
 
 	// make sure that we move at least one pixel (if there was a movement)
 	if (deltaX > 0)
-		deltaX = (int32)ceil(deltaX * acceleration);
-	else
 		deltaX = (int32)floor(deltaX * acceleration);
+	else
+		deltaX = (int32)ceil(deltaX * acceleration);
 
 	if (deltaY > 0)
-		deltaY = (int32)ceil(deltaY * acceleration);
-	else
 		deltaY = (int32)floor(deltaY * acceleration);
+	else
+		deltaY = (int32)ceil(deltaY * acceleration);
 }
 
 
