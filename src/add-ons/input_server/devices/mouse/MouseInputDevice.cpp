@@ -337,7 +337,7 @@ MouseDevice::_ComputeAcceleration(const mouse_movement& movements,
 	// acceleration
 	double acceleration = 1;
 	if (fSettings.accel.accel_factor) {
-		acceleration = 1 + sqrt(deltaX * deltaX + deltaY * deltaY)
+		acceleration = sqrt(deltaX * deltaX + deltaY * deltaY)
 			* fSettings.accel.accel_factor / 524288.0;
 	}
 
