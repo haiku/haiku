@@ -199,9 +199,9 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 	}
 }
 
-// GetCursorPosition
+
 BPoint
-HWInterface::GetCursorPosition()
+HWInterface::CursorPosition()
 {
 	BPoint location;
 	if (ReadLock()) {

@@ -91,7 +91,7 @@ class HWInterface : public MultiLocker {
 	virtual	void				ObscureCursor();
 	virtual	void				MoveCursorTo(const float& x,
 											 const float& y);
-			BPoint				GetCursorPosition();
+			BPoint				CursorPosition();
 
 			void				SetDragBitmap(const ServerBitmap* bitmap,
 											  const BPoint& offsetFromCursor);

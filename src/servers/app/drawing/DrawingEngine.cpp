@@ -1105,7 +1105,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 			int32 cursorWidth = cursor->Width();
 			int32 cursorHeight = cursor->Height();
 
-			BPoint cursorPosition = fGraphicsCard->GetCursorPosition();
+			BPoint cursorPosition = fGraphicsCard->CursorPosition();
 			cursorPosition -= bounds.LeftTop() + cursor->GetHotSpot();
 
 			BBitmap cursorArea(BRect(0, 0, cursorWidth - 1, cursorHeight - 1),
