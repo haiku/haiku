@@ -402,7 +402,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		uint16 temp16;
 		uint32 temp32;
 		uint32 sectorcount = size / 512;
-		memcpy(bs->BS_OEMName, "Haiku", 5);
+		memcpy(bs->BS_OEMName, "Haiku   ", 8);
 		bs->BPB_BytsPerSec = B_HOST_TO_LENDIAN_INT16(sectorSize);
 		bs->BPB_SecPerClus = sectorPerCluster;
 		bs->BPB_RsvdSecCnt = B_HOST_TO_LENDIAN_INT16(reservedSectorCount);
