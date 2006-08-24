@@ -64,8 +64,8 @@ struct fork_arg {
 
 
 // team list
-static void *team_hash = NULL;
-static struct team *kernel_team = NULL;
+static void *sTeamHash = NULL;
+static struct team *sKernelTeam = NULL;
 
 // some arbitrary chosen limits - should probably depend on the available
 // memory (the limit is not yet enforced)
@@ -134,15 +134,15 @@ dump_team_info(int argc, char **argv)
 	}
 
 	// walk through the thread list, trying to match name or id
-	hash_open(team_hash, &iterator);
-	while ((team = hash_next(team_hash, &iterator)) != NULL) {
+	hash_open(sTeamHash, &iterator);
+	while ((team = hash_next(sTeamHash, &iterator)) != NULL) {
 		if ((team->name && strcmp(argv[1], team->name) == 0) || team->id == id) {
 			_dump_team_info(team);
 			found = true;
 			break;
 		}
 	}
-	hash_close(team_hash, &iterator, false);
+	hash_close(sTeamHash, &iterator, false);
 
 	if (!found)
 		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
@@ -157,13 +157,13 @@ dump_teams(int argc, char **argv)
 	struct team *team;
 
 	kprintf("team          id  parent      name\n");
-	hash_open(team_hash, &iterator);
+	hash_open(sTeamHash, &iterator);
 
-	while ((team = hash_next(team_hash, &iterator)) != NULL) {
+	while ((team = hash_next(sTeamHash, &iterator)) != NULL) {
 		kprintf("%p%6lx  %p  %s\n", team, team->id, team->parent, team->name);
 	}
 
-	hash_close(team_hash, &iterator, false);
+	hash_close(sTeamHash, &iterator, false);
 	return 0;
 }
 
@@ -175,7 +175,7 @@ team_init(kernel_args *args)
 	struct process_group *group;
 
 	// create the team hash table
-	team_hash = hash_init(15, offsetof(struct team, next),
+	sTeamHash = hash_init(15, offsetof(struct team, next),
 		&team_struct_compare, &team_struct_hash);
 
 	// create initial session and process groups
@@ -191,20 +191,20 @@ team_init(kernel_args *args)
 	insert_group_into_session(session, group);
 
 	// create the kernel team
-	kernel_team = create_team_struct("kernel_team", true);
-	if (kernel_team == NULL)
+	sKernelTeam = create_team_struct("kernel_team", true);
+	if (sKernelTeam == NULL)
 		panic("could not create kernel team!\n");
-	strcpy(kernel_team->args, kernel_team->name);
-	kernel_team->state = TEAM_STATE_NORMAL;
+	strcpy(sKernelTeam->args, sKernelTeam->name);
+	sKernelTeam->state = TEAM_STATE_NORMAL;
 
-	insert_team_into_group(group, kernel_team);
+	insert_team_into_group(group, sKernelTeam);
 
-	kernel_team->io_context = vfs_new_io_context(NULL);
-	if (kernel_team->io_context == NULL)
+	sKernelTeam->io_context = vfs_new_io_context(NULL);
+	if (sKernelTeam->io_context == NULL)
 		panic("could not create io_context for kernel team!\n");
 
 	// stick it in the team hash
-	hash_insert(team_hash, kernel_team);
+	hash_insert(sTeamHash, sKernelTeam);
 
 	add_debugger_command("team", &dump_team_info, "list info about a particular team");
 	add_debugger_command("teams", &dump_teams, "list all teams");
@@ -392,7 +392,7 @@ team_get_team_struct_locked(team_id id)
 
 	key.id = id;
 
-	return hash_lookup(team_hash, &key);
+	return hash_lookup(sTeamHash, &key);
 }
 
 
@@ -641,17 +641,17 @@ create_process_session(pid_t id)
 struct team *
 team_get_kernel_team(void)
 {
-	return kernel_team;
+	return sKernelTeam;
 }
 
 
 team_id
 team_get_kernel_team_id(void)
 {
-	if (!kernel_team)
+	if (!sKernelTeam)
 		return 0;
 
-	return kernel_team->id;
+	return sKernelTeam->id;
 }
 
 
@@ -778,7 +778,7 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 	parent->dead_children.user_time += team->dead_threads_user_time
 		+ team->dead_children.user_time;
 
-	hash_remove(team_hash, team);
+	hash_remove(sTeamHash, team);
 	sUsedTeams--;
 
 	team->state = TEAM_STATE_DEATH;
@@ -1142,7 +1142,7 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	hash_insert(team_hash, team);
+	hash_insert(sTeamHash, team);
 	insert_team_into_parent(parent, team);
 	insert_team_into_group(parent->group, team);
 	sUsedTeams++;
@@ -1237,7 +1237,7 @@ err1:
 
 	remove_team_from_group(team, &group);
 	remove_team_from_parent(parent, team);
-	hash_remove(team_hash, team);
+	hash_remove(sTeamHash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -1415,7 +1415,7 @@ fork_team(void)
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	hash_insert(team_hash, team);
+	hash_insert(sTeamHash, team);
 	insert_team_into_parent(parentTeam, team);
 	insert_team_into_group(parentTeam->group, team);
 	sUsedTeams++;
@@ -1498,7 +1498,7 @@ err1:
 
 	remove_team_from_group(team, &group);
 	remove_team_from_parent(parentTeam, team);
-	hash_remove(team_hash, team);
+	hash_remove(sTeamHash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -1918,7 +1918,7 @@ kill_team(team_id id)
 
 	team = team_get_team_struct_locked(id);
 	if (team != NULL) {
-		if (team == kernel_team)
+		if (team == sKernelTeam)
 			retval = B_NOT_ALLOWED;
 		else
 			tid = team->main_thread->id;
