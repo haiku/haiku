@@ -54,7 +54,8 @@ const uint32 MSG_FIND_HIDE = 'Fhid';
 // FindDlg
 // 	Constructer
 //////////////////////////////////////////////////////////////////////////////
-FindDlg::FindDlg (BRect frame, TermWindow *win)
+FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str, 
+				  bool findselection, bool matchword, bool matchcase, bool forwardsearch)
 	: BWindow(frame, "Find",
 		B_FLOATING_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
 {
@@ -99,17 +100,23 @@ FindDlg::FindDlg (BRect frame, TermWindow *win)
 	fTextRadio = new BRadioButton(BRect(14, textRadioTop, textRadioRight, textRadioBottom),
 		"fTextRadio", "Use Text: ", NULL);
 	fFindView->AddChild(fTextRadio);
-	fTextRadio->SetValue(1);	//enable first option
 	
 	fFindLabel = new BTextControl(BRect(textRadioRight + 4, textRadioTop, frame.Width() - 14, textRadioBottom),
 		"fFindLabel", "", "", NULL);
 	fFindLabel->SetDivider(0);
 	fFindView->AddChild(fFindLabel);
+	if (!findselection)
+		fFindLabel->SetText(str.String());
 	fFindLabel->MakeFocus(true);
 
 	fSelectionRadio = new BRadioButton(BRect(14, selectionRadioTop, frame.Width() - 14, selectionRadioBottom),
 		"fSelectionRadio", "Use Selection", NULL);
 	fFindView->AddChild(fSelectionRadio);
+	
+	if (findselection)
+		fSelectionRadio->SetValue(B_CONTROL_ON);
+	else
+		fTextRadio->SetValue(B_CONTROL_ON);
 
 	fSeparator = new BBox(BRect(6, dividerHeight, frame.Width() - 6, dividerHeight + 1));
 	fFindView->AddChild(fSeparator);
@@ -117,14 +124,20 @@ FindDlg::FindDlg (BRect frame, TermWindow *win)
 	fForwardSearchBox = new BCheckBox(BRect(14, forwardsearchTop, frame.Width() - 14, forwardsearchBottom),
 		"fForwardSearchBox", "Search Forward", NULL);
 	fFindView->AddChild(fForwardSearchBox);
+	if (forwardsearch)
+		fForwardSearchBox->SetValue(B_CONTROL_ON);
 	
 	fMatchCaseBox = new BCheckBox(BRect(14, matchcaseTop, frame.Width() - 14, matchcaseBottom),
 		"fMatchCaseBox", "Match Case", NULL);
 	fFindView->AddChild(fMatchCaseBox);
+	if (matchcase)
+		fMatchCaseBox->SetValue(B_CONTROL_ON);
 	
 	fMatchWordBox = new BCheckBox(BRect(14, matchwordTop, frame.Width() - 14, matchwordBottom),
 		"fMatchWordBox", "Match Word", NULL);
 	fFindView->AddChild(fMatchWordBox);
+	if (matchword)
+		fMatchWordBox->SetValue(B_CONTROL_ON);
 	
 	fFindButton = new BButton(BRect(searchbuttonLeft, buttonsTop, searchbuttonRight, frame.Height() - 14),
 		"fFindButton", "Find", new BMessage(MSG_FIND));

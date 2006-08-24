@@ -48,7 +48,8 @@ class BCheckBox;
 class FindDlg : public BWindow
 {
 public:
-	FindDlg (BRect frame, TermWindow *win);
+	FindDlg (BRect frame, TermWindow *win, BString &str, 
+			bool findselection, bool matchword, bool matchcase, bool forwardsearch);
 	~FindDlg ();
 
 private:

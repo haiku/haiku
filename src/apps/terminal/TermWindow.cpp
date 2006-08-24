@@ -178,6 +178,8 @@ TermWindow::InitWindow(void)
 	// Init find parameters
 	fMatchCase = false;
 	fMatchWord = false;
+	fFindSelection = false;
+	fForwardSearch = false;
 
 	// Initialize MessageRunner.
 	fWindowUpdate = new BMessageRunner(BMessenger(this),
@@ -285,7 +287,7 @@ TermWindow::MessageReceived(BMessage *message)
   BRect r;
   BFont halfFont;
   BFont fullFont;
-  bool findselection, forwardsearch, findresult;
+  bool findresult;
   
 	switch (message->what) {
 		case MENU_SWITCH_TERM: {
@@ -319,7 +321,7 @@ TermWindow::MessageReceived(BMessage *message)
 				r.top += 20;
 				r.right = r.left + 260;
 				r.bottom = r.top + 190;
-				fFindPanel = new FindDlg(r, this);
+				fFindPanel = new FindDlg(r, this, fFindString, fFindSelection, fMatchWord, fMatchCase, fForwardSearch);
 			}
 			else
 				fFindPanel->Activate();
@@ -327,8 +329,8 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 		case MSG_FIND: {
 			fFindPanel->PostMessage(B_QUIT_REQUESTED);
-			message->FindBool("findselection", &findselection);
-			if (!findselection) 
+			message->FindBool("findselection", &fFindSelection);
+			if (!fFindSelection) 
 				message->FindString("findstring", &fFindString);
 			else 
 				fTermView->GetSelection(fFindString);
@@ -342,10 +344,10 @@ TermWindow::MessageReceived(BMessage *message)
 				break;
 			}
 
-			message->FindBool("forwardsearch", &forwardsearch);
+			message->FindBool("forwardsearch", &fForwardSearch);
 			message->FindBool("matchcase", &fMatchCase);
 			message->FindBool("matchword", &fMatchWord);
-			findresult = fTermView->Find(fFindString, forwardsearch, fMatchCase, fMatchWord);
+			findresult = fTermView->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
 				
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,

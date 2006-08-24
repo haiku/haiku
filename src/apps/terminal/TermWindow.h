@@ -91,6 +91,8 @@ private:
   BString	fFindString;
   BMenuItem	*fFindForwardMenuItem;
   BMenuItem *fFindBackwardMenuItem;
+  bool		fFindSelection;
+  bool		fForwardSearch;
   bool		fMatchCase;
   bool		fMatchWord;
 };
