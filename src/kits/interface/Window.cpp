@@ -2979,7 +2979,7 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 bool
 BWindow::_StealMouseMessage(BMessage* message, bool& deleteMessage)
 {
-	BMessage::Private messagePrivate(fLastMessage);
+	BMessage::Private messagePrivate(message);
 	if (!messagePrivate.UsePreferredTarget()) {
 		// this message is targeted at a specific handler, so we should
 		// not steal it
