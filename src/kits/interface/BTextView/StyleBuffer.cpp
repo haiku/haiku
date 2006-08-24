@@ -367,7 +367,6 @@ _BStyleBuffer_::GetStyleRange(int32 startOffset, int32 endOffset) const
 		return NULL;
 
 	STEStyleRun* run = &result->runs[0];
-
 	for (int32 index = 0; index < numStyles; index++) {
 		*run = (*this)[startIndex + index];
 		run->offset -= startOffset;
@@ -450,7 +449,7 @@ _BStyleBuffer_::Iterate(int32 fromOffset, int32 length, _BInlineInput_ *input,
 
 	if (runIndex < numRuns - 1) {
 		int32 nextOffset = (run + 1)->offset - fromOffset;
-		result = (result > nextOffset) ? nextOffset : result;
+		result = min_c(result, nextOffset);
 	}
 
 	return result;
@@ -486,6 +485,32 @@ _BStyleBuffer_::operator[](int32 index) const
 	}
 
 	return run;
+}
+
+
+// TODO: Horrible name, but can't think of a better one
+// ? CompareStyles ?
+// ? FilterStyles ?
+static void
+FixupMode(const STEStyle &firstStyle, const STEStyle &otherStyle, uint32 &mode, bool &sameColor)
+{
+	if (mode & B_FONT_FAMILY_AND_STYLE) {
+		if (firstStyle.font != otherStyle.font)
+			mode &= ~B_FONT_FAMILY_AND_STYLE;
+	}
+	if (mode & B_FONT_SIZE) {
+		if (firstStyle.font.Size() != otherStyle.font.Size())
+			mode &= ~B_FONT_SIZE;
+	}
+	if (mode & B_FONT_SHEAR) {
+		if (firstStyle.font.Shear() != otherStyle.font.Shear())
+			mode &= ~B_FONT_SHEAR;
+	}
+	if (firstStyle.color != otherStyle.color)
+		sameColor = false;
+	
+	// TODO: Finish this: handle B_FONT_FACE, B_FONT_FLAGS, etc.
+	// if needed
 }
 
 
@@ -527,32 +552,10 @@ _BStyleBuffer_::ContinuousGetStyle(BFont *outFont, uint32 *ioMode,
 		bool oneColor = true;
 		int32 styleIndex = fStyleRunDesc[toIndex]->index;
 		STEStyle theStyle = fStyleRecord[styleIndex]->style;
-		STEStyle* style = NULL;
-
+		
 		for (int32 i = fromIndex; i < toIndex; i++) {
 			styleIndex = fStyleRunDesc[i]->index;
-			style = &fStyleRecord[styleIndex]->style;
-
-			if (mode & B_FONT_FAMILY_AND_STYLE) {
-				if (theStyle.font != style->font)
-					mode &= ~B_FONT_FAMILY_AND_STYLE;
-			}
-
-			if (mode & B_FONT_SIZE) {
-				if (theStyle.font.Size() != style->font.Size())
-					mode &= ~B_FONT_SIZE;
-			}
-
-			if (mode & B_FONT_SHEAR) {
-				if (theStyle.font.Shear() != style->font.Shear())
-					mode &= ~B_FONT_SHEAR;
-			}
-
-			if (theStyle.color != style->color)
-				oneColor = false;
-
-			// TODO: Finish this: handle B_FONT_FACE, B_FONT_FLAGS, etc.
-			// if needed
+			FixupMode(fStyleRecord[styleIndex]->style, theStyle, mode, oneColor);
 		}
 
 		if (ioMode)
