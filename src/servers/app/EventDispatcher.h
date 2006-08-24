@@ -81,7 +81,7 @@ class EventDispatcher : public BLocker {
 		void SetKeyboardFilter(EventFilter* filter);
 
 		void GetMouse(BPoint& where, int32& buttons);
-		void SendFakeMouseMoved(BMessenger& target, int32 viewToken);
+		void SendFakeMouseMoved(EventTarget& target, int32 viewToken);
 
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);

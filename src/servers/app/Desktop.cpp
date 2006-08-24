@@ -361,6 +361,13 @@ Desktop::Init()
 	// TODO: temporary workaround, fActiveScreen will be removed
 	fActiveScreen = fVirtualScreen.ScreenAt(0);
 
+	SetCursor(NULL);
+		// this will set the default cursor
+
+	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
+		fVirtualScreen.Frame().Height() / 2);
+	fVirtualScreen.HWInterface()->SetCursorVisible(true);
+
 #if TEST_MODE
 	gInputManager->AddStream(new InputServerStream);
 #endif
@@ -369,13 +376,6 @@ Desktop::Init()
 
 	fEventDispatcher.SetMouseFilter(new MouseFilter(this));
 	fEventDispatcher.SetKeyboardFilter(new KeyboardFilter(this));
-
-	SetCursor(NULL);
-		// this will set the default cursor
-
-	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
-		fVirtualScreen.Frame().Height() / 2);
-	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 
 	// draw the background
 
@@ -1083,7 +1083,7 @@ Desktop::_SendFakeMouseMoved(WindowLayer* window)
 	EventDispatcher().GetMouse(where, buttons);
 
 	int32 viewToken = B_NULL_TOKEN;
-	BMessenger target;
+	EventTarget* target = NULL;
 
 	LockAllWindows();
 
@@ -1095,6 +1095,9 @@ Desktop::_SendFakeMouseMoved(WindowLayer* window)
 	if (window != NULL) {
 		BMessage message;
 		window->MouseMoved(&message, where, &viewToken, true);
+
+		if (viewToken != B_NULL_TOKEN)
+			target = &window->EventTarget();
 	}
 
 	if (viewToken != B_NULL_TOKEN)
@@ -1106,8 +1109,8 @@ Desktop::_SendFakeMouseMoved(WindowLayer* window)
 
 	UnlockAllWindows();
 
-	if (viewToken != B_NULL_TOKEN)
-		EventDispatcher().SendFakeMouseMoved(target, viewToken);
+	if (target != NULL)
+		EventDispatcher().SendFakeMouseMoved(*target, viewToken);
 }
 
 

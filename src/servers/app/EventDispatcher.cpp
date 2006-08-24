@@ -486,14 +486,13 @@ EventDispatcher::GetMouse(BPoint& where, int32& buttons)
 
 
 void
-EventDispatcher::SendFakeMouseMoved(BMessenger& target, int32 viewToken)
+EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 {
 	BAutolock _(this);
 
 	BMessage moved(B_MOUSE_MOVED);
 	moved.AddPoint("screen_where", fLastCursorPosition);
 	moved.AddInt32("buttons", fLastButtons);
-	moved.AddInt32("_view_token", viewToken);
 
 	if (fDraggingMessage) {
 /*		moved.AddInt32("_msg_data", );
@@ -502,7 +501,20 @@ EventDispatcher::SendFakeMouseMoved(BMessenger& target, int32 viewToken)
 		moved.AddMessage("be:drag_message", &fDragMessage);
 	}
 
-	_SendMessage(target, &moved, kMouseTransitImportance);
+	if (fPreviousMouseTarget != NULL
+		&& fPreviousMouseTarget != &target) {
+		_AddTokens(&moved, fPreviousMouseTarget, B_POINTER_EVENTS);
+		_SendMessage(fPreviousMouseTarget->Messenger(), &moved,
+			kMouseTransitImportance);
+
+		_RemoveTokens(&moved);
+	}
+
+	moved.AddInt32("_view_token", viewToken);
+		// this only belongs to the new target
+
+	_SendMessage(target.Messenger(), &moved, kMouseTransitImportance);
+	fPreviousMouseTarget = &target;
 }
 
 
@@ -523,6 +535,10 @@ EventDispatcher::SetHWInterface(HWInterface* interface)
 	BAutolock _(fCursorLock);
 
 	fHWInterface = interface;
+
+	// adopt the cursor position of the new HW interface
+	if (interface != NULL)
+		fLastCursorPosition = interface->CursorPosition();
 }
 
 
