@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
  */
 
 
@@ -14,36 +15,36 @@
 #include "TextViewSupportBuffer.h"
 
 
-typedef struct STEStyle {
-	BFont			font;		// font
-	rgb_color		color;		// pen color
-} STEStyle;
+struct STEStyle {
+	BFont		font;		// font
+	rgb_color	color;		// pen color
+};
 
 
-typedef struct STEStyleRun {
-	long			offset;		// byte offset of first character of run
-	STEStyle		style;		// style info
-} STEStyleRun;
+struct STEStyleRun {
+	long		offset;		// byte offset of first character of run
+	STEStyle	style;		// style info
+};
 
 
-typedef struct STEStyleRange {
-	long			count;		// number of style runs
-	STEStyleRun		runs[1];	// array of count number of runs
-} STEStyleRange;
+struct STEStyleRange {
+	long		count;		// number of style runs
+	STEStyleRun	runs[1];	// array of count number of runs
+};
 
 
-typedef struct STEStyleRecord {
-	long			refs;		// reference count for this style
-	float			ascent;		// ascent for this style
-	float			descent;	// descent for this style
-	STEStyle		style;		// style info
-} STEStyleRecord;
+struct STEStyleRecord {
+	long		refs;		// reference count for this style
+	float		ascent;		// ascent for this style
+	float		descent;	// descent for this style
+	STEStyle	style;		// style info
+};
 
 
-typedef struct STEStyleRunDesc {
-	long			offset;		// byte offset of first character of run
-	long			index;		// index of corresponding style record
-} STEStyleRunDesc;
+struct STEStyleRunDesc {
+	long		offset;		// byte offset of first character of run
+	long		index;		// index of corresponding style record
+};
 
 
 // _BStyleRunDescBuffer_ class -------------------------------------------------
@@ -108,14 +109,16 @@ class _BStyleBuffer_ {
 		void			GetNullStyle(const BFont **font,
 							const rgb_color **color) const;	
 
-		void			SetStyleRange(int32 fromOffset, int32 toOffset,
-							int32 textLen, uint32 inMode, 
-							const BFont *inFont, const rgb_color *inColor);
 		void			GetStyle(int32 inOffset, BFont *outFont,
 							rgb_color *outColor) const;
 		void			ContinuousGetStyle(BFont *, uint32 *, rgb_color *,
 							bool *, int32, int32) const;
-		STEStyleRange*	GetStyleRange(int32 startOffset, int32 endOffset) const;
+		
+		STEStyleRange*		AllocateStyleRange(const int32 numStyles) const;
+		void			SetStyleRange(int32 fromOffset, int32 toOffset,
+							int32 textLen, uint32 inMode, 
+							const BFont *inFont, const rgb_color *inColor);
+		STEStyleRange*		GetStyleRange(int32 startOffset, int32 endOffset) const;
 		
 		void			RemoveStyleRange(int32 fromOffset, int32 toOffset);
 		void			RemoveStyles(int32 index, int32 count = 1);
@@ -129,10 +132,6 @@ class _BStyleBuffer_ {
 		int32			OffsetToRun(int32 offset) const;
 		void			BumpOffset(int32 delta, int32 index);
 		
-		void			SetStyle(uint32 mode, const BFont *fromFont,
-						  BFont *toFont, const rgb_color *fromColor,
-						  rgb_color *toColor);
-
 		STEStyleRun		operator[](int32 index) const;
 		int32			NumRuns() const;
 

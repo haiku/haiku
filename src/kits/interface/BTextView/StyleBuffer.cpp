@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -157,6 +157,24 @@ _BStyleRecordBuffer_::MatchRecord(const BFont *inFont,
 //	#pragma mark -
 
 
+static void
+SetStyleFromMode(uint32 mode, const BFont *fromFont, BFont *toFont,
+		const rgb_color *fromColor, rgb_color *toColor)
+{	
+	if (mode & B_FONT_FAMILY_AND_STYLE)
+		toFont->SetFamilyAndStyle(fromFont->FamilyAndStyle());
+
+	if (mode & B_FONT_SIZE)
+		toFont->SetSize(fromFont->Size());
+
+	if (mode & B_FONT_SHEAR)
+		toFont->SetShear(fromFont->Shear());
+
+	if (!mode || (mode == B_FONT_ALL))
+		*toColor = *fromColor;
+}
+
+
 _BStyleBuffer_::_BStyleBuffer_(const BFont *inFont, const rgb_color *inColor)
 {
 	fValidNullStyle = true;
@@ -197,11 +215,11 @@ _BStyleBuffer_::SetNullStyle(uint32 inMode, const BFont *inFont,
 	const rgb_color *inColor, int32 offset)
 {
 	if (fValidNullStyle || fStyleRunDesc.ItemCount() < 1)
-		SetStyle(inMode, inFont, &fNullStyle.font, inColor, &fNullStyle.color);
+		SetStyleFromMode(inMode, inFont, &fNullStyle.font, inColor, &fNullStyle.color);
 	else {
 		int32 index = OffsetToRun(offset - 1);
 		fNullStyle = fStyleRecord[fStyleRunDesc[index]->index]->style;
-		SetStyle(inMode, inFont, &fNullStyle.font, inColor, &fNullStyle.color);	
+		SetStyleFromMode(inMode, inFont, &fNullStyle.font, inColor, &fNullStyle.color);	
 	}
 
 	fValidNullStyle = true;
@@ -219,6 +237,16 @@ _BStyleBuffer_::GetNullStyle(const BFont **font,
 }
 
 
+STEStyleRange *
+_BStyleBuffer_::AllocateStyleRange(const int32 numStyles) const
+{
+	STEStyleRange* range = (STEStyleRange *)malloc(sizeof(int32) + sizeof(STEStyleRun) * numStyles);
+	if (range)
+		range->count = numStyles;
+	return range;
+}
+
+		
 void
 _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 	int32 textLen, uint32 inMode, const BFont *inFont,
@@ -254,7 +282,7 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 			runEnd = fStyleRunDesc[runIndex + 1]->offset;
 		
 		STEStyle style = fStyleRecord[runDesc.index]->style;
-		SetStyle(inMode, inFont, &style.font, inColor, &style.color);
+		SetStyleFromMode(inMode, inFont, &style.font, inColor, &style.color);
 
 		styleIndex = fStyleRecord.InsertRecord(&style.font, &style.color);
 
@@ -334,12 +362,10 @@ _BStyleBuffer_::GetStyleRange(int32 startOffset, int32 endOffset) const
 	if (numStyles < 1)
 		numStyles = 1;
 
-	STEStyleRange* result = (STEStyleRange *)malloc(sizeof(int32)
-					+ sizeof(STEStyleRun) * numStyles);
+	STEStyleRange* result = AllocateStyleRange(numStyles);
 	if (!result)
 		return NULL;
 
-	result->count = numStyles;
 	STEStyleRun* run = &result->runs[0];
 
 	for (int32 index = 0; index < numStyles; index++) {
@@ -442,24 +468,6 @@ void
 _BStyleBuffer_::BumpOffset(int32 delta, int32 index)
 {
 	fStyleRunDesc.BumpOffset(delta, index);
-}
-
-
-void
-_BStyleBuffer_::SetStyle(uint32 mode, const BFont *fromFont, BFont *toFont,
-		const rgb_color *fromColor, rgb_color *toColor)
-{	
-	if (mode & B_FONT_FAMILY_AND_STYLE)
-		toFont->SetFamilyAndStyle(fromFont->FamilyAndStyle());
-
-	if (mode & B_FONT_SIZE)
-		toFont->SetSize(fromFont->Size());
-
-	if (mode & B_FONT_SHEAR)
-		toFont->SetShear(fromFont->Shear());
-
-	if (!mode || (mode == B_FONT_ALL))
-		*toColor = *fromColor;
 }
 
 
