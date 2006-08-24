@@ -2378,12 +2378,19 @@ dump_vnode_caches(int argc, char **argv)
 {
 	struct hash_iterator iterator;
 	struct vnode *vnode;
+	
+	// restrict dumped nodes to a certain device if requested
+	mount_id device = -1;
+	if (argc > 1)
+		device = atoi(argv[1]);
 
 	kprintf("address    dev     inode cache          size   pages\n");
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
 		if (vnode->cache == NULL)
+			continue;
+		if (device != -1 && vnode->device != device)
 			continue;
 
 		// count pages in cache
