@@ -74,20 +74,8 @@ static int32 sUsedTeams = 1;
 
 spinlock team_spinlock = 0;
 
-static void insert_group_into_session(struct process_session *session, struct process_group *group);
-static void insert_team_into_group(struct process_group *group, struct team *team);
-static struct process_session *create_process_session(pid_t id);
-static struct process_group *create_process_group(pid_t id);
-static struct team *create_team_struct(const char *name, bool kernel);
-static void delete_team_struct(struct team *p);
-static int team_struct_compare(void *_p, const void *_key);
-static uint32 team_struct_hash(void *_p, const void *_key, uint32 range);
-static int process_group_compare(void *_p, const void *_key);
-static uint32 process_group_hash(void *_p, const void *_key, uint32 range);
-static void free_strings_array(char **strings, int32 count);
-static status_t user_copy_strings_array(char * const *strings, int32 count, char ***_strings);
-static void _dump_team_info(struct team *p);
-static int dump_team_info(int argc, char **argv);
+
+//	#pragma mark - Private functions
 
 
 static void
@@ -167,67 +155,6 @@ dump_teams(int argc, char **argv)
 
 	hash_close(sTeamHash, &iterator, false);
 	return 0;
-}
-
-
-status_t
-team_init(kernel_args *args)
-{
-	struct process_session *session;
-	struct process_group *group;
-
-	// create the team hash table
-	sTeamHash = hash_init(16, offsetof(struct team, next),
-		&team_struct_compare, &team_struct_hash);
-
-	sGroupHash = hash_init(16, offsetof(struct process_group, next),
-		&process_group_compare, &process_group_hash);
-
-	// create initial session and process groups
-
-	session = create_process_session(1);
-	if (session == NULL)
-		panic("Could not create initial session.\n");
-
-	group = create_process_group(1);
-	if (group == NULL)
-		panic("Could not create initial process group.\n");
-
-	insert_group_into_session(session, group);
-
-	// create the kernel team
-	sKernelTeam = create_team_struct("kernel_team", true);
-	if (sKernelTeam == NULL)
-		panic("could not create kernel team!\n");
-	strcpy(sKernelTeam->args, sKernelTeam->name);
-	sKernelTeam->state = TEAM_STATE_NORMAL;
-
-	insert_team_into_group(group, sKernelTeam);
-
-	sKernelTeam->io_context = vfs_new_io_context(NULL);
-	if (sKernelTeam->io_context == NULL)
-		panic("could not create io_context for kernel team!\n");
-
-	// stick it in the team hash
-	hash_insert(sTeamHash, sKernelTeam);
-
-	add_debugger_command("team", &dump_team_info, "list info about a particular team");
-	add_debugger_command("teams", &dump_teams, "list all teams");
-	return 0;
-}
-
-
-int32
-team_max_teams(void)
-{
-	return sMaxTeams;
-}
-
-
-int32
-team_used_teams(void)
-{
-	return sUsedTeams;
 }
 
 
@@ -367,66 +294,6 @@ copy_strings_array(char * const *strings, int32 count, char ***_strings,
 
 
 static int
-process_group_compare(void *_group, const void *_key)
-{
-	struct process_group *group = _group;
-	const struct team_key *key = _key;
-
-	if (group->id == key->id)
-		return 0;
-
-	return 1;
-}
-
-
-static uint32
-process_group_hash(void *_group, const void *_key, uint32 range)
-{
-	struct process_group *group = _group;
-	const struct team_key *key = _key;
-
-	if (group != NULL)
-		return group->id % range;
-
-	return (uint32)key->id % range;
-}
-
-
-/** Quick check to see if we have a valid team ID.
- */
-
-bool
-team_is_valid(team_id id)
-{
-	struct team *team;
-	cpu_status state;
-
-	if (id <= 0)
-		return false;
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	team = team_get_team_struct_locked(id);
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	return team != NULL;
-}
-
-
-struct team *
-team_get_team_struct_locked(team_id id)
-{
-	struct team_key key;
-	key.id = id;
-
-	return hash_lookup(sTeamHash, &key);
-}
-
-
-static int
 team_struct_compare(void *_p, const void *_key)
 {
 	struct team *p = _p;
@@ -447,6 +314,32 @@ team_struct_hash(void *_p, const void *_key, uint32 range)
 
 	if (p != NULL)
 		return p->id % range;
+
+	return (uint32)key->id % range;
+}
+
+
+static int
+process_group_compare(void *_group, const void *_key)
+{
+	struct process_group *group = _group;
+	const struct team_key *key = _key;
+
+	if (group->id == key->id)
+		return 0;
+
+	return 1;
+}
+
+
+static uint32
+process_group_hash(void *_group, const void *_key, uint32 range)
+{
+	struct process_group *group = _group;
+	const struct team_key *key = _key;
+
+	if (group != NULL)
+		return group->id % range;
 
 	return (uint32)key->id % range;
 }
@@ -564,25 +457,6 @@ remove_group_from_session(struct process_group *group)
 }
 
 
-void
-team_delete_process_group(struct process_group *group)
-{
-	if (group == NULL)
-		return;
-
-	TRACE(("team_delete_process_group(id = %ld)\n", group->id));
-
-	delete_sem(group->dead_child_sem);
-
-	// remove_group_from_session() keeps this pointer around
-	// only if the session can be freed as well
-	if (group->session) {
-		TRACE(("team_delete_process_group(): frees session %ld\n", group->session->id));
-		free(group->session);
-	}
-
-	free(group);
-}
 
 
 /**	Removes the team from the group. If that group becomes therefore
@@ -673,63 +547,6 @@ create_process_session(pid_t id)
 }
 
 
-struct team *
-team_get_kernel_team(void)
-{
-	return sKernelTeam;
-}
-
-
-team_id
-team_get_kernel_team_id(void)
-{
-	if (!sKernelTeam)
-		return 0;
-
-	return sKernelTeam->id;
-}
-
-
-team_id
-team_get_current_team_id(void)
-{
-	return thread_get_current_thread()->team->id;
-}
-
-
-status_t
-team_get_address_space(team_id id, vm_address_space **_addressSpace)
-{
-	cpu_status state;
-	struct team *team;
-	status_t status;
-
-	// ToDo: we need to do something about B_SYSTEM_TEAM vs. its real ID (1)
-	if (id == 1) {
-		// we're the kernel team, so we don't have to go through all
-		// the hassle (locking and hash lookup)
-		*_addressSpace = vm_get_kernel_address_space();
-		return B_OK;
-	}
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	team = team_get_team_struct_locked(id);
-	if (team != NULL) {
-		atomic_add(&team->address_space->ref_count, 1);
-		*_addressSpace = team->address_space;
-		status = B_OK;
-	} else
-		status = B_BAD_VALUE;
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	return status;
-}
-
-
 static struct team *
 create_team_struct(const char *name, bool kernel)
 {
@@ -792,155 +609,6 @@ delete_team_struct(struct team *team)
 		free(death);
 
 	free(team);
-}
-
-
-/**	Removes the specified team from the global team hash, and from its parent.
- *	It also moves all of its children up to the parent.
- *	You must hold the team lock when you call this function.
- *	If \a _freeGroup is set to a value other than \c NULL, it must be freed
- *	from the calling function.
- */
-
-void
-team_remove_team(struct team *team, struct process_group **_freeGroup)
-{
-	struct team *parent = team->parent;
-
-	// remember how long this team lasted
-	parent->dead_children.kernel_time += team->dead_threads_kernel_time
-		+ team->dead_children.kernel_time;
-	parent->dead_children.user_time += team->dead_threads_user_time
-		+ team->dead_children.user_time;
-
-	hash_remove(sTeamHash, team);
-	sUsedTeams--;
-
-	team->state = TEAM_STATE_DEATH;
-
-	// reparent each of the team's children
-	reparent_children(team);
-
-	// remove us from our process group
-	remove_team_from_group(team, _freeGroup);
-
-	// remove us from our parent
-	remove_team_from_parent(parent, team);
-}
-
-
-void
-team_delete_team(struct team *team)
-{
-	team_id teamID = team->id;
-	port_id debuggerPort = -1;
-	cpu_status state;
-
-	if (team->num_threads > 0) {
-		// there are other threads still in this team,
-		// cycle through and signal kill on each of the threads
-		// ToDo: this can be optimized. There's got to be a better solution.
-		struct thread *temp_thread;
-		char death_sem_name[B_OS_NAME_LENGTH];
-		sem_id deathSem;
-		int32 threadCount;
-
-		sprintf(death_sem_name, "team %ld death sem", teamID);
-		deathSem = create_sem(0, death_sem_name);
-		if (deathSem < 0)
-			panic("team_delete_team: cannot init death sem for team %ld\n", teamID);
-
-		state = disable_interrupts();
-		GRAB_TEAM_LOCK();
-
-		team->death_sem = deathSem;
-		threadCount = team->num_threads;
-
-		// If the team was being debugged, that will stop with the termination
-		// of the nub thread. The team structure has already been removed from
-		// the team hash table at this point, so noone can install a debugger
-		// anymore. We fetch the debugger's port to send it a message at the
-		// bitter end.
-		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
-			debuggerPort = team->debug_info.debugger_port;
-
-		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-		// we can safely walk the list because of the lock. no new threads can be created
-		// because of the TEAM_STATE_DEATH flag on the team
-		temp_thread = team->thread_list;
-		while (temp_thread) {
-			struct thread *next = temp_thread->team_next;
-
-			send_signal_etc(temp_thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-			temp_thread = next;
-		}
-
-		RELEASE_TEAM_LOCK();
-		restore_interrupts(state);
-
-		// wait until all threads in team are dead.
-		acquire_sem_etc(team->death_sem, threadCount, 0, 0);
-		delete_sem(team->death_sem);
-	}
-
-	// If someone is waiting for this team to be loaded, but it dies
-	// unexpectedly before being done, we need to notify the waiting
-	// thread now.
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	if (team->loading_info) {
-		// there's indeed someone waiting
-		struct team_loading_info *loadingInfo = team->loading_info;
-		team->loading_info = NULL;
-
-		loadingInfo->result = B_ERROR;
-		loadingInfo->done = true;
-
-		GRAB_THREAD_LOCK();
-
-		// wake up the waiting thread
-		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
-			loadingInfo->thread->state = B_THREAD_READY;
-			loadingInfo->thread->next_state = B_THREAD_READY;
-			scheduler_enqueue_in_run_queue(loadingInfo->thread);
-		}
-
-		RELEASE_THREAD_LOCK();
-	}
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	// notify team watchers
-
-	{
-		// we're not reachable from anyone anymore at this point, so we
-		// can safely access the list without any locking
-		struct team_watcher *watcher;
-		while ((watcher = list_remove_head_item(&team->watcher_list)) != NULL) {
-			watcher->hook(teamID, watcher->data);
-			free(watcher);
-		}
-	}
-
-	// free team resources
-
-	vm_delete_address_space(team->address_space);
-	delete_owned_ports(teamID);
-	sem_delete_owned_sems(teamID);
-	remove_images(team);
-	vfs_free_io_context(team->io_context);
-
-	// ToDo: should our death_entries be moved one level up?
-	delete_team_struct(team);
-
-	// notify the debugger, that the team is gone
-	user_debug_team_deleted(teamID, debuggerPort);
 }
 
 
@@ -1804,6 +1472,331 @@ err:
 }
 
 
+//	#pragma mark - Private kernel API
+
+
+status_t
+team_init(kernel_args *args)
+{
+	struct process_session *session;
+	struct process_group *group;
+
+	// create the team hash table
+	sTeamHash = hash_init(16, offsetof(struct team, next),
+		&team_struct_compare, &team_struct_hash);
+
+	sGroupHash = hash_init(16, offsetof(struct process_group, next),
+		&process_group_compare, &process_group_hash);
+
+	// create initial session and process groups
+
+	session = create_process_session(1);
+	if (session == NULL)
+		panic("Could not create initial session.\n");
+
+	group = create_process_group(1);
+	if (group == NULL)
+		panic("Could not create initial process group.\n");
+
+	insert_group_into_session(session, group);
+
+	// create the kernel team
+	sKernelTeam = create_team_struct("kernel_team", true);
+	if (sKernelTeam == NULL)
+		panic("could not create kernel team!\n");
+	strcpy(sKernelTeam->args, sKernelTeam->name);
+	sKernelTeam->state = TEAM_STATE_NORMAL;
+
+	insert_team_into_group(group, sKernelTeam);
+
+	sKernelTeam->io_context = vfs_new_io_context(NULL);
+	if (sKernelTeam->io_context == NULL)
+		panic("could not create io_context for kernel team!\n");
+
+	// stick it in the team hash
+	hash_insert(sTeamHash, sKernelTeam);
+
+	add_debugger_command("team", &dump_team_info, "list info about a particular team");
+	add_debugger_command("teams", &dump_teams, "list all teams");
+	return 0;
+}
+
+
+int32
+team_max_teams(void)
+{
+	return sMaxTeams;
+}
+
+
+int32
+team_used_teams(void)
+{
+	return sUsedTeams;
+}
+
+
+/** Quick check to see if we have a valid team ID.
+ */
+
+bool
+team_is_valid(team_id id)
+{
+	struct team *team;
+	cpu_status state;
+
+	if (id <= 0)
+		return false;
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(id);
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	return team != NULL;
+}
+
+
+struct team *
+team_get_team_struct_locked(team_id id)
+{
+	struct team_key key;
+	key.id = id;
+
+	return hash_lookup(sTeamHash, &key);
+}
+
+
+void
+team_delete_process_group(struct process_group *group)
+{
+	if (group == NULL)
+		return;
+
+	TRACE(("team_delete_process_group(id = %ld)\n", group->id));
+
+	delete_sem(group->dead_child_sem);
+
+	// remove_group_from_session() keeps this pointer around
+	// only if the session can be freed as well
+	if (group->session) {
+		TRACE(("team_delete_process_group(): frees session %ld\n", group->session->id));
+		free(group->session);
+	}
+
+	free(group);
+}
+
+
+/**	Removes the specified team from the global team hash, and from its parent.
+ *	It also moves all of its children up to the parent.
+ *	You must hold the team lock when you call this function.
+ *	If \a _freeGroup is set to a value other than \c NULL, it must be freed
+ *	from the calling function.
+ */
+
+void
+team_remove_team(struct team *team, struct process_group **_freeGroup)
+{
+	struct team *parent = team->parent;
+
+	// remember how long this team lasted
+	parent->dead_children.kernel_time += team->dead_threads_kernel_time
+		+ team->dead_children.kernel_time;
+	parent->dead_children.user_time += team->dead_threads_user_time
+		+ team->dead_children.user_time;
+
+	hash_remove(sTeamHash, team);
+	sUsedTeams--;
+
+	team->state = TEAM_STATE_DEATH;
+
+	// reparent each of the team's children
+	reparent_children(team);
+
+	// remove us from our process group
+	remove_team_from_group(team, _freeGroup);
+
+	// remove us from our parent
+	remove_team_from_parent(parent, team);
+}
+
+
+void
+team_delete_team(struct team *team)
+{
+	team_id teamID = team->id;
+	port_id debuggerPort = -1;
+	cpu_status state;
+
+	if (team->num_threads > 0) {
+		// there are other threads still in this team,
+		// cycle through and signal kill on each of the threads
+		// ToDo: this can be optimized. There's got to be a better solution.
+		struct thread *temp_thread;
+		char death_sem_name[B_OS_NAME_LENGTH];
+		sem_id deathSem;
+		int32 threadCount;
+
+		sprintf(death_sem_name, "team %ld death sem", teamID);
+		deathSem = create_sem(0, death_sem_name);
+		if (deathSem < 0)
+			panic("team_delete_team: cannot init death sem for team %ld\n", teamID);
+
+		state = disable_interrupts();
+		GRAB_TEAM_LOCK();
+
+		team->death_sem = deathSem;
+		threadCount = team->num_threads;
+
+		// If the team was being debugged, that will stop with the termination
+		// of the nub thread. The team structure has already been removed from
+		// the team hash table at this point, so noone can install a debugger
+		// anymore. We fetch the debugger's port to send it a message at the
+		// bitter end.
+		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+			debuggerPort = team->debug_info.debugger_port;
+
+		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+		// we can safely walk the list because of the lock. no new threads can be created
+		// because of the TEAM_STATE_DEATH flag on the team
+		temp_thread = team->thread_list;
+		while (temp_thread) {
+			struct thread *next = temp_thread->team_next;
+
+			send_signal_etc(temp_thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+			temp_thread = next;
+		}
+
+		RELEASE_TEAM_LOCK();
+		restore_interrupts(state);
+
+		// wait until all threads in team are dead.
+		acquire_sem_etc(team->death_sem, threadCount, 0, 0);
+		delete_sem(team->death_sem);
+	}
+
+	// If someone is waiting for this team to be loaded, but it dies
+	// unexpectedly before being done, we need to notify the waiting
+	// thread now.
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	if (team->loading_info) {
+		// there's indeed someone waiting
+		struct team_loading_info *loadingInfo = team->loading_info;
+		team->loading_info = NULL;
+
+		loadingInfo->result = B_ERROR;
+		loadingInfo->done = true;
+
+		GRAB_THREAD_LOCK();
+
+		// wake up the waiting thread
+		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
+			loadingInfo->thread->state = B_THREAD_READY;
+			loadingInfo->thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(loadingInfo->thread);
+		}
+
+		RELEASE_THREAD_LOCK();
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	// notify team watchers
+
+	{
+		// we're not reachable from anyone anymore at this point, so we
+		// can safely access the list without any locking
+		struct team_watcher *watcher;
+		while ((watcher = list_remove_head_item(&team->watcher_list)) != NULL) {
+			watcher->hook(teamID, watcher->data);
+			free(watcher);
+		}
+	}
+
+	// free team resources
+
+	vm_delete_address_space(team->address_space);
+	delete_owned_ports(teamID);
+	sem_delete_owned_sems(teamID);
+	remove_images(team);
+	vfs_free_io_context(team->io_context);
+
+	// ToDo: should our death_entries be moved one level up?
+	delete_team_struct(team);
+
+	// notify the debugger, that the team is gone
+	user_debug_team_deleted(teamID, debuggerPort);
+}
+
+
+struct team *
+team_get_kernel_team(void)
+{
+	return sKernelTeam;
+}
+
+
+team_id
+team_get_kernel_team_id(void)
+{
+	if (!sKernelTeam)
+		return 0;
+
+	return sKernelTeam->id;
+}
+
+
+team_id
+team_get_current_team_id(void)
+{
+	return thread_get_current_thread()->team->id;
+}
+
+
+status_t
+team_get_address_space(team_id id, vm_address_space **_addressSpace)
+{
+	cpu_status state;
+	struct team *team;
+	status_t status;
+
+	// ToDo: we need to do something about B_SYSTEM_TEAM vs. its real ID (1)
+	if (id == 1) {
+		// we're the kernel team, so we don't have to go through all
+		// the hassle (locking and hash lookup)
+		*_addressSpace = vm_get_kernel_address_space();
+		return B_OK;
+	}
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(id);
+	if (team != NULL) {
+		atomic_add(&team->address_space->ref_count, 1);
+		*_addressSpace = team->address_space;
+		status = B_OK;
+	} else
+		status = B_BAD_VALUE;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	return status;
+}
+
+
 /** Adds a hook to the team that is called as soon as this
  *	team goes away.
  *	This call might get public in the future.
@@ -1885,8 +1878,7 @@ stop_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 }
 
 
-//	#pragma mark -
-// public team API
+//	#pragma mark - Public kernel API
 
 
 thread_id
@@ -2208,8 +2200,7 @@ getsid(pid_t process)
 }
 
 
-//	#pragma mark -
-//	User syscalls
+//	#pragma mark - User syscalls
 
 
 status_t
