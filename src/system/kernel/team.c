@@ -63,8 +63,8 @@ struct fork_arg {
 };
 
 
-// team list
 static void *sTeamHash = NULL;
+static void *sGroupHash = NULL;
 static struct team *sKernelTeam = NULL;
 
 // some arbitrary chosen limits - should probably depend on the available
@@ -82,6 +82,8 @@ static struct team *create_team_struct(const char *name, bool kernel);
 static void delete_team_struct(struct team *p);
 static int team_struct_compare(void *_p, const void *_key);
 static uint32 team_struct_hash(void *_p, const void *_key, uint32 range);
+static int process_group_compare(void *_p, const void *_key);
+static uint32 process_group_hash(void *_p, const void *_key, uint32 range);
 static void free_strings_array(char **strings, int32 count);
 static status_t user_copy_strings_array(char * const *strings, int32 count, char ***_strings);
 static void _dump_team_info(struct team *p);
@@ -175,8 +177,11 @@ team_init(kernel_args *args)
 	struct process_group *group;
 
 	// create the team hash table
-	sTeamHash = hash_init(15, offsetof(struct team, next),
+	sTeamHash = hash_init(16, offsetof(struct team, next),
 		&team_struct_compare, &team_struct_hash);
+
+	sGroupHash = hash_init(16, offsetof(struct process_group, next),
+		&process_group_compare, &process_group_hash);
 
 	// create initial session and process groups
 
@@ -361,6 +366,32 @@ copy_strings_array(char * const *strings, int32 count, char ***_strings,
 }
 
 
+static int
+process_group_compare(void *_group, const void *_key)
+{
+	struct process_group *group = _group;
+	const struct team_key *key = _key;
+
+	if (group->id == key->id)
+		return 0;
+
+	return 1;
+}
+
+
+static uint32
+process_group_hash(void *_group, const void *_key, uint32 range)
+{
+	struct process_group *group = _group;
+	const struct team_key *key = _key;
+
+	if (group != NULL)
+		return group->id % range;
+
+	return (uint32)key->id % range;
+}
+
+
 /** Quick check to see if we have a valid team ID.
  */
 
@@ -389,7 +420,6 @@ struct team *
 team_get_team_struct_locked(team_id id)
 {
 	struct team_key key;
-
 	key.id = id;
 
 	return hash_lookup(sTeamHash, &key);
@@ -482,6 +512,8 @@ is_process_group_leader(struct team *team)
 }
 
 
+/**	You must hold the team lock when calling this function. */
+
 static void
 insert_group_into_session(struct process_session *session, struct process_group *group)
 {
@@ -489,9 +521,12 @@ insert_group_into_session(struct process_session *session, struct process_group 
 		return;
 
 	group->session = session;
-	list_add_link_to_tail(&session->groups, group);
+	hash_insert(sGroupHash, group);
+	session->group_count++;
 }
 
+
+/**	You must hold the team lock when calling this function. */
 
 static void
 insert_team_into_group(struct process_group *group, struct team *team)
@@ -520,11 +555,11 @@ remove_group_from_session(struct process_group *group)
 	if (session == NULL)
 		return;
 
-	list_remove_link(group);
+	hash_remove(sGroupHash, group);
 
 	// we cannot free the resource here, so we're keeping the group link
 	// around - this way it'll be freed by free_process_group()
-	if (!list_is_empty(&session->groups))
+	if (--session->group_count > 0)
 		group->session = NULL;
 }
 
@@ -632,7 +667,7 @@ create_process_session(pid_t id)
 		return NULL;
 
 	session->id = id;
-	list_init(&session->groups);
+	session->group_count = 0;
 
 	return session;
 }
@@ -1517,21 +1552,13 @@ err1:
 static struct process_group *
 get_process_group_locked(struct team *team, pid_t id)
 {
-	struct list *groups = &team->group->session->groups;
-	struct process_group *group = NULL;
-	
-	// ToDo: a process group lasts as long as its last member - and
-	//	that doesn't have to be the process leader. IOW we need
-	//	a separate hash table for those groups without a leader.
+	struct process_group *group;
+	struct team_key key;
+	key.id = id;
 
-	// a short cut when the current team's group is asked for
-	if (team->group->id == id)
-		return team->group;
-
-	while ((group = list_get_next_item(groups, group)) != NULL) {
-		if (group->id == id)
-			return group;
-	}
+	group = (struct process_group *)hash_lookup(sGroupHash, &key);
+	if (group != NULL && team->group->session == group->session)
+		return group;
 
 	return NULL;
 }
@@ -2337,17 +2364,10 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			remove_team_from_group(team, &freeGroup);
 			insert_team_into_group(group, team);
 		} else {
-			struct process_session *session = team->group->session;
-			struct process_group *group = NULL;
-
 			// check if this team can have the group ID; there must be one matching
 			// process ID in the team's session
 
-			while ((group = list_get_next_item(&session->groups, group)) != NULL) {
-				if (group->id == groupID)
-					break;
-			}
-
+			struct process_group *group = get_process_group_locked(team, groupID);
 			if (group) {
 				// we got a group, let's move the team there
 				remove_team_from_group(team, &freeGroup);
@@ -2361,8 +2381,10 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	if (status != B_OK && group != NULL)
+	if (status != B_OK && group != NULL) {
+		// in case of error, the group hasn't been added into the hash
 		team_delete_process_group(group);
+	}
 
 	team_delete_process_group(freeGroup);
 

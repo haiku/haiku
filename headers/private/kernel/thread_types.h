@@ -57,11 +57,11 @@ struct death_entry {
 
 struct process_session {
 	pid_t				id;
-	struct list			groups;
+	int32				group_count;
 };
 
 struct process_group {
-	struct list_link	link;
+	struct process_group *next;	// next in hash
 	struct process_session *session;
 	pid_t				id;
 	sem_id				dead_child_sem;
@@ -86,7 +86,7 @@ struct team_watcher {
 	// this is a soft limit for the number of dead entries in a team
 
 struct team {
-	struct team		*next;			/* next team in the hash */
+	struct team		*next;			// next in hash
 	struct team		*siblings_next;
 	struct team		*parent;
 	struct team		*children;
