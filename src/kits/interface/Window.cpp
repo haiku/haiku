@@ -2530,8 +2530,7 @@ BWindow::task_looper()
 				while (_UnpackMessage(cookie, &fLastMessage, &handler, &usePreferred)) {
 					// if there is no target handler, the message is dropped
 					if (handler != NULL) {
-						if (handler != NULL)
-							_SanitizeMessage(fLastMessage, handler, usePreferred);
+						_SanitizeMessage(fLastMessage, handler, usePreferred);
 
 						// Is this a scripting message?
 						if (fLastMessage->HasSpecifiers()) {
@@ -2802,8 +2801,10 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message, BHandler** _
 		return false;
 
 	if (cookie.index == 0 && !cookie.tokens_scanned) {
+		// We were called the first time for this message
+
 		if (!*_usePreferred) {
-			// we only consider messages targeted at the preferred handler
+			// only consider messages targeted at the preferred handler
 			cookie.message = NULL;
 			return true;
 		}
@@ -2961,6 +2962,60 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 			break;
 		}
 	}
+}
+
+
+/*!
+	This is called by BView::GetMouse() when a B_MOUSE_MOVED message
+	is removed from the queue.
+	It allows the window to update the last mouse moved view, and
+	let it decide if this message should be kept. It will also remove
+	the message from the queue.
+	You need to hold the message queue lock when calling this method!
+
+	\return true if this message can be used to get the mouse data from,
+	\return false if this is not meant for the public.
+*/
+bool
+BWindow::_StealMouseMessage(BMessage* message, bool& deleteMessage)
+{
+	BMessage::Private messagePrivate(fLastMessage);
+	if (!messagePrivate.UsePreferredTarget()) {
+		// this message is targeted at a specific handler, so we should
+		// not steal it
+		return false;
+	}
+
+	int32 token;
+	if (message->FindInt32("_token", 0, &token) == B_OK) {
+		// This message has other targets, so we can't remove it;
+		// just prevent it from being sent to the preferred handler
+		// again (if it should have gotten it at all).
+		bool feedFocus;
+		if (message->FindBool("_feed_focus", &feedFocus) == B_OK && feedFocus)
+			return false;
+
+		message->RemoveName("_feed_focus");
+		deleteMessage = false;
+	} else {
+		// The message is only thought for the preferred handler, so we
+		// can just remove it.
+		MessageQueue()->RemoveMessage(message);
+		deleteMessage = true;
+
+		if (message->what == B_MOUSE_MOVED) {
+			// We need to update the last mouse moved view, as this message
+			// won't make it to _SanitizeMessage() anymore
+			BView* viewUnderMouse = NULL;
+			int32 token;
+			if (message->FindInt32("_view_token", &token) == B_OK)
+				viewUnderMouse = _FindView(token);
+	
+			fLastMouseMovedView = viewUnderMouse;
+		}
+	}
+
+	return true;
 }
 
 

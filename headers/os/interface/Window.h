@@ -310,6 +310,8 @@ private:
 			void				_SanitizeMessage(BMessage* message,
 												 BHandler* target,
 												 bool usePreferred);
+			bool				_StealMouseMessage(BMessage* message,
+									bool& deleteMessage);
 
 			bool				InUpdate();
 			void				_DequeueAll();

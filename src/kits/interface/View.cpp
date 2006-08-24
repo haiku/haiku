@@ -1337,21 +1337,27 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 
 		// Look out for mouse update messages
 
-		BMessage *msg;
-		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
-			switch (msg->what) {
+		BMessage *message;
+		for (int32 i = 0; (message = queue->FindMessage(i)) != NULL; i++) {
+			switch (message->what) {
+				case B_MOUSE_MOVED:
 				case B_MOUSE_UP:
 				case B_MOUSE_DOWN:
-				case B_MOUSE_MOVED:
-					msg->FindPoint("screen_where", location);
-					msg->FindInt32("buttons", (int32 *)buttons);
+					bool deleteMessage;
+					if (!Window()->_StealMouseMessage(message, deleteMessage))
+						continue;
+
+					message->FindPoint("screen_where", location);
+					message->FindInt32("buttons", (int32 *)buttons);
+					queue->Unlock();
+						// we need to hold the queue lock until here, because
+						// the message might still be used for something else
 
 					ConvertFromScreen(location);
 
-					queue->RemoveMessage(msg);
-					delete msg;
+					if (deleteMessage)
+						delete message;
 
-					queue->Unlock();
 					return;
 			}
 		}
