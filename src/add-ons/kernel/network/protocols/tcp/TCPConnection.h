@@ -49,14 +49,14 @@ private:
 
 	class TCPSegment {
 	public:
-		TCPSegment(net_buffer *_buffer, uint32 _sequenceNumber, bigtime_t timeout);
+		TCPSegment(uint32 sequenceNumber, uint32 size, bigtime_t timeout);
 		~TCPSegment();
 
-		net_buffer	*fBuffer;
 		bigtime_t	fTime;
 		uint32		fSequenceNumber;
 		uint32		fAcknowledgementNumber;
-		net_timer	fTimeout;
+		net_timer	fTimer;
+		bool		fTimedOut;
 	};
 
 	status_t Send(uint8 flags);
@@ -79,32 +79,37 @@ private:
 	TCPConnection	*fHashLink;
 	tcp_state		fState;
 	benaphore		fLock;
+
+	net_route 	*fRoute;
 };
 
 
-TCPConnection::TCPSegment::TCPSegment(net_buffer *_buffer, uint32 _sequenceNumber, bigtime_t timeout)
+TCPConnection::TCPSegment::TCPSegment(uint32 sequenceNumber, uint32 size, bigtime_t timeout)
 	:
-	fBuffer(_buffer),
-	fSequenceNumber(_sequenceNumber)
+	fTime(system_time()),
+	fSequenceNumber(sequenceNumber),
+	fAcknowledgementNumber(sequenceNumber+size),
+	fTimedOut(false)
 {
-	sStackModule->init_timer(&fTimeout, &TCPConnection::ResendSegment, this);
+	sStackModule->init_timer(&fTimer, &TCPConnection::ResendSegment, this);
+	sStackModule->set_timer(&fTimer, timeout);
 }
 
 
 TCPConnection::TCPSegment::~TCPSegment()
 {
-	sStackModule->set_timer(&fTimeout, -1);
-	sBufferModule->free(fBuffer);
+	sStackModule->set_timer(&fTimer, -1);
 }
 
 
 TCPConnection::TCPConnection(net_socket *socket)
 	:
-	fLastByteSent(0),//system_time()),
-	fLastByteAckd(0),//fLastByteSent),
-	fLastByteWritten(0),//fLastByteSent),
+	fLastByteSent(0), //system_time()),
+	fLastByteAckd(1), //fLastByteSent + 1),
+	fLastByteWritten(1), //fLastByteSent + 1),
 	fAvgRTT(TCP_INITIAL_RTT),
-	fState(CLOSED)
+	fState(CLOSED),
+	fRoute(NULL)
 {
 	benaphore_init(&fLock, "TCPConnection");
 }
@@ -292,7 +297,10 @@ status_t
 TCPConnection::Listen(int count)
 {
 	TRACE(("%p.Listen()\n", this));
-	return B_ERROR;
+	if (fState != CLOSED)
+		return B_ERROR;
+	fState = LISTEN;
+	return B_OK;
 }
 
 
@@ -304,6 +312,9 @@ TCPConnection::Shutdown(int direction)
 }
 
 
+/*!
+ Puts data contained in \a buffer into send buffer
+*/
 status_t
 TCPConnection::SendData(net_buffer *buffer)
 {
@@ -316,7 +327,8 @@ status_t
 TCPConnection::SendRoutedData(net_route *route, net_buffer *buffer)
 {
 	TRACE(("%p.SendRoutedData()\n", this));
-	return B_ERROR;
+	fRoute = route;
+	return SendData(buffer);
 }
 
 
@@ -348,6 +360,37 @@ status_t
 TCPConnection::ReceiveData(net_buffer *buffer)
 {
 	TRACE(("%p.ReceiveData()\n", this));
+
+	switch (fState) {
+	case CLOSED:
+		// shouldn't happen.  send RST
+		TRACE(("TCP:  Connection in CLOSED state received packet %p!\n", buffer));
+		break;
+	case LISTEN:
+		// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
+		// and add it to the Connection Queue.  The new TCPConnection
+		// must continue the handshake by replying with SYN+ACK.  Any
+		// data in the packet must go into the new TCPConnection's receive
+		// buffer.
+		// Otherwise, RST+ACK is sent.
+		// The current TCPConnection always remains in LISTEN state.
+		break;
+	case SYN_SENT:
+		// if packet is SYN+ACK, send ACK & enter ESTABLISHED state.
+		// if packet is SYN, send ACK & enter SYN_RCVD state.
+		break;
+	case SYN_RCVD:
+		// if packet is ACK, enter ESTABLISHED
+		break;
+	case ESTABLISHED:
+		// if packet has ACK, update send buffer
+		// if packet is FIN, send ACK & enter CLOSE_WAIT
+		// update receive buffer if necessary
+		break;
+	// more cases needed covering connection tear-down 
+	default:
+		return B_ERROR;
+	}
 	return B_ERROR;
 }
 
@@ -360,6 +403,8 @@ void
 TCPConnection::ResendSegment(struct net_timer *timer, void *data)
 {
 	TRACE(("ResendSegment(%p)\n", data));
+	if (data == NULL)
+		return;
 }
 
 
@@ -374,6 +419,37 @@ TCPConnection::Send(uint8 flags)
 {
 	TRACE(("%p.Send()\n", this));
 	return B_OK;
+
+	uint32 sequenceNum = 0;
+	uint32 ackNum = 0;
+	net_buffer *buffer;
+	if (1/*no data in send buffer*/) {
+		buffer = sBufferModule->create(512);
+		if (buffer == NULL)
+			return ENOBUFS;
+	} else {
+		//TODO: create net_buffer from data in send buffer
+	}
+
+	// get a net_route if there isn't one
+	if (fRoute == NULL) {
+		fRoute = sDatalinkModule->get_route(sDomain, (sockaddr *)&socket->peer);
+		if (fRoute == NULL) {
+			sBufferModule->free(buffer);
+			return ENETUNREACH;
+		}
+	}
+
+	uint16 advWin = TCP_MAX_RECV_BUF - (fNextByteExpected - fLastByteRead);
+
+	tcp_segment(buffer, flags, sequenceNum, ackNum, advWin);
+
+#if 0
+	TCPSegment *segment = new(std::nothrow)
+		TCPSegment(sequenceNum, 0, 2*fAvgRTT);
+#endif
+
+	return next->module->send_routed_data(next, fRoute, buffer);
 }
 
 

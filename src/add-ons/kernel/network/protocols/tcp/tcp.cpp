@@ -48,13 +48,15 @@ static net_stack_module_info *sStackModule;
 static hash_table *sTCPHash;
 static benaphore sTCPLock;
 
+status_t
+tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv_win);
 
 #include "tcp.h"
 #include "TCPConnection.h"
 
 
 #ifdef TRACE_TCP
-#	define DUMP_HASH tcp_dump_hash()
+#	define DUMP_TCP_HASH tcp_dump_hash()
 // Dumps the TCP Connection hash.  sTCPLock must NOT be held when calling
 void
 tcp_dump_hash(){
@@ -76,14 +78,14 @@ tcp_dump_hash(){
 	hash_close(sTCPHash, &iterator, false);
 }
 #else
-#	define DUMP_HASH
+#	define DUMP_TCP_HASH
 #endif
 
 
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	socket->protocol = IPPROTO_TCP;
 	TCPConnection *protocol = new (std::nothrow) TCPConnection(socket);
 	TRACE(("Creating new TCPConnection: %p\n", protocol));
@@ -94,7 +96,7 @@ tcp_init_protocol(net_socket *socket)
 status_t
 tcp_uninit_protocol(net_protocol *protocol)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	TRACE(("Deleting TCPConnection: %p\n", protocol));
 	delete (TCPConnection *)protocol;
 	return B_OK;
@@ -108,7 +110,7 @@ tcp_open(net_protocol *protocol)
 		sDomain = sStackModule->get_domain(AF_INET);
 	if (!sAddressModule)
 		sAddressModule = sDomain->address_module;
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 
 	return ((TCPConnection *)protocol)->Open();
 }
@@ -117,7 +119,7 @@ tcp_open(net_protocol *protocol)
 status_t
 tcp_close(net_protocol *protocol)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Close();
 }
 
@@ -125,7 +127,7 @@ tcp_close(net_protocol *protocol)
 status_t
 tcp_free(net_protocol *protocol)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Free();
 }
 
@@ -133,7 +135,7 @@ tcp_free(net_protocol *protocol)
 status_t
 tcp_connect(net_protocol *protocol, const struct sockaddr *address)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Connect(address);
 }
 
@@ -157,7 +159,7 @@ tcp_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 tcp_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Bind(address);
 }
 
@@ -165,7 +167,7 @@ tcp_bind(net_protocol *protocol, struct sockaddr *address)
 status_t
 tcp_unbind(net_protocol *protocol, struct sockaddr *address)
 {
-	DUMP_HASH;
+	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Unbind(address);
 }
 
@@ -237,19 +239,126 @@ tcp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 
 /*!
 	Constructs a TCP header on \a buffer with the specified values
-	for \a flags, \a seq and \a ack.  The packet is then sent on \a route
+	for \a flags, \a seq \a ack and \a adv_win.
 */
 status_t
-tcp_send_segment(net_buffer *buffer, net_route *route, uint16 flags, uint32 seq, uint32 ack)
+tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv_win)
 {
-	return B_ERROR;
+	buffer->protocol = IPPROTO_TCP;
+
+	NetBufferPrepend<tcp_header> bufferHeader(buffer);
+	if (bufferHeader.Status() != B_OK)
+		return bufferHeader.Status();
+
+	tcp_header &header = bufferHeader.Data();
+
+	header.source_port = sAddressModule->get_port((sockaddr *)&buffer->source);
+	header.destination_port = sAddressModule->get_port((sockaddr *)&buffer->destination);
+	header.sequence_num = htonl(seq);
+	header.acknowledge_num = htonl(ack);
+	header.reserved = 0;
+	header.header_length = 5;// currently no options supported
+	header.flags = (uint8)flags;
+	header.advertised_window = adv_win;
+	header.checksum = 0;
+	header.urgent_ptr = 0;// urgent pointer not supported
+	
+	// compute and store checksum
+	Checksum checksum;
+	sAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
+	sAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
+	checksum
+		<< (uint16)htons(IPPROTO_TCP)
+		<< (uint16)htons(buffer->size)
+		<< Checksum::BufferHelper(buffer, sBufferModule);
+	header.checksum = checksum;
+	TRACE(("TCP: Checksum for segment %p is %d\n", buffer, header.checksum));
+	return B_OK;
 }
 
 
 status_t
 tcp_receive_data(net_buffer *buffer)
 {
-	return B_ERROR;
+	TRACE(("TCP: Received buffer %p\n", buffer));
+	if (!sDomain) {
+		// domain and address module are not known yet, we copy them from
+		// the buffer's interface (if any):
+		if (buffer->interface == NULL || buffer->interface->domain == NULL)
+			sDomain = sStackModule->get_domain(AF_INET);
+		else
+			sDomain = buffer->interface->domain;
+		if (sDomain == NULL) {
+			// this shouldn't occur, of course, but who knows...
+			return B_BAD_VALUE;
+		}
+		sAddressModule = sDomain->address_module;
+	}
+
+	NetBufferHeader<tcp_header> bufferHeader(buffer);
+	if (bufferHeader.Status() < B_OK)
+		return bufferHeader.Status();
+
+	tcp_header &header = bufferHeader.Data();
+
+	tcp_connection_key key;
+	key.peer = (struct sockaddr *)&buffer->source;
+	key.local = (struct sockaddr *)&buffer->destination;
+
+	//TODO: check TCP Checksum
+
+	sAddressModule->set_port((struct sockaddr *)&buffer->source, header.source_port);
+	sAddressModule->set_port((struct sockaddr *)&buffer->destination, header.destination_port);
+
+	DUMP_TCP_HASH;
+
+	BenaphoreLocker hashLock(&sTCPLock);
+	TCPConnection *connection = (TCPConnection *)hash_lookup(sTCPHash, &key);
+	TRACE(("TCP: Received packet corresponds to connection %p\n", connection));
+	if (connection != NULL){
+		return connection->ReceiveData(buffer);
+	} else {
+		/* TODO:
+		   No explicit connection exists.  Check for wildcard connections:
+		   First check if any connections exist where local = IPADDR_ANY
+		   then check when local = peer = IPADDR_ANY.
+		   port numbers always remain the same */
+
+		// If no connection exists (and RST is not set) send RST
+		if (!(header.flags & TCP_FLG_RST)) {
+			TRACE(("TCP:  Connection does not exist!\n"));
+			net_buffer *reply_buf = sBufferModule->create(512);
+			reply_buf->source = buffer->destination;
+			reply_buf->destination = buffer->source;
+
+			uint32 sequenceNum, acknowledgeNum;
+			uint16 flags;
+			if (header.flags & TCP_FLG_ACK) {
+				sequenceNum = ntohl(header.acknowledge_num);
+				acknowledgeNum = 0;
+				flags = TCP_FLG_RST;
+			} else {
+				sequenceNum = 0;
+				acknowledgeNum = ntohl(header.sequence_num) + 1 + buffer->size - ((uint32)header.header_length<<2);
+				flags = TCP_FLG_RST | TCP_FLG_ACK;
+			}
+			
+			status_t status = tcp_segment(reply_buf, flags, sequenceNum, acknowledgeNum, 0);
+			if (status != B_OK) {
+				sBufferModule->free(reply_buf);
+				return status;
+			}
+			TRACE(("TCP:  Sending RST...\n"));
+			status = sDomain->module->send_data(NULL, reply_buf);
+			if (status !=B_OK) {
+				sBufferModule->free(reply_buf);
+				return status;
+			}
+			TRACE(("TCP:  Sent.\n"));
+		}
+	}
+	sBufferModule->free(buffer);
+	return B_OK;
 }
 
 
