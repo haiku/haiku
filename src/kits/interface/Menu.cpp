@@ -1897,7 +1897,11 @@ BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 	if (fSelected != NULL && showSubmenu == 0) {
 		BMenu *subMenu = fSelected->Submenu();
 		if (subMenu != NULL && subMenu->Window() == NULL) {
-			subMenu->_show(selectFirstItem);
+			if (!subMenu->_show(selectFirstItem)) {
+				// something went wrong, deselect the item
+				fSelected->Select(false);
+				fSelected = NULL;
+			}	
 			//subMenu->Window()->Activate();
 		}
 	}
