@@ -87,8 +87,8 @@ ohci_std_ops( int32 op , ... )
 //					- &stack: reference to a stack instance form stack.cpp
 //------------------------------------------------------------------------
 
-static bool
-ohci_add_to( Stack &stack )
+static status_t
+ohci_add_to( Stack *stack )
 {
 	status_t status;
 	pci_info *item;
@@ -126,14 +126,14 @@ ohci_add_to( Stack &stack )
 				continue;
 			}
 			TRACE("USB OHCI: init_hardware(): found at IRQ %u \n", item->u.h0.interrupt_line);
-			OHCI *bus = new OHCI( item , &stack );
+			OHCI *bus = new OHCI( item , stack );
 			if ( bus->InitCheck() != B_OK )
 			{
 				delete bus;
 				break;
 			}
 			
-			stack.AddBusManager( bus );
+			stack->AddBusManager( bus );
 			bus->Start();
 			found = true;
 			break;

@@ -91,7 +91,7 @@ struct uhci_root_hub_string_s {
 	uint8	length;
 	uint8	descriptor_type;
 	uint16	unicode_string[12];
-};
+} _PACKED;
 
 
 static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
@@ -117,8 +117,8 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 };
 
 
-UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 devicenum)
-	:	Hub(uhci, NULL, sUHCIRootHubDevice, devicenum, false)
+UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 deviceAddress)
+	:	Hub(uhci, NULL, sUHCIRootHubDevice, deviceAddress, false)
 {
 	fUHCI = uhci;
 }

@@ -1,0 +1,15 @@
+/*
+ * ehci.rdef
+ */
+
+resource app_signature "application/x-vnd.haiku-ehci";
+
+resource app_version {
+	major  = 0,
+	middle = 0,
+	minor  = 1,
+	variety = 0,
+	internal = 0,
+	short_info = "EHCI host controller driver",
+	long_info = "Haiku EHCI HCD - Copyright 2006, Haiku Inc."
+};

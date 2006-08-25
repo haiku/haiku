@@ -74,7 +74,7 @@
  * Hardware structs                                         *
  ************************************************************/
 
-//A framelist thingie
+// Framelist flags
 #define FRAMELIST_TERMINATE    0x1
 #define FRAMELIST_NEXT_IS_QH   0x2
 
@@ -82,7 +82,7 @@
 // Represents a Transfer Descriptor (TD)
 typedef struct
 {
-	//Hardware part
+	// Hardware part
 	addr_t	link_phy;		// Link to the next TD/QH
 	uint32	status;			// Status field
 	uint32	token;			// Contains the packet header (where it needs to be sent)

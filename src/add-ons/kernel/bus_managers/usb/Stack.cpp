@@ -133,7 +133,7 @@ Stack::Stack()
 		if (get_module(moduleName, (module_info **)&module) != B_OK)
 			continue;
 
-		if (module->add_to(*this) != B_OK)
+		if (module->add_to(this) < B_OK)
 			continue;
 
 		TRACE(("usb stack: module %s successfully loaded\n", moduleName));

@@ -792,8 +792,6 @@ UHCI::FinishTransfers()
 				transfer = transfer->link;
 			}
 		}
-
-		Unlock();
 	}
 }
 
@@ -988,8 +986,8 @@ UHCI::Interrupt()
 }
 
 
-bool
-UHCI::AddTo(Stack &stack)
+status_t
+UHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
 	set_dprintf_enabled(true); 
@@ -1026,7 +1024,7 @@ UHCI::AddTo(Stack &stack)
 			}
 
 			TRACE(("usb_uhci: AddTo(): found at IRQ %u\n", item->u.h0.interrupt_line));
-			UHCI *bus = new(std::nothrow) UHCI(item, &stack);
+			UHCI *bus = new(std::nothrow) UHCI(item, stack);
 			if (!bus) {
 				delete item;
 				sPCIModule = NULL;
@@ -1040,8 +1038,11 @@ UHCI::AddTo(Stack &stack)
 				continue;
 			}
 
+			// the bus took it away
+			item = new(std::nothrow) pci_info;
+
 			bus->Start();
-			stack.AddBusManager(bus);
+			stack->AddBusManager(bus);
 			found = true;
 		}
 	}
@@ -1054,6 +1055,7 @@ UHCI::AddTo(Stack &stack)
 		return ENODEV;
 	}
 
+	delete item;
 	return B_OK;
 }
 

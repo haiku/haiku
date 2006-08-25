@@ -24,3 +24,9 @@ KernelAddon <usb>ohci : [ FDirName kernel busses usb ] :
 	: ohci.rdef
 	;
 
+KernelAddon <usb>ehci : [ FDirName kernel busses usb ] :
+	ehci.cpp
+	ehci_rh.cpp
+	: libusb.a
+	: ehci.rdef
+	;

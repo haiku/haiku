@@ -71,7 +71,7 @@ public:
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual	status_t					SubmitRequest(Transfer *transfer);
 
-static	bool						AddTo(Stack &stack);
+static	status_t					AddTo(Stack *stack);
 
 		// Port operations
 		uint16						PortStatus(int32 index);
@@ -161,22 +161,15 @@ static	pci_module_info				*sPCIModule;
 
 class UHCIRootHub : public Hub {
 public:
-									UHCIRootHub(UHCI *uhci, int8 deviceNum);
+									UHCIRootHub(UHCI *uhci, int8 deviceAddress);
 
 		status_t					SubmitTransfer(Transfer *transfer);
 		void						UpdatePortStatus();
 
 private:
-
 		usb_port_status				fPortStatus[2];
 		UHCI						*fUHCI;
 };
 
-
-struct hostcontroller_priv {
-	uhci_qh		*topqh;
-	uhci_td		*firsttd;
-	uhci_td		*lasttd;
-};
 
 #endif

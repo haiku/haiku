@@ -37,7 +37,7 @@ class Object;
 struct host_controller_info {
 	module_info		info;
 	status_t		(*control)(uint32 op, void *data, size_t length);
-	bool			(*add_to)(Stack &stack);
+	status_t		(*add_to)(Stack *stack);
 };
 
 
