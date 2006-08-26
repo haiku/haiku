@@ -296,7 +296,7 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		}
 	}
 
-	delete buffer;
+	delete[] buffer;
 #endif
 	skip_args++;
 
