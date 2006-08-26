@@ -183,7 +183,11 @@ extern void 		dump_block(const char *buffer, int size, const char *prefix);
 
 extern bool			set_dprintf_enabled(bool new_state);	/* returns old state */
 
+#if __GNUC__
+extern void			panic(const char *format, ...) __attribute__ ((format (__printf__, 1, 2)));
+#else
 extern void			panic(const char *format, ...);
+#endif
 
 extern void			kernel_debugger(const char *message);	/* enter kernel debugger */
 extern uint32		parse_expression(const char *string);	/* utility for debugger cmds */
