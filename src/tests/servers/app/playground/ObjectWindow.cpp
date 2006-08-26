@@ -83,9 +83,35 @@ class ObjectListView : public BListView {
 						BListView::KeyDown(bytes, numBytes);
 				}
 			}
+
+	virtual bool InitiateDrag(BPoint point, int32 itemIndex, bool wasSelected)
+			{
+				printf("InitiateDrag(BPoint(%.1f, %.1f), itemIndex: %ld, wasSelected: %d)\n",
+						point.x, point.y, itemIndex, wasSelected);
+				SwapItems(itemIndex, itemIndex + 1);
+				return true;
+			}
+
+	virtual void SelectionChanged()
+			{
+				printf("SelectionChanged() - first selected: %ld\n", CurrentSelection(0));
+			}
 };
 
 // #pragma mark -
+
+class TestView : public BView {
+public:
+	TestView(BRect frame, const char* name, uint32 resizeMode, uint32 flags)
+		: BView(frame, name, resizeMode, flags)
+	{
+	}
+
+	void AttachedToWindow()
+	{
+		SetViewColor(255, 0, 0);
+	}
+};
 
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
@@ -110,6 +136,8 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	BMenu* menu = new BMenu("File");
 	menuBar->AddItem(menu);
+
+	menu->AddItem(new BMenu("Submenu"));
 
 	BMenuItem* menuItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
 										'Q');
@@ -322,7 +350,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.right -= B_V_SCROLL_BAR_WIDTH;
 b.bottom = fDrawingModeMF->Frame().top - 5.0;
 
-	fObjectLV = new ObjectListView(b, "object list", B_MULTIPLE_SELECTION_LIST);
+	fObjectLV = new ObjectListView(b, "object list", B_SINGLE_SELECTION_LIST);
 	fObjectLV->SetSelectionMessage(new BMessage(MSG_OBJECT_SELECTED));
 
 	// wrap a scroll view around the list view
@@ -340,9 +368,12 @@ b.bottom = fDrawingModeMF->Frame().top - 5.0;
 									 B_WILL_DRAW | B_NAVIGABLE_JUMP |
 									 B_FRAME_EVENTS | B_NAVIGABLE);
 	
-	tabView->AddTab(new BView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0));
-	tabView->AddTab(new BView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0));
-	tabView->AddTab(new BView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0));
+	BView* tabChild = new TestView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0);
+	tabView->AddTab(tabChild);
+	tabChild = new TestView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0);
+	tabView->AddTab(tabChild);
+	tabChild = new BTextControl(BRect(0, 0, 80, 40), "T", "Test", "Text", NULL);
+	tabView->AddTab(tabChild);
 	controlGroup->AddChild(tabView);
 
 	// enforce some size limits

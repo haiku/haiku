@@ -4,6 +4,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <Cursor.h>
 #include <Message.h>
 #include <MessageQueue.h>
 #include <Region.h>
@@ -14,6 +15,29 @@
 #include "States.h"
 
 #include "ObjectView.h"
+
+const unsigned char kMoveCursor[] = { 16, 1, 8, 8,
+	0x01, 0x80, 0x02, 0x40, 0x04, 0x20, 0x08, 0x10,
+	0x1e, 0x78, 0x2a, 0x54, 0x4e, 0x72, 0x80, 0x01,
+	0x80, 0x01, 0x4e, 0x72, 0x2a, 0x54, 0x1e, 0x78,
+	0x08, 0x10, 0x04, 0x20, 0x02, 0x40, 0x01, 0x80,
+
+	0x01, 0x80, 0x03, 0xc0, 0x07, 0xe0, 0x0f, 0xf0,
+	0x1f, 0xf8, 0x3b, 0xdc, 0x7f, 0xfe, 0xff, 0xff,
+	0xff, 0xff, 0x7f, 0xfe, 0x3b, 0xdc, 0x1f, 0xf8,
+	0x0f, 0xf0, 0x07, 0xe0, 0x03, 0xc0, 0x01, 0x80 };
+
+const unsigned char kGrabCursor[] = { 16, 1, 8, 9,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x0d, 0xb0, 0x12, 0x4c, 0x10, 0x0a, 0x08, 0x02,
+	0x18, 0x02, 0x20, 0x02, 0x20, 0x02, 0x20, 0x04,
+	0x10, 0x04, 0x08, 0x08, 0x04, 0x08, 0x04, 0x08,
+
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x0d, 0xb0, 0x1f, 0xfc, 0x1f, 0xfe, 0x0f, 0xfe,
+	0x1f, 0xfe, 0x3f, 0xfe, 0x3f, 0xfe, 0x3f, 0xfc,
+	0x1f, 0xfc, 0x0f, 0xf8, 0x07, 0xf8, 0x07, 0xf8 };
+
 
 // constructor
 ObjectView::ObjectView(BRect frame, const char* name,
@@ -92,15 +116,43 @@ ObjectView::Draw(BRect updateRect)
 			BPoint(r.left, r.top + 1), shadow);
 	EndLineArray();*/
 
+//Sync();
+//	SetHighColor(200, 200, 200, 255);
+////	BRect rect(0.0, 0.0, 10.0, 11.0);
+//	int32 counter = 0;
+//	BRegion region;
+////	while (rect.top < r.bottom) {
+////		while (rect.left < r.right) {
+////			region.Include(rect);
+////			rect.OffsetBy(rect.Width() + 2, 0.0);
+////
+////			counter++;
+////		}
+////		rect.OffsetTo(0.0, rect.top + rect.Height() + 2);
+////	}
+//	BRect rect(0.0, 0.0, 0.0, 10.0);
+//	for (int32 i = 0; i < 100; i++) {
+//		region.Include(rect);
+//		rect.OffsetBy(rect.Width() + 1, 1.0);
+//		counter++;
+//	}
+//bigtime_t now = system_time();
+//	FillRegion(&region);
+//Sync();
+//printf("rendering %ld small rects (region: %ld): %lld\n", counter,
+//region.CountRects(), system_time() - now);
+
+	SetDrawingMode(B_OP_COPY);
 	SetHighColor(255, 0, 0, 128);
 
 	const char* message = "Click and drag to draw an object";
 	float width = StringWidth(message);
 
-	BPoint p(r.Width() / 2.0 - width / 2.0,
-			 r.Height() / 2.0);
+	BPoint p((r.Width() - width) / 2.0, r.Height() / 2.0);
 
 //Sync();
+//snooze(1000);
+//
 //bigtime_t now = system_time();
 	DrawString(message, p);
 
@@ -231,6 +283,9 @@ if (dragMessage) {
 }
 
 	if (fScrolling) {
+		BCursor cursor(kGrabCursor);
+		SetViewCursor(&cursor);
+	
 		BPoint offset = fLastMousePos - where;
 		ScrollBy(offset.x, offset.y);
 		fLastMousePos = where + offset;
@@ -265,6 +320,9 @@ if (dragMessage) {
 			fInitiatingDrag = false;
 		}
 	} else {
+		BCursor cursor(kMoveCursor);
+		SetViewCursor(&cursor);
+	
 		if (fState && fState->IsTracking()) {
 			BRect before = fState->Bounds();
 	
@@ -275,6 +333,7 @@ if (dragMessage) {
 			Invalidate(invalid);
 		}
 	}
+//	SetViewCursor();
 }
 
 // MessageReceived

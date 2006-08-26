@@ -37,6 +37,9 @@ State::Init(rgb_color color, drawing_mode mode, bool fill, float penSize)
 void
 State::MouseDown(BPoint where)
 {
+	where.x = floorf(where.x + 0.5);
+	where.y = floorf(where.y + 0.5);
+
 	if (_HitTest(where, fStartPoint)) {
 		fTracking = TRACKING_START;
 		fClickOffset = fStartPoint - where;
@@ -61,6 +64,9 @@ State::MouseUp()
 void
 State::MouseMoved(BPoint where)
 {
+	where.x = floorf(where.x + 0.5);
+	where.y = floorf(where.y + 0.5);
+
 	if (fTracking == TRACKING_START) {
 		fStartPoint = where + fClickOffset;
 		fValid = true;
