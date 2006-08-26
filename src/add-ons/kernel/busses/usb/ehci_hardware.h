@@ -9,6 +9,14 @@
 #ifndef EHCI_HARDWARE_H
 #define EHCI_HARDWARE_H
 
+// Host Controller Capability Registers (EHCI Spec 2.2)
+#define EHCI_CAPLENGTH			0x00		// Capability Register Length
+#define EHCI_HCIVERSION			0x02		// Interface Version Number
+#define EHCI_HCSPARAMS			0x04		// Structural Parameters
+#define EHCI_HCCPARAMS			0x08		// Capability Parameters
+#define EHCI_HCSP_PORTROUTE		0x0c		// Companion Port Route Description
+
+
 // Host Controller Operational Registers (EHCI Spec 2.3)
 #define EHCI_USBCMD				0x00		// USB Command
 #define EHCI_USBSTS				0x04		// USB Status
@@ -88,16 +96,17 @@
 
 // PCI Registers
 #define PCI_LEGSUP				0xc0		// PCI Legacy Support
-#define PCI_LEGSUP_USBPIRQDEN	0x2000		// USBP IRQ Deny
+#define PCI_LEGSUP_USBPIRQDEN	0x2000		// USB PIRQ
 
 
 // Data Structures (EHCI Spec 3)
 
 // Periodic Frame List Element Flags (EHCI Spec 3.1)
-#define EHCI_PFRAMELIST_ITD		0x00		// Isochronous Transfer Descriptor
-#define EHCI_PFRAMELIST_QH		0x01		// Queue Head
-#define EHCI_PFRAMELIST_SITD	0x10		// Split Transaction Isochronous TD
-#define EHCI_PFRAMELIST_FSTN	0x11		// Frame Span Traversal Node
+#define EHCI_PFRAMELIST_TERM	(1 << 0)	// Terminate
+#define EHCI_PFRAMELIST_ITD		(0 << 1)	// Isochronous Transfer Descriptor
+#define EHCI_PFRAMELIST_QH		(1 << 1)	// Queue Head
+#define EHCI_PFRAMELIST_SITD	(2 << 1)	// Split Transaction Isochronous TD
+#define EHCI_PFRAMELIST_FSTN	(3 << 1)	// Frame Span Traversal Node
 
 
 // ToDo: Isochronous (High-Speed) Transfer Descriptors (iTD, EHCI Spec 3.2)

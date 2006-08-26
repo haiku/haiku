@@ -87,25 +87,26 @@ static	int32						FinishThread(void *data);
 		size_t						ReadActualLength(ehci_qtd *topDescriptor,
 										uint8 *lastDataToggle);
 
-		// Register functions
-inline	void						WriteReg8(uint32 reg, uint8 value);
-inline	void						WriteReg16(uint32 reg, uint16 value);
-inline	void						WriteReg32(uint32 reg, uint32 value);
-inline	uint8						ReadReg8(uint32 reg);
-inline	uint16						ReadReg16(uint32 reg);
-inline	uint32						ReadReg32(uint32 reg);
+		// Operational register functions
+inline	void						WriteOpReg(uint32 reg, uint32 value);
+inline	uint32						ReadOpReg(uint32 reg);
+
+		// Capability register functions
+inline	uint8						ReadCapReg8(uint32 reg);
+inline	uint16						ReadCapReg16(uint32 reg);
+inline	uint32						ReadCapReg32(uint32 reg);
 
 static	pci_module_info				*sPCIModule;
 
-		uint32						fRegisterBase;
+		uint8						*fCapabilityRegisters;
+		uint8						*fOperationalRegisters;
+		area_id						fRegisterArea;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
 
 		// Framelist memory
 		area_id						fPeriodicFrameListArea;
 		addr_t						*fPeriodicFrameList;
-		area_id						fAsyncFrameListArea;
-		addr_t						*fAsyncFrameList;
 
 		// Maintain a linked list of transfers
 		transfer_data				*fFirstTransfer;

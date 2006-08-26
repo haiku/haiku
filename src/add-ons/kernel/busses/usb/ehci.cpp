@@ -11,6 +11,7 @@
 #include <USB3.h>
 #include <KernelExport.h>
 
+#define TRACE_USB
 #include "ehci.h"
 
 pci_module_info *EHCI::sPCIModule = NULL;
@@ -60,8 +61,6 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fStack(stack),
 		fPeriodicFrameListArea(-1),
 		fPeriodicFrameList(NULL),
-		fAsyncFrameListArea(-1),
-		fAsyncFrameList(NULL),
 		fFirstTransfer(NULL),
 		fLastTransfer(NULL),
 		fFinishTransfers(false),
@@ -70,7 +69,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fRootHub(NULL),
 		fRootHubAddress(0)
 {
-	if (!fInitOK) {
+	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR(("usb_ehci: bus manager failed to init\n"));
 		return;
 	}
@@ -78,48 +77,48 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	TRACE(("usb_ehci: constructing new EHCI Host Controller Driver\n"));
 	fInitOK = false;
 
-	fRegisterBase = sPCIModule->read_pci_config(fPCIInfo->bus,
-		fPCIInfo->device, fPCIInfo->function, PCI_memory_base, 4);
-	fRegisterBase &= PCI_address_io_mask;
-	TRACE(("usb_ehci: register base: 0x%08x\n", fRegisterBase));
-
-	// enable pci address access
-	uint16 command = PCI_command_io | PCI_command_master | PCI_command_memory;
-	command |= sPCIModule->read_pci_config(fPCIInfo->bus, fPCIInfo->device,
-		fPCIInfo->function, PCI_command, 2);
-
-	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-		fPCIInfo->function, PCI_command, 2, command);
-
 	// make sure we take the controller away from BIOS
 	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device, 2,
 		PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN);
 
-	// disable interrupts
-	WriteReg16(EHCI_USBINTR, 0);
+	// enable busmaster and memory mapped access
+	uint16 command = sPCIModule->read_pci_config(fPCIInfo->bus,
+		fPCIInfo->device, fPCIInfo->function, PCI_command, 2);
+	command &= ~PCI_command_io;
+	command |= PCI_command_master | PCI_command_memory;
 
-	// reset the host controller
-	// ToDo...
+	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+		fPCIInfo->function, PCI_command, 2, command);
 
-	// allocate the periodic frame list
-	void *physicalAddress;
-	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
-		&physicalAddress, B_PAGE_SIZE, "USB EHCI Periodic Framelist");
-	if (fPeriodicFrameListArea < B_OK) {
-		TRACE_ERROR(("usb_ehci: unable to allocate periodic framelist\n"));
+	// map the registers
+	uint32 offset = fPCIInfo->u.h0.base_registers[0] & (B_PAGE_SIZE - 1);
+	addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0] - offset;
+	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0] + offset
+		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	TRACE(("usb_ehci: map physical memory 0x%08x (base: 0x%08x; offset: %x); size: %d -> %d\n", fPCIInfo->u.h0.base_registers[0], physicalAddress, offset, fPCIInfo->u.h0.base_register_sizes[0], mapSize));
+	fRegisterArea = map_physical_memory("EHCI memory mapped registers",
+		(void *)physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
+		(void **)&fCapabilityRegisters);
+	if (fRegisterArea < B_OK) {
+		TRACE(("usb_ehci: failed to map register memory\n"));
 		return;
 	}
 
-	WriteReg32(EHCI_PERIODICLISTBASE, (uint32)physicalAddress);
+	fCapabilityRegisters += offset;
+	fOperationalRegisters = fCapabilityRegisters + ReadCapReg8(EHCI_CAPLENGTH);
+	TRACE(("usb_ehci: mapped capability registers: 0x%08x\n", fCapabilityRegisters));
+	TRACE(("usb_ehci: mapped operational registers: 0x%08x\n", fOperationalRegisters));
 
-	// allocate the async frame list
-	fAsyncFrameListArea = fStack->AllocateArea((void **)&fAsyncFrameList,
-		&physicalAddress, B_PAGE_SIZE, "USB EHCI Async Framelist");
-	if (fAsyncFrameListArea < B_OK) {
-		TRACE_ERROR(("usb_ehci: unable to allocate async framelist\n"));
+	// disable interrupts
+	WriteOpReg(EHCI_USBINTR, 0);
+
+	// reset the host controller
+	if (ControllerReset() < B_OK) {
+		TRACE_ERROR(("usb_ehci: host controller failed to reset\n"));
+		return;
 	}
-
-	WriteReg32(EHCI_ASYNCLISTADDR, (uint32)physicalAddress);
 
 	// create finisher service thread
 	fFinishThread = spawn_kernel_thread(FinishThread, "ehci finish thread",
@@ -129,8 +128,25 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	// install the interrupt handler and enable interrupts
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		InterruptHandler, (void *)this, 0);
-	WriteReg16(EHCI_USBINTR, EHCI_USBINTR_HOSTSYSERR
+	WriteOpReg(EHCI_USBINTR, EHCI_USBINTR_HOSTSYSERR
 		| EHCI_USBINTR_USBERRINT | EHCI_USBINTR_USBINT);
+
+	// allocate the periodic frame list
+	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
+		(void **)&physicalAddress, B_PAGE_SIZE, "USB EHCI Periodic Framelist");
+	if (fPeriodicFrameListArea < B_OK) {
+		TRACE_ERROR(("usb_ehci: unable to allocate periodic framelist\n"));
+		return;
+	}
+
+	// terminate all elements
+	for (int32 i = 0; i < 1024; i++)
+		fPeriodicFrameList[i] = EHCI_PFRAMELIST_TERM;
+
+	WriteOpReg(EHCI_PERIODICLISTBASE, (uint32)physicalAddress);
+
+	// route all ports to us
+	WriteOpReg(EHCI_CONFIGFLAG, EHCI_CONFIGFLAG_FLAG);
 
 	TRACE(("usb_ehci: EHCI Host Controller Driver constructed\n"));
 	fInitOK = true;
@@ -149,8 +165,7 @@ EHCI::~EHCI()
 
 	delete fRootHub;
 	delete_area(fPeriodicFrameListArea);
-	delete_area(fAsyncFrameListArea);
-
+	delete_area(fRegisterArea);
 	put_module(B_PCI_MODULE_NAME);
 }
 
@@ -159,13 +174,13 @@ status_t
 EHCI::Start()
 {
 	TRACE(("usb_ehci: starting EHCI Host Controller\n"));
-	TRACE(("usb_ehci: usbcmd: 0x%08x; usbsts: 0x%08x\n", ReadReg32(EHCI_USBCMD), ReadReg32(EHCI_USBSTS)));
+	TRACE(("usb_ehci: usbcmd: 0x%08x; usbsts: 0x%08x\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS)));
 
-	WriteReg32(EHCI_USBCMD, ReadReg32(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP);
+	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP);
 
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
-		uint32 status = ReadReg32(EHCI_USBSTS);
+		uint32 status = ReadOpReg(EHCI_USBSTS);
 		TRACE(("usb_ehci: try %ld: status 0x%08x\n", i, status));
 
 		if (status & EHCI_USBSTS_HCHALTED) {
@@ -295,7 +310,16 @@ EHCI::ResetPort(int32 index)
 status_t
 EHCI::ControllerReset()
 {
-	return B_ERROR;
+	WriteOpReg(EHCI_USBCMD, EHCI_USBCMD_HCRESET);
+
+	int32 tries = 5;
+	while (ReadOpReg(EHCI_USBCMD) & EHCI_USBCMD_HCRESET) {
+		snooze(10000);
+		if (tries-- < 0)
+			return B_ERROR;
+	}
+
+	return B_OK;
 }
 
 
@@ -534,42 +558,35 @@ EHCI::ReadActualLength(ehci_qtd *topDescriptor, uint8 *lastDataToggle)
 
 
 inline void
-EHCI::WriteReg8(uint32 reg, uint8 value)
+EHCI::WriteOpReg(uint32 reg, uint32 value)
 {
-	sPCIModule->write_io_8(fRegisterBase + reg, value);
-}
-
-
-inline void
-EHCI::WriteReg16(uint32 reg, uint16 value)
-{
-	sPCIModule->write_io_16(fRegisterBase + reg, value);
-}
-
-
-inline void
-EHCI::WriteReg32(uint32 reg, uint32 value)
-{
-	sPCIModule->write_io_32(fRegisterBase + reg, value);
-}
-
-
-inline uint8
-EHCI::ReadReg8(uint32 reg)
-{
-	return sPCIModule->read_io_8(fRegisterBase + reg);
-}
-
-
-inline uint16
-EHCI::ReadReg16(uint32 reg)
-{
-	return sPCIModule->read_io_16(fRegisterBase + reg);
+	*(volatile uint32 *)(fOperationalRegisters + reg) = value;
 }
 
 
 inline uint32
-EHCI::ReadReg32(uint32 reg)
+EHCI::ReadOpReg(uint32 reg)
 {
-	return sPCIModule->read_io_32(fRegisterBase + reg);
+	return *(volatile uint32 *)(fOperationalRegisters + reg);
+}
+
+
+inline uint8
+EHCI::ReadCapReg8(uint32 reg)
+{
+	return *(volatile uint8 *)(fCapabilityRegisters + reg);
+}
+
+
+inline uint16
+EHCI::ReadCapReg16(uint32 reg)
+{
+	return *(volatile uint16 *)(fCapabilityRegisters + reg);
+}
+
+
+inline uint32
+EHCI::ReadCapReg32(uint32 reg)
+{
+	return *(volatile uint32 *)(fCapabilityRegisters + reg);
 }
