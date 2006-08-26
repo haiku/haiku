@@ -2,8 +2,15 @@ SubDir HAIKU_TOP src apps magnify ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 Application Magnify : 
 	Magnify.cpp 
 	: be tracker game 
 	: Magnify.rdef
 ;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Magnify
+		: tests!apps ;
+}
