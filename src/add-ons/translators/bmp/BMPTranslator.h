@@ -67,7 +67,7 @@ struct MSInfoHeader {
 	uint32 width;			// bitmap width
 	uint32 height;			// bitmap height
 	uint16 planes;			// number of planes, always 1?
-	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16 or 24)
+	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16, 24 or 32)
 	uint32 compression;		// type of compression
 	uint32 imagesize;		// size of image data if compressed
 	uint32 xpixperm;		// horizontal pixels per meter
@@ -81,7 +81,7 @@ struct OS2InfoHeader {
 	uint16 width;			// bitmap width
 	uint16 height;			// bitmap height
 	uint16 planes;			// number of planes, always 1?
-	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16 or 24)
+	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16, 24 or 32)
 };
 
 class BMPTranslator : public BaseTranslator {
