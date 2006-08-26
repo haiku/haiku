@@ -9,6 +9,7 @@
 #include <Control.h>
 #include <TextView.h>
 
+class BLayoutItem;
 class _BTextInput_;
 
 
@@ -19,6 +20,13 @@ class BTextControl : public BControl {
 								BMessage* message,
 								uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+							BTextControl(const char* name,
+								const char* label, const char* initialText,
+								BMessage* message,
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+							BTextControl(const char* label,
+								const char* initialText,
+								BMessage* message); 
 		virtual				~BTextControl();
 
 							BTextControl(BMessage* archive);
@@ -68,8 +76,16 @@ class BTextControl : public BControl {
 		virtual status_t	GetSupportedSuites(BMessage* data);
 		virtual void		SetFlags(uint32 flags);
 
+				BLayoutItem* CreateLabelLayoutItem();
+				BLayoutItem* CreateTextViewLayoutItem();
+
 	private:
+		class LabelLayoutItem;
+		class TextViewLayoutItem;
+
 		friend class _BTextInput_;
+		friend class LabelLayoutItem;
+		friend class TextViewLayoutItem;
 
 		virtual status_t	Perform(perform_code d, void* arg);
 
@@ -84,6 +100,8 @@ class BTextControl : public BControl {
 		void				_UpdateTextViewColors(bool enabled);
 		void				_InitData(const char* label, const char* initialText,
 								BMessage* archive = NULL);
+		void				_ValidateLayout();
+		void				_UpdateFrame();
 
 	private:
 		_BTextInput_*		fText;
@@ -93,8 +111,10 @@ class BTextControl : public BControl {
 		float				fDivider;
 		float				fPreviousWidth;
 		float				fPreviousHeight;
+		BLayoutItem*		fLabelLayoutItem;
+		BLayoutItem*		fTextViewLayoutItem;
 
-		uint32				_reserved[6];
+		uint32				_reserved[4];
 
 		bool				fClean;
 		bool				fSkipSetFlags;

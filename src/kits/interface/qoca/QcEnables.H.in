@@ -1,0 +1,8 @@
+#ifndef QcEnables_H
+#define QcEnables_H
+
+@QC_NDEBUG_COM@#define NDEBUG 1
+
+@NLPSOLVER_COM@#define QC_USING_NLPSOLVER 1
+
+#endif /* !QcEnables_H */

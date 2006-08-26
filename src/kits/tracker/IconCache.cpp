@@ -217,7 +217,25 @@ IconCacheEntry::IconHitTest(BPoint where, IconDrawMode mode, icon_size size) con
 
 	uchar *bits = (uchar *)bitmap->Bits();
 	ASSERT(bits);
-	return *(bits + (int32)(floor(where.y) * size + where.x)) != B_TRANSPARENT_8_BIT;
+
+	BRect bounds(bitmap->Bounds());
+	bounds.InsetBy((bounds.Width() + 1.0) / 8.0, (bounds.Height() + 1.0) / 8.0);
+	if (bounds.Contains(where))
+		return true;
+
+	switch (bitmap->ColorSpace()) {
+		case B_RGBA32:
+			// test alpha channel
+			return *(bits + (int32)(floorf(where.y) * bitmap->BytesPerRow()
+				+ floorf(where.x) * 4 + 3)) > 20;
+
+		case B_CMAP8:
+			return *(bits + (int32)(floorf(where.y) * size + where.x))
+				!= B_TRANSPARENT_8_BIT;
+
+		default:
+			return true;
+	}
 }
 
 
@@ -1223,20 +1241,63 @@ IconCache::InitHiliteTable()
 
 
 BBitmap * 
-IconCache::MakeTransformedIcon(const BBitmap *src, icon_size /*size*/,
-	int32 colorTransformTable[], LazyBitmapAllocator *lazyBitmap)
+IconCache::MakeTransformedIcon(const BBitmap* source, icon_size /*size*/,
+	int32 colorTransformTable[], LazyBitmapAllocator* lazyBitmap)
 {
 	if (fInitHiliteTable)
 		InitHiliteTable();
 
-	BBitmap *result = lazyBitmap->Get();
-	int32 bitsLength = result->BitsLength();
-	// Do I need a SetBits here? could just copy/transform straight from src
-	result->SetBits(src->Bits(), bitsLength, 0, kDefaultIconDepth);
+	BBitmap* result = lazyBitmap->Get();
+	uint8* src = (uint8*)source->Bits();
+	uint8* dst = (uint8*)result->Bits();
 
-	uchar *bits = (uchar *)result->Bits();
-	for (int32 index = 0; index < bitsLength; index++) 
-		bits[index] = (uchar)colorTransformTable[(uchar)bits[index]];
+//	ASSERT(result->ColorSpace() == source->ColorSpace()
+//		&& result->Bounds() == source->Bounds());
+	if (result->ColorSpace() != source->ColorSpace()
+		|| result->Bounds() != source->Bounds()) {
+		printf("IconCache::MakeTransformedIcon() - "
+					"bitmap format mismatch!\n");
+		return NULL;
+	}
+
+	switch (result->ColorSpace()) {
+		case B_RGB32:
+		case B_RGBA32: {
+			uint32 width = source->Bounds().IntegerWidth() + 1;
+			uint32 height = source->Bounds().IntegerHeight() + 1;
+			uint32 srcBPR = source->BytesPerRow();
+			uint32 dstBPR = result->BytesPerRow();
+			for (uint32 y = 0; y < height; y++) {
+				uint8* d = dst;
+				uint8* s = src;
+				for (uint32 x = 0; x < width; x++) {
+					// 66% brightness
+					d[0] = (int)s[0] * 168 >> 8;
+					d[1] = (int)s[1] * 168 >> 8;
+					d[2] = (int)s[2] * 168 >> 8;
+					d[3] = s[3];
+					d += 4;
+					s += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+			break;
+		}
+
+		case B_CMAP8: {
+			int32 bitsLength = result->BitsLength();
+			for (int32 i = 0; i < bitsLength; i++)
+				*dst++ = (uint8)colorTransformTable[*src++];
+			break;
+		}
+
+		default:
+			memset(dst, 0, result->BitsLength());
+			// unkown colorspace, no tinting for you
+			// "black" should make the problem stand out
+			break;
+	}
 
 	return result;
 }
@@ -1439,11 +1500,19 @@ SharedCacheEntry::SharedCacheEntry(const char *fileType, const char *appSignatur
 
 
 void 
-SharedCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size size,
+SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size size,
 	bool async)
 {
-	BBitmap *bitmap = IconForMode(mode, size);
+	BBitmap* bitmap = IconForMode(mode, size);
 	ASSERT(bitmap);
+
+	if (bitmap->ColorSpace() == B_RGBA32) {
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	} else {
+		view->SetDrawingMode(B_OP_OVER);
+	}
+	
 	if (async)
 		view->DrawBitmapAsync(bitmap, where);
 	else
@@ -1456,7 +1525,16 @@ SharedCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size s
 	void (*blitFunc)(BView *, BPoint ,BBitmap *, void *), void *passThruState)
 {
 	BBitmap *bitmap = IconForMode(mode, size);
-	ASSERT(bitmap);
+	if (!bitmap)
+		return;
+	
+	if (bitmap->ColorSpace() == B_RGBA32) {
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	} else {
+		view->SetDrawingMode(B_OP_OVER);
+	}
+	
 	(blitFunc)(view, where, bitmap, passThruState);
 }
 
@@ -1534,6 +1612,16 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 	bool async)
 {
 	BBitmap *bitmap = IconForMode(mode, size);
+	if (!bitmap)
+		return;
+	
+	if (bitmap->ColorSpace() == B_RGBA32) {
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	} else {
+		view->SetDrawingMode(B_OP_OVER);
+	}
+	
 	if (false && async) {
 		TRESPASS();
 		// need to copy the bits first in here
@@ -1548,6 +1636,16 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 	void (*blitFunc)(BView *, BPoint ,BBitmap *, void *), void *passThruState)
 {
 	BBitmap *bitmap = IconForMode(mode, size);
+	if (!bitmap)
+		return;
+	
+	if (bitmap->ColorSpace() == B_RGBA32) {
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	} else {
+		view->SetDrawingMode(B_OP_OVER);
+	}
+	
 	(blitFunc)(view, where, bitmap, passThruState);
 }
 

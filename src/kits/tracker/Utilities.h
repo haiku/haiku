@@ -75,7 +75,7 @@ const int64 kTBSize = kGBSize * kKBSize;
 
 const int32 kMiniIconSeparator = 3;
 
-const color_space kDefaultIconDepth = B_CMAP8;
+const color_space kDefaultIconDepth = B_RGBA32;
 
 // misc typedefs, constants and structs
 

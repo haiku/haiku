@@ -275,8 +275,9 @@ BDirectWindow::SetFullScreen(bool enable)
 		fLink->Attach<bool>(enable);
 
 		if (fLink->FlushWithReply(status) == B_OK
-			&& status == B_OK)
+			&& status == B_OK) {
 			fIsFullScreen = enable;
+		}
 		Unlock();
 	}
 	return status;
@@ -303,6 +304,8 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 	// TODO: Apparently, the above is false for the vesa driver,
 	// but enabling it doesn't do any harm... maybe we should just return always true.
 	// At least, I can't see why window mode shouldn't be supported.
+	// additional NOTE: it probably depends on wether hardware cursor is supported or
+	// not
 	return true;
 }
 

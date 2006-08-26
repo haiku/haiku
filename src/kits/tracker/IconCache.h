@@ -67,7 +67,7 @@ class SharedIconCache;
 class SharedCacheEntry;
 
 enum IconDrawMode {
-	// Difrent states of icon drawing
+	// Different states of icon drawing
 	kSelected 					= 0x01,
 	kNotFocused					= 0x02,		// Tracker window
 	kOpen						= 0x04,		// open folder, trash
@@ -115,7 +115,7 @@ class IconCacheEntry {
 	// to some other entry that does
 	
 	// This is used for icons that are defined by a preferred app for
-	// a metamime, types that do not have an icon an get to point to
+	// a metamime, types that do not have an icon get to point to
 	// generic, etc.
 	
 public:
@@ -140,7 +140,7 @@ public:
 		LazyBitmapAllocator *);
 		// same as above, always uses normal icon as source	
 
-	bool IconHitTest(BPoint, IconDrawMode , icon_size) const;
+	bool IconHitTest(BPoint, IconDrawMode, icon_size) const;
 		// given a point, returns true if a non-transparent pixel was hit
 
 	void RetireIcons(BObjectList<BBitmap> *retiredBitmapList);
@@ -293,7 +293,7 @@ public:
 };
 
 class NodeIconCache : public SimpleIconCache {
-	// NodeIconCache is used for nodes that define their own icon icons
+	// NodeIconCache is used for nodes that define their own icons
 public:
 	NodeIconCache();
 
@@ -311,8 +311,7 @@ public:
 	void Deleting(const node_ref *);
 		// model for this node is getting deleted (not necessarily the node itself)
 	void Removing(const node_ref *);
-		// used by permanent NodeIconCache entries, when an entry gets
-		// deleted
+		// used by permanent NodeIconCache entries, when an entry gets deleted
 	void Deleting(const BView *);
 	void IconChanged(const Model *);
 
@@ -447,7 +446,8 @@ class LazyBitmapAllocator {
 // Utility class used when we aren't sure that we will keep a bitmap,
 // need a bitmap or be able to construct it properly
 public:
-	LazyBitmapAllocator(icon_size size, color_space colorSpace = kDefaultIconDepth,
+	LazyBitmapAllocator(icon_size size,
+						color_space colorSpace = kDefaultIconDepth,
 		bool preallocate = false);
 	~LazyBitmapAllocator();
 

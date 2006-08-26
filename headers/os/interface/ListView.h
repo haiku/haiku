@@ -126,6 +126,9 @@ class BListView : public BView, public BInvoker
 		virtual void		AllAttached();
 		virtual void		AllDetached();
 
+		virtual	BSize		MinSize();
+		virtual	BSize		PreferredSize();
+
 	protected:
 		enum MiscCode { B_NO_OP, B_REPLACE_OP, B_MOVE_OP, B_SWAP_OP };
 		union MiscData {

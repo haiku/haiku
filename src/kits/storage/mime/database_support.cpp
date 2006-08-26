@@ -56,7 +56,8 @@ const std::string kApplicationDatabaseDir		= kDatabaseDir + "/application";
 #define LARGE_ICON_ATTR_PREFIX ATTR_PREFIX "L:"
 
 const char *kMiniIconAttrPrefix		= MINI_ICON_ATTR_PREFIX;
-const char *kLargeIconAttrPrefix	= LARGE_ICON_ATTR_PREFIX; 
+const char *kLargeIconAttrPrefix	= LARGE_ICON_ATTR_PREFIX;
+const char *kIconAttrPrefix			= ATTR_PREFIX; 
 
 // attribute names
 const char *kFileTypeAttr			= "BEOS:TYPE";
@@ -68,6 +69,7 @@ const char *kLongDescriptionAttr	= ATTR_PREFIX "L:DESC";
 const char *kFileExtensionsAttr		= ATTR_PREFIX "EXTENS";
 const char *kMiniIconAttr			= MINI_ICON_ATTR_PREFIX "STD_ICON";
 const char *kLargeIconAttr			= LARGE_ICON_ATTR_PREFIX "STD_ICON";
+const char *kIconAttr				= ATTR_PREFIX "ICON";
 const char *kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
 const char *kSnifferRuleAttr		= ATTR_PREFIX "SNIFF_RULE";
 const char *kSupportedTypesAttr		= ATTR_PREFIX "FILE_TYPES";
@@ -82,6 +84,7 @@ const int32 kLongDescriptionType	= 'MLDC';
 const int32 kFileExtensionsType		= B_MESSAGE_TYPE;
 const int32 kMiniIconType			= B_MINI_ICON_TYPE;
 const int32 kLargeIconType			= B_LARGE_ICON_TYPE;
+const int32 kIconType				= B_RAW_TYPE;
 const int32 kPreferredAppType		= 'MSIG';
 const int32 kSnifferRuleType		= B_STRING_TYPE;
 const int32 kSupportedTypesType		= B_MESSAGE_TYPE;

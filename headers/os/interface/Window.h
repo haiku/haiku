@@ -81,6 +81,7 @@ enum {
 	B_ASYNCHRONOUS_CONTROLS		= 0x00080000,
 	B_QUIT_ON_WINDOW_CLOSE		= 0x00100000,
 	B_SAME_POSITION_IN_ALL_WORKSPACES = 0x00200000,
+	B_AUTO_UPDATE_SIZE_LIMITS	= 0x00400000,
 };
 
 #define B_CURRENT_WORKSPACE	0
@@ -256,6 +257,11 @@ public:
 
 	virtual	bool				QuitRequested();
 	virtual thread_id			Run();
+
+	virtual	void			SetLayout(BLayout* layout);
+			BLayout*		GetLayout() const;
+
+			void			InvalidateLayout(bool descendants = false);
 
 private:
 	typedef BLooper inherited;

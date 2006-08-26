@@ -6,6 +6,8 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
 
+UseLibraryHeaders icon ;
+
 AddResources libtracker.so : TrackerIcons.rdef ;
 
 SubDirC++Flags 
@@ -86,7 +88,9 @@ SharedLibrary libtracker.so :
 	ViewState.cpp
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
-	: be libtranslation.so
+
+	: be translation libicon.a libagg.a
+
 	;
 
 if $(TARGET_PLATFORM) = libbe_test {

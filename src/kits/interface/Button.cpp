@@ -12,7 +12,9 @@
 
 
 #include <Button.h>
+
 #include <Font.h>
+#include <LayoutUtils.h>
 #include <String.h>
 #include <Window.h>
 
@@ -20,6 +22,35 @@
 BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
 				  uint32 resizingMode, uint32 flags)
 	:	BControl(frame, name, label, message, resizingMode, flags | B_WILL_DRAW),
+		fDrawAsDefault(false)
+{
+	// Resize to minimum height if needed
+	font_height fh;
+	GetFontHeight(&fh);
+	float minHeight = 12.0f + (float)ceil(fh.ascent + fh.descent);
+	if (Bounds().Height() < minHeight)
+		ResizeTo(Bounds().Width(), minHeight);
+}
+
+
+BButton::BButton(const char* name, const char* label, BMessage *message,
+				 uint32 flags)
+	:	BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
+			flags | B_WILL_DRAW | B_SUPPORTS_LAYOUT),
+		fDrawAsDefault(false)
+{
+	// Resize to minimum height if needed
+	font_height fh;
+	GetFontHeight(&fh);
+	float minHeight = 12.0f + (float)ceil(fh.ascent + fh.descent);
+	if (Bounds().Height() < minHeight)
+		ResizeTo(Bounds().Width(), minHeight);
+}
+
+
+BButton::BButton(const char* label, BMessage *message)
+	:	BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
+			B_WILL_DRAW | B_NAVIGABLE | B_SUPPORTS_LAYOUT),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
@@ -687,6 +718,16 @@ status_t
 BButton::Perform(perform_code d, void *arg)
 {
 	return BControl::Perform(d, arg);
+}
+
+
+BSize
+BButton::MaxSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
 }
 
 

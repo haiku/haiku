@@ -27,14 +27,23 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app input interface shared tracker ;
 
+# qoca headers
+SubDirSysHdrs $(SUBDIR) ;
+SubDirHdrs [ FDirName $(SUBDIR) qoca ] ;
+
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) BTextView ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
 MergeObject <libbe>interface_kit.o :
+	AbstractLayoutItem.cpp
 	Alert.cpp
+	Alignment.cpp
 	Bitmap.cpp
 	BMCPrivate.cpp
 	Box.cpp
 	Button.cpp
+	CardLayout.cpp
 	ChannelControl.cpp
 	ChannelSlider.cpp
 	CheckBox.cpp
@@ -48,8 +57,18 @@ MergeObject <libbe>interface_kit.o :
 	Dragger.cpp
 	Font.cpp
 	GraphicsDefs.cpp
+	GridLayout.cpp
+	GridLayoutBuilder.cpp
+	GridView.cpp
+	GroupLayout.cpp
+	GroupLayoutBuilder.cpp
+	GroupView.cpp
 	Input.cpp
 	InterfaceDefs.cpp
+	Layout.cpp
+	LayoutContext.cpp
+	LayoutItem.cpp
+	LayoutUtils.cpp
 	ListItem.cpp
 	ListView.cpp
 	Menu.cpp
@@ -77,14 +96,21 @@ MergeObject <libbe>interface_kit.o :
 	SeparatorItem.cpp
 	Shape.cpp
 	Shelf.cpp
+	Size.cpp
 	Slider.cpp
+	SpaceLayoutItem.cpp
+	SplitLayout.cpp
+	SplitLayoutBuilder.cpp
+	SplitView.cpp
 	StatusBar.cpp
 	StringView.cpp
 	TabView.cpp
 	TextControl.cpp
 	TextInput.cpp
 	TPicture.cpp
+	TwoDimensionalLayout.cpp
 	View.cpp
+	ViewLayoutItem.cpp
 	Window.cpp
 	ZombieReplicantView.cpp
 
@@ -96,4 +122,12 @@ MergeObject <libbe>interface_kit.o :
 	TextView.cpp
 	UndoBuffer.cpp
 	WidthBuffer.cpp
+
+	# layouter
+	ConstraintSolverLayouter.cpp
+	Layouter.cpp
+	OneElementLayouter.cpp
+	SimpleLayouter.cpp
 ;
+
+SubInclude HAIKU_TOP src kits interface qoca ;

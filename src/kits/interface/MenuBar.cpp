@@ -7,9 +7,11 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <MenuBar.h>
+
 #include <Application.h>
 #include <Autolock.h>
-#include <MenuBar.h>
+#include <LayoutUtils.h>
 #include <MenuItem.h>
 #include <Window.h>
 
@@ -295,6 +297,21 @@ BMenuBar::Perform(perform_code d, void *arg)
 {
 	return BMenu::Perform(d, arg);
 }
+
+
+BSize
+BMenuBar::MaxSize()
+{
+	// TODO: cache the result
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, height));
+}
+
+
+// #pragma mark -
 
 
 void BMenuBar::_ReservedMenuBar1() {}

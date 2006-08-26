@@ -43,6 +43,7 @@ All rights reserved.
 #include <Debug.h>
 #include <Directory.h>
 #include <fs_info.h>
+#include <IconUtils.h>
 #include <MenuItem.h>
 #include <OS.h>
 #include <PopUpMenu.h>
@@ -631,6 +632,8 @@ FlickerFreeStringView::Draw(BRect)
 		edge_info eInfo;
 		switch (Alignment()) {
 			case B_ALIGN_LEFT:
+			case B_ALIGN_HORIZONTAL_UNSET:
+			case B_ALIGN_USE_FULL_WIDTH:
 			{
 				// If the first char has a negative left edge give it
 				// some more room by shifting that much more to the right.
@@ -1335,22 +1338,45 @@ GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
 	BAppFileInfo appFileInfo(file);
 	return appFileInfo.GetIcon(result, size);
 #else
-	const char *attrName = size == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
-	uint32 type = size == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
-	char buffer[1024];
 
+	const char *attrName = kAttrIcon;
+	uint32 type = B_RAW_TYPE;
+
+	// try vector icon
 	attr_info ainfo;
-	status_t err = err = file->GetAttrInfo(attrName, &ainfo);
-	if (err)
-		return err;
+	status_t ret = file->GetAttrInfo(attrName, &ainfo);
 
-	ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer, (size_t)ainfo.size);
+	if (ret == B_OK) {
+		uint8 buffer[ainfo.size];
+		ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer,
+											ainfo.size);
+		if (readResult == ainfo.size) {
+			if (BIconUtils::GetVectorIcon(buffer, ainfo.size, result) == B_OK)
+				return B_OK;
+		}
+	}
+
+	// try again with R5 icons	
+	attrName = size == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
+	type = size == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
+
+	ret = file->GetAttrInfo(attrName, &ainfo);
+	if (ret < B_OK)
+		return ret;
+
+	uint8 buffer[ainfo.size];
+
+	ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer, ainfo.size);
 	if (readResult <= 0)
 		return (status_t)readResult;
 
-	result->SetBits(buffer, result->BitsLength(), 0, B_CMAP8);
+	if (result->ColorSpace() != B_CMAP8) {
+		ret = BIconUtils::ConvertFromCMAP8(buffer, size, size, size, result);
+	} else {
+		result->SetBits(buffer, result->BitsLength(), 0, B_CMAP8);
+	}
 
-	return B_OK;
+	return ret;
 #endif	// B_APP_FILE_INFO_IS_FAST
 }
 

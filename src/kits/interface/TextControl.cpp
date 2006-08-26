@@ -5,6 +5,7 @@
  * Authors:
  *		Frans van Nispen (xlr8@tref.nl)
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 /**	BTextControl displays text that can act like a control. */
@@ -12,6 +13,8 @@
 
 #include <stdio.h>
 
+#include <AbstractLayoutItem.h>
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <Region.h>
 #include <TextControl.h>
@@ -20,23 +23,83 @@
 #include "TextInput.h"
 
 
+class BTextControl::LabelLayoutItem : public BAbstractLayoutItem {
+public:
+								LabelLayoutItem(BTextControl* parent);
+
+	virtual	bool				IsVisible();
+	virtual	void				SetVisible(bool visible);
+
+	virtual	BRect				Frame();
+	virtual	void				SetFrame(BRect frame);
+
+	virtual	BView*				View();
+
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
+
+private:
+			BTextControl*		fParent;
+			BRect				fFrame;
+};
+
+
+class BTextControl::TextViewLayoutItem : public BAbstractLayoutItem {
+public:
+								TextViewLayoutItem(BTextControl* parent);
+
+	virtual	bool				IsVisible();
+	virtual	void				SetVisible(bool visible);
+
+	virtual	BRect				Frame();
+	virtual	void				SetFrame(BRect frame);
+
+	virtual	BView*				View();
+
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
+
+private:
+			BTextControl*		fParent;
+			BRect				fFrame;
+};
+
+
+// #pragma mark -
+
+
 BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 						   const char *text, BMessage *message, uint32 mask,
 						   uint32 flags)
 	: BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
 {
 	_InitData(label, text);
+	_ValidateLayout();
+}
 
-	float height;
-	BTextControl::GetPreferredSize(NULL, &height);
 
-	ResizeTo(Bounds().Width(), height);
+BTextControl::BTextControl(const char *name, const char *label,
+						   const char *text, BMessage *message,
+						   uint32 flags)
+	: BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
+			flags | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+{
+	_InitData(label, text);
+	_ValidateLayout();
+}
 
-	float lineHeight = ceil(fText->LineHeight(0));
-	fText->ResizeTo(fText->Bounds().Width(), lineHeight);
-	fText->MoveTo(fText->Frame().left, (height - lineHeight) / 2);
 
-	fPreviousHeight = Bounds().Height();
+BTextControl::BTextControl(const char *label,
+						   const char *text, BMessage *message)
+	: BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
+			B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+{
+	_InitData(label, text);
+	_ValidateLayout();
 }
 
 
@@ -566,6 +629,24 @@ BTextControl::Perform(perform_code d, void *arg)
 }
 
 
+BLayoutItem*
+BTextControl::CreateLabelLayoutItem()
+{
+	if (!fLabelLayoutItem)
+		fLabelLayoutItem = new LabelLayoutItem(this);
+	return fLabelLayoutItem;
+}
+
+
+BLayoutItem*
+BTextControl::CreateTextViewLayoutItem()
+{
+	if (!fTextViewLayoutItem)
+		fTextViewLayoutItem = new TextViewLayoutItem(this);
+	return fTextViewLayoutItem;
+}
+
+
 void BTextControl::_ReservedTextControl1() {}
 void BTextControl::_ReservedTextControl2() {}
 void BTextControl::_ReservedTextControl3() {}
@@ -627,6 +708,8 @@ BTextControl::_InitData(const char* label, const char* initialText,
 	fDivider = 0.0f;
 	fPreviousWidth = bounds.Width();
 	fPreviousHeight = bounds.Height();
+	fLabelLayoutItem = NULL;
+	fTextViewLayoutItem = NULL;
 	fSkipSetFlags = false;
 
 	int32 flags = 0;
@@ -672,3 +755,204 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		fText->AlignTextRect();
 	}
 }
+
+
+void
+BTextControl::_ValidateLayout()
+{
+	float height;
+	BTextControl::GetPreferredSize(NULL, &height);
+
+	ResizeTo(Bounds().Width(), height);
+
+	float lineHeight = ceil(fText->LineHeight(0));
+	fText->ResizeTo(fText->Bounds().Width(), lineHeight);
+	fText->MoveTo(fText->Frame().left, (height - lineHeight) / 2);
+
+	fPreviousHeight = Bounds().Height();
+}
+
+
+void
+BTextControl::_UpdateFrame()
+{
+	if (fLabelLayoutItem && fTextViewLayoutItem) {
+		BRect labelFrame = fLabelLayoutItem->Frame();
+		BRect textFrame = fTextViewLayoutItem->Frame();
+		MoveTo(labelFrame.left, labelFrame.top);
+		ResizeTo(textFrame.left + textFrame.Width() - labelFrame.left,
+			textFrame.top + textFrame.Height() - labelFrame.top);
+		SetDivider(textFrame.left - labelFrame.left);
+	}
+}
+
+
+// #pragma mark -
+
+
+BTextControl::LabelLayoutItem::LabelLayoutItem(BTextControl* parent)
+	: fParent(parent),
+	  fFrame()
+{
+}
+
+
+bool
+BTextControl::LabelLayoutItem::IsVisible()
+{
+	return !fParent->IsHidden(fParent);
+}
+
+
+void
+BTextControl::LabelLayoutItem::SetVisible(bool visible)
+{
+	// not allowed
+}
+
+
+BRect
+BTextControl::LabelLayoutItem::Frame()
+{
+	return fFrame;
+}
+
+
+void
+BTextControl::LabelLayoutItem::SetFrame(BRect frame)
+{
+	fFrame = frame;
+	fParent->_UpdateFrame();
+}
+
+
+BView*
+BTextControl::LabelLayoutItem::View()
+{
+	return fParent;
+}
+
+
+BSize
+BTextControl::LabelLayoutItem::BaseMinSize()
+{
+// TODO: Cache the info. Might be too expensive for this call.
+	const char* label = fParent->Label();
+	if (!label)
+		return BSize(-1, -1);
+
+	BSize size;
+	fParent->GetPreferredSize(NULL, &size.height);
+
+	size.width = fParent->StringWidth(label) + 2 * 3 - 1;
+
+	return size;
+}
+
+
+BSize
+BTextControl::LabelLayoutItem::BaseMaxSize()
+{
+	return BaseMinSize();
+}
+
+
+BSize
+BTextControl::LabelLayoutItem::BasePreferredSize()
+{
+	return BaseMinSize();
+}
+
+
+BAlignment
+BTextControl::LabelLayoutItem::BaseAlignment()
+{
+	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+}
+
+
+// #pragma mark -
+
+
+BTextControl::TextViewLayoutItem::TextViewLayoutItem(BTextControl* parent)
+	: fParent(parent),
+	  fFrame()
+{
+}
+
+
+bool
+BTextControl::TextViewLayoutItem::IsVisible()
+{
+	return !fParent->IsHidden(fParent);
+}
+
+
+void
+BTextControl::TextViewLayoutItem::SetVisible(bool visible)
+{
+	// not allowed
+}
+
+
+BRect
+BTextControl::TextViewLayoutItem::Frame()
+{
+	return fFrame;
+}
+
+
+void
+BTextControl::TextViewLayoutItem::SetFrame(BRect frame)
+{
+	fFrame = frame;
+	fParent->_UpdateFrame();
+}
+
+
+BView*
+BTextControl::TextViewLayoutItem::View()
+{
+	return fParent;
+}
+
+
+BSize
+BTextControl::TextViewLayoutItem::BaseMinSize()
+{
+// TODO: Cache the info. Might be too expensive for this call.
+	BSize size;
+	fParent->GetPreferredSize(NULL, &size.height);
+
+	// mmh, some arbitrary minimal width
+	size.width = 30;
+
+	return size;
+}
+
+
+BSize
+BTextControl::TextViewLayoutItem::BaseMaxSize()
+{
+	BSize size(BaseMinSize());
+	size.width = B_SIZE_UNLIMITED;
+	return size;
+}
+
+
+BSize
+BTextControl::TextViewLayoutItem::BasePreferredSize()
+{
+	BSize size(BaseMinSize());
+	// puh, no idea...
+	size.width = 100;
+	return size;
+}
+
+
+BAlignment
+BTextControl::TextViewLayoutItem::BaseAlignment()
+{
+	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+}
+

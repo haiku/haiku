@@ -28,6 +28,7 @@ extern const std::string kApplicationDatabaseDir;
 // Attribute Prefixes
 extern const char *kMiniIconAttrPrefix;
 extern const char *kLargeIconAttrPrefix; 
+extern const char *kIconAttrPrefix; 
 	
 // Attribute names
 extern const char *kFileTypeAttr;
@@ -39,6 +40,7 @@ extern const char *kLongDescriptionAttr;
 extern const char *kFileExtensionsAttr;
 extern const char *kMiniIconAttr;
 extern const char *kLargeIconAttr;
+extern const char *kIconAttr;
 extern const char *kPreferredAppAttr;
 extern const char *kSnifferRuleAttr;
 extern const char *kSupportedTypesAttr;
@@ -53,6 +55,7 @@ extern const int32 kLongDescriptionType;
 extern const int32 kFileExtensionsType;
 extern const int32 kMiniIconType;
 extern const int32 kLargeIconType;
+extern const int32 kIconType;
 extern const int32 kPreferredAppType;
 extern const int32 kSnifferRuleType;
 extern const int32 kSupportedTypesType;

@@ -2,9 +2,14 @@ SubDir HAIKU_TOP src kits storage ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
+UseLibraryHeaders icon ;
+
 UsePrivateHeaders shared app kernel storage ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UseArchHeaders $(TARGET_ARCH) ;
+
+# for libbe_test
+UsePublicHeaders [ FDirName add-ons registrar ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;

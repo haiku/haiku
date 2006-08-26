@@ -52,6 +52,10 @@ public:
 							BMessage *message,
 							uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 							uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+					BButton(const char* name, const char* label,
+							BMessage *message,
+							uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+					BButton(const char* label, BMessage *message);
 	
 virtual				~BButton();
 
@@ -91,6 +95,9 @@ virtual BHandler	*ResolveSpecifier(BMessage *message,
 									const char *property);
 virtual	status_t	GetSupportedSuites(BMessage *message);
 virtual status_t	Perform(perform_code d, void *arg);
+
+virtual	BSize		MaxSize();
+
 
 private:
 	

@@ -2136,7 +2136,7 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 	if (result != B_OK)
 		return result;
 
-	// make desktop fInvisible
+	// make desktop invisible
 	PoseInfo poseInfo;
 	poseInfo.fInvisible = true;
 	poseInfo.fInitedDirectory = -1LL;
@@ -2154,6 +2154,12 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 
 	if (data)
 		deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+
+	data = GetTrackerResources()->
+		LoadResource(B_RAW_TYPE, kResDeskIcon, &size);
+
+	if (data)
+		deskDir->WriteAttr(kAttrIcon, B_RAW_TYPE, 0, data, size);
 
 	return B_OK;
 }
@@ -2649,6 +2655,12 @@ FSCreateTrashDirs()
 				LoadResource('MICN', kResTrashIcon, &size);
 			if (data) {
 				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0,
+					data, size);
+			}
+			data = GetTrackerResources()->
+				LoadResource(B_RAW_TYPE, kResTrashIcon, &size);
+			if (data) {
+				trashDir.WriteAttr(kAttrIcon, B_RAW_TYPE, 0,
 					data, size);
 			}
 		}

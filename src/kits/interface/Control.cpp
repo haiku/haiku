@@ -283,6 +283,7 @@ BControl::SetLabel(const char *label)
 	free(fLabel);
 	fLabel = label ? strdup(label) : NULL;
 
+	InvalidateLayout();
 	Invalidate();
 }
 

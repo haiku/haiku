@@ -5,16 +5,68 @@
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 #include <stdlib.h>
 #include <string.h>
 
+#include <AbstractLayoutItem.h>
+#include <LayoutUtils.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <Message.h>
 #include <BMCPrivate.h>
 #include <Window.h>
+
+
+class BMenuField::LabelLayoutItem : public BAbstractLayoutItem {
+public:
+								LabelLayoutItem(BMenuField* parent);
+
+	virtual	bool				IsVisible();
+	virtual	void				SetVisible(bool visible);
+
+	virtual	BRect				Frame();
+	virtual	void				SetFrame(BRect frame);
+
+	virtual	BView*				View();
+
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
+
+private:
+			BMenuField*			fParent;
+			BRect				fFrame;
+};
+
+
+class BMenuField::MenuBarLayoutItem : public BAbstractLayoutItem {
+public:
+								MenuBarLayoutItem(BMenuField* parent);
+
+	virtual	bool				IsVisible();
+	virtual	void				SetVisible(bool visible);
+
+	virtual	BRect				Frame();
+	virtual	void				SetFrame(BRect frame);
+
+	virtual	BView*				View();
+
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
+
+private:
+			BMenuField*			fParent;
+			BRect				fFrame;
+};
+
+
+// #pragma mark -
 
 
 static float kVMargin = 2.0f;
@@ -25,19 +77,9 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 	: BView(frame, name, resize, flags)
 {
 	InitObject(label);
-	SetFont(be_plain_font);
-	fMenu = menu;
-	InitMenu(menu);
 
 	frame.OffsetTo(B_ORIGIN);
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
-		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
-		false, this);
-
-	AddChild(fMenuBar);
-	fMenuBar->AddItem(menu);
-
-	fMenuBar->SetFont(be_plain_font);
+	_InitMenuBar(menu, frame, false);
 
 	InitObject2();
 }
@@ -48,21 +90,37 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 	: BView(frame, name, resize, flags)
 {
 	InitObject(label);
-	SetFont(be_plain_font);
-	fMenu = menu;
-	InitMenu(menu);
 
 	fFixedSizeMB = fixedSize;
 
 	frame.OffsetTo(B_ORIGIN);
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
-		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
-		fixedSize, this);
+	_InitMenuBar(menu, frame, fixedSize);
 
-	AddChild(fMenuBar);
-	fMenuBar->AddItem(menu);
+	InitObject2();
+}
 
-	fMenuBar->SetFont(be_plain_font);
+
+BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
+					   BMessage* message, uint32 flags)
+	: BView(BRect(0, 0, -1, -1), name, B_FOLLOW_NONE,
+			flags | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+{
+	InitObject(label);
+
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), false);
+
+	InitObject2();
+}
+
+
+BMenuField::BMenuField(const char* label,
+					   BMenu* menu, BMessage* message)
+	: BView(BRect(0, 0, -1, -1), NULL, B_FOLLOW_NONE,
+			B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+{
+	InitObject(label);
+
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), false);
 
 	InitObject2();
 }
@@ -371,6 +429,8 @@ BMenuField::SetLabel(const char *label)
 		if (fLabel)
 			fStringWidth = StringWidth(fLabel);
 	}
+
+	InvalidateLayout();
 }
 
 
@@ -430,8 +490,23 @@ BMenuField::SetDivider(float divider)
 
 	fDivider = divider;
 
-	MenuBar()->MoveBy(-dx, 0.0f);
-	MenuBar()->ResizeBy(dx, 0.0f);
+	BRect dirty(fMenuBar->Frame());
+
+	fMenuBar->MoveTo(fDivider + 1, kVMargin);
+
+	if (fFixedSizeMB) {
+		fMenuBar->ResizeTo(Bounds().Width() - fDivider + 1 - 2,
+						   dirty.Height());
+	}
+
+	dirty = dirty | fMenuBar->Frame();
+
+	dirty.left -= 1;
+	dirty.top -= 1;
+	dirty.right += 2;
+	dirty.bottom += 2;
+
+	Invalidate(dirty);
 }
 
 
@@ -525,6 +600,24 @@ BMenuField::GetPreferredSize(float *_width, float *_height)
 }
 
 
+BLayoutItem*
+BMenuField::CreateLabelLayoutItem()
+{
+	if (!fLabelLayoutItem)
+		fLabelLayoutItem = new LabelLayoutItem(this);
+	return fLabelLayoutItem;
+}
+
+
+BLayoutItem*
+BMenuField::CreateMenuBarLayoutItem()
+{
+	if (!fMenuBarLayoutItem)
+		fMenuBarLayoutItem = new MenuBarLayoutItem(this);
+	return fMenuBarLayoutItem;
+}
+
+
 status_t
 BMenuField::Perform(perform_code d, void *arg)
 {
@@ -557,6 +650,8 @@ BMenuField::InitObject(const char *label)
 	fTransition = false;
 	fFixedSizeMB = false;
 	fMenuTaskID = -1;
+	fLabelLayoutItem = NULL;
+	fMenuBarLayoutItem = NULL;
 
 	SetLabel(label);
 
@@ -660,5 +755,208 @@ BMenuField::MenuTask(void *arg)
 	}
 
 	return 0;
+}
+
+
+void
+BMenuField::_UpdateFrame()
+{
+	if (fLabelLayoutItem && fMenuBarLayoutItem) {
+		BRect labelFrame = fLabelLayoutItem->Frame();
+		BRect menuFrame = fMenuBarLayoutItem->Frame();
+		MoveTo(labelFrame.left, labelFrame.top);
+		ResizeTo(menuFrame.left + menuFrame.Width() - labelFrame.left,
+			menuFrame.top + menuFrame.Height() - labelFrame.top);
+		SetDivider(menuFrame.left - labelFrame.left);
+	}
+}
+
+
+void
+BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
+{
+	fMenu = menu;
+	InitMenu(menu);
+
+	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
+		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
+		fixedSize, this);
+
+	AddChild(fMenuBar);
+	fMenuBar->AddItem(menu);
+
+	fMenuBar->SetFont(be_plain_font);
+}
+
+
+// #pragma mark -
+
+
+BMenuField::LabelLayoutItem::LabelLayoutItem(BMenuField* parent)
+	: fParent(parent),
+	  fFrame()
+{
+}
+
+
+bool
+BMenuField::LabelLayoutItem::IsVisible()
+{
+	return !fParent->IsHidden(fParent);
+}
+
+
+void
+BMenuField::LabelLayoutItem::SetVisible(bool visible)
+{
+	// not allowed
+}
+
+
+BRect
+BMenuField::LabelLayoutItem::Frame()
+{
+	return fFrame;
+}
+
+
+void
+BMenuField::LabelLayoutItem::SetFrame(BRect frame)
+{
+	fFrame = frame;
+	fParent->_UpdateFrame();
+}
+
+
+BView*
+BMenuField::LabelLayoutItem::View()
+{
+	return fParent;
+}
+
+
+BSize
+BMenuField::LabelLayoutItem::BaseMinSize()
+{
+// TODO: Cache the info. Might be too expensive for this call.
+	const char* label = fParent->Label();
+	if (!label)
+		return BSize(-1, -1);
+
+	BSize size;
+	fParent->GetPreferredSize(NULL, &size.height);
+
+	size.width = fParent->StringWidth(label) + 2 * 3 - 1;
+
+	return size;
+}
+
+
+BSize
+BMenuField::LabelLayoutItem::BaseMaxSize()
+{
+	return BaseMinSize();
+}
+
+
+BSize
+BMenuField::LabelLayoutItem::BasePreferredSize()
+{
+	return BaseMinSize();
+}
+
+
+BAlignment
+BMenuField::LabelLayoutItem::BaseAlignment()
+{
+	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+}
+
+
+// #pragma mark -
+
+
+BMenuField::MenuBarLayoutItem::MenuBarLayoutItem(BMenuField* parent)
+	: fParent(parent),
+	  fFrame()
+{
+}
+
+
+bool
+BMenuField::MenuBarLayoutItem::IsVisible()
+{
+	return !fParent->IsHidden(fParent);
+}
+
+
+void
+BMenuField::MenuBarLayoutItem::SetVisible(bool visible)
+{
+	// not allowed
+}
+
+
+BRect
+BMenuField::MenuBarLayoutItem::Frame()
+{
+	return fFrame;
+}
+
+
+void
+BMenuField::MenuBarLayoutItem::SetFrame(BRect frame)
+{
+	fFrame = frame;
+	fParent->_UpdateFrame();
+}
+
+
+BView*
+BMenuField::MenuBarLayoutItem::View()
+{
+	return fParent;
+}
+
+
+BSize
+BMenuField::MenuBarLayoutItem::BaseMinSize()
+{
+// TODO: Cache the info. Might be too expensive for this call.
+	BSize size;
+	fParent->fMenuBar->GetPreferredSize(&size.width, &size.height);
+
+	// BMenuField draws additional lines around BMenuBar,
+	// one line on left and top side, two on right and bottom
+	size.width += 3;
+	size.height += 3;
+
+	return size;
+}
+
+
+BSize
+BMenuField::MenuBarLayoutItem::BaseMaxSize()
+{
+	BSize size(BaseMinSize());
+	size.width = B_SIZE_UNLIMITED;
+	return size;
+}
+
+
+BSize
+BMenuField::MenuBarLayoutItem::BasePreferredSize()
+{
+	BSize size(BaseMinSize());
+	// puh, no idea...
+	size.width = 100;
+	return size;
+}
+
+
+BAlignment
+BMenuField::MenuBarLayoutItem::BaseAlignment()
+{
+	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 }
 

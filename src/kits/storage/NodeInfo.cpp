@@ -16,6 +16,7 @@
 #include <MimeTypes.h>
 #include <Bitmap.h>
 #include <Entry.h>
+#include <IconUtils.h>
 #include <Node.h>
 #include <Path.h>
 #include <Rect.h>
@@ -32,6 +33,7 @@ static const char *kNIPreferredAppAttribute	= NI_BEOS ":PREF_APP";
 static const char *kNIAppHintAttribute		= NI_BEOS ":PPATH";
 static const char *kNIMiniIconAttribute		= NI_BEOS ":M:STD_ICON";
 static const char *kNILargeIconAttribute	= NI_BEOS ":L:STD_ICON";
+static const char *kNIIconAttribute			= NI_BEOS ":ICON";
 
 
 /*!	\brief Creates an uninitialized BNodeInfo object.
@@ -225,81 +227,88 @@ BNodeInfo::SetType(const char *type)
 status_t
 BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 {
-	status_t error = B_OK;
-	// set some icon size related variables
-	const char *attribute = NULL;
-	BRect bounds;
-	uint32 attrType = 0;
-	size_t attrSize = 0;
-	switch (k) {
-		case B_MINI_ICON:
-			attribute = kNIMiniIconAttribute;
-			bounds.Set(0, 0, 15, 15);
-			attrType = B_MINI_ICON_TYPE;
-			attrSize = 16 * 16;
-			break;
-		case B_LARGE_ICON:
-			attribute = kNILargeIconAttribute;
-			bounds.Set(0, 0, 31, 31);
-			attrType = B_LARGE_ICON_TYPE;
-			attrSize = 32 * 32;
-			break;
-		default:
-			error = B_BAD_VALUE;
-			break;
-	}
+	const char* iconAttribute = kNIIconAttribute;
+	const char* miniIconAttribute = kNIMiniIconAttribute;
+	const char* largeIconAttribute = kNILargeIconAttribute;
 
-	// check parameter and initialization
-	if (error == B_OK
-		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
-		error = B_BAD_VALUE;
-	}
-	if (error == B_OK && InitCheck() != B_OK)
-		error = B_NO_INIT;
+	return BIconUtils::GetIcon(fNode, iconAttribute, miniIconAttribute,
+							   largeIconAttribute, k, icon);
 
-	// get the attribute info and check type and size of the attr contents
-	attr_info attrInfo;
-	if (error == B_OK)
-		error = fNode->GetAttrInfo(attribute, &attrInfo);
-	if (error == B_OK && attrInfo.type != attrType)
-		error = B_BAD_TYPE;
-	if (error == B_OK && attrInfo.size != attrSize)
-		error = B_BAD_DATA;
-
-	// read the attribute
-	if (error == B_OK) {
-		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		char *buffer = NULL;
-		ssize_t read;
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			buffer = new(nothrow) char[attrSize];
-			if (!buffer)
-				error = B_NO_MEMORY;
-			if (error == B_OK) {
-				read = fNode->ReadAttr(attribute, attrType, 0, buffer,
-									   attrSize);
-			}
-		} else {
-			read = fNode->ReadAttr(attribute, attrType, 0, icon->Bits(), 
-								   attrSize);
-		}
-		if (error == B_OK) {
-			if (read < 0)
-				error = read;
-			else if (read != attrInfo.size)
-				error = B_ERROR;
-		}
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			if (error == B_OK) {
-				error = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
-										 0, B_CMAP8);
-			}
-			delete[] buffer;
-		}
-	}
-	return error;
+//	status_t error = B_OK;
+//	// set some icon size related variables
+//	const char *attribute = NULL;
+//	BRect bounds;
+//	uint32 attrType = 0;
+//	size_t attrSize = 0;
+//	switch (k) {
+//		case B_MINI_ICON:
+//			attribute = kNIMiniIconAttribute;
+//			bounds.Set(0, 0, 15, 15);
+//			attrType = B_MINI_ICON_TYPE;
+//			attrSize = 16 * 16;
+//			break;
+//		case B_LARGE_ICON:
+//			attribute = kNILargeIconAttribute;
+//			bounds.Set(0, 0, 31, 31);
+//			attrType = B_LARGE_ICON_TYPE;
+//			attrSize = 32 * 32;
+//			break;
+//		default:
+//			error = B_BAD_VALUE;
+//			break;
+//	}
+//
+//	// check parameter and initialization
+//	if (error == B_OK
+//		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
+//		error = B_BAD_VALUE;
+//	}
+//	if (error == B_OK && InitCheck() != B_OK)
+//		error = B_NO_INIT;
+//
+//	// get the attribute info and check type and size of the attr contents
+//	attr_info attrInfo;
+//	if (error == B_OK)
+//		error = fNode->GetAttrInfo(attribute, &attrInfo);
+//	if (error == B_OK && attrInfo.type != attrType)
+//		error = B_BAD_TYPE;
+//	if (error == B_OK && attrInfo.size != attrSize)
+//		error = B_BAD_DATA;
+//
+//	// read the attribute
+//	if (error == B_OK) {
+//		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
+//		char *buffer = NULL;
+//		ssize_t read;
+//		if (otherColorSpace) {
+//			// other color space than stored in attribute
+//			buffer = new(nothrow) char[attrSize];
+//			if (!buffer)
+//				error = B_NO_MEMORY;
+//			if (error == B_OK) {
+//				read = fNode->ReadAttr(attribute, attrType, 0, buffer,
+//									   attrSize);
+//			}
+//		} else {
+//			read = fNode->ReadAttr(attribute, attrType, 0, icon->Bits(), 
+//								   attrSize);
+//		}
+//		if (error == B_OK) {
+//			if (read < 0)
+//				error = read;
+//			else if (read != attrInfo.size)
+//				error = B_ERROR;
+//		}
+//		if (otherColorSpace) {
+//			// other color space than stored in attribute
+//			if (error == B_OK) {
+//				error = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
+//										 0, B_CMAP8);
+//			}
+//			delete[] buffer;
+//		}
+//	}
+//	return error;
 }
 
 // SetIcon
@@ -615,6 +624,9 @@ BNodeInfo::SetAppHint(const entry_ref *ref)
 status_t 
 BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 {
+	if (!icon)
+		return B_BAD_VALUE;
+
 	// set some icon size related variables
 	status_t error = B_OK;
 	BRect bounds;
@@ -626,13 +638,15 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 			bounds.Set(0, 0, 31, 31);
 			break;
 		default:
-			error = B_BAD_VALUE;
+//			error = B_BAD_VALUE;
+			// NOTE: added to be less strict and support scaled icons
+			bounds = icon->Bounds();
 			break;
 	}
 
 	// check parameters and initialization
 	if (error == B_OK
-		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
+		&& (icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
 		error = B_BAD_VALUE;
 	}
 	if (error == B_OK && InitCheck() != B_OK)

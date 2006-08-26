@@ -15,6 +15,9 @@
 
 #include "defines.h"
 
+#include <agg_conv_curve.h>
+#include <agg_path_storage.h>
+
 #include <Font.h>
 #include <Rect.h>
 
@@ -147,6 +150,9 @@ class Painter {
 												float yRadius) const;
 
 								// ellipses
+			void				AlignEllipseRect(BRect* rect,
+												 bool filled) const;
+
 			BRect				DrawEllipse(	BRect r,
 												bool filled) const;
 
@@ -260,6 +266,8 @@ class Painter {
 	renderer_bin_type*			fRendererBin;
 
 	agg::line_profile_aa		fLineProfile;
+mutable agg::path_storage		fPath;
+mutable agg::conv_curve<agg::path_storage> fCurve;
 
 	// for internal coordinate rounding/transformation
 	bool						fSubpixelPrecise;

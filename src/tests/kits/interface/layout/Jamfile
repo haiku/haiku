@@ -1,2 +1,15 @@
 SubDir HAIKU_TOP src tests kits interface layout ;
 
+SetSubDirSupportedPlatforms haiku libbe_test ;
+
+SimpleTest LayoutTest1 :
+	LayoutTest1.cpp
+	:
+	be
+;
+
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : LayoutTest1
+		: tests!apps ;
+}

@@ -9,8 +9,10 @@
 /**	BStringView draw a non-editable text string */
 
 
-#include <Message.h>
 #include <StringView.h>
+
+#include <LayoutUtils.h>
+#include <Message.h>
 #include <View.h>
 #include <Window.h>
 
@@ -262,6 +264,16 @@ status_t
 BStringView::GetSupportedSuites(BMessage* message)
 {
 	return BView::GetSupportedSuites(message);
+}
+
+
+BSize
+BStringView::MaxSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
 }
 
 

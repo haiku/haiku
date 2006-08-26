@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,11 +9,13 @@
 #define	_VIEW_H
 
 
+#include <Alignment.h>
 #include <BeBuild.h>
 #include <Font.h>
 #include <Handler.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
+#include <Size.h>
 
 
 // mouse button
@@ -74,6 +76,8 @@ const uint32 B_SUBPIXEL_PRECISE 		= 0x01000000UL;	/* 24 */
 const uint32 B_DRAW_ON_CHILDREN 		= 0x00800000UL;	/* 23 */
 const uint32 B_INPUT_METHOD_AWARE 		= 0x00400000UL;	/* 23 */
 const uint32 _B_RESERVED7_ 				= 0x00200000UL;	/* 22 */
+const uint32 B_SUPPORTS_LAYOUT			= 0x00100000UL;	/* 21 */
+const uint32 B_INVALIDATE_AFTER_LAYOUT	= 0x00080000UL;	/* 20 */
 
 #define _RESIZE_MASK_ ~(B_FULL_UPDATE_ON_RESIZE | _B_RESERVED1_ | B_WILL_DRAW \
 	| B_PULSE_NEEDED | B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_NAVIGABLE \
@@ -104,6 +108,9 @@ inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 
 class BBitmap;
 class BCursor;
+class BLayout;
+class BLayoutContext;
+class BLayoutItem;
 class BMessage;
 class BPicture;
 class BPolygon;
@@ -125,6 +132,8 @@ namespace BPrivate {
 
 class BView : public BHandler {
 public:
+							BView(const char* name, uint32 flags,
+								BLayout* layout = NULL);
 							BView(BRect frame, const char* name,
 								  uint32 resizeMask, uint32 flags);
 	virtual					~BView();
@@ -141,6 +150,7 @@ public:
 	virtual	void			MessageReceived(BMessage* msg);
 
 			void			AddChild(BView* child, BView* before = NULL);
+			bool			AddChild(BLayoutItem* child);
 			bool			RemoveChild(BView* child);
 			int32			CountChildren() const;
 			BView*			ChildAt(int32 index) const;
@@ -490,31 +500,64 @@ public:
 
 			bool			IsPrinting() const;
 			void			SetScale(float scale) const;
+			float			Scale() const;
+								// new for Haiku
 
-// Private or reserved ---------------------------------------------------------
 	virtual status_t		Perform(perform_code d, void* arg);
 
 	virtual	void			DrawAfterChildren(BRect r);
 
-			float			Scale() const;
-								// new for Haiku
+
+			// layout related
+
+	virtual	BSize			MinSize();
+	virtual	BSize			MaxSize();
+	virtual	BSize			PreferredSize();
+	virtual	BAlignment		Alignment();
+
+			void			SetExplicitMinSize(BSize size);
+			void			SetExplicitMaxSize(BSize size);
+			void			SetExplicitPreferredSize(BSize size);
+			void			SetExplicitAlignment(BAlignment alignment);
+
+			BSize			ExplicitMinSize() const;
+			BSize			ExplicitMaxSize() const;
+			BSize			ExplicitPreferredSize() const;
+			BAlignment		ExplicitAlignment() const;
+
+	virtual	bool			HasHeightForWidth();
+	virtual	void			GetHeightForWidth(float width, float* min,
+								float* max, float* preferred);
+
+	virtual	void			SetLayout(BLayout* layout);
+			BLayout*		GetLayout() const;
+
+			void			InvalidateLayout(bool descendants = false);
+			void			EnableLayoutInvalidation();
+			void			DisableLayoutInvalidation();
+
+			BLayoutContext*	LayoutContext() const;
+
+			void			Layout(bool force);
+			void			Relayout();
+
+protected:
+	virtual	void			DoLayout();
 
 private:
-	friend class BScrollBar;
-	friend class BWindow;
+			void			_Layout(bool force, BLayoutContext* context);
+
+private:
+	struct LayoutData;
+
 	friend class BBitmap;
+	friend class BLayout;
 	friend class BPrintJob;
+	friend class BScrollBar;
 	friend class BShelf;
 	friend class BTabView;
+	friend class BWindow;
 
-	virtual	void			_ReservedView2();
-	virtual	void			_ReservedView3();
-	virtual	void			_ReservedView4();
-	virtual	void			_ReservedView5();
-	virtual	void			_ReservedView6();
-	virtual	void			_ReservedView7();
-	virtual	void			_ReservedView8();
-	virtual	void			_ReservedView9();
 	virtual	void			_ReservedView10();
 	virtual	void			_ReservedView11();
 	virtual	void			_ReservedView12();
@@ -571,6 +614,9 @@ private:
 			bool			_AddChildToList(BView* child, BView* before = NULL);
 			bool			_RemoveChildFromList(BView* child);
 
+			bool			_AddChild(BView *child, BView *before);
+			bool			_RemoveSelf();
+
 			// Debugging methods
 			void 			PrintToStream();
 			void			PrintTree();
@@ -601,7 +647,10 @@ private:
 			BShelf*			fShelf;
 			uint32			fEventMask;
 			uint32			fEventOptions;
-			uint32			_reserved[9];
+
+			LayoutData*		fLayoutData;
+
+			uint32			_reserved[8];
 };
 
 

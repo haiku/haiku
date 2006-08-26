@@ -1150,6 +1150,23 @@ FrameMoved(origin);
 			break;
 		}
 
+		case B_LAYOUT_WINDOW:
+		{
+			if (fFlags & B_AUTO_UPDATE_SIZE_LIMITS) {
+				// Get min/max constraints of the top view and enforce window
+				// size limits respectively.
+				BSize minSize = fTopView->MinSize();
+				BSize maxSize = fTopView->MaxSize();
+				SetSizeLimits(minSize.width, maxSize.width,
+					minSize.height, maxSize.height);
+			}
+
+			// do the actual layout
+			fTopView->Layout(false);
+
+			break;
+		}
+
 		default:
 			BLooper::DispatchMessage(msg, target); 
 			break;
@@ -2211,6 +2228,27 @@ thread_id
 BWindow::Run()
 {
 	return BLooper::Run();
+}
+
+
+void
+BWindow::SetLayout(BLayout* layout)
+{
+	fTopView->SetLayout(layout);
+}
+
+
+BLayout*
+BWindow::GetLayout() const
+{
+	return fTopView->GetLayout();
+}
+
+
+void
+BWindow::InvalidateLayout(bool descendants)
+{
+	fTopView->InvalidateLayout(descendants);
 }
 
 

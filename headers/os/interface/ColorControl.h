@@ -33,6 +33,8 @@ class BColorControl : public BControl {
 		static BArchivable*	Instantiate(BMessage* archive);
 		virtual status_t	Archive(BMessage* archive, bool deep = true) const;
 
+		virtual void		SetLayout(BLayout* layout);
+
 		virtual void		SetValue(int32 color_value);
 		void				SetValue(rgb_color color);
 		rgb_color			ValueAsColor();

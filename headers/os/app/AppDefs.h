@@ -50,6 +50,7 @@ enum {
 	B_KEY_UP 					= '_KYU',
 	B_UNMAPPED_KEY_DOWN 		= '_UKD',
 	B_UNMAPPED_KEY_UP 			= '_UKU',
+	B_LAYOUT_WINDOW				= '_LAY',
 	B_MODIFIERS_CHANGED			= '_MCH',
 	B_MINIMIZE					= '_WMN',
 	B_MOUSE_DOWN 				= '_MDN',

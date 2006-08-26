@@ -43,8 +43,8 @@ public:
 /* Adding and removing items. */
 	bool AddItem(void *item, int32 index);
 	bool AddItem(void *item);
-	bool AddList(BList *list, int32 index);
-	bool AddList(BList *list);
+	bool AddList(const BList *list, int32 index);
+	bool AddList(const BList *list);
 	bool RemoveItem(void *item);
 	void *RemoveItem(int32 index);
 	bool RemoveItems(int32 index, int32 count);

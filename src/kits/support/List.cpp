@@ -120,7 +120,7 @@ BList::AddItem(void *item)
 
 // AddList
 bool
-BList::AddList(BList *list, int32 index)
+BList::AddList(const BList *list, int32 index)
 {
 	bool result = (list && index >= 0 && index <= fItemCount);
 	if (result && list->fItemCount > 0) {
@@ -138,7 +138,7 @@ BList::AddList(BList *list, int32 index)
 
 // AddList
 bool
-BList::AddList(BList *list)
+BList::AddList(const BList *list)
 {
 	bool result = (list != NULL);
 	if (result && list->fItemCount > 0) {
@@ -399,6 +399,24 @@ BList::DoForEach(bool (*func)(void *, void*), void * arg)
 			index++;
 		};
 	}
+}
+
+
+// obsolete AddList(BList* list, int32 index) and AddList(BList* list)
+
+// AddList
+extern "C" bool
+AddList__5BListP5BListl(BList* self, BList* list, int32 index)
+{
+	return self->AddList((const BList*)list, index);
+}
+
+
+// AddList
+extern "C" bool
+AddList__5BListP5BList(BList* self, BList* list)
+{
+	return self->AddList((const BList*)list);
 }
 
 

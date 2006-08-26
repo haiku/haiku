@@ -74,7 +74,11 @@ Painter::Painter()
 	  fRasterizer(NULL),
 	  fRenderer(NULL),
 	  fRendererBin(NULL),
+
 	  fLineProfile(),
+	  fPath(),
+	  fCurve(fPath),
+
 	  fSubpixelPrecise(false),
 
 	  fPenSize(1.0),
@@ -358,11 +362,28 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		b.y += 0.5;
 	}
 	
-	agg::path_storage path;
-	path.move_to(a.x, a.y);
-	path.line_to(b.x, b.y);
+	fPath.remove_all();
 
-	touched = _StrokePath(path);
+	if (a == b) {
+		// special case dots
+		fPath.move_to(a.x, a.y);
+		fPath.line_to(a.x + 1, a.y);
+		fPath.line_to(a.x + 1, a.y + 1);
+		fPath.line_to(a.x, a.y + 1);
+
+		touched = _FillPath(fPath);
+	} else {
+		// do the pixel center offset here
+		a.x += 0.5;
+		a.y += 0.5;
+		b.x += 0.5;
+		b.y += 0.5;
+	
+		fPath.move_to(a.x, a.y);
+		fPath.line_to(b.x, b.y);
+
+		touched = _StrokePath(fPath);
+	}
 
 	return _Clipped(touched);
 }
@@ -458,23 +479,24 @@ Painter::DrawPolygon(BPoint* p, int32 numPts,
 
 	if (numPts > 0) {
 
-		agg::path_storage path;
+		fPath.remove_all();
+
 		_Transform(p);
-		path.move_to(p->x, p->y);
+		fPath.move_to(p->x, p->y);
 
 		for (int32 i = 1; i < numPts; i++) {
 			p++;
 			_Transform(p);
-			path.line_to(p->x, p->y);
+			fPath.line_to(p->x, p->y);
 		}
 
 		if (closed)
-			path.close_polygon();
+			fPath.close_polygon();
 
 		if (filled)
-			return _FillPath(path);
+			return _FillPath(fPath);
 		else
-			return _StrokePath(path);
+			return _StrokePath(fPath);
 	}
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
@@ -485,26 +507,24 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 {
 	CHECK_CLIPPING
 
-	agg::path_storage curve;
+	fPath.remove_all();
 
 	_Transform(&(p[0]));
 	_Transform(&(p[1]));
 	_Transform(&(p[2]));
 	_Transform(&(p[3]));
 
-	curve.move_to(p[0].x, p[0].y);
-	curve.curve4(p[1].x, p[1].y,
+	fPath.move_to(p[0].x, p[0].y);
+	fPath.curve4(p[1].x, p[1].y,
 				 p[2].x, p[2].y,
 				 p[3].x, p[3].y);
 
 
-	agg::conv_curve<agg::path_storage> path(curve);
-
 	if (filled) {
-		curve.close_polygon();
-		return _FillPath(path);
+		fPath.close_polygon();
+		return _FillPath(fCurve);
 	} else {
-		return _StrokePath(path);
+		return _StrokePath(fCurve);
 	}
 }
 
@@ -526,18 +546,18 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 	// TODO: if shapes are ever used more heavily in Haiku,
 	// it would be nice to use BShape data directly (write
 	// an AGG "VertexSource" adaptor)
-	agg::path_storage path;
+	fPath.remove_all();
 	for (int32 i = 0; i < opCount; i++) {
 		uint32 op = opList[i] & 0xFF000000;
 		if (op & OP_MOVETO) {
-			path.move_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
+			fPath.move_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
 			points++;
 		}
 
 		if (op & OP_LINETO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count--) {
-				path.line_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
+				fPath.line_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
 				points++;
 			}
 		}
@@ -545,23 +565,22 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		if (op & OP_BEZIERTO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count) {
-				path.curve4(points[0].x + fPenLocation.x, points[0].y + fPenLocation.y,
-							points[1].x + fPenLocation.x, points[1].y + fPenLocation.y,
-							points[2].x + fPenLocation.x, points[2].y + fPenLocation.y);
+				fPath.curve4(points[0].x + fPenLocation.x, points[0].y + fPenLocation.y,
+							 points[1].x + fPenLocation.x, points[1].y + fPenLocation.y,
+							 points[2].x + fPenLocation.x, points[2].y + fPenLocation.y);
 				points += 3;
 				count -= 3;
 			}
 		}
 
 		if (op & OP_CLOSE)
-			path.close_polygon();
+			fPath.close_polygon();
 	}
 
-	agg::conv_curve<agg::path_storage> curve(path);
 	if (filled)
-		return _FillPath(curve);
+		return _FillPath(fCurve);
 	else
-		return _StrokePath(curve);
+		return _StrokePath(fCurve);
 }
 
 // StrokeRect
@@ -601,19 +620,19 @@ Painter::StrokeRect(const BRect& r) const
 		b.y += 0.5;
 	}
 
-	agg::path_storage path;
-	path.move_to(a.x, a.y);
+	fPath.remove_all();
+	fPath.move_to(a.x, a.y);
 	if (a.x == b.x || a.y == b.y) {
 		// special case rects with one pixel height or width
-		path.line_to(b.x, b.y);
+		fPath.line_to(b.x, b.y);
 	} else {
-		path.line_to(b.x, a.y);
-		path.line_to(b.x, b.y);
-		path.line_to(a.x, b.y);
+		fPath.line_to(b.x, a.y);
+		fPath.line_to(b.x, b.y);
+		fPath.line_to(a.x, b.y);
 	}
-	path.close_polygon();
+	fPath.close_polygon();
 
-	return _StrokePath(path);
+	return _StrokePath(fPath);
 }
 
 // StrokeRect
@@ -678,14 +697,14 @@ Painter::FillRect(const BRect& r) const
 	b.x += 1.0;
 	b.y += 1.0;
 
-	agg::path_storage path;
-	path.move_to(a.x, a.y);
-	path.line_to(b.x, a.y);
-	path.line_to(b.x, b.y);
-	path.line_to(a.x, b.y);
-	path.close_polygon();
+	fPath.remove_all();
+	fPath.move_to(a.x, a.y);
+	fPath.line_to(b.x, a.y);
+	fPath.line_to(b.x, b.y);
+	fPath.line_to(a.x, b.y);
+	fPath.close_polygon();
 
-	return _FillPath(path);
+	return _FillPath(fPath);
 }
 
 // FillRect
@@ -810,7 +829,7 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		// make the inner rect work as a hole
 		fRasterizer->filling_rule(agg::fill_even_odd);
 
-		if (fPenSize > 4)
+		if (fPenSize > 2)
 			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
 		else
 			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
@@ -845,24 +864,31 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 
 	return _FillPath(rect);
 }
-									
+
+// AlignEllipseRect
+void
+Painter::AlignEllipseRect(BRect* rect, bool filled) const
+{
+	if (!fSubpixelPrecise) {
+		// align rect to pixels
+		align_rect_to_pixels(rect);
+		// account for "pixel index" versus "pixel area"
+		rect->right++;
+		rect->bottom++;
+		if (!filled && fmodf(fPenSize, 2.0) != 0.0) {
+			// align the stroke
+			rect->InsetBy(0.5, 0.5);
+		}
+	}
+}
+
 // DrawEllipse
 BRect
 Painter::DrawEllipse(BRect r, bool fill) const
 {
 	CHECK_CLIPPING
 
-	if (!fSubpixelPrecise) {
-		// align rect to pixels
-		align_rect_to_pixels(&r);
-		// account for "pixel index" versus "pixel area"
-		r.right++;
-		r.bottom++;
-		if (!fill && fmodf(fPenSize, 2.0) != 0.0) {
-			// align the stroke
-			r.InsetBy(0.5, 0.5);
-		}
-	}
+	AlignEllipseRect(&r, fill);
 
 	float xRadius = r.Width() / 2.0;
 	float yRadius = r.Height() / 2.0;
@@ -948,24 +974,24 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 	agg::conv_curve<agg::bezier_arc> segmentedArc(arc);
 
-	agg::path_storage path;
+	fPath.remove_all();
 
 	// build a new path by starting at the center point,
 	// then traversing the arc, then going back to the center
-	path.move_to(center.x, center.y);
+	fPath.move_to(center.x, center.y);
 
 	segmentedArc.rewind(0);
 	double x;
 	double y;
 	unsigned cmd = segmentedArc.vertex(&x, &y);
 	while (!agg::is_stop(cmd)) {
-		path.line_to(x, y);
+		fPath.line_to(x, y);
 		cmd = segmentedArc.vertex(&x, &y);
 	}
 
-	path.close_polygon();
+	fPath.close_polygon();
 
-	return _FillPath(path);
+	return _FillPath(fPath);
 }
 
 // #pragma mark -
@@ -1249,18 +1275,18 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 	_Transform(&pt2);
 	_Transform(&pt3);
 
-	agg::path_storage path;
+	fPath.remove_all();
 
-	path.move_to(pt1.x, pt1.y);
-	path.line_to(pt2.x, pt2.y);
-	path.line_to(pt3.x, pt3.y);
+	fPath.move_to(pt1.x, pt1.y);
+	fPath.line_to(pt2.x, pt2.y);
+	fPath.line_to(pt3.x, pt3.y);
 
-	path.close_polygon();
+	fPath.close_polygon();
 
 	if (fill)
-		return _FillPath(path);
+		return _FillPath(fPath);
 	else
-		return _StrokePath(path);
+		return _StrokePath(fPath);
 }
 
 // copy_bitmap_row_cmap8_copy
@@ -1327,7 +1353,8 @@ copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
 // _DrawBitmap
 void
 Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
-					 BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
+					 BRect actualBitmapRect, BRect bitmapRect,
+					 BRect viewRect) const
 {
 	if (!fBuffer || !fValidClipping
 		|| !bitmapRect.IsValid() || !bitmapRect.Intersects(actualBitmapRect)
@@ -1378,70 +1405,75 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	switch (format) {
 		case B_RGB32:
 		case B_RGBA32: {
-			bool generic = true;
 			// maybe we can use an optimized version
 			if (xScale == 1.0 && yScale == 1.0) {
 				if (fDrawingMode == B_OP_COPY) {
-					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer, xOffset, yOffset, viewRect);
-					generic = false;
+					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4,
+										 srcBuffer, xOffset, yOffset, viewRect);
+					return;
 				} else if (fDrawingMode == B_OP_ALPHA
-						 && fAlphaSrcMode == B_PIXEL_ALPHA && fAlphaFncMode == B_ALPHA_OVERLAY) {
-					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4, srcBuffer, xOffset, yOffset, viewRect);
-					generic = false;
+						 && fAlphaSrcMode == B_PIXEL_ALPHA
+						 && fAlphaFncMode == B_ALPHA_OVERLAY) {
+					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4,
+										 srcBuffer, xOffset, yOffset, viewRect);
+					return;
 				}
 			}
 
-			if (generic) {
-				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect);
-			}
+			_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset,
+								 xScale, yScale, viewRect);
 			break;
 		}
 		default: {
-			bool generic = true;
 			if (format == B_CMAP8 && xScale == 1.0 && yScale == 1.0) {
 				if (fDrawingMode == B_OP_COPY) {
-					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1, srcBuffer, xOffset, yOffset, viewRect);
-					generic = false;
+					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
+										 srcBuffer, xOffset, yOffset, viewRect);
+					return;
 				} else if (fDrawingMode == B_OP_OVER) {
-					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1, srcBuffer, xOffset, yOffset, viewRect);
-					generic = false;
+					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1,
+										 srcBuffer, xOffset, yOffset, viewRect);
+					return;
 				}
 			}
 
-			if (generic) {
-				// TODO: this is only a temporary implementation,
-				// to really handle other colorspaces, one would
-				// rather do the conversion with much less overhead,
-				// for example in the nn filter (hm), or in the
-				// scanline generator (better)
-				// maybe we can use an optimized version
-				BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-				status_t err = temp.ImportBits(srcBuffer.buf(),
-											   srcBuffer.height() * srcBuffer.stride(),
-											   srcBuffer.stride(),
-											   0, format);
-				if (err >= B_OK) {
-					agg::rendering_buffer convertedBuffer;
-					convertedBuffer.attach((uint8*)temp.Bits(),
-										   (uint32)actualBitmapRect.IntegerWidth() + 1,
-										   (uint32)actualBitmapRect.IntegerHeight() + 1,
-										   temp.BytesPerRow());
-					_DrawBitmapGeneric32(convertedBuffer, xOffset, yOffset, xScale, yScale, viewRect);
-				} else {
-					fprintf(stderr, "Painter::_DrawBitmap() - colorspace conversion failed: %s\n", strerror(err));
-				}
+			// TODO: this is only a temporary implementation,
+			// to really handle other colorspaces, one would
+			// rather do the conversion with much less overhead,
+			// for example in the nn filter (hm), or in the
+			// scanline generator (better)
+			// maybe we can use an optimized version
+			BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+			status_t err = temp.ImportBits(srcBuffer.buf(),
+										   srcBuffer.height() * srcBuffer.stride(),
+										   srcBuffer.stride(),
+										   0, format);
+			if (err >= B_OK) {
+				agg::rendering_buffer convertedBuffer;
+				convertedBuffer.attach((uint8*)temp.Bits(),
+									   (uint32)actualBitmapRect.IntegerWidth() + 1,
+									   (uint32)actualBitmapRect.IntegerHeight() + 1,
+									   temp.BytesPerRow());
+				_DrawBitmapGeneric32(convertedBuffer, xOffset, yOffset,
+									 xScale, yScale, viewRect);
+			} else {
+				fprintf(stderr, "Painter::_DrawBitmap() - "
+						"colorspace conversion failed: %s\n", strerror(err));
 			}
 			break;
 		}
 	}
 }
 
+#define DEBUG_DRAW_BITMAP 0
+
 // _DrawBitmapNoScale32
 template <class F>
 void
 Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
 							  agg::rendering_buffer& srcBuffer,
-							  int32 xOffset, int32 yOffset, BRect viewRect) const
+							  int32 xOffset, int32 yOffset,
+							  BRect viewRect) const
 {
 	// NOTE: this would crash if viewRect was large enough to read outside the
 	// bitmap, so make sure this is not the case before calling this function!
@@ -1456,6 +1488,21 @@ Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
 	int32 right = (int32)viewRect.right;
 	int32 bottom = (int32)viewRect.bottom;
 
+#if DEBUG_DRAW_BITMAP
+if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
+	right - xOffset >= (int32)srcBuffer.width() ||
+	top - yOffset < 0 || top - yOffset >= (int32)srcBuffer.height() ||
+	bottom - yOffset >= (int32)srcBuffer.height()) {
+
+	char message[256];
+	sprintf(message, "reading outside of bitmap (%ld, %ld, %ld, %ld) "
+			"(%d, %d) (%ld, %ld)",
+		left - xOffset, top - yOffset, right - xOffset, bottom - yOffset,
+		srcBuffer.width(), srcBuffer.height(), xOffset, yOffset);
+	debugger(message);
+}
+#endif
+
 	const rgb_color* colorMap = SystemPalette();
 
 	// copy rects, iterate over clipping boxes
@@ -1468,10 +1515,12 @@ Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
 			int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
 			if (y1 <= y2) {
 				uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
-				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR + (x1 - xOffset) * bytesPerSourcePixel;
+				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR
+					+ (x1 - xOffset) * bytesPerSourcePixel;
 
 				for (; y1 <= y2; y1++) {
-					copyRowFunction(dstHandle, srcHandle, x2 - x1 + 1, colorMap);
+					copyRowFunction(dstHandle, srcHandle, x2 - x1 + 1,
+									colorMap);
 
 					dstHandle += dstBPR;
 					srcHandle += srcBPR;
@@ -1496,7 +1545,8 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 
 	agg::trans_affine srcMatrix;
 // NOTE: R5 seems to ignore this offset when drawing bitmaps
-//	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
+//	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left,
+//											   -actualBitmapRect.top);
 
 	agg::trans_affine imgMatrix;
 	imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
@@ -1528,14 +1578,14 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	viewRect.bottom++;
 
 	// path enclosing the bitmap
-	agg::path_storage path;
-	path.move_to(viewRect.left, viewRect.top);
-	path.line_to(viewRect.right, viewRect.top);
-	path.line_to(viewRect.right, viewRect.bottom);
-	path.line_to(viewRect.left, viewRect.bottom);
-	path.close_polygon();
+	fPath.remove_all();
+	fPath.move_to(viewRect.left, viewRect.top);
+	fPath.line_to(viewRect.right, viewRect.top);
+	fPath.line_to(viewRect.right, viewRect.bottom);
+	fPath.line_to(viewRect.left, viewRect.bottom);
+	fPath.close_polygon();
 
-	agg::conv_transform<agg::path_storage> transformedPath(path, srcMatrix);
+	agg::conv_transform<agg::path_storage> transformedPath(fPath, srcMatrix);
 	fRasterizer->add_path(transformedPath);
 
 	// render the path with the bitmap as scanline fill
@@ -1669,14 +1719,11 @@ Painter::_StrokePath(VertexSource& path) const
 		stroke.miter_limit(fMiterLimit);
 
 		fRasterizer->reset();
-		agg::conv_clip_polygon<agg::conv_stroke<VertexSource> > clippedPath(stroke);
-		clippedPath.clip_box(-500, -500, fBuffer->width() + 500, fBuffer->height() + 500);
-		fRasterizer->add_path(clippedPath);
+		clipping_rect cb = fClippingRegion->FrameInt();
+		fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
+		fRasterizer->add_path(stroke);
 
-		if (fPenSize > 4)
-			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
-		else
-			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
+		agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
 //	} else {
 	// TODO: update to AGG 2.3 to get rid of the remaining problems:
 	// rects which are 2 or 1 pixel high/wide don't render at all.
@@ -1697,11 +1744,11 @@ BRect
 Painter::_FillPath(VertexSource& path) const
 {
 	fRasterizer->reset();
-	agg::conv_clip_polygon<VertexSource> clippedPath(path);
-	clippedPath.clip_box(-500, -500, fBuffer->width() + 500, fBuffer->height() + 500);
-	fRasterizer->add_path(clippedPath);
+	clipping_rect cb = fClippingRegion->FrameInt();
+	fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
+	fRasterizer->add_path(path);
 	agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
 
-	return _Clipped(_BoundingBox(clippedPath));
+	return _Clipped(_BoundingBox(path));
 }
 

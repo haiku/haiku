@@ -64,6 +64,7 @@ namespace BPrivate {
 #define kAttrPreferredApp				"BEOS:PREF_APP"
 #define	kAttrLargeIcon					"BEOS:L:STD_ICON"
 #define	kAttrMiniIcon					"BEOS:M:STD_ICON"
+#define	kAttrIcon						"BEOS:ICON"
 
 #define	kAttrDisksFrame					"_trk/d_windframe"
 #define	kAttrDisksWorkspace				"_trk/d_windwkspc"

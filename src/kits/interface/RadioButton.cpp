@@ -13,10 +13,11 @@
 	"multiple choice" control.
 */
 
+#include <RadioButton.h>
 
 #include <Debug.h>
 #include <Box.h>
-#include <RadioButton.h>
+#include <LayoutUtils.h>
 #include <Window.h>
 
 
@@ -24,6 +25,35 @@
 BRadioButton::BRadioButton(BRect frame, const char *name, const char *label,
 						   BMessage *message, uint32 resizMask, uint32 flags)
 	: BControl(frame, name, label, message, resizMask, flags),
+	fOutlined(false)
+{
+	// Resize to minimum height if needed
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float minHeight = ceilf(6.0f + fontHeight.ascent + fontHeight.descent);
+	if (Bounds().Height() < minHeight)
+		ResizeTo(Bounds().Width(), minHeight);
+}
+
+
+BRadioButton::BRadioButton(const char *name, const char *label,
+						   BMessage *message, uint32 flags)
+	: BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
+		flags | B_SUPPORTS_LAYOUT),
+	fOutlined(false)
+{
+	// Resize to minimum height if needed
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float minHeight = ceilf(6.0f + fontHeight.ascent + fontHeight.descent);
+	if (Bounds().Height() < minHeight)
+		ResizeTo(Bounds().Width(), minHeight);
+}
+
+
+BRadioButton::BRadioButton(const char *label, BMessage *message)
+	: BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
+		B_WILL_DRAW | B_NAVIGABLE | B_SUPPORTS_LAYOUT),
 	fOutlined(false)
 {
 	// Resize to minimum height if needed
@@ -464,6 +494,19 @@ BRadioButton::Perform(perform_code d, void *arg)
 {
 	return BControl::Perform(d, arg);
 }
+
+
+BSize
+BRadioButton::MaxSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, height));
+}
+
+
 
 
 void BRadioButton::_ReservedRadioButton1() {}

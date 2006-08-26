@@ -1,0 +1,60 @@
+SubDir HAIKU_TOP src kits interface qoca ;
+
+# Don't compile qoca with debugging. Debug/non-debug versions are
+# incompatible.
+DEBUG = 0 ;
+
+SetSubDirSupportedPlatforms haiku libbe_test ;
+
+{
+	local defines = [ FDefines HAVE_RINT=1 QOCA_INTERNALS ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+SharedLibrary libqoca.so :
+	QcCassSolver.cc
+	QcCompPivotSystem.cc
+	QcCompPivotTableau.cc
+	QcConstraintRep.cc
+	QcCoreTableau.cc
+	QcDelCoreTableau.cc
+	QcDelLinEqTableau.cc
+	QcDelLinInEqTableau.cc
+	QcDenseMatrix.cc
+	QcFixedFloatRep.cc
+	QcFloatRep.cc
+	QcIneqSolverBase.cc
+	QcLinEqSolver.cc
+	QcLinEqSystem.cc
+	QcLinEqTableau.cc
+	QcLinInEqSolver.cc
+	QcLinInEqSystem.cc
+	QcLinInEqTableau.cc
+	QcLinPoly.cc
+	QcLinEqColStateVector.cc
+	QcLinEqRowStateVector.cc
+	QcLinInEqColStateVector.cc
+	QcLinInEqRowColStateVector.cc
+	QcNlpSolver.cc
+	QcNomadicFloatRep.cc
+	QcOrigRowStateVector.cc
+	QcQuasiRowColStateVector.cc
+	QcQuasiRowStateVector.cc
+	QcSolver.cc
+	QcSparseMatrix.cc
+	QcVarStow.cc
+	QcVariableBiMap.cc
+	:
+	$(TARGET_LIBSTDC++)
+;
+
+
+# also install in app_server test environment
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
+		: libqoca.so
+		: tests!apps ;
+}

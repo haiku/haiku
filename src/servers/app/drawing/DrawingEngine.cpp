@@ -502,8 +502,15 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	if (Lock()) {
 		make_rect_valid(r);
 		BRect clipped = r;
+		fPainter->AlignEllipseRect(&clipped, filled);
 		if (!filled)
 			extend_by_stroke_width(clipped, d);
+
+		clipped.left = floorf(clipped.left);
+		clipped.top = floorf(clipped.top);
+		clipped.right = ceilf(clipped.right);
+		clipped.bottom = ceilf(clipped.bottom);
+
 		clipped = fPainter->ClipRect(clipped);
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
@@ -808,6 +815,12 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 	// though I consider this unexpected behaviour.
 	make_rect_valid(r);
 	BRect clipped = fPainter->ClipRect(r);
+
+	clipped.left = floorf(clipped.left);
+	clipped.top = floorf(clipped.top);
+	clipped.right = ceilf(clipped.right);
+	clipped.bottom = ceilf(clipped.bottom);
+
 	if (clipped.IsValid()) {
 		fGraphicsCard->HideSoftwareCursor(clipped);
 
@@ -826,6 +839,8 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
 	const DrawState* d, bool filled)
 {
+	// NOTE: hides cursor regardless of if and where
+	// shape is drawn on screen, TODO: optimize
 	fGraphicsCard->HideSoftwareCursor();
 
 	fPainter->SetDrawState(d);

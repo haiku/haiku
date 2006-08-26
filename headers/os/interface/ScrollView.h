@@ -60,6 +60,9 @@ class BScrollView : public BView {
 		virtual void		MakeFocus(bool state = true);
 		virtual status_t	GetSupportedSuites(BMessage *data);
 
+		virtual	BSize		MinSize();
+		virtual	BSize		PreferredSize();
+
 		// private or reserved methods are following
 
 		virtual status_t	Perform(perform_code d, void *arg);

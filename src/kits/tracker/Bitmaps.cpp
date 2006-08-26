@@ -37,6 +37,7 @@ All rights reserved.
 #include <Debug.h>
 #include <DataIO.h>
 #include <File.h>
+#include <IconUtils.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -129,17 +130,34 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	if (size != B_LARGE_ICON && size != B_MINI_ICON )
 		return B_ERROR;
 	
-	size_t len = 0;
-	const void *data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN',
-		id, &len);
+	size_t length = 0;
+	const void *data;
 
-	if (data == 0 || len != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
+	// try to load vector icon
+	data = LoadResource(B_RAW_TYPE, id, &length);
+
+	if (data && BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK)
+		return B_OK;
+
+	// fall back to R5 icon
+	length = 0;
+	data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN', id, &length);
+
+	if (data == 0 || length != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
 		TRESPASS();
 		return B_ERROR;
 	}
-	
-	dest->SetBits(data, (int32)len, 0, kDefaultIconDepth);
-	return B_OK;
+
+	status_t ret = B_OK;
+
+	if (dest->ColorSpace() != B_CMAP8) {
+		ret = BIconUtils::ConvertFromCMAP8((uint8*)data, size, size,
+								size, dest);
+	} else {
+		dest->SetBits(data, (int32)length, 0, B_CMAP8);
+	}
+
+	return ret;
 }
 
 image_id

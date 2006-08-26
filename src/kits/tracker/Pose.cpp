@@ -645,7 +645,7 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
 		DrawIcon(fLocation, poseView, poseView->ViewMode() == kIconMode ?
 				B_LARGE_ICON : B_MINI_ICON, true);
 	else
-		UpdateIcon(fLocation,poseView);
+		UpdateIcon(fLocation, poseView);
 
 	BColumn *column = poseView->FirstColumn();
 	if (!column)

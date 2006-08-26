@@ -162,11 +162,23 @@ BTrashWatcher::UpdateTrashIcons()
 		// apply them onto the trash directory node
 		size_t largeSize = 0;
 		size_t smallSize = 0;
+		size_t vectorSize = 0;
 		const void *largeData = GetTrackerResources()->LoadResource('ICON',
 			fTrashFull ? kResTrashFullIcon : kResTrashIcon, &largeSize);
 
 		const void *smallData = GetTrackerResources()->LoadResource('MICN',
 			fTrashFull ? kResTrashFullIcon : kResTrashIcon,  &smallSize);
+
+		const void *vectorData = GetTrackerResources()->LoadResource(
+			B_RAW_TYPE, fTrashFull ? kResTrashFullIcon : kResTrashIcon,
+			&vectorSize);
+
+		if (vectorData)
+			trashDir.WriteAttr(kAttrIcon, B_RAW_TYPE, 0,
+				vectorData, vectorSize);
+// TODO: enable me once the vector icon is indeed in the resources
+//		else
+//			TRESPASS();
 
 		if (largeData) 
 			trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,

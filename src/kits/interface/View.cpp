@@ -6,6 +6,7 @@
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 
@@ -24,6 +25,9 @@
 #include <Cursor.h>
 #include <File.h>
 #include <InterfaceDefs.h>
+#include <Layout.h>
+#include <LayoutContext.h>
+#include <LayoutUtils.h>
 #include <MenuBar.h>
 #include <Message.h>
 #include <MessageQueue.h>
@@ -310,6 +314,43 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 //	#pragma mark -
 
 
+struct BView::LayoutData {
+
+	LayoutData()
+		: fMinSize(),
+		  fMaxSize(),
+		  fPreferredSize(),
+		  fAlignment(),
+		  fLayoutInvalidationDisabled(0),
+		  fLayout(NULL),
+		  fLayoutContext(NULL),
+		  fLayoutValid(true),		// <- TODO: Rethink this!
+		  fLayoutInProgress(false),
+		  fNeedsRelayout(true)
+	{
+	}
+
+	BSize			fMinSize;
+	BSize			fMaxSize;
+	BSize			fPreferredSize;
+	BAlignment		fAlignment;
+	int				fLayoutInvalidationDisabled;
+	BLayout*		fLayout;
+	BLayoutContext*	fLayoutContext;
+	bool			fLayoutValid;
+	bool			fLayoutInProgress;
+	bool			fNeedsRelayout;
+};
+
+
+BView::BView(const char* name, uint32 flags, BLayout* layout)
+{
+	_InitData(BRect(0, 0, 0, 0), name, B_FOLLOW_NONE,
+		flags | B_SUPPORTS_LAYOUT);
+	SetLayout(layout);
+}
+
+
 BView::BView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	: BHandler(name)
 {
@@ -531,7 +572,7 @@ BView::~BView()
 	RemoveSelf();
 
 	// TODO: see about BShelf! must I delete it here? is it deleted by the window?
-	
+
 	// we also delete all our children
 
 	BView *child = fFirstChild;
@@ -542,6 +583,10 @@ BView::~BView()
 		child = nextChild;
 	}
 
+	// delete the layout and the layout data
+	delete fLayoutData->fLayout;
+	delete fLayoutData;
+	
 	if (fVerScroller)
 		fVerScroller->SetTarget((BView*)NULL);
 	if (fHorScroller)
@@ -837,6 +882,9 @@ BView::Hide()
 		fOwner->fLink->StartMessage(AS_LAYER_HIDE);
 	}
 	fShowLevel++;
+
+	if (fShowLevel == 1 && fParent)
+		fParent->InvalidateLayout();
 }
 
 
@@ -848,6 +896,9 @@ BView::Show()
 		check_lock();
 		fOwner->fLink->StartMessage(AS_LAYER_SHOW);
 	}
+
+	if (fShowLevel == 0 && fParent)
+		fParent->InvalidateLayout();
 }
 
 
@@ -3255,11 +3306,34 @@ BView::AddChild(BView *child, BView *before)
  		child && child->Name() ? child->Name(): "NULL",
  		before && before->Name() ? before->Name(): "NULL"));
 
-	if (!child)
+	if (!_AddChild(child, before))
 		return;
 
-	if (child->fParent != NULL)
+	if (fLayoutData->fLayout)
+		fLayoutData->fLayout->AddView(child);
+}
+
+
+bool
+BView::AddChild(BLayoutItem* child)
+{
+	if (!fLayoutData->fLayout)
+		return false;
+	return fLayoutData->fLayout->AddItem(child);
+}
+
+
+bool
+BView::_AddChild(BView *child, BView *before)
+{
+	if (!child)
+		return false;
+
+	if (child->fParent != NULL) {
+printf("BView::_AddChild(): child %p already has parent %p\n", child , child->fParent);
 		debugger("AddChild failed - the view already has a parent.");
+		return false;
+	}
 
 	bool lockedOwner = false;
 	if (fOwner && !fOwner->IsLocked()) {
@@ -3267,8 +3341,12 @@ BView::AddChild(BView *child, BView *before)
 		lockedOwner = true;
 	}
 
-	if (!_AddChildToList(child, before))
-		debugger("AddChild failed!");	
+	if (!_AddChildToList(child, before)) {
+		debugger("AddChild failed!");
+		if (lockedOwner)
+			fOwner->Unlock();
+		return false;
+	}
 
 	if (fOwner) {
 		check_lock();
@@ -3280,6 +3358,10 @@ BView::AddChild(BView *child, BView *before)
 		if (lockedOwner)
 			fOwner->Unlock();
 	}
+
+	InvalidateLayout();
+
+	return true;
 }
 
 
@@ -3293,7 +3375,6 @@ BView::RemoveChild(BView *child)
 
 	return child->RemoveSelf();
 }
-
 
 int32
 BView::CountChildren() const
@@ -3343,6 +3424,16 @@ BView::PreviousSibling() const
 bool
 BView::RemoveSelf()
 {
+	if (fParent && fParent->fLayoutData->fLayout)
+		return fParent->fLayoutData->fLayout->RemoveView(this);
+	else
+		return _RemoveSelf();
+}
+
+
+bool
+BView::_RemoveSelf()
+{
 	STRACE(("BView(%s)::RemoveSelf()...\n", Name()));
 
 	// Remove this child from its parent
@@ -3355,7 +3446,8 @@ BView::RemoveSelf()
 		_Detach();
 	}
 
-	if (!fParent || !fParent->_RemoveChildFromList(this))
+	BView* parent = fParent;
+	if (!parent || !parent->_RemoveChildFromList(this))
 		return false;
 
 	if (owner != NULL && !fTopLevelView) {
@@ -3363,6 +3455,8 @@ BView::RemoveSelf()
 		owner->fLink->StartMessage(AS_LAYER_DELETE);
 		owner->fLink->Attach<int32>(_get_object_token_(this));
 	}
+
+	parent->InvalidateLayout();
 
 	STRACE(("DONE: BView(%s)::RemoveSelf()\n", Name()));
 
@@ -3725,6 +3819,285 @@ BView::Perform(perform_code d, void* arg)
 }
 
 
+// #pragma mark - Layout Functions
+
+
+BSize
+BView::MinSize()
+{
+	// TODO: make sure this works correctly when some methods are overridden
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(fLayoutData->fMinSize,
+		(fLayoutData->fLayout ? fLayoutData->fLayout->MinSize()
+			: BSize(width, height)));
+}
+
+
+BSize
+BView::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(fLayoutData->fMaxSize,
+		(fLayoutData->fLayout ? fLayoutData->fLayout->MaxSize()
+			: BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED)));
+}
+
+
+BSize
+BView::PreferredSize()
+{
+	// TODO: make sure this works correctly when some methods are overridden
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(fLayoutData->fPreferredSize,
+		(fLayoutData->fLayout ? fLayoutData->fLayout->PreferredSize()
+			: BSize(width, height)));
+}
+
+
+BAlignment
+BView::Alignment()
+{
+	return BLayoutUtils::ComposeAlignment(fLayoutData->fAlignment,
+		(fLayoutData->fLayout ? fLayoutData->fLayout->Alignment()
+			: BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER)));
+}
+
+
+void
+BView::SetExplicitMinSize(BSize size)
+{
+	fLayoutData->fMinSize = size;
+	InvalidateLayout();
+}
+
+
+void
+BView::SetExplicitMaxSize(BSize size)
+{
+	fLayoutData->fMaxSize = size;
+	InvalidateLayout();
+}
+
+
+void
+BView::SetExplicitPreferredSize(BSize size)
+{
+	fLayoutData->fPreferredSize = size;
+	InvalidateLayout();
+}
+
+
+void
+BView::SetExplicitAlignment(BAlignment alignment)
+{
+	fLayoutData->fAlignment = alignment;
+	InvalidateLayout();
+}
+
+
+BSize
+BView::ExplicitMinSize() const
+{
+	return fLayoutData->fMinSize;
+}
+
+
+BSize
+BView::ExplicitMaxSize() const
+{
+	return fLayoutData->fMaxSize;
+}
+
+
+BSize
+BView::ExplicitPreferredSize() const
+{
+	return fLayoutData->fPreferredSize;
+}
+
+
+BAlignment
+BView::ExplicitAlignment() const
+{
+	return fLayoutData->fAlignment;
+}
+
+
+bool
+BView::HasHeightForWidth()
+{
+	return (fLayoutData->fLayout
+		? fLayoutData->fLayout->HasHeightForWidth() : false);
+}
+
+
+void
+BView::GetHeightForWidth(float width, float* min, float* max, float* preferred)
+{
+	if (fLayoutData->fLayout)
+		fLayoutData->fLayout->GetHeightForWidth(width, min, max, preferred);
+}
+
+
+void
+BView::SetLayout(BLayout* layout)
+{
+	if (layout == fLayoutData->fLayout)
+		return;
+
+	fFlags |= B_SUPPORTS_LAYOUT;
+
+	// unset and delete the old layout
+	if (fLayoutData->fLayout) {
+		fLayoutData->fLayout->SetView(NULL);
+		delete fLayoutData->fLayout;
+	}
+	
+	fLayoutData->fLayout = layout;
+
+	if (fLayoutData->fLayout) {
+		fLayoutData->fLayout->SetView(this);
+
+		// add all children
+		int count = CountChildren();
+		for (int i = 0; i < count; i++)
+			fLayoutData->fLayout->AddView(ChildAt(i));
+	}
+
+	InvalidateLayout();
+}
+
+
+BLayout*
+BView::GetLayout() const
+{
+	return fLayoutData->fLayout;
+}
+
+
+void
+BView::InvalidateLayout(bool descendants)
+{
+	if (fLayoutData->fLayoutValid && !fLayoutData->fLayoutInProgress
+		&& fLayoutData->fLayoutInvalidationDisabled == 0) {
+		if (fParent && fParent->fLayoutData->fLayoutValid)
+			fParent->InvalidateLayout(false);
+
+		fLayoutData->fLayoutValid = false;
+
+		if (fLayoutData->fLayout)
+			fLayoutData->fLayout->InvalidateLayout();
+
+		if (descendants) {
+			int count = CountChildren();
+			for (int i = 0; i < count; i++)
+				ChildAt(i)->InvalidateLayout(descendants);
+		}
+
+		if (fTopLevelView) {
+			// trigger layout process
+			if (fOwner)
+				fOwner->PostMessage(B_LAYOUT_WINDOW);
+		}
+	}
+}
+
+
+void
+BView::EnableLayoutInvalidation()
+{
+	if (fLayoutData->fLayoutInvalidationDisabled > 0)
+		fLayoutData->fLayoutInvalidationDisabled--;
+}
+
+
+void
+BView::DisableLayoutInvalidation()
+{
+	fLayoutData->fLayoutInvalidationDisabled++;
+}
+
+
+BLayoutContext*
+BView::LayoutContext() const
+{
+	return fLayoutData->fLayoutContext;
+}
+
+
+void
+BView::Layout(bool force)
+{
+	BLayoutContext context;
+	_Layout(force, &context);
+}
+
+
+void
+BView::Relayout()
+{
+	if (fLayoutData->fLayoutValid && !fLayoutData->fLayoutInProgress) {
+		fLayoutData->fNeedsRelayout = true;
+
+		// Layout() is recursive, that is if the parent view is currently laid
+		// out, we don't call layout() on this view, but wait for the parent's
+		// Layout() to do that for us.
+		if (!fParent || !fParent->fLayoutData->fLayoutInProgress)
+			Layout(false);
+	}
+}
+
+
+void
+BView::DoLayout()
+{
+	if (fLayoutData->fLayout)
+		fLayoutData->fLayout->LayoutView();
+}
+
+
+void
+BView::_Layout(bool force, BLayoutContext* context)
+{
+//printf("%p->BView::_Layout(%d, %p)\n", this, force, context);
+//printf("  fNeedsRelayout: %d, fLayoutValid: %d, fLayoutInProgress: %d\n",
+//fLayoutData->fNeedsRelayout, fLayoutData->fLayoutValid, fLayoutData->fLayoutInProgress);
+	if (fLayoutData->fNeedsRelayout || !fLayoutData->fLayoutValid || force) {
+		fLayoutData->fLayoutValid = false;
+
+		if (fLayoutData->fLayoutInProgress)
+			return;
+
+		BLayoutContext* oldContext = fLayoutData->fLayoutContext;
+		fLayoutData->fLayoutContext = context;
+			
+		fLayoutData->fLayoutInProgress = true;
+		DoLayout();
+		fLayoutData->fLayoutInProgress = false;
+
+		fLayoutData->fLayoutValid = true;
+		fLayoutData->fNeedsRelayout = false;
+
+		// layout children
+		int32 childCount = CountChildren();
+		for (int32 i = 0; i < childCount; i++) {
+			BView* child = ChildAt(i);
+			if (!child->IsHidden(child))
+				child->_Layout(force, context);
+		}
+
+		fLayoutData->fLayoutContext = oldContext;
+
+		// invalidate the drawn content, if requested
+		if (fFlags & B_INVALIDATE_AFTER_LAYOUT)
+			Invalidate();
+	}
+}
+
+
 //	#pragma mark -
 //	Private Functions
 
@@ -3772,6 +4145,8 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 
 	fEventMask = 0;
 	fEventOptions = 0;
+
+	fLayoutData = new LayoutData;
 }
 
 
@@ -4010,8 +4385,12 @@ BView::_ResizeBy(int32 deltaWidth, int32 deltaHeight)
 	}
 
 	// layout the children
-	for (BView* child = fFirstChild; child; child = child->fNextSibling)
-		child->_ParentResizedBy(deltaWidth, deltaHeight);
+	if (fFlags & B_SUPPORTS_LAYOUT) {
+		Relayout();
+	} else {
+		for (BView* child = fFirstChild; child; child = child->fNextSibling)
+			child->_ParentResizedBy(deltaWidth, deltaHeight);
+	}
 
 	if (fFlags & B_FRAME_EVENTS) {
 		BMessage resized(B_VIEW_RESIZED);
@@ -4383,15 +4762,15 @@ BView::do_owner_check_no_pick() const
 	}
 }
 
-
-void BView::_ReservedView2(){}
-void BView::_ReservedView3(){}
-void BView::_ReservedView4(){}
-void BView::_ReservedView5(){}
-void BView::_ReservedView6(){}
-void BView::_ReservedView7(){}
-void BView::_ReservedView8(){}
-void BView::_ReservedView9(){}
+extern "C" void _ReservedView1__5BView() {}
+extern "C" void _ReservedView2__5BView() {}
+extern "C" void _ReservedView3__5BView() {}
+extern "C" void _ReservedView4__5BView() {}
+extern "C" void _ReservedView5__5BView() {}
+extern "C" void _ReservedView6__5BView() {}
+extern "C" void _ReservedView7__5BView() {}
+extern "C" void _ReservedView8__5BView() {}
+extern "C" void _ReservedView9__5BView() {}
 void BView::_ReservedView10(){}
 void BView::_ReservedView11(){}
 void BView::_ReservedView12(){}

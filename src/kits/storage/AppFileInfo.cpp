@@ -15,6 +15,7 @@
 #include <Bitmap.h>
 #include <File.h>
 #include <fs_attr.h>
+#include <IconUtils.h>
 #include <MimeType.h>
 #include <RegistrarDefs.h>
 #include <Resources.h>
@@ -31,7 +32,9 @@ static const char *kSupportedTypesAttribute		= "BEOS:FILE_TYPES";
 static const char *kVersionInfoAttribute		= "BEOS:APP_VERSION";
 static const char *kMiniIconAttribute			= "BEOS:M:";
 static const char *kLargeIconAttribute			= "BEOS:L:";
+static const char *kIconAttribute				= "BEOS:";
 static const char *kStandardIconType			= "STD_ICON";
+static const char *kIconType					= "ICON";
 
 // resource IDs
 static const int32 kTypeResourceID				= 2;
@@ -785,7 +788,38 @@ status_t
 BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 							 icon_size which) const
 {
-	status_t error = B_OK;
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	if (!icon || icon->InitCheck() != B_OK)
+		return B_BAD_VALUE;
+
+	// try vector icon first
+	BString vectorAttributeName(kIconAttribute);
+
+	// check type param
+	if (type) {
+		if (BMimeType::IsValid(type))
+			vectorAttributeName += type;
+		else
+			return B_BAD_VALUE;
+	} else {
+		vectorAttributeName += kIconType;
+	}
+	const char* attribute = vectorAttributeName.String();
+
+	size_t bytesRead;
+	void* allocatedBuffer;
+	status_t error = _ReadData(attribute, -1, B_RAW_TYPE, NULL, 0,
+							   bytesRead, &allocatedBuffer);
+	if (error == B_OK) {
+		return BIconUtils::GetVectorIcon((uint8*)allocatedBuffer,
+										 bytesRead, icon);
+	}
+
+	// no vector icon if we got this far
+
+	error = B_OK;
 	// set some icon size related variables
 	BString attributeString;
 	BRect bounds;
@@ -805,28 +839,23 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 			attrSize = 32 * 32;
 			break;
 		default:
-			error = B_BAD_VALUE;
-			break;
+			return B_BAD_VALUE;
 	}
 	// check type param
-	if (error == B_OK) {
-		if (type) {
-			if (BMimeType::IsValid(type))
-				attributeString += type;
-			else
-				error = B_BAD_VALUE;
-		} else
-			attributeString += kStandardIconType;
-	}
-	const char *attribute = attributeString.String();
+	if (type) {
+		if (BMimeType::IsValid(type))
+			attributeString += type;
+		else
+			return B_BAD_VALUE;
+	} else
+		attributeString += kStandardIconType;
+
+	attribute = attributeString.String();
 
 	// check parameter and initialization
-	if (error == B_OK
-		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
-		error = B_BAD_VALUE;
-	}
-	if (error == B_OK && InitCheck() != B_OK)
-		error = B_NO_INIT;
+	if (icon->Bounds() != bounds)
+		return B_BAD_VALUE;
+
 	// read the data
 	if (error == B_OK) {
 		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);

@@ -1131,10 +1131,12 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 			// watch for icon updates
 			const char *attrName;
 			if (message->FindString("attr", &attrName) == B_OK) {
-				if (strcmp(attrName, kAttrLargeIcon) == 0) 
+				if (strcmp(attrName, kAttrLargeIcon) == 0
+					|| strcmp(attrName, kAttrIcon) == 0) {
 					Invalidate(BRect(10, 10, 10 + B_LARGE_ICON, 10 + B_LARGE_ICON));
 
-				if (strcmp(attrName, kAttrMIMEType) == 0) {
+				} else if (strcmp(attrName, kAttrMIMEType) == 0) {
+
 					if (model->OpenNode() == B_OK) {
 						InitStrings(model);
 						model->CloseNode();

@@ -531,6 +531,14 @@ Model::SetupBaseType()
 }
 
 
+static bool
+HasVectorIconHint(BNode *node)
+{
+	attr_info info;
+	return node->GetAttrInfo(kAttrIcon, &info) == B_OK;
+}
+
+
 void
 Model::FinishSettingUpType()
 {
@@ -543,7 +551,8 @@ Model::FinishSettingUpType()
 	// disk again for models that do not have an icon defined by the node
 	if (IsNodeOpen()
 		&& fBaseType != kLinkNode
-		&& !CheckNodeIconHintPrivate(fNode, dynamic_cast<TTracker *>(be_app) == NULL)) {
+		&& !CheckNodeIconHintPrivate(fNode, dynamic_cast<TTracker *>(be_app) == NULL)
+		&& !HasVectorIconHint(fNode)) {
 			// when checking for the node icon hint, if we are libtracker, only check
 			// for small icons - checking for the large icons is a little more
 			// work for the filesystem and this will speed up the test.
@@ -813,8 +822,9 @@ Model::AttrChanged(const char *attrName)
 
 	ASSERT(IsNodeOpen());
 	if (attrName
-		&& (strcmp(attrName, kAttrMiniIcon) == 0
-			|| strcmp(attrName, kAttrLargeIcon) == 0)) 
+		&& (strcmp(attrName, kAttrIcon) == 0
+			|| strcmp(attrName, kAttrMiniIcon) == 0
+			|| strcmp(attrName, kAttrLargeIcon) == 0))
 		return true;
 
 	if (!attrName

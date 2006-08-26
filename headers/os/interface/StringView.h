@@ -53,6 +53,8 @@ class BStringView : public BView{
 		virtual void		AllDetached();
 		virtual status_t	GetSupportedSuites(BMessage* data);
 
+		virtual	BSize		MaxSize();
+
 	private:
 		virtual status_t	Perform(perform_code d, void* arg);
 		virtual	void		_ReservedStringView1();

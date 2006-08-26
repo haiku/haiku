@@ -201,6 +201,15 @@ BColorControl::Archive(BMessage *archive, bool deep) const
 
 
 void
+BColorControl::SetLayout(BLayout* layout)
+{
+	// We need to implement this method, since we have another SetLayout()
+	// method and C++ has this special method hiding "feature".
+	BControl::SetLayout(layout);
+}
+
+
+void
 BColorControl::SetValue(int32 value)
 {
 	if (Value() == value)

@@ -33,6 +33,11 @@ SharedLibrary libbe.so :
 	<libbe>storage_diskdevice_kit.o
 	<libbe>support_kit.o
 
+	libqoca.so
+
+	libicon.a
+	libagg.a
+
 	libroot.so	# make sure it links against our libroot.so
 	$(TARGET_LIBSTDC++)
 ;
@@ -63,6 +68,11 @@ SharedLibrary libbe_haiku.so :
 	<libbe>interface_kit.o
 	<libbe>storage_kit.o
 	<libbe>support_kit.o
+
+	libqoca.so
+
+	libicon.a
+	libagg.a
 
 	libbeadapter.so
 	net

@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 
+#include <LayoutUtils.h>
 #include <ScrollView.h>
 #include <Message.h>
 #include <Window.h>
@@ -591,6 +592,44 @@ status_t
 BScrollView::GetSupportedSuites(BMessage *data)
 {
 	return BView::GetSupportedSuites(data);
+}
+
+
+BSize
+BScrollView::MinSize()
+{
+// TODO: This is not yet correct.
+	BSize size = (fTarget ? fTarget->MinSize() : BSize(-1, -1));
+
+	if (fVerticalScrollBar)
+		size.width += B_V_SCROLL_BAR_WIDTH;
+	if (fHorizontalScrollBar)
+		size.height += B_H_SCROLL_BAR_HEIGHT;
+
+	float borderSize = BorderSize(fBorder);
+	size.width += 2 * borderSize;
+	size.height += 2 * borderSize;
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BScrollView::PreferredSize()
+{
+// TODO: This is not yet correct.
+	BSize size = (fTarget ? fTarget->PreferredSize() : BSize(-1, -1));
+
+	if (fVerticalScrollBar)
+		size.width += B_V_SCROLL_BAR_WIDTH;
+	if (fHorizontalScrollBar)
+		size.height += B_H_SCROLL_BAR_HEIGHT;
+
+	float borderSize = BorderSize(fBorder);
+	size.width += 2 * borderSize;
+	size.height += 2 * borderSize;
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
 

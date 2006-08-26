@@ -1,31 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Archivable.cpp
-//	Author:			Erik Jaesler (erik@cgsoftware.com)
-//	Description:	BArchivable mix-in class defines the archiving
-//					protocol.  Also some global archiving functions.
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ */
 
-// Standard Includes -----------------------------------------------------------
+/**	Description:	BArchivable mix-in class defines the archiving
+					protocol.  Also some global archiving functions.*/
+
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -34,7 +18,6 @@
 #include <typeinfo>
 #include <vector>
 
-// System Includes -------------------------------------------------------------
 #include <AppFileInfo.h>
 #include <Archivable.h>
 #include <Entry.h>
@@ -45,14 +28,6 @@
 #include <String.h>
 #include <SupportDefs.h>
 #include <syslog.h>
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 
 using std::string;
@@ -91,26 +66,26 @@ Log entries graciously coughed up by the Be implementation:
 	Nov 28 01:40:45 instantiate_object failed: Application could not be found (8000200b) 
 */
 
-//------------------------------------------------------------------------------
+
 BArchivable::BArchivable()
 {
-	;
 }
-//------------------------------------------------------------------------------
+
+
 BArchivable::BArchivable(BMessage* from)
 {
-	;
 }
-//------------------------------------------------------------------------------
+
+
 BArchivable::~BArchivable()
 {
-	;
 }
-//------------------------------------------------------------------------------
-status_t BArchivable::Archive(BMessage* into, bool deep) const
+
+
+status_t
+BArchivable::Archive(BMessage* into, bool deep) const
 {
-	if (!into)
-	{
+	if (!into) {
 		// TODO: logging/other error reporting?
 		return B_BAD_VALUE;
 	}
@@ -120,35 +95,34 @@ status_t BArchivable::Archive(BMessage* into, bool deep) const
 
 	return into->AddString(B_CLASS_FIELD, name);
 }
-//------------------------------------------------------------------------------
-BArchivable* BArchivable::Instantiate(BMessage* from)
+
+
+BArchivable*
+BArchivable::Instantiate(BMessage* from)
 {
 	debugger("Can't create a plain BArchivable object");
 	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BArchivable::Perform(perform_code d, void* arg)
+
+
+status_t
+BArchivable::Perform(perform_code d, void* arg)
 {
 	// TODO: Check against original
 	return B_ERROR;
 }
-//------------------------------------------------------------------------------
-void BArchivable::_ReservedArchivable1()
-{
-	;
-}
-//------------------------------------------------------------------------------
-void BArchivable::_ReservedArchivable2()
-{
-	;
-}
-//------------------------------------------------------------------------------
-void BArchivable::_ReservedArchivable3()
-{
-	;
-}
-//------------------------------------------------------------------------------
-void BuildFuncName(const char* className, BString& funcName)
+
+
+void BArchivable::_ReservedArchivable1() {}
+void BArchivable::_ReservedArchivable2() {}
+void BArchivable::_ReservedArchivable3() {}
+
+
+// #pragma mark -
+
+
+void
+BuildFuncName(const char* className, BString& funcName)
 {
 	funcName = "";
 
@@ -158,19 +132,19 @@ void BuildFuncName(const char* className, BString& funcName)
 	funcName.Prepend("Instantiate__");
 	funcName.Append("P8BMessage");
 }
-//------------------------------------------------------------------------------
-BArchivable* instantiate_object(BMessage* archive, image_id* id)
+
+
+BArchivable*
+instantiate_object(BMessage* archive, image_id* id)
 {
 	errno = B_OK;
 
 	// Check our params
-	if (id)
-	{
+	if (id) {
 		*id = B_BAD_VALUE;
 	}
 
-	if (!archive)
-	{
+	if (!archive) {
 		// TODO: extended error handling
 		errno = B_BAD_VALUE;
 		syslog(LOG_ERR, "instantiate_object failed: NULL BMessage argument");
@@ -180,8 +154,7 @@ BArchivable* instantiate_object(BMessage* archive, image_id* id)
 	// Get class name from archive
 	const char* name = NULL;
 	status_t err = archive->FindString(B_CLASS_FIELD, &name);
-	if (err)
-	{
+	if (err) {
 		// TODO: extended error handling
 		syslog(LOG_ERR, "instantiate_object failed: Failed to find an entry "
 			   "defining the class name (%s).", strerror(err));
@@ -196,8 +169,7 @@ BArchivable* instantiate_object(BMessage* archive, image_id* id)
 
 	//	if find_instantiation_func() can't locate Class::Instantiate()
 	//		and a signature was specified
-	if (!iFunc && hasSig)
-	{
+	if (!iFunc && hasSig) {
 		//	use BRoster::FindApp() to locate an app or add-on with the symbol
 		BRoster Roster;
 		entry_ref ref;
@@ -207,33 +179,26 @@ BArchivable* instantiate_object(BMessage* archive, image_id* id)
 
 		//	if an entry_ref is obtained
 		if (!err)
-		{
 			err = entry.SetTo(&ref);
-		}
 
-		if (err)
-		{
+		if (err) {
 			syslog(LOG_ERR, "instantiate_object failed: Error finding app "
 							"with signature \"%s\" (%s)", sig, strerror(err));
 		}
 
-		if (!err)
-		{
+		if (!err) {
 			BPath path;
 			err = entry.GetPath(&path);
-			if (!err)
-			{
+			if (!err) {
 				//	load the app/add-on
 				image_id theImage = load_add_on(path.Path());
-				if (theImage < 0)
-				{
+				if (theImage < 0) {
 					// TODO: extended error handling
 					return NULL;
 				}
 		
 				// Save the image_id
-				if (id)
-				{
+				if (id) {
 					*id = theImage;
 				}
 		
@@ -247,16 +212,13 @@ BArchivable* instantiate_object(BMessage* archive, image_id* id)
 				}
 			}
 		}
-	}
-	else if (!iFunc)
-	{
+	} else if (!iFunc) {
 		syslog(LOG_ERR, "instantiate_object failed: No signature specified "
 			   "in archive, looking for class \"%s\".", name);
 		errno = B_BAD_VALUE;
 	}
 
-	if (err)
-	{
+	if (err) {
 		// TODO: extended error handling
 		syslog(LOG_ERR, "instantiate_object failed: %s (%x)",
 			   strerror(err), err);
@@ -265,27 +227,29 @@ BArchivable* instantiate_object(BMessage* archive, image_id* id)
 	}
 
 	//	if Class::Instantiate(BMessage*) was found
-	if (iFunc)
-	{
+	if (iFunc) {
 		//	use to create and return an object instance
 		return iFunc(archive);
 	}
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-BArchivable* instantiate_object(BMessage* from)
+
+
+BArchivable*
+instantiate_object(BMessage* from)
 {
 	return instantiate_object(from, NULL);
 }
-//------------------------------------------------------------------------------
-bool validate_instantiation(BMessage* from, const char* class_name)
+
+
+bool
+validate_instantiation(BMessage* from, const char* class_name)
 {
 	errno = B_OK;
 
 	// Make sure our params are kosher -- original skimped here =P
-	if (!from)
-	{
+	if (!from) {
 		// Not standard; Be implementation has a segment
 		// violation on this error mode
 		errno = B_BAD_VALUE;
@@ -295,11 +259,9 @@ bool validate_instantiation(BMessage* from, const char* class_name)
 
 	status_t err = B_OK;
 	const char* data;
-	for (int32 index = 0; err == B_OK; ++index)
-	{
+	for (int32 index = 0; err == B_OK; ++index) {
 		err = from->FindString(B_CLASS_FIELD, index, &data);
-		if (!err && strcmp(data, class_name) == 0)
-		{
+		if (!err && strcmp(data, class_name) == 0) {
 			return true;
 		}
 	}
@@ -309,13 +271,13 @@ bool validate_instantiation(BMessage* from, const char* class_name)
 
 	return false;
 }
-//------------------------------------------------------------------------------
-instantiation_func find_instantiation_func(const char* class_name,
-										   const char* sig)
+
+
+instantiation_func 
+find_instantiation_func(const char* class_name, const char* sig)
 {
 	errno = B_OK;
-	if (!class_name)
-	{
+	if (!class_name) {
 		errno = B_BAD_VALUE;
 		return NULL;
 	}
@@ -325,40 +287,44 @@ instantiation_func find_instantiation_func(const char* class_name,
 
 	BuildFuncName(class_name, funcName);
 
+printf("find_instantiation_func() - looking for '%s'\n", funcName.String());
+
 	thread_id tid = find_thread(NULL);
 	thread_info ti;
 	status_t err = get_thread_info(tid, &ti);
-	if (!err)
-	{
+	if (!err) {
 		//	for each image_id in team_id
 		image_info info;
 		int32 cookie = 0;
-		while (!theFunc && (get_next_image_info(ti.team, &cookie, &info) == B_OK))
-		{
+		while (!theFunc && (get_next_image_info(ti.team, &cookie, &info) == B_OK)) {
 			theFunc = FindFuncInImage(funcName, info.id, err);
 		}
 	
-		if (theFunc && !CheckSig(sig, info))
-		{
+		if (theFunc && !CheckSig(sig, info)) {
 			// TODO: extended error handling
 			theFunc = NULL;
 		}
 	}
 
+printf("find_instantiation_func(): %p\n", theFunc);
+
 	return theFunc;
 }
-//------------------------------------------------------------------------------
-instantiation_func find_instantiation_func(const char* class_name)
+
+
+instantiation_func
+find_instantiation_func(const char* class_name)
 {
 	return find_instantiation_func(class_name, NULL);
 }
-//------------------------------------------------------------------------------
-instantiation_func find_instantiation_func(BMessage* archive_data)
+
+
+instantiation_func
+find_instantiation_func(BMessage* archive_data)
 {
 	errno = B_OK;
 
-	if (!archive_data)
-	{
+	if (!archive_data) {
 		// TODO:  extended error handling
 		errno = B_BAD_VALUE;
 		return NULL;
@@ -369,8 +335,7 @@ instantiation_func find_instantiation_func(BMessage* archive_data)
 	status_t err;
 
 	err = archive_data->FindString(B_CLASS_FIELD, &name);
-	if (err)
-	{
+	if (err) {
 		// TODO:  extended error handling
 		return NULL;
 	}
@@ -379,22 +344,25 @@ instantiation_func find_instantiation_func(BMessage* archive_data)
 
 	return find_instantiation_func(name, sig);
 }
-//------------------------------------------------------------------------------
 
 
-//------------------------------------------------------------------------------
-int GetNumber(const char*& name)
+// #pragma mark -
+
+
+int
+GetNumber(const char*& name)
 {
 	int val = atoi(name);
-	while (isdigit(*name))
-	{
+	while (isdigit(*name)) {
 		++name;
 	}
 
 	return val;
 }
-//------------------------------------------------------------------------------
-void Demangle(const char* name, BString& out)
+
+
+void
+Demangle(const char* name, BString& out)
 {
 // TODO: add support for template classes
 //	_find__t12basic_string3ZcZt18string_char_traits1ZcZt24__default_alloc_template2b0i0PCccUlUl
@@ -402,13 +370,12 @@ void Demangle(const char* name, BString& out)
 	out = "";
 
 	// Are we in a namespace?
-	if (*name == 'Q')
-	{
+	if (*name == 'Q') {
 		// Yessir, we are; how many deep are we?
 		int nsCount = 0;
 		++name;
-		if (*name == '_')	// more than 10 deep
-		{
+		if (*name == '_') {
+			// more than 10 deep
 			++name;
 			if (!isdigit(*name))
 				;	// TODO: error handling
@@ -418,16 +385,13 @@ void Demangle(const char* name, BString& out)
 				++name;
 			else
 				;	// this should be an error condition
-		}
-		else
-		{
+		} else {
 			nsCount = *name - '0';
 			++name;
 		}
 
 		int nameLen = 0;
-		for (int i = 0; i < nsCount - 1; ++i)
-		{
+		for (int i = 0; i < nsCount - 1; ++i) {
 			if (!isdigit(*name))
 				;	// TODO: error handling
 
@@ -440,8 +404,10 @@ void Demangle(const char* name, BString& out)
 
 	out.Append(name, GetNumber(name));
 }
-//------------------------------------------------------------------------------
-void Mangle(const char* name, BString& out)
+
+
+void
+Mangle(const char* name, BString& out)
 {
 // TODO: add support for template classes
 //	_find__t12basic_string3ZcZt18string_char_traits1ZcZt24__default_alloc_template2b0i0PCccUlUl
@@ -455,8 +421,7 @@ void Mangle(const char* name, BString& out)
 
 	string::size_type pos = 0;
 	string::size_type oldpos = 0;
-	while (pos != string::npos)
-	{
+	while (pos != string::npos) {
 		pos = origName.find_first_of("::", oldpos);
 		spacenames.push_back(string(origName, oldpos, pos - oldpos));
 		pos = origName.find_first_not_of("::", pos);
@@ -467,8 +432,7 @@ void Mangle(const char* name, BString& out)
 	//	Now mangle it into this:
 	//		Q49testthree8testfour9Testthree8Testfour
 	out = "";
-	if (count > 1)
-	{
+	if (count > 1) {
 		out += 'Q';
 		if (count > 10)
 			out += '_';
@@ -477,15 +441,15 @@ void Mangle(const char* name, BString& out)
 			out += '_';
 	}
 
-	for (unsigned int i = 0; i < spacenames.size(); ++i)
-	{
+	for (unsigned int i = 0; i < spacenames.size(); ++i) {
 		out << (int)spacenames[i].length();
 		out += spacenames[i].c_str();
 	}
 }
-//------------------------------------------------------------------------------
-instantiation_func FindFuncInImage(BString& funcName, image_id id,
-								   status_t& err)
+
+
+instantiation_func
+FindFuncInImage(BString& funcName, image_id id, status_t& err)
 {
 	err = B_OK;
 	instantiation_func theFunc = NULL;
@@ -497,14 +461,12 @@ instantiation_func FindFuncInImage(BString& funcName, image_id id,
 	int32 funcNameLen;
 
 	//	for each B_SYMBOL_TYPE_TEXT in image_id
-	for (int32 i = 0; !err; ++i)
-	{
+	for (int32 i = 0; !err; ++i) {
 		funcNameLen = FUNC_NAME_LEN;
 		err = get_nth_image_symbol(id, i, foundFuncName, &funcNameLen,
 								   &symbolType, (void**)&theFunc);
 
-		if (!err && symbolType == B_SYMBOL_TYPE_TEXT)
-		{
+		if (!err && symbolType == B_SYMBOL_TYPE_TEXT) {
 			//	try to match Class::Instantiate(BMessage*) signature
 			if (funcName.ICompare(foundFuncName, funcNameLen) == 0)
 				break;
@@ -517,19 +479,19 @@ instantiation_func FindFuncInImage(BString& funcName, image_id id,
 	err = get_image_symbol(id, funcName.String(), B_SYMBOL_TYPE_TEXT,
 						   (void**)&theFunc);
 
-	if (err)
-	{
+	if (err) {
 		// TODO: error handling
 		theFunc = NULL;
 	}
 
 	return theFunc;
 }
-//------------------------------------------------------------------------------
-bool CheckSig(const char* sig, image_info& info)
+
+
+bool
+CheckSig(const char* sig, image_info& info)
 {
-	if (!sig)
-	{
+	if (!sig) {
 		// If it wasn't specified, anything "matches"
 		return true;
 	}
@@ -539,8 +501,7 @@ bool CheckSig(const char* sig, image_info& info)
 	// Get image signature
 	BFile ImageFile(info.name, B_READ_ONLY);
 	err = ImageFile.InitCheck();
-	if (err)
-	{
+	if (err) {
 		// TODO: extended error handling
 		return false;
 	}
@@ -548,8 +509,7 @@ bool CheckSig(const char* sig, image_info& info)
 	char imageSig[B_MIME_TYPE_LENGTH];
 	BAppFileInfo AFI(&ImageFile);
 	err = AFI.GetSignature(imageSig);
-	if (err)
-	{
+	if (err) {
 		// TODO: extended error handling
 		syslog(LOG_ERR, "instantiate_object - couldn't get mime sig for %s",
 			   info.name);
@@ -558,13 +518,4 @@ bool CheckSig(const char* sig, image_info& info)
 
 	return strcmp(sig, imageSig) == 0;
 }
-//------------------------------------------------------------------------------
-
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
 

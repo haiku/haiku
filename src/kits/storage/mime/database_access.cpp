@@ -10,6 +10,7 @@
 #include <Bitmap.h>
 #include <Entry.h>
 #include <Directory.h>
+#include <IconUtils.h>
 #include <Message.h>
 #include <mime/database_support.h>
 #include <Node.h>
@@ -209,82 +210,117 @@ get_icon(const char *type, BBitmap *icon, icon_size which)
 
 */
 status_t
-get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
-	  						   icon_size which)
+get_icon_for_type(const char* type, const char* fileType, BBitmap* icon,
+				  icon_size which)
 {
-	std::string attr;		
-	attr_info info;
-	ssize_t err;
+	if (!type || !icon)
+		return B_BAD_VALUE;
+
+	// open the node for the given type
 	BNode node;
-	uint32 attrType = 0;
-	ssize_t attrSize = 0;
-	BRect bounds;
+	ssize_t err = open_type(type, &node);
+	if (err < B_OK)
+		return (status_t)err;
 
-	err = type && icon ? B_OK : B_BAD_VALUE;
-	
-	// Figure out what kind of data we *should* find
-	if (!err) {
-		switch (which) {
-			case B_MINI_ICON:
-				bounds.Set(0, 0, 15, 15);
-				attrType = kMiniIconType;
-				attrSize = 16 * 16;
-				break;
-			case B_LARGE_ICON:
-				bounds.Set(0, 0, 31, 31);
-				attrType = kLargeIconType;
-				attrSize = 32 * 32;
-				break;
-			default:
-				err = B_BAD_VALUE;
-				break;
-		}
-	}
-	// Construct our attribute name
+	// construct our attribute name
+	std::string vectorIconAttrName;
+	std::string smallIconAttrName;
+	std::string largeIconAttrName;
+
 	if (fileType) {
-		attr = (which == B_MINI_ICON
-	              ? kMiniIconAttrPrefix
-	                : kLargeIconAttrPrefix)
-	                  + BPrivate::Storage::to_lower(fileType);
+		std::string lowerCaseFileType = BPrivate::Storage::to_lower(fileType);
+
+		vectorIconAttrName = kIconAttrPrefix + lowerCaseFileType;
+		smallIconAttrName = kMiniIconAttrPrefix + lowerCaseFileType;
+		largeIconAttrName = kLargeIconAttrPrefix + lowerCaseFileType;
 	} else {
-		attr = (which == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
-	}
-	// Check the icon and attribute to see if they match
-	if (!err)
-		err = (icon->InitCheck() == B_OK && icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
-	if (!err) 
-		err = open_type(type, &node);
-	if (!err) 
-		err = node.GetAttrInfo(attr.c_str(), &info);
-	if (!err)
-		err = (attrType == info.type && attrSize == info.size) ? B_OK : B_BAD_VALUE;
-	// read the attribute
-	if (!err) {
-		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		char *buffer = NULL;
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			buffer = new(std::nothrow) char[attrSize];
-			if (!buffer)
-				err = B_NO_MEMORY;
-			if (!err) 
-				err = node.ReadAttr(attr.c_str(), attrType, 0, buffer, attrSize);			
-		} else {
-			// same color space, just read direct
-			err = node.ReadAttr(attr.c_str(), attrType, 0, icon->Bits(), attrSize);
-		}
-		if (err >= 0)
-			err = (err == attrSize) ? (status_t)B_OK : (status_t)B_FILE_ERROR;
-		if (otherColorSpace) {
-			if (!err) {
-				err = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
-									   0, B_CMAP8);
-			}
-			delete[] buffer;
-		}
+		vectorIconAttrName = kIconAttr;
+		smallIconAttrName = kMiniIconAttr;
+		largeIconAttrName = kLargeIconAttr;
 	}
 
-	return err;
+	return BIconUtils::GetIcon(&node, vectorIconAttrName.c_str(),
+		smallIconAttrName.c_str(), largeIconAttrName.c_str(),
+		which, icon);
+
+
+//	ssize_t err = type && icon ? B_OK : B_BAD_VALUE;
+//	
+//	// Figure out what kind of data we *should* find
+//	uint32 attrType = 0;
+//	ssize_t attrSize = 0;
+//	BRect bounds;
+//
+//	if (!err) {
+//		switch (which) {
+//			case B_MINI_ICON:
+//				bounds.Set(0, 0, 15, 15);
+//				attrType = kMiniIconType;
+//				attrSize = 16 * 16;
+//				break;
+//			case B_LARGE_ICON:
+//				bounds.Set(0, 0, 31, 31);
+//				attrType = kLargeIconType;
+//				attrSize = 32 * 32;
+//				break;
+//			default:
+//				err = B_BAD_VALUE;
+//				break;
+//		}
+//	}
+//	// Construct our attribute name
+//	std::string attr;		
+//	if (fileType) {
+//		attr = (which == B_MINI_ICON
+//	              ? kMiniIconAttrPrefix
+//	                : kLargeIconAttrPrefix)
+//	                  + BPrivate::Storage::to_lower(fileType);
+//	} else {
+//		attr = (which == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
+//	}
+//	// Check the icon and attribute to see if they match
+//	if (!err) {
+//		err = (icon->InitCheck() == B_OK
+//				&& icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
+//	}
+//
+//	BNode node;
+//	if (!err) 
+//		err = open_type(type, &node);
+//
+//	attr_info info;
+//	if (!err) 
+//		err = node.GetAttrInfo(attr.c_str(), &info);
+//
+//	if (!err)
+//		err = (attrType == info.type && attrSize == info.size) ? B_OK : B_BAD_VALUE;
+//	// read the attribute
+//	if (!err) {
+//		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
+//		char *buffer = NULL;
+//		if (otherColorSpace) {
+//			// other color space than stored in attribute
+//			buffer = new(std::nothrow) char[attrSize];
+//			if (!buffer)
+//				err = B_NO_MEMORY;
+//			if (!err) 
+//				err = node.ReadAttr(attr.c_str(), attrType, 0, buffer, attrSize);			
+//		} else {
+//			// same color space, just read direct
+//			err = node.ReadAttr(attr.c_str(), attrType, 0, icon->Bits(), attrSize);
+//		}
+//		if (err >= 0)
+//			err = (err == attrSize) ? (status_t)B_OK : (status_t)B_FILE_ERROR;
+//		if (otherColorSpace) {
+//			if (!err) {
+//				err = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
+//									   0, B_CMAP8);
+//			}
+//			delete[] buffer;
+//		}
+//	}
+//
+//	return err;
 }
 
 // get_preferred_app

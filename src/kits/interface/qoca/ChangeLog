@@ -1,0 +1,17 @@
+2000-10-16  Peter Moulder  <pmoulder@bowman.csse.monash.edu.au>
+
+	* QcConstraintRep.hh (isSatisfied): Compile in unconditionally.
+
+2000-08-14  Peter Moulder  <pmoulder@bowman.csse.monash.edu.au>
+
+
+	* QcBiMap.hh (class QcBiMap): Remove unused methods ChangeIndex, EraseByIdentifier.
+	* QcBiMapNotifier.hh (class QcBiMapNotifier): Remove unused method ChangeConstraint.
+
+	* QcSolver and all derived classes (EndAddConstraint): return a
+	bool indicating success.
+
+2000-07-21  Peter Moulder  <pmoulder@bowman.csse.monash.edu.au>
+
+	* QcFloat.hh (GetValue): New method.
+

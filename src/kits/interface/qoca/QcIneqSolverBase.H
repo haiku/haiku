@@ -1,0 +1,128 @@
+// Generated automatically from QcIneqSolverBase.ch by /home/pmoulder/usr/local/bin/ch2xx.
+#ifndef QcIneqSolverBaseDCL
+#define QcIneqSolverBaseDCL
+#line 1 "QcIneqSolverBase.ch"
+#include <qoca/QcSolver.H>
+
+#include <qoca/QcDelLinInEqSystem.hh>
+
+class QcIneqSolverBase
+  : public QcSolver
+{
+public:
+
+inline
+QcIneqSolverBase();
+#line 18 "QcIneqSolverBase.ch"
+inline
+QcIneqSolverBase(unsigned hintNumConstraints, unsigned hintNumVariables);
+#line 26 "QcIneqSolverBase.ch"
+virtual ~QcIneqSolverBase()
+{
+}
+
+//-----------------------------------------------------------------------//
+// Variable management methods                                           //
+//-----------------------------------------------------------------------//
+virtual void
+AddVar(QcFloat &v)
+{
+  fSystem.AddVar( v);
+}
+
+virtual void
+SuggestValue(QcFloat &v, numT desval)
+{
+  fSystem.SuggestValue( v, desval);
+}
+
+virtual bool
+RemoveVar(QcFloat &v)
+{
+  return fSystem.RemoveVar( v);
+}
+
+virtual void
+RestSolver()
+{
+  fSystem.RestSolver();
+}
+
+//-----------------------------------------------------------------------//
+// Enquiry functions for variables                                       //
+//-----------------------------------------------------------------------//
+virtual bool
+IsRegistered(QcFloat const &v) const
+{
+  return fSystem.IsRegistered( v);
+}
+
+virtual bool
+IsFree(QcFloat const &v) const
+{
+  return fSystem.IsFree( v);
+}
+
+virtual bool
+IsBasic(QcFloat const &v) const
+{
+  return fSystem.IsBasic( v);
+}
+
+
+
+//-----------------------------------------------------------------------//
+// Constraint management methods                                         //
+//-----------------------------------------------------------------------//
+
+
+virtual bool
+AddConstraint(QcConstraint &c);
+#line 101 "QcIneqSolverBase.ch"
+virtual bool
+AddConstraint(QcConstraint &c, QcFloat &hint);
+#line 117 "QcIneqSolverBase.ch"
+virtual void
+BeginAddConstraint()
+{
+  fSystem.BeginAddConstraint();
+}
+
+virtual bool
+EndAddConstraint()
+{
+  return fSystem.EndAddConstraint();
+}
+
+
+
+virtual bool
+ChangeConstraint(QcConstraint &oldc, numT rhs);
+#line 143 "QcIneqSolverBase.ch"
+virtual bool
+RemoveConstraint(QcConstraint &c);
+#line 159 "QcIneqSolverBase.ch"
+virtual bool
+Reset()
+{
+  return fSystem.Reset();
+}
+
+
+
+
+protected:
+  QcDelLinInEqSystem fSystem;
+
+};
+
+/*
+  Local Variables:
+  mode:c++
+  c-file-style:"gnu"
+  fill-column:80
+  End:
+  vim: set filetype=c++ :
+*/
+
+#endif /* !QcIneqSolverBaseDCL */
