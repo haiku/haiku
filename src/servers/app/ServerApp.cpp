@@ -757,30 +757,24 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_COUNT_WORKSPACES:
 		{
-			DesktopSettings settings(fDesktop);
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
 
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(settings.WorkspacesCount());
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(settings.WorkspacesCount());
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
 			fLink.Flush();
 			break;
 		}
 
 		case AS_SET_WORKSPACE_COUNT:
 		{
-			DesktopSettings settings(fDesktop);
-
 			int32 newCount;
-			if (link.Read<int32>(&newCount) == B_OK) {
-				settings.SetWorkspacesCount(newCount);
-
-				// either update the workspaces window, or switch to
-				// the last available workspace - which will update
-				// the workspaces window automatically
-				if (fDesktop->CurrentWorkspace() >= newCount)
-					fDesktop->SetWorkspace(newCount - 1);
-				else
-					fDesktop->UpdateWorkspaces();
-			}
+			if (link.Read<int32>(&newCount) == B_OK)
+				fDesktop->SetWorkspacesCount(newCount);
 			break;
 		}
 
@@ -795,7 +789,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_ACTIVATE_WORKSPACE:
 		{
 			STRACE(("ServerApp %s: activate workspace\n", Signature()));
-			
+
 			// TODO: See above
 			int32 index;
 			link.Read<int32>(&index);
@@ -944,13 +938,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
-			scroll_bar_info info;
-			DesktopSettings settings(fDesktop);
-			settings.GetScrollBarInfo(info);
+			
+			if (fDesktop->LockSingleWindow()) {
+				scroll_bar_info info;
+				DesktopSettings settings(fDesktop);
+				settings.GetScrollBarInfo(info);
 
-			fLink.StartMessage(B_OK);
-			fLink.Attach<scroll_bar_info>(info);
-			fLink.Flush();
+				fLink.StartMessage(B_OK);
+				fLink.Attach<scroll_bar_info>(info);
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
+				fLink.Flush();
 			break;
 		}
 		case AS_SET_SCROLLBAR_INFO:
@@ -960,7 +960,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info info;
 			if (link.Read<scroll_bar_info>(&info) == B_OK) {
-				DesktopSettings settings(fDesktop);
+				LockedDesktopSettings settings(fDesktop);
 				settings.SetScrollBarInfo(info);
 			}
 
@@ -972,12 +972,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_MENU_INFO:
 		{
 			STRACE(("ServerApp %s: Get menu info\n", Signature()));
-			menu_info info;
-			DesktopSettings settings(fDesktop);
-			settings.GetMenuInfo(info);
+			if (fDesktop->LockSingleWindow()) {
+				menu_info info;
+				DesktopSettings settings(fDesktop);
+				settings.GetMenuInfo(info);
 
-			fLink.StartMessage(B_OK);
-			fLink.Attach<menu_info>(info);
+				fLink.StartMessage(B_OK);
+				fLink.Attach<menu_info>(info);
+
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
 			fLink.Flush();
 			break;
 		}
@@ -986,7 +992,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Set menu info\n", Signature()));
 			menu_info info;
 			if (link.Read<menu_info>(&info) == B_OK) {
-				DesktopSettings settings(fDesktop);
+				LockedDesktopSettings settings(fDesktop);
 				settings.SetMenuInfo(info);
 					// TODO: SetMenuInfo() should do some validity check, so
 					//	that the answer we're giving can actually be useful
@@ -1004,7 +1010,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mouseMode;
 			if (link.Read<mode_mouse>(&mouseMode) == B_OK) {
-				DesktopSettings settings(fDesktop);
+				LockedDesktopSettings settings(fDesktop);
 				settings.SetMouseMode(mouseMode);
 			}
 			break;
@@ -1012,10 +1018,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
-			DesktopSettings settings(fDesktop);
+			
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
 
-			fLink.StartMessage(B_OK);
-			fLink.Attach<mode_mouse>(settings.MouseMode());
+				fLink.StartMessage(B_OK);
+				fLink.Attach<mode_mouse>(settings.MouseMode());
+
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
 			fLink.Flush();
 			break;
 		}
@@ -1044,7 +1057,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				FontStyle* style = gFontManager->GetStyle(familyName, styleName);
 				if (style != NULL) {
 					ServerFont font(*style, size);
-					DesktopSettings settings(fDesktop);
+					LockedDesktopSettings settings(fDesktop);
 
 					if (!strcmp(type, "plain"))
 						settings.SetDefaultPlainFont(font);
@@ -1102,6 +1115,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
 
+			if (!fDesktop->LockSingleWindow()) {
+				fLink.StartMessage(B_OK);
+				fLink.Flush();
+				break;
+			}
+
 			DesktopSettings settings(fDesktop);
 			fLink.StartMessage(B_OK);
 
@@ -1129,6 +1148,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<uint32>(font.Flags());
 			}
 
+			fDesktop->UnlockSingleWindow();
 			fLink.Flush();
 			break;
 		}

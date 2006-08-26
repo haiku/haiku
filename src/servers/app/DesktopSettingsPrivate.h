@@ -17,10 +17,10 @@
 struct server_read_only_memory;
 
 
-class DesktopSettings::Private : public BLocker {
+class DesktopSettingsPrivate {
 	public:
-		Private(server_read_only_memory* shared);
-		~Private();
+		DesktopSettingsPrivate(server_read_only_memory* shared);
+		~DesktopSettingsPrivate();
 
 		status_t		Save(uint32 mask = kAllSettings);
 

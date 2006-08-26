@@ -74,6 +74,9 @@ Decorator *
 DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 	window_look look, uint32 flags)
 {
+	if (desktop->LockSingleWindow() == NULL)
+		return NULL;
+
 	DesktopSettings settings(desktop);
 	Decorator *decorator;
 	
@@ -83,8 +86,11 @@ DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 		else
 			decorator = new DefaultDecorator(settings, rect, look, flags);
 	} catch (...) {
+		desktop->UnlockSingleWindow();
 		return NULL;
 	}
+
+	desktop->UnlockSingleWindow();
 
 	decorator->SetDriver(desktop->GetDrawingEngine());
 	decorator->SetTitle(title);

@@ -97,7 +97,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fCurrentWorkspace; }
 		Workspace::Private&		WorkspaceAt(int32 index)
 									{ return fWorkspaces[index]; }
-		void					UpdateWorkspaces();
+		status_t				SetWorkspacesCount(int32 newCount);
 
 		// WindowLayer methods
 
@@ -180,6 +180,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									BPrivate::LinkSender& sender);
 
 	private:
+		void					_SetWorkspace(int32 index);
 		void					_ShowWindow(WindowLayer* window,
 									bool affectsOtherWindows = true);
 		void					_HideWindow(WindowLayer* window);
@@ -218,10 +219,11 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 	private:
 		friend class DesktopSettings;
+		friend class LockedDesktopSettings;
 
 		uid_t					fUserID;
 		::VirtualScreen			fVirtualScreen;
-		DesktopSettings::Private* fSettings;
+		DesktopSettingsPrivate*	fSettings;
 		port_id					fMessagePort;
 		::EventDispatcher		fEventDispatcher;
 		port_id					fInputPort;

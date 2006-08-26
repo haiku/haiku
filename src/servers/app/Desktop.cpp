@@ -349,7 +349,7 @@ Desktop::Init()
 	if (fSharedReadOnlyArea < B_OK)
 		return fSharedReadOnlyArea;
 
-	fSettings = new DesktopSettings::Private(fServerReadOnlyMemory);
+	fSettings = new DesktopSettingsPrivate(fServerReadOnlyMemory);
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		_Windows(i).SetIndex(i);
@@ -717,15 +717,39 @@ Desktop::StoreWorkspaceConfiguration(int32 index)
 }
 
 
-void
-Desktop::UpdateWorkspaces()
+status_t
+Desktop::SetWorkspacesCount(int32 newCount)
 {
-	// TODO: maybe this should be replaced by a SetWorkspacesCount() method
+	if (newCount < 1 || newCount > kMaxWorkspaces)
+		return B_BAD_VALUE;
 
-	_WindowChanged(NULL);
+	if (!LockAllWindows())
+		return B_ERROR;
+
+	fSettings->SetWorkspacesCount(newCount);
+
+	// either update the workspaces window, or switch to
+	// the last available workspace - which will update
+	// the workspaces window automatically
+	bool workspaceChanged = CurrentWorkspace() >= newCount;
+	if (workspaceChanged)
+		_SetWorkspace(newCount - 1);
+	else
+		_WindowChanged(NULL);
+
+	UnlockAllWindows();
+
+	if (workspaceChanged)
+		_SendFakeMouseMoved();
+
+	return B_OK;
 }
 
 
+/*!
+	Changes the current workspace to the one specified by \a index.
+	You must not hold any window lock when calling this method.
+*/
 void
 Desktop::SetWorkspace(int32 index)
 {
@@ -737,6 +761,20 @@ Desktop::SetWorkspace(int32 index)
 		return;
 	}
 
+	_SetWorkspace(index);
+	UnlockAllWindows();
+
+	_SendFakeMouseMoved();
+}
+
+
+/*!
+	Changes the current workspace to the one specified by \a index.
+	You must hold the all window lock when calling this method.
+*/
+void
+Desktop::_SetWorkspace(int32 index)
+{
 	int32 previousIndex = fCurrentWorkspace;
 	RGBColor previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
@@ -864,10 +902,6 @@ Desktop::SetWorkspace(int32 index)
 
 	if (previousColor != fWorkspaces[fCurrentWorkspace].Color())
 		RedrawBackground();
-
-	UnlockAllWindows();
-
-	_SendFakeMouseMoved();
 }
 
 
@@ -1056,6 +1090,9 @@ Desktop::_WindowHasModal(WindowLayer* window)
 }
 
 
+/*!
+	You must at least hold a single window lock when calling this method.
+*/
 void
 Desktop::_WindowChanged(WindowLayer* window)
 {

@@ -23,8 +23,8 @@
 #include <Path.h>
 
 
-DesktopSettings::Private::Private(server_read_only_memory* shared)
-	: BLocker("DesktopSettings_Private"),
+DesktopSettingsPrivate::DesktopSettingsPrivate(server_read_only_memory* shared)
+	:
 	fShared(*shared)
 {
 	// if the on-disk settings are not complete, the defaults will be kept
@@ -33,13 +33,13 @@ DesktopSettings::Private::Private(server_read_only_memory* shared)
 }
 
 
-DesktopSettings::Private::~Private()
+DesktopSettingsPrivate::~DesktopSettingsPrivate()
 {
 }
 
 
 void
-DesktopSettings::Private::_SetDefaults()
+DesktopSettingsPrivate::_SetDefaults()
 {
 	fPlainFont = *gFontManager->DefaultPlainFont();
 	fBoldFont = *gFontManager->DefaultBoldFont();
@@ -73,7 +73,7 @@ DesktopSettings::Private::_SetDefaults()
 
 
 status_t
-DesktopSettings::Private::_GetPath(BPath& path)
+DesktopSettingsPrivate::_GetPath(BPath& path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (status < B_OK)
@@ -88,7 +88,7 @@ DesktopSettings::Private::_GetPath(BPath& path)
 
 
 status_t
-DesktopSettings::Private::_Load()
+DesktopSettingsPrivate::_Load()
 {
 	// TODO: add support for old app_server_settings file as well
 
@@ -224,7 +224,7 @@ DesktopSettings::Private::_Load()
 
 
 status_t
-DesktopSettings::Private::Save(uint32 mask)
+DesktopSettingsPrivate::Save(uint32 mask)
 {
 	BPath basePath;
 	status_t status = _GetPath(basePath);
@@ -314,7 +314,7 @@ DesktopSettings::Private::Save(uint32 mask)
 
 
 void
-DesktopSettings::Private::SetDefaultPlainFont(const ServerFont &font)
+DesktopSettingsPrivate::SetDefaultPlainFont(const ServerFont &font)
 {
 	fPlainFont = font;
 	Save(kFontSettings);
@@ -322,14 +322,14 @@ DesktopSettings::Private::SetDefaultPlainFont(const ServerFont &font)
 
 
 const ServerFont &
-DesktopSettings::Private::DefaultPlainFont() const
+DesktopSettingsPrivate::DefaultPlainFont() const
 {
 	return fPlainFont;
 }
 
 
 void
-DesktopSettings::Private::SetDefaultBoldFont(const ServerFont &font)
+DesktopSettingsPrivate::SetDefaultBoldFont(const ServerFont &font)
 {
 	fBoldFont = font;
 	Save(kFontSettings);
@@ -337,14 +337,14 @@ DesktopSettings::Private::SetDefaultBoldFont(const ServerFont &font)
 
 
 const ServerFont &
-DesktopSettings::Private::DefaultBoldFont() const
+DesktopSettingsPrivate::DefaultBoldFont() const
 {
 	return fBoldFont;
 }
 
 
 void
-DesktopSettings::Private::SetDefaultFixedFont(const ServerFont &font)
+DesktopSettingsPrivate::SetDefaultFixedFont(const ServerFont &font)
 {
 	fFixedFont = font;
 	Save(kFontSettings);
@@ -352,14 +352,14 @@ DesktopSettings::Private::SetDefaultFixedFont(const ServerFont &font)
 
 
 const ServerFont &
-DesktopSettings::Private::DefaultFixedFont() const
+DesktopSettingsPrivate::DefaultFixedFont() const
 {
 	return fFixedFont;
 }
 
 
 void
-DesktopSettings::Private::SetScrollBarInfo(const scroll_bar_info& info)
+DesktopSettingsPrivate::SetScrollBarInfo(const scroll_bar_info& info)
 {
 	fScrollBarInfo = info;
 	Save(kAppearanceSettings);
@@ -367,14 +367,14 @@ DesktopSettings::Private::SetScrollBarInfo(const scroll_bar_info& info)
 
 
 const scroll_bar_info&
-DesktopSettings::Private::ScrollBarInfo() const
+DesktopSettingsPrivate::ScrollBarInfo() const
 {
 	return fScrollBarInfo;
 }
 
 
 void
-DesktopSettings::Private::SetMenuInfo(const menu_info& info)
+DesktopSettingsPrivate::SetMenuInfo(const menu_info& info)
 {
 	fMenuInfo = info;
 	Save(kAppearanceSettings);
@@ -382,14 +382,14 @@ DesktopSettings::Private::SetMenuInfo(const menu_info& info)
 
 
 const menu_info&
-DesktopSettings::Private::MenuInfo() const
+DesktopSettingsPrivate::MenuInfo() const
 {
 	return fMenuInfo;
 }
 
 
 void
-DesktopSettings::Private::SetMouseMode(const mode_mouse mode)
+DesktopSettingsPrivate::SetMouseMode(const mode_mouse mode)
 {
 	fMouseMode = mode;
 	Save(kMouseSettings);
@@ -397,21 +397,21 @@ DesktopSettings::Private::SetMouseMode(const mode_mouse mode)
 
 
 mode_mouse
-DesktopSettings::Private::MouseMode() const
+DesktopSettingsPrivate::MouseMode() const
 {
 	return fMouseMode;
 }
 
 
 bool
-DesktopSettings::Private::FocusFollowsMouse() const
+DesktopSettingsPrivate::FocusFollowsMouse() const
 {
 	return MouseMode() != B_NORMAL_MOUSE;
 }
 
 
 void
-DesktopSettings::Private::SetWorkspacesCount(int32 number)
+DesktopSettingsPrivate::SetWorkspacesCount(int32 number)
 {
 	if (number < 1)
 		number = 1;
@@ -423,14 +423,14 @@ DesktopSettings::Private::SetWorkspacesCount(int32 number)
 
 
 int32
-DesktopSettings::Private::WorkspacesCount() const
+DesktopSettingsPrivate::WorkspacesCount() const
 {
 	return fWorkspacesCount;
 }
 
 
 void
-DesktopSettings::Private::SetWorkspacesMessage(int32 index, BMessage& message)
+DesktopSettingsPrivate::SetWorkspacesMessage(int32 index, BMessage& message)
 {
 	if (index < 0 || index > kMaxWorkspaces)
 		return;
@@ -440,7 +440,7 @@ DesktopSettings::Private::SetWorkspacesMessage(int32 index, BMessage& message)
 
 
 const BMessage*
-DesktopSettings::Private::WorkspacesMessage(int32 index) const
+DesktopSettingsPrivate::WorkspacesMessage(int32 index) const
 {
 	if (index < 0 || index > kMaxWorkspaces)
 		return NULL;
@@ -449,27 +449,15 @@ DesktopSettings::Private::WorkspacesMessage(int32 index) const
 }
 
 
-
-//	#pragma mark -
+//	#pragma mark - read access
 
 
 DesktopSettings::DesktopSettings(Desktop* desktop)
+	:
+	fSettings(desktop->fSettings)
 {
-	fSettings = desktop->fSettings;
-	fSettings->Lock();
-}
-
-
-DesktopSettings::~DesktopSettings()
-{
-	fSettings->Unlock();
-}
-
-
-void
-DesktopSettings::SetDefaultPlainFont(const ServerFont &font)
-{
-	fSettings->SetDefaultPlainFont(font);
+	if (!desktop->fWindowLock.IsReadLocked() && !desktop->fWindowLock.IsWriteLocked())
+		debugger("desktop not locked when trying to access settings");
 }
 
 
@@ -481,23 +469,9 @@ DesktopSettings::GetDefaultPlainFont(ServerFont &font) const
 
 
 void
-DesktopSettings::SetDefaultBoldFont(const ServerFont &font)
-{
-	fSettings->SetDefaultBoldFont(font);
-}
-
-
-void
 DesktopSettings::GetDefaultBoldFont(ServerFont &font) const
 {
 	font = fSettings->DefaultBoldFont();
-}
-
-
-void
-DesktopSettings::SetDefaultFixedFont(const ServerFont &font)
-{
-	fSettings->SetDefaultFixedFont(font);
 }
 
 
@@ -509,13 +483,6 @@ DesktopSettings::GetDefaultFixedFont(ServerFont &font) const
 
 
 void
-DesktopSettings::SetScrollBarInfo(const scroll_bar_info& info)
-{
-	fSettings->SetScrollBarInfo(info);
-}
-
-
-void
 DesktopSettings::GetScrollBarInfo(scroll_bar_info& info) const
 {
 	info = fSettings->ScrollBarInfo();
@@ -523,23 +490,9 @@ DesktopSettings::GetScrollBarInfo(scroll_bar_info& info) const
 
 
 void
-DesktopSettings::SetMenuInfo(const menu_info& info)
-{
-	fSettings->SetMenuInfo(info);
-}
-
-
-void
 DesktopSettings::GetMenuInfo(menu_info& info) const
 {
 	info = fSettings->MenuInfo();
-}
-
-
-void
-DesktopSettings::SetMouseMode(const mode_mouse mode)
-{
-	fSettings->SetMouseMode(mode);
 }
 
 
@@ -557,24 +510,10 @@ DesktopSettings::FocusFollowsMouse() const
 }
 
 
-void
-DesktopSettings::SetWorkspacesCount(int32 number)
-{
-	fSettings->SetWorkspacesCount(number);
-}
-
-
 int32
 DesktopSettings::WorkspacesCount() const
 {
 	return fSettings->WorkspacesCount();
-}
-
-
-void
-DesktopSettings::SetWorkspacesMessage(int32 index, BMessage& message)
-{
-	fSettings->SetWorkspacesMessage(index, message);
 }
 
 
@@ -583,4 +522,71 @@ DesktopSettings::WorkspacesMessage(int32 index) const
 {
 	return fSettings->WorkspacesMessage(index);
 }
+
+
+//	#pragma mark - write access
+
+
+LockedDesktopSettings::LockedDesktopSettings(Desktop* desktop)
+	:
+	fSettings(desktop->fSettings),
+	fDesktop(desktop)
+{
+	// TODO: this only works in MultiLocker's DEBUG mode
+#if 0
+	if (desktop->fWindowLock.IsReadLocked())
+		debugger("desktop read locked when trying to change settings");
+#endif
+
+	fDesktop->LockAllWindows();
+}
+
+
+LockedDesktopSettings::~LockedDesktopSettings()
+{
+	fDesktop->UnlockAllWindows();
+}
+
+
+void
+LockedDesktopSettings::SetDefaultPlainFont(const ServerFont &font)
+{
+	fSettings->SetDefaultPlainFont(font);
+}
+
+
+void
+LockedDesktopSettings::SetDefaultBoldFont(const ServerFont &font)
+{
+	fSettings->SetDefaultBoldFont(font);
+}
+
+
+void
+LockedDesktopSettings::SetDefaultFixedFont(const ServerFont &font)
+{
+	fSettings->SetDefaultFixedFont(font);
+}
+
+
+void
+LockedDesktopSettings::SetScrollBarInfo(const scroll_bar_info& info)
+{
+	fSettings->SetScrollBarInfo(info);
+}
+
+
+void
+LockedDesktopSettings::SetMenuInfo(const menu_info& info)
+{
+	fSettings->SetMenuInfo(info);
+}
+
+
+void
+LockedDesktopSettings::SetMouseMode(const mode_mouse mode)
+{
+	fSettings->SetMouseMode(mode);
+}
+
 
