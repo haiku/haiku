@@ -31,8 +31,9 @@
 # include "Icons.h"
 # include "Property.h"
 # include "PropertyObject.h"
-# include "Transformable.h"
 #endif // ICON_O_MATIC
+
+#include "Transformable.h"
 
 #define obj_new(type, n)		((type *)malloc ((n) * sizeof(type)))
 #define obj_renew(p, type, n)	((type *)realloc (p, (n) * sizeof(type)))
