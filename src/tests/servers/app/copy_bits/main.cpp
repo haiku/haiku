@@ -243,9 +243,18 @@ show_window(BRect frame, const char* name)
 	b.OffsetTo(5.0, view->Bounds().bottom - (b.Height() + 15.0));
 	BButton* control = new BButton(b, "button", "Copy", new BMessage(MSG_COPY_BITS));
 	view->AddChild(control);
-printf("button frame:\n");
-control->Frame().PrintToStream();
 	control->SetTarget(view);
+
+	// test CopyBits() on top of children
+	b = BRect(80, 130, 130, 160);
+	BView* child = new BView(b, "some child", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM, 0);
+	child->SetViewColor(255, 0, 0);
+	view->AddChild(child);
+
+	b = BRect(136, 127, 158, 140);
+	child = new BView(b, "some other child", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM, 0);
+	child->SetViewColor(255, 255, 0);
+	view->AddChild(child);
 
 	window->Show();
 }
