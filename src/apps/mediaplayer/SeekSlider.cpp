@@ -34,6 +34,7 @@ SeekSlider::SeekSlider(BRect frame, const char* name, BMessage* message,
 	: BControl(frame, name, NULL, message, B_FOLLOW_NONE,
 			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	  fTracking(false),
+	  fKnobPos(_KnobPosFor(Bounds(), Value())),
 	  fMinValue(minValue),
 	  fMaxValue(maxValue)
 {
@@ -62,21 +63,38 @@ SeekSlider::SetValue(int32 value)
 	if (value == Value())
 		return;
 
+#if __HAIKU__
+	BControl::SetValueNoUpdate(value);
+#else
 	BControl::SetValue(value);
+#endif
 	Invoke();
+
+#if __HAIKU__
+	int32 oldKnobPos = fKnobPos;
+	fKnobPos = _KnobPosFor(Bounds(), Value());
+	// invalidate
+	if (oldKnobPos != fKnobPos) {
+		float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
+		BRect oldKnob(Bounds());
+		BRect newKnob(oldKnob);
+		oldKnob.left = oldKnobPos - knobWidth2;
+		oldKnob.right = oldKnobPos + knobWidth2;
+		newKnob.left = fKnobPos - knobWidth2;
+		newKnob.right = fKnobPos + knobWidth2;
+		Invalidate(oldKnob | newKnob);
+	}
+#else
+	fKnobPos = _KnobPosFor(Bounds(), Value());
+#endif
 }
 
 
 void
 SeekSlider::Draw(BRect updateRect)
 {
-	BRect r(Bounds());
-	float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
-	float sliderStart = (r.left + knobWidth2);
-	float sliderEnd = (r.right - knobWidth2);
-	float knobPos = sliderStart
-					+ floorf((sliderEnd - sliderStart - 1.0) * (Value() - fMinValue)
-					/ (fMaxValue - fMinValue) + 0.5);
+	BRect r(Bounds());	
+
 	// draw both sides (the original from Be doesn't seem
 	// to make a difference for enabled/disabled state)
 //	DrawBitmapAsync(fLeftSideBits, r.LeftTop());
@@ -115,6 +133,10 @@ SeekSlider::Draw(BRect updateRect)
 		BPoint dotPos;
 		dotPos.y = r.top + 2.0;
 		SetHighColor(dotGreen);
+
+		float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
+		float sliderStart = (r.left + knobWidth2);
+
 		for (int32 i = 0; i < dotCount; i++) {
 			dotPos.x = sliderStart + i * 6.0 + 5.0;
 			StrokeLine(dotPos, BPoint(dotPos.x, dotPos.y + 6.0));
@@ -122,8 +144,8 @@ SeekSlider::Draw(BRect updateRect)
 		// slider handle
 		r.top -= 4.0;
 		r.bottom += 3.0;
-		r.left = knobPos - knobWidth2;
-		r.right = knobPos + knobWidth2;
+		r.left = fKnobPos - knobWidth2;
+		r.right = fKnobPos + knobWidth2;
 		// black outline
 		float handleBottomSize = 2.0;
 		float handleArrowSize = 6.0;
@@ -136,15 +158,15 @@ SeekSlider::Draw(BRect updateRect)
 			AddLine(BPoint(r.right, r.top + 1.0),
 					BPoint(r.right, r.top + handleBottomSize), black);
 			AddLine(BPoint(r.right - 1.0, r.top + handleBottomSize + 1.0),
-					BPoint(knobPos, r.top + handleArrowSize), black);
-			AddLine(BPoint(knobPos - 1.0, r.top + handleArrowSize - 1.0),
+					BPoint(fKnobPos, r.top + handleArrowSize), black);
+			AddLine(BPoint(fKnobPos - 1.0, r.top + handleArrowSize - 1.0),
 					BPoint(r.left + 1.0, r.top + handleBottomSize + 1.0), black);
 			// lower handle
 			AddLine(BPoint(r.left, r.bottom),
 					BPoint(r.left, r.bottom - handleBottomSize), black);
 			AddLine(BPoint(r.left + 1.0, r.bottom - handleBottomSize - 1.0),
-					BPoint(knobPos, r.bottom - handleArrowSize), black);
-			AddLine(BPoint(knobPos + 1.0, r.bottom - handleArrowSize + 1.0),
+					BPoint(fKnobPos, r.bottom - handleArrowSize), black);
+			AddLine(BPoint(fKnobPos + 1.0, r.bottom - handleArrowSize + 1.0),
 					BPoint(r.right, r.bottom - handleBottomSize), black);
 			AddLine(BPoint(r.right, r.bottom - handleBottomSize + 1.0),
 					BPoint(r.right, r.bottom), black);
@@ -164,15 +186,15 @@ SeekSlider::Draw(BRect updateRect)
 			AddLine(BPoint(r.right, r.top + 1.0),
 					BPoint(r.right, r.top + handleBottomSize), kSeekRedShadow);
 			AddLine(BPoint(r.right - 1.0, r.top + handleBottomSize + 1.0),
-					BPoint(knobPos, r.top + handleArrowSize), kSeekRedShadow);
-			AddLine(BPoint(knobPos - 1.0, r.top + handleArrowSize - 1.0),
+					BPoint(fKnobPos, r.top + handleArrowSize), kSeekRedShadow);
+			AddLine(BPoint(fKnobPos - 1.0, r.top + handleArrowSize - 1.0),
 					BPoint(r.left + 1.0, r.top + handleBottomSize + 1.0), kSeekRedLight);
 			// lower handle
 			AddLine(BPoint(r.left, r.bottom),
 					BPoint(r.left, r.bottom - handleBottomSize), kSeekRedLight);
 			AddLine(BPoint(r.left + 1.0, r.bottom - handleBottomSize - 1.0),
-					BPoint(knobPos, r.bottom - handleArrowSize), kSeekRedLight);
-			AddLine(BPoint(knobPos + 1.0, r.bottom - handleArrowSize + 1.0),
+					BPoint(fKnobPos, r.bottom - handleArrowSize), kSeekRedLight);
+			AddLine(BPoint(fKnobPos + 1.0, r.bottom - handleArrowSize + 1.0),
 					BPoint(r.right, r.bottom - handleBottomSize), kSeekRedShadow);
 			AddLine(BPoint(r.right, r.bottom - handleBottomSize + 1.0),
 					BPoint(r.right, r.bottom), kSeekRedShadow);
@@ -189,7 +211,7 @@ SeekSlider::Draw(BRect updateRect)
 		arrow[0].y = r.top;
 		arrow[1].x = r.right;
 		arrow[1].y = r.top;
-		arrow[2].x = knobPos;
+		arrow[2].x = fKnobPos;
 		arrow[2].y = r.top + handleArrowSize;
 		FillPolygon(arrow, 3);
 		// lower handle arrow
@@ -197,7 +219,7 @@ SeekSlider::Draw(BRect updateRect)
 		arrow[0].y = r.bottom;
 		arrow[1].x = r.right;
 		arrow[1].y = r.bottom;
-		arrow[2].x = knobPos;
+		arrow[2].x = fKnobPos;
 		arrow[2].y = r.bottom - handleArrowSize;
 		FillPolygon(arrow, 3);
 	} else {
@@ -274,8 +296,10 @@ void
 SeekSlider::SetPosition(float position)
 {
 	int32 value = fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5);
-	if (value != Value())
+	if (value != Value()) {
 		BControl::SetValue(value);
+		
+	}
 }
 
 
@@ -296,6 +320,19 @@ SeekSlider::_ValueFor(float xPos) const
 	if (value > fMaxValue)
 		value = fMaxValue;
 	return value;
+}
+
+
+int32
+SeekSlider::_KnobPosFor(BRect r, int32 value) const
+{
+	float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
+	r.left += knobWidth2;
+	r.right -= knobWidth2;
+	float knobPos = r.left
+					+ floorf((r.right - r.left - 1.0) * (Value() - fMinValue)
+					/ (fMaxValue - fMinValue) + 0.5);
+	return (int32)knobPos;
 }
 
 

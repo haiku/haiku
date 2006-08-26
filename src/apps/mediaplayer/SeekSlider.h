@@ -37,6 +37,8 @@ class SeekSlider : public BControl {
 
 private:
 			int32				_ValueFor(float x) const;
+			int32				_KnobPosFor(BRect bounds,
+											int32 value) const;
 			void				_StrokeFrame(BRect frame,
 											 rgb_color left,
 											 rgb_color top,
@@ -44,6 +46,7 @@ private:
 											 rgb_color bottom);
 
 			bool				fTracking;
+			int32				fKnobPos;
 			int32				fMinValue;
 			int32				fMaxValue;
 };
