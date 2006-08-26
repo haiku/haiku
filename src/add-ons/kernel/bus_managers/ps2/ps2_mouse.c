@@ -453,6 +453,8 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			TRACE(("MS_READ\n"));
 			if ((status = mouse_read_event(cookie, &movement)) < B_OK)
 				return status;
+//			dprintf("%s %d %d %d %d\n", cookie->dev->name, 
+//				movement.xdelta, movement.ydelta, movement.buttons, movement.clicks);
 			return user_memcpy(buffer, &movement, sizeof(movement));
 		}
 
