@@ -152,7 +152,7 @@ get_rtc_info(rtc_info *info)
 		return B_BAD_VALUE;
 	info->time = real_time_clock();
 	info->is_gmt = sIsGMT;
-	info->tz_minuteswest = sTimezoneOffset;
+	info->tz_minuteswest = sTimezoneOffset / 1000000LL;
 	info->tz_dsttime = sDaylightSavingTime;
 
 	return B_OK;
