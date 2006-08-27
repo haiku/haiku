@@ -15,11 +15,12 @@ struct csi
 	uint32	sector;
 };
 
+off_t csi_to_block(struct csi *csi);
 int init_csi(struct _nspace *vol, uint32 cluster, uint32 sector, struct csi *csi);
 int iter_csi(struct csi *csi, int sectors);
-uint8 *csi_get_block(struct csi *csi);
+uint8 *csi_get_block(struct csi *csi, int32 tid);
 status_t csi_release_block(struct csi *csi);
-status_t csi_mark_block_dirty(struct csi *csi);
+status_t csi_mark_block_dirty(struct csi *csi, int32 tid);
 status_t csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len);
 status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len);
 status_t csi_write_block(struct csi *csi, uint8 *buffer);
@@ -33,6 +34,7 @@ struct diri
 	uint32 starting_cluster;
 	uint32 current_index;
 	uint8 *current_block;
+	int32 tid;
 };
 
 uint8 *diri_init(struct _nspace *vol, uint32 cluster, uint32 index, struct diri *diri);

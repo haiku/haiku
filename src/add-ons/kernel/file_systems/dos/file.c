@@ -2,15 +2,16 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-#include <KernelExport.h>
+#include <fs_cache.h>
+#include <fs_info.h>
 #include <Drivers.h>
+#include <KernelExport.h>
+#include <NodeMonitor.h>
 
-#include <fsproto.h>
-#include <lock.h>
-#include <cache.h>
 #include <time.h>
 
 #include "iter.h"
@@ -44,14 +45,26 @@ typedef struct filecookie
 
 static CHECK_MAGIC(filecookie,struct filecookie, FILECOOKIE_MAGIC)
 
+
+status_t
+dosfs_get_vnode_name(void *_ns, void *_node, char *buffer, size_t bufferSize)
+{
+	vnode   *node = (vnode*)_node;
+	strlcpy(buffer, node->filename, bufferSize);
+	return B_OK;
+}
+
+
 status_t write_vnode_entry(nspace *vol, vnode *node)
 {
 	uint32 i;
 	struct diri diri;
 	uint8 *buffer;
 
+	
+	// TODO : is it needed ? vfs job ?
 	// don't update entries of deleted files
-	if (is_vnode_removed(vol->id, node->vnid) > 0) return 0;
+	//if (is_vnode_removed(vol->id, node->vnid) > 0) return 0;
 
 	// XXX: should check if directory position is still valid even
 	// though we do the is_vnode_removed check above
@@ -96,9 +109,11 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	return B_OK;
 }
 
+
 // called when fs is done with vnode
 // after close, etc. free vnode resources here
-int dosfs_write_vnode(void *_vol, void *_node, char reenter)
+status_t 
+dosfs_release_vnode(void *_vol, void *_node, bool reenter)
 {
 	nspace *vol = (nspace *)_vol;
 	vnode *node = (vnode *)_node;
@@ -122,8 +137,11 @@ int dosfs_write_vnode(void *_vol, void *_node, char reenter)
 #if TRACK_FILENAME
 		if (node->filename) free(node->filename);
 #endif
+		
 		if (node->vnid != vol->root_vnode.vnid) {
 			node->magic = ~VNODE_MAGIC; // munge magic number to be safe
+			if (node->cache != NULL)
+				file_cache_delete(node->cache);
 			free(node);
 		}
 	}
@@ -131,7 +149,9 @@ int dosfs_write_vnode(void *_vol, void *_node, char reenter)
 	return 0;
 }
 
-int dosfs_rstat(void *_vol, void *_node, struct stat *st)
+
+status_t 
+dosfs_rstat(void *_vol, void *_node, struct stat *st)
 {
 	nspace	*vol = (nspace*)_vol;
 	vnode	*node = (vnode*)_node;
@@ -168,7 +188,9 @@ int dosfs_rstat(void *_vol, void *_node, struct stat *st)
 	return B_NO_ERROR;
 }
 
-int dosfs_wstat(void *_vol, void *_node, struct stat *st, long mask)
+
+status_t 
+dosfs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 {
 	int err = B_OK;
 	nspace	*vol = (nspace*)_vol;
@@ -197,7 +219,7 @@ int dosfs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 		return EPERM;
 	}
 
-	if (mask & WSTAT_MODE) {
+	if (mask & FS_WRITE_STAT_MODE) {
 		DPRINTF(0, ("setting file mode to %o\n", st->st_mode));
 		if (st->st_mode & S_IWUSR)
 			node->mode &= ~FAT_READ_ONLY;
@@ -206,7 +228,7 @@ int dosfs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 		dirty = true;
 	}
 
-	if (mask & WSTAT_SIZE) {
+	if (mask & FS_WRITE_STAT_SIZE) {
 		DPRINTF(0, ("setting file size to %Lx\n", st->st_size));
 		if (node->mode & FAT_SUBDIR) {
 			dprintf("dosfs_wstat: can't set file size of directory!\n");
@@ -221,11 +243,12 @@ int dosfs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 				node->st_size = st->st_size;
 				node->iteration++;
 				dirty = true;
+				file_cache_set_size(node->cache, node->st_size);
 			}
 		}
 	}
 	
-	if (mask & WSTAT_MTIME) {
+	if (mask & FS_WRITE_STAT_MTIME) {
 		DPRINTF(0, ("setting modification time\n"));
 		node->st_time = st->st_mtime;
 		dirty = true;
@@ -249,9 +272,11 @@ int dosfs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 	return err;
 }
 
-int dosfs_open(void *_vol, void *_node, int omode, void **_cookie)
+
+status_t 
+dosfs_open(void *_vol, void *_node, int omode, void **_cookie)
 {
-	int		result = EINVAL;
+	status_t	result = EINVAL;
 	nspace *vol = (nspace *)_vol;
 	vnode* 	node = (vnode*)_node;
 	filecookie *cookie;
@@ -320,18 +345,20 @@ error:
 	return result;
 }
 
-int dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
+
+status_t 
+dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 			void *buf, size_t *len)
 {
 	nspace	*vol = (nspace *)_vol;
 	vnode	*node = (vnode *)_node;
 	filecookie *cookie = (filecookie *)_cookie;
-	uint8 *buffer;
-	struct csi iter;
+	//uint8 *buffer;
+	//struct csi iter;
 	int result = B_OK;
-	size_t bytes_read = 0;
-	uint32 cluster1;
-	off_t diff;
+	//size_t bytes_read = 0;
+	//uint32 cluster1;
+	//off_t diff;
 
 	LOCK_VOL(vol);
 
@@ -342,6 +369,7 @@ int dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
+
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_read called on subdirectory %Lx\n", node->vnid));
@@ -355,13 +383,18 @@ int dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 	if (pos < 0) pos = 0;
 
 	if ((node->st_size == 0) || (*len == 0) || (pos >= node->st_size)) {
-		bytes_read = 0;
+		//bytes_read = 0;
+		*len = 0;
 		goto bi;
 	}
 
 	// truncate bytes to read to file size
 	if (pos + *len >= node->st_size)
 		*len = node->st_size - pos;
+		
+	result = file_cache_read(node->cache, pos, buf, len);
+
+#if 0
 
 	if ((cookie->ccache.iteration == node->iteration) &&
 		(pos >= cookie->ccache.index * vol->bytes_per_sector * vol->sectors_per_cluster)) {
@@ -455,9 +488,9 @@ int dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 	}
 
 	result = B_OK;
+#endif
+	
 bi:
-	*len = bytes_read;
-
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_read (%s)\n", strerror(result)));
 	} else {
@@ -468,18 +501,21 @@ bi:
 	return result;
 }
 
-int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
+
+status_t 
+dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 	const void *buf, size_t *len)
 {
 	nspace	*vol = (nspace *)_vol;
 	vnode	*node = (vnode *)_node;
 	filecookie *cookie = (filecookie *)_cookie;
-	uint8 *buffer;
-	struct csi iter;
+	//uint8 *buffer;
+	//struct csi iter;
 	int result = B_OK;
-	size_t bytes_written = 0;
-	uint32 cluster1;
-	off_t diff;
+	//size_t bytes_written = 0;
+	//uint32 cluster1;
+	//off_t diff;
+
 
 	LOCK_VOL(vol);
 
@@ -500,9 +536,10 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 	}
 
 	DPRINTF(0, ("dosfs_write called %lx bytes at %Lx from buffer at %lx (vnode id %Lx)\n", *len, pos, (uint32)buf, node->vnid));
-
+	
 	if ((cookie->mode & O_RWMASK) == O_RDONLY) {
 		dprintf("dosfs_write: called on file opened as read-only\n");
+		*len = 0;
 		result = EPERM;
 		goto bi;
 	}
@@ -515,6 +552,7 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 
 	if (pos >= MAX_FILE_SIZE) {
 		dprintf("dosfs_write: write position exceeds fat limits\n");
+		*len = 0;
 		result = E2BIG;
 		goto bi;
 	}
@@ -522,6 +560,8 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 	if (pos + *len >= MAX_FILE_SIZE) {
 		*len = (size_t)(MAX_FILE_SIZE - pos);
 	}
+	
+#if 0
 
 	if (node->st_size && 
 		(cookie->ccache.iteration == node->iteration) &&
@@ -534,6 +574,7 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 		cluster1 = 0xffffffff;
 		diff = 0;
 	}
+#endif
 
 	// extend file size if needed
 	if (pos + *len > node->st_size) {
@@ -552,8 +593,12 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 
 		DPRINTF(0, ("setting file size to %Lx (%lx clusters)\n", node->st_size, clusters));
 		node->dirty = true;
+		file_cache_set_size(node->cache, node->st_size);
 	}
-
+	
+	result = file_cache_write(node->cache, pos, buf, len);
+	
+#if 0
 	if (cluster1 == 0xffffffff) {
 		cluster1 = node->cluster;
 		diff = pos;
@@ -643,10 +688,9 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 	}
 
 	result = B_OK;
-
+#endif
+	
 bi:
-	*len = bytes_written;
-
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_write (%s)\n", strerror(result)));
 	} else {
@@ -657,7 +701,9 @@ bi:
 	return result;
 }
 
-int dosfs_close(void *_vol, void *_node, void *_cookie)
+
+status_t 
+dosfs_close(void *_vol, void *_node, void *_cookie)
 {
 	nspace	*vol = (nspace *)_vol;
 	vnode	*node = (vnode *)_node;
@@ -683,7 +729,9 @@ int dosfs_close(void *_vol, void *_node, void *_cookie)
 	return 0;
 }
 
-int dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
+
+status_t 
+dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
 {
 	nspace *vol = _vol;
 	vnode *node = _node;
@@ -707,8 +755,10 @@ int dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
 	return 0;
 }
 
-int dosfs_create(void *_vol, void *_dir, const char *name, int omode,
-	int perms, vnode_id *vnid, void **_cookie)
+
+status_t 
+dosfs_create(void *_vol, void *_dir, const char *name, int omode,
+	int perms, void **_cookie, vnode_id *vnid)
 {
 	nspace *vol = (nspace *)_vol;
 	vnode *dir = (vnode *)_dir, *file;
@@ -732,18 +782,19 @@ int dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 	}
 
 	DPRINTF(0, ("dosfs_create called: %Lx/%s perms=%o omode=%o\n", dir->vnid, name, perms, omode));
-
+	
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("dosfs_create called on read-only volume\n");
 		UNLOCK_VOL(vol);
 		return EROFS;
 	}
 
-	if (is_vnode_removed(vol->id, dir->vnid) > 0) {
+	// TODO : is it needed ? vfs job ?
+	/*if (is_vnode_removed(vol->id, dir->vnid) > 0) {
 		dprintf("dosfs_create() called in removed directory. disallowed.\n");
 		UNLOCK_VOL(vol);
 		return EPERM;
-	}
+	}*/
 
 	if ((omode & O_RWMASK) == O_RDONLY) {
 		dprintf("invalid permissions used in creating file\n");
@@ -854,7 +905,9 @@ bi:	if (result != B_OK) free(cookie);
 	return result;
 }
 
-int dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms)
+
+status_t 
+dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms, vnode_id *_vnid)
 {
 	nspace *vol = (nspace *)_vol;
 	vnode *dir = (vnode *)_dir, dummy;
@@ -871,11 +924,12 @@ int dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms)
 		return EINVAL;
 	}
 
-	if (is_vnode_removed(vol->id, dir->vnid) > 0) {
+	// TODO : is it needed ? vfs job ?
+	/*if (is_vnode_removed(vol->id, dir->vnid) > 0) {
 		dprintf("dosfs_mkdir() called in removed directory. disallowed.\n");
 		UNLOCK_VOL(vol);
 		return EPERM;
-	}
+	}*/
 
 	DPRINTF(0, ("dosfs_mkdir called: %Lx/%s (perm %o)\n", dir->vnid, name, perms));
 
@@ -1003,7 +1057,9 @@ bi:	dummy.magic = ~VNODE_MAGIC;
 	return result;
 }
 
-int dosfs_rename(void *_vol, void *_odir, const char *oldname,
+
+status_t 
+dosfs_rename(void *_vol, void *_odir, const char *oldname,
 	void *_ndir, const char *newname)
 {
 	status_t result = EINVAL;
@@ -1230,7 +1286,9 @@ bi:
 	return result;
 }
 
-int dosfs_remove_vnode(void *_vol, void *_node, char reenter)
+
+status_t 
+dosfs_remove_vnode(void *_vol, void *_node, bool reenter)
 {
 	nspace *vol = (nspace *)_vol;
 	vnode *node = (vnode *)_node;
@@ -1279,13 +1337,14 @@ int dosfs_remove_vnode(void *_vol, void *_node, char reenter)
 		UNLOCK_VOL(vol);
 	}
 
-	return 0;
+	return B_OK;
 }
 
 // get rid of node or directory
-static int do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
+static status_t 
+do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
 {
-	int result = EINVAL;
+	status_t result = EINVAL;
 	nspace *vol = (nspace *)_vol;
 	vnode *dir = (vnode *)_dir, *file;
 	vnode_id vnid;
@@ -1391,16 +1450,167 @@ bi:	UNLOCK_VOL(vol);
 	return result;
 }
 
-int dosfs_unlink(void *vol, void *dir, const char *name)
+status_t 
+dosfs_unlink(void *vol, void *dir, const char *name)
 {
 	DPRINTF(1, ("dosfs_unlink called\n"));
 
-	return do_unlink(vol,dir,name,true);
+	return do_unlink(vol, dir, name, true);
 }
 
-int dosfs_rmdir(void *vol, void *dir, const char *name)
+
+status_t 
+dosfs_rmdir(void *vol, void *dir, const char *name)
 {
 	DPRINTF(1, ("dosfs_rmdir called\n"));
 	
-	return do_unlink(vol,dir,name,false);
+	return do_unlink(vol, dir, name, false);
+}
+
+
+status_t
+dosfs_get_file_map(void *_fs, void *_node, off_t pos, size_t len,
+						struct file_io_vec *vecs, size_t *_count)
+{
+	nspace	*vol = (nspace *)_fs;
+	vnode	*node = (vnode *)_node;
+	struct csi iter;
+	int result = B_OK;
+	size_t bytes_read = 0;
+	uint32 cluster1;
+	off_t diff;
+	size_t index = 0, max = *_count;
+
+	LOCK_VOL(vol);
+	*_count = 0;
+
+	if (check_nspace_magic((nspace *)vol, "dosfs_get_file_map") ||
+		check_vnode_magic(node, "dosfs_get_file_map")) {
+		UNLOCK_VOL(vol);
+		return EINVAL;
+	}
+
+	if (node->mode & FAT_SUBDIR) {
+		DPRINTF(0, ("dosfs_get_file_map called on subdirectory %Lx\n", node->vnid));
+		UNLOCK_VOL(vol);
+		return EISDIR;
+	}
+
+	DPRINTF(0, ("dosfs_get_file_map called %lx bytes at %Lx (vnode id %Lx)\n", len, pos, node->vnid));
+		
+	if (pos < 0) pos = 0;
+
+	if ((node->st_size == 0) || (len == 0) || (pos >= node->st_size)) {
+		bytes_read = 0;
+		goto bi;
+	}
+
+	// truncate bytes to read to file size
+	if (pos + len >= node->st_size)
+		len = node->st_size - pos;
+		
+	/* the fat chain changed, so we have to start from the beginning */
+	cluster1 = node->cluster;
+	diff = pos;
+	diff /= vol->bytes_per_sector; /* convert to sectors */
+
+	if ((result = init_csi(vol, cluster1, 0, &iter)) != B_OK) {
+		dprintf("dosfs_get_file_map: invalid starting cluster (%lx)\n", cluster1);
+		goto bi;
+	}
+	
+	if (diff && ((result = iter_csi(&iter, diff)) != B_OK)) {
+		dprintf("dosfs_get_file_map: end of file reached (init)\n");
+		result = EIO;
+		goto bi;
+	}
+	
+	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster, pos / vol->bytes_per_sector / vol->sectors_per_cluster));
+
+	if ((pos % vol->bytes_per_sector) != 0) {
+		// read in partial first sector if necessary
+		size_t amt = vol->bytes_per_sector - (pos % vol->bytes_per_sector);
+		if (amt > len) 
+			amt = len;
+		vecs[index].offset = csi_to_block(&iter) * vol->bytes_per_sector + (pos % vol->bytes_per_sector);
+		vecs[index].length = amt;
+		index++;
+		if (index >= max) {
+			// we're out of file_io_vecs; let's bail out
+			result = B_BUFFER_OVERFLOW;
+			goto bi;
+		}
+		
+		bytes_read += amt;
+
+		if (bytes_read < len)
+			if ((result = iter_csi(&iter, 1)) != B_OK) {
+				dprintf("dosfs_get_file_map: end of file reached\n");
+				result = EIO;
+				goto bi;
+			}
+	}
+
+	// read middle sectors
+	while (bytes_read + vol->bytes_per_sector <= len) {
+		struct csi old_csi;
+		uint32 sectors = 1;
+		off_t block = csi_to_block(&iter);
+		status_t err;
+		
+		while (1) {
+			old_csi = iter;
+			err = iter_csi(&iter, 1);
+			if ((len - bytes_read) < (sectors + 1) * iter.vol->bytes_per_sector)
+				break;
+			if ((err < B_OK) || (block + sectors != csi_to_block(&iter)))
+				break;
+			sectors++;
+		}
+	
+		vecs[index].offset = block * vol->bytes_per_sector;
+		vecs[index].length = sectors * vol->bytes_per_sector;
+		bytes_read += sectors * vol->bytes_per_sector;
+		index++;
+		iter = old_csi;
+		
+		if (index >= max) {
+			// we're out of file_io_vecs; let's bail out
+			result = B_BUFFER_OVERFLOW;
+			goto bi;
+		}
+				
+		if (bytes_read < len)
+			if ((result = iter_csi(&iter, 1)) != B_OK) {
+				dprintf("dosfs_get_file_map: end of file reached\n");
+				result = EIO;
+				goto bi;
+			}
+	}
+	
+	// read part of remaining sector if needed
+	if (bytes_read < len) {
+		size_t amt = len - bytes_read;
+		vecs[index].offset = csi_to_block(&iter) * vol->bytes_per_sector;
+		vecs[index].length = amt;
+		index++;
+		bytes_read += amt;
+		
+		if (index >= max) {
+			// we're out of file_io_vecs; let's bail out
+			result = B_BUFFER_OVERFLOW;
+			goto bi;
+		}
+	}
+	
+	result = B_OK;
+bi:
+	*_count = index;
+	
+	if (result != B_OK) {
+		DPRINTF(0, ("dosfs_get_file_map (%s)\n", strerror(result)));
+	}
+	UNLOCK_VOL(vol);
+	
+	return result;
 }

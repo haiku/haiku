@@ -14,12 +14,10 @@
 
 #include <scsi.h>
 
-#include <fsproto.h>
-#ifndef COMPILE_IN_BEOS
+#include <fs_info.h>
+#include <fs_interface.h>
+#include <fs_cache.h>
 #include <fs_volume.h>
-#endif
-#include <lock.h>
-#include <cache.h>
 
 #include "dosfs.h"
 #include "attr.h"
@@ -49,7 +47,7 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 
 int32 instances = 0;
 
-int debug_dos(int argc, char **argv)
+static int debug_dos(int argc, char **argv)
 {
 	int i;
 	for (i=1;i<argc;i++) {
@@ -86,7 +84,7 @@ int debug_dos(int argc, char **argv)
 	return B_OK;
 }
 
-int debug_dvnode(int argc, char **argv)
+static int debug_dvnode(int argc, char **argv)
 {
 	int i;
 
@@ -116,7 +114,7 @@ int debug_dvnode(int argc, char **argv)
 	return B_OK;
 }
 
-int debug_dc2s(int argc, char **argv)
+static int debug_dc2s(int argc, char **argv)
 {
 	int i;
 	nspace *vol;
@@ -146,7 +144,7 @@ static int lock_removable_device(int fd, bool state)
 	return ioctl(fd, B_SCSI_PREVENT_ALLOW, &state, sizeof(state));
 }
 
-static status_t mount_fat_disk(const char *path, nspace_id nsid,
+static status_t mount_fat_disk(const char *path, mount_id nsid,
 		const int flags, nspace** newVol, int fs_flags, int op_sync_mode)
 {
 	nspace		*vol = NULL;
@@ -438,7 +436,8 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 	}
 
 	// initialize block cache
-	if (init_cache_for_device(vol->fd, (off_t)vol->total_sectors) < 0) {
+	vol->fBlockCache = block_cache_create(vol->fd, vol->total_sectors, vol->bytes_per_sector);
+	if (vol->fBlockCache == NULL) {
 		dprintf("error initializing block cache\n");
 		goto error;
 	}
@@ -537,7 +536,7 @@ error3:
 error2:
 	uninit_vcache(vol);
 error1:
-	remove_cached_device_blocks(vol->fd, NO_WRITES);
+	block_cache_delete(vol->fBlockCache, false);
 error:
 	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE) && (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
 		lock_removable_device(vol->fd, false);
@@ -547,8 +546,36 @@ error0:
 	return (err >= B_NO_ERROR) ? EINVAL : err;
 }
 
-static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *parms,
-		size_t len, void **data, vnode_id *vnid)
+
+//	#pragma mark - Scanning
+
+
+static float
+dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
+{
+	return 0.0f;
+}
+
+
+static status_t
+dosfs_scan_partition(int fd, partition_data *partition, void *_cookie)
+{
+	return B_OK;
+}
+
+
+static void
+dosfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+{
+}
+
+
+//	#pragma mark -
+
+
+static status_t
+dosfs_mount(mount_id nsid, const char *device, uint32 flags,
+		const char *args, void **_data, vnode_id *_rootID)
 {
 	int	result;
 	nspace	*vol;
@@ -579,17 +606,17 @@ static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *pa
 		}
 		
 	unload_driver_settings(handle);
-
-	/* parms and len are command line options; dosfs doesn't use any so
+	
+	/* args is a command line option; dosfs doesn't use any so
 	   we can ignore these arguments */
-	TOUCH(parms); TOUCH(len);
+	TOUCH(args);
 
 #if __RO__
 	// make it read-only
 	flags |= 1;
 #endif
 
-	if (data == NULL) {
+	if (_data == NULL) {
 		dprintf("dosfs_mount passed NULL data pointer\n");
 		return EINVAL;
 	}
@@ -600,17 +627,17 @@ static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *pa
 
 		if (check_nspace_magic(vol, "dosfs_mount")) return EINVAL;
 		
-		*vnid = vol->root_vnode.vnid;
-		*data = (void*)vol;
+		*_rootID = vol->root_vnode.vnid;
+		*_data = (void*)vol;
 		
 		// You MUST do this. Create the vnode for the root.
-		result = new_vnode(nsid, *vnid, (void*)&(vol->root_vnode));
+		result = publish_vnode(nsid, *_rootID, (void*)&(vol->root_vnode));
 		if (result != B_NO_ERROR) {
 			dprintf("error creating new vnode (%s)\n", strerror(result));
 			goto error;
 		}
 		sprintf(name, "fat lock %lx", vol->id);
-		if ((result = new_lock(&(vol->vlock), name)) != 0) {
+		if ((result = recursive_lock_init(&(vol->vlock), name)) != 0) {
 			dprintf("error creating lock (%s)\n", strerror(result));
 			goto error;
 		}
@@ -631,7 +658,7 @@ static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *pa
 	return result;
 
 error:
-	remove_cached_device_blocks(vol->fd, NO_WRITES);
+	block_cache_delete(vol->fBlockCache, false);
 	dlist_uninit(vol);
 	uninit_vcache(vol);
 	free(vol);
@@ -643,7 +670,9 @@ static void update_fsinfo(nspace *vol)
 	if ((vol->fat_bits == 32) && (vol->fsinfo_sector != 0xffff) &&
 		((vol->flags & B_FS_IS_READONLY) == false)) {
 		uchar *buffer;
-		if ((buffer = (uchar *)get_block(vol->fd, vol->fsinfo_sector, vol->bytes_per_sector)) != NULL) {
+		int32 tid = cache_start_transaction(vol->fBlockCache);
+		if ((buffer = (uchar *)block_cache_get_writable_etc(vol->fBlockCache, 
+			vol->fsinfo_sector, 0, vol->bytes_per_sector, tid)) != NULL) {
 			if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
 				//number of free clusters
 				buffer[0x1e8] = (vol->free_clusters & 0xff);
@@ -655,12 +684,14 @@ static void update_fsinfo(nspace *vol)
 				buffer[0x1ed] = ((vol->last_allocated >> 8) & 0xff);
 				buffer[0x1ee] = ((vol->last_allocated >> 16) & 0xff);
 				buffer[0x1ef] = ((vol->last_allocated >> 24) & 0xff);
-				mark_blocks_dirty(vol->fd, vol->fsinfo_sector, 1);
+				block_cache_set_dirty(vol->fBlockCache, vol->fsinfo_sector, true, tid);
 			} else {
 				dprintf("update_fsinfo: fsinfo block has invalid magic number\n");
 			}
-			release_block(vol->fd, vol->fsinfo_sector);
+			block_cache_put(vol->fBlockCache, vol->fsinfo_sector);
+			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 		} else {
+			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 			dprintf("update_fsinfo: error getting fsinfo sector %x\n", vol->fsinfo_sector);
 		}
 	}
@@ -674,7 +705,7 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 	if ((vol->fat_bits != 32) || (vol->fsinfo_sector == 0xffff))
 		return B_ERROR;
 		
-	if ((buffer = (uchar *)get_block(vol->fd, vol->fsinfo_sector, vol->bytes_per_sector)) == NULL) {
+	if ((buffer = (uchar *)block_cache_get_etc(vol->fBlockCache, vol->fsinfo_sector, 0, vol->bytes_per_sector)) == NULL) {
 		dprintf("get_fsinfo: error getting fsinfo sector %x\n", vol->fsinfo_sector);
 		return EIO;
 	}
@@ -688,11 +719,13 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 		result = B_ERROR;
 	}
 
-	release_block(vol->fd, vol->fsinfo_sector);
+	block_cache_put(vol->fBlockCache, vol->fsinfo_sector);
 	return result;
 }
 
-static int dosfs_unmount(void *_vol)
+
+static status_t 
+dosfs_unmount(void *_vol)
 {
 	int result = B_NO_ERROR;
 
@@ -708,8 +741,7 @@ static int dosfs_unmount(void *_vol)
 	DPRINTF(0, ("dosfs_unmount volume %lx\n", vol->id));
 
 	update_fsinfo(vol);
-	flush_device(vol->fd, 0);
-	remove_cached_device_blocks(vol->fd, ALLOW_WRITES);
+	block_cache_delete(vol->fBlockCache, true);
 
 #if DEBUG
 	if (atomic_add(&instances, -1) == 1) {
@@ -727,7 +759,7 @@ static int dosfs_unmount(void *_vol)
 	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE) && (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
 		lock_removable_device(vol->fd, false);
 	result = close(vol->fd);
-	free_lock(&(vol->vlock));
+	recursive_lock_destroy(&(vol->vlock));
 	vol->magic = ~VNODE_MAGIC;
 	free(vol);
 
@@ -738,20 +770,21 @@ static int dosfs_unmount(void *_vol)
 	return result;
 }
 
-// dosfs_rfsstat - Fill in fs_info struct for device.
-static int dosfs_rfsstat(void *_vol, struct fs_info * fss)
+// dosfs_read_fs_stat - Fill in fs_info struct for device.
+static status_t 
+dosfs_read_fs_stat(void *_vol, struct fs_info * fss)
 {
 	nspace* vol = (nspace*)_vol;
 	int i;
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_rfsstat")) {
+	if (check_nspace_magic(vol, "dosfs_read_fs_stat")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
 
-	DPRINTF(1, ("dosfs_rfsstat called\n"));
+	DPRINTF(1, ("dosfs_read_fs_stat called\n"));
 
 	// fss->dev and fss->root filled in by kernel
 	
@@ -793,22 +826,23 @@ static int dosfs_rfsstat(void *_vol, struct fs_info * fss)
 	
 	UNLOCK_VOL(vol);
 
-	return 0;
+	return B_OK;
 }
 
-static int dosfs_wfsstat(void *_vol, struct fs_info * fss, long mask)
+static status_t
+dosfs_write_fs_stat(void *_vol, const struct fs_info * fss, uint32 mask)
 {
-	int result = B_ERROR;
+	status_t result = B_ERROR;
 	nspace* vol = (nspace*)_vol;
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_wfsstat")) {
+	if (check_nspace_magic(vol, "dosfs_write_fs_stat")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_wfsstat called\n"));
+	DPRINTF(0, ("dosfs_write_fs_stat called\n"));
 
 	/* if it's a r/o file system and not the special hack, then don't allow
 	 * volume renaming */
@@ -817,7 +851,7 @@ static int dosfs_wfsstat(void *_vol, struct fs_info * fss, long mask)
 		return EROFS;
 	}
 
-	if (mask & WFSSTAT_NAME) {
+	if (mask & FS_WRITE_FSINFO_NAME) {
 		// sanitize name
 		char name[11];
 		int i,j;
@@ -840,7 +874,9 @@ static int dosfs_wfsstat(void *_vol, struct fs_info * fss, long mask)
 		if (vol->vol_entry == -1) {
 			// stored in the bpb
 			uchar *buffer;
-			if ((buffer = get_block(vol->fd, 0, vol->bytes_per_sector)) == NULL) {
+			int32 tid = cache_start_transaction(vol->fBlockCache);
+			if ((buffer = block_cache_get_writable_etc(vol->fBlockCache, 0, 0, vol->bytes_per_sector, tid)) == NULL) {
+				cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 				result = EIO;
 				goto bi;
 			}
@@ -849,10 +885,11 @@ static int dosfs_wfsstat(void *_vol, struct fs_info * fss, long mask)
 				result = B_ERROR;
 			} else {
 				memcpy(buffer + 0x2b, name, 11);
-				mark_blocks_dirty(vol->fd, 0, 1);
+				block_cache_set_dirty(vol->fBlockCache, 0, true, tid);
 				result = 0;
 			}
-			release_block(vol->fd, 0);
+			block_cache_put(vol->fBlockCache, 0);
+			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 		} else if (vol->vol_entry >= 0) {
 			struct diri diri;
 			uint8 *buffer;
@@ -887,7 +924,9 @@ bi:	UNLOCK_VOL(vol);
 	return result;
 }
 
-static int dosfs_ioctl(void *_vol, void *_node, void *cookie, int code, 
+
+static status_t 
+dosfs_ioctl(void *_vol, void *_node, void *cookie, ulong code, 
 	void *buf, size_t len)
 {
 	status_t result = B_OK;
@@ -912,9 +951,10 @@ static int dosfs_ioctl(void *_vol, void *_node, void *cookie, int code,
 				if (buf) *(bigtime_t *)buf = node->st_time;
 				break;
 
-		case 69666 :
+		/*case 69666 :
 				result = fragment(vol, buf);
 				break;
+		*/
 
 		case 100000 :
 			dprintf("built at %s on %s\n", build_time, build_date);
@@ -970,7 +1010,7 @@ static int dosfs_ioctl(void *_vol, void *_node, void *cookie, int code,
 			break;
 
 		default :
-			dprintf("dosfs_ioctl: vol %lx, vnode %Lx code = %d\n", vol->id, node->vnid, code);
+			dprintf("dosfs_ioctl: vol %lx, vnode %Lx code = %ld\n", vol->id, node->vnid, code);
 			result = EINVAL;
 			break;
 	}
@@ -980,21 +1020,25 @@ static int dosfs_ioctl(void *_vol, void *_node, void *cookie, int code,
 	return result;
 }
 
-int _dosfs_sync(nspace *vol)
+
+status_t 
+_dosfs_sync(nspace *vol)
 {
 	if (check_nspace_magic(vol, "dosfs_sync"))
 		return EINVAL;
 	
 	update_fsinfo(vol);
-	flush_device(vol->fd, 0);
+	block_cache_sync(vol->fBlockCache);
 
-	return 0;
+	return B_OK;
 }
 
-static int dosfs_sync(void *_vol)
+
+static status_t 
+dosfs_sync(void *_vol)
 {
 	nspace *vol = (nspace *)_vol;
-	int err;
+	status_t err;
 
 	DPRINTF(0, ("dosfs_sync called on volume %lx\n", vol->id));
 	
@@ -1005,76 +1049,144 @@ static int dosfs_sync(void *_vol)
 	return err;
 }
 
-static int dosfs_fsync(void *vol, void *node)
+
+static status_t 
+dosfs_fsync(void *vol, void *node)
 {
 	TOUCH(node);
 
 	return dosfs_sync(vol);
 }
 
-vnode_ops fs_entry =  {
-	&dosfs_read_vnode,
-	&dosfs_write_vnode,
-	&dosfs_remove_vnode,
-	NULL,
+
+//	#pragma mark -
+
+
+static status_t
+dos_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return B_OK;
+		case B_MODULE_UNINIT:
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+static file_system_module_info sDosFileSystem = {
+	{
+		"file_systems/dos" B_CURRENT_FS_API_VERSION,
+		0,
+		dos_std_ops,
+	},
+
+	"FAT32 File System",
+
+	// scanning
+	dosfs_identify_partition,
+	dosfs_scan_partition,
+	dosfs_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
+
+	&dosfs_mount,
+	&dosfs_unmount,
+	&dosfs_read_fs_stat,
+	&dosfs_write_fs_stat,
+	&dosfs_sync,
+
+	/* vnode operations */
 	&dosfs_walk,
-	&dosfs_access,
-	&dosfs_create,
-	&dosfs_mkdir,
-	NULL,
-	NULL,
-	&dosfs_rename,
-	&dosfs_unlink,
-	&dosfs_rmdir,
+	&dosfs_get_vnode_name,
+	&dosfs_read_vnode,
+	&dosfs_release_vnode,
+	&dosfs_remove_vnode,
+
+	/* VM file access */
+	NULL,	//&fs_can_page,
+	NULL,	//&fs_read_pages,
+	NULL,	//&fs_write_pages,
+
+	&dosfs_get_file_map,
+
+	&dosfs_ioctl,
+	NULL,	//&fs_set_flags,
+	NULL,	//&fs_select
+	NULL,	//&fs_deselect
+	&dosfs_fsync,
+
 	&dosfs_readlink,
-	&dosfs_opendir,
-	&dosfs_closedir,
-	&dosfs_free_dircookie,
-	&dosfs_rewinddir,
-	&dosfs_readdir,
+	NULL,						// write link
+	NULL,	//&fs_create_symlink,
+
+	NULL,	//&fs_link,
+	&dosfs_unlink,
+	&dosfs_rename,
+
+	&dosfs_access,
+	&dosfs_rstat,
+	&dosfs_wstat,
+
+	/* file operations */
+	&dosfs_create,
 	&dosfs_open,
 	&dosfs_close,
 	&dosfs_free_cookie,
 	&dosfs_read,
 	&dosfs_write,
-	NULL,
-	NULL,
-	&dosfs_ioctl,
-	NULL,
-	&dosfs_rstat,
-	&dosfs_wstat,
-	&dosfs_fsync,
-	NULL,
-	&dosfs_mount,
-	&dosfs_unmount,
-	&dosfs_sync,
-	&dosfs_rfsstat,
-	&dosfs_wfsstat,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+
+	/* directory operations */
+	&dosfs_mkdir,
+	&dosfs_rmdir,
+	&dosfs_opendir,
+	&dosfs_closedir,
+	&dosfs_free_dircookie,
+	&dosfs_readdir,
+	&dosfs_rewinddir,
+	
+	/* attribute directory operations */
 	&dosfs_open_attrdir,
 	&dosfs_close_attrdir,
-	&dosfs_free_attrcookie,
-	&dosfs_rewind_attrdir,
+	&dosfs_free_attrdir_cookie,
 	&dosfs_read_attrdir,
-	&dosfs_write_attr,
+	&dosfs_rewind_attrdir,
+
+	/* attribute operations */
+	NULL,	//&fs_create_attr,
+	&dosfs_open_attr,
+	&dosfs_close_attr,
+	&dosfs_free_attr_cookie,
 	&dosfs_read_attr,
-	NULL,
-	NULL,
-	&dosfs_stat_attr,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	&dosfs_write_attr,
+
+	&dosfs_read_attr_stat,
+	NULL,	//&fs_write_attr_stat,
+	NULL,	//&fs_rename_attr,
+	NULL,	//&fs_remove_attr,
+
+	/* index directory & index operations */
+	NULL,	//&fs_open_index_dir,
+	NULL,	//&fs_close_index_dir,
+	NULL,	//&fs_free_index_dir_cookie,
+	NULL,	//&fs_read_index_dir,
+	NULL,	//&fs_rewind_index_dir,
+
+	NULL,	//&fs_create_index,
+	NULL,	//&fs_remove_index,
+	NULL,	//&fs_stat_index,
+
+	/* query operations */
+	NULL,	//&fs_open_query,
+	NULL,	//&fs_close_query,
+	NULL, 	//&fs_free_query_cookie,
+	NULL, 	//&fs_read_query,
+	NULL, 	//&fs_rewind_query,
 };
 
-int32	api_version = B_CUR_FS_API_VERSION;
+module_info *modules[] = {
+	(module_info *)&sDosFileSystem,
+	NULL,
+};

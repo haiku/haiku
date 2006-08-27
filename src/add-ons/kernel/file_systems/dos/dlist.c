@@ -20,8 +20,8 @@ TODO:
 #define DPRINTF(a,b) if (debug_dlist > (a)) dprintf b
 
 #include <KernelExport.h>
-#include <fsproto.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "dosfs.h"

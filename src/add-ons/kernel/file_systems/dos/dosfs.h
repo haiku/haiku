@@ -5,21 +5,16 @@
 #ifndef _DOSFS_H_
 #define _DOSFS_H_
 
-#if USE_DMALLOC
-	#include <dmalloc.h>
-#else
-
-/* allocate memory from swappable heap */
-#define malloc smalloc
-#define free sfree
-#define calloc scalloc
-#define realloc srealloc
-
-#include <kalloc.h>
-
-#endif
-
 #include <KernelExport.h>
+#include <fs_interface.h>
+#include <lock.h>
+
+//#define DEBUG 1
+
+typedef recursive_lock lock;
+#define	LOCK(l)		recursive_lock_lock(&l);
+#define	UNLOCK(l)	recursive_lock_unlock(&l);
+
 
 /* for multiple reader/single writer locks */
 #define READERS 100000
@@ -68,8 +63,6 @@
 #define VNODE_PARENT_DIR_CLUSTER(vnode) \
 	CLUSTER_OF_DIR_CLUSTER_VNID((vnode)->dir_vnid)
 
-#include <lock.h>
-
 #define VNODE_MAGIC 'treB'
 
 typedef struct vnode
@@ -77,6 +70,7 @@ typedef struct vnode
 	uint32		magic;
 	vnode_id	vnid; 			// self id
 	vnode_id 	dir_vnid;		// parent vnode id (directory containing entry)
+	void		*cache;			// for file cache
 
 	uint32		disk_image;		// 0 = no, 1 = BEOS, 2 = IMAGE.BE
 
@@ -104,7 +98,7 @@ typedef struct vnode
 
 #if TRACK_FILENAME
 	char		*filename;
-#endif
+#endif	
 } vnode;
 
 // mode bits
@@ -122,10 +116,11 @@ struct vcache_entry;
 typedef struct _nspace
 {
 	uint32	magic;
-	nspace_id		id;				// ID passed in to fs_mount
+	mount_id		id;				// ID passed in to fs_mount
 	int				fd;				// File descriptor
 	char			device[256];
 	uint32			flags;			// see <fcntl.be.h> for modes
+	void			*fBlockCache;
 	
 	// info from bpb
 	uint32	bytes_per_sector;
@@ -206,6 +201,6 @@ int check_nspace_magic(struct _nspace *t, char *funcname);
 extern int debug_attr, debug_dir, debug_dlist, debug_dosfs, debug_encodings,
 		debug_fat, debug_file, debug_iter, debug_vcache;
 
-int _dosfs_sync(nspace *vol);
+status_t _dosfs_sync(nspace *vol);
 
 #endif

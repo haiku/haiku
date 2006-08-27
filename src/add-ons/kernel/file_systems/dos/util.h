@@ -8,12 +8,13 @@
 #include <ByteOrder.h>
 
 // debugging functions
-
+#ifndef ASSERT
 #ifndef DEBUG
 #define ASSERT(c) ((void)0)
 #else
 int _assert_(char *,int,char *);
 #define ASSERT(c) (!(c) ? _assert_(__FILE__,__LINE__,#c) : 0)
+#endif
 #endif
 
 void	dump_bytes(uint8 *buffer, uint32 count);

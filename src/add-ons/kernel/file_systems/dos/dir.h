@@ -21,16 +21,16 @@ status_t	create_volume_label(nspace *vol, const char name[11], uint32 *index);
 status_t	create_dir_entry(nspace *vol, vnode *dir, vnode *node, 
 				const char *name, uint32 *ns, uint32 *ne);
 
-int			dosfs_read_vnode(void *_vol, vnode_id vnid, char r, void **node);
-int			dosfs_walk(void *_vol, void *_dir, const char *file,
-				char **newpath, vnode_id *vnid);
-int			dosfs_access(void *_vol, void *_node, int mode);
-int			dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize);
-int			dosfs_opendir(void *_vol, void *_node, void **cookie);
-int			dosfs_readdir(void *_vol, void *_node, void *cookie,
-				long *num, struct dirent *buf, size_t bufsize);
-int			dosfs_rewinddir(void *_vol, void *_node, void *cookie);
-int			dosfs_closedir(void *_vol, void *_node, void *cookie);
-int			dosfs_free_dircookie(void *_vol, void *_node, void *cookie);
+status_t		dosfs_read_vnode(void *_vol, vnode_id vnid, void **node, bool reenter);
+status_t		dosfs_walk(void *_vol, void *_dir, const char *file,
+				vnode_id *_vnid, int *_type);
+status_t		dosfs_access(void *_vol, void *_node, int mode);
+status_t		dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize);
+status_t		dosfs_opendir(void *_vol, void *_node, void **cookie);
+status_t		dosfs_readdir(void *_vol, void *_node, void *cookie,
+				struct dirent *buf, size_t bufsize, uint32 *num);
+status_t		dosfs_rewinddir(void *_vol, void *_node, void *cookie);
+status_t		dosfs_closedir(void *_vol, void *_node, void *cookie);
+status_t		dosfs_free_dircookie(void *_vol, void *_node, void *cookie);
 
 #endif

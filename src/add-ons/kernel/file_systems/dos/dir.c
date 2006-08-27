@@ -4,12 +4,10 @@
 */
 #include <KernelExport.h> 
 
-#include <fsproto.h>
-#include <lock.h>
-#include <cache.h>
-
 #include <stdlib.h>
 #include <dirent.h>
+#include <fs_cache.h>
+#include <fs_info.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -846,7 +844,9 @@ status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 	return _create_dir_entry_(vol, dir, &info, (char *)nshort, (char *)nlong, len, ns, ne);
 }
 
-int dosfs_read_vnode(void *_vol, vnode_id vnid, char reenter, void **_node)
+
+status_t 
+dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 {
 	nspace	*vol = (nspace*)_vol;
 	int		result = B_NO_ERROR;
@@ -956,6 +956,7 @@ int dosfs_read_vnode(void *_vol, vnode_id vnid, char reenter, void **_node)
 	entry->filename = malloc(sizeof(filename) + 1);
 	if (entry->filename) strcpy(entry->filename, filename);
 #endif
+	entry->cache = file_cache_create(vol->id, vnid, entry->st_size, vol->fd);
 	if(!(entry->mode & FAT_SUBDIR))
 		set_mime_type(entry, filename);
 
@@ -969,17 +970,16 @@ bi:	if (!reenter) UNLOCK_VOL(vol);
 	return result;
 }
 
-int dosfs_walk(void *_vol, void *_dir, const char *file, char **newpath, vnode_id *vnid)
+
+status_t 
+dosfs_walk(void *_vol, void *_dir, const char *file, vnode_id *_vnid, int *_type)
 {
 	/* Starting at the base, find file in the subdir, and return path
 		string and vnode id of file. */
 	nspace	*vol = (nspace*)_vol;
 	vnode	*dir = (vnode*)_dir;
 	vnode	*vnode = NULL;
-	int		result = ENOENT;
-
-	/* we can ignore newpath since there are no symbolic links */
-	TOUCH(newpath);
+	status_t result = ENOENT;
 
 	LOCK_VOL(vol);
 
@@ -991,11 +991,11 @@ int dosfs_walk(void *_vol, void *_dir, const char *file, char **newpath, vnode_i
 
 	DPRINTF(0, ("dosfs_walk: find %Lx/%s\n", dir->vnid, file));
 
-	result = findfile_case(vol, dir, file, vnid, &vnode);
+	result = findfile_case(vol, dir, file, _vnid, &vnode);
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_walk (%s)\n", strerror(result)));
 	} else {
-		DPRINTF(0, ("dosfs_walk: found vnid %Lx\n", *vnid));
+		DPRINTF(0, ("dosfs_walk: found vnid %Lx\n", *_vnid));
 	}
 
 	UNLOCK_VOL(vol);
@@ -1003,7 +1003,8 @@ int dosfs_walk(void *_vol, void *_dir, const char *file, char **newpath, vnode_i
 	return result;
 }
 
-int dosfs_access(void *_vol, void *_node, int mode)
+status_t 
+dosfs_access(void *_vol, void *_node, int mode)
 {
 	status_t result = B_OK;
 	nspace *vol = (nspace *)_vol;
@@ -1037,7 +1038,9 @@ int dosfs_access(void *_vol, void *_node, int mode)
 	return result;
 }
 
-int dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize)
+
+status_t 
+dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize)
 {
 	TOUCH(_vol); TOUCH(_node); TOUCH(buf); TOUCH(bufsize);
 
@@ -1047,7 +1050,9 @@ int dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize)
 	return EINVAL;
 }
 
-int dosfs_opendir(void *_vol, void *_node, void **_cookie)
+
+status_t 
+dosfs_opendir(void *_vol, void *_node, void **_cookie)
 {
 	nspace		*vol = (nspace*)_vol;
 	vnode		*node = (vnode*)_node;
@@ -1102,8 +1107,10 @@ bi:
 	return result;
 }
 
-int dosfs_readdir(void *_vol, void *_dir, void *_cookie, long *num, 
-	struct dirent *entry, size_t bufsize)
+
+status_t 
+dosfs_readdir(void *_vol, void *_dir, void *_cookie, 
+	struct dirent *entry, size_t bufsize, uint32 *num)
 {
 	int 		result = ENOENT;
 	nspace* 	vol = (nspace*)_vol;
@@ -1171,7 +1178,9 @@ bi:
 	return result;
 }
 			
-int dosfs_rewinddir(void *_vol, void *_node, void* _cookie)
+
+status_t
+dosfs_rewinddir(void *_vol, void *_node, void* _cookie)
 {
 	nspace		*vol = _vol;
 	vnode		*node = _node;
@@ -1195,7 +1204,9 @@ int dosfs_rewinddir(void *_vol, void *_node, void* _cookie)
 	return B_OK;
 }
 
-int dosfs_closedir(void *_vol, void *_node, void *_cookie)
+
+status_t 
+dosfs_closedir(void *_vol, void *_node, void *_cookie)
 {
 	TOUCH(_vol); TOUCH(_node); TOUCH(_cookie);
 
@@ -1204,7 +1215,9 @@ int dosfs_closedir(void *_vol, void *_node, void *_cookie)
 	return 0;
 }
 
-int dosfs_free_dircookie(void *_vol, void *node, void *_cookie)
+
+status_t 
+dosfs_free_dircookie(void *_vol, void *node, void *_cookie)
 {
 	nspace *vol = _vol;
 	dircookie *cookie = _cookie;

@@ -4,10 +4,7 @@
 */
 #include <KernelExport.h> 
 
-#include <fsproto.h>
-#include <lock.h>
-#include <cache.h>
-
+#include <fs_cache.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ByteOrder.h>
@@ -24,9 +21,10 @@
 
 #define DPRINTF(a,b) if (debug_fat > (a)) dprintf b
 
-static status_t mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
+static status_t mirror_fats(nspace *vol, uint32 sector, uint8 *buffer, int32 tid)
 {
 	uint32 i;
+	char *buf = buffer;
 
 	if (!vol->fat_mirrored)
 		return B_OK;
@@ -34,18 +32,22 @@ static status_t mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
 	sector -= vol->active_fat * vol->sectors_per_fat;
 	
 	for (i=0;i<vol->fat_count;i++) {
+		char *blockData;
 		if (i == vol->active_fat)
 			continue;
-		cached_write(vol->fd, sector + i*vol->sectors_per_fat, buffer, 1, vol->bytes_per_sector);
+		blockData = block_cache_get_writable_etc(vol->fBlockCache, sector + i*vol->sectors_per_fat, 0, 1, tid);
+		memcpy(blockData, buf, vol->bytes_per_sector);
+		buf += vol->bytes_per_sector;
+		block_cache_put(vol->fBlockCache, sector + i*vol->sectors_per_fat);
 	}
-
+	
 	return B_OK;
 }
 
 static int32 _count_free_clusters_fat32(nspace *vol)
 {
 	int32 count = 0;
-	uint8 *block;
+	const uint8 *block;
 	uint32 fat_sector;
 	uint32 i;
 	uint32 cur_sector;
@@ -53,7 +55,7 @@ static int32 _count_free_clusters_fat32(nspace *vol)
 	cur_sector = vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat;
 	
 	for(fat_sector = 0; fat_sector < vol->sectors_per_fat; fat_sector++) {
-		block = (uint8 *)get_block(vol->fd, cur_sector, vol->bytes_per_sector);
+		block = (uint8 *)block_cache_get(vol->fBlockCache, cur_sector);
 		if(block == NULL) {
 			return EIO;
 		}
@@ -63,7 +65,7 @@ static int32 _count_free_clusters_fat32(nspace *vol)
 			if(val == 0) count++;
 		}
 
-		release_block(vol->fd, cur_sector);
+		block_cache_put(vol->fBlockCache, cur_sector);
 		cur_sector++;
 	}
 
@@ -85,6 +87,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	uint32 sector;
 	uint32 off, val = 0; /* quiet warning */
 	uint8 *block1, *block2 = NULL; /* quiet warning */
+	int32 tid = -1;
 
 	// mark end of chain for allocations
 	uint32 V = (action == _IOCTL_SET_ENTRY_) ? N : 0x0fffffff;
@@ -94,8 +97,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	if (check_nspace_magic(vol, "_fat_ioctl_")) return EINVAL;
 
 	DPRINTF(3, ("_fat_ioctl_: action %lx, cluster %lx, N %lx\n", action, cluster, N));
-
-
+	
 	if (action == _IOCTL_COUNT_FREE_) {
 		if(vol->fat_bits == 32)
 			// use a optimized version of the cluster counting algorithms
@@ -118,19 +120,31 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	sector = vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat +
 		off / vol->bytes_per_sector;
 	off %= vol->bytes_per_sector;
-
-	if ((block1 = (uint8 *)get_block(vol->fd, sector, vol->bytes_per_sector)) == NULL) {
+	
+	if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_) {
+		block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
+	} else {
+		tid = cache_start_transaction(vol->fBlockCache);
+		block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector, tid);
+	}
+	
+	if (block1 == NULL) {
 		DPRINTF(0, ("_fat_ioctl_: error reading fat (sector %lx)\n", sector));
 		return EIO;
 	}
-
+	
 	for (i=0;i<vol->total_clusters;i++) {
 		ASSERT(IS_DATA_CLUSTER(cluster));
 		ASSERT(off == ((cluster * vol->fat_bits / 8) % vol->bytes_per_sector));
 
 		if (vol->fat_bits == 12) {
 			if (off == vol->bytes_per_sector - 1) {
-				if ((block2 = (uint8 *)get_block(vol->fd, ++sector, vol->bytes_per_sector)) == NULL) {
+				if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_)
+					block2 = (uint8 *)block_cache_get(vol->fBlockCache, ++sector);
+				else
+					block2 = (uint8 *)block_cache_get_writable(vol->fBlockCache, ++sector, tid);
+				
+				if (block2 == NULL) {
 					DPRINTF(0, ("_fat_ioctl_: error reading fat (sector %lx)\n", sector));
 					result = EIO;
 					sector--;
@@ -162,8 +176,8 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 				block1[off] &= (andmask & 0xff);
 				block1[off] |= (ormask & 0xff);
 				if (off == vol->bytes_per_sector - 1) {
-					mark_blocks_dirty(vol->fd, sector - 1, 1);
-					mirror_fats(vol, sector - 1, block1);
+					//mark_blocks_dirty(vol->fd, sector - 1, 1);
+					mirror_fats(vol, sector - 1, block1, tid);
 					block2[0] &= (andmask >> 8);
 					block2[0] |= (ormask >> 8);
 				} else {
@@ -174,7 +188,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 			
 			if (off == vol->bytes_per_sector - 1) {
 				off = (cluster & 1) ? 1 : 0;
-				release_block(vol->fd, sector - 1);
+				block_cache_put(vol->fBlockCache, sector - 1);
 				block1 = block2;
 			} else {
 				off += (cluster & 1) ? 2 : 1;
@@ -220,13 +234,13 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 			result = val;
 			goto bi;
 		} else if (action == _IOCTL_SET_ENTRY_) {
-			mark_blocks_dirty(vol->fd, sector, 1);
-			mirror_fats(vol, sector, block1);
+			//mark_blocks_dirty(vol->fd, sector, 1);
+			mirror_fats(vol, sector, block1, tid);
 			goto bi;
 		} else if ((action == _IOCTL_ALLOCATE_N_ENTRIES_) && (val == 0)) {
 			vol->free_clusters--;
-			mark_blocks_dirty(vol->fd, sector, 1);
-			mirror_fats(vol, sector, block1);
+			//mark_blocks_dirty(vol->fd, sector, 1);
+			mirror_fats(vol, sector, block1, tid);
 			if (n == 0) {
 				ASSERT(first == 0);
 				first = last = cluster;
@@ -249,20 +263,29 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 
 		// iterate cluster and sector if needed
 		if (++cluster == vol->total_clusters + 2) {
-			release_block(vol->fd, sector);
+			block_cache_put(vol->fBlockCache, sector);
 			
 			cluster = 2;
 			off = 2 * vol->fat_bits / 8;
 			sector = vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat;
 
-			block1 = (uint8 *)get_block(vol->fd, sector, vol->bytes_per_sector);
+			if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_)
+				block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
+			else
+				block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector, tid);
 		}
 
 		if (off >= vol->bytes_per_sector) {
-			release_block(vol->fd, sector);
-			off -= vol->bytes_per_sector; sector++;
+			block_cache_put(vol->fBlockCache, sector);
+			
+			off -= vol->bytes_per_sector; 
+			sector++;
 			ASSERT(sector < vol->reserved_sectors + (vol->active_fat + 1) * vol->sectors_per_fat);
-			block1 = (uint8 *)get_block(vol->fd, sector, vol->bytes_per_sector);
+			
+			if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_)
+				block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
+			else
+				block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector, tid);
 		}
 		
 		if (block1 == NULL) {
@@ -273,7 +296,10 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	}
 
 bi:
-	if (block1) release_block(vol->fd, sector);
+	if (block1) 
+		block_cache_put(vol->fBlockCache, sector);
+	if (tid >= 0)
+		cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 
 	if (action == _IOCTL_ALLOCATE_N_ENTRIES_) {
 		if (result < 0) {
@@ -290,9 +316,9 @@ bi:
 		}
 	}
 
-	if (result < B_OK)
+	if (result < B_OK) {
 		DPRINTF(0, ("_fat_ioctl_ error: action = %lx cluster = %lx N = %lx (%s)\n", action, cluster, N, strerror(result)));
-
+	}
 	return result;
 }
 
@@ -553,6 +579,7 @@ void dump_fat_chain(nspace *vol, uint32 cluster)
 	dprintf("\n");
 }
 
+/*
 status_t fragment(nspace *vol, uint32 *pattern)
 {
 	uint32 sector, offset, previous_entry, i, val;
@@ -642,3 +669,4 @@ status_t fragment(nspace *vol, uint32 *pattern)
 
 	return B_OK;
 }
+*/

@@ -50,7 +50,6 @@ purpose.
 #define UNLOCK_CACHE_W \
 	release_sem_etc(vol->vcache.vc_sem, READERS, 0)
 
-#include <fsproto.h>
 #include <KernelExport.h>
 
 #include <stdio.h>
@@ -358,12 +357,12 @@ status_t vcache_set_entry(nspace *vol, vnode_id vnid, vnode_id loc)
 
 	DPRINTF(0, ("vcache_set_entry: %Lx -> %Lx\n", vnid, loc));
 
-	if (is_vnode_removed(vol->id, vnid) > 0) {
+	/*if (is_vnode_removed(vol->id, vnid) > 0) {
 		if (!IS_ARTIFICIAL_VNID(loc))
 			return B_OK;
 	} else {
 		ASSERT(is_vnode_removed(vol->id, vnid) == 0);
-	}
+	}*/
 
 	LOCK_CACHE_W;
 

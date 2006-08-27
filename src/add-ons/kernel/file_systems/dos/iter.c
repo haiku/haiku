@@ -2,11 +2,10 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-#include <KernelExport.h> 
+#include <KernelExport.h>
 
-#include <fsproto.h>
-#include <lock.h>
-#include <cache.h>
+#include <fs_cache.h>
+#include <string.h>
 
 #include "iter.h"
 #include "dosfs.h"
@@ -34,7 +33,7 @@ static int _validate_cs_(nspace *vol, uint32 cluster, uint32 sector)
 	return 0;
 }
 
-static off_t _csi_to_block_(struct csi *csi)
+off_t csi_to_block(struct csi *csi)
 {
 	// presumes the caller has already called _validate_cs_ on the argument
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
@@ -97,37 +96,34 @@ int iter_csi(struct csi *csi, int sectors)
 	return -1;
 }
 
-uint8 *csi_get_block(struct csi *csi)
+uint8 *csi_get_block(struct csi *csi, int32 tid)
 {
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return NULL;
 
-	return get_block(csi->vol->fd, _csi_to_block_(csi), csi->vol->bytes_per_sector);
+	return block_cache_get_writable_etc(csi->vol->fBlockCache, csi_to_block(csi),
+		1, csi->vol->bytes_per_sector, tid);
 }
 
 status_t csi_release_block(struct csi *csi)
 {
-	status_t err;
-
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
 
-	err = release_block(csi->vol->fd, _csi_to_block_(csi));
-	ASSERT(err == B_OK);
-	return err;
+	block_cache_put(csi->vol->fBlockCache, csi_to_block(csi));
+	return B_OK;
 }
 
-status_t csi_mark_block_dirty(struct csi *csi)
+status_t csi_mark_block_dirty(struct csi *csi, int32 tid)
 {
-	status_t err;
-
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
 
-	err = mark_blocks_dirty(csi->vol->fd, _csi_to_block_(csi), 1);
-	ASSERT(err == B_OK);
-	return err;
+	// TODO : block_cache doesn't implement this
+	//block_cache_set_dirty(csi->vol->fBlockCache, csi_to_block(csi), true, tid);
+	
+	return B_OK;
 }
 
 /* XXX: not the most efficient implementation, but it gets the job done */
@@ -137,28 +133,33 @@ status_t csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	uint32 sectors;
 	off_t block;
 	status_t err;
-
+	char *buf = buffer;
+	int32 i;
+		
 	ASSERT(len >= csi->vol->bytes_per_sector);
 
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
 
 	sectors = 1;
-	block = _csi_to_block_(csi);
+	block = csi_to_block(csi);
 
 	while (1) {
 		old_csi = *csi;
 		err = iter_csi(csi, 1);
 		if (len < (sectors + 1) * csi->vol->bytes_per_sector)
 			break;
-		if ((err < B_OK) || (block + sectors != _csi_to_block_(csi)))
+		if ((err < B_OK) || (block + sectors != csi_to_block(csi)))
 			break;
 		sectors++;
 	}
 
-	err = cached_read(csi->vol->fd, block, buffer, sectors, csi->vol->bytes_per_sector);
-	if (err < B_OK)
-		return err;
+	for (i=block; i<block+sectors; i++) {
+		char *blockData = (char *)block_cache_get(csi->vol->fBlockCache, i);
+		memcpy(buf, blockData, csi->vol->bytes_per_sector);
+		buf += csi->vol->bytes_per_sector;
+		block_cache_put(csi->vol->fBlockCache, i);
+	}
 
 	*csi = old_csi;
 
@@ -171,6 +172,8 @@ status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	uint32 sectors;
 	off_t block;
 	status_t err;
+	char *buf = buffer;
+	int32 i, tid;
 
 	ASSERT(len >= csi->vol->bytes_per_sector);
 
@@ -179,21 +182,26 @@ status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 		return EINVAL;
 
 	sectors = 1;
-	block = _csi_to_block_(csi);
+	block = csi_to_block(csi);
 
 	while (1) {
 		old_csi = *csi;
 		err = iter_csi(csi, 1);
 		if (len < (sectors + 1) * csi->vol->bytes_per_sector)
 			break;
-		if ((err < B_OK) || (block + sectors != _csi_to_block_(csi)))
+		if ((err < B_OK) || (block + sectors != csi_to_block(csi)))
 			break;
 		sectors++;
 	}
-
-	err = cached_write(csi->vol->fd, block, buffer, sectors, csi->vol->bytes_per_sector);
-	if (err < B_OK)
-		return err;
+	
+	tid = cache_start_transaction(csi->vol->fBlockCache);
+	for(i=block; i<block+sectors; i++) {
+		char *blockData = block_cache_get_writable_etc(csi->vol->fBlockCache, i, 0, 1, tid);
+		memcpy(blockData, buf, csi->vol->bytes_per_sector);
+		buf += csi->vol->bytes_per_sector;
+		block_cache_put(csi->vol->fBlockCache, i);
+	}
+	cache_end_transaction(csi->vol->fBlockCache, tid, NULL, NULL);
 
 	/* return the last state of the iterator because that's what dosfs_write
 	 * expects. this lets it meaningfully cache the state even when it's
@@ -205,11 +213,23 @@ status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 
 status_t csi_write_block(struct csi *csi, uint8 *buffer)
 {
+	off_t block;
+	int32 tid;
+	char *blockData;
+	
+	block = csi_to_block(csi);
+
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
+		
+	tid = cache_start_transaction(csi->vol->fBlockCache);
+	blockData = block_cache_get_writable_etc(csi->vol->fBlockCache, block, 0, 1, tid);
+	memcpy(blockData, buffer, csi->vol->bytes_per_sector);
+	block_cache_put(csi->vol->fBlockCache, block);
+	cache_end_transaction(csi->vol->fBlockCache, tid, NULL, NULL);
 
-	return cached_write(csi->vol->fd, _csi_to_block_(csi), buffer, 1, csi->vol->bytes_per_sector);
+	return B_OK;
 }
 
 static void _diri_release_current_block_(struct diri *diri)
@@ -238,9 +258,11 @@ uint8 *diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 		if (iter_csi(&(diri->csi), diri->current_index / (vol->bytes_per_sector / 0x20)) != 0)
 			return NULL;
 	}
+	
+	diri->tid = cache_start_transaction(diri->csi.vol->fBlockCache);
 
 	// get current sector
-	diri->current_block = csi_get_block(&(diri->csi));
+	diri->current_block = csi_get_block(&(diri->csi), diri->tid);
 
 	if (diri->current_block == NULL)
 		return NULL;
@@ -256,6 +278,8 @@ int diri_free(struct diri *diri)
 
 	if (diri->current_block)
 		_diri_release_current_block_(diri);
+		
+	cache_end_transaction(diri->csi.vol->fBlockCache, diri->tid, NULL, NULL);
 
 	return 0;
 }
@@ -281,7 +305,7 @@ uint8 *diri_next_entry(struct diri *diri)
 		_diri_release_current_block_(diri);
 		if (iter_csi(&(diri->csi), 1) != 0)
 			return NULL;
-		diri->current_block = csi_get_block(&(diri->csi));
+		diri->current_block = csi_get_block(&(diri->csi), diri->tid);
 		if (diri->current_block == NULL)
 			return NULL;
 	}
@@ -298,7 +322,7 @@ uint8 *diri_rewind(struct diri *diri)
 			_diri_release_current_block_(diri);
 		if (init_csi(diri->csi.vol, diri->starting_cluster, 0, &(diri->csi)) != 0)
 			return NULL;
-		diri->current_block = csi_get_block(&(diri->csi));
+		diri->current_block = csi_get_block(&(diri->csi), diri->tid);
 	}
 	diri->current_index = 0;
 	return diri->current_block;
@@ -306,5 +330,5 @@ uint8 *diri_rewind(struct diri *diri)
 
 void diri_mark_dirty(struct diri *diri)
 {
-	csi_mark_block_dirty(&(diri->csi));
+	csi_mark_block_dirty(&(diri->csi), diri->tid);
 }

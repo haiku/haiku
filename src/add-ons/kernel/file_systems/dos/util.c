@@ -9,8 +9,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <fsproto.h>
-#include <rtc_info.h>
+#include "rtc_info.h"
 
 #include "dosfs.h"
 #include "fat.h"
@@ -18,12 +17,16 @@
 
 static int32 tzoffset = -1; /* in minutes */
 
+#ifdef DEBUG
+
 int _assert_(char *a, int b, char *c)
 {
 	dprintf("tripped assertion in %s/%d (%s)\n", a, b, c);
 	kernel_debugger("tripped assertion");
 	return 0;
 }
+
+#endif
 
 static void print_byte(uint8 c)
 {
