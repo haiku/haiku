@@ -80,7 +80,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 		ASSERT(fEventCount == 0);
 		ASSERT(fLastEntry == NULL);
 		fFirstEntry = fLastEntry = new event_queue_entry;
-		memcpy(&fFirstEntry->event,&event,sizeof(media_timed_event));
+		fFirstEntry->event = event;
 		fFirstEntry->prev = NULL;
 		fFirstEntry->next = NULL;
 		fEventCount++;
@@ -90,7 +90,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 	//insert at queue begin
 	if (fFirstEntry->event.event_time >= event.event_time) {
 		event_queue_entry *newentry = new event_queue_entry;
-		memcpy(&newentry->event,&event,sizeof(media_timed_event));
+		newentry->event = event;
 		newentry->prev = NULL;
 		newentry->next = fFirstEntry;
 		fFirstEntry->prev = newentry;
@@ -102,7 +102,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 	//insert at queue end
 	if (fLastEntry->event.event_time <= event.event_time) {
 		event_queue_entry *newentry = new event_queue_entry;
-		memcpy(&newentry->event,&event,sizeof(media_timed_event));
+		newentry->event = event;
 		newentry->prev = fLastEntry;
 		newentry->next = NULL;
 		fLastEntry->next = newentry;
@@ -116,7 +116,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 		if (entry->event.event_time <= event.event_time) {
 			//insert after entry
 			event_queue_entry *newentry = new event_queue_entry;
-			memcpy(&newentry->event,&event,sizeof(media_timed_event));
+			newentry->event = event;
 			newentry->prev = entry;
 			newentry->next = entry->next;
 			(entry->next)->prev = newentry;
