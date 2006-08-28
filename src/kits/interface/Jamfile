@@ -32,7 +32,7 @@ SubDirSysHdrs $(SUBDIR) ;
 SubDirHdrs [ FDirName $(SUBDIR) qoca ] ;
 
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) BTextView ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
 MergeObject <libbe>interface_kit.o :
