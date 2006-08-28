@@ -220,6 +220,9 @@ fs_unmount(void *_ns)
 
 	TRACE(("fs_unmount - ENTER\n"));
 
+	// Unlike in BeOS, we need to put the reference to our root node ourselves
+	put_vnode(ns->id, ISO_ROOTNODE_ID);
+
 	block_cache_delete(ns->fBlockCache, false);
 	close(ns->fdOfSession);
 	result = close(ns->fd);
