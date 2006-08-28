@@ -26,8 +26,8 @@ BEOS_BIN = addattr alert basename beep cat catattr chgrp chmod chop chown clear
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex makebootable md5sum mimeset
-	mkdir mkindex modifiers mount mountvolume mv open pathchk ping play playfile playsound
-	playwav ps pwd
+	mkdos mkdir mkindex modifiers mount mountvolume mv open pathchk ping play playfile
+	playsound playwav ps pwd
 	query quit renice rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
 	tail tar tee top touch tput traceroute translate true tty uname unmount unzip unzipsfx 
