@@ -741,6 +741,9 @@ dosfs_unmount(void *_vol)
 	DPRINTF(0, ("dosfs_unmount volume %lx\n", vol->id));
 
 	update_fsinfo(vol);
+	
+	// Unlike in BeOS, we need to put the reference to our root node ourselves
+	put_vnode(vol->id, vol->root_vnode.vnid);
 	block_cache_delete(vol->fBlockCache, true);
 
 #if DEBUG
@@ -1051,11 +1054,23 @@ dosfs_sync(void *_vol)
 
 
 static status_t 
-dosfs_fsync(void *vol, void *node)
+dosfs_fsync(void *_vol, void *_node)
 {
-	TOUCH(node);
+	nspace *vol = (nspace *)vol;
+	vnode *node = (vnode *)_node;
+	status_t err;
 
-	return dosfs_sync(vol);
+	LOCK_VOL(vol);
+
+	if (check_vnode_magic(node, "dosfs_fsync")) {
+		UNLOCK_VOL(vol);
+		return EINVAL;
+        }
+
+	err = file_cache_sync(node->cache);
+
+	UNLOCK_VOL(vol);
+	return err;
 }
 
 
