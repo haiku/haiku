@@ -107,6 +107,7 @@ MergeObject <libbe>interface_kit.o :
 	TabView.cpp
 	TextControl.cpp
 	TextInput.cpp
+	TextView.cpp
 	TPicture.cpp
 	TwoDimensionalLayout.cpp
 	View.cpp
@@ -114,12 +115,11 @@ MergeObject <libbe>interface_kit.o :
 	Window.cpp
 	ZombieReplicantView.cpp
 
-	# BTextView
+	# BTextView support
 	InlineInput.cpp
 	LineBuffer.cpp
 	StyleBuffer.cpp
 	TextGapBuffer.cpp
-	TextView.cpp
 	UndoBuffer.cpp
 	WidthBuffer.cpp
 
