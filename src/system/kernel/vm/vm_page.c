@@ -960,7 +960,7 @@ dump_page_stats(int argc, char **argv)
 
 	for (i = 0; i < sNumPages; i++) {
 		if (sPages[i].state > 7)
-			panic("page %i at %p has invalid state!\n", i, &sPages[i]);
+			panic("page %li at %p has invalid state!\n", i, &sPages[i]);
 
 		counter[sPages[i].state]++;
 	}

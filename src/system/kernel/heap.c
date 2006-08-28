@@ -559,7 +559,7 @@ free(void *address)
 		bin = &bins[page[0].bin_index];
 
 		if (bin->element_size <= B_PAGE_SIZE && (addr_t)address % bin->element_size != 0)
-			panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%x\n", address, bin->element_size);
+			panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%lx\n", address, bin->element_size);
 
 #if PARANOID_KFREE
 		// mark the free space as freed

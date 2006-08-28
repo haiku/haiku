@@ -322,7 +322,7 @@ static void
 fatal_exception(struct iframe *frame)
 {
 	char name[32];
-	panic("Fatal exception \"%s\" occurred! Error code: 0x%x\n",
+	panic("Fatal exception \"%s\" occurred! Error code: 0x%lx\n",
 		exception_name(frame->vector, name, sizeof(name)), frame->error_code);
 }
 
@@ -339,7 +339,7 @@ unexpected_exception(struct iframe *frame, debug_exception_type type,
 	} else {
 		char name[32];
 		panic("Unexpected exception \"%s\" occurred in kernel mode! "
-			"Error code: 0x%x\n",
+			"Error code: 0x%lx\n",
 			exception_name(frame->vector, name, sizeof(name)),
 			frame->error_code);
 	}
@@ -393,7 +393,7 @@ i386_handle_trap(struct iframe frame)
 			frame.esp = tss->esp;
 			frame.flags = tss->eflags;
 			
-			panic("double fault! errorcode = 0x%x\n", frame.error_code);
+			panic("double fault! errorcode = 0x%lx\n", frame.error_code);
 
 			break;
 		}
@@ -542,8 +542,8 @@ i386_handle_trap(struct iframe frame)
 					pic_end_of_interrupt(frame.vector);
 			} else {
 				char name[32];
-				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, "
-					"thread 0x%x!\n", frame.vector,
+				panic("i386_handle_trap: unhandled trap 0x%lx (%s) at ip 0x%lx, "
+					"thread 0x%lx!\n", frame.vector,
 					exception_name(frame.vector, name, sizeof(name)), frame.eip,
 					thread ? thread->id : -1);
 				ret = B_HANDLED_INTERRUPT;

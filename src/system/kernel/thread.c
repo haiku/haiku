@@ -810,10 +810,10 @@ put_death_stack(uint32 index)
 	TRACE(("put_death_stack...: passed %lu\n", index));
 
 	if (index >= sNumDeathStacks)
-		panic("put_death_stack: passed invalid stack index %d\n", index);
+		panic("put_death_stack: passed invalid stack index %ld\n", index);
 
 	if (!(sDeathStackBitmap & (1 << index)))
-		panic("put_death_stack: passed invalid stack index %d\n", index);
+		panic("put_death_stack: passed invalid stack index %ld\n", index);
 
 	state = disable_interrupts();
 

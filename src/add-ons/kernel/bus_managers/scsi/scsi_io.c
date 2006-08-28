@@ -251,12 +251,12 @@ scsi_request_finished(scsi_ccb *request, uint num_requests)
 	SHOW_FLOW(3, "%p", request);
 
 	if (request->state != SCSI_STATE_SENT) {
-		panic("Unsent ccb 0x%x was reported as done\n", request);
+		panic("Unsent ccb %p was reported as done\n", request);
 		return;
 	}
 
 	if (request->subsys_status == SCSI_REQ_INPROG) {
-		panic("ccb 0x%xwith status \"Request in Progress\" was reported as done\n",
+		panic("ccb %p with status \"Request in Progress\" was reported as done\n",
 			request);
 		return;
 	}
