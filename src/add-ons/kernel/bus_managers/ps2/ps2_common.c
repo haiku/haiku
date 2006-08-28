@@ -138,7 +138,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 	out = 0xf0;
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
-		return res;
+		goto fail;
 	// Step 1, if controller is good, in does match out.
 	// This test failes with MS Virtual PC.
 	if (in != out)
@@ -147,7 +147,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 	out = 0x56;
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
-		return res;
+		goto fail;
 	// Step 2, if controller is good, in does match out.
 	if (in != out)
 		goto no_support;
@@ -155,7 +155,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 	out = 0xa4;
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
-		return res;
+		goto fail;
 	// Step 3, if the controller doesn't support active multiplexing, 
 	// then in data does match out data (0xa4), else it's version number.
 	if (in == out)
@@ -185,6 +185,18 @@ ps2_setup_active_multiplexing(bool *enabled)
 no_support:	
 	dprintf("ps2: active multiplexing not supported\n");
 	*enabled = false;
+	return B_OK;
+
+fail:
+	dprintf("ps2: testing for active multiplexing failed\n");
+	*enabled = false;
+	// this should revert the controller into legacy mode, 
+	// just in case it has switched to multiplexed mode
+	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &out, 1);
+	if (res != B_OK || out != 0x55) {
+		dprintf("ps2: controller self test failed, status 0x%08x, data 0x%02x\n", res, out);
+		return B_ERROR;
+	}
 	return B_OK;
 }
 
