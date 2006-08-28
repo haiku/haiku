@@ -32,6 +32,7 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 #include <SupportDefs.h>
 #include "hidparse.h"
 #include <usb/USB_hid.h>
