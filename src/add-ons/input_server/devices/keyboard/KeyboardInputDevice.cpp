@@ -13,6 +13,7 @@
 #include <String.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 
 #if DEBUG
 FILE *KeyboardInputDevice::sLogFile = NULL;
@@ -425,7 +426,7 @@ KeyboardInputDevice::Start(const char *name, void *cookie)
 	keyboard_device *device = (keyboard_device *)cookie;
 
 	if ((device->fd = open(device->path, O_RDWR)) < B_OK) {
-		fprintf(stderr, "error when opening %s: %s\n", device->path, strerror(device->fd));
+		fprintf(stderr, "error when opening %s: %s\n", device->path, strerror(errno));
 		return B_ERROR;
 	}
 	
