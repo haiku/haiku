@@ -138,9 +138,9 @@ class _BStyleBuffer_ {
 		const _BStyleRunDescBuffer_& RunBuffer() const;
 		const _BStyleRecordBuffer_& RecordBuffer() const;
 
-	protected:
-		_BStyleRunDescBuffer_ fStyleRunDesc;
-		_BStyleRecordBuffer_ fStyleRecord;
+	private:
+		_BStyleRunDescBuffer_	fStyleRunDesc;
+		_BStyleRecordBuffer_	fStyleRecord;
 		bool			fValidNullStyle;
 		STEStyle		fNullStyle;
 };

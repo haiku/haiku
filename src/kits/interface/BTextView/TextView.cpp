@@ -4020,7 +4020,9 @@ BTextView::AutoResize(bool redraw)
 		float newWidth = 0;
 		for (int32 i = 0; i < CountLines(); i++)
 			newWidth += LineWidth(i);
-			
+		
+		if (newWidth < 3)
+			newWidth = 3;
 		BRect newRect(0, 0, ceilf(newWidth) + 1, ceilf(TextHeight(0, 0)) + 1);
 		
 		if (fContainerView != NULL) {

@@ -85,8 +85,7 @@ _BStyleRecordBuffer_::_BStyleRecordBuffer_()
 
 
 int32
-_BStyleRecordBuffer_::InsertRecord(const BFont *inFont,
-	const rgb_color *inColor)
+_BStyleRecordBuffer_::InsertRecord(const BFont *inFont, const rgb_color *inColor)
 {
 	int32 index = 0;
 	
@@ -111,14 +110,14 @@ _BStyleRecordBuffer_::InsertRecord(const BFont *inFont,
 	}
 	
 	// no unused space, expand the buffer
-	index = fItemCount;
-	STEStyleRecord 	newRecord;
-	newRecord.refs = 0;
-	newRecord.ascent = fh.ascent;
-	newRecord.descent = fh.descent + fh.leading;
-	newRecord.style.font = *inFont;
-	newRecord.style.color = *inColor;
-	InsertItemsAt(1, index, &newRecord);
+	const STEStyle style = { *inFont, *inColor };
+	const STEStyleRecord newRecord = { 
+		0,
+		fh.ascent,
+		fh.descent + fh.leading,
+		style
+	};
+	InsertItemsAt(1, fItemCount, &newRecord);
 
 	return index;
 }
@@ -176,8 +175,9 @@ SetStyleFromMode(uint32 mode, const BFont *fromFont, BFont *toFont,
 
 
 _BStyleBuffer_::_BStyleBuffer_(const BFont *inFont, const rgb_color *inColor)
+	:
+	fValidNullStyle(true)
 {
-	fValidNullStyle = true;
 	fNullStyle.font = *inFont;
 	fNullStyle.color = *inColor;
 }
@@ -227,8 +227,7 @@ _BStyleBuffer_::SetNullStyle(uint32 inMode, const BFont *inFont,
 
 
 void
-_BStyleBuffer_::GetNullStyle(const BFont **font,
-	const rgb_color **color) const
+_BStyleBuffer_::GetNullStyle(const BFont **font, const rgb_color **color) const
 {
 	if (font)
 		*font = &fNullStyle.font;
