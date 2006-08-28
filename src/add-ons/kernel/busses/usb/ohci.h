@@ -43,44 +43,45 @@ class OHCIRootHub;
 class OHCI : public BusManager
 {
 	friend class OHCIRootHub;
-	public:
+public:
 		
-		OHCI( pci_info *info , Stack *stack );
-		status_t 					SubmitTransfer( Transfer *t ); 	//Override from BusManager. 
-		static pci_module_info 		*pci_module; 					// Global data for the module.
+	OHCI( pci_info *info , Stack *stack );
+	status_t 					SubmitTransfer( Transfer *t ); 	//Override from BusManager. 
+	static pci_module_info 		*pci_module; 					// Global data for the module.
+
+	inline void   WriteReg(uint32 reg, uint32 value);
+	inline uint32 ReadReg(uint32 reg);
 		
-	private:
-		// Global
-		pci_info 					*m_pcii;				// pci-info struct
-		Stack 						*m_stack;				// Pointer to the stack	 
-		addr_t						m_opreg_base;			// Base address of the operational registers
-		uint32						m_revision;				// The revision of the host controller
-		char						*m_product_descr;		// The product description (can be moved to the Busmanager Class)
-		// HCCA
-		area_id						m_hcca_area;
-		struct hc_hcca				*hcca;					// The HCCA structure for the interupt communication
-		addr_t						m_hcca_base;			// Base address of the HCCA
-		hcd_soft_endpoint			*sc_eds[OHCI_NO_EDS];	// number of interupt endpiont descriptors
-		// Registers
-		struct hcd_soft_endpoint	*ed_bulk_tail;			// last in the bulk list
-		struct hcd_soft_endpoint	*ed_control_tail;		// last in the control list
-		struct hcd_soft_endpoint	*ed_isoch_tail;			// lest in the isochrnonous list
-		struct hcd_soft_endpoint	*ed_periodic[32];		// shadow of the interupt table
-		// free list structures
-		struct hcd_soft_endpoint	*sc_freeeds;			// list of free endpoint descriptors
-		struct hcd_soft_transfer	*sc_freetds;			// list of free general transfer descriptors
-		struct hcd_soft_itransfer	*sc_freeitds; 			// list of free isonchronous transfer descriptors
-		// Done queue
-		struct hcd_soft_transfer	*sc_sdone;				// list of done general transfer descriptors 
-		struct hcd_soft_itransfer 	*sc_sidone;				// list of done isonchronous transefer descriptors
-		// memory management for queue data structures.
-		struct hcd_soft_transfer  	sc_hash_tds[OHCI_HASH_SIZE];
-		struct hcd_soft_itransfer 	sc_hash_itds[OHCI_HASH_SIZE];			
-		// Root Hub
-		OHCIRootHub 				*m_roothub;			// the root hub
-		addr_t						m_roothub_base;		// Base address of the root hub
-		// functions
-		hcd_soft_endpoint			*ohci_alloc_soft_endpoint(); // allocate memory for an endpoint
+private:
+	// Global
+	pci_info 					*m_pcii;				// pci-info struct
+	Stack 						*m_stack;				// Pointer to the stack	 
+	uint8						*m_registers;			// Base address of the operational registers
+	area_id						m_register_area;		// Area id of the 
+	// HCCA
+	area_id						m_hcca_area;
+	struct hc_hcca				*m_hcca;					// The HCCA structure for the interupt communication
+	hcd_soft_endpoint			*sc_eds[OHCI_NO_EDS];	// number of interupt endpiont descriptors
+	// Registers
+	struct hcd_soft_endpoint	*ed_bulk_tail;			// last in the bulk list
+	struct hcd_soft_endpoint	*ed_control_tail;		// last in the control list
+	struct hcd_soft_endpoint	*ed_isoch_tail;			// lest in the isochrnonous list
+	struct hcd_soft_endpoint	*ed_periodic[32];		// shadow of the interupt table
+	// free list structures
+	struct hcd_soft_endpoint	*sc_freeeds;			// list of free endpoint descriptors
+	struct hcd_soft_transfer	*sc_freetds;			// list of free general transfer descriptors
+	struct hcd_soft_itransfer	*sc_freeitds; 			// list of free isonchronous transfer descriptors
+	// Done queue
+	struct hcd_soft_transfer	*sc_sdone;				// list of done general transfer descriptors 
+	struct hcd_soft_itransfer 	*sc_sidone;				// list of done isonchronous transefer descriptors
+	// memory management for queue data structures.
+	struct hcd_soft_transfer  	sc_hash_tds[OHCI_HASH_SIZE];
+	struct hcd_soft_itransfer 	sc_hash_itds[OHCI_HASH_SIZE];			
+	// Root Hub
+	OHCIRootHub 				*m_roothub;			// the root hub
+	addr_t						m_roothub_base;		// Base address of the root hub
+	// functions
+	hcd_soft_endpoint			*ohci_alloc_soft_endpoint(); // allocate memory for an endpoint
 };
 
 // --------------------------------
@@ -101,11 +102,5 @@ class OHCIRootHub : public Hub
 };
 
 #define OHCI_DEBUG
-#ifdef OHCI_DEBUG
-#define TRACE dprintf
-#else
-#define TRACE silent
-void silent( const char * , ... ) {}
-#endif
 
 #endif // OHCI_H
