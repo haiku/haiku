@@ -80,6 +80,7 @@ struct usb_port_status
 #define PORT_STATUS_RESET			0x0010
 #define PORT_STATUS_POWER			0x0100
 #define PORT_STATUS_LOW_SPEED		0x0200
+#define PORT_STATUS_HIGH_SPEED		0x0400
 
 
 //The feature requests with ports

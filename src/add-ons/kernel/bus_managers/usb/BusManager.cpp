@@ -28,11 +28,11 @@ BusManager::BusManager(Stack *stack)
 		fDeviceMap[i] = false;
 
 	// Set up the default pipes
-	fDefaultPipe = new(std::nothrow) ControlPipe(this, 0, Pipe::NormalSpeed, 8);
+	fDefaultPipe = new(std::nothrow) ControlPipe(this, 0, Pipe::FullSpeed, 0, 8);
 	if (!fDefaultPipe)
 		return;
 
-	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(this, 0, Pipe::LowSpeed, 8);
+	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(this, 0, Pipe::LowSpeed, 0, 8);
 	if (!fDefaultPipeLowSpeed)
 		return;
 
@@ -135,7 +135,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(this, deviceAddress,
-		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 8);
+		lowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed, 0, 8);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -257,14 +257,6 @@ BusManager::Stop()
 
 status_t
 BusManager::SubmitTransfer(Transfer *transfer)
-{
-	// virtual function to be overridden
-	return B_ERROR;
-}
-
-
-status_t
-BusManager::SubmitRequest(Transfer *transfer)
 {
 	// virtual function to be overridden
 	return B_ERROR;

@@ -9,8 +9,8 @@
 #include "usb_p.h"
 
 
-Interface::Interface(Device *device)
-	:	ControlPipe(device, device->Speed(), 0, 8)
+Interface::Interface(BusManager *bus, int8 deviceAddress, pipeSpeed speed)
+	:	ControlPipe(bus, deviceAddress, speed, 0, 8)
 {
 }
 

@@ -326,7 +326,8 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fRootHub(NULL),
-		fRootHubAddress(0)
+		fRootHubAddress(0),
+		fPortResetChange(0)
 {
 	if (!fInitOK) {
 		TRACE_ERROR(("usb_uhci: bus manager failed to init\n"));
@@ -481,7 +482,6 @@ UHCI::Start()
 		return B_ERROR;
 	}
 
-	fPortResetChange[0] = fPortResetChange[1] = false;
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new(std::nothrow) UHCIRootHub(this, fRootHubAddress);
 	if (!fRootHub) {
@@ -510,7 +510,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 
 	// Short circuit the root hub
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
-		return fRootHub->SubmitTransfer(transfer);
+		return fRootHub->ProcessTransfer(this, transfer);
 
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
@@ -828,34 +828,90 @@ UHCI::ControllerReset()
 }
 
 
-uint16
-UHCI::PortStatus(int32 index)
-{
-	if (index > 1)
-		return B_BAD_VALUE;
-
-	return ReadReg16(UHCI_PORTSC1 + index * 2);
-}
-
-
 status_t
-UHCI::SetPortStatus(int32 index, uint16 status)
+UHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
 	if (index > 1)
-		return B_BAD_VALUE;
+		return B_BAD_INDEX;
 
-	TRACE(("usb_uhci: set port status of port %d: 0x%04x\n", index, status));
-	WriteReg16(UHCI_PORTSC1 + index * 2, status);
-	snooze(1000);
+	status->status = status->change = 0;
+	uint16 portStatus = ReadReg16(UHCI_PORTSC1 + index * 2);
+
+	// build the status
+	if (portStatus & UHCI_PORTSC_CURSTAT)
+		status->status |= PORT_STATUS_CONNECTION;
+	if (portStatus & UHCI_PORTSC_ENABLED)
+		status->status |= PORT_STATUS_ENABLE;
+	if (portStatus & UHCI_PORTSC_RESET)
+		status->status |= PORT_STATUS_RESET;
+	if (portStatus & UHCI_PORTSC_LOWSPEED)
+		status->status |= PORT_STATUS_LOW_SPEED;
+
+	// build the change
+	if (portStatus & UHCI_PORTSC_STATCHA)
+		status->change |= PORT_STATUS_CONNECTION;
+	if (portStatus & UHCI_PORTSC_ENABCHA)
+		status->change |= PORT_STATUS_ENABLE;
+
+	// ToDo: work out suspended/resume
+
+	// there are no bits to indicate reset change
+	if (fPortResetChange & (1 << index))
+		status->change |= PORT_STATUS_RESET;
+
+	// the port is automagically powered on
+	status->status |= PORT_STATUS_POWER;
 	return B_OK;
 }
 
 
 status_t
-UHCI::ResetPort(int32 index)
+UHCI::SetPortFeature(uint8 index, uint16 feature)
 {
 	if (index > 1)
-		return B_BAD_VALUE;
+		return B_BAD_INDEX;
+
+	switch (feature) {
+		case PORT_RESET:
+			return ResetPort(index);
+
+		case PORT_POWER:
+			// the ports are automatically powered
+			return B_OK;
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
+UHCI::ClearPortFeature(uint8 index, uint16 feature)
+{
+	if (index > 1)
+		return B_BAD_INDEX;
+
+	uint32 portRegister = UHCI_PORTSC1 + index * 2;
+	uint16 portStatus = ReadReg16(portRegister) & UHCI_PORTSC_DATAMASK;
+
+	switch (feature) {
+		case C_PORT_RESET:
+			fPortResetChange &= ~(1 << index);
+			return B_OK;
+
+		case C_PORT_CONNECTION:
+			WriteReg16(portRegister, portStatus | UHCI_PORTSC_STATCHA);
+			return B_OK;
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
+UHCI::ResetPort(uint8 index)
+{
+	if (index > 1)
+		return B_BAD_INDEX;
 
 	TRACE(("usb_uhci: reset port %d\n", index));
 
@@ -899,29 +955,9 @@ UHCI::ResetPort(int32 index)
 		}
 	}
 
-	SetPortResetChange(index, true);
+	fPortResetChange |= (1 << index);
 	TRACE(("usb_uhci: port was reset: 0x%04x\n", ReadReg16(port)));
 	return B_OK;
-}
-
-
-bool
-UHCI::PortResetChange(int32 index)
-{
-	if (index > 1)
-		return false;
-
-	return fPortResetChange[index];
-}
-
-
-void
-UHCI::SetPortResetChange(int32 index, bool value)
-{
-	if (index > 1)
-		return;
-
-	fPortResetChange[index] = value;
 }
 
 

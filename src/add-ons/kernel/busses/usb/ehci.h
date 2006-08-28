@@ -9,6 +9,7 @@
 #ifndef EHCI_H
 #define EHCI_H
 
+#define TRACE_USB
 #include "usb_p.h"
 #include "ehci_hardware.h"
 
@@ -36,12 +37,17 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
-virtual	status_t					SubmitRequest(Transfer *transfer);
 
 static	status_t					AddTo(Stack *stack);
 
 		// Port operations for root hub
-		status_t					ResetPort(int32 index);
+		uint8						PortCount() { return fPortCount; };
+		status_t					GetPortStatus(uint8 index, usb_port_status *status);
+		status_t					SetPortFeature(uint8 index, uint16 feature);
+		status_t					ClearPortFeature(uint8 index, uint16 feature);
+
+		status_t					ResetPort(uint8 index);
+		status_t					SuspendPort(uint8 index);
 
 private:
 		// Controller resets
@@ -118,6 +124,11 @@ static	pci_module_info				*sPCIModule;
 		// Root Hub
 		EHCIRootHub					*fRootHub;
 		uint8						fRootHubAddress;
+
+		// Port management
+		uint8						fPortCount;
+		uint16						fPortResetChange;
+		uint16						fPortSuspendChange;
 };
 
 
@@ -125,12 +136,8 @@ class EHCIRootHub : public Hub {
 public:
 									EHCIRootHub(EHCI *ehci, int8 deviceAddress);
 
-		status_t					SubmitTransfer(Transfer *transfer);
-		void						UpdatePortStatus();
-
-private:
-		usb_port_status				fPortStatus[2];
-		EHCI						*fEHCI;
+static	status_t					ProcessTransfer(EHCI *ehci,
+										Transfer *transfer);
 };
 
 

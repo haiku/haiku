@@ -11,7 +11,6 @@
 #include <USB3.h>
 #include <KernelExport.h>
 
-#define TRACE_USB
 #include "ehci.h"
 
 pci_module_info *EHCI::sPCIModule = NULL;
@@ -67,7 +66,10 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fRootHub(NULL),
-		fRootHubAddress(0)
+		fRootHubAddress(0),
+		fPortCount(0),
+		fPortResetChange(0),
+		fPortSuspendChange(0)
 {
 	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR(("usb_ehci: bus manager failed to init\n"));
@@ -110,6 +112,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fOperationalRegisters = fCapabilityRegisters + ReadCapReg8(EHCI_CAPLENGTH);
 	TRACE(("usb_ehci: mapped capability registers: 0x%08x\n", fCapabilityRegisters));
 	TRACE(("usb_ehci: mapped operational registers: 0x%08x\n", fOperationalRegisters));
+
+	// read port count from capability register
+	fPortCount = ReadCapReg32(EHCI_HCSPARAMS) & 0x0f;
 
 	// disable interrupts
 	WriteOpReg(EHCI_USBINTR, 0);
@@ -217,14 +222,11 @@ EHCI::Start()
 status_t
 EHCI::SubmitTransfer(Transfer *transfer)
 {
-	return B_ERROR;
-}
+	// short circuit the root hub
+	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
+		return fRootHub->ProcessTransfer(this, transfer);
 
-
-status_t
-EHCI::SubmitRequest(Transfer *transfer)
-{
-	return B_ERROR;
+ 	return B_ERROR;
 }
 
 
@@ -301,9 +303,169 @@ EHCI::AddTo(Stack *stack)
 
 
 status_t
-EHCI::ResetPort(int32 index)
+EHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
-	return B_ERROR;
+	if (index >= fPortCount)
+		return B_BAD_INDEX;
+
+	status->status = status->change = 0;
+	uint32 portStatus = ReadOpReg(EHCI_PORTSC + index * sizeof(uint32));
+
+	// build the status
+	if (portStatus & EHCI_PORTSC_CONNSTATUS)
+		status->status |= PORT_STATUS_CONNECTION;
+	if (portStatus & EHCI_PORTSC_ENABLE)
+		status->status |= PORT_STATUS_ENABLE;
+	if (portStatus & EHCI_PORTSC_ENABLE)
+		status->status |= PORT_STATUS_HIGH_SPEED;
+	if (portStatus & EHCI_PORTSC_OCACTIVE)
+		status->status |= PORT_STATUS_OVER_CURRENT;
+	if (portStatus & EHCI_PORTSC_PORTRESET)
+		status->status |= PORT_STATUS_RESET;
+	if (portStatus & EHCI_PORTSC_PORTPOWER)
+		status->status |= PORT_STATUS_POWER;
+	if (portStatus & EHCI_PORTSC_SUSPEND)
+		status->status |= PORT_STATUS_SUSPEND;
+	if (portStatus & EHCI_PORTSC_DMINUS)
+		status->status |= PORT_STATUS_LOW_SPEED;
+
+	// build the change
+	if (portStatus & EHCI_PORTSC_CONNCHANGE)
+		status->change |= PORT_STATUS_CONNECTION;
+	if (portStatus & EHCI_PORTSC_ENABLECHANGE)
+		status->change |= PORT_STATUS_ENABLE;
+	if (portStatus & EHCI_PORTSC_OCCHANGE)
+		status->change |= PORT_STATUS_OVER_CURRENT;
+
+	// there are no bits to indicate suspend and reset change
+	if (fPortResetChange & (1 << index))
+		status->change |= PORT_STATUS_RESET;
+	if (fPortSuspendChange & (1 << index))
+		status->change |= PORT_STATUS_SUSPEND;
+
+	return B_OK;
+}
+
+
+status_t
+EHCI::SetPortFeature(uint8 index, uint16 feature)
+{
+	if (index >= fPortCount)
+		return B_BAD_INDEX;
+
+	uint32 portRegister = EHCI_PORTSC + index * sizeof(uint32);
+	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
+
+	switch (feature) {
+		case PORT_SUSPEND:
+			return SuspendPort(index);
+
+		case PORT_RESET:
+			return ResetPort(index);
+
+		case PORT_POWER:
+			WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTPOWER);
+			return B_OK;
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
+EHCI::ClearPortFeature(uint8 index, uint16 feature)
+{
+	if (index >= fPortCount)
+		return B_BAD_INDEX;
+
+	uint32 portRegister = EHCI_PORTSC + index * sizeof(uint32);
+	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
+
+	switch (feature) {
+		case PORT_ENABLE:
+			WriteOpReg(portRegister, portStatus & ~EHCI_PORTSC_ENABLE);
+			return B_OK;
+
+		case PORT_POWER:
+			WriteOpReg(portRegister, portStatus & ~EHCI_PORTSC_PORTPOWER);
+			return B_OK;
+
+		case C_PORT_CONNECTION:
+			WriteOpReg(portRegister, portStatus | EHCI_PORTSC_CONNCHANGE);
+			return B_OK;
+
+		case C_PORT_ENABLE:
+			WriteOpReg(portRegister, portStatus | EHCI_PORTSC_ENABLECHANGE);
+			return B_OK;
+
+		case C_PORT_OVER_CURRENT:
+			WriteOpReg(portRegister, portStatus | EHCI_PORTSC_OCCHANGE);
+			return B_OK;
+
+		case C_PORT_RESET:
+			fPortResetChange &= ~(1 << index);
+			return B_OK;
+
+		case C_PORT_SUSPEND:
+			fPortSuspendChange &= ~(1 << index);
+			return B_OK;
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
+EHCI::ResetPort(uint8 index)
+{
+	TRACE(("usb_ehci: reset port %d\n", index));
+	uint32 portRegister = EHCI_PORTSC + index * sizeof(uint32);
+	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
+
+	if (portStatus & EHCI_PORTSC_DMINUS) {
+		TRACE(("usb_ehci: lowspeed device connected, giving up port ownership\n"));
+		// there is a lowspeed device connected.
+		// we give the ownership to a companion controller.
+		WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTOWNER);
+		fPortResetChange |= (1 << index);
+		return B_OK;
+	}
+
+	// enable reset signaling
+	WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTRESET);
+	snooze(250000);
+
+	// disable reset signaling
+	portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
+	WriteOpReg(portRegister, portStatus & ~EHCI_PORTSC_PORTRESET);
+	snooze(2000);
+
+	portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
+	if (portStatus & EHCI_PORTSC_PORTRESET) {
+		TRACE(("usb_ehci: port reset won't complete\n"));
+		return B_ERROR;
+	}
+
+	if ((portStatus & EHCI_PORTSC_ENABLE) == 0) {
+		TRACE(("usb_ehci: fullspeed device connected, giving up port ownership\n"));
+		// the port was not enabled, this means that no high speed device is
+		// attached to this port. we give up ownership to a companion controler
+		WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTOWNER);
+	}
+
+	fPortResetChange |= (1 << index);
+	return B_OK;
+}
+
+
+status_t
+EHCI::SuspendPort(uint8 index)
+{
+	uint32 portRegister = EHCI_PORTSC + index * sizeof(uint32);
+	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
+	WriteOpReg(portRegister, portStatus | EHCI_PORTSC_SUSPEND);
+	fPortSuspendChange |= (1 << index);
+	return B_OK;
 }
 
 

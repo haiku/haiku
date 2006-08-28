@@ -13,14 +13,13 @@
 Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	int8 deviceAddress, bool lowSpeed)
 	:	ControlPipe(bus, deviceAddress,
-			lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed,
+			lowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed, 0,
 			desc.max_packet_size_0),
 		fDeviceDescriptor(desc),
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
 		fInitOK(false),
 		fLowSpeed(lowSpeed),
-		fBus(bus),
 		fParent(parent),
 		fDeviceAddress(deviceAddress),
 		fLock(-1),
@@ -60,7 +59,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	TRACE(("\tvendor_id:...........0x%04x\n", fDeviceDescriptor.vendor_id));
 	TRACE(("\tproduct_id:..........0x%04x\n", fDeviceDescriptor.product_id));
 	TRACE(("\tdevice_version:......0x%04x\n", fDeviceDescriptor.device_version));
-	TRACE(("\tmanufacturer:........0x%04x\n", fDeviceDescriptor.manufacturer));
+	TRACE(("\tmanufacturer:........0x%02x\n", fDeviceDescriptor.manufacturer));
 	TRACE(("\tproduct:.............0x%02x\n", fDeviceDescriptor.product));
 	TRACE(("\tserial_number:.......0x%02x\n", fDeviceDescriptor.serial_number));
 	TRACE(("\tnum_configurations:..%d\n", fDeviceDescriptor.num_configurations));
@@ -147,7 +146,8 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 					interfaceInfo->generic_count = 0;
 					interfaceInfo->generic = NULL;
 
-					Interface *interface = new(std::nothrow) Interface(this);
+					Interface *interface = new(std::nothrow) Interface(GetBusManager(),
+						fDeviceAddress, Speed());
 					interfaceInfo->handle = interface->USBID();
 
 					currentInterface = interfaceInfo;
@@ -182,14 +182,15 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 					Pipe *endpoint = NULL;
 					switch (endpointDescriptor->attributes & 0x03) {
 						case 0x00: /* Control Endpoint */
-							endpoint = new(std::nothrow) ControlPipe(this,
-								Speed(),
+							endpoint = new(std::nothrow) ControlPipe(GetBusManager(),
+								fDeviceAddress, Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,
 								endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x01: /* Isochronous Endpoint */
-							endpoint = new(std::nothrow) IsochronousPipe(this,
+							endpoint = new(std::nothrow) IsochronousPipe(GetBusManager(),
+								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x80 > 0 ? Pipe::In : Pipe::Out,
 								Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,
@@ -197,7 +198,8 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 							break;
 
 						case 0x02: /* Bulk Endpoint */
-							endpoint = new(std::nothrow) BulkPipe(this,
+							endpoint = new(std::nothrow) BulkPipe(GetBusManager(),
+								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x80 > 0 ? Pipe::In : Pipe::Out,
 								Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,
@@ -205,7 +207,8 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 							break;
 
 						case 0x03: /* Interrupt Endpoint */
-							endpoint = new(std::nothrow) InterruptPipe(this,
+							endpoint = new(std::nothrow) InterruptPipe(GetBusManager(),
+								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x80 > 0 ? Pipe::In : Pipe::Out,
 								Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,

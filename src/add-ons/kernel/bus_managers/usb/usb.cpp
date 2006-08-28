@@ -145,10 +145,10 @@ set_feature(usb_id handle, uint16 selector)
 {
 	TRACE(("usb_module: set_feature(0x%08x, %d)\n", handle, selector));
 	Object *object = gUSBStack->GetObject(handle);
-	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
+	if (!object || (object->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 		return B_BAD_VALUE;
 
-	return ((Pipe *)object)->SetFeature(selector);
+	return ((ControlPipe *)object)->SetFeature(selector);
 }
 
 
@@ -157,10 +157,10 @@ clear_feature(usb_id handle, uint16 selector)
 {
 	TRACE(("usb_module: clear_feature(0x%08x, %d)\n", handle, selector));
 	Object *object = gUSBStack->GetObject(handle);
-	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
+	if (!object || (object->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 		return B_BAD_VALUE;
 
-	return ((Pipe *)object)->ClearFeature(selector);
+	return ((ControlPipe *)object)->ClearFeature(selector);
 }
 
 
@@ -172,10 +172,10 @@ get_status(usb_id handle, uint16 *status)
 		return B_BAD_VALUE;
 
 	Object *object = gUSBStack->GetObject(handle);
-	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
+	if (!object || (object->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 		return B_BAD_VALUE;
 
-	return ((Pipe *)object)->GetStatus(status);
+	return ((ControlPipe *)object)->GetStatus(status);
 }
 
 

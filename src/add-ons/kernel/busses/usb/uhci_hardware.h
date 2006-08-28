@@ -147,28 +147,4 @@ typedef struct
 #define QH_NEXT_IS_QH  			0x02
 #define QH_LINK_MASK			0xfffffff0
 
-
-/************************************************************
- * Roothub Emulation                                        *
- ************************************************************/
-#define RH_GET_STATUS			0
-#define RH_CLEAR_FEATURE		1
-#define RH_SET_FEATURE			3
-#define RH_SET_ADDRESS			5
-#define RH_GET_DESCRIPTOR		6
-#define RH_SET_CONFIG			9
-
-// Descriptors (in usb_request_data->Value)
-#define RH_DEVICE_DESCRIPTOR	(0x01 << 8)
-#define RH_CONFIG_DESCRIPTOR	(0x02 << 8)
-#define RH_STRING_DESCRIPTOR	(0x03 << 8)
-#define RH_HUB_DESCRIPTOR		(0x29 << 8)
-
-// Hub/Portstatus buffer
-typedef struct
-{
-	uint16 status;
-	uint16 change;
-} get_status_buffer;
-
 #endif

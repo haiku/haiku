@@ -8,7 +8,6 @@
 
 #include "ehci.h"
 
-
 static usb_device_descriptor sEHCIRootHubDevice =
 {
 	18,								// Descriptor length
@@ -75,11 +74,11 @@ static ehci_root_hub_configuration_s sEHCIRootHubConfig =
 		9,								// Descriptor length (including
 										// deprecated power control mask)
 		USB_DESCRIPTOR_HUB,				// Descriptor type
-		2,								// Number of ports
+		0x0f,							// Number of ports
 		0x0000,							// Hub characteristics
 		50,								// Power on to power good (in 2ms units)
 		0,								// Maximum current (in mA)
-		0x00,							// Both ports are removable
+		0x00,							// All ports are removable
 		0xff							// Depricated power control mask
 	}
 };
@@ -118,22 +117,135 @@ static ehci_root_hub_string_s sEHCIRootHubStrings[3] = {
 EHCIRootHub::EHCIRootHub(EHCI *ehci, int8 deviceAddress)
 	:	Hub(ehci, NULL, sEHCIRootHubDevice, deviceAddress, false)
 {
-	fEHCI = ehci;
 }
 
 
 status_t
-EHCIRootHub::SubmitTransfer(Transfer *transfer)
+EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 {
-	return B_ERROR;
-}
+	if ((transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
+		return B_ERROR;
 
+	usb_request_data *request = transfer->RequestData();
+	TRACE(("usb_ehci_roothub: request: %d\n", request->Request));
 
-void
-EHCIRootHub::UpdatePortStatus()
-{
-	for (int32 i = 0; i < sEHCIRootHubConfig.hub.num_ports; i++) {
-		fPortStatus[i].status = 0;
-		fPortStatus[i].change = 0;
+	// ToDo: define better status codes. We should return a request error.
+	uint32 status = B_USB_STATUS_DEVICE_TIMEOUT;
+	size_t actualLength = 0;
+	switch (request->Request) {
+		case USB_REQUEST_GET_STATUS: {
+			if (request->Index == 0) {
+				// get hub status
+				actualLength = MIN(sizeof(usb_port_status),
+					transfer->DataLength());
+				// the hub reports whether the local power failed (bit 0)
+				// and if there is a over-current condition (bit 1).
+				// everything as 0 means all is ok.
+				memset(transfer->Data(), 0, actualLength);
+				status = B_USB_STATUS_SUCCESS;
+				break;
+			}
+
+			usb_port_status portStatus;
+			if (ehci->GetPortStatus(request->Index - 1, &portStatus) >= B_OK) {
+				actualLength = MIN(sizeof(usb_port_status), transfer->DataLength());
+				memcpy(transfer->Data(), (void *)&portStatus, actualLength);
+				status = B_USB_STATUS_SUCCESS;
+			}
+
+			break;
+		}
+
+		case USB_REQUEST_SET_ADDRESS:
+			if (request->Value >= 128) {
+				status = B_USB_STATUS_DEVICE_TIMEOUT;
+				break;
+			}
+
+			TRACE(("usb_ehci_roothub:  set address: %d\n", request->Value));
+			status = B_USB_STATUS_SUCCESS;
+			break;
+
+		case USB_REQUEST_GET_DESCRIPTOR:
+			TRACE(("usb_ehci_roothub: get descriptor: %d\n", request->Value >> 8));
+
+			switch (request->Value >> 8) {
+				case USB_DESCRIPTOR_DEVICE: {
+					actualLength = MIN(sizeof(usb_device_descriptor),
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sEHCIRootHubDevice,
+						actualLength);
+					status = B_USB_STATUS_SUCCESS;
+					break;
+				}
+
+				case USB_DESCRIPTOR_CONFIGURATION: {
+					actualLength = MIN(sizeof(ehci_root_hub_configuration_s),
+						transfer->DataLength());
+					sEHCIRootHubConfig.hub.num_ports = ehci->PortCount();
+					memcpy(transfer->Data(), (void *)&sEHCIRootHubConfig,
+						actualLength);
+					status = B_USB_STATUS_SUCCESS;
+					break;
+				}
+
+				case USB_DESCRIPTOR_STRING: {
+					uint8 index = request->Value & 0x00ff;
+					if (index > 2)
+						break;
+
+					actualLength = MIN(sEHCIRootHubStrings[index].length,
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sEHCIRootHubStrings[index],
+						actualLength);
+					status = B_USB_STATUS_SUCCESS;
+					break;
+				}
+
+				case USB_DESCRIPTOR_HUB: {
+					actualLength = MIN(sizeof(usb_hub_descriptor),
+						transfer->DataLength());
+					sEHCIRootHubConfig.hub.num_ports = ehci->PortCount();
+					memcpy(transfer->Data(), (void *)&sEHCIRootHubConfig.hub,
+						actualLength);
+					status = B_USB_STATUS_SUCCESS;
+					break;
+				}
+			}
+			break;
+
+		case USB_REQUEST_SET_CONFIGURATION:
+			status = B_USB_STATUS_SUCCESS;
+			break;
+
+		case USB_REQUEST_CLEAR_FEATURE: {
+			if (request->Index == 0) {
+				// we don't support any hub changes
+				TRACE_ERROR(("usb_ehci_roothub: clear feature: no hub changes\n"));
+				break;
+			}
+
+			TRACE(("usb_ehci_roothub: clear feature: %d\n", request->Value));
+			if (ehci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
+				status = B_USB_STATUS_SUCCESS;
+			break;
+		}
+
+		case USB_REQUEST_SET_FEATURE: {
+			if (request->Index == 0) {
+				// we don't support any hub changes
+				TRACE_ERROR(("usb_ehci_roothub: set feature: no hub changes\n"));
+				break;
+			}
+
+			TRACE(("usb_ehci_roothub: set feature: %d\n", request->Value));
+			if (ehci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
+				status = B_USB_STATUS_SUCCESS;
+			break;
+		}
 	}
+
+	transfer->Finished(status, actualLength);
+	delete transfer;
+	return B_OK;
 }

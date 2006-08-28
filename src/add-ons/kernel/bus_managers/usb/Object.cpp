@@ -10,7 +10,8 @@
 
 
 Object::Object(BusManager *bus)
+	:	fBusManager(bus),
+		fStack(bus->GetStack()),
+		fUSBID(fStack->GetUSBID(this))
 {
-	fStack = bus->GetStack();
-	fUSBID = fStack->GetUSBID(this);
 }

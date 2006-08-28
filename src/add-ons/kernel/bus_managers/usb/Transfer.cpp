@@ -26,6 +26,9 @@ Transfer::~Transfer()
 	// we take ownership of the request data
 	if (fRequestData)
 		delete fRequestData;
+
+	if (fVector && fVector != &fData)
+		delete[] fVector;
 }
 
 
@@ -50,7 +53,8 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 void
 Transfer::SetVector(iovec *vector, size_t vectorCount)
 {
-	fVector = vector;
+	fVector = new(std::nothrow) iovec[vectorCount];
+	memcpy(fVector, vector, vectorCount * sizeof(iovec));
 	fVectorCount = vectorCount;
 }
 

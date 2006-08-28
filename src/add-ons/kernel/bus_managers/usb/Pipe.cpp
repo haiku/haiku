@@ -10,30 +10,13 @@
 #include "usb_p.h"
 
 
-Pipe::Pipe(Device *device, pipeDirection direction, pipeSpeed speed,
-	uint8 endpointAddress, size_t maxPacketSize)
-	:	Object(device->Manager()),
-		fDevice(device),
-		fDeviceAddress(device->Address()),
-		fBus(device->Manager()),
+Pipe::Pipe(BusManager *bus, int8 deviceAddress, pipeDirection direction,
+	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
+	:	Object(bus),
+		fDeviceAddress(deviceAddress),
+		fEndpointAddress(endpointAddress),
 		fDirection(direction),
 		fSpeed(speed),
-		fEndpoint(endpointAddress),
-		fMaxPacketSize(maxPacketSize),
-		fDataToggle(false)
-{
-}
-
-
-Pipe::Pipe(BusManager *bus, int8 deviceAddress, pipeSpeed speed,
-	size_t maxPacketSize)
-	:	Object(bus),
-		fDevice(NULL),
-		fDeviceAddress(deviceAddress),
-		fBus(bus),
-		fDirection(Default),
-		fSpeed(speed),
-		fEndpoint(0),
 		fMaxPacketSize(maxPacketSize),
 		fDataToggle(true)
 {
@@ -45,21 +28,11 @@ Pipe::~Pipe()
 }
 
 
-int8
-Pipe::DeviceAddress()
-{
-	if (!fDevice)
-		return fDeviceAddress;
-
-	return fDevice->Address();
-}
-
-
 status_t
 Pipe::SubmitTransfer(Transfer *transfer)
 {
 	// ToDo: keep track of all submited transfers to be able to cancel them
-	return fBus->SubmitTransfer(transfer);
+	return GetBusManager()->SubmitTransfer(transfer);
 }
 
 
@@ -70,68 +43,16 @@ Pipe::CancelQueuedTransfers()
 }
 
 
-status_t
-Pipe::SetFeature(uint16 selector)
-{
-	if (!fDevice)
-		return B_ERROR;
-
-	return fDevice->SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
-		USB_REQUEST_SET_FEATURE,
-		selector,
-		0,
-		0,
-		NULL,
-		0,
-		NULL);
-}
-
-
-status_t
-Pipe::ClearFeature(uint16 selector)
-{
-	if (!fDevice)
-		return B_ERROR;
-
-	return fDevice->SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
-		USB_REQUEST_CLEAR_FEATURE,
-		selector,
-		0,
-		0,
-		NULL,
-		0,
-		NULL);
-}
-
-
-status_t
-Pipe::GetStatus(uint16 *status)
-{
-	if (!fDevice)
-		return B_ERROR;
-
-	return fDevice->SendRequest(
-		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
-		USB_REQUEST_GET_STATUS,
-		0,
-		0,
-		2,
-		(void *)status,
-		2,
-		NULL);
-}
-
-
 //
 // #pragma mark -
 //
 
 
-InterruptPipe::InterruptPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
-	:	Pipe(device, direction, speed, endpointAddress, maxPacketSize)
+InterruptPipe::InterruptPipe(BusManager *bus, int8 deviceAddress,
+	pipeDirection direction, pipeSpeed speed, uint8 endpointAddress,
+	size_t maxPacketSize)
+	:	Pipe(bus, deviceAddress, direction, speed, endpointAddress,
+			maxPacketSize)
 {
 }
 
@@ -159,9 +80,11 @@ InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 //
 
 
-BulkPipe::BulkPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
-	:	Pipe(device, direction, speed, endpointAddress, maxPacketSize)
+BulkPipe::BulkPipe(BusManager *bus, int8 deviceAddress,
+	pipeDirection direction, pipeSpeed speed, uint8 endpointAddress,
+	size_t maxPacketSize)
+	:	Pipe(bus, deviceAddress, direction, speed, endpointAddress,
+			maxPacketSize)
 {
 }
 
@@ -207,9 +130,11 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 //
 
 
-IsochronousPipe::IsochronousPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress, size_t maxPacketSize)
-	:	Pipe(device, direction, speed, endpointAddress, maxPacketSize)
+IsochronousPipe::IsochronousPipe(BusManager *bus, int8 deviceAddress,
+	pipeDirection direction, pipeSpeed speed, uint8 endpointAddress,
+	size_t maxPacketSize)
+	:	Pipe(bus, deviceAddress, direction, speed, endpointAddress,
+			maxPacketSize)
 {
 }
 
@@ -235,16 +160,9 @@ struct transfer_result_data {
 };
 
 
-ControlPipe::ControlPipe(Device *device, pipeSpeed speed,
-	uint8 endpointAddress, size_t maxPacketSize)
-	:	Pipe(device, Pipe::Default, speed, endpointAddress, maxPacketSize)
-{
-}
-
-
 ControlPipe::ControlPipe(BusManager *bus, int8 deviceAddress, pipeSpeed speed,
-	size_t maxPacketSize)
-	:	Pipe(bus, deviceAddress, speed, maxPacketSize)
+	uint8 endpointAddress, size_t maxPacketSize)
+	:	Pipe(bus, deviceAddress, Default, speed, endpointAddress, maxPacketSize)
 {
 }
 
@@ -321,4 +239,49 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	if (result < B_OK)
 		delete transfer;
 	return result;
+}
+
+
+status_t
+ControlPipe::SetFeature(uint16 selector)
+{
+	return SendRequest(
+		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
+		USB_REQUEST_SET_FEATURE,
+		selector,
+		0,
+		0,
+		NULL,
+		0,
+		NULL);
+}
+
+
+status_t
+ControlPipe::ClearFeature(uint16 selector)
+{
+	return SendRequest(
+		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
+		USB_REQUEST_CLEAR_FEATURE,
+		selector,
+		0,
+		0,
+		NULL,
+		0,
+		NULL);
+}
+
+
+status_t
+ControlPipe::GetStatus(uint16 *status)
+{
+	return SendRequest(
+		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
+		USB_REQUEST_GET_STATUS,
+		0,
+		0,
+		2,
+		(void *)status,
+		2,
+		NULL);
 }

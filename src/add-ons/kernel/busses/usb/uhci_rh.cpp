@@ -120,61 +120,56 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 deviceAddress)
 	:	Hub(uhci, NULL, sUHCIRootHubDevice, deviceAddress, false)
 {
-	fUHCI = uhci;
 }
 
 
 status_t
-UHCIRootHub::SubmitTransfer(Transfer *transfer)
+UHCIRootHub::ProcessTransfer(UHCI *uhci, Transfer *transfer)
 {
 	if ((transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();
-	TRACE(("usb_uhci_roothub: rh_submit_packet called. request: %u\n", request->Request));
+	TRACE(("usb_uhci_roothub: request: %d\n", request->Request));
 
 	// ToDo: define better status codes. We should return a request error.
 	uint32 status = B_USB_STATUS_DEVICE_TIMEOUT;
 	size_t actualLength = 0;
 	switch (request->Request) {
-		case RH_GET_STATUS: {
+		case USB_REQUEST_GET_STATUS: {
 			if (request->Index == 0) {
 				// Get the hub status -- everything as 0 means all-right
-				actualLength = MIN(sizeof(get_status_buffer),
+				actualLength = MIN(sizeof(usb_port_status),
 					transfer->DataLength());
 				memset(transfer->Data(), 0, actualLength);
 				status = B_USB_STATUS_SUCCESS;
 				break;
-			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
-				// This port doesn't exist
-				break;
 			}
 
-			// Get port status
-			UpdatePortStatus();
-
-			actualLength = MIN(4, transfer->DataLength());
-			memcpy(transfer->Data(),
-				(void *)&fPortStatus[request->Index - 1], actualLength);
-			status = B_USB_STATUS_SUCCESS;
+			usb_port_status portStatus;
+			if (uhci->GetPortStatus(request->Index - 1, &portStatus) >= B_OK) {
+				actualLength = MIN(sizeof(usb_port_status), transfer->DataLength());
+				memcpy(transfer->Data(), (void *)&portStatus, actualLength);
+				status = B_USB_STATUS_SUCCESS;
+			}
 			break;
 		}
 
-		case RH_SET_ADDRESS:
+		case USB_REQUEST_SET_ADDRESS:
 			if (request->Value >= 128) {
 				status = B_USB_STATUS_DEVICE_TIMEOUT;
 				break;
 			}
 
-			TRACE(("usb_uhci_roothub: rh_submit_packet RH_ADDRESS: %d\n", request->Value));
+			TRACE(("usb_uhci_roothub: set address: %d\n", request->Value));
 			status = B_USB_STATUS_SUCCESS;
 			break;
 
-		case RH_GET_DESCRIPTOR:
-			TRACE(("usb_uhci_roothub: rh_submit_packet GET_DESC: %d\n", request->Value));
+		case USB_REQUEST_GET_DESCRIPTOR:
+			TRACE(("usb_uhci_roothub: get descriptor: %d\n", request->Value >> 8));
 
-			switch (request->Value & 0xff00) {
-				case RH_DEVICE_DESCRIPTOR: {
+			switch (request->Value >> 8) {
+				case USB_DESCRIPTOR_DEVICE: {
 					actualLength = MIN(sizeof(usb_device_descriptor),
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubDevice,
@@ -183,7 +178,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 					break;
 				}
 
-				case RH_CONFIG_DESCRIPTOR: {
+				case USB_DESCRIPTOR_CONFIGURATION: {
 					actualLength = MIN(sizeof(uhci_root_hub_configuration_s),
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubConfig,
@@ -192,7 +187,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 					break;
 				}
 
-				case RH_STRING_DESCRIPTOR: {
+				case USB_DESCRIPTOR_STRING: {
 					uint8 index = request->Value & 0x00ff;
 					if (index > 2)
 						break;
@@ -205,7 +200,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 					break;
 				}
 
-				case RH_HUB_DESCRIPTOR: {
+				case USB_DESCRIPTOR_HUB: {
 					actualLength = MIN(sizeof(usb_hub_descriptor),
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sUHCIRootHubConfig.hub,
@@ -216,63 +211,33 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			}
 			break;
 
-		case RH_SET_CONFIG:
+		case USB_REQUEST_SET_CONFIGURATION:
 			status = B_USB_STATUS_SUCCESS;
 			break;
 
-		case RH_CLEAR_FEATURE: {
+		case USB_REQUEST_CLEAR_FEATURE: {
 			if (request->Index == 0) {
 				// We don't support any hub changes
-				TRACE_ERROR(("usb_uhci_roothub: RH_CLEAR_FEATURE no hub changes!\n"));
-				break;
-			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
-				// Invalid port number
-				TRACE_ERROR(("usb_uhci_roothub: RH_CLEAR_FEATURE invalid port!\n"));
+				TRACE_ERROR(("usb_uhci_roothub: clear feature: no hub changes\n"));
 				break;
 			}
 
-			TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE called. Feature: %u!\n", request->Value));
-			uint16 portStatus;
-			switch(request->Value) {
-				case C_PORT_RESET:
-					fUHCI->SetPortResetChange(request->Index - 1, false);
-					status = B_USB_STATUS_SUCCESS;
-					break;
-
-				case C_PORT_CONNECTION:
-					portStatus = fUHCI->PortStatus(request->Index - 1);
-					if (fUHCI->SetPortStatus(request->Index - 1,
-						(portStatus & UHCI_PORTSC_DATAMASK)
-						| UHCI_PORTSC_STATCHA) >= B_OK)
-						status = B_USB_STATUS_SUCCESS;
-					break;
-			}
+			TRACE(("usb_uhci_roothub: clear feature: %d\n", request->Value));
+			if (uhci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
+				status = B_USB_STATUS_SUCCESS;
 			break;
 		}
 
-		case RH_SET_FEATURE: {
+		case USB_REQUEST_SET_FEATURE: {
 			if (request->Index == 0) {
-				// We don't support any hub changes
-				TRACE_ERROR(("usb_uhci_roothub: RH_SET_FEATURE no hub changes!\n"));
-				break;
-			} else if (request->Index > sUHCIRootHubConfig.hub.num_ports) {
-				// Invalid port number
-				TRACE_ERROR(("usb_uhci_roothub: RH_SET_FEATURE invalid port!\n"));
+				// we don't support any hub changes
+				TRACE_ERROR(("usb_uhci_roothub: set feature: no hub changes\n"));
 				break;
 			}
 
-			TRACE(("usb_uhci_roothub: RH_SET_FEATURE called. Feature: %u!\n", request->Value));
-			switch(request->Value) {
-				case PORT_RESET:
-					if (fUHCI->ResetPort(request->Index - 1) >= B_OK)
-						status = B_USB_STATUS_SUCCESS;
-					break;
-
-				case PORT_POWER:
-					// the ports are automatically powered
-					status = B_USB_STATUS_SUCCESS;
-					break;
-			}
+			TRACE(("usb_uhci_roothub: set feature: %d!\n", request->Value));
+			if (uhci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
+				status = B_USB_STATUS_SUCCESS;
 			break;
 		}
 	}
@@ -280,47 +245,4 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 	transfer->Finished(status, actualLength);
 	delete transfer;
 	return B_OK;
-}
-
-
-void
-UHCIRootHub::UpdatePortStatus()
-{
-	for (int32 i = 0; i < sUHCIRootHubConfig.hub.num_ports; i++) {
-		uint16 newStatus = 0;
-		uint16 newChange = 0;
-
-		uint16 portStatus = fUHCI->PortStatus(i);
-		TRACE(("usb_uhci_roothub: port: %d status: 0x%04x\n", i, portStatus));
-
-		// Set all individual bits
-		if (portStatus & UHCI_PORTSC_CURSTAT)
-			newStatus |= PORT_STATUS_CONNECTION;
-
-		if (portStatus & UHCI_PORTSC_STATCHA)
-			newChange |= PORT_STATUS_CONNECTION;
-
-		if (portStatus & UHCI_PORTSC_ENABLED)
-			newStatus |= PORT_STATUS_ENABLE;
-
-		if (portStatus & UHCI_PORTSC_ENABCHA)
-			newChange |= PORT_STATUS_ENABLE;
-
-		// TODO: work out suspended/resume
-
-		if (portStatus & UHCI_PORTSC_RESET)
-			newStatus |= PORT_STATUS_RESET;
-		if (fUHCI->PortResetChange(i))
-			newChange |= PORT_STATUS_RESET;
-
-		//The port is automagically powered on
-		newStatus |= PORT_STATUS_POWER;
-
-		if (portStatus & UHCI_PORTSC_LOWSPEED)
-			newStatus |= PORT_STATUS_LOW_SPEED;
-
-		//Update the stored port status
-		fPortStatus[i].status = newStatus;
-		fPortStatus[i].change = newChange;
-	}
 }

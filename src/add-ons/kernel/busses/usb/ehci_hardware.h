@@ -88,10 +88,12 @@
 #define EHCI_PORTSC_FORCERESUME	(1 << 6)	// Force Port Resume
 #define EHCI_PORTSC_OCCHANGE	(1 << 5)	// Over-Current Change
 #define EHCI_PORTSC_OCACTIVE	(1 << 4)	// Over-Current Active
-#define EHCI_PORTSC_ENDISCHANGE	(1 << 3)	// Port Enable/Disable Change
-#define EHCI_PORTSC_ENDIS		(1 << 2)	// Port Enabled/Disabled
+#define EHCI_PORTSC_ENABLECHANGE (1 << 3)	// Port Enable/Disable Change
+#define EHCI_PORTSC_ENABLE		(1 << 2)	// Port Enabled/Disabled
 #define EHCI_PORTSC_CONNCHANGE	(1 << 1)	// Connect Status Change
 #define EHCI_PORTSC_CONNSTATUS	(1 << 0)	// Current Connect Status
+
+#define EHCI_PORTSC_DATAMASK	0xffffffd5
 
 
 // PCI Registers

@@ -180,7 +180,7 @@ Hub::Explore()
 					continue;
 				}
 
-				Device *newDevice = fBus->AllocateNewDevice(this,
+				Device *newDevice = GetBusManager()->AllocateNewDevice(this,
 					(fPortStatus[i].status & PORT_STATUS_LOW_SPEED) > 0);
 
 				if (newDevice) {
@@ -273,7 +273,7 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 	status_t result = Device::BuildDeviceName(string, index, bufferSize, device);
 	if (result < B_OK) {
 		// recursion to parent failed, we're at the root(hub)
-		int32 managerIndex = GetStack()->IndexOfBusManager(Manager());
+		int32 managerIndex = GetStack()->IndexOfBusManager(GetBusManager());
 		*index += snprintf(string + *index, bufferSize - *index, "%ld", managerIndex);
 	}
 

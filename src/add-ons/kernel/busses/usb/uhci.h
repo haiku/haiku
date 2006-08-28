@@ -69,16 +69,16 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
-virtual	status_t					SubmitRequest(Transfer *transfer);
+		status_t					SubmitRequest(Transfer *transfer);
 
 static	status_t					AddTo(Stack *stack);
 
 		// Port operations
-		uint16						PortStatus(int32 index);
-		status_t					SetPortStatus(int32 index, uint16 status);
-		status_t					ResetPort(int32 index);
-		bool						PortResetChange(int32 index);
-		void						SetPortResetChange(int32 index, bool value);
+		status_t					GetPortStatus(uint8 index, usb_port_status *status);
+		status_t					SetPortFeature(uint8 index, uint16 feature);
+		status_t					ClearPortFeature(uint8 index, uint16 feature);
+
+		status_t					ResetPort(uint8 index);
 
 private:
 		// Controller resets
@@ -155,7 +155,7 @@ static	pci_module_info				*sPCIModule;
 		// Root hub
 		UHCIRootHub					*fRootHub;
 		uint8						fRootHubAddress;
-		bool						fPortResetChange[2];
+		uint8						fPortResetChange;
 };
 
 
@@ -163,12 +163,8 @@ class UHCIRootHub : public Hub {
 public:
 									UHCIRootHub(UHCI *uhci, int8 deviceAddress);
 
-		status_t					SubmitTransfer(Transfer *transfer);
-		void						UpdatePortStatus();
-
-private:
-		usb_port_status				fPortStatus[2];
-		UHCI						*fUHCI;
+static	status_t					ProcessTransfer(UHCI *uhci,
+										Transfer *transfer);
 };
 
 
