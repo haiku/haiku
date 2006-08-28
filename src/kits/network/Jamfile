@@ -18,3 +18,4 @@ SharedLibrary libnetwork.so :
 ;
 
 SubInclude HAIKU_TOP src kits network dns ;
+SubInclude HAIKU_TOP src kits network libnetapi ;

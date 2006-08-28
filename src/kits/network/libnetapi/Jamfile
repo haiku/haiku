@@ -1,9 +1,9 @@
-SubDir HAIKU_TOP src kits network compat libnetapi ;
+SubDir HAIKU_TOP src kits network libnetapi ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders net ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
+#UsePrivateHeaders net ;
+#UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -11,17 +11,10 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 	UseHeaders [ FStandardOSHeaders ] : true ;
 		# Needed for <net/*.h> and maybe other stuff.
-}
-
-{
-	if $(TARGET_PLATFORM) = r5 {
-		defines = [ FDefines BUILDING_R5_LIBNET ] ;
-		SubDirCcFlags $(defines) ;
-		SubDirC++Flags $(defines) ;
-		PLATFORM_LIBS = ;
-	} else {
-		PLATFORM_LIBS = libsocket.so libbind.so ;
-	}
+} else if $(TARGET_PLATFORM) = r5 {
+	defines = [ FDefines BUILDING_R5_LIBNET ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 SharedLibrary libnetapi.so :
@@ -29,7 +22,7 @@ SharedLibrary libnetapi.so :
 	NetAddress.cpp 
 	NetBuffer.cpp
 	NetDebug.cpp
-	: be libnet.so $(PLATFORM_LIBS)
+	: be $(NETWORK_LIBS)
 ;
 
 # Installation -- in the test directory for the time being
