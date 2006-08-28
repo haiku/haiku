@@ -7,7 +7,7 @@
 ## Application Specific Settings ---------------------------------------------
 
 # specify the name of the binary
-NAME := webcam.media_addon
+NAME := usb_webcam.media_addon
 
 # specify the type of binary
 #	APP:	Application
@@ -201,4 +201,7 @@ CamInternalSensors.h: $(wildcard sensors/*/*.cpp)
 
 CamInternalColorSpaceTransforms.h: $(wildcard cstransforms/*.cpp)
 	grep -h B_WEBCAM_DECLARE_CSTRANSFORM $(CURDIR)/cstransforms/*.cpp > $@
+
+clean::
+	$(DO_ECHO)rm -f CamInternalAddons.h CamInternalSensors.h CamInternalColorSpaceTransforms.h
 
