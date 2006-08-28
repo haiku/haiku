@@ -239,11 +239,11 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 		goto err2;
 	}
 
-	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
-
 	*_cookie = NULL;
 	ps2_device[PS2_DEVICE_KEYB].disconnect = &ps2_keyboard_disconnect;
 	ps2_device[PS2_DEVICE_KEYB].handle_int = &keyboard_handle_int;
+
+	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
 
 	dprintf("ps2: keyboard_open %s success\n", name);
 	return B_OK;
