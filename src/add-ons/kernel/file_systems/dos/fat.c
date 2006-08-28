@@ -79,7 +79,7 @@ static int32 _count_free_clusters_fat32(nspace *vol)
 
 enum { _IOCTL_COUNT_FREE_, _IOCTL_GET_ENTRY_, _IOCTL_SET_ENTRY_, _IOCTL_ALLOCATE_N_ENTRIES_ };
 
-static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
+static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 {
 	int32 result = 0;
 	uint32 n = 0, first = 0, last = 0;
@@ -87,7 +87,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	uint32 sector;
 	uint32 off, val = 0; /* quiet warning */
 	uint8 *block1, *block2 = NULL; /* quiet warning */
-	int32 tid = -1;
+	int32 tid = _tid;
 
 	// mark end of chain for allocations
 	uint32 V = (action == _IOCTL_SET_ENTRY_) ? N : 0x0fffffff;
@@ -124,7 +124,8 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_) {
 		block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
 	} else {
-		tid = cache_start_transaction(vol->fBlockCache);
+		if (tid == -1)
+			tid = cache_start_transaction(vol->fBlockCache);
 		block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector, tid);
 	}
 	
@@ -249,7 +250,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 				ASSERT(IS_DATA_CLUSTER(last));
 				// set last cluster to point to us
 
-				if ((result = _fat_ioctl_(vol,_IOCTL_SET_ENTRY_,last,cluster)) < 0) {
+				if ((result = _fat_ioctl_(vol,_IOCTL_SET_ENTRY_,last,cluster, tid)) < 0) {
 					ASSERT(0);
 					goto bi;
 				}
@@ -298,7 +299,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 bi:
 	if (block1) 
 		block_cache_put(vol->fBlockCache, sector);
-	if (tid >= 0)
+	if (_tid == -1 && tid > 0)
 		cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 
 	if (action == _IOCTL_ALLOCATE_N_ENTRIES_) {
@@ -324,12 +325,12 @@ bi:
 
 int32 count_free_clusters(nspace *vol)
 {
-	return _fat_ioctl_(vol, _IOCTL_COUNT_FREE_, 0, 0);
+	return _fat_ioctl_(vol, _IOCTL_COUNT_FREE_, 0, 0, -1);
 }
 
 static int32 get_fat_entry(nspace *vol, uint32 cluster)
 {
-	int32 value = _fat_ioctl_(vol, _IOCTL_GET_ENTRY_, cluster, 0);
+	int32 value = _fat_ioctl_(vol, _IOCTL_GET_ENTRY_, cluster, 0, -1);
 
 	if (value < 0)
 		return value;
@@ -349,7 +350,7 @@ static int32 get_fat_entry(nspace *vol, uint32 cluster)
 
 static status_t set_fat_entry(nspace *vol, uint32 cluster, int32 value)
 {
-	return _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, cluster, value);
+	return _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, cluster, value, -1);
 }
 
 // traverse n fat entries
@@ -449,7 +450,7 @@ status_t allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
 
 	DPRINTF(2, ("allocating %lx fat entries\n", n));
 
-	c = _fat_ioctl_(vol, _IOCTL_ALLOCATE_N_ENTRIES_, 0, n);
+	c = _fat_ioctl_(vol, _IOCTL_ALLOCATE_N_ENTRIES_, 0, n, -1);
 	if (c < 0)
 		return c;
 
@@ -670,3 +671,4 @@ status_t fragment(nspace *vol, uint32 *pattern)
 	return B_OK;
 }
 */
+
