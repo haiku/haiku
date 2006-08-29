@@ -259,7 +259,7 @@ tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv
 	header.reserved = 0;
 	header.header_length = 5;// currently no options supported
 	header.flags = (uint8)flags;
-	header.advertised_window = adv_win;
+	header.advertised_window = htons(adv_win);
 	header.checksum = 0;
 	header.urgent_ptr = 0;// urgent pointer not supported
 	
@@ -272,7 +272,7 @@ tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv
 		<< (uint16)htons(buffer->size)
 		<< Checksum::BufferHelper(buffer, sBufferModule);
 	header.checksum = checksum;
-	TRACE(("TCP: Checksum for segment %p is %d\n", buffer, header.checksum));
+	TRACE(("TCP: Checksum for segment %p is %X\n", buffer, header.checksum));
 	return B_OK;
 }
 
@@ -328,8 +328,8 @@ tcp_receive_data(net_buffer *buffer)
 		if (!(header.flags & TCP_FLG_RST)) {
 			TRACE(("TCP:  Connection does not exist!\n"));
 			net_buffer *reply_buf = sBufferModule->create(512);
-			reply_buf->source = buffer->destination;
-			reply_buf->destination = buffer->source;
+			sAddressModule->set_to((sockaddr *)&reply_buf->source, (sockaddr *)&buffer->destination);
+			sAddressModule->set_to((sockaddr *)&reply_buf->destination, (sockaddr *)&buffer->source);
 
 			uint32 sequenceNum, acknowledgeNum;
 			uint16 flags;
@@ -354,7 +354,6 @@ tcp_receive_data(net_buffer *buffer)
 				sBufferModule->free(reply_buf);
 				return status;
 			}
-			TRACE(("TCP:  Sent.\n"));
 		}
 	}
 	sBufferModule->free(buffer);

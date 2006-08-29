@@ -10,7 +10,7 @@
 #define	TCP_INITIAL_RTT	120000000LL
 
 // keep maximum buffer sizes < max net_buffer size for now
-#define	TCP_MAX_SEND_BUF 1024
+#define	TCP_MAX_SEND_BUF 0//1024
 #define TCP_MAX_RECV_BUF TCP_MAX_SEND_BUF
 
 typedef struct {
@@ -59,10 +59,10 @@ private:
 		bool		fTimedOut;
 	};
 
-	status_t Send(uint8 flags);
+	status_t Send(uint16 flags);
 
-	uint32	fLastByteSent;
 	uint32	fLastByteAckd;
+	uint32	fNextByteToSend;
 	uint32	fLastByteWritten;
 
 	uint32	fLastByteRead;
@@ -104,9 +104,12 @@ TCPConnection::TCPSegment::~TCPSegment()
 
 TCPConnection::TCPConnection(net_socket *socket)
 	:
-	fLastByteSent(0), //system_time()),
-	fLastByteAckd(1), //fLastByteSent + 1),
-	fLastByteWritten(1), //fLastByteSent + 1),
+	fLastByteAckd(0), //system_time()),
+	fNextByteToSend(0), //fLastByteAckd),
+	fLastByteWritten(0), //fLastByteAckd),
+	fLastByteRead(0),
+	fNextByteExpected(0),
+	fLastByteReceived(0),
 	fAvgRTT(TCP_INITIAL_RTT),
 	fState(CLOSED),
 	fRoute(NULL)
@@ -201,12 +204,27 @@ TCPConnection::Connect(const struct sockaddr *address)
 	if (hash_lookup(sTCPHash, &key) != NULL) {
 		status = hash_remove(sTCPHash, (void *)this);
 		if (status != B_OK) {
-			TRACE(("TCP: Hash Error: %s\n", strerror(status)));
+			TRACE(("TCP: Connect(): Hash Error: %s\n", strerror(status)));
 			benaphore_unlock(&sTCPLock);
 			return status;
 		}
-	} else
+	} else {
 		TRACE(("TCP: Connect(): Connection not in hash yet!\n"));
+		// get a net_route if there isn't one
+		if (fRoute == NULL) {
+			fRoute = sDatalinkModule->get_route(sDomain, (sockaddr *)address);
+			TRACE(("TCP: Connect(): Using Route %p\n", fRoute));
+			if (fRoute == NULL) {
+				return ENETUNREACH;
+			}
+		}
+
+		if (sAddressModule->is_empty_address((sockaddr *)&socket->address, false)) {
+			TRACE(("TCP: Connect(): Local Address is INADDR_ANY\n"));
+			sAddressModule->set_to((sockaddr *)&socket->address, (sockaddr *)fRoute->interface->address);
+		}
+	}
+
 	sAddressModule->set_to((sockaddr *)&socket->peer, address);
 	status = hash_insert(sTCPHash, (void *)this);
 	if (status != B_OK) {
@@ -223,7 +241,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 	status = Send(TCP_FLG_SYN);
 	if (status != B_OK)
 		return status;
-	fState=SYN_SENT;
+	fState = SYN_SENT;
 
 	// TODO: Should Connect() not return until 3-way handshake is complete?
 	TRACE(("TCP: Connect(): Connection complete\n"));
@@ -359,12 +377,22 @@ TCPConnection::ReadAvailable()
 status_t
 TCPConnection::ReceiveData(net_buffer *buffer)
 {
+	BenaphoreLocker lock(&fLock);
 	TRACE(("%p.ReceiveData()\n", this));
+
+	NetBufferHeader<tcp_header> bufferHeader(buffer);
+	if (bufferHeader.Status() < B_OK)
+		return bufferHeader.Status();
+
+	tcp_header &header = bufferHeader.Data();
+	uint16	flags = 0x0; 
+	status_t status;
 
 	switch (fState) {
 	case CLOSED:
 		// shouldn't happen.  send RST
 		TRACE(("TCP:  Connection in CLOSED state received packet %p!\n", buffer));
+		Send(TCP_FLG_RST);
 		break;
 	case LISTEN:
 		// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
@@ -376,11 +404,27 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 		// The current TCPConnection always remains in LISTEN state.
 		break;
 	case SYN_SENT:
+		TRACE(("TCP:  Connection in SYN_SENT state received packet %p!\n", buffer));
 		// if packet is SYN+ACK, send ACK & enter ESTABLISHED state.
 		// if packet is SYN, send ACK & enter SYN_RCVD state.
+		if (header.flags & TCP_FLG_SYN) {
+			fNextByteExpected = ntohl(header.sequence_num) + 1;
+			flags |= TCP_FLG_ACK;
+			if (header.flags & TCP_FLG_ACK) {
+				fState = ESTABLISHED;
+			} else {
+				flags |= TCP_FLG_SYN;
+				fState = SYN_RCVD;
+			}
+			status = Send(flags);
+			if (status != B_OK)
+				fState = SYN_SENT;
+		}
 		break;
 	case SYN_RCVD:
 		// if packet is ACK, enter ESTABLISHED
+		if (header.flags & TCP_FLG_ACK)
+			fState = ESTABLISHED;
 		break;
 	case ESTABLISHED:
 		// if packet has ACK, update send buffer
@@ -415,34 +459,40 @@ TCPConnection::ResendSegment(struct net_timer *timer, void *data)
 	The fLock benaphore must be held before calling.
 */
 status_t
-TCPConnection::Send(uint8 flags)
+TCPConnection::Send(uint16 flags)
 {
 	TRACE(("%p.Send()\n", this));
-	return B_OK;
 
-	uint32 sequenceNum = 0;
-	uint32 ackNum = 0;
 	net_buffer *buffer;
 	if (1/*no data in send buffer*/) {
 		buffer = sBufferModule->create(512);
+		TRACE(("TCP: Sending Buffer %p\n", buffer));
 		if (buffer == NULL)
 			return ENOBUFS;
 	} else {
 		//TODO: create net_buffer from data in send buffer
 	}
 
-	// get a net_route if there isn't one
-	if (fRoute == NULL) {
-		fRoute = sDatalinkModule->get_route(sDomain, (sockaddr *)&socket->peer);
-		if (fRoute == NULL) {
-			sBufferModule->free(buffer);
-			return ENETUNREACH;
-		}
-	}
+	sAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
+	sAddressModule->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
+	TRACE(("TCP:%p.Send() to address %s\n", this,
+		AddressString(sDomain, (sockaddr *)&buffer->destination, true).Data()));
+	TRACE(("TCP:%p.Send() from address %s\n", this,
+		AddressString(sDomain, (sockaddr *)&buffer->source, true).Data()));
 
 	uint16 advWin = TCP_MAX_RECV_BUF - (fNextByteExpected - fLastByteRead);
+	uint32 size = buffer->size;
 
-	tcp_segment(buffer, flags, sequenceNum, ackNum, advWin);
+	status_t status = tcp_segment(buffer, flags, fNextByteToSend, fNextByteExpected, advWin);
+	if (status != B_OK) {
+		sBufferModule->free(buffer);
+		return status;
+	}
+	fNextByteToSend += size;
+	if (TCP_FLG_SYN & flags)
+		fNextByteToSend++;
+	if (TCP_FLG_FIN & flags)
+		fNextByteToSend++;
 
 #if 0
 	TCPSegment *segment = new(std::nothrow)
