@@ -5,11 +5,12 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SVG_IMPORTER_H
 #define SVG_IMPORTER_H
 
 #include "Importer.h"
+
+struct entry_ref;
 
 class SVGImporter : public Importer {
  public:

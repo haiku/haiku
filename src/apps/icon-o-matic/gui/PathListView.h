@@ -5,12 +5,14 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef PATH_LIST_VIEW_H
 #define PATH_LIST_VIEW_H
 
 #include "ListViews.h"
 #include "PathContainer.h"
+
+class BMenu;
+class BMenuItem;
 
 class CommandStack;
 class VectorPath;
