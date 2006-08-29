@@ -1086,7 +1086,7 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 	if (devices != NULL) {
 		// remove the devices as specified only
 		input_device_ref *device = NULL;
-		for (int32 i = 0; NULL != (device = devices[i]); i++) {
+		for (int32 i = 0; (device = devices[i]) != NULL; i++) {
 			for (int32 j = fInputDeviceList.CountItems() - 1; j >= 0; j--) {
 				InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(j);
 	

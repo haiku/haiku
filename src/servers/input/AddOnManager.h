@@ -62,17 +62,17 @@ class AddOnManager : public BLooper {
 		struct device_info {
 			entry_ref ref;
 			image_id addon_image;
-			BInputServerDevice *isd;
+			BInputServerDevice *device;
 		};
 		struct filter_info {
 			entry_ref ref;
 			image_id addon_image;
-			BInputServerFilter *isf;
+			BInputServerFilter *filter;
 		};
 		struct method_info {
 			entry_ref ref;
 			image_id addon_image;
-			BInputServerMethod *ism;
+			BInputServerMethod *method;
 		};
 
 		BLocker fLock;
