@@ -24,12 +24,16 @@ class ColorPickerPanel : public Panel {
 												 BHandler* target = NULL);
 	virtual						~ColorPickerPanel();
 
-								// Panel
+	// Panel interface
 	virtual	void				Cancel();
 
 	virtual	void				MessageReceived(BMessage* message);
 
+	// ColorPickerPanel
 			void				SetColor(rgb_color color);
+
+			void				SetMessage(BMessage* message);
+			void				SetTarget(BHandler* target);
 
  private:
 

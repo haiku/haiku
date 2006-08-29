@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 
+#include <AppDefs.h>
+
 #include "Manipulator.h"
 #include "StateView.h"
 
@@ -120,14 +122,18 @@ MultipleManipulatorState::MouseMoved(BPoint where, uint32 transit,
 		// call MouseOver on all manipulators
 		// until one feels responsible
 		int32 count = fManipulators.CountItems();
+		bool updateCursor = true;
 		for (int32 i = 0; i < count; i++) {
 			Manipulator* manipulator =
 				(Manipulator*)fManipulators.ItemAtFast(i);
 			if (manipulator->TrackingBounds(fView).Contains(where)
 				&& manipulator->MouseOver(where)) {
+				updateCursor = false;
 				break;
 			}
 		}
+		if (updateCursor)
+			_UpdateCursor();
 	}
 }
 
@@ -214,8 +220,10 @@ MultipleManipulatorState::RemoveManipulator(int32 index)
 	if (manipulator == fCurrentManipulator)
 		fCurrentManipulator = NULL;
 
-	if (manipulator)
+	if (manipulator) {
 		fView->Invalidate(manipulator->Bounds());
+		manipulator->DetachedFromView(fView);
+	}
 
 	return manipulator;
 }
@@ -238,6 +246,7 @@ MultipleManipulatorState::DeleteManipulators()
 	fPreviousManipulator = NULL;
 
 	fView->Invalidate(dirty);
+	_UpdateCursor();
 }
 
 // CountManipulators
@@ -261,4 +270,14 @@ MultipleManipulatorState::ManipulatorAtFast(int32 index) const
 	return (Manipulator*)fManipulators.ItemAtFast(index);
 }
 
+// #pragma mark -
 
+// _UpdateViewCursor
+void
+MultipleManipulatorState::_UpdateCursor()
+{
+	if (fCurrentManipulator)
+		fCurrentManipulator->UpdateCursor();
+	else
+		fView->SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
+}

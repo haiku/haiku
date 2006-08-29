@@ -15,6 +15,7 @@
 #include "Referenceable.h"
 #include "Selectable.h"
 
+class BMessage;
 class PropertyObject;
 
 class IconObject : public Observable,
@@ -23,12 +24,17 @@ class IconObject : public Observable,
  public:
 								IconObject(const char* name);
 								IconObject(const IconObject& other);
+								IconObject(BMessage* archive);
 	virtual						~IconObject();
 
 	// Selectable interface
 	virtual	void				SelectedChanged();
 
 	// IconObject
+	virtual	status_t			Unarchive(const BMessage* archive);
+	virtual status_t			Archive(BMessage* into,
+										bool deep = true) const;
+
 	virtual	PropertyObject*		MakePropertyObject() const;
 	virtual	bool				SetToPropertyObject(
 									const PropertyObject* object);

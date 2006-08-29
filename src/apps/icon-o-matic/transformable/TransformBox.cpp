@@ -246,15 +246,52 @@ TransformBox::ModifiersChanged(uint32 modifiers)
 bool
 TransformBox::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 {
-	// TODO: nudging
-	return false;
+	bool handled = true;
+	BPoint translation(B_ORIGIN);
+
+	float offset = 1.0;
+	if (modifiers & B_SHIFT_KEY)
+		offset /= ZoomLevel();
+
+	switch (key) {
+		case B_UP_ARROW:
+			translation.y = -offset;
+			break;
+		case B_DOWN_ARROW:
+			translation.y = offset;
+			break;
+		case B_LEFT_ARROW:
+			translation.x = -offset;
+			break;
+		case B_RIGHT_ARROW:
+			translation.x = offset;
+			break;
+	
+		default:
+			handled = false;
+			break;
+	}
+
+	if (!handled)
+		return false;
+
+	if (!fCurrentCommand) {
+		fCurrentCommand = MakeCommand("Translate", -1);
+	}
+
+	TranslateBy(translation);
+
+	return true;
 }
 
 // HandleKeyUp
 bool
 TransformBox::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 {
-	// TODO: nudging
+	if (fCurrentCommand) {
+		*_command = FinishTransaction();
+		return true;
+	}
 	return false;
 }
 

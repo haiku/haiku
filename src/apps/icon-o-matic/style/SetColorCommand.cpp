@@ -34,7 +34,8 @@ SetColorCommand::~SetColorCommand()
 status_t
 SetColorCommand::InitCheck()
 {
-	return fStyle ? B_OK : B_NO_INIT;
+	return fStyle && (uint32&)fStyle->Color() != (uint32&)fColor ?
+		B_OK : B_NO_INIT;
 }
 
 // Perform

@@ -35,7 +35,15 @@ SetGradientCommand::~SetGradientCommand()
 status_t
 SetGradientCommand::InitCheck()
 {
-	return fStyle ? B_OK : B_NO_INIT;
+	if (!fStyle)
+		return B_NO_INIT;
+	if (fGradient && fStyle->Gradient()) {
+		if (*fGradient == *fStyle->Gradient()) {
+			printf("SetGradientCommand::InitCheck() - same gradients\n");
+			return B_ERROR;
+		}
+	}
+	return B_OK;
 }
 
 // Perform

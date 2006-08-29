@@ -9,12 +9,11 @@
 #ifndef TRANSFORM_SHAPES_BOX_H
 #define TRANSFORM_SHAPES_BOX_H
 
-#include "TransformBox.h"
+#include "CanvasTransformBox.h"
 
-class CanvasView;
 class Shape;
 
-class TransformShapesBox : public TransformBox {
+class TransformShapesBox : public CanvasTransformBox {
  public:
 								TransformShapesBox(CanvasView* view,
 												   const Shape** objects,
@@ -27,26 +26,16 @@ class TransformShapesBox : public TransformBox {
 	// TransformBox interface
 	virtual	void				Update(bool deep = true);
 
-	virtual	void				TransformFromCanvas(BPoint& point) const;
-	virtual	void				TransformToCanvas(BPoint& point) const;
-	virtual	float				ZoomLevel() const;
-	virtual	double				ViewSpaceRotation() const;
-
 	virtual	TransformCommand*	MakeCommand(const char* actionName,
 											uint32 nameIndex);
 
 	// TransformShapesBox
-			Command*			Perform();
-			Command*			Cancel();
-
 			Shape**				Shapes() const
 									{ return fShapes; }
 			int32				CountShapes() const
 									{ return fCount; }
 
  private:
-			CanvasView*			fCanvasView;
-
 			Shape**				fShapes;
 			int32				fCount;
 

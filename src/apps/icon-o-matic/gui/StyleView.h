@@ -23,6 +23,10 @@ class Style;
 
 // TODO: write lock the document when changing something...
 
+enum {
+	MSG_GRADIENT_SELECTED	= 'grsl',
+};
+
 class StyleView : public BView,
 				  public Observer {
  public:
@@ -32,6 +36,10 @@ class StyleView : public BView,
 	// BView interface
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
+
+#if __HAIKU__
+	virtual	BSize				MinSize();
+#endif
 
 	// Observer interface
 	virtual	void				ObjectChanged(const Observable* object);
@@ -56,6 +64,7 @@ class StyleView : public BView,
 
 			Style*				fStyle;
 			Gradient*			fGradient;
+			bool				fIgnoreCurrentColorNotifications;
 
 			GradientControl*	fGradientControl;
 			BMenuField*			fStyleType;

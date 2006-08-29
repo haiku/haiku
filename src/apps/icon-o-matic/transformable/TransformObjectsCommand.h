@@ -19,7 +19,7 @@ class TransformObjectsCommand : public TransformCommand,
  public:
 								TransformObjectsCommand(
 										TransformBox* box,
-										const Transformable** objects,
+										Transformable** const objects,
 										const double* originals,
 										int32 count,
 

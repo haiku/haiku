@@ -12,18 +12,23 @@
 
 #include <Application.h>
 #include <ListItem.h>
+#include <Menu.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <Mime.h>
 #include <Window.h>
 
 #include "AddPathsCommand.h"
 #include "CommandStack.h"
+#include "MovePathsCommand.h"
 #include "Observer.h"
 #include "RemovePathsCommand.h"
+#include "ReversePathCommand.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
 #include "Selection.h"
 #include "UnassignPathCommand.h"
+#include "Util.h"
 #include "VectorPath.h"
 
 static const float kMarkWidth		= 14.0;
@@ -178,7 +183,7 @@ class ShapePathListener : public PathContainerListener,
 	}
 
 	// PathContainerListener interface
-	virtual void PathAdded(VectorPath* path)
+	virtual void PathAdded(VectorPath* path, int32 index)
 	{
 		fListView->_SetPathMarked(path, true);
 	}
@@ -221,6 +226,21 @@ class ShapePathListener : public PathContainerListener,
 
 // #pragma mark -
 
+enum {
+	MSG_ADD				= 'addp',
+
+	MSG_ADD_RECT		= 'addr',
+	MSG_ADD_CIRCLE		= 'addc',
+	MSG_ADD_ARC			= 'adda',
+
+	MSG_DUPLICATE		= 'dupp',
+
+	MSG_REVERSE			= 'rvrs',
+	MSG_ROTATE_INDICES	= 'roti',
+
+	MSG_REMOVE			= 'remp',
+};
+
 // constructor
 PathListView::PathListView(BRect frame,
 						   const char* name,
@@ -228,9 +248,10 @@ PathListView::PathListView(BRect frame,
 	: SimpleListView(frame, name,
 					 NULL, B_SINGLE_SELECTION_LIST),
 	  fMessage(message),
+	  fMenu(NULL),
+
 	  fPathContainer(NULL),
 	  fShapeContainer(NULL),
-	  fSelection(NULL),
 	  fCommandStack(NULL),
 
 	  fCurrentShape(NULL),
@@ -258,24 +279,20 @@ PathListView::~PathListView()
 void
 PathListView::SelectionChanged()
 {
-	// NOTE: single selection list
+	SimpleListView::SelectionChanged();
 
-	PathListItem* item
-		= dynamic_cast<PathListItem*>(ItemAt(CurrentSelection(0)));
-	if (fMessage) {
-		BMessage message(*fMessage);
-		message.AddPointer("path", item ? (void*)item->path : NULL);
-		Invoke(&message);
+	if (!fSyncingToSelection) {
+		// NOTE: single selection list
+		PathListItem* item
+			= dynamic_cast<PathListItem*>(ItemAt(CurrentSelection(0)));
+		if (fMessage) {
+			BMessage message(*fMessage);
+			message.AddPointer("path", item ? (void*)item->path : NULL);
+			Invoke(&message);
+		}
 	}
 
-	// modify global Selection
-	if (!fSelection)
-		return;
-
-	if (item)
-		fSelection->Select(item->path);
-	else
-		fSelection->DeselectAll();
+	_UpdateMenu();
 }
 
 // MouseDown
@@ -323,39 +340,192 @@ PathListView::MouseDown(BPoint where)
 void
 PathListView::MessageReceived(BMessage* message)
 {
-	SimpleListView::MessageReceived(message);
+	switch (message->what) {
+		case MSG_ADD:
+			if (fCommandStack) {
+				VectorPath* path;
+				AddPathsCommand* command;
+				new_path(fPathContainer, &path, &command);
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_ADD_RECT:
+			if (fCommandStack) {
+				VectorPath* path;
+				AddPathsCommand* command;
+				new_path(fPathContainer, &path, &command);
+				if (path) {
+					path->AddPoint(BPoint(16, 16));
+					path->AddPoint(BPoint(16, 48));
+					path->AddPoint(BPoint(48, 48));
+					path->AddPoint(BPoint(48, 16));
+					path->SetClosed(true);
+				}
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_ADD_CIRCLE:
+			// TODO: ask for number of secions
+			if (fCommandStack) {
+				VectorPath* path;
+				AddPathsCommand* command;
+				new_path(fPathContainer, &path, &command);
+				if (path) {
+					// add four control points defining a circle:
+					//   a 
+					// b   d
+					//   c
+					BPoint a(32, 16);
+					BPoint b(16, 32);
+					BPoint c(32, 48);
+					BPoint d(48, 32);
+					
+					path->AddPoint(a);
+					path->AddPoint(b);
+					path->AddPoint(c);
+					path->AddPoint(d);
+			
+					path->SetClosed(true);
+			
+					float controlDist = 0.552284 * 16;
+					path->SetPoint(0, a, a + BPoint(controlDist, 0.0),
+										 a + BPoint(-controlDist, 0.0), true);
+					path->SetPoint(1, b, b + BPoint(0.0, -controlDist),
+										 b + BPoint(0.0, controlDist), true);
+					path->SetPoint(2, c, c + BPoint(-controlDist, 0.0),
+										 c + BPoint(controlDist, 0.0), true);
+					path->SetPoint(3, d, d + BPoint(0.0, controlDist),
+										 d + BPoint(0.0, -controlDist), true);
+				}
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_DUPLICATE:
+			if (fCommandStack) {
+				PathListItem* item = dynamic_cast<PathListItem*>(
+					ItemAt(CurrentSelection(0)));
+				if (!item)
+					break;
+
+				VectorPath* path;
+				AddPathsCommand* command;
+				new_path(fPathContainer, &path, &command, item->path);
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_REVERSE:
+			if (fCommandStack) {
+				PathListItem* item = dynamic_cast<PathListItem*>(
+					ItemAt(CurrentSelection(0)));
+				if (!item)
+					break;
+
+				ReversePathCommand* command
+					= new (nothrow) ReversePathCommand(item->path);
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_REMOVE:
+			RemoveSelected();
+			break;
+
+		default:
+			SimpleListView::MessageReceived(message);
+			break;
+	}
 }
 
 // MakeDragMessage
 void
 PathListView::MakeDragMessage(BMessage* message) const
 {
+	SimpleListView::MakeDragMessage(message);
+	message->AddPointer("container", fPathContainer);
+	int32 count = CountSelectedItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListItem* item = dynamic_cast<PathListItem*>(
+			ItemAt(CurrentSelection(i)));
+		if (item)
+			message->AddPointer("path", (void*)item->path);
+		else
+			break;
+	}
 }
 
 // AcceptDragMessage
 bool
 PathListView::AcceptDragMessage(const BMessage* message) const
 {
-	return false;
+	return SimpleListView::AcceptDragMessage(message);
 }
 
 // SetDropTargetRect
 void
 PathListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
+	SimpleListView::SetDropTargetRect(message, where);
 }
 
 // MoveItems
 void
 PathListView::MoveItems(BList& items, int32 toIndex)
 {
+	if (!fCommandStack || !fPathContainer)
+		return;
+
+	int32 count = items.CountItems();
+	VectorPath** paths = new (nothrow) VectorPath*[count];
+	if (!paths)
+		return;
+
+	for (int32 i = 0; i < count; i++) {
+		PathListItem* item
+			= dynamic_cast<PathListItem*>((BListItem*)items.ItemAtFast(i));
+		paths[i] = item ? item->path : NULL;
+	}
+
+	MovePathsCommand* command
+		= new (nothrow) MovePathsCommand(fPathContainer,
+										 paths, count, toIndex);
+	if (!command) {
+		delete[] paths;
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // CopyItems
 void
 PathListView::CopyItems(BList& items, int32 toIndex)
 {
-	// TODO: allow to copy path
+	if (!fCommandStack || !fPathContainer)
+		return;
+
+	int32 count = items.CountItems();
+	VectorPath* paths[count];
+
+	for (int32 i = 0; i < count; i++) {
+		PathListItem* item
+			= dynamic_cast<PathListItem*>((BListItem*)items.ItemAtFast(i));
+		paths[i] = item ? new (nothrow) VectorPath(*item->path) : NULL;
+	}
+
+	AddPathsCommand* command
+		= new (nothrow) AddPathsCommand(fPathContainer,
+										paths, count, true, toIndex);
+	if (!command) {
+		for (int32 i = 0; i < count; i++)
+			delete paths[i];
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // RemoveItemList
@@ -369,7 +539,7 @@ PathListView::RemoveItemList(BList& items)
 	VectorPath* paths[count];
 	for (int32 i = 0; i < count; i++) {
 		PathListItem* item = dynamic_cast<PathListItem*>(
-			(SimpleItem*)items.ItemAtFast(i));
+			(BListItem*)items.ItemAtFast(i));
 		if (item)
 			paths[i] = item->path;
 		else
@@ -394,11 +564,39 @@ PathListView::CloneItem(int32 index) const
 	return NULL;
 }
 
+// IndexOfSelectable
+int32
+PathListView::IndexOfSelectable(Selectable* selectable) const
+{
+	VectorPath* path = dynamic_cast<VectorPath*>(selectable);
+	if (!path)
+		return -1;
+
+	for (int32 i = 0;
+		 PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
+		 i++) {
+		if (item->path == path)
+			return i;
+	}
+
+	return -1;
+}
+
+// SelectableFor
+Selectable*
+PathListView::SelectableFor(BListItem* item) const
+{
+	PathListItem* pathItem = dynamic_cast<PathListItem*>(item);
+	if (pathItem)
+		return pathItem->path;
+	return NULL;
+}
+
 // #pragma mark -
 
 // PathAdded
 void
-PathListView::PathAdded(VectorPath* path)
+PathListView::PathAdded(VectorPath* path, int32 index)
 {
 	// NOTE: we are in the thread that messed with the
 	// ShapeContainer, so no need to lock the
@@ -407,9 +605,7 @@ PathListView::PathAdded(VectorPath* path)
 	if (!LockLooper())
 		return;
 
-	// NOTE: shapes are always added at the end
-	// of the list, so the sorting is synced...
-	if (_AddPath(path))
+	if (_AddPath(path, index))
 		Select(CountItems() - 1);
 
 	UnlockLooper();
@@ -460,7 +656,7 @@ PathListView::SetPathContainer(PathContainer* container)
 
 	int32 count = fPathContainer->CountPaths();
 	for (int32 i = 0; i < count; i++)
-		_AddPath(fPathContainer->PathAtFast(i));
+		_AddPath(fPathContainer->PathAtFast(i), i);
 
 //	fPathContainer->ReadUnlock();
 }
@@ -482,18 +678,52 @@ PathListView::SetShapeContainer(ShapeContainer* container)
 		fShapeContainer->AddListener(fShapePathListener);
 }
 
-// SetSelection
-void
-PathListView::SetSelection(Selection* selection)
-{
-	fSelection = selection;
-}
-
 // SetCommandStack
 void
 PathListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
+}
+
+// SetMenu
+void
+PathListView::SetMenu(BMenu* menu)
+{
+	fMenu = menu;
+	if (!fMenu)
+		return;
+
+	fAddMI = new BMenuItem("Add", new BMessage(MSG_ADD));
+	fAddRectMI = new BMenuItem("Add Rect", new BMessage(MSG_ADD_RECT));
+	fAddCircleMI = new BMenuItem("Add Circle"B_UTF8_ELLIPSIS,
+								new BMessage(MSG_ADD_CIRCLE));
+	fAddArcMI = new BMenuItem("Add Arc"B_UTF8_ELLIPSIS,
+								new BMessage(MSG_ADD_ARC));
+	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
+	fReverseMI = new BMenuItem("Reverse", new BMessage(MSG_REVERSE));
+	fRotateIndicesMI = new BMenuItem("Rotate Indices",
+								new BMessage(MSG_ROTATE_INDICES));
+	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
+
+	fMenu->AddItem(fAddMI);
+	fMenu->AddItem(fAddRectMI);
+	fMenu->AddItem(fAddCircleMI);
+	fMenu->AddItem(fAddArcMI);
+fAddArcMI->SetEnabled(false);
+
+	fMenu->AddSeparatorItem();
+
+	fMenu->AddItem(fDuplicateMI);
+	fMenu->AddItem(fReverseMI);
+	fMenu->AddItem(fRotateIndicesMI);
+
+	fMenu->AddSeparatorItem();
+
+	fMenu->AddItem(fRemoveMI);
+
+	fMenu->SetTargetForItems(this);
+
+	_UpdateMenu();
 }
 
 // SetCurrentShape
@@ -513,10 +743,12 @@ PathListView::SetCurrentShape(Shape* shape)
 
 // _AddPath
 bool
-PathListView::_AddPath(VectorPath* path)
+PathListView::_AddPath(VectorPath* path, int32 index)
 {
-	if (path)
-		 return AddItem(new PathListItem(path, this, fCurrentShape != NULL));
+	if (path) {
+		 return AddItem(
+		 	new PathListItem(path, this, fCurrentShape != NULL), index);
+	}
 	return false;
 }
 
@@ -583,3 +815,19 @@ PathListView::_SetPathMarked(VectorPath* path, bool marked)
 		item->SetMarked(marked);
 	}
 }
+
+// _UpdateMenu
+void
+PathListView::_UpdateMenu()
+{
+	if (!fMenu)
+		return;
+
+	bool gotSelection = CurrentSelection(0) >= 0;
+
+	fDuplicateMI->SetEnabled(gotSelection);
+	fReverseMI->SetEnabled(gotSelection);
+	fRemoveMI->SetEnabled(gotSelection);
+}
+
+

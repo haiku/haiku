@@ -10,8 +10,10 @@
 #define STYLE_LIST_VIEW_H
 
 #include "ListViews.h"
-#include "StyleManager.h"
+#include "StyleContainer.h"
 
+class BMenu;
+class BMenuItem;
 class CommandStack;
 class Selection;
 class Shape;
@@ -21,7 +23,7 @@ class Style;
 class StyleListItem;
 
 class StyleListView : public SimpleListView,
-					  public StyleManagerListener {
+					  public StyleContainerListener {
  public:
 								StyleListView(BRect frame,
 											 const char* name,
@@ -30,10 +32,11 @@ class StyleListView : public SimpleListView,
 	virtual						~StyleListView();
 
 	// SimpleListView interface
+	virtual	void				MessageReceived(BMessage* message);
+
 	virtual	void				SelectionChanged();
 
 	virtual	void				MouseDown(BPoint where);
-	virtual	void				MessageReceived(BMessage* message);
 
 	virtual	void				MakeDragMessage(BMessage* message) const;
 
@@ -47,21 +50,25 @@ class StyleListView : public SimpleListView,
 
 	virtual	BListItem*			CloneItem(int32 atIndex) const;
 
-	// StyleManagerListener interface
-	virtual	void				StyleAdded(Style* style);
+	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
+	virtual	Selectable*			SelectableFor(BListItem* item) const;
+
+	// StyleContainerListener interface
+	virtual	void				StyleAdded(Style* style, int32 index);
 	virtual	void				StyleRemoved(Style* style);
 
 	// StyleListView
-			void				SetStyleManager(StyleManager* container);
+			void				SetMenu(BMenu* menu);
+			void				SetStyleContainer(StyleContainer* container);
 			void				SetShapeContainer(ShapeContainer* container);
-			void				SetSelection(Selection* selection);
+			void				SetCommandStack(CommandStack* stack);
 
 			void				SetCurrentShape(Shape* shape);
 			Shape*				CurrentShape() const
 									{ return fCurrentShape; }
 
  private:
-			bool				_AddStyle(Style* style);
+			bool				_AddStyle(Style* style, int32 index);
 			bool				_RemoveStyle(Style* style);
 
 			StyleListItem*		_ItemForStyle(Style* style) const;
@@ -69,12 +76,12 @@ class StyleListView : public SimpleListView,
 	friend class ShapeStyleListener;
 			void				_UpdateMarks();
 			void				_SetStyleMarked(Style* style, bool marked);
+			void				_UpdateMenu();
 
 			BMessage*			fMessage;
 
-			StyleManager*		fStyleContainer;
+			StyleContainer*		fStyleContainer;
 			ShapeContainer*		fShapeContainer;
-			Selection*			fSelection;
 			CommandStack*		fCommandStack;
 
 			Shape*				fCurrentShape;
@@ -82,6 +89,12 @@ class StyleListView : public SimpleListView,
 				// is referenced by this shape
 
 			ShapeStyleListener*	fShapeListener;
+
+			BMenu*				fMenu;
+			BMenuItem*			fAddMI;
+			BMenuItem*			fDuplicateMI;
+			BMenuItem*			fResetTransformationMI;
+			BMenuItem*			fRemoveMI;
 };
 
 #endif // STYLE_LIST_VIEW_H

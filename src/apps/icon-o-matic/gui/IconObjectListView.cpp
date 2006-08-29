@@ -71,7 +71,9 @@ IconObjectListView::PropertyChanged(const Property* previous,
 void
 IconObjectListView::PasteProperties(const PropertyObject* object)
 {
-	printf("IconObjectListView::PasteProperties()\n");
+	// TODO: command for this
+	if (fObject)
+		fObject->SetToPropertyObject(object);
 
 	PropertyListView::PasteProperties(object);
 }
@@ -95,7 +97,7 @@ IconObjectListView::ObjectChanged(const Observable* object)
 	}
 
 	if (object == fObject/* && !fIgnoreObjectChange*/) {
-printf("IconObjectListView::ObjectChanged(fObject)\n");
+//printf("IconObjectListView::ObjectChanged(fObject)\n");
 		SetTo(fObject->MakePropertyObject());
 	}
 }

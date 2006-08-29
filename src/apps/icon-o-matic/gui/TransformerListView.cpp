@@ -97,7 +97,6 @@ TransformerListView::TransformerListView(BRect frame, const char* name,
 					 NULL, B_MULTIPLE_SELECTION_LIST),
 	  fMessage(message),
 	  fShape(NULL),
-	  fSelection(NULL),
 	  fCommandStack(NULL)
 {
 	SetDragCommand(MSG_DRAG_TRANSFORMER);
@@ -118,24 +117,21 @@ TransformerListView::~TransformerListView()
 void
 TransformerListView::SelectionChanged()
 {
-	// TODO: single selection versus multiple selection
+	if (CountSelectedItems() > 0)
+		SimpleListView::SelectionChanged();
+	// else
+	// TODO: any selected transformer will still be visible in the
+	// PropertyListView
 
-	TransformerItem* item
-		= dynamic_cast<TransformerItem*>(ItemAt(CurrentSelection(0)));
-	if (fMessage) {
-		BMessage message(*fMessage);
-		message.AddPointer("transformer", item ? (void*)item->transformer : NULL);
-		Invoke(&message);
+	if (!fSyncingToSelection) {
+		TransformerItem* item
+			= dynamic_cast<TransformerItem*>(ItemAt(CurrentSelection(0)));
+		if (fMessage) {
+			BMessage message(*fMessage);
+			message.AddPointer("transformer", item ? (void*)item->transformer : NULL);
+			Invoke(&message);
+		}
 	}
-
-	// modify global Selection
-	if (!fSelection)
-		return;
-
-	if (item)
-		fSelection->Select(item->transformer);
-	else
-		fSelection->DeselectAll();
 }
 
 // MakeDragMessage
@@ -203,7 +199,7 @@ TransformerListView::RemoveItemList(BList& items)
 	int32 count = items.CountItems();
 	int32 indices[count];
 	for (int32 i = 0; i < count; i++)
-		indices[i] = IndexOf((SimpleItem*)items.ItemAtFast(i));
+		indices[i] = IndexOf((BListItem*)items.ItemAtFast(i));
 
 	RemoveTransformersCommand* command
 		= new (nothrow) RemoveTransformersCommand(fShape,
@@ -219,6 +215,34 @@ TransformerListView::CloneItem(int32 index) const
 		return new TransformerItem(item->transformer,
 								   const_cast<TransformerListView*>(this));
 	}
+	return NULL;
+}
+
+// IndexOfSelectable
+int32
+TransformerListView::IndexOfSelectable(Selectable* selectable) const
+{
+	Transformer* transformer = dynamic_cast<Transformer*>(selectable);
+	if (!transformer)
+		return -1;
+
+	for (int32 i = 0;
+		 TransformerItem* item = dynamic_cast<TransformerItem*>(ItemAt(i));
+		 i++) {
+		if (item->transformer == transformer)
+			return i;
+	}
+
+	return -1;
+}
+
+// SelectableFor
+Selectable*
+TransformerListView::SelectableFor(BListItem* item) const
+{
+	TransformerItem* transformerItem = dynamic_cast<TransformerItem*>(item);
+	if (transformerItem)
+		return transformerItem->transformer;
 	return NULL;
 }
 
@@ -288,13 +312,6 @@ TransformerListView::SetShape(Shape* shape)
 	int32 count = fShape->CountTransformers();
 	for (int32 i = 0; i < count; i++)
 		_AddTransformer(fShape->TransformerAtFast(i), i);
-}
-
-// SetSelection
-void
-TransformerListView::SetSelection(Selection* selection)
-{
-	fSelection = selection;
 }
 
 // SetCommandStack

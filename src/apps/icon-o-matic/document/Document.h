@@ -11,6 +11,7 @@
 
 #include <String.h>
 
+#include "Observable.h"
 #include "RWLocker.h"
 
 struct entry_ref;
@@ -19,7 +20,8 @@ class CommandStack;
 class Icon;
 class Selection;
 
-class Document : public RWLocker {
+class Document : public RWLocker,
+				 public Observable {
  public:
 								Document(const char* name = NULL);
 	virtual						~Document();
@@ -36,9 +38,15 @@ class Document : public RWLocker {
 			void				SetRef(const entry_ref& ref);
 	inline	const entry_ref*	Ref() const
 									{ return fRef; }
+			void				SetExportRef(const entry_ref& ref);
+	inline	const entry_ref*	ExportRef() const
+									{ return fExportRef; }
 
+			void				SetIcon(::Icon* icon);
 	inline	::Icon*				Icon() const
 									{ return fIcon; }
+
+			void				MakeEmpty();
 
  private:
 			::Icon*				fIcon;
@@ -47,6 +55,7 @@ class Document : public RWLocker {
 
 			BString				fName;
 			entry_ref*			fRef;
+			entry_ref*			fExportRef;
 };
 
 #endif // DOCUMENT_H

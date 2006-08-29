@@ -53,11 +53,11 @@ class TransformCommand : public Command {
 										uint32 nameIndex);
 
  protected:
-	virtual	status_t			_SetTransformation(BPoint pivotDiff,
-												   BPoint translationDiff,
-												   double rotationDiff,
-												   double xScaleDiff,
-												   double yScaleDiff) const = 0;
+	virtual	status_t			_SetTransformation(BPoint pivot,
+												   BPoint translation,
+												   double rotation,
+												   double xScale,
+												   double yScale) const = 0;
 
 			BPoint				fOldPivot;
 			BPoint				fOldTranslation;

@@ -9,6 +9,7 @@
 #include "Observable.h"
 
 #include <stdio.h>
+#include <typeinfo>
 
 #include <OS.h>
 
@@ -27,8 +28,10 @@ Observable::~Observable()
 {
 	if (fObservers.CountItems() > 0) {
 		char message[256];
+		Observer* o = (Observer*)fObservers.ItemAt(0);
 		sprintf(message, "Observable::~Observable() - %ld "
-						 "observers still watching!\n", fObservers.CountItems());
+						 "observers still watching, first: %s\n",
+						 fObservers.CountItems(), typeid(*o).name());
 		debugger(message);
 	}
 }
@@ -49,6 +52,22 @@ Observable::RemoveObserver(Observer* observer)
 {
 	return fObservers.RemoveItem((void*)observer);
 }
+
+// CountObservers
+int32
+Observable::CountObservers() const
+{
+	return fObservers.CountItems();
+}
+
+// ObserverAtFast
+Observer*
+Observable::ObserverAtFast(int32 index) const
+{
+	return (Observer*)fObservers.ItemAtFast(index);
+}
+
+// #pragma mark -
 
 // Notify
 void

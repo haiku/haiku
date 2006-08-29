@@ -12,12 +12,12 @@
 #include "Command.h"
 
 class Style;
-class StyleManager;
+class StyleContainer;
 
 class AddStylesCommand : public Command {
  public:
 								AddStylesCommand(
-									StyleManager* container,
+									StyleContainer* container,
 									Style** const styles,
 									int32 count,
 									int32 index);
@@ -31,7 +31,7 @@ class AddStylesCommand : public Command {
 	virtual void				GetName(BString& name);
 
  private:
-			StyleManager*		fContainer;
+			StyleContainer*		fContainer;
 			Style**				fStyles;
 			int32				fCount;
 			int32				fIndex;

@@ -131,7 +131,7 @@ roundf(float v)
 status_t write_string(BPositionIO* stream, BString& string);
 void append_float(BString& string, float n, int32 maxDigits = 4);
 
-double gauss(double f);
+//double gauss(double f);
 
 
 # endif // SUPPORT_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,8 @@ class ChannelTransform : public Transformable {
 
 	// ChannelTransform
 	virtual	void				Update(bool deep = true) {}
+
+			void				SetTransformation(const Transformable& other);
 
 			void				SetTransformation(BPoint pivot,
 												  BPoint translation,

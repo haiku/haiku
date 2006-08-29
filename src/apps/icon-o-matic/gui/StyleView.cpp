@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <PopUpMenu.h>
+#include <Window.h>
 
 #include "CommandStack.h"
 #include "CurrentColor.h"
@@ -41,7 +42,8 @@ StyleView::StyleView(BRect frame)
 	  fCommandStack(NULL),
 	  fCurrentColor(NULL),
 	  fStyle(NULL),
-	  fGradient(NULL)
+	  fGradient(NULL),
+	  fIgnoreCurrentColorNotifications(false)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -155,6 +157,19 @@ StyleView::MessageReceived(BMessage* message)
 	}
 }
 
+#if __HAIKU__
+
+// MinSize
+BSize
+StyleView::MinSize()
+{
+	BSize minSize = BView::MinSize();
+	minSize.width = fGradientControl->MinSize().width + 10;
+	return minSize;
+}
+
+#endif // __HAIKU__
+
 // #pragma mark -
 
 // ObjectChanged
@@ -169,7 +184,15 @@ StyleView::ObjectChanged(const Observable* object)
 	// NOTE: it is important to compare the gradients
 	// before assignment, or we will get into an endless loop
 	if (object == controlGradient) {
-		if (fGradient && *fGradient != *controlGradient) {
+		if (!fGradient)
+			return;
+
+		// make sure we don't fall for changes of the
+		// transformation
+		// TODO: is this really necessary?
+		controlGradient->SetTransform(*fGradient);
+
+		if (*fGradient != *controlGradient) {
 			if (fCommandStack) {
 				fCommandStack->Perform(
 					new (nothrow) SetGradientCommand(
@@ -194,7 +217,13 @@ StyleView::ObjectChanged(const Observable* object)
 		if (fCurrentColor && !fStyle->Gradient())
 			fCurrentColor->SetColor(fStyle->Color());
 	} else if (object == fCurrentColor) {
-		_AdoptCurrentColor(fCurrentColor->Color());
+		// NOTE: because of imprecisions in converting
+		// RGB<->HSV, the current color can be different
+		// even if we just set it to the current
+		// gradient stop color, that's why we ignore
+		// notifications caused by this situation
+		if (!fIgnoreCurrentColorNotifications)
+			_AdoptCurrentColor(fCurrentColor->Color());
 	}
 }
 
@@ -279,6 +308,12 @@ StyleView::_SetGradient(Gradient* gradient)
 		_MarkType(fStyleType->Menu(), STYLE_TYPE_COLOR);
 		_MarkType(fGradientType->Menu(), -1);
 	}
+
+	if (Window()) {
+		BMessage message(MSG_GRADIENT_SELECTED);
+		message.AddPointer("gradient", (void*)fGradient);
+		Window()->PostMessage(&message);
+	}
 }
 
 // _MarkType
@@ -289,7 +324,8 @@ StyleView::_MarkType(BMenu* menu, int32 type) const
 		BMessage* message = item->Message();
 		int32 t;
 		if (message->FindInt32("type", &t) == B_OK && t == type) {
-			item->SetMarked(true);
+			if (!item->IsMarked())
+				item->SetMarked(true);
 			return;
 		}
 	}
@@ -311,9 +347,11 @@ StyleView::_SetStyleType(int32 type)
 		}
 	} else if (type == STYLE_TYPE_GRADIENT) {
 		if (fCommandStack) {
+			Gradient gradient(true);
+			gradient.AddColor(fStyle->Color(), 0);
+			gradient.AddColor(fStyle->Color(), 1);
 			fCommandStack->Perform(
-				new (nothrow) SetGradientCommand(
-					fStyle, fGradientControl->Gradient()));
+				new (nothrow) SetGradientCommand(fStyle, &gradient));
 		} else {
 			fStyle->SetGradient(fGradientControl->Gradient());
 		}
@@ -355,8 +393,11 @@ StyleView::_TransferGradientStopColor()
 {
 	if (fCurrentColor && fGradientControl->IsFocus()) {
 		rgb_color color;
-		if (fGradientControl->GetCurrentStop(&color))
+		if (fGradientControl->GetCurrentStop(&color)) {
+			fIgnoreCurrentColorNotifications = true;
 			fCurrentColor->SetColor(color);
+			fIgnoreCurrentColorNotifications = false;
+		}
 	}
 }
 

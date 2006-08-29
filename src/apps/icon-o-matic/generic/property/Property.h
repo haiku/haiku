@@ -19,13 +19,17 @@ class PropertyAnimator;
 
 // Property
 class Property : public BArchivable {
-	// TODO: actually use BArchivable!
  public:
 								Property(uint32 identifier);
 								Property(const Property& other);
 								Property(BMessage* archive);
 	virtual						~Property();
 
+	// BArchivable interface
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+
+	// Property
 	virtual	Property*			Clone() const = 0;
 
 	virtual	type_code			Type() const = 0;
@@ -58,7 +62,12 @@ class IntProperty : public Property {
 											int32 min = LONG_MIN,
 											int32 max = LONG_MAX);
 								IntProperty(const IntProperty& other);
+								IntProperty(BMessage* archive);
 	virtual						~IntProperty();
+
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
 	virtual	Property*			Clone() const;
 
@@ -96,7 +105,12 @@ class FloatProperty : public Property {
 											  float min = -1000000.0,
 											  float max = 1000000.0);
 								FloatProperty(const FloatProperty& other);
+								FloatProperty(BMessage* archive);
 	virtual						~FloatProperty();
+
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
 	virtual	Property*			Clone() const;
 
@@ -132,7 +146,12 @@ class UInt8Property : public Property {
 								UInt8Property(uint32 identifier,
 											  uint8 value = 255);
 								UInt8Property(const UInt8Property& other);
+								UInt8Property(BMessage* archive);
 	virtual						~UInt8Property();
+
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
 	virtual	Property*			Clone() const;
 
@@ -162,7 +181,12 @@ class BoolProperty : public Property {
 								BoolProperty(uint32 identifier,
 											 bool value = false);
 								BoolProperty(const BoolProperty& other);
+								BoolProperty(BMessage* archive);
 	virtual						~BoolProperty();
+
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
 	virtual	Property*			Clone() const;
 
@@ -192,7 +216,12 @@ class StringProperty : public Property {
 								StringProperty(uint32 identifier,
 											   const char* string);
 								StringProperty(const StringProperty& other);
+								StringProperty(BMessage* archive);
 	virtual						~StringProperty();
+
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
 	virtual	Property*			Clone() const;
 

@@ -8,6 +8,8 @@
 
 #include "IconObject.h"
 
+#include <Message.h>
+
 #include "CommonPropertyIDs.h"
 #include "Property.h"
 #include "PropertyObject.h"
@@ -32,6 +34,18 @@ IconObject::IconObject(const IconObject& other)
 {
 }
 
+// archive constructor
+IconObject::IconObject(BMessage* archive)
+	: Observable(),
+	  Referenceable(),
+	  Selectable(),
+
+	  fName()
+{
+	// NOTE: uses IconObject version, not overridden
+	Unarchive(archive);
+}
+
 // destructor
 IconObject::~IconObject()
 {
@@ -46,6 +60,32 @@ IconObject::SelectedChanged()
 }
 
 // #pragma mark -
+
+// Unarchive
+status_t
+IconObject::Unarchive(const BMessage* archive)
+{
+	if (!archive)
+		return B_BAD_VALUE;
+
+	const char* name;
+	status_t ret = archive->FindString("name", &name);
+
+	if (ret == B_OK)
+		fName = name;
+
+	return ret;
+}
+
+// Archive
+status_t
+IconObject::Archive(BMessage* into, bool deep) const
+{
+	if (!into)
+		return B_BAD_VALUE;
+
+	return into->AddString("name", fName.String());
+}
 
 // MakePropertyObject
 PropertyObject*

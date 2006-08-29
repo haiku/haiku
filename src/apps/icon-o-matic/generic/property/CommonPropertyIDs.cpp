@@ -52,6 +52,19 @@ name_for_id(int32 id)
 		case PROPERTY_CLOSED:
 			name = "Closed";
 			break;
+		case PROPERTY_PATH:
+			name = "Path";
+			break;
+
+		case PROPERTY_HINTING:
+			name = "Rounding";
+			break;
+		case PROPERTY_MIN_VISIBILITY_SCALE:
+			name = "Min LOD";
+			break;
+		case PROPERTY_MAX_VISIBILITY_SCALE:
+			name = "Max LOD";
+			break;
 
 		case PROPERTY_TRANSLATION_X:
 			name = "Translation X";

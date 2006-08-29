@@ -640,7 +640,7 @@ void
 PropertyListView::_LayoutItems()
 {
 	// figure out maximum label width
-	float labelWidth = Bounds().Width() * 0.5;
+	float labelWidth = 0.0;
 	for (int32 i = 0; PropertyItemView* item = _ItemAt(i); i++) {
 		if (item->PreferredLabelWidth() > labelWidth)
 			labelWidth = item->PreferredLabelWidth();

@@ -8,8 +8,9 @@
 
 #include "ListViews.h"
 
-#include <stdio.h>
 #include <malloc.h>
+#include <stdio.h>
+#include <typeinfo>
 
 #include <Bitmap.h>
 #include <Cursor.h>
@@ -22,6 +23,8 @@
 #include <Window.h>
 
 #include "cursors.h"
+
+#include "Selection.h"
 
 #define MAX_DRAG_HEIGHT		200.0
 #define ALPHA				170
@@ -97,15 +100,21 @@ DragSortableListView::DragSortableListView(BRect frame, const char* name,
 	  fLastClickedItem(NULL),
 	  fScrollView(NULL),
 	  fDragCommand(B_SIMPLE_DATA),
-	  fFocusedIndex(-1)
+	  fFocusedIndex(-1),
+
+	  fSelection(NULL),
+	  fSyncingToSelection(false),
+	  fModifyingSelection(false)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 }
 
 DragSortableListView::~DragSortableListView()
 {
-//	delete fMouseWheelFilter;
+	delete fMouseWheelFilter;
 	delete fScrollPulse;
+
+	SetSelection(NULL);
 }
 
 // AttachedToWindow
@@ -127,7 +136,7 @@ DragSortableListView::AttachedToWindow()
 void
 DragSortableListView::DetachedFromWindow()
 {
-//	Window()->RemoveCommonFilter(fMouseWheelFilter);
+	Window()->RemoveCommonFilter(fMouseWheelFilter);
 }
 
 // FrameResized
@@ -503,6 +512,8 @@ DragSortableListView::DrawItem(BListItem *item, BRect itemFrame, bool complete)
 	}*/
 }
 
+// #pragma mark -
+
 // MouseWheelChanged
 bool
 DragSortableListView::MouseWheelChanged(float x, float y)
@@ -515,6 +526,50 @@ DragSortableListView::MouseWheelChanged(float x, float y)
 	else
 		return false;
 }
+
+// #pragma mark -
+
+// ObjectChanged
+void
+DragSortableListView::ObjectChanged(const Observable* object)
+{
+	if (object != fSelection || fModifyingSelection)
+		return;
+
+	fSyncingToSelection = true;
+
+	// try to sync to Selection
+	BList selectedItems;
+
+	int32 count = fSelection->CountSelected();
+	for (int32 i = 0; i < count; i++) {
+		int32 index = IndexOfSelectable(fSelection->SelectableAtFast(i));
+		if (index >= 0) {
+			BListItem* item = ItemAt(index);
+			if (item && !selectedItems.HasItem((void*)item))
+				selectedItems.AddItem((void*)item);
+		}
+	}
+
+	count = selectedItems.CountItems();
+	if (count == 0) {
+		if (CurrentSelection(0) >= 0)
+			DeselectAll();
+	} else {
+		count = CountItems();
+		for (int32 i = 0; i < count; i++) {
+			BListItem* item = ItemAt(i);
+			bool selected = selectedItems.RemoveItem((void*)item);
+			if (item->IsSelected() != selected) {
+				Select(i, true);
+			}
+		}
+	}
+
+	fSyncingToSelection = false;
+}
+
+// #pragma mark -
 
 // SetDragCommand
 void
@@ -703,6 +758,45 @@ DragSortableListView::RemoveSelected()
 	RemoveItemList(items);
 }
 
+// #pragma mark -
+
+// SetSelection
+void
+DragSortableListView::SetSelection(Selection* selection)
+{
+	if (fSelection == selection)
+		return;
+
+	if (fSelection)
+		fSelection->RemoveObserver(this);
+
+	fSelection = selection;
+
+	if (fSelection)
+		fSelection->AddObserver(this);
+}
+
+// IndexOfSelectable
+int32
+DragSortableListView::IndexOfSelectable(Selectable* selectable) const
+{
+	return -1;
+}
+
+// SelectableFor
+Selectable*
+DragSortableListView::SelectableFor(BListItem* item) const
+{
+	return NULL;
+}
+
+// SelectAll
+void
+DragSortableListView::SelectAll()
+{
+	Select(0, CountItems() - 1);
+}
+
 // CountSelectedItems
 int32
 DragSortableListView::CountSelectedItems() const
@@ -713,12 +807,43 @@ DragSortableListView::CountSelectedItems() const
 	return count;
 }
 
-// SelectAll
+// SelectionChanged
 void
-DragSortableListView::SelectAll()
+DragSortableListView::SelectionChanged()
 {
-	Select(0, CountItems() - 1);
+//printf("%s::SelectionChanged()", typeid(*this).name());
+	// modify global Selection
+	if (!fSelection)
+		return;
+
+	fModifyingSelection = true;
+
+	BList selectables;
+	for (int32 i = 0; BListItem* item = ItemAt(CurrentSelection(i)); i++) {
+		Selectable* selectable = SelectableFor(item);
+		if (selectable)
+			selectables.AddItem((void*)selectable);
+	}
+
+	AutoNotificationSuspender _(fSelection);
+
+	int32 count = selectables.CountItems();
+	if (count == 0) {
+//printf("  deselecting all\n");
+		if (!fSyncingToSelection)
+			fSelection->DeselectAll();
+	} else {
+//printf("  selecting %ld items\n", count);
+		for (int32 i = 0; i < count; i++) {
+			Selectable* selectable = (Selectable*)selectables.ItemAtFast(i);
+			fSelection->Select(selectable, i > 0);
+		}
+	}
+
+	fModifyingSelection = false;
 }
+
+// #pragma mark -
 
 // DeleteItem
 bool
@@ -792,7 +917,7 @@ DragSortableListView::_SetDragMessage(const BMessage* message)
 		fDragMessageCopy.what = 0;
 }
 
-
+// #pragma mark - SimpleListView
 
 // SimpleListView class
 SimpleListView::SimpleListView(BRect frame, BMessage* selectionChangeMessage)
@@ -843,6 +968,14 @@ SimpleListView::layout(BRect frame)
 }
 #endif // LIB_LAYOUT
 
+// DetachedFromWindow
+void
+SimpleListView::DetachedFromWindow()
+{
+	DragSortableListView::DetachedFromWindow();
+	_MakeEmpty();
+}
+
 // MessageReceived
 void
 SimpleListView::MessageReceived(BMessage* message)
@@ -851,17 +984,6 @@ SimpleListView::MessageReceived(BMessage* message)
 		default:
 			DragSortableListView::MessageReceived(message);
 			break;
-	}
-}
-
-// SelectionChanged
-void
-SimpleListView::SelectionChanged()
-{
-	BLooper* looper = Looper();
-	if (fSelectionChangeMessage && looper) {
-		BMessage message(*fSelectionChangeMessage);
-		looper->PostMessage(&message);
 	}
 }
 

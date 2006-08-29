@@ -51,10 +51,11 @@ OptionProperty::OptionProperty(BMessage* archive)
 	  fOptions(4),
 	  fCurrentOptionID(-1)
 {
-	if (archive) {
-		if (archive->FindInt32("option", &fCurrentOptionID) < B_OK)
-			fCurrentOptionID = -1;
-	}
+	if (!archive)
+		return;
+
+	if (archive->FindInt32("option", &fCurrentOptionID) < B_OK)
+		fCurrentOptionID = -1;
 }
 
 // destrucor
@@ -63,6 +64,33 @@ OptionProperty::~OptionProperty()
 	int32 count = fOptions.CountItems();
 	for (int32 i = 0; i < count; i++)
 		delete (option*)fOptions.ItemAtFast(i);
+}
+
+// #pragma mark -
+
+// Archive
+status_t
+OptionProperty::Archive(BMessage* into, bool deep) const
+{
+	status_t status = Property::Archive(into, deep);
+
+	if (status >= B_OK)
+		status = into->AddInt32("option", fCurrentOptionID);
+
+	// finish off
+	if (status >= B_OK)
+		status = into->AddString("class", "OptionProperty");
+
+	return status;
+}
+
+// Instantiate
+BArchivable*
+OptionProperty::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "OptionProperty"))
+		return new (nothrow) OptionProperty(archive);
+	return NULL;
 }
 
 // #pragma mark -
@@ -133,33 +161,6 @@ bool
 OptionProperty::MakeAnimatable(bool animatable)
 {
 	return false;
-}
-
-// #pragma mark -
-
-// Archive
-status_t
-OptionProperty::Archive(BMessage* into, bool deep) const
-{
-	status_t status = Property::Archive(into, deep);
-
-	if (status >= B_OK)
-		status = into->AddInt32("option", fCurrentOptionID);
-
-	// finish off
-	if (status >= B_OK)
-		status = into->AddString("class", "OptionProperty");
-
-	return status;
-}
-
-// Instantiate
-BArchivable*
-OptionProperty::Instantiate(BMessage* archive)
-{
-	if (validate_instantiation(archive, "OptionProperty"))
-		return new (nothrow) OptionProperty(archive);
-	return NULL;
 }
 
 // #pragma mark -

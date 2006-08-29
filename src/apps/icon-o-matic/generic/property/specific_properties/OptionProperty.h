@@ -22,6 +22,10 @@ class OptionProperty : public Property {
 	virtual						~OptionProperty();
 
 	// Property interface
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
+
 	virtual	Property*			Clone() const;
 
 	virtual	type_code			Type() const;
@@ -33,10 +37,6 @@ class OptionProperty : public Property {
 	// animation
 	virtual	bool				MakeAnimatable(bool animatable = true);
 
-
-	// BArchivable interface
-	virtual	status_t			Archive(BMessage* archive, bool deep = true) const;
-	static	BArchivable*		Instantiate(BMessage* archive);
 
 	// OptionProperty
 			void				AddOption(int32 id, const char* name);

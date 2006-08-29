@@ -25,6 +25,11 @@ IconView::IconView(BRect frame, const char* name)
 	  fScale((frame.Width() + 1.0) / 64.0)
 {
 	fRenderer->SetScale(fScale);
+#if __HAIKU__
+	BSize size(frame.Width(), frame.Height());
+	SetExplicitMinSize(size);
+	SetExplicitMaxSize(size);
+#endif
 }
 
 // destructor
@@ -42,6 +47,9 @@ void
 IconView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
+
+	rgb_color lc = LowColor();
+	fRenderer->SetBackground(agg::rgba8(lc.red, lc.green, lc.blue, 255));
 }
 
 // Draw
@@ -97,3 +105,15 @@ IconView::SetIcon(Icon* icon)
 		fIcon->AddListener(this);
 }
 
+// SetIconBGColor
+void
+IconView::SetIconBGColor(const rgb_color& color)
+{
+	SetLowColor(color);
+
+	fRenderer->SetBackground(
+		agg::rgba8(color.red, color.green, color.blue, 255));
+
+	fDirtyIconArea = fBitmap->Bounds();
+	Invalidate();
+}

@@ -3,6 +3,28 @@ SubDir HAIKU_TOP src apps icon-o-matic ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+# defines (get all the extra stuff in from libicon.a classes)
+local defines = [ FDefines ICON_O_MATIC=1 ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+# libicon.a source directories
+local iconSourceDirs =
+	icon
+	icon/flat_icon
+	icon/shape
+	icon/style
+	icon/transformable
+	icon/transformer
+;
+
+local iconSourceDir ;
+for iconSourceDir in $(iconSourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs $(iconSourceDir) ] ;
+}
+
+
 # source directories
 local sourceDirs =
 	document
@@ -22,7 +44,11 @@ local sourceDirs =
 	generic/selection
 	generic/support
 	gui
-	gradient
+	import_export
+	import_export/bitmap
+	import_export/flat_icon
+	import_export/message
+	import_export/svg
 	shape
 	shape/commands
 	style
@@ -36,18 +62,58 @@ for sourceDir in $(sourceDirs) {
 }
 
 # system headers
-UseLibraryHeaders agg ;
+UseLibraryHeaders agg expat ;
+
+
 
 Application Icon-O-Matic :
+	########  libicon.a  ########
+
+	# icon/flat_icon
+	FlatIconFormat.cpp
+	FlatIconImporter.cpp
+	LittleEndianBuffer.cpp
+	PathCommandQueue.cpp
+
+	# icon/shape
+	PathContainer.cpp
+	Shape.cpp
+	ShapeContainer.cpp
+	VectorPath.cpp
+
+	# icon/style
+	Gradient.cpp
+	Style.cpp
+	StyleContainer.cpp
+
+	# icon/transformable
+	Transformable.cpp
+
+	# icon/transformer
+	AffineTransformer.cpp
+	ContourTransformer.cpp
+	PathSource.cpp
+	PerspectiveTransformer.cpp
+	StrokeTransformer.cpp
+	Transformer.cpp
+	TransformerFactory.cpp
+
+	# icon
+	Icon.cpp
+	IconRenderer.cpp
+
+	########  Icon-O-Matic  ########
+
 	# document
 	Document.cpp
-	Icon.cpp
 	IconObject.cpp
-	IconRenderer.cpp
 	SetPropertiesCommand.cpp
+
 	# generic/command
 	Command.cpp
 	CommandStack.cpp
+	CompoundCommand.cpp
+
 	# generic/gui
 	Group.cpp
 	InputTextView.cpp
@@ -55,45 +121,56 @@ Application Icon-O-Matic :
 	StringTextView.cpp
 	ListViews.cpp
 	SwatchView.cpp
+
 	# generic/gui/panel
 	Panel.cpp
+
 	# generic/gui/panel/color_picker
+	AlphaSlider.cpp
 	ColorField.cpp
 	ColorPickerPanel.cpp
 	ColorPickerView.cpp
 	ColorPreview.cpp
 	ColorSlider.cpp
+
 	# generic/gui/popup_control
+
 	# generic/gui/scrollview
 	Scrollable.cpp
 	Scroller.cpp
 	ScrollView.cpp
+
 	# generic/gui/stateview
 	Manipulator.cpp
 	MultipleManipulatorState.cpp
 	StateView.cpp
 	ViewState.cpp
+
 	# generic/listener
 	Observable.cpp
 	Observer.cpp
+
 	# generic/property
 	CommonPropertyIDs.cpp
 	Property.cpp
 	PropertyObject.cpp
+
 	# generic/property/specific_properties
 	ColorProperty.cpp
+	IconProperty.cpp
 	Int64Property.cpp
 	OptionProperty.cpp
+
 	# generic/property/view
 	PropertyEditorFactory.cpp
 	PropertyEditorView.cpp
 	PropertyItemView.cpp
 	PropertyListView.cpp
+
 	# generic/property/view/specific_properties
 	BoolValueView.cpp
 	ColorValueView.cpp
 	FloatValueView.cpp
-	IconProperty.cpp
 	IconValueView.cpp
 	Int64ValueView.cpp
 	IntValueView.cpp
@@ -101,14 +178,17 @@ Application Icon-O-Matic :
 	StringValueView.cpp
 	SwatchValueView.cpp
 	TextInputValueView.cpp
+
 	# generic/selection
 	Selectable.cpp
 	Selection.cpp
+
 	# generic/support
 	Referenceable.cpp
 	RWLocker.cpp
 	support.cpp
 	support_ui.cpp
+
 	# gui
 	GradientControl.cpp
 	IconObjectListView.cpp
@@ -118,57 +198,82 @@ Application Icon-O-Matic :
 	StyleView.cpp
 	SwatchGroup.cpp
 	TransformerListView.cpp
+
+	# import_export
+	Exporter.cpp
+	Importer.cpp
+
+	# import_export/bitmap
+	BitmapExporter.cpp
+
+	# import_export/flat_icon
+	FlatIconExporter.cpp
+	RDefExporter.cpp
+
+	# import_export/message
+	MessageExporter.cpp
+	MessageImporter.cpp
+
+	# import_export/svg
+	DocumentBuilder.cpp
+	PathTokenizer.cpp
+	SVGExporter.cpp
+	SVGGradients.cpp
+	SVGImporter.cpp
+	SVGParser.cpp
+
 	# shape
-	PathContainer.cpp
 	PathManipulator.cpp
-	Shape.cpp
-	ShapeContainer.cpp
-	VectorPath.cpp
+
 	# shape/commands
 	AddPathsCommand.cpp
 	AddPointCommand.cpp
 	AddShapesCommand.cpp
+	AddTransformersCommand.cpp
 	ChangePointCommand.cpp
 	InsertPointCommand.cpp
 	MoveShapesCommand.cpp
+	MovePathsCommand.cpp
 	MoveTransformersCommand.cpp
+	NudgePointsCommand.cpp
 	PathCommand.cpp
 	RemovePathsCommand.cpp
 	RemovePointsCommand.cpp
 	RemoveShapesCommand.cpp
 	RemoveTransformersCommand.cpp
+	ReversePathCommand.cpp
 	UnassignPathCommand.cpp
+
 	# style
 	AddStylesCommand.cpp
+	AssignStyleCommand.cpp
 	CurrentColor.cpp
-	Gradient.cpp
+	MoveStylesCommand.cpp
+	RemoveStylesCommand.cpp
 	SetColorCommand.cpp
 	SetGradientCommand.cpp
-	Style.cpp
-	StyleManager.cpp
+
 	# transformable
+	CanvasTransformBox.cpp
 	ChannelTransform.cpp
-	Transformable.cpp
+	ResetTransformationCommand.cpp
 	TransformBox.cpp
 	TransformBoxStates.cpp
-	TransformObjectsCommand.cpp
 	TransformCommand.cpp
+	TransformGradientBox.cpp
+	TransformObjectsCommand.cpp
+	TransformPointsBox.cpp
 	TransformShapesBox.cpp
-	# transformer
-	AffineTransformer.cpp
-	ContourTransformer.cpp
-	PathSource.cpp
-	PerspectiveTransformer.cpp
-	StrokeTransformer.cpp
-	Transformer.cpp
-	TransformerFactory.cpp
+
 	#
 	CanvasView.cpp
 	IconEditorApp.cpp
 	IconView.cpp
 	main.cpp
 	MainWindow.cpp
-	: be libagg.a
+	Util.cpp
+
+	: be tracker translation libagg.a libexpat.a
 ;
 
 

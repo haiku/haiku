@@ -1,0 +1,13 @@
+* Path->Rotate Indices
+* Path->Create Circle... -> Number of Sections:
+* Path->Create Arc... -> Arc params:
+* Path->Create Rect
+* PathManipulator->Context Menu->
+	* Transform (creates TransformBox)
+	* Cut
+	* Copy
+	* Paste (replacing first selected points, or appended at end)
+	* Soften (available at hard edge(s),
+			  inserts points for round corner,
+			  asks for radius)
+

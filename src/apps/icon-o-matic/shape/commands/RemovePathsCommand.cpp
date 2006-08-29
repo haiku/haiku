@@ -32,7 +32,7 @@ RemovePathsCommand::RemovePathsCommand(PathContainer* container,
 
 	for (int32 i = 0; i < fCount; i++) {
 		fInfos[i].path = paths[i];
-		fInfos[i].index = 0;//fContainer->IndexOf(paths[i]);
+		fInfos[i].index = fContainer->IndexOf(paths[i]);
 		if (paths[i]) {
 			int32 listenerCount = paths[i]->CountListeners();
 			for (int32 j = 0; j < listenerCount; j++) {
@@ -93,7 +93,7 @@ RemovePathsCommand::Undo()
 	for (int32 i = 0; i < fCount; i++) {
 		if (!fInfos[i].path)
 			continue;
-		if (!fContainer->AddPath(fInfos[i].path/*, fInfos[i].index*/)) {
+		if (!fContainer->AddPath(fInfos[i].path, fInfos[i].index)) {
 			// roll back
 			ret = B_ERROR;
 			for (int32 j = i - 1; j >= 0; j--) {

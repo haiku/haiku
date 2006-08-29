@@ -52,6 +52,27 @@ Property::~Property()
 {
 }
 
+// Archive
+status_t
+Property::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = BArchivable::Archive(into, deep);
+
+	if (ret == B_OK)
+		ret = into->AddInt32("id", fIdentifier);
+
+	if (ret == B_OK)
+		ret = into->AddBool("editable", fEditable);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "Property");
+
+	return ret;
+}
+
+// #pragma mark -
+
 // InterpolateTo
 bool
 Property::InterpolateTo(const Property* other, float scale)
@@ -88,9 +109,57 @@ IntProperty::IntProperty(const IntProperty& other)
 {
 }
 
+// constructor
+IntProperty::IntProperty(BMessage* archive)
+	: Property(archive),
+	  fValue(0),
+	  fMin(0),
+	  fMax(0)
+{
+	if (!archive)
+		return;
+
+	if (archive->FindInt32("value", &fValue) < B_OK)
+		fValue = 0;
+	if (archive->FindInt32("min", &fMin) < B_OK)
+		fMin = 0;
+	if (archive->FindInt32("max", &fMax) < B_OK)
+		fMax = 0;
+}
+
 // destructor
 IntProperty::~IntProperty()
 {
+}
+
+// Archive
+status_t
+IntProperty::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = Property::Archive(into, deep);
+
+	if (ret >= B_OK)
+		ret = into->AddInt32("value", fValue);
+	if (ret >= B_OK)
+		ret = into->AddInt32("min", fMin);
+	if (ret >= B_OK)
+		ret = into->AddInt32("max", fMax);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "IntProperty");
+
+	return ret;
+}
+
+// Instantiate
+BArchivable*
+IntProperty::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "IntProperty"))
+		return new IntProperty(archive);
+
+	return NULL;
 }
 
 // Clone
@@ -175,9 +244,57 @@ FloatProperty::FloatProperty(const FloatProperty& other)
 {
 }
 
+// constructor
+FloatProperty::FloatProperty(BMessage* archive)
+	: Property(archive),
+	  fValue(0.0),
+	  fMin(0.0),
+	  fMax(0.0)
+{
+	if (!archive)
+		return;
+
+	if (archive->FindFloat("value", &fValue) < B_OK)
+		fValue = 0.0;
+	if (archive->FindFloat("min", &fMin) < B_OK)
+		fMin = 0.0;
+	if (archive->FindFloat("max", &fMax) < B_OK)
+		fMax = 0.0;
+}
+
 // destructor
 FloatProperty::~FloatProperty()
 {
+}
+
+// Archive
+status_t
+FloatProperty::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = Property::Archive(into, deep);
+
+	if (ret >= B_OK)
+		ret = into->AddFloat("value", fValue);
+	if (ret >= B_OK)
+		ret = into->AddFloat("min", fMin);
+	if (ret >= B_OK)
+		ret = into->AddFloat("max", fMax);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "FloatProperty");
+
+	return ret;
+}
+
+// Instantiate
+BArchivable*
+FloatProperty::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "FloatProperty"))
+		return new FloatProperty(archive);
+
+	return NULL;
 }
 
 // Clone
@@ -256,9 +373,47 @@ UInt8Property::UInt8Property(const UInt8Property& other)
 {
 }
 
+// constructor
+UInt8Property::UInt8Property(BMessage* archive)
+	: Property(archive),
+	  fValue(0)
+{
+	if (!archive)
+		return;
+
+	if (archive->FindInt8("value", (int8*)&fValue) < B_OK)
+		fValue = 0;
+}
+
 // destructor
 UInt8Property::~UInt8Property()
 {
+}
+
+// Archive
+status_t
+UInt8Property::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = Property::Archive(into, deep);
+
+	if (ret >= B_OK)
+		ret = into->AddInt8("value", fValue);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "UInt8Property");
+
+	return ret;
+}
+
+// Instantiate
+BArchivable*
+UInt8Property::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "UInt8Property"))
+		return new UInt8Property(archive);
+
+	return NULL;
 }
 
 // Clone
@@ -332,9 +487,47 @@ BoolProperty::BoolProperty(const BoolProperty& other)
 {
 }
 
+// constructor
+BoolProperty::BoolProperty(BMessage* archive)
+	: Property(archive),
+	  fValue(false)
+{
+	if (!archive)
+		return;
+
+	if (archive->FindBool("value", &fValue) < B_OK)
+		fValue = false;
+}
+
 // destructor
 BoolProperty::~BoolProperty()
 {
+}
+
+// Archive
+status_t
+BoolProperty::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = Property::Archive(into, deep);
+
+	if (ret >= B_OK)
+		ret = into->AddBool("value", fValue);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "BoolProperty");
+
+	return ret;
+}
+
+// Instantiate
+BArchivable*
+BoolProperty::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "BoolProperty"))
+		return new BoolProperty(archive);
+
+	return NULL;
 }
 
 // Clone
@@ -419,9 +612,47 @@ StringProperty::StringProperty(const StringProperty& other)
 {
 }
 
+// constructor
+StringProperty::StringProperty(BMessage* archive)
+	: Property(archive),
+	  fValue()
+{
+	if (!archive)
+		return;
+
+	if (archive->FindString("value", &fValue) < B_OK)
+		fValue = "";
+}
+
 // destructor
 StringProperty::~StringProperty()
 {
+}
+
+// Archive
+status_t
+StringProperty::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = Property::Archive(into, deep);
+
+	if (ret >= B_OK)
+		ret = into->AddString("value", fValue);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "StringProperty");
+
+	return ret;
+}
+
+// Instantiate
+BArchivable*
+StringProperty::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "StringProperty"))
+		return new StringProperty(archive);
+
+	return NULL;
 }
 
 // Clone

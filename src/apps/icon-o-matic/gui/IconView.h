@@ -31,6 +31,7 @@ class IconView : public BView,
 
 	// IconView
 			void				SetIcon(Icon* icon);
+			void				SetIconBGColor(const rgb_color& color);
 
  private:
 			BBitmap*			fBitmap;

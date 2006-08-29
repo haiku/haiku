@@ -25,7 +25,8 @@ class IconProperty : public Property {
 	virtual						~IconProperty();
 
 	// BArchivable interface
-	virtual	status_t			Archive(BMessage* archive, bool deep = true) const;
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* archive);
 
 	// Property interface
@@ -41,7 +42,7 @@ class IconProperty : public Property {
 	virtual	bool				InterpolateTo(const Property* other,
 											  float scale);
 	// IconProperty
-			const	BMessage*	Message() const
+			BMessage*			Message() const
 									{ return fMessage; }
 
 			void				SetMessage(const BMessage* message);

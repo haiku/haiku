@@ -136,7 +136,7 @@ StateView::DetachedFromWindow()
 {
 	_RemoveEventFilter();
 
-	StateView::AttachedToWindow();
+	BView::DetachedFromWindow();
 }
 
 // Draw

@@ -15,6 +15,7 @@
 
 #include "Observer.h"
 
+class AlphaSlider;
 class ColorField;
 class ColorPickerPanel;
 class ColorSlider;
@@ -40,12 +41,14 @@ class SwatchGroup : public BView,
 
  private:
 			void				_SetColor(rgb_color color);
-			void				_SetColor(float h, float s, float v);
+			void				_SetColor(float h, float s, float v,
+										  uint8 a);
 
 			SwatchView*			fCurrentColorSV;
 			SwatchView*			fSwatchViews[20];
 			ColorField*			fColorField;
 			ColorSlider*		fColorSlider;
+			AlphaSlider*		fAlphaSlider;
 
 			Group*				fTopSwatchViews;
 			Group*				fBottomSwatchViews;

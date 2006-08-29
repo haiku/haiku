@@ -15,8 +15,9 @@
 class AddPointCommand;
 class CanvasView;
 class ChangePointCommand;
-class UndoStack;
 class InsertPointCommand;
+class NudgePointsCommand;
+class TransformPointsBox;
 
 //class PathSelection {
 // public:
@@ -87,17 +88,19 @@ class PathManipulator : public Manipulator,
 			friend	class		ExitTransformPointsCommand;
 			friend	class		TransformPointsCommand;
 //			friend	class		NewPathCommand;
-			friend	class		NudgePointsCommand;
 //			friend	class		RemovePathCommand;
 			friend	class		ReversePathCommand;
 //			friend	class		SelectPathCommand;
 
 			void				_SetMode(uint32 mode);
+			void				_SetTransformBox(
+									TransformPointsBox* transformBox);
 
 			// BEGIN functions that need to be undoable
 			void				_AddPoint(BPoint where);
 			void				_InsertPoint(BPoint where, int32 index);
-			void				_SetInOutConnected(int32 index, bool connected);
+			void				_SetInOutConnected(int32 index,
+												   bool connected);
 			void				_SetSharp(int32 index);
 
 			void				_RemoveSelection();
@@ -109,26 +112,30 @@ class PathManipulator : public Manipulator,
 
 			void				_Select(BRect canvasRect);
 			void				_Select(int32 index, bool extend = false);
-			void				_Select(const int32* indices, int32 count, bool extend = false);
+			void				_Select(const int32* indices,
+										int32 count, bool extend = false);
 			void				_Deselect(int32 index);
-			void				_ShiftSelection(int32 startIndex, int32 direction);
+			void				_ShiftSelection(int32 startIndex,
+												int32 direction);
 			bool				_IsSelected(int32 index) const;
 			// END functions that need to be undoable
 
 			void				_InvalidateCanvas(BRect rect) const;
-			void				_InvalidateHighlightPoints(int32 newIndex, uint32 newMode);
+			void				_InvalidateHighlightPoints(int32 newIndex,
+														   uint32 newMode);
 
 			void				_UpdateSelection() const;
 
 			BRect				_ControlPointRect() const;
-			BRect				_ControlPointRect(int32 index, uint32 mode) const;
+			BRect				_ControlPointRect(int32 index,
+												  uint32 mode) const;
 			void				_GetChangableAreas(BRect* pathArea,
 												   BRect* controlPointArea) const;
 
 			void				_SetModeForMousePos(BPoint canvasWhere);
 
 			void				_Nudge(BPoint direction);
-			void				_FinishNudging();
+			Command*			_FinishNudging();
 
 			CanvasView*			fCanvasView;
 
@@ -157,11 +164,12 @@ class PathManipulator : public Manipulator,
 			class Selection;
 			Selection*			fSelection;
 			Selection*			fOldSelection;
+			TransformPointsBox*	fTransformBox;
 
 			// stuff needed for nudging
 			BPoint				fNudgeOffset;
 			bigtime_t			fLastNudgeTime;
-//			NudgePointsCommand*	fNudgeCommand;
+			NudgePointsCommand*	fNudgeCommand;
 };
 
 #endif	// SHAPE_STATE_H

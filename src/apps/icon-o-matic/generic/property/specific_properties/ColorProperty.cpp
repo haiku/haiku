@@ -11,6 +11,8 @@
 #include <new>
 #include <stdio.h>
 
+#include <Message.h>
+
 #include "support_ui.h"
 #include "ui_defines.h"
 
@@ -37,11 +39,48 @@ ColorProperty::ColorProperty(const ColorProperty& other)
 {
 }
 
+// constructor
+ColorProperty::ColorProperty(BMessage* archive)
+	: Property(archive),
+	  fValue(kBlack)
+{
+	if (!archive)
+		return;
+
+	if (archive->FindInt32("value", (int32*)&fValue) < B_OK)
+		fValue = kBlack;
+}
+
 // destrucor
 ColorProperty::~ColorProperty()
 {
 }
 
+// Archive
+status_t
+ColorProperty::Archive(BMessage* into, bool deep) const
+{
+	status_t ret = Property::Archive(into, deep);
+
+	if (ret >= B_OK)
+		ret = into->AddInt32("value", (uint32&)fValue);
+
+	// finish off
+	if (ret >= B_OK)
+		ret = into->AddString("class", "ColorProperty");
+
+	return ret;
+}
+
+// Instantiate
+BArchivable*
+ColorProperty::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "ColorProperty"))
+		return new ColorProperty(archive);
+
+	return NULL;
+}
 
 // Clone
 Property*

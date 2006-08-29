@@ -284,16 +284,16 @@ GradientControl::KeyDown(const char* bytes, int32 numBytes)
 					fCurrentStepIndex--;
 					if (fCurrentStepIndex < 0) {
 						fCurrentStepIndex = count - 1;
-						_UpdateCurrentColor();
 					}
+					_UpdateCurrentColor();
 					break;
 				case B_DOWN_ARROW:
 					// next step
 					fCurrentStepIndex++;
 					if (fCurrentStepIndex >= count) {
 						fCurrentStepIndex = 0;
-						_UpdateCurrentColor();
 					}
+					_UpdateCurrentColor();
 					break;
 	
 				default:
@@ -438,7 +438,8 @@ GradientControl::SetGradient(const ::Gradient* gradient)
 	fDropOffset = -1.0;
 	fDropIndex = -1;
 	fDraggingStepIndex = -1;
-	fCurrentStepIndex = 0;
+	if (fCurrentStepIndex > gradient->CountColors() - 1)
+		fCurrentStepIndex = gradient->CountColors() - 1;
 
 	Invalidate();
 }
@@ -549,17 +550,29 @@ GradientControl::_UpdateColors()
 			if (alpha < 255) {
 				p[3] = 255;
 				alpha = 255 - alpha;
-				if (x % 10 >= 5) {
-					if (i % 10 >= 5) {
-						blend_colors(p, alpha, kAlphaLow.blue, kAlphaLow.green, kAlphaLow.red);
+				if (x % 8 >= 4) {
+					if (i % 8 >= 4) {
+						blend_colors(p, alpha,
+									 kAlphaLow.blue,
+									 kAlphaLow.green,
+									 kAlphaLow.red);
 					} else {
-						blend_colors(p, alpha, kAlphaHigh.blue, kAlphaHigh.green, kAlphaHigh.red);
+						blend_colors(p, alpha,
+									 kAlphaHigh.blue,
+									 kAlphaHigh.green,
+									 kAlphaHigh.red);
 					}
 				} else {
-					if (i % 10 >= 5) {
-						blend_colors(p, alpha, kAlphaHigh.blue, kAlphaHigh.green, kAlphaHigh.red);
+					if (i % 8 >= 4) {
+						blend_colors(p, alpha,
+									 kAlphaHigh.blue,
+									 kAlphaHigh.green,
+									 kAlphaHigh.red);
 					} else {
-						blend_colors(p, alpha, kAlphaLow.blue, kAlphaLow.green, kAlphaLow.red);
+						blend_colors(p, alpha,
+									 kAlphaLow.blue,
+									 kAlphaLow.green,
+									 kAlphaLow.red);
 					}
 				}
 			}

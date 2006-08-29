@@ -26,6 +26,11 @@ enum {
 	PROPERTY_STROKE_SHORTEN				= 'srtn',
 
 	PROPERTY_CLOSED						= 'clsd',
+	PROPERTY_PATH						= 'path',
+
+	PROPERTY_HINTING					= 'hntg',
+	PROPERTY_MIN_VISIBILITY_SCALE		= 'mnld',
+	PROPERTY_MAX_VISIBILITY_SCALE		= 'mxld',
 
 	PROPERTY_TRANSLATION_X				= 'trnx',
 	PROPERTY_TRANSLATION_Y				= 'trny',

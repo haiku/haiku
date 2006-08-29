@@ -12,13 +12,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "StyleManager.h"
+#include "StyleContainer.h"
 #include "Style.h"
 
 using std::nothrow;
 
 // constructor
-AddStylesCommand::AddStylesCommand(StyleManager* container,
+AddStylesCommand::AddStylesCommand(StyleContainer* container,
 								   Style** const styles,
 								   int32 count,
 								   int32 index)
@@ -61,7 +61,7 @@ AddStylesCommand::Perform()
 	// add shapes to container
 	int32 index = fIndex;
 	for (int32 i = 0; i < fCount; i++) {
-		if (fStyles[i] && !fContainer->AddStyle(fStyles[i]/*, index*/)) {
+		if (fStyles[i] && !fContainer->AddStyle(fStyles[i], index)) {
 			ret = B_ERROR;
 			// roll back
 			for (int32 j = i - 1; j >= 0; j--)

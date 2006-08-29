@@ -19,8 +19,13 @@ class ColorProperty : public Property {
 								ColorProperty(uint32 identifier,
 											  rgb_color color);
 								ColorProperty(const ColorProperty& other);
+								ColorProperty(BMessage* archive);
 
 	virtual						~ColorProperty();
+
+	virtual	status_t			Archive(BMessage* archive,
+										bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
 	virtual	Property*			Clone() const;
 

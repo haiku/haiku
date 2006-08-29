@@ -127,29 +127,29 @@ append_float(BString& string, float n, int32 maxDigits = 4)
 	}
 }
 
-// gauss
-double
-gauss(double f)
-{ 
-	// this aint' a real gauss function
-/*	if (f >= -1.0 && f <= 1.0) {
-		if (f < -0.5) {
-			f = -1.0 - f;
-			return (2.0 * f*f);
-		}
-
-		if (f < 0.5)
-			return (1.0 - 2.0 * f*f);
-
-		f = 1.0 - f;
-		return (2.0 * f*f);
-	}*/
-	if (f > 0.0) {
-		if (f < 0.5)
-			return (1.0 - 2.0 * f*f);
-
-		f = 1.0 - f;
-		return (2.0 * f*f);
-	}
-	return 1.0;
-}
+//// gauss
+//double
+//gauss(double f)
+//{ 
+//	// this aint' a real gauss function
+///*	if (f >= -1.0 && f <= 1.0) {
+//		if (f < -0.5) {
+//			f = -1.0 - f;
+//			return (2.0 * f*f);
+//		}
+//
+//		if (f < 0.5)
+//			return (1.0 - 2.0 * f*f);
+//
+//		f = 1.0 - f;
+//		return (2.0 * f*f);
+//	}*/
+//	if (f > 0.0) {
+//		if (f < 0.5)
+//			return (1.0 - 2.0 * f*f);
+//
+//		f = 1.0 - f;
+//		return (2.0 * f*f);
+//	}
+//	return 1.0;
+//}

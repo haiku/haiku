@@ -12,19 +12,37 @@
 
 #include <Application.h>
 #include <ListItem.h>
+#include <Menu.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <Mime.h>
 #include <Window.h>
 
+#include "AddStylesCommand.h"
+#include "AssignStyleCommand.h"
+#include "CurrentColor.h"
+#include "CommandStack.h"
+#include "Gradient.h"
+#include "MoveStylesCommand.h"
+#include "RemoveStylesCommand.h"
 #include "Style.h"
 #include "Observer.h"
+#include "ResetTransformationCommand.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
 #include "Selection.h"
+#include "Util.h"
 
 static const float kMarkWidth		= 14.0;
 static const float kBorderOffset	= 3.0;
 static const float kTextOffset		= 4.0;
+
+enum {
+	MSG_ADD							= 'adst',
+	MSG_REMOVE						= 'rmst',
+	MSG_DUPLICATE					= 'dpst',
+	MSG_RESET_TRANSFORMATION		= 'rstr',
+};
 
 class StyleListItem : public SimpleItem,
 					 public Observer {
@@ -226,11 +244,12 @@ StyleListView::StyleListView(BRect frame,
 	  fMessage(message),
 	  fStyleContainer(NULL),
 	  fShapeContainer(NULL),
-	  fSelection(NULL),
 	  fCommandStack(NULL),
 
 	  fCurrentShape(NULL),
-	  fShapeListener(new ShapeStyleListener(this))
+	  fShapeListener(new ShapeStyleListener(this)),
+
+	  fMenu(NULL)
 {
 	SetTarget(target);
 }
@@ -250,28 +269,88 @@ StyleListView::~StyleListView()
 	delete fShapeListener;
 }
 
+// #pragma mark -
+
+// MessageReceived
+void
+StyleListView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_ADD: {
+			Style* style;
+			AddStylesCommand* command;
+			new_style(CurrentColor::Default()->Color(),
+					  fStyleContainer, &style, &command);
+			fCommandStack->Perform(command);
+			break;
+		}
+		case MSG_REMOVE:
+			RemoveSelected();
+			break;
+		case MSG_DUPLICATE: {
+			int32 count = CountSelectedItems();
+			int32 index = 0;
+			BList items;
+			for (int32 i = 0; i < count; i++) {
+				index = CurrentSelection(i);
+				BListItem* item = ItemAt(index);
+				if (item)
+					items.AddItem((void*)item);
+			}
+			CopyItems(items, index + 1);
+			break;
+		}
+		case MSG_RESET_TRANSFORMATION: {
+			int32 count = CountSelectedItems();
+			BList gradients;
+			for (int32 i = 0; i < count; i++) {
+				StyleListItem* item = dynamic_cast<StyleListItem*>(
+					ItemAt(CurrentSelection(i)));
+				if (item && item->style && item->style->Gradient())
+					if (!gradients.AddItem(
+							(void*)item->style->Gradient()))
+						break;
+			}
+			count = gradients.CountItems();
+			if (count < 0)
+				break;
+
+			Transformable* transformables[count];
+			for (int32 i = 0; i < count; i++) {
+				Gradient* gradient = (Gradient*)gradients.ItemAtFast(i);
+				transformables[i] = gradient;
+			}
+
+			ResetTransformationCommand* command = 
+				new ResetTransformationCommand(transformables, count);
+
+			fCommandStack->Perform(command);
+			break;
+		}
+		default:
+			SimpleListView::MessageReceived(message);
+			break;
+	}
+}
+
 // SelectionChanged
 void
 StyleListView::SelectionChanged()
 {
-	// NOTE: single selection list
+	SimpleListView::SelectionChanged();
 
-	StyleListItem* item
-		= dynamic_cast<StyleListItem*>(ItemAt(CurrentSelection(0)));
-	if (fMessage) {
-		BMessage message(*fMessage);
-		message.AddPointer("style", item ? (void*)item->style : NULL);
-		Invoke(&message);
+	if (!fSyncingToSelection) {
+		// NOTE: single selection list
+		StyleListItem* item
+			= dynamic_cast<StyleListItem*>(ItemAt(CurrentSelection(0)));
+		if (fMessage) {
+			BMessage message(*fMessage);
+			message.AddPointer("style", item ? (void*)item->style : NULL);
+			Invoke(&message);
+		}
 	}
 
-	// modify global Selection
-	if (!fSelection)
-		return;
-
-	if (item)
-		fSelection->Select(item->style);
-	else
-		fSelection->DeselectAll();
+	_UpdateMenu();
 }
 
 // MouseDown
@@ -294,11 +373,13 @@ StyleListView::MouseDown(BPoint where)
 		Style* style = item->style;
 		if (itemFrame.Contains(where)) {
 			// set the style on the shape
-// TODO: code this command...
-//			Command* command = new SetStyleToShapeCommand(
-//										fCurrentShape, style);
-//			fCommandStack->Perform(command);
-fCurrentShape->SetStyle(style);
+			if (fCommandStack) {
+				::Command* command = new AssignStyleCommand(
+											fCurrentShape, style);
+				fCommandStack->Perform(command);
+			} else {
+				fCurrentShape->SetStyle(style);
+			}
 			handled = true;
 		}
 	}
@@ -307,49 +388,116 @@ fCurrentShape->SetStyle(style);
 		SimpleListView::MouseDown(where);
 }
 
-// MessageReceived
-void
-StyleListView::MessageReceived(BMessage* message)
-{
-	SimpleListView::MessageReceived(message);
-}
-
 // MakeDragMessage
 void
 StyleListView::MakeDragMessage(BMessage* message) const
 {
+	SimpleListView::MakeDragMessage(message);
+	message->AddPointer("container", fStyleContainer);
+	int32 count = CountSelectedItems();
+	for (int32 i = 0; i < count; i++) {
+		StyleListItem* item = dynamic_cast<StyleListItem*>(
+			ItemAt(CurrentSelection(i)));
+		if (item)
+			message->AddPointer("style", (void*)item->style);
+		else
+			break;
+	}
 }
 
 // AcceptDragMessage
 bool
 StyleListView::AcceptDragMessage(const BMessage* message) const
 {
-	return false;
+	return SimpleListView::AcceptDragMessage(message);
 }
 
 // SetDropTargetRect
 void
 StyleListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
+	SimpleListView::SetDropTargetRect(message, where);
 }
 
 // MoveItems
 void
 StyleListView::MoveItems(BList& items, int32 toIndex)
 {
+	if (!fCommandStack || !fStyleContainer)
+		return;
+
+	int32 count = items.CountItems();
+	Style** styles = new (nothrow) Style*[count];
+	if (!styles)
+		return;
+
+	for (int32 i = 0; i < count; i++) {
+		StyleListItem* item
+			= dynamic_cast<StyleListItem*>((BListItem*)items.ItemAtFast(i));
+		styles[i] = item ? item->style : NULL;
+	}
+
+	MoveStylesCommand* command
+		= new (nothrow) MoveStylesCommand(fStyleContainer,
+										  styles, count, toIndex);
+	if (!command) {
+		delete[] styles;
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // CopyItems
 void
 StyleListView::CopyItems(BList& items, int32 toIndex)
 {
+	if (!fCommandStack || !fStyleContainer)
+		return;
+
+	int32 count = items.CountItems();
+	Style* styles[count];
+
+	for (int32 i = 0; i < count; i++) {
+		StyleListItem* item
+			= dynamic_cast<StyleListItem*>((BListItem*)items.ItemAtFast(i));
+		styles[i] = item ? new (nothrow) Style(*item->style) : NULL;
+	}
+
+	AddStylesCommand* command
+		= new (nothrow) AddStylesCommand(fStyleContainer,
+										 styles, count, toIndex);
+	if (!command) {
+		for (int32 i = 0; i < count; i++)
+			delete styles[i];
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // RemoveItemList
 void
 StyleListView::RemoveItemList(BList& items)
 {
-	// TODO: allow removing items
+	if (!fCommandStack || !fStyleContainer)
+		return;
+
+	int32 count = items.CountItems();
+	Style* styles[count];
+	for (int32 i = 0; i < count; i++) {
+		StyleListItem* item = dynamic_cast<StyleListItem*>(
+			(BListItem*)items.ItemAtFast(i));
+		if (item)
+			styles[i] = item->style;
+		else
+			styles[i] = NULL;
+	}
+
+	RemoveStylesCommand* command
+		= new (nothrow) RemoveStylesCommand(fStyleContainer,
+											styles, count);
+	fCommandStack->Perform(command);
 }
 
 // CloneItem
@@ -364,14 +512,42 @@ StyleListView::CloneItem(int32 index) const
 	return NULL;
 }
 
+// IndexOfSelectable
+int32
+StyleListView::IndexOfSelectable(Selectable* selectable) const
+{
+	Style* style = dynamic_cast<Style*>(selectable);
+	if (!style)
+		return -1;
+
+	for (int32 i = 0;
+		 StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
+		 i++) {
+		if (item->style == style)
+			return i;
+	}
+
+	return -1;
+}
+
+// SelectableFor
+Selectable*
+StyleListView::SelectableFor(BListItem* item) const
+{
+	StyleListItem* styleItem = dynamic_cast<StyleListItem*>(item);
+	if (styleItem)
+		return styleItem->style;
+	return NULL;
+}
+
 // #pragma mark -
 
 // StyleAdded
 void
-StyleListView::StyleAdded(Style* style)
+StyleListView::StyleAdded(Style* style, int32 index)
 {
 	// NOTE: we are in the thread that messed with the
-	// StyleManager, so no need to lock the
+	// StyleContainer, so no need to lock the
 	// container, when this is changed to asynchronous
 	// notifications, then it would need to be read-locked!
 	if (!LockLooper())
@@ -379,7 +555,7 @@ StyleListView::StyleAdded(Style* style)
 
 	// NOTE: shapes are always added at the end
 	// of the list, so the sorting is synced...
-	if (_AddStyle(style))
+	if (_AddStyle(style, index))
 		Select(CountItems() - 1);
 
 	UnlockLooper();
@@ -390,7 +566,7 @@ void
 StyleListView::StyleRemoved(Style* style)
 {
 	// NOTE: we are in the thread that messed with the
-	// StyleManager, so no need to lock the
+	// StyleContainer, so no need to lock the
 	// container, when this is changed to asynchronous
 	// notifications, then it would need to be read-locked!
 	if (!LockLooper())
@@ -404,9 +580,42 @@ StyleListView::StyleRemoved(Style* style)
 
 // #pragma mark -
 
-// SetStyleManager
+// SetMenu
 void
-StyleListView::SetStyleManager(StyleManager* container)
+StyleListView::SetMenu(BMenu* menu)
+{
+	if (fMenu == menu)
+		return;
+
+	fMenu = menu;
+	if (fMenu == NULL)
+		return;
+
+	fAddMI = new BMenuItem("Add", new BMessage(MSG_ADD));
+	fMenu->AddItem(fAddMI);
+
+	fMenu->AddSeparatorItem();
+
+	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
+	fMenu->AddItem(fDuplicateMI);
+
+	fResetTransformationMI = new BMenuItem("Reset Transformation",
+		new BMessage(MSG_RESET_TRANSFORMATION));
+	fMenu->AddItem(fResetTransformationMI);
+
+	fMenu->AddSeparatorItem();
+
+	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
+	fMenu->AddItem(fRemoveMI);
+
+	fMenu->SetTargetForItems(this);
+
+	_UpdateMenu();
+}
+
+// SetStyleContainer
+void
+StyleListView::SetStyleContainer(StyleContainer* container)
 {
 	if (fStyleContainer == container)
 		return;
@@ -425,14 +634,9 @@ StyleListView::SetStyleManager(StyleManager* container)
 	fStyleContainer->AddListener(this);
 
 	// sync
-//	if (!fStyleContainer->ReadLock())
-//		return;
-
 	int32 count = fStyleContainer->CountStyles();
 	for (int32 i = 0; i < count; i++)
-		_AddStyle(fStyleContainer->StyleAtFast(i));
-
-//	fStyleContainer->ReadUnlock();
+		_AddStyle(fStyleContainer->StyleAtFast(i), i);
 }
 
 // SetShapeContainer
@@ -452,11 +656,11 @@ StyleListView::SetShapeContainer(ShapeContainer* container)
 		fShapeContainer->AddListener(fShapeListener);
 }
 
-// SetSelection
+// SetCommandStack
 void
-StyleListView::SetSelection(Selection* selection)
+StyleListView::SetCommandStack(CommandStack* stack)
 {
-	fSelection = selection;
+	fCommandStack = stack;
 }
 
 // SetCurrentShape
@@ -476,10 +680,12 @@ StyleListView::SetCurrentShape(Shape* shape)
 
 // _AddStyle
 bool
-StyleListView::_AddStyle(Style* style)
+StyleListView::_AddStyle(Style* style, int32 index)
 {
-	if (style)
-		 return AddItem(new StyleListItem(style, this, fCurrentShape != NULL));
+	if (style) {
+		 return AddItem(new StyleListItem(
+		 	style, this, fCurrentShape != NULL), index);
+	}
 	return false;
 }
 
@@ -546,3 +752,20 @@ StyleListView::_SetStyleMarked(Style* style, bool marked)
 		item->SetMarked(marked);
 	}
 }
+
+// _UpdateMenu
+void
+StyleListView::_UpdateMenu()
+{
+	if (!fMenu)
+		return;
+
+	bool gotSelection = CurrentSelection(0) >= 0;
+
+	fDuplicateMI->SetEnabled(gotSelection);
+	// TODO: only enable fResetTransformationMI if styles
+	// with gradients are selected!
+	fResetTransformationMI->SetEnabled(gotSelection);
+	fRemoveMI->SetEnabled(gotSelection);
+}
+

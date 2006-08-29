@@ -9,7 +9,6 @@
 #include "Document.h"
 
 #include <new>
-
 #include <stdio.h>
 
 #include <Entry.h>
@@ -28,7 +27,8 @@ Document::Document(const char* name)
 	  fSelection(new (nothrow) ::Selection()),
 
 	  fName(name),
-	  fRef(NULL)
+	  fRef(NULL),
+	  fExportRef(NULL)
 {
 }
 
@@ -36,20 +36,21 @@ Document::Document(const char* name)
 Document::~Document()
 {
 	delete fCommandStack;
-printf("~Document() - fCommandStack deleted\n");
 	delete fSelection;
-printf("~Document() - fSelection deleted\n");
-	delete fIcon;
-printf("~Document() - fIcon deleted\n");
+	fIcon->Release();
 	delete fRef;
-printf("~Document() - fRef deleted\n");
+	delete fExportRef;
 }
 
 // SetName
 void
 Document::SetName(const char* name)
 {
+	if (fName == name)
+		return;
+
 	fName = name;
+	Notify();
 }
 
 // Name
@@ -68,4 +69,43 @@ Document::SetRef(const entry_ref& ref)
 	else
 		*fRef = ref;
 }
+
+// SetExportRef
+void
+Document::SetExportRef(const entry_ref& ref)
+{
+	if (!fExportRef)
+		fExportRef = new (nothrow) entry_ref(ref);
+	else
+		*fExportRef = ref;
+}
+
+// SetIcon
+void
+Document::SetIcon(::Icon* icon)
+{
+	if (fIcon == icon)
+		return;
+
+	fIcon->Release();
+
+	fIcon = icon;
+
+	// we don't acquire, since we own the icon
+}
+
+// MakeEmpty
+void
+Document::MakeEmpty()
+{
+	fCommandStack->Clear();
+	fSelection->DeselectAll();
+	fIcon->MakeEmpty();
+
+	delete fRef;
+	fRef = NULL;
+	delete fExportRef;
+	fExportRef = NULL;
+}
+
 

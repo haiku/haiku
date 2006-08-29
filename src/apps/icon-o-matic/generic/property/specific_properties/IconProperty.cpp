@@ -9,6 +9,7 @@
 #include "IconProperty.h"
 
 #include <new>
+#include <stdio.h>
 
 #include <Message.h>
 

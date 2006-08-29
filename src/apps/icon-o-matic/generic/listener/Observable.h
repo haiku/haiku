@@ -21,12 +21,16 @@ class Observable {
 			bool				AddObserver(Observer* observer);
 			bool				RemoveObserver(Observer* observer);
 
+			int32				CountObservers() const;
+			Observer*			ObserverAtFast(int32 index) const;
+	
 	 		void				Notify() const;
 
 			void				SuspendNotifications(bool suspend);
 
 			bool				HasPendingNotifications() const
 									{ return fPendingNotifications; }
+
  private:
 			BList				fObservers;
 

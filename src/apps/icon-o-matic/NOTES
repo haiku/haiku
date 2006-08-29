@@ -31,7 +31,7 @@
 
 * implement commands for the newly added editing features [done]
 
-* built-in transformation for Gradient and Shape? [done for Shape]
+* built-in transformation for Gradient and Shape? [done]
 
 * Transformation manipulator [done]
 
@@ -66,5 +66,5 @@
 --------- rendering
 
 * compound shape single pass rendering [done]
-* auto hinting (aligning to pixels) of marked shapes
-* level of detail support to hide/show shapes
+* auto hinting (aligning to pixels) of marked shapes [done]
+* level of detail support to hide/show shapes [done]

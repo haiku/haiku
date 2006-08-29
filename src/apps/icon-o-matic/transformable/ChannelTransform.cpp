@@ -8,6 +8,7 @@
 
 #include "ChannelTransform.h"
 
+#include <math.h>
 #include <stdio.h>
 
 // constructor
@@ -39,12 +40,41 @@ ChannelTransform::~ChannelTransform()
 
 // SetTransformation
 void
+ChannelTransform::SetTransformation(const Transformable& other)
+{
+	// calc affine parameters
+
+	// translation
+	double tx;
+	double ty;
+	other.translation(&tx, &ty);
+
+	// rotation
+	double rotation = agg::rad2deg(other.rotation());
+
+	// scale
+	double scaleX;
+	double scaleY;
+	other.scaling(&scaleX, &scaleY);
+
+	if (isnanf(tx) || isnanf(ty) || isnanf(scaleX) || isnanf(scaleY))
+		return;
+
+	SetTransformation(B_ORIGIN, BPoint(tx, ty), rotation, scaleX, scaleY);
+}
+
+// SetTransformation
+void
 ChannelTransform::SetTransformation(BPoint pivot,
 									BPoint translation,
 									double rotation,
 									double xScale,
 									double yScale)
 {
+//printf("SetTransformation(BPoint(%.1f, %.1f), BPoint(%.1f, %.1f), "
+//"%.2f, %.2f, %.2f)\n", pivot.x, pivot.y, translation.x, translation.y,
+//rotation, xScale, yScale);
+
 	if (fTranslation != translation ||
 		fPivot != pivot ||
 		fRotation != rotation ||

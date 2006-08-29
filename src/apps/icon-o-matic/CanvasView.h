@@ -15,6 +15,13 @@
 class BBitmap;
 class IconRenderer;
 
+enum {
+	SNAPPING_OFF	= 0,
+	SNAPPING_64,
+	SNAPPING_32,
+	SNAPPING_16,
+};
+
 class CanvasView : public StateView,
 				   public IconListener {
  public:
@@ -26,6 +33,10 @@ class CanvasView : public StateView,
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				Draw(BRect updateRect);
 
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+										   const BMessage* dragMessage);
+
 	// IconListener interface
 	virtual	void				AreaInvalidated(const BRect& area);
 
@@ -34,6 +45,10 @@ class CanvasView : public StateView,
 
 	inline	float				ZoomLevel() const
 									{ return fZoomLevel; }
+
+			void				SetMouseFilterMode(uint32 mode);
+			bool				MouseFilterMode() const
+									{ return fMouseFilterMode; }
 
 			void				ConvertFromCanvas(BPoint* point) const;
 			void				ConvertToCanvas(BPoint* point) const;
@@ -54,14 +69,22 @@ class CanvasView : public StateView,
 			void				_DrawInto(BView* view,
 										  BRect updateRect);
 
+			void				_FilterMouse(BPoint* where) const;
+
+			void				_MakeBackground();
+
  private:
 			BBitmap*			fBitmap;
+			BBitmap*			fBackground;
+
 			Icon*				fIcon;
 			IconRenderer*		fRenderer;
 			BRect				fDirtyIconArea;
 
 			BPoint				fCanvasOrigin;
 			float				fZoomLevel;
+
+			uint32				fMouseFilterMode;
 
 			BBitmap*			fOffsreenBitmap;
 			BView*				fOffsreenView;

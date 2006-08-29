@@ -13,6 +13,7 @@
 
 class Shape;
 class ShapeContainer;
+class Selection;
 
 class AddShapesCommand : public Command {
  public:
@@ -20,7 +21,8 @@ class AddShapesCommand : public Command {
 									ShapeContainer* container,
 									Shape** const shapes,
 									int32 count,
-									int32 index);
+									int32 index,
+									Selection* selection);
 	virtual						~AddShapesCommand();
 	
 	virtual	status_t			InitCheck();
@@ -36,6 +38,8 @@ class AddShapesCommand : public Command {
 			int32				fCount;
 			int32				fIndex;
 			bool				fShapesAdded;
+
+			Selection*			fSelection;
 };
 
 #endif // ADD_SHAPES_COMMAND_H

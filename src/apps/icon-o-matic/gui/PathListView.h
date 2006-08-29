@@ -47,22 +47,25 @@ class PathListView : public SimpleListView,
 
 	virtual	BListItem*			CloneItem(int32 atIndex) const;
 
+	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
+	virtual	Selectable*			SelectableFor(BListItem* item) const;
+
 	// ShapeContainerListener interface
-	virtual	void				PathAdded(VectorPath* path);
+	virtual	void				PathAdded(VectorPath* path, int32 index);
 	virtual	void				PathRemoved(VectorPath* path);
 
 	// PathListView
 			void				SetPathContainer(PathContainer* container);
 			void				SetShapeContainer(ShapeContainer* container);
-			void				SetSelection(Selection* selection);
 			void				SetCommandStack(CommandStack* stack);
+			void				SetMenu(BMenu* menu);
 
 			void				SetCurrentShape(Shape* shape);
 			Shape*				CurrentShape() const
 									{ return fCurrentShape; }
 
  private:
-			bool				_AddPath(VectorPath* path);
+			bool				_AddPath(VectorPath* path, int32 index);
 			bool				_RemovePath(VectorPath* path);
 
 			PathListItem*		_ItemForPath(VectorPath* path) const;
@@ -70,12 +73,22 @@ class PathListView : public SimpleListView,
 	friend class ShapePathListener;
 			void				_UpdateMarks();
 			void				_SetPathMarked(VectorPath* path, bool marked);
+			void				_UpdateMenu();
 
 			BMessage*			fMessage;
 
+			BMenu*				fMenu;
+			BMenuItem*			fAddMI;
+			BMenuItem*			fAddRectMI;
+			BMenuItem*			fAddCircleMI;
+			BMenuItem*			fAddArcMI;
+			BMenuItem*			fDuplicateMI;
+			BMenuItem*			fReverseMI;
+			BMenuItem*			fRotateIndicesMI;
+			BMenuItem*			fRemoveMI;
+
 			PathContainer*		fPathContainer;
 			ShapeContainer*		fShapeContainer;
-			Selection*			fSelection;
 			CommandStack*		fCommandStack;
 
 			Shape*				fCurrentShape;

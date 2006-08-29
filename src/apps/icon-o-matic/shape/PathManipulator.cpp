@@ -25,12 +25,13 @@
 //#include "CloseCommand.h"
 #include "InsertPointCommand.h"
 //#include "NewPathCommand.h"
-//#include "NudgePointsCommand.h"
+#include "NudgePointsCommand.h"
 //#include "RemovePathCommand.h"
 #include "RemovePointsCommand.h"
 //#include "ReversePathCommand.h"
 //#include "SelectPathCommand.h"
 //#include "SelectPointsCommand.h"
+#include "TransformPointsBox.h"
 
 #define POINT_EXTEND 3.0
 #define CONTROL_POINT_EXTEND 2.0
@@ -187,7 +188,7 @@ public:
 
 // constructor
 PathManipulator::PathManipulator(VectorPath* path)
-	: Manipulator(path),
+	: Manipulator(NULL),
 	  fCanvasView(NULL),
 
 	  fCommandDown(false),
@@ -211,27 +212,33 @@ PathManipulator::PathManipulator(VectorPath* path)
 
 	  fSelection(new Selection()),
 	  fOldSelection(new Selection()),
+	  fTransformBox(NULL),
 
 	  fNudgeOffset(0.0, 0.0),
-	  fLastNudgeTime(system_time())//,
-//	  fNudgeCommand(NULL)
+	  fLastNudgeTime(system_time()),
+	  fNudgeCommand(NULL)
 {
+	fPath->Acquire();
 	fPath->AddListener(this);
+	fPath->AddObserver(this);
 }
 
 // destructor
 PathManipulator::~PathManipulator()
 {
-	fPath->RemoveListener(this);
-
 	delete fChangePointCommand;
 	delete fInsertPointCommand;
 	delete fAddPointCommand;
 
 	delete fSelection;
 	delete fOldSelection;
+	delete fTransformBox;
 
-//	delete fNudgeCommand;
+	delete fNudgeCommand;
+
+	fPath->RemoveObserver(this);
+	fPath->RemoveListener(this);
+	fPath->Release();
 }
 
 
@@ -365,6 +372,10 @@ PathManipulator::Draw(BView* into, BRect updateRect)
 			into->FillRect(r, B_SOLID_HIGH);
 		}
 	}
+
+	if (fTransformBox) {
+		fTransformBox->Draw(into, updateRect);
+	}
 }
 
 // #pragma mark -
@@ -374,6 +385,16 @@ bool
 PathManipulator::MouseDown(BPoint where)
 {
 	fMouseDown = true;
+
+	if (fMode == TRANSFORM_POINTS) {
+		if (fTransformBox) {
+			fTransformBox->MouseDown(where);
+
+//			if (!fTransformBox->IsRotating())
+//				fCanvasView->SetAutoScrolling(true);
+		}
+		return true;
+	}
 
 	if (fMode == MOVE_POINT &&
 		fSelection->CountItems() > 1 &&
@@ -507,6 +528,13 @@ PathManipulator::MouseMoved(BPoint where)
 
 	fLastCanvasPos = canvasWhere;
 
+	if (fMode == TRANSFORM_POINTS) {
+		if (fTransformBox) {
+			fTransformBox->MouseMoved(where);
+		}
+		return;
+	}
+
 	if (fMode == CLOSE_PATH) {
 		// continue by moving the point
 		_SetMode(MOVE_POINT);
@@ -573,6 +601,13 @@ PathManipulator::MouseUp()
 		return NULL;
 	fMouseDown = false;
 
+	if (fMode == TRANSFORM_POINTS) {
+		if (fTransformBox) {
+			return fTransformBox->MouseUp();
+		}
+		return NULL;
+	}
+
 	Command* command = NULL;
 
 	switch (fMode) {
@@ -612,7 +647,7 @@ PathManipulator::MouseUp()
 			break;
 
 		case TRANSLATE_POINTS:
-//			if (!fNudgeCommand) {
+			if (!fNudgeCommand) {
 				// select just the point that was clicked
 				*fOldSelection = *fSelection;
 				if (fCurrentPathPoint >= 0) {
@@ -625,9 +660,9 @@ PathManipulator::MouseUp()
 //													  fSelection->Items(),
 //													  fSelection->CountItems()));
 				}
-//			} else {
-//				_FinishNudging();
-//			}
+			} else {
+				command = _FinishNudging();
+			}
 			break;
 	}
 
@@ -638,6 +673,13 @@ PathManipulator::MouseUp()
 bool
 PathManipulator::MouseOver(BPoint where)
 {
+	if (fMode == TRANSFORM_POINTS) {
+		if (fTransformBox) {
+			return fTransformBox->MouseOver(where);
+		}
+		return false;
+	}
+
 	BPoint canvasWhere = where;
 	fCanvasView->ConvertToCanvas(&canvasWhere);
 
@@ -738,6 +780,10 @@ PathManipulator::ModifiersChanged(uint32 modifiers)
 	fShiftDown = modifiers & B_SHIFT_KEY;
 	fAltDown = modifiers & B_OPTION_KEY;
 
+	if (fTransformBox) {
+		fTransformBox->ModifiersChanged(modifiers);
+		return;
+	}
 	// reevaluate mode
 	if (!fMouseDown)
 		_SetModeForMousePos(fLastCanvasPos);
@@ -756,11 +802,17 @@ PathManipulator::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 	switch (key) {
 		// commit
 		case B_RETURN:
-//			_Perform();
+			if (fTransformBox) {
+				_SetModeForMousePos(fLastCanvasPos);
+			} else
+//				_Perform();
 			break;
 		// cancel
 		case B_ESCAPE:
-			if (fFallBackMode == NEW_PATH) {
+			if (fTransformBox) {
+				fTransformBox->Cancel();
+				_SetModeForMousePos(fLastCanvasPos);
+			} else if (fFallBackMode == NEW_PATH) {
 				fFallBackMode = SELECT_POINTS;
 				_SetModeForMousePos(fLastCanvasPos);
 			} else
@@ -811,7 +863,7 @@ PathManipulator::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 		case B_DOWN_ARROW:
 		case B_LEFT_ARROW:
 		case B_RIGHT_ARROW:
-			_FinishNudging();
+			*_command = _FinishNudging();
 			break;
 		default:
 			handled = false;
@@ -824,6 +876,10 @@ PathManipulator::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 void
 PathManipulator::UpdateCursor()
 {
+	if (fTransformBox) {
+		fTransformBox->UpdateCursor();
+		return;
+	}
 	const uchar* cursorData;
 	switch (fMode) {
 		case ADD_POINT:
@@ -896,7 +952,7 @@ PathManipulator::ObjectChanged(const Observable* object)
 	fPreviousBounds = currentBounds;
 
 	// reevaluate mode
-	if (!fMouseDown)
+	if (!fMouseDown && !fTransformBox)
 		_SetModeForMousePos(fLastCanvasPos);
 }
 
@@ -913,6 +969,7 @@ PathManipulator::PointAdded(int32 index)
 void
 PathManipulator::PointRemoved(int32 index)
 {
+	fSelection->Remove(index);
 	ObjectChanged(fPath);
 }
 
@@ -941,6 +998,17 @@ PathManipulator::PathClosedChanged()
 void
 PathManipulator::PathReversed()
 {
+	// reverse selection along with path
+	int32 count = fSelection->CountItems();
+	int32 pointCount = fPath->CountPoints();
+	if (count > 0) {
+		Selection temp;
+		for (int32 i = 0; i < count; i++) {
+			temp.Add((pointCount - 1) - fSelection->IndexAt(i));
+		}
+		*fSelection = temp;
+	}
+
 	ObjectChanged(fPath);
 }
 
@@ -960,6 +1028,8 @@ PathManipulator::ControlFlags() const
 //		flags |= SHAPE_UI_FLAGS_CAN_CLOSE_PATH;
 //	if (fPath->IsClosed())
 //		flags |= SHAPE_UI_FLAGS_PATH_IS_CLOSED;
+//	if (fTransformBox)
+//		flags |= SHAPE_UI_FLAGS_IS_TRANSFORMING;
 
 	return flags;
 }
@@ -990,10 +1060,59 @@ PathManipulator::_SetMode(uint32 mode)
 //printf("switching mode: %s -> %s\n", string_for_mode(fMode), string_for_mode(mode));
 		fMode = mode;
 
+		if (fMode == TRANSFORM_POINTS) {
+			_SetTransformBox(new TransformPointsBox(fCanvasView,
+													this,
+													fPath,
+													fSelection->Items(),
+													fSelection->CountItems()));
+//			fCanvasView->Perform(new EnterTransformPointsCommand(this,
+//														  fSelection->Items(),
+//														  fSelection->CountItems()));
+		} else {
+			if (fTransformBox)
+				_SetTransformBox(NULL);
+		}
+
 		if (BWindow* window = fCanvasView->Window()) {
 			window->PostMessage(MSG_UPDATE_SHAPE_UI);
 		}
 		UpdateCursor();
+	}
+}
+
+
+// _SetTransformBox
+void
+PathManipulator::_SetTransformBox(TransformPointsBox* transformBox)
+{
+	if (fTransformBox == transformBox)
+		return;
+
+	BRect dirty(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+	if (fTransformBox) {
+		// get rid of transform box display
+		dirty = fTransformBox->Bounds();
+		delete fTransformBox;
+	}
+
+	fTransformBox = transformBox;
+
+	if (fTransformBox) {
+		fTransformBox->MouseMoved(fLastCanvasPos);
+		if (fMode != TRANSFORM_POINTS) {
+			fMode = TRANSFORM_POINTS;
+		}
+		dirty = dirty | fTransformBox->Bounds();
+	} else {
+		if (fMode == TRANSFORM_POINTS) {
+			_SetModeForMousePos(fLastCanvasPos);
+		}
+	}
+
+	if (dirty.IsValid()) {
+		dirty.InsetBy(-8, -8);
+		fCanvasView->Invalidate(dirty);
 	}
 }
 
@@ -1092,13 +1211,17 @@ PathManipulator::_SetSharp(int32 index)
 void
 PathManipulator::_RemoveSelection()
 {
-	int32 count = fSelection->CountItems();
+	// NOTE: copy selection since removing points will
+	// trigger notifications, and that will influence the
+	// selection
+	Selection selection = *fSelection;
+	int32 count = selection.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		if (!fPath->RemovePoint(fSelection->IndexAt(i) - i))
+		if (!fPath->RemovePoint(selection.IndexAt(i) - i))
 			break;
 	}
 
-//	SetClosed(fPath->IsClosed() && fPath->CountPoints() > 1);
+	fPath->SetClosed(fPath->IsClosed() && fPath->CountPoints() > 1);
 
 	fSelection->MakeEmpty();
 }
@@ -1142,6 +1265,11 @@ PathManipulator::_Delete()
 {
 	Command* command = NULL;
 	if (!fMouseDown) {
+		// make sure we apply an on-going transformation before we proceed
+		if (fTransformBox) {
+			_SetTransformBox(NULL);
+		}
+
 		if (fSelection->CountItems() == fPath->CountPoints()) {
 //			command = new RemovePathCommand(fPath);
 		} else {
@@ -1367,12 +1495,14 @@ PathManipulator::_SetModeForMousePos(BPoint where)
 				index = i;
 			}
 		}
-		if (distIn < distM && distIn < MOVE_THRESHOLD) {
+		if (distM - distIn > 0.00001
+			&& distIn < MOVE_THRESHOLD) {
 			mode = fCommandDown ? TOGGLE_SHARP_IN : 
 						(fOptionDown ? REMOVE_POINT_IN : MOVE_POINT_IN);
 			index = i;
 		}
-		if (distOut < distIn && distOut < distM && distOut < MOVE_THRESHOLD) {
+		if (distIn - distOut > 0.00001
+			&& distOut < distM && distOut < MOVE_THRESHOLD) {
 			mode = fCommandDown ? TOGGLE_SHARP_OUT :
 						(fOptionDown ? REMOVE_POINT_OUT : MOVE_POINT_OUT);
 			index = i;
@@ -1437,58 +1567,65 @@ PathManipulator::_Nudge(BPoint direction)
 {
 	bigtime_t now = system_time();
 	if (now - fLastNudgeTime > 500000) {
-		_FinishNudging();
+		fCanvasView->Perform(_FinishNudging());
 	}
 	fLastNudgeTime = now;
 	fNudgeOffset += direction;
 
-//	if (!fNudgeCommand) {
-//
-//		bool fromSelection = !fSelection->IsEmpty();
-//
-//		int32 count = fromSelection ? fSelection->CountItems()
-//									: fPath->CountPoints();
-//		int32* indices = new int32[count];
-//		control_point* points = new control_point[count];
-//
-//		// init indices and points
-//		for (int32 i = 0; i < count; i++) {
-//			indices[i] = fromSelection ? fSelection->IndexAt(i) : i;
-//			fPath->GetPointsAt(indices[i],
-//							   points[i].point,
-//							   points[i].point_in,
-//							   points[i].point_out,
-//							   &points[i].connected);
-//		}
-//
-//			fNudgeCommand = new NudgePointsCommand(this, fPath,
-//												 indices, points, count);
-//
-//			fNudgeCommand->SetNewTranslation(fNudgeOffset);
-//			fNudgeCommand->Redo(fCanvasView);
-//
-//		delete[] indices;
-//		delete[] points;
-//
-//	} else {
-//		fNudgeCommand->SetNewTranslation(fNudgeOffset);
-//		fNudgeCommand->Redo(fCanvasView);
-//	}
+	if (fTransformBox) {
+		fTransformBox->NudgeBy(direction);
+		return;
+	}
+
+	if (!fNudgeCommand) {
+
+		bool fromSelection = !fSelection->IsEmpty();
+
+		int32 count = fromSelection ? fSelection->CountItems()
+									: fPath->CountPoints();
+		int32 indices[count];
+		control_point points[count];
+
+		// init indices and points
+		for (int32 i = 0; i < count; i++) {
+			indices[i] = fromSelection ? fSelection->IndexAt(i) : i;
+			fPath->GetPointsAt(indices[i],
+							   points[i].point,
+							   points[i].point_in,
+							   points[i].point_out,
+							   &points[i].connected);
+		}
+
+		fNudgeCommand = new NudgePointsCommand(fPath, indices, points, count);
+
+		fNudgeCommand->SetNewTranslation(fNudgeOffset);
+		fNudgeCommand->Redo();
+
+	} else {
+		fNudgeCommand->SetNewTranslation(fNudgeOffset);
+		fNudgeCommand->Redo();
+	}
 
 	if (!fMouseDown)
 		_SetModeForMousePos(fLastCanvasPos);
 }
 
 // _FinishNudging
-void
+Command*
 PathManipulator::_FinishNudging()
 {
 	fNudgeOffset = BPoint(0.0, 0.0);
 
-//	if (fNudgeCommand) {
-//		fCanvasView->Perform(fNudgeCommand);
-//		fNudgeCommand = NULL;
-//	}
+	Command* command;
+
+	if (fTransformBox) {
+		command = fTransformBox->FinishNudging();
+	} else {
+		command = fNudgeCommand;
+		fNudgeCommand = NULL;
+	}
+
+	return command;
 }
 
 

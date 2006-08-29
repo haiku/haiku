@@ -18,6 +18,7 @@
 #endif
 
 #include "MouseWheelFilter.h"
+#include "Observer.h"
 
 enum
 {
@@ -30,10 +31,11 @@ enum
 // when the mouse is over it with a dragmessage
 #define SCROLL_AREA			0.1
 
-class BMessageRunner;
 class BMessageFilter;
-class InterfaceWindow;
+class BMessageRunner;
 class BScrollView;
+class Selectable;
+class Selection;
 
 // SimpleItem
 class SimpleItem : public BStringItem
@@ -59,7 +61,8 @@ class SimpleItem : public BStringItem
 
 // DragSortableListView
 class DragSortableListView : public MouseWheelTarget,
-							 public BListView {
+							 public BListView,
+							 public Observer {
  public:
 							DragSortableListView(BRect frame,
 												 const char* name,
@@ -74,7 +77,7 @@ class DragSortableListView : public MouseWheelTarget,
 														  | B_FRAME_EVENTS);
 	virtual					~DragSortableListView();
 
-							// BListView
+	// BListView interface
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();
 	virtual	void			FrameResized(float width, float height);
@@ -94,10 +97,13 @@ class DragSortableListView : public MouseWheelTarget,
 	virtual void			DrawItem(BListItem *item, BRect itemFrame,
 									 bool complete = false);
 
-							// MouseWheelTarget
+	// MouseWheelTarget interface
 	virtual	bool			MouseWheelChanged(float x, float y);
 
-							// DragSortableListView
+	// Observer interface (watching Selection)
+	virtual	void			ObjectChanged(const Observable* object);
+
+	// DragSortableListView
 	virtual	void			SetDragCommand(uint32 command);
 	virtual	void			ModifiersChanged();	// called by window
 	virtual	void			DoubleClicked(int32 index) {}
@@ -119,9 +125,19 @@ class DragSortableListView : public MouseWheelTarget,
 	virtual	void			CopyItems(BList& items, int32 toIndex);
 	virtual	void			RemoveItemList(BList& indices);
 			void			RemoveSelected(); // uses RemoveItemList()
-			int32			CountSelectedItems() const;
-			void			SelectAll();
 	virtual	bool			DeleteItem(int32 index);
+
+							// selection
+			void			SetSelection(Selection* selection);
+
+	virtual	int32			IndexOfSelectable(Selectable* selectable) const;
+	virtual	Selectable*		SelectableFor(BListItem* item) const;
+
+			void			SetDeselectAllInGlobalSelection(bool deselect);
+
+			void			SelectAll();
+			int32			CountSelectedItems() const;
+	virtual	void			SelectionChanged();
 
 	virtual	BListItem*		CloneItem(int32 atIndex) const = 0;
 	virtual	void			DrawListItem(BView* owner, int32 index,
@@ -147,6 +163,10 @@ class DragSortableListView : public MouseWheelTarget,
 	BScrollView*			fScrollView;
 	uint32					fDragCommand;
 	int32					fFocusedIndex;
+
+	Selection*				fSelection;
+	bool					fSyncingToSelection;
+	bool					fModifyingSelection;
 };
 
 // SimpleListView
@@ -176,8 +196,8 @@ class SimpleListView :
 	virtual	BRect			layout(BRect frame);
 	#endif
 							// BListView
+	virtual	void			DetachedFromWindow();
 	virtual void			MessageReceived(BMessage* message);
-	virtual	void			SelectionChanged();
 
 	virtual	BListItem*		CloneItem(int32 atIndex) const;
 	virtual	void			DrawListItem(BView* owner, int32 index,

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "Selection.h"
 #include "ShapeContainer.h"
 #include "Shape.h"
 
@@ -21,13 +22,16 @@ using std::nothrow;
 AddShapesCommand::AddShapesCommand(ShapeContainer* container,
 								   Shape** const shapes,
 								   int32 count,
-								   int32 index)
+								   int32 index,
+								   Selection* selection)
 	: Command(),
 	  fContainer(container),
 	  fShapes(shapes && count > 0 ? new (nothrow) Shape*[count] : NULL),
 	  fCount(count),
 	  fIndex(index),
-	  fShapesAdded(false)
+	  fShapesAdded(false),
+
+	  fSelection(selection)
 {
 	if (!fContainer || !fShapes)
 		return;
@@ -68,6 +72,8 @@ AddShapesCommand::Perform()
 				fContainer->RemoveShape(fShapes[j]);
 			break;
 		}
+		if (fSelection)
+			fSelection->Select(fShapes[i], i > 0);
 		index++;
 	}
 	fShapesAdded = true;
@@ -81,6 +87,8 @@ AddShapesCommand::Undo()
 {
 	// remove shapes from container
 	for (int32 i = 0; i < fCount; i++) {
+		if (fSelection)
+			fSelection->Deselect(fShapes[i]);
 		fContainer->RemoveShape(fShapes[i]);
 	}
 	fShapesAdded = false;

@@ -18,6 +18,7 @@
 #include <Window.h>
 
 #include "cursors.h"
+#include "ui_defines.h"
 #include "support.h"
 #include "support_ui.h"
 
@@ -78,27 +79,73 @@ SwatchView::layout(BRect frame)
 }
 #endif // LIB_LAYOUT
 
+inline void
+blend_color(rgb_color& a, const rgb_color& b, float alpha)
+{
+	float alphaInv = 1.0 - alpha;
+	a.red = (uint8)(b.red * alphaInv + a.red * alpha);
+	a.green = (uint8)(b.green * alphaInv + a.green * alpha);
+	a.blue = (uint8)(b.blue * alphaInv + a.blue * alpha);
+}
+
 // Draw
 void
 SwatchView::Draw(BRect updateRect)
 {
-//	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-//	rgb_color shadow = tint_color(background, B_DARKEN_2_TINT);
-//	rgb_color light = tint_color(background, B_LIGHTEN_MAX_TINT);
-//	rgb_color darkShadow = tint_color(background, B_DARKEN_3_TINT);
-//	rgb_color lightShadow = tint_color(background, B_DARKEN_1_TINT);
+	BRect r(Bounds());
+
 	rgb_color colorLight = tint_color(fColor, B_LIGHTEN_2_TINT);
 	rgb_color colorShadow = tint_color(fColor, B_DARKEN_2_TINT);
-	BRect r(Bounds());
-//	_StrokeRect(r, background, background);
-//	r.InsetBy(1.0, 1.0);
-/*	_StrokeRect(r, lightShadow, light);
-	r.InsetBy(1.0, 1.0);
-	_StrokeRect(r, darkShadow, shadow);
-	r.InsetBy(1.0, 1.0);*/
-	_StrokeRect(r, colorLight, colorShadow);
-	r.InsetBy(1.0, 1.0);
-	FillRect(r);
+
+	if (fColor.alpha < 255) {
+		// left/top
+		float alpha = fColor.alpha / 255.0;
+
+		rgb_color h = colorLight;
+		blend_color(h, kAlphaHigh, alpha);
+		rgb_color l = colorLight;
+		blend_color(l, kAlphaLow, alpha);
+
+		SetHighColor(h);
+		SetLowColor(l);
+		
+		StrokeLine(BPoint(r.left, r.bottom - 1),
+				   BPoint(r.left, r.top), kDottedBig);
+		StrokeLine(BPoint(r.left + 1, r.top),
+				   BPoint(r.right, r.top), kDottedBig);
+
+		// right/bottom
+		h = colorShadow;
+		blend_color(h, kAlphaHigh, alpha);
+		l = colorShadow;
+		blend_color(l, kAlphaLow, alpha);
+
+		SetHighColor(h);
+		SetLowColor(l);
+		
+		StrokeLine(BPoint(r.right, r.top + 1),
+				   BPoint(r.right, r.bottom), kDottedBig);
+		StrokeLine(BPoint(r.right - 1, r.bottom),
+				   BPoint(r.left, r.bottom), kDottedBig);
+
+		// fill
+		r.InsetBy(1.0, 1.0);
+
+		h = fColor;
+		blend_color(h, kAlphaHigh, alpha);
+		l = fColor;
+		blend_color(l, kAlphaLow, alpha);
+
+		SetHighColor(h);
+		SetLowColor(l);		
+
+		FillRect(r, kDottedBig);
+	} else {
+		_StrokeRect(r, colorLight, colorShadow);
+		r.InsetBy(1.0, 1.0);
+		SetHighColor(fColor);
+		FillRect(r);
+	}
 }
 
 // MessageReceived
@@ -206,17 +253,17 @@ SwatchView::_Invoke(const BMessage* _message)
 // _StrokeRect
 void
 SwatchView::_StrokeRect(BRect r, rgb_color leftTop,
-					   rgb_color rightBottom)
+						rgb_color rightBottom)
 {
 	BeginLineArray(4);
-		AddLine(BPoint(r.left, r.bottom),
+		AddLine(BPoint(r.left, r.bottom - 1),
 				BPoint(r.left, r.top), leftTop);
-		AddLine(BPoint(r.left + 1.0, r.top),
+		AddLine(BPoint(r.left + 1, r.top),
 				BPoint(r.right, r.top), leftTop);
-		AddLine(BPoint(r.right, r.top + 1.0),
+		AddLine(BPoint(r.right, r.top + 1),
 				BPoint(r.right, r.bottom), rightBottom);
-		AddLine(BPoint(r.right - 1.0, r.bottom),
-				BPoint(r.left + 1.0, r.bottom), rightBottom);
+		AddLine(BPoint(r.right - 1, r.bottom),
+				BPoint(r.left, r.bottom), rightBottom);
 	EndLineArray();
 }
 

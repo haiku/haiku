@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "CanvasView.h"
 #include "Shape.h"
 #include "StateView.h"
 #include "TransformObjectsCommand.h"
@@ -23,9 +22,7 @@ using std::nothrow;
 TransformShapesBox::TransformShapesBox(CanvasView* view,
 									   const Shape** shapes,
 									   int32 count)
-	: TransformBox(view, BRect(0.0, 0.0, 1.0, 1.0)),
-
-	  fCanvasView(view),
+	: CanvasTransformBox(view),
 
 	  fShapes(shapes && count > 0 ? new Shape*[count] : NULL),
 	  fCount(count),
@@ -37,7 +34,7 @@ TransformShapesBox::TransformShapesBox(CanvasView* view,
 	if (fShapes) {
 		// allocate storage for the current transformations
 		// of each object
-		fOriginals = new double[fCount * 6];
+		fOriginals = new double[fCount * Transformable::matrix_size];
 
 		memcpy(fShapes, shapes, fCount * sizeof(Shape*));
 
@@ -90,7 +87,7 @@ TransformShapesBox::Update(bool deep)
 		fShapes[i]->SuspendNotifications(true);
 
 		// reset the objects transformation to the saved state
-		fShapes[i]->LoadFrom(&fOriginals[i * 6]);
+		fShapes[i]->LoadFrom(&fOriginals[i * Transformable::matrix_size]);
 		// combined with the current transformation
 		fShapes[i]->Multiply(*this);
 
@@ -114,7 +111,7 @@ TransformShapesBox::ObjectChanged(const Observable* object)
 			continue;
 
 		box = box | fShapes[i]->Bounds();
-		fShapes[i]->StoreTo(&fOriginals[i * 6]);
+		fShapes[i]->StoreTo(&fOriginals[i * Transformable::matrix_size]);
 	}
 	// any TransformObjectsCommand cannot use the TransformBox
 	// anymore
@@ -126,59 +123,11 @@ TransformShapesBox::ObjectChanged(const Observable* object)
 	fView->UnlockLooper();
 }
 
-// Perform
-Command*
-TransformShapesBox::Perform()
-{
-	return NULL;
-}
-
-// Cancel
-Command*
-TransformShapesBox::Cancel()
-{
-	SetTransformation(B_ORIGIN, B_ORIGIN, 0.0, 1.0, 1.0);
-
-	return NULL;
-}
-
-// TransformFromCanvas
-void
-TransformShapesBox::TransformFromCanvas(BPoint& point) const
-{
-	fParentTransform.InverseTransform(&point);
-	fCanvasView->ConvertFromCanvas(&point);
-}
-
-// TransformToCanvas
-void
-TransformShapesBox::TransformToCanvas(BPoint& point) const
-{
-	fCanvasView->ConvertToCanvas(&point);
-	fParentTransform.Transform(&point);
-}
-
-// ZoomLevel
-float
-TransformShapesBox::ZoomLevel() const
-{
-	return fCanvasView->ZoomLevel();
-}
-
-// ViewSpaceRotation
-double
-TransformShapesBox::ViewSpaceRotation() const
-{
-	Transformable t(*this);
-	t.Multiply(fParentTransform);
-	return t.rotation() * 180.0 / PI;
-}
-
 // MakeCommand
 TransformCommand*
 TransformShapesBox::MakeCommand(const char* commandName, uint32 nameIndex)
 {
-	const Transformable* objects[fCount];
+	Transformable* objects[fCount];
 	for (int32 i = 0; i < fCount; i++)
 		objects[i] = fShapes[i];
 	

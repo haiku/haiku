@@ -54,6 +54,8 @@ class MultipleManipulatorState : public ViewState {
 			Manipulator*		ManipulatorAtFast(int32 index) const;
 
  private:
+			void				_UpdateCursor();
+
 			BList				fManipulators;
 			Manipulator*		fCurrentManipulator;
 			Manipulator*		fPreviousManipulator;

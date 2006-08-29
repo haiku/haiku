@@ -37,6 +37,9 @@ class TransformerListView : public SimpleListView,
 
 	virtual	BListItem*			CloneItem(int32 atIndex) const;
 
+	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
+	virtual	Selectable*			SelectableFor(BListItem* item) const;
+
 	// ShapeListener interface
 	virtual	void				TransformerAdded(Transformer* transformer,
 												 int32 index);
@@ -46,7 +49,6 @@ class TransformerListView : public SimpleListView,
 
 	// TransformerListView
 			void				SetShape(Shape* shape);
-			void				SetSelection(Selection* selection);
 			void				SetCommandStack(CommandStack* stack);
 
  private:
@@ -61,7 +63,6 @@ class TransformerListView : public SimpleListView,
 			BMessage*			fMessage;
 
 			Shape*				fShape;
-			Selection*			fSelection;
 			CommandStack*		fCommandStack;
 };
 

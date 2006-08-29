@@ -16,7 +16,7 @@
 // constructor
 TransformObjectsCommand::TransformObjectsCommand(
 								TransformBox* box,
-								const Transformable** objects,
+								Transformable** const objects,
 								const double* originals,
 								int32 count,
 
@@ -79,8 +79,11 @@ void
 TransformObjectsCommand::TransformBoxDeleted(
 									const TransformBox* box)
 {
-	if (fTransformBox == box)
+	if (fTransformBox == box) {
+		if (fTransformBox)
+			fTransformBox->RemoveListener(this);
 		fTransformBox = NULL;
+	}
 }
 
 // #pragma mark -

@@ -155,9 +155,26 @@ ColorPickerPanel::MessageReceived(BMessage* message)
 	}
 }
 
+// #pragma mark -
+
 // SetColor
 void
 ColorPickerPanel::SetColor(rgb_color color)
 {
 	fColorPickerView->SetColor(color);
+}
+
+// SetMessage
+void
+ColorPickerPanel::SetMessage(BMessage* message)
+{
+	delete fMessage;
+	fMessage = message;
+}
+
+// SetTarget
+void
+ColorPickerPanel::SetTarget(BHandler* target)
+{
+	fTarget = target;
 }

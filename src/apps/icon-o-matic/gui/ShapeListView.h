@@ -12,10 +12,16 @@
 #include "ListViews.h"
 #include "ShapeContainer.h"
 
+class BMenu;
+class BMenuItem;
 class CommandStack;
 class Shape;
 class ShapeListItem;
 class Selection;
+
+enum {
+	MSG_ADD_SHAPE					= 'adsh',
+};
 
 class ShapeListView : public SimpleListView,
 					  public ShapeContainerListener {
@@ -43,13 +49,16 @@ class ShapeListView : public SimpleListView,
 
 	virtual	BListItem*			CloneItem(int32 atIndex) const;
 
+	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
+	virtual	Selectable*			SelectableFor(BListItem* item) const;
+
 	// ShapeContainerListener interface
 	virtual	void				ShapeAdded(Shape* shape, int32 index);
 	virtual	void				ShapeRemoved(Shape* shape);
 
 	// ShapeListView
+			void				SetMenu(BMenu* menu);
 			void				SetShapeContainer(ShapeContainer* container);
-			void				SetSelection(Selection* selection);
 			void				SetCommandStack(CommandStack* stack);
 
  private:
@@ -57,12 +66,21 @@ class ShapeListView : public SimpleListView,
 			bool				_RemoveShape(Shape* shape);
 
 			ShapeListItem*		_ItemForShape(Shape* shape) const;
+			void				_UpdateMenu();
 
 			BMessage*			fMessage;
 
 			ShapeContainer*		fShapeContainer;
-			Selection*			fSelection;
 			CommandStack*		fCommandStack;
+
+			BMenu*				fMenu;
+			BMenuItem*			fAddEmptyMI;
+			BMenuItem*			fAddWidthPathMI;
+			BMenuItem*			fAddWidthStyleMI;
+			BMenuItem*			fAddWidthPathAndStyleMI;
+			BMenuItem*			fDuplicateMI;
+			BMenuItem*			fResetTransformationMI;
+			BMenuItem*			fRemoveMI;
 };
 
 #endif // SHAPE_LIST_VIEW_H

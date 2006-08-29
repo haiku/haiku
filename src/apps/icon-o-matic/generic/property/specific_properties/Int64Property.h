@@ -18,6 +18,7 @@ class Int64Property : public Property {
 								Int64Property(const Int64Property& other);
 	virtual						~Int64Property();
 
+	// TODO: BArchivable
 	virtual	Property*			Clone() const;
 
 	virtual	type_code			Type() const

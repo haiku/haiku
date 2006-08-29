@@ -10,10 +10,10 @@
 
 #include "Referenceable.h"
 
-#define TRACE 1
-#define ICON 1
+#define TRACE 0
 
 #if TRACE
+#define ICON 1
 #include <debugger.h>
 #include <stdio.h>
 
