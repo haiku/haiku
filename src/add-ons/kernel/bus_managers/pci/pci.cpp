@@ -146,10 +146,10 @@ PCI::AddVirtBus(int domain, uint8 bus, uint8 *virt_bus)
 		panic("PCI::AddVirtBus only 8 controllers supported");
 		
 	if (domain > 7)
-		panic("PCI::AddVirtBus domain %d too large");
+		panic("PCI::AddVirtBus domain %d too large", domain);
 
 	if (bus > 31)
-		panic("PCI::AddVirtBus bus %d too large");
+		panic("PCI::AddVirtBus bus %d too large", bus);
 		
 	*virt_bus = (domain << 5) | bus;
 	return B_OK;
