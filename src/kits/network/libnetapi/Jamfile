@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src kits network libnetapi ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-#UsePrivateHeaders net ;
+UsePrivateHeaders net ;
 #UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
 
 if $(TARGET_PLATFORM) != haiku {

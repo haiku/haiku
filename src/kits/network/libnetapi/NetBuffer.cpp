@@ -1,53 +1,36 @@
-/*=--------------------------------------------------------------------------=*
- * NetBuffer.cpp -- Implementation of the BNetBuffer class.
+/*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Written by S.T. Mansfield (thephantom@mac.com)
- *
- * Remarks:
- *   * This is basically a fancy-schmancy FIFO stack manager.  Thusly, it is
- *     considered an error if data is not popped off a particular instance's
- *     stack in the order it was pushed on.
- *   * We could possibly implement this class as a thin wrapper around the
- *     BMessage class, but I'm not sure what kind of payload the latter class
- *     brings to the party, so we'll do our own stack management.  We also
- *     cannot be sure that BMessage behaves as described above down the road.
- *   * Never use hot wax to soothe enraged lobsters.
- *=--------------------------------------------------------------------------=*
- * Copyright (c) 2002, The OpenBeOS project.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *=--------------------------------------------------------------------------=*
+ * Authors:
+ *		Scott T. Mansfield, thephantom@mac.com
  */
 
+/*!
+	Remarks:
+	 * This is basically a fancy-schmancy FIFO stack manager.  Thusly, it is
+	   considered an error if data is not popped off a particular instance's
+	   stack in the order it was pushed on.
+	 * We could possibly implement this class as a thin wrapper around the
+	   BMessage class, but I'm not sure what kind of payload the latter class
+	   brings to the party, so we'll do our own stack management.  We also
+	   cannot be sure that BMessage behaves as described above down the road.
+	 * Never use hot wax to soothe enraged lobsters.
+*/
 
-#include <string.h>
 #include <ByteOrder.h>
 #include <Message.h>
-
 #include <NetBuffer.h>
+
+#include <string.h>
+
 
 /*
  * Parametric ctor initialization list defaults.
  */
 #define CTOR_INIT_LIST \
     BArchivable( ), \
-    m_init( B_NO_INIT ), \
+    fInit( B_NO_INIT ), \
     fData( NULL ), \
     fDataSize( 0 ), \
     fStackSize( 0 ), \
@@ -75,7 +58,7 @@
 BNetBuffer::BNetBuffer( size_t size )
            : CTOR_INIT_LIST
 {
-    m_init = ( resize( size ) == B_OK ) ? B_OK : B_NO_INIT;
+    fInit = ( resize( size ) == B_OK ) ? B_OK : B_NO_INIT;
 }
 
 
@@ -90,7 +73,7 @@ BNetBuffer::BNetBuffer( size_t size )
 BNetBuffer::BNetBuffer( const BNetBuffer& refparam )
             : CTOR_INIT_LIST
 {
-    m_init = ( clone( refparam ) == B_OK ) ? B_OK : B_NO_INIT;
+    fInit = ( clone( refparam ) == B_OK ) ? B_OK : B_NO_INIT;
 }
 
 
@@ -147,7 +130,7 @@ BNetBuffer::BNetBuffer( BMessage* archive )
     fStackSize = stackSize;
     fCapacity = capacity;
 
-    m_init = B_OK;
+    fInit = B_OK;
 }
 
 
@@ -166,7 +149,7 @@ BNetBuffer::~BNetBuffer( void )
 
     fDataSize = fStackSize = fCapacity = 0;
 
-    m_init = B_NO_INIT;
+    fInit = B_NO_INIT;
 }
 
 
@@ -180,7 +163,7 @@ BNetBuffer::~BNetBuffer( void )
  */
 BNetBuffer& BNetBuffer::operator=( const BNetBuffer& refparam )
 {
-    m_init = clone( refparam );
+    fInit = clone( refparam );
 
     return *this;
 }
@@ -196,7 +179,7 @@ BNetBuffer& BNetBuffer::operator=( const BNetBuffer& refparam )
  */
 status_t BNetBuffer::InitCheck( void )
 {
-    return ( m_init == B_OK ) ? B_OK : B_ERROR;
+    return ( fInit == B_OK ) ? B_OK : B_ERROR;
 }
 
 
@@ -217,7 +200,7 @@ status_t BNetBuffer::InitCheck( void )
  */
 status_t BNetBuffer::Archive( BMessage* into, bool deep ) const
 {
-    if ( m_init != B_OK )
+    if ( fInit != B_OK )
     {
         return B_NO_INIT;
     }
@@ -592,7 +575,7 @@ size_t BNetBuffer::BytesRemaining( void ) const
  */
 status_t BNetBuffer::clone( const BNetBuffer& RefParam )
 {
-    if ( !RefParam.m_init )
+    if ( !RefParam.fInit )
     {
         return B_NO_INIT;
     }
@@ -634,7 +617,7 @@ status_t BNetBuffer::clone( const BNetBuffer& RefParam )
  */
 status_t BNetBuffer::dpop( int32 Type, int32 Length, void* Data )
 {
-    if ( m_init != B_OK )
+    if ( fInit != B_OK )
     {
         return B_NO_INIT;
     }
@@ -750,7 +733,7 @@ status_t BNetBuffer::dpop( int32 Type, int32 Length, void* Data )
  */
 status_t BNetBuffer::dpush( int32 Type, int32 Length, const void* Data )
 {
-    if ( m_init != B_OK )
+    if ( fInit != B_OK )
     {
         return B_NO_INIT;
     }

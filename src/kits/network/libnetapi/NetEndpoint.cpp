@@ -1,223 +1,277 @@
-/******************************************************************************
-/
-/	File:			NetEndpoint.cpp
-/
-/   Description:    The Network API.
-/
-/	Copyright 2002, OpenBeOS Project, All Rights Reserved.
-/
-******************************************************************************/
+/*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <string.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+
+#include <r5_compatibility.h>
 
 #include <Message.h>
 #include <NetEndpoint.h>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <new>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-BNetEndpoint::BNetEndpoint(int protocol)
-	:	m_init(B_NO_INIT), m_socket(-1), m_timeout(B_INFINITE_TIMEOUT), m_last_error(0)
+
+static int
+convert_r5_type(int type)
 {
-	if ((m_socket = socket(AF_INET, protocol, 0)) < 0)
-		m_last_error = errno;
+	// TODO: ideally, we should check if libnet.so has
+	//	been loaded to activate this conversion.
+	// TODO: this is not enough, as the IPPROTO_* constants need to be translated as well
+	switch (type) {
+		case R5_SOCK_DGRAM:
+			return SOCK_DGRAM;
+		case R5_SOCK_STREAM:
+			return SOCK_STREAM;
+		case R5_SOCK_RAW:
+			return SOCK_RAW;
+	}
+
+	return type;
+}
+
+
+//	#pragma mark - BNetEndpoint
+
+
+BNetEndpoint::BNetEndpoint(int type)
+	:
+	fInit(B_NO_INIT),
+	fSocket(-1),
+	fTimeout(B_INFINITE_TIMEOUT),
+	fLastError(0)
+{
+	// Maintain R5 compatibility
+	type = convert_r5_type(type);
+
+	if ((fSocket = socket(AF_INET, type, 0)) < 0)
+		fLastError = errno;
 	else
-		m_init = B_OK;
+		fInit = B_OK;
 }
 
 
 BNetEndpoint::BNetEndpoint(int family, int type, int protocol)
-	:	m_init(B_NO_INIT), m_socket(-1), m_timeout(B_INFINITE_TIMEOUT), m_last_error(0)
+	:
+	fInit(B_NO_INIT),
+	fSocket(-1),
+	fTimeout(B_INFINITE_TIMEOUT),
+	fLastError(0)
 {
-	if ((m_socket = socket(family, type, protocol)) < 0)
-		m_last_error = errno;
+	// Maintain R5 compatibility
+	type = convert_r5_type(type);
+
+	if ((fSocket = socket(family, type, protocol)) < 0)
+		fLastError = errno;
 	else
-		m_init = B_OK;
+		fInit = B_OK;
 }
 
 
-BNetEndpoint::BNetEndpoint(BMessage *archive)
-	:	m_init(B_NO_INIT),
-		m_socket(-1),
-		m_timeout(B_INFINITE_TIMEOUT),
-		m_last_error(0)
+BNetEndpoint::BNetEndpoint(BMessage* archive)
+	:
+	fInit(B_NO_INIT),
+	fSocket(-1),
+	fTimeout(B_INFINITE_TIMEOUT),
+	fLastError(0)
 {
 	// TODO
 	if (! archive)
 		return;
-	
+
 	BMessage msg;
-	
 	if (archive->FindMessage("bnendp_peer", &msg) != B_OK)
 		return;
-	m_peer = BNetAddress(&msg);
+	fPeer = BNetAddress(&msg);
 	
 	if (archive->FindMessage("bnendp_addr", &msg) != B_OK)
 		return;
-	m_addr = BNetAddress(&msg);
-	
-	if (archive->FindMessage("bnendp_conaddr", &msg) != B_OK)
-		return;
-	m_conaddr = BNetAddress(&msg);
+	fAddr = BNetAddress(&msg);
 
-	m_init = B_OK;
+	fInit = B_OK;
 }
 
 
-BNetEndpoint::BNetEndpoint(const BNetEndpoint & ep)
-	:	m_init(ep.m_init), m_timeout(ep.m_timeout),	m_last_error(ep.m_last_error),
-		m_addr(ep.m_addr), m_peer(ep.m_peer)
+BNetEndpoint::BNetEndpoint(const BNetEndpoint& endpoint)
+	:
+	fInit(endpoint.fInit),
+	fTimeout(endpoint.fTimeout),
+	fLastError(endpoint.fLastError),
+	fAddr(endpoint.fAddr),
+	fPeer(endpoint.fPeer)
 {
-	m_socket = -1;
-	if (ep.m_socket >= 0)
-		m_socket = dup(ep.m_socket);
+	fSocket = -1;
+	if (endpoint.fSocket >= 0) {
+		fSocket = dup(endpoint.fSocket);
+		if (fSocket < 0) {
+			fLastError = errno;
+			fInit = B_NO_INIT;
+		}
+	}
 }
 
 
-BNetEndpoint & BNetEndpoint::operator=(const BNetEndpoint & ep)
+BNetEndpoint&
+BNetEndpoint::operator=(const BNetEndpoint& endpoint)
 {
 	Close();
 
-	m_init 			= ep.m_init;
-	m_timeout 		= ep.m_timeout;
-	m_last_error	= ep.m_last_error;
-	m_addr			= ep.m_addr;
-	m_peer			= ep.m_peer;
+	fInit = endpoint.fInit;
+	fTimeout = endpoint.fTimeout;
+	fLastError = endpoint.fLastError;
+	fAddr = endpoint.fAddr;
+	fPeer = endpoint.fPeer;
 
-	m_socket = -1;
-	if (ep.m_socket >= 0)
-		m_socket = dup(ep.m_socket);
-
-	if (m_socket >= 0)
-		m_init = B_OK;
+	fSocket = -1;
+	if (endpoint.fSocket >= 0) {
+		fSocket = dup(endpoint.fSocket);
+		if (fSocket < 0) {
+			fLastError = errno;
+			fInit = B_NO_INIT;
+		}
+	}
 
     return *this;
 }
+
 
 BNetEndpoint::~BNetEndpoint()
 {
 	Close();
 }
 
+
 // #pragma mark -
 
-status_t BNetEndpoint::Archive(BMessage *into, bool deep) const
+
+status_t
+BNetEndpoint::Archive(BMessage* into, bool deep) const
 {
 	// TODO
-	
-	if( into == 0 )
+	if (into == 0)
 		return B_ERROR;
 
-	if ( m_init != B_OK )
+	if (fInit != B_OK)
 		return B_NO_INIT;
-	
+
 	BMessage msg;
-	
-	if (m_peer.Archive(&msg) != B_OK)
+	if (fPeer.Archive(&msg) != B_OK)
 		return B_ERROR;
 	if (into->AddMessage("bnendp_peer", &msg) != B_OK)
 		return B_ERROR;
-	
-	if (m_addr.Archive(&msg) != B_OK)
+
+	if (fAddr.Archive(&msg) != B_OK)
 		return B_ERROR;
 	if (into->AddMessage("bnendp_addr", &msg) != B_OK)
 		return B_ERROR;
-	
-	if (m_conaddr.Archive(&msg) != B_OK)
-		return B_ERROR;
-	if (into->AddMessage("bnendp_conaddr", &msg) != B_OK)
-		return B_ERROR;
-	
+
 	return B_OK;
 }
 
 
-BArchivable *BNetEndpoint::Instantiate(BMessage *archive)
+BArchivable*
+BNetEndpoint::Instantiate(BMessage* archive)
 {
-	if (! archive)
+	if (!archive)
 		return NULL;
-	
-	if (! validate_instantiation(archive, "BNetAddress") )
+
+	if (!validate_instantiation(archive, "BNetAddress"))
 		return NULL;
-	
-	BNetEndpoint *ep = new BNetEndpoint(archive);
-	if (ep && ep->InitCheck() == B_OK)
-		return ep;
-	
-	delete ep;
+
+	BNetEndpoint* endpoint = new BNetEndpoint(archive);
+	if (endpoint && endpoint->InitCheck() == B_OK)
+		return endpoint;
+
+	delete endpoint;
 	return NULL;
 }
+
 
 // #pragma mark -
 
 
-status_t BNetEndpoint::InitCheck()
+status_t
+BNetEndpoint::InitCheck()
 {
-	return m_init;
+	return fInit;
 }
 
 
-int BNetEndpoint::Socket() const
+int
+BNetEndpoint::Socket() const
 {
-	return m_socket;
+	return fSocket;
 }
 
 
-const BNetAddress & BNetEndpoint::LocalAddr()
+const BNetAddress&
+BNetEndpoint::LocalAddr()
 {
-	return m_addr;
+	return fAddr;
 }
 
 
-const BNetAddress & BNetEndpoint::RemoteAddr()
+const BNetAddress&
+BNetEndpoint::RemoteAddr()
 {
-	return m_peer;
+	return fPeer;
 }
 
 
-status_t BNetEndpoint::SetProtocol(int protocol)
+status_t
+BNetEndpoint::SetProtocol(int protocol)
 {
 	Close();
-	if ((m_socket = socket(AF_INET, protocol, 0)) < 0) {
-		m_last_error = errno;
-		return m_last_error;
+	if ((fSocket = socket(AF_INET, protocol, 0)) < 0) {
+		fLastError = errno;
+		return fLastError;
 	}
-	m_init = B_OK;	
-	return m_init;
+	fInit = B_OK;	
+	return fInit;
 }
 
 
-int BNetEndpoint::SetOption(int32 option, int32 level,
-							 	 const void * data, unsigned int length)
+int
+BNetEndpoint::SetOption(int32 option, int32 level,
+	const void* data, unsigned int length)
 {
-	if (m_socket < 0)
+	if (fSocket < 0)
 		return B_ERROR;
 
-	if (setsockopt(m_socket, level, option, data, length) < 0) {
-		m_last_error = errno;
+	if (setsockopt(fSocket, level, option, data, length) < 0) {
+		fLastError = errno;
 		return B_ERROR;
 	}
+
 	return B_OK;
 }
 
 
-int BNetEndpoint::SetNonBlocking(bool enable)
+int
+BNetEndpoint::SetNonBlocking(bool enable)
 {
-	int flags = fcntl(m_socket, F_GETFL);
+	int flags = fcntl(fSocket, F_GETFL);
+	if (flags < 0) {
+		fLastError = errno;
+		return B_ERROR;
+	}
 
 	if (enable)
 		flags |= O_NONBLOCK;
 	else
 		flags &= ~O_NONBLOCK;
 
-	if (fcntl(m_socket, F_SETFL, flags) < 0) {
-		m_last_error = errno;
+	if (fcntl(fSocket, F_SETFL, flags) < 0) {
+		fLastError = errno;
 		return B_ERROR;
 	}
 
@@ -225,201 +279,215 @@ int BNetEndpoint::SetNonBlocking(bool enable)
 }
 
 
-int BNetEndpoint::SetReuseAddr(bool enable)
+int
+BNetEndpoint::SetReuseAddr(bool enable)
 {
 	int onoff = (int) enable;
 	return SetOption(SO_REUSEADDR, SOL_SOCKET, &onoff, sizeof(onoff));
 }
 
 
-void BNetEndpoint::SetTimeout(bigtime_t timeout)
+void
+BNetEndpoint::SetTimeout(bigtime_t timeout)
 {
-	m_timeout = timeout;
+	fTimeout = timeout;
 }
 
 
-int BNetEndpoint::Error() const
+int
+BNetEndpoint::Error() const
 {
-	return m_last_error;
+	return fLastError;
 }
 
 
-char * BNetEndpoint::ErrorStr() const
+char*
+BNetEndpoint::ErrorStr() const
 {
-	return strerror(m_last_error);
+	return strerror(fLastError);
 }
 
 
 // #pragma mark -
 
-void BNetEndpoint::Close()
+
+void
+BNetEndpoint::Close()
 {
-	if (m_socket >= 0)
-		close(m_socket);
-	m_socket = -1;
-	m_init = B_NO_INIT;
+	if (fSocket >= 0)
+		close(fSocket);
+
+	fSocket = -1;
+	fInit = B_NO_INIT;
 }
 
 
-status_t BNetEndpoint::Bind(const BNetAddress & address)
+status_t
+BNetEndpoint::Bind(const BNetAddress& address)
 {
 	struct sockaddr_in addr;
-	status_t status;
-	
-	status = address.GetAddr(addr);
+	status_t status = address.GetAddr(addr);
 	if (status != B_OK)
 		return status;
-		
-	if (bind(m_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-		m_last_error = errno;
-		Close();
-		return B_ERROR;
-	}
-		
-	int sz = sizeof(addr);
 
-	if (getsockname(m_socket, (struct sockaddr *) &addr, &sz) < 0) {
-		m_last_error = errno;
+	if (bind(fSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		fLastError = errno;
 		Close();
 		return B_ERROR;
 	}
 
-#ifdef _NETDB_H_
+	socklen_t addrSize = sizeof(addr);
+	if (getsockname(fSocket, (struct sockaddr *)&addr, &addrSize) < 0) {
+		fLastError = errno;
+		Close();
+		return B_ERROR;
+	}
+
 	if (addr.sin_addr.s_addr == 0) {
 		// Grrr, buggy getsockname!
 		char hostname[MAXHOSTNAMELEN];
-		struct hostent *he;
 		gethostname(hostname, sizeof(hostname));
-		he = gethostbyname(hostname);
-		if (he)
-			memcpy(&addr.sin_addr.s_addr, he->h_addr, sizeof(addr.sin_addr.s_addr));
+		struct hostent *host = gethostbyname(hostname);
+		if (host != NULL)
+			memcpy(&addr.sin_addr.s_addr, host->h_addr, sizeof(addr.sin_addr.s_addr));
 	}
-#endif	
-	m_addr.SetTo(addr);
+
+	fAddr.SetTo(addr);
 	return B_OK;
 }
 
 
-status_t BNetEndpoint::Bind(int port)
+status_t
+BNetEndpoint::Bind(int port)
 {
 	BNetAddress addr(INADDR_ANY, port);
 	return Bind(addr);
 }
 
 
-status_t BNetEndpoint::Connect(const BNetAddress & address)
+status_t
+BNetEndpoint::Connect(const BNetAddress& address)
 {
 	sockaddr_in addr;
-
 	if (address.GetAddr(addr) != B_OK)
 		return B_ERROR;
-		
-	if (connect(m_socket, (sockaddr *) &addr, sizeof(addr)) < 0) {
+
+	if (connect(fSocket, (sockaddr *) &addr, sizeof(addr)) < 0) {
 		Close();
-		m_last_error = errno;
+		fLastError = errno;
 		return B_ERROR;
 	}
 
-	int sz = sizeof(addr);
-	if (getpeername(m_socket, (sockaddr *) &addr, &sz) < 0) {
+	socklen_t addrSize = sizeof(addr);
+	if (getpeername(fSocket, (sockaddr *) &addr, &addrSize) < 0) {
 		Close();
 		return B_ERROR;
 	}
-		
-	m_peer.SetTo(addr);
+
+	fPeer.SetTo(addr);
 	return B_OK;
 }
 
 
-status_t BNetEndpoint::Connect(const char *hostname, int port)
+status_t
+BNetEndpoint::Connect(const char *hostname, int port)
 {
 	BNetAddress addr(hostname, port);
 	return Connect(addr);
 }
 
 
-status_t BNetEndpoint::Listen(int backlog)
+status_t
+BNetEndpoint::Listen(int backlog)
 {
-	if (listen(m_socket, backlog) < 0) {
+	if (listen(fSocket, backlog) < 0) {
 		Close();
-		m_last_error = errno;
+		fLastError = errno;
 		return B_ERROR;
 	}
 	return B_OK;
 }
 
 
-BNetEndpoint * BNetEndpoint::Accept(int32 timeout)
+BNetEndpoint*
+BNetEndpoint::Accept(int32 timeout)
 {
-	if (! IsDataPending(timeout < 0 ? B_INFINITE_TIMEOUT : 1000LL * timeout))
+	if (!IsDataPending(timeout < 0 ? B_INFINITE_TIMEOUT : 1000LL * timeout))
 		return NULL;
-		
+
 	struct sockaddr_in addr;
-	int sz = sizeof(addr);
+	socklen_t addrSize = sizeof(addr);
 
-	int handle = accept(m_socket, (struct sockaddr *) &addr, &sz);
-	if (handle < 0) {
+	int socket = accept(fSocket, (struct sockaddr *) &addr, &addrSize);
+	if (socket < 0) {
 		Close();
-		m_last_error = errno;
+		fLastError = errno;
 		return NULL;
 	}
 
-	BNetEndpoint * ep = new BNetEndpoint(*this);
-	if (! ep) {
-		close(handle);
+	BNetEndpoint* endpoint = new (std::nothrow) BNetEndpoint(*this);
+	if (endpoint == NULL) {
+		close(socket);
+		fLastError = B_NO_MEMORY;
 		return NULL;
 	}
-	
-	ep->m_socket = handle;
-	ep->m_peer.SetTo(addr);
-	if (getsockname(handle, (struct sockaddr *) &addr, &sz) < 0) {
-		ep->Close();
-		delete ep;
+
+	endpoint->fSocket = socket;
+	endpoint->fPeer.SetTo(addr);
+
+	if (getsockname(socket, (struct sockaddr *)&addr, &addrSize) < 0) {
+		endpoint->Close();
+		delete endpoint;
 		return NULL;
 	}
-	
-	ep->m_addr.SetTo(addr);
-	return ep;
+
+	endpoint->fAddr.SetTo(addr);
+	return endpoint;
 }
+
 
 // #pragma mark -
 
-bool BNetEndpoint::IsDataPending(bigtime_t timeout)
+
+bool
+BNetEndpoint::IsDataPending(bigtime_t timeout)
 {	
+	struct timeval tv;
 	fd_set fds;
-	struct timeval tv, *tv_ptr = NULL;
-	
+
 	FD_ZERO(&fds);
-	FD_SET(m_socket, &fds);
-	
+	FD_SET(fSocket, &fds);
+
 	if (timeout > 0) {
 		tv.tv_sec = timeout / 1000000;
 		tv.tv_usec = (timeout % 1000000);
-		tv_ptr = &tv;	
 	}
 
-	if (select(m_socket + 1, &fds, NULL, NULL, &tv) < 0) {
-		m_last_error = errno;
+	if (select(fSocket + 1, &fds, NULL, NULL, timeout > 0 ? &tv : NULL) < 0) {
+		fLastError = errno;
 		return false;
 	}
-	
-	return FD_ISSET(m_socket, &fds);
+
+	return FD_ISSET(fSocket, &fds);
 }
 
 
-int32 BNetEndpoint::Receive(void * buffer, size_t length, int flags)
+int32
+BNetEndpoint::Receive(void* buffer, size_t length, int flags)
 {
-	if (m_timeout >= 0 && IsDataPending(m_timeout) == false)
+	if (fTimeout >= 0 && IsDataPending(fTimeout) == false)
 		return 0;
-		
-	ssize_t sz = recv(m_socket, buffer, length, flags);
-	if (sz < 0)
-		m_last_error = errno;
-	return sz;
+
+	ssize_t bytesReceived = recv(fSocket, buffer, length, flags);
+	if (bytesReceived < 0)
+		fLastError = errno;
+
+	return bytesReceived;
 }
 
 
-int32 BNetEndpoint::Receive(BNetBuffer & buffer, size_t length, int flags)
+int32
+BNetEndpoint::Receive(BNetBuffer& buffer, size_t length, int flags)
 {
 	BNetBuffer chunk(length);
 	length = Receive(chunk.Data(), length, flags);
@@ -428,27 +496,30 @@ int32 BNetEndpoint::Receive(BNetBuffer & buffer, size_t length, int flags)
 }
 
 
-int32 BNetEndpoint::ReceiveFrom(void * buffer, size_t length,
-							    BNetAddress & address, int flags)
+int32
+BNetEndpoint::ReceiveFrom(void* buffer, size_t length,
+	BNetAddress& address, int flags)
 {
-	if (m_timeout >= 0 && IsDataPending(m_timeout) == false)
+	if (fTimeout >= 0 && IsDataPending(fTimeout) == false)
 		return 0;
-		
+
 	struct sockaddr_in addr;
-	int sz = sizeof(addr);
-	
-	length = recvfrom(m_socket, buffer, length, flags,
-						(struct sockaddr *) &addr, &sz);
+	socklen_t addrSize = sizeof(addr);
+
+	length = recvfrom(fSocket, buffer, length, flags,
+		(struct sockaddr *)&addr, &addrSize);
 	if (length < 0)
-		m_last_error = errno;
+		fLastError = errno;
 	else
 		address.SetTo(addr);
+
 	return length;
 }
 
 
-int32 BNetEndpoint::ReceiveFrom(BNetBuffer & buffer, size_t length,
-							    BNetAddress & address, int flags)
+int32
+BNetEndpoint::ReceiveFrom(BNetBuffer& buffer, size_t length,
+	BNetAddress& address, int flags)
 {
 	BNetBuffer chunk(length);
 	length = ReceiveFrom(chunk.Data(), length, address, flags);
@@ -457,74 +528,57 @@ int32 BNetEndpoint::ReceiveFrom(BNetBuffer & buffer, size_t length,
 }
 
 
-int32 BNetEndpoint::Send(const void * buffer, size_t length, int flags)
+int32
+BNetEndpoint::Send(const void* buffer, size_t length, int flags)
 {
-	ssize_t sz;
+	ssize_t bytesSent = send(fSocket, (const char *) buffer, length, flags);
+	if (bytesSent < 0)
+		fLastError = errno;
 
-	sz = send(m_socket, (const char *) buffer, length, flags);
-	if (sz < 0)
-		m_last_error = errno;
-	return sz;
+	return bytesSent;
 }
 
 
-int32 BNetEndpoint::Send(BNetBuffer & buffer, int flags)
+int32
+BNetEndpoint::Send(BNetBuffer& buffer, int flags)
 {
 	return Send(buffer.Data(), buffer.Size(), flags);
 }
 
 
-int32 BNetEndpoint::SendTo(const void * buffer, size_t length,
-						   const BNetAddress & address, int flags)
+int32
+BNetEndpoint::SendTo(const void* buffer, size_t length,
+	const BNetAddress& address, int flags)
 {
-	ssize_t	sz;
 	struct sockaddr_in addr;
-
 	if (address.GetAddr(addr) != B_OK)
 		return B_ERROR;
-		
-	sz = sendto(m_socket, buffer, length, flags,
-				  (struct sockaddr *) &addr, sizeof(addr));
-	if (sz < 0)
-		m_last_error = errno;
-	return sz;
+
+	ssize_t	bytesSent = sendto(fSocket, buffer, length, flags,
+		(struct sockaddr *) &addr, sizeof(addr));
+	if (bytesSent < 0)
+		fLastError = errno;
+
+	return bytesSent;
 }
 
-int32 BNetEndpoint::SendTo(BNetBuffer & buffer,
-						   const BNetAddress & address, int flags)
+
+int32
+BNetEndpoint::SendTo(BNetBuffer& buffer,
+	const BNetAddress& address, int flags)
 {
 	return SendTo(buffer.Data(), buffer.Size(), address, flags);
 }
 
+
 // #pragma mark -
 
+
 // These are virtuals, implemented for binary compatibility purpose
-void BNetEndpoint::_ReservedBNetEndpointFBCCruft1()
-{
-}
-
-
-void BNetEndpoint::_ReservedBNetEndpointFBCCruft2()
-{
-}
-
-
-void BNetEndpoint::_ReservedBNetEndpointFBCCruft3()
-{
-}
-
-
-void BNetEndpoint::_ReservedBNetEndpointFBCCruft4()
-{
-}
-
-
-void BNetEndpoint::_ReservedBNetEndpointFBCCruft5()
-{
-}
-
-
-void BNetEndpoint::_ReservedBNetEndpointFBCCruft6()
-{
-}
+void BNetEndpoint::_ReservedBNetEndpointFBCCruft1() {}
+void BNetEndpoint::_ReservedBNetEndpointFBCCruft2() {}
+void BNetEndpoint::_ReservedBNetEndpointFBCCruft3() {}
+void BNetEndpoint::_ReservedBNetEndpointFBCCruft4() {}
+void BNetEndpoint::_ReservedBNetEndpointFBCCruft5() {}
+void BNetEndpoint::_ReservedBNetEndpointFBCCruft6() {}
 
