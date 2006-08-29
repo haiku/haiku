@@ -1056,9 +1056,9 @@ dosfs_sync(void *_vol)
 static status_t 
 dosfs_fsync(void *_vol, void *_node)
 {
-	nspace *vol = (nspace *)vol;
+	nspace *vol = (nspace *)_vol;
 	vnode *node = (vnode *)_node;
-	status_t err;
+	status_t err = B_OK;
 
 	LOCK_VOL(vol);
 
@@ -1067,7 +1067,8 @@ dosfs_fsync(void *_vol, void *_node)
 		return EINVAL;
         }
 
-	err = file_cache_sync(node->cache);
+	if (node->cache)
+		err = file_cache_sync(node->cache);
 
 	UNLOCK_VOL(vol);
 	return err;
