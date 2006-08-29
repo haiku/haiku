@@ -150,8 +150,16 @@ dump_sem(struct sem_entry *sem)
 		kprintf("name:    '%s'\n", sem->u.used.name);
 		kprintf("owner:   0x%lx\n", sem->u.used.owner);
 		kprintf("count:   0x%lx\n", sem->u.used.count);
-		kprintf("queue:   head %p tail %p\n", sem->u.used.queue.head,
-				sem->u.used.queue.tail);
+		kprintf("queue:  ");
+		if (sem->u.used.queue.head != NULL) {
+			struct thread *thread = sem->u.used.queue.head;
+			while (thread != NULL) {
+				kprintf(" %lx", thread->id);
+				thread = thread->queue_next;
+			}
+			kprintf("\n");
+		} else
+			kprintf(" -\n");
 #ifdef DEBUG_LAST_ACQUIRER
 		kprintf("last acquired by: 0x%lx\n", sem->u.used.last_acquirer);
 #endif
