@@ -290,11 +290,6 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 	if (signal < 0 || signal > MAX_SIGNO)
 		return B_BAD_VALUE;
 
-	if (id == 0) {
-		// send a signal to the current team
-		id = thread_get_current_thread()->team->main_thread->id;
-	}
-
 	state = disable_interrupts();
 
 	if (id > 0) {
@@ -309,22 +304,24 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		// send a signal to the specified process group
 		// (the absolute value of the id)
 
-		GRAB_THREAD_LOCK();
+		struct team *team = thread_get_current_thread()->team;
+		struct process_group *group;
 
-		thread = thread_get_thread_struct_locked(-id);
-		if (thread != NULL) {
-			struct process_group *group;
+		// TODO: handle -1 correctly
+		if (id == 0 || id == -1) {
+			// send a signal to the current team
+			id = thread_get_current_thread()->team->main_thread->id;
+		} else
+			id = -id;
+
+		GRAB_TEAM_LOCK();
+
+		group = team_get_process_group_locked(team, id);
+		if (group != NULL) {
 			struct team *team, *next;
 
 			// we need a safe way to get from the thread to the process group
 			id = thread->team->id;
-
-			RELEASE_THREAD_LOCK();
-			GRAB_TEAM_LOCK();
-
-			// get a pointer to the process group
-			team = team_get_team_struct_locked(id);
-			group = team->group;
 
 			for (team = group->teams; team != NULL; team = next) {
 				next = team->group_next;
@@ -342,9 +339,9 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 				RELEASE_THREAD_LOCK();
 			}
 			
-			RELEASE_TEAM_LOCK();
-			GRAB_THREAD_LOCK();
 		}
+		RELEASE_TEAM_LOCK();
+		GRAB_THREAD_LOCK();
 	}		
 
 	// ToDo: maybe the scheduler should only be invoked if there is reason to do it?
