@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests kits media playwav ;
 
 UsePrivateHeaders media ;
 
-SimpleTest playwav
+SimpleTest <test>playwav
 	: playwav.cpp
 	: media be root
 ;
