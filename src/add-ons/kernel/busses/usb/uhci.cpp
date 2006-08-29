@@ -340,11 +340,11 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	fRegisterBase = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_memory_base, 4);
 	fRegisterBase &= PCI_address_io_mask;
-	TRACE_ERROR(("usb_uhci: iospace offset: 0x%08x\n", fRegisterBase));
+	TRACE_ERROR(("usb_uhci: iospace offset: 0x%08lx\n", fRegisterBase));
 
 	if (fRegisterBase == 0) {
 		fRegisterBase = fPCIInfo->u.h0.base_registers[0];
-		TRACE_ERROR(("usb_uhci: register base: 0x%08x\n", fRegisterBase));
+		TRACE_ERROR(("usb_uhci: register base: 0x%08lx\n", fRegisterBase));
 	}
 
 	// enable pci address access

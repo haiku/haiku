@@ -98,21 +98,28 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 	{
 		4,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
-		0x0409							// Supported language IDs (English US)
+		{
+			0x0409				// Supported language IDs (English US)
+		}
 	},
 
 	{
 		12,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
-		'H', 'A', 'I', 'K', 'U', ' ',	// Characters
-		'I', 'n', 'c', '.'
+		{
+			'H', 'A', 'I', 'K', 'U', ' ',	// Characters
+			'I', 'n', 'c', '.'
+		}
+
 	},
 
 	{
 		26,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
-		'U', 'H', 'C', 'I', ' ', 'R',	// Characters
-		'o', 'o', 't', 'H', 'u', 'b'
+		{
+			'U', 'H', 'C', 'I', ' ', 'R',	// Characters
+			'o', 'o', 't', 'H', 'u', 'b'
+		}
 	}
 };
 
