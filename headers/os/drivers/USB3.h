@@ -13,7 +13,6 @@
 #include <iovec.h>
 
 #include <USB_spec.h>
-#include <USB_rle.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +72,12 @@ struct usb_configuration_info {
 	size_t						interface_count;/* interfaces in this config */
 	usb_interface_list			*interface;
 };
+
+typedef struct {
+	int16						req_len;
+	int16						act_len;
+	status_t					status;
+} usb_iso_packet_descriptor;
 
 typedef void (*usb_callback_func)(void *cookie, uint32 status, void *data,
 	uint32 actualLength);
@@ -181,8 +186,10 @@ struct usb_module_info {
 
 	status_t						(*queue_isochronous)(usb_pipe pipe,
 										void *data, size_t dataLength,
-										rlea *rleArray,
-										uint16 bufferDurationMS,
+										usb_iso_packet_descriptor *packetDesc,
+										uint32 packetCount,
+										uint32 *startingFrameNumber,
+										uint32 flags,
 										usb_callback_func callback,
 										void *callbackCookie);
 
