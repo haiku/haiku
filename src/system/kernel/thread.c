@@ -1514,6 +1514,9 @@ exit_thread(status_t returnValue)
 status_t
 kill_thread(thread_id id)
 {
+	if (id <= 0)
+		return B_BAD_VALUE;
+
 	return send_signal(id, SIGKILLTHR);
 }
 
@@ -1917,6 +1920,9 @@ wait_for_thread(thread_id thread, status_t *_returnCode)
 status_t
 suspend_thread(thread_id id)
 {
+	if (id <= 0)
+		return B_BAD_VALUE;
+
 	return send_signal(id, SIGSTOP);
 }
 
@@ -1924,6 +1930,9 @@ suspend_thread(thread_id id)
 status_t
 resume_thread(thread_id id)
 {
+	if (id <= 0)
+		return B_BAD_VALUE;
+
 	return send_signal(id, SIGCONT);
 }
 
