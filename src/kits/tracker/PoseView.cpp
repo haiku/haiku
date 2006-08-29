@@ -905,14 +905,22 @@ BPoseView::SetIconPoseHeight()
 {
 	switch (ViewMode()) {
 		case kIconMode:
-			fIconPoseHeight = ceilf(B_LARGE_ICON + fFontHeight + 1);
+			fViewState->SetIconSize(B_LARGE_ICON);
+			fIconPoseHeight = ceilf(IconSizeInt() + fFontHeight + 1);
 			break;
-
+		
 		case kMiniIconMode:
-			fIconPoseHeight = ceilf(fFontHeight < B_MINI_ICON ? B_MINI_ICON : fFontHeight + 1);
+			fViewState->SetIconSize(B_MINI_ICON);
+			fIconPoseHeight = ceilf(fFontHeight < IconSizeInt() ? IconSizeInt() : fFontHeight + 1);
 			break;
-
+		
+		case kScaleIconMode:
+			// IconSize should allready be set in MessageReceived()
+			fIconPoseHeight = ceilf(IconSizeInt() + fFontHeight + 1);
+			break;
+		
 		default:
+			fViewState->SetIconSize(B_MINI_ICON);
 			fIconPoseHeight = fListElemHeight;
 			break;
 	}
@@ -932,10 +940,15 @@ BPoseView::GetLayoutInfo(uint32 mode, BPoint *grid, BPoint *offset) const
 			grid->Set(60, 60);
 			offset->Set(20, 20);
 			break;
-
+		
+		case kScaleIconMode:
+			grid->Set(IconSizeInt() + 28, IconSizeInt() + 28);
+			offset->Set(20, 20);
+			break;
+		
 		default:
-			offset->Set(5, 5);
 			grid->Set(0, 0);
+			offset->Set(5, 5);
 			break;
 	}
 }
@@ -1669,6 +1682,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 			case kIconMode:
 			case kMiniIconMode:
+			case kScaleIconMode:
 				if (poseInfo->fInitedDirectory == -1LL || fAlwaysAutoPlace) {
 					if (pose->HasLocation())
 						RemoveFromVSList(pose);
@@ -1909,8 +1923,8 @@ BPoseView::AddCountView()
 		Window()->AddChild(fCountView);
 
 	if (fHScrollBar) {
-		fHScrollBar->MoveBy(kCountViewWidth+1, 0);
-		fHScrollBar->ResizeBy(-kCountViewWidth-1, 0);
+		fHScrollBar->MoveBy(kCountViewWidth + 1, 0);
+		fHScrollBar->ResizeBy(-kCountViewWidth - 1, 0);
 	}
 }
 
@@ -1974,6 +1988,17 @@ BPoseView::MessageReceived(BMessage *message)
 				pendingNodeMonitorCache.Add(message);
 			break;
 
+		case kScaleIconMode: {
+			int32 size;
+			if (message->FindInt32("size", &size) == B_OK) {
+				if (size != (int32)IconSizeInt()) {
+					fViewState->SetIconSize(size);
+					Refresh();	// we need to refresh since the icons need
+								// to be rescaled
+				} else
+					break;		// no change
+			}
+		} // fall thru
 		case kListMode:
 		case kIconMode:
 		case kMiniIconMode:
@@ -2636,7 +2661,7 @@ BPoseView::ReadExtendedPoseInfo(Model *model)
 void
 BPoseView::SetViewMode(uint32 newMode)
 {
-	if (newMode == ViewMode())
+	if (newMode == ViewMode() && newMode != kScaleIconMode)
 		return;
 
 	ASSERT(!IsFilePanel());
@@ -2729,7 +2754,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	}
 
 	// sort poselist if we are switching to list mode
-	if (ViewMode() == kListMode) 
+	if (newMode == kListMode) 
 		SortPoses();
 	else
 		RecalcExtent();
@@ -3139,6 +3164,9 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 void
 BPoseView::CheckAutoPlacedPoses()
 {
+	if (ViewMode() == kListMode)
+		return;
+
 	BRect viewBounds(Bounds());
 
 	int32 count = fPoseList->CountItems();
@@ -3843,7 +3871,7 @@ BPoseView::HandleMessageDropped(BMessage *message)
 		return true;
  	}
 
-	if (fDropTarget)
+	if (fDropTarget && !DragSelectionContains(fDropTarget, message))
 		HiliteDropTarget(false);
 
 	fDropTarget = NULL;
@@ -4847,7 +4875,8 @@ BPoseView::FSNotification(const BMessage *message)
 
 				if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 					BVolume volume(device);
-					CreateVolumePose(&volume, false);
+					if (volume.InitCheck() == B_OK)
+						CreateVolumePose(&volume, false);
 				} else if (ContainerWindow()->IsTrash()) {
 					// add trash items from newly mounted volume
 
@@ -6864,8 +6893,12 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 			newList->AddItem((void *)index); // this sucks, need to clean up
 										// using a vector class instead of BList
 
-			if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds))
-				pose->Draw(poseRect, this, false);
+			if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds)) {
+				if (pose->IsSelected() || EraseWidgetTextBackground())
+					pose->Draw(poseRect, this, false);
+				else
+					Invalidate(poseRect);
+			}
 				
 			// First Pose selected gets to be the pivot.
 			if ((fSelectionPivotPose == NULL) && (selected == false))
@@ -6889,8 +6922,12 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 			loc.Set(0, oldIndex * fListElemHeight);
 			BRect poseRect(pose->CalcRect(loc, this));
 
-			if (poseRect.Intersects(bounds))
-				pose->Draw(poseRect, this, false);
+			if (poseRect.Intersects(bounds)) {
+				if (pose->IsSelected() || EraseWidgetTextBackground())
+					pose->Draw(poseRect, this, false);
+				else
+					Invalidate(poseRect);
+			}
 		}
 	}
 
@@ -6924,11 +6961,12 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList **oldList)
 				pose->Select(!fSelectionList->HasItem(pose));
 				newList->AddItem((void *)index);
 
-				if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds))
+				if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds)) {
 					if (pose->IsSelected() || EraseWidgetTextBackground())
 						pose->Draw(poseRect, this, false);
 					else
 						Invalidate(poseRect);
+				}
 
 				// First Pose selected gets to be the pivot.
 				if ((fSelectionPivotPose == NULL) && (selected == false))
@@ -7370,7 +7408,11 @@ BPoseView::UnmountSelectedVolumes()
 	
 	int32 select_count = fSelectionList->CountItems();
 	for (int32 index = 0; index < select_count; index++) {
-		Model *model = fSelectionList->ItemAt(index)->TargetModel();
+		BPose *pose = fSelectionList->ItemAt(index);
+		if (!pose)
+			continue;
+
+		Model *model = pose->TargetModel();
 		if (model->IsVolume()) {
 			BVolume volume(model->NodeRef()->device);
 			if (volume != boot) {
@@ -7705,7 +7747,11 @@ BPoseView::ClearSelection()
 				BPose *pose = fPoseList->ItemAt(index);
 				if (pose->IsSelected()) {
 					pose->Select(false);
-					pose->Draw(pose->CalcRect(loc, this, false), this, false);
+					BRect poseRect(pose->CalcRect(loc, this, false));
+					if (EraseWidgetTextBackground())
+						pose->Draw(poseRect, this, false);
+					else
+						Invalidate(poseRect);
 				}
 
 				loc.y += fListElemHeight;
@@ -8678,7 +8724,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 		// no change
 		return false;
 
-	if (fDropTarget)
+	if (fDropTarget && !DragSelectionContains(fDropTarget, dragMessage))
 		HiliteDropTarget(false);
 
 	fDropTarget = targetPose;

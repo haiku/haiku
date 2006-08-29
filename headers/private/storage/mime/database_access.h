@@ -27,8 +27,11 @@ status_t get_short_description(const char *type, char *description);
 status_t get_long_description(const char *type, char *description);
 status_t get_file_extensions(const char *type, BMessage *extensions);
 status_t get_icon(const char *type, BBitmap *icon, icon_size size);
-status_t get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
-			icon_size which);
+status_t get_icon(const char *type, uint8** data, size_t* size);
+status_t get_icon_for_type(const char *type, const char *fileType,
+			BBitmap *icon, icon_size which);
+status_t get_icon_for_type(const char *type, const char *fileType,
+			uint8** data, size_t* size);
 status_t get_preferred_app(const char *type, char *signature, app_verb verb);
 status_t get_sniffer_rule(const char *type, BString *result);
 status_t get_supported_types(const char *type, BMessage *types);

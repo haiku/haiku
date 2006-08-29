@@ -127,9 +127,6 @@ BImageResources::LoadResource(type_code type, const char *name, size_t *out_size
 status_t
 BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 {
-	if (size != B_LARGE_ICON && size != B_MINI_ICON )
-		return B_ERROR;
-	
 	size_t length = 0;
 	const void *data;
 
@@ -140,6 +137,9 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 		return B_OK;
 
 	// fall back to R5 icon
+	if (size != B_LARGE_ICON && size != B_MINI_ICON)
+		return B_ERROR;
+	
 	length = 0;
 	data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN', id, &length);
 

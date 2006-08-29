@@ -185,6 +185,19 @@ get_icon(const char *type, BBitmap *icon, icon_size which)
 	return get_icon_for_type(type, NULL, icon, which);
 }
 
+// get_icon
+//! Fetches the vector icon associated with the given MIME type
+/*  \param type The mime type
+	\param data Pointer in which the allocated icon data is returned. You need to
+				free the buffer once you're done with it.
+	\param size Pointer in which the size of the icon data is returned.
+*/
+status_t
+get_icon(const char *type, uint8** data, size_t* size)
+{
+	return get_icon_for_type(type, NULL, data, size);
+}
+
 // get_icon_for_type
 /*! \brief Fetches the large or mini icon used by an application of this type for files of the
 	given type.
@@ -197,8 +210,8 @@ get_icon(const char *type, BBitmap *icon, icon_size which)
 	be the proper size: \c 32x32 for the large icon, \c 16x16 for the mini icon.	
 	
 	\param type The MIME type
-	\param type Pointer to a pre-allocated string containing the MIME type whose
-	            custom icon you wish to fetch. If NULL, works just like get_icon().
+	\param fileType Pointer to a pre-allocated string containing the MIME type whose
+					custom icon you wish to fetch. If NULL, works just like get_icon().
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and colorspace into
 				which the icon is copied.
 	\param icon_size Value that specifies which icon to return. Currently \c B_LARGE_ICON
@@ -321,6 +334,82 @@ get_icon_for_type(const char* type, const char* fileType, BBitmap* icon,
 //	}
 //
 //	return err;
+}
+
+// get_icon_for_type
+/*! \brief Fetches the vector icon used by an application of this type for files of the
+	given type.
+	
+	The type of the \c BMimeType object is not required to actually be a subtype of
+	\c "application/"; that is the intended use however, and calling \c get_icon_for_type()
+	on a non-application type will likely return \c B_ENTRY_NOT_FOUND.
+	
+	The icon data is allocated and returned in \a data.
+	
+	\param type The MIME type
+	\param fileType Pointer to a pre-allocated string containing the MIME type whose
+					custom icon you wish to fetch. If NULL, works just like get_icon().
+	\param data Pointer in which the icon data is returned on success.
+	\param size Pointer in which the size of the icon data is returned.
+	\return
+	- \c B_OK: Success
+	- \c B_ENTRY_NOT_FOUND: No vector icon exists for the given type
+	- "error code": Failure	
+
+*/
+status_t
+get_icon_for_type(const char* type, const char* fileType, uint8** data,
+				  size_t* size)
+{
+	if (!type || !data || !size)
+		return B_BAD_VALUE;
+
+	// open the node for the given type
+	BNode node;
+	ssize_t err = open_type(type, &node);
+	if (err < B_OK)
+		return (status_t)err;
+
+	// construct our attribute name
+	std::string iconAttrName;
+
+	if (fileType)
+		iconAttrName = kIconAttrPrefix + BPrivate::Storage::to_lower(fileType);
+	else
+		iconAttrName = kIconAttr;
+
+	// get info about attribute for that name
+	attr_info info;
+	if (!err) 
+		err = node.GetAttrInfo(iconAttrName.c_str(), &info);
+
+	// validate attribute type
+	if (!err)
+		err = (info.type == B_RAW_TYPE) ? B_OK : B_BAD_VALUE;
+
+	// allocate a buffer and read the attribute data into it
+	if (!err) {
+		uint8* buffer = new(std::nothrow) uint8[info.size];
+		if (!buffer)
+			err = B_NO_MEMORY;
+		if (!err) {
+			err = node.ReadAttr(iconAttrName.c_str(), B_RAW_TYPE,
+								0, buffer, info.size);
+		}
+
+		if (err >= 0)
+			err = (err == info.size) ? (ssize_t)B_OK : (ssize_t)B_FILE_ERROR;
+
+		if (!err) {
+			// success, set data pointer and size
+			*data = buffer;
+			*size = info.size;
+		} else {
+			delete[] buffer;
+		}
+	}
+
+	return err;
 }
 
 // get_preferred_app

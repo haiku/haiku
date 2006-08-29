@@ -1879,9 +1879,25 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 {
 	BMenuItem *item;
 
-	item = new BMenuItem("Icon View", new BMessage(kIconMode), '1');
+	BMenu* iconSizeMenu = new BMenu("Icon View");
+
+	item = new BMenuItem("32 x 32", new BMessage(kIconMode), '1');
 	item->SetTarget(PoseView());
-	menu->AddItem(item);
+	iconSizeMenu->AddItem(item);
+
+	BMessage* message = new BMessage(kScaleIconMode);
+	message->AddInt32("size", 48);
+	item = new BMenuItem("48 x 48", message);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("size", 64);
+	item = new BMenuItem("64 x 64", message);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	menu->AddItem(iconSizeMenu);
 
 	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '2');
 	item->SetTarget(PoseView());
@@ -2849,7 +2865,7 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 	}
 
 	if (context == kMenuBarContext || context == kWindowPopUpContext) {
-		MarkNamedMenuItem(menu, kIconMode, PoseView()->ViewMode() == kIconMode);
+//		MarkNamedMenuItem(menu, kIconMode, PoseView()->ViewMode() == kIconMode);
 		MarkNamedMenuItem(menu, kListMode, PoseView()->ViewMode() == kListMode);
 		MarkNamedMenuItem(menu, kMiniIconMode,
 			PoseView()->ViewMode() == kMiniIconMode);

@@ -43,9 +43,11 @@ static const int32 kAppFlagsResourceID			= 1;
 static const int32 kSupportedTypesResourceID	= 1;
 static const int32 kMiniIconResourceID			= 101;
 static const int32 kLargeIconResourceID			= 101;
+static const int32 kIconResourceID				= 101;
 static const int32 kVersionInfoResourceID		= 1;
 static const int32 kMiniIconForTypeResourceID	= 0;
 static const int32 kLargeIconForTypeResourceID	= 0;
+static const int32 kIconForTypeResourceID		= 0;
 
 // type codes
 enum {
@@ -615,6 +617,22 @@ BAppFileInfo::GetIcon(BBitmap *icon, icon_size which) const
 	return GetIconForType(NULL, icon, which);
 }
 
+// GetIcon
+/*!	\brief Gets the file's icon.
+	\param data The pointer in which the flat icon data will be returned.
+	\param size The pointer in which the size of the data found will be returned.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: \c NULL \a data or \c NULL size.
+	- other error codes
+*/
+status_t
+BAppFileInfo::GetIcon(uint8** data, size_t* size) const
+{
+	return GetIconForType(NULL, data, size);
+}
+
 // SetIcon
 /*!	\brief Sets the file's icon.
 
@@ -635,6 +653,26 @@ status_t
 BAppFileInfo::SetIcon(const BBitmap *icon, icon_size which)
 {
 	return SetIconForType(NULL, icon, which);
+}
+
+// SetIcon
+/*!	\brief Sets the file's icon.
+
+	If \a icon is \c NULL the file's icon is unset.
+
+	\param data A pointer to the data buffer containing the vector icon
+		   to be set. May be \c NULL.
+	\param size Specifies the size of buffer pointed to by \a data.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: \c NULL data.
+	- other error codes
+*/
+status_t
+BAppFileInfo::SetIcon(const uint8* data, size_t size)
+{
+	return SetIconForType(NULL, data, size);
 }
 
 // GetVersionInfo
@@ -813,8 +851,10 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 	status_t error = _ReadData(attribute, -1, B_RAW_TYPE, NULL, 0,
 							   bytesRead, &allocatedBuffer);
 	if (error == B_OK) {
-		return BIconUtils::GetVectorIcon((uint8*)allocatedBuffer,
-										 bytesRead, icon);
+		error = BIconUtils::GetVectorIcon((uint8*)allocatedBuffer,
+										  bytesRead, icon);
+		free(allocatedBuffer);
+		return error;
 	}
 
 	// no vector icon if we got this far
@@ -888,6 +928,56 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 	return error;
 }
 
+// GetIconForType
+/*!	\brief Gets the icon the application provides for a given MIME type.
+
+	If \a type is \c NULL, the application's icon is retrieved.
+
+	\param type The MIME type in question. May be \c NULL.
+	\param data A pointer in which the icon data will be returned. When you
+	are done with the data, you should use free() to deallocate it.
+	\param size A pointer in which the size of the retrieved data is returned.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: \c NULL \a data and/or \a size. Or the supplied
+	\a type is not a valid MIME type.
+	- other error codes
+*/
+status_t
+BAppFileInfo::GetIconForType(const char *type, uint8** data,
+							 size_t* size) const
+{
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	if (!data || !size)
+		return B_BAD_VALUE;
+
+	// get vector icon
+	BString attributeName(kIconAttribute);
+
+	// check type param
+	if (type) {
+		if (BMimeType::IsValid(type))
+			attributeName += type;
+		else
+			return B_BAD_VALUE;
+	} else {
+		attributeName += kIconType;
+	}
+
+	void* allocatedBuffer = NULL;
+	status_t ret = _ReadData(attributeName.String(), -1,
+							 B_RAW_TYPE, NULL, 0, *size, &allocatedBuffer);
+
+	if (ret < B_OK)
+		return ret;
+
+	*data = (uint8*)allocatedBuffer;
+	return B_OK;
+}
+
 // SetIconForType
 /*!	\brief Sets the icon the application provides for a given MIME type.
 
@@ -906,8 +996,9 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_NO_INIT: The object is not properly initialized.
-	- \c B_BAD_VALUE: Unknown icon size \a which or bitmap dimensions (\a icon)
-		 and icon size (\a which) do not match.
+	- \c B_BAD_VALUE: Either the icon size \a which is unkown, bitmap dimensions (\a icon)
+		 and icon size (\a which) do not match, or the provided \a type is
+		 not a valid MIME type. 
 	- other error codes
 */
 status_t
@@ -987,6 +1078,67 @@ BAppFileInfo::SetIconForType(const char *type, const BBitmap *icon,
 			error = mimeType.Install();
 		if (error == B_OK)
 			error = mimeType.SetIconForType(type, icon, which);
+	}
+	return error;
+}
+
+// SetIconForType
+/*!	\brief Sets the icon the application provides for a given MIME type.
+
+	If \a type is \c NULL, the application's icon is set.
+	If \a data is \c NULL the icon is unset.
+
+	If the file has a signature, then the icon is also set on the MIME type.
+	If the type for the signature has not been installed yet, it is installed
+	before.
+
+	\param type The MIME type in question. May be \c NULL.
+	\param data A pointer to the data containing the icon to be set.
+		   May be \c NULL.
+	\param size Specifies the size of buffer provided in \a data.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: The provided \a type is not a valid MIME type.
+	- other error codes
+*/
+status_t
+BAppFileInfo::SetIconForType(const char* type, const uint8* data,
+							 size_t size)
+{
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	// set some icon related variables
+	BString attributeString = kIconAttribute;
+	int32 resourceID = type ? kIconForTypeResourceID : kIconResourceID;
+	uint32 attrType = B_RAW_TYPE;
+
+	// check type param
+	if (type) {
+		if (BMimeType::IsValid(type))
+			attributeString += type;
+		else
+			return B_BAD_VALUE;
+	} else
+		attributeString += kIconType;
+
+	const char *attribute = attributeString.String();
+
+	status_t error;
+	// write/remove the attribute
+	if (data)
+		error = _WriteData(attribute, resourceID, attrType, data, size, true);
+	else	// no icon given => remove
+		error = _RemoveData(attribute, attrType);
+
+	// set the attribute on the MIME type, if the file has a signature
+	BMimeType mimeType;
+	if (error == B_OK && GetMetaMime(&mimeType) == B_OK) {
+		if (!mimeType.IsInstalled())
+			error = mimeType.Install();
+		if (error == B_OK)
+			error = mimeType.SetIconForType(type, data, size);
 	}
 	return error;
 }

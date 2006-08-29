@@ -110,6 +110,7 @@ class BMimeType	{
 		status_t Delete();
 		bool IsInstalled() const;
 		status_t GetIcon(BBitmap *icon, icon_size size) const;
+		status_t GetIcon(uint8** data, size_t* size) const;
 		status_t GetPreferredApp(char *signature, app_verb verb = B_OPEN) const;
 		status_t GetAttrInfo(BMessage *info) const;
 		status_t GetFileExtensions(BMessage *extensions) const;
@@ -118,6 +119,7 @@ class BMimeType	{
 		status_t GetSupportingApps(BMessage *signatures) const;
 
 		status_t SetIcon(const BBitmap *icon, icon_size size);
+		status_t SetIcon(const uint8* data, size_t size);
 		status_t SetPreferredApp(const char *signature, app_verb verb = B_OPEN);
 		status_t SetAttrInfo(const BMessage *info);
 		status_t SetFileExtensions(const BMessage *extensions);
@@ -139,6 +141,8 @@ class BMimeType	{
 							icon_size which) const;
 		status_t SetIconForType(const char *type, const BBitmap *icon,
 							icon_size which);
+		status_t SetIconForType(const char* type, const uint8* data,
+							size_t size);
 
 		/* sniffer rule manipulation */
 		status_t GetSnifferRule(BString *result) const;

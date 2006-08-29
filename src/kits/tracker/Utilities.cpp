@@ -1334,50 +1334,50 @@ GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
 	// app icons -- the call is expensive because by default
 	// the resource fork is scanned to read the icons
 
-#ifdef B_APP_FILE_INFO_IS_FAST
+//#ifdef B_APP_FILE_INFO_IS_FAST
 	BAppFileInfo appFileInfo(file);
 	return appFileInfo.GetIcon(result, size);
-#else
-
-	const char *attrName = kAttrIcon;
-	uint32 type = B_RAW_TYPE;
-
-	// try vector icon
-	attr_info ainfo;
-	status_t ret = file->GetAttrInfo(attrName, &ainfo);
-
-	if (ret == B_OK) {
-		uint8 buffer[ainfo.size];
-		ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer,
-											ainfo.size);
-		if (readResult == ainfo.size) {
-			if (BIconUtils::GetVectorIcon(buffer, ainfo.size, result) == B_OK)
-				return B_OK;
-		}
-	}
-
-	// try again with R5 icons	
-	attrName = size == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
-	type = size == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
-
-	ret = file->GetAttrInfo(attrName, &ainfo);
-	if (ret < B_OK)
-		return ret;
-
-	uint8 buffer[ainfo.size];
-
-	ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer, ainfo.size);
-	if (readResult <= 0)
-		return (status_t)readResult;
-
-	if (result->ColorSpace() != B_CMAP8) {
-		ret = BIconUtils::ConvertFromCMAP8(buffer, size, size, size, result);
-	} else {
-		result->SetBits(buffer, result->BitsLength(), 0, B_CMAP8);
-	}
-
-	return ret;
-#endif	// B_APP_FILE_INFO_IS_FAST
+//#else
+//
+//	const char *attrName = kAttrIcon;
+//	uint32 type = B_RAW_TYPE;
+//
+//	// try vector icon
+//	attr_info ainfo;
+//	status_t ret = file->GetAttrInfo(attrName, &ainfo);
+//
+//	if (ret == B_OK) {
+//		uint8 buffer[ainfo.size];
+//		ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer,
+//											ainfo.size);
+//		if (readResult == ainfo.size) {
+//			if (BIconUtils::GetVectorIcon(buffer, ainfo.size, result) == B_OK)
+//				return B_OK;
+//		}
+//	}
+//
+//	// try again with R5 icons	
+//	attrName = size == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
+//	type = size == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
+//
+//	ret = file->GetAttrInfo(attrName, &ainfo);
+//	if (ret < B_OK)
+//		return ret;
+//
+//	uint8 buffer[ainfo.size];
+//
+//	ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer, ainfo.size);
+//	if (readResult <= 0)
+//		return (status_t)readResult;
+//
+//	if (result->ColorSpace() != B_CMAP8) {
+//		ret = BIconUtils::ConvertFromCMAP8(buffer, size, size, size, result);
+//	} else {
+//		result->SetBits(buffer, result->BitsLength(), 0, B_CMAP8);
+//	}
+//
+//	return ret;
+//#endif	// B_APP_FILE_INFO_IS_FAST
 }
 
 

@@ -77,13 +77,20 @@ class BAppFileInfo: public BNodeInfo {
 		virtual status_t GetIcon(BBitmap *icon, icon_size which) const;
 		virtual status_t SetIcon(const BBitmap *icon, icon_size which);
 
+				status_t GetIcon(uint8** data, size_t* size) const;
+				status_t SetIcon(const uint8* data, size_t size);
+
 		status_t GetVersionInfo(version_info *info, version_kind kind) const;
 		status_t SetVersionInfo(const version_info *info, version_kind kind);
 
 		status_t GetIconForType(const char *type, BBitmap *icon,
 					icon_size which) const;
+		status_t GetIconForType(const char *type, uint8** data,
+					size_t* size) const;
 		status_t SetIconForType(const char *type, const BBitmap *icon,
 					icon_size which);
+		status_t SetIconForType(const char *type, const uint8* data,
+					size_t size);
 
 		void SetInfoLocation(info_location location);
 		bool IsUsingAttributes() const;

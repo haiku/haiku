@@ -352,6 +352,12 @@ Database::SetIcon(const char *type, const void *data, size_t dataSize,
 	return SetIconForType(type, NULL, data, dataSize, which);
 }
 
+status_t
+Database::SetIcon(const char *type, const void *data, size_t dataSize)
+{
+	return SetIconForType(type, NULL, data, dataSize);
+}
+
 // SetIconForType
 /*! \brief Sets the large or mini icon used by an application of this type for
 	files of the given type.
@@ -430,6 +436,67 @@ Database::SetIconForType(const char *type, const char *fileType,
 				(which == B_LARGE_ICON), B_META_MIME_MODIFIED);
 		} else {
 			_SendMonitorUpdate(B_ICON_CHANGED, type, (which == B_LARGE_ICON),
+				B_META_MIME_MODIFIED);
+		}
+	}
+	return err;
+}
+
+// SetIconForType
+/*! \brief Sets the vector icon used by an application of this type for
+	files of the given type.
+
+	The type of the \c BMimeType object is not required to actually be a subtype of
+	\c "application/"; that is the intended use however, and application-specific
+	icons are not expected to be present for non-application types.
+		
+	\param type The MIME type
+	\param fileType The MIME type whose custom icon you wish to set.
+	\param data Pointer to an array of vector data
+	\param dataSize The length of the array pointed to by \c data
+	\return
+	- \c B_OK: Success
+	- "error code": Failure	
+
+*/
+status_t
+Database::SetIconForType(const char *type, const char *fileType,
+	const void *data, size_t dataSize)
+{
+	DBG(OUT("Database::SetIconForType()\n"));
+
+	if (type == NULL || data == NULL)
+		return B_BAD_VALUE;
+
+	int32 attrType = B_RAW_TYPE;
+	
+	// Construct our attribute name
+	std::string attr;
+	if (fileType) {
+		attr = kIconAttrPrefix + BPrivate::Storage::to_lower(fileType);
+	} else
+		attr = kIconAttr;
+
+	// Write the icon data
+	BNode node;
+	bool didCreate = false;
+
+	status_t err = open_or_create_type(type, &node, &didCreate);
+	if (!err && didCreate)
+		_SendInstallNotification(type);
+
+	if (!err)
+		err = node.WriteAttr(attr.c_str(), attrType, 0, data, dataSize);
+	if (err >= 0)
+		err = err == (ssize_t)dataSize ? (status_t)B_OK : (status_t)B_FILE_ERROR;
+	if (!err) {
+		// TODO: extra notification for vector icons (currently
+		// passing "true" for B_LARGE_ICON)?
+		if (fileType) {
+			_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
+				true, B_META_MIME_MODIFIED);
+		} else {
+			_SendMonitorUpdate(B_ICON_CHANGED, type, true,
 				B_META_MIME_MODIFIED);
 		}
 	}
@@ -993,6 +1060,28 @@ Database::DeleteIcon(const char *type, icon_size which)
 }
 	
 
+/*!	\brief Deletes the vector icon for the given type
+
+	A \c B_ICON_CHANGED notification is sent to the mime monitor service.
+	\param type The mime type of interest
+	\return
+	- B_OK: success
+	- B_ENTRY_NOT_FOUND: no such attribute existed
+	- "error code": failure
+*/
+status_t
+Database::DeleteIcon(const char *type)
+{
+	// TODO: exta notification for vector icon (uses B_LARGE_ICON now)
+	status_t status = delete_attribute(type, kIconAttr);
+	if (status == B_OK)
+		_SendMonitorUpdate(B_ICON_CHANGED, type, B_LARGE_ICON,
+						   B_META_MIME_DELETED);
+
+	return status;
+}
+	
+
 /*!	\brief Deletes the icon of the given size associated with the given file
 		type for the given application signature.
     
@@ -1001,7 +1090,7 @@ Database::DeleteIcon(const char *type, icon_size which)
     
 	A \c B_ICON_FOR_TYPE_CHANGED notification is sent to the mime monitor service.
 	\param type The mime type of the application whose custom icon you are deleting.
-	\param which The mime type for which you no longer wish \c type to have a custom icon.
+	\param fileType The mime type for which you no longer wish \c type to have a custom icon.
 	\param which The icon size of interest
 	\return
 	- B_OK: success
@@ -1025,6 +1114,41 @@ Database::DeleteIconForType(const char *type, const char *fileType, icon_size wh
 
 	return status;
 }
+
+
+/*!	\brief Deletes the vector icon associated with the given file
+		type for the given application signature.
+    
+    (If this function seems confusing, please see BMimeType::GetIconForType() for a
+    better description of what the *IconForType() functions are used for.)
+    
+	A \c B_ICON_FOR_TYPE_CHANGED notification is sent to the mime monitor service.
+	\param type The mime type of the application whose custom icon you are deleting.
+	\param fileType The mime type for which you no longer wish \c type to have a custom icon.
+	\return
+	- B_OK: success
+	- B_ENTRY_NOT_FOUND: no such attribute existed
+	- "error code": failure
+*/
+status_t
+Database::DeleteIconForType(const char *type, const char *fileType)
+{
+	if (fileType == NULL)
+		return B_BAD_VALUE;
+
+	std::string attr = kIconAttrPrefix + BPrivate::Storage::to_lower(fileType);
+
+	// TODO: introduce extra notification for vector icons?
+	// (uses B_LARGE_ICON now)
+	status_t status = delete_attribute(type, attr.c_str());
+	if (status == B_OK) {
+		_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
+			true, B_META_MIME_DELETED);
+	}
+
+	return status;
+}
+
 
 // DeletePreferredApp
 //! Deletes the preferred app for the given app verb for the given type

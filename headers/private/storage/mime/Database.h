@@ -58,8 +58,11 @@ class Database {
 		status_t SetFileExtensions(const char *type, const BMessage *extensions);
 		status_t SetIcon(const char *type, const void *data, size_t dataSize,
 					icon_size which);
-		status_t SetIconForType(const char *type, const char *fileType, const void *data,
-					size_t dataSize, icon_size which);
+		status_t SetIcon(const char *type, const void *data, size_t dataSize);
+		status_t SetIconForType(const char *type, const char *fileType,
+					const void *data, size_t dataSize, icon_size which);
+		status_t SetIconForType(const char *type, const char *fileType,
+					const void *data, size_t dataSize);
 		status_t SetPreferredApp(const char *type, const char *signature,
 					app_verb verb = B_OPEN);
 		status_t SetSnifferRule(const char *type, const char *rule);
@@ -89,8 +92,10 @@ class Database {
 		status_t DeleteLongDescription(const char *type);
 		status_t DeleteFileExtensions(const char *type);
 		status_t DeleteIcon(const char *type, icon_size size);
+		status_t DeleteIcon(const char *type);
 		status_t DeleteIconForType(const char *type, const char *fileType,
 					icon_size which);
+		status_t DeleteIconForType(const char *type, const char *fileType);
 		status_t DeletePreferredApp(const char *type, app_verb verb = B_OPEN);
 		status_t DeleteSnifferRule(const char *type);
 		status_t DeleteSupportedTypes(const char *type, bool fullSync);

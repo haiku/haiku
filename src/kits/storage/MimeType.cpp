@@ -443,6 +443,30 @@ BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 	return err;
 }
 
+
+// GetIcon
+//! Fetches the vector icon associated with the MIME type
+/*! The icon data is returned in \c data.
+	
+	\param data Pointer in which the allocated icon data is returned. You need to
+				delete the buffer when you are done with it.
+	\param size Pointer in which the size of the allocated icon data is returned.
+	\return
+	- \c B_OK: Success
+	- \c B_ENTRY_NOT_FOUND: No icon of the given size exists for the given type
+	- other error code: Failure	
+
+*/
+status_t
+BMimeType::GetIcon(uint8** data, size_t* size) const
+{
+	status_t err = InitCheck();
+	if (!err)
+		err = get_icon(Type(), data, size);
+	return err;
+}
+
+
 // GetPreferredApp
 //! Fetches the signature of the MIME type's preferred application from the MIME database
 /*! The preferred app is the application that's used to access a file when, for example, the user
@@ -711,6 +735,26 @@ status_t
 BMimeType::SetIcon(const BBitmap *icon, icon_size which)
 {
 	return SetIconForType(NULL, icon, which);
+}
+
+// SetIcon
+//! Sets the vector icon for the MIME type
+/*! The icon is copied from the provided \a data which must contain \a size bytes.
+	
+	If you want to erase the current icon, pass \c NULL as the \a data argument.
+	
+	\param data Pointer to a buffer containing the new icon, or \c NULL to clear
+				the current icon.
+	\param size Size of the provided buffer.
+	\return
+	- \c B_OK: Success
+	- other error code: Failure	
+ 
+*/
+status_t
+BMimeType::SetIcon(const uint8* data, size_t size)
+{
+	return SetIconForType(NULL, data, size);
 }
 
 // SetPreferredApp
@@ -1318,6 +1362,75 @@ BMimeType::SetIconForType(const char *type, const BBitmap *icon, icon_size which
 		err = result;
 
 	delete [] (int8*)data;
+	return err;
+}
+
+// SetIconForType
+/*! \brief Sets the large or mini icon used by an application of this type for
+	files of the given type.
+
+	This can be confusing, so here's how this function is intended to be used:
+	- The actual \c BMimeType object should be set to the MIME signature of an
+	  application to whom you want to assign custom icons for custom MIME types.
+	- The \c type parameter specifies the file type whose custom icon you are
+	  setting.
+	
+	The type of the \c BMimeType object is not required to actually be a subtype of
+	\c "application/"; that is the intended use however, and application-specific
+	icons are not expected to be present for non-application types.
+		
+	The icon is copied from the \c BBitmap pointed to by \c icon. The bitmap must
+	be the proper size: \c 32x32 for the large icon, \c 16x16 for the mini icon.	
+	
+	If you want to erase the current icon, pass \c NULL as the \c icon argument.
+	
+	\param type Pointer to a pre-allocated string containing the MIME type whose
+	            custom icon you wish to set.
+	\param icon Pointer to a pre-allocated \c BBitmap of proper size and colorspace
+				containing the new icon, or \c NULL to clear the current icon.
+	\param icon_size Value that specifies which icon to update. Currently \c B_LARGE_ICON
+					 and \c B_MINI_ICON are supported.
+	\return
+	- \c B_OK: Success
+	- other error code: Failure	
+
+*/
+status_t
+BMimeType::SetIconForType(const char* type, const uint8* data, size_t dataSize)
+{
+	status_t err = InitCheck();	
+
+	BMessage msg(data ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", (type ? B_REG_MIME_ICON_FOR_TYPE : B_REG_MIME_ICON));
+	if (data) {
+		if (!err)
+			err = msg.AddData("icon data", B_RAW_TYPE, data, dataSize);
+	}
+	if (!err)
+		err = msg.AddInt32("icon size", -1);
+		// -1 indicates size should be ignored (vector icon data)
+	if (type) {
+		if (!err)
+			err = BMimeType::IsValid(type) ? B_OK : B_BAD_VALUE;
+		if (!err)	
+			err = msg.AddString("file type", type);
+	}
+	if (!err) 
+		err = BRoster::Private().SendTo(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+
 	return err;
 }
 

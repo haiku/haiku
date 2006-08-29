@@ -99,6 +99,7 @@ class BViewState {
 
 	uint32 ViewMode() const;
 	uint32 LastIconMode() const;
+	uint32 IconSize() const;
 	BPoint ListOrigin() const;
 	BPoint IconOrigin() const;
 	uint32 PrimarySort() const;
@@ -109,6 +110,7 @@ class BViewState {
 	
 	void SetViewMode(uint32);
 	void SetLastIconMode(uint32);
+	void SetIconSize(uint32);
 	void SetListOrigin(BPoint);
 	void SetIconOrigin(BPoint);
 	void SetPrimarySort(uint32);
@@ -123,6 +125,7 @@ class BViewState {
 private:
 	uint32 fViewMode;
 	uint32 fLastIconMode;
+	uint32 fIconSize;
 	BPoint fListOrigin;
 	BPoint fIconOrigin;
 	uint32 fPrimarySortAttr;
@@ -211,6 +214,12 @@ BViewState::LastIconMode() const
 	return fLastIconMode;
 }
 
+inline uint32
+BViewState::IconSize() const
+{
+	return fIconSize;
+}
+
 inline BPoint
 BViewState::ListOrigin() const
 {
@@ -269,6 +278,12 @@ BViewState::SetLastIconMode(uint32 mode)
 		fStateNeedsSaving = true;
 
 	fLastIconMode = mode;
+}
+
+inline void
+BViewState::SetIconSize(uint32 size)
+{
+	fIconSize = size;
 }
 
 inline void

@@ -79,6 +79,7 @@ const int32 kListOffset = 20;
 const uint32 kMiniIconMode = 'Tmic';
 const uint32 kIconMode = 'Ticn';
 const uint32 kListMode = 'Tlst';
+const uint32 kScaleIconMode = 'Tsic'; // new mode for scaled icons
 
 const uint32 kCheckTypeahead = 'Tcty';
 
@@ -195,6 +196,8 @@ class BPoseView : public BView {
 
 		void SetIconPoseHeight();
 		float IconPoseHeight() const;
+		uint32 IconSizeInt() const;
+		icon_size IconSize() const;
 
 		BRect Extent() const;
 		void GetLayoutInfo(uint32 viewMode, BPoint *grid, BPoint *offset) const;
@@ -722,6 +725,18 @@ inline float
 BPoseView::IconPoseHeight() const
 {
 	return fIconPoseHeight;
+}
+
+inline uint32
+BPoseView::IconSizeInt() const
+{
+	return fViewState->IconSize();
+}
+
+inline icon_size
+BPoseView::IconSize() const
+{
+	return (icon_size)fViewState->IconSize();
 }
 
 inline PoseList *

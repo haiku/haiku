@@ -334,10 +334,10 @@ BIconUtils::ConvertFromCMAP8(const uint8* src,
 
 	const rgb_color* colorMap = system_colors()->color_list;
 
-	for (uint32 y = 0; y < dstHeight; y++) {
+	for (uint32 y = 0; y < height; y++) {
 		uint32* d = (uint32*)dst;
 		const uint8* s = src;
-		for (uint32 x = 0; x < dstWidth; x++) {
+		for (uint32 x = 0; x < width; x++) {
 			const rgb_color c = colorMap[*s];
 			uint8 alpha = 255;
 			if (*s == B_TRANSPARENT_MAGIC_CMAP8)

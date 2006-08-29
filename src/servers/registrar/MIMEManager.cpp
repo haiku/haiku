@@ -353,11 +353,16 @@ MIMEManager::HandleSetParam(BMessage *message)
 					if (!err)
 						err = message->FindString("file type", &fileType);
 					if (!err)
-						err = fDatabase.SetIconForType(type, fileType, data,
-								dataSize, (icon_size)size);				
+						err = size == -1 ?
+							fDatabase.SetIconForType(type, fileType, data,
+								dataSize) :
+							fDatabase.SetIconForType(type, fileType, data,
+								dataSize, (icon_size)size);
 				} else {
 					if (!err) 
-						err = fDatabase.SetIcon(type, data, dataSize,
+						err = size == -1 ?
+							fDatabase.SetIcon(type, data, dataSize) :
+							fDatabase.SetIcon(type, data, dataSize,
 								(icon_size)size);
 				}
 				break;
@@ -457,10 +462,14 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 					if (!err)
 						err = message->FindString("file type", &fileType);
 					if (!err)
-						err = fDatabase.DeleteIconForType(type, fileType, (icon_size)size);
+						err = (size == -1) ?
+							fDatabase.DeleteIconForType(type, fileType) :
+							fDatabase.DeleteIconForType(type, fileType, (icon_size)size);
 				} else {
 					if (!err) 
-						err = fDatabase.DeleteIcon(type, (icon_size)size);
+						err = (size == -1) ?
+							fDatabase.DeleteIcon(type) :
+							fDatabase.DeleteIcon(type, (icon_size)size);
 				}
 				break;
 			}

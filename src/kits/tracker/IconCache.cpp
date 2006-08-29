@@ -175,12 +175,14 @@ IconCacheEntry::HaveIconBitmap(IconDrawMode mode, icon_size size) const
 		if (size == B_MINI_ICON)
 			return fMiniIcon != NULL;
 		else
-			return fLargeIcon != NULL;
+			return fLargeIcon != NULL
+				&& fLargeIcon->Bounds().IntegerWidth() + 1 == size;
 	} else if (mode == kSelected) {
 		if (size == B_MINI_ICON)
 			return fHilitedMiniIcon != NULL;
 		else
-			return fHilitedLargeIcon != NULL;
+			return fHilitedLargeIcon != NULL
+				&& fHilitedLargeIcon->Bounds().IntegerWidth() + 1 == size;
 	}
 	return false;
 }
@@ -280,15 +282,15 @@ IconCacheEntry::SetIcon(BBitmap *bitmap, IconDrawMode mode, icon_size size,
 	bool /*create*/)
 {
 	if (mode == kNormalIcon) {
-		if (size == B_LARGE_ICON)
-			fLargeIcon = bitmap;
-		else
+		if (size == B_MINI_ICON)
 			fMiniIcon = bitmap;
-	} else if (mode == kSelectedIcon) {
-		if (size == B_LARGE_ICON)
-			fHilitedLargeIcon = bitmap;
 		else
+			fLargeIcon = bitmap;
+	} else if (mode == kSelectedIcon) {
+		if (size == B_MINI_ICON)
 			fHilitedMiniIcon = bitmap;
+		else
+			fHilitedLargeIcon = bitmap;
 	} else
 		TRESPASS();
 }

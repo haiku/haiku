@@ -36,6 +36,25 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 	return err;
 }
 
+// update_icon
+static status_t
+update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
+	const char *type)
+{
+	uint8* data = NULL;
+	size_t size = 0;
+
+	status_t err = appFileInfoRead.GetIconForType(type, &data, &size);
+	if (err == B_OK)
+		err = appFileInfoWrite.SetIconForType(type, data, size);
+	else if (err == B_ENTRY_NOT_FOUND)
+		err = appFileInfoWrite.SetIconForType(type, NULL, size);
+
+	free(data);
+
+	return err;
+}
+
 // is_shared_object_mime_type
 static bool
 is_shared_object_mime_type(BMimeType &type)
@@ -151,6 +170,11 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		if (err != B_OK)
 			return err;
 
+		// vector icon
+		err = update_icon(appFileInfoRead, appFileInfoWrite, NULL);
+		if (err != B_OK)
+			return err;
+
 		// small icon
 		BBitmap smallIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK,
 			B_CMAP8);
@@ -192,6 +216,12 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			for (int32 i = 0;
 				 supportedTypes.FindString("types", i, &supportedType) == B_OK;
 				 i++) {
+				// vector icon
+				err = update_icon(appFileInfoRead, appFileInfoWrite,
+					supportedType);
+				if (err != B_OK)
+					return err;
+
 				// small icon
 				err = update_icon(appFileInfoRead, appFileInfoWrite,
 					supportedType, smallIcon, B_MINI_ICON);

@@ -96,6 +96,15 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kAppHintAttr, &info) != B_OK))
 		status = mime.SetAppHint(ref);
 
+	// Vector Icon
+	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kIconAttr, &info) != B_OK)) {
+		uint8* data = NULL;
+		size_t size = 0;
+		if (appInfo.GetIcon(&data, &size) == B_OK) {
+			status = mime.SetIcon(data, size);
+			free(data);
+		}
+	}
 	// Mini Icon
 	BBitmap miniIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kMiniIconAttr, &info) != B_OK)) {
@@ -119,6 +128,13 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	// Icons for supported types
 	const char* type;
 	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++) {
+		// vector icon
+		uint8* data = NULL;
+		size_t size = 0;
+		if (status == B_OK && appInfo.GetIconForType(type, &data, &size) == B_OK) {
+			status = mime.SetIconForType(type, data, size);
+			free(data);
+		}
 		// mini icon
 		if (status == B_OK && appInfo.GetIconForType(type, &miniIcon, B_MINI_ICON) == B_OK)
 			status = mime.SetIconForType(type, &miniIcon, B_MINI_ICON);
