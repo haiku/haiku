@@ -1468,6 +1468,62 @@ dosfs_rmdir(void *vol, void *dir, const char *name)
 }
 
 
+bool
+dosfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
+{
+	// ToDo: we're obviously not even asked...
+	return false;
+}
+
+
+status_t
+dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+{
+	nspace  *vol = (nspace *)_fs;
+	vnode   *node = (vnode *)_node;
+	status_t status;
+	
+	if (check_nspace_magic(vol, "dosfs_read_pages") ||
+                check_vnode_magic(node, "dosfs_read_pages"))
+                return EINVAL;
+
+	if (node->cache == NULL)
+		return(B_BAD_VALUE);
+
+	LOCK_VOL(vol);
+	status = file_cache_read_pages(node->cache, pos, vecs, count,
+		_numBytes);
+	UNLOCK_VOL(vol);
+
+	return status;
+}
+
+
+status_t
+dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+{
+	nspace  *vol = (nspace *)_fs;
+	vnode   *node = (vnode *)_node;
+	status_t status;
+
+	if (check_nspace_magic(vol, "dosfs_write_pages") ||
+                check_vnode_magic(node, "dosfs_write_pages"))
+                return EINVAL;
+
+	if (node->cache == NULL)
+		return B_BAD_VALUE;
+
+	LOCK_VOL(vol);
+	status = file_cache_write_pages(node->cache, pos, vecs, count,
+		_numBytes);
+	UNLOCK_VOL(vol);
+
+	return status;
+}
+
+
 status_t
 dosfs_get_file_map(void *_fs, void *_node, off_t pos, size_t len,
 						struct file_io_vec *vecs, size_t *_count)

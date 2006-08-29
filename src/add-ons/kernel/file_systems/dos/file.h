@@ -29,5 +29,10 @@ status_t	dosfs_write(void *vol, void *node, void *cookie, off_t pos,
 						const void *buf, size_t *len);
 status_t	dosfs_get_file_map(void *fs, void *node, off_t pos, size_t reqLen,
 						struct file_io_vec *vecs, size_t *_count);
+bool		dosfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie);
+status_t	dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
+				const iovec *vecs, size_t count, size_t *_numBytes, bool reenter);
+status_t	dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
+				const iovec *vecs, size_t count, size_t *_numBytes, bool reenter);
 
 #endif

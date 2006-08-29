@@ -1122,9 +1122,9 @@ static file_system_module_info sDosFileSystem = {
 	&dosfs_remove_vnode,
 
 	/* VM file access */
-	NULL,	//&fs_can_page,
-	NULL,	//&fs_read_pages,
-	NULL,	//&fs_write_pages,
+	&dosfs_can_page,
+	&dosfs_read_pages,
+	&dosfs_write_pages,
 
 	&dosfs_get_file_map,
 
