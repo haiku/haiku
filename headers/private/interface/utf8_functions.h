@@ -12,7 +12,7 @@
 static inline bool
 IsInsideGlyph(uchar ch)
 {
-	return (ch & 0xC0) == 0x80;
+	return (ch & 0xc0) == 0x80;
 }
 
 static inline uint32
@@ -104,12 +104,13 @@ UTF8CountChars(const char *text, int32 numBytes)
 }
 
 
-/*	UTF8ToCharCode converts the input that includes potential multibyte chars
+/*!	UTF8ToCharCode converts the input that includes potential multibyte chars
 	to UTF-32 char codes that can be used by FreeType. The string pointer is
 	then advanced to the next character in the string. In case the terminating
 	0 is reached, the string pointer is not advanced anymore and spaces are
 	returned. This makes it safe to overruns and enables streamed processing
-	of UTF8 strings. */
+	of UTF8 strings.
+*/
 static inline uint32
 UTF8ToCharCode(const char **bytes)
 {
@@ -135,7 +136,7 @@ UTF8ToCharCode(const char **bytes)
 					result += (*bytes)[2] & 0x3f;
 					result <<= 6;
 					result += (*bytes)[3] & 0x3f;
-					(*bytes) += 3;
+					(*bytes) += 4;
 					return result;
 				}
 
@@ -175,8 +176,9 @@ UTF8ToCharCode(const char **bytes)
 }
 
 
-/*	UTF8ToLength works like strlen() but takes UTF8 encoded multibyte chars
-	into account. It's a quicker version of UTF8CountChars above. */
+/*!	UTF8ToLength works like strlen() but takes UTF8 encoded multibyte chars
+	into account. It's a quicker version of UTF8CountChars above.
+*/
 static inline int32
 UTF8ToLength(const char *bytes)
 {
