@@ -1,5 +1,6 @@
 USB Webcam driver
 (c) 2004,2005,2006 François Revol.
+Parts (c) Be,Inc. (ProducerNode sample code).
 
 Current version of my USB Webcam driver. WORK IN PROGRESS!
 Uses the USB Kit (userland API, needs libusb) to publish a
@@ -37,6 +38,23 @@ cstransforms/ for colorspace transforms so other device using
 	Another option is to turn all cstransforms into actual
 	Translators usable by other apps, or also media codecs 
 	but that would be more work for few added value.
+
+Other notes and TODO:
+- finish the bayer cstransform and use that instead of copied 
+(MIT) code in Sonix addon.
+- implement handling picture sizes correctly (currently forced 
+in the ProducerNode and the Sonix code to 320x240)
+- there are currently 2 Deframer classes, the StreamingDeframer 
+although more complex seems to work much better than the 
+BufferingDeframer. Make my mind about them.
+- write isochronous code when USB Kit supports it
+- add quickcam support (I have some code around) (requires iso)
+- add code to support Fuji FinePix to merge the FinePix addon 
+from bebits ? (need to find one to test)
+- design an extensible API to publish possible controls as 
+ParameterWeb or forward ParameterWeb changes right to the 
+device-specific addon and provide default handlers for usual 
+controls ?
 
 References:
 
