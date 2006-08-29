@@ -13,6 +13,7 @@
 #include <String.h>
 
 #include <errno.h>
+#include <new>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -327,7 +328,7 @@ extern "C"
 BInputServerDevice *
 instantiate_input_device()
 {
-	return new KeyboardInputDevice();
+	return new (std::nothrow) KeyboardInputDevice();
 }
 
 
@@ -409,20 +410,19 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 
 	keyboard_device *device = (keyboard_device *)cookie;
 
-	if (opcode == 0 
-		|| opcode == B_KEY_REPEAT_RATE_CHANGED) { 
+	if (opcode == 0 || opcode == B_KEY_REPEAT_RATE_CHANGED) {
 		if (get_key_repeat_rate(&device->settings.key_repeat_rate) != B_OK)
 			LOG_ERR("error when get_key_repeat_rate\n");
-		else
-			if (ioctl(device->fd, KB_SET_KEY_REPEAT_RATE, &device->settings.key_repeat_rate)!=B_OK)
-				LOG_ERR("error when KB_SET_KEY_REPEAT_RATE, fd:%d\n", device->fd);
+		else if (ioctl(device->fd, KB_SET_KEY_REPEAT_RATE,
+				&device->settings.key_repeat_rate) != B_OK)
+			LOG_ERR("error when KB_SET_KEY_REPEAT_RATE, fd:%d\n", device->fd);
 	}
 
 	if (opcode == 0 || opcode == B_KEY_REPEAT_DELAY_CHANGED) {
 		if (get_key_repeat_delay(&device->settings.key_repeat_delay) != B_OK)
 			LOG_ERR("error when get_key_repeat_delay\n");
 		else if (ioctl(device->fd, KB_SET_KEY_REPEAT_DELAY,
-				&device->settings.key_repeat_delay)!=B_OK)
+				&device->settings.key_repeat_delay) != B_OK)
 			LOG_ERR("error when KB_SET_KEY_REPEAT_DELAY, fd:%d\n", device->fd);
 	}
 
@@ -566,8 +566,8 @@ status_t
 KeyboardInputDevice::AddDevice(const char *path)
 {
 	CALLED();
-	keyboard_device *device = new keyboard_device(path);
-	if (!device)
+	keyboard_device *device = new (std::nothrow) keyboard_device(path);
+	if (device == NULL)
 		return B_NO_MEMORY;
 
 	device->fd = -1;
@@ -634,6 +634,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 		bigtime_t timestamp = 0;
 
 		LOG("KB_READ :");
+
 		if (dev->isAT) {
 			at_kbd_io *at_kbd = (at_kbd_io *)buffer;
 			if (at_kbd->scancode > 0)
@@ -653,27 +654,29 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 		LOG(" %Ld, %02x, %02lx\n", timestamp, isKeyDown, keycode);
 
-		if (isKeyDown
-			&& (keycode == 0x68) ) { // MENU KEY for OpenTracker 5.2.0+
-			bool nokey = true;
+		if (isKeyDown && keycode == 0x68) {
+			// MENU KEY for OpenTracker 5.2.0+
+			bool noOtherKeyPressed = true;
 			for (int32 i = 0; i < 16; i++) {
 				if (states[i] != 0) {
-					nokey = false;
+					noOtherKeyPressed = false;
 					break;
 				}
 			}
 
-			if (nokey) {		
-				BMessenger msger("application/x-vnd.Be-TSKB");
-				if (msger.IsValid())
-					msger.SendMessage('BeMn');
+			if (noOtherKeyPressed) {		
+				BMessenger deskbar("application/x-vnd.Be-TSKB");
+				if (deskbar.IsValid())
+					deskbar.SendMessage('BeMn');
 			}
 		}
 
-		if (isKeyDown)
-			states[(keycode)>>3] |= (1 << (7 - (keycode & 0x7)));
-		else
-			states[(keycode)>>3] &= (!(1 << (7 - (keycode & 0x7))));
+		if (keycode < 256) {
+			if (isKeyDown)
+				states[(keycode) >> 3] |= (1 << (7 - (keycode & 0x7)));
+			else
+				states[(keycode) >> 3] &= (!(1 << (7 - (keycode & 0x7))));
+		}
 
 		if (isKeyDown
 			&& keycode == 0x34 // DELETE KEY
@@ -682,24 +685,30 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			LOG("TeamMonitor called\n");
 
 			// show the team monitor
-			if (!dev->owner->fTMWindow)
-				dev->owner->fTMWindow = new TMWindow();
+			if (dev->owner->fTMWindow == NULL)
+				dev->owner->fTMWindow = new (std::nothrow) TMWindow();
 
-			dev->owner->fTMWindow->Enable();
+			if (dev->owner->fTMWindow != NULL) {
+				dev->owner->fTMWindow->Enable();
 
-			// cancel timer only for R5
-			if (ioctl(dev->fd, KB_CANCEL_CONTROL_ALT_DEL, NULL) == B_OK)
-				LOG("KB_CANCEL_CONTROL_ALT_DEL : OK\n");
+				// cancel timer only for R5
+				if (ioctl(dev->fd, KB_CANCEL_CONTROL_ALT_DEL, NULL) == B_OK)
+					LOG("KB_CANCEL_CONTROL_ALT_DEL : OK\n");
+			}
 		}
 
 		uint32 modifiers = keymap->Modifier(keycode);
 		if (modifiers 
 			&& (!(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) 
-			|| isKeyDown)) {
+				|| isKeyDown)) {
 			BMessage *msg = new BMessage;
+			if (msg == NULL)
+				continue;
+
 			msg->AddInt64("when", timestamp);
 			msg->what = B_MODIFIERS_CHANGED;
 			msg->AddInt32("be:old_modifiers", dev->modifiers);
+
 			if ((isKeyDown && !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)))
 				|| (isKeyDown && !(dev->modifiers & modifiers)))
 				dev->modifiers |= modifiers;
@@ -708,6 +717,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 			msg->AddInt32("modifiers", dev->modifiers);
 			msg->AddData("states", B_UINT8_TYPE, states, 16);
+
 			if (dev->owner->EnqueueMessage(msg)!=B_OK)
 				delete msg;
 
@@ -715,10 +725,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				dev->owner->SetLeds(dev);
 		}
 
-		char *str = NULL, *str2 = NULL;
-		int32 numBytes = 0, numBytes2 = 0;
 		uint8 newDeadKey = 0;
-
 		if (activeDeadKey == 0)
 			newDeadKey = keymap->IsDeadKey(keycode, dev->modifiers);
 
@@ -732,10 +739,15 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 		// R5-like dead key behaviour
 		if (newDeadKey == 0) {
+			char *str = NULL, *str2 = NULL;
+			int32 numBytes = 0, numBytes2 = 0;
 			keymap->GetChars(keycode, dev->modifiers, activeDeadKey, &str, &numBytes);
 			keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
 
 			BMessage *msg = new BMessage;
+			if (msg == NULL)
+				continue;
+
 			if (numBytes > 0)
 				msg->what = isKeyDown ? B_KEY_DOWN : B_KEY_UP;
 			else
@@ -768,6 +780,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 			if (numBytes2 > 0)
 				msg->AddInt32("raw_char", (uint32)((uint8)str2[0] & 0x7f));
+
 			delete[] str2;
 
 			if (dev->owner->EnqueueMessage(msg) != B_OK)
