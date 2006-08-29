@@ -322,8 +322,10 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
 
 		status_t						QueueIsochronous(void *data,
 											size_t dataLength,
-											rlea *rleArray,
-											uint16 bufferDurationMS,
+											usb_iso_packet_descriptor *packetDesc,
+											uint32 packetCount,
+											uint32 *startingFrameNumber,
+											uint32 flags,
 											usb_callback_func callback,
 											void *callbackCookie);
 };

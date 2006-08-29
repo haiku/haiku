@@ -9,6 +9,7 @@
 
 #include <util/kernel_cpp.h>
 #include "usb_p.h"
+#include <USB_rle.h>
 
 
 Stack *gUSBStack = NULL;
@@ -266,16 +267,18 @@ queue_bulk_v(usb_pipe pipe, iovec *vector, size_t vectorCount,
 
 status_t
 queue_isochronous(usb_pipe pipe, void *data, size_t dataLength,
-	rlea *rleArray, uint16 bufferDurationMS, usb_callback_func callback,
+	usb_iso_packet_descriptor *packetDesc, uint32 packetCount,
+	uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback,
 	void *callbackCookie)
 {
-	TRACE(("usb_module: queue_isochronous(0x%08x, 0x%08x, %d, 0x%08x, %d, 0x%08x, 0x%08x)\n", pipe, data, dataLength, rleArray, bufferDurationMS, callback, callbackCookie));
+	TRACE(("usb_module: queue_isochronous(0x%08x, 0x%08x, %d, 0x%08x, %d, 0x%08x, 0x%08x, 0x%08x, 0x%08x)\n", pipe, data, dataLength, packetDesc, packetCount, startingFrameNumber, flags, callback, callbackCookie));
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_ISO_PIPE) == 0)
 		return B_BAD_VALUE;
 
 	return ((IsochronousPipe *)object)->QueueIsochronous(data, dataLength,
-		rleArray, bufferDurationMS, callback, callbackCookie);
+		packetDesc, packetCount, startingFrameNumber, flags, callback,
+		callbackCookie);
 }
 
 
@@ -477,8 +480,11 @@ queue_isochronous_v2(const void *pipe, void *data, size_t dataLength,
 	rlea *rleArray, uint16 bufferDurationMS, usb_callback_func callback,
 	void *callbackCookie)
 {
-	return queue_isochronous((usb_id)pipe, data, dataLength, rleArray,
-		bufferDurationMS, callback, callbackCookie);
+	// ToDo: convert rlea to usb_iso_packet_descriptor
+	// ToDo: use a flag to indicate that the callback shall produce a rlea
+	usb_iso_packet_descriptor *packetDesc = NULL;
+	return queue_isochronous((usb_id)pipe, data, dataLength, packetDesc, 0,
+		NULL, 0, callback, callbackCookie);
 }
 
 

@@ -141,7 +141,8 @@ IsochronousPipe::IsochronousPipe(BusManager *bus, int8 deviceAddress,
 
 status_t
 IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
-	rlea *rleArray, uint16 bufferDurationMS, usb_callback_func callback,
+	usb_iso_packet_descriptor *packetDesc, uint32 packetCount,
+	uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback,
 	void *callbackCookie)
 {
 	return B_ERROR;
