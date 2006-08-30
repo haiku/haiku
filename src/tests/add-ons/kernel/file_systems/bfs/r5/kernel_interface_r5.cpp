@@ -1159,11 +1159,18 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	if (oldDirectory == newDirectory && !strcmp(oldName, newName))
 		return B_OK;
 
+	// are we allowed to do what we've been told?
+	status_t status = oldDirectory->CheckPermissions(W_OK);
+	if (status == B_OK)
+		status = newDirectory->CheckPermissions(W_OK);
+	if (status < B_OK)
+		return status;
+
 	RecursiveLocker locker(volume->Lock());
 
 	// get the directory's tree, and a pointer to the inode which should be changed
 	BPlusTree *tree;
-	status_t status = oldDirectory->GetTree(&tree);
+	status = oldDirectory->GetTree(&tree);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
