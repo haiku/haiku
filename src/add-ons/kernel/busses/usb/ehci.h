@@ -134,7 +134,8 @@ static	pci_module_info				*sPCIModule;
 
 class EHCIRootHub : public Hub {
 public:
-									EHCIRootHub(EHCI *ehci, int8 deviceAddress);
+									EHCIRootHub(Object *rootObject,
+										int8 deviceAddress);
 
 static	status_t					ProcessTransfer(EHCI *ehci,
 										Transfer *transfer);

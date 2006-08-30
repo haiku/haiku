@@ -7,6 +7,7 @@
  *		Niels S. Reedijk
  */
 
+#define TRACE_USB
 #include <util/kernel_cpp.h>
 #include "usb_p.h"
 #include <USB_rle.h>
@@ -146,10 +147,10 @@ set_feature(usb_id handle, uint16 selector)
 {
 	TRACE(("usb_module: set_feature(0x%08x, %d)\n", handle, selector));
 	Object *object = gUSBStack->GetObject(handle);
-	if (!object || (object->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
+	if (!object)
 		return B_BAD_VALUE;
 
-	return ((ControlPipe *)object)->SetFeature(selector);
+	return object->SetFeature(selector);
 }
 
 
@@ -158,10 +159,10 @@ clear_feature(usb_id handle, uint16 selector)
 {
 	TRACE(("usb_module: clear_feature(0x%08x, %d)\n", handle, selector));
 	Object *object = gUSBStack->GetObject(handle);
-	if (!object || (object->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
+	if (!object)
 		return B_BAD_VALUE;
 
-	return ((ControlPipe *)object)->ClearFeature(selector);
+	return object->ClearFeature(selector);
 }
 
 
@@ -173,10 +174,10 @@ get_status(usb_id handle, uint16 *status)
 		return B_BAD_VALUE;
 
 	Object *object = gUSBStack->GetObject(handle);
-	if (!object || (object->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
+	if (!object)
 		return B_BAD_VALUE;
 
-	return ((ControlPipe *)object)->GetStatus(status);
+	return object->GetStatus(status);
 }
 
 
@@ -203,8 +204,8 @@ send_request(usb_device device, uint8 requestType, uint8 request,
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_BAD_VALUE;
 
-	return ((Device *)object)->SendRequest(requestType, request, value, index,
-		length, data, length, actualLength);
+	return ((Device *)object)->DefaultPipe()->SendRequest(requestType, request,
+		value, index, length, data, length, actualLength);
 }
 
 
@@ -218,8 +219,8 @@ queue_request(usb_device device, uint8 requestType, uint8 request,
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_BAD_VALUE;
 
-	return ((Device *)object)->QueueRequest(requestType, request, value, index,
-		length, data, length, callback, callbackCookie);
+	return ((Device *)object)->DefaultPipe()->QueueRequest(requestType,
+		request, value, index, length, data, length, callback, callbackCookie);
 }
 
 

@@ -161,7 +161,8 @@ static	pci_module_info				*sPCIModule;
 
 class UHCIRootHub : public Hub {
 public:
-									UHCIRootHub(UHCI *uhci, int8 deviceAddress);
+									UHCIRootHub(Object *rootObject,
+										int8 deviceAddress);
 
 static	status_t					ProcessTransfer(UHCI *uhci,
 										Transfer *transfer);

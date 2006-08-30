@@ -202,7 +202,7 @@ EHCI::Start()
 	}
 
 	fRootHubAddress = AllocateAddress();
-	fRootHub = new(std::nothrow) EHCIRootHub(this, fRootHubAddress);
+	fRootHub = new(std::nothrow) EHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
 		TRACE_ERROR(("usb_ehci: no memory to allocate root hub\n"));
 		return B_NO_MEMORY;

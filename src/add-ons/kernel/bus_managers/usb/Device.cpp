@@ -10,17 +10,14 @@
 #include "usb_p.h"
 
 
-Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
-	int8 deviceAddress, bool lowSpeed)
-	:	ControlPipe(bus, deviceAddress,
-			lowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed, 0,
-			desc.max_packet_size_0),
+Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
+	bool lowSpeed)
+	:	Object(parent),
 		fDeviceDescriptor(desc),
+		fInitOK(false),
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
-		fInitOK(false),
 		fLowSpeed(lowSpeed),
-		fParent(parent),
 		fDeviceAddress(deviceAddress),
 		fLock(-1),
 		fNotifyCookie(NULL)
@@ -34,6 +31,14 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	}
 
 	set_sem_owner(fLock, B_SYSTEM_TEAM);
+
+	fDefaultPipe = new(std::nothrow) ControlPipe(this, deviceAddress, 0,
+		fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
+		fDeviceDescriptor.max_packet_size_0);
+	if (!fDefaultPipe) {
+		TRACE_ERROR(("USB Device: could not allocate default pipe\n"));
+		return;
+	}
 
 	fMaxPacketIn[0] = fMaxPacketOut[0] = fDeviceDescriptor.max_packet_size_0; 
 
@@ -146,8 +151,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 					interfaceInfo->generic_count = 0;
 					interfaceInfo->generic = NULL;
 
-					Interface *interface = new(std::nothrow) Interface(GetBusManager(),
-						fDeviceAddress, Speed());
+					Interface *interface = new(std::nothrow) Interface(this);
 					interfaceInfo->handle = interface->USBID();
 
 					currentInterface = interfaceInfo;
@@ -182,36 +186,37 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 					Pipe *endpoint = NULL;
 					switch (endpointDescriptor->attributes & 0x03) {
 						case 0x00: /* Control Endpoint */
-							endpoint = new(std::nothrow) ControlPipe(GetBusManager(),
-								fDeviceAddress, Speed(),
+							endpoint = new(std::nothrow) ControlPipe(this,
+								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x0f,
+								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
 								endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x01: /* Isochronous Endpoint */
-							endpoint = new(std::nothrow) IsochronousPipe(GetBusManager(),
+							endpoint = new(std::nothrow) IsochronousPipe(this,
 								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x80 > 0 ? Pipe::In : Pipe::Out,
-								Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,
+								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
 								endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x02: /* Bulk Endpoint */
-							endpoint = new(std::nothrow) BulkPipe(GetBusManager(),
+							endpoint = new(std::nothrow) BulkPipe(this,
 								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x80 > 0 ? Pipe::In : Pipe::Out,
-								Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,
+								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
 								endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x03: /* Interrupt Endpoint */
-							endpoint = new(std::nothrow) InterruptPipe(GetBusManager(),
+							endpoint = new(std::nothrow) InterruptPipe(this,
 								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x80 > 0 ? Pipe::In : Pipe::Out,
-								Speed(),
 								endpointDescriptor->endpoint_address & 0x0f,
+								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
 								endpointDescriptor->max_packet_size);
 							break;
 					}
@@ -271,7 +276,7 @@ status_t
 Device::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 	void *data, size_t dataLength, size_t *actualLength)
 {
-	return SendRequest(
+	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
 		(descriptorType << 8) | index,						// value
@@ -318,7 +323,7 @@ Device::SetConfigurationAt(uint8 index)
 	if (index >= fDeviceDescriptor.num_configurations)
 		return B_BAD_VALUE;
 
-	status_t result = SendRequest(
+	status_t result = fDefaultPipe->SendRequest(
 		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_SET_CONFIGURATION,						// request
 		fConfigurations[index].descr->configuration_value,	// value
@@ -410,10 +415,10 @@ status_t
 Device::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 	Device *device)
 {
-	if (!fParent)
+	if (!Parent() || (Parent()->Type() & USB_OBJECT_HUB) == 0)
 		return B_ERROR;
 
-	fParent->BuildDeviceName(string, index, bufferSize, this);		
+	((Hub *)Parent())->BuildDeviceName(string, index, bufferSize, this);
 	return B_OK;
 }
 
@@ -421,7 +426,7 @@ Device::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 status_t
 Device::SetFeature(uint16 selector)
 {
-	return SendRequest(
+	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,
 		USB_REQUEST_SET_FEATURE,
 		selector,
@@ -436,7 +441,7 @@ Device::SetFeature(uint16 selector)
 status_t
 Device::ClearFeature(uint16 selector)
 {
-	return SendRequest(
+	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
 		selector,
@@ -451,7 +456,7 @@ Device::ClearFeature(uint16 selector)
 status_t
 Device::GetStatus(uint16 *status)
 {
-	return SendRequest(
+	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_IN,
 		USB_REQUEST_GET_STATUS,
 		0,

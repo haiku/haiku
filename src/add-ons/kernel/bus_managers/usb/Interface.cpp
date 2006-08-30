@@ -9,8 +9,8 @@
 #include "usb_p.h"
 
 
-Interface::Interface(BusManager *bus, int8 deviceAddress, pipeSpeed speed)
-	:	ControlPipe(bus, deviceAddress, speed, 0, 8)
+Interface::Interface(Object *parent)
+	:	Object(parent)
 {
 }
 
@@ -18,7 +18,7 @@ Interface::Interface(BusManager *bus, int8 deviceAddress, pipeSpeed speed)
 status_t
 Interface::SetFeature(uint16 selector)
 {
-	return SendRequest(
+	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_OUT,
 		USB_REQUEST_SET_FEATURE,
 		selector,
@@ -33,7 +33,7 @@ Interface::SetFeature(uint16 selector)
 status_t
 Interface::ClearFeature(uint16 selector)
 {
-	return SendRequest(
+	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
 		selector,
@@ -48,7 +48,7 @@ Interface::ClearFeature(uint16 selector)
 status_t
 Interface::GetStatus(uint16 *status)
 {
-	return SendRequest(
+	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_IN,
 		USB_REQUEST_GET_STATUS,
 		0,

@@ -15,7 +15,6 @@ BusManager::BusManager(Stack *stack)
 		fDefaultPipe(NULL),
 		fDefaultPipeLowSpeed(NULL),
 		fRootHub(NULL),
-		fStack(stack),
 		fExploreThread(-1)
 {
 	if (benaphore_init(&fLock, "usb busmanager lock") < B_OK) {
@@ -23,16 +22,22 @@ BusManager::BusManager(Stack *stack)
 		return;
 	}
 
+	fRootObject = new(std::nothrow) Object(stack, this);
+	if (!fRootObject)
+		return;
+
 	// Clear the device map
 	for (int32 i = 0; i < 128; i++)
 		fDeviceMap[i] = false;
 
 	// Set up the default pipes
-	fDefaultPipe = new(std::nothrow) ControlPipe(this, 0, Pipe::FullSpeed, 0, 8);
+	fDefaultPipe = new(std::nothrow) ControlPipe(fRootObject, 0, 0,
+		Pipe::FullSpeed, 8);
 	if (!fDefaultPipe)
 		return;
 
-	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(this, 0, Pipe::LowSpeed, 0, 8);
+	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(fRootObject, 0, 0,
+		Pipe::LowSpeed, 8);
 	if (!fDefaultPipeLowSpeed)
 		return;
 
@@ -92,8 +97,28 @@ BusManager::ExploreThread(void *data)
 }
 
 
+int8
+BusManager::AllocateAddress()
+{
+	if (!Lock())
+		return -1;
+
+	int8 deviceAddress = -1;
+	for (int32 i = 1; i < 128; i++) {
+		if (fDeviceMap[i] == false) {
+			deviceAddress = i;
+			fDeviceMap[i] = true;
+			break;
+		}
+	}
+
+	Unlock();
+	return deviceAddress;
+}
+
+
 Device *
-BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
+BusManager::AllocateNewDevice(Hub *parent, bool lowSpeed)
 {
 	// Check if there is a free entry in the device map (for the device number)
 	int8 deviceAddress = AllocateAddress();
@@ -103,7 +128,6 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	}
 
 	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceAddress));
-
 	ControlPipe *defaultPipe = (lowSpeed ? fDefaultPipeLowSpeed : fDefaultPipe);
 
 	status_t result = B_ERROR;
@@ -134,8 +158,8 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	snooze(USB_DELAY_SET_ADDRESS);
 
 	// Create a temporary pipe with the new address
-	ControlPipe pipe(this, deviceAddress,
-		lowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed, 0, 8);
+	ControlPipe pipe(parent, deviceAddress, 0,
+		lowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed, 8);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -172,7 +196,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("usb BusManager::AllocateNewDevice(): creating new hub\n"));
-		Hub *hub = new(std::nothrow) Hub(this, parent, deviceDescriptor,
+		Hub *hub = new(std::nothrow) Hub(parent, deviceDescriptor,
 			deviceAddress, lowSpeed);
 		if (!hub) {
 			TRACE_ERROR(("usb BusManager::AllocateNewDevice(): no memory to allocate hub\n"));
@@ -185,16 +209,11 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 			return NULL;
 		}
 
-		if (parent == NULL) {
-			// root hub
-			fRootHub = hub;
-		}
-
 		return (Device *)hub;
 	}
 
 	TRACE(("usb BusManager::AllocateNewDevice(): creating new device\n"));
-	Device *device = new(std::nothrow) Device(this, parent, deviceDescriptor,
+	Device *device = new(std::nothrow) Device(parent, deviceDescriptor,
 		deviceAddress, lowSpeed);
 	if (!device) {
 		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): no memory to allocate device\n"));
@@ -208,26 +227,6 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	}
 
 	return device;
-}
-
-
-int8
-BusManager::AllocateAddress()
-{
-	if (!Lock())
-		return -1;
-
-	int8 deviceAddress = -1;
-	for (int32 i = 1; i < 128; i++) {
-		if (fDeviceMap[i] == false) {
-			deviceAddress = i;
-			fDeviceMap[i] = true;
-			break;
-		}
-	}
-
-	Unlock();
-	return deviceAddress;
 }
 
 

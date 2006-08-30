@@ -88,7 +88,7 @@ usb_hub_descriptor ohci_hubd =
 
 //Implementation
 OHCIRootHub::OHCIRootHub( OHCI *ohci , int8 devicenum )
-		   : Hub( ohci , NULL , ohci_devd , devicenum , false )
+		   : Hub( ohci->RootObject() , ohci_devd , devicenum , false )
 {
 	m_ohci = ohci;
 }

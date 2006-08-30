@@ -483,7 +483,7 @@ UHCI::Start()
 	}
 
 	fRootHubAddress = AllocateAddress();
-	fRootHub = new(std::nothrow) UHCIRootHub(this, fRootHubAddress);
+	fRootHub = new(std::nothrow) UHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
 		TRACE_ERROR(("usb_uhci: no memory to allocate root hub\n"));
 		return B_NO_MEMORY;

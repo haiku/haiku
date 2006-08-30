@@ -95,27 +95,34 @@ static ehci_root_hub_string_s sEHCIRootHubStrings[3] = {
 	{
 		4,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
-		0x0409							// Supported language IDs (English US)
+		{
+			0x0409						// Supported language IDs (English US)
+		}
 	},
 
 	{
 		12,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
-		'H', 'A', 'I', 'K', 'U', ' ',	// Characters
-		'I', 'n', 'c', '.'
+		{
+			'H', 'A', 'I', 'K', 'U',	// Characters
+			' ', 'I', 'n', 'c', '.'
+		}
 	},
 
 	{
 		26,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
-		'E', 'H', 'C', 'I', ' ', 'R',	// Characters
-		'o', 'o', 't', 'H', 'u', 'b'
+		{
+			'E', 'H', 'C', 'I', ' ',	// Characters
+			'R', 'o', 'o', 't', 'H',
+			'u', 'b'
+		}
 	}
 };
 
 
-EHCIRootHub::EHCIRootHub(EHCI *ehci, int8 deviceAddress)
-	:	Hub(ehci, NULL, sEHCIRootHubDevice, deviceAddress, false)
+EHCIRootHub::EHCIRootHub(Object *rootObject, int8 deviceAddress)
+	:	Hub(rootObject, sEHCIRootHubDevice, deviceAddress, false)
 {
 }
 
