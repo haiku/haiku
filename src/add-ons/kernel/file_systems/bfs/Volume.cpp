@@ -106,7 +106,7 @@ DeviceOpener::Open(const char *device, int mode)
 void *
 DeviceOpener::InitCache(off_t numBlocks, uint32 blockSize)
 {
-	return block_cache_create(fDevice, numBlocks, blockSize);
+	return block_cache_create(fDevice, numBlocks, blockSize, fMode == O_RDONLY);
 }
 
 
@@ -152,7 +152,7 @@ DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
 
 	if (_size) {
 		*_size = 1LL * geometry.head_count * geometry.cylinder_count
-					* geometry.sectors_per_track * geometry.bytes_per_sector;
+			* geometry.sectors_per_track * geometry.bytes_per_sector;
 	}
 	if (_blockSize)
 		*_blockSize = geometry.bytes_per_sector;

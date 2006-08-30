@@ -116,7 +116,9 @@ struct block_cache {
 	block_list	unmapped_blocks;
 	block_list	unused_blocks;
 
-	block_cache(int fd, off_t numBlocks, size_t blockSize);
+	bool		read_only;
+
+	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
 	~block_cache();
 
 	status_t InitCheck();

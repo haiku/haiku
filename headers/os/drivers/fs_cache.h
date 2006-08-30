@@ -31,7 +31,7 @@ extern int32 cache_blocks_in_sub_transaction(void *_cache, int32 id);
 
 /* block cache */
 extern void block_cache_delete(void *_cache, bool allowWrites);
-extern void *block_cache_create(int fd, off_t numBlocks, size_t blockSize);
+extern void *block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
 extern status_t block_cache_sync(void *_cache);
 
 extern status_t block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction);

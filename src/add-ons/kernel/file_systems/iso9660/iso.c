@@ -267,7 +267,8 @@ ISOMount(const char *path, const int flags, nspace **newVol, bool allow_joliet)
 
 				/* Initialize access to the cache so that we can do cached i/o */
 				TRACE(("ISO9660: cache init: dev %d, max blocks %Ld\n", vol->fd, maxBlocks));
-				vol->fBlockCache = block_cache_create(vol->fd, maxBlocks, vol->logicalBlkSize[FS_DATA_FORMAT]);
+				vol->fBlockCache = block_cache_create(vol->fd, maxBlocks,
+					vol->logicalBlkSize[FS_DATA_FORMAT], true);
 				is_iso = true;
 			} else if ((*buffer == 0x02) && is_iso && allow_joliet) {
 				// ISO_VD_SUPPLEMENTARY
@@ -287,7 +288,6 @@ ISOMount(const char *path, const int flags, nspace **newVol, bool allow_joliet)
 					// update root directory record.
 					if (vol->joliet_level > 0)
 						InitNode(&(vol->rootDirRec), &buffer[156], NULL, 0);
-
 				}						
 			} else if (*(unsigned char *)buffer == 0xff) {
 				// ISO_VD_END

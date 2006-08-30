@@ -149,7 +149,7 @@ cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
 //	#pragma mark - block_cache
 
 
-block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
+block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize, bool readOnly)
 	:
 	hash(NULL),
 	fd(_fd),
@@ -158,7 +158,8 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
-	ranges_hash(NULL)
+	ranges_hash(NULL),
+	read_only(readOnly)
 {
 	hash = hash_init(32, 0, &cached_block::Compare, &cached_block::Hash);
 	if (hash == NULL)
@@ -1078,9 +1079,9 @@ block_cache_delete(void *_cache, bool allowWrites)
 
 
 extern "C" void *
-block_cache_create(int fd, off_t numBlocks, size_t blockSize)
+block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 {
-	block_cache *cache = new block_cache(fd, numBlocks, blockSize);
+	block_cache *cache = new block_cache(fd, numBlocks, blockSize, readOnly);
 	if (cache == NULL)
 		return NULL;
 
@@ -1126,6 +1127,9 @@ block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 
+	if (cache->read_only)
+		panic("tried to make block writable on a read-only cache!");
+
 	// ToDo: this can be done better!
 	void *block = get_writable_cached_block(cache, blockNumber,
 		blockNumber, 1, transaction, false);
@@ -1147,6 +1151,8 @@ block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
 
 	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
+	if (cache->read_only)
+		panic("tried to get writable block on a read-only cache!");
 
 	return get_writable_cached_block(cache, blockNumber, base, length,
 		transaction, false);
@@ -1169,6 +1175,8 @@ block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
 
 	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
+	if (cache->read_only)
+		panic("tried to get empty writable block on a read-only cache!");
 
 	return get_writable_cached_block((block_cache *)_cache, blockNumber,
 				blockNumber, 1, transaction, true);

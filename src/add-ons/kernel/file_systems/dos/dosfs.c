@@ -436,12 +436,13 @@ static status_t mount_fat_disk(const char *path, mount_id nsid,
 	}
 
 	// initialize block cache
-	vol->fBlockCache = block_cache_create(vol->fd, vol->total_sectors, vol->bytes_per_sector);
+	vol->fBlockCache = block_cache_create(vol->fd, vol->total_sectors,
+		vol->bytes_per_sector, (vol->flags & B_FS_IS_READONLY) != 0);
 	if (vol->fBlockCache == NULL) {
 		dprintf("error initializing block cache\n");
 		goto error;
 	}
-	
+
 	// as well as the vnode cache
 	if (init_vcache(vol) != B_OK) {
 		dprintf("error initializing vnode cache\n");
