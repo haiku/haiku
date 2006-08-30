@@ -367,7 +367,7 @@ identify_txt_header(uint8 *data, int32 bytesRead,
 		} else if ((c & 0x80) != 0 && valid_utf8_char(data + i, length)) {
 			int32 j = 1;
 			for (; j < (int32)length && i + j < bytesRead; j++) {
-				if ((data[j] & 0xc0) != 0x80) {
+				if ((data[i + j] & 0xc0) != 0x80) {
 					bad++;
 					break;
 				}
@@ -385,7 +385,7 @@ identify_txt_header(uint8 *data, int32 bytesRead,
 		return B_NO_TRANSLATOR;
 #endif
 
-	capability *= (float)bad / bytesRead;
+	capability *= (bytesRead - bad) / (float)bytesRead;
 
 	// return information about the data in the stream
 	outInfo->type = B_TRANSLATOR_TEXT;
