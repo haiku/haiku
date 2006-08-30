@@ -1549,9 +1549,8 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
 		_vnode, _cookie, op, buffer, length));
 
-	/* we are actually checking for a *device* here, we don't make the distinction
-	 * between char and block devices (yet ?)
-	 */
+	// we are actually checking for a *device* here, we don't make the distinction
+	// between char and block devices
 	if (S_ISCHR(vnode->stream.type)) {
 		switch (op) {
 			case B_GET_GEOMETRY:
@@ -1570,7 +1569,8 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 				geometry.sectors_per_track = 0;
 				if (geometry.bytes_per_sector == 0)
 					geometry.bytes_per_sector = 512;
-				geometry.sectors_per_track = partition->info.size / geometry.bytes_per_sector;
+				geometry.sectors_per_track = partition->info.size
+					/ geometry.bytes_per_sector;
 				geometry.head_count = 1;
 				geometry.cylinder_count = 1;
 
@@ -1579,14 +1579,14 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 			case B_GET_DRIVER_FOR_DEVICE:
 			{
-				const char *dpath;
+				const char *path;
 				if (!vnode->stream.u.dev.driver)
 					return B_ENTRY_NOT_FOUND;
-				dpath = vnode->stream.u.dev.driver->path;
-				if (!dpath)
+				path = vnode->stream.u.dev.driver->path;
+				if (path == NULL)
 					return B_ENTRY_NOT_FOUND;
-				// should make sure it's \0 terminated on truncation
-				return user_memcpy(buffer, dpath, strnlen(dpath, 255)+1);
+
+				return user_strlcpy((char *)buffer, path, B_FILE_NAME_LENGTH);
 			}
 
 			case B_GET_PARTITION_INFO:
@@ -1607,17 +1607,17 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 			{
 				char path[256];
 				status_t err;
-				/* XXX: we might want to actually find the mountpoint
+				/* TODO: we might want to actually find the mountpoint
 				 * of that instance of devfs...
 				 * but for now we assume it's mounted on /dev
 				 */
 				strcpy(path, "/dev/");
-				get_device_name(vnode, path+5, sizeof(path)-5);
-				err = user_memcpy(buffer, path, strnlen(path, sizeof(path)-1)+1);
-				return err;
+				get_device_name(vnode, path + 5, sizeof(path) - 5);
+				return user_strlcpy((char *)buffer, path, sizeof(path));
 			}
 
-				/* old unsupported R5 private stuff */
+			// old unsupported R5 private stuff
+
 			case B_GET_NEXT_OPEN_DEVICE:
 				dprintf("devfs: unsupported legacy ioctl B_GET_NEXT_OPEN_DEVICE\n");
 				return B_NOT_SUPPORTED;
