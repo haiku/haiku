@@ -1176,7 +1176,7 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	if (ref == NULL)
 		return NULL;
 
-	// ToDo: delay vm_cache/vm_cache_ref creation until data is
+	// TODO: delay vm_cache/vm_cache_ref creation until data is
 	//	requested/written for the first time? Listing lots of
 	//	files in Tracker (and elsewhere) could be slowed down.
 	//	Since the file_cache_ref itself doesn't have a lock,
@@ -1186,20 +1186,28 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	//	use atomic_test_and_set(), and free the resources again
 	//	when that fails...
 
-	// get the vnode of the underlying device
+	// Get the vnode of the underlying device
 	if (vfs_get_vnode_from_fd(fd, true, &ref->device) != B_OK)
 		goto err1;
 
-	// we also need the cookie of the underlying device to properly access it
+	// We also need the cookie of the underlying device to properly access it
 	if (vfs_get_cookie_from_fd(fd, &ref->cookie) != B_OK)
 		goto err2;
 
-	// get the vnode for the object (note, this does not grab a reference to the node)
+	// Get the vnode for the object (note, this does not grab a reference to the node)
 	if (vfs_lookup_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
 		goto err2;
 
+	// Gets (usually creates) the cache for the node - note, this does grab a
+	// reference to the node...
 	if (vfs_get_vnode_cache(ref->vnode, &ref->cache, true) != B_OK)
 		goto err2;
+
+	// ... that we don't need, and therefore release it again.
+	// Our caller already holds a reference to the vnode; it will destroy us
+	// when the last one goes away (which, of course, can only ever happen if
+	// we don't grab an extra reference).
+	vfs_put_vnode(ref->vnode);
 
 	ref->cache->cache->virtual_size = size;
 	((vnode_store *)ref->cache->cache->store)->file_cache_ref = ref;

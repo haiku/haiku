@@ -1101,6 +1101,13 @@ err1:
 }
 
 
+/**	Creates the vnode cache for the specified \a vnode.
+ *	The vnode has to be marked busy when calling this function.
+ *	If successful, it will also acquire an extra reference to
+ *	the vnode (as the vnode store itself can't do this
+ *	automatically).
+ */
+
 status_t
 vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 {
@@ -1121,6 +1128,7 @@ vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 		goto err2;
 
 	*_cacheRef = cache->ref;
+	vfs_acquire_vnode(vnode);
 	return B_OK;
 
 err2:
