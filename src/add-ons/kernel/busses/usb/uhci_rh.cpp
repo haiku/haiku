@@ -104,7 +104,7 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 	},
 
 	{
-		12,								// Descriptor length
+		22,								// Descriptor length
 		USB_DESCRIPTOR_STRING,			// Descriptor type
 		{
 			'H', 'A', 'I', 'K', 'U',	// Characters
