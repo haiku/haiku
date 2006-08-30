@@ -7,7 +7,6 @@
  *		Niels S. Reedijk
  */
 
-#define TRACE_USB
 #include <util/kernel_cpp.h>
 #include "usb_p.h"
 #include <USB_rle.h>
