@@ -39,7 +39,7 @@ openDevice(const char *name)
 
 	int device = open(name, O_RDONLY);
 	if (device < 0)
-		fprintf(stderr, "%s: could not open \"%s\": %s\n", gProgramName, name, strerror(device));
+		fprintf(stderr, "%s: could not open \"%s\": %s\n", gProgramName, name, strerror(errno));
 	else {
 		uint32 version;
 		if (ioctl(device, BFS_IOCTL_VERSION, &version) < B_OK) {
@@ -119,7 +119,7 @@ main(int argc, char **argv)
 	if (argc < 2 || !strcmp(argv[1], "--help"))
 	{
 		printUsage();
-		return -1;
+		return 1;
 	}
 
 	control.magic = BFS_IOCTL_CHECK_MAGIC;
@@ -152,13 +152,13 @@ main(int argc, char **argv)
 
 	int device = openDevice(argv[0]);
 	if (device < 0)
-	    return -1;
+	    return 1;
 
 	// start checking
 
 	if (startChecking(device, control) < B_OK) {
 		close(device);
-		return -1;
+		return 1;
 	}
 
 	// reset all counters
@@ -208,7 +208,7 @@ main(int argc, char **argv)
 
 	if (stopChecking(device, control) < B_OK) {
 		close(device);
-		return -1;
+		return 1;
 	}
 
 	// print stats

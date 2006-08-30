@@ -143,7 +143,7 @@ main(int argc, char **argv)
 			if (device < 0) {
 				fprintf(stderr, "%s: could not find device: %s\n", __progname,
 					strerror(errno));
-				return -1;
+				return 1;
 			}
 			mode = kFilterDevice;
 			if (argv[1][1] == 'D')
@@ -154,7 +154,7 @@ main(int argc, char **argv)
 			if (::stat(argv[2], &stat) < 0) {
 				fprintf(stderr, "%s: could not open file: %s\n", __progname,
 					strerror(errno));
-				return -1;
+				return 1;
 			}
 			device = stat.st_dev;
 			node = stat.st_ino;

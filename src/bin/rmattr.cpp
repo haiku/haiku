@@ -33,7 +33,7 @@ usage()
 		"\t'attr' is the name of an attribute of the file\n"
 		"\tIf '-p' is specified, 'attr' is regarded as a pattern.\n", kProgramName);
 
-	exit(0);	
+	exit(1);	
 }
 
 
@@ -110,7 +110,7 @@ main(int32 argc, const char **argv)
 		if (fd < 0) {
 			fprintf(stderr, "%s: can\'t open file %s to remove attribute: %s\n", 
 				kProgramName, argv[i], strerror(errno));
-			return 0;
+			return 1;
 		}
 
 		if (remove_attribute(fd, argv[attr], isPattern) != B_OK) {
