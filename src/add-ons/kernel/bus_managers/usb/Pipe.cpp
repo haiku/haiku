@@ -18,7 +18,7 @@ Pipe::Pipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
 		fDirection(direction),
 		fSpeed(speed),
 		fMaxPacketSize(maxPacketSize),
-		fDataToggle(true)
+		fDataToggle(false)
 {
 }
 
