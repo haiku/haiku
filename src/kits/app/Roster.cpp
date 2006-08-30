@@ -1442,8 +1442,8 @@ BRoster::_AddApplication(const char *mimeSig, const entry_ref *ref,
 		} else {
 			if (reply.FindInt32("error", &error) != B_OK)
 				error = B_ERROR;
-			if (otherTeam)
-				reply.FindInt32("other_team", otherTeam);
+			if (otherTeam && reply.FindInt32("other_team", otherTeam) != B_OK)
+				*otherTeam = -1;
 		}
 	}
 	return error;
