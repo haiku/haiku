@@ -419,21 +419,21 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 
 
 status_t
-arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *fault_handler)
+arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler)
 {
 	char *tmp = (char *)to;
 	char *s = (char *)from;
 
-	*fault_handler = (addr_t)&&error;
+	*faultHandler = (addr_t)&&error;
 
 	while (size--)
 		*tmp++ = *s++;
 
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return 0;
 
 error:
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return B_BAD_ADDRESS;
 }
 
@@ -441,24 +441,25 @@ error:
 ssize_t
 arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
 {
-	int from_length = 0;
+	int fromLength = 0;
 
 	*faultHandler = (addr_t)&&error;
 
 	if (size > 0) {
 		to[--size] = '\0';
 		// copy 
-		for ( ; size; size--, from_length++, to++, from++) {
+		for ( ; size; size--, fromLength++, to++, from++) {
 			if ((*to = *from) == '\0')
 				break;
 		}
 	}
 	// count any leftover from chars
-	while (*from++ != '\0')
-		from_length++;
+	while (*from++ != '\0') {
+		fromLength++;
+	}
 
 	*faultHandler = 0;
-	return from_length;
+	return fromLength;
 
 error:
 	*faultHandler = 0;
@@ -467,20 +468,20 @@ error:
 
 
 status_t
-arch_cpu_user_memset(void *s, char c, size_t count, addr_t *fault_handler)
+arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 {
 	char *xs = (char *)s;
 
-	*fault_handler = (addr_t)&&error;
+	*faultHandler = (addr_t)&&error;
 
 	while (count--)
 		*xs++ = c;
 
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return 0;
 
 error:
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return B_BAD_ADDRESS;
 }
 
