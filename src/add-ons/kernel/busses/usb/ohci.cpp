@@ -115,11 +115,8 @@ ohci_add_to( Stack *stack )
 	item = new pci_info;
 	for ( i = 0 ; OHCI::pci_module->get_nth_pci_info( i , item ) == B_OK ; i++ )
 	{
-		//
-		//	class_base = 0C (serial bus) class_sub = 03 (usb) prog_int: 10 (OHCI)
-		//
-		if ( ( item->class_base == 0x0C ) && ( item->class_sub == 0x03 ) &&
-			 ( item->class_api  == 0x10 ) )
+		if ( ( item->class_base == PCI_serial_bus ) && ( item->class_sub == PCI_usb ) &&
+			 ( item->class_api  == PCI_usb_ohci ) )
 		{
 			if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF)) 
 			{

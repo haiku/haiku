@@ -480,6 +480,7 @@ struct pci_module_info {
 
 #define PCI_usb_uhci			0x00	/* Universal Host Controller Interface */
 #define PCI_usb_ohci			0x10	/* Open Host Controller Interface */
+#define PCI_usb_ehci			0x20	/* Enhanced Host Controller Interface */
 
 
 /* ---

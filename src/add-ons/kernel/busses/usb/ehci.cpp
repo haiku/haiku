@@ -256,9 +256,9 @@ EHCI::AddTo(Stack *stack)
 	}
 
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
-		// class_base: 0C (Serial Bus); class_sub: 03 (USB); class_api: 20 (EHCI)
-		if (item->class_base == 0x0C && item->class_sub == 0x03
-			&& item->class_api == 0x20) {
+
+		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
+			&& item->class_api == PCI_usb_ehci) {
 			if (item->u.h0.interrupt_line == 0
 				|| item->u.h0.interrupt_line == 0xFF) {
 				TRACE_ERROR(("usb_ehci: found device with invalid IRQ - check IRQ assignement\n"));
