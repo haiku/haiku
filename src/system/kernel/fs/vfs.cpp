@@ -5502,6 +5502,8 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 			// wait a bit until the last access is finished, and then try again
 			mutex_unlock(&sVnodeMutex);
 			snooze(100000);
+			// TODO: if there is some kind of bug that prevents the ref counts
+			//	from getting back to zero, this will fall into an endless loop...
 			mutex_lock(&sVnodeMutex);
 			continue;
 		}
