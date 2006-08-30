@@ -21,7 +21,7 @@ usage(const char *programName)
 	printf("usage: %s [-ro] [-t fstype] [-p parameter] device directory\n"
 		"\t-ro\tmounts the volume read-only\n"
 		"\t-t\tspecifies the file system to use (defaults to automatic recognition)\n",programName);
-	exit(0);
+	exit(1);
 }
 
 
@@ -75,11 +75,11 @@ main(int argc, char **argv)
 
 	if (stat(mountPoint, &mountStat) < 0) {
 		fprintf(stderr, "%s: The mount point '%s' is not accessible\n", programName, mountPoint);
-		return -1;
+		return 1;
 	}
 	if (!S_ISDIR(mountStat.st_mode)) {
 		fprintf(stderr, "%s: The mount point '%s' is not a directory\n", programName, mountPoint);
-		return -1;
+		return 1;
 	}
 
 	/* do the work */
@@ -87,7 +87,7 @@ main(int argc, char **argv)
 	volume = fs_mount_volume(mountPoint, device, fs, flags, parameter);
 	if (volume < B_OK) {
 		fprintf(stderr, "%s: %s\n", programName, strerror(volume));
-		return -1;
+		return 1;
 	}
 	return 0;
 }
