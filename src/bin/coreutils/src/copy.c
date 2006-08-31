@@ -168,7 +168,7 @@ copy_attributes(int fromFd, int toFd)
 				break;
 			
 			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos, buffer, bytesRead);
-			if (bytesWritten <= 0)
+			if (bytesWritten != bytesRead)
 				break;
 
 			pos += bytesWritten;
