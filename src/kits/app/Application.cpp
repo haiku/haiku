@@ -318,8 +318,10 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 	bool preRegistered = false;
 	app_info appInfo;
 	if (fInitError == B_OK && !isRegistrar) {
-		preRegistered = BRoster::Private().IsAppPreRegistered(&ref, team,
-							&appInfo);
+		if (BRoster::Private().IsAppRegistered(&ref, team, 0, &preRegistered,
+				&appInfo) != B_OK) {
+			preRegistered = false;
+		}
 	}
 	if (preRegistered) {
 		// we are pre-registered => the app info has been filled in

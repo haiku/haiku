@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2001-2006, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -65,9 +65,8 @@ static bool larger_index(const recent_entry *entry1, const recent_entry *entry2)
 	are one or more instances of the application that are pre-registered, but
 	have no team ID assigned yet, the reply to the request has to be
 	postponed until the status of the requesting team is clear. The request
-	message is dequeued from the registrar's message queue and, with
-	additional information (IAPRRequest), added to \a fIAPRRequests for a
-	later reply.
+	message is dequeued from the registrar's message queue and added to
+	\a fIARRequestsByID for a later reply.
 
 	The field \a fActiveApp identifies the currently active application
 	and \a fLastToken is a counter used to generate unique tokens for
@@ -115,7 +114,8 @@ TRoster::TRoster()
 	   : fLock("roster"),
 	     fRegisteredApps(),
 		 fEarlyPreRegisteredApps(),
-		 fIAPRRequests(),
+		 fIARRequestsByID(),
+		 fIARRequestsByToken(),
 		 fActiveApp(NULL),
 		 fWatchingService(),
 		 fRecentApps(),
@@ -176,6 +176,8 @@ PRINT(("full registration: %d\n", fullReg));
 
 	// check the parameters
 	team_id otherTeam = -1;
+	uint32 token = 0;
+	
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
 
 	// entry_ref
@@ -206,6 +208,7 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 				|| ((info = fEarlyPreRegisteredApps.InfoFor(signature))))) {
 			SET_ERROR(error, B_ALREADY_RUNNING);
 			otherTeam = info->team;
+			token = info->token;
 		}
 	}
 
@@ -219,7 +222,6 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	}
 
 	// Add the application info.
-	uint32 token = 0;
 	if (error == B_OK) {
 		// alloc and init the info
 		RosterAppInfo *info = new(nothrow) RosterAppInfo;
@@ -270,6 +272,8 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 		reply.AddInt32("error", error);
 		if (otherTeam >= 0)
 			reply.AddInt32("other_team", otherTeam);
+		if (token > 0)
+			reply.AddInt32("token", (int32)token);
 		request->SendReply(&reply);
 	}
 
@@ -339,12 +343,12 @@ TRoster::HandleCompleteRegistration(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleIsAppPreRegistered
-/*!	\brief Handles an IsAppPreRegistered() request.
+// HandleIsAppRegistered
+/*!	\brief Handles an IsAppRegistered() request.
 	\param request The request message
 */
 void
-TRoster::HandleIsAppPreRegistered(BMessage *request)
+TRoster::HandleIsAppRegistered(BMessage *request)
 {
 	FUNCTION_START();
 
@@ -354,36 +358,48 @@ TRoster::HandleIsAppPreRegistered(BMessage *request)
 	// get the parameters
 	entry_ref ref;
 	team_id team;
+	uint32 token;
 	if (request->FindRef("ref", &ref) != B_OK)
 		SET_ERROR(error, B_BAD_VALUE);
 	if (request->FindInt32("team", &team) != B_OK)
 		team = -1;
-PRINT(("team: %ld\n", team));
+	if (request->FindInt32("token", (int32*)&token) != B_OK)
+		token = 0;
+PRINT(("team: %ld, token: %lu\n", team, token));
 PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+
 	// check the parameters
 	// entry_ref
 	if (error == B_OK & !BEntry(&ref).Exists())
 		SET_ERROR(error, B_ENTRY_NOT_FOUND);
-	// team
-	if (error == B_OK && team < 0)
+	// team/token
+	if (error == B_OK && team < 0 && token == 0)
 		SET_ERROR(error, B_BAD_VALUE);
+
 	// look up the information
 	RosterAppInfo *info = NULL;
 	if (error == B_OK) {
 		if ((info = fRegisteredApps.InfoFor(team)) != NULL) {
 PRINT(("found team in fRegisteredApps\n"));
-			_ReplyToIAPRRequest(request, info);
-		} else if ((info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL) {
-PRINT(("found ref in fEarlyRegisteredApps\n"));
+			_ReplyToIARRequest(request, info);
+		} else if (token > 0
+			&& (info = fEarlyPreRegisteredApps.InfoForToken(token)) != NULL) {
+PRINT(("found ref in fEarlyRegisteredApps (by token)\n"));
 			// pre-registered and has no team ID assigned yet -- queue the
 			// request
 			be_app->DetachCurrentMessage();
-			IAPRRequest queuedRequest = { ref, team, request };
-			fIAPRRequests[team] = queuedRequest;
+			_AddIARRequest(fIARRequestsByToken, team, request);
+		} else if (team >= 0
+			&& (info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL) {
+PRINT(("found ref in fEarlyRegisteredApps (by ref)\n"));
+			// pre-registered and has no team ID assigned yet -- queue the
+			// request
+			be_app->DetachCurrentMessage();
+			_AddIARRequest(fIARRequestsByID, team, request);
 		} else {
 PRINT(("didn't find team or ref\n"));
-			// team not registered, ref not early pre-registered
-			_ReplyToIAPRRequest(request, NULL);
+			// team not registered, ref/token not early pre-registered
+			_ReplyToIARRequest(request, NULL);
 		}
 	} else {
 		// reply to the request on error
@@ -524,14 +540,23 @@ PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 					delete_port(info->port);
 				delete info;
 			}
-			// handle a pending IsAppPreRegistered() request
-			IAPRRequestMap::iterator it = fIAPRRequests.find(team);
-			if (it != fIAPRRequests.end()) {
-				IAPRRequest &request = it->second;
+			// handle pending IsAppRegistered() requests
+			IARRequestMap::iterator it = fIARRequestsByID.find(team);
+			if (it != fIARRequestsByID.end()) {
+				BMessageQueue *requests = it->second;
 				if (error == B_OK)
-					_ReplyToIAPRRequest(request.request, info);
-				delete request.request;
-				fIAPRRequests.erase(it);
+					_ReplyToIARRequests(requests, info);
+				delete requests;
+				fIARRequestsByID.erase(it);
+			}
+
+			it = fIARRequestsByToken.find((int32)token);
+			if (it != fIARRequestsByToken.end()) {
+				BMessageQueue *requests = it->second;
+				if (error == B_OK)
+					_ReplyToIARRequests(requests, info);
+				delete requests;
+				fIARRequestsByToken.erase(it);
 			}
 		} else
 			SET_ERROR(error, B_REG_APP_NOT_PRE_REGISTERED);
@@ -1543,11 +1568,57 @@ TRoster::_NextToken()
 	return ++fLastToken;
 }
 
-// _ReplyToIAPRRequest
-/*!	\brief Sends a reply message to a IsAppPreRegistered() request.
+// _AddIARRequest
+/*!	\brief Adds an IsAppRegistered() request to the given map.
+
+	If something goes wrong, the method deletes the request.
+
+	\param map The map the request shall be added to.
+	\param key The key under which to add the request.
+	\param request The request message to be added.
+*/
+void
+TRoster::_AddIARRequest(IARRequestMap& map, int32 key, BMessage* request)
+{
+	IARRequestMap::iterator it = map.find(key);
+	BMessageQueue* requests = NULL;
+	if (it == map.end()) {
+		requests = new(nothrow) BMessageQueue();
+		if (!requests) {
+			delete request;
+			return;
+		}
+
+		map[key] = requests;
+	} else
+		requests = it->second;
+
+	requests->AddMessage(request);
+}
+
+// _ReplyToIARRequests
+/*!	\brief Invokes _ReplyToIARRequest() for all messages in the given
+		   message queue.
+
+	\param requests The request messages to be replied to
+	\param info The RosterAppInfo of the application in question
+		   (may be \c NULL)
+*/
+void
+TRoster::_ReplyToIARRequests(BMessageQueue *requests,
+	const RosterAppInfo *info)
+{
+	while (BMessage* request = requests->NextMessage()) {
+		_ReplyToIARRequest(request, info);
+		delete request;
+	}
+}
+
+// _ReplyToIARRequest
+/*!	\brief Sends a reply message to an IsAppRegistered() request.
 
 	The message to be sent is a simple \c B_REG_SUCCESS message containing
-	a "pre-registered" field, that sais whether or not the application is
+	a "pre-registered" field, that says whether or not the application is
 	pre-registered. It will be set to \c false, unless an \a info is supplied
 	and the application this info refers to is pre-registered.
 
@@ -1556,7 +1627,7 @@ TRoster::_NextToken()
 		   (may be \c NULL)
 */
 void
-TRoster::_ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info)
+TRoster::_ReplyToIARRequest(BMessage *request, const RosterAppInfo *info)
 {
 	// pre-registered or registered?
 	bool preRegistered = false;
@@ -1573,9 +1644,10 @@ TRoster::_ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info)
 	}
 	// send reply
 	BMessage reply(B_REG_SUCCESS);
+	reply.AddBool("registered", (bool)info);
 	reply.AddBool("pre-registered", preRegistered);
-PRINT(("_ReplyToIAPRRequest(): pre-registered: %d\n", preRegistered));
-	if (preRegistered)
+PRINT(("_ReplyToIARRequest(): pre-registered: %d\n", preRegistered));
+	if (info)
 		_AddMessageAppInfo(&reply, info);
 	request->SendReply(&reply);
 }

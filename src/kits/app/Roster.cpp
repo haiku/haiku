@@ -1424,10 +1424,12 @@ BRoster::_AddApplication(const char *mimeSig, const entry_ref *ref,
 		error = request.AddInt32("port", port);
 	if (error == B_OK)
 		error = request.AddBool("full_registration", fullReg);
+
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
 		error = fMessenger.SendMessage(&request, &reply);
+
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -1442,8 +1444,11 @@ BRoster::_AddApplication(const char *mimeSig, const entry_ref *ref,
 		} else {
 			if (reply.FindInt32("error", &error) != B_OK)
 				error = B_ERROR;
+			// get team and token from the reply
 			if (otherTeam && reply.FindInt32("other_team", otherTeam) != B_OK)
 				*otherTeam = -1;
+			if (pToken && reply.FindInt32("token", (int32*)pToken) != B_OK)
+				*pToken = 0;
 		}
 	}
 	return error;
@@ -1580,46 +1585,66 @@ BRoster::_CompleteRegistration(team_id team, thread_id thread,
 	return error;
 }
 
-// IsAppPreRegistered
-/*!	\brief Returns whether an application is pre-registered.
+// _IsAppRegistered
+/*!	\brief Returns whether an application is registered.
 
 	If the application is indeed pre-registered and \a info is not \c NULL,
 	the methods fills in the app_info structure pointed to by \a info.
 
 	\param ref An entry_ref referring to the app's executable
-	\param team The app's team ID
+	\param team The app's team ID. May be -1, if \a token is given.
+	\param token The app's pre-registration token. May be 0, if \a team is
+				 given.
+	\param preRegistered: Pointer to a pre-allocated bool to be filled in
+		   by this method, indicating whether or not the app was
+		   pre-registered.
 	\param info A pointer to a pre-allocated app_info structure to be filled
 		   in by this method (may be \c NULL)
-	\return \c true, if the application is pre-registered, \c false if not.
+	\return
+		- \c B_OK, if the application is registered and all requested
+		  information could be retrieved,
+		- another error code, if the app is not registered or an error occurred.
 */
-bool
-BRoster::_IsAppPreRegistered(const entry_ref *ref, team_id team,
-	app_info *info) const
+status_t
+BRoster::_IsAppRegistered(const entry_ref *ref, team_id team,
+	uint32 token, bool *preRegistered, app_info *info) const
 {
 	status_t error = B_OK;
+
 	// compose the request message
-	BMessage request(B_REG_IS_APP_PRE_REGISTERED);
+	BMessage request(B_REG_IS_APP_REGISTERED);
 	if (error == B_OK && ref)
 		error = request.AddRef("ref", ref);
 	if (error == B_OK && team >= 0)
 		error = request.AddInt32("team", team);
+	if (error == B_OK && token > 0)
+		error = request.AddInt32("token", (int32)token);
+	
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
 		error = fMessenger.SendMessage(&request, &reply);
 
 	// evaluate the reply
+	bool isRegistered = false;
 	bool isPreRegistered = false;
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
-			if (reply.FindBool("pre-registered", &isPreRegistered) != B_OK)
+			if (reply.FindBool("registered", &isRegistered) != B_OK
+				|| !isRegistered
+				|| reply.FindBool("pre-registered", &isPreRegistered) != B_OK) {
 				error = B_ERROR;
-			if (error == B_OK && isPreRegistered && info)
+			}
+
+			if (error == B_OK && preRegistered)
+				*preRegistered = isPreRegistered;
+			if (error == B_OK && info)
 				error = find_message_app_info(&reply, info);
 		} else if (reply.FindInt32("error", &error) != B_OK)
 			error = B_ERROR;
 	}
-	return error == B_OK && isPreRegistered;
+	
+	return error;
 }
 
 // RemovePreRegApp
@@ -1815,10 +1840,13 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 		if (error == B_ALREADY_RUNNING) {
 			DBG(OUT("  already running\n"));
 			alreadyRunning = true;
-			error = B_OK;
+
 			// get the app flags for the running application
-			if (GetRunningAppInfo(team, &appInfo) == B_OK)
+			error = _IsAppRegistered(&appRef, team, appToken, NULL, &appInfo);
+			if (error == B_OK) {
 				otherAppFlags = appInfo.flags;
+				team = appInfo.team;
+			}
 		}
 		DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
 	}

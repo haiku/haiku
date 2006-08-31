@@ -126,8 +126,8 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_COMPLETE_REGISTRATION:
 			fRoster->HandleCompleteRegistration(message);
 			break;
-		case B_REG_IS_APP_PRE_REGISTERED:
-			fRoster->HandleIsAppPreRegistered(message);
+		case B_REG_IS_APP_REGISTERED:
+			fRoster->HandleIsAppRegistered(message);
 			break;
 		case B_REG_REMOVE_PRE_REGISTERED_APP:
 			fRoster->HandleRemovePreRegApp(message);

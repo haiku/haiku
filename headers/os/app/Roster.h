@@ -136,6 +136,8 @@ class BRoster {
 					port_id port) const;
 		bool _IsAppPreRegistered(const entry_ref *ref, team_id team,
 					app_info *info) const;
+		status_t _IsAppRegistered(const entry_ref *ref, team_id team,
+					uint32 token, bool *preRegistered, app_info *info) const;
 		status_t _RemovePreRegApp(uint32 entryToken) const;
 		status_t _RemoveApp(team_id team) const;
 		void _ApplicationCrashed(team_id team);

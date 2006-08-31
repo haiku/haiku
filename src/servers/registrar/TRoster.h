@@ -32,6 +32,7 @@
 #include <map>
 
 #include <Locker.h>
+#include <MessageQueue.h>
 #include <SupportDefs.h>
 
 #include "AppInfoList.h"
@@ -48,13 +49,7 @@ using std::map;
 class BMessage;
 class WatchingService;
 
-struct IAPRRequest {
-	entry_ref	ref;
-	team_id		team;
-	BMessage	*request;
-};
-
-typedef map<team_id, IAPRRequest>	IAPRRequestMap;
+typedef map<int32, BMessageQueue*>	IARRequestMap;
 
 class TRoster {
 public:
@@ -63,7 +58,7 @@ public:
 
 	void HandleAddApplication(BMessage *request);
 	void HandleCompleteRegistration(BMessage *request);
-	void HandleIsAppPreRegistered(BMessage *request);
+	void HandleIsAppRegistered(BMessage *request);
 	void HandleRemovePreRegApp(BMessage *request);
 	void HandleRemoveApp(BMessage *request);
 	void HandleSetThreadAndTeam(BMessage *request);
@@ -115,7 +110,11 @@ private:
 	static status_t _AddMessageWatchingInfo(BMessage *message,
 											const app_info *info);
 	uint32 _NextToken();
-	void _ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info);
+
+	void _AddIARRequest(IARRequestMap& map, int32 key, BMessage* request);
+	void _ReplyToIARRequests(BMessageQueue *requests,
+		const RosterAppInfo *info);
+	void _ReplyToIARRequest(BMessage *request, const RosterAppInfo *info);
 
 	void _HandleGetRecentEntries(BMessage *request);
 
@@ -129,7 +128,8 @@ private:
 	BLocker			fLock;
 	AppInfoList		fRegisteredApps;
 	AppInfoList		fEarlyPreRegisteredApps;
-	IAPRRequestMap	fIAPRRequests;
+	IARRequestMap	fIARRequestsByID;
+	IARRequestMap	fIARRequestsByToken;
 	RosterAppInfo	*fActiveApp;
 	WatchingService	fWatchingService;
 	RecentApps		fRecentApps;

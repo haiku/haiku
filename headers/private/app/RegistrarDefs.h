@@ -55,7 +55,7 @@ enum {
 	// roster requests
 	B_REG_ADD_APP							= 'rgaa',
 	B_REG_COMPLETE_REGISTRATION				= 'rgcr',
-	B_REG_IS_APP_PRE_REGISTERED				= 'rgip',
+	B_REG_IS_APP_REGISTERED					= 'rgip',
 	B_REG_REMOVE_PRE_REGISTERED_APP			= 'rgrp',
 	B_REG_REMOVE_APP						= 'rgra',
 	B_REG_SET_THREAD_AND_TEAM				= 'rgtt',

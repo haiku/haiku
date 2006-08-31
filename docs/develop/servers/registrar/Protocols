@@ -155,23 +155,29 @@ error reply fields:
 
 -----------------------------------------------------------------------
 
-app pre-registration check (BRoster::IsAppPreRegistered())
+app registration check (BRoster::IsAppRegistered())
 
 target:		roster
-message:	B_REG_IS_APP_PRE_REGISTERED
-			"ref":	B_REF_TYPE
-			"team":	B_INT32_TYPE
+message:	B_REG_IS_APP_REGISTERED
+			"ref":		B_REF_TYPE
+			( "team":	B_INT32_TYPE
+			| "token":	B_INT32_TYPE )
 reply:		standard success
+			"registered":		B_BOOL_TYPE
 			"pre-registered":	B_BOOL_TYPE
+			[ "app_info":		flattened app_info ]
 on error:	- B_NO_REPLY (fatal)
 			- standard error
 
 message fields:
 - "ref": An entry_ref to the application executable.
 - "team": The application team (team_id).
+- "token": The application's preregistration token.
 
 reply fields:
+- "registered": true, if the app is (pre-)registered, false otherwise.
 - "pre-registered": true, if the app is pre-registered, false otherwise.
+- "app_info": Flattened app info, if the app is known (i.e. (pre-)registered).
 
 error reply fields:
 - "error":

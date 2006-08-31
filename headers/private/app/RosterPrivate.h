@@ -43,9 +43,10 @@ class BRoster::Private {
 					port_id port) const
 			{ return fRoster->_CompleteRegistration(team, thread, port); }
 
-		bool IsAppPreRegistered(const entry_ref *ref, team_id team,
-					app_info *info) const
-			{ return fRoster->_IsAppPreRegistered(ref, team, info); }
+		status_t IsAppRegistered(const entry_ref *ref, team_id team,
+					uint32 token, bool *preRegistered, app_info *info) const
+			{ return fRoster->_IsAppRegistered(ref, team, token, preRegistered,
+					info); }
 
 		status_t RemoveApp(team_id team) const
 			{ return fRoster->_RemoveApp(team); }
