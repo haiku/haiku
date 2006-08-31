@@ -20,7 +20,7 @@
 #ifdef COMPILE_FOR_R5
 extern "C" {
 #endif
-	#include <fsproto.h>
+	#include "fsproto.h"
 #ifdef COMPILE_FOR_R5
 }
 #endif

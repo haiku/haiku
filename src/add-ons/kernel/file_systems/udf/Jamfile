@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems udf ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
 
 # save original optimization level
@@ -23,7 +24,7 @@ oldOPTIM = $(OPTIM) ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
 }
 
-UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders kernel ;			# For kernel_cpp.cpp
 UsePrivateHeaders [ FDirName kernel util ] ;	# For all the UDF source files
 
 KernelAddon udf : kernel file_systems :

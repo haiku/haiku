@@ -340,10 +340,10 @@ Volume::_SetPartition(uint number, Partition *partition)
 /*! \brief Returns the partition associated with the given number, or
 	NULL if no such partition exists or the number is invalid.
 */
-Partition*
+Udf::Partition*
 Volume::_GetPartition(uint number)
 {
 	return (number < UDF_MAX_PARTITION_MAPS)
 	       ? fPartitions[number] : NULL;
 }
-	
+
