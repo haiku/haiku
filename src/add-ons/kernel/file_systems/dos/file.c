@@ -120,8 +120,8 @@ dosfs_release_vnode(void *_vol, void *_node, bool reenter)
 
 	TOUCH(reenter);
 
-	if (check_nspace_magic(vol, "dosfs_write_vnode") ||
-		check_vnode_magic(node, "dosfs_write_vnode")) {
+	if (check_nspace_magic(vol, "dosfs_write_vnode")
+		|| check_vnode_magic(node, "dosfs_write_vnode")) {
 		return EINVAL;
 	}
 
@@ -158,8 +158,8 @@ dosfs_rstat(void *_vol, void *_node, struct stat *st)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_rstat") ||
-		check_vnode_magic(node, "dosfs_rstat")) {
+	if (check_nspace_magic(vol, "dosfs_rstat")
+		|| check_vnode_magic(node, "dosfs_rstat")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -199,8 +199,8 @@ dosfs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_wstat") ||
-		check_vnode_magic(node, "dosfs_wstat")) {
+	if (check_nspace_magic(vol, "dosfs_wstat")
+		|| check_vnode_magic(node, "dosfs_wstat")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -285,8 +285,8 @@ dosfs_open(void *_vol, void *_node, int omode, void **_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_open") ||
-		check_vnode_magic(node, "dosfs_open")) {
+	if (check_nspace_magic(vol, "dosfs_open")
+		|| check_vnode_magic(node, "dosfs_open")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -362,9 +362,9 @@ dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic((nspace *)vol, "dosfs_read") ||
-		check_vnode_magic(node, "dosfs_read") ||
-		check_filecookie_magic(cookie, "dosfs_read")) {
+	if (check_nspace_magic((nspace *)vol, "dosfs_read")
+		|| check_vnode_magic(node, "dosfs_read")
+		|| check_filecookie_magic(cookie, "dosfs_read")) {
 		*len = 0;
 		UNLOCK_VOL(vol);
 		return EINVAL;
@@ -519,9 +519,9 @@ dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic((nspace *)vol, "dosfs_write") ||
-		check_vnode_magic(node, "dosfs_write") ||
-		check_filecookie_magic(cookie, "dosfs_write")) {
+	if (check_nspace_magic((nspace *)vol, "dosfs_write")
+		|| check_vnode_magic(node, "dosfs_write")
+		|| check_filecookie_magic(cookie, "dosfs_write")) {
 		*len = 0;
 		UNLOCK_VOL(vol);
 		return EINVAL;
@@ -710,9 +710,9 @@ dosfs_close(void *_vol, void *_node, void *_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_close") ||
-		check_vnode_magic(node, "dosfs_close") ||
-		check_filecookie_magic(_cookie, "dosfs_close")) {
+	if (check_nspace_magic(vol, "dosfs_close")
+		|| check_vnode_magic(node, "dosfs_close")
+		|| check_filecookie_magic(_cookie, "dosfs_close")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -738,9 +738,9 @@ dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
 	filecookie *cookie = _cookie;
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_free_cookie") ||
-		check_vnode_magic(node, "dosfs_free_cookie") ||
-		check_filecookie_magic(cookie, "dosfs_free_cookie")) {
+	if (check_nspace_magic(vol, "dosfs_free_cookie")
+		|| check_vnode_magic(node, "dosfs_free_cookie")
+		|| check_filecookie_magic(cookie, "dosfs_free_cookie")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -768,8 +768,8 @@ dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 	
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_create") ||
-		check_vnode_magic(dir, "dosfs_create")) {
+	if (check_nspace_magic(vol, "dosfs_create")
+		|| check_vnode_magic(dir, "dosfs_create")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -918,8 +918,8 @@ dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms, vnode_id *_vnid
 	
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_mkdir") ||
-		check_vnode_magic(dir, "dosfs_mkdir")) {
+	if (check_nspace_magic(vol, "dosfs_mkdir")
+		|| check_vnode_magic(dir, "dosfs_mkdir")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1071,9 +1071,9 @@ dosfs_rename(void *_vol, void *_odir, const char *oldname,
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_rename") ||
-		check_vnode_magic(odir, "dosfs_rename") ||
-		check_vnode_magic(ndir, "dosfs_rename")) {
+	if (check_nspace_magic(vol, "dosfs_rename")
+		|| check_vnode_magic(odir, "dosfs_rename")
+		|| check_vnode_magic(ndir, "dosfs_rename")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1295,8 +1295,8 @@ dosfs_remove_vnode(void *_vol, void *_node, bool reenter)
 
 	if (!reenter) { LOCK_VOL(vol); }
 
-	if (check_nspace_magic(vol, "dosfs_remove_vnode") ||
-		check_vnode_magic(node, "dosfs_remove_vnode")) {
+	if (check_nspace_magic(vol, "dosfs_remove_vnode")
+		|| check_vnode_magic(node, "dosfs_remove_vnode")) {
 		if (!reenter) UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1357,8 +1357,8 @@ do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "do_unlink") ||
-		check_vnode_magic(dir, "do_unlink")) {
+	if (check_nspace_magic(vol, "do_unlink")
+		|| check_vnode_magic(dir, "do_unlink")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1484,9 +1484,9 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	vnode   *node = (vnode *)_node;
 	status_t status;
 	
-	if (check_nspace_magic(vol, "dosfs_read_pages") ||
-                check_vnode_magic(node, "dosfs_read_pages"))
-                return EINVAL;
+	if (check_nspace_magic(vol, "dosfs_read_pages")
+		|| check_vnode_magic(node, "dosfs_read_pages"))
+		return EINVAL;
 
 	if (node->cache == NULL)
 		return(B_BAD_VALUE);
@@ -1508,9 +1508,9 @@ dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	vnode   *node = (vnode *)_node;
 	status_t status;
 
-	if (check_nspace_magic(vol, "dosfs_write_pages") ||
-                check_vnode_magic(node, "dosfs_write_pages"))
-                return EINVAL;
+	if (check_nspace_magic(vol, "dosfs_write_pages")
+		|| check_vnode_magic(node, "dosfs_write_pages"))
+		return EINVAL;
 
 	if (node->cache == NULL)
 		return B_BAD_VALUE;
@@ -1540,8 +1540,8 @@ dosfs_get_file_map(void *_fs, void *_node, off_t pos, size_t len,
 	LOCK_VOL(vol);
 	*_count = 0;
 
-	if (check_nspace_magic((nspace *)vol, "dosfs_get_file_map") ||
-		check_vnode_magic(node, "dosfs_get_file_map")) {
+	if (check_nspace_magic((nspace *)vol, "dosfs_get_file_map")
+		|| check_vnode_magic(node, "dosfs_get_file_map")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
