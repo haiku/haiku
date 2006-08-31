@@ -263,7 +263,7 @@ typedef uint32 ohci_physaddr_t;
 
 #define OHCI_NO_INTRS				32
 
-struct hc_hcca 
+struct ohci_hcca 
 {
 	addr_t		hcca_interrupt_table[OHCI_NO_INTRS];
 	uint32		hcca_frame_number;
@@ -282,12 +282,12 @@ struct hc_hcca
 //	Endpoint descriptor structure (section 4.2)
 // --------------------------------
 
-typedef struct hc_endpoint_descriptor
+typedef struct ohci_endpoint_descriptor
 {
 	uint32		ed_flags;
-	addr_t		ed_qtailp;		// Queue tail pointer
-	addr_t		ed_qheadp;		// Queue head pointer
-	addr_t		ed_nexted;		// Next endpoint in the list
+	addr_t		ed_qtailp;				// Queue tail pointer
+	addr_t		ed_qheadp;				// Queue head pointer
+	addr_t		next_endpoint;		// Next endpoint in the list
 };
 
 #define OHCI_ED_GET_FA(s)			((s) & 0x7f)

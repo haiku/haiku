@@ -34,6 +34,7 @@
 struct pci_info;
 struct pci_module_info;
 class OHCIRootHub;
+class Endpoint;
 
 // --------------------------------
 //	OHCI: 	The OHCI class derived 
@@ -45,8 +46,9 @@ class OHCI : public BusManager
 	friend class OHCIRootHub;
 public:
 		
-	OHCI( pci_info *info , Stack *stack );
-	status_t 					SubmitTransfer( Transfer *t ); 	//Override from BusManager. 
+	OHCI(pci_info *info, Stack *stack);
+	~OHCI();
+	status_t 					SubmitTransfer(Transfer *t); 	//Override from BusManager. 
 	static pci_module_info 		*pci_module; 					// Global data for the module.
 
 	inline void   WriteReg(uint32 reg, uint32 value);
@@ -54,34 +56,24 @@ public:
 		
 private:
 	// Global
-	pci_info 					*m_pcii;				// pci-info struct
-	Stack 						*m_stack;				// Pointer to the stack	 
-	uint8						*m_registers;			// Base address of the operational registers
-	area_id						m_register_area;		// Area id of the 
+	pci_info 					*fPcii;					// pci-info struct
+	Stack 						*fStack;				// Pointer to the stack	 
+	uint8						*fRegisters;			// Base address of the operational registers
+	area_id						fRegisterArea;			// Area id of the 
 	// HCCA
-	area_id						m_hcca_area;
-	struct hc_hcca				*m_hcca;					// The HCCA structure for the interupt communication
-	hcd_soft_endpoint			*sc_eds[OHCI_NO_EDS];	// number of interupt endpiont descriptors
-	// Registers
-	struct hcd_soft_endpoint	*ed_bulk_tail;			// last in the bulk list
-	struct hcd_soft_endpoint	*ed_control_tail;		// last in the control list
-	struct hcd_soft_endpoint	*ed_isoch_tail;			// lest in the isochrnonous list
-	struct hcd_soft_endpoint	*ed_periodic[32];		// shadow of the interupt table
-	// free list structures
-	struct hcd_soft_endpoint	*sc_freeeds;			// list of free endpoint descriptors
-	struct hcd_soft_transfer	*sc_freetds;			// list of free general transfer descriptors
-	struct hcd_soft_itransfer	*sc_freeitds; 			// list of free isonchronous transfer descriptors
-	// Done queue
-	struct hcd_soft_transfer	*sc_sdone;				// list of done general transfer descriptors 
-	struct hcd_soft_itransfer 	*sc_sidone;				// list of done isonchronous transefer descriptors
-	// memory management for queue data structures.
-	struct hcd_soft_transfer  	sc_hash_tds[OHCI_HASH_SIZE];
-	struct hcd_soft_itransfer 	sc_hash_itds[OHCI_HASH_SIZE];			
+	area_id						fHccaArea;
+	struct ohci_hcca			*fHcca;					// The HCCA structure for the interupt communication
+	Endpoint					*fInterruptEndpoints[OHCI_NO_EDS];	// The interrupt endpoint list
+	// Dummy endpoints
+	Endpoint					*fDummyControl;
+	Endpoint					*fDummyBulk;
+	Endpoint					*fDummyIsochronous;
 	// Root Hub
-	OHCIRootHub 				*m_roothub;			// the root hub
-	addr_t						m_roothub_base;		// Base address of the root hub
+	OHCIRootHub 				*m_roothub;				// the root hub
+	addr_t						m_roothub_base;			// Base address of the root hub
 	// functions
-	hcd_soft_endpoint			*ohci_alloc_soft_endpoint(); // allocate memory for an endpoint
+	Endpoint					*AllocateEndpoint(); 	// allocate memory for an endpoint
+	void						FreeEndpoint(Endpoint *end); //Free endpoint
 };
 
 // --------------------------------
@@ -99,6 +91,23 @@ class OHCIRootHub : public Hub
 	private:
 		usb_port_status 	m_hw_port_status[2];	// the port status (maximum of two)
 		OHCI 				*m_ohci;				// needed because of internal data
+};
+
+//
+// Endpoint: wrapper around the hardware endpoints
+//
+
+struct Endpoint
+{
+	addr_t						physicaladdress;//Point to the physical address
+	ohci_endpoint_descriptor	*ed;			//Logical 'endpoint'
+	Endpoint					*next;			//Pointer to the 'next' endpoint
+
+	//Utility functions
+	void SetNext(Endpoint *end) {
+		next = end;
+		ed->next_endpoint = end->physicaladdress;
+	}; 
 };
 
 #define OHCI_DEBUG

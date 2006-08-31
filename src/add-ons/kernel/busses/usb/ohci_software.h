@@ -31,19 +31,6 @@
 #include "usb_p.h"
 #include "ohci_hardware.h"
 
-// ------------------------------------
-//	OHCI:: Software endpoint descriptor
-// ------------------------------------
-
-typedef struct hcd_soft_endpoint
-{	
-	addr_t 						physaddr;	// physical address of the host controller endpoint
-	hc_endpoint_descriptor 		ed; 		// host controller endpoint descriptor
-	struct hcd_soft_endpoint 	*next; 		// next software endpoint descriptor
-}hcd_soft_endpoint;
-
-#define OHCI_SED_SIZE ((sizeof (struct hcd_soft_endpoint) + OHCI_ED_ALIGN - 1) / OHCI_ED_ALIGN * OHCI_ED_ALIGN)
-#define OHCI_SED_CHUNK 128
 
 // ------------------------------------
 //	OHCI:: 	Software general 
@@ -99,51 +86,4 @@ typedef struct  hcd_soft_itransfer
 
 #define OHCI_HASH_SIZE 128
 
-// ------------------------------
-//	OHCI:: OHCI device structure
-// ------------------------------
-/*
-typedef struct 		 
-{
-	usb_dma_t 							sc_hccadma;
-	struct ohci_hcca 					*sc_hcca;
-	ohci_soft_endpoint					*sc_eds[OHCI_NO_EDS];
-	int	 								sc_bws[OHCI_NO_INTRS];
-
-	uint32								sc_eintrs;
-	ohci_soft_endpoint 					*sc_isoc_head;
-	ohci_soft_endpoint 					*sc_ctrl_head;
-	ohci_soft_endpoint 					*sc_bulk_head;
-
-	LIST_HEAD(, ohci_soft_transfer)  	sc_hash_tds[OHCI_HASH_SIZE];
-	LIST_HEAD(, ohci_soft_itransfer) 	sc_hash_itds[OHCI_HASH_SIZE];
-
-	int 								sc_noport;
-	uint8	 							sc_addr;		// device address
-	uint8	 							sc_conf;		// device configuration
-
-#ifdef USB_USE_SOFTINTR
-	char 								sc_softwake;
-#endif 													// USB_USE_SOFTINTR
-
-	ohci_soft_endpoint					*sc_freeeds;
-	ohci_soft_transfer					*sc_freetds;
-	ohci_soft_itransfer					*sc_freeitds;
-
-	usbd_xfer_handle 					sc_intrxfer;
-
-	ohci_soft_itransfer					*sc_sidone;
-	ohci_soft_transfer 					*sc_sdone;
-
-	char 								sc_vendor[16];
-	int 								sc_id_vendor;
-
-	void 								*sc_powerhook;		// cookie from power hook
-	void 								*sc_shutdownhook;		// cookie from shutdown hook
-	
-	uint32	 							sc_control;		// Preserved during suspend/standby
-	uint32	 							sc_intre;
-
-} ohci_soft;
-*/
 #endif // OHCI_SOFT

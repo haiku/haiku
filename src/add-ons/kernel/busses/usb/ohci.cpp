@@ -88,23 +88,22 @@ ohci_std_ops( int32 op , ... )
 //------------------------------------------------------------------------
 
 static status_t
-ohci_add_to( Stack *stack )
+ohci_add_to(Stack *stack)
 {
 	status_t status;
 	pci_info *item;
 	bool found = false;
 	int i;
 	
-	#ifdef OHCI_DEBUG
-	set_dprintf_enabled( true ); 
-	load_driver_symbols( "ohci" );
-	#endif
+#ifdef TRACE_USB
+	set_dprintf_enabled(true); 
+	load_driver_symbols("ohci");
+#endif
 	
 	//
 	// 	Try if the PCI module is loaded
 	//
-	if( ( status = get_module( B_PCI_MODULE_NAME, (module_info **)&( OHCI::pci_module ) ) ) != B_OK) 
-	{
+	if( ( status = get_module( B_PCI_MODULE_NAME, (module_info **)&( OHCI::pci_module ) ) ) != B_OK) {
 		TRACE(("USB_ OHCI: init_hardware(): Get PCI module failed! %lu \n", status));
 		return status;
 	}
@@ -113,20 +112,17 @@ ohci_add_to( Stack *stack )
 	// 	TODO: in the future we might want to support multiple host controllers.
 	//
 	item = new pci_info;
-	for ( i = 0 ; OHCI::pci_module->get_nth_pci_info( i , item ) == B_OK ; i++ )
-	{
-		if ( ( item->class_base == PCI_serial_bus ) && ( item->class_sub == PCI_usb ) &&
-			 ( item->class_api  == PCI_usb_ohci ) )
+	for ( i = 0 ; OHCI::pci_module->get_nth_pci_info( i , item ) == B_OK ; i++ ) {
+		if ( ( item->class_base == PCI_serial_bus ) && ( item->class_sub == PCI_usb )
+			 && ( item->class_api  == PCI_usb_ohci ) )
 		{
-			if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF)) 
-			{
+			if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF)) {
 				TRACE(("USB OHCI: init_hardware(): found with invalid IRQ - check IRQ assignement\n"));
 				continue;
 			}
 			TRACE(("USB OHCI: init_hardware(): found at IRQ %u \n", item->u.h0.interrupt_line));
 			OHCI *bus = new OHCI( item , stack );
-			if ( bus->InitCheck() != B_OK )
-			{
+			if ( bus->InitCheck() != B_OK ) {
 				delete bus;
 				break;
 			}
@@ -138,8 +134,7 @@ ohci_add_to( Stack *stack )
 		}
 	}
 	
-	if ( found == false )
-	{
+	if ( found == false ) {
 		TRACE(("USB OHCI: init hardware(): no devices found\n"));
 		free( item );
 		put_module( B_PCI_MODULE_NAME );
@@ -156,7 +151,7 @@ ohci_add_to( Stack *stack )
 
 host_controller_info ohci_module = {
 	{
-		"busses/usb/ohci/jixt", 
+		"busses/usb/ohci", 
 		NULL,						// No flag like B_KEEP_LOADED : the usb module does that
 		ohci_std_ops
 	},
@@ -170,8 +165,7 @@ host_controller_info ohci_module = {
 //		parameters:	none
 //------------------------------------------------------------------------
 
-module_info *modules[] = 
-{ 
+module_info *modules[] = { 
 	(module_info *) &ohci_module,
 	NULL 
 };
@@ -184,59 +178,67 @@ module_info *modules[] =
 //					- stack:	pointer to a stack instance
 //------------------------------------------------------------------------
 
-OHCI::OHCI( pci_info *info , Stack *stack )
-	:	BusManager(stack)
+OHCI::OHCI(pci_info *info, Stack *stack)
+	:	BusManager(stack),
+		fRegisterArea(-1),
+		fHccaArea(-1),
+		fDummyControl(0),
+		fDummyBulk(0),
+		fDummyIsochronous(0)
 {
-	m_pcii = info;
-	m_stack = stack;
+	fPcii = info;
+	fStack = stack;
 	int i;
-	hcd_soft_endpoint *sed, *psed;
 	TRACE(("USB OHCI: constructing new BusManager\n"));
 	
 	fInitOK = false;
+	
+	for(i = 0; i < OHCI_NO_EDS; i++) //Clear the interrupt list
+		fInterruptEndpoints[i] = 0;
 
 	// enable busmaster and memory mapped access 
-	uint16 cmd = OHCI::pci_module->read_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_command, 2);
+	uint16 cmd = OHCI::pci_module->read_pci_config(fPcii->bus, fPcii->device, fPcii->function, PCI_command, 2);
 	cmd &= ~PCI_command_io;
 	cmd |= PCI_command_master | PCI_command_memory;
-	OHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_command, 2, cmd );
+	OHCI::pci_module->write_pci_config(fPcii->bus, fPcii->device, fPcii->function, PCI_command, 2, cmd );
 
+	//
 	// 5.1.1.2 map the registers
+	//
 	addr_t registeroffset = pci_module->read_pci_config(info->bus,
 		info->device, info->function, PCI_base_registers, 4);
 	registeroffset &= PCI_address_memory_32_mask;	
 	TRACE(("OHCI: iospace offset: %lx\n" , registeroffset));
-	m_register_area = map_physical_memory("OHCI base registers", (void *)registeroffset,
-		B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA, (void **)&m_registers);
-	if (m_register_area < B_OK) {
+	fRegisterArea = map_physical_memory("OHCI base registers", (void *)registeroffset,
+		B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA, (void **)&fRegisters);
+	if (fRegisterArea < B_OK) {
 		TRACE(("USB OHCI: error mapping the registers\n"));
 		return;
 	}
 	
 	//	Get the revision of the controller
-	
 	uint32 rev = ReadReg(OHCI_REVISION) & 0xff;
 	
 	//	Check the revision of the controller. The revision should be 10xh
-	
 	TRACE((" OHCI: Version %ld.%ld%s\n", OHCI_REV_HI(rev), OHCI_REV_LO(rev),OHCI_REV_LEGACY(rev) ? ", legacy support" : ""));
 	if (OHCI_REV_HI(rev) != 1 || OHCI_REV_LO(rev) != 0) {
 		TRACE(("USB OHCI: Unsupported OHCI revision of the ohci device\n"));
-		delete_area(m_register_area);
 		return;
 	}
 	
 	// Set up the Host Controller Communications Area
 	void *hcca_phy;
-	m_hcca_area = m_stack->AllocateArea((void**)&m_hcca, &hcca_phy,
+	fHccaArea = fStack->AllocateArea((void**)&fHcca, &hcca_phy,
 										B_PAGE_SIZE, "OHCI HCCA");
-	if (m_hcca_area < B_OK) {
+	if (fHccaArea < B_OK) {
 		TRACE(("USB OHCI: Error allocating HCCA block\n"));
-		delete_area(m_register_area);
 		return;
 	}
+	memset((void*)fHcca, 0, sizeof(ohci_hcca));
 
+	//
 	// 5.1.1.3 Take control of the host controller
+	//
 	if (ReadReg(OHCI_CONTROL) & OHCI_IR) {
 		TRACE(("USB OHCI: SMM is in control of the host controller\n"));
 		WriteReg(OHCI_COMMAND_STATUS, OHCI_OCR);
@@ -252,44 +254,114 @@ OHCI::OHCI( pci_info *info , Stack *stack )
 		}
 	} else if (ReadReg(OHCI_CONTROL) & OHCI_HCFS_RESET) //Only if no BIOS/SMM control
 		snooze(USB_DELAY_BUS_RESET);
-	
+
+	//	
 	// 5.1.1.4 Set Up Host controller
-	// initialize the data structures for the HCCA
+	//
+	// Dummy endpoints
+	fDummyControl = AllocateEndpoint();
+	if (!fDummyControl)
+		return;
+	fDummyBulk = AllocateEndpoint();
+	if (!fDummyBulk)
+		return;
+	fDummyIsochronous = AllocateEndpoint();
+	if (!fDummyIsochronous)
+		return;
+	//Create the interrupt tree
+	//Algorhythm kindly borrowed from NetBSD code
+	for(i = 0; i < OHCI_NO_EDS; i++) {
+		fInterruptEndpoints[i] = AllocateEndpoint();
+		if (!fInterruptEndpoints[i])
+			return;
+		if (i != 0)
+			fInterruptEndpoints[i]->SetNext(fInterruptEndpoints[(i-1) / 2]);
+		else
+			fInterruptEndpoints[i]->SetNext(fDummyIsochronous);
+	}
+	for (i = 0; i < OHCI_NO_INTRS; i++)
+		fHcca->hcca_interrupt_table[revbits[i]] =
+			fInterruptEndpoints[OHCI_NO_EDS-OHCI_NO_INTRS+i]->physicaladdress;
 	
-
-	uint32 framevalue = ReadReg(OHCI_FM_NUMBER);
-		
-
+	//Go to the hardware part of the initialisation
+	uint32 frameinterval = ReadReg(OHCI_FM_INTERVAL);
+	
+	WriteReg(OHCI_COMMAND_STATUS, OHCI_HCR);
+	for (i = 0; i < 10; i++){
+		snooze(10);				//Should be okay in one run: 10 microseconds for reset
+		if (!(ReadReg(OHCI_COMMAND_STATUS) & OHCI_HCR))
+			break;
+	}
+	if (ReadReg(OHCI_COMMAND_STATUS) & OHCI_HCR) {
+		TRACE(("USB OHCI: Error resetting the host controller\n"));
+		return;
+	}
+	
+	WriteReg(OHCI_FM_INTERVAL, frameinterval);
+	//We now have 2 ms to finish the following sequence. 
+	//TODO: maybe add spinlock protection???
+	
+	WriteReg(OHCI_CONTROL_HEAD_ED, (uint32)fDummyControl->physicaladdress);
+	WriteReg(OHCI_BULK_HEAD_ED, (uint32)fDummyBulk->physicaladdress);
+	WriteReg(OHCI_HCCA, (uint32)hcca_phy);
+	
+	WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTRS);
+	WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTRS);
+	
+	//
+	// 5.1.1.5 Begin Sending SOFs
+	//
+	uint32 control = ReadReg(OHCI_CONTROL);
+	control &= ~(OHCI_CBSR_MASK | OHCI_LES | OHCI_HCFS_MASK | OHCI_IR);
+	control |= OHCI_PLE | OHCI_IE | OHCI_CLE | OHCI_BLE |
+		OHCI_RATIO_1_4 | OHCI_HCFS_OPERATIONAL;
+	WriteReg(OHCI_CONTROL, control);
+	
+	//The controller is now operational, end of 2ms block.
+	uint32 interval = OHCI_GET_IVAL(frameinterval);
+	WriteReg(OHCI_PERIODIC_START, OHCI_PERIODIC(interval));
+	
+	
 	m_roothub_base = 255; //Invalidate the Root Hub address
 
 }
 
-hcd_soft_endpoint * OHCI::ohci_alloc_soft_endpoint()
+OHCI::~OHCI()
 {
-	hcd_soft_endpoint *sed;
-	int i;
+	if (fHccaArea > 0)
+		delete_area(fHccaArea);
+	if (fRegisterArea > 0)
+		delete_area(fRegisterArea);
+	if (fDummyControl)
+		FreeEndpoint(fDummyControl);
+	if (fDummyBulk)
+		FreeEndpoint(fDummyBulk);
+	if (fDummyIsochronous)
+		FreeEndpoint(fDummyIsochronous);
+	for (int i = 0; i < OHCI_NO_EDS; i++)
+		if (fInterruptEndpoints[i])
+			FreeEndpoint(fInterruptEndpoints[i]);
+}
+
+Endpoint *
+OHCI::AllocateEndpoint()
+{
+	Endpoint *endpoint = new Endpoint;
 	void *phy;
-	if (sc_freeeds == NULL) 
-	{
-		dprintf("OHCI: ohci_alloc_soft_endpoint(): allocating chunk\n");
-		for(i = 0; i < OHCI_SED_CHUNK; i++) 
-		{
-			if(m_stack->AllocateChunk( (void **)&(sed) ,&phy , OHCI_ED_ALIGN )!= B_OK)
-			{
-				dprintf( "USB OHCI: ohci_alloc_soft_endpoint(): failed allocation of skeleton qh %i, aborting\n",  i );
-				return (0);
-			}
-			// chunk has been allocated
-			sed->physaddr = reinterpret_cast<addr_t>(phy);
-			sed->next = sc_freeeds;
-			sc_freeeds = sed;
-		}
-	}
-	sed = sc_freeeds;
-	sc_freeeds = sed->next;
-	memset(&sed->ed, 0, sizeof(hc_endpoint_descriptor));
-	sed->next = 0;
-	return (sed);
+	if (fStack->AllocateChunk((void **)&endpoint->ed, &phy, sizeof(ohci_endpoint_descriptor)) != B_OK)
+		return 0;
+	endpoint->physicaladdress = (addr_t)phy;
+	
+	memset((void *)endpoint->ed, 0, sizeof(ohci_endpoint_descriptor));
+	endpoint->ed->ed_flags = OHCI_ED_SKIP;
+	return endpoint;
+}
+
+void
+OHCI::FreeEndpoint(Endpoint *end)
+{
+	fStack->FreeChunk((void *)end->ed, (void *) end->physicaladdress, sizeof(ohci_endpoint_descriptor));
+	delete end;
 }
 
 //------------------------------------------------------------------------
@@ -309,11 +381,11 @@ pci_module_info *OHCI::pci_module = 0;
 void
 OHCI::WriteReg(uint32 reg, uint32 value)
 {
-	*(volatile uint32 *)(m_registers + reg) = value;
+	*(volatile uint32 *)(fRegisters + reg) = value;
 }
 
 uint32
 OHCI::ReadReg(uint32 reg)
 {
-	return *(volatile uint32 *)(m_registers + reg);
+	return *(volatile uint32 *)(fRegisters + reg);
 }
