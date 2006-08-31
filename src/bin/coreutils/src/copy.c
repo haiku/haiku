@@ -164,15 +164,15 @@ copy_attributes(int fromFd, int toFd)
 			ssize_t bytesRead, bytesWritten;
 			
 			bytesRead = fs_read_attr(fromFd, dirent->d_name, info.type, pos, buffer, sizeof(buffer));
-			if (bytesRead < 0)
-				continue;
+			if (bytesRead <= 0)
+				break;
 			
 			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos, buffer, bytesRead);
-			if (bytesWritten != bytesRead)
-				continue;
+			if (bytesWritten <= 0)
+				break;
 
-			pos += bytesRead;
-			info.size -= bytesRead;
+			pos += bytesWritten;
+			info.size -= bytesWritten;
 		}
 	}
 
