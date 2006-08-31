@@ -16,10 +16,11 @@
 #include <Drivers.h>
 #include <fs_volume.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 static const int32 kDesiredAllocationGroups = 56;
@@ -78,6 +79,9 @@ int
 DeviceOpener::Open(const char *device, int mode)
 {
 	fDevice = open(device, mode);
+	if (fDevice < 0)
+		fDevice = errno;
+
 	if (fDevice < 0 && mode == O_RDWR) {
 		// try again to open read-only (don't rely on a specific error code)
 		return Open(device, O_RDONLY);
