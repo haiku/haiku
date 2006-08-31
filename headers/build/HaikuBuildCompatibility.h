@@ -64,6 +64,7 @@ extern float	roundf(float value);
 
 #ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	define B_REDO 'REDO'
+#	define B_BAD_DATA	(B_NOT_ALLOWED + 1)
 #endif
 
 #endif	// HAIKU_BUILD_COMPATIBILITY_H
