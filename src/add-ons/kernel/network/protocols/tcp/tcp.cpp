@@ -356,7 +356,6 @@ tcp_receive_data(net_buffer *buffer)
 			}
 		}
 	}
-	sBufferModule->free(buffer);
 	return B_OK;
 }
 

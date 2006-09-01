@@ -40,15 +40,14 @@ struct tcp_header {
 	uint16 advertised_window;
 	uint16 checksum;
 	uint16 urgent_ptr;
-	uint32 options;
 };
 
-/* TCP flag constants */
-#define TCP_FLG_CWR 0x80 /* Congestion Window Reduced */
-#define TCP_FLG_ECN 0x40 /* Explicit Congestion Notification echo */
-#define TCP_FLG_URG 0x20 /* URGent */
-#define TCP_FLG_ACK 0x10 /* ACKnowledge */
-#define TCP_FLG_PUS 0x08 /* PUSh */
-#define TCP_FLG_RST 0x04 /* ReSeT */
-#define TCP_FLG_SYN 0x02 /* SYNchronize */
-#define TCP_FLG_FIN 0x01 /* FINish */
+// TCP flag constants
+#define TCP_FLG_CWR 0x80 // Congestion Window Reduced
+#define TCP_FLG_ECN 0x40 // Explicit Congestion Notification echo
+#define TCP_FLG_URG 0x20 // URGent
+#define TCP_FLG_ACK 0x10 // ACKnowledge
+#define TCP_FLG_PUS 0x08 // PUSh
+#define TCP_FLG_RST 0x04 // ReSeT
+#define TCP_FLG_SYN 0x02 // SYNchronize
+#define TCP_FLG_FIN 0x01 // FINish

@@ -9,9 +9,15 @@
 // Initial estimate for packet round trip time (RTT)
 #define	TCP_INITIAL_RTT	120000000LL
 
+// Estimate for Maximum segment lifetime in the internet
+#define TCP_MAX_SEGMENT_LIFETIME TCP_INITIAL_RTT
+
 // keep maximum buffer sizes < max net_buffer size for now
-#define	TCP_MAX_SEND_BUF 0//1024
+#define	TCP_MAX_SEND_BUF 1024
 #define TCP_MAX_RECV_BUF TCP_MAX_SEND_BUF
+
+#define TCP_IS_GOOD_ACK(x) (fLastByteAckd > fNextByteToSend ? ((x) >= fLastByteAckd || (x) <= fNextByteToSend) : ((x) >= fLastByteAckd && (x) <= fNextByteToSend))
+#define TCP_IS_GOOD_SEQ(x,y) (fNextByteToRead < fNextByteToRead + TCP_MAX_RECV_BUF ? (x) >= fNextByteToRead && (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF : ((x) >= fNextByteToRead || (x) <= fNextByteToRead + TCP_MAX_RECV_BUF) && ((x) + (y) >= fNextByteToRead || (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF))
 
 typedef struct {
 	const sockaddr	*local;
@@ -59,13 +65,15 @@ private:
 		bool		fTimedOut;
 	};
 
-	status_t Send(uint16 flags);
+	status_t Send(uint16 flags, bool empty);
+	status_t Reset(uint32 sequenceNum, uint32 acknowledgeNum);
+	static void TimeWait(struct net_timer *timer, void *data);
 
 	uint32	fLastByteAckd;
 	uint32	fNextByteToSend;
-	uint32	fLastByteWritten;
+	uint32	fNextByteToWrite;
 
-	uint32	fLastByteRead;
+	uint32	fNextByteToRead;
 	uint32	fNextByteExpected;
 	uint32	fLastByteReceived;
 
@@ -78,7 +86,9 @@ private:
 
 	TCPConnection	*fHashLink;
 	tcp_state		fState;
+	status_t		fError;
 	benaphore		fLock;
+	net_timer		fTimer;
 
 	net_route 	*fRoute;
 };
@@ -105,16 +115,18 @@ TCPConnection::TCPSegment::~TCPSegment()
 TCPConnection::TCPConnection(net_socket *socket)
 	:
 	fLastByteAckd(0), //system_time()),
-	fNextByteToSend(0), //fLastByteAckd),
-	fLastByteWritten(0), //fLastByteAckd),
-	fLastByteRead(0),
+	fNextByteToSend(fLastByteAckd), //fLastByteAckd),
+	fNextByteToWrite(fLastByteAckd + 1), //fLastByteAckd),
+	fNextByteToRead(0),
 	fNextByteExpected(0),
 	fLastByteReceived(0),
 	fAvgRTT(TCP_INITIAL_RTT),
 	fState(CLOSED),
+	fError(B_OK),
 	fRoute(NULL)
 {
 	benaphore_init(&fLock, "TCPConnection");
+	sStackModule->init_timer(&fTimer, TimeWait, this);
 }
 
 
@@ -130,7 +142,7 @@ TCPConnection::Open()
 	TRACE(("%p.Open()\n", this));
 	if (sAddressModule == NULL)
 		return B_ERROR;
-	TRACE(("Using Address Module %p\n", sAddressModule));
+	TRACE(("TCP: Open(): Using Address Module %p\n", sAddressModule));
 
 	BenaphoreLocker lock(&fLock);
 	sAddressModule->set_to_empty_address((sockaddr *)&socket->address);
@@ -144,7 +156,31 @@ TCPConnection::Open()
 status_t
 TCPConnection::Close()
 {
-	TRACE(("%p.Close()\n", this));
+	BenaphoreLocker lock(&fLock);
+	TRACE(("TCP:%p.Close()\n", this));
+	if (fState == SYN_SENT || fState == LISTEN) {
+		fState = CLOSED;
+		return B_OK;
+	}
+	tcp_state nextState = CLOSED;
+	if (fState == SYN_RCVD || fState == ESTABLISHED)
+		nextState = FIN_WAIT1;
+	if (fState == CLOSE_WAIT)
+		nextState = LAST_ACK;
+	status_t status = Send(TCP_FLG_FIN | TCP_FLG_ACK, false);
+	if (status != B_OK)
+		return status;
+	fState = nextState;
+	TRACE(("TCP: %p.Close(): Entering state %d\n", this, fState));
+	// need to wait until fState returns to CLOSED
+	return B_OK;
+}
+
+
+status_t
+TCPConnection::Free()
+{
+	TRACE(("TCP:%p.Free()\n", this));
 
 	BenaphoreLocker hashLock(&sTCPLock);
 	BenaphoreLocker lock(&fLock);
@@ -154,14 +190,6 @@ TCPConnection::Close()
 	if (hash_lookup(sTCPHash, &key) != NULL) {
 		return hash_remove(sTCPHash, (void *)this);
 	}
-	return B_OK;
-}
-
-
-status_t
-TCPConnection::Free()
-{
-	TRACE(("%p.Free()\n", this));
 	return B_OK;
 }
 
@@ -222,6 +250,9 @@ TCPConnection::Connect(const struct sockaddr *address)
 		if (sAddressModule->is_empty_address((sockaddr *)&socket->address, false)) {
 			TRACE(("TCP: Connect(): Local Address is INADDR_ANY\n"));
 			sAddressModule->set_to((sockaddr *)&socket->address, (sockaddr *)fRoute->interface->address);
+			// since most stacks terminate connections from port 0
+			// use port 40000 for now.  This should be moved to Bind().
+			sAddressModule->set_port((sockaddr *)&socket->address, htons(40000));
 		}
 	}
 
@@ -238,7 +269,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 
 	TRACE(("TCP: Connect(): starting 3-way handshake...\n"));
 	// send SYN
-	status = Send(TCP_FLG_SYN);
+	status = Send(TCP_FLG_SYN, false);
 	if (status != B_OK)
 		return status;
 	fState = SYN_SENT;
@@ -252,7 +283,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 status_t
 TCPConnection::Accept(struct net_socket **_acceptedSocket)
 {
-	TRACE(("%p.Accept()\n", this));
+	TRACE(("TCP:%p.Accept()\n", this));
 	return B_ERROR;
 }
 
@@ -314,7 +345,7 @@ TCPConnection::Unbind(struct sockaddr *address)
 status_t
 TCPConnection::Listen(int count)
 {
-	TRACE(("%p.Listen()\n", this));
+	TRACE(("TCP:%p.Listen()\n", this));
 	if (fState != CLOSED)
 		return B_ERROR;
 	fState = LISTEN;
@@ -325,7 +356,7 @@ TCPConnection::Listen(int count)
 status_t
 TCPConnection::Shutdown(int direction)
 {
-	TRACE(("%p.Shutdown()\n", this));
+	TRACE(("TCP:%p.Shutdown()\n", this));
 	return B_ERROR;
 }
 
@@ -336,7 +367,7 @@ TCPConnection::Shutdown(int direction)
 status_t
 TCPConnection::SendData(net_buffer *buffer)
 {
-	TRACE(("%p.SendData()\n", this));
+	TRACE(("TCP:%p.SendData()\n", this));
 	return B_ERROR;
 }
 
@@ -344,7 +375,7 @@ TCPConnection::SendData(net_buffer *buffer)
 status_t
 TCPConnection::SendRoutedData(net_route *route, net_buffer *buffer)
 {
-	TRACE(("%p.SendRoutedData()\n", this));
+	TRACE(("TCP:%p.SendRoutedData()\n", this));
 	fRoute = route;
 	return SendData(buffer);
 }
@@ -353,7 +384,7 @@ TCPConnection::SendRoutedData(net_route *route, net_buffer *buffer)
 status_t
 TCPConnection::SendAvailable()
 {
-	TRACE(("%p.SendAvailable()\n", this));
+	TRACE(("TCP:%p.SendAvailable()\n", this));
 	return B_ERROR;
 }
 
@@ -361,7 +392,7 @@ TCPConnection::SendAvailable()
 status_t
 TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
-	TRACE(("%p.ReadData()\n", this));
+	TRACE(("TCP:%p.ReadData()\n", this));
 	return B_ERROR;
 }
 
@@ -369,7 +400,7 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 status_t
 TCPConnection::ReadAvailable()
 {
-	TRACE(("%p.ReadAvailable()\n", this));
+	TRACE(("TCP:%p.ReadAvailable()\n", this));
 	return B_ERROR;
 }
 
@@ -378,21 +409,27 @@ status_t
 TCPConnection::ReceiveData(net_buffer *buffer)
 {
 	BenaphoreLocker lock(&fLock);
-	TRACE(("%p.ReceiveData()\n", this));
+	TRACE(("TCP:%p.ReceiveData()\n", this));
 
 	NetBufferHeader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
 	tcp_header &header = bufferHeader.Data();
-	uint16	flags = 0x0; 
-	status_t status;
 
+	uint16 flags = 0x0;
+	tcp_state nextState = fState;
+	status_t status = B_OK;
+	uint32 byteAckd = ntohl(header.acknowledge_num);
+	uint32 byteRcvd = ntohl(header.sequence_num);
+	uint32 payloadLength = buffer->size - ((uint32)header.header_length << 2);
+
+	TRACE(("TCP: Receive(): Connection in state %d received packet %p with flags %X!\n", fState, buffer, header.flags));
 	switch (fState) {
 	case CLOSED:
+	case TIME_WAIT:
 		// shouldn't happen.  send RST
-		TRACE(("TCP:  Connection in CLOSED state received packet %p!\n", buffer));
-		Send(TCP_FLG_RST);
+		Reset(byteRcvd + payloadLength, 0);
 		break;
 	case LISTEN:
 		// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
@@ -404,38 +441,127 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 		// The current TCPConnection always remains in LISTEN state.
 		break;
 	case SYN_SENT:
-		TRACE(("TCP:  Connection in SYN_SENT state received packet %p!\n", buffer));
+	case SYN_RCVD:
 		// if packet is SYN+ACK, send ACK & enter ESTABLISHED state.
 		// if packet is SYN, send ACK & enter SYN_RCVD state.
-		if (header.flags & TCP_FLG_SYN) {
-			fNextByteExpected = ntohl(header.sequence_num) + 1;
-			flags |= TCP_FLG_ACK;
-			if (header.flags & TCP_FLG_ACK) {
-				fState = ESTABLISHED;
-			} else {
-				flags |= TCP_FLG_SYN;
-				fState = SYN_RCVD;
+		if (header.flags & TCP_FLG_RST) {
+			fError = ECONNREFUSED;
+			fState = CLOSED;
+			return B_ERROR;
+		}
+		if (TCP_IS_GOOD_ACK(byteAckd)) {
+			if (header.flags & TCP_FLG_SYN) {
+				fNextByteToRead =
+					fNextByteExpected =
+					fLastByteReceived = ntohl(header.sequence_num) + 1;
+				flags |= TCP_FLG_ACK;
+				if (header.flags & TCP_FLG_ACK) {
+					fLastByteAckd = byteAckd;
+					// cancel resend of this segment
+					nextState = ESTABLISHED;
+				} else {
+					flags |= TCP_FLG_SYN;
+					nextState = SYN_RCVD;
+				}
+				status = Send(flags, false);
+				if (status == B_OK)
+					fState = nextState;
 			}
-			status = Send(flags);
-			if (status != B_OK)
-				fState = SYN_SENT;
+		} else {
+			Reset(byteRcvd + payloadLength, 0);
 		}
 		break;
-	case SYN_RCVD:
-		// if packet is ACK, enter ESTABLISHED
-		if (header.flags & TCP_FLG_ACK)
-			fState = ESTABLISHED;
-		break;
-	case ESTABLISHED:
-		// if packet has ACK, update send buffer
-		// if packet is FIN, send ACK & enter CLOSE_WAIT
-		// update receive buffer if necessary
-		break;
-	// more cases needed covering connection tear-down 
 	default:
-		return B_ERROR;
+		// In a synchronized state.
+		// first check that the received sequence number is good
+		if (TCP_IS_GOOD_SEQ(byteRcvd, payloadLength)) {
+			// If a valid RST was received, terminate the connection.
+			if (header.flags & TCP_FLG_RST) {
+				fError = ECONNREFUSED;
+				fState = CLOSED;
+				return B_ERROR;
+			}
+			if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd) ) {
+				fLastByteAckd = byteAckd;
+				if (fLastByteAckd == fNextByteToWrite) {
+					if (fState == LAST_ACK ) {
+						nextState = CLOSED;
+						status = hash_remove(sTCPHash, this);
+						if (status != B_OK)
+							return status;
+					}
+					if (fState == CLOSING) {
+						nextState = TIME_WAIT;
+						status = hash_remove(sTCPHash, this);
+						if (status != B_OK)
+							return status;
+					}
+					if (fState == FIN_WAIT1) {
+						nextState = FIN_WAIT2;
+					}
+				}
+			}
+			if (header.flags & TCP_FLG_FIN) {
+				// other side is closing connection.  change states
+				switch (fState) {
+				case ESTABLISHED:
+					nextState = CLOSE_WAIT;
+					fNextByteExpected++;
+					break;
+				case FIN_WAIT2:
+					nextState = TIME_WAIT;
+					fNextByteExpected++;
+					break;
+				case FIN_WAIT1:
+					if (fLastByteAckd == fNextByteToWrite) {
+						// our FIN has been ACKd: go to TIME_WAIT
+						nextState = TIME_WAIT;
+						status = hash_remove(sTCPHash, this);
+						if (status != B_OK)
+							return status;
+						sStackModule->set_timer(&fTimer, TCP_MAX_SEGMENT_LIFETIME);
+					} else
+						nextState = CLOSING;
+					fNextByteExpected++;
+					break;
+				default:
+					break;
+				}
+			}
+			if (fState != CLOSING && fState != LAST_ACK)
+				status = Send(flags | TCP_FLG_ACK, false);
+			if (status != B_OK)
+				return status;
+			fState = nextState;
+		} else {
+			// out-of-order packet received.  remind the other side of where we are
+			return Send(TCP_FLG_ACK, true);
+		}
+		break;
 	}
-	return B_ERROR;
+	TRACE(("TCP %p.Receive():Entering state %d\n", this, fState));
+	return B_OK;
+}
+
+
+status_t
+TCPConnection::Reset(uint32 sequenceNum, uint32 acknowledgeNum)
+{
+	TRACE(("TCP:%p.Reset()\n", this));
+	net_buffer *reply_buf = sBufferModule->create(512);
+	sAddressModule->set_to((sockaddr *)&reply_buf->source, (sockaddr *)&socket->address);
+	sAddressModule->set_to((sockaddr *)&reply_buf->destination, (sockaddr *)&socket->peer);
+
+	status_t status = tcp_segment(reply_buf, TCP_FLG_RST , sequenceNum, acknowledgeNum, 0);
+	if (status != B_OK) {
+		sBufferModule->free(reply_buf);
+		return status;
+	}
+	TRACE(("TCP: Reset():Sending RST...\n"));
+	status = next->module->send_routed_data(next, fRoute, reply_buf);
+	if (status !=B_OK)
+		sBufferModule->free(reply_buf);
+	return status;
 }
 
 
@@ -446,7 +572,7 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 void
 TCPConnection::ResendSegment(struct net_timer *timer, void *data)
 {
-	TRACE(("ResendSegment(%p)\n", data));
+	TRACE(("TCP:ResendSegment(%p)\n", data));
 	if (data == NULL)
 		return;
 }
@@ -454,17 +580,17 @@ TCPConnection::ResendSegment(struct net_timer *timer, void *data)
 
 /*!
 	Sends a TCP packet with the specified \a flags.  If there is any data in
-	the send buffer, fEffectiveWindow bytes or less of it are sent as well.
+	the send buffer and \a empty is false, fEffectiveWindow bytes or less of it are sent as well.
 	Sequence and Acknowledgement numbers are filled in accordingly.
 	The fLock benaphore must be held before calling.
 */
 status_t
-TCPConnection::Send(uint16 flags)
+TCPConnection::Send(uint16 flags, bool empty)
 {
-	TRACE(("%p.Send()\n", this));
+	TRACE(("TCP:%p.Send(%X,%s)\n", this, flags, empty ? "1" : "0"));
 
 	net_buffer *buffer;
-	if (1/*no data in send buffer*/) {
+	if (1/*no data in send buffer*/ || empty) {
 		buffer = sBufferModule->create(512);
 		TRACE(("TCP: Sending Buffer %p\n", buffer));
 		if (buffer == NULL)
@@ -480,7 +606,7 @@ TCPConnection::Send(uint16 flags)
 	TRACE(("TCP:%p.Send() from address %s\n", this,
 		AddressString(sDomain, (sockaddr *)&buffer->source, true).Data()));
 
-	uint16 advWin = TCP_MAX_RECV_BUF - (fNextByteExpected - fLastByteRead);
+	uint16 advWin = TCP_MAX_RECV_BUF - (fNextByteExpected - fNextByteToRead);
 	uint32 size = buffer->size;
 
 	status_t status = tcp_segment(buffer, flags, fNextByteToSend, fNextByteExpected, advWin);
@@ -488,11 +614,13 @@ TCPConnection::Send(uint16 flags)
 		sBufferModule->free(buffer);
 		return status;
 	}
+	// Only count 1 SYN, the 1 sent when transitioning from CLOSED or LISTEN
+	if (TCP_FLG_SYN & flags && (fState == CLOSED || fState == LISTEN))
+		fNextByteToSend++;
+	// Only count 1 FIN, the 1 sent when transitioning from ESTABLISHED, SYN_RCVD or CLOSE_WAIT
+	if (TCP_FLG_FIN & flags && (fState == SYN_RCVD || fState == ESTABLISHED || fState == CLOSE_WAIT))
+		fNextByteToSend++;
 	fNextByteToSend += size;
-	if (TCP_FLG_SYN & flags)
-		fNextByteToSend++;
-	if (TCP_FLG_FIN & flags)
-		fNextByteToSend++;
 
 #if 0
 	TCPSegment *segment = new(std::nothrow)
@@ -500,6 +628,12 @@ TCPConnection::Send(uint16 flags)
 #endif
 
 	return next->module->send_routed_data(next, fRoute, buffer);
+}
+
+
+void
+TCPConnection::TimeWait(struct net_timer *timer, void *data)
+{
 }
 
 
