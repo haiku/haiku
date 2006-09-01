@@ -1,4 +1,6 @@
-SubDir HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems udf r5 drive_setup_addon ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
@@ -26,12 +28,12 @@ oldOPTIM = $(OPTIM) ;
 }
 
 UsePrivateHeaders [ FDirName kernel util ] ;
-SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
+SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 
 # Note that the add-on is named "i-udf-ds" to put it alphabetically
 # before the standard iso9660 add-on, thus giving it first dibs at
 # iso9660/UDF hybrid discs.
-Addon i-udf-ds : [ FDirName drive_setup fs ] :
+Addon <r5>i-udf-ds : [ FDirName drive_setup fs ] :
 	udf-ds.cpp
 	Recognition.cpp
 	UdfDebug.cpp
@@ -45,7 +47,7 @@ Addon i-udf-ds : [ FDirName drive_setup fs ] :
 
 SEARCH on [ FGristFiles
 		Recognition.cpp UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp
-	] = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
+	] = [ FDirName $(SUBDIR) .. ] ;
 
 rule InstallUDFDS
 {

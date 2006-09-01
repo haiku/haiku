@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel file_systems udf ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems udf r5 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
@@ -27,7 +27,7 @@ oldOPTIM = $(OPTIM) ;
 UsePrivateHeaders kernel ;			# For kernel_cpp.cpp
 UsePrivateHeaders [ FDirName kernel util ] ;	# For all the UDF source files
 
-KernelAddon udf : kernel file_systems :
+KernelAddon <r5>udf : kernel file_systems :
 	kernel_cpp.cpp
 	udf.cpp
 
@@ -66,4 +66,4 @@ InstallUDF install : udf ;
 # restore original optimization level
 OPTIM = $(oldOPTIM) ;
 
-SubInclude HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf r5 drive_setup_addon ;

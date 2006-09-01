@@ -3,4 +3,4 @@ SubDir HAIKU_TOP src tests add-ons kernel file_systems ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems fs_shell ;
 #SubInclude HAIKU_TOP src tests add-ons kernel file_systems iso9660 ;
-#SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf ;

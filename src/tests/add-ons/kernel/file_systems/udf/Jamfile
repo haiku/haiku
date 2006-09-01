@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems udf ;
 
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf r5 ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf udf_shell ;
