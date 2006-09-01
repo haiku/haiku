@@ -1,0 +1,69 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems udf ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+SubDirC++Flags -fno-rtti ;
+
+# save original optimization level
+oldOPTIM = $(OPTIM) ;
+
+# set some additional defines
+{
+	local defines =
+		KEEP_WRONG_DIRENT_RECLEN
+		;
+
+	defines += COMPILE_FOR_R5 ;
+
+	if $(DEBUG) = 0 {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+}
+
+UsePrivateHeaders kernel ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel util ] ;	# For all the UDF source files
+
+KernelAddon udf : kernel file_systems :
+	kernel_cpp.cpp
+	udf.cpp
+
+	DirectoryIterator.cpp
+	DString.cpp
+	Icb.cpp
+	MetadataPartition.cpp
+	PhysicalPartition.cpp
+	Recognition.cpp
+	SparablePartition.cpp
+	UdfDebug.cpp
+	UdfString.cpp
+	UdfStructures.cpp
+	Utils.cpp
+	VirtualPartition.cpp
+	Volume.cpp
+;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+
+rule InstallUDF
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore InstallUDF
+{
+	cp $(>) /boot/home/config/add-ons/kernel/file_systems/
+}
+
+InstallUDF install : udf ;
+
+# restore original optimization level
+OPTIM = $(oldOPTIM) ;
+
+SubInclude HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;
