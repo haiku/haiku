@@ -5,7 +5,7 @@
 
 <bookinfo>
 <date>9-1-2006</date>
-<title>Haiku Human Inteface Guidelines...</title>
+<title>Haiku Human Interface Guidelines...</title>
 <subtitle>Better Known as "How <emphasis>NOT</emphasis> to Write Software</subtitle>
 <authorgroup>
 	<author>DarkWyrm</author>
@@ -154,7 +154,7 @@
 <sect1>
 <title>Make Your App's Look Fits in with Others</title>
 
-<para>Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, get colors for your program with ui_color() and the constants which go with it. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accomodate weaker visual acuity. Graphics are an important part of a program's look, but don't reimplement the look of the buttons and other standard controls just to make your application stand out from the rest. By keeping visual consistency with the rest of the operating system, you avoid confusing the user with buttons that do not look like you can click on them, strange-acting menus, and so forth.</para>
+<para>Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, get colors for your program with ui_color() and the constants which go with it. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accommodate weaker visual acuity. Graphics are an important part of a program's look, but don't reimplement the look of the buttons and other standard controls just to make your application stand out from the rest. By keeping visual consistency with the rest of the operating system, you avoid confusing the user with buttons that do not look like you can click on them, strange-acting menus, and so forth.</para>
 </sect1>
 
 <sect1>
@@ -458,7 +458,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>cApItAlIzAtIoN and Speling</title>
 
-<para>Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. This is particulary important if you are working with a language which is not your native one. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized except when they are the first or last word in the phrase, such as in "Save As...".</para>
+<para>Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. This is particularly important if you are working with a language which is not your native one. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized except when they are the first or last word in the phrase, such as in "Save As...".</para>
 
 </sect1>
 <sect1>
@@ -1097,7 +1097,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <itemizedlist>
 <listitem>Disable characters you don't want in the field</listitem>
 <listitem>Try hard to validate text entered</listitem>
-<listitem>Make them large enough to accomodate the length of common entries</listitem>
+<listitem>Make them large enough to accommodate the length of common entries</listitem>
 <listitem>Allow clipboard operations when possible</listitem>
 </itemizedlist>
 </entry>
