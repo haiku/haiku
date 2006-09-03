@@ -90,8 +90,11 @@ standard_gcc_settings()
 	# PLATFORM_LINKLIBS
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
+
 	haikuGCCVersion=`$HAIKU_CC -dumpversion`
 	haikuGCCMachine=`$HAIKU_CC -dumpmachine`
+	haikuRequiredLegacyGCCVersion="2.95.3-beos-060710"
+		# version of legacy gcc required to build haiku
 	
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
@@ -101,9 +104,10 @@ standard_gcc_settings()
 		# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC and
 		# neither needed nor wanted.
 
-	# for gcc 4 we use the libstdc++ and libsupc++ that come with the compiler
 	case $haikuGCCVersion in
 		4.*)
+			# for gcc 4 we use the libstdc++ and libsupc++ that come with the
+			# compiler
 			haikuStaticLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.a`
 			haikuSharedLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.so`
 			haikuStaticLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.a`
@@ -128,6 +132,15 @@ standard_gcc_settings()
 			fi
 			if [ $haikuSharedLibSupCxx = libsupc++.so ]; then
 				haikuSharedLibSupCxx=
+			fi
+		;;
+		2.95*)
+			# check for correct (most up-to-date) legacy compiler and complain
+			# if an older one is installed
+			if [ $haikuGCCVersion != $haikuRequiredLegacyGCCVersion ]; then
+				echo "GCC version $haikuRequiredLegacyGCCVersion is required!";
+				echo "Please download it from www.haiku-os.org...";
+				exit 1;
 			fi
 		;;
 	esac
