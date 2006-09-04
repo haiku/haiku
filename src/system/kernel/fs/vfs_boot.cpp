@@ -351,6 +351,11 @@ vfs_mount_boot_file_system(kernel_args *args)
 	}
 
 	file_cache_init_post_boot_device();
+
+	// search for other disk systems
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	manager->RescanDiskSystems();
+
 	return B_OK;
 }
 

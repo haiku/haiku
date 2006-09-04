@@ -16,7 +16,6 @@
 #include <cbuf.h>
 #include <cpu.h>
 #include <debug.h>
-#include <ddm.h>
 #include <elf.h>
 #include <int.h>
 #include <kdevice_manager.h>
@@ -228,7 +227,6 @@ main2(void *unused)
 	cpu_init_post_modules(&sKernelArgs);
 	vm_init_post_modules(&sKernelArgs);
 	debug_init_post_modules(&sKernelArgs);
-	ddm_init_post_modules(&sKernelArgs);
 
 	// start the init process
 	{
