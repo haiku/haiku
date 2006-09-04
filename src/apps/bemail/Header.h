@@ -31,25 +31,21 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//--------------------------------------------------------------------
-//	
-//	Header.h
-//
-//--------------------------------------------------------------------
-
 #ifndef _HEADER_H
 #define _HEADER_H
 
-#include <fs_attr.h>
+
+#include "ComboBox.h"
+
+#include <Box.h>
 #include <NodeInfo.h>
 #include <Point.h>
 #include <Rect.h>
 #include <TextControl.h>
 #include <View.h>
 #include <Window.h>
+#include <fs_attr.h>
 
-#include "ComboBox.h"
 
 #define TO_TEXT				"To:"
 #define FROM_TEXT			"From:"
@@ -84,19 +80,18 @@ All rights reserved.
 #define BCC_FIELD_WIDTH		197
 #define BCC_FIELD_HEIGHT	 16
 
-class	TTextControl;
-class	BFile;
-class	BMenuField;
-class	BMenuItem;
-class	BPopupMenu;
-class	QPopupMenu;
+class TTextControl;
+class BFile;
+class BMenuField;
+class BMenuItem;
+class BPopupMenu;
+class QPopupMenu;
 
-//====================================================================
 
-class THeaderView : public BBox
-{
+class THeaderView : public BBox {
 	public:
-		THeaderView(BRect, BRect, bool incoming, BEmailMessage *mail, bool resending, uint32 defaultCharacterSet);
+		THeaderView(BRect, BRect, bool incoming, BEmailMessage *mail,
+			bool resending, uint32 defaultCharacterSet);
 
 		virtual void	MessageReceived(BMessage *);
 		virtual void	AttachedToWindow(void);
@@ -126,10 +121,7 @@ class THeaderView : public BBox
 		BDefaultChoiceList fEmailList;
 };
 
-//====================================================================
-
-class TTextControl : public BComboBox
-{
+class TTextControl : public BComboBox {
 	public:
 		TTextControl(BRect, char*, BMessage*, bool, bool, int32 resizingMode = B_FOLLOW_NONE);
 

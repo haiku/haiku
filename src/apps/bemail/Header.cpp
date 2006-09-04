@@ -32,38 +32,6 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//--------------------------------------------------------------------
-//	
-//	Header.cpp
-//
-//--------------------------------------------------------------------
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <ctype.h>
-
-#include <StorageKit.h>
-#include <InterfaceKit.h>
-#include <StringView.h>
-#include <E-mail.h>
-#include <String.h>
-#include <PopUpMenu.h>
-#include <fs_index.h>
-#include <fs_info.h>
-#include <map>
-
-#include <MailSettings.h>
-#include <MailMessage.h>
-
-#include <String.h>
-#include <CharacterSet.h>
-#include <CharacterSetRoster.h>
-
-using namespace BPrivate;
-using std::map;
-
 #include "Mail.h"
 #include "Header.h"
 #include "Utilities.h"
@@ -72,10 +40,38 @@ using std::map;
 #include "Prefs.h"
 
 #include <MDRLanguage.h>
+#include <MailSettings.h>
+#include <MailMessage.h>
+
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+#include <E-mail.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <Query.h>
+#include <String.h>
+#include <StringView.h>
+#include <Volume.h>
+#include <VolumeRoster.h>
+#include <Window.h>
+#include <fs_index.h>
+#include <fs_info.h>
+
+#include <ctype.h>
+#include <map>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+
+using namespace BPrivate;
+using std::map;
 
 extern uint32 gDefaultChain;
 
-const char	*kDateLabel = "Date:";
+const char* kDateLabel = "Date:";
 const uint32 kMsgFrom = 'hFrm';
 const uint32 kMsgEncoding = 'encd';
 const uint32 kMsgAddressChosen = 'acsn';
@@ -86,8 +82,9 @@ class QPopupMenu : public QueryMenu {
 		QPopupMenu(const char *title);
 
 	private:		
-		void AddPersonItem(const entry_ref *ref, ino_t node, BString &name, BString &email,
-							const char *attr, BMenu *groupMenu, BMenuItem *superItem);
+		void AddPersonItem(const entry_ref *ref, ino_t node, BString &name,
+			BString &email, const char *attr, BMenu *groupMenu,
+			BMenuItem *superItem);
 
 	protected:
 		virtual void EntryCreated(const entry_ref &ref, ino_t node);
@@ -96,47 +93,41 @@ class QPopupMenu : public QueryMenu {
 		int32 fGroups; // Current number of "group" submenus.  Includes All People if present.
 };
 
-//====================================================================
-
-struct CompareBStrings
-{
-	bool operator()(const BString *s1, const BString *s2) const
+struct CompareBStrings {
+	bool
+	operator()(const BString *s1, const BString *s2) const
 	{
 		return (s1->Compare(*s2) < 0);
 	}
 };
 
-//====================================================================
+
+//	#pragma mark - THeaderView
 
 
-THeaderView::THeaderView (
-	BRect rect,
-	BRect windowRect,
-	bool incoming,
-	BEmailMessage *mail,
-	bool resending,
-	uint32 defaultCharacterSet
-	) :	BBox(rect, "m_header", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER),
-		fAccountMenu(NULL),
-		fEncodingMenu(NULL),
-		fChain(gDefaultChain),
-		fAccountTo(NULL),
-		fAccount(NULL),
-		fBcc(NULL),
-		fCc(NULL),
-		fSubject(NULL),
-		fTo(NULL),
-		fDate(NULL),
-		fIncoming(incoming),
-		fCharacterSetUserSees(defaultCharacterSet),
-		fResending(resending),
-		fBccMenu(NULL),
-		fCcMenu(NULL),
-		fToMenu(NULL),
-		fEmailList(NULL)
+THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
+		BEmailMessage *mail, bool resending, uint32 defaultCharacterSet)
+	: BBox(rect, "m_header", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER),
+	fAccountMenu(NULL),
+	fEncodingMenu(NULL),
+	fChain(gDefaultChain),
+	fAccountTo(NULL),
+	fAccount(NULL),
+	fBcc(NULL),
+	fCc(NULL),
+	fSubject(NULL),
+	fTo(NULL),
+	fDate(NULL),
+	fIncoming(incoming),
+	fCharacterSetUserSees(defaultCharacterSet),
+	fResending(resending),
+	fBccMenu(NULL),
+	fCcMenu(NULL),
+	fToMenu(NULL),
+	fEmailList(NULL)
 {
-	BMenuField	*field;
-	BMessage *msg;
+	BMenuField* field;
+	BMessage* msg;
 
 	BFont font = *be_plain_font;
 	font.SetSize(FONT_SIZE);
@@ -145,8 +136,7 @@ THeaderView::THeaderView (
 		MDR_DIALECT_CHOICE ("Enclosures: ","添付ファイル：")) + 9;
 	float y = TO_FIELD_V;
 
-	if (!fIncoming)
-	{
+	if (!fIncoming) {
 		InitEmailCompletion();
 		InitGroupCompletion();
 	}
@@ -165,31 +155,31 @@ THeaderView::THeaderView (
 	// bug).
 
 	float widestCharacterSet = 0;
-	bool marked_charset = false;
-	BMenuItem * item;
+	bool markedCharSet = false;
+	BMenuItem* item;
 
-	fEncodingMenu = new BPopUpMenu (B_EMPTY_STRING);
+	fEncodingMenu = new BPopUpMenu(B_EMPTY_STRING);
 
 	BCharacterSetRoster roster;
 	BCharacterSet charset;
-	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+	while (roster.GetNextCharacterSet(&charset) == B_OK) {
 		BString name(charset.GetPrintName());
-		const char * mime = charset.GetMIMEName();
-		if (mime) {
+		const char* mime = charset.GetMIMEName();
+		if (mime)
 			name << " (" << mime << ")";
-		}
+
+		uint32 convertID;
+		if (mime == NULL || strcasecmp(mime, "UTF-8") != 0)
+			convertID = charset.GetConversionID();
+		else
+			convertID = B_MAIL_UTF8_CONVERSION;
+
 		msg = new BMessage(kMsgEncoding);
-		uint32 convert_id;
-		if ((mime == 0) || (strcasecmp(mime, "UTF-8") != 0)) {
-			convert_id = charset.GetConversionID();
-		} else {
-			convert_id = B_MAIL_UTF8_CONVERSION;
-		}
-		msg->AddInt32("charset", convert_id);
+		msg->AddInt32("charset", convertID);
 		fEncodingMenu->AddItem(item = new BMenuItem(name.String(), msg));
-		if (convert_id == fCharacterSetUserSees && !marked_charset) {
+		if (convertID == fCharacterSetUserSees && !markedCharSet) {
 			item->SetMarked(true);
-			marked_charset = true;
+			markedCharSet = true;
 		}
 		if (font.StringWidth(name.String()) > widestCharacterSet)
 			widestCharacterSet = font.StringWidth(name.String());
@@ -198,9 +188,9 @@ THeaderView::THeaderView (
 	msg = new BMessage(kMsgEncoding);
 	msg->AddInt32("charset", B_MAIL_US_ASCII_CONVERSION);
 	fEncodingMenu->AddItem(item = new BMenuItem("US-ASCII", msg));
-	if (fCharacterSetUserSees == B_MAIL_US_ASCII_CONVERSION && !marked_charset) {
+	if (fCharacterSetUserSees == B_MAIL_US_ASCII_CONVERSION && !markedCharSet) {
 		item->SetMarked(true);
-		marked_charset = true;
+		markedCharSet = true;
 	}
 
 	if (!resending && fIncoming) {
@@ -209,9 +199,8 @@ THeaderView::THeaderView (
 		msg = new BMessage(kMsgEncoding);
 		msg->AddInt32("charset", B_MAIL_NULL_CONVERSION);
 		fEncodingMenu->AddItem(item = new BMenuItem("Automatic", msg));
-		if (!marked_charset) {
+		if (!markedCharSet)
 			item->SetMarked(true);
-		}
 	}
 
 	// First line of the header, From for reading e-mails (includes the
@@ -220,8 +209,7 @@ THeaderView::THeaderView (
 
 	BRect r;
 	char string[20];
-	if (fIncoming && !resending)
-	{
+	if (fIncoming && !resending) {
 		// Set up the character set pop-up menu on the right of "To" box.
 		r.Set (windowRect.Width() - widestCharacterSet -
 			font.StringWidth (DECODING_TEXT) - 2 * SEPARATOR_MARGIN,
@@ -236,28 +224,26 @@ THeaderView::THeaderView (
 		r.Set(x - font.StringWidth(FROM_TEXT) - 11, y,
 			  field->Frame().left - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT);
 		sprintf(string, FROM_TEXT);
-	}
-	else
-	{
+	} else {
 		r.Set(x - 11, y, windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT);
 		string[0] = 0;
 	}
+
 	y += FIELD_HEIGHT;
 	fTo = new TTextControl(r, string, new BMessage(TO_FIELD), fIncoming, resending,
-						   B_FOLLOW_LEFT_RIGHT);
+		B_FOLLOW_LEFT_RIGHT);
 
-	if (!fIncoming || resending)
-	{
+	if (!fIncoming || resending) {
 		fTo->SetChoiceList(&fEmailList);
 		fTo->SetAutoComplete(true);
 	}
+
 	AddChild(fTo);
 	msg = new BMessage(FIELD_CHANGED);
 	msg->AddInt32("bitmask", FIELD_TO);
 	fTo->SetModificationMessage(msg);
 
-	if (!fIncoming || resending)
-	{
+	if (!fIncoming || resending) {
 		r.right = r.left + 8;
 		r.left = r.right - be_plain_font->StringWidth(TO_TEXT) - 30;
 		r.top -= 1;
@@ -269,8 +255,7 @@ THeaderView::THeaderView (
 	}
 
 	// "From:" accounts Menu and Encoding Menu.
-	if (!fIncoming || resending)
-	{
+	if (!fIncoming || resending) {
 		// Put the character set box on the right of the From field.
 		r.Set (windowRect.Width() - widestCharacterSet -
 			font.StringWidth (ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
@@ -289,15 +274,12 @@ THeaderView::THeaderView (
 		fAccountMenu = new BPopUpMenu(B_EMPTY_STRING);
 
 		BList chains;
-		if (GetOutboundMailChains(&chains) >= B_OK)
-		{
+		if (GetOutboundMailChains(&chains) >= B_OK) {
 			bool marked = false;
-			for (int32 i = 0;i < chains.CountItems();i++)
-			{
+			for (int32 i = 0; i < chains.CountItems(); i++) {
 				BMailChain *chain = (BMailChain *)chains.ItemAt(i);
 				BString name = chain->Name();
-				if ((msg = chain->MetaData()) != NULL)
-				{
+				if ((msg = chain->MetaData()) != NULL) {
 					name << ":   " << msg->FindString("real_name")
 						 << "  <" << msg->FindString("reply_to") << ">";
 				}
@@ -305,24 +287,20 @@ THeaderView::THeaderView (
 
 				msg->AddInt32("id",chain->ID());
 
-				if (gDefaultChain == chain->ID())
-				{
+				if (gDefaultChain == chain->ID()) {
 					item->SetMarked(true);
 					marked = true;
 				}
 				fAccountMenu->AddItem(item);
 				delete chain;
 			}
-			if (!marked)
-			{
+
+			if (!marked) {
 				BMenuItem *item = fAccountMenu->ItemAt(0);
-				if (item != NULL)
-				{
+				if (item != NULL) {
 					item->SetMarked(true);
 					fChain = item->Message()->FindInt32("id");
-				}
-				else
-				{
+				} else {
 					fAccountMenu->AddItem(item = new BMenuItem("<none>",NULL));
 					item->SetEnabled(false);
 					fChain = ~0UL;
@@ -342,9 +320,8 @@ THeaderView::THeaderView (
 		AddChild(field);
 
 		y += FIELD_HEIGHT;
-	}
-	else	// To: account
-	{
+	} else {
+		// To: account
 		bool account = count_pop_accounts() > 0;
 
 		r.Set(x - font.StringWidth(TO_TEXT) - 11, y,
@@ -355,8 +332,7 @@ THeaderView::THeaderView (
 		fAccountTo->SetEnabled(false);
 		AddChild(fAccountTo);
 
-		if (account)
-		{
+		if (account) {
 			r.left = r.right + 6;  r.right = windowRect.Width() - SEPARATOR_MARGIN;
 			fAccount = new TTextControl(r, ACCOUNT_TEXT, NULL, fIncoming, false, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 			fAccount->SetEnabled(false);
@@ -374,13 +350,13 @@ THeaderView::THeaderView (
 	AddChild(fSubject);
 	(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_SUBJECT);
 	fSubject->SetModificationMessage(msg);
-	
+
 	if (fResending)
 		fSubject->SetEnabled(false);
-	
+
 	--y;
-	if (!fIncoming)
-	{
+
+	if (!fIncoming) {
 		r.Set(x - 11, y, CC_FIELD_H + CC_FIELD_WIDTH, y + CC_FIELD_HEIGHT);
 		fCc = new TTextControl(r, "", new BMessage(CC_FIELD), fIncoming, false);
 		fCc->SetChoiceList(&fEmailList);
@@ -388,7 +364,7 @@ THeaderView::THeaderView (
 		AddChild(fCc);
 		(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_CC);
 		fCc->SetModificationMessage(msg);
-	
+
 		r.right = r.left + 9;
 		r.left = r.right - be_plain_font->StringWidth(CC_TEXT) - 30;
 		r.top -= 1;
@@ -409,7 +385,7 @@ THeaderView::THeaderView (
 		AddChild(fBcc);
 		(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_BCC);
 		fBcc->SetModificationMessage(msg);
-		
+
 		r.right = r.left + 9;
 		r.left = r.right - be_plain_font->StringWidth(BCC_TEXT) - 30;
 		r.top -= 1;
@@ -418,9 +394,7 @@ THeaderView::THeaderView (
 		field->SetDivider(0.0);
 		field->SetEnabled(true);
 		AddChild(field);
-	}
-	else
-	{
+	} else {
 		r.Set(x - font.StringWidth(kDateLabel) - 10, y + 4,
 			  windowRect.Width(), y + TO_FIELD_HEIGHT + 1);
 		y += TO_FIELD_HEIGHT + 5;
@@ -435,7 +409,7 @@ THeaderView::THeaderView (
 }
 
 
-void 
+void
 THeaderView::InitEmailCompletion()
 {
 	// get boot volume
@@ -451,11 +425,9 @@ THeaderView::InitEmailCompletion()
 	query.Fetch();
 	entry_ref ref;
 
-	while (query.GetNextRef (&ref) == B_OK)
-	{
+	while (query.GetNextRef (&ref) == B_OK) {
 		BNode file;
-		if (file.SetTo(&ref) == B_OK)
-		{
+		if (file.SetTo(&ref) == B_OK) {
 			// Add the e-mail address as an auto-complete string.
 			BString email;
 			if (file.ReadAttrString("META:email", &email) >= B_OK)
@@ -482,11 +454,10 @@ THeaderView::InitEmailCompletion()
 			// multiple keyword (so you can have several e-mail addresses in
 			// one attribute, perhaps comma separated) indices!  Which aren't
 			// yet in BFS.
-			for (int16 i = 2;i < 6;i++)
-			{
+			for (int16 i = 2; i < 6; i++) {
 				char attr[16];
-				sprintf(attr,"META:email%d",i);
-				if (file.ReadAttrString(attr,&email) >= B_OK)
+				sprintf(attr, "META:email%d", i);
+				if (file.ReadAttrString(attr, &email) >= B_OK)
 					fEmailList.AddChoice(email.String());
 			}
 		}
@@ -494,7 +465,7 @@ THeaderView::InitEmailCompletion()
 }
 
 
-void 
+void
 THeaderView::InitGroupCompletion()
 {
 	// get boot volume
@@ -507,11 +478,10 @@ THeaderView::InitGroupCompletion()
 	query.SetPredicate("META:group=**");
 	query.Fetch();
 
-	map<BString *, BString *, CompareBStrings> group_map;
+	map<BString *, BString *, CompareBStrings> groupMap;
 	entry_ref ref;
 	BNode file;
-	while (query.GetNextRef(&ref) == B_OK)
-	{
+	while (query.GetNextRef(&ref) == B_OK) {
 		if (file.SetTo(&ref) != B_OK)
 			continue;
 
@@ -526,29 +496,28 @@ THeaderView::InitGroupCompletion()
 		if (address.Length() == 0)
 			continue;
 
-		char *grp = groups.LockBuffer(groups.Length());
-		char *next = strchr(grp, ',');
+		char *group = groups.LockBuffer(groups.Length());
+		char *next = strchr(group, ',');
 
-		for (;;)
-		{
-			if (next) *next = 0;
-			while (*grp && *grp == ' ') grp++;
+		for (;;) {
+			if (next)
+				*next = 0;
 
-			BString *group = new BString(grp);
+			while (*group && *group == ' ')
+				group++;
+
+			BString *groupString = new BString(group);
 			BString *addressListString = NULL;
 
 			// nobody is in this group yet, start it off
-			if (group_map[group] == NULL)
-			{
-				addressListString = new BString(*group);
+			if (groupMap[groupString] == NULL) {
+				addressListString = new BString(*groupString);
 				addressListString->Append(" ");
-				group_map[group] = addressListString;
-			}
-			else
-			{
-				addressListString = group_map[group];
+				groupMap[groupString] = addressListString;
+			} else {
+				addressListString = groupMap[groupString];
 				addressListString->Append(", ");
-				delete group;
+				delete groupString;
 			}
 
 			// Append the user's address to the end of the string with the
@@ -564,21 +533,20 @@ THeaderView::InitGroupCompletion()
 
 			if (!next)
 				break;
-	
-			grp = next+1;
-			next = strchr(grp, ',');
+
+			group = next + 1;
+			next = strchr(group, ',');
 		}
 	}
 	
 	map<BString *, BString *, CompareBStrings>::iterator iter;
-	for (iter = group_map.begin(); iter != group_map.end();)
-	{
-		BString *grp = iter->first;
+	for (iter = groupMap.begin(); iter != groupMap.end();) {
+		BString *group = iter->first;
 		BString *addr = iter->second;
 		fEmailList.AddChoice(addr->String());
 		++iter;
-		group_map.erase(grp);
-		delete grp;
+		groupMap.erase(group);
+		delete group;
 		delete addr;
 	}
 }
@@ -587,15 +555,13 @@ THeaderView::InitGroupCompletion()
 void
 THeaderView::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case B_SIMPLE_DATA:
 		{
 			BTextView *textView = dynamic_cast<BTextView *>(Window()->CurrentFocus());
 			if (dynamic_cast<TTextControl *>(textView->Parent()) != NULL)
 				textView->Parent()->MessageReceived(msg);
-			else
-			{
+			else {
 				BMessage message(*msg);
 				message.what = REFS_RECEIVED;
 				Window()->PostMessage(&message, Window());
@@ -618,10 +584,10 @@ THeaderView::MessageReceived(BMessage *msg)
 		case kMsgEncoding:
 		{
 			BMessage message(*msg);
-			int32 tempInt;
+			int32 charSet;
 
-			if (msg->FindInt32("charset", &tempInt) == B_OK)
-				fCharacterSetUserSees = tempInt;
+			if (msg->FindInt32("charset", &charSet) == B_OK)
+				fCharacterSetUserSees = charSet;
 
 			message.what = CHARSET_CHOICE_MADE;
 			message.AddInt32 ("charset", fCharacterSetUserSees);
@@ -633,20 +599,17 @@ THeaderView::MessageReceived(BMessage *msg)
 
 
 void
-THeaderView::AttachedToWindow(void)
+THeaderView::AttachedToWindow()
 {
-	if (fToMenu)
-	{
+	if (fToMenu) {
 		fToMenu->SetTargetForItems(fTo);
 		fToMenu->SetPredicate("META:email=**");
 	}
-	if (fCcMenu)
-	{
+	if (fCcMenu) {
 		fCcMenu->SetTargetForItems(fCc);
 		fCcMenu->SetPredicate("META:email=**");
 	}
-	if (fBccMenu)
-	{
+	if (fBccMenu) {
 		fBccMenu->SetTargetForItems(fBcc);
 		fBccMenu->SetPredicate("META:email=**");
 	}
@@ -672,19 +635,14 @@ THeaderView::AttachedToWindow(void)
 status_t
 THeaderView::LoadMessage(BEmailMessage *mail)
 {
-	//
 	//	Set the date on this message
-	//
 	const char *dateField = mail->Date();
 	char string[256];
 	sprintf(string, "%s   %s", kDateLabel, dateField != NULL ? dateField : "Unknown");
 	fDate->SetText(string);
 
-	//	
 	//	Set contents of header fields
-	//
-	if (fIncoming && !fResending)
-	{
+	if (fIncoming && !fResending) {
 		if (fBcc != NULL)
 			fBcc->SetEnabled(false);
 
@@ -716,13 +674,12 @@ THeaderView::LoadMessage(BEmailMessage *mail)
 }
 
 
-//====================================================================
-//	#pragma mark -
+//	#pragma mark - TTextControl
 
 
 TTextControl::TTextControl(BRect rect, char *label, BMessage *msg, 
-	bool incoming, bool resending, int32 resizingMode)
-	:	BComboBox(rect, "happy", label, msg, resizingMode),
+		bool incoming, bool resending, int32 resizingMode)
+	: BComboBox(rect, "happy", label, msg, resizingMode),
 	fRefDropMenu(NULL)
 	//:BTextControl(rect, "happy", label, "", msg, resizingMode)
 {
@@ -756,18 +713,18 @@ TTextControl::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case B_SIMPLE_DATA: {
-			if ((fIncoming == true) && (fResending == false)) return;
-			
+			if (fIncoming && !fResending)
+				return;
+
 			int32 buttons = -1;
 			BPoint point;
-
-			if (msg->FindInt32("buttons", &buttons) != B_OK) {
+			if (msg->FindInt32("buttons", &buttons) != B_OK)
 				buttons = B_PRIMARY_MOUSE_BUTTON;
-			};
-			if (buttons != B_PRIMARY_MOUSE_BUTTON) {
-				if (msg->FindPoint("_drop_point_", &point) != B_OK) return;
-			};
-		
+
+			if (buttons != B_PRIMARY_MOUSE_BUTTON
+				&& msg->FindPoint("_drop_point_", &point) != B_OK)
+				return;
+
 			BMessage message(REFS_RECEIVED);
 			bool enclosure = false;
 			BString addressList;
@@ -785,13 +742,12 @@ TTextControl::MessageReceived(BMessage *msg)
 					char type[B_FILE_NAME_LENGTH];
 					info.GetType(type);
 
-					if (fCommand != SUBJECT_FIELD &&
-						!strcmp(type,"application/x-person")) {
+					if (fCommand != SUBJECT_FIELD
+						&& !strcmp(type,"application/x-person")) {
 						// add person's E-mail address to the To: field
 
 						BString attr = "";
 						if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-						
 							if (msg->FindString("attr", &attr) < B_OK)
 								attr = "META:email"; // If not META:email3 etc.
 						} else {
@@ -800,16 +756,19 @@ TTextControl::MessageReceived(BMessage *msg)
 
 							char buffer[B_ATTR_NAME_LENGTH];
 
-							if (fRefDropMenu) delete fRefDropMenu;
+							delete fRefDropMenu;
 							fRefDropMenu = new BPopUpMenu("RecipientMenu");
-							
+
 							while (node.GetNextAttrName(buffer) == B_OK) {
-								if (strstr(buffer, "email") <= 0) continue;
+								if (strstr(buffer, "email") <= 0)
+									continue;
+
 								attr = buffer;
 
 								BString address;
 								ReadAttrString(&node, buffer, &address);
-								if (address.Length() <= 0) continue;
+								if (address.Length() <= 0)
+									continue;
 
 								BMessage *itemMsg = new BMessage(kMsgAddressChosen);
 								itemMsg->AddString("address", address.String());
@@ -818,8 +777,8 @@ TTextControl::MessageReceived(BMessage *msg)
 								BMenuItem *item = new BMenuItem(address.String(),
 									itemMsg);
 								fRefDropMenu->AddItem(item);
-							};
-							
+							}
+
 							if (fRefDropMenu->CountItems() > 1) {
 								fRefDropMenu->SetTargetForItems(this);
 								fRefDropMenu->Go(point, true, true, true);
@@ -827,26 +786,27 @@ TTextControl::MessageReceived(BMessage *msg)
 							} else {
 								delete fRefDropMenu;
 								fRefDropMenu = NULL;
-							};
-						};
+							}
+						}
 
 						BString email;
 						ReadAttrString(&file,attr.String(),&email);
 
-						/* we got something... */
+						// we got something...
 						if (email.Length() > 0) {
-							/* see if we can get a username as well */
+							// see if we can get a username as well
 							BString name;
-							ReadAttrString(&file,"META:name",&name);
+							ReadAttrString(&file, "META:name", &name);
 
 							BString	address;
-							/* if we have no Name, just use the email address */
-							if (name.Length() == 0)
+							if (name.Length() == 0) {
+								// if we have no Name, just use the email address
 								address = email;
-							else {
-								/* otherwise, pretty-format it */
+							} else {
+								// otherwise, pretty-format it
 								address << "\"" << name << "\" <" << email << ">";
 							}
+
 							if (addressList.Length() > 0)
 								addressList << ", ";
 							addressList << address;
@@ -868,10 +828,10 @@ TTextControl::MessageReceived(BMessage *msg)
 				textView->Insert(addressList.String());
 			}
 
-			if (enclosure) Window()->PostMessage(&message, Window());
-
+			if (enclosure)
+				Window()->PostMessage(&message, Window());
 			break;
-		};
+		}
 
 		case M_SELECT:
 		{
@@ -886,9 +846,10 @@ TTextControl::MessageReceived(BMessage *msg)
 			BString address;
 			entry_ref ref;
 			
-			if (msg->FindString("address", &address) != B_OK) return;
-			if (msg->FindRef("ref", &ref) != B_OK) return;
-			
+			if (msg->FindString("address", &address) != B_OK
+				|| msg->FindRef("ref", &ref) != B_OK)
+				return;
+
 			if (address.Length() > 0) {
 				BString name;
 				BNode node(&ref);
@@ -899,18 +860,18 @@ TTextControl::MessageReceived(BMessage *msg)
 				if (name.Length() > 0) {
 					display = "";
 					display << "\"" << name << "\" <" << address << ">";
-				};
+				}
 
 				BTextView *textView = TextView();
 				int end = textView->TextLength();
 				if (end != 0) {
 					textView->Select(end, end);
 					textView->Insert(", ");
-				};
+				}
 				textView->Insert(display.String());
-
-			};
-		} break;
+			}
+			break;
+		}
 
 		default:
 			// BTextControl::MessageReceived(msg);
@@ -922,15 +883,11 @@ TTextControl::MessageReceived(BMessage *msg)
 bool
 TTextControl::HasFocus()
 {
-	BTextView *textView = TextView();
-
-	return textView->IsFocus();
+	return TextView()->IsFocus();
 }
 
 
-//====================================================================
-//	QPopupMenu (definition at the beginning of this file)
-//	#pragma mark -
+//	#pragma mark - QPopupMenu
 
 
 QPopupMenu::QPopupMenu(const char *title)
