@@ -102,6 +102,20 @@ struct CompareBStrings {
 };
 
 
+const char*
+mail_to_filter(const char* text, int32& length, const text_run_array*& runs)
+{
+	if (!strncmp(text, "mailto:", 7)) {
+		text += 7;
+		length -= 7;
+		if (runs != NULL)
+			runs = NULL;
+	}
+
+	return text;
+}
+
+
 //	#pragma mark - THeaderView
 
 
@@ -232,6 +246,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	y += FIELD_HEIGHT;
 	fTo = new TTextControl(r, string, new BMessage(TO_FIELD), fIncoming, resending,
 		B_FOLLOW_LEFT_RIGHT);
+	fTo->SetFilter(mail_to_filter);
 
 	if (!fIncoming || resending) {
 		fTo->SetChoiceList(&fEmailList);
@@ -257,15 +272,15 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	// "From:" accounts Menu and Encoding Menu.
 	if (!fIncoming || resending) {
 		// Put the character set box on the right of the From field.
-		r.Set (windowRect.Width() - widestCharacterSet -
-			font.StringWidth (ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
+		r.Set(windowRect.Width() - widestCharacterSet -
+			font.StringWidth(ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
 			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT + 2);
 		field = new BMenuField (r, "encoding", ENCODING_TEXT, fEncodingMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_LEFT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetFont (&font);
-		field->SetDivider (font.StringWidth(ENCODING_TEXT) + 5);
+		field->SetFont(&font);
+		field->SetDivider(font.StringWidth(ENCODING_TEXT) + 5);
 		AddChild(field);
 
 		// And now the "from account" pop-up menu, on the left side, taking the
@@ -283,9 +298,10 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 					name << ":   " << msg->FindString("real_name")
 						 << "  <" << msg->FindString("reply_to") << ">";
 				}
-				BMenuItem *item = new BMenuItem(name.String(),msg = new BMessage(kMsgFrom));
+				BMenuItem *item = new BMenuItem(name.String(),
+					msg = new BMessage(kMsgFrom));
 
-				msg->AddInt32("id",chain->ID());
+				msg->AddInt32("id", chain->ID());
 
 				if (gDefaultChain == chain->ID()) {
 					item->SetMarked(true);
@@ -359,6 +375,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (!fIncoming) {
 		r.Set(x - 11, y, CC_FIELD_H + CC_FIELD_WIDTH, y + CC_FIELD_HEIGHT);
 		fCc = new TTextControl(r, "", new BMessage(CC_FIELD), fIncoming, false);
+		fCc->SetFilter(mail_to_filter);
 		fCc->SetChoiceList(&fEmailList);
 		fCc->SetAutoComplete(true);
 		AddChild(fCc);
@@ -380,6 +397,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		y += FIELD_HEIGHT;
 		fBcc = new TTextControl(r, "", new BMessage(BCC_FIELD),
 						fIncoming, false, B_FOLLOW_LEFT_RIGHT);
+		fBcc->SetFilter(mail_to_filter);
 		fBcc->SetChoiceList(&fEmailList);
 		fBcc->SetAutoComplete(true);
 		AddChild(fBcc);
