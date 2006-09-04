@@ -550,17 +550,107 @@ error0:
 
 //	#pragma mark - Scanning
 
+typedef struct identify_cookie {
+	uint32 bytes_per_sector;
+	uint32 total_sectors;
+	char name[12];
+} identify_cookie;
 
 static float
 dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	return 0.0f;
+	uint8 buf[512];
+	int i;
+	uint32 bytes_per_sector;
+	uint32 sectors_per_cluster;
+	uint32 fat_count;
+	uint32 reserved_sectors;
+	uint32 total_sectors;
+	uint32 sectors_per_fat;
+	char name[12];
+	identify_cookie *cookie;
+	
+
+	// read in the boot sector
+	if (read_pos(fd, 0, (void*)buf, 512) != 512) {
+		return 0.0f;
+        }
+
+        // only check boot signature on hard disks to account for broken mtools
+        // behavior
+        if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
+		return 0.0f;
+
+        if (!memcmp(buf+3, "NTFS    ", 8) || !memcmp(buf+3, "HPFS    ", 8)) {
+		return 0.0f;
+        }
+
+        // first fill in the universal fields from the bpb
+        bytes_per_sector = read16(buf,0xb);
+        if ((bytes_per_sector != 0x200) && (bytes_per_sector != 0x400) && (bytes_per_sector != 0x800)) {
+		return 0.0f;
+        }
+
+        sectors_per_cluster = i = buf[0xd];
+        if ((i != 1) && (i != 2) && (i != 4) && (i != 8) &&
+                (i != 0x10) && (i != 0x20) && (i != 0x40) && (i != 0x80)) {
+		return 0.0f;
+	}
+
+	reserved_sectors = read16(buf,0xe);
+
+        fat_count = buf[0x10];
+        if ((fat_count == 0) || (fat_count > 8)) {
+		return 0.0f;
+        }
+
+        // check media descriptor versus known types
+	if ((buf[0x15] != 0xF0) && (buf[0x15] < 0xf8)) {
+		return 0.0f;
+	}
+
+	strcpy(name, "no name    ");
+	sectors_per_fat = read16(buf,0x16);
+	if (sectors_per_fat == 0) {
+		total_sectors = read32(buf,0x20);
+	} else {
+		total_sectors = read16(buf,0x13); // partition size
+		if (total_sectors == 0)
+			total_sectors = read32(buf,0x20);
+
+		if (buf[0x26] == 0x29) {
+			// fill in the volume label
+			if (memcmp(buf+0x2b, "           ", 11)) {
+				memcpy(name, buf+0x2b, 11);
+			}
+		}
+	}
+	
+	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
+	if (!cookie)
+		return 0.0f;
+
+	cookie->bytes_per_sector = bytes_per_sector;
+	cookie->total_sectors = total_sectors;
+	strlcpy(cookie->name, name, 12);
+	*_cookie = cookie;
+
+	return 0.8f;
 }
 
 
 static status_t
 dosfs_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+	partition->content_size = cookie->total_sectors * cookie->bytes_per_sector;
+	partition->block_size = cookie->bytes_per_sector;
+	partition->content_name = strdup(cookie->name);
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
 	return B_OK;
 }
 
@@ -568,6 +658,8 @@ dosfs_scan_partition(int fd, partition_data *partition, void *_cookie)
 static void
 dosfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 {
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+	free(cookie);
 }
 
 
