@@ -570,41 +570,39 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	char name[12];
 	identify_cookie *cookie;
 	
-
 	// read in the boot sector
 	if (read_pos(fd, 0, (void*)buf, 512) != 512) {
 		return 0.0f;
-        }
+	}
 
-        // only check boot signature on hard disks to account for broken mtools
-        // behavior
-        if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
+	// only check boot signature on hard disks to account for broken mtools
+	// behavior
+	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
 		return 0.0f;
-
-        if (!memcmp(buf+3, "NTFS    ", 8) || !memcmp(buf+3, "HPFS    ", 8)) {
+	if (!memcmp(buf+3, "NTFS    ", 8) || !memcmp(buf+3, "HPFS    ", 8)) {
 		return 0.0f;
-        }
+	}
 
-        // first fill in the universal fields from the bpb
-        bytes_per_sector = read16(buf,0xb);
-        if ((bytes_per_sector != 0x200) && (bytes_per_sector != 0x400) && (bytes_per_sector != 0x800)) {
+	// first fill in the universal fields from the bpb
+	bytes_per_sector = read16(buf,0xb);
+	if ((bytes_per_sector != 0x200) && (bytes_per_sector != 0x400) && (bytes_per_sector != 0x800)) {
 		return 0.0f;
-        }
+	}
 
-        sectors_per_cluster = i = buf[0xd];
-        if ((i != 1) && (i != 2) && (i != 4) && (i != 8) &&
-                (i != 0x10) && (i != 0x20) && (i != 0x40) && (i != 0x80)) {
+	sectors_per_cluster = i = buf[0xd];
+	if ((i != 1) && (i != 2) && (i != 4) && (i != 8) &&
+		(i != 0x10) && (i != 0x20) && (i != 0x40) && (i != 0x80)) {
 		return 0.0f;
 	}
 
 	reserved_sectors = read16(buf,0xe);
 
-        fat_count = buf[0x10];
-        if ((fat_count == 0) || (fat_count > 8)) {
+	fat_count = buf[0x10];
+	if ((fat_count == 0) || (fat_count > 8)) {
 		return 0.0f;
-        }
+	}
 
-        // check media descriptor versus known types
+	// check media descriptor versus known types
 	if ((buf[0x15] != 0xF0) && (buf[0x15] < 0xf8)) {
 		return 0.0f;
 	}
@@ -1158,7 +1156,7 @@ dosfs_fsync(void *_vol, void *_node)
 	if (check_vnode_magic(node, "dosfs_fsync")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
-        }
+	}
 
 	if (node->cache)
 		err = file_cache_sync(node->cache);
