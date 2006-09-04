@@ -50,6 +50,10 @@ class BList;
 class BTextControl;
 class BWindow;
 class BComboBox;
+struct text_run_array;
+
+typedef const char* (*text_input_filter_hook)(const char* inText, int32& length,
+	const text_run_array*& runs);
 
 /*
 // Abstract class provides an interface for BComboBox to access possible choices.
@@ -153,6 +157,8 @@ public:
 
 	virtual void SetModificationMessage(BMessage *message);
     BMessage *ModificationMessage() const;
+
+	void SetFilter(text_input_filter_hook hook);
 
 	virtual	void GetPreferredSize(float *width, float *height);
 	virtual void ResizeToPreferred();
