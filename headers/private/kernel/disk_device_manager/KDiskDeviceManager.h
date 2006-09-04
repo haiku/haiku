@@ -120,6 +120,7 @@ public:
 	// by the registrar.
 
 	status_t InitialDeviceScan();
+	status_t RescanDiskSystems();
 
 private:
 	status_t _AddPartitioningSystem(const char *name);

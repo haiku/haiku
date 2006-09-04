@@ -3,6 +3,7 @@
 #include <KernelExport.h>
 #include <stdio.h>
 
+#include "ddm.h"
 #include "disk_device_manager.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceJob.h"
@@ -271,5 +272,12 @@ update_disk_device_job_interrupt_properties(disk_job_id jobID,
 		}
 	} while (paused);
 	return B_DISK_DEVICE_JOB_CONTINUE;
+}
+
+status_t
+ddm_init_post_modules(kernel_args *args)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	return manager->RescanDiskSystems();
 }
 

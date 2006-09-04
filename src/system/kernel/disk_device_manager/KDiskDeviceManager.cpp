@@ -929,6 +929,31 @@ KDiskDeviceManager::InitialDeviceScan()
 	return error;
 }
 
+//RescanDiskSystems
+status_t
+KDiskDeviceManager::RescanDiskSystems()
+{
+	// load file systems list
+	void *cookie = open_module_list(kFileSystemPrefix);
+	
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+		module_info *module;
+
+		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
+			break;
+		if (FindDiskSystem(name))
+			continue;
+		_AddFileSystem(name);
+        }
+        close_module_list(cookie);
+
+	// TODO rescan partition tree for unrecognized partitions
+
+	return B_OK;
+}
+
 // _AddPartitioningSystem
 status_t
 KDiskDeviceManager::_AddPartitioningSystem(const char *name)
