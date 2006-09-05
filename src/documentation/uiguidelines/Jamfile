@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src documentation uiguidelines ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Doc2HTML 
+	HaikuHIG.xml
+	: index.html
+	: [ FDirName $(HAIKU_TOP) src documentation docbook-xsl html chunk.xsl ]
+	: HIG
+	:
+	: -stringparam use.id.as.filename 1
+;

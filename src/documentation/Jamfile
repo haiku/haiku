@@ -3,4 +3,5 @@ SubDir HAIKU_TOP src documentation ;
 SEARCH on  <src!documentation>license.xml = [ FDirName $(HAIKU_TOP) src documentation ] ;
 
 SubInclude HAIKU_TOP src documentation haiku_book ;
+SubInclude HAIKU_TOP src documentation uiguidelines ;
 SubInclude HAIKU_TOP src documentation shell_tools ;
