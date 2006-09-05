@@ -1,0 +1,4 @@
+compilation error: file ./test-2.5-1.xsl line 6 element exciting-new-1.8-feature
+xsltStylePreCompute: unknown xsl:exciting-new-1.8-feature
+compilation error: file ./test-2.5-1.xsl line 2 element stylesheet
+xsl:version: only 1.0 features are supported

@@ -1,0 +1,101 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>xsltproc</title><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="refentry" lang="en"><a name="id2685813"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>xsltproc &#8212; command line xslt processor</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis"><p><tt class="command">xsltproc</tt>  [[-V] |  [-v] |  [-o <i class="replaceable"><tt>file</tt></i>] |  [--timing] |  [--repeat] |  [--debug] |  [--novalid] |  [--noout] |  [--maxdepth <i class="replaceable"><tt>val</tt></i>] |  [--html] |  [--param <i class="replaceable"><tt>name</tt></i> <i class="replaceable"><tt>value</tt></i>] |  [--stringparam <i class="replaceable"><tt>name</tt></i> <i class="replaceable"><tt>value</tt></i>] |  [--nonet] |  [--path <i class="replaceable"><tt>paths</tt></i>] |  [--load-trace] |  [--catalogs] |  [--xinclude] |  [--profile] |  [--dumpextensions] |  [--nowrite] |  [--nomkdir] |  [--writesubtree] |  [--nodtdattr]] [<tt class="option"><i class="replaceable"><tt>stylesheet</tt></i></tt>] [<i class="replaceable"><tt>file1</tt></i>] [<i class="replaceable"><tt>file2</tt></i>] [<i class="replaceable"><tt>....</tt></i>]</p></div></div><div class="refsect1" lang="en"><a name="introduction"></a><h2>Introduction</h2><p>
+      <span class="application">xsltproc</span> is a command line tool for applying
+      <span class="acronym">XSLT</span> stylesheets to <span class="acronym">XML</span>
+      documents. It is part of <span class="application">libxslt</span>, the XSLT C
+      library for GNOME. While it was developed as part of the GNOME project, it
+      can operate independently of the GNOME desktop.
+   </p><p>
+      <span class="application">xsltproc</span> is invoked from the command line with
+      the name of the stylesheet to be used followed by the name of the file or
+      files to which the stylesheet is to be applied. It will use the standard
+      input if a filename provided is - .
+    </p><p>
+      If a stylesheet is included in an <span class="acronym">XML</span> document with a
+      Stylesheet Processing Instruction, no stylesheet need be named at the
+      command line. <span class="application">xsltproc</span> will automatically
+      detect the included stylesheet and use it.
+    </p><p>
+      By default, output is to stdout. You can specify a file for output using
+      the <tt class="option">-o</tt> option.
+    </p></div><div class="refsect1" lang="en"><a name="options"></a><h2>Command Line Options</h2><div class="variablelist"><dl><dt><span class="term"><tt class="option">-V</tt> or <tt class="option">--version</tt></span></dt><dd>Show the version of
+      <span class="application">libxml</span> and <span class="application">libxslt</span> used.
+    </dd><dt><span class="term">
+      <tt class="option">-v</tt> or <tt class="option">--verbose</tt></span></dt><dd>Output each step taken
+      by <span class="application">xsltproc</span> in processing the stylesheet and the document.
+    </dd><dt><span class="term">
+      <tt class="option">-o</tt> or <tt class="option">--output</tt> <i class="replaceable"><tt>file</tt></i></span></dt><dd>Direct output to the file named
+      <i class="replaceable"><tt>file</tt></i>. For multiple outputs, also known as
+      "chunking", <tt class="option">-o</tt> <tt class="option">directory/</tt> directs the
+      output files to a specified directory. The directory must already exist.
+    </dd><dt><span class="term">
+      <tt class="option">--timing</tt></span></dt><dd>Display the time used for parsing the
+      stylesheet, parsing the document and applying the stylesheet and saving
+      the result. Displayed in milliseconds.
+    </dd><dt><span class="term">
+      <tt class="option">--repeat</tt></span></dt><dd>Run the transformation 20 times. Used for
+      timing tests.
+    </dd><dt><span class="term">
+      <tt class="option">--debug</tt></span></dt><dd>Output an <span class="acronym">XML</span> tree of the
+      transformed document for debugging purposes.
+    </dd><dt><span class="term">
+      <tt class="option">--novalid</tt></span></dt><dd>Skip loading the document's <span class="acronym">DTD</span>.
+    </dd><dt><span class="term">
+      <tt class="option">--noout</tt></span></dt><dd>Do not output the result.
+    </dd><dt><span class="term">
+      <tt class="option">--maxdepth</tt> <i class="replaceable"><tt>value</tt></i></span></dt><dd>Adjust the
+      maximum depth of the template stack before
+      <span class="application">libxslt</span> concludes it is in an infinite
+      loop. The default is 500.
+    </dd><dt><span class="term">
+      <tt class="option">--html</tt></span></dt><dd>The input document is an <span class="acronym">HTML</span>
+      file.
+    </dd><dt><span class="term">
+      <tt class="option">--param</tt> <i class="replaceable"><tt>name</tt></i> <i class="replaceable"><tt>value</tt></i></span></dt><dd>Pass a parameter of name
+      <i class="replaceable"><tt>name</tt></i> and value
+      <i class="replaceable"><tt>value</tt></i> to the stylesheet. You may pass multiple
+      name/value pairs up to a maximum of 32. If the value being passed is a
+	    string rather than a node identifier, use
+	    <tt class="option">--stringparam</tt> instead.
+	  </dd><dt><span class="term">
+	  <tt class="option">--stringparam</tt> <i class="replaceable"><tt>name</tt></i> <i class="replaceable"><tt>value</tt></i></span></dt><dd>Pass a paramenter of name <i class="replaceable"><tt>name</tt></i> and
+	    value <i class="replaceable"><tt>value</tt></i> where
+	    <i class="replaceable"><tt>value</tt></i> is a string rather than a node
+	    identifier. (Note: The string must be utf-8.) </dd><dt><span class="term">
+      <tt class="option">--nonet</tt></span></dt><dd>Do not use the Internet to fetch DTD's,
+      entities or documents.
+    </dd><dt><span class="term"> <tt class="option">--path</tt> <i class="replaceable"><tt>paths</tt></i></span></dt><dd>
+	    Use the list (separated by space or column) of filesystem paths 
+	specified by <i class="replaceable"><tt>paths</tt></i> to load
+        <span class="acronym">DTDs</span>, entities or documents.
+	  </dd><dt><span class="term"><tt class="option">--load-trace</tt></span></dt><dd>
+	    Display to stderr all the documents loaded during the processing.
+	  </dd><dt><span class="term">
+      <tt class="option">--catalogs</tt></span></dt><dd>Use the <span class="acronym">SGML</span> catalog specified in
+      <tt class="envar">SGML_CATALOG_FILES</tt> to resolve the location of
+	    external entities. By default, <span class="application">xsltproc</span>
+	    looks for the catalog specified in
+      <tt class="envar">XML_CATALOG_FILES</tt>. If that is not specified, it uses
+      <tt class="filename">/etc/xml/catalog</tt>.
+    </dd><dt><span class="term">
+      <tt class="option">--xinclude</tt></span></dt><dd>Process the input document using the
+      Xinclude specification. More details on this can be found in the Xinclude
+      specification: <a href="http://www.w3.org/TR/xinclude/" target="_top">http://www.w3.org/TR/xinclude/</a>
+    </dd><dt><span class="term">
+      <tt class="option">--profile</tt> or <tt class="option">--norman</tt></span></dt><dd>Output profiling
+      information detailing the amount of time spent in each part of the
+      stylesheet. This is useful in optimizing stylesheet performance.
+    </dd><dt><span class="term">
+      <tt class="option">--dumpextensions</tt></span></dt><dd>Dumps the list of all registered extensions on stdout.
+    </dd><dt><span class="term">
+      <tt class="option">--nowrite</tt></span></dt><dd>Refuses to write to any file or resource.
+    </dd><dt><span class="term">
+      <tt class="option">--nomkdir</tt></span></dt><dd>Refuses to create directories.
+    </dd><dt><span class="term">
+      <tt class="option">--writesubtree</tt> <i class="replaceable"><tt>path</tt></i></span></dt><dd>Allow file write only within the
+	  <i class="replaceable"><tt>path</tt></i> subtree.
+    </dd><dt><span class="term">
+	  <tt class="option">--nodtdattr</tt>
+	</span></dt><dd>Do not apply default attributes from the document's
+	  <span class="acronym">DTD</span>.
+	  </dd></dl></div></div><div class="refsect1" lang="en"><a name="return"></a><h2>Return values</h2><p><span class="application">xsltproc</span>'s return codes provide information
+    that can be used when calling it from scripts.</p><p>0: normal</p><p>1: no argument</p><p>2: too many parameters</p><p>3: unknown option</p><p>4: failed to parse the stylesheet</p><p>5: error in the stylesheet</p><p>6: error in one of the documents</p><p>7: unsupported xsl:output method</p><p>8: string parameter contains both quote and double-quotes</p><p>9: internal processing error</p><p>10: processing was stopped by a terminating message</p></div><div class="refsect1" lang="en"><a name="moreinfo"></a><h2>More Information</h2><p><span class="application">libxml web page: </span><a href="http://www.xmlsoft.org/" target="_top">http://www.xmlsoft.org/</a></p><p>W3C <span class="acronym">XSLT page: </span><a href="http://www.w3.org/TR/xslt" target="_top">http://www.w3.org/TR/xslt</a></p></div></div></body></html>

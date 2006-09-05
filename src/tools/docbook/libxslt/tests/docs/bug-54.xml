@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<all>
+<one xmlns="http://www.test1.com">1</one>
+<two xmlns="http://www.test2.com">2</two>
+</all>

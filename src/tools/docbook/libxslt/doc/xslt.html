@@ -1,0 +1,2383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>The XSLT C library for Gnome</title>
+  <meta name="GENERATOR" content="amaya 8.8.5, see http://www.w3.org/Amaya/">
+  <meta http-equiv="content-type" content="text/html">
+</head>
+
+<body bgcolor="#ffffff">
+<h1 align="center">The XSLT C library for Gnome</h1>
+
+<h1 style="text-align: center">libxslt</h1>
+
+<p>Libxslt is the <a href="http://www.w3.org/TR/xslt">XSLT</a>C
+librarydeveloped for the Gnome project. XSLT itself is a an XML language to
+definetransformation for XML. Libxslt is based on <a
+href="http://xmlsoft.org/">libxml2</a>the XML C library developed for
+theGnome project. It also implements most of the <a
+href="http://www.exslt.org/">EXSLT</a>set of processor-portable
+extensionsfunctions and some of Saxon's evaluate and expressions
+extensions.</p>
+
+<p>People can either embed the library in their application or use
+xsltprocthe command line processing tool. This library is free software and
+can bereused in commercial applications (see the <a
+href="intro.html">intro</a>)</p>
+
+<p>External documents:</p>
+<ul>
+  <li>John Fleck wrote <a href="tutorial/libxslttutorial.html">a tutorial
+    forlibxslt</a></li>
+  <li><a href="xsltproc.html">xsltproc user manual</a></li>
+  <li><a href="http://xmlsoft.org/">the libxml documentation</a></li>
+</ul>
+
+<p></p>
+
+<p>Logo designed by <a href="mailto:liyanage@access.ch">Marc Liyanage</a>.</p>
+
+<h2><a name="Introducti">Introduction</a></h2>
+
+<p>This document describes <a href="http://xmlsoft.org/XSLT/">libxslt</a>,the
+<a href="http://www.w3.org/TR/xslt">XSLT</a>C library developed for the<a
+href="http://www.gnome.org/">Gnome</a>project.</p>
+
+<p>Here are some key points about libxslt:</p>
+<ul>
+  <li>Libxslt is a C implementation</li>
+  <li>Libxslt is based on libxml for XML parsing, tree manipulation and
+    XPathsupport</li>
+  <li>It is written in plain C, making as few assumptions as possible,
+    andsticking closely to ANSI C/POSIX for easy embedding. Should works
+    onLinux/Unix/Windows.</li>
+  <li>This library is released under the <a
+    href="http://www.opensource.org/licenses/mit-license.html">MITLicence</a></li>
+  <li>Though not designed primarily with performances in mind, libxslt
+    seemsto be a relatively fast processor.</li>
+</ul>
+
+<h2><a name="Documentat">Documentation</a></h2>
+
+<p>There are some on-line resources about using libxslt:</p>
+<ol>
+  <li>Check the <a
+    href="html/libxslt-lib.html#LIBXSLT-LIB">APIdocumentation</a>automatically
+    extracted from code comments (using theprogram apibuild.py, developed for
+    libxml, together with the xsl script'newapi.xsl' and the libxslt xsltproc
+    program).</li>
+  <li>Look at the <a
+    href="http://mail.gnome.org/archives/xslt/">mailing-listarchive</a>.</li>
+  <li>Of course since libxslt is based on libxml, it's a good idea to atleast
+    read <a href="http://xmlsoft.org/">libxml description</a></li>
+</ol>
+
+<h2><a name="Reporting">Reporting bugs and getting help</a></h2>
+
+<p>If you need help with the XSLT language itself, here are a number ofuseful
+resources:</p>
+<ul>
+  <li>I strongly suggest to subscribe to <a
+    href="http://www.mulberrytech.com/xsl/xsl-list">XSL-list</a>, check <a
+    href="http://www.biglist.com/lists/xsl-list/archives/">the
+    XSL-listarchives</a></li>
+  <li>The <a href="http://www.dpawson.co.uk/xsl/xslfaq.html">XSL FAQ</a>.</li>
+  <li>The <a
+    href="http://www.nwalsh.com/docs/tutorials/xsl/xsl/slides.html">tutorial</a>written
+    by Paul Grosso and Norman Walsh is a very good on-lineintrodution to the
+    language.</li>
+  <li>The <a
+    href="http://www.zvon.org/xxl/XSLTutorial/Books/Book1/index.html">onlyZvon
+    XSLT tutorial</a>details a lot of constructs with examples.</li>
+  <li><a href="http://www.jenitennison.com/xslt/index.html">Jeni
+    Tennison'sXSLT</a>pages provide links to a lot of answers</li>
+  <li>the <a href="http://incrementaldevelopment.com/xsltrick/">Gallery
+    ofXSLT Tricks</a>provides non-standard use case of XSLT</li>
+  <li>And I suggest to buy Michael Kay "XSLT Programmer's Reference"
+    bookpublished by <a href="http://www.wrox.com/">Wrox</a>if you plan to
+    workseriously with XSLT in the future.</li>
+</ul>
+
+<p>Well, bugs or missing features are always possible, and I will make apoint
+of fixing them in a timely fashion. The best way to report a bug is touse the
+<a href="http://bugzilla.gnome.org/enter_bug.cgi?product=libxslt">Gnome
+bugtracking database</a>(make sure to use the "libxslt" module name).
+Beforefiling a bug, check the <a
+href="http://bugzilla.gnome.org/buglist.cgi?product=libxslt">list of
+existinglibxslt bugs</a>to make sure it hasn't already been filed. I look at
+reportsthere regularly and it's good to have a reminder when a bug is still
+open. Besure to specify that the bug is for the package libxslt.</p>
+
+<p>For small problems you can try to get help on IRC, the #xml channel
+onirc.gnome.org (port 6667) usually have a few person subscribed which may
+help(but there is no garantee and if a real issue is raised it should go on
+themailing-list for archival).</p>
+
+<p>There is also a mailing-list <a
+href="mailto:xslt@gnome.org">xslt@gnome.org</a>for libxslt, with an <a
+href="http://mail.gnome.org/archives/xslt/">on-line archive</a>. To
+subscribeto this list, please visit the <a
+href="http://mail.gnome.org/mailman/listinfo/xslt">associated Web</a>pageand
+follow the instructions.</p>
+
+<p>Alternatively, you can just send the bug to the <a
+href="mailto:xslt@gnome.org">xslt@gnome.org</a>list, if it's really
+libxsltrelated I will approve it.. Please do not send me mail directly
+especiallyfor portability problem, it makes things really harder to track and
+in somecases I'm not the best person to answer a given question, ask the
+listinstead. <strong>Do not send code, I won't debug it</strong>(but patches
+arereally appreciated!).</p>
+
+<p>Please note that with the current amount of virus and SPAM, sending mailto
+the list without being subscribed won't work. There is *far too manybounces*
+(in the order of a thousand a day !) I cannot approve them manuallyanymore.
+If your mail to the list bounced waiting for administrator approval,it is
+LOST ! Repost it and fix the problem triggering the error. Also pleasenote
+that <span style="color: #FF0000; background-color: #FFFFFF">emails witha
+legal warning asking to not copy or redistribute freely the informationsthey
+contain</span>are <strong>NOT</strong>acceptable for the mailing-list,such
+mail will as much as possible be discarded automatically, and are lesslikely
+to be answered if they made it to the list, <strong>DO NOT</strong>post to
+the list from an email address where such legal requirements areautomatically
+added, get private paying support if you can't shareinformations.</p>
+
+<p>Check the following too <span
+style="color: #E50000">beforeposting</span>:</p>
+<ul>
+  <li><a href="search.php">use the search engine</a>to get
+    informationsrelated to your problem.</li>
+  <li>make sure you are <a href="ftp://xmlsoft.org/libxslt/">using a
+    recentversion</a>, and that the problem still shows up in those</li>
+  <li>check the <a
+    href="http://mail.gnome.org/archives/xslt/">listarchives</a>to see if the
+    problem was reported already, in this casethere is probably a fix
+    available, similarly check the <a
+    href="http://bugzilla.gnome.org/buglist.cgi?product=libxslt">registeredopen
+    bugs</a></li>
+  <li>make sure you can reproduce the bug with xsltproc, a very useful
+    thingto do is run the transformation with -v argument and redirect
+    thestandard error to a file, then search in this file for the
+    transformationlogs just preceding the possible problem</li>
+  <li>Please send the command showing the error as well as the input
+    andstylesheet (as an attachment)</li>
+</ul>
+
+<p>Then send the bug with associated informations to reproduce it to the <a
+href="mailto:xslt@gnome.org">xslt@gnome.org</a>list; if it's really
+libxsltrelated I will approve it. Please do not send mail to me directly, it
+makesthings really hard to track and in some cases I am not the best person
+toanswer a given question, ask on the list.</p>
+
+<p>To <span style="color: #E50000">be really clear about support</span>:</p>
+<ul>
+  <li>Support or help <span style="color: #E50000">request MUST be sent tothe
+    list or on bugzilla</span>in case of problems, so that the Questionand
+    Answers can be shared publicly. Failing to do so carries the
+    implicitmessage "I want free support but I don't want to share the
+    benefits withothers" and is not welcome. I will automatically Carbon-Copy
+    thexslt@gnome.org mailing list for any technical reply made about libxml2
+    orlibxslt.</li>
+  <li>There is <span style="color: #E50000">no garantee for support</span>,if
+    your question remains unanswered after a week, repost it, making sureyou
+    gave all the detail needed and the informations requested.</li>
+  <li>Failing to provide informations as requested or double checking
+    firstfor prior feedback also carries the implicit message "the time of
+    thelibrary maintainers is less valuable than my time" and might not
+    bewelcome.</li>
+</ul>
+
+<p>Of course, bugs reports with a suggested patch for fixing them
+willprobably be processed faster.</p>
+
+<p>If you're looking for help, a quick look at <a
+href="http://mail.gnome.org/archives/xslt/">the list archive</a>may
+actuallyprovide the answer, I usually send source samples when answering
+libxsltusage questions. The <a
+href="html/libxslt-lib.html#LIBXSLT-LIB">auto-generated
+documentation</a>isnot as polished as I would like (I need to learn more
+about Docbook), butit's a good starting point.</p>
+
+<h2><a name="help">How to help</a></h2>
+
+<p>You can help the project in various ways, the best thing to do first is
+tosubscribe to the mailing-list as explained before, check the <a
+href="http://mail.gnome.org/archives/xslt/">archives </a>and the <a
+href="http://bugzilla.gnome.org/buglist.cgi?product=libxslt">Gnome
+bugdatabase:</a>:</p>
+<ol>
+  <li>provide patches when you find problems</li>
+  <li>provide the diffs when you port libxslt to a new platform. They may
+    notbe integrated in all cases but help pinpointing portability
+  problemsand</li>
+  <li>provide documentation fixes (either as patches to the code comments
+    oras HTML diffs).</li>
+  <li>provide new documentations pieces (translations, examples, etc ...)</li>
+  <li>Check the TODO file and try to close one of the items</li>
+  <li>take one of the points raised in the archive or the bug database
+    andprovide a fix. <a href="mailto:daniel@veillard.com">Get in touch with
+    me</a>before to avoid synchronization problems and check that the
+    suggestedfix will fit in nicely :-)</li>
+</ol>
+
+<h2><a name="Downloads">Downloads</a></h2>
+
+<p>The latest versions of libxslt can be found on the <a
+href="ftp://xmlsoft.org/libxslt/">xmlsoft.org</a>server and on mirrors (<a
+href="ftp://fr.rpmfind.net/pub/libxml/">France</a>) or on the <a
+href="ftp://ftp.gnome.org/pub/GNOME/MIRRORS.html">Gnome FTP server</a>as a<a
+href="ftp://ftp.gnome.org/pub/GNOME/sources/libxslt/1.1/">sourcearchive</a>,
+Antonin Sprinzl also provides <a href="ftp://gd.tuwien.ac.at/pub/libxml/">a
+mirror in Austria</a>. (NOTE thatyou need the <a
+href="http://rpmfind.net/linux/RPM/libxml2.html">libxml2</a>,<a
+href="http://rpmfind.net/linux/RPM/libxml2-devel.html">libxml2-devel</a>,<a
+href="http://rpmfind.net/linux/RPM/libxslt.html">libxslt</a>and <a
+href="http://rpmfind.net/linux/RPM/libxslt-devel.html">libxslt-devel</a>packages
+installed to compile applications using libxslt.) <a
+href="mailto:igor@zlatkovic.com">Igor Zlatkovic</a>is now the maintainer
+ofthe Windows port, <a
+href="http://www.zlatkovic.com/projects/libxml/index.html">he
+providesbinaries</a>. <a href="mailto:Gary.Pennington@sun.com">Gary
+Pennington</a>provides <a href="http://garypennington.net/libxml2/">Solaris
+binaries</a>.<a href="mailto:Steve.Ball@explain.com.au">Steve
+Ball</a>provides <a href="http://www.explain.com.au/oss/libxml2xslt.html">Mac
+Os Xbinaries</a>.</p>
+
+<p><a name="Contribs">Contribs:</a></p>
+
+<p>I do accept external contributions, especially if compiling on
+anotherplatform, get in touch with me to upload the package. I will keep them
+in the<a href="ftp://xmlsoft.org/libxml2/contribs/">contrib directory</a></p>
+
+<p>Libxslt is also available from CVS:</p>
+<ul>
+  <li><p>The <a href="http://cvs.gnome.org/viewcvs/libxslt/">Gnome
+    CVSbase</a>. Check the <a
+    href="http://developer.gnome.org/tools/cvs.html">Gnome CVS Tools</a>page;
+    the CVS module is <b>libxslt</b>.</p>
+  </li>
+  <li><a
+    href="ftp://xmlsoft.org/libxml2/libxslt-cvs-snapshot.tar.gz">snapshots
+    fromCVS</a>updated every hour are also provided</li>
+</ul>
+
+<h2><a name="FAQ">FAQ</a></h2>
+<ol>
+  <li><em>Troubles compiling or linking programs using libxslt</em>
+    <p>Usually the problem comes from the fact that the compiler doesn't
+    getthe right compilation or linking flags. There is a small shell
+    script<code>xslt-config</code>which is installed as part of libxslt
+    usualinstall process which provides those flags. Use</p>
+    <p><code>xslt-config --cflags</code></p>
+    <p>to get the compilation flags and</p>
+    <p><code>xslt-config --libs</code></p>
+    <p>to get the linker flags. Usually this is done directly from
+    theMakefile as:</p>
+    <p><code>CFLAGS=`xslt-config --cflags`</code></p>
+    <p><code>LIBS=`xslt-config --libs`</code></p>
+    <p>Note also that if you use the EXSLT extensions from the program
+    thenyou should prepend <code>-lexslt</code>to the LIBS options</p>
+  </li>
+  <li><em>passing parameters on the xsltproc command line doesn't work</em>
+    <p><em>xsltproc --param test alpha foo.xsl foo.xml</em></p>
+    <p><em>the param does not get passed and ends up as ""</em></p>
+    <p>In a nutshell do a double escaping at the shell prompt:</p>
+    <p>xsltproc --param test "'alpha'" foo.xsl foo.xml</p>
+    <p>i.e. the string value is surrounded by " and ' then terminated by 'and
+    ". Libxslt interpret the parameter values as XPath expressions, sothe
+    string -&gt;<code>alpha</code>&lt;- is intepreted as the node setmatching
+    this string. You really want -&gt;<code>'alpha'</code>&lt;- tobe passed
+    to the processor. And to allow this you need to escape thequotes at the
+    shell level using -&gt;<code>"'alpha'"</code>&lt;- .</p>
+    <p>or use</p>
+    <p>xsltproc --stringparam test alpha foo.xsl foo.xml</p>
+  </li>
+  <li><em>Is there C++ bindings ?</em>
+    <p>Yes for example <a
+    href="http://pmade.org/pjones/software/xmlwrapp/">xmlwrapp</a>, see <a
+    href="python.html">the related pages about bindings</a></p>
+  </li>
+</ol>
+
+<h2><a name="News">News</a></h2>
+
+<p>The <a href="ChangeLog.html">change log</a>describes the recents commitsto
+the <a href="http://cvs.gnome.org/viewcvs/libxslt/">CVS</a>code base.</p>
+
+<p>Those are the public releases made:</p>
+
+<h3>1.1.17: Jun 6 2006</h3>
+<ul>
+  <li>portability fixes: python detection</li>
+  <li>bug fixes: some regression tests, attribute/namespaces output (Kasimier
+    Buchcik), problem in mixed xsl:value-of and xsl:text uses (Kasimier)</li>
+  <li>improvements: internal refactoring (Kasimier Buchcik), use of the XPath
+    object cache in libxml2-2.6.25 (Kasimier)</li>
+</ul>
+
+<h3>1.1.16: May 01 2006</h3>
+<ul>
+  <li>portability fixes: EXSLT date/time on Solaris and IRIX (Albert
+    Chin),HP-UX  build (Albert Chin),</li>
+  <li>build fixes: Python detection(Joseph Sacco), plugin configurei(Joel
+    Reed)</li>
+  <li>bug fixes: pattern compilation fix(William Brack), EXSLT date/timefix
+    (Thomas Broyer), EXSLT function bug, potential loop on variableeval,
+    startup race (Christopher Palmer), debug statement left in python(Nic
+    Ferrier), various cleanup based on Coverity reports), error onOut of
+    memory condition (Charles Hardin), various namespace prefixesfixes
+    (Kasimier Buchcik),</li>
+  <li>improvement: speed up sortingi, start of internals refactoring
+    (KasimierBuchcik)</li>
+  <li>documentation: man page fixes and updates (Daniel Leidert)</li>
+</ul>
+
+<h3>1.1.15: Sep 04 2005</h3>
+<ul>
+  <li>build fixes: Windows build cleanups and updates (Igor Zlatkovic),remove
+    jhbuild warnings</li>
+  <li>bug fixes: negative number formatting (William Brack), numberformatting
+    per mille definition (William Brack), XInclude default values(William),
+    text copy bugs (William), bug related to xmlXPathContext size,reuse
+    libxml2 memory management for text nodes, dictionnary text bug,forbid
+    variables in match (needs libxml2-2.6.21)</li>
+  <li>improvements: EXSLT dyn:map (Mark Vakoc),</li>
+  <li>documentation: EXSLT date and time functions namespace in man
+    (JonathanWakely)</li>
+</ul>
+
+<h3>1.1.14: Apr 02 2005</h3>
+<ul>
+  <li>bug fixes: text node on stylesheet document without a
+    dictionary(William Brack), more checking of XSLT syntax, calling
+    xsltInit()multiple times, mode values interning raised by Mark Vakoc, bug
+    inpattern matching with ancestors, bug in patterna matching with
+    cascadingselect, xinclude and document() problem, build outside of source
+    tree(Mike Castle)</li>
+  <li>improvement: added a --nodict mode to xsltproc to check problems
+    fordocuemtns without dictionnaries</li>
+</ul>
+
+<h3>1.1.13: Mar 13 2005</h3>
+<ul>
+  <li>build fixes: 64bits cleanup (William Brack), python 2.4 test
+    (William),LIBXSLT_VERSION_EXTRA on Windows (William), Windows makefiles
+    fixes (JoelReed), libgcrypt-devel requires for RPM spec.</li>
+  <li>bug fixes: exslt day-of-week-in-month (Sal Paradise),
+    xsl:call-templateshould not change the current template rule (William
+    Brack), evaluationof global variables (William Brack), RVT's in XPath
+    predicates (William),namespace URI on template names (Mark Vakoc), stat()
+    for Windows patch(Aleksey Gurtovoy), pattern expression fixes (William
+    Brack), out ofmemory detection misses (William), parserOptions
+    propagation (William),exclude-result-prefixes fix (William), // patten
+    fix (William).</li>
+  <li>extensions: module support (Joel Reed), dictionnary based
+    speedupstrying to get rid of xmlStrEqual as much as possible.</li>
+  <li>documentation: added Wiki (Joel Reed)</li>
+</ul>
+
+<h3>1.1.12: Oct 29 2004</h3>
+<ul>
+  <li>build fixes: warnings removal (William).</li>
+  <li>bug fixes: attribute document pointer fix (Mark Vakoc), exslt
+    datenegative periods (William Brack), generated tree structure
+    fixes,namespace lookup fix, use reentrant gmtime_r (William
+    Brack),exslt:funtion namespace fix (William), potential NULL pointer
+    reference(Dennis Dams, William), force string interning on
+    generateddocuments.</li>
+  <li>documentation: update of the second tutorial (Panagiotis Louridas),
+    addexslt doc in rpm packages, fix the xsltproc man page.</li>
+</ul>
+
+<h3>1.1.11: Sep 29 2004</h3>
+<ul>
+  <li>bug fixes: xsl:include problems (William Brack), UTF8 number
+    pattern(William), date-time validation (William), namespace fix
+    (William),various Exslt date fixes (William), error callback fixes, leak
+    withnamespaced global variable, attempt to fix a weird problem
+  #153137</li>
+  <li>improvements: exslt:date-sum tests (Derek Poon)</li>
+  <li>documentation: second tutorial by Panagiotis Lourida</li>
+</ul>
+
+<h3>1.1.10: Aug 31 2004</h3>
+<ul>
+  <li>build fix: NUL in c file blocking compilation on Solaris, Windows
+    build(Igor Zlatkovic)</li>
+  <li>fix: key initialization problem (William Brack)</li>
+  <li>documentation: fixed missing man page description for --path</li>
+</ul>
+
+<h3>1.1.9: Aug 22 2004</h3>
+<ul>
+  <li>build fixes: missing tests (William Brack), Python dependancies,
+    Pythonon 64bits boxes, --with-crypto flag (Rob Richards),</li>
+  <li>fixes: RVT key handling (William), Python binding (William and
+    SitsofeWheeler), key and XPath troubles (William), template priority on
+    imports(William), str:tokenize with empty strings (William), #default
+    namespacealias behaviour (William), doc ordering missing for main
+    document(William), 64bit bug (Andreas Schwab)</li>
+  <li>improvements: EXSLT date:sum added (Joel Reed), hook for
+    documentloading for David Hyatt, xsltproc --nodtdattr to avoid defaulting
+    DTDattributes, extend xsltproc --version with CVS stamp (William).</li>
+  <li>Documentation: web page problem reported by Oliver Stoeneberg</li>
+</ul>
+
+<h3>1.1.8: July 5 2004</h3>
+<ul>
+  <li>build fixes: Windows runtime options (Oliver Stoeneberg), Windowsbinary
+    package layout (Igor Zlatkovic), libgcrypt version test and
+  link(William)</li>
+  <li>documentation: fix libxslt namespace name in doc (William)</li>
+  <li>bug fixes: undefined namespace message (William Brack), search
+    engine(William), multiple namespace fixups (William), namespace fix for
+    keyevaluation (William), Python memory debug bindings,</li>
+  <li>improvements: crypto extensions for exslt (Joel Reed, William)</li>
+</ul>
+
+<h3>1.1.7: May 17 2004</h3>
+<ul>
+  <li>build fix: warning about localtime_r on Solaris</li>
+  <li>bug fix: UTF8 string tokenize (William Brack), subtle memorycorruption,
+    linefeed after comment at document level
+    (William),disable-output-escaping problem (William), pattern compilation
+    in deepimported stylesheets (William), namespace extension prefix
+    bug,libxslt.m4 bug (Edward Rudd), namespace lookup for attribute,
+    namespacedDOCTYPE name</li>
+</ul>
+
+<h3>1.1.6: Apr 18 2004</h3>
+<ul>
+  <li>2 bug fixes about keys fixed one by Mark Vakoc</li>
+</ul>
+
+<h3>1.1.5: Mar 23 2004</h3>
+<ul>
+  <li>performance: use dictionnary lookup for variables</li>
+  <li>remove use of _private from source documents</li>
+  <li>cleanup of "make tests" output</li>
+  <li>bugfixes: AVT in local variables, use localtime_r to avoid
+    threadtroubles (William), dictionary handling bug (William), limited
+    number ofstubstitutions in AVT (William), tokenize fix for UTF-8
+    (William),superfluous namespace (William), xsltproc error code
+    on&lt;xsl:message&gt; halt, OpenVMS fix, dictionnary reference
+    countingchange.</li>
+</ul>
+
+<h3>1.1.4: Feb 23 2004</h3>
+<ul>
+  <li>bugfixes: attributes without doc (Mariano Suárez-Alvarez), problem
+    withYelp, extension problem</li>
+  <li>display extension modules (Steve Little)</li>
+  <li>Windows compilation patch (Mark Vadoc), Mingw (Mikhail Grushinskiy)</li>
+</ul>
+
+<h3>1.1.3: Feb 16 2004</h3>
+<ul>
+  <li>Rewrote the Attribute Value Template code, new XPath
+    compilationinterfaces, dictionnary reuses for XSLT with potential for
+    seriousperformance improvements.</li>
+  <li>bug fixes: portability (William Brack), key() in node-set()
+    results(William), comment before doctype (William), math and node-set()
+    problems(William), cdata element and default namespace (William),
+    behaviour onunknown XSLT elements (Stefan Kost), priority of "//foo"
+    patterns(William), xsl:element and xsl:attribute QName check (William),
+    commentswith -- (William), attribute namespace (William), check for ?&gt;
+    in PI(William)</li>
+  <li>Documentations: cleanup (John Fleck and William)</li>
+  <li>Python: patch for OS-X (Gianni Ceccarelli), enums export
+    (Stephanebidoul)</li>
+</ul>
+
+<h3>1.1.2: Dec 24 2003</h3>
+<ul>
+  <li>Documentation fixes (John Fleck, William Brack), EXSLT
+    documentation(William Brack)</li>
+  <li>Windows compilation fixes for MSVC and Mingw (Igor Zlatkovic)</li>
+  <li>Bug fixes: exslt:date returning NULL strings (William Brack),namespaces
+    output (William Brack),  key and namespace definition problem,passing
+    options down to the document() parser, xsl:number fixes
+  (WilliamBrack)</li>
+</ul>
+
+<h3>1.1.1: Dec 10 2003</h3>
+<ul>
+  <li>code cleanup (William Brack)</li>
+  <li>Windows: Makefile improvements (Igor Zlatkovic)</li>
+  <li>documentation improvements: William Brack, libexslt man page
+    (JonathanWakely)</li>
+  <li>param in EXSLT functions (Shaun McCance)</li>
+  <li>XSLT debugging improvements (Mark Vakoc)</li>
+  <li>bug fixes: number formatting (Bjorn Reese), exslt:tokenize
+    (WilliamBrack), key selector parsing with | reported by Oleg
+    Paraschenko,xsl:element with computed namespaces (William Brack),
+    xslt:import/includerecursion detection (William Brack), exslt:function
+    used in keys (WilliamBrack), bug when CDATA_SECTION are foun in the tree
+    (William Brack),entities handling when using XInclude.</li>
+</ul>
+
+<h3>1.1.0: Nov 4 2003</h3>
+<ul>
+  <li>Removed DocBook SGML broken support</li>
+  <li>fix xsl:key to work with PIs</li>
+  <li>Makefile and build improvement (Graham Wilson), build cleanup
+    (WilliamBrack), macro fix (Justin Fletcher), build outside of source tree
+    (RoumenPetrov)</li>
+  <li>xsltproc option display fix (Alexey Efimov), --load-trace
+    (CrutcherDunnavant)</li>
+  <li>Python: never use stdout for error</li>
+  <li>extension memory error fix (Karl Eichwalder)</li>
+  <li>header path fixes (Steve Ball)</li>
+  <li>added saxon:line-number() to libexslt (Brett Kail)</li>
+  <li>Fix some tortuous template problems when using predicates
+  (WilliamBrack)</li>
+  <li>Debugger status patch (Kasimier Buchcik)</li>
+  <li>Use new libxml2-2.6.x APIs for faster processing</li>
+  <li>Make sure xsl:sort is empty</li>
+  <li>Fixed a bug in default processing of attributes</li>
+  <li>Removes the deprecated breakpoint library</li>
+  <li>detect invalid names on templates (William Brack)</li>
+  <li>fix exslt:document (and similar) base handling problem</li>
+</ul>
+
+<h3>1.0.33: Sep 12 2003</h3>
+
+<p>This is a bugfix only release</p>
+<ul>
+  <li>error message missing argument (William Brack)</li>
+  <li>mode not cascaded in template fallbacks (William Brack)</li>
+  <li>catch redefinition of parameter/variables  (William Brack)</li>
+  <li>multiple keys with same namespace name (William Brack)</li>
+  <li>patch for compilation using MingW on Windows (Mikhail Grushinskiy)</li>
+  <li>header export macros for Windows (Igor Zlatkovic)</li>
+  <li>cdata-section-elements handling of namespaced names</li>
+  <li>compilation without libxml2 XPointer support (Mark Vadoc)</li>
+  <li>apply-templates crash (William Brack)</li>
+  <li>bug with imported templates (William Brack)</li>
+  <li>imported attribute-sets merging bug (DocBook) (William Brack)</li>
+</ul>
+
+<h3>1.0.32: Aug 9 2003</h3>
+<ul>
+  <li>bugfixes: xsltSaveResultToFile() python binding (Chris Jaeger),
+    EXSLTfunction (William Brack), RVT for globals (William Brack), EXSLT
+    date(William Brack),
+    <p>speed of large text output, xsl:copy with attributes, strip-space
+    andnamespaces prefix, fix for --path xsltproc option, EXST:tokenize
+    (ShaunMcCance), EXSLT:seconds (William Brack), sort with multiple keys
+    (WilliamBrack), checking of { and } for attribute value templates
+    (WilliamBrack)</p>
+  </li>
+  <li>Python bindings for extension elements (Sean Treadway)</li>
+  <li>EXSLT:split added (Shaun McCance)</li>
+  <li>portability fixes for HP-UX/Solaris/IRIX (William Brack)</li>
+  <li>doc cleanup</li>
+</ul>
+
+<h3>1.0.31: Jul 6 2003</h3>
+<ul>
+  <li>bugfixes: xsl:copy on namespace nodes, AVT for xsl:sort order, fix
+    forthe debugger (Keith Isdale), output filename limitation, trio.h
+    andtriodef.h added (Albert Chin), EXSLT node-set (Peter
+    Breitenlohner),xsltChoose and whitespace (Igor Zlatkovic),
+    <p>stylesheet compilation (Igor Zlatkovic), NaN and sort (William
+    Brack),RVT bug introduced in 1.0.30</p>
+  </li>
+  <li>avoid generating &amp;quot; (fix in libxml2-2.5.8)</li>
+  <li>fix 64bit cleaness problem and compilation troubles introduced
+  in1.0.30</li>
+  <li>Windows makefile generation (Igor Zlatkovic)</li>
+  <li>HP-UX portability fix</li>
+</ul>
+
+<h3>1.0.30: May 4 2003</h3>
+<ul>
+  <li>Fixes and new APIs to handle Result Value Trees and avoid leaks</li>
+  <li>Fixes for: EXSLT math pow() function (Charles Bozeman), globalparameter
+    and global variables mismatch, a segfault on patterncompilation errors,
+    namespace copy in xsl:copy-of, python generatorproblem, OpenVMS trio
+    update, premature call to xsltFreeStackElem (Igor),current node when
+    templates applies to attributes</li>
+</ul>
+
+<h3>1.0.29: Apr 1 2003</h3>
+<ul>
+  <li>performance improvements especially for large flat documents</li>
+  <li>bug fixes: Result Value Tree handling, XML IDs, keys(), extra
+    namespacedeclarations with xsl:elements.</li>
+  <li>portability: python and trio fixes (Albert Chin), python on Solaris(Ben
+    Phillips)</li>
+</ul>
+
+<h3>1.0.28: Mar 24 2003</h3>
+<ul>
+  <li>fixed node() in patterns semantic.</li>
+  <li>fixed a memory access problem in format-number()</li>
+  <li>fixed stack overflow in recursive global variable or params</li>
+  <li>cleaned up Result Value Tree handling, and fixed a couple of old bugsin
+    the process</li>
+</ul>
+
+<h3>1.0.27: Feb 24 2003</h3>
+<ul>
+  <li>bug fixes: spurious xmlns:nsX="" generation, serialization bug
+    (inlibxml2), a namespace copy problem, errors in the RPM spec prereqs</li>
+  <li>Windows path canonicalization and document cache fix (Igor)</li>
+</ul>
+
+<h3>1.0.26: Feb 10 2003</h3>
+<ul>
+  <li>Fixed 3 serious bugs in document() and stylesheet compilation
+    whichcould lead to a crash</li>
+</ul>
+
+<h3>1.0.25: Feb 5 2003</h3>
+<ul>
+  <li>Bug fix: double-free for standalone stylesheets introduced in 1.0.24,
+    Csyntax pbm, 3 bugs reported by Eric van der Vlist</li>
+  <li>Some XPath and XInclude related problems were actually fixed
+    inlibxml2-2.5.2</li>
+  <li>Documentation: emphasize taht --docbook is not for XML docs.</li>
+</ul>
+
+<h3>1.0.24: Jan 14 2003</h3>
+<ul>
+  <li>bug fixes: imported global varables, python bindings (Stéphane
+    Bidoul),EXSLT memory leak (Charles Bozeman), namespace generation
+    onxsl:attribute, space handling with imports (Daniel
+    Stodden),extension-element-prefixes (Josh Parsons), comments within
+    xsl:text (MattSergeant), superfluous xmlns generation, XInclude related
+    bug fornumbering, EXSLT strings (Alexey Efimov), attribute-sets
+    computation onimports, extension module init and shutdown callbacks not
+    called</li>
+  <li>HP-UX portability (Alexey Efimov), Windows makefiles (Igor and
+    StephaneBidoul), VMS makefile updates (Craig A. Berry)</li>
+  <li>adds xsltGetProfileInformation() (Michael Rothwell)</li>
+  <li>fix the API generation scripts</li>
+  <li>API to provide the sorting routines (Richard Jinks)</li>
+  <li>added XML description of the EXSLT API</li>
+  <li>added ESXLT URI (un)escaping (Jörg Walter)</li>
+  <li>Some memory leaks have been found and fixed</li>
+  <li>document() now support fragment identifiers in URIs</li>
+</ul>
+
+<h3>1.0.23: Nov 17 2002</h3>
+<ul>
+  <li>Windows build cleanup (Igor)</li>
+  <li>Unix build and RPM packaging cleanup</li>
+  <li>Improvement of the python bindings: extension functions and
+    activatingEXSLT</li>
+  <li>various bug fixes: number formatting, portability for bounded
+    stringfunctions, CData nodes, key(), @*[...] patterns</li>
+  <li>Documentation improvements (John Fleck)</li>
+  <li>added libxslt.m4 (Thomas Schraitle)</li>
+</ul>
+
+<h3>1.0.22: Oct 18 2002</h3>
+<ul>
+  <li>Updates on the Windows Makefiles</li>
+  <li>Added a security module, and a related set of new options
+  toxsltproc</li>
+  <li>Allowed per transformation error handler.</li>
+  <li>Fixed a few bugs: node() semantic, URI escaping, media-type,
+    attributelists</li>
+</ul>
+
+<h3>1.0.21: Sep 26 2002</h3>
+<ul>
+  <li>Bug fixes: match="node()", date:difference() (Igor and CharlieBozeman),
+    disable-output-escaping</li>
+  <li>Python bindings: style.saveResultToString() from Ralf Mattes</li>
+  <li>Logos from Marc Liyanage</li>
+  <li>Mem leak fix from Nathan Myers</li>
+  <li>Makefile: DESTDIR fix from Christophe Merlet, AMD x86_64
+    (Mandrake),Windows (Igor), Python detection</li>
+  <li>Documentation improvements: John Fleck</li>
+</ul>
+
+<h3>1.0.20: Aug 23 2002</h3>
+<ul>
+  <li>Windows makefile updates (Igor) and x86-64 (Frederic Crozat)</li>
+  <li>fixed HTML meta tag saving for Mac/IE users</li>
+  <li>possible leak patches from Nathan Myers</li>
+  <li>try to handle document('') as best as possible depending in
+  thecases</li>
+  <li>Fixed the DocBook stylesheets handling problem</li>
+  <li>Fixed a few XSLT reported errors</li>
+</ul>
+
+<h3>1.0.19:  July 6 2002</h3>
+<ul>
+  <li>EXSLT: dynamic functions and date support bug fixes (Mark Vakoc)</li>
+  <li>xsl:number fix: Richard Jinks</li>
+  <li>xsl:format-numbers fix: Ken Neighbors</li>
+  <li>document('') fix: bug pointed by Eric van der Vlist</li>
+  <li>xsl:message with terminate="yes" fixes: William Brack</li>
+  <li>xsl:sort order support added: Ken Neighbors</li>
+  <li>a few other bug fixes, some of them requiring the latest version
+    oflibxml2</li>
+</ul>
+
+<h3>1.0.18: May 27 2002</h3>
+<ul>
+  <li>a number of bug fixes: attributes, extra namespace
+    declarations(DocBook), xsl:include crash (Igor), documentation (Christian
+    Cornelssen,Charles Bozeman and Geert Kloosterman),  element-available
+    (RichardJinks)</li>
+  <li>xsltproc can now list teh registered extensions thanks to MarkVakoc</li>
+  <li>there is a new API to save directly to a stringxsltSaveResultToString()
+    by Morus Walter</li>
+  <li>specific error registration function for the python API</li>
+</ul>
+
+<h3>1.0.17: April 29 2002</h3>
+<ul>
+  <li>cleanup in code, XSLT debugger support and Makefiles for Windows
+  byIgor</li>
+  <li>a C++ portability fix by Mark Vakoc</li>
+  <li>EXSLT date improvement and regression tests by Charles Bozeman</li>
+  <li>attempt to fix a bug in xsltProcessUserParamInternal</li>
+</ul>
+
+<h3>1.0.16: April 15 2002</h3>
+<ul>
+  <li>Bug fixes: strip-space, URL in HTML output, error when xsltproc
+    can'tsave</li>
+  <li>portability fixes: OSF/1, IEEE on alphas, Windows, Python bindings</li>
+</ul>
+
+<h3>1.0.15: Mar 25 2002</h3>
+<ul>
+  <li>Bugfixes: XPath, python Makefile, recursive attribute sets,
+    @foo[..]templates</li>
+  <li>Debug of memory alocation with valgind</li>
+  <li>serious profiling leading to significant improvement for
+    DocBookprocessing</li>
+  <li>revamp of the Windows build</li>
+</ul>
+
+<h3>1.0.14: Mar 18 2002</h3>
+<ul>
+  <li>Improvement in the XPath engine (libxml2-2.4.18)</li>
+  <li>Nasty bug fix related to exslt:node-set</li>
+  <li>Fixed the python Makefiles, cleanup of doc comments, Windowsportability
+    fixes</li>
+</ul>
+
+<h3>1.0.13: Mar 8 2002</h3>
+<ul>
+  <li>a number of bug fixes including "namespace node have no parents"</li>
+  <li>Improvement of the Python bindings</li>
+  <li>Charles Bozeman provided fixes and regression tests for exslt
+    datefunctions.</li>
+</ul>
+
+<h3>1.0.12: Feb 11 2002</h3>
+<ul>
+  <li>Fixed the makefiles especially the python module ones</li>
+  <li>half a dozen bugs fixes including 2 old ones</li>
+</ul>
+
+<h3>1.0.11: Feb 8 2002</h3>
+<ul>
+  <li>Change of Licence to the <a
+    href="http://www.opensource.org/licenses/mit-license.html">MITLicence</a></li>
+  <li>Added a beta version of the Python bindings, including support toextend
+    the engine with functions written in Python</li>
+  <li>A number of bug fixes</li>
+  <li>Charlie Bozeman provided more EXSLT functions</li>
+  <li>Portability fixes</li>
+</ul>
+
+<h3>1.0.10: Jan 14 2002</h3>
+<ul>
+  <li>Windows fixes for Win32 from Igor</li>
+  <li>Fixed the Solaris compilation trouble (Albert)</li>
+  <li>Documentation changes and updates: John Fleck</li>
+  <li>Added a stringparam option to avoid escaping hell at the shelllevel</li>
+  <li>A few bug fixes</li>
+</ul>
+
+<h3>1.0.9: Dec 7 2001</h3>
+<ul>
+  <li>Makefile patches from Peter Williams</li>
+  <li>attempt to fix the compilation problem associated to prelinking</li>
+  <li>obsoleted libxsltbreakpoint now deprecated and frozen to 1.0.8 API</li>
+  <li>xsltproc return codes are now significant, John Fleck updated
+    thedocumentation</li>
+  <li>patch to allow as much as 40 steps in patterns (Marc Tardif), should
+    bemade dynamic really</li>
+  <li>fixed a bug raised by Nik Clayton when using doctypes with
+  HTMLoutput</li>
+  <li>patches from Keith Isdale to interface with xsltdebugger</li>
+</ul>
+
+<h3>1.0.8: Nov 26 2001</h3>
+<ul>
+  <li>fixed an annoying header problem, removed a few bugs and some
+    codecleanup</li>
+  <li>patches for Windows and update of Windows Makefiles by Igor</li>
+  <li>OpenVMS port instructions from John A Fotheringham</li>
+  <li>fixed some Makefiles annoyance and libraries prelinkinginformations</li>
+</ul>
+
+<h3>1.0.7: Nov 10 2001</h3>
+<ul>
+  <li>remove a compilation problem with LIBXSLT_PUBLIC</li>
+  <li>Finishing the integration steps for Keith Isdale debugger</li>
+  <li>fixes the handling of indent="no" on HTML output</li>
+  <li>fixes on the configure script and RPM spec file</li>
+</ul>
+
+<h3>1.0.6: Oct 30 2001</h3>
+<ul>
+  <li>bug fixes on number formatting (Thomas), date/time functions
+    (BruceMiller)</li>
+  <li>update of the Windows Makefiles (Igor)</li>
+  <li>fixed DOCTYPE generation rules for HTML output (me)</li>
+</ul>
+
+<h3>1.0.5: Oct 10 2001</h3>
+<ul>
+  <li>some portability fixes, including Windows makefile updates fromIgor</li>
+  <li>fixed a dozen bugs on XSLT and EXSLT (me and Thomas Broyer)</li>
+  <li>support for Saxon's evaluate and expressions extensions added
+    (initialcontribution from Darren Graves)</li>
+  <li>better handling of XPath evaluation errors</li>
+</ul>
+
+<h3>1.0.4: Sep 12 2001</h3>
+<ul>
+  <li>Documentation updates from John fleck</li>
+  <li>bug fixes (DocBook  FO generation should be fixed)  and
+    portabilityimprovements</li>
+  <li>Thomas Broyer improved the existing EXSLT support and added String,Time
+    and Date core functions support</li>
+</ul>
+
+<h3>1.0.3:  Aug 23 2001</h3>
+<ul>
+  <li>XML Catalog support see the doc</li>
+  <li>New NaN/Infinity floating point code</li>
+  <li>A few bug fixes</li>
+</ul>
+
+<h3>1.0.2:  Aug 15 2001</h3>
+<ul>
+  <li>lot of bug fixes, increased the testsuite</li>
+  <li>a large chunk of EXSLT is implemented</li>
+  <li>improvements on the extension framework</li>
+  <li>documentation improvements</li>
+  <li>Windows MSC projects files should be up-to-date</li>
+  <li>handle attributes inherited from the DTD by default</li>
+</ul>
+
+<h3>1.0.1:  July 24 2001</h3>
+<ul>
+  <li>initial EXSLT framework</li>
+  <li>better error reporting</li>
+  <li>fixed the profiler on Windows</li>
+  <li>bug fixes</li>
+</ul>
+
+<h3>1.0.0: July 10 2001</h3>
+<ul>
+  <li>a lot of cleanup, a lot of regression tests added or fixed</li>
+  <li>added a documentation for <a
+    href="extensions.html">writingextensions</a></li>
+  <li>fixed some variable evaluation problems (with William)</li>
+  <li>added profiling of stylesheet execution accessible as the
+    xsltproc--profile option</li>
+  <li>fixed element-available() and the implementation of the variouschunking
+    methods present, Norm Walsh provided a lot of feedback</li>
+  <li>exclude-result-prefixes and namespaces output should now work
+  asexpected</li>
+  <li>added support of embedded stylesheet as described in section 2.7 of
+    thespec</li>
+</ul>
+
+<h3>0.14.0: July 5 2001</h3>
+<ul>
+  <li>lot of bug fixes, and code cleanup</li>
+  <li>completion of the little XSLT-1.0 features left unimplemented</li>
+  <li>Added and implemented the extension API suggested by Thomas Broyer</li>
+  <li>the Windows MSC environment should be complete</li>
+  <li>tested and optimized with a really large document (DocBook
+    DefinitiveGuide) libxml/libxslt should really be faster on serious
+    workloads</li>
+</ul>
+
+<h3>0.13.0: June 26 2001</h3>
+<ul>
+  <li>lots of cleanups</li>
+  <li>fixed a C++ compilation problem</li>
+  <li>couple of fixes to xsltSaveTo()</li>
+  <li>try to fix Docbook-xslt-1.4 and chunking, updated the regression
+    testwith them</li>
+  <li>fixed pattern compilation and priorities problems</li>
+  <li>Patches for Windows and MSC project mostly contributed by Yon Derek</li>
+  <li>update to the Tutorial by John Fleck</li>
+  <li>William fixed bugs in templates and for-each functions</li>
+  <li>added a new interface xsltRunStylesheet() for a more flexible
+    output(incomplete), added -o option to xsltproc</li>
+</ul>
+
+<h3>0.12.0: June 18 2001</h3>
+<ul>
+  <li>fixed a dozen of bugs reported</li>
+  <li>HTML generation should be quite better (requires libxml-2.3.11
+    upgradetoo)</li>
+  <li>William fixed some problems with document()</li>
+  <li>Fix namespace nodes selection and copy (requires libxml-2.3.11
+    upgradetoo)</li>
+  <li>John Fleck added a<a
+  href="tutorial/libxslttutorial.html">tutorial</a></li>
+  <li>Fixes for namespace handling when evaluating variables</li>
+  <li>XInclude global flag added to process XInclude on document()
+  ifrequested</li>
+  <li>made xsltproc --version more detailed</li>
+</ul>
+
+<h3>0.11.0: June 1 2001</h3>
+
+<p>Mostly a bug fix release.</p>
+<ul>
+  <li>integration of catalogs from xsltproc</li>
+  <li>added --version to xsltproc for bug reporting</li>
+  <li>fixed errors when handling ID in external parsed entities</li>
+  <li>document() should hopefully work correctly but ...</li>
+  <li>fixed bug with PI and comments processing</li>
+  <li>William fixed the XPath string functions when using unicode</li>
+</ul>
+
+<h3>0.10.0: May 19 2001</h3>
+<ul>
+  <li>cleanups to make stylesheet read-only (not 100% complete)</li>
+  <li>fixed URI resolution in document()</li>
+  <li>force all XPath expression to be compiled at stylesheet parsing
+    time,even if unused ...</li>
+  <li>Fixed HTML default output detection</li>
+  <li>Fixed double attribute generation #54446</li>
+  <li>Fixed {{ handling in attributes #54451</li>
+  <li>More tests and speedups for DocBook document transformations</li>
+  <li>Fixed a really bad race like bug in xsltCopyTreeList()</li>
+  <li>added a documentation on the libxslt internals</li>
+  <li>William Brack and Bjorn Reese improved format-number()</li>
+  <li>Fixed multiple sort, it should really work now</li>
+  <li>added a --docbook option for SGML DocBook input (hackish)</li>
+  <li>a number of other bug fixes and regression test added as people
+    weresubmitting them</li>
+</ul>
+
+<h3>0.9.0: May 3 2001</h3>
+<ul>
+  <li>lot of various bugfixes, extended the regression suite</li>
+  <li>xsltproc should work with multiple params</li>
+  <li>added an option to use xsltproc with HTML input</li>
+  <li>improved the stylesheet compilation, processing of complex
+    stylesheetsshould be faster</li>
+  <li>using the same stylesheet for concurrent processing on
+    multithreadedprograms should work now</li>
+  <li>fixed another batch of namespace handling problems</li>
+  <li>Implemented multiple level of sorting</li>
+</ul>
+
+<h3>0.8.0: Apr 22 2001</h3>
+<ul>
+  <li>fixed ansidecl.h problem</li>
+  <li>fixed unparsed-entity-uri() and generate-id()</li>
+  <li>sort semantic fixes and priority prob from William M. Brack</li>
+  <li>fixed namespace handling problems in XPath expression
+    computations(requires libxml-2.3.7)</li>
+  <li>fixes to current() and key()</li>
+  <li>other, smaller fixes, lots of testing with N Walsh DocBook
+    HTMLstylesheets</li>
+</ul>
+
+<h3>0.7.0: Apr 10 2001</h3>
+<ul>
+  <li>cleanup using stricter compiler flags</li>
+  <li>command line parameter passing</li>
+  <li>fix to xsltApplyTemplates from William M. Brack</li>
+  <li>added the XSLTMark in the regression tests as well as document()</li>
+</ul>
+
+<h3>0.6.0: Mar 22 2001</h3>
+<ul>
+  <li>another beta</li>
+  <li>requires 2.3.5, which provide XPath expression compilation support</li>
+  <li>document() extension should function properly</li>
+  <li>fixed a number or reported bugs</li>
+</ul>
+
+<h3>0.5.0: Mar 10 2001</h3>
+<ul>
+  <li>fifth beta</li>
+  <li>some optimization work, for the moment 2 XSLT transform cannot use
+    thesame stylesheet at the same time (to be fixed)</li>
+  <li>fixed problems with handling of tree results</li>
+  <li>fixed a reported strip-spaces problem</li>
+  <li>added more reported/fixed bugs to the test suite</li>
+  <li>incorporated William M. Brack fix for imports and global variables
+    aswell as patch for with-param support in apply-templates</li>
+  <li>a bug fix on for-each</li>
+</ul>
+
+<h3>0.4.0: Mar 1 2001</h3>
+<ul>
+  <li>fourth beta test, released at the same time of libxml2-2.3.3</li>
+  <li>bug fixes</li>
+  <li>some optimization</li>
+  <li>started implement extension support, not finished</li>
+  <li>implemented but not tested multiple file output</li>
+</ul>
+
+<h3>0.3.0: Feb 24 2001</h3>
+<ul>
+  <li>third beta test, released at the same time of libxml2-2.3.2</li>
+  <li>lot of bug fixes</li>
+  <li>some optimization</li>
+  <li>added DocBook XSL based testsuite</li>
+</ul>
+
+<h3>0.2.0: Feb 15 2001</h3>
+<ul>
+  <li>second beta version, released at the same time as libxml2-2.3.1</li>
+  <li>getting close to feature completion, lot of bug fixes, some in the
+    HTMLand XPath support of libxml</li>
+  <li>start becoming usable for real work. This version can now regeneratethe
+    XML 2e HTML from the original XML sources and the associatedstylesheets
+    (in <a href="http://www.w3.org/TR/REC-xml#b4d250b6c21">section I of the
+    XMLREC</a>)</li>
+  <li>Still misses extension element/function/prefixes support. Support
+    ofkey() and document() is not complete</li>
+</ul>
+
+<h3>0.1.0: Feb 8 2001</h3>
+<ul>
+  <li>first beta version, released at the same time as libxml2-2.3.0</li>
+  <li>lots of bug fixes, first "testing" version, but incomplete</li>
+</ul>
+
+<h3>0.0.1: Jan 25 2001</h3>
+<ul>
+  <li>first alpha version released at the same time as libxml2-2.2.12</li>
+  <li>Framework in place, should work on simple examples, but far from
+    beingfeature complete</li>
+</ul>
+
+<h2><a name="xsltproc">The xsltproc tool</a></h2>
+
+<p>This program is the simplest way to use libxslt: from the command line.
+Itis also used for doing the regression tests of the library.</p>
+
+<p>It takes as first argument the path or URL to an XSLT stylesheet, the
+nextarguments are filenames or URIs of the inputs to be processed. The output
+ofthe processing is redirected on the standard output. There is actually a
+fewmore options available:</p>
+<pre>orchis:~ -&gt; xsltproc
+Usage: xsltproc [options] stylesheet file [file ...]
+   Options:
+      --version or -V: show the version of libxml and libxslt used
+      --verbose or -v: show logs of what's happening
+      --output file or -o file: save to a given file
+      --timing: display the time used
+      --repeat: run the transformation 20 times
+      --debug: dump the tree of the result instead
+      --novalid: skip the Dtd loading phase
+      --noout: do not dump the result
+      --maxdepth val : increase the maximum depth
+      --html: the input document is(are) an HTML file(s)
+      --docbook: the input document is SGML docbook
+      --param name value : pass a (parameter,value) pair
+      --nonet refuse to fetch DTDs or entities over network
+      --warnnet warn against fetching over the network
+      --catalogs : use the catalogs from $SGML_CATALOG_FILES
+      --xinclude : do XInclude processing on document intput
+      --profile or --norman : dump profiling informations 
+orchis:~ -&gt;</pre>
+
+<h2><a name="DocBook">DocBook</a></h2>
+
+<p><img src="duck.png" align="right" alt="The duck picture"></p>
+
+<p><a href="http://www.oasis-open.org/committees/docbook/">DocBook</a>is
+anXML/SGML vocabulary particularly well suited to books and papers
+aboutcomputer hardware and software.</p>
+
+<p>xsltproc and libxslt are not specifically dependant on DocBook, but sincea
+lot of people use xsltproc and libxml2 for DocBook formatting, here are afew
+pointers and informations which may be helpful:</p>
+<ul>
+  <li>The <a
+    href="http://www.oasis-open.org/committees/docbook/">DocBookhomepage at
+    Oasis</a>you should find pointers there on all the lastestversions of the
+    DTDs and XSLT stylesheets</li>
+  <li><a href="http://www.docbook.org/">DocBook: The Definitive
+    Guide</a>isthe official reference documentation for DocBook.</li>
+  <li><a
+    href="https://sourceforge.net/docman/index.php?group_id=21935">DocBookOpen
+    Repository</a>contains a lot of informations about DocBook</li>
+  <li>Bob Stayton provides a <a href="http://www.sagehill.net/">lot
+    ofresources</a>and consulting services around DocBook.</li>
+  <li>Here is a <a href="/buildDocBookCatalog">shell script</a>to generateXML
+    Catalogs for DocBook 4.1.2 . If it can write to the /etc/xml/directory,
+    it will set-up /etc/xml/catalog and /etc/xml/docbook based onthe
+    resources found on the system. Otherwise it will just create~/xmlcatalog
+    and ~/dbkxmlcatalog and doing:
+    <p><code>export XMLCATALOG=$HOME/xmlcatalog</code></p>
+    <p>should allow to process DocBook documentations without
+    requiringnetwork accesses for the DTd or stylesheets</p>
+  </li>
+  <li>I have uploaded <a
+    href="ftp://xmlsoft.org/libxml2/test/dbk412catalog.tar.gz">asmall
+    tarball</a>containing XML Catalogs for DocBook 4.1.2 which seemsto work
+    fine for me too</li>
+  <li>Informations on installing a <a
+    href="http://ourworld.compuserve.com/homepages/hoenicka_markus/ntsgml.html">WindowsDocBook
+    processing setup</a>based on Cygwin (using the binaries from theofficial
+    Windows port should be possible too)</li>
+  <li>Alexander Kirillov's page on <a
+    href="http://www.math.sunysb.edu/~kirillov/dbxml/">Using DocBook
+    XML4.1.2</a>(RPM packages)</li>
+  <li>Tim Waugh's <a href="http://cyberelk.net/tim/xmlto/">xmlto
+    front-endconversion script</a></li>
+  <li>Linux Documentation Project <a
+    href="http://www.linuxdoc.org/HOWTO/mini/DocBook-Install/">DocBook-Install-mini-HOWTO</a></li>
+  <li>ScrollKeeper the open documentation cataloging project has a <a
+    href="http://scrollkeeper.sourceforge.net/docbook.shtml">DocBooksection</a></li>
+  <li>Dan York presentation on <a
+    href="http://www.lodestar2.com/people/dyork/talks/2001/xugo/docbook/index.html">Publishingusing
+    DocBook XML</a></li>
+</ul>
+
+<p>Do not use the --docbook option of xsltproc to process XML
+DocBookdocuments, this option is only intended to provide some (limited)
+support ofthe SGML version of DocBook.</p>
+
+<p>Points which are not DocBook specific but still worth mentionningagain:</p>
+<ul>
+  <li>if you think DocBook processing time is too slow, make sure you haveXML
+    Catalogs pointing to a local installation of the DTD of DocBook.Check the
+    <a href="http://xmlsoft.org/catalog.html">XML Catalog page</a>to
+    understand more on this subject.</li>
+  <li>before processing a new document, use the command
+    <p><code>xmllint --valid --noout path_to_document</code></p>
+    <p>to make sure that your input is valid DocBook. And fixes the
+    errorsbefore processing further. Note that XSLT processing may work
+    correctlywith some forms of validity errors left, but in general it can
+    givetroubles on output.</p>
+  </li>
+</ul>
+
+<h2><a name="API">The programming API</a></h2>
+
+<p>Okay this section is clearly incomplete. But integrating libxslt into
+yourapplication should be relatively easy. First check the few steps
+describedbelow, then for more detailed informations, look at the<a
+href="html/libxslt-lib.html">generated pages</a>for the API and the sourceof
+libxslt/xsltproc.c  and the  <a
+href="tutorial/libxslttutorial.html">tutorial</a>.</p>
+
+<p>Basically doing an XSLT transformation can be done in a few steps:</p>
+<ol>
+  <li>configure the parser for XSLT:
+    <p>xmlSubstituteEntitiesDefault(1);</p>
+    <p>xmlLoadExtDtdDefaultValue = 1;</p>
+  </li>
+  <li>parse the stylesheet with xsltParseStylesheetFile()</li>
+  <li>parse the document with xmlParseFile()</li>
+  <li>apply the stylesheet using xsltApplyStylesheet()</li>
+  <li>save the result using xsltSaveResultToFile() if needed
+    setxmlIndentTreeOutput to 1</li>
+</ol>
+
+<p>Steps 2,3, and 5 will probably need to be changed depending on
+youprocessing needs and environment for example if reading/saving
+from/tomemory, or if you want to apply XInclude processing to the stylesheet
+orinput documents.</p>
+
+<h2><a name="Python">Python and bindings</a></h2>
+
+<p>There is a number of language bindings and wrappers available for
+libxml2,the list below is not exhaustive. Please contact the <a
+href="http://mail.gnome.org/mailman/listinfo/xml-bindings">xml-bindings@gnome.org</a>(<a
+href="http://mail.gnome.org/archives/xml-bindings/">archives</a>) inorder to
+get updates to this list or to discuss the specific topic of libxml2or
+libxslt wrappers or bindings:</p>
+<ul>
+  <li><a
+    href="http://mail.gnome.org/archives/xml/2001-March/msg00014.html">MattSergeant</a>developped
+    <a href="http://axkit.org/download/">XML::LibXMLand XML::LibXSLT</a>,
+    Perl wrappers for libxml2/libxslt as part of the <a
+    href="http://axkit.com/">AxKit XML application server</a></li>
+  <li><a href="mailto:dkuhlman@cutter.rexx.com">Dave Kuhlman</a>provides
+    andearlier version of the libxml/libxslt <a
+    href="http://www.rexx.com/~dkuhlman">wrappers for Python</a></li>
+  <li>Petr Kozelka provides <a
+    href="http://sourceforge.net/projects/libxml2-pas">Pascal units to
+    gluelibxml2</a>with Kylix, Delphi and other Pascal compilers</li>
+  <li>Wai-Sun "Squidster" Chia provides <a
+    href="http://www.rubycolor.org/arc/redist/">bindings for
+    Ruby</a>andlibxml2 bindings are also available in Ruby through the <a
+    href="http://libgdome-ruby.berlios.de/">libgdome-ruby</a>modulemaintained
+    by Tobias Peters.</li>
+  <li>Steve Ball and contributors maintains <a
+    href="http://tclxml.sourceforge.net/">libxml2 and libxslt bindings
+    forTcl</a></li>
+  <li><a href="mailto:xmlwrapp@pmade.org">Peter Jones</a>maintains
+    C++bindings for libxslt within <a
+    href="http://pmade.org/pjones/software/xmlwrapp/">xmlwrapp</a></li>
+  <li><a href="phillim2@comcast.net">Mike Phillips</a>provides a moduleusing
+    <a href="http://siasl.dyndns.org/projects/projects.html">libxsltfor
+    PHP</a>.</li>
+  <li><a href="http://savannah.gnu.org/projects/classpathx/">LibxmlJ</a>isan
+    effort to create a 100% JAXP-compatible Java wrapper for libxml2
+    andlibxslt as part of GNU ClasspathX project.</li>
+  <li>Patrick McPhee provides Rexx bindings fof libxml2 and libxslt, look
+    for<a href="http://www.interlog.com/~ptjm/software.html">RexxXML</a>.</li>
+  <li><a
+    href="http://www.satimage.fr/software/en/xml_suite.html">Satimage</a>provides
+    <a
+    href="http://www.satimage.fr/software/en/downloads_osaxen.html">XMLLibosax</a>.
+    This is an osax for Mac OS X with a set of commands toimplement in
+    AppleScript the XML DOM, XPATH and XSLT.</li>
+</ul>
+
+<p>The libxslt Python module depends on the <a
+href="http://xmlsoft.org/python.html">libxml2 Python</a>module.</p>
+
+<p>The distribution includes a set of Python bindings, which are garanteed
+tobe maintained as part of the library in the future, though the
+Pythoninterface have not yet reached the completeness of the C API.</p>
+
+<p><a href="mailto:stephane.bidoul@softwareag.com">Stéphane
+Bidoul</a>maintains <a href="http://users.skynet.be/sbi/libxml-python/">a
+Windows portof the Python bindings</a>.</p>
+
+<p>Note to people interested in building bindings, the API is formalized as<a
+href="libxslt-api.xml">an XML API description file</a>which allows toautomate
+a large part of the Python bindings, this includes functiondescriptions,
+enums, structures, typedefs, etc... The Python script used tobuild the
+bindings is python/generator.py in the source distribution.</p>
+
+<p>To install the Python bindings there are 2 options:</p>
+<ul>
+  <li>If you use an RPM based distribution, simply install the <a
+    href="http://rpmfind.net/linux/rpm2html/search.php?query=libxml2-python">libxml2-pythonRPM</a>and
+    the <a
+    href="http://rpmfind.net/linux/rpm2html/search.php?query=libxslt-python">libxslt-pythonRPM</a>.</li>
+  <li>Otherwise use the <a
+    href="ftp://xmlsoft.org/libxml2/python/">libxml2-pythonmodule
+    distribution</a>corresponding to your installed version oflibxml2 and
+    libxslt. Note that to install it you will need both libxml2and libxslt
+    installed and run "python setup.py build install" in themodule tree.</li>
+</ul>
+
+<p>The distribution includes a set of examples and regression tests for
+thepython bindings in the <code>python/tests</code>directory. Here are
+someexcepts from those tests:</p>
+
+<h3>basic.py:</h3>
+
+<p>This is a basic test of XSLT interfaces: loading a stylesheet and
+adocument, transforming the document and saving the result.</p>
+<pre>import libxml2
+import libxslt
+
+styledoc = libxml2.parseFile("test.xsl")
+style = libxslt.parseStylesheetDoc(styledoc)
+doc = libxml2.parseFile("test.xml")
+result = style.applyStylesheet(doc, None)
+style.saveResultToFilename("foo", result, 0)
+style.freeStylesheet()
+doc.freeDoc()
+result.freeDoc()</pre>
+
+<p>The Python module is called libxslt, you will also need the libxml2
+modulefor the operations on XML trees. Let's have a look at the objects
+manipulatedin that example and how is the processing done:</p>
+<ul>
+  <li><code>styledoc</code>: is a libxml2 document tree. It is obtained
+    byparsing the XML file "test.xsl" containing the stylesheet.</li>
+  <li><code>style</code>: this is a precompiled stylesheet ready to be usedby
+    the following transformations (note the plural form,
+    multipletransformations can resuse the same stylesheet).</li>
+  <li><code>doc</code>: this is the document to apply the transformation
+    to.In this case it is simply generated by parsing it from a file but
+    anyother processing is possible as long as one get a libxml2 Doc. Note
+    thatHTML tree are suitable for XSLT processing in libxslt. This is
+    actuallyhow this page is generated !</li>
+  <li><code>result</code>: this is a document generated by applying
+    thestylesheet to the document. Note that some of the stylesheet
+    informationsmay be related to the serialization of that document and as
+    in thisexample a specific saveResultToFilename() method of the stylesheet
+    shouldbe used to save it to a file (in that case to "foo").</li>
+</ul>
+
+<p>Also note the need to explicitely deallocate documents with
+freeDoc()except for the stylesheet document which is freed when its compiled
+form isgarbage collected.</p>
+
+<h3>extfunc.py:</h3>
+
+<p>This one is a far more complex test. It shows how to modify the
+behaviourof an XSLT transformation by passing parameters and how to extend
+the XSLTengine with functions defined in python:</p>
+<pre>import libxml2
+import libxslt
+import string
+
+nodeName = None
+def f(ctx, str):
+    global nodeName
+
+    #
+    # Small check to verify the context is correcly accessed
+    #
+    try:
+        pctxt = libxslt.xpathParserContext(_obj=ctx)
+        ctxt = pctxt.context()
+        tctxt = ctxt.transformContext()
+        nodeName = tctxt.insertNode().name
+    except:
+        pass
+
+    return string.upper(str)
+
+libxslt.registerExtModuleFunction("foo", "http://example.com/foo", f)</pre>
+
+<p>This code defines and register an extension function. Note that
+thefunction can be bound to any name (foo) and how the binding is
+alsoassociated to a namespace name "http://example.com/foo". From an XSLT
+pointof view the function just returns an upper case version of the string
+passedas a parameter. But the first part of the function also read some
+contextualinformation from the current XSLT processing environement, in that
+case itlooks for the current insertion node in the resulting output (either
+theresulting document or the Result Value Tree being generated), and saves it
+toa global variable for checking that the access actually worked.</p>
+
+<p>For more informations on the xpathParserContext and
+transformContextobjects check the <a href="internals.html">libray internals
+description</a>.The pctxt is actually an object from a class derived from
+thelibxml2.xpathParserContext() with just a couple more properties including
+thepossibility to look up the XSLT transformation context from the
+XPathcontext.</p>
+<pre>styledoc = libxml2.parseDoc("""
+&lt;xsl:stylesheet version='1.0'
+  xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
+  xmlns:foo='http://example.com/foo'
+  xsl:exclude-result-prefixes='foo'&gt;
+
+  &lt;xsl:param name='bar'&gt;failure&lt;/xsl:param&gt;
+  &lt;xsl:template match='/'&gt;
+    &lt;article&gt;&lt;xsl:value-of select='foo:foo($bar)'/&gt;&lt;/article&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+""")</pre>
+
+<p>Here is a simple example of how to read an XML document from a
+pythonstring with libxml2. Note how this stylesheet:</p>
+<ul>
+  <li>Uses a global parameter <code>bar</code></li>
+  <li>Reference the extension function f</li>
+  <li>how the Namespace name "http://example.com/foo" has to be bound to
+    aprefix</li>
+  <li>how that prefix is excluded from the output</li>
+  <li>how the function is called from the select</li>
+</ul>
+<pre>style = libxslt.parseStylesheetDoc(styledoc)
+doc = libxml2.parseDoc("&lt;doc/&gt;")
+result = style.applyStylesheet(doc, { "bar": "'success'" })
+style.freeStylesheet()
+doc.freeDoc()</pre>
+
+<p>that part is identical, to the basic example except that thetransformation
+is passed a dictionnary of parameters. Note that the stringpassed "success"
+had to be quoted, otherwise it is interpreted as an XPathquery for the childs
+of root named "success".</p>
+<pre>root = result.children
+if root.name != "article":
+    print "Unexpected root node name"
+    sys.exit(1)
+if root.content != "SUCCESS":
+    print "Unexpected root node content, extension function failed"
+    sys.exit(1)
+if nodeName != 'article':
+    print "The function callback failed to access its context"
+    sys.exit(1)
+
+result.freeDoc()</pre>
+
+<p>That part just verifies that the transformation worked, that the
+parametergot properly passed to the engine, that the function f() got called
+and thatit properly accessed the context to find the name of the insertion
+node.</p>
+
+<h3>pyxsltproc.py:</h3>
+
+<p>this module is a bit too long to be described there but it is basically
+arewrite of the xsltproc command line interface of libxslt in Python.
+Itprovides nearly all the functionalities of xsltproc and can be used as a
+basemodule to write Python customized XSLT processors. One of the thing to
+noticeare:</p>
+<pre>libxml2.lineNumbersDefault(1)
+libxml2.substituteEntitiesDefault(1)</pre>
+
+<p>those two calls in the main() function are needed to force the
+libxml2processor to generate DOM trees compliant with the XPath data
+model.</p>
+
+<h2><a name="Internals">Library internals</a></h2>
+
+<h3>Table  of contents</h3>
+<ul>
+  <li><a href="internals.html#Introducti">Introduction</a></li>
+  <li><a href="internals.html#Basics">Basics</a></li>
+  <li><a href="internals.html#Keep">Keep it simple stupid</a></li>
+  <li><a href="internals.html#libxml">The libxml nodes</a></li>
+  <li><a href="internals.html#XSLT">The XSLT processing steps</a></li>
+  <li><a href="internals.html#XSLT1">The XSLT stylesheet compilation</a></li>
+  <li><a href="internals.html#XSLT2">The XSLT template compilation</a></li>
+  <li><a href="internals.html#processing">The processing itself</a></li>
+  <li><a href="internals.html#XPath">XPath expressions compilation</a></li>
+  <li><a href="internals.html#XPath1">XPath interpretation</a></li>
+  <li><a href="internals.html#Descriptio">Description of XPathObjects</a></li>
+  <li><a href="internals.html#XPath3">XPath functions</a></li>
+  <li><a href="internals.html#stack">The variables stack frame</a></li>
+  <li><a href="internals.html#Extension">Extension support</a></li>
+  <li><a href="internals.html#Futher">Further reading</a></li>
+  <li><a href="internals.html#TODOs">TODOs</a></li>
+</ul>
+
+<h3><a name="Introducti2">Introduction</a></h3>
+
+<p>This document describes the processing of <a
+href="http://xmlsoft.org/XSLT/">libxslt</a>, the <a
+href="http://www.w3.org/TR/xslt">XSLT</a>C library developed for the <a
+href="http://www.gnome.org/">Gnome</a>project.</p>
+
+<p>Note: this documentation is by definition incomplete and I am not good
+atspelling, grammar, so patches and suggestions are <a
+href="mailto:veillard@redhat.com">really welcome</a>.</p>
+
+<h3><a name="Basics1">Basics</a></h3>
+
+<p>XSLT is a transformation language. It takes an input document and
+astylesheet document and generates an output document:</p>
+
+<p align="center"><img src="processing.gif"
+alt="the XSLT processing model"></p>
+
+<p>Libxslt is written in C. It relies on <a
+href="http://www.xmlsoft.org/">libxml</a>, the XML C library for Gnome,
+forthe following operations:</p>
+<ul>
+  <li>parsing files</li>
+  <li>building the in-memory DOM structure associated with the
+    documentshandled</li>
+  <li>the XPath implementation</li>
+  <li>serializing back the result document to XML and HTML. (Text is
+    handleddirectly.)</li>
+</ul>
+
+<h3><a name="Keep1">Keep it simple stupid</a></h3>
+
+<p>Libxslt is not very specialized. It is built under the assumption that
+allnodes from the source and output document can fit in the virtual memory
+ofthe system. There is a big trade-off there. It is fine for reasonably
+sizeddocuments but may not be suitable for large sets of data. The gain is
+that itcan be used in a relatively versatile way. The input or output may
+never beserialized, but the size of documents it can handle are limited by
+the sizeof the memory available.</p>
+
+<p>More specialized memory handling approaches are possible, like buildingthe
+input tree from a serialization progressively as it is consumed,factoring
+repetitive patterns, or even on-the-fly generation of the output asthe input
+is parsed but it is possible only for a limited subset of thestylesheets. In
+general the implementation of libxslt follows the followingpattern:</p>
+<ul>
+  <li>KISS (keep it simple stupid)</li>
+  <li>when there is a clear bottleneck optimize on top of this
+    simpleframework and refine only as much as is needed to reach the
+    expectedresult</li>
+</ul>
+
+<p>The result is not that bad, clearly one can do a better job but
+morespecialized too. Most optimization like building the tree on-demand
+wouldneed serious changes to the libxml XPath framework. An easy step would
+be toserialize the output directly (or call a set of SAX-like output handler
+tokeep this a flexible interface) and hence avoid the memory consumption of
+theresult.</p>
+
+<h3><a name="libxml">The libxml nodes</a></h3>
+
+<p>DOM-like trees, as used and generated by libxml and libxslt, arerelatively
+complex. Most node types follow the given structure except a fewvariations
+depending on the node type:</p>
+
+<p align="center"><img src="node.gif" alt="description of a libxml node"></p>
+
+<p>Nodes carry a <strong>name</strong>and the node
+<strong>type</strong>indicates the kind of node it represents, the most
+common ones are:</p>
+<ul>
+  <li>document nodes</li>
+  <li>element nodes</li>
+  <li>text nodes</li>
+</ul>
+
+<p>For the XSLT processing, entity nodes should not be generated (i.e.
+theyshould be replaced by their content). Most nodes also contains the
+following"navigation" informations:</p>
+<ul>
+  <li>the containing <strong>doc</strong>ument</li>
+  <li>the <strong>parent</strong>node</li>
+  <li>the first <strong>children</strong>node</li>
+  <li>the <strong>last</strong>children node</li>
+  <li>the <strong>prev</strong>ious sibling</li>
+  <li>the following sibling (<strong>next</strong>)</li>
+</ul>
+
+<p>Elements nodes carries the list of attributes in the properties,
+anattribute itself holds the navigation pointers and the children list
+(theattribute value is not represented as a simple string to allow usage
+ofentities references).</p>
+
+<p>The <strong>ns</strong>points to the namespace declaration for
+thenamespace associated to the node, <strong>nsDef</strong>is the linked
+listof namespace declaration present on element nodes.</p>
+
+<p>Most nodes also carry an <strong>_private</strong>pointer which can beused
+by the application to hold specific data on this node.</p>
+
+<h3><a name="XSLT">The XSLT processing steps</a></h3>
+
+<p>There are a few steps which are clearly decoupled at the
+interfacelevel:</p>
+<ol>
+  <li>parse the stylesheet and generate a DOM tree</li>
+  <li>take the stylesheet tree and build a compiled version of it
+    (thecompilation phase)</li>
+  <li>take the input and generate a DOM tree</li>
+  <li>process the stylesheet against the input tree and generate an
+  outputtree</li>
+  <li>serialize the output tree</li>
+</ol>
+
+<p>A few things should be noted here:</p>
+<ul>
+  <li>the steps 1/ 3/ and 5/ are optional</li>
+  <li>the stylesheet obtained at 2/ can be reused by multiple processing
+    4/(and this should also work in threaded programs)</li>
+  <li>the tree provided in 2/ should never be freed using xmlFreeDoc, but
+    byfreeing the stylesheet.</li>
+  <li>the input tree 4/ is not modified except the _private field which maybe
+    used for labelling keys if used by the stylesheet</li>
+</ul>
+
+<h3><a name="XSLT1">The XSLT stylesheet compilation</a></h3>
+
+<p>This is the second step described. It takes a stylesheet tree,
+and"compiles" it. This associates to each node a structure stored in
+the_private field and containing information computed in the stylesheet:</p>
+
+<p align="center"><img src="stylesheet.gif"
+alt="a compiled XSLT stylesheet"></p>
+
+<p>One xsltStylesheet structure is generated per document parsed for
+thestylesheet. XSLT documents allow includes and imports of other
+documents,imports are stored in the <strong>imports</strong>list (hence
+keeping thetree hierarchy of includes which is very important for a proper
+XSLTprocessing model) and includes are stored in the
+<strong>doclist</strong>list. An imported stylesheet has a parent link to
+allow browsing of thetree.</p>
+
+<p>The DOM tree associated to the document is stored in
+<strong>doc</strong>.It is preprocessed to remove ignorable empty nodes and
+all the nodes in theXSLT namespace are subject to precomputing. This usually
+consist ofextracting all the context information from the context tree
+(attributes,namespaces, XPath expressions), and storing them in an
+xsltStylePreCompstructure associated to the <strong>_private</strong>field of
+the node.</p>
+
+<p>A couple of notable exceptions to this are XSLT template nodes (more
+onthis later) and attribute value templates. If they are actually
+templates,the value cannot be computed at compilation time. (Some
+preprocessing couldbe done like isolation and preparsing of the XPath
+subexpressions but it'snot done, yet.)</p>
+
+<p>The xsltStylePreComp structure also allows storing of the precompiled
+formof an XPath expression that can be associated to an XSLT element (more
+onthis later).</p>
+
+<h3><a name="XSLT2">The XSLT template compilation</a></h3>
+
+<p>A proper handling of templates lookup is one of the keys of fast
+XSLTprocessing. (Given a node in the source document this is the process
+offinding which templates should be applied to this node.) Libxslt follows
+thehint suggested in the <a
+href="http://www.w3.org/TR/xslt#patterns">5.2Patterns</a>section of the XSLT
+Recommendation, i.e. it doesn't evaluate itas an XPath expression but
+tokenizes it and compiles it as a set of rules tobe evaluated on a candidate
+node. There usually is an indication of the nodename in the last step of this
+evaluation and this is used as a key check forthe match. As a result libxslt
+builds a relatively more complex set ofstructures for the templates:</p>
+
+<p align="center"><img src="templates.gif"
+alt="The templates related structure"></p>
+
+<p>Let's describe a bit more closely what is built. First the
+xsltStylesheetstructure holds a pointer to the template hash table. All the
+XSLT patternscompiled in this stylesheet are indexed by the value of the the
+targetelement (or attribute, pi ...) name, so when a element or an attribute
+"foo"needs to be processed the lookup is done using the name as a key.</p>
+
+<p>Each of the patterns is compiled into an xsltCompMatch structure. It
+holdsthe set of rules based on the tokenization of the pattern stored in
+reverseorder (matching is easier this way). It also holds some information
+about theprevious matches used to speed up the process when one iterates over
+a set ofsiblings. (This optimization may be defeated by trashing when
+runningthreaded computation, it's unclear that this is a big deal in
+practice.)Predicate expressions are not compiled at this stage, they may be
+at run-timeif needed, but in this case they are compiled as full XPath
+expressions (theuse of some fixed predicate can probably be optimized, they
+are not yet).</p>
+
+<p>The xsltCompMatch are then stored in the hash table, the clash list
+isitself sorted by priority of the template to implement "naturally" the
+XSLTpriority rules.</p>
+
+<p>Associated to the compiled pattern is the xsltTemplate itself
+containingthe information required for the processing of the pattern
+including, ofcourse, a pointer to the list of elements used for building the
+patternresult.</p>
+
+<p>Last but not least a number of patterns do not fit in the hash
+tablebecause they are not associated to a name, this is the case for
+patternsapplying to the root, any element, any attributes, text nodes, pi
+nodes, keysetc. Those are stored independently in the stylesheet structure as
+separatelinked lists of xsltCompMatch.</p>
+
+<h3><a name="processing">The processing itself</a></h3>
+
+<p>The processing is defined by the XSLT specification (the basis of
+thealgorithm is explained in <a
+href="http://www.w3.org/TR/xslt#section-Introduction">the
+Introduction</a>section). Basically it works by taking the root of the input
+document andapplying the following algorithm:</p>
+<ol>
+  <li>Finding the template applying to it. This is a lookup in the
+    templatehash table, walking the hash list until the node satisfies all
+    the stepsof the pattern, then checking the appropriate(s) global
+    templates to seeif there isn't a higher priority rule to apply</li>
+  <li>If there is no template, apply the default rule (recurse on
+  thechildren)</li>
+  <li>else walk the content list of the selected templates, for each of them:
+    <ul>
+      <li>if the node is in the XSLT namespace then the node has a
+        _privatefield pointing to the preprocessed values, jump to the
+        specificcode</li>
+      <li>if the node is in an extension namespace, look up the
+        associatedbehavior</li>
+      <li>otherwise copy the node.</li>
+    </ul>
+    <p>The closure is usually done through the
+    XSLT<strong>apply-templates</strong>construct recursing by applying
+    theadequate template on the input node children or on the result of
+    anassociated XPath selection lookup.</p>
+  </li>
+</ol>
+
+<p>Note that large parts of the input tree may not be processed by a
+givenstylesheet and that on the opposite some may be processed multiple
+times.(This often is the case when a Table of Contents is built).</p>
+
+<p>The module <code>transform.c</code>is the one implementing most of
+thislogic. <strong>xsltApplyStylesheet()</strong>is the entry point,
+itallocates an xsltTransformContext containing the following:</p>
+<ul>
+  <li>a pointer to the stylesheet being processed</li>
+  <li>a stack of templates</li>
+  <li>a stack of variables and parameters</li>
+  <li>an XPath context</li>
+  <li>the template mode</li>
+  <li>current document</li>
+  <li>current input node</li>
+  <li>current selected node list</li>
+  <li>the current insertion points in the output document</li>
+  <li>a couple of hash tables for extension elements and functions</li>
+</ul>
+
+<p>Then a new document gets allocated (HTML or XML depending on the type
+ofoutput), the user parameters and global variables and parameters
+areevaluated. Then <strong>xsltProcessOneNode()</strong>which implements
+the1-2-3 algorithm is called on the root element of the input. Step 1/
+isimplemented by calling <strong>xsltGetTemplate()</strong>, step 2/
+isimplemented by <strong>xsltDefaultProcessOneNode()</strong>and step 3/
+isimplemented by <strong>xsltApplyOneTemplate()</strong>.</p>
+
+<h3><a name="XPath">XPath expression compilation</a></h3>
+
+<p>The XPath support is actually implemented in the libxml module (where itis
+reused by the XPointer implementation). XPath is a relatively
+classicexpression language. The only uncommon feature is that it is working
+on XMLtrees and hence has specific syntax and types to handle them.</p>
+
+<p>XPath expressions are compiled using <strong>xmlXPathCompile()</strong>.It
+will take an expression string in input and generate a structurecontaining
+the parsed expression tree, for example the expression:</p>
+<pre>/doc/chapter[title='Introduction']</pre>
+
+<p>will be compiled as</p>
+<pre>Compiled Expression : 10 elements
+  SORT
+    COLLECT  'child' 'name' 'node' chapter
+      COLLECT  'child' 'name' 'node' doc
+        ROOT
+      PREDICATE
+        SORT
+          EQUAL =
+            COLLECT  'child' 'name' 'node' title
+              NODE
+            ELEM Object is a string : Introduction
+              COLLECT  'child' 'name' 'node' title
+                NODE</pre>
+
+<p>This can be tested using the  <code>testXPath</code>command (in thelibxml
+codebase) using the <code>--tree</code>option.</p>
+
+<p>Again, the KISS approach is used. No optimization is done. This could bean
+interesting thing to add. <a
+href="http://www-106.ibm.com/developerworks/library/x-xslt2/?dwzone=x?open&amp;l=132%2ct=gr%2c+p=saxon">MichaelKay
+describes</a>a lot of possible and interesting optimizations done inSaxon
+which would be possible at this level. I'm unsure they would providemuch gain
+since the expressions tends to be relatively simple in general andstylesheets
+are still hand generated. Optimizations at the interpretationsounds likely to
+be more efficient.</p>
+
+<h3><a name="XPath1">XPath interpretation</a></h3>
+
+<p>The interpreter is implemented by
+<strong>xmlXPathCompiledEval()</strong>which is the front-end to
+<strong>xmlXPathCompOpEval()</strong>the functionimplementing the evaluation
+of the expression tree. This evaluation followsthe KISS approach again. It's
+recursive and calls<strong>xmlXPathNodeCollectAndTest()</strong>to collect
+nodes set whenevaluating a <code>COLLECT</code>node.</p>
+
+<p>An evaluation is done within the framework of an XPath context stored inan
+<strong>xmlXPathContext</strong>structure, in the framework of
+atransformation the context is maintained within the XSLT context. Its
+contentfollows the requirements from the XPath specification:</p>
+<ul>
+  <li>the current document</li>
+  <li>the current node</li>
+  <li>a hash table of defined variables (but not used by XSLT)</li>
+  <li>a hash table of defined functions</li>
+  <li>the proximity position (the place of the node in the current
+  nodelist)</li>
+  <li>the context size (the size of the current node list)</li>
+  <li>the array of namespace declarations in scope (there also is a
+    namespacehash table but it is not used in the XSLT transformation).</li>
+</ul>
+
+<p>For the purpose of XSLT an <strong>extra</strong>pointer has been
+addedallowing to retrieve the XSLT transformation context. When an
+XPathevaluation is about to be performed, an XPath parser context is
+allocatedcontaining and XPath object stack (this is actually an XPath
+evaluationcontext, this is a remain of the time where there was no separate
+parsing andevaluation phase in the XPath implementation). Here is an overview
+of the setof contexts associated to an XPath evaluation within an
+XSLTtransformation:</p>
+
+<p align="center"><img src="contexts.gif"
+alt="The set of contexts associated "></p>
+
+<p>Clearly this is a bit too complex and confusing and should be refactoredat
+the next set of binary incompatible releases of libxml. For example
+thexmlXPathCtxt has a lot of unused parts and should probably be merged
+withxmlXPathParserCtxt.</p>
+
+<h3><a name="Descriptio">Description of XPath Objects</a></h3>
+
+<p>An XPath expression manipulates XPath objects. XPath defines the
+defaulttypes boolean, numbers, strings and node sets. XSLT adds the result
+treefragment type which is basically an unmodifiable node set.</p>
+
+<p>Implementation-wise, libxml follows again a KISS approach,
+thexmlXPathObject is a structure containing a type description and the
+variouspossibilities. (Using an enum could have gained some bytes.) In the
+case ofnode sets (or result tree fragments), it points to a separate
+xmlNodeSetobject which contains the list of pointers to the document
+nodes:</p>
+
+<p align="center"><img src="object.gif"
+alt="An Node set object pointing to "></p>
+
+<p>The <a href="http://xmlsoft.org/html/libxml-xpath.html">XPath
+API</a>(andits <a
+href="http://xmlsoft.org/html/libxml-xpathinternals.html">'internal'part</a>)
+includes a number of functions to create, copy, compare, convert orfree XPath
+objects.</p>
+
+<h3><a name="XPath3">XPath functions</a></h3>
+
+<p>All the XPath functions available to the interpreter are registered in
+thefunction hash table linked from the XPath context. They all share the
+samesignature:</p>
+<pre>void xmlXPathFunc (xmlXPathParserContextPtr ctxt, int nargs);</pre>
+
+<p>The first argument is the XPath interpretation context, holding
+theinterpretation stack. The second argument defines the number of
+objectspassed on the stack for the function to consume (last argument is on
+top ofthe stack).</p>
+
+<p>Basically an XPath function does the following:</p>
+<ul>
+  <li>check <code>nargs</code>for proper handling of errors or functionswith
+    variable numbers of parameters</li>
+  <li>pop the parameters from the stack using <code>obj
+    =valuePop(ctxt);</code></li>
+  <li>do the function specific computation</li>
+  <li>push the result parameter on the stack using
+    <code>valuePush(ctxt,res);</code></li>
+  <li>free up the input parameters
+  with<code>xmlXPathFreeObject(obj);</code></li>
+  <li>return</li>
+</ul>
+
+<p>Sometime the work can be done directly by modifying in-situ the top
+objecton the stack <code>ctxt-&gt;value</code>.</p>
+
+<h3><a name="stack">The XSLT variables stack frame</a></h3>
+
+<p>Not to be confused with XPath object stack, this stack holds the
+XSLTvariables and parameters as they are defined through the recursive calls
+ofcall-template, apply-templates and default templates. This is used to
+definethe scope of variables being called.</p>
+
+<p>This part seems to be the most urgent attention right now, first it isdone
+in a very inefficient way since the location of the variables andparameters
+within the stylesheet tree is still done at run time (it reallyshould be done
+statically at compile time), and I am still unsure that myunderstanding of
+the template variables and parameter scope is actuallyright.</p>
+
+<p>This part of the documentation is still to be written once this part ofthe
+code will be stable. <span style="background-color: #FF0000">TODO</span></p>
+
+<h3><a name="Extension">Extension support</a></h3>
+
+<p>There is a separate document explaining <a href="extensions.html">how
+theextension support works</a>.</p>
+
+<h3><a name="Futher">Further reading</a></h3>
+
+<p>Michael Kay wrote <a
+href="http://www-106.ibm.com/developerworks/library/x-xslt2/?dwzone=x?open&amp;l=132%2ct=gr%2c+p=saxon">areally
+interesting article on Saxon internals</a>and the work he did onperformance
+issues. I wishes I had read it before starting libxslt design (Iwould
+probably have avoided a few mistakes and progressed faster). A lot ofthe
+ideas in his papers should be implemented or at least tried inlibxslt.</p>
+
+<p>The <a href="http://xmlsoft.org/">libxml documentation</a>, especially <a
+href="http://xmlsoft.org/xmlio.html">the I/O interfaces</a>and the <a
+href="http://xmlsoft.org/xmlmem.html">memory management</a>.</p>
+
+<h3><a name="TODOs">TODOs</a></h3>
+
+<p>redesign the XSLT stack frame handling. Far too much work is done
+atexecution time. Similarly for the attribute value templates handling,
+atleast the embedded subexpressions ought to be precompiled.</p>
+
+<p>Allow output to be saved to a SAX like output (this notion of SAX like
+APIfor output should be added directly to libxml).</p>
+
+<p>Implement and test some of the optimization explained by Michael
+Kayespecially:</p>
+<ul>
+  <li>static slot allocation on the stack frame</li>
+  <li>specific boolean interpretation of an XPath expression</li>
+  <li>some of the sorting optimization</li>
+  <li>Lazy evaluation of location path. (this may require more changes
+    butsounds really interesting. XT does this too.)</li>
+  <li>Optimization of an expression tree (This could be done as a
+    completelyindependent module.)</li>
+</ul>
+
+<p></p>
+
+<p>Error reporting, there is a lot of case where the XSLT
+specificationspecify that a given construct is an error are not checked
+adequately bylibxslt. Basically one should do a complete pass on the XSLT
+spec again andadd all tests to the stylesheet compilation. Using the DTD
+provided in theappendix and making direct checks using the libxml validation
+API sounds agood idea too (though one should take care of not raising errors
+forelements/attributes in different namespaces).</p>
+
+<p>Double check all the places where the stylesheet compiled form might
+bemodified at run time (extra removal of blanks nodes, hint on
+thexsltCompMatch).</p>
+
+<p></p>
+
+<h2><a name="Extensions">Writing extensions</a></h2>
+
+<h3>Table  of content</h3>
+<ul>
+  <li><a href="extensions.html#Introducti">Introduction</a></li>
+  <li><a href="extensions.html#Basics">Basics</a></li>
+  <li><a href="extensions.html#Keep">Extension modules</a></li>
+  <li><a href="extensions.html#Registerin">Registering a module</a></li>
+  <li><a href="extensions.html#module">Loading a module</a></li>
+  <li><a href="extensions.html#Registerin1">Registering an
+    extensionfunction</a></li>
+  <li><a href="extensions.html#Implementi">Implementing an
+    extensionfunction</a></li>
+  <li><a href="extensions.html#Examples">Examples for
+  extensionfunctions</a></li>
+  <li><a href="extensions.html#Registerin2">Registering an
+    extensionelement</a></li>
+  <li><a href="extensions.html#Implementi1">Implementing an
+    extensionelement</a></li>
+  <li><a href="extensions.html#Example">Example for extensionelements</a></li>
+  <li><a href="extensions.html#shutdown">The shutdown of a module</a></li>
+  <li><a href="extensions.html#Future">Future work</a></li>
+</ul>
+
+<h3><a name="Introducti1">Introduction</a></h3>
+
+<p>This document describes the work needed to write extensions to thestandard
+XSLT library for use with <a href="http://xmlsoft.org/XSLT/">libxslt</a>, the
+<a href="http://www.w3.org/TR/xslt">XSLT</a>C library developed for the <a
+href="http://www.gnome.org/">Gnome</a>project.</p>
+
+<p>Before starting reading this document it is highly recommended to
+getfamiliar with <a href="internals.html">the libxslt internals</a>.</p>
+
+<p>Note: this documentation is by definition incomplete and I am not good
+atspelling, grammar, so patches and suggestions are <a
+href="mailto:veillard@redhat.com">really welcome</a>.</p>
+
+<h3><a name="Basics">Basics</a></h3>
+
+<p>The <a href="http://www.w3.org/TR/xslt">XSLT specification</a>providestwo
+<a href="http://www.w3.org/TR/xslt">ways to extend an XSLT engine</a>:</p>
+<ul>
+  <li>providing <a href="http://www.w3.org/TR/xslt">new
+    extensionfunctions</a>which can be called from XPath expressions</li>
+  <li>providing <a href="http://www.w3.org/TR/xslt">new
+    extensionelements</a>which can be inserted in stylesheets</li>
+</ul>
+
+<p>In both cases the extensions need to be associated to a new namespace,i.e.
+an URI used as the name for the extension's namespace (there is no needto
+have a resource there for this to work).</p>
+
+<p>libxslt provides a few extensions itself, either in the libxslt
+namespace"http://xmlsoft.org/XSLT/namespace" or in namespaces for other well
+knownextensions provided by other XSLT processors like Saxon, Xalan or XT.</p>
+
+<h3><a name="Keep">Extension modules</a></h3>
+
+<p>Since extensions are bound to a namespace name, usually sets of
+extensionscoming from a given source are using the same namespace name
+defining inpractice a group of extensions providing elements, functions or
+both. Fromthe libxslt point of view those are considered as an "extension
+module", andmost of the APIs work at a module point of view.</p>
+
+<p>Registration of new functions or elements are bound to the activation
+ofthe module. This is currently done by declaring the namespace as an
+extensionby using the attribute  <code>extension-element-prefixes</code>on
+the<code><a
+href="http://www.w3.org/TR/xslt">xsl:stylesheet</a></code>element.</p>
+
+<p>An extension module is defined by 3 objects:</p>
+<ul>
+  <li>the namespace name associated</li>
+  <li>an initialization function</li>
+  <li>a shutdown function</li>
+</ul>
+
+<h3><a name="Registerin">Registering a module</a></h3>
+
+<p>Currently a libxslt module has to be compiled within the application
+usinglibxslt. There is no code to load dynamically shared libraries
+associated toa namespace (this may be added but is likely to become a
+portabilitynightmare).</p>
+
+<p>The current way to register a module is to link the code implementing
+itwith the application and to call a registration function:</p>
+<pre>int xsltRegisterExtModule(const xmlChar *URI,
+                          xsltExtInitFunction initFunc,
+                          xsltExtShutdownFunction shutdownFunc);</pre>
+
+<p>The associated header is read by:</p>
+<pre>#include&lt;libxslt/extensions.h&gt;</pre>
+
+<p>which also defines the type for the initialization and
+shutdownfunctions</p>
+
+<h3><a name="module">Loading a module</a></h3>
+
+<p>Once the module URI has been registered and if the XSLT processor
+detectsthat a given stylesheet needs the functionalities of an extended
+module, thisone is initialized.</p>
+
+<p>The xsltExtInitFunction type defines the interface for an
+initializationfunction:</p>
+<pre>/**
+ * xsltExtInitFunction:
+ * @ctxt:  an XSLT transformation context
+ * @URI:  the namespace URI for the extension
+ *
+ * A function called at initialization time of an XSLT
+ * extension module
+ *
+ * Returns a pointer to the module specific data for this
+ * transformation
+ */
+typedef void *(*xsltExtInitFunction)(xsltTransformContextPtr ctxt,
+                                     const xmlChar *URI);</pre>
+
+<p>There are 3 things to notice:</p>
+<ul>
+  <li>The function gets passed the namespace name URI as an argument.
+    Thisallows a single function to provide the initialization for
+    multiplelogical modules.</li>
+  <li>It also gets passed a transformation context. The initialization isdone
+    at run time before any processing occurs on the stylesheet but itwill be
+    invoked separately each time for each transformation.</li>
+  <li>It returns a pointer.  This can be used to store module
+    specificinformation which can be retrieved later when a function or an
+    elementfrom the extension is used.  An obvious example is a connection to
+    adatabase which should be kept and reused along with the
+    transformation.NULL is a perfectly valid return; there is no way to
+    indicate a failureat this level</li>
+</ul>
+
+<p>What this function is expected to do is:</p>
+<ul>
+  <li>prepare the context for this module (like opening the
+    databaseconnection)</li>
+  <li>register the extensions specific to this module</li>
+</ul>
+
+<h3><a name="Registerin1">Registering an extension function</a></h3>
+
+<p>There is a single call to do this registration:</p>
+<pre>int xsltRegisterExtFunction(xsltTransformContextPtr ctxt,
+                            const xmlChar *name,
+                            const xmlChar *URI,
+                            xmlXPathEvalFunc function);</pre>
+
+<p>The registration is bound to a single transformation instance referred
+byctxt, name is the UTF8 encoded name for the NCName of the function, and
+URIis the namespace name for the extension (no checking is done, a module
+couldregister functions or elements from a different namespace, but it is
+notrecommended).</p>
+
+<h3><a name="Implementi">Implementing an extension function</a></h3>
+
+<p>The implementation of the function must have the signature of a
+libxmlXPath function:</p>
+<pre>/**
+ * xmlXPathEvalFunc:
+ * @ctxt: an XPath parser context
+ * @nargs: the number of arguments passed to the function
+ *
+ * an XPath evaluation function, the parameters are on the
+ * XPath context stack
+ */
+
+typedef void (*xmlXPathEvalFunc)(xmlXPathParserContextPtr ctxt,
+                                 int nargs);</pre>
+
+<p>The context passed to an XPath function is not an XSLT context but an <a
+href="internals.html#XPath1">XPath context</a>. However it is possible tofind
+one from the other:</p>
+<ul>
+  <li>The function xsltXPathGetTransformContext provides this lookup facility:
+    <pre>xsltTransformContextPtr
+         xsltXPathGetTransformContext
+                          (xmlXPathParserContextPtr ctxt);</pre>
+  </li>
+  <li>The <code>xmlXPathContextPtr</code>associated to
+    an<code>xsltTransformContext</code>is stored in the
+    <code>xpathCtxt</code>field.</li>
+</ul>
+
+<p>The first thing an extension function may want to do is to check
+thearguments passed on the stack, the <code>nargs</code>parameter will tell
+howmany of them were provided on the XPath expression. The macro valuePop
+willextract them from the XPath stack:</p>
+<pre>#include &lt;libxml/xpath.h&gt;
+#include &lt;libxml/xpathInternals.h&gt;
+
+xmlXPathObjectPtr obj = valuePop(ctxt); </pre>
+
+<p>Note that <code>ctxt</code>is the XPath context not the XSLT one. It
+isthen possible to examine the content of the value. Check <a
+href="internals.html#Descriptio">the description of XPath
+objects</a>ifnecessary. The following is a common sequence checking whether
+the argumentpassed is a string and converting it using the built-in
+XPath<code>string()</code>function if this is not the case:</p>
+<pre>if (obj-&gt;type != XPATH_STRING) {
+    valuePush(ctxt, obj);
+    xmlXPathStringFunction(ctxt, 1);
+    obj = valuePop(ctxt);
+}</pre>
+
+<p>Most common XPath functions are available directly at the C level and
+areexported either in <code>&lt;libxml/xpath.h&gt;</code>or
+in<code>&lt;libxml/xpathInternals.h&gt;</code>.</p>
+
+<p>The extension function may also need to retrieve the data associated
+tothis module instance (the database connection in the previous example)
+thiscan be done using the xsltGetExtData:</p>
+<pre>void * xsltGetExtData(xsltTransformContextPtr ctxt,
+                      const xmlChar *URI);</pre>
+
+<p>Again the URI to be provided is the one which was used when registeringthe
+module.</p>
+
+<p>Once the function finishes, don't forget to:</p>
+<ul>
+  <li>push the return value on the stack using
+    <code>valuePush(ctxt,obj)</code></li>
+  <li>deallocate the parameters passed to the function
+    using<code>xmlXPathFreeObject(obj)</code></li>
+</ul>
+
+<h3><a name="Examples">Examples for extension functions</a></h3>
+
+<p>The module libxslt/functions.c contains the sources of the XSLT
+built-infunctions, including document(), key(), generate-id(), etc. as well
+as a fullexample module at the end. Here is the test function implementation
+for thelibxslt:test function:</p>
+<pre>/**
+ * xsltExtFunctionTest:
+ * @ctxt:  the XPath Parser context
+ * @nargs:  the number of arguments
+ *
+ * function libxslt:test() for testing the extensions support.
+ */
+static void
+xsltExtFunctionTest(xmlXPathParserContextPtr ctxt, int nargs)
+{
+    xsltTransformContextPtr tctxt;
+    void *data;
+
+    tctxt = xsltXPathGetTransformContext(ctxt);
+    if (tctxt == NULL) {
+        xsltGenericError(xsltGenericErrorContext,
+            "xsltExtFunctionTest: failed to get the transformation context\n");
+        return;
+    }
+    data = xsltGetExtData(tctxt, (const xmlChar *) XSLT_DEFAULT_URL);
+    if (data == NULL) {
+        xsltGenericError(xsltGenericErrorContext,
+            "xsltExtFunctionTest: failed to get module data\n");
+        return;
+    }
+#ifdef WITH_XSLT_DEBUG_FUNCTION
+    xsltGenericDebug(xsltGenericDebugContext,
+                     "libxslt:test() called with %d args\n", nargs);
+#endif
+}</pre>
+
+<h3><a name="Registerin2">Registering an extension element</a></h3>
+
+<p>There is a single call to do this registration:</p>
+<pre>int xsltRegisterExtElement(xsltTransformContextPtr ctxt,
+                           const xmlChar *name,
+                           const xmlChar *URI,
+                           xsltTransformFunction function);</pre>
+
+<p>It is similar to the mechanism used to register an extension
+function,except that the signature of an extension element implementation
+isdifferent.</p>
+
+<p>The registration is bound to a single transformation instance referred
+toby ctxt, name is the UTF8 encoded name for the NCName of the element, and
+URIis the namespace name for the extension (no checking is done, a module
+couldregister elements for a different namespace, but it is not
+recommended).</p>
+
+<h3><a name="Implementi1">Implementing an extension element</a></h3>
+
+<p>The implementation of the element must have the signature of an
+XSLTtransformation function:</p>
+<pre>/** 
+ * xsltTransformFunction: 
+ * @ctxt: the XSLT transformation context
+ * @node: the input node
+ * @inst: the stylesheet node 
+ * @comp: the compiled information from the stylesheet 
+ * 
+ * signature of the function associated to elements part of the
+ * stylesheet language like xsl:if or xsl:apply-templates.
+ */ 
+typedef void (*xsltTransformFunction)
+                          (xsltTransformContextPtr ctxt,
+                           xmlNodePtr node,
+                           xmlNodePtr inst,
+                           xsltStylePreCompPtr comp);</pre>
+
+<p>The first argument is the XSLT transformation context. The second andthird
+arguments are xmlNodePtr i.e. internal memory <a
+href="internals.html#libxml">representation of  XML nodes</a>. They
+arerespectively <code>node</code>from the the input document being
+transformedby the stylesheet and <code>inst</code>the extension element in
+thestylesheet. The last argument is <code>comp</code>a pointer to a
+precompiledrepresentation of <code>inst</code>but usually for an extension
+functionthis value is <code>NULL</code>by default (it could be added and
+associatedto the instruction in <code>inst-&gt;_private</code>).</p>
+
+<p>The same functions are available from a function implementing an
+extensionelement as in an extension function,
+including<code>xsltGetExtData()</code>.</p>
+
+<p>The goal of an extension element being usually to enrich the
+generatedoutput, it is expected that they will grow the currently generated
+outputtree. This can be done by grabbing ctxt-&gt;insert which is the
+currentlibxml node being generated (Note this can also be the intermediate
+valuetree being built for example to initialize a variable, the processing
+shouldbe similar). The functions for libxml tree manipulation from <a
+href="http://xmlsoft.org/html/libxml-tree.html">&lt;libxml/tree.h&gt;</a>canbe
+employed to extend or modify the tree, but it is required to preserve
+theinsertion node and its ancestors since there are existing pointers to
+thoseelements still in use in the XSLT template execution stack.</p>
+
+<h3><a name="Example">Example for extension elements</a></h3>
+
+<p>The module libxslt/transform.c contains the sources of the XSLT
+built-inelements, including xsl:element, xsl:attribute, xsl:if, etc. There is
+a smallbut full example in functions.c providing the implementation for
+thelibxslt:test element, it will output a comment in the result tree:</p>
+<pre>/**
+ * xsltExtElementTest:
+ * @ctxt:  an XSLT processing context
+ * @node:  The current node
+ * @inst:  the instruction in the stylesheet
+ * @comp:  precomputed informations
+ *
+ * Process a libxslt:test node
+ */
+static void
+xsltExtElementTest(xsltTransformContextPtr ctxt, xmlNodePtr node,
+                   xmlNodePtr inst,
+                   xsltStylePreCompPtr comp)
+{
+    xmlNodePtr comment;
+
+    if (ctxt == NULL) {
+        xsltGenericError(xsltGenericErrorContext,
+                         "xsltExtElementTest: no transformation context\n");
+        return;
+    }
+    if (node == NULL) {
+        xsltGenericError(xsltGenericErrorContext,
+                         "xsltExtElementTest: no current node\n");
+        return;
+    }
+    if (inst == NULL) {
+        xsltGenericError(xsltGenericErrorContext,
+                         "xsltExtElementTest: no instruction\n");
+        return;
+    }
+    if (ctxt-&gt;insert == NULL) {
+        xsltGenericError(xsltGenericErrorContext,
+                         "xsltExtElementTest: no insertion point\n");
+        return;
+    }
+    comment =
+        xmlNewComment((const xmlChar *)
+                      "libxslt:test element test worked");
+    xmlAddChild(ctxt-&gt;insert, comment);
+}</pre>
+
+<h3><a name="shutdown">The shutdown of a module</a></h3>
+
+<p>When the XSLT processor ends a transformation, the shutdown function (ifit
+exists) for each of the modules initialized is called. 
+ThexsltExtShutdownFunction type defines the interface for a
+shutdownfunction:</p>
+<pre>/**
+ * xsltExtShutdownFunction:
+ * @ctxt:  an XSLT transformation context
+ * @URI:  the namespace URI for the extension
+ * @data:  the data associated to this module
+ *
+ * A function called at shutdown time of an XSLT extension module
+ */
+typedef void (*xsltExtShutdownFunction) (xsltTransformContextPtr ctxt,
+                                         const xmlChar *URI,
+                                         void *data);</pre>
+
+<p>This is really similar to a module initialization function except a
+thirdargument is passed, it's the value that was returned by the
+initializationfunction. This allows the routine to deallocate resources from
+the module forexample close the connection to the database to keep the same
+example.</p>
+
+<h3><a name="Future">Future work</a></h3>
+
+<p>Well, some of the pieces missing:</p>
+<ul>
+  <li>a way to load shared libraries to instantiate new modules</li>
+  <li>a better detection of extension functions usage and their
+    registrationwithout having to use the extension prefix which ought to be
+    reserved toelement extensions.</li>
+  <li>more examples</li>
+  <li>implementations of the <a
+    href="http://www.exslt.org/">EXSLT</a>commonextension libraries, Thomas
+    Broyer nearly finished implementing them.</li>
+</ul>
+
+<p></p>
+
+<h2><a name="Contributi">Contributions</a></h2>
+<ul>
+  <li>Bjorn Reese is the author of the number support and worked on
+    theXSLTMark support</li>
+  <li>William Brack was an early adopted, contributed a number of patches
+    andspent quite some time debugging non-trivial problems in early versions
+    oflibxslt</li>
+  <li><a href="mailto:igor@zlatkovic.com">Igor  Zlatkovic</a>is now
+    themaintainer of the Windows port, <a
+    href="http://www.zlatkovic.com/projects/libxml/index.html">he
+    providesbinaries</a></li>
+  <li>Thomas Broyer provided a lot of suggestions, and drafted most of
+    theextension API</li>
+  <li>John Fleck maintains <a href="tutorial/libxslttutorial.html">a
+    tutorialfor libxslt</a></li>
+  <li><a
+    href="http://mail.gnome.org/archives/xml/2001-March/msg00014.html">MattSergeant</a>developed
+    <a href="http://axkit.org/download/">XML::LibXSLT</a>, a perl wrapper
+    forlibxml2/libxslt as part of the <a href="http://axkit.com/">AxKit
+    XMLapplication server</a></li>
+  <li>there is a module for <a
+    href="http://acs-misc.sourceforge.net/nsxml.html">libxml/libxslt
+    supportin OpenNSD/AOLServer</a></li>
+  <li><a href="mailto:dkuhlman@cutter.rexx.com">Dave
+    Kuhlman</a>provideslibxml/libxslt <a
+    href="http://www.rexx.com/~dkuhlman">wrappers forPython</a></li>
+  <li><a href="mailto:Steve.Ball@explain.com.au">Steve Ball</a>,
+    andcontributors maintain <a
+    href="http://tclxml.sourceforge.net/">tclbindings for libxml2 and
+    libxslt</a>, as well as <a
+    href="http://tclxml.sf.net/tkxmllint.html">tkxmllint</a>a GUI forxmllint
+    and <a href="http://tclxml.sf.net/tkxsltproc.html">tkxsltproc</a>a GUI
+    for xsltproc.</li>
+  <li>If you want to use libxslt in a Mac OS X/Cocoa or Objective-Cframework,
+    Marc Liyanage provides <a
+    href="http://www.entropy.ch/software/macosx/#testxslt">an
+    applicationTestXSLT for XSLT and XML editing</a>including wrapper classes
+    for theXML parser and XSLT processor.</li>
+</ul>
+
+<p></p>
+
+<p><a href="mailto:daniel@veillard.com">Daniel Veillard</a></p>
+</body>
+</html>

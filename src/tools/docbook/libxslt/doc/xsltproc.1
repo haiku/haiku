@@ -1,0 +1,231 @@
+.\" ** You probably do not want to edit this file directly **
+.\" It was generated using the DocBook XSL Stylesheets (version 1.69.1).
+.\" Instead of manually editing it, you probably should edit the DocBook XML
+.\" source for it and then use the DocBook XSL Stylesheets to regenerate it.
+.TH "XSLTPROC" "1" "2006\-03\-05" "libxslt" ""
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.SH "NAME"
+xsltproc \- command line XSLT processor
+.SH "SYNOPSIS"
+.HP 9
+\fBxsltproc\fR [[\fB\-V\fR \fB\-\-version\fR] [\fB\-v\fR \fB\-\-verbose\fR] [{\fB\-o\fR \fB\-\-output\fR} {\fIFILE\fR \fIDIRECTORY\fR}] \fB\-\-timing\fR \fB\-\-repeat\fR \fB\-\-debug\fR \fB\-\-novalid\fR \fB\-\-noout\fR \fB\-\-maxdepth\ \fR\fB\fIVALUE\fR\fR \fB\-\-html\fR \fB\-\-param\ \fR\fB\fIPARAMNAME\fR\fR\fB\ \fR\fB\fIPARAMVALUE\fR\fR\fB\ \fR \fB\-\-stringparam\ \fR\fB\fIPARAMNAME\fR\fR\fB\ \fR\fB\fIPARAMVALUE\fR\fR\fB\ \fR \fB\-\-nonet\fR \fB\-\-path\ "\fR\fB\fIPATH(S)\fR\fR\fB"\fR \fB\-\-load\-trace\fR \fB\-\-catalogs\fR \fB\-\-xinclude\fR [\fB\-\-profile\fR\ \fB\-\-norman\fR] \fB\-\-dumpextensions\fR \fB\-\-nowrite\fR \fB\-\-nomkdir\fR \fB\-\-writesubtree\ \fR\fB\fIPATH\fR\fR \fB\-\-nodtdattr\fR] [\fISTYLESHEET\fR] {\fIXML\-FILE\fR \-}
+.SH "DESCRIPTION"
+.PP
+\fBxsltproc\fR
+is a command line tool for applying
+XSLT
+stylesheets to
+XML
+documents. It is part of
+\fBlibxslt\fR(3), the XSLT C library for GNOME. While it was developed as part of the GNOME project, it can operate independently of the GNOME desktop.
+.PP
+\fBxsltproc\fR
+is invoked from the command line with the name of the stylesheet to be used followed by the name of the file or files to which the stylesheet is to be applied. It will use the standard input if a filename provided is
+\fB\-\fR
+.
+.PP
+If a stylesheet is included in an
+XML
+document with a Stylesheet Processing Instruction, no stylesheet need to be named at the command line.
+\fBxsltproc\fR
+will automatically detect the included stylesheet and use it.
+.PP
+By default, output is to
+\fIstdout\fR. You can specify a file for output using the
+\fB\-o\fR
+or
+\fB\-\-output\fR
+option.
+.PP
+More information can be found at
+.TP 3
+\(bu
+\fBlibxml\fR(3)
+web page
+\fI\%http://www.xmlsoft.org/\fR
+.TP
+\(bu
+W3C
+XSLT
+page
+\fI\%http://www.w3.org/TR/xslt\fR
+.SH "OPTIONS"
+.PP
+\fBxsltproc\fR
+accepts the following options (in alphabetical order):
+.TP
+\fB\-\-catalogs\fR
+Use the
+SGML
+catalog specified in
+\fBSGML_CATALOG_FILES\fR
+to resolve the location of external entities. By default,
+\fBxsltproc\fR
+looks for the catalog specified in
+\fBXML_CATALOG_FILES\fR. If that is not specified, it uses
+\fI/etc/xml/catalog\fR.
+.TP
+\fB\-\-debug\fR
+Output an
+XML
+tree of the transformed document for debugging purposes.
+.TP
+\fB\-\-dumpextensions\fR
+Dumps the list of all registered extensions on
+\fIstdout\fR.
+.TP
+\fB\-\-html\fR
+The input document is an
+HTML
+file.
+.TP
+\fB\-\-load\-trace\fR
+Display all the documents loaded during the processing to
+\fIstderr\fR.
+.TP
+\fB\-\-maxdepth \fR\fB\fIVALUE\fR\fR
+Adjust the maximum depth of the template stack before
+\fBlibxslt\fR(3)
+concludes it is in an infinite loop. The default is 500.
+.TP
+\fB\-\-nodtdattr\fR
+Do not apply default attributes from the document's
+DTD.
+.TP
+\fB\-\-nomkdir\fR
+Refuses to create directories.
+.TP
+\fB\-\-nonet\fR
+Do not use the Internet to fetch
+DTDs, entities or documents.
+.TP
+\fB\-\-noout\fR
+Do not output the result.
+.TP
+\fB\-\-novalid\fR
+Skip loading the document's
+DTD.
+.TP
+\fB\-\-nowrite\fR
+Refuses to write to any file or resource.
+.TP
+\fB\-o\fR or \fB\-\-output\fR \fIFILE\fR | \fIDIRECTORY\fR
+Direct output to the given
+\fIFILE\fR. Using the option with a
+\fIDIRECTORY\fR
+directs the output files to the specified directory. This can be useful for multiple outputs (also known as "chunking") or manpage processing.
+\fBNote:\fR
+The given directory
+\fBmust\fR
+already exist.
+.TP
+\fB\-\-param \fR\fB\fIPARAMNAME\fR\fR\fB \fR\fB\fIPARAMVALUE\fR\fR
+Pass a parameter of name
+\fIPARAMNAME\fR
+and value
+\fIPARAMVALUE\fR
+to the stylesheet. You may pass multiple name/value pairs up to a maximum of 32. If the value being passed is a string rather than a node identifier, use
+\fB\-\-stringparam\fR
+instead.
+.TP
+\fB\-\-path "\fR\fB\fIPATH(S)\fR\fR\fB"\fR
+Use the (space\- or colon\-separated) list of filesystem paths specified by
+\fIPATHS\fR
+to load
+DTDs, entities or documents. Enclose space\-separated lists by quotation marks.
+.TP
+\fB\-\-profile\fR or \fB\-\-norman\fR
+Output profiling information detailing the amount of time spent in each part of the stylesheet. This is useful in optimizing stylesheet performance.
+.TP
+\fB\-\-repeat\fR
+Run the transformation 20 times. Used for timing tests.
+.TP
+\fB\-\-stringparam \fR\fB\fIPARAMNAME\fR\fR\fB \fR\fB\fIPARAMVALUE\fR\fR
+Pass a paramenter of name
+\fIPARAMNAME\fR
+and value
+\fIPARAMVALUE\fR
+where
+\fIPARAMVALUE\fR
+is a string rather than a node identifier.
+\fBNote:\fR
+The string must be UTF\-8 encoded.
+.TP
+\fB\-\-timing\fR
+Display the time used for parsing the stylesheet, parsing the document and applying the stylesheet and saving the result. Displayed in milliseconds.
+.TP
+\fB\-v\fR or \fB\-\-verbose\fR
+Output each step taken by
+\fBxsltproc\fR
+in processing the stylesheet and the document.
+.TP
+\fB\-V\fR or \fB\-\-version\fR
+Show the version of
+\fBlibxml\fR(3)
+and
+\fBlibxslt\fR(3)
+used.
+.TP
+\fB\-\-writesubtree \fR\fB\fIPATH\fR\fR
+Allow file write only within the
+\fIPATH\fR
+subtree.
+.TP
+\fB\-\-xinclude\fR
+Process the input document using the Xinclude specification. More details on this can be found in the Xinclude specification:
+\fI\%http://www.w3.org/TR/xinclude/\fR
+.SH "ENVIRONMENT"
+.TP
+\fBSGML_CATALOG_FILES\fR
+to be written ...
+.TP
+\fBXML_CATALOG_FILES\fR
+Catalog behavior can be changed by redirecting queries to the user's own set of catalogs. This can be done by setting the
+\fBXML_CATALOG_FILES\fR
+environment variable to a list of catalogs. An empty one should deactivate loading the default
+\fI/etc/xml/catalog\fR
+default catalog.
+.SH "DIAGNOSTICS"
+.PP
+\fBxsltproc\fR's return codes provide information that can be used when calling it from scripts.
+.TP
+\fB0\fR
+No error (normal operation)
+.TP
+\fB1\fR
+No argument
+.TP
+\fB2\fR
+Too many parameters
+.TP
+\fB3\fR
+Unknown option
+.TP
+\fB4\fR
+Failed to parse the stylesheet
+.TP
+\fB5\fR
+Error in the stylesheet
+.TP
+\fB6\fR
+Error in one of the documents
+.TP
+\fB7\fR
+Unsupported xsl:output method
+.TP
+\fB8\fR
+String parameter contains both quote and double\-quotes
+.TP
+\fB9\fR
+Internal processing error
+.TP
+\fB10\fR
+Processing was stopped by a terminating message
+.SH "SEE ALSO"
+.PP
+\fBlibxslt\fR(3)
+.SH "AUTHOR"
+John Fleck <jfleck@inkstain.net>. 
