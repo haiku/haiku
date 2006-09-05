@@ -1,4 +1,0 @@
-<root>
-  <child>      <p>Thar be whitespace!</p>     </child>
-  <child xmlns="http://example.com/ns">     <p>Thar be whitespace!</p>      </child>
-</root>

@@ -1,3 +1,0 @@
-<html xmlns:foo="http://borland.com/bogus">
-<foo:whatever>one</foo:whatever><foo:whatever>two</foo:whatever><foo:whatever>three</foo:whatever><foo:whatever>four</foo:whatever>
-</html>

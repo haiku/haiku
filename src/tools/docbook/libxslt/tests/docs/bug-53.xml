@@ -1,6 +1,0 @@
-<!DOCTYPE doc [
-<!ELEMENT doc EMPTY>
-<!ATTLIST doc
-   defatt (SUCCESS|FAILURE) "SUCCESS">
-]>
-<doc/>
