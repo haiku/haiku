@@ -23,7 +23,6 @@
 #include <ByteOrder.h>
 #include <fs_cache.h>
 
-#include "lock.h"
 #include "rock.h"
 #include "iso.h"
 
