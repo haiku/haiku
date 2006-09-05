@@ -1,0 +1,1415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book
+  PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="slides_doc">
+<bookinfo>
+<title>Slides Parameter Reference</title>
+<releaseinfo role="meta">
+$Id: param.xweb,v 1.7 2006/04/06 03:00:24 xmldoc Exp $
+</releaseinfo>
+<author>
+  <surname>Walsh</surname>
+  <firstname>Norman</firstname>
+</author>
+<copyright>
+  <year>2002</year>
+  <holder>Norman Walsh</holder>
+</copyright>
+</bookinfo>
+
+<preface><title>Introduction</title>
+
+<para>This is reference documentation for all user-configurable
+parameters in the DocBook XSL Slides stylesheets (for generating
+output from DocBook Slides documents).</para>
+
+<para>This reference describes each of the parameters.
+These are the <quote>easily customizable</quote> parts of the stylesheet.
+If you want to specify an alternate value for one or more of these
+parameters, you can do so in a <quote>driver</quote> stylesheet.</para>
+
+<para>For example, if you want to change the <literal>keyboard.nav</literal>
+parameter to <filename>0</filename>, you might create a driver
+stylesheet like this:</para>
+
+<programlisting>&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version='1.0'&gt;
+
+  &lt;xsl:import href="http://docbook.sourceforge.net/release/slides/current/xsl/slides.xsl"/&gt;
+
+  &lt;xsl:param name="keyboard.nav" select="0"/&gt;
+
+&lt;/xsl:stylesheet&gt;</programlisting>
+
+<para>Naturally, you have to change the
+<sgmltag class="attribute">href</sgmltag> attribute on
+<literal>&lt;xsl:import&gt;</literal> to point to the stylesheet
+on your system.</para>
+</preface>
+<part id="html_output">
+<title>Slides FO Parameters</title>
+<preface>
+<title>[none]</title>
+  <para>There currently are no Slides parameters for FO
+  output.</para>
+</preface>
+</part>
+
+<part id="html_output">
+<title>Slides HTML Parameters</title>
+<reference id="html_general">
+<title>General Parameters</title>
+
+<refentry id="keyboard.nav">
+<refmeta>
+<refentrytitle>keyboard.nav</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>keyboard.nav</refname>
+<refpurpose>Enable keyboard navigation?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="keyboard.nav.frag">
+&lt;xsl:param name="keyboard.nav" select="1"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, JavaScript is added to the slides to enable keyboard
+navigation. Pressing 'n', space, or return moves forward; pressing 'p' moves
+backward.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="css.stylesheet">
+<refmeta>
+<refentrytitle>css.stylesheet</refentrytitle>
+<refmiscinfo role="type">URI</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>css.stylesheet</refname>
+<refpurpose>CSS stylesheet for slides</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="css.stylesheet.frag">
+&lt;xsl:param name="css.stylesheet" select="'slides.css'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Identifies the CSS stylesheet used by all the slides. This parameter
+can be set in the source document with the &lt;?dbhtml?&gt; pseudo-attribute
+<literal>css-stylesheet</literal>.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="css.stylesheet.dir">
+<refmeta>
+<refentrytitle>css.stylesheet.dir</refentrytitle>
+<refmiscinfo role="type">URI</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>css.stylesheet.dir</refname>
+<refpurpose>Default directory for CSS stylesheets</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="css.stylesheet.dir.frag">
+&lt;xsl:param name="css.stylesheet.dir" select="''"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Identifies the default directory for the CSS stylesheet
+generated on all the slides. This parameter can be set in the source
+document with the &lt;?dbhtml?&gt; pseudo-attribute
+<literal>css-stylesheet-dir</literal>.</para>
+
+<para>If non-empty, this value is prepended to each of the stylesheets.
+</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="titlefoil.html">
+<refmeta>
+<refentrytitle>titlefoil.html</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>titlefoil.html</refname>
+<refpurpose>Name of title foil HTML file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="titlefoil.html.frag">
+&lt;xsl:param name="titlefoil.html" select="concat('index', $html.ext)"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Sets the filename used for the slides titlepage.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="toc.html">
+<refmeta>
+<refentrytitle>toc.html</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>toc.html</refname>
+<refpurpose>Name of ToC HTML file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="toc.html.frag">
+&lt;xsl:param name="toc.html" select="concat('toc', $html.ext)"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Sets the filename used for the table of contents page.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="foilgroup.toc">
+<refmeta>
+<refentrytitle>foilgroup.toc</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>foilgroup.toc</refname>
+<refpurpose>Put ToC on foilgroup pages?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="foilgroup.toc.frag">
+&lt;xsl:param name="foilgroup.toc" select="1"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, a ToC will be placed on foilgroup pages (after any
+other content).
+</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="output.indent">
+<refmeta>
+<refentrytitle>output.indent</refentrytitle>
+<refmiscinfo role="type">list</refmiscinfo>
+<refmiscinfo role="value">no</refmiscinfo>
+<refmiscinfo role="value">yes</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>output.indent</refname>
+<refpurpose>Indent output?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="output.indent.frag">
+&lt;xsl:param name="output.indent" select="'no'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the setting of the <parameter>indent</parameter> parameter
+on the HTML slides. For more information, see the discussion of the
+<sgmltag>xsl:output</sgmltag> element in the XSLT specification.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="overlay">
+<refmeta>
+<refentrytitle>overlay</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>overlay</refname>
+<refpurpose>Overlay footer navigation?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="overlay.frag">
+&lt;xsl:param name="overlay" select="0"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, JavaScript is added to the slides to make the
+bottom navigation appear at the bottom of each page. This option and
+<link linkend="multiframe">multiframe</link> are mutually exclusive.</para>
+
+<para>If this parameter is zero, the bottom navigation simply appears
+below the content of each slide.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="show.foil.number">
+<refmeta>
+<refentrytitle>show.foil.number</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>show.foil.number</refname>
+<refpurpose>Show foil number on each foil?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="show.foil.number.frag">
+&lt;xsl:param name="show.foil.number" select="0"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, on each slide there will be its number. Currently
+not supported in all output formats.</para>
+
+</refsect1>
+</refentry>
+
+</reference>
+
+<reference>
+<title>Frame Parameters</title>
+
+<refentry id="nav.separator">
+<refmeta>
+<refentrytitle>nav.separator</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>nav.separator</refname>
+<refpurpose>Output separator between navigation and body?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="nav.separator.frag">
+&lt;xsl:param name="nav.separator" select="1"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, a separator (<literal>&lt;HR&gt;</literal>) is
+added between the navigation links and the content of each slide.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="toc.row.height">
+<refmeta>
+<refentrytitle>toc.row.height</refentrytitle>
+<refmiscinfo role="type">length</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>toc.row.height</refname>
+<refpurpose>Height of ToC rows in dynamic ToCs</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="toc.row.height.frag">
+&lt;xsl:param name="toc.row.height" select="22"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>This parameter specifies the height of each row in the table of
+contents. This is only applicable if a <link linkend="dynamic.toc">dynamic ToC</link> is used. You may want to
+adjust this parameter for optimal appearance with the font and image sizes
+selected by your <link linkend="css.stylesheet">CSS stylesheet</link>.
+</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="toc.bg.color">
+<refmeta>
+<refentrytitle>toc.bg.color</refentrytitle>
+<refmiscinfo role="type">color</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>toc.bg.color</refname>
+<refpurpose>Background color for ToC frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="toc.bg.color.frag">
+&lt;xsl:param name="toc.bg.color" select="'#FFFFFF'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the background color used in the ToC frame.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="body.bg.color">
+<refmeta>
+<refentrytitle>body.bg.color</refentrytitle>
+<refmiscinfo role="type">color</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>body.bg.color</refname>
+<refpurpose>Background color for body frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="body.bg.color.frag">
+&lt;xsl:param name="body.bg.color" select="'#FFFFFF'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the background color used in the body column of tabular slides.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="toc.width">
+<refmeta>
+<refentrytitle>toc.width</refentrytitle>
+<refmiscinfo role="type">length</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>toc.width</refname>
+<refpurpose>Width of ToC frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="toc.width.frag">
+&lt;xsl:param name="toc.width" select="250"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the width of the ToC frame.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="toc.hide.show">
+<refmeta>
+<refentrytitle>toc.hide.show</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>toc.hide.show</refname>
+<refpurpose>Enable hide/show button for ToC frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="toc.hide.show.frag">
+&lt;xsl:param name="toc.hide.show" select="0"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, JavaScript (and an additional icon, see
+<link linkend="hidetoc.image">hidetoc.image</link> and
+<link linkend="hidetoc.image">showtoc.image</link>) is added to each slide
+to allow the ToC panel to be <quote>toggled</quote> on each panel.</para>
+
+<note><para>There is a bug in Mozilla 1.0 (at least as of CR3) that causes
+the browser to reload the titlepage when this feature is used.</para></note>
+
+</refsect1>
+</refentry>
+
+<refentry id="dynamic.toc">
+<refmeta>
+<refentrytitle>dynamic.toc</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>dynamic.toc</refname>
+<refpurpose>Dynamic ToCs?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="dynamic.toc.frag">
+&lt;xsl:param name="dynamic.toc" select="0"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, JavaScript is used to make the ToC panel <quote>dynamic</quote>.
+In a dynamic ToC, each section in the ToC can be expanded and collapsed by
+clicking on the appropriate image.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="active.toc">
+<refmeta>
+<refentrytitle>active.toc</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>active.toc</refname>
+<refpurpose>Active ToCs?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="active.toc.frag">
+&lt;xsl:param name="active.toc" select="0"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, JavaScript is used to keep the ToC and the current slide
+<quote>in sync</quote>. That is, each time the slide changes, the corresponding
+ToC entry will be underlined.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="overlay.logo">
+<refmeta>
+<refentrytitle>overlay.logo</refentrytitle>
+<refmiscinfo role="type">URI</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>overlay.logo</refname>
+<refpurpose>Logo to overlay on ToC frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="overlay.logo.frag">
+&lt;xsl:param name="overlay.logo" select="'http://docbook.sourceforge.net/release/buttons/slides-1.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If this URI is non-empty, JavaScript is used to overlay the
+specified image on the ToC frame.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="multiframe">
+<refmeta>
+<refentrytitle>multiframe</refentrytitle>
+<refmiscinfo role="type">boolean</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>multiframe</refname>
+<refpurpose>Use multiple frames for slide bodies?</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="multiframe.frag">
+&lt;xsl:param name="multiframe" select="0"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>If non-zero, multiple frames are used for the body of each
+slide. This is one way of forcing the slide navigation elements to
+appear in constant locations. The other way is with <link linkend="overlay">overlays</link>. The <link linkend="overlay"><parameter>overlay</parameter></link> and
+<parameter>multiframe</parameter> parameters are mutually
+exclusive.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="multiframe.top.bgcolor">
+<refmeta>
+<refentrytitle>multiframe.top.bgcolor</refentrytitle>
+<refmiscinfo role="type">color</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>multiframe.top.bgcolor</refname>
+<refpurpose>Background color for top navigation frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="multiframe.top.bgcolor.frag">
+&lt;xsl:param name="multiframe.top.bgcolor" select="'white'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the background color of the top navigation frame when
+<link linkend="multiframe">multiframe</link> is enabled.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="multiframe.bottom.bgcolor">
+<refmeta>
+<refentrytitle>multiframe.bottom.bgcolor</refentrytitle>
+<refmiscinfo role="type">color</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>multiframe.bottom.bgcolor</refname>
+<refpurpose>Background color for bottom navigation frame</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="multiframe.bottom.bgcolor.frag">
+&lt;xsl:param name="multiframe.bottom.bgcolor" select="'white'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the background color of the bottom navigation frame when
+<link linkend="multiframe">multiframe</link> is enabled.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="multiframe.navigation.height">
+<refmeta>
+<refentrytitle>multiframe.navigation.height</refentrytitle>
+<refmiscinfo role="type">length</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>multiframe.navigation.height</refname>
+<refpurpose>Height of navigation frames</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="multiframe.navigation.height.frag">
+&lt;xsl:param name="multiframe.navigation.height" select="40"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the height of the navigation frames when
+<link linkend="multiframe">multiframe</link> is enabled.</para>
+
+</refsect1>
+</refentry>
+
+</reference>
+
+<reference>
+<title>Graphics Parameters</title>
+
+<refentry id="graphics.dir">
+<refmeta>
+<refentrytitle>graphics.dir</refentrytitle>
+<refmiscinfo role="type">URI</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>graphics.dir</refname>
+<refpurpose>Graphics directory</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="graphics.dir.frag">
+&lt;xsl:param name="graphics.dir" select="''"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Identifies the graphics directory for the navigation components
+generated on all the slides. This parameter can be set in the source
+document with the &lt;?dbhtml?&gt; pseudo-attribute
+<literal>graphics-dir</literal>.</para>
+
+<para>If non-empty, this value is prepended to each of the graphic
+image paths.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="bullet.image">
+<refmeta>
+<refentrytitle>bullet.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>bullet.image</refname>
+<refpurpose>Bullet image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="bullet.image.frag">
+&lt;xsl:param name="bullet.image" select="'toc/bullet.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the bullet image used for foils in the
+framed ToC.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="next.image">
+<refmeta>
+<refentrytitle>next.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>next.image</refname>
+<refpurpose>Right-arrow image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="next.image.frag">
+&lt;xsl:param name="next.image" select="'active/nav-next.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the right-pointing navigation arrow.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="prev.image">
+<refmeta>
+<refentrytitle>prev.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>prev.image</refname>
+<refpurpose>Left-arrow image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="prev.image.frag">
+&lt;xsl:param name="prev.image" select="'active/nav-prev.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the left-pointing navigation arrow.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="up.image">
+<refmeta>
+<refentrytitle>up.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>up.image</refname>
+<refpurpose>Up-arrow image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="up.image.frag">
+&lt;xsl:param name="up.image" select="'active/nav-up.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the upward-pointing navigation arrow.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="home.image">
+<refmeta>
+<refentrytitle>home.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>home.image</refname>
+<refpurpose>Home image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="home.image.frag">
+&lt;xsl:param name="home.image" select="'active/nav-home.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the home navigation icon.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="toc.image">
+<refmeta>
+<refentrytitle>toc.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>toc.image</refname>
+<refpurpose>ToC image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="toc.image.frag">
+&lt;xsl:param name="toc.image" select="'active/nav-toc.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the ToC navigation icon.</para>
+
+</refsect1>
+</refentry>
+
+
+
+<refentry id="no.next.image">
+<refmeta>
+<refentrytitle>no.next.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>no.next.image</refname>
+<refpurpose>Inactive right-arrow image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="no.next.image.frag">
+&lt;xsl:param name="no.next.image" select="'inactive/nav-next.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the inactive right-pointing navigation arrow.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="no.prev.image">
+<refmeta>
+<refentrytitle>no.prev.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>no.prev.image</refname>
+<refpurpose>Inactive left-arrow image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="no.prev.image.frag">
+&lt;xsl:param name="no.prev.image" select="'inactive/nav-prev.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the inactive left-pointing navigation arrow.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="no.up.image">
+<refmeta>
+<refentrytitle>no.up.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>no.up.image</refname>
+<refpurpose>Inactive up-arrow image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="no.up.image.frag">
+&lt;xsl:param name="no.up.image" select="'inactive/nav-up.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the inactive upward-pointing navigation arrow.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="no.home.image">
+<refmeta>
+<refentrytitle>no.home.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>no.home.image</refname>
+<refpurpose>Inactive home image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="no.home.image.frag">
+&lt;xsl:param name="no.home.image" select="'inactive/nav-home.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the inactive home navigation icon.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="no.toc.image">
+<refmeta>
+<refentrytitle>no.toc.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>no.toc.image</refname>
+<refpurpose>Inactive ToC image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="no.toc.image.frag">
+&lt;xsl:param name="no.toc.image" select="'inactive/nav-toc.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the inactive ToC navigation icon.</para>
+
+</refsect1>
+</refentry>
+
+
+
+<refentry id="plus.image">
+<refmeta>
+<refentrytitle>plus.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>plus.image</refname>
+<refpurpose>Plus image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="plus.image.frag">
+&lt;xsl:param name="plus.image" select="'toc/closed.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the <quote>plus</quote> image; the image used in a
+<link linkend="dynamic.toc">dynamic ToC</link> to indicate that a section
+can be expanded.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="minus.image">
+<refmeta>
+<refentrytitle>minus.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>minus.image</refname>
+<refpurpose>Minus image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="minus.image.frag">
+&lt;xsl:param name="minus.image" select="'toc/open.png'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the <quote>minus</quote> image; the image used in a
+<link linkend="dynamic.toc">dynamic ToC</link> to indicate that a section
+can be collapsed.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="hidetoc.image">
+<refmeta>
+<refentrytitle>hidetoc.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>hidetoc.image</refname>
+<refpurpose>Hide ToC image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="hidetoc.image.frag">
+&lt;xsl:param name="hidetoc.image" select="'hidetoc.gif'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the <quote>hide ToC</quote> image. This is used
+when the <link linkend="toc.hide.show">ToC hide/show</link> parameter is
+enabled.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="showtoc.image">
+<refmeta>
+<refentrytitle>showtoc.image</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>showtoc.image</refname>
+<refpurpose>Show ToC image</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="showtoc.image.frag">
+&lt;xsl:param name="showtoc.image" select="'showtoc.gif'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the <quote>show ToC</quote> image. This is used
+when the <link linkend="toc.hide.show">ToC hide/show</link> parameter is
+enabled.</para>
+
+</refsect1>
+</refentry>
+
+</reference>
+
+<reference>
+<title>JavaScript Parameters</title>
+
+<refentry id="script.dir">
+<refmeta>
+<refentrytitle>script.dir</refentrytitle>
+<refmiscinfo role="type">URI</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>script.dir</refname>
+<refpurpose>Script directory</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="script.dir.frag">
+&lt;xsl:param name="script.dir" select="''"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Identifies the JavaScript source directory for the slides.
+This parameter can be set in the source
+document with the &lt;?dbhtml?&gt; pseudo-attribute
+<literal>script-dir</literal>.</para>
+
+<para>If non-empty, this value is prepended to each of the JavaScript files.
+</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="ua.js">
+<refmeta>
+<refentrytitle>ua.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>ua.js</refname>
+<refpurpose>UA JavaScript file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="ua.js.frag">
+&lt;xsl:param name="ua.js" select="'ua.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the UA JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="xbDOM.js">
+<refmeta>
+<refentrytitle>xbDOM.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>xbDOM.js</refname>
+<refpurpose>xbDOM JavaScript file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="xbDOM.js.frag">
+&lt;xsl:param name="xbDOM.js" select="'xbDOM.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the xbDOM JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="xbStyle.js">
+<refmeta>
+<refentrytitle>xbStyle.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>xbStyle.js</refname>
+<refpurpose>xbStyle JavaScript file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="xbStyle.js.frag">
+&lt;xsl:param name="xbStyle.js" select="'xbStyle.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the xbStyle JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="xbLibrary.js">
+<refmeta>
+<refentrytitle>xbLibrary.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>xbLibrary.js</refname>
+<refpurpose>xbLibrary JavaScript file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="xbLibrary.js.frag">
+&lt;xsl:param name="xbLibrary.js" select="'xbLibrary.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the xbLibrary JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="xbCollapsibleLists.js">
+<refmeta>
+<refentrytitle>xbCollapsibleLists.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>xbCollapsibleLists.js</refname>
+<refpurpose>xbCollapsibleLists JavaScript file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="xbCollapsibleLists.js.frag">
+&lt;xsl:param name="xbCollapsibleLists.js" select="'xbCollapsibleLists.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the xbCollapsibleLists JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="overlay.js">
+<refmeta>
+<refentrytitle>overlay.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>overlay.js</refname>
+<refpurpose>Overlay JavaScript file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="overlay.js.frag">
+&lt;xsl:param name="overlay.js" select="'overlay.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the overlay JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="slides.js">
+<refmeta>
+<refentrytitle>slides.js</refentrytitle>
+<refmiscinfo role="type">filename</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>slides.js</refname>
+<refpurpose>Slides overlay file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="slides.js.frag">
+&lt;xsl:param name="slides.js" select="'slides.js'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>Specifies the filename of the slides JavaScript file. It's unlikely
+that you will ever need to change this parameter.</para>
+
+</refsect1>
+</refentry>
+</reference>
+
+<reference>
+<title>Localization Parameters</title>
+
+<refentry id="text.home">
+<refmeta>
+<refentrytitle>text.home</refentrytitle>
+<refmiscinfo role="type">string</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>text.home</refname>
+<refpurpose>Home</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="text.home.frag">
+&lt;xsl:param name="text.home" select="'Home'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>FIXME:</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="text.toc">
+<refmeta>
+<refentrytitle>text.toc</refentrytitle>
+<refmiscinfo role="type">string</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>text.toc</refname>
+<refpurpose>FIXME:</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="text.toc.frag">
+&lt;xsl:param name="text.toc" select="'ToC'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>FIXME:</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="text.prev">
+<refmeta>
+<refentrytitle>text.prev</refentrytitle>
+<refmiscinfo role="type">string</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>text.prev</refname>
+<refpurpose>FIXME:</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="text.prev.frag">
+&lt;xsl:param name="text.prev" select="'Prev'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>FIXME:</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="text.up">
+<refmeta>
+<refentrytitle>text.up</refentrytitle>
+<refmiscinfo role="type">string</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>text.up</refname>
+<refpurpose>FIXME:</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="text.up.frag">
+&lt;xsl:param name="text.up" select="'Up'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>FIXME:</para>
+
+</refsect1>
+</refentry>
+
+<refentry id="text.next">
+<refmeta>
+<refentrytitle>text.next</refentrytitle>
+<refmiscinfo role="type">string</refmiscinfo>
+</refmeta>
+<refnamediv>
+<refname>text.next</refname>
+<refpurpose>FIXME:</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<programlisting id="text.next.frag">
+&lt;xsl:param name="text.next" select="'Next'"&gt;&lt;/xsl:param&gt;
+</programlisting>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+
+<para>FIXME:</para>
+
+</refsect1>
+</refentry>
+
+
+
+</reference>
+</part>
+
+<appendix><title>The Stylesheet</title>
+
+<para>The <filename>param.xsl</filename> stylesheet is just a wrapper
+around all these parameters.</para>
+
+<programlisting id="top">
+
+&lt;!-- This file is generated from param.xweb; do not edit this file! --&gt;
+
+&lt;xsl:stylesheet exclude-result-prefixes="src" version="1.0"&gt;
+
+&lt;!-- ********************************************************************
+     $Id: param.xweb,v 1.7 2006/04/06 03:00:24 xmldoc Exp $
+     ********************************************************************
+
+     This file is part of the DocBook Slides Stylesheet distribution.
+     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
+     and other information.
+
+     ******************************************************************** --&gt;
+
+&lt;src:fragref linkend="active.toc.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="body.bg.color.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="bullet.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="css.stylesheet.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="css.stylesheet.dir.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="dynamic.toc.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="foilgroup.toc.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="graphics.dir.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="hidetoc.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="home.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="keyboard.nav.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="minus.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="multiframe.bottom.bgcolor.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="multiframe.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="multiframe.navigation.height.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="multiframe.top.bgcolor.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="nav.separator.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="next.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="no.home.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="no.next.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="no.prev.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="no.toc.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="no.up.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="output.indent.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="overlay.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="overlay.js.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="overlay.logo.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="plus.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="prev.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="script.dir.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="show.foil.number.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="showtoc.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="slides.js.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="text.home.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="text.next.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="text.prev.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="text.toc.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="text.up.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="titlefoil.html.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="toc.bg.color.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="toc.hide.show.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="toc.html.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="toc.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="toc.row.height.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="toc.width.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="ua.js.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="up.image.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="xbCollapsibleLists.js.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="xbDOM.js.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="xbStyle.js.frag"&gt;&lt;/src:fragref&gt;
+&lt;src:fragref linkend="xbLibrary.js.frag"&gt;&lt;/src:fragref&gt;
+
+&lt;/xsl:stylesheet&gt;
+</programlisting>
+
+</appendix>
+
+</book>

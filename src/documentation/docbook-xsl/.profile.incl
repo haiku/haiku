@@ -1,0 +1,38 @@
+if [ -z "$XML_CATALOG_FILES" ]; then
+  XML_CATALOG_FILES="/docbook-sandbox/xsl/catalog.xml"
+else
+  # /docbook-sandbox/xsl/catalog.xml is not in XML_CATALOG_FILES, so add it
+  if [ "${XML_CATALOG_FILES#*/docbook-sandbox/xsl/catalog.xml*}" = "$XML_CATALOG_FILES" ]; then
+    XML_CATALOG_FILES="/docbook-sandbox/xsl/catalog.xml $XML_CATALOG_FILES"
+  fi
+fi
+# /etc/xml/catalog exists but is not in XML_CATALOG_FILES, so add it
+if [ -f /etc/xml/catalog ] &&   [ "${XML_CATALOG_FILES#*/etc/xml/catalog*}" = "$XML_CATALOG_FILES" ]; then
+  XML_CATALOG_FILES="$XML_CATALOG_FILES /etc/xml/catalog"
+fi
+export XML_CATALOG_FILES
+
+if [ -z "$SGML_CATALOG_FILES" ]; then
+  SGML_CATALOG_FILES="/docbook-sandbox/xsl/catalog"
+else
+  # /docbook-sandbox/xsl/catalog is not in SGML_CATALOG_FILES, so add it
+  if [ "${SGML_CATALOG_FILES#*/docbook-sandbox/xsl/catalog}" = "$SGML_CATALOG_FILES" ]; then
+    SGML_CATALOG_FILES="/docbook-sandbox/xsl/catalog:$SGML_CATALOG_FILES"
+  fi
+fi
+# /etc/sgml/catalog exists but is not in SGML_CATALOG_FILES, so add it
+if [ -f /etc/sgml/catalog ] &&   [ "${SGML_CATALOG_FILES#*/etc/sgml/catalog*}" = "$SGML_CATALOG_FILES" ]; then
+  SGML_CATALOG_FILES="$SGML_CATALOG_FILES:/etc/sgml/catalog"
+fi
+export SGML_CATALOG_FILES
+
+
+if [ -z "$CLASSPATH" ]; then
+  CLASSPATH="/home/mikes/.resolver"
+else
+  # /home/mikes/.resolver is not in CLASSPATH, so add it
+  if [ "${CLASSPATH#*/home/mikes/.resolver*}" = "$CLASSPATH" ]; then
+    CLASSPATH="/home/mikes/.resolver:$CLASSPATH"
+  fi
+fi
+export CLASSPATH

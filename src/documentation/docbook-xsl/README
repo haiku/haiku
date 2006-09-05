@@ -1,0 +1,119 @@
+----------------------------------------------------------------------
+              README file for the DocBook XSL Stylesheets
+----------------------------------------------------------------------
+$Id: README,v 1.8 2005/06/28 10:35:48 xmldoc Exp $
+
+These are XSL stylesheets for transforming DocBook XML document
+instances into various output formats.
+
+This README file provides only very minimal documentation on using
+the stylesheets. For more complete information, see Bob Stayton's
+book "DocBook XSL: The Complete Guide", available online at:
+
+  http://www.sagehill.net/docbookxsl/
+
+----------------------------------------------------------------------
+Installation
+----------------------------------------------------------------------
+See the INSTALL file for information about installing this release.
+
+----------------------------------------------------------------------
+How to use the stylesheets
+----------------------------------------------------------------------
+The base canonical URI for these stylesheets is:
+
+  http://docbook.sourceforge.net/release/xsl/current/
+
+You call any of the stylesheets in this distribution by doing one
+of the following:
+
+  - Use the base canonical URI in combination with one of the
+    pathnames below. For example, for "chunked" HTML, output:
+
+    http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
+
+    If your system has a working XML Catalog or SGML Catalog setup
+    (most Linux systems do), then that URI will automatically be
+    resolved and replaced with a local pathname on your system.
+
+  - Use a "real" local system base path in combination with one of
+    the pathnames below. For example, for "chunked" HTML, output:
+
+    /usr/share/xml/docbook/stylesheet/nwalsh/html/chunk.xsl
+
+To transform documents created with the standard DocBook schema/DTD
+(or DocBook NG schema/DTD, use one of the following stylesheets:
+
+  fo/docbook.xsl          - for XSL-FO
+  fo/profile-docbook.xsl  - for XSL-FO (single-pass profiled)
+
+  html/docbook.xsl        - for HTML (as a single file)
+  html/chunk.xsl          - for HTML (chunked into multiple files)
+  html/onechunk.xsl       - for HTML (chunked output in single file)
+  html/profile-*          - for HTML (single-pass profiled versions)
+
+  xhtml/*.xsl             - for XHTML versions of the above
+
+  htmlhelp/htmlhelp.xsl   - for HTML Help
+  javahelp/javahelp.xsl   - for JavaHelp
+  eclipse/eclipse.xsl     - for Eclipse Help
+
+  manpages/docbook.xsl    - for groff/nroff man pages
+
+To transform documents created with the DocBook Slides schema/DTD,
+use one of the following stylesheets:
+
+  slides/html/*.xsl       - for HTML slides of various kinds
+  slides/xhtml/*.xsl      - for XHTML slides of various kinds
+  slides/fo/plain.xsl     - for XSL-FO slides
+  slides/htmlhelp/...     - for HTML Help slides
+
+To transform documents created with the DocBook Website
+schema/DTD, use one of the following stylesheets:
+
+  website/website.xsl     - for non-tabular, non-chunked output
+  website/tabular.xsl     - for tabular, non-chunked output
+  website/chunk-*         - for chunked output
+
+----------------------------------------------------------------------
+Manifest
+----------------------------------------------------------------------
+AUTHORS     contact information
+BUGS        about known problems
+COPYING     copyright information
+INSTALL     installation instructions
+README      this file
+RELEASE.*   per-release cumulative summaries of user-visible changes
+TODO        about planned features not yet implemented
+VERSION     the current version number (note that this is an XSL stylesheet,
+            included by both fo/docbook.xsl and html/docbook.xsl)
+NEWS        changes since the last public release (for cumulative lists of
+            changes, see the ChangeLog files in each subdirectory)
+
+common/     contains code common to both the HTML and FO stylesheets
+doc/        documentation
+docsrc/     documentation sources
+eclipse/    stylesheet that produces Eclipse Help
+extensions/ Java extensions
+fo/         stylesheets that produce XSL FO
+html/       stylesheets that produce HTML
+htmlhelp/   stylesheets that produce HTML Help
+images/     images
+javahelp/   stylesheets that produce Java Help
+lib/        contains schema-independent functions
+manpages/   stylesheets for producing groff/nroff man pages
+profiling/  stylesheets for profiling (omitting/including conditional text)
+slides/     stylesheets for producing slides (from DocBook Slides source)
+template/   contains templates for building stylesheet customization layers
+website/    stylesheets for producing a website (from DocBook Website source)
+xhtml/      stylesheets that produce XHTML
+
+----------------------------------------------------------------------
+Changes
+----------------------------------------------------------------------
+See the ChangeLog in each subdirectory for cumulative lists of all changes.
+
+See the NEWS file for changes made since the previous release.
+
+See the RELEASE-NOTES.html or RELEASE-NOTES.txt or RELEASE-NOTES.pdf files
+for per-release cumulative summaries of significant user-visible changes.

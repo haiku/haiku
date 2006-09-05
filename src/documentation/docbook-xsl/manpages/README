@@ -1,0 +1,73 @@
+$Id: README,v 1.3 2005/06/07 09:34:13 xmldoc Exp $
+
+-----------------------------------------------------------------
+Notes
+-----------------------------------------------------------------
+
+Here are some minimal details (contributed by Barry Rountree)
+about the behavior of the manpages stylesheets.
+
+  The first <refname> found is used to create the
+  file name of the man page.
+
+  The contents of <refentrytitle> are converted to
+  ALL CAPS and used, with <manvolnum>, to decorate the
+  bottom right and top corners of the page.
+
+  Any <indexterm> is not used in man-page output.
+
+  In order to document two or more items using the
+  same page, add additional refnames to <refnamediv>.
+  Each addtiona. refname will generate a small file
+  that points to (via the magic of *roff)
+
+    man[manvolnum]/[primaryRefname].gz
+
+More detailed how-to information about processing DocBook XML
+documents for man-page output will be available in the future.
+Somewhere. Written by someone...
+
+-----------------------------------------------------------------
+A short history of the DocBook manpages stylesheets
+-----------------------------------------------------------------
+
+October 2001 - September 2002: "The Silver Age"
+  Martijn van Beers <lotr@users.sourceforge.net> contributes XSL
+  stylesheets[1] for converting DocBook documents to *roff man pages,
+  and maintains them in the [cvs]/docbook/contrib/xsl/db2man area
+  of the project source-code repository, with frequent application
+  of patches from Tim Waugh <twaugh@users.sourceforge.net>.
+
+  [1] http://sourceforge.net/tracker/download.php?group_id=21935&atid=373749&file_id=11659&aid=468779
+      http://docbook.sourceforge.net/archive/db2man.tar.gz
+
+September 2002 - March 2003: "The Joe Orton Era"
+  The man-pages stylesheets are moved to [cvs]/docbook/xsl/manpages
+  and become a standard part of all subsequent DocBook XSL
+  Stylesheets releases. Joe Orton <jorton@users.sourceforge.net>
+  takes over manpages maintenance; more patches from Tim Waugh.
+
+March 2003 - May 2005: "Tim Waugh At the Helm"
+  Tim Waugh, eventually realizing that the possibility exists to
+  commit changes to to a source-code repository *directly*, joins
+  the project and takes over manpages maintenance, making a lot of
+  fixes and refinements.
+
+May 2005 - present: "Journey Into Mystery"
+  A sense of apprehension and uncertainty sets in as the
+  least-skilled and most frequently inebriated member of the
+  project takes over manpages maintenance.
+
+-----------------------------------------------------------------
+Original circa 2001 README contributed by Martijn van Beers
+-----------------------------------------------------------------
+
+README for db2man by Martijn van Beers (lotr@users.sourceforge.net)
+
+I've been working on some stylesheets to convert <refentry>s to man
+format. I thought I'd submit what I have for inclusion in the
+docbook-xsl package.
+
+See also:
+
+  http://sourceforge.net/tracker/index.php?func=detail&aid=468779&group_id=21935&atid=373749

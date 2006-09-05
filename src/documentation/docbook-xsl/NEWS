@@ -1,0 +1,104 @@
+Changes since the 1.70.0 release
+
+------------------------------------------------------------------------------
+
+Table of Contents
+
+Release: 1.70.0
+
+    Common
+    Extensions
+    FO
+    HTML
+    HTMLHelp
+    Lib
+    Manpages
+    Params
+    Profiling
+    Template
+    Tools
+    WordML
+
+Release: 1.70.0
+
+The following is a list of changes that have been made since the 1.70.0
+release.
+
+Common
+
+The following changes have been made to the common code since the 1.70.0
+release.
+
+Extensions
+
+The following changes have been made to the extensions code since the 1.70.0
+release.
+
+FO
+
+The following changes have been made to the fo code since the 1.70.0 release.
+
+  * Added three new attribute sets (revhistory.title.properties, revhistory.
+    table.properties and revhistory.table.cell.properties) for controlling
+    appearance of revhistory in FO output.
+
+  * Support DBv5 revisions with full author name (not only authorinitials)
+
+HTML
+
+The following changes have been made to the html code since the 1.70.0
+release.
+
+  * Support DBv5 revisions with full author name (not only authorinitials)
+
+HTMLHelp
+
+The following changes have been made to the htmlhelp code since the 1.70.0
+release.
+
+  * htmlhelp.generate.index is now param, not variable. This means that you
+    can override its setting from outside. This is useful when you generate
+    indexterms on the fly (see
+    http://www.xml.com/pub/a/2004/07/14/dbndx.html?page=3).
+
+  * Support chunk.tocs.and.lots in HTML Help
+
+Lib
+
+The following changes have been made to the lib code since the 1.70.0 release.
+
+Manpages
+
+The following changes have been made to the manpages code since the 1.70.0
+release.
+
+Params
+
+The following changes have been made to the params code since the 1.70.0
+release.
+
+  * Added three new attribute sets (revhistory.title.properties, revhistory.
+    table.properties and revhistory.table.cell.properties) for controlling
+    appearance of revhistory in FO output.
+
+Profiling
+
+The following changes have been made to the profiling code since the 1.70.0
+release.
+
+Template
+
+The following changes have been made to the template code since the 1.70.0
+release.
+
+Tools
+
+The following changes have been made to the tools code since the 1.70.0
+release.
+
+WordML
+
+The following changes have been made to the wordml code since the 1.70.0
+release.
+
+
