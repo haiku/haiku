@@ -152,7 +152,8 @@ determine_stolen_memory_size(intel_info &info)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_85x)) {
+	} else if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_85x)
+		|| (info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;

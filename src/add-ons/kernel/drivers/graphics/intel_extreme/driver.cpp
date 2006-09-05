@@ -40,6 +40,13 @@ const struct supported_device {
 
 	{0x2572, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i865G"},
 	{0x3582, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i855G"},
+
+#if 0
+	{0x2582, INTEL_TYPE_9xx, "i915G"},
+	{0x2592, INTEL_TYPE_9xx, "i915GM"},
+	{0x2772, INTEL_TYPE_9xx, "i945G"},
+	{0x27a2, INTEL_TYPE_9xx, "i945GM"},
+#endif
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
