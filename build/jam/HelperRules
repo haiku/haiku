@@ -319,3 +319,9 @@ rule InheritPlatform
 		SUPPORTED_PLATFORMS on $(children) = $(SUPPORTED_PLATFORMS) ;
 	}
 }
+
+rule SubDirAsFlags
+{
+        SUBDIRASFLAGS += $(<) ;
+}
+
