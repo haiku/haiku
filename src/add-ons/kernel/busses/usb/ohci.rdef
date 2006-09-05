@@ -14,3 +14,4 @@ resource app_version {
 	short_info = "OHCI host controller driver",
 	long_info = "Haiku - This driver is (c) 2005 Jan-Rixt Van Hoye"
 };
+
