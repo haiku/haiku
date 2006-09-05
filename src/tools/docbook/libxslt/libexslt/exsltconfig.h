@@ -39,14 +39,14 @@ extern "C" {
  *
  * extra version information, used to show a CVS compilation
  */
-#define	LIBEXSLT_VERSION_EXTRA "-CVS1062"
+#define	LIBEXSLT_VERSION_EXTRA ""
 
 /**
  * WITH_CRYPTO:
  *
  * Whether crypto support is configured into exslt
  */
-#if 1
+#if 0
 #define EXSLT_CRYPTO_ENABLED
 #endif
 

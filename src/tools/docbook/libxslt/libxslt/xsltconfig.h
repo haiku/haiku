@@ -41,7 +41,7 @@ extern "C" {
  *
  * extra version information, used to show a CVS compilation
  */
-#define	LIBXSLT_VERSION_EXTRA "-CVS1062"
+#define	LIBXSLT_VERSION_EXTRA ""
 
 /**
  * WITH_XSLT_DEBUG:
@@ -54,7 +54,7 @@ extern "C" {
 #define WITH_XSLT_DEBUG
 #endif
 
-#if 1
+#if 0
 /**
  * DEBUG_MEMORY:
  *
@@ -112,11 +112,11 @@ extern "C" {
  * Whether module support is configured into libxslt
  * Note: no default module path for win32 platforms
  */
-#if 1
+#if 0
 #ifndef WITH_MODULES
 #define WITH_MODULES
 #endif
-#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/usr/lib/libxslt-plugins"
+#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/usr/local/lib/libxslt-plugins"
 #endif
 
 /**

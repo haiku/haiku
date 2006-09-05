@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src tools docbook ;
+
+SubInclude HAIKU_TOP src tools docbook libxml2 ;
+SubInclude HAIKU_TOP src tools docbook libxslt ;

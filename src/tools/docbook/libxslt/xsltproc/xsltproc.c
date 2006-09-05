@@ -506,7 +506,7 @@ static void usage(const char *name) {
     printf("\t--nomkdir : refuse to create directories\n");
     printf("\t--writesubtree path : allow file write only with the path subtree\n");
 #ifdef LIBXML_CATALOG_ENABLED
-    printf("\t--catalogs : use SGML catalogs from $SGML_CATALOG_FILES\n");
+    printf("\t--catalogs paths: load the xml catalogs at 'paths' \n");
     printf("\t             otherwise XML Catalogs starting from \n");
     printf("\t         file:///etc/xml/catalog are activated by default\n");
 #endif
@@ -637,14 +637,8 @@ main(int argc, char **argv)
 #ifdef LIBXML_CATALOG_ENABLED
         } else if ((!strcmp(argv[i], "-catalogs")) ||
                    (!strcmp(argv[i], "--catalogs"))) {
-            const char *catalogs;
-
-            catalogs = getenv("SGML_CATALOG_FILES");
-            if (catalogs == NULL) {
-                fprintf(stderr, "Variable $SGML_CATALOG_FILES not set\n");
-            } else {
-                xmlLoadCatalogs(catalogs);
-            }
+            i++;
+            xmlLoadCatalogs(argv[i]);
 #endif
 #ifdef LIBXML_XINCLUDE_ENABLED
         } else if ((!strcmp(argv[i], "-xinclude")) ||
@@ -761,7 +755,15 @@ main(int argc, char **argv)
                    (!strcmp(argv[i], "--path"))) {
             i++;
 	    continue;
+#ifdef LIBXML_CATALOG_ENABLED
+        } else if ((!strcmp(argv[i], "-catalogs")) ||
+                   (!strcmp(argv[i], "--catalogs"))) {
+            i++;
+            continue;
+#endif
 	}
+
+
         if ((!strcmp(argv[i], "-param")) || (!strcmp(argv[i], "--param"))) {
             i += 2;
             continue;

@@ -1,0 +1,65 @@
+SubDir HAIKU_TOP src tools docbook libxml2 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# defines
+local defines = [ FDefines HAVE_CONFIG_H=1 HAVE_BEOS_THREADS _REENTRANT ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+# system headers
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src tools docbook libxml2 include ] ;
+
+BuildPlatformStaticLibrary <build>libxml2.a :
+	SAX.c
+	entities.c
+	encoding.c
+	error.c
+	parserInternals.c
+	parser.c
+	tree.c
+	hash.c
+	list.c
+	xmlIO.c
+	xmlmemory.c
+	uri.c
+	valid.c
+	xlink.c
+	HTMLparser.c
+	HTMLtree.c
+	debugXML.c
+	xpath.c
+	xpointer.c
+	xinclude.c
+	nanohttp.c
+	nanoftp.c
+	DOCBparser.c
+	catalog.c
+	globals.c
+	threads.c
+	c14n.c
+	xmlstring.c
+	xmlregexp.c
+	xmlschemas.c
+	xmlschemastypes.c
+	xmlunicode.c
+	xmlreader.c
+	relaxng.c
+	dict.c
+	SAX2.c
+	xmlwriter.c
+	legacy.c
+	chvalid.c
+	pattern.c
+	xmlsave.c
+	xmlmodule.c
+	schematron.c
+;
+
+BuildPlatformMain <build>xmllint :
+	xmllint.c
+;
+
+LinkAgainst <build>xmllint
+	: <build>libxml2.a net z ;

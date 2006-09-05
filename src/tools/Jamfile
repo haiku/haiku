@@ -41,6 +41,7 @@ BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
 
 SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
 SubInclude HAIKU_TOP src tools cppunit ;
+SubInclude HAIKU_TOP src tools docbook ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
 SubInclude HAIKU_TOP src tools gensyscalls ;
 SubInclude HAIKU_TOP src tools keymap ;

@@ -1,0 +1,65 @@
+SubDir HAIKU_TOP src tools docbook libxslt ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# defines
+local defines = [ FDefines HAVE_CONFIG_H ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+# source directories
+local sourceDirs =
+	libexslt
+	libxslt
+	xsltproc
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tools docbook libxslt $(sourceDir) ] ;
+}
+
+# system headers
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src tools docbook libxml2 include ] ;
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src tools docbook libxslt ] ;
+
+BuildPlatformStaticLibrary <build>libxslt.a :
+	#xslt
+	attrvt.c
+	xslt.c
+	xsltutils.c
+	pattern.c
+	templates.c	
+	variables.c
+	keys.c
+	numbers.c
+	extensions.c
+	extra.c
+	functions.c
+	namespaces.c
+	imports.c
+	attributes.c
+	documents.c
+	preproc.c
+	transform.c
+	security.c
+	#exslt
+	exslt.c
+	common.c
+	crypto.c
+	math.c
+	sets.c
+	efunctions.c
+	strings.c
+	date.c
+	saxon.c
+	dynamic.c
+;
+
+BuildPlatformMain <build>xsltproc :
+	xsltproc.c
+;
+
+LinkAgainst <build>xsltproc
+	: <build>libxslt.a <build>libxml2.a net z ;

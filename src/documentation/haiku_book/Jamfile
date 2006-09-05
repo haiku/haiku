@@ -1,9 +1,11 @@
 SubDir HAIKU_TOP src documentation haiku_book ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Doc2HTML 
 	Haiku_Book.xml
 	: index.html
-	: http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
+	: [ FDirName $(HAIKU_TOP) src documentation docbook-xsl html chunk.xsl ]
 	: Haiku_Book
 	:
 	: -stringparam use.id.as.filename 1
