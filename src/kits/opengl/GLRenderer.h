@@ -1,3 +1,7 @@
+/*
+ * Copyright 2006, Philippe Houdoin. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef GLRENDERER_H
 #define GLRENDERER_H
 
@@ -20,10 +24,10 @@ public:
 	void 				Acquire();
 	void	 			Release();
 
-	void 				LockGL();
-	void 				UnlockGL();
+	virtual void			LockGL();
+	virtual void 			UnlockGL();
 	
-	virtual	void 		SwapBuffers(bool VSync = false) const;
+	virtual	void 		SwapBuffers(bool VSync = false);
 	virtual	void		Draw(BRect updateRect);
 	virtual status_t    CopyPixelsOut(BPoint source, BBitmap *dest);
 	virtual status_t    CopyPixelsIn(BBitmap *source, BPoint dest);

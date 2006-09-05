@@ -9,6 +9,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders opengl ;
 
+UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 UseHeaders [ FDirName $(SUBDIR) main ] ;
 UseHeaders [ FDirName $(SUBDIR) glapi ] ;
 UseHeaders [ FDirName $(SUBDIR) math ] ;
@@ -40,6 +41,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
+	SubDirAsFlags $(defines) ;
 }
 
 local arch_sources ;
@@ -246,3 +248,8 @@ StaticLibrary libmesa.a :
 	glthread.c
 ;
 
+Addon Mesa : opengl :
+	MesaRenderer.cpp
+	: false
+	: libmesa.a libGL.so be
+;
