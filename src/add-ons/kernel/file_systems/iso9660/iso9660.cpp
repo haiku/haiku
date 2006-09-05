@@ -379,8 +379,7 @@ check_common_volume_descriptor(iso9660_common_volume_descriptor *common)
 status_t
 iso9660_fs_identify(int deviceFD, iso9660_info *info)
 {
-	bool result = false;
-	uchar *buffer = NULL;
+	char buffer[ISO_PVD_SIZE];
 	bool exit = false;
 	status_t error = B_OK;
 	nspace *vol;
@@ -402,7 +401,7 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 		iso9660_common_volume_descriptor *common = NULL;
 		
 		// Read the block containing the current descriptor
-		error = read_pos (vol->fdOfSession, offset, (void *)&buffer, ISO_PVD_SIZE);
+		error = read_pos (vol->fd, offset, (void *)&buffer, ISO_PVD_SIZE);
 		offset += ISO_PVD_SIZE;
 		if (error < ISO_PVD_SIZE) {
                         break;
@@ -516,10 +515,6 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 					break;
 			}
 		}
-		if (buffer) {
-			free(buffer);
-			buffer = NULL;
-		}	
 	} 
 
 	free(vol);
