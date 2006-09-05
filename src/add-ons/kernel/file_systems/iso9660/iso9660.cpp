@@ -135,6 +135,10 @@ typedef struct iso9660_directory_record {
 	uint16 volume_space_le;
 } __attribute__((packed)) iso9660_directory_record;
 
+
+static void dump_directory_record(iso9660_directory_record *record, const char *indent);
+
+
 //----------------------------------------------------------------------------
 // iso9660_info
 //----------------------------------------------------------------------------
@@ -232,9 +236,9 @@ iso9660_info::set_string(char **string, const char *new_string, uint32 new_lengt
 	}			
 }
 
-//----------------------------------------------------------------------------
-// C functions
-//----------------------------------------------------------------------------
+
+//	#pragma mark - C functions
+
 
 /*! \brief Converts the given unicode character to utf8.
 
@@ -243,8 +247,7 @@ iso9660_info::set_string(char **string, const char *new_string, uint32 new_lengt
 	\todo Once OpenTracker's locale kit is done, perhaps that functionality
 	should be used rather than outright stealing the code.
 */
-static
-void
+static void
 unicode_to_utf8(uint32 c, char **out)
 {
 	char *s = *out;
@@ -267,8 +270,8 @@ unicode_to_utf8(uint32 c, char **out)
 	*out = s;
 }
 
-static
-const char*
+
+static const char*
 volume_descriptor_type_to_string(iso9660_volume_descriptor_type type)
 {
 	switch (type) {
@@ -281,14 +284,14 @@ volume_descriptor_type_to_string(iso9660_volume_descriptor_type type)
 	}
 }
 
-static
-void
-dump_common_volume_descriptor(iso9660_common_volume_descriptor *common, const char *indent,
-                              bool print_header)
+
+static void
+dump_common_volume_descriptor(iso9660_common_volume_descriptor *common,
+	const char *indent, bool print_header)
 {
 	if (print_header)
 		TRACE(("%siso9660_common_volume_descriptor:\n", indent));
-	
+
 	TRACE(("%s  volume descriptor type    == %d (%s)\n", indent,
 	       common->volume_descriptor_type,
 	       volume_descriptor_type_to_string((iso9660_volume_descriptor_type)common->volume_descriptor_type)));
@@ -297,14 +300,10 @@ dump_common_volume_descriptor(iso9660_common_volume_descriptor *common, const ch
 	TRACE(("%s  volume descriptor version == %d\n", indent, common->volume_descriptor_version));
 }
 
-static
-void
-dump_directory_record(iso9660_directory_record *record, const char *indent);
 
-static
-void
-dump_primary_volume_descriptor(iso9660_primary_volume_descriptor *primary, const char *indent,
-                              bool print_header)
+static void
+dump_primary_volume_descriptor(iso9660_primary_volume_descriptor *primary,
+	const char *indent, bool print_header)
 {
 	if (print_header)
 		TRACE(("%siso9660_primary_volume_descriptor:\n", indent));
@@ -327,15 +326,16 @@ dump_primary_volume_descriptor(iso9660_primary_volume_descriptor *primary, const
 	dump_directory_record((iso9660_directory_record*)primary->root_directory_record, indent);
 }
 
-static
-void
-dump_supplementary_volume_descriptor(iso9660_supplementary_volume_descriptor *supplementary, const char *indent,
-                              bool print_header)
+
+static void
+dump_supplementary_volume_descriptor(iso9660_supplementary_volume_descriptor *supplementary,
+	const char *indent, bool print_header)
 {
 	if (print_header)
 		TRACE(("%siso9660_supplementary_volume_descriptor:\n", indent));
 		
-	dump_primary_volume_descriptor((iso9660_primary_volume_descriptor*)supplementary, indent, false);
+	dump_primary_volume_descriptor((iso9660_primary_volume_descriptor*)supplementary,
+		indent, false);
 	TRACE(("%s  escape sequences          ==", indent));
 	for (int i = 0; i < ISO9660_ESCAPE_SEQUENCE_LENGTH; i++) {
 		TRACE((" %2x", supplementary->escape_sequences[i]));
@@ -344,9 +344,9 @@ dump_supplementary_volume_descriptor(iso9660_supplementary_volume_descriptor *su
 	}
 	TRACE(("\n"));
 }
-		
-static
-void
+
+
+static void
 dump_directory_record(iso9660_directory_record *record, const char *indent)
 {
 	TRACE(("%s  root directory record:\n", indent));
@@ -356,17 +356,20 @@ dump_directory_record(iso9660_directory_record *record, const char *indent)
 	TRACE(("%s    volume sequence number    == %d\n", indent, record->volume_space_le));
 }
 
-static
-status_t
+
+static status_t
 check_common_volume_descriptor(iso9660_common_volume_descriptor *common)
 {
 	status_t error = common ? B_OK : B_BAD_VALUE;
 	if (!error) {
-		error = strncmp(common->standard_identifier, kISO9660Signature,
-		                5) == 0 ? B_OK : B_BAD_DATA;
+		error = strncmp(common->standard_identifier, kISO9660Signature, 5) == 0
+			? B_OK : B_BAD_DATA;
 	}
 	return error;
 }
+
+
+//	#pragma mark - Public functions
 
 
 // iso9660_fs_identify
@@ -383,34 +386,32 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 	bool exit = false;
 	status_t error = B_OK;
 	nspace *vol;
-	
+
 	TRACE(("identify(%d, %p)\n", deviceFD, info));
 	off_t offset = 0x8000;
-		   
+
 	vol = (nspace *)calloc(sizeof(nspace), 1);
-        if (vol == NULL) {
-                return ENOMEM;
-        }
+	if (vol == NULL)
+		return ENOMEM;
 
 	vol->fd = deviceFD;
-		   
+
 	// Read through the volume descriptors looking for a primary descriptor.
 	// If for some reason there are more than one primary descriptor, the
 	// volume name from the last encountered descriptor will be used.
 	while (!error && !exit) {// && count++ < 10) {
 		iso9660_common_volume_descriptor *common = NULL;
-		
+
 		// Read the block containing the current descriptor
 		error = read_pos (vol->fd, offset, (void *)&buffer, ISO_PVD_SIZE);
 		offset += ISO_PVD_SIZE;
-		if (error < ISO_PVD_SIZE) {
-                        break;
-                }
+		if (error < ISO_PVD_SIZE)
+			break;
 
 		common = (iso9660_common_volume_descriptor*)buffer;
 		error = check_common_volume_descriptor(common);
 //		dump_common_volume_descriptor(common, "", true);
-		
+
 		// Handle each type of descriptor appropriately
 		if (!error) {
 			TRACE(("found %s descriptor\n", volume_descriptor_type_to_string((iso9660_volume_descriptor_type)common->volume_descriptor_type)));
@@ -418,14 +419,14 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 			switch (common->volume_descriptor_type) {
 				case ISO9660VD_BOOT:
 					break;
-					
+
 				case ISO9660VD_PRIMARY:
 				{
 					int i;
 					iso9660_primary_volume_descriptor *primary = (iso9660_primary_volume_descriptor*)buffer;
-					
+
 					dump_primary_volume_descriptor(primary, "  ", true);
-					
+
 					// Cut off any trailing spaces from the volume id. Note
 					// that this allows for spaces INSIDE the volume id, even
 					// though that's not technically allowed by the standard;
@@ -445,22 +446,22 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 						       "instead of former (`%s')\n", str,
 						       info->iso9660_volume_name));
 					}
-					
+
 					info->set_iso9660_volume_name(primary->volume_identifier, i+1);
 					info->maxBlocks = primary->volume_set_size_little_endian;
 					break;
 				}
-					
+
 				case ISO9660VD_SUPPLEMENTARY:
 				{
 					iso9660_supplementary_volume_descriptor *supplementary = (iso9660_supplementary_volume_descriptor*)buffer;
 					dump_supplementary_volume_descriptor((iso9660_supplementary_volume_descriptor*)supplementary, "  ", true);
-					
+
 					// Copy and null terminate the escape sequences
 					char escapes[ISO9660_ESCAPE_SEQUENCE_LENGTH+1];
 					strncpy(escapes, supplementary->escape_sequences, ISO9660_ESCAPE_SEQUENCE_LENGTH);
 					escapes[ISO9660_ESCAPE_SEQUENCE_LENGTH] = 0;
-					
+
 					// Check for a Joliet VD
 					if (strstr(escapes, "%/@") || strstr(escapes, "%/C") || strstr(escapes, "%/E")) {
 						char str[(ISO9660_VOLUME_IDENTIFIER_LENGTH*3/2)+1];
@@ -469,7 +470,7 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 							// we start out with. 
 						char *str_iterator = str;
 						uint16 ch;
-						
+
 						// Walk thru the unicode volume name, converting to utf8 as we go.
 						for (int i = 0;
 						       (ch = B_BENDIAN_TO_HOST_INT16(((uint16*)supplementary->volume_identifier)[i]))
@@ -498,19 +499,19 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 							       "instead of former (`%s')\n", str,
 							       info->joliet_volume_name));
 						}
-						
+
 						info->set_joliet_volume_name(str, strlen(str));							
 					} // end "if Joliet VD"
 					break;
 				}
-					
+
 				case ISO9660VD_PARTITION:
 					break;
-					
+
 				case ISO9660VD_TERMINATOR:
 					exit = true;
 					break;
-					
+
 				default:
 					break;
 			}
