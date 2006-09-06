@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src add-ons opengl mesa ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need our public GL headers also when not compiling for Haiku.
+}
+
+
+UsePrivateHeaders opengl ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa glapi ] ;
+
+Addon mesa_soft : opengl :
+	MesaRenderer.cpp
+	: false
+	: libmesa.a libGL.so be
+;

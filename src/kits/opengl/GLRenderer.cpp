@@ -6,6 +6,7 @@
 #include "GLRenderer.h"
 
 BGLRenderer::BGLRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher)
+	: fRefCount(1)
 {
 
 }
@@ -15,6 +16,7 @@ BGLRenderer::~BGLRenderer()
 {
 }
 
+
 void 
 BGLRenderer::Acquire()
 {
@@ -22,7 +24,7 @@ BGLRenderer::Acquire()
 }
 
 
-void 
+void
 BGLRenderer::Release()
 {
 	if (atomic_add(&fRefCount, -1) < 1)
@@ -108,4 +110,11 @@ void
 BGLRenderer::EnableDirectMode(bool enabled)
 {
 }
+
+
+status_t BGLRenderer::_Reserved_Renderer_0(int32 n, void *p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_1(int32 n, void *p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_2(int32 n, void *p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_3(int32 n, void *p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_4(int32 n, void *p) { return B_ERROR; }
 

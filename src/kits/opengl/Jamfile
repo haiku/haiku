@@ -35,25 +35,16 @@ UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 	SubDirC++Flags $(defines) ;
 }
 
-local arch_sources ;
-if $(TARGET_ARCH) = x86 {
-	# On x86 platform, use the faster GL API dispatching assembly code!
-	arch_sources = glapi_x86.S ;
-} else {
-	# For non-X86 platforms, no assembly code yet.
-	arch_sources = ;
-}
-
-SEARCH_SOURCE += [ FDirName $(SUBDIR) mesa $(TARGET_ARCH) ] ;
-
 SharedLibrary libGL.so :
 	GLView.cpp
 	GLDispatcher.cpp
 	GLRenderer.cpp
 
+	:
+
 	# Mesa optimized GL dispatching code (if any) for this target architecture 
-	$(arch_sources)
-	: 
+	<opengl>mesa_arch_$(TARGET_ARCH).o
+
 	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
 	<opengl>sgi-glu.o
 

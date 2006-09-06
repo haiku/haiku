@@ -13,6 +13,13 @@
 
 extern const char * color_space_name(color_space space);
 
+extern "C" _EXPORT BGLRenderer * 
+instanciate_gl_renderer(BGLView *view, BGLDispatcher *dispatcher)
+{
+	return new MesaRenderer(view, 0, dispatcher);
+}
+
+
 MesaRenderer::MesaRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher)
 	: BGLRenderer(view, bgl_options, dispatcher),
 	fBitmap(NULL),

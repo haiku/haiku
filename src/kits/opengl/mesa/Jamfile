@@ -9,7 +9,6 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders opengl ;
 
-UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 UseHeaders [ FDirName $(SUBDIR) main ] ;
 UseHeaders [ FDirName $(SUBDIR) glapi ] ;
 UseHeaders [ FDirName $(SUBDIR) math ] ;
@@ -248,8 +247,17 @@ StaticLibrary libmesa.a :
 	glthread.c
 ;
 
-Addon Mesa : opengl :
-	MesaRenderer.cpp
-	: false
-	: libmesa.a libGL.so be
+
+local arch_sources ;
+if $(TARGET_ARCH) = x86 {
+	# On x86 platform, use the faster GL API dispatching assembly code!
+	arch_sources = glapi_x86.S ;
+} else {
+	# For non-X86 platforms, no assembly code yet.
+	arch_sources = ;
+}
+
+MergeObject <opengl>mesa_arch_$(TARGET_ARCH).o :
+	$(arch_sources)
 ;
+
