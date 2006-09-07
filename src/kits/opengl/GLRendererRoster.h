@@ -19,7 +19,7 @@ typedef std::map<renderer_id, renderer_item> RendererMap;
 
 class GLRendererRoster {
 	public:
-		GLRendererRoster(BGLView *view);
+		GLRendererRoster(BGLView *view, ulong options);
 		virtual ~GLRendererRoster();
 
 		BGLRenderer *GetRenderer(int32 id = 0);
@@ -34,6 +34,7 @@ class GLRendererRoster {
 		RendererMap	fRenderers;
 		int32		fNextID;
 		BGLView 	*fView;
+		ulong		fOptions;
 };
 
 #endif	/* _GLRENDERER_ROSTER_H */

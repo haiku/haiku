@@ -18,9 +18,10 @@
 
 
 
-GLRendererRoster::GLRendererRoster(BGLView *view)
+GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
 	: fNextID(0),
-	fView(view)
+	fView(view),
+	fOptions(options)
 {
         AddDefaultPaths();
 }
@@ -127,12 +128,12 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 	if (image < B_OK)
 		return image;
 
-	BGLRenderer *(*instanc)(BGLView *view, BGLDispatcher *dispatcher);
+	BGLRenderer *(*instanc)(BGLView *view, ulong options, BGLDispatcher *dispatcher);
 
 	status = get_image_symbol(image, "instanciate_gl_renderer",
 		B_SYMBOL_TYPE_TEXT, (void**)&instanc);
 	if (status == B_OK) {
-		BGLRenderer *renderer = instanc(fView, new BGLDispatcher());
+		BGLRenderer *renderer = instanc(fView, fOptions, new BGLDispatcher());
 		if (AddRenderer(renderer, image, &ref, nodeRef.node) != B_OK) {
 			renderer->Release();
 			// this will delete the renderer

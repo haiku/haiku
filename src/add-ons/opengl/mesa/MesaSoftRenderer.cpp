@@ -54,9 +54,9 @@ extern const char * color_space_name(color_space space);
 #endif
 
 extern "C" _EXPORT BGLRenderer * 
-instanciate_gl_renderer(BGLView *view, BGLDispatcher *dispatcher)
+instanciate_gl_renderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
 {
-	return new MesaSoftRenderer(view, 0, dispatcher);
+	return new MesaSoftRenderer(view, options, dispatcher);
 }
 
 

@@ -34,7 +34,7 @@ BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong o
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
 		fRenderer(NULL)
 {
-	fRoster = new GLRendererRoster(this);
+	fRoster = new GLRendererRoster(this, options);
 	fRenderer = fRoster->GetRenderer();
 	if (!fRenderer) {
 		fprintf(stderr, "no renderer found! \n");
