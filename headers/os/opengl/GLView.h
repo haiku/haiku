@@ -35,6 +35,7 @@
 #include <game/DirectWindow.h>
 
 class BGLRenderer;
+class GLRendererRoster;
 
 class BGLView : public BView {
 public:
@@ -109,7 +110,8 @@ virtual void        _ReservedGLView8();
 		BLocker		m_drawLock;
 		BLocker     m_displayLock;
 		void *		m_clip_info;
-		BGLRenderer * fRenderer;
+		BGLRenderer *fRenderer;
+		GLRendererRoster *fRoster;
 
 		BBitmap *   m_ditherMap;
 		BRect       m_bounds;

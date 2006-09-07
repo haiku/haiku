@@ -69,7 +69,7 @@ private:
 	renderer_id   fID;
 };
 
-extern "C" _EXPORT BGLRenderer * instanciate_gl_renderer(BGLView *view, BGLDispatcher *dispatcher);
+extern "C" _EXPORT BGLRenderer * instanciate_gl_renderer(BGLView *view, ulong options, BGLDispatcher *dispatcher);
 
 
 #endif	// GLRENDERER_H
