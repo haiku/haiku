@@ -8,6 +8,7 @@
 
 BGLRenderer::BGLRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher)
 	: fRefCount(1),
+	fView(view),
 	fOptions(bgl_options),
 	fDispatcher(dispatcher)
 {
@@ -39,12 +40,15 @@ BGLRenderer::Release()
 void 
 BGLRenderer::LockGL()
 {
+	fView->LockLooper();
 }
 
 
 void 
 BGLRenderer::UnlockGL()
 {
+	if (fView->Looper()->IsLocked())
+		fView->UnlockLooper();
 }
 
 

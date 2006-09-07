@@ -8,6 +8,8 @@
  * 
  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
+ 
+#define CALLED() 			printf("CALLED %s\n",__PRETTY_FUNCTION__)
 
 #include "MesaSoftRenderer.h"
 extern "C" {
@@ -157,6 +159,24 @@ MesaSoftRenderer::~MesaSoftRenderer()
 
 
 void
+MesaSoftRenderer::LockGL()
+{	
+	BGLRenderer::LockGL();
+	
+	UpdateState(fContext, 0);
+	_mesa_make_current(fContext, fFrameBuffer);
+}
+
+
+void
+MesaSoftRenderer::UnlockGL()
+{
+
+	BGLRenderer::UnlockGL();
+}
+
+
+void
 MesaSoftRenderer::SwapBuffers(bool VSync = false)
 {
 	_mesa_notifySwapBuffers(fContext);
@@ -172,6 +192,7 @@ MesaSoftRenderer::SwapBuffers(bool VSync = false)
 void
 MesaSoftRenderer::Draw(BRect updateRect)
 {
+	CALLED();
 	if (fBitmap)
 		GLView()->DrawBitmap(fBitmap, updateRect, updateRect);
 }
@@ -180,6 +201,7 @@ MesaSoftRenderer::Draw(BRect updateRect)
 status_t
 MesaSoftRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 {
+	CALLED();
 	color_space scs = fBitmap->ColorSpace();
 	color_space dcs = bitmap->ColorSpace();
 
@@ -216,6 +238,7 @@ MesaSoftRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 status_t
 MesaSoftRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 {
+	CALLED();
 	color_space scs = bitmap->ColorSpace();
 	color_space dcs = fBitmap->ColorSpace();
 
@@ -252,6 +275,7 @@ MesaSoftRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 void 
 MesaSoftRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h)
 {
+	CALLED();
 	/* poll for window size change and realloc software Z/stencil/etc if needed */
 	_mesa_ResizeBuffersMESA();
 }
@@ -282,6 +306,8 @@ MesaSoftRenderer::Error(GLcontext *ctx)
 void 
 MesaSoftRenderer::ClearIndex(GLcontext *ctx, GLuint index)
 {
+	CALLED();
+	
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	mr->fClearIndex = index;
 }
@@ -290,6 +316,8 @@ MesaSoftRenderer::ClearIndex(GLcontext *ctx, GLuint index)
 void 
 MesaSoftRenderer::ClearColor(GLcontext *ctx, const GLfloat color[4])
 {
+	CALLED();
+	
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_RCOMP], color[0]);
 	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_GCOMP], color[1]);
@@ -322,6 +350,8 @@ MesaSoftRenderer::ClearFront(GLcontext *ctx,
                          GLboolean all, GLint x, GLint y,
                          GLint width, GLint height)
 {
+	CALLED();
+	
    MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
    BGLView *bglview = mr->GLView();
    assert(bglview);
@@ -367,6 +397,8 @@ MesaSoftRenderer::ClearBack(GLcontext *ctx,
                         GLboolean all, GLint x, GLint y,
                         GLint width, GLint height)
 {
+	CALLED();
+	
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
@@ -507,6 +539,8 @@ MesaSoftRenderer::WriteRGBASpanFront(const GLcontext *ctx, GLuint n,
                                  CONST GLubyte rgba[][4],
                                  const GLubyte mask[])
 {
+	CALLED();
+	
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
@@ -533,6 +567,8 @@ MesaSoftRenderer::WriteRGBSpanFront(const GLcontext *ctx, GLuint n,
                                 CONST GLubyte rgba[][3],
                                 const GLubyte mask[])
 {
+	CALLED();
+	
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
@@ -559,6 +595,8 @@ MesaSoftRenderer::WriteMonoRGBASpanFront(const GLcontext *ctx, GLuint n,
                                      const GLchan color[4],
                                      const GLubyte mask[])
 {
+	CALLED();
+	
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);

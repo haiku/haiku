@@ -27,8 +27,8 @@ public:
 	void 				Acquire();
 	void	 			Release();
 
-	virtual void			LockGL();
-	virtual void 			UnlockGL();
+	virtual void		LockGL();
+	virtual void 		UnlockGL();
 	
 	virtual	void 		SwapBuffers(bool VSync = false);
 	virtual	void		Draw(BRect updateRect);

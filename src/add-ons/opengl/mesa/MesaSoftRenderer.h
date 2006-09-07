@@ -24,6 +24,9 @@ class MesaSoftRenderer : public BGLRenderer
 public:
 				MesaSoftRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher);
 	virtual				~MesaSoftRenderer();
+	
+	virtual void		LockGL();
+	virtual void 		UnlockGL();
 
 	virtual	void 		SwapBuffers(bool VSync = false);
 	virtual	void		Draw(BRect updateRect);
