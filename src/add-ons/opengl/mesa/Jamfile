@@ -8,11 +8,26 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
+{
+        local defines ;
+        defines = BEOS_THREADS GNU_ASSEMBLER ;
+
+        if $(TARGET_ARCH) = x86 {
+                defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
+        } else {
+                # Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
+                # defines += USE_PPC_ASM ;
+        }
+
+        SubDirC++Flags [ FDefines $(defines) ] ;
+}
+
 UsePrivateHeaders opengl ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa glapi ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa tnl ] ;
 
 Addon mesa_soft : opengl :
 	MesaRenderer.cpp

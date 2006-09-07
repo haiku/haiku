@@ -18,6 +18,7 @@ UseHeaders [ FDirName $(SUBDIR) swrast ] ;
 UseHeaders [ FDirName $(SUBDIR) swrast_setup ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) array_cache ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) drivers common ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) glapi ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) main ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) math ] ;
@@ -114,6 +115,7 @@ StaticLibrary libmesa.a :
 	depth.c
 	dlist.c
 	drawpix.c
+	driverfuncs.c
 	enable.c
 	enums.c
 	eval.c

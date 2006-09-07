@@ -27,14 +27,18 @@
 #include <stdio.h>
 
 #include <GLView.h>
-// #include "GLRenderersManager.h"
-#include "GLRenderer.h"
+#include <GLRenderer.h>
+#include "GLRendererRoster.h"
 
 BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong options)
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
 		fRenderer(NULL)
 {
-	// TODO: get a renderer instance!
+	fRoster = new GLRendererRoster(this);
+	fRenderer = fRoster->GetRenderer();
+	if (!fRenderer) {
+		fprintf(stderr, "no renderer found! \n");
+	}
 }
 
 

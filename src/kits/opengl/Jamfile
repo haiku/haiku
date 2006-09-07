@@ -39,6 +39,7 @@ SharedLibrary libGL.so :
 	GLView.cpp
 	GLDispatcher.cpp
 	GLRenderer.cpp
+	GLRendererRoster.cpp
 
 	:
 

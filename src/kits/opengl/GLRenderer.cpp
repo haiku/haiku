@@ -3,10 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "GLDispatcher.h"
 #include "GLRenderer.h"
 
 BGLRenderer::BGLRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher)
-	: fRefCount(1)
+	: fRefCount(1),
+	fOptions(bgl_options),
+	fDispatcher(dispatcher)
 {
 
 }
@@ -14,6 +17,7 @@ BGLRenderer::BGLRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispat
 
 BGLRenderer::~BGLRenderer()
 {
+	delete fDispatcher;
 }
 
 
