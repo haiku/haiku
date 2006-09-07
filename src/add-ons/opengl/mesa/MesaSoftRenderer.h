@@ -19,11 +19,11 @@ extern "C" {
 
 }
 
-class MesaRenderer : public BGLRenderer
+class MesaSoftRenderer : public BGLRenderer
 {
 public:
-				MesaRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher);
-	virtual				~MesaRenderer();
+				MesaSoftRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher);
+	virtual				~MesaSoftRenderer();
 
 	virtual	void 		SwapBuffers(bool VSync = false);
 	virtual	void		Draw(BRect updateRect);
