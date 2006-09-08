@@ -9,7 +9,7 @@
  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
  
-#define CALLED() 			printf("CALLED %s\n",__PRETTY_FUNCTION__)
+#define CALLED() 			//printf("CALLED %s\n",__PRETTY_FUNCTION__)
 
 #include "MesaSoftRenderer.h"
 extern "C" {
@@ -182,6 +182,7 @@ MesaSoftRenderer::SwapBuffers(bool VSync = false)
 	_mesa_notifySwapBuffers(fContext);
 
 	if (fBitmap) {
+		CALLED();
 		GLView()->LockLooper();
 		GLView()->DrawBitmap(fBitmap);
 		GLView()->UnlockLooper();
@@ -332,16 +333,15 @@ MesaSoftRenderer::Clear(GLcontext *ctx, GLbitfield mask,
                                GLboolean all, GLint x, GLint y,
                                GLint width, GLint height)
 {
-   if (mask & DD_FRONT_LEFT_BIT)
+	CALLED();
+	if (mask & DD_FRONT_LEFT_BIT)
 		ClearFront(ctx, all, x, y, width, height);
-   if (mask & DD_BACK_LEFT_BIT)
+	if (mask & DD_BACK_LEFT_BIT)
 		ClearBack(ctx, all, x, y, width, height);
 
 	mask &= ~(DD_FRONT_LEFT_BIT | DD_BACK_LEFT_BIT);
 	if (mask)
 		_swrast_Clear( ctx, mask, all, x, y, width, height );
-
-   return;
 }
 
 
@@ -352,42 +352,41 @@ MesaSoftRenderer::ClearFront(GLcontext *ctx,
 {
 	CALLED();
 	
-   MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
-   BGLView *bglview = mr->GLView();
-   assert(bglview);
+	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	BGLView *bglview = mr->GLView();
+	assert(bglview);
 
-   bglview->SetHighColor(mr->fClearColor[BE_RCOMP],
-                         mr->fClearColor[BE_GCOMP],
-                         mr->fClearColor[BE_BCOMP],
-                         mr->fClearColor[BE_ACOMP]);
-   bglview->SetLowColor(mr->fClearColor[BE_RCOMP],
-                        mr->fClearColor[BE_GCOMP],
-                        mr->fClearColor[BE_BCOMP],
-                        mr->fClearColor[BE_ACOMP]);
-   if (all) {
-      BRect b = bglview->Bounds();
-      bglview->FillRect(b);
-   }
-   else {
-      // XXX untested
-      BRect b;
-      b.left = x;
-      b.right = x + width;
-      b.bottom = mr->fHeight - y - 1;
-      b.top = b.bottom - height;
-      bglview->FillRect(b);
-   }
+	bglview->SetHighColor(mr->fClearColor[BE_RCOMP],
+			mr->fClearColor[BE_GCOMP],
+			mr->fClearColor[BE_BCOMP],
+			mr->fClearColor[BE_ACOMP]);
+	bglview->SetLowColor(mr->fClearColor[BE_RCOMP],
+			mr->fClearColor[BE_GCOMP],
+			mr->fClearColor[BE_BCOMP],
+			mr->fClearColor[BE_ACOMP]);
+	if (all) {
+		BRect b = bglview->Bounds();
+		bglview->FillRect(b);
+	} else {
+		// XXX untested
+		BRect b;
+		b.left = x;
+		b.right = x + width;
+		b.bottom = mr->fHeight - y - 1;
+		b.top = b.bottom - height;
+		bglview->FillRect(b);
+	}
 
-   // restore drawing color
+	// restore drawing color
 #if 0
-   bglview->SetHighColor(md->mColor[BE_RCOMP],
-                         md->mColor[BE_GCOMP],
-                         md->mColor[BE_BCOMP],
-                         md->mColor[BE_ACOMP]);
-   bglview->SetLowColor(md->mColor[BE_RCOMP],
-                        md->mColor[BE_GCOMP],
-                        md->mColor[BE_BCOMP],
-                        md->mColor[BE_ACOMP]);
+	bglview->SetHighColor(md->mColor[BE_RCOMP],
+		md->mColor[BE_GCOMP],
+		md->mColor[BE_BCOMP],
+		md->mColor[BE_ACOMP]);
+	bglview->SetLowColor(md->mColor[BE_RCOMP],
+		md->mColor[BE_GCOMP],
+		md->mColor[BE_BCOMP],
+		md->mColor[BE_ACOMP]);
 #endif
 }
 
@@ -408,27 +407,25 @@ MesaSoftRenderer::ClearBack(GLcontext *ctx,
 	const GLuint *clearPixelPtr = (const GLuint *) mr->fClearColor;
 	const GLuint clearPixel = B_LENDIAN_TO_HOST_INT32(*clearPixelPtr);
 
-   if (all) {
-      const int numPixels = mr->fWidth * mr->fHeight;
-      if (clearPixel == 0) {
-         memset(start, 0, numPixels * 4);
-      }
-      else {
-         for (int i = 0; i < numPixels; i++) {
-             start[i] = clearPixel;
-         }
-      }
-   }
-   else {
-      // XXX untested
-      start += y * mr->fWidth + x;
-      for (int i = 0; i < height; i++) {
-         for (int j = 0; j < width; j++) {
-            start[j] = clearPixel;
-         }
-         start += mr->fWidth;
-      }
-   }
+	if (all) {
+		const int numPixels = mr->fWidth * mr->fHeight;
+		if (clearPixel == 0) {
+			memset(start, 0, numPixels * 4);
+		} else {
+			for (int i = 0; i < numPixels; i++) {
+				start[i] = clearPixel;
+			}
+		}
+	} else {
+		// XXX untested
+		start += y * mr->fWidth + x;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				start[j] = clearPixel;
+			}
+			start += mr->fWidth;
+		}
+	}
 }
 
 
@@ -527,9 +524,9 @@ MesaSoftRenderer::SetBuffer(GLcontext *ctx, GLframebuffer *buffer,
 // This is only used when drawing to the front buffer.
 inline void Plot(BGLView *bglview, int x, int y)
 {
-   // XXX There's got to be a better way!
-   BPoint p(x, y), q(x+1, y);
-   bglview->StrokeLine(p, q);
+	// XXX There's got to be a better way!
+	BPoint p(x, y), q(x+1, y);
+	bglview->StrokeLine(p, q);
 }
 
 
@@ -621,6 +618,7 @@ MesaSoftRenderer::WriteRGBAPixelsFront(const GLcontext *ctx,
                                    CONST GLubyte rgba[][4],
                                    const GLubyte mask[] )
 {
+	CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
@@ -646,6 +644,7 @@ MesaSoftRenderer::WriteMonoRGBAPixelsFront(const GLcontext *ctx, GLuint n,
                                        const GLchan color[4],
                                        const GLubyte mask[])
 {
+	CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
@@ -756,6 +755,7 @@ MesaSoftRenderer::WriteRGBASpanBack(const GLcontext *ctx, GLuint n,
                                  CONST GLubyte rgba[][4],
                                  const GLubyte mask[])
 {
+	//CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
@@ -787,6 +787,7 @@ MesaSoftRenderer::WriteRGBSpanBack(const GLcontext *ctx, GLuint n,
                                 CONST GLubyte rgb[][3],
                                 const GLubyte mask[])
 {
+	CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
@@ -819,6 +820,7 @@ MesaSoftRenderer::WriteMonoRGBASpanBack(const GLcontext *ctx, GLuint n,
                                     GLint x, GLint y,
                                     const GLchan color[4], const GLubyte mask[])
 {
+	CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
@@ -849,6 +851,7 @@ MesaSoftRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
                                    CONST GLubyte rgba[][4],
                                    const GLubyte mask[] )
 {
+	//CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
@@ -865,28 +868,27 @@ MesaSoftRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
 		rgba++;
 	};
 #else
-   if (mask) {
-      for (GLuint i = 0; i < n; i++) {
-         if (mask[i]) {
-            GLubyte *pixel = (GLubyte *) bitmap->Bits()
-            + ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-            pixel[BE_RCOMP] = rgba[i][RCOMP];
-            pixel[BE_GCOMP] = rgba[i][GCOMP];
-            pixel[BE_BCOMP] = rgba[i][BCOMP];
-            pixel[BE_ACOMP] = rgba[i][ACOMP];
-         }
-      }
-   }
-   else {
-      for (GLuint i = 0; i < n; i++) {
-         GLubyte *pixel = (GLubyte *) bitmap->Bits()
-            + ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-         pixel[BE_RCOMP] = rgba[i][RCOMP];
-         pixel[BE_GCOMP] = rgba[i][GCOMP];
-         pixel[BE_BCOMP] = rgba[i][BCOMP];
-         pixel[BE_ACOMP] = rgba[i][ACOMP];
-      }
-   }
+	if (mask) {
+		for (GLuint i = 0; i < n; i++) {
+			if (mask[i]) {
+				GLubyte *pixel = (GLubyte *) bitmap->Bits()
+					+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+				pixel[BE_RCOMP] = rgba[i][RCOMP];
+				pixel[BE_GCOMP] = rgba[i][GCOMP];
+				pixel[BE_BCOMP] = rgba[i][BCOMP];
+				pixel[BE_ACOMP] = rgba[i][ACOMP];
+			}
+		}
+	} else {
+		for (GLuint i = 0; i < n; i++) {
+			GLubyte *pixel = (GLubyte *) bitmap->Bits()
+				+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+			pixel[BE_RCOMP] = rgba[i][RCOMP];
+			pixel[BE_GCOMP] = rgba[i][GCOMP];
+			pixel[BE_BCOMP] = rgba[i][BCOMP];
+			pixel[BE_ACOMP] = rgba[i][ACOMP];
+		}
+	}
 #endif
 }
 
@@ -897,6 +899,7 @@ MesaSoftRenderer::WriteMonoRGBAPixelsBack(const GLcontext *ctx, GLuint n,
                                       const GLchan color[4],
                                       const GLubyte mask[])
 {
+	CALLED();
 	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
@@ -915,22 +918,21 @@ MesaSoftRenderer::WriteMonoRGBAPixelsBack(const GLcontext *ctx, GLuint n,
 		y++;
 	};
 #else
-   if (mask) {
-      for (GLuint i = 0; i < n; i++) {
-         if (mask[i]) {
-         	GLubyte * ptr = (GLubyte *) bitmap->Bits()
-            	+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-            *((uint32 *) ptr) = pixel_color;
-         }
-      }
-   }
-   else {
-	  for (GLuint i = 0; i < n; i++) {
-       	GLubyte * ptr = (GLubyte *) bitmap->Bits()
-	           	+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-       *((uint32 *) ptr) = pixel_color;
-      }
-   }
+	if (mask) {
+		for (GLuint i = 0; i < n; i++) {
+			if (mask[i]) {
+				GLubyte * ptr = (GLubyte *) bitmap->Bits()
+					+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+				*((uint32 *) ptr) = pixel_color;
+			}
+		}
+	} else {
+		for (GLuint i = 0; i < n; i++) {
+			GLubyte * ptr = (GLubyte *) bitmap->Bits()
+				+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+			*((uint32 *) ptr) = pixel_color;
+		}
+	}
 #endif
 }
 
@@ -995,20 +997,21 @@ void
 MesaSoftRenderer::ReadRGBASpanBack( const GLcontext *ctx, GLuint n,
                                 GLint x, GLint y, GLubyte rgba[][4] )
 {
-   MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
-   const BBitmap *bitmap = mr->fBitmap;
-   assert(bitmap);
-   int row = mr->fBottom - y;
-   const GLubyte *pixel = (GLubyte *) bitmap->Bits()
-                        + (row * bitmap->BytesPerRow()) + x * 4;
+	CALLED();
+	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	const BBitmap *bitmap = mr->fBitmap;
+	assert(bitmap);
+	int row = mr->fBottom - y;
+	const GLubyte *pixel = (GLubyte *) bitmap->Bits()
+		+ (row * bitmap->BytesPerRow()) + x * 4;
 
-   for (GLuint i = 0; i < n; i++) {
-      rgba[i][RCOMP] = pixel[BE_RCOMP];
-      rgba[i][GCOMP] = pixel[BE_GCOMP];
-      rgba[i][BCOMP] = pixel[BE_BCOMP];
-      rgba[i][ACOMP] = pixel[BE_ACOMP];
-      pixel += 4;
-   }
+	for (GLuint i = 0; i < n; i++) {
+		rgba[i][RCOMP] = pixel[BE_RCOMP];
+		rgba[i][GCOMP] = pixel[BE_GCOMP];
+		rgba[i][BCOMP] = pixel[BE_BCOMP];
+		rgba[i][ACOMP] = pixel[BE_ACOMP];
+		pixel += 4;
+	}
 }
 
 
@@ -1027,30 +1030,31 @@ MesaSoftRenderer::ReadRGBAPixelsBack( const GLcontext *ctx,
                                   GLuint n, const GLint x[], const GLint y[],
                                   GLubyte rgba[][4], const GLubyte mask[] )
 {
-   MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
-   const BBitmap *bitmap = mr->fBitmap;
-   assert(bitmap);
+	CALLED();
+	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	const BBitmap *bitmap = mr->fBitmap;
+	assert(bitmap);
 
-   if (mask) {
-      for (GLuint i = 0; i < n; i++) {
-         if (mask[i]) {
-            GLubyte *pixel = (GLubyte *) bitmap->Bits()
-            + ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-	         rgba[i][RCOMP] = pixel[BE_RCOMP];
-    	     rgba[i][GCOMP] = pixel[BE_GCOMP];
-        	 rgba[i][BCOMP] = pixel[BE_BCOMP];
-        	 rgba[i][ACOMP] = pixel[BE_ACOMP];
-         };
-      };
-   } else {
-      for (GLuint i = 0; i < n; i++) {
-         GLubyte *pixel = (GLubyte *) bitmap->Bits()
-            + ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-         rgba[i][RCOMP] = pixel[BE_RCOMP];
-         rgba[i][GCOMP] = pixel[BE_GCOMP];
-         rgba[i][BCOMP] = pixel[BE_BCOMP];
-         rgba[i][ACOMP] = pixel[BE_ACOMP];
-      };
-   };
+	if (mask) {
+		for (GLuint i = 0; i < n; i++) {
+			if (mask[i]) {
+				GLubyte *pixel = (GLubyte *) bitmap->Bits()
+					+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+				rgba[i][RCOMP] = pixel[BE_RCOMP];
+				rgba[i][GCOMP] = pixel[BE_GCOMP];
+				rgba[i][BCOMP] = pixel[BE_BCOMP];
+				rgba[i][ACOMP] = pixel[BE_ACOMP];
+			};
+		};
+	} else {
+		for (GLuint i = 0; i < n; i++) {
+			GLubyte *pixel = (GLubyte *) bitmap->Bits()
+				+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+			rgba[i][RCOMP] = pixel[BE_RCOMP];
+			rgba[i][GCOMP] = pixel[BE_GCOMP];
+			rgba[i][BCOMP] = pixel[BE_BCOMP];
+			rgba[i][ACOMP] = pixel[BE_ACOMP];
+		};
+	};
 }
 
