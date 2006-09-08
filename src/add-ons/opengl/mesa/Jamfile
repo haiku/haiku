@@ -32,5 +32,5 @@ UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa tnl ] ;
 Addon mesa_soft : opengl :
 	MesaSoftRenderer.cpp
 	: false
-	: libmesa.a libGL.so be
+	: libGL.so libmesa.a be
 ;
