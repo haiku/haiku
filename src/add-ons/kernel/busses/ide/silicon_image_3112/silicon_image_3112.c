@@ -7,10 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <device_manager.h>
+#include <bus/IDE.h>
 #include <bus/ide/ide_adapter.h>
 #include <block_io.h>
 
 #define TRACE(a...) dprintf("si-3112 " a)
+#define FLOW(a...)	dprintf("si-3112 " a)
 
 
 #define DRIVER_PRETTY_NAME		"Silicon Image SATA"
@@ -72,32 +74,30 @@ typedef struct  {
 	
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
-} controller_cookie;
+} controller_data;
 
 
-typedef struct {
+typedef struct {	
+
 	pci_device_module_info *pci;
-	pci_device device;
+	device_node_handle	node;
+	pci_device 			device;
 
-	device_node_handle node;
+	volatile uint8 *	task_file;
+	volatile uint8 *	control_block;
+	volatile uint8 *	command_block;
+	volatile uint8 *	dev_ctrl;
+	volatile uint8 *	bm_status_reg;
+	volatile uint8 *	bm_command_reg;
+	volatile uint32 *	bm_prdt_address;
+
+	area_id				prd_area;
+	prd_entry *			prdt;
+	void *				prdt_phys;
+	uint32 				dma_active;
+	uint32 				lost;
 	
-	uint16 command_block_base;	// io address command block
-	uint16 control_block_base; // io address control block
-	uint16 bus_master_base;
-	int intnum;				// interrupt number	
-	
-	uint32 lost;			// != 0 if device got removed, i.e. if it must not
-							// be accessed anymore
-	
-	ide_channel ide_channel;
-	
-	int32 (*inthand)( void *arg );
-	
-	area_id prd_area;
-	prd_entry *prdt;
-	uint32 prdt_phys;
-	uint32 dmaing;
-} channel_cookie;
+} channel_data;
 
 
 static ide_for_controller_interface *	ide;
@@ -248,9 +248,9 @@ err:
 
 
 static status_t 
-controller_init(device_node_handle node, void *user_cookie, void **cookie)
+controller_init(device_node_handle node, void *user_cookie, void **controller_cookie)
 {
-	controller_cookie *controller;
+	controller_data *controller;
 	pci_device_module_info *pci;
 	pci_device device;
 	uint32 asic_index;
@@ -271,7 +271,7 @@ controller_init(device_node_handle node, void *user_cookie, void **cookie)
 	if (dm->get_attr_uint32(node, "silicon_image_3112/int_num", &int_num, false) != B_OK)
 		return B_ERROR;
 
-	controller = malloc(sizeof(controller_cookie));
+	controller = malloc(sizeof(controller_data));
 	if (!controller)
 		return B_NO_MEMORY;
 
@@ -331,7 +331,7 @@ controller_init(device_node_handle node, void *user_cookie, void **cookie)
 		free(controller);
 	}
 	
-	*cookie = controller;
+	*controller_cookie = controller;
 
 	TRACE("controller_init success\n");
 	return B_OK;
@@ -339,9 +339,9 @@ controller_init(device_node_handle node, void *user_cookie, void **cookie)
 
 
 static status_t
-controller_uninit(void *cookie)
+controller_uninit(void *controller_cookie)
 {
-	controller_cookie *controller = cookie;
+	controller_data *controller = controller_cookie;
 	int i;
 
 	TRACE("controller_uninit enter\n");
@@ -363,103 +363,358 @@ controller_uninit(void *cookie)
 
 
 static void
-controller_removed(device_node_handle node, void *cookie)
+controller_removed(device_node_handle node, void *controller_cookie)
 {
-	controller_cookie *controller = cookie;
+	controller_data *controller = controller_cookie;
 	controller->lost = 1;
 }
 
 
 static status_t
-channel_init(device_node_handle node, void *user_cookie, void **_cookie)
+channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 {
-	return B_ERROR;
+	ide_channel ide_channel = user_cookie;
+	channel_data *channel;
+	
+	channel = malloc(sizeof(channel_data));
+	if (!channel)
+		return B_NO_MEMORY;
+	
+/*
+	channel->	
+	
+	pci_device_module_info *pci;
+	device_node_handle node;
+	pci_device device;
+
+	volatile uint8 *task_file      (volatile uint8 *)(channel->mmio_addr + channel->command_block_base + 1);
+	volatile uint8 *control_block  	(volatile uint8 *)(channel->mmio_addr + channel->control_block_base);
+	volatile uint8 *command_block
+	volatile uint8 *dev_ctrl
+	volatile uint32 * bm_prdt_address = (volatile uint32 *)(channel->mmio_addr + channel->bus_master_base + ata_bm_prdt_address);
+	volatile uint8 * bm_status_reg = (volatile uint8 *)(channel->mmio_addr + channel->bus_master_base + ata_bm_status_reg);
+	volatile uint8 * bm_command_reg = (volatile uint8 *)(channel->mmio_addr + channel->bus_master_base + ata_bm_command_reg);
+
+	uint32 lost;
+
+	prd_entry *prdt;
+	area_id prd_area;
+	prd_entry *prdt;
+	uint32 dma_active;
+*/	
+
+	*channel_cookie = channel;
+	return B_OK;
 }
 
 
 static status_t
-channel_uninit(void *cookie)
+channel_uninit(void *channel_cookie)
 {
+	channel_data *channel = channel_cookie;
 	return B_ERROR;
 }
 
 
 static void
-channel_removed(device_node_handle node, void *cookie)
+channel_removed(device_node_handle node, void *channel_cookie)
 {
+	channel_data *channel = channel_cookie;
 }
 
 
 static status_t
 task_file_write(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	int i;
+
+	FLOW("task_file_write\n");
+	
+	if (channel->lost)
+		return B_ERROR;
+
+	for (i = 0; i < 7; i++) {
+		if( ((1 << (i+7)) & mask) != 0 ) {
+			FLOW("%x->HI(%x)\n", tf->raw.r[i + 7], i );
+			channel->task_file[i] = tf->raw.r[i + 7];
+		}
+		
+		if (((1 << i) & mask) != 0) {
+			FLOW("%x->LO(%x)\n", tf->raw.r[i], i );
+			channel->task_file[i] = tf->raw.r[i];
+		}
+	}
+	*channel->dev_ctrl; // read altstatus to flush
+	
+	return B_OK;
 }
 
 
 static status_t
 task_file_read(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	int i;
+
+	FLOW("task_file_read\n");
+
+	if (channel->lost)
+		return B_ERROR;
+
+	for (i = 0; i < 7; i++) {
+		if (((1 << i) & mask) != 0) {
+			tf->raw.r[i] = channel->task_file[i];
+			FLOW("%x: %x\n", i, (int)tf->raw.r[i] );
+		}
+	}
+	
+	return B_OK;
 }
 
 
 static uint8
 altstatus_read(void *channel_cookie)
 {
-	return 0xff;
+	channel_data *channel = channel_cookie;
+
+	FLOW("altstatus_read\n");
+
+	if (channel->lost)
+		return 0x01; // Error bit
+
+	return *channel->dev_ctrl;
 }
 
 
 static status_t 
 device_control_write(void *channel_cookie, uint8 val)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+
+	FLOW("device_control_write %x\n", val);
+	
+	if (channel->lost)
+		return B_ERROR;
+
+	*channel->dev_ctrl = val;
+	*channel->dev_ctrl; // read altstatus to flush
+	
+	return B_OK;
 }
 
 
 static status_t
 pio_write(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	if (channel->lost)
+		return B_ERROR;
+
+	FLOW("pio_write force_16bit = %d, (count & 1) = %d\n", force_16bit, (count & 1));
+
+	// The data port is only 8 bit wide in the command register block.
+
+	if ((count & 1) != 0 || force_16bit) {
+		volatile uint16 * base = (volatile uint16 *)channel->command_block;
+		for ( ; count > 0; --count)
+			*base = *(data++);
+	} else {
+		volatile uint32 * base = (volatile uint32 *)channel->command_block;
+		uint32 *cur_data = (uint32 *)data;
+		
+		for ( ; count > 0; count -= 2 )
+			*base = *(cur_data++);
+	}
+	*channel->dev_ctrl; // read altstatus to flush
+	
+	return B_OK;
 }
+
 
 static status_t
 pio_read(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	if (channel->lost)
+		return B_ERROR;
+
+	FLOW("pio_read force_16bit = %d, (count & 1) = %d\n", force_16bit, (count & 1));
+	
+	// The data port is only 8 bit wide in the command register block.
+	// We are memory mapped and read using 16 or 32 bit access from this 8 bit location.
+
+	if ((count & 1) != 0 || force_16bit) {
+		volatile uint16 * base = (volatile uint16 *)channel->command_block;
+		for ( ; count > 0; --count)
+			*(data++) = *base;
+	} else {
+		volatile uint32 * base = (volatile uint32 *)channel->command_block;
+		uint32 *cur_data = (uint32 *)data;
+		
+		for ( ; count > 0; count -= 2 )
+			*(cur_data++) = *base;
+	}
+	
+	return B_OK;
 }
 
 
 static status_t
 dma_prepare(void *channel_cookie, const physical_entry *sg_list, size_t sg_list_count, bool write)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	pci_device_module_info *pci = channel->pci;
+	pci_device device = channel->device;
+	prd_entry *prd = channel->prdt;
+	ide_bm_command command;
+	ide_bm_status status;
+	uint32 temp;
+	int i;
+	
+	FLOW("dma_prepare enter\n");
+	
+	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sg_list ) {
+		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sg_list->address));
+		// 0 means 64K - this is done automatically be discarding upper 16 bits
+		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sg_list->size);
+		prd->EOT = i == 0;
+		
+		FLOW("%x, %x, %d\n", (int)prd->address, prd->count, prd->EOT );
+	}
+
+	// XXX move this to chan init?
+	temp = (*channel->bm_prdt_address) & 3;
+	temp |= B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, (void *)channel->prdt_phys)) & ~3;
+	*channel->bm_prdt_address = temp;
+
+	*channel->dev_ctrl; // read altstatus to flush
+
+	// reset interrupt and error signal
+	*(uint8 *)&status = *channel->bm_status_reg;
+	status.interrupt = 1;
+	status.error = 1;
+	*channel->bm_status_reg = *(uint8 *)&status;
+
+	*channel->dev_ctrl; // read altstatus to flush
+		
+	// set data direction
+	*(uint8 *)&command = *channel->bm_command_reg;
+	command.from_device = !write;
+	*channel->bm_command_reg = *(uint8 *)&command;
+
+	*channel->dev_ctrl; // read altstatus to flush
+
+	FLOW("dma_prepare leave\n");
+
+	return B_OK;
 }
 
 
 static status_t
 dma_start(void *channel_cookie)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	ide_bm_command command;
+
+	FLOW("dma_start enter\n");
+	
+	*(uint8 *)&command = *channel->bm_command_reg;
+
+	command.start_stop = 1;
+	channel->dma_active = true;
+
+	*channel->bm_command_reg = *(uint8 *)&command;
+
+	*channel->dev_ctrl; // read altstatus to flush
+	
+	FLOW("dma_start leave\n");
+	
+	return B_OK;
 }
 
 
 static status_t
 dma_finish(void *channel_cookie)
 {
-	return B_ERROR;
+	channel_data *channel = channel_cookie;
+	ide_bm_command command;
+	ide_bm_status status, new_status;
+
+	FLOW("dma_finish enter\n");
+
+	*(uint8 *)&command = *channel->bm_command_reg;
+
+	command.start_stop = 0;
+	channel->dma_active = false;
+	
+	*channel->bm_command_reg = *(uint8 *)&command;
+
+	*(uint8 *)&status = *channel->bm_status_reg;
+
+	new_status = status;	
+	new_status.interrupt = 1;
+	new_status.error = 1;
+
+	*channel->bm_status_reg = *(uint8 *)&new_status;
+
+	*channel->dev_ctrl; // read altstatus to flush
+	
+	if (status.error) {
+		FLOW("dma_finish: failed\n");
+		return B_ERROR;
+	}
+
+	if (!status.interrupt) {
+		if (status.active) {
+			FLOW("dma_finish: transfer aborted\n");
+			return B_ERROR;
+		} else {
+			FLOW("dma_finish: buffer underrun\n");
+			return B_DEV_DATA_UNDERRUN;
+		}
+	} else {
+		if (status.active) {
+			FLOW("dma_finish: buffer too large\n");
+			return B_DEV_DATA_OVERRUN;
+		} else {
+			FLOW("dma_finish leave\n");
+			return B_OK;
+		}
+	}
 }
 
 
 static int32
 handle_interrupt(void *arg)
 {
-	controller_cookie *controller = arg;
+	controller_data *controller = arg;
 	pci_device_module_info *pci = controller->pci;
 	pci_device device = controller->device;
+	ide_bm_status bm_status;
+	uint8 status;
 
+	FLOW("handle_interrupt\n");
 	return B_UNHANDLED_INTERRUPT;
+/*	
+	if (channel->lost)
+		return B_UNHANDLED_INTERRUPT;
+		
+	// add test whether this is really our IRQ
+	if (channel->dma_active) {
+		// in DMA mode, there is a safe test
+		// in PIO mode, this doesn't work
+		*(uint8 *)&bm_status = *channel->bm_status_reg;
+
+		if (!bm_status.interrupt)
+			return B_UNHANDLED_INTERRUPT;
+	}
+
+	// acknowledge IRQ
+	status = *(channel->command_block + 7);
+
+	return channel->ata->irq_handler(channel->ata_bus, status);
+*/
 }
 
 
