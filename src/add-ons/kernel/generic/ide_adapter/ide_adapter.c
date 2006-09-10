@@ -95,7 +95,7 @@ ide_adapter_get_altstatus(ide_adapter_channel_info *channel)
 	uint16 altstatusaddr = channel->control_block_base;
 
 	if (channel->lost)
-		return B_ERROR;
+		return 0x01; // Error bit
 
 	return pci->read_io_8(device, altstatusaddr);
 }
