@@ -663,7 +663,8 @@ printf("video decode start\n");
 				break;
 			goto wait;
 		}
-				
+
+#if 0
 		bigtime_t waituntil;
 		bigtime_t waitdelta;
 		char test[100];
@@ -672,22 +673,22 @@ printf("video decode start\n");
 
 			waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime;
 			waitdelta = waituntil - system_time();
-/*
 			sprintf(test, "sys %.6f perf %.6f, vid %.6f, waituntil %.6f, waitdelta %.6f",
 			 fTimeSourceSysTime / 1000000.0f,
 			 fTimeSourcePerfTime / 1000000.0f,
 			 buffer->startTime / 1000000.0f,
 			 waituntil / 1000000.0f,
 			 waitdelta / 1000000.0f);
-			 */
-//		if (status != B_TIMED_OUT)
 		}
-/*
 		if (fVideoView->LockLooperWithTimeout(5000) == B_OK) {
 			fVideoView->Window()->SetTitle(test);
 			fVideoView->UnlockLooper();
 		}
-*/
+#else
+		bigtime_t waituntil;
+		waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime;
+#endif
+
 		status = acquire_sem_etc(fThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, waituntil);
 		if (status != B_TIMED_OUT)
 			break;
