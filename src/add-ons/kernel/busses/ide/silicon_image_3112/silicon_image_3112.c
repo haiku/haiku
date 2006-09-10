@@ -464,6 +464,8 @@ channel_uninit(void *channel_cookie)
 {
 	channel_data *channel = channel_cookie;
 
+	TRACE("channel_uninit enter\n");
+
 	// disable IRQs
 	device_control_write(channel, ide_devctrl_bit3 | ide_devctrl_nien);
 
@@ -476,6 +478,8 @@ channel_uninit(void *channel_cookie)
 
 	delete_area(channel->prd_area);
 	free(channel);
+
+	TRACE("channel_uninit leave\n");
 	return B_OK;
 }
 
@@ -786,7 +790,10 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			TRACE("module init\n");
+			return B_OK;
 		case B_MODULE_UNINIT:
+			TRACE("module uninit\n");
 			return B_OK;
 
 		default:
