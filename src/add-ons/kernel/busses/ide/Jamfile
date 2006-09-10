@@ -3,3 +3,4 @@ SubDir HAIKU_TOP src add-ons kernel busses ide ;
 SubInclude HAIKU_TOP src add-ons kernel busses ide generic_ide_pci ;
 SubInclude HAIKU_TOP src add-ons kernel busses ide ide_isa ;
 SubInclude HAIKU_TOP src add-ons kernel busses ide promise_tx2 ;
+SubInclude HAIKU_TOP src add-ons kernel busses ide silicon_image_3112 ;
