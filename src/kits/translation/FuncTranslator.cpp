@@ -28,7 +28,7 @@ namespace BPrivate {
 
 BFuncTranslator::BFuncTranslator(const translator_data& data)
 {
-	memcpy(&fData, &data, sizeof(translator_data));
+	fData = data;
 }
 
 
