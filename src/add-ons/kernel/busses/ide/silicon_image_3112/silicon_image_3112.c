@@ -58,9 +58,53 @@ static const struct {
 #define SI_MASK_4PORT		((1 << 22) | (1 << 23) | (1 << 24) | (1 << 25))
 
 
+typedef struct  {
+	pci_device_module_info *pci;
+	pci_device device;
+
+	device_node_handle node;
+
+	uint32 asic_index;
+	uint32 int_num;
+
+	area_id mmio_area;
+	uint32 mmio_addr;
+	
+	uint32 lost;			// != 0 if device got removed, i.e. if it must not
+							// be accessed anymore
+} controller_cookie;
+
+
+typedef struct {
+	pci_device_module_info *pci;
+	pci_device device;
+
+	device_node_handle node;
+	
+	uint16 command_block_base;	// io address command block
+	uint16 control_block_base; // io address control block
+	uint16 bus_master_base;
+	int intnum;				// interrupt number	
+	
+	uint32 lost;			// != 0 if device got removed, i.e. if it must not
+							// be accessed anymore
+	
+	ide_channel ide_channel;
+	
+	int32 (*inthand)( void *arg );
+	
+	area_id prd_area;
+	prd_entry *prdt;
+	uint32 prdt_phys;
+	uint32 dmaing;
+} channel_cookie;
+
+
 static ide_for_controller_interface *	ide;
 static ide_adapter_interface *			ide_adapter;
 static device_manager_info *			dm;
+
+static int32 handle_interrupt(void *arg);
 
 
 static status_t
@@ -151,6 +195,7 @@ controller_probe(device_node_handle parent)
 
 		// private data to find controller
 		{ "silicon_image_3112/asic_index", B_UINT32_TYPE, { ui32: asic_index }},
+		{ "silicon_image_3112/mmio_base", B_UINT32_TYPE, { ui32: mmio_base }},
 		{ "silicon_image_3112/int_num", B_UINT32_TYPE, { ui32: int_num }},
 		{ NULL }
 	};
@@ -203,22 +248,125 @@ err:
 
 
 static status_t 
-controller_init(device_node_handle node, void *user_cookie, void **_cookie)
+controller_init(device_node_handle node, void *user_cookie, void **cookie)
 {
-	return B_ERROR;
+	controller_cookie *controller;
+	pci_device_module_info *pci;
+	pci_device device;
+	uint32 asic_index;
+	uint32 mmio_base;
+	uint32 mmio_addr;
+	area_id mmio_area;
+	uint32 int_num;
+	status_t res;
+	uint32 temp;
+	int i;
+	
+	TRACE("controller_init\n");
+	
+	if (dm->get_attr_uint32(node, "silicon_image_3112/asic_index", &asic_index, false) != B_OK)
+		return B_ERROR;
+	if (dm->get_attr_uint32(node, "silicon_image_3112/mmio_base", &mmio_base, false) != B_OK)
+		return B_ERROR;
+	if (dm->get_attr_uint32(node, "silicon_image_3112/int_num", &int_num, false) != B_OK)
+		return B_ERROR;
+
+	controller = malloc(sizeof(controller_cookie));
+	if (!controller)
+		return B_NO_MEMORY;
+
+	mmio_area = map_physical_memory("Silicon Image SATA regs", (void *)mmio_base, 
+									asic_data[asic_index].mmio_bar_size, 
+									B_ANY_KERNEL_ADDRESS, 0, (void **)&mmio_addr);
+	if (mmio_area < B_OK) {
+		TRACE("controller_init: mapping memory failed\n");
+		free(controller);
+		return B_ERROR;
+	}
+
+
+	if (dm->init_driver(dm->get_parent(node), NULL, (driver_module_info **)&pci, (void **)&device) < B_OK) {
+		TRACE("controller_init: init parent failed\n");
+		delete_area(mmio_area);
+		free(controller);
+		return B_ERROR;
+	}
+	
+	TRACE("asic %ld\n", asic_index);
+	TRACE("int_num %ld\n", int_num);
+	TRACE("mmio_addr %p\n", (void *)mmio_addr);
+
+	controller->pci        = pci;
+	controller->device     = device;
+	controller->node       = node;
+	controller->asic_index = asic_index;
+	controller->int_num    = int_num;
+	controller->mmio_area  = mmio_area;
+	controller->mmio_addr  = mmio_addr;
+	controller->lost       = 0;
+
+	if (asic_index == ASIC_SI3114) {
+		// I put a magic spell on you
+		temp = *(volatile uint32 *)mmio_addr + SI_BMDMA2;
+		*(volatile uint32 *)(mmio_addr + SI_BMDMA2) = temp | SI_INT_STEERING;
+		*(volatile uint32 *)(mmio_addr + SI_BMDMA2); // flush
+	}
+
+	temp = *(volatile uint32 *)mmio_addr + SI_SYSCFG;
+	temp &= (asic_index == ASIC_SI3114) ? ~SI_MASK_4PORT : ~SI_MASK_2PORT;
+	*(volatile uint32 *)(mmio_addr + SI_SYSCFG) = temp;
+	*(volatile uint32 *)(mmio_addr + SI_SYSCFG); // flush
+	
+	// disable interrupts
+	for (i = 0; i < asic_data[asic_index].channel_count; i++)
+		*(volatile uint32 *)(mmio_addr + controller_channel_data[i].sien) = 0;
+	*(volatile uint32 *)(mmio_addr + controller_channel_data[0].sien); // flush
+	
+	// install interrupt handler
+	res = install_io_interrupt_handler(int_num, handle_interrupt, controller, 0);
+	if (res <  B_OK) {
+		TRACE("controller_init: installing interrupt handler failed\n");
+		dm->uninit_driver(dm->get_parent(node));
+		delete_area(mmio_area);
+		free(controller);
+	}
+	
+	*cookie = controller;
+
+	TRACE("controller_init success\n");
+	return B_OK;
 }
 
 
 static status_t
 controller_uninit(void *cookie)
 {
-	return B_ERROR;
+	controller_cookie *controller = cookie;
+	int i;
+
+	TRACE("controller_uninit enter\n");
+
+	// disable interrupts
+	for (i = 0; i < asic_data[controller->asic_index].channel_count; i++)
+		*(volatile uint32 *)(controller->mmio_addr + controller_channel_data[i].sien) = 0;
+	*(volatile uint32 *)(controller->mmio_addr + controller_channel_data[0].sien); // flush
+
+	remove_io_interrupt_handler(controller->int_num, handle_interrupt, controller);
+
+	dm->uninit_driver(dm->get_parent(controller->node));	
+	delete_area(controller->mmio_area);
+	free(controller);
+
+	TRACE("controller_uninit leave\n");
+	return B_OK;
 }
 
 
 static void
 controller_removed(device_node_handle node, void *cookie)
 {
+	controller_cookie *controller = cookie;
+	controller->lost = 1;
 }
 
 
@@ -307,9 +455,9 @@ dma_finish(ide_channel_cookie channel)
 static int32
 handle_interrupt(void *arg)
 {
-	ide_adapter_channel_info *channel = (ide_adapter_channel_info *)arg;
-	pci_device_module_info *pci = channel->pci;
-	pci_device device = channel->device;
+	controller_cookie *controller = arg;
+	pci_device_module_info *pci = controller->pci;
+	pci_device device = controller->device;
 
 	return B_UNHANDLED_INTERRUPT;
 }
