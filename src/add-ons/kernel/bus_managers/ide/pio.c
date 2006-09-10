@@ -71,7 +71,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 {
 	ide_bus_info *bus = device->bus;
 	ide_controller_interface *controller = bus->controller;
-	ide_channel_cookie cookie = bus->channel;
+	void * channel_cookie = bus->channel_cookie;
 
 	if (write) {
 		// if there is a byte left from last chunk, transmit it together
@@ -83,13 +83,13 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 			buffer[0] = device->odd_byte;
 			buffer[1] = *virtualAddress++;
 
-			controller->write_pio(cookie, (uint16 *)buffer, 1, false);
+			controller->write_pio(channel_cookie, (uint16 *)buffer, 1, false);
 
 			--length;
 			*transferred += 2;
 		}
 
-		controller->write_pio(cookie, (uint16 *)virtualAddress, length / 2, false);
+		controller->write_pio(channel_cookie, (uint16 *)virtualAddress, length / 2, false);
 
 		// take care if chunk size was odd, which means that 1 byte remains		
 		virtualAddress += length & ~1;
@@ -108,7 +108,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 
 		SHOW_FLOW(4, "Reading PIO to %p, %d bytes", virtualAddress, length);
 
-		controller->read_pio(cookie, (uint16 *)virtualAddress, length / 2, false);
+		controller->read_pio(channel_cookie, (uint16 *)virtualAddress, length / 2, false);
 
 		// take care of odd chunk size;
 		// in this case we read 1 byte to few!		
@@ -122,7 +122,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 
 			// now read the missing byte; as we have to read 2 bytes at once,
 			// we'll read one byte too much
-			controller->read_pio(cookie, (uint16 *)buffer, 1, false);
+			controller->read_pio(channel_cookie, (uint16 *)buffer, 1, false);
 
 			*virtualAddress = buffer[0];
 			device->odd_byte = buffer[1];
@@ -247,7 +247,7 @@ write_discard_PIO(ide_device_info *device, int length)
 		// make length even (this is the "length + 1" term)		
 		cur_len = min(length + 1, (int)(sizeof(buffer))) / 2;
 
-		bus->controller->write_pio(bus->channel, (uint16 *)buffer, cur_len, false);
+		bus->controller->write_pio(bus->channel_cookie, (uint16 *)buffer, cur_len, false);
 
 		length -= cur_len * 2;
 	}
@@ -269,7 +269,7 @@ read_discard_PIO(ide_device_info *device, int length)
 		// read extra byte if length is odd (that's the "length + 1")
 		cur_len = min(length + 1, (int)sizeof(buffer)) / 2;
 
-		bus->controller->read_pio(bus->channel, (uint16 *)buffer, cur_len, false);
+		bus->controller->read_pio(bus->channel_cookie, (uint16 *)buffer, cur_len, false);
 
 		length -= cur_len * 2;
 	}
@@ -310,7 +310,7 @@ write_PIO_block(ide_qrequest *qrequest, int length)
 		qrequest->request->data_resid -= 1;
 		transferred += 2;
 
-		device->bus->controller->write_pio(device->bus->channel, (uint16 *)buffer, 1, false);
+		device->bus->controller->write_pio(device->bus->channel_cookie, (uint16 *)buffer, 1, false);
 	}
 
 	// "transferred" may actually be larger then length because the last odd-byte

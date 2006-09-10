@@ -196,7 +196,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 
 	// initialize device selection flags,
 	// this is the only place where this bit gets initialized in the task file
-	if (bus->controller->read_command_block_regs(bus->channel, &device->tf,
+	if (bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
 			ide_mask_device_head) != B_OK) 
 		return false;
 
@@ -218,7 +218,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 		// check the busy flag - if it's still set, there's probably no device	
 		IDE_LOCK(bus);
 
-		status = bus->controller->get_altstatus(bus->channel);
+		status = bus->controller->get_altstatus(bus->channel_cookie);
 		SHOW_FLOW(3, "status=%x", (int)status);
 		cont = (status & ide_status_bsy) == ide_status_bsy;
 
@@ -250,7 +250,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 
 	ide_wait(device, ide_status_drq, ide_status_bsy, true, 1000);
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	if ((status & ide_status_err) != 0) {
 		// if there's no device, all bits including the error bit are set
@@ -259,7 +259,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 	}
 
 	// get the infoblock		
-	bus->controller->read_pio(bus->channel, (uint16 *)&device->infoblock, 
+	bus->controller->read_pio(bus->channel_cookie, (uint16 *)&device->infoblock, 
 		sizeof(device->infoblock) / sizeof(uint16), false);
 
 	if (!wait_for_drqdown(device))

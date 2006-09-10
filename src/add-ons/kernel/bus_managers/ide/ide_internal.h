@@ -193,7 +193,7 @@ struct ide_bus_info {
 
 	// controller
 	ide_controller_interface *controller;
-	ide_channel_cookie channel;
+	void *channel_cookie;
 
 	// lock, used for changes of bus state
 	spinlock lock;
@@ -294,7 +294,7 @@ ide_device_info *get_current_device(ide_bus_info *bus)
 {
 	ide_task_file tf;
 
-	bus->controller->read_command_block_regs(bus->channel, &tf, 
+	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, 
 		ide_mask_device_head);
 
 	return bus->devices[tf.lba.device];
@@ -308,7 +308,7 @@ device_released_bus(ide_device_info *device)
 {
 	ide_bus_info *bus = device->bus;
 
-	bus->controller->read_command_block_regs(bus->channel,
+	bus->controller->read_command_block_regs(bus->channel_cookie,
 		&device->tf, ide_mask_sector_count);
 
 	return device->tf.queued.release;

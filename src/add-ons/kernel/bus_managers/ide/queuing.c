@@ -350,12 +350,12 @@ send_abort_queue(ide_device_info *device)
 		goto err;
 
 	// device must answer "command rejected" and discard outstanding commands
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	if ((status & ide_status_err) == 0)
 		goto err;
 
-	if (!bus->controller->read_command_block_regs(bus->channel,
+	if (!bus->controller->read_command_block_regs(bus->channel_cookie,
 			&device->tf, ide_mask_error)) {
 		// don't bother trying bus_reset as controller disappeared
 		device->subsys_status = SCSI_HBA_ERR;

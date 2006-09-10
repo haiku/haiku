@@ -391,62 +391,62 @@ channel_removed(device_node_handle node, void *cookie)
 
 
 static status_t
-task_file_write(ide_channel_cookie channel, ide_task_file *tf, ide_reg_mask mask)
+task_file_write(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-task_file_read(ide_channel_cookie channel, ide_task_file *tf, ide_reg_mask mask)
+task_file_read(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
 	return B_ERROR;
 }
 
 
 static uint8
-altstatus_read(ide_channel_cookie channel)
+altstatus_read(void *channel_cookie)
 {
 	return 0xff;
 }
 
 
 static status_t 
-device_control_write(ide_channel_cookie channel, uint8 val)
+device_control_write(void *channel_cookie, uint8 val)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-pio_write(ide_channel_cookie channel, uint16 *data, int count, bool force_16bit)
+pio_write(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
 	return B_ERROR;
 }
 
 static status_t
-pio_read(ide_channel_cookie channel, uint16 *data, int count, bool force_16bit)
-{
-	return B_ERROR;
-}
-
-
-static status_t
-dma_prepare(ide_channel_cookie channel, const physical_entry *sg_list, size_t sg_list_count, bool write)
+pio_read(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-dma_start(ide_channel_cookie channel)
+dma_prepare(void *channel_cookie, const physical_entry *sg_list, size_t sg_list_count, bool write)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-dma_finish(ide_channel_cookie channel)
+dma_start(void *channel_cookie)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+dma_finish(void *channel_cookie)
 {
 	return B_ERROR;
 }

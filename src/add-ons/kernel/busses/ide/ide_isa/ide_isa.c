@@ -60,11 +60,12 @@ typedef struct channel_info {
 } channel_info;
 
 
-static int
-write_command_block_regs(channel_info *channel, ide_task_file *tf, ide_reg_mask mask)
+static status_t
+write_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	int i;
+	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
+	int i;
 	
 	if (channel->lost)
 		return B_ERROR;
@@ -86,10 +87,11 @@ write_command_block_regs(channel_info *channel, ide_task_file *tf, ide_reg_mask 
 
 
 static status_t
-read_command_block_regs(channel_info *channel, ide_task_file *tf, ide_reg_mask mask)
+read_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	int i;
+	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
+	int i;
 
 	if (channel->lost)
 		return B_ERROR;
@@ -106,8 +108,9 @@ read_command_block_regs(channel_info *channel, ide_task_file *tf, ide_reg_mask m
 
 
 static uint8
-get_altstatus(channel_info *channel)
+get_altstatus(void *channel_cookie)
 {
+	channel_info *channel = channel_cookie;
 	uint16 altstatusaddr = channel->control_block_base;
 
 	if (channel->lost)
@@ -118,8 +121,9 @@ get_altstatus(channel_info *channel)
 
 
 static status_t
-write_device_control(channel_info *channel, uint8 val)
+write_device_control(void *channel_cookie, uint8 val)
 {
+	channel_info *channel = channel_cookie;
 	uint16 device_control_addr = channel->control_block_base;
 
 	SHOW_FLOW(3, "%x", (int)val);
@@ -134,8 +138,9 @@ write_device_control(channel_info *channel, uint8 val)
 
 
 static status_t
-write_pio_16(channel_info *channel, uint16 *data, int count, bool force_16bit)
+write_pio_16(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
+	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
 
 	if (channel->lost)
@@ -160,8 +165,9 @@ write_pio_16(channel_info *channel, uint16 *data, int count, bool force_16bit)
 
 
 static status_t
-read_pio_16(channel_info *channel, uint16 *data, int count, bool force_16bit)
+read_pio_16(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
+	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
 
 	if (channel->lost)
@@ -202,22 +208,23 @@ inthand(void *arg)
 
 
 static status_t
-prepare_dma(channel_info *channel, const physical_entry *sg_list, size_t sg_list_count,
-	uint32 startbyte, uint32 blocksize, size_t *numBytes, bool to_device)
+prepare_dma(void *channel_cookie, 
+	const physical_entry *sg_list, size_t sg_list_count,
+	bool write)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-start_dma(void *channel)
+start_dma(void *channel_cookie)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-finish_dma(void *channel)
+finish_dma(void *channel_cookie)
 {
 	return B_NOT_ALLOWED;
 }
@@ -302,8 +309,9 @@ err0:
 
 
 static status_t
-uninit_channel(channel_info *channel)
+uninit_channel(void *channel_cookie)
 {
+	channel_info *channel = channel_cookie;
 	// disable IRQs
 	write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien);
 
@@ -403,8 +411,9 @@ register_device(device_node_handle node)
 
 
 static void
-channel_removed(device_node_handle node, channel_info *channel)
+channel_removed(device_node_handle node, void *channel_cookie)
 {
+	channel_info *channel = channel_cookie;
 	SHOW_FLOW0(3, "");
 
 	if (channel != NULL)
@@ -458,27 +467,24 @@ ide_controller_interface isa_controller_interface = {
 		supports_device,
 		register_device,
 		(status_t (*)(device_node_handle, void *, void **))	init_channel,
-		(status_t (*)(void *))								uninit_channel,
-		(void (*)(device_node_handle, void *))				channel_removed,
+		uninit_channel,
+		channel_removed,
 		NULL,		// cleanup
 		get_paths
 	},
 
-	(status_t (*)(ide_channel_cookie,
-		ide_task_file*, ide_reg_mask))						&write_command_block_regs,
-	(status_t (*)(ide_channel_cookie,
-		ide_task_file*, ide_reg_mask))						&read_command_block_regs,
-	
-	(uint8 (*)(ide_channel_cookie))							&get_altstatus,
-	(status_t (*)(ide_channel_cookie, uint8))				&write_device_control,
+	&write_command_block_regs,
+	&read_command_block_regs,
 
-	(status_t (*)(ide_channel_cookie, uint16*, int, bool))	&write_pio_16,
-	(status_t (*)(ide_channel_cookie, uint16*, int, bool))	&read_pio_16,
+	&get_altstatus,
+	&write_device_control,
 
-	(status_t (*)(ide_channel_cookie,
-		const physical_entry *, size_t, bool))				&prepare_dma,
-	(status_t (*)(ide_channel_cookie))						&start_dma,
-	(status_t (*)(ide_channel_cookie))						&finish_dma,
+	&write_pio_16,
+	&read_pio_16,
+
+	&prepare_dma,
+	&start_dma,
+	&finish_dma,
 };
 
 module_info *modules[] = {

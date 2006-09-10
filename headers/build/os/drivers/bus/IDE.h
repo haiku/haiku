@@ -298,9 +298,6 @@ enum {
 } ide_error_mask;
 
 
-typedef struct ide_channel_info *ide_channel_cookie;
-
-
 // Controller Driver Node
 
 // attributes:
@@ -322,21 +319,21 @@ typedef struct {
 	driver_module_info info;
 
 	status_t (*write_command_block_regs)
-		(ide_channel_cookie channel, ide_task_file *tf, ide_reg_mask mask);
+		(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask);
 	status_t (*read_command_block_regs)
-		(ide_channel_cookie channel, ide_task_file *tf, ide_reg_mask mask);
+		(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask);
 
-	uint8 (*get_altstatus) (ide_channel_cookie channel);
-	status_t (*write_device_control) (ide_channel_cookie channel, uint8 val);	
+	uint8 (*get_altstatus) (void *channel_cookie);
+	status_t (*write_device_control) (void *channel_cookie, uint8 val);	
 
-	status_t (*write_pio) (ide_channel_cookie channel, uint16 *data, int count, bool force_16bit );
-	status_t (*read_pio) (ide_channel_cookie channel, uint16 *data, int count, bool force_16bit );
+	status_t (*write_pio) (void *channel_cookie, uint16 *data, int count, bool force_16bit );
+	status_t (*read_pio) (void *channel_cookie, uint16 *data, int count, bool force_16bit );
 
-	status_t (*prepare_dma)(ide_channel_cookie channel, 
+	status_t (*prepare_dma)(void *channel_cookie, 
 							const physical_entry *sg_list, size_t sg_list_count,
 	                        bool write);
-	status_t (*start_dma)(ide_channel_cookie channel);
-	status_t (*finish_dma)(ide_channel_cookie channel);
+	status_t (*start_dma)(void *channel_cookie);
+	status_t (*finish_dma)(void *channel_cookie);
 } ide_controller_interface;
 
 

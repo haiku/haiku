@@ -76,7 +76,7 @@ abort_dma(ide_device_info *device, ide_qrequest *qrequest)
 
 	SHOW_FLOW0(0, "");
 
-	bus->controller->finish_dma(bus->channel);
+	bus->controller->finish_dma(bus->channel_cookie);
 }
 
 
@@ -92,7 +92,7 @@ prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
 	scsi_ccb *request = qrequest->request;
 	status_t res;
 
-	res = bus->controller->prepare_dma(bus->channel, request->sg_list,
+	res = bus->controller->prepare_dma(bus->channel_cookie, request->sg_list,
 				request->sg_cnt, qrequest->is_write);
 
 	if (res != B_OK)
@@ -109,7 +109,7 @@ start_dma_wait(ide_device_info *device, ide_qrequest *qrequest)
 {
 	ide_bus_info *bus = device->bus;
 
-	bus->controller->start_dma(bus->channel);
+	bus->controller->start_dma(bus->channel_cookie);
 
 	start_waiting(bus, qrequest->request->timeout > 0 ? 
 		qrequest->request->timeout : IDE_STD_TIMEOUT, ide_state_async_waiting);
@@ -136,7 +136,7 @@ finish_dma(ide_device_info *device)
 	ide_bus_info *bus = device->bus;
 	status_t dma_res;
 
-	dma_res = bus->controller->finish_dma(bus->channel);
+	dma_res = bus->controller->finish_dma(bus->channel_cookie);
 
 	return dma_res == B_OK || dma_res == B_DEV_DATA_OVERRUN;
 }

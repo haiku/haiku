@@ -660,7 +660,7 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	parent = pnp->get_parent(node);
 
 	status = pnp->init_driver(parent, bus, (driver_module_info **)&bus->controller, 
-		(void **)&bus->channel);
+		(void **)&bus->channel_cookie);
 
 	pnp->put_device_node(parent);
 	if (status != B_OK)

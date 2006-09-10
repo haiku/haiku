@@ -36,14 +36,14 @@ check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
 	ide_bus_info *bus = device->bus;
 	int status;
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	if ((status & (ide_status_err | ide_status_df)) != 0) {
 		int error;
 
 		SHOW_FLOW(3, "packet error, status=%02x", status);
 
-		if (bus->controller->read_command_block_regs(bus->channel,
+		if (bus->controller->read_command_block_regs(bus->channel_cookie,
 				&device->tf, ide_mask_error) != B_OK) {
 			device->subsys_status = SCSI_HBA_ERR;
 			return true;
@@ -101,10 +101,10 @@ packet_dpc(ide_qrequest *qrequest)
 
 	SHOW_FLOW0(3, "");
 
-	bus->controller->read_command_block_regs(bus->channel,
+	bus->controller->read_command_block_regs(bus->channel_cookie,
 		&device->tf, ide_mask_error | ide_mask_ireason);
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	if (qrequest->packet_irq) {
 		// device requests packet
@@ -120,7 +120,7 @@ packet_dpc(ide_qrequest *qrequest)
 		start_waiting_nolock(device->bus, timeout, ide_state_async_waiting);
 
 		// send packet			
-		if (bus->controller->write_pio(bus->channel,
+		if (bus->controller->write_pio(bus->channel_cookie,
 				(uint16 *)device->packet, sizeof(device->packet) / sizeof(uint16), 
 				true) != B_OK) {
 			SHOW_ERROR0( 1, "Error sending command packet" );
@@ -209,7 +209,7 @@ packet_dpc(ide_qrequest *qrequest)
 		}
 
 		// ask device how much data it wants to transmit
-		bus->controller->read_command_block_regs(bus->channel,
+		bus->controller->read_command_block_regs(bus->channel_cookie,
 			&device->tf, ide_mask_byte_count);
 
 		length = device->tf.packet_res.byte_count_0_7
@@ -371,7 +371,7 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 	SHOW_FLOW0(3, "6");
 
 	// make sure device really asks for command packet		
-	bus->controller->read_command_block_regs(bus->channel, &device->tf,
+	bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
 		ide_mask_ireason);
 
 	if (!device->tf.packet_res.cmd_or_data
@@ -393,7 +393,7 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 	// sent (avoid sending 16 bits as controller may transmit 32 bit chunks)
 
 	// write packet
-	if (bus->controller->write_pio(bus->channel, 
+	if (bus->controller->write_pio(bus->channel_cookie, 
 			(uint16 *)device->packet, sizeof(device->packet) / sizeof(uint16) - 2, 
 			true) != B_OK) {
 		goto err_packet;
@@ -401,7 +401,7 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 
 	IDE_LOCK(bus);
 
-	if (bus->controller->write_pio(bus->channel, 
+	if (bus->controller->write_pio(bus->channel_cookie, 
 			(uint16 *)device->packet + sizeof(device->packet) / sizeof(uint16) - 2, 
 			2, true) != B_OK) {
 		goto err_packet2;

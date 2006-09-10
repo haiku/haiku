@@ -33,95 +33,92 @@ static ide_adapter_interface *ide_adapter;
 device_manager_info *pnp;
 
 
-static int
-write_command_block_regs(ide_adapter_channel_info *channel, ide_task_file *tf, 
-	ide_reg_mask mask)
+static status_t
+write_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	return ide_adapter->write_command_block_regs(channel, tf, mask);
+	return ide_adapter->write_command_block_regs((ide_adapter_channel_info *)channel_cookie, tf, mask);
 }
 
 
 static status_t
-read_command_block_regs(ide_adapter_channel_info *channel, ide_task_file *tf, 
-	ide_reg_mask mask)
+read_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	return ide_adapter->read_command_block_regs(channel, tf, mask);
+	return ide_adapter->read_command_block_regs((ide_adapter_channel_info *)channel_cookie, tf, mask);
 }
 
 
 static uint8
-get_altstatus(ide_adapter_channel_info *channel)
+get_altstatus(void *channel_cookie)
 {
-	return ide_adapter->get_altstatus(channel);
+	return ide_adapter->get_altstatus((ide_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
-write_device_control(ide_adapter_channel_info *channel, uint8 val)
+write_device_control(void *channel_cookie, uint8 val)
 {
-	return ide_adapter->write_device_control(channel, val);
+	return ide_adapter->write_device_control((ide_adapter_channel_info *)channel_cookie, val);
 }
 
 
 static status_t
-write_pio(ide_adapter_channel_info *channel, uint16 *data, int count, 
-	bool force_16bit)
+write_pio(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return ide_adapter->write_pio(channel, data, count, force_16bit);
+	return ide_adapter->write_pio((ide_adapter_channel_info *)channel_cookie, data, count, force_16bit);
 }
 
 
 static status_t
-read_pio(ide_adapter_channel_info *channel, uint16 *data, int count, 
-	bool force_16bit)
+read_pio(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return ide_adapter->read_pio(channel, data, count, force_16bit);
+	return ide_adapter->read_pio((ide_adapter_channel_info *)channel_cookie, data, count, force_16bit);
 }
 
 
 static status_t
-prepare_dma(ide_adapter_channel_info *channel, 
+prepare_dma(void *channel_cookie, 
 	const physical_entry *sg_list, size_t sg_list_count,
 	bool to_device)
 {
-	return ide_adapter->prepare_dma(channel, sg_list, sg_list_count, to_device);
+	return ide_adapter->prepare_dma((ide_adapter_channel_info *)channel_cookie, sg_list, sg_list_count, to_device);
 }
 
 
 static status_t
-start_dma(ide_adapter_channel_info *channel)
+start_dma(void *channel_cookie)
 {
-	return ide_adapter->start_dma(channel);
+	return ide_adapter->start_dma((ide_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
-finish_dma(ide_adapter_channel_info *channel)
+finish_dma(void *channel_cookie)
 {
-	return ide_adapter->finish_dma(channel);
+	return ide_adapter->finish_dma((ide_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
 init_channel(device_node_handle node, ide_channel ide_channel, 
-	ide_adapter_channel_info **cookie)
+	void **channel_cookie)
 {
-	return ide_adapter->init_channel(node, ide_channel, cookie, 
+	return ide_adapter->init_channel(node, ide_channel, 
+		(ide_adapter_channel_info **)channel_cookie, 
 		sizeof(ide_adapter_channel_info), ide_adapter->inthand);
 }
 
 
 static status_t
-uninit_channel(ide_adapter_channel_info *channel)
+uninit_channel(void *channel_cookie)
 {
-	return ide_adapter->uninit_channel(channel);
+	return ide_adapter->uninit_channel((ide_adapter_channel_info *)channel_cookie);
 }
 
 
 static void
-channel_removed(device_node_handle node, ide_adapter_channel_info *channel)
+channel_removed(device_node_handle node, void *channel_cookie)
 {
-	return ide_adapter->channel_removed(node, channel);
+	return ide_adapter->channel_removed(node, (ide_adapter_channel_info *)channel_cookie);
 }
 
 
@@ -231,27 +228,24 @@ static ide_controller_interface channel_interface = {
 		NULL,	// supports device
 		NULL,	// register device
 		(status_t (*)(device_node_handle, void *, void **))init_channel,
-		(status_t (*)(void *))uninit_channel,
-		(void (*)(device_node_handle, void *))channel_removed,
+		uninit_channel,
+		channel_removed,
 		NULL,	// cleanup
 		NULL,	// get_paths
 	},
 
-	(status_t (*)(ide_channel_cookie,
-		ide_task_file*,ide_reg_mask))					&write_command_block_regs,
-	(status_t (*)(ide_channel_cookie,
-		ide_task_file*,ide_reg_mask))					&read_command_block_regs,
+	&write_command_block_regs,
+	&read_command_block_regs,
 
-	(uint8 (*)(ide_channel_cookie))						&get_altstatus,
-	(status_t (*)(ide_channel_cookie,uint8))			&write_device_control,
+	&get_altstatus,
+	&write_device_control,
 
-	(status_t (*)(ide_channel_cookie,uint16*,int,bool))	&write_pio,
-	(status_t (*)(ide_channel_cookie,uint16*,int,bool))	&read_pio,
+	&write_pio,
+	&read_pio,
 
-	(status_t (*)(ide_channel_cookie,
-		const physical_entry *,size_t,bool))			&prepare_dma,
-	(status_t (*)(ide_channel_cookie))					&start_dma,
-	(status_t (*)(ide_channel_cookie))					&finish_dma,
+	&prepare_dma,
+	&start_dma,
+	&finish_dma,
 };
 
 

@@ -24,7 +24,7 @@ check_rw_status(ide_device_info *device, bool drqStatus)
 	ide_bus_info *bus = device->bus;
 	int status;
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	if ((status & ide_status_bsy) != 0) {
 		device->subsys_status = SCSI_SEQUENCE_FAIL;
@@ -459,12 +459,12 @@ check_rw_error(ide_device_info *device, ide_qrequest *qrequest)
 	ide_bus_info *bus = device->bus;
 	uint8 status;
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	if ((status & ide_status_err) != 0) {
 		uint8 error;
 
-		if (bus->controller->read_command_block_regs(bus->channel,
+		if (bus->controller->read_command_block_regs(bus->channel_cookie,
 				&device->tf, ide_mask_error) != B_OK) {
 			device->subsys_status = SCSI_HBA_ERR;
 			return true;
@@ -546,7 +546,7 @@ check_output(ide_device_info *device, bool drdy_required,
 		return false;
 	}
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	// if device is busy, other flags are indeterminate	
 	if ((status & ide_status_bsy) != 0) {
@@ -562,7 +562,7 @@ check_output(ide_device_info *device, bool drdy_required,
 	if ((status & ide_status_err) != 0) {
 		uint8 error;
 
-		if (bus->controller->read_command_block_regs(bus->channel,
+		if (bus->controller->read_command_block_regs(bus->channel_cookie,
 				&device->tf, ide_mask_error) != B_OK) {
 			device->subsys_status = SCSI_HBA_ERR;
 			return false;
@@ -658,7 +658,7 @@ configure_rmsn(ide_device_info *device)
 	if (!device_set_feature(device, IDE_CMD_SET_FEATURES_ENABLE_MSN))
 		return false;
 
-	bus->controller->read_command_block_regs(bus->channel, &device->tf,
+	bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
 		ide_mask_LBA_mid | ide_mask_LBA_high);
 
 	for (i = 0; i < 5; ++i) {

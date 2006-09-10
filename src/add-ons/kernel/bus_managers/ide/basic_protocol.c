@@ -62,7 +62,7 @@ reset_bus(ide_device_info *device, ide_qrequest *ignore)
 {
 	ide_bus_info *bus = device->bus;
 	ide_controller_interface *controller = bus->controller;
-	ide_channel_cookie channel = bus->channel;
+	ide_channel_cookie channel = bus->channel_cookie;
 
 	FAST_LOG0(bus->log, ev_ide_reset_bus);
 
@@ -147,7 +147,7 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 	}
 
 	// select device
-	if (bus->controller->write_command_block_regs(bus->channel, &device->tf, 
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, 
 			ide_mask_device_head) != B_OK) 
 		goto err;
 
@@ -157,7 +157,7 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 	// send device reset, independ of current device state
 	// (that's the point of a reset)
 	device->tf.write.command = IDE_CMD_DEVICE_RESET;
-	res = bus->controller->write_command_block_regs(bus->channel,
+	res = bus->controller->write_command_block_regs(bus->channel_cookie,
 		&device->tf, ide_mask_command);
 	device->tf.write.command = orig_command;
 
@@ -211,7 +211,7 @@ retry:
 	// XXX can we avoid that with the IDE_LOCK trick? It would
 	//     save some work and the bug workaround!
 	if (irq_guard) {
-		if (bus->controller->write_device_control(bus->channel,
+		if (bus->controller->write_device_control(bus->channel_cookie,
 				ide_devctrl_nien | ide_devctrl_bit3) != B_OK)
 			goto err;
 
@@ -219,7 +219,7 @@ retry:
 	}
 
 	// select device
-	if (bus->controller->write_command_block_regs(bus->channel, &device->tf,
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,
 			ide_mask_device_head) != B_OK)
 		goto err;
 
@@ -230,7 +230,7 @@ retry:
 
 		SHOW_FLOW0(1, "device is not ready");
 
-		status = bus->controller->get_altstatus(bus->channel);
+		status = bus->controller->get_altstatus(bus->channel_cookie);
 		if (status == 0xff) {
 			// there is no device (should happen during detection only)
 			SHOW_FLOW0(1, "there is no device");
@@ -255,14 +255,14 @@ retry:
 	}
 
 	if (need_drdy
-		&& (bus->controller->get_altstatus(bus->channel) & ide_status_drdy) == 0) {
+		&& (bus->controller->get_altstatus(bus->channel_cookie) & ide_status_drdy) == 0) {
 		SHOW_FLOW0(3, "drdy not set");
 		device->subsys_status = SCSI_SEQUENCE_FAIL;
 		return false;
 	}
 
 	// write parameters	
-	if (bus->controller->write_command_block_regs(bus->channel, &device->tf,
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,
 			device->tf_param_mask) != B_OK)
 		goto err;
 
@@ -293,14 +293,14 @@ retry:
 
 	if (irq_guard) {
 		// now it's clear why IRQs gets fired, so we can enable them again
-		if (bus->controller->write_device_control(bus->channel,
+		if (bus->controller->write_device_control(bus->channel_cookie,
 				ide_devctrl_bit3) != B_OK)
 			goto err1;
 	}
 
 	// write command code - this will start the actual command	
 	SHOW_FLOW(3, "Writing command 0x%02x", (int)device->tf.write.command);
-	if (bus->controller->write_command_block_regs(bus->channel,
+	if (bus->controller->write_command_block_regs(bus->channel_cookie,
 			&device->tf, ide_mask_command) != B_OK) 
 		goto err1;
 
@@ -345,7 +345,7 @@ ide_wait(ide_device_info *device, int mask, int not_mask,
 		// to update its status register
 		spin(1);
 
-		status = bus->controller->get_altstatus(bus->channel);
+		status = bus->controller->get_altstatus(bus->channel_cookie);
 
 		if ((status & mask) == mask && (status & not_mask) == 0)
 			return true;
@@ -390,7 +390,7 @@ device_start_service(ide_device_info *device, int *tag)
 	if (bus->active_device != device) {
 		// don't apply any precautions in terms of IRQ
 		// -> the bus is in accessing state, so IRQs are ignored anyway
-		if (bus->controller->write_command_block_regs(bus->channel,
+		if (bus->controller->write_command_block_regs(bus->channel_cookie,
 				&device->tf, ide_mask_device_head) != B_OK)
 			// on error, pretend that this device asks for service
 			// -> the disappeared controller will be recognized soon ;)
@@ -403,7 +403,7 @@ device_start_service(ide_device_info *device, int *tag)
 	}
 
 	// here we go...
-	if (bus->controller->write_command_block_regs(bus->channel, &device->tf,
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,
 			ide_mask_command) != B_OK)
 		goto err;
 
@@ -412,7 +412,7 @@ device_start_service(ide_device_info *device, int *tag)
 		return false;
 
 	// read tag
-	if (bus->controller->read_command_block_regs(bus->channel, &device->tf,
+	if (bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
 			ide_mask_sector_count) != B_OK)
 		goto err;
 
@@ -448,7 +448,7 @@ check_service_req(ide_device_info *device)
 	if (bus->active_device != device) {
 		// don't apply any precautions in terms of IRQ
 		// -> the bus is in accessing state, so IRQs are ignored anyway
-		if (bus->controller->write_command_block_regs(bus->channel, 
+		if (bus->controller->write_command_block_regs(bus->channel_cookie, 
 				&device->tf, ide_mask_device_head) != B_OK)
 			// on error, pretend that this device asks for service
 			// -> the disappeared controller will be recognized soon ;)
@@ -460,7 +460,7 @@ check_service_req(ide_device_info *device)
 		spin(1);
 	}
 
-	status = bus->controller->get_altstatus(bus->channel);
+	status = bus->controller->get_altstatus(bus->channel_cookie);
 
 	return (status & ide_status_service) != 0;
 }
