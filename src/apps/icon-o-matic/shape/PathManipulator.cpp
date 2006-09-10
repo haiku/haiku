@@ -13,6 +13,8 @@
 
 #include <Cursor.h>
 #include <Message.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <Window.h>
 
 #include "cursors.h"
@@ -31,6 +33,7 @@
 //#include "ReversePathCommand.h"
 //#include "SelectPathCommand.h"
 //#include "SelectPointsCommand.h"
+#include "SplitPointsCommand.h"
 #include "TransformPointsBox.h"
 
 #define POINT_EXTEND 3.0
@@ -63,6 +66,14 @@ enum {
 	TRANSLATE_POINTS,
 
 	SELECT_SUB_PATH,
+};
+
+enum {
+	MSG_TRANSFORM				= 'strn',
+	MSG_REMOVE_POINTS			= 'srmp',
+	MSG_UPDATE_SHAPE_UI			= 'udsi',
+
+	MSG_SPLIT_POINTS			= 'splt',
 };
 
 inline const char*
@@ -480,18 +491,29 @@ PathManipulator::MouseDown(BPoint where)
 			_RemovePointOut(fCurrentPathPoint);
 			break;
 
-		case SELECT_POINTS:
-			if (!fShiftDown) {
+		case SELECT_POINTS: {
+			// TODO: this works so that you can deselect all points
+			// when clicking outside the path even if pressing shift
+			// in case the path is open... a better way would be
+			// to deselect all on mouse up, if the mouse has not moved
+			bool appendSelection;
+			if (fPath->IsClosed())
+				appendSelection = fShiftDown;
+			else
+				appendSelection = fShiftDown && fCurrentPathPoint >= 0;
+
+			if (!appendSelection) {
 				fSelection->MakeEmpty();
 				_UpdateSelection();
 			}
 			*fOldSelection = *fSelection;
 			if (fCurrentPathPoint >= 0) {
-				_Select(fCurrentPathPoint, fShiftDown);
+				_Select(fCurrentPathPoint, appendSelection);
 			}
 			fCanvasView->BeginRectTracking(BRect(where, where),
 										   B_TRACK_RECT_CORNER);
 			break;
+		}
 	}
 
 	fTrackingStart = canvasWhere;
@@ -707,6 +729,52 @@ PathManipulator::DoubleClicked(BPoint where)
 	return false;
 }
 
+// ShowContextMenu
+bool
+PathManipulator::ShowContextMenu(BPoint where)
+{
+	BPopUpMenu* menu = new BPopUpMenu("context menu", false, false);
+	BMessage* message;
+	BMenuItem* item;
+
+	bool hasSelection = fSelection->CountItems() > 0;
+
+	message = new BMessage(B_SELECT_ALL);
+	item = new BMenuItem("Select All", message, 'A');
+	menu->AddItem(item);
+
+	menu->AddSeparatorItem();
+
+	message = new BMessage(MSG_TRANSFORM);
+	item = new BMenuItem("Transform", message);
+	item->SetEnabled(hasSelection);
+	menu->AddItem(item);
+
+	message = new BMessage(MSG_SPLIT_POINTS);
+	item = new BMenuItem("Split", message);
+	item->SetEnabled(hasSelection);
+	menu->AddItem(item);
+
+	message = new BMessage(MSG_REMOVE_POINTS);
+	item = new BMenuItem("Remove", message, 'A');
+	item->SetEnabled(hasSelection);
+	menu->AddItem(item);
+
+	// go
+	menu->SetTargetForItems(fCanvasView);
+	menu->SetAsyncAutoDestruct(true);
+	menu->SetFont(be_plain_font);
+	where = fCanvasView->ConvertToScreen(where);
+	BRect mouseRect(where, where);
+	mouseRect.InsetBy(-10.0, -10.0);
+	where += BPoint(5.0, 5.0);
+	menu->Go(where, true, false, mouseRect, true);
+
+	return true;
+}
+
+// #pragma mark -
+
 // Bounds
 BRect
 PathManipulator::Bounds()
@@ -725,24 +793,23 @@ PathManipulator::TrackingBounds(BView* withinView)
 
 // #pragma mark -
 
-enum {
-	MSG_SHAPE_TRANSFORM			= 'strn',
-	MSG_SHAPE_REMOVE_POINTS		= 'srmp',
-	MSG_UPDATE_SHAPE_UI			= 'udsi',
-};
-
 // MessageReceived
 bool
 PathManipulator::MessageReceived(BMessage* message, Command** _command)
 {
 	bool result = true;
 	switch (message->what) {
-		case MSG_SHAPE_TRANSFORM:
+		case MSG_TRANSFORM:
 			if (!fSelection->IsEmpty())
 				_SetMode(TRANSFORM_POINTS);
 			break;
-		case MSG_SHAPE_REMOVE_POINTS:
+		case MSG_REMOVE_POINTS:
 			*_command = _Delete();
+			break;
+		case MSG_SPLIT_POINTS:
+			*_command = new SplitPointsCommand(fPath,
+											   fSelection->Items(),
+											   fSelection->CountItems());
 			break;
 		case B_SELECT_ALL: {
 			*fOldSelection = *fSelection;
@@ -1292,10 +1359,12 @@ void
 PathManipulator::_Select(BRect r)
 {
 	BPoint p;
+	BPoint pIn;
+	BPoint pOut;
 	int32 count = fPath->CountPoints();
 	Selection temp;
-	for (int32 i = 0; i < count && fPath->GetPointAt(i, p); i++) {
-		if (r.Contains(p)) {
+	for (int32 i = 0; i < count && fPath->GetPointsAt(i, p, pIn, pOut); i++) {
+		if (r.Contains(p) || r.Contains(pIn) || r.Contains(pOut)) {
 			temp.Add(i);
 		}
 	}

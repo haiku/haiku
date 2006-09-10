@@ -19,6 +19,7 @@
 #include <Window.h>
 
 #include "AddPathsCommand.h"
+#include "CleanUpPathCommand.h"
 #include "CommandStack.h"
 #include "MovePathsCommand.h"
 #include "Observer.h"
@@ -236,6 +237,7 @@ enum {
 	MSG_DUPLICATE		= 'dupp',
 
 	MSG_REVERSE			= 'rvrs',
+	MSG_CLEAN_UP		= 'clup',
 	MSG_ROTATE_INDICES	= 'roti',
 
 	MSG_REMOVE			= 'remp',
@@ -426,6 +428,19 @@ PathListView::MessageReceived(BMessage* message)
 
 				ReversePathCommand* command
 					= new (nothrow) ReversePathCommand(item->path);
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_CLEAN_UP:
+			if (fCommandStack) {
+				PathListItem* item = dynamic_cast<PathListItem*>(
+					ItemAt(CurrentSelection(0)));
+				if (!item)
+					break;
+
+				CleanUpPathCommand* command
+					= new (nothrow) CleanUpPathCommand(item->path);
 				fCommandStack->Perform(command);
 			}
 			break;
@@ -701,6 +716,7 @@ PathListView::SetMenu(BMenu* menu)
 								new BMessage(MSG_ADD_ARC));
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
 	fReverseMI = new BMenuItem("Reverse", new BMessage(MSG_REVERSE));
+	fCleanUpMI = new BMenuItem("Clean Up", new BMessage(MSG_CLEAN_UP));
 	fRotateIndicesMI = new BMenuItem("Rotate Indices",
 								new BMessage(MSG_ROTATE_INDICES));
 	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
@@ -715,6 +731,7 @@ fAddArcMI->SetEnabled(false);
 
 	fMenu->AddItem(fDuplicateMI);
 	fMenu->AddItem(fReverseMI);
+	fMenu->AddItem(fCleanUpMI);
 	fMenu->AddItem(fRotateIndicesMI);
 
 	fMenu->AddSeparatorItem();

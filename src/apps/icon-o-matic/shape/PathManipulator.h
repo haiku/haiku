@@ -45,6 +45,8 @@ class PathManipulator : public Manipulator,
 	virtual	bool				MouseOver(BPoint where);
 	virtual	bool				DoubleClicked(BPoint where);
 
+	virtual	bool				ShowContextMenu(BPoint where);
+
 	virtual	BRect				Bounds();
 	virtual	BRect				TrackingBounds(BView* withinView);
 

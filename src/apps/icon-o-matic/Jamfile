@@ -231,6 +231,8 @@ Application Icon-O-Matic :
 	AddShapesCommand.cpp
 	AddTransformersCommand.cpp
 	ChangePointCommand.cpp
+	CleanUpPathCommand.cpp
+	FreezeTransformationCommand.cpp
 	InsertPointCommand.cpp
 	MoveShapesCommand.cpp
 	MovePathsCommand.cpp
@@ -242,6 +244,8 @@ Application Icon-O-Matic :
 	RemoveShapesCommand.cpp
 	RemoveTransformersCommand.cpp
 	ReversePathCommand.cpp
+	SplitPointsCommand.cpp
+	TransformPointsCommand.cpp
 	UnassignPathCommand.cpp
 
 	# style
@@ -274,6 +278,8 @@ Application Icon-O-Matic :
 	Util.cpp
 
 	: be tracker translation libagg.a libexpat.a
+
+	: Icon-O-Matic.rdef
 ;
 
 

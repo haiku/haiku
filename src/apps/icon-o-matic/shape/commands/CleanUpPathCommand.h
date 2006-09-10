@@ -6,20 +6,24 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#ifndef REVERSE_PATH_COMMAND_H
-#define REVERSE_PATH_COMMAND_H
+#ifndef CLEAN_UP_PATH_COMMAND_H
+#define CLEAN_UP_PATH_COMMAND_H
 
 #include "PathCommand.h"
+#include "VectorPath.h"
 
-class ReversePathCommand : public PathCommand {
+class CleanUpPathCommand : public PathCommand {
  public:
-								ReversePathCommand(VectorPath* path);
-	virtual						~ReversePathCommand();
+								CleanUpPathCommand(VectorPath* path);
+	virtual						~CleanUpPathCommand();
 
 	virtual	status_t			Perform();
 	virtual status_t			Undo();
 
 	virtual void				GetName(BString& name);
+
+ private:
+			VectorPath			fOriginalPath;
 };
 
-#endif // REVERSE_PATH_COMMAND_H
+#endif // CLEAN_UP_PATH_COMMAND_H

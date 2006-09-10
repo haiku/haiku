@@ -12,9 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 
-//#include "ExitTransformPointsCommand.h"
 #include "StateView.h"
-//#include "TransformPointsCommand.h"
+#include "TransformPointsCommand.h"
 #include "VectorPath.h"
 
 using std::nothrow;
@@ -118,19 +117,20 @@ TransformCommand*
 TransformPointsBox::MakeCommand(const char* commandName,
 								uint32 nameIndex)
 {
-	return NULL;
-//	return new TransformPointsAction(fManipulator,
-//									 fIndices,
-//									 fPoints,
-//									 fCount,
-////									 Translation(),
-////									 LocalRotation(),
-////									 LocalXScale(),
-////									 LocalYScale(),
-//									 *this,
-//									 CenterOffset(),
-//									 actionName,
-//									 nameIndex);
+	return new TransformPointsCommand(this, fPath,
+
+									  fIndices,
+									  fPoints,
+									  fCount,
+
+									  Pivot(),
+									  Translation(),
+									  LocalRotation(),
+									  LocalXScale(),
+									  LocalYScale(),
+
+									  commandName,
+									  nameIndex);
 }
 
 // #pragma mark -

@@ -247,6 +247,8 @@ case MSG_SHAPE_SELECTED: {
 	Shape* shape;
 	if (message->FindPointer("shape", (void**)&shape) < B_OK)
 		shape = NULL;
+	if (!fIcon || !fIcon->Shapes()->HasShape(shape))
+		shape = NULL;
 
 	fPathListView->SetCurrentShape(shape);
 	fStyleListView->SetCurrentShape(shape);
@@ -707,9 +709,20 @@ MainWindow::_CreateGUI(BRect bounds)
 	// canvas view
 	bounds.left = splitWidth;
 	bounds.top = fSwatchGroup->Frame().bottom + 1;
-	bounds.right = bg->Bounds().right;
-	bounds.bottom = bg->Bounds().bottom;
+	bounds.right = bg->Bounds().right - B_V_SCROLL_BAR_WIDTH;
+	bounds.bottom = bg->Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
 	fCanvasView = new CanvasView(bounds);
+
+	// scroll view around canvas view
+	bounds.bottom += B_H_SCROLL_BAR_HEIGHT;
+	bounds.right += B_V_SCROLL_BAR_WIDTH;
+	ScrollView* canvasScrollView
+		= new ScrollView(fCanvasView,
+						 SCROLL_HORIZONTAL | SCROLL_VERTICAL
+						 | SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS
+						 | SCROLL_NO_FRAME,
+						 bounds, "canvas scroll view",
+						 B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
 
 	// icon previews
 	bounds.left = 5;
@@ -882,7 +895,7 @@ MainWindow::_CreateGUI(BRect bounds)
 								B_WILL_DRAW | B_FRAME_EVENTS));
 
 
-	bg->AddChild(fCanvasView);
+	bg->AddChild(canvasScrollView);
 #endif // __HAIKU__
 }
 

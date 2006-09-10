@@ -55,6 +55,8 @@ class MultipleManipulatorState : public ViewState {
 
  private:
 			void				_UpdateCursor();
+			void				_ShowContextMenu(BPoint where);
+
 
 			BList				fManipulators;
 			Manipulator*		fCurrentManipulator;

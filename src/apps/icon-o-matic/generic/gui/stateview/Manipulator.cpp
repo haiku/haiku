@@ -68,6 +68,13 @@ Manipulator::DoubleClicked(BPoint where)
 	return false;
 }
 
+// ShowContextMenu
+bool
+Manipulator::ShowContextMenu(BPoint where)
+{
+	return false;
+}
+
 // #pragma mark -
 
 bool

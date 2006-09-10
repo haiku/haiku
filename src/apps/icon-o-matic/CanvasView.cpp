@@ -28,8 +28,8 @@ CanvasView::CanvasView(BRect frame)
 	  fRenderer(new IconRenderer(fBitmap)),
 	  fDirtyIconArea(fBitmap->Bounds()),
 
-	  fCanvasOrigin(50.0, 50.0),
-	  fZoomLevel(8.0),
+	  fCanvasOrigin(0.0, 0.0),
+	  fZoomLevel(1.0),
 
 	  fMouseFilterMode(SNAPPING_OFF),
 
@@ -68,6 +68,8 @@ CanvasView::AttachedToWindow()
 	SetHighColor(kStripesLow);
 
 	_AllocBackBitmap(Bounds().Width(), Bounds().Height());
+
+	_SetZoom(8.0);
 }
 
 // FrameResized
@@ -136,6 +138,25 @@ CanvasView::MouseMoved(BPoint where, uint32 transit,
 	_FilterMouse(&where);
 
 	StateView::MouseMoved(where, transit, dragMessage);
+}
+
+// #pragma mark -
+
+// ScrollOffsetChanged
+void
+CanvasView::ScrollOffsetChanged(BPoint oldOffset, BPoint newOffset)
+{
+	BPoint offset = newOffset - oldOffset;
+	ScrollBy(offset.x, offset.y);
+
+	MouseMoved(fMouseInfo.position + offset, fMouseInfo.transit, NULL);
+}
+
+// VisibleSizeChanged
+void
+CanvasView::VisibleSizeChanged(float oldWidth, float oldHeight,
+							   float newWidth, float newHeight)
+{
 }
 
 // #pragma mark -
@@ -238,6 +259,13 @@ CanvasView::_HandleKeyDown(uint32 key, uint32 modifiers)
 				CommandStack()->Redo();
 			else
 				CommandStack()->Undo();
+			break;
+
+		case '+':
+			_SetZoom(_NextZoomInLevel(fZoomLevel));
+			break;
+		case '-':
+			_SetZoom(_NextZoomOutLevel(fZoomLevel));
 			break;
 
 		default:
@@ -444,5 +472,117 @@ CanvasView::_MakeBackground()
 		}
 		row += bpr;
 	}
+}
+
+// #pragma mark -
+
+// _NextZoomInLevel
+double
+CanvasView::_NextZoomInLevel(double zoom) const
+{
+	if (zoom < 1)
+		return 1;
+	if (zoom < 1.5)
+		return 1.5;
+	if (zoom < 2)
+		return 2;
+	if (zoom < 3)
+		return 3;
+	if (zoom < 4)
+		return 4;
+	if (zoom < 6)
+		return 6;
+	if (zoom < 8)
+		return 8;
+	if (zoom < 16)
+		return 16;
+	if (zoom < 32)
+		return 32;
+	return 64;
+}
+
+// _NextZoomOutLevel
+double
+CanvasView::_NextZoomOutLevel(double zoom) const
+{
+	if (zoom > 32)
+		return 32;
+	if (zoom > 16)
+		return 16;
+	if (zoom > 8)
+		return 8;
+	if (zoom > 6)
+		return 6;
+	if (zoom > 4)
+		return 4;
+	if (zoom > 3)
+		return 3;
+	if (zoom > 2)
+		return 2;
+	if (zoom > 1.5)
+		return 1.5;
+	return 1;
+}
+
+// _SetZoom
+void
+CanvasView::_SetZoom(double zoomLevel)
+{
+	if (fZoomLevel == zoomLevel)
+		return;
+
+	// zoom into mouse position, or into center of view
+	BPoint anchor = MouseInfo()->position;
+	BRect bounds(Bounds());
+	if (!bounds.Contains(anchor)) {
+		bounds = _CanvasRect();
+		anchor.x = (bounds.left + bounds.right) / 2.0;
+		anchor.y = (bounds.top + bounds.bottom) / 2.0;
+	}
+printf("anchor: %.2f, %.2f\n", anchor.x, anchor.y);
+
+	BPoint offset;
+	if (fZoomLevel < zoomLevel) {
+		offset.x = anchor.x * (zoomLevel / fZoomLevel) - anchor.x;
+		offset.y = anchor.y * (zoomLevel / fZoomLevel) - anchor.y;
+	} else {
+		offset.x = -anchor.x * (zoomLevel / fZoomLevel);
+		offset.y = -anchor.y * (zoomLevel / fZoomLevel);
+	}
+
+	fZoomLevel = zoomLevel;
+	SetDataRect(_LayoutCanvas());
+
+printf("offset: %.2f, %.2f\n", offset.x, offset.y);
+
+	SetScrollOffset(ScrollOffset() + offset);
+
+	Invalidate();
+}
+
+// _LayoutCanvas
+BRect
+CanvasView::_LayoutCanvas()
+{
+	if (!fBitmap)
+		return BRect(0, 0, -1, -1);
+
+	// size of zoomed bitmap
+	BRect r(fBitmap->Bounds());
+	r.OffsetTo(0, 0);
+	r.right = floorf((r.Width() + 1) * fZoomLevel + 0.5) - 1;
+	r.bottom = floorf((r.Height() + 1) * fZoomLevel + 0.5) - 1;
+
+	// TODO: ask manipulators to extend size
+
+	// left top of canvas within empty area
+	fCanvasOrigin.x = floorf(r.Width() * 0.25);
+	fCanvasOrigin.y = floorf(r.Height() * 0.25);
+
+	// resize for empty area around bitmap
+	r.right += r.Width() * 0.5;
+	r.bottom += r.Height() * 0.5;
+
+	return r;
 }
 

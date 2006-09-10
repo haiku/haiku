@@ -80,7 +80,10 @@ MultipleManipulatorState::MessageReceived(BMessage* message,
 void
 MultipleManipulatorState::MouseDown(BPoint where, uint32 buttons, uint32 clicks)
 {
-	// NOTE: buttons currently ignored
+	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+		_ShowContextMenu(where);
+		return;
+	}
 
 	if (clicks == 2
 		&& fPreviousManipulator
@@ -281,3 +284,18 @@ MultipleManipulatorState::_UpdateCursor()
 	else
 		fView->SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 }
+
+// _ShowContextMenu
+void
+MultipleManipulatorState::_ShowContextMenu(BPoint where)
+{
+	int32 count = fManipulators.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		Manipulator* manipulator =
+			(Manipulator*)fManipulators.ItemAtFast(i);
+		if (manipulator->ShowContextMenu(where))
+			return;
+	}
+}
+
+

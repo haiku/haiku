@@ -10,6 +10,7 @@
 #define CANVAS_VIEW_H
 
 #include "Icon.h"
+#include "Scrollable.h"
 #include "StateView.h"
 
 class BBitmap;
@@ -23,6 +24,7 @@ enum {
 };
 
 class CanvasView : public StateView,
+				   public Scrollable,
 				   public IconListener {
  public:
 								CanvasView(BRect frame);
@@ -37,7 +39,16 @@ class CanvasView : public StateView,
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 										   const BMessage* dragMessage);
 
+	// Scrollable interface
+ protected:
+	virtual	void				ScrollOffsetChanged(BPoint oldOffset,
+													BPoint newOffset);
+	virtual	void				VisibleSizeChanged(float oldWidth,
+												   float oldHeight,
+												   float newWidth,
+												   float newHeight);
 	// IconListener interface
+ public:
 	virtual	void				AreaInvalidated(const BRect& area);
 
 	// CanvasView
@@ -74,6 +85,11 @@ class CanvasView : public StateView,
 			void				_MakeBackground();
 
  private:
+			double				_NextZoomInLevel(double zoom) const;
+			double				_NextZoomOutLevel(double zoom) const;
+			void				_SetZoom(double zoomLevel);
+			BRect				_LayoutCanvas();
+
 			BBitmap*			fBitmap;
 			BBitmap*			fBackground;
 
@@ -82,7 +98,7 @@ class CanvasView : public StateView,
 			BRect				fDirtyIconArea;
 
 			BPoint				fCanvasOrigin;
-			float				fZoomLevel;
+			double				fZoomLevel;
 
 			uint32				fMouseFilterMode;
 

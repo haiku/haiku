@@ -68,6 +68,8 @@ class ShapeListView : public SimpleListView,
 			ShapeListItem*		_ItemForShape(Shape* shape) const;
 			void				_UpdateMenu();
 
+			void				_GetSelectedShapes(BList& shapes) const;
+
 			BMessage*			fMessage;
 
 			ShapeContainer*		fShapeContainer;
@@ -80,6 +82,7 @@ class ShapeListView : public SimpleListView,
 			BMenuItem*			fAddWidthPathAndStyleMI;
 			BMenuItem*			fDuplicateMI;
 			BMenuItem*			fResetTransformationMI;
+			BMenuItem*			fFreezeTransformationMI;
 			BMenuItem*			fRemoveMI;
 };
 

@@ -33,6 +33,8 @@ class Manipulator : public Observer {
 	virtual	bool				MouseOver(BPoint where);
 	virtual	bool				DoubleClicked(BPoint where);
 
+	virtual	bool				ShowContextMenu(BPoint where);
+
 	virtual	bool				MessageReceived(BMessage* message,
 												Command** _command);
 

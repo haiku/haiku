@@ -39,7 +39,7 @@ using std::nothrow;
 
 // constructor
 IconEditorApp::IconEditorApp()
-	: BApplication("application/x-vnd.Haiku-Icon-O-Matic"),
+	: BApplication("application/x-vnd.haiku-icon_o_matic"),
 	  fMainWindow(NULL),
 	  fDocument(new Document("test")),
 
@@ -275,17 +275,24 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 	if (!icon)
 		return;
 
+	enum {
+		REF_NONE = 0,
+		REF_MESSAGE,
+		REF_FLAT
+	};
+	uint32 refMode = REF_NONE;
+
 	// try different file types
 	FlatIconImporter flatImporter;
 	status_t ret = flatImporter.Import(icon, &file);
 	if (ret >= B_OK) {
-		fDocument->SetExportRef(ref);
+		refMode = REF_FLAT;
 	} else {
 		file.Seek(0, SEEK_SET);
 		MessageImporter msgImporter;
 		ret = msgImporter.Import(icon, &file);
 		if (ret >= B_OK) {
-			fDocument->SetRef(ref);
+			refMode = REF_MESSAGE;
 		} else {
 			file.Seek(0, SEEK_SET);
 			SVGImporter svgImporter;
@@ -315,7 +322,17 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 		fMainWindow->SetIcon(NULL);
 
 	fDocument->MakeEmpty();
+
 	fDocument->SetIcon(icon);
+
+	switch (refMode) {
+		case REF_MESSAGE:
+			fDocument->SetRef(ref);
+			break;
+		case REF_FLAT:
+			fDocument->SetExportRef(ref);
+			break;
+	}
 
 	locker.Unlock();
 

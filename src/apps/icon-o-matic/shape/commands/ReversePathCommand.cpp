@@ -1,3 +1,11 @@
+/*
+ * Copyright 2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
 #include "ReversePathCommand.h"
 
 #include <stdio.h>

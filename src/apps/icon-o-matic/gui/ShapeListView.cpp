@@ -23,6 +23,7 @@
 #include "AddShapesCommand.h"
 #include "AddStylesCommand.h"
 #include "CommandStack.h"
+#include "FreezeTransformationCommand.h"
 #include "MoveShapesCommand.h"
 #include "Observer.h"
 #include "RemoveShapesCommand.h"
@@ -95,6 +96,7 @@ enum {
 	MSG_REMOVE						= 'rmsh',
 	MSG_DUPLICATE					= 'dpsh',
 	MSG_RESET_TRANSFORMATION		= 'rstr',
+	MSG_FREEZE_TRANSFORMATION		= 'frzt',
 
 	MSG_DRAG_SHAPE					= 'drgs',
 };
@@ -165,17 +167,9 @@ ShapeListView::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_RESET_TRANSFORMATION: {
-			int32 count = CountSelectedItems();
 			BList shapes;
-			for (int32 i = 0; i < count; i++) {
-				ShapeListItem* item = dynamic_cast<ShapeListItem*>(
-					ItemAt(CurrentSelection(i)));
-				if (item && item->shape) {
-					if (!shapes.AddItem((void*)item->shape))
-						break;
-				}
-			}
-			count = shapes.CountItems();
+			_GetSelectedShapes(shapes);
+			int32 count = shapes.CountItems();
 			if (count < 0)
 				break;
 
@@ -187,6 +181,20 @@ ShapeListView::MessageReceived(BMessage* message)
 
 			ResetTransformationCommand* command = 
 				new ResetTransformationCommand(transformables, count);
+
+			fCommandStack->Perform(command);
+			break;
+		}
+		case MSG_FREEZE_TRANSFORMATION: {
+			BList shapes;
+			_GetSelectedShapes(shapes);
+			int32 count = shapes.CountItems();
+			if (count < 0)
+				break;
+
+			FreezeTransformationCommand* command = 
+				new FreezeTransformationCommand((Shape**)shapes.Items(),
+					count);
 
 			fCommandStack->Perform(command);
 			break;
@@ -433,6 +441,8 @@ ShapeListView::SetMenu(BMenu* menu)
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
 	fResetTransformationMI = new BMenuItem("Reset Transformation",
 		new BMessage(MSG_RESET_TRANSFORMATION));
+	fFreezeTransformationMI = new BMenuItem("Freeze Transformation",
+		new BMessage(MSG_FREEZE_TRANSFORMATION));
 
 	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
 
@@ -446,6 +456,7 @@ ShapeListView::SetMenu(BMenu* menu)
 
 	fMenu->AddItem(fDuplicateMI);
 	fMenu->AddItem(fResetTransformationMI);
+	fMenu->AddItem(fFreezeTransformationMI);
 
 	fMenu->AddSeparatorItem();
 
@@ -453,6 +464,7 @@ ShapeListView::SetMenu(BMenu* menu)
 
 	fDuplicateMI->SetTarget(this);
 	fResetTransformationMI->SetTarget(this);
+	fFreezeTransformationMI->SetTarget(this);
 	fRemoveMI->SetTarget(this);
 
 	_UpdateMenu();
@@ -541,4 +553,17 @@ ShapeListView::_UpdateMenu()
 	fRemoveMI->SetEnabled(gotSelection);
 }
 
-
+// _GetSelectedShapes
+void
+ShapeListView::_GetSelectedShapes(BList& shapes) const
+{
+	int32 count = CountSelectedItems();
+	for (int32 i = 0; i < count; i++) {
+		ShapeListItem* item = dynamic_cast<ShapeListItem*>(
+			ItemAt(CurrentSelection(i)));
+		if (item && item->shape) {
+			if (!shapes.AddItem((void*)item->shape))
+				break;
+		}
+	}
+}

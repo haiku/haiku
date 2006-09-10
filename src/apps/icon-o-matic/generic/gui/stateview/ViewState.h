@@ -51,7 +51,6 @@ class ViewState {
 	// modifiers
 	virtual	void				ModifiersChanged(uint32 modifiers);
 
-
 	// TODO: mouse wheel
 	virtual	bool				HandleKeyDown(uint32 key, uint32 modifiers,
 											  Command** _command);

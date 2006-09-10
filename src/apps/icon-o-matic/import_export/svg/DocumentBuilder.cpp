@@ -477,19 +477,27 @@ DocumentBuilder::GetIcon(Icon* icon, SVGImporter* importer,
 	yMax = ceil(yMax);
 
 	BRect bounds;
-	if (fViewBox.IsValid())
+	if (fViewBox.IsValid()) {
 		bounds = fViewBox;
-	else
+printf("view box: ");
+bounds.PrintToStream();
+	} else {
 		bounds.Set(0.0, 0.0, (int32)fWidth - 1, (int32)fHeight - 1);
+printf("width/height: ");
+bounds.PrintToStream();
+	}
 
 	BRect boundingBox(xMin, yMin, xMax, yMax);
 
 	if (!bounds.IsValid() || !boundingBox.Intersects(bounds)) {
 		bounds = boundingBox;
+printf("using bounding box: ");
+bounds.PrintToStream();
 	}
 
-	float size = max_c(bounds.Width() + 1.0, bounds.Height() + 1.0);
+	float size = min_c(bounds.Width() + 1.0, bounds.Height() + 1.0);
 	double scale = 64.0 / size;
+printf("scale: %f\n", scale);
 
 	Transformable transform;
 	transform.TranslateBy(BPoint(-bounds.left, -bounds.top));
@@ -539,6 +547,8 @@ DocumentBuilder::EndGradient()
 	}
 	fCurrentGradient = NULL;
 }
+
+// #pragma mark -
 
 // _AddGradient
 void

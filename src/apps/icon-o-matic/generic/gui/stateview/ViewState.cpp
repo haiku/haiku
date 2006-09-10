@@ -12,7 +12,7 @@
 
 mouse_info::mouse_info()
 	: buttons(0),
-	  position(B_ORIGIN),
+	  position(-1, -1),
 	  transit(B_OUTSIDE_VIEW),
 	  modifiers(::modifiers())
 {
