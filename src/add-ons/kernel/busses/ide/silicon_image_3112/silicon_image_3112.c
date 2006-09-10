@@ -59,12 +59,16 @@ static const struct {
 #define SI_MASK_2PORT		((1 << 22) | (1 << 23))
 #define SI_MASK_4PORT		((1 << 22) | (1 << 23) | (1 << 24) | (1 << 25))
 
+struct channel_data;
 
-typedef struct  {
+typedef struct controller_data {
 	pci_device_module_info *pci;
 	pci_device device;
 
 	device_node_handle node;
+	
+	struct channel_data *channel[4]; // XXX only for interrupt workaround
+	int channel_count; // XXX only for interrupt workaround
 
 	uint32 asic_index;
 	uint32 int_num;
@@ -77,11 +81,12 @@ typedef struct  {
 } controller_data;
 
 
-typedef struct {	
+typedef struct channel_data {
 
 	pci_device_module_info *pci;
 	device_node_handle	node;
 	pci_device 			device;
+	ide_channel			ide_channel;
 
 	volatile uint8 *	task_file;
 	volatile uint8 *	control_block;
@@ -104,6 +109,7 @@ static ide_for_controller_interface *	ide;
 static ide_adapter_interface *			ide_adapter;
 static device_manager_info *			dm;
 
+static status_t device_control_write(void *channel_cookie, uint8 val);
 static int32 handle_interrupt(void *arg);
 
 
@@ -275,6 +281,8 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 	if (!controller)
 		return B_NO_MEMORY;
 
+	FLOW("controller %p\n", controller);	
+
 	mmio_area = map_physical_memory("Silicon Image SATA regs", (void *)mmio_base, 
 									asic_data[asic_index].mmio_bar_size, 
 									B_ANY_KERNEL_ADDRESS, 0, (void **)&mmio_addr);
@@ -304,6 +312,10 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 	controller->mmio_area  = mmio_area;
 	controller->mmio_addr  = mmio_addr;
 	controller->lost       = 0;
+
+	controller->channel_count = asic_data[asic_index].channel_count;
+	for (i = 0; i < asic_data[asic_index].channel_count; i++)
+		controller->channel[i] = 0;
 
 	if (asic_index == ASIC_SI3114) {
 		// I put a magic spell on you
@@ -374,37 +386,76 @@ static status_t
 channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 {
 	ide_channel ide_channel = user_cookie;
+	controller_data *controller;
 	channel_data *channel;
+	physical_entry pe[1];
+	size_t prdt_size;
+	uint32 chan_index;
+	
+	TRACE("channel_init enter\n");
 	
 	channel = malloc(sizeof(channel_data));
 	if (!channel)
 		return B_NO_MEMORY;
+
+	TRACE("channel %p\n", channel);	
+
+	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &chan_index, false) != B_OK)
+		return B_ERROR;
+
+	TRACE("channel_index %ld", chan_index);
+	TRACE("channel name: %s\n", controller_channel_data[chan_index].name);
+		
+	if (dm->init_driver(dm->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
+		return B_ERROR;
+		
+	TRACE("controller %p\n", controller);	
+	TRACE("mmio_addr %p\n", (void *)controller->mmio_addr);
+
+	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary 
+	prdt_size = (IDE_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
+	channel->prd_area = create_area("prd", (void **)&channel->prdt, B_ANY_KERNEL_ADDRESS, prdt_size, B_FULL_LOCK | B_CONTIGUOUS, 0);
+	if (channel->prd_area < B_OK) {
+		TRACE("creating prd_area failed\n");
+		goto err2;
+	}
+
+	get_memory_map(channel->prdt, prdt_size, pe, 1);
+	channel->prdt_phys = (void *)(uint32)pe[0].address;
+
+	channel->pci = controller->pci;
+	channel->device = controller->device;
+	channel->node = node;
+	channel->ide_channel = ide_channel;
+
+	channel->task_file = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].cmd + 1);
+	channel->control_block = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].ctl);
+	channel->command_block = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].cmd);
+	channel->dev_ctrl = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].ctl);
+	channel->bm_prdt_address = (volatile uint32 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_prdt_address);
+	channel->bm_status_reg = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_status_reg);
+	channel->bm_command_reg = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_command_reg);
+
+	channel->lost = 0;
+	channel->dma_active = 0;
 	
-/*
-	channel->	
-	
-	pci_device_module_info *pci;
-	device_node_handle node;
-	pci_device device;
+	controller->channel[chan_index] = channel;
 
-	volatile uint8 *task_file      (volatile uint8 *)(channel->mmio_addr + channel->command_block_base + 1);
-	volatile uint8 *control_block  	(volatile uint8 *)(channel->mmio_addr + channel->control_block_base);
-	volatile uint8 *command_block
-	volatile uint8 *dev_ctrl
-	volatile uint32 * bm_prdt_address = (volatile uint32 *)(channel->mmio_addr + channel->bus_master_base + ata_bm_prdt_address);
-	volatile uint8 * bm_status_reg = (volatile uint8 *)(channel->mmio_addr + channel->bus_master_base + ata_bm_status_reg);
-	volatile uint8 * bm_command_reg = (volatile uint8 *)(channel->mmio_addr + channel->bus_master_base + ata_bm_command_reg);
-
-	uint32 lost;
-
-	prd_entry *prdt;
-	area_id prd_area;
-	prd_entry *prdt;
-	uint32 dma_active;
-*/	
+	// enable interrupts so the channel is ready to run
+	device_control_write(channel, ide_devctrl_bit3);
 
 	*channel_cookie = channel;
+
+	TRACE("channel_init leave\n");
 	return B_OK;
+
+err3:
+	delete_area(channel->prd_area);
+err2:
+	dm->uninit_driver(dm->get_parent(node));
+err:
+	free(channel);
+	return B_ERROR;
 }
 
 
@@ -412,7 +463,20 @@ static status_t
 channel_uninit(void *channel_cookie)
 {
 	channel_data *channel = channel_cookie;
-	return B_ERROR;
+
+	// disable IRQs
+	device_control_write(channel, ide_devctrl_bit3 | ide_devctrl_nien);
+
+	// catch spurious interrupt
+	// (some controllers generate an IRQ when you _disable_ interrupts,
+	//  they are delayed by less then 40 µs, so 1 ms is safe)
+	snooze(1000);
+
+	dm->uninit_driver(dm->get_parent(channel->node));
+
+	delete_area(channel->prd_area);
+	free(channel);
+	return B_OK;
 }
 
 
@@ -420,6 +484,7 @@ static void
 channel_removed(device_node_handle node, void *channel_cookie)
 {
 	channel_data *channel = channel_cookie;
+	channel->lost = 1;
 }
 
 
@@ -689,32 +754,30 @@ static int32
 handle_interrupt(void *arg)
 {
 	controller_data *controller = arg;
-	pci_device_module_info *pci = controller->pci;
-	pci_device device = controller->device;
 	ide_bm_status bm_status;
 	uint8 status;
+	int i;
 
 	FLOW("handle_interrupt\n");
-	return B_UNHANDLED_INTERRUPT;
-/*	
-	if (channel->lost)
-		return B_UNHANDLED_INTERRUPT;
-		
-	// add test whether this is really our IRQ
-	if (channel->dma_active) {
-		// in DMA mode, there is a safe test
-		// in PIO mode, this doesn't work
-		*(uint8 *)&bm_status = *channel->bm_status_reg;
 
-		if (!bm_status.interrupt)
-			return B_UNHANDLED_INTERRUPT;
+	// XXX This is bogus
+	for (i = 0; i <  controller->channel_count; i++) {
+		channel_data *channel = controller->channel[i];
+		if (!channel || channel->lost)
+			continue;
+
+		if (channel->dma_active) {
+			*(uint8 *)&bm_status = *channel->bm_status_reg;
+			if (!bm_status.interrupt)
+				continue;
+		}
+
+		// acknowledge IRQ
+		status = *(channel->command_block + 7);
+		return ide->irq_handler(channel->ide_channel, status);
 	}
 
-	// acknowledge IRQ
-	status = *(channel->command_block + 7);
-
-	return channel->ata->irq_handler(channel->ata_bus, status);
-*/
+	return B_UNHANDLED_INTERRUPT;
 }
 
 
