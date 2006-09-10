@@ -8,9 +8,41 @@
 	<title>Introduction</title>
 
 	<para>
-		The <emphasis>Midi Kit</emphasis> provides classes capable of understanding the MIDI file format and synthesising the sounds described within. Furthermore, it also provides mechanisms for communicating with MIDI compliant hardware via messages.
+		The Midi Kit is the API that implements support for generating, processing, and 
+		playing music in MIDI format. <ulink url="http://www.midi.org/">MIDI</ulink>, which 
+		stands for 'Musical Instrument Digital Interface', is a well-established 
+		standard for representing and communicating musical data. 
+	</para>
 
-		<note>There are two versions of the Midi Kit, the latter reportedly much more up-to-date and more compatible with other applications. Though sadly it is undocumented. For more information consult the headers (At least until such time as this document is further updated).
-		</note>
+	<para>
+		The BeOS comes with two different, but compatible Midi Kits. This documentation 
+		focuses on the "new" Midi Kit, or midi2 as we like to call it, that was 
+		introduced with BeOS R5. The old kit, which we'll refer to as midi1, is more 
+		complete than the new kit, but less powerful.
+	</para>
+	
+	<para>
+		Both kits let you create so-called MIDI endpoints, but the endpoints from midi1 
+		cannot be shared between different applications. The midi2 kit solves that 
+		problem, but unlike midi1 it does not include a General MIDI softsynth, nor 
+		does it have a facility for reading and playing Standard MIDI Files. Don't 
+		worry: both kits are compatible and you can mix-and-match them in your 
+		applications.
+	</para>
+	
+	<para>
+		The main differences between the two kits:
+		<itemizedlist>
+			<listitem>Instead of one <classname>BMidi</classname> object that both produces and consumes events, we have 
+				<classname>BMidiProducer</classname> and <classname>BMidiConsumer</classname>.</listitem>
+			<listitem>Applications are capable of sharing MIDI producers and consumers with other 
+				applications via the centralized Midi Roster.</listitem>
+			<listitem>Physical MIDI ports are now sharable without apps "stealing" events from each 
+				other.</listitem>
+			<listitem>Applications can now send/receive raw MIDI byte streams (useful if an 
+				application has its own MIDI parser/engine).</listitem>
+			<listitem>Channels are numbered 0..15, not 1..16</listitem>
+			<listitem>Timing is now specified in microseconds instead of milliseconds.</listitem>	
+		</itemizedlist>
 	</para>
 </sect1>

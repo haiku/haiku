@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="midi2roster">
+	<title>BMidiRoster</title>
+	
+	<para>
+		Interface to the system-wide Midi Roster
+	</para>
+	
+	<para>	
+		BMidiRoster allows you to find available MIDI consumer and producer objects. 
+		You can locate these objects using the iterative NextEndpoint(), 
+		NextProducer(), and NextConsumer() methods or by requesting notification 
+		messages to be sent with StartWatching(). Notification messages may contain 
+		object IDs which can be resolved using the FindEndpoint(), FindProducer(), and 
+		FindConsumer() methods.
+	</para>
+	
+	<para>	
+		The constructor and destructor of BMidiRoster are private, which means that you 
+		cannot create or delete your own BMidiRoster objects. Every application can 
+		have only one instance of BMidiRoster, which is automatically created the very 
+		first time you use a Midi Kit function. 
+	</para>
+	
+	<para>
+		You can call BMidiRoster's functions like this:
+		<programlisting>
+		producer = BMidiRoster::FindProducer(someID);
+		</programlisting>
+		
+		Or using the slightly more annoying:
+		<programlisting>
+		BMidiRoster* roster = BMidiRoster::MidiRoster();
+		if (roster != NULL)
+		{
+		producer = roster->FindProducer(someID);
+		}
+		</programlisting>
+	</para>
+	
+	<sect3 id="bmidiroster_nextendpoint">
+		<title>BMidiEndpoint* BMidiRoster::NextEndpoint(int32* id)</title>
+		
+		<para>
+			Returns the next endpoint from the roster
+		</para>
+		
+		<para>
+			The "next endpoint" means: the endpoint with the ID that follows id. So if you 
+			set id to 3, the first possible endpoint it returns is endpoint 4. No endpoint 
+			can have ID 0, so passing 0 gives you the first endpoint. If you pass NULL 
+			instead of an ID, NextEndpoint() always returns NULL. When the function 
+			returns, it sets id to the ID of the endpoint that was found. If no more 
+			endpoints exist, NextEndpoint() returns NULL and id is not changed. 
+			NextEndpoint() does <emphasis>not</emphasis> return locally created endpoints, even if they 
+			are Register()'ed.
+		</para>
+		
+		<para>
+			Usage example:
+			<programlisting>
+			int32 id = 0;
+			BMidiEndpoint* endp;
+			while ((endp = BMidiRoster::NextEndpoint(&amp;id)) != NULL) 
+			{
+			...do something with endpoint ...
+			endp->Release();  // don't forget!
+			}
+			</programlisting>
+		</para>
+		
+		<warning><para>	
+			Remember that NextEndpoint() bumps the endpoint's reference count, so you 
+			should always  BMidiEndpoint::Release() it when you are 
+			done.
+		</para></warning>
+	</sect3>
+	
+	<sect3 id="bmidiroster_nextproducer">
+		<title>BMidiProducer* BMidiRoster::NextProducer(int32* id)</title>
+		
+		<para>
+			Returns the next producer from the roster
+		</para>
+		
+		<para>	
+			Like NextEndpoint(), but only returns producer endpoints.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidiroster_nextconsumer"/> and
+			<xref linkend="bmidiroster_nextendpoint"/>.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_nextconsumer">
+		<title>BMidiConsumer* BMidiRoster::NextConsumer(int32* id)</title>
+		
+		<para>
+			Returns the next consumer from the roster
+		</para>
+		
+		<para>
+			Like NextEndpoint(), but only returns consumer endpoints.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidiroster_nextproducer"/> and
+			<xref linkend="bmidiroster_nextendpoint"/>.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_findendpoint">
+		<title>BMidiEndpoint* BMidiRoster::FindEndpoint(
+			int32 id, bool localOnly = false)</title>
+		
+		<para>
+			Returns the endpoint with the specified ID
+		</para>
+		
+		<para>	
+			FindEndpoint() will always find <emphasis>any</emphasis> local endpoints created by this 
+			application; they do not have to be published with Register() first. If 
+			localOnly is false, FindEndpoint() also looks at remote endpoints, otherwise 
+			only local endpoints will be resolved. Returns NULL if no such endpoint could 
+			be found.
+		</para>
+		
+		<para>
+			You should use a dynamic_cast to convert the BMidiEndpoint into a producer or 
+			consumer:
+		</para>
+		
+		<para><programlisting>
+			BMidiEndpoint* endp = ...;
+			BMidiProducer* prod = NULL;
+			BMidiConsumer* cons = NULL;
+			
+			if (endp->IsProducer())
+			{
+				prod = dynamic_cast&lt;BMidiProducer*&gt;(endp);
+			}
+			else if (endp->IsConsumer())
+			{
+				cons = dynamic_cast&lt;BMidiConsumer*&gt;(endp);
+			}
+		</programlisting></para>
+		
+		<para>					
+			Remember that FindEndpoint() increments the endpoint's reference count, so you 
+			should always \link BMidiEndpoint::Release() Release() \endlink an endpoint 
+			when you are done with it:
+			<programlisting>	
+			BMidiEndpoint* endp = BMidiRoster::FindEndpoint(someID);
+			if (endp != NULL) 
+			{
+			...do stuff with the endpoint...
+			endp->Release();
+			}
+			</programlisting>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_findproducer">
+		<title>BMidiProducer* BMidiRoster::FindProducer(
+			int32 id, bool localOnly = false)</title>
+		
+		<para>
+			Finds the producer with the specified ID
+		</para>
+		
+		<para>			
+			Like FindEndpoint(), but only looks for producer endpoints. Returns NULL if no 
+			endpoint with that ID exists, or if that endpoint is not a producer.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidiroster_findconsumer"/> and
+			<xref linkend="bmidiroster_findendpoint"/>.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_findconsumer">
+		<title>BMidiConsumer* BMidiRoster::FindConsumer(
+			int32 id, bool localOnly = false)</title>
+		
+		<para>
+			Finds the consumer with the specified ID
+		</para>
+		
+		<para>	
+			Like FindEndpoint(), but only looks for consumer endpoints. Returns NULL if no 
+			endpoint with that ID exists, or if that endpoint is not a consumer.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidiroster_findproducer"/> and
+			<xref linkend="bmidiroster_findendpoint"/>. 
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_startwatching">
+		<title>void BMidiRoster::StartWatching(const BMessenger* msngr)</title>
+		
+		<para>
+			Start receiving notifications from the Midi Roster
+		</para>
+		
+		<para>	
+			When you start watching, BMidiRoster sends you notifications for all currently 
+			<emphasis>published</emphasis> <emphasis>remote</emphasis> endpoints, and all the current connections 
+			between them. (At this point, BMidiRoster does not let you know about 
+			connections between unpublished endpoints, nor does it tell you anything about 
+			your local endpoints, even though they may be published.)
+		</para>
+		
+		<para>	
+			Thereafter, you'll receive notifications any time something important happens 
+			to an object. The application that performs these operations is itself not 
+			notified. The assumption here is that you already know about these changes, 
+			because you are the one that is performing them.
+		</para>
+		
+		<para>
+			The notifications are BMessages with code B_MIDI_EVENT. You specify the 
+			BMessenger that will be used to send these messages. Each message contains a 
+			field called be:op that describes the type of notification.
+		</para>
+		
+		<para>
+			The "registered" and "unregistered" notifications are sent when a remote 
+			endpoint Register()'s or Unregister()'s, respectively. You don't receive these 
+			notifications when you register or unregister your local endpoints, but the 
+			other apps will.
+			<table id="bmidirostertable1">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>B_MIDI_REGISTERED</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:id</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the endpoint</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:type</constant></entry>
+							<entry><constant>string</constant></entry>
+							<entry>"producer" or "consumer"</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+			
+			<table id="bmidirostertable2">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>B_MIDI_UNREGISTERED</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:id</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the endpoint</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:type</constant></entry>
+							<entry><constant>string</constant></entry>
+							<entry>"producer" or "consumer"</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</para>
+		
+		<para>
+			The "connected" and "disconnected" notifications are sent when a consumer
+			BMidiProducer::Connect()'s to a producer, or when they 
+			BMidiProducer::Disconnect(). You will receive these 
+			notifications when <emphasis>any</emphasis> two endpoints connect or disconnect, even if they 
+			are not published. (The purpose of which is debatable.) You won't receive the 
+			notifications if you are the one making the connection, even if both endpoints 
+			are remote. You <emphasis>will</emphasis> be notified when another app connects one of your 
+			published endpoints.
+			
+			<table id="bmidirostertable3">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry><entry>
+								<constant>B_MIDI_CONNECTED</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:producer</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the connector</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:consumer</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the connectee</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+			
+			<table id="bmidirostertable4">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>B_MIDI_DISCONNECTED</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:producer</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the connector</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:consumer</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the connectee</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</para>
+		
+		<para>
+			The following notifications are sent when an endpoint's attributes are changed. 
+			You receive these notifications only if another application is changing one of 
+			its published endpoints.
+			
+			<table id="bmidirostertable5">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>B_MIDI_CHANGED_NAME</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:id</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>ID of the endpoint</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:type</constant></entry>
+							<entry><constant>string</constant></entry>
+							<entry>"producer" or "consumer"</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:name</constant></entry>
+							<entry><constant>string</constant></entry>
+							<entry>the endpoint's new name></entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+			
+			<table id="bmidirostertable6">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>B_MIDI_CHANGED_LATENCY</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:id</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the endpoint</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:type</constant></entry>
+							<entry><constant>string</constant></entry>
+							<entry>"producer" or "consumer"</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:latency</constant></entry>
+							<entry><constant>int64</constant></entry>
+							<entry>the new latency (microseconds)</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+			
+			<table id="bmidirostertable7">
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="label"/>
+					<colspec colname='type'/>
+					<colspec colname='description'/>
+					<tbody>
+						<row>
+							<entry><constant>be:op</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry><constant>B_MIDI_CHANGED_PROPERTIES</constant></entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:id</constant></entry>
+							<entry><constant>int32</constant></entry>
+							<entry>ID of the endpoint</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:type</constant></entry>
+							<entry><constant>string</constant></entry>
+							<entry>"producer" or "consumer"</entry>
+						</row>
+						
+						<row>
+							<entry><constant>be:properties</constant></entry>
+							<entry><constant>BMessage</constant></entry>
+							<entry>the new properties</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</para>
+		
+		<para>	
+			Typical usage example:
+			<programlisting>
+			void MyView::AttachedToWindow()
+			{
+				BMessenger msgr(this);
+				BMidiRoster::StartWatching(&amp;msgr);
+			}
+			
+			void MyView::MessageReceived(BMessage* msg)
+			{
+				switch (msg->what) 
+				{
+				case B_MIDI_EVENT:
+					HandleMidiEvent(msg);
+					break;
+					default:
+				super::MessageReceived(msg);
+					break;
+				}
+			}
+			</programlisting>
+		</para>
+		
+		<para>
+			See Also<link linkend="bmidiop">"The possible be:op codes (BMidiOp)"</link>.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_stopwatching">
+		<title>void BMidiRoster::StopWatching()</title>
+		
+		<para>
+			Stop receiving notifications from the Midi Roster
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidiroster_startwatching"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_register">
+		<title>status_t BMidiRoster::Register(BMidiEndpoint* object)</title>
+		
+		<para>
+			Publishes an endpoint to other applications
+		</para>
+		
+		<para>	
+			Calls BMidiEndpoint's  BMidiEndpoint::Register()
+			method to publish an endpoint, which makes it visible to other applications.
+		</para>	
+	</sect3>
+					
+	<sect3 id="bmidiroster_unregister">
+		<title>status_t BMidiRoster::Unregister(BMidiEndpoint* object)</title>
+		
+		<para>
+			Hides an endpoint from other applications
+		</para>
+		
+		<para>
+			Calls BMidiEndpoint's BMidiEndpoint::Unregister()
+			method to hide a previously published endpoint from other applications
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiroster_midiroster">
+		<title>BMidiRoster* BMidiRoster::MidiRoster()</title>
+		
+		<para>
+			Returns a pointer to the only instance of BMidiRoster
+		</para>
+		
+		<para>
+			There is no real reason use this function, since all BMidiRoster's public 
+			function are static.
+		</para>
+	</sect3>
+</sect2>

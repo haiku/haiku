@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="midi2defs">
+	<title>Midi Defs</title>
+	
+	<para>
+		The <filename>Midi2Defs.h</filename> defines a series of constants that are used throughout
+		the Kit.
+	</para>
+	
+	<table id="midichannelmask">
+		<title>Channel message masks</title>
+		<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<colspec colname='constant'/>
+			<colspec colname='value'/>
+			<tbody>
+				<row>
+					<entry><constant>B_NOTE_OFF</constant></entry>
+					<entry>0x80</entry>
+				</row>
+				<row>
+					<entry><constant>B_NOTE_ON</constant></entry>
+					<entry>0x90</entry>
+				</row>
+				<row>
+					<entry><constant>B_KEY_PRESSURE</constant></entry>
+					<entry>0xa0</entry>
+				</row>
+				<row>
+					<entry><constant>B_CONTROL_CHANGE</constant></entry>
+					<entry>0xb0</entry>
+				</row>
+				<row>
+					<entry><constant>B_PROGRAM_CHANGE</constant></entry>
+					<entry>0xc0</entry>
+				</row>
+				<row>
+					<entry><constant>B_CHANNEL_PRESSURE</constant></entry>
+					<entry>0xd0</entry>
+				</row>
+				<row>
+					<entry><constant>B_PITCH_BEND</constant></entry>
+					<entry>0xe0</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</table>
+	
+	<table id="midisystemmessages">
+		<title>System Messages</title>
+		<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<colspec colname='constant'/>
+			<colspec colname='value'/>
+			<tbody>
+				<row>
+					<entry><constant>B_SYS_EX_START</constant></entry>
+					<entry>0xf0</entry>
+				</row>
+				<row>
+					<entry><constant>B_MIDI_TIME_CODE</constant></entry>
+					<entry>0xf1</entry>
+				</row>
+				<row>
+					<entry><constant>B_SONG_POSITION</constant></entry>
+					<entry>0xf2</entry>
+				</row>
+				<row>
+					<entry><constant>B_SONG_SELECT</constant></entry>
+					<entry>0xf3</entry>
+				</row>
+				<row>
+					<entry><constant>B_CABLE_MESSAGE</constant></entry>
+					<entry>0xf5</entry>
+				</row>
+				<row>
+					<entry><constant>B_TUNE_REQUEST</constant></entry>
+					<entry>0xf6</entry>
+				</row>
+				<row>
+					<entry><constant>B_SYS_EX_END</constant></entry>
+					<entry>0xf7</entry>
+				</row>
+				<row>
+					<entry><constant>B_TIMING_CLOCK</constant></entry>
+					<entry>0xf8</entry>
+				</row>
+				<row>
+					<entry><constant>B_START</constant></entry>
+					<entry>0xfa</entry>
+				</row>
+				<row>
+					<entry><constant>B_CONTINUE</constant></entry>
+					<entry>0xfb</entry>
+				</row>
+				<row>
+					<entry><constant>B_STOP</constant></entry>
+					<entry>0xfc</entry>
+				</row>
+				<row>
+					<entry><constant>B_ACTIVE_SENSING</constant></entry>
+					<entry>0xfe</entry>
+				</row>
+				<row>
+					<entry><constant>B_SYSTEM_RESET</constant></entry>
+					<entry>0xff</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</table>
+		
+	<table id="midicontrollernumbers">
+		<title>Controller numbers</title>
+		<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<colspec colname='constant'/>
+			<colspec colname='value'/>
+			<tbody>
+				<row>
+					<entry><constant>B_MODULATION</constant></entry>
+					<entry>0x01</entry>
+				</row>
+				<row>
+					<entry><constant>B_BREATH_CONTROLLER</constant></entry>
+					<entry>0x02</entry>
+				</row>
+				<row>
+					<entry><constant>B_FOOT_CONTROLLER</constant></entry>
+					<entry>0x04</entry>
+				</row>
+				<row>
+					<entry><constant>B_PORTAMENTO_TIME</constant></entry>
+					<entry>0x05</entry>
+				</row>
+				<row>
+					<entry><constant>B_DATA_ENTRY</constant>
+					</entry><entry>0x06</entry>
+				</row>
+				<row>
+					<entry><constant>B_MAIN_VOLUME</constant></entry>
+					<entry>0x07</entry>
+				</row>
+				<row>
+					<entry><constant>B_MIDI_BALANCE</constant></entry>
+					<entry>0x08</entry>
+				</row>
+				<row>
+					<entry><constant>B_PAN</constant></entry>
+					<entry>0x0a</entry>
+				</row>
+				<row>
+					<entry><constant>B_EXPRESSION_CTRL</constant></entry>
+					<entry>0x0b</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_1</constant></entry>
+					<entry>0x10</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_2</constant></entry>
+					<entry>0x11</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_3</constant></entry>
+					<entry>0x12</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_4</constant></entry>
+					<entry>0x13</entry>
+				</row>
+				<row>
+					<entry><constant>B_SUSTAIN_PEDAL</constant></entry>
+					<entry>0x40</entry>
+				</row>
+				<row>
+					<entry><constant>B_PORTAMENTO</constant></entry>
+					<entry>0x41</entry>
+				</row>
+				<row>
+					<entry><constant>B_SOSTENUTO</constant></entry>
+					<entry>0x42</entry>
+				</row>
+				<row>
+					<entry><constant>B_SOFT_PEDAL</constant></entry>
+					<entry>0x43</entry>
+				</row>
+				<row>
+					<entry><constant>B_HOLD_2</constant></entry>
+					<entry>0x45</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_5</constant></entry>
+					<entry>0x50</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_6</constant></entry>
+					<entry>0x51</entry>
+				</row>
+				<row>
+					<entry><constant>B_TEMPO_CHANGE</constant></entry>
+					<entry>0x51</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_7</constant></entry>
+					<entry>0x52</entry>
+				</row>
+				<row>
+					<entry><constant>B_GENERAL_CTRL_8</constant></entry>
+					<entry>0x53</entry>
+				</row>
+				<row>
+					<entry><constant>B_EFFECTS_DEPTH</constant></entry>
+					<entry>0x5b</entry>
+				</row>
+				<row>
+					<entry><constant>B_TREMOLO_DEPTH</constant></entry>
+					<entry>0x5c</entry>
+				</row>
+				<row>
+					<entry><constant>B_CHORUS_DEPTH</constant></entry>
+					<entry>0x5d</entry>
+				</row>
+				<row>
+					<entry><constant>B_CELESTE_DEPTH</constant></entry>
+					<entry>0x5e</entry>
+				</row>
+				<row>
+					<entry><constant>B_PHASER_DEPTH</constant></entry>
+					<entry>0x5f</entry>
+				</row>
+				<row>
+					<entry><constant>B_DATA_INCREMENT</constant></entry>
+					<entry>0x60</entry>
+				</row>
+				<row>
+					<entry><constant>B_DATA_DECREMENT</constant></entry>
+					<entry>0x61</entry>
+				</row>
+				<row>
+					<entry><constant>B_RESET_ALL_CONTROLLERS</constant></entry>
+					<entry>0x79</entry>
+				</row>
+				<row>
+					<entry><constant>B_LOCAL_CONTROL</constant></entry>
+					<entry>0x7a</entry>
+				</row>
+				<row>
+					<entry><constant>B_ALL_NOTES_OFF</constant></entry>
+					<entry>0x7b</entry>
+				</row>
+				<row>
+					<entry><constant>B_OMNI_MODE_OFF</constant></entry>
+					<entry>0x7c</entry>
+				</row>
+				<row>
+					<entry><constant>B_OMNI_MODE_ON</constant></entry>
+					<entry>0x7d</entry>
+				</row>
+				<row>
+					<entry><constant>B_MONO_MODE_ON</constant></entry>
+					<entry>0x7e</entry>
+				</row>
+				<row>
+					<entry><constant>B_POLY_MODE_ON</constant></entry>
+					<entry>0x7f</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</table>
+	
+	<table id="bmidiop">
+		<title>BMidiOp</title>
+		<tgroup cols='1' align='left' colsep='1' rowsep='1'>
+			<colspec colname='constant'/>
+			<tbody>
+				<row><entry>B_MIDI_NO_OP</entry></row>
+				<row><entry>B_MIDI_REGISTERED</entry></row>
+				<row><entry>B_MIDI_UNREGISTERED</entry></row>
+				<row><entry>B_MIDI_CONNECTED</entry></row>
+				<row><entry>B_MIDI_DISCONNECTED</entry></row>
+				<row><entry>B_MIDI_CHANGED_NAME</entry></row>
+				<row><entry>B_MIDI_CHANGED_LATENCY</entry></row>
+				<row><entry>B_MIDI_CHANGED_PROPERTIES</entry></row>
+			</tbody>
+		</tgroup>
+	</table>
+</sect2>

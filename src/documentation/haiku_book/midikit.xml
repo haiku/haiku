@@ -4,5 +4,8 @@
 	<title>The Midi Kit</title>	
 	
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="midi/intro.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="midi/midi1.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="midi/midi2.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="midi/midi2api.xml" />
 </chapter>
 

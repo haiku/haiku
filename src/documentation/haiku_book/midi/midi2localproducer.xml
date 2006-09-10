@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bmidilocalproducer">
+	<title>BMidiLocalProducer</title>
+	
+	<para>
+		You create a BMidiLocalProducer if you want your application to send MIDI 
+		events. You use the various spray functions to send events to all connected 
+		consumers. If no consumers are connected to the producer, any calls to the 
+		spray functions are ignored.
+	</para>
+	
+	<para>
+		Most spray functions accept a channel argument. Even though MIDI channels are 
+		really numbered 1 through 16, the spray functions work with channels 0 through 
+		15. You can also specify the performance time for the event using the time 
+		argument. Specify 0 (or any time in the past) to perform the event "now", i.e. 
+		as soon as possible. You can also schedule events to be performed in the 
+		future, by passing a time such as system_time() + 5000000, which means 5 
+		seconds from now.
+	</para>
+	
+	<para>
+		Unlike BMidiLocalConsumer, which should be subclassed almost always, you hardly 
+		ever need to derive a class from BMidiLocalProducer. The only reason for 
+		subclassing is when you need to know when the producer gets connected or 
+		disconnected.
+	</para>
+	
+	<para>
+		Also unlike consumers, local producers have no thread of control directly 
+		associated with them. If you want to send out the MIDI events from a different 
+		thread, you will have to create one yourself.
+	</para>
+	
+	<sect3 id="bmidilocalproducer_bmidilocalproducer">
+		<title>BMidiLocalProducer::BMidiLocalProducer(const char *name = NULL)</title>
+		
+		<para>
+			Creates a new local producer endpoint.
+		</para>
+		
+		<para>	
+			The new endpoint is not visible to other applications until you Register() it.
+		</para>
+		
+		<para>	
+			You can tell the constructor what the name of the new producer will be. If you 
+			pass NULL (or use the default argument), then the producer's name will be an 
+			empty string. It won't be NULL, since endpoint names cannot be NULL.
+		</para>
+		
+		<para>
+			There is no guarantee that the endpoint will be successfully created. For 
+			example, the Midi Server may not be running. Therefore, you should always call 
+			IsValid() after creating a new endpoint to make sure that everything went okay. 
+			If not, Release() the object to reclaim memory and abort gracefully.
+		</para>
+		
+		<para>
+			<programlisting>
+			BMidiLocalProducer* prod = new BMidiLocalProducer(...);
+			if (!prod->IsValid())
+			{
+			prod->Release();
+			...exit gracefully...
+			}
+			</programlisting>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_connected">
+		<title>void BMidiLocalProducer::Connected(BMidiConsumer* cons)</title>
+		
+		<para>
+			Invoked when a new consumer is connected to this producer
+		</para>
+		
+		<para>
+			Although typical notifications (i.e. from BMidiRoster's "watching" facility) 
+			are only sent if it is some other app that is performing the operation, 
+			Connected() is also called if you are making the connection yourself.
+		</para>
+		
+		<para>
+			If you override this hook, you don't have to call the default implementation, 
+			because that does nothing.
+		</para>
+		
+		<para>
+			<parameter>cons</parameter> The newly connected consumer. The reference count of the consumer 
+			object is not increased, so you should not Release() it. However, if you want 
+			to keep track of the consumer beyond this function, you should first Acquire() 
+			it, and Release() it when you are done.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalproducer_disconnected" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_disconnected">
+		<title>void BMidiLocalProducer::Disconnected(BMidiConsumer* cons)</title>
+		
+		<para>
+			Invoked when a consumer is disconnected from this producer.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalproducer_connected" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraydata">
+		<title>void BMidiLocalProducer::SprayData(
+			void* data, size_t length, bool atomic = false, bigtime_t time = 0) const </title>
+		
+		<para>
+			Sends raw MIDI data downstream to all connected consumers
+		</para>
+		
+		<para>
+			Typically you won't have to call SprayData(); the other spray functions will do 
+			just fine. If you do call it, remember that you retain ownership of the data 
+			and that you are responsible for freeing it at some point. (Even though data is 
+			not declared const, the function does not change it.)
+		</para>
+		
+		<para>	
+			With atomic set to false, you can send a MIDI message in segments (perhaps for 
+			a large sysex dump). However, when you do this, you are on your own. The Midi 
+			Kit only tags the data as being non-atomic, but offers no additional support. 
+			The default implementation of BMidiLocalConsumer completely ignores such 
+			events. To handle non-atomic MIDI data, you should override the 
+			BMidiLocalConsumer::Data() hook and process the MIDI event yourself. All of
+			BMidiLocalProducer's other spray functions always send atomic data.
+		</para>
+		
+		<para>
+			Parameters:
+			<itemizedlist>
+				<listitem><parameter>data</parameter> the MIDI event data</listitem>
+				<listitem><parameter>length</parameter> byte size of the data buffer</listitem>
+				<listitem><parameter>atomic</parameter> whether the data buffer contains
+					a single complete MIDI event</listitem>
+				<listitem><parameter>time</parameter> the required performance time of the event</listitem>
+			</itemizedlist>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraynoteoff">
+		<title>void BMidiLocalProducer::SprayNoteOff(
+			uchar channel, uchar note, uchar velocity, bigtime_t time = 0) const</title>
+		
+		<para>
+			Sends a Note Off event to all connected consumers
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_noteoff" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraynoteon">
+		<title>void BMidiLocalProducer::SprayNoteOn(
+			uchar channel, uchar note, uchar velocity, bigtime_t time = 0) const</title>
+		
+		<para>
+			Sends a Note On event to all connected consumers
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_noteon" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidIlocalproducer_spraykeypressure">
+		<title>void BMidiLocalProducer::SprayKeyPressure(
+			uchar channel, uchar note, uchar pressure, bigtime_t time = 0) const</title>
+		
+		<para>
+			Sends a Polyphonic Pressure (Aftertouch) event to all connected 
+			consumers.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_keypressure"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraycontrolchange">
+		<title>void BMidiLocalProducer::SprayControlChange(
+			uchar channel, uchar controlNumber, uchar controlValue,
+			bigtime_t time = 0) const </title>
+		
+		<para>
+			Sends a Controller Change event to all connected consumers.
+		</para>
+		
+		<para>
+			See Also <xref linkend="midicontrollernumbers"/> and
+			<xref linkend="bmidilocalconsumer_controlchange"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_sprayprogramchange">
+		<title>BMidiLocalProducer::SprayProgramChange(
+			uchar channel, uchar programNumber, bigtime_t time = 0) const </title>
+		
+		<para>
+			Sends a Program Change event to all connected consumers
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_programchange"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraychannelpressure">
+		<title>void BMidiLocalProducer::SprayChannelPressure(
+			uchar channel, uchar pressure, bigtime_t time = 0) const </title>
+		
+		<para>
+			Sends a Channel Pressure event to all connected consumers
+		</para>
+		
+		<para>
+			See also <xref linkend="bmidilocalconsumer_channelpressure"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraypitchbend">
+		<title>void BMidiLocalProducer::SprayPitchBend(
+			uchar channel, uchar lsb, uchar msb, bigtime_t time = 0) const </title>
+		
+		<para>
+			Sends a Pitch Bend event to all connected consumers
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalproducer_spraypitchbend"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraysystemexclusive">
+		<title>
+			void BMidiLocalProducer::SpraySystemExclusive(
+			void* data, size_t length, bigtime_t time = 0) const </title>
+		
+		<para>
+			Sends a System Exclusive event to all connected consumers
+		</para>
+		
+		<para>	
+			You retain ownership of the data and are responsible for freeing it. Even 
+			though data is not declared const, the function does not change it. Even though 
+			the amount of data may be quite large, this function always sends sysex 
+			messages as an atomic block of data.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_systemexclusive"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraysystemcommon">
+		<title>void BMidiLocalProducer::SpraySystemCommon(
+			uchar status, uchar data1, uchar data2, bigtime_t time = 0) const</title>
+		
+		<para>
+			Sends a System Common event to the connected consumers
+		</para>
+		
+		<para>	
+			The status byte must be one of the following:
+			
+			<table id="midisystemcode">
+				<title>System Status</title>
+				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+					<colspec colname="hexvalue"/>
+					<colspec colname='constant'/>
+					<colspec colname='value'/>
+					<tbody>
+						<row>
+							<entry><constant>0xF1</constant></entry>
+							<entry><constant>B_MIDI_TIME_CODE</constant></entry>
+							<entry>data1 only</entry>
+						</row>
+						<row>
+							<entry><constant>0xF2</constant></entry>
+							<entry><constant>B_SONG_POSITION</constant></entry>
+							<entry>data1 and data2</entry>
+						</row>
+						<row>
+							<entry><constant>0xF3</constant></entry>
+							<entry><constant>B_SONG_SELECT</constant>
+							</entry><entry>data1 only</entry>
+						</row>
+						<row>
+							<entry><constant>0xF5</constant></entry>
+							<entry><constant>B_CABLE_MESSAGE</constant></entry>
+							<entry>data1 only</entry>
+						</row>
+						<row>
+							<entry><constant>0xF6</constant></entry>
+							<entry><constant>B_TUNE_REQUEST</constant></entry>
+							<entry>no data</entry>
+						</row>
+						<row>
+							<entry><constant>0xF7</constant></entry>
+							<entry><constant>B_SYS_EX_END</constant></entry>
+							<entry>no data</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_systemcommon"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraysystemrealtime">
+		<title>void BMidiLocalProducer::SpraySystemRealTime(
+			uchar status, bigtime_t time = 0) const</title>
+		
+		<para>
+			Sends a Real Time event to the connected consumers
+		</para>
+		
+		<para>	
+			The status byte must be one of the following:
+			
+			<table id="midirealtimecode">
+				<title>RealTime Status</title>
+				<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+					<colspec colname="hexvalue"/>
+					<colspec colname='constant'/>
+					<colspec colname='value'/>
+					<tbody>
+						<row>
+							<entry><constant>0xF8</constant></entry>
+							<entry><constant>B_TIMING_CLOCK</constant></entry>
+						</row>
+						<row>
+							<entry><constant>0xFA</constant></entry>
+							<entry><constant>B_START</constant></entry>
+						</row>
+						<row>
+							<entry><constant>0xFB</constant></entry>
+							<entry><constant>B_CONTINUE</constant></entry>
+						</row>
+						<row>
+							<entry><constant>0xFC</constant></entry>
+							<entry><constant>B_STOP</constant></entry>
+						</row>
+						<row>
+							<entry><constant>0xFE</constant></entry>
+							<entry><constant>B_ACTIVE_SENSING</constant></entry>
+						</row>
+						<row>
+							<entry><constant>0xFF</constant></entry>
+							<entry><constant>B_SYSTEM_RESET</constant></entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</para>
+		
+		<para>	
+			Because of their high priority, the MIDI specification allows real time 
+			messages to "interleave" with other MIDI messages. A large sysex dump, for 
+			example, may be interrupted by a real time event. The Midi Kit, however, 
+			doesn't care. If you (or another producer) have just sent a big system 
+			exclusive to a consumer, any following real time message will simply have to 
+			wait until the consumer has dealt with the sysex.
+		</para>
+		
+		<para>	
+			See Also <xref linkend="bmidilocalconsumer_systemrealtime"/>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidilocalproducer_spraytempochange">
+		<title>void BMidiLocalProducer::SprayTempoChange(
+			int32 bpm, bigtime_t time = 0) const </title>
+		<para>
+			Sends a Tempo Change event to the connected consumers.
+		</para>
+		
+		<para>	
+			This kind of Tempo Change event is not really part of the MIDI spec, rather
+			it is an extension from the SMF (Standard MIDI File) format.
+		</para>
+		
+		<para>
+			See Also <xref linkend="bmidilocalconsumer_tempochange"/>
+		</para>
+	</sect3>
+</sect2>

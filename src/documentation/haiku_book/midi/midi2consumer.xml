@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="midi2consumer">
+	<title>BMidiConsumer</title>
+	
+	<para>
+		A consumer is an object that knows how to deal with incoming MIDI events. A 
+		consumer can be connected to multiple producers at the same time. There is no 
+		way to find out which producers are connected to this consumer just by looking 
+		at the BMidiConsumer object; you will have to consult BMidiRoster for that.
+	</para>
+	
+	<para>
+		A BMidiConsumer either represents a local consumer, i.e. a class extending from 
+		BMidiLocalConsumer, or is a proxy for a remote object published by another app. 
+	</para>
+	
+	<sect3 id="BMidiConsumer_Latency">
+		<title>bigtime_t BMidiConsumer::Latency() const</title>
+		
+		<para>
+			The latency is measured in microseconds. Producers should attempt to get MIDI 
+			events to this consumer by <emphasis>(when - latency)</emphasis>. You do this by subtracting 
+			the latency from the performance time when you spray the events (provided that 
+			you spray these events ahead of time, of course).
+		</para>
+		
+		<para>
+			You cannot <emphasis>set</emphasis> the latency on a BMidiConsumer, only on a 
+			BMidiLocalConsumer.
+		</para>
+		
+		<para>	
+			The latency issue gets slightly more complicated when multiple endpoints are 
+			chained together, as in the following picture:
+			
+			+-------+     +-------------+     +-------+
+			|       |     |             |     |       |
+			| prodA |---->| consB prodB |---->| consC |
+			|       |     |             |     |       |
+			+-------+     +-------------+     +-------+
+			appA          appB (filter)       appC
+		</para>
+		
+		<para>
+			Suppose consC has 200ms latency, and consB has 100ms latency. If consB simply 
+			reports 100ms, then prodA will schedule its events for (t - 100), which is 
+			really 200ms too late. (Of course, producers send out their events as soon as 
+			possible, so depending on the load of the system, everything may work out just 
+			fine.)
+		</para>
+			
+		<para>
+			ConsB should report the latency of the consumer that is hooked up to its 
+			output, consC, in addition to its own latency. In other words, the full 
+			downstream latency. So, the reported latency in this case would be 300ms. This 
+			also means that appB should change the latency of consB when prodB makes or 
+			breaks a connection, and when consC reports a latency change. (If multiple 
+			consumers are connected to prodB, you should take the slowest one.) 
+			Unfortunately, the Midi Kit provides no easy mechanism for doing any of this, 
+			so you are on your own here.
+		</para>
+	</sect3>
+</sect2>

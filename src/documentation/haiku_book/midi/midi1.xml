@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="midi1">
+	<title>The Old Midi 1 Kit</title>
+	<para>
+	The old Midi Kit, or midi1 for short, goes all the way back to DR8, when the 
+	BeOS only ran on BeBoxen. Fortunately for us, it is pretty well documented:
+	<itemizedlist>
+		<listitem><ulink url="http://bang.dhs.org/be/bebook/The%20Midi%20Kit/index.html">Midi 
+			Kit chapter in the online Be Book</ulink></listitem>
+		<listitem><ulink url="http://web.archive.org/web/20010618100542/www-classic.be.com/developers/developer_library/midi_kit.html">Midi 
+		Kit section of the old Be Developer Library</ulink></listitem>
+		<listitem>Be Newsletter Volume 1, Issue 49 - Introduces the MIDI synth</listitem>
+		<listitem>Be Newsletter Volume 1, Issue 52 - Follow-up on issue 49</listitem>
+		<listitem>Be Newsletter Volume 1, Issue 91 - How to use BSynth</listitem>
+		<listitem>Be Newsletter Volume 1, Issue 102 - Axe sample code</listitem>
+		<listitem>Be Newsletter Volume 1, Issue 104 - How to use BMidiPort</listitem>
+		<listitem>Be Newsletter Volume 2, Issue 23 - EdMidi sample code</listitem>
+		<listitem>Be Newsletter Volume 2, Issue 37 - How to use the MIDI synth</listitem>
+		<listitem>Be Newsletter Volume 3, Issue 37 - Whistle sample code</listitem>
+	</itemizedlist></para>
+	
+	<para>
+	To summarize, there are four basic MIDI classes:
+	<itemizedlist>
+		<listitem><classname>BMidi</classname> is the base class for most other classes from the Midi Kit.</listitem>
+		<listitem><classname>BMidiPort</classname> can talk to a MIDI hardware port.</listitem>
+		<listitem><classname>BMidiStore</classname> can read, write, and perform Standard MIDI files.</listitem>
+		<listitem><classname>BMidiText</classname> is a debugging aid that dumps MIDI messages to <function>stdout</function></listitem>
+	</itemizedlist>
+	</para>
+	
+	<para>
+	The following classes let you use the Midi Kit's General MIDI synthesizer:
+	<itemizedlist>
+		<listitem><classname>BSynth</classname> controls the synthesizer.</listitem>
+		<listitem><classname>BMidiSynth</classname> connects a <classname>BMidi</classname> object to the synth.</listitem>
+		<listitem><classname>BMidiSynthFile</classname> connects a MIDI file to the synth</listitem>
+		<listitem><classname>BSamples</classname> lets you access the synth's sound data stream</listitem>
+	</itemizedlist></para>
+		
+	<para>	
+	To make MIDI data stream through your application, you create a "network" of 
+	BMidi-derived objects that send and receive MIDI messages.
+	</para>
+	
+	<para>
+	The old Midi Kit is slowly fading into obscurity. You may want to use the
+	<xref linkend="midi2"/> instead. Also note that the Haiku implementation
+	of the kit sometimes behaves differently than the one from BeOS R5 or what
+	the BeBook says, but usually for the better ;-)
+	</para>
+	
+	<para>
+	Especially the synth classes are not completely functional, but enough to
+	play back General MIDI tunes. They should be backwards compatible with the
+	majority of BeOS MIDI applications. Not all methods of BSynth, BMidiSynth,
+	and BMidiSynthFile are implemented because some of them are rather obscure. 
+	BSamples is a complete no-op; in other words, with the Haiku Midi Kit 
+	you cannot push waveform data into the output stream of the softsynth.
+	</para>
+</sect1>

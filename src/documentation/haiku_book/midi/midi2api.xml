@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+<!ENTITY midi2defs SYSTEM "midi2defs.xml">
+<!ENTITY midi2consumer SYSTEM "midi2consumer.xml">
+<!ENTITY midi2endpoint SYSTEM "midi2endpoint.xml">
+<!ENTITY midi2localconsumer SYSTEM "midi2localconsumer.xml">
+<!ENTITY midi2localproducer SYSTEM "midi2localproducer.xml">
+<!ENTITY midi2producer SYSTEM "midi2producer.xml">
+<!ENTITY midi2roster SYSTEM "midi2roster.xml">
+
+]>
+
+<sect1 id="midi2api">
+	<title>Midi 2 Kit API</title>
+	
+	&midi2defs;
+	&midi2roster;
+	&midi2consumer;
+	&midi2producer;
+	&midi2endpoint;
+	&midi2localconsumer;
+	&midi2localproducer;
+</sect1>
+	

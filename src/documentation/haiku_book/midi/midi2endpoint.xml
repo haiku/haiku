@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bmidiendpoint">
+	<title>BMidiEndpoint</title>
+	
+	<para>
+		The <filename>MidiEndpoint.h</filename> file defines the <classname>BMidiEndpoint</classname>,,
+		which is the baseclass for all MIDI endpoints.
+	</para>
+	
+	<para>
+		BMidiEndpoint is the abstract base class that represents either a producer or 
+		consumer endpoint. It may be used to obtain the state, name, properties, or 
+		system-wide ID of the object. BMidiEndpoint also provides the ability to change 
+		the name and properties of endpoints that were created locally.
+	</para>
+	
+	<para>	
+		Remember, you cannot call the destructor of BMidiEndpoint and its subclasses 
+		directly. Endpoint objects are destructed automatically when their reference 
+		count drops to zero. If necessary, the destructor of a local endpoint first 
+		breaks off any connections and Unregister()'s the endpoint before it is 
+		deleted. However, for good style and bonus points you should really 
+		BMidiProducer::Disconnect() and Unregister() the object 
+		yourself and not rely on the destructor to do this.
+	</para>
+	
+	<sect3 id="bmidiendpoint_name">
+		<title>const char* BMidiEndpoint::Name() const</title>
+		
+		<para>
+			Returns the name of the endpoint.
+		</para>
+		
+		<para>
+			The function never returns NULL. If you created a local endpoint by passing a 
+			NULL name into its constructor (or passing no name, which is the same thing), 
+			then Name() will return an empty string, not NULL.
+		</para>
+		
+		<para>
+			See also <xref linkend="bmidiendpoint_setname" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_setname">
+		<title>void BMidiEndpoint::SetName(const char* name)</title>
+		
+		<para>
+			Changes the name of the endpoint.
+		</para>
+		
+		<para>
+			Names don't have to be unique, but it is recommended that you give any 
+			endpoints you publish meaningful and unique names, so users can easily 
+			recognize what each endpoint does. There is no limit to the size of endpoint 
+			names.
+		</para>
+		
+		<para>
+			Even though you can call this function on both remote and local objects, you 
+			are only allowed to change the names of local endpoints; SetName() calls on 
+			remote endpoints are ignored.
+		</para>
+		
+		<para>
+			<parameter>name</parameter> The new name. If you pass NULL, the name simply won't be changed.
+		</para>
+		
+		<para>
+			See also <xref linkend="bmidiendpoint_name" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_id">
+		<title>int32 BMidiEndpoint::ID() const</title>
+		
+		<para>
+			Returns the ID of the endpoint
+		</para>
+		
+		<para>
+			An ID uniquely identifies an endpoint in the system. The ID is a signed 32-bit 
+			number that is assigned by the Midi Server when the endpoint is created. (So 
+			even if a local endpoint is not published, it still has a unique ID.) Valid IDs 
+			range from 1 to 0x7FFFFFFF, the largest value an int32 can have. 0 and negative 
+			values are <emphasis>not</emphasis> valid IDs.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_isproducer">
+		<title>bool BMidiEndpoint::IsProducer() const</title>
+		
+		<para>
+			Determines whether this endpoint is a BMidiProducer
+		</para>
+		
+		<para>
+			If it is, you can use a dynamic_cast to convert this object into a producer:
+			
+			<programlisting>
+			if (endp->IsProducer())
+			{
+			BMidiProducer* prod = dynamic_cast &lt;BMidiProducer*&gt;(endp);
+				....
+				}
+			</programlisting>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_isconsumer">
+		<title>bool BMidiEndpoint::IsConsumer() const</title>
+		
+		<para>
+			Determines whether this endpoint is a BMidiConsumer
+		</para>
+		
+		<para>
+			If it is, you can use a dynamic_cast to convert this object into a consumer:
+			<programlisting>
+			if (endp->IsConsumer())
+			{
+			BMidiConsumer* cons = dynamic_cast&lt;BMidiConsumer*&gt;(endp);
+				....
+			}
+			</programlisting>
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_isremote">
+		<title>bool BMidiEndpoint::IsRemote() const</title>
+		
+		<para>
+			Determines whether this endpoint is a proxy for a remote object.
+		</para>
+		
+		<para>
+			An endpoint is "remote" when it is created by another application. Obviously, 
+			the remote object is Register()'ed as well, otherwise you would not be able to 
+			see it.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_islocal">
+		<title>bool BMidiEndpoint::IsLocal() const</title>
+		
+		<para>
+			Determines whether this endpoint represents a local object
+		</para>
+		
+		<para>
+			An endpoint is "local" when it is created by this application; in other words, 
+			a BMidiLocalConsumer or BMidiLocalProducer.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_ispersistent">
+		<title>bool BMidiEndpoint::IsPersistent() const</title>
+		
+		<para>
+			Not used
+		</para>
+		
+		<para>
+			The purpose of this function is unclear, and as a result it doesn't do anything
+			in the Haiku implementation of the Midi Kit.
+		</para>
+		
+		<para>	
+			Always returns false.
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_isvalid">
+		<title>bool BMidiEndpoint::IsValid() const</title>
+		
+		<para>
+			Determines whether the endpoint still exists
+		</para>
+		
+		<para>
+			Suppose you obtained a proxy object for a remote endpoint by querying the 
+			BMidiRoster. What if the application that published this endpoint quits, or 
+			less drastically, Unregister()'s that endpoint? Even though you still have a 
+			BMidiEndpoint proxy object, the real endpoint no longer exists. You can use 
+			IsValid() to check for this.
+		</para>
+		
+		<para>	
+			Don't worry, operations on invalid objects, such as GetProperties(), will 
+			return an error code (typically B_ERROR), but not cause a crash. Local objects 
+			are always are considered to be valid, even if you did not Register() them. 
+			(The only time a local endpoint is not valid is when there was a problem 
+			constructing it.)
+		</para>
+		
+		<para>	
+			If the application that created the remote endpoint crashes, then there is no 
+			guarantee that the Midi Server immediately recognizes this. In that case, 
+			IsValid() may still return true. Eventually, the stale endpoint will be removed 
+			from the roster, though. From then on, IsValid() correctly returns false.
+		</para>	
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_acquire">
+		<title>status_t BMidiEndpoint::Acquire()</title>
+		
+		<para>
+			Increments the endpoint's reference count
+		</para>
+		
+		<para>	
+			Each BMidiEndpoint has a reference count associated with it, so that 
+			BMidiRoster can do proper bookkeeping. Acquire() increments this reference 
+			count, and Release() decrements it. Once the count reaches zero, the endpoint 
+			is deleted.
+		</para>
+		
+		<para>
+			When you are done with the endpoint, whether local or remote, you should 
+			<emphasis>always</emphasis> Release() it!
+		</para>
+		
+		<para>	
+			Upon construction, local endpoints start with a reference count of 1. Any 
+			objects you obtain from BMidiRoster using the NextXXX() or FindXXX() functions 
+			have their reference counts incremented in the process. If you forget to call 
+			Release(), the objects won't be properly cleaned up and you'll make a fool out 
+			of yourself.
+		</para>
+		
+		<para>	
+			After you Release() an object, you are advised not to use it any further. If 
+			you do, your app will probably crash. That also happens if you Release() an 
+			object too many times.
+		</para>
+		
+		<para>	
+			Typically, you don't need to call Acquire(), unless you have two disparate 
+			parts of your application working with the same endpoint, and you don't want to 
+			have to keep track of who needs to Release() the endpoint. Now you simply have 
+			both of them release it.
+		</para>
+		
+		<para>	
+			Always returns B_OK.
+		</para>
+		
+		<para>
+			See also <xref linkend="bmidiendpoint_release" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_release">
+		<title>status_t BMidiEndpoint::Release()</title>
+		
+		<para>
+			Decrements the endpoint's reference count
+		</para>
+		
+		<para>
+			Always returns B_OK.
+		</para>
+		
+		<para>
+			See also <xref linkend="bmidiendpoint_acquire" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_register">
+		<title>status_t BMidiEndpoint::Register()</title>
+		
+		<para>
+			Publishes the endpoint on the roster
+		</para>
+		
+		<para>	
+			MIDI objects created by an application are invisible to other applications 
+			until they are published. To publish an object use the Register() method. The 
+			corresponding Unregister() method will cause an object to once again become 
+			invisible to remote applications.
+		</para>
+		
+		<para>	
+			BMidiRoster also has Register() and Unregister() methods. You may also use 
+			those methods  to publish or hide your endpoints; both do the same thing.
+		</para>
+		
+		<para>	
+			Although it is considered bad style, calling Register() on local endpoints that 
+			are already registered won't mess things up. The Midi Server will simply ignore 
+			your request. Likewise for Unregister()'ing more than once. Attempts to 
+			Register() or Unregister() remote endpoints will fail, of course.
+		</para>
+		
+		<para>	
+			If you are BMidiRoster::StartWatching() watching, you will 
+			<emphasis>not</emphasis> receive notifications for any local endpoints you register or 
+			unregister. Of course, other applications <emphasis>will</emphasis> be notified about your 
+			endpoints.
+		</para>
+		
+		<para>
+			Existing connections will not be broken when an object is unregistered, but 
+			future remote connections will be denied. When objects are destroyed, they 
+			automatically become unregistered.
+		</para>
+		
+		<para>	
+			Returns B_OK on success, or a negative error code (typically B_ERROR) if 
+			something went wrong.
+		</para>
+		
+		<para>	
+			See also <xref linkend="bmidiendpoint_unregister" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_unregister">
+		<title>status_t BMidiEndpoint::Unregister()</title>
+		
+		<para>
+			Hides the endpoint from the roster
+		</para>
+		
+		<para>
+			See also <xref linkend="bmidiendpoint_register" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_setproperties">
+		<title>status_t BMidiEndpoint::SetProperties(const BMessage* props)</title>
+		
+		<para>
+			Changes the properties of the endpoint
+		</para>
+		
+		<para>
+			Endpoints can have properties, which is any kind of information that might be 
+			useful to associate with a MIDI object. The properties are stored in a 
+			BMessage.
+		</para>
+		
+		<para>
+			Usage example:
+			
+			<programlisting>
+			BMessage props;
+			if (endpoint->GetProperties(&amp;props) == B_OK)
+			{
+			...add data to the message...
+			endpoint->SetProperties(&amp;props);
+			} 
+			</programlisting>
+		</para>
+		
+			
+		<para>
+			You are only allowed to call SetProperties() on a local object.
+		</para>
+			
+		<para>
+			Properties should follow a protocol, so different applications will know how to 
+			read each other's properties. The current protocol is very limited -- it only 
+			allows you to associate icons with your endpoints. Be planned to publish a more 
+			complete protocol that included additional information, such as vendor/model 
+			names, copyright/version info, category, etc., but they never got around to it.
+		</para>
+			
+		<table id="bmidiendpoint_property1">
+			<title>Large Icon Property</title>
+			<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+				<colspec colname='constant'/>
+				<colspec colname='value'/>
+				<tbody>
+					<row>
+						<entry>property</entry>
+						<entry>Large (32x32) icon</entry>
+					</row>
+					<row>
+						<entry>field name</entry>
+						<entry>"be:large_icon"</entry>
+					</row>
+					<row>
+						<entry>field type</entry>
+						<entry>'ICON'</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+			
+		<table id="bmidiendpoint_property2">
+			<title>Small Icon Property</title>
+			<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+				<colspec colname='constant'/>
+				<colspec colname='value'/>
+				<tbody>
+					<row>
+						<entry>property</entry>
+						<entry>Small (16x16) ico</entry>
+					</row>
+					<row>
+						<entry>field name</entry>
+						<entry>"be:mini_icon"</entry>
+					</row>
+					<row>
+						<entry>field type</entry>
+						<entry>'MICN'</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+			
+		<para>
+			The MidiUtil package (downloadable from the Haiku website) contains a number 
+			of convenient functions to associate icons with endpoints, so you don't have to 
+			write that code all over again.
+		</para>
+			
+		<para>
+			See also <xref linkend="bmidiendpoint_getproperties" />
+		</para>
+	</sect3>
+	
+	<sect3 id="bmidiendpoint_getproperties">
+		<title>status_t BMidiEndpoint::GetProperties(BMessage* props) const</title>
+		
+		<para>
+			Reads the properties of the endpoint
+		</para>
+		
+		<para>	
+			Usage example:
+			
+			<programlisting>
+			BMessage props;
+			if (endpoint->GetProperties(&amp;props) == B_OK) 
+			{
+			...examine the contents of the message...
+			}
+			</programlisting>
+		</para>
+		
+		<note><para>
+			Note that GetProperties() overwrites the contents of your BMessage.
+		</para></note>
+		
+		<para>
+			See also <xref linkend="bmidiendpoint_setproperties" />
+		</para>
+	</sect3>
+</sect2>
