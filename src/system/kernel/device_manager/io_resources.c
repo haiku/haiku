@@ -560,7 +560,7 @@ dm_acquire_io_resources(io_resource *resources, io_resource_handle *handles)
 	status = acquire_io_resources(resources, handles);
 	benaphore_unlock(&gNodeLock);
 
-	TRACE(("  done (%s)", strerror(status)));
+	TRACE(("  done (%s)\n", strerror(status)));
 
 	return status;
 }
