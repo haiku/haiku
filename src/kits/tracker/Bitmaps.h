@@ -125,6 +125,11 @@ public:
 		// resources.  this does sanity checking on the found data,
 		// and if all is okay blasts it into the 'dest' bitmap.
 
+	status_t GetIconResource(int32 id, const uint8** iconData,
+							 size_t* iconSize) const;
+		// this is a wrapper around LoadResource(), for retrieving
+		// the vector icon data
+
  	status_t GetBitmapResource(type_code type, int32 id, BBitmap **out) const;
  		// this is a wrapper around LoadResource(), for retrieving
  		// arbitrary bitmaps.  the resource with the given type and

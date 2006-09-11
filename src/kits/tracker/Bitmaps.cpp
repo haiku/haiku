@@ -160,6 +160,23 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	return ret;
 }
 
+status_t
+BImageResources::GetIconResource(int32 id, const uint8** iconData,
+								 size_t* iconSize) const
+{
+	// try to load vector icon data from resources
+	size_t length = 0;
+	const void* data = LoadResource(B_RAW_TYPE, id, &length);
+
+	if (!data)
+		return B_ERROR;
+
+	*iconData = (const uint8*)data;
+	*iconSize = length;
+
+	return B_OK;
+}
+
 image_id
 BImageResources::find_image(void *memAddr) const
 {

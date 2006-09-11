@@ -158,14 +158,26 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 	// whole mime type is installed and all attributes are set; nulls can
 	// be passed for attributes that don't matter; returns true if anything
 	// had to be changed
-	BBitmap largeIcon(BRect(0, 0, 31, 31), B_CMAP8);
-	BBitmap miniIcon(BRect(0, 0, 15, 15), B_CMAP8);
+
+#ifndef __HAIKU__
+# define B_BITMAP_NO_SERVER_LINK 0
+#endif
+
+#if __HAIKU__
+	BBitmap vectorIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_RGB32);
+#endif
+	BBitmap largeIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
+	BBitmap miniIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	char tmp[B_MIME_TYPE_LENGTH];
 
 	BMimeType mime(type);
 	bool installed = mime.IsInstalled();
 	
 	if (!installed
+#if __HAIKU__
+		|| (bitsID >= 0 && ((forceMask & kForceLargeIcon)
+			|| mime.GetIcon(&vectorIcon, B_LARGE_ICON) != B_OK))
+#endif
 		|| (bitsID >= 0 && ((forceMask & kForceLargeIcon)
 			|| mime.GetIcon(&largeIcon, B_LARGE_ICON) != B_OK))
 		|| (bitsID >= 0 && ((forceMask & kForceMiniIcon)
@@ -181,6 +193,14 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 			mime.Install();
 
 		if (bitsID >= 0) {
+#if __HAIKU__
+			const uint8* iconData;
+			size_t iconSize;
+			if (GetTrackerResources()->
+					GetIconResource(bitsID, &iconData, &iconSize) == B_OK)
+				mime.SetIcon(iconData, iconSize);
+#endif
+
 			if (GetTrackerResources()->
 					GetIconResource(bitsID, B_LARGE_ICON, &largeIcon) == B_OK) 
 				mime.SetIcon(&largeIcon, B_LARGE_ICON);
@@ -433,7 +453,8 @@ InstallTemporaryBackgroundImagesIfNeeded(BNode *node, const char *imagePath,
 void 
 TTracker::InstallTemporaryBackgroundImages()
 {
-	
+	// TODO: make the large Haiku Logo the default background
+
 	BPath path;
 	FSFindTrackerSettingsDir(&path, false);
 	BString defaultFolderPath(path.Path());
