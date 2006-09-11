@@ -118,6 +118,8 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 	char *bus;
 	uint16 vendorID;
 	uint16 deviceID;
+	
+	FLOW("controller_supports\n");
 
 	// get the bus (should be PCI)
 	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
@@ -133,6 +135,8 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 		free(bus);
 		return B_ERROR;
 	}
+	
+	FLOW("controller_supports: checking 0x%04x 0x%04x\n", vendorID, deviceID);
 
 	// check, whether bus, vendor and device ID match
 	if (strcmp(bus, "pci") != 0
@@ -141,6 +145,8 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 		free(bus);
 		return 0.0;
 	}
+
+	TRACE("controller_supports success\n");
 
 	free(bus);
 	return 0.6;
@@ -240,7 +246,7 @@ controller_probe(device_node_handle parent)
 		{ NULL }
 	};
 	
-	TRACE("publishing controller");
+	TRACE("publishing controller\n");
 
 	res = dm->register_device(parent, controller_attrs, resource_handles, &controller_node);
 	if (res != B_OK || controller_node == NULL) {
@@ -448,7 +454,7 @@ channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &chan_index, false) != B_OK)
 		return B_ERROR;
 
-	TRACE("channel_index %ld", chan_index);
+	TRACE("channel_index %ld\n", chan_index);
 	TRACE("channel name: %s\n", controller_channel_data[chan_index].name);
 		
 	if (dm->init_driver(dm->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
