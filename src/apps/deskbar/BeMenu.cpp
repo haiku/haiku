@@ -743,7 +743,8 @@ MountMenu::AddDynamicItem(add_state s)
 	int32 countFound;
 	reply.GetInfo("DisplayName", &code, &countFound);
 	for (int32 vol = 0; vol < countFound; vol++) {
-		BBitmap *icon = new BBitmap(BRect(0,0,15,15),B_COLOR_8_BIT);
+		// TODO: get_device_icon version that supports B_RGBA32
+		BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 		get_device_icon(reply.FindString("DeviceName", vol), icon->Bits(), B_MINI_ICON);	
 		BMessage *invokeMessage = new BMessage;
 		reply.FindMessage("InvokeMessage", vol, invokeMessage);

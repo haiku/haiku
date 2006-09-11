@@ -80,6 +80,13 @@ const uint32 kShowTeamMenu = 'TmMn';
 
 const BRect kIconSize(0.0f, 0.0f, 15.0f, 15.0f);
 
+#if __HAIKU__
+	static const color_space kIconFormat = B_RGBA32;
+#else
+	static const color_space kIconFormat = B_CMAP8;
+#endif
+
+
 
 int
 main()
@@ -531,9 +538,8 @@ TBarApp::Subscribe(const BMessenger &subscriber, BList *list)
 	for (int32 i = 0; i < numTeams; i++) {
 		BarTeamInfo	*barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
 		BList *tList = new BList(*(barInfo->teams));
-		BBitmap *icon = new BBitmap(kIconSize, B_COLOR_8_BIT);
+		BBitmap *icon = new BBitmap(barInfo->icon);
 		ASSERT(icon);
-		icon->SetBits(barInfo->icon->Bits(), icon->BitsLength(), 0, B_COLOR_8_BIT);
 		list->AddItem(new BarTeamInfo(tList, barInfo->flags, strdup(barInfo->sig), icon, strdup(barInfo->name)));
 	}
 
@@ -605,14 +611,14 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 	BAppFileInfo appMime(&file);
 
 	BarTeamInfo *barInfo = new BarTeamInfo(new BList(), flags, strdup(sig), 
-		new BBitmap(kIconSize, B_COLOR_8_BIT), strdup(ref->name));
+		new BBitmap(kIconSize, kIconFormat), strdup(ref->name));
 
 	barInfo->teams->AddItem((void *)team);
 	if (appMime.GetIcon(barInfo->icon, B_MINI_ICON) != B_OK) {
 		const BBitmap* generic = AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_GenericAppIcon);
 		if (generic)
 			barInfo->icon->SetBits(generic->Bits(), barInfo->icon->BitsLength(),
-				0, B_COLOR_8_BIT);
+				0, kIconFormat);
 	}
 
 	sBarTeamInfoList.AddItem(barInfo);
@@ -626,10 +632,9 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 			BList *tList = new BList(*(barInfo->teams));
 			message.AddPointer("teams", tList);
 
-			BBitmap *icon = new BBitmap(kIconSize, B_COLOR_8_BIT);
+			BBitmap *icon = new BBitmap(barInfo->icon);
 			ASSERT(icon);
 
-			icon->SetBits(barInfo->icon->Bits(), icon->BitsLength(), 0, B_COLOR_8_BIT);
 			message.AddPointer("icon", icon);
 
 			message.AddInt32("flags", static_cast<int32>(barInfo->flags));

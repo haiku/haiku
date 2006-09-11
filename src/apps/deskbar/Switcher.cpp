@@ -60,6 +60,12 @@ static bool OKToUse(const TTeamGroup *);
 static bool IsWindowOK(const window_info *);
 static int SmartStrcmp(const char *s1, const char *s2);
 
+#if __HAIKU__
+	static const color_space kIconFormat = B_RGBA32;
+#else
+	static const color_space kIconFormat = B_CMAP8;
+#endif
+
 
 static int32
 LowBitIndex(uint32 value)
@@ -121,8 +127,8 @@ TTeamGroup::TTeamGroup(BList *teams, uint32 flags, char *name,
 {
 	strcpy(fSignature, signature);
 
-	fSmallIcon = new BBitmap(BRect(0,0,15,15), B_COLOR_8_BIT);
-	fLargeIcon = new BBitmap(BRect(0,0,31,31), B_COLOR_8_BIT);
+	fSmallIcon = new BBitmap(BRect(0, 0, 15, 15), kIconFormat);
+	fLargeIcon = new BBitmap(BRect(0, 0, 31, 31), kIconFormat);
 
 	app_info appInfo;
 	if (be_roster->GetAppInfo(signature, &appInfo) == B_OK) {
@@ -1469,8 +1475,8 @@ TIconView::TIconView(BRect frame, TSwitchManager *manager, TSwitcherWindow *swit
 	fOffBitmap = new BBitmap(rect, B_RGB32, true);
 	fOffBitmap->AddChild(fOffView);
 
-	fCurrentSmall = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
-	fCurrentLarge = new BBitmap(BRect(0, 0, 31, 31), B_COLOR_8_BIT);
+	fCurrentSmall = new BBitmap(BRect(0, 0, 15, 15), kIconFormat);
+	fCurrentLarge = new BBitmap(BRect(0, 0, 31, 31), kIconFormat);
 
 	SetViewColor(color);
 	SetLowColor(color);
@@ -1497,12 +1503,12 @@ TIconView::CacheIcons(TTeamGroup *teamGroup)
 	const BBitmap *bitmap = teamGroup->SmallIcon();
 	ASSERT(bitmap);
 	fCurrentSmall->SetBits(bitmap->Bits(), bitmap->BitsLength(), 0,
-		B_COLOR_8_BIT);
+		bitmap->ColorSpace());
 
 	bitmap = teamGroup->LargeIcon();
 	ASSERT(bitmap);
 	fCurrentLarge->SetBits(bitmap->Bits(), bitmap->BitsLength(), 0,
-		B_COLOR_8_BIT);
+		bitmap->ColorSpace());
 }
 
 

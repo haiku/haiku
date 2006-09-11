@@ -189,7 +189,7 @@ TTeamMenuItem::GetContentSize(float *width, float *height)
 	if (fIcon)
 		iconBounds = fIcon->Bounds();
 	else
-		iconBounds = BRect(0,0,15,15);
+		iconBounds = BRect(0, 0, 15, 15);
 
 	BMenuItem::GetContentSize(width, height);
 
@@ -281,7 +281,12 @@ TTeamMenuItem::DrawContent()
 {
 	BMenu *menu = Menu();
 	if (fIcon) {
-		menu->SetDrawingMode(B_OP_OVER);
+		if (fIcon->ColorSpace() == B_RGBA32) {
+			menu->SetDrawingMode(B_OP_ALPHA);
+			menu->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		} else {
+			menu->SetDrawingMode(B_OP_OVER);
+		}
 		BRect frame(Frame());
 
 		if (!fVertical)
@@ -307,7 +312,7 @@ TTeamMenuItem::DrawContent()
 	//	set the pen to black so that either method will draw in the same color
 	//	low color is set in inherited::DrawContent, override makes sure its what we want
 	if (fDrawLabel) {
-		menu->SetHighColor(0,0,0);
+		menu->SetHighColor(0, 0, 0);
 
 		//	override the drawing of the content when the item is disabled
 		//	the wrong lowcolor is used when the item is disabled since the

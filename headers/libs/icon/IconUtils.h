@@ -75,6 +75,11 @@ class BIconUtils {
 												 uint32 width, uint32 height,
 												 uint32 bytesPerRow,
 												 BBitmap* result);
+
+	static	status_t			ConvertToCMAP8(const uint8* data,
+											   uint32 width, uint32 height,
+											   uint32 bytesPerRow,
+											   BBitmap* result);
 };
 
 #endif // ICON_UTILS_H

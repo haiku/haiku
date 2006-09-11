@@ -261,9 +261,45 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 	tempateMenu->SetFont(be_plain_font);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Icon View", new BMessage(kIconMode)));
-	menu->AddItem(new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode)));
+
+	BMenu* iconSizeMenu = new BMenu("Icon View");
+
+	BMessage* message = new BMessage(kIconMode);
+	message->AddInt32("size", 32);
+	BMenuItem* item = new BMenuItem("32 x 32", message, '1');
+	item->SetMarked(PoseView()->IconSizeInt() == 32);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("size", 40);
+	item = new BMenuItem("40 x 40", message);
+	item->SetMarked(PoseView()->IconSizeInt() == 40);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("size", 48);
+	item = new BMenuItem("48 x 48", message);
+	item->SetMarked(PoseView()->IconSizeInt() == 48);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("size", 64);
+	item = new BMenuItem("64 x 64", message);
+	item->SetMarked(PoseView()->IconSizeInt() == 64);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	menu->AddItem(iconSizeMenu);
+
+	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode));
+	item->SetMarked(PoseView()->ViewMode() == kMiniIconMode);
+	menu->AddItem(item);
+
 	menu->AddSeparatorItem();
+
 #ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	BMenuItem *pasteItem;
 	menu->AddItem(pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));

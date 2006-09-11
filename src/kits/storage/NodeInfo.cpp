@@ -679,8 +679,10 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 				} else if (S_ISLNK(stat.st_mode))
 					type.SetTo(B_SYMLINK_MIME_TYPE);
 
-				error = type.GetIcon(icon, iconSize);
-				success = (error == B_OK);
+				success = (type.GetIcon(icon, iconSize) == B_OK);
+					// NOTE: if there is an icon but getting it failes for some reason,
+					// the error is not reported, and the fall back retrieval methods
+					// are still tried. (IAW, we can't differentiate the reason for error.)
 			}
 		}
 	}

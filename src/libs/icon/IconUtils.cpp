@@ -11,6 +11,7 @@
 
 #include <new>
 #include <fs_attr.h>
+#include <stdio.h>
 
 #include <Bitmap.h>
 #include <Node.h>
@@ -80,11 +81,12 @@ BIconUtils::GetIcon(BNode* node,
 				uint32 width = temp.Bounds().IntegerWidth() + 1;
 				uint32 height = temp.Bounds().IntegerHeight() + 1;
 				uint32 bytesPerRow = temp.BytesPerRow();
-				ret = ConvertFromCMAP8((uint8*)temp.Bits(),
-									   width,height, bytesPerRow, result);
+				ret = ConvertToCMAP8((uint8*)temp.Bits(),
+									 width, height, bytesPerRow, result);
 			}
 			break;
 		default:
+			printf("BIconUtils::GetIcon() - unsupported colorspace\n");
 			break;
 	}
 
@@ -197,6 +199,17 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 		return B_BAD_VALUE;
 
 	status_t ret = B_OK;
+
+	// NOTE: this might be changed if other icon
+	// sizes are supported in B_CMAP8 attributes,
+	// but this is currently not the case, so we
+	// relax the requirement to pass an icon
+	// of just the right size
+	if (size < B_LARGE_ICON)
+		size = B_MINI_ICON;
+	else
+		size = B_LARGE_ICON;
+
 	// set some icon size related variables
 	const char *attribute = NULL;
 	BRect bounds;
@@ -216,13 +229,10 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 			attrSize = 32 * 32;
 			break;
 		default:
+			// can not happen, see above
 			ret = B_BAD_VALUE;
 			break;
 	}
-
-	// TODO: relax this requirement?
-	if (icon->Bounds() != bounds)
-		return B_BAD_VALUE;
 
 	// get the attribute info and check type and size of the attr contents
 	attr_info attrInfo;
@@ -235,10 +245,11 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 
 	// read the attribute
 	if (ret == B_OK) {
-		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
+		bool tempBuffer = (icon->ColorSpace() != B_CMAP8
+						   || icon->Bounds() != bounds);
 		uint8* buffer = NULL;
 		ssize_t read;
-		if (otherColorSpace) {
+		if (tempBuffer) {
 			// other color space than stored in attribute
 			buffer = new(nothrow) uint8[attrSize];
 			if (!buffer)
@@ -257,7 +268,7 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 			else if (read != attrInfo.size)
 				ret = B_ERROR;
 		}
-		if (otherColorSpace) {
+		if (tempBuffer) {
 			// other color space than stored in attribute
 			if (ret == B_OK) {
 				ret = ConvertFromCMAP8(buffer,
@@ -316,13 +327,14 @@ BIconUtils::ConvertFromCMAP8(const uint8* src,
 	} else if (dstWidth > width || dstHeight > height) {
 		// TODO: up scaling
 		// (currently copies bitmap into result at left-top)
+memset(result->Bits(), 255, result->BitsLength());
 	}
 
-#if __HAIKU__
-
-	return result->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
-
-#else
+//#if __HAIKU__
+//
+//	return result->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
+//
+//#else
 
 	if (result->ColorSpace() != B_RGBA32 && result->ColorSpace() != B_RGB32) {
 		// TODO: support other color spaces
@@ -352,7 +364,70 @@ BIconUtils::ConvertFromCMAP8(const uint8* src,
 
 	return B_OK;
 
-#endif // __HAIKU__
+//#endif // __HAIKU__
+}
+
+// ConvertToCMAP8
+status_t
+BIconUtils::ConvertToCMAP8(const uint8* src,
+						   uint32 width, uint32 height, uint32 srcBPR,
+						   BBitmap* result)
+{
+	if (!src || !result || srcBPR == 0)
+		return B_BAD_VALUE;
+
+	status_t ret = result->InitCheck();
+	if (ret < B_OK)
+		return ret;
+
+	uint32 dstWidth = result->Bounds().IntegerWidth() + 1;
+	uint32 dstHeight = result->Bounds().IntegerHeight() + 1;
+
+	if (dstWidth < width || dstHeight < height) {
+		// TODO: down scaling
+		return B_ERROR;
+	} else if (dstWidth > width || dstHeight > height) {
+		// TODO: up scaling
+		// (currently copies bitmap into result at left-top)
+memset(result->Bits(), 255, result->BitsLength());
+	}
+
+//#if __HAIKU__
+//
+//	return result->ImportBits(src, height * srcBPR, srcBPR, 0, B_RGBA32);
+//
+//#else
+
+	if (result->ColorSpace() != B_CMAP8)
+		return B_BAD_VALUE;
+
+	uint8* dst = (uint8*)result->Bits();
+	uint32 dstBPR = result->BytesPerRow();
+
+	const color_map* colorMap = system_colors();
+	uint16 index;
+
+	for (uint32 y = 0; y < height; y++) {
+		uint8* d = dst;
+		const uint8* s = src;
+		for (uint32 x = 0; x < width; x++) {
+			if (s[3] < 128) {
+				*d = B_TRANSPARENT_MAGIC_CMAP8;
+			} else {
+				index = ((s[2] & 0xf8) << 7) | ((s[1] & 0xf8) << 2)
+						| (s[0] >> 3);
+				*d = colorMap->index_map[index];
+			}
+			s += 4;
+			d += 1;
+		}
+		src += srcBPR;
+		dst += dstBPR;
+	}
+
+	return B_OK;
+
+//#endif // __HAIKU__
 }
 
 // #pragma mark - forbidden

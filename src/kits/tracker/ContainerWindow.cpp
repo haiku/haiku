@@ -1881,11 +1881,19 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 
 	BMenu* iconSizeMenu = new BMenu("Icon View");
 
-	item = new BMenuItem("32 x 32", new BMessage(kIconMode), '1');
+	BMessage* message = new BMessage(kIconMode);
+	message->AddInt32("size", 32);
+	item = new BMenuItem("32 x 32", message, '1');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
-	BMessage* message = new BMessage(kScaleIconMode);
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("size", 40);
+	item = new BMenuItem("40 x 40", message);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 48);
 	item = new BMenuItem("48 x 48", message);
 	item->SetTarget(PoseView());
@@ -2865,10 +2873,36 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 	}
 
 	if (context == kMenuBarContext || context == kWindowPopUpContext) {
-//		MarkNamedMenuItem(menu, kIconMode, PoseView()->ViewMode() == kIconMode);
-		MarkNamedMenuItem(menu, kListMode, PoseView()->ViewMode() == kListMode);
-		MarkNamedMenuItem(menu, kMiniIconMode,
-			PoseView()->ViewMode() == kMiniIconMode);
+		BMenu* sizeMenu = NULL;
+		if (BMenuItem* item = menu->FindItem("Icon View")) {
+			sizeMenu = item->Submenu();
+		}
+
+		uint32 viewMode = PoseView()->ViewMode();
+		if (sizeMenu) {
+			if (viewMode == kIconMode || viewMode == kScaleIconMode) {
+				int32 iconSize = (int32)PoseView()->IconSizeInt();
+				for (int32 i = 0; BMenuItem* item = sizeMenu->ItemAt(i); i++) {
+					BMessage* message = item->Message();
+					if (!message) {
+						item->SetMarked(false);
+						continue;
+					}
+					int32 size;
+					if (message->FindInt32("size", &size) < B_OK)
+						size = -1;
+					item->SetMarked(iconSize == size);
+				}
+			} else {
+				for (int32 i = 0; BMenuItem* item = sizeMenu->ItemAt(i); i++)
+					item->SetMarked(false);
+			}
+		} else {
+			MarkNamedMenuItem(menu, kIconMode, viewMode == kIconMode);
+		}
+
+		MarkNamedMenuItem(menu, kListMode, viewMode == kListMode);
+		MarkNamedMenuItem(menu, kMiniIconMode, viewMode == kMiniIconMode);
 
 		SetCloseItem(menu);
 		SetCleanUpItem(menu);
