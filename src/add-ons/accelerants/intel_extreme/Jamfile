@@ -18,3 +18,8 @@ Addon intel_extreme.accelerant : accelerants :
 	: false
 	: be
 ;
+
+Package haiku-intel_extreme-cvs :
+	intel_extreme.accelerant :
+	boot home config add-ons accelerants ;
+	

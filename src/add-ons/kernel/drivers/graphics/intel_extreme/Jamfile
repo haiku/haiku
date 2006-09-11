@@ -19,3 +19,8 @@ KernelAddon intel_extreme : kernel drivers bin :
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+Package haiku-intel_extreme-cvs :
+	intel_extreme : 
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-intel_extreme-cvs : graphics intel_extreme ;
