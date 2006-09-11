@@ -812,6 +812,7 @@ handle_interrupt(void *arg)
 	controller_data *controller = arg;
 	ide_bm_status bm_status;
 	uint8 status;
+	int32 ret;
 	int i;
 
 	FLOW("handle_interrupt\n");
@@ -830,7 +831,9 @@ handle_interrupt(void *arg)
 
 		// acknowledge IRQ
 		status = *(channel->command_block + 7);
-		return ide->irq_handler(channel->ide_channel, status);
+		ret = ide->irq_handler(channel->ide_channel, status);
+		if (ret != B_UNHANDLED_INTERRUPT)
+			return ret;
 	}
 
 	return B_UNHANDLED_INTERRUPT;
