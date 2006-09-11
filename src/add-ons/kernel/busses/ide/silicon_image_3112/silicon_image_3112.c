@@ -140,7 +140,7 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 	// check, whether bus, vendor and device ID match
 	if (strcmp(bus, "pci") != 0
 		|| (vendorID != 0x1095)
-		|| (deviceID != 0x3112 && deviceID != 3114)) {
+		|| (deviceID != 0x3112 && deviceID != 0x3114)) {
 		free(bus);
 		return 0.0;
 	}
