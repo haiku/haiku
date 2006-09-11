@@ -16,7 +16,6 @@
 
 
 #define DRIVER_PRETTY_NAME		"Silicon Image SATA"
-#define CONTROLLER_DRIVER		"silicon_image_3112"
 #define CONTROLLER_NAME			DRIVER_PRETTY_NAME
 #define CONTROLLER_MODULE_NAME	"busses/ide/silicon_image_3112/device_v1"
 #define CHANNEL_MODULE_NAME		"busses/ide/silicon_image_3112/channel/v1"
@@ -214,7 +213,7 @@ controller_probe(device_node_handle parent)
 
 	device_attr controller_attrs[] = {
 		// info about ourself and our consumer
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: CONTROLLER_DRIVER }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: CONTROLLER_MODULE_NAME }},
 
 		// properties of this controller for ide bus manager
 		// there are always max. 2 devices 
