@@ -358,17 +358,12 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 
 	if (asic_index == ASIC_SI3114) {
 		// I put a magic spell on you
-		temp = *(volatile uint32 *)mmio_addr + SI_BMDMA2;
+		temp = *(volatile uint32 *)(mmio_addr + SI_BMDMA2);
 		*(volatile uint32 *)(mmio_addr + SI_BMDMA2) = temp | SI_INT_STEERING;
 		*(volatile uint32 *)(mmio_addr + SI_BMDMA2); // flush
 	}
 
-	temp = *(volatile uint32 *)mmio_addr + SI_SYSCFG;
-	temp &= (asic_index == ASIC_SI3114) ? ~SI_MASK_4PORT : ~SI_MASK_2PORT;
-	*(volatile uint32 *)(mmio_addr + SI_SYSCFG) = temp;
-	*(volatile uint32 *)(mmio_addr + SI_SYSCFG); // flush
-	
-	// disable interrupts
+	// disable all sata phy interrupts
 	for (i = 0; i < asic_data[asic_index].channel_count; i++)
 		*(volatile uint32 *)(mmio_addr + controller_channel_data[i].sien) = 0;
 	*(volatile uint32 *)(mmio_addr + controller_channel_data[0].sien); // flush
@@ -381,6 +376,12 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 		delete_area(mmio_area);
 		free(controller);
 	}
+
+	// unmask interrupts
+	temp = *(volatile uint32 *)(mmio_addr + SI_SYSCFG);
+	temp &= (asic_index == ASIC_SI3114) ? (~SI_MASK_4PORT) : (~SI_MASK_2PORT);
+	*(volatile uint32 *)(mmio_addr + SI_SYSCFG) = temp;
+	*(volatile uint32 *)(mmio_addr + SI_SYSCFG); // flush
 	
 	*controller_cookie = controller;
 
@@ -393,14 +394,15 @@ static status_t
 controller_uninit(void *controller_cookie)
 {
 	controller_data *controller = controller_cookie;
-	int i;
+	uint32 temp;
 
 	TRACE("controller_uninit enter\n");
 
 	// disable interrupts
-	for (i = 0; i < asic_data[controller->asic_index].channel_count; i++)
-		*(volatile uint32 *)(controller->mmio_addr + controller_channel_data[i].sien) = 0;
-	*(volatile uint32 *)(controller->mmio_addr + controller_channel_data[0].sien); // flush
+	temp = *(volatile uint32 *)(controller->mmio_addr + SI_SYSCFG);
+	temp |= (controller->asic_index == ASIC_SI3114) ? SI_MASK_4PORT : SI_MASK_2PORT;
+	*(volatile uint32 *)(controller->mmio_addr + SI_SYSCFG) = temp;
+	*(volatile uint32 *)(controller->mmio_addr + SI_SYSCFG); // flush
 
 	remove_io_interrupt_handler(controller->int_num, handle_interrupt, controller);
 
