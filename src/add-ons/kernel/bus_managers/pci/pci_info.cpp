@@ -21,7 +21,8 @@
 
 
 void get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull);
-void get_device_info(uint16 vendorID, uint16 deviceID, const char **devShort, const char **devFull);
+void get_device_info(uint16 vendorID, uint16 deviceID, uint16 subvendorID, 
+		uint16 subsystemID, const char **devShort, const char **devFull);
 const char *get_class_info(uint8 class_base, uint8 class_sub, uint8 class_api);
 const char *get_capability_name(uint8 cap_id);
 
@@ -172,7 +173,8 @@ print_info_basic(const pci_info *info, bool verbose)
 		}
 		const char *devShort;
 		const char *devFull;
-		get_device_info(info->vendor_id, info->device_id, &devShort, &devFull);
+		get_device_info(info->vendor_id, info->device_id, info->u.h0.subsystem_vendor_id, info->u.h0.subsystem_id, 
+			&devShort, &devFull);
 		if (!devShort && !devFull) {
 			TRACE(("PCI:   device %04x: Unknown\n", info->device_id));
 		} else if (devShort && devFull) {
@@ -679,16 +681,30 @@ get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull)
 
 
 void
-get_device_info(uint16 vendorID, uint16 deviceID, const char **devShort, const char **devFull)
+get_device_info(uint16 vendorID, uint16 deviceID, 
+		uint16 subvendorID, uint16 subsystemID, const char **devShort, const char **devFull)
 {
-	for (int i = 0; i < (int)PCI_DEVTABLE_LEN; i++) {
+	int i;
+	*devShort = NULL;
+	*devFull = NULL;
+	
+	// search for the device
+	for (i = 0; i < (int)PCI_DEVTABLE_LEN; i++) {
 		if (PciDevTable[i].VenId == vendorID && PciDevTable[i].DevId == deviceID ) {
 			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
 			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
-			return;
 		}
 	}
-	*devShort = NULL;
-	*devFull = NULL;
+
+	// search for the subsystem eventually
+	for (; i < (int)PCI_DEVTABLE_LEN; i++) {
+		if (PciDevTable[i].VenId != vendorID || PciDevTable[i].DevId != deviceID)
+			break;
+		if (PciDevTable[i].SubVenId == subvendorID && PciDevTable[i].SubDevId == subsystemID ) {
+			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
+			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
+			break;
+		}
+	}
 }
 #endif	/* USE_PCI_HEADER */

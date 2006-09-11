@@ -58,10 +58,14 @@ BEGIN {
 	device = substr($0, 8)
 	gsub( /\"/, "\\\"", device )
 
+	# store device ID for possible devices afterwards
+	deviceid = $1
 	devicecount++
 	devices[devicecount, 1] = vendorid
 	devices[devicecount, 2] = $1
-	devices[devicecount, 3] = device 
+	devices[devicecount, 3] = 0
+	devices[devicecount, 4] = 0
+	devices[devicecount, 5] = device 
 }
 
 # matches subvendor device
@@ -71,9 +75,11 @@ BEGIN {
 	gsub( /\"/, "\\\"", device )
 
 	devicecount++
-	devices[devicecount, 1] = $1 
-	devices[devicecount, 2] = $2
-	devices[devicecount, 3] = device 
+	devices[devicecount, 1] = vendorid
+	devices[devicecount, 2] = deviceid
+	devices[devicecount, 3] = $1 
+	devices[devicecount, 4] = $2
+	devices[devicecount, 5] = device 
 }
 
 # match device class - store data for later
@@ -123,7 +129,7 @@ END {
 
 	if ( devicecount > 0 ) {
 
-		print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tchar *\tChipDesc ;\n\tchar *\tChip;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"  > ofile
+		print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tunsigned short\tSubVenId ;\n\tunsigned short\tSubDevId ;\n\tchar *\tChipDesc ;\n\tchar *\tChip;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"  > ofile
 		print "PCI_DEVTABLE\tPciDevTable [] =\n{" > ofile
 		for (i = 1; i <= devicecount; i++) {
 
@@ -132,7 +138,7 @@ END {
 			} else {
 				formatting = ""
 			}
-			printf formatting "\t{ 0x" devices[i, 1] ", 0x" devices[i, 2] ", \"" devices[i, 3] "\" }" > ofile
+			printf formatting "\t{ 0x" devices[i, 1] ", 0x" devices[i, 2] ", 0x" devices[i, 3] ", 0x" devices[i, 4] ", \"" devices[i, 5] "\" }" > ofile
 		}
 		print "\n} ;\n\n// Use this value for loop control during searching:\n#define	PCI_DEVTABLE_LEN	(sizeof(PciDevTable)/sizeof(PCI_DEVTABLE))\n" > ofile
 
