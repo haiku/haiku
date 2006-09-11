@@ -112,6 +112,40 @@ static device_manager_info *			dm;
 static status_t device_control_write(void *channel_cookie, uint8 val);
 static int32 handle_interrupt(void *arg);
 
+static float
+controller_supports(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+	uint16 vendorID;
+	uint16 deviceID;
+
+	// get the bus (should be PCI)
+	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
+			!= B_OK) {
+		return B_ERROR;
+	}
+	
+	// get vendor and device ID
+	if (dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM,
+			&vendorID, false) != B_OK
+		|| dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM,
+			&deviceID, false) != B_OK) {
+		free(bus);
+		return B_ERROR;
+	}
+
+	// check, whether bus, vendor and device ID match
+	if (strcmp(bus, "pci") != 0
+		|| (vendorID != 0x1095)
+		|| (deviceID != 0x3112 && deviceID != 3114)) {
+		free(bus);
+		return 0.0;
+	}
+
+	free(bus);
+	return 0.6;
+}
+
 
 static status_t
 controller_probe(device_node_handle parent)
@@ -379,6 +413,17 @@ controller_removed(device_node_handle node, void *controller_cookie)
 {
 	controller_data *controller = controller_cookie;
 	controller->lost = 1;
+}
+
+
+static void
+controller_get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = { "pci", NULL };
+	static const char *kDevice[] = { "drivers/dev/disk/sata", NULL };
+
+	*_bus = kBus;
+	*_device = kDevice;
 }
 
 
@@ -846,13 +891,13 @@ static driver_module_info controller_interface = {
 		std_ops
 	},
 
-	.supports_device							= NULL,
+	.supports_device							= &controller_supports,
 	.register_device							= &controller_probe,
 	.init_driver								= &controller_init,
 	.uninit_driver								= &controller_uninit,
 	.device_removed								= &controller_removed,
 	.device_cleanup								= NULL,
-	.get_supported_paths						= NULL,
+	.get_supported_paths							= &controller_get_paths,
 };
 
 module_info *modules[] = {
