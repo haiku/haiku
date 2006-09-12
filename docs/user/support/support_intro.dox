@@ -1,12 +1,10 @@
-/** \page support The Support Kit
+/*!
+\ingroup support
+\page supportintro The Support Kit
 
 The Support Kit provides a handy set of functions and classes that you can
-use in your applications. It is part of both, libbe.so and libroot.so - a
-clear distinction of where you'll find what is still to be written/created.
-Documentation is avaible for the following parts:
+use in your applications.
 
-	- \ref parsedate.h Date parsing functions 
-	- \ref syslog.h system logging capabilities 
-
+This section is still under construction.
 */
 

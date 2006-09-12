@@ -1,5 +1,7 @@
 /*!
 \class BMidiLocalConsumer MidiConsumer.h
+\ingroup midi2
+\ingroup libmidi2
 \brief A consumer endpoint that is created by your own application
 
 If you want to create a consumer that reacts to MIDI events, you should 

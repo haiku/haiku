@@ -1,4 +1,7 @@
-/** \file syslog.h
+/*!
+\file syslog.h
+\ingroup support
+\ingroup libroot
 \brief System logging capabilities
 
 The functions described here are interacting with the syslog_daemon, a server
@@ -6,30 +9,30 @@ that provides the system logging capabilities.
 The log can be found in /var/log/syslog.
 */
 
-/** \fn void closelog(void)
+/*! \fn void closelog(void)
 \brief Closes the current log session
 */
 
-/** \fn void openlog(const char *ident, int options, int facility)
+/*! \fn void openlog(const char *ident, int options, int facility)
 \brief Starts a log session, and sets some output options
 
 Like openlog_thread() this function defines the log session in thread context; the
 global options set by openlog_team() are not affected by this function.
 */
 
-/** \fn int setlogmask(int priorityMask)
+/*! \fn int setlogmask(int priorityMask)
 \brief sets the logging priority mask
 */
 
-/** \fn void syslog(int priority, const char *message, ...)
+/*! \fn void syslog(int priority, const char *message, ...)
 \brief sends a message to the system log
 */
 
-/** \fn void closelog_team(void)
+/*! \fn void closelog_team(void)
 \brief Closes the log
 */
 
-/** \fn void openlog_team(const char *ident, int logopt, int facility)
+/*! \fn void openlog_team(const char *ident, int logopt, int facility)
 \brief Starts a log session, and sets some output options
 
 This function defines the team-wide logging options. Thread local sessions
@@ -37,26 +40,26 @@ started with openlog() or openlog_thread() will inherit the options of the
 global session.
 */
 
-/** \fn void log_team(int priority, const char *message, ...)
+/*! \fn void log_team(int priority, const char *message, ...)
 \brief sends a message to the system log
 */
 
-/** \fn int setlogmask_team(int priorityMask)
+/*! \fn int setlogmask_team(int priorityMask)
 \brief sets the logging priority mask
 */
 
-/** \fn void closelog_thread(void)
+/*! \fn void closelog_thread(void)
 \brief Closes the log
 */
 
-/** \fn void openlog_thread(const char *ident, int logopt, int facility)
+/*! \fn void openlog_thread(const char *ident, int logopt, int facility)
 \brief Starts a log session, and sets some output options
 */
 
-/** \fn void log_thread(int priority, const char *message, ...)
+/*! \fn void log_thread(int priority, const char *message, ...)
 \brief sends a message to the system log
 */
 
-/** \fn int setlogmask_thread(int priorityMask)
+/*! \fn int setlogmask_thread(int priorityMask)
 \brief sets the logging priority mask
 */

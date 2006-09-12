@@ -6,5 +6,12 @@
 - \ref midi1
 - \ref midi2
 - \ref support
-- \ref ppp
+*/
+
+/*!
+\defgroup midi2 MIDI 2 Kit
+\defgroup libmidi2 (libmidi2.so)
+\defgroup support Support Kit
+\defgroup libbe (libbe.so)
+\defgroup libroot (libroot.so)
 */

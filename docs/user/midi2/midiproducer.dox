@@ -1,5 +1,7 @@
 /*!
 \class BMidiProducer MidiProducer.h
+\ingroup midi2
+\ingroup libmidi2
 \brief Streams MIDI events to connected consumers
 
 A producer is an object that generate a stream of MIDI events. Each producer 

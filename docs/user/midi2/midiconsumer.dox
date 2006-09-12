@@ -1,5 +1,7 @@
 /*!
 \class BMidiConsumer MidiConsumer.h
+\ingroup midi2
+\ingroup libmidi2
 \brief Receives MIDI events from a producer
 
 A consumer is an object that knows how to deal with incoming MIDI events. A 

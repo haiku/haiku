@@ -1,5 +1,7 @@
 /*!
 \class BMidiEndpoint MidiEndpoint.h
+\ingroup midi2
+\ingroup libmidi2
 \brief Base class for all MIDI endpoints
 
 BMidiEndpoint is the abstract base class that represents either a producer or 

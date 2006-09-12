@@ -1,5 +1,7 @@
 /*!
 \class BMidiRoster MidiRoster.h
+\ingroup midi2
+\ingroup libmidi2
 \brief Interface to the system-wide Midi Roster
 
 BMidiRoster allows you to find available MIDI consumer and producer objects. 

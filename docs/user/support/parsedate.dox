@@ -1,4 +1,7 @@
-/** \file parsedate.h
+/*!
+\file parsedate.h
+\ingroup support
+\ingroup libroot
 \brief date parsing functions
 
 This is a set a functions for parsing date strings in various formats.

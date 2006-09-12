@@ -1,5 +1,11 @@
 /*!
-\page midi2 The new Midi Kit (libmidi2.so)
+\ingroup midi2
+*/
+
+/*\{*/
+
+/*!
+\page midi2intro
 
 The Midi Kit is the API that implements support for generating, processing, and 
 playing music in MIDI format. <A HREF="http://www.midi.org/">MIDI</A>, which 
@@ -282,7 +288,7 @@ as the BeOS R5 kits, although there are a few small differences in the API
 
 More about the Midi Kit:
 
-- \ref midi2defs
+- \subpage midi2defs
 - Be Newsletter Volume 3, Issue 47 - Motor Mix sample code
 - Be Newsletter Volume 4, Issue 3 - Overview of the new kit
 - <A HREF="http://open-beos.sourceforge.net/nsl.php?mode=display&id=33">OpenBeOS
@@ -301,3 +307,5 @@ Information about MIDI in general:
 - <A HREF="http://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</A>
 
 */
+
+/*\}*/

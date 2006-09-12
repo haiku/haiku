@@ -1,5 +1,7 @@
 /*!
 \class BMidiLocalProducer MidiProducer.h
+\ingroup midi2
+\ingroup libmidi2
 \brief A producer endpoint that is created by your own application
 
 You create a BMidiLocalProducer if you want your application to send MIDI 
