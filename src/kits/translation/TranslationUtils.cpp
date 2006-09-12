@@ -413,7 +413,11 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 		if (runArray) {
 			intoView->Insert(intoView->TextLength(), text,
 				textHeader.header.data_size, runArray);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			BTextView::FreeRunArray(runArray);
+#else
+			free(runArray);
+#endif
 		} else {
 			// run array seems to be garbled; the text alone must be enough
 			intoView->Insert(intoView->TextLength(), text,
@@ -473,7 +477,11 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 	void *pflatRunArray =
 		BTextView::FlattenRunArray(runArray, &flatRunArrayLength);
 	if (pflatRunArray == NULL) {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		BTextView::FreeRunArray(runArray);
+#else
+		free(runArray);
+#endif
 		return B_ERROR;
 	}
 	
@@ -564,7 +572,11 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 	}
 
 	free(pflatRunArray);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	BTextView::FreeRunArray(runArray);
+#else
+	free(runArray);
+#endif
 
 	return ok ? B_OK : B_ERROR;
 }
@@ -667,7 +679,11 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
 		}
 
 		free(flattenedRunArray);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		BTextView::FreeRunArray(runArray);
+#else
+		free(runArray);
+#endif
 	}
 
 	return B_OK;
