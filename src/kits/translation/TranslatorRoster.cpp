@@ -21,6 +21,7 @@
 #include <Autolock.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <driver_settings.h>
 #include <image.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -29,6 +30,14 @@
 
 #include <new>
 #include <string.h>
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+extern "C" status_t _kern_get_safemode_option(const char *parameter,
+        char *buffer, size_t *_bufferSize);
+#else
+extern "C" status_t _kget_safemode_option_(const char *parameter,
+        char *buffer, size_t *_bufferSize);
+#endif
 
 
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
@@ -124,8 +133,25 @@ QuarantineTranslatorImage::Remove()
 BTranslatorRoster::Private::Private()
 	: BHandler("translator roster"), BLocker("translator list"),
 	fNextID(1),
-	fLazyScanning(true)
+	fLazyScanning(true),
+	fSafeMode(false)
 {
+
+	char parameter[32];
+	size_t parameterLength = sizeof(parameter);
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
+#else
+	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
+#endif
+	{
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
+			fSafeMode = true;
+	}
+
 	// we're sneaking us into the BApplication
 	if (be_app != NULL && be_app->Lock()) {
 		be_app->AddHandler(this);
@@ -288,7 +314,7 @@ BTranslatorRoster::Private::AddDefaultPaths()
 		B_BEOS_ADDONS_DIRECTORY,
 	};
 
-	for (uint32 i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+	for (uint32 i = fSafeMode ? 1 : 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
 		BPath path;
 		status_t status = find_directory(paths[i], &path, true);
 		if (status == B_OK && path.Append("Translators") == B_OK) {

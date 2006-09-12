@@ -101,6 +101,7 @@ class BTranslatorRoster::Private : public BHandler, public BLocker {
 		EntryRefSet		fRescanEntries;
 		int32			fNextID;
 		bool			fLazyScanning;
+		bool			fSafeMode;
 };
 
 #endif	// TRANSLATOR_ROSTER_PRIVATE_H
