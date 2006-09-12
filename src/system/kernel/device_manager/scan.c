@@ -1,13 +1,11 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of PnP Manager
-
 	Scanning for consumers.
 
 	Logic to execute (re)scanning of nodes.
@@ -94,10 +92,16 @@ scan_bus(device_node_info *node, bool rescan)
 {
 	// busses can register their children themselves
 	bus_module_info *interface;
+	status_t status;
 	void *cookie;
 
 	// load driver during rescan
-	pnp_load_driver(node, NULL, (driver_module_info **)&interface, &cookie);
+
+	status = pnp_load_driver(node, NULL, (driver_module_info **)&interface, &cookie);
+	if (status < B_OK) {
+		// we couldn't load a driver that had already registered itself...
+		return;
+	}
 
 	TRACE(("scan bus\n"));
 
