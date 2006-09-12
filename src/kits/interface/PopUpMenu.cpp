@@ -293,11 +293,8 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	data->lock = sem;
 
 	// Spawn the tracking thread
-	fTrackThread = spawn_thread(entry, "popup", B_NORMAL_PRIORITY, data); 
-
-	if (fTrackThread >= 0)
-		resume_thread(fTrackThread);
-	else {
+	fTrackThread = spawn_thread(entry, "popup", B_DISPLAY_PRIORITY, data); 
+	if (fTrackThread < B_OK) {
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
 		if (async && window != NULL)
@@ -305,6 +302,8 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		delete data;
 		return NULL;
 	}
+
+	resume_thread(fTrackThread);
 
 	// Synchronous menu: we block on the sem till
 	// the other thread deletes it.

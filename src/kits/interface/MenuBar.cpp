@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+
 #include <MenuBar.h>
 
 #include <Application.h>
@@ -21,6 +22,7 @@
 
 using BPrivate::gDefaultTokens;
 
+
 struct menubar_data {
 	BMenuBar *menuBar;
 	int32 menuIndex;
@@ -34,9 +36,9 @@ struct menubar_data {
 
 
 BMenuBar::BMenuBar(BRect frame, const char *title, uint32 resizeMask,
-			menu_layout layout, bool resizeToFit)
-	: BMenu(frame, title, resizeMask,
-			B_WILL_DRAW | B_FRAME_EVENTS, layout, resizeToFit),
+		menu_layout layout, bool resizeToFit)
+	: BMenu(frame, title, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS, layout,
+		resizeToFit),
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
@@ -349,7 +351,7 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 	fMenuSem = create_sem(0, "window close sem");
 	_set_menu_sem_(window, fMenuSem);
 	
-	fTrackingPID = spawn_thread(TrackTask, "menu_tracking", B_NORMAL_PRIORITY, NULL);
+	fTrackingPID = spawn_thread(TrackTask, "menu_tracking", B_DISPLAY_PRIORITY, NULL);
 	if (fTrackingPID >= 0) {
 		menubar_data data;	
 		data.menuBar = this;

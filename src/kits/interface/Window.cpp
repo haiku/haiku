@@ -40,7 +40,6 @@
 
 //#define DEBUG_WIN
 #ifdef DEBUG_WIN
-#	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
@@ -269,7 +268,7 @@ BWindow::Shortcut::PrepareKey(uint32 key)
 
 BWindow::BWindow(BRect frame, const char* title, window_type type,
 	uint32 flags, uint32 workspace)
-	: BLooper(title)
+	: BLooper(title, B_DISPLAY_PRIORITY)
 {
 	window_look look;
 	window_feel feel;
@@ -281,7 +280,7 @@ BWindow::BWindow(BRect frame, const char* title, window_type type,
 
 BWindow::BWindow(BRect frame, const char* title, window_look look, window_feel feel,
 	uint32 flags, uint32 workspace)
-	: BLooper(title)
+	: BLooper(title, B_DISPLAY_PRIORITY)
 {
 	_InitData(frame, title, look, feel, flags, workspace);
 }
@@ -350,9 +349,8 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 
 BWindow::~BWindow()
 {
-	if (BMenu *menu = dynamic_cast<BMenu *>(fFocus)) {
+	if (BMenu *menu = dynamic_cast<BMenu *>(fFocus))
 		menu->QuitTracking();
-	}
 
 	// The BWindow is locked when the destructor is called,
 	// we need to unlock because the menubar thread tries
