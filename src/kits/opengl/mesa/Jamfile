@@ -245,7 +245,7 @@ StaticLibrary libmesa.a :
 	$(arch_sources)
 
 	# glapi
-	glapi.c
+#	glapi.c
 	glthread.c
 ;
 
