@@ -453,13 +453,13 @@ channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 	TRACE("channel %p\n", channel);	
 
 	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &chan_index, false) != B_OK)
-		return B_ERROR;
+		goto err;
 
 	TRACE("channel_index %ld\n", chan_index);
 	TRACE("channel name: %s\n", controller_channel_data[chan_index].name);
 		
 	if (dm->init_driver(dm->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
-		return B_ERROR;
+		goto err;
 		
 	TRACE("controller %p\n", controller);	
 	TRACE("mmio_addr %p\n", (void *)controller->mmio_addr);
