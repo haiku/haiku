@@ -35,8 +35,8 @@ public:
 	status_t SetProperties(const BMessage* properties);
 	status_t GetProperties(BMessage* properties) const;
 
-	status_t Register(void);
-	status_t Unregister(void);
+	status_t Register();
+	status_t Unregister();
 						
 private:
 

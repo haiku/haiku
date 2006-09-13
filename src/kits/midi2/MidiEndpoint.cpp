@@ -198,7 +198,7 @@ BMidiEndpoint::GetProperties(BMessage* _properties) const
 
 
 status_t
-BMidiEndpoint::Register(void)
+BMidiEndpoint::Register()
 {
 	if (IsRemote()) { 
 		WARN("You cannot Register() remote endpoints");
@@ -216,7 +216,7 @@ BMidiEndpoint::Register(void)
 
 
 status_t
-BMidiEndpoint::Unregister(void)
+BMidiEndpoint::Unregister()
 {
 	if (IsRemote()) { 
 		WARN("You cannot Unregister() remote endpoints");
