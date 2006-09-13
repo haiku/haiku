@@ -12,10 +12,10 @@ class BMidiProducer : public BMidiEndpoint
 {
 public:
 
-	status_t Connect(BMidiConsumer* cons);
-	status_t Disconnect(BMidiConsumer* cons);
-	bool IsConnected(BMidiConsumer* cons) const;
-	BList* Connections() const;
+	status_t Connect(BMidiConsumer *cons);
+	status_t Disconnect(BMidiConsumer *cons);
+	bool IsConnected(BMidiConsumer *cons) const;
+	BList *Connections() const;
 
 private:
 
@@ -55,10 +55,10 @@ class BMidiLocalProducer : public BMidiProducer
 {
 public:
 
-	BMidiLocalProducer(const char* name = NULL);	
+	BMidiLocalProducer(const char *name = NULL);	
 	
-	virtual void Connected(BMidiConsumer* cons);
-	virtual void Disconnected(BMidiConsumer* cons);
+	virtual void Connected(BMidiConsumer *cons);
+	virtual void Disconnected(BMidiConsumer *cons);
 	
 	void SprayData(
 		void* data, size_t length, bool atomic = false, 

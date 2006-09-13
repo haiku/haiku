@@ -59,7 +59,7 @@
 		
 		<para>
 			<programlisting>
-			BMidiLocalProducer* prod = new BMidiLocalProducer(...);
+			BMidiLocalProducer *prod = new BMidiLocalProducer(...);
 			if (!prod->IsValid())
 			{
 			prod->Release();
@@ -70,7 +70,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_connected">
-		<title>void BMidiLocalProducer::Connected(BMidiConsumer* cons)</title>
+		<title>virtual void BMidiLocalProducer::Connected(BMidiConsumer *cons)</title>
 		
 		<para>
 			Invoked when a new consumer is connected to this producer
@@ -100,7 +100,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_disconnected">
-		<title>void BMidiLocalProducer::Disconnected(BMidiConsumer* cons)</title>
+		<title>virtual void BMidiLocalProducer::Disconnected(BMidiConsumer *cons)</title>
 		
 		<para>
 			Invoked when a consumer is disconnected from this producer.
@@ -113,7 +113,7 @@
 	
 	<sect3 id="bmidilocalproducer_spraydata">
 		<title>void BMidiLocalProducer::SprayData(
-			void* data, size_t length, bool atomic = false, bigtime_t time = 0) const </title>
+			void *data, size_t length, bool atomic = false, bigtime_t time = 0) const </title>
 		
 		<para>
 			Sends raw MIDI data downstream to all connected consumers
@@ -245,7 +245,7 @@
 	<sect3 id="bmidilocalproducer_spraysystemexclusive">
 		<title>
 			void BMidiLocalProducer::SpraySystemExclusive(
-			void* data, size_t length, bigtime_t time = 0) const </title>
+			void *data, size_t length, bigtime_t time = 0) const </title>
 		
 		<para>
 			Sends a System Exclusive event to all connected consumers

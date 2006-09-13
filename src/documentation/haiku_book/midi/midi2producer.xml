@@ -20,7 +20,7 @@
 	</para>
 	
 	<sect3 id="bmidiproducer_connect">
-		<title>status_t BMidiProducer::Connect(BMidiConsumer* cons)</title>
+		<title>status_t BMidiProducer::Connect(BMidiConsumer *cons)</title>
 		
 		<para>
 			Connects a consumer to this producer
@@ -45,7 +45,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_disconnect">
-		<title>status_t BMidiProducer::Disconnect(BMidiConsumer* cons)</title>
+		<title>status_t BMidiProducer::Disconnect(BMidiConsumer *cons)</title>
 		
 		<para>
 			Disconnects a consumer from this producer
@@ -67,7 +67,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_isconnected">
-		<title>bool BMidiProducer::IsConnected(BMidiConsumer* cons) const</title>
+		<title>bool BMidiProducer::IsConnected(BMidiConsumer *cons) const</title>
 		
 		<para>
 			Determines whether a consumer is connected to this producer
@@ -80,7 +80,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_connections">
-		<title>BList* BMidiProducer::Connections() const</title>
+		<title>BList *BMidiProducer::Connections() const</title>
 		
 		<para>
 			Returns a list with all connected consumers
@@ -94,10 +94,10 @@
 		
 		<para>
 			<programlisting>
-			BList* list = prod->Connections();
+			BList *list = prod->Connections();
 			for (int32 t = 0; t &lt; list-&gt; CountItems(); ++t)
 			{
-			BMidiEndpoint* endp = (BMidiEndpoint*) list->ItemAt(t);
+			BMidiEndpoint *endp = (BMidiEndpoint *) list->ItemAt(t);
 			...do stuff...
 			endp->Release();  // yes, here too!
 			}
