@@ -329,7 +329,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_setproperties">
-		<title>status_t BMidiEndpoint::SetProperties(const BMessage* props)</title>
+		<title>status_t BMidiEndpoint::SetProperties(const BMessage* properties)</title>
 		
 		<para>
 			Changes the properties of the endpoint
@@ -423,7 +423,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_getproperties">
-		<title>status_t BMidiEndpoint::GetProperties(BMessage* props) const</title>
+		<title>status_t BMidiEndpoint::GetProperties(BMessage* properties) const</title>
 		
 		<para>
 			Reads the properties of the endpoint
