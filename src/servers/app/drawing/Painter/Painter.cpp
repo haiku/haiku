@@ -234,6 +234,11 @@ Painter::ConstrainClipping(const BRegion* region)
 {
 	*fClippingRegion = *region;
 	fValidClipping = fClippingRegion->Frame().IsValid();
+
+	if (fValidClipping) {
+		clipping_rect cb = fClippingRegion->FrameInt();
+		fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
+	}
 // TODO: would be nice if we didn't need to copy a region
 // for *each* drawing command...
 //fBaseRenderer->set_clipping_region(const_cast<BRegion*>(region));
@@ -1570,7 +1575,6 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	span_gen_type spanGenerator(source, interpolator);
 
 
-
 	// clip to the current clipping region's frame
 	viewRect = viewRect & fClippingRegion->Frame();
 	// convert to pixel coords (versus pixel indices)
@@ -1586,6 +1590,7 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	fPath.close_polygon();
 
 	agg::conv_transform<agg::path_storage> transformedPath(fPath, srcMatrix);
+	fRasterizer->reset();
 	fRasterizer->add_path(transformedPath);
 
 	// render the path with the bitmap as scanline fill
@@ -1719,8 +1724,6 @@ Painter::_StrokePath(VertexSource& path) const
 		stroke.miter_limit(fMiterLimit);
 
 		fRasterizer->reset();
-		clipping_rect cb = fClippingRegion->FrameInt();
-		fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 		fRasterizer->add_path(stroke);
 
 		agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
@@ -1744,8 +1747,6 @@ BRect
 Painter::_FillPath(VertexSource& path) const
 {
 	fRasterizer->reset();
-	clipping_rect cb = fClippingRegion->FrameInt();
-	fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 	fRasterizer->add_path(path);
 	agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
 

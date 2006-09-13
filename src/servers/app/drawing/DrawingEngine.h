@@ -47,6 +47,7 @@ public:
 			// locking
 			bool			Lock();
 			void			Unlock();
+			bool			IsLocked();
 
 			bool			WriteLock();
 			void			WriteUnlock();

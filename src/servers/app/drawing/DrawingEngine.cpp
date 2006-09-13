@@ -23,6 +23,9 @@
 
 #include "drawing_support.h"
 
+#define CRASH_IF_NOT_LOCKED
+//#define CRASH_IF_NOT_LOCKED if (!IsLocked()) debugger("not locked!");
+
 // make_rect_valid
 static inline void
 make_rect_valid(BRect& rect)
@@ -138,6 +141,8 @@ DrawingEngine::SetHWInterface(HWInterface* interface)
 void
 DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 {
+	CRASH_IF_NOT_LOCKED
+
 	fPainter->ConstrainClipping(region);
 }
 
@@ -145,6 +150,8 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 void
 DrawingEngine::SuspendAutoSync()
 {
+	CRASH_IF_NOT_LOCKED
+
 	fSuspendSyncLevel++;
 }
 
@@ -152,6 +159,8 @@ DrawingEngine::SuspendAutoSync()
 void
 DrawingEngine::Sync()
 {
+	CRASH_IF_NOT_LOCKED
+
 	fSuspendSyncLevel--;
 	if (fSuspendSyncLevel == 0)
 		fGraphicsCard->Sync();
@@ -426,19 +435,17 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 						  const BRect &source, const BRect &dest,
 						  const DrawState *d)
 {
-	if (Lock()) {
-		BRect clipped = fPainter->ClipRect(dest);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			fPainter->DrawBitmap(bitmap, source, dest);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
+	CRASH_IF_NOT_LOCKED
 
-		Unlock();
+	BRect clipped = fPainter->ClipRect(dest);
+	if (clipped.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(clipped);
+
+		fPainter->SetDrawState(d);
+		fPainter->DrawBitmap(bitmap, source, dest);
+
+		fGraphicsCard->Invalidate(clipped);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -448,32 +455,30 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 					   const float &span, const DrawState *d,
 					   bool filled)
 {
-	if (Lock()) {
-		make_rect_valid(r);
-		BRect clipped(r);
-		if (!filled)
-			extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(r);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-	
-			float xRadius = r.Width() / 2.0;
-			float yRadius = r.Height() / 2.0;
-			BPoint center(r.left + xRadius,
-						  r.top + yRadius);
+	CRASH_IF_NOT_LOCKED
 
-			if (filled)	
-				fPainter->FillArc(center, xRadius, yRadius, angle, span);
-			else
-				fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
+	make_rect_valid(r);
+	BRect clipped(r);
+	if (!filled)
+		extend_by_stroke_width(clipped, d);
+	clipped = fPainter->ClipRect(r);
+	if (clipped.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(clipped);
 
-		Unlock();
+		fPainter->SetDrawState(d);
+
+		float xRadius = r.Width() / 2.0;
+		float yRadius = r.Height() / 2.0;
+		BPoint center(r.left + xRadius,
+					  r.top + yRadius);
+
+		if (filled)	
+			fPainter->FillArc(center, xRadius, yRadius, angle, span);
+		else
+			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
+
+		fGraphicsCard->Invalidate(clipped);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -481,48 +486,44 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 void
 DrawingEngine::DrawBezier(BPoint *pts, const DrawState *d, bool filled)
 {
-	if (Lock()) {
-		// TODO: figure out bounds and hide cursor depending on that
-		fGraphicsCard->HideSoftwareCursor();
+	CRASH_IF_NOT_LOCKED
 
-		fPainter->SetDrawState(d);
-		BRect touched = fPainter->DrawBezier(pts, filled);
+	// TODO: figure out bounds and hide cursor depending on that
+	fGraphicsCard->HideSoftwareCursor();
 
-		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
+	fPainter->SetDrawState(d);
+	BRect touched = fPainter->DrawBezier(pts, filled);
 
-		Unlock();
-	}
+	fGraphicsCard->Invalidate(touched);
+	fGraphicsCard->ShowSoftwareCursor();
 }
 
 // DrawEllipse
 void
 DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 {
-	if (Lock()) {
-		make_rect_valid(r);
-		BRect clipped = r;
-		fPainter->AlignEllipseRect(&clipped, filled);
-		if (!filled)
-			extend_by_stroke_width(clipped, d);
+	CRASH_IF_NOT_LOCKED
 
-		clipped.left = floorf(clipped.left);
-		clipped.top = floorf(clipped.top);
-		clipped.right = ceilf(clipped.right);
-		clipped.bottom = ceilf(clipped.bottom);
+	make_rect_valid(r);
+	BRect clipped = r;
+	fPainter->AlignEllipseRect(&clipped, filled);
+	if (!filled)
+		extend_by_stroke_width(clipped, d);
 
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			fPainter->DrawEllipse(r, filled);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
+	clipped.left = floorf(clipped.left);
+	clipped.top = floorf(clipped.top);
+	clipped.right = ceilf(clipped.right);
+	clipped.bottom = ceilf(clipped.bottom);
 
-		Unlock();
+	clipped = fPainter->ClipRect(clipped);
+	if (clipped.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(clipped);
+
+		fPainter->SetDrawState(d);
+		fPainter->DrawEllipse(r, filled);
+
+		fGraphicsCard->Invalidate(clipped);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -532,22 +533,20 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 						   BRect bounds, const DrawState* d,
 						   bool filled, bool closed)
 {
-	if (Lock()) {
-		make_rect_valid(bounds);
-		if (!filled)
-			extend_by_stroke_width(bounds, d);
-		bounds = fPainter->ClipRect(bounds);
-		if (bounds.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(bounds);
-	
-			fPainter->SetDrawState(d);
-			fPainter->DrawPolygon(ptlist, numpts, filled, closed);
-	
-			fGraphicsCard->Invalidate(bounds);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
+	CRASH_IF_NOT_LOCKED
 
-		Unlock();
+	make_rect_valid(bounds);
+	if (!filled)
+		extend_by_stroke_width(bounds, d);
+	bounds = fPainter->ClipRect(bounds);
+	if (bounds.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(bounds);
+
+		fPainter->SetDrawState(d);
+		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
+
+		fGraphicsCard->Invalidate(bounds);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -566,6 +565,8 @@ DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
 void
 DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
+	CRASH_IF_NOT_LOCKED
+
 	if (Lock()) {
 		BRect touched(start, end);
 		make_rect_valid(touched);
@@ -589,6 +590,8 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor
 void
 DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 {
+	CRASH_IF_NOT_LOCKED
+
 	if (Lock()) {
 		make_rect_valid(r);
 		BRect clipped = fPainter->ClipRect(r);
@@ -609,6 +612,8 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 void
 DrawingEngine::FillRect(BRect r, const RGBColor& color)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
@@ -643,6 +648,8 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 void
 DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
@@ -682,6 +689,8 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 void
 DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// support invalid rects
 	make_rect_valid(r);
 	BRect clipped(r);
@@ -703,6 +712,8 @@ DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 void
 DrawingEngine::FillRect(BRect r, const DrawState *d)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
@@ -756,6 +767,8 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 void
 DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
@@ -811,6 +824,8 @@ void
 DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 	const DrawState* d, bool filled)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// NOTE: the stroke does not extend past "r" in R5,
 	// though I consider this unexpected behaviour.
 	make_rect_valid(r);
@@ -839,6 +854,8 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
 	const DrawState* d, bool filled)
 {
+	CRASH_IF_NOT_LOCKED
+
 	// NOTE: hides cursor regardless of if and where
 	// shape is drawn on screen, TODO: optimize
 	fGraphicsCard->HideSoftwareCursor();
@@ -857,6 +874,8 @@ void
 DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 	const DrawState* d, bool filled)
 {
+	CRASH_IF_NOT_LOCKED
+
 	BRect clipped(bounds);
 	if (!filled)
 		extend_by_stroke_width(clipped, d);
@@ -879,6 +898,8 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 void
 DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* context)
 {
+	CRASH_IF_NOT_LOCKED
+
 	BRect touched(start, end);
 	make_rect_valid(touched);
 	extend_by_stroke_width(touched, context);
@@ -899,6 +920,8 @@ void
 DrawingEngine::StrokeLineArray(int32 numLines,
 	const LineArrayData *linedata, const DrawState *d)
 {
+	CRASH_IF_NOT_LOCKED
+
 	if (!d || !linedata || numLines <= 0)
 		return;
 
@@ -953,6 +976,8 @@ DrawingEngine::DrawString(const char* string, int32 length,
 						  const BPoint& pt, DrawState* d,
 						  escapement_delta* delta)
 {
+	CRASH_IF_NOT_LOCKED
+
 // TODO: use delta
 	FontLocker locker(d);
 
@@ -1055,6 +1080,13 @@ void
 DrawingEngine::Unlock()
 {
 	fGraphicsCard->WriteUnlock();
+}
+
+// IsLocked
+bool
+DrawingEngine::IsLocked()
+{
+	return fGraphicsCard->IsWriteLocked();
 }
 
 // WriteLock
