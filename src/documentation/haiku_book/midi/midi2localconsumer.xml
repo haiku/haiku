@@ -105,7 +105,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_settimeout">
-		<title>void BMidiLocalConsumer::SetTimeout(bigtime_t when, void* data)</title>
+		<title>void BMidiLocalConsumer::SetTimeout(bigtime_t when, void *data)</title>
 		
 		<para>
 			Requests that the Timeout() hook will be called at some point
@@ -146,7 +146,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_timeout">
-		<title>void BMidiLocalConsumer::Timeout(void* data)</title>
+		<title>virtual void BMidiLocalConsumer::Timeout(void *data)</title>
 		
 		<para>
 			Hook function that is called per your own request.
@@ -158,8 +158,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_data">
-		<title>void BMidiLocalConsumer::Data(
-			uchar* data, size_t length, bool atomic, bigtime_t time)</title>
+		<title>virtual void BMidiLocalConsumer::Data(
+			uchar *data, size_t length, bool atomic, bigtime_t time)</title>
 		
 		<para>
 			Invoked when raw MIDI is received
@@ -205,7 +205,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_noteoff">
-		<title>void BMidiLocalConsumer::NoteOff(
+		<title>virtual void BMidiLocalConsumer::NoteOff(
 			uchar channel, uchar note, uchar velocity, bigtime_t time)</title>
 		
 		<para>
@@ -218,7 +218,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_noteon">
-		<title>void BMidiLocalConsumer::NoteOn(
+		<title>virtual void BMidiLocalConsumer::NoteOn(
 			uchar channel, uchar note, uchar velocity, bigtime_t time)</title>
 		
 		<para>
@@ -231,7 +231,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_keypressure">
-		<title>void BMidiLocalConsumer::KeyPressure(
+		<title>virtual void BMidiLocalConsumer::KeyPressure(
 			uchar channel, uchar note, uchar pressure, bigtime_t time)</title>
 		
 		<para>
@@ -244,7 +244,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_controlchange">
-		<title>void BMidiLocalConsumer::ControlChange(
+		<title>virtual void BMidiLocalConsumer::ControlChange(
 			uchar channel, uchar controlNumber, uchar controlValue, bigtime_t time)</title>
 		
 		<para>
@@ -257,7 +257,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_programchange">
-		<title>void BMidiLocalConsumer::ProgramChange(
+		<title>virtual void BMidiLocalConsumer::ProgramChange(
 			uchar channel, uchar programNumber, bigtime_t time)</title>
 		
 		<para>
@@ -270,7 +270,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_channelpressure">
-		<title>void BMidiLocalConsumer::ChannelPressure(
+		<title>virtual void BMidiLocalConsumer::ChannelPressure(
 			uchar channel, uchar pressure, bigtime_t time)</title>
 		
 		<para>
@@ -283,7 +283,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_pitchbend">
-		<title>void BMidiLocalConsumer::PitchBend(
+		<title>virtual void BMidiLocalConsumer::PitchBend(
 			uchar channel, uchar lsb, uchar msb, bigtime_t time)</title>
 		
 		<para>
@@ -296,7 +296,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_systemexclusive">
-		<title>void BMidiLocalConsumer::SystemExclusive(
+		<title>virtual void BMidiLocalConsumer::SystemExclusive(
 			void* data, size_t length, bigtime_t time)
 		</title>
 		
@@ -320,7 +320,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_systemcommon">
-		<title>void BMidiLocalConsumer::SystemCommon(
+		<title>virtual void BMidiLocalConsumer::SystemCommon(
 			uchar status, uchar data1, uchar data2, bigtime_t time)</title>
 		
 		<para>
@@ -337,7 +337,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_systemrealtime">
-		<title>void BMidiLocalConsumer::SystemRealTime(
+		<title>virtual void BMidiLocalConsumer::SystemRealTime(
 			uchar status, bigtime_t time)</title>
 		
 		<para>			
@@ -350,7 +350,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_tempochange">
-		<title>void BMidiLocalConsumer::TempoChange(int32 beatsPerMinute, bigtime_t time)</title>
+		<title>virtual void BMidiLocalConsumer::TempoChange(int32 beatsPerMinute, bigtime_t time)</title>
 		
 		<para>
 			Invoked when a Tempo Change event is received
@@ -362,7 +362,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_allnotesoff">
-		<title>void BMidiLocalConsumer::AllNotesOff(bool justChannel, bigtime_t time)</title>
+		<title>virtual void BMidiLocalConsumer::AllNotesOff(bool justChannel, bigtime_t time)</title>
 		
 		<para>
 			Not used

@@ -78,7 +78,7 @@ BMidiLocalConsumer::SetLatency(bigtime_t latency_)
 
 
 int32 
-BMidiLocalConsumer::GetProducerID(void)
+BMidiLocalConsumer::GetProducerID()
 {
 	return fCurrentProducer;
 }

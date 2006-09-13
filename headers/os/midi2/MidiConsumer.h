@@ -19,7 +19,7 @@ private:
 	friend class BMidiRoster;
 	friend class BPrivate::BMidiRosterLooper;
 	
-	BMidiConsumer(const char* name = NULL);	
+	BMidiConsumer(const char *name = NULL);	
 	virtual ~BMidiConsumer();
 	
 	virtual void _Reserved1();
@@ -41,16 +41,16 @@ class BMidiLocalConsumer : public BMidiConsumer
 {
 public:
 
-	BMidiLocalConsumer(const char* name = NULL);
+	BMidiLocalConsumer(const char *name = NULL);
 	
 	void SetLatency(bigtime_t latency);
-	int32 GetProducerID(void);
+	int32 GetProducerID();
 	
-	void SetTimeout(bigtime_t when, void* data);	
-	virtual void Timeout(void* data);
+	void SetTimeout(bigtime_t when, void *data);	
+	virtual void Timeout(void *data);
 	
 	virtual void Data(
-		uchar* data, size_t length, bool atomic, bigtime_t time);	
+		uchar *data, size_t length, bool atomic, bigtime_t time);	
 	
 	virtual	void NoteOff(
 		uchar channel, uchar note, uchar velocity, bigtime_t time);
@@ -93,7 +93,7 @@ protected:
 private:
 
 	friend class BMidiRoster;
-	friend int32 _midi_event_thread(void*);
+	friend int32 _midi_event_thread(void *);
 	
 	virtual void _Reserved1();
 	virtual void _Reserved2();
