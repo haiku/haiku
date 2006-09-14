@@ -133,7 +133,8 @@ blend_color_hspan_blend(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-			if (*covers) {
+//			if (*covers) {
+if (*covers && (colors->a & 0xff)) {
 				if (*covers == 255) {
 					ASSIGN_BLEND(p, colors->r, colors->g, colors->b);
 				} else {
@@ -148,7 +149,9 @@ blend_color_hspan_blend(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
+if (colors->a & 0xff) {
 				ASSIGN_BLEND(p, colors->r, colors->g, colors->b);
+}
 				p += 4;
 				++colors;
 			} while(--len);
