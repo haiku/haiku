@@ -46,8 +46,8 @@ make_rect_valid(BRect& rect)
 static inline void
 extend_by_stroke_width(BRect& rect, const DrawState* context)
 {
-	// "- 1.0" because if stroke width == 1, we don't need to extend
-	float inset = -ceilf(context->PenSize() / 2.0 - 1.0);
+	// "- 0.5" because if stroke width == 1, we don't need to extend
+	float inset = -ceilf(context->PenSize() / 2.0 - 0.5);
 	rect.InsetBy(inset, inset);
 }
 
@@ -507,6 +507,7 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	make_rect_valid(r);
 	BRect clipped = r;
 	fPainter->AlignEllipseRect(&clipped, filled);
+
 	if (!filled)
 		extend_by_stroke_width(clipped, d);
 
@@ -516,6 +517,7 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	clipped.bottom = ceilf(clipped.bottom);
 
 	clipped = fPainter->ClipRect(clipped);
+
 	if (clipped.IsValid()) {
 		fGraphicsCard->HideSoftwareCursor(clipped);
 
@@ -674,7 +676,7 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 				fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
 			}
 
-			fGraphicsCard->Invalidate(r.Frame());
+			fGraphicsCard->Invalidate(frame);
 		}
 
 		if (cursorTouched)
@@ -908,7 +910,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 		fGraphicsCard->HideSoftwareCursor(touched);
 
 		fPainter->SetDrawState(context);
-		touched = fPainter->StrokeLine(start, end);
+		fPainter->StrokeLine(start, end);
 
 		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
