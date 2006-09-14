@@ -10,7 +10,10 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <utf8_functions.h>
+
 #include <File.h>
+#include <InterfaceDefs.h> // for B_UTF8_BULLET
 
 #include "TextGapBuffer.h"
 
@@ -166,15 +169,18 @@ _BTextGapBuffer_::SizeGapTo(long inCount)
 
 
 const char *
-_BTextGapBuffer_::GetString(int32 fromOffset, int32 numChars)
+_BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes)
 {
+	// numBytes won't necessarily be honored. This function could return more
+	// bytes than specified (for example when in password mode)
+	// TODO: Fix this, it's not very nice.
 	char *result = "";
 	
-	if (numChars < 1)
-		return (result);
+	if (numBytes < 1)
+		return result;
 	
 	bool isStartBeforeGap = (fromOffset < fGapIndex);
-	bool isEndBeforeGap = ((fromOffset + numChars - 1) < fGapIndex);
+	bool isEndBeforeGap = ((fromOffset + numBytes - 1) < fGapIndex);
 
 	if (isStartBeforeGap == isEndBeforeGap) {
 		result = fBuffer + fromOffset;
@@ -182,17 +188,37 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numChars)
 			result += fGapCount;
 	
 	} else {
-		if (fScratchSize < numChars) {
-			fScratchBuffer = (char *)realloc(fScratchBuffer, numChars);
-			fScratchSize = numChars;
+		if (fScratchSize < numBytes) {
+			fScratchBuffer = (char *)realloc(fScratchBuffer, numBytes);
+			fScratchSize = numBytes;
 		}
 		
-		for (long i = 0; i < numChars; i++)
+		for (long i = 0; i < numBytes; i++)
 			fScratchBuffer[i] = (*this)[fromOffset + i];
 
 		result = fScratchBuffer;
 	}
 	
+	// TODO: this could be improved. We are overwriting what we did some lines ago,
+	// we could just avoid to do that.
+	if (fPasswordMode) {
+		uint32 numChars = UTF8CountChars(result, numBytes);
+		uint32 charLen = UTF8CountBytes(B_UTF8_BULLET, 1);
+		uint32 newSize = numChars * charLen + 1;
+		if ((uint32)fScratchSize < newSize) {
+			fScratchBuffer = (char *)realloc(fScratchBuffer, newSize);
+			fScratchSize = newSize;
+		}
+		result = fScratchBuffer;
+
+		char *scratchPtr = result;
+		for (uint32 i = 0; i < numChars; i++) {
+			memcpy(scratchPtr, B_UTF8_BULLET, charLen);
+			scratchPtr += charLen;
+		}
+		scratchPtr = '\0';		
+	}
+
 	return result;
 }
 
@@ -206,7 +232,7 @@ _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 			continue;
 		if ((*this)[fromIndex + i] == inChar) {
 			*ioDelta = i;
-			return (true);
+			return true;
 		}
 	}
 	

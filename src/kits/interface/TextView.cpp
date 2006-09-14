@@ -2438,16 +2438,16 @@ BTextView::DoesUndo() const
 void
 BTextView::HideTyping(bool enabled)
 {
-	CALLED();
-	//TODO: Implement ?
-	//fText->SetPasswordMode(enabled);
+	if (enabled)
+		Delete(0, fText->Length());
+
+	fText->SetPasswordMode(enabled);
 }
 
 
 bool
 BTextView::IsTypingHidden() const
 {
-	CALLED();
 	return fText->PasswordMode();
 }
 
@@ -3636,13 +3636,13 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 			long offset = startOffset != -1 ? startOffset : line->offset;
 			const BFont *font = NULL;
 			const rgb_color *color = NULL;
-			int32 numChars;
+			int32 numBytes;
 			// iterate through each style on this line
-			while ((numChars = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
+			while ((numBytes = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
 				view->SetFont(font);
 				view->SetHighColor(*color);
 				
-				tabChars = numChars;
+				tabChars = numBytes;
 				do {
 					foundTab = fText->FindChar(B_TAB, offset, &tabChars);
 					if (foundTab) {
@@ -3650,7 +3650,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 							numTabs++;
 							if ((*fText)[offset + tabChars + numTabs] != B_TAB)
 								break;
-						} while ((tabChars + numTabs) < numChars);
+						} while ((tabChars + numTabs) < numBytes);
 					}
 					
 					if (inputRegion.CountRects() > 0) {
@@ -3680,7 +3680,8 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 						view->PopState();
 					}
 					
-					view->DrawString(fText->GetString(offset, tabChars), tabChars);
+					const char *string = fText->GetString(offset, numBytes);
+					view->DrawString(string);
 					
 					if (foundTab) {
 						float penPos = PenLocation().x - fTextRect.left;
@@ -3695,8 +3696,8 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 					
 					offset += tabChars;
 					length -= tabChars;
-					numChars -= tabChars;
-					tabChars = numChars;
+					numBytes -= tabChars;
+					tabChars = numBytes;
 					numTabs = 0;
 				} while (foundTab && tabChars > 0);
 			}
