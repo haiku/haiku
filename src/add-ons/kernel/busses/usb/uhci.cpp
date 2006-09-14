@@ -99,7 +99,8 @@ Queue::Queue(Stack *stack)
 	}
 
 	void *physicalAddress;
-	fStatus = fStack->AllocateChunk((void **)&fQueueHead, &physicalAddress, 32);
+	fStatus = fStack->AllocateChunk((void **)&fQueueHead, &physicalAddress,
+		sizeof(uhci_qh));
 	if (fStatus < B_OK)
 		return;
 
@@ -116,10 +117,11 @@ Queue::~Queue()
 	Lock();
 	benaphore_destroy(&fLock);
 
-	fStack->FreeChunk(fQueueHead, (void *)fQueueHead->this_phy, 32);
+	fStack->FreeChunk(fQueueHead, (void *)fQueueHead->this_phy, sizeof(uhci_qh));
 
 	if (fStrayDescriptor)
-		fStack->FreeChunk(fStrayDescriptor, (void *)fStrayDescriptor->this_phy, 32);
+		fStack->FreeChunk(fStrayDescriptor, (void *)fStrayDescriptor->this_phy,
+			sizeof(uhci_td));
 }
 
 
@@ -168,7 +170,7 @@ Queue::TerminateByStrayDescriptor()
 	// descriptor in order to get some chipset to work nicely (like the PIIX).
 	void *physicalAddress;
 	status_t result = fStack->AllocateChunk((void **)&fStrayDescriptor,
-		&physicalAddress, 32);
+		&physicalAddress, sizeof(uhci_td));
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_uhci: failed to allocate a stray transfer descriptor\n"));
 		return result;
@@ -186,7 +188,7 @@ Queue::TerminateByStrayDescriptor()
 
 	if (!Lock()) {
 		fStack->FreeChunk(fStrayDescriptor, (void *)fStrayDescriptor->this_phy,
-			32);
+			sizeof(uhci_td));
 		return B_ERROR;
 	}
 
@@ -1104,14 +1106,15 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 	uhci_td *result;
 	void *physicalAddress;
 
-	if (fStack->AllocateChunk((void **)&result, &physicalAddress, 32) < B_OK) {
+	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
+		sizeof(uhci_td)) < B_OK) {
 		TRACE_ERROR(("usb_uhci: failed to allocate a transfer descriptor\n"));
 		return NULL;
 	}
 
 	result->this_phy = (addr_t)physicalAddress;
 	result->status = TD_STATUS_ACTIVE | TD_CONTROL_3_ERRORS | TD_CONTROL_SPD;
-	if (pipe->Speed() == Pipe::LowSpeed)
+	if (pipe->Speed() == USB_SPEED_LOWSPEED)
 		result->status |= TD_CONTROL_LOWSPEED;
 
 	result->buffer_size = bufferSize;
@@ -1134,7 +1137,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 	if (fStack->AllocateChunk(&result->buffer_log, &result->buffer_phy,
 		bufferSize) < B_OK) {
 		TRACE_ERROR(("usb_uhci: unable to allocate space for the buffer\n"));
-		fStack->FreeChunk(result, (void *)result->this_phy, 32);
+		fStack->FreeChunk(result, (void *)result->this_phy, sizeof(uhci_td));
 		return NULL;
 	}
 
@@ -1192,7 +1195,7 @@ UHCI::FreeDescriptor(uhci_td *descriptor)
 			(void *)descriptor->buffer_phy, descriptor->buffer_size);
 	}
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy, 32);
+	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy, sizeof(uhci_td));
 }
 
 

@@ -11,7 +11,7 @@
 
 
 Pipe::Pipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
-	pipeDirection direction, pipeSpeed speed, size_t maxPacketSize)
+	pipeDirection direction, usb_speed speed, size_t maxPacketSize)
 	:	Object(parent),
 		fDeviceAddress(deviceAddress),
 		fEndpointAddress(endpointAddress),
@@ -94,7 +94,7 @@ Pipe::GetStatus(uint16 *status)
 
 
 InterruptPipe::InterruptPipe(Object *parent, int8 deviceAddress,
-	uint8 endpointAddress, pipeDirection direction, pipeSpeed speed,
+	uint8 endpointAddress, pipeDirection direction, usb_speed speed,
 	size_t maxPacketSize)
 	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
 			maxPacketSize)
@@ -126,7 +126,7 @@ InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 
 
 BulkPipe::BulkPipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
-	pipeDirection direction, pipeSpeed speed, size_t maxPacketSize)
+	pipeDirection direction, usb_speed speed, size_t maxPacketSize)
 	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
 			maxPacketSize)
 {
@@ -175,7 +175,7 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 
 
 IsochronousPipe::IsochronousPipe(Object *parent, int8 deviceAddress,
-	uint8 endpointAddress, pipeDirection direction, pipeSpeed speed,
+	uint8 endpointAddress, pipeDirection direction, usb_speed speed,
 	size_t maxPacketSize)
 	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
 			maxPacketSize)
@@ -206,7 +206,7 @@ typedef struct transfer_result_data_s {
 
 
 ControlPipe::ControlPipe(Object *parent, int8 deviceAddress,
-	uint8 endpointAddress, pipeSpeed speed, size_t maxPacketSize)
+	uint8 endpointAddress, usb_speed speed, size_t maxPacketSize)
 	:	Pipe(parent, deviceAddress, endpointAddress, Default, speed,
 			maxPacketSize)
 {

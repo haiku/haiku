@@ -32,6 +32,7 @@ class Transfer;
 class BusManager;
 class ControlPipe;
 class Object;
+class PhysicalMemoryAllocator;
 
 
 struct host_controller_info {
@@ -49,6 +50,14 @@ struct usb_driver_info {
 	usb_notify_hooks				notify_hooks;
 	usb_driver_info					*link;
 };
+
+
+typedef enum {
+	USB_SPEED_LOWSPEED = 0,
+	USB_SPEED_FULLSPEED,
+	USB_SPEED_HIGHSPEED,
+	USB_SPEED_MAX = USB_SPEED_HIGHSPEED
+} usb_speed;
 
 
 #define USB_OBJECT_NONE					0x00000000
@@ -80,9 +89,9 @@ public:
 		int32							IndexOfBusManager(BusManager *bus);
 
 		status_t						AllocateChunk(void **logicalAddress,
-											void **physicalAddress, uint8 size);
+											void **physicalAddress, size_t size);
 		status_t						FreeChunk(void *logicalAddress,
-											void *physicalAddress, uint8 size);
+											void *physicalAddress, size_t size);
 
 		area_id							AllocateArea(void **logicalAddress,
 											void **physicalAddress,
@@ -105,15 +114,7 @@ private:
 		Vector<BusManager *>			fBusManagers;
 
 		benaphore						fLock;
-		area_id							fAreas[USB_MAX_AREAS];
-		void							*fLogical[USB_MAX_AREAS];
-		void							*fPhysical[USB_MAX_AREAS];
-		uint16							fAreaFreeCount[USB_MAX_AREAS];
-
-		addr_t							fListhead8;
-		addr_t							fListhead16;
-		addr_t							fListhead32;
-		addr_t							fListhead64;
+		PhysicalMemoryAllocator			*fAllocator;
 
 		uint32							fObjectIndex;
 		uint32							fObjectMaxCount;
@@ -140,7 +141,7 @@ virtual	status_t						InitCheck();
 
 		int8							AllocateAddress();
 		Device							*AllocateNewDevice(Hub *parent,
-											bool lowSpeed);
+											usb_speed speed);
 
 virtual	status_t						Start();
 virtual	status_t						Stop();
@@ -160,8 +161,7 @@ static	int32							ExploreThread(void *data);
 
 		benaphore						fLock;
 		bool							fDeviceMap[128];
-		ControlPipe						*fDefaultPipe;
-		ControlPipe						*fDefaultPipeLowSpeed;
+		ControlPipe						*fDefaultPipes[USB_SPEED_MAX + 1];
 		Hub								*fRootHub;
 		thread_id						fExploreThread;
 		Object							*fRootObject;
@@ -202,20 +202,19 @@ private:
 class Pipe : public Object {
 public:
 enum	pipeDirection 	{ In, Out, Default };
-enum	pipeSpeed		{ LowSpeed, FullSpeed, HighSpeed };
 
 										Pipe(Object *parent,
 											int8 deviceAddress,
 											uint8 endpointAddress,
 											pipeDirection direction,
-											pipeSpeed speed,
+											usb_speed speed,
 											size_t maxPacketSize);
 virtual									~Pipe();
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE; };
 
 		int8							DeviceAddress() { return fDeviceAddress; };
-		pipeSpeed						Speed() { return fSpeed; };
+		usb_speed						Speed() { return fSpeed; };
 		pipeDirection					Direction() { return fDirection; };
 		int8							EndpointAddress() { return fEndpointAddress; };
 		size_t							MaxPacketSize() { return fMaxPacketSize; };
@@ -235,7 +234,7 @@ private:
 		int8							fDeviceAddress;
 		uint8							fEndpointAddress;
 		pipeDirection					fDirection;
-		pipeSpeed						fSpeed;
+		usb_speed						fSpeed;
 		size_t							fMaxPacketSize;
 		bool							fDataToggle;
 };
@@ -246,7 +245,7 @@ public:
 										ControlPipe(Object *parent,
 											int8 deviceAddress,
 											uint8 endpointAddress,
-											pipeSpeed speed,
+											usb_speed speed,
 											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE; };
@@ -283,7 +282,7 @@ public:
 											int8 deviceAddress,
 											uint8 endpointAddress,
 											pipeDirection direction,
-											pipeSpeed speed,
+											usb_speed speed,
 											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE; };
@@ -301,7 +300,7 @@ public:
 											int8 deviceAddress,
 											uint8 endpointAddress,
 											pipeDirection direction,
-											pipeSpeed speed,
+											usb_speed speed,
 											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
@@ -323,7 +322,7 @@ public:
 											int8 deviceAddress,
 											uint8 endpointAddress,
 											pipeDirection direction,
-											pipeSpeed speed,
+											usb_speed speed,
 											size_t maxPacketSize);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
@@ -356,7 +355,8 @@ class Device : public Object {
 public:
 										Device(Object *parent,
 											usb_device_descriptor &desc,
-											int8 deviceAddress, bool lowSpeed);
+											int8 deviceAddress,
+											usb_speed speed);
 
 		status_t						InitCheck();
 
@@ -397,7 +397,7 @@ protected:
 private:
 		usb_configuration_info			*fConfigurations;
 		usb_configuration_info			*fCurrentConfiguration;
-		bool							fLowSpeed;
+		usb_speed						fSpeed;
 		int8							fDeviceAddress;
 		size_t							fMaxPacketIn[16];
 		size_t							fMaxPacketOut[16];
@@ -411,7 +411,8 @@ class Hub : public Device {
 public:
 										Hub(Object *parent,
 											usb_device_descriptor &desc,
-											int8 deviceAddress, bool lowSpeed);
+											int8 deviceAddress,
+											usb_speed speed);
 
 virtual	uint32							Type() { return USB_OBJECT_DEVICE | USB_OBJECT_HUB; };
 

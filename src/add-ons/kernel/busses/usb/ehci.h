@@ -22,9 +22,7 @@ class EHCIRootHub;
 typedef struct transfer_data_s {
 	Transfer		*transfer;
 	ehci_qh			*queue_head;
-	ehci_qtd		*first_descriptor;
 	ehci_qtd		*data_descriptor;
-	ehci_qtd		*last_descriptor;
 	bool			incoming;
 	transfer_data_s	*link;
 } transfer_data;
@@ -37,6 +35,8 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
+		status_t					SubmitPeriodicTransfer(Transfer *transfer);
+		status_t					SubmitAsyncTransfer(Transfer *transfer);
 
 static	status_t					AddTo(Stack *stack);
 
@@ -61,9 +61,7 @@ static	int32						InterruptHandler(void *data);
 		// Transfer management
 		status_t					AddPendingTransfer(Transfer *transfer,
 										ehci_qh *queueHead,
-										ehci_qtd *firstDescriptor,
 										ehci_qtd *dataDescriptor,
-										ehci_qtd *lastDescriptor,
 										bool directionIn);
 		status_t					CancelPendingTransfer(Transfer *transfer);
 		status_t					CancelAllPendingTransfers();
@@ -71,19 +69,38 @@ static	int32						InterruptHandler(void *data);
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
 
+		// Queue Head functions
+		ehci_qh						*CreateQueueHead();
+		void						FreeQueueHead(ehci_qh *queueHead);
+
+		status_t					LinkQueueHead(ehci_qh *queueHead);
+		status_t					UnlinkQueueHead(ehci_qh *queueHead);
+
+		// Queue functions
+		status_t					FillQueueWithRequest(Transfer *transfer,
+										ehci_qh *queueHead,
+										ehci_qtd **dataDescriptor,
+										bool *directionIn);
+		status_t					FillQueueWithData(Transfer *transfer,
+										ehci_qh *queueHead,
+										ehci_qtd **dataDescriptor,
+										bool *directionIn);
+
 		// Descriptor functions
-		ehci_qtd					*CreateDescriptor(Pipe *pipe,
-										size_t bufferSizeToAllocate);
+		ehci_qtd					*CreateDescriptor(size_t bufferSizeToAllocate,
+										uint8 pid);
 		status_t					CreateDescriptorChain(Pipe *pipe,
 										ehci_qtd **firstDescriptor,
 										ehci_qtd **lastDescriptor,
-										size_t bufferSizeToAllocate);
+										ehci_qtd *strayDescriptor,
+										size_t bufferSizeToAllocate,
+										uint8 pid);
 
 		void						FreeDescriptor(ehci_qtd *descriptor);
 		void						FreeDescriptorChain(ehci_qtd *topDescriptor);
 
 		void						LinkDescriptors(ehci_qtd *first,
-										ehci_qtd *last);
+										ehci_qtd *last, ehci_qtd *alt);
 
 		size_t						WriteDescriptorChain(ehci_qtd *topDescriptor,
 										iovec *vector, size_t vectorCount);
@@ -113,6 +130,9 @@ static	pci_module_info				*sPCIModule;
 		// Framelist memory
 		area_id						fPeriodicFrameListArea;
 		addr_t						*fPeriodicFrameList;
+
+		// Async frame list
+		ehci_qh						*fAsyncQueueHead;
 
 		// Maintain a linked list of transfers
 		transfer_data				*fFirstTransfer;

@@ -11,13 +11,13 @@
 
 
 Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
-	bool lowSpeed)
+	usb_speed speed)
 	:	Object(parent),
 		fDeviceDescriptor(desc),
 		fInitOK(false),
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
-		fLowSpeed(lowSpeed),
+		fSpeed(speed),
 		fDeviceAddress(deviceAddress),
 		fLock(-1),
 		fNotifyCookie(NULL)
@@ -33,8 +33,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	set_sem_owner(fLock, B_SYSTEM_TEAM);
 
 	fDefaultPipe = new(std::nothrow) ControlPipe(this, deviceAddress, 0,
-		fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
-		fDeviceDescriptor.max_packet_size_0);
+		fSpeed, fDeviceDescriptor.max_packet_size_0);
 	if (!fDefaultPipe) {
 		TRACE_ERROR(("USB Device: could not allocate default pipe\n"));
 		return;
@@ -189,8 +188,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 							endpoint = new(std::nothrow) ControlPipe(this,
 								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x0f,
-								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
-								endpointDescriptor->max_packet_size);
+								fSpeed, endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x01: /* Isochronous Endpoint */
@@ -198,8 +196,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x0f,
 								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
-								endpointDescriptor->max_packet_size);
+								fSpeed, endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x02: /* Bulk Endpoint */
@@ -207,8 +204,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x0f,
 								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
-								endpointDescriptor->max_packet_size);
+								fSpeed, endpointDescriptor->max_packet_size);
 							break;
 
 						case 0x03: /* Interrupt Endpoint */
@@ -216,8 +212,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 								fDeviceAddress,
 								endpointDescriptor->endpoint_address & 0x0f,
 								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-								fLowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed,
-								endpointDescriptor->max_packet_size);
+								fSpeed, endpointDescriptor->max_packet_size);
 							break;
 					}
 

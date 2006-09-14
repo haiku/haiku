@@ -12,8 +12,8 @@
 
 
 Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
-	bool lowSpeed)
-	:	Device(parent, desc, deviceAddress, lowSpeed)
+	usb_speed speed)
+	:	Device(parent, desc, deviceAddress, speed)
 {
 	TRACE(("USB Hub is being initialised\n"));
 
@@ -23,7 +23,7 @@ Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	}
 
 	// Set to false again for the hub init.
-	fInitOK = false; 
+	fInitOK = false;
 
 	for (int32 i = 0; i < 8; i++)
 		fChildren[i] = NULL;
@@ -178,8 +178,14 @@ Hub::Explore()
 					continue;
 				}
 
+				usb_speed speed = USB_SPEED_FULLSPEED;
+				if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
+					speed = USB_SPEED_LOWSPEED;
+				if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
+					speed = USB_SPEED_HIGHSPEED;
+
 				Device *newDevice = GetBusManager()->AllocateNewDevice(this,
-					(fPortStatus[i].status & PORT_STATUS_LOW_SPEED) > 0);
+					speed);
 
 				if (newDevice) {
 					fChildren[i] = newDevice;

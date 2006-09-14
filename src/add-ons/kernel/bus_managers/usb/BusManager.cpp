@@ -12,8 +12,6 @@
 
 BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
-		fDefaultPipe(NULL),
-		fDefaultPipeLowSpeed(NULL),
 		fRootHub(NULL),
 		fExploreThread(-1)
 {
@@ -31,15 +29,14 @@ BusManager::BusManager(Stack *stack)
 		fDeviceMap[i] = false;
 
 	// Set up the default pipes
-	fDefaultPipe = new(std::nothrow) ControlPipe(fRootObject, 0, 0,
-		Pipe::FullSpeed, 8);
-	if (!fDefaultPipe)
-		return;
-
-	fDefaultPipeLowSpeed = new(std::nothrow) ControlPipe(fRootObject, 0, 0,
-		Pipe::LowSpeed, 8);
-	if (!fDefaultPipeLowSpeed)
-		return;
+	for (int32 i = 0; i <= USB_SPEED_MAX; i++) {
+		fDefaultPipes[i] = new(std::nothrow) ControlPipe(fRootObject, 0, 0,
+			(usb_speed)i, 8);
+		if (!fDefaultPipes[i]) {
+			TRACE_ERROR(("usb BusManager: failed to allocate default pipes\n"));
+			return;
+		}
+	}
 
 	fInitOK = true;
 }
@@ -118,7 +115,7 @@ BusManager::AllocateAddress()
 
 
 Device *
-BusManager::AllocateNewDevice(Hub *parent, bool lowSpeed)
+BusManager::AllocateNewDevice(Hub *parent, usb_speed speed)
 {
 	// Check if there is a free entry in the device map (for the device number)
 	int8 deviceAddress = AllocateAddress();
@@ -128,7 +125,7 @@ BusManager::AllocateNewDevice(Hub *parent, bool lowSpeed)
 	}
 
 	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceAddress));
-	ControlPipe *defaultPipe = (lowSpeed ? fDefaultPipeLowSpeed : fDefaultPipe);
+	ControlPipe *defaultPipe = fDefaultPipes[speed];
 
 	status_t result = B_ERROR;
 	for (int32 i = 0; i < 15; i++) {
@@ -158,8 +155,7 @@ BusManager::AllocateNewDevice(Hub *parent, bool lowSpeed)
 	snooze(USB_DELAY_SET_ADDRESS);
 
 	// Create a temporary pipe with the new address
-	ControlPipe pipe(parent, deviceAddress, 0,
-		lowSpeed ? Pipe::LowSpeed : Pipe::FullSpeed, 8);
+	ControlPipe pipe(parent, deviceAddress, 0, speed, 8);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -197,7 +193,7 @@ BusManager::AllocateNewDevice(Hub *parent, bool lowSpeed)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("usb BusManager::AllocateNewDevice(): creating new hub\n"));
 		Hub *hub = new(std::nothrow) Hub(parent, deviceDescriptor,
-			deviceAddress, lowSpeed);
+			deviceAddress, speed);
 		if (!hub) {
 			TRACE_ERROR(("usb BusManager::AllocateNewDevice(): no memory to allocate hub\n"));
 			return NULL;
@@ -214,7 +210,7 @@ BusManager::AllocateNewDevice(Hub *parent, bool lowSpeed)
 
 	TRACE(("usb BusManager::AllocateNewDevice(): creating new device\n"));
 	Device *device = new(std::nothrow) Device(parent, deviceDescriptor,
-		deviceAddress, lowSpeed);
+		deviceAddress, speed);
 	if (!device) {
 		TRACE_ERROR(("usb BusManager::AllocateNewDevice(): no memory to allocate device\n"));
 		return NULL;

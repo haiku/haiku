@@ -126,7 +126,7 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 
 
 UHCIRootHub::UHCIRootHub(Object *rootObject, int8 deviceAddress)
-	:	Hub(rootObject, sUHCIRootHubDevice, deviceAddress, false)
+	:	Hub(rootObject, sUHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED)
 {
 }
 

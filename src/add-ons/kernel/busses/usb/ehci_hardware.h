@@ -56,6 +56,7 @@
 #define EHCI_USBSTS_PORTCHANGE	(1 << 2)	// Port Change Detected
 #define EHCI_USBSTS_USBERRINT	(1 << 1)	// USB Error Interrupt
 #define EHCI_USBSTS_USBINT		(1 << 0)	// USB Interrupt
+#define EHCI_USBSTS_INTMASK		0x3f
 
 
 // USB Interrupt Enable Register (EHCI Spec 2.3.3)
@@ -96,9 +97,13 @@
 #define EHCI_PORTSC_DATAMASK	0xffffffd5
 
 
-// PCI Registers
-#define PCI_LEGSUP				0xc0		// PCI Legacy Support
-#define PCI_LEGSUP_USBPIRQDEN	0x2000		// USB PIRQ
+// Extended Capabilities
+#define EHCI_ECP_SHIFT			8			// Extended Capability Pointer
+#define EHCI_ECP_MASK			0xff
+#define EHCI_LEGSUP_CAPID_MASK	0xff
+#define EHCI_LEGSUP_CAPID		0x01
+#define EHCI_LEGSUP_OSOWNED		(1 << 24)	// OS Owned Semaphore
+#define EHCI_LEGSUP_BIOSOWNED	(1 << 16)	// BIOS Owned Semaphore
 
 
 // Data Structures (EHCI Spec 3)
@@ -119,7 +124,7 @@ typedef struct {
 	// Hardware Part
 	addr_t		next_phy;
 	addr_t		alt_next_phy;
-	uint32		status_token;
+	uint32		token;
 	addr_t		buffer_phy[5];
 
 	// Software Part
@@ -132,15 +137,19 @@ typedef struct {
 
 
 #define EHCI_QTD_TERMINATE		(1 << 0)
+#define EHCI_QTD_DATA_TOGGLE	(1 << 31)
 #define EHCI_QTD_BYTES_SHIFT	16
-#define EHCI_QTD_BYTES_MASK		0xffff
+#define EHCI_QTD_BYTES_MASK		0x7fff
 #define EHCI_QTD_IOC			(1 << 15)
-#define EHCI_QTD_PAGE_SHIFT		12
-#define EHCI_QTD_PAGE_MASK		0x07
+#define EHCI_QTD_CPAGE_SHIFT	12
+#define EHCI_QTD_CPAGE_MASK		0x07
 #define EHCI_QTD_ERRCOUNT_SHIFT	10
 #define EHCI_QTD_ERRCOUNT_MASK	0x03
 #define EHCI_QTD_PID_SHIFT		8
 #define EHCI_QTD_PID_MASK		0x03
+#define EHCI_QTD_PID_OUT		0x00
+#define EHCI_QTD_PID_IN			0x01
+#define EHCI_QTD_PID_SETUP		0x02
 #define EHCI_QTD_STATUS_SHIFT	0
 #define EHCI_QTD_STATUS_MASK	0x7f
 #define EHCI_QTD_STATUS_ACTIVE	(1 << 7)	// Active
@@ -151,19 +160,29 @@ typedef struct {
 #define EHCI_QTD_STATUS_MISSED	(1 << 2)	// Missed Micro-Frame
 #define EHCI_QTD_STATUS_SPLIT	(1 << 1)	// Split Transaction State
 #define EHCI_QTD_STATUS_PING	(1 << 0)	// Ping State
+#define EHCI_QTD_PAGE_MASK		0xfffff000
 
 
 // Queue Head (QH, EHCI Spec 3.6)
 typedef struct {
 	// Hardware Part
-	addr_t		link_phy;
+	addr_t		next_phy;
 	uint32		endpoint_chars;
 	uint32		endpoint_caps;
 	addr_t		current_qtd_phy;
-	uint32		overlay[8];
+
+	struct {
+		addr_t		next_phy;
+		addr_t		alt_next_phy;
+		uint32		token;
+		addr_t		buffer_phy[5];
+	} overlay;
+
 	// Software Part
 	addr_t		this_phy;
-	void		*link_log;
+	void		*next_log;
+	void		*prev_log;
+	void		*stray_log;
 	void		*element_log;
 } ehci_qh;
 

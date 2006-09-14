@@ -19,6 +19,7 @@ KernelStaticLibrary libusb.a :
 	Pipe.cpp
 	Interface.cpp
 	Object.cpp
+	PhysicalMemoryAllocator.cpp
 	: -fno-pic
 ;	
 
