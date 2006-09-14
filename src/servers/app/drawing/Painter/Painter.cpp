@@ -352,21 +352,6 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		}
 	}
 	
-	// do the pixel center offset here
-	// TODO review this :
-	// in case it's the same pixel, we offset differently to have something drawn
-	if (a == b) {
-		a.x += 0.25;
-		a.y += 0.25;
-		b.x += 0.75;
-		b.y += 0.75;
-	} else {
-		a.x += 0.5;
-		a.y += 0.5;
-		b.x += 0.5;
-		b.y += 0.5;
-	}
-	
 	fPath.remove_all();
 
 	if (a == b) {
@@ -379,10 +364,12 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		touched = _FillPath(fPath);
 	} else {
 		// do the pixel center offset here
-		a.x += 0.5;
-		a.y += 0.5;
-		b.x += 0.5;
-		b.y += 0.5;
+		if (!fSubpixelPrecise && fmodf(fPenSize, 2.0) != 0.0) {
+			a.x += 0.5;
+			a.y += 0.5;
+			b.x += 0.5;
+			b.y += 0.5;
+		}
 	
 		fPath.move_to(a.x, a.y);
 		fPath.line_to(b.x, b.y);
