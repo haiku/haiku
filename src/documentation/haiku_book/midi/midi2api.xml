@@ -10,6 +10,35 @@
 <!ENTITY midi2producer SYSTEM "midi2producer.xml">
 <!ENTITY midi2roster SYSTEM "midi2roster.xml">
 
+<!ENTITY bmidiroster "<link linkend='bmidiroster'><classname>BMidiRoster</classname></link>">
+<!ENTITY bmidiroster_register "<link linkend='bmidiroster_register'><function>Register()</function></link>">
+<!ENTITY bmidiroster_unregister "<link linkend='bmidiroster_unregister'><function>Unregister()</function></link>">
+<!ENTITY bmidiroster_startwatching "<link linkend='bmidiroster_startwatching'><function>StartWatching()</function></link>">
+
+<!ENTITY bmidiendpoint "<link linkend='bmidiendpoint'><classname>BMidiEndpoint</classname></link>">
+<!ENTITY bmidiendpoint_name "<link linkend='bmidiendpoint_name'><function>Name()</function></link>">
+<!ENTITY bmidiendpoint_setname "<link linkend='bmidiendpoint_setname'><function>SetName()</function></link>">
+<!ENTITY bmidiendpoint_id "<link linkend='bmidiendpoint_id'><function>ID()</function></link>">
+<!ENTITY bmidiendpoint_register "<link linkend='bmidiendpoint_register'><function>Register()</function></link>">
+<!ENTITY bmidiendpoint_unregister "<link linkend='bmidiendpoint_unregister'><function>Unregister()</function></link>">
+<!ENTITY bmidiendpoint_isproducer "<link linkend='bmidiendpoint_isproducer'><function>IsProducer()</function></link>">
+<!ENTITY bmidiendpoint_isconsumer "<link linkend='bmidiendpoint_isconsumer'><function>IsConsumer()</function></link>">
+<!ENTITY bmidiendpoint_isremote "<link linkend='bmidiendpoint_isremote'><function>IsRemote()</function></link>">
+<!ENTITY bmidiendpoint_islocal "<link linkend='bmidiendpoint_islocal'><function>IsLocal()</function></link>">
+<!ENTITY bmidiendpoint_ispersistent "<link linkend='bmidiendpoint_ispersistent'><function>IsPersistent()</function></link>">
+<!ENTITY bmidiendpoint_isvalid "<link linkend='bmidiendpoint_isvalid'><function>IsValid()</function></link>">
+<!ENTITY bmidiendpoint_Acquire "<link linkend='bmidiendpoint_acquire'><function>Acquire()</function></link>">
+<!ENTITY bmidiendpoint_Release "<link linkend='bmidiendpoint_release'><function>Release()</function></link>">
+<!ENTITY bmidiendpoint_SetProperties "<link linkend='bmidiendpoint_setproperties'><function>SetProperties()</function></link>">
+<!ENTITY bmidiendpoint_GetProperties "<link linkend='bmidiendpoint_getproperies'><function>GetProperties()</function></link>">
+
+<!ENTITY bmidilocalconsumer "<link linkend='midi2localconsumer'><classname>BMidiLocalConsumer</classname></link>">
+<!ENTITY bmidilocalconsumer_channelpressure "<link linkend='bmidilocalconsumer_channelpressure'><function>BMidiLocalConsumer</function></link>">
+
+<!ENTITY bmidilocalproducer "<link linkend='bmidilocalproducer'><classname>BMidiLocalProducer</classname></link>">
+
+<!ENTITY bmidiproducer "<link linkend='bmidiproducer'><classname>BMidiProducer</classname></link>">
+<!ENTITY bmidiconsumer "<link linkend='bmidiconsumer'><classname>BMidiConsumer</classname></link>">
 ]>
 
 <sect1 id="midi2api">
