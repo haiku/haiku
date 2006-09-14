@@ -2676,6 +2676,11 @@ BView::FillRect(BRect rect, ::pattern pattern)
 	if (fOwner == NULL)
 		return;
 
+	// NOTE: ensuring compatibility with R5,
+	// invalid rects are not filled, they are stroked though!
+	if (!rect.IsValid())
+		return;
+
 	check_lock();
 	_UpdatePattern(pattern);
 
