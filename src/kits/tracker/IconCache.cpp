@@ -1508,9 +1508,13 @@ SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size s
 	BBitmap* bitmap = IconForMode(mode, size);
 	ASSERT(bitmap);
 
+	drawing_mode oldMode = view->DrawingMode();
+
 	if (bitmap->ColorSpace() == B_RGBA32) {
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		if (oldMode != B_OP_ALPHA) {
+			view->SetDrawingMode(B_OP_ALPHA);
+			view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		}
 	} else {
 		view->SetDrawingMode(B_OP_OVER);
 	}
@@ -1519,6 +1523,8 @@ SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size s
 		view->DrawBitmapAsync(bitmap, where);
 	else
 		view->DrawBitmap(bitmap, where);
+
+	view->SetDrawingMode(oldMode);
 }
 
 
@@ -1530,13 +1536,13 @@ SharedCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size s
 	if (!bitmap)
 		return;
 	
-	if (bitmap->ColorSpace() == B_RGBA32) {
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	} else {
-		view->SetDrawingMode(B_OP_OVER);
-	}
-	
+//	if (bitmap->ColorSpace() == B_RGBA32) {
+//		view->SetDrawingMode(B_OP_ALPHA);
+//		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+//	} else {
+//		view->SetDrawingMode(B_OP_OVER);
+//	}
+//	
 	(blitFunc)(view, where, bitmap, passThruState);
 }
 
@@ -1617,9 +1623,13 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 	if (!bitmap)
 		return;
 	
+	drawing_mode oldMode = view->DrawingMode();
+
 	if (bitmap->ColorSpace() == B_RGBA32) {
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		if (oldMode != B_OP_ALPHA) {
+			view->SetDrawingMode(B_OP_ALPHA);
+			view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		}
 	} else {
 		view->SetDrawingMode(B_OP_OVER);
 	}
@@ -1630,6 +1640,8 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 		view->DrawBitmapAsync(bitmap, where);
 	} else
 		view->DrawBitmap(bitmap, where);
+
+	view->SetDrawingMode(oldMode);
 }
 
 
@@ -1641,12 +1653,12 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 	if (!bitmap)
 		return;
 	
-	if (bitmap->ColorSpace() == B_RGBA32) {
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	} else {
-		view->SetDrawingMode(B_OP_OVER);
-	}
+//	if (bitmap->ColorSpace() == B_RGBA32) {
+//		view->SetDrawingMode(B_OP_ALPHA);
+//		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+//	} else {
+//		view->SetDrawingMode(B_OP_OVER);
+//	}
 	
 	(blitFunc)(view, where, bitmap, passThruState);
 }
