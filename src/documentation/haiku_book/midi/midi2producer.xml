@@ -20,7 +20,7 @@
 	</para>
 	
 	<sect3 id="bmidiproducer_connect">
-		<title>status_t BMidiProducer::Connect(BMidiConsumer *cons)</title>
+		<title>status_t Connect(BMidiConsumer *cons)</title>
 		
 		<para>
 			Connects a consumer to this producer
@@ -45,7 +45,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_disconnect">
-		<title>status_t BMidiProducer::Disconnect(BMidiConsumer *cons)</title>
+		<title>status_t Disconnect(BMidiConsumer *cons)</title>
 		
 		<para>
 			Disconnects a consumer from this producer
@@ -67,7 +67,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_isconnected">
-		<title>bool BMidiProducer::IsConnected(BMidiConsumer *cons) const</title>
+		<title>bool IsConnected(BMidiConsumer *cons) const</title>
 		
 		<para>
 			Determines whether a consumer is connected to this producer
@@ -80,7 +80,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_connections">
-		<title>BList *BMidiProducer::Connections() const</title>
+		<title>BList *Connections() const</title>
 		
 		<para>
 			Returns a list with all connected consumers

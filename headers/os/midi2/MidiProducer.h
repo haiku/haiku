@@ -23,7 +23,7 @@ private:
 	friend class BMidiRoster;
 	friend class BPrivate::BMidiRosterLooper;
 	
-	BMidiProducer(const char* name = NULL);	
+	BMidiProducer(const char *name = NULL);	
 	virtual ~BMidiProducer();
 
 	virtual void _Reserved1();
@@ -35,12 +35,12 @@ private:
 	virtual void _Reserved7();
 	virtual void _Reserved8();		
 
-	status_t SendConnectRequest(BMidiConsumer*, bool);
-	void ConnectionMade(BMidiConsumer*);
-	bool ConnectionBroken(BMidiConsumer*);
+	status_t SendConnectRequest(BMidiConsumer *, bool);
+	void ConnectionMade(BMidiConsumer *);
+	bool ConnectionBroken(BMidiConsumer *);
 
 	int32 CountConsumers() const;
-	BMidiConsumer* ConsumerAt(int32) const;
+	BMidiConsumer *ConsumerAt(int32) const;
 
 	bool LockProducer() const;
 	void UnlockProducer() const;
@@ -61,7 +61,7 @@ public:
 	virtual void Disconnected(BMidiConsumer *cons);
 	
 	void SprayData(
-		void* data, size_t length, bool atomic = false, 
+		void *data, size_t length, bool atomic = false, 
 		bigtime_t time = 0) const;
 	
 	void SprayNoteOff(
@@ -90,7 +90,7 @@ public:
 		uchar channel, uchar lsb, uchar msb, bigtime_t time = 0) const;
 
 	void SpraySystemExclusive(
-		void* data, size_t length, bigtime_t time = 0) const;
+		void *data, size_t length, bigtime_t time = 0) const;
 
 	void SpraySystemCommon(
 		uchar status, uchar data1, uchar data2, bigtime_t time = 0) const;
@@ -108,7 +108,7 @@ protected:
 private:
 
 	void SprayEvent(
-		const void* data, size_t length, bool atomic, bigtime_t time,
+		const void *data, size_t length, bool atomic, bigtime_t time,
 		bool sysex = false) const;
 	
 	virtual void _Reserved1();

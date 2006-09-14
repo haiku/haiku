@@ -16,7 +16,7 @@
 	</para>
 	
 	<sect3 id="BMidiConsumer_Latency">
-		<title>bigtime_t BMidiConsumer::Latency() const</title>
+		<title>bigtime_t Latency() const</title>
 		
 		<para>
 			The latency is measured in microseconds. Producers should attempt to get MIDI 

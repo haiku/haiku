@@ -32,21 +32,21 @@ class BMidiRoster
 {
 public:
 
-	static BMidiEndpoint* NextEndpoint(int32* id);
-	static BMidiProducer* NextProducer(int32* id);
-	static BMidiConsumer* NextConsumer(int32* id);
+	static BMidiEndpoint *NextEndpoint(int32 *id);
+	static BMidiProducer *NextProducer(int32 *id);
+	static BMidiConsumer *NextConsumer(int32 *id);
 	
-	static BMidiEndpoint* FindEndpoint(int32 id, bool localOnly = false);
-	static BMidiProducer* FindProducer(int32 id, bool localOnly = false);
-	static BMidiConsumer* FindConsumer(int32 id, bool localOnly = false);
+	static BMidiEndpoint *FindEndpoint(int32 id, bool localOnly = false);
+	static BMidiProducer *FindProducer(int32 id, bool localOnly = false);
+	static BMidiConsumer *FindConsumer(int32 id, bool localOnly = false);
 	
-	static void StartWatching(const BMessenger* msngr);
+	static void StartWatching(const BMessenger *msngr);
 	static void StopWatching();
 
-	static status_t Register(BMidiEndpoint* endp);
-	static status_t Unregister(BMidiEndpoint* endp);
+	static status_t Register(BMidiEndpoint *endp);
+	static status_t Unregister(BMidiEndpoint *endp);
 
-	static BMidiRoster* MidiRoster();
+	static BMidiRoster *MidiRoster();
 	
 private:
 

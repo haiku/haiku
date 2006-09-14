@@ -26,7 +26,7 @@
 	</para>
 	
 	<sect3 id="bmidiendpoint_name">
-		<title>const char* BMidiEndpoint::Name() const</title>
+		<title>const char* Name() const</title>
 		
 		<para>
 			Returns the name of the endpoint.
@@ -44,7 +44,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_setname">
-		<title>void BMidiEndpoint::SetName(const char* name)</title>
+		<title>void SetName(const char* name)</title>
 		
 		<para>
 			Changes the name of the endpoint.
@@ -73,7 +73,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_id">
-		<title>int32 BMidiEndpoint::ID() const</title>
+		<title>int32 ID() const</title>
 		
 		<para>
 			Returns the ID of the endpoint
@@ -89,7 +89,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_isproducer">
-		<title>bool BMidiEndpoint::IsProducer() const</title>
+		<title>bool IsProducer() const</title>
 		
 		<para>
 			Determines whether this endpoint is a BMidiProducer
@@ -109,7 +109,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_isconsumer">
-		<title>bool BMidiEndpoint::IsConsumer() const</title>
+		<title>bool IsConsumer() const</title>
 		
 		<para>
 			Determines whether this endpoint is a BMidiConsumer
@@ -128,7 +128,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_isremote">
-		<title>bool BMidiEndpoint::IsRemote() const</title>
+		<title>bool IsRemote() const</title>
 		
 		<para>
 			Determines whether this endpoint is a proxy for a remote object.
@@ -142,7 +142,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_islocal">
-		<title>bool BMidiEndpoint::IsLocal() const</title>
+		<title>bool IsLocal() const</title>
 		
 		<para>
 			Determines whether this endpoint represents a local object
@@ -155,7 +155,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_ispersistent">
-		<title>bool BMidiEndpoint::IsPersistent() const</title>
+		<title>bool IsPersistent() const</title>
 		
 		<para>
 			Not used
@@ -172,7 +172,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_isvalid">
-		<title>bool BMidiEndpoint::IsValid() const</title>
+		<title>bool IsValid() const</title>
 		
 		<para>
 			Determines whether the endpoint still exists
@@ -203,7 +203,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_acquire">
-		<title>status_t BMidiEndpoint::Acquire()</title>
+		<title>status_t Acquire()</title>
 		
 		<para>
 			Increments the endpoint's reference count
@@ -252,7 +252,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_release">
-		<title>status_t BMidiEndpoint::Release()</title>
+		<title>status_t Release()</title>
 		
 		<para>
 			Decrements the endpoint's reference count
@@ -268,7 +268,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_register">
-		<title>status_t BMidiEndpoint::Register()</title>
+		<title>status_t Register()</title>
 		
 		<para>
 			Publishes the endpoint on the roster
@@ -317,7 +317,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_unregister">
-		<title>status_t BMidiEndpoint::Unregister()</title>
+		<title>status_t Unregister()</title>
 		
 		<para>
 			Hides the endpoint from the roster
@@ -329,7 +329,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_setproperties">
-		<title>status_t BMidiEndpoint::SetProperties(const BMessage* properties)</title>
+		<title>status_t SetProperties(const BMessage* properties)</title>
 		
 		<para>
 			Changes the properties of the endpoint
@@ -423,7 +423,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_getproperties">
-		<title>status_t BMidiEndpoint::GetProperties(BMessage* properties) const</title>
+		<title>status_t GetProperties(BMessage* properties) const</title>
 		
 		<para>
 			Reads the properties of the endpoint

@@ -34,7 +34,7 @@
 	</para>
 	
 	<sect3 id="bmidilocalproducer_bmidilocalproducer">
-		<title>BMidiLocalProducer::BMidiLocalProducer(const char *name = NULL)</title>
+		<title>BMidiLocalProducer(const char *name = NULL)</title>
 		
 		<para>
 			Creates a new local producer endpoint.
@@ -70,7 +70,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_connected">
-		<title>virtual void BMidiLocalProducer::Connected(BMidiConsumer *cons)</title>
+		<title>virtual void Connected(BMidiConsumer *cons)</title>
 		
 		<para>
 			Invoked when a new consumer is connected to this producer
@@ -100,7 +100,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_disconnected">
-		<title>virtual void BMidiLocalProducer::Disconnected(BMidiConsumer *cons)</title>
+		<title>virtual void Disconnected(BMidiConsumer *cons)</title>
 		
 		<para>
 			Invoked when a consumer is disconnected from this producer.
@@ -112,8 +112,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraydata">
-		<title>void BMidiLocalProducer::SprayData(
-			void *data, size_t length, bool atomic = false, bigtime_t time = 0) const </title>
+		<title>void SprayData(
+			void *data, size_t length, bool atomic = false, bigtime_t time = 0) const</title>
 		
 		<para>
 			Sends raw MIDI data downstream to all connected consumers
@@ -149,7 +149,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraynoteoff">
-		<title>void BMidiLocalProducer::SprayNoteOff(
+		<title>void SprayNoteOff(
 			uchar channel, uchar note, uchar velocity, bigtime_t time = 0) const</title>
 		
 		<para>
@@ -162,7 +162,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraynoteon">
-		<title>void BMidiLocalProducer::SprayNoteOn(
+		<title>void SprayNoteOn(
 			uchar channel, uchar note, uchar velocity, bigtime_t time = 0) const</title>
 		
 		<para>
@@ -175,7 +175,7 @@
 	</sect3>
 	
 	<sect3 id="bmidIlocalproducer_spraykeypressure">
-		<title>void BMidiLocalProducer::SprayKeyPressure(
+		<title>void SprayKeyPressure(
 			uchar channel, uchar note, uchar pressure, bigtime_t time = 0) const</title>
 		
 		<para>
@@ -189,9 +189,9 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraycontrolchange">
-		<title>void BMidiLocalProducer::SprayControlChange(
+		<title>void SprayControlChange(
 			uchar channel, uchar controlNumber, uchar controlValue,
-			bigtime_t time = 0) const </title>
+			bigtime_t time = 0) const</title>
 		
 		<para>
 			Sends a Controller Change event to all connected consumers.
@@ -204,9 +204,9 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_sprayprogramchange">
-		<title>BMidiLocalProducer::SprayProgramChange(
-			uchar channel, uchar programNumber, bigtime_t time = 0) const </title>
-		
+		<title>void SprayProgramChange(
+			uchar channel, uchar programNumber, bigtime_t time = 0) const</title>
+
 		<para>
 			Sends a Program Change event to all connected consumers
 		</para>
@@ -217,8 +217,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraychannelpressure">
-		<title>void BMidiLocalProducer::SprayChannelPressure(
-			uchar channel, uchar pressure, bigtime_t time = 0) const </title>
+		<title>void SprayChannelPressure(
+			uchar channel, uchar pressure, bigtime_t time = 0) const</title>
 		
 		<para>
 			Sends a Channel Pressure event to all connected consumers
@@ -230,8 +230,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraypitchbend">
-		<title>void BMidiLocalProducer::SprayPitchBend(
-			uchar channel, uchar lsb, uchar msb, bigtime_t time = 0) const </title>
+		<title>void SprayPitchBend(
+			uchar channel, uchar lsb, uchar msb, bigtime_t time = 0) const</title>
 		
 		<para>
 			Sends a Pitch Bend event to all connected consumers
@@ -243,9 +243,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraysystemexclusive">
-		<title>
-			void BMidiLocalProducer::SpraySystemExclusive(
-			void *data, size_t length, bigtime_t time = 0) const </title>
+		<title>void SpraySystemExclusive(
+			void *data, size_t length, bigtime_t time = 0) const</title>
 		
 		<para>
 			Sends a System Exclusive event to all connected consumers
@@ -264,7 +263,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraysystemcommon">
-		<title>void BMidiLocalProducer::SpraySystemCommon(
+		<title>void SpraySystemCommon(
 			uchar status, uchar data1, uchar data2, bigtime_t time = 0) const</title>
 		
 		<para>
@@ -322,7 +321,7 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraysystemrealtime">
-		<title>void BMidiLocalProducer::SpraySystemRealTime(
+		<title>void SpraySystemRealTime(
 			uchar status, bigtime_t time = 0) const</title>
 		
 		<para>
@@ -383,8 +382,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraytempochange">
-		<title>void BMidiLocalProducer::SprayTempoChange(
-			int32 bpm, bigtime_t time = 0) const </title>
+		<title>void SprayTempoChange(
+			int32 beatsPerMinute, bigtime_t time = 0) const</title>
 		<para>
 			Sends a Tempo Change event to the connected consumers.
 		</para>

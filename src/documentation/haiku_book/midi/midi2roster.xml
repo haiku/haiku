@@ -26,12 +26,12 @@
 	<para>
 		You can call BMidiRoster's functions like this:
 		<programlisting>
-		producer = BMidiRoster::FindProducer(someID);
+		producer = FindProducer(someID);
 		</programlisting>
 		
 		Or using the slightly more annoying:
 		<programlisting>
-		BMidiRoster* roster = BMidiRoster::MidiRoster();
+		BMidiRoster *roster = MidiRoster();
 		if (roster != NULL)
 		{
 		producer = roster->FindProducer(someID);
@@ -40,7 +40,7 @@
 	</para>
 	
 	<sect3 id="bmidiroster_nextendpoint">
-		<title>BMidiEndpoint* BMidiRoster::NextEndpoint(int32* id)</title>
+		<title>static BMidiEndpoint *NextEndpoint(int32 *id)</title>
 		
 		<para>
 			Returns the next endpoint from the roster
@@ -61,8 +61,8 @@
 			Usage example:
 			<programlisting>
 			int32 id = 0;
-			BMidiEndpoint* endp;
-			while ((endp = BMidiRoster::NextEndpoint(&amp;id)) != NULL) 
+			BMidiEndpoint *endp;
+			while ((endp = NextEndpoint(&amp;id)) != NULL) 
 			{
 			...do something with endpoint ...
 			endp->Release();  // don't forget!
@@ -78,7 +78,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_nextproducer">
-		<title>BMidiProducer* BMidiRoster::NextProducer(int32* id)</title>
+		<title>static BMidiProducer *NextProducer(int32 *id)</title>
 		
 		<para>
 			Returns the next producer from the roster
@@ -95,7 +95,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_nextconsumer">
-		<title>BMidiConsumer* BMidiRoster::NextConsumer(int32* id)</title>
+		<title>static BMidiConsumer *NextConsumer(int32 *id)</title>
 		
 		<para>
 			Returns the next consumer from the roster
@@ -112,7 +112,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_findendpoint">
-		<title>BMidiEndpoint* BMidiRoster::FindEndpoint(
+		<title>static BMidiEndpoint *FindEndpoint(
 			int32 id, bool localOnly = false)</title>
 		
 		<para>
@@ -133,17 +133,17 @@
 		</para>
 		
 		<para><programlisting>
-			BMidiEndpoint* endp = ...;
-			BMidiProducer* prod = NULL;
-			BMidiConsumer* cons = NULL;
+			BMidiEndpoint *endp = ...;
+			BMidiProducer *prod = NULL;
+			BMidiConsumer *cons = NULL;
 			
 			if (endp->IsProducer())
 			{
-				prod = dynamic_cast&lt;BMidiProducer*&gt;(endp);
+				prod = dynamic_cast&lt;BMidiProducer *&gt;(endp);
 			}
 			else if (endp->IsConsumer())
 			{
-				cons = dynamic_cast&lt;BMidiConsumer*&gt;(endp);
+				cons = dynamic_cast&lt;BMidiConsumer *&gt;(endp);
 			}
 		</programlisting></para>
 		
@@ -152,7 +152,7 @@
 			should always \link BMidiEndpoint::Release() Release() \endlink an endpoint 
 			when you are done with it:
 			<programlisting>	
-			BMidiEndpoint* endp = BMidiRoster::FindEndpoint(someID);
+			BMidiEndpoint *endp = FindEndpoint(someID);
 			if (endp != NULL) 
 			{
 			...do stuff with the endpoint...
@@ -163,7 +163,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_findproducer">
-		<title>BMidiProducer* BMidiRoster::FindProducer(
+		<title>static BMidiProducer *FindProducer(
 			int32 id, bool localOnly = false)</title>
 		
 		<para>
@@ -182,7 +182,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_findconsumer">
-		<title>BMidiConsumer* BMidiRoster::FindConsumer(
+		<title>static BMidiConsumer *FindConsumer(
 			int32 id, bool localOnly = false)</title>
 		
 		<para>
@@ -201,7 +201,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_startwatching">
-		<title>void BMidiRoster::StartWatching(const BMessenger* msngr)</title>
+		<title>static void StartWatching(const BMessenger *msngr)</title>
 		
 		<para>
 			Start receiving notifications from the Midi Roster
@@ -464,10 +464,10 @@
 			void MyView::AttachedToWindow()
 			{
 				BMessenger msgr(this);
-				BMidiRoster::StartWatching(&amp;msgr);
+				StartWatching(&amp;msgr);
 			}
 			
-			void MyView::MessageReceived(BMessage* msg)
+			void MyView::MessageReceived(BMessage *msg)
 			{
 				switch (msg->what) 
 				{
@@ -488,7 +488,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_stopwatching">
-		<title>void BMidiRoster::StopWatching()</title>
+		<title>static void StopWatching()</title>
 		
 		<para>
 			Stop receiving notifications from the Midi Roster
@@ -500,7 +500,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_register">
-		<title>status_t BMidiRoster::Register(BMidiEndpoint* object)</title>
+		<title>static status_t Register(BMidiEndpoint *endp)</title>
 		
 		<para>
 			Publishes an endpoint to other applications
@@ -513,7 +513,7 @@
 	</sect3>
 					
 	<sect3 id="bmidiroster_unregister">
-		<title>status_t BMidiRoster::Unregister(BMidiEndpoint* object)</title>
+		<title>static status_t Unregister(BMidiEndpoint *endp)</title>
 		
 		<para>
 			Hides an endpoint from other applications
@@ -526,7 +526,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_midiroster">
-		<title>BMidiRoster* BMidiRoster::MidiRoster()</title>
+		<title>static BMidiRoster *MidiRoster()</title>
 		
 		<para>
 			Returns a pointer to the only instance of BMidiRoster
