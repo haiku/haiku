@@ -4,24 +4,24 @@
 	<title>BMidiEndpoint</title>
 	
 	<para>
-		The <filename>MidiEndpoint.h</filename> file defines the &bmidiendpoint;,
+		The <filename>MidiEndpoint.h</filename> file defines the &BMidiEndpoint;,
 		which is the baseclass for all MIDI endpoints.
 	</para>
 	
 	<para>
-		&bmidiendpoint; is the abstract base class that represents either a producer or 
+		&BMidiEndpoint; is the abstract base class that represents either a producer or 
 		consumer endpoint. It may be used to obtain the state, name, properties, or 
-		system-wide ID of the object. &bmidiendpoint; also provides the ability to change 
+		system-wide ID of the object. &BMidiEndpoint; also provides the ability to change 
 		the name and properties of endpoints that were created locally.
 	</para>
 	
 	<para>	
-		Remember, you cannot call the destructor of &bmidiendpoint; and its subclasses 
+		Remember, you cannot call the destructor of &BMidiEndpoint; and its subclasses 
 		directly. Endpoint objects are destructed automatically when their reference 
 		count drops to zero. If necessary, the destructor of a local endpoint first 
-		breaks off any connections and &bmidiendpoint_unregister;'s the endpoint before it is 
+		breaks off any connections and &BMidiEndpoint_Unregister;'s the endpoint before it is 
 		deleted. However, for good style and bonus points you should really 
-		BMidiProducer::Disconnect() and &bmidiendpoint_unregister; the object 
+		BMidiProducer::Disconnect() and &BMidiEndpoint_Unregister; the object 
 		yourself and not rely on the destructor to do this.
 	</para>
 	
@@ -31,7 +31,7 @@
 		<title>Name()</title>
 		
 		<methodsynopsis>
-			<modifier>const</modifier> <type>char *</type>
+			<type>const char *</type>
 			<methodname>Name</methodname>
 			<modifier>const</modifier>
 		</methodsynopsis>
@@ -43,11 +43,11 @@
 		<para>
 			The function never returns NULL. If you created a local endpoint by passing a 
 			NULL name into its constructor (or passing no name, which is the same thing), 
-			then &bmidiendpoint_name; will return an empty string, not NULL.
+			then &BMidiEndpoint_Name; will return an empty string, not NULL.
 		</para>
 		
 		<para>
-			See also &bmidiendpoint_setname;.
+			See also &BMidiEndpoint_SetName;.
 		</para>
 	</sect3>
 	
@@ -55,7 +55,7 @@
 		<title>SetName()</title>
 		
 		<methodsynopsis>
-			<modifier>void</modifier> <methodname>SetName</methodname>
+			<type>void</type> <methodname>SetName</methodname>
 			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter></methodparam>
 		</methodsynopsis>
 		
@@ -72,7 +72,7 @@
 		
 		<para>
 			Even though you can call this function on both remote and local objects, you 
-			are only allowed to change the names of local endpoints; &bmidiendpoint_setname;
+			are only allowed to change the names of local endpoints; &BMidiEndpoint_SetName;
 			calls on remote endpoints are ignored.
 		</para>
 		
@@ -81,12 +81,12 @@
 		</para>
 		
 		<para>
-			See also &bmidiendpoint_name;.
+			See also &BMidiEndpoint_Name;.
 		</para>
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_id">
-		<title>int32 BMidiEndpoint::ID() const</title>
+		<title>ID()</title>
 		
 		<methodsynopsis>
 			<type>int32</type> <methodname>Name</methodname> <void/> <modifier>const</modifier>
@@ -113,18 +113,18 @@
 		</methodsynopsis>
 		
 		<para>
-			Determines whether this endpoint is a &bmidiproducer;.
+			Determines whether this endpoint is a &BMidiProducer;.
 		</para>
 		
 		<para>
 			If it is, you can use a dynamic_cast to convert this object into a producer:
 			
 			<programlisting>
-			if (endp->IsProducer())
-			{
-			BMidiProducer* prod = dynamic_cast &lt;BMidiProducer*&gt;(endp);
-				....
-				}
+if (endp->IsProducer())
+{
+	BMidiProducer* prod = dynamic_cast &lt;BMidiProducer*&gt;(endp);
+	....
+}
 			</programlisting>
 		</para>
 	</sect3>
@@ -137,17 +137,17 @@
 		</methodsynopsis>
 		
 		<para>
-			Determines whether this endpoint is a &bmidiconsumer;.
+			Determines whether this endpoint is a &BMidiConsumer;.
 		</para>
 		
 		<para>
 			If it is, you can use a dynamic_cast to convert this object into a consumer:
 			<programlisting>
-			if (endp->IsConsumer())
-			{
-			BMidiConsumer* cons = dynamic_cast&lt;BMidiConsumer*&gt;(endp);
-				....
-			}
+if (endp->IsConsumer())
+{
+	BMidiConsumer* cons = dynamic_cast&lt;BMidiConsumer*&gt;(endp);
+	....
+}
 			</programlisting>
 		</para>
 	</sect3>
@@ -165,7 +165,7 @@
 		
 		<para>
 			An endpoint is "remote" when it is created by another application. Obviously, 
-			the remote object is &bmidiendpoint_register;'ed as well, otherwise you would not be able to 
+			the remote object is &BMidiEndpoint_Register;'ed as well, otherwise you would not be able to 
 			see it.
 		</para>
 	</sect3>
@@ -183,7 +183,7 @@
 		
 		<para>
 			An endpoint is "local" when it is created by this application; in other words, 
-			a &bmidilocalconsumer; or &bmidilocalproducer;.
+			a &BMidiLocalConsumer; or &BMidiLocalProducer;.
 		</para>
 	</sect3>
 	
@@ -221,16 +221,16 @@
 		
 		<para>
 			Suppose you obtained a proxy object for a remote endpoint by querying the 
-			&bmidiroster;. What if the application that published this endpoint quits, or 
-			less drastically, &bmidiendpoint_unregister;'s that endpoint? Even though you still have a 
-			&bmidiendpoint; proxy object, the real endpoint no longer exists. You can use 
-			&bmidiendpoint_isvalid; to check for this.
+			&BMidiRoster;. What if the application that published this endpoint quits, or 
+			less drastically, &BMidiEndpoint_Unregister;'s that endpoint? Even though you still have a 
+			&BMidiEndpoint; proxy object, the real endpoint no longer exists. You can use 
+			&BMidiEndpoint_IsValid; to check for this.
 		</para>
 		
 		<para>	
-			Don't worry, operations on invalid objects, such as &bmidiendpoint_getproperties;, will 
+			Don't worry, operations on invalid objects, such as &BMidiEndpoint_GetProperties;, will 
 			return an error code (typically B_ERROR), but not cause a crash. Local objects 
-			are always are considered to be valid, even if you did not &bmidiendpoint_register; them. 
+			are always are considered to be valid, even if you did not &BMidiEndpoint_Register; them. 
 			(The only time a local endpoint is not valid is when there was a problem 
 			constructing it.)
 		</para>
@@ -238,8 +238,8 @@
 		<para>	
 			If the application that created the remote endpoint crashes, then there is no 
 			guarantee that the Midi Server immediately recognizes this. In that case, 
-			&bmidiendpoint_isvalid; may still return true. Eventually, the stale endpoint will be removed 
-			from the roster, though. From then on, &bmidiendpoint_isvalid; correctly returns false.
+			&BMidiEndpoint_IsValid; may still return true. Eventually, the stale endpoint will be removed 
+			from the roster, though. From then on, &BMidiEndpoint_IsValid; correctly returns false.
 		</para>	
 	</sect3>
 	
@@ -255,35 +255,35 @@
 		</para>
 		
 		<para>	
-			Each &bmidiendpoint; has a reference count associated with it, so that 
-			&bmidiroster; can do proper bookkeeping. &bmidiendpoint_acquire; increments this reference 
-			count, and &bmidiendpoint_release; decrements it. Once the count reaches zero, the endpoint 
+			Each &BMidiEndpoint; has a reference count associated with it, so that 
+			&BMidiRoster; can do proper bookkeeping. &BMidiEndpoint_Acquire; increments this reference 
+			count, and &BMidiEndpoint_Release; decrements it. Once the count reaches zero, the endpoint 
 			is deleted.
 		</para>
 		
 		<para>
 			When you are done with the endpoint, whether local or remote, you should 
-			<emphasis>always</emphasis> &bmidiendpoint_release; it!
+			<emphasis>always</emphasis> &BMidiEndpoint_Release; it!
 		</para>
 		
 		<para>	
 			Upon construction, local endpoints start with a reference count of 1. Any 
-			objects you obtain from &bmidiroster; using the NextXXX() or FindXXX() functions 
+			objects you obtain from &BMidiRoster; using the NextXXX() or FindXXX() functions 
 			have their reference counts incremented in the process. If you forget to call 
-			&bmidiendpoint_release;, the objects won't be properly cleaned up and you'll make a fool out 
+			&BMidiEndpoint_Release;, the objects won't be properly cleaned up and you'll make a fool out 
 			of yourself.
 		</para>
 		
 		<para>	
-			After you &bmidiendpoint_release; an object, you are advised not to use it any further. If 
-			you do, your app will probably crash. That also happens if you &bmidiendpoint_release; an 
+			After you &BMidiEndpoint_Release; an object, you are advised not to use it any further. If 
+			you do, your app will probably crash. That also happens if you &BMidiEndpoint_Release; an 
 			object too many times.
 		</para>
 		
 		<para>	
-			Typically, you don't need to call &bmidiendpoint_acquire;, unless you have two disparate 
+			Typically, you don't need to call &BMidiEndpoint_Acquire;, unless you have two disparate 
 			parts of your application working with the same endpoint, and you don't want to 
-			have to keep track of who needs to &bmidiendpoint_release; the endpoint. Now you simply have 
+			have to keep track of who needs to &BMidiEndpoint_Release; the endpoint. Now you simply have 
 			both of them release it.
 		</para>
 		
@@ -292,7 +292,7 @@
 		</para>
 		
 		<para>
-			See also &bmidiendpoint_release;.
+			See also &BMidiEndpoint_Release;.
 		</para>
 	</sect3>
 	
@@ -312,7 +312,7 @@
 		</para>
 		
 		<para>
-			See also &bmidiendpoint_acquire;
+			See also &BMidiEndpoint_Acquire;
 		</para>
 	</sect3>
 	
@@ -329,25 +329,25 @@
 		
 		<para>	
 			MIDI objects created by an application are invisible to other applications 
-			until they are published. To publish an object use the &bmidiendpoint_register; 
-			method. The corresponding &bmidiendpoint_unregister; method will cause an object to 
+			until they are published. To publish an object use the &BMidiEndpoint_Register; 
+			method. The corresponding &BMidiEndpoint_Unregister; method will cause an object to 
 			once again become invisible to remote applications.
 		</para>
 		
 		<para>	
-			&bmidiroster; also has &bmidiroster_register; and &bmidiroster_unregister; methods. You may also use 
+			&BMidiRoster; also has &BMidiRoster_Register; and &BMidiRoster_Unregister; methods. You may also use 
 			those methods  to publish or hide your endpoints; both do the same thing.
 		</para>
 		
 		<para>	
-			Although it is considered bad style, calling &bmidiendpoint_register; on local endpoints that 
+			Although it is considered bad style, calling &BMidiEndpoint_Register; on local endpoints that 
 			are already registered won't mess things up. The Midi Server will simply ignore 
-			your request. Likewise for &bmidiendpoint_unregister;'ing more than once. Attempts to 
-			&bmidiendpoint_register; or &bmidiendpoint_unregister; remote endpoints will fail, of course.
+			your request. Likewise for &BMidiEndpoint_Unregister;'ing more than once. Attempts to 
+			&BMidiEndpoint_Register; or &BMidiEndpoint_Unregister; remote endpoints will fail, of course.
 		</para>
 		
 		<para>	
-			If you are &bmidiroster;::&startwatching; watching, you will 
+			If you are &BMidiRoster;::&BMidiRoster_StartWatching; watching, you will 
 			<emphasis>not</emphasis> receive notifications for any local endpoints you register or 
 			unregister. Of course, other applications <emphasis>will</emphasis> be notified about your 
 			endpoints.
@@ -365,7 +365,7 @@
 		</para>
 		
 		<para>	
-			See also &bmidiendpoint_unregister;.
+			See also &BMidiEndpoint_Unregister;.
 		</para>
 	</sect3>
 	
@@ -384,7 +384,7 @@
 		</para>
 		
 		<para>
-			See also &bmidiendpoint_register;.
+			See also &BMidiEndpoint_Register;.
 		</para>
 	</sect3>
 	
@@ -410,18 +410,18 @@
 			Usage example:
 			
 			<programlisting>
-			BMessage props;
-			if (endpoint->GetProperties(&amp;props) == B_OK)
-			{
-			...add data to the message...
-			endpoint->SetProperties(&amp;props);
-			} 
+BMessage props;
+if (endpoint->GetProperties(&amp;props) == B_OK)
+{
+	...add data to the message...
+	endpoint->SetProperties(&amp;props);
+} 
 			</programlisting>
 		</para>
 		
 			
 		<para>
-			You are only allowed to call &bmidiendpoint_setproperties; on a local object.
+			You are only allowed to call &BMidiEndpoint_SetProperties; on a local object.
 		</para>
 			
 		<para>
@@ -483,7 +483,7 @@
 		</para>
 			
 		<para>
-			See also &bmidiendpoint_getproperties;.
+			See also &BMidiEndpoint_GetProperties;.
 		</para>
 	</sect3>
 	
@@ -504,20 +504,20 @@
 			Usage example:
 			
 			<programlisting>
-			BMessage props;
-			if (endpoint->GetProperties(&amp;props) == B_OK) 
-			{
-			...examine the contents of the message...
-			}
+BMessage props;
+if (endpoint->GetProperties(&amp;props) == B_OK) 
+{
+	...examine the contents of the message...
+}
 			</programlisting>
 		</para>
 		
 		<note><para>
-			Note that &bmidiendpoint_getproperties; overwrites the contents of your BMessage.
+			Note that &BMidiEndpoint_GetProperties; overwrites the contents of your BMessage.
 		</para></note>
 		
 		<para>
-			See also &bmidiendpoint_setproperties;
+			See also &BMidiEndpoint_SetProperties;
 		</para>
 	</sect3>
 </sect2>

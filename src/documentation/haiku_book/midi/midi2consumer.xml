@@ -7,16 +7,22 @@
 		A consumer is an object that knows how to deal with incoming MIDI events. A 
 		consumer can be connected to multiple producers at the same time. There is no 
 		way to find out which producers are connected to this consumer just by looking 
-		at the BMidiConsumer object; you will have to consult BMidiRoster for that.
+		at the &BMidiConsumer; object; you will have to consult &BMidiRoster; for that.
 	</para>
 	
 	<para>
-		A BMidiConsumer either represents a local consumer, i.e. a class extending from 
-		BMidiLocalConsumer, or is a proxy for a remote object published by another app. 
+		A &BMidiConsumer; either represents a local consumer, i.e. a class extending from 
+		&BMidiLocalConsumer;, or is a proxy for a remote object published by another app. 
 	</para>
 	
 	<sect3 id="BMidiConsumer_Latency">
-		<title>bigtime_t Latency() const</title>
+		<title>Latency()</title>
+		
+		<methodsynopsis>
+			<type>bigtime_t</type>
+			<methodname>Latency</methodname>
+			<modifier>const</modifier>
+		</methodsynopsis>
 		
 		<para>
 			The latency is measured in microseconds. Producers should attempt to get MIDI 
@@ -26,20 +32,22 @@
 		</para>
 		
 		<para>
-			You cannot <emphasis>set</emphasis> the latency on a BMidiConsumer, only on a 
-			BMidiLocalConsumer.
+			You cannot <emphasis>set</emphasis> the latency on a &BMidiConsumer;, only on a 
+			&BMidiLocalConsumer;.
 		</para>
 		
 		<para>	
 			The latency issue gets slightly more complicated when multiple endpoints are 
 			chained together, as in the following picture:
 			
-			+-------+     +-------------+     +-------+
-			|       |     |             |     |       |
-			| prodA |---->| consB prodB |---->| consC |
-			|       |     |             |     |       |
-			+-------+     +-------------+     +-------+
-			appA          appB (filter)       appC
+			<programlisting>
++-------+     +-------------+     +-------+
+|       |     |             |     |       |
+| prodA |---->| consB prodB |---->| consC |
+|       |     |             |     |       |
++-------+     +-------------+     +-------+
+appA          appB (filter)       appC
+			</programlisting>
 		</para>
 		
 		<para>

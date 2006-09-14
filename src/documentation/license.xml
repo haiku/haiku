@@ -4,7 +4,7 @@
 
 <appendix id="license">
 	<title>MIT License</title>
-	<sect1>
+	<sect1 id="licensesect">
 	<para>
 	Copyright (c) 2003-2005, Haiku, Inc.
 	</para>

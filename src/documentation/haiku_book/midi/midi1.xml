@@ -50,7 +50,7 @@
 	
 	<para>
 	The old Midi Kit is slowly fading into obscurity. You may want to use the
-	<xref linkend="midi2"/> instead. Also note that the Haiku implementation
+	<link linkend="midi2">MIDI 2 Kit</link> instead. Also note that the Haiku implementation
 	of the kit sometimes behaves differently than the one from BeOS R5 or what
 	the BeBook says, but usually for the better ;-)
 	</para>
