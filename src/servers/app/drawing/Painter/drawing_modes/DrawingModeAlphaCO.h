@@ -150,7 +150,7 @@ blend_color_hspan_alpha_co(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-			uint16 alpha = hAlpha * *covers;
+			uint16 alpha = hAlpha * colors->a * *covers / 255;
 			if (alpha) {
 				if (alpha == 255*255) {
 					ASSIGN_ALPHA_CO(p, colors->r, colors->g, colors->b);
@@ -164,7 +164,7 @@ blend_color_hspan_alpha_co(int x, int y, unsigned len,
 		} while(--len);
 	} else {
 		// solid full opcacity
-		uint16 alpha = hAlpha * cover;
+		uint16 alpha = hAlpha * colors->a * cover / 255;
 		if (alpha == 255 * 255) {
 			do {
 				ASSIGN_ALPHA_CO(p, colors->r, colors->g, colors->b);

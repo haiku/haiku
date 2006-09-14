@@ -83,8 +83,6 @@ blend_solid_hspan_over_solid(int x, int y, unsigned len,
 	} while(--len);
 }
 
-
-
 // blend_solid_vspan_over_solid
 void
 blend_solid_vspan_over_solid(int x, int y, unsigned len, 
@@ -107,51 +105,6 @@ blend_solid_vspan_over_solid(int x, int y, unsigned len,
 		p += buffer->stride();
 		y++;
 	} while(--len);
-}
-
-
-// blend_color_hspan_over_solid
-void
-blend_color_hspan_over_solid(int x, int y, unsigned len, 
-							 const color_type* colors,
-							 const uint8* covers, uint8 cover,
-							 agg_buffer* buffer, const PatternHandler* pattern)
-{
-	uint8* p = buffer->row_ptr(y) + (x << 2);
-	if (covers) {
-		// non-solid opacity
-		do {
-//				if (*covers) {
-if (*covers && (colors->a & 0xff)) {
-				if (*covers == 255) {
-					ASSIGN_OVER(p, colors->r, colors->g, colors->b);
-				} else {
-					BLEND_OVER(p, colors->r, colors->g, colors->b, *covers);
-				}
-			}
-			covers++;
-			p += 4;
-			++colors;
-		} while(--len);
-	} else {
-		// solid full opcacity
-		if (cover == 255) {
-			do {
-if (colors->a & 0xff) {
-				ASSIGN_OVER(p, colors->r, colors->g, colors->b);
-}
-				p += 4;
-				++colors;
-			} while(--len);
-		// solid partial opacity
-		} else if (cover) {
-			do {
-				BLEND_OVER(p, colors->r, colors->g, colors->b, cover);
-				p += 4;
-				++colors;
-			} while(--len);
-		}
-	}
 }
 
 #endif // DRAWING_MODE_OVER_H
