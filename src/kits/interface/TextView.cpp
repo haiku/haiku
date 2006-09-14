@@ -1689,7 +1689,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		height = (line + 1)->origin - line->origin;
 	
 		// special case: go down one line if inOffset is a newline
-		if (inOffset == textLength && (*fText)[inOffset - 1] == '\n') {
+		if (inOffset == textLength && (*fText)[inOffset - 1] == B_ENTER) {
 			float ascent, descent;
 			StyledWidth(inOffset, 1, &ascent, &descent);
 			
@@ -1749,9 +1749,11 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 int32
 BTextView::OffsetAt(BPoint point) const
 {
+	const int32 textLength = fText->Length();
+
 	// should we even bother?
 	if (point.y >= fTextRect.bottom)
-		return fText->Length();
+		return textLength;
 	else if (point.y < fTextRect.top)
 		return 0;
 	
@@ -1764,7 +1766,7 @@ BTextView::OffsetAt(BPoint point) const
 	// (can happen for newlines)
 	if (lineNum == (fLines->NumLines() - 1)) {
 		if (point.y >= ((line + 1)->origin + fTextRect.top))
-			return (fText->Length());
+			return textLength;
 	}
 	
 	// convert to text rect coordinates
@@ -1781,12 +1783,14 @@ BTextView::OffsetAt(BPoint point) const
 	// TODO: The following code isn't very efficient because it always starts from the left end,
 	// so when the point is near the right end it's very slow.
 	int32 offset = line->offset;
-	int32 limit = (line + 1)->offset;
+	const int32 limit = (line + 1)->offset;
+	
 	int32 saveOffset;
 	float location = 0;
 	do {
+		const int32 nextInitial = NextInitialByte(offset);
+		
 		saveOffset = offset;
-		int32 nextInitial = NextInitialByte(offset);
 		float width = 0;
 		if (ByteAt(offset) == B_TAB)
 			width = ActualTabWidth(location);
@@ -1805,15 +1809,15 @@ BTextView::OffsetAt(BPoint point) const
 	if (offset == (line + 1)->offset) {
 		// special case: newlines aren't visible
 		// return the offset of the character preceding the newline
-		if ((*fText)[offset - 1] == '\n')
+		if (ByteAt(offset - 1) == B_ENTER)
 			return --offset;
 
 		// special case: return the offset preceding any spaces that 
 		// aren't at the end of the buffer
-		if (offset != fText->Length() && (*fText)[offset - 1] == B_SPACE)
+		if (offset != textLength && ByteAt(offset - 1) == B_SPACE)
 			return --offset;
 	}
-	
+
 	return offset;
 }
 
@@ -1919,7 +1923,7 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	
 	float height = (*fLines)[endLine + 1]->origin - (*fLines)[startLine]->origin;
 				
-	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == '\n')
+	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == B_ENTER)
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
 	
 	return ceilf(height);
@@ -3313,7 +3317,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 	// Just find the offset of the first \n character
 	if (!fWrap) {
 		offset = limit - fromOffset;
-		fText->FindChar('\n', fromOffset, &offset);
+		fText->FindChar(B_ENTER, fromOffset, &offset);
 		offset += fromOffset;
 		offset = (offset < limit) ? offset + 1 : limit;
 		
@@ -3344,7 +3348,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 			if (!CanEndLine(offset + delta))
 				break;
 			
-			if (theChar == '\n') {
+			if (theChar == B_ENTER) {
 				// found a newline, we're done!
 				done = true;
 				delta++;
@@ -3389,7 +3393,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 			int32 pos = delta - 1;
 			if ((*fText)[offset + pos] != B_SPACE &&
 				(*fText)[offset + pos] != B_TAB &&
-				(*fText)[offset + pos] != '\n')
+				(*fText)[offset + pos] != B_ENTER)
 				break;
 			
 			strWidth -= (deltaWidth + tabWidth);
@@ -3398,7 +3402,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 				uchar theChar = (*fText)[offset + pos];
 				if (theChar != B_SPACE &&
 					theChar != B_TAB &&
-					theChar != '\n')
+					theChar != B_ENTER)
 					break;
 			}
 
@@ -3413,7 +3417,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 						break;
 				}
 				if ( (offset + delta) < limit && 
-					 (*fText)[offset + delta] == '\n' )
+					 (*fText)[offset + delta] == B_ENTER )
 					delta++;
 			}
 			// get the ascent and descent of the spaces/tabs
@@ -3604,7 +3608,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 			length -= line->offset;
 		
 		// DrawString() chokes if you draw a newline
-		if ((*fText)[(line + 1)->offset - 1] == '\n')
+		if ((*fText)[(line + 1)->offset - 1] == B_ENTER)
 			length--;	
 
 		if (fAlignment != B_ALIGN_LEFT) {
@@ -4197,6 +4201,9 @@ BTextView::CharClassification(int32 offset) const
 int32
 BTextView::NextInitialByte(int32 offset) const
 {
+	if (ByteAt(offset) == '\0')
+		return offset;
+
 	for (++offset; (ByteAt(offset) & 0xC0) == 0x80; ++offset)
 		;
 

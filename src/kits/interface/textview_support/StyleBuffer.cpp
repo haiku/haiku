@@ -138,8 +138,7 @@ _BStyleRecordBuffer_::RemoveRecord(int32 index)
 
 
 bool
-_BStyleRecordBuffer_::MatchRecord(const BFont *inFont,
-	const rgb_color *inColor, int32 *outIndex)
+_BStyleRecordBuffer_::MatchRecord(const BFont *inFont, const rgb_color *inColor, int32 *outIndex)
 {
 	for (int32 i = 0; i < fItemCount; i++) {
 		if (*inFont == fBuffer[i].style.font 
@@ -314,13 +313,6 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 		}
 
 		runIndex++;
-		if (offset == runEnd) {
-			// TODO: this hides a bug somewhere else in the code that
-			//	should probably be fixed...
-			// Can't reproduce this anymore...
-			printf("_BStyleBuffer_::SetStyleRange(): offset == runEnd!\n");
-			break;
-		}
 		offset = runEnd;
 	} while (offset < toOffset);
 
