@@ -217,18 +217,22 @@ sub ValidateDocbook {
 
 	open(IN2, $gDocbookpath) || die "Can't open '$gDocbookpath'";
 	my $line = "";
-	my $last = "";
-	my $input = $_;
+	my $last1 = "";
+	my $last2 = "";
+	my $input = $_ ;
+	my $pattern = "<title>" . $_ . "</title>" ;
 	my $found = 0;
 	while (<IN2>) {
 		chomp;
 		s/^[\t ]+//;
-		$line = $last . $_ ;
-		if ( index($line, $input) >= 0 ) {
+		s/[\t ]+$//;
+		$line = $last1 . $last2 . " " . $_ ;
+		if ( index($line, $pattern) >= 0 ) {
 			$found = 1;
 			break;
 		}
-		$last = $_;
+		$last1 = $last2;
+		$last2 = $_;
 	}
 	if ( $found == 0 ) {
 		print $input . "\n" ;
