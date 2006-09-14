@@ -6590,26 +6590,29 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPose
 	newClip.Set(clipRect);
 	view->ConstrainClippingRegion(&newClip);
 
+	memset(bitmap->Bits(), 0, bitmap->BitsLength());
+
+//TODO: what was this supposed to do?
 	// Transparent draw magic
-	view->SetHighColor(0, 0, 0, uint8(fade ? 10 : 0));
-	view->FillRect(view->Bounds());
-	view->Sync();
-
-	if (fade) {
-		// If we fade out any border of the selection, the background
-		// will be slightly darker, and we will also fade out the
-		// edges so that everything looks smooth
-		uint32 *bits = (uint32 *)bitmap->Bits();
-		int32 width = bitmap->BytesPerRow() / 4;
-
-		FadeRGBA32Horizontal(bits, width, int32(rect.bottom),
-			int32(rect.right), int32(rect.right) - 16);
-		FadeRGBA32Horizontal(bits, width, int32(rect.bottom), 0, 16);
-
-		FadeRGBA32Vertical(bits, width, int32(rect.bottom),
-			int32(rect.bottom), int32(rect.bottom) - 16);
-		FadeRGBA32Vertical(bits, width, int32(rect.bottom), 0, 16);
-	}
+//	view->SetHighColor(0, 0, 0, uint8(fade ? 10 : 0));
+//	view->FillRect(view->Bounds());
+//	view->Sync();
+//
+//	if (fade) {
+//		// If we fade out any border of the selection, the background
+//		// will be slightly darker, and we will also fade out the
+//		// edges so that everything looks smooth
+//		uint32 *bits = (uint32 *)bitmap->Bits();
+//		int32 width = bitmap->BytesPerRow() / 4;
+//
+//		FadeRGBA32Horizontal(bits, width, int32(rect.bottom),
+//			int32(rect.right), int32(rect.right) - 16);
+//		FadeRGBA32Horizontal(bits, width, int32(rect.bottom), 0, 16);
+//
+//		FadeRGBA32Vertical(bits, width, int32(rect.bottom),
+//			int32(rect.bottom), int32(rect.bottom) - 16);
+//		FadeRGBA32Vertical(bits, width, int32(rect.bottom), 0, 16);
+//	}
 
 	view->SetDrawingMode(B_OP_ALPHA);
 	view->SetHighColor(0, 0, 0, uint8(fade ? 164 : 128));
