@@ -14,6 +14,7 @@
 #include <PopUpMenu.h>
 #include <Window.h>
 
+#include <new>
 
 struct popup_menu_data {
 	BPopUpMenu *object;
@@ -264,15 +265,18 @@ BMenuItem *
 BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
-	BMenuItem *selected = NULL;
+	popup_menu_data *data = new (nothrow) popup_menu_data;
+	if (!data)
+		return NULL;
 
-	// Can't use Window(), as the BPopUpMenu isn't attached
-	BLooper *looper = BLooper::LooperForThread(find_thread(NULL));
-	BWindow *window = dynamic_cast<BWindow *>(looper);
-
-	popup_menu_data *data = new popup_menu_data;
 	sem_id sem = create_sem(0, "window close lock");
+	if (sem < B_OK) {
+		delete data;
+		return NULL;	
+	}
 
+	// Get a pointer to the window from which Go() was called
+	BWindow *window = dynamic_cast<BWindow *>(BLooper::LooperForThread(find_thread(NULL)));
 	data->window = window;
 
 	// Asynchronous menu: we set the BWindow menu's semaphore
@@ -289,7 +293,7 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	data->async = async;
 	data->where = where;
 	data->startOpened = startOpened;
-	data->selected = selected;
+	data->selected = NULL;
 	data->lock = sem;
 
 	// Spawn the tracking thread
@@ -305,22 +309,22 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 
 	resume_thread(fTrackThread);
 
-	// Synchronous menu: we block on the sem till
-	// the other thread deletes it.
+	BMenuItem *selected = NULL;
 	if (!async) {
-		if (window) {
-			// TODO: usually it's not a good idea to check for a particular error
-			// code. Though here we just want to wait till the semaphore is deleted
-			// (it will return B_BAD_SEM_ID in that case), not provide locking or whatever.
-			while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID) {
+		// Synchronous menu: we update the parent window in a loop,
+		// until the other thread finishes and deletes this semaphore.
+		if (window != NULL) {
+			while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
 				window->UpdateIfNeeded();
-			}
+			
 		}
 
 		status_t unused;
 		while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
 			;
-
+		
+		fTrackThread = -1;
+		
 		selected = data->selected;
 		delete data;
 	}
@@ -359,8 +363,7 @@ BPopUpMenu::entry(void *arg)
 
 
 BMenuItem *
-BPopUpMenu::start_track(BPoint where, bool autoInvoke,
-	bool startOpened, BRect *_specialRect)
+BPopUpMenu::start_track(BPoint where, bool autoInvoke, bool startOpened, BRect *_specialRect)
 {
 	fWhere = where;
 
@@ -382,8 +385,6 @@ BPopUpMenu::start_track(BPoint where, bool autoInvoke,
 
 	Hide();
 	be_app->ShowCursor();
-
-	fTrackThread = -1;
 
 	return result;
 }
