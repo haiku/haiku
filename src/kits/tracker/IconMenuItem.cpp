@@ -120,8 +120,17 @@ ModelMenuItem::Highlight(bool hilited)
 static void
 DimmedIconBlitter(BView *view, BPoint where, BBitmap *bitmap, void *)
 {
-	view->SetDrawingMode(B_OP_BLEND);
-	view->DrawBitmap(bitmap, where);
+	if (bitmap->ColorSpace() == B_RGBA32) {
+		rgb_color oldHighColor = view->HighColor();
+		view->SetHighColor(0, 0, 0, 128);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		view->DrawBitmap(bitmap, where);
+		view->SetHighColor(oldHighColor);
+	} else {
+		view->SetDrawingMode(B_OP_BLEND);
+		view->DrawBitmap(bitmap, where);
+	}
 	view->SetDrawingMode(B_OP_OVER);
 }
 
