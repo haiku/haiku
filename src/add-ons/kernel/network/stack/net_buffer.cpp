@@ -55,7 +55,8 @@ struct net_buffer_private : net_buffer {
 
 
 static status_t append_data(net_buffer *buffer, const void *data, size_t size);
-
+static status_t trim_data(net_buffer *_buffer, size_t newSize);
+static status_t remove_header(net_buffer *_buffer, size_t bytes);
 
 static data_header *
 create_data_header(size_t size, size_t headerSpace)
@@ -340,6 +341,29 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 	clone->protocol = buffer->protocol;
 
 	return clone;
+}
+
+
+/*!
+	Split the buffer at offset, the trailer data
+	is returned as new buffer.
+	TODO: optimize and avoid making a copy.
+*/
+static net_buffer *
+split_buffer(net_buffer *from, uint32 offset)
+{
+	status_t err;
+	net_buffer *buf = duplicate_buffer(from);
+	if (buf == NULL)
+		return NULL;
+	if ((err = remove_header(buf, offset)) < B_OK)
+		goto fail;
+	if ((err = trim_data(from, from->size - offset)) < B_OK)
+		goto fail;
+	return buf;
+fail:
+	free_buffer(buf);
+	return NULL;
 }
 
 
@@ -872,7 +896,7 @@ net_buffer_module_info gNetBufferModule = {
 
 	duplicate_buffer,
 	clone_buffer,
-	NULL,	// split
+	split_buffer,
 	merge_buffer,
 
 	prepend_size,
