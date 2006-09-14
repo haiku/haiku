@@ -428,101 +428,101 @@ SliderOffscreenView::~SliderOffscreenView()
 void
 SliderOffscreenView::DrawX()
 {
-	SetHighColor(216,216,216);
+	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	FillRect(Bounds());
 	
-	SetHighColor(189,186,189);
-	StrokeLine(BPoint(11,SLIDER_BASE+1), BPoint(fRight,SLIDER_BASE+1));
-	SetHighColor(0,0,0);
-	StrokeLine(BPoint(11,SLIDER_BASE+2), BPoint(fRight,SLIDER_BASE+2));
-	SetHighColor(255,255,255);
-	StrokeLine(BPoint(11,SLIDER_BASE+17), BPoint(fRight,SLIDER_BASE+17));
-	SetHighColor(231,227,231);
-	StrokeLine(BPoint(11,SLIDER_BASE+18), BPoint(fRight,SLIDER_BASE+18));
+	SetHighColor(189, 186, 189);
+	StrokeLine(BPoint(11, SLIDER_BASE + 1), BPoint(fRight, SLIDER_BASE + 1));
+	SetHighColor(0, 0, 0);
+	StrokeLine(BPoint(11, SLIDER_BASE + 2), BPoint(fRight, SLIDER_BASE + 2));
+	SetHighColor(255, 255, 255);
+	StrokeLine(BPoint(11, SLIDER_BASE + 17), BPoint(fRight, SLIDER_BASE + 17));
+	SetHighColor(231, 227, 231);
+	StrokeLine(BPoint(11, SLIDER_BASE + 18), BPoint(fRight, SLIDER_BASE + 18));
 	
 	SetDrawingMode(B_OP_OVER);
 	SetLowColor(HighColor());
 
-	BPoint leftPoint(5,SLIDER_BASE+1);
-	DrawBitmapAsync(&leftBitmap, BRect(BPoint(0,0), kLeftRightTrackSliderSize - BPoint(5,0)),
-		BRect(leftPoint, leftPoint+kLeftRightTrackSliderSize-BPoint(5,0)));
-	BPoint rightPoint(fRight + 1,SLIDER_BASE+1);
-	DrawBitmapAsync(&rightBitmap, BRect(BPoint(5,0), kLeftRightTrackSliderSize), 
-		BRect(rightPoint, rightPoint+kLeftRightTrackSliderSize-BPoint(5,0)));
+	BPoint leftPoint(5, SLIDER_BASE + 1);
+	DrawBitmapAsync(&leftBitmap, BRect(BPoint(0, 0), kLeftRightTrackSliderSize - BPoint(5, 0)),
+		BRect(leftPoint, leftPoint + kLeftRightTrackSliderSize - BPoint(5, 0)));
+	BPoint rightPoint(fRight + 1, SLIDER_BASE + 1);
+	DrawBitmapAsync(&rightBitmap, BRect(BPoint(5, 0), kLeftRightTrackSliderSize), 
+		BRect(rightPoint, rightPoint + kLeftRightTrackSliderSize-BPoint(5, 0)));
 		
-	SetHighColor(153,153,153);
-	FillRect(BRect(11,SLIDER_BASE+3,fLeftX-9,SLIDER_BASE+16));
-	FillRect(BRect(fRightX+9,SLIDER_BASE+3,fRight,SLIDER_BASE+16));
-	if (fLeftX>19) {
-		StrokeLine(BPoint(fLeftX-9,SLIDER_BASE+3),BPoint(fLeftX-6,SLIDER_BASE+3));
-		StrokeLine(BPoint(fLeftX-9,SLIDER_BASE+4),BPoint(fLeftX-7,SLIDER_BASE+4));
-		StrokeLine(BPoint(fLeftX-9,SLIDER_BASE+5),BPoint(fLeftX-8,SLIDER_BASE+5));
-		StrokeLine(BPoint(fLeftX-9,SLIDER_BASE+16),BPoint(fLeftX-6,SLIDER_BASE+16));
-		StrokeLine(BPoint(fLeftX-9,SLIDER_BASE+15),BPoint(fLeftX-7,SLIDER_BASE+15));
-		StrokeLine(BPoint(fLeftX-9,SLIDER_BASE+14),BPoint(fLeftX-8,SLIDER_BASE+14));
+	SetHighColor(153, 153, 153);
+	FillRect(BRect(11, SLIDER_BASE + 3, fLeftX - 9, SLIDER_BASE + 16));
+	FillRect(BRect(fRightX + 9, SLIDER_BASE + 3, fRight, SLIDER_BASE + 16));
+	if (fLeftX > 19) {
+		StrokeLine(BPoint(fLeftX - 9, SLIDER_BASE + 3), BPoint(fLeftX - 6, SLIDER_BASE + 3));
+		StrokeLine(BPoint(fLeftX - 9, SLIDER_BASE + 4), BPoint(fLeftX - 7, SLIDER_BASE + 4));
+		StrokeLine(BPoint(fLeftX - 9, SLIDER_BASE + 5), BPoint(fLeftX - 8, SLIDER_BASE + 5));
+		StrokeLine(BPoint(fLeftX - 9, SLIDER_BASE + 16), BPoint(fLeftX - 6, SLIDER_BASE + 16));
+		StrokeLine(BPoint(fLeftX - 9, SLIDER_BASE + 15), BPoint(fLeftX - 7, SLIDER_BASE + 15));
+		StrokeLine(BPoint(fLeftX - 9, SLIDER_BASE + 14), BPoint(fLeftX - 8, SLIDER_BASE + 14));
 	}
 	if (fRightX < fRight - 5) {
-		StrokeLine(BPoint(fRightX+5,SLIDER_BASE+3),BPoint(fRightX+8,SLIDER_BASE+3));
-		StrokeLine(BPoint(fRightX+7,SLIDER_BASE+4),BPoint(fRightX+8,SLIDER_BASE+4));
-		StrokeLine(BPoint(fRightX+8,SLIDER_BASE+5),BPoint(fRightX+8,SLIDER_BASE+6));
-		StrokeLine(BPoint(fRightX+8,SLIDER_BASE+13),BPoint(fRightX+8,SLIDER_BASE+14));
-		StrokeLine(BPoint(fRightX+5,SLIDER_BASE+16),BPoint(fRightX+8,SLIDER_BASE+16));
-		StrokeLine(BPoint(fRightX+7,SLIDER_BASE+15),BPoint(fRightX+8,SLIDER_BASE+15));
+		StrokeLine(BPoint(fRightX + 5, SLIDER_BASE + 3), BPoint(fRightX + 8, SLIDER_BASE + 3));
+		StrokeLine(BPoint(fRightX + 7, SLIDER_BASE + 4), BPoint(fRightX + 8, SLIDER_BASE + 4));
+		StrokeLine(BPoint(fRightX + 8, SLIDER_BASE + 5), BPoint(fRightX + 8, SLIDER_BASE + 6));
+		StrokeLine(BPoint(fRightX + 8, SLIDER_BASE + 13), BPoint(fRightX + 8, SLIDER_BASE + 14));
+		StrokeLine(BPoint(fRightX + 5, SLIDER_BASE + 16), BPoint(fRightX + 8, SLIDER_BASE + 16));
+		StrokeLine(BPoint(fRightX + 7, SLIDER_BASE + 15), BPoint(fRightX + 8, SLIDER_BASE + 15));
 	}
-	SetHighColor(144,186,136);
-	FillRect(BRect(fLeftX+1,SLIDER_BASE+3,fRightX,SLIDER_BASE+4));
-	FillRect(BRect(fLeftX+1,SLIDER_BASE+5,fLeftX+2,SLIDER_BASE+16));
-	SetHighColor(171,221,161);
-	FillRect(BRect(fLeftX+3,SLIDER_BASE+5,fRightX,SLIDER_BASE+16));
+	SetHighColor(144, 186, 136);
+	FillRect(BRect(fLeftX + 1, SLIDER_BASE + 3, fRightX, SLIDER_BASE + 4));
+	FillRect(BRect(fLeftX + 1, SLIDER_BASE + 5, fLeftX + 2, SLIDER_BASE + 16));
+	SetHighColor(171, 221, 161);
+	FillRect(BRect(fLeftX + 3, SLIDER_BASE + 5, fRightX, SLIDER_BASE + 16));
 	
 	int i = 17;
 	int j = 18;
-	SetHighColor(128,128,128);
-	for (; i<fLeftX-9; i+=6) {
-		StrokeLine(BPoint(i,SLIDER_BASE+7), BPoint(i,SLIDER_BASE+13));
+	SetHighColor(128, 128, 128);
+	for (; i < fLeftX - 9; i += 6) {
+		StrokeLine(BPoint(i, SLIDER_BASE + 7), BPoint(i, SLIDER_BASE + 13));
 	}
-	SetHighColor(179,179,179);
-	for (; j<fLeftX-9; j+=6) {
-		StrokeLine(BPoint(j,SLIDER_BASE+7), BPoint(j,SLIDER_BASE+13));
+	SetHighColor(179, 179, 179);
+	for (; j < fLeftX - 9; j += 6) {
+		StrokeLine(BPoint(j, SLIDER_BASE + 7), BPoint(j, SLIDER_BASE + 13));
 	}
 	
-	while (i<=fLeftX)
-		i+=6;
-	while (j<=fLeftX)
-		j+=6;
+	while (i <= fLeftX)
+		i += 6;
+	while (j <= fLeftX)
+		j += 6;
 	
-	SetHighColor(144,186,136);
-	for (; i<=fRightX; i+=6) {
-		StrokeLine(BPoint(i,SLIDER_BASE+7), BPoint(i,SLIDER_BASE+13));
+	SetHighColor(144, 186, 136);
+	for (; i <= fRightX; i += 6) {
+		StrokeLine(BPoint(i, SLIDER_BASE + 7), BPoint(i, SLIDER_BASE + 13));
 	}		
-	SetHighColor(189,244,178);
-	for (; j<=fRightX; j+=6) {
-		StrokeLine(BPoint(j,SLIDER_BASE+7), BPoint(j,SLIDER_BASE+13));
+	SetHighColor(189, 244, 178);
+	for (; j <= fRightX; j += 6) {
+		StrokeLine(BPoint(j, SLIDER_BASE + 7), BPoint(j, SLIDER_BASE + 13));
 	}
 	
-	while (i<=fRightX+9)
-		i+=6;
-	while (j<=fRightX+9)
-		j+=6;
+	while (i <= fRightX + 9)
+		i += 6;
+	while (j <= fRightX + 9)
+		j += 6;
 	
-	SetHighColor(128,128,128);
-	for (; i<=fRight + 1; i+=6) {
-		StrokeLine(BPoint(i,SLIDER_BASE+7), BPoint(i,SLIDER_BASE+13));
+	SetHighColor(128, 128, 128);
+	for (; i <= fRight + 1; i += 6) {
+		StrokeLine(BPoint(i, SLIDER_BASE + 7), BPoint(i, SLIDER_BASE + 13));
 	}
-	SetHighColor(179,179,179);
-	for (; j<=fRight + 1; j+=6) {
-		StrokeLine(BPoint(j,SLIDER_BASE+7), BPoint(j,SLIDER_BASE+13));
+	SetHighColor(179, 179, 179);
+	for (; j <= fRight + 1; j += 6) {
+		StrokeLine(BPoint(j, SLIDER_BASE + 7), BPoint(j, SLIDER_BASE + 13));
 	}
 	
 	SetLowColor(HighColor());
 	
-	BPoint leftThumbPoint(fLeftX-8,SLIDER_BASE+3);
-	DrawBitmapAsync(&leftThumbBitmap, BRect(BPoint(0,0), kLeftRightThumbSize - BPoint(7,0)),
-		BRect(leftThumbPoint, leftThumbPoint+kLeftRightThumbSize-BPoint(7,0)));
+	BPoint leftThumbPoint(fLeftX - 8, SLIDER_BASE + 3);
+	DrawBitmapAsync(&leftThumbBitmap, BRect(BPoint(0, 0), kLeftRightThumbSize - BPoint(7, 0)),
+		BRect(leftThumbPoint, leftThumbPoint + kLeftRightThumbSize - BPoint(7, 0)));
 	
-	BPoint rightThumbPoint(fRightX,SLIDER_BASE+3);
-	DrawBitmapAsync(&rightThumbBitmap, BRect(BPoint(6,0), kLeftRightThumbSize), 
-		BRect(rightThumbPoint, rightThumbPoint+kLeftRightThumbSize-BPoint(6,0)));
+	BPoint rightThumbPoint(fRightX, SLIDER_BASE + 3);
+	DrawBitmapAsync(&rightThumbBitmap, BRect(BPoint(6, 0), kLeftRightThumbSize), 
+		BRect(rightThumbPoint, rightThumbPoint + kLeftRightThumbSize-BPoint(6, 0)));
 	
 	Sync();
 }
