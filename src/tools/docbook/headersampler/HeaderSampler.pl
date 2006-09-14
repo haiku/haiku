@@ -78,7 +78,7 @@ sub HandleTextline {
 	SWITCH: {
 
 		# skip 'typedef' or 'struct' region.
-		(/^typedef/ || /^struct/) && do {
+		(/^typedef/ || /^struct/ || /^namespace/) && do {
 			$gIsIgnoring = 1;
 			last SWITCH;
 			};
@@ -99,6 +99,14 @@ sub HandleTextline {
 
 		# skip this line if it ends with "}???;".
 		/\}.*;$/ && do {
+			$gSentence = "";
+			@gComment = ();
+			$gIsIgnoring = 0;
+			last SWITCH;
+			};
+
+		# skip this line if it ends with "}???". for namespace
+		/\}$/ && do {
 			$gSentence = "";
 			@gComment = ();
 			$gIsIgnoring = 0;
