@@ -76,7 +76,10 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
 	if (_p.data8[3] == 255) { \
-		BLEND(d, r, g, b, a); \
+		d[0] = (((((b) - _p.data8[0]) * (a)) + (_p.data8[0] << 8)) >> 8); \
+		d[1] = (((((g) - _p.data8[1]) * (a)) + (_p.data8[1] << 8)) >> 8); \
+		d[2] = (((((r) - _p.data8[2]) * (a)) + (_p.data8[2] << 8)) >> 8); \
+		d[3] = 255; \
 	} else { \
 		if (_p.data8[3] == 0) { \
 			d[0] = (b); \
@@ -91,7 +94,7 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 			d[0] = (_p.data8[0] * alphaDest + (b) * alphaSrc) / alphaTemp; \
 			d[1] = (_p.data8[1] * alphaDest + (g) * alphaSrc) / alphaTemp; \
 			d[2] = (_p.data8[2] * alphaDest + (r) * alphaSrc) / alphaTemp; \
-			d[3] = alphaTemp >> 8; \
+			d[3] = alphaTemp / 255; \
 		} \
 	} \
 }
@@ -103,7 +106,8 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 // TODO: implement a faster version
 #define BLEND_COMPOSITE16(d, r, g, b, a) \
 { \
-	BLEND_COMPOSITE(d, r, g, b, (a) >> 8); \
+	uint16 _a = (a) / 255; \
+	BLEND_COMPOSITE(d, r, g, b, _a); \
 }
 
 
