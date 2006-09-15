@@ -80,6 +80,7 @@ sub HandleTextline {
 		# skip 'typedef' or 'struct' region.
 		(/^typedef/ || /^struct/ || /^namespace/) && do {
 			$gIsIgnoring = 1;
+			if ( /^namespace.*}$/ ) { $gIsIgnoring = 0; }
 			last SWITCH;
 			};
 
@@ -193,24 +194,58 @@ sub PrintFunction {
 	$funcname = pop();
 	$functype = join(' ', @_);
 
+	if ( $funcname =~ /^\*/ ) {
+		$funcname = $';
+		$functype = $functype . " *";
+	}
+
 # handle func arg list.
-#	split(/[ ]*,[ ]*/, $funcargs);
-#	my @args = @_;
-#		for (@args) {
-#			if ( /[ ]*=[ ]*/ ) { $_ = $`; }		# for default value; ex. (short X = 100)
-#			split(/[ ]+/);
-#			pop();
-#			$_ = join(' ',@_);
-#		}
-#	$funcargs = join(', ', @args);
+	split(/[ ]*,[ ]*/, $funcargs);
+	my @args = @_;
+		for (@args) {
+			$paramconst = "";
+			if ( /const*/ ) { $paramconst = "<modifier>const</modifier>"; }
+			if ( /[ ]*=[ ]*/ ) { $_ = $`; }		# for default value; ex. (short X = 100)
+			split(/[ ]+/);
+			$paramname = pop();
+			$paramtype = pop();
+			if ( $paramname =~ /^\*/ ) {
+				$paramname = $';
+				$paramtype = $paramtype . " *";
+			}
+			$_ = "<type>" . $paramconst . $paramtype . "</type> <parameter>" . $paramname . "</parameter>"
+		}
+	$funcargs = join('</methodparam><methodparam>', @args);
 
 	if ($functype) {
-		$functype = $functype . " "
+		$_ = $functype;
+		$funcmod = "";
+		if ( s/^virtual[ ]*// ) { 
+			$funcmod .= "virtual" 
+		}
+		if ( s/^static[ ]*// ) { 
+			if ( $funcmod =~ /^$/ ) { 
+				$funcmode .= " "; 
+			}
+			$funcmode .= "static" 
+		}
+		if ( /^void/ ) {
+			$functype = $funcmode . "<void/>"
+		} else {
+			$typeconst = "";
+			if ( /^const / ) { $typeconst = "<modifier>const</modifier>"; $_ = $'; }
+			$functype = $funcmode . "<type>" . $typeconst . $_ . "</type>"
+		}
 	}
 	if ($funcconst) {
-		$funcconst = " " . $funcconst
+		$funcconst = " " . "<modifier>" . $funcconst . "</modifier>"
 	}
-	$_ = $functype . $funcname . "(" . $funcargs . ")" . $funcconst;
+	if ($funcargs) {
+		$funcargs = "<methodparam>" . $funcargs . "</methodparam>"
+	} else {
+		$funcargs = "<void/>"
+	}
+	$_ = $functype . " <methodname>" . $funcname . "</methodname> " . $funcargs . $funcconst;
 	ValidateDocbook();
 #	print "FUNC = TYPE($funcname)+NAME($funcname)+ARGS($funcargs)\n";
 #		print $funcname . "\t" x CalcTabs($funcname,5) . $functype . "(" . $funcargs . ")";
@@ -224,26 +259,39 @@ sub PrintFunction {
 sub ValidateDocbook {
 
 	open(IN2, $gDocbookpath) || die "Can't open '$gDocbookpath'";
+
+	# we drop every space for the moment
+	s/[\t ]//g;
+
 	my $line = "";
-	my $last1 = "";
-	my $last2 = "";
-	my $input = $_ ;
-	my $pattern = "<title>" . $_ . "</title>" ;
+	my $pattern = $_;
 	my $found = 0;
+	my $ignoring = 1;
+
 	while (<IN2>) {
 		chomp;
 		s/^[\t ]+//;
 		s/[\t ]+$//;
-		$line = $last1 . $last2 . " " . $_ ;
-		if ( index($line, $pattern) >= 0 ) {
-			$found = 1;
-			break;
+		s/[\t ]//g;
+		if ($ignoring) {
+			if ( m/<methodsynopsis>/ ) {
+				$line = $';
+				$ignoring = 0;
+			}
+		} else {
+			$line .= $_;
+			if ( index($line, $pattern) >= 0 ) {
+				$found = 1;
+				break;
+			}
+			if ( $line =~ /<\/methodsynopsis>/ ) {
+				$line = "";
+				$ignoring = 1;
+			}
 		}
-		$last1 = $last2;
-		$last2 = $_;
 	}
 	if ( $found == 0 ) {
-		print $input . "\n" ;
+		print $pattern . "\n" ;
 	}
 	close IN2;
 }

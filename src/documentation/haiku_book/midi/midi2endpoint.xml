@@ -31,8 +31,8 @@
 		<title>Name()</title>
 		
 		<methodsynopsis>
-			<type>const char *</type>
-			<methodname>Name</methodname>
+			<type><modifier>const</modifier> char *</type>
+			<methodname>Name</methodname><void/>
 			<modifier>const</modifier>
 		</methodsynopsis>
 		
@@ -56,7 +56,7 @@
 		
 		<methodsynopsis>
 			<void/> <methodname>SetName</methodname>
-			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter></methodparam>
+			<methodparam><type><modifier>const</modifier>char *</type><parameter>name</parameter></methodparam>
 		</methodsynopsis>
 		
 		<para>
@@ -89,7 +89,7 @@
 		<title>ID()</title>
 		
 		<methodsynopsis>
-			<type>int32</type> <methodname>Name</methodname> <void/> <modifier>const</modifier>
+			<type>int32</type> <methodname>ID</methodname> <void/> <modifier>const</modifier>
 		</methodsynopsis>
 		
 		<para>
@@ -390,7 +390,7 @@ if (endp->IsConsumer())
 		
 		<methodsynopsis>
 			<type>status_t</type> <methodname>SetProperties</methodname>
-			<methodparam><modifier>const</modifier><type>BMessage *</type><parameter>properties</parameter></methodparam>
+			<methodparam><type><modifier>const</modifier>BMessage *</type><parameter>properties</parameter></methodparam>
 		</methodsynopsis>
 		
 		<para>
