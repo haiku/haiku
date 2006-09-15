@@ -40,7 +40,8 @@
 	</para>
 	
 	<sect3 id="bmidiroster_nextendpoint">
-		<title>static BMidiEndpoint *NextEndpoint(int32 *id)</title>
+		<title>NextEndpoint()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiEndpoint *</type><methodname>NextEndpoint</methodname><methodparam><type>int32 *</type><parameter>id</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Returns the next endpoint from the roster
@@ -78,7 +79,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_nextproducer">
-		<title>static BMidiProducer *NextProducer(int32 *id)</title>
+		<title>NextProducer()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiProducer *</type><methodname>NextProducer</methodname><methodparam><type>int32 *</type><parameter>id</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Returns the next producer from the roster
@@ -95,7 +97,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_nextconsumer">
-		<title>static BMidiConsumer *NextConsumer(int32 *id)</title>
+		<title>NextConsumer()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiConsumer *</type><methodname>NextConsumer</methodname><methodparam><type>int32 *</type><parameter>id</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Returns the next consumer from the roster
@@ -112,8 +115,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_findendpoint">
-		<title>static BMidiEndpoint *FindEndpoint(
-			int32 id, bool localOnly = false)</title>
+		<title>FindEndpoint()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiEndpoint *</type><methodname>FindEndpoint</methodname><methodparam><type>int32</type><parameter>id</parameter></methodparam><methodparam><type>bool</type><parameter>localOnly</parameter><initializer>false</initializer></methodparam></methodsynopsis>
 		
 		<para>
 			Returns the endpoint with the specified ID
@@ -163,8 +166,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_findproducer">
-		<title>static BMidiProducer *FindProducer(
-			int32 id, bool localOnly = false)</title>
+		<title>FindProducer()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiProducer *</type><methodname>FindProducer</methodname><methodparam><type>int32</type><parameter>id</parameter></methodparam><methodparam><type>bool</type><parameter>localOnly</parameter><initializer>false</initializer></methodparam></methodsynopsis>
 		
 		<para>
 			Finds the producer with the specified ID
@@ -182,8 +185,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_findconsumer">
-		<title>static BMidiConsumer *FindConsumer(
-			int32 id, bool localOnly = false)</title>
+		<title>FindConsumer()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiConsumer *</type><methodname>FindConsumer</methodname><methodparam><type>int32</type><parameter>id</parameter></methodparam><methodparam><type>bool</type><parameter>localOnly</parameter><initializer>false</initializer></methodparam></methodsynopsis>
 		
 		<para>
 			Finds the consumer with the specified ID
@@ -201,7 +204,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_startwatching">
-		<title>static void StartWatching(const BMessenger *msngr)</title>
+		<title>StartWatching()</title>
+		<methodsynopsis><modifier>static</modifier><void/><methodname>StartWatching</methodname><methodparam><modifier>const</modifier><type>BMessenger *</type><parameter>msngr</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Start receiving notifications from the Midi Roster
@@ -488,7 +492,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_stopwatching">
-		<title>static void StopWatching()</title>
+		<title>StopWatching()</title>
+		<methodsynopsis><modifier>static</modifier><void/><methodname>StopWatching</methodname><void/></methodsynopsis>
 		
 		<para>
 			Stop receiving notifications from the Midi Roster
@@ -500,7 +505,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_register">
-		<title>static status_t Register(BMidiEndpoint *endp)</title>
+		<title>Register()</title>
+		<methodsynopsis><modifier>static</modifier><type>status_t</type><methodname>Register</methodname><methodparam><type>BMidiEndpoint *</type><parameter>endp</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Publishes an endpoint to other applications
@@ -513,7 +519,8 @@
 	</sect3>
 					
 	<sect3 id="bmidiroster_unregister">
-		<title>static status_t Unregister(BMidiEndpoint *endp)</title>
+		<title>Unregister()</title>
+		<methodsynopsis><modifier>static</modifier><type>status_t</type><methodname>Unregister</methodname><methodparam><type>BMidiEndpoint *</type><parameter>endp</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Hides an endpoint from other applications
@@ -526,7 +533,8 @@
 	</sect3>
 	
 	<sect3 id="bmidiroster_midiroster">
-		<title>static BMidiRoster *MidiRoster()</title>
+		<title>MidiRoster()</title>
+		<methodsynopsis><modifier>static</modifier><type>BMidiRoster *</type><methodname>MidiRoster</methodname><void/></methodsynopsis>
 		
 		<para>
 			Returns a pointer to the only instance of BMidiRoster
