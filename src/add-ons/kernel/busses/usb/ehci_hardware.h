@@ -126,6 +126,7 @@ typedef struct {
 	addr_t		alt_next_phy;
 	uint32		token;
 	addr_t		buffer_phy[5];
+	addr_t		ext_buffer_phy[5];
 
 	// Software Part
 	addr_t		this_phy;
@@ -152,6 +153,7 @@ typedef struct {
 #define EHCI_QTD_PID_SETUP		0x02
 #define EHCI_QTD_STATUS_SHIFT	0
 #define EHCI_QTD_STATUS_MASK	0x7f
+#define EHCI_QTD_STATUS_ERRMASK	0x78
 #define EHCI_QTD_STATUS_ACTIVE	(1 << 7)	// Active
 #define EHCI_QTD_STATUS_HALTED	(1 << 6)	// Halted
 #define EHCI_QTD_STATUS_BUFFER	(1 << 5)	// Data Buffer Error
@@ -176,6 +178,7 @@ typedef struct {
 		addr_t		alt_next_phy;
 		uint32		token;
 		addr_t		buffer_phy[5];
+		addr_t		ext_buffer_phy[5];
 	} overlay;
 
 	// Software Part

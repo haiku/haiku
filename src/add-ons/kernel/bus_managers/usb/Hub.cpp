@@ -155,7 +155,11 @@ Hub::Explore()
 		if (result < B_OK)
 			continue;
 
-		TRACE(("USB Hub (%d): port %d: status: 0x%04x; change: 0x%04x\n", DeviceAddress(), i, fPortStatus[i].status, fPortStatus[i].change));
+#ifdef TRACE_USB
+		if (fPortStatus[i].change)
+			TRACE(("USB Hub: port %d: status: 0x%04x; change: 0x%04x\n", i, fPortStatus[i].status, fPortStatus[i].change));
+#endif
+
 		if (fPortStatus[i].change & PORT_STATUS_CONNECTION) {
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
 				// new device attached!

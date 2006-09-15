@@ -60,7 +60,7 @@ void
 print_descriptor_chain(ehci_qtd *descriptor)
 {
 	while (descriptor) {
-		dprintf(" %08x n%08x a%08x t%08x %08x %08x %08x %08x %08x s%d\n",
+		dprintf(" %08lx n%08lx a%08lx t%08lx %08lx %08lx %08lx %08lx %08lx s%ld\n",
 			descriptor->this_phy, descriptor->next_phy,
 			descriptor->alt_next_phy, descriptor->token,
 			descriptor->buffer_phy[0], descriptor->buffer_phy[1],
@@ -77,10 +77,10 @@ print_descriptor_chain(ehci_qtd *descriptor)
 void
 print_queue(ehci_qh *queueHead)
 {
-	dprintf("queue:    t%08x n%08x ch%08x ca%08x cu%08x\n",
+	dprintf("queue:    t%08lx n%08lx ch%08lx ca%08lx cu%08lx\n",
 		queueHead->this_phy, queueHead->next_phy, queueHead->endpoint_chars,
 		queueHead->endpoint_caps, queueHead->current_qtd_phy);
-	dprintf("overlay:  n%08x a%08x t%08x %08x %08x %08x %08x %08x\n",
+	dprintf("overlay:  n%08lx a%08lx t%08lx %08lx %08lx %08lx %08lx %08lx\n",
 		queueHead->overlay.next_phy, queueHead->overlay.alt_next_phy,
 		queueHead->overlay.token, queueHead->overlay.buffer_phy[0],
 		queueHead->overlay.buffer_phy[1], queueHead->overlay.buffer_phy[2],
@@ -136,7 +136,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0] + offset
 		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE(("usb_ehci: map physical memory 0x%08x (base: 0x%08x; offset: %x); size: %d -> %d\n", fPCIInfo->u.h0.base_registers[0], physicalAddress, offset, fPCIInfo->u.h0.base_register_sizes[0], mapSize));
+	TRACE(("usb_ehci: map physical memory 0x%08lx (base: 0x%08lx; offset: %lx); size: %ld\n", fPCIInfo->u.h0.base_registers[0], physicalAddress, offset, fPCIInfo->u.h0.base_register_sizes[0]));
 	fRegisterArea = map_physical_memory("EHCI memory mapped registers",
 		(void *)physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
@@ -148,8 +148,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	fCapabilityRegisters += offset;
 	fOperationalRegisters = fCapabilityRegisters + ReadCapReg8(EHCI_CAPLENGTH);
-	TRACE(("usb_ehci: mapped capability registers: 0x%08x\n", fCapabilityRegisters));
-	TRACE(("usb_ehci: mapped operational registers: 0x%08x\n", fOperationalRegisters));
+	TRACE(("usb_ehci: mapped capability registers: 0x%08lx\n", (uint32)fCapabilityRegisters));
+	TRACE(("usb_ehci: mapped operational registers: 0x%08lx\n", (uint32)fOperationalRegisters));
+
+	TRACE(("usb_ehci: structural parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCSPARAMS)));
+	TRACE(("usb_ehci: capability parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCCPARAMS)));
 
 	// read port count from capability register
 	fPortCount = ReadCapReg32(EHCI_HCSPARAMS) & 0x0f;
@@ -157,7 +160,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	uint32 extendedCapPointer = ReadCapReg32(EHCI_HCCPARAMS) >> EHCI_ECP_SHIFT;
 	extendedCapPointer &= EHCI_ECP_MASK;
 	if (extendedCapPointer > 0) {
-		TRACE(("usb_ehci: extended capabilities register at %d\n", extendedCapPointer));
+		TRACE(("usb_ehci: extended capabilities register at %ld\n", extendedCapPointer));
 
 		uint32 legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
@@ -215,7 +218,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		InterruptHandler, (void *)this, 0);
 	WriteOpReg(EHCI_USBINTR, EHCI_USBINTR_HOSTSYSERR
-		| EHCI_USBINTR_USBERRINT | EHCI_USBINTR_USBINT);
+		| EHCI_USBINTR_USBERRINT | EHCI_USBINTR_USBINT | EHCI_USBINTR_INTONAA);
 
 	// allocate the periodic frame list
 	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
@@ -248,6 +251,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	WriteOpReg(EHCI_ASYNCLISTADDR, (uint32)fAsyncQueueHead->this_phy
 		| EHCI_QH_TYPE_QH);
+	TRACE(("usb_ehci: set the async list addr to 0x%08lx\n", ReadOpReg(EHCI_ASYNCLISTADDR)));
 
 	fInitOK = true;
 	TRACE(("usb_ehci: EHCI Host Controller Driver constructed\n"));
@@ -277,7 +281,7 @@ status_t
 EHCI::Start()
 {
 	TRACE(("usb_ehci: starting EHCI Host Controller\n"));
-	TRACE(("usb_ehci: usbcmd: 0x%08x; usbsts: 0x%08x\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS)));
+	TRACE(("usb_ehci: usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS)));
 
 	uint32 frameListSize = (ReadOpReg(EHCI_USBCMD) >> EHCI_USBCMD_FLS_SHIFT)
 		& EHCI_USBCMD_FLS_MASK;
@@ -292,7 +296,7 @@ EHCI::Start()
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint32 status = ReadOpReg(EHCI_USBSTS);
-		TRACE(("usb_ehci: try %ld: status 0x%08x\n", i, status));
+		TRACE(("usb_ehci: try %ld: status 0x%08lx\n", i, status));
 
 		if (status & EHCI_USBSTS_HCHALTED) {
 			snooze(10000);
@@ -377,14 +381,15 @@ EHCI::SubmitAsyncTransfer(Transfer *transfer)
 	}
 
 	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE) {
-		queueHead->endpoint_chars |= EHCI_QH_CHARS_TOGGLE
-			| (pipe->Speed() != USB_SPEED_HIGHSPEED ? EHCI_QH_CHARS_CONTROL : 0);
+		queueHead->endpoint_chars |=
+			(pipe->Speed() != USB_SPEED_HIGHSPEED ? EHCI_QH_CHARS_CONTROL : 0);
 	}
 
 	queueHead->endpoint_chars |= (3 << EHCI_QH_CHARS_RL_SHIFT)
 		| (pipe->MaxPacketSize() << EHCI_QH_CHARS_MPL_SHIFT)
 		| (pipe->EndpointAddress() << EHCI_QH_CHARS_EPT_SHIFT)
-		| (pipe->DeviceAddress() << EHCI_QH_CHARS_DEV_SHIFT);
+		| (pipe->DeviceAddress() << EHCI_QH_CHARS_DEV_SHIFT)
+		| EHCI_QH_CHARS_TOGGLE;
 	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT)
 		| (0x1c << EHCI_QH_CAPS_SCM_SHIFT);
 
@@ -750,15 +755,12 @@ EHCI::Interrupt()
 	if (status & EHCI_USBSTS_INTONAA) {
 		TRACE(("usb_ehci: interrupt on async advance\n"));
 		acknowledge |= EHCI_USBSTS_INTONAA;
+		fAsyncAdvance = true;
 	}
 
 	if (status & EHCI_USBSTS_HOSTSYSERR) {
 		TRACE_ERROR(("usb_ehci: host system error!\n"));
 		acknowledge |= EHCI_USBSTS_HOSTSYSERR;
-		print_queue(fAsyncQueueHead);
-		if (fAsyncQueueHead->next_log) {
-			print_queue((ehci_qh *)fAsyncQueueHead->next_log);
-		}
 	}
 
 	if (acknowledge)
@@ -884,10 +886,73 @@ EHCI::FinishTransfers()
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
 
+		ehci_qh *freeListHead = NULL;
 		while (transfer) {
 			bool transferDone = false;
+			ehci_qtd *descriptor = (ehci_qtd *)transfer->queue_head->element_log;
 
-			// ToDo...
+#ifdef TRACE_USB
+			print_queue(transfer->queue_head);
+#endif
+
+			while (descriptor) {
+				uint32 status = descriptor->token;
+				if (status & EHCI_QTD_STATUS_ACTIVE) {
+					// still in progress
+					TRACE(("usb_ehci: qtd (0x%08lx) still active\n", descriptor->this_phy));
+					break;
+				}
+
+				if (status & EHCI_QTD_STATUS_ERRMASK) {
+					// a transfer error occured
+					TRACE_ERROR(("usb_ehci: qtd (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status));
+
+					uint32 callbackStatus = 0;
+					if (status & EHCI_QTD_STATUS_HALTED)
+						callbackStatus |= B_USB_STATUS_DEVICE_STALLED;
+					if (status & EHCI_QTD_STATUS_BUFFER)
+						callbackStatus |= B_USB_STATUS_DEVICE_TIMEOUT;
+					if (status & EHCI_QTD_STATUS_BABBLE)
+						callbackStatus |= B_USB_STATUS_ADAPTER_HARDWARE_ERROR;
+					if (status & EHCI_QTD_STATUS_TERROR)
+						callbackStatus |= B_USB_STATUS_DRIVER_INTERNAL_ERROR;
+					// ToDo: define better error values!
+
+					UnlinkQueueHead(transfer->queue_head, &freeListHead);
+					transfer->transfer->Finished(callbackStatus, 0);
+					transferDone = true;
+					break;
+				}
+
+				if (descriptor->next_phy & EHCI_QTD_TERMINATE) {
+					// we arrived at the last (stray) descriptor, we're done
+					TRACE(("usb_ehci: qtd (0x%08lx) done\n", descriptor->this_phy));
+
+					size_t actualLength = 0;
+					uint8 lastDataToggle = 0;
+					if (transfer->data_descriptor && transfer->incoming) {
+						// data to read out
+						actualLength = ReadDescriptorChain(
+							transfer->data_descriptor,
+							transfer->transfer->Vector(),
+							transfer->transfer->VectorCount(),
+							&lastDataToggle);
+					} else {
+						// calculate transfered length
+						actualLength = ReadActualLength(
+							(ehci_qtd *)transfer->queue_head->element_log,
+							&lastDataToggle);
+					}
+
+					UnlinkQueueHead(transfer->queue_head, &freeListHead);
+					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle);
+					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, actualLength);
+					transferDone = true;
+					break;
+				}
+
+				descriptor = (ehci_qtd *)descriptor->next_log;
+			}
 
 			if (transferDone) {
 				if (Lock()) {
@@ -908,6 +973,20 @@ EHCI::FinishTransfers()
 			} else {
 				lastTransfer = transfer;
 				transfer = transfer->link;
+			}
+		}
+
+		if (freeListHead) {
+			fAsyncAdvance = false;
+			// set the doorbell and wait for the host controller to notify us
+			WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_INTONAAD);
+			while (!fAsyncAdvance)
+				snooze(10);
+
+			while (freeListHead) {
+				ehci_qh *next = (ehci_qh *)freeListHead->next_log;
+				FreeQueueHead(freeListHead);
+				freeListHead = next;
 			}
 		}
 	}
@@ -944,11 +1023,11 @@ EHCI::CreateQueueHead()
 	result->overlay.next_phy = descriptor->this_phy;
 	result->overlay.alt_next_phy = EHCI_QTD_TERMINATE;
 	result->overlay.token = 0;
-	result->overlay.buffer_phy[0] = 0;
-	result->overlay.buffer_phy[1] = 0;
-	result->overlay.buffer_phy[2] = 0;
-	result->overlay.buffer_phy[3] = 0;
-	result->overlay.buffer_phy[4] = 0;
+	for (int32 i = 0; i < 5; i++) {
+		result->overlay.buffer_phy[i] = 0;
+		result->overlay.ext_buffer_phy[i] = 0;
+	}
+
 	return result;
 }
 
@@ -959,9 +1038,8 @@ EHCI::FreeQueueHead(ehci_qh *queueHead)
 	if (!queueHead)
 		return;
 
-	FreeDescriptor((ehci_qtd *)queueHead->stray_log);
+	FreeDescriptorChain((ehci_qtd *)queueHead->element_log);
 	fStack->FreeChunk(queueHead, (void *)queueHead->this_phy, sizeof(ehci_qh));
-	
 }
 
 
@@ -985,7 +1063,7 @@ EHCI::LinkQueueHead(ehci_qh *queueHead)
 
 
 status_t
-EHCI::UnlinkQueueHead(ehci_qh *queueHead)
+EHCI::UnlinkQueueHead(ehci_qh *queueHead, ehci_qh **freeListHead)
 {
 	if (!Lock())
 		return B_ERROR;
@@ -998,6 +1076,9 @@ EHCI::UnlinkQueueHead(ehci_qh *queueHead)
 	queueHead->next_phy = fAsyncQueueHead->this_phy | EHCI_QH_TYPE_QH;
 	queueHead->next_log = NULL;
 	queueHead->prev_log = NULL;
+
+	queueHead->next_log = *freeListHead;
+	*freeListHead = queueHead;
 
 	Unlock();
 	return B_OK;
@@ -1070,9 +1151,34 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 
 status_t
 EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
-	ehci_qtd **dataDescriptor, bool *directionIn)
+	ehci_qtd **_dataDescriptor, bool *_directionIn)
 {
-	return B_ERROR;
+	Pipe *pipe = transfer->TransferPipe();
+	bool directionIn = (pipe->Direction() == Pipe::In);
+
+	ehci_qtd *firstDescriptor = NULL;
+	ehci_qtd *lastDescriptor = NULL;
+	ehci_qtd *strayDescriptor = (ehci_qtd *)queueHead->stray_log;
+	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
+		&lastDescriptor, strayDescriptor, transfer->VectorLength(),
+		directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT);
+
+	if (result < B_OK)
+		return result;
+
+	lastDescriptor->token |= EHCI_QTD_IOC;
+	if (!directionIn) {
+		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
+			transfer->VectorCount());
+	}
+
+	queueHead->element_log = firstDescriptor;
+	queueHead->overlay.next_phy = firstDescriptor->this_phy;
+	queueHead->overlay.alt_next_phy = EHCI_QTD_TERMINATE;
+
+	*_dataDescriptor = firstDescriptor;
+	*_directionIn = directionIn;
+	return B_OK;
 }
 
 
@@ -1099,11 +1205,11 @@ EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 	result->token |= EHCI_QTD_STATUS_ACTIVE;
 	if (bufferSize == 0) {
 		result->buffer_log = NULL;
-		result->buffer_phy[0] = 0;
-		result->buffer_phy[1] = 0;
-		result->buffer_phy[2] = 0;
-		result->buffer_phy[3] = 0;
-		result->buffer_phy[4] = 0;
+		for (int32 i = 0; i < 5; i++) {
+			result->buffer_phy[i] = 0;
+			result->ext_buffer_phy[i] = 0;
+		}
+
 		return result;
 	}
 
@@ -1116,9 +1222,11 @@ EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 
 	addr_t physicalBase = (addr_t)physicalAddress;
 	result->buffer_phy[0] = physicalBase;
+	result->ext_buffer_phy[0] = 0;
 	for (int32 i = 1; i < 5; i++) {
 		physicalBase += B_PAGE_SIZE;
 		result->buffer_phy[i] = physicalBase & EHCI_QTD_PAGE_MASK;
+		result->ext_buffer_phy[i] = 0;
 	}
 
 	return result;
@@ -1236,7 +1344,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_ehci: wrote descriptor chain (%d bytes, no more vectors)\n", actualLength));
+					TRACE(("usb_ehci: wrote descriptor chain (%ld bytes, no more vectors)\n", actualLength));
 					return actualLength;
 				}
 
@@ -1255,7 +1363,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 		current = (ehci_qtd *)current->next_log;
 	}
 
-	TRACE(("usb_ehci: wrote descriptor chain (%d bytes)\n", actualLength));
+	TRACE(("usb_ehci: wrote descriptor chain (%ld bytes)\n", actualLength));
 	return actualLength;
 }
 
@@ -1271,12 +1379,13 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 	size_t vectorOffset = 0;
 	size_t bufferOffset = 0;
 
-	while (current && (current->token & EHCI_QTD_STATUS_ACTIVE) > 0) {
+	while (current && (current->token & EHCI_QTD_STATUS_ACTIVE) == 0) {
 		if (!current->buffer_log)
 			break;
 
 		dataToggle = current->token & EHCI_QTD_DATA_TOGGLE;
-		size_t bufferSize = 0; // ToDo
+		size_t bufferSize = current->buffer_size;
+		bufferSize -= (current->token >> EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK;
 
 		while (true) {
 			size_t length = min_c(bufferSize - bufferOffset,
@@ -1291,7 +1400,7 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_ehci: read descriptor chain (%d bytes, no more vectors)\n", actualLength));
+					TRACE(("usb_ehci: read descriptor chain (%ld bytes, no more vectors)\n", actualLength));
 					if (lastDataToggle)
 						*lastDataToggle = dataToggle > 0 ? 1 : 0;
 					return actualLength;
@@ -1312,7 +1421,7 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 		current = (ehci_qtd *)current->next_log;
 	}
 
-	TRACE(("usb_ehci: read descriptor chain (%d bytes)\n", actualLength));
+	TRACE(("usb_ehci: read descriptor chain (%ld bytes)\n", actualLength));
 	if (lastDataToggle)
 		*lastDataToggle = dataToggle > 0 ? 1 : 0;
 	return actualLength;
@@ -1326,9 +1435,10 @@ EHCI::ReadActualLength(ehci_qtd *topDescriptor, uint8 *lastDataToggle)
 	ehci_qtd *current = topDescriptor;
 	uint32 dataToggle = 0;
 
-	while (current && (current->token & EHCI_QTD_STATUS_ACTIVE) > 0) {
+	while (current && (current->token & EHCI_QTD_STATUS_ACTIVE) == 0) {
 		dataToggle = current->token & EHCI_QTD_DATA_TOGGLE;
-		size_t length = 0; // ToDo
+		size_t length = current->buffer_size;
+		length -= (current->token >> EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK;
 		actualLength += length;
 
 		if (current->next_phy & EHCI_QTD_TERMINATE)
@@ -1337,7 +1447,7 @@ EHCI::ReadActualLength(ehci_qtd *topDescriptor, uint8 *lastDataToggle)
 		current = (ehci_qtd *)current->next_log;
 	}
 
-	TRACE(("usb_ehci: read actual length (%d bytes)\n", actualLength));
+	TRACE(("usb_ehci: read actual length (%ld bytes)\n", actualLength));
 	if (lastDataToggle)
 		*lastDataToggle = dataToggle > 0 ? 1 : 0;
 	return actualLength;

@@ -9,7 +9,6 @@
 #ifndef EHCI_H
 #define EHCI_H
 
-#define TRACE_USB
 #include "usb_p.h"
 #include "ehci_hardware.h"
 
@@ -74,7 +73,8 @@ static	int32						FinishThread(void *data);
 		void						FreeQueueHead(ehci_qh *queueHead);
 
 		status_t					LinkQueueHead(ehci_qh *queueHead);
-		status_t					UnlinkQueueHead(ehci_qh *queueHead);
+		status_t					UnlinkQueueHead(ehci_qh *queueHead,
+										ehci_qh **freeList);
 
 		// Queue functions
 		status_t					FillQueueWithRequest(Transfer *transfer,
@@ -133,6 +133,7 @@ static	pci_module_info				*sPCIModule;
 
 		// Async frame list
 		ehci_qh						*fAsyncQueueHead;
+		bool						fAsyncAdvance;
 
 		// Maintain a linked list of transfers
 		transfer_data				*fFirstTransfer;
