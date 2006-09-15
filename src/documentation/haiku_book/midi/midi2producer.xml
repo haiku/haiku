@@ -25,7 +25,7 @@
 		<methodsynopsis>
 			<type>status_t</type>
 			<methodname>Connect</methodname>
-			<methodparam><type><modifier>const</modifier>BMidiConsumer *</type> <parameter>cons</parameter></methodparam>
+			<methodparam><modifier>const</modifier><type>BMidiConsumer *</type> <parameter>cons</parameter></methodparam>
 		</methodsynopsis>
 		
 		<para>
@@ -56,7 +56,7 @@
 		<methodsynopsis>
 			<type>status_t</type>
 			<methodname>Disconnect</methodname>
-			<methodparam><type><modifier>const</modifier>BMidiConsumer *</type> <parameter>cons</parameter></methodparam>
+			<methodparam><modifier>const</modifier><type>BMidiConsumer *</type> <parameter>cons</parameter></methodparam>
 		</methodsynopsis>
 		
 		<para>
@@ -84,7 +84,7 @@
 		<methodsynopsis>
 			<type>bool</type>
 			<methodname>IsConnected</methodname>
-			<methodparam><type><modifier>const</modifier>BMidiConsumer *</type> <parameter>cons</parameter></methodparam>
+			<methodparam><modifier>const</modifier><type>BMidiConsumer *</type> <parameter>cons</parameter></methodparam>
 			<modifier>const</modifier>
 		</methodsynopsis>
 		

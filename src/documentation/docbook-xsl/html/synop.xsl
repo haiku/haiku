@@ -1074,6 +1074,9 @@ paramdef      ::= (#PCDATA|type|replaceable|parameter|funcparams)*
 <xsl:template match="type" mode="cpp">
   <span class="{name(.)}">
     <xsl:apply-templates mode="cpp"/>
+    <xsl:if test="substring(., string-length(.)) != '*'">
+	<xsl:text>&nbsp;</xsl:text>
+    </xsl:if>
   </span>
 </xsl:template>
 
@@ -1086,7 +1089,7 @@ paramdef      ::= (#PCDATA|type|replaceable|parameter|funcparams)*
 
 <xsl:template match="initializer" mode="cpp">
   <span class="{name(.)}">
-    <xsl:text>=&nbsp;</xsl:text>
+    <xsl:text>&nbsp;=&nbsp;</xsl:text>
     <xsl:apply-templates mode="cpp"/>
   </span>
 </xsl:template>

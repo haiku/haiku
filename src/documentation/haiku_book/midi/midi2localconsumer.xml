@@ -46,8 +46,13 @@
 	</para>
 	
 	<sect3 id="bmidilocalconsumer_bmidilocalconsumer">
-		<title>BMidiLocalConsumer(const char *name = NULL)</title>
-		
+		<title>BMidiLocalConsumer()</title>
+
+		<methodsynopsis>
+		<methodname>BMidiLocalConsumer</methodname>
+		<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter><initializer>NULL</initializer></methodparam>
+		</methodsynopsis>		
+
 		<para>
 			Creates a new local consumer endpoint.
 		</para>
@@ -82,7 +87,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_setlatency">
-		<title>void SetLatency(bigtime_t latency)</title>
+		<title>SetLatency()</title>
+		<methodsynopsis><void/><methodname>SetLatency</methodname><methodparam><type>bigtime_t</type><parameter>latency</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Changes the published latency of the consumer.
@@ -91,7 +97,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_getproducerid">
-		<title>int32 GetProducerID()</title>
+		<title>GetProducerID()</title>
+		<methodsynopsis><type>int32</type><methodname>GetProducerID</methodname><void/></methodsynopsis>
 		
 		<para>
 			Returns the ID of the producer that most recently sent a MIDI event to 
@@ -105,7 +112,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_settimeout">
-		<title>void SetTimeout(bigtime_t when, void *data)</title>
+		<title>SetTimeout()</title>
+		<methodsynopsis><void/><methodname>SetTimeout</methodname><methodparam><type>bigtime_t</type><parameter>when</parameter></methodparam><methodparam><type>void *</type><parameter>data</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Requests that the Timeout() hook will be called at some point
@@ -146,7 +154,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_timeout">
-		<title>virtual void Timeout(void *data)</title>
+		<title>Timeout()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>Timeout</methodname><methodparam><type>void *</type><parameter>data</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Hook function that is called per your own request.
@@ -158,8 +167,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_data">
-		<title>virtual void Data(
-			uchar *data, size_t length, bool atomic, bigtime_t time)</title>
+		<title>Data()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>Data</methodname><methodparam><type>uchar *</type><parameter>data</parameter></methodparam><methodparam><type>size_t</type><parameter>length</parameter></methodparam><methodparam><type>bool</type><parameter>atomic</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when raw MIDI is received
@@ -205,8 +214,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_noteoff">
-		<title>virtual void NoteOff(
-			uchar channel, uchar note, uchar velocity, bigtime_t time)</title>
+		<title>NoteOff()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>NoteOff</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>note</parameter></methodparam><methodparam><type>uchar</type><parameter>velocity</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Note Off event is received
@@ -218,8 +227,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_noteon">
-		<title>virtual void NoteOn(
-			uchar channel, uchar note, uchar velocity, bigtime_t time)</title>
+		<title>NoteOn()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>NoteOn</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>note</parameter></methodparam><methodparam><type>uchar</type><parameter>velocity</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Note On event is received
@@ -231,8 +240,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_keypressure">
-		<title>virtual void KeyPressure(
-			uchar channel, uchar note, uchar pressure, bigtime_t time)</title>
+		<title>KeyPressure()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>KeyPressure</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>note</parameter></methodparam><methodparam><type>uchar</type><parameter>pressure</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Polyphonic Pressure (Aftertouch) event is received
@@ -244,8 +253,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_controlchange">
-		<title>virtual void ControlChange(
-			uchar channel, uchar controlNumber, uchar controlValue, bigtime_t time)</title>
+		<title>ControlChange()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>ControlChange</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>controlNumber</parameter></methodparam><methodparam><type>uchar</type><parameter>controlValue</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Controller Change event is received
@@ -257,8 +266,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_programchange">
-		<title>virtual void ProgramChange(
-			uchar channel, uchar programNumber, bigtime_t time)</title>
+		<title>ProgramChange()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>ProgramChange</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>programNumber</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Program Change event is received
@@ -270,8 +279,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_channelpressure">
-		<title>virtual void ChannelPressure(
-			uchar channel, uchar pressure, bigtime_t time)</title>
+		<title>ChannelPressure()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>ChannelPressure</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>pressure</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Channel Pressure event is received
@@ -283,8 +292,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_pitchbend">
-		<title>virtual void PitchBend(
-			uchar channel, uchar lsb, uchar msb, bigtime_t time)</title>
+		<title>PitchBend()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>PitchBend</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>lsb</parameter></methodparam><methodparam><type>uchar</type><parameter>msb</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Pitch Bend event is received
@@ -296,8 +305,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_systemexclusive">
-		<title>virtual void SystemExclusive(
-			void* data, size_t length, bigtime_t time)</title>
+		<title>SystemExclusive()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>SystemExclusive</methodname><methodparam><type>void *</type><parameter>data</parameter></methodparam><methodparam><type>size_t</type><parameter>length</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a System Exclusive event is received
@@ -319,8 +328,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_systemcommon">
-		<title>virtual void SystemCommon(
-			uchar status, uchar data1, uchar data2, bigtime_t time)</title>
+		<title>SystemCommon()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>SystemCommon</methodname><methodparam><type>uchar</type><parameter>status</parameter></methodparam><methodparam><type>uchar</type><parameter>data1</parameter></methodparam><methodparam><type>uchar</type><parameter>data2</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a System Common event is received.
@@ -336,8 +345,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_systemrealtime">
-		<title>virtual void SystemRealTime(
-			uchar status, bigtime_t time)</title>
+		<title>SystemRealTime()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>SystemRealTime</methodname><methodparam><type>uchar</type><parameter>status</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>			
 			Invoked when a Real Time event is received
@@ -349,7 +358,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_tempochange">
-		<title>virtual void TempoChange(int32 beatsPerMinute, bigtime_t time)</title>
+		<title>TempoChange()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>TempoChange</methodname><methodparam><type>int32</type><parameter>beatsPerMinute</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a Tempo Change event is received
@@ -361,7 +371,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalconsumer_allnotesoff">
-		<title>virtual void AllNotesOff(bool justChannel, bigtime_t time)</title>
+		<title>AllNotesOff()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>AllNotesOff</methodname><methodparam><type>bool</type><parameter>justChannel</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Not used

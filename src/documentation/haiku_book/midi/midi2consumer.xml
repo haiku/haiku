@@ -20,7 +20,7 @@
 		
 		<methodsynopsis>
 			<type>bigtime_t</type>
-			<methodname>Latency</methodname>
+			<methodname>Latency</methodname><void/>
 			<modifier>const</modifier>
 		</methodsynopsis>
 		

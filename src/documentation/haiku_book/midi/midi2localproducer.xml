@@ -34,8 +34,11 @@
 	</para>
 	
 	<sect3 id="bmidilocalproducer_bmidilocalproducer">
-		<title>BMidiLocalProducer(const char *name = NULL)</title>
-		
+		<title>BMidiLocalProducer()</title>
+		<methodsynopsis>
+			<methodname>BMidiLocalProducer</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter><initializer>NULL</initializer></methodparam>
+		</methodsynopsis>
 		<para>
 			Creates a new local producer endpoint.
 		</para>
@@ -70,8 +73,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_connected">
-		<title>virtual void Connected(BMidiConsumer *cons)</title>
-		
+		<title>Connected()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>Connected</methodname><methodparam><modifier>const</modifier><type>BMidiConsumer *</type><parameter>cons</parameter></methodparam></methodsynopsis>
 		<para>
 			Invoked when a new consumer is connected to this producer
 		</para>
@@ -100,7 +103,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_disconnected">
-		<title>virtual void Disconnected(BMidiConsumer *cons)</title>
+		<title>Disconnected()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>Disconnected</methodname><methodparam><modifier>const</modifier><type>BMidiConsumer *</type><parameter>cons</parameter></methodparam></methodsynopsis>
 		
 		<para>
 			Invoked when a consumer is disconnected from this producer.
@@ -112,8 +116,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraydata">
-		<title>void SprayData(
-			void *data, size_t length, bool atomic = false, bigtime_t time = 0) const</title>
+		<title>SprayData()</title>
+		<methodsynopsis><void/><methodname>SprayData</methodname><methodparam><type>void *</type><parameter>data</parameter></methodparam><methodparam><type>size_t</type><parameter>length</parameter></methodparam><methodparam><type>bool</type><parameter>atomic</parameter><initializer>false</initializer></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends raw MIDI data downstream to all connected consumers
@@ -149,8 +153,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraynoteoff">
-		<title>void SprayNoteOff(
-			uchar channel, uchar note, uchar velocity, bigtime_t time = 0) const</title>
+		<title>SprayNoteOff()</title>
+		<methodsynopsis><void/><methodname>SprayNoteOff</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>note</parameter></methodparam><methodparam><type>uchar</type><parameter>velocity</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Note Off event to all connected consumers
@@ -162,8 +166,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraynoteon">
-		<title>void SprayNoteOn(
-			uchar channel, uchar note, uchar velocity, bigtime_t time = 0) const</title>
+		<title>SprayNoteOn()</title>
+		<methodsynopsis><void/><methodname>SprayNoteOn</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>note</parameter></methodparam><methodparam><type>uchar</type><parameter>velocity</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Note On event to all connected consumers
@@ -175,8 +179,8 @@
 	</sect3>
 	
 	<sect3 id="bmidIlocalproducer_spraykeypressure">
-		<title>void SprayKeyPressure(
-			uchar channel, uchar note, uchar pressure, bigtime_t time = 0) const</title>
+		<title>SprayKeyPressure()</title>
+		<methodsynopsis><void/><methodname>SprayKeyPressure</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>note</parameter></methodparam><methodparam><type>uchar</type><parameter>pressure</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Polyphonic Pressure (Aftertouch) event to all connected 
@@ -189,9 +193,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraycontrolchange">
-		<title>void SprayControlChange(
-			uchar channel, uchar controlNumber, uchar controlValue,
-			bigtime_t time = 0) const</title>
+		<title>SprayControlChange()</title>
+		<methodsynopsis><void/><methodname>SprayControlChange</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>controlNumber</parameter></methodparam><methodparam><type>uchar</type><parameter>controlValue</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Controller Change event to all connected consumers.
@@ -204,8 +207,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_sprayprogramchange">
-		<title>void SprayProgramChange(
-			uchar channel, uchar programNumber, bigtime_t time = 0) const</title>
+		<title>SprayProgramChange()</title>
+		<methodsynopsis><void/><methodname>SprayProgramChange</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>programNumber</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 
 		<para>
 			Sends a Program Change event to all connected consumers
@@ -217,8 +220,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraychannelpressure">
-		<title>void SprayChannelPressure(
-			uchar channel, uchar pressure, bigtime_t time = 0) const</title>
+		<title>SprayChannelPressure()</title>
+		<methodsynopsis><void/><methodname>SprayChannelPressure</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>pressure</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Channel Pressure event to all connected consumers
@@ -230,8 +233,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraypitchbend">
-		<title>void SprayPitchBend(
-			uchar channel, uchar lsb, uchar msb, bigtime_t time = 0) const</title>
+		<title>SprayPitchBend()</title>
+		<methodsynopsis><void/><methodname>SprayPitchBend</methodname><methodparam><type>uchar</type><parameter>channel</parameter></methodparam><methodparam><type>uchar</type><parameter>lsb</parameter></methodparam><methodparam><type>uchar</type><parameter>msb</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Pitch Bend event to all connected consumers
@@ -243,8 +246,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraysystemexclusive">
-		<title>void SpraySystemExclusive(
-			void *data, size_t length, bigtime_t time = 0) const</title>
+		<title>SpraySystemExclusive()</title>
+		<methodsynopsis><void/><methodname>SpraySystemExclusive</methodname><methodparam><type>void *</type><parameter>data</parameter></methodparam><methodparam><type>size_t</type><parameter>length</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a System Exclusive event to all connected consumers
@@ -263,8 +266,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraysystemcommon">
-		<title>void SpraySystemCommon(
-			uchar status, uchar data1, uchar data2, bigtime_t time = 0) const</title>
+		<title>SpraySystemCommon()</title>
+		<methodsynopsis><void/><methodname>SpraySystemCommon</methodname><methodparam><type>uchar</type><parameter>status</parameter></methodparam><methodparam><type>uchar</type><parameter>data1</parameter></methodparam><methodparam><type>uchar</type><parameter>data2</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a System Common event to the connected consumers
@@ -321,8 +324,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraysystemrealtime">
-		<title>void SpraySystemRealTime(
-			uchar status, bigtime_t time = 0) const</title>
+		<title>SpraySystemRealTime()</title>
+		<methodsynopsis><void/><methodname>SpraySystemRealTime</methodname><methodparam><type>uchar</type><parameter>status</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		
 		<para>
 			Sends a Real Time event to the connected consumers
@@ -382,8 +385,8 @@
 	</sect3>
 	
 	<sect3 id="bmidilocalproducer_spraytempochange">
-		<title>void SprayTempoChange(
-			int32 beatsPerMinute, bigtime_t time = 0) const</title>
+		<title>SprayTempoChange()</title>
+		<methodsynopsis><void/><methodname>SprayTempoChange</methodname><methodparam><type>int32</type><parameter>beatsPerMinute</parameter></methodparam><methodparam><type>bigtime_t</type><parameter>time</parameter><initializer>0</initializer></methodparam><modifier>const</modifier></methodsynopsis>
 		<para>
 			Sends a Tempo Change event to the connected consumers.
 		</para>

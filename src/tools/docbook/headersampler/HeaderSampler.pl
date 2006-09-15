@@ -204,16 +204,17 @@ sub PrintFunction {
 	my @args = @_;
 		for (@args) {
 			$paramconst = "";
+			$paraminit = "";
 			if ( /const*/ ) { $paramconst = "<modifier>const</modifier>"; }
-			if ( /[ ]*=[ ]*/ ) { $_ = $`; }		# for default value; ex. (short X = 100)
+			if ( /[ ]*=[ ]*/ ) { $paraminit = "<initializer>". $' ."</initializer>" ; $_ = $`; }	# for default value; ex. (short X = 100)
 			split(/[ ]+/);
 			$paramname = pop();
 			$paramtype = pop();
 			if ( $paramname =~ /^\*/ ) {
 				$paramname = $';
-				$paramtype = $paramtype . " *";
+				$paramtype .= " *";
 			}
-			$_ = "<type>" . $paramconst . $paramtype . "</type> <parameter>" . $paramname . "</parameter>"
+			$_ = $paramconst . "<type>" . $paramtype . "</type> <parameter>" . $paramname . "</parameter>" . $paraminit;
 		}
 	$funcargs = join('</methodparam><methodparam>', @args);
 
@@ -225,16 +226,19 @@ sub PrintFunction {
 		}
 		if ( s/^static[ ]*// ) { 
 			if ( $funcmod =~ /^$/ ) { 
-				$funcmode .= " "; 
+				$funcmod .= " "; 
 			}
-			$funcmode .= "static" 
+			$funcmod .= "static" 
+		}
+		if ($funcmod) {
+			$funcmod = "<modifier>" . $funcmod . "</modifier>";
 		}
 		if ( /^void/ ) {
-			$functype = $funcmode . "<void/>"
+			$functype = $funcmod . "<void/>"
 		} else {
 			$typeconst = "";
 			if ( /^const / ) { $typeconst = "<modifier>const</modifier>"; $_ = $'; }
-			$functype = $funcmode . "<type>" . $typeconst . $_ . "</type>"
+			$functype = $funcmod . $typeconst . "<type>" . $_ . "</type>"
 		}
 	}
 	if ($funcconst) {
@@ -291,7 +295,8 @@ sub ValidateDocbook {
 		}
 	}
 	if ( $found == 0 ) {
-		print $pattern . "\n" ;
+		$pattern =~ s/\*/ \*/g;
+		print "<methodsynopsis>".$pattern . "</methodsynopsis>\n" ;
 	}
 	close IN2;
 }
