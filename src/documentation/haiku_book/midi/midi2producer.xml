@@ -51,7 +51,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_disconnect">
-		<title>status_t Disconnect(BMidiConsumer *cons)</title>
+		<title>Disconnect()</title>
 		
 		<methodsynopsis>
 			<type>status_t</type>

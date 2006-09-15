@@ -8,7 +8,7 @@ Doc2HTML
 	: [ FDirName $(HAIKU_TOP) src documentation docbook-xsl html chunk.xsl ]
 	: Haiku_Book
 	:
-	: -stringparam use.id.as.filename 1
+	: -stringparam use.id.as.filename 1 -stringparam language cpp
 	;
 
 # Single most ugly string manipulation ever ...
@@ -71,7 +71,8 @@ local media_files = intro.xml ;
 Includes [ FGristFiles mediakit.xml ] : [ FRelGristFiles $(media_files) : media ] ;
 SEARCH on [ FRelGristFiles $(media_files) : media ] = [ FDirName $(SUBDIR) media ] ;
 
-local midi_files = intro.xml ;
+local midi_files = intro.xml midi2.xml midi2consumer.xml midi2endpoint.xml midi2localproducer.xml midi2roster.xml
+	midi1.xml midi2api.xml midi2defs.xml midi2localconsumer.xml midi2producer.xml ;
 Includes [ FGristFiles midikit.xml ] : [ FRelGristFiles $(midi_files) : midi ] ;
 SEARCH on [ FRelGristFiles $(midi_files) : midi ] = [ FDirName $(SUBDIR) midi ] ;
 

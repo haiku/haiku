@@ -730,6 +730,9 @@ paramdef      ::= (#PCDATA|type|replaceable|parameter|funcparams)*
       <xsl:when test="@language">
 	<xsl:value-of select="@language"/>
       </xsl:when>
+      <xsl:when test="$language">
+	<xsl:value-of select="$language"/>
+      </xsl:when>
       <xsl:otherwise>
 	<xsl:value-of select="$default-classsynopsis-language"/>
       </xsl:otherwise>
@@ -1071,7 +1074,6 @@ paramdef      ::= (#PCDATA|type|replaceable|parameter|funcparams)*
 <xsl:template match="type" mode="cpp">
   <span class="{name(.)}">
     <xsl:apply-templates mode="cpp"/>
-    <xsl:text>&nbsp;</xsl:text>
   </span>
 </xsl:template>
 

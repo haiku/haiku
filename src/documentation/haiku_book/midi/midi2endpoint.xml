@@ -21,7 +21,7 @@
 		count drops to zero. If necessary, the destructor of a local endpoint first 
 		breaks off any connections and &BMidiEndpoint_Unregister;'s the endpoint before it is 
 		deleted. However, for good style and bonus points you should really 
-		BMidiProducer::Disconnect() and &BMidiEndpoint_Unregister; the object 
+		&BMidiProducer_Disconnect; and &BMidiEndpoint_Unregister; the object 
 		yourself and not rely on the destructor to do this.
 	</para>
 	
@@ -55,7 +55,7 @@
 		<title>SetName()</title>
 		
 		<methodsynopsis>
-			<type>void</type> <methodname>SetName</methodname>
+			<void/> <methodname>SetName</methodname>
 			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter></methodparam>
 		</methodsynopsis>
 		
@@ -244,7 +244,7 @@ if (endp->IsConsumer())
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_acquire">
-		<title>status_t BMidiEndpoint::Acquire()</title>
+		<title>Acquire()</title>
 		
 		<methodsynopsis>
 			<type>status_t</type> <methodname>Acquire</methodname> <void/>
@@ -297,7 +297,7 @@ if (endp->IsConsumer())
 	</sect3>
 	
 	<sect3 id="bmidiendpoint_release">
-		<title>status_t BMidiEndpoint::Release()</title>
+		<title>Release()</title>
 		
 		<methodsynopsis>
 			<type>status_t</type> <methodname>Release</methodname> <void/>
@@ -347,7 +347,7 @@ if (endp->IsConsumer())
 		</para>
 		
 		<para>	
-			If you are &BMidiRoster;::&BMidiRoster_StartWatching; watching, you will 
+			If you are &BMidiRoster_StartWatching; watching, you will 
 			<emphasis>not</emphasis> receive notifications for any local endpoints you register or 
 			unregister. Of course, other applications <emphasis>will</emphasis> be notified about your 
 			endpoints.
@@ -372,12 +372,9 @@ if (endp->IsConsumer())
 	<sect3 id="bmidiendpoint_unregister">
 		<title>Unregister()</title>
 		
-		<funcsynopsis>
-			<funcprototype>
-				<funcdef>status_t <function>Unregister</function></funcdef>
-				<void/>
-			</funcprototype>
-		</funcsynopsis>
+		<methodsynopsis>
+			<type>status_t</type> <methodname>Unregister</methodname> <void/>
+		</methodsynopsis>
 		
 		<para>
 			Hides the endpoint from the roster.
