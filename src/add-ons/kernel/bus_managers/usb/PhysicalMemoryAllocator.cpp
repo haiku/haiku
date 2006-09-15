@@ -9,6 +9,8 @@
 #include <malloc.h>
 #include <string.h>
 #include <KernelExport.h>
+#include <util/kernel_cpp.h>
+#include "BeOSCompatibility.h"
 #include "PhysicalMemoryAllocator.h"
 
 
