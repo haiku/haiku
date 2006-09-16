@@ -42,7 +42,7 @@ uhci_std_ops(int32 op, ...)
 host_controller_info uhci_module = {
 	{
 		"busses/usb/uhci/nielx",
-		NULL,
+		0,
 		uhci_std_ops
 	},
 	NULL,
@@ -324,7 +324,6 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fQueues(NULL),	
 		fFirstTransfer(NULL),
 		fLastTransfer(NULL),
-		fFinishTransfers(false),
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fRootHub(NULL),
@@ -410,6 +409,13 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	for (int32 i = 0; i < 1024; i++)
 		fFrameList[i] = fQueues[0]->PhysicalAddress() | FRAMELIST_NEXT_IS_QH;
 
+	// create semaphore the finisher thread will wait for
+	fFinishTransfersSem = create_sem(0, "UHCI Finish Transfers");
+	if (fFinishTransfersSem < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to create semaphore\n"));
+		return;
+	}
+
 	// Create the finisher service thread
 	fFinishThread = spawn_kernel_thread(FinishThread,
 		"uhci finish thread", B_NORMAL_PRIORITY, (void *)this);
@@ -433,6 +439,7 @@ UHCI::~UHCI()
 {
 	int32 result = 0;
 	fStopFinishThread = true;
+	delete_sem(fFinishTransfersSem);
 	wait_for_thread(fFinishThread, &result);
 
 	Lock();
@@ -686,14 +693,9 @@ void
 UHCI::FinishTransfers()
 {
 	while (!fStopFinishThread) {
-		while (!fFinishTransfers) {
-			if (fStopFinishThread)
-				return;
+		if (acquire_sem(fFinishTransfersSem) < B_OK)
+			continue;
 
-			snooze(1000);
-		}
-
-		fFinishTransfers = false;
 		if (!Lock())
 			continue;
 
@@ -966,35 +968,39 @@ UHCI::ResetPort(uint8 index)
 int32
 UHCI::InterruptHandler(void *data)
 {
-	cpu_status status = disable_interrupts();
-	spinlock lock = 0;
-	acquire_spinlock(&lock);
-
-	int32 result = ((UHCI *)data)->Interrupt();
-
-	release_spinlock(&lock);
-	restore_interrupts(status);
-	return result;
+	return ((UHCI *)data)->Interrupt();
 }
 
 
 int32
 UHCI::Interrupt()
 {
+	spinlock lock = 0;
+	acquire_spinlock(&lock);
+
 	// Check if we really had an interrupt
 	uint16 status = ReadReg16(UHCI_USBSTS);
-	if ((status & UHCI_INTERRUPT_MASK) == 0)
+	if ((status & UHCI_INTERRUPT_MASK) == 0) {
+		release_spinlock(&lock);
 		return B_UNHANDLED_INTERRUPT;
+	}
 
 	uint16 acknowledge = 0;
+	bool finishTransfers = false;
+	int32 result = B_HANDLED_INTERRUPT;
+
 	if (status & UHCI_USBSTS_USBINT) {
 		TRACE(("usb_uhci: transfer finished\n"));
 		acknowledge |= UHCI_USBSTS_USBINT;
+		result = B_INVOKE_SCHEDULER;
+		finishTransfers = true;
 	}
 
 	if (status & UHCI_USBSTS_ERRINT) {
 		TRACE(("usb_uhci: transfer error\n"));
 		acknowledge |= UHCI_USBSTS_ERRINT;
+		result = B_INVOKE_SCHEDULER;
+		finishTransfers = true;
 	}
 
 	if (status & UHCI_USBSTS_RESDET) {
@@ -1021,8 +1027,12 @@ UHCI::Interrupt()
 	if (acknowledge)
 		WriteReg16(UHCI_USBSTS, acknowledge);
 
-	fFinishTransfers = true;
-	return B_HANDLED_INTERRUPT;
+	release_spinlock(&lock);
+
+	if (finishTransfers)
+		release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
+
+	return result;
 }
 
 

@@ -131,14 +131,14 @@ static	pci_module_info				*sPCIModule;
 		area_id						fPeriodicFrameListArea;
 		addr_t						*fPeriodicFrameList;
 
-		// Async frame list
+		// Async frame list management
 		ehci_qh						*fAsyncQueueHead;
-		bool						fAsyncAdvance;
+		sem_id						fAsyncAdvanceSem;
 
 		// Maintain a linked list of transfers
 		transfer_data				*fFirstTransfer;
 		transfer_data				*fLastTransfer;
-		bool						fFinishTransfers;
+		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
 

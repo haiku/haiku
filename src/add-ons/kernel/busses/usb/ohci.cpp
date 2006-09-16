@@ -152,7 +152,7 @@ ohci_add_to(Stack *stack)
 host_controller_info ohci_module = {
 	{
 		"busses/usb/ohci", 
-		NULL,						// No flag like B_KEEP_LOADED : the usb module does that
+		0,						// No flag like B_KEEP_LOADED : the usb module does that
 		ohci_std_ops
 	},
 	NULL ,

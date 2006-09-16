@@ -35,7 +35,7 @@ ehci_std_ops(int32 op, ...)
 host_controller_info ehci_module = {
 	{
 		"busses/usb/ehci",
-		NULL,
+		0,
 		ehci_std_ops
 	},
 	NULL,
@@ -104,7 +104,6 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPeriodicFrameList(NULL),
 		fFirstTransfer(NULL),
 		fLastTransfer(NULL),
-		fFinishTransfers(false),
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fRootHub(NULL),
@@ -209,6 +208,14 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
+	// create semaphores the finisher thread will wait for
+	fAsyncAdvanceSem = create_sem(0, "EHCI Async Advance");
+	fFinishTransfersSem = create_sem(0, "EHCI Finish Transfers");
+	if (fFinishTransfersSem < B_OK || fAsyncAdvanceSem < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to create semaphores\n"));
+		return;
+	}
+
 	// create finisher service thread
 	fFinishThread = spawn_kernel_thread(FinishThread, "ehci finish thread",
 		B_NORMAL_PRIORITY, (void *)this);
@@ -262,13 +269,15 @@ EHCI::~EHCI()
 {
 	TRACE(("usb_ehci: tear down EHCI Host Controller Driver\n"));
 
-	int32 result = 0;
-	fStopFinishThread = true;
-	wait_for_thread(fFinishThread, &result);
-
-	CancelAllPendingTransfers();
 	WriteOpReg(EHCI_USBCMD, 0);
 	WriteOpReg(EHCI_CONFIGFLAG, 0);
+	CancelAllPendingTransfers();
+
+	int32 result = 0;
+	fStopFinishThread = true;
+	delete_sem(fAsyncAdvanceSem);
+	delete_sem(fFinishTransfersSem);
+	wait_for_thread(fFinishThread, &result);
 
 	delete fRootHub;
 	delete_area(fPeriodicFrameListArea);
@@ -305,6 +314,10 @@ EHCI::Start()
 			break;
 		}
 	}
+
+	// set the interrupt threshold
+	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD)
+		| (1 << EHCI_USBCMD_ITC_SHIFT));
 
 	if (!running) {
 		TRACE(("usb_ehci: Host Controller didn't start\n"));
@@ -709,37 +722,40 @@ EHCI::LightReset()
 int32
 EHCI::InterruptHandler(void *data)
 {
-	cpu_status status = disable_interrupts();
-	spinlock lock = 0;
-	acquire_spinlock(&lock);
-
-	int32 result = ((EHCI *)data)->Interrupt();
-
-	release_spinlock(&lock);
-	restore_interrupts(status);
-	return result;
+	return ((EHCI *)data)->Interrupt();
 }
 
 
 int32
 EHCI::Interrupt()
 {
+	spinlock lock = 0;
+	acquire_spinlock(&lock);
+
 	// check if any interrupt was generated
 	uint32 status = ReadOpReg(EHCI_USBSTS);
-	if ((status & EHCI_USBSTS_INTMASK) == 0)
+	if ((status & EHCI_USBSTS_INTMASK) == 0) {
+		release_spinlock(&lock);
 		return B_UNHANDLED_INTERRUPT;
+	}
 
 	uint32 acknowledge = 0;
+	bool asyncAdvance = false;
+	bool finishTransfers = false;
+	int32 result = B_HANDLED_INTERRUPT;
+
 	if (status & EHCI_USBSTS_USBINT) {
 		TRACE(("usb_ehci: transfer finished\n"));
 		acknowledge |= EHCI_USBSTS_USBINT;
-		fFinishTransfers = true;
+		result = B_INVOKE_SCHEDULER;
+		finishTransfers = true;
 	}
 
 	if (status & EHCI_USBSTS_USBERRINT) {
 		TRACE(("usb_ehci: transfer error\n"));
 		acknowledge |= EHCI_USBSTS_USBERRINT;
-		fFinishTransfers = true;
+		result = B_INVOKE_SCHEDULER;
+		finishTransfers = true;
 	}
 
 	if (status & EHCI_USBSTS_PORTCHANGE) {
@@ -755,7 +771,8 @@ EHCI::Interrupt()
 	if (status & EHCI_USBSTS_INTONAA) {
 		TRACE(("usb_ehci: interrupt on async advance\n"));
 		acknowledge |= EHCI_USBSTS_INTONAA;
-		fAsyncAdvance = true;
+		asyncAdvance = true;
+		result = B_INVOKE_SCHEDULER;
 	}
 
 	if (status & EHCI_USBSTS_HOSTSYSERR) {
@@ -766,7 +783,14 @@ EHCI::Interrupt()
 	if (acknowledge)
 		WriteOpReg(EHCI_USBSTS, acknowledge);
 
-	return B_HANDLED_INTERRUPT;
+	release_spinlock(&lock);
+
+	if (asyncAdvance)
+		release_sem_etc(fAsyncAdvanceSem, 1, B_DO_NOT_RESCHEDULE);
+	if (finishTransfers)
+		release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
+
+	return result;
 }
 
 
@@ -871,13 +895,9 @@ void
 EHCI::FinishTransfers()
 {
 	while (!fStopFinishThread) {
-		while (!fFinishTransfers) {
-			if (fStopFinishThread)
-				return;
-			snooze(1000);
-		}
+		if (acquire_sem(fFinishTransfersSem) < B_OK)
+			continue;
 
-		fFinishTransfers = false;
 		if (!Lock())
 			continue;
 
@@ -977,16 +997,14 @@ EHCI::FinishTransfers()
 		}
 
 		if (freeListHead) {
-			fAsyncAdvance = false;
 			// set the doorbell and wait for the host controller to notify us
 			WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_INTONAAD);
-			while (!fAsyncAdvance)
-				snooze(10);
-
-			while (freeListHead) {
-				ehci_qh *next = (ehci_qh *)freeListHead->next_log;
-				FreeQueueHead(freeListHead);
-				freeListHead = next;
+			if (acquire_sem_etc(fAsyncAdvanceSem, 1, B_RELATIVE_TIMEOUT, 1000) == B_OK) {
+				while (freeListHead) {
+					ehci_qh *next = (ehci_qh *)freeListHead->next_log;
+					FreeQueueHead(freeListHead);
+					freeListHead = next;
+				}
 			}
 		}
 	}
@@ -1039,6 +1057,7 @@ EHCI::FreeQueueHead(ehci_qh *queueHead)
 		return;
 
 	FreeDescriptorChain((ehci_qtd *)queueHead->element_log);
+	FreeDescriptor((ehci_qtd *)queueHead->stray_log);
 	fStack->FreeChunk(queueHead, (void *)queueHead->this_phy, sizeof(ehci_qh));
 }
 
@@ -1112,7 +1131,6 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 
 	ehci_qtd *strayDescriptor = (ehci_qtd *)queueHead->stray_log;
 	statusDescriptor->token |= EHCI_QTD_IOC | EHCI_QTD_DATA_TOGGLE;
-	LinkDescriptors(statusDescriptor, strayDescriptor, strayDescriptor);
 
 	ehci_qtd *dataDescriptor = NULL;
 	if (transfer->VectorCount() > 0) {

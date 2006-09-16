@@ -148,7 +148,7 @@ static	pci_module_info				*sPCIModule;
 		// Maintain a linked list of transfers
 		transfer_data				*fFirstTransfer;
 		transfer_data				*fLastTransfer;
-		bool						fFinishTransfers;
+		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
 
