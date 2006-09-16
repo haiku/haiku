@@ -110,14 +110,17 @@ standard_gcc_settings()
 			haikuSharedLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.so`
 			haikuStaticLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.a`
 			haikuSharedLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.so`
-			local headers=$gccdir/../../../../include/c++/$haikuGCCVersion
-			haikuCxxHeadersDir=$headers
-			for d in $haikuGCCMachine backward ext; do
-				# Note: We need the line break, otherwise the line might become
-				# too long for jam (512 bytes max).
-				haikuCxxHeadersDir="$haikuCxxHeadersDir
-					$headers/$d"
-			done
+			# only when building a cross compiler use the local (non haiku) C++ headers
+			if [ -n "$buildCrossTools"  ]; then
+				local headers=$gccdir/../../../../include/c++/$haikuGCCVersion
+				haikuCxxHeadersDir=$headers
+				for d in $haikuGCCMachine backward ext; do
+					# Note: We need the line break, otherwise the line might become
+					# too long for jam (512 bytes max).
+					haikuCxxHeadersDir="$haikuCxxHeadersDir
+						$headers/$d"
+				done
+			fi
 			
 			if [ $haikuStaticLibStdCxx = libstdc++.a ]; then
 				haikuStaticLibStdCxx=
