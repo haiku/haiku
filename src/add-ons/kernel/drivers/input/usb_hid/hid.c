@@ -812,6 +812,8 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	/* get initial state */
 
+#if 0
+	/* ToDo: find out why some mice hang here */
 	status = usb->send_request(dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
 		USB_REQUEST_HID_GET_REPORT,
@@ -819,6 +821,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 		device->buffer, device->total_report_size, &actual);
 	if (status != B_OK)
 		DPRINTF_ERR ((MY_ID "Get_Report failed %d\n", (int)status));
+#endif
 	device->timestamp = system_time ();
 
 	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)device->buffer)), *(((uint32*)device->buffer)+1), *(((uint32*)device->buffer)+2)));
