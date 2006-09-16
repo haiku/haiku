@@ -231,7 +231,7 @@ Hub::Explore()
 
 void
 Hub::InterruptCallback(void *cookie, uint32 status, void *data,
-	uint32 actualLength)
+	size_t actualLength)
 {
 	TRACE(("USB Hub: interrupt callback!\n"));
 }

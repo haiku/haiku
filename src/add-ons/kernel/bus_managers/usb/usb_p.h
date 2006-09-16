@@ -426,7 +426,7 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 		void							Explore();
 static	void							InterruptCallback(void *cookie,
 											uint32 status, void *data,
-											uint32 actualLength);
+											size_t actualLength);
 
 virtual	void							ReportDevice(
 											usb_support_descriptor *supportDescriptors,

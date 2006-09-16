@@ -80,7 +80,7 @@ typedef struct {
 } usb_iso_packet_descriptor;
 
 typedef void (*usb_callback_func)(void *cookie, uint32 status, void *data,
-	uint32 actualLength);
+	size_t actualLength);
 
 
 /* The usb_module_info represents the public API of the USB Stack. */
