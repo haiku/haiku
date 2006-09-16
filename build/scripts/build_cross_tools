@@ -59,8 +59,7 @@ rm -rf $installDir $objDir
 
 mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
-mkdir -p $installDir/lib/gcc-lib/i586-pc-beos/2.95.3-beos-041202
-
+mkdir -p $installDir/lib/gcc-lib/i586-pc-beos/$haikuRequiredLegacyGCCVersion
 
 # build binutils
 cd $binutilsObjDir

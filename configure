@@ -91,10 +91,9 @@ standard_gcc_settings()
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
 
+echo "$HAIKU_CC"
 	haikuGCCVersion=`$HAIKU_CC -dumpversion`
 	haikuGCCMachine=`$HAIKU_CC -dumpmachine`
-	haikuRequiredLegacyGCCVersion="2.95.3-beos-060710"
-		# version of legacy gcc required to build haiku
 	
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
@@ -137,6 +136,7 @@ standard_gcc_settings()
 		2.95*)
 			# check for correct (most up-to-date) legacy compiler and complain
 			# if an older one is installed
+			echo "$haikuGCCVersion != $haikuRequiredLegacyGCCVersion"
 			if [ $haikuGCCVersion != $haikuRequiredLegacyGCCVersion ]; then
 				echo "GCC version $haikuRequiredLegacyGCCVersion is required!";
 				echo "Please download it from www.haiku-os.org...";
@@ -206,6 +206,9 @@ crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
+
+export haikuRequiredLegacyGCCVersion="2.95.3-beos-060710"
+	# version of legacy gcc required to build haiku
 
 set_default_value HAIKU_AR			ar
 set_default_value HAIKU_CC			gcc
