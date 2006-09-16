@@ -222,10 +222,15 @@ FUNCTION(arch_debug_save_registers):
 	popl	%eax
 	movl	%eax, 36(%esi)
 
-	movl	%cs, 40(%esi)
-	movl	%ss, 44(%esi)
-	movl	%ds, 48(%esi)
-	movl	%es, 52(%esi)
+	xor	%eax, %eax
+	movw	%cs, %ax
+	movl	%eax, 40(%esi)
+	movw	%ss, %ax
+	movl	%eax, 44(%esi)
+	movw	%ds, %ax
+	movl	%eax, 48(%esi)
+	movw	%es, %ax
+	movl	%eax, 52(%esi)
 
 	popl	%eax
 	popl	%esi
