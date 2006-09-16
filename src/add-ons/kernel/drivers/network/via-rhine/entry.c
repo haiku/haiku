@@ -28,10 +28,10 @@
 /*
  * Standard Driver Entry Functions
  */
-__declspec(dllexport) status_t       init_driver    (void);
-__declspec(dllexport) void           uninit_driver  (void);
-__declspec(dllexport) const char   **publish_devices(void);
-__declspec(dllexport) device_hooks  *find_device    (const char *name);
+status_t       init_driver    (void);
+void           uninit_driver  (void);
+const char   **publish_devices(void);
+device_hooks  *find_device    (const char *name);
 
 char            *pDevNameList[MAX_CARDS+1];
 pci_info        *pDevList    [MAX_CARDS+1];

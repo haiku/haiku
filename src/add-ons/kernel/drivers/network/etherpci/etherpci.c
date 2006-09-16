@@ -62,11 +62,11 @@ static int32 				gOpenMask = 0;
 
 
 /* Driver Entry Points */
-__declspec(dllexport) status_t init_hardware(void);
-__declspec(dllexport) status_t init_driver(void);
-__declspec(dllexport) void uninit_driver(void);
-__declspec(dllexport) const char** publish_devices(void);
-__declspec(dllexport) device_hooks *find_device(const char *name);
+status_t init_hardware(void);
+status_t init_driver(void);
+void uninit_driver(void);
+const char** publish_devices(void);
+device_hooks *find_device(const char *name);
 
 
 
