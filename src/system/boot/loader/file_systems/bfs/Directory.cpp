@@ -63,7 +63,7 @@ Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
 
-	*_cookie = (void *)new TreeIterator(&fTree);
+	*_cookie = (void *)new(nothrow) TreeIterator(&fTree);
 	if (*_cookie == NULL)
 		return B_NO_MEMORY;
 

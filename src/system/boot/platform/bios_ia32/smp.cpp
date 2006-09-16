@@ -510,13 +510,13 @@ smp_add_safemode_menus(Menu *menu)
 
 	// ToDo: this should work with dual CPUs with HT as well!
 	if (gKernelArgs.num_cpus > 2 || !supports_hyper_threading()) {
-		menu->AddItem(item = new MenuItem("Disable SMP"));
+		menu->AddItem(item = new(nothrow) MenuItem("Disable SMP"));
 		item->SetData(B_SAFEMODE_DISABLE_SMP);
 		item->SetType(MENU_ITEM_MARKABLE);
 	}
 
 	if (supports_hyper_threading()) {
-		menu->AddItem(item = new MenuItem("Disable Hyper-Threading"));
+		menu->AddItem(item = new(nothrow) MenuItem("Disable Hyper-Threading"));
 		item->SetData(B_SAFEMODE_DISABLE_HYPER_THREADING);
 		item->SetType(MENU_ITEM_MARKABLE);
 	}

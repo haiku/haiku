@@ -287,7 +287,7 @@ Descriptor::Release()
 status_t
 vfs_init(stage2_args *args)
 {
-	gRoot = new RootFileSystem();
+	gRoot = new(nothrow) RootFileSystem();
 	if (gRoot == NULL)
 		return B_NO_MEMORY;
 
@@ -543,7 +543,7 @@ open_node(Node *node, int mode)
 
 	TRACE(("could open node at %p\n", node));
 
-	Descriptor *descriptor = new Descriptor(node, cookie);
+	Descriptor *descriptor = new(nothrow) Descriptor(node, cookie);
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
 

@@ -296,7 +296,7 @@ TarFS::Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
 
-	EntryIterator *iterator = new EntryIterator(fEntries.GetIterator());
+	EntryIterator *iterator = new(nothrow) EntryIterator(fEntries.GetIterator());
 	if (iterator == NULL)
 		return B_NO_MEMORY;
 
@@ -414,7 +414,7 @@ TarFS::Directory::AddDirectory(char *dirName, TarFS::Directory **_dir)
 			return B_ERROR;
 	} else {
 		// doesn't exist yet -- create it
-		dir = new TarFS::Directory(dirName);
+		dir = new(nothrow) TarFS::Directory(dirName);
 		if (!dir)
 			return B_NO_MEMORY;
 
@@ -456,7 +456,7 @@ TarFS::Directory::AddFile(tar_header *header)
 	}
 
 	// create the file
-	TarFS::File *file = new TarFS::File(header, leaf);
+	TarFS::File *file = new(nothrow) TarFS::File(header, leaf);
 	if (!file)
 		return B_NO_MEMORY;
 
@@ -654,7 +654,7 @@ TarFS::Volume::Init(boot::Partition *partition)
 static status_t
 tarfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
-	TarFS::Volume *volume = new TarFS::Volume;
+	TarFS::Volume *volume = new(nothrow) TarFS::Volume;
 	if (volume == NULL)
 		return B_NO_MEMORY;
 

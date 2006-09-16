@@ -288,7 +288,7 @@ Menu::AddItem(MenuItem *item)
 status_t
 Menu::AddSeparatorItem()
 {
-	MenuItem *item = new MenuItem();
+	MenuItem *item = new(nothrow) MenuItem();
 	if (item == NULL)
 		return B_NO_MEMORY;
 
@@ -368,7 +368,7 @@ user_menu_boot_volume(Menu *menu, MenuItem *item)
 static Menu *
 add_boot_volume_menu(Directory *bootVolume)
 {
-	Menu *menu = new Menu(CHOICE_MENU, "Select Boot Volume");
+	Menu *menu = new(nothrow) Menu(CHOICE_MENU, "Select Boot Volume");
 	MenuItem *item;
 	void *cookie;
 	int32 count = 0;
@@ -382,7 +382,7 @@ add_boot_volume_menu(Directory *bootVolume)
 
 			char name[B_FILE_NAME_LENGTH];
 			if (volume->GetName(name, sizeof(name)) == B_OK) {
-				menu->AddItem(item = new MenuItem(name));
+				menu->AddItem(item = new(nothrow) MenuItem(name));
 				item->SetTarget(user_menu_boot_volume);
 				item->SetData(volume);
 
@@ -399,20 +399,20 @@ add_boot_volume_menu(Directory *bootVolume)
 
 	if (count == 0) {
 		// no boot volume found yet
-		menu->AddItem(item = new MenuItem("<No boot volume found>"));
+		menu->AddItem(item = new(nothrow) MenuItem("<No boot volume found>"));
 		item->SetType(MENU_ITEM_NO_CHOICE);
 		item->SetEnabled(false);
 	}
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new MenuItem("Rescan volumes"));
+	menu->AddItem(item = new(nothrow) MenuItem("Rescan volumes"));
 	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - depending on your system, you can then boot from them.");
 	item->SetType(MENU_ITEM_NO_CHOICE);
 	if (count == 0)
 		item->Select(true);
 
-	menu->AddItem(item = new MenuItem("Return to main menu"));
+	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
 	if (gKernelArgs.boot_disk.booted_from_image)
@@ -425,33 +425,33 @@ add_boot_volume_menu(Directory *bootVolume)
 static Menu *
 add_safe_mode_menu()
 {
-	Menu *safeMenu = new Menu(SAFE_MODE_MENU, "Safe Mode Options");
+	Menu *safeMenu = new(nothrow) Menu(SAFE_MODE_MENU, "Safe Mode Options");
 	MenuItem *item;
 
-	safeMenu->AddItem(item = new MenuItem("Safe mode"));
+	safeMenu->AddItem(item = new(nothrow) MenuItem("Safe mode"));
 	item->SetData(B_SAFEMODE_SAFE_MODE);
 	item->SetType(MENU_ITEM_MARKABLE);
 	item->SetHelpText("Puts the system into safe mode. This can be enabled independently "
 		"from the other options.");
 
-	safeMenu->AddItem(item = new MenuItem("Disable user add-ons"));
+	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable user add-ons"));
 	item->SetData(B_SAFEMODE_DISABLE_USER_ADD_ONS);
 	item->SetType(MENU_ITEM_MARKABLE);
 	item->SetHelpText("Prevent all user installed add-ons to be loaded. Only the add-ons "
 		"in the system directory will be used.");
 
-	safeMenu->AddItem(item = new MenuItem("Disable IDE DMA"));
+	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable IDE DMA"));
 	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
 
 	platform_add_menus(safeMenu);
 
-	safeMenu->AddItem(item = new MenuItem("Enable on screen debug output"));
+	safeMenu->AddItem(item = new(nothrow) MenuItem("Enable on screen debug output"));
 	item->SetData("debug_screen");
 	item->SetType(MENU_ITEM_MARKABLE);
 
 	safeMenu->AddSeparatorItem();
-	safeMenu->AddItem(item = new MenuItem("Return to main menu"));
+	safeMenu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 
 	return safeMenu;
 }
@@ -491,26 +491,26 @@ user_menu_reboot(Menu *menu, MenuItem *item)
 status_t
 user_menu(Directory **_bootVolume)
 {
-	Menu *menu = new Menu(MAIN_MENU);
+	Menu *menu = new(nothrow) Menu(MAIN_MENU);
 	Menu *safeModeMenu;
 	MenuItem *item;
 
 	// Add boot volume
-	menu->AddItem(item = new MenuItem("Select boot volume", add_boot_volume_menu(*_bootVolume)));
+	menu->AddItem(item = new(nothrow) MenuItem("Select boot volume", add_boot_volume_menu(*_bootVolume)));
 
 	// Add safe mode
-	menu->AddItem(item = new MenuItem("Select safe mode options", safeModeMenu = add_safe_mode_menu()));
+	menu->AddItem(item = new(nothrow) MenuItem("Select safe mode options", safeModeMenu = add_safe_mode_menu()));
 
 	// Add platform dependent menus
 	platform_add_menus(menu);
 
 	menu->AddSeparatorItem();
 	if (*_bootVolume == NULL) {
-		menu->AddItem(item = new MenuItem("Reboot"));
+		menu->AddItem(item = new(nothrow) MenuItem("Reboot"));
 		item->SetTarget(user_menu_reboot);
 	}
 
-	menu->AddItem(item = new MenuItem("Continue booting"));
+	menu->AddItem(item = new(nothrow) MenuItem("Continue booting"));
 	if (*_bootVolume == NULL) {
 		item->SetEnabled(false);
 		menu->ItemAt(0)->Select(true);

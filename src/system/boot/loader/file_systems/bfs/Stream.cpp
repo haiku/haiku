@@ -403,12 +403,12 @@ Stream::NodeFactory(Volume &volume, off_t id)
 		return NULL;
 
 	if (stream.IsContainer())
-		return new Directory(stream);
+		return new(nothrow) Directory(stream);
 
 	if (stream.IsSymlink())
-		return new Link(stream);
+		return new(nothrow) Link(stream);
 
-	return new File(stream);
+	return new(nothrow) File(stream);
 }
 
 

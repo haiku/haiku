@@ -57,7 +57,7 @@ Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
 
-	HashIterator *iterator = new HashIterator(fVolume.Device(), fNode);
+	HashIterator *iterator = new(nothrow) HashIterator(fVolume.Device(), fNode);
 	if (iterator == NULL)
 		return B_NO_MEMORY;
 
@@ -102,9 +102,9 @@ Directory::Lookup(const char *name, bool traverseLinks)
 		if (node->GetName(fileName, sizeof(fileName)) == B_OK
 			&& !strcmp(name, fileName)) {
 			if (node->IsFile())
-				return new File(fVolume, block);
+				return new(nothrow) File(fVolume, block);
 			if (node->IsDirectory())
-				return new Directory(fVolume, block);
+				return new(nothrow) Directory(fVolume, block);
 
 			return NULL;
 		}

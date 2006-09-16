@@ -55,7 +55,7 @@ Volume::Volume(boot::Partition *partition)
 
 	TRACE(("bfs: we do have a valid super block (name = %s)!\n", fSuperBlock.name));
 
-	fRootNode = new BFS::Directory(*this, Root());
+	fRootNode = new(nothrow) BFS::Directory(*this, Root());
 	if (fRootNode == NULL)
 		return;
 
@@ -135,7 +135,7 @@ Volume::ToBlockRun(off_t block) const
 static status_t
 bfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
-	Volume *volume = new Volume(partition);
+	Volume *volume = new(nothrow) Volume(partition);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 

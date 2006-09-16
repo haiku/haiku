@@ -38,7 +38,7 @@ HFSPlus::get_root_block(int fDevice, char *buffer, int32 blockSize, off_t partit
 static status_t
 hfs_plus_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
-/*	Volume *volume = new Volume(partition);
+/*	Volume *volume = new(nothrow) Volume(partition);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 

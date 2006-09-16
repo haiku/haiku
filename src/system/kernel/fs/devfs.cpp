@@ -866,8 +866,11 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 
 	// every raw disk gets an I/O scheduler object attached
 	// ToDo: the driver should ask for a scheduler (ie. using its devfs node attributes)
-	if (isDisk && !strcmp(node->name, "raw")) 
-		node->stream.u.dev.scheduler = new IOScheduler(path, info);
+	if (isDisk && !strcmp(node->name, "raw")) {
+		node->stream.u.dev.scheduler = new(nothrow) IOScheduler(path, info);
+		if (!node->stream.u.dev.scheduler)
+			return B_NO_MEMORY;
+	}
 
 	return status;
 }

@@ -412,29 +412,29 @@ video_mode_hook(Menu *menu, MenuItem *item)
 Menu *
 video_mode_menu()
 {
-	Menu *menu = new Menu(CHOICE_MENU, "Select Video Mode");
+	Menu *menu = new(nothrow) Menu(CHOICE_MENU, "Select Video Mode");
 	MenuItem *item;
 
-	menu->AddItem(item = new MenuItem("Default"));
+	menu->AddItem(item = new(nothrow) MenuItem("Default"));
 	item->SetMarked(true);
 	item->Select(true);
 	item->SetHelpText("The Default video mode is the one currently configured in "
 		"the system. If there is no mode configured yet, a viable mode will be chosen "
 		"automatically.");
 
-	menu->AddItem(new MenuItem("Standard VGA"));
+	menu->AddItem(new(nothrow) MenuItem("Standard VGA"));
 
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
 		char label[64];
 		sprintf(label, "%ldx%ld %ld bit", mode->width, mode->height, mode->bits_per_pixel);
 
-		menu->AddItem(item = new MenuItem(label));
+		menu->AddItem(item = new(nothrow) MenuItem(label));
 		item->SetData(mode);
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new MenuItem("Return to main menu"));
+	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
 	return menu;

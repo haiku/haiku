@@ -75,7 +75,7 @@ Volume::Volume(boot::Partition *partition)
 		buffer = newBuffer;
 
 	fRootNode.SetTo(buffer, blockSize);
-	fRoot = new Directory(*this, fRootNode);
+	fRoot = new(nothrow) Directory(*this, fRootNode);
 		// fRoot will free the buffer for us upon destruction
 }
 
@@ -103,7 +103,7 @@ Volume::InitCheck()
 static status_t
 amiga_ffs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
-	Volume *volume = new Volume(partition);
+	Volume *volume = new(nothrow) Volume(partition);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 

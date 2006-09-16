@@ -77,7 +77,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		return B_ERROR;
 	}
 
-	Handle *device = new Handle(handle);
+	Handle *device = new(nothrow) Handle(handle);
 	if (device == NULL)
 		return B_NO_MEMORY;
 
@@ -174,7 +174,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 			continue;
 		}
 
-		Handle *device = new Handle(handle);
+		Handle *device = new(nothrow) Handle(handle);
 		printf("\t\t(could open device, handle = %p, node = %p)\n", (void *)handle, device);
 
 		devicesList->Add(device);

@@ -298,7 +298,7 @@ block_cache::FreeBlock(cached_block *block)
 cached_block *
 block_cache::NewBlock(off_t blockNumber)
 {
-	cached_block *block = new cached_block;
+	cached_block *block = new(nothrow) cached_block;
 	if (block == NULL) {
 		FATAL(("could not allocate block!\n"));
 		return NULL;
@@ -679,7 +679,7 @@ cache_start_transaction(void *_cache)
 	if (cache->last_transaction && cache->last_transaction->open)
 		panic("last transaction (%ld) still open!\n", cache->last_transaction->id);
 
-	cache_transaction *transaction = new cache_transaction;
+	cache_transaction *transaction = new(nothrow) cache_transaction;
 	if (transaction == NULL)
 		return B_NO_MEMORY;
 
@@ -841,7 +841,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 		return B_BAD_VALUE;
 
 	// create a new transaction for the sub transaction
-	cache_transaction *newTransaction = new cache_transaction;
+	cache_transaction *newTransaction = new(nothrow) cache_transaction;
 	if (transaction == NULL)
 		return B_NO_MEMORY;
 
@@ -1081,7 +1081,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 extern "C" void *
 block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 {
-	block_cache *cache = new block_cache(fd, numBlocks, blockSize, readOnly);
+	block_cache *cache = new(nothrow) block_cache(fd, numBlocks, blockSize, readOnly);
 	if (cache == NULL)
 		return NULL;
 

@@ -19,16 +19,16 @@ platform_add_menus(Menu *menu)
 
 	switch (menu->Type()) {
 		case MAIN_MENU:
-			menu->AddItem(item = new MenuItem("Select fail-safe video mode", video_mode_menu()));
+			menu->AddItem(item = new(nothrow) MenuItem("Select fail-safe video mode", video_mode_menu()));
 			item->SetTarget(video_mode_hook);
 			break;
 		case SAFE_MODE_MENU:
 			smp_add_safemode_menus(menu);
 
-			menu->AddItem(item = new MenuItem("Don't call the BIOS"));
+			menu->AddItem(item = new(nothrow) MenuItem("Don't call the BIOS"));
 			item->SetType(MENU_ITEM_MARKABLE);
 
-			menu->AddItem(item = new MenuItem("Disable APM"));
+			menu->AddItem(item = new(nothrow) MenuItem("Disable APM"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData("disable_apm");
 			item->SetHelpText("This overrides the APM setting in the kernel settings file");

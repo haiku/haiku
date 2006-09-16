@@ -494,7 +494,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 		if (driveID == gBootDriveID)
 			continue;
 
-		BIOSDrive *drive = new BIOSDrive(driveID);
+		BIOSDrive *drive = new(nothrow) BIOSDrive(driveID);
 		if (drive->InitCheck() != B_OK) {
 			dprintf("could not add drive %u\n", driveID);
 			delete drive;
@@ -741,7 +741,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
 	TRACE(("boot drive ID: %x\n", gBootDriveID));
 
-	BIOSDrive *drive = new BIOSDrive(gBootDriveID);
+	BIOSDrive *drive = new(nothrow) BIOSDrive(gBootDriveID);
 	if (drive->InitCheck() != B_OK) {
 		dprintf("no boot drive!\n");
 		return B_ERROR;

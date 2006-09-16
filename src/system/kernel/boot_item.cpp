@@ -30,7 +30,7 @@ static ItemList sItemList;
 status_t
 add_boot_item(const char *name, void *data, size_t size)
 {
-	boot_item *item = new boot_item;
+	boot_item *item = new(nothrow) boot_item;
 	if (item == NULL)
 		return B_NO_MEMORY;
 

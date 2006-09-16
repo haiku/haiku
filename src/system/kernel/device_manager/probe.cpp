@@ -180,7 +180,9 @@ next_entry:
 		goto next_entry;
 
 	if (S_ISDIR(stat.st_mode) && fRecursive) {
-		KPath *nextPath = new KPath(path);
+		KPath *nextPath = new(nothrow) KPath(path);
+		if (!nextPath)
+			return B_NO_MEMORY;
 		if (fPaths.Push(nextPath) != B_OK)
 			return B_NO_MEMORY;
 
@@ -211,7 +213,9 @@ DirectoryIterator::Unset()
 void 
 DirectoryIterator::AddPath(const char *basePath, const char *subPath)
 {
-	KPath *path = new KPath(basePath);
+	KPath *path = new(nothrow) KPath(basePath);
+	if (!path)
+		panic("out of memory");
 	if (subPath != NULL)
 		path->Append(subPath);
 
