@@ -321,7 +321,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 			struct team *team, *next;
 
 			// we need a safe way to get from the thread to the process group
-			id = thread->team->id;
+			// XXX whats this? id = thread->team->id;
 
 			for (team = group->teams; team != NULL; team = next) {
 				next = team->group_next;
