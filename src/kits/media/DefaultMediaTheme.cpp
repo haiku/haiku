@@ -995,7 +995,7 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				// ToDo: take BContinuousParameter::GetResponse() & ValueStep() into account!
 
 				for (int32 i = 0; i < continuous.CountChannels(); i++)
-					slider->SetLimitsFor(i, continuous.MinValue() * 1000, continuous.MaxValue() * 1000);
+					slider->SetLimitsFor(i, int32(continuous.MinValue() * 1000), int32(continuous.MaxValue() * 1000));
 
 				return slider;
 			}
