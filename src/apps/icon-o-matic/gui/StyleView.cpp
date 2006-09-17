@@ -24,6 +24,8 @@
 #include "SetGradientCommand.h"
 #include "Style.h"
 
+using std::nothrow;
+
 enum {
 	MSG_SET_COLOR			= 'stcl',
 

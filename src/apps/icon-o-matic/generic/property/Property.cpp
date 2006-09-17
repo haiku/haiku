@@ -17,7 +17,7 @@
 
 #include "support.h"
 
-using std::nowthrow;
+using std::nothrow;
 
 // constructor
 Property::Property(uint32 identifier)

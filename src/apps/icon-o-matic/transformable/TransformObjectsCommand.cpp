@@ -13,6 +13,8 @@
 
 #include "ChannelTransform.h"
 
+using std::nothrow;
+
 // constructor
 TransformObjectsCommand::TransformObjectsCommand(
 								TransformBox* box,

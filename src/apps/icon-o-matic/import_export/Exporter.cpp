@@ -22,6 +22,8 @@
 #include "Document.h"
 #include "Icon.h"
 
+using std::nothrow;
+
 // constructor
 Exporter::Exporter()
 	: fDocument(NULL),

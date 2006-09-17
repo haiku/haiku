@@ -33,14 +33,16 @@ class QcUtility
 {
 #if NUMT_IS_DOUBLE
 private:
-  static double const qcEps     = 2.273736754432321e-13;   // 2 ** -42
+  #define             _QC_EPS	  2.273736754432321e-13		// 2 ** -42
+  static double const qcEps     = _QC_EPS;
   static double const qcNearEps = 9.313225746154785e-10;   // 2 ** -30
   static double const qcVaguelyNearEps = 9.5367431640625e-7; // 2 ** -20
 
 public:
   /** Highest <tt>numT</tt> <var>x</var> s.t.&nbsp;<tt>IsZero(x)</tt>.
       This is a positive (non-zero) number iff numT is floating point. */
-  static double const qcMaxZeroVal = qcEps * (1 - DBL_EPSILON / 2);
+  static double const qcMaxZeroVal = _QC_EPS * (1 - DBL_EPSILON / 2);
+  #undef _QC_EPS
 
 public:
 	//-----------------------------------------------------------------------//

@@ -16,7 +16,7 @@
 # include <Archivable.h>
 
 # include "Observable.h"
-#endif ICON_O_MATIC
+#endif // ICON_O_MATIC
 
 #include "Transformable.h"
 

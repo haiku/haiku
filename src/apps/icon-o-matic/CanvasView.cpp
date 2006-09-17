@@ -18,6 +18,8 @@
 #include "CommandStack.h"
 #include "IconRenderer.h"
 
+using std::nothrow;
+
 // constructor
 CanvasView::CanvasView(BRect frame)
 	: StateView(frame, "canvas view", B_FOLLOW_ALL,

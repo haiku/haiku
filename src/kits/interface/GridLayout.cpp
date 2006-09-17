@@ -13,6 +13,8 @@
 
 #include "ViewLayoutItem.h"
 
+using std::nothrow;
+using std::swap;
 
 enum {	
 	MAX_COLUMN_ROW_COUNT	= 1024,

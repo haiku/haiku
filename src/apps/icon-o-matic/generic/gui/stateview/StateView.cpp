@@ -22,6 +22,7 @@
 //
 #include "RWLocker.h"
 
+using std::nothrow;
 
 class EventFilter : public BMessageFilter {
  public:

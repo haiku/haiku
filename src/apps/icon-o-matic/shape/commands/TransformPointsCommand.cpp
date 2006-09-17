@@ -14,6 +14,8 @@
 #include "ChannelTransform.h"
 #include "VectorPath.h"
 
+using std::nothrow;
+
 // constructor
 TransformPointsCommand::TransformPointsCommand(
 								TransformBox* box,

@@ -19,6 +19,7 @@ class Selection;
 class Shape;
 class ShapeContainer;
 class ShapeListener;
+class ShapeStyleListener;
 class Style;
 class StyleListItem;
 

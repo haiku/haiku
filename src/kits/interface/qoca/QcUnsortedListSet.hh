@@ -3,7 +3,11 @@
 
 #include <vector.h>
 
-template <class T, class Alloc = alloc>
+#if __GNUC__ >= 4
+  template <class T, class Alloc = std::allocator<T> >
+#else
+  template <class T, class Alloc = alloc>
+#endif
 class QcUnsortedListSet
 {
 public:

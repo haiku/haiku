@@ -33,6 +33,8 @@
 #include "Selection.h"
 #include "Util.h"
 
+using std::nothrow;
+
 static const float kMarkWidth		= 14.0;
 static const float kBorderOffset	= 3.0;
 static const float kTextOffset		= 4.0;

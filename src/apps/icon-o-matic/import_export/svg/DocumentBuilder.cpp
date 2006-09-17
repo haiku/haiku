@@ -183,7 +183,7 @@ DocumentBuilder::curve4(double x2, double y2,				   // S, s
 void
 DocumentBuilder::elliptical_arc(double rx, double ry, double angle,
 							    bool large_arc_flag, bool sweep_flag,
-							    double x, double y, bool rel = false)
+							    double x, double y, bool rel)
 {
 	angle = angle / 180.0 * pi;
 	if (rel) {
@@ -531,7 +531,10 @@ DocumentBuilder::StartGradient(bool radial)
 						"previous gradient (%s) not finished!\n", fCurrentGradient->ID());
 	}
 
-	fCurrentGradient = radial ? new SVGRadialGradient() : new SVGLinearGradient();
+	if (radial)
+		fCurrentGradient = new SVGRadialGradient();
+	else
+		fCurrentGradient = new SVGLinearGradient();
 
 	_AddGradient(fCurrentGradient);
 }

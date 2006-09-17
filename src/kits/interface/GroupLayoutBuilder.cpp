@@ -111,7 +111,7 @@ BGroupLayoutBuilder::Add(BLayoutItem* item, float weight)
 // AddGroup
 BGroupLayoutBuilder&
 BGroupLayoutBuilder::AddGroup(enum orientation orientation,
-	float spacing = 0.0f, float weight = 1.0f)
+	float spacing, float weight)
 {
 	if (BGroupLayout* layout = TopLayout()) {
 		BGroupView* group = new(nothrow) BGroupView(orientation, spacing);
@@ -136,7 +136,7 @@ BGroupLayoutBuilder::End()
 
 // AddGlue
 BGroupLayoutBuilder&
-BGroupLayoutBuilder::AddGlue(float weight = 1.0f)
+BGroupLayoutBuilder::AddGlue(float weight)
 {
 	if (BGroupLayout* layout = TopLayout())
 		layout->AddItem(BSpaceLayoutItem::CreateGlue(), weight);

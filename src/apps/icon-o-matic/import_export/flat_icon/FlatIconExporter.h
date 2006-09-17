@@ -28,6 +28,10 @@ class VectorPath;
 # include <Point.h>
 # include <hash_set>
 
+#if __GNUC__ >= 4
+  using __gnu_cxx::hash_set;
+#endif
+
 class PointHash {
  public:
 	int operator()(const BPoint& point) const

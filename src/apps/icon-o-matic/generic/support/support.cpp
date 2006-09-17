@@ -93,7 +93,7 @@ write_string(BPositionIO* stream, BString& string)
 
 // append_float
 void
-append_float(BString& string, float n, int32 maxDigits = 4)
+append_float(BString& string, float n, int32 maxDigits)
 {
 	int32 rounded = n >= 0.0 ? (int32)fabs(floorf(n)) : (int32)fabs(ceilf(n));
 

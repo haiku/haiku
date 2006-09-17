@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-using std::nowthrow;
+using std::nothrow;
 
 // constructor
 Int64Property::Int64Property(uint32 identifier, int64 value)

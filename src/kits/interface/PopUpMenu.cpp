@@ -16,6 +16,8 @@
 
 #include <new>
 
+using std::nothrow;
+
 struct popup_menu_data {
 	BPopUpMenu *object;
 	BWindow *window;
