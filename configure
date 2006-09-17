@@ -119,11 +119,12 @@ standard_gcc_settings()
 					$headers/$d"
 			done
 
-			if [ "$buildCrossTools" = "" ]; then
-				# when not building the crosscompiler, we use cpp headers from 
-				# tree first, but fallback to local C++ system headers (like <new>)
-				haikuCxxHeadersDir="headers/cpp $haikuCxxHeadersDir"
-			fi
+			
+			# when not building the crosscompiler, to use cpp headers from 
+			# tree first, but fallback to local C++ system headers (like <new>)
+			# if [ "$buildCrossTools" = "" ]; then
+			#	haikuCxxHeadersDir="headers/cpp $haikuCxxHeadersDir"
+			# fi
 
 			if [ $haikuStaticLibStdCxx = libstdc++.a ]; then
 				haikuStaticLibStdCxx=
