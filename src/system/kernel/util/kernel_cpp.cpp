@@ -99,6 +99,102 @@ puts(const char *string)
 
 #endif	// __GNUC__ >= 3
 
+#if __GNUC__ >= 4
+
+extern "C"
+void
+_Unwind_DeleteException()
+{
+	panic("_Unwind_DeleteException");
+}
+
+extern "C"
+void
+_Unwind_Find_FDE()
+{
+	panic("_Unwind_Find_FDE");
+}
+
+
+extern "C"
+void
+_Unwind_GetDataRelBase()
+{
+	panic("_Unwind_GetDataRelBase");
+}
+
+extern "C"
+void
+_Unwind_GetGR()
+{
+	panic("_Unwind_GetGR");
+}
+
+extern "C"
+void
+_Unwind_GetIP()
+{
+	panic("_Unwind_GetIP");
+}
+
+extern "C"
+void
+_Unwind_GetLanguageSpecificData()
+{
+	panic("_Unwind_GetLanguageSpecificData");
+}
+
+extern "C"
+void
+_Unwind_GetRegionStart()
+{
+	panic("_Unwind_GetRegionStart");
+}
+
+extern "C"
+void
+_Unwind_GetTextRelBase()
+{
+	panic("_Unwind_GetTextRelBase");
+}
+
+extern "C"
+void
+_Unwind_RaiseException()
+{
+	panic("_Unwind_RaiseException");
+}
+
+extern "C"
+void
+_Unwind_Resume()
+{
+	panic("_Unwind_Resume");
+}
+
+extern "C"
+void
+_Unwind_Resume_or_Rethrow()
+{
+	panic("_Unwind_Resume_or_Rethrow");
+}
+
+extern "C"
+void
+_Unwind_SetGR()
+{
+	panic("_Unwind_SetGR");
+}
+
+extern "C"
+void
+_Unwind_SetIP()
+{
+	panic("_Unwind_SetIP");
+}
+
+#endif	// __GNUC__ >= 4
+
 extern "C"
 void
 abort()
