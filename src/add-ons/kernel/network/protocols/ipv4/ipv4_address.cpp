@@ -34,7 +34,7 @@
 */
 static status_t
 ipv4_copy_address(const sockaddr *from, sockaddr **to,
-	bool replaceWithZeros = false, sockaddr *mask = NULL)
+	bool replaceWithZeros = false, const sockaddr *mask = NULL)
 {
 	if (replaceWithZeros) {
 		*to = (sockaddr *)malloc(sizeof(sockaddr_in));
@@ -58,7 +58,7 @@ ipv4_copy_address(const sockaddr *from, sockaddr **to,
 
 		if (mask != NULL) {
 			((sockaddr_in *)*to)->sin_addr.s_addr
-				&= ((sockaddr_in *)mask)->sin_addr.s_addr;
+				&= ((const sockaddr_in *)mask)->sin_addr.s_addr;
 		}
 	}
 	return B_OK;
@@ -194,12 +194,12 @@ ipv4_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 		that there's no bit set in the mask).
 */
 static int32
-ipv4_first_mask_bit(sockaddr *_mask)
+ipv4_first_mask_bit(const sockaddr *_mask)
 {
 	if (_mask == NULL)
 		return 0;
 
-	uint32 mask = ntohl(((sockaddr_in *)_mask)->sin_addr.s_addr);
+	uint32 mask = ntohl(((const sockaddr_in *)_mask)->sin_addr.s_addr);
 
 	// TODO: this can be optimized, there are also some nice assembler mnemonics for this
 	int8 bit = 0;
@@ -224,7 +224,7 @@ ipv4_check_mask(const sockaddr *_mask)
 	if (_mask == NULL)
 		return true;
 
-	uint32 mask = ntohl(((sockaddr_in *)_mask)->sin_addr.s_addr);
+	uint32 mask = ntohl(((const sockaddr_in *)_mask)->sin_addr.s_addr);
 
 	// A mask (from LSB) starts with zeros, after the first one, only ones 
 	// are allowed:
@@ -364,7 +364,7 @@ ipv4_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 	\return B_BAD_VALUE if either \a address or \a checksum is NULL
 */
 static status_t
-ipv4_checksum_address(Checksum *checksum, const sockaddr *address)
+ipv4_checksum_address(struct Checksum *checksum, const sockaddr *address)
 {
 	if (checksum == NULL || address == NULL)
 		return B_BAD_VALUE;
@@ -396,4 +396,5 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_set_to_empty_address,
 	ipv4_hash_address_pair,
 	ipv4_checksum_address,
+	NULL // ipv4_matches_broadcast_address,
 };

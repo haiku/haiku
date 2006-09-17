@@ -89,4 +89,4 @@ tobias_text_encoded_media_format()
 }
 
 
-#endif _OGG_TOBIAS_FORMATS_H
+#endif // _OGG_TOBIAS_FORMATS_H

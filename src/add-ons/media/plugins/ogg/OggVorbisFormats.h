@@ -43,4 +43,4 @@ vorbis_encoded_media_format()
 }
 
 
-#endif _OGG_VORBIS_FORMATS_H
+#endif //_OGG_VORBIS_FORMATS_H

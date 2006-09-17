@@ -7,4 +7,4 @@ const uint32 OGG_FILE_FORMAT = 'OggS';
 //! for use in media_header.user_data_type
 const uint32 OGG_PACKET_DATA_TYPE = 'OggP';
 
-#endif _OGG_FORMATS_H
+#endif // _OGG_FORMATS_H

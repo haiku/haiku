@@ -716,7 +716,7 @@ ipv4_bind(net_protocol *protocol, struct sockaddr *address)
 
 	// only INADDR_ANY and addresses of local interfaces are accepted:
 	if (((sockaddr_in *)address)->sin_addr.s_addr == INADDR_ANY
-		|| sDatalinkModule->is_local_address(sDomain, address)) {
+		|| sDatalinkModule->is_local_address(sDomain, address, NULL, NULL)) {
 		protocol->socket->address.ss_len = sizeof(struct sockaddr_in);
 			// explicitly set length, as our callers can't be trusted to
 			// always provide the correct length!

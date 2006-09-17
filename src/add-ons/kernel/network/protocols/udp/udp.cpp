@@ -372,7 +372,7 @@ UdpEndpointManager::DemuxBroadcast(net_buffer *buffer)
 		}
 
 		connectAddr = (sockaddr *)&endpoint->socket->peer;
-		if (!sAddressModule->is_empty_address(connectAddr)) {
+		if (!sAddressModule->is_empty_address(connectAddr, true)) {
 			// endpoint is connected to a specific destination, we check if
 			// this datagram is from there:
 			if (!sAddressModule->equal_addresses_and_ports(connectAddr, peerAddr)) {

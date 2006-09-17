@@ -109,6 +109,8 @@
 #include <Path.h>
 #include <SupportDefs.h>
 
+using std::vector;
+
 int32 HeyInterpreterThreadHook(void* arg);
 
 status_t Hey(BMessenger* target, const char* arg, BMessage* reply);

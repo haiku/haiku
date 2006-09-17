@@ -61,7 +61,43 @@
 #define AVOPTION_SUB(ptr) { .name = NULL, .help = (const char*)ptr }
 #define AVOPTION_END() AVOPTION_SUB(NULL)
 
-struct AVOption;
+
+/**
+ * AVOption.
+ */
+typedef struct AVOption {
+    /** options' name */
+    const char *name; /* if name is NULL, it indicates a link to next */
+    /** short English text help or const struct AVOption* subpointer */
+    const char *help; //	const struct AVOption* sub;
+    /** offset to context structure where the parsed value should be stored */
+    int offset;
+    /** options' type */
+    int type;
+#define FF_OPT_TYPE_BOOL 1      ///< boolean - true,1,on  (or simply presence)
+#define FF_OPT_TYPE_DOUBLE 2    ///< double
+#define FF_OPT_TYPE_INT 3       ///< integer
+#define FF_OPT_TYPE_STRING 4    ///< string (finished with \0)
+#define FF_OPT_TYPE_MASK 0x1f	///< mask for types - upper bits are various flags
+//#define FF_OPT_TYPE_EXPERT 0x20 // flag for expert option
+#define FF_OPT_TYPE_FLAG (FF_OPT_TYPE_BOOL | 0x40)
+#define FF_OPT_TYPE_RCOVERRIDE (FF_OPT_TYPE_STRING | 0x80)
+    /** min value  (min == max   ->  no limits) */
+    double min;
+    /** maximum value for double/int */
+    double max;
+    /** default boo [0,1]l/double/int value */
+    double defval;
+    /**
+     * default string value (with optional semicolon delimited extra option-list
+     * i.e.   option1;option2;option3
+     * defval might select other then first argument as default
+     */
+    const char *defstr;
+#define FF_OPT_MAX_DEPTH 10
+} AVOption;
+
+
 #ifdef HAVE_MMX
 extern const struct AVOption avoptions_common[3 + 5];
 #else

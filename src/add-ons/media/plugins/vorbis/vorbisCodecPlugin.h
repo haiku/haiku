@@ -43,4 +43,4 @@ public:
 	status_t	GetSupportedFormats(media_format ** formats, size_t * count);
 };
 
-#endif _VORBIS_CODEC_PLUGIN_H_
+#endif //_VORBIS_CODEC_PLUGIN_H_

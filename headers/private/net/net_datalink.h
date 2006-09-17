@@ -69,8 +69,8 @@ struct net_datalink_module_info {
 
 	bool (*is_local_address)(struct net_domain *domain, 
 					const struct sockaddr *address,
-					net_interface **_interface = NULL, 
-					uint32 *_matchedType = NULL);
+					net_interface **_interface /* = NULL */, 
+					uint32 *_matchedType /* = NULL*/);
 
 	// routes
 	status_t (*add_route)(struct net_domain *domain,
@@ -93,7 +93,7 @@ struct net_address_module_info {
 	module_info info;
 
 	status_t (*copy_address)(const sockaddr *from, sockaddr **to,
-					bool replaceWithZeros = false, sockaddr *mask = NULL);
+					bool replaceWithZeros /* = false */, const sockaddr *mask /* = NULL*/);
 
 	status_t (*mask_address)(const sockaddr *address, const sockaddr *mask, 
 					sockaddr *result);
@@ -103,11 +103,11 @@ struct net_address_module_info {
 	bool (*equal_addresses_and_ports)(const sockaddr *a, const sockaddr *b);
 	bool (*equal_masked_addresses)(const sockaddr *a, const sockaddr *b, 
 					const sockaddr *mask);
-	bool (*is_empty_address)(const sockaddr *address, bool checkPort = true);
+	bool (*is_empty_address)(const sockaddr *address, bool checkPort /* = true */);
 
-	int32 (*first_mask_bit)(sockaddr *mask);
+	int32 (*first_mask_bit)(const sockaddr *mask);
 
-	bool (*check_mask)(sockaddr *address);
+	bool (*check_mask)(const sockaddr *address);
 	
 	status_t (*print_address)(const sockaddr *address, char **buffer, 
 					bool printPort);

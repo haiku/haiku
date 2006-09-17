@@ -53,7 +53,7 @@ BGLRenderer::UnlockGL()
 
 
 void
-BGLRenderer::SwapBuffers(bool VSync = false)
+BGLRenderer::SwapBuffers(bool VSync)
 {
 }
 

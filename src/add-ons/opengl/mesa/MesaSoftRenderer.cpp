@@ -177,7 +177,7 @@ MesaSoftRenderer::UnlockGL()
 
 
 void
-MesaSoftRenderer::SwapBuffers(bool VSync = false)
+MesaSoftRenderer::SwapBuffers(bool VSync)
 {
 	_mesa_notifySwapBuffers(fContext);
 

@@ -158,7 +158,7 @@ virtualAssertLinkageInvar() const
     {
       QcOrigRowState const *state = CAST(QcOrigRowState const *, *i);
       assert( state->fRHS == 0.0);
-      assert( state->fMRowIndex == i - fStates);
+      assert( state->fMRowIndex == (void *)i - (void *)fStates);
       assert( !state->fARowDeleted);
     }
 }

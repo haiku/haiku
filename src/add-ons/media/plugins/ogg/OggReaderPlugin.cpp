@@ -106,7 +106,7 @@ retry:
 			TRACE("oggReader::GetPage: ogg_page_continued: continued page: not ogg\n");
 			return B_ERROR;
 		}
-#endif STRICT_OGG
+#endif //STRICT_OGG
 		// this is a beginning of stream page
 		ogg_stream_state stream;
 		if (ogg_stream_init(&stream, serialno) != 0) {
@@ -121,7 +121,7 @@ retry:
 		if (ogg_stream_packetout(&stream, &packet) != 1) {
 #ifdef STRICT_OGG
 			return B_ERROR;
-#endif STRICT_OGG
+#endif //STRICT_OGG
 		}
 		if (fSeekable) {
 			fTracks[serialno] = OggSeekable::makeOggSeekable(fSeekable, &fSeekableLock, serialno, packet);

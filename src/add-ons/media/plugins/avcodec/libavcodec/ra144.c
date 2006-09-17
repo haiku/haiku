@@ -483,7 +483,7 @@ static int ra144_decode_frame(AVCodecContext * avctx,
       *((int16_t *)data)=s;
       if (s>32767) *((int16_t *)data)=32767;
       if (s<-32767) *((int16_t *)data)=-32768;
-      ((int16_t *)data)++;
+      data = (int16_t *)data + 1;
     }
     b+=30;
   }

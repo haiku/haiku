@@ -26,7 +26,6 @@
 #	define TRACE(x) ;
 #endif
 
-
 static benaphore sDomainLock;
 static list sDomains;
 

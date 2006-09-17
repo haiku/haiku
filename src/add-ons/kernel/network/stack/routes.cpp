@@ -349,9 +349,9 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 		&route->destination, (newRoute->flags & RTF_DEFAULT) != 0, 
 		newRoute->mask) != B_OK
 		|| domain->address_module->copy_address(newRoute->mask, &route->mask,
-				(newRoute->flags & RTF_DEFAULT) != 0) != B_OK
+				(newRoute->flags & RTF_DEFAULT) != 0, NULL) != B_OK
 		|| domain->address_module->copy_address(newRoute->gateway, 
-			&route->gateway) != B_OK) {
+			&route->gateway, false, NULL) != B_OK) {
 		delete route;
 		return B_NO_MEMORY;
 	}
