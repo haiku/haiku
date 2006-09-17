@@ -1354,8 +1354,10 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		return;
 	}
 
-	if (!fSubpixelPrecise)
+	if (!fSubpixelPrecise) {
 		align_rect_to_pixels(&viewRect);
+		align_rect_to_pixels(&bitmapRect);
+	}
 		
 	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
 	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
