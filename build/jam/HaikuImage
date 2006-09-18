@@ -243,7 +243,6 @@ AddSymlinkToHaikuImage beos system add-ons Tracker : /boot/beos/preferences/Back
 AddFilesToHaikuImage beos system add-ons input_server devices
 	: <input>keyboard <input>mouse ;
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
-# AddFilesToHaikuImage beos system add-ons input_server methods : canna ;
 AddFilesToHaikuImage beos system add-ons kernel network
 	: stack ;
 AddFilesToHaikuImage beos system add-ons kernel network devices
@@ -261,6 +260,9 @@ AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
 AddDirectoryToHaikuImage beos etc synth ;
+
+#optional
+AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
 
 
 #pragma mark -
