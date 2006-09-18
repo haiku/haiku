@@ -14,13 +14,13 @@ UsePrivateHeaders kernel net ;
 
 # a) Userland stack version:
 
-KernelAddon userland_net_server : kernel drivers bin :
+KernelAddon userland_net_server :
 	userland_server.cpp
 ;
 
 # b) Kernelland stack version:
 
-KernelAddon net_stack : kernel drivers bin :
+KernelAddon net_stack :
 	kernel_stack.cpp
 ;
 

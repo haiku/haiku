@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers graphics et6x00 ;
 
 UsePrivateHeaders [ FDirName graphics et6x00 ] ;
 
-KernelAddon et6x00.driver : kernel drivers bin :
+KernelAddon et6x00.driver :
 	driver.c setmode.c bits.c acl.c
 ;
 

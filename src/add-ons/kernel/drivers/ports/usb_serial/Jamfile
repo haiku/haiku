@@ -6,7 +6,7 @@ local defines = [ FDefines DB_USB_USE_V2_MODULE ] ;
 
 SubDirCcFlags $(defines) ;
 
-KernelAddon usb_serial : kernel drivers bin :
+KernelAddon usb_serial :
 	driver.c
 	tracing.c
 	acm.c

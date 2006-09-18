@@ -10,7 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 	buffer_impl = ring_buffer.cpp ;
 }
 
-KernelAddon usb_hid : kernel drivers bin :
+KernelAddon usb_hid :
 	hid.c
 	hidparse.c
 	devlist.c

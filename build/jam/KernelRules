@@ -72,13 +72,12 @@ actions KernelLd
 
 rule KernelAddon
 {
-	# KernelAddon <name> : <relpath> : <sources> : <static-libraries> : <res> ;
+	# KernelAddon <name> : <sources> : <static-libraries> : <res> ;
 	#
-# TODO: <relpath> no longer needed!
 	local target = $(1) ;
-	local sources = $(3) ;
-	local libs = $(4) ;
-	AddResources $(1) : $(5) ;
+	local sources = $(2) ;
+	local libs = $(3) ;
+	AddResources $(1) : $(4) ;
 
 	local kernel ;
 	local beginGlue ;

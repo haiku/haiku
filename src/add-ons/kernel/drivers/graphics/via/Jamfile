@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics via ] ;
 
-KernelAddon via.driver : kernel drivers bin :
+KernelAddon via.driver :
 	driver.c
 ;
 

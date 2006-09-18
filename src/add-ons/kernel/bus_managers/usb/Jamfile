@@ -23,7 +23,7 @@ KernelStaticLibrary libusb.a :
 	: -fno-pic
 ;	
 
-KernelAddon usb : [ FDirName kernel bus_managers ] :
+KernelAddon usb :
 	usb.cpp
 	: libusb.a
 	: usb.rdef

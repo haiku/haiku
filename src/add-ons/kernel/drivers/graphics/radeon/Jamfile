@@ -11,7 +11,7 @@ StaticLibrary libradeon.a :
 	utils.c
 ;
 
-KernelAddon radeon.driver : kernel drivers bin :
+KernelAddon radeon.driver :
 	driver.c
 	agp.c
 	bios.c

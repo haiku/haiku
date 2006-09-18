@@ -7,7 +7,7 @@ SubDirCcFlags -w -DINCLUDE_TBI_SUPPORT=1 ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
-KernelAddon bcm570x : kernel drivers bin :
+KernelAddon bcm570x :
 	autoneg.c
 	b57um.c
 	tigon3.c

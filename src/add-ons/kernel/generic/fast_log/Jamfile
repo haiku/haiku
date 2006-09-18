@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel generic fast_log ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon fast_log : kernel generic :
+KernelAddon fast_log :
 	clients.c
 	device.c
 	long_buffers.c

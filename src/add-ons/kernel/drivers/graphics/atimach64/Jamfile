@@ -4,7 +4,7 @@ SubDirCcFlags -DSEMAPHORE=1 ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics atimach64 ] ;
 
-KernelAddon atimach64.driver : kernel drivers bin :
+KernelAddon atimach64.driver :
 	driver.c
 	m64info.c
 ;

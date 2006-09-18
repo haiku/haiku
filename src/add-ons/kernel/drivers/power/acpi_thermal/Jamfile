@@ -8,7 +8,7 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders drivers ;
 }
 
-KernelAddon acpi_thermal : kernel drivers bin :
+KernelAddon acpi_thermal :
 	acpi_thermal.c
 	;
 

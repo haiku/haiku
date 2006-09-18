@@ -22,7 +22,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 }
 
 
-KernelAddon pppoe : kernel obos_network ppp :
+KernelAddon pppoe :
 	pppoe.cpp
 	PPPoEDevice.cpp
 	DiscoveryPacket.cpp

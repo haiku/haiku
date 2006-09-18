@@ -10,21 +10,21 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders [ FDirName drivers ] ;
 }
 
-KernelAddon <usb>uhci : [ FDirName kernel busses usb ] :
+KernelAddon <usb>uhci :
 	uhci.cpp
 	uhci_rh.cpp
 	: libusb.a
 	: uhci.rdef
 	;
 
-KernelAddon <usb>ohci : [ FDirName kernel busses usb ] :
+KernelAddon <usb>ohci :
 	ohci.cpp
 	ohci_rh.cpp
 	: libusb.a
 	: ohci.rdef
 	;
 
-KernelAddon <usb>ehci : [ FDirName kernel busses usb ] :
+KernelAddon <usb>ehci :
 	ehci.cpp
 	ehci_rh.cpp
 	: libusb.a

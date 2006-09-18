@@ -17,7 +17,7 @@ local session_files =
 	session.cpp
 	;
 
-KernelAddon session : kernel partitioning_systems :
+KernelAddon session :
 	$(session_files)
 ;
 

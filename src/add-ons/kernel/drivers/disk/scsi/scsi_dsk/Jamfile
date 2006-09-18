@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers disk scsi scsi_dsk ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon scsi_dsk : kernel drivers bin :
+KernelAddon scsi_dsk :
 	device.c
 	handle.c
 	scsi_dsk.c

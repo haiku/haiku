@@ -3,6 +3,6 @@ SubDir HAIKU_TOP src add-ons kernel drivers input ps2_hid ;
 UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
 
-KernelAddon ps2_hid : kernel drivers bin :
+KernelAddon ps2_hid :
 	ps2_hid.c
 ;

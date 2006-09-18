@@ -7,7 +7,7 @@ UsePrivateHeaders usb_vision ;
 #local defines = [ FDefines DB_USB_USE_V2_MODULE ] ;
 #SubDirCcFlags $(defines) ;
 
-KernelAddon usb_vision : kernel drivers bin :
+KernelAddon usb_vision :
 	usb_vision.c
 	tracing.c
 ;

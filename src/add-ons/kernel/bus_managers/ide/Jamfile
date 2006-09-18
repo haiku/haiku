@@ -4,7 +4,7 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) ] ;
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
-KernelAddon ide : kernel bus_managers :
+KernelAddon ide :
 	ata.c
 	atapi.c
 	basic_protocol.c

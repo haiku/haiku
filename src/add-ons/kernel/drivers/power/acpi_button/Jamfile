@@ -8,7 +8,7 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders drivers ;
 }
 
-KernelAddon acpi_button : kernel drivers bin :
+KernelAddon acpi_button :
 	acpi_button.c
 	;
 

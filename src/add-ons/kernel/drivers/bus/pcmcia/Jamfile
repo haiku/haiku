@@ -11,7 +11,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-KernelAddon ds : kernel drivers bus pcmcia :
+KernelAddon ds :
 	ds.c
 	;
 

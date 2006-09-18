@@ -27,7 +27,7 @@ oldOPTIM = $(OPTIM) ;
 UsePrivateHeaders kernel ;			# For kernel_cpp.cpp
 UsePrivateHeaders [ FDirName kernel util ] ;	# For all the UDF source files
 
-KernelAddon <r5>udf : kernel file_systems :
+KernelAddon <r5>udf :
 	kernel_cpp.cpp
 	udf.cpp
 

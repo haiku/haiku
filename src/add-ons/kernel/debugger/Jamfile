@@ -6,6 +6,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 # UsePrivateHeaders kernel ;
 
 
-KernelAddon <kdebug>hangman : kernel debugger :
+KernelAddon <kdebug>hangman :
 	hangman.c
 	;

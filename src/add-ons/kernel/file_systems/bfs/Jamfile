@@ -31,7 +31,7 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
-KernelAddon bfs : kernel file_systems :
+KernelAddon bfs :
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	kernel_cpp.cpp

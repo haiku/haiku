@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders audio ;
 
-KernelAddon usb_audio : kernel drivers bin :
+KernelAddon usb_audio :
 	usb_audio.c
 	USB_audio_utils.c
 ;

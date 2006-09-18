@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio module_driver ;
 
 UsePrivateHeaders media ;
 
-KernelAddon audio_module_driver : kernel drivers bin :
+KernelAddon audio_module_driver :
 	audio_module_driver.c
 ;
 

@@ -51,7 +51,7 @@ KernelStaticLibrary libbfs :
 	BufferPool.cpp
 	;
 
-KernelAddon $(bfsAddOnName)_r5 : kernel file_systems :
+KernelAddon $(bfsAddOnName)_r5 :
 	kernel_interface_r5.cpp
 	: libbfs.a
 	;

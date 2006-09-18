@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-KernelAddon ich_ac97 : kernel drivers bin :
+KernelAddon ich_ac97 :
 	ac97_multi.c
 	config.c
 	debug.c

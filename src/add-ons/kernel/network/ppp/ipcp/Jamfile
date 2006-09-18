@@ -22,7 +22,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 }
 
 
-KernelAddon ipcp : kernel obos_network ppp :
+KernelAddon ipcp :
 	# imported from libnet
 	inet_addr.c
 	

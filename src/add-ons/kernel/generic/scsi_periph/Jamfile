@@ -7,7 +7,7 @@ if $(DEBUG) = 0 {
 	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
 }
 
-KernelAddon scsi_periph : kernel generic :
+KernelAddon scsi_periph :
 	block.c
 	device_icons.c
 	device.c

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 auvia ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-KernelAddon auvia : kernel drivers bin :
+KernelAddon auvia :
 	ac97.c
 	debug.c
 	auvia.c

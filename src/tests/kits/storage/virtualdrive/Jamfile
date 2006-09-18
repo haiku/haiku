@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests kits storage virtualdrive ;
 
-KernelAddon virtualdrive : kernel drivers bin : virtualdrive.cpp ;
+KernelAddon virtualdrive : 
+	virtualdrive.cpp ;
 
 SimpleTest mkvirtualdrive : mkvirtualdrive.cpp : be ;
 

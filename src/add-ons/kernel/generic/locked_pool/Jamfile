@@ -7,6 +7,6 @@ if $(DEBUG) != 0 {
 	SubDirCcFlags [ FDefines TRACE_LOCKED_POOL=1  ] ;
 }
 
-KernelAddon locked_pool : kernel generic :
+KernelAddon locked_pool :
 	locked_pool.c
 	;

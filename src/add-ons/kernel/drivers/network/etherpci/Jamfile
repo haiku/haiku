@@ -8,7 +8,7 @@ SubDirCcFlags -Wall ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
-KernelAddon etherpci : kernel drivers bin : 
+KernelAddon etherpci :
 	etherpci.c 
 	;
 

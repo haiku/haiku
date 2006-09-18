@@ -13,7 +13,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders kernel net ;
 
-KernelAddon stack : kernel haiku_network :
+KernelAddon stack :
 	datalink.cpp
 	domains.cpp
 	interfaces.cpp

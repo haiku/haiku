@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers arch x86 floppy ;
 
-KernelAddon floppy : kernel drivers bin :
+KernelAddon floppy :
 	floppy.c
 	floppy_ctrl.c
 	device_icons.c

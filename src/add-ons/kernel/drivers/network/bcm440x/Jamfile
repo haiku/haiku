@@ -7,7 +7,7 @@ UsePrivateHeaders net ;
 
 ObjectCcFlags [ FGristFiles b44lm.o ] : -w ;
 
-KernelAddon bcm440x : kernel drivers bin :
+KernelAddon bcm440x :
 	b44lm.c
 	b44um.c
 	mempool.c

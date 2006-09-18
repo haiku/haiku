@@ -8,6 +8,6 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders [ FDirName drivers ] ;
 }
 
-KernelAddon usb_raw : kernel drivers bus usb :
+KernelAddon usb_raw :
 	usb_raw.cpp
 	;

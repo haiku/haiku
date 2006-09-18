@@ -47,7 +47,7 @@ local echo_files =
 	CPipeOutCtrl.cpp
 	;
 
-KernelAddon echo24 : kernel drivers bin :
+KernelAddon echo24 :
 	kernel_cpp.cpp
 	debug.c
 	echo.cpp

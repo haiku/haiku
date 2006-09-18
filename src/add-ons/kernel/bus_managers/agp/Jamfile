@@ -17,7 +17,7 @@ Package haiku-agp :
 	agp.settings :
 	boot home config settings kernel drivers ;
 
-KernelAddon agp : [ FDirName kernel bus_managers ] :
+KernelAddon agp :
 	agp.cpp
 	module.cpp
 	;

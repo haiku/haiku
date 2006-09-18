@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics cirrus ] ;
 
-KernelAddon cirrus.driver : kernel drivers bin :
+KernelAddon cirrus.driver :
 	driver.c
 ;
 

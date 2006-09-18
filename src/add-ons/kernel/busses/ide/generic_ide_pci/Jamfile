@@ -2,6 +2,6 @@ SubDir HAIKU_TOP src add-ons kernel busses ide generic_ide_pci ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon generic_ide_pci : kernel busses ide :
+KernelAddon generic_ide_pci :
 	generic_ide_pci.c
 	;

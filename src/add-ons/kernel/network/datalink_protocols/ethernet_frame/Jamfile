@@ -12,7 +12,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders kernel net ;
 
-KernelAddon ethernet_frame : kernel haiku_network datalink_protocols :
+KernelAddon ethernet_frame :
 	ethernet_frame.cpp
 ;
 

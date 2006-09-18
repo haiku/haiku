@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel disk_scanner ;
 
 UsePrivateHeaders $(DOT) ;
 
-KernelAddon disk_scanner : kernel disk_scanner :
+KernelAddon disk_scanner :
 	disk_scanner.c
 ;
 

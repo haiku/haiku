@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics neomagic ] ;
 
-KernelAddon nm.driver : kernel drivers bin :
+KernelAddon nm.driver :
 	driver.c
 ;
 

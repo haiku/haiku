@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders audio ;
 
-KernelAddon sis7018 : kernel drivers bin :
+KernelAddon sis7018 :
 	ac97.c
 	midi.c
 	pcm.c

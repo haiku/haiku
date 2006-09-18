@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirCcFlags -DBUILD_LOADABLE ;
 
-KernelAddon buslogic : kernel busses scsi :
+KernelAddon buslogic :
 	buslogic.c
 ;
 

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers tty ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon <driver>tty : kernel drivers dev :
+KernelAddon <driver>tty :
 	driver.cpp
 	tty.cpp
 	line_buffer.cpp

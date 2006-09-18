@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirCcFlags -DBUILD_LOADABLE ;
 
-KernelAddon 53c8xx : kernel busses scsi :
+KernelAddon 53c8xx :
 	53c8xx.c
 ;
 

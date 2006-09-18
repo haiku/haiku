@@ -11,7 +11,7 @@ oldOPTIM = $(OPTIM) ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon iso9660 : kernel file_systems :
+KernelAddon iso9660 :
 	iso.c
 	iso9660.cpp
 	kernel_interface.cpp

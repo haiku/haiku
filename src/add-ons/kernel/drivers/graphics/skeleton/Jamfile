@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics skeleton ] ;
 
-KernelAddon skel.driver : kernel drivers bin :
+KernelAddon skel.driver :
 	driver.c
 ;
 

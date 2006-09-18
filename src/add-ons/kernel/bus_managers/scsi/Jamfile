@@ -9,7 +9,7 @@ if $(DEBUG) = 0 {
 	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
 }
 
-KernelAddon scsi : kernel bus_managers :
+KernelAddon scsi :
 	bus_raw.c
 	busses.c
 	ccb.c

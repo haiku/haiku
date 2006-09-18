@@ -22,7 +22,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 }
 
 
-KernelAddon modem : kernel obos_network ppp :
+KernelAddon modem :
 	modem.cpp
 	ModemDevice.cpp
 	ACFCHandler.cpp

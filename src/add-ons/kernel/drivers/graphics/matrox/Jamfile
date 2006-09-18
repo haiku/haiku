@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
 
-KernelAddon mga.driver : kernel drivers bin :
+KernelAddon mga.driver :
 	driver.c
 ;
 

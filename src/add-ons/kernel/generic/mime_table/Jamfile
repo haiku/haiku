@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel generic mime_table ;
 
-KernelAddon mime_table : kernel generic :
+KernelAddon mime_table :
 	mime_table.c
 	module.c
 ;

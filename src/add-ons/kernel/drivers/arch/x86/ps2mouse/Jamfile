@@ -23,7 +23,7 @@ KernelLd ps2mouse :
 if $(COMPILE_FOR_R5) {
 SubDirCcFlags -DCOMPILE_FOR_R5 ;
 
-KernelAddon <driver>ps2mouse : kernel drivers bin :
+KernelAddon <driver>ps2mouse :
 	ps2mouse.c
 ;
 

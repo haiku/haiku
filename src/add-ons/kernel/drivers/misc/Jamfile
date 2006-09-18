@@ -3,10 +3,10 @@ SubDir HAIKU_TOP src add-ons kernel drivers misc ;
 UsePrivateHeaders drivers ;
 
 
-KernelAddon <driver>config : kernel drivers dev misc :
+KernelAddon <driver>config :
 	config.c
 	;
 
-KernelAddon <driver>poke : kernel drivers dev misc :
+KernelAddon <driver>poke :
 	poke.c
 	;

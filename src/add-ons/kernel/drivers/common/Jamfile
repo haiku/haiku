@@ -2,18 +2,18 @@ SubDir HAIKU_TOP src add-ons kernel drivers common ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon dprintf : kernel drivers dev :
+KernelAddon dprintf :
 	dprintf.cpp
 	;
 
-KernelAddon null : kernel drivers dev :
+KernelAddon null :
 	null.c
 	;
 
-KernelAddon zero : kernel drivers dev :
+KernelAddon zero :
 	zero.c
 	;
 
-KernelAddon console : kernel drivers dev :
+KernelAddon console :
 	console.cpp
 	;

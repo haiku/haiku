@@ -12,7 +12,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders kernel net ;
 
-KernelAddon tcp : kernel haiku_network protocols :
+KernelAddon tcp :
 	tcp.cpp
 ;
 

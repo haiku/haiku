@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel busses scsi usb ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-KernelAddon usb_scsi : kernel busses scsi :
+KernelAddon usb_scsi :
 	usb_scsi.c
 	tracing.c
 	transform_procs.c

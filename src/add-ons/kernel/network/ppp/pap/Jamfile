@@ -22,7 +22,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 }
 
 
-KernelAddon pap : kernel obos_network ppp :
+KernelAddon pap :
 	pap.cpp
 	Protocol.cpp
 ;

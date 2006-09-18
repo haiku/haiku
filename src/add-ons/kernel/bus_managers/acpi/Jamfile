@@ -172,7 +172,7 @@ SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-o
 SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter executer ] ;
 SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter parser ] ;
 
-KernelAddon acpi : kernel bus_managers :
+KernelAddon acpi :
 	oshaiku.c
 	acpi_busman.c
 	:

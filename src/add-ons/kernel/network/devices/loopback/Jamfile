@@ -12,7 +12,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders net ;
 
-KernelAddon loopback : kernel haiku_network devices :
+KernelAddon loopback :
 	loopback.cpp
 ;
 

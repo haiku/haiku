@@ -5,7 +5,7 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-KernelAddon intel : kernel partitioning_systems :
+KernelAddon intel :
 	intel.cpp
 	PartitionMap.cpp
 	PartitionMapParser.cpp
