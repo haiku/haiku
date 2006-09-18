@@ -1,3 +1,10 @@
+/*
+ * Copyright 2006, Bryan Varner. All rights reserved.
+ * Copyright 2005, Nathan Whitehorn. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <ACPI.h>
 #include <KernelExport.h>
 #include <stdio.h>
@@ -32,6 +39,7 @@ status_t evaluate_method (const char *object, const char *method, acpi_object_ty
 
 status_t enter_sleep_state (uint8 state);
 
+
 struct acpi_module_info acpi_module = {
 	{
 		{
@@ -65,7 +73,9 @@ _EXPORT module_info *modules[] = {
 	NULL
 };
 
-status_t acpi_std_ops(int32 op,...) {
+
+status_t acpi_std_ops(int32 op,...) 
+{
 	ACPI_STATUS Status;
 	
 	switch(op) {
@@ -110,37 +120,61 @@ status_t acpi_std_ops(int32 op,...) {
 	return B_OK;
 }
 
-status_t acpi_rescan_stub(void) {
+
+status_t 
+acpi_rescan_stub(void)
+{
 	return B_OK;
 }
 
-void enable_fixed_event (uint32 event) {
+
+void 
+enable_fixed_event(uint32 event)
+{
 	AcpiEnableEvent(event,0);
 }
 
-void disable_fixed_event (uint32 event) {
+
+void 
+disable_fixed_event(uint32 event)
+{
 	AcpiDisableEvent(event,0);
 }
 
-uint32 fixed_event_status (uint32 event) {
+
+uint32 
+fixed_event_status(uint32 event)
+{
 	ACPI_EVENT_STATUS status = 0;
 	AcpiGetEventStatus(event,&status);
 	return (status/* & ACPI_EVENT_FLAG_SET*/);
 }
 
-void reset_fixed_event (uint32 event) {
+
+void 
+reset_fixed_event(uint32 event)
+{
 	AcpiClearEvent(event);
 }
 
-status_t install_fixed_event_handler (uint32 event, interrupt_handler *handler, void *data) {
+
+status_t 
+install_fixed_event_handler (uint32 event, interrupt_handler *handler, void *data)
+{
 	return ((AcpiInstallFixedEventHandler(event,handler,data) == AE_OK) ? B_OK : B_ERROR);
 }
 
-status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler) {
+
+status_t 
+remove_fixed_event_handler	(uint32 event, interrupt_handler *handler) 
+{
 	return ((AcpiRemoveFixedEventHandler(event,handler) == AE_OK) ? B_OK : B_ERROR);
 }
 
-status_t get_next_entry (uint32 object_type, const char *base, char *result, size_t len, void **counter) {
+
+status_t 
+get_next_entry (uint32 object_type, const char *base, char *result, size_t len, void **counter)
+{
 	ACPI_STATUS result_status;
 	ACPI_HANDLE parent,child,new_child;
 	ACPI_BUFFER buffer;
@@ -170,7 +204,10 @@ status_t get_next_entry (uint32 object_type, const char *base, char *result, siz
 	return B_OK;
 }
 
-static ACPI_STATUS get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void *context, void **return_val) {
+
+static ACPI_STATUS 
+get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void *context, void **return_val) 
+{
 	ACPI_STATUS result;
 	ACPI_BUFFER buffer;
 	uint32 *counter = (uint32 *)(context);
@@ -196,7 +233,10 @@ static ACPI_STATUS get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, 
 	return AE_OK;
 }
 
-status_t get_device (const char *hid, uint32 index, char *result) {
+
+status_t 
+get_device (const char *hid, uint32 index, char *result) 
+{
 	ACPI_STATUS status;
 	uint32 counter[2] = {index,0};
 	char *result2 = NULL;
@@ -210,7 +250,10 @@ status_t get_device (const char *hid, uint32 index, char *result) {
 	return B_OK;
 }
 
-status_t get_device_hid (const char *path, char *hid) {
+
+status_t 
+get_device_hid (const char *path, char *hid) 
+{
 	ACPI_HANDLE handle;
 	ACPI_OBJECT info;
 	ACPI_BUFFER info_buffer;
@@ -244,7 +287,10 @@ status_t get_device_hid (const char *path, char *hid) {
 	return B_OK;
 }
 
-uint32 get_object_type (const char *path) {
+
+uint32 
+get_object_type (const char *path) 
+{
 	ACPI_HANDLE handle;
 	ACPI_OBJECT_TYPE type;
 	
@@ -255,7 +301,10 @@ uint32 get_object_type (const char *path) {
 	return type;
 }
 
-status_t get_object (const char *path, acpi_object_type **return_value) {
+
+status_t 
+get_object (const char *path, acpi_object_type **return_value) 
+{
 	ACPI_HANDLE handle;
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
@@ -273,7 +322,10 @@ status_t get_object (const char *path, acpi_object_type **return_value) {
 	return (status == AE_OK) ? B_OK : B_ERROR;
 }
 
-status_t get_object_typed (const char *path, acpi_object_type **return_value, uint32 object_type) {
+
+status_t 
+get_object_typed (const char *path, acpi_object_type **return_value, uint32 object_type) 
+{
 	ACPI_HANDLE handle;
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
@@ -291,7 +343,10 @@ status_t get_object_typed (const char *path, acpi_object_type **return_value, ui
 	return (status == AE_OK) ? B_OK : B_ERROR;
 }
 
-status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len) {
+
+status_t 
+evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len) 
+{
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 	
@@ -302,7 +357,11 @@ status_t evaluate_object (const char *object, acpi_object_type *return_value, si
 	return (status == AE_OK) ? B_OK : B_ERROR;
 }
 
-status_t evaluate_method (const char *object, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args) {
+
+status_t 
+evaluate_method (const char *object, const char *method, acpi_object_type *return_value, 
+	size_t buf_len, acpi_object_type *args, int num_args) 
+{
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 	ACPI_OBJECT_LIST acpi_args;
@@ -321,11 +380,17 @@ status_t evaluate_method (const char *object, const char *method, acpi_object_ty
 	return (status == AE_OK) ? B_OK : B_ERROR;
 }
 
-void waking_vector(void) {
+
+void 
+waking_vector(void) 
+{
 	//--- This should do something ---
 }
 
-status_t enter_sleep_state (uint8 state) {
+
+status_t 
+enter_sleep_state (uint8 state) 
+{
 	ACPI_STATUS status;
 	cpu_status cpu;
 	physical_entry wake_vector;
@@ -356,3 +421,4 @@ status_t enter_sleep_state (uint8 state) {
 	
 	return B_OK;
 }
+
