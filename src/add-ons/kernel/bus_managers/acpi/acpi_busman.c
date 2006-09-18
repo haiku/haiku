@@ -23,9 +23,9 @@ status_t get_next_entry (uint32 object_type, const char *base, char *result, siz
 status_t get_device (const char *hid, uint32 index, char *result);
 
 status_t get_device_hid (const char *path, char *hid);
+uint32 get_object_type (const char *path);
 status_t get_object(const char *path, acpi_object_type **return_value);
 status_t get_object_typed(const char *path, acpi_object_type **return_value, uint32 object_type);
-uint32 get_object_type (const char *path);
 
 status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len);
 status_t evaluate_method (const char *object, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args);
@@ -52,9 +52,9 @@ struct acpi_module_info acpi_module = {
 	get_next_entry,
 	get_device,
 	get_device_hid,
+	get_object_type,
 	get_object,
 	get_object_typed,
-	get_object_type,
 	evaluate_object,
 	evaluate_method,
 	enter_sleep_state
