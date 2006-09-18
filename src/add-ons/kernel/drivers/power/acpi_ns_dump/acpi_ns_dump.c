@@ -11,6 +11,7 @@
 #include <string.h>
 #include <malloc.h>
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 #include <ACPI.h>
 
 acpi_module_info *acpi;
@@ -246,7 +247,7 @@ device_hooks my_device_hooks = {
 const char**
 publish_devices()
 {
-	dprintf("acpi_ns_driver: publish_devices\n");
+	dprintf("acpi_ns_dump: publish_devices\n");
 	return my_device_name;
 }
 
@@ -258,6 +259,6 @@ publish_devices()
 device_hooks*
 find_device(const char* name)
 {
-	dprintf("acpi_ns_driver: find_device(%s)\n", name);
+	dprintf("acpi_ns_dump: find_device(%s)\n", name);
 	return &my_device_hooks;
 }

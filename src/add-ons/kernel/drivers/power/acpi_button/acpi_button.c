@@ -9,6 +9,7 @@
 
 #include <ACPI.h>
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 acpi_module_info *acpi;
 
 status_t

@@ -6,6 +6,7 @@
 #include "acpi_thermal_dev.h"
 #include "acpi_thermal.h"
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 acpi_module_info *acpi;
 
 static thermal_dev *device_list = NULL;
