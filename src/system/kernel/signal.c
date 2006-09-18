@@ -291,7 +291,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
-
+	
 	if (id > 0) {
 		// send a signal to the specified thread
 
@@ -304,43 +304,52 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		// send a signal to the specified process group
 		// (the absolute value of the id)
 
-		struct team *team = thread_get_current_thread()->team;
-		struct process_group *group;
-
+		struct team *team = NULL;
+		
 		// TODO: handle -1 correctly
 		if (id == 0 || id == -1) {
 			// send a signal to the current team
-			id = thread_get_current_thread()->team->main_thread->id;
-		} else
+			team = thread_get_current_thread()->team;
+			id = team->main_thread->id;
+		} else {
 			id = -id;
-
-		GRAB_TEAM_LOCK();
-
-		group = team_get_process_group_locked(team, id);
-		if (group != NULL) {
-			struct team *team, *next;
-
-			// we need a safe way to get from the thread to the process group
-			// XXX whats this? id = thread->team->id;
-
-			for (team = group->teams; team != NULL; team = next) {
-				next = team->group_next;
-				id = team->main_thread->id;
-
-				GRAB_THREAD_LOCK();
-
-				thread = thread_get_thread_struct_locked(id);
-				if (thread != NULL) {
-					// we don't stop because of an error sending the signal; we
-					// rather want to send as much signals as possible
-					status = deliver_signal(thread, signal, flags);
-				}
-
-				RELEASE_THREAD_LOCK();
-			}
-			
+			GRAB_THREAD_LOCK();
+			thread = thread_get_thread_struct_locked(id);
+			if (thread)
+				team = thread->team;
+			RELEASE_THREAD_LOCK();
 		}
-		RELEASE_TEAM_LOCK();
+
+		if (team != NULL) {
+			struct process_group *group;
+			GRAB_TEAM_LOCK();
+	
+			group = team_get_process_group_locked(team, id);
+			
+			if (group != NULL) {
+				struct team *team, *next;
+	
+				// we need a safe way to get from the thread to the process group
+				
+				for (team = group->teams; team != NULL; team = next) {
+					next = team->group_next;
+					id = team->main_thread->id;
+					
+					GRAB_THREAD_LOCK();
+	
+					thread = thread_get_thread_struct_locked(id);
+					if (thread != NULL) {
+						// we don't stop because of an error sending the signal; we
+						// rather want to send as much signals as possible
+						status = deliver_signal(thread, signal, flags);
+					}
+	
+					RELEASE_THREAD_LOCK();
+				}
+				
+			}
+			RELEASE_TEAM_LOCK();
+		}
 		GRAB_THREAD_LOCK();
 	}		
 
