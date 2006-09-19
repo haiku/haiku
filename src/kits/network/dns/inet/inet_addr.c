@@ -204,3 +204,7 @@ inet_aton(const char *cp, struct in_addr *addr) {
 		addr->s_addr = htonl(val);
 	return (1);
 }
+
+#undef inet_addr
+#pragma weak inet_addr=__inet_addr
+

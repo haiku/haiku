@@ -60,3 +60,7 @@ inet_ntoa(struct in_addr in) {
 	(void) inet_ntop(AF_INET, &in, ret, sizeof ret);
 	return (ret);
 }
+
+#undef inet_ntoa
+#pragma weak inet_ntoa=__inet_ntoa
+
