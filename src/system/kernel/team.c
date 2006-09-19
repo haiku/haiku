@@ -100,6 +100,8 @@ _dump_team_info(struct team *team)
 		kprintf("address_space: %p (id = 0x%lx)\n", team->address_space, team->address_space->id);
 	kprintf("main_thread: %p\n", team->main_thread);
 	kprintf("thread_list: %p\n", team->thread_list);
+	kprintf("group_id:    0x%lx\n", team->group_id);
+	kprintf("session_id:  0x%lx\n", team->session_id);
 }
 
 
