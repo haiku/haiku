@@ -69,6 +69,7 @@ MergeObject posix_gnu_libio.o :
 	iovsprintf.c
 	iovsscanf.c
 #	obprintf.c
+	oldtmpfile.c
 	pclose.c
 	peekc.c
 	putc.c
