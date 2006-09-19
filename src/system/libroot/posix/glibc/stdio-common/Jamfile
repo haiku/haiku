@@ -39,6 +39,7 @@ MergeObject posix_gnu_stdio.o : #_common.o :
 	sscanf.c
 	tempnam.c
 	tempname.c
+	tmpfile.c
 	tmpnam.c
 	tmpnam_r.c
 	vfprintf.c

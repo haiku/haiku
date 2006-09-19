@@ -19,4 +19,7 @@
 #define __lseek(fd, pos, whence) \
 	lseek(fd, pos, whence)
 
+#define __unlink(buf) \
+	unlink(buf)
+
 #endif	/* _LIBC_UNISTD_H */
