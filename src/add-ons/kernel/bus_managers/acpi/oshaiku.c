@@ -371,7 +371,6 @@ AcpiOsPrintf (
     AcpiOsVprintf (Fmt, Args);
 
     va_end (Args);
-    return;
 }
 
 
@@ -423,12 +422,8 @@ AcpiOsVprintf (
     }
 
 #else
-	//char acpi_err_string[512];
-	//vsprintf(acpi_err_string, Fmt, Args);
-	//dprintf("ACPI: %s\n",acpi_err_string);
+	dprintf(Fmt, Args);
 #endif
-
-    return;
 }
 
 

@@ -17,6 +17,9 @@
 status_t acpi_std_ops(int32 op,...);
 status_t acpi_rescan_stub(void);
 
+#define TRACE(x...) dprintf("acpi: " x)
+#define ERROR(x...) dprintf("acpi: " x)
+
 void enable_fixed_event (uint32 event);
 void disable_fixed_event (uint32 event);
 
@@ -89,28 +92,28 @@ status_t acpi_std_ops(int32 op,...)
 			/* Bring up ACPI */
 			Status = AcpiInitializeSubsystem();
 			if (Status != AE_OK) {
-				dprintf("ACPI: AcpiInitializeSubsystem() failed (%s)",AcpiFormatException(Status));
+				ERROR("AcpiInitializeSubsystem() failed (%s)\n",AcpiFormatException(Status));
 				return B_ERROR;
 			}
 			Status = AcpiLoadTables();
 			if (Status != AE_OK) {
-				dprintf("ACPI: AcpiLoadTables failed (%s)",AcpiFormatException(Status));
+				ERROR("AcpiLoadTables failed (%s)\n",AcpiFormatException(Status));
 				return B_ERROR;
 			}
 			Status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
 			if (Status != AE_OK) {
-				dprintf("ACPI: AcpiEnableSubsystem failed (%s)",AcpiFormatException(Status));
+				ERROR("AcpiEnableSubsystem failed (%s)\n",AcpiFormatException(Status));
 				return B_ERROR;
 			}
 			
 			/* Phew. Now in ACPI mode */
-			dprintf("ACPI: ACPI initialized\n");
+			TRACE("ACPI initialized\n");
 			break;
 		
 		case B_MODULE_UNINIT:
 			Status = AcpiTerminate();
 			if (Status != AE_OK)
-				dprintf("Could not bring system out of ACPI mode. Oh well.\n");
+				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
 			
 				/* This isn't so terrible. We'll just fail silently */
 			break;
