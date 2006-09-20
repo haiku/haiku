@@ -57,6 +57,7 @@ typedef struct transfer_data_s {
 	uhci_td			*first_descriptor;
 	uhci_td			*data_descriptor;
 	uhci_td			*last_descriptor;
+	area_id			user_area;
 	bool			incoming;
 	transfer_data_s	*link;
 } transfer_data;

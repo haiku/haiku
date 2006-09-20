@@ -22,6 +22,7 @@ typedef struct transfer_data_s {
 	Transfer		*transfer;
 	ehci_qh			*queue_head;
 	ehci_qtd		*data_descriptor;
+	area_id			user_area;
 	bool			incoming;
 	transfer_data_s	*link;
 } transfer_data;

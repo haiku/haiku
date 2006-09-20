@@ -39,6 +39,7 @@ Pipe::SubmitTransfer(Transfer *transfer)
 status_t
 Pipe::CancelQueuedTransfers()
 {
+	TRACE_ERROR(("Pipe: cancelling transfers is not implemented!\n"));
 	return B_ERROR;
 }
 

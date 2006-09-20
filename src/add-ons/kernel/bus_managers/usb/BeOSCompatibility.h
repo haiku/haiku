@@ -7,6 +7,10 @@
 #include <stdio.h>
 
 
+#define IS_USER_ADDRESS(x)		(((uint32)x & 0x80000000) > 0)
+#define IS_KERNEL_ADDRESS(x)	(((uint32)x & 0x80000000) == 0)
+
+
 inline status_t
 benaphore_init(benaphore *ben, const char *name)
 {
