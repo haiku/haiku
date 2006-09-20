@@ -57,7 +57,7 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 	$"FFFF111111111111111111000AFFFFFF"
 };
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.OBOS-NETC";
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Network";
 
 resource(1, "BEOS:APP_VERSION") #'APPV' array
 {
