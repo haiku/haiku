@@ -29,6 +29,10 @@
 .equ BOOTP_OPCODE_REQ,	1
 .equ BOOTP_OPCODE_REP,	2
 
+.equ scatchbuffer_addr_seg, 0x2000
+.equ scatchbuffer_addr_ofs, 0x0000
+.equ scatchbuffer_size, 15000
+
 
 .code16
 .text
@@ -100,54 +104,166 @@ _start:
 			movw	$crlf, %si
 			call	puts
 
-			movw	$PXENV_PACKET_TYPE_CACHED_REPLY, %ax
-//			movw	$PXENV_PACKET_TYPE_DHCP_ACK, %ax
-			movw	%ax, s_PXENV_GET_CACHED_INFO_PacketType
-			movw	$300, %ax
-			movw	%ax, s_PXENV_GET_CACHED_INFO_BufferSize
-			movl	$cached_info, %eax
-			movl 	%eax, s_PXENV_GET_CACHED_INFO_Buffer
-
+			// determine client and server ips
 			movw	$PXENV_GET_CACHED_INFO, %bx
-			movw	$s_PXENV_GET_CACHED_INFO, %di
+			movw	$s_PXENV_GET_CACHED_INFO_3, %di
 			lcall *	pxenv_api
 			test 	%ax, %ax
+			jnz		err_ip
 
-			andl	$0xffff, %eax
+			// convert pointer to linear 32 bit address
+			movl	$s_PXENV_GET_CACHED_INFO_3_Buffer, %edx
+			movzwl	2(%edx), %eax
+			movzwl	0(%edx), %ebx
+			shll	$4, %eax
+			addl	%ebx, %eax
+			movl	%eax, s_PXENV_GET_CACHED_INFO_3_Buffer
+
+			// print environment data pointer and size
+			movw	$envdata, %si
+			call	puts
+			movl	s_PXENV_GET_CACHED_INFO_3_Buffer, %eax
+			call	puthex32
+			movw	$length, %si
+			call	puts
+			movw	s_PXENV_GET_CACHED_INFO_3_BufferSize, %ax
+			call	puthex16
+			movw	$crlf, %si
+			call	puts
+
+			// determine client and server IPs
+			movl	s_PXENV_GET_CACHED_INFO_3_Buffer, %ebx
+			movl	16(%ebx), %eax
+			movl	%eax, client_ip
+			movl	20(%ebx), %eax
+			movl	%eax, server_ip
+
+			// print client and server IPs
+			movw	$ipmsg_1, %si
+			call	puts
+			movl	client_ip, %eax
+			call	puthex32
+			movw	$ipmsg_2, %si
+			call	puts
+			movl	server_ip, %eax
 			call	puthex32
 			movw	$crlf, %si
 			call	puts
 
-			movw	s_PXENV_GET_CACHED_INFO_Status, %ax
-			andl	$0xffff, %eax
+			// handle DHCP options.....		
+			movw	$PXENV_GET_CACHED_INFO, %bx
+			movw	$s_PXENV_GET_CACHED_INFO_2, %di
+			lcall *	pxenv_api
+			test 	%ax, %ax
+			jnz		err_dhcp
+
+			// convert pointer to linear 32 bit address
+			movl	$s_PXENV_GET_CACHED_INFO_2_Buffer, %edx
+			movzwl	2(%edx), %eax
+			movzwl	0(%edx), %ebx
+			shll	$4, %eax
+			addl	%ebx, %eax
+			movl	%eax, s_PXENV_GET_CACHED_INFO_2_Buffer
+
+			// print dhcp data pointer and size
+			movw	$dhcpdata, %si
+			call	puts
+			movl	s_PXENV_GET_CACHED_INFO_2_Buffer, %eax
+			call	puthex32
+			movw	$length, %si
+			call	puts
+			movw	s_PXENV_GET_CACHED_INFO_2_BufferSize, %ax
+			call	puthex16
+			movw	$crlf, %si
+			call	puts
+
+			// we could process the DHCP ack here, but we don't need options yet...
+
+
+			// Print loading file
+			movw	$loading, %si
+			call	puts
+			movw	$s_PXENV_TFTP_OPEN_FileName, %si
+			call	puts
+			movw	$crlf, %si
+			call	puts
+		
+			// get file size
+			movl	server_ip, %eax
+			movl	%eax, s_PXENV_TFTP_GET_FSIZE_ServerIPAddress
+			movw	$PXENV_TFTP_GET_FSIZE, %bx
+			movw	$s_PXENV_TFTP_GET_FSIZE, %di
+			lcall *	pxenv_api
+			test 	%ax, %ax
+			jnz		err_fsize
+			movw	s_PXENV_TFTP_GET_FSIZE_Status, %ax
+			test 	%ax, %ax
+			jnz		err_fsize
+
+			// print file size
+			movw	$fsizeis, %si
+			call	puts
+			movl	s_PXENV_TFTP_GET_FSIZE_FileSize, %eax
 			call	puthex32
 			movw	$crlf, %si
 			call	puts
 
-			movl	cached_info_cip, %eax
-			call	puthex32
+			// open TFTP connection
+			movl	server_ip, %eax
+			movl	%eax, s_PXENV_TFTP_OPEN_ServerIPAddress
+			movw	$PXENV_TFTP_OPEN, %bx
+			movw	$s_PXENV_TFTP_OPEN, %di
+			lcall *	pxenv_api
+			test 	%ax, %ax
+			jnz		err_load
+			movw	s_PXENV_TFTP_OPEN_Status, %ax
+			test 	%ax, %ax
+			jnz		err_load
+
+			// print packet size
+			movw	$psizeis, %si
+			call	puts
+			movw	s_PXENV_TFTP_OPEN_PacketSize, %ax
+			call	puthex16
 			movw	$crlf, %si
 			call	puts
 
-			movl	cached_info_yip, %eax
-			call	puthex32
-			movw	$crlf, %si
-			call	puts
 
-			movl	cached_info_sip, %eax
-			call	puthex32
-			movw	$crlf, %si
-			call	puts
-
-			movl	cached_info_gip, %eax
-			call	puthex32
-			movw	$crlf, %si
+			// load data
+			movw	$dot, %si
 			call	puts
 
 
-loop:
-			jmp		loop
+			// close TFTP connection
 
+
+			// execute
+			movw	$executing, %si
+//			call	puts
+
+
+stop:		hlt
+			jmp		stop
+
+err_dhcp:
+			movw	$dhcpfailed, %si
+			call	puts
+			jmp		stop
+
+err_ip:
+			movw	$ipfailed, %si
+			call	puts
+			jmp		stop
+
+err_fsize:
+			movw	$sizefailed, %si
+			call	puts
+			jmp		stop
+		
+err_load:
+			movw	$loadfailed, %si
+			call	puts
+			jmp		stop
 
 puts:		pushal
 _puts2:		lodsb
@@ -228,7 +344,20 @@ unrealmsg:	.asciz	"Switch to unreal mode done\r\n"
 
 pxenvmsg:	.asciz	"PXENV+ data structure at "
 apimsg:		.asciz	"PXENV+ API entry point at "
+envdata:	.asciz	"Boot environment data at "
+dhcpdata:	.asciz	"DHCP options data at "
+ipfailed:	.asciz	"Error, can't determine IP address\r\n"
+dhcpfailed:	.asciz	"Error, can't determine DHCP options\r\n"
 apivermsg:	.asciz	"API version is "
+ipmsg_1:	.asciz	"My IP address is "
+ipmsg_2:	.asciz	", server IP address is "
+length:		.asciz	", length "
+loading:	.asciz	"Loading image file "
+fsizeis:	.asciz	"Image file size is "
+psizeis:	.asciz	"Packet size is "
+sizefailed: .asciz	"\r\nCouldn't get image file size, loading failed\r\n"
+loadfailed: .asciz	"\r\nLoading image file failed\r\n"
+executing:	.asciz	"\r\nExecuting stage 2 loader\r\n"
 colon:		.asciz	":"
 dot:		.asciz	"."
 crlf:		.asciz	"\r\n"
@@ -247,31 +376,40 @@ gdt_descriptor:
 
 pxenv_api:	.long	0
 
+client_ip:	.long 0
+server_ip:	.long 0
 
+s_PXENV_GET_CACHED_INFO_2:
+s_PXENV_GET_CACHED_INFO_2_Status:		.word 0
+s_PXENV_GET_CACHED_INFO_2_PacketType:	.word 2
+s_PXENV_GET_CACHED_INFO_2_BufferSize:	.word scatchbuffer_size
+s_PXENV_GET_CACHED_INFO_2_Buffer:		.word scatchbuffer_addr_ofs
+										.word scatchbuffer_addr_seg
+s_PXENV_GET_CACHED_INFO_2_BufferLimit:	.word 0
 
-s_PXENV_GET_CACHED_INFO:
-s_PXENV_GET_CACHED_INFO_Status:			.word 0
-s_PXENV_GET_CACHED_INFO_PacketType:		.word 0
-s_PXENV_GET_CACHED_INFO_BufferSize:		.word 0
-s_PXENV_GET_CACHED_INFO_Buffer:			.long 0
-s_PXENV_GET_CACHED_INFO_BufferLimit:	.word 0
+s_PXENV_GET_CACHED_INFO_3:
+s_PXENV_GET_CACHED_INFO_3_Status:		.word 0
+s_PXENV_GET_CACHED_INFO_3_PacketType:	.word 3
+s_PXENV_GET_CACHED_INFO_3_BufferSize:	.word scatchbuffer_size
+s_PXENV_GET_CACHED_INFO_3_Buffer:		.word scatchbuffer_addr_ofs
+										.word scatchbuffer_addr_seg
+s_PXENV_GET_CACHED_INFO_3_BufferLimit:	.word 0
 
-cached_info:
-cached_info_opcode:						.byte 0
-cached_info_hardware:					.byte 0
-cached_info_hardlen:					.byte 0
-cached_info_gatehops:					.byte 0
-cached_info_ident:						.long 0
-cached_info_seconds:					.word 0
-cached_info_flags:						.word 0
-cached_info_cip:						.long 0
-cached_info_yip:						.long 0
-cached_info_sip:						.long 0
-cached_info_gip:						.long 0
-cached_info_mac_addr:					.fill 16
-cached_info_server_name:				.fill 64
-cached_info_bootfile:					.fill 128
-cached_info_vendorspec:					.fill 64
+s_PXENV_TFTP_OPEN:
+s_PXENV_TFTP_OPEN_Status:				.word 0
+s_PXENV_TFTP_OPEN_ServerIPAddress:		.long 0
+s_PXENV_TFTP_OPEN_GatewayIPAddress:		.long 0
+s_PXENV_TFTP_OPEN_FileName:				.asciz "haiku-pxe-image"
+										.fill 112
+s_PXENV_TFTP_OPEN_TFTPPort:				.word (69 << 8)
+s_PXENV_TFTP_OPEN_PacketSize:			.word 1456
 
+s_PXENV_TFTP_GET_FSIZE:
+s_PXENV_TFTP_GET_FSIZE_Status:			.word 0
+s_PXENV_TFTP_GET_FSIZE_ServerIPAddress:	.long 0
+s_PXENV_TFTP_GET_FSIZE_GatewayIPAddress:.long 0
+s_PXENV_TFTP_GET_FSIZE_FileName:		.asciz "haiku-pxe-image"
+										.fill 112
+s_PXENV_TFTP_GET_FSIZE_FileSize:		.long 0
 
 end:
