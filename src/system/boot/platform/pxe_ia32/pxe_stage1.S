@@ -15,24 +15,24 @@
 //   SS:[SP+4] 	address of the !PXE structure.
 //   SS:SP	at least 1.5KB of free stack
 
-
 .equ PXENV_GET_CACHED_INFO,		0x71
 .equ PXENV_TFTP_OPEN,			0x20
 .equ PXENV_TFTP_CLOSE,			0x21
 .equ PXENV_TFTP_READ,			0x22
 .equ PXENV_TFTP_GET_FSIZE,		0x25
 
-.equ PXENV_PACKET_TYPE_DHCP_DISCOVER,	1
 .equ PXENV_PACKET_TYPE_DHCP_ACK,		2
 .equ PXENV_PACKET_TYPE_CACHED_REPLY,	3
 
-.equ BOOTP_OPCODE_REQ,	1
-.equ BOOTP_OPCODE_REP,	2
+.equ scratchbuffer_addr_seg, 0x2000
+.equ scratchbuffer_addr_ofs, 0x0000
+.equ scratchbuffer_addr, ((scratchbuffer_addr_seg << 4) + scratchbuffer_addr_ofs)
+.equ scratchbuffer_size, 15000
 
-.equ scatchbuffer_addr_seg, 0x2000
-.equ scatchbuffer_addr_ofs, 0x0000
-.equ scatchbuffer_size, 15000
-
+// load at 1 MB
+.equ load_addr, 0x100000
+.equ load_addr_seg,	0xffff
+.equ load_addr_ofs,	0x0010
 
 .code16
 .text
@@ -228,19 +228,89 @@ _start:
 			movw	$crlf, %si
 			call	puts
 
-
-			// load data
-			movw	$dot, %si
+			// calculate max file size
+			xorl	%eax, %eax
+			movw	s_PXENV_TFTP_OPEN_PacketSize, %ax
+			imull	$65535, %eax
+			movl	%eax, max_file_size
+			
+			// print max file size
+			movw	$maxfsize, %si
+			call	puts
+			movl	max_file_size, %eax
+			call	puthex32
+			movw	$crlf, %si
 			call	puts
 
+			// check if file is small enough
+			movl	s_PXENV_TFTP_GET_FSIZE_FileSize, %eax
+			movl	max_file_size, %ebx
+			cmpl	%ebx, %eax
+			ja		err_etoobig
 
-			// close TFTP connection
+			// load data
+			movl	$load_addr, %edi
+read_loop:
+			movw	$PXENV_TFTP_READ, %bx
+			movw	$s_PXENV_TFTP_READ, %di
+			lcall *	pxenv_api
+			test 	%ax, %ax
+			jnz		err_load
+			movw	s_PXENV_TFTP_READ_Status, %ax
+			test 	%ax, %ax
+			jnz		err_load
 
+			// copy to upper mem
+			movw	s_PXENV_TFTP_READ_BufferSize, %cx
+			movw	%cx, %dx
+			shrw	$2, %cx
+			andw	$3, %dx
+			movl	$scratchbuffer_addr, %esi
+			testw	%cx, %cx
+			jz _copy_b
+_copy_l:	movl	(%esi), %eax
+			movl	%eax, (%edi)
+			addl	$4, %esi
+			addl	$4, %edi
+			decw	%cx
+			jnz		_copy_l
+			testw	%dx, %dx
+			jz _copy_done
+_copy_b:	movb	(%esi), %al
+			movb	%al, (%edi)
+			incl	%esi
+			incl	%edi
+			decw	%dx
+			jnz		_copy_b
+_copy_done:
+
+			// print a dot every 100 packets
+			movw	pos, %ax
+			incw	%ax
+			movw	%ax, pos
+			cmpw	$100, %ax
+			jb		_no_dot
+			xorw	%ax, %ax
+			movw	%ax, pos
+			movw	$dot, %si
+			call	puts
+_no_dot:
+
+			// check if copy is done
+			movw	s_PXENV_TFTP_OPEN_PacketSize, %ax
+			movw	s_PXENV_TFTP_READ_BufferSize, %bx
+			cmpw	%ax, %bx
+			je		read_loop
+
+			// close TFTP connection, ignore result
+			movw	$PXENV_TFTP_CLOSE, %bx
+			movw	$s_PXENV_TFTP_OPEN, %di
+			lcall *	pxenv_api
 
 			// execute
 			movw	$executing, %si
-//			call	puts
-
+			call	puts
+			ljmp	$load_addr_seg, $load_addr_ofs
 
 stop:		hlt
 			jmp		stop
@@ -262,6 +332,11 @@ err_fsize:
 		
 err_load:
 			movw	$loadfailed, %si
+			call	puts
+			jmp		stop
+
+err_etoobig:
+			movw	$etoobig, %si
 			call	puts
 			jmp		stop
 
@@ -355,6 +430,8 @@ length:		.asciz	", length "
 loading:	.asciz	"Loading image file "
 fsizeis:	.asciz	"Image file size is "
 psizeis:	.asciz	"Packet size is "
+maxfsize:	.asciz	"Maximum file size is "
+etoobig: 	.asciz	"Image file is too large, loading failed\r\n"
 sizefailed: .asciz	"\r\nCouldn't get image file size, loading failed\r\n"
 loadfailed: .asciz	"\r\nLoading image file failed\r\n"
 executing:	.asciz	"\r\nExecuting stage 2 loader\r\n"
@@ -379,20 +456,24 @@ pxenv_api:	.long	0
 client_ip:	.long 0
 server_ip:	.long 0
 
+max_file_size: .long 0
+
+pos:		.word 0
+
 s_PXENV_GET_CACHED_INFO_2:
 s_PXENV_GET_CACHED_INFO_2_Status:		.word 0
 s_PXENV_GET_CACHED_INFO_2_PacketType:	.word 2
-s_PXENV_GET_CACHED_INFO_2_BufferSize:	.word scatchbuffer_size
-s_PXENV_GET_CACHED_INFO_2_Buffer:		.word scatchbuffer_addr_ofs
-										.word scatchbuffer_addr_seg
+s_PXENV_GET_CACHED_INFO_2_BufferSize:	.word scratchbuffer_size
+s_PXENV_GET_CACHED_INFO_2_Buffer:		.word scratchbuffer_addr_ofs
+										.word scratchbuffer_addr_seg
 s_PXENV_GET_CACHED_INFO_2_BufferLimit:	.word 0
 
 s_PXENV_GET_CACHED_INFO_3:
 s_PXENV_GET_CACHED_INFO_3_Status:		.word 0
 s_PXENV_GET_CACHED_INFO_3_PacketType:	.word 3
-s_PXENV_GET_CACHED_INFO_3_BufferSize:	.word scatchbuffer_size
-s_PXENV_GET_CACHED_INFO_3_Buffer:		.word scatchbuffer_addr_ofs
-										.word scatchbuffer_addr_seg
+s_PXENV_GET_CACHED_INFO_3_BufferSize:	.word scratchbuffer_size
+s_PXENV_GET_CACHED_INFO_3_Buffer:		.word scratchbuffer_addr_ofs
+										.word scratchbuffer_addr_seg
 s_PXENV_GET_CACHED_INFO_3_BufferLimit:	.word 0
 
 s_PXENV_TFTP_OPEN:
@@ -412,4 +493,10 @@ s_PXENV_TFTP_GET_FSIZE_FileName:		.asciz "haiku-pxe-image"
 										.fill 112
 s_PXENV_TFTP_GET_FSIZE_FileSize:		.long 0
 
+s_PXENV_TFTP_READ:
+s_PXENV_TFTP_READ_Status:				.word 0
+s_PXENV_TFTP_READ_PacketNumber:			.word 0
+s_PXENV_TFTP_READ_BufferSize:			.word 0
+s_PXENV_TFTP_READ_Buffer:				.word scratchbuffer_addr_ofs
+										.word scratchbuffer_addr_seg
 end:
