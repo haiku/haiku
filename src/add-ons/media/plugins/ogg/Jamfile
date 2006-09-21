@@ -19,7 +19,7 @@ Addon ogg : media plugins :
 	OggVorbisStream.cpp
 	OggVorbisSeekable.cpp
 	: false
-	: libogg.a be libmedia.so
+	: libogg.a be libmedia.so $(TARGET_LIBSTDC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins ogg libogg ;

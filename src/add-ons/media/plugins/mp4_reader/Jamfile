@@ -13,8 +13,7 @@ Addon mp4_reader : media plugins :
 	:
 	libmp4reader.a
 	libz.a
-	be
-	libmedia.so
+	be libmedia.so $(TARGET_LIBSTDC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader libMP4 ;
