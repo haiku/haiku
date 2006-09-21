@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include "acc_std.h"
 
 static status_t init_common(int the_fd);
