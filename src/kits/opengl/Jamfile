@@ -57,6 +57,7 @@ SharedLibrary libGL.so :
 	# External libs:
 	be 
 	game			# BWindowScreen needed by BGLScreen stub class 
+	$(TARGET_LIBSTDC++)
 ;
 
 Package haiku-opengl-cvs :

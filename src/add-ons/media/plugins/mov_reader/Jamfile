@@ -12,9 +12,7 @@ Addon mov_reader : media plugins :
 	false
 	:
 	libmovreader.a
-	libz.a
-	be
-	libmedia.so
+	libz.a be libmedia.so $(TARGET_LIBSTDC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins mov_reader libMOV ;
