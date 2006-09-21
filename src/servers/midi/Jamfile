@@ -4,17 +4,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders midi ;
 
-AddResources midi_server :
-	midi_server.rdef
-;
-
 Server midi_server :
 	MidiServerApp.cpp 
 	DeviceWatcher.cpp
 	PortDrivers.cpp
+	: be midi2
+	: midi_server.rdef
 ;
 
-LinkAgainst midi_server : 
-	be 
-	midi2
-;
