@@ -323,7 +323,7 @@ status_t CLONE_ACCELERANT(void *data) {
 	/* open the device, the permissions aren't important */
 	fd = open(path, B_READ_WRITE);
 	if (fd < 0) {
-		result = fd;
+		result = errno;
 		goto error0;
 	}
 

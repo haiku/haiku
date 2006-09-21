@@ -186,7 +186,7 @@ vesa_clone_accelerant(void *info)
 
 	int fd = open(path, B_READ_WRITE);
 	if (fd < 0)
-		return fd;
+		return errno;
 
 	status_t status = init_common(fd, true);
 	if (status != B_OK)

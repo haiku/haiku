@@ -256,7 +256,7 @@ status_t CLONE_ACCELERANT(void *data) {
 		fclose(myhand);
 
 		/* abort with resultcode from open attempt on kerneldriver */
-		result = fd;
+		result = errno;
 		goto error0;
 	}
 

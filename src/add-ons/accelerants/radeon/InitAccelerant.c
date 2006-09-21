@@ -256,7 +256,7 @@ status_t CLONE_ACCELERANT( void *data )
 	// this will probably change once access right are checked properly
 	fd = open(path, B_READ_WRITE);
 	if( fd < 0 )
-		return fd;
+		return errno;
 
 	result = init_common( fd, 1 );
 	if( result != B_OK )
