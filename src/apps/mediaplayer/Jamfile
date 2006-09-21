@@ -18,7 +18,7 @@ Application MediaPlayer :
 	VideoNode.cpp
 	VideoView.cpp
 	VolumeSlider.cpp
-	: be media tracker
+	: be media tracker $(TARGET_LIBSTDC++)
 	: MediaPlayer.rdef
 ;
 

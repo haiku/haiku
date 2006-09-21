@@ -8,17 +8,10 @@ UsePrivateHeaders media ;
 SubDirHdrs [ FDirName $(SUBDIR) libMatroskaParser ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ogg libogg ] ;
 
-local r5_src = strlcpy.c ;
-
-if $(HAIKU_COMPATIBLE) {
-	r5_src = ;
-}
-
 Addon matroska : media plugins :
 	matroska_codecs.cpp
 	matroska_reader.cpp
 	matroska_util.cpp
-	$(r5_src)
 	:
 	false
 	:
@@ -26,18 +19,8 @@ Addon matroska : media plugins :
 #	libmatroska.a
 	libMatroskaParser.a
 	libz.a
-	libmedia.so
+	libmedia.so be $(TARGET_LIBSTDC++)
 ;
-
-if $(HAIKU_COMPATIBLE) {
-	LinkAgainst matroska : libbe.so libroot.so ;
-} else {
-	LinkAgainst matroska : be ;
-}
-
-SEARCH on [ FGristFiles
-                strlcpy.c
-        ] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
 # SubInclude HAIKU_TOP src add-ons media plugins matroska libebml ;
 # SubInclude HAIKU_TOP src add-ons media plugins matroska libmatroska ;
