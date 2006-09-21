@@ -6,9 +6,9 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <Roster.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 #include "MediaMisc.h"
 #include "debug.h"
 
@@ -725,7 +725,7 @@ media_format::operator=(const media_format &clone)
 			if (meta_data_area < 0) {
 				// whoops, we just lost our meta data
 				meta_data = NULL;
-				meta_data_size = NULL;
+				meta_data_size = 0;
 			}
 		} else {
 			meta_data = malloc(meta_data_size);
@@ -733,7 +733,7 @@ media_format::operator=(const media_format &clone)
 				memcpy(meta_data, clone.meta_data, meta_data_size);
 			} else {
 				// whoops, we just lost our meta data
-				meta_data_size = NULL;
+				meta_data_size = 0;
 			}
 		}
 	}

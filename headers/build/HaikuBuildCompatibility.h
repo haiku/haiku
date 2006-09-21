@@ -67,5 +67,10 @@ extern float	roundf(float value);
 #	define B_BAD_DATA	(B_NOT_ALLOWED + 1)
 #endif
 
+#ifndef INT64_MAX
+#include <limits.h>
+#define INT64_MAX LONGLONG_MAX
+#endif
+
 #endif	// HAIKU_BUILD_COMPATIBILITY_H
 
