@@ -1600,9 +1600,25 @@ Query::LiveUpdate(Inode *inode, const char *attribute, int32 type, const uint8 *
 	char nameBuffer[B_FILE_NAME_LENGTH];
 
 	if (name == NULL) {
-		if (inode->GetName(nameBuffer) != B_OK)
-			nameBuffer[0] = '\0';
-		name = nameBuffer;
+		
+		// We have to special-case the name attribute here because
+		// Inode::Getname will return NULL as we are in the middle
+		// of the transaction at this point when a new file is
+		// created. We just use newKey which happens to contain
+		// the new file name anyway.
+		//
+		// TODO: Check if there is any sense in leaving this if
+		// statement as it is or if we can completelly remove the
+		// original code.
+		if (strcmp(attribute, "name") == 0) {
+			name = (const char *)newKey;
+		}
+		else
+		{
+			if (inode->GetName(nameBuffer) != B_OK)
+				nameBuffer[0] = '\0';
+			name = nameBuffer;
+		}
 	}
 
 	// notify query listeners
