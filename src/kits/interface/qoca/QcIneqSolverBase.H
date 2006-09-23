@@ -1,7 +1,6 @@
 // Generated automatically from QcIneqSolverBase.ch by /home/pmoulder/usr/local/bin/ch2xx.
 #ifndef QcIneqSolverBaseDCL
 #define QcIneqSolverBaseDCL
-#line 1 "QcIneqSolverBase.ch"
 #include <qoca/QcSolver.H>
 
 #include <qoca/QcDelLinInEqSystem.hh>
@@ -12,11 +11,24 @@ class QcIneqSolverBase
 public:
 
 inline
-QcIneqSolverBase();
 #line 18 "QcIneqSolverBase.ch"
+QcIneqSolverBase() 
+  : QcSolver(),
+    fSystem()
+{
+	;
+}
+
 inline
-QcIneqSolverBase(unsigned hintNumConstraints, unsigned hintNumVariables);
 #line 26 "QcIneqSolverBase.ch"
+QcIneqSolverBase(unsigned hintNumConstraints, unsigned hintNumVariables)
+  : QcSolver(),
+    fSystem( hintNumConstraints, hintNumVariables)
+{
+	;
+}
+
+
 virtual ~QcIneqSolverBase()
 {
 }
@@ -78,10 +90,8 @@ IsBasic(QcFloat const &v) const
 
 virtual bool
 AddConstraint(QcConstraint &c);
-#line 101 "QcIneqSolverBase.ch"
 virtual bool
 AddConstraint(QcConstraint &c, QcFloat &hint);
-#line 117 "QcIneqSolverBase.ch"
 virtual void
 BeginAddConstraint()
 {
@@ -98,10 +108,8 @@ EndAddConstraint()
 
 virtual bool
 ChangeConstraint(QcConstraint &oldc, numT rhs);
-#line 143 "QcIneqSolverBase.ch"
 virtual bool
 RemoveConstraint(QcConstraint &c);
-#line 159 "QcIneqSolverBase.ch"
 virtual bool
 Reset()
 {

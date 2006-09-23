@@ -27,7 +27,8 @@
 #ifndef __QcStateVectorH
 #define __QcStateVectorH
 
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 #include "qoca/QcDefines.hh"
 #include "qoca/QcState.hh"
 

@@ -27,9 +27,11 @@
 #ifndef __QcCassSolverH
 #define __QcCassSolverH
 
-#include <map.h>
+#include <map>
 #include "qoca/QcDelLinInEqSystem.hh"
 #include "qoca/QcCassConstraint.hh"
+
+using namespace std;
 
 class QcCassSolver : public QcDelLinInEqSystem
 {

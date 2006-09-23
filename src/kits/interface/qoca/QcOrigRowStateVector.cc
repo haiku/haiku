@@ -113,7 +113,7 @@ QcOrigRowStateVector::virtualAssertLinkageInvar() const
     {
       QcOrigRowState const *state = CAST(QcOrigRowState const *, *i);
       assert( state->fRHS == 0.0);
-      assert( state->fMRowIndex == i - fStates);
+      assert( state->fMRowIndex == (i - (QcState const * const *)fStates));
       assert( !state->fARowDeleted);
     }
 }

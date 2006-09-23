@@ -47,6 +47,7 @@ SharedLibrary libqoca.so :
 	QcSparseMatrix.cc
 	QcVarStow.cc
 	QcVariableBiMap.cc
+	QcUtility.cc
 	:
 	$(TARGET_LIBSTDC++)
 ;

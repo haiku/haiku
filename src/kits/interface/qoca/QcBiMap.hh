@@ -7,7 +7,11 @@
 #line 21 "QcBiMap.ch"
 #define TMPL template<class AKey>
 
-
+#if __GNUC__ >= 4
+	#define TYPENAMEDEF typename
+#else
+	#define TYPENAMEDEF
+#endif
 
 
 
@@ -23,12 +27,12 @@ QcBiMap<AKey>::assertInvar() const
       fIndexMap[ i].assertInvar();
       if(fIndexMap[ i].isDead())
 	continue;
-      TIdentifierMap::const_iterator f = fIdentifierMap.find(fIndexMap[i]);
+      TYPENAMEDEF TIdentifierMap::const_iterator f = fIdentifierMap.find(fIndexMap[i]);
       qcAssertInvar( f != fIdentifierMap.end());
       qcAssertInvar( f->second == i);
     }
 
-  for(TIdentifierMap::const_iterator ii = fIdentifierMap.begin(); ii != fIdentifierMap.end(); ii++)
+  for(TYPENAMEDEF TIdentifierMap::const_iterator ii = fIdentifierMap.begin(); ii != fIdentifierMap.end(); ii++)
     {
       unsigned ix = ii->second;
       qcAssertInvar( ix < fIndexMap.size());
@@ -99,11 +103,11 @@ QcBiMap<AKey>::SwapByIndex(int i1, int i2)
   fIndexMap[ i1] = ident2;
   fIndexMap[ i2] = ident1;
 
-  QcBiMap<AKey>::TIdentifierMap::iterator it1 = fIdentifierMap.find( ident1);
+  TYPENAMEDEF QcBiMap<AKey>::TIdentifierMap::iterator it1 = fIdentifierMap.find( ident1);
   qcAssertPost( it1 != fIdentifierMap.end());
   it1->second = i2;
 
-  QcBiMap<AKey>::TIdentifierMap::iterator it2 = fIdentifierMap.find( ident2);
+  TYPENAMEDEF QcBiMap<AKey>::TIdentifierMap::iterator it2 = fIdentifierMap.find( ident2);
   qcAssertPost( it2 != fIdentifierMap.end());
   it2->second = i1;
 }
@@ -127,8 +131,8 @@ QcBiMap<AKey>::Update(const AKey &ident, int index)
   fIndexMap[ index] = ident;
 
   // Insert ident->index mapping.
-  TIdentifierMap::value_type ins (ident, index);
-  typedef pair<TIdentifierMap::iterator, bool> insResultT;
+  TYPENAMEDEF TIdentifierMap::value_type ins (ident, index);
+  typedef pair<TYPENAMEDEF TIdentifierMap::iterator, bool> insResultT;
   dbgPre(insResultT insResult =)
     fIdentifierMap.insert (ins);
 
@@ -159,7 +163,7 @@ TMPL
 inline AKey &
 QcBiMap<AKey>::Identifier(char const *n)
 {
-  QcBiMap<AKey>::TIdentifierMap::iterator iIt = fIdentifierMap.begin();
+  TYPENAMEDEF QcBiMap<AKey>::TIdentifierMap::iterator iIt = fIdentifierMap.begin();
 
   while(iIt != fIdentifierMap.end())
     {
@@ -179,7 +183,7 @@ TMPL
 inline int
 QcBiMap<AKey>::Index(AKey const &ident) const
 {
-  QcBiMap<AKey>::TIdentifierMap::const_iterator iIt = fIdentifierMap.find( ident);
+  TYPENAMEDEF QcBiMap<AKey>::TIdentifierMap::const_iterator iIt = fIdentifierMap.find( ident);
   qcAssertPre( iIt != fIdentifierMap.end());
   unsigned ix = iIt->second;
   qcAssertPost( (ix < fIndexMap.size())
@@ -194,7 +198,7 @@ TMPL
 inline int
 QcBiMap<AKey>::safeIndex(AKey const &ident) const
 {
-  QcBiMap<AKey>::TIdentifierMap::const_iterator iIt = fIdentifierMap.find( ident);
+  TYPENAMEDEF QcBiMap<AKey>::TIdentifierMap::const_iterator iIt = fIdentifierMap.find( ident);
   if(iIt == fIdentifierMap.end())
     return -1;
   int ix = iIt->second;
@@ -217,7 +221,7 @@ QcBiMap<AKey>::Print(ostream &os) const
     os << i << " -> " << fIndexMap[i] << endl;
 
   os << "Reverse Map:" << endl;
-  QcBiMap<AKey>::TIdentifierMap::const_iterator itF;
+  TYPENAMEDEF QcBiMap<AKey>::TIdentifierMap::const_iterator itF;
 
   for (itF = fIdentifierMap.begin(); itF != fIdentifierMap.end(); ++itF)
     os << (*itF).first << " -> " << (*itF).second << endl;

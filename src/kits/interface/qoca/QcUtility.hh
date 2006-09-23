@@ -60,26 +60,26 @@ public:
 	//-----------------------------------------------------------------------//
 
   static bool IsVaguelyZero(numT val)
-    { return fabs( val) < qcVaguelyNearEps; }
+    { return fabs( val) < QcUtility::qcVaguelyNearEps; }
 
   static bool IsNearZero(numT val)
-    { return fabs( val) < qcNearEps; }
+    { return fabs( val) < QcUtility::qcNearEps; }
 
   static bool IsZero(double val)
-    { return fabs( val) < qcEps; }
+    { return fabs( val) < QcUtility::qcEps; }
 
   static bool IsOne(double val)
-    { return IsZero( val - 1.0); }
+    { return QcUtility::IsZero( val - 1.0); }
 
   static bool IsNegative(numT val)
-    { return (val <= -qcEps); }
+    { return (val <= -QcUtility::qcEps); }
 
   static bool IsPositive(numT val)
-    { return (val >= qcEps); }
+    { return (val >= QcUtility::qcEps); }
 
   static double Zeroise(double val)
     {
-      return (IsZero( val)
+      return (QcUtility::IsZero( val)
 	      ? 0.0
 	      : val);
     }
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
   static bool IsZeroised(double val)
     {
-      return (val == 0 || !IsZero( val));
+      return (val == 0 || !QcUtility::IsZero( val));
     }
 #endif
 

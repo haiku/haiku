@@ -1,7 +1,7 @@
 #ifndef __QcUnsortedListSetH
 #define __QcUnsortedListSetH
 
-#include <vector.h>
+#include <vector>
 
 #if __GNUC__ >= 4
   template <class T, class Alloc = std::allocator<T> >
@@ -12,8 +12,8 @@ class QcUnsortedListSet
 {
 public:
 	typedef T value_type;
-	typedef value_type* iterator;
-	typedef value_type const * const_iterator;
+	typedef typename std::vector<T>::iterator iterator;
+	typedef typename std::vector<T>::const_iterator const_iterator;
 	typedef value_type& reference;
 	typedef const value_type& const_reference;
 	typedef size_t size_type;
@@ -34,11 +34,12 @@ public:
 	{
 	}
 
-	iterator begin() { return elements.begin(); }
-	iterator end() { return elements.end(); }
+	// TODO: This really shouldn't rely on vector's iterator type being a pointer
+	iterator begin() { return (iterator)elements.begin(); }
+	iterator end() { return (iterator)elements.end(); }
 
-	iterator abegin() { return elements.begin(); }
-	iterator aend() { return elements.end(); }
+	iterator abegin() { return (iterator)elements.begin(); }
+	iterator aend() { return (iterator)elements.end(); }
 
 	const_iterator abegin() const { return elements.begin(); }
 	const_iterator aend() const { return elements.end(); }
@@ -83,6 +84,6 @@ private:
 
 	   (The reason for using an instance variable is so that we can control
 	   the interface.) */
-	vector<T> elements;
+	std::vector<T> elements;
 };
 #endif /* !__QcUnsortedListSetH */

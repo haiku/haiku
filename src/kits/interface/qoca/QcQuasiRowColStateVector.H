@@ -28,10 +28,12 @@
 // included with the above copyright notice.                                  //
 //============================================================================//
 
-#include <iostream.h>
+#include <iostream>
 #include <qoca/QcQuasiRowStateVector.H>
 
 #include <qoca/QcQuasiColStateVector.hh>
+
+using namespace std;
 
 class QcQuasiRowColStateVector
 {

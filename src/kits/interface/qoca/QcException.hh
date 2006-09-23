@@ -31,7 +31,7 @@
 #include "qoca/QcDefines.hh"
 
 #ifndef qcNoStream
-#include <iostream.h>
+#include <iostream>
 #endif
 
 //#ifdef DEBUG

@@ -27,8 +27,8 @@
 // included with the above copyright notice.                                  //
 //============================================================================//
 
-#include <vector.h>
-#include <algo.h>
+#include <vector>
+#include <algorithm>
 #include "qoca/QcConstraint.hh"
 #include <qoca/QcFixedFloatRep.hh>
 

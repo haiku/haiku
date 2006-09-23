@@ -27,7 +27,7 @@
 #ifndef __QcLinEqSystemH
 #define __QcLinEqSystemH
 
-#include <vector.h>
+#include <vector>
 #include "qoca/QcSolver.hh"
 #include "qoca/QcLinEqTableau.hh"
 #include "qoca/QcConstraint.hh"

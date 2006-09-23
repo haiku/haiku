@@ -3,11 +3,13 @@
 #define QcBiMapDCL
 #line 1 "QcBiMap.ch"
 
-#include <iostream.h>
-#include <map.h>
-#include <vector.h>
+#include <iostream>
+#include <map>
+#include <vector>
 #include "qoca/QcDefines.hh"
 #include "qoca/KeyIterator.hh"
+
+using namespace std;
 
 
 /** Bi-directional one-to-one mapping between identifier class and non-negative
@@ -24,7 +26,7 @@
 
 
 
-template<class AKey>
+template<typename AKey>
 class QcBiMap
 {
 
@@ -55,11 +57,11 @@ vAssertDeepInvar() const;
 
 
 protected:
-	typedef map<AKey, int, less<AKey> > TIdentifierMap;
-	typedef vector<AKey> TIndexMap;
+	typedef std::map<AKey, int, less<AKey> > TIdentifierMap;
+	typedef std::vector<AKey> TIndexMap;
 
 public:
-	typedef KeyIterator<TIdentifierMap::const_iterator, AKey> const_identifier_iterator;
+	typedef KeyIterator<typename TIdentifierMap::const_iterator, AKey> const_identifier_iterator;
 
 
 	//-----------------------------------------------------------------------//
@@ -117,7 +119,7 @@ Update(const AKey &ident, int index);
   const_identifier_iterator
   getIdentifiers_begin() const
   {
-    TIdentifierMap::const_iterator i = fIdentifierMap.begin();
+    typename TIdentifierMap::const_iterator i = fIdentifierMap.begin();
     return const_identifier_iterator (i);
   }
 

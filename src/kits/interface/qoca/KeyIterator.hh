@@ -1,7 +1,7 @@
 #ifndef KeyIteratorHH
 #define KeyIteratorHH
 
-template <class Iterator, class Key>
+template <class Iterator, typename Key>
 class KeyIterator
   : public Iterator
 {

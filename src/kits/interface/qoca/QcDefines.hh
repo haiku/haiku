@@ -173,7 +173,8 @@
   )
 
 #ifndef qcNoStream
-# include <iostream.h>
+# include <iostream>
+using namespace std;
 #endif
 
 /* TODO: Maybe use autoconf to detect this.  (OTOH, I imagine that

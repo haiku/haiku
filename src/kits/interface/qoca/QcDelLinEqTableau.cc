@@ -24,7 +24,7 @@
 // included with the above copyright notice.                                  //
 //============================================================================//
 
-#include <math.h>
+#include <cmath>
 #include "qoca/QcDefines.hh"
 #include "qoca/QcDelLinEqTableau.hh"
 #ifdef qcDenseQuasiInverse

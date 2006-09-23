@@ -27,7 +27,7 @@
 #ifndef __QcSparseMatrixH
 #define __QcSparseMatrixH
 
-#include <vector.h>
+#include <vector>
 #include "qoca/QcDefines.hh"
 #include "qoca/QcMatrix.hh"
 #include "qoca/QcSparseMatrixElement.hh"

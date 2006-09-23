@@ -27,7 +27,8 @@
 #ifndef __QcSparseCoeffH
 #define __QcSparseCoeffH
 
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 
 class QcSparseCoeff
 {

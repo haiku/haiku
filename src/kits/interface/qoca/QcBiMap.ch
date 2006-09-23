@@ -1,7 +1,7 @@
 //begin o[d]
-#include <iostream.h>
-#include <map.h>
-#include <vector.h>
+#include <iostream>
+#include <map>
+#include <vector>
 #include "qoca/QcDefines.hh"
 #include "qoca/KeyIterator.hh"
 //end o[d]
@@ -46,12 +46,12 @@ assertInvar() const
       fIndexMap[ i].assertInvar();
       if(fIndexMap[ i].isDead())
 	continue;
-      TIdentifierMap::const_iterator f = fIdentifierMap.find(fIndexMap[i]);
+      typename TIdentifierMap::const_iterator f = fIdentifierMap.find(fIndexMap[i]);
       qcAssertInvar( f != fIdentifierMap.end());
       qcAssertInvar( f->second == i);
     }
 
-  for(TIdentifierMap::const_iterator ii = fIdentifierMap.begin(); ii != fIdentifierMap.end(); ii++)
+  for(typename TIdentifierMap::const_iterator ii = fIdentifierMap.begin(); ii != fIdentifierMap.end(); ii++)
     {
       unsigned ix = ii->second;
       qcAssertInvar( ix < fIndexMap.size());
@@ -80,7 +80,7 @@ protected:
 	typedef vector<AKey> TIndexMap;
 
 public:
-	typedef KeyIterator<TIdentifierMap::const_iterator, AKey> const_identifier_iterator;
+	typedef KeyIterator<typename TIdentifierMap::const_iterator, AKey> const_identifier_iterator;
 //end o[d]
 
 	//-----------------------------------------------------------------------//
@@ -134,11 +134,11 @@ SwapByIndex(int i1, int i2)
   fIndexMap[ i1] = ident2;
   fIndexMap[ i2] = ident1;
 
-  QcBiMap<AKey>::TIdentifierMap::iterator it1 = fIdentifierMap.find( ident1);
+  typename QcBiMap<AKey>::TIdentifierMap::iterator it1 = fIdentifierMap.find( ident1);
   qcAssertPost( it1 != fIdentifierMap.end());
   it1->second = i2;
 
-  QcBiMap<AKey>::TIdentifierMap::iterator it2 = fIdentifierMap.find( ident2);
+  typename QcBiMap<AKey>::TIdentifierMap::iterator it2 = fIdentifierMap.find( ident2);
   qcAssertPost( it2 != fIdentifierMap.end());
   it2->second = i1;
 }
@@ -191,13 +191,13 @@ Update(const AKey &ident, int index)
   unsigned GetSize() const
     { return fIdentifierMap.size(); }
 
-  bool IdentifierPresent(AKey const &ident) const
+bool IdentifierPresent(AKey const &ident) const
     { return (fIdentifierMap.find(ident) != fIdentifierMap.end()); }
 
   const_identifier_iterator
   getIdentifiers_begin() const
   {
-    TIdentifierMap::const_iterator i = fIdentifierMap.begin();
+    typename TIdentifierMap::const_iterator i = fIdentifierMap.begin();
     return const_identifier_iterator (i);
   }
 
@@ -220,7 +220,7 @@ Identifier(int index)
 inline AKey &
 Identifier(char const *n)
 {
-  QcBiMap<AKey>::TIdentifierMap::iterator iIt = fIdentifierMap.begin();
+  typename QcBiMap<AKey>::TIdentifierMap::iterator iIt = fIdentifierMap.begin();
   
   while(iIt != fIdentifierMap.end())
     {
@@ -243,7 +243,7 @@ Identifier(char const *n)
 inline int
 Index(AKey const &ident) const
 {
-  QcBiMap<AKey>::TIdentifierMap::const_iterator iIt = fIdentifierMap.find( ident);
+  typename QcBiMap<AKey>::TIdentifierMap::const_iterator iIt = fIdentifierMap.find( ident);
   qcAssertPre( iIt != fIdentifierMap.end());
   unsigned ix = iIt->second;
   qcAssertPost( (ix < fIndexMap.size())

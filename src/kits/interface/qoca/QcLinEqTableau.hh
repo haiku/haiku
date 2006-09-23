@@ -27,8 +27,8 @@
 #ifndef __QcLinEqTableauH
 #define __QcLinEqTableauH
 
-#include <deque.h>
-#include <vector.h>
+#include <deque>
+#include <vector>
 #include "qoca/QcTableau.hh"
 #include "qoca/QcSparseCoeff.hh"
 #include "qoca/QcDelCoreTableau.hh"

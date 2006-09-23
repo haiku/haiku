@@ -25,7 +25,7 @@
 //============================================================================//
 
 #include <math.h>
-#include <vector.h>
+#include <vector>
 #include "qoca/QcDefines.hh"
 #include "qoca/QcLinInEqTableau.hh"
 #include "qoca/QcConstraintIndexIterator.hh"

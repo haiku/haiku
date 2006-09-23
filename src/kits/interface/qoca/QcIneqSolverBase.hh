@@ -2,7 +2,6 @@
 #include "QcIneqSolverBase.H"
 #ifndef QcIneqSolverBaseIFN
 #define QcIneqSolverBaseIFN
-#line 1 "QcIneqSolverBase.ch"
 
 #include <qoca/QcSolver.hh>
 
@@ -12,11 +11,12 @@
 
 
 
-inline
+/*inline
 QcIneqSolverBase::QcIneqSolverBase()
   : QcSolver(),
     fSystem()
 {
+	;
 }
 
 
@@ -25,16 +25,15 @@ QcIneqSolverBase::QcIneqSolverBase(unsigned hintNumConstraints, unsigned hintNum
   : QcSolver(),
     fSystem( hintNumConstraints, hintNumVariables)
 {
-}
+	;
+}*/
 
 
-#line 80 "QcIneqSolverBase.ch"
 //-----------------------------------------------------------------------//
 // Constraint management methods                                         //
 //-----------------------------------------------------------------------//
 
 
-#line 173 "QcIneqSolverBase.ch"
 /*
   Local Variables:
   mode:c++

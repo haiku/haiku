@@ -27,7 +27,7 @@
 #ifndef __QcStateH
 #define __QcStateH
 
-#include <iostream.h>
+#include <iostream>
 
 class QcState
 {
@@ -37,7 +37,7 @@ public:
 	//-----------------------------------------------------------------------//
 	// Utililty functions.                                                   //
 	//-----------------------------------------------------------------------//
-	virtual void Print(ostream &os) = 0;
+	virtual void Print(std::ostream &os) = 0;
 };
 
 #endif
