@@ -193,6 +193,21 @@ _Unwind_SetIP()
 	panic("_Unwind_SetIP");
 }
 
+extern "C"
+void
+__deregister_frame_info()
+{
+	panic("__deregister_frame_info");
+}
+
+extern "C"
+void
+__register_frame_info()
+{
+	panic("__register_frame_info");
+}
+
+
 #endif	// __GNUC__ >= 4
 
 extern "C"
