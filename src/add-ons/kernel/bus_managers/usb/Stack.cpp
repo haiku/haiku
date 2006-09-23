@@ -8,6 +8,7 @@
  */
 
 #include <module.h>
+#include <unistd.h>
 #include <util/kernel_cpp.h>
 #include "usb_p.h"
 #include "PhysicalMemoryAllocator.h"
@@ -230,9 +231,18 @@ Stack::NotifyDeviceChange(Device *device, bool added)
 	while (element) {
 		if ((added && element->notify_hooks.device_added != NULL)
 			|| (!added && element->notify_hooks.device_removed != NULL)) {
-			device->ReportDevice(element->support_descriptors,
+			status_t result = device->ReportDevice(element->support_descriptors,
 				element->support_descriptor_count,
-				&element->notify_hooks, added);
+				&element->notify_hooks, element->cookies, added);
+
+			if (result == B_OK) {
+				const char *name = element->driver_name;
+				if (element->republish_driver_name)
+					name = element->republish_driver_name;
+				int devFS = open("/dev", O_WRONLY);
+				write(devFS, name, strlen(name));
+				close(devFS);
+			}
 		}
 
 		element = element->link;
@@ -258,6 +268,7 @@ Stack::RegisterDriver(const char *driverName,
 	memcpy(info->support_descriptors, descriptors, descriptorsSize);
 	info->support_descriptor_count = descriptorCount;
 
+	memset(info->cookies, 0, sizeof(void *) * 128);
 	info->notify_hooks.device_added = NULL;
 	info->notify_hooks.device_removed = NULL;
 	info->link = NULL;
@@ -285,6 +296,7 @@ status_t
 Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 {
 	TRACE(("usb stack: installing notify hooks for driver \"%s\"\n", driverName));
+
 	usb_driver_info *element = fDriverList;
 	while (element) {
 		if (strcmp(element->driver_name, driverName) == 0) {
@@ -297,7 +309,8 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 
 					// Report device will recurse down the whole tree
 					rootHub->ReportDevice(element->support_descriptors,
-						element->support_descriptor_count, hooks, true);
+						element->support_descriptor_count, hooks,
+						element->cookies, true);
 				}
 			}
 
@@ -317,16 +330,30 @@ status_t
 Stack::UninstallNotify(const char *driverName)
 {
 	TRACE(("usb stack: uninstalling notify hooks for driver \"%s\"\n", driverName));
+	if (!Lock())
+		return B_ERROR;
+
 	usb_driver_info *element = fDriverList;
 	while (element) {
 		if (strcmp(element->driver_name, driverName) == 0) {
+			// trigger the device removed hook
+			for (int32 i = 0; i < fBusManagers.Count(); i++) {
+				Hub *rootHub = fBusManagers.ElementAt(i)->GetRootHub();
+				if (rootHub)
+					rootHub->ReportDevice(element->support_descriptors,
+						element->support_descriptor_count,
+						&element->notify_hooks, element->cookies, false);
+			}
+
 			element->notify_hooks.device_added = NULL;
 			element->notify_hooks.device_removed = NULL;
+			Unlock();
 			return B_OK;
 		}
 
 		element = element->link;
 	}
 
+	Unlock();
 	return B_NAME_NOT_FOUND;
 }

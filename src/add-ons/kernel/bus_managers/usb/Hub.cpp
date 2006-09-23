@@ -161,6 +161,11 @@ Hub::Explore()
 #endif
 
 		if (fPortStatus[i].change & PORT_STATUS_CONNECTION) {
+			// clear status change
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_CONNECTION, i + 1,
+				0, NULL, 0, NULL);
+
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
 				// new device attached!
 				TRACE(("USB Hub: Explore(): New device connected\n"));
@@ -211,11 +216,6 @@ Hub::Explore()
 					fChildren[i] = NULL;
 				}
 			}
-
-			// clear status change
-			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
-				USB_REQUEST_CLEAR_FEATURE, C_PORT_CONNECTION, i + 1,
-				0, NULL, 0, NULL);
 		}
 	}
 
@@ -253,23 +253,28 @@ Hub::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 }			
 
 
-void
+status_t
 Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
-	uint32 supportDescriptorCount, const usb_notify_hooks *hooks, bool added)
+	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
+	void *cookies[], bool added)
 {
 	TRACE(("USB Hub ReportDevice\n"));
 
 	// Report ourselfs first
-	Device::ReportDevice(supportDescriptors, supportDescriptorCount, hooks, added);
+	status_t result = Device::ReportDevice(supportDescriptors,
+		supportDescriptorCount, hooks, cookies, added);
 
 	// Then report all of our children
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
 		if (!fChildren[i])
 			continue;
 
-		fChildren[i]->ReportDevice(supportDescriptors,
-				supportDescriptorCount, hooks, added);
+		if (fChildren[i]->ReportDevice(supportDescriptors,
+				supportDescriptorCount, hooks, cookies, added) == B_OK)
+			result = B_OK;
 	}
+
+	return result;
 }
 
 

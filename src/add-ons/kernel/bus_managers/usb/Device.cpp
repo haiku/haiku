@@ -19,8 +19,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 		fCurrentConfiguration(NULL),
 		fSpeed(speed),
 		fDeviceAddress(deviceAddress),
-		fLock(-1),
-		fNotifyCookie(NULL)
+		fLock(-1)
 {
 	TRACE(("USB Device: new device\n"));
 
@@ -150,7 +149,8 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 					interfaceInfo->generic_count = 0;
 					interfaceInfo->generic = NULL;
 
-					Interface *interface = new(std::nothrow) Interface(this);
+					Interface *interface = new(std::nothrow) Interface(this,
+						interfaceDescriptor->interface_number);
 					interfaceInfo->handle = interface->USBID();
 
 					currentInterface = interfaceInfo;
@@ -347,20 +347,22 @@ Device::DeviceDescriptor() const
 }
 
 
-void
+status_t
 Device::ReportDevice(usb_support_descriptor *supportDescriptors,
-	uint32 supportDescriptorCount, const usb_notify_hooks *hooks, bool added)
+	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
+	void *cookies[], bool added)
 {
 	TRACE(("USB Device ReportDevice\n"));
-	if (supportDescriptorCount == 0 || supportDescriptors == NULL) {
-		if (added && hooks->device_added != NULL)
-			hooks->device_added(USBID(), &fNotifyCookie);
-		else if (!added && hooks->device_removed != NULL)
-			hooks->device_removed(fNotifyCookie);
-		return;
-	}
+	if ((added && hooks->device_added == NULL)
+		|| (!added && hooks->device_removed == NULL)
+		|| (!added && cookies[fDeviceAddress] == NULL))
+		return B_BAD_VALUE;
 
-	for (uint32 i = 0; i < supportDescriptorCount; i++) {
+	bool supported = false;
+	if (supportDescriptorCount == 0 || supportDescriptors == NULL)
+		supported = true;
+
+	for (uint32 i = 0; !supported && i < supportDescriptorCount; i++) {
 		if ((supportDescriptors[i].vendor != 0
 			&& fDeviceDescriptor.vendor_id != supportDescriptors[i].vendor)
 			|| (supportDescriptors[i].product != 0
@@ -373,18 +375,13 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 			|| fDeviceDescriptor.device_subclass == supportDescriptors[i].dev_subclass)
 			&& (supportDescriptors[i].dev_protocol == 0
 			|| fDeviceDescriptor.device_protocol == supportDescriptors[i].dev_protocol)) {
-
-			if (added && hooks->device_added != NULL)
-				hooks->device_added(USBID(), &fNotifyCookie);
-			else if (!added && hooks->device_removed != NULL)
-				hooks->device_removed(fNotifyCookie);
-			return;
+			supported = true;
 		}
 
 		// we have to check all interfaces for matching class/subclass/protocol
-		for (uint32 j = 0; j < fDeviceDescriptor.num_configurations; j++) {
-			for (uint32 k = 0; k < fConfigurations[j].interface_count; k++) {
-				for (uint32 l = 0; l < fConfigurations[j].interface[k].alt_count; l++) {
+		for (uint32 j = 0; !supported && j < fDeviceDescriptor.num_configurations; j++) {
+			for (uint32 k = 0; !supported && k < fConfigurations[j].interface_count; k++) {
+				for (uint32 l = 0; !supported && l < fConfigurations[j].interface[k].alt_count; l++) {
 					usb_interface_descriptor *descriptor = fConfigurations[j].interface[k].alt[l].descr;
 					if ((supportDescriptors[i].dev_class == 0
 						|| descriptor->interface_class == supportDescriptors[i].dev_class)
@@ -392,17 +389,27 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 						|| descriptor->interface_subclass == supportDescriptors[i].dev_subclass)
 						&& (supportDescriptors[i].dev_protocol == 0
 						|| descriptor->interface_protocol == supportDescriptors[i].dev_protocol)) {
-
-						if (added && hooks->device_added != NULL)
-							hooks->device_added(USBID(), &fNotifyCookie);
-						else if (!added && hooks->device_removed != NULL)
-							hooks->device_removed(fNotifyCookie);
-						return;
+						supported = true;
 					}
 				}
 			}
 		}
 	}
+
+	if (supported) {
+		if (added) {
+			status_t result = hooks->device_added(USBID(), &cookies[fDeviceAddress]);
+			if (result != B_OK)
+				cookies[fDeviceAddress] = NULL;
+			return result;
+		}
+
+		hooks->device_removed(cookies[fDeviceAddress]);
+		cookies[fDeviceAddress] = NULL;
+		return B_OK;
+	}
+
+	return B_UNSUPPORTED;
 }
 
 

@@ -48,6 +48,7 @@ struct usb_driver_info {
 	uint32							support_descriptor_count;
 	const char						*republish_driver_name;
 	usb_notify_hooks				notify_hooks;
+	void							*cookies[128];
 	usb_driver_info					*link;
 };
 
@@ -340,7 +341,8 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
 
 class Interface : public Object {
 public:
-										Interface(Object *parent);
+										Interface(Object *parent,
+											uint8 interfaceIndex);
 
 virtual	uint32							Type() { return USB_OBJECT_INTERFACE; };
 
@@ -348,6 +350,9 @@ virtual	uint32							Type() { return USB_OBJECT_INTERFACE; };
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
+
+private:
+		uint8							fInterfaceIndex;
 };
 
 
@@ -376,11 +381,11 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 		status_t						SetConfiguration(const usb_configuration_info *configuration);
 		status_t						SetConfigurationAt(uint8 index);
 
-virtual	void							ReportDevice(
+virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
-											bool added);
+											void *cookies[], bool added);
 virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
@@ -402,7 +407,6 @@ private:
 		size_t							fMaxPacketIn[16];
 		size_t							fMaxPacketOut[16];
 		sem_id							fLock;
-		void							*fNotifyCookie;
 		ControlPipe						*fDefaultPipe;
 };
 
@@ -428,11 +432,11 @@ static	void							InterruptCallback(void *cookie,
 											uint32 status, void *data,
 											size_t actualLength);
 
-virtual	void							ReportDevice(
+virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
-											bool added);
+											void *cookies[], bool added);
 virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);

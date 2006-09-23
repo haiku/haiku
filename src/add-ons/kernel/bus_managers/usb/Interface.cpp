@@ -9,8 +9,9 @@
 #include "usb_p.h"
 
 
-Interface::Interface(Object *parent)
-	:	Object(parent)
+Interface::Interface(Object *parent, uint8 interfaceIndex)
+	:	Object(parent),
+		fInterfaceIndex(interfaceIndex)
 {
 }
 
@@ -22,7 +23,7 @@ Interface::SetFeature(uint16 selector)
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_OUT,
 		USB_REQUEST_SET_FEATURE,
 		selector,
-		0,
+		fInterfaceIndex,
 		0,
 		NULL,
 		0,
@@ -37,7 +38,7 @@ Interface::ClearFeature(uint16 selector)
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
 		selector,
-		0,
+		fInterfaceIndex,
 		0,
 		NULL,
 		0,
@@ -51,7 +52,7 @@ Interface::GetStatus(uint16 *status)
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_IN,
 		USB_REQUEST_GET_STATUS,
-		0,
+		fInterfaceIndex,
 		0,
 		2,
 		(void *)status,
