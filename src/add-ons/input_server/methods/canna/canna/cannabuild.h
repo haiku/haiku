@@ -10,9 +10,9 @@
 //#define _BUILDING_CANNALIB 
 
 #ifdef _BUILDING_CANNALIB 
-#define canna_export     __declspec(dllexport) 
+#define canna_export   //  __declspec(dllexport) 
 #else 
-#define canna_export __declspec(dllimport) 
+#define canna_export   //  __declspec(dllimport) 
 #endif
 
 #endif // CANNABUILD_H
