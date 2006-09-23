@@ -133,6 +133,7 @@ typedef union {
 typedef struct {
 	usb_device			device;
 	benaphore			lock;
+	uint32				reference_count;
 
 	char				name[32];
 	void				*link;

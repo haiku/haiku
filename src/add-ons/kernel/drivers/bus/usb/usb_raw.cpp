@@ -15,7 +15,7 @@
 #include "BeOSCompatibility.h"
 
 
-#define TRACE_USB_RAW
+//#define TRACE_USB_RAW
 #ifdef TRACE_USB_RAW
 #define TRACE(x)	dprintf x
 #else
@@ -28,15 +28,16 @@
 #define DRIVER_VERSION	0x0015
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
-usb_module_info *gUSBModule = NULL;
-raw_device *gDeviceList = NULL;
-uint32 gDeviceCount = 0;
-benaphore gDeviceListLock;
+static usb_module_info *gUSBModule = NULL;
+static raw_device *gDeviceList = NULL;
+static uint32 gDeviceCount = 0;
+static benaphore gDeviceListLock;
+static char **gDeviceNames = NULL;
 
 static status_t
 usb_raw_device_added(usb_device newDevice, void **cookie)
 {
-	TRACE((DRIVER_NAME": device_added()\n"));
+	TRACE((DRIVER_NAME": device_added(0x%08lx)\n", newDevice));
 	raw_device *device = (raw_device *)malloc(sizeof(raw_device));
 
 	status_t result = benaphore_init(&device->lock, "usb_raw device lock");
@@ -57,10 +58,11 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 	if (gUSBModule->usb_ioctl('DNAM', deviceName, sizeof(deviceName)) >= B_OK) {
 		sprintf(device->name, "bus/usb/%s", deviceName);
 	} else {
-		sprintf(device->name, "bus/usb/%08x", newDevice);
+		sprintf(device->name, "bus/usb/%08lx", newDevice);
 	}
 
 	device->device = newDevice;
+	device->reference_count = 0;
 
 	benaphore_lock(&gDeviceListLock);
 	device->link = (void *)gDeviceList;
@@ -68,6 +70,7 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 	gDeviceCount++;
 	benaphore_unlock(&gDeviceListLock);
 
+	TRACE((DRIVER_NAME": new device: 0x%08lx\n", (uint32)device));
 	*cookie = (void *)device;
 	return B_OK;
 }
@@ -76,7 +79,7 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 static status_t
 usb_raw_device_removed(void *cookie)
 {
-	TRACE((DRIVER_NAME": device_removed()\n"));
+	TRACE((DRIVER_NAME": device_removed(0x%08lx)\n", (uint32)cookie));
 	raw_device *device = (raw_device *)cookie;
 
 	benaphore_lock(&gDeviceListLock);
@@ -97,9 +100,12 @@ usb_raw_device_removed(void *cookie)
 	benaphore_unlock(&gDeviceListLock);
 
 	benaphore_lock(&device->lock);
+	device->device = 0;
 	benaphore_destroy(&device->lock);
 	delete_sem(device->notify);
-	free(device);
+	if (device->reference_count == 0)
+		free(device);
+
 	return B_OK;
 }
 
@@ -117,6 +123,13 @@ usb_raw_open(const char *name, uint32 flags, void **cookie)
 	raw_device *element = gDeviceList;
 	while (element) {
 		if (strcmp(name, element->name) == 0) {
+			if (element->reference_count > 0) {
+				// device is already open
+				benaphore_unlock(&gDeviceListLock);
+				return B_BUSY;
+			}
+
+			element->reference_count++;
 			*cookie = element;
 			benaphore_unlock(&gDeviceListLock);
 			return B_OK;
@@ -142,6 +155,14 @@ static status_t
 usb_raw_free(void *cookie)
 {
 	TRACE((DRIVER_NAME": free()\n"));
+	benaphore_lock(&gDeviceListLock);
+
+	raw_device *device = (raw_device *)cookie;
+	device->reference_count--;
+	if (device->device == 0)
+		free(device);
+
+	benaphore_unlock(&gDeviceListLock);
 	return B_OK;
 }
 
@@ -184,6 +205,9 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 	TRACE((DRIVER_NAME": ioctl\n"));
 	raw_device *device = (raw_device *)cookie;
 	raw_command *command = (raw_command *)buffer;
+
+	if (device->device == 0)
+		return B_DEV_NOT_READY;
 
 	switch (op) {
 		case RAW_COMMAND_GET_VERSION: {
@@ -573,7 +597,7 @@ init_driver()
 	TRACE((DRIVER_NAME": trying module %s\n", B_USB_MODULE_NAME));
 	result = get_module(B_USB_MODULE_NAME, (module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE((DRIVER_NAME": getting module failed 0x%08x\n", result));
+		TRACE((DRIVER_NAME": getting module failed 0x%08lx\n", result));
 		return result;
 	}
 
@@ -589,30 +613,42 @@ uninit_driver()
 	TRACE((DRIVER_NAME": uninit_driver()\n"));
 	gUSBModule->uninstall_notify(DRIVER_NAME);
 	benaphore_lock(&gDeviceListLock);
+
+	if (gDeviceNames) {
+		for (int32 i = 1; gDeviceNames[i]; i++)
+			free(gDeviceNames[i]);
+		free(gDeviceNames);
+	}
+
 	benaphore_destroy(&gDeviceListLock);
 	put_module(B_USB_MODULE_NAME);
 }
 
 
 const char **
-publish_devices(void)
+publish_devices()
 {
 	TRACE((DRIVER_NAME": publish_devices()\n"));
+	if (gDeviceNames) {
+		for (int32 i = 1; gDeviceNames[i]; i++)
+			free(gDeviceNames[i]);
+		free(gDeviceNames);
+	}
+
+	int32 index = 0;
+	gDeviceNames = (char **)malloc(sizeof(char *) * (gDeviceCount + 2));
+	gDeviceNames[index++] = DEVICE_NAME;
+
 	benaphore_lock(&gDeviceListLock);
-	const char **deviceNames = (const char **)malloc(sizeof(char *) * (gDeviceCount + 2));
-
-	uint8 index = 0;
-	deviceNames[index++] = DEVICE_NAME;
-
 	raw_device *element = gDeviceList;
 	while (element) {
-		deviceNames[index++] = element->name;
+		gDeviceNames[index++] = strdup(element->name);
 		element = (raw_device *)element->link;
 	}
 
-	deviceNames[index++] = NULL;
+	gDeviceNames[index++] = NULL;
 	benaphore_unlock(&gDeviceListLock);
-	return deviceNames;
+	return (const char **)gDeviceNames;
 }
 
 
