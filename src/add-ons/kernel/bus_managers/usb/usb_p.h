@@ -272,7 +272,7 @@ virtual	void							SetDataToggle(bool toggle) {};
 											void *data, size_t dataLength,
 											size_t *actualLength);
 static	void							SendRequestCallback(void *cookie,
-											uint32 status, void *data,
+											status_t status, void *data,
 											size_t actualLength);
 
 		status_t						QueueRequest(uint8 requestType,
@@ -437,7 +437,7 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 		status_t						ResetPort(uint8 index);
 		void							Explore();
 static	void							InterruptCallback(void *cookie,
-											uint32 status, void *data,
+											status_t status, void *data,
 											size_t actualLength);
 
 virtual	status_t						ReportDevice(

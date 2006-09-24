@@ -136,8 +136,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 	usb_request_data *request = transfer->RequestData();
 	TRACE(("usb_ehci_roothub: request: %d\n", request->Request));
 
-	// ToDo: define better status codes. We should return a request error.
-	uint32 status = B_USB_STATUS_DEVICE_TIMEOUT;
+	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
 	switch (request->Request) {
 		case USB_REQUEST_GET_STATUS: {
@@ -149,7 +148,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 				// and if there is a over-current condition (bit 1).
 				// everything as 0 means all is ok.
 				memset(transfer->Data(), 0, actualLength);
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 				break;
 			}
 
@@ -157,7 +156,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 			if (ehci->GetPortStatus(request->Index - 1, &portStatus) >= B_OK) {
 				actualLength = MIN(sizeof(usb_port_status), transfer->DataLength());
 				memcpy(transfer->Data(), (void *)&portStatus, actualLength);
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 			}
 
 			break;
@@ -165,12 +164,12 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 
 		case USB_REQUEST_SET_ADDRESS:
 			if (request->Value >= 128) {
-				status = B_USB_STATUS_DEVICE_TIMEOUT;
+				status = B_TIMED_OUT;
 				break;
 			}
 
 			TRACE(("usb_ehci_roothub:  set address: %d\n", request->Value));
-			status = B_USB_STATUS_SUCCESS;
+			status = B_OK;
 			break;
 
 		case USB_REQUEST_GET_DESCRIPTOR:
@@ -182,7 +181,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sEHCIRootHubDevice,
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 
@@ -192,7 +191,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 					sEHCIRootHubConfig.hub.num_ports = ehci->PortCount();
 					memcpy(transfer->Data(), (void *)&sEHCIRootHubConfig,
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 
@@ -205,7 +204,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 						transfer->DataLength());
 					memcpy(transfer->Data(), (void *)&sEHCIRootHubStrings[index],
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 
@@ -215,14 +214,14 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 					sEHCIRootHubConfig.hub.num_ports = ehci->PortCount();
 					memcpy(transfer->Data(), (void *)&sEHCIRootHubConfig.hub,
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 			}
 			break;
 
 		case USB_REQUEST_SET_CONFIGURATION:
-			status = B_USB_STATUS_SUCCESS;
+			status = B_OK;
 			break;
 
 		case USB_REQUEST_CLEAR_FEATURE: {
@@ -234,7 +233,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 
 			TRACE(("usb_ehci_roothub: clear feature: %d\n", request->Value));
 			if (ehci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 			break;
 		}
 
@@ -247,7 +246,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 
 			TRACE(("usb_ehci_roothub: set feature: %d\n", request->Value));
 			if (ehci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 			break;
 		}
 	}

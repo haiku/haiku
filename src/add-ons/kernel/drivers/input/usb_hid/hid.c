@@ -592,11 +592,11 @@ usb_callback(void *cookie, uint32 busStatus,
 	acquire_sem(device->sem_lock);
 	device->actual_length = actualLength;
 	device->bus_status = busStatus;	/* B_USB_STATUS_* */
-	if (busStatus != B_USB_STATUS_SUCCESS) {
+	if (busStatus != B_OK) {
 		/* request failed */
 		release_sem(device->sem_lock);
 		DPRINTF_ERR((MY_ID "bus status %d\n", (int)busStatus));
-		if (busStatus == B_USB_STATUS_IRP_CANCELLED_BY_REQUEST) {
+		if (busStatus == B_CANCELED) {
 			/* cancelled: device is unplugged */
 			return;
 		}

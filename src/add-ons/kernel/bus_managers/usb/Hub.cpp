@@ -230,7 +230,7 @@ Hub::Explore()
 
 
 void
-Hub::InterruptCallback(void *cookie, uint32 status, void *data,
+Hub::InterruptCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
 	TRACE(("USB Hub: interrupt callback!\n"));

@@ -204,9 +204,9 @@ IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
 
 
 typedef struct transfer_result_data_s {
-	sem_id	notify_sem;
-	uint32	status;
-	size_t	actual_length;
+	sem_id		notify_sem;
+	status_t	status;
+	size_t		actual_length;
 } transfer_result_data;
 
 
@@ -243,15 +243,12 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	if (actualLength)
 		*actualLength = transferResult.actual_length;
 
-	if (transferResult.status == B_USB_STATUS_SUCCESS)
-		return B_OK;
-
-	return B_ERROR;
+	return transferResult.status;
 }
 
 
 void
-ControlPipe::SendRequestCallback(void *cookie, uint32 status, void *data,
+ControlPipe::SendRequestCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
 	transfer_result_data *transferResult = (transfer_result_data *)cookie;

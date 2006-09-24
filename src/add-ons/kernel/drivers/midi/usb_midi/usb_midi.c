@@ -158,11 +158,11 @@ midi_usb_callback(void *cookie, uint32 status,
 	acquire_sem (my_dev->sem_lock);
 	my_dev->actual_length = actual_len;
 	my_dev->bus_status = status;	/* B_USB_STATUS_* */
-	if (status != B_USB_STATUS_SUCCESS) {
+	if (status != B_OK) {
 		/* request failed */
 		release_sem (my_dev->sem_lock);
 		DPRINTF_ERR ((MY_ID "bus status %d\n", (int)status));
-		if (status == B_USB_STATUS_IRP_CANCELLED_BY_REQUEST) {
+		if (status == B_CANCELED) {
 			/* cancelled: device is unplugged */
 			return;
 		}

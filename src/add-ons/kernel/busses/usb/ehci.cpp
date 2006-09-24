@@ -106,6 +106,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fLastTransfer(NULL),
 		fFinishThread(-1),
 		fStopFinishThread(false),
+		fFreeListHead(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fPortCount(0),
@@ -879,7 +880,7 @@ EHCI::CancelPendingTransfer(Transfer *transfer)
 	transfer_data *current = fFirstTransfer;
 	while (current) {
 		if (current->transfer == transfer) {
-			current->transfer->Finished(B_USB_STATUS_IRP_CANCELLED_BY_REQUEST, 0);
+			current->transfer->Finished(B_CANCELED, 0);
 			delete current->transfer;
 
 			if (last)
@@ -912,7 +913,7 @@ EHCI::CancelAllPendingTransfers()
 
 	transfer_data *transfer = fFirstTransfer;
 	while (transfer) {
-		transfer->transfer->Finished(B_USB_STATUS_IRP_CANCELLED_BY_REQUEST, 0);
+		transfer->transfer->Finished(B_CANCELED, 0);
 		delete transfer->transfer;
 
 		transfer_data *next = transfer->link;
@@ -956,7 +957,6 @@ EHCI::FinishTransfers()
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
 
-		ehci_qh *freeListHead = NULL;
 		while (transfer) {
 			bool transferDone = false;
 			ehci_qtd *descriptor = (ehci_qtd *)transfer->queue_head->element_log;
@@ -977,18 +977,34 @@ EHCI::FinishTransfers()
 					// a transfer error occured
 					TRACE_ERROR(("usb_ehci: qtd (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status));
 
-					uint32 callbackStatus = 0;
-					if (status & EHCI_QTD_STATUS_HALTED)
-						callbackStatus |= B_USB_STATUS_DEVICE_STALLED;
-					if (status & EHCI_QTD_STATUS_BUFFER)
-						callbackStatus |= B_USB_STATUS_DEVICE_TIMEOUT;
-					if (status & EHCI_QTD_STATUS_BABBLE)
-						callbackStatus |= B_USB_STATUS_ADAPTER_HARDWARE_ERROR;
-					if (status & EHCI_QTD_STATUS_TERROR)
-						callbackStatus |= B_USB_STATUS_DRIVER_INTERNAL_ERROR;
-					// ToDo: define better error values!
+					status_t callbackStatus = B_ERROR;
+					uint8 errorCount = status >> EHCI_QTD_ERRCOUNT_SHIFT;
+					errorCount &= EHCI_QTD_ERRCOUNT_MASK;
+					if (errorCount == 0) {
+						// the error counter counted down to zero, report why
+						int32 reasons = 0;
+						if (status & EHCI_QTD_STATUS_BUFFER) {
+							callbackStatus = transfer->incoming ? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
+							reasons++;
+						}
+						if (status & EHCI_QTD_STATUS_TERROR) {
+							callbackStatus = B_DEV_CRC_ERROR;
+							reasons++;
+						}
 
-					UnlinkQueueHead(transfer->queue_head, &freeListHead);
+						if (reasons > 1)
+							callbackStatus = B_DEV_MULTIPLE_ERRORS;
+					} else if (status & EHCI_QTD_STATUS_BABBLE) {
+						// there is a babble condition
+						callbackStatus = transfer->incoming ? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;
+					} else {
+						// if the error counter didn't count down to zero
+						// and there was no babble, then this halt was caused
+						// by a stall handshake
+						callbackStatus = B_DEV_STALLED;
+					}
+
+					UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
 					transfer->transfer->Finished(callbackStatus, 0);
 					transferDone = true;
 					break;
@@ -1038,9 +1054,9 @@ EHCI::FinishTransfers()
 							&nextDataToggle);
 					}
 
-					UnlinkQueueHead(transfer->queue_head, &freeListHead);
+					UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
 					transfer->transfer->TransferPipe()->SetDataToggle(nextDataToggle);
-					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, actualLength);
+					transfer->transfer->Finished(B_OK, actualLength);
 					transferDone = true;
 					break;
 				}
@@ -1065,19 +1081,22 @@ EHCI::FinishTransfers()
 					Unlock();
 				}
 			} else {
-				lastTransfer = transfer;
-				transfer = transfer->link;
+				if (Lock()) {
+					lastTransfer = transfer;
+					transfer = transfer->link;
+					Unlock();
+				}
 			}
 		}
 
-		if (freeListHead) {
+		if (fFreeListHead) {
 			// set the doorbell and wait for the host controller to notify us
 			WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_INTONAAD);
 			if (acquire_sem_etc(fAsyncAdvanceSem, 1, B_RELATIVE_TIMEOUT, 1000) == B_OK) {
-				while (freeListHead) {
-					ehci_qh *next = (ehci_qh *)freeListHead->next_log;
-					FreeQueueHead(freeListHead);
-					freeListHead = next;
+				while (fFreeListHead) {
+					ehci_qh *next = (ehci_qh *)fFreeListHead->next_log;
+					FreeQueueHead(fFreeListHead);
+					fFreeListHead = next;
 				}
 			}
 		}

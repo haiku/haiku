@@ -30,7 +30,7 @@
 	
 	???
 */
-void bulk_callback(void	*cookie, uint32 status, void* data, uint32 actual_len)
+void bulk_callback(void	*cookie, status_t status, void* data, uint32 actual_len)
 {
 	TRACE_BULK_CALLBACK(status, actual_len);
 	if(cookie){

@@ -17,7 +17,7 @@
 	#include "device_info.h"
 #endif /* _DEVICE_INFO_H_ */
 
-void bulk_callback(void	*cookie, uint32 status, void* data, uint32 actual_len);
+void bulk_callback(void	*cookie, status_t status, void* data, uint32 actual_len);
 									 
 status_t process_data_io(usb_device_info *udi, iovec *sg_data, int32 sg_count/*sg_buffer *sgb*/, EDirection dir);
  

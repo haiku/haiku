@@ -142,6 +142,7 @@ static	pci_module_info				*sPCIModule;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
+		ehci_qh						*fFreeListHead;
 
 		// Root Hub
 		EHCIRootHub					*fRootHub;

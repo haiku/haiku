@@ -79,7 +79,7 @@ typedef struct {
 	status_t					status;
 } usb_iso_packet_descriptor;
 
-typedef void (*usb_callback_func)(void *cookie, uint32 status, void *data,
+typedef void (*usb_callback_func)(void *cookie, status_t status, void *data,
 	size_t actualLength);
 
 
@@ -212,24 +212,6 @@ struct usb_module_info {
 	status_t						(*usb_ioctl)(uint32 opcode, void *buffer,
 										size_t bufferSize);
 };
-
-
-/*
- *	These status are passed to the usb_callback_func callbacks. They indicate
- *	the status of a completed queued transfer. Multiple of these status codes
- *	may be combined. For example it is possible to have:
- *		B_USB_STATUS_DEVICE_TIMEOUT | B_USB_STATUS_DEVICE_STALLED
- *	This indicates that a timeout happened and that the used pipe is now
- *	stalled.
- */
-#define B_USB_STATUS_SUCCESS						0x0000
-#define B_USB_STATUS_DEVICE_CRC_ERROR				0x0002
-#define B_USB_STATUS_DEVICE_TIMEOUT					0x0004
-#define B_USB_STATUS_DEVICE_STALLED					0x0008
-#define B_USB_STATUS_IRP_CANCELLED_BY_REQUEST		0x0010
-#define B_USB_STATUS_DRIVER_INTERNAL_ERROR			0x0020
-#define B_USB_STATUS_ADAPTER_HARDWARE_ERROR			0x0040
-#define B_USB_STATUS_ISOCH_IRP_ABORTED				0x0080
 
 
 #define	B_USB_MODULE_NAME		"bus_managers/usb/v3"

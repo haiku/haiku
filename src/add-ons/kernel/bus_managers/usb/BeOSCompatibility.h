@@ -10,6 +10,22 @@
 #define IS_USER_ADDRESS(x)		(((uint32)x & 0x80000000) > 0)
 #define IS_KERNEL_ADDRESS(x)	(((uint32)x & 0x80000000) == 0)
 
+#ifndef B_DEV_INVALID_PIPE
+enum {
+	B_DEV_INVALID_PIPE = B_DEV_DOOR_OPEN + 1,
+	B_DEV_CRC_ERROR,
+	B_DEV_STALLED,
+	B_DEV_BAD_PID,
+	B_DEV_UNEXPECTED_PID,
+	B_DEV_DATA_OVERRUN,
+	B_DEV_DATA_UNDERRUN,
+	B_DEV_FIFO_OVERRUN,
+	B_DEV_FIFO_UNDERRUN,
+	B_DEV_PENDING,
+	B_DEV_MULTIPLE_ERRORS,
+	B_DEV_TOO_LATE,
+};
+#endif
 
 inline status_t
 benaphore_init(benaphore *ben, const char *name)

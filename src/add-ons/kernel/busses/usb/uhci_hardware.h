@@ -128,7 +128,9 @@ typedef struct
 
 #define TD_DEPTH_FIRST				0x04
 #define TD_TERMINATE				0x01
-#define TD_ERROR_MASK				0x7e0000
+#define TD_ERROR_MASK				0x440000
+#define TD_ERROR_COUNT_SHIFT		27
+#define TD_ERROR_COUNT_MASK			0x03
 #define TD_LINK_MASK				0xfffffff0
 
 

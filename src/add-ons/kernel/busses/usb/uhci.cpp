@@ -770,14 +770,39 @@ UHCI::FinishTransfers()
 					// an error occured. we have to remove the
 					// transfer from the queue and clean up
 
-					uint32 callbackStatus = 0;
-					if (status & TD_STATUS_ERROR_STALLED)
-						callbackStatus |= B_USB_STATUS_DEVICE_STALLED;
-					if (status & TD_STATUS_ERROR_TIMEOUT) {
-						if (transfer->incoming)
-							callbackStatus |= B_USB_STATUS_DEVICE_CRC_ERROR;
-						else
-							callbackStatus |= B_USB_STATUS_DEVICE_TIMEOUT;
+					status_t callbackStatus = B_ERROR;
+					uint8 errorCount = status >> TD_ERROR_COUNT_SHIFT;
+					errorCount &= TD_ERROR_COUNT_MASK;
+					if (errorCount == 0) {
+						// the error counter counted down to zero, report why
+						int32 reasons = 0;
+						if (status & TD_STATUS_ERROR_BUFFER) {
+							callbackStatus = transfer->incoming ? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
+							reasons++;
+						}
+						if (status & TD_STATUS_ERROR_TIMEOUT) {
+							callbackStatus = transfer->incoming ? B_DEV_CRC_ERROR : B_TIMED_OUT;
+							reasons++;
+						}
+						if (status & TD_STATUS_ERROR_NAK) {
+							callbackStatus = B_DEV_UNEXPECTED_PID;
+							reasons++;
+						}
+						if (status & TD_STATUS_ERROR_BITSTUFF) {
+							callbackStatus = B_DEV_CRC_ERROR;
+							reasons++;
+						}
+
+						if (reasons > 1)
+							callbackStatus = B_DEV_MULTIPLE_ERRORS;
+					} else if (status & TD_STATUS_ERROR_BABBLE) {
+						// there is a babble condition
+						callbackStatus = transfer->incoming ? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;
+					} else {
+						// if the error counter didn't count down to zero
+						// and there was no babble, then this halt was caused
+						// by a stall handshake
+						callbackStatus = B_DEV_STALLED;
 					}
 
 					transfer->queue->RemoveDescriptorChain(
@@ -841,7 +866,7 @@ UHCI::FinishTransfers()
 
 					FreeDescriptorChain(transfer->first_descriptor);
 					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
-					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, actualLength);
+					transfer->transfer->Finished(B_OK, actualLength);
 					transferDone = true;
 					break;
 				}

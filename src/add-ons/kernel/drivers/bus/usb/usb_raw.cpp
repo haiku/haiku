@@ -99,12 +99,13 @@ usb_raw_device_removed(void *cookie)
 	gDeviceCount--;
 	benaphore_unlock(&gDeviceListLock);
 
-	benaphore_lock(&device->lock);
 	device->device = 0;
-	benaphore_destroy(&device->lock);
-	delete_sem(device->notify);
-	if (device->reference_count == 0)
+	if (device->reference_count == 0) {
+		benaphore_lock(&device->lock);
+		benaphore_destroy(&device->lock);
+		delete_sem(device->notify);
 		free(device);
+	}
 
 	return B_OK;
 }
@@ -123,12 +124,6 @@ usb_raw_open(const char *name, uint32 flags, void **cookie)
 	raw_device *element = gDeviceList;
 	while (element) {
 		if (strcmp(name, element->name) == 0) {
-			if (element->reference_count > 0) {
-				// device is already open
-				benaphore_unlock(&gDeviceListLock);
-				return B_BUSY;
-			}
-
 			element->reference_count++;
 			*cookie = element;
 			benaphore_unlock(&gDeviceListLock);
@@ -159,8 +154,12 @@ usb_raw_free(void *cookie)
 
 	raw_device *device = (raw_device *)cookie;
 	device->reference_count--;
-	if (device->device == 0)
+	if (device->device == 0) {
+		benaphore_lock(&device->lock);
+		benaphore_destroy(&device->lock);
+		delete_sem(device->notify);
 		free(device);
+	}
 
 	benaphore_unlock(&gDeviceListLock);
 	return B_OK;
@@ -168,26 +167,26 @@ usb_raw_free(void *cookie)
 
 
 static void
-usb_raw_callback(void *cookie, uint32 status, void *data, size_t actualLength)
+usb_raw_callback(void *cookie, status_t status, void *data, size_t actualLength)
 {
 	TRACE((DRIVER_NAME": callback()\n"));
 	raw_device *device = (raw_device *)cookie;
 
 	switch (status) {
-		case B_USB_STATUS_SUCCESS:
+		case B_OK:
 			device->status = RAW_STATUS_SUCCESS;
 			break;
-		case B_USB_STATUS_DEVICE_CRC_ERROR:
-			device->status = RAW_STATUS_CRC_ERROR;
-			break;
-		case B_USB_STATUS_DEVICE_TIMEOUT:
+		case B_TIMED_OUT:
 			device->status = RAW_STATUS_TIMEOUT;
 			break;
-		case B_USB_STATUS_DEVICE_STALLED:
-			device->status = RAW_STATUS_STALLED;
-			break;
-		case B_USB_STATUS_IRP_CANCELLED_BY_REQUEST:
+		case B_CANCELED:
 			device->status = RAW_STATUS_ABORTED;
+			break;
+		case B_DEV_CRC_ERROR:
+			device->status = RAW_STATUS_CRC_ERROR;
+			break;
+		case B_DEV_STALLED:
+			device->status = RAW_STATUS_STALLED;
 			break;
 		default:
 			device->status = RAW_STATUS_FAILED;
