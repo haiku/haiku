@@ -256,7 +256,7 @@ Hub::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 status_t
 Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
-	void *cookies[], bool added)
+	usb_driver_cookie **cookies, bool added)
 {
 	TRACE(("USB Hub ReportDevice\n"));
 

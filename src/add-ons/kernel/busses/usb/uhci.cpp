@@ -67,7 +67,7 @@ void
 print_descriptor_chain(uhci_td *descriptor)
 {
 	while (descriptor) {
-		dprintf("ph: 0x%08x; lp: 0x%08x; vf: %s; q: %s; t: %s; st: 0x%08x; to: 0x%08x\n",
+		dprintf("ph: 0x%08lx; lp: 0x%08lx; vf: %s; q: %s; t: %s; st: 0x%08lx; to: 0x%08lx\n",
 			descriptor->this_phy & 0xffffffff, descriptor->link_phy & 0xfffffff0,
 			descriptor->link_phy & 0x4 ? "y" : "n",
 			descriptor->link_phy & 0x2 ? "qh" : "td",
@@ -301,8 +301,8 @@ Queue::PrintToStream()
 {
 #ifdef TRACE_USB
 	dprintf("USB UHCI Queue:\n");
-	dprintf("link phy: 0x%08x; link type: %s; terminate: %s\n", fQueueHead->link_phy & 0xfff0, fQueueHead->link_phy & 0x0002 ? "QH" : "TD", fQueueHead->link_phy & 0x0001 ? "yes" : "no");
-	dprintf("elem phy: 0x%08x; elem type: %s; terminate: %s\n", fQueueHead->element_phy & 0xfff0, fQueueHead->element_phy & 0x0002 ? "QH" : "TD", fQueueHead->element_phy & 0x0001 ? "yes" : "no");
+	dprintf("link phy: 0x%08lx; link type: %s; terminate: %s\n", fQueueHead->link_phy & 0xfff0, fQueueHead->link_phy & 0x0002 ? "QH" : "TD", fQueueHead->link_phy & 0x0001 ? "yes" : "no");
+	dprintf("elem phy: 0x%08lx; elem type: %s; terminate: %s\n", fQueueHead->element_phy & 0xfff0, fQueueHead->element_phy & 0x0002 ? "QH" : "TD", fQueueHead->element_phy & 0x0001 ? "yes" : "no");
 	dprintf("elements:\n");
 	print_descriptor_chain(fQueueTop);
 #endif
@@ -476,7 +476,7 @@ UHCI::Start()
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint16 status = ReadReg16(UHCI_USBSTS);
-		TRACE(("usb_uhci: current loop %u, status 0x%04x\n", i, status));
+		TRACE(("usb_uhci: current loop %ld, status 0x%04x\n", i, status));
 
 		if (status & UHCI_USBSTS_HCHALT)
 			snooze(10000);
@@ -515,12 +515,11 @@ UHCI::Start()
 status_t
 UHCI::SubmitTransfer(Transfer *transfer)
 {
-	TRACE(("usb_uhci: submit transfer called for device %d\n", transfer->TransferPipe()->DeviceAddress()));
-
 	// Short circuit the root hub
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
+	TRACE(("usb_uhci: submit transfer called for device %d\n", transfer->TransferPipe()->DeviceAddress()));
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
@@ -740,10 +739,16 @@ UHCI::FinishTransfers()
 		if (acquire_sem(fFinishTransfersSem) < B_OK)
 			continue;
 
+		// eat up sems that have been released by multiple interrupts
+		int32 semCount = 0;
+		get_sem_count(fFinishTransfersSem, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
+
 		if (!Lock())
 			continue;
 
-		TRACE(("usb_uhci: finishing transfers (first transfer: 0x%08x; last transfer: 0x%08x)\n", fFirstTransfer, fLastTransfer));
+		TRACE(("usb_uhci: finishing transfers (first transfer: 0x%08lx; last transfer: 0x%08lx)\n", (uint32)fFirstTransfer, (uint32)fLastTransfer));
 		transfer_data *lastTransfer = NULL;
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
@@ -755,7 +760,7 @@ UHCI::FinishTransfers()
 			while (descriptor) {
 				uint32 status = descriptor->status;
 				if (status & TD_STATUS_ACTIVE) {
-					TRACE(("usb_uhci: td (0x%08x) still active\n", descriptor->this_phy));
+					TRACE(("usb_uhci: td (0x%08lx) still active\n", descriptor->this_phy));
 					// still in progress
 					break;
 				}
@@ -789,7 +794,7 @@ UHCI::FinishTransfers()
 				if (descriptor == transfer->last_descriptor
 					|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
 					< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
-					TRACE(("usb_uhci: td (0x%08x) ok\n", descriptor->this_phy));
+					TRACE(("usb_uhci: td (0x%08lx) ok\n", descriptor->this_phy));
 					// we got through without errors so we are finished
 					transfer->queue->RemoveDescriptorChain(
 						transfer->first_descriptor,
@@ -1317,7 +1322,7 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 			size_t length = min_c(current->buffer_size - bufferOffset,
 				vector[vectorIndex].iov_len - vectorOffset);
 
-			TRACE(("usb_uhci: copying %d bytes to bufferOffset %d from vectorOffset %d at index %d of %d\n", length, bufferOffset, vectorOffset, vectorIndex, vectorCount));
+			TRACE(("usb_uhci: copying %ld bytes to bufferOffset %ld from vectorOffset %ld at index %ld of %ld\n", length, bufferOffset, vectorOffset, vectorIndex, vectorCount));
 			memcpy((uint8 *)current->buffer_log + bufferOffset,
 				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
 
@@ -1327,7 +1332,7 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_uhci: wrote descriptor chain (%d bytes, no more vectors)\n", actualLength));
+					TRACE(("usb_uhci: wrote descriptor chain (%ld bytes, no more vectors)\n", actualLength));
 					return actualLength;
 				}
 
@@ -1346,7 +1351,7 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 		current = (uhci_td *)current->link_log;
 	}
 
-	TRACE(("usb_uhci: wrote descriptor chain (%d bytes)\n", actualLength));
+	TRACE(("usb_uhci: wrote descriptor chain (%ld bytes)\n", actualLength));
 	return actualLength;
 }
 
@@ -1375,7 +1380,7 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 			size_t length = min_c(bufferSize - bufferOffset,
 				vector[vectorIndex].iov_len - vectorOffset);
 
-			TRACE(("usb_uhci: copying %d bytes to vectorOffset %d from bufferOffset %d at index %d of %d\n", length, vectorOffset, bufferOffset, vectorIndex, vectorCount));
+			TRACE(("usb_uhci: copying %ld bytes to vectorOffset %ld from bufferOffset %ld at index %ld of %ld\n", length, vectorOffset, bufferOffset, vectorIndex, vectorCount));
 			memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
 				(uint8 *)current->buffer_log + bufferOffset, length);
 
@@ -1385,7 +1390,7 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_uhci: read descriptor chain (%d bytes, no more vectors)\n", actualLength));
+					TRACE(("usb_uhci: read descriptor chain (%ld bytes, no more vectors)\n", actualLength));
 					if (lastDataToggle)
 						*lastDataToggle = dataToggle;
 					return actualLength;
@@ -1409,7 +1414,7 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 	if (lastDataToggle)
 		*lastDataToggle = dataToggle;
 
-	TRACE(("usb_uhci: read descriptor chain (%d bytes)\n", actualLength));
+	TRACE(("usb_uhci: read descriptor chain (%ld bytes)\n", actualLength));
 	return actualLength;
 }
 
@@ -1438,7 +1443,7 @@ UHCI::ReadActualLength(uhci_td *topDescriptor, uint8 *lastDataToggle)
 	if (lastDataToggle)
 		*lastDataToggle = dataToggle;
 
-	TRACE(("usb_uhci: read actual length (%d bytes)\n", actualLength));
+	TRACE(("usb_uhci: read actual length (%ld bytes)\n", actualLength));
 	return actualLength;
 }
 

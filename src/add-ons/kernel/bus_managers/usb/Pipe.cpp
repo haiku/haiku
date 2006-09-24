@@ -62,6 +62,10 @@ Pipe::SetFeature(uint16 selector)
 status_t
 Pipe::ClearFeature(uint16 selector)
 {
+	// clearing a stalled condition resets the data toggle
+	if (selector == USB_FEATURE_ENDPOINT_HALT)
+		SetDataToggle(false);
+
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_CLEAR_FEATURE,

@@ -42,13 +42,20 @@ struct host_controller_info {
 };
 
 
+struct usb_driver_cookie {
+	usb_id							device;
+	void							*cookie;
+	usb_driver_cookie				*link;
+};
+
+
 struct usb_driver_info {
 	const char						*driver_name;
 	usb_support_descriptor			*support_descriptors;
 	uint32							support_descriptor_count;
 	const char						*republish_driver_name;
 	usb_notify_hooks				notify_hooks;
-	void							*cookies[128];
+	usb_driver_cookie				*cookies;
 	usb_driver_info					*link;
 };
 
@@ -385,7 +392,8 @@ virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
-											void *cookies[], bool added);
+											usb_driver_cookie **cookies,
+											bool added);
 virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
@@ -436,7 +444,8 @@ virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
-											void *cookies[], bool added);
+											usb_driver_cookie **cookies,
+											bool added);
 virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);

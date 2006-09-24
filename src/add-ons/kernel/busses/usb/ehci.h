@@ -107,9 +107,9 @@ static	int32						FinishThread(void *data);
 										iovec *vector, size_t vectorCount);
 		size_t						ReadDescriptorChain(ehci_qtd *topDescriptor,
 										iovec *vector, size_t vectorCount,
-										uint8 *lastDataToggle);
+										bool *nextDataToggle);
 		size_t						ReadActualLength(ehci_qtd *topDescriptor,
-										uint8 *lastDataToggle);
+										bool *nextDataToggle);
 
 		// Operational register functions
 inline	void						WriteOpReg(uint32 reg, uint32 value);

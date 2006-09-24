@@ -32,7 +32,7 @@ Stack::Stack()
 	memset(fObjectArray, 0, objectArraySize);
 
 	fAllocator = new(std::nothrow) PhysicalMemoryAllocator("USB Stack Allocator",
-		8, B_PAGE_SIZE * 4, 50);
+		8, B_PAGE_SIZE * 4, 64);
 	if (!fAllocator) {
 		TRACE_ERROR(("usb stack: failed to allocate the allocator\n"));
 		return;
@@ -233,7 +233,7 @@ Stack::NotifyDeviceChange(Device *device, bool added)
 			|| (!added && element->notify_hooks.device_removed != NULL)) {
 			status_t result = device->ReportDevice(element->support_descriptors,
 				element->support_descriptor_count,
-				&element->notify_hooks, element->cookies, added);
+				&element->notify_hooks, &element->cookies, added);
 
 			if (result == B_OK) {
 				const char *name = element->driver_name;
@@ -268,9 +268,9 @@ Stack::RegisterDriver(const char *driverName,
 	memcpy(info->support_descriptors, descriptors, descriptorsSize);
 	info->support_descriptor_count = descriptorCount;
 
-	memset(info->cookies, 0, sizeof(void *) * 128);
 	info->notify_hooks.device_added = NULL;
 	info->notify_hooks.device_removed = NULL;
+	info->cookies = NULL;
 	info->link = NULL;
 
 	if (!Lock()) {
@@ -310,7 +310,7 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 					// Report device will recurse down the whole tree
 					rootHub->ReportDevice(element->support_descriptors,
 						element->support_descriptor_count, hooks,
-						element->cookies, true);
+						&element->cookies, true);
 				}
 			}
 
@@ -342,7 +342,7 @@ Stack::UninstallNotify(const char *driverName)
 				if (rootHub)
 					rootHub->ReportDevice(element->support_descriptors,
 						element->support_descriptor_count,
-						&element->notify_hooks, element->cookies, false);
+						&element->notify_hooks, &element->cookies, false);
 			}
 
 			element->notify_hooks.device_added = NULL;

@@ -942,6 +942,12 @@ EHCI::FinishTransfers()
 		if (acquire_sem(fFinishTransfersSem) < B_OK)
 			continue;
 
+		// eat up sems that have been released by multiple interrupts
+		int32 semCount = 0;
+		get_sem_count(fFinishTransfersSem, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
+
 		if (!Lock())
 			continue;
 
@@ -993,7 +999,7 @@ EHCI::FinishTransfers()
 					TRACE(("usb_ehci: qtd (0x%08lx) done\n", descriptor->this_phy));
 
 					size_t actualLength = 0;
-					uint8 lastDataToggle = 0;
+					bool nextDataToggle = false;
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
 						iovec *vector = transfer->transfer->Vector();
@@ -1019,7 +1025,7 @@ EHCI::FinishTransfers()
 						actualLength = ReadDescriptorChain(
 							transfer->data_descriptor,
 							vector, vectorCount,
-							&lastDataToggle);
+							&nextDataToggle);
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 						if (clonedArea >= B_OK)
@@ -1029,11 +1035,11 @@ EHCI::FinishTransfers()
 						// calculate transfered length
 						actualLength = ReadActualLength(
 							(ehci_qtd *)transfer->queue_head->element_log,
-							&lastDataToggle);
+							&nextDataToggle);
 					}
 
 					UnlinkQueueHead(transfer->queue_head, &freeListHead);
-					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle);
+					transfer->transfer->TransferPipe()->SetDataToggle(nextDataToggle);
 					transfer->transfer->Finished(B_USB_STATUS_SUCCESS, actualLength);
 					transferDone = true;
 					break;
@@ -1324,7 +1330,7 @@ EHCI::CreateDescriptorChain(Pipe *pipe, ehci_qtd **_firstDescriptor,
 	ehci_qtd **_lastDescriptor, ehci_qtd *strayDescriptor, size_t bufferSize,
 	uint8 pid)
 {
-	size_t packetSize = pipe->MaxPacketSize();
+	size_t packetSize = B_PAGE_SIZE * 4;
 	int32 descriptorCount = (bufferSize + packetSize - 1) / packetSize;
 
 	bool dataToggle = pipe->DataToggle();
@@ -1345,7 +1351,6 @@ EHCI::CreateDescriptorChain(Pipe *pipe, ehci_qtd **_firstDescriptor,
 		if (lastDescriptor)
 			LinkDescriptors(lastDescriptor, descriptor, strayDescriptor);
 
-		dataToggle = !dataToggle;		
 		bufferSize -= packetSize;
 		lastDescriptor = descriptor;
 		if (!firstDescriptor)
@@ -1456,7 +1461,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 
 size_t
 EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
-	size_t vectorCount, uint8 *lastDataToggle)
+	size_t vectorCount, bool *nextDataToggle)
 {
 	uint32 dataToggle = 0;
 	ehci_qtd *current = topDescriptor;
@@ -1487,8 +1492,7 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
 					TRACE(("usb_ehci: read descriptor chain (%ld bytes, no more vectors)\n", actualLength));
-					if (lastDataToggle)
-						*lastDataToggle = dataToggle > 0 ? 1 : 0;
+					*nextDataToggle = dataToggle > 0 ? true : false;
 					return actualLength;
 				}
 
@@ -1508,14 +1512,13 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 	}
 
 	TRACE(("usb_ehci: read descriptor chain (%ld bytes)\n", actualLength));
-	if (lastDataToggle)
-		*lastDataToggle = dataToggle > 0 ? 1 : 0;
+	*nextDataToggle = dataToggle > 0 ? true : false;
 	return actualLength;
 }
 
 
 size_t
-EHCI::ReadActualLength(ehci_qtd *topDescriptor, uint8 *lastDataToggle)
+EHCI::ReadActualLength(ehci_qtd *topDescriptor, bool *nextDataToggle)
 {
 	size_t actualLength = 0;
 	ehci_qtd *current = topDescriptor;
@@ -1534,8 +1537,7 @@ EHCI::ReadActualLength(ehci_qtd *topDescriptor, uint8 *lastDataToggle)
 	}
 
 	TRACE(("usb_ehci: read actual length (%ld bytes)\n", actualLength));
-	if (lastDataToggle)
-		*lastDataToggle = dataToggle > 0 ? 1 : 0;
+	*nextDataToggle = dataToggle > 0 ? true : false;
 	return actualLength;
 }
 

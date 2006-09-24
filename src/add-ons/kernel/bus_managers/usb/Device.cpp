@@ -350,12 +350,11 @@ Device::DeviceDescriptor() const
 status_t
 Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
-	void *cookies[], bool added)
+	usb_driver_cookie **cookies, bool added)
 {
 	TRACE(("USB Device ReportDevice\n"));
 	if ((added && hooks->device_added == NULL)
-		|| (!added && hooks->device_removed == NULL)
-		|| (!added && cookies[fDeviceAddress] == NULL))
+		|| (!added && hooks->device_removed == NULL))
 		return B_BAD_VALUE;
 
 	bool supported = false;
@@ -397,16 +396,31 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 	}
 
 	if (supported) {
+		usb_id id = USBID();
 		if (added) {
-			status_t result = hooks->device_added(USBID(), &cookies[fDeviceAddress]);
-			if (result != B_OK)
-				cookies[fDeviceAddress] = NULL;
+			usb_driver_cookie *cookie = new(std::nothrow) usb_driver_cookie;
+			status_t result = hooks->device_added(id, &cookie->cookie);
+			cookie->device = id;
+			cookie->link = *cookies;
+			*cookies = cookie;
 			return result;
 		}
 
-		hooks->device_removed(cookies[fDeviceAddress]);
-		cookies[fDeviceAddress] = NULL;
-		return B_OK;
+		usb_driver_cookie **pointer = cookies;
+		usb_driver_cookie *cookie = *cookies;
+		while (cookie) {
+			if (cookie->device == id)
+				break;
+			pointer = &cookie->link;
+			cookie = cookie->link;
+		}
+
+		if (cookie) {
+			hooks->device_removed(cookie->cookie);
+			*pointer = cookie->link;
+			delete cookie;
+			return B_OK;
+		}
 	}
 
 	return B_UNSUPPORTED;
