@@ -1155,7 +1155,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 		return false;
 	}
 	if (err < B_OK) {
-                reply.what = B_ERROR;
+                reply.what = B_MESSAGE_NOT_UNDERSTOOD;
                 reply.AddString("message", strerror(err));
         }
 	reply.AddInt32("error", err);
