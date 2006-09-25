@@ -138,7 +138,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 		}
 	}
 
-	int32 retries = 20;
+	int32 retries = 5000;
 	while (retries-- > 0) {
 		if (!_Lock())
 			return B_ERROR;
