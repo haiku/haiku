@@ -68,6 +68,8 @@ static	int32						InterruptHandler(void *data);
 
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
+static	int32						CleanupThread(void *data);
+		void						Cleanup();
 
 		// Queue Head functions
 		ehci_qh						*CreateQueueHead();
@@ -141,7 +143,9 @@ static	pci_module_info				*sPCIModule;
 		transfer_data				*fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
-		bool						fStopFinishThread;
+		sem_id						fCleanupSem;
+		thread_id					fCleanupThread;
+		bool						fStopThreads;
 		ehci_qh						*fFreeListHead;
 
 		// Root Hub

@@ -105,7 +105,8 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fFirstTransfer(NULL),
 		fLastTransfer(NULL),
 		fFinishThread(-1),
-		fStopFinishThread(false),
+		fCleanupThread(-1),
+		fStopThreads(false),
 		fFreeListHead(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
@@ -212,7 +213,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	// create semaphores the finisher thread will wait for
 	fAsyncAdvanceSem = create_sem(0, "EHCI Async Advance");
 	fFinishTransfersSem = create_sem(0, "EHCI Finish Transfers");
-	if (fFinishTransfersSem < B_OK || fAsyncAdvanceSem < B_OK) {
+	fCleanupSem = create_sem(0, "EHCI Cleanup");
+	if (fFinishTransfersSem < B_OK || fAsyncAdvanceSem < B_OK
+		|| fCleanupSem < B_OK) {
 		TRACE_ERROR(("usb_ehci: failed to create semaphores\n"));
 		return;
 	}
@@ -221,6 +224,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fFinishThread = spawn_kernel_thread(FinishThread, "ehci finish thread",
 		B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
+
+	// create cleanup service thread
+	fCleanupThread = spawn_kernel_thread(CleanupThread, "ehci cleanup thread",
+		B_NORMAL_PRIORITY, (void *)this);
+	resume_thread(fCleanupThread);
 
 	// install the interrupt handler and enable interrupts
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
@@ -275,10 +283,11 @@ EHCI::~EHCI()
 	CancelAllPendingTransfers();
 
 	int32 result = 0;
-	fStopFinishThread = true;
+	fStopThreads = true;
 	delete_sem(fAsyncAdvanceSem);
 	delete_sem(fFinishTransfersSem);
 	wait_for_thread(fFinishThread, &result);
+	wait_for_thread(fCleanupThread, &result);
 
 	delete fRootHub;
 	delete_area(fPeriodicFrameListArea);
@@ -939,7 +948,7 @@ EHCI::FinishThread(void *data)
 void
 EHCI::FinishTransfers()
 {
-	while (!fStopFinishThread) {
+	while (!fStopThreads) {
 		if (acquire_sem(fFinishTransfersSem) < B_OK)
 			continue;
 
@@ -1087,19 +1096,47 @@ EHCI::FinishTransfers()
 					Unlock();
 				}
 			}
+
+			release_sem(fCleanupSem);
+		}
+	}
+}
+
+
+int32
+EHCI::CleanupThread(void *data)
+{
+	((EHCI *)data)->Cleanup();
+	return B_OK;
+}
+
+
+void
+EHCI::Cleanup()
+{
+	ehci_qh *lastFreeListHead = NULL;
+
+	while (!fStopThreads) {
+		if (acquire_sem(fCleanupSem) < B_OK)
+			continue;
+
+		ehci_qh *freeListHead = fFreeListHead;
+		if (freeListHead == lastFreeListHead)
+			continue;
+
+		// set the doorbell and wait for the host controller to notify us
+		WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_INTONAAD);
+		if (acquire_sem(fAsyncAdvanceSem) < B_OK)
+			continue;
+
+		ehci_qh *current = freeListHead;
+		while (current != lastFreeListHead) {
+			ehci_qh *next = (ehci_qh *)current->next_log;
+			FreeQueueHead(current);
+			current = next;
 		}
 
-		if (fFreeListHead) {
-			// set the doorbell and wait for the host controller to notify us
-			WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_INTONAAD);
-			if (acquire_sem_etc(fAsyncAdvanceSem, 1, B_RELATIVE_TIMEOUT, 1000) == B_OK) {
-				while (fFreeListHead) {
-					ehci_qh *next = (ehci_qh *)fFreeListHead->next_log;
-					FreeQueueHead(fFreeListHead);
-					fFreeListHead = next;
-				}
-			}
-		}
+		lastFreeListHead = freeListHead;
 	}
 }
 

@@ -138,50 +138,59 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 		}
 	}
 
-	if (!_Lock())
-		return B_ERROR;
+	int32 retries = 20;
+	while (retries-- > 0) {
+		if (!_Lock())
+			return B_ERROR;
 
-	TRACE(("PMA: will use array %ld (blocksize: %ld) to allocate %ld bytes\n", arrayToUse, fBlockSize[arrayToUse], size));
-	uint8 *targetArray = fArray[arrayToUse];
-	uint32 arrayOffset = fArrayOffset[arrayToUse] % arrayLength;
-	for (size_t i = arrayOffset + 1; i != arrayOffset; i++) {
-		if (i >= arrayLength)
-			i -= arrayLength;
+		TRACE(("PMA: will use array %ld (blocksize: %ld) to allocate %ld bytes\n", arrayToUse, fBlockSize[arrayToUse], size));
+		uint8 *targetArray = fArray[arrayToUse];
+		uint32 arrayOffset = fArrayOffset[arrayToUse] % arrayLength;
+		for (size_t i = arrayOffset + 1; i != arrayOffset; i++) {
+			if (i >= arrayLength)
+				i -= arrayLength;
 
- 		if (targetArray[i] == 0) {
-			// found a free slot
-			fArrayOffset[arrayToUse] = i;
+ 			if (targetArray[i] == 0) {
+				// found a free slot
+				fArrayOffset[arrayToUse] = i;
 
-			// fill upwards to the smallest block
-			uint32 fillSize = 1;
-			uint32 arrayIndex = i;
-			for (int32 j = arrayToUse; j >= 0; j--) {
-				memset(&fArray[j][arrayIndex], 1, fillSize);
-				fillSize <<= 1;
-				arrayIndex <<= 1;
+				// fill upwards to the smallest block
+				uint32 fillSize = 1;
+				uint32 arrayIndex = i;
+				for (int32 j = arrayToUse; j >= 0; j--) {
+					memset(&fArray[j][arrayIndex], 1, fillSize);
+					fillSize <<= 1;
+					arrayIndex <<= 1;
+				}
+
+				// fill downwards to the biggest block
+				arrayIndex = i >> 1;
+				for (int32 j = arrayToUse + 1; j < fArrayCount; j++) {
+					fArray[j][arrayIndex]++;
+					if (fArray[j][arrayIndex] > 1)
+						break;
+
+					arrayIndex >>= 1;
+				}
+
+				_Unlock();
+				size_t offset = fBlockSize[arrayToUse] * i;
+				*logicalAddress = (void *)((uint8 *)fLogicalBase + offset);
+				*physicalAddress = (void *)((uint8 *)fPhysicalBase + offset);
+				return B_OK;
 			}
-
-			// fill downwards to the biggest block
-			arrayIndex = i >> 1;
-			for (int32 j = arrayToUse + 1; j < fArrayCount; j++) {
-				fArray[j][arrayIndex]++;
-				if (fArray[j][arrayIndex] > 1)
-					break;
-
-				arrayIndex >>= 1;
-			}
-
-			_Unlock();
-			size_t offset = fBlockSize[arrayToUse] * i;
-			*logicalAddress = (void *)((uint8 *)fLogicalBase + offset);
-			*physicalAddress = (void *)((uint8 *)fPhysicalBase + offset);
-			return B_OK;
 		}
+
+		// no slot found
+		_Unlock();
+
+		TRACE_ERROR(("PMA: found no free slot to store %ld bytes (%ld tries left)\n", size, retries));
+		// we provide a scratch space here, memory will probably be freed
+		// as soon as some other transfer is completed and cleaned up.
+		// just wait a bit to give other threads a chance to free some slots.
+		snooze(100);
 	}
 
-	// no slot found
-	_Unlock();
-	TRACE_ERROR(("PMA: found no free slot to store %ld bytes\n", size));
 	return B_NO_MEMORY;
 }
 
