@@ -127,7 +127,7 @@
 
 /* Define to 1 if you have the declaration of wcwidth(), and to 0 otherwise.
    */
-#define HAVE_DECL_WCWIDTH 0
+#define HAVE_DECL_WCWIDTH 1
 
 /* Define to 1 if you have the `dup2' function. */
 #define HAVE_DUP2 1
