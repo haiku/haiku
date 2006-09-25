@@ -104,6 +104,7 @@ class SettingsArgvDispatcher {
 	// base class for a single setting item
 public:
 	SettingsArgvDispatcher(const char *name);
+	virtual ~SettingsArgvDispatcher() {};
 
 	void SaveSettings(Settings *settings, bool onlyIfNonDefault);
 	

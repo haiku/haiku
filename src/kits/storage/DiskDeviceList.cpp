@@ -3,7 +3,8 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
-#include <new.h>
+#include <new>
+using namespace std;
 
 #include <DiskDevice.h>
 #include <DiskDeviceList.h>
@@ -305,6 +306,7 @@ BDiskDeviceList::VisitEachMountedPartition(BDiskDeviceVisitor *visitor)
 	BPartition *partition = NULL;
 	if (visitor) {
 		struct MountedPartitionFilter : public PartitionFilter {
+			virtual ~MountedPartitionFilter() {};
 			virtual bool Filter(BPartition *partition, int32 level)
 				{ return partition->IsMounted(); }
 		} filter;
@@ -334,6 +336,7 @@ BDiskDeviceList::VisitEachMountablePartition(BDiskDeviceVisitor *visitor)
 	BPartition *partition = NULL;
 	if (visitor) {
 		struct MountablePartitionFilter : public PartitionFilter {
+			virtual ~MountablePartitionFilter() {};
 			virtual bool Filter(BPartition *partition, int32 level)
 				{ return partition->ContainsFileSystem(); }
 		} filter;

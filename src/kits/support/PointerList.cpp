@@ -72,6 +72,7 @@ struct comparator;
 class AbstractPointerListHelper {
 public:
 	AbstractPointerListHelper() {};
+	virtual ~AbstractPointerListHelper() {};
 	
 	/** 
 		Returns the index of the item that matches key or
