@@ -561,7 +561,6 @@ BShelf::MessageReceived(BMessage *msg)
 
 	if (err < B_OK) {
 		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-		replyMsg.AddInt32("error", err);
 
 		if (err == B_BAD_SCRIPT_SYNTAX)
 			replyMsg.AddString("message", "Didn't understand the specifier(s)");
@@ -569,6 +568,7 @@ BShelf::MessageReceived(BMessage *msg)
 			replyMsg.AddString("message", strerror(err));			
 	}
 
+	replyMsg.AddInt32("error", err);
 	msg->SendReply(&replyMsg);
 }
 
