@@ -14,8 +14,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
-KernelMergeObject boot_platform_pxe_ia32.o :
-	pxe_stage2.S
+local bios_ia32_src = 
 	start.c
 	debug.c
 	bios.S
@@ -31,12 +30,20 @@ KernelMergeObject boot_platform_pxe_ia32.o :
 	support.S
 	video.cpp
 	apm.cpp
+;
+
+KernelMergeObject boot_platform_pxe_ia32.o :
+	pxe_stage2.S
+	$(bios_ia32_src)
 	
 	# generic
 	text_menu.cpp
 	: -fno-pic
 ;
 
+
+SEARCH on [ FGristFiles $(bios_ia32_src) ]
+	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
