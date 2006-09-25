@@ -13,6 +13,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <Application.h>
 #include <Entry.h>
 #include <MediaFiles.h>

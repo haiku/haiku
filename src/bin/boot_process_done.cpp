@@ -11,6 +11,7 @@
 #include <generic_syscall.h>
 
 #include <stdio.h>
+#include <string.h>
 
 
 int
