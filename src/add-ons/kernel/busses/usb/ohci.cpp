@@ -329,6 +329,15 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 interval = OHCI_GET_IVAL(frameinterval);
 	WriteReg(OHCI_PERIODIC_START, OHCI_PERIODIC(interval));
 	
+	//Work on some Roothub settings
+	uint32 desca = ReadReg(OHCI_RH_DESCRIPTOR_A);
+	WriteReg(OHCI_RH_DESCRIPTOR_A, desca | OHCI_NOCP); //FreeBSD source does this to avoid a chip bug
+	//Enable power
+	WriteReg(OHCI_RH_STATUS, OHCI_LPSC);
+	snooze(5000); //Wait for power to stabilize (5ms)
+	WriteReg(OHCI_RH_DESCRIPTOR_A, desca);
+	snooze(5000); //Delay required by the AMD756 because else the # of ports might be misread
+	
 	fInitOK = true;
 }
 
