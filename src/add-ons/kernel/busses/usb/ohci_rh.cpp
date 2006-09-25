@@ -142,7 +142,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 	usb_request_data *request = t->RequestData();
 	TRACE(("OHCIRootHub::ProcessTransfer(): request: %d\n", request->Request));
 
-	uint32 status = B_USB_STATUS_DEVICE_TIMEOUT;
+	uint32 status = B_TIMED_OUT;
 	size_t actualLength = 0;
 	switch (request->Request) {
 		case USB_REQUEST_GET_STATUS: {
@@ -155,7 +155,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 				// everything as 0 means all is ok.
 				// TODO (?) actually check for the value
 				memset(t->Data(), 0, actualLength);
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 				break;
 			}
 
@@ -163,7 +163,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 			if (ohci->GetPortStatus(request->Index, &portStatus) >= B_OK) {
 				actualLength = MIN(sizeof(usb_port_status), t->DataLength());
 				memcpy(t->Data(), (void *)&portStatus, actualLength);
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 			}
 
 			break;
@@ -171,12 +171,12 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 
 		case USB_REQUEST_SET_ADDRESS:
 			if (request->Value >= 128) {
-				status = B_USB_STATUS_DEVICE_TIMEOUT;
+				status = B_TIMED_OUT;
 				break;
 			}
 
 			TRACE(("OHCIRootHub::ProcessTransfer():  set address: %d\n", request->Value));
-			status = B_USB_STATUS_SUCCESS;
+			status = B_OK;
 			break;
 
 		case USB_REQUEST_GET_DESCRIPTOR:
@@ -188,7 +188,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 						t->DataLength());
 					memcpy(t->Data(), (void *)&sOHCIRootHubDevice,
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 
@@ -200,7 +200,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 						t->DataLength());
 					memcpy(t->Data(), (void *)&(sOHCIRootHubConfig),
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 
@@ -213,7 +213,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 						t->DataLength());
 					memcpy(t->Data(), (void *)&sOHCIRootHubStrings[index],
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 
@@ -225,14 +225,14 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 						t->DataLength());
 					memcpy(t->Data(), (void *)&sOHCIRootHubConfig.hub,
 						actualLength);
-					status = B_USB_STATUS_SUCCESS;
+					status = B_OK;
 					break;
 				}
 			}
 			break;
 
 		case USB_REQUEST_SET_CONFIGURATION:
-			status = B_USB_STATUS_SUCCESS;
+			status = B_OK;
 			break;
 
 		case USB_REQUEST_CLEAR_FEATURE: {
@@ -244,7 +244,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 
 			TRACE(("OHCIRootHub::ProcessTransfer(): clear feature: %d\n", request->Value));
 			if (ohci->ClearPortFeature(request->Index, request->Value) >= B_OK)
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 			break;
 		}
 
@@ -257,7 +257,7 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 
 			TRACE(("OHCIRootHub::ProcessTransfer(): set feature: %d\n", request->Value));
 			if (ohci->SetPortFeature(request->Index, request->Value) >= B_OK)
-				status = B_USB_STATUS_SUCCESS;
+				status = B_OK;
 			break;
 		}
 	}
