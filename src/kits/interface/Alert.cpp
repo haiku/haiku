@@ -71,7 +71,7 @@ class TAlertView : public BView {
 		~TAlertView();
 
 		static TAlertView*	Instantiate(BMessage* archive);
-		status_t			Archive(BMessage* archive, bool deep = true);
+		virtual status_t	Archive(BMessage* archive, bool deep = true) const;
 
 		virtual void	Draw(BRect updateRect);
 
@@ -681,7 +681,7 @@ TAlertView::Instantiate(BMessage* archive)
 
 
 status_t
-TAlertView::Archive(BMessage* archive, bool deep)
+TAlertView::Archive(BMessage* archive, bool deep) const
 {
 	return BView::Archive(archive, deep);
 }
