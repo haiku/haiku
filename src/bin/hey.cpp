@@ -104,12 +104,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <vector>
 #include <AppKit.h>
 #include <Path.h>
 #include <SupportDefs.h>
-
-using std::vector;
 
 int32 HeyInterpreterThreadHook(void* arg);
 
@@ -347,7 +344,7 @@ HeyInterpreterThreadHook(void* arg)
 status_t 
 Hey(BMessenger* target, const char* arg, BMessage* reply)
 {
-	vector<char*> argv; // number of tokens is now limited only by memory  -- pfolk@uni.uiuc.edu 1999-11-03
+	BList argv; // number of tokens is now limited only by memory  -- pfolk@uni.uiuc.edu 1999-11-03
 	char* tokens = new char[strlen(arg)*2];
 	char* currentToken = tokens;
 	int32 tokenNdex = 0;
@@ -360,7 +357,7 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 		if (!inquotes && isSpace(arg[argNdex])) { // if the character is white space
 			if (tokenNdex!=0) { //  close off currentToken token
 				currentToken[tokenNdex] = 0; 
-				argv.push_back(currentToken);
+				argv.AddItem(currentToken);
 				currentToken += tokenNdex+1;
 				tokenNdex=0;
 				argNdex++;
@@ -376,12 +373,12 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 	
 	if (tokenNdex!=0) { //  close off currentToken token
 		currentToken[tokenNdex] = 0; 
-		argv.push_back(currentToken);
+		argv.AddItem(currentToken);
 	}
-	argv.push_back(NULL);
+	argv.AddItem(NULL);
 	
 	int32 argx = 0;
-	status_t ret = Hey(target, argv.begin(), &argx, argv.size()-1, reply);
+	status_t ret = Hey(target, (char **)argv.Items(), &argx, argv.CountItems()-1, reply);
 	  // This used to be "return Hey(...);"---so tokens wasn't delete'd.  -- pfolk@uni.uiuc.edu 1999-11-03
 	delete tokens;
 	return ret;
