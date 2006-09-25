@@ -684,6 +684,7 @@ reset_termios(struct termios &termios)
 	termios.c_cc[VEOF] = CTRL('D');
 	termios.c_cc[VSTART] = CTRL('S');
 	termios.c_cc[VSTOP] = CTRL('Q');
+	termios.c_cc[VSUSP] = CTRL('Z');
 }
 
 
