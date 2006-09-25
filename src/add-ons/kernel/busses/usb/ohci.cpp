@@ -108,9 +108,6 @@ ohci_add_to(Stack *stack)
 		return status;
 	}
 	TRACE(("usb_ohci init_hardware(): Setting up hardware\n"));
-	//
-	// 	TODO: in the future we might want to support multiple host controllers.
-	//
 	item = new pci_info;
 	for ( i = 0 ; OHCI::pci_module->get_nth_pci_info( i , item ) == B_OK ; i++ ) {
 		if ( ( item->class_base == PCI_serial_bus ) && ( item->class_sub == PCI_usb )
@@ -121,20 +118,28 @@ ohci_add_to(Stack *stack)
 				continue;
 			}
 			TRACE(("USB OHCI: init_hardware(): found at IRQ %u \n", item->u.h0.interrupt_line));
-			OHCI *bus = new OHCI( item , stack );
-			if ( bus->InitCheck() != B_OK ) {
-				delete bus;
-				break;
+			OHCI *bus = new(std::nothrow) OHCI(item, stack);
+			
+			if (!bus) {
+				delete item;
+				OHCI::pci_module = NULL;
+				put_module(B_PCI_MODULE_NAME);
+				return B_NO_MEMORY;
 			}
 			
+			if (bus->InitCheck() != B_OK) {
+				TRACE(("usb_ohci: bus failed to initialize...\n"));
+				delete bus;
+				continue;
+			}
+
+			bus->Start();			
 			stack->AddBusManager( bus );
-			bus->Start();
 			found = true;
-			break;
 		}
 	}
 	
-	if ( found == false ) {
+	if (!found) {
 		TRACE(("USB OHCI: init hardware(): no devices found\n"));
 		free( item );
 		put_module( B_PCI_MODULE_NAME );
@@ -184,7 +189,10 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fHccaArea(-1),
 		fDummyControl(0),
 		fDummyBulk(0),
-		fDummyIsochronous(0)
+		fDummyIsochronous(0),
+		fRootHub(0),
+		fRootHubAddress(0),
+		fNumPorts(0)
 {
 	fPcii = info;
 	fStack = stack;
@@ -321,9 +329,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 interval = OHCI_GET_IVAL(frameinterval);
 	WriteReg(OHCI_PERIODIC_START, OHCI_PERIODIC(interval));
 	
-	
-	m_roothub_base = 255; //Invalidate the Root Hub address
-
+	fInitOK = true;
 }
 
 OHCI::~OHCI()
@@ -338,9 +344,129 @@ OHCI::~OHCI()
 		FreeEndpoint(fDummyBulk);
 	if (fDummyIsochronous)
 		FreeEndpoint(fDummyIsochronous);
+	if (fRootHub)
+		delete fRootHub;
 	for (int i = 0; i < OHCI_NO_EDS; i++)
 		if (fInterruptEndpoints[i])
 			FreeEndpoint(fInterruptEndpoints[i]);
+}
+
+status_t
+OHCI::Start()
+{
+	if (!(ReadReg(OHCI_CONTROL) & OHCI_HCFS_OPERATIONAL)) {
+		TRACE(("USB OHCI::Start(): Controller not started. TODO: find out what happens.\n"));
+		return B_ERROR;
+	}
+	
+	fRootHubAddress = AllocateAddress();
+	fNumPorts = OHCI_GET_PORT_COUNT(ReadReg(OHCI_RH_DESCRIPTOR_A));
+	
+	fRootHub = new(std::nothrow) OHCIRootHub(this, fRootHubAddress);
+	if (!fRootHub) {
+		TRACE_ERROR(("USB OHCI::Start(): no memory to allocate root hub\n"));
+		return B_NO_MEMORY;
+	}
+
+	if (fRootHub->InitCheck() < B_OK) {
+		TRACE_ERROR(("USB OHCI::Start(): root hub failed init check\n"));
+		return B_ERROR;
+	}
+
+	SetRootHub(fRootHub);
+	TRACE(("USB OHCI::Start(): Succesful start\n"));
+	return B_OK;
+}
+
+status_t OHCI::SubmitTransfer( Transfer *t )
+{
+	TRACE(("usb OHCI::SubmitTransfer: called for device %d\n", t->TransferPipe()->DeviceAddress()));
+
+	if (t->TransferPipe()->DeviceAddress() == fRootHubAddress)
+		return fRootHub->ProcessTransfer(t, this);
+
+	return B_ERROR;
+}
+
+status_t
+OHCI::GetPortStatus(uint8 index, usb_port_status *status)
+{
+	if (index > fNumPorts)
+		return B_BAD_INDEX;
+	
+	status->status = status->change = 0;
+	uint32 portStatus = ReadReg(OHCI_RH_PORT_STATUS(index));
+	
+	TRACE(("OHCIRootHub::GetPortStatus: Port %i Value 0x%lx\n", OHCI_RH_PORT_STATUS(index), portStatus));
+	
+	// status
+	if (portStatus & OHCI_PORTSTATUS_CCS)
+		status->status |= PORT_STATUS_CONNECTION;
+	if (portStatus & OHCI_PORTSTATUS_PES)
+		status->status |= PORT_STATUS_ENABLE;
+	if (portStatus & OHCI_PORTSTATUS_PRS)
+		status->status |= PORT_STATUS_RESET;
+	if (portStatus & OHCI_PORTSTATUS_LSDA)
+		status->status |= PORT_STATUS_LOW_SPEED;
+	if (portStatus & OHCI_PORTSTATUS_PSS)
+		status->status |= PORT_STATUS_SUSPEND;
+	if (portStatus & OHCI_PORTSTATUS_POCI)
+		status->status |= PORT_STATUS_OVER_CURRENT;
+	if (portStatus & OHCI_PORTSTATUS_PPS)
+		status->status |= PORT_STATUS_POWER;
+	
+	
+	// change
+	if (portStatus & OHCI_PORTSTATUS_CSC)
+		status->change |= PORT_STATUS_CONNECTION;
+	if (portStatus & OHCI_PORTSTATUS_PESC)
+		status->change |= PORT_STATUS_ENABLE;
+	if (portStatus & OHCI_PORTSTATUS_PSSC)
+		status->change |= PORT_STATUS_SUSPEND;
+	if (portStatus & OHCI_PORTSTATUS_OCIC)
+		status->change |= PORT_STATUS_OVER_CURRENT;
+	if (portStatus & OHCI_PORTSTATUS_PRSC)
+		status->change |= PORT_STATUS_RESET;
+	
+	return B_OK;
+}
+
+status_t
+OHCI::SetPortFeature(uint8 index, uint16 feature)
+{
+	if (index > fNumPorts)
+		return B_BAD_INDEX;
+	
+	switch (feature) {
+		case PORT_RESET:
+			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_PORTSTATUS_PRS);
+			return B_OK;
+		
+		case PORT_POWER:
+			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_PORTSTATUS_PPS);
+			return B_OK;
+	}
+	
+	return B_BAD_VALUE;
+}
+
+status_t
+OHCI::ClearPortFeature(uint8 index, uint16 feature)
+{
+	if (index > fNumPorts)
+		return B_BAD_INDEX;
+	
+	switch (feature) {
+		case C_PORT_RESET:
+			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_PORTSTATUS_CSC);
+			return B_OK;
+		
+		case C_PORT_CONNECTION:
+			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_PORTSTATUS_CSC);
+			return B_OK;
+	}
+	
+	return B_BAD_VALUE;
 }
 
 Endpoint *
@@ -348,8 +474,10 @@ OHCI::AllocateEndpoint()
 {
 	Endpoint *endpoint = new Endpoint;
 	void *phy;
-	if (fStack->AllocateChunk((void **)&endpoint->ed, &phy, sizeof(ohci_endpoint_descriptor)) != B_OK)
+	if (fStack->AllocateChunk((void **)&endpoint->ed, &phy, sizeof(ohci_endpoint_descriptor)) != B_OK) {
+		TRACE(("OHCI::AllocateEndpoint(): Error Allocating Endpoint\n"));
 		return 0;
+	}
 	endpoint->physicaladdress = (addr_t)phy;
 	
 	memset((void *)endpoint->ed, 0, sizeof(ohci_endpoint_descriptor));
@@ -364,17 +492,6 @@ OHCI::FreeEndpoint(Endpoint *end)
 	delete end;
 }
 
-//------------------------------------------------------------------------
-//	OHCI::	Submit a transfer
-//		
-//		parameters:	
-//					- t: pointer to a transfer instance
-//------------------------------------------------------------------------
-
-status_t OHCI::SubmitTransfer( Transfer *t )
-{
-	return B_OK;
-}
 
 pci_module_info *OHCI::pci_module = 0;
 

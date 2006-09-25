@@ -48,13 +48,20 @@ public:
 		
 	OHCI(pci_info *info, Stack *stack);
 	~OHCI();
+	status_t					Start();
 	status_t 					SubmitTransfer(Transfer *t); 	//Override from BusManager. 
 	static pci_module_info 		*pci_module; 					// Global data for the module.
 
+	status_t GetPortStatus(uint8 index, usb_port_status *status);
+	status_t ClearPortFeature(uint8 index, uint16 feature);
+	status_t SetPortFeature(uint8 index, uint16 feature);
+	
+	uint8 PortCount() { return fNumPorts; };
+
+private:
 	inline void   WriteReg(uint32 reg, uint32 value);
 	inline uint32 ReadReg(uint32 reg);
-		
-private:
+
 	// Global
 	pci_info 					*fPcii;					// pci-info struct
 	Stack 						*fStack;				// Pointer to the stack	 
@@ -69,8 +76,9 @@ private:
 	Endpoint					*fDummyBulk;
 	Endpoint					*fDummyIsochronous;
 	// Root Hub
-	OHCIRootHub 				*m_roothub;				// the root hub
-	addr_t						m_roothub_base;			// Base address of the root hub
+	OHCIRootHub 				*fRootHub;				// the root hub
+	uint8						fRootHubAddress;		// the usb address of the roothub
+	uint8						fNumPorts;				// the number of ports
 	// functions
 	Endpoint					*AllocateEndpoint(); 	// allocate memory for an endpoint
 	void						FreeEndpoint(Endpoint *end); //Free endpoint
@@ -85,12 +93,8 @@ private:
 class OHCIRootHub : public Hub
 {
 	public:
-		OHCIRootHub( OHCI *ohci , int8 devicenum );
-		status_t SubmitTransfer( Transfer *t );
-		void UpdatePortStatus();
-	private:
-		usb_port_status 	m_hw_port_status[2];	// the port status (maximum of two)
-		OHCI 				*m_ohci;				// needed because of internal data
+		OHCIRootHub(OHCI *ohci, int8 deviceAddress);
+		status_t 			ProcessTransfer(Transfer *t, OHCI *ohci);
 };
 
 //
@@ -109,7 +113,5 @@ struct Endpoint
 		ed->next_endpoint = end->physicaladdress;
 	}; 
 };
-
-#define OHCI_DEBUG
 
 #endif // OHCI_H

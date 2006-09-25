@@ -189,7 +189,7 @@
 // --------------------------------
 
 #define OHCI_RH_DESCRIPTOR_A		0x48
-#define		OHCI_GET_NDP(s)			((s) & 0xff)
+#define		OHCI_GET_PORT_COUNT(s)	((s) & 0xff)
 #define		OHCI_PSM				0x0100     // Power Switching Mode
 #define		OHCI_NPS				0x0200	   // No Power Switching
 #define		OHCI_DT					0x0400     // Device Type
@@ -220,6 +220,18 @@
 // --------------------------------
 
 #define OHCI_RH_PORT_STATUS(n)		(0x50 + (n)*4) // 1 based indexing
+#define     OHCI_PORTSTATUS_CCS     0x00000001 // Current Connection Status
+#define     OHCI_PORTSTATUS_PES     0x00000002 // Port Enable Status
+#define     OHCI_PORTSTATUS_PSS     0x00000004 // Port Suspend Status
+#define     OHCI_PORTSTATUS_POCI    0x00000008 // Port Overcurrent Indicator
+#define     OHCI_PORTSTATUS_PRS     0x00000010 // Port Reset Status
+#define     OHCI_PORTSTATUS_PPS     0x00000100 // Port Power Status
+#define     OHCI_PORTSTATUS_LSDA    0x00000200 // Low Speed Device Attached
+#define     OHCI_PORTSTATUS_CSC     0x00010000 // Connection Status Change
+#define     OHCI_PORTSTATUS_PESC    0x00020000 // Port Enable Status Change
+#define     OHCI_PORTSTATUS_PSSC    0x00040000 // Port Suspend Status change
+#define     OHCI_PORTSTATUS_OCIC    0x00080000 // Port Overcurrent Change
+#define     OHCI_PORTSTATUS_PRSC    0x00100000 // Port Reset Status Change
 
 // --------------------------------
 //	????
