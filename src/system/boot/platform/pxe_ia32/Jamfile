@@ -1,0 +1,45 @@
+SubDir HAIKU_TOP src system boot platform bios_ia32 ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics vesa ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+}
+
+KernelMergeObject boot_platform_bios_ia32.o :
+	shell.S
+	start.c
+	debug.c
+	bios.S
+	console.cpp
+	serial.cpp
+	devices.cpp
+	keyboard.cpp
+	menu.cpp
+	mmu.cpp
+	cpu.cpp
+	smp.cpp
+	smp_trampoline.S
+	support.S
+	video.cpp
+	apm.cpp
+	
+	# generic
+	text_menu.cpp
+	: -fno-pic
+;
+
+SEARCH on [ FGristFiles text_menu.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+# Tell the build system to where stage1.bin can be found, so it can be used
+# elsewhere.
+SEARCH on stage1.bin = $(SUBDIR) ;
