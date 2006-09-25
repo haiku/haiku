@@ -29,7 +29,7 @@ if $(TARGET_ARCH) = x86 {
 	platformObjects += <src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o ;
 }
 
-KernelLd boot_loader :
+KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_arch_$(TARGET_ARCH).o
 	boot_loader.a
@@ -50,7 +50,7 @@ KernelLd boot_loader :
 	# platform specific objects
 	$(platformObjects)
 
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader.ld 
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(TARGET_BOOT_PLATFORM).ld
 	: -Bstatic
 ;
 
@@ -67,7 +67,7 @@ actions BuildZbeos {
 	$(TARGET_OBJCOPY) -O binary $(2) $(1)
 }
 
-BuildZbeos zbeos : boot_loader ;
+BuildZbeos zbeos : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 SubInclude HAIKU_TOP src system boot arch $(TARGET_ARCH) ;
 SubInclude HAIKU_TOP src system boot loader ;
