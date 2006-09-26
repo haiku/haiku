@@ -1235,7 +1235,7 @@ update_wait_for_any(struct team *team, thread_id child, int32 change)
 
 	if (child < 0) {
 		// we wait for all children of the specified process group
-		group = team_get_process_group_locked(team, -child);
+		group = team_get_process_group_locked(team->group->session, -child);
 	} else {
 		// we wait for any children of the current team's group
 		group = team->group;
@@ -1320,7 +1320,7 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 		return get_team_death_entry(team, child, death, _freeDeath);
 	} else if (child < 0) {
 		// we wait for all children of the specified process group
-		group = team_get_process_group_locked(team, -child);
+		group = team_get_process_group_locked(team->group->session, -child);
 		if (group == NULL)
 			return B_BAD_THREAD_ID;
 	} else {
@@ -1558,14 +1558,14 @@ team_get_team_struct_locked(team_id id)
  */
 
 struct process_group *
-team_get_process_group_locked(struct team *team, pid_t id)
+team_get_process_group_locked(struct process_session *session, pid_t id)
 {
 	struct process_group *group;
 	struct team_key key;
 	key.id = id;
 
 	group = (struct process_group *)hash_lookup(sGroupHash, &key);
-	if (group != NULL && team->group->session == group->session)
+	if (group != NULL && (session == NULL || session == group->session))
 		return group;
 
 	return NULL;
@@ -2360,7 +2360,8 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			// check if this team can have the group ID; there must be one matching
 			// process ID in the team's session
 
-			struct process_group *group = team_get_process_group_locked(team, groupID);
+			struct process_group *group =
+				team_get_process_group_locked(team->group->session, groupID);
 			if (group) {
 				// we got a group, let's move the team there
 				remove_team_from_group(team, &freeGroup);

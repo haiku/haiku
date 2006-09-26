@@ -20,7 +20,7 @@ team_id team_create_team(const char *path, const char *name, char **args, int ar
 status_t wait_for_team(team_id id, status_t *returnCode);
 void team_remove_team(struct team *team, struct process_group **_freeGroup);
 void team_delete_team(struct team *team);
-struct process_group *team_get_process_group_locked(struct team *team, pid_t id);
+struct process_group *team_get_process_group_locked(struct process_session *session, pid_t id);
 void team_delete_process_group(struct process_group *group);
 struct team *team_get_kernel_team(void);
 team_id team_get_kernel_team_id(void);
