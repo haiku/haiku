@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <new>
+using namespace std;
 
 #include <Application.h>
 #include <Beep.h>
