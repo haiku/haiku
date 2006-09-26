@@ -14,7 +14,6 @@
 // - Finish documenting this class
 // - Consider using BObjectList instead of BList
 // 	 for disallowed characters (it would remove a lot of reinterpret_casts)
-// - Asynchronous mouse tracking
 // - Check for correctness and possible optimizations the calls to Refresh(),
 // 	 to refresh only changed parts of text (currently we often redraw the whole text)
 
@@ -3799,35 +3798,32 @@ BTextView::PerformMouseMoved(BPoint where, uint32 code)
 
 	int32 oldOffset = fTrackingMouse->anchor;
 	int32 currentOffset = OffsetAt(where);
-	if (oldOffset < currentOffset) {
-		fTrackingMouse->selStart = oldOffset;
-		fTrackingMouse->selEnd = currentOffset;
-	} else {
-		fTrackingMouse->selStart = currentOffset;
-		fTrackingMouse->selEnd = oldOffset;
-	}
-	
-	int32 start = fTrackingMouse->selStart;
-	int32 end = fTrackingMouse->selEnd;
-		
+			
 	switch (fClickCount) {
 		case 0:
 			// triple click, select line by line
-			start = (*fLines)[LineAt(start)]->offset;
-			end = (*fLines)[LineAt(end) + 1]->offset;
+			fTrackingMouse->selStart = (*fLines)[LineAt(fTrackingMouse->selStart)]->offset;
+			fTrackingMouse->selEnd = (*fLines)[LineAt(fTrackingMouse->selEnd) + 1]->offset;
 			break;
 											
 		case 2:
 			// double click, select word by word
-			FindWord(oldOffset, &start, &end);
+			FindWord(currentOffset, &fTrackingMouse->selStart, &fTrackingMouse->selEnd);
 			break;
 			
 		default:
 			// new click, select char by char
+			if (oldOffset < currentOffset) {
+				fTrackingMouse->selStart = oldOffset;
+				fTrackingMouse->selEnd = currentOffset;
+			} else {
+				fTrackingMouse->selStart = currentOffset;
+				fTrackingMouse->selEnd = oldOffset;
+			}
 			break;			
 	}
 
-	Select(start, end);
+	Select(fTrackingMouse->selStart, fTrackingMouse->selEnd);
 	
 	TrackMouse(where, NULL);
 
