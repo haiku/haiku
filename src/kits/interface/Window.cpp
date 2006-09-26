@@ -1576,6 +1576,9 @@ BWindow::UpdateIfNeeded()
 	if (((const BMessageQueue *)MessageQueue())->IsLocked())
 		return;
 
+	if (!Lock())
+		return;
+
 	// make sure all requests that would cause an update have
 	// arrived at the server
 	Sync();
@@ -1606,6 +1609,7 @@ BWindow::UpdateIfNeeded()
 	}
 
 	queue->Unlock();
+	Unlock();
 }
 
 
