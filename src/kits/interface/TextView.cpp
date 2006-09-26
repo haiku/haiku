@@ -88,20 +88,36 @@ enum {
 } separatorCharacters;
 
 
-// _BTextTrackState_ class -----------------------------------------------------
 class _BTextTrackState_ {
-
-	// TODO: Implement ? 
-	// It's most probably used to keep track of asynchronous mouse
-	// movements
 public:
-	_BTextTrackState_(bool inSelection)
-		:	fMoved(false),
-			fInSelection(inSelection)
-	{}
+	_BTextTrackState_(BMessenger messenger)
+		:
+		clickOffset(0),
+		shiftDown(false),
+		anchor(0),
+		selStart(0),
+		selEnd(0),
+		fRunner(NULL)
+	{
+		BMessage message(_PING_);
+		//fRunner = new (nothrow) BMessageRunner(messenger, &message, 30000);
+	}
 
-	bool	fMoved;
-	bool	fInSelection;
+	~_BTextTrackState_()
+	{
+		delete fRunner;
+	}
+
+	int32 clickOffset;
+	bool shiftDown;
+	BRect selectionRect;
+
+	int32 anchor;
+	int32 selStart;
+	int32 selEnd;
+
+private:
+	BMessageRunner *fRunner;
 };
 
 
@@ -110,9 +126,11 @@ _BWidthBuffer_* BTextView::sWidths = NULL;
 sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
 int32 BTextView::sWidthAtom = 0;
 
+
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
 const static rgb_color kBlueInputColor = { 152, 203, 255, 255 };			
 const static rgb_color kRedInputColor = { 255, 152, 152, 255 };	
+
 															
 static property_info
 sPropertyList[] = {
@@ -296,6 +314,8 @@ BTextView::~BTextView()
 	delete fStyles;
 	delete fDisallowedChars;
 	delete fUndo;
+	delete fClickRunner;
+	delete fDragRunner;	
 }
 
 
@@ -438,7 +458,6 @@ BTextView::Draw(BRect updateRect)
 void
 BTextView::MouseDown(BPoint where)
 {
-	CALLED();
 	// should we even bother?
 	if (!fEditable && !fSelectable)
 		return;
@@ -452,158 +471,85 @@ BTextView::MouseDown(BPoint where)
 	if (fCaretVisible)
 		InvertCaret();
 	
-	int32 oldOffset = fClickOffset;
-	fClickOffset = OffsetAt(where);
+	StopMouseTracking();
 	
-	int32 modifiers = 0;
-	BMessage *currentMessage = Window()->CurrentMessage();
-	if (currentMessage != NULL)
-		currentMessage->FindInt32("modifiers", &modifiers);
-	bool shiftDown = modifiers & B_SHIFT_KEY;
+	BMessenger messenger(this);
+	fTrackingMouse = new (nothrow) _BTextTrackState_(messenger);
+	if (fTrackingMouse == NULL)
+		return;
 
-	// should we initiate a drag?
-	if (fSelStart != fSelEnd && !shiftDown) {
-		BPoint loc;
-		ulong buttons;
-		GetMouse(&loc, &buttons);
-		// TODO: here we shouldn't check for B_SECONDARY_MOUSE_BUTTON,
-		// since dragging works also with the primary button.
-		if (buttons == B_SECONDARY_MOUSE_BUTTON) {
-			// was the click within the selection range?
-			if (fClickOffset >= fSelStart && fClickOffset <= fSelEnd) {
-				InitiateDrag();
-				return;
-			}
-		}
+	int32 modifiers = 0;
+	//uint32 buttons;
+	BMessage *currentMessage = Window()->CurrentMessage();
+	if (currentMessage != NULL) {
+		currentMessage->FindInt32("modifiers", &modifiers);
+		//currentMessage->FindInt32("buttons", (int32 *)&buttons);
 	}
 
-	// Unhighlights the selection if needed
-	if (fSelStart != fSelEnd)
-		Select(fSelStart, fSelEnd);
-		
-	// get the system-wide click speed
+	fTrackingMouse->clickOffset = OffsetAt(where);
+	fTrackingMouse->shiftDown = modifiers & B_SHIFT_KEY;
+
+	bigtime_t clickTime = system_time();
 	bigtime_t clickSpeed = 0;
 	get_click_speed(&clickSpeed);
-	
-	// TODO: it looks like the input server sends the number of clicks in the 
-	// B_MOUSE_DOWN message (the "clicks" field), so we could use it instead
-	// of doing this mess.
+	bool multipleClick = false;
+	if (clickTime - fClickTime < clickSpeed && fClickOffset == fTrackingMouse->clickOffset)
+		multipleClick = true;
 
-	// is this a double/triple click, or is it a new click?
-	if (clickSpeed > (system_time() - fClickTime) &&
-		 oldOffset == fClickOffset ) {
+	fWhere = where;	
+
+	SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,	B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+	
+	if (fSelStart != fSelEnd && !fTrackingMouse->shiftDown && !multipleClick) {
+		BRegion region;
+		GetTextRegion(fSelStart, fSelEnd, &region);
+		if (region.Contains(where)) {
+			// Setup things for dragging
+			fTrackingMouse->selectionRect = region.Frame();
+			return;
+		}
+	}
+	
+	if (multipleClick) {
 		if (fClickCount > 1) {
-			// triple click
 			fClickCount = 0;
 			fClickTime = 0;
 		} else {
-			// double click
 			fClickCount = 2;
-			fClickTime = system_time();
-			int32 start, end;
-			FindWord(fClickOffset, &start, &end);
-			Select(start, end);
+			fClickTime = clickTime;
 		}
 	} else {
-		// new click
+		fClickOffset = fTrackingMouse->clickOffset;
 		fClickCount = 1;
-		fClickTime = system_time();
-	
-		if (!shiftDown) {
-			Select(fClickOffset, fClickOffset);
-			if (fEditable)
-				InvertCaret();
-		}
+		fClickTime = clickTime;
+
+		// Deselect any previously selected text
+		if (!fTrackingMouse->shiftDown)
+			Select(fTrackingMouse->clickOffset, fTrackingMouse->clickOffset);
 	}
 	
-	// no need to track the mouse if we can't select
-	if (!fSelectable)
-		return;
+	if (fClickTime == clickTime) {
+		BMessage message(_PING_);
+		message.AddInt64("clickTime", clickTime);
+		delete fClickRunner;
 
-	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
-		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
-				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
-		BMessage pingMessage(_PING_);
-		fClickRunner = new BMessageRunner(this, &pingMessage, 100000);
-		return;
+		BMessenger messenger(this);
+		fClickRunner = new BMessageRunner(messenger, &message, clickSpeed, 1);
 	}
 
-	// track the mouse while it's down
-	int32 start = 0;
-	int32 end = 0;
-	int32 anchor = (fClickOffset > fSelStart) ? fSelStart : fSelEnd;
-	BPoint curMouse = where;
-	ulong buttons = 0;
-	do {
-		if (fClickOffset > anchor) {
-			start = anchor;
-			end = fClickOffset;
-		} else {
-			start = fClickOffset;
-			end = anchor;
-		}
-		
-		switch (fClickCount) {
-			case 0:
-				// triple click, select line by line
-				start = (*fLines)[LineAt(start)]->offset;
-				end = (*fLines)[LineAt(end) + 1]->offset;
-				break;
-												
-			case 2:
-				// double click, select word by word
-				FindWord(fClickOffset, &start, &end);
-				break;
-				
-			default:
-				// new click, select char by char
-				break;			
-		}
+	
+	if (!fSelectable) {
+		StopMouseTracking();
+		return;
+	} 
 
-		if (shiftDown) {
-			if (fClickOffset > anchor)
-				start = anchor;
-			else
-				end = anchor;
-		}
+	int32 offset = fSelStart;
+	if (fTrackingMouse->clickOffset > fSelStart)
+		offset = fSelEnd;
 
-		Select(start, end);
-		
-		// Should we scroll the view?
-		// TODO: the implementation is incorrect, as I think a BTextView
-		// scrolls regardless of the fact if it is targeted by scroll bars.
-		// Also: auto scrolling can be disabled, I think.
-		if (!Bounds().Contains(curMouse)) {	
-			float hDelta = 0;
-			float vDelta = 0;
-			if (ScrollBar(B_HORIZONTAL) != NULL) {
-				if (curMouse.x < Bounds().left)
-					hDelta = curMouse.x - Bounds().left;
-				else {
-					if (curMouse.x > Bounds().right)
-						hDelta = curMouse.x - Bounds().right;
-				}
-				if (hDelta != 0)
-					ScrollBar(B_HORIZONTAL)->SetValue(ScrollBar(B_HORIZONTAL)->Value() + hDelta);
-			}
-			if (ScrollBar(B_VERTICAL) != NULL) {
-				if (curMouse.y < Bounds().top)
-					vDelta = curMouse.y - Bounds().top;
-				else if (curMouse.y > Bounds().bottom)
-						vDelta = curMouse.y - Bounds().bottom;
-				if (vDelta != 0)
-					ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() + vDelta);
-			}
-			if (hDelta != 0 || vDelta != 0)
-				Window()->UpdateIfNeeded();
-		}
-		
-		// Zzzz...
-		snooze(30000);
-		
-		GetMouse(&curMouse, &buttons);
-		fClickOffset = OffsetAt(curMouse);	
-	} while (buttons != 0);
+	fTrackingMouse->anchor = offset;
+	
+	MouseMoved(where, B_INSIDE_VIEW, NULL); 	
 }
 
 
@@ -616,7 +562,11 @@ BTextView::MouseDown(BPoint where)
 void
 BTextView::MouseUp(BPoint where)
 {
+	BView::MouseUp(where);
 	PerformMouseUp(where);
+	
+	delete fDragRunner;
+	fDragRunner = NULL;
 }
 
 
@@ -946,9 +896,28 @@ BTextView::MessageReceived(BMessage *message)
 			break;
 		}
 
-		// TODO: Find out what these two do
 		case _PING_:
+		{
+			if (message->HasInt64("clickTime")) {
+				bigtime_t clickTime;
+				message->FindInt64("clickTime", &clickTime);
+				if (clickTime == fClickTime) {
+					if (fSelStart != fSelEnd && fSelectable) {
+						BRegion region;
+						GetTextRegion(fSelStart, fSelEnd, &region);
+						if (region.Contains(fWhere))
+							TrackMouse(fWhere, NULL);
+					}
+					delete fClickRunner;
+					fClickRunner = NULL;
+				}
+			}
+			break;
+		}
+
 		case _DISPOSE_DRAG_:
+			if (fEditable)
+				TrackDrag(fWhere);
 			break;
 
 		default:
@@ -971,7 +940,6 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 									  BMessage *specifier, int32 what,
 									  const char *property)
 {
-	CALLED();
 	BPropertyInfo propInfo(sPropertyList);
 	BHandler *target = this;
 
@@ -3797,25 +3765,20 @@ BTextView::StopMouseTracking()
 {
 	delete fTrackingMouse;
 	fTrackingMouse = NULL;
-
-	delete fClickRunner;
-	fClickRunner = NULL;
-
-	delete fDragRunner;
-	fDragRunner = NULL;
 }
 
 
 bool
 BTextView::PerformMouseUp(BPoint where)
 {
-	if (fClickRunner == NULL)
+	if (fTrackingMouse == NULL)
 		return false;
-	
+
+	if (fTrackingMouse->selectionRect.IsValid() && fTrackingMouse->selectionRect.Contains(where))
+		Select(fTrackingMouse->clickOffset, fTrackingMouse->clickOffset);
+
 	StopMouseTracking();
-	
-	fClickOffset = OffsetAt(where);
-	
+		
 	return true;
 }
 
@@ -3823,34 +3786,51 @@ BTextView::PerformMouseUp(BPoint where)
 bool
 BTextView::PerformMouseMoved(BPoint where, uint32 code)
 {
-	if (fClickRunner == NULL)
+	fWhere = where;
+
+	if (fTrackingMouse == NULL)
 		return false;
 
-	int32 start = 0, end = 0;
-	int32 offset = OffsetAt(where);
-	
-	switch (fClickCount) {
-		case 1:
-			start = min_c(offset, fClickOffset);
-			end = max_c(offset, fClickOffset);
-			break;
-		
-		case 2:
-			FindWord(offset, &start, &end);
-			start = min_c(start, fClickOffset);
-			end = max_c(end, fClickOffset);
-			break;
-		
-		case 3:
-			//TODO: Multiline selection
-			break;
-		
-		default:
-			break;
+	if (fTrackingMouse->selectionRect.IsValid() && fTrackingMouse->selectionRect.Contains(where)) {
+		StopMouseTracking();
+		InitiateDrag();
+		return true;
+	}
+
+	int32 oldOffset = fTrackingMouse->anchor;
+	int32 currentOffset = OffsetAt(where);
+	if (oldOffset < currentOffset) {
+		fTrackingMouse->selStart = oldOffset;
+		fTrackingMouse->selEnd = currentOffset;
+	} else {
+		fTrackingMouse->selStart = currentOffset;
+		fTrackingMouse->selEnd = oldOffset;
 	}
 	
+	int32 start = fTrackingMouse->selStart;
+	int32 end = fTrackingMouse->selEnd;
+		
+	switch (fClickCount) {
+		case 0:
+			// triple click, select line by line
+			start = (*fLines)[LineAt(start)]->offset;
+			end = (*fLines)[LineAt(end) + 1]->offset;
+			break;
+											
+		case 2:
+			// double click, select word by word
+			FindWord(oldOffset, &start, &end);
+			break;
+			
+		default:
+			// new click, select char by char
+			break;			
+	}
+
 	Select(start, end);
 	
+	TrackMouse(where, NULL);
+
 	return true;
 }
 
@@ -3892,16 +3872,16 @@ BTextView::TrackDrag(BPoint where)
 void
 BTextView::InitiateDrag()
 {
-	BMessage *message = new BMessage(B_MIME_DATA);
+	BMessage *dragMessage = new BMessage(B_MIME_DATA);
 	BBitmap *dragBitmap = NULL;
 	BPoint bitmapPoint;
 	BHandler *dragHandler = NULL;
 	
-	GetDragParameters(message, &dragBitmap, &bitmapPoint, &dragHandler);
+	GetDragParameters(dragMessage, &dragBitmap, &bitmapPoint, &dragHandler);
 	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	
 	if (dragBitmap != NULL)
-		DragMessage(message, dragBitmap, bitmapPoint, dragHandler);
+		DragMessage(dragMessage, dragBitmap, bitmapPoint, dragHandler);
 	else {
 		BRegion region;
 		GetTextRegion(fSelStart, fSelEnd, &region);
@@ -3910,8 +3890,12 @@ BTextView::InitiateDrag()
 		if (!bounds.Contains(dragRect))
 			dragRect = bounds & dragRect;
 			
-		DragMessage(message, dragRect, dragHandler);
+		DragMessage(dragMessage, dragRect, dragHandler);
 	}
+
+	BMessenger messenger(this);
+	BMessage message(_DISPOSE_DRAG_);
+	fDragRunner = new (nothrow) BMessageRunner(this, &message, 100000);
 }
 
 
@@ -3933,6 +3917,10 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 		internalDrop = true;
 	
 	DragCaret(-1);
+	
+	delete fDragRunner;
+	fDragRunner = NULL;
+
 	TrackMouse(where, NULL);
 		
 	// are we sure we like this message?
@@ -4205,7 +4193,7 @@ BTextView::CharClassification(int32 offset) const
 int32
 BTextView::NextInitialByte(int32 offset) const
 {
-	if (ByteAt(offset) == '\0')
+	if (offset >= TextLength())
 		return offset;
 
 	for (++offset; (ByteAt(offset) & 0xC0) == 0x80; ++offset)
