@@ -256,3 +256,11 @@ BusManager::SubmitTransfer(Transfer *transfer)
 	// virtual function to be overridden
 	return B_ERROR;
 }
+
+
+status_t
+BusManager::NotifyPipeChange(Pipe *pipe, usb_change change)
+{
+	// virtual function to be overridden
+	return B_ERROR;
+}

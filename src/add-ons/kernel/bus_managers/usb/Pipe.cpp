@@ -20,11 +20,13 @@ Pipe::Pipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
 		fMaxPacketSize(maxPacketSize),
 		fDataToggle(false)
 {
+	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_CREATED);
 }
 
 
 Pipe::~Pipe()
 {
+	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
 }
 
 
@@ -183,7 +185,10 @@ IsochronousPipe::IsochronousPipe(Object *parent, int8 deviceAddress,
 	uint8 endpointAddress, pipeDirection direction, usb_speed speed,
 	size_t maxPacketSize)
 	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
-			maxPacketSize)
+			maxPacketSize),
+		fMaxQueuedPackets(0),
+		fMaxBufferDuration(0),
+		fSampleSize(0)
 {
 }
 
@@ -195,6 +200,38 @@ IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
 	void *callbackCookie)
 {
 	return B_ERROR;
+}
+
+
+status_t
+IsochronousPipe::SetPipePolicy(uint8 maxQueuedPackets,
+	uint16 maxBufferDurationMS, uint16 sampleSize)
+{
+	if (maxQueuedPackets == fMaxQueuedPackets
+		|| maxBufferDurationMS == fMaxBufferDuration
+		|| sampleSize == fSampleSize)
+		return B_OK;
+
+	fMaxQueuedPackets = maxQueuedPackets;
+	fMaxBufferDuration = maxBufferDurationMS;
+	fSampleSize = sampleSize;
+
+	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_PIPE_POLICY_CHANGED);
+	return B_OK;
+}
+
+
+status_t
+IsochronousPipe::GetPipePolicy(uint8 *maxQueuedPackets,
+	uint16 *maxBufferDurationMS, uint16 *sampleSize)
+{
+	if (maxQueuedPackets)
+		*maxQueuedPackets = fMaxQueuedPackets;
+	if (maxBufferDurationMS)
+		*maxBufferDurationMS = fMaxBufferDuration;
+	if (sampleSize)
+		*sampleSize = fSampleSize;
+	return B_OK;
 }
 
 

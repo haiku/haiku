@@ -30,6 +30,7 @@ class Stack;
 class Device;
 class Transfer;
 class BusManager;
+class Pipe;
 class ControlPipe;
 class Object;
 class PhysicalMemoryAllocator;
@@ -66,6 +67,13 @@ typedef enum {
 	USB_SPEED_HIGHSPEED,
 	USB_SPEED_MAX = USB_SPEED_HIGHSPEED
 } usb_speed;
+
+
+typedef enum {
+	USB_CHANGE_CREATED = 0,
+	USB_CHANGE_DESTROYED,
+	USB_CHANGE_PIPE_POLICY_CHANGED
+} usb_change;
 
 
 #define USB_OBJECT_NONE					0x00000000
@@ -155,6 +163,9 @@ virtual	status_t						Start();
 virtual	status_t						Stop();
 
 virtual	status_t						SubmitTransfer(Transfer *transfer);
+
+virtual	status_t						NotifyPipeChange(Pipe *pipe,
+											usb_change change);
 
 		Object							*RootObject() { return fRootObject; };
 
@@ -343,6 +354,18 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
 											uint32 flags,
 											usb_callback_func callback,
 											void *callbackCookie);
+
+		status_t						SetPipePolicy(uint8 maxQueuedPackets,
+											uint16 maxBufferDurationMS,
+											uint16 sampleSize);
+		status_t						GetPipePolicy(uint8 *maxQueuedPackets,
+											uint16 *maxBufferDurationMS,
+											uint16 *sampleSize);
+
+private:
+		uint8							fMaxQueuedPackets;
+		uint16							fMaxBufferDuration;
+		uint16							fSampleSize;
 };
 
 

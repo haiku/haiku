@@ -463,6 +463,29 @@ EHCI::SubmitPeriodicTransfer(Transfer *transfer)
 
 
 status_t
+EHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
+{
+	TRACE_ERROR(("usb_ehci: pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe));
+	switch (change) {
+		case USB_CHANGE_CREATED:
+		case USB_CHANGE_DESTROYED: {
+			// ToDo: we should create and keep a single queue head
+			// for all transfers to/from this pipe
+			break;
+		}
+
+		case USB_CHANGE_PIPE_POLICY_CHANGED: {
+			// ToDo: for isochronous pipes we might need to adapt to new
+			// pipe policy settings here
+			break;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
 EHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB

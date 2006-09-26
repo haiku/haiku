@@ -38,6 +38,9 @@ virtual	status_t					SubmitTransfer(Transfer *transfer);
 		status_t					SubmitPeriodicTransfer(Transfer *transfer);
 		status_t					SubmitAsyncTransfer(Transfer *transfer);
 
+virtual	status_t					NotifyPipeChange(Pipe *pipe,
+										usb_change change);
+
 static	status_t					AddTo(Stack *stack);
 
 		// Port operations for root hub
