@@ -10,12 +10,10 @@
  *		Matt Madia
  */
 
-/**	Workspaces window trick found by Michael "Minox" Paine.
- *	(using B_ALL_WORKSPACES as flags in BWindow)
- *	Found out that using 0xffffffff as Flags was causing the window not to close on Alt-W
- *	hey Workspaces get Flags of Window 0
- *	gives 0x00008080 which makes it.
- */
+/*!
+	Workspaces window trick found by Michael "Minox" Paine.
+	(using B_ALL_WORKSPACES as flags in BWindow)
+*/
 
 
 #include <Alert.h>
@@ -358,6 +356,12 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 			// if the app is running, don't quit
 			// but if it isn't, cancel the complete run, so it doesn't
 			// open any window
+			if (IsLaunching())
+				Quit();
+		} else {
+			// some unknown arguments were specified
+			fprintf(stderr, "Invalid argument: %s\n", argv[i]);
+
 			if (IsLaunching())
 				Quit();
 		}
