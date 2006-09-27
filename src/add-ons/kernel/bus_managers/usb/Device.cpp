@@ -18,18 +18,9 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
 		fSpeed(speed),
-		fDeviceAddress(deviceAddress),
-		fLock(-1)
+		fDeviceAddress(deviceAddress)
 {
 	TRACE(("USB Device: new device\n"));
-
-	fLock = create_sem(1, "USB Device Lock");
-	if (fLock < B_OK) {
-		TRACE_ERROR(("USB Device: could not create locking semaphore\n"));
-		return;
-	}
-
-	set_sem_owner(fLock, B_SYSTEM_TEAM);
 
 	fDefaultPipe = new(std::nothrow) ControlPipe(this, deviceAddress, 0,
 		fSpeed, fDeviceDescriptor.max_packet_size_0);
@@ -181,42 +172,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 					usb_endpoint_info *endpointInfo =
 						&currentInterface->endpoint[currentInterface->endpoint_count - 1];
 					endpointInfo->descr = endpointDescriptor;
-
-					Pipe *endpoint = NULL;
-					switch (endpointDescriptor->attributes & 0x03) {
-						case 0x00: /* Control Endpoint */
-							endpoint = new(std::nothrow) ControlPipe(this,
-								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x0f,
-								fSpeed, endpointDescriptor->max_packet_size);
-							break;
-
-						case 0x01: /* Isochronous Endpoint */
-							endpoint = new(std::nothrow) IsochronousPipe(this,
-								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x0f,
-								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-								fSpeed, endpointDescriptor->max_packet_size);
-							break;
-
-						case 0x02: /* Bulk Endpoint */
-							endpoint = new(std::nothrow) BulkPipe(this,
-								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x0f,
-								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-								fSpeed, endpointDescriptor->max_packet_size);
-							break;
-
-						case 0x03: /* Interrupt Endpoint */
-							endpoint = new(std::nothrow) InterruptPipe(this,
-								fDeviceAddress,
-								endpointDescriptor->endpoint_address & 0x0f,
-								(endpointDescriptor->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-								fSpeed, endpointDescriptor->max_packet_size);
-							break;
-					}
-
-					endpointInfo->handle = endpoint->USBID();
+					endpointInfo->handle = 0;
 					break;
 				}
 
@@ -254,6 +210,37 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	}
 
 	fInitOK = true;
+}
+
+
+Device::~Device()
+{
+	// Destroy open endpoints. Do not send a device request to unconfigure
+	// though, since we may be deleted because the device was unplugged
+	// already.
+	Unconfigure(false);
+
+	// Free all allocated resources
+	for (int32 i = 0; i < fDeviceDescriptor.num_configurations; i++) {
+		usb_configuration_info *configuration = &fConfigurations[i];
+		for (size_t j = 0; j < configuration->interface_count; j++) {
+			usb_interface_list *interfaceList = configuration->interface;
+			for (size_t k = 0; k < interfaceList->alt_count; k++) {
+				usb_interface_info *interface = &interfaceList->alt[k];
+				delete (Interface *)GetStack()->GetObject(interface->handle);
+				free(interface->endpoint);
+				free(interface->generic);
+			}
+
+			free(interfaceList->alt);
+		}
+
+		free(configuration->interface);
+		free(configuration->descr);
+	}
+
+	free(fConfigurations);
+	delete fDefaultPipe;
 }
 
 
@@ -303,8 +290,12 @@ Device::ConfigurationAt(uint8 index) const
 status_t
 Device::SetConfiguration(const usb_configuration_info *configuration)
 {
+	if (!configuration)
+		return Unconfigure(true);
+
 	for (uint8 i = 0; i < fDeviceDescriptor.num_configurations; i++) {
-		if (configuration == &fConfigurations[i])
+		if (configuration->descr->configuration_value
+			== fConfigurations[i].descr->configuration_value)
 			return SetConfigurationAt(i);
 	}
 
@@ -317,7 +308,13 @@ Device::SetConfigurationAt(uint8 index)
 {
 	if (index >= fDeviceDescriptor.num_configurations)
 		return B_BAD_VALUE;
+	if (&fConfigurations[index] == fCurrentConfiguration)
+		return B_OK;
 
+	// Destroy our open endpoints
+	Unconfigure(false);
+
+	// Tell the device to set the configuration
 	status_t result = fDefaultPipe->SendRequest(
 		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_SET_CONFIGURATION,						// request
@@ -334,8 +331,85 @@ Device::SetConfigurationAt(uint8 index)
 	// Set current configuration
 	fCurrentConfiguration = &fConfigurations[index];
 
+	// Initialize all the endpoints that are now active
+	usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[0].active;
+	for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
+		usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
+		Pipe *pipe = NULL;
+
+		switch (endpoint->descr->attributes & 0x03) {
+			case 0x00: /* Control Endpoint */
+				pipe = new(std::nothrow) ControlPipe(this, fDeviceAddress,
+					endpoint->descr->endpoint_address & 0x0f, fSpeed,
+					endpoint->descr->max_packet_size);
+				break;
+
+			case 0x01: /* Isochronous Endpoint */
+				pipe = new(std::nothrow) IsochronousPipe(this, fDeviceAddress,
+					endpoint->descr->endpoint_address & 0x0f,
+					(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+					fSpeed, endpoint->descr->max_packet_size);
+				break;
+
+			case 0x02: /* Bulk Endpoint */
+				pipe = new(std::nothrow) BulkPipe(this, fDeviceAddress,
+					endpoint->descr->endpoint_address & 0x0f,
+					(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+					fSpeed, endpoint->descr->max_packet_size);
+				break;
+
+			case 0x03: /* Interrupt Endpoint */
+				pipe = new(std::nothrow) InterruptPipe(this, fDeviceAddress,
+					endpoint->descr->endpoint_address & 0x0f,
+					(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+					fSpeed, endpoint->descr->max_packet_size);
+				break;
+		}
+
+		endpoint->handle = pipe->USBID();
+	}
+
 	// Wait some for the configuration being finished
 	snooze(USB_DELAY_SET_CONFIGURATION);
+	return B_OK;
+}
+
+
+status_t
+Device::Unconfigure(bool atDeviceLevel)
+{
+	// if we only want to destroy our open pipes before setting
+	// another configuration unconfigure will be called with
+	// atDevice = false. otherwise we explicitly want to unconfigure
+	// the device and have to send it the corresponding request.
+	if (atDeviceLevel) {
+		status_t result = fDefaultPipe->SendRequest(
+			USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,	// type
+			USB_REQUEST_SET_CONFIGURATION,					// request
+			0,												// value
+			0,												// index
+			0,												// length										
+			NULL,											// buffer
+			0,												// buffer length
+			NULL);											// actual length
+
+		if (result < B_OK)
+			return result;
+
+		snooze(USB_DELAY_SET_CONFIGURATION);
+	}
+
+	if (!fCurrentConfiguration)
+		return B_OK;
+
+	usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[0].active;
+	for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
+		usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];		
+		delete (Pipe *)GetStack()->GetObject(endpoint->handle);
+		endpoint->handle = 0;
+	}
+
+	fCurrentConfiguration = NULL;
 	return B_OK;
 }
 

@@ -392,6 +392,7 @@ public:
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
 											usb_speed speed);
+virtual									~Device();
 
 		status_t						InitCheck();
 
@@ -410,6 +411,7 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 		const usb_configuration_info	*ConfigurationAt(uint8 index) const;
 		status_t						SetConfiguration(const usb_configuration_info *configuration);
 		status_t						SetConfigurationAt(uint8 index);
+		status_t						Unconfigure(bool atDeviceLevel);
 
 virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
@@ -437,7 +439,6 @@ private:
 		int8							fDeviceAddress;
 		size_t							fMaxPacketIn[16];
 		size_t							fMaxPacketOut[16];
-		sem_id							fLock;
 		ControlPipe						*fDefaultPipe;
 };
 
