@@ -699,7 +699,8 @@ Inode::Name(const bfs_inode *node) const
 
 	small_data *smallData = NULL;
 	while (GetNextSmallData((bfs_inode *)node, &smallData) == B_OK) {
-		if (*smallData->Name() == FILE_NAME_NAME && smallData->NameSize() == FILE_NAME_NAME_LENGTH)
+		if (*smallData->Name() == FILE_NAME_NAME
+			&& smallData->NameSize() == FILE_NAME_NAME_LENGTH)
 			return (const char *)smallData->Data();
 	}
 	return NULL;
@@ -2226,6 +2227,9 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 		// the group ID is inherited from the parent, if available
 
 	node->type = HOST_ENDIAN_TO_BFS_INT32(type);
+
+	inode->WriteBack(transaction);
+		// make sure the initialized node is available to others
 
 	// only add the name to regular files, directories, or symlinks
 	// don't add it to attributes, or indices
