@@ -484,8 +484,6 @@ dump_ipv4_header(ipv4_header &header)
 	\return B_OK if everything went well; if it could reassemble the packet, \a _buffer
 		will point to its buffer, otherwise, it will be \c NULL.
 	\return various error codes if something went wrong (mostly B_NO_MEMORY)
-
-	TODO: Implement packet aging
 */
 static status_t
 reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)

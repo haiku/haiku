@@ -486,27 +486,39 @@ net_buffer_read_data(net_buffer *_buffer, size_t offset, void *data, size_t size
 static data_node *
 data_node_prepend_size(data_node *node, size_t size, void **_contiguousBuffer)
 {
+
 	if (node->header_space < size) {
-		// need one or more new buffers
-		data_node *new_node = (data_node *)malloc(sizeof(data_node));
-		new_node->datablock = (uint8 *)get_datablock(&sDatastore);
-		if (new_node->datablock == NULL) {
-			free(new_node);
-			return NULL;
-		}
-		node->previous = new_node;
-		new_node->next = node;
-		new_node->previous = NULL;
-		new_node->trailer_space = 0;
-		if (size > BUFFER_SIZE) {
-			new_node->header_space = 0;
-			new_node->start = new_node->datablock;
-			new_node->size = BUFFER_SIZE;
-			*_contiguousBuffer = NULL;
-			return data_node_prepend_size(new_node, size - BUFFER_SIZE, NULL);
+		data_node *new_node;
+		size_t available_space;
+		if (node->size == 0) {
+			// current node is empty; use it before making new ones
+			available_space = node->header_space + node->trailer_space;
+			node->start += node->trailer_space;
+			new_node = node;
 		} else {
-			new_node->header_space = BUFFER_SIZE - size;
-			new_node->start = new_node->datablock + new_node->header_space;
+			// need one or more new nodes
+			new_node = (data_node *)malloc(sizeof(data_node));
+			new_node->datablock = (uint8 *)get_datablock(&sDatastore);
+			if (new_node->datablock == NULL) {
+				free(new_node);
+				return NULL;
+			}
+			available_space = BUFFER_SIZE;
+			node->previous = new_node;
+			new_node->next = node;
+			new_node->previous = NULL;
+			new_node->start = node->datablock + available_space;
+		}
+		new_node->trailer_space = 0;
+		if (size > available_space) {
+			new_node->header_space = 0;
+			new_node->size = available_space;
+			new_node->start -= available_space;
+			*_contiguousBuffer = NULL;
+			return data_node_prepend_size(new_node, size - available_space, NULL);
+		} else {
+			new_node->header_space = available_space - size;
+			new_node->start -= size;
 			new_node->size = size;
 			if (_contiguousBuffer != NULL)
 				*_contiguousBuffer = new_node->start;
@@ -571,25 +583,35 @@ data_node_append_size(data_node *node, size_t size, void **_contiguousBuffer)
 		node = node->next;
 
 	if (node->trailer_space < size) {
-		// need one or more new buffers
-		data_node *new_node = (data_node *)malloc(sizeof(data_node));
-		new_node->datablock = (uint8 *)get_datablock(&sDatastore);
-		if (new_node->datablock == NULL) {
-			free(new_node);
-			return ENOBUFS;
-		}
-		new_node->previous = node;
-		node->next = new_node;
-		new_node->next = NULL;
-		new_node->header_space = 0;
-		new_node->start = new_node->datablock;
-		if (size > BUFFER_SIZE) {
-			new_node->trailer_space = 0;
-			new_node->size = BUFFER_SIZE;
-			*_contiguousBuffer = NULL;
-			return data_node_append_size(new_node, size - BUFFER_SIZE, NULL);
+		data_node *new_node;
+		size_t available_space;
+		if (node->size == 0) {
+			// if this node is empty, use it before making new nodes
+			available_space = node->header_space + node->trailer_space;	
+			node->start -= node->header_space;
+			new_node = node;
 		} else {
-			new_node->trailer_space = BUFFER_SIZE - size;
+			// need one or more new buffers
+			new_node = (data_node *)malloc(sizeof(data_node));
+			new_node->datablock = (uint8 *)get_datablock(&sDatastore);
+			if (new_node->datablock == NULL) {
+				free(new_node);
+				return ENOBUFS;
+			}
+			available_space = BUFFER_SIZE;
+			new_node->previous = node;
+			node->next = new_node;
+			new_node->next = NULL;
+			new_node->start = new_node->datablock;
+		}
+		new_node->header_space = 0;
+		if (size > available_space) {
+			new_node->trailer_space = 0;
+			new_node->size = available_space;
+			*_contiguousBuffer = NULL;
+			return data_node_append_size(new_node, size - available_space, NULL);
+		} else {
+			new_node->trailer_space = available_space - size;
 			new_node->size = size;
 			if (_contiguousBuffer != NULL)
 				*_contiguousBuffer = new_node->start;
@@ -701,9 +723,10 @@ data_node_trim_data(data_node *node, size_t newSize)
 		} else {
 			node->trailer_space += node->size - newSize;
 			node->size = newSize;
-			if (node->next != NULL)
+			if (node->next != NULL) {
 				data_node_free(node->next);
-			node->next = NULL;
+				node->next = NULL;
+			}
 		}
 	}
 	return B_OK;
@@ -728,6 +751,19 @@ net_buffer_trim_data(net_buffer *_buffer, size_t newSize)
 
 	buffer->size = newSize;
 	return B_OK;
+}
+
+
+/*!
+ *	Removes \a bytes from the end of \a buffer
+ */
+static status_t
+net_buffer_remove_trailer(net_buffer *buffer, size_t bytes)
+{
+	if (buffer->size < bytes)
+		return B_BAD_VALUE;
+
+	return net_buffer_trim_data(buffer, buffer->size - bytes);
 }
 
 
@@ -896,7 +932,7 @@ net_buffer_module_info gNetBufferModule = {
 	NULL,	// net_buffer_insert
 	NULL,	// net_buffer_remove
 	net_buffer_remove_header,
-	net_buffer_trim_data,	// net_buffer_remove_trailer
+	net_buffer_remove_trailer,
 	net_buffer_trim_data,
 
 	NULL,	// net_buffer_associate_data
