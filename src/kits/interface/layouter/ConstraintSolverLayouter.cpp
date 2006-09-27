@@ -5,8 +5,8 @@
 
 #include "ConstraintSolverLayouter.h"
 
-#include <math.h>
-#include <string>
+#include <cmath>
+#include <cstring>
 
 #include <LayoutUtils.h>
 #include <Size.h>
