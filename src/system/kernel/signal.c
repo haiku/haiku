@@ -336,10 +336,9 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 
 				RELEASE_THREAD_LOCK();
 			}
-
-			RELEASE_TEAM_LOCK();
 		}
 
+		RELEASE_TEAM_LOCK();
 		GRAB_THREAD_LOCK();
 	}		
 
