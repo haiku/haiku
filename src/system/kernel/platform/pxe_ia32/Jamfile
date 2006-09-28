@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src system kernel platform bios_ia32 ;
+
+SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
+SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
+
+KernelMergeObject kernel_platform_bios_ia32.o :
+	platform.cpp
+;
