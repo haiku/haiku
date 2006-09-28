@@ -100,7 +100,7 @@ public:
 		fRunner(NULL)
 	{
 		BMessage message(_PING_);
-		//fRunner = new (nothrow) BMessageRunner(messenger, &message, 30000);
+		fRunner = new (nothrow) BMessageRunner(messenger, &message, 300000);
 	}
 
 	~_BTextTrackState_()
@@ -911,6 +911,23 @@ BTextView::MessageReceived(BMessage *message)
 					delete fClickRunner;
 					fClickRunner = NULL;
 				}
+			} else {
+				// Scroll the view a bit if mouse is outside the view bounds
+				BPoint scrollBy;
+				BRect bounds = Bounds(); // TODO: Use the textrect instead ?
+				if (fWhere.x > bounds.right)
+					scrollBy.x = fWhere.x - bounds.right;
+				else if (fWhere.x < bounds.left)
+					scrollBy.x = fWhere.x - bounds.left;
+				
+				if (fWhere.y > bounds.bottom)
+					scrollBy.y = fWhere.y - bounds.bottom;
+				else if (fWhere.y < bounds.top)
+					scrollBy.y = fWhere.y - bounds.top;
+
+				// TODO: Review this, it's not working correctly
+				//if (scrollBy != B_ORIGIN)
+				//	ScrollBy(scrollBy.x, scrollBy.y);
 			}
 			break;
 		}
@@ -2814,7 +2831,6 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 	int32 selStart = fSelStart;
 	int32 selEnd = fSelEnd;
 	
-	int32 scrollToOffset = 0;
 	int32 modifiers = 0;
 	BMessage *message = Window()->CurrentMessage();
 	if (message != NULL)
@@ -2822,40 +2838,39 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 		
 	bool shiftDown = modifiers & B_SHIFT_KEY;
 
+	int32 currentOffset = fClickOffset;
 	switch (inArrowKey) {
 		case B_LEFT_ARROW:
-			if (fClickOffset > 0)
-				fClickOffset = PreviousInitialByte(fClickOffset);
-			else if (shiftDown)
-				return;
-				
 			if (shiftDown) {
-				if (fClickOffset >= fSelStart)
-					selEnd = fClickOffset;
-				else
-					selStart = fClickOffset; 
-							
-			} else
-				selStart = selEnd = fClickOffset;
-	
-			scrollToOffset = selStart;
+				fClickOffset = PreviousInitialByte(fClickOffset); 
+				if (fClickOffset != currentOffset) {
+					if (fClickOffset > fSelStart) {
+						selStart = fSelStart;
+						selEnd = fClickOffset;
+					} else if (fClickOffset < fSelStart) {
+						selStart = fClickOffset;
+						selEnd = fSelEnd;
+					}
+				}	
+			} else 
+				fClickOffset = PreviousInitialByte(fSelStart);
+			
 			break;
 			
 		case B_RIGHT_ARROW:
-			if (fClickOffset < fText->Length())
-				fClickOffset = NextInitialByte(fClickOffset);
-			else if (shiftDown)
-				return;
-				
 			if (shiftDown) {
-				if (fClickOffset <= fSelEnd)
-					selStart = fClickOffset;
-				else
-					selEnd = fClickOffset;
+				fClickOffset = NextInitialByte(fClickOffset);
+				if (fClickOffset != currentOffset) {
+					if (fClickOffset < fSelEnd) {
+						selStart = fClickOffset;
+						selEnd = fSelEnd;
+					} else if (fClickOffset > fSelEnd) {
+						selStart = fSelStart;
+						selEnd = fClickOffset;
+					}
+				}	
 			} else
-				selStart = selEnd = fClickOffset;
-			
-			scrollToOffset = selEnd;
+				fClickOffset = NextInitialByte(fSelEnd);
 			break;
 			
 		case B_UP_ARROW:
@@ -2864,15 +2879,6 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 			BPoint point = PointAt(fClickOffset, &height);
 			point.y -= height;
 			fClickOffset = OffsetAt(point);
-			if (shiftDown) {
-				if (fClickOffset > fSelStart)
-					selEnd = fClickOffset;
-				else
-					selStart = fClickOffset;
-			} else
-				selStart = selEnd = fClickOffset;
-
-			scrollToOffset = selStart;
 			break;
 		}
 		
@@ -2882,27 +2888,23 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 			BPoint point = PointAt(fClickOffset, &height);
 			point.y += height;
 			fClickOffset = OffsetAt(point);
-			if (shiftDown) {
-				if (fClickOffset < fSelEnd)
-					selStart = fClickOffset;
-				else
-					selEnd = fClickOffset;
-			} else
-				selStart = selEnd = fClickOffset;
-			
-			scrollToOffset = selEnd;
 			break;
 		}
 	}
-	
+
 	// invalidate the null style
 	fStyles->InvalidateNullStyle();
 	
-	if (selEnd != fSelEnd || selStart != fSelStart)
+	currentOffset = fClickOffset;
+	if (shiftDown)
 		Select(selStart, selEnd);
-		
+	else
+		Select(fClickOffset, fClickOffset);
+	
+	fClickOffset = currentOffset;
+
 	// scroll if needed
-	ScrollToOffset(scrollToOffset);
+	ScrollToOffset(fClickOffset);
 }
 
 
@@ -4190,8 +4192,9 @@ BTextView::CharClassification(int32 offset) const
 int32
 BTextView::NextInitialByte(int32 offset) const
 {
-	if (offset >= TextLength())
-		return offset;
+	int32 textLength = TextLength();
+	if (offset >= textLength)
+		return textLength;
 
 	for (++offset; (ByteAt(offset) & 0xC0) == 0x80; ++offset)
 		;
@@ -4207,6 +4210,9 @@ BTextView::NextInitialByte(int32 offset) const
 int32
 BTextView::PreviousInitialByte(int32 offset) const
 {
+	if (offset <= 0)
+		return 0;
+
 	int32 count = 6;
 	
 	for (--offset; offset > 0 && count; --offset, --count) {
