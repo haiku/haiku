@@ -129,7 +129,12 @@ BuildFuncName(const char* className, BString& funcName)
 	//	This is what we're after:
 	//		Instantiate__Q28OpenBeOS11BArchivableP8BMessage
 	Mangle(className, funcName);
+#if __GNUC__ >= 4
+	funcName.Prepend("_ZN");
+	funcName.Append("11InstantiateE");
+#else
 	funcName.Prepend("Instantiate__");
+#endif
 	funcName.Append("P8BMessage");
 }
 
