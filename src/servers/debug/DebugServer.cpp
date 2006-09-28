@@ -567,7 +567,8 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	if (_IsGUIServer()) {
 		// App or input server. If it's the app server, we'll try to debug it.
 		kill = !(_IsAppServer() && strlen(fExecutablePath) > 0);
-
+		debug_printf("*** GUI server died: thread %ld, %s: %s\n", thread, fExecutablePath, buffer);
+			// TODO: for now, so that we know what's going on
 	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
 		// normal app
 
@@ -767,7 +768,7 @@ TeamDebugHandler::_HandlerThread()
 				kill = true;
 				break;
 			}
-	
+
 			if (message->Code() == B_DEBUGGER_MESSAGE_HANDED_OVER) {
 				// The team has successfully been handed over to the debugger.
 				// Nothing to do.
@@ -790,9 +791,8 @@ TeamDebugHandler::_HandlerThread()
 					terminate = true;
 				}
 			}
-	
+
 			delete message;
-	
 		} while (!terminate);
 	} else
 		kill = true;
@@ -814,7 +814,7 @@ TeamDebugHandler::_HandlerThread()
 bool
 TeamDebugHandler::_ExecutableNameEquals(const char *name) const
 {
-	return (strcmp(_LastPathComponent(fExecutablePath), name) == 0);
+	return strcmp(_LastPathComponent(fExecutablePath), name) == 0;
 }
 
 // _IsAppServer
@@ -843,7 +843,7 @@ bool
 TeamDebugHandler::_IsGUIServer() const
 {
 	// app or input server
-	return (_IsAppServer() || _IsInputServer() || _IsRegistrar());
+	return _IsAppServer() || _IsInputServer() || _IsRegistrar();
 }
 
 // _LastPathComponent
@@ -851,7 +851,7 @@ const char *
 TeamDebugHandler::_LastPathComponent(const char *path)
 {
 	const char *lastSlash = strrchr(path, '/');
-	return (lastSlash ? lastSlash + 1 : path);
+	return lastSlash ? lastSlash + 1 : path;
 }
 
 // _FindTeam
@@ -876,8 +876,8 @@ TeamDebugHandler::_FindTeam(const char *name)
 bool
 TeamDebugHandler::_AreGUIServersAlive()
 {
-	return (_FindTeam("app_server") >= 0 && _FindTeam("input_server") >= 0
-		&& _FindTeam("registrar"));
+	return _FindTeam("app_server") >= 0 && _FindTeam("input_server") >= 0
+		&& _FindTeam("registrar");
 }
 
 
