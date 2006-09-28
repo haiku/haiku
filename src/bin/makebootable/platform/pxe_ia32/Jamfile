@@ -1,6 +1,9 @@
-SubDir HAIKU_TOP src bin makebootable platform bios_ia32 ;
+SubDir HAIKU_TOP src bin makebootable platform pxe_ia32 ;
 
 # write the stage 1 boot loader into the makebootable resources
 AddFileDataResource makebootable : RAWT:666:BootCode : stage1.bin ;
 
 BinCommand makebootable : makebootable.cpp : be ;
+
+SEARCH on [ FGristFiles makebootable.cpp ]
+	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;

@@ -47,3 +47,6 @@ PrepareConfigVariables ;
 
 # specify the Haiku image contents
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
+
+# for creating PXE targets
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPXE ] ;
