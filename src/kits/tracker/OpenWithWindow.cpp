@@ -543,25 +543,21 @@ OpenWithPoseView::CanHandleDragSelection(const Model *, const BMessage *, bool)
 
 static void
 AddSupportingAppForTypeToQuery(SearchForSignatureEntryList *queryIterator,
-	const char *signature)
+	const char *type)
 {
 	// get supporting apps for type
-	BMimeType mime(signature);
+	BMimeType mime(type);
 	if (!mime.IsInstalled())
 		return;
 
 	BMessage message;
 	mime.GetSupportingApps(&message);
 
-	for (int32 index =0; ; index++) {
-		const char *signature;
-		int32 length;
+	// push each of the supporting apps signature uniquely
 
-		if (message.FindData("applications", 'CSTR', index, (const void **)&signature,
-			&length) != B_OK)
-			break;
-
-		// push each of the supporting apps signature uniquely
+	const char *signature;
+	for (int32 index = 0; message.FindString("applications", index,
+			&signature) == B_OK; index++) {
 		queryIterator->PushUniqueSignature(signature);
 	}
 }
@@ -1196,7 +1192,7 @@ SearchForSignatureEntryList::PushUniqueSignature(const char *str)
 	// do a unique add
 	if (fSignatures.EachElement(FindOne, (void *)str))
 		return;
-	
+
 	fSignatures.AddItem(new BString(str));
 }
 
@@ -1222,11 +1218,11 @@ SearchForSignatureEntryList::GetNextDirents(struct dirent *buffer,
 	return fIteratorList->GetNextDirents(buffer, length, count);
 }
 
+
 struct AddOneTermParams {
 	BString *result;
 	bool first;
 };
-
 
 static const BString *
 AddOnePredicateTerm(const BString *item, void *castToParams)
