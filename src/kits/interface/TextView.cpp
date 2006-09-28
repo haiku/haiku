@@ -1105,9 +1105,13 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	CancelInputMethod();
 	
 	// do we really need to do anything?
-	if (inLength < 1)
+	if (inText == NULL || inLength < 1)
 		return;
 	
+	int32 realLength = strlen(inText);
+	if (inLength > realLength)
+		inLength = realLength;
+
 	if (startOffset > TextLength())
 		startOffset = TextLength();
 
@@ -3496,9 +3500,8 @@ BTextView::ActualTabWidth(float location) const
 
 
 void
-BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset,
-							 const text_run_array *inRuns,
-							 _BTextChangeResult_ *outResult)
+BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset, 
+				const text_run_array *inRuns, _BTextChangeResult_ *outResult)
 {
 	CALLED();
 }
