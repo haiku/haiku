@@ -13,7 +13,6 @@
 
 
 class BFile;
-// _BTextGapBuffer_ class ------------------------------------------------------
 class _BTextGapBuffer_ {
 
 public:
@@ -27,32 +26,31 @@ virtual				~_BTextGapBuffer_();
 		void		MoveGapTo(int32 toIndex);
 		void		SizeGapTo(int32 inCount);
 
-		const char *GetString(int32 fromOffset, int32 numChars);
 		bool		FindChar(char inChar, int32 fromIndex, int32 *ioDelta);
 
-		const char *Text();
+		const char 	*Text();
 		int32		Length() const;
 		char		operator[](int32 index) const;
 
 		
-//		char 	*RealText();
-		void	GetString(int32 offset, int32 length, char *buffer);
-//		void	GetString(int32, int32 *);
+//		char 		*RealText();
+		const char 	*GetString(int32 fromOffset, int32 numBytes, int32 *returnedBytes);
+		void		GetString(int32 offset, int32 length, char *buffer);
 		
-		char	RealCharAt(int32 offset) const;
+		char		RealCharAt(int32 offset) const;
 				
-		bool	PasswordMode() const;
-		void	SetPasswordMode(bool);
+		bool		PasswordMode() const;
+		void		SetPasswordMode(bool);
 
-//		void	Resize(int32 size);
+//		void		Resize(int32 size);
 
 protected:
 		int32	fExtraCount;		// when realloc()-ing
-		int32	fItemCount;			// logical count
-		char	*fBuffer;			// allocated memory
+		int32	fItemCount;		// logical count
+		char	*fBuffer;		// allocated memory
 		int32	fBufferCount;		// physical count
-		int32	fGapIndex;			// gap position
-		int32	fGapCount;			// gap count
+		int32	fGapIndex;		// gap position
+		int32	fGapCount;		// gap count
 		char	*fScratchBuffer;	// for GetString
 		int32	fScratchSize;		// scratch size
 		bool	fPasswordMode;

@@ -3661,11 +3661,9 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 						view->PopState();
 					}
 					
-					const char *string = fText->GetString(offset, tabChars);
-					// TODO: GetString() could return less or more bytes than requested
-					// Improve the backend api so it's more robust and pass back the returned
-					// bytes
-					view->DrawString(string, tabChars);
+					int32 returnedBytes = 0;
+					const char *string = fText->GetString(offset, tabChars, &returnedBytes);
+					view->DrawString(string, returnedBytes);
 					
 					if (foundTab) {
 						float penPos = PenLocation().x - fTextRect.left;

@@ -169,15 +169,15 @@ _BTextGapBuffer_::SizeGapTo(long inCount)
 
 
 const char *
-_BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes)
+_BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes, int32 *returnedBytes)
 {
-	// numBytes won't necessarily be honored. This function could return more
-	// bytes than specified (for example when in password mode)
-	// TODO: Fix this, it's not very nice.
 	char *result = "";
 	
-	if (numBytes < 1)
+	if (numBytes < 1) {
+		if (returnedBytes != NULL)
+			*returnedBytes = 0;
 		return result;
+	}
 	
 	bool isStartBeforeGap = (fromOffset < fGapIndex);
 	bool isEndBeforeGap = ((fromOffset + numBytes - 1) < fGapIndex);
@@ -198,7 +198,10 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes)
 
 		result = fScratchBuffer;
 	}
-	
+
+	if (returnedBytes != NULL)
+		*returnedBytes = numBytes;
+
 	// TODO: this could be improved. We are overwriting what we did some lines ago,
 	// we could just avoid to do that.
 	if (fPasswordMode) {
@@ -216,7 +219,9 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes)
 			memcpy(scratchPtr, B_UTF8_BULLET, charLen);
 			scratchPtr += charLen;
 		}
-		scratchPtr = '\0';		
+		scratchPtr = '\0';	
+		if (returnedBytes != NULL)
+			*returnedBytes = newSize - 1;	
 	}
 
 	return result;
