@@ -420,7 +420,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 		// the last allocation group may contain less blocks than the others
 		if (i == fNumGroups - 1) {
 			fGroups[i].fNumBits = fVolume->NumBlocks() - i * numBits;
-			fGroups[i].fNumBlocks = fGroups[i].fNumBits >> (blockShift + 3);
+			fGroups[i].fNumBlocks = 1 + ((fGroups[i].NumBits() - 1) >> (blockShift + 3));
 		} else {
 			fGroups[i].fNumBits = numBits;
 			fGroups[i].fNumBlocks = blocks;
@@ -475,7 +475,7 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 		// the last allocation group may contain less blocks than the others
 		if (i == num - 1) {
 			groups[i].fNumBits = volume->NumBlocks() - i * numBits;
-			groups[i].fNumBlocks = groups[i].fNumBits >> (blockShift + 3);
+			groups[i].fNumBlocks = 1 + ((groups[i].NumBits() - 1) >> (blockShift + 3));
 		} else {
 			groups[i].fNumBits = numBits;
 			groups[i].fNumBlocks = blocks;
