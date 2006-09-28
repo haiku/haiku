@@ -1265,7 +1265,7 @@ BView::EndRectTracking()
 void
 BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 {
-	if (!message || !dragRect.IsValid())
+	if (!message)
 		return;
 
 	do_owner_check_no_pick();
@@ -1277,6 +1277,14 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 	if (!current || current->FindPoint("be:view_where", &offset) != B_OK)
 		GetMouse(&offset, &buttons, false);
 	offset -= dragRect.LeftTop();
+
+	if (!dragRect.IsValid()) {
+		DragMessage(message, NULL, B_OP_BLEND, offset, replyTo);
+		return;
+	}
+
+	// TODO: that's not really what should happen - the app_server should take the chance
+	//	*NOT* to need to drag a whole bitmap around but just a frame.
 
 	// create a drag bitmap for the rect
 	BBitmap *bitmap = new BBitmap(dragRect, B_RGBA32);
@@ -1320,8 +1328,13 @@ void
 BView::DragMessage(BMessage *message, BBitmap *image,
 	drawing_mode dragMode, BPoint offset, BHandler *replyTo)
 {
-	// ToDo: is this correct? Isn't \a image allowed to be NULL?
-	if (message == NULL || image == NULL)
+	if (message == NULL)
+		return;
+
+	// TODO: workaround for drags without a bitmap - should not be necessary if
+	//	we move the rectangle dragging into the app_server
+	image = new (nothrow) BBitmap(BRect(0, 0, 0, 0), B_RGBA32);
+	if (image == NULL)
 		return;
 
 	if (replyTo == NULL)
