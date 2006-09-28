@@ -1083,16 +1083,17 @@ void
 BTextView::Insert(const char *inText, const text_run_array *inRuns)
 {
 	if (inText != NULL)
-		Insert(fSelStart, inText, strlen(inText), inRuns);
+		DoInsertText(inText, strlen(inText), fSelStart, inRuns, NULL);
 }
 
 
 void
-BTextView::Insert(const char *inText, int32 inLength,
-					   const text_run_array *inRuns)
+BTextView::Insert(const char *inText, int32 inLength, const text_run_array *inRuns)
 {
-	if (inText != NULL)
-		Insert(fSelStart, inText, inLength, inRuns);
+	if (inText != NULL && inLength > 0) {
+		int32 realLength = strlen(inText);
+		DoInsertText(inText, min_c(inLength, realLength), fSelStart, inRuns, NULL);
+	}
 }
 
 
@@ -1102,29 +1103,11 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 {
 	CALLED();
 	
-	CancelInputMethod();
-	
 	// do we really need to do anything?
-	if (inText == NULL || inLength < 1)
-		return;
-	
-	int32 realLength = strlen(inText);
-	if (inLength > realLength)
-		inLength = realLength;
-
-	if (startOffset > TextLength())
-		startOffset = TextLength();
-
-	// copy data into buffer
-	InsertText(inText, inLength, startOffset, inRuns);
-	
-	// offset the caret/selection
-	int32 saveStart = fSelStart;
-	fSelStart += inLength;
-	fSelEnd += inLength;
-
-	// recalc line breaks and draw the text
-	Refresh(saveStart, fSelEnd, true, false);
+	if (inText != NULL && inLength > 0) {
+		int32 realLength = strlen(inText);
+		DoInsertText(inText, min_c(inLength, realLength), startOffset, inRuns, NULL);
+	}
 }
 
 
@@ -3503,7 +3486,25 @@ void
 BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset, 
 				const text_run_array *inRuns, _BTextChangeResult_ *outResult)
 {
-	CALLED();
+	CancelInputMethod();
+	
+	// Don't do any check, the public methods will have adjusted
+	// eventual bogus values...
+
+	int32 textLength = TextLength();
+	if (inOffset > textLength)
+		inOffset = textLength;
+
+	// copy data into buffer
+	InsertText(inText, inLength, inOffset, inRuns);
+	
+	// offset the caret/selection
+	int32 saveStart = fSelStart;
+	fSelStart += inLength;
+	fSelEnd += inLength;
+
+	// recalc line breaks and draw the text
+	Refresh(saveStart, fSelEnd, true, false);
 }
 
 
