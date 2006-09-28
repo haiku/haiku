@@ -83,6 +83,7 @@ const char *kAttrGroup = "META:group";
 const char *kAttrNickname = "META:nickname";
 
 const char *kNetPositiveSignature = "application/x-vnd.Be-NPOS";
+const char *kPeopleSignature = "application/x-vnd.Be-PEPL";
 
 namespace BPrivate {
 
@@ -267,8 +268,8 @@ TTracker::InitMimeTypes()
 	}
 
 	InstallMimeIfNeeded(B_PERSON_MIMETYPE, kResPersonIcon,
-		"Person", "Contact information for a person.", 0);
-		
+		"Person", "Contact information for a person.", kPeopleSignature);
+
 	{
 		ExtraAttributeLazyInstaller installer(B_PERSON_MIMETYPE);
 		installer.AddExtraAttribute("Contact Name", kAttrName, B_STRING_TYPE, true, true,
