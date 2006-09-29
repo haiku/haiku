@@ -33,6 +33,7 @@
 
 
 struct datastore {
+	area_id area;
 	void *store;		// ptr to data region
 	size_t blocksize;	// size of the blocks in the datastore
 	size_t blockcount;	// total number of blocks in the datastore
@@ -82,9 +83,11 @@ init_datastore(struct datastore *store, size_t blocksize, int blockcount)
 	store->blocksize = blocksize;
 	store->blockcount = blockcount;
 
-	store->store = malloc(blocksize * blockcount);
-	if (store->store == NULL)
-		return B_NO_MEMORY;
+	store->area = create_area("net datastore", (void **)&store->store,
+		B_ANY_KERNEL_ADDRESS, blocksize * blockcount, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (store->area < B_OK)
+		return store->area;
 
 	store->refcounts = (int32 *)calloc(blockcount, sizeof(uint32));
 	if (store->refcounts == NULL)
@@ -106,7 +109,7 @@ uninit_datastore(struct datastore *store)
 	store->blocksize = 0;
 	store->blockcount = 0;
 
-	free(store->store);
+	delete_area(store->area);
 	store->store = NULL;
 	free(store->refcounts);
 	store->refcounts = NULL;
