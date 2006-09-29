@@ -2,11 +2,12 @@
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
-#if !defined(GLOBALDATA_H)
+#ifndef GLOBALDATA_H
 #define GLOBALDATA_H
 
+
 #include "DriverInterface.h"
+
 
 extern int fd;
 extern shared_info *si;
@@ -21,5 +22,11 @@ extern int accelerantIsClone;
 
 /* Print debug message through kernel driver. Should move to other location later. */
 extern void dpf (const char * format, ...);
+
+/* ProposeDisplayMode.c */
+extern status_t create_mode_list(void);
+
+/* Cursor.c */
+extern void set_cursor_colors(void);
 
 #endif

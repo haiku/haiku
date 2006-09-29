@@ -12,31 +12,35 @@
 #include "s3mmio.h"
 #include "s3accel.h"
 
+#include "errno.h"
+#include "fcntl.h"
 #include "string.h"
 #include "unistd.h"
 #include "sys/types.h"
 #include "sys/stat.h"
-#include "fcntl.h"
 #include <sys/ioctl.h>
 
-/* defined in ProposeDisplayMode.c */
-extern status_t create_mode_list(void);
-/* defined in Cursor.c */
-extern void set_cursor_colors(void);
 
-/* Get the linear address of an area.  Workaround for BeOS bug that 
-   returns invalid pointer from clone_area. */
-static void * __get_area_address (area_id area)
+/*!
+	Get the linear address of an area.  Workaround for BeOS bug that 
+	returns invalid pointer from clone_area.
+*/
+static void *
+get_area_address(area_id area)
 {
-    area_info ai;
-    get_area_info (area, &ai);
-    return ai.address;
+	area_info ai;
+	get_area_info(area, &ai);
+	return ai.address;
 }
 
+
+#if 0
+// unused!
 // Determines the amount of card memory available by seeing how far up 
 // the frame buffer data can be written and read back reliably. Does a
 // paranoia check to make sure that it isn't just wrapping, either.
-unsigned long Get_Card_Mem_Size()
+unsigned long
+Get_Card_Mem_Size()
 {
     // Allowed sizes actually go up to 16 megs, but clip at the
     // register window for now.
@@ -115,81 +119,73 @@ unsigned long Get_Card_Mem_Size()
 
     return MaxMem;
 }
+#endif
 
-
-
-static status_t init_common(int the_fd);
 
 /* Initialization code shared between primary and cloned accelerants */
-static status_t init_common(int the_fd)
+static status_t
+init_common(int the_fd)
 {
-    status_t result;
-    savage_get_private_data gpd;
+	status_t result;
+	savage_get_private_data gpd;
 
-    /* memorize the file descriptor */
-    fd = the_fd;
-    dpf ("init_common begin\n");
-    /* set the magic number so the driver knows we're for real */
-    gpd.magic = SAVAGE_PRIVATE_DATA_MAGIC;
-    /* contact driver and get a pointer to the registers and shared data */
-    result = ioctl(fd, SAVAGE_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
-    if (result != B_OK) goto error0;
+	/* memorize the file descriptor */
+	fd = the_fd;
+	dpf ("init_common begin\n");
+	/* set the magic number so the driver knows we're for real */
+	gpd.magic = SAVAGE_PRIVATE_DATA_MAGIC;
+	/* contact driver and get a pointer to the registers and shared data */
+	if (ioctl(fd, SAVAGE_GET_PRIVATE_DATA, &gpd, sizeof(gpd)) != 0)
+		return errno;
 
     /* clone the shared area for our use */
-    shared_info_area = clone_area (
-        "SAVAGE shared info", (void **)&si, B_ANY_ADDRESS,
-        B_READ_AREA | B_WRITE_AREA, gpd.shared_info_area);
-    if (shared_info_area < 0)
-    {
-        result = shared_info_area;
-        goto error0;
-    }
-    /* clone the memory mapped registers for our use */
-    regs_area = clone_area (
-        "SAVAGE regs area", (void **)&regs, B_ANY_ADDRESS,
-        B_READ_AREA | B_WRITE_AREA, si->regs_area);
-    if (regs_area < 0)
-    {
-        result = regs_area;
-        goto error1;
-    }
-    regs = __get_area_address (regs_area);
+	shared_info_area = clone_area("SAVAGE shared info", (void **)&si,
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, gpd.shared_info_area);
+	if (shared_info_area < 0)
+		return shared_info_area;
 
-    dpf ("PCI VENDOR_ID = 0x%4X, DEVICE_ID = 0x%4X\n",
-         read16 ((byte_t*)regs + 0x8000),
-         read16 ((byte_t*)regs + 0x8002));
+	/* clone the memory mapped registers for our use */
+	regs_area = clone_area("SAVAGE regs area", (void **)&regs, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, si->regs_area);
+	if (regs_area < 0) {
+		result = regs_area;
+		goto error1;
+	}
+	regs = get_area_address(regs_area);
 
-    /* clone the framebuffer buffer for our use */
-    fb_area = clone_area (
-        "SAVAGE fb area", (void **)&framebuffer, B_ANY_ADDRESS,
-        B_READ_AREA | B_WRITE_AREA, si->fb_area);
-    if (fb_area < 0)
-    {
-        result = regs_area;
-        goto error2;
-    }
-    framebuffer = __get_area_address (fb_area);
+	dpf("PCI VENDOR_ID = 0x%4X, DEVICE_ID = 0x%4X\n",
+		read16((byte_t*)regs + 0x8000),
+		read16((byte_t*)regs + 0x8002));
 
-    s3drv_init ((byte_t*)regs);
-    dpf ("s3drv_init called\n");
-    s3accel_init (s3drv_get_context ());
-    dpf ("s3accel_init called\n");
-    s3drv_unlock_regs ();
-    
-    /* all done */
-    goto error0;
+	/* clone the framebuffer buffer for our use */
+	fb_area = clone_area("SAVAGE fb area", (void **)&framebuffer,
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, si->fb_area);
+	if (fb_area < 0) {
+		result = regs_area;
+		goto error2;
+	}
+	framebuffer = get_area_address(fb_area);
+
+	s3drv_init((byte_t*)regs);
+	dpf ("s3drv_init called\n");
+	s3accel_init(s3drv_get_context());
+	dpf ("s3accel_init called\n");
+	s3drv_unlock_regs();
+
+	/* all done */
+	return B_OK;
 
 error2:
-    delete_area(regs_area);
+	delete_area(regs_area);
 error1:
-    delete_area(shared_info_area);
-error0:
-    dpf ("init_common done\n");
-    return result;
+	delete_area(shared_info_area);
+	return result;
 }
 
-/* Clean up code shared between primary and cloned accelrants */
-static void uninit_common(void)
+
+/*! Clean up code shared between primary and cloned accelerants */
+static void
+uninit_common(void)
 {
     /* release framebuffer area */
     delete_area (fb_area);
@@ -204,14 +200,15 @@ static void uninit_common(void)
 }
 
  
-/*
-Initialize the accelerant.  the_fd is the file handle of the device (in
-/dev/graphics) that has been opened by the app_server (or some test harness).
-We need to determine if the kernel driver and the accelerant are compatible.
-If they are, get the accelerant ready to handle other hook functions and
-report success or failure.
+/*!
+	Initialize the accelerant.  the_fd is the file handle of the device (in
+	/dev/graphics) that has been opened by the app_server (or some test harness).
+	We need to determine if the kernel driver and the accelerant are compatible.
+	If they are, get the accelerant ready to handle other hook functions and
+	report success or failure.
 */
-status_t INIT_ACCELERANT(int the_fd)
+status_t
+INIT_ACCELERANT(int the_fd)
 {
     status_t result;
     /* note that we're the primary accelerant (accelerantIsClone is global) */
@@ -219,9 +216,8 @@ status_t INIT_ACCELERANT(int the_fd)
 
     /* do the initialization common to both the primary and the clones */
     result = init_common(the_fd);
-
-    /* bail out if the common initialization failed */
-    if (result != B_OK) goto error0;
+    if (result != B_OK)
+    	goto error0;
 
     /*
     If there is a possiblity that the kernel driver will recognize a card that
@@ -268,8 +264,9 @@ status_t INIT_ACCELERANT(int the_fd)
     initialized with this routine) will own the "one true copy" of the list.
     Everybody else get's a read-only clone.
     */
-    result = create_mode_list();
-    if (result != B_OK) goto error2;
+	result = create_mode_list();
+	if (result != B_OK)
+		goto error2;
 
     /*
     Initialize the frame buffer and cursor pointers.  Most newer video cards
@@ -343,11 +340,13 @@ error0:
     return result;
 }
 
-/*
-Return the number of bytes required to hold the information required
-to clone the device.
+
+/*!
+	Return the number of bytes required to hold the information required
+	to clone the device.
 */
-ssize_t ACCELERANT_CLONE_INFO_SIZE(void)
+ssize_t
+ACCELERANT_CLONE_INFO_SIZE(void)
 {
     /*
     Since we're passing the name of the device as the only required
@@ -357,11 +356,12 @@ ssize_t ACCELERANT_CLONE_INFO_SIZE(void)
 }
 
 
-/*
-Return the info required to clone the device.  void *data points to
-a buffer at least ACCELERANT_CLONE_INFO_SIZE() bytes in length.
+/*!
+	Return the info required to clone the device.  void *data points to
+	a buffer at least ACCELERANT_CLONE_INFO_SIZE() bytes in length.
 */
-void GET_ACCELERANT_CLONE_INFO(void *data)
+void
+GET_ACCELERANT_CLONE_INFO(void *data)
 {
     savage_device_name dn;
     status_t result;
@@ -373,60 +373,54 @@ void GET_ACCELERANT_CLONE_INFO(void *data)
     result = ioctl(fd, SAVAGE_DEVICE_NAME, &dn, sizeof(dn));
 }
 
-/*
-Initialize a copy of the accelerant as a clone.  void *data points to
-a copy of the data returned by GET_ACCELERANT_CLONE_INFO().
+
+/*!
+	Initialize a copy of the accelerant as a clone.  void *data points to
+	a copy of the data returned by GET_ACCELERANT_CLONE_INFO().
 */
-status_t CLONE_ACCELERANT(void *data)
+status_t
+CLONE_ACCELERANT(void *data)
 {
-    status_t result;
-    char path[MAXPATHLEN];
+	status_t result;
+	char path[MAXPATHLEN];
 
-    /* the data is the device name */
-    strcpy(path, "/dev");
-    strcat(path, (const char *)data);
-    /* open the device, the permissions aren't important */
-    fd = open(path, B_READ_WRITE);
-    if (fd < 0)
-    {
-        result = fd;
-        goto error0;
-    }
+	/* the data is the device name */
+	strcpy(path, "/dev/");
+	strcat(path, (const char *)data);
+	/* open the device, the permissions aren't important */
+	fd = open(path, B_READ_WRITE);
+	if (fd < 0)
+		return errno;
 
-    /* note that we're a clone accelerant */
-    accelerantIsClone = 1;
+	/* note that we're a clone accelerant */
+	accelerantIsClone = 1;
 
-    /* call the shared initialization code */
-    result = init_common(fd);
+	/* call the shared initialization code */
+	result = init_common(fd);
+	if (result != B_OK)
+		goto error1;
 
-    /* bail out if the common initialization failed */
-    if (result != B_OK) goto error1;
+	/* get shared area for display modes */
+	result = my_mode_list_area = clone_area("SAVAGE cloned display_modes",
+		(void **)&my_mode_list, B_ANY_ADDRESS, B_READ_AREA, si->mode_area);
+	if (result < B_OK)
+		goto error2;
 
-    /* get shared area for display modes */
-    result = my_mode_list_area = clone_area(
-        "SAVAGE cloned display_modes",
-        (void **)&my_mode_list,
-        B_ANY_ADDRESS,
-        B_READ_AREA,
-        si->mode_area
-    );
-    if (result < B_OK) goto error2;
-
-    /* all done */
-    result = B_OK;
-    goto error0;
+	/* all done */
+	return B_OK;
 
 error2:
-    /* free up the areas we cloned */
-    uninit_common();
+	/* free up the areas we cloned */
+	uninit_common();
 error1:
-    /* close the device we opened */
-    close(fd);
-error0:
-    return result;
+	/* close the device we opened */
+	close(fd);
+	return result;
 }
 
-void UNINIT_ACCELERANT(void)
+
+void
+UNINIT_ACCELERANT(void)
 {
     /* free our mode list area */
     delete_area(my_mode_list_area);
@@ -435,10 +429,13 @@ void UNINIT_ACCELERANT(void)
     /* release our cloned data */
     uninit_common();
     /* close the file handle ONLY if we're the clone */
-    if (accelerantIsClone) close(fd);
+    if (accelerantIsClone)
+    	close(fd);
 }
 
-status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info *adi)
+
+status_t
+GET_ACCELERANT_DEVICE_INFO(accelerant_device_info *adi)
 {
     status_t retval;
     static const char * names1[] = 
@@ -450,41 +447,34 @@ status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info *adi)
         { "ProSavage PN133", "ProSavage KN133", "ProSavage P4M266", "ProSavage8 KM266" };
 
     adi->version = 0x10000;
-    if (si->device_id == PCI_PID_SAVAGE2000)
-    {
+    if (si->device_id == PCI_PID_SAVAGE2000) {
         strcpy (adi->name, "Savage2000");
         strcpy (adi->chipset, "Savage2000");
-    }
-    else
-    {
+    } else {
         const char ** names = NULL;
         int offset = 0;
-        switch (si->device_id & 0xFFF0)
-        {
-        case 0x8a20:
-            names = names1;
-            offset = si->device_id - PCI_PID_SAVAGE3D;
-            break;
-        case 0x8c10:
-            names = names2;
-            offset = si->device_id - PCI_PID_SAVAGEMXMV;
-            break;
-        case 0x8d00:
-            names = names3;
-            offset = si->device_id - PCI_PID_PN133;
-            break;
+        switch (si->device_id & 0xFFF0) {
+			case 0x8a20:
+				names = names1;
+				offset = si->device_id - PCI_PID_SAVAGE3D;
+				break;
+			case 0x8c10:
+				names = names2;
+				offset = si->device_id - PCI_PID_SAVAGEMXMV;
+				break;
+			case 0x8d00:
+				names = names3;
+				offset = si->device_id - PCI_PID_PN133;
+				break;
         }
-	if (names != NULL)
-	{
-            strcpy (adi->name, names[offset]);
-            strcpy (adi->chipset, names[offset]);
-        }
-        else
-        {
-        	strcpy (adi->name, "not supported");
-        	strcpy (adi->chipset, "Savage");
-        }
-    }
+		if (names != NULL) {
+			strcpy (adi->name, names[offset]);
+			strcpy (adi->chipset, names[offset]);
+		} else {
+			strcpy (adi->name, "not supported");
+			strcpy (adi->chipset, "Savage");
+		}
+	}
     strcpy (adi->serial_no, "0");
     adi->memory = si->mem_size;
     adi->dac_speed = 250;
