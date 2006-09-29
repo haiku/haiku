@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics s3savage ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders [ FDirName graphics s3savage ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders graphics kernel ;
+
+KernelAddon s3savage :
+	driver.c
+;
+
+Package haiku-s3savage-cvs :
+	s3savage : 
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-s3savage-cvs : graphics s3savage ;

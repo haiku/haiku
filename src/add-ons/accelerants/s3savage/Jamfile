@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src add-ons accelerants s3savage ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics s3savage ] ;
+
+Addon s3savage.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagement.c
+	GetAccelerantHook.c
+	GetModeInfo.c
+	GlobalData.c
+	InitAccelerant.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+
+	s3accel.c
+	s3drv.c
+	s3vga.c
+
+	: false
+	: be
+;
+
+Package haiku-s3savage-cvs :
+	s3savage.accelerant :
+	boot home config add-ons accelerants ;
+	

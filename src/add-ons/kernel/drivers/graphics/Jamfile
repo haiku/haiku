@@ -7,6 +7,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers graphics matrox ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics neomagic ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics radeon ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics s3savage ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics tdfx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vesa ;
