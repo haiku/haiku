@@ -127,9 +127,15 @@ public:
 		status_t						UninstallNotify(const char *driverName);
 
 private:
+static	int32							ExploreThread(void *data);
+
 		Vector<BusManager *>			fBusManagers;
+		thread_id						fExploreThread;
+		bool							fFirstExploreDone;
+		bool							fStopThreads;
 
 		benaphore						fLock;
+		benaphore						fExploreLock;
 		PhysicalMemoryAllocator			*fAllocator;
 
 		uint32							fObjectIndex;
@@ -176,13 +182,10 @@ protected:
 		bool							fInitOK;
 
 private:
-static	int32							ExploreThread(void *data);
-
 		benaphore						fLock;
 		bool							fDeviceMap[128];
 		ControlPipe						*fDefaultPipes[USB_SPEED_MAX + 1];
 		Hub								*fRootHub;
-		thread_id						fExploreThread;
 		Object							*fRootObject;
 };
 

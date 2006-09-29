@@ -12,8 +12,7 @@
 
 BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
-		fRootHub(NULL),
-		fExploreThread(-1)
+		fRootHub(NULL)
 {
 	if (benaphore_init(&fLock, "usb busmanager lock") < B_OK) {
 		TRACE_ERROR(("usb BusManager: failed to create busmanager lock\n"));
@@ -70,27 +69,6 @@ void
 BusManager::Unlock()
 {
 	benaphore_unlock(&fLock);
-}
-
-
-/*
-	This is the 'main' function of the explore thread, which keeps track of
-	the hub states.
-*/
-int32
-BusManager::ExploreThread(void *data)
-{
-	Hub *rootHub = (Hub *)data;
-	if (!rootHub)
-		return B_ERROR;
-
-	snooze(USB_DELAY_FIRST_EXPLORE);
-	while (true) {
-		rootHub->Explore();
-		snooze(USB_DELAY_HUB_EXPLORE);
-	}
-
-	return B_OK;
 }
 
 
@@ -229,23 +207,13 @@ BusManager::AllocateNewDevice(Hub *parent, usb_speed speed)
 status_t
 BusManager::Start()
 {
-	TRACE(("usb BusManager::Start()\n"));
-	if (InitCheck() != B_OK)
-		return InitCheck();
-
-	if (fExploreThread < 0) {
-		fExploreThread = spawn_kernel_thread(ExploreThread,
-			"usb busmanager explore", B_LOW_PRIORITY, (void *)fRootHub);
-	}
-
-	return resume_thread(fExploreThread);
+	return B_OK;
 }
 
 
 status_t
 BusManager::Stop()
 {
-	// ToDo: implement (should end the explore thread)
 	return B_OK;
 }
 
