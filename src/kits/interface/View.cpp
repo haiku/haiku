@@ -1331,11 +1331,13 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	if (message == NULL)
 		return;
 
-	// TODO: workaround for drags without a bitmap - should not be necessary if
-	//	we move the rectangle dragging into the app_server
-	image = new (nothrow) BBitmap(BRect(0, 0, 0, 0), B_RGBA32);
-	if (image == NULL)
-		return;
+	if (image == NULL) {
+		// TODO: workaround for drags without a bitmap - should not be necessary if
+		//	we move the rectangle dragging into the app_server
+		image = new (nothrow) BBitmap(BRect(0, 0, 0, 0), B_RGBA32);
+		if (image == NULL)
+			return;
+	}
 
 	if (replyTo == NULL)
 		replyTo = this;
