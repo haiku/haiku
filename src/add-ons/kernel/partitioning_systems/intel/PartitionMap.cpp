@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ */
+
 /*!
 	\file PartitionMap.cpp
 	\brief Definitions for "intel" style partitions and implementation
@@ -28,8 +32,8 @@
 
 #include "PartitionMap.h"
 
-#define TRACE(x) ;
-//#define TRACE(x) dprintf x
+//#define TRACE(x) ;
+#define TRACE(x) dprintf x
 
 
 using std::nothrow;

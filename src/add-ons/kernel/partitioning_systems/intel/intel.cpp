@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ */
+
 /*!
 	\file intel.cpp
 	\brief disk_scanner partition module for "intel" style partitions.
@@ -31,8 +35,8 @@
 #include "PartitionMap.h"
 #include "PartitionMapParser.h"
 
-#define TRACE(x) ;
-//#define TRACE(x) dprintf x
+//#define TRACE(x) ;
+#define TRACE(x) dprintf x
 
 // module names
 #define INTEL_PARTITION_MODULE_NAME "partitioning_systems/intel/map/v1"

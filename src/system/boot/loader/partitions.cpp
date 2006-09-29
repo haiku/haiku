@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,7 +19,7 @@
 
 using namespace boot;
 
-//#define TRACE_PARTITIONS
+#define TRACE_PARTITIONS
 #ifdef TRACE_PARTITIONS
 #	define TRACE(x) dprintf x
 #else
@@ -409,7 +409,8 @@ get_child_partition(partition_id id, int32 index)
 	//Partition &partition = *(Partition *)id;
 
 	// ToDo: do we really have to implement this?
-	//	The intel partition module doesn't really needs this for our mission...
+	//	The intel partition module doesn't really need this for our mission...
+	TRACE(("get_child_partition(id = %lu, index = %ld)\n", id, index));
 
 	return NULL;
 }

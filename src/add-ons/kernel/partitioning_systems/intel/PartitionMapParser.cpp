@@ -1,4 +1,11 @@
-// PartitionMapParser.cpp
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ */
+
 
 #ifndef _USER_MODE
 #	include <KernelExport.h>
@@ -14,8 +21,8 @@
 #include "PartitionMap.h"
 #include "PartitionMapParser.h"
 
-#define TRACE(x) ;
-//#define TRACE(x) dprintf x
+//#define TRACE(x) ;
+#define TRACE(x) dprintf x
 
 
 using std::nothrow;
@@ -90,7 +97,7 @@ PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
 			// ignore, if location is bad
 			if (!partition->CheckLocation(fSessionSize, fBlockSize)) {
 				TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
-					"ignoring\n"));
+					"ignoring\n", i));
 				partition->Unset();
 			}
 		}
