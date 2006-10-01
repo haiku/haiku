@@ -48,8 +48,8 @@ haikuOutputDir=$(pwd)
 
 
 # create the object and installation directories for the cross compilation tools
-installDir=$haikuOutputDir/cross-tools
-objDir=$haikuOutputDir/cross-tools-build
+installDir=$haikuOutputDir/cross-tools-legacy
+objDir=$haikuOutputDir/cross-tools-legacyt-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 tmpIncludeDir=$objDir/sysincludes

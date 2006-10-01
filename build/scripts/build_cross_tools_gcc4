@@ -62,8 +62,8 @@ fi
 
 
 # create the object and installation directories for the cross compilation tools
-installDir=$haikuOutputDir/cross-tools
-objDir=$haikuOutputDir/cross-tools-build
+installDir=$haikuOutputDir/cross-tools-gcc4
+objDir=$haikuOutputDir/cross-tools-gcc4-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 tmpIncludeDir=$objDir/sysincludes
