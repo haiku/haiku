@@ -84,9 +84,9 @@ static const struct partition_type kPartitionTypes[] = {
 	{ 0, NULL }
 };
 
+
 // partition_type_string
-static
-const char *
+static const char *
 partition_type_string(uint8 type)
 {
 	int32 i;
@@ -111,7 +111,58 @@ get_partition_type_string(uint8 type, char *buffer)
 }
 
 
-// Partition
+static int
+cmp_partition_offset(const void *p1, const void *p2)
+{
+	const Partition *partition1 = *(const Partition**)p1;
+	const Partition *partition2 = *(const Partition**)p2;
+	if (partition1->Offset() < partition2->Offset())
+		return -1;
+	else if (partition1->Offset() > partition2->Offset())
+		return 1;
+	return 0;
+}
+
+
+static int
+cmp_offset(const void *o1, const void *o2)
+{
+	off_t offset1 = *static_cast<const off_t*>(o1);
+	off_t offset2 = *static_cast<const off_t*>(o2);
+	if (offset1 < offset2)
+		return -1;
+	else if (offset1 > offset2)
+		return 1;
+	return 0;
+}
+
+
+static bool
+is_inside_partitions(off_t location, const Partition **partitions, int32 count)
+{
+	bool result = false;
+	if (count > 0) {
+		// binary search
+		int32 lower = 0;
+		int32 upper = count - 1;
+		while (lower < upper) {
+			int32 mid = (lower + upper) / 2;
+			const Partition *midPartition = partitions[mid];
+			if (location >= midPartition->Offset() + midPartition->Size())
+				lower = mid + 1;
+			else
+				upper = mid;
+		}
+		const Partition *partition = partitions[lower];
+		result = (location >= partition->Offset() &&
+				  location < partition->Offset() + partition->Size());
+	}
+	return result;
+}
+
+
+//	#pragma mark - Partition
+
 
 // constructor
 Partition::Partition()
@@ -161,21 +212,35 @@ Partition::Unset()
 	fActive = false;
 }
 
-// CheckLocation
+
+#ifdef _BOOT_MODE
+void
+Partition::AdjustSize(off_t sessionSize)
+{
+	// To work around buggy (or older) BIOS, we shrink the partition size to
+	// always fit into its session - this should improve detection of boot
+	// partitions (see bug #238 for more information)
+	if (sessionSize > fOffset + fSize)
+		fSize = sessionSize - fOffset;
+}
+#endif
+
+
 bool
 Partition::CheckLocation(off_t sessionSize, int32 blockSize) const
 {
 	// offsets and size must be block aligned, PTS and partition must lie
 	// within the session
-	return (fPTSOffset % blockSize == 0
-			&& fOffset % blockSize == 0
-			&& fSize % blockSize == 0
-			&& fPTSOffset >= 0 && fPTSOffset < sessionSize
-			&& fOffset >= 0 && fOffset + fSize <= sessionSize);
+	return fPTSOffset % blockSize == 0
+		&& fOffset % blockSize == 0
+		&& fSize % blockSize == 0
+		&& fPTSOffset >= 0 && fPTSOffset < sessionSize
+		&& fOffset >= 0 && fOffset + fSize <= sessionSize;
 }
 
 
-// PrimaryPartition
+//	#pragma mark - PrimaryPartition
+
 
 // constructor
 PrimaryPartition::PrimaryPartition()
@@ -249,7 +314,8 @@ PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
 }
 
 
-// LogicalPartition
+//	#pragma mark - LogicalPartition
+
 
 // constructor
 LogicalPartition::LogicalPartition()
@@ -295,7 +361,8 @@ LogicalPartition::Unset()
 }
 
 
-// PartitionMap
+//	#pragma mark - PartitionMap
+
 
 // constructor
 PartitionMap::PartitionMap()
@@ -385,59 +452,6 @@ const Partition *
 PartitionMap::PartitionAt(int32 index) const
 {
 	return const_cast<PartitionMap*>(this)->PartitionAt(index);
-}
-
-// cmp_partition_offset
-static
-int
-cmp_partition_offset(const void *p1, const void *p2)
-{
-	const Partition *partition1 = *(const Partition**)p1;
-	const Partition *partition2 = *(const Partition**)p2;
-	if (partition1->Offset() < partition2->Offset())
-		return -1;
-	else if (partition1->Offset() > partition2->Offset())
-		return 1;
-	return 0;
-}
-
-// cmp_offset
-static
-int
-cmp_offset(const void *o1, const void *o2)
-{
-	off_t offset1 = *static_cast<const off_t*>(o1);
-	off_t offset2 = *static_cast<const off_t*>(o2);
-	if (offset1 < offset2)
-		return -1;
-	else if (offset1 > offset2)
-		return 1;
-	return 0;
-}
-
-// is_inside_partitions
-static
-bool
-is_inside_partitions(off_t location, const Partition **partitions, int32 count)
-{
-	bool result = false;
-	if (count > 0) {
-		// binary search
-		int32 lower = 0;
-		int32 upper = count - 1;
-		while (lower < upper) {
-			int32 mid = (lower + upper) / 2;
-			const Partition *midPartition = partitions[mid];
-			if (location >= midPartition->Offset() + midPartition->Size())
-				lower = mid + 1;
-			else
-				upper = mid;
-		}
-		const Partition *partition = partitions[lower];
-		result = (location >= partition->Offset() &&
-				  location < partition->Offset() + partition->Size());
-	}
-	return result;
 }
 
 // Check

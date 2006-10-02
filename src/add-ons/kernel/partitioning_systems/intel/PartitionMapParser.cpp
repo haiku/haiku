@@ -88,45 +88,50 @@ PartitionMapParser::Parse(const uint8 *block, PartitionMap *map)
 status_t
 PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
 {
-	status_t error = (pts ? B_OK : B_BAD_VALUE);
+	if (pts == NULL)
+		return B_BAD_VALUE;
+
 	// check the signature
-	if (error == B_OK && pts->signature != kPartitionTableSectorSignature) {
+	if (pts->signature != kPartitionTableSectorSignature) {
 		TRACE(("intel: _ParsePrimary(): invalid PTS signature\n"));
-		error = B_BAD_DATA;
+		return B_BAD_DATA;
 	}
+
 	// examine the table
-	if (error == B_OK) {
-		for (int32 i = 0; i < 4; i++) {
-			const partition_descriptor *descriptor = &pts->table[i];
-			PrimaryPartition *partition = fMap->PrimaryPartitionAt(i);
-			partition->SetTo(descriptor, 0, fBlockSize);
-			// ignore, if location is bad
-			if (!partition->CheckLocation(fSessionSize, fBlockSize)) {
-				TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
-					"ignoring\n", i));
-				partition->Unset();
-			}
+	for (int32 i = 0; i < 4; i++) {
+		const partition_descriptor *descriptor = &pts->table[i];
+		PrimaryPartition *partition = fMap->PrimaryPartitionAt(i);
+		partition->SetTo(descriptor, 0, fBlockSize);
+
+#ifdef _BOOT_MODE
+		// work-around potential BIOS problems
+		partition->AdjustSize(fSessionSize);
+#endif
+		// ignore, if location is bad
+		if (!partition->CheckLocation(fSessionSize, fBlockSize)) {
+			TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
+				"ignoring\n", i));
+			partition->Unset();
 		}
 	}
+
 	// allocate a PTS buffer
-	if (error == B_OK) {
-		fPTS = new(nothrow) partition_table_sector;
-		if (!fPTS)
-			error = B_NO_MEMORY;
-	}
+	fPTS = new(nothrow) partition_table_sector;
+	if (fPTS == NULL)
+		return B_NO_MEMORY;
+
 	// parse extended partitions
-	if (error == B_OK) {
-		for (int32 i = 0; error == B_OK && i < 4; i++) {
-			PrimaryPartition *primary = fMap->PrimaryPartitionAt(i);
-			if (primary->IsExtended())
-				error = _ParseExtended(primary, primary->Offset());
-		}
+	status_t error = B_OK;
+	for (int32 i = 0; error == B_OK && i < 4; i++) {
+		PrimaryPartition *primary = fMap->PrimaryPartitionAt(i);
+		if (primary->IsExtended())
+			error = _ParseExtended(primary, primary->Offset());
 	}
+
 	// cleanup
-	if (fPTS) {
-		delete fPTS;
-		fPTS = NULL;
-	}
+	delete fPTS;
+	fPTS = NULL;
+
 	return error;
 }
 
@@ -193,6 +198,11 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 								   "non-extended partition allowed\n"));
 						}
 					}
+#ifdef _BOOT_MODE
+					// work-around potential BIOS problems
+					if (partition)
+						partition->AdjustSize(fSessionSize);
+#endif
 					// check the partition's location
 					if (partition && !partition->CheckLocation(fSessionSize,
 															   fBlockSize)) {

@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ */
+
 /*!
 	\file PartitionMap.h
 	\brief Definitions for "intel" style partitions and interface definitions
@@ -104,6 +108,9 @@ public:
 	void SetActive(bool active)		{ fActive = active; }
 
 	bool CheckLocation(off_t sessionSize, int32 blockSize) const;
+#ifdef _BOOT_MODE
+	void AdjustSize(off_t sessionSize);
+#endif
 
 private:
 	off_t	fPTSOffset;
