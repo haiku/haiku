@@ -42,8 +42,7 @@ _BTextGapBuffer_::~_BTextGapBuffer_()
 
 
 void
-_BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems,
-								  int32 inAtIndex)
+_BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems, int32 inAtIndex)
 {
 	if (inNumItems < 1)
 		return;
@@ -169,15 +168,15 @@ _BTextGapBuffer_::SizeGapTo(long inCount)
 
 
 const char *
-_BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes, int32 *returnedBytes)
+_BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 {
 	char *result = "";
-	
-	if (numBytes < 1) {
-		if (returnedBytes != NULL)
-			*returnedBytes = 0;
+	if (_numBytes == NULL)
 		return result;
-	}
+
+	int32 numBytes = *_numBytes;
+	if (numBytes < 1)
+		return result;
 	
 	bool isStartBeforeGap = (fromOffset < fGapIndex);
 	bool isEndBeforeGap = ((fromOffset + numBytes - 1) < fGapIndex);
@@ -199,9 +198,6 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes, int32 *returnedByt
 		result = fScratchBuffer;
 	}
 
-	if (returnedBytes != NULL)
-		*returnedBytes = numBytes;
-
 	// TODO: this could be improved. We are overwriting what we did some lines ago,
 	// we could just avoid to do that.
 	if (fPasswordMode) {
@@ -220,8 +216,7 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numBytes, int32 *returnedByt
 			scratchPtr += charLen;
 		}
 		scratchPtr = '\0';	
-		if (returnedBytes != NULL)
-			*returnedBytes = newSize - 1;	
+		*_numBytes = newSize - 1;	
 	}
 
 	return result;

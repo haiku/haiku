@@ -34,7 +34,7 @@ virtual				~_BTextGapBuffer_();
 
 		
 //		char 		*RealText();
-		const char 	*GetString(int32 fromOffset, int32 numBytes, int32 *returnedBytes);
+		const char 	*GetString(int32 fromOffset, int32 *numBytes);
 		void		GetString(int32 offset, int32 length, char *buffer);
 		
 		char		RealCharAt(int32 offset) const;

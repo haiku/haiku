@@ -3574,18 +3574,18 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	BRegion inputRegion;
 	if (fInline != NULL && fInline->IsActive())
 		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
-
-	float startLeft = fTextRect.left;
-	if (startOffset != -1) {
-		startLeft = PointAt(startOffset).x;
-		if (ByteAt(startOffset) == B_ENTER) {
-			// StartOffset is a newline
-			startLeft = PointAt((*fLines)[startLine]->offset).x;
-		}
-	}
 	
-	BPoint leftTop(startLeft, line->origin);
+	//BPoint leftTop(startLeft, line->origin);
 	for (long i = startLine; i <= endLine; i++) {
+		float startLeft = fTextRect.left;
+		if (startOffset != -1) {
+			startLeft = PointAt(startOffset).x;
+			if (ByteAt(startOffset) == B_ENTER) {
+				// StartOffset is a newline
+				startLeft = PointAt((*fLines)[i]->offset).x;
+			}
+		}
+		
 		long length = (line + 1)->offset;
 		if (startOffset != -1)
 			length -= startOffset;
@@ -3665,9 +3665,8 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 						view->PopState();
 					}
 					
-					int32 returnedBytes = 0;
-					const char *string = fText->GetString(offset, tabChars, &returnedBytes);
-					view->DrawString(string, returnedBytes);
+					int32 returnedBytes = tabChars;
+					view->DrawString(fText->GetString(offset, &returnedBytes), returnedBytes);
 					
 					if (foundTab) {
 						float penPos = PenLocation().x - fTextRect.left;
@@ -3705,9 +3704,9 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		
 	if (fOffscreen != NULL) {
 		view->Sync();
-		BPoint penLocation = view->PenLocation();
+		/*BPoint penLocation = view->PenLocation();
 		BRect drawRect(leftTop.x, leftTop.y, penLocation.x, penLocation.y);
-		DrawBitmap(fOffscreen, drawRect, drawRect);
+		DrawBitmap(fOffscreen, drawRect, drawRect);*/
 		fOffscreen->Unlock();
 	}
 
