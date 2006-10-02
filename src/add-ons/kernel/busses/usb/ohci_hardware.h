@@ -296,42 +296,41 @@ struct ohci_hcca
 
 typedef struct ohci_endpoint_descriptor
 {
-	uint32		ed_flags;
-	addr_t		ed_qtailp;				// Queue tail pointer
-	addr_t		ed_qheadp;				// Queue head pointer
+	uint32		flags;
+	addr_t		tailp;				// Queue tail pointer
+	addr_t		headp;				// Queue head pointer
 	addr_t		next_endpoint;		// Next endpoint in the list
 };
 
-#define OHCI_ED_GET_FA(s)			((s) & 0x7f)
-#define OHCI_ED_ADDRMASK			0x0000007f
-#define OHCI_ED_SET_FA(s)			(s)
-#define OHCI_ED_GET_EN(s)			(((s) >> 7) & 0xf)
-#define OHCI_ED_SET_EN(s)			((s) << 7)
-#define OHCI_ED_DIR_MASK			0x00001800
-#define  	OHCI_ED_DIR_TD			0x00000000
-#define  	OHCI_ED_DIR_OUT			0x00000800
-#define  	OHCI_ED_DIR_IN			0x00001000
-#define OHCI_ED_SPEED				0x00002000
-#define OHCI_ED_SKIP				0x00004000
-#define OHCI_ED_FORMAT_GEN			0x00000000
-#define OHCI_ED_FORMAT_ISO			0x00008000
-#define OHCI_ED_GET_MAXP(s)			(((s) >> 16) & 0x07ff)
-#define OHCI_ED_SET_MAXP(s)			((s) << 16)
-#define OHCI_ED_MAXPMASK			(0x7ff << 16)
+#define OHCI_ENDPOINT_GET_FA(s)		((s) & 0x7f)
+#define OHCI_ENDPOINT_ADDRMASK		0x0000007f
+#define OHCI_ENDPOINT_SET_FA(s)		(s)
+#define OHCI_ENDPOINT_GET_EN(s)		(((s) >> 7) & 0xf)
+#define OHCI_ENDPOINT_SET_EN(s)		((s) << 7)
+#define OHCI_ENDPOINT_DIR_MASK		0x00001800
+#define  	OHCI_ENDPOINT_DIR_TD	0x00000000
+#define  	OHCI_ENDPOINT_DIR_OUT	0x00000800
+#define  	OHCI_ENDPOINT_DIR_IN	0x00001000
+#define OHCI_ENDPOINT_SPEED			0x00002000
+#define OHCI_ENDPOINT_SKIP			0x00004000
+#define OHCI_ENDPOINT_FORMAT_GEN	0x00000000
+#define OHCI_ENDPOINT_FORMAT_ISO	0x00008000
+#define OHCI_ENDPOINT_GET_MAXP(s)	(((s) >> 16) & 0x07ff)
+#define OHCI_ENDPOINT_SET_MAXP(s)	((s) << 16)
+#define OHCI_ENDPOINT_MAXPMASK		(0x7ff << 16)
 
 #define OHCI_HALTED					0x00000001
 #define OHCI_TOGGLECARRY			0x00000002
 #define OHCI_HEADMASK				0xfffffffc
 
-#define OHCI_ED_ALIGN 16
 
 // --------------------------------
 //	General transfer descriptor structure (section 4.3.1)
 // --------------------------------
 
-typedef struct hc_transfer_descriptor
+typedef struct ohci_transfer_descriptor
 {
-	uint32		td_flags;
+	uint32		flags;
 	addr_t		td_cbp;			// Current Buffer Pointer 
 	addr_t 		td_nexttd;		// Next Transfer Descriptor 
 	addr_t 		td_be;			// Buffer End 

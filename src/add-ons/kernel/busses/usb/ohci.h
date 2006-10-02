@@ -34,7 +34,8 @@
 struct pci_info;
 struct pci_module_info;
 class OHCIRootHub;
-class Endpoint;
+struct Endpoint;
+struct TransferDescriptor;
 
 // --------------------------------
 //	OHCI: 	The OHCI class derived 
@@ -50,6 +51,9 @@ public:
 	~OHCI();
 	status_t					Start();
 	status_t 					SubmitTransfer(Transfer *t); 	//Override from BusManager. 
+	status_t					NotifyPipeChange(Pipe *pipe,    //Override from BusManager.
+								                 usb_change change);
+
 	static pci_module_info 		*pci_module; 					// Global data for the module.
 
 	status_t GetPortStatus(uint8 index, usb_port_status *status);
@@ -81,7 +85,11 @@ private:
 	uint8						fNumPorts;				// the number of ports
 	// functions
 	Endpoint					*AllocateEndpoint(); 	// allocate memory for an endpoint
-	void						FreeEndpoint(Endpoint *end); //Free endpoint
+	void						FreeEndpoint(Endpoint *end); // Free endpoint
+	TransferDescriptor			*AllocateTransfer();    // create a NULL transfer
+	void						FreeTransfer(TransferDescriptor *trans); // Free transfer
+
+	status_t					InsertEndpointForPipe(Pipe *p);
 };
 
 // --------------------------------
@@ -106,12 +114,25 @@ struct Endpoint
 	addr_t						physicaladdress;//Point to the physical address
 	ohci_endpoint_descriptor	*ed;			//Logical 'endpoint'
 	Endpoint					*next;			//Pointer to the 'next' endpoint
+	TransferDescriptor			*head, *tail;	//Pointers to the 'head' and 'tail' transfer descriptors
 
 	//Utility functions
 	void SetNext(Endpoint *end) {
 		next = end;
-		ed->next_endpoint = end->physicaladdress;
+		if (end == 0)
+			ed->next_endpoint = 0;
+		else
+			ed->next_endpoint = end->physicaladdress;
 	}; 
+	
+	//Constructor (or better: initialiser)
+	Endpoint() : physicaladdress(0), ed(0), next(0), head(0), tail(0) {};
+};
+
+struct TransferDescriptor
+{
+	addr_t						physicaladdress;
+	ohci_transfer_descriptor	*td;
 };
 
 #endif // OHCI_H

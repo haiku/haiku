@@ -363,6 +363,9 @@ OHCI::~OHCI()
 status_t
 OHCI::Start()
 {
+	if (InitCheck())
+		return B_ERROR;
+	
 	if (!(ReadReg(OHCI_CONTROL) & OHCI_HCFS_OPERATIONAL)) {
 		TRACE(("USB OHCI::Start(): Controller not started. TODO: find out what happens.\n"));
 		return B_ERROR;
@@ -395,6 +398,25 @@ status_t OHCI::SubmitTransfer( Transfer *t )
 		return fRootHub->ProcessTransfer(t, this);
 
 	return B_ERROR;
+}
+
+status_t
+OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
+{
+	if (InitCheck())
+		return B_ERROR;
+
+	switch (change) {
+	case USB_CHANGE_CREATED:
+		return InsertEndpointForPipe(pipe);
+	case USB_CHANGE_DESTROYED:
+		// Do something
+		return B_ERROR;
+	case USB_CHANGE_PIPE_POLICY_CHANGED:
+	default:
+		break;
+	}
+	return B_ERROR; //We should never go here
 }
 
 status_t
@@ -481,7 +503,8 @@ OHCI::ClearPortFeature(uint8 index, uint16 feature)
 Endpoint *
 OHCI::AllocateEndpoint()
 {
-	Endpoint *endpoint = new Endpoint;
+	//Allocate memory chunk
+	Endpoint *endpoint = new(std::nothrow) Endpoint;
 	void *phy;
 	if (fStack->AllocateChunk((void **)&endpoint->ed, &phy, sizeof(ohci_endpoint_descriptor)) != B_OK) {
 		TRACE(("OHCI::AllocateEndpoint(): Error Allocating Endpoint\n"));
@@ -489,8 +512,15 @@ OHCI::AllocateEndpoint()
 	}
 	endpoint->physicaladdress = (addr_t)phy;
 	
+	//Initialize the physical part
 	memset((void *)endpoint->ed, 0, sizeof(ohci_endpoint_descriptor));
-	endpoint->ed->ed_flags = OHCI_ED_SKIP;
+	endpoint->ed->flags = OHCI_ENDPOINT_SKIP;
+	
+	//Add a NULL list by creating one TransferDescriptor
+	TransferDescriptor *trans = new(std::nothrow) TransferDescriptor;
+	endpoint->head = endpoint->tail = trans;
+	endpoint->ed->headp = endpoint->ed->tailp = trans->physicaladdress; 
+	
 	return endpoint;
 }
 
@@ -501,6 +531,122 @@ OHCI::FreeEndpoint(Endpoint *end)
 	delete end;
 }
 
+TransferDescriptor *
+OHCI::AllocateTransfer()
+{
+	TransferDescriptor *transfer = new TransferDescriptor;
+	void *phy;
+	if (fStack->AllocateChunk((void **)&transfer->td, &phy, sizeof(ohci_transfer_descriptor)) != B_OK) {
+		TRACE(("OHCI::AllocateTransfer(): Error Allocating Transfer\n"));
+		return 0;
+	}
+	transfer->physicaladdress = (addr_t)phy;
+	memset((void *)transfer->td, 0, sizeof(ohci_transfer_descriptor));
+	return transfer;
+}	
+	
+void
+OHCI::FreeTransfer(TransferDescriptor *trans)
+{
+	fStack->FreeChunk((void *)trans->td, (void *) trans->physicaladdress, sizeof(ohci_transfer_descriptor));
+	delete trans;
+}
+
+status_t
+OHCI::InsertEndpointForPipe(Pipe *p)
+{
+	TRACE(("OHCI: Inserting Endpoint for device %u function %u\n", p->DeviceAddress(), p->EndpointAddress()));
+
+	if (InitCheck())
+		return B_ERROR;
+	
+	Endpoint *endpoint = AllocateEndpoint();
+	if (!endpoint)
+		return B_NO_MEMORY;
+	
+	//Set up properties of the endpoint
+	//TODO: does this need its own utility function?
+	{
+		uint32 properties = 0;
+		
+		//Set the device address
+		properties |= OHCI_ENDPOINT_SET_FA(p->DeviceAddress());
+		
+		//Set the endpoint number
+		properties |= OHCI_ENDPOINT_SET_EN(p->EndpointAddress());
+		
+		//Set the direction
+		switch (p->Direction()) {
+		case Pipe::In:
+			properties |= OHCI_ENDPOINT_DIR_IN;
+			break;
+		case Pipe::Out:
+			properties |= OHCI_ENDPOINT_DIR_OUT;
+			break;
+		case Pipe::Default:
+			properties |= OHCI_ENDPOINT_DIR_TD;
+			break;
+		default:
+			//TODO: error
+			break;
+		}
+		
+		//Set the speed
+		switch (p->Speed()) {
+		case USB_SPEED_LOWSPEED:
+			//the bit is 0
+			break;
+		case USB_SPEED_FULLSPEED:
+			properties |= OHCI_ENDPOINT_SPEED;
+			break;
+		case USB_SPEED_HIGHSPEED:
+		default:
+			//TODO: error
+			break;
+		}
+		
+		//Assign the format. Isochronous endpoints require this switch
+		if (p->Type() & USB_OBJECT_ISO_PIPE)
+			properties |= OHCI_ENDPOINT_FORMAT_ISO;
+		
+		//Set the maximum packet size
+		properties |= OHCI_ENDPOINT_SET_MAXP(p->MaxPacketSize());
+		
+		endpoint->ed->flags = properties;
+	}
+	
+	//Check which list we need to add the endpoint in
+	Endpoint *listhead;
+	switch (p->Type()) {
+	case USB_OBJECT_CONTROL_PIPE:
+		listhead = fDummyControl;
+		break;
+	case USB_OBJECT_BULK_PIPE:
+		listhead = fDummyBulk;
+		break;
+	case USB_OBJECT_ISO_PIPE:
+		listhead = fDummyIsochronous;
+		break;
+	default:
+		FreeEndpoint(endpoint);
+		return B_ERROR;
+	}
+
+	//Add the endpoint to the queues
+	if (p->Type() != USB_OBJECT_ISO_PIPE) {
+		//Link the endpoint into the head of the list
+		endpoint->SetNext(listhead->next);
+		listhead->SetNext(endpoint);
+	} else { 
+		//Link the endpoint into the tail of the list
+		Endpoint *tail = listhead;
+		while (tail->next != 0)
+			tail = tail->next;
+		tail->SetNext(endpoint);
+	}
+
+	return B_OK;
+}
 
 pci_module_info *OHCI::pci_module = 0;
 

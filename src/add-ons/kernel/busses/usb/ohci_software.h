@@ -32,28 +32,6 @@
 #include "ohci_hardware.h"
 
 
-// ------------------------------------
-//	OHCI:: 	Software general 
-//			transfer descriptor
-// ------------------------------------
-
-typedef struct hcd_soft_transfer 
-{
-	hc_transfer_descriptor			td;
-	struct hcd_soft_transfer		*nexttd; 	// mirrors nexttd in TD
-	struct hcd_soft_trasfer			*dnext; 	// next in done list
-	addr_t 							physaddr;	// physical address to the host controller transfer
-	//LIST_ENTRY(hcd_soft_transfer) 	hnext;
-	uint16 							len;		// the lenght
-	uint16 							flags;		// flags
-}hcd_soft_transfer;
-
-#define OHCI_CALL_DONE	0x0001
-#define OHCI_ADD_LEN	0x0002
-
-#define OHCI_STD_SIZE ((sizeof (struct hcd_soft_transfer) + OHCI_TD_ALIGN - 1) / OHCI_TD_ALIGN * OHCI_TD_ALIGN)
-#define OHCI_STD_CHUNK 128
-
 // --------------------------------------
 //	OHCI:: 	Software isonchronous 
 //			transfer descriptor
@@ -80,10 +58,5 @@ typedef struct  hcd_soft_itransfer
 
 #define OHCI_NO_EDS (2*OHCI_NO_INTRS-1)
 
-// --------------------------
-//	OHCI:: Hash size for the 
-// --------------------------
-
-#define OHCI_HASH_SIZE 128
 
 #endif // OHCI_SOFT
