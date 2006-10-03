@@ -1328,9 +1328,9 @@ BContainerWindow::ResizeToFit()
 	MoveTo(frame.LeftTop());
 	PoseView()->DisableScrollBars();
 
-	if (PoseView()->Bounds().bottom > extent.bottom)
+	if (PoseView()->Bounds().bottom > extent.bottom && PoseView()->Bounds().top < 0)
 		PoseView()->ScrollBy(0, extent.bottom - PoseView()->Bounds().bottom);
-	if (PoseView()->Bounds().right > extent.right)
+	if (PoseView()->Bounds().right > extent.right && PoseView()->Bounds().left < 0)
 		PoseView()->ScrollBy(extent.right - PoseView()->Bounds().right, 0);
 
 	PoseView()->UpdateScrollRange();
