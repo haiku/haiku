@@ -220,7 +220,7 @@ Partition::AdjustSize(off_t sessionSize)
 	// To work around buggy (or older) BIOS, we shrink the partition size to
 	// always fit into its session - this should improve detection of boot
 	// partitions (see bug #238 for more information)
-	if (sessionSize > fOffset + fSize)
+	if (sessionSize < fOffset + fSize)
 		fSize = sessionSize - fOffset;
 }
 #endif
