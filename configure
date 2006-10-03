@@ -26,25 +26,13 @@ options:
                               Assume cross compilation. <build tools dir>
                               defines the location of the build tools sources.
                               They will be compiled and placed in the output
-                              directory under "cross-tools-legacy". The HAIKU_* 
-                              tools variables will be set accordingly.
+                              directory under "cross-tools". The HAIKU_* tools
+                              variables will be set accordingly.
   --build-cross-tools-gcc4 <arch> <build tools dir>
                               Like "--build-cross-tools" just that gcc 4 will
-                              be used for cross-compilation and the cross-tools
-                              will be placed in the output directory under 
-                              "cross-tools-current". Note, that the resulting
-                              Haiku installation built with gcc 4 will not be
-                              binary compatible with BeOS R5.
-                              <arch> specifies the target architecture, either
-                              "x86" or "ppc".
-  --use-cross-tools
-                              Selects the cross-tools from "cross-tools-legacy"
-                              for compilation. The HAIKU_* tools variables will 
-                              be set accordingly.
-  --use-cross-tools-gcc4 <arch>
-                              Selects the cross-tools from "cross-tools-gcc4"
-                              for compilation. The HAIKU_* tools variables will 
-                              be set accordingly.
+                              be used for cross-compilation. Note, that the
+                              resulting Haiku installation built with gcc 4
+                              will not be binary compatible with BeOS R5.
                               <arch> specifies the target architecture, either
                               "x86" or "ppc".
   --target=TARGET             Select build target platform. [default=${target}]
@@ -248,10 +236,7 @@ while [ $# -gt 0 ] ; do
 		--bochs-debug)	bochs_debug=1; shift 1;;
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--cross-tools-prefix) assertparam "$1" $#; crossToolsPrefix=$2; shift 2;;
-		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; 
-						crossToolsFolder="cross-tools-legacy";
-						shift 2;;
-		--use-cross-tools) crossToolsFolder="cross-tools-legacy"; shift 1;;
+		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--build-cross-tools-gcc4) assertparams "$1" 2 $#; buildCrossTools=$3;
 						buildCrossToolsScript="${buildCrossToolsScript}_gcc4";
 						case "$2" in
@@ -260,19 +245,8 @@ while [ $# -gt 0 ] ; do
 							*)		echo "Unsupported target architecture: $2"
 									exit 1;;
 						esac
-						buildCrossToolsMachine=$haikuGCCMachine;
-						crossToolsFolder="cross-tools-gcc4";
+						buildCrossToolsMachine=$haikuGCCMachine
 						shift 3;;
-		--use-cross-tools-gcc4) assertparam "$1" $#;
-						case "$2" in
-							x86)	haikuGCCMachine=i586-pc-haiku;;
-							ppc)	haikuGCCMachine=powerpc-apple-haiku;;
-							*)		echo "Unsupported target architecture: $2"
-									exit 1;;
-						esac
-						buildCrossToolsMachine=$haikuGCCMachine;
-						crossToolsFolder="cross-tools-gcc4"; 
-						shift 2;;
 		--help | -h)	usage; exit 0;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
@@ -321,11 +295,7 @@ mkdir -p "$buildOutputDir" || exit 1
 if [ -n "$buildCrossTools" ]; then
 	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
 		"$buildCrossTools" "$outputDir" || exit 1
-fi
-
-# use specified cross tools
-if [ -n "$crossToolsFolder" ]; then
-	crossToolsPrefix="$outputDir/$crossToolsFolder/bin/${haikuGCCMachine}-"
+	crossToolsPrefix="$outputDir/cross-tools/bin/${haikuGCCMachine}-"
 fi
 
 # cross tools
