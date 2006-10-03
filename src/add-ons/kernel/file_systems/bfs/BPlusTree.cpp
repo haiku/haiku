@@ -1641,11 +1641,9 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 			return B_IO_ERROR;
 
 		// if it's an empty root node, we have to convert it
-		// to a leaf node by dropping the overflow link, or,
-		// if it's a leaf node, just empty it
+		// to a leaf node by dropping the overflow link
 		if (nodeAndKey.nodeOffset == fHeader->RootNode()
-			&& node->NumKeys() == 0
-			|| node->NumKeys() == 1 && node->IsLeaf()) {
+			&& node->NumKeys() == 0) {
 			writableNode->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 			writableNode->all_key_count = 0;
 			writableNode->all_key_length = 0;
@@ -1883,8 +1881,11 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 {
 	if (fTree == NULL)
 		return B_INTERRUPTED;
+	
+	bool forward = direction == BPLUSTREE_FORWARD;
+
 	if (fCurrentNodeOffset == BPLUSTREE_NULL
-		&& Goto(direction == BPLUSTREE_FORWARD ? BPLUSTREE_BEGIN : BPLUSTREE_END) < B_OK) 
+		&& Goto(forward ? BPLUSTREE_BEGIN : BPLUSTREE_END) < B_OK) 
 		RETURN_ERROR(B_ERROR);
 
 	// if the tree was emptied since the last call
@@ -1928,6 +1929,8 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 	}
 
 	off_t savedNodeOffset = fCurrentNodeOffset;
+	int32 savedKey = fCurrentKey;
+
 	if ((node = cached.SetTo(fCurrentNodeOffset)) == NULL)
 		RETURN_ERROR(B_ERROR);
 
@@ -1935,11 +1938,11 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 		*duplicate = 0;
 
 	fCurrentKey += direction;
-	
+
 	// is the current key in the current node?
-	while ((direction == BPLUSTREE_FORWARD && fCurrentKey >= node->NumKeys())
-			|| (direction == BPLUSTREE_BACKWARD && fCurrentKey < 0)) {
-		fCurrentNodeOffset = direction == BPLUSTREE_FORWARD ? node->RightLink() : node->LeftLink();
+	while ((forward && fCurrentKey >= node->NumKeys())
+			|| (!forward && fCurrentKey < 0)) {
+		fCurrentNodeOffset = forward ? node->RightLink() : node->LeftLink();
 
 		// are there any more nodes?
 		if (fCurrentNodeOffset != BPLUSTREE_NULL) {
@@ -1948,11 +1951,11 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 				RETURN_ERROR(B_ERROR);
 
 			// reset current key
-			fCurrentKey = direction == BPLUSTREE_FORWARD ? 0 : node->NumKeys();
+			fCurrentKey = forward ? 0 : node->NumKeys();
 		} else {
 			// there are no nodes left, so turn back to the last key
 			fCurrentNodeOffset = savedNodeOffset;
-			fCurrentKey = direction == BPLUSTREE_FORWARD ? node->NumKeys() : -1;
+			fCurrentKey = savedKey;
 
 			return B_ENTRY_NOT_FOUND;
 		}
@@ -1971,7 +1974,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 
 	length = min_c(length, maxLength);
 	memcpy(key, keyStart, length);
-	
+
 	if (fTree->fHeader->data_type == BPLUSTREE_STRING_TYPE)	{
 		// terminate string type
 		if (length == maxLength)
