@@ -1637,11 +1637,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - point size
-			// 4) float - rotation
-			// 5) uint32 - flags
-			// 6) int32 - numChars
-			// 7) char - char     -\       both
-			// 8) BPoint - offset -/ (numChars times)
+			// 4) uint8 - spacing
+			// 5) float - rotation
+			// 6) uint32 - flags
+			// 7) int32 - numChars
+			// 8) char - char     -\       both
+			// 9) BPoint - offset -/ (numChars times)
 
 			// Returns:
 			// 1) BPoint - escapement
@@ -1650,10 +1651,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint16 familyID, styleID;
 			uint32 flags;
 			float size, rotation;
+			uint8 spacing;
 
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 			link.Read<float>(&size);
+			link.Read<uint8>(&spacing);
 			link.Read<float>(&rotation);
 			link.Read<uint32>(&flags);
 
@@ -1676,6 +1679,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
 				font.SetSize(size);
+				font.SetSpacing(spacing);
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
@@ -1716,15 +1720,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - point size
-			// 4) float - rotation
-			// 5) uint32 - flags
+			// 4) uint8 - spacing
+			// 5) float - rotation
+			// 6) uint32 - flags
 
-			// 6) float - additional "nonspace" delta
-			// 7) float - additional "space" delta
+			// 7) float - additional "nonspace" delta
+			// 8) float - additional "space" delta
 
-			// 8) int32 - numChars
-			// 9) int32 - numBytes
-			// 10) char - the char buffer with size numBytes
+			// 9) int32 - numChars
+			// 10) int32 - numBytes
+			// 11) char - the char buffer with size numBytes
 
 			// Returns:
 			// 1) float - escapement buffer with numChar entries
@@ -1732,10 +1737,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint16 familyID, styleID;
 			uint32 flags;
 			float size, rotation;
-			
+			uint8 spacing;
+
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 			link.Read<float>(&size);
+			link.Read<uint8>(&spacing);
 			link.Read<float>(&rotation);
 			link.Read<uint32>(&flags);
 
@@ -1759,6 +1766,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
 				font.SetSize(size);
+				font.SetSpacing(spacing);
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 

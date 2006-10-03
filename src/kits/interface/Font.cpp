@@ -1047,6 +1047,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
+	link.Attach<uint8>(fSpacing);
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
 
@@ -1088,6 +1089,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
+	link.Attach<uint8>(fSpacing);
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
 
