@@ -32,9 +32,6 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <string.h>
-#include <stdlib.h>
-
 #include <Debug.h>
 #include <AppDefs.h>
 #include <InterfaceDefs.h>
@@ -44,6 +41,11 @@ All rights reserved.
 #include "PoseView.h"
 #include "Utilities.h"
 #include "ViewState.h"
+
+#include <new>
+#include <string.h>
+#include <stdlib.h>
+
 
 const char *kColumnVersionName = "BColumn:version";
 const char *kColumnTitleName = "BColumn:fTitle";
@@ -56,24 +58,40 @@ const char *kColumnAttrTypeName = "BColumn:fAttrType";
 const char *kColumnStatFieldName = "BColumn:fStatField";
 const char *kColumnEditableName = "BColumn:fEditable";
 
-BColumn::BColumn(const char *title, float offset, float width, alignment a,
-	const char *attributeName, uint32 attr_type, bool stat_field,
-	bool editable)
-	:	fTitle(title),
-		fAttrName(attributeName)
+const char *kViewStateVersionName = "ViewState:version";
+const char *kViewStateViewModeName = "ViewState:fViewMode";
+const char *kViewStateLastIconModeName = "ViewState:fLastIconMode";
+const char *kViewStateListOriginName = "ViewState:fListOrigin";
+const char *kViewStateIconOriginName = "ViewState:fIconOrigin";
+const char *kViewStatePrimarySortAttrName = "ViewState:fPrimarySortAttr";
+const char *kViewStatePrimarySortTypeName = "ViewState:fPrimarySortType";
+const char *kViewStateSecondarySortAttrName = "ViewState:fSecondarySortAttr";
+const char *kViewStateSecondarySortTypeName = "ViewState:fSecondarySortType";
+const char *kViewStateReverseSortName = "ViewState:fReverseSort";
+const char *kViewStateIconSizeName = "ViewState:fIconSize";
+
+
+BColumn::BColumn(const char *title, float offset, float width, alignment align,
+		const char *attributeName, uint32 attrType, bool statField,
+		bool editable)
+	:
+	fTitle(title),
+	fAttrName(attributeName)
 {
 	fOffset = offset;
 	fWidth = width;
-	fAlignment = a;
-	fAttrHash = AttrHashString(attributeName, attr_type);
-	fAttrType = attr_type;
-	fStatField = stat_field;
+	fAlignment = align;
+	fAttrHash = AttrHashString(attributeName, attrType);
+	fAttrType = attrType;
+	fStatField = statField;
 	fEditable = editable;
 }
+
 
 BColumn::~BColumn()
 {
 }
+
 
 BColumn::BColumn(BMallocIO *stream, bool endianSwap)
 {
@@ -98,6 +116,7 @@ BColumn::BColumn(BMallocIO *stream, bool endianSwap)
 	}
 }
 
+
 BColumn::BColumn(const BMessage &message, int32 index)
 {
 	message.FindString(kColumnTitleName, index, &fTitle);
@@ -111,6 +130,7 @@ BColumn::BColumn(const BMessage &message, int32 index)
 	message.FindBool(kColumnEditableName, index, &fEditable);
 }
 
+
 BColumn *
 BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 {
@@ -118,7 +138,6 @@ BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 	uint32 key = AttrHashString("BColumn", B_OBJECT_TYPE);
 	int32 version = kColumnStateArchiveVersion;
 
-	
 	if (endianSwap) {
 		key = SwapUInt32(key);
 		version = SwapInt32(version);
@@ -129,28 +148,9 @@ BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 		return 0;
 
 //	PRINT(("instantiating column, %s\n", endianSwap ? "endian swapping," : ""));
-	BColumn *result = new BColumn(stream, endianSwap);
-	
-	// sanity-check the resulting column
-	if (result->fTitle.Length() > 500
-		|| result->fOffset < 0
-		|| result->fOffset > 10000
-		|| result->fWidth < 0
-		|| result->fWidth > 10000
-		|| (int32)result->fAlignment < B_ALIGN_LEFT
-		|| (int32)result->fAlignment > B_ALIGN_CENTER
-		|| result->fAttrName.Length() > 500) {
-		PRINT(("column data not valid\n"));
-		delete result;
-		return 0;
-	}
-#if DEBUG
-	else if (endianSwap)
-		PRINT(("Instantiated foreign column ok\n"));
-#endif
-
-	return result;
+	return _Sanitize(new (std::nothrow) BColumn(stream, endianSwap));
 }
+
 
 BColumn *
 BColumn::InstantiateFromMessage(const BMessage &message, int32 index)
@@ -164,23 +164,9 @@ BColumn::InstantiateFromMessage(const BMessage &message, int32 index)
 	if (version != messageVersion) 
 		return NULL;
 
-	BColumn *result = new BColumn(message, index);
-	
-	// sanity-check the resulting column
-	if (result->fTitle.Length() > 500
-		|| result->fOffset < 0
-		|| result->fOffset > 10000
-		|| result->fWidth < 0
-		|| result->fWidth > 10000
-		|| (int32)result->fAlignment < B_ALIGN_LEFT
-		|| (int32)result->fAlignment > B_ALIGN_CENTER
-		|| result->fAttrName.Length() > 500) {
-		PRINT(("column data not valid\n"));
-		delete result;
-		return NULL;
-	}
-	return result;
+	return _Sanitize(new (std::nothrow) BColumn(message, index));
 }
+
 
 void
 BColumn::ArchiveToStream(BMallocIO *stream) const
@@ -204,6 +190,7 @@ BColumn::ArchiveToStream(BMallocIO *stream) const
 	stream->Write(&fEditable, sizeof(bool));
 }
 
+
 void
 BColumn::ArchiveToMessage(BMessage &message) const
 {
@@ -220,17 +207,37 @@ BColumn::ArchiveToMessage(BMessage &message) const
 	message.AddBool(kColumnEditableName, fEditable);
 }
 
-const char *kViewStateVersionName = "ViewState:version";
-const char *kViewStateViewModeName = "ViewState:fViewMode";
-const char *kViewStateLastIconModeName = "ViewState:fLastIconMode";
-const char *kViewStateListOriginName = "ViewState:fListOrigin";
-const char *kViewStateIconOriginName = "ViewState:fIconOrigin";
-const char *kViewStatePrimarySortAttrName = "ViewState:fPrimarySortAttr";
-const char *kViewStatePrimarySortTypeName = "ViewState:fPrimarySortType";
-const char *kViewStateSecondarySortAttrName = "ViewState:fSecondarySortAttr";
-const char *kViewStateSecondarySortTypeName = "ViewState:fSecondarySortType";
-const char *kViewStateReverseSortName = "ViewState:fReverseSort";
-const char *kViewStateIconSizeName = "ViewState:fIconSize";
+
+BColumn *
+BColumn::_Sanitize(BColumn *column)
+{
+	if (column == NULL)
+		return NULL;
+
+	// sanity-check the resulting column
+	if (column->fTitle.Length() > 500
+		|| column->fOffset < 0
+		|| column->fOffset > 10000
+		|| column->fWidth < 0
+		|| column->fWidth > 10000
+		|| (int32)column->fAlignment < B_ALIGN_LEFT
+		|| (int32)column->fAlignment > B_ALIGN_CENTER
+		|| column->fAttrName.Length() > 500) {
+		PRINT(("column data not valid\n"));
+		delete column;
+		return NULL;
+	}
+#if DEBUG
+	else if (endianSwap)
+		PRINT(("Instantiated foreign column ok\n"));
+#endif
+
+	return column;
+}
+
+
+//	#pragma mark -
+
 
 BViewState::BViewState()
 {
@@ -247,6 +254,7 @@ BViewState::BViewState()
 	fStateNeedsSaving = false;
 }
 
+
 BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 {
 	stream->Read(&fViewMode, sizeof(uint32));
@@ -259,7 +267,7 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 	stream->Read(&fSecondarySortType, sizeof(uint32));
 	stream->Read(&fReverseSort, sizeof(bool));
 	stream->Read(&fIconSize, sizeof(uint32));
-	
+
 	if (endianSwap) {
 		PRINT(("endian swapping view state\n"));
 		fViewMode = B_SWAP_INT32(fViewMode);
@@ -273,14 +281,11 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 		fSecondarySortType = B_SWAP_INT32(fSecondarySortType);
 	}
 
-	// assure a sane state
-	if (fIconSize < 16)	
-		fIconSize = 16; 
-	if (fIconSize > 64)	
-		fIconSize = 64; 
-
 	fStateNeedsSaving = false;
+
+	_Sanitize(this, true);
 }
+
 
 BViewState::BViewState(const BMessage &message)
 {
@@ -293,16 +298,11 @@ BViewState::BViewState(const BMessage &message)
 	message.FindInt32(kViewStateSecondarySortAttrName, (int32 *)&fSecondarySortAttr);
 	message.FindInt32(kViewStateSecondarySortTypeName, (int32 *)&fSecondarySortType);
 	message.FindBool(kViewStateReverseSortName, &fReverseSort);
-	message.FindInt32(kViewStateIconSizeName, (int32 *)&fIconSize);
-	
-	// assure a sane state
-	if (fIconSize < 16)	
-		fIconSize = 16; 
-	if (fIconSize > 64)	
-		fIconSize = 64; 
-
 	fStateNeedsSaving = false;
+
+	_Sanitize(this, true);
 }
+
 
 void
 BViewState::ArchiveToStream(BMallocIO *stream) const
@@ -344,14 +344,13 @@ BViewState::ArchiveToMessage(BMessage &message) const
 }
 
 
-
 BViewState *
 BViewState::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 {
 	// compare stream header in canonical form
 	uint32 key = AttrHashString("BViewState", B_OBJECT_TYPE);
 	int32 version = kViewStateArchiveVersion;
-	
+
 	if (endianSwap) {
 		key = SwapUInt32(key);
 		version = SwapInt32(version);
@@ -360,65 +359,68 @@ BViewState::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 	if (!ValidateStream(stream, key, version)) 
 		return NULL;
 
-	BViewState *result = new BViewState(stream, endianSwap);
-	
-	// do a sanity check here
-	if ((result->fViewMode != kListMode
-			&& result->fViewMode != kIconMode
-			&& result->fViewMode != kMiniIconMode
-			&& result->fViewMode != kScaleIconMode
-			&& result->fViewMode != 0)
-		|| (result->fLastIconMode != kListMode
-			&& result->fLastIconMode != kIconMode
-			&& result->fLastIconMode != kMiniIconMode
-			&& result->fLastIconMode != kScaleIconMode
-			&& result->fLastIconMode != 0)) {
-		
-		PRINT(("Bad data instantiating ViewState, view mode %x, lastIconMode %x\n",
-			result->fViewMode, result->fLastIconMode));
-
-		delete result;
-		return NULL;
-	}
-#if DEBUG
-	else if (endianSwap)
-		PRINT(("Instantiated foreign view state ok\n"));
-#endif
-	return result;
+	return _Sanitize(new (std::nothrow) BViewState(stream, endianSwap));
 }
+
 
 BViewState *
 BViewState::InstantiateFromMessage(const BMessage &message)
 {
 	int32 version = kViewStateArchiveVersion;
-	
-	int32 messageVersion;
 
+	int32 messageVersion;
 	if (message.FindInt32(kViewStateVersionName, &messageVersion) != B_OK)
 		return NULL;
 
 	if (version != messageVersion) 
 		return NULL;
 
-	BViewState *result = new BViewState(message);
-	
-	// do a sanity check here
-	if ((result->fViewMode != kListMode
-			&& result->fViewMode != kIconMode
-			&& result->fViewMode != kMiniIconMode
-			&& result->fViewMode != kScaleIconMode
-			&& result->fViewMode != 0)
-		|| (result->fLastIconMode != kListMode
-			&& result->fLastIconMode != kIconMode
-			&& result->fLastIconMode != kMiniIconMode
-			&& result->fLastIconMode != kScaleIconMode
-			&& result->fLastIconMode != 0)) {
-	
-		PRINT(("Bad data instantiating ViewState, view mode %x, lastIconMode %x\n",
-			result->fViewMode, result->fLastIconMode));
+	return _Sanitize(new (std::nothrow) BViewState(message));
+}
 
-		delete result;
+
+BViewState *
+BViewState::_Sanitize(BViewState *state, bool fixOnly)
+{
+	if (state == NULL)
+		return NULL;
+
+	if (state->fViewMode == kListMode) {
+		if (state->fListOrigin.x < 0)
+			state->fListOrigin.x = 0;
+		if (state->fListOrigin.y < 0)
+			state->fListOrigin.y = 0;
+	}
+	if (state->fIconSize < 16)
+		state->fIconSize = 16;
+	if (state->fIconSize > 64)
+		state->fIconSize = 64;
+
+	if (fixOnly)
+		return state;
+
+	// do a sanity check here
+	if ((state->fViewMode != kListMode
+			&& state->fViewMode != kIconMode
+			&& state->fViewMode != kMiniIconMode
+			&& state->fViewMode != kScaleIconMode
+			&& state->fViewMode != 0)
+		|| (state->fLastIconMode != kListMode
+			&& state->fLastIconMode != kIconMode
+			&& state->fLastIconMode != kMiniIconMode
+			&& state->fLastIconMode != kScaleIconMode
+			&& state->fLastIconMode != 0)) {
+		PRINT(("Bad data instantiating ViewState, view mode %x, lastIconMode %x\n",
+			state->fViewMode, state->fLastIconMode));
+
+		delete state;
 		return NULL;
 	}
-	return result;
+#if DEBUG
+	else if (endianSwap)
+		PRINT(("Instantiated foreign view state ok\n"));
+#endif
+
+	return state;
 }
+
