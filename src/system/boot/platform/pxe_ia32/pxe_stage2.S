@@ -17,6 +17,7 @@
 
 .text
 .code16
+.org 0
 
 pxe_start:
 	cli
@@ -25,7 +26,7 @@ pxe_start:
 	.code32					// This forces a 32 bit relocation entry
 	.byte	0x66			// that allows linking with others
 	.byte	0x67
-	lgdt	gdt_descriptor + 0x100000
+	lgdt	gdt_descriptor
 
 	.code16
 	movl	%cr0, %eax		// set the PE bit of cr0 to switch to protected mode
