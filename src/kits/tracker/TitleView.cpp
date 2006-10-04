@@ -478,6 +478,7 @@ BColumnTitle::Draw(BView *view, bool pressed)
 
 	switch (fColumn->Alignment()) {
 		case B_ALIGN_LEFT:
+		default:
 			loc.x = bounds.left + 1 + kTitleColumnLeftExtraMargin;
 			break;
 
@@ -489,7 +490,7 @@ BColumnTitle::Draw(BView *view, bool pressed)
 			loc.x = bounds.right - resultingWidth - kTitleColumnRightExtraMargin;
 			break;
 	}
-		
+
 	view->SetHighColor(0, 0, 0);
 	view->DrawString(titleString.String(), loc);
 
