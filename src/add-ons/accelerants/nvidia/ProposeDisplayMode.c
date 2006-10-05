@@ -87,11 +87,14 @@ static const display_mode mode_list[] = {
 { { 147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
 /* 16:10 panel mode; 2.304M pixels */
 { { 193200, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
+/* 16:9 panel mode; 1280x720 */
+{ { 74520, 1280, 1368, 1424, 1656, 720, 724, 730, 750, T_POSITIVE_SYNC}, B_CMAP8, 1280, 720, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X720) */
 };
 
-/*
-Check mode is between low and high limits
-returns:
+
+/*!
+	Check mode is between low and high limits.
+	Returns:
 	B_OK - found one
 	B_BAD_VALUE - mode can be made, but outside limits
 	B_ERROR - not possible
@@ -108,7 +111,8 @@ returns:
  */
 /* Note:
  * The target mode should be modified to correspond to the mode as it can be made. */
-status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const display_mode *high) 
+status_t
+PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const display_mode *high) 
 {
 	status_t status = B_OK;
 	float pix_clock_found, target_aspect;
@@ -116,17 +120,13 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	status_t result;
 	uint32 max_vclk, row_bytes, mem_reservation;
 	bool acc_mode;
-	double target_refresh = ((double)target->timing.pixel_clock * 1000.0) /
-			(
-				(double)target->timing.h_total * 
-				(double)target->timing.v_total
-			);
-	bool
-		want_same_width = target->timing.h_display == target->virtual_width,
-		want_same_height = target->timing.v_display == target->virtual_height;
+	double target_refresh = ((double)target->timing.pixel_clock * 1000.0)
+		/ ((double)target->timing.h_total * (double)target->timing.v_total);
+	bool want_same_width = target->timing.h_display == target->virtual_width;
+	bool want_same_height = target->timing.v_display == target->virtual_height;
 
 	LOG(1, ("PROPOSEMODE: (ENTER) requested virtual_width %d, virtual_height %d\n",
-									target->virtual_width, target->virtual_height));
+		target->virtual_width, target->virtual_height));
 
 	/*check valid list:
 		if (VALID_REQUIRED is set)
@@ -141,7 +141,8 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			}
 		}
 	*/
-	#ifdef VALID_MODE_REQUIRED
+
+#ifdef VALID_MODE_REQUIRED
 	{
 		int i;
 		int closest_mode_ptr;
@@ -151,118 +152,96 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 
 		closest_mode_ptr = 0xbad;
 		closest_mode_clock = 0;
-		for (i=0;i<VALID_MODES;i++)
-		{
+		for (i = 0; i < VALID_MODES; i++) {
 			/*check size is ok and clock is better than any found before*/
-			if(
-				target->timing.h_display==valid_mode_list[i].h_display &&
-				target->timing.v_display==valid_mode_list[i].v_display
-			)
-			{
-				if (
-					abs(valid_mode_list[i].pixel_clock-target->timing.pixel_clock)<
-					abs(closest_mode_clock-target->timing.pixel_clock)
-				)
-				{
-					closest_mode_clock=valid_mode_list[i].pixel_clock;
-					closest_mode_ptr=i;
+			if (target->timing.h_display == valid_mode_list[i].h_display
+				&& target->timing.v_display == valid_mode_list[i].v_display) {
+				if (abs(valid_mode_list[i].pixel_clock-target->timing.pixel_clock)
+						< abs(closest_mode_clock-target->timing.pixel_clock)) {
+					closest_mode_clock = valid_mode_list[i].pixel_clock;
+					closest_mode_ptr = i;
 				}
 			}
 		}
 
-		if (closest_mode_ptr==0xbad)/*if no modes of correct size*/
-		{
+		if (closest_mode_ptr == 0xbad) {
+			/* if no modes of correct size */
 			LOG(4, ("PROPOSEMODE: no valid mode found, aborted.\n"));
 			return B_ERROR;
+		} else {
+			target->timing = valid_mode_list[closest_mode_ptr];
+			/* I require this refresh */
+			target_refresh = ((double)target->timing.pixel_clock * 1000.0)
+				/ ((double)target->timing.h_total * (double)target->timing.v_total);
 		}
-		else
-		{
-			target->timing=valid_mode_list[closest_mode_ptr];
-			target_refresh = ((double)target->timing.pixel_clock * 1000.0) /  /*I require this refresh*/
-			((double)target->timing.h_total * (double)target->timing.v_total);
-		}
-	}	
-	#endif
+	}
+#endif
 
 	/*find a nearby valid timing from that given*/
-	result = head1_validate_timing
-	(
-		&target->timing.h_display, &target->timing.h_sync_start, &target->timing.h_sync_end, &target->timing.h_total,
-		&target->timing.v_display, &target->timing.v_sync_start, &target->timing.v_sync_end, &target->timing.v_total
-	);
-	if (result == B_ERROR)
-	{
+	result = head1_validate_timing(&target->timing.h_display,
+		&target->timing.h_sync_start, &target->timing.h_sync_end,
+		&target->timing.h_total, &target->timing.v_display,
+		&target->timing.v_sync_start, &target->timing.v_sync_end,
+		&target->timing.v_total);
+	if (result == B_ERROR) {
 		LOG(4, ("PROPOSEMODE: could not validate timing, aborted.\n"));
 		return result;
 	}
 
 	/* disable aspect checks for a requested TVout mode when mode is TVout capable */
-	if (!(si->ps.tvout) ||
-		!(BT_check_tvmode(*target) && (target->flags & TV_BITS)))
-	{
+	if (!si->ps.tvout
+		|| !(BT_check_tvmode(*target) && (target->flags & TV_BITS))) {
 		/* check if all connected output devices can display the requested mode's aspect: */
 		/* calculate display mode aspect */
 		target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
 		/* NOTE:
 		 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
-		switch (si->ps.monitors)
-		{
-		case 0x01: /* digital panel on head 1, nothing on head 2 */
-			if (si->ps.panel1_aspect < (target_aspect - 0.10))
-			{
-				LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
-				return B_ERROR;
-			}
-			break;
-		case 0x10: /* nothing on head 1, digital panel on head 2 */
-			if (si->ps.panel2_aspect < (target_aspect - 0.10))
-			{
-				LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
-				return B_ERROR;
-			}
-			break;
-		case 0x11: /* digital panels on both heads */
-			if ((si->ps.panel1_aspect < (target_aspect - 0.10)) ||
-				(si->ps.panel2_aspect < (target_aspect - 0.10)))
-			{
-				LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
-				return B_ERROR;
-			}
-			break;
-		default: /* at least one analog monitor is connected, or nothing detected at all */
-				 /* (if forcing widescreen type was requested don't block mode) */
-			if ((target_aspect > 1.34) && !(si->settings.force_ws))
-			{
-				LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
-				return B_ERROR;
-			}
-			break;
+		switch (si->ps.monitors) {
+			case 0x01: /* digital panel on head 1, nothing on head 2 */
+				if (si->ps.panel1_aspect < (target_aspect - 0.10)) {
+					LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
+			case 0x10: /* nothing on head 1, digital panel on head 2 */
+				if (si->ps.panel2_aspect < (target_aspect - 0.10)) {
+					LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
+			case 0x11: /* digital panels on both heads */
+				if ((si->ps.panel1_aspect < (target_aspect - 0.10))
+					|| (si->ps.panel2_aspect < (target_aspect - 0.10))) {
+					LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
+			default:
+				/* at least one analog monitor is connected, or nothing detected at all */
+				/* (if forcing widescreen type was requested don't block mode) */
+				if (target_aspect > 1.34 && !si->settings.force_ws) {
+					LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
 		}
 
 		/* only export widescreen panel-TV modes when an exact resolution match exists,
 		 * to prevent the modelist from becoming too crowded */
-		if (target_aspect > 1.61)
-		{
+		if (target_aspect > 1.61) {
 			status_t panel_TV_stat = B_ERROR;
 
-			if (si->ps.tmds1_active)
-			{
-				if ((target->timing.h_display == si->ps.p1_timing.h_display) &&
-					(target->timing.v_display == si->ps.p1_timing.v_display))
-				{
+			if (si->ps.tmds1_active) {
+				if (target->timing.h_display == si->ps.p1_timing.h_display
+					&& target->timing.v_display == si->ps.p1_timing.v_display)
 					panel_TV_stat = B_OK;
-				}
 			}
-			if (si->ps.tmds2_active)
-			{
-				if ((target->timing.h_display == si->ps.p2_timing.h_display) &&
-					(target->timing.v_display == si->ps.p2_timing.v_display))
-				{
+			if (si->ps.tmds2_active) {
+				if (target->timing.h_display == si->ps.p2_timing.h_display
+					&& target->timing.v_display == si->ps.p2_timing.v_display)
 					panel_TV_stat = B_OK;
-				}
 			}
-			if (panel_TV_stat != B_OK)
-			{
+			if (panel_TV_stat != B_OK) {
 				LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
 				return B_ERROR;
 			}
@@ -270,114 +249,102 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	}
 
 	/* check if panel(s) can display the requested resolution (if connected) */
-	if (si->ps.tmds1_active)
-	{
-		if ((target->timing.h_display > si->ps.p1_timing.h_display) ||
-			(target->timing.v_display > si->ps.p1_timing.v_display))
-		{
+	if (si->ps.tmds1_active) {
+		if (target->timing.h_display > si->ps.p1_timing.h_display
+			|| target->timing.v_display > si->ps.p1_timing.v_display) {
 			LOG(4, ("PROPOSEMODE: panel1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
-	if (si->ps.tmds2_active)
-	{
-		if ((target->timing.h_display > si->ps.p2_timing.h_display) ||
-			(target->timing.v_display > si->ps.p2_timing.v_display))
-		{
+	if (si->ps.tmds2_active) {
+		if (target->timing.h_display > si->ps.p2_timing.h_display
+			|| target->timing.v_display > si->ps.p2_timing.v_display) {
 			LOG(4, ("PROPOSEMODE: panel2 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
 
 	/* validate display vs. virtual */
-	if ((target->timing.h_display > target->virtual_width) || want_same_width)
+	if (target->timing.h_display > target->virtual_width || want_same_width)
 		target->virtual_width = target->timing.h_display;
-	if ((target->timing.v_display > target->virtual_height) || want_same_height)
+	if (target->timing.v_display > target->virtual_height || want_same_height)
 		target->virtual_height = target->timing.v_display;
 
 	/* nail virtual size and 'subsequently' calculate rowbytes */
-	result = nv_general_validate_pic_size (target, &row_bytes, &acc_mode);
-	if (result == B_ERROR)
-	{
+	result = nv_general_validate_pic_size(target, &row_bytes, &acc_mode);
+	if (result == B_ERROR) {
 		LOG(4, ("PROPOSEMODE: could not validate virtual picture size, aborted.\n"));
 		return result;
 	}
 
-	/*check if virtual_width is still within the requested limits*/
-	if ((target->virtual_width < low->virtual_width) ||
-		(target->virtual_width > high->virtual_width))
-	{
+	/* check if virtual_width is still within the requested limits */
+	if (target->virtual_width < low->virtual_width
+		|| target->virtual_width > high->virtual_width) {
 		status = B_BAD_VALUE;
 		LOG(4, ("PROPOSEMODE: WARNING: virtual_width deviates too much\n"));
 	}
 
-	/*check if timing found is within the requested horizontal limits*/
-	if ((target->timing.h_display < low->timing.h_display) ||
-		(target->timing.h_display > high->timing.h_display) ||
-		(target->timing.h_sync_start < low->timing.h_sync_start) ||
-		(target->timing.h_sync_start > high->timing.h_sync_start) ||
-		(target->timing.h_sync_end < low->timing.h_sync_end) ||
-		(target->timing.h_sync_end > high->timing.h_sync_end) ||
-		(target->timing.h_total < low->timing.h_total) ||
-		(target->timing.h_total > high->timing.h_total))
-	{
+	/* check if timing found is within the requested horizontal limits */
+	if (target->timing.h_display < low->timing.h_display
+		|| target->timing.h_display > high->timing.h_display
+		|| target->timing.h_sync_start < low->timing.h_sync_start
+		|| target->timing.h_sync_start > high->timing.h_sync_start
+		|| target->timing.h_sync_end < low->timing.h_sync_end
+		|| target->timing.h_sync_end > high->timing.h_sync_end
+		|| target->timing.h_total < low->timing.h_total
+		|| target->timing.h_total > high->timing.h_total) {
 		/* BWindowScreen workaround: we accept everything except h_display deviations */
-		if ((target->timing.h_display < low->timing.h_display) ||
-			(target->timing.h_display > high->timing.h_display))
-		{		
+		if (target->timing.h_display < low->timing.h_display
+			|| target->timing.h_display > high->timing.h_display)
 			status = B_BAD_VALUE;
-		}
+
 		LOG(4, ("PROPOSEMODE: WARNING: horizontal timing deviates too much\n"));
 	}
 
-	/*check if timing found is within the requested vertical limits*/
-	if (
-		(target->timing.v_display < low->timing.v_display) ||
-		(target->timing.v_display > high->timing.v_display) ||
-		(target->timing.v_sync_start < low->timing.v_sync_start) ||
-		(target->timing.v_sync_start > high->timing.v_sync_start) ||
-		(target->timing.v_sync_end < low->timing.v_sync_end) ||
-		(target->timing.v_sync_end > high->timing.v_sync_end) ||
-		(target->timing.v_total < low->timing.v_total) ||
-		(target->timing.v_total > high->timing.v_total)
-	)
-	{
+	/* check if timing found is within the requested vertical limits */
+	if (target->timing.v_display < low->timing.v_display
+		|| target->timing.v_display > high->timing.v_display
+		|| target->timing.v_sync_start < low->timing.v_sync_start
+		|| target->timing.v_sync_start > high->timing.v_sync_start
+		|| target->timing.v_sync_end < low->timing.v_sync_end
+		|| target->timing.v_sync_end > high->timing.v_sync_end
+		|| target->timing.v_total < low->timing.v_total
+		|| target->timing.v_total > high->timing.v_total) {
 		/* BWindowScreen workaround: we accept everything except v_display deviations */
-		if ((target->timing.v_display < low->timing.v_display) ||
-			(target->timing.v_display > high->timing.v_display))
-		{		
+		if (target->timing.v_display < low->timing.v_display
+			|| target->timing.v_display > high->timing.v_display)
 			status = B_BAD_VALUE;
-		}
+
 		LOG(4, ("PROPOSEMODE: WARNING: vertical timing deviates too much\n"));
 	}
 
 	/* adjust pixelclock for possible timing modifications done above */
-	target->timing.pixel_clock = target_refresh * ((double)target->timing.h_total) * ((double)target->timing.v_total) / 1000.0;
+	target->timing.pixel_clock = target_refresh * ((double)target->timing.h_total)
+		* ((double)target->timing.v_total) / 1000.0;
 
 	/* Now find the nearest valid pixelclock we actually can setup for the target mode,
 	 * this also makes sure we don't generate more pixel bandwidth than the device can handle */
 	/* calculate settings, but do not actually test anything (that costs too much time!) */
-	result = head1_pix_pll_find(*target,&pix_clock_found,&m,&n,&p,0);
+	result = head1_pix_pll_find(*target, &pix_clock_found, &m, &n, &p, 0);
 	/* update the target mode */
-	target->timing.pixel_clock = (pix_clock_found * 1000);	
+	target->timing.pixel_clock = pix_clock_found * 1000;
 
 	/* note if we fell outside the limits */
-	if ((target->timing.pixel_clock < low->timing.pixel_clock) ||
-		(target->timing.pixel_clock > high->timing.pixel_clock)
-	)
-	{
+	if (target->timing.pixel_clock < low->timing.pixel_clock
+		|| target->timing.pixel_clock > high->timing.pixel_clock) {
 		/* BWindowScreen workaround: we accept deviations <= 1Mhz */
-		if ((target->timing.pixel_clock < (low->timing.pixel_clock - 1000)) ||
-			(target->timing.pixel_clock > (high->timing.pixel_clock + 1000)))
-		{
+		if (target->timing.pixel_clock < low->timing.pixel_clock - 1000
+			|| target->timing.pixel_clock > high->timing.pixel_clock + 1000)
 			status = B_BAD_VALUE;
-		}
+
 		LOG(4, ("PROPOSEMODE: WARNING: pixelclock deviates too much\n"));
 	}
 
 	mem_reservation = 0;
 	/* checkout space needed for hardcursor (if any) */
-	if (si->settings.hardcursor) mem_reservation = 2048;
+	if (si->settings.hardcursor)
+		mem_reservation = 2048;
+
 	/* Reserve extra space as a workaround for certain bugs (see DriverInterface.h
 	 * for an explanation). */
 	if (si->ps.card_arch < NV40A)
@@ -386,23 +353,19 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		mem_reservation += NV40_PLUS_OFFSET;
 
 	/* memory requirement for frame buffer */
-	if ((row_bytes * target->virtual_height) >
-		(si->ps.memory_size - mem_reservation))
-	{
-		target->virtual_height = 
-			(si->ps.memory_size - mem_reservation) / row_bytes;
+	if (row_bytes * target->virtual_height > si->ps.memory_size - mem_reservation) {
+		target->virtual_height = (si->ps.memory_size - mem_reservation) / row_bytes;
 	}
-	if (target->virtual_height < target->timing.v_display) 
-	{
+	if (target->virtual_height < target->timing.v_display) {
 		LOG(4,("PROPOSEMODE: not enough memory for current mode, aborted.\n"));
 		return B_ERROR;
 	}
+
 	LOG(4,("PROPOSEMODE: validated virtual_width %d, virtual_height %d pixels\n",
 		target->virtual_width, target->virtual_height));
 
-	if ((target->virtual_height < low->virtual_height) ||
-		(target->virtual_height > high->virtual_height))
-	{
+	if (target->virtual_height < low->virtual_height
+		|| target->virtual_height > high->virtual_height) {
 		status = B_BAD_VALUE;
 		LOG(4, ("PROPOSEMODE: WARNING: virtual_height deviates too much\n"));
 	}
@@ -423,8 +386,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	target->flags |= (B_PARALLEL_ACCESS | B_8_BIT_DAC | B_DPMS | B_SCROLL);
 
 	/* determine the 'would be' max. pixelclock for the second DAC for the current videomode if dualhead were activated */
-	switch (target->space)
-	{
+	switch (target->space) {
 		case B_CMAP8:
 			max_vclk = si->ps.max_dac2_clock_8;
 			bpp = 1;
@@ -451,78 +413,55 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 
 	/* set DUALHEAD_CAPABLE if suitable */
 	//fixme: update for independant secondary head use! (reserve fixed memory then)
-	if (si->ps.secondary_head && (target->timing.pixel_clock <= (max_vclk * 1000)))
-	{
-		switch (target->flags & DUALHEAD_BITS)
-		{
-		case DUALHEAD_ON:
-		case DUALHEAD_SWITCH:
-			if (((si->ps.memory_size - mem_reservation) >=
-					(row_bytes * target->virtual_height)) &&
-			 	((uint16)(row_bytes / bpp) >= (target->timing.h_display * 2)))
-			{
-				target->flags |= DUALHEAD_CAPABLE;
-			}
-			break;
-		case DUALHEAD_CLONE:
-			if ((si->ps.memory_size - mem_reservation) >=
-					(row_bytes * target->virtual_height))
-			{
-				target->flags |= DUALHEAD_CAPABLE;
-			}
-			break;
-		case DUALHEAD_OFF:
-			if ((si->ps.memory_size - mem_reservation) >=
-					(row_bytes * target->virtual_height * 2))
-			{
-				target->flags |= DUALHEAD_CAPABLE;
-			}
-			break;
+	if (si->ps.secondary_head && target->timing.pixel_clock <= (max_vclk * 1000)) {
+		switch (target->flags & DUALHEAD_BITS) {
+			case DUALHEAD_ON:
+			case DUALHEAD_SWITCH:
+				if (si->ps.memory_size - mem_reservation
+						>= row_bytes * target->virtual_height
+					&& (uint16)(row_bytes / bpp) >= target->timing.h_display * 2)
+					target->flags |= DUALHEAD_CAPABLE;
+				break;
+			case DUALHEAD_CLONE:
+				if (si->ps.memory_size - mem_reservation
+						>= row_bytes * target->virtual_height)
+					target->flags |= DUALHEAD_CAPABLE;
+				break;
+			case DUALHEAD_OFF:
+				if (si->ps.memory_size - mem_reservation
+						>= row_bytes * target->virtual_height * 2)
+					target->flags |= DUALHEAD_CAPABLE;
+				break;
 		}
 	}
 
 	/* if not dualhead capable card clear dualhead flags */
 	if (!(target->flags & DUALHEAD_CAPABLE))
-	{
 		target->flags &= ~DUALHEAD_BITS;
-	}
 
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
 	if (si->ps.tvout && BT_check_tvmode(*target))
-	{
 		target->flags |= TV_CAPABLE;
-	}
 
 	/* if not TVout capable card clear TVout flags */
 	if (!(target->flags & TV_CAPABLE))
-	{
 		target->flags &= ~TV_BITS;
-	}
 
 	/* make sure TV head assignment is sane */
-	if (target->flags & TV_BITS)
-	{
+	if (target->flags & TV_BITS) {
 		if (!si->ps.secondary_head)
-		{
 			target->flags |= TV_PRIMARY;
-		}
-		else
-		{
-			if ((target->flags & DUALHEAD_BITS) == DUALHEAD_OFF)
-				target->flags |= TV_PRIMARY;
-		}
-	}
-	else
-	{
+		else if ((target->flags & DUALHEAD_BITS) == DUALHEAD_OFF)
+			target->flags |= TV_PRIMARY;
+	} else
 		target->flags &= ~TV_PRIMARY;
-	}
 
 	/* set HARDWARE_CURSOR mode if suitable */
 	if (si->settings.hardcursor)
 		target->flags |= B_HARDWARE_CURSOR;
 
 	/* set SUPPORTS_OVERLAYS if suitable */
-	if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
+	if (si->ps.card_type <= NV40 || si->ps.card_type == NV45)
 		target->flags |= B_SUPPORTS_OVERLAYS;
 
 	LOG(1, ("PROPOSEMODE: validated modeflags: $%08x\n", target->flags));
@@ -532,23 +471,30 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	target->timing.flags &= ~(B_BLANK_PEDESTAL | B_TIMING_INTERLACED | B_SYNC_ON_GREEN);
 	/* The HSYNC and VSYNC command flags are actually executed by the driver. */
 
-	if (status == B_OK)	LOG(4, ("PROPOSEMODE: completed successfully.\n"));
-	else LOG(4, ("PROPOSEMODE: mode can be made, but outside given limits.\n"));
+	if (status == B_OK)
+		LOG(4, ("PROPOSEMODE: completed successfully.\n"));
+	else
+		LOG(4, ("PROPOSEMODE: mode can be made, but outside given limits.\n"));
 	return status;
 }
 
-/* Return the number of modes this device will return from GET_MODE_LIST().  
+
+/*!
+	Return the number of modes this device will return from GET_MODE_LIST().  
 	This is precalculated in create_mode_list (called from InitAccelerant stuff)
 */
-uint32 ACCELERANT_MODE_COUNT(void)
+uint32
+ACCELERANT_MODE_COUNT(void)
 {
 	LOG(1, ("ACCELERANT_MODE_COUNT: the modelist contains %d modes\n",si->mode_count));
-
 	return si->mode_count;
 }
 
-/* Copy the list of guaranteed supported video modes to the location provided.*/
-status_t GET_MODE_LIST(display_mode *dm)
+
+/*! Copy the list of guaranteed supported video modes to the location provided.
+*/
+status_t
+GET_MODE_LIST(display_mode *dm)
 {
 	LOG(1, ("GET_MODE_LIST: exporting the modelist created before.\n"));
 
@@ -556,35 +502,33 @@ status_t GET_MODE_LIST(display_mode *dm)
 	return B_OK;
 }
 
-/* Create a list of display_modes to pass back to the caller.*/
-status_t create_mode_list(void)
+
+/*! Create a list of display_modes to pass back to the caller.
+*/
+status_t
+create_mode_list(void)
 {
 	size_t max_size;
-	uint32
-		i, j,
-		pix_clk_range;
-	const display_mode
-		*src;
-	display_mode
-		*dst,
-		low,
-		high;
-
-	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
+	uint32 i, j, pix_clk_range;
+	const display_mode *src;
+	display_mode *dst, low, high;
+	color_space spaces[4] = {B_RGB32_LITTLE, B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
 	/* figure out how big the list could be, and adjust up to nearest multiple of B_PAGE_SIZE */
 	max_size = (((MODE_COUNT * 4) * sizeof(display_mode)) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
+
 	/* create an area to hold the info */
-	si->mode_area = my_mode_list_area =
-		create_area("NV accelerant mode info", (void **)&my_mode_list, B_ANY_ADDRESS, max_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (my_mode_list_area < B_OK) return my_mode_list_area;
+	si->mode_area = my_mode_list_area = create_area("NV accelerant mode info",
+		(void **)&my_mode_list, B_ANY_ADDRESS, max_size, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+	if (my_mode_list_area < B_OK)
+		return my_mode_list_area;
 
 	/* walk through our predefined list and see which modes fit this device */
 	src = mode_list;
 	dst = my_mode_list;
 	si->mode_count = 0;
-	for (i = 0; i < MODE_COUNT; i++)
-	{
+	for (i = 0; i < MODE_COUNT; i++) {
 		/* set ranges for acceptable values */
 		low = high = *src;
 		/* range is 6.25% of default clock: arbitrarily picked */ 
@@ -597,8 +541,7 @@ status_t create_mode_list(void)
 		//So disable next line: 
 		//high.virtual_width = 4096;
 		/* do it once for each depth we want to support */
-		for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
-		{
+		for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) {
 			/* set target values */
 			*dst = *src;
 			/* poke the specific space */
