@@ -228,7 +228,7 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 
 		/* only export widescreen panel-TV modes when an exact resolution match exists,
 		 * to prevent the modelist from becoming too crowded */
-		if (target_aspect > 1.61) {
+		if (target_aspect > 1.61 && !si->settings.force_ws) {
 			status_t panel_TV_stat = B_ERROR;
 
 			if (si->ps.tmds1_active) {
