@@ -143,11 +143,11 @@
 		<para>
 			Parameters:
 			<itemizedlist>
-				<listitem><parameter>data</parameter> the MIDI event data</listitem>
-				<listitem><parameter>length</parameter> byte size of the data buffer</listitem>
-				<listitem><parameter>atomic</parameter> whether the data buffer contains
-					a single complete MIDI event</listitem>
-				<listitem><parameter>time</parameter> the required performance time of the event</listitem>
+				<listitem><para><parameter>data</parameter> the MIDI event data</para></listitem>
+				<listitem><para><parameter>length</parameter> byte size of the data buffer</para></listitem>
+				<listitem><para><parameter>atomic</parameter> whether the data buffer contains
+					a single complete MIDI event</para></listitem>
+				<listitem><para><parameter>time</parameter> the required performance time of the event</para></listitem>
 			</itemizedlist>
 		</para>
 	</sect3>

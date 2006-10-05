@@ -143,12 +143,12 @@
 		<para>	
 			Parameters:
 			<itemizedlist>
-				<listitem><parameter>when</parameter> An absolute time that's 
-					measured against the system clock.</listitem>
-				<listitem><parameter>data</parameter> A pointer to a "cookie" that 
+				<listitem><para><parameter>when</parameter> An absolute time that's 
+					measured against the system clock.</para></listitem>
+				<listitem><para><parameter>data</parameter> A pointer to a "cookie" that 
 					you can pass along to Timeout(). The data is not copied, so 
 					you must ensure that the pointer remains valid until Timeout() is 
-					called. You typically delete the data inside Timeout().</listitem>
+					called. You typically delete the data inside Timeout().</para></listitem>
 			</itemizedlist>
 		</para>
 	</sect3>
@@ -200,11 +200,11 @@
 		<para>
 			Parameters:
 			<itemizedlist>
-				<listitem><parameter>data</parameter> the MIDI event data</listitem>
-				<listitem><parameter>length</parameter> byte size of the data buffer</listitem>
-				<listitem><parameter>atomic</parameter> whether the data buffer contains 
-					a single complete MIDI event</listitem>
-				<listitem><parameter>time</parameter> the requested performance time of the event</listitem>
+				<listitem><para><parameter>data</parameter> the MIDI event data</para></listitem>
+				<listitem><para><parameter>length</parameter> byte size of the data buffer</para></listitem>
+				<listitem><para><parameter>atomic</parameter> whether the data buffer contains 
+					a single complete MIDI event</para></listitem>
+				<listitem><para><parameter>time</parameter> the requested performance time of the event</para></listitem>
 			</itemizedlist>
 		</para>
 		

@@ -238,6 +238,7 @@
 			notifications when you register or unregister your local endpoints, but the 
 			other apps will.
 			<table id="bmidirostertable1">
+				<table>B_MIDI_REGISTERED message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -265,6 +266,7 @@
 			</table>
 			
 			<table id="bmidirostertable2">
+				<table>B_MIDI_UNREGISTERED message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -294,7 +296,7 @@
 		
 		<para>
 			The "connected" and "disconnected" notifications are sent when a consumer
-			BMidiProducer::Connect()'s to a producer, or when they 
+			BMidiProducer::Connect()'s to a producer, or when they table
 			BMidiProducer::Disconnect(). You will receive these 
 			notifications when <emphasis>any</emphasis> two endpoints connect or disconnect, even if they 
 			are not published. (The purpose of which is debatable.) You won't receive the 
@@ -303,6 +305,7 @@
 			published endpoints.
 			
 			<table id="bmidirostertable3">
+				<table>B_MIDI_CONNECTED message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -330,6 +333,7 @@
 			</table>
 			
 			<table id="bmidirostertable4">
+				<table>B_MIDI_DISCONNECTED message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -363,6 +367,7 @@
 			its published endpoints.
 			
 			<table id="bmidirostertable5">
+				<table>B_MIDI_CHANGED_NAME message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -396,6 +401,7 @@
 			</table>
 			
 			<table id="bmidirostertable6">
+				<table>B_MIDI_CHANGED_LATENCY message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -429,6 +435,7 @@
 			</table>
 			
 			<table id="bmidirostertable7">
+				<table>B_MIDI_CHANGED_PROPERTIES message structure</table>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>

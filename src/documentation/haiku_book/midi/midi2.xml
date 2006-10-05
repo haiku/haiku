@@ -12,35 +12,35 @@
 		<para>
 		A brief overview of the elements that comprise the Midi Kit:
 		<itemizedlist>
-			<listitem><emphasis>Endpoints</emphasis>. This is what the Midi Kit is all about: sending MIDI messages 
+			<listitem><para><emphasis>Endpoints</emphasis>. This is what the Midi Kit is all about: sending MIDI messages 
 			between endpoints. An endpoint is like a MIDI In or MIDI Out socket on your 
 			equipment; it either receives information or it sends information. Endpoints 
 			that send MIDI events are called \b producers; the endpoints that receive those 
 			events are called \b consumers. An endpoint that is created by your own 
 			application is called \b local; endpoints from other applications are \b 
-			remote. You can access remote endpoints using \b proxies.</listitem>
+			remote. You can access remote endpoints using \b proxies.</para></listitem>
 		
-			<listitem><emphasis>Filters</emphasis>. A filter is an object that has a consumer and a producer 
+			<listitem><para><emphasis>Filters</emphasis>. A filter is an object that has a consumer and a producer 
 			endpoint. It reads incoming events from its consumer, performs some operation, 
 			and tells its producer to send out the results. In its current form, the Midi 
-				Kit doesn't provide any special facilities for writing filters.</listitem>
+				Kit doesn't provide any special facilities for writing filters.</para></listitem>
 		
-			<listitem><emphasis>Midi Roster</emphasis>. The roster is the list of all published producers and 
+			<listitem><para><emphasis>Midi Roster</emphasis>. The roster is the list of all published producers and 
 			consumers. By publishing an endpoint, you allow other applications to talk to 
 			it. You are not required to publish your endpoints, in which case only your own 
-				application can use them.</listitem>
+				application can use them.</para></listitem>
 		
-			<listitem><emphasis>Midi Server</emphasis>. The Midi Server does the behind-the-scenes work. It 
+			<listitem><para><emphasis>Midi Server</emphasis>. The Midi Server does the behind-the-scenes work. It 
 			manages the roster, it connects endpoints, it makes sure that endpoints can 
 			communicate, and so on. The Midi Server is started automatically when BeOS 
 			boots, and you never have to deal with it directly. Just remember that it runs 
-			the show.</listitem>
+			the show.</para></listitem>
 		
-			<listitem><filename>libmidi</filename>. The BMidi* classes live inside two shared libraries: <filename>libmidi.so</filename> 
+			<listitem><para><filename>libmidi</filename>. The BMidi* classes live inside two shared libraries: <filename>libmidi.so</filename> 
 			and <filename>libmidi2.so</filename>. If you write an application that uses old Midi Kit, you must 
 			link it to <filename>libmidi.so</filename>. Applications that use the new Midi Kit must link to 
 			<filename>libmidi2.so</filename>. If you want to mix-and-match both kits, you should also link to 
-				both libraries.</listitem>
+				both libraries.</para></listitem>
 		</itemizedlist>
 	</para>
 	
@@ -319,12 +319,12 @@
 			as the BeOS R5 kits, although there are a few small differences in the API 
 			(mostly bug fixes):
 			<itemizedlist>
-				<listitem>BMidiEndpoint::IsPersistent() always returns false.</listitem>
-				<listitem>The B_MIDI_CHANGE_LATENCY notification is now properly sent. The Be kit 
+				<listitem><para>BMidiEndpoint::IsPersistent() always returns false.</para></listitem>
+				<listitem><para>The B_MIDI_CHANGE_LATENCY notification is now properly sent. The Be kit 
 				incorrectly set be:op to B_MIDI_CHANGED_NAME, even though the rest of the 
-				message was properly structured.</listitem>
-				<listitem>If creating a local endpoint fails, you can still Release() the object 
-				without crashing into the debugger.</listitem>
+				message was properly structured.</para></listitem>
+				<listitem><para>If creating a local endpoint fails, you can still Release() the object 
+				without crashing into the debugger.</para></listitem>
 			</itemizedlist>
 		</para>
 	</sect2>
@@ -335,25 +335,25 @@
 		<para>
 			More about the Midi Kit:
 			<itemizedlist>
-				<listitem>Be Newsletter Volume 3, Issue 47 - Motor Mix sample code</listitem>
-				<listitem>Be Newsletter Volume 4, Issue 3 - Overview of the new kit</listitem>
-				<listitem><ulink url="http://haiku-os.org/learn.php?mode=nsl_view&amp;id=33">Haiku
-				Newsletter 33</ulink>, Introduction to MIDI, Part 1</listitem>
-				<listitem><ulink url="http://haiku-os.org/learn.php?mode=nsl_view&amp;id=36">Haiku
-				Newsletter 36</ulink>, Introduction to MIDI, Part 2</listitem>
-				<listitem>Sample code and other goodies at the 
-				<ulink url="http://haiku-os.org/contribute.php?mode=team_view&amp;id=midi">OpenBeOS Midi Kit team page</ulink></listitem>
+				<listitem><para>Be Newsletter Volume 3, Issue 47 - Motor Mix sample code</para></listitem>
+				<listitem><para>Be Newsletter Volume 4, Issue 3 - Overview of the new kit</para></listitem>
+				<listitem><para><ulink url="http://haiku-os.org/learn.php?mode=nsl_view&amp;id=33">Haiku
+				Newsletter 33</ulink>, Introduction to MIDI, Part 1</para></listitem>
+				<listitem><para><ulink url="http://haiku-os.org/learn.php?mode=nsl_view&amp;id=36">Haiku
+				Newsletter 36</ulink>, Introduction to MIDI, Part 2</para></listitem>
+				<listitem><para>Sample code and other goodies at the 
+				<ulink url="http://haiku-os.org/contribute.php?mode=team_view&amp;id=midi">OpenBeOS Midi Kit team page</ulink></para></listitem>
 			</itemizedlist>
 		</para>
 		
 		<para>
 			Information about MIDI in general:
 			<itemizedlist>
-				<listitem><ulink url="http://www.midi.org">MIDI Manufacturers Association</ulink></listitem>
-				<listitem><ulink url="http://www.borg.com/~jglatt/tutr/miditutr.htm">MIDI Tutorials</ulink></listitem>
-				<listitem><ulink url="http://www.borg.com/~jglatt/tech/midispec.htm">MIDI Specification</ulink></listitem>
-				<listitem><ulink url="http://www.borg.com/~jglatt/tech/midifile.htm">Standard MIDI File Format</ulink></listitem>
-				<listitem><ulink url="http://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</ulink></listitem>
+				<listitem><para><ulink url="http://www.midi.org">MIDI Manufacturers Association</ulink></para></listitem>
+				<listitem><para><ulink url="http://www.borg.com/~jglatt/tutr/miditutr.htm">MIDI Tutorials</ulink></para></listitem>
+				<listitem><para><ulink url="http://www.borg.com/~jglatt/tech/midispec.htm">MIDI Specification</ulink></para></listitem>
+				<listitem><para><ulink url="http://www.borg.com/~jglatt/tech/midifile.htm">Standard MIDI File Format</ulink></para></listitem>
+				<listitem><para><ulink url="http://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</ulink></para></listitem>
 			</itemizedlist>
 		</para>
 	</sect2>

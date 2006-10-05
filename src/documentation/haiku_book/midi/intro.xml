@@ -33,16 +33,16 @@
 	<para>
 		The main differences between the two kits:
 		<itemizedlist>
-			<listitem>Instead of one <classname>BMidi</classname> object that both produces and consumes events, we have 
-				<classname>BMidiProducer</classname> and <classname>BMidiConsumer</classname>.</listitem>
-			<listitem>Applications are capable of sharing MIDI producers and consumers with other 
-				applications via the centralized Midi Roster.</listitem>
-			<listitem>Physical MIDI ports are now sharable without apps "stealing" events from each 
-				other.</listitem>
-			<listitem>Applications can now send/receive raw MIDI byte streams (useful if an 
-				application has its own MIDI parser/engine).</listitem>
-			<listitem>Channels are numbered 0..15, not 1..16</listitem>
-			<listitem>Timing is now specified in microseconds instead of milliseconds.</listitem>	
+			<listitem><para>Instead of one <classname>BMidi</classname> object that both produces and consumes events, we have 
+				<classname>BMidiProducer</classname> and <classname>BMidiConsumer</classname>.</para></listitem>
+			<listitem><para>Applications are capable of sharing MIDI producers and consumers with other 
+				applications via the centralized Midi Roster.</para></listitem>
+			<listitem><para>Physical MIDI ports are now sharable without apps "stealing" events from each 
+				other.</para></listitem>
+			<listitem><para>Applications can now send/receive raw MIDI byte streams (useful if an 
+				application has its own MIDI parser/engine).</para></listitem>
+			<listitem><para>Channels are numbered 0..15, not 1..16</para></listitem>
+			<listitem><para>Timing is now specified in microseconds instead of milliseconds.</para></listitem>	
 		</itemizedlist>
 	</para>
 </sect1>
