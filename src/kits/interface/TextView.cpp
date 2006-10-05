@@ -54,7 +54,7 @@ using namespace std;
 #endif
 
 
-#define USE_WIDTHBUFFER 1
+#define USE_WIDTHBUFFER 0
 #define USE_DOUBLEBUFFERING 0
 
 
@@ -4416,10 +4416,9 @@ BTextView::HandleInputMethodLocationRequest()
 	message.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
 	
 	// Add the location of the UTF8 characters
-	float height = 0;
-	BPoint where;
-	while (offset < limit) {	
-		where = PointAt(offset, &height);
+	while (offset < limit) {
+		float height;	
+		BPoint where = PointAt(offset, &height);
 		ConvertToScreen(&where);
 			
 		message.AddPoint("be:location_reply", where);
