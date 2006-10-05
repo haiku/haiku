@@ -616,6 +616,7 @@ BPlusTree::SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLeng
 
 		nodeAndKey.nodeOffset = nextOffset;
 	}
+
 	RETURN_ERROR(B_ERROR);
 }
 
@@ -1192,6 +1193,7 @@ BPlusTree::Insert(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 			}
 		}
 	}
+
 	RETURN_ERROR(B_ERROR);
 }
 
@@ -1487,9 +1489,9 @@ BPlusTree::Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 
 		// if it's an empty root node, we have to convert it
 		// to a leaf node by dropping the overflow link, or,
-		// if it's a leaf node, just empty it
+		// if it's already a leaf node, just empty it
 		if (nodeAndKey.nodeOffset == fHeader->RootNode()
-			&& node->NumKeys() == 0) {
+			&& (node->NumKeys() == 0 || node->NumKeys() == 1 && node->IsLeaf())) {
 			node->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 			node->all_key_count = 0;
 			node->all_key_length = 0;
@@ -1497,9 +1499,13 @@ BPlusTree::Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 			if (cached.WriteBack(transaction) < B_OK)
 				return B_IO_ERROR;
 
-			// reset the maximum number of levels in the header
-			fHeader->max_number_of_levels = HOST_ENDIAN_TO_BFS_INT32(1);
-			return fCachedHeader.WriteBack(transaction);
+			// if we've made a leaf node out of the root node, we need
+			// to reset the maximum number of levels in the header
+			if (fHeader->MaxNumberOfLevels() != 1) {
+				fHeader->max_number_of_levels = HOST_ENDIAN_TO_BFS_INT32(1);
+				return fCachedHeader.WriteBack(transaction);
+			}
+			return B_OK;
 		}
 
 		// if there is only one key left, we don't have to remove

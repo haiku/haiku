@@ -1641,16 +1641,17 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 			return B_IO_ERROR;
 
 		// if it's an empty root node, we have to convert it
-		// to a leaf node by dropping the overflow link
+		// to a leaf node by dropping the overflow link, or,
+		// if it's already a leaf node, just empty it
 		if (nodeAndKey.nodeOffset == fHeader->RootNode()
-			&& node->NumKeys() == 0) {
+			&& (node->NumKeys() == 0 || node->NumKeys() == 1 && node->IsLeaf())) {
 			writableNode->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 			writableNode->all_key_count = 0;
 			writableNode->all_key_length = 0;
 
-			// if we've cleared the root node, reset the maximum
-			// number of levels in the header
-			if (nodeAndKey.nodeOffset == fHeader->RootNode()) {
+			// if we've made a leaf node out of the root node, we need
+			// to reset the maximum number of levels in the header
+			if (fHeader->MaxNumberOfLevels() != 1) {
 				bplustree_header *header = fCachedHeader.MakeWritableHeader(transaction);
 				if (header == NULL)
 					return B_IO_ERROR;
