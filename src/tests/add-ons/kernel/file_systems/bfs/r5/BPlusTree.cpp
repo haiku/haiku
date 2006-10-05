@@ -1489,8 +1489,7 @@ BPlusTree::Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 		// to a leaf node by dropping the overflow link, or,
 		// if it's a leaf node, just empty it
 		if (nodeAndKey.nodeOffset == fHeader->RootNode()
-			&& node->NumKeys() == 0
-			|| node->NumKeys() == 1 && node->IsLeaf()) {
+			&& node->NumKeys() == 0) {
 			node->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 			node->all_key_count = 0;
 			node->all_key_length = 0;
@@ -1498,13 +1497,9 @@ BPlusTree::Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 			if (cached.WriteBack(transaction) < B_OK)
 				return B_IO_ERROR;
 
-			// if we've cleared the root node, reset the maximum
-			// number of levels in the header
-			if (nodeAndKey.nodeOffset == fHeader->RootNode()) {
-				fHeader->max_number_of_levels = HOST_ENDIAN_TO_BFS_INT32(1);
-				return fCachedHeader.WriteBack(transaction);
-			}
-			return B_OK;
+			// reset the maximum number of levels in the header
+			fHeader->max_number_of_levels = HOST_ENDIAN_TO_BFS_INT32(1);
+			return fCachedHeader.WriteBack(transaction);
 		}
 
 		// if there is only one key left, we don't have to remove
@@ -1775,6 +1770,8 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 	}
 
 	off_t savedNodeOffset = fCurrentNodeOffset;
+	int32 savedKey = fCurrentKey;
+
 	if ((node = cached.SetTo(fCurrentNodeOffset)) == NULL)
 		RETURN_ERROR(B_ERROR);
 
@@ -1799,7 +1796,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 		} else {
 			// there are no nodes left, so turn back to the last key
 			fCurrentNodeOffset = savedNodeOffset;
-			fCurrentKey = direction == BPLUSTREE_FORWARD ? node->NumKeys() : -1;
+			fCurrentKey = savedKey;
 
 			return B_ENTRY_NOT_FOUND;
 		}
