@@ -51,6 +51,9 @@ static benaphore sTCPLock;
 status_t
 tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv_win);
 
+size_t
+tcp_get_mtu(net_protocol *protocol, const struct sockaddr *address);
+
 #include "tcp.h"
 #include "TCPConnection.h"
 
@@ -78,7 +81,7 @@ tcp_dump_hash(){
 	hash_close(sTCPHash, &iterator, false);
 }
 #else
-#	define DUMP_TCP_HASH
+#	define DUMP_TCP_HASH 0
 #endif
 
 
@@ -189,7 +192,7 @@ tcp_shutdown(net_protocol *protocol, int direction)
 status_t
 tcp_send_data(net_protocol *protocol, net_buffer *buffer)
 {
-	return protocol->next->module->send_data(protocol->next, buffer);
+	return ((TCPConnection *)protocol)->SendData(buffer);
 }
 
 
@@ -197,7 +200,7 @@ status_t
 tcp_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
-	return protocol->next->module->send_routed_data(protocol->next, route, buffer);
+	return ((TCPConnection *)protocol)->SendRoutedData(route, buffer);
 }
 
 

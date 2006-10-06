@@ -10,14 +10,20 @@
 #define	TCP_INITIAL_RTT	120000000LL
 
 // Estimate for Maximum segment lifetime in the internet
-#define TCP_MAX_SEGMENT_LIFETIME TCP_INITIAL_RTT
+#define TCP_MAX_SEGMENT_LIFETIME (2 * TCP_INITIAL_RTT)
 
 // keep maximum buffer sizes < max net_buffer size for now
 #define	TCP_MAX_SEND_BUF 1024
 #define TCP_MAX_RECV_BUF TCP_MAX_SEND_BUF
 
-#define TCP_IS_GOOD_ACK(x) (fLastByteAckd > fNextByteToSend ? ((x) >= fLastByteAckd || (x) <= fNextByteToSend) : ((x) >= fLastByteAckd && (x) <= fNextByteToSend))
-#define TCP_IS_GOOD_SEQ(x,y) (fNextByteToRead < fNextByteToRead + TCP_MAX_RECV_BUF ? (x) >= fNextByteToRead && (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF : ((x) >= fNextByteToRead || (x) <= fNextByteToRead + TCP_MAX_RECV_BUF) && ((x) + (y) >= fNextByteToRead || (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF))
+#define TCP_IS_GOOD_ACK(x) (fLastByteAckd > fNextByteToSend ? \
+	((x) >= fLastByteAckd || (x) <= fNextByteToSend) : \
+	((x) >= fLastByteAckd && (x) <= fNextByteToSend))
+
+#define TCP_IS_GOOD_SEQ(x,y) (fNextByteToRead < fNextByteToRead + TCP_MAX_RECV_BUF ? \
+	(x) >= fNextByteToRead && (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF : \
+	((x) >= fNextByteToRead || (x) <= fNextByteToRead + TCP_MAX_RECV_BUF) && \
+	((x) + (y) >= fNextByteToRead || (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF))
 
 typedef struct {
 	const sockaddr	*local;
@@ -41,9 +47,9 @@ public:
 	status_t Shutdown(int direction);
 	status_t SendData(net_buffer *buffer);
 	status_t SendRoutedData(net_route *route, net_buffer *buffer);
-	status_t SendAvailable();
+	size_t SendAvailable();
 	status_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
-	status_t ReadAvailable();
+	size_t ReadAvailable();
 
 	status_t ReceiveData(net_buffer *buffer);
 
@@ -77,12 +83,10 @@ private:
 	uint32	fNextByteExpected;
 	uint32	fLastByteReceived;
 
-	uint32	fEffectiveWindow;
-	
 	bigtime_t	fAvgRTT;
 
-	TCPSegment	*fSent;
-	TCPSegment	*fReceived;
+	net_buffer	*fSendBuffer;
+	net_buffer	*fReceiveBuffer;
 
 	TCPConnection	*fHashLink;
 	tcp_state		fState;
@@ -115,12 +119,14 @@ TCPConnection::TCPSegment::~TCPSegment()
 TCPConnection::TCPConnection(net_socket *socket)
 	:
 	fLastByteAckd(0), //system_time()),
-	fNextByteToSend(fLastByteAckd), //fLastByteAckd),
-	fNextByteToWrite(fLastByteAckd + 1), //fLastByteAckd),
+	fNextByteToSend(fLastByteAckd),
+	fNextByteToWrite(fLastByteAckd + 1),
 	fNextByteToRead(0),
 	fNextByteExpected(0),
 	fLastByteReceived(0),
 	fAvgRTT(TCP_INITIAL_RTT),
+	fSendBuffer(NULL),
+	fReceiveBuffer(NULL),
 	fState(CLOSED),
 	fError(B_OK),
 	fRoute(NULL)
@@ -216,6 +222,25 @@ TCPConnection::Connect(const struct sockaddr *address)
 	}
 	TRACE(("TCP: Connect(): in state %d\n", fState));
 
+	// get a net_route if there isn't one
+	if (fRoute == NULL) {
+		fRoute = sDatalinkModule->get_route(sDomain, (sockaddr *)address);
+		TRACE(("TCP: Connect(): Using Route %p\n", fRoute));
+		if (fRoute == NULL) {
+			benaphore_unlock(&sTCPLock);
+			return ENETUNREACH;
+		}
+	}
+
+	// need to associate this connection with a real address, not INADDR_ANY
+	if (sAddressModule->is_empty_address((sockaddr *)&socket->address, false)) {
+		TRACE(("TCP: Connect(): Local Address is INADDR_ANY\n"));
+		sAddressModule->set_to((sockaddr *)&socket->address, (sockaddr *)fRoute->interface->address);
+		// since most stacks terminate connections from port 0
+		// use port 40000 for now.  This should be moved to Bind(), and Bind() called before Connect().
+		sAddressModule->set_port((sockaddr *)&socket->address, htons(40000));
+	}
+
 	// make sure connection does not already exist
 	tcp_connection_key key;
 	key.local = (sockaddr *)&socket->address;
@@ -227,35 +252,6 @@ TCPConnection::Connect(const struct sockaddr *address)
 	TRACE(("TCP: Connect(): connecting...\n"));
 
 	status_t status;
-	// update the hash with the new key values
-	key.peer = (sockaddr *)&socket->peer;
-	if (hash_lookup(sTCPHash, &key) != NULL) {
-		status = hash_remove(sTCPHash, (void *)this);
-		if (status != B_OK) {
-			TRACE(("TCP: Connect(): Hash Error: %s\n", strerror(status)));
-			benaphore_unlock(&sTCPLock);
-			return status;
-		}
-	} else {
-		TRACE(("TCP: Connect(): Connection not in hash yet!\n"));
-		// get a net_route if there isn't one
-		if (fRoute == NULL) {
-			fRoute = sDatalinkModule->get_route(sDomain, (sockaddr *)address);
-			TRACE(("TCP: Connect(): Using Route %p\n", fRoute));
-			if (fRoute == NULL) {
-				return ENETUNREACH;
-			}
-		}
-
-		if (sAddressModule->is_empty_address((sockaddr *)&socket->address, false)) {
-			TRACE(("TCP: Connect(): Local Address is INADDR_ANY\n"));
-			sAddressModule->set_to((sockaddr *)&socket->address, (sockaddr *)fRoute->interface->address);
-			// since most stacks terminate connections from port 0
-			// use port 40000 for now.  This should be moved to Bind().
-			sAddressModule->set_port((sockaddr *)&socket->address, htons(40000));
-		}
-	}
-
 	sAddressModule->set_to((sockaddr *)&socket->peer, address);
 	status = hash_insert(sTCPHash, (void *)this);
 	if (status != B_OK) {
@@ -346,6 +342,7 @@ status_t
 TCPConnection::Listen(int count)
 {
 	TRACE(("TCP:%p.Listen()\n", this));
+	BenaphoreLocker lock(&fLock);
 	if (fState != CLOSED)
 		return B_ERROR;
 	fState = LISTEN;
@@ -368,7 +365,19 @@ status_t
 TCPConnection::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
-	return B_ERROR;
+	size_t bufSize = buffer->size;
+	BenaphoreLocker lock(&fLock);
+	if (fSendBuffer == NULL) {
+		fSendBuffer = buffer;
+		fNextByteToWrite += bufSize;
+		return Send(TCP_FLG_ACK, false);
+	} else {
+		status_t status = sBufferModule->merge(fSendBuffer, buffer, true);
+		if (status != B_OK)
+			return status;
+		fNextByteToWrite += bufSize;
+		return Send(TCP_FLG_ACK, false);
+	}
 }
 
 
@@ -376,16 +385,23 @@ status_t
 TCPConnection::SendRoutedData(net_route *route, net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendRoutedData()\n", this));
-	fRoute = route;
+	{
+		BenaphoreLocker lock(&fLock);
+		fRoute = route;
+	}
 	return SendData(buffer);
 }
 
 
-status_t
+size_t
 TCPConnection::SendAvailable()
 {
 	TRACE(("TCP:%p.SendAvailable()\n", this));
-	return B_ERROR;
+	BenaphoreLocker lock(&fLock);
+	if (fSendBuffer != NULL)
+		return TCP_MAX_SEND_BUF - fSendBuffer->size;
+	else
+		return TCP_MAX_SEND_BUF;
 }
 
 
@@ -397,11 +413,15 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 }
 
 
-status_t
+size_t
 TCPConnection::ReadAvailable()
 {
 	TRACE(("TCP:%p.ReadAvailable()\n", this));
-	return B_ERROR;
+	BenaphoreLocker lock(&fLock);
+	if (fReceiveBuffer != NULL)
+		return fReceiveBuffer->size;
+	else
+		return 0;
 }
 
 
@@ -424,12 +444,15 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 	uint32 byteRcvd = ntohl(header.sequence_num);
 	uint32 payloadLength = buffer->size - ((uint32)header.header_length << 2);
 
-	TRACE(("TCP: Receive(): Connection in state %d received packet %p with flags %X!\n", fState, buffer, header.flags));
+	TRACE(("TCP: ReceiveData(): Connection in state %d received packet %p with flags %X!\n", fState, buffer, header.flags));
 	switch (fState) {
 	case CLOSED:
 	case TIME_WAIT:
-		// shouldn't happen.  send RST
-		Reset(byteRcvd + payloadLength, 0);
+		sBufferModule->free(buffer);
+		if (header.flags & TCP_FLG_ACK)
+			return Reset(byteAckd, 0);
+		else
+			return Reset(0, byteRcvd + payloadLength);
 		break;
 	case LISTEN:
 		// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
@@ -439,37 +462,39 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 		// buffer.
 		// Otherwise, RST+ACK is sent.
 		// The current TCPConnection always remains in LISTEN state.
+		return B_ERROR;
 		break;
 	case SYN_SENT:
-	case SYN_RCVD:
-		// if packet is SYN+ACK, send ACK & enter ESTABLISHED state.
-		// if packet is SYN, send ACK & enter SYN_RCVD state.
 		if (header.flags & TCP_FLG_RST) {
 			fError = ECONNREFUSED;
 			fState = CLOSED;
 			return B_ERROR;
 		}
-		if (TCP_IS_GOOD_ACK(byteAckd)) {
-			if (header.flags & TCP_FLG_SYN) {
-				fNextByteToRead =
-					fNextByteExpected =
-					fLastByteReceived = ntohl(header.sequence_num) + 1;
-				flags |= TCP_FLG_ACK;
-				if (header.flags & TCP_FLG_ACK) {
-					fLastByteAckd = byteAckd;
-					// cancel resend of this segment
-					nextState = ESTABLISHED;
-				} else {
-					flags |= TCP_FLG_SYN;
-					nextState = SYN_RCVD;
-				}
-				status = Send(flags, false);
-				if (status == B_OK)
-					fState = nextState;
+		if (header.flags & TCP_FLG_ACK && !TCP_IS_GOOD_ACK(byteAckd))
+			return Reset(byteAckd, 0);
+		if (header.flags & TCP_FLG_SYN) {
+			fNextByteToRead = fNextByteExpected = ntohl(header.sequence_num) + 1;
+			flags |= TCP_FLG_ACK;
+			fLastByteAckd = byteAckd;
+			// cancel resend of this segment
+			if (header.flags & TCP_FLG_ACK)
+				nextState = ESTABLISHED;
+			else {
+				nextState = SYN_RCVD;
+				flags |= TCP_FLG_SYN;
 			}
-		} else {
-			Reset(byteRcvd + payloadLength, 0);
+			status = Send(flags, false);
+			if (status == B_OK)
+				fState = nextState;
+			else
+				return status;
 		}
+		break;
+	case SYN_RCVD:
+		if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd))
+			fState = ESTABLISHED;
+		else
+			Reset(byteAckd, 0);
 		break;
 	default:
 		// In a synchronized state.
@@ -539,7 +564,7 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 		}
 		break;
 	}
-	TRACE(("TCP %p.Receive():Entering state %d\n", this, fState));
+	TRACE(("TCP %p.ReceiveData():Entering state %d\n", this, fState));
 	return B_OK;
 }
 
@@ -552,7 +577,8 @@ TCPConnection::Reset(uint32 sequenceNum, uint32 acknowledgeNum)
 	sAddressModule->set_to((sockaddr *)&reply_buf->source, (sockaddr *)&socket->address);
 	sAddressModule->set_to((sockaddr *)&reply_buf->destination, (sockaddr *)&socket->peer);
 
-	status_t status = tcp_segment(reply_buf, TCP_FLG_RST , sequenceNum, acknowledgeNum, 0);
+	uint16 flags = TCP_FLG_RST | acknowledgeNum == 0 ? 0 : TCP_FLG_ACK;
+	status_t status = tcp_segment(reply_buf, flags , sequenceNum, acknowledgeNum, 0);
 	if (status != B_OK) {
 		sBufferModule->free(reply_buf);
 		return status;
@@ -590,13 +616,18 @@ TCPConnection::Send(uint16 flags, bool empty)
 	TRACE(("TCP:%p.Send(%X,%s)\n", this, flags, empty ? "1" : "0"));
 
 	net_buffer *buffer;
-	if (1/*no data in send buffer*/ || empty) {
-		buffer = sBufferModule->create(512);
+	uint32 effectiveWindow = min_c(tcp_get_mtu(this, (sockaddr *)&socket->address), fNextByteToWrite - fNextByteToSend);
+	if (empty || effectiveWindow == 0 || fSendBuffer == NULL || fSendBuffer->size == 0) {
+		buffer = sBufferModule->create(256);
 		TRACE(("TCP: Sending Buffer %p\n", buffer));
 		if (buffer == NULL)
 			return ENOBUFS;
 	} else {
-		//TODO: create net_buffer from data in send buffer
+		buffer = fSendBuffer;
+		if (effectiveWindow == fSendBuffer->size)
+			fSendBuffer = NULL;
+		else
+			fSendBuffer = sBufferModule->split(fSendBuffer, effectiveWindow);
 	}
 
 	sAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
