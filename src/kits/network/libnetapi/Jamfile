@@ -3,7 +3,13 @@ SubDir HAIKU_TOP src kits network libnetapi ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders net ;
-#UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
+
+local netapi_sources =
+	NetEndpoint.cpp
+	NetAddress.cpp 
+	NetBuffer.cpp
+	NetDebug.cpp
+;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -11,32 +17,33 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 	UseHeaders [ FStandardOSHeaders ] : true ;
 		# Needed for <net/*.h> and maybe other stuff.
-} else if $(TARGET_PLATFORM) = r5 {
-	defines = [ FDefines BUILDING_R5_LIBNET ] ;
+
+	local defines = [ FDefines BUILDING_R5_LIBNET ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
+
+	SharedLibrary libnetapi.so :
+		$(netapi_sources)
+		: be $(NETWORK_LIBS)
+	;
+
+	# Installation -- in the test directory for the time being
+	HaikuInstallRelSymLink install-networking
+		: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
+		: libnetapi.so
+		: installed-networking-test ;
+
+	HaikuInstallRelSymLink install-userland-networking
+		: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
+		: libnetapi.so
+		: installed-userland-networking ;
+
+	Package haiku-networkingkit-cvs :
+		libnetapi.so :
+	#	boot home config lib ;
+		boot home Desktop haiku-networkingkit lib ;
+} else {
+	MergeObject <libnetwork_netapi>netapi.o :
+		$(netapi_sources)
+	;
 }
-
-SharedLibrary libnetapi.so :
-	NetEndpoint.cpp
-	NetAddress.cpp 
-	NetBuffer.cpp
-	NetDebug.cpp
-	: be $(NETWORK_LIBS)
-;
-
-# Installation -- in the test directory for the time being
-HaikuInstallRelSymLink install-networking
-	: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
-	: libnetapi.so
-	: installed-networking-test ;
-
-HaikuInstallRelSymLink install-userland-networking
-	: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
-	: libnetapi.so
-	: installed-userland-networking ;
-
-Package haiku-networkingkit-cvs :
-	libnetapi.so :
-#	boot home config lib ;
-	boot home Desktop haiku-networkingkit lib ;

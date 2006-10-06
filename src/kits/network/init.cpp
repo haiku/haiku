@@ -43,9 +43,11 @@ initialize_before()
 	while (__get_next_image_dependency(info.id, &cookie, &name) == B_OK) {
 		if (!strcmp(name, "libbind.so")
 			|| !strcmp(name, "libsocket.so")
+			|| !strcmp(name, "libbnetapi.so")
 			|| !strcmp(name, "libnetwork.so"))
 			enable -= 2;
-		else if (!strcmp(name, "libnet.so"))
+		else if (!strcmp(name, "libnet.so")
+			|| !strcmp(name, "libnetapi.so"))
 			enable++;
 	}
 

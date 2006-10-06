@@ -8,6 +8,8 @@ SharedLibrary libnetwork.so :
 	socket.cpp
 	r5_compatibility.cpp
 	:
+	<libnetwork_netapi>netapi.o
+
 	<libnetwork_dns>dns_dst.o
 	<libnetwork_dns>dns_inet.o
 	<libnetwork_dns>dns_irs.o

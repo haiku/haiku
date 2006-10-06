@@ -44,7 +44,7 @@ BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScreenSaver Sounds Time VirtualMemory
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
-	libtranslation.so libnetwork.so libdebug.so libbsd.so libnetapi.so
+	libtranslation.so libnetwork.so libdebug.so libbsd.so
 	libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so libmidi2.so
 	libdevice.so libgame.so libscreensaver.so libroot.so $(X86_ONLY)libGL.so
 	libfluidsynth.so libqoca.so
@@ -134,10 +134,12 @@ AddFilesToHaikuImage beos system : kernel_$(TARGET_ARCH) ;
 
 # libs
 AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) ;
+# libnetwork.so replaces quite a few libraries
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libsocket.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbind.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnet.so ;
-AddSymlinkToHaikuImage beos system lib : libnetapi.so : libbnetapi.so ;
+AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnetapi.so ;
+AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbnetapi.so ;
 
 # servers
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
