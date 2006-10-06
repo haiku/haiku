@@ -1419,6 +1419,37 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType, void **_l
 }
 
 
+status_t
+get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
+{
+	image_t *image = find_loaded_image_by_id(id);
+	uint32 i, j, searchIndex = *cookie;
+	struct Elf32_Dyn *dynamicSection;
+
+	if (image == NULL)
+		return B_BAD_VALUE;
+
+	dynamicSection = (struct Elf32_Dyn *)image->dynamic_ptr;
+	if (dynamicSection == NULL || image->num_needed <= searchIndex)
+		return B_ENTRY_NOT_FOUND;
+
+	for (i = 0, j = 0; dynamicSection[i].d_tag != DT_NULL; i++) {
+		if (dynamicSection[i].d_tag != DT_NEEDED)
+			continue;
+
+		if (j++ == searchIndex) {
+			int32 neededOffset = dynamicSection[i].d_un.d_val;
+
+			*_name = STRING(image, neededOffset);
+			*cookie = searchIndex + 1;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 //	#pragma mark -
 
 

@@ -183,6 +183,13 @@ __parse_invoke_line(char *invoker, char ***_newArgs,
 
 
 status_t
+__get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
+{
+	return __gRuntimeLoader->get_next_image_dependency(id, cookie, _name);
+}
+
+
+status_t
 __test_executable(const char *path, char *invoker)
 {
 	return __gRuntimeLoader->test_executable(path, geteuid(), getegid(), invoker);

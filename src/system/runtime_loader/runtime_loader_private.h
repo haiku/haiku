@@ -34,6 +34,7 @@ status_t get_nth_symbol(image_id imageID, int32 num, char *nameBuffer, int32 *_n
 	int32 *_type, void **_location);
 status_t get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 	void **_location);
+status_t get_next_image_dependency(image_id id, uint32 *cookie, const char **_name);
 int resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr);
 
 

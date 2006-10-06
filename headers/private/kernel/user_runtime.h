@@ -34,6 +34,8 @@ struct rld_export {
 		int32 *nameLength, int32 *symbolType, void **_location);
 	status_t (*test_executable)(const char *path, uid_t user, gid_t group,
 		char *starter);
+	status_t (*get_next_image_dependency)(image_id id, uint32 *cookie,
+		const char **_name);
 
 	const struct uspace_program_args *program_args;
 };

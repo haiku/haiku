@@ -49,13 +49,21 @@ export_test_executable(const char *path, uid_t user, gid_t group, char *starter)
 }
 
 
+static status_t
+export_get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
+{
+	return get_next_image_dependency(id, cookie, _name);
+}
+
+
 struct rld_export gRuntimeLoader = {
 	// dynamic loading support API
 	export_load_add_on,
 	export_unload_add_on,
 	export_get_image_symbol,
 	export_get_nth_image_symbol,
-	export_test_executable
+	export_test_executable,
+	export_get_next_image_dependency
 };
 
 
