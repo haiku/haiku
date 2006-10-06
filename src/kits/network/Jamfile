@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src kits network ;
 
-UsePrivateHeaders net ;
+UsePrivateHeaders libroot net ;
 
 SharedLibrary libnetwork.so :
+	init.cpp
 	interfaces.cpp
 	socket.cpp
 	:

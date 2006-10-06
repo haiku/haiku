@@ -136,6 +136,7 @@ AddFilesToHaikuImage beos system : kernel_$(TARGET_ARCH) ;
 AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libsocket.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbind.so ;
+AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnet.so ;
 
 # servers
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
