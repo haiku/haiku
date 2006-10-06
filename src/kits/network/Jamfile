@@ -6,6 +6,7 @@ SharedLibrary libnetwork.so :
 	init.cpp
 	interfaces.cpp
 	socket.cpp
+	r5_compatibility.cpp
 	:
 	<libnetwork_dns>dns_dst.o
 	<libnetwork_dns>dns_inet.o
