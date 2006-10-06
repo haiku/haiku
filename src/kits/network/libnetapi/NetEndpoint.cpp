@@ -21,28 +21,6 @@
 #include <unistd.h>
 
 
-static int
-convert_r5_type(int type)
-{
-	// TODO: ideally, we should check if libnet.so has
-	//	been loaded to activate this conversion.
-	// TODO: this is not enough, as the IPPROTO_* constants need to be translated as well
-	switch (type) {
-		case R5_SOCK_DGRAM:
-			return SOCK_DGRAM;
-		case R5_SOCK_STREAM:
-			return SOCK_STREAM;
-		case R5_SOCK_RAW:
-			return SOCK_RAW;
-	}
-
-	return type;
-}
-
-
-//	#pragma mark - BNetEndpoint
-
-
 BNetEndpoint::BNetEndpoint(int type)
 	:
 	fInit(B_NO_INIT),
@@ -50,10 +28,7 @@ BNetEndpoint::BNetEndpoint(int type)
 	fTimeout(B_INFINITE_TIMEOUT),
 	fLastError(0)
 {
-	// Maintain R5 compatibility
-	type = convert_r5_type(type);
-
-	if ((fSocket = socket(AF_INET, type, 0)) < 0)
+	if ((fSocket = socket(__gR5Compatibility ? R5_AF_INET : AF_INET, type, 0)) < 0)
 		fLastError = errno;
 	else
 		fInit = B_OK;
@@ -67,9 +42,6 @@ BNetEndpoint::BNetEndpoint(int family, int type, int protocol)
 	fTimeout(B_INFINITE_TIMEOUT),
 	fLastError(0)
 {
-	// Maintain R5 compatibility
-	type = convert_r5_type(type);
-
 	if ((fSocket = socket(family, type, protocol)) < 0)
 		fLastError = errno;
 	else
