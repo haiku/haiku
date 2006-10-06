@@ -1367,15 +1367,18 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer, int32 *_nameLength
 				strlcpy(nameBuffer, SYMNAME(image, symbol), *_nameLength);
 				*_nameLength = strlen(SYMNAME(image, symbol));
 
-				// ToDo: check with the return types of that BeOS function
-				if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
-					*_type = B_SYMBOL_TYPE_TEXT;
-				else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
-					*_type = B_SYMBOL_TYPE_DATA;
-				else
-					*_type = B_SYMBOL_TYPE_ANY;
+				if (_type != NULL) {
+					// ToDo: check with the return types of that BeOS function
+					if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
+						*_type = B_SYMBOL_TYPE_TEXT;
+					else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
+						*_type = B_SYMBOL_TYPE_DATA;
+					else
+						*_type = B_SYMBOL_TYPE_ANY;
+				}
 
-				*_location = (void *)(symbol->st_value + image->regions[0].delta);
+				if (_location != NULL)
+					*_location = (void *)(symbol->st_value + image->regions[0].delta);
 				goto out;
 			}
 			count++;
@@ -1407,9 +1410,10 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType, void **_l
 
 		// get the symbol in the image
 		symbol = find_symbol(image, symbolName, symbolType);
-		if (symbol)
-			*_location = (void *)(symbol->st_value + image->regions[0].delta);
-		else
+		if (symbol) {
+			if (_location != NULL)
+				*_location = (void *)(symbol->st_value + image->regions[0].delta);
+		} else
 			status = B_ENTRY_NOT_FOUND;
 	} else
 		status = B_BAD_IMAGE_ID;
