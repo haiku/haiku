@@ -24,6 +24,8 @@ extern char **argv_save;
 extern thread_id __main_thread_id;
 extern char **environ;
 
+bool __gHaikuStartupCode = true;
+
 
 int
 _start(int argc, char **argv, char **environment)
