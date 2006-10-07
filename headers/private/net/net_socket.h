@@ -9,6 +9,9 @@
 #include <net_buffer.h>
 #include <sys/socket.h>
 
+#include <Select.h>
+#include <lock.h>
+
 
 #define NET_SOCKET_MODULE_NAME "network/stack/socket/v1"
 
@@ -31,6 +34,11 @@ typedef struct net_socket {
 		uint32		low_water_mark;
 		bigtime_t	timeout;
 	}						send, receive;
+
+	// TODO: could be moved into a private structure
+	status_t				error;
+	struct select_sync_pool	*select_pool;
+	benaphore				lock;
 } net_socket;
 
 struct net_socket_module_info {
@@ -52,6 +60,13 @@ struct net_socket_module_info {
 	status_t	(*send_data)(net_socket *socket, net_buffer *buffer);
 	status_t	(*receive_data)(net_socket *socket, size_t length, uint32 flags,
 					net_buffer **_buffer);
+
+	// notifications
+	status_t	(*request_notification)(net_socket *socket, uint8 event, uint32 ref,
+					selectsync *sync);
+	status_t	(*cancel_notification)(net_socket *socket, uint8 event,
+					selectsync *sync);
+	status_t	(*notify)(net_socket *socket, uint8 event, int32 value);
 
 	// standard socket API
 	int			(*accept)(net_socket *socket, struct sockaddr *address,

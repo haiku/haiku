@@ -63,6 +63,16 @@ checksum(uint8 *buffer, size_t length)
 }
 
 
+//	#pragma mark - Notifications
+
+
+status_t
+notify_socket(net_socket *socket, uint8 event, int32 value)
+{
+	return gNetSocketModule.notify(socket, event, value);
+}
+
+
 //	#pragma mark - FIFOs
 
 

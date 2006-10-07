@@ -910,6 +910,8 @@ static net_stack_module_info sNetStackModule = {
 	unregister_device_monitor,
 	device_removed,
 
+	notify_socket,
+
 	checksum,
 
 	init_fifo,

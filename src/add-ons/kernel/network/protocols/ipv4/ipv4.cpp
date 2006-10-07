@@ -115,7 +115,7 @@ typedef DoublyLinkedList<class RawSocket> RawSocketList;
 
 class RawSocket : public DoublyLinkedListLinkImpl<RawSocket> {
 	public:
-		RawSocket();
+		RawSocket(net_socket *socket);
 		~RawSocket();
 
 		status_t InitCheck();
@@ -127,6 +127,7 @@ class RawSocket : public DoublyLinkedListLinkImpl<RawSocket> {
 		status_t Write(net_buffer *buffer);
 
 	private:
+		net_socket	*fSocket;
 		net_fifo	fFifo;
 };
 
@@ -153,7 +154,9 @@ static benaphore sFragmentLock;
 static hash_table *sFragmentHash;
 
 
-RawSocket::RawSocket()
+RawSocket::RawSocket(net_socket *socket)
+	:
+	fSocket(socket)
 {
 	status_t status = sStackModule->init_fifo(&fFifo, "ipv4 raw socket", 65536);
 	if (status < B_OK)
@@ -211,7 +214,13 @@ RawSocket::Write(net_buffer *source)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	return sStackModule->fifo_enqueue_buffer(&fFifo, buffer);
+	status_t status = sStackModule->fifo_enqueue_buffer(&fFifo, buffer);
+	if (status >= B_OK)
+		sStackModule->notify_socket(fSocket, B_SELECT_READ, BytesAvailable());
+	else
+		sBufferModule->free(buffer);
+
+	return status;
 }
 
 
@@ -597,7 +606,7 @@ ipv4_open(net_protocol *_protocol)
 {
 	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
 
-	RawSocket *raw = new (std::nothrow) RawSocket;
+	RawSocket *raw = new (std::nothrow) RawSocket(protocol->socket);
 	if (raw == NULL)
 		return B_NO_MEMORY;
 

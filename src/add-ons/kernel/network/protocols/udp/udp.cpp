@@ -871,7 +871,9 @@ UdpEndpoint::StoreData(net_buffer *_buffer)
 		return B_NO_MEMORY;
 
 	status_t status = sStackModule->fifo_enqueue_buffer(&fFifo, buffer);
-	if (status < B_OK)
+	if (status >= B_OK)
+		sStackModule->notify_socket(socket, B_SELECT_READ, BytesAvailable());
+	else
 		sBufferModule->free(buffer);
 
 	return status;

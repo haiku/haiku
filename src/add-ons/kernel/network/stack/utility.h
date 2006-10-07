@@ -16,6 +16,9 @@
 uint16		compute_checksum(uint8 *_buffer, size_t length);
 uint16		checksum(uint8 *buffer, size_t length);
 
+// notifications
+status_t	notify_socket(net_socket *socket, uint8 event, int32 value);
+
 // fifos
 status_t	init_fifo(net_fifo *fifo, const char *name, size_t maxBytes);
 void		uninit_fifo(net_fifo *fifo);

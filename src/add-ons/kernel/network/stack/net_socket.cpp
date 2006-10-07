@@ -14,6 +14,7 @@
 
 #include <KernelExport.h>
 #include <util/list.h>
+#include <fs/select_sync_pool.h>
 
 #include <new>
 #include <stdlib.h>
@@ -32,6 +33,10 @@ create_socket(int family, int type, int protocol, net_socket **_socket)
 	socket->type = type;
 	socket->protocol = protocol;
 
+	status_t status = benaphore_init(&socket->lock, "socket");
+	if (status < B_OK)
+		goto err1;
+
 	// set defaults (may be overridden by the protocols)
 	socket->send.buffer_size = 65536;
 	socket->send.low_water_mark = 1;
@@ -40,21 +45,26 @@ create_socket(int family, int type, int protocol, net_socket **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	status_t status = get_domain_protocols(socket);
-	if (status < B_OK) {
-		delete socket;
-		return status;
-	}
+	socket->select_pool = NULL;
+
+	status = get_domain_protocols(socket);
+	if (status < B_OK)
+		goto err2;
 
 	status = socket->first_info->open(socket->first_protocol);
-	if (status < B_OK) {
-		put_domain_protocols(socket);
-		delete socket;
-		return status;
-	}
+	if (status < B_OK)
+		goto err3;
 
 	*_socket = socket;
 	return B_OK;
+
+err3:
+	put_domain_protocols(socket);
+err2:
+	benaphore_destroy(&socket->lock);
+err1:
+	delete socket;
+	return status;
 }
 
 
@@ -71,6 +81,8 @@ socket_free(net_socket *socket)
 	status_t status = socket->first_info->free(socket->first_protocol);
 
 	put_domain_protocols(socket);
+	benaphore_destroy(&socket->lock);
+	delete_select_sync_pool(socket->select_pool);
 	delete socket;
 
 	return status;
@@ -163,6 +175,96 @@ socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 {
 	return socket->first_info->read_data(socket->first_protocol,
 		length, flags, _buffer);
+}
+
+
+//	#pragma mark - notifications
+
+
+status_t
+socket_request_notification(net_socket *socket, uint8 event, uint32 ref,
+	selectsync *sync)
+{
+	benaphore_lock(&socket->lock);
+
+	status_t status = add_select_sync_pool_entry(&socket->select_pool, sync,
+		ref, event);
+	if (status < B_OK) {
+		benaphore_unlock(&socket->lock);
+		return status;
+	}
+
+	// check if the event is already present
+	// TODO: add support for poll() types
+
+	switch (event) {
+		case B_SELECT_READ:
+		{
+			ssize_t available = socket_read_avail(socket);
+			if ((ssize_t)socket->receive.low_water_mark <= available || available < B_OK)
+				notify_select_event(sync, ref, event);
+			break;
+		}
+		case B_SELECT_WRITE:
+		{
+			ssize_t available = socket_send_avail(socket);
+			if ((ssize_t)socket->send.low_water_mark <= available || available < B_OK)
+				notify_select_event(sync, ref, event);
+			break;
+		}
+		case B_SELECT_ERROR:
+			// TODO: B_SELECT_ERROR condition!
+			break;
+	}
+
+	benaphore_unlock(&socket->lock);
+	return B_OK;
+}
+
+
+status_t
+socket_cancel_notification(net_socket *socket, uint8 event, selectsync *sync)
+{
+	benaphore_lock(&socket->lock);
+
+	status_t status = remove_select_sync_pool_entry(&socket->select_pool,
+		sync, event);
+
+	benaphore_unlock(&socket->lock);
+	return status;
+}
+
+
+status_t
+socket_notify(net_socket *socket, uint8 event, int32 value)
+{
+	benaphore_lock(&socket->lock);
+
+	bool notify = true;
+
+	switch (event) {
+		case B_SELECT_READ:
+		{
+			if ((ssize_t)socket->receive.low_water_mark > value && value >= B_OK)
+				notify = false;
+			break;
+		}
+		case B_SELECT_WRITE:
+		{
+			if ((ssize_t)socket->send.low_water_mark > value && value >= B_OK)
+				notify = false;
+			break;
+		}
+		case B_SELECT_ERROR:
+			socket->error = value;
+			break;
+	}
+
+	if (notify && socket->select_pool)
+		notify_select_event_pool(socket->select_pool, event);
+
+	benaphore_unlock(&socket->lock);
+	return B_OK;
 }
 
 
@@ -303,6 +405,17 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 			int32 *_set = (int32 *)value;
 			*_set = (socket->options & option) != 0;
 			*_length = sizeof(int32);
+			return B_OK;
+		}
+
+		case SO_ERROR:
+		{
+			int32 *_set = (int32 *)value;
+			*_set = socket->error;
+			*_length = sizeof(int32);
+
+			socket->error = B_OK;
+				// clear error upon retrieval
 			return B_OK;
 		}
 
@@ -571,6 +684,11 @@ net_socket_module_info gNetSocketModule = {
 
 	socket_send_data,
 	socket_receive_data,
+
+	// notifications
+	socket_request_notification,
+	socket_cancel_notification,
+	socket_notify,
 
 	// standard socket API
 	socket_accept,

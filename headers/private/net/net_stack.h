@@ -76,6 +76,9 @@ struct net_stack_module_info {
 
 	// Utility Functions
 
+	// notification
+	status_t	(*notify_socket)(struct net_socket *socket, uint8 event, int32 value);
+
 	// checksum
 	uint16 (*checksum)(uint8 *buffer, size_t length);
 
