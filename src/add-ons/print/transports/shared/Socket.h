@@ -4,17 +4,12 @@
 #ifndef __Socket_H
 #define __Socket_H
 
-#ifdef WIN32
-#include <istream>
-#include <ostream>
-#else
 #include <istream.h>
 #include <ostream.h>
-#endif	// WIN32
 
 #include <string>
 
-#if (!__MWERKS__ || defined(WIN32))
+#if (!__MWERKS__)
 using namespace std;
 #else 
 #define std

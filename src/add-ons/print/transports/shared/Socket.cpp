@@ -1,17 +1,13 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
-#ifdef WIN32
-  #include <winsock.h>
-#else
 #ifdef __HAIKU__
 #	include <sys/socket.h>
 #else
 #	include <net/socket.h>
 #endif
-  #include <netdb.h>
-  #include <arpa/inet.h>	
-#endif	// WIN32
+#include <netdb.h>
+#include <arpa/inet.h>	
 
 #include <stdio.h>
 #include <unistd.h>
@@ -23,29 +19,7 @@
 #define INADDR_NONE		0xffffffff
 #endif
 
-#ifdef WIN32
-	#define EADDRINUSE	WSAEADDRINUSE
-	#define errno		WSAGetLastError()
-#else
-	#include <errno.h>
-#endif
-
-#ifdef WIN32
-class WIN32SOCKET {
-public:
-	WIN32SOCKET()
-	{
-		WSADATA winsockdata;
-		WSAStartup(MAKEWORD(1,1), &winsockdata);
-	}
-	~WIN32SOCKET()
-	{
-		WSACleanup();
-	}
-};
-
-WIN32SOCKET win32socket;
-#endif
+#include <errno.h>
 
 Socket::Socket(const char *host, int port)
 	: __sock(-1), __is(NULL), __os(NULL), __error(false)

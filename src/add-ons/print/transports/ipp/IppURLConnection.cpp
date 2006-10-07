@@ -1,11 +1,6 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
-#ifdef WIN32
-#include <winsock.h>
-#include <ostream>
-#include <cstring>
-#else
 #ifdef __HAIKU__
 #	include <sys/socket.h>
 #else
@@ -21,7 +16,6 @@ char *itoa(int i, char *buf, int unit)
 }
 #define stricmp		strcasecmp
 #define strnicmp	strncasecmp
-#endif	// WIN32
 
 #include <list>
 #include "IppURLConnection.h"

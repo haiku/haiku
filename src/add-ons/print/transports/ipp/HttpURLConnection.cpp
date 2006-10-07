@@ -5,11 +5,7 @@
 #include <algorithm>
 #include <cstring>
 
-#ifdef WIN32
-#include <minmax.h>
-#else
 #define stricmp	strcasecmp
-#endif
 
 #include "HttpURLConnection.h"
 #include "Socket.h"

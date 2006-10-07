@@ -9,8 +9,7 @@ if $(BONE_COMPATIBLE) {
 Objects
 	DbgMsg.cpp
 	Socket.cpp
-	SocketStream1.cpp
-	SocketStream2.cpp
+	SocketStream.cpp
 ;
 
 

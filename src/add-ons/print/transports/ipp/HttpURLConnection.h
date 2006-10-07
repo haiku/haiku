@@ -4,13 +4,8 @@
 #ifndef __HttpURLConnection_H
 #define __HttpURLConnection_H
 
-#ifdef WIN32
-#include <istream>
-#include <ostream>
-#else
 #include <istream.h>
 #include <ostream.h>
-#endif
 
 #include <list>
 #include <string>

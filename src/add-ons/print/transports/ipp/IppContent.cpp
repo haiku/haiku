@@ -1,9 +1,7 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
-#ifdef WIN32
-#	include <winsock.h>
-#elif defined(__HAIKU__)
+#if defined(__HAIKU__)
 #	include <sys/socket.h>
 #	include <netinet/in.h>
 #else

@@ -1,21 +1,15 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
-#ifdef WIN32
-#	include <windows.h>
-#	include <winsock.h>
-#	include <sstream>
+#ifdef __HAIKU__
+#	include <sys/socket.h>
+#	include <netdb.h>
 #else
-#	ifdef __HAIKU__
-#		include <sys/socket.h>
-#		include <netdb.h>
-#	else
-#		include <net/socket.h>
-#		include <net/netdb.h>
-#	endif
-#	include <errno.h>
-#	include "_sstream"
+#	include <net/socket.h>
+#	include <net/netdb.h>
 #endif
+#include <errno.h>
+#include "_sstream"
 
 #include <iomanip>
 #include <algorithm>
@@ -23,7 +17,7 @@
 #include "Socket.h"
 //#include "DbgMsg.h"
 
-#if (!__MWERKS__ || defined(WIN32))
+#if (!__MWERKS__)
 using namespace std;
 #else 
 #define std
@@ -51,12 +45,7 @@ using namespace std;
 #define INADDR_NONE		0xffffffff
 #endif
 
-#ifdef WIN32
-	#define EADDRINUSE	WSAEADDRINUSE
-	#define ERRNO	WSAGetLastError()
-#else
-	#define ERRNO	errno
-#endif
+#define ERRNO	errno
 
 
 LpsClient::LpsClient(const char *host)

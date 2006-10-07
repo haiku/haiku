@@ -18,7 +18,7 @@
 #include "IppDefs.h"
 #include "DbgMsg.h"
 
-#if (!__MWERKS__ || defined(WIN32))
+#if (!__MWERKS__)
 using namespace std;
 #else 
 #define std
