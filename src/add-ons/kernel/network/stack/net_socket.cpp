@@ -71,6 +71,11 @@ err1:
 status_t
 socket_close(net_socket *socket)
 {
+	if (socket->select_pool) {
+		// notify all pending selects
+		notify_select_event_pool(socket->select_pool, ~0);
+	}
+
 	return socket->first_info->close(socket->first_protocol);
 }
 
