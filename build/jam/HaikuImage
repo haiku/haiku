@@ -80,6 +80,12 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
 	# theora
 	vorbis wav_reader
 ;
+BEOS_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible PCL5\ Compatible
+	PCL6\ Compatible PDF\ Writer PS\ Compatible Preview
+;
+BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port Print\ To\ File
+	Serial\ Port USB\ Port
+;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
@@ -257,6 +263,9 @@ AddFilesToHaikuImage beos system add-ons kernel network ppp
 	: $(BEOS_NETWORK_PPP) ;
 AddFilesToHaikuImage beos system add-ons kernel network protocols
 	: $(BEOS_NETWORK_PROTOCOLS) ;
+AddFilesToHaikuImage beos system add-ons Print : $(BEOS_ADD_ONS_PRINT) ;
+AddFilesToHaikuImage beos system add-ons Print transport
+	: $(BEOS_ADD_ONS_PRINT_TRANSPORT) ;
 AddFilesToHaikuImage beos system add-ons Screen\ Savers
 	: $(BEOS_ADD_ONS_SCREENSAVERS) ;
 
