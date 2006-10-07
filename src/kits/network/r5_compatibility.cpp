@@ -23,6 +23,8 @@ char *find_net_setting(net_settings* settings, const char* heading,
 	const char* name, char* value, unsigned numBytes);
 status_t set_net_setting(net_settings* settings, const char* heading,
 	const char* name, const char* value);
+int getusername(char *user, size_t bufferLength);
+int getpassword(char *password, size_t bufferLength);
 
 
 int
@@ -74,3 +76,22 @@ set_net_setting(net_settings* settings, const char* heading,
 	return B_UNSUPPORTED;
 }
 
+
+int
+getusername(char *user, size_t length)
+{
+	if (find_net_setting(NULL, "GLOBAL", "USERNAME", user, length) == NULL)
+		return B_ERROR;
+
+	return strlen(user);
+}
+
+
+int
+getpassword(char *password, size_t length)
+{
+	if (find_net_setting(NULL, "GLOBAL", "PASSWORD", password, length) == NULL)
+		return B_ERROR;
+
+	return strlen(password);
+}
