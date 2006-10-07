@@ -481,7 +481,7 @@ if $(TARGET_PLATFORM) != haiku {
 if $(TARGET_PLATFORM) = haiku {
 	NETWORK_LIBS = network ;
 	SELECT_UNAME_ETC_LIB = root ;
-	NETAPI_LIB = netapi ;
+	NETAPI_LIB = network ;
 } else if $(TARGET_PLATFORM_BONE_COMPATIBLE) {
 	NETWORK_LIBS = socket bind ;
 	NETAPI_LIB = bnetapi ;
