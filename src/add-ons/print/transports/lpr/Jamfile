@@ -9,14 +9,15 @@ Addon LPR : Print transport :
 	LprSetupDlg.cpp
 	LprTransport.cpp
 	LpsClient.cpp
+
 	Socket.o
-	SocketStream2.o
+	SocketStream.o
 	DbgMsg.o
 ;
 
 ObjectReferences
 	<src!add-ons!print!transports!shared>Socket.o
-	<src!add-ons!print!transports!shared>SocketStream2.o
+	<src!add-ons!print!transports!shared>SocketStream.o
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
