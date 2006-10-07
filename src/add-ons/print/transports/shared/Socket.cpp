@@ -4,15 +4,18 @@
 #ifdef WIN32
   #include <winsock.h>
 #else
-  #include <net/socket.h>
-  #include <net/netdb.h>
-  #ifdef HAVE_ARPA_INET
-	// inet_addr() is not defined in netdb.h anymore under BONE & later
-    #include <arpa/inet.h>	
-  #endif
+#ifdef __HAIKU__
+#	include <sys/socket.h>
+#else
+#	include <net/socket.h>
+#endif
+  #include <netdb.h>
+  #include <arpa/inet.h>	
 #endif	// WIN32
 
-#include <cstdio>
+#include <stdio.h>
+#include <unistd.h>
+
 #include "Socket.h"
 #include "SocketStream.h"
 

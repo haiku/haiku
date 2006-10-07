@@ -2,7 +2,11 @@
 // Y.Takagi
 
 #ifndef WIN32
-#include <net/socket.h>
+#ifdef __HAIKU__
+#	include <sys/socket.h>
+#else
+#	include <net/socket.h>
+#endif
 
 #ifdef _DEBUG
 #include <iostream>

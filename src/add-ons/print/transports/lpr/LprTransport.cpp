@@ -1,11 +1,13 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
+#include <Alert.h>
 #include <DataIO.h>
 #include <Message.h>
 #include <Directory.h>
-#include <net/netdb.h>
-#include <Alert.h>
+
+#include <netdb.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <iomanip>
@@ -33,6 +35,12 @@ LprTransport::LprTransport(BMessage *msg)
 	__jobid     = 0;
 	__error     = false;
 
+	struct passwd *pwd = getpwuid(geteuid());
+	if (pwd != NULL && pwd->pw_name != NULL && pwd->pw_name[0])
+		strcpy(__user, pwd->pw_name);
+	else
+		strcpy(__user, "baron");
+
 	DUMP_BMESSAGE(msg);
 
 	const char *spool_path = msg->FindString(SPOOL_PATH);
@@ -58,11 +66,6 @@ LprTransport::LprTransport(BMessage *msg)
 		}
 		dir.WriteAttr(LPR_JOB_ID, B_INT32_TYPE, 0, &__jobid, sizeof(__jobid));
 
-		getusername(__user, sizeof(__user));
-		if (__user[0] == '\0') {
-			strcpy(__user, "baron");
-		}
-
 		sprintf(__file, "%s/%s@ipp.%ld", spool_path, __user, __jobid);
 
 		__fs.open(__file, ios::in | ios::out | ios::binary | ios::trunc);
@@ -79,14 +82,6 @@ LprTransport::~LprTransport()
 	char hostname[128];
 	gethostname(hostname, sizeof(hostname));
 
-	char username[128];
-#ifdef WIN32
-	unsigned long length = sizeof(hostname);
-	GetUserName(username, &length);
-#else
-	getusername(username, sizeof(username));
-#endif
-
 	ostringstream cfname;
 	cfname << "cfA" << setw(3) << setfill('0') << __jobid << hostname;
 
@@ -95,7 +90,7 @@ LprTransport::~LprTransport()
 
 	ostringstream cf;
 	cf << 'H' << hostname     << '\n';
-	cf << 'P' << username     << '\n';
+	cf << 'P' << __user << '\n';
 	cf << 'l' << dfname.str() << '\n';
 	cf << 'U' << dfname.str() << '\n';
 

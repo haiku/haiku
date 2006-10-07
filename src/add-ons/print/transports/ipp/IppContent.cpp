@@ -2,9 +2,12 @@
 // Y.Takagi
 
 #ifdef WIN32
-#include <winsock.h>
+#	include <winsock.h>
+#elif defined(__HAIKU__)
+#	include <sys/socket.h>
+#	include <netinet/in.h>
 #else
-#include <net/socket.h>
+#	include <net/socket.h>
 #endif
 
 #include <fstream>
@@ -976,7 +979,7 @@ bool IppContent::fail() const
 
 bool IppContent::good() const
 {
-	return (IPP_SUCCESSFUL_OK_S <= operation_id) && (operation_id <= IPP_SUCCESSFUL_OK_E);
+	return /*operation_id >= IPP_SUCCESSFUL_OK_S &&*/ operation_id <= IPP_SUCCESSFUL_OK_E;
 }
 
 bool IppContent::operator !() const

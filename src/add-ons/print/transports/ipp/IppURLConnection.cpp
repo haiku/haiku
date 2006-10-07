@@ -6,7 +6,11 @@
 #include <ostream>
 #include <cstring>
 #else
-#include <net/socket.h>
+#ifdef __HAIKU__
+#	include <sys/socket.h>
+#else
+#	include <net/socket.h>
+#endif
 #include <ostream.h>
 #include <string.h>
 #include <stdio.h>

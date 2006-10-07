@@ -2,14 +2,19 @@
 // Y.Takagi
 
 #ifdef WIN32
-	#include <windows.h>
-	#include <winsock.h>
-	#include <sstream>
-#else	/* BeOS */
-	#include <cerrno>
-	#include <net/socket.h>
-	#include <net/netdb.h>
-	#include "_sstream"
+#	include <windows.h>
+#	include <winsock.h>
+#	include <sstream>
+#else
+#	ifdef __HAIKU__
+#		include <sys/socket.h>
+#		include <netdb.h>
+#	else
+#		include <net/socket.h>
+#		include <net/netdb.h>
+#	endif
+#	include <errno.h>
+#	include "_sstream"
 #endif
 
 #include <iomanip>
