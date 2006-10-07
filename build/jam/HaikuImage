@@ -38,13 +38,13 @@ BEOS_BIN = addattr alert basename beep cat catattr chgrp chmod chop chown clear
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse ProcessController
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
 	StyledEdit Installer Chart Workspaces $(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost $(X86_ONLY)GLTeapot
-	MediaPlayer DeskCalc MidiPlayer Icon-O-Matic
+	MediaPlayer DeskCalc MidiPlayer Icon-O-Matic BeMail
 ;
-BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
-	Mouse Keyboard Keymap Screen ScreenSaver Sounds Time VirtualMemory
+BEOS_PREFERENCES = Backgrounds DataTranslations E-mail FileTypes Fonts Media Menu
+	Mouse Keyboard Keymap Printers Screen ScreenSaver Sounds Time VirtualMemory
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
-	libtranslation.so libnetwork.so libdebug.so libbsd.so
+	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
 	libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so libmidi2.so
 	libdevice.so libgame.so libscreensaver.so libroot.so $(X86_ONLY)libGL.so
 	libfluidsynth.so libqoca.so
