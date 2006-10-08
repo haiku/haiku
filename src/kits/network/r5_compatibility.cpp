@@ -17,14 +17,16 @@
 
 struct net_settings;
 
-int _netstat(int fd, char **output, int verbose);
-int closesocket(int socket);
-char *find_net_setting(net_settings* settings, const char* heading,
-	const char* name, char* value, unsigned numBytes);
-status_t set_net_setting(net_settings* settings, const char* heading,
-	const char* name, const char* value);
-int getusername(char *user, size_t bufferLength);
-int getpassword(char *password, size_t bufferLength);
+extern "C" {
+	int _netstat(int fd, char **output, int verbose);
+	int closesocket(int socket);
+	char *find_net_setting(net_settings* settings, const char* heading,
+		const char* name, char* value, unsigned numBytes);
+	status_t set_net_setting(net_settings* settings, const char* heading,
+		const char* name, const char* value);
+	int getusername(char *user, size_t bufferLength);
+	int getpassword(char *password, size_t bufferLength);
+}
 
 
 int
