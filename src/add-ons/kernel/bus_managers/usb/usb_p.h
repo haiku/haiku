@@ -15,7 +15,7 @@
 #include "BeOSCompatibility.h"
 
 
-//#define TRACE_USB
+#define TRACE_USB
 #ifdef TRACE_USB
 #define TRACE(x)		dprintf x
 #define TRACE_ERROR(x)	dprintf x
@@ -182,6 +182,8 @@ protected:
 		bool							fInitOK;
 
 private:
+		ControlPipe 					*GetDefaultPipe(usb_speed);
+
 		benaphore						fLock;
 		bool							fDeviceMap[128];
 		ControlPipe						*fDefaultPipes[USB_SPEED_MAX + 1];
