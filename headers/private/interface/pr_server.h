@@ -66,7 +66,7 @@
 #define PSRV_JOB_STATUS_WAITING         "Waiting"
 #define PSRV_JOB_STATUS_PROCESSING      "Processing"
 #define PSRV_JOB_STATUS_FAILED          "Failed"
-#define PSRV_JOB_STATUS_COMPLETED "Completed"
+#define PSRV_JOB_STATUS_COMPLETED 		"Completed"
 
 // printer attributes
 #define PSRV_PRINTER_ATTR_DRV_NAME			"Driver Name"
@@ -79,19 +79,23 @@
 #define PSRV_PRINTER_ATTR_PNP				"_PNP"
 #define PSRV_PRINTER_ATTR_MDL				"_MDL"
 
-// job settings fields
+// printer name
 #define PSRV_FIELD_CURRENT_PRINTER "current_printer"
+
+// page settings fields
 #define PSRV_FIELD_XRES "xres"
 #define PSRV_FIELD_YRES "yres"
 #define PSRV_FIELD_PAPER_RECT "paper_rect"
 #define PSRV_FIELD_PRINTABLE_RECT "printable_rect"
-#define PSRV_FIELD_FIRST_PAGE "first_page"
-#define PSRV_FIELD_LAST_PAGE "last_page"
 
-// optional job settings field
+// optional page settings field
 #define PSRV_FIELD_ORIENTATION "orientation"
 #define PSRV_FIELD_COPIES "copies"
 #define PSRV_FIELD_SCALE "scale"
 #define PSRV_FIELD_QUALITY "quality"
+
+// job settings fields
+#define PSRV_FIELD_FIRST_PAGE "first_page"
+#define PSRV_FIELD_LAST_PAGE "last_page"
 
 #endif
