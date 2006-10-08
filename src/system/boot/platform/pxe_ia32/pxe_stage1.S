@@ -251,9 +251,11 @@ _start:
 			// load data
 			movl	$load_addr, %edi
 read_loop:
+			pushl	%edi
 			movw	$PXENV_TFTP_READ, %bx
 			movw	$s_PXENV_TFTP_READ, %di
 			lcall *	pxenv_api
+			popl	%edi
 			test 	%ax, %ax
 			jnz		err_load
 			movw	s_PXENV_TFTP_READ_Status, %ax
