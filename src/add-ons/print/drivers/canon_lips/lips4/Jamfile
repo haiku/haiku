@@ -12,7 +12,7 @@ Addon Canon\ LIPS4\ Compatible : Print :
 	Lips4Cap.cpp
 ;
 
-LinkAgainst Canon\ LIPS4\ Compatible : be stdc++.r4 libprint.a ;
+LinkAgainst Canon\ LIPS4\ Compatible : be $(TARGET_LIBSTDC++) libprint.a ;
 
 Package haiku-printingkit-cvs :
 	Canon\ LIPS4\ Compatible :

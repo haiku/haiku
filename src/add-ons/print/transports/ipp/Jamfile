@@ -23,7 +23,7 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkAgainst IPP : be $(NETWORK_LIBS) stdc++.r4 ;
+LinkAgainst IPP : be $(NETWORK_LIBS) $(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	IPP :

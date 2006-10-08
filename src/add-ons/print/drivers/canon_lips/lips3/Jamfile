@@ -13,7 +13,7 @@ Addon Canon\ LIPS3\ Compatible : Print :
 	Compress3.cpp
 ;
 
-LinkAgainst Canon\ LIPS3\ Compatible : be stdc++.r4 libprint.a ;
+LinkAgainst Canon\ LIPS3\ Compatible : be $(TARGET_LIBSTDC++) libprint.a ;
 
 Package haiku-printingkit-cvs :
 	Canon\ LIPS3\ Compatible :

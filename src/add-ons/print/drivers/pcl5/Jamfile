@@ -12,7 +12,7 @@ Addon PCL5\ Compatible : Print :
 	PCL5Cap.cpp
 ;
 
-LinkAgainst PCL5\ Compatible : be stdc++.r4 libprint.a ;
+LinkAgainst PCL5\ Compatible : be $(TARGET_LIBSTDC++) libprint.a ;
 
 Package haiku-printingkit-cvs :
 	PCL5\ Compatible :

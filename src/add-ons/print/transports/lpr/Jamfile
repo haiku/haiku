@@ -21,7 +21,7 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkAgainst LPR : be $(NETWORK_LIBS) stdc++.r4 ;
+LinkAgainst LPR : be $(NETWORK_LIBS) $(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	LPR :
