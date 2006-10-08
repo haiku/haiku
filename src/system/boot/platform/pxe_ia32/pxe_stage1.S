@@ -1,4 +1,5 @@
 /*
+** Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Copyright 2006, Marcus Overhagen. All rights reserved.
 ** Distributed under the terms of the MIT License.
 */
@@ -48,6 +49,8 @@ _start:
 			movw	%ax, %es
 			movw	%ax, %ss
 			movw	$0x7c00, %sp
+
+			cld
 
 			// print start banner	
 			movw	$startmsg, %si
@@ -232,19 +235,19 @@ _start:
 			xorl	%eax, %eax
 			movw	s_PXENV_TFTP_OPEN_PacketSize, %ax
 			imull	$65535, %eax
-			movl	%eax, max_file_size
+			movl	%eax, max_fsize
 			
 			// print max file size
 			movw	$maxfsize, %si
 			call	puts
-			movl	max_file_size, %eax
+			movl	max_fsize, %eax
 			call	puthex32
 			movw	$crlf, %si
 			call	puts
 
 			// check if file is small enough
 			movl	s_PXENV_TFTP_GET_FSIZE_FileSize, %eax
-			movl	max_file_size, %ebx
+			movl	max_fsize, %ebx
 			cmpl	%ebx, %eax
 			ja		err_etoobig
 
@@ -312,8 +315,34 @@ _no_dot:
 			// execute
 			movw	$executing, %si
 			call	puts
-			ljmp	$load_addr_seg, $load_addr_ofs
 
+			cli
+
+			// switch to PM
+			.code32
+			.byte	0x66
+			.byte	0x67
+			lgdt	pm_gdt_descriptor
+			.code16
+
+			movl	%cr0, %eax
+			orb		$0x1, %al
+			movl	%eax, %cr0
+
+.code32
+			.byte	0x66
+			ljmp	$0x8, $pm_start
+pm_start:
+			mov		$0x10, %ax
+			mov		%ax, %ds
+			mov		%ax, %es
+			mov		%ax, %fs
+			mov		%ax, %gs
+			mov		%ax, %ss
+
+			ljmp	$0x8, $0x100000
+
+.code16
 stop:		hlt
 			jmp		stop
 
@@ -400,7 +429,7 @@ go_unreal:	pushw	%ds
 			.code32
 			.byte	0x66
 			.byte	0x67
-			lgdt	gdt_descriptor
+			lgdt	unreal_gdt_descriptor
 			.code16
 			movl	%cr0, %eax
 			orb		$1, %al
@@ -442,23 +471,50 @@ dot:		.asciz	"."
 crlf:		.asciz	"\r\n"
 
 .balign 8
-gdt:
+unreal_gdt:
 			.long	0
 			.long	0
 			.long	0x0000ffff
 			.long	0x00cf9200
-gdt_descriptor:
+unreal_gdt_descriptor:
 			.word	0x10
-			.long	gdt
+			.long	unreal_gdt
 
 .balign 8
+pm_gdt:
+	// null descriptor
+			.long	0
+			.long	0
 
+	// kernel code segment
+			.long	0x0000ffff
+			.long	0x00cf9e00
+	// kernel data and stack segment
+			.long	0x0000ffff
+			.long	0x00cf9200
+
+	// real mode 16 bit code segment
+			.long	0x0000ffff
+			.long	0x00009e01
+	// real mode 16 bit data and stack segment
+			.long	0x0000ffff
+			.long	0x00009201
+	// real mode 16 bit stack segment
+			.long	0x0000ffff
+			.long	0x00009200
+
+pm_gdt_descriptor:
+			.word	0x2f
+			.long	pm_gdt
+
+
+.balign 8
 pxenv_api:	.long	0
 
 client_ip:	.long 0
 server_ip:	.long 0
 
-max_file_size: .long 0
+max_fsize:	.long 0
 
 pos:		.word 0
 
