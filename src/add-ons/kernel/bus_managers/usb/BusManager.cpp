@@ -29,7 +29,7 @@ BusManager::BusManager(Stack *stack)
 
 	// Set the default pipes to NULL (these will be created when needed)
 	for (int32 i = 0; i <= USB_SPEED_MAX; i++)
-		fDefaultPipes[i] = 0;
+		fDefaultPipes[i] = NULL;
 
 	fInitOK = true;
 }
@@ -40,8 +40,7 @@ BusManager::~BusManager()
 	Lock();
 	benaphore_destroy(&fLock);
 	for (int32 i = 0; i <= USB_SPEED_MAX; i++)
-		if (fDefaultPipes[i] != 0)
-			delete fDefaultPipes[i];
+		delete fDefaultPipes[i];
 }
 
 
@@ -100,7 +99,7 @@ BusManager::AllocateNewDevice(Hub *parent, usb_speed speed)
 	}
 
 	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceAddress));
-	ControlPipe *defaultPipe = GetDefaultPipe(speed);
+	ControlPipe *defaultPipe = _GetDefaultPipe(speed);
 	
 	if (!defaultPipe) {
 		TRACE(("usb BusManager::AllocateNewDevice(): Error getting the default pipe for speed %d\n", (int)speed));
@@ -236,16 +235,20 @@ BusManager::NotifyPipeChange(Pipe *pipe, usb_change change)
 }
 
 ControlPipe *
-BusManager::GetDefaultPipe(usb_speed speed)
+BusManager::_GetDefaultPipe(usb_speed speed)
 {
-	if (fDefaultPipes[(int)speed] == 0) {
-		fDefaultPipes[(int)speed] = new(std::nothrow) ControlPipe(fRootObject,
-					0, 0, (usb_speed)speed, 8);
-		if (!fDefaultPipes[(int)speed]) {
+	if (!Lock())
+		return NULL;
+
+
+	if (fDefaultPipes[speed] == NULL) {
+		fDefaultPipes[speed] = new(std::nothrow) ControlPipe(fRootObject,
+					0, 0, speed, 8);
+		if (!fDefaultPipes[speed]) {
 			TRACE_ERROR(("usb BusManager: failed to allocate default pipe\n"));
-			return 0;
+			return NULL;
 		}
 	}
 	
-	return fDefaultPipes[(int)speed];
+	return fDefaultPipes[speed];
 }
