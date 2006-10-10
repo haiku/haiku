@@ -398,24 +398,71 @@ void
 vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 {
 	vm_cache *cache = cacheRef->cache;
+	vm_cache *newSource = NULL;
+
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
 
 	mutex_lock(&cacheRef->lock);
 
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
-	
+
 	if (cacheRef->areas == NULL && cache->source != NULL
 		&& !list_is_empty(&cache->consumers)
 		&& cache->consumers.link.next == cache->consumers.link.prev) {
 		// The cache is not really needed anymore - it can be merged with its only
 		// consumer left.
-		// TODO!
+		vm_cache_ref *consumerRef;
+		vm_page *page, *nextPage;
+
+		consumer = list_get_first_item(&cache->consumers);
+		consumerRef = consumer->ref;
+
+		mutex_lock(&consumerRef->lock);
+			// TODO: is it okay to lock them in this direction?
+
 		TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
-			cache, cacheRef->ref_count, cache->consumers.link.next));
+			cache, cacheRef->ref_count, consumer));
+
+		for (page = cache->page_list; page != NULL; page = nextPage) {
+			nextPage = page->cache_next;
+			vm_cache_remove_page(cacheRef, page);
+
+			if (vm_cache_lookup_page(consumerRef,
+					(off_t)page->cache_offset << PAGE_SHIFT) != NULL) {
+				// the page already is in the consumer cache - this copy is no
+				// longer needed, and can be freed
+				vm_page_set_state(page, PAGE_STATE_FREE);
+				continue;
+			}
+
+			// move the page into the consumer cache
+			vm_cache_insert_page(consumerRef, page,
+				(off_t)page->cache_offset << PAGE_SHIFT);
+		}
+
+		newSource = cache->source;
+		mutex_unlock(&consumerRef->lock);
 	}
 
 	mutex_unlock(&cacheRef->lock);
+
+	if (newSource != NULL) {
+		// The remaining consumer has gotten a new source
+		mutex_lock(&cacheRef->lock);
+
+		list_remove_item(&newSource->consumers, cache);
+		list_add_item(&newSource->consumers, consumer);
+		consumer->source = newSource;
+		cache->source = NULL;
+
+		mutex_unlock(&cacheRef->lock);
+
+		// Release the other reference to the cache - we take over
+		// its reference of its source cache
+		vm_cache_release_ref(cacheRef);
+	}
+
 	vm_cache_release_ref(cacheRef);
 }
 
