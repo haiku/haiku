@@ -12,6 +12,8 @@
 #include <OS.h>
 #include <image.h>
 
+#include <cstring>
+
 
 bool __gR5Compatibility = false;
 

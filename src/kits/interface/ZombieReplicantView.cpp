@@ -57,7 +57,7 @@ _BZombieReplicantView_::MessageReceived(BMessage *msg)
 				"Can't create the \"%s\" replicant because the library is in the Trash. (%s)",
 				description, strerror(fError));
 			
-			BAlert *alert = new (nothrow) BAlert("Error", error, "OK", NULL, NULL,
+			BAlert *alert = new (std::nothrow) BAlert("Error", error, "OK", NULL, NULL,
 								B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			if (alert != NULL)
 				alert->Go();
