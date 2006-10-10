@@ -2453,7 +2453,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
 
 // We can print a stack trace of the userland thread here.
-#if 1
+#if 0
 			if (area) {
 				struct stack_frame {
 					#ifdef __INTEL__
