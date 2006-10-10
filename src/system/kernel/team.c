@@ -1154,8 +1154,8 @@ fork_team(void)
 	cookie = 0;
 	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
 		void *address;
-		area_id area = vm_copy_area(team->address_space->id, info.name, &address, B_CLONE_ADDRESS,
-							info.protection, info.area);
+		area_id area = vm_copy_area(team->address_space->id, info.name,
+			&address, B_CLONE_ADDRESS, info.protection, info.area);
 		if (area < B_OK) {
 			status = area;
 			break;
@@ -1177,8 +1177,9 @@ fork_team(void)
 	// ToDo: copy image list
 
 	// create a kernel thread under the context of the new team
-	threadID = spawn_kernel_thread_etc(fork_team_thread_start, parentThread->name,
-					parentThread->priority, forkArgs, team->id, team->id);
+	threadID = spawn_kernel_thread_etc(fork_team_thread_start,
+		parentThread->name, parentThread->priority, forkArgs,
+		team->id, team->id);
 	if (threadID < 0) {
 		status = threadID;
 		goto err4;
