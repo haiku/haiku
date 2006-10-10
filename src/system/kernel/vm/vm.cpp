@@ -1867,8 +1867,8 @@ page_state_to_text(int state)
 static int
 dump_cache(int argc, char **argv)
 {
+	vm_cache *cache, *consumer = NULL;
 	addr_t address;
-	vm_cache *cache;
 	vm_page *page;
 
 	if (argc < 2) {
@@ -1886,6 +1886,10 @@ dump_cache(int argc, char **argv)
 	kprintf("cache at %p:\n", cache);
 	kprintf("cache_ref: %p\n", cache->ref);
 	kprintf("source: %p\n", cache->source);
+	kprintf("consumers:\n");
+	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers, consumer)) != NULL) {
+		kprintf("  %p\n", consumer);
+	}
 	kprintf("store: %p\n", cache->store);
 	kprintf("virtual_size: 0x%Lx\n", cache->virtual_size);
 	kprintf("temporary: %ld\n", cache->temporary);
@@ -2012,6 +2016,7 @@ vm_delete_areas(struct vm_address_space *addressSpace)
 			else
 				addressSpace->areas = area->address_space_next;
 
+			vm_put_address_space(addressSpace);
 			free(area);
 			continue;
 		}
