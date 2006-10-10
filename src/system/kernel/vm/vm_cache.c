@@ -20,7 +20,8 @@
 #include <smp.h>
 #include <arch/cpu.h>
 
-#include <malloc.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 //#define TRACE_VM_CACHE
 #ifdef TRACE_VM_CACHE
@@ -73,11 +74,9 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 
 
 status_t
-vm_cache_init(kernel_args *ka)
+vm_cache_init(kernel_args *args)
 {
-	vm_page p;
-
-	page_cache_table = hash_init(PAGE_TABLE_SIZE, (int)&p.hash_next - (int)&p,
+	page_cache_table = hash_init(PAGE_TABLE_SIZE, offsetof(vm_page, hash_next),
 		&page_compare_func, &page_hash_func);
 	if (!page_cache_table)
 		panic("vm_cache_init: cannot allocate memory for page cache hash table\n");
@@ -101,6 +100,7 @@ vm_cache_create(vm_store *store)
 	if (cache == NULL)
 		return NULL;
 
+	list_init(&cache->consumers);
 	cache->page_list = NULL;
 	cache->ref = NULL;
 	cache->source = NULL;
@@ -211,7 +211,7 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 
 	// remove the ref to the source
 	if (cache_ref->cache->source)
-		vm_cache_release_ref(cache_ref->cache->source->ref);
+		vm_cache_remove_consumer(cache_ref->cache->source->ref, cache_ref->cache);
 
 	mutex_destroy(&cache_ref->lock);
 	free(cache_ref->cache);
@@ -388,6 +388,56 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 
 	cache->virtual_size = newSize;
 	return B_OK;
+}
+
+
+/*!
+	Removes the \a consumer from the \a cacheRef's cache.
+	It will also release the reference to the cacheRef owned by the consumer.
+*/
+void
+vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
+{
+	vm_cache *cache = cacheRef->cache;
+	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
+
+	mutex_lock(&cacheRef->lock);
+
+	list_remove_item(&cache->consumers, consumer);
+	consumer->source = NULL;
+	
+	if (cacheRef->areas == NULL && cache->source != NULL
+		&& !list_is_empty(&cache->consumers)
+		&& cache->consumers.link.next == cache->consumers.link.prev) {
+		// The cache is not really needed anymore - it can be merged with its only
+		// consumer left.
+		// TODO!
+		TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
+			cache, cacheRef->ref_count, cache->consumers.link.next));
+	}
+
+	mutex_unlock(&cacheRef->lock);
+	vm_cache_release_ref(cacheRef);
+}
+
+
+/*!
+	Marks the \a cacheRef's cache as source of the \a consumer cache,
+	and adds the \a consumer to its list.
+	This also grabs a reference to the source cache.
+*/
+void
+vm_cache_add_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
+{
+	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cacheRef->cache));
+	mutex_lock(&cacheRef->lock);
+
+	consumer->source = cacheRef->cache;
+	list_add_item(&cacheRef->cache->consumers, consumer);
+
+	mutex_unlock(&cacheRef->lock);
+
+	vm_cache_acquire_ref(cacheRef);
 }
 
 

@@ -68,6 +68,9 @@ typedef struct vm_cache_ref {
 
 // vm_cache
 typedef struct vm_cache {
+	struct list_link	consumer_link;
+	struct list			consumers;
+		// list of caches that use this cache as a source
 	vm_page				*page_list;
 	vm_cache_ref		*ref;
 	struct vm_cache		*source;

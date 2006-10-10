@@ -552,11 +552,10 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		newCache->temporary = 1;
 		newCache->scan_skip = cache->scan_skip;
 
-		newCache->source = cache;
-		vm_cache_acquire_ref(cacheRef);
+		vm_cache_add_consumer(cacheRef, newCache);
 
 		cache = newCache;
-		cacheRef = cache->ref;
+		cacheRef = newCache->ref;
 		store = newStore;
 		cache->virtual_size = offset + size;
 	}
@@ -1479,13 +1478,12 @@ vm_copy_on_write_area(vm_area *area)
 	upperCache->temporary = 1;
 	upperCache->scan_skip = lowerCache->scan_skip;
 	upperCache->source = lowerCache;
+	list_add_item(&lowerCache->consumers, upperCache);
 	upperCache->ref = upperCacheRef;
 	upperCacheRef->cache = upperCache;
 
-	// we need to manually alter the ref_count
-	// ToDo: investigate a bit deeper if this is really correct
-	// (doesn't look like it, but it works)
-	lowerCacheRef->ref_count = upperCacheRef->ref_count;
+	// we need to manually alter the ref_count (divide it between the two)
+	lowerCacheRef->ref_count = upperCacheRef->ref_count - 1;
 	upperCacheRef->ref_count = 1;
 
 	// grab a ref to the cache object we're now linked to as a source
