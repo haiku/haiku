@@ -34,8 +34,8 @@
 /* hash table of pages keyed by cache they're in and offset */
 #define PAGE_TABLE_SIZE 1024 /* TODO: make this dynamic */
 
-static void *page_cache_table;
-static spinlock page_cache_table_lock;
+static void *sPageCacheTable;
+static spinlock sPageCacheTableLock;
 
 struct page_lookup_key {
 	uint32	offset;
@@ -76,11 +76,10 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 status_t
 vm_cache_init(kernel_args *args)
 {
-	page_cache_table = hash_init(PAGE_TABLE_SIZE, offsetof(vm_page, hash_next),
+	sPageCacheTable = hash_init(PAGE_TABLE_SIZE, offsetof(vm_page, hash_next),
 		&page_compare_func, &page_hash_func);
-	if (!page_cache_table)
-		panic("vm_cache_init: cannot allocate memory for page cache hash table\n");
-	page_cache_table_lock = 0;
+	if (sPageCacheTable == NULL)
+		panic("vm_cache_init: no memory\n");
 
 	return B_OK;
 }
@@ -147,37 +146,37 @@ vm_cache_ref_create(vm_cache *cache)
 
 
 void
-vm_cache_acquire_ref(vm_cache_ref *cache_ref)
+vm_cache_acquire_ref(vm_cache_ref *cacheRef)
 {
-	TRACE(("vm_cache_acquire_ref: cache_ref %p, ref will be %ld\n",
-		cache_ref, cache_ref->ref_count + 1));
+	TRACE(("vm_cache_acquire_ref: cacheRef %p, ref will be %ld\n",
+		cacheRef, cacheRef->ref_count + 1));
 
-	if (cache_ref == NULL)
+	if (cacheRef == NULL)
 		panic("vm_cache_acquire_ref: passed NULL\n");
 
-	if (cache_ref->cache->store->ops->acquire_ref != NULL)
-		cache_ref->cache->store->ops->acquire_ref(cache_ref->cache->store);
+	if (cacheRef->cache->store->ops->acquire_ref != NULL)
+		cacheRef->cache->store->ops->acquire_ref(cacheRef->cache->store);
 
-	atomic_add(&cache_ref->ref_count, 1);
+	atomic_add(&cacheRef->ref_count, 1);
 }
 
 
 void
-vm_cache_release_ref(vm_cache_ref *cache_ref)
+vm_cache_release_ref(vm_cache_ref *cacheRef)
 {
 	vm_page *page;
 
-	TRACE(("vm_cache_release_ref: cache_ref %p, ref will be %ld\n",
-		cache_ref, cache_ref->ref_count - 1));
+	TRACE(("vm_cache_release_ref: cacheRef %p, ref will be %ld\n",
+		cacheRef, cacheRef->ref_count - 1));
 
-	if (cache_ref == NULL)
+	if (cacheRef == NULL)
 		panic("vm_cache_release_ref: passed NULL\n");
 
-	if (atomic_add(&cache_ref->ref_count, -1) != 1) {
+	if (atomic_add(&cacheRef->ref_count, -1) != 1) {
 		// the store ref is only released on the "working" refs, not
 		// on the initial one (this is vnode specific)
-		if (cache_ref->cache->store->ops->release_ref)
-			cache_ref->cache->store->ops->release_ref(cache_ref->cache->store);
+		if (cacheRef->cache->store->ops->release_ref)
+			cacheRef->cache->store->ops->release_ref(cacheRef->cache->store);
 
 		return;
 	}
@@ -185,10 +184,10 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 	// delete this cache
 
 	// delete the cache's backing store
-	cache_ref->cache->store->ops->destroy(cache_ref->cache->store);
+	cacheRef->cache->store->ops->destroy(cacheRef->cache->store);
 
 	// free all of the pages in the cache
-	page = cache_ref->cache->page_list;
+	page = cacheRef->cache->page_list;
 	while (page) {
 		vm_page *oldPage = page;
 		int state;
@@ -197,11 +196,11 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 
 		// remove it from the hash table
 		state = disable_interrupts();
-		acquire_spinlock(&page_cache_table_lock);
+		acquire_spinlock(&sPageCacheTableLock);
 
-		hash_remove(page_cache_table, oldPage);
+		hash_remove(sPageCacheTable, oldPage);
 
-		release_spinlock(&page_cache_table_lock);
+		release_spinlock(&sPageCacheTableLock);
 		restore_interrupts(state);
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
@@ -210,33 +209,33 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 	}
 
 	// remove the ref to the source
-	if (cache_ref->cache->source)
-		vm_cache_remove_consumer(cache_ref->cache->source->ref, cache_ref->cache);
+	if (cacheRef->cache->source)
+		vm_cache_remove_consumer(cacheRef->cache->source->ref, cacheRef->cache);
 
-	mutex_destroy(&cache_ref->lock);
-	free(cache_ref->cache);
-	free(cache_ref);
+	mutex_destroy(&cacheRef->lock);
+	free(cacheRef->cache);
+	free(cacheRef);
 }
 
 
 vm_page *
-vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
+vm_cache_lookup_page(vm_cache_ref *cacheRef, off_t offset)
 {
 	struct page_lookup_key key;
 	cpu_status state;
 	vm_page *page;
 
-	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
+	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	key.offset = (uint32)(offset >> PAGE_SHIFT);
-	key.cache = cache_ref->cache;
+	key.cache = cacheRef->cache;
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_cache_table_lock);
+	acquire_spinlock(&sPageCacheTableLock);
 
-	page = hash_lookup(page_cache_table, &key);
+	page = hash_lookup(sPageCacheTable, &key);
 
-	release_spinlock(&page_cache_table_lock);
+	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
 
 	return page;
@@ -248,7 +247,7 @@ vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset)
 {
 	cpu_status state;
 
-	TRACE(("vm_cache_insert_page: cache_ref %p, page %p, offset %Ld\n", cacheRef, page, offset));
+	TRACE(("vm_cache_insert_page: cacheRef %p, page %p, offset %Ld\n", cacheRef, page, offset));
 	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	page->cache_offset = (uint32)(offset >> PAGE_SHIFT);
@@ -264,21 +263,21 @@ vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset)
 	page->cache = cacheRef->cache;
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_cache_table_lock);
+	acquire_spinlock(&sPageCacheTableLock);
 
-	hash_insert(page_cache_table, page);
+	hash_insert(sPageCacheTable, page);
 
-	release_spinlock(&page_cache_table_lock);
+	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
 
 }
 
 
-/**	Removes the vm_page from this cache. Of course, the page must
- *	really be in this cache or evil things will happen.
- *	The vm_cache_ref lock must be held.
- */
-
+/*!
+	Removes the vm_page from this cache. Of course, the page must
+	really be in this cache or evil things will happen.
+	The vm_cache_ref lock must be held.
+*/
 void
 vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page)
 {
@@ -288,11 +287,11 @@ vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page)
 	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_cache_table_lock);
+	acquire_spinlock(&sPageCacheTableLock);
 
-	hash_remove(page_cache_table, page);
+	hash_remove(sPageCacheTable, page);
 
-	release_spinlock(&page_cache_table_lock);
+	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
 
 	if (cacheRef->cache->page_list == page) {
@@ -348,13 +347,13 @@ vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
 }
 
 
-/**	This function updates the size field of the vm_cache structure.
- *	If needed, it will free up all pages that don't belong to the cache anymore.
- *	The vm_cache_ref lock must be held when you call it.
- *	Since removed pages don't belong to the cache any longer, they are not
- *	written back before they will be removed.
- */
-
+/*!
+	This function updates the size field of the vm_cache structure.
+	If needed, it will free up all pages that don't belong to the cache anymore.
+	The vm_cache_ref lock must be held when you call it.
+	Since removed pages don't belong to the cache any longer, they are not
+	written back before they will be removed.
+*/
 status_t
 vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 {
@@ -442,33 +441,33 @@ vm_cache_add_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 
 
 status_t
-vm_cache_insert_area(vm_cache_ref *cache_ref, vm_area *area)
+vm_cache_insert_area(vm_cache_ref *cacheRef, vm_area *area)
 {
-	mutex_lock(&cache_ref->lock);
+	mutex_lock(&cacheRef->lock);
 
-	area->cache_next = cache_ref->areas;
+	area->cache_next = cacheRef->areas;
 	if (area->cache_next)
 		area->cache_next->cache_prev = area;
 	area->cache_prev = NULL;
-	cache_ref->areas = area;
+	cacheRef->areas = area;
 
-	mutex_unlock(&cache_ref->lock);
+	mutex_unlock(&cacheRef->lock);
 	return B_OK;
 }
 
 
 status_t
-vm_cache_remove_area(vm_cache_ref *cache_ref, vm_area *area)
+vm_cache_remove_area(vm_cache_ref *cacheRef, vm_area *area)
 {
-	mutex_lock(&cache_ref->lock);
+	mutex_lock(&cacheRef->lock);
 
 	if (area->cache_prev)
 		area->cache_prev->cache_next = area->cache_next;
 	if (area->cache_next)
 		area->cache_next->cache_prev = area->cache_prev;
-	if (cache_ref->areas == area)
-		cache_ref->areas = area->cache_next;
+	if (cacheRef->areas == area)
+		cacheRef->areas = area->cache_next;
 
-	mutex_unlock(&cache_ref->lock);
+	mutex_unlock(&cacheRef->lock);
 	return B_OK;
 }
