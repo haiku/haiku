@@ -310,13 +310,15 @@ count_regions(char const *buff, int phnum, int phentsize)
 static image_t *
 create_image(const char *name, const char *path, int num_regions)
 {
-	size_t allocSize;
-	image_t *image;
+	size_t allocSize = sizeof(image_t) + (num_regions - 1) * sizeof(elf_region_t);
 	const char *lastSlash;
 
-	allocSize = sizeof(image_t) + (num_regions - 1) * sizeof(elf_region_t);
+	image_t *image = malloc(allocSize);
+	if (image == NULL) {
+		FATAL("no memory for image %s\n", path);
+		return NULL;
+	}
 
-	image = rldalloc(allocSize);
 	memset(image, 0, allocSize);
 
 	strlcpy(image->path, path, sizeof(image->path));
@@ -342,12 +344,12 @@ delete_image_struct(image_t *image)
 	size_t size = sizeof(image_t) + (image->num_regions - 1) * sizeof(elf_region_t);
 	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
 #endif
-	rldfree(image->needed);
+	free(image->needed);
 
 #ifdef DEBUG
 	memset(image, 0xa5, size);
 #endif
-	rldfree(image);
+	free(image);
 }
 
 
@@ -990,6 +992,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	_kern_close(fd);
 
 	enqueue_image(&sLoadedImages, image);
+	sLoadedImageCount++;
 
 	*_image = image;
 	return B_OK;
@@ -1032,15 +1035,19 @@ load_dependencies(image_t *image)
 		return B_OK;
 
 	image->flags |= RFLAG_DEPENDENCIES_LOADED;
+	if (image->num_needed == 0) {
+		image->needed = NULL;
+		return B_OK;
+	}
 
-	rpath = find_dt_rpath(image);
-
-	image->needed = rldalloc(image->num_needed * sizeof(image_t *));
+	image->needed = malloc(image->num_needed * sizeof(image_t *));
 	if (image->needed == NULL) {
 		FATAL("failed to allocate needed struct\n");
 		return B_NO_MEMORY;
 	}
+
 	memset(image->needed, 0, image->num_needed * sizeof(image_t *));
+	rpath = find_dt_rpath(image);
 
 	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
@@ -1088,16 +1095,18 @@ topological_sort(image_t *image, uint32 slot, image_t **initList,
 }
 
 
-static uint32
+static ssize_t
 get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 {
 	image_t **list;
 
-	list = rldalloc(sLoadedImageCount * sizeof(image_t *));
+	list = malloc(sLoadedImageCount * sizeof(image_t *));
 	if (list == NULL) {
 		FATAL("memory shortage in get_sorted_image_list()");
-		return 0; // B_NO_MEMORY
+		*_list = NULL;
+		return B_NO_MEMORY;
 	}
+
 	memset(list, 0, sLoadedImageCount * sizeof(image_t *));
 
 	*_list = list;
@@ -1108,10 +1117,12 @@ get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 static status_t
 relocate_dependencies(image_t *image)
 {
-	uint32 count, i;
+	ssize_t count, i;
 	image_t **list;
 
 	count = get_sorted_image_list(image, &list, RFLAG_RELOCATED);
+	if (count < B_OK)
+		return count;
 
 	for (i = 0; i < count; i++) {
 		status_t status = relocate_image(list[i]);
@@ -1119,7 +1130,7 @@ relocate_dependencies(image_t *image)
 			return status;
 	}
 
-	rldfree(list);
+	free(list);
 	return B_OK;
 }
 
@@ -1128,10 +1139,10 @@ static void
 init_dependencies(image_t *image, bool initHead)
 {
 	image_t **initList;
-	uint32 count, i;
+	ssize_t count, i;
 
 	count = get_sorted_image_list(image, &initList, RFLAG_INITIALIZED);
-	if (count == 0)
+	if (count <= 0)
 		return;
 
 	if (!initHead) {
@@ -1151,7 +1162,7 @@ init_dependencies(image_t *image, bool initHead)
 	}
 	TRACE(("%ld:  init done.\n", find_thread(NULL)));
 
-	rldfree(initList);
+	free(initList);
 }
 
 
@@ -1475,10 +1486,10 @@ void
 terminate_program(void)
 {
 	image_t **termList;
-	uint32 count, i;
+	ssize_t count, i;
 
 	count = get_sorted_image_list(sProgramImage, &termList, RFLAG_TERMINATED);
-	if (count == 0)
+	if (count < B_OK)
 		return;
 
 	TRACE(("%ld: terminate dependencies\n", find_thread(NULL)));
@@ -1492,8 +1503,7 @@ terminate_program(void)
 	}
 	TRACE(("%ld:  term done.\n", find_thread(NULL)));
 
-	rldfree(termList);
-	
+	free(termList);
 }
 
 

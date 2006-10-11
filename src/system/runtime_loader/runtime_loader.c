@@ -352,7 +352,9 @@ runtime_loader(void *_args)
 	close(2); open("/dev/console", 0); /* stderr  */
 #endif
 
-	rldheap_init();
+	if (heap_init() < B_OK)
+		return 1;
+
 	rldexport_init();
 	rldelf_init();
 

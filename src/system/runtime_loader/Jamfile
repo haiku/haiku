@@ -59,7 +59,7 @@ Objects
 	runtime_loader.c
 	elf.c
 	export.c
-	heap.c
+	heap.cpp
 	utility.cpp
 	arch_relocate.c
 ;

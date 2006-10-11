@@ -42,10 +42,7 @@ status_t elf_verify_header(void *header, int32 length);
 void rldelf_init(void);
 void rldexport_init(void);
 
-// RLD heap
-void rldheap_init(void);
-void *rldalloc(size_t);
-void rldfree(void *p);
+status_t heap_init(void);
 
 // arch dependent prototypes
 status_t arch_relocate_image(image_t *image);
