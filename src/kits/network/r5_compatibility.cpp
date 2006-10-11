@@ -10,7 +10,9 @@
 
 
 #include <SupportDefs.h>
+#include <TLS.h>
 
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -18,6 +20,7 @@
 struct net_settings;
 
 extern "C" {
+	int *_h_errnop(void);
 	int _netstat(int fd, char **output, int verbose);
 	int closesocket(int socket);
 	char *find_net_setting(net_settings* settings, const char* heading,
@@ -26,6 +29,16 @@ extern "C" {
 		const char* name, const char* value);
 	int getusername(char *user, size_t bufferLength);
 	int getpassword(char *password, size_t bufferLength);
+}
+
+
+int32 __gHErrnoTLS = tls_allocate();
+
+
+int *
+_h_errnop(void)
+{
+	return (int *)tls_address(__gHErrnoTLS);
 }
 
 
