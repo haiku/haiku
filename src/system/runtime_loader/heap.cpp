@@ -50,8 +50,7 @@ struct free_chunk {
 };
 
 
-static void *sHeapBase;
-static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable;
+static uint32 sAvailable;
 static free_chunk sFreeAnchor;
 
 
@@ -172,51 +171,55 @@ free_chunk::SetToAllocated(void *allocated)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - private functions
+
+
+static status_t
+add_area(size_t size)
+{
+	void *base;
+	area_id area = _kern_create_area("rld heap", &base, B_ANY_ADDRESS, size,
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (area < B_OK)
+		return area;
+
+	sAvailable += size - sizeof(uint32);
+
+	// declare the whole heap as one chunk, and add it
+	// to the free list
+
+	free_chunk *chunk = (free_chunk *)base;
+	chunk->size = size;
+	chunk->next = sFreeAnchor.next;
+
+	sFreeAnchor.next = chunk;
+	return B_OK;
+}
+
+
+static status_t
+grow_heap(uint32 bytes)
+{
+	// align the area size to an 32768 bytes boundary
+	bytes = (bytes + 32767) & ~32767;
+	return add_area(bytes);
+}
+
+
+//	#pragma mark - public API
 
 
 status_t
 heap_init(void)
 {
-	area_id area = _kern_create_area("rld heap",
-		&sHeapBase, B_ANY_ADDRESS, kInitialHeapSize,
-		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (area < B_OK)
-		return area;
-
-	sMaxHeapSize = kInitialHeapSize;
-	sAvailable = sMaxHeapSize - sizeof(uint32);
-
-	// declare the whole heap as one chunk, and add it
-	// to the free list
-
-	free_chunk *chunk = (free_chunk *)sHeapBase;
-	chunk->size = sMaxHeapSize;
-	chunk->next = NULL;
+	status_t status = add_area(kInitialHeapSize);
+	if (status < B_OK)
+		return status;
 
 	sFreeAnchor.size = 0;
-	sFreeAnchor.next = chunk;
-
 	return B_OK;
 }
 
-
-#if 0
-char *
-grow_heap(uint32 bytes)
-{
-	char *start;
-
-	if (sHeapSize + bytes > sMaxHeapSize)
-		return NULL;
-
-	start = (char *)sHeapBase + sHeapSize;
-	memset(start, 0, bytes);
-	sHeapSize += bytes;
-
-	return start;
-}
-#endif
 
 #ifdef HEAP_TEST
 void
@@ -230,27 +233,24 @@ dump_chunks(void)
 		chunk = chunk->next;
 	}
 }
-
-
-uint32
-heap_available(void)
-{
-	return sAvailable;
-}
 #endif
 
 
 void *
 malloc(size_t size)
 {
-	if (sHeapBase == NULL || size == 0)
+	if (size == 0)
 		return NULL;
 
 	// align the size requirement to an 8 bytes boundary
 	size = (size + 7) & ~7;
 
-	if (size > sAvailable)
-		return NULL;
+restart:
+	if (size > sAvailable) {
+		// try to enlarge heap
+		if (grow_heap(size) < B_OK)
+			return NULL;
+	}
 
 	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
 	while (chunk && chunk->Size() < size) {
@@ -260,7 +260,10 @@ malloc(size_t size)
 
 	if (chunk == NULL) {
 		// could not find a free chunk as large as needed
-		return NULL;
+		if (grow_heap(size) < B_OK)
+			return NULL;
+
+		goto restart;
 	}
 
 	if (chunk->Size() > size + sizeof(free_chunk) + 4) {
