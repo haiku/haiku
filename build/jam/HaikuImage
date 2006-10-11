@@ -50,7 +50,7 @@ BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libfluidsynth.so libqoca.so
 ;
 BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
-	media_addon_server input_server app_server fake_app_server midi_server
+	media_addon_server input_server app_server fake_app_server midi_server print_server
 ;
 
 BEOS_NETWORK_DEVICES = ethernet loopback ;
