@@ -1681,6 +1681,9 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 		if (frame.right > screenFrame.right)
 			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2, 0);
 
+		if (frame.left < 0)
+			frame.OffsetBy(-frame.left + 6, 0);
+
 		if (frame.bottom > screenFrame.bottom)
 			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
 	} else {
