@@ -49,7 +49,7 @@ printf(const char *format, ...)
 	va_list args;
 
 	va_start(args, format);
-	int length = vsprintf(buffer, format, args);
+	int length = vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
 	_kern_write(STDERR_FILENO, 0, buffer, length);
