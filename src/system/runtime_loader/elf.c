@@ -1035,10 +1035,9 @@ load_dependencies(image_t *image)
 		return B_OK;
 
 	image->flags |= RFLAG_DEPENDENCIES_LOADED;
-	if (image->num_needed == 0) {
-		image->needed = NULL;
+
+	if (image->num_needed == 0)
 		return B_OK;
-	}
 
 	image->needed = malloc(image->num_needed * sizeof(image_t *));
 	if (image->needed == NULL) {
@@ -1177,6 +1176,7 @@ put_image(image_t *image)
 
 		dequeue_image(&sLoadedImages, image);
 		enqueue_image(&sDisposableImages, image);
+		sLoadedImageCount--;
 
 		for (i = 0; i < image->num_needed; i++) {
 			put_image(image->needed[i]);
@@ -1304,6 +1304,8 @@ load_library(char const *path, uint32 flags, bool addOn)
 	return image->id;
 
 err:
+	dequeue_image(&sLoadedImages, image);
+	sLoadedImageCount--;
 	delete_image(image);
 	rld_unlock();
 	return status;
@@ -1437,16 +1439,23 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType, void **_l
 status_t
 get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 {
-	image_t *image = find_loaded_image_by_id(id);
 	uint32 i, j, searchIndex = *cookie;
 	struct Elf32_Dyn *dynamicSection;
+	image_t *image;
 
-	if (image == NULL)
+	rld_lock();
+
+	image = find_loaded_image_by_id(id);
+	if (image == NULL) {
+		rld_unlock();
 		return B_BAD_VALUE;
+	}
 
 	dynamicSection = (struct Elf32_Dyn *)image->dynamic_ptr;
-	if (dynamicSection == NULL || image->num_needed <= searchIndex)
+	if (dynamicSection == NULL || image->num_needed <= searchIndex) {
+		rld_unlock();
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	for (i = 0, j = 0; dynamicSection[i].d_tag != DT_NULL; i++) {
 		if (dynamicSection[i].d_tag != DT_NEEDED)
@@ -1457,10 +1466,12 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 
 			*_name = STRING(image, neededOffset);
 			*cookie = searchIndex + 1;
+			rld_unlock();
 			return B_OK;
 		}
 	}
 
+	rld_unlock();
 	return B_ENTRY_NOT_FOUND;
 }
 
