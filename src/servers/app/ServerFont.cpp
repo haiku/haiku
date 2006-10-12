@@ -240,6 +240,8 @@ ServerFont::SetStyle(FontStyle* style)
 
 /*!
 	\brief Sets the ServerFont instance to whatever font is specified
+	This method will lock the font manager.
+
 	\param familyID ID number of the family to set
 	\param styleID ID number of the style to set
 	\return B_OK if successful, B_ERROR if not

@@ -1042,7 +1042,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			//	2) string - family
 			//	3) string - style
 			//	4) float - size
-			
+
 			char type[B_OS_NAME_LENGTH];
 			font_family familyName;
 			font_style styleName;
@@ -1052,11 +1052,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				&& link.ReadString(familyName, sizeof(familyName)) == B_OK
 				&& link.ReadString(styleName, sizeof(styleName)) == B_OK
 				&& link.Read<float>(&size) == B_OK) {
-				BAutolock locker(gFontManager);
+				gFontManager->Lock();
 
 				FontStyle* style = gFontManager->GetStyle(familyName, styleName);
 				if (style != NULL) {
 					ServerFont font(*style, size);
+					gFontManager->Unlock();
+						// We must not have locked the font manager when
+						// locking the desktop (through LockedDesktopSettings
+						// below)
+
 					LockedDesktopSettings settings(fDesktop);
 
 					if (!strcmp(type, "plain"))
@@ -1065,7 +1070,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 						settings.SetDefaultBoldFont(font);
 					else if (!strcmp(type, "fixed"))
 						settings.SetDefaultFixedFont(font);
-				}
+				} else
+					gFontManager->Unlock();
 			}
 			break;
 		}
