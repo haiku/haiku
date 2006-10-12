@@ -441,7 +441,12 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 		TWindowMenu *sub = (static_cast<TWindowMenu *>(Submenu()));
 		if (sub) {
 			// force the menu to update it's contents.
-			Submenu()->AttachedToWindow();
+			bool locked = sub->LockLooper();
+				// if locking the looper failed, the menu is just not visible
+			sub->AttachedToWindow();
+			if (locked)
+				sub->UnlockLooper();
+
 			if (sub->CountItems() > 1){
 				TExpandoMenuBar *parent = static_cast<TExpandoMenuBar *>(Menu());
 				int myindex = parent->IndexOf(this) + 1;
