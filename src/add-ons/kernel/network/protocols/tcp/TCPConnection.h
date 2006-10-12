@@ -615,6 +615,9 @@ TCPConnection::Send(uint16 flags, bool empty)
 {
 	TRACE(("TCP:%p.Send(%X,%s)\n", this, flags, empty ? "1" : "0"));
 
+	if (fRoute == NULL)
+		return B_ERROR;
+
 	net_buffer *buffer;
 	uint32 effectiveWindow = min_c(tcp_get_mtu(this, (sockaddr *)&socket->address), fNextByteToWrite - fNextByteToSend);
 	if (empty || effectiveWindow == 0 || fSendBuffer == NULL || fSendBuffer->size == 0) {
