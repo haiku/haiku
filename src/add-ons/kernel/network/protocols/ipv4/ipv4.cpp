@@ -761,6 +761,9 @@ status_t
 ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	net_buffer *buffer)
 {
+	if (route == NULL)
+		return B_BAD_VALUE;
+
 	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
 	net_interface *interface = route->interface;
 
