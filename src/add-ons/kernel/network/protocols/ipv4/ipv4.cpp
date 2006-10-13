@@ -557,6 +557,84 @@ reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
 }
 
 
+/*!
+	Fragments the incoming buffer and send all fragments via the specified
+	\a route.
+*/
+static status_t
+send_fragments(ipv4_protocol *protocol, struct net_route *route,
+	net_buffer *buffer, uint32 mtu)
+{
+	dprintf("ipv4 needs to fragment (size %lu, MTU %lu), but that's not yet tested...\n",
+		buffer->size, mtu);
+
+	// adapt MTU to be a multiple of 8 (fragment offsets can only be specified this way)
+	mtu &= ~7;
+	dprintf("  adjusted MTU to %ld\n", mtu);
+
+	NetBufferHeader<ipv4_header> bufferHeader(buffer);
+	if (bufferHeader.Status() < B_OK)
+		return bufferHeader.Status();
+
+	ipv4_header &header = bufferHeader.Data();
+	bufferHeader.Detach();
+
+	uint16 headerLength = header.HeaderLength();
+	uint32 bytesLeft = buffer->size - headerLength;
+	uint32 fragmentOffset = 0;
+	status_t status = B_OK;
+
+	net_buffer *headerBuffer = sBufferModule->split(buffer, headerLength);
+	if (headerBuffer == NULL)
+		return B_NO_MEMORY;
+
+	while (bytesLeft > 0) {
+		uint32 fragmentLength = max_c(bytesLeft, mtu);
+		bytesLeft -= fragmentLength;
+		bool lastFragment = bytesLeft == 0;
+
+		header.total_length = htons(fragmentLength);
+		header.fragment_offset = htons((lastFragment ? 0 : IP_MORE_FRAGMENTS)
+			| (fragmentOffset >> 3));
+		header.checksum = sBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
+			// TODO: compute the checksum only for those parts that changed?
+		dprintf("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
+
+		net_buffer *fragmentBuffer;
+		if (!lastFragment) {
+			fragmentBuffer = sBufferModule->split(buffer, fragmentLength);
+			fragmentOffset += fragmentLength;
+		} else
+			fragmentBuffer = buffer;
+
+		if (fragmentBuffer == NULL) {
+			status = B_NO_MEMORY;
+			break;
+		}
+
+		// copy header to fragment
+		status = sBufferModule->prepend(fragmentBuffer, &header, headerLength);
+
+		// send fragment
+		if (status == B_OK)
+			status = sDatalinkModule->send_data(route, fragmentBuffer);
+		
+		if (lastFragment) {
+			// we don't own the last buffer, so we don't have to free it
+			break;
+		}
+
+		if (status < B_OK) {
+			sBufferModule->free(fragmentBuffer);
+			break;
+		}
+	}
+
+	sBufferModule->free(headerBuffer);
+	return status;
+}
+
+
 static void
 raw_receive_data(net_buffer *buffer)
 {
@@ -809,15 +887,14 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		sBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
 		sBufferModule->checksum(buffer, 0, buffer->size, true)));
 
+	TRACE(("destination-IP: buffer=%p addr=%p %08lx\n", buffer, &buffer->destination,
+		ntohl(((sockaddr_in *)&buffer->destination)->sin_addr.s_addr)));
+
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
 		// we need to fragment the packet
-		dprintf("ipv4 needs to fragment (size %lu, MTU %lu), but that's not yet implemented...\n", buffer->size, mtu);
-		return B_ERROR;
+		return send_fragments(protocol, route, buffer, mtu);
 	}
-
-	TRACE(("destination-IP: buffer=%p addr=%p %08lx\n", buffer, &buffer->destination,
-		ntohl(((sockaddr_in *)&buffer->destination)->sin_addr.s_addr)));
 
 	return sDatalinkModule->send_data(route, buffer);
 }
