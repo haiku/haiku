@@ -179,7 +179,7 @@ scan(device_node_info *node, bool rescan)
 
 	// do the real thing - scan node
 	if (!rescan) {
-		bool loadDriversLater = false;
+		uint8 loadDriversLater = false;
 		char *deviceType = NULL;
 		pnp_get_attr_uint8(node, B_DRIVER_FIND_DEVICES_ON_DEMAND, &loadDriversLater, false);
 		pnp_get_attr_string(node, B_DRIVER_DEVICE_TYPE, &deviceType, false);
