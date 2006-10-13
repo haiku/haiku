@@ -436,7 +436,8 @@ syslog_sender(void *data)
 				if (length > SYSLOG_MAX_MESSAGE_LENGTH)
 					length = SYSLOG_MAX_MESSAGE_LENGTH;
 
-				length = ring_buffer_read(sSyslogBuffer, sSyslogMessage->message, length);
+				length = ring_buffer_read(sSyslogBuffer,
+					(uint8 *)sSyslogMessage->message, length);
 				if (sSyslogDropped) {
 					// add drop marker
 					if (length < SYSLOG_MAX_MESSAGE_LENGTH - 6)
@@ -498,9 +499,9 @@ syslog_write(const char *text, int32 length)
 			sSyslogDropped = true;
 	}
 
-	ring_buffer_write(sSyslogBuffer, text, length);
+	ring_buffer_write(sSyslogBuffer, (uint8 *)text, length);
 	if (trunc)
-		ring_buffer_write(sSyslogBuffer, "<TRUNC>", 7);
+		ring_buffer_write(sSyslogBuffer, (uint8 *)"<TRUNC>", 7);
 
 	release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
 }
