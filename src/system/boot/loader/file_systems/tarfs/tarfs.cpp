@@ -154,16 +154,14 @@ skip_gzip_header(z_stream *stream)
 	if (buffer[0] != 0x1f || buffer[1] != 0x8b)
 		return false;
 
-	uint32 offset = 3;
-
 	// we need the flags field to determine the length of the header
-	int flags = buffer[offset++];
+	int flags = buffer[3];
 
-	offset += 6;
+	uint32 offset = 10;
 
 	if ((flags & 0x04) != 0) {
 		// skip extra field
-		offset += buffer[offset++] | (buffer[offset++] << 8);
+		offset += (buffer[offset] | (buffer[offset + 1] << 8)) + 2;
 		if (offset >= stream->avail_in)
 			return false;
 	}
