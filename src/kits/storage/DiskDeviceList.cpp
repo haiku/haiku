@@ -1,10 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
 
-#include <new>
-using namespace std;
 
 #include <DiskDevice.h>
 #include <DiskDeviceList.h>
@@ -14,6 +15,9 @@ using namespace std;
 #include <Looper.h>
 #include <ObjectLocker.h>
 #include <Partition.h>
+
+#include <new>
+using namespace std;
 
 using BPrivate::BObjectLocker;
 
@@ -612,7 +616,7 @@ BDiskDeviceList::_StopWatching()
 void
 BDiskDeviceList::_MountPointMoved(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			MountPointMoved(partition);
 	}
@@ -625,7 +629,7 @@ BDiskDeviceList::_MountPointMoved(BMessage *message)
 void
 BDiskDeviceList::_PartitionMounted(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionMounted(partition);
 	}
@@ -638,7 +642,7 @@ BDiskDeviceList::_PartitionMounted(BMessage *message)
 void
 BDiskDeviceList::_PartitionUnmounted(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionUnmounted(partition);
 	}
@@ -651,7 +655,7 @@ BDiskDeviceList::_PartitionUnmounted(BMessage *message)
 void
 BDiskDeviceList::_PartitionInitialized(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionInitialized(partition);
 	}
@@ -664,7 +668,7 @@ BDiskDeviceList::_PartitionInitialized(BMessage *message)
 void
 BDiskDeviceList::_PartitionResized(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionResized(partition);
 	}
@@ -677,7 +681,7 @@ BDiskDeviceList::_PartitionResized(BMessage *message)
 void
 BDiskDeviceList::_PartitionMoved(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionMoved(partition);
 	}
@@ -690,7 +694,7 @@ BDiskDeviceList::_PartitionMoved(BMessage *message)
 void
 BDiskDeviceList::_PartitionCreated(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionCreated(partition);
 	}
@@ -718,7 +722,7 @@ BDiskDeviceList::_PartitionDeleted(BMessage *message)
 void
 BDiskDeviceList::_PartitionDefragmented(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionDefragmented(partition);
 	}
@@ -731,7 +735,7 @@ BDiskDeviceList::_PartitionDefragmented(BMessage *message)
 void
 BDiskDeviceList::_PartitionRepaired(BMessage *message)
 {
-	if (BDiskDevice *device = _UpdateDevice(message)) {
+	if (_UpdateDevice(message) != NULL) {
 		if (BPartition *partition = _FindPartition(message))
 			PartitionRepaired(partition);
 	}

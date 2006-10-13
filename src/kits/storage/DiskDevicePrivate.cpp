@@ -1,13 +1,23 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 
 #include <DiskDevicePrivate.h>
 #include <DiskDevice.h>
 #include <Partition.h>
 
-// PartitionFilterVisitor
+
+PartitionFilter::~PartitionFilter()
+{
+}
+
+
+//	#pragma mark - PartitionFilterVisitor
 
 // constructor
 PartitionFilterVisitor::PartitionFilterVisitor(BDiskDeviceVisitor *visitor,
