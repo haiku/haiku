@@ -158,7 +158,7 @@ dequeue_image(image_queue_t *queue, image_t *image)
 
 
 static uint32
-elf_hash(const uchar *name)
+elf_hash(const uint8 *name)
 {
 	uint32 hash = 0;
 	uint32 temp;
@@ -707,7 +707,7 @@ find_symbol(image_t *image, const char *name, int32 type)
 	if (image->dynamic_ptr == NULL)
 		return NULL;
 
-	hash = elf_hash(name) % HASHTABSIZE(image);
+	hash = elf_hash((uint8 *)name) % HASHTABSIZE(image);
 
 	for (i = HASHBUCKETS(image)[hash]; i != STN_UNDEF; i = HASHCHAINS(image)[i]) {
 		struct Elf32_Sym *symbol = &image->syms[i];
