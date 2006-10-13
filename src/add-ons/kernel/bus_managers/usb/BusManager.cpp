@@ -246,9 +246,12 @@ BusManager::_GetDefaultPipe(usb_speed speed)
 					0, 0, speed, 8);
 		if (!fDefaultPipes[speed]) {
 			TRACE_ERROR(("usb BusManager: failed to allocate default pipe\n"));
+			Unlock();
 			return NULL;
 		}
 	}
+	
+	Unlock();
 	
 	return fDefaultPipes[speed];
 }
