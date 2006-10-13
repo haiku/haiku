@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system boot platform openfirmware arch ppc ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] 
+	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
 SubDirC++Flags -fno-rtti ;
 
