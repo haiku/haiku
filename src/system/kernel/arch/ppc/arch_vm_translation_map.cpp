@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -161,7 +161,8 @@ static void
 destroy_tmap(vm_translation_map *map)
 {
 	if (map->map_count > 0) {
-		panic("vm_translation_map.destroy_tmap: map %p has positive map count %d\n", map, map->map_count);
+		panic("vm_translation_map.destroy_tmap: map %p has positive map count %ld\n",
+			map, map->map_count);
 	}
 
 	// mark the vsid base not in use
