@@ -235,7 +235,7 @@ void ConfigWindow::MessageReceived(BMessage* m) {
 		case B_ABOUT_REQUESTED: AboutRequested();
 			break;
 		default:
-			inherited::MessageReceived(m);
+			BWindow::MessageReceived(m);
 	}
 }
 
