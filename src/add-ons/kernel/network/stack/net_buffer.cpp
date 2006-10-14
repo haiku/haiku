@@ -4,7 +4,6 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
- *		Andrew Galante, haiku.galante@gmail.com
  */
 
 
@@ -29,215 +28,151 @@
 #endif
 
 #define BUFFER_SIZE 2048
-#define MAX_BUFFERS 2048
-
-
-struct datastore {
-	area_id area;
-	void *store;		// ptr to data region
-	size_t blocksize;	// size of the blocks in the datastore
-	size_t blockcount;	// total number of blocks in the datastore
-	int32 *refcounts;		// array containing refcounts for each block.  a refcount of 0 is a free block
-	int lastfreed;		// index of last freed block
-	int nextfree;		// index of next free block
-};
 
 struct data_node {
-	struct data_node *next;
-	struct data_node *previous;
-	uint8		*datablock;
-	uint8		*start;
+	struct list_link link;
+	struct data_header *header;
+	size_t		offset;			// the net_buffer-wide offset of this node
+	uint8		*start;			// points to the start of the data
+	size_t		used;			// defines how much memory is used by this node
 	size_t		header_space;
-	size_t		trailer_space;
-	size_t		size;
+	size_t		tail_space;
 };
 
-typedef struct data_node data_node;
-
+struct data_header {
+	int32		ref_count;
+	addr_t		physical_address;
+	size_t		size;
+	uint8		*data_end;
+	size_t		data_space;
+	data_node	*first_node;
+};
 
 struct net_buffer_private : net_buffer {
-	struct data_node *first_node;
+	struct list	buffers;
+	data_node	first_node;
 };
 
-typedef struct net_buffer_private net_buffer_private;
 
+static status_t append_data(net_buffer *buffer, const void *data, size_t size);
+static status_t trim_data(net_buffer *_buffer, size_t newSize);
+static status_t remove_header(net_buffer *_buffer, size_t bytes);
 
-static struct datastore sDatastore;
-	// The structure that manages all the storage space
-
-
-//	#pragma mark -
-
-
-/*!
-	Creates a new datastore with \a blockcount datablocks of \a blocksize size
-	\return B_NO_MEMORY if there is not enough memory to allocate to the datastore
-	\return B_BAD_VALUE if blockcount is negative
-*/
-status_t
-init_datastore(struct datastore *store, size_t blocksize, int blockcount)
+static data_header *
+create_data_header(size_t size, size_t headerSpace)
 {
-	if (blockcount < 1)
-		return B_BAD_VALUE;
-
-	store->blocksize = blocksize;
-	store->blockcount = blockcount;
-
-	store->area = create_area("net datastore", (void **)&store->store,
-		B_ANY_KERNEL_ADDRESS, blocksize * blockcount, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (store->area < B_OK)
-		return store->area;
-
-	store->refcounts = (int32 *)calloc(blockcount, sizeof(uint32));
-	if (store->refcounts == NULL)
-		return B_NO_MEMORY;
-
-	store->lastfreed = -1;
-	store->nextfree = 0;
-
-	return B_OK;
-}
-
-
-/*!
- * Frees all memory occupied by the datastore, except for the datastore structure itself
- */
-status_t
-uninit_datastore(struct datastore *store)
-{
-	store->blocksize = 0;
-	store->blockcount = 0;
-
-	delete_area(store->area);
-	store->store = NULL;
-	free(store->refcounts);
-	store->refcounts = NULL;
-
-	store->lastfreed = -1;
-	store->nextfree = 0;
-
-	return B_OK;
-}
-
-
-/*!
- * Searches the datastore for a free datablock.  If none are free,
- * continues search until one is freed.
- * \return a pointer to the datablock
- * \return NULL if the datastore has not been properly initialized
- */
-void *
-get_datablock(struct datastore *store)
-{
-	void *block = NULL;
-	if (store->store == NULL)
+	// TODO: don't use malloc!
+	data_header *header = (data_header *)malloc(size);
+	if (header == NULL)
 		return NULL;
 
-	int index = store->lastfreed;
-	// first check lastfreed index, as that's most likely to be free
-	if (index >= 0) {
-		if (atomic_add(&store->refcounts[index], 1) == 0) {
-			block = (void *)(index * store->blocksize + (uint8 *)store->store);
-			store->lastfreed = -1;
-			return block;
-		} else
-			atomic_add(&store->refcounts[index], -1);
-	}
-	// otherwise start at the "next free" block and search
-	index = store->nextfree;
-	while (1) {
-		if(atomic_add(&store->refcounts[index], 1) == 0) {
-			// found a free block
-			block = (void *)(index * store->blocksize + (uint8 *)store->store);
-			store->nextfree = (index + 1) % store->blockcount;
-			break;
-		} else
-			atomic_add(&store->refcounts[index], -1);
-		index = (index + 1) % store->blockcount;
-	}
-
-	return block;
+	header->ref_count = 1;
+	header->physical_address = 0;
+		// TODO: initialize this correctly
+	header->size = size;
+	header->data_space = headerSpace;
+	header->data_end = (uint8 *)header + sizeof(struct data_header);
+	header->first_node = NULL;
+	
+	TRACE(("  create new data header %p\n", header));
+	return header;
 }
 
 
-/*!
- * Increments the refcount of the specified block
- * \return a reference to the block on success
- * \return NULL if there was an error
- */
-void *
-get_datablock(struct datastore *store, void *block)
+static void
+release_data_header(data_header *header)
 {
-	if (block == NULL
-		|| block < store->store
-		|| block > (uint8 *)store->store + (store->blocksize * store->blockcount))
+	if (atomic_add(&header->ref_count, -1) != 1)
+		return;
+
+	TRACE(("  free header %p\n", header));
+	free(header);
+}
+
+
+inline void
+acquire_data_header(data_header *header)
+{
+	atomic_add(&header->ref_count, 1);
+}
+
+
+static void
+free_data_header_space(data_header *header, uint8 *data, size_t size)
+{
+	if (header->data_end != data + size) {
+		// this wasn't the last allocation, unfortunately, there is nothing
+		// to do for us, then
+		// TODO: if the need arises, a simple free list could do wonder
+		// TODO: remove_data_node() currently calls this function no matter
+		//	where the node had been placed - this would need to be changed
+		//	then, too.
+		return;
+	}
+
+	header->data_end -= size;
+	header->data_space += size;
+}
+
+
+static uint8 *
+alloc_data_header_space(data_header *header, size_t size)
+{
+	if (header->data_space < size)
 		return NULL;
-	size_t i = ((uint8 *)block - (uint8 *)store->store) / store->blocksize;
 
-	if (atomic_add(&store->refcounts[i], 1) < 0) {
-		atomic_add(&store->refcounts[i], -1);
+	uint8 *data = header->data_end;
+	header->data_end += size;
+	header->data_space -= size;
+
+	if (header->first_node != NULL)
+		header->first_node->header_space -= size;
+#if 0
+	else
+		dprintf("add data to a header without first node - could overwrite something!\n");
+#endif
+
+	return data;
+}
+
+
+static void
+init_data_node(data_node *node, data_header *header, size_t headerSpace)
+{
+	node->header = header;
+	node->offset = 0;
+	node->start = (uint8 *)header + sizeof(data_header) + headerSpace;
+	node->used = 0;
+	node->header_space = headerSpace;
+	node->tail_space = header->size - headerSpace - sizeof(data_header);
+}
+
+
+static data_node *
+add_data_node(data_header *header)
+{
+	data_node *node = (data_node *)alloc_data_header_space(header, sizeof(data_node));
+	if (node == NULL)
 		return NULL;
-	}
-	return block;
+
+	TRACE(("  add data node %p to header %p\n", node, header));
+	acquire_data_header(header);
+	memset(node, 0, sizeof(struct data_node));
+	return node;
 }
 
 
-/*!
- * Decrements the refcount of the specified block
- * \return B_OK on success
- * \return B_BAD_VALUE if \a block is not in the datastore \a store
- */
-status_t
-put_datablock(struct datastore *store, void *block)
+void
+remove_data_node(data_node *node)
 {
-	if (block == NULL
-		|| block < store->store
-		|| block > (uint8 *)store->store + (store->blocksize * store->blockcount))
-		return B_BAD_VALUE;
-	size_t i = ((uint8 *)block - (uint8 *)store->store) / store->blocksize;
+	data_header *header = node->header;
 
-	if (store->refcounts[i] == 0)
-		return B_OK;
-	if (atomic_add(&store->refcounts[i], -1) == 1)
-		if ((store->nextfree - 1) % store->blockcount == i)
-			store->nextfree = i;
-		else
-			store->lastfreed = i;
-	return B_OK;
-}
+	TRACE(("  remove data node %p from header %p\n", node, header));
+	free_data_header_space(header, (uint8 *)node, sizeof(data_node));
+	if (header->first_node == node)
+		header->first_node = NULL;
 
-
-/*!
- * Checks if the datastore is empty.
- * Not guaranteed to be thread safe!
- * \return nonzero if all blocks are free
- * \return zero otherwise
- */
-int
-is_empty_datastore(struct datastore *store)
-{
-	size_t i;
-	for (i = 0; i < store->blockcount; i++)
-		if (store->refcounts[i] != 0)
-			return 0;
-	return 1;
-}
-
-
-/*!
- * Checks if the datastore is occupied
- * Not guaranteed to be thread safe!
- * \return nonzero if no blocks are free
- * \return zero otherwise
- */
-int is_full_datastore(struct datastore *store)
-{
-	size_t i;
-	for (i = 0; i < store->blockcount; i++)
-		if (store->refcounts[i] == 0)
-			return 0;
-	return 1;
+	release_data_header(node->header);
 }
 
 
@@ -245,7 +180,7 @@ int is_full_datastore(struct datastore *store)
 
 
 static net_buffer *
-net_buffer_create(size_t headerSpace)
+create_buffer(size_t headerSpace)
 {
 	net_buffer_private *buffer = (net_buffer_private *)malloc(sizeof(struct net_buffer_private));
 	if (buffer == NULL)
@@ -253,173 +188,81 @@ net_buffer_create(size_t headerSpace)
 
 	TRACE(("create buffer %p\n", buffer));
 
-	data_node *node = buffer->first_node = (data_node *)malloc(sizeof(data_node));
-	if (node == NULL) {
+	data_header *header = create_data_header(BUFFER_SIZE, headerSpace);
+	if (header == NULL) {
 		free(buffer);
 		return NULL;
 	}
 
-	node->datablock = (uint8 *)get_datablock(&sDatastore);
-	if (node->datablock == NULL) {
-		free(node);
-		free(buffer);
-		return NULL;
-	}
+	init_data_node(&buffer->first_node, header, headerSpace);
+	header->first_node = &buffer->first_node;
 
-	if (headerSpace > BUFFER_SIZE)
-		headerSpace = 0;
-	node->start = node->datablock + headerSpace;
-	node->header_space = headerSpace;
-	node->trailer_space = BUFFER_SIZE - headerSpace;
-
-	node->next = NULL;
-	node->previous = NULL;
-	node->size = 0;
+	list_init(&buffer->buffers);
+	list_add_item(&buffer->buffers, &buffer->first_node);
 
 	buffer->source.ss_len = 0;
 	buffer->destination.ss_len = 0;
 	buffer->interface = NULL;
 	buffer->flags = 0;
-	buffer->size = node->size;
+	buffer->size = 0;
 
 	return buffer;
 }
 
 
 static void
-data_node_free(data_node *node)
-{
-	if (node != NULL) {
-
-
-		put_datablock(&sDatastore, (void *)node->datablock);
-		if (node->next != NULL)
-			data_node_free(node->next);
-
-		free(node);
-	}
-}
-
-
-static void
-net_buffer_free(net_buffer *_buffer)
+free_buffer(net_buffer *_buffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
 	TRACE(("free buffer %p\n", buffer));
 
-	if (buffer->first_node != NULL)
-		data_node_free(buffer->first_node);
+	data_node *node;
+	while ((node = (data_node *)list_remove_head_item(&buffer->buffers)) != NULL) {
+		remove_data_node(node);
+	}
 
 	free(buffer);
 }
 
 
-static data_node *
-data_node_duplicate(data_node *node)
-{
-	data_node *duplicate = (data_node *)malloc(sizeof(data_node));
-
-	// copy the data from the source buffer
-	duplicate->datablock = (uint8 *)get_datablock(&sDatastore);
-	if (duplicate->datablock == NULL) {
-		free(duplicate);
-		return NULL;
-	}
-	
-	duplicate->header_space = node->start - node->datablock;
-	duplicate->start = duplicate->datablock + duplicate->header_space;
-	duplicate->size = node->size;
-	duplicate->trailer_space = BUFFER_SIZE - duplicate->size - duplicate->header_space;
-	memcpy(&duplicate->start, &node->start, duplicate->size);
-
-	if (node->next != NULL) {
-		duplicate->next = data_node_duplicate(node->next);
-		if (duplicate->next == NULL) {
-			put_datablock(&sDatastore, (void *)duplicate->datablock);
-			free(duplicate);
-			return NULL;
-		}
-		duplicate->next->previous = duplicate;
-	} else
-		duplicate->next = NULL;
-
-	duplicate->previous = NULL;
-
-	return duplicate;
-}
-
-
-/*!
- *	Creates a duplicate of the \a buffer. The new buffer does not share internal
- *	storage; they are completely independent from each other.
- */
+/*!	Creates a duplicate of the \a buffer. The new buffer does not share internal
+	storage; they are completely independent from each other.
+*/
 static net_buffer *
-net_buffer_duplicate(net_buffer *_buffer)
+duplicate_buffer(net_buffer *_buffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
-	net_buffer_private *duplicate =
-			(net_buffer_private *)malloc(sizeof(struct net_buffer_private));
+	net_buffer *duplicate = create_buffer(buffer->first_node.header_space);
 	if (duplicate == NULL)
 		return NULL;
 
-	duplicate->first_node = data_node_duplicate(buffer->first_node);
-	if (duplicate->first_node == NULL) {
-		free(duplicate);
-		return NULL;
+	// copy the data from the source buffer
+
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (true) {
+		if (append_data(duplicate, node->start, node->used) < B_OK) {
+			free_buffer(duplicate);
+			return NULL;
+		}
+
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			break;
 	}
 
 	// copy meta data from source buffer
+
 	memcpy(&duplicate->source, &buffer->source, buffer->source.ss_len);
 	memcpy(&duplicate->destination, &buffer->destination, buffer->destination.ss_len);
 
 	duplicate->flags = buffer->flags;
 	duplicate->interface = buffer->interface;
-	duplicate->protocol = buffer->protocol;
 	duplicate->size = buffer->size;
+	duplicate->protocol = buffer->protocol;
 
 	return duplicate;
-}
-
-
-static data_node *
-data_node_clone(data_node *node, bool shareFreeSpace)
-{
-	data_node *clone = (data_node *)malloc(sizeof(data_node));
-
-	clone->datablock = (uint8 *)get_datablock(&sDatastore, (void *)node->datablock);
-	if (clone->datablock == NULL) {
-		free(clone);
-		return NULL;
-	}
-
-	// clone the data from the source buffer
-	clone->start = node->start;
-	if (shareFreeSpace) {
-		clone->header_space = node->header_space;
-		clone->trailer_space = node->trailer_space;
-	} else {
-		clone->header_space = 0;
-		clone->trailer_space = 0;
-	}
-
-	clone->size = node->size;
-
-	if (node->next != NULL) {
-		clone->next = data_node_clone(node->next, shareFreeSpace);
-		if (clone->next == NULL) {
-			put_datablock(&sDatastore, (void *)clone->datablock);
-			free(clone);
-			return NULL;
-		}
-		clone->next->previous = clone;
-	} else
-		clone->next = NULL;
-
-	clone->previous = NULL;
-
-	return clone;
 }
 
 
@@ -432,443 +275,389 @@ data_node_clone(data_node *node, bool shareFreeSpace)
 	will do this.
 */
 static net_buffer *
-net_buffer_clone(net_buffer *_buffer, bool shareFreeSpace)
+clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
-	net_buffer_private *clone =
-			(net_buffer_private *)malloc(sizeof(struct net_buffer_private));
+	net_buffer_private *clone = (net_buffer_private *)malloc(sizeof(struct net_buffer_private));
 	if (clone == NULL)
 		return NULL;
 
-	if (buffer->first_node != NULL) {
-		clone->first_node = data_node_clone(buffer->first_node, shareFreeSpace);
-		if (clone->first_node == NULL) {
+	data_node *node = &clone->first_node;
+	data_node *sourceNode = (data_node *)list_get_first_item(&buffer->buffers);
+	if (sourceNode == NULL) {
+		free(clone);
+		return NULL;
+	}
+
+	list_init(&clone->buffers);
+
+	// grab reference to this buffer - all additional nodes will get
+	// theirs in add_data_node()
+	atomic_add(&sourceNode->header->ref_count, 1);
+
+	while (sourceNode != NULL) {
+		node->header = sourceNode->header;
+		node->start = sourceNode->start;
+		node->used = sourceNode->used;
+		node->offset = sourceNode->offset;
+
+		if (shareFreeSpace) {
+			// both buffers could claim the free space - note that this option
+			// has to be used carefully
+			node->header_space = sourceNode->header_space;
+			node->tail_space = sourceNode->tail_space;
+		} else {
+			// the free space stays with the original buffer
+			node->header_space = 0;
+			node->tail_space = 0;
+		}
+
+		// add node to clone's list of buffers
+		list_add_item(&clone->buffers, node);
+
+		sourceNode = (data_node *)list_get_next_item(&buffer->buffers, sourceNode);
+		if (sourceNode == NULL)
+			break;
+
+		node = add_data_node(sourceNode->header);
+		if (node == NULL) {
+			// There was not enough space left for another node in this buffer
+			// TODO: handle this case!
+			panic("clone buffer hits size limit... (fix me)");
 			free(clone);
 			return NULL;
 		}
 	}
 
 	// copy meta data from source buffer
+
 	memcpy(&clone->source, &buffer->source, buffer->source.ss_len);
 	memcpy(&clone->destination, &buffer->destination, buffer->destination.ss_len);
 
 	clone->flags = buffer->flags;
 	clone->interface = buffer->interface;
-	clone->protocol = buffer->protocol;
 	clone->size = buffer->size;
+	clone->protocol = buffer->protocol;
 
 	return clone;
 }
 
 
-static data_node *
-data_node_split(data_node *node, uint32 offset)
-{
-	if (node == NULL)
-		return NULL;
-
-	if (offset > node->size)
-		return data_node_split(node->next, offset - node->size);
-
-	data_node *new_node;
-	if (offset == node->size) {
-		new_node = node->next;
-		node->next = NULL;
-		if (new_node != NULL)
-			new_node->previous = NULL;
-	} else {
-		// offset < node->size
-		new_node = (data_node *)malloc(sizeof(data_node));
-		new_node->datablock = (uint8 *)get_datablock(&sDatastore, (void *)node->datablock);
-		if (new_node->datablock == NULL) {
-			free(new_node);
-			return NULL;
-		}
-		new_node->size = node->size - offset;
-		node->size = offset;
-		new_node->start = node->start + offset;
-		new_node->header_space = 0;
-		new_node->trailer_space = node->trailer_space;
-		node->trailer_space = 0;
-		new_node->next = node->next;
-		if (new_node->next != NULL)
-			new_node->next->previous = new_node;
-		node->next = NULL;
-	}
-
-	return new_node;
-}
-
 /*!
- * Splits \a buffer at byte \a offset.
- * \return a buffer containing the lower half of the split
- * \return NULL if offset is larger than the buffer size, 0, or there was an error
- */
+	Split the buffer at offset, the trailer data
+	is returned as new buffer.
+	TODO: optimize and avoid making a copy.
+*/
 static net_buffer *
-net_buffer_split(net_buffer *_buffer, uint32 offset)
+split_buffer(net_buffer *from, uint32 offset)
 {
-	if (offset >= _buffer->size || offset == 0)
+	status_t err;
+	net_buffer *buf = duplicate_buffer(from);
+	if (buf == NULL)
 		return NULL;
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	net_buffer_private *new_buf =
-			(net_buffer_private *)malloc(sizeof(net_buffer_private));
-
-	new_buf->first_node = data_node_split(buffer->first_node, offset);
-	if (new_buf->first_node == NULL) {
-		free(new_buf);
-		return NULL;
-	}
-
-	// copy meta data from source buffer
-	memcpy(&new_buf->source, &buffer->source, buffer->source.ss_len);
-	memcpy(&new_buf->destination, &buffer->destination, buffer->destination.ss_len);
-
-	new_buf->flags = buffer->flags;
-	new_buf->interface = buffer->interface;
-	new_buf->protocol = buffer->protocol;
-	new_buf->size = buffer->size;
-
-	return new_buf;
-}
-
-
-static data_node *
-data_node_merge(data_node *before, data_node *after)
-{
-	if (before == NULL)
-		return NULL;
-
-	data_node *node = before;
-
-	while (node->next != NULL)
-		node = node->next;
-
-	node->next = after;
-	if (after != NULL)
-		after->previous = node;
-
-	return before;
+	if ((err = remove_header(buf, offset)) < B_OK)
+		goto fail;
+	if ((err = trim_data(from, from->size - offset)) < B_OK)
+		goto fail;
+	return buf;
+fail:
+	free_buffer(buf);
+	return NULL;
 }
 
 
 /*!
-	Merges the second buffer with the first.
-	if \a after is true, \a _with will be placed after \a _buffer
-	else \a _with will be placed before \a _buffer
-	\return a pointer to the merged buffer
+	Merges the second buffer with the first. If \a after is \c true, the
+	second buffer's contents will be appended to the first ones, else they
+	will be prepended.
+	The second buffer will be freed if this function succeeds.
 */
 static status_t
-net_buffer_merge(net_buffer *_buffer, net_buffer *_with, bool after)
+merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 {
-	net_buffer_private *buffer = (net_buffer_private *) _buffer;
-	net_buffer_private *with = (net_buffer_private *) _with;
+	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private *with = (net_buffer_private *)_with;
+	if (with == NULL)
+		return B_BAD_VALUE;
 
-	TRACE(("merge buffer %p %s %p\n", _with, after ? "after" : "before", _buffer));
+	TRACE(("merge buffer %p with %p (%s)\n", buffer, with, after ? "after" : "before"));
+	// TODO: this is currently very simplistic, I really need to finish the
+	//	harder part of this implementation (data_node management per header)
 
-	if (with == NULL || buffer == NULL)
-		return B_ERROR;
-	if (buffer->first_node == NULL || with->first_node == NULL)
-		return B_ERROR;
+	if (!after) {
+		// change offset of all nodes already in the buffer
+		data_node *node = NULL;
+		while (true) {
+			node = (data_node *)list_get_next_item(&buffer->buffers, node);
+			if (node == NULL)
+				break;
 
-	if (after)
-		buffer->first_node = data_node_merge(buffer->first_node, with->first_node);
-	else
-		buffer->first_node = data_node_merge(with->first_node, buffer->first_node);
-
-	buffer->size += with->size;
-
-	free(with);
-
-	return B_OK;
-}
-
-
-static status_t
-data_node_write_data(data_node *node, size_t offset, const void *data, size_t size)
-{
-	if (node == NULL)
-		return ENOBUFS;
-
-	if (offset > node->size)
-		return data_node_write_data(node->next, offset - node->size, data, size);
-	else {
-		if (node->size - offset < size) {
-			memcpy(node->start + offset, data, node->size - offset);
-			return data_node_write_data(node->next, 0, (uint8 *)data + (node->size - offset), size - (node->size - offset));
-		} else {
-			memcpy(node->start + offset, data, size);
-			return B_OK;
+			node->offset += with->size;
 		}
 	}
 
+	data_node *last = NULL;
+
+	while (true) {
+		data_node *node = (data_node *)list_get_next_item(&with->buffers, last);
+		if (node == NULL)
+			break;
+
+		if ((uint8 *)node > (uint8 *)node->header
+			&& (uint8 *)node < (uint8 *)node->header + node->header->size) {
+			// The node is already in the buffer, we can just move it
+			// over to the new owner
+			list_remove_item(&with->buffers, node);
+		} else {
+			// we need a new place for this node
+			data_node *newNode = add_data_node(node->header);
+			if (newNode == NULL) {
+// TODO: this can't work right now as add_data_node() also grabs a reference
+//		to the header - but in this case, we would need two references, one
+//		for the data, one for the node, and there is no mechanism for this.
+#if 0
+				// try again on the buffers own header
+				newNode = add_data_node(buffer->first_node.header);
+				if (newNode == NULL)
+#endif
+// TODO: try to revert buffers to their initial state!!
+				return ENOBUFS;
+			}
+
+			last = node;
+			*newNode = *node;
+			node = newNode;
+				// the old node will get freed with its buffer
+		}
+
+		if (after) {
+			list_add_item(&buffer->buffers, node);
+			node->offset = buffer->size;
+		} else
+			list_add_link_to_head(&buffer->buffers, node);
+
+		buffer->size += node->used;
+	}
+
+	// the data has been merged completely at this point
+	free_buffer(with);
 	return B_OK;
 }
 
 
 /*!	Writes into existing allocated memory.
- *	\return B_BAD_VALUE if you write outside of the buffers current bounds.
- *	\return ENOBUFS if there was an internal buffer error
- */
+	\return B_BAD_VALUE if you write outside of the buffers current
+		bounds.
+*/
 static status_t
-net_buffer_write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
+write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
-	if (buffer == NULL)
-		return ENOBUFS;
 	if (offset + size > buffer->size)
 		return B_BAD_VALUE;
 	if (size == 0)
 		return B_OK;
 
-	return data_node_write_data(buffer->first_node, offset, data, size);
-}
+	// find first node to write into
 
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			return B_BAD_VALUE;
+	}
 
-static status_t
-data_node_read_data(data_node *node, size_t offset, void *data, size_t size)
-{
-	if (node == NULL)
-		return ENOBUFS;
+	offset -= node->offset;
 
-	if (offset > node->size)
-		return data_node_read_data(node->next, offset - node->size, data, size);
-	else {
-		if (node->size - offset < size) {
-			memcpy(data, node->start + offset, node->size - offset);
-			return data_node_read_data(node->next, 0, (uint8 *)data + (node->size - offset), size - (node->size - offset));
-		} else {
-			memcpy(data, node->start + offset, size);
-			return B_OK;
-		}
+	while (true) {
+		size_t written = min_c(size, node->used - offset);
+		memcpy(node->start + offset, data, written);
+
+		size -= written;
+		if (size == 0)
+			break;
+
+		offset = 0;
+
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			return B_BAD_VALUE;
 	}
 
 	return B_OK;
 }
 
 
-/*!	Reads into \a data \a size bytes from \a buffer starting at \a offset
- *	\return B_BAD_VALUE if you write outside of the buffers current bounds.
- *	\return ENOBUFS if there was an internal buffer error
- */
 static status_t
-net_buffer_read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
+read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
-	if (buffer == NULL)
-		return ENOBUFS;
 	if (offset + size > buffer->size)
 		return B_BAD_VALUE;
 	if (size == 0)
 		return B_OK;
 
-	return data_node_read_data(buffer->first_node, offset, data, size);
-}
+	// find first node to read from
 
-
-static data_node *
-data_node_prepend_size(data_node *node, size_t size, void **_contiguousBuffer)
-{
-
-	if (node->header_space < size) {
-		data_node *new_node;
-		size_t available_space;
-		if (node->size == 0) {
-			// current node is empty; use it before making new ones
-			available_space = node->header_space + node->trailer_space;
-			node->start += node->trailer_space;
-			new_node = node;
-		} else {
-			// need one or more new nodes
-			new_node = (data_node *)malloc(sizeof(data_node));
-			new_node->datablock = (uint8 *)get_datablock(&sDatastore);
-			if (new_node->datablock == NULL) {
-				free(new_node);
-				return NULL;
-			}
-			available_space = BUFFER_SIZE;
-			node->previous = new_node;
-			new_node->next = node;
-			new_node->previous = NULL;
-			new_node->start = node->datablock + available_space;
-		}
-		new_node->trailer_space = 0;
-		if (size > available_space) {
-			new_node->header_space = 0;
-			new_node->size = available_space;
-			new_node->start -= available_space;
-			*_contiguousBuffer = NULL;
-			return data_node_prepend_size(new_node, size - available_space, NULL);
-		} else {
-			new_node->header_space = available_space - size;
-			new_node->start -= size;
-			new_node->size = size;
-			if (_contiguousBuffer != NULL)
-				*_contiguousBuffer = new_node->start;
-			return new_node;
-		}
-	} else {
-		node->header_space -= size;
-		node->start -= size;
-		node->size += size;
-		if (_contiguousBuffer != NULL)
-			*_contiguousBuffer = node->start;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			return B_BAD_VALUE;
 	}
 
-	return node;
+	offset -= node->offset;
+
+	while (true) {
+		size_t bytesRead = min_c(size, node->used - offset);
+		memcpy(data, node->start + offset, bytesRead);
+
+		size -= bytesRead;
+		if (size == 0)
+			break;
+
+		offset = 0;
+
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			return B_BAD_VALUE;
+	}
+
+	return B_OK;
 }
 
 
-/*!
- * Allocates \a size bytes of space at the beginning of \a buffer.
- * \a contiguousBuffer is a pointer to this region, or NULL if it
- * is not contiguous
- */
 static status_t
-net_buffer_prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
+prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 
-	data_node *node = data_node_prepend_size(buffer->first_node, size, _contiguousBuffer);
-	if (node == NULL)
-		return ENOBUFS;
+	if (node->header_space < size) {
+		// we need to prepend a new buffer
 
-	buffer->first_node = node;
+		// TODO: implement me!
+		panic("prepending buffer not implemented\n");
+
+		if (_contiguousBuffer)
+			*_contiguousBuffer = NULL;
+
+		return B_ERROR;
+	}
+
+	// the data fits into this buffer
+	node->header_space -= size;
+	node->start -= size;
+	node->used += size;
+
+	if (_contiguousBuffer)
+		*_contiguousBuffer = node->start;
+
 	buffer->size += size;
 	return B_OK;
 }
 
 
 static status_t
-net_buffer_prepend_data(net_buffer *buffer, const void *data, size_t size)
+prepend_data(net_buffer *buffer, const void *data, size_t size)
 {
 	void *contiguousBuffer;
-	status_t status = net_buffer_prepend_size(buffer, size, &contiguousBuffer);
+	status_t status = prepend_size(buffer, size, &contiguousBuffer);
 	if (status < B_OK)
 		return status;
 
 	if (contiguousBuffer)
 		memcpy(contiguousBuffer, data, size);
 	else
-		net_buffer_write_data(buffer, 0, data, size);
+		write_data(buffer, 0, data, size);
 
 	return B_OK;
 }
 
 
 static status_t
-data_node_append_size(data_node *node, size_t size, void **_contiguousBuffer)
-{
-	if (node == NULL)
-		return ENOBUFS;
-
-	while (node->next != NULL)
-		node = node->next;
-
-	if (node->trailer_space < size) {
-		data_node *new_node;
-		size_t available_space;
-		if (node->size == 0) {
-			// if this node is empty, use it before making new nodes
-			available_space = node->header_space + node->trailer_space;	
-			node->start -= node->header_space;
-			new_node = node;
-		} else {
-			// need one or more new buffers
-			new_node = (data_node *)malloc(sizeof(data_node));
-			new_node->datablock = (uint8 *)get_datablock(&sDatastore);
-			if (new_node->datablock == NULL) {
-				free(new_node);
-				return ENOBUFS;
-			}
-			available_space = BUFFER_SIZE;
-			new_node->previous = node;
-			node->next = new_node;
-			new_node->next = NULL;
-			new_node->start = new_node->datablock;
-		}
-		new_node->header_space = 0;
-		if (size > available_space) {
-			new_node->trailer_space = 0;
-			new_node->size = available_space;
-			*_contiguousBuffer = NULL;
-			return data_node_append_size(new_node, size - available_space, NULL);
-		} else {
-			new_node->trailer_space = available_space - size;
-			new_node->size = size;
-			if (_contiguousBuffer != NULL)
-				*_contiguousBuffer = new_node->start;
-		}
-	} else {
-		if (_contiguousBuffer != NULL)
-			*_contiguousBuffer = node->start + node->size;
-		node->trailer_space -= size;
-		node->size += size;
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-net_buffer_append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
+append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	data_node *node = (data_node *)list_get_last_item(&buffer->buffers);
 
-	status_t status = data_node_append_size(buffer->first_node, size, _contiguousBuffer);
-	if (status < B_OK)
-		return status;
+	if (node->tail_space < size) {
+		// we need to append a new buffer
 
+		// compute how many buffers we're going to need
+		// TODO: this doesn't leave any tail space, if that should be desired...
+		uint32 tailSpace = node->tail_space;
+		uint32 minimalHeaderSpace = sizeof(data_header) + 2 * sizeof(data_node);
+		uint32 sizeNeeded = size - tailSpace;
+		uint32 count = (sizeNeeded + BUFFER_SIZE - minimalHeaderSpace - 1)
+			/ (BUFFER_SIZE - minimalHeaderSpace);
+		uint32 averageHeaderSpace = BUFFER_SIZE - sizeNeeded / count - sizeof(data_header);
+		uint32 averageSize = BUFFER_SIZE - sizeof(data_header) - averageHeaderSpace;
+
+		// allocate space left in the node
+		node->tail_space -= tailSpace;
+		node->used += tailSpace;
+		buffer->size += tailSpace;
+
+		// allocate all buffers
+
+		for (uint32 i = 0; i < count; i++) {
+			data_header *header = create_data_header(BUFFER_SIZE, averageHeaderSpace);
+			if (header == NULL) {
+				// TODO: free up headers we already allocated!
+				return B_NO_MEMORY;
+			}
+
+			node = (data_node *)alloc_data_header_space(header, sizeof(data_node));
+				// this can't fail as we made sure there will be enough header space
+
+			init_data_node(node, header, averageHeaderSpace);
+			node->header_space = header->data_space;
+			node->tail_space -= averageSize;
+			node->used = averageSize;
+			node->offset = buffer->size;
+			buffer->size += averageSize;
+
+			list_add_item(&buffer->buffers, node);
+		}
+
+		if (_contiguousBuffer)
+			*_contiguousBuffer = NULL;
+
+		return B_OK;
+	}
+
+	// the data fits into this buffer
+	node->tail_space -= size;
+
+	if (_contiguousBuffer)
+		*_contiguousBuffer = node->start + node->used;
+
+	node->used += size;
 	buffer->size += size;
 	return B_OK;
 }
 
 
 static status_t
-net_buffer_append_data(net_buffer *buffer, const void *data, size_t size)
+append_data(net_buffer *buffer, const void *data, size_t size)
 {
 	size_t used = buffer->size;
 
 	void *contiguousBuffer;
-	status_t status = net_buffer_append_size(buffer, size, &contiguousBuffer);
+	status_t status = append_size(buffer, size, &contiguousBuffer);
 	if (status < B_OK)
 		return status;
 
 	if (contiguousBuffer)
 		memcpy(contiguousBuffer, data, size);
 	else
-		net_buffer_write_data(buffer, used, data, size);
+		write_data(buffer, used, data, size);
 
 	return B_OK;
-}
-
-
-static data_node *
-data_node_remove_header(data_node *node, size_t bytes)
-{
-	if (node == NULL)
-		return NULL;
-
-	if (node->size < bytes) {
-		data_node *next_node = data_node_remove_header(node->next, bytes - node->size);
-		put_datablock(&sDatastore, (void *)node->datablock);
-		free(node);
-		return next_node;
-	} else {
-		if (node->size == bytes && node->next != NULL) {
-			data_node *next_node = node->next;
-			put_datablock(&sDatastore, (void *)node->datablock);
-			free(node);
-			return next_node;
-		} else {
-			node->start += bytes;
-			node->header_space += bytes;
-			node->size -= bytes;
-		}
-	}
-	return node;
 }
 
 
@@ -876,44 +665,35 @@ data_node_remove_header(data_node *node, size_t bytes)
 	Removes bytes from the beginning of the buffer.
 */
 static status_t
-net_buffer_remove_header(net_buffer *_buffer, size_t bytes)
+remove_header(net_buffer *_buffer, size_t bytes)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
 	if (bytes > buffer->size)
 		return B_BAD_VALUE;
 
-	data_node *node = data_node_remove_header(buffer->first_node, bytes);
-	if (node == NULL)
-		return ENOBUFS;
+	size_t left = bytes;
+
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node != NULL && left > 0) {
+		size_t cut = min_c(node->used, left);
+		node->offset = 0;
+		node->start += cut;
+		node->header_space += cut;
+		node->used -= cut;
+
+		left -= cut;
+
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+	}
+
+	// adjust offset of following nodes	
+	while (node != NULL) {
+		node->offset -= bytes;
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+	}
 
 	buffer->size -= bytes;
-	buffer->first_node = node;
-	return B_OK;
-}
-
-
-static status_t
-data_node_trim_data(data_node *node, size_t newSize)
-{
-	if (node == NULL)
-		return ENOBUFS;
-
-	if (newSize > node->size)
-		return data_node_trim_data(node->next, newSize - node->size);
-	else {
-		if (newSize == 0 && node->previous != NULL) {
-			node->previous->next = NULL;
-			data_node_free(node);
-		} else {
-			node->trailer_space += node->size - newSize;
-			node->size = newSize;
-			if (node->next != NULL) {
-				data_node_free(node->next);
-				node->next = NULL;
-			}
-		}
-	}
 	return B_OK;
 }
 
@@ -923,32 +703,41 @@ data_node_trim_data(data_node *node, size_t newSize)
 	the end of the buffer.
 */
 static status_t
-net_buffer_trim_data(net_buffer *_buffer, size_t newSize)
+trim_data(net_buffer *_buffer, size_t newSize)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
 	if (newSize > buffer->size)
 		return B_BAD_VALUE;
+	if (newSize == buffer->size)
+		return B_OK;
 
-	status_t status = data_node_trim_data(buffer->first_node, newSize);
-	if (status < B_OK)
-		return ENOBUFS;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < newSize) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL) {
+			// trim size greater than buffer size
+			return B_BAD_VALUE;
+		}
+	}
+
+	int32 diff = node->used + node->offset - newSize;
+	node->tail_space += diff;
+	node->used -= diff;
+
+	if (node->used > 0)
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+
+	while (node != NULL) {
+		data_node *next = (data_node *)list_get_next_item(&buffer->buffers, node);
+		list_remove_item(&buffer->buffers, node);
+		remove_data_node(node);
+
+		node = next;
+	}
 
 	buffer->size = newSize;
 	return B_OK;
-}
-
-
-/*!
- *	Removes \a bytes from the end of \a buffer
- */
-static status_t
-net_buffer_remove_trailer(net_buffer *buffer, size_t bytes)
-{
-	if (buffer->size < bytes)
-		return B_BAD_VALUE;
-
-	return net_buffer_trim_data(buffer, buffer->size - bytes);
 }
 
 
@@ -961,7 +750,7 @@ net_buffer_remove_trailer(net_buffer *buffer, size_t bytes)
 	\return B_ERROR in case the buffer is not contiguous at that location.
 */
 static status_t
-net_buffer_direct_access(net_buffer *_buffer, uint32 offset, size_t size,
+direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 	void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
@@ -971,15 +760,16 @@ net_buffer_direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 
 	// find node to access
 
-	data_node *node = buffer->first_node;
-	while (node->size < offset) {
-		offset -= node->size;
-		node = node->next;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return B_BAD_VALUE;
 	}
 
-	if (size > node->size - offset)
+	offset -= node->offset;
+
+	if (size > node->used - offset)
 		return B_ERROR;
 
 	*_contiguousBuffer = node->start + offset;
@@ -988,7 +778,7 @@ net_buffer_direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 
 
 static int32
-net_buffer_checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool finalize)
+checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool finalize)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
@@ -997,13 +787,14 @@ net_buffer_checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool f
 
 	// find first node to read from
 
-	data_node *node = buffer->first_node;
-	while (node->size < offset) {
-		offset -= node->size;
-		node = node->next;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return B_ERROR;
 	}
+
+	offset -= node->offset;
 
 	// Since the maximum buffer size is 65536 bytes, it's impossible
 	// to overlap 32 bit - we don't need to handle this overlap in
@@ -1011,8 +802,8 @@ net_buffer_checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool f
 	uint32 sum = 0;
 
 	while (true) {
-		size_t bytes = min_c(size, node->size - offset);
-		if (offset & 1) {
+		size_t bytes = min_c(size, node->used - offset);
+		if ((offset + node->offset) & 1) {
 			// if we're at an uneven offset, we have to swap the checksum
 			sum += __swap_int16(compute_checksum(node->start + offset, bytes));
 		} else
@@ -1024,7 +815,7 @@ net_buffer_checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool f
 
 		offset = 0;
 
-		node = node->next;
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return B_ERROR;
 	}
@@ -1041,20 +832,20 @@ net_buffer_checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool f
 
 
 static uint32
-net_buffer_get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
+get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	data_node *node = buffer->first_node;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 	uint32 count = 0;
 
 	while (count < vecCount) {
-		if (node == NULL)
-			break;
 		iovecs[count].iov_base = node->start;
-		iovecs[count].iov_len = node->size;
+		iovecs[count].iov_len = node->used;
 		count++;
 
-		node = node->next;
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			break;
 	}
 
 	return count;
@@ -1062,19 +853,18 @@ net_buffer_get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount
 
 
 static uint32
-net_buffer_count_iovecs(net_buffer *_buffer)
+count_iovecs(net_buffer *_buffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	data_node *node = buffer->first_node;
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 	uint32 count = 0;
 
 	while (true) {
-		if (node == NULL)
-			break;
-		
 		count++;
 
-		node = node->next;
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			break;
 	}
 
 	return count;
@@ -1086,9 +876,8 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			return init_datastore(&sDatastore, BUFFER_SIZE, MAX_BUFFERS);
 		case B_MODULE_UNINIT:
-			return uninit_datastore(&sDatastore);
+			return B_OK;
 
 		default:
 			return B_ERROR;
@@ -1102,36 +891,36 @@ net_buffer_module_info gNetBufferModule = {
 		0,
 		std_ops
 	},
-	net_buffer_create,
-	net_buffer_free,
+	create_buffer,
+	free_buffer,
 
-	net_buffer_duplicate,
-	net_buffer_clone,
-	net_buffer_split,
-	net_buffer_merge,
+	duplicate_buffer,
+	clone_buffer,
+	split_buffer,
+	merge_buffer,
 
-	net_buffer_prepend_size,
-	net_buffer_prepend_data,
-	net_buffer_append_size,
-	net_buffer_append_data,
-	NULL,	// net_buffer_insert
-	NULL,	// net_buffer_remove
-	net_buffer_remove_header,
-	net_buffer_remove_trailer,
-	net_buffer_trim_data,
+	prepend_size,
+	prepend_data,
+	append_size,
+	append_data,
+	NULL,	// insert
+	NULL,	// remove
+	remove_header,
+	NULL,	// remove_trailer
+	trim_data,
 
-	NULL,	// net_buffer_associate_data
+	NULL,	// associate_data
 
-	net_buffer_direct_access,
-	net_buffer_read_data,
-	net_buffer_write_data,
+	direct_access,
+	read_data,
+	write_data,
 
-	net_buffer_checksum_data,
+	checksum_data,
 
-	NULL,	// net_buffer_get_memory_map
-	net_buffer_get_iovecs,
-	net_buffer_count_iovecs,
+	NULL,	// get_memory_map
+	get_iovecs,
+	count_iovecs,
 
-	NULL,	// net_buffer_dump
+	NULL,	// dump
 };
 
