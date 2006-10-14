@@ -7,7 +7,9 @@
  */
 
 
+#include <net_buffer.h>
 #include <net_device.h>
+#include <net_stack.h>
 
 #include <KernelExport.h>
 
@@ -19,18 +21,66 @@
 
 
 struct loopback_device : net_device {
+	net_fifo	fifo;
 };
+
+
+struct net_buffer_module_info *sBufferModule;
+static struct net_stack_module_info *sStackModule;
+
+
+/*!
+	Swaps \a size bytes of the memory pointed to by \a and \b with each other.
+*/
+void
+swap_memory(void *a, void *b, size_t size)
+{
+	uint32 *a4 = (uint32 *)a;
+	uint32 *b4 = (uint32 *)b;
+	while (size > 4) {
+		uint32 temp = *a4;
+		*(a4++) = *b4;
+		*(b4++) = temp;
+
+		size -= 4;
+	}
+
+	uint8 *a1 = (uint8 *)a4;
+	uint8 *b1 = (uint8 *)b4;
+	while (size > 0) {
+		uint8 temp = *a1;
+		*(a1++) = *b1;
+		*(b1++) = temp;
+
+		size--;
+	}
+}
+
+
+//	#pragma mark -
 
 
 status_t
 loopback_init(const char *name, net_device **_device)
 {
+	loopback_device *device;
+
 	if (strncmp(name, "loop", 4))
 		return B_BAD_VALUE;
 
-	loopback_device *device = new (std::nothrow) loopback_device;
-	if (device == NULL)
-		return B_NO_MEMORY;
+	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
+	if (status < B_OK)
+		return status;
+
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	if (status < B_OK)
+		goto err1;
+
+	device = new (std::nothrow) loopback_device;
+	if (device == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
 
 	memset(device, 0, sizeof(loopback_device));
 
@@ -41,27 +91,41 @@ loopback_init(const char *name, net_device **_device)
 
 	*_device = device;
 	return B_OK;
+
+err2:
+	put_module(NET_BUFFER_MODULE_NAME);
+err1:
+	put_module(NET_STACK_MODULE_NAME);
+	return status;
 }
 
 
 status_t
-loopback_uninit(net_device *device)
+loopback_uninit(net_device *_device)
 {
+	loopback_device *device = (loopback_device *)_device;
+
+	put_module(NET_STACK_MODULE_NAME);
+	put_module(NET_BUFFER_MODULE_NAME);
 	delete device;
+
 	return B_OK;
 }
 
 
 status_t
-loopback_up(net_device *device)
+loopback_up(net_device *_device)
 {
-	return B_OK;
+	loopback_device *device = (loopback_device *)_device;
+	return sStackModule->init_fifo(&device->fifo, "loopback fifo", 65536);
 }
 
 
 void
-loopback_down(net_device *device)
+loopback_down(net_device *_device)
 {
+	loopback_device *device = (loopback_device *)_device;
+	sStackModule->uninit_fifo(&device->fifo);
 }
 
 
@@ -74,37 +138,55 @@ loopback_control(net_device *device, int32 op, void *argument,
 
 
 status_t
-loopback_send_data(net_device *device, net_buffer *buffer)
+loopback_send_data(net_device *_device, net_buffer *buffer)
 {
-	return B_ERROR;
+	loopback_device *device = (loopback_device *)_device;
+	return sStackModule->fifo_enqueue_buffer(&device->fifo, buffer);
 }
 
 
 status_t
-loopback_receive_data(net_device *device, net_buffer **_buffer)
+loopback_receive_data(net_device *_device, net_buffer **_buffer)
 {
-	return B_ERROR;
+	loopback_device *device = (loopback_device *)_device;
+	net_buffer *buffer;
+
+	status_t status = sStackModule->fifo_dequeue_buffer(&device->fifo, 0, 0, &buffer);
+	if (status < B_OK)
+		return status;
+
+	// switch network addresses before delivering
+	swap_memory(&buffer->source, &buffer->destination,
+		max_c(buffer->source.ss_len, buffer->destination.ss_len));
+
+	*_buffer = buffer;
+	return B_OK;
 }
 
 
 status_t
 loopback_set_mtu(net_device *device, size_t mtu)
 {
-	return B_ERROR;
+	if (mtu > 65536
+		|| mtu < 16)
+		return B_BAD_VALUE;
+
+	device->mtu = mtu;
+	return B_OK;
 }
 
 
 status_t
 loopback_set_promiscuous(net_device *device, bool promiscuous)
 {
-	return B_ERROR;
+	return EOPNOTSUPP;
 }
 
 
 status_t
 loopback_set_media(net_device *device, uint32 media)
 {
-	return B_ERROR;
+	return EOPNOTSUPP;
 }
 
 
