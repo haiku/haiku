@@ -8,7 +8,7 @@ resource(1, "META:TYPE") "video/x-matroska";
 
 resource(3, "META:S:DESC") #'MSDC' "Matroska Video";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
 
 resource(5, "META:EXTENS") message(234) {
 	"extensions" = "mkv",
