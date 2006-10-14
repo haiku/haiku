@@ -446,6 +446,12 @@ main(int argc, char** argv)
 			add_route(socket, interface, route);
 			break;
 		case RTM_DELETE:
+			if (interface == NULL) {
+				fprintf(stderr, "%s: You need to specify an interface when removing a route.\n",
+					kProgramName);
+				usage(1);
+			}
+
 			delete_route(socket, interface, route);
 			break;
 
