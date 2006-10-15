@@ -36,6 +36,13 @@ template<typename Type, typename Module = NetBufferModuleGetter > class NetBuffe
 			return fBuffer->size < sizeof(Type) ? B_BAD_VALUE : B_OK;
 		}
 
+		status_t
+		SetTo(net_buffer *buffer)
+		{
+			fBuffer = buffer;
+			return Status();
+		}
+
 		Type &
 		Data()
 		{
@@ -51,10 +58,7 @@ template<typename Type, typename Module = NetBufferModuleGetter > class NetBuffe
 		void
 		Remove()
 		{
-			if (fBuffer != NULL) {
-				Module::Get()->remove_header(fBuffer, sizeof(Type));
-				fBuffer = NULL;
-			}
+			Remove(sizeof(Type));
 		}
 
 		void

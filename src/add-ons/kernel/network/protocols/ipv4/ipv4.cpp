@@ -568,18 +568,14 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	dprintf("ipv4 needs to fragment (size %lu, MTU %lu), but that's not yet tested...\n",
 		buffer->size, mtu);
 
-	// adapt MTU to be a multiple of 8 (fragment offsets can only be specified this way)
-	mtu &= ~7;
-	dprintf("  adjusted MTU to %ld\n", mtu);
-
 	NetBufferHeader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
-	ipv4_header &header = bufferHeader.Data();
+	ipv4_header *header = &bufferHeader.Data();
 	bufferHeader.Detach();
 
-	uint16 headerLength = header.HeaderLength();
+	uint16 headerLength = header->HeaderLength();
 	uint32 bytesLeft = buffer->size - headerLength;
 	uint32 fragmentOffset = 0;
 	status_t status = B_OK;
@@ -588,16 +584,28 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	if (headerBuffer == NULL)
 		return B_NO_MEMORY;
 
+	bufferHeader.SetTo(headerBuffer);
+	header = &bufferHeader.Data();
+	bufferHeader.Detach();
+
+	// adapt MTU to be a multiple of 8 (fragment offsets can only be specified this way)
+	mtu -= headerLength;
+	mtu &= ~7;
+	dprintf("  adjusted MTU to %ld\n", mtu);
+
+	dprintf("  bytesLeft = %ld\n", bytesLeft);
 	while (bytesLeft > 0) {
-		uint32 fragmentLength = max_c(bytesLeft, mtu);
+		uint32 fragmentLength = min_c(bytesLeft, mtu);
 		bytesLeft -= fragmentLength;
 		bool lastFragment = bytesLeft == 0;
 
-		header.total_length = htons(fragmentLength);
-		header.fragment_offset = htons((lastFragment ? 0 : IP_MORE_FRAGMENTS)
+		header->total_length = htons(fragmentLength + headerLength);
+		header->fragment_offset = htons((lastFragment ? 0 : IP_MORE_FRAGMENTS)
 			| (fragmentOffset >> 3));
-		header.checksum = sBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
+		header->checksum = 0;
+		header->checksum = sStackModule->checksum((uint8 *)header, headerLength);
 			// TODO: compute the checksum only for those parts that changed?
+
 		dprintf("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
 
 		net_buffer *fragmentBuffer;
@@ -613,12 +621,12 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 		}
 
 		// copy header to fragment
-		status = sBufferModule->prepend(fragmentBuffer, &header, headerLength);
+		status = sBufferModule->prepend(fragmentBuffer, header, headerLength);
 
 		// send fragment
 		if (status == B_OK)
 			status = sDatalinkModule->send_data(route, fragmentBuffer);
-		
+
 		if (lastFragment) {
 			// we don't own the last buffer, so we don't have to free it
 			break;
@@ -979,7 +987,7 @@ ipv4_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 ipv4_receive_data(net_buffer *buffer)
 {
-	TRACE(("IPv4 received a packet of %ld size!\n", buffer->size));
+	TRACE(("IPv4 received a packet (%p) of %ld size!\n", buffer, buffer->size));
 
 	NetBufferHeader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
