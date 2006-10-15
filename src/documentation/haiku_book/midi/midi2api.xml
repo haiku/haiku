@@ -11,6 +11,8 @@
 <!ENTITY midi2roster SYSTEM "midi2roster.xml">
 
 <!ENTITY BMidiRoster "<link linkend='bmidiroster'><classname>BMidiRoster</classname></link>">
+<!ENTITY BMidiRoster_FindEndpoint "<link linkend='bmidiroster_findendpoint'><function>FindEndpoint()</function></link>">
+<!ENTITY BMidiRoster_NextEndpoint "<link linkend='bmidiroster_nextendpoint'><function>NextEndpoint()</function></link>">
 <!ENTITY BMidiRoster_Register "<link linkend='bmidiroster_register'><function>Register()</function></link>">
 <!ENTITY BMidiRoster_Unregister "<link linkend='bmidiroster_unregister'><function>Unregister()</function></link>">
 <!ENTITY BMidiRoster_StartWatching "<link linkend='bmidiroster_startwatching'><function>StartWatching()</function></link>">
@@ -34,6 +36,7 @@
 
 <!ENTITY BMidiLocalConsumer "<link linkend='midi2localconsumer'><classname>BMidiLocalConsumer</classname></link>">
 <!ENTITY BMidiLocalConsumer_ChannelPressure "<link linkend='bmidilocalconsumer_channelpressure'><function>BMidiLocalConsumer</function></link>">
+<!ENTITY BMidiLocalConsumer_Timeout "<link linkend='bmidilocalconsumer_timeout'><function>Timeout</function></link>">
 
 <!ENTITY BMidiLocalProducer "<link linkend='bmidilocalproducer'><classname>BMidiLocalProducer</classname></link>">
 

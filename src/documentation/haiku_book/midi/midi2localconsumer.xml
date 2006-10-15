@@ -58,7 +58,7 @@
 		</para>
 		
 		<para>	
-			The new endpoint is not visible to other applications until you Register() it.
+			The new endpoint is not visible to other applications until you &BMidiRoster_Register; it.
 		</para>
 		
 		<para>
@@ -71,7 +71,7 @@
 			There is no guarantee that the endpoint will be successfully created. For 
 			example, the Midi Server may not be running. Therefore, you should always call 
 			IsValid() after creating a new endpoint to make sure that everything went okay. 
-			If not, Release() the object to reclaim memory and abort gracefully.
+			If not, &BMidiEndpoint_Release; the object to reclaim memory and abort gracefully.
 		</para>
 		
 		<para>
@@ -116,13 +116,13 @@
 		<methodsynopsis><void/><methodname>SetTimeout</methodname><methodparam><type>bigtime_t</type><parameter>when</parameter></methodparam><methodparam><type>void *</type><parameter>data</parameter></methodparam></methodsynopsis>
 		
 		<para>
-			Requests that the Timeout() hook will be called at some point
+			Requests that the &BMidiLocalConsumer_Timeout; hook will be called at some point
 		</para>
 		
 		<para>
-			This method asks the consumer thread to call the Timeout() hook as soon as 
+			This method asks the consumer thread to call the &BMidiLocalConsumer_Timeout; hook as soon as 
 			possible after the timeout expires. For every call to SetTimeout(), the 
-			Timeout() hook is only called once. Note: the term "timeout" may be a little 
+			&BMidiLocalConsumer_Timeout; hook is only called once. Note: the term "timeout" may be a little 
 			misleading; the hook will <emphasis>always</emphasis> be called, even if events are received 
 			in the mean time. Apparently, this facility is handy for dealing with early 
 			events.
@@ -135,7 +135,7 @@
 			forever. Your call to SetTimeout() doesn't change this. The new timeout value 
 			will go into effect the next time the thread tries to read from the port, i.e. 
 			after the first event has been received. If no event ever comes in, the 
-			Timeout() hook will never be called. This also means that you cannot cancel a 
+			&BMidiLocalConsumer_Timeout; hook will never be called. This also means that you cannot cancel a 
 			timeout once you have set it. To repeat, calling SetTimeout() only takes effect 
 			after at least one new event has been received.
 		</para>
@@ -146,9 +146,9 @@
 				<listitem><para><parameter>when</parameter> An absolute time that's 
 					measured against the system clock.</para></listitem>
 				<listitem><para><parameter>data</parameter> A pointer to a "cookie" that 
-					you can pass along to Timeout(). The data is not copied, so 
-					you must ensure that the pointer remains valid until Timeout() is 
-					called. You typically delete the data inside Timeout().</para></listitem>
+					you can pass along to &BMidiLocalConsumer_Timeout;. The data is not copied, so 
+					you must ensure that the pointer remains valid until &BMidiLocalConsumer_Timeout; is 
+					called. You typically delete the data inside &BMidiLocalConsumer_Timeout;.</para></listitem>
 			</itemizedlist>
 		</para>
 	</sect3>

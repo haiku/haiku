@@ -55,7 +55,7 @@
 			returns, it sets id to the ID of the endpoint that was found. If no more 
 			endpoints exist, NextEndpoint() returns NULL and id is not changed. 
 			NextEndpoint() does <emphasis>not</emphasis> return locally created endpoints, even if they 
-			are Register()'ed.
+			are &BMidiEndpoint_Register;'ed.
 		</para>
 		
 		<para>
@@ -87,7 +87,7 @@
 		</para>
 		
 		<para>	
-			Like NextEndpoint(), but only returns producer endpoints.
+			Like &BMidiRoster_NextEndpoint;, but only returns producer endpoints.
 		</para>
 		
 		<para>
@@ -105,7 +105,7 @@
 		</para>
 		
 		<para>
-			Like NextEndpoint(), but only returns consumer endpoints.
+			Like &BMidiRoster_NextEndpoint;, but only returns consumer endpoints.
 		</para>
 		
 		<para>
@@ -124,7 +124,7 @@
 		
 		<para>	
 			FindEndpoint() will always find <emphasis>any</emphasis> local endpoints created by this 
-			application; they do not have to be published with Register() first. If 
+			application; they do not have to be published with &BMidiRoster_Register; first. If 
 			localOnly is false, FindEndpoint() also looks at remote endpoints, otherwise 
 			only local endpoints will be resolved. Returns NULL if no such endpoint could 
 			be found.
@@ -152,7 +152,7 @@
 		
 		<para>					
 			Remember that FindEndpoint() increments the endpoint's reference count, so you 
-			should always \link BMidiEndpoint::Release() Release() \endlink an endpoint 
+			should always &BMidiEndpoint_Release; an endpoint 
 			when you are done with it:
 			<programlisting>	
 			BMidiEndpoint *endp = FindEndpoint(someID);
@@ -174,7 +174,7 @@
 		</para>
 		
 		<para>			
-			Like FindEndpoint(), but only looks for producer endpoints. Returns NULL if no 
+			Like &BMidiRoster_FindEndpoint;, but only looks for producer endpoints. Returns NULL if no 
 			endpoint with that ID exists, or if that endpoint is not a producer.
 		</para>
 		
@@ -193,7 +193,7 @@
 		</para>
 		
 		<para>	
-			Like FindEndpoint(), but only looks for consumer endpoints. Returns NULL if no 
+			Like &BMidiRoster_FindEndpoint;, but only looks for consumer endpoints. Returns NULL if no 
 			endpoint with that ID exists, or if that endpoint is not a consumer.
 		</para>
 		
@@ -296,8 +296,8 @@
 		
 		<para>
 			The "connected" and "disconnected" notifications are sent when a consumer
-			BMidiProducer::Connect()'s to a producer, or when they table
-			BMidiProducer::Disconnect(). You will receive these 
+			&BMidiProducer_Connect;'s to a producer, or when they 
+			&BMidiProducer_Disconnect;. You will receive these 
 			notifications when <emphasis>any</emphasis> two endpoints connect or disconnect, even if they 
 			are not published. (The purpose of which is debatable.) You won't receive the 
 			notifications if you are the one making the connection, even if both endpoints 
@@ -494,7 +494,7 @@
 		</para>
 		
 		<para>
-			See Also<link linkend="bmidiop">"The possible be:op codes (BMidiOp)"</link>.
+			See Also <link linkend="bmidiop">"The possible be:op codes (BMidiOp)"</link>.
 		</para>
 	</sect3>
 	
@@ -548,7 +548,7 @@
 		</para>
 		
 		<para>
-			There is no real reason use this function, since all BMidiRoster's public 
+			There is no real reason to use this function, since all BMidiRoster's public 
 			function are static.
 		</para>
 	</sect3>

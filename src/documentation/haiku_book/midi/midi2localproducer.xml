@@ -56,8 +56,8 @@
 		<para>
 			There is no guarantee that the endpoint will be successfully created. For 
 			example, the Midi Server may not be running. Therefore, you should always call 
-			IsValid() after creating a new endpoint to make sure that everything went okay. 
-			If not, Release() the object to reclaim memory and abort gracefully.
+			&BMidiEndpoint_IsValid; after creating a new endpoint to make sure that everything went okay. 
+			If not, &BMidiEndpoint_Release; the object to reclaim memory and abort gracefully.
 		</para>
 		
 		<para>
