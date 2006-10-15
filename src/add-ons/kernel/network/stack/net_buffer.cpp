@@ -57,6 +57,26 @@ struct net_buffer_private : net_buffer {
 static status_t append_data(net_buffer *buffer, const void *data, size_t size);
 static status_t trim_data(net_buffer *_buffer, size_t newSize);
 static status_t remove_header(net_buffer *_buffer, size_t bytes);
+static status_t remove_trailer(net_buffer *_buffer, size_t bytes);
+
+
+#if 0
+static void
+dump_buffer(net_buffer *_buffer)
+{
+	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	dprintf("buffer %p, size %ld\n", buffer, buffer->size);
+	data_node *node = NULL;
+	while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
+		dprintf("  node %p, offset %ld, used %ld, header %ld, tail %ld, header %p\n",
+			node, node->offset, node->used, node->header_space, node->tail_space, node->header);
+		//dump_block((char *)node->start, node->used, "    ");
+		dump_block((char *)node->start, min_c(node->used, 32), "    ");
+	}
+}
+#endif
+
 
 static data_header *
 create_data_header(size_t size, size_t headerSpace)
@@ -345,24 +365,24 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 
 /*!
-	Split the buffer at offset, the trailer data
+	Split the buffer at offset, the header data
 	is returned as new buffer.
 	TODO: optimize and avoid making a copy.
 */
 static net_buffer *
 split_buffer(net_buffer *from, uint32 offset)
 {
-	status_t err;
-	net_buffer *buf = duplicate_buffer(from);
-	if (buf == NULL)
+	net_buffer *buffer = duplicate_buffer(from);
+	if (buffer == NULL)
 		return NULL;
-	if ((err = remove_header(buf, offset)) < B_OK)
-		goto fail;
-	if ((err = trim_data(from, from->size - offset)) < B_OK)
-		goto fail;
-	return buf;
-fail:
-	free_buffer(buf);
+
+	TRACE(("split_buffer(buffer %p -> %p, offset %ld)\n", from, buffer, offset));
+
+	if (remove_header(from, offset) == B_OK
+		&& trim_data(buffer, offset) == B_OK)
+		return buffer;
+
+	free_buffer(buffer);
 	return NULL;
 }
 
@@ -382,8 +402,14 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 		return B_BAD_VALUE;
 
 	TRACE(("merge buffer %p with %p (%s)\n", buffer, with, after ? "after" : "before"));
+	//dump_buffer(buffer);
+	//dprintf("with:\n");
+	//dump_buffer(with);
+
 	// TODO: this is currently very simplistic, I really need to finish the
 	//	harder part of this implementation (data_node management per header)
+
+	data_node *before = NULL;
 
 	if (!after) {
 		// change offset of all nodes already in the buffer
@@ -394,6 +420,8 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 				break;
 
 			node->offset += with->size;
+			if (before == NULL)
+				before = node;
 		}
 	}
 
@@ -435,13 +463,16 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 			list_add_item(&buffer->buffers, node);
 			node->offset = buffer->size;
 		} else
-			list_add_link_to_head(&buffer->buffers, node);
+			list_insert_item_before(&buffer->buffers, before, node);
 
 		buffer->size += node->used;
 	}
 
 	// the data has been merged completely at this point
 	free_buffer(with);
+
+	//dprintf(" merge result:\n");
+	//dump_buffer(buffer);
 	return B_OK;
 }
 
@@ -480,6 +511,7 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 			break;
 
 		offset = 0;
+		data = (void *)((uint8 *)data + written);
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
@@ -520,6 +552,7 @@ read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 			break;
 
 		offset = 0;
+		data = (void *)((uint8 *)data + bytesRead);
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
@@ -535,6 +568,9 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+
+	TRACE(("prepend_size(buffer %p, size %ld)\n", buffer, size));
+	//dump_buffer(buffer);
 
 	if (node->header_space < size) {
 		// we need to prepend a new buffer
@@ -556,7 +592,15 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	if (_contiguousBuffer)
 		*_contiguousBuffer = node->start;
 
+	// adjust offset of following nodes	
+	while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
+		node->offset += size;
+	}
+
 	buffer->size += size;
+
+	//dprintf(" prepend_size result:\n");
+	//dump_buffer(buffer);
 	return B_OK;
 }
 
@@ -574,6 +618,9 @@ prepend_data(net_buffer *buffer, const void *data, size_t size)
 	else
 		write_data(buffer, 0, data, size);
 
+	//dprintf(" prepend result:\n");
+	//dump_buffer(buffer);
+
 	return B_OK;
 }
 
@@ -583,6 +630,9 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_last_item(&buffer->buffers);
+
+	TRACE(("append_size(buffer %p, size %ld)\n", buffer, size));
+	//dump_buffer(buffer);
 
 	if (node->tail_space < size) {
 		// we need to append a new buffer
@@ -627,6 +677,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		if (_contiguousBuffer)
 			*_contiguousBuffer = NULL;
 
+		//dprintf(" append result 1:\n");
+		//dump_buffer(buffer);
 		return B_OK;
 	}
 
@@ -638,6 +690,9 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 	node->used += size;
 	buffer->size += size;
+
+	//dprintf(" append result 2:\n");
+	//dump_buffer(buffer);
 	return B_OK;
 }
 
@@ -672,17 +727,38 @@ remove_header(net_buffer *_buffer, size_t bytes)
 	if (bytes > buffer->size)
 		return B_BAD_VALUE;
 
-	size_t left = bytes;
+	TRACE(("remove_header(buffer %p, %ld bytes)\n", buffer, bytes));
+	//dump_buffer(buffer);
 
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node != NULL && left > 0) {
+	size_t left = bytes;
+	data_node *node = NULL;
+
+	while (left >= 0) {
+		node = (data_node *)list_get_first_item(&buffer->buffers);
+		if (node == NULL) {
+			if (left == 0)
+				break;
+			return B_ERROR;
+		}
+
+		if (node->used > left)
+			break;
+
+		// node will be removed completely
+		list_remove_item(&buffer->buffers, node);
+		left -= node->used;
+		remove_data_node(node);
+		node = NULL;
+	}
+
+	// cut remaining node, if any
+
+	if (node != NULL) {
 		size_t cut = min_c(node->used, left);
 		node->offset = 0;
 		node->start += cut;
 		node->header_space += cut;
 		node->used -= cut;
-
-		left -= cut;
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 	}
@@ -694,7 +770,20 @@ remove_header(net_buffer *_buffer, size_t bytes)
 	}
 
 	buffer->size -= bytes;
+
+	//dprintf(" remove result:\n");
+	//dump_buffer(buffer);
 	return B_OK;
+}
+
+
+/*!
+	Removes bytes from the end of the buffer.
+*/
+static status_t
+remove_trailer(net_buffer *buffer, size_t bytes)
+{
+	return trim_data(buffer, buffer->size - bytes);
 }
 
 
@@ -706,6 +795,9 @@ static status_t
 trim_data(net_buffer *_buffer, size_t newSize)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	TRACE(("trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
+		buffer, newSize, buffer->size));
+	//dump_buffer(buffer);
 
 	if (newSize > buffer->size)
 		return B_BAD_VALUE;
@@ -737,6 +829,9 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	}
 
 	buffer->size = newSize;
+
+	//dprintf(" trim result:\n");
+	//dump_buffer(buffer);
 	return B_OK;
 }
 
@@ -754,6 +849,8 @@ direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 	void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	//TRACE(("direct_access(buffer %p, offset %ld, size %ld)\n", buffer, offset, size));
 
 	if (offset + size > buffer->size)
 		return B_BAD_VALUE;
@@ -906,7 +1003,7 @@ net_buffer_module_info gNetBufferModule = {
 	NULL,	// insert
 	NULL,	// remove
 	remove_header,
-	NULL,	// remove_trailer
+	remove_trailer,
 	trim_data,
 
 	NULL,	// associate_data
