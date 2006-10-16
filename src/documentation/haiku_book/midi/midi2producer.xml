@@ -99,7 +99,7 @@
 	</sect3>
 	
 	<sect3 id="bmidiproducer_connections">
-		<title>BList *Connections() const</title>
+		<title>Connections()</title>
 		
 		<methodsynopsis>
 			<type>BList *</type>

@@ -6,4 +6,143 @@
 
 <sect1 id="app-Application">
 	<title>BApplication</title>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	
+	<sect3 id="bapplication_bapplication">
+		<title>BApplication()</title>
+		<methodsynopsis><methodname>BApplication</methodname><methodparam><modifier>const</modifier><type>char *</type><parameter>signature</parameter></methodparam></methodsynopsis>
+<methodsynopsis><methodname>BApplication</methodname><methodparam><modifier>const</modifier><type>char *</type><parameter>signature</parameter></methodparam><methodparam><type>status_t *</type><parameter>error</parameter></methodparam></methodsynopsis>
+<methodsynopsis><methodname>BApplication</methodname><methodparam><type>BMessage *</type><parameter>data</parameter></methodparam></methodsynopsis>
+
+	</sect3>
+	
+	<sect3 id="bapplication_tildebapplication">
+		<title>~BApplication()</title>
+		<methodsynopsis><modifier>virtual</modifier><methodname>~BApplication</methodname><void/></methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bapplication_instanciate">
+		<title>Instanciate()</title>
+		<methodsynopsis><modifier>static</modifier><type>BArchivable *</type><methodname>Instantiate</methodname><methodparam><type>BMessage *</type><parameter>data</parameter></methodparam></methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bapplication_archive">
+		<title>Archive()</title>
+		<methodsynopsis><modifier>virtual</modifier><type>status_t</type><methodname>Archive</methodname><methodparam><type>BMessage *</type><parameter>data</parameter></methodparam><methodparam><type>bool</type><parameter>deep</parameter><initializer>true</initializer></methodparam><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bapplication_initcheck">
+		<title>InitCheck()</title>
+<methodsynopsis><type>status_t</type><methodname>InitCheck</methodname><void/><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_run">
+		<title>Run()</title>
+		<methodsynopsis><modifier>virtual</modifier><type>thread_id</type><methodname>Run</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_quit">
+		<title>Quit()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>Quit</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_quitrequested">
+		<title>QuitRequested()</title>
+		<methodsynopsis><modifier>virtual</modifier><type>bool</type><methodname>QuitRequested</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_pulse">
+		<title>Pulse()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>Pulse</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_readytorun">
+		<title>ReadyToRun()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>ReadyToRun</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_messagereceived">
+		<title>MessageReceived()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>MessageReceived</methodname><methodparam><type>BMessage *</type><parameter>msg</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_argvreceived">
+		<title>ArgvReceived()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>ArgvReceived</methodname><methodparam><type>int32</type><parameter>argc</parameter></methodparam><methodparam><type>char * *</type><parameter>argv</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_appactivated">
+		<title>AppActivated()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>AppActivated</methodname><methodparam><type>bool</type><parameter>active</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_refsreceived">
+		<title>RefsReceived()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>RefsReceived</methodname><methodparam><type>BMessage *</type><parameter>message</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_aboutrequested">
+		<title>AboutRequested()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>AboutRequested</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_resolvespecifier">
+		<title>ResolveSpecifier()</title>
+		<methodsynopsis><modifier>virtual</modifier><type>BHandler *</type><methodname>ResolveSpecifier</methodname><methodparam><type>BMessage *</type><parameter>msg</parameter></methodparam><methodparam><type>int32</type><parameter>index</parameter></methodparam><methodparam><type>BMessage *</type><parameter>specifier</parameter></methodparam><methodparam><type>int32</type><parameter>form</parameter></methodparam><methodparam><modifier>const</modifier><type>char *</type><parameter>property</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_showcursor">
+		<title>ShowCursor()</title>
+		<methodsynopsis><void/><methodname>ShowCursor</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_hidecursor">
+		<title>HideCursor()</title>
+		<methodsynopsis><void/><methodname>HideCursor</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_obscurecursor">
+		<title>ObscureCursor()</title>
+		<methodsynopsis><void/><methodname>ObscureCursor</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_iscursorhidden">
+		<title>IsCursorHidden()</title>
+		<methodsynopsis><type>bool</type><methodname>IsCursorHidden</methodname><void/><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_setcursor">
+		<title>SetCursor</title>
+		<methodsynopsis><void/><methodname>SetCursor</methodname><methodparam><modifier>const</modifier><type>void *</type><parameter>cursor</parameter></methodparam></methodsynopsis>
+		<methodsynopsis><void/><methodname>SetCursor</methodname><methodparam><modifier>const</modifier><type>BCursor *</type><parameter>cursor</parameter></methodparam><methodparam><type>bool</type><parameter>sync</parameter><initializer>true</initializer></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_countwindows">
+		<title>CountWindows()</title>
+		<methodsynopsis><type>int32</type><methodname>CountWindows</methodname><void/><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_windowat">
+		<title>WindowAt()</title>
+		<methodsynopsis><type>BWindow *</type><methodname>WindowAt</methodname><methodparam><type>int32</type><parameter>index</parameter></methodparam><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_countloopers">
+		<title>CountLoopers()</title>
+		<methodsynopsis><type>int32</type><methodname>CountLoopers</methodname><void/><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_looperat">
+		<title>LooperAt()</title>
+		<methodsynopsis><type>BLooper *</type><methodname>LooperAt</methodname><methodparam><type>int32</type><parameter>index</parameter></methodparam><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_islaunching">
+		<title>IsLaunching</title>
+		<methodsynopsis><type>bool</type><methodname>IsLaunching</methodname><void/><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_getappinfo">
+		<title>GetAppInfo()</title>
+		<methodsynopsis><type>status_t</type><methodname>GetAppInfo</methodname><methodparam><type>app_info *</type><parameter>info</parameter></methodparam><modifier>const</modifier></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_appresources">
+		<title>AppResources()</title>
+		<methodsynopsis><modifier>static</modifier><type>BResources *</type><methodname>AppResources</methodname><void/></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_dispatchmessage">
+		<title>DispatchMessage()</title>
+		<methodsynopsis><modifier>virtual</modifier><void/><methodname>DispatchMessage</methodname><methodparam><type>BMessage *</type><parameter>message</parameter></methodparam><methodparam><type>BHandler *</type><parameter>handler</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_setpulserate">
+		<title>SetPulseRate()</title>
+		<methodsynopsis><void/><methodname>SetPulseRate</methodname><methodparam><type>bigtime_t</type><parameter>rate</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_getsupportedsuites">
+		<title>GetSupportedSuites()</title>
+		<methodsynopsis><modifier>virtual</modifier><type>status_t</type><methodname>GetSupportedSuites</methodname><methodparam><type>BMessage *</type><parameter>data</parameter></methodparam></methodsynopsis>
+	</sect3>
+	<sect3 id="bapplication_perform">
+		<title>Perform()</title>
+		<methodsynopsis><modifier>virtual</modifier><type>status_t</type><methodname>Perform</methodname><methodparam><type>perform_code</type><parameter>d</parameter></methodparam><methodparam><type>void *</type><parameter>arg</parameter></methodparam></methodsynopsis>
+	</sect3>
 </sect1>
