@@ -8,7 +8,7 @@ Doc2HTML
 	: [ FDirName $(HAIKU_TOP) src documentation docbook-xsl html chunk.xsl ]
 	: Haiku_Book
 	:
-	: -stringparam use.id.as.filename 1 -stringparam language cpp
+	: -stringparam use.id.as.filename 1 -stringparam language cpp -stringparam chunk.section.depth 2
 	;
 
 # Single most ugly string manipulation ever ...

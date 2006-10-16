@@ -238,7 +238,7 @@
 			notifications when you register or unregister your local endpoints, but the 
 			other apps will.
 			<table id="bmidirostertable1">
-				<table>B_MIDI_REGISTERED message structure</table>
+				<title>B_MIDI_REGISTERED message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -266,7 +266,7 @@
 			</table>
 			
 			<table id="bmidirostertable2">
-				<table>B_MIDI_UNREGISTERED message structure</table>
+				<title>B_MIDI_UNREGISTERED message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -305,7 +305,7 @@
 			published endpoints.
 			
 			<table id="bmidirostertable3">
-				<table>B_MIDI_CONNECTED message structure</table>
+				<title>B_MIDI_CONNECTED message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -333,7 +333,7 @@
 			</table>
 			
 			<table id="bmidirostertable4">
-				<table>B_MIDI_DISCONNECTED message structure</table>
+				<title>B_MIDI_DISCONNECTED message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -367,7 +367,7 @@
 			its published endpoints.
 			
 			<table id="bmidirostertable5">
-				<table>B_MIDI_CHANGED_NAME message structure</table>
+				<title>B_MIDI_CHANGED_NAME message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -401,7 +401,7 @@
 			</table>
 			
 			<table id="bmidirostertable6">
-				<table>B_MIDI_CHANGED_LATENCY message structure</table>
+				<title>B_MIDI_CHANGED_LATENCY message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
@@ -435,7 +435,7 @@
 			</table>
 			
 			<table id="bmidirostertable7">
-				<table>B_MIDI_CHANGED_PROPERTIES message structure</table>
+				<title>B_MIDI_CHANGED_PROPERTIES message structure</title>
 				<tgroup cols='3' align='left' colsep='1' rowsep='1'>
 					<colspec colname="label"/>
 					<colspec colname='type'/>
