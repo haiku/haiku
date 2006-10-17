@@ -173,13 +173,11 @@ ServerApp::~ServerApp()
 		fWindowListLock.Lock();
 	}
 
-	// first, make sure our monitor thread doesn't 
-	for (int32 i = 0; i < fBitmapList.CountItems(); i++) {
+	for (int32 i = fBitmapList.CountItems(); i-- > 0;) {
 		gBitmapManager->DeleteBitmap(static_cast<ServerBitmap *>(fBitmapList.ItemAt(i)));
 	}
 
-	int32 pictureCount = fPictureList.CountItems();
-	for (int32 i = 0; i < pictureCount; i++) {
+	for (int32 i = fPictureList.CountItems(); i-- > 0;) {
 		delete (ServerPicture*)fPictureList.ItemAtFast(i);
 	}
 
