@@ -1008,9 +1008,6 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 		} else if (_Windows(previousWorkspace).HasWindow(floating)) {
 			// was visible, but is no longer
 
-			if (fMouseEventWindow == floating)
-				fMouseEventWindow = NULL;
-
 			_Windows(previousWorkspace).RemoveWindow(floating);
 			floating->SetCurrentWorkspace(-1);
 			_HideWindow(floating);
