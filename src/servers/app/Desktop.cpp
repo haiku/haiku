@@ -496,7 +496,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < count; i++) {
 				ServerApp *app = fApplications.ItemAt(i);
 
-				if (app != NULL && app->Thread() == thread) {
+				if (app->Thread() == thread) {
 					fApplications.RemoveItemAt(i);
 					removeApp = app;
 					break;
@@ -631,7 +631,7 @@ Desktop::BroadcastToAllApps(int32 code)
 {
 	BAutolock locker(fApplicationsLock);
 
-	for (int32 i = 0; i < fApplications.CountItems(); i++) {
+	for (int32 i = fApplications.CountItems(); i-- > 0;) {
 		fApplications.ItemAt(i)->PostMessage(code);
 	}
 }
@@ -1007,9 +1007,16 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 			}
 		} else if (_Windows(previousWorkspace).HasWindow(floating)) {
 			// was visible, but is no longer
+
+			if (fMouseEventWindow == floating)
+				fMouseEventWindow = NULL;
+
 			_Windows(previousWorkspace).RemoveWindow(floating);
 			floating->SetCurrentWorkspace(-1);
 			_HideWindow(floating);
+
+			if (FocusWindow() == floating)
+				SetFocusWindow(_CurrentWindows().LastWindow());
 		}
 	}
 }
@@ -1191,35 +1198,41 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 		return;
 	}
 
-	ServerApp* oldActiveApp = NULL;
-	ServerApp* newActiveApp = NULL;
+	team_id oldActiveApp = -1;
+	team_id newActiveApp = -1;
 
 	if (fFocus != NULL) {
 		fFocus->SetFocus(false);
-		oldActiveApp = fFocus->ServerWindow()->App();
+		oldActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
 	}
 
 	fFocus = focus;
 
 	if (fFocus != NULL) {
 		fFocus->SetFocus(true);
-		newActiveApp = fFocus->ServerWindow()->App();
+		newActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
+	}
+
+	if (newActiveApp == -1) {
+		// make sure the cursor is visible
+		HWInterface()->SetCursorVisible(true);
 	}
 
 	UnlockAllWindows();
 
 	// change the "active" app if appropriate
-	if (oldActiveApp != newActiveApp) {
-		if (oldActiveApp) {
-			oldActiveApp->Activate(false);
-		}
+	if (oldActiveApp == newActiveApp)
+		return;
 
-		if (newActiveApp) {
-			newActiveApp->Activate(true);
-		} else {
-			// make sure the cursor is visible
-			HWInterface()->SetCursorVisible(true);
-		}
+	BAutolock locker(fApplicationsLock);
+
+	for (int32 i = 0; i < fApplications.CountItems(); i++) {
+		ServerApp *app = fApplications.ItemAt(i);
+
+		if (oldActiveApp != -1 && app->ClientTeam() == oldActiveApp)
+			app->Activate(false);
+		else if (newActiveApp != -1 && app->ClientTeam() == newActiveApp)
+			app->Activate(true);
 	}
 }
 
