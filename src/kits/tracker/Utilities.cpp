@@ -632,8 +632,10 @@ FlickerFreeStringView::Draw(BRect)
 		edge_info eInfo;
 		switch (Alignment()) {
 			case B_ALIGN_LEFT:
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			case B_ALIGN_HORIZONTAL_UNSET:
 			case B_ALIGN_USE_FULL_WIDTH:
+#endif
 			{
 				// If the first char has a negative left edge give it
 				// some more room by shifting that much more to the right.
