@@ -1,0 +1,158 @@
+#
+# This is the configuration file for the ipw2100 wireless network driver.
+# It should be located at "/boot/home/config/settings/kernel/drivers" and named "ipw2100".
+#
+
+# -----
+# Network setup
+# -----
+
+#
+# mode
+# -----
+# This setting specifies the operation mode of the driver and hardware:
+#
+#		0=IBSS	In IBSS mode network devices communicate directly with eachother. No
+#				access point required. This mode is also called ad-hoc or peer-to-peer mode.
+#		1=BSS	The BSS mode (also called infrastructure mode) requires each network device
+#				to connect to a central access point. All traffic (also between two wireless
+#				devices) is routed through the access point.
+#		2=Monitor	Monitoring is only really useful when you're debugging a network (if you need
+#				to check for other, possibly overlapping, wireless networks for example). In
+#				monitoring mode you are not activly scanning or connecting to a network, you
+#				rather passivly capture every packet that is sent through the air. Note that
+#				for this to be useful you should enable packet dumping (below) too.
+#
+# Valid modes range from 0 to 2, the default is 1 (BSS).
+#
+mode		1
+
+#
+# channel
+# -----
+# Selects the channel to operate on. The channel should be the same as set on the other wireless
+# devices (access point in BSS mode or other computers in IBSS mode).
+#
+# Valid channels range from 1 to 14, the default is 1.
+#
+channel	1
+
+#
+# essid
+# -----
+# Specifies which network to connect to ("the network name"). If you don't specify the ESSID the next
+# best network will be used to connect.
+#
+# Valid are strings of up to 32 characters, the default is "unset".
+#
+essid		unset
+
+#
+# privacy
+# -----
+# Selects the encryption to be used for the network:
+#
+#		0=None	Don't use encryption at all.
+#		1=WEP64	Use WEP with 64 bit strength (40 bit keys + 16 bit initialisation vector)
+#		2=WEP128	Use WEP with 128 bit strength (104 bit keys + 16 bit initialisation vector)
+#
+# Valid privacy settings range from 0 to 2, the default is 0.
+#
+privacy	0
+
+#
+# authmode
+# -----
+# Selects the authentication mode to be used for joining a network:
+#
+#		0=Open	Use Open System Authentication.
+#		1=Shared	Use Shared Key Authentication.
+#
+# Valid authmode settings range from 0 to 1, the default is 0.
+#
+authmode	0
+
+#
+# keyindex
+# -----
+# Selects the key to be used for encryption out of the four keys specified below.
+#
+# Valid index settings range from 0 to 3, default is 0.
+#
+keyindex	0
+
+#
+# keyX
+# -----
+# These four entries are used to specify the WEP keys. Only one of them will be used at any one time
+# though (selected by the keyindex setting above). They need to be at the same index that is
+# configured at the access point or on other wireless devices.
+# The keys can be either specified in ASCII format, where strings of 5 or 13 characters are valid, or in
+# hex format, where hex strings of 10 or 26 digits are valid. Note that you need to enclose ASCII
+# strings in quotes (") when they contain spaces. Unused keys can be left blank or commented out by
+# adding a # at the beginning of the line.
+#
+# Example of a ASCII key for WEP with 64 bits (5 characters required):
+# key0	SOMEK
+#
+# Example of a hex key for WEP with 128 bits (26 digits required):
+# key1	a8d9fec82387d7912fdaa86820
+#
+key0		00000000000000000000000000
+key1		00000000000000000000000000
+key2		00000000000000000000000000
+key3		00000000000000000000000000
+
+
+# -----
+# Device settings
+# -----
+
+#
+# interrupt
+# -----
+# If you have configured your network settings and tried to enable the interface but didn't get
+# connected this can have a few causes. One of them beeing that the interrupt line reported to the
+# driver is not the interrupt line where interrupts actually arrive. If you enable syslog debug output in
+# the kernel settings and then examine the syslog in "/var/log" you might see a lot of messages like
+# this:
+#
+# KERN 'idle thread 1'[1]: disable irq 5
+# KERN 'idle thread 1'[1]: irq 5 reenabled (handled by 0x600e4f60)
+#
+# This indicates that the interrupts were sent to the interrupt line 5, while there was no handler for
+# them. In this case you can use the following setting to force the driver into using a specific interrupt
+# line. Change the default value of -1 to the desired interrupt line.
+#
+# Note though that there are other factors that may cause the driver / hardware not to function
+# properly. One of which might be the RF kill switch. This switch that needs to be present on all
+# wireless equipment provides the function of explicitly disabling the radio wave emitting device.
+# You should see a line like the following in the syslog if an RF kill switch is enabled:
+#
+# KERN 'ifconfig'[2000]: IPW2100: rf kill switch enabled
+#
+# In this case you should try to toggle the switch / key that is present somewhere on your device.
+# If the problem persists, it means that you need a special driver to handle your RF kill switch. This
+# is very unfortunate, because there is no way for this driver to override this. You will need to find
+# a driver for the specific switch.
+#
+# Valid settings are any valid interrupt line number, the default is -1 (use the pci provided value).
+#
+interrupt	-1
+
+#
+# dump_x
+# -----
+# Enables packet dumping. The dumptx setting sets whether outgoing packets should be dumped
+# before they are sent out, the dumprx setting specifies if incoming packets should be dumped
+# before being handed over to the network stack. Packets will be written to a temporary folder
+# called "ipwlog" under "/var/tmp". The files are prefixed with either "ipwtx-" or "ipwrx-" depending on
+# their direction. They are also numbered continiously. Note that when the driver resets, the counter
+# will start at 0 again, possibly overwriting a packet of a previous session. Also note that the
+# temporary folders are emptied on startup. You should therefore copy out any data that is of
+# interest to you.
+#
+# Valid settings are 0 (disabled) and 1 (enabled), the default is 0.
+#
+dumptx	0
+dumprx	0
