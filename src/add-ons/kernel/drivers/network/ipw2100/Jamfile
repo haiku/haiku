@@ -12,6 +12,6 @@ Package haiku-ipw2100-cvs :
 	ipw2100 :
 	boot home config add-ons kernel drivers bin ;
 Package haiku-ipw2100-cvs :
-	ipw2100 :
+	ipw2100.settings :
 	boot home config settings kernel drivers sample ;
 PackageDriverSymLink haiku-ipw2100-cvs : net ipw2100 ;
