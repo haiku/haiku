@@ -280,7 +280,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 		// retrieve addresses
 
 		bool hasAddress = false, hasMask = false, hasPeer = false, hasBroadcast = false;
-		struct sockaddr address, mask, peer, broadcast;
+		struct sockaddr address, mask, peer, broadcast, gateway;
 
 		const char* string;
 		if (addressMessage.FindString("address", &string) == B_OK
@@ -297,6 +297,23 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 		if (addressMessage.FindString("broadcast", &string) == B_OK
 			&& parse_address(familyIndex, string, broadcast))
 			hasBroadcast = true;
+
+		// add gateway route, if we're asked for it
+
+		if (addressMessage.FindString("gateway", &string) == B_OK
+			&& parse_address(familyIndex, string, gateway)) {
+			route_entry route;
+			memset(&route, 0, sizeof(route_entry));
+			route.gateway = &gateway;
+			route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
+
+			request.ifr_route = route;
+
+			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
+				fprintf(stderr, "%s: Could not add route for %s: %s\n",
+					Name(), device, strerror(errno));
+			}
+		}
 
 		// set addresses
 
@@ -417,6 +434,7 @@ NetServer::_ConfigureDevice(int socket, const char* path)
 	BMessage address;
 	address.AddString("family", "inet");
 	address.AddString("address", "192.168.0.56");
+	address.AddString("gateway", "192.168.0.254");
 	interface.AddMessage("address", &address);
 
 	return _ConfigureInterface(socket, interface);
