@@ -49,7 +49,7 @@ BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libdevice.so libgame.so libscreensaver.so libroot.so $(X86_ONLY)libGL.so
 	libfluidsynth.so libqoca.so
 ;
-BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
+BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server net_server
 	media_addon_server input_server app_server fake_app_server midi_server print_server
 ;
 

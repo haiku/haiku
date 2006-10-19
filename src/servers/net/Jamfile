@@ -1,29 +1,21 @@
 SubDir HAIKU_TOP src servers net ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders net ;
 
-# additonal headers for built-in add-ons:
-UsePrivateHeaders net ;
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net DialUpPreflet ] ;
+#UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+#UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+#UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net DialUpPreflet ] ;
 
 
 Server net_server :
 	NetServer.cpp
-	
-	# utils
-	SimpleMessageFilter.cpp
-	
-	# built-in add-ons
-	PPPServer.cpp
 ;
 
 LinkAgainst net_server : 
-	be 
-	libsocket.so
-	libbind.so
-	
+	be
+	libnetwork.so
+
 	# for PPP
-	libppp.a
+	#libppp.a
 ;
