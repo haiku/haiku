@@ -13,6 +13,7 @@
 #include <Application.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <TextView.h>
 
@@ -37,6 +38,7 @@ class NetServer : public BApplication {
 
 		virtual void AboutRequested();
 		virtual void ReadyToRun();
+		virtual void MessageReceived(BMessage* message);
 
 	private:
 		bool _PrepareRequest(ifreq& request, const char* name);
@@ -44,6 +46,7 @@ class NetServer : public BApplication {
 		status_t _ConfigureInterface(int socket, BMessage& interface);
 		status_t _ConfigureDevice(int socket, const char* path);
 		void _ConfigureDevices(int socket, const char* path);
+		void _ConfigureInterfaces(int socket);
 		void _BringUpInterfaces();
 
 		Settings	fSettings;
@@ -153,7 +156,35 @@ NetServer::AboutRequested()
 void
 NetServer::ReadyToRun()
 {
+	fSettings.StartMonitoring(this);
 	_BringUpInterfaces();
+}
+
+
+void
+NetServer::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_NODE_MONITOR:
+			fSettings.Update(message);
+			break;
+
+		case kMsgInterfaceSettingsUpdated:
+		{
+			// we need a socket to talk to the networking stack
+			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+			if (socket < 0)
+				break;
+
+			_ConfigureInterfaces(socket);
+			close(socket);
+			break;
+		}
+
+		default:
+			BApplication::MessageReceived(message);
+			return;
+	}
 }
 
 
@@ -304,10 +335,13 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 			&& parse_address(familyIndex, string, gateway)) {
 			route_entry route;
 			memset(&route, 0, sizeof(route_entry));
-			route.gateway = &gateway;
 			route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
+			route.gateway = &gateway;
 
 			request.ifr_route = route;
+			ioctl(socket, SIOCDELRT, &request, sizeof(request));
+				// Try to remove a previous default route, doesn't matter
+				// if it fails.
 
 			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
 				fprintf(stderr, "%s: Could not add route for %s: %s\n",
@@ -465,19 +499,8 @@ NetServer::_ConfigureDevices(int socket, const char* startPath)
 
 
 void
-NetServer::_BringUpInterfaces()
+NetServer::_ConfigureInterfaces(int socket)
 {
-	// we need a socket to talk to the networking stack
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0) {
-		fprintf(stderr, "%s: The networking stack doesn't seem to be available.\n",
-			Name());
-		Quit();
-		return;
-	}
-
-	// First, we look into the settings, and try to bring everything up from there
-
 	BMessage interface;
 	uint32 cookie = 0;
 	while (fSettings.GetNextInterface(cookie, interface) == B_OK) {
@@ -492,16 +515,32 @@ NetServer::_BringUpInterfaces()
 				continue;
 		}
 
-		// try to bring the interface up
-
 		_ConfigureInterface(socket, interface);
 	}
+}
+
+
+void
+NetServer::_BringUpInterfaces()
+{
+	// we need a socket to talk to the networking stack
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0) {
+		fprintf(stderr, "%s: The networking stack doesn't seem to be available.\n",
+			Name());
+		Quit();
+		return;
+	}
+
+	// First, we look into the settings, and try to bring everything up from there
+
+	_ConfigureInterfaces(socket);
 
 	// check configuration
 
 	if (!_TestForInterface(socket, "loop")) {
 		// there is no loopback interface, create one
-		interface.MakeEmpty();
+		BMessage interface;
 		interface.AddString("device", "loop");
 		BMessage address;
 		address.AddString("family", "inet");

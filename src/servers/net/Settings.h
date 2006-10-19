@@ -11,6 +11,7 @@
 
 #include <driver_settings.h>
 #include <Message.h>
+#include <Messenger.h>
 
 class BPath;
 
@@ -28,6 +29,10 @@ class Settings {
 		~Settings();
 
 		status_t GetNextInterface(uint32& cookie, BMessage& interface);
+		status_t StartMonitoring(const BMessenger& target);
+		status_t StopMonitoring(const BMessenger& target);
+
+		status_t Update(BMessage* message);
 
 	private:
 		status_t _Load();
@@ -42,8 +47,11 @@ class Settings {
 		status_t _ConvertFromDriverSettings(const char* path,
 			const settings_template* settingsTemplate, BMessage& message);
 
+		BMessenger	fListener;
 		BMessage	fInterfaces;
 		bool		fUpdated;
 };
+
+static const uint32 kMsgInterfaceSettingsUpdated = 'SUif';
 
 #endif	// SETTINGS_H

@@ -9,7 +9,9 @@
 
 #include "Settings.h"
 
+#include <Directory.h>
 #include <FindDirectory.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 
 #include <stdio.h>
@@ -23,6 +25,7 @@ const static settings_template kInterfaceAddressTemplate[] = {
 	{B_STRING_TYPE, "mask", NULL},
 	{B_STRING_TYPE, "peer", NULL},
 	{B_STRING_TYPE, "broadcast", NULL},
+	{B_STRING_TYPE, "gateway", NULL},
 	{0, NULL, NULL}
 };
 
@@ -66,12 +69,13 @@ Settings::~Settings()
 status_t
 Settings::_GetPath(const char* name, BPath& path)
 {
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return B_ERROR;
 
 	path.Append("network");
-	path.Append(name);
+	create_directory(path.Path(), 0755);
 
+	path.Append(name);
 	return B_OK;
 }
 
@@ -183,6 +187,81 @@ status_t
 Settings::_Load()
 {
 	return _ConvertFromDriverSettings("interfaces", kInterfaceTemplate, fInterfaces);
+}
+
+
+status_t
+Settings::StartMonitoring(const BMessenger& target)
+{
+	fListener = target;
+
+	BPath path;
+	status_t status = _GetPath("interfaces", path);
+	if (status < B_OK)
+		return status;
+
+	node_ref ref;
+	BNode node;
+
+	BPath parent;
+	if (path.GetParent(&parent) == B_OK) {
+		status = node.SetTo(parent.Path());
+		if (status < B_OK)
+			return status;
+
+		status = node.GetNodeRef(&ref);
+		if (status < B_OK)
+			return status;
+
+		status = watch_node(&ref, B_WATCH_DIRECTORY, target);
+		if (status < B_OK)
+			return status;
+	}
+
+	status = node.SetTo(path.Path());
+	if (status < B_OK)
+		return status;
+
+	status = node.GetNodeRef(&ref);
+	if (status < B_OK)
+		return status;
+
+	return watch_node(&ref, B_WATCH_STAT, target);
+}
+
+
+status_t
+Settings::StopMonitoring(const BMessenger& target)
+{
+	// TODO: this needs to be changed in case the server will watch
+	//	anything else but settings
+	return stop_watching(target);
+}
+
+
+status_t
+Settings::Update(BMessage* message)
+{
+	const char* name;
+	int32 opcode;
+	if (message->FindInt32("opcode", &opcode) < B_OK
+		|| message->FindString("name", &name) < B_OK)
+		return B_BAD_VALUE;
+
+	if (opcode == B_ENTRY_REMOVED)
+		return B_OK;
+
+	if (!strcmp(name, "interfaces")) {
+		status_t status = _ConvertFromDriverSettings("interfaces",
+			kInterfaceTemplate, fInterfaces);
+		if (status < B_OK)
+			return status;
+
+		BMessage update(kMsgInterfaceSettingsUpdated);
+		fListener.SendMessage(&update);
+	}
+
+	return B_OK;
 }
 
 
