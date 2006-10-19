@@ -166,7 +166,7 @@ Settings::_ConvertFromDriverSettings(const char* name,
 	const settings_template* settingsTemplate, BMessage& message)
 {
 	BPath path;
-	status_t status = _GetPath("interfaces", path);
+	status_t status = _GetPath(name, path);
 	if (status < B_OK)
 		return status;
 
