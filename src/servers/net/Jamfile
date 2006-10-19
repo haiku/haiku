@@ -10,6 +10,7 @@ UsePrivateHeaders net ;
 
 Server net_server :
 	NetServer.cpp
+	Settings.cpp
 ;
 
 LinkAgainst net_server : 
