@@ -1,5 +1,5 @@
 /* 
- * Copyright 2003-2005, Haiku Inc.
+ * Copyright 2003-2006, Haiku Inc.
  * Authors:
  *		Stefano Ceccherini (burton666@libero.it).
  *		Carwyn Jones (turok2@currantbun.com)
@@ -450,7 +450,7 @@ BDirectWindow::InitData()
 	fClonedClippingArea = clone_area("Clone direct area", (void**)&fBufferDesc,
 		B_ANY_ADDRESS, B_READ_AREA, fSourceClippingArea);		
 
-	if (fSourceClippingArea > 0) {			
+	if (fClonedClippingArea > 0) {			
 		fInitStatus |= DW_STATUS_AREA_CLONED;
 
 		fDirectDaemonId = spawn_thread(_DaemonStarter, "direct daemon",
