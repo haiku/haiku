@@ -87,6 +87,12 @@ find_route(struct net_domain *_domain, const net_route *description)
 	while (iterator.HasNext()) {
 		net_route_private *route = iterator.Next();
 
+		if ((route->flags & RTF_DEFAULT) != 0
+			&& (description->flags & RTF_DEFAULT) != 0) {
+			// there can only be one default route
+			return route;
+		}
+
 		if ((route->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL)) ==
 				(description->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL))
 			&& domain->address_module->equal_masked_addresses(route->destination, 
