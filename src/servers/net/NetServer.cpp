@@ -11,7 +11,9 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Directory.h>
 #include <Entry.h>
+#include <Path.h>
 #include <TextView.h>
 
 #include <arpa/inet.h>
@@ -24,6 +26,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -37,7 +40,10 @@ class NetServer : public BApplication {
 
 	private:
 		bool _PrepareRequest(ifreq& request, const char* name);
+		bool _TestForInterface(int socket, const char* name);
 		status_t _ConfigureInterface(int socket, BMessage& interface);
+		status_t _ConfigureDevice(int socket, const char* path);
+		void _ConfigureDevices(int socket, const char* path);
 		void _BringUpInterfaces();
 
 		Settings	fSettings;
@@ -161,6 +167,51 @@ NetServer::_PrepareRequest(ifreq& request, const char* name)
 
 	strcpy(request.ifr_name, name);
 	return true;
+}
+
+
+bool
+NetServer::_TestForInterface(int socket, const char* name)
+{
+	// get a list of all interfaces
+
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+		return false;
+
+	uint32 count = (uint32)config.ifc_value;
+	if (count == 0) {
+		// there are no interfaces yet
+		return false;
+	}
+
+	void *buffer = malloc(count * sizeof(struct ifreq));
+	if (buffer == NULL) {
+		fprintf(stderr, "%s: Out of memory.\n", Name());
+		return false;
+	}
+
+	config.ifc_len = count * sizeof(struct ifreq);
+	config.ifc_buf = buffer;
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+		return false;
+
+	ifreq *interface = (ifreq *)buffer;
+	int32 nameLength = strlen(name);
+	bool success = false;
+
+	for (uint32 i = 0; i < count; i++) {
+		if (!strncmp(interface->ifr_name, name, nameLength)) {
+			success = true;
+			break;
+		}
+
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + interface->ifr_addr.sa_len);
+	}
+
+	free(buffer);
+	return success;
 }
 
 
@@ -356,6 +407,45 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 }
 
 
+status_t
+NetServer::_ConfigureDevice(int socket, const char* path)
+{
+	BMessage interface;
+	interface.AddString("device", path);
+
+	// TODO: enable DHCP instead
+	BMessage address;
+	address.AddString("family", "inet");
+	address.AddString("address", "192.168.0.56");
+	interface.AddMessage("address", &address);
+
+	return _ConfigureInterface(socket, interface);
+}
+
+
+void
+NetServer::_ConfigureDevices(int socket, const char* startPath)
+{
+	BDirectory directory(startPath);
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		char name[B_FILE_NAME_LENGTH];
+		struct stat stat;
+		BPath path;
+		if (entry.GetName(name) != B_OK
+			|| !strcmp(name, "stack")
+			|| entry.GetPath(&path) != B_OK
+			|| entry.GetStat(&stat) != B_OK)
+			continue;
+
+		if (S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode))
+			_ConfigureDevice(socket, path.Path());
+		else if (entry.IsDirectory())
+			_ConfigureDevices(socket, path.Path());
+	}
+}
+
+
 void
 NetServer::_BringUpInterfaces()
 {
@@ -386,10 +476,29 @@ NetServer::_BringUpInterfaces()
 
 		// try to bring the interface up
 
-		status_t status = _ConfigureInterface(socket, interface);
-		if (status < B_OK)
-			continue;
+		_ConfigureInterface(socket, interface);
 	}
+
+	// check configuration
+
+	if (!_TestForInterface(socket, "loop")) {
+		// there is no loopback interface, create one
+		interface.MakeEmpty();
+		interface.AddString("device", "loop");
+		BMessage address;
+		address.AddString("family", "inet");
+		address.AddString("address", "127.0.0.1");
+		interface.AddMessage("address", &address);
+
+		_ConfigureInterface(socket, interface);
+	}
+
+	if (!_TestForInterface(socket, "/dev/net/")) {
+		// there is no driver configured - see if there is one and try to use it
+		_ConfigureDevices(socket, "/dev/net");
+	}
+
+	close(socket);
 }
 
 
