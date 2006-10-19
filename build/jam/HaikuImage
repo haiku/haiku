@@ -54,7 +54,7 @@ BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 ;
 
 BEOS_NETWORK_DEVICES = ethernet loopback ;
-BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp ;
+BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame ;
 #BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
 BEOS_NETWORK_PROTOCOLS = ipv4 tcp udp icmp ;
 
