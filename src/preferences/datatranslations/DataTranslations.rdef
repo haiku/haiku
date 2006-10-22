@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.haiku-translations";
+resource app_signature "application/x-vnd.Haiku-Translations";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -12,10 +12,10 @@ resource app_version {
 	   3 = gamma		4 = golden master	5 = final */
 	variety = 2,
 
-	internal = 1,
+	internal = 0,
 
 	short_info = "DataTranslations",
-	long_info = "DataTranslations, Copyright 2002-2006 Haiku Inc."
+    long_info  = "DataTranslations ©2002-2006 Haiku"
 };
 
 resource large_icon array {

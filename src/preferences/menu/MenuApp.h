@@ -1,16 +1,27 @@
-#ifndef __MENU_APP_H 
-#define __MENU_APP_H
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		<unknown, please fill in who knows>
+ *		Jack Burton
+ */
+#ifndef MENU_APP_H
+#define MENU_APP_H
+
 
 #include <Application.h>
 
+
 class MenuWindow;	
+
 class MenuApp : public BApplication {
-public:
-			MenuApp();
-	virtual void	MessageReceived(BMessage *msg);
-	
-private:
-	MenuWindow	*fMenuWindow;
+	public:
+		MenuApp();
+		virtual void MessageReceived(BMessage* msg);
+
+	private:
+		MenuWindow* fMenuWindow;
 };
-	
-#endif
+
+#endif	// MENU_APP_H

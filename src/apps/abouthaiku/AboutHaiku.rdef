@@ -1,7 +1,24 @@
 
+resource app_signature "application/x-vnd.Haiku-About";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_BETA,
+
+	internal = 0,
+
+	short_info = "AboutHaiku",
+	long_info = "AboutHaiku ©2005-2006 Haiku, Inc."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
 resource(1, "haikulogo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - tiny.png";
 
-resource(101, "BEOS:L:STD_ICON") #'ICON' array {
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF62FFFFFFFFFF"
@@ -36,7 +53,7 @@ resource(101, "BEOS:L:STD_ICON") #'ICON' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:M:STD_ICON") #'MICN' array {
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -54,20 +71,3 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array {
 	$"FFFFFFFFFFFF83FFFFFF1DFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
-
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.haiku-AboutHaiku";
-
-resource app_version {
-	major  = 1,
-	middle = 0,
-	minor  = 0,
-
-	variety = B_APPV_ALPHA,
-
-	internal = 3,
-
-	short_info = "AboutHaiku 1.0.0",
-	long_info = "AboutHaiku ©2005 Haiku, Inc."
-};
-
-resource(1, "BEOS:APP_FLAGS") #'APPF' $"02000000";

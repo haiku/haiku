@@ -1,13 +1,21 @@
 
-resource app_signature "application/x-vnd.be.desklink";
+resource app_signature "application/x-vnd.Haiku-desklink";
 
 resource file_types message;
 
-resource app_version
-{
-	short_info = "Haiku-Desklink",
-	long_info  = "Haiku version of Desklink"
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "desklink",
+    long_info  = "desklink ©2003-2006 Haiku"
 };
 
-resource app_flags B_MULTIPLE_LAUNCH|B_ARGV_ONLY|B_BACKGROUND_APP ;
-
+resource app_flags B_MULTIPLE_LAUNCH | B_ARGV_ONLY | B_BACKGROUND_APP ;

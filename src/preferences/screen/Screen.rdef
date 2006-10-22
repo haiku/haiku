@@ -1,10 +1,26 @@
 
+resource app_signature "application/x-vnd.Be-SCRN";
+
 resource app_flags B_SINGLE_LAUNCH;
 
-resource app_version { major = 0, minor = 8 };
+resource file_types message;
 
-resource large_icon
-{
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "Screen",
+    long_info  = "Screen ©2001-2006 Haiku"
+};
+
+resource large_icon {
 	$"FFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFF001B0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFF003F1B1C1B0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -39,8 +55,7 @@ resource large_icon
 	$"FFFFFFFF0000000E0F0F0F0F0F0F0F0E0F0FFFFFFFFFFF000000FFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FFFFFF0000FFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFF001B1B0000FFFFFFFFFFFFFFFFFF"
 	$"FFFF000F151B1C0000FFFFFFFFFFFFFF"
@@ -58,7 +73,3 @@ resource mini_icon
 	$"FFFF2B2F00FF000015151B1C1500FFFF"
 	$"FFFF00000E0F0F0F000000000000FFFF"
 };
-
-resource app_signature "application/x-vnd.Be-SCRN";
-
-resource file_types message;

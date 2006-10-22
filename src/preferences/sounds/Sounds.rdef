@@ -1,13 +1,22 @@
 
-resource app_signature "application/x-vnd.Haiku.SoundsPrefs";
-
-resource app_version
-{
-	short_info = "Sounds", 
-    long_info  = "Haiku Sounds Preferences"
-};
+resource app_signature "application/x-vnd.Haiku-Sounds";
 
 resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "Sounds",
+    long_info  = "Sounds ©2003-2006 Haiku"
+};
 
 resource file_types message;
 

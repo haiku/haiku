@@ -1,9 +1,20 @@
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		<unknown, please fill in who knows>
+ *		Jack Burton
+ */
+
+
 #include "MenuApp.h"
 #include "MenuWindow.h"	
 #include "msg.h"
 
+
 MenuApp::MenuApp()
-	: BApplication("application/x-vnd.Be-GGUI")
+	: BApplication("application/x-vnd.Haiku-Menu")
 {
 	fMenuWindow = new MenuWindow(BRect(100, 100, 400, 300));
 	fMenuWindow->Show();
@@ -13,8 +24,7 @@ MenuApp::MenuApp()
 void
 MenuApp::MessageReceived(BMessage *msg)
 {
-	switch(msg->what) {
-		//others
+	switch (msg->what) {
 		case UPDATE_WINDOW:
 		case CLICK_OPEN_MSG:
 		case ALLWAYS_TRIGGERS_MSG:
@@ -32,10 +42,15 @@ MenuApp::MessageReceived(BMessage *msg)
 }
 
 
-int main()
+//	#pragma mark -
+
+
+int
+main(int, char**)
 {
-	new MenuApp();
-	be_app->Run();
-	delete be_app;
+	MenuApp app;
+	app.Run();
+
+	return 0;
 }
-	
+

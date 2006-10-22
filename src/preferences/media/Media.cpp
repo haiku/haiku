@@ -1,32 +1,26 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        Media.cpp
-//  Author:      Sikosis, Jérôme Duval
-//  Description: Media Preferences
-//  Created :    June 25, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		Sikosis
+ *		Jérôme Duval
+ */
 
 
-// Includes -------------------------------------------------------------------------------------------------- //
+#include "Media.h"
+
 #include <StorageKit.h>
 #include <Roster.h>
 #include <String.h>
 #include <stdio.h>
-#include "Media.h"
 
-// Media -- constructor 
+
 Media::Media() 
-: BApplication (APP_SIGNATURE)
+	: BApplication("application/x-vnd.Haiku-Media")
 {
 	BRect rect(32,64,637,442);
-	
+
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(SETTINGS_FILE);
@@ -35,19 +29,19 @@ Media::Media()
 			char buffer[255];
 			ssize_t size = 0;
 			while ((size = file.Read(buffer, 255)) > 0) {
-				int32 i=0;
-				while(buffer[i]=='#') {
-					while(i<size&&buffer[i]!='\n')
+				int32 i = 0;
+				while (buffer[i] == '#') {
+					while (i < size && buffer[i] != '\n')
 						i++;
 					i++;
 				}
-				int32 a,b,c,d;
+				int32 a, b, c, d;
 				if (sscanf(&buffer[i], " rect = %li,%li,%li,%li", &a, &b, &c, &d) > 0) {
-					if (c-a >= rect.IntegerWidth()) {
+					if (c - a >= rect.IntegerWidth()) {
 						rect.left = a;
 						rect.right = c;
 					}
-					if (d-b >= rect.IntegerHeight()) {
+					if (d - b >= rect.IntegerHeight()) {
 						rect.top = b;
 						rect.bottom = d;
 					}
@@ -58,14 +52,14 @@ Media::Media()
 
 	fWindow = new MediaWindow(rect);
 	fWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
-	
-	be_roster->StartWatching(BMessenger(this)); 
+
+	be_roster->StartWatching(BMessenger(this));
 }
-// ---------------------------------------------------------------------------------------------------------- //
+
 
 Media::~Media()
 {
-	be_roster->StopWatching(BMessenger(this)); 
+	be_roster->StopWatching(BMessenger(this));
 }
 
 
@@ -78,28 +72,32 @@ Media::InitCheck()
 }
 
 
-// Media::MessageReceived -- handles incoming messages
-void Media::MessageReceived (BMessage *message)
+void
+Media::MessageReceived(BMessage *message)
 {
-	switch(message->what)
-	{
+	switch (message->what) {
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
 			fWindow->PostMessage(message);
 			break;
+
 	    default:
-    	    BApplication::MessageReceived(message); // pass it along ... 
+    	    BApplication::MessageReceived(message);
         	break;
     }
 }
-// ---------------------------------------------------------------------------------------------------------- //
 
-// Media Main
-int main(void)
+
+//	#pragma mark -
+
+
+int
+main(int, char**)
 {
-   Media theApp;
-   if (theApp.InitCheck() == B_OK)
-   	theApp.Run();
+	Media app;
+	if (app.InitCheck() == B_OK)
+		app.Run();
+
    return 0;
 }
-// end ------------------------------------------------------------------------------------------------------ //
+

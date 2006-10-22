@@ -1,5 +1,9 @@
-resource app_version
-{
+
+resource app_signature "application/x-vnd.Haiku-Mail";
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
 	major  = 3,
 	middle = 0,
 	minor  = 3,
@@ -10,12 +14,11 @@ resource app_version
 
 	internal = 3,
 
-	short_info = "E-mail Preferences 3.0.3",
-	long_info = "E-mail Preferences 3.0.3 ©2005 Haiku"
+	short_info = "E-mail",
+	long_info = "E-mail ©2005-2006 Haiku"
 };
 
-resource(101, "BEOS:L:STD_ICON") #'ICON' array
-{
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -50,8 +53,7 @@ resource(101, "BEOS:L:STD_ICON") #'ICON' array
 	$"FFFFFFFF0000000E0F0F0F0F0F0F0F0F0F0FFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:M:STD_ICON") #'MICN' array
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFF00FFFFFFFFFFFFFFFFFFFF"
@@ -71,7 +73,3 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 };
 
 resource(1, "BEOS:FILE_TYPES") message;
-
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-mprf";
-
-resource(1, "BEOS:APP_FLAGS") #'APPF' $"00000000";

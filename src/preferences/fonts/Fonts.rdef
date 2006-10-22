@@ -1,4 +1,23 @@
 
+resource app_signature "application/x-vnd.Haiku-Fonts";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "Fonts",
+    long_info  = "Fonts ©2002-2006 Haiku"
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
 resource file_types message;
 
 resource large_icon
@@ -56,14 +75,3 @@ resource mini_icon
 	$"FF002B2F00FFFF00B28C21000F0E0FFF"
 	$"FFFF00000E0F0F0F0000000E0F0FFFFF"
 };
-
-resource app_signature "application/x-vnd.Haiku-Fonts";
-
-resource app_version
-{
-	short_info = "Haiku-Fonts",
-	long_info  = "Haiku version of Fonts"
-};
-
-resource app_flags B_SINGLE_LAUNCH;
-

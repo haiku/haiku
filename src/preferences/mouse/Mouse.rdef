@@ -1,13 +1,26 @@
+
+resource app_signature "application/x-vnd.Haiku-Mouse";
+
+resource file_types message;
+
 resource app_flags B_SINGLE_LAUNCH;
 
-resource app_version
-{
-	short_info = "Haiku-Mouse", 
-	long_info  = "The Haiku replacement for the Mouse preference panel."
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "Mouse",
+    long_info  = "Mouse ©2002-2006 Haiku"
 };
 
-resource large_icon
-{
+resource large_icon {
 	$"FFFFFFFFFFFF000000000000000000000EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFF00000E0F0F0F0F0F0F0F0E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFF00000E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -42,8 +55,7 @@ resource large_icon
 	$"FFFFFFFFFF0000000E0F0F0F0F0F0F0F0F0F0FFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FF00000000000E0F0FFFFFFFFFFFFFFF"
 	$"000F0F0F000000FFFFFFFFFFFFFFFFFF"
 	$"000FFF001717180000FFFFFFFFFFFFFF"
@@ -62,12 +74,7 @@ resource mini_icon
 	$"FFFF00000E0F0F0F0FFFFFFFFFFFFFFF"
 };
 
-resource app_signature "application/x-vnd.haiku.Mouse";
-
-resource file_types message;
-
-resource(601, "double_click_bmap") #'bits' array
-{
+resource(601, "double_click_bmap") #'bits' array {
 	$"424D06070000000000003A000000280000000E0000001E000000010018000000"
 	$"0000CC060000130B0000130B00000000000000000000FFFFFFFFD8D8D8000000"
 	$"0000000000000000000000000000000000000000000000000000000000000000"
@@ -127,8 +134,7 @@ resource(601, "double_click_bmap") #'bits' array
 	$"000000000000"
 };
 
-resource(602, "speed_bmap") #'bits' array
-{
+resource(602, "speed_bmap") #'bits' array {
 	$"424DE8080000000000003A000000280000001900000016000000010018000000"
 	$"0000AE080000130B0000130B00000000000000000000FFFFFFFFD8D8D8D8D8D8"
 	$"D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8"
@@ -203,8 +209,7 @@ resource(602, "speed_bmap") #'bits' array
 	$"0000000000000000"
 };
 
-resource(603, "acceleration_bmap") #'bits' array
-{
+resource(603, "acceleration_bmap") #'bits' array {
 	$"424D83080000000000003A000000280000001900000015000000010018000000"
 	$"000049080000130B0000130B00000000F8410000F841FFFFFFFFD8D8D8D8D8D8"
 	$"D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D80000"

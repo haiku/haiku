@@ -1,51 +1,45 @@
 /*
- * Time.cpp
- * Time mccall@@digitalparadise.co.uk
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
+ * Authors in chronological order:
+ *		Andrew McCall, mccall@digitalparadise.co.uk
+ *		Mike Berg
  */
 
-#include <Alert.h>
 
 #include "Time.h"
 #include "TimeSettings.h"
 #include "TimeMessages.h"
 
-
-int main()
-{
-	new TimeApplication();
-
-	be_app->Run();
-
-	delete be_app;
-	return(0);
-}
+#include <Alert.h>
 
 
 TimeApplication::TimeApplication()
-		:BApplication(HAIKU_APP_SIGNATURE)
+	: BApplication(HAIKU_APP_SIGNATURE)
 {
-	f_settings = new TimeSettings();
-	f_window = new TTimeWindow();
+	fSettings = new TimeSettings();
+	fWindow = new TTimeWindow();
 }
 
 
 TimeApplication::~TimeApplication()
 {
-	delete f_settings;
+	delete fSettings;
 }
 
 
 void
 TimeApplication::MessageReceived(BMessage *message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case ERROR_DETECTED:
-			{
-				(new BAlert("Error", "Something has gone wrong!","OK",NULL,NULL,B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT))->Go();
-				be_app->PostMessage(B_QUIT_REQUESTED);
-			}
+			(new BAlert("Error", "Something has gone wrong!", "OK",
+				NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+				B_WARNING_ALERT))->Go();
+			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;			
+
 		default:
 			BApplication::MessageReceived(message);
 			break;
@@ -54,14 +48,14 @@ TimeApplication::MessageReceived(BMessage *message)
 
 
 void
-TimeApplication::ReadyToRun(void)
+TimeApplication::ReadyToRun()
 {
-	f_window->Show();
+	fWindow->Show();
 }
 
 
 void
-TimeApplication::AboutRequested(void)
+TimeApplication::AboutRequested()
 {
 	(new BAlert("about", "...by Andrew Edward McCall\n...Mike Berg too", "Big Deal"))->Go();
 }
@@ -70,5 +64,19 @@ TimeApplication::AboutRequested(void)
 void
 TimeApplication::SetWindowCorner(BPoint corner)
 {
-	f_settings->SetWindowCorner(corner);
+	fSettings->SetWindowCorner(corner);
 }
+
+
+//	#pragma mark -
+
+
+int
+main(int, char**)
+{
+	TimeApplication app;
+	app.Run();
+
+	return 0;
+}
+

@@ -1,28 +1,26 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        HApp.h
-//  Author:      Jérôme Duval, Oliver Ruiz Dorantes, Atsushi Takamatsu
-//  Description: Sounds Preferences
-//  Created :    November 24, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Atsushi Takamatsu
+ *		Jérôme Duval
+ *		Oliver Ruiz Dorantes
+ */
+#ifndef HAPP_H
+#define HAPP_H
 
-#ifndef __HAPP_H__
-#define __HAPP_H__
 
 #include <Application.h>
 
-class HApp :public BApplication{
-public:
-					HApp();
-	virtual			~HApp();
-protected:
-	virtual void	AboutRequested();
+
+class HApp :public BApplication {
+	public:
+		HApp();
+		virtual ~HApp();
+
+	protected:
+		virtual void AboutRequested();
 };
-#endif
+
+#endif	// HAPP_H

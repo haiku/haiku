@@ -1,9 +1,16 @@
 /*
- * TimeSettings.cpp
- * Time mccall@@digitalparadise.co.uk
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
+ * Authors in chronological order:
+ *		Andrew McCall, mccall@digitalparadise.co.uk
+ *		Mike Berg
  */
+
  
+#include "TimeSettings.h"
+#include "TimeMessages.h"
+
 #include <Application.h>
 #include <FindDirectory.h>
 #include <File.h>
@@ -11,8 +18,6 @@
 #include <String.h>
 #include <stdio.h>
 
-#include "TimeSettings.h"
-#include "TimeMessages.h"
 
 const char TimeSettings::kTimeSettingsFile[] = "Time_settings";
 
@@ -27,12 +32,12 @@ TimeSettings::TimeSettings()
 		if (file.InitCheck() == B_OK) {
 			// Now read in the data
 			if (file.Read(&fCorner, sizeof(BPoint)) != sizeof(BPoint)) {
-					fCorner.x=50;
-					fCorner.y=50;
-				};
+				fCorner.x = 50;
+				fCorner.y = 50;
+			}
 		} else {
-			fCorner.x=50;
-			fCorner.y=50;
+			fCorner.x = 50;
+			fCorner.y = 50;
 		}
 	} else
 		be_app->PostMessage(ERROR_DETECTED);	
@@ -40,10 +45,9 @@ TimeSettings::TimeSettings()
 
 
 TimeSettings::~TimeSettings()
-{	
+{
 	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) < B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
 		return;
 
 	path.Append(kTimeSettingsFile);
@@ -52,13 +56,11 @@ TimeSettings::~TimeSettings()
 	if (file.InitCheck() == B_OK) {
 		file.Write(&fCorner, sizeof(BPoint));
 	}
-	
-		
 }
 
 
 void
 TimeSettings::SetWindowCorner(BPoint corner)
 {
-	fCorner=corner;
+	fCorner = corner;
 }

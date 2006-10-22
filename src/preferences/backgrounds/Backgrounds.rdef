@@ -1,8 +1,26 @@
 
+resource app_signature "application/x-vnd.Haiku-Backgrounds";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "Backgrounds",
+    long_info  = "Backgrounds ©2002-2006 Haiku"
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
 resource file_types message;
 
-resource large_icon
-{
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFF0000000000FFFFFFFFFFFFFFFF"
 	$"FFFF000000F8F8000000FFFFFFFFFFFFFFFF001D1D1D1D1D00FFFFFFFFFFFFFF"
@@ -37,8 +55,7 @@ resource large_icon
 	$"FFFFFFFF0000000F0F0F0F0F0F0F0F0F0F0FFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFF00000000FFFFFF"
 	$"FF0000FFFFFFFFFF003F1D1D1D00FFFF"
 	$"003FF80000FFFFFF00163F3F1600FFFF"
@@ -56,14 +73,3 @@ resource mini_icon
 	$"FF002B2F00FFFF0F0F0F000D000F0F0F"
 	$"FFFF00000E0F0F0F0F0F0F000F0F0FFF"
 };
-
-resource app_signature "application/x-vnd.haiku-backgrounds";
-
-resource app_version
-{
-	short_info = "Haiku-Backgrounds", 
-    long_info  = "Haiku version of Backgrounds"
-};
-
-resource app_flags B_SINGLE_LAUNCH;
-

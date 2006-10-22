@@ -1,40 +1,30 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        KeymapApplication.h
-//  Author:      Sandor Vroemisse, Jérôme Duval
-//  Description: Keymap Preferences
-//  Created :    July 12, 2004
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
+/*
+ * Copyright 2004-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		Sandor Vroemisse
+ *		Jérôme Duval
+ */
 #ifndef KEYMAP_APPLICATION_H
 #define KEYMAP_APPLICATION_H
 
-#include <Application.h>
-#include <Entry.h>
+
 #include "KeymapWindow.h"
 
-#define APP_SIGNATURE		"application/x-vnd.haiku.Keymap"
+#include <Application.h>
+#include <Entry.h>
+
 
 class KeymapApplication : public BApplication {
-public:
-	KeymapApplication();
-	void	MessageReceived(BMessage *message);
-	
-	bool	UseKeymap( BEntry *keymap );
+	public:
+		KeymapApplication();
 
-protected:
-	KeymapWindow		*fWindow;
+		void MessageReceived(BMessage* message);
+		bool UseKeymap(BEntry* keymap);
 
-	bool 	IsValidKeymap( BFile *inFile );
-	int		NotifyInputServer();
-
+	private:
+		KeymapWindow* fWindow;
 };
 
 #endif // KEYMAP_APPLICATION_H

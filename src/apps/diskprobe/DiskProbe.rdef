@@ -1,13 +1,13 @@
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-DiskProbe";
 
-resource(1, "BEOS:FILE_TYPES") message
-{
+resource app_flags B_SINGLE_LAUNCH;
+
+resource(1, "BEOS:FILE_TYPES") message {
 	"types" = "application/octet-stream"
 };
 
-resource app_version
-{
+resource app_version {
 	major  = 1, 
 	middle = 0,
 	minor  = 0,
@@ -19,11 +19,10 @@ resource app_version
 	internal = 3,
 
 	short_info = "DiskProbe",
-	long_info = "DiskProbe 1.0.0 ©2004-2005 Haiku"
+	long_info = "DiskProbe ©2004-2006 Haiku"
 };
 
-resource(101, "BEOS:L:STD_ICON") #'ICON' array
-{
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -58,8 +57,7 @@ resource(101, "BEOS:L:STD_ICON") #'ICON' array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:M:STD_ICON") #'MICN' array
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFF0000FFFFFFFFFFFFFFFF"
@@ -77,5 +75,3 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 	$"FFFFFFFFFF0000171C0E000F0FFFFFFF"
 	$"FFFFFFFFFFFFFF0000000E0FFFFFFFFF"
 };
-
-resource(1, "BEOS:APP_FLAGS") #'APPF' $"00000000";

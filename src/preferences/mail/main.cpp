@@ -9,15 +9,15 @@
 #include <Application.h>
 
 
-class MailConfigApp : public BApplication
-{
+class MailConfigApp : public BApplication {
 	public:
 		MailConfigApp();
 		~MailConfigApp();
 };
 
 
-MailConfigApp::MailConfigApp() : BApplication("application/x-vnd.Be-mprf")
+MailConfigApp::MailConfigApp()
+	: BApplication("application/x-vnd.Haiku-Mail")
 {
 	(new ConfigWindow())->Show();
 }
@@ -31,10 +31,12 @@ MailConfigApp::~MailConfigApp()
 //	#pragma mark -
 
 
-int main(int argc,char **argv)
+int
+main(int argc,char **argv)
 {
 	(new MailConfigApp())->Run();
-
 	delete be_app;
+
+	return 0;
 }
 

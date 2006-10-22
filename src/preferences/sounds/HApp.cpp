@@ -1,47 +1,36 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        HApp.cpp
-//  Author:      Jérôme Duval, Oliver Ruiz Dorantes, Atsushi Takamatsu
-//  Description: Sounds Preferences
-//  Created :    November 24, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Atsushi Takamatsu
+ *		Jérôme Duval
+ *		Oliver Ruiz Dorantes
+ */
 
-#include <Alert.h>
+
 #include "HApp.h"
 #include "HWindow.h"
 
-#define APP_SIG "application/x-vnd.Haiku.SoundsPrefs"
+#include <Alert.h>
 
-/***********************************************************
- * Constructor
- ***********************************************************/
-HApp::HApp() :BApplication(APP_SIG)
+
+HApp::HApp()
+	: BApplication("application/x-vnd.Haiku-Sounds")
 {
 	BRect rect;
-	rect.Set(200,150,500,450);
-	
-	HWindow *win = new HWindow(rect,"Sounds");
+	rect.Set(200, 150, 500, 450);
+
+	HWindow *win = new HWindow(rect, "Sounds");
 	win->Show();
-}	
-
-/***********************************************************
- * Destructor
- ***********************************************************/
-HApp::~HApp()
-{
-
 }
 
-/***********************************************************
- * AboutRequested
- ***********************************************************/
+
+HApp::~HApp()
+{
+}
+
+
 void
 HApp::AboutRequested()
 {
@@ -50,13 +39,19 @@ HApp::AboutRequested()
 			    "	Oliver Ruiz Dorantes\n"
 			    "	Jérôme DUVAL.\n"
 			    "  Original work from Atsushi Takamatsu.\n"
-			    "OpenBeOS, 2003","OK"))->Go();
+			    "Copyright " B_UTF8_COPYRIGHT "2003-2006 Haiku","OK"))->Go();
 }
 
-int main()
+
+//	#pragma mark -
+
+
+int
+main(int, char**)
 {
 	HApp app;
 	app.Run();
+
 	return 0;
 }
 

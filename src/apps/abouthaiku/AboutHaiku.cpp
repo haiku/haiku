@@ -2,7 +2,8 @@
  * Copyright (c) 2005-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
  */
 
 
@@ -79,7 +80,7 @@ class AboutView : public BView {
 
 
 AboutApp::AboutApp(void)
-	: BApplication("application/x-vnd.haiku-AboutHaiku")
+	: BApplication("application/x-vnd.Haiku-About")
 {
 	AboutWindow *window = new AboutWindow();
 	window->Show();

@@ -13,7 +13,7 @@ Preference Printers :
 	SpoolFolder.cpp
 	Globals.cpp 
 	: libbe.so libtranslation.so libprint.a
-	: Printers.FileTypes.rdef
+	: Printers.rdef
 	;
 
 # TODO remove dependency to libtranslation (BeUtils) 

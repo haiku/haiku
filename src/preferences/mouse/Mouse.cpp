@@ -1,32 +1,26 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			Mouse.cpp
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Jérôme Duval
+ *		Axel Dörfler (axeld@pinc-software.de)
+ */
 
-#include <Alert.h>
-#include <Screen.h>
 
 #include "Mouse.h"
 #include "MouseWindow.h"
 
+#include <Alert.h>
+#include <Screen.h>
 
-const char kMouseApplicationSig[] = "application/x-vnd.haiku.Mouse";
+
+const char* kSignature = "application/x-vnd.Haiku-Mouse";
 
 
 MouseApplication::MouseApplication()
-	: BApplication(kMouseApplicationSig)					
+	: BApplication(kSignature)					
 {
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);
@@ -35,7 +29,7 @@ MouseApplication::MouseApplication()
 
 
 void
-MouseApplication::AboutRequested(void)
+MouseApplication::AboutRequested()
 {
 	(new BAlert("about", "...by Andrew Edward McCall", "Dig Deal"))->Go();
 }

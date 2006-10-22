@@ -1,18 +1,26 @@
 
-resource app_signature "application/x-vnd.Haiku.MediaPrefs";
+resource app_signature "application/x-vnd.Haiku-Media";
 
-resource app_version
-{
+resource app_version {
+	major  = 1, 
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
 	short_info = "Media", 
-    long_info  = "Haiku Media Preferences"
+    long_info  = "Media ©2003-2006 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message;
 
-resource large_icon
-{
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -47,8 +55,7 @@ resource large_icon
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFF00000E0F0F0F0F0F0F0F0F0F0FFFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFF00FFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFF00FFFFFFFFFFFF"
 	$"FFFFFFFFFF0000FFFF00FFFF00FFFFFF"

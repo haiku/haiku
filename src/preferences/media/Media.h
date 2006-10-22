@@ -1,39 +1,30 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        Media.h
-//  Author:      Sikosis, Jérôme Duval
-//  Description: Media Preferences
-//  Created :    June 25, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		Sikosis
+ *		Jérôme Duval
+ */
+#ifndef MEDIA_H
+#define MEDIA_H
 
 
-#ifndef __MEDIA_H__
-#define __MEDIA_H__
-
-// Constants ------------------------------------------------------------------------------------------------- //
-const char *APP_SIGNATURE = "application/x-vnd.Haiku.MediaPrefs";  // Application Signature
-
-#include <Application.h>
 #include "MediaWindow.h"
 
-class Media : public BApplication
-{
+#include <Application.h>
+
+
+class Media : public BApplication {
 	public:
-    	Media();
-    	~Media();
-    	virtual void MessageReceived(BMessage *message);
-	status_t InitCheck();	
-	    	    
+		Media();
+		virtual ~Media();
+
+		virtual void MessageReceived(BMessage* message);
+		status_t InitCheck();
+
 	private:
-		MediaWindow   *fWindow;
-		
+		MediaWindow* fWindow;
 };
 
-#endif
+#endif	// MEDIA_H

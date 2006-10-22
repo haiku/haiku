@@ -1,15 +1,24 @@
 
-resource app_signature "application/x-vnd.Haiku-KeyboardPrefs";
+resource app_signature "application/x-vnd.Haiku-Keyboard";
 
-resource app_version
-{
-	short_info = "Keyboard", 
-    long_info  = "Haiku Keyboard Preferences"
-};
 resource app_flags B_SINGLE_LAUNCH;
 
-resource large_icon
-{
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
+	short_info = "Keyboard",
+    long_info  = "Keyboard ©2004-2006 Haiku"
+};
+
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFF001B1C1B0000FFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFF001B151C3F1B1C0000FFFFFFFFFFFFFFFFFFFFFF"
@@ -44,8 +53,7 @@ resource large_icon
 	$"FFFFFFFFFFFFFF0000000E0F0F0F0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFF0000FFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFF001B1C0000FFFFFFFFFF"
 	$"FFFFFFFFFF001B1C1B1C1C0000FFFFFF"
@@ -66,8 +74,7 @@ resource mini_icon
 
 resource file_types message;
 
-resource(601, "key_bmap") #'bits' array
-{
+resource(601, "key_bmap") #'bits' array {
 	$"424D14050000000000003A000000280000001100000012000000010018000000"
 	$"0000DA040000130B0000130B00000000F0420000F042FFFFFFFFD8D8D8D8D8D8"
 	$"D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8000000000000D8D8D8D8D8"
@@ -111,8 +118,7 @@ resource(601, "key_bmap") #'bits' array
 	$"91FF000015430000004000001543000090419292"
 };
 
-resource(602, "clock_bmap") #'bits' array
-{
+resource(602, "clock_bmap") #'bits' array {
 	$"424DEB030000000000003A000000280000000F0000000F000000010018000000"
 	$"0000B1030000130B0000130B00000800000008000000FFFFFFFFD8D8D8D8D8D8"
 	$"D8D8D8D8D8D8D8D8D8000000000000000000000000000000D8D8D8D8D8D8D8D8"

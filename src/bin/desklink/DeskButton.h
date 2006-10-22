@@ -1,50 +1,40 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  Program:	 desklink
-//  Author:      Jérôme DUVAL
-//  Description: VolumeControl and link items in Deskbar
-//  Created :    October 20, 2003
-//	Modified by: Jérome Duval
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-#ifndef DESKBUTTON_H
-#define DESKBUTTON_H
+/*
+ * Copyright 2003-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		Jérôme Duval
+ */
+#ifndef DESK_BUTTON_H
+#define DESK_BUTTON_H
+
 
 #include <View.h>
 #include <List.h>
 #include <Entry.h>
 
+
 class DeskButton : public BView {
-public:
-	DeskButton(BRect frame, entry_ref *ref, const char *name, BList &titleList, BList &actionList,
-		uint32 resizeMask = B_FOLLOW_ALL, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-		
-	DeskButton(BMessage *);
-		// BMessage * based constructor needed to support archiving
-	virtual ~DeskButton();
-	
-	// archiving overrides
-	static DeskButton *Instantiate(BMessage *data);
-	virtual	status_t Archive(BMessage *data, bool deep = true) const;
+	public:
+		DeskButton(BRect frame, entry_ref* ref, const char* name, BList& titleList,
+			BList& actionList, uint32 resizeMask = B_FOLLOW_ALL, 
+			uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+		DeskButton(BMessage* archive);
+		virtual ~DeskButton();
 
-	// misc BView overrides
-	virtual void MouseDown(BPoint);
-	
-	virtual void Draw(BRect );
+		// archiving overrides
+		static DeskButton* Instantiate(BMessage *data);
+		virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
-	virtual void MessageReceived(BMessage *);
-private:
-	BBitmap *		segments;
-	entry_ref		ref;
-	BList 			actionList, titleList;
+		// misc BView overrides
+		virtual void MouseDown(BPoint);
+		virtual void Draw(BRect updateRect);
+		virtual void MessageReceived(BMessage* message);
+
+	private:
+		BBitmap*	fSegments;
+		entry_ref	fRef;
+		BList 		fActionList, fTitleList;
 };
 
-
-#endif
+#endif	// DESK_BUTTON_H
