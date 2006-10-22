@@ -7,7 +7,7 @@ resource(2, "META:SNIFF_RULE") "0.50 (\"RIFF????AVI \" & 0xffffffff00000000fffff
 
 resource(3, "META:S:DESC") #'MSDC' "AVI Movie";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
 
 resource(5, "META:EXTENS") message(234) {
 	"extensions" = "avi",

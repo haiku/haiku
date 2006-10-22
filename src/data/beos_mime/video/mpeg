@@ -7,4 +7,4 @@ resource(2, "META:SNIFF_RULE") "0.50 (\"\\000\\000\\001\\272\" | \"\\000\\000\\0
 
 resource(3, "META:S:DESC") #'MSDC' "MPEG Movie";
 
-resource(6, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
+resource(6, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";

@@ -1,15 +1,14 @@
 
-resource app_signature "application/x-vnd.Haiku.MediaPlayer";
+resource app_signature "application/x-vnd.Haiku-MediaPlayer";
 
-resource app_version
-{
+resource app_version {
 	major      = 1,
 	middle     = 0,
 	minor      = 0,
 	variety    = B_APPV_BETA,
 	internal   = 0,
 	short_info = "MediaPlayer",
-	long_info  = "Haiku Media Player"
+	long_info  = "MediaPlayer ©2006 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

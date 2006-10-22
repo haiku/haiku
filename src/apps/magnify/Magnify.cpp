@@ -187,7 +187,7 @@ BuildInfoMenu(BMenu *menu)
 // pass in pixelCount to maintain backward compatibility of setting
 // the pixelcount from the command line
 TApp::TApp(int32 pixelCount)
-	: BApplication("application/x-vnd.Haiku.Magnify")
+	: BApplication("application/x-vnd.Haiku-Magnify")
 {
 	TWindow* magWindow = new TWindow(pixelCount);
 	magWindow->Show();

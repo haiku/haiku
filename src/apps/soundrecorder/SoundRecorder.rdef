@@ -3,19 +3,17 @@ resource app_signature "application/x-vnd.Haiku-SoundRecorder";
 
 resource app_flags B_SINGLE_LAUNCH;
 
-resource app_version
-{
-	major      = 1, 
+resource app_version {
+	major      = 1,
 	middle     = 0,
 	minor      = 0,
 	variety    = B_APPV_BETA,
 	internal   = 0,
 	short_info = "SoundRecorder",
-	long_info  = "Haiku Sound Recorder"
+	long_info  = "SoundRecorder ©2005-2006 Haiku"
 };
 
-resource file_types message
-{
+resource file_types message {
 	"types" = "audio/basic",
 	"types" = "audio/x-wav",
 	"types" = "audio/x-riff",
@@ -26,8 +24,7 @@ resource file_types message
 	"types" = "audio/riff"
 };
 
-resource large_icon array
-{
+resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -62,8 +59,7 @@ resource large_icon array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon array
-{
+resource mini_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFF000000FFFFFFFFFFFF"
 	$"FFFFFFFFFFFF00FED8840000FFFFFFFF"

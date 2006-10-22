@@ -24,4 +24,4 @@ resource(4, "META:EXTENS") message(234) {
 	"type" = "text/x-source-code"
 };
 
-resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku.styled-edit";
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-StyledEdit";

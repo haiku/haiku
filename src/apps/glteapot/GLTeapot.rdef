@@ -1,17 +1,24 @@
 
-resource app_signature "application/x-vnd.Haiku-teapot";
+resource app_signature "application/x-vnd.Haiku-GLTeapot";
 
 resource app_flags B_SINGLE_LAUNCH;
 
-resource app_version
-{
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+
+	internal = 0,
+
 	short_info = "GLTeapot",
-	long_info  = "Haiku GLTeapot"
+	long_info  = "GLTeapot ©2006 Haiku"
 };
 
-
-resource large_icon array
-{
+resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -46,8 +53,7 @@ resource large_icon array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000E0F0F0FFFFFFFFFFFFFFF"
 };
 
-resource mini_icon array
-{
+resource mini_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFF0000FF"

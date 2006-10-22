@@ -19,32 +19,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
-
 #ifndef MIDI_PLAYER_APP_H
 #define MIDI_PLAYER_APP_H
 
 #include <Application.h>
 
-#define MIDI_PLAYER_SIGNATURE  "application/x-vnd.haiku.MidiPlayer"
+#define MIDI_PLAYER_SIGNATURE  "application/x-vnd.Haiku-MidiPlayer"
 
 class MidiPlayerWindow;
 
-class MidiPlayerApp : public BApplication
-{
-public:
+class MidiPlayerApp : public BApplication {
+	public:
+		MidiPlayerApp();
 
-	MidiPlayerApp();
+		virtual void ReadyToRun();
+		virtual void AboutRequested();
+		virtual void RefsReceived(BMessage* msg);
+		virtual void ArgvReceived(int32 argc, char** argv);
 
-	virtual void ReadyToRun();
-	virtual void AboutRequested();
-	virtual void RefsReceived(BMessage* msg);
-	virtual void ArgvReceived(int32 argc, char** argv);
+	private:
+		typedef BApplication super;
 
-private:
-
-	typedef BApplication super;
-	
-	MidiPlayerWindow* window;
+		MidiPlayerWindow* window;
 };
 
 #endif // MIDI_PLAYER_APP_H

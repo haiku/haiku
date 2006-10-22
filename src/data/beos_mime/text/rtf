@@ -12,4 +12,4 @@ resource(3, "META:EXTENS") message(234) {
 
 resource(4, "META:SNIFF_RULE") "0.50 (\"\\173\\134rtf\")";
 
-resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku.styled-edit";
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-StyledEdit";

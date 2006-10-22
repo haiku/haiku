@@ -1,8 +1,20 @@
 
-resource file_types message;
+resource app_signature "application/x-vnd.Be-TSKB";
 
-resource large_icon array
-{
+resource app_version {
+	major      = 5,
+	middle     = 2,
+	minor      = 1,
+	variety    = B_APPV_FINAL,
+	internal   = 0,
+	short_info = "Deskbar",
+	long_info  = "Deskbar 5.2.1 ©1991-2001 Be Inc.,\n"
+		"©2006 Haiku"
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource large_icon array {
 	$"FFFFFF0000FFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFF00FAFA0000FFFFFFFFFFFFFF00600000FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFF00FAF8FAFA0000FFFFFFFF00606060600000FFFFFFFFFFFFFFFFFFFFFFFF"
@@ -37,8 +49,7 @@ resource large_icon array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000E0FFFFFFFFFFFFFFF"
 };
 
-resource mini_icon array
-{
+resource mini_icon array {
 	$"FF000000FFFFFFFF00FFFFFFFFFFFFFF"
 	$"0000FAFA0000FF00600000FFFFFFFFFF"
 	$"00FA0000FA00008660D500000000FFFF"
@@ -56,18 +67,3 @@ resource mini_icon array
 	$"FFFFFFFFFF00000E0F0083D9AA000FFF"
 	$"FFFFFFFFFFFFFFFFFFFF0000000EFFFF"
 };
-
-resource app_signature "application/x-vnd.Be-TSKB";
-
-resource app_version
-{
-        major      = 5,
-        middle     = 2,
-        minor      = 1,
-        variety    = B_APPV_FINAL,
-        internal   = 0,
-        short_info = "OpenDeskbar",
-        long_info  = "OpenDeskbar 5.2.1 for BeOS © 1991-2001 Be Inc."
-};
-
-resource app_flags B_SINGLE_LAUNCH;

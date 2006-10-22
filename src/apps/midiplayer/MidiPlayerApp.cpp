@@ -26,7 +26,6 @@
 #include "MidiPlayerApp.h"
 #include "MidiPlayerWindow.h"
 
-//------------------------------------------------------------------------------
 
 MidiPlayerApp::MidiPlayerApp()
 	: BApplication(MIDI_PLAYER_SIGNATURE)
@@ -34,16 +33,16 @@ MidiPlayerApp::MidiPlayerApp()
 	window = new MidiPlayerWindow;
 }
 
-//------------------------------------------------------------------------------
 
-void MidiPlayerApp::ReadyToRun()
+void
+MidiPlayerApp::ReadyToRun()
 {
 	window->Show();
 }
 
-//------------------------------------------------------------------------------
 
-void MidiPlayerApp::AboutRequested()
+void
+MidiPlayerApp::AboutRequested()
 {
 	(new BAlert(
 		NULL,
@@ -55,43 +54,44 @@ void MidiPlayerApp::AboutRequested()
 		B_WIDTH_AS_USUAL, B_INFO_ALERT))->Go();
 }
 
-//------------------------------------------------------------------------------
 
-void MidiPlayerApp::RefsReceived(BMessage* msg)
+void
+MidiPlayerApp::RefsReceived(BMessage* msg)
 {
 	msg->what = B_SIMPLE_DATA;
 	window->PostMessage(msg);
 }
 
-//------------------------------------------------------------------------------
 
-void MidiPlayerApp::ArgvReceived(int32 argc, char** argv)
+void
+MidiPlayerApp::ArgvReceived(int32 argc, char** argv)
 {
 	// Note: we only load the first file, even if more than one is specified.
 	// For some reason, BeOS R5 MidiPlayer loads them all but will only play
 	// the last one. That's not very useful.
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		BMessage msg;
 		msg.what = B_SIMPLE_DATA;
-		
+
 		BEntry entry(argv[1]);
 		entry_ref ref;
 		entry.GetRef(&ref);
 		msg.AddRef("refs", &ref);
-	
+
 		window->PostMessage(&msg);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-int main()
+//	#pragma mark -
+
+
+int
+main()
 {
 	MidiPlayerApp app;
 	app.Run();
 	return 0;
 }
 
-//------------------------------------------------------------------------------

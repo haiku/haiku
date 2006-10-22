@@ -9,7 +9,7 @@
 #include <TextView.h>
 #include "InstallerApp.h"
 
-const char *APP_SIG		= "application/x-vnd.haiku-Installer";
+const char *APP_SIG		= "application/x-vnd.Haiku-Installer";
 
 #define EULA_TEXT "HAIKU INC - END USER LICENSE AGREEMENT\n\n\
 NOTICE: READ THIS BEFORE INSTALLING OR USING Haiku\n\

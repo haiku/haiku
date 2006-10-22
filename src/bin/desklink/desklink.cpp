@@ -170,7 +170,7 @@ MediaReplicant::MessageReceived(BMessage *message)
 		break;
 	case OPEN_MEDIA_PLAYER:
 		// launch the media player app
-		if (LaunchBySig("application/x-vnd.Haiku.MediaPlayer") == B_OK
+		if (LaunchBySig("application/x-vnd.Haiku-MediaPlayer") == B_OK
 			|| LaunchBySig("application/x-vnd.Be.MediaPlayer") == B_OK
 			|| LaunchByPath("/boot/beos/apps/MediaPlayer") == B_OK)
 			break;

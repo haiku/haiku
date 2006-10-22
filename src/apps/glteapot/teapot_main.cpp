@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     //GLenum type = BGL_RGB | BGL_DEPTH | BGL_SINGLE;
 	BRect r(0,0,300,315);
 	
-	BApplication *app = new BApplication("application/x-vnd.Haiku-teapot");
+	BApplication *app = new BApplication("application/x-vnd.Haiku-GLTeapot");
 	
 	r.OffsetTo(BPoint(100,100));
 	QuitWindow *win = new QuitWindow(r,"GLTeapot",B_TITLED_WINDOW,0);

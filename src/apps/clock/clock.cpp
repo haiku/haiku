@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-const char *app_signature = "application/x-vnd.Be-simpleclock";
+const char *app_signature = "application/x-vnd.Haiku-Clock";
 
 THelloApplication::THelloApplication()
 		  :BApplication(app_signature)

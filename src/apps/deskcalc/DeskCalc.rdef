@@ -1,23 +1,21 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-DeskCalc";
+resource app_signature "application/x-vnd.Haiku-DeskCalc";
 
-resource app_version
-{
-	major  = 2, 
+resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
+	major  = 2,
 	middle = 1,
 	minor  = 0,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 1,
-
+	variety = B_APPV_ALPHA,
 	internal = 1,
 
 	short_info = "DeskCalc",
-	long_info = "DeskCalc 2.1.0 ©2006 Haiku"
+	long_info = "DeskCalc ©2006 Haiku"
 };
 
-resource(101, "BEOS:L:STD_ICON") #'ICON' array {
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -52,7 +50,7 @@ resource(101, "BEOS:L:STD_ICON") #'ICON' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:M:STD_ICON") #'MICN' array {
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFF0000FFFFFFFFFFFFFF"
@@ -70,5 +68,3 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array {
 	$"FFFFFFFFFFFF001010FFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
-
-resource(1, "BEOS:APP_FLAGS") (#'APPF') $"01000000";

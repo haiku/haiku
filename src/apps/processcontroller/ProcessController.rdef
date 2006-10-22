@@ -6,14 +6,12 @@ resource app_version {
 	middle = 1,
 	minor  = 1,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 5,
-
+	variety = B_APPV_FINAL,
 	internal = 0,
 
 	short_info = "ProcessController",
-	long_info = "ProcessController 3.1.1 ©1996-2001 G. E. Berenger"
+	long_info = "ProcessController ©1997-2001, G.E. Berenger,\n"
+		"©2006 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

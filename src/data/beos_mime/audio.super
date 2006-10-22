@@ -7,15 +7,13 @@ resource(2, "META:L:DESC") #'MLDC' "generic audio";
 
 resource(3, "META:S:DESC") #'MSDC' "generic audio";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
 
-resource(5, "META:EXTENS") message(234)
-{
+resource(5, "META:EXTENS") message(234) {
 	"type" = "audio"
 };
 
-resource(6, "META:ATTR_INFO") message(233)
-{
+resource(6, "META:ATTR_INFO") message(233) {
 	"attr:name" = "Audio:Length",
 	"attr:name" = "Audio:Bitrate",
 	"attr:public_name" = "Playing time",

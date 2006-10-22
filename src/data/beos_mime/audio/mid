@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "audio/mid";
 
 resource(2, "META:S:DESC") #'MSDC' "MIDI File";
 
-resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku.MidiPlayer";
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MidiPlayer";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "mid",

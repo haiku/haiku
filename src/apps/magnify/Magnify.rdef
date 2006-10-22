@@ -1,6 +1,21 @@
 
-resource large_icon
-{
+resource app_signature "application/x-vnd.Haiku-Magnify";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_FINAL,
+	internal = 0,
+
+	short_info = "Magnify",
+	long_info  = "Magnify ©2006 Haiku"
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00040F040200"
@@ -35,8 +50,7 @@ resource large_icon
 	$"FFFFFFFFFFFFFFFFFF0000000000000000000E0F0FFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFF000000"
 	$"FFFFFFFFFFFFFFFFFFFFFFFF000E0000"
 	$"FFFFFFFFFFFFFFFFFFFFFF000E000000"
@@ -54,14 +68,3 @@ resource mini_icon
 	$"FFFF00006060603F878700000FFFFFFF"
 	$"FFFFFFFF0000000000000E0FFFFFFFFF"
 };
-
-resource app_signature "application/x-vnd.Haiku.Magnify";
-
-resource app_version
-{
-	short_info = "Haiku-Magnify",
-	long_info  = "Haiku version of Magnify"
-};
-
-resource app_flags B_SINGLE_LAUNCH;
-

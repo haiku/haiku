@@ -1,26 +1,23 @@
 
-resource app_signature "application/x-vnd.haiku.MidiPlayer";
+resource app_signature "application/x-vnd.Haiku-MidiPlayer";
 
 resource app_flags B_SINGLE_LAUNCH;
 
-resource app_version
-{
+resource app_version {
 	major      = 1, 
 	middle     = 0,
 	minor      = 0,
 	variety    = B_APPV_BETA,
 	internal   = 0,
 	short_info = "MidiPlayer",
-	long_info  = "Haiku MIDI Player"
+	long_info  = "MidiPlayer ©2004-2006 Haiku"
 };
 
-resource file_types message
-{
+resource file_types message {
 	"types" = "audio/x-midi"
 };
 
-resource large_icon array
-{
+resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"

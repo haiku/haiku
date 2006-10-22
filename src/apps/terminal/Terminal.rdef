@@ -11,14 +11,11 @@ resource app_version {
 	middle = 0,
 	minor  = 0,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 0,
-
+	variety = B_APPV_BETA,
 	internal = 1,
 
 	short_info = "Terminal",
-	long_info = "Terminal, Copyright 2002-2006 Haiku Inc."
+	long_info = "Terminal ©2002-2006 Haiku Inc."
 };
 
 resource file_types message {

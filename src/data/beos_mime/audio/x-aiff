@@ -5,10 +5,9 @@ resource(1, "META:TYPE") "audio/x-aiff";
 
 resource(2, "META:S:DESC") #'MSDC' "AIFF Sound File";
 
-resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
 
-resource(4, "META:EXTENS") message(234)
-{
+resource(4, "META:EXTENS") message(234) {
 	"extensions" = "aif",
 	"extensions" = "aiff",
 	"extensions" = "aifc",

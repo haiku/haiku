@@ -2,21 +2,18 @@
  * StyledEdit.rdef
  */
 
-resource app_signature "application/x-vnd.haiku.styled-edit";
+resource app_signature "application/x-vnd.Haiku-StyledEdit";
 
 resource app_version {
 	major  = 1,
 	middle = 0,
 	minor  = 0,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 2,
-
+	variety = B_APPV_BETA,
 	internal = 0,
 
 	short_info = "StyledEdit",
-	long_info = "StyledEdit 1.0.0 ©2002-2006 Haiku"
+	long_info = "StyledEdit ©2002-2006 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

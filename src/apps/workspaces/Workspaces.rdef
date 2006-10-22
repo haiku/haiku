@@ -1,6 +1,21 @@
 
-resource large_icon
-{
+resource app_signature "application/x-vnd.Be-WORK";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_FINAL,
+	internal = 0,
+
+	short_info = "Workspaces",
+	long_info  = "Workspaces ©2002-2006 Haiku"
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFF00D9D90000FFFF0037360000FFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFF00D9D9D9D9D9000035343736370000FFFFFFFFFFFFFFFF"
@@ -35,8 +50,7 @@ resource large_icon
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000E0F0FFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon
-{
+resource mini_icon {
 	$"FFFFFFFFFF0000FFFF0000FFFFFFFFFF"
 	$"FFFFFFFF00D9D9000037360000FFFFFF"
 	$"FFFFFF00D9D9D9D9D909083600FFFFFF"
@@ -54,14 +68,3 @@ resource mini_icon
 	$"FFFFFFFFFFFF008383AA000FFFFFFFFF"
 	$"FFFFFFFFFFFFFF0000000EFFFFFFFFFF"
 };
-
-resource app_signature "application/x-vnd.Be-WORK";
-
-resource app_version
-{
-	short_info = "Haiku-Workspaces",
-	long_info  = "Haiku version of Workspaces"
-};
-
-resource app_flags B_SINGLE_LAUNCH;
-

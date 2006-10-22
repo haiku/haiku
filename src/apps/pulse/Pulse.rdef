@@ -1,5 +1,21 @@
-resource large_icon array
-{
+
+resource app_signature "application/x-vnd.Haiku-Pulse";
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_FINAL,
+	internal = 0,
+
+	short_info = "Pulse",
+	long_info = "Pulse ©2005-2006 Haiku"
+};
+
+resource large_icon array {
 	$"FFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFF001B1C0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFF001B1C1B1C1C0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -34,8 +50,7 @@ resource large_icon array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000E0F0FFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon array 
-{
+resource mini_icon array {
 	$"FFFFFF0000FFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFF001B1C0000FFFFFFFFFFFFFFFFFF"
 	$"FF001B1C1B1C1C0000FFFFFFFFFFFFFF"
@@ -53,23 +68,3 @@ resource mini_icon array
 	$"FFFFFFFF000017170F000F0F0EFFFFFF"
 	$"FFFFFFFFFFFF0000000E0FFFFFFFFFFF"
 };
-
-resource app_signature "application/x-vnd.Haiku-Pulse";
-
-resource app_version
-{
-	major  = 1,
-	middle = 0,
-	minor  = 0,
-
-        /* 0 = development      1 = alpha                       2 = beta
-           3 = gamma            4 = golden master       5 = final */
-        variety = 0,
-
-        internal = 0,
-
-        short_info = "Pulse 1.0.0",
-        long_info = "Pulse 1.0.0 ©2005 Haiku"
-};
-
-resource app_flags B_SINGLE_LAUNCH;

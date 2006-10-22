@@ -24,7 +24,7 @@
 
 #define WINDOWS_TO_IGNORE 1
 
-extern const char *kApplicationSignature = "application/x-vnd.haiku-showimage";
+extern const char *kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
 
 
 ShowImageApp::ShowImageApp()
