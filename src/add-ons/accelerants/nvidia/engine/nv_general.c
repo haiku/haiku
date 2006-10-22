@@ -1123,7 +1123,7 @@ status_t nv_general_powerup()
 		si->ps.card_type = G73;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		sprintf(si->adi.name, "Nvidia GeForce 7300 GT");
+		sprintf(si->adi.name, "Nvidia GeForce 7600 GO");
 		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
