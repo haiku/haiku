@@ -2,23 +2,20 @@
  * app_server.rdef
  */
 
-resource app_signature "application/x-vnd.haiku-app-server";
+resource app_signature "application/x-vnd.Haiku-app-server";
 
 resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
 
 resource app_version {
-	major  = 1, 
+	major  = 1,
 	middle = 0,
 	minor  = 0,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 1,
-
+	variety = B_APPV_ALPHA,
 	internal = 0,
 
 	short_info = "app_server",
-	long_info = "app_server, Copyright 2006, Haiku Inc."
+	long_info = "app_server ©2004-2006 Haiku Inc."
 };
 
 resource large_icon array {

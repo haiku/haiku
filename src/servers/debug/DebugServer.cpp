@@ -37,7 +37,7 @@
 using std::map;
 using std::nothrow;
 
-static const char *kSignature = "application/x-vnd.haiku-debug-server";
+static const char *kSignature = "application/x-vnd.Haiku-debug_server";
 
 // paths to the apps used for debugging
 static const char *kConsoledPath	= "/bin/consoled";

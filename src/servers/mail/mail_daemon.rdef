@@ -1,23 +1,24 @@
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-POST";
+resource app_signature "application/x-vnd.Be-POST";
 
-resource app_version
-{
+resource app_flags B_BACKGROUND_APP;
+
+resource(1, "BEOS:FILE_TYPES") message {
+	"types" = "text/x-partial-email"
+};
+
+resource app_version {
 	major  = 3,
 	middle = 0,
 	minor  = 3,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 5,
-
+	variety = B_APPV_FINAL,
 	internal = 3,
 
-	short_info = "Mail Daemon 3.0.3",
-	long_info = "Mail Daemon 3.0.3 ©2005 Haiku"
+	short_info = "mail_daemon",
+	long_info = "mail_daemon ©2005-2006 Haiku"
 };
 
-resource(0, "Read") #'BBMP' archive BBitmap
-{
+resource(0, "Read") #'BBMP' archive BBitmap {
 	"_frame" = rect { 0.00000, 0.00000, 15.0000, 15.0000 },
 	"_cspace" = 4,
 	"_bmflags" = 1,
@@ -35,8 +36,7 @@ resource(0, "Read") #'BBMP' archive BBitmap
 	}
 };
 
-resource(1, "New") #'BBMP' archive BBitmap
-{
+resource(1, "New") #'BBMP' archive BBitmap {
 	"_frame" = rect { 0.00000, 0.00000, 15.0000, 15.0000 },
 	"_cspace" = 4,
 	"_bmflags" = 1,
@@ -54,8 +54,7 @@ resource(1, "New") #'BBMP' archive BBitmap
 	}
 };
 
-resource(2) #'BBMP' archive BBitmap
-{
+resource(2) #'BBMP' archive BBitmap {
 	"_frame" = rect { 0.00000, 0.00000, 15.0000, 15.0000 },
 	"_cspace" = 4,
 	"_bmflags" = 1,
@@ -73,8 +72,7 @@ resource(2) #'BBMP' archive BBitmap
 	}
 };
 
-resource(3) #'BBMP' archive BBitmap
-{
+resource(3) #'BBMP' archive BBitmap {
 	"_frame" = rect { 0.00000, 0.00000, 15.0000, 15.0000 },
 	"_cspace" = 4,
 	"_bmflags" = 1,
@@ -92,8 +90,7 @@ resource(3) #'BBMP' archive BBitmap
 	}
 };
 
-resource(0, "BEOS:L:text/x-partial-email") #'ICON' array
-{
+resource(0, "BEOS:L:text/x-partial-email") #'ICON' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -128,8 +125,7 @@ resource(0, "BEOS:L:text/x-partial-email") #'ICON' array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0F0F0FFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:L:STD_ICON") #'ICON' array
-{
+resource large_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -184,8 +180,7 @@ resource(0, "BEOS:M:text/x-partial-email") #'MICN' array
 	$"FFFFFFFFFFFFFFFFFF0FFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:M:STD_ICON") #'MICN' array
-{
+resource mini_icon {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFF0000FFFFFF"
 	$"FFFFFF0000000000000000D9D90000FF"
@@ -204,9 +199,3 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(1, "BEOS:FILE_TYPES") message
-{
-	"types" = "text/x-partial-email"
-};
-
-resource(1, "BEOS:APP_FLAGS") #'APPF' $"04000000";

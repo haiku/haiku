@@ -11,7 +11,7 @@ UsePrivateHeaders shared interface print ;
 AddResources
 	print_server
 	:
-	PrintServer.FileTypes.rdef
+	print_server.rdef
 	;
 
 Server 

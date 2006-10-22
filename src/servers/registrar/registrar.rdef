@@ -1,9 +1,8 @@
 /*
-** registrar.rdef
-**
-*/
+ * registrar.rdef
+ */
 
-resource app_signature "application/x-vnd.haiku-registrar";
+resource app_signature "application/x-vnd.Haiku-Registrar";
 
 resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
 	/* the registrar's application flags are actually
@@ -16,14 +15,11 @@ resource app_version {
 	middle = 0,
 	minor  = 0,
 
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 1,
-
+	variety = B_APPV_ALPHA,
 	internal = 0,
 
 	short_info = "registrar",
-	long_info = "registrar, Copyright 2005, Haiku Inc."
+	long_info = "registrar ©2005-2006 Haiku Inc."
 };
 
 resource large_icon array {
