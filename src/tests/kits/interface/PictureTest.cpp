@@ -41,6 +41,16 @@ PictureView::AllAttached(void)
 	shape.Close();
 	StrokeShape(&shape);
 	
+	PushState();
+	const rgb_color blue = { 0, 0, 240, 0 };
+	SetHighColor(blue);
+	SetLineMode(B_BUTT_CAP, B_BEVEL_JOIN);
+	SetPenSize(7);
+	StrokeRect(BRect(10, 220, 50, 260));
+
+	FillRect(BRect(65, 245, 120, 300));
+	PopState();
+	
 	StrokeEllipse(BPoint(50, 150), 50, 50);
 	
 	FillEllipse(BPoint(100, 120), 50, 50);
