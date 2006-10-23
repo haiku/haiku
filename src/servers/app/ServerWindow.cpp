@@ -2427,6 +2427,26 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			break;
 		}
+		case AS_STROKE_ARC:
+		case AS_FILL_ARC:
+		{
+			BRect rect;
+			link.Read<BRect>(&rect);
+			float startTheta, arcTheta;
+			link.Read<float>(&startTheta);
+			link.Read<float>(&arcTheta);
+
+			BPoint radii((rect.Width() + 1) / 2, (rect.Height() + 1) / 2);
+			BPoint center = rect.LeftTop() + radii;
+
+			picture->BeginOp(code == AS_FILL_ARC ? B_PIC_FILL_ARC : B_PIC_STROKE_ARC);
+			picture->AddCoord(center);
+			picture->AddCoord(radii);
+			picture->AddFloat(startTheta);
+			picture->AddFloat(arcTheta);
+			picture->EndOp();
+			break;
+		}
 		case AS_STROKE_LINE:
 		{
 			float x1, y1, x2, y2;

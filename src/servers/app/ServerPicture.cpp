@@ -102,8 +102,10 @@ static void
 stroke_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 			   float arcTheta)
 {
-	/*view->ConvertToScreenForDrawing(&r);
-	view->Window()->GetDrawingEngine()->DrawArc(r, angle, span, view->CurrentState(), false);*/
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
+			center.y + radii.y);
+	view->ConvertToScreenForDrawing(&rect);
+	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, view->CurrentState(), false);
 }
 
 
@@ -111,8 +113,10 @@ static void
 fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 			 float arcTheta)
 {
-	/*view->ConvertToScreenForDrawing(&r);
-	view->Window()->GetDrawingEngine()->DrawArc(r, angle, span, view->CurrentState(), true);*/
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
+			center.y + radii.y);
+	view->ConvertToScreenForDrawing(&rect);
+	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, view->CurrentState(), true);
 }
 
 
