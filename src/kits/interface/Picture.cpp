@@ -15,8 +15,9 @@
 #include <Picture.h>
 
 #include <AppServerLink.h>
+#include <PicturePlayer.h>
 #include <ServerProtocol.h>
-#include <TPicture.h>
+
 
 #include <stdio.h>
 #include <stdlib.h>
