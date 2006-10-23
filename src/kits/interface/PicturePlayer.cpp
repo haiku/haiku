@@ -214,7 +214,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_PBPoint)callBackTable[8])(userData, control);
 				break;
 			}
-case B_PIC_STROKE_ARC:
+			case B_PIC_STROKE_ARC:
 			{
 				BPoint center = GetCoord();
 				BPoint radii = GetCoord();
@@ -237,18 +237,16 @@ case B_PIC_STROKE_ARC:
 			case B_PIC_STROKE_ELLIPSE:
 			{
 				BRect rect = GetRect();
-				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				center = rect.LeftTop() + radii;
+				BPoint center = rect.LeftTop() + radii;
 				((fnc_BPointBPoint)callBackTable[11])(userData, center, radii);
 				break;
 			}
 			case B_PIC_FILL_ELLIPSE:
 			{
 				BRect rect = GetRect();
-				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				center = rect.LeftTop() + radii;
+				BPoint center = rect.LeftTop() + radii;
 				((fnc_BPointBPoint)callBackTable[12])(userData, center, radii);
 				break;
 			}
@@ -259,7 +257,7 @@ case B_PIC_STROKE_ARC:
 				GetData(points, numPoints * sizeof(BPoint));
 				bool isClosed = GetBool();
 				((fnc_iPBPointb)callBackTable[13])(userData, numPoints, points, isClosed);
-				delete points;
+				delete[] points;
 				break;
 			}
 			case B_PIC_FILL_POLYGON:
@@ -268,7 +266,7 @@ case B_PIC_STROKE_ARC:
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
 				((fnc_iPBPoint)callBackTable[14])(userData, numPoints, points);
-				delete points;
+				delete[] points;
 				break;
 			}
 			case B_PIC_STROKE_SHAPE:
@@ -283,7 +281,7 @@ case B_PIC_STROKE_ARC:
 				float deltax = GetFloat();
 				float deltay = GetFloat();
 				((fnc_Pcff)callBackTable[17])(userData, string, deltax, deltay);
-				delete string;
+				delete[] string;
 				break;
 			}
 			case B_PIC_DRAW_PIXELS:
@@ -299,7 +297,7 @@ case B_PIC_STROKE_ARC:
 				GetData(data, size - (fData.Position() - pos));
 				((fnc_DrawPixels)callBackTable[18])(userData, src, dest,
 					width, height, bytesPerRow, pixelFormat, flags, data);
-				delete data;
+				delete[] data;
 				break;
 			}
 			case B_PIC_DRAW_PICTURE:
@@ -403,7 +401,7 @@ case B_PIC_STROKE_ARC:
 				GetData(string, len);
 				string[len] = '\0';
 				((fnc_Pc)callBackTable[37])(userData, string);
-				delete string;
+				delete[] string;
 				break;
 			}
 			case B_PIC_SET_FONT_STYLE:
@@ -413,7 +411,7 @@ case B_PIC_STROKE_ARC:
 				GetData(string, len);
 				string[len] = '\0';
 				((fnc_Pc)callBackTable[38])(userData, string);
-				delete string;
+				delete[] string;
 				break;
 			}
 			case B_PIC_SET_FONT_SPACING:
