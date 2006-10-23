@@ -6,7 +6,7 @@
 #else
 #	include <net/socket.h>
 #endif
-#include <ostream.h>
+#include <iostream>
 #include <string.h>
 #include <stdio.h>
 char *itoa(int i, char *buf, int unit)

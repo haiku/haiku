@@ -58,6 +58,7 @@ private:
 	
 public:
 	Link(PDFWriter* writer, BString* utf8);
+	virtual ~Link() {}
 	void Do();
 };
 

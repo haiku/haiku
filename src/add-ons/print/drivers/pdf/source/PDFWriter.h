@@ -394,6 +394,26 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 
 
 
+// --------------------------------------------------
+inline bool 
+PDFWriter::IsSame(const pattern &p1, const pattern &p2)
+{
+	char *a = (char*)p1.data;
+	char *b = (char*)p2.data;
+	return memcmp(a, b, 8) == 0;
+}
+
+
+// --------------------------------------------------
+inline bool 
+PDFWriter::IsSame(const rgb_color &c1, const rgb_color &c2)
+{
+	char *a = (char*)&c1;
+	char *b = (char*)&c1;
+	return memcmp(a, b, sizeof(rgb_color)) == 0;
+}
+
+
 // PDFLib C callbacks class instance redirectors
 size_t	_WriteData(PDF *p, void *data, size_t size);
 void	_ErrorHandler(PDF *p, int type, const char *msg);

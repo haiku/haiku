@@ -529,7 +529,7 @@ JobSetupView::AttachedToWindow()
 	fGamma = new JSDSlider(gamma_rect, "gamma", "Gamma", new BMessage(kMsgQuality), -300, 300, B_BLOCK_THUMB);
 	
 	fGamma->SetLimitLabels("Brighter", "Darker");
-	fGamma->SetValue(100 * log(fJobData->getGamma()) / log(2.0));
+	fGamma->SetValue((int32)(100 * log(fJobData->getGamma()) / log(2.0)));
 	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
 	fGamma->SetHashMarkCount(7);
 	box->AddChild(fGamma);

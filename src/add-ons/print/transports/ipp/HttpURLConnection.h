@@ -4,8 +4,7 @@
 #ifndef __HttpURLConnection_H
 #define __HttpURLConnection_H
 
-#include <istream.h>
-#include <ostream.h>
+#include <iostream>
 
 #include <list>
 #include <string>

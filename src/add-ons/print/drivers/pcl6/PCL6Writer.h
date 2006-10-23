@@ -13,6 +13,7 @@ class PCL6Driver;
 
 class PCL6WriterStream {
 public:
+	virtual ~PCL6WriterStream() {}
 	virtual void write(const uint8 *data, uint32 size) = 0;
 };
 

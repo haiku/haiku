@@ -152,7 +152,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		margin.Set(0, 0, 0, 0);
 	}
 
-	fMarginView = new MarginView(BRect(20,20,200,160), width, height,
+	fMarginView = new MarginView(BRect(20,20,200,160), (int32)width, (int32)height,
 			margin, units);
 	panel->AddChild(fMarginView);
 	

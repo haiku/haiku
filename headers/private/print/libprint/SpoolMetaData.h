@@ -12,6 +12,7 @@
 using namespace std;
 
 class SpoolMetaData {
+	typedef std::string string;
 private:
 	string fDescription;
 	string fMimeType;

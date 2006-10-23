@@ -4,8 +4,7 @@
 #ifndef __LPSCLIENT_H
 #define __LPSCLIENT_H
 
-#include <istream.h>
-#include <ostream.h>
+#include <iostream>
 #include <string>
 
 #if (!__MWERKS__)

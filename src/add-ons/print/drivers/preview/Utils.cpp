@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include <string.h>
 #include "Utils.h"
+#include <string.h>
 
 // --------------------------------------------------
 EscapeMessageFilter::EscapeMessageFilter(BWindow *window, int32 what) 

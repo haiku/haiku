@@ -268,6 +268,7 @@ class ListIterator
 	virtual bool DoItem(BListItem* item) = 0;
 public:
 	static bool DoIt(BListItem* item, void* data);
+	virtual ~ListIterator() {}
 };
 
 

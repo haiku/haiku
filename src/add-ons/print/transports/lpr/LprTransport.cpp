@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <iomanip>
-#include  "_sstream"
+#include  <sstream>
 
 #include "LpsClient.h"
 #include "LprSetupDlg.h"

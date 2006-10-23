@@ -9,7 +9,7 @@
 #	include <net/netdb.h>
 #endif
 #include <errno.h>
-#include "_sstream"
+#include <sstream>
 
 #include <iomanip>
 #include <algorithm>

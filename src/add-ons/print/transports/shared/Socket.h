@@ -4,8 +4,7 @@
 #ifndef __Socket_H
 #define __Socket_H
 
-#include <istream.h>
-#include <ostream.h>
+#include <iostream>
 
 #include <string>
 

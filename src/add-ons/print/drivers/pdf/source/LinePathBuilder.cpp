@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include <math.h>
 #include "LinePathBuilder.h"
 
+#include <math.h>
+
 static const float kNearZero   = 0.000000000001;
 static const float kMinPenSize = 0.0001;
 

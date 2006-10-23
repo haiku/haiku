@@ -4,8 +4,7 @@
 #ifndef __IppContent_H
 #define __IppContent_H
 
-#include <istream.h>
-#include <ostream.h>
+#include <iostream>
 #include <list>
 #include <string>
 

@@ -4,9 +4,7 @@
 #ifndef __SocketStream_H
 #define __SocketStream_H
 
-#include <istream.h>
-#include <ostream.h>
-#include <streambuf.h>
+#include <iostream>
 
 class Socket;
 

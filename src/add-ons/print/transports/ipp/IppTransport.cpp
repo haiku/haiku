@@ -141,7 +141,7 @@ ssize_t IppTransport::Write(const void *buffer, size_t size)
 {
 //	DBGMSG(("write: %d\n", size));
 
-	if (!__fs.write(buffer, size)) {
+	if (!__fs.write((const char *)buffer, size)) {
 		__error = true;
 		return 0;
 	}
