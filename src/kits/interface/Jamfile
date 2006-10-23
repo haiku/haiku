@@ -81,6 +81,7 @@ MergeObject <libbe>interface_kit.o :
 	OutlineListView.cpp
 	Picture.cpp
 	PictureButton.cpp
+	PicturePlayer.cpp
 	Point.cpp
 	Polygon.cpp
 	PopUpMenu.cpp
@@ -108,7 +109,6 @@ MergeObject <libbe>interface_kit.o :
 	TextControl.cpp
 	TextInput.cpp
 	TextView.cpp
-	TPicture.cpp
 	TwoDimensionalLayout.cpp
 	View.cpp
 	ViewLayoutItem.cpp
