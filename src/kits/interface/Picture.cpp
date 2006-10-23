@@ -35,7 +35,6 @@ struct _BPictureExtent_ {
 	status_t SetSize(const int32 &size);
 
 	bool AddPicture(BPicture *picture) { return fPictures.AddItem(picture); }
-	
 	void DeletePicture(const int32 &index)
 			{ delete static_cast<BPicture *>(fPictures.RemoveItem(index)); }
 	BPicture *PictureAt(const int32 &index)
@@ -51,6 +50,12 @@ private:
 	int32	fOldStyleSize;
 
 	BList	fPictures;	// In R5 this is a BArray<BPicture*> which is completely inline.
+};
+
+
+struct picture_header {
+	int32 magic1; // ?
+	int32 magic2; // ?
 };
 
 
@@ -225,7 +230,7 @@ BPicture::Archive(BMessage *archive, bool deep) const
 	for (int32 i = 0; i < extent->CountPictures(); i++) {
 		BMessage picMsg;
 
-		((BPicture*)extent->PictureAt(i))->Archive(&picMsg, deep);
+		extent->PictureAt(i)->Archive(&picMsg, deep);
 		err = archive->AddMessage("piclib", &picMsg);
 			if (err != B_OK)
 				break;
@@ -260,49 +265,56 @@ BPicture::Flatten(BDataIO *stream)
 	if (!assert_local_copy())
 		return B_ERROR;
 
-	// TODO check the header
-	int32 bla1 = 2;
-	int32 bla2 = 0;
-	int32 count = 0;
+	const picture_header header = { 2, 0 };
+	status_t status = stream->Write(&header, sizeof(header));
+	if (status < B_OK)
+		return status;
 
-	stream->Write(&bla1, sizeof(bla1));
-	stream->Write(&bla2, sizeof(bla2));
-
-	count = extent->CountPictures();
-	stream->Write(&count, sizeof(count));
-
-	for (int32 i = 0; i < extent->CountPictures(); i++)
-		(extent->PictureAt(i))->Flatten(stream);
+	int32 count = extent->CountPictures();
+	if (count > 0) {
+		status = stream->Write(&count, sizeof(count));
+		if (status < B_OK)
+			return status;
+	
+		for (int32 i = 0; i < extent->CountPictures(); i++) {
+			status = extent->PictureAt(i)->Flatten(stream);
+			if (status < B_OK)
+				return status;
+		}
+	}
 
 	int32 size = extent->Size();
-	stream->Write(&size, sizeof(size));
-	stream->Write(extent->Data(), extent->Size());
+	status = stream->Write(&size, sizeof(size));
+	if (status == B_OK)
+		status = stream->Write(extent->Data(), extent->Size());
 
-	return B_OK;
+	return status;
 }
 
 
 status_t
 BPicture::Unflatten(BDataIO *stream)
 {
-	// TODO check the header
-	int32 bla1 = 2;
-	int32 bla2 = 0;
+	picture_header header;
+	if (stream->Read(&header, sizeof(header)) < sizeof(header)
+		|| header.magic1 != 2 || header.magic2 != 0)
+		return B_ERROR;
+
 	int32 count = 0;
-
-	stream->Read(&bla1, 4);
-	stream->Read(&bla2, 4);
-
-	stream->Read(&count, 4);
-
+	status_t status = stream->Read(&count, sizeof(count));
+	if (status < B_OK)
+		return status;
+	
 	for (int32 i = 0; i < count; i++) {
 		BPicture *pic = new BPicture;
+		status = pic->Unflatten(stream);
+		if (status < B_OK)
+			return status;
 
-		pic->Unflatten(stream);
 		extent->AddPicture(pic);
 	}
 
-	status_t status = extent->ImportData(stream);
+	status = extent->ImportData(stream);
 	if (status < B_OK)
 		return status;
 
