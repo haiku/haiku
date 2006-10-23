@@ -391,7 +391,7 @@ void PicturePrinter::SetFontEncoding(int32 encoding) {
 }
 
 #define PRINT_FLAG(flag) \
-  if (flags & flag) { f |= flag; Print(##flag); }
+  if (flags & flag) { f |= flag; Print(#flag); }
 
 void PicturePrinter::SetFontFlags(int32 flags) { 
 	Indent(); Print("SetFontFlags"); 

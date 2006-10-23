@@ -90,4 +90,4 @@ public:
 		virtual void		Iterate(BPicture* picture);
 };
 
-#endif _PICTURE_ITERATOR_H
+#endif // _PICTURE_ITERATOR_H

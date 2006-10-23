@@ -147,7 +147,7 @@ enum MarginUnit {
  */
 class MarginView : public BBox 
 {
-friend MarginManager;
+friend class MarginManager;
 
 private:
 

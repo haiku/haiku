@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 */
 
+#include <string.h>
 #include "Utils.h"
 
 // --------------------------------------------------

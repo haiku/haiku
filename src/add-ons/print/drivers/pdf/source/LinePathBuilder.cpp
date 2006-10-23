@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 */
 
+#include <math.h>
 #include "LinePathBuilder.h"
 
 static const float kNearZero   = 0.000000000001;

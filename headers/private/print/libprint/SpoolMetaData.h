@@ -9,6 +9,7 @@
 #include <SupportDefs.h>
 #include <File.h>
 #include <string>
+using namespace std;
 
 class SpoolMetaData {
 private:

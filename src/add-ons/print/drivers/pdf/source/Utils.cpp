@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 */
 
+#include <string.h>
 #include "Utils.h"
 
 // --------------------------------------------------
@@ -64,7 +65,7 @@ static bool InList(const char* list[], const char* name) {
 
 // --------------------------------------------------
 // copied from BeUtils.cpp
-void AddFields(BMessage* to, const BMessage* from, bool overwrite = true, const char* excludeList[], const char* includeList[]) {
+void AddFields(BMessage* to, const BMessage* from, bool overwrite, const char* excludeList[], const char* includeList[]) {
 	if (to == from) return;
 	char* name;
 	type_code type;

@@ -140,7 +140,7 @@ const uint32 FLIP_PAGE             = 'flip';
  */
 class MarginView : public BBox 
 {
-friend MarginManager;
+friend class MarginManager;
 
 public:
 	// used to index unitFormat array

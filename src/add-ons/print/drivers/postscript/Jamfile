@@ -12,7 +12,7 @@ Addon PS\ Compatible : Print :
 	PSCap.cpp
 ;
 
-LinkAgainst PS\ Compatible : be $(TARGET_LIBSTDC++) libprint.a ;
+LinkAgainst PS\ Compatible : be libprint.a $(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	PS\ Compatible :
