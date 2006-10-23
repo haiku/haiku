@@ -18,7 +18,8 @@ class PictureView : public BBox {
 };
 
 PictureView::PictureView(BRect frame)
-	:	BBox(frame, "pict_view", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	:	BBox(frame, "pict_view", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+		fPicture(NULL)
 {
 }
 
@@ -30,18 +31,29 @@ PictureView::~PictureView()
 void
 PictureView::AllAttached(void)
 {
+	BeginPicture(new BPicture);
+	
 	BShape shape;
 	BPoint bezier[3] = {BPoint(100,0), BPoint(100, 100), BPoint(25, 50)};
-	BeginPicture(new BPicture);
 	shape.MoveTo(BPoint(150,0));
 	shape.LineTo(BPoint(200,100));
 	shape.BezierTo(bezier);
 	shape.Close();
 	StrokeShape(&shape);
+	
 	StrokeEllipse(BPoint(50, 150), 50, 50);
+	
 	FillEllipse(BPoint(100, 120), 50, 50);
+	
 	StrokeArc(BRect(0, 200, 50, 250), 180, 180);
+	
 	FillArc(BPoint(150, 250), 50, 50, 0, 125);
+	
+	const rgb_color red = { 240, 0, 0, 0 };
+	SetHighColor(red);
+	SetFontSize(20);
+	DrawString("BPicture test", BPoint(30, 20));
+
 	fPicture = EndPicture();
 }
 
