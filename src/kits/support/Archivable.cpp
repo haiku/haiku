@@ -292,7 +292,7 @@ find_instantiation_func(const char* class_name, const char* sig)
 
 	BuildFuncName(class_name, funcName);
 
-printf("find_instantiation_func() - looking for '%s'\n", funcName.String());
+//printf("find_instantiation_func() - looking for '%s'\n", funcName.String());
 
 	thread_id tid = find_thread(NULL);
 	thread_info ti;
@@ -311,7 +311,7 @@ printf("find_instantiation_func() - looking for '%s'\n", funcName.String());
 		}
 	}
 
-printf("find_instantiation_func(): %p\n", theFunc);
+//printf("find_instantiation_func(): %p\n", theFunc);
 
 	return theFunc;
 }
