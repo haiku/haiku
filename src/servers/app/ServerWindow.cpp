@@ -2415,7 +2415,18 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			break;
 		}
-		
+		case AS_STROKE_ELLIPSE:
+		case AS_FILL_ELLIPSE:
+		{
+			BRect rect;
+			link.Read<BRect>(&rect);
+			picture->BeginOp(code == AS_FILL_ELLIPSE ? B_PIC_FILL_ELLIPSE : 
+					B_PIC_STROKE_ELLIPSE);
+			picture->AddRect(rect);
+			picture->EndOp();
+			
+			break;
+		}
 		case AS_STROKE_LINE:
 		{
 			float x1, y1, x2, y2;

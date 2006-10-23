@@ -119,16 +119,20 @@ fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 static void
 stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 {
-	/*view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), false);*/
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
+			center.y + radii.y);
+	view->ConvertToScreenForDrawing(&rect);
+	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), false);
 }
 
 
 static void
 fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 {
-	/*view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), true);*/
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
+			center.y + radii.y);
+	view->ConvertToScreenForDrawing(&rect);
+	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), true);
 }
 
 
