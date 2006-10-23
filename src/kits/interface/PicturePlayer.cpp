@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-#include <TPicture.h>
+#include <PicturePlayer.h>
 #include <PictureProtocol.h>
 
 

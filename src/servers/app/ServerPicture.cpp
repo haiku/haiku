@@ -15,9 +15,9 @@
 #include "ViewLayer.h"
 #include "WindowLayer.h"
 
+#include <PicturePlayer.h>
 #include <PictureProtocol.h>
 #include <ServerProtocol.h>
-#include <TPicture.h>
 
 #include <Bitmap.h>
 
