@@ -36,12 +36,14 @@ BEOS_BIN = addattr alert basename beep cat catattr chgrp chmod chop chown clear
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse ProcessController
-	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit Installer Chart Workspaces $(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost $(X86_ONLY)GLTeapot
-	MediaPlayer DeskCalc MidiPlayer Icon-O-Matic BeMail
+	SoundRecorder Magnify DiskProbe AboutHaiku StyledEdit Installer Workspaces
+	$(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost MediaPlayer DeskCalc MidiPlayer
+	Icon-O-Matic BeMail
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations E-mail FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Printers Screen ScreenSaver Sounds Time VirtualMemory
+;
+BEOS_DEMOS = BitmapDrawing Chart $(X86_ONLY)GLTeapot Playground
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
@@ -154,12 +156,14 @@ AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
 AddFilesToHaikuImage beos system		: runtime_loader Deskbar Tracker ;
 AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled ;
 AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
-AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
+AddFilesToHaikuImage beos preferences		: $(BEOS_PREFERENCES) ;
+AddFilesToHaikuImage beos demos			: $(BEOS_DEMOS) ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 AddSymlinkToHaikuImage home config be : /boot/beos/apps : Applications ;
 AddSymlinkToHaikuImage home config be : /boot/beos/preferences : Preferences ;
+AddSymlinkToHaikuImage home config be : /boot/beos/demos : Demos ;
 
 AddSymlinkToHaikuImage beos bin : less : more ;
 AddSymlinkToHaikuImage beos bin : gzip : gunzip ;
@@ -284,7 +288,7 @@ AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
 HAIKU_IMAGE_NAME ?= haiku.image ;
 HAIKU_IMAGE_DIR ?= $(HAIKU_OUTPUT_DIR) ;
 HAIKU_IMAGE ?= $(HAIKU_IMAGE_NAME) ;
-HAIKU_IMAGE_SIZE ?= 80 ; # 80 MB
+HAIKU_IMAGE_SIZE ?= 100 ; # 100 MB
 MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
 
 # Set the default installation directory.
