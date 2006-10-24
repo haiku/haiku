@@ -25,15 +25,13 @@
 .equ PXENV_PACKET_TYPE_DHCP_ACK,		2
 .equ PXENV_PACKET_TYPE_CACHED_REPLY,	3
 
-.equ scratchbuffer_addr_seg, 0x2000
-.equ scratchbuffer_addr_ofs, 0x0000
-.equ scratchbuffer_addr, ((scratchbuffer_addr_seg << 4) + scratchbuffer_addr_ofs)
-.equ scratchbuffer_size, 15000
+.equ scratchbuffer_addr,		0x9000
+.equ scratchbuffer_addr_seg,	(scratchbuffer_addr / 16)
+.equ scratchbuffer_addr_ofs,	(scratchbuffer_addr % 16)
+.equ scratchbuffer_size,		0x7000
 
-// load at 1 MB
-.equ load_addr, 0x100000
-.equ load_addr_seg,	0xffff
-.equ load_addr_ofs,	0x0010
+.equ load_addr,					0x10000
+.equ load_size_max,				0x80000
 
 .code16
 .text
@@ -237,7 +235,7 @@ _start:
 			imull	$65535, %eax
 			movl	%eax, max_fsize
 			
-			// print max file size
+			// print max TFTP file size
 			movw	$maxfsize, %si
 			call	puts
 			movl	max_fsize, %eax
@@ -245,9 +243,23 @@ _start:
 			movw	$crlf, %si
 			call	puts
 
-			// check if file is small enough
+			// print max stage 2 file size
+			movw	$maxs2size, %si
+			call	puts
+			movl	$load_size_max, %eax
+			call	puthex32
+			movw	$crlf, %si
+			call	puts
+
+			// check if file is small enough (TFTP limit)
 			movl	s_PXENV_TFTP_GET_FSIZE_FileSize, %eax
 			movl	max_fsize, %ebx
+			cmpl	%ebx, %eax
+			ja		err_etoobig
+
+			// check if file is small enough (address range limit)
+			movl	s_PXENV_TFTP_GET_FSIZE_FileSize, %eax
+			movl	$load_size_max, %ebx
 			cmpl	%ebx, %eax
 			ja		err_etoobig
 
@@ -289,11 +301,11 @@ _copy_b:	movb	(%esi), %al
 			jnz		_copy_b
 _copy_done:
 
-			// print a dot every 100 packets
+			// print a dot every 20 packets
 			movw	pos, %ax
 			incw	%ax
 			movw	%ax, pos
-			cmpw	$100, %ax
+			cmpw	$20, %ax
 			jb		_no_dot
 			xorw	%ax, %ax
 			movw	%ax, pos
@@ -340,7 +352,7 @@ pm_start:
 			mov		%ax, %gs
 			mov		%ax, %ss
 
-			ljmp	$0x8, $0x100000
+			ljmp	$0x8, $load_addr
 
 .code16
 stop:		hlt
@@ -461,11 +473,12 @@ length:		.asciz	", length "
 loading:	.asciz	"Loading image file "
 fsizeis:	.asciz	"Image file size is "
 psizeis:	.asciz	"Packet size is "
-maxfsize:	.asciz	"Maximum file size is "
-etoobig: 	.asciz	"Image file is too large, loading failed\r\n"
-sizefailed: .asciz	"\r\nCouldn't get image file size, loading failed\r\n"
-loadfailed: .asciz	"\r\nLoading image file failed\r\n"
-executing:	.asciz	"\r\nExecuting stage 2 loader\r\n"
+maxfsize:	.asciz	"Maximum TFTP file size is "
+maxs2size:	.asciz	"Maximum stage 2 file size is "
+etoobig: 	.asciz	"haiku-pxe-loader file is too large, loading aborted\r\n"
+sizefailed: .asciz	"\r\nCouldn't get haiku-pxe-loader  file size, loading failed\r\n"
+loadfailed: .asciz	"\r\nLoading haiku-pxe-loader (stage 2) failed\r\n"
+executing:	.asciz	"\r\nExecuting haiku-pxe-loader (stage 2)\r\n"
 colon:		.asciz	":"
 dot:		.asciz	"."
 crlf:		.asciz	"\r\n"
@@ -538,8 +551,8 @@ s_PXENV_TFTP_OPEN:
 s_PXENV_TFTP_OPEN_Status:				.word 0
 s_PXENV_TFTP_OPEN_ServerIPAddress:		.long 0
 s_PXENV_TFTP_OPEN_GatewayIPAddress:		.long 0
-s_PXENV_TFTP_OPEN_FileName:				.asciz "haiku-pxe-image"
-										.fill 112
+s_PXENV_TFTP_OPEN_FileName:				.asciz "haiku-pxe-loader"
+										.fill 111
 s_PXENV_TFTP_OPEN_TFTPPort:				.word (69 << 8)
 s_PXENV_TFTP_OPEN_PacketSize:			.word 1456
 
@@ -547,8 +560,8 @@ s_PXENV_TFTP_GET_FSIZE:
 s_PXENV_TFTP_GET_FSIZE_Status:			.word 0
 s_PXENV_TFTP_GET_FSIZE_ServerIPAddress:	.long 0
 s_PXENV_TFTP_GET_FSIZE_GatewayIPAddress:.long 0
-s_PXENV_TFTP_GET_FSIZE_FileName:		.asciz "haiku-pxe-image"
-										.fill 112
+s_PXENV_TFTP_GET_FSIZE_FileName:		.asciz "haiku-pxe-loader"
+										.fill 111
 s_PXENV_TFTP_GET_FSIZE_FileSize:		.long 0
 
 s_PXENV_TFTP_READ:

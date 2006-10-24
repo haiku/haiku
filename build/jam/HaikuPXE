@@ -1,4 +1,6 @@
 
 NotFile pxehaiku ;
+Depends pxehaiku : pxe_stage1.bin ;
 
-NotFile haiku-pxe-image ;
+NotFile haiku-pxe-loader ;
+Depends pxehaiku : zbeos ;

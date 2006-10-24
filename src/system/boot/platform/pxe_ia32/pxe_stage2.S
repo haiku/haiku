@@ -5,10 +5,10 @@
  */
 
 
-/**	This file contains the stage 2 boot loader for the PXE (preboot execution 
- *  environment) image.
- *  It gets loaded by the PXE stage1 loader to 0xffff:0010 (0x100000), and it
- *  starts execution in 32 bit protected mode. Entry point is at offset 0.
+/**	This file contains the stage 2 boot loader (haiku-pxe-loader) for the PXE 
+ *  (preboot execution environment) API
+ *  It gets loaded by the PXE stage1 loader to 0x10000, and it starts execution 
+ *  in 32 bit protected mode. Entry point is at offset 0.
  *	This code will directly call the entry function of the embedded ELF part 
  *  of the loader.
  */
@@ -23,9 +23,6 @@ pxe_start:
 
 	mov		$0x10000, %ebp	// setup new stack
 	mov		%ebp, %esp
-
-// stop:	hlt
-// jmp		stop
 
 	call	_start
 

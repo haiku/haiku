@@ -44,6 +44,23 @@ KernelMergeObject boot_platform_pxe_ia32.o :
 ;
 
 
+rule BuildPXEstage1 {
+	local bin = $(1) ;
+	local source = $(2) ;
+
+	Depends $(bin) : $(source) ;
+	MakeLocateDebug $(bin) ;
+}
+
+
+actions BuildPXEstage1 {
+	rm -f $(1)
+	as -o $(1).o $(2)
+	ld --oformat binary --Ttext 0x7C00 -o $(1) $(1).o
+}
+
+BuildPXEstage1 pxe_stage1.bin : pxe_stage1.S ;
+
 SEARCH on [ FGristFiles $(bios_ia32_src) ]
 	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
 
@@ -56,5 +73,5 @@ SEARCH on stage1.bin
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.
-SEARCH on pxe_stage1.bin = $(SUBDIR) ;
+# SEARCH on pxe_stage1.bin = $(SUBDIR) ;
 
