@@ -4337,37 +4337,37 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	// TODO: block input if not editable (Andrew)
 	if (!fInline)
 		return;
-	
+
 	const char *string = NULL;
 	if (message->FindString("be:string", &string) < B_OK || string == NULL)
 		return;
-	
+
 	be_app->ObscureCursor();
-	
+
 	// If we find the "be:confirmed" boolean (and the boolean is true),
 	// it means it's over for now, so the current _BInlineInput_ object
 	// should become inactive. We will probably receive a B_INPUT_METHOD_STOPPED
 	// message after this one.
-	bool confirmed = false;
-	if (message->FindBool("be:confirmed", &confirmed) == B_OK && confirmed) {
-		fInline->SetActive(false);
-		Refresh(0, fInline->Offset() + fInline->Length(), true, false);
-		return;
-	}
-	
+	bool confirmed;
+	if (message->FindBool("be:confirmed", &confirmed) != B_OK)
+		confirmed = false;
+
 	// Delete the previously inserted text (if any)
 	if (fInline->IsActive()) {
 		int32 oldOffset = fInline->Offset();
 		DeleteText(oldOffset, oldOffset + fInline->Length());
 		fClickOffset = fSelStart = fSelEnd = oldOffset;
+
+		if (confirmed)
+			fInline->SetActive(false);
 	}
-	
+
 	int32 stringLen = strlen(string);
-	
+
 	fInline->SetOffset(fSelStart);
 	fInline->SetLength(stringLen);
 	fInline->ResetClauses();
-	
+
 	// Get the clauses, and pass them to the _BInlineInput_ object
 	// TODO: Find out if what we did it's ok, currently we don't consider clauses
 	// at all, while the bebook says we should; though the visual effect we obtained
@@ -4380,21 +4380,21 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 		fInline->AddClause(clauseStart, clauseEnd);
 		clauseCount++;	
 	}
-	
+
 	int32 selectionStart = 0;
 	int32 selectionEnd = 0;
 	message->FindInt32("be:selection", 0, &selectionStart);
 	message->FindInt32("be:selection", 1, &selectionEnd);
-	
+
 	fInline->SetSelectionOffset(selectionStart);
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
-	
+
 	// Insert the new text
 	InsertText(string, stringLen, fSelStart, NULL);
 	fSelStart += stringLen;
 	fClickOffset = fSelEnd = fSelStart;
-	
-	if (!fInline->IsActive())
+
+	if (!confirmed && !fInline->IsActive())
 		fInline->SetActive(true);
 
 	Refresh(fInline->Offset(), fSelEnd, true, false);
