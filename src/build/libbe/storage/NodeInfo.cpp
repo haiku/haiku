@@ -643,7 +643,7 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 						type.SetTo(B_FILE_MIME_TYPE);
 				} else if (S_ISDIR(stat.st_mode)) {
 					// it's either a volume or just a standard directory
-					fs_info info;
+//					fs_info info;
 // 					if (fs_stat_dev(stat.st_dev, &info) == 0 && stat.st_ino == info.root)
 // 						type.SetTo(B_VOLUME_MIME_TYPE);
 // 					else
