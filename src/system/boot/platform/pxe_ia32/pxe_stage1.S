@@ -25,13 +25,22 @@
 .equ PXENV_PACKET_TYPE_DHCP_ACK,		2
 .equ PXENV_PACKET_TYPE_CACHED_REPLY,	3
 
+
+// memory map:
+// 0x00000 - 0x07bff		real mode IDT, stack
+// 0x07C00 - 0x08FFF		pxehaiku (stage 1, this)
+// 0x09000 - 0x0FFFF		scratchbuffer
+// 0x10000 - 0x8CFFF		pxe-haiku-loader (stage 2)
+// 0x8D000 - 0x9F7FF		PXE and UNDI code and data segments
+// 0x9F800 - 0xA0000		extended BIOS data area
+
 .equ scratchbuffer_addr,		0x9000
 .equ scratchbuffer_addr_seg,	(scratchbuffer_addr / 16)
 .equ scratchbuffer_addr_ofs,	(scratchbuffer_addr % 16)
 .equ scratchbuffer_size,		0x7000
 
 .equ load_addr,					0x10000
-.equ load_size_max,				0x80000
+.equ load_size_max,				(0x8D000 - load_addr)
 
 .code16
 .text
