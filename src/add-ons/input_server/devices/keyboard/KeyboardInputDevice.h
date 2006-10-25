@@ -10,6 +10,7 @@
 #include "TMWindow.h"
 #include "kb_mouse_settings.h"
 
+#include <Handler.h>
 #include <InputServerDevice.h>
 #include <List.h>
 
@@ -18,10 +19,14 @@
 
 class KeyboardInputDevice;
 
-struct keyboard_device {
+struct keyboard_device : public BHandler {
 	keyboard_device(const char *path);
-	~keyboard_device();	
-	
+	virtual ~keyboard_device();	
+
+	virtual void MessageReceived(BMessage* message);
+	status_t EnqueueInlineInputMethod(int32 opcode, const char* string = NULL,
+		bool confirmed = false, BMessage* keyDown = NULL);
+
 	KeyboardInputDevice *owner;
 	input_device_ref device_ref;
 	char path[B_PATH_NAME_LENGTH];
@@ -30,6 +35,7 @@ struct keyboard_device {
 	kb_settings settings;
 	volatile bool active;
 	bool isAT;
+	volatile bool input_method_started;
 	uint32 modifiers;
 };
 
@@ -60,9 +66,6 @@ class KeyboardInputDevice : public BInputServerDevice {
 
 		status_t _AddDevice(const char *path);
 		status_t _RemoveDevice(const char *path);
-
-		status_t _EnqueueInlineInputMethod(int32 opcode, const char* string = NULL,
-			bool confirmed = false, BMessage* keyDown = NULL);
 
 		static int32 _DeviceWatcher(void *arg);
 

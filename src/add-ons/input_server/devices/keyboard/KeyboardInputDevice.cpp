@@ -364,7 +364,8 @@ get_short_name(const char *longName)
 
 
 KeyboardInputDevice::KeyboardInputDevice()
-	: fTMWindow(NULL)
+	:
+	fTMWindow(NULL)
 {
 #if DEBUG
 	if (sLogFile == NULL)
@@ -523,7 +524,7 @@ KeyboardInputDevice::Control(const char *name, void *cookie,
 }
 
 
-status_t 
+status_t
 KeyboardInputDevice::_HandleMonitor(BMessage *message)
 {
 	CALLED();
@@ -572,11 +573,7 @@ KeyboardInputDevice::_AddDevice(const char *path)
 	if (device == NULL)
 		return B_NO_MEMORY;
 
-	device->fd = -1;
-	device->device_watcher = -1;
-	device->active = false;
 	device->owner = this;
-	device->isAT = strstr(device->path, "keyboard/at") != NULL;
 
 	input_device_ref *devices[2];
 	devices[0] = &device->device_ref;
@@ -611,36 +608,6 @@ KeyboardInputDevice::_RemoveDevice(const char *path)
 }
 
 
-status_t
-KeyboardInputDevice::_EnqueueInlineInputMethod(int32 opcode,
-	const char* string, bool confirmed, BMessage* keyDown)
-{
-	BMessage* message = new BMessage(B_INPUT_METHOD_EVENT);
-	if (message == NULL)
-		return B_NO_MEMORY;
-
-	message->AddInt32("be:opcode", opcode);
-	message->AddBool("be:inline_only", true);
-
-	if (string != NULL)
-		message->AddString("be:string", string);
-	if (confirmed)
-		message->AddBool("be:confirmed", true);
-	if (keyDown)
-		message->AddMessage("be:translated", keyDown);
-	if (opcode == B_INPUT_METHOD_STARTED) {
-		message->AddMessenger("be:reply_to", be_app_messenger);
-			// we don't really need a real messenger; be_app must be enough
-	}
-
-	status_t status = EnqueueMessage(message);
-	if (status != B_OK)
-		delete message;
-
-	return status;
-}
-
-
 /*static*/ int32
 KeyboardInputDevice::_DeviceWatcher(void *arg)
 {
@@ -652,7 +619,6 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 	Keymap* keymap = &owner->fKeymap;
 	uint32 lastKeyCode = 0;
 	uint32 repeatCount = 1;
-	bool inlineStarted = false;
 	uint8 states[16];
 
 	memset(states, 0, sizeof(states));
@@ -808,28 +774,29 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 
 			delete[] rawString;
 
-			if (isKeyDown && !modifiers && activeDeadKey != 0 && inlineStarted) {
+			if (isKeyDown && !modifiers && activeDeadKey != 0
+				&& device->input_method_started) {
 				// a dead key was completed
-				owner->_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED, string, true,
-					msg);
+				device->EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED,
+					string, true, msg);
 			} else if (owner->EnqueueMessage(msg) != B_OK)
 				delete msg;
 		} else if (isKeyDown) {
 			// start of a dead key
-			if (owner->_EnqueueInlineInputMethod(B_INPUT_METHOD_STARTED) == B_OK) {
+			if (device->EnqueueInlineInputMethod(B_INPUT_METHOD_STARTED) == B_OK) {
 				char *string = NULL;
 				int32 numBytes = 0;
 				keymap->GetChars(keycode, device->modifiers, 0, &string, &numBytes);
 
-				if (owner->_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED, string) == B_OK)
-					inlineStarted = true;
+				if (device->EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED, string) == B_OK)
+					device->input_method_started = true;
 			}
 		}
 
 		if (!isKeyDown && !modifiers) {
 			if (activeDeadKey != 0) {
-				owner->_EnqueueInlineInputMethod(B_INPUT_METHOD_STOPPED);
-				inlineStarted = false;
+				device->EnqueueInlineInputMethod(B_INPUT_METHOD_STOPPED);
+				device->input_method_started = false;
 			}
 
 			activeDeadKey = newDeadKey;
@@ -883,17 +850,79 @@ KeyboardInputDevice::_SetLeds(keyboard_device *device)
 
 
 keyboard_device::keyboard_device(const char *path)
+	: BHandler("keyboard device"),
+	owner(NULL),
+	fd(-1),
+	device_watcher(-1),
+	active(false),
+	input_method_started(false)
 {
-	// todo: initialize other members
 	strcpy(this->path, path);
 	device_ref.name = get_short_name(path);
 	device_ref.type = B_KEYBOARD_DEVICE;
 	device_ref.cookie = this;
+
+	isAT = strstr(path, "keyboard/at") != NULL;
+
+	if (be_app->Lock()) {
+		be_app->AddHandler(this);
+		be_app->Unlock();
+	}
 }
 
 
 keyboard_device::~keyboard_device()
 {
 	free(device_ref.name);
+
+	if (be_app->Lock()) {
+		be_app->RemoveHandler(this);
+		be_app->Unlock();
+	}
+}
+
+
+status_t
+keyboard_device::EnqueueInlineInputMethod(int32 opcode,
+	const char* string, bool confirmed, BMessage* keyDown)
+{
+	BMessage* message = new BMessage(B_INPUT_METHOD_EVENT);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	message->AddInt32("be:opcode", opcode);
+	message->AddBool("be:inline_only", true);
+
+	if (string != NULL)
+		message->AddString("be:string", string);
+	if (confirmed)
+		message->AddBool("be:confirmed", true);
+	if (keyDown)
+		message->AddMessage("be:translated", keyDown);
+	if (opcode == B_INPUT_METHOD_STARTED)
+		message->AddMessenger("be:reply_to", this);
+
+	status_t status = owner->EnqueueMessage(message);
+	if (status != B_OK)
+		delete message;
+
+	return status;
+}
+
+
+void
+keyboard_device::MessageReceived(BMessage *message)
+{
+	if (message->what != B_INPUT_METHOD_EVENT) {
+		BHandler::MessageReceived(message);
+		return;
+	}
+
+	int32 opcode;
+	if (message->FindInt32("be:opcode", &opcode) != B_OK)
+		return;
+
+	if (opcode == B_INPUT_METHOD_STOPPED)
+		input_method_started = false;
 }
 
