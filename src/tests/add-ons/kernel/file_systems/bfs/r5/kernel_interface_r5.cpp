@@ -1,6 +1,6 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 
@@ -967,13 +967,20 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 		node->gid = stat->st_gid;
 
 	if (mask & WSTAT_MTIME) {
-		// Index::UpdateLastModified() will set the new time in the inode
-		Index index(volume);
-		index.UpdateLastModified(&transaction, inode,
-			(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+		if (inode->IsDirectory()) {
+			// directory modification times are not part of the index
+			node->last_modified_time = HOST_ENDIAN_TO_BFS_INT64(
+				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+		} else if (!inode->IsDeleted()) {
+			// Index::UpdateLastModified() will set the new time in the inode
+			Index index(volume);
+			index.UpdateLastModified(&transaction, inode,
+				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+		}
 	}
 	if (mask & WSTAT_CRTIME) {
-		node->create_time = (bigtime_t)stat->st_crtime << INODE_TIME_SHIFT;
+		node->create_time = HOST_ENDIAN_TO_BFS_INT64(
+			(bigtime_t)stat->st_crtime << INODE_TIME_SHIFT);
 	}
 
 	if ((status = inode->WriteBack(&transaction)) == B_OK)

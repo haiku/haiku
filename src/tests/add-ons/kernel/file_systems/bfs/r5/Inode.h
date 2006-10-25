@@ -98,6 +98,8 @@ class Inode : public CachedBlock {
 		bool IsIndex() const { return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
 			// that's a stupid check, but AFAIK the only possible method...
 
+		bool IsDeleted() const { return (Flags() & INODE_DELETED) != 0; }
+
 		bool IsAttributeDirectory() const { return (Mode() & S_ATTR_DIR) != 0; }
 		bool IsAttribute() const { return Mode() & S_ATTR; }
 		bool IsFile() const { return (Mode() & (S_IFMT | S_ATTR)) == S_FILE; }
