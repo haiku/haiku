@@ -1202,6 +1202,14 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 	if (status < B_OK)
 		return status;
 
+	if (inode->IsSymLink() && (inode->Flags() & INODE_LONG_SYMLINK) == 0) {
+		// symlinks may not have a valid data stream
+		if (strlen(inode->Node().short_symlink) >= SHORT_SYMLINK_NAME_LENGTH)
+			return B_BAD_DATA;
+
+		return B_OK;
+	}
+
 	data_stream *data = &inode->Node().data;
 
 	// check the direct range
