@@ -850,6 +850,10 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 		strcpy(link->Node().short_symlink, path);
 	} else {
 		link->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_LONG_SYMLINK | INODE_LOGGED);
+		
+		// links usually don't have a file cache attached - but we now need one
+		link->SetFileCache(file_cache_create(volume->ID(), link->ID(), 0, volume->Device()));
+
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
 		status = link->WriteAt(transaction, 0, (const uint8 *)path, &length);
@@ -1359,7 +1363,7 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 	if (inode->Flags() & INODE_LONG_SYMLINK) {
 		// we also need space for the terminating null byte
 		if (inode->Size() >= bufferSize) {
-			*_bufferSize = inode->Size();
+			*_bufferSize = inode->Size() + 1;
 			return B_BUFFER_OVERFLOW;
 		}
 
@@ -1367,7 +1371,7 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
-		buffer[*_bufferSize] = '\0';
+		buffer[++*_bufferSize] = '\0';
 		return B_OK;
 	}
 
