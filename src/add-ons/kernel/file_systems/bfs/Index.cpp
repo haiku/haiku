@@ -1,6 +1,6 @@
 /* Index - index access functions
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -292,18 +292,23 @@ Index::RemoveName(Transaction &transaction, const char *name, Inode *inode)
 
 
 status_t
-Index::UpdateName(Transaction &transaction, const char *oldName, const char *newName, Inode *inode)
+Index::UpdateName(Transaction &transaction, const char *oldName,
+	const char *newName, Inode *inode)
 {
+	ASSERT(inode->IsRegularNode());
+
 	uint16 oldLength = oldName ? strlen(oldName) : 0;
 	uint16 newLength = newName ? strlen(newName) : 0;
-	return Update(transaction, "name", B_STRING_TYPE, (uint8 *)oldName, oldLength,
-		(uint8 *)newName, newLength, inode);
+	return Update(transaction, "name", B_STRING_TYPE, (uint8 *)oldName,
+		oldLength, (uint8 *)newName, newLength, inode);
 }
 
 
 status_t
 Index::InsertSize(Transaction &transaction, Inode *inode)
 {
+	ASSERT(inode->IsFile());
+
 	off_t size = inode->Size();
 	return Update(transaction, "size", B_INT64_TYPE, NULL, 0, (uint8 *)&size, sizeof(int64), inode);
 }
@@ -312,6 +317,8 @@ Index::InsertSize(Transaction &transaction, Inode *inode)
 status_t
 Index::RemoveSize(Transaction &transaction, Inode *inode)
 {
+	ASSERT(inode->IsFile());
+
 	// Inode::OldSize() is the size that's in the index
 	off_t size = inode->OldSize();
 	return Update(transaction, "size", B_INT64_TYPE, (uint8 *)&size, sizeof(int64), NULL, 0, inode);
@@ -321,6 +328,8 @@ Index::RemoveSize(Transaction &transaction, Inode *inode)
 status_t
 Index::UpdateSize(Transaction &transaction, Inode *inode)
 {
+	ASSERT(inode->IsFile());
+
 	off_t oldSize = inode->OldSize();
 	off_t newSize = inode->Size();
 
@@ -336,6 +345,8 @@ Index::UpdateSize(Transaction &transaction, Inode *inode)
 status_t
 Index::InsertLastModified(Transaction &transaction, Inode *inode)
 {
+	ASSERT(inode->IsFile() || inode->IsSymLink());
+
 	off_t modified = inode->LastModified();
 	return Update(transaction, "last_modified", B_INT64_TYPE, NULL, 0,
 		(uint8 *)&modified, sizeof(int64), inode);
@@ -345,6 +356,8 @@ Index::InsertLastModified(Transaction &transaction, Inode *inode)
 status_t
 Index::RemoveLastModified(Transaction &transaction, Inode *inode)
 {
+	ASSERT(inode->IsFile() || inode->IsSymLink());
+
 	// Inode::OldLastModified() is the value which is in the index
 	off_t modified = inode->OldLastModified();
 	return Update(transaction, "last_modified", B_INT64_TYPE, (uint8 *)&modified,
@@ -355,6 +368,8 @@ Index::RemoveLastModified(Transaction &transaction, Inode *inode)
 status_t
 Index::UpdateLastModified(Transaction &transaction, Inode *inode, off_t modified)
 {
+	ASSERT(inode->IsFile() || inode->IsSymLink());
+
 	off_t oldModified = inode->OldLastModified();
 	if (modified == -1)
 		modified = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
