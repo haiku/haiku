@@ -22,7 +22,6 @@ local bios_ia32_src =
 	bios.S
 	console.cpp
 	serial.cpp
-	devices.cpp
 	keyboard.cpp
 	menu.cpp
 	mmu.cpp
@@ -36,6 +35,9 @@ local bios_ia32_src =
 KernelMergeObject boot_platform_pxe_ia32.o :
 	pxe_stage2.S
 	smp_trampoline.S
+	devices.cpp
+	network.cpp
+	pxe_undi.cpp
 	$(bios_ia32_src)
 	
 	# generic
