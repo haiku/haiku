@@ -1541,28 +1541,43 @@ InputServer::_MethodizeEvents(EventList& events)
 
 			int32 opcode;
 			if (event->FindInt32("be:opcode", &opcode) == B_OK) {
-				if (fInputMethodWindow == NULL
-					&& opcode == B_INPUT_METHOD_STARTED)
-					fInputMethodWindow = new (nothrow) BottomlineWindow();
+				bool inlineOnly;
+				if (event->FindBool("be:inline_only", &inlineOnly) != B_OK)
+					inlineOnly = false;
 
-				if (fInputMethodWindow != NULL) {
-					EventList newEvents;
-					fInputMethodWindow->HandleInputMethodEvent(event, newEvents);
-
-					// replace event with new events (but don't scan them again
-					// for input method messages)
-					events.RemoveItemAt(i--);
-					delete event;
-					newCount--;
-
-					if (!newEvents.IsEmpty()) {
-						events.AddList(&newEvents);
-						opcode = B_INPUT_METHOD_STOPPED;
+				if (inlineOnly) {
+					BMessage translated;
+					bool confirmed;
+					if (opcode == B_INPUT_METHOD_CHANGED
+						&& event->FindBool("be:confirmed", &confirmed) == B_OK && confirmed
+						&& event->FindMessage("be:translated", &translated) == B_OK) {
+						// translate event for the non-aware view
+						*event = translated;
 					}
+				} else {
+					if (fInputMethodWindow == NULL
+						&& opcode == B_INPUT_METHOD_STARTED)
+						fInputMethodWindow = new (nothrow) BottomlineWindow();
 
-					if (opcode == B_INPUT_METHOD_STOPPED) {
-						fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
-						fInputMethodWindow = NULL;
+					if (fInputMethodWindow != NULL) {
+						EventList newEvents;
+						fInputMethodWindow->HandleInputMethodEvent(event, newEvents);
+
+						// replace event with new events (but don't scan them again
+						// for input method messages)
+						events.RemoveItemAt(i--);
+						delete event;
+						newCount--;
+
+						if (!newEvents.IsEmpty()) {
+							events.AddList(&newEvents);
+							opcode = B_INPUT_METHOD_STOPPED;
+						}
+
+						if (opcode == B_INPUT_METHOD_STOPPED) {
+							fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
+							fInputMethodWindow = NULL;
+						}
 					}
 				}
 			}
