@@ -4438,14 +4438,21 @@ BTextView::CancelInputMethod()
 {
 	if (!fInline)
 		return;
-	
+
 	BMessage message(B_INPUT_METHOD_EVENT);
 	message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
 	fInline->Method()->SendMessage(&message);
-	
+
+	// Delete the previously inserted text (if any)
+	if (fInline->IsActive()) {
+		int32 oldOffset = fInline->Offset();
+		DeleteText(oldOffset, oldOffset + fInline->Length());
+		fClickOffset = fSelStart = fSelEnd = oldOffset;
+	}
+
 	delete fInline;
 	fInline = NULL;
-	
+
 	if (Window())
 		Refresh(0, fText->Length(), true, false);
 }
