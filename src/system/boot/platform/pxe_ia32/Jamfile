@@ -9,7 +9,7 @@ UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 {
-	local defines = _BOOT_MODE ;
+	local defines = _BOOT_MODE _PXE_ENV ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
@@ -28,7 +28,6 @@ local bios_ia32_src =
 	mmu.cpp
 	cpu.cpp
 	smp.cpp
-	smp_trampoline.S
 	support.S
 	video.cpp
 	apm.cpp
@@ -36,6 +35,7 @@ local bios_ia32_src =
 
 KernelMergeObject boot_platform_pxe_ia32.o :
 	pxe_stage2.S
+	smp_trampoline.S
 	$(bios_ia32_src)
 	
 	# generic

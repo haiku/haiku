@@ -396,8 +396,13 @@ smp_boot_other_cpus(void)
 
 	// allocate a stack and a code area for the smp trampoline
 	// (these have to be < 1M physical, 0xa0000-0xfffff is reserved by the BIOS)
+#ifdef _PXE_ENV
+	trampolineCode = 0x8b000;
+	trampolineStack = 0x8c000;
+#else
 	trampolineCode = 0x9f000;
 	trampolineStack = 0x9e000;
+#endif
 
 	// copy the trampoline code over
 	memcpy((char *)trampolineCode, (const void*)&smp_trampoline,

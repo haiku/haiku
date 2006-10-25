@@ -59,6 +59,23 @@ struct extended_memory {
 	uint32 type;
 };
 
+#ifdef _PXE_ENV
+
+static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
+static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
+static const uint32 kPageTableRegionEnd = 0x110000;
+
+// working page directory and page table
+static uint32 *sPageDirectory = 0;
+
+static addr_t sNextPhysicalAddress = 0x110000;
+static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
+static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
+
+static addr_t sNextPageTableAddress = 0x100000;
+
+#else
+
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
 static const uint32 kPageTableRegionEnd = 0x9e000;
@@ -72,6 +89,8 @@ static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 
 static addr_t sNextPageTableAddress = 0x90000;
+
+#endif
 
 
 static addr_t
@@ -266,7 +285,7 @@ init_page_directory(void)
 	// These page tables won't be taken over into the kernel.
 
 	// make the first page table at the first free spot
-	uint32 *pageTable = get_next_page_table();;
+	uint32 *pageTable = get_next_page_table();
 
 	for (int32 i = 0; i < 1024; i++) {
 		pageTable[i] = (i * 0x1000) | kDefaultPageFlags;
@@ -275,7 +294,7 @@ init_page_directory(void)
 	sPageDirectory[0] = (uint32)pageTable | kDefaultPageFlags;
 
 	// make the second page table
-	pageTable = get_next_page_table();;
+	pageTable = get_next_page_table();
 
 	for (int32 i = 0; i < 1024; i++) {
 		pageTable[i] = (i * 0x1000 + 0x400000) | kDefaultPageFlags;

@@ -3,14 +3,14 @@
 ** Distributed under the terms of the NewOS License.
 */
 // expects a stack page like this:
-// (stack has to be at (0x9e000)
-//	0x9effc            : final esp
-//  0x9eff8            : page dir
+// (stack has to be at (0x8c000)
+//	0x8cffc            : final esp
+//  0x8cff8            : page dir
 //
-//  0x9e000 - 0x9e006  : gdt descriptor
-//	0x9e008 - 0x9e020  : gdt
+//  0x8c000 - 0x8c006  : gdt descriptor
+//	0x8c008 - 0x8c020  : gdt
 //
-// smp_trampoline must be located at 0x9f000
+// smp_trampoline must be located at 0x8b000
 .globl smp_trampoline
 .globl smp_trampoline_end
 .globl foo
@@ -19,11 +19,11 @@
 smp_trampoline:
 	cli
 	
-	mov    $0x9e00,%ax
+	mov    $0x8c00,%ax
 	mov    %ax,%ds
 
-//	lgdt   0x9e000          # load the gdt
-.byte 0x66, 0x0f, 0x01, 0x15, 0x00, 0xe0, 0x09, 0x00
+//	lgdt   0x8c000          # load the gdt
+.byte 0x66, 0x0f, 0x01, 0x15, 0x00, 0xc0, 0x08, 0x00
 
 	movl   %cr0,%eax
 	orl    $0x01,%eax
@@ -32,7 +32,7 @@ smp_trampoline:
 .code32
 _trampoline_32:
 	.byte 0x66
-	ljmp   $0x08,$(trampoline_32 - smp_trampoline + 0x9f000)
+	ljmp   $0x08,$(trampoline_32 - smp_trampoline + 0x8b000)
 trampoline_32:
 	mov    $0x10, %ax
 	mov    %ax, %ds
@@ -41,7 +41,7 @@ trampoline_32:
 	mov    %ax, %gs
 	mov    %ax, %ss
 
-	movl   $0x9eff8,%esp    # set up the stack pointer
+	movl   $0x8cff8,%esp    # set up the stack pointer
 
 	popl   %eax             # get the page dir
 	movl   %eax,%cr3        # set the page dir

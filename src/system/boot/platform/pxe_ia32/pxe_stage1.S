@@ -30,7 +30,8 @@
 // 0x00000 - 0x07bff		real mode IDT, stack
 // 0x07C00 - 0x08FFF		pxehaiku (stage 1, this)
 // 0x09000 - 0x0FFFF		scratchbuffer
-// 0x10000 - 0x8CFFF		pxe-haiku-loader (stage 2)
+// 0x10000 - 0x8AFFF		pxe-haiku-loader (stage 2)
+// 0x8B000 - 0x8CFFF		used by stage2 trampoline code
 // 0x8D000 - 0x9F7FF		PXE and UNDI code and data segments
 // 0x9F800 - 0xA0000		extended BIOS data area
 
@@ -40,7 +41,7 @@
 .equ scratchbuffer_size,		0x7000
 
 .equ load_addr,					0x10000
-.equ load_size_max,				(0x8D000 - load_addr)
+.equ load_size_max,				(0x8B000 - load_addr)
 
 .code16
 .text
