@@ -661,7 +661,7 @@ vm_page_allocate_page(int page_state)
 	if (p == NULL) {
 #ifdef DEBUG
 		if (q->count != 0)
-			panic("queue %p corrupted, count = %ld\n", q, q->count);
+			panic("queue %p corrupted, count = %d\n", q, q->count);
 #endif
 
 		// if the primary queue was empty, grap the page from the
@@ -670,7 +670,7 @@ vm_page_allocate_page(int page_state)
 		if (p == NULL) {
 #ifdef DEBUG
 			if (q_other->count != 0)
-				panic("other queue %p corrupted, count = %ld\n", q_other, q_other->count);
+				panic("other queue %p corrupted, count = %d\n", q_other, q_other->count);
 #endif
 
 			// ToDo: issue "someone" to free up some pages for us, and go into wait state until that's done
