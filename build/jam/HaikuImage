@@ -43,7 +43,7 @@ BEOS_APPS = Terminal Expander People ShowImage Clock Pulse ProcessController
 BEOS_PREFERENCES = Backgrounds DataTranslations E-mail FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Printers Screen ScreenSaver Sounds Time VirtualMemory
 ;
-BEOS_DEMOS = BitmapDrawing Chart $(X86_ONLY)GLTeapot Playground
+BEOS_DEMOS = BitmapDrawing Chart $(X86_ONLY)GLTeapot PictureTest Playground
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
