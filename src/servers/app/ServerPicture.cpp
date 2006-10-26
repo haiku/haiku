@@ -42,7 +42,7 @@ stroke_line(ViewLayer *view, BPoint start, BPoint end)
 {
 	view->ConvertToScreenForDrawing(&start);
 	view->ConvertToScreenForDrawing(&end);	
-	view->Window()->GetDrawingEngine()->StrokeLine(start, end, view->CurrentState()->HighColor());
+	view->Window()->GetDrawingEngine()->StrokeLine(start, end, view->CurrentState());
 }
 
 
@@ -50,7 +50,7 @@ static void
 stroke_rect(ViewLayer *view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);	
-	view->Window()->GetDrawingEngine()->StrokeRect(rect, view->CurrentState()->HighColor());
+	view->Window()->GetDrawingEngine()->StrokeRect(rect, view->CurrentState());
 }
 
 
@@ -58,7 +58,7 @@ static void
 fill_rect(ViewLayer *view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);			
-	view->Window()->GetDrawingEngine()->FillRect(rect, view->CurrentState()->HighColor());
+	view->Window()->GetDrawingEngine()->FillRect(rect, view->CurrentState());
 }
 
 
@@ -667,6 +667,10 @@ ServerPicture::SyncState(ViewLayer *view)
 
 	BeginOp(B_PIC_SET_PEN_SIZE);
 	AddFloat(view->CurrentState()->PenSize());
+	EndOp();
+
+	BeginOp(B_PIC_SET_SCALE);
+	AddFloat(view->CurrentState()->Scale());
 	EndOp();
 
 	BeginOp(B_PIC_SET_LINE_MODE);

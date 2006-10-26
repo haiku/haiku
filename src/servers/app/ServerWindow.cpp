@@ -1809,16 +1809,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
 			break;
 		}
-		case AS_SETPENSIZE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n", Title()));
-
-			float size;
-			link.Read<float>(&size);
-
-			fCurrentLayer->CurrentState()->SetPenSize(size);
-			break;
-		}
 		case AS_SET_FONT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n", Title()));
@@ -2383,6 +2373,16 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&penSize);
 			picture->BeginOp(B_PIC_SET_PEN_SIZE);
 			picture->AddFloat(penSize);
+			picture->EndOp();
+			break;
+		}
+
+		case AS_LAYER_SET_SCALE:
+		{
+			float scale;
+			link.Read<float>(&scale);
+			picture->BeginOp(B_PIC_SET_SCALE);
+			picture->AddFloat(scale);
 			picture->EndOp();
 			break;
 		}
