@@ -1797,17 +1797,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			fCurrentLayer->CurrentState()->SetPattern(Pattern(pat));
 			break;
-		}	
-		case AS_MOVEPENTO:
-		{
-			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n", Title()));
-
-			float x,y;
-			link.Read<float>(&x);
-			link.Read<float>(&y);
-
-			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
-			break;
 		}
 		case AS_SET_FONT:
 		{
