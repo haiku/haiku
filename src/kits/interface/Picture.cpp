@@ -18,7 +18,6 @@
 #include <PicturePlayer.h>
 #include <ServerProtocol.h>
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +42,7 @@ struct _BPictureExtent_ {
 	
 	int32 CountPictures() const { return fPictures.CountItems(); }
 	BList &Pictures() { return fPictures; }
-	
+
 private:
 	void	*fNewData;
 	int32	fNewSize;
@@ -297,7 +296,7 @@ status_t
 BPicture::Unflatten(BDataIO *stream)
 {
 	picture_header header;
-	if (stream->Read(&header, sizeof(header)) < sizeof(header)
+	if (stream->Read(&header, sizeof(header)) < (ssize_t)sizeof(header)
 		|| header.magic1 != 2 || header.magic2 != 0)
 		return B_ERROR;
 
