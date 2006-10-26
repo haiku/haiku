@@ -1106,6 +1106,7 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x039210de: /* Nvidia GeForce 7600 GS */
+	case 0x02e110de:
 		si->ps.card_type = G73;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 7600 GS");
