@@ -28,16 +28,9 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
 #ifndef _JPEGTRANSLATOR_H_
 #define _JPEGTRANSLATOR_H_
 
-
-//----------------------------------------------------------------------------
-//
-//	Include
-//
-//----------------------------------------------------------------------------
 
 #include <Alert.h>
 #include <Application.h>
@@ -83,9 +76,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define	VIEW_LABEL_SHOWREADERRORBOX "Show warning messages"
 
 
-//---------------------------------------------------
-//	Settings storage structure
-//---------------------------------------------------
+//!	Settings storage structure
 struct jpeg_settings {
 	// compression
 	uchar	Smoothing;			// default: 0
@@ -100,119 +91,110 @@ struct jpeg_settings {
 	bool	ShowReadWarningBox;	// default: true
 };
 
-//---------------------------------------------------
-//	Slider used in TranslatorView
-//	With status showing actual value
-//---------------------------------------------------
+
+/*!
+	Slider used in TranslatorView
+	With status showing actual value
+*/
 class SSlider : public BSlider {
 	public:
-							SSlider(BRect frame, const char *name, const char *label, BMessage *message, int32 minValue, int32 maxValue, orientation posture = B_HORIZONTAL, thumb_style thumbType = B_BLOCK_THUMB, uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
-		char*				UpdateText() const;
-		void				ResizeToPreferred();
+				SSlider(BRect frame, const char *name, const char *label,
+					BMessage *message, int32 minValue, int32 maxValue,
+					orientation posture = B_HORIZONTAL,
+					thumb_style thumbType = B_BLOCK_THUMB,
+					uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+					uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
+		char*	UpdateText() const;
+		void	ResizeToPreferred();
 
 	private:
-		char				statusLabel[12];
+		mutable char fStatusLabel[12];
 };
 
 
-//---------------------------------------------------
-//	Basic view class with resizing to needed size
-//---------------------------------------------------
+//!	Basic view class with resizing to needed size
 class SView : public BView {
 	public:
-							SView(const char *name, float x = 0, float y = 0)
-								:BView( BRect(x,y,x,y), name, B_FOLLOW_NONE, B_WILL_DRAW)
-								{
-									preferredWidth = 0;
-									preferredHeight = 0;
-									SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR));
-									SetFont(be_plain_font);
-								};
-		void				GetPreferredSize(float *width, float *height)
-								{
-									*width = preferredWidth;
-									*height = preferredHeight;
-								}
-		inline float		GetPreferredWidth() { return preferredWidth; };
-		inline float		GetPreferredHeight() { return preferredHeight; };
-		inline void			ResizePreferredBy(float width, float height) { preferredWidth += width; preferredHeight += height; };
-		inline void			ResizeToPreferred() { ResizeTo(preferredWidth, preferredHeight); };
-		void				AddChild(BView *child, BView *before = NULL)
-								{
-									BView::AddChild(child, before);
-									child->ResizeToPreferred();
-									BRect frame = child->Frame();
-									if (frame.right > preferredWidth)
-										preferredWidth = frame.right;
-									if (frame.bottom > preferredHeight)
-										preferredHeight = frame.bottom;
-								}
+		SView(const char* name, float x = 0, float y = 0);
+
+		virtual void	GetPreferredSize(float* _width, float* _height);
+		virtual void	ResizeToPreferred();
+
+		void			AddChild(BView* child, BView* before = NULL);
+
+		float			GetPreferredWidth()
+							{ return fPreferredWidth; }
+		float			GetPreferredHeight()
+							{ return fPreferredHeight; }
+		void			ResizePreferredBy(float width, float height);
 
 	private:
-		float				preferredWidth;
-		float				preferredHeight;
+		float			fPreferredWidth;
+		float			fPreferredHeight;
 };
 
-//---------------------------------------------------
-//	Configuration view for reading settings
-//---------------------------------------------------
+
+//!	Configuration view for reading settings
 class TranslatorReadView : public SView {
 	public:
-							TranslatorReadView(const char *name, jpeg_settings *settings, float x = 0, float y = 0);
-		void				AttachedToWindow();
-		void				MessageReceived(BMessage *message);
+		TranslatorReadView(const char* name, jpeg_settings* settings,
+			float x = 0, float y = 0);
+
+		virtual void	AttachedToWindow();
+		virtual void	MessageReceived(BMessage* message);
 
 	private:
-		jpeg_settings		*fSettings;
-		BCheckBox			*alwaysrgb32;
-		BCheckBox			*photoshopCMYK;
-		BCheckBox			*showerrorbox;
+		jpeg_settings*	fSettings;
+		BCheckBox*		fAlwaysRGB32;
+		BCheckBox*		fPhotoshopCMYK;
+		BCheckBox*		fShowErrorBox;
 };
 
-//---------------------------------------------------
-//	Configuration view for writing settings
-//---------------------------------------------------
+
+//	!Configuration view for writing settings
 class TranslatorWriteView : public SView {
 	public:
-							TranslatorWriteView(const char *name, jpeg_settings *settings, float x = 0, float y = 0);
-		void				AttachedToWindow();
-		void				MessageReceived(BMessage *message);
+		TranslatorWriteView(const char* name, jpeg_settings* settings,
+			float x = 0, float y = 0);
+
+		virtual void	AttachedToWindow();
+		virtual void	MessageReceived(BMessage* message);
 
 	private:
-		jpeg_settings			*fSettings;
-		SSlider				*quality;
-		SSlider				*smoothing;
-		BCheckBox			*progress;
-		BCheckBox			*optimizecolors;
-		BCheckBox			*smallerfile;
-		BCheckBox			*gray1asrgb24;
+		jpeg_settings*	fSettings;
+		SSlider*		fQualitySlider;
+		SSlider*		fSmoothingSlider;
+		BCheckBox*		fProgress;
+		BCheckBox*		fOptimizeColors;
+		BCheckBox*		fSmallerFile;
+		BCheckBox*		fGrayAsRGB24;
 };
 
-//---------------------------------------------------
-//	About view
-//---------------------------------------------------
+
 class TranslatorAboutView : public SView {
 	public:
-							TranslatorAboutView(const char *name, float x = 0, float y = 0);
+		TranslatorAboutView(const char* name, float x = 0, float y = 0);
 };
 
-//---------------------------------------------------
-//	Configuration view
-//---------------------------------------------------
+
+//!	Configuration view
 class TranslatorView : public SView {
 	public:
-							TranslatorView(const char *name);
-							~TranslatorView();
+		TranslatorView(const char *name);
+		virtual ~TranslatorView();
 
-		void				AttachedToWindow();
-		void				Draw(BRect updateRect);
-		void				MouseDown(BPoint where);
+		virtual void	AttachedToWindow();
+		virtual void	Draw(BRect updateRect);
+		virtual void	MouseDown(BPoint where);
 
 	private:
-		jpeg_settings		fSettings;
-		int32				fTabWidth;
-		int32				fTabHeight;
-		int32				fActiveChild;
+		BRect			_TabFrame(int32 index) const;
+
+		jpeg_settings	fSettings;
+		BList			fTabs;
+		int32			fTabWidth;
+		int32			fTabHeight;
+		int32			fActiveChild;
 };
 
 //---------------------------------------------------
