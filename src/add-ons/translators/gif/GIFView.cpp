@@ -37,12 +37,13 @@ GIFView::GIFView(BRect rect, const char *name)
 	
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
-	BRect r(10, 15, 10 + be_bold_font->StringWidth(translatorName), 15 + fh.ascent + fh.descent);
-	
+	BRect r(10, 15, 10 + be_bold_font->StringWidth(translatorName),
+		15 + fh.ascent + fh.descent);
+
 	BStringView *title = new BStringView(r, "Title", translatorName);
 	title->SetFont(be_bold_font);
 	AddChild(title);
-	
+
 	char version_string[100];
 	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8), (int)((translatorVersion >> 4) & 0xf),
 		(int)(translatorVersion & 0xf), __DATE__);
@@ -50,24 +51,22 @@ GIFView::GIFView(BRect rect, const char *name)
 	r.bottom = r.top + fh.ascent + fh.descent;
 	r.left = r.right + 2.0 * r.Height();
 	r.right = r.left + be_plain_font->StringWidth(version_string);
-	
+
 	BStringView *version = new BStringView(r, "Version", version_string);
 	version->SetFont(be_plain_font);
 	AddChild(version);
 
-	BFont small(be_plain_font);
-	small.SetSize(max_c(7.0, small.Size() * 0.7));
-	const char *copyright_string = "© 2003 Daniel Switkin, software@switkin.com";
+	const char *copyrightString = "©2003 Daniel Switkin, software@switkin.com";
 	r.top = r.bottom + 5;
 	r.left = 10;
 	r.bottom = r.top + fh.ascent + fh.descent;
 	r.right = rect.right - 10;
-	
-	BStringView *copyright = new BStringView(r, "Copyright", copyright_string);
-	copyright->SetFont(&small);
+
+	BStringView *copyright = new BStringView(r, "Copyright", copyrightString);
+	copyright->ResizeToPreferred();
 	AddChild(copyright);
 
-	//menu fields (Palette & Colors)
+	// menu fields (Palette & Colors)
 	fWebSafeMI = new BMenuItem("Websafe", new BMessage(GV_WEB_SAFE), 0, 0);
 	fBeOSSystemMI = new BMenuItem("BeOS System", new BMessage(GV_BEOS_SYSTEM), 0, 0);
 	fGreyScaleMI = new BMenuItem("Greyscale", new BMessage(GV_GREYSCALE), 0, 0);
@@ -91,7 +90,7 @@ GIFView::GIFView(BRect rect, const char *name)
 	}
 	fColorCount256MI = fColorCountMI[7];
 	
-	r.top = r.bottom + 5;
+	r.top = r.bottom + 14;
 	r.bottom = r.top + 24;
 	fPaletteMF = new BMenuField(r, "PaletteMenuField", "Palette",
 		fPaletteM, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
@@ -102,7 +101,7 @@ GIFView::GIFView(BRect rect, const char *name)
 	fColorCountMF = new BMenuField(r, "ColorCountMenuField", "Colors",
 		fColorCountM, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(fColorCountMF);
-	
+
 	// align menu fields
 	float maxLabelWidth = ceilf(max_c(be_plain_font->StringWidth("Colors"),
 									  be_plain_font->StringWidth("Palette")));
@@ -168,7 +167,7 @@ GIFView::GIFView(BRect rect, const char *name)
 	BTextView *tr = fTransparentRedTC->TextView();
 	BTextView *tg = fTransparentGreenTC->TextView();
 	BTextView *tb = fTransparentBlueTC->TextView();
-	
+
 	for (uint32 x = 0; x < 256; x++) {
 		if (x < '0' || x > '9') {
 			tr->DisallowChar(x);
@@ -176,17 +175,20 @@ GIFView::GIFView(BRect rect, const char *name)
 			tb->DisallowChar(x);
 		}
 	}
-	
+
 	RestorePrefs();
+
+	if (copyright->Frame().right + 10 > Bounds().Width())
+		ResizeTo(copyright->Frame().right + 10, Bounds().Height());
 }
 
-// destructor
+
 GIFView::~GIFView()
 {
 	delete fPrefs;
 }
 
-// RestorePrefs
+
 void
 GIFView::RestorePrefs()
 {
