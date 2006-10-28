@@ -39,7 +39,8 @@ const uint32 kMsgSelectedTranslator = 'trsl';
 
 DataTranslationsWindow::DataTranslationsWindow()
 	: BWindow(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
-		"DataTranslations", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+		"DataTranslations", B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	MoveTo(dynamic_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
