@@ -221,7 +221,7 @@ BTab::DrawLabel(BView *owner, BRect frame)
 	if (label == NULL)
 		return;
 
-	owner->SetHighColor(0, 0, 0);
+	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 	float width = owner->StringWidth(label);
 	// TODO: remove offset
 	float offset = frame.Height() / 2.0;
@@ -668,10 +668,11 @@ BTabView::Draw(BRect updateRect)
 BRect
 BTabView::DrawTabs()
 {
-	for (int32 i = 0; i < CountTabs(); i++)
+	for (int32 i = 0; i < CountTabs(); i++) {
 		TabAt(i)->DrawTab(this, TabFrame(i),
 			i == fSelection ? B_TAB_FRONT : (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			i + 1 != fSelection);
+	}
 
 	if (fSelection < CountTabs())
 		return TabFrame(fSelection);

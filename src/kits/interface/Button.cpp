@@ -427,7 +427,7 @@ BButton::Draw(BRect updateRect)
 						255 - buttonBgColor.green,
 						255 - buttonBgColor.blue);
 		} else {
-			SetHighColor(maxShadowColor);	
+			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 			SetLowColor(buttonBgColor);
 		}
 	} else {
