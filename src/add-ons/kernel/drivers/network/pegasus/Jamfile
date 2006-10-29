@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network pegasus ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+KernelAddon pegasus :
+	driver.c
+	devlist.c
+	if_aue.c
+	;
+
+# driver.c currently needs usbdevs.h so we make its path available and adds dependency
+ObjectHdrs [ FGristFiles driver$(SUFOBJ) if_aue$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) preferences devices ] ;
+Includes [ FGristFiles driver.c if_aue.c ] : <src!preferences!devices>usbdevs.h ;

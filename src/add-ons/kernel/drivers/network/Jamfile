@@ -9,6 +9,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8169 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipw2100 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network etherpci ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network pegasus ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
