@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src apps powerstatus ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared ;
+
+Application PowerStatus :
+	PowerStatusWindow.cpp
+	PowerStatusView.cpp
+	PowerStatus.cpp
+	: be
+	: PowerStatus.rdef
+	;
