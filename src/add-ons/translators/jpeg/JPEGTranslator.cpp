@@ -445,7 +445,7 @@ SView::ResizePreferredBy(float width, float height)
 
 
 void
-SView::AddChild(BView *child, BView *before = NULL)
+SView::AddChild(BView *child, BView *before)
 {
 	BView::AddChild(child, before);
 	child->ResizeToPreferred();
