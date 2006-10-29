@@ -1518,7 +1518,7 @@ InputServer::_MethodizeEvents(EventList& events)
 	for (int32 i = 0; i < count;) {
 		_FilterEvent(fActiveMethod, events, i, count);
 	}
-	
+
 	{
 		// move the method events into the event queue - they are not
 		// "methodized" either
@@ -1526,11 +1526,13 @@ InputServer::_MethodizeEvents(EventList& events)
 		events.AddList(&fMethodQueue);
 		fMethodQueue.MakeEmpty();
 	}
-	
-	int32 newCount = events.CountItems();
 
 	if (!fInputMethodAware) {
 		// special handling for non-input-method-aware views
+
+		int32 newCount = events.CountItems();
+			// we may add new events in this loop that don't need to be checked again
+
 		for (int32 i = 0; i < newCount; i++) {
 			BMessage* event = events.ItemAt(i);
 
@@ -1538,6 +1540,8 @@ InputServer::_MethodizeEvents(EventList& events)
 				continue;
 
 			SERIAL_PRINT(("IME received\n"));
+
+			bool removeEvent = true;
 
 			int32 opcode;
 			if (event->FindInt32("be:opcode", &opcode) == B_OK) {
@@ -1553,6 +1557,7 @@ InputServer::_MethodizeEvents(EventList& events)
 						&& event->FindMessage("be:translated", &translated) == B_OK) {
 						// translate event for the non-aware view
 						*event = translated;
+						removeEvent = false;
 					}
 				} else {
 					if (fInputMethodWindow == NULL
@@ -1562,12 +1567,6 @@ InputServer::_MethodizeEvents(EventList& events)
 					if (fInputMethodWindow != NULL) {
 						EventList newEvents;
 						fInputMethodWindow->HandleInputMethodEvent(event, newEvents);
-
-						// replace event with new events (but don't scan them again
-						// for input method messages)
-						events.RemoveItemAt(i--);
-						delete event;
-						newCount--;
 
 						if (!newEvents.IsEmpty()) {
 							events.AddList(&newEvents);
@@ -1580,6 +1579,13 @@ InputServer::_MethodizeEvents(EventList& events)
 						}
 					}
 				}
+			}
+
+			if (removeEvent) {
+				// the inline/bottom window has eaten the event
+				events.RemoveItemAt(i--);
+				delete event;
+				newCount--;
 			}
 		}
 	}
