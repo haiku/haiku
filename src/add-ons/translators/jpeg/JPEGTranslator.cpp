@@ -105,15 +105,14 @@ SaveSettings(jpeg_settings *settings)
 {
 	// Make path to settings file
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
-		path.SetTo(SETTINGS_PATH);
-		path.Append(SETTINGS_FILE);
-	} else
-		path.Append(SETTINGS_FILE);
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+		return;
+
+	path.Append(SETTINGS_FILE);
 
 	// Open settings file (create it if there's no file) and write settings			
 	FILE *file = NULL;
-	if ((file = fopen( path.Path(), "wb+"))) {
+	if ((file = fopen(path.Path(), "wb+"))) {
 		fwrite(settings, sizeof(jpeg_settings), 1, file);
 		fclose(file);
 	}
@@ -155,10 +154,11 @@ LoadSettings(jpeg_settings *settings)
 	// Make path to settings file
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
-		path.SetTo(SETTINGS_PATH);
-		path.Append(SETTINGS_FILE);
-	} else
-		path.Append(SETTINGS_FILE);
+		LoadDefaultSettings(settings);
+		return;
+	}
+
+	path.Append(SETTINGS_FILE);
 
 	// Open settings file (create it if there's no file) and write settings			
 	FILE *file = NULL;
@@ -485,7 +485,7 @@ SSlider::UpdateText() const
 void
 SSlider::ResizeToPreferred()
 {
-	int32 width = (int32)ceil(StringWidth( Label()) + StringWidth("9999"));
+	int32 width = (int32)ceil(StringWidth(Label()) + StringWidth("9999"));
 	if (width < 230)
 		width = 230;
 
@@ -503,7 +503,7 @@ TranslatorReadView::TranslatorReadView(const char *name, jpeg_settings *settings
 	: SView(name, x, y),
 	fSettings(settings)
 {
-	fAlwaysRGB32 = new BCheckBox( BRect(10, GetPreferredHeight(), 10,
+	fAlwaysRGB32 = new BCheckBox(BRect(10, GetPreferredHeight(), 10,
 		GetPreferredHeight()), "alwaysrgb32", VIEW_LABEL_ALWAYSRGB32,
 		new BMessage(VIEW_MSG_SET_ALWAYSRGB32));
 	fAlwaysRGB32->SetFont(be_plain_font);
@@ -512,7 +512,7 @@ TranslatorReadView::TranslatorReadView(const char *name, jpeg_settings *settings
 
 	AddChild(fAlwaysRGB32);
 
-	fPhotoshopCMYK = new BCheckBox( BRect(10, GetPreferredHeight(), 10,
+	fPhotoshopCMYK = new BCheckBox(BRect(10, GetPreferredHeight(), 10,
 		GetPreferredHeight()), "photoshopCMYK", VIEW_LABEL_PHOTOSHOPCMYK,
 		new BMessage(VIEW_MSG_SET_PHOTOSHOPCMYK));
 	fPhotoshopCMYK->SetFont(be_plain_font);
@@ -521,7 +521,7 @@ TranslatorReadView::TranslatorReadView(const char *name, jpeg_settings *settings
 
 	AddChild(fPhotoshopCMYK);
 
-	fShowErrorBox = new BCheckBox( BRect(10, GetPreferredHeight(), 10,
+	fShowErrorBox = new BCheckBox(BRect(10, GetPreferredHeight(), 10,
 		GetPreferredHeight()), "error", VIEW_LABEL_SHOWREADERRORBOX,
 		new BMessage(VIEW_MSG_SET_SHOWREADERRORBOX));
 	fShowErrorBox->SetFont(be_plain_font);
@@ -609,7 +609,7 @@ TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settin
 	fSmoothingSlider->SetValue(fSettings->Smoothing);
 	AddChild(fSmoothingSlider);
 
-	fProgress = new BCheckBox( BRect(10, GetPreferredHeight()+10, 10,
+	fProgress = new BCheckBox(BRect(10, GetPreferredHeight()+10, 10,
 		GetPreferredHeight()), "progress", VIEW_LABEL_PROGRESSIVE,
 		new BMessage(VIEW_MSG_SET_PROGRESSIVE));
 	fProgress->SetFont(be_plain_font);
@@ -618,8 +618,8 @@ TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settin
 
 	AddChild(fProgress);
 
-	fOptimizeColors = new BCheckBox( BRect(10, GetPreferredHeight()+5, 10,
-		GetPreferredHeight()+5), "optimizecolors", VIEW_LABEL_OPTIMIZECOLORS,
+	fOptimizeColors = new BCheckBox(BRect(10, GetPreferredHeight()+5, 10,
+		GetPreferredHeight() + 5), "optimizecolors", VIEW_LABEL_OPTIMIZECOLORS,
 		new BMessage(VIEW_MSG_SET_OPTIMIZECOLORS));
 	fOptimizeColors->SetFont(be_plain_font);
 	if (fSettings->OptimizeColors)
@@ -627,8 +627,8 @@ TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settin
 
 	AddChild(fOptimizeColors);
 
-	fSmallerFile = new BCheckBox( BRect(25, GetPreferredHeight()+5, 25,
-		GetPreferredHeight()+5), "smallerfile", VIEW_LABEL_SMALLERFILE,
+	fSmallerFile = new BCheckBox(BRect(25, GetPreferredHeight()+5, 25,
+		GetPreferredHeight() + 5), "smallerfile", VIEW_LABEL_SMALLERFILE,
 		new BMessage(VIEW_MSG_SET_SMALLERFILE));
 	fSmallerFile->SetFont(be_plain_font);
 	if (fSettings->SmallerFile)
@@ -638,7 +638,7 @@ TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settin
 
 	AddChild(fSmallerFile);
 
-	fGrayAsRGB24 = new BCheckBox( BRect(10, GetPreferredHeight()+5, 25,
+	fGrayAsRGB24 = new BCheckBox(BRect(10, GetPreferredHeight()+5, 25,
 		GetPreferredHeight()+5), "gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24,
 		new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
 	fGrayAsRGB24->SetFont(be_plain_font);
@@ -861,54 +861,6 @@ TranslatorView::AttachedToWindow()
 	while ((child = ChildAt(index++)) != NULL)
 		child->Hide();
 
-#if 0
-	// Hack for DataTranslations which doesn't resize visible area to requested by view
-	// which makes some parts of bigger than usual translationviews out of visible area
-	// so if it was loaded to DataTranslations resize window if needed
-	BWindow *window = Window();
-	if (!strcmp(window->Name(), "DataTranslations")) {
-		BView *view = Parent();
-		if (view) {
-			BRect frame = view->Frame();
-			if (frame.Width() < GetPreferredWidth()
-				|| (frame.Height()-48) < GetPreferredHeight()) {
-				float x = ceil(GetPreferredWidth() - frame.Width());
-				float y = ceil(GetPreferredHeight() - (frame.Height()-48));
-				if (x < 0)
-					x = 0;
-				if (y < 0)	
-					y = 0;
-
-				// DataTranslations has main view called "Background"
-				// change it's resizing mode so it will always resize with window
-				// also make sure view will be redrawed after resize
-				view = window->FindView("Background");
-				if (view) {
-					view->SetResizingMode(B_FOLLOW_ALL);
-					view->SetFlags(B_FULL_UPDATE_ON_RESIZE);
-				}
-
-				// The same with "Info..." button, except redrawing, which isn't needed
-				view = window->FindView("Info…");
-				if (view)
-					view->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-
-				window->ResizeBy(x, y);
-
-				// Let user resize window if resizing option is not already there...
-				uint32 flags = window->Flags();
-				if (flags & B_NOT_RESIZABLE) {
-					// ...but first prevent too small window (so "Info..." button will not look strange ;)
-					// max will be 800x600 which should be enough for now
-					window->SetSizeLimits(400, 800, 66, 600);
-
-					flags ^= B_NOT_RESIZABLE;
-					window->SetFlags(flags);
-				}
-			}
-		}
-	}
-#endif
 }
 
 
@@ -1000,7 +952,8 @@ TranslatorView::MouseDown(BPoint where)
 
 
 TranslatorWindow::TranslatorWindow(bool quitOnClose)
-:	BWindow(BRect(100, 100, 100, 100), "JPEG Settings", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+	: BWindow(BRect(100, 100, 100, 100), "JPEG Settings", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect extent(0, 0, 0, 0);
 	BView *config = NULL;
@@ -1424,7 +1377,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	jpeg_start_decompress(&cinfo);
 
 	// !!! Initialize this bounds rect to the size of your image
-	BRect bounds( 0, 0, cinfo.output_width-1, cinfo.output_height-1);
+	BRect bounds(0, 0, cinfo.output_width-1, cinfo.output_height-1);
 
 	// Bytes count in one line of image (scanline)
 	int64 row_bytes = cinfo.output_width * out_color_components;
@@ -1504,12 +1457,13 @@ Error(j_common_ptr cinfo, status_t error)
 
 
 int
-main() {
-	BApplication app("application/x-vnd.Shard.JPEGTranslator");
-	
+main(int, char**)
+{
+	BApplication app("application/x-vnd.Haiku-JPEGTranslator");
+
 	TranslatorWindow *window = new TranslatorWindow();
 	window->Show();
-	
+
 	app.Run();
 	return 0;
 }

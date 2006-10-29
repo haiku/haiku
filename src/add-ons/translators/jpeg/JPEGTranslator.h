@@ -50,8 +50,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // Settings
-#define SETTINGS_FILE	"OpenJPEGTranslator"
-#define SETTINGS_PATH	"/boot/home/config/settings"
+#define SETTINGS_FILE	"JPEGTranslator"
 
 // View messages
 #define VIEW_MSG_SET_QUALITY 'JSCQ'
@@ -111,7 +110,6 @@ class SSlider : public BSlider {
 		mutable char fStatusLabel[12];
 };
 
-
 //!	Basic view class with resizing to needed size
 class SView : public BView {
 	public:
@@ -133,7 +131,6 @@ class SView : public BView {
 		float			fPreferredHeight;
 };
 
-
 //!	Configuration view for reading settings
 class TranslatorReadView : public SView {
 	public:
@@ -150,8 +147,7 @@ class TranslatorReadView : public SView {
 		BCheckBox*		fShowErrorBox;
 };
 
-
-//	!Configuration view for writing settings
+//! Configuration view for writing settings
 class TranslatorWriteView : public SView {
 	public:
 		TranslatorWriteView(const char* name, jpeg_settings* settings,
@@ -170,12 +166,10 @@ class TranslatorWriteView : public SView {
 		BCheckBox*		fGrayAsRGB24;
 };
 
-
 class TranslatorAboutView : public SView {
 	public:
 		TranslatorAboutView(const char* name, float x = 0, float y = 0);
 };
-
 
 //!	Configuration view
 class TranslatorView : public SView {
@@ -197,9 +191,7 @@ class TranslatorView : public SView {
 		int32			fActiveChild;
 };
 
-//---------------------------------------------------
-//	Window used for configuration
-//---------------------------------------------------
+//!	Window used for configuration
 class TranslatorWindow : public BWindow {
 	public:
 		TranslatorWindow(bool quitOnClose = true);
@@ -222,9 +214,8 @@ EXTERN(void) be_jpeg_stdio_dest(j_compress_ptr cinfo, BPositionIO *outfile);	// 
 //---------------------------------------------------
 EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings * settings); // from "be_jerror.cpp"
 
-//---------------------------------------------------
-//	Main functions of translator :)
-//---------------------------------------------------
+
+// Main functions of translator :)
 status_t Copy(BPositionIO *in, BPositionIO *out);
 status_t Compress(BPositionIO *in, BPositionIO *out);
 status_t Decompress(BPositionIO *in, BPositionIO *out);

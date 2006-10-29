@@ -29,21 +29,13 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-//----------------------------------------------------------------------------
-//
-//	Include
-//
-//----------------------------------------------------------------------------
 
 #include "JPEG2000Translator.h"
 #include "jp2_cod.h"
 #include "jpc_cs.h"
 
-//----------------------------------------------------------------------------
-//
-//	Global variables initialization
-//
-//----------------------------------------------------------------------------
+#include <TabView.h>
+
 
 // Set these accordingly
 #define JP2_ACRONYM "JP2"
@@ -57,7 +49,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Translation Kit required globals
 char translatorName[] = "JPEG2000 Images";
-char translatorInfo[] = "© 2002-2003, Shard\n"
+char translatorInfo[] = "©2002-2003, Shard\n"
+	"©2005-2006, Haiku\n"
 	"\n"
 	"Based on JasPer library:\n"
 	"© 1999-2000, Image Power, Inc. and\n"
@@ -68,7 +61,7 @@ char translatorInfo[] = "© 2002-2003, Shard\n"
 	"ImageMagick's jp2 codec was used as \"tutorial\".\n"
 	"          http://www.imagemagick.org/\n";
 
-int32 translatorVersion = 256;	// 256 = v1.0.0
+int32 translatorVersion = 0x100;
 
 // Define the formats we know how to read
 translation_format inputFormats[] = {
@@ -88,152 +81,646 @@ translation_format outputFormats[] = {
 	{},
 };
 
-bool AreSettingsRunning = false;
+bool gAreSettingsRunning = false;
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: jas_stream for BPositionIO
-//
-//----------------------------------------------------------------------------
 
-static int Read(jas_stream_obj_t *object,char *buffer,const int length)
+//!	Make settings to defaults
+void
+LoadDefaultSettings(jpeg_settings *settings)
 {
-	return (*(BPositionIO**) object)->Read(buffer, length);
+	settings->Quality = 25;
+	settings->JPC = false;
+	settings->B_GRAY1_as_B_RGB24 = false;
+	settings->B_GRAY8_as_B_RGB32 = true;
 }
 
-static int Write(jas_stream_obj_t *object,char *buffer,const int length)
+
+//!	Save settings to config file
+void
+SaveSettings(jpeg_settings *settings)
 {
-	return (*(BPositionIO**) object)->Write(buffer, length);
+	// Make path to settings file
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+		return;
+
+	path.Append(SETTINGS_FILE);
+
+	// Open settings file (create it if there's no file) and write settings			
+	FILE *file = NULL;
+	if ((file = fopen(path.Path(), "wb+"))) {
+		fwrite(settings, sizeof(jpeg_settings), 1, file);
+		fclose(file);
+	}
 }
 
-static long Seek(jas_stream_obj_t *object,long offset,int origin)
+
+//!	Return true if settings were run, false if not
+bool
+SettingsChangedAlert()
 {
-  return (*(BPositionIO**) object)->Seek(offset, origin);
+	// If settings view wasn't already initialized (settings not running)
+	// and user wants to run settings
+	if (!gAreSettingsRunning && (new BAlert("Different settings file", "JPEG2000 settings were set to default because of incompatible settings file.", "Configure settings", "OK", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 0) {
+		// Create settings window (with no quit on close!), launch it and wait until it's closed
+		status_t err;
+		TranslatorWindow *window = new TranslatorWindow(false);
+		window->Show();
+		wait_for_thread(window->Thread(), &err);
+		return true;
+	}
+
+	return false;
 }
 
-static int Close(jas_stream_obj_t *object)
+
+/*!
+	Load settings from config file
+	If can't find it make them default and try to save
+*/
+void
+LoadSettings(jpeg_settings *settings)
 {
-  return(0);
+	// Make path to settings file
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
+		LoadDefaultSettings(settings);
+		return;
+	}
+
+	path.Append(SETTINGS_FILE);
+
+	// Open settings file (create it if there's no file) and write settings			
+	FILE *file = NULL;
+	if ((file = fopen(path.Path(), "rb"))) {
+		if (!fread(settings, sizeof(jpeg_settings), 1, file)) {
+			// settings struct has changed size
+			// Load default settings, and Save them
+			fclose(file);
+			LoadDefaultSettings(settings);
+			SaveSettings(settings);
+			// Tell user settings were changed to default, and ask to run settings panel or not
+			if (SettingsChangedAlert())
+				// User configured settings, load them again
+				LoadSettings(settings);
+		} else
+			fclose(file);
+	} else if ((file = fopen(path.Path(), "wb+"))) {
+		LoadDefaultSettings(settings);
+		fwrite(settings, sizeof(jpeg_settings), 1, file);
+		fclose(file);
+		// Tell user settings were changed to default, and ask to run settings panel or not
+		if (SettingsChangedAlert())
+			// User configured settings, load them again
+			LoadSettings(settings);
+	}
 }
 
-static jas_stream_ops_t
-positionIOops =
+
+//	#pragma mark - conversion routines
+
+
+//!	Make RGB32 scanline from *pixels[3]
+inline void
+read_rgb24_to_rgb32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 {
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[2], x);
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[1], x);
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[0], x);
+		scanline[index++] = 255;
+		x++;
+	}
+}
+
+
+//!	Make gray scanline from *pixels[1]
+inline void
+read_gray_to_rgb32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	jpr_uchar_t color = 0;
+	while (x < width) {
+		color = (jpr_uchar_t)jas_matrix_getv(pixels[0], x++);
+		scanline[index++] = color;
+		scanline[index++] = color;
+		scanline[index++] = color;
+		scanline[index++] = 255;
+	}
+}
+
+
+/*!
+	Make RGBA32 scanline from *pixels[4]
+	(just read data to scanline)
+*/
+inline void
+read_rgba32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[2], x);
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[1], x);
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[0], x);
+		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[3], x);
+		x++;
+	}
+}
+
+
+/*!
+	Make gray scanline from *pixels[1]
+	(just read data to scanline)
+*/
+inline void
+read_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	while (x < width) {
+		scanline[x] = (jpr_uchar_t)jas_matrix_getv(pixels[0], x);
+		x++;
+	}
+}
+
+
+//!	Make *pixels[1] from gray1 scanline
+inline void
+write_gray1_to_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	int32 index = 0;
+	while (x < (width/8)) {
+		unsigned char c = scanline[x++];
+		for (int b = 128; b; b = b >> 1) {
+			if (c & b)
+				jas_matrix_setv(pixels[0], index++, 0);
+			else
+				jas_matrix_setv(pixels[0], index++, 255);
+		}
+	}
+}
+
+
+//!	Make *pixels[3] from gray1 scanline
+inline void
+write_gray1_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	int32 index = 0;
+	while (x < (width/8)) {
+		unsigned char c = scanline[x++];
+		for (int b = 128; b; b = b >> 1) {
+			if (c & b) {
+				jas_matrix_setv(pixels[0], index, 0);
+				jas_matrix_setv(pixels[1], index, 0);
+				jas_matrix_setv(pixels[2], index, 0);
+			} else {
+				jas_matrix_setv(pixels[0], index, 255);
+				jas_matrix_setv(pixels[1], index, 255);
+				jas_matrix_setv(pixels[2], index, 255);
+			}
+			index++;
+		}
+	}
+}
+
+
+//!	Make *pixels[3] from cmap8 scanline
+inline void
+write_cmap8_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	const color_map *map = system_colors();
+	int32 x = 0;
+	while (x < width) {
+		rgb_color color = map->color_list[scanline[x]];
+
+		jas_matrix_setv(pixels[0], x, color.red);
+		jas_matrix_setv(pixels[1], x, color.green);
+		jas_matrix_setv(pixels[2], x, color.blue);
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[1] from gray scanline
+	(just write data to pixels)
+*/
+inline void
+write_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	while (x < width) {
+		jas_matrix_setv(pixels[0], x, scanline[x]);
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB15/RGBA15 scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb15_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	int32 index = 0;
+	int16 in_pixel;
+	while (x < width) {
+		in_pixel = scanline[index] | (scanline[index+1] << 8);
+		index += 2;
+
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB15/RGBA15 bigendian scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb15b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	int32 index = 0;
+	int16 in_pixel;
+	while (x < width) {
+		in_pixel = scanline[index+1] | (scanline[index] << 8);
+		index += 2;
+
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB16/RGBA16 scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb16_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	int32 index = 0;
+	int16 in_pixel;
+	while (x < width) {
+		in_pixel = scanline[index] | (scanline[index+1] << 8);
+		index += 2;
+
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0x7c00)) >> 12));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB16/RGBA16 bigendian scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb16b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 x = 0;
+	int32 index = 0;
+	int16 in_pixel;
+	while (x < width) {
+		in_pixel = scanline[index+1] | (scanline[index] << 8);
+		index += 2;
+
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0xf800)) >> 13));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB24 scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		jas_matrix_setv(pixels[2], x, scanline[index++]);
+		jas_matrix_setv(pixels[1], x, scanline[index++]);
+		jas_matrix_setv(pixels[0], x, scanline[index++]);
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB24 bigendian scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb24b(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		jas_matrix_setv(pixels[0], x, scanline[index++]);
+		jas_matrix_setv(pixels[1], x, scanline[index++]);
+		jas_matrix_setv(pixels[2], x, scanline[index++]);
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB32 scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb32_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		jas_matrix_setv(pixels[2], x, scanline[index++]);
+		jas_matrix_setv(pixels[1], x, scanline[index++]);
+		jas_matrix_setv(pixels[0], x, scanline[index++]);
+		index++;
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[3] from RGB32 bigendian scanline
+	(just write data to pixels)
+*/
+inline void
+write_rgb32b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		index++;
+		jas_matrix_setv(pixels[0], x, scanline[index++]);
+		jas_matrix_setv(pixels[1], x, scanline[index++]);
+		jas_matrix_setv(pixels[2], x, scanline[index++]);
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[4] from RGBA32 scanline
+	(just write data to pixels)
+	!!! UNTESTED !!!
+*/
+inline void
+write_rgba32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width) {
+		jas_matrix_setv(pixels[3], x, scanline[index++]);
+		jas_matrix_setv(pixels[2], x, scanline[index++]);
+		jas_matrix_setv(pixels[1], x, scanline[index++]);
+		jas_matrix_setv(pixels[0], x, scanline[index++]);
+		x++;
+	}
+}
+
+
+/*!
+	Make *pixels[4] from RGBA32 bigendian scanline
+	(just write data to pixels)
+	!!! UNTESTED !!!
+*/
+inline void
+write_rgba32b(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+{
+	int32 index = 0;
+	int32 x = 0;
+	while (x < width)
+	{
+		jas_matrix_setv(pixels[0], x, scanline[index++]);
+		jas_matrix_setv(pixels[1], x, scanline[index++]);
+		jas_matrix_setv(pixels[2], x, scanline[index++]);
+		jas_matrix_setv(pixels[3], x, scanline[index++]);
+		x++;
+	}
+}
+
+
+//	#pragma mark -	jasper I/O
+
+
+static int
+Read(jas_stream_obj_t *object, char *buffer, const int length)
+{
+	return (*(BPositionIO**)object)->Read(buffer, length);
+}
+
+
+static int
+Write(jas_stream_obj_t *object, char *buffer, const int length)
+{
+	return (*(BPositionIO**)object)->Write(buffer, length);
+}
+
+
+static long
+Seek(jas_stream_obj_t *object, long offset, int origin)
+{
+	return (*(BPositionIO**)object)->Seek(offset, origin);
+}
+
+
+static int
+Close(jas_stream_obj_t *object)
+{
+	return 0;
+}
+
+
+static jas_stream_ops_t positionIOops = {
 	Read,
 	Write,
 	Seek,
 	Close
 };
 
-static jas_stream_t *jas_stream_positionIOopen(BPositionIO *positionIO)
+
+static jas_stream_t *
+jas_stream_positionIOopen(BPositionIO *positionIO)
 {
 	jas_stream_t *stream;
 
-	stream=(jas_stream_t *) malloc( sizeof(jas_stream_t));
-	if (stream == (jas_stream_t *) NULL)
-		return((jas_stream_t *) NULL);
-	(void) memset(stream, 0, sizeof(jas_stream_t));
-	stream->rwlimit_=(-1);
-	stream->obj_=(jas_stream_obj_t *) malloc( sizeof(BPositionIO*));
-	if (stream->obj_ == (jas_stream_obj_t *) NULL)
-		return((jas_stream_t *) NULL);
+	stream = (jas_stream_t *)malloc(sizeof(jas_stream_t));
+	if (stream == (jas_stream_t *)NULL)
+		return (jas_stream_t *)NULL;
+
+	memset(stream, 0, sizeof(jas_stream_t));
+	stream->rwlimit_ = -1;
+	stream->obj_=(jas_stream_obj_t *)malloc(sizeof(BPositionIO*));
+	if (stream->obj_ == (jas_stream_obj_t *)NULL)
+		return (jas_stream_t *)NULL;
+
 	*((BPositionIO**)stream->obj_) = positionIO;
-	stream->ops_=(&positionIOops);
-	stream->openmode_=JAS_STREAM_READ | JAS_STREAM_WRITE | JAS_STREAM_BINARY;
-	stream->bufbase_=stream->tinybuf_;
-	stream->bufsize_=1;
-	stream->bufstart_=(&stream->bufbase_[JAS_STREAM_MAXPUTBACK]);
-	stream->ptr_=stream->bufstart_;
-	stream->bufmode_|=JAS_STREAM_UNBUF & JAS_STREAM_BUFMODEMASK;
-	return(stream);
+	stream->ops_ = (&positionIOops);
+	stream->openmode_ = JAS_STREAM_READ | JAS_STREAM_WRITE | JAS_STREAM_BINARY;
+	stream->bufbase_ = stream->tinybuf_;
+	stream->bufsize_ = 1;
+	stream->bufstart_ = (&stream->bufbase_[JAS_STREAM_MAXPUTBACK]);
+	stream->ptr_ = stream->bufstart_;
+	stream->bufmode_ |= JAS_STREAM_UNBUF & JAS_STREAM_BUFMODEMASK;
+
+	return stream;
 }
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: SSlider
-//
-//----------------------------------------------------------------------------
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-SSlider::SSlider(BRect frame, const char *name, const char *label, BMessage *message, int32 minValue, int32 maxValue, orientation posture, thumb_style thumbType, uint32 resizingMode, uint32 flags)
-:	BSlider(frame, name, label, message, minValue, maxValue, posture, thumbType, resizingMode, flags)
+//	#pragma mark - SView
+
+
+SView::SView(const char *name, float x, float y)
+	: BView(BRect(x, y, x, y), name, B_FOLLOW_NONE, B_WILL_DRAW)
 {
-	rgb_color bar_color = { 0, 0, 229, 255 };
-	UseFillColor(true, &bar_color);
+	fPreferredWidth = 0;
+	fPreferredHeight = 0;
+
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
+
+	SetFont(be_plain_font);
 }
 
-//---------------------------------------------------
-//	Update status string - show actual value
-//---------------------------------------------------
+
+void
+SView::GetPreferredSize(float* _width, float* _height)
+{
+	if (_width)
+		*_width = fPreferredWidth;
+	if (_height)
+		*_height = fPreferredHeight;
+}
+
+
+void
+SView::ResizeToPreferred()
+{
+	ResizeTo(fPreferredWidth, fPreferredHeight);
+}
+
+
+void
+SView::ResizePreferredBy(float width, float height)
+{
+	fPreferredWidth += width;
+	fPreferredHeight += height;
+}
+
+
+void
+SView::AddChild(BView *child, BView *before)
+{
+	BView::AddChild(child, before);
+	child->ResizeToPreferred();
+	BRect frame = child->Frame();
+
+	if (frame.right > fPreferredWidth)
+		fPreferredWidth = frame.right;
+	if (frame.bottom > fPreferredHeight)
+		fPreferredHeight = frame.bottom;
+}
+
+
+//	#pragma mark -
+
+
+SSlider::SSlider(BRect frame, const char *name, const char *label,
+		BMessage *message, int32 minValue, int32 maxValue, orientation posture,
+		thumb_style thumbType, uint32 resizingMode, uint32 flags)
+	: BSlider(frame, name, label, message, minValue, maxValue,
+		posture, thumbType, resizingMode, flags)
+{
+	rgb_color barColor = { 0, 0, 229, 255 };
+	UseFillColor(true, &barColor);
+}
+
+
+//!	Update status string - show actual value
 char*
 SSlider::UpdateText() const
 {
-	sprintf( (char*)statusLabel, "%ld", Value());
-	return (char*)statusLabel;
+	snprintf(fStatusLabel, sizeof(fStatusLabel), "%ld", Value());
+	return fStatusLabel;
 }
 
-//---------------------------------------------------
-//	BSlider::ResizeToPreferred + Resize width if it's too small to show label and status
-//---------------------------------------------------
+
+//!	BSlider::ResizeToPreferred + Resize width if it's too small to show label and status
 void
 SSlider::ResizeToPreferred()
 {
-	int32 width = (int32)ceil(StringWidth( Label()) + StringWidth("9999"));
-	if (width < 230) width = 230;
+	int32 width = (int32)ceil(StringWidth(Label()) + StringWidth("9999"));
+	if (width < 230)
+		width = 230;
+
 	float w, h;
 	GetPreferredSize(&w, &h);
 	ResizeTo(width, h);
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorReadView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-TranslatorReadView::TranslatorReadView(const char *name, SETTINGS *settings, float x, float y)
-:	SView(name, x, y),
-	Settings(settings)
+
+TranslatorReadView::TranslatorReadView(const char *name, jpeg_settings *settings,
+		float x, float y)
+	: SView(name, x, y),
+	fSettings(settings)
 {
-	grayasrgb32 = new BCheckBox( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "alwaysrgb32", VIEW_LABEL_GRAYASRGB32, new BMessage(VIEW_MSG_SET_GRAYASRGB32));
-	grayasrgb32->SetFont(be_plain_font);
-	if (Settings->B_GRAY8_as_B_RGB32)
-		grayasrgb32->SetValue(1);
+	fGrayAsRGB32 = new BCheckBox(BRect(10, GetPreferredHeight(), 10,
+		GetPreferredHeight()), "grayasrgb32", VIEW_LABEL_GRAYASRGB32,
+		new BMessage(VIEW_MSG_SET_GRAYASRGB32));
+	fGrayAsRGB32->SetFont(be_plain_font);
+	if (fSettings->B_GRAY8_as_B_RGB32)
+		fGrayAsRGB32->SetValue(1);
 
-	AddChild(grayasrgb32);
+	AddChild(fGrayAsRGB32);
 
 	ResizeToPreferred();
 }
 
-//---------------------------------------------------
-//	Attached to window - set children target
-//---------------------------------------------------
+
 void
 TranslatorReadView::AttachedToWindow()
 {
-	grayasrgb32->SetTarget(this);
+	fGrayAsRGB32->SetTarget(this);
 }
 
-//---------------------------------------------------
-//	MessageReceived - receive GUI changes, save settings
-//---------------------------------------------------
+
 void
 TranslatorReadView::MessageReceived(BMessage *message)
 {
-	switch (message->what)
-	{
+	switch (message->what) {
 		case VIEW_MSG_SET_GRAYASRGB32:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->B_GRAY8_as_B_RGB32 = value;
-				SaveSettings(Settings);
+				fSettings->B_GRAY8_as_B_RGB32 = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -244,70 +731,65 @@ TranslatorReadView::MessageReceived(BMessage *message)
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorWriteView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark - TranslatorWriteView
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-TranslatorWriteView::TranslatorWriteView(const char *name, SETTINGS *settings, float x, float y)
-:	SView(name, x, y),
-	Settings(settings)
+
+TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settings,
+		float x, float y)
+	: SView(name, x, y),
+	fSettings(settings)
 {
-	quality = new SSlider( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "quality", VIEW_LABEL_QUALITY, new BMessage(VIEW_MSG_SET_QUALITY), 1, 100);
-	quality->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	quality->SetHashMarkCount(10);
-	quality->SetLimitLabels("Low", "High");
-	quality->SetFont(be_plain_font);
-	quality->SetValue(Settings->Quality);
+	fQualitySlider = new SSlider(BRect(10, GetPreferredHeight(), 10,
+		GetPreferredHeight()), "quality", VIEW_LABEL_QUALITY,
+		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
+	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fQualitySlider->SetHashMarkCount(10);
+	fQualitySlider->SetLimitLabels("Low", "High");
+	fQualitySlider->SetFont(be_plain_font);
+	fQualitySlider->SetValue(fSettings->Quality);
+	AddChild(fQualitySlider);
 
-	AddChild(quality);
+	fGrayAsRGB24 = new BCheckBox(BRect(10, GetPreferredHeight() + 5, 25,
+		GetPreferredHeight() + 5), "gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24,
+		new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
+	fGrayAsRGB24->SetFont(be_plain_font);
+	if (fSettings->B_GRAY1_as_B_RGB24)
+		fGrayAsRGB24->SetValue(1);
 
-	gray1asrgb24 = new BCheckBox( BRect(10, GetPreferredHeight()+10, 10, GetPreferredHeight()), "alwaysrgb32", VIEW_LABEL_GRAY1ASRGB24, new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
-	gray1asrgb24->SetFont(be_plain_font);
-	if (Settings->B_GRAY1_as_B_RGB24)
-		gray1asrgb24->SetValue(1);
+	AddChild(fGrayAsRGB24);
 
-	AddChild(gray1asrgb24);
+	fCodeStreamOnly = new BCheckBox(BRect(10, GetPreferredHeight() + 5, 10,
+		GetPreferredHeight()), "codestreamonly", VIEW_LABEL_JPC,
+		new BMessage(VIEW_MSG_SET_JPC));
+	fCodeStreamOnly->SetFont(be_plain_font);
+	if (fSettings->JPC)
+		fCodeStreamOnly->SetValue(1);
 
-	jpc = new BCheckBox( BRect(10, GetPreferredHeight()+5, 10, GetPreferredHeight()), "alwaysrgb32", VIEW_LABEL_JPC, new BMessage(VIEW_MSG_SET_JPC));
-	jpc->SetFont(be_plain_font);
-	if (Settings->JPC)
-		jpc->SetValue(1);
-
-	AddChild(jpc);
+	AddChild(fCodeStreamOnly);
 
 	ResizeToPreferred();
 }
 
-//---------------------------------------------------
-//	Attached to window - set children target
-//---------------------------------------------------
+
 void
 TranslatorWriteView::AttachedToWindow()
 {
-	quality->SetTarget(this);
-	gray1asrgb24->SetTarget(this);
-	jpc->SetTarget(this);
+	fQualitySlider->SetTarget(this);
+	fGrayAsRGB24->SetTarget(this);
+	fCodeStreamOnly->SetTarget(this);
 }
 
-//---------------------------------------------------
-//	MessageReceived - receive GUI changes, save settings
-//---------------------------------------------------
+
 void
 TranslatorWriteView::MessageReceived(BMessage *message)
 {
-	switch (message->what)
-	{
+	switch (message->what) {
 		case VIEW_MSG_SET_QUALITY:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->Quality = value;
-				SaveSettings(Settings);
+				fSettings->Quality = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -315,8 +797,8 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->B_GRAY1_as_B_RGB24 = value;
-				SaveSettings(Settings);
+				fSettings->B_GRAY1_as_B_RGB24 = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -324,8 +806,8 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->JPC = value;
-				SaveSettings(Settings);
+				fSettings->JPC = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -336,19 +818,14 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorAboutView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
+
 TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
-:	SView(name, x, y)
+	: SView(name, x, y)
 {
-	BStringView *title = new BStringView( BRect(10, 0, 10, 0), "Title", translatorName);
+	BStringView *title = new BStringView(BRect(10, 0, 10, 0), "Title",
+		translatorName);
 	title->SetFont(be_bold_font);
 
 	AddChild(title);
@@ -357,95 +834,90 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 	float space = title->StringWidth("    ");
 
 	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(translatorVersion >> 8), (int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf));
-	
-	BStringView *version = new BStringView( BRect(rect.right+space, rect.top, rect.right+space, rect.top), "Version", versionString);
+	sprintf(versionString, "v%d.%d.%d", (int)(translatorVersion >> 8),
+		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf));
+
+	BStringView *version = new BStringView(BRect(rect.right+space, rect.top,
+		rect.right+space, rect.top), "Version", versionString);
 	version->SetFont(be_plain_font);
-	version->SetFontSize( 9);
+	version->SetFontSize(9);
 	// Make version be in the same line as title
 	version->ResizeToPreferred();
 	version->MoveBy(0, rect.bottom-version->Frame().bottom);
-	
+
 	AddChild(version);
 
-	// Now for each line in translatorInfo add BStringView
-	BStringView *copyright;
-	const char *current = translatorInfo;
-	char *temp = translatorInfo;
-	while (*current != 0) {
-		// Find next line char
-		temp = strchr(current, 0x0a);
-		// If found replace it with 0 so current will look like ending here
-		if (temp)
-			*temp = 0;
-		// Add BStringView showing what's under current
-		copyright = new BStringView( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "Copyright", current);
-		copyright->SetFont(be_plain_font);
-		copyright->SetFontSize( 9);
-		AddChild(copyright);
+	// Now for each line in translatorInfo add a BStringView
+	char* current = translatorInfo;
+	int32 index = 1;
+	while (current != NULL && current[0]) {
+		char text[128];
+		char* newLine = strchr(current, '\n');
+		if (newLine == NULL) {
+			strlcpy(text, current, sizeof(text));
+			current = NULL;
+		} else {
+			strlcpy(text, current, min_c((int32)sizeof(text), newLine + 1 - current));
+			current = newLine + 1;
+		}
 
-		// If there was next line, move current there and put next line char back
-		if (temp) {
-			current = temp+1;
-			*temp = 0x0a;
-		} else
-		// If there was no next line char break loop
-			break;
+		BStringView* string = new BStringView(BRect(10, GetPreferredHeight(),
+			10, GetPreferredHeight()), "copyright", text);
+		if (index > 3)
+			string->SetFontSize(9);
+		AddChild(string);
+
+		index++;
 	}
 
 	ResizeToPreferred();
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
+
 TranslatorView::TranslatorView(const char *name)
 	: SView(name),
-	  tabWidth(30),
-	  tabHeight((int32)ceilf(7 + be_plain_font->Size())),
-	  activeChild(0)
+	fTabWidth(30),
+	fActiveChild(0)
 {
 	// Set global var to true
-	AreSettingsRunning = true;
+	gAreSettingsRunning = true;
 
-	// Without this strings are not correctly aliased
-	// THX to Jack Burton for info :)
-	SetLowColor( ViewColor());
+	// Load settings to global settings struct
+	LoadSettings(&fSettings);
 
-	// Load settings to global Settings struct
-	LoadSettings(&Settings);
-
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	fTabHeight = (int32)ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 7;
 	// Add left and top margins
-	float top = tabHeight+15;
+	float top = fTabHeight + 20;
 	float left = 0;
 
 	// This will remember longest string width
-	float nameWidth = 0;
+	int32 nameWidth = 0;
 
-	SView *view = new TranslatorWriteView("Write", &Settings, left, top);
+	SView *view = new TranslatorWriteView("Write", &fSettings, left, top);
 	AddChild(view);
-	nameWidth = StringWidth(view->Name());
+	nameWidth = (int32)StringWidth(view->Name());
+	fTabs.AddItem(new BTab(view));
 
-	view = new TranslatorReadView("Read", &Settings, left, top);
+	view = new TranslatorReadView("Read", &fSettings, left, top);
 	AddChild(view);
 	if (nameWidth < StringWidth(view->Name()))
-		nameWidth = StringWidth(view->Name());
+		nameWidth = (int32)StringWidth(view->Name());
+	fTabs.AddItem(new BTab(view));
 
 	view = new TranslatorAboutView("About", left, top);
 	AddChild(view);
 	if (nameWidth < StringWidth(view->Name()))
-		nameWidth = StringWidth(view->Name());
+		nameWidth = (int32)StringWidth(view->Name());
+	fTabs.AddItem(new BTab(view));
 
-	tabWidth += (int32)ceilf(nameWidth);
-	if (tabWidth * CountChildren() > GetPreferredWidth())
-		ResizePreferredBy((tabWidth * CountChildren()) - GetPreferredWidth(), 0);
+	fTabWidth += nameWidth;
+	if (fTabWidth * CountChildren() > GetPreferredWidth())
+		ResizePreferredBy((fTabWidth * CountChildren()) - GetPreferredWidth(), 0);
 
 	// Add right and bottom margins
 	ResizePreferredBy(10, 15);
@@ -453,163 +925,124 @@ TranslatorView::TranslatorView(const char *name)
 	ResizeToPreferred();
 
 	// Make TranslatorView resize itself with parent
-	SetFlags( Flags() | B_FOLLOW_ALL);
+	SetFlags(Flags() | B_FOLLOW_ALL);
 }
 
-//---------------------------------------------------
-//	Attached to window - resize parent to preferred
-//---------------------------------------------------
+
+TranslatorView::~TranslatorView()
+{
+	gAreSettingsRunning = false;
+
+	BTab* tab;
+	while ((tab = (BTab*)fTabs.RemoveItem((int32)0)) != NULL) {
+		delete tab;
+	}
+}
+
+
+//!	Attached to window - resize parent to preferred
 void
 TranslatorView::AttachedToWindow()
 {
 	// Hide all children except first one
-	BView *child = NULL;
+	BView *child;
 	int32 index = 1;
-	while ((child = ChildAt(index++)))
+	while ((child = ChildAt(index++)) != NULL)
 		child->Hide();
-	
-	// Hack for DataTranslations which doesn't resize visible area to requested by view
-	// which makes some parts of bigger than usual translationviews out of visible area
-	// so if it was loaded to DataTranslations resize window if needed
-	BWindow *window = Window();
-	if (!strcmp(window->Name(), "DataTranslations")) {
-		BView *view = Parent();
-		if (view) {
-			BRect frame = view->Frame();
-			if (frame.Width() < GetPreferredWidth() || (frame.Height()-48) < GetPreferredHeight()) {
-				float x = ceil(GetPreferredWidth() - frame.Width());
-				float y = ceil(GetPreferredHeight() - (frame.Height()-48));
-				if (x < 0) x = 0;
-				if (y < 0) y = 0;
 
-				// DataTranslations has main view called "Background"
-				// change it's resizing mode so it will always resize with window
-				// also make sure view will be redrawed after resize
-				view = window->FindView("Background");
-				if (view) {
-					view->SetResizingMode(B_FOLLOW_ALL);
-					view->SetFlags(B_FULL_UPDATE_ON_RESIZE);
-				}
-
-				// The same with "Info..." button, except redrawing, which isn't needed
-				view = window->FindView("Info…");
-				if (view)
-					view->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-
-				window->ResizeBy( x, y);
-
-				// Let user resize window if resizing option is not already there...
-				uint32 flags = window->Flags();
-				if (flags & B_NOT_RESIZABLE) {
-					// ...but first prevent too small window (so "Info..." button will not look strange ;)
-					// max will be 800x600 which should be enough for now
-					window->SetSizeLimits(400, 800, 66, 600);
-
-					flags ^= B_NOT_RESIZABLE;
-					window->SetFlags(flags);
-				}
-			}
-		}
-	}
 }
 
-//---------------------------------------------------
-//	DrawTabs
-//---------------------------------------------------
+
+BRect
+TranslatorView::_TabFrame(int32 index) const
+{
+	return BRect(index * fTabWidth, 10, (index + 1) * fTabWidth, 10 + fTabHeight);
+}
+
+
 void
 TranslatorView::Draw(BRect updateRect)
 {
 	// This is needed because DataTranslations app hides children
 	// after user changes translator
-	if (ChildAt(activeChild)->IsHidden())
-		ChildAt(activeChild)->Show();
-
-	// Prepare colors used for drawing "tabs"
-	rgb_color dark_line_color = tint_color( ViewColor(), B_DARKEN_2_TINT);
-	rgb_color darkest_line_color = tint_color( ViewColor(), B_DARKEN_3_TINT);
-	rgb_color light_line_color = tint_color( ViewColor(), B_LIGHTEN_MAX_TINT);
-	rgb_color text_color = ui_color(B_MENU_ITEM_TEXT_COLOR);
-
-	int32 index = 0;
-	BView *child = NULL;
-	float left = 0;
+	if (ChildAt(fActiveChild)->IsHidden())
+		ChildAt(fActiveChild)->Show();
 
 	// Clear
-	SetHighColor( ViewColor());
-	FillRect( BRect(0, 0, Frame().right, tabHeight));
+	SetHighColor(ViewColor());
+	BRect frame = _TabFrame(0);
+	FillRect(BRect(frame.left, frame.top, Bounds().right, frame.bottom - 1));
 
-	while ((child = ChildAt(index))) {
-		// Draw outline
-		SetHighColor(dark_line_color);
-		StrokeLine( BPoint(left, 10), BPoint(left, tabHeight));
-		StrokeArc( BPoint(left+10, 10), 10, 10, 90, 90);
-		StrokeLine( BPoint(left+10, 0), BPoint(left+tabWidth-10, 0));
-		StrokeArc( BPoint(left+tabWidth-10, 10), 9, 10, 0, 90);
-		StrokeLine( BPoint(left+tabWidth-1, 10), BPoint(left+tabWidth-1, tabHeight));
-		// Draw "shadow" on the right side
-		SetHighColor(darkest_line_color);
-		StrokeArc( BPoint(left+tabWidth-10, 10), 10, 10, 0, 50);
-		StrokeLine( BPoint(left+tabWidth, 10), BPoint(left+tabWidth, tabHeight-1));
-		// Draw label
-		SetHighColor(text_color);
-		DrawString( child->Name(), BPoint(left+(tabWidth/2)-(StringWidth(child->Name())/2), 3+be_plain_font->Size()));
-		// Draw "light" on left and top side
-		SetHighColor(light_line_color);
-		StrokeArc( BPoint(left+10, 10), 9, 9, 90, 90);
-		StrokeLine( BPoint(left+1, 10), BPoint(left+1, tabHeight));
-		StrokeLine( BPoint(left+10, 1), BPoint(left+tabWidth-8, 1));
-		// Draw bottom edge
-		if (activeChild != index)
-			StrokeLine( BPoint(left-2,tabHeight), BPoint(left+tabWidth,tabHeight));
+	int32 index = 0;
+	BTab* tab;
+	while ((tab = (BTab*)fTabs.ItemAt(index)) != NULL) {
+		tab_position position;
+		if (fActiveChild == index)
+			position = B_TAB_FRONT;
+		else if (index == 0)
+			position = B_TAB_FIRST;
 		else
-			StrokeLine( BPoint(left-2,tabHeight), BPoint(left+1,tabHeight));
+			position = B_TAB_ANY;
 
-		left += tabWidth+2;
+		tab->DrawTab(this, _TabFrame(index), position, index + 1 != fActiveChild);
 		index++;
 	}
-	// Draw bottom edge to the rigth side
-	StrokeLine( BPoint(left-2,tabHeight), BPoint(Bounds().Width(),tabHeight));
+
+	// Draw bottom edge
+	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_MAX_TINT));
+
+	BRect selectedFrame = _TabFrame(fActiveChild);
+	float offset = ceilf(frame.Height() / 2.0);
+
+	if (selectedFrame.left > frame.left) {
+		StrokeLine(BPoint(frame.left, frame.bottom),
+			BPoint(selectedFrame.left, frame.bottom));
+	}
+	if (selectedFrame.right + offset < Bounds().right) {
+		StrokeLine(BPoint(selectedFrame.right + offset, frame.bottom),
+			BPoint(Bounds().right, frame.bottom));
+	}
 }
 
-//---------------------------------------------------
-//	MouseDown, check if on tab, if so change tab if needed
-//---------------------------------------------------
+
+//!	MouseDown, check if on tab, if so change tab if needed
 void
 TranslatorView::MouseDown(BPoint where)
 {
-	// If user clicked on tabs part of view
-	if (where.y <= tabHeight)
-		// If there is a tab (not whole width is occupied by tabs)
-		if (where.x < tabWidth*CountChildren()) {
-			// Which tab was selected?
-			int32 index = (int32)(where.x / tabWidth);
-			if (activeChild != index) {
-				// Hide current visible child
-				ChildAt(activeChild)->Hide();
-				// This loop is needed because it looks like in DataTranslations
-				// view gets hidden more than one time when user changes translator
-				while (ChildAt(index)->IsHidden())
-					ChildAt(index)->Show();
-				// Remember which one is currently visible
-				activeChild = index;
-				// Redraw
-				Draw( Frame());
+	BRect frame = _TabFrame(fTabs.CountItems() - 1);
+	frame.left = 0;
+	if (!frame.Contains(where))
+		return;
+
+	for (int32 index = fTabs.CountItems(); index-- > 0;) {
+		if (!_TabFrame(index).Contains(where))
+			continue;
+
+		if (fActiveChild != index) {
+			// Hide current visible child
+			ChildAt(fActiveChild)->Hide();
+
+			// This loop is needed because it looks like in DataTranslations
+			// view gets hidden more than one time when user changes translator
+			while (ChildAt(index)->IsHidden()) {
+				ChildAt(index)->Show();
 			}
+
+			// Remember which one is currently visible
+			fActiveChild = index;
+			Invalidate(frame);
+			break;
 		}
+	}
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorWindow
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-TranslatorWindow::TranslatorWindow(bool quit_on_close)
-:	BWindow(BRect(100, 100, 100, 100), "JPEG2000 Settings", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+
+TranslatorWindow::TranslatorWindow(bool quitOnClose)
+	: BWindow(BRect(100, 100, 100, 100), "JPEG Settings", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect extent(0, 0, 0, 0);
 	BView *config = NULL;
@@ -619,34 +1052,15 @@ TranslatorWindow::TranslatorWindow(bool quit_on_close)
 	ResizeTo(extent.Width(), extent.Height());
 
 	// Make application quit after this window close
-	if (quit_on_close)
+	if (quitOnClose)
 		SetFlags(Flags() | B_QUIT_ON_WINDOW_CLOSE);
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: main
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	main function
-//---------------------------------------------------
-int
-main() {
-	BApplication app("application/x-vnd.Shard.JPEG2000Translator");
-	
-	TranslatorWindow *window = new TranslatorWindow();
-	window->Show();
-	
-	app.Run();
-	return 0;
-}
 
-//---------------------------------------------------
-//	Hook to create and return our configuration view
-//---------------------------------------------------
+//!	Hook to create and return our configuration view
 status_t
 MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 {
@@ -655,13 +1069,11 @@ MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Determine whether or not we can handle this data
-//---------------------------------------------------
+
+//!	Determine whether or not we can handle this data
 status_t
 Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *ioExtension, translator_info *outInfo, uint32 outType)
 {
-
 	if ((outType != 0) && (outType != B_TRANSLATOR_BITMAP) && outType != JP2_FORMAT)
 		return B_NO_TRANSLATOR;
 
@@ -669,8 +1081,9 @@ Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *io
 	off_t position = inSource->Position();
 	uint8 header[sizeof(TranslatorBitmap)];
 	status_t err = inSource->Read(header, sizeof(TranslatorBitmap));
-	inSource->Seek( position, SEEK_SET);
-	if (err < B_OK) return err;
+	inSource->Seek(position, SEEK_SET);
+	if (err < B_OK)
+		return err;
 
 	if (B_BENDIAN_TO_HOST_INT32(((TranslatorBitmap *)header)->magic) == B_TRANSLATOR_BITMAP) {
 		outInfo->type = inputFormats[1].type;
@@ -699,30 +1112,28 @@ Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *io
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Arguably the most important method in the add-on
-//---------------------------------------------------
+
+//!	Arguably the most important method in the add-on
 status_t
 Translate(BPositionIO *inSource, const translator_info *inInfo, BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
 {
 	// If no specific type was requested, convert to the interchange format
-	if (outType == 0) outType = B_TRANSLATOR_BITMAP;
-	
+	if (outType == 0)
+		outType = B_TRANSLATOR_BITMAP;
+
 	// What action to take, based on the findings of Identify()
-	if (outType == inInfo->type) {
+	if (outType == inInfo->type)
 		return Copy(inSource, outDestination);
-	} else if (inInfo->type == B_TRANSLATOR_BITMAP && outType == JP2_FORMAT) {
+	if (inInfo->type == B_TRANSLATOR_BITMAP && outType == JP2_FORMAT)
 		return Compress(inSource, outDestination);
-	} else if (inInfo->type == JP2_FORMAT && outType == B_TRANSLATOR_BITMAP) {
+	if (inInfo->type == JP2_FORMAT && outType == B_TRANSLATOR_BITMAP)
 		return Decompress(inSource, outDestination);
-	}
 
 	return B_NO_TRANSLATOR;
 }
 
-//---------------------------------------------------
-//	The user has requested the same format for input and output, so just copy
-//---------------------------------------------------
+
+//!	The user has requested the same format for input and output, so just copy
 status_t
 Copy(BPositionIO *in, BPositionIO *out)
 {
@@ -734,14 +1145,15 @@ Copy(BPositionIO *in, BPositionIO *out)
 		block_size = 1024;
 	}
 	status_t err = B_OK;
-	
+
 	// Read until end of file or error
 	while (1) {
 		ssize_t to_read = block_size;
 		err = in->Read(buffer, to_read);
 		// Explicit check for EOF
 		if (err == -1) {
-			if (buffer != temp) free(buffer);
+			if (buffer != temp)
+				free(buffer);
 			return B_OK;
 		}
 		if (err <= B_OK) break;
@@ -750,27 +1162,29 @@ Copy(BPositionIO *in, BPositionIO *out)
 		if (err != to_read) if (err >= 0) err = B_DEVICE_FULL;
 		if (err < B_OK) break;
 	}
-	
-	if (buffer != temp) free(buffer);
+
+	if (buffer != temp)
+		free(buffer);
 	return (err >= 0) ? B_OK : err;
 }
 
-//---------------------------------------------------
-//	Encode into the native format
-//---------------------------------------------------
+
+//!	Encode into the native format
 status_t
 Compress(BPositionIO *in, BPositionIO *out)
 {
-	// Load Settings
-	SETTINGS Settings;
-	LoadSettings(&Settings);
-	
+	// Load settings
+	jpeg_settings settings;
+	LoadSettings(&settings);
+
 	// Read info about bitmap
 	TranslatorBitmap header;
 	status_t err = in->Read(&header, sizeof(TranslatorBitmap));
-	if (err < B_OK) return err;
-	else if (err < (int)sizeof(TranslatorBitmap)) return B_ERROR;
-	
+	if (err < B_OK)
+		return err;
+	if (err < (int)sizeof(TranslatorBitmap))
+		return B_ERROR;
+
 	// Grab dimension, color space, and size information from the stream
 	BRect bounds;
 	bounds.left = B_BENDIAN_TO_HOST_FLOAT(header.bounds.left);
@@ -791,11 +1205,9 @@ Compress(BPositionIO *in, BPositionIO *out)
 	int out_color_space = JAS_IMAGE_CS_RGB;
 	int out_color_components = 3;
 
-	switch ((color_space)B_BENDIAN_TO_HOST_INT32(header.colors))
-	{
+	switch ((color_space)B_BENDIAN_TO_HOST_INT32(header.colors)) {
 		case B_GRAY1:
-		{
-			if (Settings.B_GRAY1_as_B_RGB24) {
+			if (settings.B_GRAY1_as_B_RGB24) {
 				converter = write_gray1_to_rgb24;
 			} else {
 				out_color_components = 1;
@@ -803,63 +1215,52 @@ Compress(BPositionIO *in, BPositionIO *out)
 				converter = write_gray1_to_gray;
 			}
 			break;
-		}
+
 		case B_CMAP8:
-		{
 			converter = write_cmap8_to_rgb24;
 			break;
-		}
+
 		case B_GRAY8:
-		{
 			out_color_components = 1;
 			out_color_space = JAS_IMAGE_CS_GRAY;
 			converter = write_gray;
 			break;
-		}
+
 		case B_RGB15:
 		case B_RGBA15:
-		{
 			converter = write_rgb15_to_rgb24;
 			break;
-		}
+
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
-		{
 			converter = write_rgb15b_to_rgb24;
 			break;
-		}
+
 		case B_RGB16:
-		{
 			converter = write_rgb16_to_rgb24;
 			break;
-		}
+
 		case B_RGB16_BIG:
-		{
 			converter = write_rgb16b_to_rgb24;
 			break;
-		}
+
 		case B_RGB24:
-		{
 			converter = write_rgb24;
 			break;
-		}
+
 		case B_RGB24_BIG:
-		{
 			converter = write_rgb24b;
 			break;
-		}
+
 		case B_RGB32:
-		{
 			converter = write_rgb32_to_rgb24;
 			break;
-		}
+
 		case B_RGB32_BIG:
-		{
 			converter = write_rgb32b_to_rgb24;
 			break;
-		}
+
 		case B_RGBA32:
-		{
 		/*
 			// In theory it should be possible to write 4 color components
 			// to jp2, so it should be possible to have transparency.
@@ -871,9 +1272,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 		*/
 			converter = write_rgb32_to_rgb24;
 			break;
-		}
+
 		case B_RGBA32_BIG:
-		{
 		/*
 			// In theory it should be possible to write 4 color components
 			// to jp2, so it should be possible to have transparency.
@@ -885,12 +1285,10 @@ Compress(BPositionIO *in, BPositionIO *out)
 		*/
 			converter = write_rgb32b_to_rgb24;
 			break;
-		}
+
 		default:
-		{
 			(new BAlert("Error", "Unknown color space.", "Quit"))->Go();
 			return B_ERROR;
-		}
 	}
 
 	jas_image_t *image;
@@ -905,8 +1303,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 		return B_ERROR;
 
 	int32 i = 0;
-	for (i = 0; i < (long)out_color_components; i++)
-	{
+	for (i = 0; i < (long)out_color_components; i++) {
 		(void) memset(component_info + i, 0, sizeof(jas_image_cmptparm_t));
 		component_info[i].hstep = 1;
 		component_info[i].vstep = 1;
@@ -915,23 +1312,22 @@ Compress(BPositionIO *in, BPositionIO *out)
 		component_info[i].prec = (unsigned int)8;
 	}
 
-	image = jas_image_create( (short)out_color_components, component_info, out_color_space);
+	image = jas_image_create((short)out_color_components, component_info, out_color_space);
 	if (image == (jas_image_t *)NULL)
 		return Error(outs, NULL, NULL, 0, NULL, B_ERROR);
-		
-	jpr_uchar_t *in_scanline = (jpr_uchar_t*) malloc(in_row_bytes);
-	if (in_scanline == NULL) return Error(outs, image, NULL, 0, NULL, B_ERROR);
 
-	for (i = 0; i < (long)out_color_components; i++)
-	{
+	jpr_uchar_t *in_scanline = (jpr_uchar_t*) malloc(in_row_bytes);
+	if (in_scanline == NULL)
+		return Error(outs, image, NULL, 0, NULL, B_ERROR);
+
+	for (i = 0; i < (long)out_color_components; i++) {
 		pixels[i] = jas_matrix_create(1, (unsigned int)width);
 		if (pixels[i] == (jas_matrix_t *)NULL)
 			return Error(outs, image, pixels, i+1, in_scanline, B_ERROR);
 	}
 
 	int32 y = 0;
-	for (y = 0; y < (long)height; y++)
-	{
+	for (y = 0; y < (long)height; y++) {
 		err = in->Read(in_scanline, in_row_bytes);
 		if (err < in_row_bytes)
 			return (err < B_OK) ? Error(outs, image, pixels, out_color_components, in_scanline, err) : Error(outs, image, pixels, out_color_components, in_scanline, B_ERROR);
@@ -943,14 +1339,15 @@ Compress(BPositionIO *in, BPositionIO *out)
 	}
 
 	char opts[16];
-	sprintf(opts, "rate=%1f", (float)Settings.Quality / 100.0);
-	if ( jas_image_encode(image, outs, jas_image_strtofmt(Settings.JPC ? (char*)"jpc" : (char*)"jp2"), opts))
+	sprintf(opts, "rate=%1f", (float)settings.Quality / 100.0);
+	if (jas_image_encode(image, outs, jas_image_strtofmt(settings.JPC ? (char*)"jpc" : (char*)"jp2"), opts))
 		return Error(outs, image, pixels, out_color_components, in_scanline, err);
 
 	free(in_scanline);
 
 	for (i = 0; i < (long)out_color_components; i++)
 		jas_matrix_destroy(pixels[i]);
+
 	jas_stream_close(outs);
 	jas_image_destroy(image);
 	jas_image_clearfmts();
@@ -958,14 +1355,13 @@ Compress(BPositionIO *in, BPositionIO *out)
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Decode the native format
-//---------------------------------------------------
+
+//!	Decode the native format
 status_t
 Decompress(BPositionIO *in, BPositionIO *out)
 {
-	SETTINGS Settings;
-	LoadSettings(&Settings);
+	jpeg_settings settings;
+	LoadSettings(&settings);
 
 	jas_image_t *image;
 	jas_stream_t *ins;
@@ -988,9 +1384,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	// Function pointer to read function
 	// It MUST point to proper function
 	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *outscanline, int width) = NULL;
-	
-	switch( jas_image_colorspace(image))
-	{
+
+	switch (jas_image_colorspace(image)) {
 		case JAS_IMAGE_CS_RGB:
 			out_color_components = 4;
 			if (in_color_components == 3) {
@@ -1005,7 +1400,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 			}
 			break;
 		case JAS_IMAGE_CS_GRAY:
-			if (Settings.B_GRAY8_as_B_RGB32) {
+			if (settings.B_GRAY8_as_B_RGB32) {
 				out_color_space = B_RGB32;
 				out_color_components = 4;
 				converter = read_gray_to_rgb32;
@@ -1034,7 +1429,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 		// NOTE: things will go wrong if "out_row_bytes" wouldn't fit into 32 bits
 
 	// !!! Initialize this bounds rect to the size of your image
-	BRect bounds( 0, 0, width-1, height-1);
+	BRect bounds(0, 0, width-1, height-1);
 
 	// Fill out the B_TRANSLATOR_BITMAP's header
 	TranslatorBitmap header;
@@ -1049,23 +1444,24 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	// Write out the header
 	status_t err = out->Write(&header, sizeof(TranslatorBitmap));
-	if (err < B_OK)	return Error(ins, image, NULL, 0, NULL, err);
-	else if (err < (int)sizeof(TranslatorBitmap)) return Error(ins, image, NULL, 0, NULL, B_ERROR);
+	if (err < B_OK)
+		return Error(ins, image, NULL, 0, NULL, err);
+	if (err < (int)sizeof(TranslatorBitmap))
+		return Error(ins, image, NULL, 0, NULL, B_ERROR);
 
 	jpr_uchar_t *out_scanline = (jpr_uchar_t*) malloc(out_row_bytes);
-	if (out_scanline == NULL) return Error(ins, image, NULL, 0, NULL, B_ERROR);
+	if (out_scanline == NULL)
+		return Error(ins, image, NULL, 0, NULL, B_ERROR);
 
 	int32 i = 0;
-	for (i = 0; i < (long)in_color_components; i++)
-	{
+	for (i = 0; i < (long)in_color_components; i++) {
 		pixels[i] = jas_matrix_create(1, (unsigned int)width);
 		if (pixels[i] == (jas_matrix_t *)NULL)
 			return Error(ins, image, pixels, i+1, out_scanline, B_ERROR);
 	}
-	
+
 	int32 y = 0;
-	for (y = 0; y < (long)height; y++)
-	{
+	for (y = 0; y < (long)height; y++) {
 		for (i = 0; i < (long)in_color_components; i++)
 			(void)jas_image_readcmpt(image, (short)i, 0, (unsigned int)y, (unsigned int)width, 1, pixels[i]);
 
@@ -1080,6 +1476,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	for (i = 0; i < (long)in_color_components; i++)
 		jas_matrix_destroy(pixels[i]);
+
 	jas_stream_close(ins);
 	jas_image_destroy(image);
 	jas_image_clearfmts();
@@ -1087,27 +1484,45 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Frees jpeg alocated memory
-//	Returns given error (B_ERROR by default)
-//---------------------------------------------------
+
+/*!
+	Frees jpeg alocated memory
+	Returns given error (B_ERROR by default)
+*/
 status_t
 Error(jas_stream_t *stream, jas_image_t *image, jas_matrix_t **pixels, int32 pixels_count, jpr_uchar_t *scanline, status_t error)
 {
-	if (pixels)
-	{
+	if (pixels) {
 		int32 i;
-		for (i = 0; i < (long)pixels_count; i++)
+		for (i = 0; i < (long)pixels_count; i++) {
 			if (pixels[i] != NULL)
 				jas_matrix_destroy(pixels[i]);
+		}
 	}
 	if (stream)
 		jas_stream_close(stream);
 	if (image)
 		jas_image_destroy(image);
+
 	jas_image_clearfmts();
-	if (scanline)
-		free(scanline);
+	free(scanline);
 
 	return error;
 }
+
+
+//	#pragma mark -
+
+
+int
+main()
+{
+	BApplication app("application/x-vnd.Haiku-JPEG2000Translator");
+
+	TranslatorWindow *window = new TranslatorWindow();
+	window->Show();
+
+	app.Run();
+	return 0;
+}
+
