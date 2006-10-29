@@ -40,6 +40,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string.h>
 #include "driver.h"
 #include "usbdevs.h"
 
