@@ -1206,7 +1206,7 @@ BMenu::_show(bool selectFirstItem)
 		window->Show();
 		
 		if (selectFirstItem)
-			SelectItem(ItemAt(0));
+			_SelectItem(ItemAt(0));
 		
 		window->Unlock();
 	}
@@ -1223,7 +1223,7 @@ BMenu::_hide()
 		return;
 	
 	if (fSelected != NULL)
-		SelectItem(NULL);
+		_SelectItem(NULL);
 
 	window->Hide();
 	window->DetachMenu();
@@ -1275,14 +1275,14 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
 			if (item != fSelected && system_time() > closeTime + kHysteresis) {
-				SelectItem(item, -1);
+				_SelectItem(item, false);
 				openTime = system_time();
 			} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
 				&& item->Submenu()->Window() == NULL) {
 				// Open the submenu if it's not opened yet, but only if
 				// the mouse pointer stayed over there for some time
 				// (hysteresis)
-				SelectItem(item);
+				_SelectItem(item);
 				closeTime = system_time();
 			}
 			fState = MENU_STATE_TRACKING;
@@ -1319,7 +1319,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			if (fSelected != NULL && !OverSubmenu(fSelected, screenLocation)
 				&& system_time() > closeTime + kHysteresis
 				&& fState != MENU_STATE_TRACKING_SUBMENU) {
-				SelectItem(NULL);
+				_SelectItem(NULL);
 				fState = MENU_STATE_TRACKING;
 			}
 
@@ -1354,7 +1354,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		*action = fState;
 
 	if (fSelected != NULL && LockLooper()) {
-		SelectItem(NULL);
+		_SelectItem(NULL);
 		UnlockLooper();
 	}
 
@@ -1408,7 +1408,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 	if (item != NULL) {
 		if (fItems.RemoveItem(item)) {
 			if (item == fSelected && window != NULL)
-				SelectItem(NULL);
+				_SelectItem(NULL);
 			item->Uninstall();	
 			item->SetSuper(NULL);
 			if (deleteItems)
@@ -1427,7 +1427,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 			if (item != NULL) {
 				if (fItems.RemoveItem(item)) {
 					if (item == fSelected && window != NULL)
-						SelectItem(NULL);
+						_SelectItem(NULL);
 					item->Uninstall();
 					item->SetSuper(NULL);
 					if (deleteItems)
@@ -1880,7 +1880,7 @@ BMenu::Uninstall()
 
 
 void
-BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
+BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 {	
 	// Avoid deselecting and then reselecting the same item
 	// which would cause flickering
@@ -1897,7 +1897,7 @@ BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 			fSelected->Select(true);
 	}
 	
-	if (fSelected != NULL && showSubmenu == 0) {
+	if (fSelected != NULL && showSubmenu) {
 		BMenu *subMenu = fSelected->Submenu();
 		if (subMenu != NULL && subMenu->Window() == NULL) {
 			if (!subMenu->_show(selectFirstItem)) {
@@ -1925,7 +1925,7 @@ BMenu::SelectNextItem(BMenuItem *item, bool forward)
 	if (nextItem == NULL)
 		return false;
 	
-	SelectItem(nextItem);
+	_SelectItem(nextItem);
 	return true;
 }
 
@@ -2111,7 +2111,7 @@ BMenu::OkToProceed(BMenuItem* item)
 void
 BMenu::QuitTracking()
 {
-	SelectItem(NULL);
+	_SelectItem(NULL);
 	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
 		menuBar->RestoreFocus();
 

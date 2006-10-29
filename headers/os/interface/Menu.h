@@ -219,9 +219,8 @@ virtual	void			_ReservedMenu6();
 		void		ItemMarked(BMenuItem *item);
 		void		Install(BWindow *target);
 		void		Uninstall();
-		void		SelectItem(	BMenuItem *m,
-								uint32 showSubmenu = 0,
-								bool selectFirstItem = false);
+		void		_SelectItem(BMenuItem* item, bool showSubmenu = true,
+						bool selectFirstItem = false);
 		BMenuItem	*CurrentSelection() const;
 		bool		SelectNextItem(BMenuItem *item, bool forward);
 		BMenuItem	*NextItem(BMenuItem *item, bool forward) const;

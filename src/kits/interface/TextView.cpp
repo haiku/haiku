@@ -85,7 +85,7 @@ static const uint32 kFlattenedTextRunArrayVersion = 0;
 enum {
 	B_SEPARATOR_CHARACTER,
 	B_OTHER_CHARACTER
-} separatorCharacters;
+};
 
 
 class _BTextTrackState_ {

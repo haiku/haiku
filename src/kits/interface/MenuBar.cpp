@@ -416,7 +416,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	if (startIndex != -1) {
 		be_app->ObscureCursor();
 		window->Lock();
-		SelectItem(ItemAt(startIndex), 0, true);
+		_SelectItem(ItemAt(startIndex), true, true);
 		window->Unlock();
 	}
 	while (true) {
@@ -442,18 +442,18 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				if (menuItem->Submenu() != NULL) {
 					if (menuItem->Submenu()->Window() == NULL) {
 						// open the menu if it's not opened yet
-						SelectItem(menuItem);
+						_SelectItem(menuItem);
 						if (IsStickyMode())
 							SetStickyMode(false);
 					} else {
 						// Menu was already opened, close it and bail
-						SelectItem(NULL);
+						_SelectItem(NULL);
 						fState = MENU_STATE_CLOSED;
 						fChosenItem = NULL;
 					}
 				} else {
 					// No submenu, just select the item
-					SelectItem(menuItem);					
+					_SelectItem(menuItem);					
 				}
 			}
 		}
@@ -476,7 +476,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			}
 		} else if (menuItem == NULL && !IsStickyMode()
 				&& fState != MENU_STATE_TRACKING_SUBMENU) {
-			SelectItem(NULL);
+			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
 		
@@ -500,7 +500,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 	if (window->Lock()) {
 		if (fSelected != NULL)
-			SelectItem(NULL);
+			_SelectItem(NULL);
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
 		RestoreFocus();
