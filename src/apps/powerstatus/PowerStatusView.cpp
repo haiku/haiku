@@ -37,8 +37,8 @@ const uint32 kMsgToggleStatusIcon = 'tgsi';
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
 
-const bigtime_t kUpdateInterval = 1000000;
-		// every second
+const bigtime_t kUpdateInterval = 2000000;
+		// every two seconds
 
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
@@ -408,7 +408,7 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 		snprintf(buffer, bufferLength, "%s%ld%%%s", open, fPercent, close);
 	else if (fShowTime && fTimeLeft >= 0) {
 		snprintf(buffer, bufferLength, "%s%ld:%ld%s",
-			open, fTimeLeft / 3600, fTimeLeft / 60, close);
+			open, fTimeLeft / 3600, (fTimeLeft / 60) % 60, close);
 	}
 }
 
@@ -416,6 +416,10 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 void
 PowerStatusView::_Update(bool force)
 {
+	int32 previousPercent = fPercent;
+	bool previousTimeLeft = fTimeLeft;
+	bool wasOnline = fOnline;
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	// TODO: retrieve data from APM/ACPI kernel interface
 	fPercent = 42;
@@ -436,6 +440,8 @@ PowerStatusView::_Update(bool force)
 		fTimeLeft = fPercent >= 0 ? regs[3] : -1;
 		if (fTimeLeft > 0xffff)
 			fTimeLeft = -1;
+		else if (fTimeLeft & 0x8000)
+			fTimeLeft = (fTimeLeft & 0x7fff) * 60;
 	}
 #endif
 
@@ -459,7 +465,9 @@ PowerStatusView::_Update(bool force)
 			ResizeTo(width, Bounds().Height());
 	}
 
-	if (force)
+	if (force || wasOnline != fOnline
+		|| (fShowTime && fTimeLeft != previousTimeLeft)
+		|| (!fShowTime && fPercent != previousPercent))
 		Invalidate();
 }
 
