@@ -77,8 +77,15 @@ BDeskbar::~BDeskbar()
 }
 
 
+bool
+BDeskbar::IsRunning() const
+{
+	return fMessenger->IsValid();
+}
+
+
 BRect
-BDeskbar::Frame(void) const
+BDeskbar::Frame() const
 {
 	BRect frame(0.0, 0.0, 0.0, 0.0);
 	get_deskbar_frame(&frame);
