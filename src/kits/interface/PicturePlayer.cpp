@@ -14,6 +14,7 @@
 #include <PicturePlayer.h>
 #include <PictureProtocol.h>
 
+#include <Shape.h>
 
 typedef void (*fnc)(void*);
 typedef void (*fnc_BPoint)(void*, BPoint);
@@ -36,6 +37,7 @@ typedef void (*fnc_ss)(void *, int16, int16);
 typedef void (*fnc_PBRecti)(void*, BRect*, int32);
 typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, void*);
+typedef void (*fnc_BShape)(void*, BShape*);
 
 
 PicturePlayer::PicturePlayer(void *data, int32 size, BList *pictures)
@@ -270,8 +272,49 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				break;
 			}
 			case B_PIC_STROKE_SHAPE:
-			case B_PIC_FILL_SHAPE:
+			{
+				BRect shapeFrame = GetRect();
+				(void)shapeFrame;
+
+				int32 opCount, ptCount;
+				opCount = GetInt32();
+				ptCount = GetInt32();
+
+				uint32 *opList = new uint32[opCount];
+				BPoint *ptList = new BPoint[ptCount];
+				GetData(opList, opCount * sizeof(uint32));
+				GetData(ptList, ptCount * sizeof(BPoint));
+
+				BShape shape;
+				shape.SetData(opCount, ptCount, opList, ptList);
+
+				((fnc_BShape)callBackTable[15])(userData, &shape);
+				delete[] opList;
+				delete[] ptList;
 				break;
+			}
+			case B_PIC_FILL_SHAPE:
+			{
+				BRect shapeFrame = GetRect();
+				(void)shapeFrame;
+				
+				int32 opCount, ptCount;
+				opCount = GetInt32();
+				ptCount = GetInt32();
+
+				uint32 *opList = new uint32[opCount];
+				BPoint *ptList = new BPoint[ptCount];
+				GetData(opList, opCount * sizeof(uint32));
+				GetData(ptList, ptCount * sizeof(BPoint));
+
+				BShape shape;
+				shape.SetData(opCount, ptCount, opList, ptList);
+
+				((fnc_BShape)callBackTable[16])(userData, &shape);
+				delete[] opList;
+				delete[] ptList;
+				break;
+			}
 			case B_PIC_DRAW_STRING:
 			{
 				int32 len = GetInt32();

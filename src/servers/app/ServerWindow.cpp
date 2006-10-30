@@ -2525,6 +2525,33 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;		
 		}
 		
+		case AS_STROKE_SHAPE:
+		case AS_FILL_SHAPE:
+		{
+			BRect shapeFrame;
+			int32 opCount;
+			int32 ptCount;
+
+			link.Read<BRect>(&shapeFrame);
+			link.Read<int32>(&opCount);
+			link.Read<int32>(&ptCount);
+
+			uint32 *opList = new(nothrow) uint32[opCount];
+			BPoint *ptList = new(nothrow) BPoint[ptCount];
+			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
+				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
+				
+				picture->BeginOp(code == AS_FILL_SHAPE ? B_PIC_FILL_SHAPE : B_PIC_STROKE_SHAPE);
+				picture->AddRect(shapeFrame);
+				picture->AddInt32(opCount);
+				picture->AddInt32(ptCount);
+				picture->AddData(opList, opCount * sizeof(uint32));
+				picture->AddData(ptList, ptCount * sizeof(BPoint));
+				picture->EndOp();
+			}
+			break;
+		}
+
 		case AS_LAYER_DRAW_BITMAP:
 		{
 			int32 token;

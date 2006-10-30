@@ -75,7 +75,7 @@ virtual	void			_ReservedShape3();
 virtual	void			_ReservedShape4();
 
 		friend class	BShapeIterator;
-		friend class	TPicture;
+		friend class	PicturePlayer;
 		friend class	BView;
 		friend class	BFont;
 		friend class	BPrivate::ServerLink;

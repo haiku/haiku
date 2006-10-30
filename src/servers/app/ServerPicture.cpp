@@ -20,9 +20,111 @@
 #include <ServerProtocol.h>
 
 #include <Bitmap.h>
+#include <Shape.h>
 
 #include <stdio.h>
+#include <stack>
 
+// NOTE: Initially defined in Shape.cpp. 
+#define OP_LINETO   0x10000000
+#define OP_BEZIERTO   0x20000000
+#define OP_CLOSE    0x40000000
+#define OP_MOVETO   0x80000000
+
+
+class ShapePainter : public BShapeIterator {
+	public:
+		ShapePainter();
+		virtual ~ShapePainter();
+
+		virtual status_t IterateMoveTo(BPoint *point);
+		virtual status_t IterateLineTo(int32 lineCount, BPoint *linePts);
+		virtual status_t IterateBezierTo(int32 bezierCount, BPoint *bezierPts);
+		virtual status_t IterateClose();
+
+		void Draw(ViewLayer *view, BRect frame, bool filled);
+
+	private:
+		stack<uint32> fOpStack;
+		stack<BPoint> fPtStack;
+};
+
+ShapePainter::ShapePainter()
+	:	BShapeIterator()
+{
+}
+
+ShapePainter::~ShapePainter()
+{
+}
+
+status_t
+ShapePainter::IterateMoveTo(BPoint *point)
+{
+	fOpStack.push(OP_MOVETO);
+	fPtStack.push(*point);
+
+	return B_OK;
+}
+
+status_t
+ShapePainter::IterateLineTo(int32 lineCount, BPoint *linePts)
+{
+	fOpStack.push(OP_LINETO | lineCount);
+	for(int32 i = 0;i < lineCount;i++)
+		fPtStack.push(linePts[i]);
+	
+	return B_OK;
+}
+
+status_t
+ShapePainter::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
+{
+	bezierCount *= 3;
+	fOpStack.push(OP_BEZIERTO | bezierCount);
+	for(int32 i = 0;i < bezierCount;i++)
+		fPtStack.push(bezierPts[i]);
+
+	return B_OK;
+}
+
+status_t
+ShapePainter::IterateClose(void)
+{
+	fOpStack.push(OP_CLOSE);
+	
+	return B_OK;
+}
+
+void
+ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
+{
+	// We're going to draw the currently iterated picture.
+	int32 opCount, ptCount;
+	opCount = fOpStack.size();
+	ptCount = fPtStack.size();
+
+	uint32 *opList;
+	BPoint *ptList;
+	if(opCount > 0 && ptCount > 0) {
+		int32 i;
+		opList = new uint32[opCount];
+		ptList = new BPoint[ptCount];
+
+		for(i = (opCount - 1);i >= 0;i--) {
+			opList[i] = fOpStack.top();
+			fOpStack.pop();
+		}
+
+		for(i = (ptCount - 1);i >= 0;i--) {
+			ptList[i] = fPtStack.top();
+			fPtStack.pop();
+		}
+
+		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount, opList, ptCount, ptList,
+				view->CurrentState(), filled);
+	}
+}
 
 static void
 nop()
@@ -191,21 +293,20 @@ fill_polygon(ViewLayer *view, int32 numPoints, BPoint *points)
 static void
 stroke_shape(ViewLayer *view, BShape *shape)
 {
-	//TODO: Oh-ho... how do I access BShape private members ?
-	/*for (int32 i = 0; i < ptCount; i++)
-		fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
+	ShapePainter drawShape;
 
-	view->Window()->GetDrawingEngine()->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
-				fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);*/
+	drawShape.Iterate(shape);
+	drawShape.Draw(view, shape->Bounds(), false);
 }
 
 
 static void
 fill_shape(ViewLayer *view, BShape *shape)
 {
-	//view->FillShape(shape);
+	ShapePainter drawShape;
 
-	printf("FillShape\n");
+	drawShape.Iterate(shape);
+	drawShape.Draw(view, shape->Bounds(), true);
 }
 
 
