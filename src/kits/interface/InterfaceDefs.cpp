@@ -746,10 +746,11 @@ set_ui_color(const color_which &which, const rgb_color &color)
 		return;
 	}
 
-	if (be_app) {
-		server_read_only_memory* shared = BApplication::Private::ServerReadOnlyMemory();
-		shared->colors[index] = color;
-	}
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_UI_COLOR);
+	link.Attach<color_which>(which);
+	link.Attach<rgb_color>(color);
+	link.Flush();
 }
 
 
