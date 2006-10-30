@@ -219,6 +219,7 @@ static uint16 nvidia_device_list[] = {
 	0x018d, /* Nvidia GeForce4 448 Go */
 	0x01a0, /* Nvidia GeForce2 Integrated GPU */
 	0x01d1, /* Nvidia GeForce 7300 LE */
+	0x01d8,	/* Nvidia GeForce 7400 GO */
 	0x01df, /* Nvidia GeForce 7300 GS */
 	0x01f0, /* Nvidia GeForce4 MX Integrated GPU */
 	0x0200, /* Nvidia GeForce3 */

@@ -681,6 +681,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G72");
 		status = nvxx_general_powerup();
 		break;
+	case 0x01d810de: /* Nvidia GeForce 7400 GO */
+		si->ps.card_type = G72;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7400 Go");
+		sprintf(si->adi.chipset, "G72");
+		status = nvxx_general_powerup();
+		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
