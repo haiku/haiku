@@ -41,6 +41,7 @@
 #include <MenuItem.h>
 #include <StringView.h>
 #include <Invoker.h>
+
 #include "ColorSet.h"
 
 class ColorWell;
@@ -51,6 +52,7 @@ class APRView : public BView
 public:
 			APRView(const BRect &frame, const char *name, int32 resize, 
 					int32 flags);
+			~APRView(void);
 	void	AttachedToWindow(void);
 	void	MessageReceived(BMessage *msg);
 	
@@ -62,7 +64,6 @@ protected:
 	
 	BColorControl	*picker;
 	
-	BButton			*apply;
 	BButton			*revert;
 	BButton			*defaults;
 	
@@ -75,7 +76,7 @@ protected:
 	BScrollView		*scrollview;
 	
 	ColorWell		*colorwell;
-	
+
 	ColorSet		currentset;
 	ColorSet		prevset;
 };

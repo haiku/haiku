@@ -6,20 +6,21 @@ Preference Appearance :
 	APRMain.cpp
 	APRView.cpp
 	APRWindow.cpp
-	DecView.cpp
+	ColorSet.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	
 	# These are currently disabled while everything else is being worked on
 	#CurView.cpp
 	#CursorWhichItem.cpp
+	#DecView.cpp
 	#SysCursorAPI.cpp
 	
 	# These exist for post-R1, so they are disabled for now
 	#FontMenu.cpp
 	#MenuView.cpp
 	
-	: be libtranslation.so libappserver.so
+	: be
 	: Appearance.rdef
 	;
 

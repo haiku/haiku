@@ -27,7 +27,7 @@
 #include "ColorWell.h"
 
 ColorWell::ColorWell(BRect frame, BMessage *msg, bool is_rectangle=false)
-	: BView(frame,"ColorWell", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	: BView(frame,"ColorWell", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(0,0,0);

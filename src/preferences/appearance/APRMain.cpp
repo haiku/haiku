@@ -33,7 +33,7 @@
 APRApplication::APRApplication(void)
   : BApplication(APPEARANCE_APP_SIGNATURE)
 {
-	fWindow=new APRWindow( BRect(100,100,540,410) );
+	fWindow=new APRWindow( BRect(100,100,540,390) );
 	fWindow->Show();
 }
 

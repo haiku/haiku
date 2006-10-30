@@ -28,9 +28,6 @@
 #include <Messenger.h>
 #include "APRWindow.h"
 #include "APRView.h"
-#include "DecView.h"
-#include "CurView.h"
-#include "MenuView.h"
 #include "defs.h"
 #include <TabView.h>
 
@@ -38,18 +35,8 @@ APRWindow::APRWindow(BRect frame)
 	: BWindow(frame, "Appearance", B_TITLED_WINDOW,
 	  B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES )
 {
-	BTabView *tabview = new BTabView(Bounds(),"tabview");
-	
-	BRect r(Bounds());
-	r.bottom -= 20;
-	
-	DecView *decview=new DecView(r,"Decorators",B_FOLLOW_ALL, B_WILL_DRAW);
-	tabview->AddTab(decview);
-
-	APRView *colorview=new APRView(r,"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
-	tabview->AddTab(colorview);
-
-	AddChild(tabview);
+	APRView *colorview=new APRView(Bounds(),"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
+	AddChild(colorview);
 }
 
 bool APRWindow::QuitRequested()

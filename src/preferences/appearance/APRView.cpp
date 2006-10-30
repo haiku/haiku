@@ -36,47 +36,35 @@
 #include <File.h>
 #include <stdio.h>
 
-#include <PortLink.h>
 #include <InterfaceDefs.h>
-#include <ServerProtocol.h>
 
 #include "APRView.h"
 #include "defs.h"
 #include "ColorWell.h"
-#include <ColorUtils.h>
 #include "ColorWhichItem.h"
 #include "ColorSet.h"
 
-#include "ServerConfig.h"
+//#define DEBUG_APRVIEW
 
-//#define DEBUG_COLORSET
-
-#ifdef DEBUG_COLORSET
-#define STRACE(a) printf a
+#ifdef DEBUG_APRVIEW
+	#define STRACE(a) printf a
 #else
-#define STRACE(A) /* nothing */
+	#define STRACE(A) /* nothing */
 #endif
 
 #define COLOR_DROPPED 'cldp'
 
-// Declarations for private functions in InterfaceDefs.cpp
-namespace BPrivate
-{
-	void get_system_colors(ColorSet *colors);
-	void set_system_colors(const ColorSet &colors);
-}
-
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
-	:BView(frame,name,resize,flags)
+ :	BView(frame,name,resize,flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// Set up list of color attributes
-	BRect rect(10,10,200,150);
-	attrlist=new BListView(rect,"AttributeList");
+	BRect rect(10,10,200,85);
+	attrlist = new BListView(rect,"AttributeList");
 	
-	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
-		B_FOLLOW_TOP, 0, false, true);
+	scrollview = new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |	B_FOLLOW_TOP,
+								 0, false, true);
 	AddChild(scrollview);
 	scrollview->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
@@ -110,81 +98,60 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 
 	BRect wellrect(0,0,50,50);
-	wellrect.OffsetTo( rect.right + 42, rect.top +
+	wellrect.OffsetTo(rect.right + 30, rect.top +
 					(scrollview->Bounds().Height() - wellrect.Height())/2 );
 
-	colorwell=new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
+	colorwell = new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
 	AddChild(colorwell);
 	
 	// Center the list and color well
 	
 	rect = scrollview->Frame();
 	rect.right = wellrect.right;
-	rect.OffsetTo( (Bounds().Width()-rect.Width())/2,rect.top);
+	rect.OffsetTo((Bounds().Width()-rect.Width())/2,rect.top);
 	
-	scrollview->MoveTo(rect.left, rect.top);
-	colorwell->MoveTo(rect.right - colorwell->Bounds().Width(), colorwell->Frame().top);
-	
-	picker=new BColorControl(BPoint(10,scrollview->Frame().bottom+20),B_CELLS_32x8,5.0,"Picker",
-		new BMessage(UPDATE_COLOR));
+	picker = new BColorControl(BPoint(10,scrollview->Frame().bottom+20),B_CELLS_32x8,5.0,"Picker",
+							new BMessage(UPDATE_COLOR));
 	AddChild(picker);
 	
-	picker->MoveTo( (Bounds().Width() - picker->Frame().Width())/2,
-			scrollview->Frame().bottom + 20 );
-	
-	BRect cvrect;
-	
-	cvrect=picker->Frame();
-	cvrect.right=cvrect.left+60;
-	cvrect.bottom=cvrect.top+30;
-	
-	// 40 is a 10 pixel space between buttons and other objects, 
-	// such as the edge or another button
-	cvrect.OffsetTo( (Bounds().Width()- ((cvrect.Width()*3) + 40))/2,
-					picker->Frame().bottom+10);
-
-	defaults=new BButton(cvrect,"DefaultsButton","Defaults",
+	defaults = new BButton(BRect(0,0,1,1),"DefaultsButton","Defaults",
 						new BMessage(DEFAULT_SETTINGS),
 						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	defaults->ResizeToPreferred(); 
+	defaults->MoveTo((picker->Frame().right-(defaults->Frame().Width()*2)-20)/2,picker->Frame().bottom+20);
 	AddChild(defaults);
+	
+	
+	BRect cvrect(defaults->Frame());
+	cvrect.OffsetBy(cvrect.Width() + 20,0);
 
-	cvrect.OffsetBy(70,0);
-	revert=new BButton(cvrect,"RevertButton","Revert", 
+	revert = new BButton(cvrect,"RevertButton","Revert", 
 						new BMessage(REVERT_SETTINGS),
 						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(revert);
 	revert->SetEnabled(false);
 	
-	cvrect.OffsetBy(70,0);
-	apply=new BButton(cvrect,"ApplyButton","Apply", new BMessage(APPLY_SETTINGS),
-						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(apply);
-	apply->SetEnabled(false);
+}
 
-	BEntry entry(COLOR_SET_DIR);
-	entry_ref ref;
-	entry.GetRef(&ref);
-
-	attribute=B_PANEL_BACKGROUND_COLOR;
-	attrstring="Panel Background";
-	
-	LoadSettings();
-	
-	// Save values for when we need to revert
-	prevset=currentset;
+APRView::~APRView(void)
+{
+	ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",currentset);
 }
 
 void APRView::AttachedToWindow(void)
 {
 	picker->SetTarget(this);
-	attrlist->Select(0);
 	attrlist->SetTarget(this);
-	apply->SetTarget(this);
 	defaults->SetTarget(this);
 	revert->SetTarget(this);
 	colorwell->SetTarget(this);
 
 	picker->SetValue(currentset.StringToColor(attrstring.String()));
+	
+	Window()->ResizeTo(MAX(picker->Frame().right,picker->Frame().right) + 10,
+					   defaults->Frame().bottom + 10);
+	LoadSettings();
+	attrlist->Select(0);
 }
 
 void APRView::MessageReceived(BMessage *msg)
@@ -215,7 +182,6 @@ void APRView::MessageReceived(BMessage *msg)
 			// Update current attribute in the settings
 			currentset.SetColor(attrstring.String(),col);
 			
-			apply->SetEnabled(true);
 			revert->SetEnabled(true);
 			
 			break;
@@ -233,30 +199,11 @@ void APRView::MessageReceived(BMessage *msg)
 			UpdateControlsFromAttr(whichitem->Text());
 			break;
 		}
-		case APPLY_SETTINGS:
-		{
-			apply->SetEnabled(false);
-			BPrivate::set_system_colors(currentset);
-			
-			BString path(SERVER_SETTINGS_DIR);
-			path += COLOR_SETTINGS_NAME;
-			
-			SaveColorSet( path.String(), currentset);
-			break;
-		}
 		case REVERT_SETTINGS:
 		{
 			currentset=prevset;
 			UpdateControlsFromAttr(attrstring.String());
 			
-			// Save settings on disk if 'Apply' has been used
-			if(!apply->IsEnabled())
-			{
-				BString path(SERVER_SETTINGS_DIR);
-				path += COLOR_SETTINGS_NAME;
-				SaveColorSet( path.String(), currentset);
-			}
-			apply->SetEnabled(false);
 			revert->SetEnabled(false);
 			
 			break;
@@ -264,7 +211,6 @@ void APRView::MessageReceived(BMessage *msg)
 		case DEFAULT_SETTINGS:
 		{
 			currentset.SetToDefaults();
-			apply->SetEnabled(true);
 			
 			UpdateControlsFromAttr(attrstring.String());
 			break;
@@ -284,9 +230,13 @@ void APRView::LoadSettings(void)
 	//BPrivate::get_system_colors(&currentset);
 	
 	// TODO: remove this and enable the get_system_colors() call
-	LoadColorSet("/boot/home/config/settings/app_server/system_colors",&currentset);
-		
-	UpdateControlsFromAttr(attrstring.String());
+	if(ColorSet::LoadColorSet("/boot/home/config/settings/app_server/system_colors",&currentset)!=B_OK)
+	{
+		currentset.SetToDefaults();
+		ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",currentset);
+	}
+	
+	prevset = currentset;
 }
 
 void APRView::UpdateControlsFromAttr(const char *string)
