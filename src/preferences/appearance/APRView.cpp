@@ -1,33 +1,10 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		APRView.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	color handler for the app
-//  
-//	Handles all the grunt work. Color settings are stored in a BMessage to
-//	allow for easy transition to and from disk. The messy details are in the
-//	hard-coded strings to translate the enumerated color_which defines to
-//	strings and such, but even those should be easy to maintain.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm (darkwyrm@earthlink.net)
+ */
 #include <OS.h>
 #include <Directory.h>
 #include <Alert.h>
@@ -59,160 +36,157 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	// Set up list of color attributes
+	// Set up list of color fAttributes
 	BRect rect(10,10,200,85);
-	attrlist = new BListView(rect,"AttributeList");
+	fAttrList = new BListView(rect,"AttributeList");
 	
-	scrollview = new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |	B_FOLLOW_TOP,
+	fScrollView = new BScrollView("ScrollView",fAttrList, B_FOLLOW_LEFT |	B_FOLLOW_TOP,
 								 0, false, true);
-	AddChild(scrollview);
-	scrollview->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fScrollView);
+	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	attrlist->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
+	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 
-	attrlist->AddItem(new ColorWhichItem(B_PANEL_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_PANEL_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_BORDER_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_HIGHLIGHT_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_BASE_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_PULSE_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_SHINE_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_SHADOW_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BORDER_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_TOOLTIP_BACKGROUND_COLOR));
+	fAttrList->AddItem(new ColorWhichItem(B_PANEL_BACKGROUND_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_PANEL_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_BACKGROUND_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_BACKGROUND_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_BORDER_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_HIGHLIGHT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_BASE_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_PULSE_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_SHINE_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_SHADOW_COLOR));
+	fAttrList->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BACKGROUND_COLOR));
+	fAttrList->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BORDER_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_TOOLTIP_BACKGROUND_COLOR));
 	
-	attrlist->AddItem(new ColorWhichItem((color_which)B_SUCCESS_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_FAILURE_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_WINDOW_TAB_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_WINDOW_TAB_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_COLOR));
-	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_SUCCESS_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_FAILURE_COLOR));
+	fAttrList->AddItem(new ColorWhichItem(B_WINDOW_TAB_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_WINDOW_TAB_TEXT_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_COLOR));
+	fAttrList->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR));
 
 
 	BRect wellrect(0,0,50,50);
 	wellrect.OffsetTo(rect.right + 30, rect.top +
-					(scrollview->Bounds().Height() - wellrect.Height())/2 );
+					(fScrollView->Bounds().Height() - wellrect.Height())/2 );
 
-	colorwell = new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
-	AddChild(colorwell);
+	fColorWell = new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
+	AddChild(fColorWell);
 	
 	// Center the list and color well
 	
-	rect = scrollview->Frame();
+	rect = fScrollView->Frame();
 	rect.right = wellrect.right;
 	rect.OffsetTo((Bounds().Width()-rect.Width())/2,rect.top);
 	
-	picker = new BColorControl(BPoint(10,scrollview->Frame().bottom+20),B_CELLS_32x8,5.0,"Picker",
+	fPicker = new BColorControl(BPoint(10,fScrollView->Frame().bottom+20),B_CELLS_32x8,5.0,"fPicker",
 							new BMessage(UPDATE_COLOR));
-	AddChild(picker);
+	AddChild(fPicker);
 	
-	defaults = new BButton(BRect(0,0,1,1),"DefaultsButton","Defaults",
+	fDefaults = new BButton(BRect(0,0,1,1),"DefaultsButton","Defaults",
 						new BMessage(DEFAULT_SETTINGS),
 						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	defaults->ResizeToPreferred(); 
-	defaults->MoveTo((picker->Frame().right-(defaults->Frame().Width()*2)-20)/2,picker->Frame().bottom+20);
-	AddChild(defaults);
+	fDefaults->ResizeToPreferred(); 
+	fDefaults->MoveTo((fPicker->Frame().right-(fDefaults->Frame().Width()*2)-20)/2,fPicker->Frame().bottom+20);
+	AddChild(fDefaults);
 	
 	
-	BRect cvrect(defaults->Frame());
+	BRect cvrect(fDefaults->Frame());
 	cvrect.OffsetBy(cvrect.Width() + 20,0);
 
-	revert = new BButton(cvrect,"RevertButton","Revert", 
+	fRevert = new BButton(cvrect,"RevertButton","Revert", 
 						new BMessage(REVERT_SETTINGS),
 						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(revert);
-	revert->SetEnabled(false);
+	AddChild(fRevert);
+	fRevert->SetEnabled(false);
 	
 }
 
 APRView::~APRView(void)
 {
-	ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",currentset);
+	ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",fCurrentSet);
 }
 
-void APRView::AttachedToWindow(void)
+void
+APRView::AttachedToWindow(void)
 {
-	picker->SetTarget(this);
-	attrlist->SetTarget(this);
-	defaults->SetTarget(this);
-	revert->SetTarget(this);
-	colorwell->SetTarget(this);
+	fPicker->SetTarget(this);
+	fAttrList->SetTarget(this);
+	fDefaults->SetTarget(this);
+	fRevert->SetTarget(this);
+	fColorWell->SetTarget(this);
 
-	picker->SetValue(currentset.StringToColor(attrstring.String()));
+	fPicker->SetValue(fCurrentSet.StringToColor(fAttrString.String()));
 	
-	Window()->ResizeTo(MAX(picker->Frame().right,picker->Frame().right) + 10,
-					   defaults->Frame().bottom + 10);
+	Window()->ResizeTo(MAX(fPicker->Frame().right,fPicker->Frame().right) + 10,
+					   fDefaults->Frame().bottom + 10);
 	LoadSettings();
-	attrlist->Select(0);
+	fAttrList->Select(0);
 }
 
-void APRView::MessageReceived(BMessage *msg)
+void
+APRView::MessageReceived(BMessage *msg)
 {
-	if(msg->WasDropped())
-	{
+	if(msg->WasDropped()) {
 		rgb_color *col;
 		ssize_t size;
-		if(msg->FindData("RGBColor",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		{
-			picker->SetValue(*col);
-			colorwell->SetColor(*col);
-			colorwell->Invalidate();
+		
+		if(msg->FindData("RGBColor",(type_code)'RGBC',(const void**)&col,&size)==B_OK) {
+			fPicker->SetValue(*col);
+			fColorWell->SetColor(*col);
+			fColorWell->Invalidate();
 		}
 	}
 
-	switch(msg->what)
-	{
-		case UPDATE_COLOR:
-		{
-			// Received from the color picker when its color changes
+	switch(msg->what) {
+		case UPDATE_COLOR: {
+			// Received from the color fPicker when its color changes
 			
-			rgb_color col=picker->ValueAsColor();
+			rgb_color col=fPicker->ValueAsColor();
 
-			colorwell->SetColor(col);
-			colorwell->Invalidate();
+			fColorWell->SetColor(col);
+			fColorWell->Invalidate();
 			
-			// Update current attribute in the settings
-			currentset.SetColor(attrstring.String(),col);
+			// Update current fAttribute in the settings
+			fCurrentSet.SetColor(fAttrString.String(),col);
 			
-			revert->SetEnabled(true);
+			fRevert->SetEnabled(true);
 			
 			break;
 		}
-		case ATTRIBUTE_CHOSEN:
-		{
-			// Received when the user chooses a GUI attribute from the list
+		case ATTRIBUTE_CHOSEN: {
+			// Received when the user chooses a GUI fAttribute from the list
 			
-			ColorWhichItem *whichitem = (ColorWhichItem*)attrlist->ItemAt( attrlist->CurrentSelection() );
+			ColorWhichItem *whichitem = (ColorWhichItem*)
+										fAttrList->ItemAt(fAttrList->CurrentSelection());
 			
 			if(!whichitem)
 				break;
 			
-			attrstring=whichitem->Text();
+			fAttrString=whichitem->Text();
 			UpdateControlsFromAttr(whichitem->Text());
 			break;
 		}
-		case REVERT_SETTINGS:
-		{
-			currentset=prevset;
-			UpdateControlsFromAttr(attrstring.String());
+		case REVERT_SETTINGS: {
+			fCurrentSet=fPrevSet;
+			UpdateControlsFromAttr(fAttrString.String());
 			
-			revert->SetEnabled(false);
+			fRevert->SetEnabled(false);
 			
 			break;
 		}
-		case DEFAULT_SETTINGS:
-		{
-			currentset.SetToDefaults();
+		case DEFAULT_SETTINGS: {
+			fCurrentSet.SetToDefaults();
 			
-			UpdateControlsFromAttr(attrstring.String());
+			UpdateControlsFromAttr(fAttrString.String());
 			break;
 		}
 		default:
@@ -227,16 +201,15 @@ void APRView::LoadSettings(void)
 	// getting them from the server at this point for testing purposes.
 	
 	// Query the server for the current settings
-	//BPrivate::get_system_colors(&currentset);
+	//BPrivate::get_system_colors(&fCurrentSet);
 	
 	// TODO: remove this and enable the get_system_colors() call
-	if(ColorSet::LoadColorSet("/boot/home/config/settings/app_server/system_colors",&currentset)!=B_OK)
-	{
-		currentset.SetToDefaults();
-		ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",currentset);
+	if(ColorSet::LoadColorSet("/boot/home/config/settings/app_server/system_colors",&fCurrentSet)!=B_OK) {
+		fCurrentSet.SetToDefaults();
+		ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",fCurrentSet);
 	}
 	
-	prevset = currentset;
+	fPrevSet = fCurrentSet;
 }
 
 void APRView::UpdateControlsFromAttr(const char *string)
@@ -245,7 +218,7 @@ void APRView::UpdateControlsFromAttr(const char *string)
 		return;
 	STRACE(("Update color for %s\n",string));
 
-	picker->SetValue(currentset.StringToColor(string));
-	colorwell->SetColor(picker->ValueAsColor());
-	colorwell->Invalidate();
+	fPicker->SetValue(fCurrentSet.StringToColor(string));
+	fColorWell->SetColor(fPicker->ValueAsColor());
+	fColorWell->Invalidate();
 }

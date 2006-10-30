@@ -1,3 +1,10 @@
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm (darkwyrm@earthlink.net)
+ */
 #ifndef DEFS_H_
 #define DEFS_H_
 
@@ -10,7 +17,7 @@
 #define COLOR_SETTINGS_NAME "system_colors"
 */
 
-#define APPEARANCE_APP_SIGNATURE "application/x-vnd.obos-Appearance"
+#define APPEARANCE_APP_SIGNATURE "application/x-vnd.haiku-Appearance"
 
 #define APPLY_SETTINGS 'aply'
 #define REVERT_SETTINGS 'rvrt'

@@ -1,33 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ColorWell.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Color display class which accepts drops
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm (darkwyrm@earthlink.net)
+ */
 #include "ColorWell.h"
 
-ColorWell::ColorWell(BRect frame, BMessage *msg, bool is_rectangle=false)
-	: BView(frame,"ColorWell", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
+ColorWell::ColorWell(BRect frame, BMessage *msg, bool is_rectangle)
+ :	BView(frame,"ColorWell", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(0,0,0);
@@ -45,42 +26,43 @@ ColorWell::~ColorWell(void)
 	delete invoker;
 }
 
-void ColorWell::SetTarget(BHandler *tgt)
+void
+ColorWell::SetTarget(BHandler *tgt)
 {
 	invoker->SetTarget(tgt);
 }
 
-void ColorWell::SetColor(rgb_color col)
+void
+ColorWell::SetColor(rgb_color col)
 {
 	SetHighColor(col);
 	currentcol=col;
 	Draw(Bounds());
-//	Invalidate();
 	invoker->Invoke();
 }
 
-void ColorWell::SetColor(uint8 r,uint8 g, uint8 b)
+void
+ColorWell::SetColor(uint8 r,uint8 g, uint8 b)
 {
 	SetHighColor(r,g,b);
 	currentcol.red=r;
 	currentcol.green=g;
 	currentcol.blue=b;
 	Draw(Bounds());
-	//Invalidate();
 	invoker->Invoke();
 }
 
-void ColorWell::MessageReceived(BMessage *msg)
+void
+ColorWell::MessageReceived(BMessage *msg)
 {
 	// If we received a dropped message, try to see if it has color data
 	// in it
-	if(msg->WasDropped())
-	{
+	if(msg->WasDropped()) {
 		rgb_color *col;
 		uint8 *ptr;
 		ssize_t size;
-		if(msg->FindData("RGBColor",(type_code)'RGBC',(const void**)&ptr,&size)==B_OK)
-		{
+		if(msg->FindData("RGBColor",(type_code)'RGBC',
+			(const void**)&ptr,&size)==B_OK) {
 			col=(rgb_color*)ptr;
 			SetHighColor(*col);
 		}
@@ -90,27 +72,26 @@ void ColorWell::MessageReceived(BMessage *msg)
 	BView::MessageReceived(msg);
 }
 
-void ColorWell::SetEnabled(bool value)
+void
+ColorWell::SetEnabled(bool value)
 {
-	if(is_enabled!=value)
-	{
+	if(is_enabled!=value) {
 		is_enabled=value;
 		Invalidate();
 	}
 }
 
-void ColorWell::Draw(BRect update)
+void
+ColorWell::Draw(BRect update)
 {
 	if(is_enabled)
 		SetHighColor(currentcol);
 	else
 		SetHighColor(disabledcol);
 
-	if(is_rect)
-	{
+	if(is_rect) {
 		FillRect(Bounds());
-		if(is_enabled)
-		{
+		if(is_enabled) {
 			BRect r(Bounds());
 			SetHighColor(184,184,184);
 			StrokeRect(r);
@@ -129,20 +110,21 @@ void ColorWell::Draw(BRect update)
 
 		}
 	}
-	else
-	{
+	else {
 		FillEllipse(Bounds());
 		if(is_enabled)
 			StrokeEllipse(Bounds(),B_SOLID_LOW);
 	}
 }
 
-rgb_color ColorWell::Color(void) const
+rgb_color
+ColorWell::Color(void) const
 {
 	return currentcol;
 }
 
-void ColorWell::SetMode(bool is_rectangle)
+void
+ColorWell::SetMode(bool is_rectangle)
 {
 	is_rect=is_rectangle;
 }

@@ -7,8 +7,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	Class for encapsulating GUI system colors */
-
 #include <stdio.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
@@ -17,7 +15,6 @@
 #include <Directory.h>
 #include <String.h>
 #include "ColorSet.h"
-
 
 static void
 set_rgb_color(rgb_color& color, uint8 red, uint8 green, uint8 blue)
@@ -325,8 +322,7 @@ rgb_color
 ColorSet::StringToColor(const char *string)
 {
 	rgb_color *col=StringToMember(string);
-	if(!col)
-	{
+	if(!col) {
 		rgb_color c;
 		return c;
 	}
@@ -403,117 +399,95 @@ ColorSet::StringToMember(const char *string)
 rgb_color
 ColorSet::AttributeToColor(int32 which)
 {
-	switch(which)
-	{
-		case B_PANEL_BACKGROUND_COLOR:
-		{
+	switch(which) {
+		case B_PANEL_BACKGROUND_COLOR: {
 			return panel_background;
 			break;
 		}
+		
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-		case B_PANEL_TEXT_COLOR:
-		{
+		case B_PANEL_TEXT_COLOR: {
 			return panel_text;
 			break;
 		}
-		case B_DOCUMENT_BACKGROUND_COLOR:
-		{
+		case B_DOCUMENT_BACKGROUND_COLOR: {
 			return document_background;
 			break;
 		}
-		case B_DOCUMENT_TEXT_COLOR:
-		{
+		case B_DOCUMENT_TEXT_COLOR: {
 			return document_text;
 			break;
 		}
-		case B_CONTROL_BACKGROUND_COLOR:
-		{
+		case B_CONTROL_BACKGROUND_COLOR: {
 			return control_background;
 			break;
 		}
-		case B_CONTROL_TEXT_COLOR:
-		{
+		case B_CONTROL_TEXT_COLOR: {
 			return control_text;
 			break;
 		}
-		case B_CONTROL_BORDER_COLOR:
-		{
+		case B_CONTROL_BORDER_COLOR: {
 			return control_border;
 			break;
 		}
-		case B_CONTROL_HIGHLIGHT_COLOR:
-		{
+		case B_CONTROL_HIGHLIGHT_COLOR: {
 			return control_highlight;
 			break;
 		}
-		case B_NAVIGATION_BASE_COLOR:
-		{
+		case B_NAVIGATION_BASE_COLOR: {
 			return keyboard_navigation_base;
 			break;
 		}
-		case B_NAVIGATION_PULSE_COLOR:
-		{
+		case B_NAVIGATION_PULSE_COLOR: {
 			return keyboard_navigation_pulse;
 			break;
 		}
-		case B_SHINE_COLOR:
-		{
+		case B_SHINE_COLOR: {
 			return shine;
 			break;
 		}
-		case B_SHADOW_COLOR:
-		{
+		case B_SHADOW_COLOR: {
 			return shadow;
 			break;
 		}
-		case B_MENU_SELECTED_BACKGROUND_COLOR:
-		{
+		case B_MENU_SELECTED_BACKGROUND_COLOR: {
 			return menu_selected_background;
 			break;
 		}
-		case B_MENU_SELECTED_BORDER_COLOR:
-		{
+		case B_MENU_SELECTED_BORDER_COLOR: {
 			return menu_selected_border;
 			break;
 		}
-		case B_TOOLTIP_BACKGROUND_COLOR:
-		{
+		case B_TOOLTIP_BACKGROUND_COLOR: {
 			return tooltip_background;
 			break;
 		}
-		case B_TOOLTIP_TEXT_COLOR:
-		{
+		case B_TOOLTIP_TEXT_COLOR: {
 			return tooltip_text;
 			break;
 		}
-		case B_SUCCESS_COLOR:
-		{
+		case B_SUCCESS_COLOR: {
 			return success;
 			break;
 		}
-		case B_FAILURE_COLOR:
-		{
+		case B_FAILURE_COLOR: {
 			return failure;
 			break;
 		}
 #endif
-		case B_MENU_BACKGROUND_COLOR:
-		{
+		case B_MENU_BACKGROUND_COLOR: {
 			return menu_background;
 			break;
 		}
-		case B_MENU_ITEM_TEXT_COLOR:
-		{
+		case B_MENU_ITEM_TEXT_COLOR: {
 			return menu_text;
 			break;
 		}
-		case B_MENU_SELECTED_ITEM_TEXT_COLOR:
-		{
+		case B_MENU_SELECTED_ITEM_TEXT_COLOR: {
 			return menu_selected_text;
 			break;
 		}
-		case B_WINDOW_TAB_COLOR:
-		{
+		case B_WINDOW_TAB_COLOR: {
 			return window_tab;
 			break;
 		}
@@ -521,24 +495,20 @@ ColorSet::AttributeToColor(int32 which)
 		// DANGER! DANGER, WILL ROBINSON!!
 		// These are magic numbers to work around compatibility difficulties while still keeping
 		// functionality. This __will__ break following R1
-		case 22:
-		{
+		case 22: {
 			return window_tab_text;
 			break;
 		}
-		case 23:
-		{
+		case 23: {
 			return inactive_window_tab;
 			break;
 		}
-		case 24:
-		{
+		case 24: {
 			return inactive_window_tab_text;
 			break;
 		}
 		
-		default:
-		{
+		default: {
 			rgb_color c;
 			return c;
 			break;
@@ -549,7 +519,8 @@ ColorSet::AttributeToColor(int32 which)
 void
 ColorSet::PrintMember(const rgb_color &color) const
 {
-	printf("rgb_color(%d, %d, %d, %d)", color.red,color.green,color.blue,color.alpha);
+	printf("rgb_color(%d, %d, %d, %d)",color.red,color.green,color.blue,
+			color.alpha);
 }
 
 
