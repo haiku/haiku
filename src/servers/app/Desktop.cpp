@@ -100,11 +100,8 @@ KeyboardFilter::_UpdateFocus(int32 key, EventTarget** _target)
 	if (!fDesktop->LockSingleWindow())
 		return;
 
+	EventTarget* focus = fDesktop->KeyboardEventTarget();
 	bigtime_t now = system_time();
-
-	EventTarget* focus = NULL;
-	if (fDesktop->FocusWindow() != NULL)
-		focus = &fDesktop->FocusWindow()->EventTarget();
 
 	// TODO: this is a try to not steal focus from the current window
 	//	in case you enter some text and a window pops up you haven't
@@ -1071,6 +1068,25 @@ Desktop::_UpdateFronts(bool updateFloating)
 {
 	_UpdateBack();
 	_UpdateFront(updateFloating);
+}
+
+
+/*!
+	Returns the current keyboard event target candidate - which is either the
+	top-most window (in case it's a menu), or the one having focus.
+	The window lock must be held when calling this function.
+*/
+EventTarget*
+Desktop::KeyboardEventTarget()
+{
+	WindowLayer* window = _CurrentWindows().LastWindow();
+	if (window != NULL && window->Feel() == kMenuWindowFeel)
+		return &window->EventTarget();
+
+	if (FocusWindow() != NULL)
+		return &FocusWindow()->EventTarget();
+
+	return NULL;
 }
 
 

@@ -55,6 +55,7 @@ BMenuWindow::AttachMenu(BMenu *menu)
 	if (menu != NULL) {
 		BMenuFrame *menuFrame = new BMenuFrame(menu);
 		AddChild(menuFrame);
+		menu->MakeFocus(true);
 	}
 }
 

@@ -144,6 +144,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		int32					ViewUnderMouse(const WindowLayer* window);
 
 		void					SetFocusWindow(WindowLayer* window);
+		EventTarget*			KeyboardEventTarget();
 
 		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
 		//WindowLayer*			FindWindowLayerByServerToken(int32 token);
