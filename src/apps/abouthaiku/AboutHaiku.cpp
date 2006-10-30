@@ -403,6 +403,7 @@ AboutView::AboutView(const BRect &rect)
 		"Nathan Whitehorn\n"
 		"Ulrich Wimboeck\n"
 		"Gabe Yoder\n"
+		"Łukasz Zemczak\n"
 		"Siarzhuk Zharski\n"
 		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
 		"\n\n");
