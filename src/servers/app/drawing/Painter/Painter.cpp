@@ -15,6 +15,8 @@
 #include <Region.h>
 #include <String.h>
 
+#include <ShapePrivate.h>
+
 #include <agg_bezier_arc.h>
 #include <agg_bounding_rect.h>
 #include <agg_conv_clip_polygon.h>
@@ -520,12 +522,7 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 	}
 }
 
-// this comes from Shape.cpp
-// code duplication ahead...
-#define OP_LINETO		0x10000000
-#define OP_BEZIERTO		0x20000000
-#define OP_CLOSE		0x40000000
-#define OP_MOVETO		0x80000000
+
 
 // DrawShape
 BRect

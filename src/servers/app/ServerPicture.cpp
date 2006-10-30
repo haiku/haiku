@@ -18,18 +18,13 @@
 #include <PicturePlayer.h>
 #include <PictureProtocol.h>
 #include <ServerProtocol.h>
+#include <ShapePrivate.h>
 
 #include <Bitmap.h>
 #include <Shape.h>
 
 #include <stdio.h>
 #include <stack>
-
-// NOTE: Initially defined in Shape.cpp. 
-#define OP_LINETO   0x10000000
-#define OP_BEZIERTO   0x20000000
-#define OP_CLOSE    0x40000000
-#define OP_MOVETO   0x80000000
 
 
 class ShapePainter : public BShapeIterator {

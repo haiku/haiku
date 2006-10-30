@@ -16,6 +16,7 @@
 #include <MessageUtils.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
+#include <ShapePrivate.h>
 #include <TokenSpace.h>
 #include <ViewPrivate.h>
 

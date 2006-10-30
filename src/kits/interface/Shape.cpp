@@ -16,29 +16,13 @@
 #include <Point.h>
 #include <Rect.h>
 
+#include <ShapePrivate.h>
+
 #include <new>
 #include <stdlib.h>
 #include <string.h>
 
 
-// NOTE: changing these defines will break Painter,
-// currently located in src/servers/app/drawing/Painter/Painter.cpp
-#define OP_LINETO		0x10000000
-#define OP_BEZIERTO		0x20000000
-#define OP_CLOSE		0x40000000
-#define OP_MOVETO		0x80000000
-
-
-struct shape_data {
-	uint32	*opList;
-	int32	opCount;
-	int32	opSize;
-	int32	opBlockSize;
-	BPoint	*ptList;
-	int32	ptCount;
-	int32	ptSize;
-	int32	ptBlockSize;
-};
 
 
 BShapeIterator::BShapeIterator()
