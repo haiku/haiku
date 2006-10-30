@@ -266,37 +266,30 @@ CannaInterface::GetMode()
 
 
 int
-CannaInterface::ConvertSpecial( char ch, uint32 mod, int32 key )
+CannaInterface::ConvertSpecial(char ch, uint32 mod, int32 key)
 {
 #ifdef DEBUG
 SERIAL_PRINT(( "CannaInterface: ConvertSpecial ch = 0x%x, mod = 0x%x, key = 0x%x\n", ch, mod, key )); 
 #endif
-	if ( mod & B_CONTROL_KEY ) // if control key is held down, do not convert special key
-	{
-		switch ( ch )
-		{
+	if (mod & B_CONTROL_KEY) {
+		// if control key is held down, do not convert special key
+		switch (ch) {
 			case B_UP_ARROW:
 				return CANNA_KEY_Cntrl_Up;
-				break;
 			case B_DOWN_ARROW:
 				return CANNA_KEY_Cntrl_Down;
-				break;
 			case B_RIGHT_ARROW:
 				return CANNA_KEY_Cntrl_Right;
-				break;
 			case B_LEFT_ARROW:
 				return CANNA_KEY_Cntrl_Left;
-				break;
 			default:
-				return (uint8)ch;
+				return ch;
 		}
 	}
-	
-	switch ( ch )
-	{
+
+	switch (ch) {
 		case B_FUNCTION_KEY:
-			switch( key )
-			{
+			switch (key) {
 				case B_F1_KEY:
 				case B_F2_KEY:
 				case B_F3_KEY:
@@ -309,76 +302,60 @@ SERIAL_PRINT(( "CannaInterface: ConvertSpecial ch = 0x%x, mod = 0x%x, key = 0x%x
 				case B_F10_KEY:
 				case B_F11_KEY:
 				case B_F12_KEY:
-				return (int)CANNA_KEY_F1 + (int)key - (int)B_F1_KEY;
-				break;
+					return (int)CANNA_KEY_F1 + (int)key - (int)B_F1_KEY;
 			}
 			break;
 
 		case B_INSERT:
 			return CANNA_KEY_Insert;
-			break;
 		case B_PAGE_UP:
 			return CANNA_KEY_Rollup;
-			break;
 		case B_PAGE_DOWN:
 			return CANNA_KEY_Rolldown;
-			break;
 		case B_UP_ARROW:
 			if (mod & B_SHIFT_KEY /* shifted */ )
 				return CANNA_KEY_Shift_Up;
-			else
-				return CANNA_KEY_Up;
-			break;
+			return CANNA_KEY_Up;
+
 		case B_DOWN_ARROW:
 			if (mod & B_SHIFT_KEY /* shifted */ )
 				return CANNA_KEY_Shift_Down;
-			else
-				return CANNA_KEY_Down;
-			break;
+			return CANNA_KEY_Down;
+
 		case B_RIGHT_ARROW:
 			if (mod & B_SHIFT_KEY /* shifted */ )
 				return CANNA_KEY_Shift_Right;
-			else
-				return CANNA_KEY_Right;
-			break;
+			return CANNA_KEY_Right;
+
 		case B_LEFT_ARROW:
 			if (mod & B_SHIFT_KEY /* shifted */ )
 				return CANNA_KEY_Shift_Left;
-			else
-				return CANNA_KEY_Left;
-			break;
+			return CANNA_KEY_Left;
+
 		case B_END:
 			return CANNA_KEY_Help;
-			break;
 		case B_HOME:
 			return CANNA_KEY_Home;
-			break;
-		default:
-			return (int)ch;
-			break;
 	}
+
+	return ch;
 }
 
+
 int
-CannaInterface::ConvertArrowKey( int key )
+CannaInterface::ConvertArrowKey(int key)
 {
-	switch ( key )
-	{
+	switch (key) {
 		case CANNA_KEY_Up:
 			return CANNA_KEY_Left;
-			break;
 		case CANNA_KEY_Down:
 			return CANNA_KEY_Right;
-			break;
 		case CANNA_KEY_Shift_Up:
 			return CANNA_KEY_Up;
-			break;
 		case CANNA_KEY_Shift_Down:
 			return CANNA_KEY_Down;
-			break;
 		case CANNA_KEY_Right:
 			return (uint8)B_RETURN;
-			break;
 		default:
 			return key;
 	}
@@ -612,51 +589,47 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 		char* index;
 		int32 len;
 		
-		if ( current_mode == CANNA_MODE_IchiranMode
+		if (current_mode == CANNA_MODE_IchiranMode
 			|| current_mode == CANNA_MODE_ExtendMode
 			|| (current_mode == CANNA_MODE_TourokuHinshiMode
-			    && kouhoRevLine != -1 )
+			    && kouhoRevLine != -1)
 			|| current_mode == CANNA_MODE_TourokuDicMode
-			|| current_mode == CANNA_MODE_BushuMode )
-		{
-			//remove first index
-			memmove( kouhoUTF, kouhoUTF + 2, kouhoUTFLen - 1 );
+			|| current_mode == CANNA_MODE_BushuMode) {
+			// remove first index
+			memmove(kouhoUTF, kouhoUTF + 2, kouhoUTFLen - 1);
 
-			//convert full-space to LF
-			while( index = strstr( kouhoUTF, "\xe3\x80\x80" ) )
-			{
+			// convert full-space to LF
+			while ((index = strstr(kouhoUTF, "\xe3\x80\x80")) != NULL) {
 				*index = '\x0a';
-				len = strlen( index );
-				memmove( index + 1, index + 5, len - 4 );
+				len = strlen(index);
+				memmove(index + 1, index + 5, len - 4);
 			}
-			kouhoUTFLen = strlen( kouhoUTF );
+			kouhoUTFLen = strlen(kouhoUTF);
 		}
 
-		if ( current_mode == CANNA_MODE_KigoMode )
-		{
-			char num[ 5 ];
-			for ( long i = 0 ; i < 4 ; i++ )
-				num[ i ] = kouhoUTF[ i + 3 ];
-			num[ 4 ] = '\0';
-			strcat( infoUTF, num );
+		if (current_mode == CANNA_MODE_KigoMode) {
+			char num[5];
+			for (long i = 0; i < 4; i++) {
+				num[i] = kouhoUTF[i + 3];
+			}
+			num[4] = '\0';
+			strcat(infoUTF, num);
 			kouhoUTFLen -= 9;
-			memmove( kouhoUTF, kouhoUTF + 10, kouhoUTFLen );
+			memmove(kouhoUTF, kouhoUTF + 10, kouhoUTFLen);
 		}
 
-		if ( current_mode == CANNA_MODE_KigoMode
+		if (current_mode == CANNA_MODE_KigoMode
 			|| current_mode == CANNA_MODE_MountDicMode
 			|| current_mode == CANNA_MODE_RussianMode
 			|| current_mode == CANNA_MODE_LineMode
-			|| current_mode == CANNA_MODE_GreekMode )
-		{
+			|| current_mode == CANNA_MODE_GreekMode) {
 			//convert full-space to LF
-			while( index = strstr( kouhoUTF, "\xe3\x80\x80" ) )
-			{
+			while ((index = strstr(kouhoUTF, "\xe3\x80\x80")) != NULL) {
 				*index = '\x0a';
-				len = strlen( index );
-				memmove( index + 1, index + 3, len - 2 );
+				len = strlen(index);
+				memmove(index + 1, index + 3, len - 2);
 			}
-			kouhoUTFLen = strlen( kouhoUTF );
+			kouhoUTFLen = strlen(kouhoUTF);
 		}
 /*
 		if ( current_mode == CANNA_MODE_TourokuMode 
