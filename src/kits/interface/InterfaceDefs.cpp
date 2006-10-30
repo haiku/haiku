@@ -737,6 +737,22 @@ ui_color(color_which which)
 }
 
 
+_IMPEXP_BE void
+set_ui_color(const color_which &which, const rgb_color &color)
+{
+	int32 index = color_which_to_index(which);
+	if (index < 0 || index >= kNumColors) {
+		fprintf(stderr, "set_ui_color(): unknown color_which %d\n", which);
+		return;
+	}
+
+	if (be_app) {
+		server_read_only_memory* shared = BApplication::Private::ServerReadOnlyMemory();
+		shared->colors[index] = color;
+	}
+}
+
+
 _IMPEXP_BE rgb_color
 tint_color(rgb_color color, float tint)
 {

@@ -351,6 +351,8 @@ enum color_which {
 };
 
 _IMPEXP_BE rgb_color	ui_color(color_which which);
+_IMPEXP_BE void			set_ui_color(const color_which &which, 
+									 const rgb_color &color);
 _IMPEXP_BE rgb_color	tint_color(rgb_color color, float tint);
 
 extern "C" status_t	_init_interface_kit_();
