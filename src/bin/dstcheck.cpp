@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <Alert.h>
 #include <Application.h>
 #include <FindDirectory.h>
@@ -10,43 +11,42 @@
 #include <Roster.h>
 #include <String.h>
 #include <TextView.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+
 const uint32 TIMEDALERT_UPDATE = 'taup';
 
-class TimedAlert : public BAlert
-{
-public:
-	TimedAlert(const char *title, const char *text, const char *button1,
-		const char *button2 = NULL, const char *button3 = NULL, 
-		button_width width = B_WIDTH_AS_USUAL,  alert_type type = B_INFO_ALERT);
-	void MessageReceived(BMessage *);
-	void Show();
-	static void GetLabel(BString &string);
-private:
-	BMessageRunner *fRunner;
+class TimedAlert : public BAlert {
+	public:
+		TimedAlert(const char *title, const char *text, const char *button1,
+			const char *button2 = NULL, const char *button3 = NULL, 
+			button_width width = B_WIDTH_AS_USUAL, alert_type type = B_INFO_ALERT);
+		void MessageReceived(BMessage *);
+		void Show();
+
+		static void GetLabel(BString &string);
+
+	private:
+		BMessageRunner *fRunner;
 };
 
-#define STRING1 "Attention!\n\nBecause of the switch from daylight saving time,\nyour \
-computer's clock may be an hour off. Currently,\nyour computer thinks it is "
-#define STRING2 ".\n\nIs this the correct time?"
 
 TimedAlert::TimedAlert(const char *title, const char *text, const char *button1,
-	const char *button2, const char *button3,
-	button_width width,  alert_type type)
+		const char *button2, const char *button3,
+		button_width width, alert_type type)
 	: BAlert(title, text, button1, button2, button3, width, type),
 	fRunner(NULL)
 {
-	
 }
 
 
 void
 TimedAlert::Show()
 {
-	fRunner = new BMessageRunner(BMessenger(this), new BMessage(TIMEDALERT_UPDATE), 60000000);
+	fRunner = new BMessageRunner(this, new BMessage(TIMEDALERT_UPDATE), 60000000);
 	BAlert::Show();
 }
 
@@ -57,15 +57,19 @@ TimedAlert::MessageReceived(BMessage *msg)
 	if (msg->what == TIMEDALERT_UPDATE) {
 		BString string;
 		GetLabel(string);	
-		this->TextView()->SetText(string.String());
+		TextView()->SetText(string.String());
 	} else
 		BAlert::MessageReceived(msg);
 }
 
+
 void
 TimedAlert::GetLabel(BString &string)
 {
-	string = STRING1;
+	string = "Attention!\n\nBecause of the switch from daylight saving time, "
+		"your computer's clock may be an hour off. Currently, your computer "
+		"thinks it is ";
+
 	time_t t;
 	struct tm tm;
 	char timestring[15];
@@ -73,8 +77,12 @@ TimedAlert::GetLabel(BString &string)
 	localtime_r(&t, &tm);
 	strftime(timestring, 15, "%I:%M %p", &tm);
 	string += timestring;
-	string += STRING2;
+
+	string += ".\n\nIs this the correct time?";
 }
+
+
+//	#pragma mark -
 
 
 int
@@ -108,13 +116,11 @@ main(int argc, char **argv)
 		read(fd, &dst_byte, 1);
 
 		dst = dst_byte == '1';
-
 	} else {
 		dst = tm.tm_isdst;
 	}
 
 	if (dst != tm.tm_isdst) {
-
 		BApplication app("application/x-vnd.Haiku-cmd-dstconfig");	
 
 		BString string;
@@ -125,11 +131,12 @@ main(int argc, char **argv)
 			exit(0);
 
 		if (index == 2) {
-			index = (new BAlert("dstcheck", "Would you like to set the clock using the Time and\nDate preference utility?", 
+			index = (new BAlert("dstcheck",
+				"Would you like to set the clock using the Time and\nDate preference utility?", 
 				"No", "Yes"))->Go();
 
 			if (index == 1)
-				be_roster->Launch("application/x-vnd.Haiku-TIME");
+				be_roster->Launch("application/x-vnd.Haiku-Time");
 		}
 	}
 
@@ -137,7 +144,7 @@ main(int argc, char **argv)
 	char dst_byte = tm.tm_isdst ? '1' : '0';
 	write(fd, &dst_byte, 1);
 	close(fd);
-	
-	return 0;	
+
+	return 0;
 }
 
