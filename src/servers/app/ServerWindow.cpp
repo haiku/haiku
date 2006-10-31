@@ -2501,7 +2501,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		
 		case AS_DRAW_STRING:
 		{
-			char* string;
+			char* string = NULL;
 			int32 length;
 			BPoint location;
 			escapement_delta delta;
@@ -2521,7 +2521,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->AddFloat(delta.space);
 			picture->AddFloat(delta.nonspace);
 			picture->EndOp();
-
+			
+			free(string);
 			break;		
 		}
 		
@@ -2549,6 +2550,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				picture->AddData(ptList, ptCount * sizeof(BPoint));
 				picture->EndOp();
 			}
+			delete[] opList;
+			delete[] ptList;
+
 			break;
 		}
 
