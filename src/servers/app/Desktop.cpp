@@ -191,7 +191,8 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 
 	if (message->what == B_KEY_DOWN
 		|| message->what == B_MODIFIERS_CHANGED
-		|| message->what == B_UNMAPPED_KEY_DOWN)
+		|| message->what == B_UNMAPPED_KEY_DOWN
+		|| message->what == B_INPUT_METHOD_EVENT)
 		_UpdateFocus(key, _target);
 
 	return B_DISPATCH_MESSAGE;

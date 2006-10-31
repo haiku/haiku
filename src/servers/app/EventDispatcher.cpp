@@ -828,6 +828,7 @@ EventDispatcher::_EventLoop()
 			case B_UNMAPPED_KEY_DOWN:
 			case B_UNMAPPED_KEY_UP:
 			case B_MODIFIERS_CHANGED:
+			case B_INPUT_METHOD_EVENT:
 				ETRACE(("key event, focus = %p\n", fFocus));
 
 				if (fKeyboardFilter != NULL
