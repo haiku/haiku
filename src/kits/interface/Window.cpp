@@ -900,6 +900,19 @@ FrameMoved(origin);
 					// call hook function 'WindowActivated(bool)' for all
 					// views attached to this window.
 					fTopView->_Activate(active);
+	
+					// we notify the input server if we are gaining or losing focus
+					// from a view which has the B_INPUT_METHOD_AWARE on a window 
+					// (de)activation
+					bool inputMethodAware = false;
+					if (fFocus)
+						inputMethodAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
+					BMessage msg(active && inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+					BMessenger messenger(fFocus);
+					BMessage reply;
+					if (fFocus)
+						msg.AddMessenger("view", messenger);
+					_control_input_server_(&msg, &reply);
 				}
 			} else
 				target->MessageReceived(msg);
