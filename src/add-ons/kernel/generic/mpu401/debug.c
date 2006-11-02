@@ -30,6 +30,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <OS.h>
+#include <string.h>
 #include "debug.h"
 
 #define DRIVER_NAME "mpu401"
