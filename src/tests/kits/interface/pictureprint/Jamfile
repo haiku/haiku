@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits interface picture ;
+SubDir HAIKU_TOP src tests kits interface pictureprint ;
 
 UsePrivateHeaders interface print ;
 
