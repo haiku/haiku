@@ -210,6 +210,7 @@ TCPConnection::Free()
 	return B_OK;
 }
 
+
 /*!
 	Creates and sends a SYN packet to /a address
 */
@@ -356,6 +357,7 @@ TCPConnection::Listen(int count)
 	BenaphoreLocker lock(&fLock);
 	if (fState != CLOSED)
 		return B_ERROR;
+
 	fState = LISTEN;
 	return B_OK;
 }
@@ -370,25 +372,23 @@ TCPConnection::Shutdown(int direction)
 
 
 /*!
- Puts data contained in \a buffer into send buffer
+	Puts data contained in \a buffer into send buffer
 */
 status_t
 TCPConnection::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
-	size_t bufSize = buffer->size;
+	size_t bufferSize = buffer->size;
 	BenaphoreLocker lock(&fLock);
-	if (fSendBuffer == NULL) {
-		fSendBuffer = buffer;
-		fNextByteToWrite += bufSize;
-		return SendQueuedData(TCP_FLG_ACK, false);
-	} else {
+	if (fSendBuffer != NULL) {
 		status_t status = sBufferModule->merge(fSendBuffer, buffer, true);
 		if (status != B_OK)
 			return status;
-		fNextByteToWrite += bufSize;
-		return SendQueuedData(TCP_FLG_ACK, false);
-	}
+	} else
+		fSendBuffer = buffer;
+
+	fNextByteToWrite += bufferSize;
+	return SendQueuedData(TCP_FLG_ACK, false);
 }
 
 
@@ -411,13 +411,13 @@ TCPConnection::SendAvailable()
 	BenaphoreLocker lock(&fLock);
 	if (fSendBuffer != NULL)
 		return TCP_MAX_SEND_BUF - fSendBuffer->size;
-	else
-		return TCP_MAX_SEND_BUF;
+
+	return TCP_MAX_SEND_BUF;
 }
 
 
 status_t
-TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **buffer)
+TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
 	TRACE(("TCP:%p.ReadData()\n", this));
 
@@ -426,19 +426,22 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer **buffer)
 	// must be in a synchronous state
 	if (fState != ESTABLISHED || fState != FIN_WAIT1 || fState != FIN_WAIT2) {
 		// is this correct semantics?
+dprintf("  TCP state = %d\n", fState);
 		return B_ERROR;
 	}
 
+dprintf("  TCP error = %ld\n", fError);
 	if (fError != B_OK)
 		return fError;
 
 	if (fReceiveBuffer->size < numBytes)
 		numBytes = fReceiveBuffer->size;
-	*buffer = sBufferModule->split(fReceiveBuffer, numBytes);
-	if (*buffer != NULL)
-		return B_OK;
-	else
-		return B_ERROR;
+
+	*_buffer = sBufferModule->split(fReceiveBuffer, numBytes);
+	if (*_buffer == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -449,15 +452,15 @@ TCPConnection::ReadAvailable()
 	BenaphoreLocker lock(&fLock);
 	if (fReceiveBuffer != NULL)
 		return fReceiveBuffer->size;
-	else
-		return 0;
+
+	return 0;
 }
 
 
 status_t
 TCPConnection::EnqueueReceivedData(net_buffer *buffer, uint32 sequenceNumber)
 {
-	TRACE(("TCP:%p.EnqueueReceivedData(%p, %u)\n", this, buffer, sequenceNumber));
+	TRACE(("TCP:%p.EnqueueReceivedData(%p, %lu)\n", this, buffer, sequenceNumber));
 	status_t status;
 
 	if (sequenceNumber == fNextByteExpected) {
@@ -545,114 +548,120 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 
 	TRACE(("TCP: ReceiveData(): Connection in state %d received packet %p with flags %X!\n", fState, buffer, header.flags));
 	switch (fState) {
-	case CLOSED:
-	case TIME_WAIT:
-		sBufferModule->free(buffer);
-		if (header.flags & TCP_FLG_ACK)
-			return Reset(byteAckd, 0);
-		else
-			return Reset(0, byteRcvd + payloadLength);
-		break;
-	case LISTEN:
-		// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
-		// and add it to the Connection Queue.  The new TCPConnection
-		// must continue the handshake by replying with SYN+ACK.  Any
-		// data in the packet must go into the new TCPConnection's receive
-		// buffer.
-		// Otherwise, RST+ACK is sent.
-		// The current TCPConnection always remains in LISTEN state.
-		return B_ERROR;
-		break;
-	case SYN_SENT:
-		if (header.flags & TCP_FLG_RST) {
-			fError = ECONNREFUSED;
-			fState = CLOSED;
-			return B_ERROR;
-		}
-		if (header.flags & TCP_FLG_ACK && !TCP_IS_GOOD_ACK(byteAckd))
-			return Reset(byteAckd, 0);
-		if (header.flags & TCP_FLG_SYN) {
-			fNextByteToRead = fNextByteExpected = ntohl(header.sequence_num) + 1;
-			flags |= TCP_FLG_ACK;
-			fLastByteAckd = byteAckd;
-			// cancel resend of this segment
+		case CLOSED:
+		case TIME_WAIT:
+			sBufferModule->free(buffer);
 			if (header.flags & TCP_FLG_ACK)
-				nextState = ESTABLISHED;
-			else {
-				nextState = SYN_RCVD;
-				flags |= TCP_FLG_SYN;
-			}
-		}
-		break;
-	case SYN_RCVD:
-		if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd))
-			fState = ESTABLISHED;
-		else
-			Reset(byteAckd, 0);
-		break;
-	default:
-		// In a synchronized state.
-		// first check that the received sequence number is good
-		if (TCP_IS_GOOD_SEQ(byteRcvd, payloadLength)) {
-			// If a valid RST was received, terminate the connection.
+				return Reset(byteAckd, 0);
+
+			return Reset(0, byteRcvd + payloadLength);
+
+		case LISTEN:
+			// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
+			// and add it to the Connection Queue.  The new TCPConnection
+			// must continue the handshake by replying with SYN+ACK.  Any
+			// data in the packet must go into the new TCPConnection's receive
+			// buffer.
+			// Otherwise, RST+ACK is sent.
+			// The current TCPConnection always remains in LISTEN state.
+			return B_ERROR;
+
+		case SYN_SENT:
 			if (header.flags & TCP_FLG_RST) {
 				fError = ECONNREFUSED;
 				fState = CLOSED;
 				return B_ERROR;
 			}
-			if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd) ) {
+
+			if (header.flags & TCP_FLG_ACK && !TCP_IS_GOOD_ACK(byteAckd))
+				return Reset(byteAckd, 0);
+
+			if (header.flags & TCP_FLG_SYN) {
+				fNextByteToRead = fNextByteExpected = ntohl(header.sequence_num) + 1;
+				flags |= TCP_FLG_ACK;
 				fLastByteAckd = byteAckd;
-				if (fLastByteAckd == fNextByteToWrite) {
-					if (fState == LAST_ACK ) {
-						nextState = CLOSED;
-						status = hash_remove(sTCPHash, this);
-						if (status != B_OK)
-							return status;
-					}
-					if (fState == CLOSING) {
-						nextState = TIME_WAIT;
-						status = hash_remove(sTCPHash, this);
-						if (status != B_OK)
-							return status;
-					}
-					if (fState == FIN_WAIT1) {
-						nextState = FIN_WAIT2;
-					}
+
+				// cancel resend of this segment
+				if (header.flags & TCP_FLG_ACK)
+					nextState = ESTABLISHED;
+				else {
+					nextState = SYN_RCVD;
+					flags |= TCP_FLG_SYN;
 				}
 			}
-			if (header.flags & TCP_FLG_FIN) {
-				// other side is closing connection.  change states
-				switch (fState) {
-				case ESTABLISHED:
-					nextState = CLOSE_WAIT;
-					fNextByteExpected++;
-					break;
-				case FIN_WAIT2:
-					nextState = TIME_WAIT;
-					fNextByteExpected++;
-					break;
-				case FIN_WAIT1:
+			break;
+
+		case SYN_RCVD:
+			if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd))
+				fState = ESTABLISHED;
+			else
+				Reset(byteAckd, 0);
+			break;
+
+		default:
+			// In a synchronized state.
+			// first check that the received sequence number is good
+			if (TCP_IS_GOOD_SEQ(byteRcvd, payloadLength)) {
+				// If a valid RST was received, terminate the connection.
+				if (header.flags & TCP_FLG_RST) {
+					fError = ECONNREFUSED;
+					fState = CLOSED;
+					return B_ERROR;
+				}
+
+				if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd) ) {
+					fLastByteAckd = byteAckd;
 					if (fLastByteAckd == fNextByteToWrite) {
-						// our FIN has been ACKd: go to TIME_WAIT
-						nextState = TIME_WAIT;
-						status = hash_remove(sTCPHash, this);
-						if (status != B_OK)
-							return status;
-						sStackModule->set_timer(&fTimer, TCP_MAX_SEGMENT_LIFETIME);
-					} else
-						nextState = CLOSING;
-					fNextByteExpected++;
-					break;
-				default:
-					break;
+						if (fState == LAST_ACK ) {
+							nextState = CLOSED;
+							status = hash_remove(sTCPHash, this);
+							if (status != B_OK)
+								return status;
+						}
+						if (fState == CLOSING) {
+							nextState = TIME_WAIT;
+							status = hash_remove(sTCPHash, this);
+							if (status != B_OK)
+								return status;
+						}
+						if (fState == FIN_WAIT1) {
+							nextState = FIN_WAIT2;
+						}
+					}
 				}
+				if (header.flags & TCP_FLG_FIN) {
+					// other side is closing connection.  change states
+					switch (fState) {
+						case ESTABLISHED:
+							nextState = CLOSE_WAIT;
+							fNextByteExpected++;
+							break;
+						case FIN_WAIT2:
+							nextState = TIME_WAIT;
+							fNextByteExpected++;
+							break;
+						case FIN_WAIT1:
+							if (fLastByteAckd == fNextByteToWrite) {
+								// our FIN has been ACKd: go to TIME_WAIT
+								nextState = TIME_WAIT;
+								status = hash_remove(sTCPHash, this);
+								if (status != B_OK)
+									return status;
+								sStackModule->set_timer(&fTimer, TCP_MAX_SEGMENT_LIFETIME);
+							} else
+								nextState = CLOSING;
+							fNextByteExpected++;
+							break;
+						default:
+							break;
+					}
+				}
+				flags |= TCP_FLG_ACK;
+			} else {
+				// out-of-order packet received.  remind the other side of where we are
+				return SendQueuedData(TCP_FLG_ACK, true);
 			}
-			flags |= TCP_FLG_ACK;
-		} else {
-			// out-of-order packet received.  remind the other side of where we are
-			return SendQueuedData(TCP_FLG_ACK, true);
-		}
-		break;
+			break;
 	}
 	TRACE(("TCP %p.ReceiveData():Entering state %d\n", this, fState));
 
@@ -675,7 +684,6 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 	}
 
 	fState = nextState;
-
 	return B_OK;
 }
 
@@ -788,10 +796,10 @@ TCPConnection::Compare(void *_connection, const void *_key)
 	const tcp_connection_key *key = (tcp_connection_key *)_key;
 	TCPConnection *connection= ((TCPConnection *)_connection);
 
-	if (sAddressModule->equal_addresses_and_ports(
-			key->local, (sockaddr *)&connection->socket->address)
-		&& sAddressModule->equal_addresses_and_ports(
-			key->peer, (sockaddr *)&connection->socket->peer))
+	if (sAddressModule->equal_addresses_and_ports(key->local,
+			(sockaddr *)&connection->socket->address)
+		&& sAddressModule->equal_addresses_and_ports(key->peer,
+			(sockaddr *)&connection->socket->peer))
 		return 0;
 
 	return 1;
