@@ -135,6 +135,6 @@ SubInclude HAIKU_TOP src tests kits interface bprintjob ;
 SubInclude HAIKU_TOP src tests kits interface bfont ;
 SubInclude HAIKU_TOP src tests kits interface bshelf ;
 SubInclude HAIKU_TOP src tests kits interface layout ;
-SubInclude HAIKU_TOP src tests kits interface picture ;
+SubInclude HAIKU_TOP src tests kits interface pictureprint ;
 SubInclude HAIKU_TOP src tests kits interface NewRegion ;
 
