@@ -5,8 +5,18 @@
  * Authors:
  *		Andrew Galante, haiku.galante@gmail.com
  */
+#ifndef TCP_H
+#define TCP_H
 
-#include <ByteOrder.h>
+
+#include <net_buffer.h>
+#include <net_datalink.h>
+#include <net_stack.h>
+
+#include <util/khash.h>
+
+#include <sys/socket.h>
+
 
 typedef enum {
 	CLOSED,
@@ -51,3 +61,23 @@ struct tcp_header {
 #define TCP_FLG_RST 0x04 // ReSeT
 #define TCP_FLG_SYN 0x02 // SYNchronize
 #define TCP_FLG_FIN 0x01 // FINish
+
+struct tcp_connection_key {
+	const sockaddr	*local;
+	const sockaddr	*peer;
+};
+
+
+extern net_domain *gDomain;
+extern net_address_module_info *gAddressModule;
+extern net_buffer_module_info *gBufferModule;
+extern net_datalink_module_info *gDatalinkModule;
+extern net_stack_module_info *gStackModule;
+extern hash_table *gConnectionHash;
+extern benaphore gConnectionLock;
+
+
+status_t add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
+	uint32 ack, uint16 advertisedWindow);
+
+#endif TCP_H

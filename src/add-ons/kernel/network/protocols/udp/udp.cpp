@@ -147,7 +147,7 @@ static UdpEndpointManager *sUdpEndpointManager;
 static net_domain *sDomain;
 
 static net_address_module_info *sAddressModule;
-net_buffer_module_info *sBufferModule;
+net_buffer_module_info *gBufferModule;
 static net_datalink_module_info *sDatalinkModule;
 static net_stack_module_info *sStackModule;
 
@@ -495,7 +495,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	if (buffer->size > udpLength) {
 		TRACE(("buffer %p is too long (%lu instead of %u), trimming it.\n", 
 			buffer, buffer->size, udpLength));
-		sBufferModule->trim(buffer, udpLength);
+		gBufferModule->trim(buffer, udpLength);
 	}
 
 	if (header.udp_checksum != 0) {
@@ -508,7 +508,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 			<< header.udp_length
 					// peculiar but correct: UDP-len is used twice for checksum
 					// (as it is already contained in udp_header)
-			<< Checksum::BufferHelper(buffer, sBufferModule);
+			<< Checksum::BufferHelper(buffer, gBufferModule);
 		uint16 sum = udpChecksum;
 		if (sum != 0) {
 			TRACE(("buffer %p has bad checksum (%u), we drop it!\n", buffer, sum));
@@ -813,7 +813,7 @@ UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 			<< (uint16)htons(buffer->size)
 					// peculiar but correct: UDP-len is used twice for checksum
 					// (as it is already contained in udp_header)
-			<< Checksum::BufferHelper(buffer, sBufferModule);
+			<< Checksum::BufferHelper(buffer, gBufferModule);
 		header.udp_checksum = udpChecksum;
 		if (header.udp_checksum == 0)
 			header.udp_checksum = 0xFFFF;
@@ -851,7 +851,7 @@ UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 
 	if (numBytes < buffer->size) {
 		// discard any data behind the amount requested
-		sBufferModule->trim(buffer, numBytes);
+		gBufferModule->trim(buffer, numBytes);
 			// TODO: we should indicate MSG_TRUNC to application!
 	}
 
@@ -866,7 +866,7 @@ UdpEndpoint::StoreData(net_buffer *_buffer)
 {
 	TRACE(("buffer %p passed to endpoint with (%s)\n", _buffer,
 		AddressString(sDomain, (sockaddr *)&socket->address, true).Data()));
-	net_buffer *buffer = sBufferModule->clone(_buffer, false);
+	net_buffer *buffer = gBufferModule->clone(_buffer, false);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
@@ -874,7 +874,7 @@ UdpEndpoint::StoreData(net_buffer *_buffer)
 	if (status >= B_OK)
 		sStackModule->notify_socket(socket, B_SELECT_READ, BytesAvailable());
 	else
-		sBufferModule->free(buffer);
+		gBufferModule->free(buffer);
 
 	return status;
 }
@@ -1098,7 +1098,7 @@ init_udp()
 	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		goto err1;
 	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);

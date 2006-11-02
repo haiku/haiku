@@ -98,7 +98,7 @@ struct arp_protocol : net_datalink_protocol {
 
 static void arp_timer(struct net_timer *timer, void *data);
 
-struct net_buffer_module_info *sBufferModule;
+struct net_buffer_module_info *gBufferModule;
 static net_stack_module_info *sStackModule;
 static hash_table *sCache;
 static benaphore sCacheLock;
@@ -242,7 +242,7 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	}
 
 	if (entry->request_buffer != NULL) {
-		sBufferModule->free(entry->request_buffer);
+		gBufferModule->free(entry->request_buffer);
 		entry->request_buffer = NULL;
 	}
 
@@ -401,7 +401,7 @@ arp_receive(void *cookie, net_buffer *buffer)
 			return B_ERROR;
 	}
 
-	sBufferModule->free(buffer);
+	gBufferModule->free(buffer);
 	return B_OK;
 }
 
@@ -447,7 +447,7 @@ arp_timer(struct net_timer *timer, void *data)
 			if (entry->timer_state < ARP_STATE_LAST_REQUEST) {
 				// we'll still need our buffer, so in order to prevent it being
 				// freed by a successful send, we need to clone it
-				request = sBufferModule->clone(request, true);
+				request = gBufferModule->clone(request, true);
 				if (request == NULL) {
 					// cloning failed - that means we won't be able to send as
 					// many requests as originally planned
@@ -460,7 +460,7 @@ arp_timer(struct net_timer *timer, void *data)
 			status_t status = entry->protocol->next->module->send_data(
 				entry->protocol->next, request);
 			if (status < B_OK)
-				sBufferModule->free(request);
+				gBufferModule->free(request);
 
 			if (entry->timer_state == ARP_STATE_LAST_REQUEST) {
 				// buffer has been freed on send
@@ -535,7 +535,7 @@ arp_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry **_ent
 
 	// prepare ARP request
 
-	entry->request_buffer = sBufferModule->create(256);
+	entry->request_buffer = gBufferModule->create(256);
 	if (entry->request_buffer == NULL) {
 		// TODO: do something with the entry
 		return B_NO_MEMORY;
@@ -725,7 +725,7 @@ arp_init()
 	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		goto err1;
 

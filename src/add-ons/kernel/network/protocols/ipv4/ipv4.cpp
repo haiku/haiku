@@ -146,7 +146,7 @@ extern net_protocol_module_info gIPv4Module;
 static struct net_domain *sDomain;
 static net_datalink_module_info *sDatalinkModule;
 static net_stack_module_info *sStackModule;
-struct net_buffer_module_info *sBufferModule;
+struct net_buffer_module_info *gBufferModule;
 static int32 sPacketID;
 static RawSocketList sRawSockets;
 static benaphore sRawSocketsLock;
@@ -190,7 +190,7 @@ RawSocket::Read(size_t numBytes, uint32 flags, bigtime_t timeout,
 
 	if (numBytes < buffer->size) {
 		// discard any data behind the amount requested
-		sBufferModule->trim(buffer, numBytes);
+		gBufferModule->trim(buffer, numBytes);
 	}
 
 	*_buffer = buffer;
@@ -209,7 +209,7 @@ status_t
 RawSocket::Write(net_buffer *source)
 {
 	// we need to make a clone for that buffer and pass it to the socket
-	net_buffer *buffer = sBufferModule->clone(source, false);
+	net_buffer *buffer = gBufferModule->clone(source, false);
 	TRACE(("ipv4::RawSocket::Write(): cloned buffer %p\n", buffer));
 	if (buffer == NULL)
 		return B_NO_MEMORY;
@@ -218,7 +218,7 @@ RawSocket::Write(net_buffer *source)
 	if (status >= B_OK)
 		sStackModule->notify_socket(fSocket, B_SELECT_READ, BytesAvailable());
 	else
-		sBufferModule->free(buffer);
+		gBufferModule->free(buffer);
 
 	return status;
 }
@@ -246,7 +246,7 @@ FragmentPacket::~FragmentPacket()
 	ipv4_fragment *fragment;
 	while ((fragment = fFragments.RemoveHead()) != NULL) {
 		if (fragment->buffer != NULL)
-			sBufferModule->free(fragment->buffer);
+			gBufferModule->free(fragment->buffer);
 		delete fragment;
 	}
 }
@@ -283,7 +283,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 
 	if (previous != NULL && previous->start <= start && previous->end >= end) {
 		// we do, so we can just drop this fragment
-		sBufferModule->free(buffer);
+		gBufferModule->free(buffer);
 		return B_OK;
 	}
 
@@ -293,12 +293,12 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 
 	if (previous != NULL && previous->end > start) {
 		TRACE(("    remove header %d bytes\n", previous->end - start));
-		sBufferModule->remove_header(buffer, previous->end - start);
+		gBufferModule->remove_header(buffer, previous->end - start);
 		start = previous->end;
 	}
 	if (next != NULL && next->start < end) {
 		TRACE(("    remove trailer %d bytes\n", next->start - end));
-		sBufferModule->remove_trailer(buffer, next->start - end);
+		gBufferModule->remove_trailer(buffer, next->start - end);
 		end = next->start;
 	}
 
@@ -308,7 +308,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 	// report an error (in which case we're not responsible for freeing it)
 
 	if (previous != NULL && previous->end == start) {
-		status_t status = sBufferModule->merge(buffer, previous->buffer, false);
+		status_t status = gBufferModule->merge(buffer, previous->buffer, false);
 		TRACE(("    merge previous: %s\n", strerror(status)));
 		if (status < B_OK)
 			return status;
@@ -328,7 +328,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 
 		return B_OK;
 	} else if (next != NULL && next->start == end) {
-		status_t status = sBufferModule->merge(buffer, next->buffer, true);
+		status_t status = gBufferModule->merge(buffer, next->buffer, true);
 		TRACE(("    merge next: %s\n", strerror(status)));
 		if (status < B_OK)
 			return status;
@@ -392,10 +392,10 @@ FragmentPacket::Reassemble(net_buffer *to)
 		if (buffer != NULL) {
 			status_t status;
 			if (to == fragment->buffer) {
-				status = sBufferModule->merge(fragment->buffer, buffer, false);
+				status = gBufferModule->merge(fragment->buffer, buffer, false);
 				buffer = fragment->buffer;
 			} else
-				status = sBufferModule->merge(buffer, fragment->buffer, true);
+				status = gBufferModule->merge(buffer, fragment->buffer, true);
 			if (status < B_OK)
 				return status;
 		} else
@@ -534,7 +534,7 @@ reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
 
 	// Remove header unless this is the first fragment
 	if (start != 0)
-		sBufferModule->remove_header(buffer, header.HeaderLength());
+		gBufferModule->remove_header(buffer, header.HeaderLength());
 
 	status = packet->AddFragment(start, end, buffer, lastFragment);
 	if (status != B_OK)
@@ -580,7 +580,7 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	uint32 fragmentOffset = 0;
 	status_t status = B_OK;
 
-	net_buffer *headerBuffer = sBufferModule->split(buffer, headerLength);
+	net_buffer *headerBuffer = gBufferModule->split(buffer, headerLength);
 	if (headerBuffer == NULL)
 		return B_NO_MEMORY;
 
@@ -610,7 +610,7 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 
 		net_buffer *fragmentBuffer;
 		if (!lastFragment) {
-			fragmentBuffer = sBufferModule->split(buffer, fragmentLength);
+			fragmentBuffer = gBufferModule->split(buffer, fragmentLength);
 			fragmentOffset += fragmentLength;
 		} else
 			fragmentBuffer = buffer;
@@ -621,7 +621,7 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 		}
 
 		// copy header to fragment
-		status = sBufferModule->prepend(fragmentBuffer, header, headerLength);
+		status = gBufferModule->prepend(fragmentBuffer, header, headerLength);
 
 		// send fragment
 		if (status == B_OK)
@@ -633,12 +633,12 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 		}
 
 		if (status < B_OK) {
-			sBufferModule->free(fragmentBuffer);
+			gBufferModule->free(fragmentBuffer);
 			break;
 		}
 	}
 
-	sBufferModule->free(headerBuffer);
+	gBufferModule->free(headerBuffer);
 	return status;
 }
 
@@ -884,7 +884,7 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 			// always use the actual used source address
 		header.destination = ((sockaddr_in *)&buffer->destination)->sin_addr.s_addr;
 
-		header.checksum = sBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
+		header.checksum = gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
 		dump_ipv4_header(header);
 
 		bufferHeader.Detach();
@@ -892,8 +892,8 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	}
 
 	TRACE(("header chksum: %ld, buffer checksum: %ld\n",
-		sBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
-		sBufferModule->checksum(buffer, 0, buffer->size, true)));
+		gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
+		gBufferModule->checksum(buffer, 0, buffer->size, true)));
 
 	TRACE(("destination-IP: buffer=%p addr=%p %08lx\n", buffer, &buffer->destination,
 		ntohl(((sockaddr_in *)&buffer->destination)->sin_addr.s_addr)));
@@ -1007,7 +1007,7 @@ ipv4_receive_data(net_buffer *buffer)
 		return B_BAD_DATA;
 
 	// TODO: would be nice to have a direct checksum function somewhere
-	if (sBufferModule->checksum(buffer, 0, headerLength, true) != 0)
+	if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
 		return B_BAD_DATA;
 
 	struct sockaddr_in &source = *(struct sockaddr_in *)&buffer->source;
@@ -1036,7 +1036,7 @@ ipv4_receive_data(net_buffer *buffer)
 	uint8 protocol = buffer->protocol = header.protocol;
 
 	// remove any trailing/padding data
-	status_t status = sBufferModule->trim(buffer, packetLength);
+	status_t status = gBufferModule->trim(buffer, packetLength);
 	if (status < B_OK)
 		return status;
 
@@ -1067,7 +1067,7 @@ ipv4_receive_data(net_buffer *buffer)
 		raw_receive_data(buffer);
 	}
 
-	sBufferModule->remove_header(buffer, headerLength);
+	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options
 		// (that we ignore for now)
 
@@ -1111,7 +1111,7 @@ init_ipv4()
 	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		goto err1;
 	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);

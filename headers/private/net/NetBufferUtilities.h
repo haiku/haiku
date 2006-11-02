@@ -9,11 +9,11 @@
 #include <net_buffer.h>
 
 
-extern net_buffer_module_info *sBufferModule;
+extern net_buffer_module_info *gBufferModule;
 
 class NetBufferModuleGetter {
 	public:
-		static net_buffer_module_info *Get() { return sBufferModule; }
+		static net_buffer_module_info *Get() { return gBufferModule; }
 };
 
 //! A class to retrieve and remove a header from a buffer

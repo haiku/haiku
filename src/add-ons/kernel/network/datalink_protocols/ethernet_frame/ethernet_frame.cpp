@@ -30,7 +30,7 @@ struct ethernet_frame_protocol : net_datalink_protocol {
 
 static const uint8 kBroadcastAddress[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
-struct net_buffer_module_info *sBufferModule;
+struct net_buffer_module_info *gBufferModule;
 
 
 int32
@@ -174,7 +174,7 @@ ethernet_frame_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			return get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+			return get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 		case B_MODULE_UNINIT:
 			put_module(NET_BUFFER_MODULE_NAME);
 			return B_OK;

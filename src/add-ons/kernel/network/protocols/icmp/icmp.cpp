@@ -54,7 +54,7 @@ struct icmp_protocol : net_protocol {
 
 
 static net_stack_module_info *sStackModule;
-struct net_buffer_module_info *sBufferModule;
+struct net_buffer_module_info *gBufferModule;
 
 
 net_protocol *
@@ -214,8 +214,8 @@ icmp_receive_data(net_buffer *buffer)
 
 	dprintf("  got type %u, code %u, checksum %u\n", header.type, header.code,
 		ntohs(header.checksum));
-	dprintf("  computed checksum: %ld\n", sBufferModule->checksum(buffer, 0, buffer->size, true));
-	if (sBufferModule->checksum(buffer, 0, buffer->size, true) != 0)
+	dprintf("  computed checksum: %ld\n", gBufferModule->checksum(buffer, 0, buffer->size, true));
+	if (gBufferModule->checksum(buffer, 0, buffer->size, true) != 0)
 		return B_BAD_DATA;
 
 	switch (header.type) {
@@ -232,7 +232,7 @@ icmp_receive_data(net_buffer *buffer)
 			if (domain == NULL || domain->module == NULL)
 				break;
 
-			net_buffer *reply = sBufferModule->duplicate(buffer);
+			net_buffer *reply = gBufferModule->duplicate(buffer);
 			if (reply == NULL)
 				return B_NO_MEMORY;
 
@@ -242,26 +242,26 @@ icmp_receive_data(net_buffer *buffer)
 
 			// There already is an ICMP header, and we'll reuse it
 			icmp_header *header;
-			status_t status = sBufferModule->direct_access(reply,
+			status_t status = gBufferModule->direct_access(reply,
 				0, sizeof(icmp_header), (void **)&header);
 			if (status == B_OK) {
 				header->type = ICMP_TYPE_ECHO_REPLY;
 				header->code = 0;
 				header->checksum = 0;
-				header->checksum = sBufferModule->checksum(reply, 0, reply->size, true);
+				header->checksum = gBufferModule->checksum(reply, 0, reply->size, true);
 			}
 
 			if (status == B_OK)
 				status = domain->module->send_data(NULL, reply);
 
 			if (status < B_OK) {
-				sBufferModule->free(reply);
+				gBufferModule->free(reply);
 				return status;
 			}
 		}
 	}
 
-	sBufferModule->free(buffer);
+	gBufferModule->free(buffer);
 	return B_OK;
 }
 
@@ -293,7 +293,7 @@ icmp_std_ops(int32 op, ...)
 			status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 			if (status < B_OK)
 				return status;
-			status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+			status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 			if (status < B_OK) {
 				put_module(NET_STACK_MODULE_NAME);
 				return status;

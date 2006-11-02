@@ -4,13 +4,13 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrew Galante, haiku.galante@gmail.com
  */
 
 
-#include <net_buffer.h>
-#include <net_datalink.h>
+#include "TCPConnection.h"
+
 #include <net_protocol.h>
-#include <net_stack.h>
 
 #include <KernelExport.h>
 #include <util/list.h>
@@ -23,7 +23,6 @@
 
 #include <lock.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 
 #include <NetBufferUtilities.h>
 #include <NetUtilities.h>
@@ -40,49 +39,110 @@
 
 #define MAX_HASH_TCP	64
 
-static net_domain *sDomain;
-static net_address_module_info *sAddressModule;
-net_buffer_module_info *sBufferModule;
-static net_datalink_module_info *sDatalinkModule;
-static net_stack_module_info *sStackModule;
-static hash_table *sTCPHash;
-static benaphore sTCPLock;
 
-status_t
-tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv_win);
-
-size_t
-tcp_get_mtu(net_protocol *protocol, const struct sockaddr *address);
-
-#include "tcp.h"
-#include "TCPConnection.h"
+net_domain *gDomain;
+net_address_module_info *gAddressModule;
+net_buffer_module_info *gBufferModule;
+net_datalink_module_info *gDatalinkModule;
+net_stack_module_info *gStackModule;
+hash_table *gConnectionHash;
+benaphore gConnectionLock;
 
 
 #ifdef TRACE_TCP
 #	define DUMP_TCP_HASH tcp_dump_hash()
-// Dumps the TCP Connection hash.  sTCPLock must NOT be held when calling
+// Dumps the TCP Connection hash.  gConnectionLock must NOT be held when calling
 void
-tcp_dump_hash(){
-	BenaphoreLocker lock(&sTCPLock);
-	if (sDomain == NULL) {
+tcp_dump_hash()
+{
+	BenaphoreLocker lock(&gConnectionLock);
+	if (gDomain == NULL) {
 		TRACE(("Unable to dump TCP Connections!\n"));
 		return;
 	}
 	struct hash_iterator iterator;
-	hash_open(sTCPHash, &iterator);
+	hash_open(gConnectionHash, &iterator);
 	TCPConnection *connection;
-	hash_rewind(sTCPHash, &iterator);
+	hash_rewind(gConnectionHash, &iterator);
 	TRACE(("Active TCP Connections:\n"));
-	while ((connection = (TCPConnection *)hash_next(sTCPHash, &iterator)) != NULL) {
+	while ((connection = (TCPConnection *)hash_next(gConnectionHash, &iterator)) != NULL) {
 		TRACE(("  TCPConnection %p: %s, %s\n", connection,
-		AddressString(sDomain, (sockaddr *)&connection->socket->address, true).Data(),
-		AddressString(sDomain, (sockaddr *)&connection->socket->peer, true).Data()));
+		AddressString(gDomain, (sockaddr *)&connection->socket->address, true).Data(),
+		AddressString(gDomain, (sockaddr *)&connection->socket->peer, true).Data()));
 	}
-	hash_close(sTCPHash, &iterator, false);
+	hash_close(gConnectionHash, &iterator, false);
 }
 #else
 #	define DUMP_TCP_HASH 0
 #endif
+
+
+status_t
+set_domain(net_interface *interface = NULL)
+{
+	if (gDomain == NULL) {
+		// domain and address module are not known yet, we copy them from
+		// the buffer's interface (if any):
+		if (interface == NULL || interface->domain == NULL)
+			gDomain = gStackModule->get_domain(AF_INET);
+		else
+			gDomain = interface->domain;
+
+		if (gDomain == NULL) {
+			// this shouldn't occur, of course, but who knows...
+			return B_BAD_VALUE;
+		}
+		gAddressModule = gDomain->address_module;
+	}
+
+	return B_OK;
+}
+
+
+/*!
+	Constructs a TCP header on \a buffer with the specified values
+	for \a flags, \a seq \a ack and \a advertisedWindow.
+*/
+status_t
+add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence, uint32 ack,
+	uint16 advertisedWindow)
+{
+	buffer->protocol = IPPROTO_TCP;
+
+	NetBufferPrepend<tcp_header> bufferHeader(buffer);
+	if (bufferHeader.Status() != B_OK)
+		return bufferHeader.Status();
+
+	tcp_header &header = bufferHeader.Data();
+
+	header.source_port = gAddressModule->get_port((sockaddr *)&buffer->source);
+	header.destination_port = gAddressModule->get_port((sockaddr *)&buffer->destination);
+	header.sequence_num = htonl(sequence);
+	header.acknowledge_num = htonl(ack);
+	header.reserved = 0;
+	header.header_length = 5;
+		// currently no options supported
+	header.flags = (uint8)flags;
+	header.advertised_window = htons(advertisedWindow);
+	header.checksum = 0;
+	header.urgent_ptr = 0;
+		// urgent pointer not supported
+
+	// compute and store checksum
+	Checksum checksum;
+	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
+	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
+	checksum
+		<< (uint16)htons(IPPROTO_TCP)
+		<< (uint16)htons(buffer->size)
+		<< Checksum::BufferHelper(buffer, gBufferModule);
+	header.checksum = checksum;
+	TRACE(("TCP: Checksum for segment %p is %X\n", buffer, header.checksum));
+	return B_OK;
+}
+
+
+//	#pragma mark - protocol API
 
 
 net_protocol *
@@ -109,10 +169,9 @@ tcp_uninit_protocol(net_protocol *protocol)
 status_t
 tcp_open(net_protocol *protocol)
 {
-	if (!sDomain)
-		sDomain = sStackModule->get_domain(AF_INET);
-	if (!sAddressModule)
-		sAddressModule = sDomain->address_module;
+	if (gDomain == NULL && set_domain() != B_OK)
+		return B_ERROR;
+
 	DUMP_TCP_HASH;
 
 	return ((TCPConnection *)protocol)->Open();
@@ -240,63 +299,13 @@ tcp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 }
 
 
-/*!
-	Constructs a TCP header on \a buffer with the specified values
-	for \a flags, \a seq \a ack and \a adv_win.
-*/
-status_t
-tcp_segment(net_buffer *buffer, uint16 flags, uint32 seq, uint32 ack, uint16 adv_win)
-{
-	buffer->protocol = IPPROTO_TCP;
-
-	NetBufferPrepend<tcp_header> bufferHeader(buffer);
-	if (bufferHeader.Status() != B_OK)
-		return bufferHeader.Status();
-
-	tcp_header &header = bufferHeader.Data();
-
-	header.source_port = sAddressModule->get_port((sockaddr *)&buffer->source);
-	header.destination_port = sAddressModule->get_port((sockaddr *)&buffer->destination);
-	header.sequence_num = htonl(seq);
-	header.acknowledge_num = htonl(ack);
-	header.reserved = 0;
-	header.header_length = 5;// currently no options supported
-	header.flags = (uint8)flags;
-	header.advertised_window = htons(adv_win);
-	header.checksum = 0;
-	header.urgent_ptr = 0;// urgent pointer not supported
-	
-	// compute and store checksum
-	Checksum checksum;
-	sAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
-	sAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
-	checksum
-		<< (uint16)htons(IPPROTO_TCP)
-		<< (uint16)htons(buffer->size)
-		<< Checksum::BufferHelper(buffer, sBufferModule);
-	header.checksum = checksum;
-	TRACE(("TCP: Checksum for segment %p is %X\n", buffer, header.checksum));
-	return B_OK;
-}
-
-
 status_t
 tcp_receive_data(net_buffer *buffer)
 {
 	TRACE(("TCP: Received buffer %p\n", buffer));
-	if (!sDomain) {
-		// domain and address module are not known yet, we copy them from
-		// the buffer's interface (if any):
-		if (buffer->interface == NULL || buffer->interface->domain == NULL)
-			sDomain = sStackModule->get_domain(AF_INET);
-		else
-			sDomain = buffer->interface->domain;
-		if (sDomain == NULL) {
-			// this shouldn't occur, of course, but who knows...
-			return B_BAD_VALUE;
-		}
-		sAddressModule = sDomain->address_module;
-	}
+
+	if (gDomain == NULL && set_domain(buffer->interface) != B_OK)
+		return B_ERROR;
 
 	NetBufferHeader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
@@ -308,15 +317,15 @@ tcp_receive_data(net_buffer *buffer)
 	key.peer = (struct sockaddr *)&buffer->source;
 	key.local = (struct sockaddr *)&buffer->destination;
 
-	//TODO: check TCP Checksum
+	// TODO: check TCP Checksum
 
-	sAddressModule->set_port((struct sockaddr *)&buffer->source, header.source_port);
-	sAddressModule->set_port((struct sockaddr *)&buffer->destination, header.destination_port);
+	gAddressModule->set_port((struct sockaddr *)&buffer->source, header.source_port);
+	gAddressModule->set_port((struct sockaddr *)&buffer->destination, header.destination_port);
 
 	DUMP_TCP_HASH;
 
-	BenaphoreLocker hashLock(&sTCPLock);
-	TCPConnection *connection = (TCPConnection *)hash_lookup(sTCPHash, &key);
+	BenaphoreLocker hashLock(&gConnectionLock);
+	TCPConnection *connection = (TCPConnection *)hash_lookup(gConnectionHash, &key);
 	TRACE(("TCP: Received packet corresponds to connection %p\n", connection));
 	if (connection != NULL){
 		return connection->ReceiveData(buffer);
@@ -330,31 +339,37 @@ tcp_receive_data(net_buffer *buffer)
 		// If no connection exists (and RST is not set) send RST
 		if (!(header.flags & TCP_FLG_RST)) {
 			TRACE(("TCP:  Connection does not exist!\n"));
-			net_buffer *reply_buf = sBufferModule->create(512);
-			sAddressModule->set_to((sockaddr *)&reply_buf->source, (sockaddr *)&buffer->destination);
-			sAddressModule->set_to((sockaddr *)&reply_buf->destination, (sockaddr *)&buffer->source);
+			net_buffer *reply = gBufferModule->create(512);
+			if (reply == NULL)
+				return B_NO_MEMORY;
 
-			uint32 sequenceNum, acknowledgeNum;
+			gAddressModule->set_to((sockaddr *)&reply->source,
+				(sockaddr *)&buffer->destination);
+			gAddressModule->set_to((sockaddr *)&reply->destination,
+				(sockaddr *)&buffer->source);
+
+			uint32 sequence, acknowledge;
 			uint16 flags;
 			if (header.flags & TCP_FLG_ACK) {
-				sequenceNum = ntohl(header.acknowledge_num);
-				acknowledgeNum = 0;
+				sequence = ntohl(header.acknowledge_num);
+				acknowledge = 0;
 				flags = TCP_FLG_RST;
 			} else {
-				sequenceNum = 0;
-				acknowledgeNum = ntohl(header.sequence_num) + 1 + buffer->size - ((uint32)header.header_length<<2);
+				sequence = 0;
+				acknowledge = ntohl(header.sequence_num) + 1
+					+ buffer->size - ((uint32)header.header_length << 2);
 				flags = TCP_FLG_RST | TCP_FLG_ACK;
 			}
-			
-			status_t status = tcp_segment(reply_buf, flags, sequenceNum, acknowledgeNum, 0);
-			if (status != B_OK) {
-				sBufferModule->free(reply_buf);
-				return status;
+
+			status_t status = add_tcp_header(reply, flags, sequence, acknowledge, 0);
+
+			if (status == B_OK) {
+				TRACE(("TCP:  Sending RST...\n"));
+				status = gDomain->module->send_data(NULL, reply);
 			}
-			TRACE(("TCP:  Sending RST...\n"));
-			status = sDomain->module->send_data(NULL, reply_buf);
-			if (status !=B_OK) {
-				sBufferModule->free(reply_buf);
+
+			if (status != B_OK) {
+				gBufferModule->free(reply);
 				return status;
 			}
 		}
@@ -386,43 +401,43 @@ tcp_init()
 {
 	status_t status;
 
-	sDomain = NULL;
-	sAddressModule = NULL;
+	gDomain = NULL;
+	gAddressModule = NULL;
 
-	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
+	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		goto err1;
-	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);
+	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule);
 	if (status < B_OK)
 		goto err2;
 
-	sTCPHash = hash_init(MAX_HASH_TCP, TCPConnection::HashOffset(),
+	gConnectionHash = hash_init(MAX_HASH_TCP, TCPConnection::HashOffset(),
 		&TCPConnection::Compare, &TCPConnection::Hash);
-	if (sTCPHash == NULL)
+	if (gConnectionHash == NULL)
 		goto err3;
 
-	status = benaphore_init(&sTCPLock, "TCP Hash Lock");
+	status = benaphore_init(&gConnectionLock, "TCP Hash Lock");
 	if (status < B_OK)
 		goto err4;
 
-	status = sStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_IP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_IP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err5;
 
-	status = sStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err5;
 
-	status = sStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
+	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
 		"network/protocols/tcp/v1");
 	if (status < B_OK)
 		goto err5;
@@ -430,9 +445,9 @@ tcp_init()
 	return B_OK;
 
 err5:
-	benaphore_destroy(&sTCPLock);
+	benaphore_destroy(&gConnectionLock);
 err4:
-	hash_uninit(sTCPHash);
+	hash_uninit(gConnectionHash);
 err3:
 	put_module(NET_DATALINK_MODULE_NAME);
 err2:
@@ -448,8 +463,8 @@ err1:
 static status_t
 tcp_uninit()
 {
-	benaphore_destroy(&sTCPLock);
-	hash_uninit(sTCPHash);
+	benaphore_destroy(&gConnectionLock);
+	hash_uninit(gConnectionHash);
 	put_module(NET_DATALINK_MODULE_NAME);
 	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);

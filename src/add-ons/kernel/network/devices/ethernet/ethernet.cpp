@@ -29,7 +29,7 @@ struct ethernet_device : net_device {
 };
 
 
-struct net_buffer_module_info *sBufferModule;
+struct net_buffer_module_info *gBufferModule;
 
 
 status_t
@@ -41,7 +41,7 @@ ethernet_init(const char *name, net_device **_device)
 		|| !strcmp(name, "/dev/net/userland_server"))
 		return B_BAD_VALUE;
 
-	status_t status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status_t status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		return status;
 
@@ -134,13 +134,13 @@ dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size,
 	if (buffer->size > device->frame_size || buffer->size < ETHER_HEADER_LENGTH)
 		return B_BAD_VALUE;
 
-	if (sBufferModule->count_iovecs(buffer) > 1) {
+	if (gBufferModule->count_iovecs(buffer) > 1) {
 		dprintf("scattered I/O is not yet supported by ethernet device.\n");
 		return B_NOT_SUPPORTED;
 	}
 
 	struct iovec iovec;
-	sBufferModule->get_iovecs(buffer, &iovec, 1);
+	gBufferModule->get_iovecs(buffer, &iovec, 1);
 
 dump_block((const char *)iovec.iov_base, buffer->size, "  ");
 	ssize_t bytesWritten = write(device->fd, iovec.iov_base, iovec.iov_len);
@@ -153,7 +153,7 @@ dprintf("sent: %ld\n", bytesWritten);
 	device->stats.send.packets++;
 	device->stats.send.bytes += bytesWritten;
 	
-	sBufferModule->free(buffer);
+	gBufferModule->free(buffer);
 	return B_OK;
 }
 
@@ -164,7 +164,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	ethernet_device *device = (ethernet_device *)_device;
 
 	// TODO: better header space
-	net_buffer *buffer = sBufferModule->create(256);
+	net_buffer *buffer = gBufferModule->create(256);
 	if (buffer == NULL)
 		return ENOBUFS;
 
@@ -176,7 +176,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	ssize_t bytesRead;
 	void *data;
 
-	status_t status = sBufferModule->append_size(buffer, device->frame_size, &data);
+	status_t status = gBufferModule->append_size(buffer, device->frame_size, &data);
 	if (status == B_OK && data == NULL) {
 		dprintf("scattered I/O is not yet supported by ethernet device.\n");
 		status = B_NOT_SUPPORTED;
@@ -191,7 +191,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 		goto err;
 	}
 
-	status = sBufferModule->trim(buffer, bytesRead);
+	status = gBufferModule->trim(buffer, bytesRead);
 	if (status < B_OK) {
 		device->stats.receive.dropped++;
 		goto err;
@@ -204,7 +204,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	return B_OK;
 
 err:
-	sBufferModule->free(buffer);
+	gBufferModule->free(buffer);
 	return status;
 }
 

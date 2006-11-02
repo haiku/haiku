@@ -25,7 +25,7 @@ struct loopback_device : net_device {
 };
 
 
-struct net_buffer_module_info *sBufferModule;
+struct net_buffer_module_info *gBufferModule;
 static struct net_stack_module_info *sStackModule;
 
 
@@ -72,7 +72,7 @@ loopback_init(const char *name, net_device **_device)
 	if (status < B_OK)
 		return status;
 
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&sBufferModule);
+	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		goto err1;
 
