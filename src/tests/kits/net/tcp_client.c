@@ -65,7 +65,7 @@ main(int argc, char **argv)
 				perror("recv");
 				sleep(1);
 				// want the read thread to stay alive
-				//exit(1);
+				continue;
 			}
 
 			buffer[numBytes] = '\0';
