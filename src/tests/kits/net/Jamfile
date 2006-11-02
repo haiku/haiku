@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests kits net ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 # bonefish: Tried to get the first test compiling. It complained about not
 # being able to find some headers, thus I added the respective include dirs
 # until it was asking for headers we currently don't have
@@ -13,6 +15,9 @@ SubDir HAIKU_TOP src tests kits net ;
 SimpleTest udp_client : udp_client.c : $(NETWORK_LIBS) ;
 SimpleTest udp_echo : udp_echo.c : $(NETWORK_LIBS) ;
 SimpleTest udp_server : udp_server.c : $(NETWORK_LIBS) ;
+
+SimpleTest tcp_server : tcp_server.c : $(NETWORK_LIBS) ;
+SimpleTest tcp_client : tcp_client.c : $(NETWORK_LIBS) ;
 
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
