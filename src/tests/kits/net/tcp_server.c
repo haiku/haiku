@@ -35,7 +35,7 @@ main(int argc, char *argv[])
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
 	struct sockaddr_in my_addr;	// my address information
 	struct sockaddr_in their_addr; // connector's address information
-	int sin_size;
+	uint32_t sin_size;
 	struct sigaction sa;
 	int yes = 1;
 	short int port = MYPORT;
