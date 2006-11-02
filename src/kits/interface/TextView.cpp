@@ -1484,18 +1484,34 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont* font
 {
 	CALLED();
 
+	if (startOffset > endOffset)
+		return;
+
 	BFont newFont;
 	if (font != NULL) {
 		newFont = font;
 		NormalizeFont(&newFont);
 	}
 
+	const int32 textLength = fText->Length();
+
 	if (!fStylable) {
 		// When the text view is not stylable, we always set the whole text's
 		// style and ignore the offsets
 		startOffset = 0;
-		endOffset = fText->Length();
+		endOffset = textLength;
 	}
+
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > textLength)
+		startOffset = textLength;
+
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > textLength)
+		endOffset = textLength;
 
 	// add the style to the style buffer
 	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
