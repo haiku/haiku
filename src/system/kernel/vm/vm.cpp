@@ -2167,6 +2167,8 @@ create_preloaded_image_areas(struct preloaded_image *image)
 	image->text_region.id = create_area(name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->text_region.size), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		// this will later be remapped read-only/executable by the
+		// ELF initialization code
 
 	strcpy(name + length, "_data");
 	address = (void *)ROUNDOWN(image->data_region.start, B_PAGE_SIZE);

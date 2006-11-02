@@ -820,6 +820,10 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 	preloadedImage->id = image->id;
 		// modules_init() uses this information to get the preloaded images
 
+	// we now no longer need to write to the text area anymore
+	set_area_protection(image->text_region.id,
+		B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA);
+
 	return B_OK;
 
 error1:
