@@ -14,12 +14,7 @@
 
 #include <arpa/inet.h>
 #include <netdb.h>
-//#include <net/if.h>
-//#include <net/if_dl.h>
-//#include <net/if_types.h>
 #include <netinet/in.h>
-//#include <sys/socket.h>
-//#include <sys/sockio.h>
 
 #include <ctype.h>
 #include <errno.h>
@@ -84,7 +79,6 @@ check_for_arp_syscall(void)
 	status_t status = _kern_generic_syscall(ARP_SYSCALLS, B_SYSCALL_INFO,
 		&version, sizeof(version));
 	if (status != B_OK) {
-		// the launch speedup module is not available
 		fprintf(stderr, "\"ARP\" module not available.\n");
 		exit(1);
 	}
