@@ -253,7 +253,8 @@ AddOnThread(BMessage *refsMessage, entry_ref addonRef, entry_ref dirRef)
 				PRINT(("couldn't find process_refs\n"));
 
 			unload_add_on(addonImage);
-		}
+		} else
+			result = addonImage;
 	}
 
 	char buffer[1024];
