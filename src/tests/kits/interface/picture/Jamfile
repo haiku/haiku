@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src tests kits interface picture ;
+
+SimpleTest PictureTest :
+	PictureTest.cpp
+	: be
+	;	

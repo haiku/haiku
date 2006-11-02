@@ -122,10 +122,6 @@ SimpleTest MenuBeginningTest :
 	: be
 	;
 
-SimpleTest PictureTest :
-	PictureTest.cpp
-	: be
-	;
 
 SEARCH on [ FGristFiles
 		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp Slider.cpp Control.cpp
@@ -135,6 +131,7 @@ SubInclude HAIKU_TOP src tests kits interface bprintjob ;
 SubInclude HAIKU_TOP src tests kits interface bfont ;
 SubInclude HAIKU_TOP src tests kits interface bshelf ;
 SubInclude HAIKU_TOP src tests kits interface layout ;
+SubInclude HAIKU_TOP src tests kits interface picture ;
 SubInclude HAIKU_TOP src tests kits interface pictureprint ;
 SubInclude HAIKU_TOP src tests kits interface NewRegion ;
 
