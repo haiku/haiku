@@ -1,8 +1,15 @@
-/* Author: Marcus Overhagen
-**         Axel Dörfler, axeld@pinc-software.de
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+
+#include "DefaultMediaTheme.h"
+#include "debug.h"
 
 #include <MediaTheme.h>
 #include <StringView.h>
@@ -11,87 +18,76 @@
 
 #include <string.h>
 
-#include "DefaultMediaTheme.h"
-#include "debug.h"
-
 
 static BLocker sLock;
 
-/*************************************************************
- * static BMediaTheme variables
- *************************************************************/
+BMediaTheme* BMediaTheme::sDefaultTheme;
 
-BMediaTheme * BMediaTheme::_mDefaultTheme;
-
-
-/*************************************************************
- * public BMediaTheme
- *************************************************************/
 
 BMediaTheme::~BMediaTheme()
 {
 	CALLED();
 
-	free(_mName);
-	free(_mInfo);
+	free(fName);
+	free(fInfo);
 }
 
 
 const char *
 BMediaTheme::Name()
 {
-	return _mName;
+	return fName;
 }
 
 
 const char *
 BMediaTheme::Info()
 {
-	return _mInfo;
+	return fInfo;
 }
 
 
 int32
 BMediaTheme::ID()
 {
-	return _mID;
+	return fID;
 }
 
 
 bool
-BMediaTheme::GetRef(entry_ref *out_ref)
+BMediaTheme::GetRef(entry_ref* ref)
 {
-	UNIMPLEMENTED();
+	if (!fIsAddOn || ref == NULL)
+		return false;
 
-	return false;
+	*ref = fAddOnRef;
+	return true;
 }
 
 
 BView *
-BMediaTheme::ViewFor(BParameterWeb *web, const BRect *hintRect, BMediaTheme *usingTheme)
+BMediaTheme::ViewFor(BParameterWeb* web, const BRect* hintRect,
+	BMediaTheme* usingTheme)
 {
 	CALLED();
 
 	// use default theme if none was specified
+	if (usingTheme == NULL)
+		usingTheme = PreferredTheme();
 
 	if (usingTheme == NULL) {
-		BAutolock locker(sLock);
-
-		if (_mDefaultTheme == NULL)
-			_mDefaultTheme = new BPrivate::DefaultMediaTheme();
-
-		usingTheme = _mDefaultTheme;
+		BStringView* view = new BStringView(BRect(0, 0, 200, 30), "",
+			"No BMediaTheme available, sorry!");
+		view->ResizeToPreferred();
+		return view;
 	}
-
-	if (usingTheme == NULL)
-		return new BStringView(BRect(0, 0, 200, 30), "", "No BMediaTheme available, sorry!");
 
 	return usingTheme->MakeViewFor(web, hintRect);
 }
 
 
 status_t
-BMediaTheme::SetPreferredTheme(BMediaTheme *defaultTheme)
+BMediaTheme::SetPreferredTheme(BMediaTheme* defaultTheme)
 {
 	CALLED();
 
@@ -103,18 +99,18 @@ BMediaTheme::SetPreferredTheme(BMediaTheme *defaultTheme)
 	if (defaultTheme == NULL) {
 		// if the current preferred theme is not the default media theme,
 		// delete it, and set it back to the default
-		if (dynamic_cast<BPrivate::DefaultMediaTheme *>(_mDefaultTheme) == NULL)
-			_mDefaultTheme = new BPrivate::DefaultMediaTheme();
+		if (dynamic_cast<BPrivate::DefaultMediaTheme *>(sDefaultTheme) == NULL)
+			sDefaultTheme = new BPrivate::DefaultMediaTheme();
 
 		return B_OK;
 	}
 
 	// this method takes possession of the BMediaTheme passed, even
 	// if it fails, so it has to delete it
-	if (defaultTheme != _mDefaultTheme)
-		delete _mDefaultTheme;
+	if (defaultTheme != sDefaultTheme)
+		delete sDefaultTheme;
 
-	_mDefaultTheme = defaultTheme;
+	sDefaultTheme = defaultTheme;
 
 	return B_OK;
 }
@@ -131,10 +127,10 @@ BMediaTheme::PreferredTheme()
 	//	add-on and load this from disk - in the meantime, just use
 	//	the default theme
 
-	if (_mDefaultTheme == NULL)
-		_mDefaultTheme = new BPrivate::DefaultMediaTheme();
+	if (sDefaultTheme == NULL)
+		sDefaultTheme = new BPrivate::DefaultMediaTheme();
 
-	return _mDefaultTheme;
+	return sDefaultTheme;
 }
 
 
@@ -150,9 +146,7 @@ rgb_color
 BMediaTheme::BackgroundColorFor(bg_kind bg)
 {
 	UNIMPLEMENTED();
-	rgb_color dummy = {0, 0, 0};
-
-	return dummy;
+	return ui_color(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -166,25 +160,22 @@ BMediaTheme::ForegroundColorFor(fg_kind fg)
 }
 
 
-/*************************************************************
- * protected BMediaTheme
- *************************************************************/
-
-
-BMediaTheme::BMediaTheme(const char *name, const char *info, const entry_ref *ref, int32 id)
+//! protected BMediaTheme
+BMediaTheme::BMediaTheme(const char* name, const char* info,
+	const entry_ref* ref, int32 id)
 	:
-	_mID(id)
+	fID(id)
 {
-	_mName = strdup(name);
-	_mInfo = strdup(info);
+	fName = strdup(name);
+	fInfo = strdup(info);
 
 	// ToDo: is there something else here, which has to be done?
 
 	if (ref) {
-		_mAddOn = true;
-		_mAddOnRef = *ref;
+		fIsAddOn = true;
+		fAddOnRef = *ref;
 	} else
-		_mAddOn = false;
+		fIsAddOn = false;
 }
 
 
@@ -197,10 +188,6 @@ BMediaTheme::MakeFallbackViewFor(BParameter *parameter)
 	return BPrivate::DefaultMediaTheme::MakeViewFor(parameter);
 }
 
-
-/*************************************************************
- * private BMediaTheme
- *************************************************************/
 
 /*
 private unimplemented
