@@ -135,11 +135,11 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_AMD_ATHLON_THUNDERBIRD:
 			return "Athlon";
 		case B_CPU_AMD_ATHLON_XP:
-		case B_CPU_AMD_ATHLON_XP_MODEL_7:
 		case B_CPU_AMD_ATHLON_XP_MODEL_8:
 		case B_CPU_AMD_ATHLON_XP_MODEL_10:
 			return "Athlon XP";
 		case B_CPU_AMD_DURON:
+		case B_CPU_AMD_ATHLON_XP_MODEL_7:
 			return "Duron";
 		case B_CPU_AMD_ATHLON_64_MODEL_4:
 		case B_CPU_AMD_ATHLON_64_MODEL_7:
