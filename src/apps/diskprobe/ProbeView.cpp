@@ -236,7 +236,7 @@ IconView::Draw(BRect updateRect)
 	if (fBitmap == NULL)
 		return;
 
-	SetDrawingMode(B_OP_OVER);
+	SetDrawingMode(B_OP_ALPHA);
 	DrawBitmap(fBitmap, updateRect, updateRect);
 	SetDrawingMode(B_OP_COPY);
 }
@@ -246,7 +246,7 @@ void
 IconView::UpdateIcon()
 {
 	if (fBitmap == NULL)
-		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGB32);
 
 	if (fBitmap != NULL) {
 		status_t status = B_ERROR;

@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src apps diskprobe ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseLibraryHeaders icon ;
 UsePrivateHeaders shared ;
 
 Application DiskProbe :

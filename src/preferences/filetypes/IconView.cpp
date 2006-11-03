@@ -96,8 +96,8 @@ IconView::SetTo(entry_ref* ref)
 		if (node.InitCheck() != B_OK
 			|| info.InitCheck() != B_OK)
 			return;
-	
-		BBitmap* icon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
+
+		BBitmap* icon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_RGB32);
 		if (info.GetIcon(icon, B_LARGE_ICON) != B_OK) {
 			delete icon;
 			return;

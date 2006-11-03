@@ -7,6 +7,10 @@
 #include "AttributeEditors.h"
 #include "DataEditor.h"
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <IconUtils.h>
+#endif
+
 #include <MenuItem.h>
 #include <StringView.h>
 #include <TextControl.h>
@@ -764,7 +768,8 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 	fEditor(editor),
 	fBitmap(NULL)
 {
-	if (editor.Type() == 'MICN' || editor.Type() == 'ICON')
+	if (editor.Type() == 'MICN' || editor.Type() == 'ICON'
+		|| (!strcmp(editor.Attribute(), "BEOS:ICON") && editor.Type() == B_RAW_TYPE))
 		SetName("Icon View");
 
 	fDescriptionView = new BStringView(Bounds(), "", "Could not read image", B_FOLLOW_NONE);
@@ -817,8 +822,11 @@ ImageView::MessageReceived(BMessage *message)
 void 
 ImageView::Draw(BRect updateRect)
 {
-	if (fBitmap != NULL)
+	if (fBitmap != NULL) {
+		SetDrawingMode(B_OP_ALPHA);
 		DrawBitmap(fBitmap, BPoint((Bounds().Width() - fBitmap->Bounds().Width()) / 2, 0));
+		SetDrawingMode(B_OP_COPY);
+	}
 }
 
 
@@ -848,6 +856,10 @@ ImageView::UpdateImage()
 		fEditor.SetViewSize(viewSize);
 		return;
 	}
+	if (fBitmap != NULL && !strcmp(fEditor.Attribute(), "BEOS:ICON")
+		&& fEditor.Type() == B_RAW_TYPE) {
+		return;
+	}
 
 	delete fBitmap;
 	fBitmap = NULL;
@@ -863,6 +875,20 @@ ImageView::UpdateImage()
 			if (fBitmap->InitCheck() == B_OK)
 				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
 			break;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		case B_RAW_TYPE:
+			if (strcmp(fEditor.Attribute(), "BEOS:ICON"))
+				break;
+
+			fBitmap = new BBitmap(BRect(0, 0, 127, 127), B_RGB32);
+			if (fBitmap->InitCheck() != B_OK || fEditor.FileSize() > 64 * 1024
+				|| BIconUtils::GetVectorIcon((const uint8 *)data,
+					(size_t)fEditor.FileSize(), fBitmap) != B_OK) {
+				delete fBitmap;
+				fBitmap = NULL;
+			}
+			break;
+#endif
 		case 'PNG ':
 		{
 			BMemoryIO stream(data, fEditor.FileSize());
@@ -883,18 +909,22 @@ ImageView::UpdateImage()
 	// Update the bitmap description. If no image can be displayed,
 	// we will show our "unsupported" message
 
-	if (fBitmap->InitCheck() != B_OK) {
+	if (fBitmap != NULL && fBitmap->InitCheck() != B_OK) {
 		delete fBitmap;
 		fBitmap = NULL;
 	}
 
 	if (fBitmap != NULL) {
 		char buffer[256];
-		const char *type;
+		const char *type = "Unknown Type";
 		switch (fEditor.Type()) {
 			case 'MICN':
 			case 'ICON':
 				type = "Icon";
+				break;
+			case B_RAW_TYPE:
+				if (!strcmp(fEditor.Attribute(), "BEOS:ICON"))
+					type = "Icon";
 				break;
 			case 'PNG ':
 				type = "PNG Format";
@@ -903,7 +933,6 @@ ImageView::UpdateImage()
 				type = "Flattened Bitmap";
 				break;
 			default:	
-				type = "Unknown Type";
 				break;
 		}
 		const char *colorSpace;
@@ -1016,6 +1045,11 @@ GetTypeEditorFor(BRect rect, DataEditor &editor)
 		case 'MSGG':
 			return new ImageView(rect, editor);
 	}
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (!strcmp(editor.Attribute(), "BEOS:ICON") && editor.Type() == B_RAW_TYPE)
+		return new ImageView(rect, editor);
+#endif
 
 	return NULL;
 }

@@ -115,7 +115,7 @@ TypeIconView::SetTo(BMimeType* type)
 	if (type != NULL) {
 		if (fIcon == NULL) {
 			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1),
-				B_CMAP8);
+				B_RGB32);
 		}
 
 		icon_for_type(*type, *fIcon, B_LARGE_ICON, &fIconSource);
