@@ -454,6 +454,8 @@ DocumentBuilder::parse_path(PathTokenizer& tok)
 	}
 }
 
+// #pragma mark -
+
 // GetIcon
 status_t
 DocumentBuilder::GetIcon(Icon* icon, SVGImporter* importer,
@@ -519,6 +521,25 @@ printf("scale: %f\n", scale);
 			_AddShape(attributes, true, transform, icon);
 	}
 
+	// clean up styles and paths (remove duplicates)
+	int32 count = icon->Shapes()->CountShapes();
+	for (int32 i = 1; i < count; i++) {
+		Shape* shape = icon->Shapes()->ShapeAtFast(i);
+		Style* style = shape->Style();
+		if (!style)
+			continue;
+		int32 styleIndex = icon->Styles()->IndexOf(style);
+		for (int32 j = 0; j < styleIndex; j++) {
+			Style* earlierStyle = icon->Styles()->StyleAtFast(j);
+			if (*style == *earlierStyle) {
+				shape->SetStyle(earlierStyle);
+				icon->Styles()->RemoveStyle(style);
+				style->Release();
+				break;
+			}
+		}
+	}
+
 	return B_OK;
 }
 
@@ -528,7 +549,8 @@ DocumentBuilder::StartGradient(bool radial)
 {
 	if (fCurrentGradient) {
 		fprintf(stderr, "DocumentBuilder::StartGradient() - ERROR: "
-						"previous gradient (%s) not finished!\n", fCurrentGradient->ID());
+						"previous gradient (%s) not finished!\n",
+						fCurrentGradient->ID());
 	}
 
 	if (radial)
@@ -546,7 +568,8 @@ DocumentBuilder::EndGradient()
 	if (fCurrentGradient) {
 //		fCurrentGradient->PrintToStream();
 	} else {
-		fprintf(stderr, "DocumentBuilder::EndGradient() - ERROR: no gradient started!\n");
+		fprintf(stderr, "DocumentBuilder::EndGradient() - "
+				"ERROR: no gradient started!\n");
 	}
 	fCurrentGradient = NULL;
 }

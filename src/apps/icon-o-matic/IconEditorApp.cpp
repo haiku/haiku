@@ -137,10 +137,16 @@ IconEditorApp::MessageReceived(BMessage* message)
 				}
 				_SyncPanels(fSavePanel, fOpenPanel);
 			} else {
+				const char* saveText = NULL;
+				if (fDocument->Ref())
+					saveText = fDocument->Ref()->name;
+
 				switch (message->what) {
 					case MSG_EXPORT_AS:
 					case MSG_EXPORT:
 						exportMode = EXPORT_MODE_FLAT_ICON;
+						if (fDocument->ExportRef())
+							saveText = fDocument->ExportRef()->name;
 						break;
 					case MSG_EXPORT_BITMAP:
 						exportMode = EXPORT_MODE_BITMAP;
@@ -171,6 +177,8 @@ IconEditorApp::MessageReceived(BMessage* message)
 
 				fSavePanel->SetMessage(&fpMessage);
 //				fSavePanel->Refresh();
+				if (saveText)
+					fSavePanel->SetSaveText(saveText);
 				fSavePanel->Show();
 			}
 			break;
@@ -325,13 +333,15 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 
 	fDocument->SetIcon(icon);
 
-	switch (refMode) {
-		case REF_MESSAGE:
-			fDocument->SetRef(ref);
-			break;
-		case REF_FLAT:
-			fDocument->SetExportRef(ref);
-			break;
+	if (!append) {
+		switch (refMode) {
+			case REF_MESSAGE:
+				fDocument->SetRef(ref);
+				break;
+			case REF_FLAT:
+				fDocument->SetExportRef(ref);
+				break;
+		}
 	}
 
 	locker.Unlock();

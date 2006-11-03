@@ -34,11 +34,11 @@ SetColorCommand::~SetColorCommand()
 status_t
 SetColorCommand::InitCheck()
 {
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
+#ifdef __HAIKU__
+	return fStyle && fStyle->Color() != fColor ? B_OK : B_NO_INIT;
+#else
 	return fStyle && *(uint32*)&fStyle->Color() != *(uint32*)&fColor ?
 		B_OK : B_NO_INIT;
-#else
-	return fStyle && fStyle->Color() != fColor ? B_OK : B_NO_INIT;
 #endif
 }
 

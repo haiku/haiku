@@ -20,6 +20,7 @@
 
 #ifdef ICON_O_MATIC
 #include <debugger.h>
+#include <typeinfo>
 
 #include <Message.h>
 #include <TypeConstants.h>
@@ -169,9 +170,14 @@ VectorPath::~VectorPath()
 		obj_free(fPath);
 
 #ifdef ICON_O_MATIC
-	if (fListeners.CountItems() > 0)
-		debugger("VectorPath::~VectorPath() - "
-				 "there are still listeners attached!");
+	if (fListeners.CountItems() > 0) {
+		PathListener* listener = (PathListener*)fListeners.ItemAt(0);
+		char message[512];
+		sprintf(message, "VectorPath::~VectorPath() - "
+				 "there are still listeners attached! %p/%s",
+				 listener, typeid(*listener).name());
+		debugger(message);
+	}
 #endif
 }
 

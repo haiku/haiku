@@ -142,13 +142,31 @@ Style::Archive(BMessage* into, bool deep) const
 
 	return ret;
 }
+
+// operator ==
+bool
+Style::operator==(const Style& other) const
+{
+	if (fGradient) {
+		if (other.fGradient)
+			return *fGradient == *other.fGradient;
+		else
+			return false;
+	} else {
+		if (!other.fGradient)
+			return *(uint32*)&fColor == *(uint32*)&other.fColor;
+		else
+			return false;
+	}
+}
+
 #endif // ICON_O_MATIC
 
 // SetColor
 void
 Style::SetColor(const rgb_color& color)
 {
-	if ((uint32&)fColor == (uint32&)color)
+	if (*(uint32*)&fColor == *(uint32*)&color)
 		return;
 
 	fColor = color;

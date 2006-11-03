@@ -45,6 +45,8 @@ class Style {
 	// Style
 			status_t			Archive(BMessage* into,
 										bool deep = true) const;
+
+			bool				operator==(const Style& other) const;
 #else
 	inline	void				Notify() {}
 #endif // ICON_O_MATIC
