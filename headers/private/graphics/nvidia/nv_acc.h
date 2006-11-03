@@ -299,13 +299,17 @@ typedef struct {
 #define NV_SCALED_IMAGE_FROM_MEMORY_SOURCESIZE		0x0400
 
 
-/************************
- * 3D specific commands *
- ************************/
+/*****************************************
+ * 3D specific commands, TNT style setup *
+ *****************************************/
 
 #define NV4_DX5_TEXTURE_TRIANGLE_COLORKEY			0x0300
 #define NV4_DX5_TEXTURE_TRIANGLE_TLVERTEX(i)		0x0400 + (i << 5)
 #define NV4_DX5_TEXTURE_TRIANGLE_TLVDRAWPRIM(i)		0x0600 + (i << 2)
 #define NV4_CONTEXT_SURFACES_ARGB_ZS_PITCH			0x0308
+
+/*********************************************
+ * 3D specific commands, GeForce style setup *
+ *********************************************/
 
 #endif
