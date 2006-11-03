@@ -487,7 +487,7 @@ message fields:
     "which"                     additional message fields       field comments
     -------------------------   ----------------------------    --------------------------
 	B_REG_MIME_ICON:			"icon data": B_RAW_TYPE,        B_CMAP8 bitmap data only
-								"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
+								"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON or -1 for flat vector icon data
 	B_REG_MIME_PREFERRED_APP:	"signature": B_STRING_TYPE,
 								"app verb": B_INT32_TYPE
 	B_REG_MIME_ATTR_INFO:		"attr info": B_MESSAGE_TYPE
@@ -524,7 +524,7 @@ message fields:
 
     "which"                     additional message fields       field comments
     -------------------------   ----------------------------    --------------------------
-	B_REG_MIME_ICON:			"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
+	B_REG_MIME_ICON:			"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON or -1 for vector icon data
 	B_REG_MIME_PREFERRED_APP:	"app verb": B_INT32_TYPE
 	B_REG_MIME_ATTR_INFO:			
 	B_REG_MIME_FILE_EXTENSIONS:	
