@@ -185,7 +185,7 @@ copy(const char *from, const char *to)
 		}
 	} else {
 		// stat(target) failed, so it doesn't exist yet - if
-		// the target doesn't end in "/", that's should not
+		// the target doesn't end in "/", that should not
 		// be a problem, just copy the file under the new name
 
 		if (toPath[strlen(toPath) - 1] == '/') {
