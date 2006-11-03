@@ -188,8 +188,6 @@ MouseView::Pulse()
 void 
 MouseView::Draw(BRect updateFrame)
 {
-	inherited::Draw(updateFrame);
-
 	// Draw the mouse top
 	SetDrawingMode(B_OP_ALPHA);
 	if (fMouseBitmap != NULL)
