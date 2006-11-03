@@ -11,24 +11,26 @@
 #	include <IconUtils.h>
 #endif
 
+#include <Alert.h>
+#include <Autolock.h>
+#include <Bitmap.h>
+#include <MenuField.h>
 #include <MenuItem.h>
+#include <Mime.h>
+#include <PopUpMenu.h>
+#include <ScrollView.h>
+#include <Slider.h>
+#include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
 #include <TextView.h>
-#include <ScrollView.h>
-#include <MenuField.h>
-#include <PopUpMenu.h>
-#include <Bitmap.h>
-#include <Alert.h>
-#include <String.h>
-#include <Autolock.h>
-#include <Mime.h>
 #include <TranslationUtils.h>
 
 #include <stdlib.h>
 
 
 static const uint32 kMsgValueChanged = 'vlch';
+static const uint32 kMsgScaleChanged = 'scch';
 static const uint32 kMimeTypeItem = 'miti';
 
 
@@ -125,6 +127,7 @@ class ImageView : public TypeEditorView {
 		DataEditor	&fEditor;
 		BBitmap		*fBitmap;
 		BStringView	*fDescriptionView;
+		BSlider		*fScaleSlider;
 };
 
 
@@ -766,11 +769,25 @@ BooleanEditor::MessageReceived(BMessage *message)
 ImageView::ImageView(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, "Image View", B_FOLLOW_NONE, B_WILL_DRAW),
 	fEditor(editor),
-	fBitmap(NULL)
+	fBitmap(NULL),
+	fScaleSlider(NULL)
 {
 	if (editor.Type() == 'MICN' || editor.Type() == 'ICON'
-		|| (!strcmp(editor.Attribute(), "BEOS:ICON") && editor.Type() == B_RAW_TYPE))
+		|| (!strcmp(editor.Attribute(), "BEOS:ICON") && editor.Type() == B_RAW_TYPE)) {
 		SetName("Icon View");
+
+		if (editor.Type() == B_RAW_TYPE) {
+			// vector icon
+			fScaleSlider = new BSlider(Bounds(), "", NULL,
+				new BMessage(kMsgScaleChanged), 2, 16);
+			fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
+			fScaleSlider->ResizeToPreferred();
+			fScaleSlider->SetValue(8.0);
+			fScaleSlider->SetHashMarks(B_HASH_MARKS_BOTH);
+			fScaleSlider->SetHashMarkCount(15);
+			AddChild(fScaleSlider);
+		}
+	}
 
 	fDescriptionView = new BStringView(Bounds(), "", "Could not read image", B_FOLLOW_NONE);
 	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
@@ -794,6 +811,9 @@ ImageView::AttachedToWindow()
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fEditor.StartWatching(this);
+	if (fScaleSlider != NULL)
+		fScaleSlider->SetTarget(this);
+
 	UpdateImage();
 }
 
@@ -805,11 +825,15 @@ ImageView::DetachedFromWindow()
 }
 
 
-void 
+void
 ImageView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgDataEditorUpdate:
+			UpdateImage();
+			break;
+
+		case kMsgScaleChanged:
 			UpdateImage();
 			break;
 
@@ -819,7 +843,7 @@ ImageView::MessageReceived(BMessage *message)
 }
 
 
-void 
+void
 ImageView::Draw(BRect updateRect)
 {
 	if (fBitmap != NULL) {
@@ -830,7 +854,7 @@ ImageView::Draw(BRect updateRect)
 }
 
 
-void 
+void
 ImageView::UpdateImage()
 {
 	// ToDo: add scroller if necessary?!
@@ -857,8 +881,17 @@ ImageView::UpdateImage()
 		return;
 	}
 	if (fBitmap != NULL && !strcmp(fEditor.Attribute(), "BEOS:ICON")
-		&& fEditor.Type() == B_RAW_TYPE) {
-		return;
+		&& fEditor.Type() == B_RAW_TYPE
+		&& fScaleSlider->Value() * 8 - 1 == fBitmap->Bounds().Width()) {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		if (BIconUtils::GetVectorIcon((const uint8 *)data,
+				(size_t)fEditor.FileSize(), fBitmap) == B_OK) {
+#endif
+			fEditor.SetViewSize(viewSize);
+			return;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		}
+#endif
 	}
 
 	delete fBitmap;
@@ -880,8 +913,9 @@ ImageView::UpdateImage()
 			if (strcmp(fEditor.Attribute(), "BEOS:ICON"))
 				break;
 
-			fBitmap = new BBitmap(BRect(0, 0, 127, 127), B_RGB32);
-			if (fBitmap->InitCheck() != B_OK || fEditor.FileSize() > 64 * 1024
+			fBitmap = new BBitmap(BRect(0, 0, fScaleSlider->Value() * 8 - 1,
+				fScaleSlider->Value() * 8 - 1), B_RGB32);
+			if (fBitmap->InitCheck() != B_OK
 				|| BIconUtils::GetVectorIcon((const uint8 *)data,
 					(size_t)fEditor.FileSize(), fBitmap) != B_OK) {
 				delete fBitmap;
@@ -972,7 +1006,9 @@ ImageView::UpdateImage()
 
 	// Update the view size to match the image and its description
 
-	fDescriptionView->ResizeToPreferred();
+	float width, height;
+	fDescriptionView->GetPreferredSize(&width, &height);
+	fDescriptionView->ResizeTo(width, height);
 
 	BRect rect = fDescriptionView->Bounds();
 	if (fBitmap != NULL) {
@@ -987,6 +1023,12 @@ ImageView::UpdateImage()
 
 		// center description below the bitmap
 		fDescriptionView->MoveTo(x, bounds.Height() + 5);
+
+		if (fScaleSlider != NULL) {
+			rect.bottom += fScaleSlider->Bounds().Height() + 5;
+			fScaleSlider->MoveTo(0, fDescriptionView->Frame().bottom + 5);
+			fScaleSlider->ResizeTo(rect.Width(), fScaleSlider->Bounds().Height());
+		}
 	}
 
 	ResizeTo(rect.Width(), rect.Height());
@@ -1004,7 +1046,7 @@ ImageView::UpdateImage()
 }
 
 
-void 
+void
 ImageView::CommitChanges()
 {
 	// we're not an editor, we're just displaying something
