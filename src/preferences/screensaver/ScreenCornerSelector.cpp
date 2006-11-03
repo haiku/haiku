@@ -194,9 +194,9 @@ ScreenCornerSelector::_DrawStop(BRect innerFrame)
 	SetPenSize(2);
 	StrokeEllipse(rect);
 
-	size -= ceilf(sin(PI / 4) * size) + 1;
+	size -= ceilf(sin(PI / 4) * size + 2);
 	rect.InsetBy(size, size);
-	StrokeLine(BPoint(rect.right, rect.top), BPoint(rect.left, rect.bottom));
+	StrokeLine(rect.RightTop(), rect.LeftBottom());
 
 	SetPenSize(1);
 }
