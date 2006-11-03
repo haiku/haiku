@@ -299,13 +299,10 @@ TTimeView::Draw(BRect /*updateRect*/)
 	FillRect(Bounds());
 	SetHighColor(0, 0, 0, 255);
 
-	if (fShowingDate) {
-		MovePenTo(fDateLocation);
-		DrawString(fDateStr);
-	} else {
-		MovePenTo(fTimeLocation);
-		DrawString(fTimeStr);
-	}
+	if (fShowingDate)
+		DrawString(fDateStr, fDateLocation);
+	else
+		DrawString(fTimeStr, fTimeLocation);
 
 	PopState();
 }
