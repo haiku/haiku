@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons translators rtf ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 # Include code from shared translator directory
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 

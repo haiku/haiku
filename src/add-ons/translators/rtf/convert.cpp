@@ -259,7 +259,7 @@ text_runs_are_equal(text_run *a, text_run *b)
 		return false;
 
 	return a->offset == b->offset
-		&& a->color == b->color
+		&& *(uint32*)&a->color == *(uint32*)&b->color
 		&& a->font == b->font;
 }
 
