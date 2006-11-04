@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tools ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private storage ] : true ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
 
 local tools =
@@ -26,7 +29,14 @@ BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	AddResources <build>mimeset : mimeset.rdef ;
 }
-BuildPlatformMain <build>mimeset : mimeset.cpp : $(HOST_LIBBE) ;
+BuildPlatformMain <build>mimeset :
+	mimeset.cpp
+	Mime.cpp
+	database_support.cpp
+	UpdateMimeInfoThread.cpp
+	MimeUpdateThread.cpp
+	: $(HOST_LIBBE)
+;
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
@@ -38,6 +48,13 @@ BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
 
+SEARCH on [ FGristFiles
+		Mime.cpp
+	] = [ FDirName $(HAIKU_TOP) src build libbe storage ] ;
+
+SEARCH on [ FGristFiles
+		UpdateMimeInfoThread.cpp MimeUpdateThread.cpp database_support.cpp
+	] = [ FDirName $(HAIKU_TOP) src build libbe storage mime ] ;
 
 SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
 SubInclude HAIKU_TOP src tools cppunit ;
