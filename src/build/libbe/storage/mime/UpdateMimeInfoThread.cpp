@@ -53,7 +53,7 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 		err = appFileInfoWrite.SetIconForType(type, &icon, iconSize);
 	else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND) {
 		err = appFileInfoWrite.SetIconForType(type, NULL, iconSize);
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
 		// gives an error if the attribute didn't exist yet...
 		err = B_OK;
 #endif
@@ -217,7 +217,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 	BMimeType type;
 	if (!err && (updateType || updateAppInfo)) {
 		err = BMimeType::GuessMimeType(entry, &type);
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
 		if (err)
 			err = guess_mime_type(entry, &type);
 #endif
@@ -258,7 +258,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND || err == B_BAD_VALUE) {
 			// BeOS returns B_BAD_VALUE on shared libraries
 			err = appFileInfoWrite.SetSignature(NULL);
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
 			err = B_OK;
 #endif
 		}
@@ -285,7 +285,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			err = appFileInfoWrite.SetSupportedTypes(&supportedTypes);
 			hasSupportedTypes = true;
 		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND || err == B_BAD_VALUE) {
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
 			file.RemoveAttr(kSupportedTypesAttr);
 			err = B_OK;
 #else
@@ -329,8 +329,14 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			err = appFileInfoRead.GetVersionInfo(&versionInfo, kind);
 			if (err == B_OK)
 				err = appFileInfoWrite.SetVersionInfo(&versionInfo, kind);
-			else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND)
+			else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND || err == B_BAD_VALUE) {
+#if !defined(HAIKU_HOST_PLATFORM_DANO) && !defined(HAIKU_HOST_PLATFORM_BEOS) && !defined(HAIKU_HOST_PLATFORM_BONE)
+				// BeOS crashes when calling SetVersionInfo() with a NULL pointer
 				err = appFileInfoWrite.SetVersionInfo(NULL, kind);
+#else
+				err = B_OK;
+#endif
+			}
 			if (err != B_OK)
 				return err;
 		}
