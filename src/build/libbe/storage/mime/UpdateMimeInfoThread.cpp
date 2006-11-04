@@ -255,8 +255,13 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		err = appFileInfoRead.GetSignature(signature);
 		if (err == B_OK)
 			err = appFileInfoWrite.SetSignature(signature);
-		else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND)
+		else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND || err == B_BAD_VALUE) {
+			// BeOS returns B_BAD_VALUE on shared libraries
 			err = appFileInfoWrite.SetSignature(NULL);
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+			err = B_OK;
+#endif
+		}
 		if (err != B_OK)
 			return err;
 
@@ -265,7 +270,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		err = appFileInfoRead.GetAppFlags(&appFlags);
 		if (err == B_OK) {
 			err = appFileInfoWrite.SetAppFlags(appFlags);
-		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND) {
+		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND || err == B_BAD_VALUE) {
 			file.RemoveAttr(kAppFlagsAttribute);
 			err = B_OK;
 		}
@@ -279,7 +284,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		if (err == B_OK) {
 			err = appFileInfoWrite.SetSupportedTypes(&supportedTypes);
 			hasSupportedTypes = true;
-		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND) {
+		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND || err == B_BAD_VALUE) {
 #if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
 			file.RemoveAttr(kSupportedTypesAttr);
 			err = B_OK;
