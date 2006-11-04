@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file UpdateMimeInfoThread.h
 	UpdateMimeInfoThread implementation
@@ -13,17 +18,32 @@
 #include <Bitmap.h>
 #include <fs_attr.h>
 #include <Message.h>
-#include <MimeType.h>
 #include <mime/database_support.h>
 #include <Node.h>
+#include <Resources.h>
+#include <String.h>
+
+#if !defined(HAIKU_HOST_PLATFORM_DANO) && !defined(HAIKU_HOST_PLATFORM_BEOS) && !defined(HAIKU_HOST_PLATFORM_BONE)
+#	include <MimeType.h>
+#endif
+
+#ifndef B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL
+#	define B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL 2
+#endif
+#ifndef B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE
+#	define B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE 1
+#endif
+#ifndef B_BITMAP_NO_SERVER_LINK
+#	define B_BITMAP_NO_SERVER_LINK 0
+#endif
 
 namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-static const char *kAppFlagsAttribute			= "BEOS:APP_FLAGS";
+static const char *kAppFlagsAttribute = "BEOS:APP_FLAGS";
 
-// update_icon
+
 static status_t
 update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 	const char *type, BBitmap &icon, icon_size iconSize)
@@ -36,7 +56,51 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 	return err;
 }
 
-// is_shared_object_mime_type
+
+/*!
+	This updates the vector icon of the file from its resources.
+	Instead of putting this functionality into BAppFileInfo (as done in Haiku),
+	we're doing it here, so that the mimeset executable that runs under BeOS
+	can make use of it as well.
+*/
+static status_t
+update_vector_icon(BFile& file, const char *type)
+{
+	// try to read icon from resources
+	BResources resources(&file);
+
+	BString name("BEOS:");
+
+	// check type param
+	if (type) {
+		if (BMimeType::IsValid(type))
+			name += type;
+		else
+			return B_BAD_VALUE;
+	} else
+		name += "ICON";
+
+	size_t size;
+	const void* data = resources.LoadResource(B_RAW_TYPE, name.String(), &size);
+	if (data == NULL) {
+		// remove attribute; the resources don't have an icon
+		file.RemoveAttr(name.String());
+		return B_OK;
+	}
+
+	// update icon
+
+	ssize_t written = file.WriteAttr(name.String(), B_RAW_TYPE, 0, data, size);
+	if (written < B_OK)
+		return written;
+	if ((size_t)written < size) {
+		file.RemoveAttr(name.String());
+		return B_ERROR;
+	}
+	return B_OK;
+}
+
+
 static bool
 is_shared_object_mime_type(BMimeType &type)
 {
@@ -44,7 +108,9 @@ is_shared_object_mime_type(BMimeType &type)
 }
 
 
-// constructor
+//	#pragma mark -
+
+
 //! Creates a new UpdateMimeInfoThread object
 UpdateMimeInfoThread::UpdateMimeInfoThread(const char *name, int32 priority,
 	BMessenger managerMessenger, const entry_ref *root, bool recursive,
@@ -63,24 +129,25 @@ UpdateMimeInfoThread::UpdateMimeInfoThread(const char *name, int32 priority,
 status_t
 UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 {
-	status_t err = entry ? B_OK : B_BAD_VALUE;
+	if (entry == NULL)
+		return B_BAD_VALUE;
+
 	bool updateType = false;
 	bool updateAppInfo = false;
-	BNode node;
 
-	if (!err)
-		err = node.SetTo(entry);
+	BNode node;
+	status_t err = node.SetTo(entry);
 	if (!err && entryIsDir)
 		*entryIsDir = node.IsDirectory();
 	if (!err) {
 		// If not forced, only update if the entry has no file type attribute
 		attr_info info;
 		if (fForce == B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL
-			|| node.GetAttrInfo(kFileTypeAttr, &info) == B_ENTRY_NOT_FOUND) {
+			|| node.GetAttrInfo(kFileTypeAttr, &info) == B_ENTRY_NOT_FOUND)
 			updateType = true;
-		}
-		updateAppInfo = (updateType
-			|| fForce == B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE);
+
+		updateAppInfo = updateType
+			|| fForce == B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE;
 	}
 
 	// guess the MIME type
@@ -94,9 +161,9 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 	// update the MIME type
 	if (!err && updateType) {
 		const char *typeStr = type.Type();
-		ssize_t len = strlen(typeStr)+1;
-		ssize_t bytes = node.WriteAttr(kFileTypeAttr, kFileTypeType, 0, typeStr,
-			len);
+		ssize_t len = strlen(typeStr) + 1;
+		ssize_t bytes = node.WriteAttr(kFileTypeAttr, kFileTypeType, 0,
+			typeStr, len);
 		if (bytes < B_OK)
 			err = bytes;
 		else
@@ -112,11 +179,10 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		&& file.SetTo(entry, B_READ_WRITE) == B_OK
 		&& appFileInfoRead.SetTo(&file) == B_OK
 		&& appFileInfoWrite.SetTo(&file) == B_OK) {
-
 		// we read from resources and write to attributes
 		appFileInfoRead.SetInfoLocation(B_USE_RESOURCES);
 		appFileInfoWrite.SetInfoLocation(B_USE_ATTRIBUTES);
-	
+
 		// signature
 		char signature[B_MIME_TYPE_LENGTH];
 		err = appFileInfoRead.GetSignature(signature);
@@ -148,6 +214,11 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			hasSupportedTypes = true;
 		} else if (err == B_ENTRY_NOT_FOUND)
 			err = appFileInfoWrite.SetSupportedTypes(NULL);
+		if (err != B_OK)
+			return err;
+
+		// vector icon
+		err = update_vector_icon(file, NULL);
 		if (err != B_OK)
 			return err;
 
@@ -190,8 +261,13 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		if (hasSupportedTypes) {
 			const char *supportedType;
 			for (int32 i = 0;
-				 supportedTypes.FindString("types", i, &supportedType) == B_OK;
-				 i++) {
+					supportedTypes.FindString("types", i, &supportedType) == B_OK;
+				 	i++) {
+				// vector icon
+				err = update_vector_icon(file, supportedType);
+				if (err != B_OK)
+					return err;
+
 				// small icon
 				err = update_icon(appFileInfoRead, appFileInfoWrite,
 					supportedType, smallIcon, B_MINI_ICON);

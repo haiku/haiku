@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file MimeUpdateThread.cpp
 	MimeUpdateThread implementation
@@ -22,8 +27,19 @@
 #define DBG(x)
 #define OUT printf
 
+
 namespace BPrivate {
 namespace Storage {
+
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
+// device_is_root_device
+bool
+device_is_root_device(dev_t device)
+{
+	return device == 1;
+}
+#endif
+
 namespace Mime {
 
 /*!	\class MimeUpdateThread
