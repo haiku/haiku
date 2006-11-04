@@ -18,6 +18,7 @@
 #include <Bitmap.h>
 #include <fs_attr.h>
 #include <Message.h>
+#include <Messenger.h>
 #include <mime/database_support.h>
 #include <Node.h>
 #include <Resources.h>
@@ -107,7 +108,7 @@ update_vector_icon(BFile& file, const char *type)
 }
 
 
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
 // BMimeType::GuessMimeType() doesn't seem to work under BeOS
 status_t
 guess_mime_type(const void *_buffer, int32 length, BMimeType *type)
