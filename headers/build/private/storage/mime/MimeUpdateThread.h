@@ -11,6 +11,7 @@
 #define _MIME_UPDATE_THREAD_H
 
 #include <Entry.h>
+#include <Messenger.h>
 //#include <RegistrarThread.h>
 #include <SupportDefs.h>
 
