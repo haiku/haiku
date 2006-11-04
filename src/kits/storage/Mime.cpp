@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file Mime.cpp
 	Mime type C functions implementation.
@@ -31,7 +36,8 @@ enum {
 
 // do_mime_update
 //! Helper function that contacts the registrar for mime update calls
-status_t do_mime_update(int32 what, const char *path, int recursive,
+status_t
+do_mime_update(int32 what, const char *path, int recursive,
 	int synchronous, int force)
 {
 	BEntry root;
@@ -121,11 +127,11 @@ update_mime_info(const char *path, int recursive, int synchronous, int force)
 */
 status_t
 create_app_meta_mime(const char *path, int recursive, int synchronous,
-					 int force)
+	int force)
 {
 	// If path is NULL, we are recursive, otherwise no.
 	recursive = !path;
-	
+
 	return do_mime_update(B_REG_MIME_CREATE_APP_META_MIME, path, recursive,
 		synchronous, force);
 }
@@ -149,12 +155,11 @@ create_app_meta_mime(const char *path, int recursive, int synchronous,
 status_t
 get_device_icon(const char *dev, void *icon, int32 size)
 {
-	status_t err = dev && icon
-				     && (size == B_LARGE_ICON || size == B_MINI_ICON)
-				       ? B_OK : B_BAD_VALUE;
-	
+	status_t err = dev && icon && (size == B_LARGE_ICON || size == B_MINI_ICON)
+		? B_OK : B_BAD_VALUE;
+
 	int fd = -1;
-	
+
 	if (!err) {
 		fd = open(dev, O_RDONLY);
 		err = fd != -1 ? B_OK : B_BAD_VALUE;
@@ -210,6 +215,7 @@ get_device_icon(const char *dev, BBitmap *icon, icon_size which)
 		&& (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)) {
 		error = B_BAD_VALUE;
 	}
+	// TODO: support bitmap with other color spaces!
 	// get the icon
 	if (error == B_OK)
 		error = get_device_icon(dev, icon->Bits(), which);
