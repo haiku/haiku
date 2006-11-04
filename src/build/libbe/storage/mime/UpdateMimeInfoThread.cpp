@@ -51,8 +51,14 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 	status_t err = appFileInfoRead.GetIconForType(type, &icon, iconSize);
 	if (err == B_OK)
 		err = appFileInfoWrite.SetIconForType(type, &icon, iconSize);
-	else if (err == B_ENTRY_NOT_FOUND)
+	else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND) {
 		err = appFileInfoWrite.SetIconForType(type, NULL, iconSize);
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+		// gives an error if the attribute didn't exist yet...
+		err = B_OK;
+#endif
+	}
+
 	return err;
 }
 
@@ -99,6 +105,63 @@ update_vector_icon(BFile& file, const char *type)
 	}
 	return B_OK;
 }
+
+
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+// BMimeType::GuessMimeType() doesn't seem to work under BeOS
+status_t
+guess_mime_type(const void *_buffer, int32 length, BMimeType *type)
+{
+	const uint8 *buffer = (const uint8*)_buffer;
+	if (!buffer || !type)
+		return B_BAD_VALUE;
+
+	// we only know ELF files
+	if (length >= 4 && buffer[0] == 0x7f && buffer[1] == 'E' && buffer[2] == 'L'
+		&&  buffer[3] == 'F') {
+		return type->SetType(B_ELF_APP_MIME_TYPE);
+	}
+
+	return type->SetType(B_FILE_MIME_TYPE);
+}
+
+
+status_t
+guess_mime_type(const entry_ref *ref, BMimeType *type)
+{
+	if (!ref || !type)
+		return B_BAD_VALUE;
+
+	// get BEntry
+	BEntry entry;
+	status_t error = entry.SetTo(ref);
+	if (error != B_OK)
+		return error;
+
+	// does entry exist?
+	if (!entry.Exists())
+		return B_ENTRY_NOT_FOUND;
+
+	// check entry type
+	if (entry.IsDirectory())
+		return type->SetType("application/x-vnd.be-directory");
+	if (entry.IsSymLink())
+		return type->SetType("application/x-vnd.be-symlink");
+	if (!entry.IsFile())
+		return B_ERROR;
+
+	// we have a file, read the first 4 bytes
+	BFile file;
+	char buffer[4];
+	if (file.SetTo(ref, B_READ_ONLY) == B_OK
+		&& file.Read(buffer, 4) == 4) {
+		return guess_mime_type(buffer, 4, type);
+	}
+
+	// we couldn't open or read the file
+	return type->SetType(B_FILE_MIME_TYPE);
+}
+#endif
 
 
 static bool
@@ -154,6 +217,10 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 	BMimeType type;
 	if (!err && (updateType || updateAppInfo)) {
 		err = BMimeType::GuessMimeType(entry, &type);
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+		if (err)
+			err = guess_mime_type(entry, &type);
+#endif
 		if (!err)
 			err = type.InitCheck();
 	}
@@ -188,7 +255,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		err = appFileInfoRead.GetSignature(signature);
 		if (err == B_OK)
 			err = appFileInfoWrite.SetSignature(signature);
-		else if (err == B_ENTRY_NOT_FOUND)
+		else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND)
 			err = appFileInfoWrite.SetSignature(NULL);
 		if (err != B_OK)
 			return err;
@@ -198,7 +265,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		err = appFileInfoRead.GetAppFlags(&appFlags);
 		if (err == B_OK) {
 			err = appFileInfoWrite.SetAppFlags(appFlags);
-		} else if (err == B_ENTRY_NOT_FOUND) {
+		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND) {
 			file.RemoveAttr(kAppFlagsAttribute);
 			err = B_OK;
 		}
@@ -212,8 +279,14 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		if (err == B_OK) {
 			err = appFileInfoWrite.SetSupportedTypes(&supportedTypes);
 			hasSupportedTypes = true;
-		} else if (err == B_ENTRY_NOT_FOUND)
+		} else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND) {
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) && defined(HAIKU_HOST_PLATFORM_BONE)
+			file.RemoveAttr(kSupportedTypesAttr);
+			err = B_OK;
+#else
 			err = appFileInfoWrite.SetSupportedTypes(NULL);
+#endif
+		}
 		if (err != B_OK)
 			return err;
 
@@ -251,7 +324,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			err = appFileInfoRead.GetVersionInfo(&versionInfo, kind);
 			if (err == B_OK)
 				err = appFileInfoWrite.SetVersionInfo(&versionInfo, kind);
-			else if (err == B_ENTRY_NOT_FOUND)
+			else if (err == B_ENTRY_NOT_FOUND || err == B_NAME_NOT_FOUND)
 				err = appFileInfoWrite.SetVersionInfo(NULL, kind);
 			if (err != B_OK)
 				return err;

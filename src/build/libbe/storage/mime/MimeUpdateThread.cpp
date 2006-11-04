@@ -174,10 +174,9 @@ MimeUpdateThread::UpdateEntry(const entry_ref *ref)
 	      && (device_is_root_device(ref->device)
 	            || DeviceSupportsAttributes(ref->device))) {	
 		// Update this entry
-		if (!err) {
-			// R5 appears to ignore whether or not the update succeeds.
-			DoMimeUpdate(ref, &entryIsDir);
-		}
+		if (!err)
+			err = DoMimeUpdate(ref, &entryIsDir);
+
 		// If we're recursing and this is a directory, update
 		// each of the directory's children as well
 		if (!err && fRecursive && entryIsDir) {		
