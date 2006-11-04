@@ -778,7 +778,7 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 
 		if (editor.Type() == B_RAW_TYPE) {
 			// vector icon
-			fScaleSlider = new BSlider(Bounds(), "", NULL,
+			fScaleSlider = new BSlider(BRect(0, 0, 140, 20), "", NULL,
 				new BMessage(kMsgScaleChanged), 2, 16);
 			fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
 			fScaleSlider->ResizeToPreferred();
@@ -1015,21 +1015,26 @@ ImageView::UpdateImage()
 		BRect bounds = fBitmap->Bounds();
 		rect.bottom += bounds.Height() + 5;
 
-		float x = 0;
-		if (bounds.Width() > rect.Width()) {
+		if (fScaleSlider != NULL && rect.Width() < fScaleSlider->Bounds().Width())
+			rect.right = fScaleSlider->Bounds().right;
+		if (bounds.Width() > rect.Width())
 			rect.right = bounds.right;
-			x = (bounds.Width() - rect.Width()) / 2;
-		}
 
 		// center description below the bitmap
-		fDescriptionView->MoveTo(x, bounds.Height() + 5);
+		fDescriptionView->MoveTo((rect.Width() - fDescriptionView->Bounds().Width()) / 2,
+			bounds.Height() + 5);
 
 		if (fScaleSlider != NULL) {
+			// center slider below description
 			rect.bottom += fScaleSlider->Bounds().Height() + 5;
-			fScaleSlider->MoveTo(0, fDescriptionView->Frame().bottom + 5);
-			fScaleSlider->ResizeTo(rect.Width(), fScaleSlider->Bounds().Height());
+			fScaleSlider->MoveTo((rect.Width() - fScaleSlider->Bounds().Width()) / 2,
+				fDescriptionView->Frame().bottom + 5);
+
+			if (fScaleSlider->IsHidden())
+				fScaleSlider->Show();
 		}
-	}
+	} else if (fScaleSlider != NULL && !fScaleSlider->IsHidden())
+		fScaleSlider->Hide();
 
 	ResizeTo(rect.Width(), rect.Height());
 	if (Parent()) {
