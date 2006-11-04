@@ -49,15 +49,11 @@
 ESDEndpoint::ESDEndpoint()
  : BDataIO()
  , fHost(NULL)
- , fPort(ESD_PORT)
+ , fPort(ESD_DEFAULT_PORT)
  , fSocket(-1)
- , fDefaultCommand(ESD_CMD_STREAM_PLAY)
- , fDefaultCommandSent(false)
- , fDefaultFormat(ESD_BITS8 | ESD_MONO)
- , fDefaultRate(ESD_DEFAULT_RATE)
- , fLatency(0LL)
 {
 	CALLED();
+	Reset();
 }
 
 ESDEndpoint::~ESDEndpoint()
@@ -66,6 +62,15 @@ ESDEndpoint::~ESDEndpoint()
 	if (fSocket > -1)
 		closesocket(fSocket);
 	fSocket = -1;
+}
+
+void ESDEndpoint::Reset()
+{
+	fDefaultCommand = ESD_PROTO_STREAM_PLAY;
+	fDefaultCommandSent = false;
+	fDefaultFormat = ESD_BITS8 | ESD_MONO;
+	fDefaultRate = ESD_DEFAULT_RATE;
+	fLatency = 0LL;
 }
 
 status_t ESDEndpoint::SendAuthKey()
@@ -104,6 +109,7 @@ status_t ESDEndpoint::SendAuthKey()
 status_t ESDEndpoint::Connect(const char *host, uint16 port)
 {
 	status_t err;
+	int flag;
 	CALLED();
 	fHost = host;
 	fPort = port;
@@ -116,46 +122,104 @@ status_t ESDEndpoint::Connect(const char *host, uint16 port)
 		return ENOENT;
 	memcpy((struct in_addr *)&sin.sin_addr, he->h_addr, sizeof(struct in_addr));
 	
+	/* close old connection */
+	if (fSocket > -1)
+		closesocket(fSocket);
+	Reset();
+	
 	fSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (fSocket < 0)
 		return errno;
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons( port );
 	
+	/*
+	flag = 128*1024;
+	setsockopt(fSocket, SOL_SOCKET, SO_SNDBUF, &flag, sizeof(flag));
+	setsockopt(fSocket, SOL_SOCKET, SO_RCVBUF, &flag, sizeof(flag));
+	*/
+	
 	err = connect(fSocket, (struct sockaddr *) &sin, sizeof(sin));
 	PRINT(("connect: %s\n", strerror(err)));
 	if (err < 0)
 		return errno;
 	
-/*	uint32 cmd = ESD_CMD_CONNECT;
+	uint32 cmd;
+	uint32 result;
+/*	uint32 cmd = ESD_PROTO_CONNECT;
 	err = write(fSocket, &cmd, sizeof(cmd));
 	if (err < 0)
 		return errno;
 	if (err < sizeof(cmd))
 		return EIO;
 */	
+	/* send authentification key */
 	err = SendAuthKey();
 	if (err < 0)
 		return errno;
 	
+	/* send endian tag, wait for 'ok' and measure the round-trip time 
+	 * to account for the network latency
+	 */
 	bigtime_t ping = system_time();
 
-	uint32 endian = ESD_ENDIAN_TAG;
-	err = write(fSocket, &endian, sizeof(endian));
+	cmd = ESD_ENDIAN_TAG;
+	err = write(fSocket, &cmd, sizeof(cmd));
 	if (err < 0)
 		return errno;
-	if (err < sizeof(endian))
+	if (err < sizeof(cmd))
 		return EIO;
-	uint32 ok;
 	
-	read(fSocket, &ok, sizeof(uint32));
+	read(fSocket, &result, sizeof(result));
+	if (result != 1)
+		fprintf(stderr, "ESDEndpoint::Connect: didn't get ok from ESD_PROTO_INIT (%ld)!\n", result);
 
-	ping = system_time() - ping;
+	ping = (system_time() - ping) / 2; /* approximate one-way trip time */
 	fLatency = ping;
-
-	int flag = 1;
+	
+	/* ask the server for its own latency
+	 * sadly it seems to only give a fixed value,
+	 * not counting the audio card's buffering into account.
+	 * we take another measurement of the round-trip,
+	 * and use the mean of the 2.
+	 */
+	
+	ping = system_time();
+	
+	cmd = ESD_PROTO_LATENCY;
+	err = write(fSocket, &cmd, sizeof(cmd));
+	if (err < 0)
+		return errno;
+	if (err < sizeof(cmd))
+		return EIO;
+	
+	read(fSocket, &result, sizeof(result));
+	fprintf(stderr, "ESDEndpoint::Connect: ESD_PROTO_LATENCY: %ld\n", result);
+	
+	ping = (system_time() - ping) / 2; /* approximate one-way trip time */
+	
+	bigtime_t serverLatency = result * 1000000LL / (ESD_DEFAULT_RATE * 2/*16b*/ * 2/*stereo*/ );
+	bigtime_t netLatency = (fLatency + ping) / 2; /* mean of both */
+	fprintf(stderr, "ESDEndpoint::Connect: Latency: server: %Ld, net1: %Ld, net2: %Ld\n", serverLatency, fLatency, ping);
+	
+	fLatency = netLatency + serverLatency;
+	
+	
+	
+	flag = 1;
+	int len;
+	/* disable Nagle */
 	setsockopt(fSocket, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
-
+	//setsockopt(fSocket, SOL_SOCKET, SO_NONBLOCK, &flag, sizeof(flag));
+	/*
+	len = sizeof(flag);
+	getsockopt(fSocket, SOL_SOCKET, SO_SNDBUF, &flag, &len);
+	fprintf(stderr, "ESDEndpoint::Connect: SNDBUF: %ld\n", flag);
+	flag = MIN(TCP_MAXWIN, MAX(flag, (4 * netLatency * (ESD_DEFAULT_RATE*2*2) / 1000000LL)));
+	fprintf(stderr, "ESDEndpoint::Connect: SNDBUF: %ld\n", flag);
+	setsockopt(fSocket, SOL_SOCKET, SO_SNDBUF, &flag, sizeof(flag));
+	*/
+	
 //	read(fSocket, &ok, sizeof(uint32));
 // connect
 // auth
@@ -227,7 +291,7 @@ status_t ESDEndpoint::GetServerInfo()
 		uint32 fmt;
 	} si;
 	status_t err;
-	err = SendCommand(ESD_CMD_SERVER_INFO, (const uint8 *)&si, 0, (uint8 *)&si, sizeof(si));
+	err = SendCommand(ESD_PROTO_SERVER_INFO, (const uint8 *)&si, 0, (uint8 *)&si, sizeof(si));
 	if (err < 0)
 		return err;
 	PRINT(("err %d, version: %lu, rate: %lu, fmt: %lu\n", err, si.ver, si.rate, si.fmt));

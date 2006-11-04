@@ -357,6 +357,8 @@ private:
 		bool 				fTimeSourceStarted;
 		
 		BParameterWeb		*fWeb;
+		int32				fWebHostId;
+		int32				fWebPortId;
 		
 		BMessage			fConfig;
 };

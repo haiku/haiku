@@ -1087,14 +1087,31 @@ status_t
 ESDSinkNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value, size_t* ioSize)
 {
 	CALLED();
-	
-	PRINT(("id : %i\n", id));
+	if (!fDevice)
+		return B_ERROR;
+	//PRINT(("id : %i\n", id));
+	if (id == fWebHostId) {
+		BString s = fDevice->Host();
+		*ioSize = MIN(*ioSize, s.Length());
+		memcpy(value, s.String(), *ioSize);
+		return B_OK;
+	}
+	if (id == fWebPortId) {
+		BString s;
+		s << fDevice->Port();
+		*ioSize = MIN(*ioSize, s.Length());
+		memcpy(value, s.String(), *ioSize);
+		return B_OK;
+	}
+#if 0
 	BParameter *parameter = NULL;
 	for(int32 i=0; i<fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
 		if(parameter->ID() == id)
 			break;
 	}
+#endif
+	
 #if 0
 	if(!parameter) {
 		// Hmmm, we were asked for a parameter that we don't actually
@@ -1181,6 +1198,20 @@ ESDSinkNode::SetParameterValue(int32 id, bigtime_t performance_time, const void*
 		if(parameter->ID() == id)
 			break;
 	}
+	if (id == fWebHostId) {
+		fprintf(stderr, "set HOST: %s\n", (const char *)value);
+		BString host = (const char *)value;
+		uint16 port = fDevice->Port();
+		fDevice->Connect(host.String(), port);
+		return;
+	}
+	if (id == fWebPortId) {
+		fprintf(stderr, "set PORT: %s\n", (const char *)value);
+		BString host = fDevice->Host();
+		uint16 port = atoi((const char *)value);
+		fDevice->Connect(host.String(), port);
+		return;
+	}
 #if 0
 	if(parameter) {
 		multi_mix_value_info MMVI;
@@ -1259,8 +1290,13 @@ ESDSinkNode::MakeParameterWeb()
 	int id = 0;
 	BParameterGroup *group = web->MakeGroup("Server");
 	BParameter *p;
-	p = group->MakeTextParameter(id++, B_MEDIA_RAW_AUDIO, "Hostname", B_GENERIC, 128);
-	p = group->MakeTextParameter(id++, B_MEDIA_RAW_AUDIO, "Port", B_GENERIC, 16);
+	fWebHostId = fWebPortId = -1;
+#ifdef B_BEOS_VERSION_DANO /* not yet in Haiku */
+	fWebHostId = id++;
+	p = group->MakeTextParameter(fWebHostId, B_MEDIA_RAW_AUDIO, "Hostname", B_GENERIC, 128);
+	fWebPortId = id++;
+	p = group->MakeTextParameter(fWebPortId, B_MEDIA_RAW_AUDIO, "Port", B_GENERIC, 16);
+#endif
 	return web;
 }
 #if 0

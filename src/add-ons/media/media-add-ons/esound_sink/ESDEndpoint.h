@@ -44,12 +44,13 @@ public:
 	~ESDEndpoint();
 	
 	/*  */
+void		Reset();
 status_t	SendAuthKey();
-status_t	Connect(const char *host, uint16 port=ESD_PORT);
+status_t	Connect(const char *host, uint16 port=ESD_DEFAULT_PORT);
 status_t	Disconnect();
 	
 	/* set the default command and format for BDataIO interface */
-status_t	SetCommand(esd_command_t cmd=ESD_CMD_STREAM_PLAY);
+status_t	SetCommand(esd_command_t cmd=ESD_PROTO_STREAM_PLAY);
 status_t	SetFormat(int bits, int channels, float rate=ESD_DEFAULT_RATE);
 
 status_t	GetServerInfo();
@@ -57,6 +58,8 @@ status_t	GetServerInfo();
 	/*  */
 
 bigtime_t	GetLatency() const { return fLatency; };
+const char	*Host() const { return fHost.String(); };
+uint16		Port() const { return fPort; };
 
 bool		CanSend();
 
