@@ -12,3 +12,4 @@ SubInclude HAIKU_TOP src add-ons translators rtf ;
 SubInclude HAIKU_TOP src add-ons translators sgi ;
 SubInclude HAIKU_TOP src add-ons translators stxt ;
 SubInclude HAIKU_TOP src add-ons translators tga ;
+SubInclude HAIKU_TOP src add-ons translators wonderbrush ;
