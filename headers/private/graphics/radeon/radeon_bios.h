@@ -44,8 +44,10 @@ typedef struct {
 	uint8 dummy[15];
 	
 	uint16 panel_pwr_delay;		// 44
-	
-	uint8 dummy2[18];
+	uint16 ref_div;				// 46
+	uint8 post_div;				// 48
+	uint8 feedback_div;			// 49
+	uint8 dummy2[14];
 	
 	uint16 fpi_timing_ofs[20];	// 64
 } __attribute__ ((packed)) FPI_BLOCK;

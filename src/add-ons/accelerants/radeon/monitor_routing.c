@@ -61,6 +61,7 @@ void Radeon_ReadMonitorRoutingRegs(
 	case rt_rv360:
 	case rt_r350:
 	case rt_r360:
+	case rt_m11:
 		values->gpiopad_a = INREG( regs, RADEON_GPIOPAD_A );
 		break;
 		
@@ -155,6 +156,7 @@ void Radeon_CalcMonitorRouting(
 		case rt_r300_4p:
 		case rt_rv350:
 		case rt_m10:
+		case rt_m11:
 		case rt_rv360:
 		case rt_r350:
 		case rt_r360:
@@ -207,6 +209,7 @@ void Radeon_CalcMonitorRouting(
 			case rt_r300_4p:
 			case rt_rv350:
 			case rt_m10:
+			case rt_m11:
 			case rt_rv360:
 			case rt_r350:
 			case rt_r360:
@@ -243,6 +246,7 @@ void Radeon_CalcMonitorRouting(
 			case rt_rv350:
 			case rt_rv360:
 			case rt_m10:
+			case rt_m11:
 			case rt_r350:
 			case rt_r360:
 				values->gpiopad_a &= ~1;
@@ -353,6 +357,7 @@ void Radeon_CalcMonitorRouting(
 		case rt_r300_4p:
 		case rt_rv350:
 		case rt_m10:
+		case rt_m11:
 		case rt_rv360:
 		case rt_r350:
 		case rt_r360:
@@ -486,6 +491,7 @@ void Radeon_ProgramMonitorRouting(
 	case rt_r300_4p:
 	case rt_rv350:
 	case rt_m10:
+	case rt_m11:
 	case rt_rv360:
 	case rt_r350:
 	case rt_r360:

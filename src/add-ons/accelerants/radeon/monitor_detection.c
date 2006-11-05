@@ -321,6 +321,7 @@ static bool Radeon_DetectTVCRT( accelerator_info *ai )
 	case rt_rv360:
 	case rt_r350:
 	case rt_r360:
+	case rt_m11:
 		return Radeon_DetectTVCRT_R300( ai );
 		
 	case rt_r200:
@@ -679,6 +680,7 @@ static display_device_e Radeon_DetectTV( accelerator_info *ai, bool tv_crt_found
 	case rt_rv350:
 	case rt_rv360:
 	case rt_m10:
+	case rt_m11:
 	case rt_r350:
 	case rt_r360:
 		return Radeon_DetectTV_R300( ai );

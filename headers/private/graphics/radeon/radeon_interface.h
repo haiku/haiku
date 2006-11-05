@@ -114,7 +114,8 @@ typedef enum {
 	rt_m10,			// mobile Radeon 9600
 	rt_rv360,		// Radeon 9600
 	rt_r350,		// Radeon 9800
-	rt_r360			// Radeon 9800
+	rt_r360,		// Radeon 9800
+	rt_m11			// Radeon 9700 Mobility
 } radeon_type;
 
 
@@ -166,6 +167,10 @@ typedef struct {
 
 	bool is_fp2;				// true, if second flat panel
 //	display_type_e disp_type;
+	uint16 ref_div;
+	uint8 post_div;
+	uint8 feedback_div;
+	bool fixed_dividers;
 	
 	uint64 h_ratio;				// current stretch ratio, needed for overlays
 	uint64 v_ratio;				// (mode_res/native_res; 32.32)

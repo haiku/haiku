@@ -204,6 +204,13 @@ void Radeon_SetMode(
 		Radeon_CalcCRTPLLDividers( &si->pll, mode, &dividers );
 	else
 		dividers = tv_params->crt_dividers;
+
+	if( (disp_devices & dd_lvds) != 0 && si->flatpanels[0].fixed_dividers ) {
+		SHOW_FLOW0( 0, "Using fixed dividers for laptop panel" );
+		dividers.feedback = si->flatpanels[0].feedback_div;
+		dividers.post_code = si->flatpanels[0].post_div;
+		dividers.ref = si->flatpanels[0].ref_div;
+	}
 	
 	Radeon_CalcPLLRegisters( mode, &dividers, &pll_values );
 	

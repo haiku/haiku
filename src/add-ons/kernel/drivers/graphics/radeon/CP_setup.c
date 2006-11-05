@@ -326,6 +326,7 @@ static void loadMicroEngineRAMData( device_info *di )
 	case rt_r300_4p:
 	case rt_rv350:
 	case rt_rv360:
+	case rt_m11:
 	case rt_r350:
 	case rt_r360:
 		microcode = r300_cp_microcode;

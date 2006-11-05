@@ -79,6 +79,10 @@
 #define DEVICE_ID_RADEON_NF     0x4e46
 #define DEVICE_ID_RADEON_NG     0x4e47
 
+// m11
+#define DEVICE_ID_RADEON_NP		0x4e50	// Mobility 9700
+#define DEVICE_ID_RADEON_SE		0x4e52	// Mobility 9700 SE
+
 // r300-4P
 #define DEVICE_ID_RADEON_AD     0x4144
 #define DEVICE_ID_RADEON_AE     0x4145
@@ -91,7 +95,7 @@
 #define DEVICE_ID_RADEON_AS		0x4153
 
 // m10
-#define DEVICE_ID_RADEON_NP		0x4e50
+//#define DEVICE_ID_RADEON_NP		0x4e50
 // Mobility Fire GL T2 - any idea about the chip?
 #define DEVICE_ID_RADEON_NT		0x4e54
 
@@ -198,7 +202,12 @@ RadeonDevice radeon_device_list[] = {
 	{ DEVICE_ID_RADEON_AS, 	rt_rv350,	"Radeon 9600 AS" },
 	
 	// M10 (based on rv350)
-	{ DEVICE_ID_RADEON_NP,	rt_m10,		"Radeon Mobility 9600 NP" },
+//	{ DEVICE_ID_RADEON_NP,	rt_m10,		"Radeon Mobility 9600 NP" },
+	
+	// M11 (based on rv360)
+	{ DEVICE_ID_RADEON_NP,	rt_m11,		"Radeon 9700 Mobility" },
+	{ DEVICE_ID_RADEON_SE,	rt_m11,		"Radeon 9700 Mobility SE" },
+		
 	// not sure about that: ROM signature is "RADEON" which means r100
 	{ DEVICE_ID_RADEON_NT,	rt_m10,		"Radeon Mobility FireGL T2" },
 
@@ -308,7 +317,8 @@ static struct {
 	{ "m10",	tc_internal_rt2, 	true,	true,	false,	true,	false },
 	{ "rv360",	tc_internal_rt2, 	true,	false,	true,	true,	false },
 	{ "r350",	tc_internal_rt2, 	true,	false,	true,	true,	false },
-	{ "r360",	tc_internal_rt2, 	true,	false,	true,	true,	false }
+	{ "r360",	tc_internal_rt2, 	true,	false,	true,	true,	false },
+	{ "m11",	tc_internal_rt2, 	true,	true,	false,	true,	false }
 };
 
 

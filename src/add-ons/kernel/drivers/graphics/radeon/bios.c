@@ -278,6 +278,14 @@ static bool Radeon_GetBIOSDFPInfo( device_info *di )
 	if( di->fp_info.panel_pwr_delay > 2000 || di->fp_info.panel_pwr_delay < 0 )
 		di->fp_info.panel_pwr_delay = 2000;
 
+	di->fp_info.ref_div = fpi.ref_div;
+	di->fp_info.post_div = fpi.post_div;
+	di->fp_info.feedback_div = fpi.feedback_div;
+	
+	di->fp_info.fixed_dividers =
+		di->fp_info.ref_div != 0 && di->fp_info.feedback_div > 3;
+
+
 	// there might be multiple supported resolutions stored;
 	// we are looking for native resolution
 	for( i = 0; i < 20; ++i ) {
