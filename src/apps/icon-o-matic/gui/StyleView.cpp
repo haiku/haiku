@@ -8,6 +8,11 @@
 
 #include "StyleView.h"
 
+#if __HAIKU__
+# include "GridLayout.h"
+# include "GroupLayout.h"
+# include "SpaceLayoutItem.h"
+#endif
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -40,7 +45,11 @@ enum {
 
 // constructor
 StyleView::StyleView(BRect frame)
+#ifdef __HAIKU__
+	: BView("style view", 0),
+#else
 	: BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, 0),
+#endif
 	  fCommandStack(NULL),
 	  fCurrentColor(NULL),
 	  fStyle(NULL),
@@ -48,10 +57,6 @@ StyleView::StyleView(BRect frame)
 	  fIgnoreCurrentColorNotifications(false)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	frame.OffsetTo(B_ORIGIN);
-	frame.InsetBy(5, 5);
-	frame.bottom = frame.top + 15;
 
 	// style type
 	BMenu* menu = new BPopUpMenu("<unavailable>");
@@ -61,6 +66,18 @@ StyleView::StyleView(BRect frame)
 	message = new BMessage(MSG_SET_STYLE_TYPE);
 	message->AddInt32("type", STYLE_TYPE_GRADIENT);
 	menu->AddItem(new BMenuItem("Gradient", message));
+
+#ifdef __HAIKU__
+	BGridLayout* layout = new BGridLayout(5, 5);
+	SetLayout(layout);
+
+	fStyleType = new BMenuField( "Style Type", menu, NULL);
+
+#else
+	frame.OffsetTo(B_ORIGIN);
+	frame.InsetBy(5, 5);
+	frame.bottom = frame.top + 15;
+
 	fStyleType = new BMenuField(frame, "style type", "Style Type",
 								menu, true);
 	AddChild(fStyleType);
@@ -70,7 +87,7 @@ StyleView::StyleView(BRect frame)
 	fStyleType->MenuBar()->GetPreferredSize(&width, &height);
 	fStyleType->MenuBar()->ResizeTo(width, height);
 	fStyleType->ResizeTo(frame.Width(), height + 6);
-
+#endif // __HAIKU__
 
 	// gradient type
 	menu = new BPopUpMenu("<unavailable>");
@@ -87,6 +104,27 @@ StyleView::StyleView(BRect frame)
 	message->AddInt32("type", GRADIENT_CONIC);
 	menu->AddItem(new BMenuItem("Conic", message));
 
+#if __HAIKU__
+	fGradientType = new BMenuField("Gradient Type", menu, NULL);
+
+	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR),
+										   this);
+
+	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 0, 4);
+	layout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(3), 0, 1, 1, 3);
+
+	layout->AddItem(fStyleType->CreateLabelLayoutItem(), 1, 1);
+	layout->AddItem(fStyleType->CreateMenuBarLayoutItem(), 2, 1);
+
+	layout->AddItem(fGradientType->CreateLabelLayoutItem(), 1, 2);
+	layout->AddItem(fGradientType->CreateMenuBarLayoutItem(), 2, 2);
+
+	layout->AddView(fGradientControl, 1, 3, 2);
+
+	layout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(3), 3, 1, 1, 3);
+	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 4, 4);
+
+#else // __HAIKU__
 	frame.OffsetBy(0, fStyleType->Frame().Height() + 6);
 	fGradientType = new BMenuField(frame, "gradient type", "Gradient Type",
 								   menu, true);
@@ -110,8 +148,9 @@ StyleView::StyleView(BRect frame)
 	fGradientControl->MoveTo(frame.left, frame.top);
 
 	AddChild(fGradientControl);
-	fGradientControl->SetEnabled(false);
+#endif // __HAIKU__
 
+	fGradientControl->SetEnabled(false);
 	fGradientControl->Gradient()->AddObserver(this);
 }
 

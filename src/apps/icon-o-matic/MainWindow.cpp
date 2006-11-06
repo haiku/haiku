@@ -624,8 +624,18 @@ MainWindow::_CreateGUI(BRect bounds)
 	layout->AddView(topSideView, 1, 0);
 
 	// canvas view
-	fCanvasView = new CanvasView(BRect(0, 0, 200, 200));
-	layout->AddView(fCanvasView, 1, 1);
+	BRect canvasBounds = BRect(0, 0, 200, 200);
+	fCanvasView = new CanvasView(canvasBounds);
+
+	// scroll view around canvas view
+	canvasBounds.bottom += B_H_SCROLL_BAR_HEIGHT;
+	canvasBounds.right += B_V_SCROLL_BAR_WIDTH;
+	ScrollView* canvasScrollView
+		= new ScrollView(fCanvasView, SCROLL_VERTICAL | SCROLL_HORIZONTAL
+				| SCROLL_NO_FRAME | SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS,
+				canvasBounds, "canvas scroll view",
+				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
+	layout->AddView(canvasScrollView, 1, 1);
 
 	// views along the top
 
