@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Time",
-    long_info  = "Time ©2002-2006 Haiku"
+	long_info  = "Time ©2002-2006 Haiku"
 };
 
 resource large_icon {

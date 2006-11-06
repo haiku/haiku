@@ -3,8 +3,6 @@ resource app_signature "application/x-vnd.Be-SCRN";
 
 resource app_flags B_SINGLE_LAUNCH;
 
-resource file_types message;
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -22,7 +20,7 @@ resource app_version {
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
-resource(101, "BEOS:ICON") #'RAWT' array {
+resource vector_icon {
 	$"6E6369660B03010000020016023CC7EE389BC0BA16573E39B04977C842ADC700"
 	$"FFFFD3020006023C529D3753A2B8966F3D9D084B6044496AAF00474747FFA5A0"
 	$"A002001602BC4E76BC411B3C90DABCA00D47587D4ABA850090FFD40200160238"
