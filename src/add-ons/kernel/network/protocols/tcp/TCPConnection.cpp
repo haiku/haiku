@@ -47,15 +47,6 @@
 #define	TCP_MAX_SEND_BUF 1024
 #define TCP_MAX_RECV_BUF TCP_MAX_SEND_BUF
 
-#define TCP_IS_GOOD_ACK(x) (fLastByteAckd > fNextByteToSend ? \
-	((x) >= fLastByteAckd || (x) <= fNextByteToSend) : \
-	((x) >= fLastByteAckd && (x) <= fNextByteToSend))
-
-#define TCP_IS_GOOD_SEQ(x,y) (fNextByteToRead < fNextByteToRead + TCP_MAX_RECV_BUF ? \
-	(x) >= fNextByteToRead && (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF : \
-	((x) >= fNextByteToRead || (x) <= fNextByteToRead + TCP_MAX_RECV_BUF) && \
-	((x) + (y) >= fNextByteToRead || (x) + (y) <= fNextByteToRead + TCP_MAX_RECV_BUF))
-
 struct tcp_segment {
 	struct list_link link;
 
@@ -121,6 +112,33 @@ TCPConnection::~TCPConnection()
 }
 
 
+inline bool
+TCPConnection::_IsAcknowledgeValid(uint32 acknowledge)
+{
+	return fLastByteAckd > fNextByteToSend
+		? acknowledge >= fLastByteAckd || acknowledge <= fNextByteToSend
+		: acknowledge >= fLastByteAckd && acknowledge <= fNextByteToSend;
+}
+
+
+inline bool
+TCPConnection::_IsSequenceValid(uint32 sequence, uint32 length)
+{
+	uint32 end = sequence + length;
+
+	if (fNextByteToRead < fNextByteToRead + TCP_MAX_RECV_BUF) {
+		return sequence >= fNextByteToRead
+			&& end <= fNextByteToRead + TCP_MAX_RECV_BUF;
+	}
+
+	// integer overflow
+	return (sequence >= fNextByteToRead
+			|| sequence <= fNextByteToRead + TCP_MAX_RECV_BUF)
+		&& (end >= fNextByteToRead
+			|| end <= fNextByteToRead + TCP_MAX_RECV_BUF);
+}
+
+
 status_t
 TCPConnection::Open()
 {
@@ -143,21 +161,23 @@ TCPConnection::Close()
 {
 	BenaphoreLocker lock(&fLock);
 	TRACE(("TCP:%p.Close()\n", this));
-	if (fState == SYN_SENT || fState == LISTEN) {
+	if (fState == SYNCHRONIZE_SENT || fState == LISTEN) {
 		fState = CLOSED;
 		return B_OK;
 	}
 	tcp_state nextState = CLOSED;
-	if (fState == SYN_RCVD || fState == ESTABLISHED)
-		nextState = FIN_WAIT1;
-	if (fState == CLOSE_WAIT)
-		nextState = LAST_ACK;
-	status_t status = _SendQueuedData(TCP_FLG_FIN | TCP_FLG_ACK, false);
+	if (fState == SYNCHRONIZE_RECEIVED || fState == ESTABLISHED)
+		nextState = FINISH_SENT;
+	if (fState == FINISH_RECEIVED)
+		nextState = WAIT_FOR_FINISH_ACKNOWLEDGE;
+
+	status_t status = _SendQueuedData(TCP_FLAG_FINISH | TCP_FLAG_ACKNOWLEDGE, false);
 	if (status != B_OK)
 		return status;
+
 	fState = nextState;
 	TRACE(("TCP: %p.Close(): Entering state %d\n", this, fState));
-	//do i need to wait until fState returns to CLOSED?
+	// TODO: do i need to wait until fState returns to CLOSED?
 	return B_OK;
 }
 
@@ -180,7 +200,8 @@ TCPConnection::Free()
 
 
 /*!
-	Creates and sends a SYN packet to /a address
+	Creates and sends a synchronize packet to /a address, and then waits
+	until the connection has been established or refused.
 */
 status_t
 TCPConnection::Connect(const struct sockaddr *address)
@@ -191,7 +212,8 @@ TCPConnection::Connect(const struct sockaddr *address)
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
 
-	benaphore_lock(&gConnectionLock); // want to release lock later, so no autolock
+	benaphore_lock(&gConnectionLock);
+		// want to release lock later, so no autolock
 	BenaphoreLocker lock(&fLock);
 
 	// Can only call Connect from CLOSED or LISTEN states
@@ -203,6 +225,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 	TRACE(("TCP: Connect(): in state %d\n", fState));
 
 	// get a net_route if there isn't one
+	// TODO: get a net_route_info instead!
 	if (fRoute == NULL) {
 		fRoute = gDatalinkModule->get_route(gDomain, (sockaddr *)address);
 		TRACE(("TCP: Connect(): Using Route %p\n", fRoute));
@@ -245,12 +268,13 @@ TCPConnection::Connect(const struct sockaddr *address)
 
 	TRACE(("TCP: Connect(): starting 3-way handshake...\n"));
 	// send SYN
-	status = _SendQueuedData(TCP_FLG_SYN, false);
+	status = _SendQueuedData(TCP_FLAG_SYNCHRONIZE, false);
 	if (status != B_OK)
 		return status;
-	fState = SYN_SENT;
 
-	// TODO: Should Connect() not return until 3-way handshake is complete?
+	fState = SYNCHRONIZE_SENT;
+
+	// TODO: wait until 3-way handshake is complete
 	TRACE(("TCP: Connect(): Connection complete\n"));
 	return B_OK;
 }
@@ -356,7 +380,7 @@ TCPConnection::SendData(net_buffer *buffer)
 		fSendBuffer = buffer;
 
 	fNextByteToWrite += bufferSize;
-	return _SendQueuedData(TCP_FLG_ACK, false);
+	return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, false);
 }
 
 
@@ -392,8 +416,8 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	BenaphoreLocker lock(&fLock);
 
 	// must be in a synchronous state
-	if (fState != ESTABLISHED || fState != FIN_WAIT1 || fState != FIN_WAIT2) {
-		// is this correct semantics?
+	if (fState != ESTABLISHED || fState != FINISH_SENT || fState != FINISH_ACKNOWLEDGED) {
+		// TODO: is this correct semantics?
 dprintf("  TCP state = %d\n", fState);
 		return B_ERROR;
 	}
@@ -520,17 +544,17 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 	uint32 byteAckd = ntohl(header.acknowledge_num);
 	uint32 byteRcvd = ntohl(header.sequence_num);
 	uint32 headerLength = (uint32)header.header_length << 2;
-	uint32 payloadLength = buffer->size - headerLength;
+	uint32 dataLength = buffer->size - headerLength;
 
 	TRACE(("TCP: ReceiveData(): Connection in state %d received packet %p with flags %X!\n", fState, buffer, header.flags));
 	switch (fState) {
 		case CLOSED:
 		case TIME_WAIT:
 			gBufferModule->free(buffer);
-			if (header.flags & TCP_FLG_ACK)
+			if (header.flags & TCP_FLAG_ACKNOWLEDGE)
 				return _Reset(byteAckd, 0);
 
-			return _Reset(0, byteRcvd + payloadLength);
+			return _Reset(0, byteRcvd + dataLength);
 
 		case LISTEN:
 			// if packet is SYN, spawn new TCPConnection in SYN_RCVD state
@@ -542,33 +566,33 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 			// The current TCPConnection always remains in LISTEN state.
 			return B_ERROR;
 
-		case SYN_SENT:
-			if (header.flags & TCP_FLG_RST) {
+		case SYNCHRONIZE_SENT:
+			if (header.flags & TCP_FLAG_RESET) {
 				fError = ECONNREFUSED;
 				fState = CLOSED;
 				return B_ERROR;
 			}
 
-			if (header.flags & TCP_FLG_ACK && !TCP_IS_GOOD_ACK(byteAckd))
+			if (header.flags & TCP_FLAG_ACKNOWLEDGE && !_IsAcknowledgeValid(byteAckd))
 				return _Reset(byteAckd, 0);
 
-			if (header.flags & TCP_FLG_SYN) {
+			if (header.flags & TCP_FLAG_SYNCHRONIZE) {
 				fNextByteToRead = fNextByteExpected = ntohl(header.sequence_num) + 1;
-				flags |= TCP_FLG_ACK;
+				flags |= TCP_FLAG_ACKNOWLEDGE;
 				fLastByteAckd = byteAckd;
 
 				// cancel resend of this segment
-				if (header.flags & TCP_FLG_ACK)
+				if (header.flags & TCP_FLAG_ACKNOWLEDGE)
 					nextState = ESTABLISHED;
 				else {
-					nextState = SYN_RCVD;
-					flags |= TCP_FLG_SYN;
+					nextState = SYNCHRONIZE_RECEIVED;
+					flags |= TCP_FLAG_SYNCHRONIZE;
 				}
 			}
 			break;
 
-		case SYN_RCVD:
-			if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd))
+		case SYNCHRONIZE_RECEIVED:
+			if (header.flags & TCP_FLAG_ACKNOWLEDGE && _IsAcknowledgeValid(byteAckd))
 				fState = ESTABLISHED;
 			else
 				_Reset(byteAckd, 0);
@@ -577,18 +601,18 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 		default:
 			// In a synchronized state.
 			// first check that the received sequence number is good
-			if (TCP_IS_GOOD_SEQ(byteRcvd, payloadLength)) {
+			if (_IsSequenceValid(byteRcvd, dataLength)) {
 				// If a valid RST was received, terminate the connection.
-				if (header.flags & TCP_FLG_RST) {
+				if (header.flags & TCP_FLAG_RESET) {
 					fError = ECONNREFUSED;
 					fState = CLOSED;
 					return B_ERROR;
 				}
 
-				if (header.flags & TCP_FLG_ACK && TCP_IS_GOOD_ACK(byteAckd) ) {
+				if (header.flags & TCP_FLAG_ACKNOWLEDGE && _IsAcknowledgeValid(byteAckd)) {
 					fLastByteAckd = byteAckd;
 					if (fLastByteAckd == fNextByteToWrite) {
-						if (fState == LAST_ACK ) {
+						if (fState == WAIT_FOR_FINISH_ACKNOWLEDGE) {
 							nextState = CLOSED;
 							status = hash_remove(gConnectionHash, this);
 							if (status != B_OK)
@@ -600,23 +624,23 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 							if (status != B_OK)
 								return status;
 						}
-						if (fState == FIN_WAIT1) {
-							nextState = FIN_WAIT2;
+						if (fState == FINISH_SENT) {
+							nextState = FINISH_ACKNOWLEDGED;
 						}
 					}
 				}
-				if (header.flags & TCP_FLG_FIN) {
-					// other side is closing connection.  change states
+				if (header.flags & TCP_FLAG_FINISH) {
+					// other side is closing connection; change states
 					switch (fState) {
 						case ESTABLISHED:
-							nextState = CLOSE_WAIT;
+							nextState = FINISH_RECEIVED;
 							fNextByteExpected++;
 							break;
-						case FIN_WAIT2:
+						case FINISH_ACKNOWLEDGED:
 							nextState = TIME_WAIT;
 							fNextByteExpected++;
 							break;
-						case FIN_WAIT1:
+						case FINISH_RECEIVED:
 							if (fLastByteAckd == fNextByteToWrite) {
 								// our FIN has been ACKd: go to TIME_WAIT
 								nextState = TIME_WAIT;
@@ -632,10 +656,10 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 							break;
 					}
 				}
-				flags |= TCP_FLG_ACK;
+				flags |= TCP_FLAG_ACKNOWLEDGE;
 			} else {
 				// out-of-order packet received.  remind the other side of where we are
-				return _SendQueuedData(TCP_FLG_ACK, true);
+				return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, true);
 			}
 			break;
 	}
@@ -653,7 +677,7 @@ TCPConnection::ReceiveData(net_buffer *buffer)
 	} else
 		gBufferModule->free(buffer);
 
-	if (fState != CLOSING && fState != LAST_ACK) {
+	if (fState != CLOSING && fState != WAIT_FOR_FINISH_ACKNOWLEDGE) {
 		status = _SendQueuedData(flags, false);
 		if (status != B_OK)
 			return status;
@@ -676,7 +700,8 @@ TCPConnection::_Reset(uint32 sequence, uint32 acknowledge)
 	gAddressModule->set_to((sockaddr *)&reply->destination, (sockaddr *)&socket->peer);
 
 	status_t status = add_tcp_header(reply,
-		TCP_FLG_RST | (acknowledge == 0 ? 0 : TCP_FLG_ACK), sequence, acknowledge, 0);
+		TCP_FLAG_RESET | (acknowledge == 0 ? 0 : TCP_FLAG_ACKNOWLEDGE),
+		sequence, acknowledge, 0);
 	if (status != B_OK) {
 		gBufferModule->free(reply);
 		return status;
@@ -758,11 +783,15 @@ TCPConnection::_SendQueuedData(uint16 flags, bool empty)
 	}
 
 	// Only count 1 SYN, the 1 sent when transitioning from CLOSED or LISTEN
-	if (TCP_FLG_SYN & flags && (fState == CLOSED || fState == LISTEN))
+	if ((flags & TCP_FLAG_SYNCHRONIZE) != 0 && (fState == CLOSED || fState == LISTEN))
 		fNextByteToSend++;
-	// Only count 1 FIN, the 1 sent when transitioning from ESTABLISHED, SYN_RCVD or CLOSE_WAIT
-	if (TCP_FLG_FIN & flags && (fState == SYN_RCVD || fState == ESTABLISHED || fState == CLOSE_WAIT))
+
+	// Only count 1 FIN, the 1 sent when transitioning from
+	// ESTABLISHED, SYNCHRONIZE_RECEIVED or FINISH_RECEIVED
+	if ((flags & TCP_FLAG_FINISH) != 0
+		&& (fState == SYNCHRONIZE_RECEIVED || fState == ESTABLISHED || fState == FINISH_RECEIVED))
 		fNextByteToSend++;
+
 	fNextByteToSend += size;
 
 #if 0

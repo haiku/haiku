@@ -46,6 +46,9 @@ class TCPConnection : public net_protocol {
 		static int32 HashOffset() { return offsetof(TCPConnection, fHashLink); }
 
 	private:
+		bool _IsAcknowledgeValid(uint32 acknowledge);
+		bool _IsSequenceValid(uint32 sequence, uint32 length);
+
 		status_t _SendQueuedData(uint16 flags, bool empty);
 		status_t _EnqueueReceivedData(net_buffer *buffer, uint32 sequenceNumber);
 		status_t _Reset(uint32 sequenceNum, uint32 acknowledgeNum);

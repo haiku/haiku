@@ -19,15 +19,20 @@
 
 
 typedef enum {
+	// establishing a connection
 	CLOSED,
 	LISTEN,
-	SYN_SENT,
-	SYN_RCVD,
+	SYNCHRONIZE_SENT,
+	SYNCHRONIZE_RECEIVED,
 	ESTABLISHED,
-	CLOSE_WAIT,
-	LAST_ACK,
-	FIN_WAIT1,
-	FIN_WAIT2,
+
+	// peer closes the connection
+	FINISH_RECEIVED,
+	WAIT_FOR_FINISH_ACKNOWLEDGE,
+
+	// we close the connection
+	FINISH_SENT,
+	FINISH_ACKNOWLEDGED,
 	CLOSING,
 	TIME_WAIT
 } tcp_state;
@@ -53,14 +58,14 @@ struct tcp_header {
 };
 
 // TCP flag constants
-#define TCP_FLG_CWR 0x80 // Congestion Window Reduced
-#define TCP_FLG_ECN 0x40 // Explicit Congestion Notification echo
-#define TCP_FLG_URG 0x20 // URGent
-#define TCP_FLG_ACK 0x10 // ACKnowledge
-#define TCP_FLG_PUS 0x08 // PUSh
-#define TCP_FLG_RST 0x04 // ReSeT
-#define TCP_FLG_SYN 0x02 // SYNchronize
-#define TCP_FLG_FIN 0x01 // FINish
+#define TCP_FLAG_FINISH			0x01
+#define TCP_FLAG_SYNCHRONIZE	0x02
+#define TCP_FLAG_RESET			0x04
+#define TCP_FLAG_PUSH			0x08
+#define TCP_FLAG_ACKNOWLEDGE	0x10
+#define TCP_FLAG_URGENT			0x20
+#define TCP_FLAG_ECN			0x40 // Explicit Congestion Notification echo
+#define TCP_FLAG_CWR			0x80 // Congestion Window Reduced
 
 struct tcp_connection_key {
 	const sockaddr	*local;
@@ -80,4 +85,4 @@ extern benaphore gConnectionLock;
 status_t add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
 	uint32 ack, uint16 advertisedWindow);
 
-#endif TCP_H
+#endif	// TCP_H

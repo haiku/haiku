@@ -336,8 +336,8 @@ tcp_receive_data(net_buffer *buffer)
 		   then check when local = peer = IPADDR_ANY.
 		   port numbers always remain the same */
 
-		// If no connection exists (and RST is not set) send RST
-		if (!(header.flags & TCP_FLG_RST)) {
+		// If no connection exists (and RESET is not set) send RESET
+		if ((header.flags & TCP_FLAG_RESET) == 0) {
 			TRACE(("TCP:  Connection does not exist!\n"));
 			net_buffer *reply = gBufferModule->create(512);
 			if (reply == NULL)
@@ -350,15 +350,15 @@ tcp_receive_data(net_buffer *buffer)
 
 			uint32 sequence, acknowledge;
 			uint16 flags;
-			if (header.flags & TCP_FLG_ACK) {
+			if (header.flags & TCP_FLAG_ACKNOWLEDGE) {
 				sequence = ntohl(header.acknowledge_num);
 				acknowledge = 0;
-				flags = TCP_FLG_RST;
+				flags = TCP_FLAG_RESET;
 			} else {
 				sequence = 0;
 				acknowledge = ntohl(header.sequence_num) + 1
 					+ buffer->size - ((uint32)header.header_length << 2);
-				flags = TCP_FLG_RST | TCP_FLG_ACK;
+				flags = TCP_FLAG_RESET | TCP_FLAG_ACKNOWLEDGE;
 			}
 
 			status_t status = add_tcp_header(reply, flags, sequence, acknowledge, 0);
