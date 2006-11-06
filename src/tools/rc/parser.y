@@ -1576,6 +1576,48 @@ add_app_version()
 
 
 static void
+add_png_icon()
+{
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("raw");
+	fields[0].name   = "icon";
+	fields[0].resize = 0;
+	fields[0].data   = make_data(fields[0].resize, fields[0].type);
+
+	type_t type;
+	type.code     = 'PNG ';
+	type.name     = "png_icon";
+	type.fields   = fields;
+	type.count    = 1;
+	type.def_id   = 101;
+	type.def_name = "BEOS:ICON";
+
+	type_table.insert(make_pair(type.name, type));
+}
+
+
+static void
+add_vector_icon()
+{
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("raw");
+	fields[0].name   = "icon";
+	fields[0].resize = 0;
+	fields[0].data   = make_data(fields[0].resize, fields[0].type);
+
+	type_t type;
+	type.code     = 'RAWT';
+	type.name     = "vector_icon";
+	type.fields   = fields;
+	type.count    = 1;
+	type.def_id   = 101;
+	type.def_name = "BEOS:ICON";
+
+	type_table.insert(make_pair(type.name, type));
+}
+
+
+static void
 add_large_icon()
 {
 	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
@@ -1680,6 +1722,8 @@ init_parser()
 	add_app_version();
 	add_large_icon();
 	add_mini_icon();
+	add_vector_icon();
+	add_png_icon();
 	add_file_types();
 
 	add_define("B_SINGLE_LAUNCH",    0x0);

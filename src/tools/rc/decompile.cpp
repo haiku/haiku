@@ -713,8 +713,28 @@ write_app_flags(const void *data, size_t length)
 static void
 write_app_icon(uint32 which, const void *data, size_t length)
 {
-	fprintf(sOutputFile, "resource %s_icon ", which == B_MINI_ICON ? "mini" : "large");
-	write_raw(NULL, B_RAW_TYPE, data, length, which);
+	int32 lineWidth = 32;
+	const char* type = "";
+	switch (which) {
+		case B_MINI_ICON:
+			type = "mini";
+			lineWidth = 16;
+			break;
+		case B_LARGE_ICON:
+			type = "large";
+			break;
+		case 'VICN':
+			type = "vector";
+			break;
+		case 'PNG ':
+			type = "png";
+			break;
+		default:
+			fprintf(stderr, "write_app_icon() called with invalid type!\n");
+			break;
+	}
+	fprintf(sOutputFile, "resource %s_icon ", type);
+	write_raw(NULL, B_RAW_TYPE, data, length, lineWidth);
 }
 
 
@@ -824,6 +844,20 @@ write_data(int32 id, const char *name, type_code type,
 		case B_MIME_STRING_TYPE:
 			if (!strcmp(name, "BEOS:APP_SIG")) {
 				write_app_signature(data, length);
+				return;
+			}
+			break;
+
+		case B_RAW_TYPE:
+			if (!strcmp(name, "BEOS:ICON")) {
+				write_app_icon('VICN', data, length);
+				return;
+			}
+			break;
+
+		case 'PNG ':
+			if (!strcmp(name, "BEOS:ICON")) {
+				write_app_icon('PNG ', data, length);
 				return;
 			}
 			break;
