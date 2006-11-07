@@ -385,7 +385,7 @@ get_icon_for_type(const char* type, const char* fileType, uint8** data,
 
 	// validate attribute type
 	if (!err)
-		err = (info.type == B_RAW_TYPE) ? B_OK : B_BAD_VALUE;
+		err = (info.type == B_VECTOR_ICON_TYPE) ? B_OK : B_BAD_VALUE;
 
 	// allocate a buffer and read the attribute data into it
 	if (!err) {
@@ -393,7 +393,7 @@ get_icon_for_type(const char* type, const char* fileType, uint8** data,
 		if (!buffer)
 			err = B_NO_MEMORY;
 		if (!err) {
-			err = node.ReadAttr(iconAttrName.c_str(), B_RAW_TYPE,
+			err = node.ReadAttr(iconAttrName.c_str(), B_VECTOR_ICON_TYPE,
 								0, buffer, info.size);
 		}
 

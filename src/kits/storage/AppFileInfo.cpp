@@ -848,7 +848,7 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 
 	size_t bytesRead;
 	void* allocatedBuffer;
-	status_t error = _ReadData(attribute, -1, B_RAW_TYPE, NULL, 0,
+	status_t error = _ReadData(attribute, -1, B_VECTOR_ICON_TYPE, NULL, 0,
 							   bytesRead, &allocatedBuffer);
 	if (error == B_OK) {
 		error = BIconUtils::GetVectorIcon((uint8*)allocatedBuffer,
@@ -969,7 +969,7 @@ BAppFileInfo::GetIconForType(const char *type, uint8** data,
 
 	void* allocatedBuffer = NULL;
 	status_t ret = _ReadData(attributeName.String(), -1,
-							 B_RAW_TYPE, NULL, 0, *size, &allocatedBuffer);
+							 B_VECTOR_ICON_TYPE, NULL, 0, *size, &allocatedBuffer);
 
 	if (ret < B_OK)
 		return ret;
@@ -1112,7 +1112,7 @@ BAppFileInfo::SetIconForType(const char* type, const uint8* data,
 	// set some icon related variables
 	BString attributeString = kIconAttribute;
 	int32 resourceID = type ? kIconForTypeResourceID : kIconResourceID;
-	uint32 attrType = B_RAW_TYPE;
+	uint32 attrType = B_VECTOR_ICON_TYPE;
 
 	// check type param
 	if (type) {

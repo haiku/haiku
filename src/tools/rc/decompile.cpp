@@ -823,9 +823,14 @@ write_generic_data(const char *name, type_code type,
 			write_string(name, type, data, length);
 			break;
 
-		case B_POINTER_TYPE: write_raw(name, type, data, length);     break;
-		case 'MICN':         write_raw(name, type, data, length, 16); break;
-		case 'ICON':         write_raw(name, type, data, length);     break;
+		case 'MICN':
+			write_raw(name, type, data, length, 16);
+			break;
+		case B_POINTER_TYPE:
+		case 'ICON':
+		case 'VICN':
+			write_raw(name, type, data, length);
+			break;
 
 		default:
 			write_other(name, type, data, length);
@@ -848,7 +853,7 @@ write_data(int32 id, const char *name, type_code type,
 			}
 			break;
 
-		case B_RAW_TYPE:
+		case 'VICN':
 			if (!strcmp(name, "BEOS:ICON")) {
 				write_app_icon('VICN', data, length);
 				return;

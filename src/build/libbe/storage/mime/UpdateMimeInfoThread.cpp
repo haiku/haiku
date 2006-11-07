@@ -26,6 +26,8 @@
 
 #if !defined(HAIKU_HOST_PLATFORM_DANO) && !defined(HAIKU_HOST_PLATFORM_BEOS) && !defined(HAIKU_HOST_PLATFORM_BONE)
 #	include <MimeType.h>
+#else
+#	define B_VECTOR_ICON_TYPE 'VICN'
 #endif
 
 #ifndef B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL
@@ -88,7 +90,7 @@ update_vector_icon(BFile& file, const char *type)
 		name += "ICON";
 
 	size_t size;
-	const void* data = resources.LoadResource(B_RAW_TYPE, name.String(), &size);
+	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE, name.String(), &size);
 	if (data == NULL) {
 		// remove attribute; the resources don't have an icon
 		file.RemoveAttr(name.String());
@@ -97,7 +99,7 @@ update_vector_icon(BFile& file, const char *type)
 
 	// update icon
 
-	ssize_t written = file.WriteAttr(name.String(), B_RAW_TYPE, 0, data, size);
+	ssize_t written = file.WriteAttr(name.String(), B_VECTOR_ICON_TYPE, 0, data, size);
 	if (written < B_OK)
 		return written;
 	if ((size_t)written < size) {

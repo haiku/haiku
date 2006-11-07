@@ -1342,7 +1342,7 @@ GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
 //#else
 //
 //	const char *attrName = kAttrIcon;
-//	uint32 type = B_RAW_TYPE;
+//	uint32 type = B_VECTOR_ICON_TYPE;
 //
 //	// try vector icon
 //	attr_info ainfo;

@@ -1606,7 +1606,7 @@ add_vector_icon()
 	fields[0].data   = make_data(fields[0].resize, fields[0].type);
 
 	type_t type;
-	type.code     = 'RAWT';
+	type.code     = 'VICN';
 	type.name     = "vector_icon";
 	type.fields   = fields;
 	type.count    = 1;

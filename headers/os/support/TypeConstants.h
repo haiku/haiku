@@ -52,6 +52,7 @@ enum {
 	B_UINT32_TYPE					= 'ULNG',
 	B_UINT64_TYPE					= 'ULLG',
 	B_UINT8_TYPE					= 'UBYT',
+	B_VECTOR_ICON_TYPE				= 'VICN',
 
 	// deprecated, do not use
 	B_ASCII_TYPE					= 'TEXT'	// use B_STRING_TYPE instead

@@ -169,16 +169,18 @@ BTrashWatcher::UpdateTrashIcons()
 		const void *smallData = GetTrackerResources()->LoadResource('MICN',
 			fTrashFull ? kResTrashFullIcon : kResTrashIcon,  &smallSize);
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		const void *vectorData = GetTrackerResources()->LoadResource(
-			B_RAW_TYPE, fTrashFull ? kResTrashFullIcon : kResTrashIcon,
+			B_VECTOR_ICON_TYPE, fTrashFull ? kResTrashFullIcon : kResTrashIcon,
 			&vectorSize);
 
 		if (vectorData)
-			trashDir.WriteAttr(kAttrIcon, B_RAW_TYPE, 0,
+			trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
 				vectorData, vectorSize);
 // TODO: enable me once the vector icon is indeed in the resources
 //		else
 //			TRESPASS();
+#endif
 
 		if (largeData) 
 			trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,

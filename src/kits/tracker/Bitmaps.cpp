@@ -44,6 +44,7 @@ All rights reserved.
 #include "Bitmaps.h"
 #include "Utilities.h"
 
+
 BImageResources::BImageResources(void *memAddr)
 {
 	image_id image = find_image(memAddr);
@@ -61,27 +62,31 @@ BImageResources::BImageResources(void *memAddr)
 	}
 }
 
+
 BImageResources::~BImageResources()
 {
 }
+
 
 const BResources *
 BImageResources::ViewResources() const
 {
 	if (fLock.Lock() != B_OK)
 		return NULL;
-	
+
 	return &fResources;
 }
+
 
 BResources *
 BImageResources::ViewResources()
 {
 	if (fLock.Lock() != B_OK)
 		return NULL;
-	
+
 	return &fResources;
 }
+
 
 status_t
 BImageResources::FinishResources(BResources *res) const
@@ -93,7 +98,8 @@ BImageResources::FinishResources(BResources *res) const
 	fLock.Unlock();
 	return B_OK;
 }
-	
+
+
 const void *
 BImageResources::LoadResource(type_code type, int32 id, size_t *out_size) const
 {	
@@ -103,12 +109,13 @@ BImageResources::LoadResource(type_code type, int32 id, size_t *out_size) const
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
 		return 0;
-	
+
 	// Return the resource.  Because we never change the BResources
 	// object, the returned data will not change until TTracker is
 	// destroyed.
 	return const_cast<BResources *>(&fResources)->LoadResource(type, id, out_size);
 }
+
 
 const void *
 BImageResources::LoadResource(type_code type, const char *name, size_t *out_size) const
@@ -117,12 +124,13 @@ BImageResources::LoadResource(type_code type, const char *name, size_t *out_size
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
 		return NULL;
-	
+
 	// Return the resource.  Because we never change the BResources
 	// object, the returned data will not change until TTracker is
 	// destroyed.
 	return const_cast<BResources *>(&fResources)->LoadResource(type, name, out_size);
 }
+
 
 status_t
 BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
@@ -131,7 +139,7 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	const void *data;
 
 	// try to load vector icon
-	data = LoadResource(B_RAW_TYPE, id, &length);
+	data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
 
 	if (data && BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK)
 		return B_OK;
@@ -139,7 +147,7 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	// fall back to R5 icon
 	if (size != B_LARGE_ICON && size != B_MINI_ICON)
 		return B_ERROR;
-	
+
 	length = 0;
 	data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN', id, &length);
 
@@ -152,7 +160,7 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 
 	if (dest->ColorSpace() != B_CMAP8) {
 		ret = BIconUtils::ConvertFromCMAP8((uint8*)data, size, size,
-								size, dest);
+			size, dest);
 	} else {
 		dest->SetBits(data, (int32)length, 0, B_CMAP8);
 	}
@@ -160,13 +168,14 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	return ret;
 }
 
+
 status_t
 BImageResources::GetIconResource(int32 id, const uint8** iconData,
-								 size_t* iconSize) const
+	size_t* iconSize) const
 {
 	// try to load vector icon data from resources
 	size_t length = 0;
-	const void* data = LoadResource(B_RAW_TYPE, id, &length);
+	const void* data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
 
 	if (!data)
 		return B_ERROR;
@@ -176,6 +185,7 @@ BImageResources::GetIconResource(int32 id, const uint8** iconData,
 
 	return B_OK;
 }
+
 
 image_id
 BImageResources::find_image(void *memAddr) const
@@ -191,11 +201,12 @@ BImageResources::find_image(void *memAddr) const
 	return -1;
 }
 
+
 status_t
 BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap **out) const
 {
 	*out = NULL;
-	
+
 	size_t len = 0;
 	const void *data = LoadResource(type, id, &len);
 
@@ -203,9 +214,9 @@ BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap **out) cons
 		TRESPASS();
 		return B_ERROR;
 	}
-	
+
 	BMemoryIO stream(data, len);
-	
+
 	// Try to read as an archived bitmap.
 	stream.Seek(0, SEEK_SET);
 	BMessage archive;
@@ -222,7 +233,7 @@ BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap **out) cons
 		delete *out;
 		*out = NULL;
 	}
-	
+
 	return err;
 }
 	
@@ -232,8 +243,7 @@ static BImageResources *resources = NULL;
 
 // This class is used as a static instance to delete the resources
 // global object when the image is getting unloaded.
-class _TTrackerCleanupResources
-{
+class _TTrackerCleanupResources {
 public:
 	_TTrackerCleanupResources() { }
 	~_TTrackerCleanupResources()

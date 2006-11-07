@@ -773,21 +773,25 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 	fScaleSlider(NULL)
 {
 	if (editor.Type() == 'MICN' || editor.Type() == 'ICON'
-		|| (!strcmp(editor.Attribute(), "BEOS:ICON") && editor.Type() == B_RAW_TYPE)) {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		|| editor.Type() == B_VECTOR_ICON_TYPE
+#endif
+		)
 		SetName("Icon View");
 
-		if (editor.Type() == B_RAW_TYPE) {
-			// vector icon
-			fScaleSlider = new BSlider(BRect(0, 0, 195, 20), "", NULL,
-				new BMessage(kMsgScaleChanged), 2, 16);
-			fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
-			fScaleSlider->ResizeToPreferred();
-			fScaleSlider->SetValue(8.0);
-			fScaleSlider->SetHashMarks(B_HASH_MARKS_BOTH);
-			fScaleSlider->SetHashMarkCount(15);
-			AddChild(fScaleSlider);
-		}
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (editor.Type() == B_VECTOR_ICON_TYPE) {
+		// vector icon
+		fScaleSlider = new BSlider(BRect(0, 0, 195, 20), "", NULL,
+			new BMessage(kMsgScaleChanged), 2, 16);
+		fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
+		fScaleSlider->ResizeToPreferred();
+		fScaleSlider->SetValue(8.0);
+		fScaleSlider->SetHashMarks(B_HASH_MARKS_BOTH);
+		fScaleSlider->SetHashMarkCount(15);
+		AddChild(fScaleSlider);
 	}
+#endif
 
 	fDescriptionView = new BStringView(Bounds(), "", "Could not read image", B_FOLLOW_NONE);
 	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
@@ -880,19 +884,16 @@ ImageView::UpdateImage()
 		fEditor.SetViewSize(viewSize);
 		return;
 	}
-	if (fBitmap != NULL && !strcmp(fEditor.Attribute(), "BEOS:ICON")
-		&& fEditor.Type() == B_RAW_TYPE
-		&& fScaleSlider->Value() * 8 - 1 == fBitmap->Bounds().Width()) {
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (fBitmap != NULL && fEditor.Type() == B_VECTOR_ICON_TYPE
+		&& fScaleSlider->Value() * 8 - 1 == fBitmap->Bounds().Width()) {
 		if (BIconUtils::GetVectorIcon((const uint8 *)data,
 				(size_t)fEditor.FileSize(), fBitmap) == B_OK) {
-#endif
 			fEditor.SetViewSize(viewSize);
 			return;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		}
-#endif
 	}
+#endif
 
 	delete fBitmap;
 	fBitmap = NULL;
@@ -909,10 +910,7 @@ ImageView::UpdateImage()
 				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
 			break;
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		case B_RAW_TYPE:
-			if (strcmp(fEditor.Attribute(), "BEOS:ICON"))
-				break;
-
+		case B_VECTOR_ICON_TYPE:
 			fBitmap = new BBitmap(BRect(0, 0, fScaleSlider->Value() * 8 - 1,
 				fScaleSlider->Value() * 8 - 1), B_RGB32);
 			if (fBitmap->InitCheck() != B_OK
@@ -954,11 +952,10 @@ ImageView::UpdateImage()
 		switch (fEditor.Type()) {
 			case 'MICN':
 			case 'ICON':
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			case B_VECTOR_ICON_TYPE:
+#endif
 				type = "Icon";
-				break;
-			case B_RAW_TYPE:
-				if (!strcmp(fEditor.Attribute(), "BEOS:ICON"))
-					type = "Icon";
 				break;
 			case 'PNG ':
 				type = "PNG Format";
@@ -1090,13 +1087,11 @@ GetTypeEditorFor(BRect rect, DataEditor &editor)
 		case 'ICON':
 		case 'PNG ':
 		case 'MSGG':
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		case B_VECTOR_ICON_TYPE:
+#endif
 			return new ImageView(rect, editor);
 	}
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (!strcmp(editor.Attribute(), "BEOS:ICON") && editor.Type() == B_RAW_TYPE)
-		return new ImageView(rect, editor);
-#endif
 
 	return NULL;
 }

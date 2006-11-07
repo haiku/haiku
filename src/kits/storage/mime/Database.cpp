@@ -468,7 +468,7 @@ Database::SetIconForType(const char *type, const char *fileType,
 	if (type == NULL || data == NULL)
 		return B_BAD_VALUE;
 
-	int32 attrType = B_RAW_TYPE;
+	int32 attrType = B_VECTOR_ICON_TYPE;
 	
 	// Construct our attribute name
 	std::string attr;
