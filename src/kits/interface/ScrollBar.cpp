@@ -244,7 +244,7 @@ BScrollBar::Archive(BMessage *data, bool deep) const
 	err = data->AddInt32("_orient",(int32)fOrientation);
 	if (err != B_OK)
 		return err;
-	err = data->AddInt32("_prop",fProportion);
+	err = data->AddInt32("_prop",(int32)fProportion);
 	
 	return err;
 }
