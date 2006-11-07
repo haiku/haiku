@@ -122,6 +122,10 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	HAIKU_KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
 }
 
+if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	HAIKU_C++FLAGS += -Wno-deprecated ;
+}
+
 HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 HAIKU_KERNEL_PIC_LINKFLAGS = ;
 if $(HAIKU_ARCH) = ppc {
