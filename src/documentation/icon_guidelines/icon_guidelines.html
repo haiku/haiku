@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+       "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Haiku Icon Guidelines</title>
+</head>
+
+<body bgcolor="#ffffff">
+
+<h2>Haiku Icon Guidelines</h2>
+
+<p align="justify">
+This document explains the artistic subtleties of Haiku icons. If it leaves something unclear to you, in what rules to follow when designing an icon for the Haiku operating system, please bring the issue to our intention and we will try to improve this text. The icons already in existence will give you a pretty good idea what directions to follow. This document is ment to further define the distinctive look in written form and be a useful resource in case of doubt. Also, if you designed an icon, and you feel it doesn't fit seemlessly into the rest of the system, this document will hopefully provide you with the help on what you should change to improve that.
+</p>
+
+<p align="justify">
+Please be aware that Haiku users feel very strong about a consistent look. The more you make your icon fit into the rest of the system, the more it is appreciated by your users.
+</p>
+
+
+<h3>Perspective</h3>
+
+<p align="justify">
+Haiku icons inherit the perspective of the BeOS icons and add some of their own. If you imagine a cube sitting on the floor, let's define the angles of its edges: The line where the left front side and the floor meet has an angle such that for every two pixels it goes to the right, it goes one pixel down. The line of the right side meeting the floor goes one pixel up for every pixel going right. Lines pointing up are straight without any angle to help make the icons crisper (realistically, icons should be wider at the top but they aren't).
+
+<img src="perspective.png" border="0" align="right" hspacing="10" vspacing="5">
+
+The perspective that Haiku icons add to the original BeOS look comes from tweaking lines that do not touch the floor (and don't point up) to add a somewhat more dramatic perspective. So edges of the objects corner being closest to the viewer and on the floor still follow the BeOS perspective with the angles described above, all other edges are slightly tweaked to break free of the strict isometric look. The most important thing is still crispness, that's why there is no <i>strictly</i> defined perspective. Don't exaggerate too much, try to make it fit with the rest of the icons. It is sometimes easiest to design an icon with the consequent isometric look first and tweaking for perspective as the last step of work. Also, keeping the perspective consistent and correct looking throughout the icon is desirable.
+</p>
+
+
+<h3>Lights</h3>
+
+<p align="justify">
+There are two lightsources illuminating a Haiku icon: The main lightsource casts a bright neutral light from the left top. A second lightsource lits the icon from the opposite side with an ambient light that can be slightly colored (for example, a warmer tone). Its effects are not seen on surfaces wich are hit directly by the main lightsource.
+</p>
+
+
+<h3>Gradients</h3>
+
+<p align="justify">
+Gradients used on the icon should result from the effects of the lightsources as described above. You do not need to use gradients on every surface, they obviously use more storage space than solid colors. But without gradients, icons would look too stiff, you should use enough of them to give it a modern look.<br>
+As a general rule, surfaces facing towards the viewer should be lighter at the top as a result of being closer to the main lightsource there. The top surfaces should be lighter on the left side for the same reason. Surfaces on the right, which are not directly lit by the main lightsource should get the darkest colors. They are lit from the ambient lightsource and from the reflection of the floor, but the effects should be very subtile and only seen on closer examination. These surfaces get the darkest colors where they touch the directly lit surfaces. Overall, colors should be vivid and tweaked to help the contrast within the icon. Gradient directions don't have to line up with a specific angle to make icons look less stiff. Instead, you should tweak the gradient directions to help improve contrast.
+</p>
+
+
+<h3>Colors</h3>
+
+<p align="justify">
+Colors are obviously a tough subject.
+<img src="trash_full_64.png" align="right" hspacing="10" vspacing="5">
+At the moment, there is not a color palette defined from which you should pick the dominant colors of your icon. In the existing icons, <i>clean</i> colors are almost completely avoided, with the exception of grays, which are not toned in any way. Most dominant colors appear quite saturated somewhere in the icon. But the colors are always a mixture, never straight red, green or blue. Where they fade into a lighter tone, they are mostly desaturated and pastellic. In the shade, the colors are mostly still saturated, aiming for a believable lighting, but colors can vary in tone, to give the appearance of a warmer or colder light condition in the shadow. Which mostly depends on the overall coloring of the icon and gut feeling.
+</p>
+
+
+<h3>Shadows</h3>
+
+<p align="justify">
+<img src="fonts_64.png" align="left" hspacing="10" vspacing="5">
+<img src="expander_64.png" align="left" hspacing="10" vspacing="5">
+
+First of all, a shadow is the silhouette of a body as seen from the lightsource. Cast onto the flat floor, the shadow is subject to distortion because of the viewers perspective. Selfshadowing on the icon objects is encouraged, because it can improve contrast. Sometimes, it works good to use gradients for these. A naturalistic shadow is preferred, unless it gets too complicated and would distract from the main icon. The people icon is one example for a simplified shadow shape. Shadows that are cut off at the right boundary of the icon are discouraged. Leave enough room for the shadow. It is not so important that the shadows have approximately the same length throughout all icons, but they all need to be the same direction, which is straight horizontally.
+</p>
+
+
+<h3>Outlines</h3>
+
+<p align="justify">
+Haiku icons use a main black outline at least around the silhouette of the icons shape. The outline is 1 pixel wide at 32x32 size. If shapes within the icon overlap each other, they can be separated by an outline as well, but don't overuse outlines. Not every edge gets one, or the icon will look too complicated. In comparisson to BeOS, Haiku icons use less outlines. The Magnify icon is a good example of this.
+
+<img src="workspaces_32.png" align="right" hspacing="10" vspacing="5">
+
+Outlines help emphasise the silhuette of an object, so skip outlines that would work against this idea. If a certain feature of an icon is not to be emphasised as much as a black outline would do, such outlines can be dark versions of the color used for the surface they enclose. An example is the Folder and the Workspaces icon. In the Workspaces icon, the foot of the lamp is too small to justify a black outline, in the Folder icon, the paper sheets should appear thin.
+</p>
+
+<table>
+<tr><td valign="bottom">
+
+<h3>Highlights</h3>
+
+</td><td width="30">
+</td><td>
+
+<table cellspacing="10">
+	<tr>
+		<td><img src="magnify_64.png"></td>
+		<td><img src="clock_64.png"></td>
+		<td><img src="show_image_64.png"></td>
+	</tr>
+</table>
+
+</td></tr>
+</table>
+
+<p align="justify">
+Glossy effects and highlights should be used with care. If applied too often, an icon will lose it's simplified, stylish look. Some icons use highlight effects on metallic or glass surfaces, but usually only if the surface is curved (round or spherical). In these cases, the material itself supported the meaning of the icon in an important way. The use of gradients should usually provide enough room to make an icon look vivid.
+</p>
+
+<table width="100%">
+<tr>
+<td valign="top">
+
+<h3>Overlays</h3>
+
+<p align="justify">
+Some of the system icons use <i>overlays</i> to further differentiate between file system objects for the users benefit. These objects are generally the same type, and get the same base icon. A good example are the many standard folders. Since the overlays need to work reasonably well at 16x16 icon size, it was decided to make them flat symbols, much like labels. If they were 3D objects like normal icons, they would get just too blurry at 16x16. If you look closer, you would notice that the overlays don't have exactly the same size or even position with all icons that use them. Instead, they are arranged to overlap at an optimal place, so that lines with similar angles don't merge. Another good use of overlays is where they immediately provide some additional information, perhaps about a particular subtype of a fileformat. If it is possible to implement the overlay with an object rather than a text label, it should be preferred.<br>
+You might be tempted to just copy and paste a graphic from somewhere else to use as the overlay, but please remove any unnecessary detail for the final icon.
+</p>
+
+</td>
+<td valign="top">
+
+<table cellspacing="10">
+	<tr>
+		<td><img src="folder_haiku_32.png"></td>
+		<td><img src="folder_apps_32.png"></td>
+	</tr>
+	<tr>
+		<td><img src="folder_prefs_32.png"></td>
+		<td><img src="folder_home_32.png"></td>
+	</tr>
+	<tr>
+		<td><img src="folder_development_32.png"></td>
+		<td><img src="folder_config_32.png"></td>
+	</tr>
+	<tr>
+		<td><img src="folder_people_32.png"></td>
+		<td><img src="folder_download_32.png"></td>
+	</tr>
+	<tr>
+		<td><img src="folder_mail_32.png"></td>
+		<td><img src="folder_queries_32.png"></td>
+	</tr>
+</table>
+
+</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p align="justify">
+Usually, you should avoid any detail not stricly necessary to help the meaning of an icon. There should be just enough detail to make the icon look interesting. Icons are usually viewed at 32x32 or 16x16 size. With regards to the amount of detail, you should optimize for the 32x32 size. There should not be any detail that is not well seen at this size. When reusing existing vector material in an icon, make sure its details are reduced to what can actually be seen at the icon size, otherwise the icon will waste a lot of storage space and rendering time. Sometimes it is helpful to make some details of the icon disappear at the small sizes, with the help of the Min and Max LOD property in Icon-O-Matic.
+</p>
+
+
+<hr>
+
+
+<h3>Abstract</h3>
+
+<p align="justify">
+Haiku filesystem objects are represented by simplified real life objects that act as a symbol for the objects meaning and purpose. Try to think of a single object that is easily recognizable and helps to express the purpose of the filesystem object. It is encouraged to cross reference the icon objects with related filesystem objects and their icons. Good examples are document files that are opened by a specific application. [...]
+</p>
+
+
+<h3>Tips and Tricks</h3>
+
+<p align="justify">
+Try to give icons a good silhuette. Shift multiple shapes so that they clearly overlap each other. [...]
+</p>
+
+
+</body>
+</html>
