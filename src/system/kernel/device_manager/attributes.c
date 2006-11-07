@@ -348,11 +348,12 @@ pnp_get_next_attr(device_node_handle node, device_attr_handle *attr)
 		next = node->attributes;
 	}
 
-	++next->ref_count;
+	if (next)
+		++next->ref_count;
 	*attr = next;
 
 	benaphore_unlock(&gNodeLock);
-	return B_OK;
+	return next ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
