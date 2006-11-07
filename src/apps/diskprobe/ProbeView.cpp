@@ -1821,7 +1821,8 @@ ProbeView::MessageReceived(BMessage *message)
 					// There might be a new icon
 					if (!strcmp(name, "BEOS:TYPE")
 						|| !strcmp(name, "BEOS:M:STD_ICON")
-						|| !strcmp(name, "BEOS:L:STD_ICON"))
+						|| !strcmp(name, "BEOS:L:STD_ICON")
+						|| !strcmp(name, "BEOS:ICON"))
 						fHeaderView->UpdateIcon();
 					break;
 				}
