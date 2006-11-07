@@ -673,7 +673,7 @@ _IMPEXP_BE void
 run_be_about()
 {
 	if (be_roster != NULL)
-		be_roster->Launch("application/x-vnd.haiku-AboutHaiku");
+		be_roster->Launch("application/x-vnd.Haiku-About");
 }
 
 
