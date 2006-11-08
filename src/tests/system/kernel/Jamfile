@@ -70,4 +70,5 @@ SimpleTest lock_node_test :
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
+SubInclude HAIKU_TOP src tests system kernel device_manager ;
 SubInclude HAIKU_TOP src tests system kernel util ;

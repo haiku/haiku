@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tests system kernel device_manager ;
+
+BinCommand <test>listdev :
+	dm_wrapper.c
+	listdev.c
+;
+
+KernelAddon <test_driver>config :
+        config.c
+        ;
+
