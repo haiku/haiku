@@ -714,7 +714,9 @@ dprintf(const char *format,...)
 {
 	va_list args;
 	va_start(args, format);
+	printf("\33[34m");
 	vprintf(format, args);
+	printf("\33[0m");
 	va_end(args);
 }
 
