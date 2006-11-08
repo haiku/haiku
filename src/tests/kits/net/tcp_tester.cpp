@@ -10,6 +10,7 @@
 #include <KernelExport.h>
 #include <module.h>
 
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +34,11 @@ extern module_info *modules[];
 
 
 extern struct net_protocol_module_info gDomainModule;
+static struct net_protocol sDomainProtocol;
+struct net_interface gInterface;
 struct net_socket_module_info gNetSocketModule;
+struct net_protocol_module_info *gTCPModule;
+struct net_socket gServerSocket, gClientSocket;
 
 static struct net_domain sDomain = {
 	"ipv4",
@@ -51,6 +56,13 @@ status_t
 std_ops(int32, ...)
 {
 	return B_OK;
+}
+
+
+net_domain *
+get_domain(int family)
+{
+	return &sDomain;
 }
 
 
@@ -83,7 +95,7 @@ static net_stack_module_info gNetStackModule = {
 	},
 	NULL, //register_domain,
 	NULL, //unregister_domain,
-	NULL, //get_domain,
+	get_domain,
 
 	register_domain_protocols,
 	register_domain_datalink_protocols,
@@ -116,13 +128,177 @@ static net_stack_module_info gNetStackModule = {
 };
 
 
+//	#pragma mark - protocol/socket
+
+
+net_protocol*
+init_protocol(net_socket& socket)
+{
+	memset(&socket, 0, sizeof(net_socket));
+	socket.family = AF_INET;
+	socket.type = SOCK_STREAM;
+	socket.protocol = IPPROTO_TCP;
+
+	// set defaults (may be overridden by the protocols)
+	socket.send.buffer_size = 65536;
+	socket.send.low_water_mark = 1;
+	socket.send.timeout = B_INFINITE_TIMEOUT;
+	socket.receive.buffer_size = 65536;
+	socket.receive.low_water_mark = 1;
+	socket.receive.timeout = B_INFINITE_TIMEOUT;
+
+	net_protocol* protocol = gTCPModule->init_protocol(&socket);
+	if (protocol == NULL) {
+		fprintf(stderr, "tcp_tester: cannot create protocol\n");
+		return NULL;
+	}
+
+	socket.first_info = gTCPModule;
+	socket.first_protocol = protocol;
+
+	protocol->next = &sDomainProtocol;
+	protocol->module = gTCPModule;
+	protocol->socket = &socket;
+
+	status_t status = gTCPModule->open(protocol);
+	if (status < B_OK) {
+		fprintf(stderr, "tcp_tester: cannot open client: %s\n", strerror(status));
+		return NULL;
+	}
+
+	return protocol;
+}
+
+
+void
+close_protocol(net_protocol* protocol)
+{
+	gTCPModule->close(protocol);
+	gTCPModule->free(protocol);
+	gTCPModule->uninit_protocol(protocol);
+}
+
+
+int
+socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressLength,
+	net_socket **_acceptedSocket)
+{
+	net_socket *accepted;
+	status_t status = socket->first_info->accept(socket->first_protocol,
+		&accepted);
+	if (status < B_OK)
+		return status;
+
+	if (address && *_addressLength > 0) {
+		memcpy(address, &accepted->peer, min_c(*_addressLength, accepted->peer.ss_len));
+		*_addressLength = accepted->peer.ss_len;
+	}
+
+	*_acceptedSocket = accepted;
+	return B_OK;
+}
+
+
+int
+socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength)
+{
+	sockaddr empty;
+	if (address == NULL) {
+		// special - try to bind to an empty address, like INADDR_ANY
+		memset(&empty, 0, sizeof(sockaddr));
+		empty.sa_len = sizeof(sockaddr);
+		empty.sa_family = socket->family;
+
+		address = &empty;
+		addressLength = sizeof(sockaddr);
+	}
+
+	if (socket->address.ss_len != 0) {
+		status_t status = socket->first_info->unbind(socket->first_protocol,
+			(sockaddr *)&socket->address);
+		if (status < B_OK)
+			return status;
+	}
+
+	memcpy(&socket->address, address, sizeof(sockaddr));
+
+	status_t status = socket->first_info->bind(socket->first_protocol, 
+		(sockaddr *)address);
+	if (status < B_OK) {
+		// clear address again, as binding failed
+		socket->address.ss_len = 0;
+	}
+
+	return status;
+}
+
+
+int
+socket_connect(net_socket *socket, const struct sockaddr *address, socklen_t addressLength)
+{
+	if (address == NULL || addressLength == 0)
+		return ENETUNREACH;
+
+	if (socket->address.ss_len == 0) {
+		// try to bind first
+		status_t status = socket_bind(socket, NULL, 0);
+		if (status < B_OK)
+			return status;
+	}
+
+	return socket->first_info->connect(socket->first_protocol, address);
+}
+
+
+int
+socket_listen(net_socket *socket, int backlog)
+{
+	status_t status = socket->first_info->listen(socket->first_protocol, backlog);
+	if (status == B_OK)
+		socket->options |= SO_ACCEPTCONN;
+
+	return status;
+}
+
+
 //	#pragma mark - datalink
 
 
-struct /*net_datalink_*/module_info gNetDatalinkModule = {
+status_t
+datalink_send_data(struct net_route *route, net_buffer *buffer)
+{
+	return sDomain.module->receive_data(buffer);
+}
+
+
+struct net_route *
+get_route(struct net_domain *_domain, const struct sockaddr *address)
+{
+	static net_route route;
+	route.interface = &gInterface;
+	return &route;
+}
+
+
+net_datalink_module_info gNetDatalinkModule = {
+	{
 		NET_DATALINK_MODULE_NAME,
 		0,
 		std_ops
+	},
+
+	NULL, //datalink_control,
+	datalink_send_data,
+
+	NULL, //is_local_address,
+
+	NULL, //add_route,
+	NULL, //remove_route,
+	get_route,
+	NULL, //put_route,
+	NULL, //register_route_info,
+	NULL, //unregister_route_info,
+	NULL, //update_route_info
 };
 
 
@@ -175,14 +351,14 @@ domain_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 domain_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 
 status_t
 domain_unbind(net_protocol *protocol, struct sockaddr *address)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -212,8 +388,8 @@ status_t
 domain_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
-	puts("domain send routed data!");
-	return B_OK;
+	printf("send routed buffer %p!\n", buffer);
+	return sDomain.module->receive_data(buffer);
 }
 
 
@@ -256,8 +432,7 @@ domain_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 domain_receive_data(net_buffer *buffer)
 {
-	puts("domain receive");
-	return B_OK;
+	return gTCPModule->receive_data(buffer);
 }
 
 
@@ -310,9 +485,53 @@ net_protocol_module_info gDomainModule = {
 //	#pragma mark - test
 
 
+int32
+server_thread(void *)
+{
+	while (true) {
+		// main accept() loop
+		net_socket* connectionSocket;
+		sockaddr_in address;
+		uint32 size = sizeof(struct sockaddr_in);
+		status_t status = socket_accept(&gServerSocket, (struct sockaddr *)&address,
+			&size, &connectionSocket);
+		if (status < B_OK) {
+			fprintf(stderr, "SERVER: accepting failed: %s\n", strerror(status));
+			break;
+		}
+
+		printf("server: got connection from %ld\n", address.sin_addr.s_addr);
+	}
+
+	return 0;
+}
+
+
 static void do_help(int argc, char** argv);
 
+
+static void
+do_connect(int argc, char** argv)
+{
+	int port = 1024;
+	if (argc > 1)
+		port = atoi(argv[1]);
+
+	sockaddr_in address;
+	memset(&address, 0, sizeof(address));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
+	address.sin_addr.s_addr = INADDR_ANY;
+
+	status_t status = socket_connect(&gClientSocket, (struct sockaddr *)&address,
+		sizeof(struct sockaddr));
+	if (status < B_OK)
+		fprintf(stderr, "tcp_tester: could not connect: %s\n", strerror(status));
+}
+
+
 static cmd_entry sBuiltinCommands[] = {
+	{"connect", do_connect, "Connects the client"},
 	{"help", do_help, "prints this help text"},
 	{"quit", NULL, "exits the application"},
 	{NULL, NULL, NULL},
@@ -345,19 +564,54 @@ main(int argc, char** argv)
 	_add_builtin_module((module_info *)&gNetDatalinkModule);
 	_add_builtin_module(modules[0]);
 
-	net_protocol_module_info* tcp;
-	status = get_module("network/protocols/tcp/v1", (module_info **)&tcp);
+	sDomainProtocol.module = &gDomainModule;
+	sockaddr_in interfaceAddress;
+	interfaceAddress.sin_len = sizeof(sockaddr_in);
+	interfaceAddress.sin_family = AF_INET;
+	gInterface.address = (sockaddr*)&interfaceAddress;
+
+	status = get_module("network/protocols/tcp/v1", (module_info **)&gTCPModule);
 	if (status < B_OK) {
 		fprintf(stderr, "tcp_tester: Could not open TCP module: %s\n",
 			strerror(status));
 		return 1;
 	}
 
-	net_socket clientSocket, serverSocket;
-	net_protocol* client = tcp->init_protocol(&clientSocket);
-	net_protocol* server = tcp->init_protocol(&serverSocket);
+	net_protocol* client = init_protocol(gClientSocket);
+	if (client == NULL)
+		return 1;
+	net_protocol* server = init_protocol(gServerSocket);
+	if (server == NULL)
+		return 1;
 
 	printf("*** Server: %p, Client: %p\n", server, client);
+
+	// setup server
+
+	sockaddr_in address;
+	memset(&address, 0, sizeof(address));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(1024);
+	address.sin_addr.s_addr = INADDR_ANY;
+
+	status = socket_bind(&gServerSocket, (struct sockaddr *)&address, sizeof(struct sockaddr));
+	if (status < B_OK) {
+		fprintf(stderr, "tcp_tester: cannot bind server: %s\n", strerror(status));
+		return 1;
+	}
+	status = socket_listen(&gServerSocket, 40);
+	if (status < B_OK) {
+		fprintf(stderr, "tcp_tester: server cannot listen: %s\n", strerror(status));
+		return 1;
+	}
+
+	thread_id serverThread = spawn_thread(server_thread, "server", B_NORMAL_PRIORITY, NULL);
+	if (serverThread < B_OK) {
+		fprintf(stderr, "tcp_tester: cannot start server: %s\n", strerror(serverThread));
+		return 1;
+	}
+
+	resume_thread(serverThread);
 
 	while (true) {
 		printf("> ");
@@ -395,8 +649,8 @@ main(int argc, char** argv)
 		free(argv);
 	}
 
-	tcp->uninit_protocol(server);
-	tcp->uninit_protocol(client);
+	close_protocol(server);
+	close_protocol(client);
 
 	put_module("network/protocols/tcp/v1");
 	uninit_timers();
