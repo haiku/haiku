@@ -168,7 +168,7 @@ public:
 	status_t Init();
 	status_t Uninit();
 
-	void Get();
+	status_t Get();
 	bool Put();
 
 	ModuleAddOn *AddOn() const	{ return fAddOn; }
@@ -188,13 +188,11 @@ Module::Module(ModuleAddOn *addon, module_info *info)
 	  fReferenceCount(0),
 	  fInitialized(false)
 {
-	Init();
 }
 
 // destructor
 Module::~Module()
 {
-	Uninit();
 }
 
 // Init
@@ -222,22 +220,29 @@ Module::Uninit()
 	return error;
 }
 
-// Get
-void
+
+status_t
 Module::Get()
 {
-	if (fAddOn != NULL)
-		fReferenceCount++;
+	if (fReferenceCount == 0) {
+		status_t status = Init();
+		if (status < B_OK)
+			return status;
+	}
+
+	fReferenceCount++;
+	return B_OK;
 }
 
-// Put
+
 bool
 Module::Put()
 {
-	if (fAddOn == NULL)
+	if (--fReferenceCount > 0)
 		return false;
 
-	return (--fReferenceCount == 0 && !(fInfo->flags & B_KEEP_LOADED));
+	Uninit();
+	return fAddOn && !(fInfo->flags & B_KEEP_LOADED);
 }
 
 
@@ -362,36 +367,40 @@ ModuleManager::~ModuleManager()
 		delete module;
 }
 
-// GetModule
+
 status_t
-ModuleManager::GetModule(const char *path, module_info **infop)
+ModuleManager::GetModule(const char *path, module_info **_info)
 {
-	status_t error = (path && infop ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		BAutolock _lock(fModules);
-		Module *module = fModules.FindModule(path);
-		if (!module) {
-			// module not yet loaded, try to get it
-			// get the responsible add-on
-			ModuleAddOn *addon = NULL;
-			error = _GetAddOn(path, &addon);
-			if (error == B_OK) {
-				// add-on found, get the module
-				if (module_info *info = addon->FindModuleInfo(path)) {
-					module = new Module(addon, info);
-					fModules.AddModule(module);
-				} else {
-					_PutAddOn(addon);
-					error = B_ENTRY_NOT_FOUND;
-				}
+	if (path == NULL || _info == NULL)
+		return B_BAD_VALUE;
+
+	BAutolock _lock(fModules);
+	status_t error = B_OK;
+
+	Module *module = fModules.FindModule(path);
+	if (module == NULL) {
+		// module not yet loaded, try to get it
+		// get the responsible add-on
+		ModuleAddOn *addon = NULL;
+		error = _GetAddOn(path, &addon);
+		if (error == B_OK) {
+			// add-on found, get the module
+			if (module_info *info = addon->FindModuleInfo(path)) {
+				module = new Module(addon, info);
+				fModules.AddModule(module);
+			} else {
+				_PutAddOn(addon);
+				error = B_ENTRY_NOT_FOUND;
 			}
 		}
-		// "get" the module
-		if (error == B_OK) {
-			module->Get();
-			*infop = module->Info();
-		}
 	}
+
+	// "get" the module
+	if (error == B_OK)
+		error = module->Get();
+	if (error == B_OK)
+		*_info = module->Info();
+
 	return error;
 }
 
@@ -399,20 +408,22 @@ ModuleManager::GetModule(const char *path, module_info **infop)
 status_t
 ModuleManager::PutModule(const char *path)
 {
-	status_t error = (path ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		BAutolock _lock(fModules);
-		if (Module *module = fModules.FindModule(path)) {
-			if (module->Put()) {
-				ModuleAddOn *addon = module->AddOn();
-				fModules.RemoveModule(module);
-				delete module;
-				_PutAddOn(addon);
-			}
-		} else
-			error = B_BAD_VALUE;
-	}
-	return error;
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	BAutolock _lock(fModules);
+
+	if (Module *module = fModules.FindModule(path)) {
+		if (module->Put()) {
+			ModuleAddOn *addon = module->AddOn();
+			fModules.RemoveModule(module);
+			delete module;
+			_PutAddOn(addon);
+		}
+	} else
+		return B_BAD_VALUE;
+
+	return B_OK;
 }
 
 // GetNextLoadedModuleName
@@ -607,10 +618,10 @@ _add_builtin_module(module_info *info)
 
 // get_module
 status_t
-get_module(const char *path, module_info **vec)
+get_module(const char *path, module_info **_info)
 {
 	TRACE(("get_module(`%s')\n", path));
-	return ModuleManager::Default()->GetModule(path, vec);
+	return ModuleManager::Default()->GetModule(path, _info);
 }
 
 // put_module
