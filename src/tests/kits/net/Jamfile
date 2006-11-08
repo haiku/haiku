@@ -2,6 +2,12 @@ SubDir HAIKU_TOP src tests kits net ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders net ;
+
 # bonefish: Tried to get the first test compiling. It complained about not
 # being able to find some headers, thus I added the respective include dirs
 # until it was asking for headers we currently don't have
@@ -18,6 +24,40 @@ SimpleTest udp_server : udp_server.c : $(NETWORK_LIBS) ;
 
 SimpleTest tcp_server : tcp_server.c : $(NETWORK_LIBS) ;
 SimpleTest tcp_client : tcp_client.c : $(NETWORK_LIBS) ;
+
+SimpleTest tcp_tester :
+	tcp_tester.cpp
+	
+	# stack
+	net_buffer.cpp
+	utility.cpp
+
+	# tcp
+	tcp.cpp
+	TCPConnection.cpp
+
+	# misc
+	argv.c
+	ipv4_address.cpp
+
+	: libkernelland_emu.so
+;
+
+SEARCH on [ FGristFiles 
+		tcp.cpp TCPConnection.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
+
+SEARCH on [ FGristFiles 
+		ipv4_address.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ipv4 ] ;
+
+SEARCH on [ FGristFiles 
+		net_buffer.cpp utility.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
+
+SEARCH on [ FGristFiles 
+		argv.c
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
 
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
