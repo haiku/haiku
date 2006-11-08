@@ -2,12 +2,12 @@ SubDir HAIKU_TOP src tests add-ons kernel ;
 
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders shared ;
-SubDirHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
-SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 SharedLibrary libkernelland_emu.so :
 	kernelland_emu.cpp
 	strlcpy.c
+	khash.c
 	lock.c
 	list.c
 
@@ -25,7 +25,7 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(HAIKU_TOP) src system kernel ] ;
 
 SEARCH on [ FGristFiles
-		list.c
+		list.c khash.c
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 # SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner ;
