@@ -2156,10 +2156,10 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 		deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
 
 	data = GetTrackerResources()->
-		LoadResource(B_RAW_TYPE, kResDeskIcon, &size);
+		LoadResource(B_VECTOR_ICON_TYPE, kResDeskIcon, &size);
 
 	if (data)
-		deskDir->WriteAttr(kAttrIcon, B_RAW_TYPE, 0, data, size);
+		deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
 
 	return B_OK;
 }
@@ -2658,9 +2658,9 @@ FSCreateTrashDirs()
 					data, size);
 			}
 			data = GetTrackerResources()->
-				LoadResource(B_RAW_TYPE, kResTrashIcon, &size);
+				LoadResource(B_VECTOR_ICON_TYPE, kResTrashIcon, &size);
 			if (data) {
-				trashDir.WriteAttr(kAttrIcon, B_RAW_TYPE, 0,
+				trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
 					data, size);
 			}
 		}

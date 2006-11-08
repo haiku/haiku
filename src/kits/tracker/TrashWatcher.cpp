@@ -177,9 +177,8 @@ BTrashWatcher::UpdateTrashIcons()
 		if (vectorData)
 			trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
 				vectorData, vectorSize);
-// TODO: enable me once the vector icon is indeed in the resources
-//		else
-//			TRESPASS();
+		else
+			TRESPASS();
 #endif
 
 		if (largeData) 
