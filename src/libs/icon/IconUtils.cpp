@@ -113,8 +113,7 @@ bigtime_t startTime = system_time();
 	if (ret < B_OK)
 		return ret;
 
-	type_code attrType = B_RAW_TYPE;
-		// TODO: introduce special type?
+	type_code attrType = B_VECTOR_ICON_TYPE;
 
 	if (attrInfo.type != attrType)
 		return B_BAD_TYPE;
