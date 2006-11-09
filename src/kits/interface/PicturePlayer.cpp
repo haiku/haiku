@@ -63,12 +63,12 @@ PicturePlayer::GetOp()
 }
 
 
-bool
-PicturePlayer::GetBool()
+int8
+PicturePlayer::GetInt8()
 {
-	bool data;
+	int8 data;
 
-	fData.Read(&data, sizeof(bool));
+	fData.Read(&data, sizeof(int8));
 	
 	return data;
 }
@@ -169,6 +169,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_BPoint)callBackTable[1])(userData, where);
 				break;
 			}
+
 			case B_PIC_STROKE_LINE:
 			{
 				BPoint start = GetCoord();
@@ -176,18 +177,21 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_BPointBPoint)callBackTable[2])(userData, start, end);
 				break;
 			}
+
 			case B_PIC_STROKE_RECT:
 			{
 				BRect rect = GetRect();
 				((fnc_BRect)callBackTable[3])(userData, rect);
 				break;
 			}
+
 			case B_PIC_FILL_RECT:
 			{
 				BRect rect = GetRect();
 				((fnc_BRect)callBackTable[4])(userData, rect);
 				break;
 			}
+
 			case B_PIC_STROKE_ROUND_RECT:
 			{
 				BRect rect = GetRect();
@@ -195,6 +199,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_BRectBPoint)callBackTable[5])(userData, rect, radii);
 				break;
 			}
+
 			case B_PIC_FILL_ROUND_RECT:
 			{
 				BRect rect = GetRect();
@@ -202,6 +207,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_BRectBPoint)callBackTable[6])(userData, rect, radii);
 				break;
 			}
+
 			case B_PIC_STROKE_BEZIER:
 			{
 				BPoint control[4];
@@ -209,6 +215,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_PBPoint)callBackTable[7])(userData, control);
 				break;
 			}
+
 			case B_PIC_FILL_BEZIER:
 			{
 				BPoint control[4];
@@ -216,6 +223,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_PBPoint)callBackTable[8])(userData, control);
 				break;
 			}
+
 			case B_PIC_STROKE_ARC:
 			{
 				BPoint center = GetCoord();
@@ -226,6 +234,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 					startTheta, arcTheta);
 				break;
 			}
+
 			case B_PIC_FILL_ARC:
 			{
 				BPoint center = GetCoord();
@@ -236,6 +245,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 					startTheta, arcTheta);
 				break;
 			}
+
 			case B_PIC_STROKE_ELLIPSE:
 			{
 				BRect rect = GetRect();
@@ -244,6 +254,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_BPointBPoint)callBackTable[11])(userData, center, radii);
 				break;
 			}
+
 			case B_PIC_FILL_ELLIPSE:
 			{
 				BRect rect = GetRect();
@@ -252,16 +263,18 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_BPointBPoint)callBackTable[12])(userData, center, radii);
 				break;
 			}
+
 			case B_PIC_STROKE_POLYGON:
 			{
 				int32 numPoints = GetInt32();
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
-				bool isClosed = GetBool();
+				bool isClosed = (bool)GetInt8();
 				((fnc_iPBPointb)callBackTable[13])(userData, numPoints, points, isClosed);
 				delete[] points;
 				break;
 			}
+
 			case B_PIC_FILL_POLYGON:
 			{
 				int32 numPoints = GetInt32();
@@ -271,50 +284,30 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				delete[] points;
 				break;
 			}
+
 			case B_PIC_STROKE_SHAPE:
-			{
-				BRect shapeFrame = GetRect();
-				(void)shapeFrame;
-
-				int32 opCount, ptCount;
-				opCount = GetInt32();
-				ptCount = GetInt32();
-
-				uint32 *opList = new uint32[opCount];
-				BPoint *ptList = new BPoint[ptCount];
-				GetData(opList, opCount * sizeof(uint32));
-				GetData(ptList, ptCount * sizeof(BPoint));
-
-				BShape shape;
-				shape.SetData(opCount, ptCount, opList, ptList);
-
-				((fnc_BShape)callBackTable[15])(userData, &shape);
-				delete[] opList;
-				delete[] ptList;
-				break;
-			}
 			case B_PIC_FILL_SHAPE:
 			{
-				BRect shapeFrame = GetRect();
-				(void)shapeFrame;
-				
-				int32 opCount, ptCount;
-				opCount = GetInt32();
-				ptCount = GetInt32();
-
+				int32 opCount = GetInt32();
 				uint32 *opList = new uint32[opCount];
-				BPoint *ptList = new BPoint[ptCount];
 				GetData(opList, opCount * sizeof(uint32));
+				
+				int32 ptCount = GetInt32();
+				BPoint *ptList = new BPoint[ptCount];
 				GetData(ptList, ptCount * sizeof(BPoint));
 
 				BShape shape;
 				shape.SetData(opCount, ptCount, opList, ptList);
 
-				((fnc_BShape)callBackTable[16])(userData, &shape);
+				const int32 tableIndex = (op == B_PIC_STROKE_SHAPE) ? 15 : 16;
+				((fnc_BShape)callBackTable[tableIndex])(userData, &shape);
+				
 				delete[] opList;
 				delete[] ptList;
+
 				break;
 			}
+			
 			case B_PIC_DRAW_STRING:
 			{
 				int32 len = GetInt32();
@@ -327,6 +320,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				delete[] string;
 				break;
 			}
+
 			case B_PIC_DRAW_PIXELS:
 			{
 				BRect src = GetRect();
@@ -336,68 +330,81 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				int32 bytesPerRow = GetInt32();
 				int32 pixelFormat = GetInt32();
 				int32 flags = GetInt32();
-				char *data = new char[size - (fData.Position() - pos)];
-				GetData(data, size - (fData.Position() - pos));
+				int32 length = GetInt32();
+				char *data = new char[length];
+				GetData(data, length);
 				((fnc_DrawPixels)callBackTable[18])(userData, src, dest,
 					width, height, bytesPerRow, pixelFormat, flags, data);
 				delete[] data;
 				break;
 			}
+
 			case B_PIC_DRAW_PICTURE:
 			{
 				break;
 			}
 			
-			case B_PIC_ENTER_STATE_CHANGE:
-			{
-				break;
-			}
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
 				break;
 			}
+
 			case B_PIC_CLEAR_CLIPPING_RECTS:
 			{
 				((fnc_PBRecti)callBackTable[20])(userData, NULL, 0);
 				break;
 			}
+
 			case B_PIC_CLIP_TO_PICTURE:
 			{
 				break;
 			}
+
 			case B_PIC_PUSH_STATE:
 			{
 				((fnc)callBackTable[22])(userData);
 				break;
 			}
+
 			case B_PIC_POP_STATE:
 			{
 				((fnc)callBackTable[23])(userData);
 				break;
 			}
+
+			case B_PIC_ENTER_STATE_CHANGE:
+			{
+				((fnc)callBackTable[24])(userData);
+				break;
+			}
+
 			case B_PIC_ENTER_FONT_STATE:
 			{
 				((fnc)callBackTable[26])(userData);
 				break;
 			}
+
 			case B_PIC_SET_ORIGIN:
 			{
 				BPoint pt = GetCoord();
 				((fnc_BPoint)callBackTable[28])(userData, pt);
 				break;
 			}
+
 			case B_PIC_SET_PEN_LOCATION:
 			{
 				BPoint pt = GetCoord();
 				((fnc_BPoint)callBackTable[29])(userData, pt);
 				break;
 			}
+
 			case B_PIC_SET_DRAWING_MODE:
 			{
 				int16 mode = GetInt16();
 				((fnc_s)callBackTable[30])(userData, mode);
 				break;
 			}
+
 			case B_PIC_SET_LINE_MODE:
 			{
 				int16 capMode = GetInt16();
@@ -406,24 +413,28 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_ssf)callBackTable[31])(userData, capMode, joinMode, miterLimit);
 				break;
 			}
+
 			case B_PIC_SET_PEN_SIZE:
 			{
 				float size = GetFloat();
 				((fnc_f)callBackTable[32])(userData, size);
 				break;
 			}
+
 			case B_PIC_SET_FORE_COLOR:
 			{			
 				rgb_color color = GetColor();
 				((fnc_Color)callBackTable[33])(userData, color);
 				break;
 			}
+
 			case B_PIC_SET_BACK_COLOR:
 			{			
 				rgb_color color = GetColor();
 				((fnc_Color)callBackTable[34])(userData, color);
 				break;
 			}
+
 			case B_PIC_SET_STIPLE_PATTERN:
 			{
 				pattern p;
@@ -431,12 +442,14 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_Pattern)callBackTable[35])(userData, p);
 				break;
 			}
+
 			case B_PIC_SET_SCALE:
 			{
 				float scale = GetFloat();
 				((fnc_f)callBackTable[36])(userData, scale);
 				break;
 			}
+
 			case B_PIC_SET_FONT_FAMILY:
 			{
 				int32 len = GetInt32();
@@ -447,6 +460,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				delete[] string;
 				break;
 			}
+
 			case B_PIC_SET_FONT_STYLE:
 			{
 				int32 len = GetInt32();
@@ -457,30 +471,35 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				delete[] string;
 				break;
 			}
+
 			case B_PIC_SET_FONT_SPACING:
 			{
 				int32 spacing = GetInt32();
 				((fnc_i)callBackTable[39])(userData, spacing);
 				break;
 			}
+
 			case B_PIC_SET_FONT_SIZE:
 			{
 				float size = GetFloat();
 				((fnc_f)callBackTable[40])(userData, size);
 				break;
 			}
+
 			case B_PIC_SET_FONT_ROTATE:
 			{
 				float rotation = GetFloat();
 				((fnc_f)callBackTable[41])(userData, rotation);
 				break;
 			}
+
 			case B_PIC_SET_FONT_ENCODING:
 			{
 				int32 encoding = GetInt32();
 				((fnc_i)callBackTable[42])(userData, encoding);
 				break;
 			}
+
 			case B_PIC_SET_FONT_FLAGS:
 			{
 				int32 flags = GetInt32();
@@ -494,6 +513,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_f)callBackTable[44])(userData, shear);
 				break;
 			}
+
 			case B_PIC_SET_FONT_FACE:
 			{
 				int32 flags = GetInt32();
@@ -510,13 +530,14 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_ss)callBackTable[47])(userData, alphaSrcMode, alphaFncMode);
 				break;
 			}
+
 			default:
 				break;
 		}
 
 		// If we didn't read enough bytes, skip them. This is not a error
 		// since the instructions can change over time.
-		if (fData.Position() - pos < size)
+		if (op != B_ENTER_STATE_CHANGE && op != B_ENTER_FONT_STATE && fData.Position() - pos < size)
 			fData.Seek(size - (fData.Position() - pos), SEEK_CUR);
 
 		// TODO: what if too much was read, should we return B_ERROR?

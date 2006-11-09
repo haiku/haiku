@@ -2331,6 +2331,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			break;
 		}
+
 		case AS_LAYER_PUSH_STATE:
 		{
 			picture->BeginOp(B_PIC_PUSH_STATE);
@@ -2404,6 +2405,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			break;
 		}
+
 		case AS_STROKE_ELLIPSE:
 		case AS_FILL_ELLIPSE:
 		{
@@ -2416,6 +2418,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			break;
 		}
+
 		case AS_STROKE_ARC:
 		case AS_FILL_ARC:
 		{
@@ -2436,6 +2439,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			break;
 		}
+
 		case AS_STROKE_LINE:
 		{
 			float x1, y1, x2, y2;
@@ -2539,14 +2543,14 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			uint32 *opList = new(nothrow) uint32[opCount];
 			BPoint *ptList = new(nothrow) BPoint[ptCount];
-			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
-				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
+			if (opList != NULL && ptList != NULL
+				&& link.Read(opList, opCount * sizeof(uint32)) >= B_OK
+				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
 				
 				picture->BeginOp(code == AS_FILL_SHAPE ? B_PIC_FILL_SHAPE : B_PIC_STROKE_SHAPE);
-				picture->AddRect(shapeFrame);
 				picture->AddInt32(opCount);
-				picture->AddInt32(ptCount);
 				picture->AddData(opList, opCount * sizeof(uint32));
+				picture->AddInt32(ptCount);
 				picture->AddData(ptList, ptCount * sizeof(BPoint));
 				picture->EndOp();
 			}
@@ -2579,6 +2583,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->AddInt32(bitmap->BytesPerRow());
 			picture->AddInt32(bitmap->ColorSpace());
 			picture->AddInt32(/*bitmap->Flags()*/0);
+			picture->AddInt32(bitmap->BitsLength());
 			picture->AddData((void *)bitmap->Bits(), bitmap->BitsLength());
 			picture->EndOp();
 

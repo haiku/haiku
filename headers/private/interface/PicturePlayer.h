@@ -26,8 +26,7 @@ public:
 virtual				~PicturePlayer();
 
 		int16		GetOp();
-		bool		GetBool();
-		int16		GetInt8();
+		int8		GetInt8();
 		int16		GetInt16();
 		int32		GetInt32();
 		int64		GetInt64();
