@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-       "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 
 <head>
@@ -25,7 +24,7 @@ Please be aware that Haiku users feel very strong about a consistent look. The m
 <p align="justify">
 Haiku icons inherit the perspective of the BeOS icons and add some of their own. If you imagine a cube sitting on the floor, let's define the angles of its edges: The line where the left front side and the floor meet has an angle such that for every two pixels it goes to the right, it goes one pixel down. The line of the right side meeting the floor goes one pixel up for every pixel going right. Lines pointing up are straight without any angle to help make the icons crisper (realistically, icons should be wider at the top but they aren't).
 
-<img src="perspective.png" border="0" align="right" hspacing="10" vspacing="5">
+<img src="perspective.png" border="0" align="right" hspace="10" vspace="5">
 
 The perspective that Haiku icons add to the original BeOS look comes from tweaking lines that do not touch the floor (and don't point up) to add a somewhat more dramatic perspective. So edges of the objects corner being closest to the viewer and on the floor still follow the BeOS perspective with the angles described above, all other edges are slightly tweaked to break free of the strict isometric look. The most important thing is still crispness, that's why there is no <i>strictly</i> defined perspective. Don't exaggerate too much, try to make it fit with the rest of the icons. It is sometimes easiest to design an icon with the consequent isometric look first and tweaking for perspective as the last step of work. Also, keeping the perspective consistent and correct looking throughout the icon is desirable.
 </p>
@@ -50,7 +49,7 @@ As a general rule, surfaces facing towards the viewer should be lighter at the t
 
 <p align="justify">
 Colors are obviously a tough subject.
-<img src="trash_full_64.png" align="right" hspacing="10" vspacing="5">
+<img src="trash_full_64.png" align="right" hspace="20" vspace="5">
 At the moment, there is not a color palette defined from which you should pick the dominant colors of your icon. In the existing icons, <i>clean</i> colors are almost completely avoided, with the exception of grays, which are not toned in any way. Most dominant colors appear quite saturated somewhere in the icon. But the colors are always a mixture, never straight red, green or blue. Where they fade into a lighter tone, they are mostly desaturated and pastellic. In the shade, the colors are mostly still saturated, aiming for a believable lighting, but colors can vary in tone, to give the appearance of a warmer or colder light condition in the shadow. Which mostly depends on the overall coloring of the icon and gut feeling.
 </p>
 
@@ -58,8 +57,8 @@ At the moment, there is not a color palette defined from which you should pick t
 <h3>Shadows</h3>
 
 <p align="justify">
-<img src="fonts_64.png" align="left" hspacing="10" vspacing="5">
-<img src="expander_64.png" align="left" hspacing="10" vspacing="5">
+<img src="fonts_64.png" align="left" vspace="5">
+<img src="expander_64.png" align="left" hspace="20" vspace="5">
 
 First of all, a shadow is the silhouette of a body as seen from the lightsource. Cast onto the flat floor, the shadow is subject to distortion because of the viewers perspective. Selfshadowing on the icon objects is encouraged, because it can improve contrast. Sometimes, it works good to use gradients for these. A naturalistic shadow is preferred, unless it gets too complicated and would distract from the main icon. The people icon is one example for a simplified shadow shape. Shadows that are cut off at the right boundary of the icon are discouraged. Leave enough room for the shadow. It is not so important that the shadows have approximately the same length throughout all icons, but they all need to be the same direction, which is straight horizontally.
 </p>
@@ -70,7 +69,7 @@ First of all, a shadow is the silhouette of a body as seen from the lightsource.
 <p align="justify">
 Haiku icons use a main black outline at least around the silhouette of the icon's shape. The outline is 1 pixel wide at 32x32 size. If shapes within the icon overlap each other, they can be separated by an outline as well, but don't overuse outlines. Not every edge gets one, or the icon will look too complicated. In comparison to BeOS, Haiku icons use less outlines. The Magnify icon is a good example of this.
 
-<img src="workspaces_32.png" align="right" hspacing="10" vspacing="5">
+<img src="workspaces_32.png" align="right" hspace="10" vspace="5">
 
 Outlines help emphasize the silhouette of an object, so skip outlines that would work against this idea. If a certain feature of an icon is not to be emphasised as much as a black outline would do, such outlines can be dark versions of the color used for the surface they enclose. An example is the Folder and the Workspaces icon. In the Workspaces icon, the foot of the lamp is too small to justify a black outline, in the Folder icon, the paper sheets should appear thin.
 </p>
