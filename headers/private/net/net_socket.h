@@ -36,6 +36,13 @@ typedef struct net_socket {
 	}						send, receive;
 
 	// TODO: could be moved into a private structure
+	struct net_socket		*parent;
+	struct list_link		link;
+	uint32					max_backlog;
+	uint32					child_count;
+	struct list				pending_children;
+	struct list				connected_children;
+
 	status_t				error;
 	struct select_sync_pool	*select_pool;
 	benaphore				lock;
@@ -60,6 +67,13 @@ struct net_socket_module_info {
 	status_t	(*send_data)(net_socket *socket, net_buffer *buffer);
 	status_t	(*receive_data)(net_socket *socket, size_t length, uint32 flags,
 					net_buffer **_buffer);
+
+	// connections
+	status_t	(*spawn_pending_socket)(net_socket *parent, net_socket **_socket);
+	void		(*delete_socket)(net_socket *socket);
+	status_t	(*dequeue_connected)(net_socket *parent, net_socket **_socket);
+	status_t	(*set_max_backlog)(net_socket *socket, uint32 backlog);
+	status_t	(*set_connected)(net_socket *socket);
 
 	// notifications
 	status_t	(*request_notification)(net_socket *socket, uint8 event, uint32 ref,

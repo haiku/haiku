@@ -21,8 +21,11 @@
 #include <string.h>
 
 
+void socket_delete(net_socket *socket);
+
+
 status_t
-create_socket(int family, int type, int protocol, net_socket **_socket)
+socket_create(int family, int type, int protocol, net_socket **_socket)
 {
 	struct net_socket *socket = new (std::nothrow) net_socket;
 	if (socket == NULL)
@@ -84,13 +87,11 @@ status_t
 socket_free(net_socket *socket)
 {
 	status_t status = socket->first_info->free(socket->first_protocol);
+	if (status == B_BUSY)
+		return B_OK;
 
-	put_domain_protocols(socket);
-	benaphore_destroy(&socket->lock);
-	delete_select_sync_pool(socket->select_pool);
-	delete socket;
-
-	return status;
+	socket_delete(socket);
+	return B_OK;
 }
 
 
@@ -180,6 +181,114 @@ socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 {
 	return socket->first_info->read_data(socket->first_protocol,
 		length, flags, _buffer);
+}
+
+
+//	#pragma mark - connections
+
+
+status_t
+socket_spawn_pending(net_socket *parent, net_socket **_socket)
+{
+	net_socket *socket;
+	status_t status = socket_create(parent->family, parent->type, parent->protocol, &socket);
+	if (status < B_OK)
+		return status;
+
+	// inherit parent's properties
+	socket->send = parent->send;
+	socket->receive = parent->receive;
+	socket->options = parent->options;
+	socket->linger = parent->linger;
+	memcpy(&socket->address, &parent->address, parent->address.ss_len);
+	memcpy(&socket->peer, &parent->peer, parent->peer.ss_len);
+
+	// add to the parent's list of pending connections
+	list_add_item(&parent->pending_children, socket);
+	parent->child_count++;
+
+	*_socket = socket;
+	return B_OK;
+}
+
+
+void
+socket_delete(net_socket *socket)
+{
+	if (socket->parent != NULL)
+		panic("socket still has a parent!");
+
+	put_domain_protocols(socket);
+	benaphore_destroy(&socket->lock);
+	delete_select_sync_pool(socket->select_pool);
+	delete socket;
+}
+
+
+status_t
+socket_dequeue_connected(net_socket *parent, net_socket **_socket)
+{
+	benaphore_lock(&parent->lock);
+
+	net_socket *socket = (net_socket *)list_remove_head_item(&parent->connected_children);
+	if (socket != NULL) {
+		socket->parent = NULL;
+		parent->child_count--;
+		*_socket = socket;
+	}
+
+	benaphore_unlock(&parent->lock);
+	return socket != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+socket_set_max_backlog(net_socket *socket, uint32 backlog)
+{
+	// we enforce an upper limit of connections waiting to be accepted
+	if (backlog > 256)
+		backlog = 256;
+
+	benaphore_lock(&socket->lock);
+
+	// first remove the pending connections, then the already connected ones as needed	
+	net_socket *child;
+	while (socket->child_count > backlog
+		&& (child = (net_socket *)list_remove_tail_item(&socket->pending_children)) != NULL) {
+		child->parent = NULL;
+		socket->child_count--;
+	}
+	while (socket->child_count > backlog
+		&& (child = (net_socket *)list_remove_tail_item(&socket->connected_children)) != NULL) {
+		child->parent = NULL;
+		socket_delete(child);
+		socket->child_count--;
+	}
+
+	socket->max_backlog = backlog;
+	benaphore_unlock(&socket->lock);
+	return B_OK;
+}
+
+
+/*!
+	The socket has been connected. It will be moved to the connected queue
+	of its parent socket.
+*/
+status_t
+socket_connected(net_socket *socket)
+{
+	net_socket *parent = socket->parent;
+	if (parent == NULL)
+		return B_BAD_VALUE;
+
+	benaphore_lock(&parent->lock);
+
+	list_remove_item(&parent->pending_children, socket);
+	list_add_item(&parent->connected_children, socket);
+
+	benaphore_unlock(&parent->lock);
+	return B_OK;
 }
 
 
@@ -676,7 +785,7 @@ net_socket_module_info gNetSocketModule = {
 		0,
 		socket_std_ops
 	},
-	create_socket,
+	socket_create,
 	socket_close,
 	socket_free,
 
@@ -689,6 +798,13 @@ net_socket_module_info gNetSocketModule = {
 
 	socket_send_data,
 	socket_receive_data,
+
+	// connections
+	socket_spawn_pending,
+	socket_delete,
+	socket_dequeue_connected,
+	socket_set_max_backlog,
+	socket_connected,
 
 	// notifications
 	socket_request_notification,
