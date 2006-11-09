@@ -5,6 +5,17 @@
 #include <View.h>
 #include <Window.h>
 
+#include "SVGViewView.h"
+
+class Svg2PictureWindow : public BWindow {
+public:
+	Svg2PictureWindow(BRect frame, const char *filename)
+		:   BWindow(frame, "Svg2Picture", B_TITLED_WINDOW, 0) {
+        
+        	BView *view = new Svg2PictureView(Bounds(), filename);
+        	AddChild(view);
+	}
+};
 
 class OriginalView : public BBox {
 public:
@@ -117,6 +128,9 @@ main()
 				"BPicture test", B_TITLED_WINDOW,
 				B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_QUIT_ON_WINDOW_CLOSE);
 	
+	BWindow *svgWindow = new Svg2PictureWindow(BRect(300, 300, 600, 600), "/boot/beos/etc/artwork/lion.svg");
+	
+	
 	BRect rect(pictureWindow->Bounds());
 	rect.right -= (rect.Width() + 1) / 2;
 	OriginalView *testView = new OriginalView(rect);
@@ -128,7 +142,8 @@ main()
 	pictureWindow->AddChild(pictureView);
 	
 	pictureWindow->Show();
-	
+	svgWindow->Show();
+
 	pictureApp.Run();
 	
 	return 0;

@@ -1,6 +1,25 @@
 SubDir HAIKU_TOP src tests kits interface picture ;
 
+# libicon.a source directories
+local iconSourceDirs =
+	icon
+	icon/flat_icon
+	icon/shape
+	icon/style
+	icon/transformable
+	icon/transformer
+;
+
+local iconSourceDir ;
+for iconSourceDir in $(iconSourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs $(iconSourceDir) ] ;
+}
+
+# system headers
+UseLibraryHeaders agg expat ;
+
 SimpleTest PictureTest :
 	PictureTest.cpp
-	: be
+	SVGViewView.cpp
+	: be translation libexpat.a
 	;	
