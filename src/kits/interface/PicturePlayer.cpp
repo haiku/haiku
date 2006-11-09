@@ -537,7 +537,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 		// If we didn't read enough bytes, skip them. This is not a error
 		// since the instructions can change over time.
-		if (op != B_ENTER_STATE_CHANGE && op != B_ENTER_FONT_STATE && fData.Position() - pos < size)
+		if (op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE && fData.Position() - pos < size)
 			fData.Seek(size - (fData.Position() - pos), SEEK_CUR);
 
 		// TODO: what if too much was read, should we return B_ERROR?
