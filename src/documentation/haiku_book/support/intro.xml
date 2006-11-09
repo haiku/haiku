@@ -26,9 +26,14 @@
 					<listitem><para> BMemoryIO and BMallocIO </para></listitem>
 				</itemizedlist>
 			</para></listitem>
-			<listitem><para> BBlockCache </para></listitem>
-			<listitem><para> BList </para></listitem>
-			<listitem><para> BString </para></listitem>
+			<listitem><para>
+				Container classes:
+				<itemizedlist>
+					<listitem><para> BBlockCache </para></listitem>
+					<listitem><para> <link linkend="blist">BList</link></para></listitem>
+					<listitem><para> BString </para></listitem>
+				</itemizedlist>
+			</para></listitem>
 			<listitem><para> BStopWatch </para></listitem>
 			<listitem><para> Common types and constants </para></listitem>
 			<listitem><para> Error codes for all kits </para></listitem>

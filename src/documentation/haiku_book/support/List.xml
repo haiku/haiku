@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="blist">
+	<title>BList</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/List.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+			
+	<para>BList is a is a simple ordered list of data pointers.</para>
+
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	
+	<sect3 id="blist_constructor">
+		<title>BList()</title>
+		
+		<methodsynopsis>
+			<void/><methodname>BList</methodname>
+			<methodparam><type>int32</type><parameter>count</parameter><initializer>20</initializer></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<void/><methodname>BList</methodname>
+			<methodparam><modifier>const</modifier><type>BList &amp;</type><parameter>list</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_destructor">
+		<title>~BList()</title>
+		
+		<methodsynopsis>
+			<void/><methodname>~BList</methodname>
+		</methodsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="blist_additem">
+		<title>AddItem()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>AddItem</methodname>
+			<methodparam><type>void *</type><parameter>item</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>AddItem</methodname>
+			<methodparam><type>void *</type><parameter>item</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_addlist">
+		<title>AddList()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>AddList</methodname>
+			<methodparam><modifier>const</modifier><type>BList *</type><parameter>list</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>AddList</methodname>
+			<methodparam><modifier>const</modifier><type>BList *</type><parameter>list</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_countitems">
+		<title>CountItems()</title>
+		
+		<methodsynopsis>
+			<type>int32</type><methodname>CountItems</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_doforeach">
+		<title>DoForEach()</title>
+		
+		<methodsynopsis>
+			<void/><methodname>DoForEach</methodname>
+			<methodparam><type>bool</type><parameter>(*func)(void *)</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<void/><methodname>DoForEach</methodname>
+			<methodparam><type>bool</type><parameter>(*func)(void *, void *)</parameter></methodparam>
+			<methodparam><type>void *</type><parameter>arg2</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_firstitem">
+		<title>FirstItem()</title>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>FirstItem()</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_hasitem">
+		<title>HasItem()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>HasItem</methodname>
+			<methodparam><type>void *</type><parameter>item</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_indexof">
+		<title>IndexOf()</title>
+		
+		<methodsynopsis>
+			<type>int32</type><methodname>IndexOf</methodname>
+			<methodparam><type>void *</type><parameter>item</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_itemat">
+		<title>ItemAt()</title>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>ItemAt</methodname>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>ItemAtFast</methodname>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_itematfast">
+		<title>ItemAtFast()</title>
+		
+		<para>See ItemAt()</para>
+	</sect3>
+	
+	<sect3 id="blist_items">
+		<title>Items()</title>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>Items</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_isempty">
+		<title>IsEmpty</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>IsEmpty</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_lastitem">
+		<title>LastItem()</title>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>LastItem</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_moveitem">
+		<title>MoveItem()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>MoveItem</methodname>
+			<methodparam><type>int32</type><parameter>fromIndex</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>toIndex</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_removeitem">
+		<title>RemoveItem()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>RemoveItem</methodname>
+			<methodparam><type>void *</type><parameter>item</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>RemoveItem</methodname>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>RemoveItems</methodname>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>count</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_removeitems">
+		<title>RemoveItems()</title>
+		
+		<para>See RemoveItem()</para>
+	</sect3>
+	
+	<sect3 id="blist_replaceitem">
+		<title>ReplaceItem()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>ReplaceItem</methodname>
+			<methodparam><type>int32</type><parameter>index</parameter></methodparam>
+			<methodparam><type>void *</type><parameter>newItem</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_sortitems">
+		<title>SortItems()</title>
+		
+		<methodsynopsis>
+			<void/><methodname>SortItems</methodname>
+			<methodparam><type>int</type><parameter>(int (*compareFunc)(const void *, const void *)</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_swapitems">
+		<title>SwapItems()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>SwapItems</methodname>
+			<methodparam><type>int32</type><parameter>indexA</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>indexB</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+</sect2>

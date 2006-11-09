@@ -4,5 +4,6 @@
 	<title>The Support Kit</title>
 
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="support/intro.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="support/api.xml" />
 </chapter>
 
