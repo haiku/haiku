@@ -156,7 +156,7 @@ handle_signals(struct thread *thread)
 				case SIGVTALRM:
 				case SIGXCPU:
 				case SIGXFSZ:
-					TRACE(("Shutting down thread 0x%lx due to signal #%d\n",
+					TRACE(("Shutting down thread 0x%lx due to signal #%ld\n",
 						thread->id, signal));
 				case SIGKILL:
 				case SIGKILLTHR:
