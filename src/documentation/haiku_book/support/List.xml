@@ -16,23 +16,23 @@
 	<sect3 id="blist_constructor">
 		<title>BList()</title>
 		
-		<methodsynopsis>
-			<void/><methodname>BList</methodname>
+		<constructorsynopsis>
+			<methodname>BList</methodname>
 			<methodparam><type>int32</type><parameter>count</parameter><initializer>20</initializer></methodparam>
-		</methodsynopsis>
+		</constructorsynopsis>
 		
-		<methodsynopsis>
-			<void/><methodname>BList</methodname>
+		<constructorsynopsis>
+			<methodname>BList</methodname>
 			<methodparam><modifier>const</modifier><type>BList &amp;</type><parameter>list</parameter></methodparam>
-		</methodsynopsis>
+		</constructorsynopsis>
 	</sect3>
 	
 	<sect3 id="blist_destructor">
 		<title>~BList()</title>
 		
-		<methodsynopsis>
-			<void/><methodname>~BList</methodname>
-		</methodsynopsis>
+		<destructorsynopsis>
+			<methodname>~BList</methodname>
+		</destructorsynopsis>
 	</sect3>
 	
 	<bridgehead renderas="sect2">Member Functions</bridgehead>
