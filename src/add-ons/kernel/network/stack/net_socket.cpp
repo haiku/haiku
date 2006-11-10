@@ -389,6 +389,9 @@ int
 socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressLength,
 	net_socket **_acceptedSocket)
 {
+	if ((socket->options & SO_ACCEPTCONN) == 0)
+		return B_BAD_VALUE;
+
 	net_socket *accepted;
 	status_t status = socket->first_info->accept(socket->first_protocol,
 		&accepted);
