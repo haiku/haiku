@@ -13,6 +13,7 @@
 #include <net_stack.h>
 
 #include <KernelExport.h>
+#include <util/AutoLock.h>
 #include <util/list.h>
 #include <fs/select_sync_pool.h>
 
@@ -190,6 +191,14 @@ socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 status_t
 socket_spawn_pending(net_socket *parent, net_socket **_socket)
 {
+	BenaphoreLocker locker(parent->lock);
+
+	// We actually accept more pending connections to compensate for those
+	// that never complete, and also make sure at least a single connection
+	// can always be accepted
+	if (parent->child_count > 3 * parent->max_backlog / 2)
+		return ENOBUFS;
+
 	net_socket *socket;
 	status_t status = socket_create(parent->family, parent->type, parent->protocol, &socket);
 	if (status < B_OK)
@@ -198,7 +207,7 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 	// inherit parent's properties
 	socket->send = parent->send;
 	socket->receive = parent->receive;
-	socket->options = parent->options;
+	socket->options = parent->options & ~SO_ACCEPTCONN;
 	socket->linger = parent->linger;
 	memcpy(&socket->address, &parent->address, parent->address.ss_len);
 	memcpy(&socket->peer, &parent->peer, parent->peer.ss_len);
