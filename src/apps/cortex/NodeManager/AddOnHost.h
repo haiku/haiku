@@ -50,3 +50,4 @@ private:											// implementation
 
 __END_CORTEX_NAMESPACE
 #endif /*__NodeManager_AddOnHost_H__*/
+

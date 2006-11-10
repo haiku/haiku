@@ -42,3 +42,4 @@ private:										// implementation
 }; // addon_host
 __END_CORTEX_NAMESPACE
 #endif /*__NodeManager_AddOnHostApp_H__*/
+

@@ -60,3 +60,4 @@ inline void assert_locked(const ILockable* target) {
 
 __END_CORTEX_NAMESPACE
 #endif /*__node_manager_impl_H__*/
+

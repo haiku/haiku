@@ -131,3 +131,4 @@ private:											// *** implementation
 
 __END_CORTEX_NAMESPACE
 #endif /*__ConnectionIO_H__*/
+

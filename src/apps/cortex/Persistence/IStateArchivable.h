@@ -28,3 +28,4 @@ public:												// *** INTERFACE
 
 __END_CORTEX_NAMESPACE
 #endif /*__IStateArchivable_H__*/
+

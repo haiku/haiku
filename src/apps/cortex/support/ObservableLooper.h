@@ -101,3 +101,4 @@ private:										// members
 
 __END_CORTEX_NAMESPACE
 #endif /*__ObservableLooper_H__*/
+

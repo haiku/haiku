@@ -86,3 +86,4 @@ private:										// members
 
 __END_CORTEX_NAMESPACE
 #endif /*__ObservableHandler_H__*/
+

@@ -39,3 +39,4 @@ enum message_t {
 }; // addon_host
 __END_CORTEX_NAMESPACE
 #endif //__CORTEX_ADD_ON_HOST_PROTOCOL_H__
+

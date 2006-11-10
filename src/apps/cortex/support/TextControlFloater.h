@@ -60,3 +60,4 @@ private:
 
 __END_CORTEX_NAMESPACE
 #endif /*__TextControlFloater_H__*/
+
