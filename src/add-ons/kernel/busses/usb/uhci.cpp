@@ -356,8 +356,8 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 		fPCIInfo->function, PCI_command, 2, command);
 
-	// make sure we gain controll of the UHCI controller instead of the BIOS
-	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device, 2,
+	// make sure we gain control of the UHCI controller instead of the BIOS
+	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device, fPCIInfo->function,
 		PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN);
 
 	// disable interrupts
