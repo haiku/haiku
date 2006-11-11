@@ -57,13 +57,10 @@ class ShowImageView : public BView {
 		bool GetShrinkToBounds() const { return fShrinkToBounds; }
 		void SetZoomToBounds(bool enable);
 		bool GetZoomToBounds() const { return fZoomToBounds; }
-		void SetBorder(bool hasBorder);
-		bool HasBorder() const { return fHasBorder; }
-		void SetAlignment(alignment horizontal, vertical_alignment vertical);
+		void SetFullScreen(bool fullScreen);
 		BBitmap *GetBitmap();
 		void GetName(BString *name);
 		void GetPath(BString *name);
-		void FlushToLeftTop();
 		void SetScaleBilinear(bool b);
 		bool GetScaleBilinear() { return fScaleBilinear; }
 
@@ -206,13 +203,9 @@ class ShowImageView : public BView {
 		bool fShrinkToBounds;
 		bool fZoomToBounds;
 		bool fShrinkOrZoomToBounds;
-		bool fHasBorder;			// should the image have a border?
-		alignment fHAlignment;		// horizontal alignment (left and centered only)
-		vertical_alignment fVAlignment; // vertical alignment (left and centered only)
+		bool fFullScreen;			// is the image displayed fullscreen?
 		float fLeft;				// the origin of the image in the view
 		float fTop;
-		float fScaleX;				// to convert image from/to view coordinates
-		float fScaleY;
 		bool fMovesImage;			// is the image being moved with the mouse
 		bool fMakesSelection;		// is a selection being made
 		BPoint fFirstPoint;			// first point in image space of selection

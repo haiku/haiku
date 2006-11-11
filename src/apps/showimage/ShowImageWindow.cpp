@@ -156,7 +156,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 		SetPulseRate(100000);
 			// every 1/10 second; ShowImageView needs it for marching ants
 
-		fImageView->FlushToLeftTop();
 		WindowRedimension(fImageView->GetBitmap());
 		fImageView->MakeFocus(true); // to receive KeyDown messages
 		Show();
@@ -230,7 +229,7 @@ ShowImageWindow::BuildViewMenu(BMenu *menu)
 	menu->AddSeparatorItem();
 
 	AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, 'W', true);
-	AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '+', 0, 'W', true);
+	AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '=', 0, 'W', true);
 	AddItemMenu(menu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
 
 	menu->AddSeparatorItem();
@@ -934,7 +933,6 @@ ShowImageWindow::ToggleFullScreen()
 		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
 
 		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
-		fImageView->SetAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE);
 
 		Activate();
 			// make the window frontmost
@@ -942,14 +940,9 @@ ShowImageWindow::ToggleFullScreen()
 		frame = fWindowFrame;
 
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
-// NOTE: I changed this to not use left/top alignment at all, because
-// I have no idea why it would be useful. The layouting is much more
-// predictable now. -Stephan
-//		fImageView->SetAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-		fImageView->SetAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE);
 	}
 
-	fImageView->SetBorder(!fFullScreen);
+	fImageView->SetFullScreen(fFullScreen);
 	fImageView->SetShowCaption(fFullScreen && fShowCaption);
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());

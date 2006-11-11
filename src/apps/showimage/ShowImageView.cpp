@@ -56,8 +56,6 @@ class PopUpMenu : public BPopUpMenu {
 
 
 #define SHOW_IMAGE_ORIENTATION_ATTRIBUTE "ShowImage:orientation"
-#define BORDER_WIDTH 16
-#define BORDER_HEIGHT 16
 const rgb_color kBorderColor = { 0, 0, 0, 255 };
 
 enum ShowImageView::image_orientation 
@@ -181,9 +179,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fHasSelection = false;
 	fShrinkToBounds = false;
 	fZoomToBounds = false;
-	fHasBorder = true;
-	fHAlignment = B_ALIGN_CENTER;
-	fVAlignment = B_ALIGN_MIDDLE;
+	fFullScreen = false;
 	fSlideShow = false;
 	fSlideShowDelay = 3 * 10; // 3 seconds
 	fShowCaption = false;
@@ -302,7 +298,7 @@ ShowImageView::Pulse()
 	}
 
 	// Hide cursor in full screen mode
-	if (!fHasBorder && !fShowingPopUpMenu)
+	if (fFullScreen && !fShowingPopUpMenu)
 		be_app->ObscureCursor();
 
 #if DELAYED_SCALING
@@ -608,30 +604,15 @@ ShowImageView::SetZoomToBounds(bool enable)
 
 
 void
-ShowImageView::SetBorder(bool hasBorder)
+ShowImageView::SetFullScreen(bool fullScreen)
 {
-	if (fHasBorder != hasBorder) {
-		fHasBorder = hasBorder;
-		if (fHasBorder)
-			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		else {
+	if (fFullScreen != fullScreen) {
+		fFullScreen = fullScreen;
+		if (fFullScreen) {
 			SetLowColor(0, 0, 0, 255);
 			be_app->ObscureCursor();
-		}
-		FixupScrollBars();
-		Invalidate();
-	}
-}
-
-
-void 
-ShowImageView::SetAlignment(alignment horizontal, vertical_alignment vertical)
-{
-	if (fHAlignment != horizontal || fVAlignment != vertical) {
-		fHAlignment = horizontal;
-		fVAlignment = vertical;
-		FixupScrollBars();
-		Invalidate();
+		} else
+			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
 }
 
@@ -664,14 +645,6 @@ ShowImageView::GetPath(BString *outPath)
 		outPath->SetTo("");
 	else
 		outPath->SetTo(path.Path());
-}
-
-
-void
-ShowImageView::FlushToLeftTop()
-{
-	BRect rect = AlignBitmap();
-	ScrollTo(rect.LeftTop());
 }
 
 
@@ -729,57 +702,20 @@ ShowImageView::AlignBitmap()
 			rect.OffsetBy(static_cast<int>((width - rect.Width()) / 2), 0);
 		}
 	} else {
-		float zoom;
-		if (fShrinkToBounds || fZoomToBounds) {
-			// ignore user zoom setting in automatic zoom modes
-			zoom = 1.0;
-		} else {
-			zoom = fZoom;
-		}
-
 		// zoom image
-		rect.right = floorf(bitmapWidth * zoom) - 1; 
-		rect.bottom = floorf(bitmapHeight * zoom) - 1;
+		rect.right = floorf(bitmapWidth * fZoom) - 1; 
+		rect.bottom = floorf(bitmapHeight * fZoom) - 1;
 
 		// update the bitmap size after the zoom
 		bitmapWidth = rect.Width() + 1.0;
 		bitmapHeight = rect.Height() + 1.0;
 
-		// align
-		switch (fHAlignment) {
-			case B_ALIGN_CENTER:
-				if (width > bitmapWidth) {
-					rect.OffsetBy((width - bitmapWidth) / 2.0, 0);
-					break;
-				}
-				// fall through
-			default:
-			case B_ALIGN_LEFT:
-				if (fHasBorder) {
-					float border = min_c(BORDER_WIDTH, width - bitmapWidth);
-					if (border < 0)
-						border = 0;
-					rect.OffsetBy(border, 0);
-				}
-				break;
-		}
-		switch (fVAlignment) {
-			case B_ALIGN_MIDDLE:
-				if (height > bitmapHeight) {
-					rect.OffsetBy(0, (height - bitmapHeight) / 2.0);
-				break;
-				}
-				// fall through
-			default:
-			case B_ALIGN_TOP:
-				if (fHasBorder) {
-					float border = min_c(BORDER_WIDTH, height - bitmapHeight);
-					if (border < 0)
-						border = 0;
-					rect.OffsetBy(0, border);
-				}
-				break;
-		}
+		// always align in the center
+		if (width > bitmapWidth)
+			rect.OffsetBy((width - bitmapWidth) / 2.0, 0);
+
+		if (height > bitmapHeight)
+			rect.OffsetBy(0, (height - bitmapHeight) / 2.0);
 	}
 	rect.OffsetBy(PEN_SIZE, PEN_SIZE);
 	return rect;
@@ -791,16 +727,14 @@ ShowImageView::Setup(BRect rect)
 {
 	fLeft = floorf(rect.left);
 	fTop = floorf(rect.top);
-	fScaleX = (rect.Width()+1.0) / (fBitmap->Bounds().Width()+1.0);
-	fScaleY = (rect.Height()+1.0) / (fBitmap->Bounds().Height()+1.0);
 }
 
 
 BPoint
 ShowImageView::ImageToView(BPoint p) const
 {
-	p.x = floorf(fScaleX * p.x + fLeft);
-	p.y = floorf(fScaleY * p.y + fTop);
+	p.x = floorf(fZoom * p.x + fLeft);
+	p.y = floorf(fZoom * p.y + fTop);
 	return p;
 }
 
@@ -808,8 +742,8 @@ ShowImageView::ImageToView(BPoint p) const
 BPoint
 ShowImageView::ViewToImage(BPoint p) const
 {
-	p.x = floorf((p.x - fLeft) / fScaleX);
-	p.y = floorf((p.y - fTop) / fScaleY);
+	p.x = floorf((p.x - fLeft) / fZoom);
+	p.y = floorf((p.y - fTop) / fZoom);
 	return p;
 }
 
@@ -1063,8 +997,8 @@ ShowImageView::CopySelection(uchar alpha, bool imageSize)
 	BRect rect(0, 0, fSelectionRect.Width(), fSelectionRect.Height());
 	if (!imageSize) {
 		// scale image to view size
-		rect.right = floorf((rect.right + 1.0) * fScaleX - 1.0); 
-		rect.bottom = floorf((rect.bottom + 1.0) * fScaleY - 1.0);
+		rect.right = floorf((rect.right + 1.0) * fZoom - 1.0); 
+		rect.bottom = floorf((rect.bottom + 1.0) * fZoom - 1.0);
 	}
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
 	BBitmap *bitmap = new(nothrow) BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
@@ -1150,11 +1084,11 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		// avoid flickering of dragged bitmap caused by drawing into the window
 		AnimateSelection(false);
 		// only use a transparent bitmap on selections less than 400x400 (taking into account scaling)
-		if ((fSelectionRect.Width() * fScaleX) < 400.0 && (fSelectionRect.Height() * fScaleY) < 400.0)
+		if ((fSelectionRect.Width() * fZoom) < 400.0 && (fSelectionRect.Height() * fZoom) < 400.0)
 		{
 			sourcePoint -= fSelectionRect.LeftTop();
-			sourcePoint.x *= fScaleX;
-			sourcePoint.y *= fScaleY;
+			sourcePoint.x *= fZoom;
+			sourcePoint.y *= fZoom;
 			// DragMessage takes ownership of bitmap
 			DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint);
 			bitmap = NULL;
@@ -1804,9 +1738,6 @@ ShowImageView::FixupScrollBar(orientation o, float bitmapLength, float viewLengt
 
 	psb = ScrollBar(o);
 	if (psb) {
-		if (fHasBorder && !fShrinkOrZoomToBounds && (fHAlignment == B_ALIGN_LEFT || fVAlignment == B_ALIGN_TOP)) {
-			bitmapLength += BORDER_WIDTH * 2;
-		}
 		range = bitmapLength - viewLength;
 		if (range < 0.0) {
 			range = 0.0;
@@ -2430,7 +2361,19 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 	if (!quiet) {
 		// remove selection
 		SetHasSelection(false);
-		Notify(NULL);
+		// Pull the image type name from fCaption (hackish?)
+		int32 last_comma_index = fCaption.FindLast(',');
+		if (last_comma_index != B_ERROR) {
+			// The -1 at the end is -2 to get rid of the comma and space, +1 for the \0
+			int32 name_size = fCaption.CountChars() - last_comma_index - 1;
+			char *name = new char[name_size];
+			fCaption.CopyInto(name, last_comma_index + 2, name_size - 1);
+			name[name_size - 1] = '\0';
+			Notify(name);
+			delete name;
+		}
+		else
+			Notify(NULL);
 	}	
 }
 
