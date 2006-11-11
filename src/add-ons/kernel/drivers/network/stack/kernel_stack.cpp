@@ -32,43 +32,11 @@
 #endif
 
 
-// Local definitions
-
-// this struct will store one select() event to monitor per thread
-typedef struct selecter {
-	struct selecter *next;
-	thread_id thread;
-	uint32 event;
-	selectsync *sync;
-	uint32 ref;
-} selecter;
-
 // the cookie we attach to each file descriptor opened on our driver entry
-typedef struct net_stack_cookie {
-	net_socket *socket;		// NULL before ioctl(fd, NET_STACK_SOCKET/_ACCEPT)
-	sem_id selecters_lock;	// protect the selecters linked-list
-	selecter *selecters;	// the select()'ers lists (thread-aware)
-} net_stack_cookie;
-
-// TODO: disabled
-/* To unload this driver execute
- * $ echo unload > /dev/net/stack
- * As soon as the last app stops using sockets the netstack will be unloaded.
- */
-//static const char *kUnloadCommand = "unload";
-
-
-// prototypes of device hooks functions
-static status_t net_stack_open(const char *name, uint32 flags, void **_cookie);
-static status_t net_stack_close(void *cookie);
-static status_t net_stack_free_cookie(void *cookie);
-static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t length);
-static status_t net_stack_read(void *cookie, off_t pos, void *data, size_t *_length);
-static status_t net_stack_write(void *cookie, off_t pos, const void *data, size_t *_length);
-static status_t net_stack_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
-static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync);
-static status_t net_stack_readv(void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_length);
-static status_t net_stack_writev(void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_length);
+struct net_stack_cookie {
+	net_socket *socket;
+		// is set using NET_STACK_SOCKET/_ACCEPT
+};
 
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -128,48 +96,6 @@ check_args(ArgType &args, void *data, size_t length)
 }
 
 
-#if 0
-static void
-on_socket_event(void * socket, uint32 event, void *_cookie)
-{
-	net_stack_cookie *cookie = (net_stack_cookie *) _cookie;
-	selecter *s;
-	
-	if (!cookie)
-		return;
-	
-	if (cookie->socket != socket) {
-		ERROR("on_socket_event(%p, %ld, %p): socket is higly suspect! Aborting.\n",
-			socket, event, cookie);
-		return;
-	}
-
-	TRACE("on_socket_event(%p, %ld, %p)\n", socket, event, cookie);
-
-	// lock the selecters list
-	if (acquire_sem(cookie->selecters_lock) != B_OK)
-		return;
-
-	s = cookie->selecters;
-	while (s) {
-		if (s->event == event)
-			// notify this selecter (thread/event pair)
-#ifdef COMPILE_FOR_R5
-			notify_select_event(s->sync, s->ref);
-#else
-			notify_select_event(s->sync, s->ref, event);
-#endif
-		
-		s = s->next;
-	}
-
-	// unlock the selecters list
-	release_sem(cookie->selecters_lock);
-	return;
-}
-#endif
-
-
 #ifdef DEBUG
 static const char*
 opcode_name(int op)
@@ -226,81 +152,6 @@ opcode_name(int op)
 #endif	// DEBUG
 
 
-//	#pragma mark - driver
-
-
-/**	Do we init ourselves? If we're in safe mode we'll decline so if things
- *	screw up we can boot and delete the broken driver!
- *	After my experiences earlier - a good idea!
- */
-
-status_t
-init_hardware(void)
-{
-	void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-	if (settings != NULL) {
-		// we got a pointer, now get settings...
-		bool safemode = get_driver_boolean_parameter(settings, B_SAFEMODE_SAFE_MODE, false, false);
-		// now get rid of settings
-		unload_driver_settings(settings);
-
-		if (safemode) {
-			WARN("init_hardware: declining offer to join the party.\n");
-			return B_ERROR;
-		}
-	}
-
-	TRACE("init_hardware done.\n");
-	return B_OK;
-}
-
-
-status_t
-init_driver(void)
-{
-
-	return B_OK;
-}
-
-
-void
-uninit_driver(void)
-{
-	TRACE("uninit_driver\n");
-
-	put_module(NET_SOCKET_MODULE_NAME);
-}
-
-
-const char **
-publish_devices(void)
-{
-	static const char *devices[] = { NET_STACK_DRIVER_DEV, NULL };
-
-	return devices;
-}
-
-
-device_hooks*
-find_device(const char* device_name)
-{
-	static device_hooks hooks = {
-		net_stack_open,
-		net_stack_close,
-		net_stack_free_cookie,
-		net_stack_control,
-		net_stack_read,
-		net_stack_write,
-		net_stack_select,
-		net_stack_deselect,
-		net_stack_readv,
-		net_stack_writev,
-	};
-
-	return &hooks;
-}
-
-
 //	#pragma mark - device
 
 
@@ -321,11 +172,7 @@ net_stack_open(const char *name, uint32 flags, void **_cookie)
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	memset(cookie, 0, sizeof(net_stack_cookie));
-	cookie->socket = NULL; // the socket will be allocated in NET_STACK_SOCKET ioctl
-	cookie->selecters_lock = create_sem(1, "socket_selecters_lock");
-
-	// attach this new net_socket_cookie to file descriptor
+	cookie->socket = NULL;
 	*_cookie = cookie;
 
 	TRACE("net_stack_open(%s, %s%s) return this cookie: %p\n",
@@ -357,28 +204,18 @@ static status_t
 net_stack_free_cookie(void *_cookie)
 {
 	net_stack_cookie *cookie = (net_stack_cookie *)_cookie;
-	selecter *s;
 	
 	TRACE("net_stack_free_cookie(%p)\n", cookie);
-	
-	// free the selecters list
-	delete_sem(cookie->selecters_lock);
-	s = cookie->selecters;
-	while (s) {
-		selecter *tmp = s;
-		s = s->next;
-		free(tmp);
-	}
 
 	if (cookie->socket != NULL)
 		sSocket->free(cookie->socket);
 
-	// free the cookie
 	free(cookie);
 
 	if (atomic_add(&sOpenCount, -1) == 1) {
 		// the last reference to us has been removed, unload the networking
-		// stack again
+		// stack again (it will only be actually unloaded in case there is
+		// no interface defined)
 		put_module(NET_SOCKET_MODULE_NAME);
 	}
 
@@ -692,40 +529,13 @@ static status_t
 net_stack_select(void *_cookie, uint8 event, uint32 ref, selectsync *sync)
 {
 	net_stack_cookie *cookie = (net_stack_cookie *)_cookie;
-	status_t status;
 
 	TRACE("net_stack_select(%p, %d, %ld, %p)\n", cookie, event, ref, sync);
 
 	if (cookie->socket == NULL)
 		return B_BAD_VALUE;
 
-	selecter *s = (selecter *)malloc(sizeof(selecter));
-	if (s == NULL)
-		return B_NO_MEMORY;
-
-	s->thread = find_thread(NULL);
-	s->event = event;
-	s->sync = sync;
-	s->ref = ref;
-
-	// lock the selecters list
-	status = acquire_sem(cookie->selecters_lock);
-	if (status != B_OK) {
-		free(s);
-		return status;
-	}
-
-	// add it to selecters list
-	s->next = cookie->selecters;
-	cookie->selecters = s;
-
-	// unlock the selecters list
-	release_sem(cookie->selecters_lock);
-
-	// start (or continue) to monitor for socket event
-	// TODO: enable select() notification
-//	return sSocket->socket_set_event_callback(cookie->socket, on_socket_event, cookie, event);
-	return B_OK;
+	return sSocket->request_notification(cookie->socket, event, ref, sync);
 }
 
 
@@ -736,44 +546,81 @@ net_stack_deselect(void *_cookie, uint8 event, selectsync *sync)
 
 	TRACE("net_stack_deselect(%p, %d, %p)\n", cookie, event, sync);
 
-	if (!cookie || !cookie->socket)
+	if (cookie->socket == NULL)
 		return B_BAD_VALUE;
 
-	// lock the selecters list
-	status_t status = acquire_sem(cookie->selecters_lock);
-	if (status != B_OK)
-		return status;
+	return sSocket->cancel_notification(cookie->socket, event, sync);
+}
 
-	thread_id currentThread = find_thread(NULL);;
-	selecter *previous = NULL;
-	selecter *s = cookie->selecters;
 
-	while (s) {
-		if (s->thread == currentThread
-			&& s->event == event && s->sync == sync) {
-			// selecter found!
-			break;
+//	#pragma mark - driver
+
+
+/**	Do we init ourselves? If we're in safe mode we'll decline so if things
+ *	screw up we can boot and delete the broken driver!
+ *	After my experiences earlier - a good idea!
+ */
+
+status_t
+init_hardware(void)
+{
+	void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (settings != NULL) {
+		// we got a pointer, now get settings...
+		bool safemode = get_driver_boolean_parameter(settings, B_SAFEMODE_SAFE_MODE, false, false);
+		// now get rid of settings
+		unload_driver_settings(settings);
+
+		if (safemode) {
+			WARN("net_stack: Safemode! Declining offer to join the party.\n");
+			return B_ERROR;
 		}
-
-		previous = s;
-		s = s->next;
 	}
 
-	if (s != NULL) {
-		// remove it from selecters list
-		if (previous)
-			previous->next = s->next;
-		else
-			cookie->selecters = s->next;
-		free(s);
-	}
+	return B_OK;
+}
 
-	// TODO: enable deselect()
-	if (cookie->selecters == NULL) {
-		// selecters list is empty: no need to monitor socket events anymore
-		//sSocket->socket_set_event_callback(cookie->socket, NULL, NULL, event);
-	}
 
-	// unlock the selecters list
-	return release_sem(cookie->selecters_lock);
+status_t
+init_driver(void)
+{
+	return B_OK;
+}
+
+
+void
+uninit_driver(void)
+{
+}
+
+
+const char **
+publish_devices(void)
+{
+	static const char *devices[] = {
+		NET_STACK_DRIVER_DEVICE,
+		NULL
+	};
+
+	return devices;
+}
+
+
+device_hooks*
+find_device(const char* device_name)
+{
+	static device_hooks hooks = {
+		net_stack_open,
+		net_stack_close,
+		net_stack_free_cookie,
+		net_stack_control,
+		net_stack_read,
+		net_stack_write,
+		net_stack_select,
+		net_stack_deselect,
+		net_stack_readv,
+		net_stack_writev,
+	};
+
+	return &hooks;
 }
