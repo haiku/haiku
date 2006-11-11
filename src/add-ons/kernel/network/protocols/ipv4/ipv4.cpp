@@ -439,15 +439,18 @@ FragmentPacket::Hash(void *_packet, const void *_key, uint32 range)
 }
 
 
-void
+/*static*/ void
 FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
 {
-	BenaphoreLocker locker(&sFragmentLock);
-	hash_remove(sFragmentHash, (FragmentPacket *)data);
+	FragmentPacket *packet = (FragmentPacket *)data;
+	TRACE(("Assembling FragmentPacket %p timed out!\n", packet));
 
-	TRACE(("Assembling FragmentPacket timed out!\n"));
-	delete (FragmentPacket *)data;
+	BenaphoreLocker locker(&sFragmentLock);
+
+	hash_remove(sFragmentHash, packet);
+	delete packet;
 }
+
 
 //	#pragma mark -
 
