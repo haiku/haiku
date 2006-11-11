@@ -25,8 +25,8 @@
 void socket_delete(net_socket *socket);
 
 
-status_t
-socket_create(int family, int type, int protocol, net_socket **_socket)
+static status_t
+create_socket(int family, int type, int protocol, net_socket **_socket)
 {
 	struct net_socket *socket = new (std::nothrow) net_socket;
 	if (socket == NULL)
@@ -55,20 +55,36 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 	if (status < B_OK)
 		goto err2;
 
-	status = socket->first_info->open(socket->first_protocol);
-	if (status < B_OK)
-		goto err3;
-
 	*_socket = socket;
 	return B_OK;
 
-err3:
-	put_domain_protocols(socket);
 err2:
 	benaphore_destroy(&socket->lock);
 err1:
 	delete socket;
 	return status;
+}
+
+
+//	#pragma mark -
+
+
+status_t
+socket_open(int family, int type, int protocol, net_socket **_socket)
+{
+	net_socket *socket;
+	status_t status = create_socket(family, type, protocol, &socket);
+	if (status < B_OK)
+		return status;
+	
+	status = socket->first_info->open(socket->first_protocol);
+	if (status < B_OK) {
+		socket_delete(socket);
+		return status;
+	}
+
+	*_socket = socket;
+	return B_OK;
 }
 
 
@@ -200,7 +216,7 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 		return ENOBUFS;
 
 	net_socket *socket;
-	status_t status = socket_create(parent->family, parent->type, parent->protocol, &socket);
+	status_t status = create_socket(parent->family, parent->type, parent->protocol, &socket);
 	if (status < B_OK)
 		return status;
 
@@ -797,7 +813,7 @@ net_socket_module_info gNetSocketModule = {
 		0,
 		socket_std_ops
 	},
-	socket_create,
+	socket_open,
 	socket_close,
 	socket_free,
 

@@ -51,7 +51,7 @@ typedef struct net_socket {
 struct net_socket_module_info {
 	struct module_info info;
 
-	status_t	(*socket)(int family, int type, int protocol, net_socket **_socket);
+	status_t	(*open_socket)(int family, int type, int protocol, net_socket **_socket);
 	status_t	(*close)(net_socket *socket);
 	status_t	(*free)(net_socket *socket);
 

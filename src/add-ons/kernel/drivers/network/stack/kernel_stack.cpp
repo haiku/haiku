@@ -409,7 +409,8 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				return sSocket->socket(args.family, args.type, args.protocol, &cookie->socket);
+				return sSocket->open_socket(args.family, args.type,
+					args.protocol, &cookie->socket);
 			}
 
 			case NET_STACK_GET_COOKIE:
