@@ -49,7 +49,8 @@ create_socket(int family, int type, int protocol, net_socket **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	socket->select_pool = NULL;
+	list_init_etc(&socket->pending_children, offsetof(net_socket, link));
+	list_init_etc(&socket->connected_children, offsetof(net_socket, link));
 
 	status = get_domain_protocols(socket);
 	if (status < B_OK)
