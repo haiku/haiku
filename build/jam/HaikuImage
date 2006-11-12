@@ -181,6 +181,10 @@ local logoArtwork = "HAIKU logo - white on blue - big.png" "HAIKU logo - white o
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToHaikuImage beos etc artwork : $(logoArtwork) ;
 
+local svgFiles = "lion.svg" ;
+SEARCH on $(svgFiles) = [ FDirName $(HAIKU_TOP) src tests kits interface picture ] ;
+AddFilesToHaikuImage beos etc artwork : $(svgFiles) ;
+
 # TODO: Use data/etc/termcap or src/libs/termcap.src?
 local etcFiles = fortunes profile termcap teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
