@@ -176,6 +176,8 @@ status_t dm_get_next_child_node(device_node_info *parent,
 device_node_info *dm_get_root(void);
 device_node_info *dm_get_parent(device_node_info *node);
 
+status_t device_manager_control(const char *subsystem, uint32 function, void *buffer, size_t bufferSize);
+
 
 // notifications.c
 

@@ -24,6 +24,8 @@
 #include "device_manager_private.h"
 #include "dl_list.h"
 
+#include <kernel.h>
+
 #include <KernelExport.h>
 #include <TypeConstants.h>
 
@@ -40,6 +42,8 @@
 
 
 benaphore gNodeLock;
+
+uint32 sNodeID;	// nodes counter
 
 
 static void
@@ -263,6 +267,7 @@ dm_allocate_node(const device_attr *attrs, const io_resource_handle *resources,
 	node->num_blocked_loads = 0;
 	node->load_block_count = 0;
 	node->loading = 0;
+	node->internal_id = sNodeID++;
 
 	TRACE(("dm_allocate_node(): new node %p\n", node));
 
@@ -432,6 +437,7 @@ dm_dump_node(device_node_info *node, int32 level)
 status_t
 dm_init_nodes(void)
 {
+	sNodeID = 1;
 	return benaphore_init(&gNodeLock, "device nodes");
 }
 
@@ -513,3 +519,163 @@ dm_get_next_child_node(device_node_info *parent, device_node_info **_node,
 	return B_ENTRY_NOT_FOUND;
 }
 
+
+// hold gNodeLock
+static device_node_info *
+device_manager_find_device(device_node_info *parent, uint32 id)
+{
+	device_node_info *node = NULL;
+
+	if (parent->internal_id == id)
+		return parent;
+
+	while ((node = (device_node_info *)list_get_next_item(&parent->children, node)) != NULL) {
+		device_node_info *child = device_manager_find_device(node, id);
+		if (child != NULL)
+			return child;
+	}	
+	return NULL;
+}
+
+
+status_t
+device_manager_control(const char *subsystem, uint32 function, void *buffer, size_t bufferSize)
+{
+	switch (function) {
+		case DM_GET_ROOT: {
+			uint32 cookie;
+			if (!IS_USER_ADDRESS(buffer))
+				return B_BAD_ADDRESS;
+			if (bufferSize < sizeof(uint32))
+				return B_BAD_VALUE;
+			cookie = gRootNode->internal_id;
+
+			// copy back to user space
+			if (user_memcpy(buffer, &cookie, sizeof(uint32)) < B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
+		case DM_GET_CHILD: {
+			uint32 cookie;
+			device_node_info *node;
+			device_node_info *child;
+
+			if (!IS_USER_ADDRESS(buffer))
+				return B_BAD_ADDRESS;
+			if (bufferSize < sizeof(uint32))
+				return B_BAD_VALUE;
+			if (user_memcpy(&cookie, buffer, sizeof(uint32)) < B_OK)
+                                return B_BAD_ADDRESS;
+			
+        		benaphore_lock(&gNodeLock);
+			node = device_manager_find_device(gRootNode, cookie);
+			if (!node) {
+				benaphore_unlock(&gNodeLock);
+				return B_BAD_VALUE;
+			}
+
+			child = (device_node_info *)list_get_next_item(&node->children, NULL);
+			if (child)
+				cookie = child->internal_id;
+			benaphore_unlock(&gNodeLock);
+			
+			if (!child)
+				return B_ENTRY_NOT_FOUND;
+
+			// copy back to user space
+			if (user_memcpy(buffer, &cookie, sizeof(uint32)) < B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
+		case DM_GET_NEXT_CHILD: {
+			uint32 cookie;
+			device_node_info *node;
+			device_node_info *child;
+
+			if (!IS_USER_ADDRESS(buffer))
+				return B_BAD_ADDRESS;
+			if (bufferSize < sizeof(uint32))
+				return B_BAD_VALUE;
+			if (user_memcpy(&cookie, buffer, sizeof(uint32)) < B_OK)
+				return B_BAD_ADDRESS;
+			
+			benaphore_lock(&gNodeLock);
+			node = device_manager_find_device(gRootNode, cookie);
+			if (!node) {
+				benaphore_unlock(&gNodeLock);
+				return B_BAD_VALUE;
+			}
+			child = (device_node_info *)list_get_next_item(&node->parent->children, node);
+			if (child)
+				cookie = child->internal_id;
+			benaphore_unlock(&gNodeLock);
+
+			cookie++;
+
+			if (!child)
+				return B_ENTRY_NOT_FOUND;
+			// copy back to user space
+			if (user_memcpy(buffer, &cookie, sizeof(uint32)) < B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
+		case DM_GET_NEXT_ATTRIBUTE: {
+			struct dev_attr attr;
+			device_node_info *node;
+			uint32 i = 0;
+			device_attr_info *attr_info;
+			if (!IS_USER_ADDRESS(buffer))
+				return B_BAD_ADDRESS;
+			if (bufferSize < sizeof(struct dev_attr))
+				return B_BAD_VALUE;
+			if (user_memcpy(&attr, buffer, sizeof(struct dev_attr)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			benaphore_lock(&gNodeLock);
+			node = device_manager_find_device(gRootNode, attr.node_cookie);
+			if (!node) {
+				benaphore_unlock(&gNodeLock);
+				return B_BAD_VALUE;
+			}
+			for (attr_info = node->attributes; attr.cookie > i && attr_info != NULL; attr_info = attr_info->next) {
+				i++;
+			}
+
+			if (!attr_info) {
+				benaphore_unlock(&gNodeLock);
+				return B_ENTRY_NOT_FOUND;
+			}
+
+			attr.cookie++;
+
+			strlcpy(attr.name, attr_info->attr.name, 254);
+			attr.type = attr_info->attr.type;
+			switch (attr_info->attr.type) {
+				case B_UINT8_TYPE:
+					attr.value.ui8 = attr_info->attr.value.ui8; break;
+				case B_UINT16_TYPE:
+					attr.value.ui16 = attr_info->attr.value.ui16; break;
+				case B_UINT32_TYPE:
+					attr.value.ui32 = attr_info->attr.value.ui32; break;
+				case B_UINT64_TYPE:
+					attr.value.ui64 = attr_info->attr.value.ui64; break;
+				case B_STRING_TYPE:
+					strlcpy(attr.value.string, attr_info->attr.value.string, 254); break;
+				case B_RAW_TYPE:
+					if (attr.value.raw.length > attr_info->attr.value.raw.length)
+						attr.value.raw.length = attr_info->attr.value.raw.length;
+					memcpy(attr.value.raw.data, attr_info->attr.value.raw.data,
+						attr.value.raw.length);
+					break;
+			}
+
+			benaphore_unlock(&gNodeLock);
+
+			// copy back to user space
+			if (user_memcpy(buffer, &attr, sizeof(struct dev_attr)) < B_OK) 
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
+	};
+	return B_BAD_HANDLER;
+}

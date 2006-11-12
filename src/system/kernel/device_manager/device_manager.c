@@ -14,6 +14,7 @@
 #include "device_manager_private.h"
 #include <kdevice_manager.h>
 
+#include <generic_syscall.h>
 #include <KernelExport.h>
 #include <string.h>
 
@@ -166,6 +167,7 @@ device_manager_init(struct kernel_args *args)
 #endif
 
 	add_debugger_command("dm_tree", &dump_device_nodes, "dump device node tree");
+	register_generic_syscall(DEVICE_MANAGER_SYSCALLS, device_manager_control, 1, 0);
 	return B_OK;
 }
 
