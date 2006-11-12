@@ -36,8 +36,7 @@ class CanvasView : public StateView,
 	virtual	void				Draw(BRect updateRect);
 
 	virtual	void				MouseDown(BPoint where);
-	virtual	void				MouseMoved(BPoint where, uint32 transit,
-										   const BMessage* dragMessage);
+	virtual	void				FilterMouse(BPoint* where) const;
 
 	// Scrollable interface
  protected:
@@ -79,8 +78,6 @@ class CanvasView : public StateView,
 			void				_FreeBackBitmap();
 			void				_DrawInto(BView* view,
 										  BRect updateRect);
-
-			void				_FilterMouse(BPoint* where) const;
 
 			void				_MakeBackground();
 

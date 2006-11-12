@@ -107,7 +107,8 @@ RDefExporter::_Export(const uint8* source, size_t sourceSize, BPositionIO* strea
 		}
 	}
 	// last line (up to 32 values)
-	if (ret >= B_OK) {
+	bool endQuotes = sourceSize > 0;
+	if (ret >= B_OK && sourceSize > 0) {
 		for (size_t i = 0; i < sourceSize; i++) {
 			sprintf(buffer, "%.2X", b[i]);
 			size = strlen(buffer);
@@ -122,8 +123,8 @@ RDefExporter::_Export(const uint8* source, size_t sourceSize, BPositionIO* strea
 		}
 	}
 	if (ret >= B_OK) {
-		// finish (-> sourceSize - 1)
-		sprintf(buffer, "\"\n};\n");
+		// finish
+		sprintf(buffer, endQuotes ? "\"\n};\n" : "};\n");
 		size = strlen(buffer);
 		written = stream->Write(buffer, size);
 		if (written != (ssize_t)size) {

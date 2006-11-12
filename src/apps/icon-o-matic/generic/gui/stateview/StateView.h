@@ -51,6 +51,8 @@ class StateView : public BView {
 			const mouse_info*	MouseInfo() const
 									{ return &fMouseInfo; }
 
+	virtual	void				FilterMouse(BPoint* where) const;
+
 	virtual	ViewState*			StateForDragMessage(const BMessage* message);
 
 			void				SetLocker(RWLocker* locker);

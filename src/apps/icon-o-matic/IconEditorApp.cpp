@@ -8,15 +8,17 @@
 
 #include "IconEditorApp.h"
 
+#include <new>
+#include <stdio.h>
+#include <string.h>
+
 #include <Alert.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
 
-#include <new>
-#include <stdio.h>
-#include <string.h>
+#include "support_settings.h"
 
 #include "AutoLocker.h"
 #include "BitmapExporter.h"
@@ -44,7 +46,11 @@ IconEditorApp::IconEditorApp()
 	  fDocument(new Document("test")),
 
 	  fOpenPanel(NULL),
-	  fSavePanel(NULL)
+	  fSavePanel(NULL),
+
+	  fLastOpenPath(""),
+	  fLastSavePath(""),
+	  fLastExportPath("")
 {
 }
 
@@ -67,6 +73,8 @@ bool
 IconEditorApp::QuitRequested()
 {
 	// TODO: ask main window if quitting is ok
+	_StoreSettings();
+
 	fMainWindow->Lock();
 	fMainWindow->Quit();
 	fMainWindow = NULL;
@@ -214,6 +222,9 @@ IconEditorApp::ReadyToRun()
 
 	// create main window
 	fMainWindow = new MainWindow(this, fDocument);
+
+	_RestoreSettings();
+
 	fMainWindow->Show();
 }
 
@@ -329,11 +340,31 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 	if (mainWindowLocked)
 		fMainWindow->SetIcon(NULL);
 
-	fDocument->MakeEmpty();
+	// incorporate the loaded icon into the document
+	// (either replace it or append to it)
+	if (append) {
+		// preserve the entry_refs
+		entry_ref saveRef;
+		if (fDocument->Ref())
+			saveRef = *fDocument->Ref();
+		entry_ref exportRef;
+		if (fDocument->ExportRef())
+			exportRef = *fDocument->ExportRef();
 
-	fDocument->SetIcon(icon);
+		fDocument->MakeEmpty();
+		fDocument->SetIcon(icon);
 
-	if (!append) {
+		// restore refs after "append"
+		if (saveRef.name)
+			fDocument->SetRef(saveRef);
+		if (exportRef.name)
+			fDocument->SetExportRef(exportRef);
+	} else {
+		fDocument->MakeEmpty();
+		fDocument->SetIcon(icon);
+
+		// document got replaced, but we have at
+		// least one ref already
 		switch (refMode) {
 			case REF_MESSAGE:
 				fDocument->SetRef(ref);
@@ -443,3 +474,65 @@ IconEditorApp::_SyncPanels(BFilePanel* from, BFilePanel* to)
 		from->Window()->Unlock();
 	}
 }
+
+// _LastFilePath
+const char*
+IconEditorApp::_LastFilePath(path_kind which)
+{
+	const char* path = NULL;
+
+	switch (which) {
+		case LAST_PATH_OPEN:
+			if (fLastOpenPath.Length() > 0)
+				path = fLastOpenPath.String();
+			else if (fLastSavePath.Length() > 0)
+				path = fLastSavePath.String();
+			else if (fLastExportPath.Length() > 0)
+				path = fLastExportPath.String();
+			break;
+		case LAST_PATH_SAVE:
+			if (fLastSavePath.Length() > 0)
+				path = fLastSavePath.String();
+			else if (fLastExportPath.Length() > 0)
+				path = fLastExportPath.String();
+			else if (fLastOpenPath.Length() > 0)
+				path = fLastOpenPath.String();
+			break;
+		case LAST_PATH_EXPORT:
+			if (fLastExportPath.Length() > 0)
+				path = fLastExportPath.String();
+			else if (fLastSavePath.Length() > 0)
+				path = fLastSavePath.String();
+			else if (fLastOpenPath.Length() > 0)
+				path = fLastOpenPath.String();
+			break;
+	}
+	if (!path)
+		path = "/boot/home";
+
+	return path;
+}
+
+// #pragma mark -
+
+// _StoreSettings
+void
+IconEditorApp::_StoreSettings()
+{
+	BMessage settings('stns');
+
+	fMainWindow->StoreSettings(&settings);
+
+	save_settings(&settings, "Icon-O-Matic");
+}
+
+// _RestoreSettings
+void
+IconEditorApp::_RestoreSettings()
+{
+	BMessage settings('stns');
+	load_settings(&settings, "Icon-O-Matic");
+
+	fMainWindow->RestoreSettings(&settings);
+}
+

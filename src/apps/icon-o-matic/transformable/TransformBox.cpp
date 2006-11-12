@@ -137,6 +137,8 @@ TransformBox::Draw(BView* into, BRect updateRect)
 bool
 TransformBox::MouseDown(BPoint where)
 {
+	fView->FilterMouse(&where);
+		// NOTE: filter mouse here and in MouseMoved only
 	TransformToCanvas(where);
 
 	fDragging = true;
@@ -155,6 +157,8 @@ TransformBox::MouseDown(BPoint where)
 void
 TransformBox::MouseMoved(BPoint where)
 {
+	fView->FilterMouse(&where);
+		// NOTE: filter mouse here and in MouseDown only
 	TransformToCanvas(where);
 
 	if (fMousePos != where) {

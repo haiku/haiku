@@ -119,6 +119,7 @@ SwatchGroup::SwatchGroup(BRect frame)
 	fColorField->MoveTo(0, fBottomSwatchViews->Frame().bottom + 3);
 	fColorSlider->MoveTo(0, fColorField->Frame().bottom + 1);
 	fAlphaSlider->MoveTo(0, fColorSlider->Frame().bottom + 1);
+	fAlphaSlider->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
 	// configure self
 	ResizeTo(width, fAlphaSlider->Frame().bottom + 4);

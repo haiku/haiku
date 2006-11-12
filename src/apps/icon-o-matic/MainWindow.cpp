@@ -24,6 +24,8 @@
 # include <GroupView.h>
 #endif
 
+#include "support_ui.h"
+
 #include "AddPathsCommand.h"
 #include "AddShapesCommand.h"
 #include "AddStylesCommand.h"
@@ -445,6 +447,28 @@ MainWindow::SetIcon(Icon* icon)
 
 // #pragma mark -
 
+// StoreSettings
+void
+MainWindow::StoreSettings(BMessage* archive)
+{
+	if (archive->ReplaceRect("main window frame", Frame()) < B_OK)
+		archive->AddRect("main window frame", Frame());
+}
+
+// RestoreSettings
+void
+MainWindow::RestoreSettings(BMessage* archive)
+{
+	BRect frame;
+	if (archive->FindRect("main window frame", &frame) == B_OK) {
+		make_sure_frame_is_on_screen(frame, this);
+		MoveTo(frame.LeftTop());
+		ResizeTo(frame.Width(), frame.Height());
+	}
+}
+
+// #pragma mark -
+
 // _Init
 void
 MainWindow::_Init()
@@ -795,6 +819,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	bounds.right = fSwatchGroup->Frame().left - 1;
 	bounds.bottom = fCanvasView->Frame().top - 1;
 	fStyleView = new StyleView(bounds);
+	fStyleView->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	bg->AddChild(fStyleView);
 
 	// path list view

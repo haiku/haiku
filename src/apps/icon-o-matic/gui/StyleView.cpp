@@ -87,6 +87,7 @@ StyleView::StyleView(BRect frame)
 	fStyleType->MenuBar()->GetPreferredSize(&width, &height);
 	fStyleType->MenuBar()->ResizeTo(width, height);
 	fStyleType->ResizeTo(frame.Width(), height + 6);
+	fStyleType->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 #endif // __HAIKU__
 
 	// gradient type
@@ -133,6 +134,7 @@ StyleView::StyleView(BRect frame)
 	fGradientType->MenuBar()->GetPreferredSize(&width, &height);
 	fGradientType->MenuBar()->ResizeTo(width, height);
 	fGradientType->ResizeTo(frame.Width(), height + 6);
+	fGradientType->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 
 	// create gradient control
 	frame.top = fGradientType->Frame().bottom + 8;
@@ -146,6 +148,7 @@ StyleView::StyleView(BRect frame)
 	fGradientControl->ResizeTo(width, height);
 	fGradientControl->FrameResized(width, height);
 	fGradientControl->MoveTo(frame.left, frame.top);
+	fGradientControl->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 
 	AddChild(fGradientControl);
 #endif // __HAIKU__

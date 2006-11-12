@@ -56,8 +56,10 @@ class MainWindow : public BWindow,
 
 	// MainWindow
 			void				MakeEmpty();
-
 			void				SetIcon(Icon* icon);
+
+			void				StoreSettings(BMessage* archive);
+			void				RestoreSettings(BMessage* archive);
 
  private:
 			void				_Init();

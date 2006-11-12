@@ -413,12 +413,17 @@ PathManipulator::MouseDown(BPoint where)
 		fMode = TRANSLATE_POINTS;
 	}
 
+	// apply the canvas view mouse filter depending on current mode
+	if (fMode == ADD_POINT || fMode == TRANSLATE_POINTS)
+		fCanvasView->FilterMouse(&where);
+
 	BPoint canvasWhere = where;
 	fCanvasView->ConvertToCanvas(&canvasWhere);
 
 	// maybe we're changing some point, so we construct the
 	// "ChangePointCommand" here so that the point is remembered
 	// in its current state
+	// apply the canvas view mouse filter depending on current mode
 	delete fChangePointCommand;
 	fChangePointCommand = NULL;
 	switch (fMode) {
@@ -539,6 +544,9 @@ PathManipulator::MouseDown(BPoint where)
 void
 PathManipulator::MouseMoved(BPoint where)
 {
+	fCanvasView->FilterMouse(&where);
+		// NOTE: only filter mouse coords in mouse moved, no other
+		// mouse function
 	BPoint canvasWhere = where;
 	fCanvasView->ConvertToCanvas(&canvasWhere);
 
@@ -870,19 +878,19 @@ PathManipulator::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 		// commit
 		case B_RETURN:
 			if (fTransformBox) {
-				_SetModeForMousePos(fLastCanvasPos);
-			} else
+				_SetTransformBox(NULL);
+			}// else
 //				_Perform();
 			break;
 		// cancel
 		case B_ESCAPE:
 			if (fTransformBox) {
 				fTransformBox->Cancel();
-				_SetModeForMousePos(fLastCanvasPos);
+				_SetTransformBox(NULL);
 			} else if (fFallBackMode == NEW_PATH) {
 				fFallBackMode = SELECT_POINTS;
-				_SetModeForMousePos(fLastCanvasPos);
-			} else
+				_SetTransformBox(NULL);
+			}// else
 //				_Cancel();
 			break;
 		case 't':
@@ -1165,6 +1173,10 @@ PathManipulator::_SetTransformBox(TransformPointsBox* transformBox)
 
 	fTransformBox = transformBox;
 
+	// TODO: this is weird, fMode should only be set in _SetMode, not
+	// here as well, also this method could be called this way
+	// _SetModeForMousePos -> _SetMode -> _SetTransformBox
+	// and then below it does _SetModeForMousePos again...
 	if (fTransformBox) {
 		fTransformBox->MouseMoved(fLastCanvasPos);
 		if (fMode != TRANSFORM_POINTS) {

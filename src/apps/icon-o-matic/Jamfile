@@ -188,6 +188,7 @@ Application Icon-O-Matic :
 	RWLocker.cpp
 	support.cpp
 	support_ui.cpp
+	support_settings.cpp
 
 	# gui
 	GradientControl.cpp

@@ -397,6 +397,12 @@ StateView::HandleKeyUp(uint32 key, uint32 modifiers)
 	return false;
 }
 
+// FilterMouse
+void
+StateView::FilterMouse(BPoint* where) const
+{
+}
+
 // StateForDragMessage
 ViewState*
 StateView::StateForDragMessage(const BMessage* message)

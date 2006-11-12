@@ -134,24 +134,36 @@ make_color_drop_message(rgb_color color, BBitmap* bitmap)
 void
 make_sure_frame_is_on_screen(BRect& frame, BWindow* window)
 {
-	BScreen screen(window);
-	if (frame.IsValid() && screen.IsValid()) {
-		if (!screen.Frame().Contains(frame)) {
-			// make sure frame fits in the screen
-			if (frame.Width() > screen.Frame().Width())
-				frame.right -= frame.Width() - screen.Frame().Width() + 10.0;
-			if (frame.Height() > screen.Frame().Height())
-				frame.bottom -= frame.Height() - screen.Frame().Height() + 30.0;
-			// frame is now at the most the size of the screen
-			if (frame.right > screen.Frame().right)
-				frame.OffsetBy(-(frame.right - screen.Frame().right), 0.0);
-			if (frame.bottom > screen.Frame().bottom)
-				frame.OffsetBy(0.0, -(frame.bottom - screen.Frame().bottom));
-			if (frame.left < screen.Frame().left)
-				frame.OffsetBy((screen.Frame().left - frame.left), 0.0);
-			if (frame.top < screen.Frame().top)
-				frame.OffsetBy(0.0, (screen.Frame().top - frame.top));
-		}
+	if (!frame.IsValid())
+		return;
+
+	BRect screenFrame;
+	if (window) {
+		BScreen screen(window);
+		if (!screen.IsValid())
+			return;
+		screenFrame = screen.Frame();
+	} else {
+		BScreen screen(B_MAIN_SCREEN_ID);
+		if (!screen.IsValid())
+			return;
+		screenFrame = screen.Frame();
+	}
+	if (!screenFrame.Contains(frame)) {
+		// make sure frame fits in the screen
+		if (frame.Width() > screenFrame.Width())
+			frame.right -= frame.Width() - screenFrame.Width() + 10.0;
+		if (frame.Height() > screenFrame.Height())
+			frame.bottom -= frame.Height() - screenFrame.Height() + 30.0;
+		// frame is now at the most the size of the screen
+		if (frame.right > screenFrame.right)
+			frame.OffsetBy(-(frame.right - screenFrame.right), 0.0);
+		if (frame.bottom > screenFrame.bottom)
+			frame.OffsetBy(0.0, -(frame.bottom - screenFrame.bottom));
+		if (frame.left < screenFrame.left)
+			frame.OffsetBy((screenFrame.left - frame.left), 0.0);
+		if (frame.top < screenFrame.top)
+			frame.OffsetBy(0.0, (screenFrame.top - frame.top));
 	}
 }
 

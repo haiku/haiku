@@ -10,6 +10,7 @@
 #define ICON_EDITOR_APP_H
 
 #include <Application.h>
+#include <String.h>
 
 class BFilePanel;
 class Document;
@@ -49,6 +50,12 @@ enum {
 	EXPORT_MODE_ICON_RDEF,
 };
 
+typedef enum {
+	LAST_PATH_OPEN = 0,
+	LAST_PATH_SAVE,
+	LAST_PATH_EXPORT,
+} path_kind;
+
 class IconEditorApp : public BApplication {
  public:
 								IconEditorApp();
@@ -73,11 +80,20 @@ class IconEditorApp : public BApplication {
 			void				_SyncPanels(BFilePanel* from,
 											BFilePanel* to);
 
+			const char*			_LastFilePath(path_kind which);
+
+			void				_StoreSettings();
+			void				_RestoreSettings();
+
 			MainWindow*			fMainWindow;
 			Document*			fDocument;
 
 			BFilePanel*			fOpenPanel;
 			BFilePanel*			fSavePanel;
+
+			BString				fLastOpenPath;
+			BString				fLastSavePath;
+			BString				fLastExportPath;
 };
 
 #endif // ICON_EDITOR_APP_H

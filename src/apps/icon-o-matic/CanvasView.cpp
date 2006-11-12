@@ -126,20 +126,48 @@ CanvasView::MouseDown(BPoint where)
 	if (!IsFocus())
 		MakeFocus(true);
 
-	_FilterMouse(&where);
-
 	StateView::MouseDown(where);
 }
 
-
-// MouseMoved
+// FilterMouse
 void
-CanvasView::MouseMoved(BPoint where, uint32 transit,
-					   const BMessage* dragMessage)
+CanvasView::FilterMouse(BPoint* where) const
 {
-	_FilterMouse(&where);
+	switch (fMouseFilterMode) {
 
-	StateView::MouseMoved(where, transit, dragMessage);
+		case SNAPPING_64:
+			ConvertToCanvas(where);
+			where->x = floorf(where->x + 0.5);
+			where->y = floorf(where->y + 0.5);
+			ConvertFromCanvas(where);
+			break;
+
+		case SNAPPING_32:
+			ConvertToCanvas(where);
+			where->x /= 2.0;
+			where->y /= 2.0;
+			where->x = floorf(where->x + 0.5);
+			where->y = floorf(where->y + 0.5);
+			where->x *= 2.0;
+			where->y *= 2.0;
+			ConvertFromCanvas(where);
+			break;
+
+		case SNAPPING_16:
+			ConvertToCanvas(where);
+			where->x /= 4.0;
+			where->y /= 4.0;
+			where->x = floorf(where->x + 0.5);
+			where->y = floorf(where->y + 0.5);
+			where->x *= 4.0;
+			where->y *= 4.0;
+			ConvertFromCanvas(where);
+			break;
+
+		case SNAPPING_OFF:
+		default:
+			break;
+	}
 }
 
 // #pragma mark -
@@ -385,47 +413,6 @@ CanvasView::_DrawInto(BView* view, BRect updateRect)
 	view->FillRegion(&outside, kStripes);
 
 	StateView::Draw(view, updateRect);
-}
-
-// _FilterMouse
-void
-CanvasView::_FilterMouse(BPoint* where) const
-{
-	switch (fMouseFilterMode) {
-
-		case SNAPPING_64:
-			ConvertToCanvas(where);
-			where->x = floorf(where->x + 0.5);
-			where->y = floorf(where->y + 0.5);
-			ConvertFromCanvas(where);
-			break;
-
-		case SNAPPING_32:
-			ConvertToCanvas(where);
-			where->x /= 2.0;
-			where->y /= 2.0;
-			where->x = floorf(where->x + 0.5);
-			where->y = floorf(where->y + 0.5);
-			where->x *= 2.0;
-			where->y *= 2.0;
-			ConvertFromCanvas(where);
-			break;
-
-		case SNAPPING_16:
-			ConvertToCanvas(where);
-			where->x /= 4.0;
-			where->y /= 4.0;
-			where->x = floorf(where->x + 0.5);
-			where->y = floorf(where->y + 0.5);
-			where->x *= 4.0;
-			where->y *= 4.0;
-			ConvertFromCanvas(where);
-			break;
-
-		case SNAPPING_OFF:
-		default:
-			break;
-	}
 }
 
 // _MakeBackground
