@@ -70,7 +70,7 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 	
 	LockLooper();
 	
-	// gl->LockGL();
+	gl->LockGL();
 	
 	list->AddItem(new BStringItem("OpenGL", 0));
 
@@ -135,7 +135,7 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 	list->AddItem(new BStringItem(l.String(), 1));
 #endif
 
-	// gl->UnlockGL();
+	gl->UnlockGL();
 
 	UnlockLooper();
 }
