@@ -1,31 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		RecentEntries.cpp
-//	Author:			Tyler Dauwalder (tyler@dauwalder.net)
-//	Description:	Recently launched apps list
-//------------------------------------------------------------------------------
-/*! \file RecentEntries.cpp
-	\brief RecentEntries class implementation
-*/
+/*
+ * Copyright 2001-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+//!	Recently launched apps list
 
 #include "RecentEntries.h"
 
@@ -48,9 +31,6 @@ using namespace std;
 //#define DBG(x)
 #define OUT printf
 
-//------------------------------------------------------------------------------
-// recent_entry
-//------------------------------------------------------------------------------
 
 /*!	\struct recent_entry
 
@@ -64,16 +44,17 @@ using namespace std;
 /*! \brief Creates a new recent_entry object.
 */
 recent_entry::recent_entry(const entry_ref *ref, const char *appSig,
-                           uint32 index)
-	: ref(ref ? *ref : entry_ref())
-	, sig(appSig)
-	, index(index)
+		uint32 index)
+	:
+	ref(ref ? *ref : entry_ref()),
+	sig(appSig),
+	index(index)
 {	
 }
 
-//------------------------------------------------------------------------------
-// RecentEntries
-//------------------------------------------------------------------------------
+
+//	#pragma mark -
+
 
 /*!	\class RecentEntries
 	\brief Implements the common functionality used by the roster's recent
@@ -88,7 +69,7 @@ recent_entry::recent_entry(const entry_ref *ref, const char *appSig,
 	signatures are case-independent.
 */
 
-// constructor
+
 /*!	\brief Creates a new list.
 	
 	The list is initially empty.
@@ -97,7 +78,7 @@ RecentEntries::RecentEntries()
 {
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with the object.
 */
 RecentEntries::~RecentEntries()
@@ -105,7 +86,7 @@ RecentEntries::~RecentEntries()
 	Clear();
 }
 
-// Add
+
 /*! \brief Places the given entry Places the app with the given signature at the front of
 	the recent apps list.
 	
@@ -124,31 +105,33 @@ RecentEntries::~RecentEntries()
 status_t
 RecentEntries::Add(const entry_ref *ref, const char *appSig)
 {
-	std::string sig;
-	status_t error = ref && appSig ? B_OK : B_BAD_VALUE;
-	if (!error) {
-		// Store all sigs as lowercase
-		sig = BPrivate::Storage::to_lower(appSig);
-		
-		// Look for a previous instance of this entry
-		std::list<recent_entry*>::iterator item;
-		for (item = fEntryList.begin(); item != fEntryList.end(); item++) {
-			if ((*item)->ref == *ref && (*item)->sig == sig) {
-				fEntryList.erase(item);
-				break;
-			}
+	if (ref == NULL || appSig == NULL)
+		return B_BAD_VALUE;
+
+	// Look for a previous instance of this entry
+	std::list<recent_entry*>::iterator item;
+	for (item = fEntryList.begin(); item != fEntryList.end(); item++) {
+		if ((*item)->ref == *ref && !strcasecmp((*item)->sig.c_str(), appSig)) {
+			fEntryList.erase(item);
+			break;
 		}
-		
-		// Add this entry to the front of the list
-		recent_entry *entry = new(nothrow) recent_entry(ref, appSig, 0);
-		error = entry ? B_OK : B_NO_MEMORY;
-		if (!error)
-			fEntryList.push_front(entry);	
 	}
-	return error;
+
+	// Add this entry to the front of the list
+	recent_entry *entry = new (nothrow) recent_entry(ref, appSig, 0);
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	try {
+		fEntryList.push_front(entry);
+	} catch (...) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
-// Get
+
 /*! \brief Returns the first \a maxCount recent apps in the \c BMessage
 	pointed to by \a list.
 	
@@ -171,82 +154,87 @@ RecentEntries::Add(const entry_ref *ref, const char *appSig)
 	       expected to be all lowercase.
 */	
 status_t
-RecentEntries::Get(int32 maxCount, const char *fileTypes[], int32 fileTypesCount,
-                   const char *appSig, BMessage *result)
+RecentEntries::Get(int32 maxCount, const char *fileTypes[],
+	int32 fileTypesCount, const char *appSig, BMessage *result)
 {
-	status_t error = result && (fileTypesCount == 0 || (fileTypesCount > 0 && fileTypes))
-	               ? B_OK : B_BAD_VALUE;
-	if (!error) {
-		result->MakeEmpty();
-		
-		std::list<recent_entry*> duplicateList;
-		std::list<recent_entry*>::iterator item;
-		int count = 0;
-		
-		for (item = fEntryList.begin();
-		       count < maxCount && item != fEntryList.end();
-		         item++)
-		{
-			bool match = true;
-			// Filter if necessary
-			if (fileTypesCount > 0 || appSig) {
-				match = false;
-				// Filter by app sig
-				if (appSig)
-					match = (*item)->sig == appSig;
-				// Filter by file type
-				if (!match && fileTypesCount > 0) {
-					char type[B_MIME_TYPE_LENGTH];
-					if (GetTypeForRef(&(*item)->ref, type) == B_OK) {
-						for (int i = 0; i < fileTypesCount; i++) {						
-							if (strcasecmp(type, fileTypes[i]) == 0) {
-								match = true;
-								break;
-							}					
-						}
-					}
-				}
-			}
-			if (match) {
-				// Check for duplicates
-				for (std::list<recent_entry*>::iterator dupItem
-				     = duplicateList.begin();
-				       dupItem != duplicateList.end();
-				         dupItem++)
-				{
-					if ((*dupItem)->ref == (*item)->ref) {
-						match = false;
+	if (result == NULL
+		|| fileTypesCount < 0
+		|| (fileTypesCount > 0 && fileTypes == NULL))
+		return B_BAD_VALUE;
+
+	result->MakeEmpty();
+
+	std::list<recent_entry*> duplicateList;
+	std::list<recent_entry*>::iterator item;
+	status_t error = B_OK;
+	int count = 0;
+
+	for (item = fEntryList.begin();
+			error == B_OK && count < maxCount && item != fEntryList.end();
+			item++) {
+		// Filter by app sig
+		if (appSig != NULL && strcasecmp((*item)->sig.c_str(), appSig))
+			continue;
+
+		// Filter by file type
+		if (fileTypesCount > 0) {
+			char type[B_MIME_TYPE_LENGTH];
+			if (GetTypeForRef(&(*item)->ref, type) == B_OK) {
+				bool match = false;
+				for (int i = 0; i < fileTypesCount; i++) {						
+					if (!strcasecmp(type, fileTypes[i])) {
+						match = true;
 						break;
 					}
 				}
-			}
-			if (match) {
-				// Add the ref to the list used to check
-				// for duplicates, and then to the result
-				duplicateList.push_back(*item);			
-				result->AddRef("refs", &(*item)->ref);
-				count++;
+				if (!match)
+					continue;
 			}
 		}
+
+		// Check for duplicates
+		bool duplicate = false;
+		for (std::list<recent_entry*>::iterator dupItem = duplicateList.begin();
+				dupItem != duplicateList.end(); dupItem++) {
+			if ((*dupItem)->ref == (*item)->ref) {
+				duplicate = true;
+				break;
+			}
+		}
+		if (duplicate)
+			continue;
+
+		// Add the ref to the list used to check
+		// for duplicates, and then to the result
+		try {
+			duplicateList.push_back(*item);
+		} catch (...) {
+			error = B_NO_MEMORY;
+		}
+		if (error == B_OK)
+			error = result->AddRef("refs", &(*item)->ref);
+		if (error == B_OK)
+			count++;
 	}
-		
+
 	return error;
 }
 
-// Clear
+
 /*! \brief Clears the list of recently launched apps
 */
 status_t
 RecentEntries::Clear()
 {
 	std::list<recent_entry*>::iterator i;
-	for (i = fEntryList.begin(); i != fEntryList.end(); i++)
+	for (i = fEntryList.begin(); i != fEntryList.end(); i++) {
 		delete *i;
+	}
 	fEntryList.clear();
 	return B_OK;	
 }
 
-// Print
+
 /*! \brief Dumps the the current list of entries to stdout.
 */
 status_t
@@ -254,10 +242,7 @@ RecentEntries::Print()
 {
 	std::list<recent_entry*>::iterator item;
 	int counter = 1;
-	for (item = fEntryList.begin();
-	       item != fEntryList.end();
-	         item++)
-	{
+	for (item = fEntryList.begin(); item != fEntryList.end(); item++) {
 		printf("%d: device == '%ld', dir == '%lld', name == '%s', app == '%s', index == %ld\n",
 		       counter++, (*item)->ref.device, (*item)->ref.directory, (*item)->ref.name,
 		       (*item)->sig.c_str(), (*item)->index);
@@ -265,31 +250,31 @@ RecentEntries::Print()
 	return B_OK;
 }
 
-// Save
+
 status_t
 RecentEntries::Save(FILE* file, const char *description, const char *tag)
 {
-	status_t error = file ? B_OK : B_BAD_VALUE;
-	if (!error) {
-		fprintf(file, "# %s\n", description);
+	if (file == NULL || description == NULL || tag == NULL)
+		return B_BAD_VALUE;
 
-		/*	In order to write our entries out in the format used by the
-			Roster settings file, we need to collect all the signatures
-			for each entry in one place, while at the same time updating
-			the index values for each entry/sig pair to reflect the current
-			ordering of the list. I believe this is the data structure
-			R5 actually maintains all the time, as their indices do not
-			change over time (whereas ours will). If our implementation
-			proves to be slower that R5, we may want to consider using
-			the data structure pervasively.
-		*/			
-		std::map<entry_ref, std::list<recent_entry*> > map;
-		uint32 count = fEntryList.size();
-		
+	fprintf(file, "# %s\n", description);
+
+	/*	In order to write our entries out in the format used by the
+		Roster settings file, we need to collect all the signatures
+		for each entry in one place, while at the same time updating
+		the index values for each entry/sig pair to reflect the current
+		ordering of the list. I believe this is the data structure
+		R5 actually maintains all the time, as their indices do not
+		change over time (whereas ours will). If our implementation
+		proves to be slower that R5, we may want to consider using
+		the data structure pervasively.
+	*/			
+	std::map<entry_ref, std::list<recent_entry*> > map;
+	uint32 count = fEntryList.size();
+
+	try {
 		for (std::list<recent_entry*>::iterator item = fEntryList.begin();
-		       item != fEntryList.end();
-		         count--, item++)
-		{
+				item != fEntryList.end(); count--, item++) {
 			recent_entry *entry = *item;
 			if (entry) {
 				entry->index = count;
@@ -300,49 +285,47 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 				        fEntryList.size() - count));
 			}			
 		}
-		
-		for (std::map<entry_ref, std::list<recent_entry*> >::iterator mapItem
-		     = map.begin();
-		       mapItem != map.end();
-		         mapItem++)
-		{
-			// We're going to need to properly escape the path name we
-			// get, which will at absolute worst double the length of
-			// the string.
-			BPath path;
-			char escapedPath[B_PATH_NAME_LENGTH*2];
-			status_t outputError = path.SetTo(&mapItem->first);
-			if (!outputError) {
-				BPrivate::Storage::escape_path(path.Path(), escapedPath);
-				fprintf(file, "%s %s", tag, escapedPath);
-				std::list<recent_entry*> &list = mapItem->second;
-				int32 i = 0;
-				for (std::list<recent_entry*>::iterator item = list.begin();
-				       item != list.end();
-				         i++, item++)
-				{
-					recent_entry *entry = *item;
-					if (entry) 
-						fprintf(file, " \"%s\" %ld", entry->sig.c_str(), entry->index);
-					else {
-						DBG(OUT("WARNING: RecentEntries::Save(): The entry %ld entries "
-						        "from the front of the compiled recent_entry* list for the "
-						        "entry ref (%ld, %lld, '%s') was found to be NULL\n",
-						        i, mapItem->first.device, mapItem->first.directory,
-						        mapItem->first.name));
-					}
-				}
-				fprintf(file, "\n");
-			} else {
-				DBG(OUT("WARNING: RecentEntries::Save(): entry_ref_to_path() failed on "
-				        "the entry_ref (%ld, %lld, '%s') with error 0x%lx\n",
-				        mapItem->first.device, mapItem->first.directory,
-				        mapItem->first.name, outputError));
-			}
-		}
-		fprintf(file, "\n");
+	} catch (...) {
+		return B_NO_MEMORY;
 	}
-	return error;
+
+	for (std::map<entry_ref, std::list<recent_entry*> >::iterator mapItem = map.begin();
+			mapItem != map.end(); mapItem++) {
+		// We're going to need to properly escape the path name we
+		// get, which will at absolute worst double the length of
+		// the string.
+		BPath path;
+		char escapedPath[B_PATH_NAME_LENGTH*2];
+		status_t outputError = path.SetTo(&mapItem->first);
+		if (!outputError) {
+			BPrivate::Storage::escape_path(path.Path(), escapedPath);
+			fprintf(file, "%s %s", tag, escapedPath);
+			std::list<recent_entry*> &list = mapItem->second;
+			int32 i = 0;
+			for (std::list<recent_entry*>::iterator item = list.begin();
+					item != list.end(); i++, item++) {
+				recent_entry *entry = *item;
+				if (entry) 
+					fprintf(file, " \"%s\" %ld", entry->sig.c_str(), entry->index);
+				else {
+					DBG(OUT("WARNING: RecentEntries::Save(): The entry %ld entries "
+					        "from the front of the compiled recent_entry* list for the "
+					        "entry ref (%ld, %lld, '%s') was found to be NULL\n",
+					        i, mapItem->first.device, mapItem->first.directory,
+					        mapItem->first.name));
+				}
+			}
+			fprintf(file, "\n");
+		} else {
+			DBG(OUT("WARNING: RecentEntries::Save(): entry_ref_to_path() failed on "
+			        "the entry_ref (%ld, %lld, '%s') with error 0x%lx\n",
+			        mapItem->first.device, mapItem->first.directory,
+			        mapItem->first.name, outputError));
+		}
+	}
+
+	fprintf(file, "\n");
+	return B_OK;
 }
 
 
@@ -355,20 +338,20 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 status_t
 RecentEntries::GetTypeForRef(const entry_ref *ref, char *result)
 {
+	if (ref == NULL || result == NULL)
+		return B_BAD_VALUE;
+
+	// Read the type
 	BNode node;
-	status_t error = ref && result ? B_OK : B_BAD_VALUE;
-	// Read the type and force to lowercase
-	if (!error)
-		error = node.SetTo(ref);
-	if (!error) {
+	status_t error = node.SetTo(ref);
+	if (error == B_OK) {
 		ssize_t bytes = node.ReadAttr("BEOS:TYPE", B_MIME_STRING_TYPE,
-		                0, result, B_MIME_TYPE_LENGTH-1);
-		if (bytes < 0)
+			0, result, B_MIME_TYPE_LENGTH - 1);
+		if (bytes < B_OK)
 			error = bytes;
-		else 
+		else
 			result[bytes] = '\0';
 	}
-	if (!error)
-		BPrivate::Storage::to_lower(result);
+
 	return error;		
 }

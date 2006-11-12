@@ -82,7 +82,7 @@ RecentApps::Add(const char *appSig, int32 appFlags)
 	// of recent apps
 	if (!strcasecmp(appSig, kTrackerSignature)
 		|| !strcasecmp(appSig, kDeskbarSignature)
-		|| (appFlags & B_ARGV_ONLY) != 0 || (appFlags & B_BACKGROUND_APP) != 0)
+		|| (appFlags & (B_ARGV_ONLY | B_BACKGROUND_APP)) != 0)
 		return B_OK;
 
 	// Remove any previous instance
