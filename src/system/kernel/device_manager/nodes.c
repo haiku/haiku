@@ -610,8 +610,6 @@ device_manager_control(const char *subsystem, uint32 function, void *buffer, siz
 				cookie = child->internal_id;
 			benaphore_unlock(&gNodeLock);
 
-			cookie++;
-
 			if (!child)
 				return B_ENTRY_NOT_FOUND;
 			// copy back to user space
@@ -661,12 +659,12 @@ device_manager_control(const char *subsystem, uint32 function, void *buffer, siz
 					attr.value.ui64 = attr_info->attr.value.ui64; break;
 				case B_STRING_TYPE:
 					strlcpy(attr.value.string, attr_info->attr.value.string, 254); break;
-				case B_RAW_TYPE:
+				/*case B_RAW_TYPE:
 					if (attr.value.raw.length > attr_info->attr.value.raw.length)
 						attr.value.raw.length = attr_info->attr.value.raw.length;
-					memcpy(attr.value.raw.data, attr_info->attr.value.raw.data,
+					user_memcpy(attr.value.raw.data, attr_info->attr.value.raw.data,
 						attr.value.raw.length);
-					break;
+					break;*/
 			}
 
 			benaphore_unlock(&gNodeLock);
