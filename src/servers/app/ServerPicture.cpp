@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stack>
 
+using std::stack;
 
 class ShapePainter : public BShapeIterator {
 	public:
@@ -602,16 +603,18 @@ const void *tableEntries[] = {
 
 // ServerPicture
 ServerPicture::ServerPicture()
+	:PictureDataWriter(&fData)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 }
 
 
 ServerPicture::ServerPicture(const ServerPicture &picture)
+	:PictureDataWriter(&fData)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
-	AddData(picture.Data(), picture.DataLength());
+	fData.Write(picture.Data(), picture.DataLength());
 }
 
 
@@ -619,38 +622,7 @@ ServerPicture::~ServerPicture()
 {
 }
 
-
-void
-ServerPicture::BeginOp(int16 op)
-{
-	fStack.push(fData.Position());
-	fData.Write(&op, sizeof(op));
-	
-	// Init the size of the opcode block to 0
-	size_t size = 0;
-	fData.Write(&size, sizeof(size));
-}
-
-
-void
-ServerPicture::EndOp()
-{
-	off_t curPos = fData.Position();
-	off_t stackPos = fStack.top();
-	fStack.pop();
-	
-	// The size of the op is calculated like this:
-	// current position on the stream minus the position on the stack,
-	// minus the space occupied by the op code itself (int16)
-	// and the space occupied by the size field (size_t) 
-	size_t size = curPos - stackPos - sizeof(size_t) - sizeof(int16);
-
-	// Size was set to 0 in BeginOp(). Now we overwrite it with the correct value
-	fData.Seek(stackPos + sizeof(int16), SEEK_SET);
-	fData.Write(&size, sizeof(size));
-	fData.Seek(curPos, SEEK_SET);
-}
-
+/*
 
 void
 ServerPicture::EnterStateChange()
@@ -751,11 +723,11 @@ ServerPicture::AddData(const void *data, int32 size)
 	fData.Write(data, size);
 }
 
-
+*/
 void
 ServerPicture::SyncState(ViewLayer *view)
 {
-	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+/*	BeginOp(B_PIC_ENTER_STATE_CHANGE);
 
 	BeginOp(B_PIC_SET_PEN_LOCATION);
 	AddCoord(view->CurrentState()->PenLocation());
@@ -797,6 +769,7 @@ ServerPicture::SyncState(ViewLayer *view)
 	EndOp();
 
 	EndOp();
+*/
 }
 
 

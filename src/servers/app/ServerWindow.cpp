@@ -42,7 +42,6 @@
 
 #include <DirectWindowPrivate.h>
 #include <MessagePrivate.h>
-#include <PictureProtocol.h>
 #include <PortLink.h>
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
@@ -2307,42 +2306,28 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			
-			picture->BeginOp(B_PIC_SET_ORIGIN);
-			picture->AddCoord(BPoint(x, y));
-			picture->EndOp();
+			picture->WriteSetOrigin(BPoint(x, y));
 			break;
 		}
 
 		case AS_LAYER_INVERT_RECT:
 		{
-			picture->BeginOp(B_PIC_SET_DRAWING_MODE);
-			picture->AddInt16((int16)B_OP_INVERT);
-			picture->EndOp();
-			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			picture->BeginOp(B_PIC_FILL_RECT);
-			picture->AddRect(rect);
-			picture->EndOp();
-
-			picture->BeginOp(B_PIC_SET_DRAWING_MODE);
-			picture->AddInt16((int16)B_OP_COPY);
-			picture->EndOp();
+			picture->WriteInvertRect(rect);
 
 			break;
 		}
 
 		case AS_LAYER_PUSH_STATE:
 		{
-			picture->BeginOp(B_PIC_PUSH_STATE);
-			picture->EndOp();
+			picture->WritePushState();
 			break;
 		}
 
 		case AS_LAYER_POP_STATE:
 		{
-			picture->BeginOp(B_PIC_POP_STATE);
-			picture->EndOp();
+			picture->WritePopState();
 			break;
 		}
 
@@ -2351,29 +2336,36 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			int8 drawingMode;
 			link.Read<int8>(&drawingMode);
 			
-			picture->BeginOp(B_PIC_SET_DRAWING_MODE);
-			picture->AddInt16((int16)drawingMode);
-			picture->EndOp();
+			picture->WriteSetDrawingMode((drawing_mode)drawingMode);
 			break;
 		}
-
+		
 		case AS_LAYER_SET_PEN_SIZE:
 		{
 			float penSize;
 			link.Read<float>(&penSize);
-			picture->BeginOp(B_PIC_SET_PEN_SIZE);
-			picture->AddFloat(penSize);
-			picture->EndOp();
+			picture->WriteSetPenSize(penSize);
 			break;
 		}
 
+		case AS_LAYER_SET_LINE_MODE:
+		{
+			int8 lineCap, lineJoin;
+			float miterLimit;
+
+			link.Read<int8>(&lineCap);
+			link.Read<int8>(&lineJoin);
+			link.Read<float>(&miterLimit);
+			
+			picture->WriteSetLineMode((cap_mode)lineCap, (join_mode)lineJoin, miterLimit);
+		
+			break;
+		}
 		case AS_LAYER_SET_SCALE:
 		{
 			float scale;
 			link.Read<float>(&scale);
-			picture->BeginOp(B_PIC_SET_SCALE);
-			picture->AddFloat(scale);
-			picture->EndOp();
+			picture->WriteSetScale(scale);
 			break;
 		}
 
@@ -2383,9 +2375,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 
-			picture->BeginOp(code == AS_FILL_RECT ? B_PIC_FILL_RECT : B_PIC_STROKE_RECT);
-			picture->AddRect(rect);
-			picture->EndOp();
+			picture->WriteDrawRect(rect, code == AS_FILL_RECT);
 			break;
 		}
 		
@@ -2399,10 +2389,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&radii.x);
 			link.Read<float>(&radii.y);
 			
-			picture->BeginOp(code == AS_FILL_ROUNDRECT ? B_PIC_FILL_ROUND_RECT : B_PIC_STROKE_ROUND_RECT);
-			picture->AddRect(rect);
-			picture->AddCoord(radii);
-			picture->EndOp();
+			picture->WriteDrawRoundRect(rect, radii, code == AS_FILL_ROUNDRECT);
 			break;
 		}
 
@@ -2411,11 +2398,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			BRect rect;
 			link.Read<BRect>(&rect);
-			picture->BeginOp(code == AS_FILL_ELLIPSE ? B_PIC_FILL_ELLIPSE : 
-					B_PIC_STROKE_ELLIPSE);
-			picture->AddRect(rect);
-			picture->EndOp();
-			
+			picture->WriteDrawEllipse(rect, code == AS_FILL_ELLIPSE);			
 			break;
 		}
 
@@ -2431,12 +2414,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint radii((rect.Width() + 1) / 2, (rect.Height() + 1) / 2);
 			BPoint center = rect.LeftTop() + radii;
 
-			picture->BeginOp(code == AS_FILL_ARC ? B_PIC_FILL_ARC : B_PIC_STROKE_ARC);
-			picture->AddCoord(center);
-			picture->AddCoord(radii);
-			picture->AddFloat(startTheta);
-			picture->AddFloat(arcTheta);
-			picture->EndOp();
+			picture->WriteDrawArc(center, radii, startTheta, arcTheta, code == AS_FILL_ARC);
 			break;
 		}
 
@@ -2449,10 +2427,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x2);
 			link.Read<float>(&y2);
 
-			picture->BeginOp(B_PIC_STROKE_LINE);
-			picture->AddCoord(BPoint(x1, y1));
-			picture->AddCoord(BPoint(x2, y2));
-			picture->EndOp();
+			picture->WriteStrokeLine(BPoint(x1, y1), BPoint(x2, y2));
 			break;
 		}
 		
@@ -2463,8 +2438,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (lineCount <= 0)
 				break;
 
-			picture->BeginOp(B_PIC_PUSH_STATE);
-			picture->EndOp();
+			picture->WritePushState();
 
 			for (int32 i = 0; i < lineCount; i++) {
 				float x1, y1, x2, y2;
@@ -2476,18 +2450,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				rgb_color color;
 				link.Read<rgb_color>(&color);
 			
-				picture->BeginOp(B_PIC_SET_FORE_COLOR);
-				picture->AddColor(color);
-				picture->EndOp();
-
-				picture->BeginOp(B_PIC_STROKE_LINE);
-				picture->AddCoord(BPoint(x1, y1));
-				picture->AddCoord(BPoint(x2, y2));
-				picture->EndOp();
+				picture->WriteSetHighColor(color);
+				picture->WriteStrokeLine(BPoint(x1, y1), BPoint(x2, y2));
 			}
 			
-			picture->BeginOp(B_PIC_POP_STATE);
-			picture->EndOp();
+			picture->WritePopState();
 			break;
 		}
 
@@ -2497,9 +2464,10 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			rgb_color color;
 			link.Read(&color, sizeof(rgb_color));
 
-			picture->BeginOp(code == AS_LAYER_SET_HIGH_COLOR ? B_PIC_SET_FORE_COLOR : B_PIC_SET_BACK_COLOR);
-			picture->AddColor(color);
-			picture->EndOp();
+			if (code == AS_LAYER_SET_HIGH_COLOR)
+				picture->WriteSetHighColor(color);
+			else
+				picture->WriteSetLowColor(color);
 			break;
 		}
 		
@@ -2515,16 +2483,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 
-			picture->BeginOp(B_PIC_SET_PEN_LOCATION);
-			picture->AddCoord(location);
-			picture->EndOp();
-		
-			picture->BeginOp(B_PIC_DRAW_STRING);
-			picture->AddInt32(length);
-			picture->AddData(string, length);
-			picture->AddFloat(delta.space);
-			picture->AddFloat(delta.nonspace);
-			picture->EndOp();
+			picture->WriteDrawString(location, string, length, delta);
 			
 			free(string);
 			break;		
@@ -2547,12 +2506,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				&& link.Read(opList, opCount * sizeof(uint32)) >= B_OK
 				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
 				
-				picture->BeginOp(code == AS_FILL_SHAPE ? B_PIC_FILL_SHAPE : B_PIC_STROKE_SHAPE);
-				picture->AddInt32(opCount);
-				picture->AddData(opList, opCount * sizeof(uint32));
-				picture->AddInt32(ptCount);
-				picture->AddData(ptList, ptCount * sizeof(BPoint));
-				picture->EndOp();
+				const bool fill = (code == AS_FILL_SHAPE);
+				picture->WriteDrawShape(opCount, opList, ptCount, ptList, fill);
 			}
 			delete[] opList;
 			delete[] ptList;
@@ -2575,21 +2530,13 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (bitmap == NULL)
 				break;
 
-			picture->BeginOp(B_PIC_DRAW_PIXELS);
-			picture->AddRect(sourceRect);
-			picture->AddRect(destRect);
-			picture->AddInt32(bitmap->Width());
-			picture->AddInt32(bitmap->Height());
-			picture->AddInt32(bitmap->BytesPerRow());
-			picture->AddInt32(bitmap->ColorSpace());
-			picture->AddInt32(/*bitmap->Flags()*/0);
-			picture->AddInt32(bitmap->BitsLength());
-			picture->AddData((void *)bitmap->Bits(), bitmap->BitsLength());
-			picture->EndOp();
+			picture->WriteDrawBitmap(sourceRect, destRect, bitmap->Width(), bitmap->Height(),
+						bitmap->BytesPerRow(), bitmap->ColorSpace(), /*bitmap->Flags()*/0,
+						bitmap->Bits(), bitmap->BitsLength());
 
 			break;
 		}
-
+/*
 		case AS_LAYER_SET_BLENDING_MODE:
 		{
 			int8 srcAlpha, alphaFunc;
@@ -2603,7 +2550,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			
 			break;
-		}
+		}*/
 		default:
 			return false;
 	}

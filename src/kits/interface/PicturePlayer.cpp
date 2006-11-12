@@ -40,7 +40,7 @@ typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 typedef void (*fnc_BShape)(void*, BShape*);
 
 
-PicturePlayer::PicturePlayer(void *data, int32 size, BList *pictures)
+PicturePlayer::PicturePlayer(const void *data, int32 size, BList *pictures)
 	:	fData(data, size),
 		fPictures(pictures)
 {
@@ -537,7 +537,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 		// If we didn't read enough bytes, skip them. This is not a error
 		// since the instructions can change over time.
-		if (op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE && fData.Position() - pos < size)
+		if (/*op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE && */fData.Position() - pos < size)
 			fData.Seek(size - (fData.Position() - pos), SEEK_CUR);
 
 		// TODO: what if too much was read, should we return B_ERROR?

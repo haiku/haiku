@@ -81,6 +81,7 @@ MergeObject <libbe>interface_kit.o :
 	OutlineListView.cpp
 	Picture.cpp
 	PictureButton.cpp
+	PictureDataWriter.cpp
 	PicturePlayer.cpp
 	Point.cpp
 	Polygon.cpp
