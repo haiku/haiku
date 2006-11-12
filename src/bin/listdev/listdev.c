@@ -19,6 +19,7 @@
 #include <drivers/bus/PCI.h>
 
 #include "dm_wrapper.h"
+#include "pcihdr.h"
 
 extern const char *__progname;
 
@@ -29,74 +30,57 @@ int gMode = USER_MODE;
 #define BUS_ISA		1
 #define BUS_PCI		2
 
-const char *base_desc[] = {
-	"Legacy",
-	"Mass Storage Controller",
-	"NIC",
-	"Display Controller",
-	"Multimedia Device",
-	"Memory Controller",
-	"Bridge Device",
-	"Communication Device",
-	"Generic System Peripheral",
-	"Input Device",
-	"Docking Station",
-	"CPU",
-	"Serial Bus Controller"
-};
 
-struct subtype_descriptions {
-	uchar base, subtype;
-	char *name;
-} subtype_desc[] = {
-	{ 0, 0, "non-VGA" },
-	{ 0, 0, "VGA" },
-	{ 1, 0, "SCSI" },
-	{ 1, 1, "IDE" },
-	{ 1, 2, "Floppy" },
-	{ 1, 3, "IPI" },
-	{ 1, 4, "RAID" },
-	{ 2, 0, "Ethernet" },
-	{ 2, 1, "Token Ring" },
-	{ 2, 2, "FDDI" },
-	{ 2, 3, "ATM" },
-	{ 3, 0, "VGA/8514" },
-	{ 3, 1, "XGA" },
-	{ 4, 0, "Video" },
-	{ 4, 1, "Audio" },
-	{ 5, 0, "RAM" },
-	{ 5, 1, "Flash" },
-	{ 6, 0, "Host" },
-	{ 6, 1, "ISA" },
-	{ 6, 2, "EISA" },
-	{ 6, 3, "MCA" },
-	{ 6, 4, "PCI-PCI" },
-	{ 6, 5, "PCMCIA" },
-	{ 6, 6, "NuBus" },
-	{ 6, 7, "CardBus" },
-	{ 7, 0, "Serial" },
-	{ 7, 1, "Parallel" },
-	{ 8, 0, "PIC" },
-	{ 8, 1, "DMA" },
-	{ 8, 2, "Timer" },
-	{ 8, 3, "RTC" },
-	{ 9, 0, "Keyboard" },
-	{ 9, 1, "Digitizer" },
-	{ 9, 2, "Mouse" },
-	{10, 0, "Generic" },
-	{11, 0, "386" },
-	{11, 1, "486" },
-	{11, 2, "Pentium" },
-	{11,16, "Alpha" },
-	{11,32, "PowerPC" },
-	{11,48, "Coprocessor" },
-	{12, 0, "IEEE 1394" },
-	{12, 1, "ACCESS" },
-	{12, 2, "SSA" },
-	{12, 3, "USB" },
-	{12, 4, "Fibre Channel" },
-	{255,255, NULL }
-};
+static void
+get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull)
+{
+	int i;
+	for (i = 0; i < (int)PCI_VENTABLE_LEN; i++) {
+		if (PciVenTable[i].VenId == vendorID) {
+			if (PciVenTable[i].VenShort && PciVenTable[i].VenFull
+				&& 0 == strcmp(PciVenTable[i].VenShort, PciVenTable[i].VenFull)) {
+				*venShort = PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
+				*venFull = NULL;
+			} else {
+				*venShort = PciVenTable[i].VenShort && PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
+				*venFull = PciVenTable[i].VenFull && PciVenTable[i].VenFull[0] ? PciVenTable[i].VenFull : NULL;
+			}
+			return;
+		}
+	}
+	*venShort = NULL;
+	*venFull = NULL;
+}
+
+
+static void
+get_device_info(uint16 vendorID, uint16 deviceID, 
+		uint16 subvendorID, uint16 subsystemID, const char **devShort, const char **devFull)
+{
+	int i;
+	*devShort = NULL;
+	*devFull = NULL;
+	
+	// search for the device
+	for (i = 0; i < (int)PCI_DEVTABLE_LEN; i++) {
+		if (PciDevTable[i].VenId == vendorID && PciDevTable[i].DevId == deviceID ) {
+			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
+			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
+			break;
+		}
+	}
+
+	// search for the subsystem eventually
+	for (; i < (int)PCI_DEVTABLE_LEN; i++) {
+		if (PciDevTable[i].VenId != vendorID || PciDevTable[i].DevId != deviceID)
+			break;
+		if (PciDevTable[i].SubVenId == subvendorID && PciDevTable[i].SubDevId == subsystemID ) {
+			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
+			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
+			break;
+		}
+	}
+}
 
 
 static void
@@ -197,7 +181,14 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 	uint8 pci_class_api_id = 0;
 	uint16 pci_vendor_id = 0;
 	uint16 pci_device_id = 0;
-
+	uint16 pci_subsystem_vendor_id = 0;
+	uint16 pci_subsystem_id = 0;
+	
+	const char *venShort;
+	const char *venFull;
+	const char *devShort;
+	const char *devFull;
+		
 	attr.cookie = 0;
 	attr.node_cookie = *node;
 	attr.value.raw.data = data;
@@ -247,21 +238,42 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			break;
 		case BUS_PCI:
 			printf("device ");
-			printf((pci_class_base_id < 13) ? base_desc[pci_class_base_id] : "Unknown");
 			
 			if (pci_class_sub_id == 0x80)
 				printf(" (Other)");
 			else {
-				struct subtype_descriptions *s = subtype_desc;
+				PCI_CLASSCODETABLE *s = PciClassCodeTable;
 		
-				while (s->name) {
-					if ((pci_class_base_id == s->base) && (pci_class_sub_id == s->subtype))
+				while (s->BaseDesc) {
+					if ((pci_class_base_id == s->BaseClass) 
+						&& (pci_class_sub_id == s->SubClass)
+						&& (pci_class_api_id == s->ProgIf))
 						break;
 					s++;
 				}
-				printf(" (%s)", (s->name) ? s->name : "Unknown");
+				printf("%s (%s%s%s)", s->BaseDesc, s->SubDesc, s->ProgDesc ? ", " : "", s->ProgDesc);
 			}
 			printf(" [%x|%x|%x]\n", pci_class_base_id, pci_class_sub_id, pci_class_api_id);
+			
+			get_vendor_info(pci_vendor_id, &venShort, &venFull);
+			if (!venShort && !venFull) {
+				printf("vendor %04x: Unknown\n", pci_vendor_id);
+			} else if (venShort && venFull) {
+				printf("vendor %04x: %s - %s\n", pci_vendor_id, venShort, venFull);
+			} else {
+				printf("vendor %04x: %s\n", pci_vendor_id, venShort ? venShort : venFull);
+			}
+		
+			get_device_info(pci_vendor_id, pci_device_id, pci_subsystem_vendor_id, pci_subsystem_id, 
+				&devShort, &devFull);
+			if (!devShort && !devFull) {
+				printf("device %04x: Unknown\n", pci_device_id);
+			} else if (devShort && devFull) {
+				printf("device %04x: %s - %s\n", pci_device_id, devShort, devFull);
+			} else {
+				printf("device %04x: %s\n", pci_device_id, devShort ? devShort : devFull);
+			}
+			
 			printf("vendor id: %x, device id: %x\n", pci_vendor_id, pci_device_id);
 			break;
 	}
