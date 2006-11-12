@@ -22,7 +22,7 @@
 class PicturePlayer {
 public:
 					PicturePlayer();
-					PicturePlayer(void *data, int32 size, BList *pictures);
+					PicturePlayer(const void *data, int32 size, BList *pictures);
 virtual				~PicturePlayer();
 
 		int16		GetOp();
