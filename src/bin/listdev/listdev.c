@@ -20,6 +20,7 @@
 
 #include "dm_wrapper.h"
 #include "pcihdr.h"
+#include "pci-utils.h"
 
 extern const char *__progname;
 
@@ -29,58 +30,6 @@ int gMode = USER_MODE;
 
 #define BUS_ISA		1
 #define BUS_PCI		2
-
-
-static void
-get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull)
-{
-	int i;
-	for (i = 0; i < (int)PCI_VENTABLE_LEN; i++) {
-		if (PciVenTable[i].VenId == vendorID) {
-			if (PciVenTable[i].VenShort && PciVenTable[i].VenFull
-				&& 0 == strcmp(PciVenTable[i].VenShort, PciVenTable[i].VenFull)) {
-				*venShort = PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
-				*venFull = NULL;
-			} else {
-				*venShort = PciVenTable[i].VenShort && PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
-				*venFull = PciVenTable[i].VenFull && PciVenTable[i].VenFull[0] ? PciVenTable[i].VenFull : NULL;
-			}
-			return;
-		}
-	}
-	*venShort = NULL;
-	*venFull = NULL;
-}
-
-
-static void
-get_device_info(uint16 vendorID, uint16 deviceID, 
-		uint16 subvendorID, uint16 subsystemID, const char **devShort, const char **devFull)
-{
-	int i;
-	*devShort = NULL;
-	*devFull = NULL;
-	
-	// search for the device
-	for (i = 0; i < (int)PCI_DEVTABLE_LEN; i++) {
-		if (PciDevTable[i].VenId == vendorID && PciDevTable[i].DevId == deviceID ) {
-			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
-			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
-			break;
-		}
-	}
-
-	// search for the subsystem eventually
-	for (; i < (int)PCI_DEVTABLE_LEN; i++) {
-		if (PciDevTable[i].VenId != vendorID || PciDevTable[i].DevId != deviceID)
-			break;
-		if (PciDevTable[i].SubVenId == subvendorID && PciDevTable[i].SubDevId == subsystemID ) {
-			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
-			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
-			break;
-		}
-	}
-}
 
 
 static void
@@ -188,6 +137,7 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 	const char *venFull;
 	const char *devShort;
 	const char *devFull;
+	char classInfo[255];
 		
 	attr.cookie = 0;
 	attr.node_cookie = *node;
@@ -237,30 +187,8 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 		case BUS_ISA:
 			break;
 		case BUS_PCI:
-			printf("device ");
-			
-			if (pci_class_base_id == 0x80)
-				printf(" (Other)");
-			else {
-				PCI_CLASSCODETABLE *s = PciClassCodeTable, *foundItem;
-		
-				while (s->BaseDesc) {
-					if ((pci_class_base_id == s->BaseClass) 
-						&& (pci_class_sub_id == s->SubClass)) {
-						foundItem = s;
-						if (pci_class_api_id == s->ProgIf)
-							break;
-					}
-					s++;
-				}
-				if (!s->BaseDesc)
-					s = foundItem;
-				printf("%s", s->BaseDesc);
-				if (pci_class_sub_id != 0x80)
-					printf(" (%s%s%s)", s->SubDesc, 
-						(s->ProgDesc && strcmp("", s->ProgDesc)) ? ", " : "", s->ProgDesc);
-			}
-			printf(" [%x|%x|%x]\n", pci_class_base_id, pci_class_sub_id, pci_class_api_id);
+			get_class_info(pci_class_base_id, pci_class_sub_id, pci_class_api_id, classInfo);
+			printf("device %s [%x|%x|%x]\n", classInfo, pci_class_base_id, pci_class_sub_id, pci_class_api_id);
 			
 			get_vendor_info(pci_vendor_id, &venShort, &venFull);
 			if (!venShort && !venFull) {
