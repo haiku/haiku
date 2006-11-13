@@ -1,3 +1,11 @@
+/*
+ * Copyright 2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+ 
 #ifndef __PICTUREDATAWRITER_H
 #define __PICTUREDATAWRITER_H
 
