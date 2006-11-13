@@ -239,19 +239,26 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 		case BUS_PCI:
 			printf("device ");
 			
-			if (pci_class_sub_id == 0x80)
+			if (pci_class_base_id == 0x80)
 				printf(" (Other)");
 			else {
-				PCI_CLASSCODETABLE *s = PciClassCodeTable;
+				PCI_CLASSCODETABLE *s = PciClassCodeTable, *foundItem;
 		
 				while (s->BaseDesc) {
 					if ((pci_class_base_id == s->BaseClass) 
-						&& (pci_class_sub_id == s->SubClass)
-						&& (pci_class_api_id == s->ProgIf))
-						break;
+						&& (pci_class_sub_id == s->SubClass)) {
+						foundItem = s;
+						if (pci_class_api_id == s->ProgIf)
+							break;
+					}
 					s++;
 				}
-				printf("%s (%s%s%s)", s->BaseDesc, s->SubDesc, s->ProgDesc ? ", " : "", s->ProgDesc);
+				if (!s->BaseDesc)
+					s = foundItem;
+				printf("%s", s->BaseDesc);
+				if (pci_class_sub_id != 0x80)
+					printf(" (%s%s%s)", s->SubDesc, 
+						(s->ProgDesc && strcmp("", s->ProgDesc)) ? ", " : "", s->ProgDesc);
 			}
 			printf(" [%x|%x|%x]\n", pci_class_base_id, pci_class_sub_id, pci_class_api_id);
 			
@@ -273,8 +280,8 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			} else {
 				printf("device %04x: %s\n", pci_device_id, devShort ? devShort : devFull);
 			}
+			printf("\n");
 			
-			printf("vendor id: %x, device id: %x\n", pci_vendor_id, pci_device_id);
 			break;
 	}
 }
