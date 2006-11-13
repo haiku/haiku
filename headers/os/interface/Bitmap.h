@@ -38,6 +38,8 @@ class BBitmap : public BArchivable {
 				screen_id screenID = B_MAIN_SCREEN_ID);
 		BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews = false,
 				bool needsContiguous = false);
+		BBitmap(const BBitmap& source, uint32 flags);
+		BBitmap(const BBitmap& source);
 		BBitmap(const BBitmap *source, bool acceptsViews = false,
 				bool needsContiguous = false);
 		virtual ~BBitmap();
@@ -87,6 +89,8 @@ class BBitmap : public BArchivable {
 		void Unlock();
 		bool IsLocked() const;
 
+		BBitmap& operator=(const BBitmap& source);
+
 		//----- Private or reserved -----------------------------------------//
 	
 		virtual status_t Perform(perform_code d, void *arg);
@@ -99,9 +103,6 @@ class BBitmap : public BArchivable {
 		virtual void _ReservedBitmap1();
 		virtual void _ReservedBitmap2();
 		virtual void _ReservedBitmap3();
-
-		BBitmap(const BBitmap &);
-		BBitmap &operator=(const BBitmap &);
 
 		int32 _ServerToken() const;
 		void _InitObject(BRect bounds, color_space colorSpace, uint32 flags,

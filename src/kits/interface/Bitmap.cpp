@@ -212,7 +212,27 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 	}
 }
 
-// destructor
+
+BBitmap::BBitmap(const BBitmap& source, uint32 flags)
+{
+	if (!source.IsValid())
+		return;
+
+	_InitObject(source.Bounds(), source.ColorSpace(), flags,
+		source.BytesPerRow(), B_MAIN_SCREEN_ID);
+
+	if (InitCheck() == B_OK)
+		memcpy(Bits(), source.Bits(), min_c(BitsLength(), source.BitsLength()));
+}
+
+
+BBitmap::BBitmap(const BBitmap& source)
+{
+	fBasePointer = NULL;
+	*this = source;
+}
+
+
 /*!	\brief Frees all resources associated with this object.
 */
 BBitmap::~BBitmap()
@@ -373,7 +393,7 @@ BBitmap::InitCheck() const
 bool
 BBitmap::IsValid() const
 {
-	return (InitCheck() == B_OK);
+	return InitCheck() == B_OK;
 }
 
 
@@ -840,9 +860,25 @@ BBitmap::IsLocked() const
 	return fWindow != NULL ? fWindow->IsLocked() : false;
 }
 
-// Perform
-/*!	\brief ???
-*/
+
+BBitmap &
+BBitmap::operator=(const BBitmap& source)
+{
+	_CleanUp();
+	fInitError = B_NO_INIT;
+
+	if (!source.IsValid())
+		return *this;
+
+	_InitObject(source.Bounds(), source.ColorSpace(), source.Flags(),
+		source.BytesPerRow(), B_MAIN_SCREEN_ID);
+	if (InitCheck() == B_OK)
+		memcpy(Bits(), source.Bits(), min_c(BitsLength(), source.BitsLength()));
+
+	return *this;
+}
+
+
 status_t
 BBitmap::Perform(perform_code d, void *arg)
 {
@@ -854,21 +890,6 @@ void BBitmap::_ReservedBitmap1() {}
 void BBitmap::_ReservedBitmap2() {}
 void BBitmap::_ReservedBitmap3() {}
 
-// copy constructor
-/*!	\brief Privatized copy constructor to prevent usage.
-*/
-BBitmap::BBitmap(const BBitmap &)
-{
-}
-
-// =
-/*!	\brief Privatized assignment operator to prevent usage.
-*/
-BBitmap &
-BBitmap::operator=(const BBitmap &)
-{
-	return *this;
-}
 
 #if 0
 // get_shared_pointer
