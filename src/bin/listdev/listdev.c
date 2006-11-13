@@ -145,10 +145,10 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 	attr.value.raw.length = sizeof(data);
 
 	while (dm_get_next_attr(&attr) == B_OK) {
-		if (!strcmp(attr.name, "bus/is_bus") 
+		if (!strcmp(attr.name, PNP_BUS_IS_BUS) 
 			&& attr.type == B_UINT8_TYPE) {
 			is_bus = attr.value.ui8;
-		} else if (!strcmp(attr.name, "connection")
+		} else if (!strcmp(attr.name, PNP_DRIVER_CONNECTION)
 			&& attr.type == B_STRING_TYPE) {
 			strlcpy(connection, attr.value.string, 255);
 		}
@@ -157,13 +157,13 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			case BUS_ISA:
 				break;
 			case BUS_PCI:
-				if (!strcmp(attr.name, "pci/class/base_id")
+				if (!strcmp(attr.name, PCI_DEVICE_BASE_CLASS_ID_ITEM)
 					&& attr.type == B_UINT8_TYPE) 
 					pci_class_base_id = attr.value.ui8;
-				else if (!strcmp(attr.name, "pci/class/sub_id")
+				else if (!strcmp(attr.name, PCI_DEVICE_SUB_CLASS_ID_ITEM)
 					&& attr.type == B_UINT8_TYPE)
 					pci_class_sub_id = attr.value.ui8;
-				else if (!strcmp(attr.name, "pci/class/api_id")
+				else if (!strcmp(attr.name, PCI_DEVICE_API_ID_ITEM)
 					&& attr.type == B_UINT8_TYPE)
 					pci_class_api_id = attr.value.ui8;
 				else if (!strcmp(attr.name, PCI_DEVICE_VENDOR_ID_ITEM)
