@@ -184,7 +184,7 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 	if (fMixerParam == NULL)
 		value = -1;
 	fSlider = new SliderView(box->Bounds().InsetByCopy(1, 1), new BMessage(VOLUME_CHANGED), 
-		errString == NULL ? "Volume" : errString, B_FOLLOW_LEFT | B_FOLLOW_TOP, value);
+		errString == NULL ? "Volume" : errString, B_FOLLOW_LEFT | B_FOLLOW_TOP, (int32)value);
 	box->AddChild(fSlider);
 
 	fSlider->SetTarget(this);
@@ -366,7 +366,7 @@ SliderView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 	float v = MIN(MAX(point.x, 11), 192);
 	v = (v - 11) / (192-11) * 100;
 	v = MAX(MIN(v,100), 0);
-	SetValue(v);
+	SetValue((int32)v);
 	Draw(Bounds());
 	Flush();
 
@@ -385,7 +385,7 @@ SliderView::MouseUp(BPoint point)
 		float v = MIN(MAX(point.x, 11), 192);
 		v = (v - 11) / (192-11) * 100;
 		v = MAX(MIN(v,100), 0);
-		SetValue(v);
+		SetValue((int32)v);
 	}
 
 	Invoke();
