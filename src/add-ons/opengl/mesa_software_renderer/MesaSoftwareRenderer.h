@@ -8,8 +8,8 @@
  * 
  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
-#ifndef MESARENDERER_H
-#define MESARENDERER_H
+#ifndef MESASOFTWARERENDERER_H
+#define MESASOFTWARERENDERER_H
 
 #include "GLRenderer.h"
 
@@ -19,11 +19,11 @@ extern "C" {
 
 }
 
-class MesaSoftRenderer : public BGLRenderer
+class MesaSoftwareRenderer : public BGLRenderer
 {
 public:
-				MesaSoftRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher);
-	virtual				~MesaSoftRenderer();
+						MesaSoftwareRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher);
+	virtual				~MesaSoftwareRenderer();
 	
 	virtual void		LockGL();
 	virtual void 		UnlockGL();
@@ -160,5 +160,5 @@ private:
 	GLuint		fHeight;
 };
 
-#endif	// MESARENDERER_H
+#endif	// MESASOFTWARERENDERER_H
 

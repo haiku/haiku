@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons opengl mesa ;
+SubDir HAIKU_TOP src add-ons opengl mesa_software_renderer ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -29,8 +29,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa glapi ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa tnl ] ;
 
-Addon mesa_soft : opengl :
-	MesaSoftRenderer.cpp
+Addon Mesa\ Software\ Renderer : opengl :
+	MesaSoftwareRenderer.cpp
 	: false
 	: libGL.so libmesa.a be
 ;

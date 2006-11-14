@@ -11,7 +11,7 @@
  
 #define CALLED() 			//printf("CALLED %s\n",__PRETTY_FUNCTION__)
 
-#include "MesaSoftRenderer.h"
+#include "MesaSoftwareRenderer.h"
 extern "C" {
 	#include "array_cache/acache.h"
 	#include "extensions.h"
@@ -58,11 +58,11 @@ extern const char * color_space_name(color_space space);
 extern "C" _EXPORT BGLRenderer * 
 instanciate_gl_renderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
 {
-	return new MesaSoftRenderer(view, options, dispatcher);
+	return new MesaSoftwareRenderer(view, options, dispatcher);
 }
 
 
-MesaSoftRenderer::MesaSoftRenderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
+MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
 	: BGLRenderer(view, options, dispatcher),
 	fBitmap(NULL),
 	fContext(NULL),
@@ -134,7 +134,7 @@ MesaSoftRenderer::MesaSoftRenderer(BGLView *view, ulong options, BGLDispatcher *
 	_swsetup_CreateContext(fContext);
 	_swsetup_Wakeup(fContext);
 
-	MesaSoftRenderer * mr = (MesaSoftRenderer *) fContext->DriverCtx;
+	MesaSoftwareRenderer * mr = (MesaSoftwareRenderer *) fContext->DriverCtx;
 	struct swrast_device_driver * swdd = _swrast_GetDeviceDriverReference( fContext );
 	TNLcontext * tnl = TNL_CONTEXT(fContext);
 
@@ -146,9 +146,17 @@ MesaSoftRenderer::MesaSoftRenderer(BGLView *view, ulong options, BGLDispatcher *
 	tnl->Driver.RunPipeline = _tnl_run_pipeline;
  
 	swdd->SetBuffer = this->SetBuffer;
+	
+	// some stupid applications (Quake2) don't even think about calling LockGL()
+	// before using glGetString and its glGet*() friends...
+	// so make sure there is at least a valid context.
+	if (!_mesa_get_current_context()) {
+		LockGL();
+		// not needed, we don't have a looper yet: UnlockLooper();
+	}
 }
 
-MesaSoftRenderer::~MesaSoftRenderer()
+MesaSoftwareRenderer::~MesaSoftwareRenderer()
 {
 	_mesa_destroy_visual(fVisual);
 	_mesa_destroy_framebuffer(fFrameBuffer);
@@ -159,7 +167,7 @@ MesaSoftRenderer::~MesaSoftRenderer()
 
 
 void
-MesaSoftRenderer::LockGL()
+MesaSoftwareRenderer::LockGL()
 {	
 	BGLRenderer::LockGL();
 	
@@ -169,7 +177,7 @@ MesaSoftRenderer::LockGL()
 
 
 void
-MesaSoftRenderer::UnlockGL()
+MesaSoftwareRenderer::UnlockGL()
 {
 
 	BGLRenderer::UnlockGL();
@@ -177,7 +185,7 @@ MesaSoftRenderer::UnlockGL()
 
 
 void
-MesaSoftRenderer::SwapBuffers(bool VSync)
+MesaSoftwareRenderer::SwapBuffers(bool VSync)
 {
 	_mesa_notifySwapBuffers(fContext);
 
@@ -191,7 +199,7 @@ MesaSoftRenderer::SwapBuffers(bool VSync)
 
 
 void
-MesaSoftRenderer::Draw(BRect updateRect)
+MesaSoftwareRenderer::Draw(BRect updateRect)
 {
 	CALLED();
 	if (fBitmap)
@@ -200,7 +208,7 @@ MesaSoftRenderer::Draw(BRect updateRect)
 
 
 status_t
-MesaSoftRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
+MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 {
 	CALLED();
 	color_space scs = fBitmap->ColorSpace();
@@ -237,7 +245,7 @@ MesaSoftRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 
 
 status_t
-MesaSoftRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
+MesaSoftwareRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 {
 	CALLED();
 	color_space scs = bitmap->ColorSpace();
@@ -274,7 +282,7 @@ MesaSoftRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 
 
 void 
-MesaSoftRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h)
+MesaSoftwareRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h)
 {
 	CALLED();
 	/* poll for window size change and realloc software Z/stencil/etc if needed */
@@ -283,11 +291,11 @@ MesaSoftRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei 
 
 
 const GLubyte *
-MesaSoftRenderer::GetString(GLcontext *ctx, GLenum name)
+MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 {
 	switch (name) {
 		case GL_RENDERER:
-			return (const GLubyte *) "Mesa " MESA_VERSION_STRING " powered BGLView (software)";
+			return (const GLubyte *) "Haiku's OpenGL Software Renderer, powered by Mesa " MESA_VERSION_STRING ;
 		default:
 			// Let core library handle all other cases
 			return NULL;
@@ -296,30 +304,30 @@ MesaSoftRenderer::GetString(GLcontext *ctx, GLenum name)
 
 
 void 
-MesaSoftRenderer::Error(GLcontext *ctx)
+MesaSoftwareRenderer::Error(GLcontext *ctx)
 {
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	if (mr && mr->GLView())
 		mr->GLView()->ErrorCallback((unsigned long) ctx->ErrorValue);
 }
 
 
 void 
-MesaSoftRenderer::ClearIndex(GLcontext *ctx, GLuint index)
+MesaSoftwareRenderer::ClearIndex(GLcontext *ctx, GLuint index)
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	mr->fClearIndex = index;
 }
 
 
 void 
-MesaSoftRenderer::ClearColor(GLcontext *ctx, const GLfloat color[4])
+MesaSoftwareRenderer::ClearColor(GLcontext *ctx, const GLfloat color[4])
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_RCOMP], color[0]);
 	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_GCOMP], color[1]);
 	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_BCOMP], color[2]);
@@ -329,7 +337,7 @@ MesaSoftRenderer::ClearColor(GLcontext *ctx, const GLfloat color[4])
 
 
 void 
-MesaSoftRenderer::Clear(GLcontext *ctx, GLbitfield mask,
+MesaSoftwareRenderer::Clear(GLcontext *ctx, GLbitfield mask,
                                GLboolean all, GLint x, GLint y,
                                GLint width, GLint height)
 {
@@ -346,13 +354,13 @@ MesaSoftRenderer::Clear(GLcontext *ctx, GLbitfield mask,
 
 
 void 
-MesaSoftRenderer::ClearFront(GLcontext *ctx,
+MesaSoftwareRenderer::ClearFront(GLcontext *ctx,
                          GLboolean all, GLint x, GLint y,
                          GLint width, GLint height)
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 
@@ -392,13 +400,13 @@ MesaSoftRenderer::ClearFront(GLcontext *ctx,
 
 
 void 
-MesaSoftRenderer::ClearBack(GLcontext *ctx,
+MesaSoftwareRenderer::ClearBack(GLcontext *ctx,
                         GLboolean all, GLint x, GLint y,
                         GLint width, GLint height)
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 	BBitmap *bitmap = mr->fBitmap;
@@ -430,7 +438,7 @@ MesaSoftRenderer::ClearBack(GLcontext *ctx,
 
 
 void 
-MesaSoftRenderer::UpdateState( GLcontext *ctx, GLuint new_state )
+MesaSoftwareRenderer::UpdateState( GLcontext *ctx, GLuint new_state )
 {
 	struct swrast_device_driver *	swdd = _swrast_GetDeviceDriverReference( ctx );
 
@@ -476,14 +484,14 @@ MesaSoftRenderer::UpdateState( GLcontext *ctx, GLuint new_state )
 
 
 void 
-MesaSoftRenderer::GetBufferSize(GLframebuffer * framebuffer, GLuint *width,
+MesaSoftwareRenderer::GetBufferSize(GLframebuffer * framebuffer, GLuint *width,
                             GLuint *height)
 {
 	GET_CURRENT_CONTEXT(ctx);
 	if (!ctx)
 		return;
 
-	MesaSoftRenderer * mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer * mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 
@@ -510,7 +518,7 @@ MesaSoftRenderer::GetBufferSize(GLframebuffer * framebuffer, GLuint *width,
 
 
 void 
-MesaSoftRenderer::SetBuffer(GLcontext *ctx, GLframebuffer *buffer,
+MesaSoftwareRenderer::SetBuffer(GLcontext *ctx, GLframebuffer *buffer,
                             GLenum mode)
 {
    /* TODO */
@@ -531,14 +539,14 @@ inline void Plot(BGLView *bglview, int x, int y)
 
 
 void
-MesaSoftRenderer::WriteRGBASpanFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteRGBASpanFront(const GLcontext *ctx, GLuint n,
                                  GLint x, GLint y,
                                  CONST GLubyte rgba[][4],
                                  const GLubyte mask[])
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 	int flippedY = mr->fBottom - y;
@@ -559,14 +567,14 @@ MesaSoftRenderer::WriteRGBASpanFront(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteRGBSpanFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteRGBSpanFront(const GLcontext *ctx, GLuint n,
                                 GLint x, GLint y,
                                 CONST GLubyte rgba[][3],
                                 const GLubyte mask[])
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 	int flippedY = mr->fBottom - y;
@@ -587,14 +595,14 @@ MesaSoftRenderer::WriteRGBSpanFront(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteMonoRGBASpanFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoRGBASpanFront(const GLcontext *ctx, GLuint n,
                                      GLint x, GLint y,
                                      const GLchan color[4],
                                      const GLubyte mask[])
 {
 	CALLED();
 	
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 	int flippedY = mr->fBottom - y;
@@ -613,13 +621,13 @@ MesaSoftRenderer::WriteMonoRGBASpanFront(const GLcontext *ctx, GLuint n,
 }
 
 void
-MesaSoftRenderer::WriteRGBAPixelsFront(const GLcontext *ctx,
+MesaSoftwareRenderer::WriteRGBAPixelsFront(const GLcontext *ctx,
                                    GLuint n, const GLint x[], const GLint y[],
                                    CONST GLubyte rgba[][4],
                                    const GLubyte mask[] )
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 	if (mask) {
@@ -639,13 +647,13 @@ MesaSoftRenderer::WriteRGBAPixelsFront(const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::WriteMonoRGBAPixelsFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoRGBAPixelsFront(const GLcontext *ctx, GLuint n,
                                        const GLint x[], const GLint y[],
                                        const GLchan color[4],
                                        const GLubyte mask[])
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BGLView *bglview = mr->GLView();
 	assert(bglview);
 	// plot points using current color
@@ -665,7 +673,7 @@ MesaSoftRenderer::WriteMonoRGBAPixelsFront(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteCI32SpanFront( const GLcontext *ctx, GLuint n, GLint x, GLint y,
+MesaSoftwareRenderer::WriteCI32SpanFront( const GLcontext *ctx, GLuint n, GLint x, GLint y,
                              const GLuint index[], const GLubyte mask[] )
 {
  	printf("WriteCI32SpanFront() not implemented yet!\n");
@@ -673,7 +681,7 @@ MesaSoftRenderer::WriteCI32SpanFront( const GLcontext *ctx, GLuint n, GLint x, G
 }
 
 void
-MesaSoftRenderer::WriteCI8SpanFront( const GLcontext *ctx, GLuint n, GLint x, GLint y,
+MesaSoftwareRenderer::WriteCI8SpanFront( const GLcontext *ctx, GLuint n, GLint x, GLint y,
                             const GLubyte index[], const GLubyte mask[] )
 {
  	printf("WriteCI8SpanFront() not implemented yet!\n");
@@ -681,7 +689,7 @@ MesaSoftRenderer::WriteCI8SpanFront( const GLcontext *ctx, GLuint n, GLint x, GL
 }
 
 void
-MesaSoftRenderer::WriteMonoCISpanFront( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoCISpanFront( const GLcontext *ctx, GLuint n,
                                     GLint x, GLint y,
                                     GLuint colorIndex, const GLubyte mask[] )
 {
@@ -691,7 +699,7 @@ MesaSoftRenderer::WriteMonoCISpanFront( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteCI32PixelsFront( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteCI32PixelsFront( const GLcontext *ctx, GLuint n,
                                     const GLint x[], const GLint y[],
                                     const GLuint index[], const GLubyte mask[] )
 {
@@ -700,7 +708,7 @@ MesaSoftRenderer::WriteCI32PixelsFront( const GLcontext *ctx, GLuint n,
 }
 
 void
-MesaSoftRenderer::WriteMonoCIPixelsFront( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoCIPixelsFront( const GLcontext *ctx, GLuint n,
                                       const GLint x[], const GLint y[],
                                       GLuint colorIndex, const GLubyte mask[] )
 {
@@ -710,7 +718,7 @@ MesaSoftRenderer::WriteMonoCIPixelsFront( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::ReadCI32SpanFront( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadCI32SpanFront( const GLcontext *ctx,
                                  GLuint n, GLint x, GLint y, GLuint index[] )
 {
  	printf("ReadCI32SpanFront() not implemented yet!\n");
@@ -719,7 +727,7 @@ MesaSoftRenderer::ReadCI32SpanFront( const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::ReadRGBASpanFront( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::ReadRGBASpanFront( const GLcontext *ctx, GLuint n,
                                  GLint x, GLint y, GLubyte rgba[][4] )
 {
  	printf("ReadRGBASpanFront() not implemented yet!\n");
@@ -728,7 +736,7 @@ MesaSoftRenderer::ReadRGBASpanFront( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::ReadCI32PixelsFront( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadCI32PixelsFront( const GLcontext *ctx,
                                    GLuint n, const GLint x[], const GLint y[],
                                    GLuint indx[], const GLubyte mask[] )
 {
@@ -738,7 +746,7 @@ MesaSoftRenderer::ReadCI32PixelsFront( const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::ReadRGBAPixelsFront( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadRGBAPixelsFront( const GLcontext *ctx,
                                    GLuint n, const GLint x[], const GLint y[],
                                    GLubyte rgba[][4], const GLubyte mask[] )
 {
@@ -750,13 +758,13 @@ MesaSoftRenderer::ReadRGBAPixelsFront( const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::WriteRGBASpanBack(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteRGBASpanBack(const GLcontext *ctx, GLuint n,
                                  GLint x, GLint y,
                                  CONST GLubyte rgba[][4],
                                  const GLubyte mask[])
 {
 	//CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
 	assert(bitmap);
@@ -782,13 +790,13 @@ MesaSoftRenderer::WriteRGBASpanBack(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteRGBSpanBack(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteRGBSpanBack(const GLcontext *ctx, GLuint n,
                                 GLint x, GLint y,
                                 CONST GLubyte rgb[][3],
                                 const GLubyte mask[])
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
 	assert(bitmap);
@@ -816,12 +824,12 @@ MesaSoftRenderer::WriteRGBSpanBack(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteMonoRGBASpanBack(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoRGBASpanBack(const GLcontext *ctx, GLuint n,
                                     GLint x, GLint y,
                                     const GLchan color[4], const GLubyte mask[])
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
 	assert(bitmap);
@@ -846,13 +854,13 @@ MesaSoftRenderer::WriteMonoRGBASpanBack(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
+MesaSoftwareRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
                                    GLuint n, const GLint x[], const GLint y[],
                                    CONST GLubyte rgba[][4],
                                    const GLubyte mask[] )
 {
 	//CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
 	assert(bitmap);
@@ -894,13 +902,13 @@ MesaSoftRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::WriteMonoRGBAPixelsBack(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoRGBAPixelsBack(const GLcontext *ctx, GLuint n,
                                       const GLint x[], const GLint y[],
                                       const GLchan color[4],
                                       const GLubyte mask[])
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	BBitmap *bitmap = mr->fBitmap;
 
 	assert(bitmap);
@@ -938,7 +946,7 @@ MesaSoftRenderer::WriteMonoRGBAPixelsBack(const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteCI32SpanBack( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteCI32SpanBack( const GLcontext *ctx, GLuint n,
                                  GLint x, GLint y,
                                  const GLuint index[], const GLubyte mask[] )
 {
@@ -947,7 +955,7 @@ MesaSoftRenderer::WriteCI32SpanBack( const GLcontext *ctx, GLuint n,
 }
 
 void
-MesaSoftRenderer::WriteCI8SpanBack( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteCI8SpanBack( const GLcontext *ctx, GLuint n,
                                 GLint x, GLint y,
                                 const GLubyte index[], const GLubyte mask[] )
 {
@@ -956,7 +964,7 @@ MesaSoftRenderer::WriteCI8SpanBack( const GLcontext *ctx, GLuint n,
 }
 
 void
-MesaSoftRenderer::WriteMonoCISpanBack( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoCISpanBack( const GLcontext *ctx, GLuint n,
                                    GLint x, GLint y,
                                    GLuint colorIndex, const GLubyte mask[] )
 {
@@ -966,7 +974,7 @@ MesaSoftRenderer::WriteMonoCISpanBack( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::WriteCI32PixelsBack( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteCI32PixelsBack( const GLcontext *ctx, GLuint n,
                                    const GLint x[], const GLint y[],
                                    const GLuint index[], const GLubyte mask[] )
 {
@@ -975,7 +983,7 @@ MesaSoftRenderer::WriteCI32PixelsBack( const GLcontext *ctx, GLuint n,
 }
 
 void
-MesaSoftRenderer::WriteMonoCIPixelsBack( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoCIPixelsBack( const GLcontext *ctx, GLuint n,
                                      const GLint x[], const GLint y[],
                                      GLuint colorIndex, const GLubyte mask[] )
 {
@@ -985,7 +993,7 @@ MesaSoftRenderer::WriteMonoCIPixelsBack( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::ReadCI32SpanBack( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadCI32SpanBack( const GLcontext *ctx,
                                 GLuint n, GLint x, GLint y, GLuint index[] )
 {
  	printf("ReadCI32SpanBack() not implemented yet!\n");
@@ -994,11 +1002,11 @@ MesaSoftRenderer::ReadCI32SpanBack( const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::ReadRGBASpanBack( const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::ReadRGBASpanBack( const GLcontext *ctx, GLuint n,
                                 GLint x, GLint y, GLubyte rgba[][4] )
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	const BBitmap *bitmap = mr->fBitmap;
 	assert(bitmap);
 	int row = mr->fBottom - y;
@@ -1016,7 +1024,7 @@ MesaSoftRenderer::ReadRGBASpanBack( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftRenderer::ReadCI32PixelsBack( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadCI32PixelsBack( const GLcontext *ctx,
                                    GLuint n, const GLint x[], const GLint y[],
                                    GLuint indx[], const GLubyte mask[] )
 {
@@ -1026,12 +1034,12 @@ MesaSoftRenderer::ReadCI32PixelsBack( const GLcontext *ctx,
 
 
 void
-MesaSoftRenderer::ReadRGBAPixelsBack( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadRGBAPixelsBack( const GLcontext *ctx,
                                   GLuint n, const GLint x[], const GLint y[],
                                   GLubyte rgba[][4], const GLubyte mask[] )
 {
 	CALLED();
-	MesaSoftRenderer *mr = (MesaSoftRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	const BBitmap *bitmap = mr->fBitmap;
 	assert(bitmap);
 
