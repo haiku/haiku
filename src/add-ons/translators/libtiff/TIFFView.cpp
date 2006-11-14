@@ -100,6 +100,7 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 	fCompressionMF = new BMenuField(BRect(20, 50, 215, 70), "compression",
 									"Use Compression:", menu, true);
 	AddChild(fCompressionMF);
+
 }
 
 // ---------------------------------------------------------------
@@ -143,6 +144,7 @@ TIFFView::MessageReceived(BMessage* message)
 				fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
+			fCompressionMF->ResizeToPreferred();
 			break;
 		}
 		default:
@@ -167,6 +169,8 @@ void
 TIFFView::AllAttached()
 {
 	fCompressionMF->Menu()->SetTargetForItems(this);
+	fCompressionMF->SetDivider(fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
+	fCompressionMF->ResizeToPreferred();
 }
 
 
