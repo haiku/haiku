@@ -1,17 +1,14 @@
-#include <iostream>
-#include <expat.h>
-#include <AppKit.h>
-#include <InterfaceKit.h>
-#include <SupportKit.h>
-#include <TranslationUtils.h>
+/*
+ * Copyright 2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ */
 
-#include "Matrix.h"
+
 #include "SVGViewView.h"
 
-struct named_color {
-	const char *name;
-	rgb_color color;
-};
 
 named_color colors[] = {
 	{ "aliceblue",			{ 240, 248, 255, 255 } },
@@ -164,61 +161,69 @@ named_color colors[] = {
 	{ NULL		,			{ 0,   0,	  0, 255 } },
 };
 
-enum {
-	STROKE_FLAG			= 0x01,
-	FILL_FLAG			= 0x02,
-	STROKE_WIDTH_FLAG	= 0x04,
-	LINE_MODE_FLAG		= 0x08,
-	FONT_SIZE_FLAG		= 0x10,
-	MATRIX_FLAG			= 0x20,
+// Globals ---------------------------------------------------------------------
 
-};
+// Svg2PictureView class -------------------------------------------------------
+Svg2PictureView::Svg2PictureView(BRect frame, const char *filename)
+    :   BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
+	fFileName(filename),
+	fPicture(NULL)
+{
+	fPicture = new BPicture();
+}
 
-struct _state_ {
 
-	_state_() { set_default_values(); }
-	_state_(_state_ &state) { *this = state; }
-	void set_default_values()
-	{
-		fFlags = 0;
-		fStrokeColor.red = 0; fStrokeColor.green = 0;
-		fStrokeColor.blue = 0; fStrokeColor.alpha = 255;
-		fStroke = false;
-		fFillColor.red = 0; fFillColor.green = 0;
-		fFillColor.blue = 0; fFillColor.alpha = 255;
-		fFill = true;
-		fStrokeWidth = 1.0f;
-		fLineCap = B_BUTT_CAP;
-		fLineJoin = B_MITER_JOIN;
-		fLineMiterLimit = B_DEFAULT_MITER_LIMIT;
-		fFontSize = 9.0f;
+Svg2PictureView::~Svg2PictureView()
+{
+	delete fPicture;
+}
+
+
+void
+Svg2PictureView::AttachedToWindow()
+{
+	BeginPicture(fPicture);
+
+	bool done = false;
+	FILE *file = fopen(fFileName.String(), "rb");
+	if (file) {
+		XML_Parser parser = XML_ParserCreate("UTF-8");
+		XML_SetUserData(parser, this);
+		XML_SetElementHandler(parser, (XML_StartElementHandler)_StartElement, (XML_EndElementHandler)_EndElement);
+		XML_SetCharacterDataHandler(parser, (XML_CharacterDataHandler)_CharacterDataHandler);
+
+		while (!done) {
+			char buf[256];
+			size_t len = fread(buf, 1, sizeof(buf), file);
+			done = len < sizeof(buf);
+            		if (!XML_Parse(parser, buf, len, done))
+                		break;
+        	}
+
+        	XML_ParserFree(parser);
+        	fclose(file);
 	}
+	fPicture = EndPicture();
+}
 
-	uint32		fFlags;
-	rgb_color	fStrokeColor;
-	bool		fStroke;
-	rgb_color	fFillColor;
-	bool		fFill;
-	float		fStrokeWidth;
-	cap_mode	fLineCap;
-	join_mode	fLineJoin;
-	float		fLineMiterLimit;
-	float		fFontSize;
-	BMatrix		fMatrix;
-};
 
-_state_     fState;
-BList		fStack;
-//BList		fGradients;
+void
+Svg2PictureView::Draw(BRect updateRect)
+{
+	if (fPicture)
+		DrawPicture(fPicture);
+}
 
-bool HasAttribute(const XML_Char **attributes, const char *name) {
+
+//------------------------------------------------------------------------------
+bool Svg2PictureView::HasAttribute(const XML_Char **attributes, const char *name) {
     while (*attributes && strcasecmp(*attributes, name) != 0)
         attributes += 2;
 
     return (*attributes);
 }
-
-float GetFloatAttribute(const XML_Char **attributes, const char *name) {
+//------------------------------------------------------------------------------
+float Svg2PictureView::GetFloatAttribute(const XML_Char **attributes, const char *name) {
     while (*attributes && strcasecmp(*attributes, name) != 0)
         attributes += 2;
 
@@ -227,8 +232,8 @@ float GetFloatAttribute(const XML_Char **attributes, const char *name) {
 	else
 		return 0;
 }
-
-const char *GetStringAttribute(const XML_Char **attributes, const char *name) {
+//------------------------------------------------------------------------------
+const char *Svg2PictureView::GetStringAttribute(const XML_Char **attributes, const char *name) {
     while (*attributes && strcasecmp(*attributes, name) != 0)
         attributes += 2;
 
@@ -237,8 +242,8 @@ const char *GetStringAttribute(const XML_Char **attributes, const char *name) {
 	else
 		return NULL;
 }
-
-rgb_color GetColorAttribute(const XML_Char **attributes, const char *name, uint8 alpha) {
+//------------------------------------------------------------------------------
+rgb_color Svg2PictureView::GetColorAttribute(const XML_Char **attributes, const char *name, uint8 alpha) {
     const char *attr = GetStringAttribute(attributes, name);
 
 	if (!attr)
@@ -290,7 +295,7 @@ rgb_color GetColorAttribute(const XML_Char **attributes, const char *name, uint8
 		return color;
 	}
 
-	/*if (strcasecmp(attr, "url")) {
+	if (strcasecmp(attr, "url")) {
 		const char *grad = strchr(attr, '#');
 
 		if (grad) {
@@ -304,7 +309,7 @@ rgb_color GetColorAttribute(const XML_Char **attributes, const char *name, uint8
 				}
 			}
 		}
-	}*/
+	}
 
 	for (int32 i = 0; colors[i].name != NULL; i++)
 		if (strcasecmp(colors[i].name, attr) == 0) {
@@ -317,8 +322,8 @@ rgb_color GetColorAttribute(const XML_Char **attributes, const char *name, uint8
 	color.alpha = alpha;
 	return color;
 }
-
-void GetPolygonAttribute(const XML_Char **attributes, const char *name, BShape &shape) {
+//------------------------------------------------------------------------------
+void Svg2PictureView::GetPolygonAttribute(const XML_Char **attributes, const char *name, BShape &shape) {
 	const char *attr = NULL;
 
 	while (*attributes && strcasecmp(*attributes, name) != 0)
@@ -363,8 +368,8 @@ void GetPolygonAttribute(const XML_Char **attributes, const char *name, BShape &
 			ptr++;
 	}
 }
-
-void GetMatrixAttribute(const XML_Char **attributes, const char *name, BMatrix *matrix) {
+//------------------------------------------------------------------------------
+void Svg2PictureView::GetMatrixAttribute(const XML_Char **attributes, const char *name, BMatrix *matrix) {
 	const char *attr = NULL;
 
 	while (*attributes && strcasecmp(*attributes, name) != 0)
@@ -434,7 +439,7 @@ void GetMatrixAttribute(const XML_Char **attributes, const char *name, BMatrix *
 		ptr++;
 	}
 }
-
+//------------------------------------------------------------------------------
 double CalcVectorAngle(double ux, double uy, double vx, double vy) {
 	double ta = atan2(uy, ux);
 	double tb = atan2(vy, vx);
@@ -444,7 +449,7 @@ double CalcVectorAngle(double ux, double uy, double vx, double vy) {
 
 	return 6.28318530718 - (ta - tb);
 }
-
+//------------------------------------------------------------------------------
 char *SkipFloat(char *string) {
 	if (*string == '-')
 		string++;
@@ -453,26 +458,20 @@ char *SkipFloat(char *string) {
 
 	return string + len;
 }
-
+//------------------------------------------------------------------------------
 char *FindFloat(char *string) {
 	return strpbrk(string, "1234567890-.");
 }
-
+//------------------------------------------------------------------------------
 float GetFloat(char **string) {
 	*string = FindFloat(*string);
 	float f = atof(*string);
 	*string = SkipFloat(*string);
 	return f;
 }
-
-void GetShapeAttribute(const XML_Char **attributes, const char *name, BShape &shape) {
-	const char *attr = NULL;
-
-	while (*attributes && strcasecmp(*attributes, name) != 0)
-        attributes += 2;
-
-    if (*attributes)
-		attr = *(attributes + 1);
+//------------------------------------------------------------------------------
+void Svg2PictureView::GetShapeAttribute(const XML_Char **attributes, const char *name, BShape &shape) {
+	const char *attr = GetStringAttribute(attributes, name);
 
 	if (!attr)
 		return;
@@ -590,12 +589,16 @@ void GetShapeAttribute(const XML_Char **attributes, const char *name, BShape &sh
 			case 'q':
 			{
 				if (command == 'Q') {
-					if (sscanf(ptr, "Q %f %f %f %f", &x1, &y1, &x, &y) != 4)
-						sscanf(ptr, "Q %f,%f %f,%f", &x1, &y1, &x, &y);
+				    x1 = GetFloat(&ptr);
+					y1 = GetFloat(&ptr);
+					x = GetFloat(&ptr);
+					y = GetFloat(&ptr);
 				}
 				else {
-					if (sscanf(ptr, "q %f %f %f %f", &x1, &y1, &x, &y) != 4)
-						sscanf(ptr, "q %f,%f %f,%f", &x1, &y1, &x, &y);
+					x1 = GetFloat(&ptr);
+					y1 = GetFloat(&ptr);
+					x = GetFloat(&ptr);
+					y = GetFloat(&ptr);
 
 					x1 += pos.x;
 					y1 += pos.y;
@@ -624,19 +627,25 @@ void GetShapeAttribute(const XML_Char **attributes, const char *name, BShape &sh
 				y1 = pos.y;
 
 				if (command == 'A') {
-					if (sscanf(ptr, "A %f %f %f %d %d %f %f", &rx, &ry, &angle,
-						&largeArcFlag, &sweepFlag, &x, &y) != 7)
-						sscanf(ptr, "A %f,%f %f %d,%d %f,%f", &rx, &ry, &angle,
-							&largeArcFlag, &sweepFlag, &x, &y);
+				    rx = GetFloat(&ptr);
+					ry = GetFloat(&ptr);
+					angle = GetFloat(&ptr);
+					largeArcFlag = GetFloat(&ptr);
+					sweepFlag = GetFloat(&ptr);
+					x = GetFloat(&ptr);
+					y = GetFloat(&ptr);
 
 					x2 = x;
 					y2 = y;
 				}
 				else {
-					if (sscanf(ptr, "a %f %f %f %d %d %f %f", &rx, &ry, &angle,
-					&largeArcFlag, &sweepFlag, &x, &y) != 7)
-						sscanf(ptr, "a %f,%f %f %d,%d %f,%f", &rx, &ry, &angle,
-							&largeArcFlag, &sweepFlag, &x, &y);
+					rx = GetFloat(&ptr);
+					ry = GetFloat(&ptr);
+					angle = GetFloat(&ptr);
+					largeArcFlag = GetFloat(&ptr);
+					sweepFlag = GetFloat(&ptr);
+					x = GetFloat(&ptr);
+					y = GetFloat(&ptr);
 
 					x2 = x + pos.x;
 					y2 = y + pos.y;
@@ -819,12 +828,12 @@ void GetShapeAttribute(const XML_Char **attributes, const char *name, BShape &sh
 			case 't':
 			{
 				if (command == 'T') {
-					if (sscanf(ptr, "T %f %f", &x, &y) != 2)
-						sscanf(ptr, "T %f,%f", &x, &y);
+					x = GetFloat(&ptr);
+					y = GetFloat(&ptr);
 				}
 				else {
-					if (sscanf(ptr, "t %f %f", &x, &y) != 2)
-						sscanf(ptr, "t %f,%f", &x, &y);
+					x = GetFloat(&ptr);
+					y = GetFloat(&ptr);
 
 					x += pos.x;
 					y += pos.y;
@@ -859,8 +868,8 @@ void GetShapeAttribute(const XML_Char **attributes, const char *name, BShape &sh
 		prevCommand = command;
 	}
 }
-
-void CheckAttributes(const XML_Char **attributes, BView *view) {
+//------------------------------------------------------------------------------
+void Svg2PictureView::CheckAttributes(const XML_Char **attributes) {
 	uint8 alpha = fState.fStrokeColor.alpha;
 
 	if (HasAttribute(attributes, "opacity")) {
@@ -871,14 +880,22 @@ void CheckAttributes(const XML_Char **attributes, BView *view) {
 		fState.fFlags |= FILL_FLAG;
 	}
 
+	if (HasAttribute(attributes, "color")) {
+        fState.fCurrentColor = GetColorAttribute(attributes, "color", fState.fCurrentColor.alpha);
+	}
+
 	if (HasAttribute(attributes, "stroke")) {
 	    const char *stroke = GetStringAttribute(attributes, "stroke");
 		if (strcasecmp(stroke, "none") == 0)
 			fState.fStroke = false;
+        else if (strcasecmp(stroke, "currentColor") == 0) {
+            fState.fStrokeColor = fState.fCurrentColor;
+			fState.fStroke = true;
+        }
 		else {
 			fState.fStrokeColor = GetColorAttribute(attributes, "stroke", fState.fFillColor.alpha);
 			fState.fStroke = true;
-			view->SetHighColor(fState.fStrokeColor);
+			SetHighColor(fState.fStrokeColor);
 		}
 		fState.fFlags |= STROKE_FLAG;
 	}
@@ -892,6 +909,10 @@ void CheckAttributes(const XML_Char **attributes, BView *view) {
 	    const char *fill = GetStringAttribute(attributes, "fill");
 		if (strcasecmp(fill, "none") == 0)
 			fState.fFill = false;
+		else if (strcasecmp(fill, "currentColor") == 0) {
+		    fState.fFillColor = fState.fCurrentColor;
+			fState.fFill = true;
+		}
 		else {
 			fState.fFillColor = GetColorAttribute(attributes, "fill", fState.fFillColor.alpha);
 			fState.fFill = true;
@@ -906,7 +927,7 @@ void CheckAttributes(const XML_Char **attributes, BView *view) {
 
 	if (HasAttribute(attributes, "stroke-width")) {
 		fState.fStrokeWidth = GetFloatAttribute(attributes, "stroke-width");
-		view->SetPenSize(fState.fStrokeWidth);
+		SetPenSize(fState.fStrokeWidth);
 		fState.fFlags |= STROKE_WIDTH_FLAG;
 	}
 
@@ -920,7 +941,7 @@ void CheckAttributes(const XML_Char **attributes, BView *view) {
 		else if (strcasecmp(stroke_linecap, "square") == 0)
 			fState.fLineCap = B_SQUARE_CAP;
 
-		view->SetLineMode(fState.fLineCap, view->LineJoinMode(), view->LineMiterLimit());
+		SetLineMode(fState.fLineCap, LineJoinMode(), LineMiterLimit());
 		fState.fFlags |= LINE_MODE_FLAG;
 	}
 
@@ -934,19 +955,19 @@ void CheckAttributes(const XML_Char **attributes, BView *view) {
 		else if (strcasecmp(stroke_linejoin, "bevel") == 0)
 			fState.fLineJoin = B_BEVEL_JOIN;
 
-		view->SetLineMode(view->LineCapMode(), fState.fLineJoin, view->LineMiterLimit());
+		SetLineMode(LineCapMode(), fState.fLineJoin, LineMiterLimit());
 		fState.fFlags |= LINE_MODE_FLAG;
 	}
 
 	if (HasAttribute(attributes, "stroke-miterlimit")) {
 		fState.fLineMiterLimit = GetFloatAttribute(attributes, "stroke-miterlimit");
-		view->SetLineMode(view->LineCapMode(), view->LineJoinMode(), fState.fLineMiterLimit);
+		SetLineMode(LineCapMode(), LineJoinMode(), fState.fLineMiterLimit);
 		fState.fFlags |= LINE_MODE_FLAG;
 	}
 
 	if (HasAttribute(attributes, "font-size")) {
 		fState.fFontSize = GetFloatAttribute(attributes, "font-size");
-		view->SetFontSize(fState.fFontSize);
+		SetFontSize(fState.fFontSize);
 		fState.fFlags |= FONT_SIZE_FLAG;
 	}
 
@@ -957,61 +978,22 @@ void CheckAttributes(const XML_Char **attributes, BView *view) {
 		fState.fFlags |= MATRIX_FLAG;
 	}
 }
-
-void Push() {
-	_state_ *state = new _state_(fState);
-
-	fStack.AddItem(state);
-}
-
-void Pop(BView *view) {
-	if (fStack.CountItems() == 0)
-		printf("Unbalance Push/Pop\n");
-
-	_state_ *state = (_state_*)fStack.LastItem();
-
-	if (fState.fFlags & STROKE_FLAG)
-	{
-		if (state->fStroke)
-			view->SetHighColor(state->fStrokeColor);
-	}
-
-	if (fState.fFlags & FILL_FLAG)
-	{
-		if (state->fFill)
-			view->SetHighColor(state->fFillColor);
-	}
-
-	if (fState.fFlags & STROKE_WIDTH_FLAG)
-		view->SetPenSize(state->fStrokeWidth);
-
-	if (fState.fFlags & LINE_MODE_FLAG)
-		view->SetLineMode(state->fLineCap, state->fLineJoin, state->fLineMiterLimit);
-
-	if (fState.fFlags & FONT_SIZE_FLAG)
-		view->SetFontSize(state->fFontSize);
-
-	fState = *state;
-
-	fStack.RemoveItem(state);
-	delete state;
-}
-
-void startElement(BView *view, const XML_Char *name, const XML_Char **attributes) {
+//------------------------------------------------------------------------------
+void Svg2PictureView::StartElement(const XML_Char *name, const XML_Char **attributes) {
     Push();
-    CheckAttributes(attributes, view);
+    CheckAttributes(attributes);
 
     if (strcasecmp(name, "circle") == 0) {
         BPoint c(GetFloatAttribute(attributes, "cx"), GetFloatAttribute(attributes, "cy"));
         float r = GetFloatAttribute(attributes, "r");
 
         if (fState.fFill) {
-            view->SetHighColor(fState.fFillColor);
-            view->FillEllipse(c, r, r);
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            FillEllipse(c, r, r);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->StrokeEllipse(c, r, r);
+            StrokeEllipse(c, r, r);
     }
     else if (strcasecmp(name, "ellipse") == 0) {
         BPoint c(GetFloatAttribute(attributes, "cx"), GetFloatAttribute(attributes, "cy"));
@@ -1019,12 +1001,12 @@ void startElement(BView *view, const XML_Char *name, const XML_Char **attributes
         float ry = GetFloatAttribute(attributes, "ry");
 
         if (fState.fFill) {
-            view->SetHighColor(fState.fFillColor);
-            view->FillEllipse(c, rx, ry);
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            FillEllipse(c, rx, ry);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->StrokeEllipse(c, rx, ry);
+            StrokeEllipse(c, rx, ry);
     }
     else if (strcasecmp(name, "image") == 0) {
         BPoint topLeft(GetFloatAttribute(attributes, "x"), GetFloatAttribute(attributes, "y"));
@@ -1040,7 +1022,7 @@ void startElement(BView *view, const XML_Char *name, const XML_Char **attributes
             BBitmap *bitmap = BTranslationUtils::GetBitmap(href);
 
             if (bitmap) {
-                view->DrawBitmap(bitmap, BRect(topLeft, bottomRight));
+                DrawBitmap(bitmap, BRect(topLeft, bottomRight));
                 delete bitmap;
             }
         }
@@ -1052,26 +1034,30 @@ void startElement(BView *view, const XML_Char *name, const XML_Char **attributes
         fState.fMatrix.Transform(&from);
         fState.fMatrix.Transform(&to);
 
-        view->StrokeLine(from, to);
+        StrokeLine(from, to);
     }
-    /*else if (strcasecmp(name, "linearGradient") == 0) {
-        named_color *gradient = GetFloatAttribute(element);
+    else if (strcasecmp(name, "linearGradient") == 0) {
+        fGradient = new named_gradient;
 
-        if (gradient)
-            fGradients.AddItem(gradient);
-    }*/
+        fGradient->name = strdup(GetStringAttribute(attributes, "id"));
+        fGradient->color.red = 0;
+        fGradient->color.green = 0;
+        fGradient->color.blue = 0;
+        fGradient->color.alpha = 255;
+        fGradient->started = false;
+    }
     else if (strcasecmp(name, "path") == 0) {
         BShape shape;
         GetShapeAttribute(attributes, "d", shape);
         fState.fMatrix.Transform(shape);
 
         if (fState.fFill) {
-            view->SetHighColor(fState.fFillColor);
-            view->FillShape(&shape);
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            FillShape(&shape);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->StrokeShape(&shape);
+            StrokeShape(&shape);
     }
     else if (strcasecmp(name, "polygon") == 0) {
         BShape shape;
@@ -1080,12 +1066,12 @@ void startElement(BView *view, const XML_Char *name, const XML_Char **attributes
         fState.fMatrix.Transform(shape);
 
         if (fState.fFill) {
-            view->SetHighColor(fState.fFillColor);
-            view->FillShape(&shape);
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            FillShape(&shape);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->StrokeShape(&shape);
+            StrokeShape(&shape);
     }
     else if (strcasecmp(name, "polyline") == 0) {
         BShape shape;
@@ -1093,12 +1079,37 @@ void startElement(BView *view, const XML_Char *name, const XML_Char **attributes
         fState.fMatrix.Transform(shape);
 
         if (fState.fFill) {
-            view->SetHighColor(fState.fFillColor);
-            view->FillShape(&shape);
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            FillShape(&shape);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->StrokeShape(&shape);
+            StrokeShape(&shape);
+    }
+    else if (strcasecmp(name, "radialGradient") == 0) {
+        fGradient = new named_gradient;
+
+        fGradient->name = strdup(GetStringAttribute(attributes, "id"));
+        fGradient->color.red = 0;
+        fGradient->color.green = 0;
+        fGradient->color.blue = 0;
+        fGradient->color.alpha = 255;
+        fGradient->started = false;
+    }
+    else if (strcasecmp(name, "stop") == 0) {
+        rgb_color color = GetColorAttribute(attributes, "stop-color", 255);
+
+        if (fGradient) {
+            if (fGradient->started) {
+                fGradient->color.red = (int8)(((int32)fGradient->color.red + (int32)color.red) / 2);
+                fGradient->color.green = (int8)(((int32)fGradient->color.green + (int32)color.green) / 2);
+                fGradient->color.blue = (int8)(((int32)fGradient->color.blue + (int32)color.blue) / 2);
+            }
+            else {
+                fGradient->color = color;
+                fGradient->started = true;
+            }
+        }
     }
     else if (strcasecmp(name, "rect") == 0) {
         BPoint points[4];
@@ -1160,83 +1171,97 @@ void startElement(BView *view, const XML_Char *name, const XML_Char **attributes
 
         if (fState.fFill)
         {
-            view->SetHighColor(fState.fFillColor);
-            view->FillShape(&shape);
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            FillShape(&shape);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->StrokeShape(&shape);
+            StrokeShape(&shape);
     }
-    /*else if (strcasecmp(name, "text") == 0) {
-        BPoint point(GetFloatAttribute(attributes, "x"), GetFloatAttribute(attributes, "y"));
-
-        fState.fMatrix.Transform(&point);
-
+    else if (strcasecmp(name, "text") == 0) {
+        fTextPosition.Set(GetFloatAttribute(attributes, "x"), GetFloatAttribute(attributes, "y"));
+        fState.fMatrix.Transform(&fTextPosition);
+    }
+}
+//------------------------------------------------------------------------------
+void Svg2PictureView::EndElement(const XML_Char *name) {
+    if (strcasecmp(name, "linearGradient") == 0) {
+        if (fGradient)
+            fGradients.AddItem(fGradient);
+        fGradient = NULL;
+    }
+    else if (strcasecmp(name, "radialGradient") == 0) {
+        if (fGradient)
+            fGradients.AddItem(fGradient);
+        fGradient = NULL;
+    }
+    else if (strcasecmp(name, "text") == 0) {
         if (fState.fFill)
         {
-            view->SetHighColor(fState.fFillColor);
-            view->DrawString(GetText(element), point); // We need to get the text using another callback
-            view->SetHighColor(fState.fStrokeColor);
+            SetHighColor(fState.fFillColor);
+            DrawString(fText.String(), fTextPosition);
+            SetHighColor(fState.fStrokeColor);
         }
         if (fState.fStroke)
-            view->DrawString(GetText(element), point);
+            DrawString(fText.String(), fTextPosition);
+        printf("%f, %f\n", fTextPosition.x, fTextPosition.y);
+    }
 
-    }*/
+    Pop();
 }
-
-
-void
-endElement(BView *view, const XML_Char *name)
-{
-    Pop(view);
+//------------------------------------------------------------------------------
+void Svg2PictureView::CharacterDataHandler(const XML_Char *s, int len) {
+    fText.SetTo(s, len);
 }
+//------------------------------------------------------------------------------
+void Svg2PictureView::Push() {
+	_state_ *state = new _state_(fState);
 
-
-Svg2PictureView::Svg2PictureView(BRect frame, const char *filename)
-        :   BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
-            fPicture(NULL)
-{
-	fFilename = filename;
-	fPicture = new BPicture;
+	fStack.AddItem(state);
 }
+//------------------------------------------------------------------------------
+void Svg2PictureView::Pop() {
+	if (fStack.CountItems() == 0)
+		printf("Unbalanced Push/Pop\n");
 
+	_state_ *state = (_state_*)fStack.LastItem();
 
-Svg2PictureView::~Svg2PictureView()
-{
-	delete fPicture;
+	if (fState.fFlags & STROKE_FLAG)
+	{
+		if (state->fStroke)
+			SetHighColor(state->fStrokeColor);
+	}
+
+	if (fState.fFlags & FILL_FLAG)
+	{
+		if (state->fFill)
+			SetHighColor(state->fFillColor);
+	}
+
+	if (fState.fFlags & STROKE_WIDTH_FLAG)
+		SetPenSize(state->fStrokeWidth);
+
+	if (fState.fFlags & LINE_MODE_FLAG)
+		SetLineMode(state->fLineCap, state->fLineJoin, state->fLineMiterLimit);
+
+	if (fState.fFlags & FONT_SIZE_FLAG)
+		SetFontSize(state->fFontSize);
+
+	fState = *state;
+
+	fStack.RemoveItem(state);
+	delete state;
 }
-
-
-void
-Svg2PictureView::AttachedToWindow()
-{
-	BeginPicture(fPicture);
-	char buf[256];
-	bool done = false;
-        FILE *file = fopen(fFilename.String(), "rb");
-
-	if (file) {
-		XML_Parser parser = XML_ParserCreate("UTF-8");
-		XML_SetUserData(parser, this);
-		XML_SetElementHandler(parser, (XML_StartElementHandler)startElement, (XML_EndElementHandler)endElement);
-
-		while (!done) {
-			size_t len = fread(buf, 1, sizeof(buf), file);
-			done = len < sizeof(buf);
-			if (!XML_Parse(parser, buf, len, done))
-				break;
-		}
-
-		XML_ParserFree(parser);
-		fclose(file);
-        }
-
-        EndPicture();
+//------------------------------------------------------------------------------
+void Svg2PictureView::_StartElement(Svg2PictureView *view, const XML_Char *name, const XML_Char **attributes) {
+    view->StartElement(name, attributes);
 }
-
-
-void
-Svg2PictureView::Draw(BRect updateRect)
-{
-	DrawPicture(fPicture);
+//------------------------------------------------------------------------------
+void Svg2PictureView::_EndElement(Svg2PictureView *view, const XML_Char *name) {
+    view->EndElement(name);
 }
+//------------------------------------------------------------------------------
+void Svg2PictureView::_CharacterDataHandler(Svg2PictureView *view, const XML_Char *s, int len) {
+    view->CharacterDataHandler(s, len);
+}
+//------------------------------------------------------------------------------
