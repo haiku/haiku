@@ -322,9 +322,9 @@ TIFFClientOpen(
 	 */
 	if (tif->tif_header.tiff_magic != TIFF_BIGENDIAN &&
 	    tif->tif_header.tiff_magic != TIFF_LITTLEENDIAN) {
-		TIFFError(name,  "Not a TIFF file, bad magic number %d (0x%x)",
+/*		TIFFError(name,  "Not a TIFF file, bad magic number %d (0x%x)",
 		    tif->tif_header.tiff_magic,
-		    tif->tif_header.tiff_magic);
+		    tif->tif_header.tiff_magic);*/
 		goto bad;
 	}
 	TIFFInitOrder(tif, tif->tif_header.tiff_magic, bigendian);
