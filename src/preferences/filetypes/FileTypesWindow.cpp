@@ -9,6 +9,7 @@
 #include "ExtensionWindow.h"
 #include "FileTypes.h"
 #include "FileTypesWindow.h"
+#include "IconView.h"
 #include "MimeTypeListView.h"
 #include "NewFileTypeWindow.h"
 #include "PreferredAppMenu.h"

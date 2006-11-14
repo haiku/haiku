@@ -87,15 +87,6 @@ class MimeTypeListView : public BOutlineListView {
 		bool		fApplicationMode;
 };
 
-enum icon_source {
-	kNoIcon = 0,
-	kOwnIcon,
-	kApplicationIcon,
-	kSupertypeIcon
-};
-
-extern status_t icon_for_type(BMimeType& type, BBitmap& bitmap, icon_size size,
-					icon_source* _source = NULL);
 extern bool mimetype_is_application_signature(BMimeType& type);
 
 #endif	// MIME_TYPE_LIST_VIEW_H

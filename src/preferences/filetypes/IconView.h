@@ -111,4 +111,14 @@ static const uint32 kMsgRemoveIcon = 'icrm';
 static const uint32 kMsgAddIcon = 'icad';
 static const uint32 kMsgEditIcon = 'iced';
 
+enum icon_source {
+	kNoIcon = 0,
+	kOwnIcon,
+	kApplicationIcon,
+	kSupertypeIcon
+};
+
+extern status_t icon_for_type(BMimeType& type, BBitmap& bitmap,
+	icon_size size, icon_source* _source = NULL);
+
 #endif	// ICON_VIEW_H
