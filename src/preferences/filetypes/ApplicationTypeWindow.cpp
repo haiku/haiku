@@ -51,17 +51,22 @@ class SupportedTypeItem : public BStringItem {
 		~SupportedTypeItem();
 
 		const char* Type() const { return fType.String(); }
+		::Icon* Icon() { return fIcon; }
+		void SetIcon(::Icon* icon);
+		void SetIcon(entry_ref& ref, const char* type);
 
 		static int Compare(const void* _a, const void* _b);
 
 	private:
 		BString	fType;
+		::Icon*	fIcon;
 };
 
 
 SupportedTypeItem::SupportedTypeItem(const char* type)
 	: BStringItem(type),
-	fType(type)
+	fType(type),
+	fIcon(NULL)
 {
 	BMimeType mimeType(type);
 
@@ -73,6 +78,27 @@ SupportedTypeItem::SupportedTypeItem(const char* type)
 
 SupportedTypeItem::~SupportedTypeItem()
 {
+}
+
+
+void
+SupportedTypeItem::SetIcon(::Icon* icon)
+{
+	delete fIcon;
+	if (icon != NULL)
+		fIcon = new ::Icon(*icon);
+	else
+		fIcon = NULL;
+}
+
+
+void
+SupportedTypeItem::SetIcon(entry_ref& ref, const char* type)
+{
+	if (fIcon == NULL)
+		fIcon = new ::Icon;
+
+	fIcon->SetTo(ref, type);
 }
 
 
@@ -223,24 +249,24 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.bottom = rect.top + box->Bounds().Height();
 	rect.left = 8.0f;
 	rect.right = Bounds().Width() - 8.0f;
-	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel("Supported Types");
-	topView->AddChild(box);
+	BBox* typeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
+	typeBox->SetLabel("Supported Types");
+	topView->AddChild(typeBox);
 
-	rect = box->Bounds().InsetByCopy(8.0f, 6.0f);
+	rect = typeBox->Bounds().InsetByCopy(8.0f, 6.0f);
 	rect.top += ceilf(fontHeight.ascent);
 	fAddTypeButton = new BButton(rect, "add type", "Add" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgAddType), B_FOLLOW_RIGHT);
 	fAddTypeButton->ResizeToPreferred();
 	fAddTypeButton->MoveBy(rect.right - fAddTypeButton->Bounds().Width()
 		- B_LARGE_ICON - 16.0f, 0.0f);
-	box->AddChild(fAddTypeButton);
+	typeBox->AddChild(fAddTypeButton);
 
 	rect = fAddTypeButton->Frame();
 	rect.OffsetBy(0, rect.Height() + 4.0f);
 	fRemoveTypeButton = new BButton(rect, "remove type", "Remove",
 		new BMessage(kMsgRemoveType), B_FOLLOW_RIGHT);
-	box->AddChild(fRemoveTypeButton);
+	typeBox->AddChild(fRemoveTypeButton);
 
 	rect.right = rect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
 	rect.left = 10.0f;
@@ -248,14 +274,14 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.bottom -= 2.0f;
 		// take scrollview border into account
 	fTypeListView = new BListView(rect, "type listview",
-		B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT);
+		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
 	BScrollView* scrollView = new BScrollView("type scrollview", fTypeListView,
-		B_FOLLOW_LEFT_RIGHT, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	box->AddChild(scrollView);
+		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	box->ResizeTo(box->Bounds().Width(), fRemoveTypeButton->Frame().bottom + 8.0f);
+	typeBox->ResizeTo(typeBox->Bounds().Width(), fRemoveTypeButton->Frame().bottom + 8.0f);
+	typeBox->AddChild(scrollView);
 
 	rect.left = fRemoveTypeButton->Frame().right + 8.0f;
 #ifdef __HAIKU__
@@ -266,16 +292,16 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.right = rect.left + B_LARGE_ICON - 1.0f;
 	rect.bottom = rect.top + B_LARGE_ICON - 1.0f;
 	fTypeIconView = new IconView(rect, "type icon", B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	box->AddChild(fTypeIconView);
+	typeBox->AddChild(fTypeIconView);
 
 	// "Version Info" group
 
-	rect.top = box->Frame().bottom + 8.0f;
-	rect.bottom = rect.top + box->Bounds().Height();
+	rect.top = typeBox->Frame().bottom + 8.0f;
+	rect.bottom = rect.top + typeBox->Bounds().Height();
 	rect.left = 8.0f;
 	rect.right = Bounds().Width() - 8.0f;
 	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-		// the resizing mode will later be set to B_FOLLOW_ALL
+		// the resizing mode will later also be set to B_FOLLOW_BOTTOM
 	box->SetLabel("Version Info");
 	topView->AddChild(box);
 
@@ -353,7 +379,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect = box->Bounds().InsetByCopy(8.0f, 0.0f);
 	rect.top = fInternalVersionControl->Frame().bottom + 8.0f;
 	fShortDescriptionControl = new BTextControl(rect, "short desc", "Short Description:",
-		NULL, NULL, B_FOLLOW_LEFT_RIGHT);
+		NULL, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	float labelWidth = fShortDescriptionControl->StringWidth(
 		fShortDescriptionControl->Label()) + 4.0f;
 	fShortDescriptionControl->SetDivider(labelWidth);
@@ -373,15 +399,14 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect.left = rect.right + 3.0f;
 	rect.top += 1.0f;
-	rect.right = box->Bounds().Width() - 8.0f;
+	rect.right = box->Bounds().Width() - 10.0f - B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = rect.top + fShortDescriptionControl->Bounds().Height() * 3.0f - 1.0f;
 	fLongDescriptionView = new BTextView(rect, "long desc",
 		rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
 	fLongDescriptionView->SetMaxBytes(sizeof(versionInfo.long_info));
-//	box->AddChild(fLongDescriptionView);
 
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
-		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, false);
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	box->ResizeTo(box->Bounds().Width(), scrollView->Frame().bottom + 8.0f);
 	box->AddChild(scrollView);
 
@@ -395,7 +420,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	ResizeTo(Bounds().Width() > minWidth ? Bounds().Width() : minWidth,
 		box->Frame().bottom + topView->Frame().top + 8.0f);
 	SetSizeLimits(minWidth, 32767.0f, Bounds().Height(), 32767.0f);
-	box->SetResizingMode(B_FOLLOW_ALL);
+	typeBox->SetResizingMode(B_FOLLOW_ALL);
+	box->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 
 	fSignatureControl->MakeFocus(true);
 
@@ -488,7 +514,11 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 
 	entry_ref ref;
 	if (entry.GetRef(&ref) == B_OK)
-		fIconView->SetTo(&ref);
+		fIcon.SetTo(ref);
+	else
+		fIcon.Unset();
+
+	fIconView->SetTo(&fIcon);
 
 	// supported types
 
@@ -499,9 +529,17 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 
 	const char* type;
 	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++) {
-		fTypeListView->AddItem(new SupportedTypeItem(type));
+		SupportedTypeItem* item = new SupportedTypeItem(type);
+
+		entry_ref ref;
+		if (fEntry.GetRef(&ref) == B_OK)
+			item->SetIcon(ref, type);
+
+		fTypeListView->AddItem(item);
 	}
 	fTypeListView->SortItems(&SupportedTypeItem::Compare);
+	fTypeIconView->SetTo(NULL);
+	fTypeIconView->SetEnabled(false);
 	fRemoveTypeButton->SetEnabled(false);
 
 	// version info
@@ -647,7 +685,10 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				BStringItem* item = (BStringItem*)fTypeListView->ItemAt(index);
+				SupportedTypeItem* item = (SupportedTypeItem*)fTypeListView->ItemAt(index);
+
+				fTypeIconView->SetTo(item != NULL ? item->Icon() : NULL);
+				fTypeIconView->SetEnabled(item != NULL);
 				fRemoveTypeButton->SetEnabled(item != NULL);
 			}
 			break;
@@ -705,6 +746,9 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 				break;
 
 			delete fTypeListView->RemoveItem(index);
+			fTypeIconView->SetTo(NULL);
+			fTypeIconView->SetEnabled(false);
+			fRemoveTypeButton->SetEnabled(false);
 			break;
 		}
 

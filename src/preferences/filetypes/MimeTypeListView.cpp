@@ -137,7 +137,11 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 			owner->FillRect(rect, B_SOLID_LOW);
 		}
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGB32);
+#else
+		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
+#endif
 		BMimeType mimeType(fType.String());
 		status_t status = icon_for_type(mimeType, bitmap, B_MINI_ICON);
 		if (status < B_OK) {

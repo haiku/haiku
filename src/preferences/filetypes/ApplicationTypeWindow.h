@@ -6,6 +6,8 @@
 #define APPLICATION_TYPE_WINDOW_H
 
 
+#include "IconView.h"
+
 #include <Mime.h>
 #include <String.h>
 #include <Window.h>
@@ -18,7 +20,6 @@ class BRadioButton;
 class BTextControl;
 class BTextView;
 
-class IconView;
 class MimeTypeListView;
 
 
@@ -43,6 +44,7 @@ class ApplicationTypeWindow : public BWindow {
 
 		BTextControl*	fSignatureControl;
 		IconView*		fIconView;
+		Icon			fIcon;
 
 		BCheckBox*		fFlagsCheckBox;
 		BRadioButton*	fSingleLaunchButton;

@@ -261,7 +261,7 @@ FileTypeWindow::_SetTo(const BMessage& refs)
 			fCommonPreferredApp = preferredApp;
 
 		if (i == 0)
-			fIconView->SetTo(&ref);
+			fIconView->SetTo(ref);
 	}
 
 	fTypeControl->SetText(fCommonType.String());
