@@ -9,10 +9,10 @@
 #include <stdio.h>
 
 static void
-get_class_info(uint8 pci_class_base_id, uint8 pci_class_sub_id, uint8 pci_class_api_id, char *classInfo)
+get_class_info(uint8 pci_class_base_id, uint8 pci_class_sub_id, uint8 pci_class_api_id, char *classInfo, size_t size)
 {
 	if (pci_class_base_id == 0x80)
-		sprintf(classInfo, " (Other)");
+		snprintf(classInfo, size, " (Other)");
 	else {
 		PCI_CLASSCODETABLE *s = PciClassCodeTable, *foundItem = NULL;
 		while (s->BaseDesc) {
@@ -27,10 +27,10 @@ get_class_info(uint8 pci_class_base_id, uint8 pci_class_sub_id, uint8 pci_class_
 		if (!s->BaseDesc)
 			s = foundItem;
 		if (pci_class_sub_id != 0x80)
-			sprintf(classInfo, "%s (%s%s%s)", s->BaseDesc, s->SubDesc, 
+			snprintf(classInfo, size, "%s (%s%s%s)", s->BaseDesc, s->SubDesc, 
 				(s->ProgDesc && strcmp("", s->ProgDesc)) ? ", " : "", s->ProgDesc);
 		else
-			sprintf(classInfo, "%s", s->BaseDesc);
+			snprintf(classInfo, size, "%s", s->BaseDesc);
 	}
 }
 

@@ -17,6 +17,7 @@
 #include <drivers/module.h>
 #include <drivers/PCI.h>
 #include <drivers/bus/PCI.h>
+#include <drivers/bus/SCSI.h>
 
 #include "dm_wrapper.h"
 #include "pcihdr.h"
@@ -30,6 +31,28 @@ int gMode = USER_MODE;
 
 #define BUS_ISA		1
 #define BUS_PCI		2
+#define BUS_SCSI 	3
+
+static const char *
+get_scsi_device_type(uint8 type)
+{
+	switch (type) {
+		case 0x0: return "Direct Access";
+		case 0x1: return "Sequential Access";
+		case 0x2: return "Printer";
+		case 0x3: return "Processor";
+		case 0x4: return "WORM";
+		case 0x5: return "CDROM";
+		case 0x6: return "Scanner";
+		case 0x7: return "Optical memory";
+		case 0x8: return "Medium changer";
+		case 0x9: return "Communication";
+		case 0xc: return "Storage array controller";
+		case 0xd: return "Enclosure services";
+		case 0xe: return "Simplified Direct Access";
+		default: return "";
+	}
+}
 
 
 static void
@@ -116,15 +139,20 @@ dump_nodes(uint32 *node, uint8 level)
 }
 
 
-static void
+static int32
 display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 {
+	uint8 new_level = level;
+
 	char data[256];
 	struct dev_attr attr;
 
+	// BUS attributes
 	uint8 is_bus = 0;
-	char connection[255] = "";
+	char connection[64];
+	uint8 scsi_path_id = 255;
 
+	// PCI attributes
 	uint8 pci_class_base_id = 0;
 	uint8 pci_class_sub_id = 0;
 	uint8 pci_class_api_id = 0;
@@ -132,13 +160,19 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 	uint16 pci_device_id = 0;
 	uint16 pci_subsystem_vendor_id = 0;
 	uint16 pci_subsystem_id = 0;
+
+	// SCSI attributes
+	uint8 scsi_target_lun = 0;
+	uint8 scsi_target_id = 0;
+	uint8 scsi_type = 255;
+	char scsi_vendor[64];
+	char scsi_product[64];
 	
 	const char *venShort;
 	const char *venFull;
 	const char *devShort;
 	const char *devFull;
-	char classInfo[255];
-		
+
 	attr.cookie = 0;
 	attr.node_cookie = *node;
 	attr.value.raw.data = data;
@@ -150,7 +184,10 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			is_bus = attr.value.ui8;
 		} else if (!strcmp(attr.name, PNP_DRIVER_CONNECTION)
 			&& attr.type == B_STRING_TYPE) {
-			strlcpy(connection, attr.value.string, 255);
+			strlcpy(connection, attr.value.string, 64);
+		} else if (!strcmp(attr.name, "scsi/path_id")
+			&& attr.type == B_UINT8_TYPE) {
+			scsi_path_id = attr.value.ui8;
 		}
 
 		switch (parent_bus) {
@@ -173,7 +210,27 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 					&& attr.type == B_UINT16_TYPE)
 					pci_device_id = attr.value.ui16;
 				break;
+			case BUS_SCSI:
+				if (!strcmp(attr.name, SCSI_DEVICE_TARGET_LUN_ITEM)
+					&& attr.type == B_UINT8_TYPE)
+					scsi_target_lun = attr.value.ui8;
+				if (!strcmp(attr.name, SCSI_DEVICE_TARGET_ID_ITEM)
+					&& attr.type == B_UINT8_TYPE)
+					scsi_target_id = attr.value.ui8;
+				if (!strcmp(attr.name, SCSI_DEVICE_TYPE_ITEM)
+					&& attr.type == B_UINT8_TYPE)
+					scsi_type = attr.value.ui8;
+				if (!strcmp(attr.name, SCSI_DEVICE_VENDOR_ITEM)
+					&& attr.type == B_STRING_TYPE)
+					strlcpy(scsi_vendor, attr.value.string, 64);
+				if (!strcmp(attr.name, SCSI_DEVICE_PRODUCT_ITEM)
+					&& attr.type == B_STRING_TYPE)
+					strlcpy(scsi_product, attr.value.string, 64);
+				break;
 		};
+
+		attr.value.raw.data = data;
+		attr.value.raw.length = sizeof(data);
 	}
 
 	if (is_bus) {
@@ -181,15 +238,25 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			*bus = BUS_ISA;
 		else if (!strcmp(connection, "PCI"))
 			*bus = BUS_PCI;
+		else if (scsi_path_id < 255)
+			*bus = BUS_SCSI;
 	}
 
 	switch (parent_bus) {
 		case BUS_ISA:
+			new_level=level+1;
 			break;
-		case BUS_PCI:
-			get_class_info(pci_class_base_id, pci_class_sub_id, pci_class_api_id, classInfo);
-			printf("device %s [%x|%x|%x]\n", classInfo, pci_class_base_id, pci_class_sub_id, pci_class_api_id);
+		case BUS_PCI: 
+			printf("\n");
+			{
+				char classInfo[64];
+				get_class_info(pci_class_base_id, pci_class_sub_id, pci_class_api_id, classInfo, 64);
+				put_level(level);
+				printf("device %s [%x|%x|%x]\n", classInfo, pci_class_base_id, pci_class_sub_id, pci_class_api_id);
+			}
 			
+			put_level(level);
+			printf("  ");
 			get_vendor_info(pci_vendor_id, &venShort, &venFull);
 			if (!venShort && !venFull) {
 				printf("vendor %04x: Unknown\n", pci_vendor_id);
@@ -199,6 +266,8 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 				printf("vendor %04x: %s\n", pci_vendor_id, venShort ? venShort : venFull);
 			}
 		
+			put_level(level);
+			printf("  ");
 			get_device_info(pci_vendor_id, pci_device_id, pci_subsystem_vendor_id, pci_subsystem_id, 
 				&devShort, &devFull);
 			if (!devShort && !devFull) {
@@ -208,10 +277,22 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			} else {
 				printf("device %04x: %s\n", pci_device_id, devShort ? devShort : devFull);
 			}
-			printf("\n");
-			
+			new_level = level+1;
+			break;
+		case BUS_SCSI:
+			if (scsi_type == 255)
+				break;
+			put_level(level);
+			printf("  device [%x|%x]\n", scsi_target_id, scsi_target_lun);
+			put_level(level);
+			printf("  vendor %15s\tmodel %15s\ttype %s\n", scsi_vendor, 
+				scsi_product, get_scsi_device_type(scsi_type)); 
+
+			new_level = level+1;
 			break;
 	}
+	
+	return new_level;
 }
 
 
@@ -221,13 +302,13 @@ display_nodes(uint32 *node, uint8 level, int parent_bus)
 	status_t err;
 	uint32 child = *node;
 	int bus = 0;
-	display_device(node, level, parent_bus, &bus);
+	level = display_device(node, level, parent_bus, &bus);
 
 	if (get_child(&child) != B_OK)
 		return;
 		
 	do {
-		display_nodes(&child, level+1, bus);
+		display_nodes(&child, level, bus);
 	} while ((err = get_next_child(&child)) == B_OK);
 }
 
