@@ -166,6 +166,7 @@ SGIView::MessageReceived(BMessage* message)
 				fSettings->SetGetInt32(SGI_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
+			fCompressionMF->ResizeToPreferred();
 			break;
 		}
 		default:
@@ -190,6 +191,8 @@ void
 SGIView::AllAttached()
 {
 	fCompressionMF->Menu()->SetTargetForItems(this);
+	fCompressionMF->ResizeToPreferred();
+	fCompressionMF->SetDivider(fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
 }
 
 // ---------------------------------------------------------------
