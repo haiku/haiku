@@ -10,18 +10,19 @@
 *******************************************************************************/
 
 #include "ColumnTypes.h"
-#include <stdio.h>
+
 #include <View.h>
+
 #include <parsedate.h>
+#include <stdio.h>
+
 
 #define kTEXT_MARGIN	8
 
 
-//=====================================================================
-
 BTitledColumn::BTitledColumn(const char* title, float width, float minWidth,
-							 float maxWidth, alignment align)
-	:BColumn(width, minWidth, maxWidth, align),
+		float maxWidth, alignment align)
+	: BColumn(width, minWidth, maxWidth, align),
 	fTitle(title)
 {
 	font_height	fh;
@@ -31,42 +32,39 @@ BTitledColumn::BTitledColumn(const char* title, float width, float minWidth,
 }
 
 
-//--------------------------------------------------------------------
-
-void BTitledColumn::DrawTitle(BRect rect, BView* parent)
+void
+BTitledColumn::DrawTitle(BRect rect, BView* parent)
 {
-	float		width = rect.Width() - (2 * kTEXT_MARGIN);
-	BString		out_string(fTitle);
+	float width = rect.Width() - (2 * kTEXT_MARGIN);
+	BString out_string(fTitle);
 
 	parent->TruncateString(&out_string, B_TRUNCATE_END, width + 2);
 	DrawString(out_string.String(), parent, rect);
 }
 
 
-//--------------------------------------------------------------------
-
-void BTitledColumn::GetColumnName(BString* into) const
+void
+BTitledColumn::GetColumnName(BString* into) const
 {
 	*into = fTitle;
 }
 
 
-//--------------------------------------------------------------------
-
-void BTitledColumn::DrawString(const char* string, BView* parent, BRect rect)
+void
+BTitledColumn::DrawString(const char* string, BView* parent, BRect rect)
 {
-	float		width = rect.Width() - (2 * kTEXT_MARGIN);
-	float		y;
-	BFont		font;
+	float width = rect.Width() - (2 * kTEXT_MARGIN);
+	float y;
+	BFont font;
 	font_height	finfo;
 
 	parent->GetFont(&font);
 	font.GetHeight(&finfo);
-	y = rect.top + ((rect.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
-					(finfo.ascent + finfo.descent) - 2;
+	y = rect.top + ((rect.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2)
+		+ (finfo.ascent + finfo.descent) - 2;
 
-	switch (Alignment())
-	{
+	switch (Alignment()) {
+		default:
 		case B_ALIGN_LEFT:
 			parent->MovePenTo(rect.left + kTEXT_MARGIN, y);
 			break;
@@ -83,45 +81,42 @@ void BTitledColumn::DrawString(const char* string, BView* parent, BRect rect)
 }
 
 
-//--------------------------------------------------------------------
-
-void BTitledColumn::SetTitle(const char* title)
+void
+BTitledColumn::SetTitle(const char* title)
 {
 	fTitle.SetTo(title);
 }
 
 
-//--------------------------------------------------------------------
-
-void BTitledColumn::Title(BString* forTitle) const
+void
+BTitledColumn::Title(BString* forTitle) const
 {
 	if (forTitle)
 		forTitle->SetTo(fTitle.String());
 }
 
 
-//--------------------------------------------------------------------
-
-float BTitledColumn::FontHeight() const
+float
+BTitledColumn::FontHeight() const
 {
 	return fFontHeight;
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BStringField::BStringField(const char* string)
-	:fWidth(0),
+	:
+	fWidth(0),
 	fString(string),
 	fClippedString(string)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void BStringField::SetString(const char* val)
+void
+BStringField::SetString(const char* val)
 {
 	fString = val;
 	fClippedString = "";
@@ -129,66 +124,60 @@ void BStringField::SetString(const char* val)
 } 
 
 
-//--------------------------------------------------------------------
-
-const char* BStringField::String() const
+const char*
+BStringField::String() const
 {
 	return fString.String();
 }
 
 
-//--------------------------------------------------------------------
-
-void BStringField::SetWidth(float width)
+void
+BStringField::SetWidth(float width)
 {
 	fWidth = width;
 }
 
-//--------------------------------------------------------------------
 
-float BStringField::Width()
+float
+BStringField::Width()
 {
 	return fWidth;
 }
 
 
-//--------------------------------------------------------------------
-
-void BStringField::SetClippedString(const char* val)
+void
+BStringField::SetClippedString(const char* val)
 {
 	fClippedString = val;
 } 
 
 
-//--------------------------------------------------------------------
-
-const char* BStringField::ClippedString()
+const char*
+BStringField::ClippedString()
 {
 	return fClippedString.String();
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BStringColumn::BStringColumn(const char* title, float width, float minWidth,
-							 float maxWidth, uint32 truncate, alignment align)
-	:BTitledColumn(title, width, minWidth, maxWidth, align),
+		float maxWidth, uint32 truncate, alignment align)
+	: BTitledColumn(title, width, minWidth, maxWidth, align),
 	fTruncate(truncate)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void BStringColumn::DrawField(BField* _field, BRect rect, BView* parent)
+void
+BStringColumn::DrawField(BField* _field, BRect rect, BView* parent)
 {
-	float			width = rect.Width() - (2 * kTEXT_MARGIN);
-	BStringField*	field = static_cast<BStringField*>(_field);
+	float width = rect.Width() - (2 * kTEXT_MARGIN);
+	BStringField* field = static_cast<BStringField*>(_field);
 
-	if (width != field->Width())
-	{
-		BString		out_string(field->String());
+	if (width != field->Width()) {
+		BString out_string(field->String());
 
 		parent->TruncateString(&out_string, fTruncate, width + 2);
 		field->SetClippedString(out_string.String());
@@ -198,28 +187,27 @@ void BStringColumn::DrawField(BField* _field, BRect rect, BView* parent)
 }
 
 
-//--------------------------------------------------------------------
-
-int BStringColumn::CompareFields(BField* field1, BField* field2)
+int
+BStringColumn::CompareFields(BField* field1, BField* field2)
 {
-	return(ICompare(((BStringField*)field1)->String(),
-				   (((BStringField*)field2)->String())));
+	return ICompare(((BStringField*)field1)->String(),
+		(((BStringField*)field2)->String()));
 }
 
 
-//--------------------------------------------------------------------
-
-bool BStringColumn::AcceptsField(const BField *field) const
+bool
+BStringColumn::AcceptsField(const BField *field) const
 {
 	return static_cast<bool>(dynamic_cast<const BStringField*>(field));
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BDateField::BDateField(time_t *t)
-	:fTime(*localtime(t)),
+	:
+	fTime(*localtime(t)),
 	fUnixTime(*t),
 	fSeconds(0),
 	fClippedString(""),
@@ -229,66 +217,58 @@ BDateField::BDateField(time_t *t)
 }
 
 
-//--------------------------------------------------------------------
-
-void BDateField::SetWidth(float width)
+void
+BDateField::SetWidth(float width)
 {
 	fWidth = width;
 }
 
 
-//--------------------------------------------------------------------
-
-float BDateField::Width()
+float
+BDateField::Width()
 {
 	return fWidth;
 }
 
 
-//--------------------------------------------------------------------
-
-void BDateField::SetClippedString(const char* val)
+void
+BDateField::SetClippedString(const char* val)
 {
 	fClippedString = val;
 } 
 
 
-//--------------------------------------------------------------------
-
-const char* BDateField::ClippedString()
+const char*
+BDateField::ClippedString()
 {
 	return fClippedString.String();
 }
 
 
-//--------------------------------------------------------------------
-
-time_t BDateField::Seconds()
+time_t
+BDateField::Seconds()
 {
 	return fSeconds;
 }
 
 
-//--------------------------------------------------------------------
-
-time_t BDateField::UnixTime()
+time_t
+BDateField::UnixTime()
 {
 	return fUnixTime;
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BDateColumn::BDateColumn(const char* title, float width, float minWidth,
-						 float maxWidth, alignment align)
-	:BTitledColumn(title, width, minWidth, maxWidth, align),
+		float maxWidth, alignment align)
+	: BTitledColumn(title, width, minWidth, maxWidth, align),
 	fTitle(title)
 {
 }
 
-
-//--------------------------------------------------------------------
 
 const char *kTIME_FORMATS[] = {
 	"%A, %B %d %Y, %I:%M:%S %p",	// Monday, July 09 1997, 05:08:15 PM
@@ -300,22 +280,23 @@ const char *kTIME_FORMATS[] = {
 	NULL
 };
 
-void BDateColumn::DrawField(BField* _field, BRect rect, BView* parent)
+
+void
+BDateColumn::DrawField(BField* _field, BRect rect, BView* parent)
 {
-	float		width = rect.Width() - (2 * kTEXT_MARGIN);
+	float width = rect.Width() - (2 * kTEXT_MARGIN);
 	BDateField*	field = (BDateField*)_field;
 
-	if (field->Width() != rect.Width())
-	{
-		char	dateString[256];
-		time_t	curtime = field->UnixTime();
-		tm		time_data;
-		BFont	font;
+	if (field->Width() != rect.Width()) {
+		char dateString[256];
+		time_t curtime = field->UnixTime();
+		tm time_data;
+		BFont font;
 
 		parent->GetFont(&font);
 		localtime_r(&curtime, &time_data);
-		for (int32 index = 0; ; index++)
-		{
+
+		for (int32 index = 0; ; index++) {
 			if (!kTIME_FORMATS[index])
 				break;
 			strftime(dateString, 256, kTIME_FORMATS[index], &time_data);
@@ -323,9 +304,8 @@ void BDateColumn::DrawField(BField* _field, BRect rect, BView* parent)
 				break;
 		}
 
-		if (font.StringWidth(dateString) > width)
-		{
-			BString		out_string(dateString);
+		if (font.StringWidth(dateString) > width) {
+			BString out_string(dateString);
 
 			parent->TruncateString(&out_string, B_TRUNCATE_MIDDLE, width + 2);
 			strcpy(dateString, out_string.String());
@@ -338,55 +318,51 @@ void BDateColumn::DrawField(BField* _field, BRect rect, BView* parent)
 }
 
 
-//--------------------------------------------------------------------
-
-int BDateColumn::CompareFields(BField* field1, BField* field2)
+int
+BDateColumn::CompareFields(BField* field1, BField* field2)
 {
 	return((BDateField*)field1)->Seconds() - ((BDateField*)field2)->Seconds();
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BSizeField::BSizeField(off_t size)
-	:fSize(size)
+	:
+	fSize(size)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void BSizeField::SetSize(off_t size)
+void
+BSizeField::SetSize(off_t size)
 {
 	fSize = size;
 }
 
 
-//--------------------------------------------------------------------
-
-off_t BSizeField::Size()
+off_t
+BSizeField::Size()
 {
 	return fSize;
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BSizeColumn::BSizeColumn(const char* title, float width, float minWidth,
-						 float maxWidth, alignment align)
-	:BTitledColumn(title, width, minWidth, maxWidth, align)
+		float maxWidth, alignment align)
+	: BTitledColumn(title, width, minWidth, maxWidth, align)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-const int64 	kKB_SIZE				= 1024;
-const int64 	kMB_SIZE				= 1048576;
-const int64 	kGB_SIZE				= 1073741824;
-const int64 	kTB_SIZE				= kGB_SIZE * kKB_SIZE;
+const int64 kKB_SIZE = 1024;
+const int64 kMB_SIZE = 1048576;
+const int64 kGB_SIZE = 1073741824;
+const int64 kTB_SIZE = kGB_SIZE * kKB_SIZE;
 
 const char *kSIZE_FORMATS[] = {
 	"%.2f %s",
@@ -396,48 +372,38 @@ const char *kSIZE_FORMATS[] = {
 	0
 };
 
-void BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
+void
+BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 {
-	char		str[256];
-	float		width = rect.Width() - (2 * kTEXT_MARGIN);
-	BFont		font;
-	BString		string;
-	off_t		size = ((BSizeField*)_field)->Size();
+	char str[256];
+	float width = rect.Width() - (2 * kTEXT_MARGIN);
+	BFont font;
+	BString string;
+	off_t size = ((BSizeField*)_field)->Size();
 
 	parent->GetFont(&font);
-	if (size < kKB_SIZE)
-	{
+	if (size < kKB_SIZE) {
 		sprintf(str, "%Ld bytes", size);
 		if (font.StringWidth(str) > width)
 			sprintf(str, "%Ld B", size);
-	}
-	else
-	{
+	} else {
 		const char*	suffix;
-		float 		float_value;
-		if (size >= kTB_SIZE)
-		{
+		float float_value;
+		if (size >= kTB_SIZE) {
 			suffix = "TB";
 			float_value = (float)size / kTB_SIZE;
-		}
-		else if (size >= kGB_SIZE)
-		{
+		} else if (size >= kGB_SIZE) {
 			suffix = "GB";
 			float_value = (float)size / kGB_SIZE;
-		}
-		else if (size >= kMB_SIZE)
-		{
+		} else if (size >= kMB_SIZE) {
 			suffix = "MB";
 			float_value = (float)size / kMB_SIZE;
-		}
-		else
-		{
+		} else {
 			suffix = "KB";
 			float_value = (float)size / kKB_SIZE;
 		}
 
-		for (int32 index = 0; ; index++)
-		{
+		for (int32 index = 0; ; index++) {
 			if (!kSIZE_FORMATS[index])
 				break;
 
@@ -446,20 +412,19 @@ void BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 			// such as 1.00
 			char *period = 0;
 			char *tmp (NULL);
-			for (tmp = str; *tmp; tmp++)
-			{
+			for (tmp = str; *tmp; tmp++) {
 				if (*tmp == '.')
 					period = tmp;
 			}
-			if (period && period[1] && period[2] == '0')
+			if (period && period[1] && period[2] == '0') {
 				// move the rest of the string over the insignificant zero
 				for (tmp = &period[2]; *tmp; tmp++)
 					*tmp = tmp[1];
+			}
 			if (font.StringWidth(str) <= width)
 				break;
 		}
 	}
-
 
 	string = str;
 	parent->TruncateString(&string, B_TRUNCATE_MIDDLE, width + 2);
@@ -467,55 +432,52 @@ void BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 }
 
 
-//--------------------------------------------------------------------
-
-int BSizeColumn::CompareFields(BField* field1, BField* field2)
+int
+BSizeColumn::CompareFields(BField* field1, BField* field2)
 {
 	return ((BSizeField*)field1)->Size() - ((BSizeField*)field2)->Size();
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BIntegerField::BIntegerField(int32 number)
-              :fInteger(number)
+	:
+	fInteger(number)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void BIntegerField::SetValue(int32 value)
+void
+BIntegerField::SetValue(int32 value)
 {
 	fInteger = value;
 }
 
 
-//--------------------------------------------------------------------
-
-int32 BIntegerField::Value()
+int32
+BIntegerField::Value()
 {
 	return fInteger;
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BIntegerColumn::BIntegerColumn(const char* title, float width, float minWidth,
-							   float maxWidth, alignment align)
-	:BTitledColumn(title, width, minWidth, maxWidth, align)
+		float maxWidth, alignment align)
+	: BTitledColumn(title, width, minWidth, maxWidth, align)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void BIntegerColumn::DrawField(BField *field, BRect rect, BView* parent)
+void
+BIntegerColumn::DrawField(BField *field, BRect rect, BView* parent)
 {
-	char	formatted[256];
-	float	width = rect.Width() - (2 * kTEXT_MARGIN);
+	char formatted[256];
+	float width = rect.Width() - (2 * kTEXT_MARGIN);
 	BString	string;
 
 	sprintf(formatted, "%d", (int)((BIntegerField*)field)->Value());
@@ -526,27 +488,25 @@ void BIntegerColumn::DrawField(BField *field, BRect rect, BView* parent)
 }
 
 
-//--------------------------------------------------------------------
-
-int BIntegerColumn::CompareFields(BField *field1, BField *field2)
+int
+BIntegerColumn::CompareFields(BField *field1, BField *field2)
 {
 	return (((BIntegerField*)field1)->Value() - ((BIntegerField*)field2)->Value());
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 GraphColumn::GraphColumn(const char* name, float width, float minWidth,
-						 float maxWidth, alignment align)
-	:BIntegerColumn(name, width, minWidth, maxWidth, align)
+		float maxWidth, alignment align)
+	: BIntegerColumn(name, width, minWidth, maxWidth, align)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void GraphColumn::DrawField(BField* field, BRect rect, BView* parent)
+void
+GraphColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
 	int	number = ((BIntegerField*)field)->Value();
 
@@ -576,58 +536,54 @@ void GraphColumn::DrawField(BField* field, BRect rect, BView* parent)
 	parent->DrawString(numstr);
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BBitmapField::BBitmapField(BBitmap *bitmap)
-	:fBitmap(bitmap)
+	:
+	fBitmap(bitmap)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-const BBitmap* BBitmapField::Bitmap()
+const BBitmap*
+BBitmapField::Bitmap()
 {
 	return fBitmap;
 }
 
-//--------------------------------------------------------------------
 
-void BBitmapField::SetBitmap(BBitmap* bitmap)
+void
+BBitmapField::SetBitmap(BBitmap* bitmap)
 {
 	fBitmap = bitmap;
 }
 
+
 // #pragma mark -
 
-//=====================================================================
 
 BBitmapColumn::BBitmapColumn(const char* title, float width, float minWidth,
-							 float maxWidth, alignment align)
-	:BTitledColumn(title, width, minWidth, maxWidth, align)
+		float maxWidth, alignment align)
+	: BTitledColumn(title, width, minWidth, maxWidth, align)
 {
 }
 
 
-//--------------------------------------------------------------------
-
-void BBitmapColumn::DrawField(BField* field, BRect rect, BView* parent)
+void
+BBitmapColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
 	BBitmapField *bitmapField = static_cast<BBitmapField *>(field);
 	const BBitmap *bitmap = bitmapField->Bitmap();
 
-	if (bitmap != NULL)
-	{
-		float	x = 0.0;
-		float	y;
-		BRect	r = bitmap->Bounds();
+	if (bitmap != NULL) {
+		float x = 0.0;
+		BRect r = bitmap->Bounds();
+		float y = rect.top + ((rect.Height() - r.Height()) / 2);
 
-		y = rect.top + ((rect.Height() - r.Height()) / 2);
-
-		switch (Alignment())
-		{
+		switch (Alignment()) {
+			default:
 			case B_ALIGN_LEFT:
 				x = rect.left + kTEXT_MARGIN;
 				break;
@@ -647,16 +603,13 @@ void BBitmapColumn::DrawField(BField* field, BRect rect, BView* parent)
 }
 
 
-//--------------------------------------------------------------------
-
-int BBitmapColumn::CompareFields(BField* /*field1*/, BField* /*field2*/)
+int
+BBitmapColumn::CompareFields(BField* /*field1*/, BField* /*field2*/)
 {
 	// Comparing bitmaps doesn't really make sense...
 	return 0;
 }
 
-
-//--------------------------------------------------------------------
 
 bool 
 BBitmapColumn::AcceptsField(const BField *field) const
