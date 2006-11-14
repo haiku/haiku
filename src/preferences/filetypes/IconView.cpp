@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+using namespace std;
+
 
 status_t
 icon_for_type(BMimeType& type, BBitmap& bitmap, icon_size size,
