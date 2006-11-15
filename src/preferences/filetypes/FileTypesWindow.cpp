@@ -6,6 +6,7 @@
 
 #include "AttributeListView.h"
 #include "AttributeWindow.h"
+#include "DropTargetListView.h"
 #include "ExtensionWindow.h"
 #include "FileTypes.h"
 #include "FileTypesWindow.h"
@@ -35,6 +36,7 @@
 #include <be_apps/Tracker/RecentItems.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 const uint32 kMsgTypeSelected = 'typs';
@@ -85,6 +87,23 @@ class TypeIconView : public BControl {
 	private:
 		BBitmap*	fIcon;
 		icon_source	fIconSource;
+};
+
+class ExtensionListView : public DropTargetListView {
+	public:
+		ExtensionListView(BRect frame, const char* name,
+			list_view_type type = B_SINGLE_SELECTION_LIST,
+			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+		virtual ~ExtensionListView();
+
+		virtual void MessageReceived(BMessage* message);
+		virtual bool AcceptsDrag(const BMessage* message);
+
+		void SetType(BMimeType* type);
+
+	private:
+		BMimeType	fType;
 };
 
 
@@ -232,6 +251,74 @@ TypeIconView::MouseDown(BPoint where)
 
 		menu->Go(where);
 	}
+}
+
+
+//	#pragma mark -
+
+
+ExtensionListView::ExtensionListView(BRect frame, const char* name,
+		list_view_type type, uint32 resizeMask, uint32 flags)
+	: DropTargetListView(frame, name, type, resizeMask, flags)
+{
+}
+
+
+ExtensionListView::~ExtensionListView()
+{
+}
+
+
+void
+ExtensionListView::MessageReceived(BMessage* message)
+{
+	if (message->WasDropped() && AcceptsDrag(message)) {
+		// create extension list
+		BList list;
+		entry_ref ref;
+		for (int32 index = 0; message->FindRef("refs", index++, &ref) == B_OK; ) {
+			const char* point = strchr(ref.name, '.');
+			if (point != NULL && point[1])
+				list.AddItem(strdup(++point));
+		}
+
+		add_extensions(fType, list);
+
+		// delete extension list
+		for (int32 index = list.CountItems(); index-- > 0;) {
+			free(list.ItemAt(index));
+		}
+	} else
+		DropTargetListView::MessageReceived(message);
+}
+
+
+bool
+ExtensionListView::AcceptsDrag(const BMessage* message)
+{
+	if (fType.Type() == NULL)
+		return false;
+
+	int32 count = 0;
+	entry_ref ref;
+
+	for (int32 index = 0; message->FindRef("refs", index++, &ref) == B_OK; ) {
+		const char* point = strchr(ref.name, '.');
+		if (point != NULL && point[1])
+			count++;
+	}
+
+	return count > 0;
+}
+
+
+void
+ExtensionListView::SetType(BMimeType* type)
+{
+	if (type != NULL)
+		fType.SetTo(type->Type());
+	else
+		fType.Unset();
 }
 
 
@@ -395,7 +482,7 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	innerRect.top = fAddExtensionButton->Frame().top + 2.0f;
 	innerRect.bottom = innerRect.bottom - 2.0f;
 		// take scrollview border into account
-	fExtensionListView = new BListView(innerRect, "listview ext",
+	fExtensionListView = new ExtensionListView(innerRect, "listview ext",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT);
 	fExtensionListView->SetSelectionMessage(new BMessage(kMsgExtensionSelected));
 	fExtensionListView->SetInvocationMessage(new BMessage(kMsgExtensionInvoked));
@@ -696,6 +783,8 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 				rule = "";
 			fRuleControl->SetText(rule.String());
 		}
+
+		fExtensionListView->SetType(&fCurrentType);
 	} else {
 		fCurrentType.Unset();
 		fInternalNameView->SetText(NULL);
@@ -703,6 +792,7 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 		fDescriptionControl->SetText(NULL);
 		fRuleControl->SetText(NULL);
 		fPreferredField->Menu()->ItemAt(0)->SetMarked(true);
+		fExtensionListView->SetType(NULL);
 	}
 
 	if ((forceUpdate & B_FILE_EXTENSIONS_CHANGED) != 0)

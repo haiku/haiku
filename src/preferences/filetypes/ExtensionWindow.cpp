@@ -38,6 +38,57 @@ compare_extensions(const void* _a, const void* _b)
 }
 
 
+status_t
+add_extensions(BMimeType& type, BList& list, const char* removeExtension)
+{
+	BMessage extensions;
+	status_t status = type.GetFileExtensions(&extensions);
+	if (status < B_OK)
+		return status;
+
+	// replace the entry, and remove any equivalent entries
+	BList newList;
+	newList.AddList(&list);
+
+	const char* extension;
+	for (int32 i = 0; extensions.FindString("extensions", i,
+			&extension) == B_OK; i++) {
+		bool add = true;
+		for (int32 j = list.CountItems(); j-- > 0;) {
+			if ((removeExtension && !strcmp(removeExtension, extension))
+				|| !strcmp((const char*)list.ItemAt(j), extension)) {
+				// remove this item
+				continue;
+			}
+		}
+
+		if (add)
+			newList.AddItem((void *)extension);
+	}
+
+	newList.SortItems(compare_extensions);
+
+	// Copy them to a new message (their memory is still part of the
+	// original BMessage)
+	BMessage newExtensions;
+	for (int32 i = 0; i < newList.CountItems(); i++) {
+		newExtensions.AddString("extensions", (const char*)newList.ItemAt(i));
+	}
+
+	return type.SetFileExtensions(&newExtensions);
+}
+
+
+status_t
+replace_extension(BMimeType& type, const char* newExtension, const char* oldExtension)
+{
+	BList list;
+	list.AddItem((void *)newExtension);
+
+	return add_extensions(type, list, oldExtension);
+}
+
+
 //	#pragma mark -
 
 
@@ -139,37 +190,8 @@ ExtensionWindow::MessageReceived(BMessage* message)
 			if (newExtension[0] == '.')
 				newExtension++;
 
-			BMessage extensions;
-			status_t status = fMimeType.GetFileExtensions(&extensions);
-			if (status == B_OK) {
-				// replace the entry, and remove any equivalent entries
-				BList list;
-				list.AddItem((void *)newExtension);
-
-				const char* extension;
-				for (int32 i = 0; extensions.FindString("extensions", i,
-						&extension) == B_OK; i++) {
-					if (!strcmp(fExtension.String(), extension)
-						|| !strcmp(newExtension, extension)) {
-						// remove this item
-						continue;
-					}
-
-					list.AddItem((void *)extension);
-				}
-
-				list.SortItems(compare_extensions);
-
-				// Copy them to a new message (their memory is still part of the
-				// original BMessage)
-				BMessage newExtensions;
-				for (int32 i = 0; i < list.CountItems(); i++) {
-					newExtensions.AddString("extensions", (const char*)list.ItemAt(i));
-				}
-
-				status = fMimeType.SetFileExtensions(&newExtensions);
-			}
-
+			status_t status = replace_extension(fMimeType, newExtension,
+				fExtension.String());
 			if (status != B_OK)
 				error_alert("Could not change file extensions", status);
 

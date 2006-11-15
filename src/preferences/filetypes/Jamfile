@@ -12,6 +12,7 @@ Preference FileTypes :
 	FileTypesWindow.cpp
 	ApplicationTypesWindow.cpp
 	AttributeListView.cpp
+	DropTargetListView.cpp
 	MimeTypeListView.cpp
 	NewFileTypeWindow.cpp
 	AttributeWindow.cpp

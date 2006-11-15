@@ -19,6 +19,7 @@ class BOutlineListView;
 class BTextControl;
 
 class AttributeListView;
+class ExtensionListView;
 class TypeIconView;
 class MimeTypeListView;
 class StringView;
@@ -54,7 +55,7 @@ class FileTypesWindow : public BWindow {
 
 		BBox*			fRecognitionBox;
 		StringView*		fExtensionLabel;
-		BListView*		fExtensionListView;
+		ExtensionListView* fExtensionListView;
 		BButton*		fAddExtensionButton;
 		BButton*		fRemoveExtensionButton;
 		BTextControl*	fRuleControl;

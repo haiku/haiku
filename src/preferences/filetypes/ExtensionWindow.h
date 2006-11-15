@@ -33,4 +33,9 @@ class ExtensionWindow : public BWindow {
 		BButton*		fAcceptButton;
 };
 
+extern status_t add_extensions(BMimeType& type, BList& list,
+	const char* removeExtension = NULL);
+extern status_t replace_extension(BMimeType& type, const char* newExtension,
+	const char* oldExtension);
+
 #endif	// EXTENSION_WINDOW_H
