@@ -744,7 +744,21 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 		icon->CopyTo(message);
 
-		BBitmap *dragBitmap = new BBitmap(fIcon);
+		BBitmap *dragBitmap = new BBitmap(fIcon->Bounds(), B_RGB32, true);
+		dragBitmap->Lock();
+		BView *view = new BView(dragBitmap->Bounds(), B_EMPTY_STRING, B_FOLLOW_NONE, 0);
+		dragBitmap->AddChild(view);
+
+		view->SetHighColor(B_TRANSPARENT_COLOR);
+		view->FillRect(dragBitmap->Bounds());
+		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetHighColor(0, 0, 0, 160);
+		view->DrawBitmap(fIcon);
+
+		view->Sync();
+		dragBitmap->Unlock();
+
 		DragMessage(&message, dragBitmap, B_OP_ALPHA, fDragPoint, this);
 		fDragging = true;
 		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
