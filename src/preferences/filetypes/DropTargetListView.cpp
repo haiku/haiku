@@ -28,8 +28,21 @@ DropTargetListView::Draw(BRect updateRect)
 	if (fDropTarget) {
 		// mark this view as a drop target
 		rgb_color color = HighColor();
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(Bounds());
+
+		SetHighColor(0, 0, 0);
+		SetPenSize(2);
+		BRect rect = Bounds();
+// TODO: this is an incompatibility between R5 and Haiku and should be fixed!
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		rect.left++;
+		rect.top++;
+#else
+		rect.right--;
+		rect.bottom--;
+#endif
+		StrokeRect(rect);
+
+		SetPenSize(1);
 		SetHighColor(color);
 	}
 }
@@ -62,5 +75,20 @@ DropTargetListView::AcceptsDrag(const BMessage* /*message*/)
 void
 DropTargetListView::_InvalidateFrame()
 {
-	Invalidate();
+	// only update the parts affected by the change to reduce flickering
+	BRect rect = Bounds();
+	rect.right = rect.left + 1;
+	Invalidate(rect);
+	
+	rect = Bounds();
+	rect.left = rect.right - 1;
+	Invalidate(rect);
+
+	rect = Bounds();
+	rect.bottom = rect.top + 1;
+	Invalidate(rect);
+
+	rect = Bounds();
+	rect.top = rect.bottom - 1;
+	Invalidate(rect);
 }

@@ -529,11 +529,19 @@ IconView::_AcceptsDrag(const BMessage* message)
 
 	type_code type;
 	int32 count;
-	if (message->GetInfo("refs", &type, &count) == B_OK && count == 1 && type == B_REF_TYPE
+	if (message->GetInfo("refs", &type, &count) == B_OK && count == 1 && type == B_REF_TYPE) {
+		// if we're bound to an entry, check that no one drops this to us
+		entry_ref ref;
+		if (fHasRef && message->FindRef("refs", &ref) == B_OK && fRef == ref)
+			return false;
+
+		return true;
+	}
+
+	if (message->GetInfo("icon/large", &type) == B_OK && type == B_MESSAGE_TYPE
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		|| message->GetInfo("icon", &type) == B_OK && type == B_VECTOR_ICON_TYPE
 #endif
-		|| message->GetInfo("icon/large", &type) == B_OK && type == B_MESSAGE_TYPE
 		|| message->GetInfo("icon/mini", &type) == B_OK && type == B_MESSAGE_TYPE)
 		return true;
 
@@ -564,10 +572,26 @@ IconView::Draw(BRect updateRect)
 		StrokeRect(Bounds());
 	}
 
-	if (IsFocus() || fDropTarget) {
-		// mark this view as a drop target
+	if (IsFocus()) {
+		// mark this view as a having focus
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		StrokeRect(_BitmapRect());
+	}
+	if (fDropTarget) {
+		// mark this view as a drop target
+		SetHighColor(0, 0, 0);
+		SetPenSize(2);
+		BRect rect = _BitmapRect();
+// TODO: this is an incompatibility between R5 and Haiku and should be fixed!
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		rect.left++;
+		rect.top++;
+#else
+		rect.right--;
+		rect.bottom--;
+#endif
+		StrokeRect(rect);
+		SetPenSize(1);
 	}
 }
 
