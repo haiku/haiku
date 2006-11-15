@@ -30,7 +30,7 @@ using namespace std;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 status_t
-icon_for_type(BMimeType& type, uint8** _data, size_t* _size,
+icon_for_type(const BMimeType& type, uint8** _data, size_t* _size,
 	icon_source* _source)
 {
 	if (_data == NULL || _size == NULL)
@@ -89,7 +89,7 @@ icon_for_type(BMimeType& type, uint8** _data, size_t* _size,
 
 
 status_t
-icon_for_type(BMimeType& type, BBitmap& bitmap, icon_size size,
+icon_for_type(const BMimeType& type, BBitmap& bitmap, icon_size size,
 	icon_source* _source)
 {
 	icon_source source = kNoIcon;
@@ -170,7 +170,7 @@ Icon::~Icon()
 
 
 void
-Icon::SetTo(BAppFileInfo& info, const char* type)
+Icon::SetTo(const BAppFileInfo& info, const char* type)
 {
 	Unset();
 
@@ -199,7 +199,7 @@ Icon::SetTo(BAppFileInfo& info, const char* type)
 
 
 void
-Icon::SetTo(entry_ref& ref, const char* type)
+Icon::SetTo(const entry_ref& ref, const char* type)
 {
 	Unset();
 
@@ -212,7 +212,7 @@ Icon::SetTo(entry_ref& ref, const char* type)
 
 
 void
-Icon::SetTo(BMimeType& type, icon_source* _source)
+Icon::SetTo(const BMimeType& type, icon_source* _source)
 {
 	Unset();
 
@@ -258,7 +258,7 @@ Icon::CopyTo(BAppFileInfo& info, const char* type, bool force) const
 
 
 status_t
-Icon::CopyTo(entry_ref& ref, const char* type, bool force) const
+Icon::CopyTo(const entry_ref& ref, const char* type, bool force) const
 {
 	BFile file;
 	status_t status = file.SetTo(&ref, B_READ_ONLY);
@@ -522,7 +522,7 @@ Icon::AllocateBitmap(int32 size, int32 space)
 
 
 IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags)
-	: BView(rect, name, resizeMode, B_WILL_DRAW | flags),
+	: BControl(rect, name, NULL, NULL, resizeMode, B_WILL_DRAW | flags),
 	fIconSize(B_LARGE_ICON),
 	fIcon(NULL),
 	fHeapIcon(NULL),
@@ -532,7 +532,7 @@ IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags
 	fTracking(false),
 	fDragging(false),
 	fDropTarget(false),
-	fEnabled(true)
+	fShowEmptyFrame(true)
 {
 }
 
@@ -569,7 +569,8 @@ IconView::DetachedFromWindow()
 void
 IconView::MessageReceived(BMessage* message)
 {
-	if (message->WasDropped() && _AcceptsDrag(message)) {
+	if (message->WasDropped() && message->ReturnAddress() != BMessenger(this)
+		&& AcceptsDrag(message)) {
 		// set icon from message
 		BBitmap* mini = NULL;
 		BBitmap* large = NULL;
@@ -631,36 +632,49 @@ IconView::MessageReceived(BMessage* message)
 			const char* type;
 			int32 which;
 			if (message->FindString("be:type", &type) != B_OK
-				|| !strcmp(type, fType.Type())
 				|| message->FindInt32("be:which", &which) != B_OK)
 				break;
 
-			switch (which) {
-				case B_MIME_TYPE_DELETED:
-					Unset();
-					break;
+			if (!strcasecmp(type, fType.Type())) {
+				switch (which) {
+					case B_MIME_TYPE_DELETED:
+						Unset();
+						break;
+	
+					case B_ICON_CHANGED:
+						Update();
+						break;
+	
+					default:
+						break;
+				}
+			} else if (fSource != kOwnIcon
+				&& message->FindString("be:extra_type", &type) == B_OK
+				&& !strcasecmp(type, fType.Type())) {
+				// this change could still affect our current icon
 
-				case B_ICON_CHANGED:
+				if (which == B_MIME_TYPE_DELETED
+					|| which == B_PREFERRED_APP_CHANGED
+#ifdef __HAIKU__
+					|| which == B_SUPPORTED_TYPES_CHANGED
+#endif
+					|| which == B_ICON_FOR_TYPE_CHANGED)
 					Update();
-					break;
-
-				default:
-					break;
 			}
 			break;
 		}
 
 		default:
-			BView::MessageReceived(message);
+			BControl::MessageReceived(message);
 			break;
 	}
 }
 
 
 bool
-IconView::_AcceptsDrag(const BMessage* message)
+IconView::AcceptsDrag(const BMessage* message)
 {
-	if (!fEnabled)
+	if (!IsEnabled())
 		return false;
 
 	type_code type;
@@ -686,9 +700,9 @@ IconView::_AcceptsDrag(const BMessage* message)
 
 
 BRect
-IconView::_BitmapRect() const
+IconView::BitmapRect() const
 {
-	return BRect(0, 0, 31, 31);
+	return BRect(0, 0, fIconSize - 1, fIconSize - 1);
 }
 
 
@@ -698,26 +712,26 @@ IconView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 
 	if (fHeapIcon != NULL)
-		DrawBitmap(fHeapIcon, _BitmapRect().LeftTop());
+		DrawBitmap(fHeapIcon, BitmapRect().LeftTop());
 	else if (fIcon != NULL)
-		DrawBitmap(fIcon, _BitmapRect().LeftTop());
-	else if (!fDropTarget) {
+		DrawBitmap(fIcon, BitmapRect().LeftTop());
+	else if (!fDropTarget && fShowEmptyFrame) {
 		// draw frame so that the user knows here is something he
 		// might be able to click on
 		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		StrokeRect(Bounds());
+		StrokeRect(BitmapRect());
 	}
 
 	if (IsFocus()) {
 		// mark this view as a having focus
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(_BitmapRect());
+		StrokeRect(BitmapRect());
 	}
 	if (fDropTarget) {
 		// mark this view as a drop target
 		SetHighColor(0, 0, 0);
 		SetPenSize(2);
-		BRect rect = _BitmapRect();
+		BRect rect = BitmapRect();
 // TODO: this is an incompatibility between R5 and Haiku and should be fixed!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		rect.left++;
@@ -736,17 +750,17 @@ void
 IconView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
-		*_width = ceilf(fIconSize);
+		*_width = fIconSize;
 
 	if (_height)
-		*_height = ceilf(fIconSize);
+		*_height = fIconSize;
 }
 
 
 void
 IconView::MouseDown(BPoint where)
 {
-	if (!fEnabled)
+	if (!IsEnabled())
 		return;
 
 	int32 buttons = B_PRIMARY_MOUSE_BUTTON;
@@ -758,7 +772,7 @@ IconView::MouseDown(BPoint where)
 			clicks = 1;
 	}
 
-	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0 && _BitmapRect().Contains(where)) {
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0 && BitmapRect().Contains(where)) {
 		if (clicks == 2) {
 			// double click - open Icon-O-Matic
 			Invoke();
@@ -777,12 +791,17 @@ IconView::MouseDown(BPoint where)
 		BPopUpMenu* menu = new BPopUpMenu("context");
 		menu->SetFont(be_plain_font);
 
-		if (fIcon != NULL)
+		bool hasIcon = fHasType ? fSource == kOwnIcon : fIcon != NULL;
+		if (hasIcon)
 			menu->AddItem(new BMenuItem("Edit Icon" B_UTF8_ELLIPSIS, new BMessage(kMsgEditIcon)));
 		else
 			menu->AddItem(new BMenuItem("Add Icon" B_UTF8_ELLIPSIS, new BMessage(kMsgAddIcon)));
 
-		menu->AddItem(new BMenuItem("Remove Icon", new BMessage(kMsgRemoveIcon)));
+		BMenuItem* item = new BMenuItem("Remove Icon", new BMessage(kMsgRemoveIcon));
+		if (!hasIcon)
+			item->SetEnabled(false);
+
+		menu->AddItem(item);
 		menu->SetTargetForItems(fTarget);
 
 		menu->Go(where, true, false, true);
@@ -813,9 +832,12 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		BMessage message(B_SIMPLE_DATA);
 
 		::Icon* icon = fIconData;
-		if (fHasRef) {
+		if (fHasRef || fHasType) {
 			icon = new ::Icon;
-			icon->SetTo(fRef, fType.Type());
+			if (fHasRef)
+				icon->SetTo(fRef, fType.Type());
+			else if (fHasType)
+				icon->SetTo(fType);
 		}
 
 		icon->CopyTo(message);
@@ -835,12 +857,13 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		view->Sync();
 		dragBitmap->Unlock();
 
-		DragMessage(&message, dragBitmap, B_OP_ALPHA, fDragPoint, this);
+		DragMessage(&message, dragBitmap, B_OP_ALPHA,
+			fDragPoint - BitmapRect().LeftTop(), this);
 		fDragging = true;
 		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	}
 
-	if (dragMessage != NULL && !fDragging && _AcceptsDrag(dragMessage)) {
+	if (dragMessage != NULL && !fDragging && AcceptsDrag(dragMessage)) {
 		bool dropTarget = transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW;
 		if (dropTarget != fDropTarget) {
 			fDropTarget = dropTarget;
@@ -869,7 +892,7 @@ IconView::KeyDown(const char* bytes, int32 numBytes)
 		}
 	}
 
-	BView::KeyDown(bytes, numBytes);
+	BControl::KeyDown(bytes, numBytes);
 }
 
 
@@ -879,12 +902,12 @@ IconView::MakeFocus(bool focus)
 	if (focus != IsFocus())
 		Invalidate();
 
-	BView::MakeFocus(focus);
+	BControl::MakeFocus(focus);
 }
 
 
 void
-IconView::SetTo(entry_ref& ref, const char* fileType)
+IconView::SetTo(const entry_ref& ref, const char* fileType)
 {
 	Unset();
 
@@ -901,7 +924,7 @@ IconView::SetTo(entry_ref& ref, const char* fileType)
 
 
 void
-IconView::SetTo(BMimeType& type)
+IconView::SetTo(const BMimeType& type)
 {
 	Unset();
 
@@ -1028,20 +1051,21 @@ IconView::ShowIconHeap(bool show)
 
 
 void
-IconView::SetTarget(const BMessenger& target)
+IconView::ShowEmptyFrame(bool show)
 {
-	fTarget = target;
+	if (show == fShowEmptyFrame)
+		return;
+
+	fShowEmptyFrame = show;
+	if (fIcon == NULL)
+		Invalidate();
 }
 
 
 void
-IconView::SetEnabled(bool enabled)
+IconView::SetTarget(const BMessenger& target)
 {
-	if (fEnabled == enabled)
-		return;
-
-	fEnabled = enabled;
-	Invalidate();
+	fTarget = target;
 }
 
 
@@ -1056,6 +1080,28 @@ Icon*
 IconView::Icon()
 {
 	return fIconData;
+}
+
+
+status_t
+IconView::GetRef(entry_ref& ref) const
+{
+	if (!fHasRef)
+		return B_BAD_TYPE;
+
+	ref = fRef;
+	return B_OK;
+}
+
+
+status_t
+IconView::GetMimeType(BMimeType& type) const
+{
+	if (!fHasType)
+		return B_BAD_TYPE;
+
+	type.SetTo(fType.Type());
+	return B_OK;
 }
 
 

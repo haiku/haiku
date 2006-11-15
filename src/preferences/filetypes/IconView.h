@@ -6,11 +6,11 @@
 #define ICON_VIEW_H
 
 
+#include <Control.h>
 #include <Entry.h>
 #include <Messenger.h>
 #include <Mime.h>
 #include <String.h>
-#include <View.h>
 
 
 enum icon_source {
@@ -27,11 +27,13 @@ class Icon {
 		Icon(const Icon& source);
 		~Icon();
 
-		void SetTo(BAppFileInfo& info, const char* type = NULL);
-		void SetTo(entry_ref& ref, const char* type = NULL);
-		void SetTo(BMimeType& type, icon_source* _source = NULL);
-		status_t CopyTo(BAppFileInfo& info, const char* type = NULL, bool force = false) const;
-		status_t CopyTo(entry_ref& ref, const char* type = NULL, bool force = false) const;
+		void SetTo(const BAppFileInfo& info, const char* type = NULL);
+		void SetTo(const entry_ref& ref, const char* type = NULL);
+		void SetTo(const BMimeType& type, icon_source* _source = NULL);
+		status_t CopyTo(BAppFileInfo& info, const char* type = NULL,
+			bool force = false) const;
+		status_t CopyTo(const entry_ref& ref, const char* type = NULL,
+			bool force = false) const;
 		status_t CopyTo(BMimeType& type, bool force = false) const;
 		status_t CopyTo(BMessage& message) const;
 
@@ -61,7 +63,7 @@ class Icon {
 		size_t		fSize;
 };
 
-class IconView : public BView {
+class IconView : public BControl {
 	public:
 		IconView(BRect rect, const char* name,
 			uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -81,23 +83,29 @@ class IconView : public BView {
 
 		virtual void MakeFocus(bool focus = true);
 
-		void SetTo(entry_ref& file, const char* fileType = NULL);
-		void SetTo(BMimeType& type);
+		void SetTo(const entry_ref& file, const char* fileType = NULL);
+		void SetTo(const BMimeType& type);
 		void SetTo(::Icon* icon);
 		void Unset();
 		void Update();
 
 		void SetIconSize(int32 size);
 		void ShowIconHeap(bool show);
-		void SetEnabled(bool enabled);
+		void ShowEmptyFrame(bool show);
 		void SetTarget(const BMessenger& target);
 		void Invoke();
 
 		::Icon* Icon();
+		int32 IconSize() const { return fIconSize; } 
+		icon_source IconSource() const { return fSource; }
+		status_t GetRef(entry_ref& ref) const;
+		status_t GetMimeType(BMimeType& type) const;
+
+	protected:
+		virtual bool AcceptsDrag(const BMessage* message);
+		virtual BRect BitmapRect() const;
 
 	private:
-		bool _AcceptsDrag(const BMessage* message);
-		BRect _BitmapRect() const;
 		void _AddOrEditIcon();
 		void _SetIcon(BBitmap* large, BBitmap* mini, const uint8* data, size_t size,
 			bool force = false);
@@ -123,7 +131,7 @@ class IconView : public BView {
 		bool		fTracking;
 		bool		fDragging;
 		bool		fDropTarget;
-		bool		fEnabled;
+		bool		fShowEmptyFrame;
 };
 
 static const uint32 kMsgIconInvoked = 'iciv';
@@ -131,9 +139,9 @@ static const uint32 kMsgRemoveIcon = 'icrm';
 static const uint32 kMsgAddIcon = 'icad';
 static const uint32 kMsgEditIcon = 'iced';
 
-extern status_t icon_for_type(BMimeType& type, uint8** _data, size_t* _size,
+extern status_t icon_for_type(const BMimeType& type, uint8** _data, size_t* _size,
 	icon_source* _source = NULL);
-extern status_t icon_for_type(BMimeType& type, BBitmap& bitmap,
+extern status_t icon_for_type(const BMimeType& type, BBitmap& bitmap,
 	icon_size size, icon_source* _source = NULL);
 
 #endif	// ICON_VIEW_H

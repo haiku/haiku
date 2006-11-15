@@ -67,26 +67,17 @@ const uint32 kMsgDescriptionEntered = 'dsce';
 const uint32 kMsgToggleIcons = 'tgic';
 const uint32 kMsgToggleRule = 'tgrl';
 
-class TypeIconView : public BControl {
+class TypeIconView : public IconView {
 	public:
-		TypeIconView(BRect frame, const char* name, BMessage* message,
+		TypeIconView(BRect frame, const char* name,
 			int32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		virtual ~TypeIconView();
-
-		void SetTo(BMimeType* type);
 
 		virtual void Draw(BRect updateRect);
 		virtual void GetPreferredSize(float* _width, float* _height);
 
-		virtual void MouseDown(BPoint where);
-#if 0
-		virtual void MouseMoved(BPoint where, uint32 transit,
-			BMessage* dragMessage);
-#endif
-
-	private:
-		BBitmap*	fIcon;
-		icon_source	fIconSource;
+	protected:
+		virtual BRect BitmapRect() const;
 };
 
 class ExtensionListView : public DropTargetListView {
@@ -110,70 +101,29 @@ class ExtensionListView : public DropTargetListView {
 //	#pragma mark -
 
 
-TypeIconView::TypeIconView(BRect frame, const char* name, BMessage* message,
-		int32 resizingMode)
-	: BControl(frame, name, NULL, message,
-		resizingMode, B_WILL_DRAW),
-	fIcon(NULL),
-	fIconSource(kNoIcon)
+TypeIconView::TypeIconView(BRect frame, const char* name, int32 resizingMode)
+	: IconView(frame, name, resizingMode)
 {
+	ShowEmptyFrame(false);
 }
 
 
 TypeIconView::~TypeIconView()
 {
-	delete fIcon;
-}
-
-
-void
-TypeIconView::SetTo(BMimeType* type)
-{
-	int32 sourceWas = fIconSource;
-	fIconSource = kNoIcon;
-
-	if (type != NULL) {
-		if (fIcon == NULL) {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1),
-				B_RGB32);
-#else
-			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1),
-				B_CMAP8);
-#endif
-		}
-
-		icon_for_type(*type, *fIcon, B_LARGE_ICON, &fIconSource);
-	}
-
-	if (fIconSource == kNoIcon) {
-		delete fIcon;
-		fIcon = NULL;
-	}
-
-	if (sourceWas != fIconSource || sourceWas != kNoIcon)
-		Invalidate();
 }
 
 
 void
 TypeIconView::Draw(BRect updateRect)
 {
-	SetHighColor(ViewColor());
-	FillRect(updateRect);
-
 	if (!IsEnabled())
 		return;
 
-	if (fIcon != NULL) {
-		SetDrawingMode(B_OP_ALPHA);
-		DrawBitmap(fIcon,
-			BPoint((Bounds().Width() - fIcon->Bounds().Width()) / 2.0f, 0.0f));
-	}
+	IconView::Draw(updateRect);
 
 	const char* text = NULL;
 
-	switch (fIconSource) {
+	switch (IconSource()) {
 		case kNoIcon:
 			text = "no icon";
 			break;
@@ -195,14 +145,14 @@ TypeIconView::Draw(BRect updateRect)
 	GetFontHeight(&fontHeight);
 
 	float y = fontHeight.ascent;
-	if (fIconSource == kNoIcon) {
+	if (IconSource() == kNoIcon) {
 		// center text in the middle of the icon
-		y += (B_LARGE_ICON - fontHeight.ascent - fontHeight.descent) / 2.0f;
+		y += (IconSize() - fontHeight.ascent - fontHeight.descent) / 2.0f;
 	} else
-		y += B_LARGE_ICON + 3.0f;
+		y += IconSize() + 3.0f;
 
-	DrawString(text, BPoint((Bounds().Width() - StringWidth(text)) / 2.0f,
-		y));
+	DrawString(text, BPoint(ceilf((Bounds().Width() - StringWidth(text)) / 2.0f),
+		ceilf(y)));
 }
 
 
@@ -213,8 +163,8 @@ TypeIconView::GetPreferredSize(float* _width, float* _height)
 		float a = StringWidth("(from application)");
 		float b = StringWidth("(from super type)");
 		float width = max_c(a, b);
-		if (width < B_LARGE_ICON)
-			width = B_LARGE_ICON;
+		if (width < IconSize())
+			width = IconSize();
 
 		*_width = ceilf(width);
 	}
@@ -223,34 +173,29 @@ TypeIconView::GetPreferredSize(float* _width, float* _height)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = B_LARGE_ICON + 3.0f + ceilf(fontHeight.ascent + fontHeight.descent);
+		*_height = IconSize() + 3.0f + ceilf(fontHeight.ascent + fontHeight.descent);
 	}
 }
 
 
-void
-TypeIconView::MouseDown(BPoint where)
+BRect
+TypeIconView::BitmapRect() const
 {
-	int32 buttons = B_PRIMARY_MOUSE_BUTTON;
-	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
-		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
+	if (IconSource() == kNoIcon) {
+		// this also defines the drop target area
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
 
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		// show context menu
+		float width = StringWidth("no icon") + 8.0f;
+		float height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0f;
+		float x = (Bounds().Width() - width) / 2.0f;
+		float y = ceilf((IconSize() - fontHeight.ascent - fontHeight.descent) / 2.0f) - 3.0f;
 
-		ConvertToScreen(&where);
-
-		BPopUpMenu* menu = new BPopUpMenu("context");
-		menu->SetFont(be_plain_font);
-		BMenuItem* item;
-		menu->AddItem(item = new BMenuItem(fIconSource == kOwnIcon
-			? "Edit Icon" B_UTF8_ELLIPSIS : "Add Icon" B_UTF8_ELLIPSIS, NULL));
-		item->SetEnabled(false);
-		menu->AddItem(item = new BMenuItem("Remove Icon", NULL));
-		item->SetEnabled(false);
-
-		menu->Go(where);
+		return BRect(x, y, x + width, y + height);
 	}
+
+	float x = (Bounds().Width() - IconSize()) / 2.0f;
+	return BRect(x, 0.0f, x + IconSize() - 1, IconSize() - 1);
 }
 
 
@@ -427,7 +372,7 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	font.GetHeight(&boldHeight);
 
 	BRect innerRect;
-	fIconView = new TypeIconView(innerRect, "icon", NULL,
+	fIconView = new TypeIconView(innerRect, "icon",
 		B_FOLLOW_LEFT | B_FOLLOW_V_CENTER);
 	fIconView->ResizeToPreferred();
 
@@ -740,7 +685,10 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 void
 FileTypesWindow::_UpdateIcon(BMimeType* type)
 {
-	fIconView->SetTo(type);
+	if (type != NULL)
+		fIconView->SetTo(*type);
+	else
+		fIconView->Unset();
 }
 
 
@@ -1151,14 +1099,11 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				// this change could still affect our current type
 
 				if (which == B_MIME_TYPE_DELETED
-					|| which == B_PREFERRED_APP_CHANGED
 #ifdef __HAIKU__
 					|| which == B_SUPPORTED_TYPES_CHANGED
 #endif
-					|| which == B_ICON_FOR_TYPE_CHANGED) {
+					|| which == B_PREFERRED_APP_CHANGED)
 					_UpdatePreferredApps(&fCurrentType);
-					_UpdateIcon(&fCurrentType);
-				}
 			}
 			break;
 		}
