@@ -5,6 +5,7 @@
 
 
 #include "ApplicationTypeWindow.h"
+#include "DropTargetListView.h"
 #include "FileTypes.h"
 #include "IconView.h"
 #include "PreferredAppMenu.h"
@@ -62,6 +63,18 @@ class SupportedTypeItem : public BStringItem {
 		::Icon*	fIcon;
 };
 
+class SupportedTypeListView : public DropTargetListView {
+	public:
+		SupportedTypeListView(BRect frame, const char* name,
+			list_view_type type = B_SINGLE_SELECTION_LIST,
+			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+		virtual ~SupportedTypeListView();
+
+		virtual void MessageReceived(BMessage* message);
+		virtual bool AcceptsDrag(const BMessage* message);
+};
+
 
 SupportedTypeItem::SupportedTypeItem(const char* type)
 	: BStringItem(type),
@@ -109,7 +122,73 @@ SupportedTypeItem::Compare(const void* _a, const void* _b)
 	const SupportedTypeItem* a = *(const SupportedTypeItem**)_a;
 	const SupportedTypeItem* b = *(const SupportedTypeItem**)_b;
 
+	int compare = strcasecmp(a->Text(), b->Text());
+	if (compare != 0)
+		return compare;
+
 	return strcasecmp(a->Type(), b->Type());
+}
+
+
+//	#pragma mark -
+
+
+SupportedTypeListView::SupportedTypeListView(BRect frame, const char* name,
+		list_view_type type, uint32 resizeMask, uint32 flags)
+	: DropTargetListView(frame, name, type, resizeMask, flags)
+{
+}
+
+
+SupportedTypeListView::~SupportedTypeListView()
+{
+}
+
+
+void
+SupportedTypeListView::MessageReceived(BMessage* message)
+{
+	if (message->WasDropped() && AcceptsDrag(message)) {
+		// Add unique types
+		entry_ref ref;
+		for (int32 index = 0; message->FindRef("refs", index++, &ref) == B_OK; ) {
+			BNode node(&ref);
+			BNodeInfo info(&node);
+			if (node.InitCheck() != B_OK || info.InitCheck() != B_OK)
+				continue;
+
+			// TODO: we could identify the file in case it doesn't have a type...
+			char type[B_MIME_TYPE_LENGTH];
+			if (info.GetType(type) != B_OK)
+				continue;
+
+			// check if that type is already in our list
+			bool found = false;
+			for (int32 i = CountItems(); i-- > 0;) {
+				SupportedTypeItem* item = (SupportedTypeItem*)ItemAt(i);
+				if (!strcmp(item->Text(), type)) {
+					found = true;
+					break;
+				}
+			}
+
+			if (!found) {
+				// add type
+				AddItem(new SupportedTypeItem(type));
+			}
+		}
+
+		SortItems(&SupportedTypeItem::Compare);
+	} else
+		DropTargetListView::MessageReceived(message);
+}
+
+
+bool
+SupportedTypeListView::AcceptsDrag(const BMessage* message)
+{
+	type_code type;
+	return message->GetInfo("refs", &type) == B_OK && type == B_REF_TYPE;
 }
 
 
@@ -273,7 +352,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.top = 8.0f + ceilf(fontHeight.ascent);
 	rect.bottom -= 2.0f;
 		// take scrollview border into account
-	fTypeListView = new BListView(rect, "type listview",
+	fTypeListView = new SupportedTypeListView(rect, "type listview",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
