@@ -13,6 +13,14 @@
 #include <View.h>
 
 
+enum icon_source {
+	kNoIcon = 0,
+	kOwnIcon,
+	kApplicationIcon,
+	kSupertypeIcon
+};
+
+
 class Icon {
 	public:
 		Icon();
@@ -21,9 +29,11 @@ class Icon {
 
 		void SetTo(BAppFileInfo& info, const char* type = NULL);
 		void SetTo(entry_ref& ref, const char* type = NULL);
-		status_t CopyTo(BAppFileInfo& info, const char* type = NULL, bool force = false);
-		status_t CopyTo(entry_ref& ref, const char* type = NULL, bool force = false);
-		status_t CopyTo(BMessage& message);
+		void SetTo(BMimeType& type, icon_source* _source = NULL);
+		status_t CopyTo(BAppFileInfo& info, const char* type = NULL, bool force = false) const;
+		status_t CopyTo(entry_ref& ref, const char* type = NULL, bool force = false) const;
+		status_t CopyTo(BMimeType& type, bool force = false) const;
+		status_t CopyTo(BMessage& message) const;
 
 		void SetData(const uint8* data, size_t size);
 		void SetLarge(const BBitmap* large);
@@ -72,12 +82,15 @@ class IconView : public BView {
 		virtual void MakeFocus(bool focus = true);
 
 		void SetTo(entry_ref& file, const char* fileType = NULL);
+		void SetTo(BMimeType& type);
 		void SetTo(::Icon* icon);
+		void Unset();
+		void Update();
+
 		void SetIconSize(int32 size);
 		void ShowIconHeap(bool show);
 		void SetEnabled(bool enabled);
 		void SetTarget(const BMessenger& target);
-		void Update();
 		void Invoke();
 
 		::Icon* Icon();
@@ -99,12 +112,13 @@ class IconView : public BView {
 		BBitmap*	fIcon;
 		BBitmap*	fHeapIcon;
 
+		bool		fHasRef;
+		bool		fHasType;
+		entry_ref	fRef;
+		BMimeType	fType;
+		icon_source	fSource;
 		::Icon*		fIconData;
 
-		bool		fHasRef;
-		bool		fIsLive;
-		entry_ref	fRef;
-		BString		fFileType;
 		BPoint		fDragPoint;
 		bool		fTracking;
 		bool		fDragging;
@@ -116,13 +130,6 @@ static const uint32 kMsgIconInvoked = 'iciv';
 static const uint32 kMsgRemoveIcon = 'icrm';
 static const uint32 kMsgAddIcon = 'icad';
 static const uint32 kMsgEditIcon = 'iced';
-
-enum icon_source {
-	kNoIcon = 0,
-	kOwnIcon,
-	kApplicationIcon,
-	kSupertypeIcon
-};
 
 extern status_t icon_for_type(BMimeType& type, uint8** _data, size_t* _size,
 	icon_source* _source = NULL);

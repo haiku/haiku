@@ -211,8 +211,37 @@ Icon::SetTo(entry_ref& ref, const char* type)
 }
 
 
+void
+Icon::SetTo(BMimeType& type, icon_source* _source)
+{
+	Unset();
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	uint8* data;
+	size_t size;
+	if (icon_for_type(type, &data, &size, _source) == B_OK) {
+		// we have the vector icon, no need to get the rest
+		AdoptData(data, size);
+		return;
+	}
+#endif
+
+	BBitmap* icon = AllocateBitmap(B_LARGE_ICON, B_CMAP8);
+	if (icon && icon_for_type(type, *icon, B_LARGE_ICON, _source) == B_OK)
+		AdoptLarge(icon);
+	else
+		delete icon;
+
+	icon = AllocateBitmap(B_MINI_ICON, B_CMAP8);
+	if (icon && icon_for_type(type, *icon, B_MINI_ICON) == B_OK)
+		AdoptMini(icon);
+	else
+		delete icon;
+}
+
+
 status_t
-Icon::CopyTo(BAppFileInfo& info, const char* type, bool force)
+Icon::CopyTo(BAppFileInfo& info, const char* type, bool force) const
 {
 	status_t status = B_OK;
 
@@ -229,7 +258,7 @@ Icon::CopyTo(BAppFileInfo& info, const char* type, bool force)
 
 
 status_t
-Icon::CopyTo(entry_ref& ref, const char* type, bool force)
+Icon::CopyTo(entry_ref& ref, const char* type, bool force) const
 {
 	BFile file;
 	status_t status = file.SetTo(&ref, B_READ_ONLY);
@@ -246,7 +275,24 @@ Icon::CopyTo(entry_ref& ref, const char* type, bool force)
 
 
 status_t
-Icon::CopyTo(BMessage& message)
+Icon::CopyTo(BMimeType& type, bool force) const
+{
+	status_t status = B_OK;
+
+	if (fLarge != NULL || force)
+		status = type.SetIcon(fLarge, B_LARGE_ICON);
+	if (fMini != NULL || force)
+		status = type.SetIcon(fMini, B_MINI_ICON);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (fData != NULL || force)
+		status = type.SetIcon(fData, fSize);
+#endif
+	return status;
+}
+
+
+status_t
+Icon::CopyTo(BMessage& message) const
 {
 	status_t status = B_OK;
 
@@ -480,9 +526,9 @@ IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags
 	fIconSize(B_LARGE_ICON),
 	fIcon(NULL),
 	fHeapIcon(NULL),
-	fIconData(NULL),
 	fHasRef(false),
-	fIsLive(false),
+	fHasType(false),
+	fIconData(NULL),
 	fTracking(false),
 	fDragging(false),
 	fDropTarget(false),
@@ -508,7 +554,7 @@ IconView::AttachedToWindow()
 	fTarget = this;
 
 	// SetTo() was already called before we were a valid messenger
-	if (fIsLive)
+	if (fHasRef || fHasType)
 		_StartWatching();
 }
 
@@ -560,6 +606,9 @@ IconView::MessageReceived(BMessage* message)
 
 		case B_NODE_MONITOR:
 		{
+			if (!fHasRef)
+				break;
+
 			int32 opcode;
 			if (message->FindInt32("opcode", &opcode) != B_OK
 				|| opcode != B_ATTR_CHANGED)
@@ -571,6 +620,33 @@ IconView::MessageReceived(BMessage* message)
 
 			if (!strcmp(name, "BEOS:L:STD_ICON"))
 				Update();
+			break;
+		}
+
+		case B_META_MIME_CHANGED:
+		{
+			if (!fHasType)
+				break;
+
+			const char* type;
+			int32 which;
+			if (message->FindString("be:type", &type) != B_OK
+				|| !strcmp(type, fType.Type())
+				|| message->FindInt32("be:which", &which) != B_OK)
+				break;
+
+			switch (which) {
+				case B_MIME_TYPE_DELETED:
+					Unset();
+					break;
+
+				case B_ICON_CHANGED:
+					Update();
+					break;
+
+				default:
+					break;
+			}
 			break;
 		}
 
@@ -739,7 +815,7 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		::Icon* icon = fIconData;
 		if (fHasRef) {
 			icon = new ::Icon;
-			icon->SetTo(fRef, fFileType.Length() > 0 ? fFileType.String() : NULL);
+			icon->SetTo(fRef, fType.Type());
 		}
 
 		icon->CopyTo(message);
@@ -810,18 +886,31 @@ IconView::MakeFocus(bool focus)
 void
 IconView::SetTo(entry_ref& ref, const char* fileType)
 {
-	if (fHasRef && fIsLive)
-		_StopWatching();
+	Unset();
 
 	fHasRef = true;
 	fRef = ref;
-
 	if (fileType != NULL)
-		fFileType = fileType;
+		fType.SetTo(fileType);
 	else
-		fFileType = "";
+		fType.Unset();
 
-	fIsLive = true;
+	_StartWatching();
+	Update();
+}
+
+
+void
+IconView::SetTo(BMimeType& type)
+{
+	Unset();
+
+	if (type.Type() == NULL)
+		return;
+
+	fHasType = true;
+	fType.SetTo(type.Type());
+
 	_StartWatching();
 	Update();
 }
@@ -833,9 +922,70 @@ IconView::SetTo(::Icon* icon)
 	if (fIconData == icon)
 		return;
 
+	Unset();
+
 	fIconData = icon;
-	fHasRef = false;
+
 	Update();
+}
+
+
+void
+IconView::Unset()
+{
+	if (fHasRef || fHasType)
+		_StopWatching();
+
+	fHasRef = false;
+	fHasType = false;
+
+	fType.Unset();
+	fIconData = NULL;
+}
+
+
+void
+IconView::Update()
+{
+	delete fIcon;
+	fIcon = NULL;
+
+	Invalidate();
+		// this will actually trigger a redraw *after* we updated the icon below
+
+	BBitmap* icon = NULL;
+
+	if (fHasRef) {
+		BFile file(&fRef, B_READ_ONLY);
+		if (file.InitCheck() != B_OK)
+			return;
+
+		BAppFileInfo info;
+		if (info.SetTo(&file) != B_OK)
+			return;
+
+		icon = Icon::AllocateBitmap(fIconSize);
+		if (icon != NULL && info.GetIconForType(fType.Type(), icon,
+				(icon_size)fIconSize) != B_OK) {
+			delete icon;
+			return;
+		}
+	} else if (fHasType) {
+		icon = Icon::AllocateBitmap(fIconSize);
+		if (icon != NULL && icon_for_type(fType, *icon, (icon_size)fIconSize,
+				&fSource) != B_OK) {
+			delete icon;
+			return;
+		}
+	} else if (fIconData) {
+		icon = Icon::AllocateBitmap(fIconSize);
+		if (fIconData->GetIcon(icon) != B_OK) {
+			delete icon;
+			icon = NULL;
+		}
+	}
+
+	fIcon = icon;
 }
 
 
@@ -896,51 +1046,6 @@ IconView::SetEnabled(bool enabled)
 
 
 void
-IconView::Update()
-{
-	delete fIcon;
-	fIcon = NULL;
-
-	Invalidate();
-		// this will actually trigger a redraw *after* we updated the icon below
-
-	BBitmap* icon = NULL;
-
-	if (fHasRef) {
-		if (fIconData != NULL)
-			fIconData->Unset();
-
-		BFile file(&fRef, B_READ_ONLY);
-		if (file.InitCheck() != B_OK)
-			return;
-
-		const char* fileType = fFileType.Length() > 0 ? fFileType.String() : NULL;
-
-		BAppFileInfo info;
-		if (info.SetTo(&file) != B_OK)
-			return;
-
-		icon = Icon::AllocateBitmap(fIconSize);
-		if (icon != NULL && info.GetIconForType(fileType, icon, (icon_size)fIconSize) != B_OK) {
-			delete icon;
-			return;
-		}
-
-		if (fIconData != NULL)
-			fIconData->SetTo(info, fileType);
-	} else if (fIconData) {
-		icon = Icon::AllocateBitmap(fIconSize);
-		if (fIconData->GetIcon(icon) != B_OK) {
-			delete icon;
-			icon = NULL;
-		}
-	}
-
-	fIcon = icon;
-}
-
-
-void
 IconView::Invoke()
 {
 	fTarget.SendMessage(kMsgIconInvoked);
@@ -958,13 +1063,15 @@ void
 IconView::_AddOrEditIcon()
 {
 	BMessage message;
-	if (fIsLive) {
-		// in live mode, Icon-O-Matic can change the icon directly, and
+	if (fHasRef) {
+		// in ref mode, Icon-O-Matic can change the icon directly, and
 		// we'll pick it up via node monitoring
 		message.what = B_REFS_RECEIVED;
 		message.AddRef("refs", &fRef);
-		if (fFileType.Length() > 0)
-			message.AddString("file type", fFileType.String());
+		if (fType.Type() != NULL)
+			message.AddString("file type", fType.Type());
+//	} else if (fHasType) {
+//		// TODO!
 	} else {
 		// in static mode, Icon-O-Matic need to return the buffer it
 		// changed once its done
@@ -980,23 +1087,32 @@ IconView::_AddOrEditIcon()
 void
 IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data, size_t size, bool force)
 {
-	if (fIsLive) {
+	if (fHasRef) {
 		BFile file(&fRef, B_READ_WRITE);
 
 		BAppFileInfo info(&file);
 		if (info.InitCheck() == B_OK) {
-			const char* type = fFileType.Length() > 0 ? fFileType.String() : NULL;
-
 			if (large != NULL || force)
-				info.SetIconForType(type, large, B_LARGE_ICON);
+				info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
 			if (mini != NULL || force)
-				info.SetIconForType(type, mini, B_MINI_ICON);
+				info.SetIconForType(fType.Type(), mini, B_MINI_ICON);
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			if (data != NULL || force)
-				info.SetIconForType(type, data, size);
+				info.SetIconForType(fType.Type(), data, size);
 #endif
 		}
 		// the icon shown will be updated using node monitoring
+	} else if (fHasType) {
+		if (large != NULL || force)
+			fType.SetIcon(large, B_LARGE_ICON);
+		if (mini != NULL || force)
+			fType.SetIcon(mini, B_MINI_ICON);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		if (data != NULL || force)
+			fType.SetIcon(data, size);
+#endif
+		// the icon shown will be updated automatically - we're watching
+		// any changes to the MIME database
 	} else if (fIconData != NULL) {
 		if (large != NULL || force)
 			fIconData->SetLarge(large);
@@ -1109,17 +1225,23 @@ IconView::_StartWatching()
 		return;
 	}
 
-	BNode node(&fRef);
-	node_ref nodeRef;
-	if (node.InitCheck() == B_OK
-		&& node.GetNodeRef(&nodeRef) == B_OK)
-		watch_node(&nodeRef, B_WATCH_ATTR, this);
+	if (fHasRef) {
+		BNode node(&fRef);
+		node_ref nodeRef;
+		if (node.InitCheck() == B_OK
+			&& node.GetNodeRef(&nodeRef) == B_OK)
+			watch_node(&nodeRef, B_WATCH_ATTR, this);
+	} else if (fHasType)
+		BMimeType::StartWatching(this);
 }
 
 
 void
 IconView::_StopWatching()
 {
-	stop_watching(this);
+	if (fHasRef)
+		stop_watching(this);
+	else if (fHasType)
+		BMimeType::StopWatching(this);
 }
 
