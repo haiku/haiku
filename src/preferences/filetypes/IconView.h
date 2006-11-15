@@ -124,6 +124,8 @@ enum icon_source {
 	kSupertypeIcon
 };
 
+extern status_t icon_for_type(BMimeType& type, uint8** _data, size_t* _size,
+	icon_source* _source = NULL);
 extern status_t icon_for_type(BMimeType& type, BBitmap& bitmap,
 	icon_size size, icon_source* _source = NULL);
 

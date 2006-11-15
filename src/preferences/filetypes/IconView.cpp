@@ -28,6 +28,66 @@
 using namespace std;
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+status_t
+icon_for_type(BMimeType& type, uint8** _data, size_t* _size,
+	icon_source* _source)
+{
+	if (_data == NULL || _size == NULL)
+		return B_BAD_VALUE;
+
+	icon_source source = kNoIcon;
+	uint8* data;
+	size_t size;
+
+	if (type.GetIcon(&data, &size) == B_OK)
+		source = kOwnIcon;
+
+	if (source == kNoIcon) {
+		// check for icon from preferred app
+
+		char preferred[B_MIME_TYPE_LENGTH];
+		if (type.GetPreferredApp(preferred) == B_OK) {
+			BMimeType preferredApp(preferred);
+
+			if (preferredApp.GetIconForType(type.Type(), &data, &size) == B_OK)
+				source = kApplicationIcon;
+		}
+	}
+
+	if (source == kNoIcon) {
+		// check super type for an icon
+
+		BMimeType superType;
+		if (type.GetSupertype(&superType) == B_OK) {
+			if (superType.GetIcon(&data, &size) == B_OK)
+				source = kSupertypeIcon;
+			else {
+				// check the super type's preferred app
+				char preferred[B_MIME_TYPE_LENGTH];
+				if (superType.GetPreferredApp(preferred) == B_OK) {
+					BMimeType preferredApp(preferred);
+
+					if (preferredApp.GetIconForType(superType.Type(),
+							&data, &size) == B_OK)
+						source = kSupertypeIcon;
+				}
+			}
+		}
+	}
+
+	if (source != kNoIcon) {
+		*_data = data;
+		*_size = size;
+	}
+	if (_source)
+		*_source = source;
+
+	return source != kNoIcon ? B_OK : B_ERROR;
+}
+#endif
+
+
 status_t
 icon_for_type(BMimeType& type, BBitmap& bitmap, icon_size size,
 	icon_source* _source)
@@ -992,14 +1052,26 @@ IconView::_SetIcon(entry_ref* ref)
 		if (info.GetType(type) != B_OK)
 			return;
 
-		// TODO: vector icon support!
 		BMimeType mimeType(type);
-		if (large != NULL && icon_for_type(mimeType, *large, B_LARGE_ICON) == B_OK)
-			hasLarge = true;
-		if (mini != NULL && icon_for_type(mimeType, *mini, B_MINI_ICON) == B_OK)
-			hasMini = true;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		if (icon_for_type(mimeType, &data, &size) != B_OK) {
+			// only try large/mini icons when there is no vector icon
+#endif
+			if (large != NULL && icon_for_type(mimeType, *large, B_LARGE_ICON) == B_OK)
+				hasLarge = true;
+			if (mini != NULL && icon_for_type(mimeType, *mini, B_MINI_ICON) == B_OK)
+				hasMini = true;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		}
+#endif
 	}
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (data != NULL) {
+		_SetIcon(NULL, NULL, data, size);
+		free(data);
+	} else
+#endif
 	if (hasLarge || hasMini)
 		_SetIcon(large, mini, NULL, 0);
 
