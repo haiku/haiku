@@ -70,20 +70,6 @@ enum {
 	B_META_MIME_DELETED 	= 'MMDL',
 };
 
-/* ------------------------------------------------------------- */
-
-//!		File typing functionality.
-/*! 	The BMimeType class provides access to the file typing system, which
-		provides the following functionality:		
-			- Basic MIME string manipulation 
-			- Access to file type information in the MIME database
-			- Ways to receive notifications when parts of the MIME database are updated
-			- Methods to determine/help determine the types of untyped files
-		
-		\author <a href='mailto:tylerdauwalder@users.sf.net'>Tyler Dauwalder</a>
-		\author <a href='bonefish@users.sf.net'>Ingo Weinhold</a>
-		\version 0.0.0
-*/
 class BMimeType	{
 	public:
 		BMimeType();
@@ -109,8 +95,8 @@ class BMimeType	{
 		status_t Install();
 		status_t Delete();
 		bool IsInstalled() const;
-		status_t GetIcon(BBitmap *icon, icon_size size) const;
-		status_t GetIcon(uint8** data, size_t* size) const;
+		status_t GetIcon(BBitmap* icon, icon_size size) const;
+		status_t GetIcon(uint8** _data, size_t* _size) const;
 		status_t GetPreferredApp(char *signature, app_verb verb = B_OPEN) const;
 		status_t GetAttrInfo(BMessage *info) const;
 		status_t GetFileExtensions(BMessage *extensions) const;
@@ -137,9 +123,11 @@ class BMimeType	{
 		status_t SetAppHint(const entry_ref *ref);
 
 		/* for application signatures only. */
-		status_t GetIconForType(const char *type, BBitmap *icon,
+		status_t GetIconForType(const char* type, BBitmap* icon,
 							icon_size which) const;
-		status_t SetIconForType(const char *type, const BBitmap *icon,
+		status_t GetIconForType(const char* type, uint8** _data,
+							size_t* _size) const;
+		status_t SetIconForType(const char* type, const BBitmap* icon,
 							icon_size which);
 		status_t SetIconForType(const char* type, const uint8* data,
 							size_t size);
@@ -163,7 +151,7 @@ class BMimeType	{
 		status_t SetType(const char *mimeType);
 
 	private:
-		BMimeType(const char *mimeType, const char *mimePath);
+		BMimeType(const char* mimeType, const char* mimePath);
 			// if mimePath is NULL, defaults to "/boot/home/config/settings/beos_mime/"
 
 		friend class MimeTypeTest;
@@ -176,13 +164,13 @@ class BMimeType	{
 		virtual void _ReservedMimeType2();
 		virtual void _ReservedMimeType3();
 
-		BMimeType &operator=(const BMimeType &);
-		BMimeType(const BMimeType &);
+		BMimeType& operator=(const BMimeType& source);
+		BMimeType(const BMimeType& source);
 
 		status_t GetSupportedTypes(BMessage* types);
 		status_t SetSupportedTypes(const BMessage* types, bool fullSync = true);
-	
-		static status_t GetAssociatedTypes(const char *extension, BMessage *types);
+
+		static status_t GetAssociatedTypes(const char* extension, BMessage* types);
 
 	private:
 		char*		fType;

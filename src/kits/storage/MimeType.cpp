@@ -444,10 +444,9 @@ BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 }
 
 
-// GetIcon
-//! Fetches the vector icon associated with the MIME type
-/*! The icon data is returned in \c data.
-	
+/*!	\brief Fetches the vector icon associated with the MIME type
+	The icon data is returned in \c data.
+
 	\param data Pointer in which the allocated icon data is returned. You need to
 				delete the buffer when you are done with it.
 	\param size Pointer in which the size of the allocated icon data is returned.
@@ -1247,7 +1246,7 @@ BMimeType::SetAppHint(const entry_ref *ref)
 	return err;	
 }
 
-// GetIconForType
+
 /*! \brief Fetches the large or mini icon used by an application of this type for files of the
 	given type.
 	
@@ -1291,7 +1290,39 @@ BMimeType::GetIconForType(const char *type, BBitmap *icon, icon_size which) cons
 	return err;
 }
 
-// SetIconForType
+
+/*! \brief Fetches the vector icon used by an application of this type for files of
+	the given type.
+
+	The icon data is returned in \c data.
+	See the other GetIconForType() for more information.
+
+	\param type Pointer to a pre-allocated string containing the MIME type whose
+	            custom icon you wish to fetch.
+	\param data Pointer in which the allocated icon data is returned. You need to
+				delete the buffer when you are done with it.
+	\param size Pointer in which the size of the allocated icon data is returned.
+	\return
+	- \c B_OK: Success
+	- \c B_ENTRY_NOT_FOUND: No icon of the given size exists for the given type
+	- other error code: Failure	
+
+*/
+status_t
+BMimeType::GetIconForType(const char *type, uint8** _data, size_t* _size) const
+{
+	// If type is NULL, this function works just like GetIcon(), otherwise,
+	// we need to make sure the give type is valid.
+	if (type == NULL)
+		return GetIcon(_data, _size);
+
+	if (!BMimeType::IsValid(type))
+		return B_BAD_VALUE;
+
+	return get_icon_for_type(Type(), type, _data, _size);
+}
+
+
 /*! \brief Sets the large or mini icon used by an application of this type for
 	files of the given type.
 
