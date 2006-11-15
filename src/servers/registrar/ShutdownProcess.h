@@ -13,6 +13,7 @@
 
 #include "AppInfoList.h"
 #include "EventMaskWatcher.h"
+#include "RosterAppInfo.h"
 
 #if __GNUC__ >= 4
 using __gnu_cxx::hash_set;
@@ -96,6 +97,7 @@ private:
 	AppInfoList				fSystemApps;
 	AppInfoList				fUserApps;
 	AppInfoList				fBackgroundApps;
+	RosterAppInfo			fInputServer;
 	TimeoutEvent			*fTimeoutEvent;
 	InternalEventList		*fInternalEvents;
 	sem_id					fInternalEventSemaphore;

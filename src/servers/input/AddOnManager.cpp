@@ -735,7 +735,11 @@ AddOnManager::HandleSystemShuttingDown(BMessage* message,
 {
 	CALLED();
 
-	// TODO
+	device_info *pinfo;
+	for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
+		pinfo->device->SystemShuttingDown();
+	}
+
 	return B_OK;
 }
 

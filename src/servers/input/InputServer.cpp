@@ -366,8 +366,6 @@ InputServer::QuitRequested()
 	if (!BApplication::QuitRequested())
 		return false;
 
-	PostMessage(SYSTEM_SHUTTING_DOWN);
-
 	fAddOnManager->SaveState();
 	gDeviceManager.SaveState();
 

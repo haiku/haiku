@@ -1321,7 +1321,7 @@ TRoster::SetShuttingDown(bool shuttingDown)
 */
 status_t
 TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
-	AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps)
+	AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps, RosterAppInfo &inputServer)
 {
 	BAutolock _(fLock);
 
@@ -1353,8 +1353,10 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	// input server
 	RosterAppInfo *info
 		= fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
-	if (info)
+	if (info) {
+		inputServer = *info;
 		vitalSystemApps.insert(info->team);
+	}
 
 	// debug server
 	info = fRegisteredApps.InfoFor("application/x-vnd.haiku-debug-server");

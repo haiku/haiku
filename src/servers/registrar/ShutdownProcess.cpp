@@ -34,6 +34,7 @@
 #include "AppInfoListMessagingTargetSet.h"
 #include "Debug.h"
 #include "EventQueue.h"
+#include "InputServerTypes.h"
 #include "MessageDeliverer.h"
 #include "MessageEvent.h"
 #include "Registrar.h"
@@ -703,7 +704,7 @@ ShutdownProcess::Init(BMessage *request)
 
 	// get a list of all applications to shut down and sort them
 	error = fRoster->GetShutdownApps(fUserApps, fSystemApps, fBackgroundApps,
-		fVitalSystemApps);
+		fVitalSystemApps, fInputServer);
 	if (error != B_OK) {
 		fRoster->RemoveWatcher(this);
 		fRoster->SetShuttingDown(false);
@@ -1263,6 +1264,14 @@ ShutdownProcess::_WorkerDoShutdown()
 	// sync
 	sync();
 
+	// notify the input server we are shutting down
+	if (fInputServer.registration_time != 0) {
+		// The SYSTEM_SHUTTING_DOWN message is defined in InputServerTypes.h
+		BMessage message(SYSTEM_SHUTTING_DOWN);
+		SingleMessagingTargetSet target(fInputServer.port, B_PREFERRED_TOKEN);
+		MessageDeliverer::Default()->DeliverMessage(&message, target);
+	}
+	
 	// phase 1: terminate the user apps
 	_SetPhase(USER_APP_TERMINATION_PHASE);
 	_QuitApps(fUserApps, false);
