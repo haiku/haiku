@@ -151,28 +151,63 @@ Icon::SetTo(entry_ref& ref, const char* type)
 }
 
 
-void
+status_t
 Icon::CopyTo(BAppFileInfo& info, const char* type, bool force)
 {
+	status_t status = B_OK;
+
 	if (fLarge != NULL || force)
-		info.SetIconForType(type, fLarge, B_LARGE_ICON);
+		status = info.SetIconForType(type, fLarge, B_LARGE_ICON);
 	if (fMini != NULL || force)
-		info.SetIconForType(type, fMini, B_MINI_ICON);
+		status = info.SetIconForType(type, fMini, B_MINI_ICON);
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (fData != NULL || force)
-		info.SetIconForType(type, fData, fSize);
+		status = info.SetIconForType(type, fData, fSize);
 #endif
+	return status;
 }
 
 
-void
+status_t
 Icon::CopyTo(entry_ref& ref, const char* type, bool force)
 {
-	BFile file(&ref, B_READ_ONLY);
+	BFile file;
+	status_t status = file.SetTo(&ref, B_READ_ONLY);
+	if (status < B_OK)
+		return status;
+
 	BAppFileInfo info(&file);
-	if (file.InitCheck() == B_OK
-		&& info.InitCheck() == B_OK)
-		CopyTo(info, type, force);
+	status = info.InitCheck();
+	if (status < B_OK)
+		return status;
+
+	return CopyTo(info, type, force);
+}
+
+
+status_t
+Icon::CopyTo(BMessage& message)
+{
+	status_t status = B_OK;
+
+	if (status == B_OK && fLarge != NULL) {
+		BMessage archive;
+		status = fLarge->Archive(&archive);
+		if (status == B_OK)
+			status = message.AddMessage("icon/large", &archive);
+	}
+	if (status == B_OK && fMini != NULL) {
+		BMessage archive;
+		status = fMini->Archive(&archive);
+		if (status == B_OK)
+			status = message.AddMessage("icon/mini", &archive);
+	}
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (status == B_OK && fData != NULL)
+		status = message.AddData("icon", B_VECTOR_ICON_TYPE, fData, fSize);
+#endif
+
+	return B_OK;
 }
 
 
@@ -380,8 +415,8 @@ Icon::AllocateBitmap(int32 size, int32 space)
 //	#pragma mark -
 
 
-IconView::IconView(BRect rect, const char* name, uint32 resizeMode)
-	: BView(rect, name, resizeMode, B_WILL_DRAW),
+IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags)
+	: BView(rect, name, resizeMode, B_WILL_DRAW | flags),
 	fIconSize(B_LARGE_ICON),
 	fIcon(NULL),
 	fHeapIcon(NULL),
@@ -529,10 +564,10 @@ IconView::Draw(BRect updateRect)
 		StrokeRect(Bounds());
 	}
 
-	if (fDropTarget) {
+	if (IsFocus() || fDropTarget) {
 		// mark this view as a drop target
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(Bounds());
+		StrokeRect(_BitmapRect());
 	}
 }
 
@@ -566,7 +601,7 @@ IconView::MouseDown(BPoint where)
 	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0 && _BitmapRect().Contains(where)) {
 		if (clicks == 2) {
 			// double click - open Icon-O-Matic
-			fTarget.SendMessage(kMsgIconInvoked);
+			Invoke();
 		} else if (fIcon != NULL) {
 			// start tracking - this icon might be dragged around
 			fDragPoint = where;
@@ -617,10 +652,13 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		// Start drag
 		BMessage message(B_SIMPLE_DATA);
 
-		// TODO: for now...
-		BMessage archive;
-		fIcon->Archive(&archive);
-		message.AddMessage("icon/large", &archive);
+		::Icon* icon = fIconData;
+		if (fHasRef) {
+			icon = new ::Icon;
+			icon->SetTo(fRef, fFileType.Length() > 0 ? fFileType.String() : NULL);
+		}
+
+		icon->CopyTo(message);
 
 		BBitmap *dragBitmap = new BBitmap(fIcon);
 		DragMessage(&message, dragBitmap, B_OP_ALPHA, fDragPoint, this);
@@ -638,6 +676,36 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		fDropTarget = false;
 		Invalidate();
 	}
+}
+
+
+void
+IconView::KeyDown(const char* bytes, int32 numBytes)
+{
+	if (numBytes == 1) {
+		switch (bytes[0]) {
+			case B_DELETE:
+			case B_BACKSPACE:
+				_RemoveIcon();
+				return;
+			case B_ENTER:
+			case B_SPACE:
+				Invoke();
+				return;
+		}
+	}
+
+	BView::KeyDown(bytes, numBytes);
+}
+
+
+void
+IconView::MakeFocus(bool focus)
+{
+	if (focus != IsFocus())
+		Invalidate();
+
+	BView::MakeFocus(focus);
 }
 
 
@@ -771,6 +839,13 @@ IconView::Update()
 	}
 
 	fIcon = icon;
+}
+
+
+void
+IconView::Invoke()
+{
+	fTarget.SendMessage(kMsgIconInvoked);
 }
 
 

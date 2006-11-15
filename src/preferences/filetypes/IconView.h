@@ -21,8 +21,9 @@ class Icon {
 
 		void SetTo(BAppFileInfo& info, const char* type = NULL);
 		void SetTo(entry_ref& ref, const char* type = NULL);
-		void CopyTo(BAppFileInfo& info, const char* type = NULL, bool force = false);
-		void CopyTo(entry_ref& ref, const char* type = NULL, bool force = false);
+		status_t CopyTo(BAppFileInfo& info, const char* type = NULL, bool force = false);
+		status_t CopyTo(entry_ref& ref, const char* type = NULL, bool force = false);
+		status_t CopyTo(BMessage& message);
 
 		void SetData(const uint8* data, size_t size);
 		void SetLarge(const BBitmap* large);
@@ -53,7 +54,8 @@ class Icon {
 class IconView : public BView {
 	public:
 		IconView(BRect rect, const char* name,
-			uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
+			uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			uint32 flags = B_NAVIGABLE);
 		virtual ~IconView();
 
 		virtual void AttachedToWindow();
@@ -65,6 +67,9 @@ class IconView : public BView {
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint where);
 		virtual void MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage);
+		virtual void KeyDown(const char* bytes, int32 numBytes);
+
+		virtual void MakeFocus(bool focus = true);
 
 		void SetTo(entry_ref& file, const char* fileType = NULL);
 		void SetTo(::Icon* icon);
@@ -73,6 +78,7 @@ class IconView : public BView {
 		void SetEnabled(bool enabled);
 		void SetTarget(const BMessenger& target);
 		void Update();
+		void Invoke();
 
 		::Icon* Icon();
 
