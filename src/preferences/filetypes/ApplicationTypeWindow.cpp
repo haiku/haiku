@@ -52,7 +52,7 @@ class SupportedTypeItem : public BStringItem {
 		~SupportedTypeItem();
 
 		const char* Type() const { return fType.String(); }
-		::Icon* Icon() { return fIcon; }
+		::Icon& Icon() { return fIcon; }
 		void SetIcon(::Icon* icon);
 		void SetIcon(entry_ref& ref, const char* type);
 
@@ -60,7 +60,7 @@ class SupportedTypeItem : public BStringItem {
 
 	private:
 		BString	fType;
-		::Icon*	fIcon;
+		::Icon	fIcon;
 };
 
 class SupportedTypeListView : public DropTargetListView {
@@ -78,8 +78,7 @@ class SupportedTypeListView : public DropTargetListView {
 
 SupportedTypeItem::SupportedTypeItem(const char* type)
 	: BStringItem(type),
-	fType(type),
-	fIcon(NULL)
+	fType(type)
 {
 	BMimeType mimeType(type);
 
@@ -97,21 +96,17 @@ SupportedTypeItem::~SupportedTypeItem()
 void
 SupportedTypeItem::SetIcon(::Icon* icon)
 {
-	delete fIcon;
 	if (icon != NULL)
-		fIcon = new ::Icon(*icon);
+		fIcon = *icon;
 	else
-		fIcon = NULL;
+		fIcon.Unset();
 }
 
 
 void
 SupportedTypeItem::SetIcon(entry_ref& ref, const char* type)
 {
-	if (fIcon == NULL)
-		fIcon = new ::Icon;
-
-	fIcon->SetTo(ref, type);
+	fIcon.SetTo(ref, type);
 }
 
 
@@ -706,8 +701,6 @@ ApplicationTypeWindow::_Save()
 	for (int32 i = 0; i < fTypeListView->CountItems(); i++) {
 		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
 			fTypeListView->ItemAt(i));
-		if (item == NULL)
-			continue;
 
 		supportedTypes.AddString("types", item->Type());
 	}
@@ -730,13 +723,19 @@ ApplicationTypeWindow::_Save()
 		status = info.SetAppFlags(flags);
 	if (status == B_OK)
 		status = info.SetVersionInfo(&versionInfo, B_APP_VERSION_KIND);
+	if (status == B_OK)
+		fIcon.CopyTo(info, NULL, true);
 
-// TODO: icon & supported types icons
-//	if (status == B_OK)
-//		status = info.SetIcon(&icon);
-
+	// supported types and their icons
 	if (status == B_OK)
 		status = info.SetSupportedTypes(&supportedTypes);
+
+	for (int32 i = 0; i < fTypeListView->CountItems(); i++) {
+		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
+			fTypeListView->ItemAt(i));
+
+		item->Icon().CopyTo(info, item->Type(), true);
+	}
 }
 
 
@@ -766,7 +765,7 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("index", &index) == B_OK) {
 				SupportedTypeItem* item = (SupportedTypeItem*)fTypeListView->ItemAt(index);
 
-				fTypeIconView->SetTo(item != NULL ? item->Icon() : NULL);
+				fTypeIconView->SetTo(item != NULL ? &item->Icon() : NULL);
 				fTypeIconView->SetEnabled(item != NULL);
 				fRemoveTypeButton->SetEnabled(item != NULL);
 			}
