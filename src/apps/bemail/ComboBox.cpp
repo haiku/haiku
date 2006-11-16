@@ -820,6 +820,7 @@ BComboBox::TextInput::AlignTextRect()
 	BRect textRect = TextRect();
 
 	switch (Alignment()) {
+		default:
 		case B_ALIGN_LEFT:
 			textRect.OffsetTo(B_ORIGIN);
 			break;
@@ -1483,6 +1484,7 @@ BComboBox::Draw(BRect /*updateRect*/)
 		GetFontHeight(&fInfo);
 
 		switch (fLabelAlign) {
+			default:
 			case B_ALIGN_LEFT:
 				loc.x = bounds.left + TV_MARGIN;
 				break;
