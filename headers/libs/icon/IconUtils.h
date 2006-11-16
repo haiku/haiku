@@ -27,9 +27,8 @@ class BIconUtils {
 	// has either of the provided attribute names. Which icon type
 	// is preferred (vector, small or large B_CMAP8 icon) depends
 	// on the colorspace of the provided bitmap. If the colorspace
-	// is B_CMAP8, B_CMAP8 icons are preferred. If no vector icon
-	// is available, the bitmap size must match the provided
-	// icon_size "size"!
+	// is B_CMAP8, B_CMAP8 icons are preferred. In that case, the
+	// bitmap size must also match the provided icon_size "size"!
 	static	status_t			GetIcon(BNode* node,
 										const char* vectorIconAttrName,
 										const char* smallIconAttrName,

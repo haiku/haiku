@@ -12,6 +12,7 @@
 #include <new>
 #include <fs_attr.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <Bitmap.h>
 #include <Node.h>
@@ -55,6 +56,13 @@ BIconUtils::GetIcon(BNode* node,
 			if (ret < B_OK) {
 				// try to fallback to B_CMAP8 icons
 				// (converting to B_RGBA32 is handled)
+
+				// override size
+				if (result->Bounds().IntegerWidth() + 1 >= 32)
+					size = B_LARGE_ICON;
+				else
+					size = B_MINI_ICON;
+
 				ret = GetCMAP8Icon(node,
 								   smallIconAttrName,
 								   largeIconAttrName,
@@ -123,7 +131,9 @@ bigtime_t startTime = system_time();
 		return B_BAD_VALUE;
 
 	uint8 buffer[attrInfo.size];
-	node->ReadAttr(attrName, attrType, 0, buffer, attrInfo.size);
+	ssize_t read = node->ReadAttr(attrName, attrType, 0, buffer, attrInfo.size);
+	if (read != attrInfo.size)
+		return B_ERROR;
 
 #if TIME_VECTOR_ICONS
 bigtime_t importTime = system_time();
@@ -242,6 +252,11 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 	if (ret == B_OK && attrInfo.size != attrSize)
 		ret = B_BAD_DATA;
 
+	// check parameters
+	// currently, scaling B_CMAP8 icons is not supported
+	if (icon->ColorSpace() == B_CMAP8 && icon->Bounds() != bounds)
+		return B_BAD_VALUE;
+
 	// read the attribute
 	if (ret == B_OK) {
 		bool tempBuffer = (icon->ColorSpace() != B_CMAP8
@@ -249,11 +264,11 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 		uint8* buffer = NULL;
 		ssize_t read;
 		if (tempBuffer) {
-			// other color space than stored in attribute
+			// other color space or bitmap size than stored in attribute
 			buffer = new(nothrow) uint8[attrSize];
-			if (!buffer)
+			if (!buffer) {
 				ret = B_NO_MEMORY;
-			if (ret == B_OK) {
+			} else {
 				read = node->ReadAttr(attribute, attrType, 0, buffer,
 									  attrSize);
 			}
@@ -264,7 +279,7 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 		if (ret == B_OK) {
 			if (read < 0)
 				ret = read;
-			else if (read != attrInfo.size)
+			else if (read != (ssize_t)attrSize)
 				ret = B_ERROR;
 		}
 		if (tempBuffer) {
@@ -304,6 +319,73 @@ BIconUtils::ConvertFromCMAP8(BBitmap* source, BBitmap* result)
 	return ConvertFromCMAP8(src, width, height, srcBPR, result);
 }
 
+// scale_bilinear
+static void
+scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight,
+			   int32 dstWidth, int32 dstHeight, uint32 bpr)
+{
+	// first pass: scale bottom to top
+
+	uint8* dst = bits + (dstHeight - 1) * bpr;
+		// offset to bottom left pixel in target size
+	for (int32 x = 0; x < srcWidth; x++) {
+		uint8* d = dst;
+		for (int32 y = dstHeight - 1; y >= 0; y--) {
+			int32 lineF = y * 256 * srcHeight / (dstHeight - 1);
+			int32 lineI = lineF >> 8;
+			uint8 weight = (uint8)(lineF & 0xff);
+			uint8* s1 = bits + lineI * bpr + 4 * x;
+			if (weight == 0) {
+				d[0] = s1[0];
+				d[1] = s1[1];
+				d[2] = s1[2];
+				d[3] = s1[3];
+			} else {
+				uint8* s2 = s1 + bpr;
+				
+				d[0] = (((s2[0] - s1[0]) * weight) + (s1[0] << 8)) >> 8;
+				d[1] = (((s2[1] - s1[1]) * weight) + (s1[1] << 8)) >> 8;
+				d[2] = (((s2[2] - s1[2]) * weight) + (s1[2] << 8)) >> 8;
+				d[3] = (((s2[3] - s1[3]) * weight) + (s1[3] << 8)) >> 8;
+			}
+
+			d -= bpr;
+		}
+		dst += 4;
+	}
+
+	// second pass: scale right to left
+
+	dst = bits + (dstWidth - 1) * 4;
+		// offset to top left pixel in target size
+	for (int32 y = 0; y < dstWidth; y++) {
+		uint8* d = dst;
+		for (int32 x = dstWidth - 1; x >= 0; x--) {
+			int32 columnF = x * 256 * srcWidth / (dstWidth - 1);
+			int32 columnI = columnF >> 8;
+			uint8 weight = (uint8)(columnF & 0xff);
+			uint8* s1 = bits + y * bpr + 4 * columnI;
+			if (weight == 0) {
+				d[0] = s1[0];
+				d[1] = s1[1];
+				d[2] = s1[2];
+				d[3] = s1[3];
+			} else {
+				uint8* s2 = s1 + 4;
+				
+				d[0] = (((s2[0] - s1[0]) * weight) + (s1[0] << 8)) >> 8;
+				d[1] = (((s2[1] - s1[1]) * weight) + (s1[1] << 8)) >> 8;
+				d[2] = (((s2[2] - s1[2]) * weight) + (s1[2] << 8)) >> 8;
+				d[3] = (((s2[3] - s1[3]) * weight) + (s1[3] << 8)) >> 8;
+			}
+
+			d -= 4;
+		}
+		dst += bpr;
+	}
+}
+
+
 // ConvertFromCMAP8
 status_t
 BIconUtils::ConvertFromCMAP8(const uint8* src,
@@ -323,10 +405,6 @@ BIconUtils::ConvertFromCMAP8(const uint8* src,
 	if (dstWidth < width || dstHeight < height) {
 		// TODO: down scaling
 		return B_ERROR;
-	} else if (dstWidth > width || dstHeight > height) {
-		// TODO: up scaling
-		// (currently copies bitmap into result at left-top)
-memset(result->Bits(), 255, result->BitsLength());
 	}
 
 //#if __HAIKU__
@@ -359,6 +437,12 @@ memset(result->Bits(), 255, result->BitsLength());
 		}
 		src += srcBPR;
 		dst += dstBPR;
+	}
+
+	if (dstWidth > width || dstHeight > height) {
+		// up scaling
+		scale_bilinear((uint8*)result->Bits(), width, height,
+					   dstWidth, dstHeight, dstBPR);
 	}
 
 	return B_OK;

@@ -823,8 +823,8 @@ BAppFileInfo::SetVersionInfo(const version_info *info, version_kind kind)
 	- other error codes
 */
 status_t
-BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
-							 icon_size which) const
+BAppFileInfo::GetIconForType(const char* type, BBitmap* icon,
+							 icon_size size) const
 {
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
@@ -857,7 +857,12 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 		return error;
 	}
 
-	// no vector icon if we got this far
+	// no vector icon if we got this far,
+	// align size argument just in case
+	if (size < B_LARGE_ICON)
+		size = B_MINI_ICON;
+	else
+		size = B_LARGE_ICON;
 
 	error = B_OK;
 	// set some icon size related variables
@@ -865,7 +870,7 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 	BRect bounds;
 	uint32 attrType = 0;
 	size_t attrSize = 0;
-	switch (which) {
+	switch (size) {
 		case B_MINI_ICON:
 			attributeString = kMiniIconAttribute;
 			bounds.Set(0, 0, 15, 15);
@@ -892,21 +897,23 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 
 	attribute = attributeString.String();
 
-	// check parameter and initialization
-	if (icon->Bounds() != bounds)
+	// check parameters
+	// currently, scaling B_CMAP8 icons is not supported
+	if (icon->ColorSpace() == B_CMAP8 && icon->Bounds() != bounds)
 		return B_BAD_VALUE;
 
 	// read the data
 	if (error == B_OK) {
-		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		char *buffer = NULL;
+		bool tempBuffer = (icon->ColorSpace() != B_CMAP8
+						   || icon->Bounds() != bounds);
+		uint8* buffer = NULL;
 		size_t read;
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			buffer = new(nothrow) char[attrSize];
-			if (!buffer)
+		if (tempBuffer) {
+			// other color space or bitmap size than stored in attribute
+			buffer = new(nothrow) uint8[attrSize];
+			if (!buffer) {
 				error = B_NO_MEMORY;
-			if (error == B_OK) {
+			} else {
 				error = _ReadData(attribute, -1, attrType, buffer, attrSize,
 								  read);
 			}
@@ -916,11 +923,14 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 		}
 		if (error == B_OK && read != attrSize)
 			error = B_ERROR;
-		if (otherColorSpace) {
+		if (tempBuffer) {
 			// other color space than stored in attribute
 			if (error == B_OK) {
-				error = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
-										 0, B_CMAP8);
+				error = BIconUtils::ConvertFromCMAP8(buffer,
+													 (uint32)size,
+													 (uint32)size,
+													 (uint32)size,
+													 icon);
 			}
 			delete[] buffer;
 		}

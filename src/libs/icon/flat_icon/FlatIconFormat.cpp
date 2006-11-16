@@ -49,7 +49,7 @@ write_coord(LittleEndianBuffer& buffer, float coord)
 		coord = 192.0;
 
 	if (int(coord * 100.0) == (int)coord * 100
-		&& coord >= - 32.0 && coord <= 96.0) {
+		&& coord >= - 32.0 && coord <= 95.0) {
 		// saving coord in 7 bit is sufficient
 		uint8 value = (uint8)(coord + 32.0);
 		return buffer.Write(value);
