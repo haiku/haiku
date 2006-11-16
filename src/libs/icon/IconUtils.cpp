@@ -331,7 +331,7 @@ scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight,
 	for (int32 x = 0; x < srcWidth; x++) {
 		uint8* d = dst;
 		for (int32 y = dstHeight - 1; y >= 0; y--) {
-			int32 lineF = y * 256 * srcHeight / (dstHeight - 1);
+			int32 lineF = y * 256 * (srcHeight - 1) / (dstHeight - 1);
 			int32 lineI = lineF >> 8;
 			uint8 weight = (uint8)(lineF & 0xff);
 			uint8* s1 = bits + lineI * bpr + 4 * x;
@@ -361,7 +361,7 @@ scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight,
 	for (int32 y = 0; y < dstWidth; y++) {
 		uint8* d = dst;
 		for (int32 x = dstWidth - 1; x >= 0; x--) {
-			int32 columnF = x * 256 * srcWidth / (dstWidth - 1);
+			int32 columnF = x * 256 * (srcWidth - 1) / (dstWidth - 1);
 			int32 columnI = columnF >> 8;
 			uint8 weight = (uint8)(columnF & 0xff);
 			uint8* s1 = bits + y * bpr + 4 * columnI;
