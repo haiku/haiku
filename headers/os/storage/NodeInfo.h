@@ -1,12 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file NodeInfo.h
-	BNodeInfo interface declaration.
-*/
-
+/*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _NODE_INFO_H
 #define _NODE_INFO_H
 
@@ -54,6 +49,8 @@ public:
 	virtual status_t SetType(const char *type);
 	virtual status_t GetIcon(BBitmap *icon, icon_size k = B_LARGE_ICON) const;
 	virtual status_t SetIcon(const BBitmap *icon, icon_size k = B_LARGE_ICON);
+			status_t GetIcon(uint8** data, size_t* size, type_code* type) const;
+			status_t SetIcon(const uint8* data, size_t size);
 
 	status_t GetPreferredApp(char *signature,
 								app_verb verb = B_OPEN) const;

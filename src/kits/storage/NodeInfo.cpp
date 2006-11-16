@@ -395,6 +395,106 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 	return error;
 }
 
+
+// GetIcon
+/*!	\brief Gets the node's icon.
+
+	The icon stored in the node's "BEOS:ICON" attribute is retrieved.
+	The caller is responsible to \c delete[] the returned data if the
+	function was successful.
+
+	\param data A pointer in which a pointer to the icon data
+		   will be returned.
+	\param size A pointer in which the size of the found icon data
+		   will be returned.
+	\param type A pointer in which the type of the found icon data
+		   will be returned.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: \c NULL \a data, \c NULL size or \c NULL \a type.
+	- \c B_NO_MEMORY: No memory to allocate the data buffer.
+	- other error codes
+*/
+status_t
+BNodeInfo::GetIcon(uint8** data, size_t* size, type_code* type) const
+{
+	// check params
+	if (!data || !size || !type)
+		return B_BAD_VALUE;
+
+	// check initialization
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	// get the attribute info and check type and size of the attr contents
+	attr_info attrInfo;
+	status_t ret = fNode->GetAttrInfo(kNIIconAttribute, &attrInfo);
+	if (ret < B_OK)
+		return ret;
+
+	// chicken out on unrealisticly large attributes
+	if (attrInfo.size > 128 * 1024)
+		return B_ERROR;
+
+	// fill the params
+	*type = attrInfo.type;
+	*size = attrInfo.size;
+	*data = new (nothrow) uint8[*size];
+
+	if (!*data)
+		return B_NO_MEMORY;
+
+	// featch the data
+	ssize_t read = fNode->ReadAttr(kNIIconAttribute, *type, 0, *data, *size);
+	if (read != attrInfo.size) {
+		delete[] *data;
+		*data = NULL;
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+// SetIcon
+/*!	\brief Sets the node's icon.
+
+	The icon is stored in the node's "BEOS:ICON" attribute.
+
+	If \a data is \c NULL, the respective attribute is removed.
+
+	\param data A pointer to valid vector icon data.
+		   May be \c NULL.
+	\param size Specifies the size of the provided data buffer.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- other error codes
+*/
+status_t 
+BNodeInfo::SetIcon(const uint8* data, size_t size)
+{
+	// check initialization
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	status_t error = B_OK;
+
+	// write/remove the attribute
+	if (data && size > 0) {
+		ssize_t written = fNode->WriteAttr(kNIIconAttribute,
+										   B_VECTOR_ICON_TYPE,
+										   0, data, size);
+		if (written < 0)
+			error = (status_t)written;
+		else if (written != (ssize_t)size)
+			error = B_ERROR;
+	} else	// no icon given => remove
+		error = fNode->RemoveAttr(kNIIconAttribute);
+
+	return error;
+}
+
 // GetPreferredApp
 /*!	\brief Gets the node's preferred application.
 
