@@ -865,7 +865,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 			break;
 
 		case BUTTON_LAUNCH_BACKGROUNDS_MSG:
-			be_roster->Launch(kBackgroundsSignature);
+			if (be_roster->Launch(kBackgroundsSignature) == B_ALREADY_RUNNING) {
+				app_info info;
+				be_roster->GetAppInfo(kBackgroundsSignature, &info);
+				be_roster->ActivateApp(info.team);
+			}
 			break;
 
 		case BUTTON_DEFAULTS_MSG:
