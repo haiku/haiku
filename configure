@@ -139,7 +139,7 @@ standard_gcc_settings()
 				haikuSharedLibSupCxx=
 			fi
 		;;
-		2.95*)
+		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
 			# if an older one is installed
 			if [ $haikuGCCVersion != $haikuRequiredLegacyGCCVersion ]; then
