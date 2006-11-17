@@ -17,18 +17,21 @@
 #include <assert.h>
 
 #include <Alert.h>
+#include <Application.h>
+#include <AppFileInfo.h>
 #include <Beep.h>
 #include <Bitmap.h>
 #include <Clipboard.h>
+#include <File.h>
 #include <Font.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <PlaySound.h>
 #include <Point.h>
 #include <PopUpMenu.h>
+#include <Roster.h>
 
 #include "CalcApplication.h"
-#include "CalcIcon.h"
 #include "CalcOptionsWindow.h"
 #include "ExpressionParser.h"
 #include "ExpressionTextView.h"
@@ -84,8 +87,11 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	  fKeypadDescription(strdup(kDefaultKeypadDescription)),
 	  fKeypad(NULL),
 
-	  fCalcIcon(new BBitmap(BRect(0, 0, kIconWidth - 1, kIconHeight - 1),
-	  						0, kIconFormat)),
+#ifdef __HAIKU__
+	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
+#else
+	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
+#endif
 
 	  fAboutItem(NULL),
 	  fOptionsItem(NULL),
@@ -112,8 +118,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	// create pop-up menu system
 	_CreatePopUpMenu();
 
-	// copy calculator icon into bitmap
-	memcpy(fCalcIcon->Bits(), kIconBits, fCalcIcon->BitsLength());
+	_FetchAppIcon(fCalcIcon);
 }
 
 
@@ -131,8 +136,11 @@ CalcView::CalcView(BMessage* archive)
 	  fKeypadDescription(strdup(kDefaultKeypadDescription)),
 	  fKeypad(NULL),
 
-	  fCalcIcon(new BBitmap(BRect(0, 0, kIconWidth - 1, kIconHeight - 1),
-	  						0, kIconFormat)),
+#ifdef __HAIKU__
+	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
+#else
+	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
+#endif
 
 	  fAboutItem(NULL),
 	  fOptionsItem(NULL),
@@ -153,8 +161,7 @@ CalcView::CalcView(BMessage* archive)
 	// create pop-up menu system
 	_CreatePopUpMenu();
 
-	// copy calculator icon into bitmap
-	memcpy(fCalcIcon->Bits(), kIconBits, fCalcIcon->BitsLength());
+	_FetchAppIcon(fCalcIcon);
 }
 
 
@@ -265,8 +272,12 @@ CalcView::Draw(BRect updateRect)
 			SetHighColor(fBaseColor);
 			FillRect(updateRect & expressionRect);
 
-			SetDrawingMode(B_OP_ALPHA);
-			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+			if (fCalcIcon->ColorSpace() == B_RGBA32) {
+				SetDrawingMode(B_OP_ALPHA);
+				SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+			} else {
+				SetDrawingMode(B_OP_OVER);
+			}
 
 			BPoint iconPos;
 			iconPos.x = expressionRect.right - (expressionRect.Width()
@@ -1038,5 +1049,14 @@ CalcView::_ShowKeypad(bool show)
 		ResizeTo(fWidth, height);
 }
 
-
-
+ 
+void
+CalcView::_FetchAppIcon(BBitmap* into)
+{
+	app_info info;
+	be_roster->GetAppInfo(kAppSig, &info);
+	BFile file(&info.ref, B_READ_ONLY);
+	BAppFileInfo appInfo(&file);
+	if (appInfo.GetIcon(into, B_MINI_ICON) < B_OK)
+		memset(into->Bits(), 0, into->BitsLength());
+}

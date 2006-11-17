@@ -84,6 +84,7 @@ class CalcView : public BView {
 			BRect				_KeypadRect() const;
 
 			void				_ShowKeypad(bool show);
+			void				_FetchAppIcon(BBitmap* into);
 
 			// grid dimensions
 			int16				fColums;
