@@ -5,6 +5,7 @@
  * Authors in chronological order:
  *		<unknown, please fill in who knows>
  *		Jack Burton
+ *		Vasilis Kaoutsis, kaoutsis@sch.gr
  */
 
 
@@ -30,7 +31,7 @@ MenuApp::MessageReceived(BMessage *msg)
 		case ALLWAYS_TRIGGERS_MSG:
 		case CTL_MARKED_MSG:
 		case ALT_MARKED_MSG:
-		case COLOR_SCHEME_MSG:
+		case COLOR_SCHEME_OPEN_MSG:
 		case MENU_COLOR:
 			fMenuWindow->PostMessage(msg);
 			break;

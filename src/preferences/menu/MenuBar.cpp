@@ -1,3 +1,13 @@
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		<unknown, please fill in who knows>
+ *		Vasilis Kaoutsis, kaoutsis@sch.gr
+ */
+
+
 #include "BitmapMenuItem.h"
 #include "FontMenu.h"
 #include "MenuBar.h"
@@ -13,7 +23,8 @@
 #include <stdlib.h>
 
 MenuBar::MenuBar()
-	:BMenuBar(BRect(40,10,10,10), "menu", B_FOLLOW_TOP|B_FRAME_EVENTS, B_ITEMS_IN_COLUMN, true)
+	:BMenuBar(BRect(40,10,10,10), "menu", B_FOLLOW_TOP|B_FRAME_EVENTS,
+		B_ITEMS_IN_COLUMN, true)
 {
 	build_menu();
 	set_menu();
@@ -37,15 +48,17 @@ MenuBar::build_menu()
 	fontSizeMenu = new FontSizeMenu();
 	
 	// create the menu items
-	alwaysShowTriggersItem = new BMenuItem("Always Show Triggers", new BMessage(ALLWAYS_TRIGGERS_MSG), 0, 0);
-	separatorStyleItem = new BMenuItem("Separator Style", new BMessage(DEFAULT_MSG), 0, 0);
+	alwaysShowTriggersItem = new BMenuItem("Always Show Triggers",
+			new BMessage(ALLWAYS_TRIGGERS_MSG), 0, 0);
+	separatorStyleItem = new BMenuItem("Separator Style", 
+			new BMessage(DEFAULT_MSG), 0, 0);
 	ctlAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
-			 new BMessage(CTL_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "CTL"));
+			new BMessage(CTL_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "CTL"));
 	altAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
 			 new BMessage(ALT_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "ALT"));
 	
 	// color menu
-	colorSchemeItem = new BMenuItem("Color Scheme...", new BMessage(COLOR_SCHEME_MSG), 0, 0);
+	colorSchemeItem = new BMenuItem("Color Scheme...", new BMessage(COLOR_SCHEME_OPEN_MSG), 0, 0);
 
 	// create the separator menu
 	separatorStyleMenu = new BMenu("Separator Style", B_ITEMS_IN_COLUMN);

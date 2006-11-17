@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences menu ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Preference Menu : 
 	AutoSettingsMenu.cpp
 	BitmapMenuItem.cpp 
@@ -10,7 +12,7 @@ Preference Menu :
 	MenuBar.cpp
 	MenuSettings.cpp
 	MenuWindow.cpp 
-	: libtranslation.so libbe.so
+	: be translation
 	: Menu.rdef
 	;
 

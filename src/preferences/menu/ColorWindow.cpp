@@ -1,3 +1,13 @@
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors in chronological order:
+ *		<unknown, please fill in who knows>
+ *		Vasilis Kaoutsis, kaoutsis@sch.gr
+ */
+
+
 #include <Application.h>
 #include <Button.h>
 #include <ColorControl.h>
@@ -6,13 +16,16 @@
 #include "ColorWindow.h"
 #include "msg.h"
 
-ColorWindow::ColorWindow()
-	: BWindow(BRect(150,150,350,200), "Menu Color Scheme", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+
+ColorWindow::ColorWindow(BMessenger owner)
+	: BWindow(BRect(150,150,350,200), "Menu Color Scheme", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	fOwner(owner)
 {
 	// Set and collect the variables for revert
 	get_menu_info(&info);
 	get_menu_info(&revert_info);
-		
+
 	BView *colView = new BView(BRect(0,0,1000,100), "menuView",
 		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	
@@ -22,27 +35,42 @@ ColorWindow::ColorWindow()
 	colView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	colView->AddChild(colorPicker);
 	AddChild(colView);
-	
-	ResizeTo(383,130);
-	
+
+	ResizeTo(383, 130);
+
 	// Create the buttons and add them to the view
 	DefaultButton = new BButton(BRect(10,100,85,110), "Default", "Default",
-		new BMessage(MENU_COLOR_DEFAULT), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+		new BMessage(MENU_COLOR_DEFAULT), B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+			B_WILL_DRAW | B_NAVIGABLE);
 	RevertButton = new BButton(BRect(95,100,175,20), "REVERT", "Revert",
-		new BMessage(MENU_REVERT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
-	
+		new BMessage(MENU_REVERT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, 
+			B_WILL_DRAW | B_NAVIGABLE);
+
 	colView->AddChild(DefaultButton);
 	colView->AddChild(RevertButton);
-	
+
 	DefaultButton->SetEnabled(false);
 	RevertButton->SetEnabled(false);
+}
+
+
+ColorWindow::~ColorWindow()
+{
+}
+
+
+void
+ColorWindow::Quit()
+{
+	fOwner.SendMessage(COLOR_SCHEME_CLOSED_MSG);
+	BWindow::Quit();
 }
 
 
 void
 ColorWindow::MessageReceived(BMessage *msg)
 {
-	switch(msg->what) {
+	switch (msg->what) {
 		case MENU_REVERT:
 			colorPicker->SetValue(revert_info.background_color);
 			info.background_color = colorPicker->ValueAsColor();
@@ -50,10 +78,10 @@ ColorWindow::MessageReceived(BMessage *msg)
 			be_app->PostMessage(UPDATE_WINDOW);
 			RevertButton->SetEnabled(false);
 			break;
-				
+
 		case MENU_COLOR_DEFAULT:
-		//	change to system color for system wide
-		//	compatability
+			// change to system color for system wide
+			// compatability
 			rgb_color color;
 			color.red = 216;
 			color.blue = 216;
@@ -76,7 +104,7 @@ ColorWindow::MessageReceived(BMessage *msg)
 			DefaultButton->SetEnabled(true);
 			RevertButton->SetEnabled(true);
 			break;
-		
+
 		default:
 			be_app->PostMessage(UPDATE_WINDOW);
 			BWindow::MessageReceived(msg);
