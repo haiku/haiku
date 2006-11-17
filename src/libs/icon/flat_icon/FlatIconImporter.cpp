@@ -108,7 +108,7 @@ FlatIconImporter::_ParseSections(LittleEndianBuffer& buffer, Icon* icon)
 	// test if this is an icon at all
 	uint32 magic;
 	if (!buffer.Read(magic) || magic != FLAT_ICON_MAGIC)
-		return B_ERROR;
+		return B_BAD_TYPE;
 
 	// styles
 	StyleContainer* styles = icon->Styles();
