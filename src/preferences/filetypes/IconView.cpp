@@ -9,6 +9,7 @@
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #	include <IconUtils.h>
+#	include <IconEditorProtocol.h>
 #endif
 
 #include <Application.h>
@@ -500,7 +501,7 @@ Icon::AdoptData(uint8* data, size_t size)
 Icon::AllocateBitmap(int32 size, int32 space)
 {
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	int32 kSpace = B_RGB32;
+	int32 kSpace = B_RGBA32;
 #else
 	int32 kSpace = B_CMAP8;
 #endif
@@ -663,6 +664,19 @@ IconView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+#if HAIKU_TARGET_PLATFORM_HAIKU
+		case B_ICON_DATA_EDITED: {
+			const uint8* data;
+			ssize_t size;
+			if (message->FindData("icon data", B_VECTOR_ICON_TYPE,
+								  (const void**)&data, &size) < B_OK) {
+				// required
+				break;
+			}
+			_SetIcon(NULL, NULL, data, size);
+			break;
+		}
+#endif
 
 		default:
 			BControl::MessageReceived(message);
@@ -1119,11 +1133,22 @@ IconView::_AddOrEditIcon()
 //	} else if (fHasType) {
 //		// TODO!
 	} else {
-		// in static mode, Icon-O-Matic need to return the buffer it
+		// in static mode, Icon-O-Matic needs to return the buffer it
 		// changed once its done
-		message.what = 0;
-		// TODO: this interface is yet to be determined
 		message.AddMessenger("reply to", BMessenger(this));
+#if HAIKU_TARGET_PLATFORM_HAIKU
+		message.what = B_EDIT_ICON_DATA;
+		uint8* data;
+		size_t size;
+		if (fIconData->GetData(&data, &size) == B_OK)
+			message.AddData("icon data", B_VECTOR_ICON_TYPE, data, size);
+		// TODO: somehow figure out how names of objects in the icon
+		// can be preserved. Maybe in a second (optional) attribute
+		// where ever a vector icon attribute is present?
+#else
+		message.what = 0;
+		// TODO: ?
+#endif
 	}
 
 	be_roster->Launch("application/x-vnd.Haiku-icon_o_matic", &message);
