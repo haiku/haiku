@@ -555,7 +555,12 @@ private:
 			FillRect(Bounds(), B_SOLID_LOW);
 
 			if (fAppInfo && fAppInfo->largeIcon) {
-				SetDrawingMode(B_OP_OVER);
+				if (fAppInfo->largeIcon->ColorSpace() == B_RGBA32) {
+					SetDrawingMode(B_OP_ALPHA);
+					SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+				} else
+					SetDrawingMode(B_OP_OVER);
+			
 				DrawBitmap(fAppInfo->largeIcon, BPoint(0, 0));
 			}
 		}
@@ -975,9 +980,14 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList &infos)
 		}
 
 		// get the application icons
+#ifdef __HAIKU__
+		color_space format = B_RGBA32;
+#else
+		color_space format = B_CMAP8;
+#endif
 
 		// mini icon
-		BBitmap *miniIcon = new(nothrow) BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
+		BBitmap *miniIcon = new(nothrow) BBitmap(BRect(0, 0, 15, 15), format);
 		if (miniIcon != NULL) {
 			error = miniIcon->InitCheck();
 			if (error == B_OK)
@@ -989,7 +999,7 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList &infos)
 		}
 
 		// mini icon
-		BBitmap *largeIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+		BBitmap *largeIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31), format);
 		if (largeIcon != NULL) {
 			error = largeIcon->InitCheck();
 			if (error == B_OK)
