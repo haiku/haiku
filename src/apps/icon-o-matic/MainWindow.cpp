@@ -972,26 +972,12 @@ MainWindow::_CreateMenuBar(BRect frame)
 									new BMessage(MSG_SAVE_AS),
 									'S', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Export Flat",
+	fileMenu->AddItem(new BMenuItem("Export",
 									new BMessage(MSG_EXPORT),
 									'E'));
-	fileMenu->AddItem(new BMenuItem("Export Flat As",
+	fileMenu->AddItem(new BMenuItem("Export As",
 									new BMessage(MSG_EXPORT_AS),
 									'E', B_SHIFT_KEY));
-	fileMenu->AddItem(new BMenuItem("Export RDef As",
-									new BMessage(MSG_EXPORT_ICON_RDEF)));
-	fileMenu->AddItem(new BMenuItem("Export SVG As",
-									new BMessage(MSG_EXPORT_SVG)));
-	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Export Bitmap As",
-									new BMessage(MSG_EXPORT_BITMAP)));
-	fileMenu->AddItem(new BMenuItem("Export Bitmap Set As",
-									new BMessage(MSG_EXPORT_BITMAP_SET)));
-	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Export Icon Attribute",
-									new BMessage(MSG_EXPORT_ICON_ATTRIBUTE)));
-	fileMenu->AddItem(new BMenuItem("Export Icon Mime Attribute",
-									new BMessage(MSG_EXPORT_ICON_MIME_ATTRIBUTE)));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Quit",
 									new BMessage(B_QUIT_REQUESTED),

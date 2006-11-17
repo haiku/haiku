@@ -17,6 +17,7 @@
 struct entry_ref;
 
 class CommandStack;
+class DocumentSaver;
 class Icon;
 class Selection;
 
@@ -35,18 +36,19 @@ class Document : public RWLocker,
 			void				SetName(const char* name);
 			const char*			Name() const;
 
-			void				SetRef(const entry_ref& ref);
-	inline	const entry_ref*	Ref() const
-									{ return fRef; }
-			void				SetExportRef(const entry_ref& ref);
-	inline	const entry_ref*	ExportRef() const
-									{ return fExportRef; }
+			void				SetNativeSaver(::DocumentSaver* saver);
+	inline	::DocumentSaver*	NativeSaver() const
+									{ return fNativeSaver; }
+
+			void				SetExportSaver(::DocumentSaver* saver);
+	inline	::DocumentSaver*	ExportSaver() const
+									{ return fExportSaver; }
 
 			void				SetIcon(::Icon* icon);
 	inline	::Icon*				Icon() const
 									{ return fIcon; }
 
-			void				MakeEmpty();
+			void				MakeEmpty(bool includingSavers = true);
 
  private:
 			::Icon*				fIcon;
@@ -54,8 +56,9 @@ class Document : public RWLocker,
 			::Selection*		fSelection;
 
 			BString				fName;
-			entry_ref*			fRef;
-			entry_ref*			fExportRef;
+
+			::DocumentSaver*	fNativeSaver;
+			::DocumentSaver*	fExportSaver;
 };
 
 #endif // DOCUMENT_H

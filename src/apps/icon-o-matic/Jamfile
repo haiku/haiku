@@ -28,6 +28,7 @@ for iconSourceDir in $(iconSourceDirs) {
 # source directories
 local sourceDirs =
 	document
+	document/savers
 	generic
 	generic/command
 	generic/gui
@@ -108,6 +109,13 @@ Application Icon-O-Matic :
 	Document.cpp
 	IconObject.cpp
 	SetPropertiesCommand.cpp
+
+	# document/savers
+	AttributeSaver.cpp
+	BitmapSetSaver.cpp
+	DocumentSaver.cpp
+	FileSaver.cpp
+	SimpleFileSaver.cpp
 
 	# generic/command
 	Command.cpp
@@ -194,6 +202,7 @@ Application Icon-O-Matic :
 	GradientControl.cpp
 	IconObjectListView.cpp
 	PathListView.cpp
+	SavePanel.cpp
 	ShapeListView.cpp
 	StyleListView.cpp
 	StyleView.cpp

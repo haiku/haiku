@@ -14,6 +14,7 @@
 #include <Entry.h>
 
 #include "CommandStack.h"
+#include "DocumentSaver.h"
 #include "Icon.h"
 #include "Selection.h"
 
@@ -27,8 +28,9 @@ Document::Document(const char* name)
 	  fSelection(new (nothrow) ::Selection()),
 
 	  fName(name),
-	  fRef(NULL),
-	  fExportRef(NULL)
+
+	  fNativeSaver(NULL),
+	  fExportSaver(NULL)
 {
 }
 
@@ -38,8 +40,8 @@ Document::~Document()
 	delete fCommandStack;
 	delete fSelection;
 	fIcon->Release();
-	delete fRef;
-	delete fExportRef;
+	delete fNativeSaver;
+	delete fExportSaver;
 }
 
 // SetName
@@ -60,24 +62,20 @@ Document::Name() const
 	return fName.String();
 }
 
-// SetRef
+// SetNativeSaver
 void
-Document::SetRef(const entry_ref& ref)
+Document::SetNativeSaver(::DocumentSaver* saver)
 {
-	if (!fRef)
-		fRef = new (nothrow) entry_ref(ref);
-	else
-		*fRef = ref;
+	delete fNativeSaver;
+	fNativeSaver = saver;
 }
 
-// SetExportRef
+// SetExportSaver
 void
-Document::SetExportRef(const entry_ref& ref)
+Document::SetExportSaver(::DocumentSaver* saver)
 {
-	if (!fExportRef)
-		fExportRef = new (nothrow) entry_ref(ref);
-	else
-		*fExportRef = ref;
+	delete fExportSaver;
+	fExportSaver = saver;
 }
 
 // SetIcon
@@ -96,16 +94,18 @@ Document::SetIcon(::Icon* icon)
 
 // MakeEmpty
 void
-Document::MakeEmpty()
+Document::MakeEmpty(bool includingSavers)
 {
 	fCommandStack->Clear();
 	fSelection->DeselectAll();
 	fIcon->MakeEmpty();
 
-	delete fRef;
-	fRef = NULL;
-	delete fExportRef;
-	fExportRef = NULL;
+	if (includingSavers) {
+		delete fNativeSaver;
+		fNativeSaver = NULL;
+		delete fExportSaver;
+		fExportSaver = NULL;
+	}
 }
 
 

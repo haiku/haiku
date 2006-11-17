@@ -20,8 +20,10 @@
 
 #include "support_settings.h"
 
+#include "AttributeSaver.h"
 #include "AutoLocker.h"
 #include "BitmapExporter.h"
+#include "BitmapSetSaver.h"
 #include "CommandStack.h"
 #include "Document.h"
 #include "FlatIconExporter.h"
@@ -33,7 +35,9 @@
 #include "MessageImporter.h"
 #include "PathContainer.h"
 #include "RDefExporter.h"
+#include "SavePanel.h"
 #include "ShapeContainer.h"
+#include "SimpleFileSaver.h"
 #include "SVGExporter.h"
 #include "SVGImporter.h"
 
@@ -107,28 +111,20 @@ IconEditorApp::MessageReceived(BMessage* message)
 		}
 		case MSG_SAVE:
 		case MSG_EXPORT: {
-			const entry_ref* ref;
+			DocumentSaver* saver;
 			if (message->what == MSG_SAVE)
-				ref = fDocument->Ref();
+				saver = fDocument->NativeSaver();
 			else
-				ref = fDocument->ExportRef();
-			if (ref) {
-				_Save(*ref, message->what == MSG_EXPORT ?
-								EXPORT_MODE_FLAT_ICON :
-								EXPORT_MODE_MESSAGE);
+				saver = fDocument->ExportSaver();
+			if (saver) {
+				saver->Save(fDocument);
 				break;
 			} // else fall through
 		}
 		case MSG_SAVE_AS:
-		case MSG_EXPORT_AS:
-		case MSG_EXPORT_BITMAP:
-		case MSG_EXPORT_BITMAP_SET:
-		case MSG_EXPORT_SVG:
-		case MSG_EXPORT_ICON_ATTRIBUTE:
-		case MSG_EXPORT_ICON_MIME_ATTRIBUTE:
-		case MSG_EXPORT_ICON_RDEF: {
-			uint32 exportMode;
-			if (message->FindInt32("mode", (int32*)&exportMode) < B_OK)
+		case MSG_EXPORT_AS: {
+			int32 exportMode;
+			if (message->FindInt32("export mode", &exportMode) < B_OK)
 				exportMode = EXPORT_MODE_MESSAGE;
 			entry_ref ref;
 			const char* name;
@@ -141,49 +137,34 @@ IconEditorApp::MessageReceived(BMessage* message)
 					&& entry.SetTo(&dir, name, true) >= B_OK
 					&& entry.GetRef(&ref) >= B_OK) {
 
-					_Save(ref, exportMode);
+					// create the document saver and remember it for later
+					DocumentSaver* saver = _CreateSaver(ref, exportMode);
+					if (saver) {
+						if (exportMode == EXPORT_MODE_MESSAGE)
+							fDocument->SetNativeSaver(saver);
+						else
+							fDocument->SetExportSaver(saver);
+						saver->Save(fDocument);
+					}
 				}
 				_SyncPanels(fSavePanel, fOpenPanel);
 			} else {
+				// configure the file panel
 				const char* saveText = NULL;
-				if (fDocument->Ref())
-					saveText = fDocument->Ref()->name;
+				FileSaver* saver = dynamic_cast<FileSaver*>(
+					fDocument->NativeSaver());
 
-				switch (message->what) {
-					case MSG_EXPORT_AS:
-					case MSG_EXPORT:
-						exportMode = EXPORT_MODE_FLAT_ICON;
-						if (fDocument->ExportRef())
-							saveText = fDocument->ExportRef()->name;
-						break;
-					case MSG_EXPORT_BITMAP:
-						exportMode = EXPORT_MODE_BITMAP;
-						break;
-					case MSG_EXPORT_BITMAP_SET:
-						exportMode = EXPORT_MODE_BITMAP_SET;
-						break;
-					case MSG_EXPORT_SVG:
-						exportMode = EXPORT_MODE_SVG;
-						break;
-					case MSG_EXPORT_ICON_ATTRIBUTE:
-						exportMode = EXPORT_MODE_ICON_ATTR;
-						break;
-					case MSG_EXPORT_ICON_MIME_ATTRIBUTE:
-						exportMode = EXPORT_MODE_ICON_MIME_ATTR;
-						break;
-					case MSG_EXPORT_ICON_RDEF:
-						exportMode = EXPORT_MODE_ICON_RDEF;
-						break;
-					case MSG_SAVE_AS:
-					case MSG_SAVE:
-					default:
-						exportMode = EXPORT_MODE_MESSAGE;
-						break;
+				bool exportMode = message->what == MSG_EXPORT_AS
+									|| message->what == MSG_EXPORT;
+				if (exportMode) {
+					saver = dynamic_cast<FileSaver*>(
+						fDocument->ExportSaver());
 				}
-				BMessage fpMessage(MSG_SAVE_AS);
-				fpMessage.AddInt32("mode", exportMode);
 
-				fSavePanel->SetMessage(&fpMessage);
+				if (saver)
+					saveText = saver->Ref()->name;
+
+				fSavePanel->SetExportMode(exportMode);
 //				fSavePanel->Refresh();
 				if (saveText)
 					fSavePanel->SetSaveText(saveText);
@@ -211,14 +192,14 @@ IconEditorApp::ReadyToRun()
 								true,
 								new BMessage(B_REFS_RECEIVED));
 
-	fSavePanel = new BFilePanel(B_SAVE_PANEL,
-								&messenger,
+	fSavePanel = new SavePanel("save panel",
+							   &messenger,
 								NULL,
 								B_FILE_NODE
 									| B_DIRECTORY_NODE
 									| B_SYMLINK_NODE,
 								false,
-								new BMessage(MSG_SAVE));
+								new BMessage(MSG_SAVE_AS));
 
 	// create main window
 	fMainWindow = new MainWindow(this, fDocument);
@@ -297,7 +278,8 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 	enum {
 		REF_NONE = 0,
 		REF_MESSAGE,
-		REF_FLAT
+		REF_FLAT,
+		REF_SVG
 	};
 	uint32 refMode = REF_NONE;
 
@@ -316,6 +298,8 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 			file.Seek(0, SEEK_SET);
 			SVGImporter svgImporter;
 			ret = svgImporter.Import(icon, &ref);
+			if (ret >= B_OK)
+				refMode = REF_SVG;
 		}
 	}
 
@@ -342,35 +326,24 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 
 	// incorporate the loaded icon into the document
 	// (either replace it or append to it)
-	if (append) {
-		// preserve the entry_refs
-		entry_ref saveRef;
-		if (fDocument->Ref())
-			saveRef = *fDocument->Ref();
-		entry_ref exportRef;
-		if (fDocument->ExportRef())
-			exportRef = *fDocument->ExportRef();
-
-		fDocument->MakeEmpty();
-		fDocument->SetIcon(icon);
-
-		// restore refs after "append"
-		if (saveRef.name)
-			fDocument->SetRef(saveRef);
-		if (exportRef.name)
-			fDocument->SetExportRef(exportRef);
-	} else {
-		fDocument->MakeEmpty();
-		fDocument->SetIcon(icon);
-
+	fDocument->MakeEmpty(!append);
+		// if append, the document savers are preserved
+	fDocument->SetIcon(icon);
+	if (!append) {
 		// document got replaced, but we have at
 		// least one ref already
 		switch (refMode) {
 			case REF_MESSAGE:
-				fDocument->SetRef(ref);
+				fDocument->SetNativeSaver(
+					new SimpleFileSaver(new MessageExporter(), ref));
 				break;
 			case REF_FLAT:
-				fDocument->SetExportRef(ref);
+				fDocument->SetExportSaver(
+					new SimpleFileSaver(new FlatIconExporter(), ref));
+				break;
+			case REF_SVG:
+				fDocument->SetExportSaver(
+					new SimpleFileSaver(new SVGExporter(), ref));
 				break;
 		}
 	}
@@ -385,74 +358,49 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 	}
 }
 
-// _Save
-void
-IconEditorApp::_Save(const entry_ref& ref, uint32 exportMode)
+// _CreateSaver
+DocumentSaver*
+IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 {
-	Exporter* exporter;
+	DocumentSaver* saver;
+	
 	switch (exportMode) {
 		case EXPORT_MODE_FLAT_ICON:
-			exporter = new FlatIconExporter();
-			fDocument->SetExportRef(ref);
+			saver = new SimpleFileSaver(new FlatIconExporter(), ref);
 			break;
 
 		case EXPORT_MODE_ICON_ATTR:
 		case EXPORT_MODE_ICON_MIME_ATTR: {
-			BNode node(&ref);
-			FlatIconExporter iconExporter;
 			const char* attrName
 				= exportMode == EXPORT_MODE_ICON_ATTR ?
 					kVectorAttrNodeName : kVectorAttrMimeName;
-			iconExporter.Export(fDocument->Icon(), &node, attrName);
-			return;
+			saver = new AttributeSaver(ref, attrName);
+			break;
 		}
 
 		case EXPORT_MODE_ICON_RDEF:
-			exporter = new RDefExporter();
+			saver = new SimpleFileSaver(new RDefExporter(), ref);
 			break;
 
 		case EXPORT_MODE_BITMAP:
-			exporter = new BitmapExporter(64);
+			saver = new SimpleFileSaver(new BitmapExporter(64), ref);
 			break;
 
-		case EXPORT_MODE_BITMAP_SET: {
-			entry_ref smallRef(ref);
-			// 64x64
-			char name[B_OS_NAME_LENGTH];
-			sprintf(name, "%s_64.png", ref.name);
-			smallRef.set_name(name);
-			exporter = new BitmapExporter(64);
-			exporter->SetSelfDestroy(true);
-			exporter->Export(fDocument, smallRef);
-			// 16x16
-			sprintf(name, "%s_16.png", ref.name);
-			smallRef.set_name(name);
-			Exporter* smallExporter = new BitmapExporter(16);
-			smallExporter->SetSelfDestroy(true);
-			smallExporter->Export(fDocument, smallRef);
-			// 32x32
-			sprintf(name, "%s_32.png", ref.name);
-			smallRef.set_name(name);
-			smallExporter = new BitmapExporter(32);
-			smallExporter->SetSelfDestroy(true);
-			smallExporter->Export(fDocument, smallRef);
-			return;
-		}
+		case EXPORT_MODE_BITMAP_SET:
+			saver = new BitmapSetSaver(ref);
+			break;
 
 		case EXPORT_MODE_SVG:
-			exporter = new SVGExporter();
+			saver = new SimpleFileSaver(new SVGExporter(), ref);
 			break;
 
 		case EXPORT_MODE_MESSAGE:
 		default:
-			exporter = new MessageExporter();
-			fDocument->SetRef(ref);
+			saver = new SimpleFileSaver(new MessageExporter(), ref);
 			break;
 	}
 
-	exporter->SetSelfDestroy(true);
-		// we don't wait for the export thread to finish here
-	exporter->Export(fDocument, ref);
+	return saver;
 }
 
 // _SyncPanels
@@ -523,6 +471,9 @@ IconEditorApp::_StoreSettings()
 
 	fMainWindow->StoreSettings(&settings);
 
+	if (settings.ReplaceInt32("export mode", fSavePanel->ExportMode()) < B_OK)
+		settings.AddInt32("export mode", fSavePanel->ExportMode());
+
 	save_settings(&settings, "Icon-O-Matic");
 }
 
@@ -532,6 +483,10 @@ IconEditorApp::_RestoreSettings()
 {
 	BMessage settings('stns');
 	load_settings(&settings, "Icon-O-Matic");
+
+	int32 mode;
+	if (settings.FindInt32("export mode", &mode) >= B_OK)
+		fSavePanel->SetExportMode(mode);
 
 	fMainWindow->RestoreSettings(&settings);
 }

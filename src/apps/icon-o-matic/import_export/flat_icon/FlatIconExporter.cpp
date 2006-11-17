@@ -235,8 +235,8 @@ FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer,
 
 		if (styleType == STYLE_TYPE_SOLID_COLOR) {
 			// solid color
-			uint32 color = *(uint32*)&style->Color();
-			if (!buffer.Write(color))
+			rgb_color color = style->Color();
+			if (!buffer.Write(*(uint32*)&color))
 				return B_NO_MEMORY;
 		} else if (styleType == STYLE_TYPE_SOLID_COLOR_NO_ALPHA) {
 			// solid color without alpha

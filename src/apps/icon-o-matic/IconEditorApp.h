@@ -14,7 +14,9 @@
 
 class BFilePanel;
 class Document;
+class DocumentSaver;
 class MainWindow;
+class SavePanel;
 
 enum {
 	MSG_NEW							= 'newi',
@@ -27,16 +29,6 @@ enum {
 
 	MSG_EXPORT						= 'xprt',
 	MSG_EXPORT_AS					= 'xpas',
-
-	// TODO: remove once export format can be chosen
-	MSG_EXPORT_BITMAP				= 'xpbm',
-	MSG_EXPORT_BITMAP_SET			= 'xpbs',
-
-	MSG_EXPORT_SVG					= 'xpsv',
-
-	MSG_EXPORT_ICON_ATTRIBUTE		= 'xpia',
-	MSG_EXPORT_ICON_MIME_ATTRIBUTE	= 'xpma',
-	MSG_EXPORT_ICON_RDEF			= 'xprd',
 };
 
 enum {
@@ -74,8 +66,8 @@ class IconEditorApp : public BApplication {
 			void				_MakeIconEmpty();
 			void				_Open(const entry_ref& ref,
 									  bool append = false);
-			void				_Save(const entry_ref& ref,
-									  uint32 exportMode);
+			DocumentSaver*		_CreateSaver(const entry_ref& ref,
+											 uint32 exportMode);
 
 			void				_SyncPanels(BFilePanel* from,
 											BFilePanel* to);
@@ -89,7 +81,7 @@ class IconEditorApp : public BApplication {
 			Document*			fDocument;
 
 			BFilePanel*			fOpenPanel;
-			BFilePanel*			fSavePanel;
+			SavePanel*			fSavePanel;
 
 			BString				fLastOpenPath;
 			BString				fLastSavePath;
