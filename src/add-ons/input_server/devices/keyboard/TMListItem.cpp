@@ -27,8 +27,13 @@ static const int32 kItemMargin = 2;
 TMListItem::TMListItem(team_info &tinfo) 
 	: BListItem(),
 	fInfo(tinfo),
+#ifdef __HAIKU__
+	fIcon(BRect(0, 0, 15, 15), B_RGBA32),
+	fLargeIcon(BRect(0, 0, 31, 31), B_RGBA32)
+#else
 	fIcon(BRect(0, 0, 15, 15), B_CMAP8),
 	fLargeIcon(BRect(0, 0, 31, 31), B_CMAP8)
+#endif
 {
 	int32 cookie = 0;
 	image_info info;
@@ -74,7 +79,12 @@ TMListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	frame.left += 4;
 	BRect iconFrame(frame);
 	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
+#ifdef __HAIKU__
+	owner->SetDrawingMode(B_OP_ALPHA);
+	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
 	owner->SetDrawingMode(B_OP_OVER);
+#endif
 	owner->DrawBitmap(&fIcon, iconFrame);
 	owner->SetDrawingMode(B_OP_COPY);
 
