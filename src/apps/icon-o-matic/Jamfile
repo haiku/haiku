@@ -63,7 +63,7 @@ for sourceDir in $(sourceDirs) {
 }
 
 # system headers
-UseLibraryHeaders agg expat ;
+UseLibraryHeaders agg expat icon ;
 
 
 
@@ -115,6 +115,7 @@ Application Icon-O-Matic :
 	BitmapSetSaver.cpp
 	DocumentSaver.cpp
 	FileSaver.cpp
+	MessengerSaver.cpp
 	SimpleFileSaver.cpp
 
 	# generic/command

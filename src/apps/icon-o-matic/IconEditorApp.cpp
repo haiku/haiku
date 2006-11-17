@@ -17,6 +17,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <IconEditorProtocol.h>
 
 #include "support_settings.h"
 
@@ -33,6 +34,7 @@
 #include "MainWindow.h"
 #include "MessageExporter.h"
 #include "MessageImporter.h"
+#include "MessengerSaver.h"
 #include "PathContainer.h"
 #include "RDefExporter.h"
 #include "SavePanel.h"
@@ -170,6 +172,23 @@ IconEditorApp::MessageReceived(BMessage* message)
 					fSavePanel->SetSaveText(saveText);
 				fSavePanel->Show();
 			}
+			break;
+		}
+		case B_EDIT_ICON_DATA: {
+			BMessenger messenger;
+			if (message->FindMessenger("reply to", &messenger) < B_OK) {
+				// required
+				break;
+			}
+			const uint8* data;
+			ssize_t size;
+			if (message->FindData("icon data", B_VECTOR_ICON_TYPE,
+				(const void**)&data, &size) < B_OK) {
+				// optional (new icon will be created)
+				data = NULL;
+				size = 0;
+			}
+			_Open(messenger, data, size);
 			break;
 		}
 
@@ -347,6 +366,66 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 				break;
 		}
 	}
+
+	locker.Unlock();
+
+	if (mainWindowLocked) {
+		fMainWindow->Unlock();
+		// cause the mainwindow to adopt icon in
+		// it's own thread
+		fMainWindow->PostMessage(MSG_SET_ICON);
+	}
+}
+
+// _Open
+void
+IconEditorApp::_Open(const BMessenger& externalObserver,
+					 const uint8* data, size_t size)
+{
+	if (!externalObserver.IsValid())
+		return;
+
+	Icon* icon = new (nothrow) Icon();
+	if (!icon)
+		return;
+
+	if (data && size > 0) {
+		// try to open the icon from the provided data
+		FlatIconImporter flatImporter;
+		status_t ret = flatImporter.Import(icon, const_cast<uint8*>(data), size);
+			// NOTE: the const_cast is a bit ugly, but no harm is done
+			// the reason is that the LittleEndianBuffer knows read and write
+			// mode, in this case it is used read-only, and it does not assume
+			// ownership of the buffer
+	
+		if (ret < B_OK) {
+			// inform user of failure at this point
+			BString helper("Opening the icon failed!");
+			helper << "\n\n" << "Error: " << strerror(ret);
+			BAlert* alert = new BAlert("bad news", helper.String(),
+									   "Bummer", NULL, NULL);
+			// launch alert asynchronously
+			alert->Go(NULL);
+	
+			delete icon;
+			return;
+		}
+	}
+
+	// keep the mainwindow locked while switching icons
+	bool mainWindowLocked = fMainWindow && fMainWindow->Lock();
+
+	AutoWriteLocker locker(fDocument);
+
+	if (mainWindowLocked)
+		fMainWindow->SetIcon(NULL);
+
+	// incorporate the loaded icon into the document
+	// (either replace it or append to it)
+	fDocument->MakeEmpty();
+	fDocument->SetIcon(icon);
+
+	fDocument->SetNativeSaver(new MessengerSaver(externalObserver));
 
 	locker.Unlock();
 

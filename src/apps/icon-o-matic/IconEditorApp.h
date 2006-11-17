@@ -66,6 +66,8 @@ class IconEditorApp : public BApplication {
 			void				_MakeIconEmpty();
 			void				_Open(const entry_ref& ref,
 									  bool append = false);
+			void				_Open(const BMessenger& externalObserver,
+									  const uint8* data, size_t size);
 			DocumentSaver*		_CreateSaver(const entry_ref& ref,
 											 uint32 exportMode);
 
