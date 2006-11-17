@@ -664,15 +664,16 @@ IconView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-#if HAIKU_TARGET_PLATFORM_HAIKU
-		case B_ICON_DATA_EDITED: {
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		case B_ICON_DATA_EDITED:
+		{
 			const uint8* data;
 			ssize_t size;
 			if (message->FindData("icon data", B_VECTOR_ICON_TYPE,
-								  (const void**)&data, &size) < B_OK) {
-				// required
+					(const void**)&data, &size) < B_OK)
 				break;
-			}
+
 			_SetIcon(NULL, NULL, data, size);
 			break;
 		}
@@ -1122,36 +1123,44 @@ IconView::GetMimeType(BMimeType& type) const
 void
 IconView::_AddOrEditIcon()
 {
+	// this works only in Haiku! (the icon editor is built-in in R5's FileType)
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	BMessage message;
-	if (fHasRef) {
+	if (fHasRef && fType.Type() == NULL) {
 		// in ref mode, Icon-O-Matic can change the icon directly, and
 		// we'll pick it up via node monitoring
 		message.what = B_REFS_RECEIVED;
 		message.AddRef("refs", &fRef);
-		if (fType.Type() != NULL)
-			message.AddString("file type", fType.Type());
-//	} else if (fHasType) {
-//		// TODO!
 	} else {
-		// in static mode, Icon-O-Matic needs to return the buffer it
-		// changed once its done
-		message.AddMessenger("reply to", BMessenger(this));
-#if HAIKU_TARGET_PLATFORM_HAIKU
+		// in static or MIME type mode, Icon-O-Matic needs to return the
+		// buffer it changed once its done
 		message.what = B_EDIT_ICON_DATA;
-		uint8* data;
-		size_t size;
-		if (fIconData->GetData(&data, &size) == B_OK)
-			message.AddData("icon data", B_VECTOR_ICON_TYPE, data, size);
-		// TODO: somehow figure out how names of objects in the icon
-		// can be preserved. Maybe in a second (optional) attribute
-		// where ever a vector icon attribute is present?
-#else
-		message.what = 0;
-		// TODO: ?
-#endif
+		message.AddMessenger("reply to", BMessenger(this));
+
+		::Icon* icon = fIconData;
+		if (icon == NULL) {
+			icon = new ::Icon();
+			if (fHasRef)
+				icon->SetTo(fRef, fType.Type());
+			else
+				icon->SetTo(fType);
+		}
+
+		if (icon->HasData()) {
+			uint8* data;
+			size_t size;
+			if (icon->GetData(&data, &size) == B_OK)
+				message.AddData("icon data", B_VECTOR_ICON_TYPE, data, size);
+			// TODO: somehow figure out how names of objects in the icon
+			// can be preserved. Maybe in a second (optional) attribute
+			// where ever a vector icon attribute is present?
+
+			free(data);
+		}
 	}
 
 	be_roster->Launch("application/x-vnd.Haiku-icon_o_matic", &message);
+#endif
 }
 
 
