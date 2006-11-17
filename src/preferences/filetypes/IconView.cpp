@@ -427,6 +427,7 @@ Icon::GetData(uint8** _data, size_t* _size) const
 	if (data == NULL)
 		return B_NO_MEMORY;
 
+	memcpy(data, fData, fSize);
 	*_data = data;
 	*_size = fSize;
 	return B_OK;
@@ -1149,17 +1150,18 @@ IconView::_AddOrEditIcon()
 		if (icon->HasData()) {
 			uint8* data;
 			size_t size;
-			if (icon->GetData(&data, &size) == B_OK)
+			if (icon->GetData(&data, &size) == B_OK) {
 				message.AddData("icon data", B_VECTOR_ICON_TYPE, data, size);
+				free(data);
+			}
+
 			// TODO: somehow figure out how names of objects in the icon
 			// can be preserved. Maybe in a second (optional) attribute
 			// where ever a vector icon attribute is present?
-
-			free(data);
 		}
 	}
 
-	be_roster->Launch("application/x-vnd.Haiku-icon_o_matic", &message);
+	be_roster->Launch("application/x-vnd.haiku-icon_o_matic", &message);
 #endif
 }
 
