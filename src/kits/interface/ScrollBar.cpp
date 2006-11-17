@@ -502,11 +502,29 @@ BScrollBar::MouseDown(BPoint where)
 
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 
+	int32 buttons = B_PRIMARY_MOUSE_BUTTON;
+	if (Looper() != NULL && Looper()->CurrentMessage() != NULL
+		&& Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK)
+		buttons = B_PRIMARY_MOUSE_BUTTON;
+
 	// hit test for the thumb
 	if (fPrivateData->fThumbFrame.Contains(where)) {
 		fPrivateData->fButtonDown = THUMB;
 		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
 		Invalidate(fPrivateData->fThumbFrame);
+		return;
+	}
+
+	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+		// special absolute scrolling: move thumb to where we clicked
+		fPrivateData->fButtonDown = THUMB;
+		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
+		if (Orientation() == B_HORIZONTAL)
+			fPrivateData->fClickOffset.x = -fPrivateData->fThumbFrame.Width() / 2;
+		else
+			fPrivateData->fClickOffset.y = -fPrivateData->fThumbFrame.Height() / 2;
+
+		SetValue(_ValueFor(where + fPrivateData->fClickOffset));
 		return;
 	}
 
