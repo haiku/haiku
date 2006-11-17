@@ -79,15 +79,26 @@ MemoryBarMenuItem::DrawContent()
 void
 MemoryBarMenuItem::DrawIcon()
 {
+	// TODO: exact code duplication with TeamBarMenuItem::DrawIcon()
+	if (!fIcon)
+		return;
+
 	BPoint loc = ContentLocation();
 	BRect frame = Frame();
+
 	loc.y = frame.top + (frame.bottom - frame.top - 15) / 2;
 
-	if (fIcon) {
-		Menu()->SetDrawingMode(B_OP_OVER);
-		Menu()->DrawBitmap(fIcon, loc);
-		Menu()->SetDrawingMode(B_OP_COPY);
-	}
+	BMenu* menu = Menu();
+
+	if (fIcon->ColorSpace() == B_RGBA32) {
+		menu->SetDrawingMode(B_OP_ALPHA);
+		menu->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	} else
+		menu->SetDrawingMode(B_OP_OVER);
+
+	menu->DrawBitmap(fIcon, loc);
+
+	menu->SetDrawingMode(B_OP_COPY);
 }
 
 

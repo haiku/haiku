@@ -68,7 +68,8 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 		BEntry entry(infoPack.team_info.args, true);
 		status = entry.GetRef(&info.ref);
 		if (status != B_OK
-			|| strncmp(infoPack.team_info.args, systemPath.Path(), strlen(systemPath.Path())) != 0)
+			|| strncmp(infoPack.team_info.args, systemPath.Path(),
+				strlen(systemPath.Path())) != 0)
 			nameFromArgs = true;
 		tryTrackerIcon = (status == B_OK);
 	}
@@ -77,9 +78,17 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 		B_PATH_NAME_LENGTH - 1);
 
 	if (icon) {
-		infoPack.team_icon = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
-		if (!tryTrackerIcon || BNodeInfo::GetTrackerIcon(&info.ref, infoPack.team_icon, B_MINI_ICON) != B_OK)
-			infoPack.team_icon->SetBits(k_app_mini, 256, 0, B_COLOR_8_BIT);
+#ifdef __HAIKU__
+		infoPack.team_icon = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
+#else
+		infoPack.team_icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
+#endif
+		if (!tryTrackerIcon
+			|| BNodeInfo::GetTrackerIcon(&info.ref, infoPack.team_icon,
+				B_MINI_ICON) != B_OK) {
+			// TODO: don't hardcode the "app" icon!
+			infoPack.team_icon->SetBits(k_app_mini, 256, 0, B_CMAP8);
+		}
 	} else
 		infoPack.team_icon = NULL;
 
