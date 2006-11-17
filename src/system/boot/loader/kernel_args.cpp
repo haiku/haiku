@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <OS.h>
@@ -13,7 +13,7 @@
 #include <string.h>
 
 
-static const size_t kChunkSize = 16384;
+static const size_t kChunkSize = 4 * B_PAGE_SIZE;
 
 kernel_args gKernelArgs;
 
@@ -126,8 +126,8 @@ static status_t
 add_kernel_args_range(void *start, uint32 size)
 {
 	return insert_address_range(gKernelArgs.kernel_args_range, 
-				&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
-				(addr_t)start, size);
+		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
+		(addr_t)start, size);
 }
 
 
@@ -140,6 +140,8 @@ add_kernel_args_range(void *start, uint32 size)
 extern "C" void *
 kernel_args_malloc(size_t size)
 {
+	//dprintf("kernel_args_malloc(): %ld bytes (%ld bytes left)\n", size, sFree);
+
 	if (sFirstFree != NULL && size <= sFree) {
 		// there is enough space in the current buffer
 		void *address = sFirstFree;

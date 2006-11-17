@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -20,7 +20,7 @@
 
 
 #define CURRENT_KERNEL_ARGS_VERSION	1
-#define MAX_KERNEL_ARGS_RANGE		8
+#define MAX_KERNEL_ARGS_RANGE		16
 
 typedef struct kernel_args {
 	uint32		kernel_args_size;
