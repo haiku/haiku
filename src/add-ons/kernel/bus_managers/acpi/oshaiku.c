@@ -128,8 +128,31 @@
 #include <OS.h>
 
 #ifdef _KERNEL_MODE
-	#include <PCI.h>
-	#include <KernelExport.h>
+#	include "pci_controller.h"
+#	include <KernelExport.h>
+
+void		*pci_ram_address(const void *physical_address_in_system_memory);
+
+status_t	pci_io_init(void);
+uint8		pci_read_io_8(int mapped_io_addr);
+void		pci_write_io_8(int mapped_io_addr, uint8 value);
+uint16		pci_read_io_16(int mapped_io_addr);
+void		pci_write_io_16(int mapped_io_addr, uint16 value);
+uint32		pci_read_io_32(int mapped_io_addr);
+void		pci_write_io_32(int mapped_io_addr, uint32 value);
+
+pci_controller *gController = NULL;
+void *gControllerCookie;
+
+status_t
+pci_controller_add(pci_controller *controller, void *cookie)
+{
+	gController = controller;
+	gControllerCookie = cookie;
+	return B_OK;
+}
+
+
 #endif
 
 #include "acpi.h"
@@ -166,6 +189,11 @@ AcpiOsInitialize (void)
 	AcpiGbl_OutputFile = NULL;
 #endif
 
+	if (pci_io_init() != B_OK)
+		return AE_ERROR;
+	if (pci_controller_init() != B_OK)
+		return AE_ERROR;
+	
     return AE_OK;
 }
 
@@ -529,7 +557,7 @@ AcpiOsUnmapMemory (
 {
 	
 	delete_area(area_for(where));
-    return;
+	return;
 }
 
 
@@ -1044,16 +1072,8 @@ AcpiOsReadPciConfiguration (
 {
 
 #ifdef _KERNEL_MODE
-	
-	static struct pci_module_info *pci = NULL;
-	uint32 result;
-	
-	if (pci == NULL)
-   		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
-   	
-   	result = pci->read_pci_config(PciId->Bus,PciId->Device,PciId->Function,Register,Width/8);
-    memcpy(Value,&result,Width);
-
+	gController->read_pci_config(gControllerCookie,
+		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8, Value);
 #endif  
 
     return (AE_OK);
@@ -1084,14 +1104,8 @@ AcpiOsWritePciConfiguration (
 {
 
 #ifdef _KERNEL_MODE
-
-    static struct pci_module_info *pci = NULL;
-	
-	if (pci == NULL)
-   		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
-   	
-   	pci->write_pci_config(PciId->Bus,PciId->Device,PciId->Function,Register,Width/8,Value);
-    
+	gController->write_pci_config(gControllerCookie, 
+		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8, Value);
 #endif
     
     return (AE_OK);
@@ -1131,23 +1145,18 @@ AcpiOsReadPort (
 	
 #ifdef _KERNEL_MODE
 
-	static struct pci_module_info *pci = NULL;
-	
-	if (pci == NULL)
-   		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
-	
     switch (Width)
     {
     case 8:
-        *Value = pci->read_io_8(Address);
+        *Value = pci_read_io_8(Address);
         break;
 
     case 16:
-        *Value = pci->read_io_16(Address);
+        *Value = pci_read_io_16(Address);
         break;
 
     case 32:
-        *Value = pci->read_io_32(Address);
+        *Value = pci_read_io_32(Address);
         break;
     }
     
@@ -1180,25 +1189,19 @@ AcpiOsWritePort (
 
 #ifdef _KERNEL_MODE
 
-	static struct pci_module_info *pci = NULL;
-	
-	if (pci == NULL)
-   		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
-	
-    switch (Width)
-    {
-    case 8:
-        pci->write_io_8(Address,Value);
-        break;
+	switch (Width) {
+	case 8:
+		pci_write_io_8(Address,Value);
+		break;
 
-    case 16:
-        pci->write_io_16(Address,Value);
-        break;
+	case 16:
+		pci_write_io_16(Address,Value);
+		break;
 
-    case 32:
-        pci->write_io_32(Address,Value);
-        break;
-    }
+	case 32:
+		pci_write_io_32(Address,Value);
+		break;
+	}
 
 #endif
 
@@ -1229,12 +1232,7 @@ AcpiOsReadMemory (
 
 #ifdef _KERNEL_MODE
 
-	static struct pci_module_info *pci = NULL;
-	
-	if (pci == NULL)
-   		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
-
-    memcpy(Value,pci->ram_address(ACPI_TO_POINTER(Address)),Width/8);
+    memcpy(Value, pci_ram_address(ACPI_TO_POINTER(Address)), Width/8);
     
 #endif
 
@@ -1265,12 +1263,7 @@ AcpiOsWriteMemory (
 
 #ifdef _KERNEL_MODE
 
-	static struct pci_module_info *pci = NULL;
-	
-	if (pci == NULL)
-   		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
-
-    memcpy(pci->ram_address(ACPI_TO_POINTER(Address)),&Value,Width/8);
+    memcpy(pci_ram_address(ACPI_TO_POINTER(Address)), &Value, Width/8);
 
 #endif
 
@@ -1326,3 +1319,4 @@ AcpiOsSignal (
 
     return (AE_OK);
 }
+

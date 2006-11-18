@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) include ] ;
 SubDirHdrs [ FDirName $(SUBDIR) include platform ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) pci ] ;
 SubDirCcFlags -fno-pic -D_KERNEL_MODE ;
 
 if $(TARGET_PLATFORM) != haiku {
@@ -175,6 +176,9 @@ SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons k
 KernelAddon acpi :
 	oshaiku.c
 	acpi_busman.c
+	acpi_module.c
+	acpi_device.c
 	:
 	libacpi_ca.a
+	pci_arch_bus_manager.a
 	;

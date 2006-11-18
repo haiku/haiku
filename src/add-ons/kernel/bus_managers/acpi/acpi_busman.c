@@ -7,12 +7,14 @@
 
 #include <ACPI.h>
 #include <KernelExport.h>
+
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
 
 #include "acpi.h"
 #include "acpixf.h"
+#include "acpi_priv.h"
 
 status_t acpi_std_ops(int32 op,...);
 status_t acpi_rescan_stub(void);
@@ -20,27 +22,9 @@ status_t acpi_rescan_stub(void);
 #define TRACE(x...) dprintf("acpi: " x)
 #define ERROR(x...) dprintf("acpi: " x)
 
-void enable_fixed_event (uint32 event);
-void disable_fixed_event (uint32 event);
 
-uint32 fixed_event_status (uint32 event);
-void reset_fixed_event (uint32 event);
 
-status_t install_fixed_event_handler	(uint32 event, interrupt_handler *handler, void *data); 
-status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler); 
 
-status_t get_next_entry (uint32 object_type, const char *base, char *result, size_t len, void **counter);
-status_t get_device (const char *hid, uint32 index, char *result);
-
-status_t get_device_hid (const char *path, char *hid);
-uint32 get_object_type (const char *path);
-status_t get_object(const char *path, acpi_object_type **return_value);
-status_t get_object_typed(const char *path, acpi_object_type **return_value, uint32 object_type);
-
-status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len);
-status_t evaluate_method (const char *object, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args);
-
-status_t enter_sleep_state (uint8 state);
 
 
 struct acpi_module_info acpi_module = {
@@ -71,13 +55,9 @@ struct acpi_module_info acpi_module = {
 	enter_sleep_state
 };
 
-_EXPORT module_info *modules[] = {
-	(module_info *) &acpi_module,
-	NULL
-};
 
-
-status_t acpi_std_ops(int32 op,...) 
+status_t 
+acpi_std_ops(int32 op,...) 
 {
 	ACPI_STATUS Status;
 	
@@ -111,7 +91,7 @@ status_t acpi_std_ops(int32 op,...)
 			break;
 		
 		case B_MODULE_UNINIT:
-			Status = AcpiTerminate();
+			/*Status = AcpiTerminate();*/
 			if (Status != AE_OK)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
 			

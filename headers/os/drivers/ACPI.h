@@ -6,6 +6,7 @@
 #ifndef _ACPI_H
 #define _ACPI_H
 
+#include <device_manager.h>
 #include <bus_manager.h>
 #include <KernelExport.h>
 
@@ -120,5 +121,13 @@ struct acpi_object_type {
 #endif
 
 #define B_ACPI_MODULE_NAME	"bus_managers/acpi/v1"
+
+#define ACPI_DEVICE_HID_ITEM "acpi/hid"
+#define ACPI_DEVICE_PATH_ITEM "acpi/path"
+#define ACPI_DEVICE_TYPE_ITEM "acpi/type"
+
+
+typedef struct acpi_device_info *acpi_device;
+
 
 #endif /* _ACPI_H */

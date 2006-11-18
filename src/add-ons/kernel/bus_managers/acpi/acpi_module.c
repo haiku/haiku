@@ -1,0 +1,210 @@
+/*
+ * Copyright 2006, Jérôme Duval. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+#include <stdlib.h>
+#include <string.h>
+#include "acpi_priv.h"
+
+device_manager_info *gDeviceManager;
+
+module_dependency module_dependencies[] = {
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
+	{}
+};
+
+
+static float
+acpi_module_supports_device(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+
+	// make sure parent is really device root
+	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "root")) {
+		free(bus);
+		return 0.0;
+	}
+
+	free(bus);
+	return 1.0;
+}
+
+
+static status_t 
+acpi_module_register_device(device_node_handle parent)
+{
+
+	device_attr attrs[] = {
+		// info about ourself
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ACPI_ROOT_MODULE_NAME }},
+		// unique connection name
+		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "ACPI" }},
+
+		// mark as being a bus
+		{ PNP_BUS_IS_BUS, B_UINT8_TYPE, { ui8: 1 }},
+		// search for device drivers once all devices are detected
+		//{ PNP_BUS_DEFER_PROBE, B_UINT8_TYPE, { ui8: 1 }},
+		// don't scan if loaded as we own I/O resources
+		//{ PNP_DRIVER_NO_LIVE_RESCAN, B_UINT8_TYPE, { ui8: 1 }},
+		{}
+	};
+
+	io_resource_handle *resourceHandles = NULL;
+	device_node_handle node;
+
+	return gDeviceManager->register_device(parent, attrs, resourceHandles, &node);
+}
+
+
+static status_t 
+acpi_enumerate_child_devices(device_node_handle node, const char *root)
+{
+	char result[255];
+	void *counter = NULL;
+
+	dprintf("acpi_enumerate_child_devices: recursing from %s\n", root);
+	
+	while (get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
+		uint32 type = get_object_type(result);
+		device_node_handle deviceNode;
+	
+		switch (type) {
+		case ACPI_TYPE_DEVICE: {
+			char hid[9] = "";
+			get_device_hid(result, hid);
+			device_attr attrs[] = {
+				// info about device
+				{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ACPI_DEVICE_MODULE_NAME }},
+				{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: 
+					"path: %"ACPI_DEVICE_PATH_ITEM"%" }},
+	
+				// location on ACPI bus
+				{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
+				
+				// info about the device
+				{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
+				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
+				
+				// consumer specification
+				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "apci" }},
+				{ NULL }
+			};
+			
+			if (gDeviceManager->register_device(node, attrs, NULL, &deviceNode) == B_OK)
+				acpi_enumerate_child_devices(deviceNode, result);
+			break;
+		}
+		case ACPI_TYPE_POWER:
+		case ACPI_TYPE_PROCESSOR:
+		case ACPI_TYPE_THERMAL: {
+			device_attr attrs[] = {
+				// info about device
+				{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ACPI_DEVICE_MODULE_NAME }},
+				{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: 
+					"path: %"ACPI_DEVICE_PATH_ITEM"%" }},
+	
+				// location on ACPI bus
+				{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
+				
+				// info about the device
+				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
+				
+				// consumer specification
+				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "apci" }},
+				{ NULL }
+			};
+			
+			if (gDeviceManager->register_device(node, attrs, NULL, &deviceNode) == B_OK)
+				acpi_enumerate_child_devices(deviceNode, result);
+			break;
+		}
+		default:
+			acpi_enumerate_child_devices(node, result);
+			break;
+		}
+
+	}
+
+	return B_OK;
+}
+
+
+static status_t 
+acpi_module_register_child_devices(void *cookie)
+{
+	device_node_handle node = cookie;
+	return acpi_enumerate_child_devices(node, "\\");
+}
+
+
+static void
+acpi_module_get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = {"root", NULL};
+
+	*_bus = kBus;
+	*_device = NULL;
+}
+
+
+static status_t
+acpi_module_init(device_node_handle node, void *user_cookie, void **_cookie)
+{
+	*_cookie = node;
+	return B_OK;
+}
+
+
+static int32
+apci_module_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+		{
+			module_info *module;
+			return get_module(B_ACPI_MODULE_NAME, &module);
+				// this serializes our module initialization
+		}
+
+		case B_MODULE_UNINIT:
+			return put_module(B_ACPI_MODULE_NAME);
+	}
+
+	return B_BAD_VALUE;	
+}
+
+
+static struct acpi_root_info sACPIModule = {
+	{
+		{
+			{
+				ACPI_ROOT_MODULE_NAME,
+				0,
+				apci_module_std_ops
+			},
+
+			acpi_module_supports_device,
+			acpi_module_register_device,
+			acpi_module_init,
+			NULL,	// uninit
+			NULL,	// removed
+			NULL,	// cleanup
+			acpi_module_get_paths,
+		},
+
+		acpi_module_register_child_devices,
+		NULL,		// rescan bus
+	},
+
+};
+
+_EXPORT module_info *modules[] = {
+	(module_info *) &acpi_module,
+	(module_info *) &sACPIModule,
+	NULL
+};
