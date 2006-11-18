@@ -55,9 +55,11 @@ SimpleTest user_shutdown_reply
 # the registrar itself
 
 UsePrivateHeaders app ;
+UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
+UsePrivateHeaders tracker ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers registrar ] ;
 
