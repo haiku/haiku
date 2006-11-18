@@ -76,7 +76,6 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 		switch (type) {
 		case ACPI_TYPE_DEVICE: {
 			char hid[9] = "";
-			get_device_hid(result, hid);
 			device_attr attrs[] = {
 				// info about device
 				{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ACPI_DEVICE_MODULE_NAME }},
@@ -94,6 +93,7 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "apci" }},
 				{ NULL }
 			};
+			get_device_hid(result, hid);
 			
 			if (gDeviceManager->register_device(node, attrs, NULL, &deviceNode) == B_OK)
 				acpi_enumerate_child_devices(deviceNode, result);
