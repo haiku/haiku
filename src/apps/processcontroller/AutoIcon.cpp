@@ -37,15 +37,19 @@ BBitmap*
 AutoIcon::bitmap()
 {
 	if (fBitmap == NULL) {
-		fBitmap = new BBitmap (BRect (0, 0, 15, 15), B_COLOR_8_BIT);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		fBitmap = new BBitmap (BRect (0, 0, 15, 15), B_RGBA32);
+#else
+		fBitmap = new BBitmap (BRect (0, 0, 15, 15), B_CMAP8);
+#endif
 		if (fSignature) {
 			entry_ref ref;
 			be_roster->FindApp (fSignature, &ref);
 			if (BNodeInfo::GetTrackerIcon(&ref, fBitmap, B_MINI_ICON) != B_OK)
-				fBitmap->SetBits(k_app_mini, 256, 0, B_COLOR_8_BIT);
+				fBitmap->SetBits(k_app_mini, 256, 0, B_CMAP8);
 		}
 		if (fbits)
-			fBitmap->SetBits (fbits, 256, 0, B_COLOR_8_BIT);
+			fBitmap->SetBits (fbits, 256, 0, B_CMAP8);
 	}
 	return fBitmap;
 }
