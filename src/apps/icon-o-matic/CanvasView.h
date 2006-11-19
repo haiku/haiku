@@ -84,7 +84,8 @@ class CanvasView : public StateView,
  private:
 			double				_NextZoomInLevel(double zoom) const;
 			double				_NextZoomOutLevel(double zoom) const;
-			void				_SetZoom(double zoomLevel);
+			void				_SetZoom(double zoomLevel,
+										 bool mouseIsAnchor = true);
 			BRect				_LayoutCanvas();
 
 			BBitmap*			fBitmap;

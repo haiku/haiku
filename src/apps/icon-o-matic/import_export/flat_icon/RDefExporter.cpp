@@ -50,7 +50,7 @@ RDefExporter::_Export(const uint8* source, size_t sourceSize, BPositionIO* strea
 {
 	char buffer[2048];
 	// write header
-	sprintf(buffer, "\nresource(<your resource id here>) #'RAWT' array {\n");
+	sprintf(buffer, "\nresource(<your resource id here>) #'VICN' array {\n");
 	size_t size = strlen(buffer);
 
 	ssize_t written = stream->Write(buffer, size);

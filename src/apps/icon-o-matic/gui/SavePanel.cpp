@@ -152,11 +152,10 @@ SavePanel::~SavePanel()
 void
 SavePanel::SendMessage(const BMessenger* messenger, BMessage* message)
 {
-	// add the current translator information to the message
-	if (message) {
-		int32 mode = ExportMode();
-		message->AddInt32("export mode", mode);
-	}
+	// add the current format information to the message,
+	// bot only if we are indeed in export mode
+	if (message && fFormatM->IsEnabled())
+		message->AddInt32("export mode", ExportMode());
 	// let the original file panel code handle the rest
 	BFilePanel::SendMessage(messenger, message);
 }

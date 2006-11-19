@@ -69,9 +69,18 @@ CanvasView::AttachedToWindow()
 	SetLowColor(kStripesHigh);
 	SetHighColor(kStripesLow);
 
-	_AllocBackBitmap(Bounds().Width(), Bounds().Height());
+	BRect bounds(Bounds());
 
-	_SetZoom(8.0);
+	_AllocBackBitmap(bounds.Width(), bounds.Height());
+
+	// layout icon in the center
+	BRect bitmapBounds(fBitmap->Bounds());
+	fCanvasOrigin.x = floorf((bounds.left + bounds.right
+		- bitmapBounds.right - bitmapBounds.left) / 2.0 + 0.5);
+	fCanvasOrigin.y = floorf((bounds.top + bounds.bottom
+		- bitmapBounds.bottom - bitmapBounds.top) / 2.0 + 0.5);
+
+	_SetZoom(8.0, false);
 }
 
 // FrameResized
@@ -79,6 +88,12 @@ void
 CanvasView::FrameResized(float width, float height)
 {
 	_AllocBackBitmap(width, height);
+
+	// keep canvas centered
+	BPoint oldCanvasOrigin = fCanvasOrigin;
+	SetDataRect(_LayoutCanvas());
+	if (oldCanvasOrigin != fCanvasOrigin)
+		Invalidate();
 }
 
 // Draw
@@ -515,34 +530,30 @@ CanvasView::_NextZoomOutLevel(double zoom) const
 
 // _SetZoom
 void
-CanvasView::_SetZoom(double zoomLevel)
+CanvasView::_SetZoom(double zoomLevel, bool mouseIsAnchor)
 {
 	if (fZoomLevel == zoomLevel)
 		return;
 
-	// zoom into mouse position, or into center of view
-	BPoint anchor = MouseInfo()->position;
-	BRect bounds(Bounds());
-	if (!bounds.Contains(anchor)) {
-		bounds = _CanvasRect();
-		anchor.x = (bounds.left + bounds.right) / 2.0;
-		anchor.y = (bounds.top + bounds.bottom) / 2.0;
-	}
-printf("anchor: %.2f, %.2f\n", anchor.x, anchor.y);
+	// TODO: still not working 100% correctly
 
-	BPoint offset;
-	if (fZoomLevel < zoomLevel) {
-		offset.x = anchor.x * (zoomLevel / fZoomLevel) - anchor.x;
-		offset.y = anchor.y * (zoomLevel / fZoomLevel) - anchor.y;
-	} else {
-		offset.x = -anchor.x * (zoomLevel / fZoomLevel);
-		offset.y = -anchor.y * (zoomLevel / fZoomLevel);
-	}
+	// zoom into center of view
+	BRect bounds(Bounds());
+	BPoint anchor;
+	anchor.x = (bounds.left + bounds.right + 1) / 2.0;
+	anchor.y = (bounds.top + bounds.bottom + 1) / 2.0;
+
+	BPoint canvasAnchor = anchor;
+	ConvertToCanvas(&canvasAnchor);
 
 	fZoomLevel = zoomLevel;
 	SetDataRect(_LayoutCanvas());
 
-printf("offset: %.2f, %.2f\n", offset.x, offset.y);
+	ConvertFromCanvas(&canvasAnchor);
+
+	BPoint offset;
+	offset.x = roundf(canvasAnchor.x - anchor.x);
+	offset.y = roundf(canvasAnchor.y - anchor.y);
 
 	SetScrollOffset(ScrollOffset() + offset);
 
@@ -564,14 +575,22 @@ CanvasView::_LayoutCanvas()
 
 	// TODO: ask manipulators to extend size
 
-	// left top of canvas within empty area
-	fCanvasOrigin.x = floorf(r.Width() * 0.25);
-	fCanvasOrigin.y = floorf(r.Height() * 0.25);
+	BRect bitmapRect = r;
 
 	// resize for empty area around bitmap
+	// (the size we want, but might still be much smaller than view)
 	r.right += r.Width() * 0.5;
 	r.bottom += r.Height() * 0.5;
 
-	return r;
+	// left top of canvas within empty area
+	BRect bounds(Bounds());
+	bounds.OffsetTo(B_ORIGIN);
+	bounds = bounds | r;
+	fCanvasOrigin.x = floorf((bounds.left + bounds.right
+		- bitmapRect.right - bitmapRect.left) / 2.0 + 0.5);
+	fCanvasOrigin.y = floorf((bounds.top + bounds.bottom
+		- bitmapRect.bottom - bitmapRect.top) / 2.0 + 0.5);
+
+	return bounds;
 }
 
