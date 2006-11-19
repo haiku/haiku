@@ -44,9 +44,10 @@ net_domain *gDomain;
 net_address_module_info *gAddressModule;
 net_buffer_module_info *gBufferModule;
 net_datalink_module_info *gDatalinkModule;
+net_socket_module_info *gSocketModule;
 net_stack_module_info *gStackModule;
 hash_table *gConnectionHash;
-benaphore gConnectionLock;
+recursive_lock gConnectionLock;
 
 
 #ifdef TRACE_TCP
@@ -55,7 +56,7 @@ benaphore gConnectionLock;
 void
 tcp_dump_hash()
 {
-	BenaphoreLocker lock(&gConnectionLock);
+	RecursiveLocker lock(&gConnectionLock);
 	if (gDomain == NULL) {
 		TRACE(("Unable to dump TCP Connections!\n"));
 		return;
@@ -66,9 +67,9 @@ tcp_dump_hash()
 	hash_rewind(gConnectionHash, &iterator);
 	TRACE(("Active TCP Connections:\n"));
 	while ((connection = (TCPConnection *)hash_next(gConnectionHash, &iterator)) != NULL) {
-		TRACE(("  TCPConnection %p: %s, %s\n", connection,
-		AddressString(gDomain, (sockaddr *)&connection->socket->address, true).Data(),
-		AddressString(gDomain, (sockaddr *)&connection->socket->peer, true).Data()));
+		TRACE(("  TCPConnection %p: local %s, peer %s\n", connection,
+			AddressString(gDomain, (sockaddr *)&connection->socket->address, true).Data(),
+			AddressString(gDomain, (sockaddr *)&connection->socket->peer, true).Data()));
 	}
 	hash_close(gConnectionHash, &iterator, false);
 }
@@ -104,8 +105,8 @@ set_domain(net_interface *interface = NULL)
 	for \a flags, \a seq \a ack and \a advertisedWindow.
 */
 status_t
-add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence, uint32 ack,
-	uint16 advertisedWindow)
+add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
+	uint32 acknowledge, uint16 advertisedWindow)
 {
 	buffer->protocol = IPPROTO_TCP;
 
@@ -117,16 +118,19 @@ add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence, uint32 ack,
 
 	header.source_port = gAddressModule->get_port((sockaddr *)&buffer->source);
 	header.destination_port = gAddressModule->get_port((sockaddr *)&buffer->destination);
-	header.sequence_num = htonl(sequence);
-	header.acknowledge_num = htonl(ack);
+	header.sequence = htonl(sequence);
+	header.acknowledge = (flags & TCP_FLAG_ACKNOWLEDGE) ? htonl(acknowledge) : 0;
 	header.reserved = 0;
-	header.header_length = 5;
+	header.header_length = sizeof(tcp_header) >> 2;
 		// currently no options supported
 	header.flags = (uint8)flags;
 	header.advertised_window = htons(advertisedWindow);
 	header.checksum = 0;
-	header.urgent_ptr = 0;
-		// urgent pointer not supported
+	header.urgent_offset = 0;
+		// TODO: urgent pointer not yet supported
+
+	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu\n", buffer,
+		flags, sequence, acknowledge));
 
 	// compute and store checksum
 	Checksum checksum;
@@ -137,8 +141,115 @@ add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence, uint32 ack,
 		<< (uint16)htons(buffer->size)
 		<< Checksum::BufferHelper(buffer, gBufferModule);
 	header.checksum = checksum;
-	TRACE(("TCP: Checksum for segment %p is %X\n", buffer, header.checksum));
+
 	return B_OK;
+}
+
+
+status_t
+reply_with_reset(tcp_segment_header& segment, net_buffer *buffer)
+{
+	TRACE(("TCP: Sending RST...\n"));
+
+	net_buffer *reply = gBufferModule->create(512);
+	if (reply == NULL)
+		return B_NO_MEMORY;
+
+	gAddressModule->set_to((sockaddr *)&reply->source,
+		(sockaddr *)&buffer->destination);
+	gAddressModule->set_to((sockaddr *)&reply->destination,
+		(sockaddr *)&buffer->source);
+
+	uint8 flags = TCP_FLAG_RESET;
+	uint32 acknowledge = 0;
+	uint32 sequence = 0;
+
+	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) == 0) {
+		flags |= TCP_FLAG_ACKNOWLEDGE;
+		acknowledge = segment.sequence + buffer->size;
+	} else
+		sequence = segment.acknowledge;
+
+	status_t status = add_tcp_header(reply, flags,
+		sequence, acknowledge, 0);
+	if (status == B_OK) {
+		status = gDomain->module->send_data(NULL, reply);
+	}
+
+	if (status != B_OK)
+		gBufferModule->free(reply);
+
+	return status;
+}
+
+
+TCPConnection *
+lookup_connection(sockaddr *local, sockaddr *peer)
+{
+	tcp_connection_key key;
+	key.local = local;
+	key.peer = peer;
+
+	return (TCPConnection *)hash_lookup(gConnectionHash, &key);
+}
+
+
+status_t
+remove_connection(TCPConnection *connection)
+{
+	RecursiveLocker hashLock(&gConnectionLock);
+	return hash_remove(gConnectionHash, connection);
+}
+
+
+status_t
+insert_connection(TCPConnection *connection)
+{
+	RecursiveLocker hashLock(&gConnectionLock);
+
+	tcp_connection_key key;
+	key.local = (sockaddr *)&connection->socket->address;
+	key.peer = (sockaddr *)&connection->socket->peer;
+
+	if (hash_lookup(gConnectionHash, &key) != NULL)
+		return EADDRINUSE;
+
+	return hash_insert(gConnectionHash, connection);
+}
+
+
+TCPConnection *
+find_connection(sockaddr *local, sockaddr *peer)
+{
+	TCPConnection *connection = lookup_connection(local, peer);
+	if (connection != NULL) {
+		TRACE(("TCP: Received packet corresponds to explicit connection %p\n", connection));
+		return connection;
+	}
+
+	// no explicit connection exists, check for wildcard connections
+
+	sockaddr wildcard;
+	gAddressModule->set_to_empty_address(&wildcard);
+
+	connection = lookup_connection(local, &wildcard);
+	if (connection != NULL) {
+		TRACE(("TCP: Received packet corresponds to wildcard connection %p\n", connection));
+		return connection;
+	}
+
+	sockaddr localWildcard;
+	gAddressModule->set_to_empty_address(&localWildcard);
+	gAddressModule->set_port(&localWildcard, gAddressModule->get_port(local));
+
+	connection = lookup_connection(&localWildcard, &wildcard);
+	if (connection != NULL) {
+		TRACE(("TCP: Received packet corresponds to local wildcard connection %p\n", connection));
+		return connection;
+	}
+
+	// no matching connection exists	
+	return NULL;
 }
 
 
@@ -148,9 +259,16 @@ add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence, uint32 ack,
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
-	DUMP_TCP_HASH;
 	socket->protocol = IPPROTO_TCP;
 	TCPConnection *protocol = new (std::nothrow) TCPConnection(socket);
+	if (protocol == NULL)
+		return NULL;
+
+	if (protocol->InitCheck() != B_OK) {
+		delete protocol;
+		return NULL;
+	}
+
 	TRACE(("Creating new TCPConnection: %p\n", protocol));
 	return protocol;
 }
@@ -259,7 +377,8 @@ status_t
 tcp_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
-	return ((TCPConnection *)protocol)->SendRoutedData(route, buffer);
+	// TCP never sends routed data
+	return B_ERROR;
 }
 
 
@@ -313,67 +432,89 @@ tcp_receive_data(net_buffer *buffer)
 
 	tcp_header &header = bufferHeader.Data();
 
-	tcp_connection_key key;
-	key.peer = (struct sockaddr *)&buffer->source;
-	key.local = (struct sockaddr *)&buffer->destination;
+	uint16 headerLength = header.HeaderLength();
+	if (headerLength < sizeof(tcp_header))
+		return B_BAD_DATA;
 
-	// TODO: check TCP Checksum
+	// compute checksum using a pseudo IP header
+	Checksum checksum;
+	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
+	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
+	checksum << (uint16)htons(IPPROTO_TCP)
+		<< (uint16)htons(buffer->size)
+		<< Checksum::BufferHelper(buffer, gBufferModule);
+
+	if (checksum != 0)
+		return B_BAD_DATA;
 
 	gAddressModule->set_port((struct sockaddr *)&buffer->source, header.source_port);
 	gAddressModule->set_port((struct sockaddr *)&buffer->destination, header.destination_port);
 
+	TRACE(("  Looking for: peer %s, local %s\n",
+		AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
+		AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
+
 	DUMP_TCP_HASH;
 
-	BenaphoreLocker hashLock(&gConnectionLock);
-	TCPConnection *connection = (TCPConnection *)hash_lookup(gConnectionHash, &key);
-	TRACE(("TCP: Received packet corresponds to connection %p\n", connection));
-	if (connection != NULL){
-		return connection->ReceiveData(buffer);
-	} else {
-		/* TODO:
-		   No explicit connection exists.  Check for wildcard connections:
-		   First check if any connections exist where local = IPADDR_ANY
-		   then check when local = peer = IPADDR_ANY.
-		   port numbers always remain the same */
+	// TODO: process options!
+	tcp_segment_header segment;
+	segment.sequence = header.Sequence();
+	segment.acknowledge = header.Acknowledge();
+	segment.advertised_window = header.AdvertisedWindow();
+	segment.urgent_offset = header.UrgentOffset();
+	segment.flags = header.flags;
 
-		// If no connection exists (and RESET is not set) send RESET
-		if ((header.flags & TCP_FLAG_RESET) == 0) {
-			TRACE(("TCP:  Connection does not exist!\n"));
-			net_buffer *reply = gBufferModule->create(512);
-			if (reply == NULL)
-				return B_NO_MEMORY;
+	bufferHeader.Remove(headerLength);
+		// we no longer need to keep the header around
 
-			gAddressModule->set_to((sockaddr *)&reply->source,
-				(sockaddr *)&buffer->destination);
-			gAddressModule->set_to((sockaddr *)&reply->destination,
-				(sockaddr *)&buffer->source);
+	RecursiveLocker hashLock(&gConnectionLock);
+	int32 segmentAction = DROP;
+ 
+	TCPConnection *connection = find_connection((struct sockaddr *)&buffer->destination,
+		(struct sockaddr *)&buffer->source);
+	if (connection != NULL) {
+		switch (connection->State()) {
+			case CLOSED:
+			case TIME_WAIT:
+				connection->UpdateTimeWait();
+				break;
 
-			uint32 sequence, acknowledge;
-			uint16 flags;
-			if (header.flags & TCP_FLAG_ACKNOWLEDGE) {
-				sequence = ntohl(header.acknowledge_num);
-				acknowledge = 0;
-				flags = TCP_FLAG_RESET;
-			} else {
-				sequence = 0;
-				acknowledge = ntohl(header.sequence_num) + 1
-					+ buffer->size - ((uint32)header.header_length << 2);
-				flags = TCP_FLAG_RESET | TCP_FLAG_ACKNOWLEDGE;
-			}
+			case LISTEN:
+				segmentAction = connection->ListenReceive(segment, buffer);
+				break;
 
-			status_t status = add_tcp_header(reply, flags, sequence, acknowledge, 0);
+			case SYNCHRONIZE_SENT:
+				segmentAction = connection->SynchronizeSentReceive(segment, buffer);
+				break;
 
-			if (status == B_OK) {
-				TRACE(("TCP:  Sending RST...\n"));
-				status = gDomain->module->send_data(NULL, reply);
-			}
-
-			if (status != B_OK) {
-				gBufferModule->free(reply);
-				return status;
-			}
+			case SYNCHRONIZE_RECEIVED:
+			case ESTABLISHED:
+			case FINISH_RECEIVED:
+			case WAIT_FOR_FINISH_ACKNOWLEDGE:
+			case FINISH_SENT:
+			case FINISH_ACKNOWLEDGED:
+			case CLOSING:
+				segmentAction = connection->Receive(segment, buffer);
+				break;
 		}
+
+		// process acknowledge action as asked for by the *Receive() method
+		if (segmentAction & IMMEDIATE_ACKNOWLEDGE)
+			connection->SendAcknowledge();
+		else if (segmentAction & ACKNOWLEDGE)
+			connection->DelayedAcknowledge();
+	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
+		segmentAction = DROP | RESET;
+
+	if (segmentAction & RESET) {
+		// send reset
+		TRACE(("TCP:  Connection does not exist!\n"));
+
+		reply_with_reset(segment, buffer);
 	}
+	if (segmentAction & DROP)
+		gBufferModule->free(buffer);
+
 	return B_OK;
 }
 
@@ -410,46 +551,51 @@ tcp_init()
 	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		goto err1;
-	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule);
+	status = get_module(NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule);
 	if (status < B_OK)
 		goto err2;
+	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule);
+	if (status < B_OK)
+		goto err3;
 
 	gConnectionHash = hash_init(MAX_HASH_TCP, TCPConnection::HashOffset(),
 		&TCPConnection::Compare, &TCPConnection::Hash);
 	if (gConnectionHash == NULL)
-		goto err3;
-
-	status = benaphore_init(&gConnectionLock, "TCP Hash Lock");
-	if (status < B_OK)
 		goto err4;
+
+	status = recursive_lock_init(&gConnectionLock, "tcp connection hash");
+	if (status < B_OK)
+		goto err5;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_IP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err5;
+		goto err6;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err5;
+		goto err6;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
 		"network/protocols/tcp/v1");
 	if (status < B_OK)
-		goto err5;
+		goto err6;
 
 	return B_OK;
 
+err6:
+	recursive_lock_destroy(&gConnectionLock);
 err5:
-	benaphore_destroy(&gConnectionLock);
-err4:
 	hash_uninit(gConnectionHash);
-err3:
+err4:
 	put_module(NET_DATALINK_MODULE_NAME);
+err3:
+	put_module(NET_SOCKET_MODULE_NAME);
 err2:
 	put_module(NET_BUFFER_MODULE_NAME);
 err1:
@@ -463,9 +609,10 @@ err1:
 static status_t
 tcp_uninit()
 {
-	benaphore_destroy(&gConnectionLock);
+	recursive_lock_destroy(&gConnectionLock);
 	hash_uninit(gConnectionHash);
 	put_module(NET_DATALINK_MODULE_NAME);
+	put_module(NET_SOCKET_MODULE_NAME);
 	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);
 

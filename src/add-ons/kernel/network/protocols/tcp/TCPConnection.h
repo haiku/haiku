@@ -23,6 +23,8 @@ class TCPConnection : public net_protocol {
 		TCPConnection(net_socket *socket);
 		~TCPConnection();
 
+		status_t InitCheck() const;
+
 		status_t Open();
 		status_t Close();
 		status_t Free();
@@ -33,17 +35,24 @@ class TCPConnection : public net_protocol {
 		status_t Listen(int count);
 		status_t Shutdown(int direction);
 		status_t SendData(net_buffer *buffer);
-		status_t SendRoutedData(net_route *route, net_buffer *buffer);
 		size_t SendAvailable();
 		status_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
 		size_t ReadAvailable();
 
-		status_t ReceiveData(net_buffer *buffer);
+		tcp_state State() const { return fState; }
+
+		status_t DelayedAcknowledge();
+		status_t SendAcknowledge();
+		status_t UpdateTimeWait();
+		int32 ListenReceive(tcp_segment_header& segment, net_buffer *buffer);
+		int32 SynchronizeSentReceive(tcp_segment_header& segment,
+			net_buffer *buffer);
+		int32 Receive(tcp_segment_header& segment, net_buffer *buffer);
 
 		static void ResendSegment(struct net_timer *timer, void *data);
 		static int Compare(void *_packet, const void *_key);
 		static uint32 Hash(void *_packet, const void *_key, uint32 range);
-		static int32 HashOffset() { return offsetof(TCPConnection, fHashLink); }
+		static int32 HashOffset() { return offsetof(TCPConnection, fHashNext); }
 
 	private:
 		bool _IsAcknowledgeValid(uint32 acknowledge);
@@ -51,34 +60,38 @@ class TCPConnection : public net_protocol {
 
 		status_t _SendQueuedData(uint16 flags, bool empty);
 		status_t _EnqueueReceivedData(net_buffer *buffer, uint32 sequenceNumber);
-		status_t _Reset(uint32 sequenceNum, uint32 acknowledgeNum);
 
 		static void _TimeWait(struct net_timer *timer, void *data);
 
-		uint32			fLastByteAckd;
-		uint32			fNextByteToSend;
-		uint32			fNextByteToWrite;
+		TCPConnection	*fHashNext;
 
-		uint32			fNextByteToRead;
-		uint32			fNextByteExpected;
-		uint32			fLastByteReceived;
+		benaphore		fSendLock;
+		benaphore		fReceiveLock;
+		benaphore		fLock;
+		sem_id			fAcceptSemaphore;
 
-		bigtime_t		fAvgRTT;
-
+		uint32			fLastAcknowledged;
+		uint32			fSendNext;
+		uint32			fSendWindow;
 		net_buffer		*fSendBuffer;
+
+		net_route 		*fRoute;
+			// TODO: don't use a net_route, but a net_route_info!!!
+
+		uint32			fReceiveNext;
+		uint32			fReceiveWindow;
+		bigtime_t		fAvgRTT;
 		net_buffer		*fReceiveBuffer;
+
+		tcp_state		fState;
+		status_t		fError;
+		vint32			fDelayedAcknowledge;
 
 		struct list 	fReorderQueue;
 		struct list 	fWaitQueue;
 
-		TCPConnection	*fHashLink;
-		tcp_state		fState;
-		status_t		fError;
-		benaphore		fLock;
+		// timer
 		net_timer		fTimer;
-
-		net_route 		*fRoute;
-			// TODO: don't use a net_route, but a net_route_info!!!
 };
 
 #endif	// TCP_CONNECTION_H
