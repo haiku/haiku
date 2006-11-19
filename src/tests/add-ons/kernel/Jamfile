@@ -8,7 +8,6 @@ SharedLibrary libkernelland_emu.so :
 	kernelland_emu.cpp
 	strlcpy.c
 	khash.c
-	lock.c
 	list.c
 
 	: be stdc++.r4 ;
@@ -19,10 +18,6 @@ AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 SEARCH on [ FGristFiles 
 		strlcpy.c
 	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
-
-SEARCH on [ FGristFiles 
-		lock.c
-	] = [ FDirName $(HAIKU_TOP) src system kernel ] ;
 
 SEARCH on [ FGristFiles
 		list.c khash.c

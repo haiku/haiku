@@ -9,8 +9,10 @@
 
 #include <KernelExport.h>
 #include <module.h>
+#include <util/AutoLock.h>
 
 #include <netinet/in.h>
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,9 +38,9 @@ extern module_info *modules[];
 extern struct net_protocol_module_info gDomainModule;
 static struct net_protocol sDomainProtocol;
 struct net_interface gInterface;
-struct net_socket_module_info gNetSocketModule;
+extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
-struct net_socket gServerSocket, gClientSocket;
+struct net_socket *gServerSocket, *gClientSocket;
 
 static struct net_domain sDomain = {
 	"ipv4",
@@ -128,54 +130,68 @@ static net_stack_module_info gNetStackModule = {
 };
 
 
-//	#pragma mark - protocol/socket
+//	#pragma mark - socket
 
 
-net_protocol*
-init_protocol(net_socket& socket)
+status_t
+socket_create(int family, int type, int protocol, net_socket **_socket)
 {
-	memset(&socket, 0, sizeof(net_socket));
-	socket.family = AF_INET;
-	socket.type = SOCK_STREAM;
-	socket.protocol = IPPROTO_TCP;
+	struct net_socket *socket = new (std::nothrow) net_socket;
+	if (socket == NULL)
+		return B_NO_MEMORY;
+
+	memset(socket, 0, sizeof(net_socket));
+	socket->family = family;
+	socket->type = type;
+	socket->protocol = protocol;
+
+	status_t status = benaphore_init(&socket->lock, "socket");
+	if (status < B_OK)
+		goto err1;
 
 	// set defaults (may be overridden by the protocols)
-	socket.send.buffer_size = 65536;
-	socket.send.low_water_mark = 1;
-	socket.send.timeout = B_INFINITE_TIMEOUT;
-	socket.receive.buffer_size = 65536;
-	socket.receive.low_water_mark = 1;
-	socket.receive.timeout = B_INFINITE_TIMEOUT;
+	socket->send.buffer_size = 65536;
+	socket->send.low_water_mark = 1;
+	socket->send.timeout = B_INFINITE_TIMEOUT;
+	socket->receive.buffer_size = 65536;
+	socket->receive.low_water_mark = 1;
+	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	net_protocol* protocol = gTCPModule->init_protocol(&socket);
-	if (protocol == NULL) {
+	list_init_etc(&socket->pending_children, offsetof(net_socket, link));
+	list_init_etc(&socket->connected_children, offsetof(net_socket, link));
+
+	socket->first_protocol = gTCPModule->init_protocol(socket);
+	if (socket->first_protocol == NULL) {
 		fprintf(stderr, "tcp_tester: cannot create protocol\n");
-		return NULL;
+		goto err2;
 	}
 
-	socket.first_info = gTCPModule;
-	socket.first_protocol = protocol;
+	socket->first_info = gTCPModule;
 
-	protocol->next = &sDomainProtocol;
-	protocol->module = gTCPModule;
-	protocol->socket = &socket;
+	socket->first_protocol->next = &sDomainProtocol;
+	socket->first_protocol->module = gTCPModule;
+	socket->first_protocol->socket = socket;
 
-	status_t status = gTCPModule->open(protocol);
-	if (status < B_OK) {
-		fprintf(stderr, "tcp_tester: cannot open client: %s\n", strerror(status));
-		return NULL;
-	}
+	*_socket = socket;
+	return B_OK;
 
-	return protocol;
+err2:
+	benaphore_destroy(&socket->lock);
+err1:
+	delete socket;
+	return status;
 }
 
 
 void
-close_protocol(net_protocol* protocol)
+socket_delete(net_socket *socket)
 {
-	gTCPModule->close(protocol);
-	gTCPModule->free(protocol);
-	gTCPModule->uninit_protocol(protocol);
+	if (socket->parent != NULL)
+		panic("socket still has a parent!");
+
+	socket->first_info->uninit_protocol(socket->first_protocol);
+	benaphore_destroy(&socket->lock);
+	delete socket;
 }
 
 
@@ -258,6 +274,187 @@ socket_listen(net_socket *socket, int backlog)
 		socket->options |= SO_ACCEPTCONN;
 
 	return status;
+}
+
+
+status_t
+socket_spawn_pending(net_socket *parent, net_socket **_socket)
+{
+	BenaphoreLocker locker(parent->lock);
+
+	// We actually accept more pending connections to compensate for those
+	// that never complete, and also make sure at least a single connection
+	// can always be accepted
+	if (parent->child_count > 3 * parent->max_backlog / 2)
+		return ENOBUFS;
+
+	net_socket *socket;
+	status_t status = socket_create(parent->family, parent->type, parent->protocol, &socket);
+	if (status < B_OK)
+		return status;
+
+	// inherit parent's properties
+	socket->send = parent->send;
+	socket->receive = parent->receive;
+	socket->options = parent->options & ~SO_ACCEPTCONN;
+	socket->linger = parent->linger;
+	memcpy(&socket->address, &parent->address, parent->address.ss_len);
+	memcpy(&socket->peer, &parent->peer, parent->peer.ss_len);
+
+	// add to the parent's list of pending connections
+	list_add_item(&parent->pending_children, socket);
+	parent->child_count++;
+
+	*_socket = socket;
+	return B_OK;
+}
+
+
+status_t
+socket_dequeue_connected(net_socket *parent, net_socket **_socket)
+{
+	benaphore_lock(&parent->lock);
+
+	net_socket *socket = (net_socket *)list_remove_head_item(&parent->connected_children);
+	if (socket != NULL) {
+		socket->parent = NULL;
+		parent->child_count--;
+		*_socket = socket;
+	}
+
+	benaphore_unlock(&parent->lock);
+	return socket != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+socket_set_max_backlog(net_socket *socket, uint32 backlog)
+{
+	// we enforce an upper limit of connections waiting to be accepted
+	if (backlog > 256)
+		backlog = 256;
+
+	benaphore_lock(&socket->lock);
+
+	// first remove the pending connections, then the already connected ones as needed	
+	net_socket *child;
+	while (socket->child_count > backlog
+		&& (child = (net_socket *)list_remove_tail_item(&socket->pending_children)) != NULL) {
+		child->parent = NULL;
+		socket->child_count--;
+	}
+	while (socket->child_count > backlog
+		&& (child = (net_socket *)list_remove_tail_item(&socket->connected_children)) != NULL) {
+		child->parent = NULL;
+		socket_delete(child);
+		socket->child_count--;
+	}
+
+	socket->max_backlog = backlog;
+	benaphore_unlock(&socket->lock);
+	return B_OK;
+}
+
+
+/*!
+	The socket has been connected. It will be moved to the connected queue
+	of its parent socket.
+*/
+status_t
+socket_connected(net_socket *socket)
+{
+	net_socket *parent = socket->parent;
+	if (parent == NULL)
+		return B_BAD_VALUE;
+
+	benaphore_lock(&parent->lock);
+
+	list_remove_item(&parent->pending_children, socket);
+	list_add_item(&parent->connected_children, socket);
+
+	benaphore_unlock(&parent->lock);
+	return B_OK;
+}
+
+
+net_socket_module_info gNetSocketModule = {
+	{
+		NET_SOCKET_MODULE_NAME,
+		0,
+		std_ops
+	},
+	NULL, //socket_open,
+	NULL, //socket_close,
+	NULL, //socket_free,
+
+	NULL, //socket_readv,
+	NULL, //socket_writev,
+	NULL, //socket_control,
+
+	NULL, //socket_read_avail,
+	NULL, //socket_send_avail,
+
+	NULL, //socket_send_data,
+	NULL, //socket_receive_data,
+
+	// connections
+	socket_spawn_pending,
+	socket_delete,
+	socket_dequeue_connected,
+	socket_set_max_backlog,
+	socket_connected,
+
+	// notifications
+	NULL, //socket_request_notification,
+	NULL, //socket_cancel_notification,
+	NULL, //socket_notify,
+
+	// standard socket API
+	NULL, //socket_accept,
+	NULL, //socket_bind,
+	NULL, //socket_connect,
+	NULL, //socket_getpeername,
+	NULL, //socket_getsockname,
+	NULL, //socket_getsockopt,
+	NULL, //socket_listen,
+	NULL, //socket_recv,
+	NULL, //socket_recvfrom,
+	NULL, //socket_send,
+	NULL, //socket_sendto,
+	NULL, //socket_setsockopt,
+	NULL, //socket_shutdown,
+};
+
+
+//	#pragma mark - protocol
+
+
+net_protocol*
+init_protocol(net_socket** _socket)
+{
+	net_socket *socket;
+	status_t status = socket_create(AF_INET, SOCK_STREAM, IPPROTO_TCP, &socket);
+	if (status < B_OK)
+		return NULL;
+
+	status = socket->first_info->open(socket->first_protocol);
+	if (status < B_OK) {
+		fprintf(stderr, "tcp_tester: cannot open client: %s\n", strerror(status));
+		socket_delete(socket);
+		return NULL;
+	}
+
+	*_socket = socket;
+	return socket->first_protocol;
+}
+
+
+void
+close_protocol(net_protocol* protocol)
+{
+	gTCPModule->close(protocol);
+	gTCPModule->free(protocol);
+	gTCPModule->uninit_protocol(protocol);
 }
 
 
@@ -493,7 +690,7 @@ server_thread(void *)
 		net_socket* connectionSocket;
 		sockaddr_in address;
 		uint32 size = sizeof(struct sockaddr_in);
-		status_t status = socket_accept(&gServerSocket, (struct sockaddr *)&address,
+		status_t status = socket_accept(gServerSocket, (struct sockaddr *)&address,
 			&size, &connectionSocket);
 		if (status < B_OK) {
 			fprintf(stderr, "SERVER: accepting failed: %s\n", strerror(status));
@@ -523,7 +720,7 @@ do_connect(int argc, char** argv)
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = INADDR_ANY;
 
-	status_t status = socket_connect(&gClientSocket, (struct sockaddr *)&address,
+	status_t status = socket_connect(gClientSocket, (struct sockaddr *)&address,
 		sizeof(struct sockaddr));
 	if (status < B_OK)
 		fprintf(stderr, "tcp_tester: could not connect: %s\n", strerror(status));
@@ -561,6 +758,7 @@ main(int argc, char** argv)
 
 	_add_builtin_module((module_info *)&gNetStackModule);
 	_add_builtin_module((module_info *)&gNetBufferModule);
+	_add_builtin_module((module_info *)&gNetSocketModule);
 	_add_builtin_module((module_info *)&gNetDatalinkModule);
 	_add_builtin_module(modules[0]);
 
@@ -568,6 +766,7 @@ main(int argc, char** argv)
 	sockaddr_in interfaceAddress;
 	interfaceAddress.sin_len = sizeof(sockaddr_in);
 	interfaceAddress.sin_family = AF_INET;
+	interfaceAddress.sin_addr.s_addr = htonl(0xc0a80001);
 	gInterface.address = (sockaddr*)&interfaceAddress;
 
 	status = get_module("network/protocols/tcp/v1", (module_info **)&gTCPModule);
@@ -577,10 +776,10 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	net_protocol* client = init_protocol(gClientSocket);
+	net_protocol* client = init_protocol(&gClientSocket);
 	if (client == NULL)
 		return 1;
-	net_protocol* server = init_protocol(gServerSocket);
+	net_protocol* server = init_protocol(&gServerSocket);
 	if (server == NULL)
 		return 1;
 
@@ -594,12 +793,12 @@ main(int argc, char** argv)
 	address.sin_port = htons(1024);
 	address.sin_addr.s_addr = INADDR_ANY;
 
-	status = socket_bind(&gServerSocket, (struct sockaddr *)&address, sizeof(struct sockaddr));
+	status = socket_bind(gServerSocket, (struct sockaddr *)&address, sizeof(struct sockaddr));
 	if (status < B_OK) {
 		fprintf(stderr, "tcp_tester: cannot bind server: %s\n", strerror(status));
 		return 1;
 	}
-	status = socket_listen(&gServerSocket, 40);
+	status = socket_listen(gServerSocket, 40);
 	if (status < B_OK) {
 		fprintf(stderr, "tcp_tester: server cannot listen: %s\n", strerror(status));
 		return 1;
@@ -639,12 +838,18 @@ main(int argc, char** argv)
 			|| !strcmp(argv[0], "q"))
 			break;
 
+		bool found = false;
+
 		for (cmd_entry* command = sBuiltinCommands; command->name != NULL; command++) {
 			if (!strncmp(command->name, argv[0], length)) {
 				command->func(argc, argv);
+				found = true;
 				break;
 			}
 		}
+
+		if (!found)
+			fprintf(stderr, "Unknown command \"%s\". Type \"help\" for a list of commands.\n", argv[0]);
 
 		free(argv);
 	}
