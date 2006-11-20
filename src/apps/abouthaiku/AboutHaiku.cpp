@@ -347,6 +347,7 @@ AboutView::AboutView(const BRect &rect)
 		"Jérôme Duval\n"
 		"Waldemar Kornewald\n"
 		"Thomas Kurschel\n"
+		"Ryan Leavengood\n"
 		"Michael Lotz\n"
 		"Niels Reedijk\n"
 		"Bryan Varner\n"
