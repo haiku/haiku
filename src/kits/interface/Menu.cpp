@@ -1184,6 +1184,7 @@ BMenu::_show(bool selectFirstItem)
 	if (window->Lock()) {
 		fAttachAborted = false;
 		window->AttachMenu(this);
+		fCachedMenuWindow = window;
 
 		// Menu didn't have the time to add its items: aborting...
 		if (fAttachAborted) {
@@ -1203,6 +1204,7 @@ BMenu::_show(bool selectFirstItem)
 			MoveTo(1, 1);
 	
 		UpdateWindowViewSize();
+		fCachedMenuWindow = NULL;
 		window->Show();
 		
 		if (selectFirstItem)
@@ -2061,13 +2063,27 @@ BMenu::UpdateWindowViewSize(bool upWind)
 	BRect frame = CalcFrame(ScreenLocation(), &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
-	if (fItems.CountItems() > 0)
-		window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
-	else {
+	if (fItems.CountItems() > 0) {
+		if (!scroll) {
+			window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+		} else {
+			BScreen screen(window);
+
+			// If we need scrolling, resize the window to fit the screen and
+			// attach scrollers to our cached MenuWindow.
+			window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - 10);
+			
+			if (fCachedMenuWindow)
+				fCachedMenuWindow->AttachScrollers();
+
+			frame.top = 0;
+		}
+	} else {
 		CacheFontInfo();
 		window->ResizeTo(StringWidth(kEmptyMenuLabel) + fPad.left + fPad.right,
 						fFontHeight + fPad.top + fPad.bottom);
 	}
+	
 	window->MoveTo(frame.LeftTop());
 }
 

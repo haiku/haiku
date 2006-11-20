@@ -30,21 +30,59 @@
 #include <Window.h>
 
 class BMenu;
-class BMenuScroller;
+class BMenuScroller : public BView {
+	public:
+		BMenuScroller(BRect frame, BMenu *menu);
+		virtual ~BMenuScroller();
+
+		virtual void Pulse();
+		virtual void Draw(BRect updateRect);
+
+	private:
+		BMenu *fMenu;
+		BRect fUpperButton;
+		BRect fLowerButton;
+
+		float fValue;
+		float fLimit;
+
+		bool fUpperEnabled;
+		bool fLowerEnabled;
+
+		uint32 fButton;
+		BPoint fPosition;
+};
+
+
+class BMenuFrame : public BView {
+	public:
+		BMenuFrame(BMenu *menu);
+
+		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
+		virtual void Draw(BRect updateRect);
+
+  private:
+		friend class BMenuWindow;
+
+		BMenu *fMenu;
+};
+
 
 class BMenuWindow : public BWindow {
-public:
-	BMenuWindow(const char *name);
-	virtual ~BMenuWindow();
+	public:
+		BMenuWindow(const char *name);
+		virtual ~BMenuWindow();
 	
-	void AttachMenu(BMenu *menu);
-	void DetachMenu();
+		void AttachMenu(BMenu *menu);
+		void DetachMenu();
 	
-	void UpdateScrollers();
+		void AttachScrollers();
+		void DetachScrollers();
 
-private:
-	BMenuScroller *fUpperScroller;
-	BMenuScroller *fLowerScroller;
+	private:
+		BMenuScroller *fScroller;
+		BMenuFrame *fMenuFrame;
 };
 
 #endif
