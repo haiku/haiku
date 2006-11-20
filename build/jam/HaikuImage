@@ -30,9 +30,9 @@ BEOS_BIN = addattr alert basename beep cat catattr chgrp chmod chop chown clear
 	playsound playwav ps pwd
 	query quit renice rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
-	tail tar tee top touch tput traceroute translate true tty uname unmount unzip unzipsfx 
-	uptime version waitfor wc whoami xargs xres yes zdiff zforce zgrep zip zipcloak 
-	zipnote zipsplit zmore znew
+	tail tar tee top touch tput traceroute translate true tty uname unmount unrar unzip
+	unzipsfx uptime version waitfor wc whoami xargs xres yes zdiff zforce zgrep zip
+	zipcloak zipnote zipsplit zmore znew
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse ProcessController
