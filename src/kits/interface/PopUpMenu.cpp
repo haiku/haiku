@@ -354,8 +354,10 @@ BPopUpMenu::entry(void *arg)
 	delete_sem(data->lock);
 
 	// Commit suicide if needed	
-	if (menu->fAutoDestruct)
-		delete menu;	
+	if (menu->fAutoDestruct) {
+		menu->fTrackThread = -1;
+		delete menu;
+	}
 
 	if (data->async)
 		delete data;
