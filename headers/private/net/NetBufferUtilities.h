@@ -84,12 +84,15 @@ template<typename Type, typename Module = NetBufferModuleGetter > class NetBuffe
 //! A class to add a header to a buffer
 template<typename Type, typename Module = NetBufferModuleGetter > class NetBufferPrepend {
 	public:
-		NetBufferPrepend(net_buffer *buffer)
+		NetBufferPrepend(net_buffer *buffer, size_t size = 0)
 			:
 			fBuffer(buffer),
 			fData(NULL)
 		{
-			fStatus = Module::Get()->prepend_size(buffer, sizeof(Type), (void **)&fData);
+			if (size == 0)
+				size = sizeof(Type);
+
+			fStatus = Module::Get()->prepend_size(buffer, size, (void **)&fData);
 		}
 
 		~NetBufferPrepend()
