@@ -21,7 +21,8 @@ resource(1, "BEOS:FILE_TYPES") message {
 	"types" = "application/x-zip-compressed",
 	"types" = "application/zip",
 	"types" = "application/x-gunzip",
-	"types" = "application/x-bzip2"
+	"types" = "application/x-bzip2",
+	"types" = "application/x-rar"
 };
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -427,4 +428,5 @@ resource(5, "BEOS:M:application/x-bzip2") #'MICN' array {
 	$"FFFFFFFFFFFF0000D98301FFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFF0000FFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-};          
+};
+
