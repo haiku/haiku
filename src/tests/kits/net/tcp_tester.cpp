@@ -1,6 +1,8 @@
 #include "argv.h"
+#include "tcp.h"
 #include "utility.h"
 
+#include <NetBufferUtilities.h>
 #include <net_buffer.h>
 #include <net_datalink.h>
 #include <net_protocol.h>
@@ -26,6 +28,8 @@ struct cmd_entry {
 
 
 extern "C" status_t _add_builtin_module(module_info *info);
+extern bool gDebugOutputEnabled;
+	// from libkernelland_emu.so
 
 extern struct net_buffer_module_info gNetBufferModule;
 	// from net_buffer.cpp
@@ -42,6 +46,8 @@ extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
 struct net_socket *gServerSocket, *gClientSocket;
 
+bool gTCPDump = true;
+
 static struct net_domain sDomain = {
 	"ipv4",
 	AF_INET,
@@ -49,6 +55,13 @@ static struct net_domain sDomain = {
 	&gDomainModule,
 	&gIPv4AddressModule
 };
+
+
+bool
+is_server(sockaddr *addr)
+{
+	return ((sockaddr_in *)addr)->sin_port == htons(1024);
+}
 
 
 //	#pragma mark - stack
@@ -473,6 +486,8 @@ get_route(struct net_domain *_domain, const struct sockaddr *address)
 {
 	static net_route route;
 	route.interface = &gInterface;
+	route.mtu = 1500;
+
 	return &route;
 }
 
@@ -585,7 +600,6 @@ status_t
 domain_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
-	printf("send routed buffer %p!\n", buffer);
 	return sDomain.module->receive_data(buffer);
 }
 
@@ -629,6 +643,95 @@ domain_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 domain_receive_data(net_buffer *buffer)
 {
+	static uint32 packetNumber = 1;
+
+	if (gTCPDump) {
+		NetBufferHeader<tcp_header> bufferHeader(buffer);
+		if (bufferHeader.Status() < B_OK)
+			return bufferHeader.Status();
+
+		tcp_header &header = bufferHeader.Data();
+
+		printf("% 3ld ", packetNumber++);
+
+		if (is_server((sockaddr *)&buffer->source))
+			printf("\33[31mserver > client: ");
+		else
+			printf("client > server: ");
+
+		int32 length = buffer->size - header.HeaderLength();
+
+		if ((header.flags & TCP_FLAG_PUSH) != 0)
+			putchar('P');
+		if ((header.flags & TCP_FLAG_SYNCHRONIZE) != 0)
+			putchar('S');
+		if ((header.flags & TCP_FLAG_FINISH) != 0)
+			putchar('F');
+		if ((header.flags & TCP_FLAG_RESET) != 0)
+			putchar('R');
+		if ((header.flags
+			& (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_PUSH | TCP_FLAG_RESET)) == 0)
+			putchar('.');
+
+		printf(" %lu:%lu (%lu)", header.Sequence(), header.Sequence() + length, length);
+		if ((header.flags & TCP_FLAG_ACKNOWLEDGE) != 0)
+			printf(" ack %lu", header.Acknowledge());
+
+		printf(" win %u", header.AdvertisedWindow());
+
+		if (header.HeaderLength() > sizeof(tcp_header)) {
+			int32 size = header.HeaderLength() - sizeof(tcp_header);
+
+			tcp_option *option;
+			uint8 optionsBuffer[1024];
+			if (gBufferModule->direct_access(buffer, sizeof(tcp_header),
+					size, (void **)&option) != B_OK) {
+				if (size > 1024) {
+					printf("options too large to take into account (%ld bytes)\n", size);
+					size = 1024;
+				}
+
+				gBufferModule->read(buffer, sizeof(tcp_header), optionsBuffer, size);
+				option = (tcp_option *)optionsBuffer;
+			}
+
+			while (size > 0) {
+				uint32 length = 1;
+				switch (option->kind) {
+					case TCP_OPTION_END:
+					case TCP_OPTION_NOP:
+						break;
+					case TCP_OPTION_MAX_SEGMENT_SIZE:
+						printf(" <mss %u>", ntohs(option->max_segment_size));
+						length = 4;
+						break;
+					case TCP_OPTION_WINDOW_SHIFT:
+						printf(" <ws %u>", option->window_shift);
+						length = 3;
+						break;
+					case TCP_OPTION_TIMESTAMP:
+						printf(" <ts %lu:%lu>", option->timestamp, option->timestamp_reply);
+						length = 10;
+						break;
+
+					default:
+						length = option->length;
+						// make sure we don't end up in an endless loop
+						if (length == 0)
+							size = 0;
+						break;
+				}
+
+				size -= length;
+				option = (tcp_option *)((uint8 *)option + length);
+			}
+		}
+
+		printf("\33[0m\n");
+
+		bufferHeader.Detach();
+	}
+
 	return gTCPModule->receive_data(buffer);
 }
 
@@ -727,8 +830,21 @@ do_connect(int argc, char** argv)
 }
 
 
+static void
+do_dprintf(int argc, char** argv)
+{
+	if (argc > 1)
+		gDebugOutputEnabled = !strcmp(argv[1], "on");
+	else
+		gDebugOutputEnabled = !gDebugOutputEnabled;
+
+	printf("debug output turned %s.\n", gDebugOutputEnabled ? "on" : "off");
+}
+
+
 static cmd_entry sBuiltinCommands[] = {
 	{"connect", do_connect, "Connects the client"},
+	{"dprintf", do_dprintf, "Toggles debug output"},
 	{"help", do_help, "prints this help text"},
 	{"quit", NULL, "exits the application"},
 	{NULL, NULL, NULL},

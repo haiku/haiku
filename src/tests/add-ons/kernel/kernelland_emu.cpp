@@ -29,6 +29,8 @@ static const char *gModuleDirs[] = {
 	NULL
 };
 
+bool gDebugOutputEnabled = true;
+
 struct module_name_list {
 	set<string>				names;
 	set<string>::iterator	it;
@@ -695,7 +697,7 @@ devfs_publish_partition(const char *path, const partition_info *info)
 }
 
 
-void
+extern "C" void
 panic(const char *format, ...)
 {
 	va_list args;
@@ -709,10 +711,12 @@ panic(const char *format, ...)
 }
 
 
-// dprintf
-void
+extern "C" void
 dprintf(const char *format,...)
 {
+	if (!gDebugOutputEnabled)
+		return;
+
 	va_list args;
 	va_start(args, format);
 	printf("\33[34m");
@@ -721,9 +725,45 @@ dprintf(const char *format,...)
 	va_end(args);
 }
 
-// user_memcpy
-extern "C"
-status_t
+
+extern "C" void
+dump_block(const char *buffer, int size, const char *prefix)
+{
+	const int DUMPED_BLOCK_SIZE = 16;
+	int i;
+	
+	for (i = 0; i < size;) {
+		int start = i;
+
+		dprintf(prefix);
+		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (!(i % 4))
+				dprintf(" ");
+
+			if (i >= size)
+				dprintf("  ");
+			else
+				dprintf("%02x", *(unsigned char *)(buffer + i));
+		}
+		dprintf("  ");
+
+		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (i < size) {
+				char c = buffer[i];
+
+				if (c < 30)
+					dprintf(".");
+				else
+					dprintf("%c", c);
+			} else
+				break;
+		}
+		dprintf("\n");
+	}
+}
+
+
+extern "C" status_t
 user_memcpy(void *to, const void *from, size_t size)
 {
 	char *tmp = (char *)to;
@@ -735,9 +775,8 @@ user_memcpy(void *to, const void *from, size_t size)
 	return 0;
 }
 
-//user_strcpy
-extern "C"
-int
+
+extern "C" int
 user_strcpy(char *to, const char *from)
 {
 	while ((*to++ = *from++) != '\0')
@@ -745,7 +784,7 @@ user_strcpy(char *to, const char *from)
 	return 0;
 }
 
-// user_strlcpy
+
 /*!	\brief Copies at most (\a size - 1) characters from the string in \a from to
 	the string in \a to, NULL-terminating the result.
 
@@ -755,8 +794,7 @@ user_strcpy(char *to, const char *from)
 	
 	\return strlen(\a from).
 */
-extern "C"
-ssize_t 
+extern "C" ssize_t 
 user_strlcpy(char *to, const char *from, size_t size)
 {
 	int from_length = 0;
@@ -774,17 +812,6 @@ user_strlcpy(char *to, const char *from, size_t size)
 		from_length++;
 
 	return from_length;
-}
-
-
-/*! Needed for locking */
-
-bool kernel_startup = false;
-
-extern "C" bool
-arch_int_are_interrupts_enabled(void)
-{
-	return true;
 }
 
 
