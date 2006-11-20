@@ -104,7 +104,7 @@ for inSuperFile in $mimeDBSource/*.super; do
 	# iterate through the sub types
 	for inSubFile in $mimeDBSource/$superType/*; do
 		# check, if the type exists
-		if test -f $inSubFile && grep META:TYPE $inSubFile &> /dev/null; then
+		if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
 			subType=$(basename $inSubFile)
 			outSubFile=$outSuperDir/$subType
 
