@@ -74,7 +74,7 @@ tcp_dump_hash()
 	hash_close(gConnectionHash, &iterator, false);
 }
 #else
-#	define DUMP_TCP_HASH 0
+#	define DUMP_TCP_HASH ;
 #endif
 
 
@@ -100,17 +100,63 @@ set_domain(net_interface *interface = NULL)
 }
 
 
+static inline void
+bump_option(tcp_option *&option, size_t &length)
+{
+	length = option->length;
+	option = (tcp_option *)((uint8 *)option + option->length);
+}
+
+
+static inline size_t
+add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
+{
+	tcp_option *option = (tcp_option *)buffer;
+	size_t length = 0;
+
+	if (segment.max_segment_size > 0 && length + 8 < bufferSize) {
+		option->kind = TCP_OPTION_MAX_SEGMENT_SIZE;
+		option->length = 4;
+		option->max_segment_size = htons(segment.max_segment_size);
+		bump_option(option, length);
+	}
+	if (segment.window_shift > 0 && length + 4 < bufferSize) {
+		option->kind = TCP_OPTION_WINDOW_SHIFT;
+		option->length = 3;
+		option->window_shift = segment.window_shift;
+		bump_option(option, length);
+	}
+
+	if (length == 0) {
+		// no option defined
+		return 0;
+	}
+
+	while ((length + 1) & 0x3) {
+		// bump to a multiple of 4 length
+		option->kind = TCP_OPTION_NOP;
+		option = (tcp_option *)((uint8 *)option + 1);
+		length++;
+	}
+
+	option->kind = TCP_OPTION_END;
+	return length + 1;
+}
+
+
 /*!
 	Constructs a TCP header on \a buffer with the specified values
 	for \a flags, \a seq \a ack and \a advertisedWindow.
 */
 status_t
-add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
-	uint32 acknowledge, uint16 advertisedWindow)
+add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 {
 	buffer->protocol = IPPROTO_TCP;
 
-	NetBufferPrepend<tcp_header> bufferHeader(buffer);
+	uint8 optionsBuffer[32];
+	uint32 optionsLength = add_options(segment, optionsBuffer, sizeof(optionsBuffer));
+
+	NetBufferPrepend<tcp_header> bufferHeader(buffer, sizeof(tcp_header) + optionsLength);
 	if (bufferHeader.Status() != B_OK)
 		return bufferHeader.Status();
 
@@ -118,19 +164,22 @@ add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
 
 	header.source_port = gAddressModule->get_port((sockaddr *)&buffer->source);
 	header.destination_port = gAddressModule->get_port((sockaddr *)&buffer->destination);
-	header.sequence = htonl(sequence);
-	header.acknowledge = (flags & TCP_FLAG_ACKNOWLEDGE) ? htonl(acknowledge) : 0;
+	header.sequence = htonl(segment.sequence);
+	header.acknowledge = (segment.flags & TCP_FLAG_ACKNOWLEDGE)
+		? htonl(segment.acknowledge) : 0;
 	header.reserved = 0;
-	header.header_length = sizeof(tcp_header) >> 2;
-		// currently no options supported
-	header.flags = (uint8)flags;
-	header.advertised_window = htons(advertisedWindow);
+	header.header_length = (sizeof(tcp_header) + optionsLength) >> 2;
+	header.flags = segment.flags;
+	header.advertised_window = htons(segment.advertised_window);
 	header.checksum = 0;
 	header.urgent_offset = 0;
 		// TODO: urgent pointer not yet supported
 
-	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu\n", buffer,
-		flags, sequence, acknowledge));
+	if (optionsLength > 0)
+		gBufferModule->write(buffer, sizeof(tcp_header), optionsBuffer, optionsLength);
+
+	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, win %u\n", buffer,
+		segment.flags, segment.sequence, segment.acknowledge, segment.advertised_window));
 
 	// compute and store checksum
 	Checksum checksum;
@@ -146,8 +195,64 @@ add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
 }
 
 
+void
+process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
+{
+	segment.window_shift = 0;
+	segment.max_segment_size = 0;
+
+	if (size == 0)
+		return;
+
+	tcp_option *option;
+	uint8 optionsBuffer[32];
+	if (gBufferModule->direct_access(buffer, sizeof(tcp_header), size,
+			(void **)&option) != B_OK) {
+		if (size > 32) {
+			dprintf("options too large to take into account (%ld bytes)\n", size);
+			return;
+		}
+
+		gBufferModule->read(buffer, sizeof(tcp_header), optionsBuffer, size);
+		option = (tcp_option *)optionsBuffer;
+	}
+
+	while (size > 0) {
+		uint32 length = 1;
+		switch (option->kind) {
+			case TCP_OPTION_END:
+			case TCP_OPTION_NOP:
+				break;
+			case TCP_OPTION_MAX_SEGMENT_SIZE:
+				segment.max_segment_size = ntohs(option->max_segment_size);
+				length = 4;
+				break;
+			case TCP_OPTION_WINDOW_SHIFT:
+				segment.window_shift = option->window_shift;
+				length = 3;
+				break;
+			case TCP_OPTION_TIMESTAMP:
+				// TODO: support timestamp!
+				length = 10;
+				break;
+
+			default:
+				length = option->length;
+				// make sure we don't end up in an endless loop
+				if (length == 0)
+					return;
+				break;
+		}
+
+		size -= length;
+		option = (tcp_option *)((uint8 *)option + length);
+	}
+	// TODO: check if options are valid!
+}
+
+
 status_t
-reply_with_reset(tcp_segment_header& segment, net_buffer *buffer)
+reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
 {
 	TRACE(("TCP: Sending RST...\n"));
 
@@ -160,21 +265,22 @@ reply_with_reset(tcp_segment_header& segment, net_buffer *buffer)
 	gAddressModule->set_to((sockaddr *)&reply->destination,
 		(sockaddr *)&buffer->source);
 
-	uint8 flags = TCP_FLAG_RESET;
-	uint32 acknowledge = 0;
-	uint32 sequence = 0;
+	tcp_segment_header outSegment;
+	outSegment.flags = TCP_FLAG_RESET;
+	outSegment.sequence = 0;
+	outSegment.acknowledge = 0;
+	outSegment.advertised_window = 0;
+	outSegment.urgent_offset = 0;
 
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) == 0) {
-		flags |= TCP_FLAG_ACKNOWLEDGE;
-		acknowledge = segment.sequence + buffer->size;
+		outSegment.flags |= TCP_FLAG_ACKNOWLEDGE;
+		outSegment.acknowledge = segment.sequence + buffer->size;
 	} else
-		sequence = segment.acknowledge;
+		outSegment.sequence = segment.acknowledge;
 
-	status_t status = add_tcp_header(reply, flags,
-		sequence, acknowledge, 0);
-	if (status == B_OK) {
+	status_t status = add_tcp_header(segment, reply);
+	if (status == B_OK)
 		status = gDomain->module->send_data(NULL, reply);
-	}
 
 	if (status != B_OK)
 		gBufferModule->free(reply);
@@ -277,7 +383,6 @@ tcp_init_protocol(net_socket *socket)
 status_t
 tcp_uninit_protocol(net_protocol *protocol)
 {
-	DUMP_TCP_HASH;
 	TRACE(("Deleting TCPConnection: %p\n", protocol));
 	delete (TCPConnection *)protocol;
 	return B_OK;
@@ -290,8 +395,6 @@ tcp_open(net_protocol *protocol)
 	if (gDomain == NULL && set_domain() != B_OK)
 		return B_ERROR;
 
-	DUMP_TCP_HASH;
-
 	return ((TCPConnection *)protocol)->Open();
 }
 
@@ -299,7 +402,6 @@ tcp_open(net_protocol *protocol)
 status_t
 tcp_close(net_protocol *protocol)
 {
-	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Close();
 }
 
@@ -307,7 +409,6 @@ tcp_close(net_protocol *protocol)
 status_t
 tcp_free(net_protocol *protocol)
 {
-	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Free();
 }
 
@@ -339,7 +440,6 @@ tcp_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 tcp_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Bind(address);
 }
 
@@ -347,7 +447,6 @@ tcp_bind(net_protocol *protocol, struct sockaddr *address)
 status_t
 tcp_unbind(net_protocol *protocol, struct sockaddr *address)
 {
-	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Unbind(address);
 }
 
@@ -454,15 +553,13 @@ tcp_receive_data(net_buffer *buffer)
 		AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
 		AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
 
-	DUMP_TCP_HASH;
-
-	// TODO: process options!
 	tcp_segment_header segment;
 	segment.sequence = header.Sequence();
 	segment.acknowledge = header.Acknowledge();
 	segment.advertised_window = header.AdvertisedWindow();
 	segment.urgent_offset = header.UrgentOffset();
 	segment.flags = header.flags;
+	process_options(segment, buffer, headerLength - sizeof(tcp_header));
 
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around

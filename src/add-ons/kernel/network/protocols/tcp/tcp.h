@@ -67,7 +67,7 @@ struct tcp_header {
 	uint16 AdvertisedWindow() const { return ntohs(advertised_window); }
 	uint16 Checksum() const { return ntohs(checksum); }
 	uint16 UrgentOffset() const { return ntohs(urgent_offset); }
-};
+} _PACKED;
 
 // TCP flag constants
 #define TCP_FLAG_FINISH			0x01
@@ -79,12 +79,36 @@ struct tcp_header {
 #define TCP_FLAG_ECN			0x40 // Explicit Congestion Notification echo
 #define TCP_FLAG_CWR			0x80 // Congestion Window Reduced
 
+struct tcp_option {
+	uint8	kind;
+	uint8	length;
+	union {
+		uint8	window_shift;
+		uint16	max_segment_size;
+		uint32	timestamp;
+	};
+	uint32	timestamp_reply;
+} _PACKED;
+
+enum tcp_option_kind {
+	TCP_OPTION_END	= 0,
+	TCP_OPTION_NOP	= 1,
+	TCP_OPTION_MAX_SEGMENT_SIZE = 2,
+	TCP_OPTION_WINDOW_SHIFT = 3,
+	TCP_OPTION_TIMESTAMP = 8,
+};
+
 struct tcp_segment_header {
+	tcp_segment_header() : window_shift(0), max_segment_size(0) {}
+		// constructor zeros options
+
 	uint32	sequence;
 	uint32	acknowledge;
 	uint16	advertised_window;
 	uint16	urgent_offset;
 	uint8	flags;
+	uint8	window_shift;
+	uint16	max_segment_size;
 };
 
 enum tcp_segment_action {
@@ -111,8 +135,7 @@ extern net_stack_module_info *gStackModule;
 //extern benaphore gConnectionLock;
 
 
-status_t add_tcp_header(net_buffer *buffer, uint16 flags, uint32 sequence,
-	uint32 ack, uint16 advertisedWindow);
+status_t add_tcp_header(tcp_segment_header &segment, net_buffer *buffer);
 status_t remove_connection(TCPConnection *connection);
 status_t insert_connection(TCPConnection *connection);
 

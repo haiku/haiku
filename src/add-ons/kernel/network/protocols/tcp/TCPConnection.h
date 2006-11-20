@@ -73,6 +73,7 @@ class TCPConnection : public net_protocol {
 		uint32			fLastAcknowledged;
 		uint32			fSendNext;
 		uint32			fSendWindow;
+		uint32			fMaxSegmentSize;
 		net_buffer		*fSendBuffer;
 
 		net_route 		*fRoute;
@@ -80,6 +81,7 @@ class TCPConnection : public net_protocol {
 
 		uint32			fReceiveNext;
 		uint32			fReceiveWindow;
+		uint32			fMaxReceiveSize;
 		bigtime_t		fAvgRTT;
 		net_buffer		*fReceiveBuffer;
 

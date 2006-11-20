@@ -92,7 +92,7 @@ TCPConnection::TCPConnection(net_socket *socket)
 	fSendBuffer(NULL),
 	fRoute(NULL),
 	fReceiveNext(0),
-	fReceiveWindow(0),
+	fReceiveWindow(32768),
 	fAvgRTT(TCP_INITIAL_RTT),
 	fReceiveBuffer(NULL),
 	fState(CLOSED),
@@ -263,6 +263,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 	TRACE(("  TCP: Connect(): starting 3-way handshake...\n"));
 
 	fState = SYNCHRONIZE_SENT;
+	fMaxReceiveSize = fRoute->mtu - 40;
 
 	// send SYN
 	status = _SendQueuedData(TCP_FLAG_SYNCHRONIZE, false);
@@ -581,7 +582,15 @@ TCPConnection::ListenReceive(tcp_segment_header& segment, net_buffer *buffer)
 	if (insert_connection(connection) < B_OK)
 		return DROP;
 
-	connection->fState = SYNCHRONIZE_SENT;
+	connection->fState = SYNCHRONIZE_RECEIVED;
+	connection->fMaxReceiveSize = connection->fRoute->mtu - 40;
+		// 40 bytes for IP and TCP header without any options
+		// TODO: make this depending on the RTF_LOCAL flag?
+	connection->fReceiveNext = segment.sequence + 1;
+		// account for the extra sequence number for the synchronization
+
+	if (segment.max_segment_size > 0)
+		connection->fMaxSegmentSize = segment.max_segment_size;
 
 	benaphore_lock(&connection->fSendLock);
 	status_t status = connection->_SendQueuedData(
@@ -663,14 +672,21 @@ TCPConnection::Receive(tcp_segment_header& segment, net_buffer *buffer)
 					return DROP;
 			} else if (fState == FINISH_SENT)
 				fState = FINISH_ACKNOWLEDGED;
+			else if (fState == SYNCHRONIZE_RECEIVED)
+				fState = ESTABLISHED;
 		}
+
+		fSendWindow = segment.advertised_window;
+
 		if (segment.flags & TCP_FLAG_FINISH) {
+			dprintf("peer is finishing connection!");
 			fReceiveNext++;
 
 			// other side is closing connection; change states
 			switch (fState) {
 				case ESTABLISHED:
 					fState = FINISH_RECEIVED;
+					action |= IMMEDIATE_ACKNOWLEDGE;
 					break;
 				case FINISH_ACKNOWLEDGED:
 					fState = TIME_WAIT;
@@ -691,7 +707,7 @@ TCPConnection::Receive(tcp_segment_header& segment, net_buffer *buffer)
 					break;
 			}
 		}
-		if (fState != FINISH_ACKNOWLEDGED)
+		if (buffer->size > 0 || (segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH)) != 0)
 			action |= ACKNOWLEDGE;
 	} else {
 		// out-of-order packet received, remind the other side of where we are
@@ -779,8 +795,19 @@ TCPConnection::_SendQueuedData(uint16 flags, bool empty)
 
 	uint32 size = buffer->size;
 
-	status_t status = add_tcp_header(buffer, flags, fSendNext,
-		fReceiveNext, fReceiveWindow);
+	tcp_segment_header segment;
+	segment.flags = (uint8)flags;
+	segment.sequence = fSendNext;
+	segment.acknowledge = fReceiveNext;
+	segment.advertised_window = fReceiveWindow;
+	segment.urgent_offset = 0;
+
+	if ((flags & TCP_FLAG_SYNCHRONIZE) != 0) {
+		// add connection establishment options
+		segment.max_segment_size = fMaxReceiveSize;
+	}
+
+	status_t status = add_tcp_header(segment, buffer);
 	if (status != B_OK) {
 		gBufferModule->free(buffer);
 		return status;
