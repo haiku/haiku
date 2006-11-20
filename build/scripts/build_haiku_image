@@ -93,7 +93,7 @@ for inSuperFile in $mimeDBSource/*.super; do
 	outSuperDir=$mimeDBDest/$superType
 
 	# compile rdef to rsrc file and the rsrc file to attributes
-	mimeTmpIndex=$[$mimeTmpIndex + 1]
+	mimeTmpIndex=$(($mimeTmpIndex + 1))
 	tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
 	tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
 	$rc -o $tmpFile $inSuperFile
@@ -109,7 +109,7 @@ for inSuperFile in $mimeDBSource/*.super; do
 			outSubFile=$outSuperDir/$subType
 
 			# compile rdef to rsrc file and the rsrc file to attributes
-			mimeTmpIndex=$[$mimeTmpIndex + 1]
+			mimeTmpIndex=$(($mimeTmpIndex + 1))
 			tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
 			tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
 			$rc -o $tmpFile $inSubFile
