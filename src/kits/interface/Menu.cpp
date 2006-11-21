@@ -1184,8 +1184,7 @@ BMenu::_show(bool selectFirstItem)
 	if (window->Lock()) {
 		fAttachAborted = false;
 		window->AttachMenu(this);
-		fCachedMenuWindow = window;
-
+		
 		// Menu didn't have the time to add its items: aborting...
 		if (fAttachAborted) {
 			window->DetachMenu();
@@ -1204,7 +1203,6 @@ BMenu::_show(bool selectFirstItem)
 			MoveTo(1, 1);
 	
 		UpdateWindowViewSize();
-		fCachedMenuWindow = NULL;
 		window->Show();
 		
 		if (selectFirstItem)
@@ -1259,8 +1257,9 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	while (true) {
 		if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
 			&& fExtraMenuData->trackingState != NULL) {
-			/*bool result =*/ fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
-			//printf("tracking hook returned %s\n", result ? "true" : "false");
+			bool quit = fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
+			if (quit)
+				break;
 		}
 		
 		bool locked = LockLooper();
@@ -2073,8 +2072,7 @@ BMenu::UpdateWindowViewSize(bool upWind)
 			// attach scrollers to our cached MenuWindow.
 			window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - 10);
 			
-			if (fCachedMenuWindow)
-				fCachedMenuWindow->AttachScrollers();
+			static_cast<BMenuWindow *>(window)->AttachScrollers();
 
 			frame.top = 0;
 		}
