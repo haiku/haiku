@@ -131,6 +131,7 @@ void
 PropertyListView::FrameResized(float width, float height)
 {
 	SetVisibleSize(width, height);
+	Invalidate();
 }
 
 // Draw
@@ -422,6 +423,7 @@ PropertyListView::SetTo(PropertyObject* object)
 
 	_UpdateSavedProperties();
 	_CheckMenuStatus();
+	Invalidate();
 }
 
 // PropertyChanged
@@ -666,8 +668,14 @@ PropertyListView::_LayoutItems()
 void
 PropertyListView::_CheckMenuStatus()
 {
-	if (!fPropertyM || !fSuspendUpdates)
+	if (!fPropertyM || fSuspendUpdates)
 		return;
+
+	if (!fPropertyObject) {
+		fPropertyM->SetEnabled(false);
+		return;
+	} else
+		fPropertyM->SetEnabled(false);
 
 	bool gotSelection = false;
 	for (int32 i = 0; PropertyItemView* item = _ItemAt(i); i++) {

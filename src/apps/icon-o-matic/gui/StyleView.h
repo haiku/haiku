@@ -50,7 +50,8 @@ class StyleView : public BView,
 			void				SetCurrentColor(CurrentColor* color);
 
  private:
-			void				_SetGradient(Gradient* gradient);
+			void				_SetGradient(Gradient* gradient,
+											 bool forceControlUpdate = false);
 			void				_MarkType(BMenu* menu,
 										  int32 type) const;
 			void				_SetStyleType(int32 type);

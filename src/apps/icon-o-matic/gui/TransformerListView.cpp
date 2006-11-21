@@ -13,14 +13,18 @@
 
 #include <Application.h>
 #include <ListItem.h>
-#include <Message.h>
+#include <Menu.h>
+#include <MenuItem.h>
 #include <Mime.h>
+#include <Message.h>
 #include <Window.h>
 
+#include "AddTransformersCommand.h"
 #include "CommandStack.h"
 #include "MoveTransformersCommand.h"
 #include "RemoveTransformersCommand.h"
 #include "Transformer.h"
+#include "TransformerFactory.h"
 #include "Observer.h"
 #include "Selection.h"
 
@@ -87,7 +91,8 @@ class TransformerItem : public SimpleItem,
 // #pragma mark -
 
 enum {
-	MSG_DRAG_TRANSFORMER = 'drgt',
+	MSG_DRAG_TRANSFORMER			= 'drgt',
+	MSG_ADD_TRANSFORMER				= 'adtr',
 };
 
 // constructor
@@ -113,6 +118,35 @@ TransformerListView::~TransformerListView()
 		fShape->RemoveListener(this);
 }
 
+// Draw
+void
+TransformerListView::Draw(BRect updateRect)
+{
+	SimpleListView::Draw(updateRect);
+
+	if (fShape)
+		return;
+
+	// display helpful messages
+	const char* message1 = "Click on a shape above";
+	const char* message2 = "to attach Transformers.";
+
+	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	font_height fh;
+	GetFontHeight(&fh);
+	BRect b(Bounds());
+
+	BPoint middle;
+	float textHeight = (fh.ascent + fh.descent) * 1.5;
+	middle.y = (b.top + b.bottom - textHeight) / 2.0;
+	middle.x = (b.left + b.right - StringWidth(message1)) / 2.0;
+	DrawString(message1, middle);
+
+	middle.y += textHeight;
+	middle.x = (b.left + b.right - StringWidth(message2)) / 2.0;
+	DrawString(message2, middle);
+}
+
 // SelectionChanged
 void
 TransformerListView::SelectionChanged()
@@ -131,6 +165,42 @@ TransformerListView::SelectionChanged()
 			message.AddPointer("transformer", item ? (void*)item->transformer : NULL);
 			Invoke(&message);
 		}
+	}
+}
+
+// MessageReceived
+void
+TransformerListView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_ADD_TRANSFORMER: {
+			if (!fShape || !fCommandStack)
+				break;
+		
+			uint32 type;
+			if (message->FindInt32("type", (int32*)&type) < B_OK)
+				break;
+		
+			Transformer* transformer
+				= TransformerFactory::TransformerFor(type,
+													 fShape->VertexSource());
+			if (!transformer)
+				break;
+		
+			Transformer* transformers[1];
+			transformers[0] = transformer;
+			::Command* command = new (nothrow) AddTransformersCommand(
+				fShape, transformers, 1, fShape->CountTransformers());
+		
+			if (!command)
+				delete transformer;
+		
+			fCommandStack->Perform(command);
+			break;
+		}
+		default:
+			SimpleListView::MessageReceived(message);
+			break;
 	}
 }
 
@@ -289,6 +359,32 @@ TransformerListView::StyleChanged(Style* oldStyle, Style* newStyle)
 
 // #pragma mark -
 
+// SetMenu
+void
+TransformerListView::SetMenu(BMenu* menu)
+{
+	if (fMenu == menu)
+		return;
+
+	fMenu = menu;
+	if (fMenu == NULL)
+		return;
+
+	BMenu* addMenu = new BMenu("Add");
+	int32 cookie = 0;
+	uint32 type;
+	BString name;
+	while (TransformerFactory::NextType(&cookie, &type, &name)) {
+		BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);
+		message->AddInt32("type", type);
+		addMenu->AddItem(new BMenuItem(name.String(), message));
+	}
+	addMenu->SetTargetForItems(this);
+	fMenu->AddItem(addMenu);
+
+	_UpdateMenu();
+}
+
 // SetShape
 void
 TransformerListView::SetShape(Shape* shape)
@@ -312,6 +408,8 @@ TransformerListView::SetShape(Shape* shape)
 	int32 count = fShape->CountTransformers();
 	for (int32 i = 0; i < count; i++)
 		_AddTransformer(fShape->TransformerAtFast(i), i);
+
+	_UpdateMenu();
 }
 
 // SetCommandStack
@@ -357,4 +455,9 @@ TransformerListView::_ItemForTransformer(Transformer* transformer) const
 	return NULL;
 }
 
-
+// _UpdateMenu
+void
+TransformerListView::_UpdateMenu()
+{
+	fMenu->SetEnabled(fShape != NULL);
+}

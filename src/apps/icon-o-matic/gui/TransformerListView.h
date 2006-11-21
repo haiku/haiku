@@ -12,6 +12,7 @@
 #include "ListViews.h"
 #include "Shape.h"
 
+class BMenu;
 class CommandStack;
 class Transformer;
 class TransformerItem;
@@ -27,7 +28,11 @@ class TransformerListView : public SimpleListView,
 	virtual						~TransformerListView();
 
 	// SimpleListView interface
+	virtual	void				Draw(BRect updateRect);
+
 	virtual	void				SelectionChanged();
+
+	virtual	void				MessageReceived(BMessage* message);
 
 	virtual	void				MakeDragMessage(BMessage* message) const;
 
@@ -48,6 +53,7 @@ class TransformerListView : public SimpleListView,
 	virtual	void				StyleChanged(Style* oldStyle, Style* newStyle);
 
 	// TransformerListView
+			void				SetMenu(BMenu* menu);
 			void				SetShape(Shape* shape);
 			void				SetCommandStack(CommandStack* stack);
 
@@ -60,10 +66,14 @@ class TransformerListView : public SimpleListView,
 			TransformerItem*	_ItemForTransformer(
 									Transformer* transformer) const;
 
+			void				_UpdateMenu();
+
 			BMessage*			fMessage;
 
 			Shape*				fShape;
 			CommandStack*		fCommandStack;
+
+			BMenu*				fMenu;
 };
 
 #endif // TRANSFORMER_LIST_VIEW_H

@@ -23,6 +23,8 @@ class IconObjectListView : public PropertyListView,
 	virtual						~IconObjectListView();
 
 	// PropertyListView interface
+	virtual	void				Draw(BRect updateRect);
+
 	virtual	void				PropertyChanged(const Property* previous,
 												const Property* current);
 	virtual	void				PasteProperties(const PropertyObject* object);

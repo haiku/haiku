@@ -153,6 +153,8 @@ StyleView::StyleView(BRect frame)
 	AddChild(fGradientControl);
 #endif // __HAIKU__
 
+	fStyleType->SetEnabled(false);
+	fGradientType->SetEnabled(false);
 	fGradientControl->SetEnabled(false);
 	fGradientControl->Gradient()->AddObserver(this);
 }
@@ -295,9 +297,12 @@ StyleView::SetStyle(Style* style)
 
 		if (fCurrentColor && !gradient)
 			fCurrentColor->SetColor(fStyle->Color());
-	}
 
-	_SetGradient(gradient);
+		fStyleType->SetEnabled(true);
+	} else
+		fStyleType->SetEnabled(false);
+
+	_SetGradient(gradient, true);
 }
 
 // SetCommandStack
@@ -327,9 +332,9 @@ StyleView::SetCurrentColor(CurrentColor* color)
 
 // _SetGradient
 void
-StyleView::_SetGradient(Gradient* gradient)
+StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate)
 {
-	if (fGradient == gradient)
+	if (!forceControlUpdate && fGradient == gradient)
 		return;
 
 	if (fGradient)

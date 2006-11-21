@@ -39,6 +39,40 @@ IconObjectListView::~IconObjectListView()
 	_SetObject(NULL);
 }
 
+// Draw
+void
+IconObjectListView::Draw(BRect updateRect)
+{
+	PropertyListView::Draw(updateRect);
+
+	if (fObject)
+		return;
+
+	// display helpful messages
+	const char* message1 = "Click on an object in";
+	const char* message2 = "any of the other lists to";
+	const char* message3 = "edit it's properties here.";
+
+	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	font_height fh;
+	GetFontHeight(&fh);
+	BRect b(Bounds());
+
+	BPoint middle;
+	float textHeight = (fh.ascent + fh.descent) * 1.5;
+	middle.y = (b.top + b.bottom) / 2.0 - textHeight;
+	middle.x = (b.left + b.right - StringWidth(message1)) / 2.0;
+	DrawString(message1, middle);
+
+	middle.y += textHeight;
+	middle.x = (b.left + b.right - StringWidth(message2)) / 2.0;
+	DrawString(message2, middle);
+
+	middle.y += textHeight;
+	middle.x = (b.left + b.right - StringWidth(message3)) / 2.0;
+	DrawString(message3, middle);
+}
+
 // PropertyChanged
 void
 IconObjectListView::PropertyChanged(const Property* previous,

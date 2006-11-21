@@ -29,7 +29,6 @@
 #include "AddPathsCommand.h"
 #include "AddShapesCommand.h"
 #include "AddStylesCommand.h"
-#include "AddTransformersCommand.h"
 #include "CanvasView.h"
 #include "CommandStack.h"
 #include "CompoundCommand.h"
@@ -45,7 +44,6 @@
 #include "StyleListView.h"
 #include "StyleView.h"
 #include "SwatchGroup.h"
-#include "TransformerFactory.h"
 #include "TransformerListView.h"
 #include "TransformGradientBox.h"
 #include "TransformShapesBox.h"
@@ -77,8 +75,6 @@ enum {
 
 	MSG_SHAPE_RESET_TRANSFORMATION	= 'rtsh',
 	MSG_STYLE_RESET_TRANSFORMATION	= 'rtst',
-
-	MSG_ADD_TRANSFORMER				= 'adtr',
 
 	MSG_MOUSE_FILTER_MODE			= 'mfmd',
 };
@@ -268,7 +264,6 @@ case MSG_SHAPE_SELECTED: {
 
 	fState->DeleteManipulators();
 	if (selectedShapes.CountItems() > 0) {
-printf("selected shapes: %ld\n", selectedShapes.CountItems());
 		TransformShapesBox* transformBox = new (nothrow) TransformShapesBox(
 			fCanvasView,
 			(const Shape**)selectedShapes.Items(),
@@ -277,33 +272,6 @@ printf("selected shapes: %ld\n", selectedShapes.CountItems());
 	}
 	break;
 }
-		case MSG_ADD_TRANSFORMER: {
-			Shape* shape = fPathListView->CurrentShape();
-			if (!shape)
-				break;
-
-			uint32 type;
-			if (message->FindInt32("type", (int32*)&type) < B_OK)
-				break;
-
-			Transformer* transformer
-				= TransformerFactory::TransformerFor(type,
-													 shape->VertexSource());
-			if (!transformer)
-				break;
-
-			Transformer* transformers[1];
-			transformers[0] = transformer;
-			::Command* command = new (nothrow) AddTransformersCommand(
-				shape, transformers, 1, shape->CountTransformers());
-
-			if (!command)
-				delete transformer;
-
-			fDocument->CommandStack()->Perform(command);
-			break;
-		}
-
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -499,6 +467,7 @@ MainWindow::_Init()
 	fShapeListView->SetCommandStack(fDocument->CommandStack());
 	fShapeListView->SetSelection(fDocument->Selection());
 
+	fTransformerListView->SetMenu(fTransformerMenu);
 	fTransformerListView->SetCommandStack(fDocument->CommandStack());
 	fTransformerListView->SetSelection(fDocument->Selection());
 
@@ -1018,19 +987,6 @@ MainWindow::_CreateMenuBar(BRect frame)
 	filterModeMenu->SetRadioMode(true);
 
 	settingsMenu->AddItem(filterModeMenu);
-
-	// Transformer
-	BMenu* addMenu = new BMenu("Add");
-	int32 cookie = 0;
-	uint32 type;
-	BString name;
-	while (TransformerFactory::NextType(&cookie, &type, &name)) {
-		message = new BMessage(MSG_ADD_TRANSFORMER);
-		message->AddInt32("type", type);
-		addMenu->AddItem(new BMenuItem(name.String(), message));
-	}
-	addMenu->SetTargetForItems(this);
-	fTransformerMenu->AddItem(addMenu);
 
 	return menuBar;
 }
