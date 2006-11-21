@@ -1335,9 +1335,10 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		if (locked)
 			UnlockLooper();
 		
-		if (buttons != 0 && IsStickyMode())
+		if (buttons != 0 && IsStickyMode()) {
 			SetStickyMode(false);
-		else if (buttons == 0 && !IsStickyMode()) {
+			trackTime = 0;
+		} else if (buttons == 0 && !IsStickyMode()) {
 			if (system_time() < trackTime + 1000000
 				|| (fExtraRect != NULL && fExtraRect->Contains(location)))
 				SetStickyMode(true);
