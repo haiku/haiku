@@ -32,7 +32,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
 	defines = BEOS_THREADS GNU_ASSEMBLER ;
 
 	if $(TARGET_ARCH) = x86 {
-		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM ; #USE_SSE_ASM ;
+		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM ; 
+		if $(TARGET_PLATFORM != haiku) {
+			# FIXME: Remove me when Haiku SSE support will be fixed.
+			defines += USE_SSE_ASM ;
+		}
 	} else {
 		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
 		# defines += USE_PPC_ASM ;

@@ -24,7 +24,15 @@ extern "C" {
 	#include "tnl/tnl.h"
 	#include "tnl/t_context.h"
 	#include "tnl/t_pipeline.h"
+	
+	
+	#if defined(USE_X86_ASM)
+	#include "x86/common_x86_asm.h"
+	#endif
 
+	#if defined(USE_PPC_ASM)
+	#include "ppc/common_ppc_features.h"
+	#endif
 }
 
 extern const char * color_space_name(color_space space);
@@ -294,8 +302,51 @@ const GLubyte *
 MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 {
 	switch (name) {
-		case GL_RENDERER:
-			return (const GLubyte *) "Haiku's OpenGL Software Renderer, powered by Mesa " MESA_VERSION_STRING ;
+		case GL_RENDERER: {
+			static char buffer[256] = { '\0' };
+
+			if (!buffer[0] ) {
+				// Let's build an renderer string
+				strncat(buffer, "Haiku's Mesa " MESA_VERSION_STRING " Software Renderer", sizeof(buffer));
+
+			   // Append any CPU-specific information.
+#ifdef USE_X86_ASM
+				if (_mesa_x86_cpu_features)
+					strncat(buffer, " x86", sizeof(buffer));
+	#ifdef USE_MMX_ASM
+   				if (cpu_has_mmx)
+   					strncat(buffer, (cpu_has_mmxext) ? "/MMX+" : "/MMX", sizeof(buffer));
+	#endif
+	#ifdef USE_3DNOW_ASM
+				if (cpu_has_3dnow)
+   					strncat(buffer, (cpu_has_3dnowext) ? "/3DNow!+" : "/3DNow!", sizeof(buffer));
+	#endif
+	#ifdef USE_SSE_ASM
+				if (cpu_has_xmm)
+   					strncat(buffer, (cpu_has_xmm2) ? "/SSE2" : "/SSE", sizeof(buffer));
+	#endif
+
+#elif defined(USE_SPARC_ASM)
+
+				strncat(buffer, " SPARC", sizeof(buffer));
+
+#elif defined(USE_PPC_ASM)
+
+				if (_mesa_ppc_cpu_features)
+					strncat(buffer, (cpu_has_64) ? " PowerPC 64" : " PowerPC", sizeof(buffer));
+
+	#ifdef USE_VMX_ASM
+				if (cpu_has_vmx)
+					strncat(buffer, "/Altivec", sizeof(buffer));
+	#endif
+
+				if (! cpu_has_fpu)
+					strncat(buffer, "/No FPU", sizeof(buffer));
+#endif				
+			
+			}
+			return (const GLubyte *) buffer;
+		}
 		default:
 			// Let core library handle all other cases
 			return NULL;
