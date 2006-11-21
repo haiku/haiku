@@ -21,6 +21,7 @@ static struct list sTimers;
 static benaphore sTimerLock;
 static sem_id sTimerWaitSem;
 static thread_id sTimerThread;
+static bigtime_t sTimerTimeout;
 
 
 uint16
@@ -256,6 +257,7 @@ timer_thread(void * /*data*/)
 				}
 			}
 
+			sTimerTimeout = timeout;
 			benaphore_unlock(&sTimerLock);
 		}
 
@@ -307,10 +309,11 @@ set_timer(net_timer *timer, bigtime_t delay)
 		// add this timer
 		timer->due = system_time() + delay;
 		list_add_item(&sTimers, timer);
-	}
 
-	// notify timer about the change
-	release_sem(sTimerWaitSem);
+		// notify timer about the change if necessary
+		if (sTimerTimeout > timer->due)
+			release_sem(sTimerWaitSem);
+	}
 }
 
 
@@ -318,6 +321,7 @@ status_t
 init_timers(void)
 {
 	list_init(&sTimers);
+	sTimerTimeout = B_INFINITE_TIMEOUT;
 
 	status_t status = benaphore_init(&sTimerLock, "net timer");
 	if (status < B_OK)
