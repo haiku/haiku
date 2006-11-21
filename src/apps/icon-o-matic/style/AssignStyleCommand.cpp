@@ -38,7 +38,7 @@ AssignStyleCommand::~AssignStyleCommand()
 status_t
 AssignStyleCommand::InitCheck()
 {
-	return fShape && fOldStyle && fNewStyle ? B_OK : B_NO_INIT;
+	return fShape && fNewStyle ? B_OK : B_NO_INIT;
 }
 
 // Perform

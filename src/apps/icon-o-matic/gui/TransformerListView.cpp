@@ -400,14 +400,13 @@ TransformerListView::SetShape(Shape* shape)
 
 	fShape = shape;
 
-	if (!fShape)
-		return;
-
-	fShape->AddListener(this);
-
-	int32 count = fShape->CountTransformers();
-	for (int32 i = 0; i < count; i++)
-		_AddTransformer(fShape->TransformerAtFast(i), i);
+	if (fShape) {
+		fShape->AddListener(this);
+	
+		int32 count = fShape->CountTransformers();
+		for (int32 i = 0; i < count; i++)
+			_AddTransformer(fShape->TransformerAtFast(i), i);
+	}
 
 	_UpdateMenu();
 }
