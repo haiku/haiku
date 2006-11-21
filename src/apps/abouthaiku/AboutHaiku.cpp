@@ -598,10 +598,14 @@ UptimeToString(char string[], size_t size)
 				str != string ? ", " : "",
 				minutes, minutes > 1 ? "s" : "");	
 	}
-	// Always show second(s)...
-	str += snprintf(str, size - strlen(string), "%s%lld second%s",
+	
+	if (seconds || str == string) {
+		// Haiku would be well-known to boot very fast.
+		// Let's be ready to handle below minute uptime, zero second included ;-)  
+		str += snprintf(str, size - strlen(string), "%s%lld second%s",
 				str != string ? ", " : "",
 				seconds, seconds > 1 ? "s" : "");	
+	}
 
 	return string;
 }
