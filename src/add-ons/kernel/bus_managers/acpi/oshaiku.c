@@ -128,31 +128,9 @@
 #include <OS.h>
 
 #ifdef _KERNEL_MODE
-#	include "pci_controller.h"
 #	include <KernelExport.h>
-
-void		*pci_ram_address(const void *physical_address_in_system_memory);
-
-status_t	pci_io_init(void);
-uint8		pci_read_io_8(int mapped_io_addr);
-void		pci_write_io_8(int mapped_io_addr, uint8 value);
-uint16		pci_read_io_16(int mapped_io_addr);
-void		pci_write_io_16(int mapped_io_addr, uint16 value);
-uint32		pci_read_io_32(int mapped_io_addr);
-void		pci_write_io_32(int mapped_io_addr, uint32 value);
-
-pci_controller *gController = NULL;
-void *gControllerCookie;
-
-status_t
-pci_controller_add(pci_controller *controller, void *cookie)
-{
-	gController = controller;
-	gControllerCookie = cookie;
-	return B_OK;
-}
-
-
+#include <PCI.h>
+extern pci_module_info *gPCIManager;
 #endif
 
 #include "acpi.h"
@@ -188,11 +166,6 @@ AcpiOsInitialize (void)
 #else
 	AcpiGbl_OutputFile = NULL;
 #endif
-
-	if (pci_io_init() != B_OK)
-		return AE_ERROR;
-	if (pci_controller_init() != B_OK)
-		return AE_ERROR;
 	
     return AE_OK;
 }
@@ -1072,8 +1045,13 @@ AcpiOsReadPciConfiguration (
 {
 
 #ifdef _KERNEL_MODE
-	gController->read_pci_config(gControllerCookie,
-		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8, Value);
+	UINT32 val = gPCIManager->read_pci_config(
+		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8);
+	switch (Width) {
+		case 1: *(UINT8*)Value = val;
+		case 2: *(UINT16*)Value = val;
+		case 4: *(UINT32*)Value = val;
+	}
 #endif  
 
     return (AE_OK);
@@ -1104,7 +1082,7 @@ AcpiOsWritePciConfiguration (
 {
 
 #ifdef _KERNEL_MODE
-	gController->write_pci_config(gControllerCookie, 
+	gPCIManager->write_pci_config( 
 		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8, Value);
 #endif
     
@@ -1148,15 +1126,15 @@ AcpiOsReadPort (
     switch (Width)
     {
     case 8:
-        *Value = pci_read_io_8(Address);
+        *Value = gPCIManager->read_io_8(Address);
         break;
 
     case 16:
-        *Value = pci_read_io_16(Address);
+        *Value = gPCIManager->read_io_16(Address);
         break;
 
     case 32:
-        *Value = pci_read_io_32(Address);
+        *Value = gPCIManager->read_io_32(Address);
         break;
     }
     
@@ -1191,15 +1169,15 @@ AcpiOsWritePort (
 
 	switch (Width) {
 	case 8:
-		pci_write_io_8(Address,Value);
+		gPCIManager->write_io_8(Address,Value);
 		break;
 
 	case 16:
-		pci_write_io_16(Address,Value);
+		gPCIManager->write_io_16(Address,Value);
 		break;
 
 	case 32:
-		pci_write_io_32(Address,Value);
+		gPCIManager->write_io_32(Address,Value);
 		break;
 	}
 
@@ -1232,7 +1210,7 @@ AcpiOsReadMemory (
 
 #ifdef _KERNEL_MODE
 
-    memcpy(Value, pci_ram_address(ACPI_TO_POINTER(Address)), Width/8);
+    memcpy(Value, gPCIManager->ram_address(ACPI_TO_POINTER(Address)), Width/8);
     
 #endif
 
@@ -1263,7 +1241,7 @@ AcpiOsWriteMemory (
 
 #ifdef _KERNEL_MODE
 
-    memcpy(pci_ram_address(ACPI_TO_POINTER(Address)), &Value, Width/8);
+    memcpy(gPCIManager->ram_address(ACPI_TO_POINTER(Address)), &Value, Width/8);
 
 #endif
 

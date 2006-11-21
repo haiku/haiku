@@ -91,7 +91,7 @@ acpi_std_ops(int32 op,...)
 			break;
 		
 		case B_MODULE_UNINIT:
-			/*Status = AcpiTerminate();*/
+			Status = AcpiTerminate();
 			if (Status != AE_OK)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
 			

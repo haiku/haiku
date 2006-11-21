@@ -13,9 +13,34 @@
 // information about one ACPI device
 typedef struct acpi_device_info {
 	char			*path;			// path
+	uint32			type;			// type	
 	device_node_handle	node;
 	char			name[32];		// name (for fast log)
 } acpi_device_info;
+
+
+static uint32 
+acpi_get_object_type(acpi_device device)
+{
+	return device->type;
+}
+
+
+static status_t 
+acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_value) 
+{
+	char objname[255];
+	sprintf(objname, "%s.%s", device->path, path);
+	return get_object(objname, return_value);
+}
+
+
+static status_t 
+acpi_evaluate_method(acpi_device device, const char *method, acpi_object_type *return_value, 
+	size_t buf_len, acpi_object_type *args, int num_args) 
+{
+	return evaluate_method(device->path, method, return_value, buf_len, args, num_args);
+}
 
 
 static status_t
@@ -24,18 +49,23 @@ acpi_device_init_driver(device_node_handle node, void *user_cookie, void **cooki
 	char *path;
 	acpi_device_info *device;
 	status_t status = B_OK;
+	uint32 type;
 	
+	if (gDeviceManager->get_attr_uint32(node, ACPI_DEVICE_TYPE_ITEM, &type, false) != B_OK)
+		return B_ERROR;
 	if (gDeviceManager->get_attr_string(node, ACPI_DEVICE_PATH_ITEM, &path, false) != B_OK)
 		return B_ERROR;
-
+	
 	device = malloc(sizeof(*device));
 	if (device == NULL) {
+		free(path);
 		return B_NO_MEMORY;
 	}
 
 	memset(device, 0, sizeof(*device));
 
 	device->path = path;
+	device->type = type;
 	device->node = node;
 	
 	snprintf(device->name, sizeof(device->name), "acpi_device %s", 
@@ -86,6 +116,7 @@ acpi_device_module_info gACPIDeviceModule = {
 		NULL,		// cleanup
 		NULL,		// get supported paths
 	},
-
-	
+	acpi_get_object_type,
+	acpi_get_object,
+	acpi_evaluate_method,
 };

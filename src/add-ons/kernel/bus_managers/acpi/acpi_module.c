@@ -7,11 +7,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "acpi_priv.h"
+#include <PCI.h>
 
 device_manager_info *gDeviceManager;
+pci_module_info *gPCIManager;
 
 module_dependency module_dependencies[] = {
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
+	{B_PCI_MODULE_NAME, (module_info **)&gPCIManager},
 	{}
 };
 
@@ -51,6 +54,9 @@ acpi_module_register_device(device_node_handle parent)
 		//{ PNP_BUS_DEFER_PROBE, B_UINT8_TYPE, { ui8: 1 }},
 		// don't scan if loaded as we own I/O resources
 		//{ PNP_DRIVER_NO_LIVE_RESCAN, B_UINT8_TYPE, { ui8: 1 }},
+		
+		// tell ns dump driver to register a device in devfs
+		{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: ACPI_NS_DUMP_MODULE_NAME }},
 		{}
 	};
 
@@ -68,11 +74,17 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 	void *counter = NULL;
 
 	dprintf("acpi_enumerate_child_devices: recursing from %s\n", root);
-	
+
 	while (get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		uint32 type = get_object_type(result);
 		device_node_handle deviceNode;
-	
+
+		if (!strcmp("\\_PR_", result) || !strcmp("\\_TZ_", result)
+			|| !strcmp("\\_SI_", result) || !strcmp("\\_SB_", result)) {
+			acpi_enumerate_child_devices(node, result);
+			continue;
+		}
+		
 		switch (type) {
 		case ACPI_TYPE_DEVICE: {
 			char hid[9] = "";
@@ -93,6 +105,7 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "apci" }},
 				{ NULL }
 			};
+
 			get_device_hid(result, hid);
 			
 			if (gDeviceManager->register_device(node, attrs, NULL, &deviceNode) == B_OK)
@@ -160,6 +173,13 @@ acpi_module_init(device_node_handle node, void *user_cookie, void **_cookie)
 }
 
 
+static status_t
+acpi_module_uninit(void *cookie)
+{
+	return B_OK;
+}
+
+
 static int32
 apci_module_std_ops(int32 op, ...)
 {
@@ -191,7 +211,7 @@ static struct acpi_root_info sACPIModule = {
 			acpi_module_supports_device,
 			acpi_module_register_device,
 			acpi_module_init,
-			NULL,	// uninit
+			acpi_module_uninit,
 			NULL,	// removed
 			NULL,	// cleanup
 			acpi_module_get_paths,
@@ -201,10 +221,26 @@ static struct acpi_root_info sACPIModule = {
 		NULL,		// rescan bus
 	},
 
+	enable_fixed_event,
+	disable_fixed_event,
+	fixed_event_status,
+	reset_fixed_event,
+	install_fixed_event_handler,
+	remove_fixed_event_handler,
+	get_next_entry,
+	get_device,
+	get_device_hid,
+	get_object_type,
+	get_object,
+	get_object_typed,
+	evaluate_object,
+	evaluate_method,
+
 };
 
 _EXPORT module_info *modules[] = {
 	(module_info *) &acpi_module,
 	(module_info *) &sACPIModule,
+	(module_info *) &acpi_ns_dump_module,
 	NULL
 };

@@ -98,7 +98,7 @@ BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
 	via-rhine wb840 net_stack
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
-BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button $(X86_ONLY)acpi_ns_dump ;
+BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi config_manager 
 	$(X86_ONLY)acpi $(X86_ONLY)agp usb
 ;
