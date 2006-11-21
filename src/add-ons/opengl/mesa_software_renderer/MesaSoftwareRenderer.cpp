@@ -307,12 +307,13 @@ MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 
 			if (!buffer[0] ) {
 				// Let's build an renderer string
+				// TODO: add SVN revision
 				strncat(buffer, "Haiku's Mesa " MESA_VERSION_STRING " Software Renderer", sizeof(buffer));
 
 			   // Append any CPU-specific information.
 #ifdef USE_X86_ASM
 				if (_mesa_x86_cpu_features)
-					strncat(buffer, " x86", sizeof(buffer));
+					strncat(buffer, ", optimized for x86", sizeof(buffer));
 	#ifdef USE_MMX_ASM
    				if (cpu_has_mmx)
    					strncat(buffer, (cpu_has_mmxext) ? "/MMX+" : "/MMX", sizeof(buffer));
@@ -328,12 +329,12 @@ MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 
 #elif defined(USE_SPARC_ASM)
 
-				strncat(buffer, " SPARC", sizeof(buffer));
+				strncat(buffer, ", optimized for SPARC", sizeof(buffer));
 
 #elif defined(USE_PPC_ASM)
 
 				if (_mesa_ppc_cpu_features)
-					strncat(buffer, (cpu_has_64) ? " PowerPC 64" : " PowerPC", sizeof(buffer));
+					strncat(buffer, (cpu_has_64) ? ", optimized for PowerPC 64" : ", optimized for PowerPC", sizeof(buffer));
 
 	#ifdef USE_VMX_ASM
 				if (cpu_has_vmx)
