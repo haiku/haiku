@@ -1,3 +1,12 @@
+/*
+ * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+
 #include "argv.h"
 #include "tcp.h"
 #include "utility.h"
@@ -13,8 +22,10 @@
 #include <module.h>
 #include <util/AutoLock.h>
 
+#include <ctype.h>
 #include <netinet/in.h>
 #include <new>
+#include <set>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +57,12 @@ extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
 struct net_socket *gServerSocket, *gClientSocket;
 
-bool gTCPDump = true;
+static set<uint32> sDropList;
+static bigtime_t sRoundTripTime = 0;
+static bool sIncreasingRoundTrip = false;
+static bool sRandomRoundTrip = false;
+static bool sTCPDump = true;
+static bigtime_t sStartTime;
 
 static struct net_domain sDomain = {
 	"ipv4",
@@ -287,6 +303,63 @@ socket_listen(net_socket *socket, int backlog)
 		socket->options |= SO_ACCEPTCONN;
 
 	return status;
+}
+
+
+ssize_t
+socket_send(net_socket *socket, const void *data, size_t length, int flags)
+{
+	if (socket->peer.ss_len == 0)
+		return EDESTADDRREQ;
+
+	if (socket->address.ss_len == 0) {
+		// try to bind first
+		status_t status = socket_bind(socket, NULL, 0);
+		if (status < B_OK)
+			return status;
+	}
+
+	// TODO: useful, maybe even computed header space!
+	net_buffer *buffer = gNetBufferModule.create(256);
+	if (buffer == NULL)
+		return ENOBUFS;
+
+	// copy data into buffer
+	if (gNetBufferModule.append(buffer, data, length) < B_OK) {
+		gNetBufferModule.free(buffer);
+		return ENOBUFS;
+	}
+
+	buffer->flags = flags;
+	//buffer->source = (sockaddr *)&socket->address;
+	//buffer->destination = (sockaddr *)&socket->peer;
+	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
+	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
+
+	status_t status = socket->first_info->send_data(socket->first_protocol, buffer);
+	if (status < B_OK) {
+		gNetBufferModule.free(buffer);
+		return status;
+	}
+
+	return length;
+}
+
+
+ssize_t
+socket_recv(net_socket *socket, void *data, size_t length, int flags)
+{
+	net_buffer *buffer;
+	status_t status = socket->first_info->read_data(
+		socket->first_protocol, length, flags, &buffer);
+	if (status < B_OK)
+		return status;
+
+	ssize_t bytesReceived = buffer->size;
+	gNetBufferModule.read(buffer, 0, data, bytesReceived);
+	gNetBufferModule.free(buffer);
+
+	return bytesReceived;
 }
 
 
@@ -644,15 +717,36 @@ status_t
 domain_receive_data(net_buffer *buffer)
 {
 	static uint32 packetNumber = 1;
+	static bigtime_t lastTime = 0;
 
-	if (gTCPDump) {
+	bool drop = false;
+	if (sDropList.find(packetNumber) != sDropList.end())
+		drop = true;
+
+	if (!drop && (sRoundTripTime > 0 || sRandomRoundTrip || sIncreasingRoundTrip)) {
+		bigtime_t add = 0;
+		if (sRandomRoundTrip)
+			add = (bigtime_t)(1.0 * rand() / RAND_MAX * 500000);
+		if (sIncreasingRoundTrip)
+			sRoundTripTime += (bigtime_t)(1.0 * rand() / RAND_MAX * 150000);
+
+		snooze(sRoundTripTime / 2 + add);
+	}
+
+	if (sTCPDump) {
 		NetBufferHeader<tcp_header> bufferHeader(buffer);
 		if (bufferHeader.Status() < B_OK)
 			return bufferHeader.Status();
 
 		tcp_header &header = bufferHeader.Data();
 
-		printf("% 3ld ", packetNumber++);
+		bigtime_t now = system_time();
+		if (lastTime == 0)
+			lastTime = now;
+
+		printf("% 3ld %8.6f (%8.6f) ", packetNumber, (now - sStartTime) / 1000000.0,
+			(now - lastTime) / 1000000.0);
+		lastTime = now;
 
 		if (is_server((sockaddr *)&buffer->source))
 			printf("\33[31mserver > client: ");
@@ -727,9 +821,19 @@ domain_receive_data(net_buffer *buffer)
 			}
 		}
 
+		if (drop)
+			printf(" <DROPPED>");
 		printf("\33[0m\n");
 
 		bufferHeader.Detach();
+	} else if (drop)
+		printf("<**** DROPPED %ld ****>\n", packetNumber);
+
+	packetNumber++;
+
+	if (drop) {
+		gNetBufferModule.free(buffer);
+		return B_OK;
 	}
 
 	return gTCPModule->receive_data(buffer);
@@ -817,6 +921,8 @@ do_connect(int argc, char** argv)
 	if (argc > 1)
 		port = atoi(argv[1]);
 
+	sStartTime = system_time();
+
 	sockaddr_in address;
 	memset(&address, 0, sizeof(address));
 	address.sin_family = AF_INET;
@@ -827,6 +933,120 @@ do_connect(int argc, char** argv)
 		sizeof(struct sockaddr));
 	if (status < B_OK)
 		fprintf(stderr, "tcp_tester: could not connect: %s\n", strerror(status));
+}
+
+
+static void
+do_send(int argc, char** argv)
+{
+	size_t size = 1024;
+	if (argc > 1 && isdigit(argv[1][0])) {
+		char *unit;
+		size = strtoul(argv[1], &unit, 0);
+		if (unit != NULL && unit[0]) {
+			if (unit[0] == 'k' || unit[0] == 'K')
+				size *= 1024;
+			else if (unit[0] == 'm' || unit[0] == 'M')
+				size *= 1024 * 1024;
+			else {
+				fprintf(stderr, "unknown unit specified!\n");
+				return;
+			}
+		}
+	} else if (argc > 1) {
+		fprintf(stderr, "invalid args!\n");
+		return;
+	}
+
+	if (size > 4 * 1024 * 1024) {
+		printf("amount to send will be limited to 4 MB\n");
+		size = 4 * 1024 * 1024;
+	}
+
+	char *buffer = (char *)malloc(size);
+	if (buffer == NULL) {
+		fprintf(stderr, "not enough memory!\n");
+		return;
+	}
+
+	// initialize buffer with some not so random data
+	for (uint32 i = 0; i < size; i++) {
+		buffer[i] = (char)(i & 0xff);
+	}
+
+	ssize_t bytesWritten = socket_send(gClientSocket, buffer, size, 0);
+	if (bytesWritten < B_OK) {
+		fprintf(stderr, "failed sending buffer: %s\n", strerror(bytesWritten));
+		return;
+	}
+}
+
+
+static void
+do_drop(int argc, char** argv)
+{
+	if (argc == 1) {
+		// show list of dropped packets
+		printf("Drop pakets:\n");
+
+		set<uint32>::iterator iterator = sDropList.begin();
+		uint32 count = 0;
+		for (; iterator != sDropList.end(); iterator++) {
+			printf("%4lu\n", *iterator);
+			count++;
+		}
+
+		if (count == 0)
+			printf("<empty>\n");
+	} else if (!strcmp(argv[1], "-f")) {
+		// flush drop list
+		sDropList.clear();
+		puts("drop list cleared.");
+	} else if (isdigit(argv[1][0])) {
+		// add to drop list
+		for (int i = 1; i < argc; i++) {
+			uint32 packet = strtoul(argv[i], NULL, 0);
+			if (packet == 0) {
+				fprintf(stderr, "invalid packet number: %s\n", argv[i]);
+				break;
+			}
+
+			sDropList.insert(packet);
+		}
+	} else {
+		// print usage
+		puts("usage: drop <packet-number> [...]\n"
+			"   or: drop [-f]\n\n"
+			"Specifiying -f flushes the drop list; if you called drop without\n"
+			"any arguments, the current drop list is dumped.");
+	}
+}
+
+
+static void
+do_round_trip_time(int argc, char** argv)
+{
+	if (argc == 1) {
+		// show current time
+		printf("Current round trip time: %g ms\n", sRoundTripTime / 1000.0);
+	} else if (!strcmp(argv[1], "-r")) {
+		// toggle random time
+		sRandomRoundTrip = !sRandomRoundTrip;
+		printf("Round trip time is now %s.\n", sRandomRoundTrip ? "random" : "fixed");
+	} else if (!strcmp(argv[1], "-i")) {
+		// toggle increasing time
+		sIncreasingRoundTrip = !sIncreasingRoundTrip;
+		printf("Round trip time is now %s.\n", sIncreasingRoundTrip ? "increasing" : "fixed");
+	} else if (isdigit(argv[1][0])) {
+		// set time
+		sRoundTripTime = 1000LL * strtoul(argv[1], NULL, 0);
+	} else {
+		// print usage
+		puts("usage: rtt <time in ms>\n"
+			"   or: rtt [-r|-i]\n\n"
+			"Specifiying -r sets random time, -i causes the times to increase over time;\n"
+			"witout any arguments, the current time is printed.");
+	}
 }
 
 
@@ -844,8 +1064,11 @@ do_dprintf(int argc, char** argv)
 
 static cmd_entry sBuiltinCommands[] = {
 	{"connect", do_connect, "Connects the client"},
+	{"send", do_send, "Sends data from the client to the server"},
 	{"dprintf", do_dprintf, "Toggles debug output"},
+	{"drop", do_drop, "Lets you drop packets during transfer"},
 	{"help", do_help, "prints this help text"},
+	{"rtt", do_round_trip_time, "Specifies the round trip time"},
 	{"quit", NULL, "exits the application"},
 	{NULL, NULL, NULL},
 };
