@@ -466,10 +466,17 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				window->Unlock();
 				locked = false;
 				snoozeAmount = 30000;
-				if (IsStickyMode())
+				bool wasSticky = IsStickyMode();
+				if (wasSticky)
 					menu->SetStickyMode(true);
 				int localAction;
 				fChosenItem = menu->_track(&localAction, system_time());
+				
+				// check if the user started holding down a mouse button in a submenu
+				if (wasSticky && !IsStickyMode())
+					buttons = 1;
+						// buttons must have been pressed in the meantime
+				
 				//menu->Window()->Activate();
 				if (localAction == MENU_STATE_CLOSED)
 					fState = MENU_STATE_CLOSED;

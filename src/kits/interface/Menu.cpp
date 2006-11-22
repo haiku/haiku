@@ -1295,16 +1295,26 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			locked = false;
 			int submenuAction = MENU_STATE_TRACKING;
 			BMenu *submenu = fSelected->Submenu();
-			if (IsStickyMode())
+			bool wasSticky = IsStickyMode();
+			if (wasSticky)
 				submenu->SetStickyMode(true);
 			BMenuItem *submenuItem = submenu->_track(&submenuAction, trackTime);
+			
+			// check if the user started holding down a mouse button in a submenu
+			if (wasSticky && !IsStickyMode()) {
+				buttons = 1;
+					// buttons must have been pressed in the meantime
+				trackTime = 0;
+					// we are already in non-sticky mode
+			}
+			
 			//submenu->Window()->Activate();
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
 				fState = submenuAction;
 				break;
 			}
-
+			
 			locked = LockLooper();
 			if (!locked)
 				break;
@@ -1328,7 +1338,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 				if (locked)
 					UnlockLooper();
 				*action = fState;
-				return NULL;				
+				return NULL;
 			}
 		}
 		
@@ -1336,11 +1346,16 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			UnlockLooper();
 		
 		if (buttons != 0 && IsStickyMode()) {
+			BMenu *supermenu = Supermenu();
+			for(; supermenu; supermenu = supermenu->Supermenu())
+				supermenu->SetStickyMode(false);
 			SetStickyMode(false);
 			trackTime = 0;
 		} else if (buttons == 0 && !IsStickyMode()) {
-			if (system_time() < trackTime + 1000000
-				|| (fExtraRect != NULL && fExtraRect->Contains(location)))
+//			TODO: trackTime isn't very useful. we should probably remove it
+/*			if (system_time() < trackTime + 1000000
+				|| (fExtraRect != NULL && fExtraRect->Contains(location))) */
+			if (fExtraRect != NULL && fExtraRect->Contains(location))
 				SetStickyMode(true);
 			else
 				fState = MENU_STATE_CLOSED;
