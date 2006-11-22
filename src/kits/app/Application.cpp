@@ -354,9 +354,11 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 			// An instance is already running and we asked for
 			// single/exclusive launch. Send our argv to the running app.
 			// Do that only, if the app is NOT B_ARGV_ONLY.
-			if (otherTeam >= 0 && __libc_argc > 1) {
+			if (otherTeam >= 0) {
+				BMessenger otherApp(NULL, otherTeam);
 				app_info otherAppInfo;
-				if (be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo) == B_OK
+				if (__libc_argc > 1
+					&& be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo) == B_OK
 					&& !(otherAppInfo.flags & B_ARGV_ONLY)) {
 					// create an B_ARGV_RECEIVED message
 					BMessage argvMessage(B_ARGV_RECEIVED);
@@ -369,8 +371,9 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 						argvMessage.ReplaceString("argv", 0, path.Path());
 
 					// send the message
-					BMessenger(NULL, otherTeam).SendMessage(&argvMessage);
-				}
+					otherApp.SendMessage(&argvMessage);
+				} else
+					otherApp.SendMessage(B_SILENT_RELAUNCH);
 			}
 		} else if (fInitError == B_OK) {
 			// the registrations was successful
@@ -398,30 +401,27 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 	PostMessage(B_READY_TO_RUN, this);
 #endif	// ifndef RUN_WITHOUT_REGISTRAR
 
-	// TODO: Not completely sure about the order, but this should be close.
-
-	// init be_app and be_app_messenger
 	if (fInitError == B_OK) {
+		// TODO: Not completely sure about the order, but this should be close.
+
+		// init be_app and be_app_messenger
 		be_app = this;
 		be_app_messenger = BMessenger(NULL, this);
-	}
 
-	// set the BHandler's name
-	if (fInitError == B_OK)
+		// set the BHandler's name
 		SetName(ref.name);
 
-	// create meta MIME
-	if (fInitError == B_OK) {
+		// create meta MIME
 		BPath path;
 		if (path.SetTo(&ref) == B_OK)
 			create_app_meta_mime(path.Path(), false, true, false);
-	}
 
 #ifndef RUN_WITHOUT_APP_SERVER
-	// app server connection and IK initialization
-	if (fInitError == B_OK && initGUI)
-		fInitError = _InitGUIContext();
+		// app server connection and IK initialization
+		if (initGUI)
+			fInitError = _InitGUIContext();
 #endif	// RUN_WITHOUT_APP_SERVER
+	}
 
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
@@ -578,12 +578,12 @@ BApplication::MessageReceived(BMessage *message)
 			break;
 		}
 
-		// Bebook says: B_SILENT_RELAUNCH
-		// Sent to a single-launch application when it's activated by being launched
-		// (for example, if the user double-clicks its icon in Tracker).
 		case B_SILENT_RELAUNCH:
+			// Sent to a B_SINGLE_LAUNCH application when it's launched again
+			// (see _InitData())
 			be_roster->ActivateApp(Team());
-			// supposed to fall through	
+			break;
+
 		default:
 			BLooper::MessageReceived(message);
 			break;
