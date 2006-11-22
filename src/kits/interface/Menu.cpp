@@ -1354,7 +1354,9 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			SetStickyMode(false);
 			trackTime = 0;
 		} else if (buttons == 0 && !IsStickyMode()) {
-//			TODO: trackTime isn't very useful. we should probably remove it
+/*			TODO: FIXME! trackTime is a hacky workaround for BMenuField. It
+			opens directly under your mouse pointer, so when you release the mouse
+			button the menu closes again because it started in non-sticky mode. */
 /*			if (system_time() < trackTime + 1000000
 				|| (fExtraRect != NULL && fExtraRect->Contains(location))) */
 			if (fExtraRect != NULL && fExtraRect->Contains(location))
