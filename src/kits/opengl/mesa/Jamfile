@@ -7,6 +7,9 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need our not platform one, public GL headers also when not compiling for Haiku.
 }
 
+# Don't compile libmesa.a with debugging.
+DEBUG = 0 ;
+
 UsePrivateHeaders opengl ;
 
 UseHeaders [ FDirName $(SUBDIR) main ] ;

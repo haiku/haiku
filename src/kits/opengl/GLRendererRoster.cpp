@@ -36,7 +36,11 @@ GLRendererRoster::~GLRendererRoster()
 BGLRenderer *
 GLRendererRoster::GetRenderer(int32 id)
 {
-	struct renderer_item item = fRenderers[id];
+	RendererMap::const_iterator iterator = fRenderers.find(id);
+	if (iterator == fRenderers.end())
+		return NULL;
+
+	struct renderer_item item = iterator->second;
 	return item.renderer;
 }
 
