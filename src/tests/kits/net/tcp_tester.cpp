@@ -68,12 +68,15 @@ struct net_protocol_module_info *gTCPModule;
 struct net_socket *gServerSocket, *gClientSocket;
 static struct context sClientContext, sServerContext;
 
+static vint32 sPacketNumber = 1;
 static set<uint32> sDropList;
 static bigtime_t sRoundTripTime = 0;
 static bool sIncreasingRoundTrip = false;
 static bool sRandomRoundTrip = false;
 static bool sTCPDump = true;
 static bigtime_t sStartTime;
+static double sRandomReorder = 0.0;
+static set<uint32> sReorderList;
 
 static struct net_domain sDomain = {
 	"ipv4",
@@ -739,8 +742,9 @@ domain_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 domain_receive_data(net_buffer *buffer)
 {
-	static uint32 packetNumber = 1;
 	static bigtime_t lastTime = 0;
+
+	uint32 packetNumber = atomic_add(&sPacketNumber, 1);
 
 	bool drop = false;
 	if (sDropList.find(packetNumber) != sDropList.end())
@@ -749,7 +753,7 @@ domain_receive_data(net_buffer *buffer)
 	if (!drop && (sRoundTripTime > 0 || sRandomRoundTrip || sIncreasingRoundTrip)) {
 		bigtime_t add = 0;
 		if (sRandomRoundTrip)
-			add = (bigtime_t)(1.0 * rand() / RAND_MAX * 500000);
+			add = (bigtime_t)(1.0 * rand() / RAND_MAX * 500000) - 250000;
 		if (sIncreasingRoundTrip)
 			sRoundTripTime += (bigtime_t)(1.0 * rand() / RAND_MAX * 150000);
 
@@ -852,8 +856,6 @@ domain_receive_data(net_buffer *buffer)
 	} else if (drop)
 		printf("<**** DROPPED %ld ****>\n", packetNumber);
 
-	packetNumber++;
-
 	if (drop) {
 		gNetBufferModule.free(buffer);
 		return B_OK;
@@ -916,6 +918,7 @@ int32
 receiving_thread(void* _data)
 {
 	struct context* context = (struct context*)_data;
+	struct net_buffer* reorderBuffer = NULL;
 
 	while (true) {
 		status_t status;
@@ -926,11 +929,29 @@ receiving_thread(void* _data)
 		if (status < B_OK)
 			break;
 
-		context->lock.Lock();
-		net_buffer* buffer = (net_buffer*)list_remove_head_item(&context->list);
-		context->lock.Unlock();
+		while (true) {
+			context->lock.Lock();
+			net_buffer* buffer = (net_buffer*)list_remove_head_item(&context->list);
+			context->lock.Unlock();
 
-		sDomain.module->receive_data(buffer);
+			if (buffer == NULL)
+				break;
+
+			if (sRandomReorder > 0.0 || sReorderList.find(sPacketNumber) != sReorderList.end()
+				&& reorderBuffer == NULL
+				&& (1.0 * rand() / RAND_MAX) > sRandomReorder) {
+				reorderBuffer = buffer;
+			} else {
+				if (sDomain.module->receive_data(buffer) < B_OK)
+					gNetBufferModule.free(buffer);
+
+				if (reorderBuffer != NULL) {
+					if (sDomain.module->receive_data(reorderBuffer) < B_OK)
+						gNetBufferModule.free(reorderBuffer);
+					reorderBuffer = NULL;
+				}
+			}
+		}
 	}
 
 	return 0;
@@ -1102,6 +1123,63 @@ do_drop(int argc, char** argv)
 
 
 static void
+do_reorder(int argc, char** argv)
+{
+	if (argc == 1) {
+		// show list of dropped packets
+		if (sRandomReorder > 0.0)
+			printf("Reorder probability is %f\n", sRandomReorder);
+
+		printf("Reorder packets:\n");
+
+		set<uint32>::iterator iterator = sReorderList.begin();
+		uint32 count = 0;
+		for (; iterator != sReorderList.end(); iterator++) {
+			printf("%4lu\n", *iterator);
+			count++;
+		}
+
+		if (count == 0)
+			printf("<empty>\n");
+	} else if (!strcmp(argv[1], "-f")) {
+		// flush reorder list
+		sReorderList.clear();
+		puts("reorder list cleared.");
+	} else if (!strcmp(argv[1], "-r")) {
+		if (argc < 3) {
+			fprintf(stderr, "No reorder probability specified.\n");
+			return;
+		}
+
+		sRandomReorder = atof(argv[2]);
+		if (sRandomReorder < 0.0)
+			sRandomReorder = 0;
+		else if (sRandomReorder > 1.0)
+			sRandomReorder = 1.0;
+	} else if (isdigit(argv[1][0])) {
+		// add to reorder list
+		for (int i = 1; i < argc; i++) {
+			uint32 packet = strtoul(argv[i], NULL, 0);
+			if (packet == 0) {
+				fprintf(stderr, "invalid packet number: %s\n", argv[i]);
+				break;
+			}
+
+			sReorderList.insert(packet);
+		}
+	} else {
+		// print usage
+		puts("usage: reorder <packet-number> [...]\n"
+			"   or: reorder -r <probability>\n\n"
+			"   or: reorder [-f]\n\n"
+			"Specifiying -f flushes the reorder list, -r sets the probability a packet\n"
+			"is reordered; if you called reorder without any arguments, the current\n"
+			"reorder list is dumped.");
+	}
+}
+
+
+static void
 do_round_trip_time(int argc, char** argv)
 {
 	if (argc == 1) {
@@ -1145,6 +1223,7 @@ static cmd_entry sBuiltinCommands[] = {
 	{"send", do_send, "Sends data from the client to the server"},
 	{"dprintf", do_dprintf, "Toggles debug output"},
 	{"drop", do_drop, "Lets you drop packets during transfer"},
+	{"reorder", do_reorder, "Lets you reorder packets during transfer"},
 	{"help", do_help, "prints this help text"},
 	{"rtt", do_round_trip_time, "Specifies the round trip time"},
 	{"quit", NULL, "exits the application"},
