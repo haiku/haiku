@@ -21,8 +21,10 @@
 
 class BMenuItem;
 class BMenuBar;
-class BMenuWindow;
-class BMenuFrame;
+
+namespace BPrivate {
+	class BMenuWindow;
+}
 
 class _ExtraMenuData_;
 
@@ -210,7 +212,7 @@ virtual	void			_ReservedMenu6();
 
 		bool		OverSuper(BPoint loc);
 		bool		OverSubmenu(BMenuItem *item, BPoint loc);
-		BMenuWindow	*MenuWindow();
+		BPrivate::BMenuWindow* MenuWindow();
 		void		DeleteMenuWindow();
 		BMenuItem	*HitTestItems(BPoint where, BPoint slop = B_ORIGIN) const;
 		BRect		Superbounds() const;
@@ -265,7 +267,7 @@ static	bool		sAltAsCommandKey;
 		BList		fItems;
 		BRect		fPad;
 		BMenuItem	*fSelected;
-		BMenuWindow	*fCachedMenuWindow;
+		BPrivate::BMenuWindow* fCachedMenuWindow;
 		BMenu		*fSuper;
 		BMenuItem	*fSuperitem;
 		BRect		fSuperbounds;

@@ -5,7 +5,6 @@
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (burton666@libero.it)
- *		
  */
 
 //!	BMenuWindow is a custom BWindow for BMenus.
@@ -17,12 +16,58 @@
 #include <WindowPrivate.h>
 
 
+namespace BPrivate {
+
+class BMenuScroller : public BView {
+	public:
+		BMenuScroller(BRect frame, BMenu *menu);
+		virtual ~BMenuScroller();
+
+		virtual void Pulse();
+		virtual void Draw(BRect updateRect);
+
+	private:
+		BMenu *fMenu;
+		BRect fUpperButton;
+		BRect fLowerButton;
+
+		float fValue;
+		float fLimit;
+
+		bool fUpperEnabled;
+		bool fLowerEnabled;
+
+		uint32 fButton;
+		BPoint fPosition;
+};
+
+class BMenuFrame : public BView {
+	public:
+		BMenuFrame(BMenu *menu);
+		virtual ~BMenuFrame();
+
+		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
+		virtual void Draw(BRect updateRect);
+
+  private:
+		friend class BMenuWindow;
+
+		BMenu *fMenu;
+};
+
+}	// namespace BPrivate
+
+using namespace BPrivate;
+
+
 const int kScrollerHeight = 10;
 const int kScrollStep = 16;
 
+
 BMenuScroller::BMenuScroller(BRect frame, BMenu *menu)
-	:	BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS 
-			| B_PULSE_NEEDED),
+	: BView(frame, "menu scroller", 0,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
 	fMenu(menu),
 	fUpperButton(0, 0, frame.right, kScrollerHeight),
 	fLowerButton(0, frame.bottom - kScrollerHeight, frame.right, frame.bottom),
@@ -136,6 +181,77 @@ BMenuScroller::Draw(BRect updateRect)
 //	#pragma mark -
 
 
+BMenuFrame::BMenuFrame(BMenu *menu)
+	: BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fMenu(menu)
+{
+}
+	
+
+BMenuFrame::~BMenuFrame()
+{
+}
+
+
+void
+BMenuFrame::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+	
+	if (fMenu != NULL)
+		AddChild(fMenu);
+		
+	ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
+	if (fMenu != NULL) {
+		BFont font;
+		fMenu->GetFont(&font);
+		SetFont(&font);
+	}
+}
+	
+
+void
+BMenuFrame::DetachedFromWindow()
+{
+	if (fMenu != NULL)
+		RemoveChild(fMenu);
+}
+
+
+void
+BMenuFrame::Draw(BRect updateRect)
+{
+	if (fMenu != NULL && fMenu->CountItems() == 0) {
+		// TODO: Review this as it's a bit hacky.
+		// Menu has a size of 0, 0, since there are no items in it.
+		// So the BMenuFrame class has to fake it and draw an empty item.
+		// Note that we can't add a real "empty" item because then we couldn't
+		// tell if the item was added by us or not.
+		// See also BMenu::UpdateWindowViewSize()
+		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
+		SetLowColor(HighColor());
+		FillRect(updateRect);
+
+		font_height height;
+		GetFontHeight(&height);
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
+		BPoint where((Bounds().Width() - fMenu->StringWidth(kEmptyMenuLabel)) / 2, ceilf(height.ascent + 1));
+		DrawString(kEmptyMenuLabel, where);
+	}
+
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	
+	BRect bounds(Bounds());
+
+	StrokeLine(BPoint(bounds.right, bounds.top),
+		BPoint(bounds.right, bounds.bottom - 1));
+	StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
+		BPoint(bounds.right, bounds.bottom));
+}
+
+
+//	#pragma mark -
+
+
 BMenuWindow::BMenuWindow(const char *name)
 	// The window will be resized by BMenu, so just pass a dummy rect
 	: BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
@@ -215,70 +331,4 @@ BMenuWindow::DetachScrollers()
 
 	delete fScroller;
 	fScroller = NULL;
-}
-
-
-//	#pragma mark -
-
-
-BMenuFrame::BMenuFrame(BMenu *menu)
-	: BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-	fMenu(menu)
-{
-}
-	
-
-void
-BMenuFrame::AttachedToWindow()
-{
-	BView::AttachedToWindow();
-	
-	if (fMenu != NULL)
-		AddChild(fMenu);
-		
-	ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
-	if (fMenu != NULL) {
-		BFont font;
-		fMenu->GetFont(&font);
-		SetFont(&font);
-	}
-}
-	
-
-void
-BMenuFrame::DetachedFromWindow()
-{
-	if (fMenu != NULL)
-		RemoveChild(fMenu);
-}
-
-
-void
-BMenuFrame::Draw(BRect updateRect)
-{
-	if (fMenu != NULL && fMenu->CountItems() == 0) {
-		// TODO: Review this as it's a bit hacky.
-		// Menu has a size of 0, 0, since there are no items in it.
-		// So the BMenuFrame class has to fake it and draw an empty item.
-		// Note that we can't add a real "empty" item because then we couldn't
-		// tell if the item was added by us or not.
-		// See also BMenu::UpdateWindowViewSize()
-		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
-		SetLowColor(HighColor());
-		FillRect(updateRect);
-
-		font_height height;
-		GetFontHeight(&height);
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
-		BPoint where((Bounds().Width() - fMenu->StringWidth(kEmptyMenuLabel)) / 2, ceilf(height.ascent + 1));
-		DrawString(kEmptyMenuLabel, where);
-	}
-
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	
-	BRect bounds(Bounds());
-
-	StrokeLine(BPoint(bounds.right, bounds.top),
-		BPoint(bounds.right, bounds.bottom - 1));
-	StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
-		BPoint(bounds.right, bounds.bottom));
 }

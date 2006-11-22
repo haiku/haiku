@@ -28,6 +28,8 @@
 #include <ServerProtocol.h>
 
 using std::nothrow;
+using BPrivate::BMenuWindow;
+
 
 class _ExtraMenuData_ {
 public:
