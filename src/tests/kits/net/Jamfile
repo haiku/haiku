@@ -40,7 +40,7 @@ SimpleTest tcp_tester :
 	argv.c
 	ipv4_address.cpp
 
-	: libkernelland_emu.so
+	: be libkernelland_emu.so
 ;
 
 SEARCH on [ FGristFiles 

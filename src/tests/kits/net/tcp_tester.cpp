@@ -20,6 +20,7 @@
 
 #include <KernelExport.h>
 #include <module.h>
+#include <Locker.h>
 #include <util/AutoLock.h>
 
 #include <ctype.h>
@@ -30,6 +31,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+struct context {
+	BLocker		lock;
+	sem_id		wait_sem;
+	struct list list;
+	net_route	route;
+	bool		server;
+	thread_id	thread;
+};
 
 struct cmd_entry {
 	char*	name;
@@ -56,6 +66,7 @@ struct net_interface gInterface;
 extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
 struct net_socket *gServerSocket, *gClientSocket;
+static struct context sClientContext, sServerContext;
 
 static set<uint32> sDropList;
 static bigtime_t sRoundTripTime = 0;
@@ -74,9 +85,9 @@ static struct net_domain sDomain = {
 
 
 bool
-is_server(sockaddr *addr)
+is_server(const sockaddr* addr)
 {
-	return ((sockaddr_in *)addr)->sin_port == htons(1024);
+	return ((sockaddr_in*)addr)->sin_port == htons(1024);
 }
 
 
@@ -550,18 +561,26 @@ close_protocol(net_protocol* protocol)
 status_t
 datalink_send_data(struct net_route *route, net_buffer *buffer)
 {
-	return sDomain.module->receive_data(buffer);
+	struct context* context = (struct context*)route->gateway;
+
+	context->lock.Lock();
+	list_add_item(&context->list, buffer);
+	context->lock.Unlock();
+
+	release_sem(context->wait_sem);
+	return B_OK;
 }
 
 
 struct net_route *
 get_route(struct net_domain *_domain, const struct sockaddr *address)
 {
-	static net_route route;
-	route.interface = &gInterface;
-	route.mtu = 1500;
+	if (is_server(address)) {
+		// to the server
+		return &sClientContext.route;
+	}
 
-	return &route;
+	return &sServerContext.route;
 }
 
 
@@ -664,8 +683,12 @@ domain_shutdown(net_protocol *protocol, int direction)
 status_t
 domain_send_data(net_protocol *protocol, net_buffer *buffer)
 {
-	puts("domain send data!");
-	return B_OK;
+	// find route
+	struct net_route *route = get_route(&sDomain, (sockaddr *)&buffer->destination);
+	if (route == NULL)
+		return ENETUNREACH;
+
+	return datalink_send_data(route, buffer);
 }
 
 
@@ -673,7 +696,7 @@ status_t
 domain_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
-	return sDomain.module->receive_data(buffer);
+	return datalink_send_data(route, buffer);
 }
 
 
@@ -890,7 +913,32 @@ net_protocol_module_info gDomainModule = {
 
 
 int32
-server_thread(void *)
+receiving_thread(void* _data)
+{
+	struct context* context = (struct context*)_data;
+
+	while (true) {
+		status_t status;
+		do {
+			status = acquire_sem(context->wait_sem);
+		} while (status == B_INTERRUPTED);
+
+		if (status < B_OK)
+			break;
+
+		context->lock.Lock();
+		net_buffer* buffer = (net_buffer*)list_remove_head_item(&context->list);
+		context->lock.Unlock();
+
+		sDomain.module->receive_data(buffer);
+	}
+
+	return 0;
+}
+
+
+int32
+server_thread(void*)
 {
 	while (true) {
 		// main accept() loop
@@ -909,6 +957,36 @@ server_thread(void *)
 
 	return 0;
 }
+
+
+void
+setup_context(struct context& context, bool server)
+{
+	list_init(&context.list);
+	context.route.interface = &gInterface;
+	context.route.gateway = (sockaddr *)&context;
+		// backpointer to the context
+	context.route.mtu = 1500;
+	context.server = server;
+	context.wait_sem = create_sem(0, "receive wait");
+
+	context.thread = spawn_thread(receiving_thread,
+		server ? "server receiver" : "client receiver", B_NORMAL_PRIORITY, &context);
+	resume_thread(context.thread);
+}
+
+
+void
+cleanup_context(struct context& context)
+{
+	delete_sem(context.wait_sem);
+
+	status_t status;
+	wait_for_thread(context.thread, &status);
+}
+
+
+//	#pragma mark -
 
 
 static void do_help(int argc, char** argv);
@@ -1122,7 +1200,11 @@ main(int argc, char** argv)
 	if (server == NULL)
 		return 1;
 
-	printf("*** Server: %p, Client: %p\n", server, client);
+	setup_context(sClientContext, false);
+	setup_context(sServerContext, true);
+
+	printf("*** Server: %p (%ld), Client: %p (%ld)\n", server,
+		sServerContext.thread, client, sClientContext.thread);
 
 	// setup server
 
@@ -1195,6 +1277,9 @@ main(int argc, char** argv)
 
 	close_protocol(server);
 	close_protocol(client);
+
+	cleanup_context(sClientContext);
+	cleanup_context(sServerContext);
 
 	put_module("network/protocols/tcp/v1");
 	uninit_timers();
