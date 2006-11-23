@@ -69,6 +69,7 @@ struct net_socket *gServerSocket, *gClientSocket;
 static struct context sClientContext, sServerContext;
 
 static vint32 sPacketNumber = 1;
+static double sRandomDrop = 0.0;
 static set<uint32> sDropList;
 static bigtime_t sRoundTripTime = 0;
 static bool sIncreasingRoundTrip = false;
@@ -77,6 +78,7 @@ static bool sTCPDump = true;
 static bigtime_t sStartTime;
 static double sRandomReorder = 0.0;
 static set<uint32> sReorderList;
+static bool sSimultaneousConnect = false;
 
 static struct net_domain sDomain = {
 	"ipv4",
@@ -91,6 +93,20 @@ bool
 is_server(const sockaddr* addr)
 {
 	return ((sockaddr_in*)addr)->sin_port == htons(1024);
+}
+
+
+bool
+is_syn(net_buffer* buffer)
+{
+	NetBufferHeader<tcp_header> bufferHeader(buffer);
+	if (bufferHeader.Status() < B_OK)
+		return bufferHeader.Status();
+
+	tcp_header &header = bufferHeader.Data();
+	bufferHeader.Detach();
+
+	return (header.flags & TCP_FLAG_SYNCHRONIZE) != 0;
 }
 
 
@@ -580,10 +596,10 @@ get_route(struct net_domain *_domain, const struct sockaddr *address)
 {
 	if (is_server(address)) {
 		// to the server
-		return &sClientContext.route;
+		return &sServerContext.route;
 	}
 
-	return &sServerContext.route;
+	return &sClientContext.route;
 }
 
 
@@ -747,7 +763,8 @@ domain_receive_data(net_buffer *buffer)
 	uint32 packetNumber = atomic_add(&sPacketNumber, 1);
 
 	bool drop = false;
-	if (sDropList.find(packetNumber) != sDropList.end())
+	if (sDropList.find(packetNumber) != sDropList.end()
+		|| (sRandomDrop > 0.0 && (1.0 * rand() / RAND_MAX) > sRandomDrop))
 		drop = true;
 
 	if (!drop && (sRoundTripTime > 0 || sRandomRoundTrip || sIncreasingRoundTrip)) {
@@ -937,6 +954,21 @@ receiving_thread(void* _data)
 			if (buffer == NULL)
 				break;
 
+			if (sSimultaneousConnect && context->server && is_syn(buffer)) {
+				// delay getting the SYN request, and connect as well
+				sockaddr_in address;
+				memset(&address, 0, sizeof(address));
+				address.sin_family = AF_INET;
+				address.sin_port = htons(1023);
+				address.sin_addr.s_addr = htonl(0xc0a80001);
+
+				status_t status = socket_connect(gServerSocket, (struct sockaddr *)&address,
+					sizeof(struct sockaddr));
+				if (status < B_OK)
+					fprintf(stderr, "tcp_tester: simultaneous connect failed: %s\n", strerror(status));
+
+				sSimultaneousConnect = false;
+			}
 			if (sRandomReorder > 0.0 || sReorderList.find(sPacketNumber) != sReorderList.end()
 				&& reorderBuffer == NULL
 				&& (1.0 * rand() / RAND_MAX) > sRandomReorder) {
@@ -981,6 +1013,37 @@ server_thread(void*)
 
 
 void
+setup_server()
+{
+	sockaddr_in address;
+	memset(&address, 0, sizeof(address));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(1024);
+	address.sin_addr.s_addr = INADDR_ANY;
+
+	status_t status = socket_bind(gServerSocket, (struct sockaddr *)&address,
+		sizeof(struct sockaddr));
+	if (status < B_OK) {
+		fprintf(stderr, "tcp_tester: cannot bind server: %s\n", strerror(status));
+		exit(1);
+	}
+	status = socket_listen(gServerSocket, 40);
+	if (status < B_OK) {
+		fprintf(stderr, "tcp_tester: server cannot listen: %s\n", strerror(status));
+		exit(1);
+	}
+
+	thread_id serverThread = spawn_thread(server_thread, "server", B_NORMAL_PRIORITY, NULL);
+	if (serverThread < B_OK) {
+		fprintf(stderr, "tcp_tester: cannot start server: %s\n", strerror(serverThread));
+		exit(1);
+	}
+
+	resume_thread(serverThread);
+}
+
+
+void
 setup_context(struct context& context, bool server)
 {
 	list_init(&context.list);
@@ -1016,9 +1079,36 @@ static void do_help(int argc, char** argv);
 static void
 do_connect(int argc, char** argv)
 {
+	sSimultaneousConnect = false;
+
 	int port = 1024;
-	if (argc > 1)
-		port = atoi(argv[1]);
+	if (argc > 1) {
+		if (!strcmp(argv[1], "-s"))
+			sSimultaneousConnect = true;
+		else if (isdigit(argv[1][0]))
+			port = atoi(argv[1]);
+		else {
+			fprintf(stderr, "usage: connect [-s|<port-number>]\n");
+			return;
+		}
+	}
+
+	if (sSimultaneousConnect) {
+		// bind to a port first, so the other end can find us
+		sockaddr_in address;
+		memset(&address, 0, sizeof(address));
+		address.sin_family = AF_INET;
+		address.sin_port = htons(1023);
+		address.sin_addr.s_addr = htonl(0xc0a80001);
+
+		status_t status = socket_bind(gClientSocket, (struct sockaddr *)&address,
+			sizeof(struct sockaddr));
+		if (status < B_OK) {
+			fprintf(stderr, "Could not bind to port 1023: %s\n", strerror(status));
+			sSimultaneousConnect = false;
+			return;
+		}
+	}
 
 	sStartTime = system_time();
 
@@ -1026,7 +1116,10 @@ do_connect(int argc, char** argv)
 	memset(&address, 0, sizeof(address));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
-	address.sin_addr.s_addr = INADDR_ANY;
+	if (sSimultaneousConnect)
+		address.sin_addr.s_addr = htonl(0xc0a80001);
+	else
+		address.sin_addr.s_addr = INADDR_ANY;
 
 	status_t status = socket_connect(gClientSocket, (struct sockaddr *)&address,
 		sizeof(struct sockaddr));
@@ -1101,6 +1194,17 @@ do_drop(int argc, char** argv)
 		// flush drop list
 		sDropList.clear();
 		puts("drop list cleared.");
+	} else if (!strcmp(argv[1], "-r")) {
+		if (argc < 3) {
+			fprintf(stderr, "No drop probability specified.\n");
+			return;
+		}
+
+		sRandomDrop = atof(argv[2]);
+		if (sRandomDrop < 0.0)
+			sRandomDrop = 0;
+		else if (sRandomDrop > 1.0)
+			sRandomDrop = 1.0;
 	} else if (isdigit(argv[1][0])) {
 		// add to drop list
 		for (int i = 1; i < argc; i++) {
@@ -1115,9 +1219,11 @@ do_drop(int argc, char** argv)
 	} else {
 		// print usage
 		puts("usage: drop <packet-number> [...]\n"
+			"   or: drop -r <probability>\n\n"
 			"   or: drop [-f]\n\n"
-			"Specifiying -f flushes the drop list; if you called drop without\n"
-			"any arguments, the current drop list is dumped.");
+			"Specifiying -f flushes the drop list, -r sets the probability a packet\n"
+			"is dropped; if you called drop without any arguments, the current\n"
+			"drop list is dumped.");
 	}
 }
 
@@ -1285,32 +1391,7 @@ main(int argc, char** argv)
 	printf("*** Server: %p (%ld), Client: %p (%ld)\n", server,
 		sServerContext.thread, client, sClientContext.thread);
 
-	// setup server
-
-	sockaddr_in address;
-	memset(&address, 0, sizeof(address));
-	address.sin_family = AF_INET;
-	address.sin_port = htons(1024);
-	address.sin_addr.s_addr = INADDR_ANY;
-
-	status = socket_bind(gServerSocket, (struct sockaddr *)&address, sizeof(struct sockaddr));
-	if (status < B_OK) {
-		fprintf(stderr, "tcp_tester: cannot bind server: %s\n", strerror(status));
-		return 1;
-	}
-	status = socket_listen(gServerSocket, 40);
-	if (status < B_OK) {
-		fprintf(stderr, "tcp_tester: server cannot listen: %s\n", strerror(status));
-		return 1;
-	}
-
-	thread_id serverThread = spawn_thread(server_thread, "server", B_NORMAL_PRIORITY, NULL);
-	if (serverThread < B_OK) {
-		fprintf(stderr, "tcp_tester: cannot start server: %s\n", strerror(serverThread));
-		return 1;
-	}
-
-	resume_thread(serverThread);
+	setup_server();
 
 	while (true) {
 		printf("> ");
@@ -1354,8 +1435,8 @@ main(int argc, char** argv)
 		free(argv);
 	}
 
-	close_protocol(server);
 	close_protocol(client);
+	close_protocol(server);
 
 	cleanup_context(sClientContext);
 	cleanup_context(sServerContext);
