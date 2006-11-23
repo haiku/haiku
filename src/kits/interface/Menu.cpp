@@ -1348,11 +1348,15 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			UnlockLooper();
 		
 		if (buttons != 0 && IsStickyMode()) {
-			BMenu *supermenu = Supermenu();
-			for(; supermenu; supermenu = supermenu->Supermenu())
-				supermenu->SetStickyMode(false);
-			SetStickyMode(false);
-			trackTime = 0;
+			if (item == NULL)
+				fState = MENU_STATE_CLOSED;
+			else {
+				BMenu *supermenu = Supermenu();
+				for(; supermenu; supermenu = supermenu->Supermenu())
+					supermenu->SetStickyMode(false);
+				SetStickyMode(false);
+				trackTime = 0;
+			}		
 		} else if (buttons == 0 && !IsStickyMode()) {
 /*			TODO: FIXME! trackTime is a hacky workaround for BMenuField. It
 			opens directly under your mouse pointer, so when you release the mouse
