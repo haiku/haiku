@@ -42,10 +42,10 @@ create_socket(int family, int type, int protocol, net_socket **_socket)
 		goto err1;
 
 	// set defaults (may be overridden by the protocols)
-	socket->send.buffer_size = 65536;
+	socket->send.buffer_size = 65535;
 	socket->send.low_water_mark = 1;
 	socket->send.timeout = B_INFINITE_TIMEOUT;
-	socket->receive.buffer_size = 65536;
+	socket->receive.buffer_size = 65535;
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
@@ -535,6 +535,52 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 			return B_OK;
 		}
 
+		case SO_SNDLOWAT:
+		{
+			uint32 *size = (uint32 *)value;
+			*size = socket->send.low_water_mark;
+			*_length = sizeof(uint32);
+			return B_OK;
+		}
+
+		case SO_RCVLOWAT:
+		{
+			uint32 *size = (uint32 *)value;
+			*size = socket->receive.low_water_mark;
+			*_length = sizeof(uint32);
+			return B_OK;
+		}
+
+		case SO_RCVTIMEO:
+		case SO_SNDTIMEO:
+		{
+			if (*_length < sizeof(struct timeval))
+				return B_BAD_VALUE;
+
+			bigtime_t timeout;
+			if (option == SO_SNDTIMEO)
+				timeout = socket->send.timeout;
+			else
+				timeout = socket->receive.timeout;
+			if (timeout == B_INFINITE_TIMEOUT)
+				timeout = 0;
+
+			struct timeval *timeval = (struct timeval *)value;
+			timeval->tv_secs = timeout / 1000000LL;
+			timeval->tv_usecs = timeout % 1000000LL;
+
+			*_length = sizeof(struct timeval);
+			return B_OK;
+		}
+
+		case SO_NONBLOCK:
+		{
+			int32 *_set = (int32 *)value;
+			*_set = socket->receive.timeout == 0 && socket->send.timeout == 0;
+			*_length = sizeof(int32);
+			return B_OK;
+		}
+
 		case SO_ACCEPTCONN:
 		case SO_BROADCAST:
 		case SO_DEBUG:
@@ -741,6 +787,8 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 		}
 
 		case SO_SNDBUF:
+			// TODO: should be handled in the protocol modules - they can actually
+			//	check if setting the value is allowed and within valid bounds.
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
@@ -748,10 +796,58 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 			return B_OK;
 
 		case SO_RCVBUF:
+			// TODO: see above (SO_SNDBUF)
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
 			socket->receive.buffer_size = *(const uint32 *)value;
+			return B_OK;
+
+		case SO_SNDLOWAT:
+			// TODO: see above (SO_SNDBUF)
+			if (length != sizeof(uint32))
+				return B_BAD_VALUE;
+
+			socket->send.low_water_mark = *(const uint32 *)value;
+			return B_OK;
+
+		case SO_RCVLOWAT:
+			// TODO: see above (SO_SNDBUF)
+			if (length != sizeof(uint32))
+				return B_BAD_VALUE;
+
+			socket->receive.low_water_mark = *(const uint32 *)value;
+			return B_OK;
+
+		case SO_RCVTIMEO:
+		case SO_SNDTIMEO:
+		{
+			if (length != sizeof(struct timeval))
+				return B_BAD_VALUE;
+
+			const struct timeval *timeval = (const struct timeval *)value;
+			bigtime_t timeout = timeval->tv_sec * 1000000LL + timeval->tv_usec;
+			if (timeout == 0)
+				timeout = B_INFINITE_TIMEOUT;
+
+			if (option == SO_SNDTIMEO)
+				socket->send.timeout = timeout;
+			else
+				socket->receive.timeout = timeout;
+			return B_OK;
+		}
+
+		case SO_NONBLOCK:
+			if (length != sizeof(int32))
+				return B_BAD_VALUE;
+
+			if (*(const int32 *)value) {
+				socket->send.timeout = 0;
+				socket->receive.timeout = 0;
+			} else {
+				socket->send.timeout = B_INFINITE_TIMEOUT;
+				socket->receive.timeout = B_INFINITE_TIMEOUT;
+			}
 			return B_OK;
 
 		case SO_BROADCAST:
