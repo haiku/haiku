@@ -20,6 +20,7 @@
 #include <new>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 
 void socket_delete(net_socket *socket);
@@ -554,7 +555,7 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 		case SO_RCVTIMEO:
 		case SO_SNDTIMEO:
 		{
-			if (*_length < sizeof(struct timeval))
+			if (*_length < (int)sizeof(struct timeval))
 				return B_BAD_VALUE;
 
 			bigtime_t timeout;
@@ -566,8 +567,8 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 				timeout = 0;
 
 			struct timeval *timeval = (struct timeval *)value;
-			timeval->tv_secs = timeout / 1000000LL;
-			timeval->tv_usecs = timeout % 1000000LL;
+			timeval->tv_sec = timeout / 1000000LL;
+			timeval->tv_usec = timeout % 1000000LL;
 
 			*_length = sizeof(struct timeval);
 			return B_OK;
