@@ -22,6 +22,14 @@ typedef struct net_buffer {
 	struct sockaddr_storage source;
 	struct sockaddr_storage destination;
 	struct net_interface *interface;
+	union {
+		struct {
+			uint16	start;
+			uint16	end;
+		}		fragment;
+		uint32	sequence;
+		uint32	offset;
+	};
 	uint32	flags;
 	uint32	size;
 	uint8	protocol;

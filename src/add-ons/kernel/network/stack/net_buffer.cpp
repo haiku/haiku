@@ -223,6 +223,7 @@ create_buffer(size_t headerSpace)
 	buffer->source.ss_len = 0;
 	buffer->destination.ss_len = 0;
 	buffer->interface = NULL;
+	buffer->offset = 0;
 	buffer->flags = 0;
 	buffer->size = 0;
 

@@ -71,13 +71,7 @@ struct ipv4_header {
 #define FRAGMENT_TIMEOUT		60000000LL
 	// discard fragment after 60 seconds
 
-struct ipv4_fragment : DoublyLinkedListLinkImpl<ipv4_fragment> {
-	uint16		start;
-	uint16		end;
-	net_buffer	*buffer;
-};
-
-typedef DoublyLinkedList<struct ipv4_fragment> FragmentList;
+typedef DoublyLinkedList<struct net_buffer, DoublyLinkedListCLink<struct net_buffer> > FragmentList;
 
 struct ipv4_packet_key {
 	in_addr_t	source;
@@ -243,11 +237,9 @@ FragmentPacket::~FragmentPacket()
 	sStackModule->set_timer(&fTimer, -1);
 
 	// delete all fragments
-	ipv4_fragment *fragment;
-	while ((fragment = fFragments.RemoveHead()) != NULL) {
-		if (fragment->buffer != NULL)
-			gBufferModule->free(fragment->buffer);
-		delete fragment;
+	net_buffer *buffer;
+	while ((buffer = fFragments.RemoveHead()) != NULL) {
+		gBufferModule->free(buffer);
 	}
 }
 
@@ -267,11 +259,10 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 	// Search for a position in the list to insert the fragment
 
 	FragmentList::ReverseIterator iterator = fFragments.GetReverseIterator();
-	ipv4_fragment *previous = NULL;
-	ipv4_fragment *next = NULL;
+	net_buffer *previous = NULL;
+	net_buffer *next = NULL;
 	while ((previous = iterator.Next()) != NULL) {
-
-		if (previous->start <= start) {
+		if (previous->fragment.start <= start) {
 			// The new fragment can be inserted after this one
 			break;
 		}
@@ -281,7 +272,8 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 
 	// See if we already have the fragment's data
 
-	if (previous != NULL && previous->start <= start && previous->end >= end) {
+	if (previous != NULL && previous->fragment.start <= start
+		&& previous->fragment.end >= end) {
 		// we do, so we can just drop this fragment
 		gBufferModule->free(buffer);
 		return B_OK;
@@ -291,15 +283,15 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 
 	// If we have parts of the data already, truncate as needed
 
-	if (previous != NULL && previous->end > start) {
-		TRACE(("    remove header %d bytes\n", previous->end - start));
-		gBufferModule->remove_header(buffer, previous->end - start);
-		start = previous->end;
+	if (previous != NULL && previous->fragment.end > start) {
+		TRACE(("    remove header %d bytes\n", previous->fragment.end - start));
+		gBufferModule->remove_header(buffer, previous->fragment.end - start);
+		start = previous->fragment.end;
 	}
-	if (next != NULL && next->start < end) {
-		TRACE(("    remove trailer %d bytes\n", next->start - end));
-		gBufferModule->remove_trailer(buffer, next->start - end);
-		end = next->start;
+	if (next != NULL && next->fragment.start < end) {
+		TRACE(("    remove trailer %d bytes\n", next->fragment.start - end));
+		gBufferModule->remove_trailer(buffer, next->fragment.start - end);
+		end = next->fragment.start;
 	}
 
 	// Now try if we can already merge the fragments together
@@ -307,14 +299,20 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 	// We will always keep the last buffer received, so that we can still
 	// report an error (in which case we're not responsible for freeing it)
 
-	if (previous != NULL && previous->end == start) {
-		status_t status = gBufferModule->merge(buffer, previous->buffer, false);
-		TRACE(("    merge previous: %s\n", strerror(status)));
-		if (status < B_OK)
-			return status;
+	if (previous != NULL && previous->fragment.end == start) {
+		fFragments.Remove(previous);
 
-		previous->buffer = buffer;
-		previous->end = end;
+		buffer->fragment.start = previous->fragment.start;
+		buffer->fragment.end = end;
+
+		status_t status = gBufferModule->merge(buffer, previous, false);
+		TRACE(("    merge previous: %s\n", strerror(status)));
+		if (status < B_OK) {
+			fFragments.Insert(next, previous);
+			return status;
+		}
+
+		fFragments.Insert(next, buffer);
 
 		// cut down existing hole
 		fBytesLeft -= end - start;
@@ -327,14 +325,20 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		TRACE(("    hole length: %d\n", (int)fBytesLeft));
 
 		return B_OK;
-	} else if (next != NULL && next->start == end) {
-		status_t status = gBufferModule->merge(buffer, next->buffer, true);
-		TRACE(("    merge next: %s\n", strerror(status)));
-		if (status < B_OK)
-			return status;
+	} else if (next != NULL && next->fragment.start == end) {
+		fFragments.Remove(next);
 
-		next->buffer = buffer;
-		next->start = start;
+		buffer->fragment.start = start;
+		buffer->fragment.end = next->fragment.end;
+
+		status_t status = gBufferModule->merge(buffer, next, true);
+		TRACE(("    merge next: %s\n", strerror(status)));
+		if (status < B_OK) {
+			fFragments.Insert((net_buffer *)previous->link.next, next);
+			return status;
+		}
+
+		fFragments.Insert((net_buffer *)previous->link.next, buffer);
 
 		// cut down existing hole
 		fBytesLeft -= end - start;
@@ -349,17 +353,13 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		return B_OK;
 	}
 
-	// We couldn't merge the fragments, so we need to add a new fragment
+	// We couldn't merge the fragments, so we need to add it as is
 
-	ipv4_fragment *fragment = new (std::nothrow) ipv4_fragment;
-	TRACE(("    new fragment: %p, bytes %d-%d\n", fragment, start, end));
-	if (fragment == NULL)
-		return B_NO_MEMORY;
+	TRACE(("    new fragment: %p, bytes %d-%d\n", buffer, start, end));
 
-	fragment->start = start;
-	fragment->end = end;
-	fragment->buffer = buffer;
-	fFragments.Insert(next, fragment);
+	buffer->fragment.start = start;
+	buffer->fragment.end = end;
+	fFragments.Insert(next, buffer);
 
 	// update length of the hole, if any
 	fBytesLeft -= end - start;
@@ -387,21 +387,19 @@ FragmentPacket::Reassemble(net_buffer *to)
 
 	net_buffer *buffer = NULL;
 
-	ipv4_fragment *fragment;
+	net_buffer *fragment;
 	while ((fragment = fFragments.RemoveHead()) != NULL) {
 		if (buffer != NULL) {
 			status_t status;
-			if (to == fragment->buffer) {
-				status = gBufferModule->merge(fragment->buffer, buffer, false);
-				buffer = fragment->buffer;
+			if (to == fragment) {
+				status = gBufferModule->merge(fragment, buffer, false);
+				buffer = fragment;
 			} else
-				status = gBufferModule->merge(buffer, fragment->buffer, true);
+				status = gBufferModule->merge(buffer, fragment, true);
 			if (status < B_OK)
 				return status;
 		} else
-			buffer = fragment->buffer;
-
-		delete fragment;
+			buffer = fragment;
 	}
 
 	if (buffer != to)
@@ -568,8 +566,8 @@ static status_t
 send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	net_buffer *buffer, uint32 mtu)
 {
-	dprintf("ipv4 needs to fragment (size %lu, MTU %lu), but that's not yet tested...\n",
-		buffer->size, mtu);
+	TRACE(("ipv4 needs to fragment (size %lu, MTU %lu)...\n",
+		buffer->size, mtu));
 
 	NetBufferHeader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
