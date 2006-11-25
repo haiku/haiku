@@ -61,6 +61,8 @@ struct net_buffer_module_info {
 	status_t		(*remove_header)(net_buffer *buffer, size_t bytes);
 	status_t		(*remove_trailer)(net_buffer *buffer, size_t bytes);
 	status_t		(*trim)(net_buffer *buffer, size_t newSize);
+	status_t		(*append_cloned)(net_buffer *buffer, net_buffer *source,
+						uint32 offset, size_t bytes);
 
 	status_t		(*associate_data)(net_buffer *buffer, void *data);
 

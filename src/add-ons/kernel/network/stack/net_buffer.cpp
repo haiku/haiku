@@ -60,7 +60,7 @@ static status_t remove_header(net_buffer *_buffer, size_t bytes);
 static status_t remove_trailer(net_buffer *_buffer, size_t bytes);
 
 
-#if 0
+#if 1
 static void
 dump_buffer(net_buffer *_buffer)
 {
@@ -838,6 +838,70 @@ trim_data(net_buffer *_buffer, size_t newSize)
 
 
 /*!
+	Appends data coming from buffer \a source to the buffer \a buffer. It only
+	clones the data, though, that is the data is not copied, just referenced.
+*/
+status_t
+append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
+	size_t bytes)
+{
+	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private *source = (net_buffer_private *)_source;
+	TRACE(("append_cloned_data(buffer %p, source %p, offset = %ld, bytes = %ld)\n",
+		buffer, source, offset, bytes));
+
+	if (source->size < offset + bytes)
+		return B_BAD_VALUE;
+
+	// find data_node to start with from the source buffer
+
+	data_node *node = (data_node *)list_get_first_item(&source->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&source->buffers, node);
+		if (node == NULL) {
+			// trim size greater than buffer size
+			return B_BAD_VALUE;
+		}
+	}
+
+	while (node != NULL && bytes > 0) {
+		data_node *clone = (data_node *)alloc_data_header_space(node->header,
+			sizeof(data_node));
+		if (clone == NULL) {
+			// There is not enough space in the buffer for another node
+			// TODO: handle this case!
+			panic("appending clone buffer in new header not implemented\n");
+			return ENOBUFS;
+		}
+
+		if (offset)
+			offset -= node->offset;
+
+		clone->header = node->header;
+		clone->offset = buffer->size;
+		clone->start = node->start + offset;
+		clone->used = min_c(bytes, node->used - offset);
+		clone->header_space = 0;
+		clone->tail_space = 0;
+
+		list_add_item(&buffer->buffers, clone);
+
+		offset = 0;
+		bytes -= clone->used;
+		buffer->size += clone->used;
+		node = (data_node *)list_get_next_item(&source->buffers, node);
+	}
+
+	if (bytes != 0)
+		panic("add_cloned_data() failed, bytes != 0!\n");
+
+	dprintf(" append cloned result:\n");
+	dump_buffer(buffer);
+	return B_OK;
+}
+
+
+/*!
 	Tries to directly access the requested space in the buffer.
 	If the space is contiguous, the function will succeed and place a pointer
 	to that space into \a _contiguousBuffer.
@@ -1006,6 +1070,7 @@ net_buffer_module_info gNetBufferModule = {
 	remove_header,
 	remove_trailer,
 	trim_data,
+	append_cloned_data,
 
 	NULL,	// associate_data
 
