@@ -103,7 +103,7 @@ set_domain(net_interface *interface = NULL)
 static inline void
 bump_option(tcp_option *&option, size_t &length)
 {
-	length = option->length;
+	length += option->length;
 	option = (tcp_option *)((uint8 *)option + option->length);
 }
 
