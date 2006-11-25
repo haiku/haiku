@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs pdflib libs tiff ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdcore ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs flate ] ;
 

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons print transports shared ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 if $(BONE_COMPATIBLE) {
 	ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET -Dclosesocket=close ;
 } else {
@@ -11,5 +13,3 @@ Objects
 	Socket.cpp
 	SocketStream.cpp
 ;
-
-

@@ -12,7 +12,7 @@ Preference Printers :
 	JobListView.cpp
 	SpoolFolder.cpp
 	Globals.cpp 
-	: libbe.so libtranslation.so libprint.a
+	: be translation libprint.a
 	: Printers.rdef
 	;
 

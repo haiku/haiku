@@ -1,7 +1,7 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
-#ifdef __HAIKU__
+#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_BONE)
 #	include <sys/socket.h>
 #	include <netdb.h>
 #else
@@ -9,7 +9,6 @@
 #	include <net/netdb.h>
 #endif
 #include <errno.h>
-#include <sstream>
 
 #include <iomanip>
 #include <algorithm>
