@@ -86,25 +86,26 @@ tcp_segment::~tcp_segment()
 
 TCPConnection::TCPConnection(net_socket *socket)
 	:
+	fSendWindowShift(0),
+	fReceiveWindowShift(0),
 	fLastAcknowledged(0), //system_time()),
 	fSendNext(fLastAcknowledged),
 	fSendWindow(0),
-	fSendBuffer(NULL),
+	fSendQueue(socket->send.buffer_size),
 	fRoute(NULL),
 	fReceiveNext(0),
-	fReceiveWindow(32768),
-	fAvgRTT(TCP_INITIAL_RTT),
-	fReceiveBuffer(NULL),
+	fReceiveWindow(socket->receive.buffer_size),
+	fReceiveQueue(socket->receive.buffer_size),
+	fRoundTripTime(TCP_INITIAL_RTT),
 	fState(CLOSED),
 	fError(B_OK)
 {
 	gStackModule->init_timer(&fTimer, _TimeWait, this);
-	list_init(&fReorderQueue);
-	list_init(&fWaitQueue);
 
-	benaphore_init(&fReceiveLock, "tcp receive");
-	benaphore_init(&fSendLock, "tcp send");
-	fAcceptSemaphore = create_sem(0, "tcp accept");
+	//benaphore_init(&fReceiveLock, "tcp receive");
+	//benaphore_init(&fSendLock, "tcp send");
+	fSendLock = create_sem(0, "tcp send");
+	fReceiveLock = create_sem(0, "tcp receive");
 }
 
 
@@ -112,21 +113,23 @@ TCPConnection::~TCPConnection()
 {
 	gStackModule->set_timer(&fTimer, -1);
 
-	benaphore_destroy(&fReceiveLock);
-	benaphore_destroy(&fSendLock);
-	delete_sem(fAcceptSemaphore);
+	//benaphore_destroy(&fReceiveLock);
+	//benaphore_destroy(&fSendLock);
+	//delete_sem(fAcceptSemaphore);
+	delete_sem(fReceiveLock);
+	delete_sem(fSendLock);
 }
 
 
 status_t
 TCPConnection::InitCheck() const
 {
-	if (fReceiveLock.sem < B_OK)
-		return fReceiveLock.sem;
-	if (fSendLock.sem < B_OK)
-		return fSendLock.sem;
-	if (fAcceptSemaphore < B_OK)
-		return fAcceptSemaphore;
+	if (fReceiveLock < B_OK)
+		return fReceiveLock;
+	if (fSendLock < B_OK)
+		return fSendLock;
+	//if (fAcceptSemaphore < B_OK)
+	//	return fAcceptSemaphore;
 
 	return B_OK;
 }
@@ -172,7 +175,7 @@ TCPConnection::Open()
 status_t
 TCPConnection::Close()
 {
-	BenaphoreLocker lock(&fSendLock);
+	//BenaphoreLocker lock(&fSendLock);
 	TRACE(("TCP:%p.Close()\n", this));
 	if (fState == SYNCHRONIZE_SENT || fState == LISTEN) {
 		fState = CLOSED;
@@ -224,7 +227,9 @@ TCPConnection::Connect(const struct sockaddr *address)
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
 
-	BenaphoreLocker lock(&fSendLock);
+	//BenaphoreLocker lock(&fSendLock);
+
+	TRACE(("  TCP: Connect(): in state %d\n", fState));
 
 	// Can only call connect() from CLOSED or LISTEN states
 	// otherwise connection is considered already connected
@@ -233,8 +238,6 @@ TCPConnection::Connect(const struct sockaddr *address)
 		gSocketModule->set_max_backlog(socket, 0);
 	} else if (fState != CLOSED)
 		return EISCONN;
-
-	TRACE(("  TCP: Connect(): in state %d\n", fState));
 
 	// get a net_route if there isn't one
 	// TODO: get a net_route_info instead!
@@ -245,10 +248,18 @@ TCPConnection::Connect(const struct sockaddr *address)
 			return ENETUNREACH;
 	}
 
+	remove_connection(this);
+		// we need to temporarily remove us from the connection list, as we're
+		// changing our addresses
+
 	// need to associate this connection with a real address, not INADDR_ANY
 	if (gAddressModule->is_empty_address((sockaddr *)&socket->address, false)) {
 		TRACE(("  TCP: Connect(): Local Address is INADDR_ANY\n"));
-		gAddressModule->set_to((sockaddr *)&socket->address, (sockaddr *)fRoute->interface->address);
+		uint16 port = gAddressModule->get_port((sockaddr *)&socket->address);
+		gAddressModule->set_to((sockaddr *)&socket->address,
+			(sockaddr *)fRoute->interface->address);
+		gAddressModule->set_port((sockaddr *)&socket->address, port);
+			// need to reset the port after overwriting the address
 	}
 
 	gAddressModule->set_to((sockaddr *)&socket->peer, address);
@@ -260,10 +271,21 @@ TCPConnection::Connect(const struct sockaddr *address)
 		return status;
 	}
 
+	fMaxReceiveSize = next->module->get_mtu(next, (sockaddr *)address)
+		- sizeof(tcp_header);
+
+	// Compute the window shift we advertise to our peer - if it doesn't support
+	// this option, this will be reset to 0 (when its SYN is received)
+	fReceiveWindowShift = 0;
+	while (fReceiveWindowShift < TCP_MAX_WINDOW_SHIFT
+		&& (0xffffUL << fReceiveWindowShift) < socket->receive.buffer_size) {
+		fReceiveWindowShift++;
+	}
+dprintf("************************* size = %ld, shift = %d\n", socket->receive.buffer_size, fReceiveWindowShift);
+
 	TRACE(("  TCP: Connect(): starting 3-way handshake...\n"));
 
 	fState = SYNCHRONIZE_SENT;
-	fMaxReceiveSize = fRoute->mtu - 40;
 
 	// send SYN
 	status = _SendQueuedData(TCP_FLAG_SYNCHRONIZE, false);
@@ -272,9 +294,18 @@ TCPConnection::Connect(const struct sockaddr *address)
 		return status;
 	}
 
-	// TODO: wait until 3-way handshake is complete
-	TRACE(("  TCP: Connect(): Connection complete\n"));
-	return B_OK;
+	// wait until 3-way handshake is complete (if needed)
+
+	bigtime_t timeout = min_c(socket->send.timeout, TCP_CONNECTION_TIMEOUT);
+	if (timeout == 0) {
+		// we're a non-blocking socket
+		return EINPROGRESS;
+	}
+
+	status = acquire_sem_etc(fSendLock, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+
+	TRACE(("  TCP: Connect(): Connection complete: %s\n", strerror(status)));
+	return status;
 }
 
 
@@ -287,7 +318,8 @@ TCPConnection::Accept(struct net_socket **_acceptedSocket)
 	// TODO: test for non-blocking I/O
 	status_t status;
 	do {
-		status = acquire_sem(fAcceptSemaphore);
+		status = acquire_sem_etc(fReceiveLock, 1, B_RELATIVE_TIMEOUT,
+			socket->receive.timeout);
 		if (status < B_OK)
 			return status;
 
@@ -307,7 +339,7 @@ TCPConnection::Bind(sockaddr *address)
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
 
-	BenaphoreLocker lock(&fSendLock);
+	//BenaphoreLocker lock(&fSendLock);
 		// TODO: there is no lock yet for these things...
 
 	if (fState != CLOSED)
@@ -339,7 +371,7 @@ TCPConnection::Unbind(struct sockaddr *address)
 {
 	TRACE(("TCP:%p.Unbind()\n", this ));
 
-	BenaphoreLocker lock(&fSendLock);
+	//BenaphoreLocker lock(&fSendLock);
 		// TODO: there is no lock yet for these things...
 
 	status_t status = remove_connection(this);
@@ -356,7 +388,7 @@ status_t
 TCPConnection::Listen(int count)
 {
 	TRACE(("TCP:%p.Listen()\n", this));
-	BenaphoreLocker lock(&fSendLock);
+	//BenaphoreLocker lock(&fSendLock);
 	if (fState != CLOSED)
 		return B_BAD_VALUE;
 
@@ -382,13 +414,7 @@ TCPConnection::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
 
-	BenaphoreLocker lock(&fSendLock);
-	if (fSendBuffer != NULL) {
-		status_t status = gBufferModule->merge(fSendBuffer, buffer, true);
-		if (status != B_OK)
-			return status;
-	} else
-		fSendBuffer = buffer;
+	fSendQueue.Add(buffer);
 
 	return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, false);
 }
@@ -398,11 +424,8 @@ size_t
 TCPConnection::SendAvailable()
 {
 	TRACE(("TCP:%p.SendAvailable()\n", this));
-	BenaphoreLocker lock(&fSendLock);
-	if (fSendBuffer != NULL)
-		return TCP_MAX_SEND_BUF - fSendBuffer->size;
 
-	return TCP_MAX_SEND_BUF;
+	return fSendQueue.Free();
 }
 
 
@@ -411,27 +434,24 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
 	TRACE(("TCP:%p.ReadData()\n", this));
 
-	BenaphoreLocker lock(&fReceiveLock);
+	//BenaphoreLocker lock(&fReceiveLock);
 
-	// must be in a synchronous state
-	if (fState != ESTABLISHED || fState != FINISH_SENT || fState != FINISH_ACKNOWLEDGED) {
-		// TODO: is this correct semantics?
-dprintf("  TCP state = %d\n", fState);
-		return B_ERROR;
+	if (fState == SYNCHRONIZE_SENT || fState == SYNCHRONIZE_RECEIVED) {
+		// we need to wait until the connection becomes established
+		if (flags & MSG_DONTWAIT)
+			return B_WOULD_BLOCK;
+
+		status_t status = acquire_sem_etc(fSendLock, 1,
+			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, socket->receive.timeout);
+		if (status < B_OK)
+			return status;
 	}
 
-dprintf("  TCP error = %ld\n", fError);
-	if (fError != B_OK)
-		return fError;
+	// read data out of buffer
+	// TODO: add support for urgent data (MSG_OOB)
+	// TODO: wait until enough bytes are available
 
-	if (fReceiveBuffer->size < numBytes)
-		numBytes = fReceiveBuffer->size;
-
-	*_buffer = gBufferModule->split(fReceiveBuffer, numBytes);
-	if (*_buffer == NULL)
-		return B_NO_MEMORY;
-
-	return B_OK;
+	return fReceiveQueue.Get(numBytes, (flags & MSG_PEEK) == 0, _buffer);
 }
 
 
@@ -439,88 +459,8 @@ size_t
 TCPConnection::ReadAvailable()
 {
 	TRACE(("TCP:%p.ReadAvailable()\n", this));
-	BenaphoreLocker lock(&fReceiveLock);
-	if (fReceiveBuffer != NULL)
-		return fReceiveBuffer->size;
-
-	return 0;
-}
-
-
-/*!
-	You must hold the connection's receive lock when calling this method
-*/
-status_t
-TCPConnection::_EnqueueReceivedData(net_buffer *buffer, uint32 sequence)
-{
-	TRACE(("TCP:%p.EnqueueReceivedData(%p, %lu)\n", this, buffer, sequence));
-	status_t status;
-
-	if (sequence == fReceiveNext) {
-		// first check if the received buffer meets up with the first
-		// segment in the ReorderQueue
-		tcp_segment *next;
-		while ((next = (tcp_segment *)list_get_first_item(&fReorderQueue)) != NULL) {
-			if (sequence + buffer->size >= next->sequence) {
-				if (sequence + buffer->size > next->sequence) {
-					status = gBufferModule->trim(buffer, sequence - next->sequence);
-					if (status != B_OK)
-						return status;
-				}
-				status = gBufferModule->merge(buffer, next->buffer, true);
-				if (status != B_OK)
-					return status;
-				list_remove_item(&fReorderQueue, next);
-				delete next;
-			} else
-				break;
-		}
-
-		fReceiveNext += buffer->size;
-
-		if (fReceiveBuffer != NULL) {
-			status = gBufferModule->merge(fReceiveBuffer, buffer, true);
-			if (status < B_OK) {
-				fReceiveNext -= buffer->size;
-				return status;
-			}
-		} else
-			fReceiveBuffer = buffer;
-	} else {
-		// add this buffer into the ReorderQueue in the correct place
-		// creating a new tcp_segment if necessary
-		tcp_segment *next = NULL;
-		do {
-			next = (tcp_segment *)list_get_next_item(&fReorderQueue, next);
-			if (next != NULL && next->sequence < sequence)
-				continue;
-			if (next != NULL && sequence + buffer->size >= next->sequence) {
-				// merge the new buffer with the next buffer
-				if (sequence + buffer->size > next->sequence) {
-					status = gBufferModule->trim(buffer, sequence - next->sequence);
-					if (status != B_OK)
-						return status;
-				}
-				status = gBufferModule->merge(buffer, next->buffer, true);
-				if (status != B_OK)
-					return status;
-
-				next->buffer = buffer;
-				next->sequence = sequence;
-				break;
-			}
-			tcp_segment *segment = new(std::nothrow) tcp_segment(buffer, sequence, -1);
-			if (segment == NULL)
-				return B_NO_MEMORY;
-
-			if (next == NULL)
-				list_add_item(&fReorderQueue, segment);
-			else
-				list_insert_item_before(&fReorderQueue, next, segment);
-		} while (next != NULL);
-	}
-
-	return B_OK;
+	//BenaphoreLocker lock(&fReceiveLock);
+	return fReceiveQueue.Available();
 }
 
 
@@ -575,7 +515,7 @@ TCPConnection::ListenReceive(tcp_segment_header& segment, net_buffer *buffer)
 	// TODO: proper error handling!
 
 	connection->fRoute = gDatalinkModule->get_route(gDomain,
-		(sockaddr *)&newSocket->address);
+		(sockaddr *)&newSocket->peer);
 	if (connection->fRoute == NULL)
 		return DROP;
 
@@ -592,10 +532,10 @@ TCPConnection::ListenReceive(tcp_segment_header& segment, net_buffer *buffer)
 	if (segment.max_segment_size > 0)
 		connection->fMaxSegmentSize = segment.max_segment_size;
 
-	benaphore_lock(&connection->fSendLock);
+	//benaphore_lock(&connection->fSendLock);
 	status_t status = connection->_SendQueuedData(
 		TCP_FLAG_SYNCHRONIZE | TCP_FLAG_ACKNOWLEDGE, false);
-	benaphore_unlock(&connection->fSendLock);
+	//benaphore_unlock(&connection->fSendLock);
 
 	if (status < B_OK)
 		return DROP;
@@ -626,6 +566,8 @@ TCPConnection::SynchronizeSentReceive(tcp_segment_header& segment, net_buffer *b
 	if (segment.flags & TCP_FLAG_ACKNOWLEDGE) {
 		// the connection has been established
 		fState = ESTABLISHED;
+		release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
+			// TODO: this is not enough - we need to use B_RELEASE_ALL
 	} else {
 		// simultaneous open
 		fState = SYNCHRONIZE_RECEIVED;
@@ -721,11 +663,9 @@ TCPConnection::Receive(tcp_segment_header& segment, net_buffer *buffer)
 	// TODO: This isn't the most efficient way to do it, and will need to be changed
 	//  to deal with Silly Window Syndrome
 
-	if (buffer->size > 0) {
-		status = _EnqueueReceivedData(buffer, segment.sequence);
-		if (status != B_OK)
-			return DROP;
-	} else
+	if (buffer->size > 0)
+		fReceiveQueue.Add(buffer, segment.sequence);
+	else
 		gBufferModule->free(buffer);
 
 	if (fState != CLOSING && fState != WAIT_FOR_FINISH_ACKNOWLEDGE)
@@ -765,26 +705,21 @@ TCPConnection::_SendQueuedData(uint16 flags, bool empty)
 	if (fRoute == NULL)
 		return B_ERROR;
 
-	net_buffer *buffer;
 	uint32 effectiveWindow = min_c(next->module->get_mtu(next,
 		(sockaddr *)&socket->address), fSendWindow);
+	uint32 available = fSendQueue.Available(fSendNext);
 
-	if (empty || effectiveWindow == 0 || fSendBuffer == NULL || fSendBuffer->size == 0) {
-		if (flags == 0) {
-			// there is just nothing left to do
-			return B_OK;
-		}
+	if (effectiveWindow > available)
+		effectiveWindow = available;
 
-		buffer = gBufferModule->create(256);
-		if (buffer == NULL)
-			return ENOBUFS;
-	} else {
-		if (effectiveWindow == fSendBuffer->size) {
-			buffer = fSendBuffer;
-			fSendBuffer = NULL;
-		} else
-			buffer = gBufferModule->split(fSendBuffer, effectiveWindow);
-	}
+	if (effectiveWindow == 0 && flags == 0)
+		return B_OK;
+
+	// TODO: determine if we should send anything at all!
+
+	net_buffer *buffer = gBufferModule->create(256);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
 
 	gAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
 	gAddressModule->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
@@ -799,12 +734,14 @@ TCPConnection::_SendQueuedData(uint16 flags, bool empty)
 	segment.flags = (uint8)flags;
 	segment.sequence = fSendNext;
 	segment.acknowledge = fReceiveNext;
-	segment.advertised_window = fReceiveWindow;
+	segment.advertised_window = min_c(65535, fReceiveWindow);
+		// TODO: support shift option!
 	segment.urgent_offset = 0;
 
 	if ((flags & TCP_FLAG_SYNCHRONIZE) != 0) {
 		// add connection establishment options
 		segment.max_segment_size = fMaxReceiveSize;
+		//segment.window_shift = fReceiveWindowShift;
 	}
 
 	status_t status = add_tcp_header(segment, buffer);

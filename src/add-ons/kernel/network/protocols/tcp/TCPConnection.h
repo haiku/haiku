@@ -11,9 +11,11 @@
 
 
 #include "tcp.h"
+#include "BufferQueue.h"
 
 #include <net_protocol.h>
 #include <net_stack.h>
+#include <util/DoublyLinkedList.h>
 
 #include <stddef.h>
 
@@ -59,22 +61,23 @@ class TCPConnection : public net_protocol {
 		bool _IsSequenceValid(uint32 sequence, uint32 length);
 
 		status_t _SendQueuedData(uint16 flags, bool empty);
-		status_t _EnqueueReceivedData(net_buffer *buffer, uint32 sequenceNumber);
 
 		static void _TimeWait(struct net_timer *timer, void *data);
 
 		TCPConnection	*fHashNext;
 
-		benaphore		fSendLock;
-		benaphore		fReceiveLock;
-		benaphore		fLock;
-		sem_id			fAcceptSemaphore;
+		//benaphore		fLock;
+		sem_id			fReceiveLock;
+		sem_id			fSendLock;
+
+		uint8			fSendWindowShift;
+		uint8			fReceiveWindowShift;
 
 		uint32			fLastAcknowledged;
 		uint32			fSendNext;
 		uint32			fSendWindow;
 		uint32			fMaxSegmentSize;
-		net_buffer		*fSendBuffer;
+		BufferQueue		fSendQueue;
 
 		net_route 		*fRoute;
 			// TODO: don't use a net_route, but a net_route_info!!!
@@ -82,15 +85,23 @@ class TCPConnection : public net_protocol {
 		uint32			fReceiveNext;
 		uint32			fReceiveWindow;
 		uint32			fMaxReceiveSize;
-		bigtime_t		fAvgRTT;
-		net_buffer		*fReceiveBuffer;
+		BufferQueue		fReceiveQueue;
+
+		// round trip time and retransmit timeout computation
+		int32			fRoundTripTime;
+		int32			fRetransmitTimeoutBase;
+		bigtime_t		fRetransmitTimeout;
+		int32			fRoundTripDeviation;
+		bigtime_t		fTrackingTimeStamp;
+		uint32			fTrackingSequence;
+		bool			fTracking;
+
+		uint32			fCongestionWindow;
+		uint32			fSlowStartThreshold;
 
 		tcp_state		fState;
 		status_t		fError;
 		vint32			fDelayedAcknowledge;
-
-		struct list 	fReorderQueue;
-		struct list 	fWaitQueue;
 
 		// timer
 		net_timer		fTimer;

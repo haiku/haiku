@@ -69,6 +69,22 @@ struct tcp_header {
 	uint16 UrgentOffset() const { return ntohs(urgent_offset); }
 } _PACKED;
 
+class tcp_sequence {
+	public:
+		tcp_sequence(uint32 sequence) : number(sequence) {}
+
+		operator uint32() const { return number; }
+		void operator=(uint32 sequence) { number = sequence; }
+		bool operator>(uint32 sequence) const { return (int32)(number - sequence) > 0; }
+		bool operator>=(uint32 sequence) const { return (int32)(number - sequence) >= 0; }
+		bool operator<(uint32 sequence) const { return (int32)(number - sequence) < 0; }
+		bool operator<=(uint32 sequence) const { return (int32)(number - sequence) <= 0; }
+		uint32 operator+=(uint32 sequence) { return number += sequence; }
+
+	private:
+		uint32 number;
+};
+
 // TCP flag constants
 #define TCP_FLAG_FINISH			0x01
 #define TCP_FLAG_SYNCHRONIZE	0x02
@@ -78,6 +94,8 @@ struct tcp_header {
 #define TCP_FLAG_URGENT			0x20
 #define TCP_FLAG_ECN			0x40 // Explicit Congestion Notification echo
 #define TCP_FLAG_CWR			0x80 // Congestion Window Reduced
+
+#define TCP_CONNECTION_TIMEOUT	75000000	// 75 secs
 
 struct tcp_option {
 	uint8	kind;
@@ -97,6 +115,8 @@ enum tcp_option_kind {
 	TCP_OPTION_WINDOW_SHIFT = 3,
 	TCP_OPTION_TIMESTAMP = 8,
 };
+
+#define TCP_MAX_WINDOW_SHIFT	14
 
 struct tcp_segment_header {
 	tcp_segment_header() : window_shift(0), max_segment_size(0) {}
