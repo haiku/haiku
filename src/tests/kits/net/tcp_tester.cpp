@@ -209,10 +209,10 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 		goto err1;
 
 	// set defaults (may be overridden by the protocols)
-	socket->send.buffer_size = 65536;
+	socket->send.buffer_size = 65535;
 	socket->send.low_water_mark = 1;
 	socket->send.timeout = B_INFINITE_TIMEOUT;
-	socket->receive.buffer_size = 65536;
+	socket->receive.buffer_size = 65535;
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
@@ -751,7 +751,8 @@ domain_get_domain(net_protocol *protocol)
 size_t
 domain_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 {
-	return 1500;
+	return 1480;
+		// 1500 ethernet - IPv4 header
 }
 
 
