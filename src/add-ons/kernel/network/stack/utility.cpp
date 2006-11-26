@@ -300,15 +300,18 @@ set_timer(net_timer *timer, bigtime_t delay)
 {
 	BenaphoreLocker locker(sTimerLock);
 
-	if (timer->due > 0) {
-		// this timer is already scheduled, cancel it
+	if (timer->due > 0 && delay < 0) {
+		// this timer is scheduled, cancel it
 		list_remove_item(&sTimers, timer);
+		timer->due = 0;
 	}
 
 	if (delay >= 0) {
-		// add this timer
+		// reschedule or add this timer
+		if (timer->due <= 0)
+			list_add_item(&sTimers, timer);
+
 		timer->due = system_time() + delay;
-		list_add_item(&sTimers, timer);
 
 		// notify timer about the change if necessary
 		if (sTimerTimeout > timer->due)

@@ -845,12 +845,15 @@ status_t
 append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 	size_t bytes)
 {
+	if (bytes == 0)
+		return B_OK;
+
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	net_buffer_private *source = (net_buffer_private *)_source;
 	TRACE(("append_cloned_data(buffer %p, source %p, offset = %ld, bytes = %ld)\n",
 		buffer, source, offset, bytes));
 
-	if (source->size < offset + bytes)
+	if (source->size < offset + bytes || source->size < offset)
 		return B_BAD_VALUE;
 
 	// find data_node to start with from the source buffer
