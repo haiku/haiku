@@ -127,20 +127,14 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		bump_option(option, length);
 	}
 
-	if (length == 0) {
-		// no option defined
-		return 0;
-	}
-
-	while ((length + 1) & 0x3) {
-		// bump to a multiple of 4 length
-		option->kind = TCP_OPTION_NOP;
-		option = (tcp_option *)((uint8 *)option + 1);
-		length++;
+	if ((length & 3) == 0) {
+		// options completely fill out the option space
+		return length;
 	}
 
 	option->kind = TCP_OPTION_END;
-	return length + 1;
+	return (length + 3) & ~3;
+		// bump to a multiple of 4 length
 }
 
 
@@ -198,9 +192,6 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 void
 process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 {
-	segment.window_shift = 0;
-	segment.max_segment_size = 0;
-
 	if (size == 0)
 		return;
 
@@ -559,7 +550,11 @@ tcp_receive_data(net_buffer *buffer)
 	segment.advertised_window = header.AdvertisedWindow();
 	segment.urgent_offset = header.UrgentOffset();
 	segment.flags = header.flags;
-	process_options(segment, buffer, headerLength - sizeof(tcp_header));
+	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0) {
+		// for now, we only process the options in the SYN segment
+		// TODO: when we support timestamps, they could be handled specifically
+		process_options(segment, buffer, headerLength - sizeof(tcp_header));
+	}
 
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around

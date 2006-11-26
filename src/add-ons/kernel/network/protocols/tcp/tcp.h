@@ -71,15 +71,20 @@ struct tcp_header {
 
 class tcp_sequence {
 	public:
+		tcp_sequence() {}
 		tcp_sequence(uint32 sequence) : number(sequence) {}
 
 		operator uint32() const { return number; }
+
 		void operator=(uint32 sequence) { number = sequence; }
 		bool operator>(uint32 sequence) const { return (int32)(number - sequence) > 0; }
 		bool operator>=(uint32 sequence) const { return (int32)(number - sequence) >= 0; }
 		bool operator<(uint32 sequence) const { return (int32)(number - sequence) < 0; }
 		bool operator<=(uint32 sequence) const { return (int32)(number - sequence) <= 0; }
-		uint32 operator+=(uint32 sequence) { return number += sequence; }
+
+		uint32& operator+=(uint32 sequence) { return number += sequence; }
+		uint32& operator++() { return ++number; }
+		uint32 operator++(int _) { return number++; }
 
 	private:
 		uint32 number;
@@ -129,6 +134,12 @@ struct tcp_segment_header {
 	uint8	flags;
 	uint8	window_shift;
 	uint16	max_segment_size;
+
+	bool AcknowledgeOnly() const
+	{
+		return (flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_RESET
+			| TCP_FLAG_URGENT | TCP_FLAG_ACKNOWLEDGE)) == TCP_FLAG_ACKNOWLEDGE;
+	}
 };
 
 enum tcp_segment_action {

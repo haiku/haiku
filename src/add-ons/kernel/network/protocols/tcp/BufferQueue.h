@@ -36,7 +36,11 @@ class BufferQueue {
 		size_t Used() const { return fNumBytes; }
 		size_t Free() const { return fMaxBytes - fNumBytes; }
 
+		bool IsContiguous() const { return fNumBytes == fContiguousBytes; }
+
+		tcp_sequence FirstSequence() const { return fFirstSequence; }
 		tcp_sequence LastSequence() const { return fLastSequence; }
+		tcp_sequence NextSequence() const { return fFirstSequence + fContiguousBytes; }
 
 	private:
 		SegmentList fList;

@@ -67,12 +67,13 @@ BufferQueue::Add(net_buffer *buffer)
 void
 BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 {
+	TRACE(("BufferQueue@%p::Add(buffer %p, size %lu, sequence %lu)\n",
+		this, buffer, buffer->size, (uint32)sequence));
+
 	buffer->sequence = sequence;
-	if (fList.IsEmpty() || fFirstSequence > sequence)
-		fFirstSequence = sequence;
 
 	if (fList.IsEmpty() || sequence >= fLastSequence) {
-		// we usually just add the buffer to the 
+		// we usually just add the buffer to the end of the queue
 		fList.Add(buffer);
 
 		if (sequence == fLastSequence && fLastSequence - fFirstSequence == fNumBytes) {
@@ -87,6 +88,12 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 	if (fLastSequence < sequence + buffer->size)
 		fLastSequence = sequence + buffer->size;
+
+	if (fFirstSequence > sequence) {
+		// this buffer contains data that is already long gone - trim it
+		gBufferModule->remove_header(buffer, fFirstSequence - sequence);
+		sequence = fFirstSequence;
+	}
 
 	// find for the place where to insert the buffer into the queue
 
@@ -161,6 +168,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 status_t
 BufferQueue::RemoveUntil(tcp_sequence sequence)
 {
+	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this, (uint32)sequence));
+
 	SegmentList::Iterator iterator = fList.GetIterator();
 	net_buffer *buffer = NULL;
 	while ((buffer = iterator.Next()) != NULL) {
@@ -196,6 +205,8 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 status_t
 BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 {
+	TRACE(("BufferQueue@%p::Get(sequence %lu, bytes %lu)\n", this, (uint32)sequence, bytes));
+
 	if (bytes == 0)
 		return B_OK;
 
@@ -213,7 +224,7 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 	SegmentList::Iterator iterator = fList.GetIterator();
 	net_buffer *source = NULL;
 	while ((source = iterator.Next()) != NULL) {
-		if (tcp_sequence(sequence + bytes) <= source->sequence)
+		if (sequence < source->sequence + source->size)
 			break;
 	}
 
@@ -225,7 +236,7 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 	uint32 offset = source->sequence - sequence;
 
 	while (source != NULL && bytesLeft > 0) {
-		size_t size = min_c(buffer->size - offset, bytesLeft);
+		size_t size = min_c(source->size - offset, bytesLeft);
 		status_t status = gBufferModule->append_cloned(buffer, source, offset, size);
 		if (status < B_OK)
 			return status;
