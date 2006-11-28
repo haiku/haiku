@@ -49,16 +49,17 @@ public:
 	status_t WritePushState();
 	status_t WritePopState();	
 	
-private:
-	BPositionIO *fData;
-	std::stack<off_t> fStack;
 
+protected:
 	status_t WriteData(const void *data, size_t size);
 	template <typename T> status_t Write(const T &data) { return WriteData(&data, sizeof(data)); }
-	
+
 	status_t BeginOp(const int16 &op);
 	status_t EndOp();	
 	
+private:
+	BPositionIO *fData;
+	std::stack<off_t> fStack;
 };
 
 #endif // __PICTUREDATAWRITER_H

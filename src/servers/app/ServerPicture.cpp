@@ -622,154 +622,36 @@ ServerPicture::~ServerPicture()
 {
 }
 
-/*
 
-void
-ServerPicture::EnterStateChange()
-{
-	// BeginOp(B_PIC_ENTER_STATE_CHANGE);
-}
-
-
-void
-ServerPicture::ExitStateChange()
-{
-	// EndOp();
-}
-
-
-void
-ServerPicture::EnterFontChange()
-{
-	// BeginOp(B_PIC_ENTER_FONT_STATE);
-}
-
-
-void
-ServerPicture::ExitFontChange()
-{
-	// EndOp();
-}
-
-
-void
-ServerPicture::AddInt8(int8 data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddInt16(int16 data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddInt32(int32 data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddInt64(int64 data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddFloat(float data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddCoord(BPoint data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddRect(BRect data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddColor(rgb_color data)
-{
-	fData.Write(&data, sizeof(data));
-}
-
-
-void
-ServerPicture::AddString(const char *data)
-{
-	int32 len = data ? strlen(data) : 0;
-	fData.Write(&len, sizeof(int32));
-	fData.Write(data, len);
-}
-
-
-void
-ServerPicture::AddData(const void *data, int32 size)
-{
-	fData.Write(data, size);
-}
-
-*/
 void
 ServerPicture::SyncState(ViewLayer *view)
 {
-/*	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+	// TODO: Finish this
+	BeginOp(B_PIC_ENTER_STATE_CHANGE);
 
-	BeginOp(B_PIC_SET_PEN_LOCATION);
-	AddCoord(view->CurrentState()->PenLocation());
-	EndOp();
-
-	BeginOp(B_PIC_SET_PEN_SIZE);
-	AddFloat(view->CurrentState()->PenSize());
-	EndOp();
-
-	BeginOp(B_PIC_SET_SCALE);
-	AddFloat(view->CurrentState()->Scale());
-	EndOp();
-
-	BeginOp(B_PIC_SET_LINE_MODE);
-	AddInt16((int16)view->CurrentState()->LineCapMode());
-	AddInt16((int16)view->CurrentState()->LineJoinMode());
-	AddFloat(view->CurrentState()->MiterLimit());
-	EndOp();
-
+//	WriteSetPenLocation(view->CurrentState()->PenLocation());
+	WriteSetPenSize(view->CurrentState()->PenSize());
+	WriteSetScale(view->CurrentState()->Scale());
+	WriteSetLineMode(view->CurrentState()->LineCapMode(), view->CurrentState()->LineJoinMode(),
+			view->CurrentState()->MiterLimit());
+	
+/*
 	BeginOp(B_PIC_SET_STIPLE_PATTERN);
 	AddData(view->CurrentState()->GetPattern().GetInt8(), sizeof(pattern));
 	EndOp();
-
-	BeginOp(B_PIC_SET_DRAWING_MODE);
-	AddInt16((int16)view->CurrentState()->GetDrawingMode());
-	EndOp();
+*/
+	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
 	
-	BeginOp(B_PIC_SET_BLENDING_MODE);
+	/*BeginOp(B_PIC_SET_BLENDING_MODE);
 	AddInt16((int16)view->CurrentState()->AlphaSrcMode());
 	AddInt16((int16)view->CurrentState()->AlphaFncMode());
 	EndOp();
-
-	BeginOp(B_PIC_SET_FORE_COLOR);
-	AddColor(view->CurrentState()->HighColor().GetColor32());
-	EndOp();
-	
-	BeginOp(B_PIC_SET_BACK_COLOR);
-	AddColor(view->CurrentState()->LowColor().GetColor32());
-	EndOp();
-
-	EndOp();
 */
+	WriteSetHighColor(view->CurrentState()->HighColor().GetColor32());
+	WriteSetLowColor(view->CurrentState()->LowColor().GetColor32());
+
+	EndOp();
+
 }
 
 
