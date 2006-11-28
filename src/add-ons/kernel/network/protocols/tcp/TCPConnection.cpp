@@ -18,6 +18,7 @@
 
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <netinet/tcp.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -53,56 +54,24 @@
 // Estimate for Maximum segment lifetime in the internet
 #define TCP_MAX_SEGMENT_LIFETIME (2 * TCP_INITIAL_RTT)
 
-struct tcp_segment {
-	struct list_link link;
-
-	net_buffer	*buffer;
-	bigtime_t	time;
-	uint32		sequence;
-	net_timer	timer;
-	bool		timed_out;
-
-	tcp_segment(net_buffer *buffer, uint32 sequenceNumber, bigtime_t timeout);
-	~tcp_segment();
-};
-
-
-tcp_segment::tcp_segment(net_buffer *_buffer, uint32 sequenceNumber, bigtime_t timeout)
-	:
-	buffer(_buffer),
-	time(system_time()),
-	sequence(sequenceNumber),
-	timed_out(false)
-{
-	if (timeout > 0) {
-		gStackModule->init_timer(&timer, &TCPConnection::ResendSegment, this);
-		gStackModule->set_timer(&timer, timeout);
-	}
-}
-
-
-tcp_segment::~tcp_segment()
-{
-	gStackModule->set_timer(&timer, -1);
-}
-
-
-//	#pragma mark -
-
 
 TCPConnection::TCPConnection(net_socket *socket)
 	:
+	fOptions(0),
 	fSendWindowShift(0),
 	fReceiveWindowShift(0),
 	fSendUnacknowledged(0),
 	fSendNext(fSendUnacknowledged),
 	fSendWindow(0),
+	fSendMaxWindow(0),
+	fSendMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fSendQueue(socket->send.buffer_size),
 	fInitialSendSequence(0),
 	fDuplicateAcknowledgeCount(0),
 	fRoute(NULL),
 	fReceiveNext(0),
 	fReceiveWindow(socket->receive.buffer_size),
+	fReceiveMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fReceiveQueue(socket->receive.buffer_size),
 	fRoundTripTime(TCP_INITIAL_RTT),
 	fState(CLOSED),
@@ -110,6 +79,8 @@ TCPConnection::TCPConnection(net_socket *socket)
 {
 	gStackModule->init_timer(&fTimer, _TimeWait, this);
 
+	recursive_lock_init(&fLock, "tcp lock");
+		// TODO: to be replaced with a real locking strategy!
 	//benaphore_init(&fReceiveLock, "tcp receive");
 	//benaphore_init(&fSendLock, "tcp send");
 	fSendLock = create_sem(0, "tcp send");
@@ -121,6 +92,7 @@ TCPConnection::~TCPConnection()
 {
 	gStackModule->set_timer(&fTimer, -1);
 
+	recursive_lock_destroy(&fLock);
 	//benaphore_destroy(&fReceiveLock);
 	//benaphore_destroy(&fSendLock);
 	//delete_sem(fAcceptSemaphore);
@@ -171,7 +143,7 @@ TCPConnection::Close()
 	else
 		fState = CLOSED;
 
-	status_t status = _SendQueuedData(TCP_FLAG_FINISH | TCP_FLAG_ACKNOWLEDGE, false);
+	status_t status = _SendQueued();
 	if (status != B_OK) {
 		fState = previousState;
 		return status;
@@ -251,7 +223,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 		return status;
 	}
 
-	fMaxReceiveSize = next->module->get_mtu(next, (sockaddr *)address)
+	fReceiveMaxSegmentSize = next->module->get_mtu(next, (sockaddr *)address)
 		- sizeof(tcp_header);
 
 	// Compute the window shift we advertise to our peer - if it doesn't support
@@ -268,7 +240,7 @@ dprintf("************************* size = %ld, shift = %d\n", socket->receive.bu
 	fState = SYNCHRONIZE_SENT;
 
 	// send SYN
-	status = _SendQueuedData(TCP_FLAG_SYNCHRONIZE, false);
+	status = _SendQueued();
 	if (status != B_OK) {
 		fState = CLOSED;
 		return status;
@@ -396,9 +368,9 @@ TCPConnection::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
 
+	RecursiveLocker locker(fLock);
 	fSendQueue.Add(buffer);
-
-	return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, false);
+	return _SendQueued();
 }
 
 
@@ -407,6 +379,7 @@ TCPConnection::SendAvailable()
 {
 	TRACE(("TCP:%p.SendAvailable()\n", this));
 
+	RecursiveLocker locker(fLock);
 	return fSendQueue.Free();
 }
 
@@ -433,6 +406,7 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	// TODO: add support for urgent data (MSG_OOB)
 	// TODO: wait until enough bytes are available
 
+	RecursiveLocker locker(fLock);
 	return fReceiveQueue.Get(numBytes, (flags & MSG_PEEK) == 0, _buffer);
 }
 
@@ -441,7 +415,8 @@ size_t
 TCPConnection::ReadAvailable()
 {
 	TRACE(("TCP:%p.ReadAvailable()\n", this));
-	//BenaphoreLocker lock(&fReceiveLock);
+
+	RecursiveLocker locker(fLock);
 	return fReceiveQueue.Available();
 }
 
@@ -450,14 +425,14 @@ status_t
 TCPConnection::DelayedAcknowledge()
 {
 	// TODO: use timer instead and/or piggyback on send
-	return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, false);
+	return _SendQueued();
 }
 
 
 status_t
 TCPConnection::SendAcknowledge()
 {
-	return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, false);
+	return _SendQueued();
 }
 
 
@@ -506,7 +481,7 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 
 	connection->fInitialReceiveSequence = segment.sequence;
 	connection->fState = SYNCHRONIZE_RECEIVED;
-	connection->fMaxReceiveSize = connection->fRoute->mtu - 40;
+	connection->fReceiveMaxSegmentSize = connection->fRoute->mtu - 40;
 		// 40 bytes for IP and TCP header without any options
 		// TODO: make this depending on the RTF_LOCAL flag?
 	connection->fReceiveNext = segment.sequence + 1;
@@ -517,11 +492,10 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	connection->fSendMax = connection->fSendNext;
 
 	if (segment.max_segment_size > 0)
-		connection->fMaxSegmentSize = segment.max_segment_size;
+		connection->fSendMaxSegmentSize = segment.max_segment_size;
 
 	//benaphore_lock(&connection->fSendLock);
-	status_t status = connection->_SendQueuedData(
-		TCP_FLAG_SYNCHRONIZE | TCP_FLAG_ACKNOWLEDGE, false);
+	status_t status = connection->_SendQueued();
 	//benaphore_unlock(&connection->fSendLock);
 
 	connection->fInitialSendSequence = fSendNext;
@@ -556,14 +530,14 @@ TCPConnection::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *b
 
 	segment.sequence++;
 
-	fSendUnacknowledged = segment.acknowledge + 1;
+	fSendUnacknowledged = segment.acknowledge;
 	fReceiveNext = segment.sequence;
 	fInitialReceiveSequence = segment.sequence;
+	fReceiveQueue.SetInitialSequence(fReceiveNext);
 
 	if (segment.flags & TCP_FLAG_ACKNOWLEDGE) {
 		// the connection has been established
 		fState = ESTABLISHED;
-		fReceiveQueue.SetInitialSequence(fReceiveNext);
 
 		release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: this is not enough - we need to use B_RELEASE_ALL
@@ -758,6 +732,8 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 	// TODO: update window
 	fSendWindow = advertisedWindow;
+	if (advertisedWindow > fSendMaxWindow)
+		fSendMaxWindow = advertisedWindow;
 
 	// TODO: process urgent data!
 	// TODO: ignore data *after* FIN
@@ -823,93 +799,189 @@ TCPConnection::ResendSegment(struct net_timer *timer, void *data)
 
 
 /*!
-	Sends a TCP packet with the specified \a flags.  If there is any data in
-	the send buffer and \a empty is false, fEffectiveWindow bytes or less of
-	it are sent as well.
-	Sequence and Acknowledgement numbers are filled in accordingly.
-	The send lock must be held before calling.
+	The segment flags to send depend completely on the state we're in.
+	_SendQueued() need to be smart enough to clear TCP_FLAG_FINISH when
+	it couldn't send all the data.
+*/
+inline uint8
+TCPConnection::_CurrentFlags()
+{
+	switch (fState) {
+		case CLOSED:
+			return TCP_FLAG_RESET | TCP_FLAG_ACKNOWLEDGE;
+		case LISTEN:
+			return 0;
+
+		case SYNCHRONIZE_SENT:
+			return TCP_FLAG_SYNCHRONIZE;
+		case SYNCHRONIZE_RECEIVED:
+			return TCP_FLAG_SYNCHRONIZE | TCP_FLAG_ACKNOWLEDGE;
+
+		case ESTABLISHED:
+		case FINISH_RECEIVED:
+		case FINISH_ACKNOWLEDGED:
+		case TIME_WAIT:
+			return TCP_FLAG_ACKNOWLEDGE;
+
+		case WAIT_FOR_FINISH_ACKNOWLEDGE:
+		case FINISH_SENT:
+		case CLOSING:
+			return TCP_FLAG_FINISH | TCP_FLAG_ACKNOWLEDGE;
+	}
+
+	// never gets here
+	return 0;
+}
+
+
+inline bool
+TCPConnection::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
+	bool outstandingAcknowledge)
+{
+	// Avoid the silly window syndrome - we only send a segment in case:
+	// - we have a full segment to send, or
+	// - we're at the end of our buffer queue (and we're 
+	// - we're retransmitting data
+	if (length > 0) {
+		if (length == fSendMaxSegmentSize
+			|| ((!outstandingAcknowledge || (fOptions & TCP_NODELAY) != 0)
+				&& tcp_sequence(fSendNext + length) == fSendQueue.LastSequence())
+			|| (fSendMaxWindow > 0 && length >= fSendMaxWindow / 2)
+			|| fSendNext < fSendMax)
+			return true;
+	}
+
+	// TODO: incomplete!
+
+	if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_RESET | TCP_FLAG_ACKNOWLEDGE)) != 0)
+		return true;
+
+	return false;
+}
+
+
+/*!
+	Sends one or more TCP segments with the data waiting in the queue, or some
+	specific flags that need to be sent.
 */
 status_t
-TCPConnection::_SendQueuedData(uint16 flags, bool empty)
+TCPConnection::_SendQueued(bool force)
 {
-	TRACE(("TCP:%p.SendQueuedData(%X,%s)\n", this, flags, empty ? "1" : "0"));
-
 	if (fRoute == NULL)
 		return B_ERROR;
 
-	uint32 effectiveWindow = min_c(next->module->get_mtu(next,
-		(sockaddr *)&socket->address), fSendWindow);
-	uint32 available = fSendQueue.Available(fSendNext);
-dprintf("fSendWindow = %lu, available = %lu, fSendNext = %lu\n", fSendWindow, available, (uint32)fSendNext);
-
-	if (effectiveWindow > available)
-		effectiveWindow = available;
-
-	if (effectiveWindow == 0 && flags == 0)
-		return B_OK;
-
-	// TODO: determine if we should send anything at all!
-
-	net_buffer *buffer = gBufferModule->create(256);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	status_t status = B_OK;
-	if (effectiveWindow > 0)
-		fSendQueue.Get(buffer, fSendNext, effectiveWindow);
-	if (status < B_OK) {
-		gBufferModule->free(buffer);
-		return status;
-	}
-
-	gAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
-	gAddressModule->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
-	TRACE(("TCP:%p.SendQueuedData() buffer %p, from address %s to %s\n", this,
-		buffer,
-		AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
-		AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
-
-	uint32 size = buffer->size;
+	// Determine if we need to send anything at all
 
 	tcp_segment_header segment;
-	segment.flags = (uint8)flags;
-	segment.sequence = fSendNext;
-	segment.acknowledge = fReceiveNext;
-	segment.advertised_window = min_c(65535, fReceiveWindow);
+	segment.flags = _CurrentFlags();
+
+	uint32 sendWindow = fSendWindow;
+	uint32 available = fSendQueue.Available(fSendNext);
+	bool outstandingAcknowledge = fSendMax != fSendUnacknowledged;
+dprintf("fSendWindow = %lu, available = %lu, fSendNext = %lu, fSendUnacknowledged = %lu\n", fSendWindow, available, (uint32)fSendNext, (uint32)fSendUnacknowledged);
+
+	if (force && sendWindow == 0 && fSendNext <= fSendQueue.LastSequence()) {
+		// send one byte of data to ask for a window update
+		// (triggered by the persist timer)
+		segment.flags &= ~TCP_FLAG_FINISH;
+		sendWindow = 1;
+	}
+
+	int32 length = min_c(available, sendWindow) - (fSendNext - fSendUnacknowledged);
+	if (length < 0) {
+		// either the window shrank, or we sent a still unacknowledged FIN 
+		length = 0;
+		if (sendWindow == 0) {
+			// Enter persist state
+			// TODO: stop retransmit timer!
+			fSendNext = fSendUnacknowledged;
+		}
+	}
+
+	uint32 segmentLength = min_c((uint32)length, fSendMaxSegmentSize);
+	if (tcp_sequence(fSendNext + segmentLength) > fSendUnacknowledged + available) {
+		// we'll still have data in the queue after the next write, so remove the FIN
+		segment.flags &= ~TCP_FLAG_FINISH;
+	}
+
+	segment.advertised_window = min_c(65535, fReceiveQueue.Free());
 		// TODO: support shift option!
+	segment.acknowledge = fReceiveNext;
 	segment.urgent_offset = 0;
 
-	if ((flags & TCP_FLAG_SYNCHRONIZE) != 0) {
-		// add connection establishment options
-		segment.max_segment_size = fMaxReceiveSize;
-		//segment.window_shift = fReceiveWindowShift;
+	while (true) {
+dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
+		// Determine if we should really send this segment
+		if (!force && !_ShouldSendSegment(segment, segmentLength, outstandingAcknowledge))
+			return B_OK;
+
+		net_buffer *buffer = gBufferModule->create(256);
+		if (buffer == NULL)
+			return B_NO_MEMORY;
+
+		status_t status = B_OK;
+		if (segmentLength > 0)
+			fSendQueue.Get(buffer, fSendNext, segmentLength);
+		if (status < B_OK) {
+			gBufferModule->free(buffer);
+			return status;
+		}
+
+		gAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
+		gAddressModule->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
+		TRACE(("TCP:%p.SendQueued() flags %u, buffer %p, size %lu, from address %s to %s\n", this,
+			segment.flags, buffer, buffer->size,
+			AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
+			AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
+
+		uint32 size = buffer->size;
+		if (length > 0 && fSendNext + segmentLength == fSendQueue.LastSequence()) {
+			// if we've emptied our send queue, set the PUSH flag
+			segment.flags |= TCP_FLAG_PUSH;
+		}
+
+		segment.sequence = fSendNext;
+
+		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0) {
+			// add connection establishment options
+			segment.max_segment_size = fReceiveMaxSegmentSize;
+			segment.window_shift = fReceiveWindowShift;
+		}
+
+		status = add_tcp_header(segment, buffer);
+		if (status != B_OK) {
+			gBufferModule->free(buffer);
+			return status;
+		}
+
+		status = next->module->send_routed_data(next, fRoute, buffer);
+		if (status < B_OK) {
+			gBufferModule->free(buffer);
+			return status;
+		}
+
+		// Only count 1 SYN, the 1 sent when transitioning from CLOSED or LISTEN
+		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
+			size++;
+
+		// Only count 1 FIN, the 1 sent when transitioning from
+		// ESTABLISHED, SYNCHRONIZE_RECEIVED or FINISH_RECEIVED
+		if ((segment.flags & TCP_FLAG_FINISH) != 0)
+			size++;
+
+		if (fSendMax == fSendNext)
+			fSendMax += size;
+		fSendNext += size;
+
+		length -= segmentLength;
+		if (length == 0)
+			break;
+
+		segmentLength = min_c((uint32)length, fSendMaxSegmentSize);
+		segment.flags &= ~(TCP_FLAG_SYNCHRONIZE | TCP_FLAG_RESET | TCP_FLAG_FINISH);
 	}
 
-	status = add_tcp_header(segment, buffer);
-	if (status != B_OK) {
-		gBufferModule->free(buffer);
-		return status;
-	}
-
-	// Only count 1 SYN, the 1 sent when transitioning from CLOSED or LISTEN
-	if ((flags & TCP_FLAG_SYNCHRONIZE) != 0)
-		size++;
-
-	// Only count 1 FIN, the 1 sent when transitioning from
-	// ESTABLISHED, SYNCHRONIZE_RECEIVED or FINISH_RECEIVED
-	if ((flags & TCP_FLAG_FINISH) != 0)
-		size++;
-
-	if (fSendMax == fSendNext)
-		fSendMax += size;
-	fSendNext += size;
-
-#if 0
-	tcp_segment *segment = new(std::nothrow)
-		tcp_segment(sequenceNum, 0, 2*fAvgRTT);
-#endif
-
-	return next->module->send_routed_data(next, fRoute, buffer);
+	return B_OK;
 }
 
 

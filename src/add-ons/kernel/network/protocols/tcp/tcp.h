@@ -91,16 +91,17 @@ class tcp_sequence {
 };
 
 // TCP flag constants
-#define TCP_FLAG_FINISH			0x01
-#define TCP_FLAG_SYNCHRONIZE	0x02
-#define TCP_FLAG_RESET			0x04
-#define TCP_FLAG_PUSH			0x08
-#define TCP_FLAG_ACKNOWLEDGE	0x10
-#define TCP_FLAG_URGENT			0x20
+#define TCP_FLAG_FINISH					0x01
+#define TCP_FLAG_SYNCHRONIZE			0x02
+#define TCP_FLAG_RESET					0x04
+#define TCP_FLAG_PUSH					0x08
+#define TCP_FLAG_ACKNOWLEDGE			0x10
+#define TCP_FLAG_URGENT					0x20
 #define TCP_FLAG_CONGESTION_NOTIFICATION_ECHO	0x40
 #define TCP_FLAG_CONGESTION_WINDOW_REDUCED		0x80
 
-#define TCP_CONNECTION_TIMEOUT	75000000	// 75 secs
+#define TCP_CONNECTION_TIMEOUT			75000000	// 75 secs
+#define TCP_DEFAULT_MAX_SEGMENT_SIZE	536
 
 struct tcp_option {
 	uint8	kind;

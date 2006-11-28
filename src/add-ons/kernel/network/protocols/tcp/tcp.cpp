@@ -565,6 +565,8 @@ tcp_receive_data(net_buffer *buffer)
 	TCPConnection *connection = find_connection((struct sockaddr *)&buffer->destination,
 		(struct sockaddr *)&buffer->source);
 	if (connection != NULL) {
+		RecursiveLocker locker(connection->Lock());
+
 		switch (connection->State()) {
 			case TIME_WAIT:
 				segmentAction |= IMMEDIATE_ACKNOWLEDGE;

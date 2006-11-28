@@ -27,6 +27,8 @@ class TCPConnection : public net_protocol {
 
 		status_t InitCheck() const;
 
+		recursive_lock &Lock() { return fLock; }
+
 		status_t Open();
 		status_t Close();
 		status_t Free();
@@ -57,15 +59,19 @@ class TCPConnection : public net_protocol {
 		static int32 HashOffset() { return offsetof(TCPConnection, fHashNext); }
 
 	private:
-		status_t _SendQueuedData(uint16 flags, bool empty);
+		uint8 _CurrentFlags();
+		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
+			bool outstandingAcknowledge);
+		status_t _SendQueued(bool force = false);
 
 		static void _TimeWait(struct net_timer *timer, void *data);
 
 		TCPConnection	*fHashNext;
 
-		//benaphore		fLock;
+		recursive_lock	fLock;
 		sem_id			fReceiveLock;
 		sem_id			fSendLock;
+		uint8			fOptions;
 
 		uint8			fSendWindowShift;
 		uint8			fReceiveWindowShift;
@@ -74,7 +80,8 @@ class TCPConnection : public net_protocol {
 		tcp_sequence	fSendNext;
 		tcp_sequence	fSendMax;
 		uint32			fSendWindow;
-		uint32			fMaxSegmentSize;
+		uint32			fSendMaxWindow;
+		uint32			fSendMaxSegmentSize;
 		BufferQueue		fSendQueue;
 		tcp_sequence	fLastAcknowledgeSent;
 		tcp_sequence	fInitialSendSequence;
@@ -85,7 +92,7 @@ class TCPConnection : public net_protocol {
 
 		tcp_sequence	fReceiveNext;
 		uint32			fReceiveWindow;
-		uint32			fMaxReceiveSize;
+		uint32			fReceiveMaxSegmentSize;
 		BufferQueue		fReceiveQueue;
 		tcp_sequence	fInitialReceiveSequence;
 

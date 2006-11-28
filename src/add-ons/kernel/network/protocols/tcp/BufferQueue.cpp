@@ -213,7 +213,7 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 	if (bytes == 0)
 		return B_OK;
 
-	if (sequence >= fLastSequence) {
+	if (sequence >= fLastSequence || sequence < fFirstSequence) {
 		// we don't have the requested data
 		return B_BAD_VALUE;
 	}
@@ -233,10 +233,12 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 
 	if (source == NULL)
 		panic("we should have had that data...");
+	if (source->sequence > sequence)
+		panic("source %p, sequence = %lu (%lu)\n", source, source->sequence, (uint32)sequence);
 
 	// clone the data
 
-	uint32 offset = source->sequence - sequence;
+	uint32 offset = sequence - source->sequence;
 
 	while (source != NULL && bytesLeft > 0) {
 		size_t size = min_c(source->size - offset, bytesLeft);
