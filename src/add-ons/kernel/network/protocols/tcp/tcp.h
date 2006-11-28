@@ -97,8 +97,8 @@ class tcp_sequence {
 #define TCP_FLAG_PUSH			0x08
 #define TCP_FLAG_ACKNOWLEDGE	0x10
 #define TCP_FLAG_URGENT			0x20
-#define TCP_FLAG_ECN			0x40 // Explicit Congestion Notification echo
-#define TCP_FLAG_CWR			0x80 // Congestion Window Reduced
+#define TCP_FLAG_CONGESTION_NOTIFICATION_ECHO	0x40
+#define TCP_FLAG_CONGESTION_WINDOW_REDUCED		0x80
 
 #define TCP_CONNECTION_TIMEOUT	75000000	// 75 secs
 

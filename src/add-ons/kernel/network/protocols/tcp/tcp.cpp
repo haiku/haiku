@@ -269,7 +269,7 @@ reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
 	} else
 		outSegment.sequence = segment.acknowledge;
 
-	status_t status = add_tcp_header(segment, reply);
+	status_t status = add_tcp_header(outSegment, reply);
 	if (status == B_OK)
 		status = gDomain->module->send_data(NULL, reply);
 
@@ -566,8 +566,9 @@ tcp_receive_data(net_buffer *buffer)
 		(struct sockaddr *)&buffer->source);
 	if (connection != NULL) {
 		switch (connection->State()) {
-			case CLOSED:
 			case TIME_WAIT:
+				segmentAction |= IMMEDIATE_ACKNOWLEDGE;
+			case CLOSED:
 				connection->UpdateTimeWait();
 				break;
 
@@ -600,8 +601,6 @@ tcp_receive_data(net_buffer *buffer)
 
 	if (segmentAction & RESET) {
 		// send reset
-		TRACE(("TCP:  Connection does not exist!\n"));
-
 		reply_with_reset(segment, buffer);
 	}
 	if (segmentAction & DROP)

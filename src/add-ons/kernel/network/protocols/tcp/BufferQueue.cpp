@@ -170,11 +170,14 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 {
 	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this, (uint32)sequence));
 
+	fFirstSequence = sequence;
+
 	SegmentList::Iterator iterator = fList.GetIterator();
 	net_buffer *buffer = NULL;
 	while ((buffer = iterator.Next()) != NULL) {
 		if (sequence <= buffer->sequence) {
 			fFirstSequence = buffer->sequence;
+				// just in case there is a hole, how unlikely this may ever be
 			break;
 		}
 

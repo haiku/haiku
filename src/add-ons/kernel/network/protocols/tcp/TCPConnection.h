@@ -57,8 +57,6 @@ class TCPConnection : public net_protocol {
 		static int32 HashOffset() { return offsetof(TCPConnection, fHashNext); }
 
 	private:
-		bool _IsAcknowledgeValid(tcp_sequence acknowledge) const;
-		bool _IsSequenceValid(tcp_sequence sequence, uint32 length) const;
 		status_t _SendQueuedData(uint16 flags, bool empty);
 
 		static void _TimeWait(struct net_timer *timer, void *data);
@@ -79,6 +77,8 @@ class TCPConnection : public net_protocol {
 		uint32			fMaxSegmentSize;
 		BufferQueue		fSendQueue;
 		tcp_sequence	fLastAcknowledgeSent;
+		tcp_sequence	fInitialSendSequence;
+		uint32			fDuplicateAcknowledgeCount;
 
 		net_route 		*fRoute;
 			// TODO: don't use a net_route, but a net_route_info!!!
@@ -87,6 +87,7 @@ class TCPConnection : public net_protocol {
 		uint32			fReceiveWindow;
 		uint32			fMaxReceiveSize;
 		BufferQueue		fReceiveQueue;
+		tcp_sequence	fInitialReceiveSequence;
 
 		// round trip time and retransmit timeout computation
 		int32			fRoundTripTime;
