@@ -493,6 +493,39 @@ socket_connected(net_socket *socket)
 }
 
 
+status_t
+socket_notify(net_socket *socket, uint8 event, int32 value)
+{
+	benaphore_lock(&socket->lock);
+
+	bool notify = true;
+
+	switch (event) {
+		case B_SELECT_READ:
+		{
+			if ((ssize_t)socket->receive.low_water_mark > value && value >= B_OK)
+				notify = false;
+			break;
+		}
+		case B_SELECT_WRITE:
+		{
+			if ((ssize_t)socket->send.low_water_mark > value && value >= B_OK)
+				notify = false;
+			break;
+		}
+		case B_SELECT_ERROR:
+			socket->error = value;
+			break;
+	}
+
+	if (notify)
+		;
+
+	benaphore_unlock(&socket->lock);
+	return B_OK;
+}
+
+
 net_socket_module_info gNetSocketModule = {
 	{
 		NET_SOCKET_MODULE_NAME,
@@ -523,7 +556,7 @@ net_socket_module_info gNetSocketModule = {
 	// notifications
 	NULL, //socket_request_notification,
 	NULL, //socket_cancel_notification,
-	NULL, //socket_notify,
+	socket_notify,
 
 	// standard socket API
 	NULL, //socket_accept,
@@ -1393,6 +1426,9 @@ main(int argc, char** argv)
 		sServerContext.thread, client, sClientContext.thread);
 
 	setup_server();
+
+	gDebugOutputEnabled = false;
+		// debug output defaults to off after start
 
 	while (true) {
 		printf("> ");
