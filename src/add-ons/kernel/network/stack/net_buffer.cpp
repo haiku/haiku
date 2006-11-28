@@ -49,7 +49,6 @@ struct free_data {
 struct data_header {
 	int32		ref_count;
 	addr_t		physical_address;
-	size_t		size;
 	free_data	*first_free;
 	uint8		*data_end;
 	size_t		data_space;
