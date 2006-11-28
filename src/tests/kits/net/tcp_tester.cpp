@@ -822,7 +822,7 @@ domain_receive_data(net_buffer *buffer)
 		if (lastTime == 0)
 			lastTime = now;
 
-		printf("% 3ld %8.6f (%8.6f) ", packetNumber, (now - sStartTime) / 1000000.0,
+		printf("\33[0m% 3ld %8.6f (%8.6f) ", packetNumber, (now - sStartTime) / 1000000.0,
 			(now - lastTime) / 1000000.0);
 		lastTime = now;
 

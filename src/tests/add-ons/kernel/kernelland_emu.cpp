@@ -722,6 +722,7 @@ dprintf(const char *format,...)
 	printf("\33[34m");
 	vprintf(format, args);
 	printf("\33[0m");
+	fflush(stdout);
 	va_end(args);
 }
 
