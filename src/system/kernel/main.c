@@ -227,6 +227,7 @@ main2(void *unused)
 	cpu_init_post_modules(&sKernelArgs);
 	vm_init_post_modules(&sKernelArgs);
 	debug_init_post_modules(&sKernelArgs);
+	device_manager_init_post_modules(&sKernelArgs);
 
 	// start the init process
 	{

@@ -23,18 +23,7 @@
 
 extern device_manager_info *gDeviceManager;
 
-//	Interface to one ACPI device.
-typedef struct acpi_device_module_info {
-	driver_module_info info;
 
-	/* Namespace Access */
-	uint32				(*get_object_type) (acpi_device device);
-	status_t			(*get_object) (acpi_device device, const char *path, acpi_object_type **return_value);
-	
-	/* Control method execution and data acquisition */
-	status_t			(*evaluate_method) (acpi_device device, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args);
-	
-} acpi_device_module_info;
 
 
 // ACPI root.

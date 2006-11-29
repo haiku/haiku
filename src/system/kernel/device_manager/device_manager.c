@@ -171,3 +171,32 @@ device_manager_init(struct kernel_args *args)
 	return B_OK;
 }
 
+
+// hold gNodeLock
+static void
+device_manager_rescan_bus(device_node_info *parent)
+{
+	device_node_info *node = NULL;
+	char *dummy;
+	
+	if (pnp_get_attr_string(parent, B_DRIVER_BUS, &dummy, false) == B_OK) {
+		free(dummy);
+		dm_rescan(parent);
+	}
+
+	while ((node = (device_node_info *)list_get_next_item(&parent->children, node)) != NULL) {
+		device_manager_rescan_bus(node);
+	}
+}
+
+
+
+status_t
+device_manager_init_post_modules(struct kernel_args *args)
+{
+	TRACE(("device_manager_init_post_modules()\n"));
+	device_manager_rescan_bus(gRootNode);
+	TRACE(("device_manager_init_post_modules() rescan done\n"));
+	return B_OK;
+}
+

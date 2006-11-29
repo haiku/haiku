@@ -196,16 +196,19 @@ scan(device_node_info *node, bool rescan)
 		}
 
 		free(deviceType);
+	} else {
+		if (!isBus)
+			status = dm_register_dynamic_child_devices(node);	
 	}
-
-	benaphore_lock(&gNodeLock);
-
+	
 	// scan children recursively;
 	// keep the node_lock to make sure noone removes children meanwhile
-	if (rescan && isBus)
+	if (rescan && isBus) {
+		scan_bus(node, true);
+		benaphore_lock(&gNodeLock);
 		status = recursive_scan(node);
-
-	benaphore_unlock(&gNodeLock);
+		benaphore_unlock(&gNodeLock);
+	}
 
 	TRACE(("scan(): done (%p) - %s\n", node, strerror(status)));
 	return status;
@@ -220,13 +223,18 @@ scan(device_node_info *node, bool rescan)
 status_t
 dm_rescan(device_node_info *node)
 {
+	status_t err;
+
 	// only allow a single rescan at a time
-	if (atomic_add(&sRescanning, 1) > 0) {
+	if (atomic_add(&sRescanning, 1) > 1) {
+		dprintf("dm_rescan already scanning\n");
 		atomic_add(&sRescanning, -1);
 		return B_BUSY;
 	}
 
-	return scan(node, true);
+	err = scan(node, true);
+	atomic_add(&sRescanning, -1);
+	return err;
 }
 
 

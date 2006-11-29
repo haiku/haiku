@@ -23,7 +23,7 @@
 
 // driver registration directories
 #define PNP_DIR
-#define SYSTEM_DRIVER_REGISTRATION "/boot/beos/add-ons/kernel/"PNP_DIR"registration/"
+#define SYSTEM_DRIVER_REGISTRATION "/boot/beos/system/add-ons/kernel/"PNP_DIR"registration/"
 #define COMMON_DRIVER_REGISTRATION "/boot/home/config/add-ons/kernel/"PNP_DIR"registration/"
 
 // module directories
@@ -197,7 +197,7 @@ status_t pnp_expand_pattern_attr(device_node_info *node, const char *attr_name,
 
 
 // probe.cpp
-status_t dm_register_child_device(device_node_info *node, const char *childName);
+status_t dm_register_child_device(device_node_info *node, const char *childName, bool checkSupport);
 status_t dm_register_fixed_child_devices(device_node_info *node);
 status_t dm_register_dynamic_child_devices(device_node_info *node);
 

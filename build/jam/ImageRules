@@ -181,6 +181,26 @@ rule AddDriversToHaikuImage
 	}
 }
 
+rule AddDriverRegistrationToHaikuImage
+{
+	# AddDriverRegistrationToHaikuImage <directory> : <link target> : <link names> ] ;
+	#
+	local relativeDirectoryTokens = $(1) ;
+	local target = $(2) ;
+	local links = $(3) ;
+	local directoryTokens = beos system add-ons kernel registration $(relativeDirectoryTokens) ;
+
+	# get the relative symlink path prefix
+	local linkPrefix = ;
+	for i in $(relativeDirectoryTokens) {
+		linkPrefix += .. ;
+	}
+	linkPrefix += .. drivers bin ;
+
+	# add the symlink
+	AddSymlinkToHaikuImage $(directoryTokens) : [ FDirName $(linkPrefix) $(target:BS) ] : $(links) ;
+}
+
 rule AddBootModuleSymlinks
 {
 	# AddBootModuleSymlinks <targets> ;

@@ -355,7 +355,6 @@ remove_device_nodes(struct list *list)
 }
 
 
-#if 0
 /** notify a consumer that a device he might handle is added
  *	fileName - file name of consumer
  *	(moved to end of file to avoid inlining)
@@ -364,68 +363,40 @@ remove_device_nodes(struct list *list)
 static status_t
 notify_probe_by_file(device_node_info *node, const char *fileName)
 {
-	char *type;
-	char *resolved_path;
-	char *module_name;
-	int i;
-	bool valid_module_name;
+	char *bus;
+	int i, suffix_length;
+	const char *module_name;
+	const char device_suffix[] = "_device_v1";
 	status_t res;
 
 	TRACE(("notify_probe_by_file(%s)\n", fileName));
 
-	res = pnp_get_attr_string(node, PNP_DRIVER_TYPE, &type, false);
+	res = pnp_get_attr_string(node, B_DRIVER_BUS, &bus, false);
 	if (res != B_OK)
 		return res;
 
-	// resolve link to actual driver file
-	resolved_path = (char *)malloc(B_PATH_NAME_LENGTH + 1);
-	if (resolved_path == NULL) {
-		res = B_NO_MEMORY;
-		goto err;
+	// check if it's a driver module
+	module_info **modules;
+	if ((res = load_module(fileName, &modules)) != B_OK) {
+		goto err;		
 	}
 
-	// ToDo: do something about this; realpath() doesn't exist in the kernel!
-	//module_name = pnp_boot_safe_realpath(consumer_name, resolved_path);
-	module_name = NULL;
-	if (module_name == NULL) {
-		// broken link or something
-		dprintf("Cannot resolve driver file name: %s\n", fileName);
-		res = errno;
-		goto err2;
-	}
-
-	// make sure both consumer and module file are either in 
-	// system or user modules directory
-	valid_module_name = false;
-
-	for (i = 0; i < (disable_useraddons ? 1 : 2); ++i) {
-		int len = strlen(kModulePaths[i]);
-
-		if (!strncmp(fileName, kModulePaths[i], len)
-			&& !strncmp(module_name, kModulePaths[i], len)) {
-			valid_module_name = true;
-			module_name = module_name + len;
+	suffix_length = strlen(bus) + sizeof(device_suffix);
+	for (i=0; modules[i]; i++) {
+		module_name = modules[i]->name;
+		TRACE(("notify_probe_by_file trying %s %s %s\n", module_name, bus, module_name + (strlen(module_name) - suffix_length + 1)));
+		if (strlen(module_name) > suffix_length
+			&& !strncmp(module_name + (strlen(module_name) - suffix_length + 1), bus, strlen(bus))
+			&& !strncmp(module_name + (strlen(module_name) - sizeof(device_suffix) + 1), device_suffix, sizeof(device_suffix))) {
+			// found the module
+			res = dm_register_child_device(node, module_name, true);
 			break;
 		}
 	}
 
-	if (!valid_module_name) {
-		TRACE(("Module file %s of consumer %s is in wrong path\n",
-			fileName, module_name));
-		res = B_NAME_NOT_FOUND;
-		goto err2;
-	}
-
-	// append driver type to get specific module name
-	strlcat(module_name, "/", B_PATH_NAME_LENGTH);
-	strlcat(module_name, type, B_PATH_NAME_LENGTH);	
-
-	res = dm_register_child_device(node, module_name);
-
-err2:
-	free(resolved_path);
+	unload_module(fileName);
 err:
-	free(type);
+	free(bus);
 	return res;
 }
 
@@ -455,7 +426,7 @@ compose_driver_names(device_node_info *node, const char *dir,
 	strlcpy(path, dir, B_PATH_NAME_LENGTH);
 	strlcat(path, "/", B_PATH_NAME_LENGTH);
 
-	TRACE(("compose_drive_names(%s)\n", path));
+	TRACE(("compose_driver_names(%s)\n", path));
 
 	benaphore_lock(&gNodeLock);
 
@@ -567,7 +538,7 @@ find_normal_child(device_node_info *node, const char *dir,
 		for (i = num_parts - 1; i >= 0; --i) {
 			int j;
 
-			TRACE(("%d: %lu\n", i, term_array[i]));
+			//TRACE(("%d: %lu\n", i, term_array[i]));
 			path[term_array[i]] = 0;
 
 			// first, check for user driver, then system driver
@@ -585,8 +556,7 @@ find_normal_child(device_node_info *node, const char *dir,
 						// got him!
 						break;
 				} else {
-					/*SHOW_ERROR( 4, "Specific driver %s doesn't exists",
-						buffer );*/
+					TRACE(("Specific driver %s doesn't exist\n", buffer ));
 				}
 			}
 		}
@@ -731,6 +701,7 @@ register_dynamic_child_device(device_node_info *node, const char *bus,
 			goto err;
 	}
 
+#if 0
 	// tell universal drivers
 	strlcpy(buffers, bus, B_PATH_NAME_LENGTH);
 	strlcat(buffers, UNIVERSAL_SUBDIR, B_PATH_NAME_LENGTH);
@@ -739,6 +710,7 @@ register_dynamic_child_device(device_node_info *node, const char *bus,
 	if (status != B_OK && status != B_NAME_NOT_FOUND)
 		// again, only abort on real problems
 		goto err;
+#endif
 
 	free(buffers);
 
@@ -749,7 +721,6 @@ err:
 	free(buffers);
 	return status;
 }
-#endif
 
 
 static path_entry *
@@ -1041,7 +1012,7 @@ get_nodes_for_device_type(device_node_info *node, struct list *list, const char 
  */
 
 status_t
-dm_register_child_device(device_node_info *node, const char *childName)
+dm_register_child_device(device_node_info *node, const char *childName, bool checkSupport)
 {
 	driver_module_info *child;
 	status_t status;
@@ -1054,6 +1025,19 @@ dm_register_child_device(device_node_info *node, const char *childName)
 		return status;
 	}
 
+	status = B_ERROR;
+	bool hasConnection;
+	if (checkSupport) {
+		if (child->supports_device == NULL) {
+			dprintf("Driver %s has no support_device() hook\n", childName);
+			goto err;
+		}
+		if (child->supports_device(node, &hasConnection) <= 0.0) {
+			TRACE(("Driver %s doesn't support the device\n", childName));
+			goto err;
+		}
+	}
+		
 	if (child->register_device != NULL) {
 		status = child->register_device(node);
 		if (status != B_OK) {
@@ -1065,6 +1049,7 @@ dm_register_child_device(device_node_info *node, const char *childName)
 		status = B_ERROR;
 	}
 
+err:
 	put_module(childName);
 	return status;
 }
@@ -1091,6 +1076,7 @@ dm_register_dynamic_child_devices(device_node_info *node)
 	TRACE(("  Search bus: \"%s\"\n", bus));
 
 	if (gBootDevice < 0) {
+		TRACE(("  Scanning built-in modules only\n"));
 		// there is no boot device yet, we have to scan the already
 		// loaded and built-in modules
 		struct list modules;
@@ -1103,9 +1089,6 @@ dm_register_dynamic_child_devices(device_node_info *node)
 		register_supporting_child_devices(node, &modules);
 		return B_OK;
 	} else {
-		// ToDo: this is completely outdated and must be redone!
-		status = B_ERROR;
-#if 0
 		buffer = (char *)malloc(B_PATH_NAME_LENGTH + 1);
 		if (buffer == NULL) {
 			status = B_NO_MEMORY;
@@ -1142,9 +1125,8 @@ dm_register_dynamic_child_devices(device_node_info *node)
 				break;
 			}
 		}
-#endif
 	}
-#if 0
+	
 	if (found == 0) {
 		// no requirement for a special mapping, so we're just scanning the bus directory
 		bool noSpecificDriver = false;
@@ -1153,7 +1135,6 @@ dm_register_dynamic_child_devices(device_node_info *node)
 
 	// supposed to go through
 	free(buffer);
-#endif
 err:
 	free(bus);
 	return status;
@@ -1188,7 +1169,7 @@ dm_register_fixed_child_devices(device_node_info *node)
 
 		TRACE(("Consumer %ld: %s\n", i, childName));
 
-		if (dm_register_child_device(node, childName) != B_OK) {
+		if (dm_register_child_device(node, childName, false) != B_OK) {
 			dprintf("Cannot register fixed child device %s\n", childName);
 
 			// report error if fixed consumers couldn't be loaded

@@ -118,6 +118,8 @@ pci_module_register_child_devices(void *cookie)
 
 			// consumer specification
 			{ B_DRIVER_BUS, B_STRING_TYPE, { string: "pci" }},
+			{ B_DRIVER_MAPPING, B_STRING_TYPE, { string: "%"PCI_DEVICE_VENDOR_ID_ITEM "%|_%" PCI_DEVICE_DEVICE_ID_ITEM "%" }},
+
 			// ToDo: this is a hack
 			{ B_DRIVER_DEVICE_TYPE, B_STRING_TYPE, { string: device.class_base == 1 ? "drivers/dev/disk" : "drivers/dev" }},
 			{ NULL }

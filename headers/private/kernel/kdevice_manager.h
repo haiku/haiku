@@ -50,6 +50,7 @@ extern "C" {
 
 extern status_t probe_for_device_type(const char *type);
 extern status_t device_manager_init(struct kernel_args *args);
+extern status_t device_manager_init_post_modules(struct kernel_args *args);
 
 // temporary/optional device manager syscall API
 #define DEVICE_MANAGER_SYSCALLS "device_manager"

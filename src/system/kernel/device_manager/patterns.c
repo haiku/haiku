@@ -23,7 +23,7 @@
 #include <string.h>
 
 
-#define TRACE_PATTERNS
+//#define TRACE_PATTERNS
 #ifdef TRACE_PATTERNS
 #	define TRACE(x) dprintf x
 #else
@@ -91,7 +91,7 @@ expand_attr(device_node_info *node, const char **pattern, char *buffer, char *ds
 		case B_STRING_TYPE: {
 			const char *str;
 
-			strlcat(dst, "\"", PATH_MAX);
+			//strlcat(dst, "\"", PATH_MAX);
 
 			for (str = attr->attr.value.string; *str; ++str) {
 				char ch;
@@ -108,7 +108,7 @@ expand_attr(device_node_info *node, const char **pattern, char *buffer, char *ds
 				strlcat(dst, buffer, PATH_MAX);
 			}
 
-			strlcat(dst, "\"", PATH_MAX);
+			//strlcat(dst, "\"", PATH_MAX);
 			break;
 		}
 		case B_RAW_TYPE:

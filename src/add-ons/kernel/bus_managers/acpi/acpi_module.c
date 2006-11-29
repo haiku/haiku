@@ -9,6 +9,13 @@
 #include "acpi_priv.h"
 #include <PCI.h>
 
+//#define TRACE_ACPI_MODULE
+#ifdef TRACE_ACPI_MODULE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 device_manager_info *gDeviceManager;
 pci_module_info *gPCIManager;
 
@@ -73,7 +80,7 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 	char result[255];
 	void *counter = NULL;
 
-	dprintf("acpi_enumerate_child_devices: recursing from %s\n", root);
+	TRACE(("acpi_enumerate_child_devices: recursing from %s\n", root));
 
 	while (get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		uint32 type = get_object_type(result);
@@ -102,7 +109,11 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
 				
 				// consumer specification
-				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "apci" }},
+				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "acpi" }},
+				{ B_DRIVER_MAPPING, B_STRING_TYPE, { string: 
+					"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
+				{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string: 
+					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},
 				{ NULL }
 			};
 
@@ -128,7 +139,9 @@ acpi_enumerate_child_devices(device_node_handle node, const char *root)
 				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
 				
 				// consumer specification
-				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "apci" }},
+				{ B_DRIVER_BUS, B_STRING_TYPE, { string: "acpi" }},
+				{ B_DRIVER_MAPPING, B_STRING_TYPE, { string: 
+					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},
 				{ NULL }
 			};
 			
