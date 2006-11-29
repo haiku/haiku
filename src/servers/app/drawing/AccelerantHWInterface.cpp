@@ -536,6 +536,8 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT,
 		(void *)&fDisplayMode);
 
+	_NotifyFrameBufferChanged();
+
 	return status;
 }
 
@@ -580,6 +582,7 @@ AccelerantHWInterface::_UpdateFrameBufferConfig()
 	}
 
 	fFrontBuffer->SetFrameBufferConfig(fFrameBufferConfig);
+
 	return B_OK;
 }
 

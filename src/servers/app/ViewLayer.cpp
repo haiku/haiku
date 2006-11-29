@@ -912,17 +912,18 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 	// remember old bounds for tracking dirty region
 	IntRect oldBounds(Bounds());
-	// find the area of the view that can be scrolled,
-	// contents are shifted in the opposite direction from scrolling
-	IntRect stillVisibleBounds(oldBounds);
-	stillVisibleBounds.OffsetBy(x, y);
 
 	// NOTE: using ConvertToVisibleInTopView()
 	// instead of ConvertToScreen(), this makes
 	// sure we don't try to move or invalidate an
 	// area hidden underneath the parent view
 	ConvertToVisibleInTopView(&oldBounds);
-	ConvertToVisibleInTopView(&stillVisibleBounds);
+
+	// find the area of the view that can be scrolled,
+	// contents are shifted in the opposite direction from scrolling
+	IntRect stillVisibleBounds(oldBounds);
+	stillVisibleBounds.OffsetBy(x, y);
+	stillVisibleBounds = stillVisibleBounds & oldBounds;
 
 	fScrollingOffset.x += x;
 	fScrollingOffset.y += y;

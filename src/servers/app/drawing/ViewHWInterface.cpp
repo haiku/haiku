@@ -540,6 +540,8 @@ ViewHWInterface::SetMode(const display_mode &mode)
 			}
 		}
 
+		_NotifyFrameBufferChanged();
+
 		if (ret >= B_OK) {
 			// clear out buffers, alpha is 255 this way
 			// TODO: maybe this should handle different color spaces in different ways

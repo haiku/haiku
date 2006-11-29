@@ -8,17 +8,10 @@
 	#define TEST_MODE 0
 #endif
 
-// Uncomment this if the DisplayDriver should only rely on drawing functions implemented
-// in software even though hardware-accelerated functions are available
-// NOTE: everything is software right now (since DisplayDriverPainter)
-//#define DISABLE_HARDWARE_ACCELERATION
-
-// Define this for a quick hack to test some of the drawing functions
-//#define DISPLAYDRIVER_TEST_HACK
-
 // Define this if you want the display driver to emulate the input server.
 #if TEST_MODE
 #	define ENABLE_INPUT_SERVER_EMULATION
+//#	define USE_DIRECT_WINDOW_TEST_MODE
 #endif
 
 // This is the application signature of our app_server when running as a

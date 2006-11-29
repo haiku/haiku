@@ -16,12 +16,13 @@
 #include <Locker.h>
 #include <Point.h>
 
+#include "HWInterface.h"
+
 class BPoint;
 class BRect;
 class BRegion;
 
 class DrawState;
-class HWInterface;
 class Painter;
 class RGBColor;
 class ServerBitmap;
@@ -35,14 +36,13 @@ typedef struct {
 
 } LineArrayData;
 
-class DrawingEngine {
+class DrawingEngine : public HWInterfaceListener {
 public:
 							DrawingEngine(HWInterface* interface = NULL);
 	virtual					~DrawingEngine();
 
-			// when implementing, be sure to call the inherited version
-			status_t		Initialize();
-			void			Shutdown();
+	// HWInterfaceListener interface
+	virtual	void			FrameBufferChanged();
 
 			// locking
 			bool			Lock();
@@ -53,8 +53,6 @@ public:
 			void			WriteUnlock();
 
 			// for "changing" hardware
-			void			Update();
-
 			void			SetHWInterface(HWInterface* interface);
 
 			// for screen shots
@@ -133,7 +131,8 @@ public:
 
 			// -------- text related calls
 
-			// DrawState is NOT const because this call updates the pen position in the passed DrawState
+			// DrawState is NOT const because this call updates the
+			// pen position in the passed DrawState
 			BPoint			DrawString(const char* string, int32 length,
 								const BPoint& pt, DrawState* d,
 								escapement_delta* delta = NULL);

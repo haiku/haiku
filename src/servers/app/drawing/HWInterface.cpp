@@ -20,6 +20,12 @@
 #include <string.h>
 
 
+HWInterfaceListener::HWInterfaceListener()		{}
+HWInterfaceListener::~HWInterfaceListener()		{}
+
+
+// #pragma mark - HWInterface
+
 // constructor
 HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
@@ -33,7 +39,8 @@ HWInterface::HWInterface(bool doubleBuffered)
 	  fCursorLocation(0, 0),
 	  fDoubleBuffered(doubleBuffered),
 //	  fUpdateExecutor(new UpdateQueue(this))
-	  fUpdateExecutor(NULL)
+	  fUpdateExecutor(NULL),
+	  fListeners(20)
 {
 }
 
@@ -303,6 +310,9 @@ HWInterface::CopyBackToFront(const BRect& frame)
 }
 
 
+// #pragma mark -
+
+
 overlay_token
 HWInterface::AcquireOverlayChannel()
 {
@@ -348,7 +358,9 @@ HWInterface::HideOverlay(Overlay* overlay)
 }
 
 
-// HideSoftwareCursor
+// #pragma mark -
+
+
 bool
 HWInterface::HideSoftwareCursor(const BRect& area)
 {
@@ -365,14 +377,14 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 	return false;
 }
 
-// HideSoftwareCursor
+
 void
 HWInterface::HideSoftwareCursor()
 {
 	_RestoreCursorArea();
 }
 
-// ShowSoftwareCursor
+
 void
 HWInterface::ShowSoftwareCursor()
 {
@@ -381,6 +393,27 @@ HWInterface::ShowSoftwareCursor()
 	}
 }
 
+
+// #pragma mark -
+
+
+bool
+HWInterface::AddListener(HWInterfaceListener* listener)
+{
+	if (listener && !fListeners.HasItem(listener))
+		return fListeners.AddItem(listener);
+	return false;
+}
+
+
+void
+HWInterface::RemoveListener(HWInterfaceListener* listener)
+{
+	fListeners.RemoveItem(listener);
+}
+
+
+// #pragma mark -
 
 // _DrawCursor
 // * default implementation, can be used as fallback or for
@@ -843,5 +876,15 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 }
 
 
-
+void
+HWInterface::_NotifyFrameBufferChanged()
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		HWInterfaceListener* listener
+			= (HWInterfaceListener*)listeners.ItemAtFast(i);
+		listener->FrameBufferChanged();
+	}
+}
 

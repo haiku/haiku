@@ -13,7 +13,6 @@
 #include <algo.h>
 #include <stack.h>
 
-#include "HWInterface.h"
 #include "DrawState.h"
 #include "Painter.h"
 #include "PNGDump.h"
@@ -81,50 +80,37 @@ class FontLocker {
 //	#pragma mark -
 
 
-// constructor
 DrawingEngine::DrawingEngine(HWInterface* interface)
 	: fPainter(new Painter()),
-	  fGraphicsCard(interface),
+	  fGraphicsCard(NULL),
 	  fAvailableHWAccleration(0),
 	  fSuspendSyncLevel(0)
 {
+	SetHWInterface(interface);
 }
 
-// destructor
+
 DrawingEngine::~DrawingEngine()
 {
+	SetHWInterface(NULL);
 	delete fPainter;
 }
 
-// Initialize
-status_t
-DrawingEngine::Initialize()
+
+void
+DrawingEngine::FrameBufferChanged()
 {
-	status_t err = B_ERROR;
-	if (WriteLock()) {
-		err = fGraphicsCard->Initialize();
-		if (err < B_OK)
-			fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
-		WriteUnlock();
+	if (!fGraphicsCard) {
+		fPainter->DetachFromBuffer();
+		fAvailableHWAccleration = 0;
+		return;
 	}
-	return err;
-}
 
-// Shutdown
-void
-DrawingEngine::Shutdown()
-{
-}
-
-// Update
-void
-DrawingEngine::Update()
-{
-	if (Lock()) {
+	if (WriteLock()) {
 		fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
 		// available HW acceleration might have changed
 		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -132,7 +118,18 @@ DrawingEngine::Update()
 void
 DrawingEngine::SetHWInterface(HWInterface* interface)
 {
+	if (fGraphicsCard == interface)
+		return;
+
+	if (fGraphicsCard)
+		fGraphicsCard->RemoveListener(this);
+
 	fGraphicsCard = interface;
+
+	if (fGraphicsCard)
+		fGraphicsCard->AddListener(this);
+
+	FrameBufferChanged();
 }
 
 // #pragma mark -
@@ -146,7 +143,7 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 	fPainter->ConstrainClipping(region);
 }
 
-// SuspendAutoSync
+
 void
 DrawingEngine::SuspendAutoSync()
 {
@@ -155,7 +152,7 @@ DrawingEngine::SuspendAutoSync()
 	fSuspendSyncLevel++;
 }
 
-// Sync
+
 void
 DrawingEngine::Sync()
 {

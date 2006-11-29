@@ -599,6 +599,7 @@ DWindowHWInterface::_UpdateFrameBufferConfig()
 						fDisplayMode.virtual_width, 
 						fDisplayMode.virtual_height,
 						(color_space)fDisplayMode.space);
+
 	return B_OK;
 }
 
@@ -709,6 +710,7 @@ DWindowHWInterface::SetMode(const display_mode &mode)
 	}
 
 	_UpdateFrameBufferConfig();
+	_NotifyFrameBufferChanged();
 
 	return ret;
 }

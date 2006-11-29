@@ -26,9 +26,8 @@ OffscreenWindowLayer::OffscreenWindowLayer(ServerBitmap* bitmap,
 	  fBitmap(bitmap),
 	  fHWInterface(new BitmapHWInterface(fBitmap))
 {
+	fHWInterface->Initialize();
 	GetDrawingEngine()->SetHWInterface(fHWInterface);
-	GetDrawingEngine()->Initialize();
-	GetDrawingEngine()->Update();
 
 	fVisibleRegion.Set(fFrame);
 	fVisibleContentRegion.Set(fFrame);
@@ -42,7 +41,6 @@ OffscreenWindowLayer::~OffscreenWindowLayer()
 {
 	fHWInterface->WriteLock();
 	// Unlike normal Layers, we own the DrawingEngine instance
-	GetDrawingEngine()->Shutdown();
 	delete GetDrawingEngine();
 	fHWInterface->Shutdown();
 	fHWInterface->WriteUnlock();

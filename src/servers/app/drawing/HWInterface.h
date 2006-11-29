@@ -15,6 +15,7 @@
 
 #include <Accelerant.h>
 #include <GraphicsCard.h>
+#include <List.h>
 #include <OS.h>
 #include <Region.h>
 
@@ -31,6 +32,14 @@ enum {
 	HW_ACC_COPY_REGION					= 0x00000001,
 	HW_ACC_FILL_REGION					= 0x00000002,
 	HW_ACC_INVERT_REGION				= 0x00000004,
+};
+
+class HWInterfaceListener {
+ public:
+								HWInterfaceListener();
+	virtual						~HWInterfaceListener();
+
+	virtual	void				FrameBufferChanged() = 0;
 };
 
 class HWInterface : public MultiLocker {
@@ -139,6 +148,10 @@ class HWInterface : public MultiLocker {
 			void				HideSoftwareCursor();
 			void				ShowSoftwareCursor();
 
+	// Listener support
+			bool				AddListener(HWInterfaceListener* listener);
+			void				RemoveListener(HWInterfaceListener* listener);
+
  protected:
 	// implement this in derived classes
 	virtual	void				_DrawCursor(BRect area) const;
@@ -152,6 +165,8 @@ class HWInterface : public MultiLocker {
 			void				_RestoreCursorArea() const;
 			void				_AdoptDragBitmap(const ServerBitmap* bitmap,
 												 const BPoint& offset);
+
+			void				_NotifyFrameBufferChanged();
 
 			// If we draw the cursor somewhere in the drawing buffer,
 			// we need to backup its contents before drawing, so that
@@ -197,6 +212,8 @@ class HWInterface : public MultiLocker {
 
  private:
 			UpdateQueue*		fUpdateExecutor;
+
+			BList				fListeners;
 };
 
 #endif // HW_INTERFACE_H

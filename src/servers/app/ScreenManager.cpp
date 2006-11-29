@@ -10,6 +10,8 @@
 
 
 #include "ScreenManager.h"
+
+#include "ServerConfig.h"
 #include "ServerScreen.h"
 
 #include <Autolock.h>

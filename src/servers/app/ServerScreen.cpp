@@ -67,9 +67,9 @@ Screen::~Screen()
 status_t
 Screen::Initialize()
 {
-	if (fDriver) {
-		// this will also init the graphics hardware the driver is attached to
-		return fDriver->Initialize();
+	if (fHWInterface) {
+		// init the graphics hardware
+		return fHWInterface->Initialize();
 	}
 
 	return B_NO_INIT;
@@ -79,8 +79,8 @@ Screen::Initialize()
 void
 Screen::Shutdown()
 {
-	if (fDriver)
-		fDriver->Shutdown();
+	if (fHWInterface)
+		fHWInterface->Shutdown();
 }
 
 
@@ -88,12 +88,10 @@ status_t
 Screen::SetMode(display_mode mode, bool makeDefault)
 {
 	status_t status = fHWInterface->SetMode(mode);
+		// any attached DrawingEngines will be notified
 
-	// the DrawingEngine needs to adjust itself
-	if (status >= B_OK) {
-		fDriver->Update();
+	if (status >= B_OK)
 		fIsDefault = makeDefault;
-	}
 
 	return status;
 }
