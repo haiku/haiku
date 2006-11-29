@@ -70,16 +70,13 @@ void Angle::Normalize(void)
 	// if the value of the angle is >=360 or <0, make it so that it is 
 	// within those bounds
 	
-	if(fAngleValue>359)
-	{
-		while(fAngleValue>359)
-			fAngleValue-=360;
+	if (fAngleValue > 360) {
+		while (fAngleValue > 360)
+			fAngleValue -= 360;
 		return;
-	}
-	if(fAngleValue<0)
-	{
-		while(fAngleValue<0)
-			fAngleValue+=360;
+	} else if (fAngleValue < 0) {
+		while (fAngleValue < 0)
+			fAngleValue += 360;
 	}
 }
 
