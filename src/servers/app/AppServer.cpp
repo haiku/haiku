@@ -278,7 +278,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			delete this;
 
 			// we are now clear to exit
-			exit_thread(0);
+			exit(0);
 			break;
 		}
 #endif
