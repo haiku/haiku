@@ -70,8 +70,9 @@ virtual					~Angle();
 		bool			operator<=(const Angle &from);
 
 protected:	
+		void			_InitTrigTables(void);
+
 		float			fAngleValue;
-		void			InitTrigTables(void);
 };
 
 #endif
