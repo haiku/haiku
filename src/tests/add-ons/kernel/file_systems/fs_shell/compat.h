@@ -6,7 +6,7 @@
   and some versions of Unix).  To further avoid complications I've also
   hidden the stat and dirent structs since those vary even more widely.
 
-  THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED 
+  THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED
   OR IMPLIED.  YOU MAY USE THIS CODE AND FREELY DISTRIBUTE IT FOR
   NON-COMMERCIAL USE AS LONG AS THIS NOTICE REMAINS ATTACHED.
 
@@ -14,8 +14,8 @@
 
   Dominic Giampaolo
   dbg@be.com
-*/  
-  
+*/
+
 
 #ifndef _COMPAT_H
 #define _COMPAT_H
@@ -51,6 +51,19 @@ typedef struct iovec iovec;
 #	include <image.h>			/* for a few typedefs */
 #	include <Drivers.h>			/* for various ioctl structs, etc */
 #	include <iovec.h>			/* because we're boneheads sometimes */
+#elif HAIKU_HOST_PLATFORM_FREEBSD
+/* BSD Compilant stat.h */
+#	define __BSD_VISIBLE 1
+#undef __XSI_VISIBLE
+#	define __XSI_VISIBLE 1
+	/* for mknod */
+#	define __POSIX_VISIBLE 200112
+	/* for S_ISLNK, S_ISSOCK and lstat */
+#	include <sys/stat.h>
+#	include <sys/uio.h>
+#	include <image.h>			/* for a few typedefs */
+#	include <Drivers.h>			/* for various ioctl structs, etc */
+typedef unsigned long ulong;
 #else
 #	include <sys/uio.h>
 #	include <image.h>			/* for a few typedefs */

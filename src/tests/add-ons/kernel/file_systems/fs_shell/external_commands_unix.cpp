@@ -121,7 +121,8 @@ get_external_command(const char *prompt, char *input, int len)
 		}
 
 		// get the len of the command
-		int commandLen = strnlen(message.command, sizeof(message.command)) + 1;
+		message.command[sizeof(message.command) - 1] = '\0';
+		int commandLen = strlen(message.command) + 1;
 		if (commandLen <= 1) {
 			fprintf(stderr, "No command given.\n");
 			continue;

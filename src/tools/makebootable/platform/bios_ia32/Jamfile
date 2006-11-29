@@ -8,7 +8,7 @@ SEARCH_SOURCE
 USES_BE_API on <build>makebootable = true ;
 
 local hostPlatformSources ;
-if $(HOST_PLATFORM) = linux {
+if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd {
 	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp ;
 
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel

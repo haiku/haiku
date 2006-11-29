@@ -80,13 +80,21 @@ init_error_map()
 	ADD_ERROR(EDQUOT);
 	ADD_ERROR(EIDRM);
 	ADD_ERROR(EMULTIHOP);
-	ADD_ERROR(ENODATA);
+	#ifdef ENODATA
+		ADD_ERROR(ENODATA);
+	#endif
 	ADD_ERROR(ENOLINK);
-	ADD_ERROR(ENOSR);
-	ADD_ERROR(ENOSTR);
+	#ifdef ENOSR
+		ADD_ERROR(ENOSR);
+	#endif
+	#ifdef ENOSTR
+		ADD_ERROR(ENOSTR);
+	#endif
 	ADD_ERROR(ENOTSUP);
 	ADD_ERROR(EPROTO);
-	ADD_ERROR(ETIME);
+	#ifdef ETIME
+		ADD_ERROR(ETIME);
+	#endif
 	ADD_ERROR(ETXTBSY);
 	ADD_ERROR(ENOMEM);
 	ADD_ERROR(EACCES);
@@ -122,7 +130,7 @@ static int
 to_host_error(int error)
 {
 	init_error_map();
-	
+
 	map<int, int>::iterator it = sToHostErrorMap.find(error);
 	return (it != sToHostErrorMap.end() ? it->second : error);
 }
@@ -132,11 +140,11 @@ static int
 to_haiku_error(int error)
 {
 	init_error_map();
-	
+
 	map<int, int>::iterator it = sToHaikuErrorMap.find(error);
 	if (it != sToHaikuErrorMap.end())
 		return it->second;
-	
+
 	return (error > 0 ? -error : error);
 }
 

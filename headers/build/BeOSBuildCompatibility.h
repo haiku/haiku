@@ -25,7 +25,7 @@ extern ssize_t  read_pos(int fd, off_t pos, void *buffer, size_t count);
 extern ssize_t  write_pos(int fd, off_t pos, const void *buffer,size_t count);
 
 
-// There's no O_NOTRAVERSE under Linux, but there's a O_NOFOLLOW, which
+// There's no O_NOTRAVERSE under Linux and FreeBSD, but there's a O_NOFOLLOW, which
 // means something different (open() fails when the file is a symlink), but
 // we can abuse this flag for our purposes (we filter it in libroot).
 #ifndef O_NOTRAVERSE

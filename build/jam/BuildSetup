@@ -294,7 +294,7 @@ HOST_UNARFLAGS		?= x ;
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host : linux freebsd ;
 
-if $(HOST_PLATFORM) = linux {
+if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd {
 	# don't use lex: otherwise rc will not work correctly
 	if $(LEX) = lex {
 		LEX = flex ;
@@ -422,6 +422,11 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBSUPC++ = supc++ ;
 	}
 
+	# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
+	if $(HOST_PLATFORM) = freebsd {
+		HOST_LIBROOT += /usr/lib/libgnuregex.so ;
+	}
+
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
 	# build platform we need to make sure, this is also defined.
 	if $(HOST_CPU) = x86 {
@@ -449,7 +454,7 @@ if $(METROWERKS) {
 HOST_BE_API_HEADERS = ;
 HOST_BE_API_CCFLAGS = ;
 HOST_BE_API_C++FLAGS = ;
-	
+
 if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_BE_API_HEADERS =
 		[ FDirName $(HAIKU_TOP) headers build ]
@@ -464,6 +469,10 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
 	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 }
+
+# Add directory with system headers we need when building something for the host
+# platform, e.g. containing missing POSIX/GNU headers.
+HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host $(HOST_PLATFORM) ] ;
 
 
 #pragma mark -
@@ -655,7 +664,7 @@ CC = bad-cc ;
 C++ = bad-c++ ;
 LINK = bad-link ;
 
-# Allow compiling unit tests on Zeta. Instead of fixing the PostMessage() 
+# Allow compiling unit tests on Zeta. Instead of fixing the PostMessage()
 # issues, they deprecated that nice function. This will enable it again:
 C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
 # Same for buggy find_directory threadsafety fixes

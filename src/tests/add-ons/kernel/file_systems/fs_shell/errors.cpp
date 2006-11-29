@@ -55,8 +55,12 @@ static error_entry sErrors[] = {
 	{ FS_ENXIO, ENXIO },
 	{ FS_ESPIPE, ESPIPE },
 	{ FS_ESRCH, ESRCH },
-//	{ FS_EFPOS, EFPOS },
-//	{ FS_ESIGPARM, ESIGPARM },
+	#ifdef EFPOS
+		{ FS_EFPOS, EFPOS },
+	#endif
+	#ifdef ESIGPARM
+		{ FS_ESIGPARM, ESIGPARM },
+	#endif
 	{ FS_EDOM, EDOM },
 	{ FS_ERANGE, ERANGE },
 	{ FS_EPROTOTYPE, EPROTOTYPE },
@@ -93,13 +97,21 @@ static error_entry sErrors[] = {
 	{ FS_EDQUOT, EDQUOT },
 	{ FS_EIDRM, EIDRM },
 	{ FS_EMULTIHOP, EMULTIHOP },
-	{ FS_ENODATA, ENODATA },
+	#ifdef ENODATA
+		{ FS_ENODATA, ENODATA },
+	#endif
 	{ FS_ENOLINK, ENOLINK },
-	{ FS_ENOSR, ENOSR },
-	{ FS_ENOSTR, ENOSTR },
+	#ifdef ENOSR
+		{ FS_ENOSR, ENOSR },
+	#endif
+	#ifdef ENOSTR
+		{ FS_ENOSTR, ENOSTR },
+	#endif
 	{ FS_ENOTSUP, ENOTSUP },
 	{ FS_EPROTO, EPROTO },
-	{ FS_ETIME, ETIME },
+	#ifdef ETIME
+		{ FS_ETIME, ETIME },
+	#endif
 	{ FS_ETXTBSY, ETXTBSY },
 
 	{ FS_ENOMEM, ENOMEM },
