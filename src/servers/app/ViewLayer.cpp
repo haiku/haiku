@@ -39,7 +39,7 @@ using std::nothrow;
 
 
 void
-resize_frame(BRect& frame, uint32 resizingMode, int32 x, int32 y)
+resize_frame(IntRect& frame, uint32 resizingMode, int32 x, int32 y)
 {
 	// follow with left side
 	if ((resizingMode & 0x0F00U) == _VIEW_RIGHT_ << 8)
@@ -70,7 +70,7 @@ resize_frame(BRect& frame, uint32 resizingMode, int32 x, int32 y)
 //	#pragma mark -
 
 
-ViewLayer::ViewLayer(BRect frame, BPoint scrollingOffset, const char* name,
+ViewLayer::ViewLayer(IntRect frame, IntPoint scrollingOffset, const char* name,
 		int32 token, uint32 resizeMode, uint32 flags)
 	:
 	fName(name),
@@ -110,11 +110,6 @@ ViewLayer::ViewLayer(BRect frame, BPoint scrollingOffset, const char* name,
 	fScreenClipping(),
 	fScreenClippingValid(false)
 {
-	fFrame.left = float((int32)fFrame.left);
-	fFrame.top = float((int32)fFrame.top);
-	fFrame.right = float((int32)fFrame.right);
-	fFrame.bottom = float((int32)fFrame.bottom);
-
 	if (fDrawState)
 		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
@@ -145,18 +140,18 @@ ViewLayer::~ViewLayer()
 }
 
 
-BRect
+IntRect
 ViewLayer::Bounds() const
 {
-	BRect bounds(fScrollingOffset.x, fScrollingOffset.y,
-				 fScrollingOffset.x + fFrame.Width(),
-				 fScrollingOffset.y + fFrame.Height());
+	IntRect bounds(fScrollingOffset.x, fScrollingOffset.y,
+				   fScrollingOffset.x + fFrame.Width(),
+				   fScrollingOffset.y + fFrame.Height());
 	return bounds;
 }
 
 
 void
-ViewLayer::ConvertToVisibleInTopView(BRect* bounds) const
+ViewLayer::ConvertToVisibleInTopView(IntRect* bounds) const
 {
 	*bounds = *bounds & Bounds();
 	// NOTE: this step is necessary even if we don't have a parent!
@@ -233,11 +228,11 @@ ViewLayer::AddChild(ViewLayer* layer)
 
 		if (layer->IsVisible()) {
 			// trigger redraw
-			BRect clippedFrame = layer->Frame();
+			IntRect clippedFrame = layer->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
 			BRegion* dirty = fWindow->GetRegion();
 			if (dirty) {
-				dirty->Set(clippedFrame);
+				dirty->Set((clipping_rect)clippedFrame);
 				fWindow->MarkContentDirtyAsync(*dirty);
 				fWindow->RecycleRegion(dirty);
 			}
@@ -288,11 +283,11 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 
 		if (fVisible && layer->IsVisible()) {
 			// trigger redraw
-			BRect clippedFrame = layer->Frame();
+			IntRect clippedFrame = layer->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
 			BRegion* dirty = fWindow->GetRegion();
 			if (dirty) {
-				dirty->Set(clippedFrame);
+				dirty->Set((clipping_rect)clippedFrame);
 				fWindow->MarkContentDirtyAsync(*dirty);
 				fWindow->RecycleRegion(dirty);
 			}
@@ -300,34 +295,6 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	}
 
 	return true;
-}
-
-
-ViewLayer*
-ViewLayer::FirstChild() const
-{
-	return fFirstChild;
-}
-
-
-ViewLayer*
-ViewLayer::PreviousSibling() const
-{
-	return fPreviousSibling;
-}
-
-
-ViewLayer*
-ViewLayer::NextSibling() const
-{
-	return fNextSibling;
-}
-
-
-ViewLayer*
-ViewLayer::LastChild() const
-{
-	return fLastChild;
 }
 
 
@@ -404,13 +371,6 @@ ViewLayer::SetFlags(uint32 flags)
 }
 
 
-BPoint
-ViewLayer::ScrollingOffset() const
-{
-	return fScrollingOffset;
-}
-
-
 void
 ViewLayer::SetDrawingOrigin(BPoint origin)
 {
@@ -464,8 +424,8 @@ ViewLayer::SetUserClipping(const BRegion* region)
 
 
 void
-ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
-	BRect destRect, int32 resizingMode, int32 options)
+ViewLayer::SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
+	IntRect destRect, int32 resizingMode, int32 options)
 {
 	if (fViewBitmap != NULL) {
 		Overlay* overlay = _Overlay();
@@ -492,13 +452,6 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 	fBitmapResizingMode = resizingMode;
 	fBitmapOptions = options;
 
-	// round off destination rect to avoid problems
-	// with drawing the view color around the bitmap
-	fBitmapDestination.OffsetTo(roundf(fBitmapDestination.left),
-								roundf(fBitmapDestination.top));
-	fBitmapDestination.right = roundf(fBitmapDestination.right);
-	fBitmapDestination.bottom = roundf(fBitmapDestination.bottom);
-
 	_UpdateOverlayView();
 }
 
@@ -520,7 +473,7 @@ ViewLayer::_UpdateOverlayView() const
 	if (overlay == NULL)
 		return;
 
-	BRect destination = fBitmapDestination;
+	IntRect destination = fBitmapDestination;
 	ConvertToScreen(&destination);
 
 	overlay->Configure(fBitmapSource, destination);
@@ -562,7 +515,25 @@ ViewLayer::ConvertToParent(BPoint* point) const
 
 
 void
+ViewLayer::ConvertToParent(IntPoint* point) const
+{
+	// remove scrolling offset and convert to parent coordinate space
+	point->x += fFrame.left - fScrollingOffset.x;
+	point->y += fFrame.top - fScrollingOffset.y;
+}
+
+
+void
 ViewLayer::ConvertToParent(BRect* rect) const
+{
+	// remove scrolling offset and convert to parent coordinate space
+	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
+				   fFrame.top - fScrollingOffset.y);
+}
+
+
+void
+ViewLayer::ConvertToParent(IntRect* rect) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
@@ -582,7 +553,16 @@ ViewLayer::ConvertToParent(BRegion* region) const
 void
 ViewLayer::ConvertFromParent(BPoint* point) const
 {
-	// remove scrolling offset and convert to parent coordinate space
+	// convert from parent coordinate space amd add scrolling offset
+	point->x += fScrollingOffset.x - fFrame.left;
+	point->y += fScrollingOffset.y - fFrame.top;
+}
+
+
+void
+ViewLayer::ConvertFromParent(IntPoint* point) const
+{
+	// convert from parent coordinate space amd add scrolling offset
 	point->x += fScrollingOffset.x - fFrame.left;
 	point->y += fScrollingOffset.y - fFrame.top;
 }
@@ -591,7 +571,16 @@ ViewLayer::ConvertFromParent(BPoint* point) const
 void
 ViewLayer::ConvertFromParent(BRect* rect) const
 {
-	// remove scrolling offset and convert to parent coordinate space
+	// convert from parent coordinate space amd add scrolling offset
+	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
+				   fScrollingOffset.y - fFrame.top);
+}
+
+
+void
+ViewLayer::ConvertFromParent(IntRect* rect) const
+{
+	// convert from parent coordinate space amd add scrolling offset
 	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
 				   fScrollingOffset.y - fFrame.top);
 }
@@ -600,7 +589,7 @@ ViewLayer::ConvertFromParent(BRect* rect) const
 void
 ViewLayer::ConvertFromParent(BRegion* region) const
 {
-	// remove scrolling offset and convert to parent coordinate space
+	// convert from parent coordinate space amd add scrolling offset
 	region->OffsetBy(fScrollingOffset.x - fFrame.left,
 					 fScrollingOffset.y - fFrame.top);
 }
@@ -616,9 +605,31 @@ ViewLayer::ConvertToScreen(BPoint* pt) const
 }
 
 
+//! converts a point from local to screen coordinate system 
+void
+ViewLayer::ConvertToScreen(IntPoint* pt) const
+{
+	ConvertToParent(pt);
+
+	if (fParent)
+		fParent->ConvertToScreen(pt);
+}
+
+
 //! converts a rect from local to screen coordinate system 
 void
 ViewLayer::ConvertToScreen(BRect* rect) const
+{
+	BPoint offset(0.0, 0.0);
+	ConvertToScreen(&offset);
+
+	rect->OffsetBy(offset);
+}
+
+
+//! converts a rect from local to screen coordinate system 
+void
+ViewLayer::ConvertToScreen(IntRect* rect) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertToScreen(&offset);
@@ -649,9 +660,31 @@ ViewLayer::ConvertFromScreen(BPoint* pt) const
 }
 
 
+//! converts a point from screen to local coordinate system 
+void
+ViewLayer::ConvertFromScreen(IntPoint* pt) const
+{
+	ConvertFromParent(pt);
+
+	if (fParent)
+		fParent->ConvertFromScreen(pt);
+}
+
+
 //! converts a rect from screen to local coordinate system 
 void
 ViewLayer::ConvertFromScreen(BRect* rect) const
+{
+	BPoint offset(0.0, 0.0);
+	ConvertFromScreen(&offset);
+
+	rect->OffsetBy(offset.x, offset.y);
+}
+
+
+//! converts a rect from screen to local coordinate system 
+void
+ViewLayer::ConvertFromScreen(IntRect* rect) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertFromScreen(&offset);
@@ -729,26 +762,26 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 #if 1
 // based on redraw on new location
 		// the place were we are now visible
-		BRect newVisibleBounds = Bounds();
+		IntRect newVisibleBounds(Bounds());
 		// we can use the frame of the old
 		// local clipping to see which parts need invalidation
-		BRect oldVisibleBounds(Bounds());
+		IntRect oldVisibleBounds(newVisibleBounds);
 		oldVisibleBounds.OffsetBy(-x, -y);
 		ConvertToScreen(&oldVisibleBounds);
 
 		ConvertToVisibleInTopView(&newVisibleBounds);
 
-		dirtyRegion->Include(oldVisibleBounds);
+		dirtyRegion->Include((clipping_rect)oldVisibleBounds);
 		// newVisibleBounds already is in screen coords
-		dirtyRegion->Include(newVisibleBounds);
+		dirtyRegion->Include((clipping_rect)newVisibleBounds);
 #else
 // blitting version, invalidates
 // old contents
-		BRect oldVisibleBounds(Bounds());
+		IntRect oldVisibleBounds(Bounds());
+		IntRect newVisibleBounds(oldVisibleBounds);
 		oldVisibleBounds.OffsetBy(-x, -y);
 		ConvertToScreen(&oldVisibleBounds);
 
-		BRect newVisibleBounds(Bounds());
 		// NOTE: using ConvertToVisibleInTopView()
 		// instead of ConvertToScreen()! see below
 		ConvertToVisibleInTopView(&newVisibleBounds);
@@ -765,7 +798,7 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 			region->Set(oldVisibleBounds);
 			newVisibleBounds.OffsetBy(x, y);
-			region->Exclude(newVisibleBounds);
+			region->Exclude((clipping_rect)newVisibleBounds);
 			dirtyRegion->Include(dirty);
 
 			fWindow->RecycleRegion(region);
@@ -784,7 +817,7 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 		// the parent, or might now be hidden underneath
 		// the parent, this is taken care of when building
 		// the screen clipping
-		InvalidateScreenClipping(true);
+		InvalidateScreenClipping();
 	}
 }
 
@@ -799,7 +832,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fFrame.bottom += y;
 
 	if (fVisible && dirtyRegion) {
-		BRect oldBounds(Bounds());
+		IntRect oldBounds(Bounds());
 		oldBounds.right -= x;
 		oldBounds.bottom -= y;
 
@@ -807,25 +840,25 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 		if (!dirty)
 			return;
 
-		dirty->Set(Bounds());
-		dirty->Include(oldBounds);
+		dirty->Set((clipping_rect)Bounds());
+		dirty->Include((clipping_rect)oldBounds);
 
 		if (!(fFlags & B_FULL_UPDATE_ON_RESIZE)) {
 			// the dirty region is just the difference of
 			// old and new bounds
-			dirty->Exclude(oldBounds & Bounds());
+			dirty->Exclude((clipping_rect)(oldBounds & Bounds()));
 		}
 
-		InvalidateScreenClipping(true);
+		InvalidateScreenClipping();
 
 		if (dirty->CountRects() > 0) {
 			// exclude children, they are expected to
 			// include their own dirty regions in ParentResized()
 			for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 				if (child->IsVisible()) {
-					BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
+					IntRect previousChildVisible(child->Frame() & oldBounds & Bounds());
 					if (dirty->Frame().Intersects(previousChildVisible)) {
-						dirty->Exclude(previousChildVisible);
+						dirty->Exclude((clipping_rect)previousChildVisible);
 					}
 				}
 			}
@@ -855,7 +888,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 void
 ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 {
-	BRect newFrame = fFrame;
+	IntRect newFrame = fFrame;
 	resize_frame(newFrame, fResizeMode & 0x0000ffff, x, y);
 
 	if (newFrame != fFrame) {
@@ -878,10 +911,10 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 	// old contents
 
 	// remember old bounds for tracking dirty region
-	BRect oldBounds(Bounds());
+	IntRect oldBounds(Bounds());
 	// find the area of the view that can be scrolled,
 	// contents are shifted in the opposite direction from scrolling
-	BRect stillVisibleBounds(oldBounds);
+	IntRect stillVisibleBounds(oldBounds);
 	stillVisibleBounds.OffsetBy(x, y);
 
 	// NOTE: using ConvertToVisibleInTopView()
@@ -900,7 +933,7 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 	BRegion* copyRegion = fWindow->GetRegion();
 	if (!copyRegion)
 		return;
-	copyRegion->Set(stillVisibleBounds);
+	copyRegion->Set((clipping_rect)stillVisibleBounds);
 	fWindow->CopyContents(copyRegion, -x, -y);
 
 	// find the dirty region as far as we are
@@ -908,22 +941,22 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 	BRegion* dirty = copyRegion;
 		// reuse copyRegion and call it dirty
 
-	dirty->Set(oldBounds);
+	dirty->Set((clipping_rect)oldBounds);
 	stillVisibleBounds.OffsetBy(-x, -y);
-	dirty->Exclude(stillVisibleBounds);
+	dirty->Exclude((clipping_rect)stillVisibleBounds);
 	dirtyRegion->Include(dirty);
 
 	fWindow->RecycleRegion(dirty);
 
 	// the screen clipping of this view and it's
 	// childs is no longer valid
-	InvalidateScreenClipping(true);
+	InvalidateScreenClipping();
 	RebuildClipping(false);
 }
 
 
 void
-ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
+ViewLayer::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 {
 	if (!fVisible || !fWindow)
 		return;
@@ -932,14 +965,14 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 
 	// blitting version
 
-	int32 xOffset = (int32)(dst.left - src.left);
-	int32 yOffset = (int32)(dst.top - src.top);
+	int32 xOffset = dst.left - src.left;
+	int32 yOffset = dst.top - src.top;
 
 	// figure out which part can be blittet
-	BRect visibleSrc(src);
+	IntRect visibleSrc(src);
 	ConvertToVisibleInTopView(&visibleSrc);
 
-	BRect visibleSrcAtDest(src);
+	IntRect visibleSrcAtDest(src);
 	visibleSrcAtDest.OffsetBy(xOffset, yOffset);
 	ConvertToVisibleInTopView(&visibleSrcAtDest);
 
@@ -963,7 +996,7 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 	// the reason for this is that we are not supposed to visually
 	// copy children in the source rect and neither to copy onto
 	// children in the destination rect...
-	copyRegion->Set(visibleSrc);
+	copyRegion->Set((clipping_rect)visibleSrc);
 	copyRegion->IntersectWith(&ScreenClipping(&windowContentClipping));
 		// note that fScreenClipping is used directly from hereon
 		// because it is now up to date
@@ -975,7 +1008,7 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 	fWindow->CopyContents(copyRegion, xOffset, yOffset);
 
 	// find the dirty region as far as we are concerned
-	BRect dirtyDst(dst);
+	IntRect dirtyDst(dst);
 	ConvertToVisibleInTopView(&dirtyDst);
 
 	BRegion* dirty = fWindow->GetRegion();
@@ -987,7 +1020,7 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 	// offset copyRegion to destination again
 	copyRegion->OffsetBy(xOffset, yOffset);
 	// start with destination given by user
-	dirty->Set(dirtyDst);
+	dirty->Set((clipping_rect)dirtyDst);
 	// exclude the part that we could copy
 	dirty->Exclude(copyRegion);
 
@@ -1238,12 +1271,12 @@ ViewLayer::SetHidden(bool hidden)
 
 			if (fWindow) {
 				// trigger a redraw
-				BRect clippedBounds = Bounds();
+				IntRect clippedBounds = Bounds();
 				ConvertToVisibleInTopView(&clippedBounds);
 				BRegion* dirty = fWindow->GetRegion();
 				if (!dirty)
 					return;
-				dirty->Set(clippedBounds);
+				dirty->Set((clipping_rect)clippedBounds);
 				fWindow->MarkContentDirty(*dirty);
 				fWindow->RecycleRegion(dirty);
 			}
@@ -1287,6 +1320,8 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 void
 ViewLayer::MarkBackgroundDirty()
 {
+	if (fBackgroundDirty)
+		return;
 	fBackgroundDirty = true;
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->MarkBackgroundDirty();
@@ -1332,8 +1367,8 @@ ViewLayer::PrintToStream() const
 {
 	printf("ViewLayer:          %s\n", Name());
 	printf("  fToken:           %ld\n", fToken);
-	printf("  fFrame:           BRect(%.1f, %.1f, %.1f, %.1f)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
-	printf("  fScrollingOffset: BPoint(%.1f, %.1f)\n", fScrollingOffset.x, fScrollingOffset.y);
+	printf("  fFrame:           IntRect(%ld, %ld, %ld, %ld)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
+	printf("  fScrollingOffset: IntPoint(%ld, %ld)\n", fScrollingOffset.x, fScrollingOffset.y);
 	printf("  fHidden:          %d\n", fHidden);
 	printf("  fVisible:         %d\n", fVisible);
 	printf("  fWindow:          %p\n", fWindow);
@@ -1355,12 +1390,12 @@ void
 ViewLayer::RebuildClipping(bool deep)
 {
 	// the clipping spans over the bounds area
-	fLocalClipping.Set(Bounds());
+	fLocalClipping.Set((clipping_rect)Bounds());
 
 	// exclude all childs from the clipping
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 		if (child->IsVisible())
-			fLocalClipping.Exclude(child->Frame());
+			fLocalClipping.Exclude((clipping_rect)child->Frame());
 
 		if (deep)
 			child->RebuildClipping(deep);
@@ -1395,13 +1430,13 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 
 		// see if we parts of our bounds are hidden underneath
 		// the parent, the local clipping does not account for this
-		BRect clippedBounds = Bounds();
+		IntRect clippedBounds = Bounds();
 		ConvertToVisibleInTopView(&clippedBounds);
 		if (clippedBounds.Width() < fScreenClipping.Frame().Width() ||
 			clippedBounds.Height() < fScreenClipping.Frame().Height()) {
 			BRegion* temp = fWindow->GetRegion();
 			if (temp) {
-				temp->Set(clippedBounds);
+				temp->Set((clipping_rect)clippedBounds);
 				fScreenClipping.IntersectWith(temp);
 				fWindow->RecycleRegion(temp);
 			}
@@ -1417,14 +1452,15 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 
 
 void
-ViewLayer::InvalidateScreenClipping(bool deep)
+ViewLayer::InvalidateScreenClipping()
 {
+	if (!fScreenClippingValid)
+		return;
+
 	fScreenClippingValid = false;
-	if (deep) {
-		// invalidate the childrens screen clipping as well
-		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
-			child->InvalidateScreenClipping(deep);
-		}
+	// invalidate the childrens screen clipping as well
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		child->InvalidateScreenClipping();
 	}
 }
 

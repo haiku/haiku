@@ -20,8 +20,8 @@ UseFreeTypeHeaders ;
 local defines = [ FDefines TEST_MODE=1 ] ;
 	# USE_DIRECT_WINDOW_TEST_MODE=1
 
-SubDirCcFlags $(defines) ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
-SubDirC++Flags $(defines) ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
+SubDirCcFlags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
+SubDirC++Flags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
@@ -46,6 +46,7 @@ SharedLibrary libhwinterfaceimpl.so :
 	DWindowHWInterface.cpp
 	MultiLocker.cpp
 
+#	trace.c
 	: be libhwinterface.so
 ;
 
@@ -60,6 +61,8 @@ SharedLibrary libhaikuappserver.so :
 	FontFamily.cpp
 	FontManager.cpp
 	HashTable.cpp
+	IntPoint.cpp
+	IntRect.cpp
 	MultiLocker.cpp
 	Overlay.cpp
 	RGBColor.cpp
@@ -70,6 +73,8 @@ SharedLibrary libhaikuappserver.so :
 
 	# drawing
 	PatternHandler.cpp
+
+#	trace.c
 
 	# libraries
 	: be libtextencoding.so libfreetype.so

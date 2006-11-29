@@ -28,6 +28,8 @@ Server app_server :
 	FontManager.cpp
 	HashTable.cpp
 	InputManager.cpp
+	IntPoint.cpp
+	IntRect.cpp
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp

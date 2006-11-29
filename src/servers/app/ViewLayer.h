@@ -13,6 +13,7 @@
 
 
 #include "RGBColor.h"
+#include "IntRect.h"
 
 #include <GraphicsDefs.h>
 #include <Region.h>
@@ -34,7 +35,7 @@ class ServerPicture;
 
 class ViewLayer {
  public:
-							ViewLayer(BRect frame, BPoint scrollingOffset,
+							ViewLayer(IntRect frame, IntPoint scrollingOffset,
 								const char* name, int32 token, uint32 resizeMode,
 								uint32 flags);
 
@@ -43,9 +44,9 @@ class ViewLayer {
 			int32			Token() const
 								{ return fToken; }
 
-			BRect			Frame() const
+			IntRect			Frame() const
 								{ return fFrame; }
-			BRect			Bounds() const;
+			IntRect			Bounds() const;
 
 			void			SetResizeMode(uint32 resizeMode)
 								{ fResizeMode = resizeMode; }
@@ -58,7 +59,8 @@ class ViewLayer {
 			uint32			Flags() const
 								{ return fFlags; }
 
-			BPoint			ScrollingOffset() const;
+	inline	IntPoint		ScrollingOffset() const
+								{ return fScrollingOffset; }
 
 			void			SetDrawingOrigin(BPoint origin);
 			BPoint			DrawingOrigin() const;
@@ -71,7 +73,7 @@ class ViewLayer {
 
 			// converts the given frame up the view hierarchy and
 			// clips to each views bounds
-			void			ConvertToVisibleInTopView(BRect* bounds) const;
+			void			ConvertToVisibleInTopView(IntRect* bounds) const;
 
 			void			AttachedToWindow(WindowLayer* window);
 			void			DetachedFromWindow();
@@ -84,10 +86,14 @@ class ViewLayer {
 	inline	ViewLayer*		Parent() const
 								{ return fParent; }
 
-			ViewLayer*		FirstChild() const;
-			ViewLayer*		LastChild() const;
-			ViewLayer*		PreviousSibling() const;
-			ViewLayer*		NextSibling() const;
+	inline	ViewLayer*		FirstChild() const
+								{ return fFirstChild; }
+	inline	ViewLayer*		LastChild() const
+								{ return fLastChild; }
+	inline	ViewLayer*		PreviousSibling() const
+								{ return fPreviousSibling; }
+	inline	ViewLayer*		NextSibling() const
+								{ return fNextSibling; }
 
 			ViewLayer*		TopLayer();
 
@@ -99,19 +105,27 @@ class ViewLayer {
 
 			// coordinate conversion
 			void			ConvertToParent(BPoint* point) const;
+			void			ConvertToParent(IntPoint* point) const;
 			void			ConvertToParent(BRect* rect) const;
+			void			ConvertToParent(IntRect* rect) const;
 			void			ConvertToParent(BRegion* region) const; 
 
 			void			ConvertFromParent(BPoint* point) const;
+			void			ConvertFromParent(IntPoint* point) const;
 			void			ConvertFromParent(BRect* rect) const;
+			void			ConvertFromParent(IntRect* rect) const;
 			void			ConvertFromParent(BRegion* region) const; 
 
 			void			ConvertToScreen(BPoint* point) const;
+			void			ConvertToScreen(IntPoint* point) const;
 			void			ConvertToScreen(BRect* rect) const;
+			void			ConvertToScreen(IntRect* rect) const;
 			void			ConvertToScreen(BRegion* region) const;
 
 			void			ConvertFromScreen(BPoint* point) const;
+			void			ConvertFromScreen(IntPoint* point) const;
 			void			ConvertFromScreen(BRect* rect) const;
+			void			ConvertFromScreen(IntRect* rect) const;
 			void			ConvertFromScreen(BRegion* region) const;
 
 			void			ConvertToScreenForDrawing(BPoint* point) const;
@@ -133,7 +147,7 @@ class ViewLayer {
 			void			ParentResized(int32 dx, int32 dy,
 								BRegion* dirtyRegion);
 
-			void			CopyBits(BRect src, BRect dst,
+			void			CopyBits(IntRect src, IntRect dst,
 									 BRegion& windowContentClipping);
 
 			const BRegion&	LocalClipping() const { return fLocalClipping; }
@@ -147,8 +161,8 @@ class ViewLayer {
 
 			ServerBitmap*	ViewBitmap() const
 								{ return fViewBitmap; }
-			void			SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
-								BRect destRect, int32 resizingMode, int32 options);
+			void			SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
+								IntRect destRect, int32 resizingMode, int32 options);
 
 			void			PushState();
 			void			PopState();
@@ -207,8 +221,8 @@ class ViewLayer {
 			void			RebuildClipping(bool deep);
 			BRegion&		ScreenClipping(BRegion* windowContentClipping,
 										   bool force = false) const;
-			void			InvalidateScreenClipping(bool deep);
-			bool			IsScreenClippingValid() const
+			void			InvalidateScreenClipping();
+	inline	bool			IsScreenClippingValid() const
 								{ return fScreenClippingValid; }
 
 			// debugging
@@ -223,15 +237,15 @@ class ViewLayer {
 			BString			fName;
 			int32			fToken;
 			// area within parent coordinate space
-			BRect			fFrame;
+			IntRect			fFrame;
 			// scrolling offset
-			BPoint			fScrollingOffset;
+			IntPoint		fScrollingOffset;
 
 			RGBColor		fViewColor;
 			DrawState*		fDrawState;
 			ServerBitmap*	fViewBitmap;
-			BRect			fBitmapSource;
-			BRect			fBitmapDestination;
+			IntRect			fBitmapSource;
+			IntRect			fBitmapDestination;
 			int32			fBitmapResizingMode;
 			int32			fBitmapOptions;
 
@@ -263,5 +277,6 @@ class ViewLayer {
 	mutable	bool			fScreenClippingValid;
 
 };
+
 
 #endif // LAYER_H
