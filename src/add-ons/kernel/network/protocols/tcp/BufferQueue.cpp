@@ -193,6 +193,7 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 			size_t size = sequence - buffer->sequence;
 			gBufferModule->remove_header(buffer, size);
 
+			buffer->sequence += size;
 			fNumBytes -= size;
 			fContiguousBytes -= size;
 		}

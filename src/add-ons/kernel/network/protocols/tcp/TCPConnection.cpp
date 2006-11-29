@@ -70,6 +70,7 @@ TCPConnection::TCPConnection(net_socket *socket)
 	fDuplicateAcknowledgeCount(0),
 	fRoute(NULL),
 	fReceiveNext(0),
+	fReceiveMaxAdvertised(0),
 	fReceiveWindow(socket->receive.buffer_size),
 	fReceiveMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fReceiveQueue(socket->receive.buffer_size),
@@ -77,7 +78,7 @@ TCPConnection::TCPConnection(net_socket *socket)
 	fState(CLOSED),
 	fError(B_OK)
 {
-	gStackModule->init_timer(&fTimer, _TimeWait, this);
+	//gStackModule->init_timer(&fTimer, _TimeWait, this);
 
 	recursive_lock_init(&fLock, "tcp lock");
 		// TODO: to be replaced with a real locking strategy!
@@ -85,12 +86,17 @@ TCPConnection::TCPConnection(net_socket *socket)
 	//benaphore_init(&fSendLock, "tcp send");
 	fSendLock = create_sem(0, "tcp send");
 	fReceiveLock = create_sem(0, "tcp receive");
+
+	gStackModule->init_timer(&fPersistTimer, TCPConnection::_PersistTimer, this);
+	gStackModule->init_timer(&fRetransmitTimer, TCPConnection::_RetransmitTimer, this);
+	gStackModule->init_timer(&fDelayedAcknowledgeTimer,
+		TCPConnection::_DelayedAcknowledgeTimer, this);
 }
 
 
 TCPConnection::~TCPConnection()
 {
-	gStackModule->set_timer(&fTimer, -1);
+	//gStackModule->set_timer(&fTimer, -1);
 
 	recursive_lock_destroy(&fLock);
 	//benaphore_destroy(&fReceiveLock);
@@ -115,6 +121,9 @@ TCPConnection::InitCheck() const
 }
 
 
+//	#pragma mark - protocol API
+
+
 status_t
 TCPConnection::Open()
 {
@@ -127,8 +136,9 @@ TCPConnection::Open()
 status_t
 TCPConnection::Close()
 {
-	//BenaphoreLocker lock(&fSendLock);
 	TRACE(("TCP:%p.Close()\n", this));
+	RecursiveLocker lock(fLock);
+
 	if (fState == SYNCHRONIZE_SENT || fState == LISTEN) {
 		fState = CLOSED;
 		return B_OK;
@@ -161,7 +171,6 @@ TCPConnection::Free()
 	TRACE(("TCP:%p.Free()\n", this));
 
 	// TODO: if this connection is not in the hash, we don't have to call this one
-	remove_connection(this);
 	return B_OK;
 }
 
@@ -421,18 +430,40 @@ TCPConnection::ReadAvailable()
 }
 
 
+//	#pragma mark - misc
+
+
 status_t
 TCPConnection::DelayedAcknowledge()
 {
-	// TODO: use timer instead and/or piggyback on send
-	return _SendQueued();
+	// if the timer is already running, and there is still more than
+	// half of the receive window free, just wait for the timer to expire
+	if (gStackModule->is_timer_active(&fDelayedAcknowledgeTimer)
+		&& (fReceiveMaxAdvertised - fReceiveNext) > (socket->receive.buffer_size >> 1))
+		return B_OK;
+
+	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
+		// timer was active, send an ACK now (with the exception above,
+		// we send every other ACK)
+		return _SendQueued();
+	}
+
+	gStackModule->set_timer(&fDelayedAcknowledgeTimer, TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
+	return B_OK;
 }
 
 
 status_t
 TCPConnection::SendAcknowledge()
 {
-	return _SendQueued();
+	return _SendQueued(true);
+}
+
+
+void
+TCPConnection::_StartPersistTimer()
+{
+	gStackModule->set_timer(&fPersistTimer, 1000000LL);
 }
 
 
@@ -441,6 +472,9 @@ TCPConnection::UpdateTimeWait()
 {
 	return B_OK;
 }
+
+
+//	#pragma mark - receive
 
 
 int32
@@ -582,7 +616,8 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				fSendQueue.RemoveUntil(segment.acknowledge);
 				fSendUnacknowledged = segment.acknowledge;
 
-				// TODO: stop retransmit timer
+				// stop retransmit timer
+				gStackModule->cancel_timer(&fRetransmitTimer);
 
 				// notify threads waiting on the socket to become writable again
 				release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
@@ -590,7 +625,7 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				gSocketModule->notify(socket, B_SELECT_WRITE, fSendWindow);
 
 				// if there is data left to be send, send it now
-				//return _SendQueuedData(TCP_FLAG_ACKNOWLEDGE, false);
+				_SendQueued();
 				return DROP;
 			}
 		} else if (segment.acknowledge == fSendUnacknowledged
@@ -621,7 +656,6 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			// TODO: close connection depending on state
 			fError = ECONNREFUSED;
 			fState = CLOSED;
-			remove_connection(this);
 		}
 
 		return DROP;
@@ -692,15 +726,20 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 		if (fSendUnacknowledged >= segment.acknowledge) {
 			// this is a duplicate acknowledge
 			// TODO: handle this!
+			fDuplicateAcknowledgeCount++;
 		} else {
 			// this segment acknowleges in flight data
 			fDuplicateAcknowledgeCount = 0;
-			
+
 			if (fSendMax == segment.acknowledge) {
 				// there is no outstanding data to be acknowledged
-				// TODO: stop retransmit timer
+				// TODO: if the transmit timer function is already waiting
+				//	to acquire this connection's lock, we should stop it anyway
+				gStackModule->cancel_timer(&fRetransmitTimer);
 			} else {
-				// TODO: set retransmit timer
+				// TODO: set retransmit timer correctly
+				if (!gStackModule->is_timer_active(&fRetransmitTimer))
+					gStackModule->set_timer(&fRetransmitTimer, 1000000LL);
 			}
 
 			fSendUnacknowledged = segment.acknowledge;
@@ -774,7 +813,8 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	// put it in the receive buffer
 
 	if (buffer->size > 0) {
-		fReceiveNext += buffer->size;
+		if (fReceiveNext == segment.sequence)
+			fReceiveNext += buffer->size;
 		fReceiveQueue.Add(buffer, segment.sequence);
 	} else
 		gBufferModule->free(buffer);
@@ -783,19 +823,7 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 }
 
 
-/*!
- 	Resends a sent segment (\a data) if the segment's ACK wasn't received
-	before the timeout (eg \a timer expired)
-*/
-void
-TCPConnection::ResendSegment(struct net_timer *timer, void *data)
-{
-	TRACE(("TCP:ResendSegment(%p)\n", data));
-	if (data == NULL)
-		return;
-
-	// TODO: implement me!
-}
+//	#pragma mark - send
 
 
 /*!
@@ -838,11 +866,12 @@ inline bool
 TCPConnection::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 	bool outstandingAcknowledge)
 {
-	// Avoid the silly window syndrome - we only send a segment in case:
-	// - we have a full segment to send, or
-	// - we're at the end of our buffer queue (and we're 
-	// - we're retransmitting data
 	if (length > 0) {
+		// Avoid the silly window syndrome - we only send a segment in case:
+		// - we have a full segment to send, or
+		// - we're at the end of our buffer queue, or
+		// - the buffer is at least larger than half of the maximum send window, or
+		// - we're retransmitting data
 		if (length == fSendMaxSegmentSize
 			|| ((!outstandingAcknowledge || (fOptions & TCP_NODELAY) != 0)
 				&& tcp_sequence(fSendNext + length) == fSendQueue.LastSequence())
@@ -851,11 +880,23 @@ TCPConnection::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			return true;
 	}
 
-	// TODO: incomplete!
+	// check if we need to send a window update to the peer
+	if (segment.advertised_window > 0) {
+		// correct the window to take into account what already has been advertised
+		uint32 window = (min_c(segment.advertised_window, TCP_MAX_WINDOW)
+			<< fReceiveWindowShift) - (fReceiveMaxAdvertised - fReceiveNext);
 
-	if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_RESET | TCP_FLAG_ACKNOWLEDGE)) != 0)
+		// if we can advertise a window larger than twice the maximum segment
+		// size, or half the maximum buffer size we send a window update
+		if (window >= (fReceiveMaxSegmentSize << 1)
+			|| window >= (socket->receive.buffer_size >> 1))
+			return true;
+	}
+
+	if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_RESET)) != 0)
 		return true;
 
+	// there is no reason to send a segment just now
 	return false;
 }
 
@@ -912,8 +953,14 @@ dprintf("fSendWindow = %lu, available = %lu, fSendNext = %lu, fSendUnacknowledge
 	while (true) {
 dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 		// Determine if we should really send this segment
-		if (!force && !_ShouldSendSegment(segment, segmentLength, outstandingAcknowledge))
+		if (!force && !_ShouldSendSegment(segment, segmentLength, outstandingAcknowledge)) {
+			if (fSendQueue.Available()
+				&& !gStackModule->is_timer_active(&fPersistTimer)
+				&& !gStackModule->is_timer_active(&fRetransmitTimer))
+				_StartPersistTimer();
+
 			return B_OK;
+		}
 
 		net_buffer *buffer = gBufferModule->create(256);
 		if (buffer == NULL)
@@ -973,6 +1020,9 @@ dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 			fSendMax += size;
 		fSendNext += size;
 
+		fReceiveMaxAdvertised = fReceiveNext
+			+ ((uint32)segment.advertised_window << fReceiveWindowShift);
+
 		length -= segmentLength;
 		if (length == 0)
 			break;
@@ -985,10 +1035,49 @@ dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 }
 
 
-void
+//	#pragma mark - timer
+
+
+/*static*/ void
+TCPConnection::_RetransmitTimer(net_timer *timer, void *data)
+{
+	TCPConnection *connection = (TCPConnection *)data;
+
+	RecursiveLocker locker(connection->Lock());
+
+	connection->fSendNext = connection->fSendUnacknowledged;
+	connection->_SendQueued();
+	connection->fSendNext = connection->fSendMax;
+}
+
+
+/*static*/ void
+TCPConnection::_PersistTimer(net_timer *timer, void *data)
+{
+	TCPConnection *connection = (TCPConnection *)data;
+
+	RecursiveLocker locker(connection->Lock());
+	connection->_SendQueued(true);
+}
+
+
+/*static*/ void
+TCPConnection::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
+{
+	TCPConnection *connection = (TCPConnection *)data;
+
+	RecursiveLocker locker(connection->Lock());
+	connection->_SendQueued(true);
+}
+
+
+/*static*/ void
 TCPConnection::_TimeWait(struct net_timer *timer, void *data)
 {
 }
+
+
+//	#pragma mark - hash functions
 
 
 int

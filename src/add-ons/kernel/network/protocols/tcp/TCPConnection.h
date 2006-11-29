@@ -53,18 +53,21 @@ class TCPConnection : public net_protocol {
 			net_buffer *buffer);
 		int32 Receive(tcp_segment_header& segment, net_buffer *buffer);
 
-		static void ResendSegment(struct net_timer *timer, void *data);
 		static int Compare(void *_packet, const void *_key);
 		static uint32 Hash(void *_packet, const void *_key, uint32 range);
 		static int32 HashOffset() { return offsetof(TCPConnection, fHashNext); }
 
 	private:
+		void _StartPersistTimer();
 		uint8 _CurrentFlags();
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			bool outstandingAcknowledge);
 		status_t _SendQueued(bool force = false);
 
-		static void _TimeWait(struct net_timer *timer, void *data);
+		static void _TimeWait(net_timer *timer, void *data);
+		static void _RetransmitTimer(net_timer *timer, void *data);
+		static void _PersistTimer(net_timer *timer, void *data);
+		static void _DelayedAcknowledgeTimer(net_timer *timer, void *data);
 
 		TCPConnection	*fHashNext;
 
@@ -91,6 +94,7 @@ class TCPConnection : public net_protocol {
 			// TODO: don't use a net_route, but a net_route_info!!!
 
 		tcp_sequence	fReceiveNext;
+		tcp_sequence	fReceiveMaxAdvertised;
 		uint32			fReceiveWindow;
 		uint32			fReceiveMaxSegmentSize;
 		BufferQueue		fReceiveQueue;
@@ -110,10 +114,11 @@ class TCPConnection : public net_protocol {
 
 		tcp_state		fState;
 		status_t		fError;
-		vint32			fDelayedAcknowledge;
 
 		// timer
-		net_timer		fTimer;
+		net_timer		fRetransmitTimer;
+		net_timer		fPersistTimer;
+		net_timer		fDelayedAcknowledgeTimer;
 };
 
 #endif	// TCP_CONNECTION_H
