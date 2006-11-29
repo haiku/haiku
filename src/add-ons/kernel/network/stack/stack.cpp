@@ -923,6 +923,8 @@ static net_stack_module_info sNetStackModule = {
 
 	init_timer,
 	set_timer,
+	cancel_timer,
+	is_timer_active,
 };
 
 static module_info sNetStarterModule = {

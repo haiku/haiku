@@ -320,6 +320,28 @@ set_timer(net_timer *timer, bigtime_t delay)
 }
 
 
+bool
+cancel_timer(struct net_timer *timer)
+{
+	BenaphoreLocker locker(sTimerLock);
+
+	if (timer->due <= 0)
+		return false;
+
+	// this timer is scheduled, cancel it
+	list_remove_item(&sTimers, timer);
+	timer->due = 0;
+	return true;
+}
+
+
+bool
+is_timer_active(net_timer *timer)
+{
+	return timer->due > 0;
+}
+
+
 status_t
 init_timers(void)
 {

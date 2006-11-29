@@ -93,6 +93,8 @@ struct net_stack_module_info {
 	// timer
 	void (*init_timer)(struct net_timer *timer, net_timer_func hook, void *data);
 	void (*set_timer)(struct net_timer *timer, bigtime_t delay);
+	bool (*cancel_timer)(struct net_timer *timer);
+	bool (*is_timer_active)(struct net_timer *timer);
 };
 
 #endif	// NET_STACK_H

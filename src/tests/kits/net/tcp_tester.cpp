@@ -186,6 +186,8 @@ static net_stack_module_info gNetStackModule = {
 
 	init_timer,
 	set_timer,
+	cancel_timer,
+	is_timer_active,
 };
 
 

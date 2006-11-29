@@ -30,6 +30,8 @@ status_t	clear_fifo(net_fifo *fifo);
 // timer
 void		init_timer(net_timer *timer, net_timer_func hook, void *data);
 void		set_timer(net_timer *timer, bigtime_t delay);
+bool		cancel_timer(struct net_timer *timer);
+bool		is_timer_active(net_timer *timer);
 status_t	init_timers(void);
 void		uninit_timers(void);
 
