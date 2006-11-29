@@ -74,7 +74,7 @@ Decorator *
 DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 	window_look look, uint32 flags)
 {
-	if (desktop->LockSingleWindow() == NULL)
+	if (!desktop->LockSingleWindow())
 		return NULL;
 
 	DesktopSettings settings(desktop);
