@@ -36,13 +36,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <ServerProtocol.h>
 
 #include "DWindowBuffer.h"
 #include "PortLink.h"
 #include "RGBColor.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
-#include "ServerProtocol.h"
 #include "UpdateQueue.h"
 
 #include "DWindowHWInterface.h"

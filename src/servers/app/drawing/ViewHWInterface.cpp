@@ -25,11 +25,12 @@
 #include <View.h>
 #include <Window.h>
 
+#include <ServerProtocol.h>
+
 #include "BBitmapBuffer.h"
 #include "PortLink.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
-#include "ServerProtocol.h"
 #include "UpdateQueue.h"
 
 #include "ViewHWInterface.h"
