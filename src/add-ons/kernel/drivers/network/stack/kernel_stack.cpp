@@ -20,6 +20,8 @@
 #include <string.h>
 
 
+#define NET_STARTER_MODULE_NAME "network/stack/starter/v1"
+
 // debugging macros
 #define LOGID					"net_stack_driver: "
 #define ERROR(format, args...)	dprintf(LOGID "ERROR: " format, ## args)
@@ -161,9 +163,17 @@ net_stack_open(const char *name, uint32 flags, void **_cookie)
 	if (atomic_add(&sOpenCount, 1) == 0) {
 		// When we're opened for the first time, we'll try to load the
 		// networking stack
-		status_t status = get_module(NET_SOCKET_MODULE_NAME, (module_info **)&sSocket);
+		module_info *module;
+		status_t status = get_module(NET_STARTER_MODULE_NAME, &module);
+		if (status < B_OK) {
+			ERROR("Can't load network stack module: %ld\n", status);
+			return status;
+		}
+
+		status = get_module(NET_SOCKET_MODULE_NAME, (module_info **)&sSocket);
 		if (status < B_OK) {
 			ERROR("Can't load " NET_SOCKET_MODULE_NAME " module: %ld\n", status);
+			put_module(NET_STARTER_MODULE_NAME);
 			return status;
 		}
 	}
@@ -217,6 +227,7 @@ net_stack_free_cookie(void *_cookie)
 		// stack again (it will only be actually unloaded in case there is
 		// no interface defined)
 		put_module(NET_SOCKET_MODULE_NAME);
+		put_module(NET_STARTER_MODULE_NAME);
 	}
 
 	return B_OK;

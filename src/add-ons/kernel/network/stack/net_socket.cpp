@@ -892,12 +892,14 @@ socket_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
+			// TODO: this is currently done in the net_stack driver
 			// initialize the main stack if not done so already
-			module_info *module;
-			return get_module(NET_STARTER_MODULE_NAME, &module);
+			//module_info *module;
+			//return get_module(NET_STARTER_MODULE_NAME, &module);
 		}
 		case B_MODULE_UNINIT:
-			return put_module(NET_STARTER_MODULE_NAME);
+			//return put_module(NET_STARTER_MODULE_NAME);
+			return B_OK;
 
 		default:
 			return B_ERROR;
