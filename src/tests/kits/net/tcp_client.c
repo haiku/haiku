@@ -13,8 +13,8 @@
 #include <sys/socket.h>
 
 
-#define PORT 40000 // the port client will be connecting to 
-#define MAXDATASIZE 100 // max number of bytes we can get at once 
+#define PORT 1234		// the port client will be connecting to 
+#define MAXDATASIZE 100	// max number of bytes we can get at once 
 
 
 int
