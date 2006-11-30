@@ -382,10 +382,14 @@ ssize_t
 socket_recv(net_socket *socket, void *data, size_t length, int flags)
 {
 	net_buffer *buffer;
-	status_t status = socket->first_info->read_data(
+	ssize_t status = socket->first_info->read_data(
 		socket->first_protocol, length, flags, &buffer);
 	if (status < B_OK)
 		return status;
+
+	// if 0 bytes we're received, no buffer will be created
+	if (buffer == NULL)
+		return 0;
 
 	ssize_t bytesReceived = buffer->size;
 	gNetBufferModule.read(buffer, 0, data, bytesReceived);
@@ -421,6 +425,7 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 
 	// add to the parent's list of pending connections
 	list_add_item(&parent->pending_children, socket);
+	socket->parent = parent;
 	parent->child_count++;
 
 	*_socket = socket;
@@ -1041,7 +1046,16 @@ server_thread(void*)
 			break;
 		}
 
-		printf("server: got connection from %ld\n", address.sin_addr.s_addr);
+		printf("server: got connection from %08lx\n", address.sin_addr.s_addr);
+
+		char buffer[1024];
+		ssize_t bytesRead;
+		while ((bytesRead = socket_recv(connectionSocket, buffer, sizeof(buffer), 0)) >= 0) {
+			printf("server: received %ld bytes\n", bytesRead);
+		}
+		printf("server: receiving failed: %s\n", strerror(bytesRead));
+
+		close_protocol(connectionSocket->first_protocol);
 	}
 
 	return 0;

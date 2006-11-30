@@ -232,6 +232,7 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 
 	// add to the parent's list of pending connections
 	list_add_item(&parent->pending_children, socket);
+	socket->parent = parent;
 	parent->child_count++;
 
 	*_socket = socket;
@@ -637,6 +638,10 @@ socket_recv(net_socket *socket, void *data, size_t length, int flags)
 	if (status < B_OK)
 		return status;
 
+	// if 0 bytes we're received, no buffer will be created
+	if (buffer == NULL)
+		return 0;
+
 	ssize_t bytesReceived = buffer->size;
 	gNetBufferModule.read(buffer, 0, data, bytesReceived);
 	gNetBufferModule.free(buffer);
@@ -654,6 +659,10 @@ socket_recvfrom(net_socket *socket, void *data, size_t length, int flags,
 		socket->first_protocol, length, flags, &buffer);
 	if (status < B_OK)
 		return status;
+
+	// if 0 bytes we're received, no buffer will be created
+	if (buffer == NULL)
+		return 0;
 
 	ssize_t bytesReceived = buffer->size;
 	gNetBufferModule.read(buffer, 0, data, bytesReceived);
