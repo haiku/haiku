@@ -356,7 +356,6 @@ find_connection(sockaddr *local, sockaddr *peer)
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
-	socket->protocol = IPPROTO_TCP;
 	TCPConnection *protocol = new (std::nothrow) TCPConnection(socket);
 	if (protocol == NULL)
 		return NULL;
@@ -367,6 +366,7 @@ tcp_init_protocol(net_socket *socket)
 	}
 
 	TRACE(("Creating new TCPConnection: %p\n", protocol));
+	socket->protocol = IPPROTO_TCP;
 	return protocol;
 }
 
@@ -660,7 +660,7 @@ tcp_init()
 	if (status < B_OK)
 		goto err5;
 
-	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_IP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, 0,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);

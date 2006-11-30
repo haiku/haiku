@@ -74,6 +74,7 @@ class TCPConnection : public net_protocol {
 		recursive_lock	fLock;
 		sem_id			fReceiveLock;
 		sem_id			fSendLock;
+		sem_id			fAcceptSemaphore;
 		uint8			fOptions;
 
 		uint8			fSendWindowShift;

@@ -52,6 +52,8 @@ BufferQueue::SetMaxBytes(size_t maxBytes)
 void
 BufferQueue::SetInitialSequence(tcp_sequence sequence)
 {
+	TRACE(("BufferQueue@%p::SetInitialSequence(%lu)\n", this, (uint32)sequence));
+
 	fFirstSequence = fLastSequence = sequence;
 }
 
@@ -264,8 +266,14 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 status_t
 BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 {
-	if (Available() < bytes || bytes == 0)
-		return B_BAD_VALUE;
+	if (bytes > Available())
+		bytes = Available();
+
+	if (bytes == 0) {
+		// we don't need to create a buffer when there is no data
+		*_buffer = NULL;
+		return B_OK;
+	}
 
 	net_buffer *buffer = fList.First();
 	size_t bytesLeft = bytes;
