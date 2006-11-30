@@ -287,10 +287,9 @@ BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 	} else {
 		// we can reuse this buffer
 		bytesLeft -= buffer->size;
-		fList.Remove(buffer);
+		fFirstSequence += buffer->size;
 
-		if (fList.First() != NULL)
-			fFirstSequence = fList.First()->sequence;
+		fList.Remove(buffer);
 	}
 
 	// clone/copy the remaining data
@@ -311,11 +310,15 @@ BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 
 		// remove either the whole buffer or only the part we cloned
 
+		fFirstSequence += size;
+
 		if (size == source->size) {
 			iterator.Remove();
 			gBufferModule->free(source);
-		} else
+		} else {
 			gBufferModule->remove_header(source, size);
+			source->sequence += size;
+		}
 	}
 
 	if (status == B_OK) {

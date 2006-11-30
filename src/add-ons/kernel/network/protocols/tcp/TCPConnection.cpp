@@ -384,6 +384,19 @@ TCPConnection::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
 
+	// TODO: hangs if the buffer size is larger than the maximum!
+	while (fSendQueue.Free() < buffer->size) {
+		status_t status = acquire_sem_etc(fSendLock, 1,
+			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, socket->send.timeout);
+		if (status < B_OK)
+			return status;
+	}
+
+	// TODO: check state!
+
+	if (buffer->size == 0)
+		return B_OK;
+
 	RecursiveLocker locker(fLock);
 	fSendQueue.Add(buffer);
 	return _SendQueued();
