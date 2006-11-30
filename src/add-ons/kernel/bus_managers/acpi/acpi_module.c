@@ -255,5 +255,6 @@ _EXPORT module_info *modules[] = {
 	(module_info *) &acpi_module,
 	(module_info *) &sACPIModule,
 	(module_info *) &acpi_ns_dump_module,
+	(module_info *) &gACPIDeviceModule,
 	NULL
 };

@@ -16,9 +16,6 @@ typedef struct acpi_thermal_active_object acpi_thermal_active_object;
 typedef struct acpi_thermal_type acpi_thermal_type;
 
 struct acpi_thermal_type {
-	/* Published thermal device number */
-	int devnum;
-	
 	/* Required fields for thermal devices */
 	uint32 critical_temp;
 	uint32 current_temp;

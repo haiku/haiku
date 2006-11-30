@@ -63,6 +63,8 @@ extern struct acpi_module_info acpi_module;
 
 extern pnp_devfs_driver_info acpi_ns_dump_module;
 
+extern acpi_device_module_info gACPIDeviceModule;
+
 
 void enable_fixed_event (uint32 event);
 void disable_fixed_event (uint32 event);
