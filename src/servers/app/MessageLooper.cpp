@@ -37,7 +37,7 @@ MessageLooper::Run()
 	_GetLooperName(name, sizeof(name));
 
 	// Spawn our message-monitoring thread
-	fThread = spawn_thread(_message_thread, name, B_NORMAL_PRIORITY, this);
+	fThread = spawn_thread(_message_thread, name, B_DISPLAY_PRIORITY, this);
 	if (fThread < B_OK) {
 		fQuitting = true;
 		return false;
