@@ -707,7 +707,8 @@ panic(const char *format, ...)
 	vprintf(format, args);
 	va_end(args);
 
-	exit(-1);
+	putchar('\n');
+	debugger("Kernel Panic");
 }
 
 
