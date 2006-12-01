@@ -74,7 +74,7 @@ PowerStatus::ReadyToRun()
 		// acknowledged the requester below
 		BDeskbar deskbar;
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		isDeskbarRunning = deskbar.IsRunning())
+		isDeskbarRunning = deskbar.IsRunning();
 #endif
 		isInstalled = deskbar.HasItem(kDeskbarItemName);
 	}
