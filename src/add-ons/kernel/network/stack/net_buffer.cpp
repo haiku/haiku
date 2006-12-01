@@ -362,9 +362,10 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 	// grab reference to this buffer - all additional nodes will get
 	// theirs in add_data_node()
 	atomic_add(&sourceNode->header->ref_count, 1);
+	node->header = sourceNode->header;
+	node->located = NULL;
 
 	while (sourceNode != NULL) {
-		node->header = sourceNode->header;
 		node->start = sourceNode->start;
 		node->used = sourceNode->used;
 		node->offset = sourceNode->offset;
