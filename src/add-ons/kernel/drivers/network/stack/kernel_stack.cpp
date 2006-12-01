@@ -238,15 +238,10 @@ static status_t
 net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 {
 	net_stack_cookie *cookie = (net_stack_cookie *)_cookie;
-	status_t status = B_BAD_VALUE;
+	status_t status;
 
 	TRACE("net_stack_control(%p, %s (0x%lX), %p, %ld)\n",
-		_cookie, opcode_name(op), op, data, len);
-
-	if (op < NET_STACK_IOCTL_BASE || op > NET_STACK_IOCTL_END) {
-		// we only accept networking ioctl()s to get into our stack
-		return B_BAD_VALUE;
-	}
+		_cookie, opcode_name(op), op, data, length);
 
 	if (cookie->socket == NULL) {
 		switch (op) {
@@ -266,6 +261,9 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				// in NET_STACK_ACCEPT opcode the cookie (aka the net_stack_cookie!)
 				// of the file descriptor to use for the new accepted socket
 				return user_memcpy(data, cookie, sizeof(void *));
+
+			default:
+				return B_BAD_VALUE;
 		}
 	} else {
 		switch (op) {
@@ -456,11 +454,16 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 			}
 
 			default:
+				if (op < NET_STACK_IOCTL_BASE || op > NET_STACK_IOCTL_END) {
+					// we only accept networking ioctl()s to get into our stack
+					return B_BAD_VALUE;
+				}
+
 				return sSocket->control(cookie->socket, op, data, length);
 		}
 	}
 
-	return status;
+	return B_BAD_VALUE;
 }
 
 
