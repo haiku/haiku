@@ -117,17 +117,17 @@ struct tcp_option {
 } _PACKED;
 
 enum tcp_option_kind {
-	TCP_OPTION_END	= 0,
-	TCP_OPTION_NOP	= 1,
-	TCP_OPTION_MAX_SEGMENT_SIZE = 2,
-	TCP_OPTION_WINDOW_SHIFT = 3,
-	TCP_OPTION_TIMESTAMP = 8,
+	TCP_OPTION_END				= 0,
+	TCP_OPTION_NOP				= 1,
+	TCP_OPTION_MAX_SEGMENT_SIZE	= 2,
+	TCP_OPTION_WINDOW_SHIFT		= 3,
+	TCP_OPTION_TIMESTAMP		= 8,
 };
 
 #define TCP_MAX_WINDOW_SHIFT	14
 
 struct tcp_segment_header {
-	tcp_segment_header() : window_shift(0), max_segment_size(0) {}
+	tcp_segment_header() : has_window_shift(false), window_shift(0), max_segment_size(0) {}
 		// constructor zeros options
 
 	uint32	sequence;
@@ -135,7 +135,8 @@ struct tcp_segment_header {
 	uint16	advertised_window;
 	uint16	urgent_offset;
 	uint8	flags;
-	uint8	window_shift;
+	uint8	has_window_shift : 1;
+	uint8	window_shift : 7;
 	uint16	max_segment_size;
 
 	bool AcknowledgeOnly() const

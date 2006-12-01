@@ -114,6 +114,7 @@ class TCPConnection : public net_protocol {
 		uint32			fSlowStartThreshold;
 
 		tcp_state		fState;
+		uint32			fFlags;
 		status_t		fError;
 
 		// timer

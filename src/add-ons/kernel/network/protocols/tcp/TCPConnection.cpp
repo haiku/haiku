@@ -54,6 +54,12 @@
 // Estimate for Maximum segment lifetime in the internet
 #define TCP_MAX_SEGMENT_LIFETIME (2 * TCP_INITIAL_RTT)
 
+// constants for the fFlags field
+enum {
+	FLAG_OPTION_WINDOW_SHIFT	= 0x01,
+	FLAG_OPTION_TIMESTAMP		= 0x02,
+};
+
 
 TCPConnection::TCPConnection(net_socket *socket)
 	:
@@ -76,6 +82,7 @@ TCPConnection::TCPConnection(net_socket *socket)
 	fReceiveQueue(socket->receive.buffer_size),
 	fRoundTripTime(TCP_INITIAL_RTT),
 	fState(CLOSED),
+	fFlags(0), //FLAG_OPTION_WINDOW_SHIFT),
 	fError(B_OK)
 {
 	//gStackModule->init_timer(&fTimer, _TimeWait, this);
@@ -384,22 +391,59 @@ TCPConnection::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
 
-	// TODO: hangs if the buffer size is larger than the maximum!
-	while (fSendQueue.Free() < buffer->size) {
-		status_t status = acquire_sem_etc(fSendLock, 1,
-			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, socket->send.timeout);
+	size_t bytesLeft = buffer->size;
+	bigtime_t timeout = socket->send.timeout;
+
+	do {
+		net_buffer *chunk;
+		if (bytesLeft > socket->send.buffer_size) {
+			// divide the buffer in multiple of the maximum segment size
+			size_t chunkSize = ((socket->send.buffer_size >> 1) / fSendMaxSegmentSize)
+				* fSendMaxSegmentSize;
+
+			chunk = gBufferModule->split(buffer, chunkSize);
+			if (chunk == NULL)
+				return B_NO_MEMORY;
+		} else
+			chunk = buffer;
+
+		recursive_lock_lock(&fLock);
+
+		while (fSendQueue.Free() < chunk->size) {
+			recursive_lock_unlock(&fLock);
+			bigtime_t now = system_time();
+
+			status_t status = acquire_sem_etc(fSendLock, 1,
+				B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+			if (status < B_OK)
+				return status;
+
+			if (timeout > 0)
+				timeout -= system_time() - now;
+			recursive_lock_lock(&fLock);
+		}
+
+		// TODO: check state!
+
+		if (chunk->size == 0) {
+			gBufferModule->free(chunk);
+			return B_OK;
+		}
+
+		fSendQueue.Add(chunk);
+		status_t status = _SendQueued();
+
+		recursive_lock_unlock(&fLock);
+
 		if (status < B_OK)
 			return status;
-	}
+		if (timeout < 0)
+			return B_WOULD_BLOCK;
 
-	// TODO: check state!
+		bytesLeft -= chunk->size;
+	} while (bytesLeft > 0);
 
-	if (buffer->size == 0)
-		return B_OK;
-
-	RecursiveLocker locker(fLock);
-	fSendQueue.Add(buffer);
-	return _SendQueued();
+	return B_OK;
 }
 
 
@@ -554,9 +598,22 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	connection->fSendUnacknowledged = connection->fSendNext;
 	connection->fSendMax = connection->fSendNext;
 
-	if (segment.max_segment_size > 0)
-		connection->fSendMaxSegmentSize = segment.max_segment_size;
+	// set options
+	if ((fOptions & TCP_NOOPT) == 0) {
+		if (segment.max_segment_size > 0)
+			connection->fSendMaxSegmentSize = segment.max_segment_size;
+		else
+			connection->fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
+		if (segment.has_window_shift) {
+			connection->fFlags |= FLAG_OPTION_WINDOW_SHIFT;
+			connection->fSendWindowShift = segment.window_shift;
+		} else {
+			connection->fFlags &= ~FLAG_OPTION_WINDOW_SHIFT;
+			connection->fReceiveWindowShift = 0;
+		}
+	}
 
+	// send SYN+ACK
 	//benaphore_lock(&connection->fSendLock);
 	status_t status = connection->_SendQueued();
 	//benaphore_unlock(&connection->fSendLock);
@@ -598,6 +655,18 @@ TCPConnection::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *b
 	fSendUnacknowledged = segment.acknowledge;
 	fReceiveNext = segment.sequence;
 	fReceiveQueue.SetInitialSequence(fReceiveNext);
+
+	if (segment.max_segment_size > 0)
+		fSendMaxSegmentSize = segment.max_segment_size;
+	else
+		fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
+	if (segment.has_window_shift) {
+		fFlags |= FLAG_OPTION_WINDOW_SHIFT;
+		fSendWindowShift = segment.window_shift;
+	} else {
+		fFlags &= ~FLAG_OPTION_WINDOW_SHIFT;
+		fReceiveWindowShift = 0;
+	}
 
 	if (segment.flags & TCP_FLAG_ACKNOWLEDGE) {
 		// the connection has been established
@@ -1042,10 +1111,14 @@ dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 
 		segment.sequence = fSendNext;
 
-		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0) {
+		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
+			&& (fOptions & TCP_NOOPT) == 0) {
 			// add connection establishment options
 			segment.max_segment_size = fReceiveMaxSegmentSize;
-			segment.window_shift = fReceiveWindowShift;
+			if ((fFlags & FLAG_OPTION_WINDOW_SHIFT) != 0) {
+				segment.has_window_shift = true;
+				segment.window_shift = fReceiveWindowShift;
+			}
 		}
 
 		status = add_tcp_header(segment, buffer);
@@ -1061,8 +1134,11 @@ dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 		}
 
 		// Only count 1 SYN, the 1 sent when transitioning from CLOSED or LISTEN
-		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
+		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0) {
+			segment.max_segment_size = 0;
+			segment.has_window_shift = false;
 			size++;
+		}
 
 		// Only count 1 FIN, the 1 sent when transitioning from
 		// ESTABLISHED, SYNCHRONIZE_RECEIVED or FINISH_RECEIVED

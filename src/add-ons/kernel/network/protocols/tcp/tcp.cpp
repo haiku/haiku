@@ -103,8 +103,13 @@ set_domain(net_interface *interface = NULL)
 static inline void
 bump_option(tcp_option *&option, size_t &length)
 {
-	length += option->length;
-	option = (tcp_option *)((uint8 *)option + option->length);
+	if (option->kind <= TCP_OPTION_NOP) {
+		length++;
+		option = (tcp_option *)((uint8 *)option + 1);
+	} else {
+		length += option->length;
+		option = (tcp_option *)((uint8 *)option + option->length);
+	}
 }
 
 
@@ -120,7 +125,11 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		option->max_segment_size = htons(segment.max_segment_size);
 		bump_option(option, length);
 	}
-	if (segment.window_shift > 0 && length + 4 < bufferSize) {
+	if (segment.has_window_shift && length + 4 < bufferSize) {
+		// insert one NOP so that the subsequent data is aligned on a 4 byte boundary
+		option->kind = TCP_OPTION_NOP;
+		bump_option(option, length);
+		
 		option->kind = TCP_OPTION_WINDOW_SHIFT;
 		option->length = 3;
 		option->window_shift = segment.window_shift;
@@ -219,6 +228,7 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 				length = 4;
 				break;
 			case TCP_OPTION_WINDOW_SHIFT:
+				segment.has_window_shift = true;
 				segment.window_shift = option->window_shift;
 				length = 3;
 				break;
