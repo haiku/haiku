@@ -682,12 +682,13 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		// compute how many buffers we're going to need
 		// TODO: this doesn't leave any tail space, if that should be desired...
 		uint32 tailSpace = node->tail_space;
-		uint32 minimalHeaderSpace = sizeof(data_header) + 2 * sizeof(data_node);
+		uint32 minimalHeaderSpace = sizeof(data_header) + 3 * sizeof(data_node);
 		uint32 sizeNeeded = size - tailSpace;
 		uint32 count = (sizeNeeded + BUFFER_SIZE - minimalHeaderSpace - 1)
 			/ (BUFFER_SIZE - minimalHeaderSpace);
 		uint32 headerSpace = BUFFER_SIZE - sizeNeeded / count - sizeof(data_header);
 		uint32 sizeUsed = BUFFER_SIZE - sizeof(data_header) - headerSpace;
+		uint32 sizeAdded = tailSpace;
 
 		// allocate space left in the node
 		node->tail_space -= tailSpace;
@@ -699,7 +700,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		for (uint32 i = 0; i < count; i++) {
 			if (i == count - 1) {
 				// last data_header - compensate rounding errors
-				sizeUsed = size - buffer->size;
+				sizeUsed = size - sizeAdded;
 				headerSpace = BUFFER_SIZE - sizeof(data_header) - sizeUsed;
 			}
 
@@ -720,6 +721,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 			header->first_node = node;
 			buffer->size += sizeUsed;
+			sizeAdded += sizeUsed;
 
 			list_add_item(&buffer->buffers, node);
 		}
