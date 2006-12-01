@@ -41,9 +41,11 @@ setitimer(int which, const struct itimerval *value, struct itimerval *oldValue)
 		}
 	}
 
-	// Record the time left of any previous itimer
-	oldValue->it_value.tv_sec = remaining / USEC_PER_SECOND;
-	oldValue->it_value.tv_usec = remaining % USEC_PER_SECOND;
+	if (oldValue != NULL) {
+		// Record the time left of any previous itimer
+		oldValue->it_value.tv_sec = remaining / USEC_PER_SECOND;
+		oldValue->it_value.tv_usec = remaining % USEC_PER_SECOND;
+	}
 
 	return 0;
 }
