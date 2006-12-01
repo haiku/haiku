@@ -22,6 +22,7 @@ struct net_settings;
 extern "C" {
 	int *_h_errnop(void);
 	int _netstat(int fd, char **output, int verbose);
+	int _socket_interrupt(void);
 	int closesocket(int socket);
 	char *find_net_setting(net_settings* settings, const char* heading,
 		const char* name, char* value, unsigned numBytes);
@@ -46,6 +47,13 @@ int
 _netstat(int fd, char **output, int verbose)
 {
 	return ENOSYS;
+}
+
+
+int
+_socket_interrupt(void)
+{
+	return -1;
 }
 
 
