@@ -6,11 +6,12 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
+#include "r5_message.h"
+
 #include <DataIO.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
 #include <TokenSpace.h>
-#include "r5_message.h"
 
 #define R5_MESSAGE_FLAG_VALID			0x01
 #define R5_MESSAGE_FLAG_INCLUDE_TARGET	0x02
@@ -297,9 +298,6 @@ unflatten_r5_message(uint32 format, BMessage *message, BDataIO *stream)
 	r5_message_header r5header;
 	reader(((uint8 *)&r5header) + sizeof(uint32),
 		sizeof(r5header) - sizeof(uint32));
-
-	messagePrivate.Clear();
-	messagePrivate.InitHeader();
 
 	header->what = message->what = r5header.what;
 	if (r5header.flags & R5_MESSAGE_FLAG_INCLUDE_TARGET)

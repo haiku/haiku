@@ -9,7 +9,7 @@
 #define _R5_MESSAGE_H_
 
 
-#include <sys/types.h>
+#include <SupportDefs.h>
 
 class BMessage;
 class BDataIO;
