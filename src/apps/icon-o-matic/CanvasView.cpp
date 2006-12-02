@@ -38,10 +38,6 @@ CanvasView::CanvasView(BRect frame)
 	  fOffsreenBitmap(NULL),
 	  fOffsreenView(NULL)
 {
-	#if __HAIKU__
-	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
-	#endif // __HAIKU__
-
 	_MakeBackground();
 	fRenderer->SetBackground(fBackground);
 }
@@ -114,7 +110,6 @@ CanvasView::Draw(BRect updateRect)
 			BRegion clipping;
 			GetClippingRegion(&clipping);
 			fOffsreenView->ConstrainClippingRegion(&clipping);
-			fOffsreenView->FillRect(updateRect, B_SOLID_LOW);
 
 			_DrawInto(fOffsreenView, updateRect);
 
