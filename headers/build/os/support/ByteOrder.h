@@ -9,9 +9,7 @@
 #include <SupportDefs.h>
 #include <TypeConstants.h>	/* For convenience */
 
-#ifndef HAIKU_HOST_PLATFORM_FREEBSD
-#	include <endian.h>
-#endif
+#include <endian.h>
 
 
 #ifdef __cplusplus
