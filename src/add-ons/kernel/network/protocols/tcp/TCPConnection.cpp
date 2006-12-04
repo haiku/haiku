@@ -51,9 +51,6 @@
 // Initial estimate for packet round trip time (RTT)
 #define	TCP_INITIAL_RTT	120000000LL
 
-// Estimate for Maximum segment lifetime in the internet
-#define TCP_MAX_SEGMENT_LIFETIME (2 * TCP_INITIAL_RTT)
-
 // constants for the fFlags field
 enum {
 	FLAG_OPTION_WINDOW_SHIFT	= 0x01,
@@ -98,12 +95,18 @@ TCPConnection::TCPConnection(net_socket *socket)
 	gStackModule->init_timer(&fRetransmitTimer, TCPConnection::_RetransmitTimer, this);
 	gStackModule->init_timer(&fDelayedAcknowledgeTimer,
 		TCPConnection::_DelayedAcknowledgeTimer, this);
+	gStackModule->init_timer(&fTimeWaitTimer, TCPConnection::_TimeWaitTimer, this);
 }
 
 
 TCPConnection::~TCPConnection()
 {
-	//gStackModule->set_timer(&fTimer, -1);
+	gStackModule->cancel_timer(&fRetransmitTimer);
+	gStackModule->cancel_timer(&fPersistTimer);
+	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
+	gStackModule->cancel_timer(&fTimeWaitTimer);
+
+	gEndpointManager->Unbind(this);
 
 	recursive_lock_destroy(&fLock);
 	//benaphore_destroy(&fReceiveLock);
@@ -179,8 +182,12 @@ TCPConnection::Free()
 {
 	TRACE(("TCP:%p.Free()\n", this));
 
-	// TODO: if this connection is not in the hash, we don't have to call this one
-	return B_OK;
+	if (fState <= SYNCHRONIZE_SENT || fState == TIME_WAIT)
+		return B_OK;
+
+	_EnterTimeWait();
+	return B_BUSY;
+		// we'll be freed later when the 2MSL timer expires
 }
 
 
@@ -509,6 +516,13 @@ void
 TCPConnection::_StartPersistTimer()
 {
 	gStackModule->set_timer(&fPersistTimer, 1000000LL);
+}
+
+
+void
+TCPConnection::_EnterTimeWait()
+{
+	gStackModule->set_timer(&fTimeWaitTimer, TCP_MAX_SEGMENT_LIFETIME << 1);
 }
 
 
@@ -850,6 +864,7 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 						break;
 					case CLOSING:
 						fState = TIME_WAIT;
+						_EnterTimeWait();
 						break;
 					case WAIT_FOR_FINISH_ACKNOWLEDGE:
 						fState = CLOSED;
@@ -883,6 +898,7 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				break;
 			case FINISH_ACKNOWLEDGED:
 				fState = TIME_WAIT;
+				_EnterTimeWait();
 				break;
 			case FINISH_RECEIVED:
 				// a second FIN?
@@ -1177,7 +1193,11 @@ TCPConnection::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 
 
 /*static*/ void
-TCPConnection::_TimeWait(struct net_timer *timer, void *data)
+TCPConnection::_TimeWaitTimer(struct net_timer *timer, void *data)
 {
+	TCPConnection *connection = (TCPConnection *)data;
+
+	RecursiveLocker locker(connection->Lock());
+	gSocketModule->delete_socket(connection->socket);
 }
 

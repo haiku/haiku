@@ -60,12 +60,13 @@ class TCPConnection : public net_protocol {
 		friend class EndpointManager;
 
 		void _StartPersistTimer();
+		void _EnterTimeWait();
 		uint8 _CurrentFlags();
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			bool outstandingAcknowledge);
 		status_t _SendQueued(bool force = false);
 
-		static void _TimeWait(net_timer *timer, void *data);
+		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
 		static void _PersistTimer(net_timer *timer, void *data);
 		static void _DelayedAcknowledgeTimer(net_timer *timer, void *data);
@@ -124,6 +125,7 @@ class TCPConnection : public net_protocol {
 		net_timer		fRetransmitTimer;
 		net_timer		fPersistTimer;
 		net_timer		fDelayedAcknowledgeTimer;
+		net_timer		fTimeWaitTimer;
 };
 
 #endif	// TCP_CONNECTION_H

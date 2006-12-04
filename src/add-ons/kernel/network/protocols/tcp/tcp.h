@@ -104,6 +104,7 @@ class tcp_sequence {
 #define TCP_DELAYED_ACKNOWLEDGE_TIMEOUT	100000		// 100 msecs
 #define TCP_DEFAULT_MAX_SEGMENT_SIZE	536
 #define TCP_MAX_WINDOW					65535
+#define TCP_MAX_SEGMENT_LIFETIME		60000000	// 60 secs
 
 struct tcp_option {
 	uint8	kind;
