@@ -618,7 +618,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 		const BBitmap* generic = AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_GenericAppIcon);
 		if (generic)
 			barInfo->icon->SetBits(generic->Bits(), barInfo->icon->BitsLength(),
-				0, kIconFormat);
+				0, generic->ColorSpace());
 	}
 
 	sBarTeamInfoList.AddItem(barInfo);
