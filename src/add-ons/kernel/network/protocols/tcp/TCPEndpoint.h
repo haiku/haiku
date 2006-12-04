@@ -6,8 +6,8 @@
  *		Andrew Galante, haiku.galante@gmail.com
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef TCP_CONNECTION_H
-#define TCP_CONNECTION_H
+#ifndef TCP_ENDPOINT_H
+#define TCP_ENDPOINT_H
 
 
 #include "tcp.h"
@@ -22,10 +22,10 @@
 
 class EndpointManager;
 
-class TCPConnection : public net_protocol {
+class TCPEndpoint : public net_protocol {
 	public:
-		TCPConnection(net_socket *socket);
-		~TCPConnection();
+		TCPEndpoint(net_socket *socket);
+		~TCPEndpoint();
 
 		status_t InitCheck() const;
 
@@ -71,9 +71,9 @@ class TCPConnection : public net_protocol {
 		static void _PersistTimer(net_timer *timer, void *data);
 		static void _DelayedAcknowledgeTimer(net_timer *timer, void *data);
 
-		TCPConnection	*fConnectionHashNext;
-		TCPConnection	*fEndpointHashNext;
-		TCPConnection	*fEndpointNextWithSamePort;
+		TCPEndpoint		*fConnectionHashNext;
+		TCPEndpoint		*fEndpointHashNext;
+		TCPEndpoint		*fEndpointNextWithSamePort;
 
 		recursive_lock	fLock;
 		sem_id			fReceiveLock;
@@ -128,4 +128,4 @@ class TCPConnection : public net_protocol {
 		net_timer		fTimeWaitTimer;
 };
 
-#endif	// TCP_CONNECTION_H
+#endif	// TCP_ENDPOINT_H

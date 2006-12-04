@@ -8,7 +8,7 @@
  */
 
 
-#include "TCPConnection.h"
+#include "TCPEndpoint.h"
 #include "EndpointManager.h"
 
 #include <net_buffer.h>
@@ -58,7 +58,7 @@ enum {
 };
 
 
-TCPConnection::TCPConnection(net_socket *socket)
+TCPEndpoint::TCPEndpoint(net_socket *socket)
 	:
 	fOptions(0),
 	fSendWindowShift(0),
@@ -91,15 +91,15 @@ TCPConnection::TCPConnection(net_socket *socket)
 	fSendLock = create_sem(0, "tcp send");
 	fReceiveLock = create_sem(0, "tcp receive");
 
-	gStackModule->init_timer(&fPersistTimer, TCPConnection::_PersistTimer, this);
-	gStackModule->init_timer(&fRetransmitTimer, TCPConnection::_RetransmitTimer, this);
+	gStackModule->init_timer(&fPersistTimer, TCPEndpoint::_PersistTimer, this);
+	gStackModule->init_timer(&fRetransmitTimer, TCPEndpoint::_RetransmitTimer, this);
 	gStackModule->init_timer(&fDelayedAcknowledgeTimer,
-		TCPConnection::_DelayedAcknowledgeTimer, this);
-	gStackModule->init_timer(&fTimeWaitTimer, TCPConnection::_TimeWaitTimer, this);
+		TCPEndpoint::_DelayedAcknowledgeTimer, this);
+	gStackModule->init_timer(&fTimeWaitTimer, TCPEndpoint::_TimeWaitTimer, this);
 }
 
 
-TCPConnection::~TCPConnection()
+TCPEndpoint::~TCPEndpoint()
 {
 	gStackModule->cancel_timer(&fRetransmitTimer);
 	gStackModule->cancel_timer(&fPersistTimer);
@@ -117,7 +117,7 @@ TCPConnection::~TCPConnection()
 
 
 status_t
-TCPConnection::InitCheck() const
+TCPEndpoint::InitCheck() const
 {
 	if (fLock.sem < B_OK)
 		return fLock.sem;
@@ -134,7 +134,7 @@ TCPConnection::InitCheck() const
 
 
 status_t
-TCPConnection::Open()
+TCPEndpoint::Open()
 {
 	TRACE(("%p.Open()\n", this));
 	// nothing to do here...
@@ -143,7 +143,7 @@ TCPConnection::Open()
 
 
 status_t
-TCPConnection::Close()
+TCPEndpoint::Close()
 {
 	TRACE(("TCP:%p.Close()\n", this));
 	RecursiveLocker lock(fLock);
@@ -178,7 +178,7 @@ TCPConnection::Close()
 
 
 status_t
-TCPConnection::Free()
+TCPEndpoint::Free()
 {
 	TRACE(("TCP:%p.Free()\n", this));
 
@@ -196,7 +196,7 @@ TCPConnection::Free()
 	until the connection has been established or refused.
 */
 status_t
-TCPConnection::Connect(const struct sockaddr *address)
+TCPEndpoint::Connect(const struct sockaddr *address)
 {
 	TRACE(("TCP:%p.Connect() on address %s\n", this,
 		AddressString(gDomain, address, true).Data()));
@@ -209,7 +209,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 	TRACE(("  TCP: Connect(): in state %d\n", fState));
 
 	// Can only call connect() from CLOSED or LISTEN states
-	// otherwise connection is considered already connected
+	// otherwise endpoint is considered already connected
 	if (fState == LISTEN) {
 		// this socket is about to connect; remove pending connections in the backlog
 		gSocketModule->set_max_backlog(socket, 0);
@@ -275,7 +275,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 
 
 status_t
-TCPConnection::Accept(struct net_socket **_acceptedSocket)
+TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 {
 	TRACE(("TCP:%p.Accept()\n", this));
 
@@ -296,7 +296,7 @@ TCPConnection::Accept(struct net_socket **_acceptedSocket)
 
 
 status_t
-TCPConnection::Bind(sockaddr *address)
+TCPEndpoint::Bind(sockaddr *address)
 {
 	TRACE(("TCP:%p.Bind() on address %s\n", this,
 		AddressString(gDomain, address, true).Data()));
@@ -321,7 +321,7 @@ TCPConnection::Bind(sockaddr *address)
 
 
 status_t
-TCPConnection::Unbind(struct sockaddr *address)
+TCPEndpoint::Unbind(struct sockaddr *address)
 {
 	TRACE(("TCP:%p.Unbind()\n", this));
 
@@ -331,7 +331,7 @@ TCPConnection::Unbind(struct sockaddr *address)
 
 
 status_t
-TCPConnection::Listen(int count)
+TCPEndpoint::Listen(int count)
 {
 	TRACE(("TCP:%p.Listen()\n", this));
 
@@ -349,7 +349,7 @@ TCPConnection::Listen(int count)
 
 
 status_t
-TCPConnection::Shutdown(int direction)
+TCPEndpoint::Shutdown(int direction)
 {
 	TRACE(("TCP:%p.Shutdown()\n", this));
 	// TODO: implement shutdown!
@@ -361,7 +361,7 @@ TCPConnection::Shutdown(int direction)
 	Puts data contained in \a buffer into send buffer
 */
 status_t
-TCPConnection::SendData(net_buffer *buffer)
+TCPEndpoint::SendData(net_buffer *buffer)
 {
 	TRACE(("TCP:%p.SendData()\n", this));
 
@@ -422,7 +422,7 @@ TCPConnection::SendData(net_buffer *buffer)
 
 
 size_t
-TCPConnection::SendAvailable()
+TCPEndpoint::SendAvailable()
 {
 	TRACE(("TCP:%p.SendAvailable()\n", this));
 
@@ -432,7 +432,7 @@ TCPConnection::SendAvailable()
 
 
 status_t
-TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
+TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
 	TRACE(("TCP:%p.ReadData()\n", this));
 
@@ -466,7 +466,7 @@ TCPConnection::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 
 size_t
-TCPConnection::ReadAvailable()
+TCPEndpoint::ReadAvailable()
 {
 	TRACE(("TCP:%p.ReadAvailable()\n", this));
 
@@ -479,14 +479,14 @@ TCPConnection::ReadAvailable()
 
 
 bool
-TCPConnection::IsBound() const
+TCPEndpoint::IsBound() const
 {
 	return !gAddressModule->is_empty_address((sockaddr *)&socket->address, true);
 }
 
 
 status_t
-TCPConnection::DelayedAcknowledge()
+TCPEndpoint::DelayedAcknowledge()
 {
 	// if the timer is already running, and there is still more than
 	// half of the receive window free, just wait for the timer to expire
@@ -506,28 +506,28 @@ TCPConnection::DelayedAcknowledge()
 
 
 status_t
-TCPConnection::SendAcknowledge()
+TCPEndpoint::SendAcknowledge()
 {
 	return _SendQueued(true);
 }
 
 
 void
-TCPConnection::_StartPersistTimer()
+TCPEndpoint::_StartPersistTimer()
 {
 	gStackModule->set_timer(&fPersistTimer, 1000000LL);
 }
 
 
 void
-TCPConnection::_EnterTimeWait()
+TCPEndpoint::_EnterTimeWait()
 {
 	gStackModule->set_timer(&fTimeWaitTimer, TCP_MAX_SEGMENT_LIFETIME << 1);
 }
 
 
 status_t
-TCPConnection::UpdateTimeWait()
+TCPEndpoint::UpdateTimeWait()
 {
 	return B_OK;
 }
@@ -537,7 +537,7 @@ TCPConnection::UpdateTimeWait()
 
 
 int32
-TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
+TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 {
 	// Essentially, we accept only TCP_FLAG_SYNCHRONIZE in this state,
 	// but the error behaviour differs
@@ -550,7 +550,7 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 
 	// TODO: drop broadcast/multicast
 
-	// spawn new connection for accept()
+	// spawn new endpoint for accept()
 	net_socket *newSocket;
 	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK)
 		return DROP;
@@ -560,55 +560,55 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	gAddressModule->set_to((sockaddr *)&newSocket->peer,
 		(sockaddr *)&buffer->source);
 
-	TCPConnection *connection = (TCPConnection *)newSocket->first_protocol;
+	TCPEndpoint *endpoint = (TCPEndpoint *)newSocket->first_protocol;
 
 	// TODO: proper error handling!
 
-	connection->fRoute = gDatalinkModule->get_route(gDomain,
+	endpoint->fRoute = gDatalinkModule->get_route(gDomain,
 		(sockaddr *)&newSocket->peer);
-	if (connection->fRoute == NULL)
+	if (endpoint->fRoute == NULL)
 		return DROP;
 
-	if (gEndpointManager->SetConnection(connection, (sockaddr *)&buffer->destination,
+	if (gEndpointManager->SetConnection(endpoint, (sockaddr *)&buffer->destination,
 			(sockaddr *)&buffer->source, NULL) < B_OK)
 		return DROP;
 
-	connection->fInitialReceiveSequence = segment.sequence;
-	connection->fReceiveQueue.SetInitialSequence(segment.sequence + 1);
-	connection->fState = SYNCHRONIZE_RECEIVED;
-	connection->fAcceptSemaphore = fAcceptSemaphore;
-	connection->fReceiveMaxSegmentSize = connection->fRoute->mtu - 40;
+	endpoint->fInitialReceiveSequence = segment.sequence;
+	endpoint->fReceiveQueue.SetInitialSequence(segment.sequence + 1);
+	endpoint->fState = SYNCHRONIZE_RECEIVED;
+	endpoint->fAcceptSemaphore = fAcceptSemaphore;
+	endpoint->fReceiveMaxSegmentSize = endpoint->fRoute->mtu - 40;
 		// 40 bytes for IP and TCP header without any options
 		// TODO: make this depending on the RTF_LOCAL flag?
-	connection->fReceiveNext = segment.sequence + 1;
+	endpoint->fReceiveNext = segment.sequence + 1;
 		// account for the extra sequence number for the synchronization
 
-	connection->fSendNext = connection->fInitialSendSequence;
-	connection->fSendUnacknowledged = connection->fSendNext;
-	connection->fSendMax = connection->fSendNext;
+	endpoint->fSendNext = endpoint->fInitialSendSequence;
+	endpoint->fSendUnacknowledged = endpoint->fSendNext;
+	endpoint->fSendMax = endpoint->fSendNext;
 
 	// set options
 	if ((fOptions & TCP_NOOPT) == 0) {
 		if (segment.max_segment_size > 0)
-			connection->fSendMaxSegmentSize = segment.max_segment_size;
+			endpoint->fSendMaxSegmentSize = segment.max_segment_size;
 		else
-			connection->fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
+			endpoint->fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
 		if (segment.has_window_shift) {
-			connection->fFlags |= FLAG_OPTION_WINDOW_SHIFT;
-			connection->fSendWindowShift = segment.window_shift;
+			endpoint->fFlags |= FLAG_OPTION_WINDOW_SHIFT;
+			endpoint->fSendWindowShift = segment.window_shift;
 		} else {
-			connection->fFlags &= ~FLAG_OPTION_WINDOW_SHIFT;
-			connection->fReceiveWindowShift = 0;
+			endpoint->fFlags &= ~FLAG_OPTION_WINDOW_SHIFT;
+			endpoint->fReceiveWindowShift = 0;
 		}
 	}
 
 	// send SYN+ACK
-	//benaphore_lock(&connection->fSendLock);
-	status_t status = connection->_SendQueued();
-	//benaphore_unlock(&connection->fSendLock);
+	//benaphore_lock(&endpoint->fSendLock);
+	status_t status = endpoint->_SendQueued();
+	//benaphore_unlock(&endpoint->fSendLock);
 
-	connection->fInitialSendSequence = fSendNext;
-	connection->fSendQueue.SetInitialSequence(fSendNext);
+	endpoint->fInitialSendSequence = fSendNext;
+	endpoint->fSendQueue.SetInitialSequence(fSendNext);
 
 	if (status < B_OK)
 		return DROP;
@@ -616,13 +616,13 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	segment.flags &= ~TCP_FLAG_SYNCHRONIZE;
 		// we handled this flag now, it must not be set for further processing
 
-	return connection->Receive(segment, buffer);
+	return endpoint->Receive(segment, buffer);
 		// TODO: here, the ack/delayed ack call will be made on the parent socket!
 }
 
 
 int32
-TCPConnection::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buffer)
+TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buffer)
 {
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
 		&& (fInitialSendSequence >= segment.acknowledge
@@ -683,7 +683,7 @@ TCPConnection::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *b
 
 
 int32
-TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
+TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 {
 	TRACE(("TCP:%p.ReceiveData(): Connection in state %d received packet %p with flags 0x%x, seq %lu, ack %lu!\n",
 		this, fState, buffer, segment.flags, segment.sequence, segment.acknowledge));
@@ -841,7 +841,7 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			if (fSendMax == segment.acknowledge) {
 				// there is no outstanding data to be acknowledged
 				// TODO: if the transmit timer function is already waiting
-				//	to acquire this connection's lock, we should stop it anyway
+				//	to acquire this endpoint's lock, we should stop it anyway
 				gStackModule->cancel_timer(&fRetransmitTimer);
 			} else {
 				// TODO: set retransmit timer correctly
@@ -945,7 +945,7 @@ TCPConnection::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	it couldn't send all the data.
 */
 inline uint8
-TCPConnection::_CurrentFlags()
+TCPEndpoint::_CurrentFlags()
 {
 	switch (fState) {
 		case CLOSED:
@@ -976,7 +976,7 @@ TCPConnection::_CurrentFlags()
 
 
 inline bool
-TCPConnection::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
+TCPEndpoint::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 	bool outstandingAcknowledge)
 {
 	if (length > 0) {
@@ -1019,7 +1019,7 @@ TCPConnection::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 	specific flags that need to be sent.
 */
 status_t
-TCPConnection::_SendQueued(bool force)
+TCPEndpoint::_SendQueued(bool force)
 {
 	if (fRoute == NULL)
 		return B_ERROR;
@@ -1160,9 +1160,9 @@ TCPConnection::_SendQueued(bool force)
 
 
 /*static*/ void
-TCPConnection::_RetransmitTimer(net_timer *timer, void *data)
+TCPEndpoint::_RetransmitTimer(net_timer *timer, void *data)
 {
-	TCPConnection *connection = (TCPConnection *)data;
+	TCPEndpoint *connection = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(connection->Lock());
 
@@ -1173,9 +1173,9 @@ TCPConnection::_RetransmitTimer(net_timer *timer, void *data)
 
 
 /*static*/ void
-TCPConnection::_PersistTimer(net_timer *timer, void *data)
+TCPEndpoint::_PersistTimer(net_timer *timer, void *data)
 {
-	TCPConnection *connection = (TCPConnection *)data;
+	TCPEndpoint *connection = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(connection->Lock());
 	connection->_SendQueued(true);
@@ -1183,9 +1183,9 @@ TCPConnection::_PersistTimer(net_timer *timer, void *data)
 
 
 /*static*/ void
-TCPConnection::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
+TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 {
-	TCPConnection *connection = (TCPConnection *)data;
+	TCPEndpoint *connection = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(connection->Lock());
 	connection->_SendQueued(true);
@@ -1193,9 +1193,9 @@ TCPConnection::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 
 
 /*static*/ void
-TCPConnection::_TimeWaitTimer(struct net_timer *timer, void *data)
+TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 {
-	TCPConnection *connection = (TCPConnection *)data;
+	TCPEndpoint *connection = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(connection->Lock());
 	gSocketModule->delete_socket(connection->socket);

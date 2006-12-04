@@ -9,7 +9,7 @@
 
 
 #include "EndpointManager.h"
-#include "TCPConnection.h"
+#include "TCPEndpoint.h"
 
 #include <net_protocol.h>
 
@@ -265,7 +265,7 @@ reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
-	TCPConnection *protocol = new (std::nothrow) TCPConnection(socket);
+	TCPEndpoint *protocol = new (std::nothrow) TCPEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
 
@@ -274,7 +274,7 @@ tcp_init_protocol(net_socket *socket)
 		return NULL;
 	}
 
-	TRACE(("Creating new TCPConnection: %p\n", protocol));
+	TRACE(("Creating new TCPEndpoint: %p\n", protocol));
 	socket->protocol = IPPROTO_TCP;
 	return protocol;
 }
@@ -283,8 +283,8 @@ tcp_init_protocol(net_socket *socket)
 status_t
 tcp_uninit_protocol(net_protocol *protocol)
 {
-	TRACE(("Deleting TCPConnection: %p\n", protocol));
-	delete (TCPConnection *)protocol;
+	TRACE(("Deleting TCPEndpoint: %p\n", protocol));
+	delete (TCPEndpoint *)protocol;
 	return B_OK;
 }
 
@@ -295,35 +295,35 @@ tcp_open(net_protocol *protocol)
 	if (gDomain == NULL && set_domain() != B_OK)
 		return B_ERROR;
 
-	return ((TCPConnection *)protocol)->Open();
+	return ((TCPEndpoint *)protocol)->Open();
 }
 
 
 status_t
 tcp_close(net_protocol *protocol)
 {
-	return ((TCPConnection *)protocol)->Close();
+	return ((TCPEndpoint *)protocol)->Close();
 }
 
 
 status_t
 tcp_free(net_protocol *protocol)
 {
-	return ((TCPConnection *)protocol)->Free();
+	return ((TCPEndpoint *)protocol)->Free();
 }
 
 
 status_t
 tcp_connect(net_protocol *protocol, const struct sockaddr *address)
 {
-	return ((TCPConnection *)protocol)->Connect(address);
+	return ((TCPEndpoint *)protocol)->Connect(address);
 }
 
 
 status_t
 tcp_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
 {
-	return ((TCPConnection *)protocol)->Accept(_acceptedSocket);
+	return ((TCPEndpoint *)protocol)->Accept(_acceptedSocket);
 }
 
 
@@ -339,35 +339,35 @@ tcp_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 tcp_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	return ((TCPConnection *)protocol)->Bind(address);
+	return ((TCPEndpoint *)protocol)->Bind(address);
 }
 
 
 status_t
 tcp_unbind(net_protocol *protocol, struct sockaddr *address)
 {
-	return ((TCPConnection *)protocol)->Unbind(address);
+	return ((TCPEndpoint *)protocol)->Unbind(address);
 }
 
 
 status_t
 tcp_listen(net_protocol *protocol, int count)
 {
-	return ((TCPConnection *)protocol)->Listen(count);
+	return ((TCPEndpoint *)protocol)->Listen(count);
 }
 
 
 status_t
 tcp_shutdown(net_protocol *protocol, int direction)
 {
-	return ((TCPConnection *)protocol)->Shutdown(direction);
+	return ((TCPEndpoint *)protocol)->Shutdown(direction);
 }
 
 
 status_t
 tcp_send_data(net_protocol *protocol, net_buffer *buffer)
 {
-	return ((TCPConnection *)protocol)->SendData(buffer);
+	return ((TCPEndpoint *)protocol)->SendData(buffer);
 }
 
 
@@ -383,7 +383,7 @@ tcp_send_routed_data(net_protocol *protocol, struct net_route *route,
 ssize_t
 tcp_send_avail(net_protocol *protocol)
 {
-	return ((TCPConnection *)protocol)->SendAvailable();
+	return ((TCPEndpoint *)protocol)->SendAvailable();
 }
 
 
@@ -391,14 +391,14 @@ status_t
 tcp_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
-	return ((TCPConnection *)protocol)->ReadData(numBytes, flags, _buffer);
+	return ((TCPEndpoint *)protocol)->ReadData(numBytes, flags, _buffer);
 }
 
 
 ssize_t
 tcp_read_avail(net_protocol *protocol)
 {
-	return ((TCPConnection *)protocol)->ReadAvailable();
+	return ((TCPEndpoint *)protocol)->ReadAvailable();
 }
 
 
@@ -470,24 +470,24 @@ tcp_receive_data(net_buffer *buffer)
 	RecursiveLocker locker(gEndpointManager->Locker());
 	int32 segmentAction = DROP;
  
-	TCPConnection *connection = gEndpointManager->FindConnection(
+	TCPEndpoint *endpoint = gEndpointManager->FindConnection(
 		(struct sockaddr *)&buffer->destination, (struct sockaddr *)&buffer->source);
-	if (connection != NULL) {
-		RecursiveLocker locker(connection->Lock());
+	if (endpoint != NULL) {
+		RecursiveLocker locker(endpoint->Lock());
 
-		switch (connection->State()) {
+		switch (endpoint->State()) {
 			case TIME_WAIT:
 				segmentAction |= IMMEDIATE_ACKNOWLEDGE;
 			case CLOSED:
-				connection->UpdateTimeWait();
+				endpoint->UpdateTimeWait();
 				break;
 
 			case LISTEN:
-				segmentAction = connection->ListenReceive(segment, buffer);
+				segmentAction = endpoint->ListenReceive(segment, buffer);
 				break;
 
 			case SYNCHRONIZE_SENT:
-				segmentAction = connection->SynchronizeSentReceive(segment, buffer);
+				segmentAction = endpoint->SynchronizeSentReceive(segment, buffer);
 				break;
 
 			case SYNCHRONIZE_RECEIVED:
@@ -497,15 +497,15 @@ tcp_receive_data(net_buffer *buffer)
 			case FINISH_SENT:
 			case FINISH_ACKNOWLEDGED:
 			case CLOSING:
-				segmentAction = connection->Receive(segment, buffer);
+				segmentAction = endpoint->Receive(segment, buffer);
 				break;
 		}
 
 		// process acknowledge action as asked for by the *Receive() method
 		if (segmentAction & IMMEDIATE_ACKNOWLEDGE)
-			connection->SendAcknowledge();
+			endpoint->SendAcknowledge();
 		else if (segmentAction & ACKNOWLEDGE)
-			connection->DelayedAcknowledge();
+			endpoint->DelayedAcknowledge();
 	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 

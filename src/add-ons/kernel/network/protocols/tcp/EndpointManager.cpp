@@ -8,7 +8,7 @@
 
 
 #include "EndpointManager.h"
-#include "TCPConnection.h"
+#include "TCPEndpoint.h"
 
 #include <NetUtilities.h>
 
@@ -45,10 +45,10 @@ static const uint16 kFirstEphemeralPort = 40000;
 EndpointManager::EndpointManager()
 {
 	fConnectionHash = hash_init(kConnectionHashBuckets,
-		offsetof(TCPConnection, fConnectionHashNext),
+		offsetof(TCPEndpoint, fConnectionHashNext),
 		&_ConnectionCompare, &_ConnectionHash);
 	fEndpointHash = hash_init(kEndpointHashBuckets,
-		offsetof(TCPConnection, fEndpointHashNext),
+		offsetof(TCPEndpoint, fEndpointHashNext),
 		&_EndpointCompare, &_EndpointHash);
 
 	recursive_lock_init(&fLock, "endpoint manager");
@@ -85,19 +85,19 @@ EndpointManager::InitCheck() const
 	Returns the endpoint matching the connection.
 	You must hold the manager's lock when calling this method.
 */
-TCPConnection *
+TCPEndpoint *
 EndpointManager::_LookupConnection(sockaddr *local, sockaddr *peer)
 {
 	connection_key key;
 	key.local = local;
 	key.peer = peer;
 
-	return (TCPConnection *)hash_lookup(fConnectionHash, &key);
+	return (TCPEndpoint *)hash_lookup(fConnectionHash, &key);
 }
 
 
 status_t
-EndpointManager::_RemoveConnection(TCPConnection *endpoint)
+EndpointManager::_RemoveConnection(TCPEndpoint *endpoint)
 {
 	RecursiveLocker locker(&fLock);
 	return hash_remove(fConnectionHash, endpoint);
@@ -117,9 +117,9 @@ EndpointManager::_DumpConnections()
 
 	TRACE(("Active TCP Connections:\n"));
 
-	TCPConnection *endpoint;
-	while ((endpoint = (TCPConnection *)hash_next(fConnectionHash, &iterator)) != NULL) {
-		TRACE(("  TCPConnection %p: local %s, peer %s\n", endpoint,
+	TCPEndpoint *endpoint;
+	while ((endpoint = (TCPEndpoint *)hash_next(fConnectionHash, &iterator)) != NULL) {
+		TRACE(("  TCPEndpoint %p: local %s, peer %s\n", endpoint,
 			AddressString(gDomain, (sockaddr *)&endpoint->socket->address, true).Data(),
 			AddressString(gDomain, (sockaddr *)&endpoint->socket->peer, true).Data()));
 	}
@@ -129,7 +129,7 @@ EndpointManager::_DumpConnections()
 
 
 status_t
-EndpointManager::SetConnection(TCPConnection *endpoint,
+EndpointManager::SetConnection(TCPEndpoint *endpoint,
 	const sockaddr *local, const sockaddr *peer, const sockaddr *interfaceLocal)
 {
 	RecursiveLocker locker(&fLock);
@@ -158,10 +158,10 @@ EndpointManager::SetConnection(TCPConnection *endpoint,
 }
 
 
-TCPConnection *
+TCPEndpoint *
 EndpointManager::FindConnection(sockaddr *local, sockaddr *peer)
 {
-	TCPConnection *endpoint = _LookupConnection(local, peer);
+	TCPEndpoint *endpoint = _LookupConnection(local, peer);
 	if (endpoint != NULL) {
 		TRACE(("TCP: Received packet corresponds to explicit endpoint %p\n", endpoint));
 		return endpoint;
@@ -199,18 +199,18 @@ EndpointManager::FindConnection(sockaddr *local, sockaddr *peer)
 //	#pragma mark - endpoints
 
 
-TCPConnection *
+TCPEndpoint *
 EndpointManager::_LookupEndpoint(uint16 port)
 {
 	endpoint_key key;
 	key.port = port;
 
-	return (TCPConnection *)hash_lookup(fEndpointHash, &key);
+	return (TCPEndpoint *)hash_lookup(fEndpointHash, &key);
 }
 
 
 status_t
-EndpointManager::Bind(TCPConnection *endpoint, sockaddr *address)
+EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
 {
 	if (gAddressModule->is_empty_address(address, true))
 		return B_BAD_VALUE;
@@ -223,7 +223,7 @@ EndpointManager::Bind(TCPConnection *endpoint, sockaddr *address)
 
 	RecursiveLocker locker(&fLock);
 
-	TCPConnection *first = _LookupEndpoint(port);
+	TCPEndpoint *first = _LookupEndpoint(port);
 
 	// If there is already an endpoint bound to that port, SO_REUSEADDR has to be
 	// specified by the new endpoint to be allowed to bind to that same port.
@@ -235,7 +235,7 @@ EndpointManager::Bind(TCPConnection *endpoint, sockaddr *address)
 		return EADDRINUSE;
 
 	if (first != NULL) {
-		TCPConnection *last = first;
+		TCPEndpoint *last = first;
 		while (true) {
 			// check if this endpoint binds to a wildcard address
 			if (gAddressModule->is_empty_address((sockaddr *)&last->socket->address, false)) {
@@ -263,7 +263,7 @@ EndpointManager::Bind(TCPConnection *endpoint, sockaddr *address)
 
 
 status_t
-EndpointManager::BindToEphemeral(TCPConnection *endpoint, sockaddr *address)
+EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 {
 	RecursiveLocker locker(&fLock);
 
@@ -281,7 +281,7 @@ EndpointManager::BindToEphemeral(TCPConnection *endpoint, sockaddr *address)
 
 			port = htons(port);
 
-			TCPConnection *other = _LookupEndpoint(port);
+			TCPEndpoint *other = _LookupEndpoint(port);
 			if (other == NULL) {
 				// found a port
 				gAddressModule->set_port((sockaddr *)&endpoint->socket->address, port);
@@ -300,7 +300,7 @@ EndpointManager::BindToEphemeral(TCPConnection *endpoint, sockaddr *address)
 
 
 status_t
-EndpointManager::Unbind(TCPConnection *endpoint)
+EndpointManager::Unbind(TCPEndpoint *endpoint)
 {
 	if (endpoint == NULL || !endpoint->IsBound())
 		return B_BAD_VALUE;
@@ -310,7 +310,7 @@ EndpointManager::Unbind(TCPConnection *endpoint)
 	if (!endpoint->IsBound())
 		return B_BAD_VALUE;
 
-	TCPConnection *other = _LookupEndpoint(gAddressModule->get_port((sockaddr *)&endpoint->socket->address));
+	TCPEndpoint *other = _LookupEndpoint(gAddressModule->get_port((sockaddr *)&endpoint->socket->address));
 	if (other != endpoint) {
 		// remove endpoint from the list of endpoints with the same port
 		while (other->fEndpointNextWithSamePort != endpoint) {
@@ -343,7 +343,7 @@ EndpointManager::Unbind(TCPConnection *endpoint)
 EndpointManager::_ConnectionCompare(void *_endpoint, const void *_key)
 {
 	const connection_key *key = (connection_key *)_key;
-	TCPConnection *endpoint = (TCPConnection *)_endpoint;
+	TCPEndpoint *endpoint = (TCPEndpoint *)_endpoint;
 
 	if (gAddressModule->equal_addresses_and_ports(key->local,
 			(sockaddr *)&endpoint->socket->address)
@@ -362,7 +362,7 @@ EndpointManager::_ConnectionHash(void *_endpoint, const void *_key, uint32 range
 	const sockaddr *peer;
 
 	if (_endpoint != NULL) {
-		TCPConnection *endpoint = (TCPConnection *)_endpoint;
+		TCPEndpoint *endpoint = (TCPEndpoint *)_endpoint;
 		local = (sockaddr *)&endpoint->socket->address;
 		peer = (sockaddr *)&endpoint->socket->peer;
 	} else {
@@ -379,7 +379,7 @@ EndpointManager::_ConnectionHash(void *_endpoint, const void *_key, uint32 range
 EndpointManager::_EndpointCompare(void *_endpoint, const void *_key)
 {
 	const endpoint_key *key = (endpoint_key *)_key;
-	TCPConnection *endpoint = (TCPConnection *)_endpoint;
+	TCPEndpoint *endpoint = (TCPEndpoint *)_endpoint;
 
 	return gAddressModule->get_port((sockaddr *)&endpoint->socket->address)
 		== key->port ? 0 : 1;
@@ -390,7 +390,7 @@ EndpointManager::_EndpointCompare(void *_endpoint, const void *_key)
 EndpointManager::_EndpointHash(void *_endpoint, const void *_key, uint32 range)
 {
 	if (_endpoint != NULL) {
-		TCPConnection *endpoint = (TCPConnection *)_endpoint;
+		TCPEndpoint *endpoint = (TCPEndpoint *)_endpoint;
 		return gAddressModule->get_port((sockaddr *)&endpoint->socket->address) % range;
 	}
 

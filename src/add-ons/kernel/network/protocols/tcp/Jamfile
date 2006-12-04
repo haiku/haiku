@@ -14,7 +14,7 @@ UsePrivateHeaders kernel net ;
 
 KernelAddon tcp :
 	tcp.cpp
-	TCPConnection.cpp
+	TCPEndpoint.cpp
 	BufferQueue.cpp
 	EndpointManager.cpp
 ;

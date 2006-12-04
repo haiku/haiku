@@ -34,7 +34,7 @@ SimpleTest tcp_tester :
 
 	# tcp
 	tcp.cpp
-	TCPConnection.cpp
+	TCPEndpoint.cpp
 	BufferQueue.cpp
 	EndpointManager.cpp
 
@@ -46,7 +46,7 @@ SimpleTest tcp_tester :
 ;
 
 SEARCH on [ FGristFiles 
-		tcp.cpp TCPConnection.cpp BufferQueue.cpp EndpointManager.cpp
+		tcp.cpp TCPEndpoint.cpp BufferQueue.cpp EndpointManager.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
 
 SEARCH on [ FGristFiles 

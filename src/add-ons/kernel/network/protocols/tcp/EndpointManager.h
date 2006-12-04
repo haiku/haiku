@@ -15,7 +15,7 @@
 #include <sys/socket.h>
 
 
-class TCPConnection;
+class TCPEndpoint;
 
 class EndpointManager {
 	public:
@@ -26,18 +26,18 @@ class EndpointManager {
 
 		recursive_lock *Locker() { return &fLock; }
 
-		status_t SetConnection(TCPConnection *endpoint, const sockaddr *local,
+		status_t SetConnection(TCPEndpoint *endpoint, const sockaddr *local,
 			const sockaddr *peer, const sockaddr *interfaceLocal);
-		TCPConnection *FindConnection(sockaddr *local, sockaddr *peer);
+		TCPEndpoint *FindConnection(sockaddr *local, sockaddr *peer);
 
-		status_t Bind(TCPConnection *endpoint, sockaddr *address);
-		status_t BindToEphemeral(TCPConnection *endpoint, sockaddr *address);
-		status_t Unbind(TCPConnection *endpoint);
+		status_t Bind(TCPEndpoint *endpoint, sockaddr *address);
+		status_t BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address);
+		status_t Unbind(TCPEndpoint *endpoint);
 
 	private:
-		TCPConnection *_LookupConnection(sockaddr *local, sockaddr *peer);
-		status_t _RemoveConnection(TCPConnection *endpoint);
-		TCPConnection *_LookupEndpoint(uint16 port);
+		TCPEndpoint *_LookupConnection(sockaddr *local, sockaddr *peer);
+		status_t _RemoveConnection(TCPEndpoint *endpoint);
+		TCPEndpoint *_LookupEndpoint(uint16 port);
 		void _DumpConnections();
 
 		static int _ConnectionCompare(void *_endpoint, const void *_key);
