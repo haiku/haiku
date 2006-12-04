@@ -16,6 +16,7 @@ KernelAddon tcp :
 	tcp.cpp
 	TCPConnection.cpp
 	BufferQueue.cpp
+	EndpointManager.cpp
 ;
 
 # Installation

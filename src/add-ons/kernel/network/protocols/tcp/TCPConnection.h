@@ -20,6 +20,8 @@
 #include <stddef.h>
 
 
+class EndpointManager;
+
 class TCPConnection : public net_protocol {
 	public:
 		TCPConnection(net_socket *socket);
@@ -44,6 +46,7 @@ class TCPConnection : public net_protocol {
 		size_t ReadAvailable();
 
 		tcp_state State() const { return fState; }
+		bool IsBound() const;
 
 		status_t DelayedAcknowledge();
 		status_t SendAcknowledge();
@@ -53,11 +56,9 @@ class TCPConnection : public net_protocol {
 			net_buffer *buffer);
 		int32 Receive(tcp_segment_header& segment, net_buffer *buffer);
 
-		static int Compare(void *_packet, const void *_key);
-		static uint32 Hash(void *_packet, const void *_key, uint32 range);
-		static int32 HashOffset() { return offsetof(TCPConnection, fHashNext); }
-
 	private:
+		friend class EndpointManager;
+
 		void _StartPersistTimer();
 		uint8 _CurrentFlags();
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
@@ -69,7 +70,9 @@ class TCPConnection : public net_protocol {
 		static void _PersistTimer(net_timer *timer, void *data);
 		static void _DelayedAcknowledgeTimer(net_timer *timer, void *data);
 
-		TCPConnection	*fHashNext;
+		TCPConnection	*fConnectionHashNext;
+		TCPConnection	*fEndpointHashNext;
+		TCPConnection	*fEndpointNextWithSamePort;
 
 		recursive_lock	fLock;
 		sem_id			fReceiveLock;

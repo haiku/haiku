@@ -9,12 +9,19 @@
 
 
 #include "TCPConnection.h"
+#include "EndpointManager.h"
 
 #include <net_buffer.h>
 #include <net_datalink.h>
+#include <NetBufferUtilities.h>
+#include <NetUtilities.h>
+
+#include <lock.h>
+#include <util/AutoLock.h>
+#include <util/khash.h>
+#include <util/list.h>
 
 #include <KernelExport.h>
-#include <util/list.h>
 
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -22,13 +29,6 @@
 #include <new>
 #include <stdlib.h>
 #include <string.h>
-
-#include <lock.h>
-#include <util/AutoLock.h>
-#include <util/khash.h>
-
-#include <NetBufferUtilities.h>
-#include <NetUtilities.h>
 
 
 // Things this implementation currently doesn't implement:
@@ -197,7 +197,7 @@ TCPConnection::Connect(const struct sockaddr *address)
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
 
-	//BenaphoreLocker lock(&fSendLock);
+	RecursiveLocker locker(&fLock);
 
 	TRACE(("  TCP: Connect(): in state %d\n", fState));
 
@@ -218,24 +218,9 @@ TCPConnection::Connect(const struct sockaddr *address)
 			return ENETUNREACH;
 	}
 
-	remove_connection(this);
-		// we need to temporarily remove us from the connection list, as we're
-		// changing our addresses
-
-	// need to associate this connection with a real address, not INADDR_ANY
-	if (gAddressModule->is_empty_address((sockaddr *)&socket->address, false)) {
-		TRACE(("  TCP: Connect(): Local Address is INADDR_ANY\n"));
-		uint16 port = gAddressModule->get_port((sockaddr *)&socket->address);
-		gAddressModule->set_to((sockaddr *)&socket->address,
-			(sockaddr *)fRoute->interface->address);
-		gAddressModule->set_port((sockaddr *)&socket->address, port);
-			// need to reset the port after overwriting the address
-	}
-
-	gAddressModule->set_to((sockaddr *)&socket->peer, address);
-
 	// make sure connection does not already exist
-	status_t status = insert_connection(this);
+	status_t status = gEndpointManager->SetConnection(this,
+		(sockaddr *)&socket->address, address, fRoute->interface->address);
 	if (status < B_OK) {
 		TRACE(("  TCP: Connect(): could not add connection: %s!\n", strerror(status)));
 		return status;
@@ -251,7 +236,6 @@ TCPConnection::Connect(const struct sockaddr *address)
 		&& (0xffffUL << fReceiveWindowShift) < socket->receive.buffer_size) {
 		fReceiveWindowShift++;
 	}
-dprintf("************************* size = %ld, shift = %d\n", socket->receive.buffer_size, fReceiveWindowShift);
 
 	TRACE(("  TCP: Connect(): starting 3-way handshake...\n"));
 
@@ -273,6 +257,8 @@ dprintf("************************* size = %ld, shift = %d\n", socket->receive.bu
 		// we're a non-blocking socket
 		return EINPROGRESS;
 	}
+
+	locker.Unlock();
 
 	status = acquire_sem_etc(fSendLock, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
@@ -308,11 +294,7 @@ TCPConnection::Bind(sockaddr *address)
 	TRACE(("TCP:%p.Bind() on address %s\n", this,
 		AddressString(gDomain, address, true).Data()));
 
-	if (address->sa_family != AF_INET)
-		return EAFNOSUPPORT;
-
-	//BenaphoreLocker lock(&fSendLock);
-		// TODO: there is no lock yet for these things...
+	RecursiveLocker lock(fLock);
 
 	if (fState != CLOSED)
 		return EISCONN;
@@ -322,21 +304,10 @@ TCPConnection::Bind(sockaddr *address)
 	if (status < B_OK)
 		return status;
 
-	gAddressModule->set_to((sockaddr *)&socket->address, address);
-
-	if (gAddressModule->get_port((sockaddr *)&socket->address) == 0) {
-		// assign ephemeral port
-		// TODO: use port 40000 and following for now
-		static int e = 40000;
-		gAddressModule->set_port((sockaddr *)&socket->address, htons(e++));
-
-		TRACE(("TCP:%p.Bind() on address with ephemeral port %s, peer %s\n", this,
-			AddressString(gDomain, (sockaddr *)&socket->address, true).Data(),
-			AddressString(gDomain, (sockaddr *)&socket->peer, true).Data()));
-		status = insert_connection(this);
-	} else {
-		status = insert_connection(this);
-	}
+	if (gAddressModule->get_port(address) == 0)
+		status = gEndpointManager->BindToEphemeral(this, address);
+	else
+		status = gEndpointManager->Bind(this, address);
 
 	return status;
 }
@@ -345,18 +316,10 @@ TCPConnection::Bind(sockaddr *address)
 status_t
 TCPConnection::Unbind(struct sockaddr *address)
 {
-	TRACE(("TCP:%p.Unbind()\n", this ));
+	TRACE(("TCP:%p.Unbind()\n", this));
 
-	//BenaphoreLocker lock(&fSendLock);
-		// TODO: there is no lock yet for these things...
-
-	status_t status = remove_connection(this);
-	if (status != B_OK)
-		return status;
-
-	gAddressModule->set_to_empty_address((sockaddr *)&socket->address);
-	gAddressModule->set_port((sockaddr *)&socket->address, 0);
-	return B_OK;
+	RecursiveLocker lock(fLock);
+	return gEndpointManager->Unbind(this);
 }
 
 
@@ -364,9 +327,13 @@ status_t
 TCPConnection::Listen(int count)
 {
 	TRACE(("TCP:%p.Listen()\n", this));
-	//BenaphoreLocker lock(&fSendLock);
+
+	RecursiveLocker lock(fLock);
+
 	if (fState != CLOSED)
 		return B_BAD_VALUE;
+	if (!IsBound())
+		return EDESTADDRREQ;
 
 	fAcceptSemaphore = create_sem(0, "tcp accept");
 	fState = LISTEN;
@@ -504,6 +471,13 @@ TCPConnection::ReadAvailable()
 //	#pragma mark - misc
 
 
+bool
+TCPConnection::IsBound() const
+{
+	return !gAddressModule->is_empty_address((sockaddr *)&socket->address, true);
+}
+
+
 status_t
 TCPConnection::DelayedAcknowledge()
 {
@@ -581,7 +555,8 @@ TCPConnection::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	if (connection->fRoute == NULL)
 		return DROP;
 
-	if (insert_connection(connection) < B_OK)
+	if (gEndpointManager->SetConnection(connection, (sockaddr *)&buffer->destination,
+			(sockaddr *)&buffer->source, NULL) < B_OK)
 		return DROP;
 
 	connection->fInitialReceiveSequence = segment.sequence;
@@ -1041,7 +1016,6 @@ TCPConnection::_SendQueued(bool force)
 	uint32 sendWindow = fSendWindow;
 	uint32 available = fSendQueue.Available(fSendNext);
 	bool outstandingAcknowledge = fSendMax != fSendUnacknowledged;
-dprintf("fSendWindow = %lu, available = %lu, fSendNext = %lu, fSendUnacknowledged = %lu\n", fSendWindow, available, (uint32)fSendNext, (uint32)fSendUnacknowledged);
 
 	if (force && sendWindow == 0 && fSendNext <= fSendQueue.LastSequence()) {
 		// send one byte of data to ask for a window update
@@ -1073,7 +1047,6 @@ dprintf("fSendWindow = %lu, available = %lu, fSendNext = %lu, fSendUnacknowledge
 	segment.urgent_offset = 0;
 
 	while (true) {
-dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 		// Determine if we should really send this segment
 		if (!force && !_ShouldSendSegment(segment, segmentLength, outstandingAcknowledge)) {
 			if (fSendQueue.Available()
@@ -1126,6 +1099,9 @@ dprintf("length = %ld, segmentLength = %lu\n", length, segmentLength);
 			gBufferModule->free(buffer);
 			return status;
 		}
+
+		// TODO: we need to trim the segment to the max segment size in case
+		//		the options made it too large
 
 		status = next->module->send_routed_data(next, fRoute, buffer);
 		if (status < B_OK) {
@@ -1205,35 +1181,3 @@ TCPConnection::_TimeWait(struct net_timer *timer, void *data)
 {
 }
 
-
-//	#pragma mark - hash functions
-
-
-int
-TCPConnection::Compare(void *_connection, const void *_key)
-{
-	const tcp_connection_key *key = (tcp_connection_key *)_key;
-	TCPConnection *connection = ((TCPConnection *)_connection);
-
-	if (gAddressModule->equal_addresses_and_ports(key->local,
-			(sockaddr *)&connection->socket->address)
-		&& gAddressModule->equal_addresses_and_ports(key->peer,
-			(sockaddr *)&connection->socket->peer))
-		return 0;
-
-	return 1;
-}
-
-
-uint32
-TCPConnection::Hash(void *_connection, const void *_key, uint32 range)
-{
-	if (_connection != NULL) {
-		TCPConnection *connection = (TCPConnection *)_connection;
-		return gAddressModule->hash_address_pair((sockaddr *)&connection->socket->address,
-			(sockaddr *)&connection->socket->peer) % range;
-	}
-
-	const tcp_connection_key *key = (tcp_connection_key *)_key;
-	return gAddressModule->hash_address_pair(key->local, key->peer) % range;
-}

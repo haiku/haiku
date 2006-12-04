@@ -21,7 +21,7 @@
 #include <sys/socket.h>
 
 
-class TCPConnection;
+class EndpointManager;
 
 typedef enum {
 	// establishing a connection
@@ -154,11 +154,6 @@ enum tcp_segment_action {
 	IMMEDIATE_ACKNOWLEDGE = 0x08,
 };
 
-struct tcp_connection_key {
-	const sockaddr	*local;
-	const sockaddr	*peer;
-};
-
 
 extern net_domain *gDomain;
 extern net_address_module_info *gAddressModule;
@@ -166,12 +161,9 @@ extern net_buffer_module_info *gBufferModule;
 extern net_datalink_module_info *gDatalinkModule;
 extern net_socket_module_info *gSocketModule;
 extern net_stack_module_info *gStackModule;
-//extern hash_table *gConnectionHash;
-//extern benaphore gConnectionLock;
+extern EndpointManager *gEndpointManager;
 
 
 status_t add_tcp_header(tcp_segment_header &segment, net_buffer *buffer);
-status_t remove_connection(TCPConnection *connection);
-status_t insert_connection(TCPConnection *connection);
 
 #endif	// TCP_H

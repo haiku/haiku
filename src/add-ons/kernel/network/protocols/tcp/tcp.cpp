@@ -8,6 +8,7 @@
  */
 
 
+#include "EndpointManager.h"
 #include "TCPConnection.h"
 
 #include <net_protocol.h>
@@ -37,45 +38,13 @@
 #endif
 
 
-#define MAX_HASH_TCP	64
-
-
 net_domain *gDomain;
 net_address_module_info *gAddressModule;
 net_buffer_module_info *gBufferModule;
 net_datalink_module_info *gDatalinkModule;
 net_socket_module_info *gSocketModule;
 net_stack_module_info *gStackModule;
-hash_table *gConnectionHash;
-recursive_lock gConnectionLock;
-
-
-#ifdef TRACE_TCP
-#	define DUMP_TCP_HASH tcp_dump_hash()
-// Dumps the TCP Connection hash.  gConnectionLock must NOT be held when calling
-void
-tcp_dump_hash()
-{
-	RecursiveLocker lock(&gConnectionLock);
-	if (gDomain == NULL) {
-		TRACE(("Unable to dump TCP Connections!\n"));
-		return;
-	}
-	struct hash_iterator iterator;
-	hash_open(gConnectionHash, &iterator);
-	TCPConnection *connection;
-	hash_rewind(gConnectionHash, &iterator);
-	TRACE(("Active TCP Connections:\n"));
-	while ((connection = (TCPConnection *)hash_next(gConnectionHash, &iterator)) != NULL) {
-		TRACE(("  TCPConnection %p: local %s, peer %s\n", connection,
-			AddressString(gDomain, (sockaddr *)&connection->socket->address, true).Data(),
-			AddressString(gDomain, (sockaddr *)&connection->socket->peer, true).Data()));
-	}
-	hash_close(gConnectionHash, &iterator, false);
-}
-#else
-#	define DUMP_TCP_HASH ;
-#endif
+EndpointManager *gEndpointManager;
 
 
 status_t
@@ -290,76 +259,6 @@ reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
 }
 
 
-TCPConnection *
-lookup_connection(sockaddr *local, sockaddr *peer)
-{
-	tcp_connection_key key;
-	key.local = local;
-	key.peer = peer;
-
-	return (TCPConnection *)hash_lookup(gConnectionHash, &key);
-}
-
-
-status_t
-remove_connection(TCPConnection *connection)
-{
-	RecursiveLocker hashLock(&gConnectionLock);
-	return hash_remove(gConnectionHash, connection);
-}
-
-
-status_t
-insert_connection(TCPConnection *connection)
-{
-	RecursiveLocker hashLock(&gConnectionLock);
-
-	tcp_connection_key key;
-	key.local = (sockaddr *)&connection->socket->address;
-	key.peer = (sockaddr *)&connection->socket->peer;
-
-	if (hash_lookup(gConnectionHash, &key) != NULL)
-		return EADDRINUSE;
-
-	return hash_insert(gConnectionHash, connection);
-}
-
-
-TCPConnection *
-find_connection(sockaddr *local, sockaddr *peer)
-{
-	TCPConnection *connection = lookup_connection(local, peer);
-	if (connection != NULL) {
-		TRACE(("TCP: Received packet corresponds to explicit connection %p\n", connection));
-		return connection;
-	}
-
-	// no explicit connection exists, check for wildcard connections
-
-	sockaddr wildcard;
-	gAddressModule->set_to_empty_address(&wildcard);
-
-	connection = lookup_connection(local, &wildcard);
-	if (connection != NULL) {
-		TRACE(("TCP: Received packet corresponds to wildcard connection %p\n", connection));
-		return connection;
-	}
-
-	sockaddr localWildcard;
-	gAddressModule->set_to_empty_address(&localWildcard);
-	gAddressModule->set_port(&localWildcard, gAddressModule->get_port(local));
-
-	connection = lookup_connection(&localWildcard, &wildcard);
-	if (connection != NULL) {
-		TRACE(("TCP: Received packet corresponds to local wildcard connection %p\n", connection));
-		return connection;
-	}
-
-	// no matching connection exists	
-	return NULL;
-}
-
-
 //	#pragma mark - protocol API
 
 
@@ -417,7 +316,6 @@ tcp_free(net_protocol *protocol)
 status_t
 tcp_connect(net_protocol *protocol, const struct sockaddr *address)
 {
-	DUMP_TCP_HASH;
 	return ((TCPConnection *)protocol)->Connect(address);
 }
 
@@ -569,11 +467,11 @@ tcp_receive_data(net_buffer *buffer)
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around
 
-	RecursiveLocker hashLock(&gConnectionLock);
+	RecursiveLocker locker(gEndpointManager->Locker());
 	int32 segmentAction = DROP;
  
-	TCPConnection *connection = find_connection((struct sockaddr *)&buffer->destination,
-		(struct sockaddr *)&buffer->source);
+	TCPConnection *connection = gEndpointManager->FindConnection(
+		(struct sockaddr *)&buffer->destination, (struct sockaddr *)&buffer->source);
 	if (connection != NULL) {
 		RecursiveLocker locker(connection->Lock());
 
@@ -661,12 +559,12 @@ tcp_init()
 	if (status < B_OK)
 		goto err3;
 
-	gConnectionHash = hash_init(MAX_HASH_TCP, TCPConnection::HashOffset(),
-		&TCPConnection::Compare, &TCPConnection::Hash);
-	if (gConnectionHash == NULL)
+	gEndpointManager = new (std::nothrow) EndpointManager();
+	if (gEndpointManager == NULL) {
+		status = B_NO_MEMORY;
 		goto err4;
-
-	status = recursive_lock_init(&gConnectionLock, "tcp connection hash");
+	}
+	status = gEndpointManager->InitCheck();
 	if (status < B_OK)
 		goto err5;
 
@@ -675,26 +573,24 @@ tcp_init()
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err6;
+		goto err5;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err6;
+		goto err5;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
 		"network/protocols/tcp/v1");
 	if (status < B_OK)
-		goto err6;
+		goto err5;
 
 	return B_OK;
 
-err6:
-	recursive_lock_destroy(&gConnectionLock);
 err5:
-	hash_uninit(gConnectionHash);
+	delete gEndpointManager;
 err4:
 	put_module(NET_DATALINK_MODULE_NAME);
 err3:
@@ -712,8 +608,8 @@ err1:
 static status_t
 tcp_uninit()
 {
-	recursive_lock_destroy(&gConnectionLock);
-	hash_uninit(gConnectionHash);
+	delete gEndpointManager;
+
 	put_module(NET_DATALINK_MODULE_NAME);
 	put_module(NET_SOCKET_MODULE_NAME);
 	put_module(NET_BUFFER_MODULE_NAME);
