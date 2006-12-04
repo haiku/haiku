@@ -134,9 +134,23 @@ dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size,
 	if (buffer->size > device->frame_size || buffer->size < ETHER_HEADER_LENGTH)
 		return B_BAD_VALUE;
 
+	net_buffer *allocated = NULL;
+	net_buffer *original = buffer;
+
 	if (gBufferModule->count_iovecs(buffer) > 1) {
-		dprintf("scattered I/O is not yet supported by ethernet device.\n");
-		return B_NOT_SUPPORTED;
+		// TODO: for now, create a new buffer containing the data
+		net_buffer *original = buffer;
+
+		buffer = gBufferModule->duplicate(original);
+		if (buffer == NULL)
+			return ENOBUFS;
+
+		allocated = buffer;
+
+		if (gBufferModule->count_iovecs(buffer) > 1) {
+			dprintf("scattered I/O is not yet supported by ethernet device.\n");
+			return B_NOT_SUPPORTED;
+		}
 	}
 
 	struct iovec iovec;
@@ -145,15 +159,20 @@ dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size,
 dump_block((const char *)iovec.iov_base, buffer->size, "  ");
 	ssize_t bytesWritten = write(device->fd, iovec.iov_base, iovec.iov_len);
 dprintf("sent: %ld\n", bytesWritten);
+
 	if (bytesWritten < 0) {
 		device->stats.send.errors++;
+		if (allocated)
+			gBufferModule->free(allocated);
 		return bytesWritten;
 	}
 
 	device->stats.send.packets++;
 	device->stats.send.bytes += bytesWritten;
-	
-	gBufferModule->free(buffer);
+
+	gBufferModule->free(original);
+	if (allocated)
+		gBufferModule->free(allocated);
 	return B_OK;
 }
 
