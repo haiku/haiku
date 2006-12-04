@@ -132,8 +132,11 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		&& tcp_sequence(sequence + buffer->size) > next->sequence) {
 		// we already have at least part of this data
 		if (tcp_sequence(next->sequence + next->size) < sequence + buffer->size) {
-			gBufferModule->free(next);
+			net_buffer *remove = next;
 			next = (net_buffer *)next->link.next;
+
+			fList.Remove(remove);
+			gBufferModule->free(remove);
 		} else
 			gBufferModule->remove_trailer(buffer, next->sequence - (sequence + buffer->size));
 	}
