@@ -331,10 +331,11 @@ socket_request_notification(net_socket *socket, uint8 event, uint32 ref,
 
 	status_t status = add_select_sync_pool_entry(&socket->select_pool, sync,
 		ref, event);
-	if (status < B_OK) {
-		benaphore_unlock(&socket->lock);
+
+	benaphore_unlock(&socket->lock);
+
+	if (status < B_OK)
 		return status;
-	}
 
 	// check if the event is already present
 	// TODO: add support for poll() types
@@ -359,7 +360,6 @@ socket_request_notification(net_socket *socket, uint8 event, uint32 ref,
 			break;
 	}
 
-	benaphore_unlock(&socket->lock);
 	return B_OK;
 }
 
@@ -380,8 +380,6 @@ socket_cancel_notification(net_socket *socket, uint8 event, selectsync *sync)
 status_t
 socket_notify(net_socket *socket, uint8 event, int32 value)
 {
-	benaphore_lock(&socket->lock);
-
 	bool notify = true;
 
 	switch (event) {
@@ -401,6 +399,8 @@ socket_notify(net_socket *socket, uint8 event, int32 value)
 			socket->error = value;
 			break;
 	}
+
+	benaphore_lock(&socket->lock);
 
 	if (notify && socket->select_pool)
 		notify_select_event_pool(socket->select_pool, event);
