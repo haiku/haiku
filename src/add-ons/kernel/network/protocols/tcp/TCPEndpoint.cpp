@@ -1166,42 +1166,42 @@ TCPEndpoint::_SendQueued(bool force)
 /*static*/ void
 TCPEndpoint::_RetransmitTimer(net_timer *timer, void *data)
 {
-	TCPEndpoint *connection = (TCPEndpoint *)data;
+	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(connection->Lock());
+	RecursiveLocker locker(endpoint->Lock());
 
-	connection->fSendNext = connection->fSendUnacknowledged;
-	connection->_SendQueued();
-	connection->fSendNext = connection->fSendMax;
+	endpoint->fSendNext = endpoint->fSendUnacknowledged;
+	endpoint->_SendQueued();
+	endpoint->fSendNext = endpoint->fSendMax;
 }
 
 
 /*static*/ void
 TCPEndpoint::_PersistTimer(net_timer *timer, void *data)
 {
-	TCPEndpoint *connection = (TCPEndpoint *)data;
+	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(connection->Lock());
-	connection->_SendQueued(true);
+	RecursiveLocker locker(endpoint->Lock());
+	endpoint->_SendQueued(true);
 }
 
 
 /*static*/ void
 TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 {
-	TCPEndpoint *connection = (TCPEndpoint *)data;
+	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(connection->Lock());
-	connection->_SendQueued(true);
+	RecursiveLocker locker(endpoint->Lock());
+	endpoint->_SendQueued(true);
 }
 
 
 /*static*/ void
 TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 {
-	TCPEndpoint *connection = (TCPEndpoint *)data;
+	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(connection->Lock());
-	gSocketModule->delete_socket(connection->socket);
+	recursive_lock_lock(&endpoint->Lock());
+	gSocketModule->delete_socket(endpoint->socket);
 }
 
