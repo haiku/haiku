@@ -1059,9 +1059,11 @@ get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
 	uint32 count = 0;
 
 	while (count < vecCount) {
-		iovecs[count].iov_base = node->start;
-		iovecs[count].iov_len = node->used;
-		count++;
+		if (node->used > 0) {
+			iovecs[count].iov_base = node->start;
+			iovecs[count].iov_len = node->used;
+			count++;
+		}
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
@@ -1080,7 +1082,8 @@ count_iovecs(net_buffer *_buffer)
 	uint32 count = 0;
 
 	while (true) {
-		count++;
+		if (node->used > 0)
+			count++;
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
