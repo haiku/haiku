@@ -1067,6 +1067,7 @@ setup_server()
 {
 	sockaddr_in address;
 	memset(&address, 0, sizeof(address));
+	address.sin_len = sizeof(sockaddr_in);
 	address.sin_family = AF_INET;
 	address.sin_port = htons(1024);
 	address.sin_addr.s_addr = INADDR_ANY;
