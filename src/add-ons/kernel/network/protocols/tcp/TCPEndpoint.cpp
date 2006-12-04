@@ -247,6 +247,10 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	TRACE(("  TCP: Connect(): starting 3-way handshake...\n"));
 
 	fState = SYNCHRONIZE_SENT;
+	fInitialSendSequence = system_time() >> 4;
+	fSendNext = fInitialSendSequence;
+	fSendUnacknowledged = fInitialSendSequence;
+	fSendMax = fInitialSendSequence;
 
 	// send SYN
 	status = _SendQueued();
@@ -583,6 +587,7 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	endpoint->fReceiveNext = segment.sequence + 1;
 		// account for the extra sequence number for the synchronization
 
+	endpoint->fInitialSendSequence = system_time() >> 4;
 	endpoint->fSendNext = endpoint->fInitialSendSequence;
 	endpoint->fSendUnacknowledged = endpoint->fSendNext;
 	endpoint->fSendMax = endpoint->fSendNext;
@@ -603,9 +608,7 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	}
 
 	// send SYN+ACK
-	//benaphore_lock(&endpoint->fSendLock);
 	status_t status = endpoint->_SendQueued();
-	//benaphore_unlock(&endpoint->fSendLock);
 
 	endpoint->fInitialSendSequence = fSendNext;
 	endpoint->fSendQueue.SetInitialSequence(fSendNext);
@@ -761,9 +764,10 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	}
 	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
 		|| (fState == SYNCHRONIZE_RECEIVED
-			&& (fSendUnacknowledged > segment.acknowledge
-				|| fSendMax < segment.acknowledge
-				|| fInitialReceiveSequence > segment.sequence))) {
+			&& (fInitialReceiveSequence > segment.sequence
+				|| (segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
+					&& (fSendUnacknowledged > segment.acknowledge
+						|| fSendMax < segment.acknowledge)))) {
 		// reset the connection - either the initial SYN was faulty, or we received
 		// a SYN within the data stream
 		return DROP | RESET;

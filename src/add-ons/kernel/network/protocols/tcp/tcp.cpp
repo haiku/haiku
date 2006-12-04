@@ -469,7 +469,7 @@ tcp_receive_data(net_buffer *buffer)
 
 	RecursiveLocker locker(gEndpointManager->Locker());
 	int32 segmentAction = DROP;
- 
+
 	TCPEndpoint *endpoint = gEndpointManager->FindConnection(
 		(struct sockaddr *)&buffer->destination, (struct sockaddr *)&buffer->source);
 	if (endpoint != NULL) {
