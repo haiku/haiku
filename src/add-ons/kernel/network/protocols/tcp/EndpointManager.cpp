@@ -285,6 +285,7 @@ EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 			if (other == NULL) {
 				// found a port
 				gAddressModule->set_port((sockaddr *)&endpoint->socket->address, port);
+				endpoint->fEndpointNextWithSamePort = NULL;
 				hash_insert(fEndpointHash, endpoint);
 				hash_insert(fConnectionHash, endpoint);
 				return B_OK;
