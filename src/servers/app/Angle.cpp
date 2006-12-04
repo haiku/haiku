@@ -31,10 +31,10 @@
 	#define ANGLE_PI 3.14159265358979323846
 #endif
 
-bool sTablesInitialized = false;
-float sSinTable[360];
-float sCosTable[360];
-float sTanTable[360];
+static bool sTablesInitialized = false;
+static float sSinTable[360];
+static float sCosTable[360];
+static float sTanTable[360];
 
 /*!
 	\brief Constructor

@@ -30,19 +30,19 @@
 Decorator::Decorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
 	:
-	_driver(NULL),
+	fDrawingEngine(NULL),
 	fDrawState(),
 
 	fLook(look),
 	fFlags(flags),
 
-	_zoomrect(),
-	_closerect(),
-	_minimizerect(),
-	_tabrect(),
-	_frame(rect),
-	_resizerect(),
-	_borderrect(),
+	fZoomRect(),
+	fCloseRect(),
+	fMinimizeRect(),
+	fTabRect(),
+	fFrame(rect),
+	fResizeRect(),
+	fBorderRect(),
 
 	fClosePressed(false),
 	fZoomPressed(false),
@@ -68,12 +68,12 @@ Decorator::~Decorator()
 	\param driver A valid DrawingEngine object
 */
 void
-Decorator::SetDriver(DrawingEngine *driver)
+Decorator::SetDrawingEngine(DrawingEngine* engine)
 {
-	_driver = driver;
+	fDrawingEngine = engine;
 	// lots of subclasses will depend on the driver for text support, so call
 	// _DoLayout() after we have it
-	if (_driver) {
+	if (fDrawingEngine) {
 		_DoLayout();
 	}
 }
@@ -227,7 +227,7 @@ Decorator::Title() const
 BRect
 Decorator::BorderRect() const
 {
-	return _borderrect;
+	return fBorderRect;
 }
 
 
@@ -238,7 +238,7 @@ Decorator::BorderRect() const
 BRect
 Decorator::TabRect() const
 {
-	return _tabrect;
+	return fTabRect;
 }
 
 /*!
@@ -373,14 +373,14 @@ Decorator::MoveBy(float x, float y)
 void
 Decorator::MoveBy(BPoint pt)
 {
-	_zoomrect.OffsetBy(pt);
-	_closerect.OffsetBy(pt);
-	_minimizerect.OffsetBy(pt);
-	_minimizerect.OffsetBy(pt);
-	_tabrect.OffsetBy(pt);
-	_frame.OffsetBy(pt);
-	_resizerect.OffsetBy(pt);
-	_borderrect.OffsetBy(pt);
+	fZoomRect.OffsetBy(pt);
+	fCloseRect.OffsetBy(pt);
+	fMinimizeRect.OffsetBy(pt);
+	fMinimizeRect.OffsetBy(pt);
+	fTabRect.OffsetBy(pt);
+	fFrame.OffsetBy(pt);
+	fResizeRect.OffsetBy(pt);
+	fBorderRect.OffsetBy(pt);
 }
 
 /*!
@@ -389,7 +389,7 @@ Decorator::MoveBy(BPoint pt)
 	\param dy y offset
 	
 	This is a required function for subclasses to implement - the default does nothing.
-	Note that window resize flags should be followed and _frame should be resized
+	Note that window resize flags should be followed and fFrame should be resized
 	accordingly. It would also be a wise idea to ensure that the window's rectangles
 	are not inverted. 
 */
@@ -423,62 +423,62 @@ Decorator::GetSettings(BMessage* settings) const
 void
 Decorator::Draw(BRect r)
 {
-	_DrawFrame(r & _frame);
-	_DrawTab(r & _tabrect);
+	_DrawFrame(r & fFrame);
+	_DrawTab(r & fTabRect);
 }
 
 //! Forces a complete decorator update
 void
 Decorator::Draw()
 {
-	_DrawFrame(_frame);
-	_DrawTab(_tabrect);
+	_DrawFrame(fFrame);
+	_DrawTab(fTabRect);
 }
 
 //! Draws the close button
 void
 Decorator::DrawClose()
 {
-	_DrawClose(_closerect);
+	_DrawClose(fCloseRect);
 }
 
 //! draws the frame
 void
 Decorator::DrawFrame()
 {
-	_DrawFrame(_frame);
+	_DrawFrame(fFrame);
 }
 
 //! draws the minimize button
 void
 Decorator::DrawMinimize(void)
 {
-	_DrawTab(_minimizerect);
+	_DrawTab(fMinimizeRect);
 }
 
 //! draws the tab, title, and buttons
 void
 Decorator::DrawTab()
 {
-	_DrawTab(_tabrect);
-	_DrawZoom(_zoomrect);
-	_DrawMinimize(_minimizerect);
-	_DrawTitle(_tabrect);
-	_DrawClose(_closerect);
+	_DrawTab(fTabRect);
+	_DrawZoom(fZoomRect);
+	_DrawMinimize(fMinimizeRect);
+	_DrawTitle(fTabRect);
+	_DrawClose(fCloseRect);
 }
 
 // draws the title
 void
 Decorator::DrawTitle()
 {
-	_DrawTitle(_tabrect);
+	_DrawTitle(fTabRect);
 }
 
 //! draws the zoom button
 void
 Decorator::DrawZoom(void)
 {
-	_DrawZoom(_zoomrect);
+	_DrawZoom(fZoomRect);
 }
 
 
@@ -501,16 +501,16 @@ Decorator::_ClipTitle(float width)
 {
 	// TODO: eventually, use ServerFont::TruncateString()
 	// when it exists (if it doesn't already)
-	if (_driver) {
+	if (fDrawingEngine) {
 		int32 strlength = fTitle.CountChars();
-		float pixwidth=_driver->StringWidth(fTitle.String(),strlength,&fDrawState);
+		float pixwidth=fDrawingEngine->StringWidth(fTitle.String(),strlength,&fDrawState);
 
 		while (strlength >= 0) {
 			if (pixwidth < width)
 				return strlength;
 
 			strlength--;
-			pixwidth=_driver->StringWidth(fTitle.String(), strlength, &fDrawState);
+			pixwidth=fDrawingEngine->StringWidth(fTitle.String(), strlength, &fDrawState);
 		}
 	}
 	return 0;

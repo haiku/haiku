@@ -1354,8 +1354,13 @@ ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
 	if (!fVisible)
 		return;
 
-	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
-		link.Attach<int32>(fToken);
+//	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
+	IntRect screenBounds(Bounds());
+	ConvertToScreen(&screenBounds);
+	if (!region.Intersects((clipping_rect)screenBounds))
+		return;
+
+	link.Attach<int32>(fToken);
 
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->AddTokensForLayersInRegion(link, region,

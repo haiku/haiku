@@ -39,11 +39,11 @@ OffscreenWindowLayer::OffscreenWindowLayer(ServerBitmap* bitmap,
 
 OffscreenWindowLayer::~OffscreenWindowLayer()
 {
-	fHWInterface->WriteLock();
+	fHWInterface->LockExclusiveAccess();
 	// Unlike normal Layers, we own the DrawingEngine instance
 	delete GetDrawingEngine();
 	fHWInterface->Shutdown();
-	fHWInterface->WriteUnlock();
+	fHWInterface->UnlockExclusiveAccess();
 	delete fHWInterface;
 }
 

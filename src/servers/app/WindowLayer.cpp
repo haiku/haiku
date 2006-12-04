@@ -796,8 +796,9 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		GetBorderRegion(visibleBorder);
 		visibleBorder->IntersectWith(&VisibleRegion());
 
-		fDrawingEngine->Lock();
-		fDrawingEngine->ConstrainClippingRegion(visibleBorder);
+		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+		engine->LockExclusiveAccess();
+		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fDecorator->SetZoom(true);
@@ -807,7 +808,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			fDecorator->SetMinimize(true);
 		}
 
-		fDrawingEngine->Unlock();
+		engine->UnlockExclusiveAccess();
 
 		fRegionPool.Recycle(visibleBorder);
 
@@ -872,8 +873,9 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		GetBorderRegion(visibleBorder);
 		visibleBorder->IntersectWith(&VisibleRegion());
 
-		fDrawingEngine->Lock();
-		fDrawingEngine->ConstrainClippingRegion(visibleBorder);
+		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+		engine->LockExclusiveAccess();
+		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fIsZooming = false;
@@ -900,7 +902,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 			}
 		}
 
-		fDrawingEngine->Unlock();
+		engine->UnlockExclusiveAccess();
 
 		fRegionPool.Recycle(visibleBorder);
 	}
@@ -959,8 +961,9 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 		GetBorderRegion(visibleBorder);
 		visibleBorder->IntersectWith(&VisibleRegion());
 
-		fDrawingEngine->Lock();
-		fDrawingEngine->ConstrainClippingRegion(visibleBorder);
+		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+		engine->LockExclusiveAccess();
+		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fDecorator->SetZoom(_ActionFor(message) == DEC_ZOOM);
@@ -970,7 +973,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 			fDecorator->SetMinimize(_ActionFor(message) == DEC_MINIMIZE);
 		}
 
-		fDrawingEngine->Unlock();
+		engine->UnlockExclusiveAccess();
 		fRegionPool.Recycle(visibleBorder);
 	}
 
@@ -1737,14 +1740,14 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 				backgroundClearingRegion = &fPendingUpdateSession.DirtyRegion();
 			}
 
-			if (fDrawingEngine->Lock()) {
+			if (fDrawingEngine->LockParallelAccess()) {
 				fDrawingEngine->SuspendAutoSync();
 
 				fTopLayer->Draw(fDrawingEngine, backgroundClearingRegion,
 								&fContentRegion, true);
 
 				fDrawingEngine->Sync();
-				fDrawingEngine->Unlock();
+				fDrawingEngine->UnlockParallelAccess();
 			}
 		}
 	}
@@ -1771,15 +1774,19 @@ WindowLayer::_DrawBorder()
 	// intersect with the dirty region
 	dirtyBorderRegion->IntersectWith(&fDirtyRegion);
 
-	if (dirtyBorderRegion->CountRects() > 0 && fDrawingEngine->Lock()) {
-		fDrawingEngine->ConstrainClippingRegion(dirtyBorderRegion);
+	DrawingEngine* engine = fDecorator->GetDrawingEngine();
+	if (dirtyBorderRegion->CountRects() > 0 && engine->LockExclusiveAccess()) {
+		engine->ConstrainClippingRegion(dirtyBorderRegion);
 		fDecorator->Draw(dirtyBorderRegion->Frame());
 
-		fDrawingEngine->Unlock();
+		engine->UnlockExclusiveAccess();
 	}
 	fRegionPool.Recycle(dirtyBorderRegion);
 }
 
+
+//static rgb_color sPendingColor;
+//static rgb_color sCurrentColor;
 
 /*!
 	pre: the clipping is readlocked (this function is
@@ -1793,7 +1800,7 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
 
-//fDrawingEngine->FillRegion(*contentDirtyRegion, RGBColor(255, 255, 0, 255));
+//fDrawingEngine->FillRegion(*contentDirtyRegion, RGBColor(sPendingColor));
 //snooze(10000);
 
 	// add to pending
@@ -1873,6 +1880,15 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 
 		dirty->IntersectWith(&VisibleContentRegion());
 
+//sCurrentColor.red = rand() % 255;
+//sCurrentColor.green = rand() % 255;
+//sCurrentColor.blue = rand() % 255;
+//sPendingColor.red = rand() % 255;
+//sPendingColor.green = rand() % 255;
+//sPendingColor.blue = rand() % 255;
+//fDrawingEngine->FillRegion(*dirty, RGBColor(sCurrentColor));
+//snooze(10000);
+
 		link.StartMessage(B_OK);
 		// append the current window geometry to the
 		// message, the client will need it
@@ -1888,7 +1904,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		link.Attach<int32>(B_NULL_TOKEN);
 		link.Flush();
 
-		if (!fCurrentUpdateSession.IsExpose() && fDrawingEngine->Lock()) {
+		if (!fCurrentUpdateSession.IsExpose() && fDrawingEngine->LockParallelAccess()) {
 //fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 0, 255));
 			fDrawingEngine->SuspendAutoSync();
 
@@ -1896,7 +1912,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 							&fContentRegion, true);
 
 			fDrawingEngine->Sync();
-			fDrawingEngine->Unlock();
+			fDrawingEngine->UnlockParallelAccess();
 		} // else the background was cleared already
 
 		fRegionPool.Recycle(dirty);

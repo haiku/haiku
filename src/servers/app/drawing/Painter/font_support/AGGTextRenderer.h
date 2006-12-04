@@ -21,6 +21,14 @@ class AGGTextRenderer {
 								AGGTextRenderer();
 	virtual						~AGGTextRenderer();
 
+	// NOTE: every Painter instance is using the same
+	// AGGTextRenderer instance, and the only thing that
+	// protects locking is the fact that every use of a
+	// ServerFont goes through a global lock... this will
+	// have to be changed. Maybe every ServerFont should
+	// have it's own AGGTextRenderer or something
+	static	AGGTextRenderer*	Default();
+
 			bool				SetFont(const ServerFont &font);
 			void				Unset();
 
@@ -76,6 +84,8 @@ class AGGTextRenderer {
 	bool						fAntialias;
 	bool						fKerning;
 	Transformable				fEmbeddedTransformation;	// rotated or sheared font?
+
+	static	AGGTextRenderer		sDefaultInstance;
 };
 
 #endif // AGG_TEXT_RENDERER_H

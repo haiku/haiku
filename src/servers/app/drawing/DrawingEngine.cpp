@@ -23,7 +23,10 @@
 #include "drawing_support.h"
 
 #define CRASH_IF_NOT_LOCKED
-//#define CRASH_IF_NOT_LOCKED if (!IsLocked()) debugger("not locked!");
+//#define CRASH_IF_NOT_LOCKED if (!IsParallelAccessLocked()) debugger("not parallel locked!");
+
+#define CRASH_IF_NOT_EXCLUSIVE_LOCKED
+//#define CRASH_IF_NOT_EXCLUSIVE_LOCKED if (!IsExclusiveAccessLocked()) debugger("not exclusive locked!");
 
 // make_rect_valid
 static inline void
@@ -97,6 +100,38 @@ DrawingEngine::~DrawingEngine()
 }
 
 
+// #pragma mark - locking
+
+
+bool
+DrawingEngine::LockParallelAccess()
+{
+	return fGraphicsCard->LockExclusiveAccess();
+}
+
+
+void
+DrawingEngine::UnlockParallelAccess()
+{
+	fGraphicsCard->UnlockExclusiveAccess();
+}
+
+
+bool
+DrawingEngine::LockExclusiveAccess()
+{	
+	return fGraphicsCard->LockExclusiveAccess();
+}
+
+
+void
+DrawingEngine::UnlockExclusiveAccess()
+{
+	fGraphicsCard->UnlockExclusiveAccess();
+}
+
+// #pragma mark -
+
 void
 DrawingEngine::FrameBufferChanged()
 {
@@ -106,11 +141,13 @@ DrawingEngine::FrameBufferChanged()
 		return;
 	}
 
-	if (WriteLock()) {
+	// NOTE: locking is probably bogus, since we are called
+	// in the thread that changed the frame buffer...
+	if (LockExclusiveAccess()) {
 		fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
 		// available HW acceleration might have changed
 		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
-		WriteUnlock();
+		UnlockExclusiveAccess();
 	}
 }
 
@@ -212,11 +249,11 @@ DrawingEngine::Sync()
 // Since A is to the left of C and B is to the top of C, The "node"
 // for C will point to the nodes of A and B as its "successors". Therefor,
 // A and B will have an "indegree" of 1 for C pointing to them. C will
-// have and "indegree" of 0, because there was no rect to which C
+// have an "indegree" of 0, because there was no rect to which C
 // was to the left or top of. When comparing A and B, neither is left
 // or top from the other and in the sense that the algorithm cares about.
 
-// NOTE: comparisson of coordinates assumes that rects don't overlap
+// NOTE: comparison of coordinates assumes that rects don't overlap
 // and don't share the actual edge either (as is the case in BRegions).
 
 struct node {
@@ -263,12 +300,12 @@ struct node {
 	int32	next_pointer;
 };
 
-bool
+static bool
 is_left_of(const BRect& a, const BRect& b)
 {
 	return (a.right < b.left);
 }
-bool
+static bool
 is_above(const BRect& a, const BRect& b)
 {
 	return (a.bottom < b.top);
@@ -279,150 +316,142 @@ void
 DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 						  int32 xOffset, int32 yOffset)
 {
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
-	if (WriteLock()) {
-		BRect frame = region->Frame();
-		frame = frame | frame.OffsetByCopy(xOffset, yOffset);
-		fGraphicsCard->HideSoftwareCursor(frame);
+	CRASH_IF_NOT_EXCLUSIVE_LOCKED
 
-		int32 count = region->CountRects();
+	BRect frame = region->Frame();
+	frame = frame | frame.OffsetByCopy(xOffset, yOffset);
+	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
 
-		// TODO: make this step unnecessary
-		// (by using different stack impl inside node)
-		node nodes[count];
-		for (int32 i= 0; i < count; i++) {
-			nodes[i].init(region->RectAt(i), count);
-		}
+	int32 count = region->CountRects();
 
-		for (int32 i = 0; i < count; i++) {
-			BRect a = region->RectAt(i);
-			for (int32 k = i + 1; k < count; k++) {
-				BRect b = region->RectAt(k);
-				int cmp = 0;
-				// compare horizontally
-				if (xOffset > 0) {
-					if (is_left_of(a, b)) {
-						cmp -= 1;
-					} else if (is_left_of(b, a)) {
-						cmp += 1;
-					}
-				} else if (xOffset < 0) {
-					if (is_left_of(a, b)) {
-						cmp += 1;
-					} else if (is_left_of(b, a)) {
-						cmp -= 1;
-					}
-				}
-				// compare vertically
-				if (yOffset > 0) {
-					if (is_above(a, b)) {
-						cmp -= 1;	
-					} else if (is_above(b, a)) {
-						cmp += 1;
-					}
-				} else if (yOffset < 0) {
-					if (is_above(a, b)) {
-						cmp += 1;
-					} else if (is_above(b, a)) {
-						cmp -= 1;
-					}
-				}
-				// add appropriate node as successor
-				if (cmp > 0) {
-					nodes[i].push(&nodes[k]);
-					nodes[k].in_degree++;
-				} else if (cmp < 0) {
-					nodes[k].push(&nodes[i]);
-					nodes[i].in_degree++;
-				}
-			}
-		}
-		// put all nodes onto a stack that have an "indegree" count of zero
-		stack<node*> inDegreeZeroNodes;
-		for (int32 i = 0; i < count; i++) {
-			if (nodes[i].in_degree == 0) {
-				inDegreeZeroNodes.push(&nodes[i]);
-			}
-		}
-		// pop the rects from the stack, do the actual copy operation
-		// and decrease the "indegree" count of the other rects not
-		// currently on the stack and to which the current rect pointed
-		// to. If their "indegree" count reaches zero, put them onto the
-		// stack as well.
-
-		clipping_rect* sortedRectList = NULL;
-		int32 nextSortedIndex = 0;
-
-		if (fAvailableHWAccleration & HW_ACC_COPY_REGION)
-			sortedRectList = new clipping_rect[count];
-
-		while (!inDegreeZeroNodes.empty()) {
-			node* n = inDegreeZeroNodes.top();
-			inDegreeZeroNodes.pop();
-
-			// do the software implementation or add to sorted
-			// rect list for using the HW accelerated version
-			// later
-			if (sortedRectList) {
-				sortedRectList[nextSortedIndex].left	= (int32)n->rect.left;
-				sortedRectList[nextSortedIndex].top		= (int32)n->rect.top;
-				sortedRectList[nextSortedIndex].right	= (int32)n->rect.right;
-				sortedRectList[nextSortedIndex].bottom	= (int32)n->rect.bottom;
-				nextSortedIndex++;
-			} else {
-				BRect touched = _CopyRect(n->rect, xOffset, yOffset);
-				fGraphicsCard->Invalidate(touched);
-			}
-
-			for (int32 k = 0; k < n->next_pointer; k++) {
-				n->pointers[k]->in_degree--;
-				if (n->pointers[k]->in_degree == 0)
-					inDegreeZeroNodes.push(n->pointers[k]);
-			}
-		}
-
-		// trigger the HW accelerated version if is was available
-		if (sortedRectList)
-			fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
-
-		delete[] sortedRectList;
-
-		fGraphicsCard->ShowSoftwareCursor();
-
-		WriteUnlock();
+	// TODO: make this step unnecessary
+	// (by using different stack impl inside node)
+	node nodes[count];
+	for (int32 i= 0; i < count; i++) {
+		nodes[i].init(region->RectAt(i), count);
 	}
+
+	for (int32 i = 0; i < count; i++) {
+		BRect a = region->RectAt(i);
+		for (int32 k = i + 1; k < count; k++) {
+			BRect b = region->RectAt(k);
+			int cmp = 0;
+			// compare horizontally
+			if (xOffset > 0) {
+				if (is_left_of(a, b)) {
+					cmp -= 1;
+				} else if (is_left_of(b, a)) {
+					cmp += 1;
+				}
+			} else if (xOffset < 0) {
+				if (is_left_of(a, b)) {
+					cmp += 1;
+				} else if (is_left_of(b, a)) {
+					cmp -= 1;
+				}
+			}
+			// compare vertically
+			if (yOffset > 0) {
+				if (is_above(a, b)) {
+					cmp -= 1;	
+				} else if (is_above(b, a)) {
+					cmp += 1;
+				}
+			} else if (yOffset < 0) {
+				if (is_above(a, b)) {
+					cmp += 1;
+				} else if (is_above(b, a)) {
+					cmp -= 1;
+				}
+			}
+			// add appropriate node as successor
+			if (cmp > 0) {
+				nodes[i].push(&nodes[k]);
+				nodes[k].in_degree++;
+			} else if (cmp < 0) {
+				nodes[k].push(&nodes[i]);
+				nodes[i].in_degree++;
+			}
+		}
+	}
+	// put all nodes onto a stack that have an "indegree" count of zero
+	stack<node*> inDegreeZeroNodes;
+	for (int32 i = 0; i < count; i++) {
+		if (nodes[i].in_degree == 0) {
+			inDegreeZeroNodes.push(&nodes[i]);
+		}
+	}
+	// pop the rects from the stack, do the actual copy operation
+	// and decrease the "indegree" count of the other rects not
+	// currently on the stack and to which the current rect pointed
+	// to. If their "indegree" count reaches zero, put them onto the
+	// stack as well.
+
+	clipping_rect* sortedRectList = NULL;
+	int32 nextSortedIndex = 0;
+
+	if (fAvailableHWAccleration & HW_ACC_COPY_REGION)
+		sortedRectList = new clipping_rect[count];
+
+	while (!inDegreeZeroNodes.empty()) {
+		node* n = inDegreeZeroNodes.top();
+		inDegreeZeroNodes.pop();
+
+		// do the software implementation or add to sorted
+		// rect list for using the HW accelerated version
+		// later
+		if (sortedRectList) {
+			sortedRectList[nextSortedIndex].left	= (int32)n->rect.left;
+			sortedRectList[nextSortedIndex].top		= (int32)n->rect.top;
+			sortedRectList[nextSortedIndex].right	= (int32)n->rect.right;
+			sortedRectList[nextSortedIndex].bottom	= (int32)n->rect.bottom;
+			nextSortedIndex++;
+		} else {
+			BRect touched = _CopyRect(n->rect, xOffset, yOffset);
+			fGraphicsCard->Invalidate(touched);
+		}
+
+		for (int32 k = 0; k < n->next_pointer; k++) {
+			n->pointers[k]->in_degree--;
+			if (n->pointers[k]->in_degree == 0)
+				inDegreeZeroNodes.push(n->pointers[k]);
+		}
+	}
+
+	// trigger the HW accelerated version if is was available
+	if (sortedRectList)
+		fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
+
+	delete[] sortedRectList;
+
+	if (cursorTouched)
+		fGraphicsCard->ShowSoftwareCursor();
 }
 
 // InvertRect
 void
 DrawingEngine::InvertRect(BRect r)
 {
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
-	if (WriteLock()) {
-		make_rect_valid(r);
-		r = fPainter->ClipRect(r);
-		if (r.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(r);
+	CRASH_IF_NOT_LOCKED
 
-			// try hardware optimized version first
-			if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
-				BRegion region(r);
-				region.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->InvertRegion(region);
-			} else {		
-				fPainter->InvertRect(r);
+	make_rect_valid(r);
+	r = fPainter->ClipRect(r);
+	if (r.IsValid()) {
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
 
-				fGraphicsCard->Invalidate(r);
-			}
+		// try hardware optimized version first
+		if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
+			BRegion region(r);
+			region.IntersectWith(fPainter->ClippingRegion());
+			fGraphicsCard->InvertRegion(region);
+		} else {		
+			fPainter->InvertRect(r);
 
-			fGraphicsCard->ShowSoftwareCursor();
+			fGraphicsCard->Invalidate(r);
 		}
 
-		WriteUnlock();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -436,13 +465,14 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 
 	BRect clipped = fPainter->ClipRect(dest);
 	if (clipped.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(clipped);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
 		fPainter->DrawBitmap(bitmap, source, dest);
 
 		fGraphicsCard->Invalidate(clipped);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -460,7 +490,7 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 		extend_by_stroke_width(clipped, d);
 	clipped = fPainter->ClipRect(r);
 	if (clipped.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(clipped);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
 
@@ -475,7 +505,8 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 
 		fGraphicsCard->Invalidate(clipped);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -516,13 +547,14 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	clipped = fPainter->ClipRect(clipped);
 
 	if (clipped.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(clipped);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
 		fPainter->DrawEllipse(r, filled);
 
 		fGraphicsCard->Invalidate(clipped);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -539,13 +571,14 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 		extend_by_stroke_width(bounds, d);
 	bounds = fPainter->ClipRect(bounds);
 	if (bounds.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(bounds);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(bounds);
 
 		fPainter->SetDrawState(d);
 		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 
 		fGraphicsCard->Invalidate(bounds);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -562,27 +595,26 @@ DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
 // * this function is only used by Decorators
 // * it assumes a one pixel wide line
 void
-DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
+DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
+						  const RGBColor &color)
 {
 	CRASH_IF_NOT_LOCKED
 
-	if (Lock()) {
-		BRect touched(start, end);
-		make_rect_valid(touched);
-		touched = fPainter->ClipRect(touched);
-		fGraphicsCard->HideSoftwareCursor(touched);
+	BRect touched(start, end);
+	make_rect_valid(touched);
+	touched = fPainter->ClipRect(touched);
+	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
-		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-			DrawState context;
-			context.SetHighColor(color);
-			context.SetDrawingMode(B_OP_OVER);
-			StrokeLine(start, end, &context);
-		} else {
-			fGraphicsCard->Invalidate(touched);
-		}
-		fGraphicsCard->ShowSoftwareCursor();
-		Unlock();
+	if (!fPainter->StraightLine(start, end, color.GetColor32())) {
+		DrawState context;
+		context.SetHighColor(color);
+		context.SetDrawingMode(B_OP_OVER);
+		StrokeLine(start, end, &context);
+	} else {
+		fGraphicsCard->Invalidate(touched);
 	}
+	if (cursorTouched)
+		fGraphicsCard->ShowSoftwareCursor();
 }
 
 // this function is used to draw a one pixel wide rect
@@ -591,19 +623,16 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 {
 	CRASH_IF_NOT_LOCKED
 
-	if (Lock()) {
-		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->StrokeRect(r, color.GetColor32());
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
+	make_rect_valid(r);
+	BRect clipped = fPainter->ClipRect(r);
+	if (clipped.IsValid()) {
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		Unlock();
+		fPainter->StrokeRect(r, color.GetColor32());
+
+		fGraphicsCard->Invalidate(clipped);
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -616,30 +645,26 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
-	if (WriteLock()) {
-		make_rect_valid(r);
-		r = fPainter->ClipRect(r);
-		if (r.IsValid()) {
-			bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
-	
-			// try hardware optimized version first
-			if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
-				BRegion region(r);
-				region.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(region, color,
-										  fSuspendSyncLevel == 0
-										  || cursorTouched);
-			} else {
-				fPainter->FillRect(r, color.GetColor32());
-		
-				fGraphicsCard->Invalidate(r);
-			}
+	make_rect_valid(r);
+	r = fPainter->ClipRect(r);
+	if (r.IsValid()) {
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
 
-			if (cursorTouched)
-				fGraphicsCard->ShowSoftwareCursor();
+		// try hardware optimized version first
+		if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
+			BRegion region(r);
+			region.IntersectWith(fPainter->ClippingRegion());
+			fGraphicsCard->FillRegion(region, color,
+									  fSuspendSyncLevel == 0
+									  || cursorTouched);
+		} else {
+			fPainter->FillRect(r, color.GetColor32());
+	
+			fGraphicsCard->Invalidate(r);
 		}
 
-		WriteUnlock();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -649,38 +674,31 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 {
 	CRASH_IF_NOT_LOCKED
 
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
 	// NOTE: region expected to be already clipped correctly!!
-	if (WriteLock()) {
-		BRect frame = r.Frame();
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
+	BRect frame = r.Frame();
+	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
 
-		bool doInSoftware = true;
-		// try hardware optimized version first
-		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
-			&& frame.Width() * frame.Height() > 100) {
-			fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
-												|| cursorTouched);
-			doInSoftware = false;
-		}
-
-		if (doInSoftware) {
-
-			int32 count = r.CountRects();
-			for (int32 i = 0; i < count; i++) {
-				fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
-			}
-
-			fGraphicsCard->Invalidate(frame);
-		}
-
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
-
-		WriteUnlock();
+	bool doInSoftware = true;
+	// try hardware optimized version first
+	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
+		&& frame.Width() * frame.Height() > 100) {
+		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
+											|| cursorTouched);
+		doInSoftware = false;
 	}
+
+	if (doInSoftware) {
+
+		int32 count = r.CountRects();
+		for (int32 i = 0; i < count; i++) {
+			fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
+		}
+
+		fGraphicsCard->Invalidate(frame);
+	}
+
+	if (cursorTouched)
+		fGraphicsCard->ShowSoftwareCursor();
 }
 
 // #pragma mark - DrawState
@@ -697,13 +715,14 @@ DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
 
-		fGraphicsCard->HideSoftwareCursor(clipped);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
 		fPainter->StrokeRect(r);
 
 		fGraphicsCard->Invalidate(clipped);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -713,52 +732,45 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 {
 	CRASH_IF_NOT_LOCKED
 
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
-	if (WriteLock()) {
-		make_rect_valid(r);
-		r = fPainter->ClipRect(r);
-		if (r.IsValid()) {
-			bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
+	make_rect_valid(r);
+	r = fPainter->ClipRect(r);
+	if (r.IsValid()) {
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
 
-			bool doInSoftware = true;
-			if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
-				// try hardware optimized version first
-				// if the rect is large enough
-				if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-					if (d->GetPattern() == B_SOLID_HIGH
-						&& (d->GetDrawingMode() == B_OP_COPY
-							|| d->GetDrawingMode() == B_OP_OVER)) {
-						BRegion region(r);
-						region.IntersectWith(fPainter->ClippingRegion());
-						fGraphicsCard->FillRegion(region, d->HighColor(),
-												  fSuspendSyncLevel == 0
-												  || cursorTouched);
-						doInSoftware = false;
-					} else if (d->GetPattern() == B_SOLID_LOW
-							   && d->GetDrawingMode() == B_OP_COPY) {
-						BRegion region(r);
-						region.IntersectWith(fPainter->ClippingRegion());
-						fGraphicsCard->FillRegion(region, d->LowColor(),
-												  fSuspendSyncLevel == 0
-												  || cursorTouched);
-						doInSoftware = false;
-					}
+		bool doInSoftware = true;
+		if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
+			// try hardware optimized version first
+			// if the rect is large enough
+			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+				if (d->GetPattern() == B_SOLID_HIGH
+					&& (d->GetDrawingMode() == B_OP_COPY
+						|| d->GetDrawingMode() == B_OP_OVER)) {
+					BRegion region(r);
+					region.IntersectWith(fPainter->ClippingRegion());
+					fGraphicsCard->FillRegion(region, d->HighColor(),
+											  fSuspendSyncLevel == 0
+											  || cursorTouched);
+					doInSoftware = false;
+				} else if (d->GetPattern() == B_SOLID_LOW
+						   && d->GetDrawingMode() == B_OP_COPY) {
+					BRegion region(r);
+					region.IntersectWith(fPainter->ClippingRegion());
+					fGraphicsCard->FillRegion(region, d->LowColor(),
+											  fSuspendSyncLevel == 0
+											  || cursorTouched);
+					doInSoftware = false;
 				}
 			}
-			if (doInSoftware) {
-				fPainter->SetDrawState(d);
-				fPainter->FillRect(r);
+		}
+		if (doInSoftware) {
+			fPainter->SetDrawState(d);
+			fPainter->FillRect(r);
 
-				fGraphicsCard->Invalidate(r);
-			}
-
-			if (cursorTouched)
-				fGraphicsCard->ShowSoftwareCursor();
+			fGraphicsCard->Invalidate(r);
 		}
 
-		WriteUnlock();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -768,53 +780,46 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 {
 	CRASH_IF_NOT_LOCKED
 
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
-	if (WriteLock()) {
-		BRect clipped = fPainter->ClipRect(r.Frame());
-		if (clipped.IsValid()) {
-			bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+	BRect clipped = fPainter->ClipRect(r.Frame());
+	if (clipped.IsValid()) {
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-			bool doInSoftware = true;
-			// try hardware optimized version first
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-				if (d->GetPattern() == B_SOLID_HIGH
-					&& (d->GetDrawingMode() == B_OP_COPY
-						|| d->GetDrawingMode() == B_OP_OVER)) {
-					r.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(r, d->HighColor(),
-											  fSuspendSyncLevel == 0
-											  || cursorTouched);
-					doInSoftware = false;
-				} else if (d->GetPattern() == B_SOLID_LOW
-						   && d->GetDrawingMode() == B_OP_COPY) {
-					r.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(r, d->LowColor(),
-											  fSuspendSyncLevel == 0
-											  || cursorTouched);
-					doInSoftware = false;
-				}
+		bool doInSoftware = true;
+		// try hardware optimized version first
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+			if (d->GetPattern() == B_SOLID_HIGH
+				&& (d->GetDrawingMode() == B_OP_COPY
+					|| d->GetDrawingMode() == B_OP_OVER)) {
+				r.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(r, d->HighColor(),
+										  fSuspendSyncLevel == 0
+										  || cursorTouched);
+				doInSoftware = false;
+			} else if (d->GetPattern() == B_SOLID_LOW
+					   && d->GetDrawingMode() == B_OP_COPY) {
+				r.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(r, d->LowColor(),
+										  fSuspendSyncLevel == 0
+										  || cursorTouched);
+				doInSoftware = false;
 			}
-
-			if (doInSoftware) {
-				fPainter->SetDrawState(d);
-
-				BRect touched = fPainter->FillRect(r.RectAt(0));
-
-				int32 count = r.CountRects();
-				for (int32 i = 1; i < count; i++) {
-					touched = touched | fPainter->FillRect(r.RectAt(i));
-				}
-
-				fGraphicsCard->Invalidate(touched);
-			}
-
-			if (cursorTouched)
-				fGraphicsCard->ShowSoftwareCursor();
 		}
 
-		WriteUnlock();
+		if (doInSoftware) {
+			fPainter->SetDrawState(d);
+
+			BRect touched = fPainter->FillRect(r.RectAt(0));
+
+			int32 count = r.CountRects();
+			for (int32 i = 1; i < count; i++) {
+				touched = touched | fPainter->FillRect(r.RectAt(i));
+			}
+
+			fGraphicsCard->Invalidate(touched);
+		}
+
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -836,14 +841,15 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 	clipped.bottom = ceilf(clipped.bottom);
 
 	if (clipped.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(clipped);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
 		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
 							   : fPainter->StrokeRoundRect(r, xrad, yrad);
 
 		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -880,7 +886,7 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 		extend_by_stroke_width(clipped, d);
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(clipped);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
 		if (filled)
@@ -889,7 +895,8 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 			fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 
 		fGraphicsCard->Invalidate(clipped);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -904,13 +911,14 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 	extend_by_stroke_width(touched, context);
 	touched = fPainter->ClipRect(touched);
 	if (touched.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(touched);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
 		fPainter->SetDrawState(context);
 		fPainter->StrokeLine(start, end);
 
 		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -942,7 +950,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 	extend_by_stroke_width(touched, d);
 	touched = fPainter->ClipRect(touched);
 	if (touched.IsValid()) {
-		fGraphicsCard->HideSoftwareCursor(touched);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
 		data = (const LineArrayData *)&(linedata[0]);
 
@@ -964,7 +972,8 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		}
 
 		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -996,14 +1005,15 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	b = fPainter->ClipRect(b);
 	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
-		fGraphicsCard->HideSoftwareCursor(b);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(b);
 
 //now = system_time();
 		BRect touched = fPainter->DrawString(string, length, pt, delta);
 //printf("drawing string: %lld µs\n", system_time() - now);
 
 		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 	}
 
 	return penLocation;
@@ -1018,16 +1028,13 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 	FontLocker locker(d);
 
 	float width = 0.0;
-//	if (Lock()) {
 // NOTE: For now it is enough to block on the
 // font style lock, this already prevents multiple
 // threads from executing this code and avoids a
 // deadlock in case another thread holds the font
 // lock already and then tries to lock the drawing
 // engine after it is already locked here (race condition)
-		width = fPainter->StringWidth(string, length, d);
-//		Unlock();
-//	}
+	width = fPainter->StringWidth(string, length, d);
 	return width;
 }
 
@@ -1049,57 +1056,17 @@ DrawingEngine::StringHeight(const char *string, int32 length,
 	FontLocker locker(d);
 
 	float height = 0.0;
-//	if (Lock()) {
 // NOTE: For now it is enough to block on the
 // font style lock, this already prevents multiple
 // threads from executing this code and avoids a
 // deadlock in case another thread holds the font
 // lock already and then tries to lock the drawing
 // engine after it is already locked here (race condition)
-		fPainter->SetDrawState(d, true);
-		BPoint dummy1(0.0, 0.0);
-		BPoint dummy2(0.0, 0.0);
-		height = fPainter->BoundingBox(string, length, dummy1, &dummy2).Height();
-//		Unlock();
-//	}
+	fPainter->SetDrawState(d, true);
+	BPoint dummy1(0.0, 0.0);
+	BPoint dummy2(0.0, 0.0);
+	height = fPainter->BoundingBox(string, length, dummy1, &dummy2).Height();
 	return height;
-}
-
-// #pragma mark -
-
-// Lock
-bool
-DrawingEngine::Lock()
-{
-	return fGraphicsCard->WriteLock();
-}
-
-// Unlock
-void
-DrawingEngine::Unlock()
-{
-	fGraphicsCard->WriteUnlock();
-}
-
-// IsLocked
-bool
-DrawingEngine::IsLocked()
-{
-	return fGraphicsCard->IsWriteLocked();
-}
-
-// WriteLock
-bool
-DrawingEngine::WriteLock()
-{	
-	return fGraphicsCard->WriteLock();
-}
-
-// WriteUnlock
-void
-DrawingEngine::WriteUnlock()
-{
-	fGraphicsCard->WriteUnlock();
 }
 
 // #pragma mark -
@@ -1108,18 +1075,18 @@ DrawingEngine::WriteUnlock()
 bool
 DrawingEngine::DumpToFile(const char *path)
 {
-	if (Lock()) {
-		RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
-		if (buffer) {
-			BRect bounds(0.0, 0.0, buffer->Width() - 1, buffer->Height() - 1);
-			SaveToPNG(path, bounds, buffer->ColorSpace(),
-					  buffer->Bits(),
-					  buffer->BitsLength(),
-					  buffer->BytesPerRow());
-		}
-		Unlock();
-	}	
-	return true;
+	CRASH_IF_NOT_EXCLUSIVE_LOCKED
+
+	RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
+	if (buffer) {
+		BRect bounds(0.0, 0.0, buffer->Width() - 1, buffer->Height() - 1);
+		SaveToPNG(path, bounds, buffer->ColorSpace(),
+				  buffer->Bits(),
+				  buffer->BitsLength(),
+				  buffer->BytesPerRow());
+		return true;
+	}
+	return false;
 }
 
 // DumpToBitmap
@@ -1132,61 +1099,59 @@ DrawingEngine::DumpToBitmap()
 status_t
 DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 {
-	if (Lock()) {
-		RenderingBuffer *buffer = fGraphicsCard->DrawingBuffer();
-		if (!buffer)
-			return B_ERROR;
+	CRASH_IF_NOT_EXCLUSIVE_LOCKED
 
-		BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
-		bounds = bounds & clip;
-		fGraphicsCard->HideSoftwareCursor(bounds);
+	RenderingBuffer *buffer = fGraphicsCard->DrawingBuffer();
+	if (!buffer)
+		return B_ERROR;
 
-		status_t result = bitmap->ImportBits(buffer->Bits(), buffer->BitsLength(),
-			buffer->BytesPerRow(), buffer->ColorSpace(),
-			bounds.LeftTop(), BPoint(0, 0), 
-			bounds.IntegerWidth() + 1, bounds.IntegerHeight() + 1);
+	BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
+	bounds = bounds & clip;
+	fGraphicsCard->HideSoftwareCursor(bounds);
 
-		if (drawCursor) {
-			ServerCursor *cursor = fGraphicsCard->Cursor();
-			int32 cursorWidth = cursor->Width();
-			int32 cursorHeight = cursor->Height();
+	status_t result = bitmap->ImportBits(buffer->Bits(), buffer->BitsLength(),
+		buffer->BytesPerRow(), buffer->ColorSpace(),
+		bounds.LeftTop(), BPoint(0, 0), 
+		bounds.IntegerWidth() + 1, bounds.IntegerHeight() + 1);
 
-			BPoint cursorPosition = fGraphicsCard->CursorPosition();
-			cursorPosition -= bounds.LeftTop() + cursor->GetHotSpot();
+	if (drawCursor) {
+		ServerCursor *cursor = fGraphicsCard->Cursor();
+		int32 cursorWidth = cursor->Width();
+		int32 cursorHeight = cursor->Height();
 
-			BBitmap cursorArea(BRect(0, 0, cursorWidth - 1, cursorHeight - 1),
-				B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-				
-			cursorArea.ImportBits(bitmap->Bits(), bitmap->BitsLength(),
-				bitmap->BytesPerRow(), bitmap->ColorSpace(),
-				cursorPosition,	BPoint(0, 0),
-				cursorWidth, cursorHeight);
+		BPoint cursorPosition = fGraphicsCard->CursorPosition();
+		cursorPosition -= bounds.LeftTop() + cursor->GetHotSpot();
 
-			uint8 *bits = (uint8 *)cursorArea.Bits();
-			uint8 *cursorBits = (uint8 *)cursor->Bits();
-			for (int32 i = 0; i < cursorHeight; i++) {
-				for (int32 j = 0; j < cursorWidth; j++) {
-					uint8 alpha = 255 - cursorBits[3];
-					bits[0] = ((bits[0] * alpha) >> 8) + cursorBits[0];
-					bits[1] = ((bits[1] * alpha) >> 8) + cursorBits[1];
-					bits[2] = ((bits[2] * alpha) >> 8) + cursorBits[2];
-					cursorBits += 4;
-					bits += 4;
-				}
+		BBitmap cursorArea(BRect(0, 0, cursorWidth - 1, cursorHeight - 1),
+			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+			
+		cursorArea.ImportBits(bitmap->Bits(), bitmap->BitsLength(),
+			bitmap->BytesPerRow(), bitmap->ColorSpace(),
+			cursorPosition,	BPoint(0, 0),
+			cursorWidth, cursorHeight);
+
+		uint8 *bits = (uint8 *)cursorArea.Bits();
+		uint8 *cursorBits = (uint8 *)cursor->Bits();
+		for (int32 i = 0; i < cursorHeight; i++) {
+			for (int32 j = 0; j < cursorWidth; j++) {
+				uint8 alpha = 255 - cursorBits[3];
+				bits[0] = ((bits[0] * alpha) >> 8) + cursorBits[0];
+				bits[1] = ((bits[1] * alpha) >> 8) + cursorBits[1];
+				bits[2] = ((bits[2] * alpha) >> 8) + cursorBits[2];
+				cursorBits += 4;
+				bits += 4;
 			}
-
-			bitmap->ImportBits(cursorArea.Bits(), cursorArea.BitsLength(),
-				cursorArea.BytesPerRow(), cursorArea.ColorSpace(),
-				BPoint(0, 0), cursorPosition, 
-				cursorWidth, cursorHeight);
 		}
 
-		fGraphicsCard->ShowSoftwareCursor();
-		Unlock();
-		return result;
+		bitmap->ImportBits(cursorArea.Bits(), cursorArea.BitsLength(),
+			cursorArea.BytesPerRow(), cursorArea.ColorSpace(),
+			BPoint(0, 0), cursorPosition, 
+			cursorWidth, cursorHeight);
 	}
 
-	return B_ERROR;
+	fGraphicsCard->ShowSoftwareCursor();
+
+	return result;
 }
 
 // #pragma mark -

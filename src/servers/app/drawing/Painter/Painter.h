@@ -273,7 +273,7 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	bool						fSubpixelPrecise;
 
 	float						fPenSize;
-	BRegion*					fClippingRegion;
+	const BRegion*				fClippingRegion;
 	bool						fValidClipping;
 	drawing_mode				fDrawingMode;
 	bool						fDrawingText;

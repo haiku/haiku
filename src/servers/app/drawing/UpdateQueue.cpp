@@ -85,7 +85,7 @@ UpdateQueue::_ExecuteUpdates()
 			case B_OK:
 			case B_TIMED_OUT:
 				// execute updates
-				if (fInterface->ReadLock()) {
+				if (fInterface->LockParallelAccess()) {
 					int32 count = fUpdateRegion.CountRects();
 					if (count > 0) {
 						for (int32 i = 0; i < count; i++) {
@@ -93,7 +93,7 @@ UpdateQueue::_ExecuteUpdates()
 						}
 						fUpdateRegion.MakeEmpty();
 					}
-					fInterface->ReadUnlock();
+					fInterface->UnlockParallelAccess();
 				}
 				break;
 			case B_BAD_SEM_ID:

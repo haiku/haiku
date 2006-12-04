@@ -69,6 +69,10 @@ is_white_space(uint32 charCode)
 
 #define DEFAULT_UNI_CODE_BUFFER_SIZE	2048
 
+// init default instance
+AGGTextRenderer
+AGGTextRenderer::sDefaultInstance;
+
 // constructor
 AGGTextRenderer::AGGTextRenderer()
 	: fFontEngine(gFreeTypeLibrary),
@@ -95,6 +99,13 @@ AGGTextRenderer::~AGGTextRenderer()
 {
 	Unset();
 	free(fUnicodeBuffer);
+}
+
+// Default
+/*static*/ AGGTextRenderer*
+AGGTextRenderer::Default()
+{
+	return &sDefaultInstance;
 }
 
 // SetFont

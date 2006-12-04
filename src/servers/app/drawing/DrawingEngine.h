@@ -44,16 +44,17 @@ public:
 	// HWInterfaceListener interface
 	virtual	void			FrameBufferChanged();
 
-			// locking
-			bool			Lock();
-			void			Unlock();
-			bool			IsLocked();
-
-			bool			WriteLock();
-			void			WriteUnlock();
-
 			// for "changing" hardware
 			void			SetHWInterface(HWInterface* interface);
+
+			// locking
+			bool			LockParallelAccess();
+			bool			IsParallelAccessLocked();
+			void			UnlockParallelAccess();
+
+			bool			LockExclusiveAccess();
+			bool			IsExclusiveAccessLocked();
+			void			UnlockExclusiveAccess();
 
 			// for screen shots
 			bool			DumpToFile(const char *path);

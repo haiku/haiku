@@ -2315,11 +2315,11 @@ Desktop::_SetBackground(BRegion& background)
 	dirtyBackground.IntersectWith(&background);
 	fBackgroundRegion = background;
 	if (dirtyBackground.Frame().IsValid()) {
-		if (GetDrawingEngine()->Lock()) {
+		if (GetDrawingEngine()->LockParallelAccess()) {
 			GetDrawingEngine()->FillRegion(dirtyBackground,
 				fWorkspaces[fCurrentWorkspace].Color());
 
-			GetDrawingEngine()->Unlock();
+			GetDrawingEngine()->UnlockParallelAccess();
 		}
 	}
 }

@@ -1966,10 +1966,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		return;
 	}
 
-	// prevent other ServerWindows from messing with the drawing engine
-	// as long as each uses the same instance... TODO: remove the locking
-	// when each has its own
-	drawingEngine->Lock();
+	drawingEngine->LockParallelAccess();
+	// TODO: avoid setting the region each time
 	drawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
 
 	switch (code) {
@@ -2288,7 +2286,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			break;
 	}
 
-	drawingEngine->Unlock();
+	drawingEngine->UnlockParallelAccess();
 }
 
 
@@ -2698,7 +2696,8 @@ ServerWindow::MakeWindowLayer(BRect frame, const char* name,
 {
 	// The non-offscreen ServerWindow uses the DrawingEngine instance from the desktop.
 	return new (nothrow) WindowLayer(frame, name, look, feel, flags,
-		workspace, this, fDesktop->GetDrawingEngine());
+//		workspace, this, fDesktop->GetDrawingEngine());
+		workspace, this, new DrawingEngine(fDesktop->HWInterface()));
 }
 
 
@@ -2830,7 +2829,7 @@ ServerWindow::_SetCurrentLayer(ViewLayer* layer)
 #if DELAYED_BACKGROUND_CLEARING
 		if (fCurrentLayer && fCurrentLayer->IsBackgroundDirty() && fWindowLayer->InUpdate()) {
 			DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
-			if (drawingEngine->Lock()) {
+			if (drawingEngine->LockParallelAccess()) {
 		
 				fWindowLayer->GetEffectiveDrawingRegion(fCurrentLayer, fCurrentDrawingRegion);
 				fCurrentDrawingRegionValid = true;
@@ -2841,7 +2840,7 @@ ServerWindow::_SetCurrentLayer(ViewLayer* layer)
 
 				fCurrentLayer->Draw(drawingEngine, &dirty, &content, false);
 	
-				drawingEngine->Unlock();
+				drawingEngine->UnlockParallelAccess();
 			}
 		}
 #endif

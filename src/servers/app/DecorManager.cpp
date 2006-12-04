@@ -92,7 +92,7 @@ DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 
 	desktop->UnlockSingleWindow();
 
-	decorator->SetDriver(desktop->GetDrawingEngine());
+	decorator->SetDrawingEngine(desktop->GetDrawingEngine());
 	decorator->SetTitle(title);
 
 	return decorator;

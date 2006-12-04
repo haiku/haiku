@@ -545,9 +545,9 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 void
 AccelerantHWInterface::GetMode(display_mode *mode)
 {
-	if (mode && ReadLock()) {
+	if (mode && LockParallelAccess()) {
 		*mode = fDisplayMode;
-		ReadUnlock();
+		UnlockParallelAccess();
 	}
 }
 
@@ -997,13 +997,13 @@ void
 AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 {
 	HWInterface::SetCursor(cursor);
-//	if (WriteLock()) {
+//	if (LockExclusiveAccess()) {
 		// TODO: implement setting the hard ware cursor
 		// NOTE: cursor should be always B_RGBA32
 		// NOTE: The HWInterface implementation should
 		// still be called, since it takes ownership of
 		// the cursor.
-//		WriteUnlock();
+//		UnlockExclusiveAccess();
 //	}
 }
 
@@ -1012,9 +1012,9 @@ void
 AccelerantHWInterface::SetCursorVisible(bool visible)
 {
 	HWInterface::SetCursorVisible(visible);
-//	if (WriteLock()) {
+//	if (LockExclusiveAccess()) {
 		// TODO: update graphics hardware
-//		WriteUnlock();
+//		UnlockExclusiveAccess();
 //	}
 }
 
@@ -1023,9 +1023,9 @@ void
 AccelerantHWInterface::MoveCursorTo(const float& x, const float& y)
 {
 	HWInterface::MoveCursorTo(x, y);
-//	if (WriteLock()) {
+//	if (LockExclusiveAccess()) {
 		// TODO: update graphics hardware
-//		WriteUnlock();
+//		UnlockExclusiveAccess();
 //	}
 }
 

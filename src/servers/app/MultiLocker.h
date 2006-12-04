@@ -115,19 +115,27 @@ class AutoReadLocker {
 								AutoReadLocker(MultiLocker* lock)
 									: fLock(*lock)
 								{
-									fLock.ReadLock();
+									fLocked = fLock.ReadLock();
 								}
 								AutoReadLocker(MultiLocker& lock)
 									: fLock(lock)
 								{
-									fLock.ReadLock();
+									fLocked = fLock.ReadLock();
 								}
 								~AutoReadLocker()
 								{
-									fLock.ReadUnlock();
+									Unlock();
+								}
+			void				Unlock()
+								{
+									if (fLocked) {
+										fLock.ReadUnlock();
+										fLocked = false;
+									}
 								}
  private:
 	 	MultiLocker&			fLock;
+	 	bool					fLocked;
 };
 
 

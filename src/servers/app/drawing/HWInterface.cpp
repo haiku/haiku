@@ -30,6 +30,7 @@ HWInterfaceListener::~HWInterfaceListener()		{}
 HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
+	  fSoftwareCursorLock("software cursor lock"),
 	  fCursor(NULL),
 	  fDragBitmap(NULL),
 	  fDragBitmapOffset(0, 0),
@@ -78,74 +79,78 @@ HWInterface::GetDriverPath(BString &path)
 }
 
 
-// SetCursor
+// #pragma mark -
+
+
 void
 HWInterface::SetCursor(ServerCursor* cursor)
 {
-	if (WriteLock()) {
-		// TODO: if a bitmap is being dragged, it could
-		// be considered iritating to the user to change
-		// cursor shapes while something is dragged.
-		// The disabled code below would do this (except
-		// for the minor annoyance that the cursor is not
-		// updated when the drag is over)
-//		if (fDragBitmap) {
-//			// TODO: like a "+" or "-" sign when dragging some files to indicate
-//			//		the current drag mode?
-//			WriteUnlock();
-//			return;
-//		}
-		if (fCursor != cursor) {
-			BRect oldFrame = _CursorFrame();
+	if (!fSoftwareCursorLock.Lock())
+		return;
 
-			if (fCursorAndDragBitmap == fCursor) {
-				// make sure _AdoptDragBitmap doesn't delete a real cursor
-				fCursorAndDragBitmap = NULL;
-			}
+	// TODO: if a bitmap is being dragged, it could
+	// be considered iritating to the user to change
+	// cursor shapes while something is dragged.
+	// The disabled code below would prevent this (except
+	// for the minor annoyance that the cursor is not
+	// updated when the drag is over)
+//	if (fDragBitmap) {
+//		// TODO: like a "+" or "-" sign when dragging some files to indicate
+//		//		the current drag mode?
+//		UnlockExclusiveAccess();
+//		return;
+//	}
+	if (fCursor != cursor) {
+		BRect oldFrame = _CursorFrame();
 
-			if (fCursor)
-				fCursor->Release();
-
-			fCursor = cursor;
-
-			if (fCursor)
-				fCursor->Acquire();
-
-			Invalidate(oldFrame);
-
-			_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
-			Invalidate(_CursorFrame());
+		if (fCursorAndDragBitmap == fCursor) {
+			// make sure _AdoptDragBitmap doesn't delete a real cursor
+			fCursorAndDragBitmap = NULL;
 		}
-		WriteUnlock();
+
+		if (fCursor)
+			fCursor->Release();
+
+		fCursor = cursor;
+
+		if (fCursor)
+			fCursor->Acquire();
+
+		Invalidate(oldFrame);
+
+		_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
+		Invalidate(_CursorFrame());
 	}
+	fSoftwareCursorLock.Unlock();
 }
 
 // SetCursorVisible
 void
 HWInterface::SetCursorVisible(bool visible)
 {
-	if (WriteLock()) {
-		if (fCursorVisible != visible) {
-			// NOTE: _CursorFrame() will
-			// return an invalid rect if
-			// fCursorVisible == false!
-			if (visible) {
-				fCursorVisible = visible;
-				fCursorObscured = false;
-				BRect r = _CursorFrame();
+	if (!fSoftwareCursorLock.Lock())
+		return;
 
-				_DrawCursor(r);
-				Invalidate(r);
-			} else {
-				BRect r = _CursorFrame();
-				fCursorVisible = visible;
+	if (fCursorVisible != visible) {
+		// NOTE: _CursorFrame() will
+		// return an invalid rect if
+		// fCursorVisible == false!
+		if (visible) {
+			fCursorVisible = visible;
+			fCursorObscured = false;
+			BRect r = _CursorFrame();
 
-				_RestoreCursorArea();
-				Invalidate(r);
-			}
+			_DrawCursor(r);
+			Invalidate(r);
+		} else {
+			BRect r = _CursorFrame();
+			fCursorVisible = visible;
+
+			_RestoreCursorArea();
+			Invalidate(r);
 		}
-		WriteUnlock();
 	}
+	fSoftwareCursorLock.Unlock();
 }
 
 // IsCursorVisible
@@ -153,9 +158,9 @@ bool
 HWInterface::IsCursorVisible()
 {
 	bool visible = true;
-	if (ReadLock()) {
+	if (fSoftwareCursorLock.Lock()) {
 		visible = fCursorVisible;
-		ReadUnlock();
+		fSoftwareCursorLock.Unlock();
 	}
 	return visible;
 }
@@ -164,46 +169,46 @@ HWInterface::IsCursorVisible()
 void
 HWInterface::ObscureCursor()
 {
-	if (WriteLock()) {
-		if (!fCursorObscured) {
-			SetCursorVisible(false);
-			fCursorObscured = true;
-		}
-		WriteUnlock();
+	if (!fSoftwareCursorLock.Lock())
+		return;
+
+	if (!fCursorObscured) {
+		SetCursorVisible(false);
+		fCursorObscured = true;
 	}
+	fSoftwareCursorLock.Unlock();
 }
 
 // MoveCursorTo
 void
 HWInterface::MoveCursorTo(const float& x, const float& y)
 {
-	if (WriteLock()) {
-		BPoint p(x, y);
-		if (p != fCursorLocation) {
-			// unhide cursor if it is obscured only
-			if (fCursorObscured) {
-				// TODO: causes nested lock, which
-				// the MultiLocker doesn't actually support?
-				SetCursorVisible(true);
-			}
-			BRect oldFrame = _CursorFrame();
-			fCursorLocation = p;
-			if (fCursorVisible) {
-				// Invalidate and _DrawCursor would not draw
-				// anything if the cursor is hidden
-				// (invalid cursor frame), but explicitly
-				// testing for it here saves us some cycles
-				if (fCursorAreaBackup) {
-					// means we have a software cursor which we need to draw
-					_RestoreCursorArea();
-					_DrawCursor(_CursorFrame());
-				}
-				Invalidate(oldFrame);
-				Invalidate(_CursorFrame());
-			}
+	if (!fSoftwareCursorLock.Lock())
+		return;
+
+	BPoint p(x, y);
+	if (p != fCursorLocation) {
+		// unhide cursor if it is obscured only
+		if (fCursorObscured) {
+			SetCursorVisible(true);
 		}
-		WriteUnlock();
+		BRect oldFrame = _CursorFrame();
+		fCursorLocation = p;
+		if (fCursorVisible) {
+			// Invalidate and _DrawCursor would not draw
+			// anything if the cursor is hidden
+			// (invalid cursor frame), but explicitly
+			// testing for it here saves us some cycles
+			if (fCursorAreaBackup) {
+				// means we have a software cursor which we need to draw
+				_RestoreCursorArea();
+				_DrawCursor(_CursorFrame());
+			}
+			Invalidate(oldFrame);
+			Invalidate(_CursorFrame());
+		}
 	}
+	fSoftwareCursorLock.Unlock();
 }
 
 
@@ -211,25 +216,28 @@ BPoint
 HWInterface::CursorPosition()
 {
 	BPoint location;
-	if (ReadLock()) {
+	if (fSoftwareCursorLock.Lock()) {
 		location = fCursorLocation;
-		ReadUnlock();
+		fSoftwareCursorLock.Unlock();
 	}
 	return location;
 }
 
-// SetDragBitmap
+
 void
 HWInterface::SetDragBitmap(const ServerBitmap* bitmap,
 						   const BPoint& offsetFromCursor)
 {
-	if (WriteLock()) {
+	if (fSoftwareCursorLock.Lock()) {
 		_AdoptDragBitmap(bitmap, offsetFromCursor);
-		WriteUnlock();
+		fSoftwareCursorLock.Unlock();
 	}
 }
 
-// DrawingBuffer
+
+// #pragma mark -
+
+
 RenderingBuffer*
 HWInterface::DrawingBuffer() const
 {
@@ -238,14 +246,14 @@ HWInterface::DrawingBuffer() const
 	return FrontBuffer();
 }
 
-// IsDoubleBuffered
+
 bool
 HWInterface::IsDoubleBuffered() const
 {
 	return fDoubleBuffered;
 }
 
-// Invalidate
+
 // * the object needs to be already locked!
 status_t
 HWInterface::Invalidate(const BRect& frame)
@@ -269,7 +277,7 @@ HWInterface::Invalidate(const BRect& frame)
 	return B_OK;
 }
 
-// CopyBackToFront
+
 // * the object must already be locked!
 status_t
 HWInterface::CopyBackToFront(const BRect& frame)
@@ -370,7 +378,9 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 						 fCursorAreaBackup->right,
 						 fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
+			fSoftwareCursorLock.Lock();
 			_RestoreCursorArea();
+			// do not unlock the cursor lock
 			return true;
 		}
 	}
@@ -381,6 +391,7 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 void
 HWInterface::HideSoftwareCursor()
 {
+	fSoftwareCursorLock.Lock();
 	_RestoreCursorArea();
 }
 
@@ -391,6 +402,7 @@ HWInterface::ShowSoftwareCursor()
 	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden) {
 		_DrawCursor(_CursorFrame());
 	}
+	fSoftwareCursorLock.Unlock();
 }
 
 
@@ -415,7 +427,7 @@ HWInterface::RemoveListener(HWInterfaceListener* listener)
 
 // #pragma mark -
 
-// _DrawCursor
+
 // * default implementation, can be used as fallback or for
 //   software cursor
 // * area is where we potentially draw the cursor, the cursor
@@ -433,6 +445,7 @@ HWInterface::_DrawCursor(BRect area) const
 	area = backBuffer->Bounds() & area;
 
 	if (cf.IsValid() && area.Intersects(cf)) {
+
 		// clip to common area
 		area = area & cf;
 
@@ -465,7 +478,8 @@ HWInterface::_DrawCursor(BRect area) const
 
 		uint8* dst = buffer;
 
-		if (fCursorAreaBackup && fCursorAreaBackup->buffer) {
+		if (fCursorAreaBackup && fCursorAreaBackup->buffer
+			&& fSoftwareCursorLock.Lock()) {
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
 			fCursorAreaBackup->left = left;
@@ -501,6 +515,7 @@ HWInterface::_DrawCursor(BRect area) const
 				dst += width * 4;
 				bup += bupBPR;
 			}
+			fSoftwareCursorLock.Unlock();
 		} else {
 			// blending
 			for (int32 y = top; y <= bottom; y++) {
@@ -531,8 +546,7 @@ HWInterface::_DrawCursor(BRect area) const
 	}
 }
 
-// _CopyToFront
-//
+
 // * source is assumed to be already at the right offset
 // * source is assumed to be in B_RGBA32 format
 // * location in front buffer is calculated
@@ -563,8 +577,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 					dst += dstBPR;
 					src += srcBPR;
 				}
-			} else
-printf("nothing to copy\n");
+			}
 			break;
 		}
 		// NOTE: on R5, B_RGB24 bitmaps are not supported by DrawBitmap()
@@ -679,8 +692,6 @@ printf("nothing to copy\n");
 }
 
 
-// _CursorFrame
-//
 // PRE: the object must be locked
 BRect
 HWInterface::_CursorFrame() const
@@ -693,7 +704,7 @@ HWInterface::_CursorFrame() const
 	return frame;
 }
 
-// _RestoreCursorArea
+
 void
 HWInterface::_RestoreCursorArea() const
 {

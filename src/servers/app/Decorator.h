@@ -50,7 +50,9 @@ class Decorator {
 									window_look look, uint32 flags);
 	virtual						~Decorator();
 
-			void				SetDriver(DrawingEngine *driver);
+			void				SetDrawingEngine(DrawingEngine *driver);
+	inline	DrawingEngine*		GetDrawingEngine() const
+									{ return fDrawingEngine; }
 			void				SetFont(ServerFont *font);
 
 	virtual void				SetLook(DesktopSettings& settings,
@@ -68,7 +70,7 @@ class Decorator {
 
 			const char*			Title() const;
 
-			// we need to know its border(frame). WinBorder's _frame rect
+			// we need to know its border(frame). WinBorder's fFrame rect
 			// must expand to include Decorator borders. Otherwise we can't
 			// draw the border. We also add TabRect because I feel we'll need it
 			BRect				BorderRect() const;
@@ -138,19 +140,19 @@ class Decorator {
 
 	virtual	void				_SetFocus();
 
-			DrawingEngine*		_driver;
+			DrawingEngine*		fDrawingEngine;
 			DrawState			fDrawState;
 
 			window_look			fLook;
 			uint32				fFlags;
 
-			BRect				_zoomrect;
-			BRect				_closerect;
-			BRect				_minimizerect;
-			BRect				_tabrect;
-			BRect				_frame;
-			BRect				_resizerect;
-			BRect				_borderrect;
+			BRect				fZoomRect;
+			BRect				fCloseRect;
+			BRect				fMinimizeRect;
+			BRect				fTabRect;
+			BRect				fFrame;
+			BRect				fResizeRect;
+			BRect				fBorderRect;
 
  private:
 			bool				fClosePressed;

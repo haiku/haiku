@@ -84,7 +84,7 @@ Painter::Painter()
 	  fSubpixelPrecise(false),
 
 	  fPenSize(1.0),
-	  fClippingRegion(new BRegion()),
+	  fClippingRegion(NULL),
 	  fValidClipping(false),
 	  fDrawingMode(B_OP_COPY),
 	  fDrawingText(false),
@@ -96,7 +96,7 @@ Painter::Painter()
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
 	  fPatternHandler(new PatternHandler()),
-	  fTextRenderer(new AGGTextRenderer())
+	  fTextRenderer(AGGTextRenderer::Default())
 {
 	// Usually, the drawing engine will lock the font for us when
 	// needed - unfortunately, it can't know we need it here
@@ -114,9 +114,7 @@ Painter::~Painter()
 {
 	_MakeEmpty();
 
-	delete fClippingRegion;
 	delete fPatternHandler;
-	delete fTextRenderer;
 }
 
 // #pragma mark -
@@ -141,8 +139,6 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
-		// attach our clipping region to the renderer, it keeps a pointer
-		fBaseRenderer->set_clipping_region(fClippingRegion);
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
@@ -234,17 +230,14 @@ Painter::SetDrawState(const DrawState* data, bool updateFont)
 void
 Painter::ConstrainClipping(const BRegion* region)
 {
-	*fClippingRegion = *region;
-	fValidClipping = fClippingRegion->Frame().IsValid();
+	fClippingRegion = region;
+	fBaseRenderer->set_clipping_region(const_cast<BRegion*>(region));
+	fValidClipping = region->Frame().IsValid();
 
 	if (fValidClipping) {
 		clipping_rect cb = fClippingRegion->FrameInt();
 		fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 	}
-// TODO: would be nice if we didn't need to copy a region
-// for *each* drawing command...
-//fBaseRenderer->set_clipping_region(const_cast<BRegion*>(region));
-//fValidClipping = region->Frame().IsValid();
 }
 
 // SetHighColor

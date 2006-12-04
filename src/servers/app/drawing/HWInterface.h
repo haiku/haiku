@@ -16,6 +16,7 @@
 #include <Accelerant.h>
 #include <GraphicsCard.h>
 #include <List.h>
+#include <Locker.h>
 #include <OS.h>
 #include <Region.h>
 
@@ -42,10 +43,19 @@ class HWInterfaceListener {
 	virtual	void				FrameBufferChanged() = 0;
 };
 
-class HWInterface : public MultiLocker {
+class HWInterface : protected MultiLocker {
  public:
 								HWInterface(bool doubleBuffered = false);
 	virtual						~HWInterface();
+
+	// locking
+			bool				LockParallelAccess() { return ReadLock(); }
+			bool				IsParallelAccessLocked() { return IsReadLocked(); }
+			void				UnlockParallelAccess() { ReadUnlock(); }
+
+			bool				LockExclusiveAccess() { return WriteLock(); }
+			bool				IsExclusiveAccessLocked() { return IsWriteLocked(); }
+			void				UnlockExclusiveAccess() { WriteUnlock(); }
 
 	// You need to WriteLock
 	virtual	status_t			Initialize();
@@ -200,6 +210,7 @@ class HWInterface : public MultiLocker {
 			};
 
 			buffer_clip*		fCursorAreaBackup;
+	mutable	BLocker				fSoftwareCursorLock;
 
 			ServerCursor*		fCursor;
 			const ServerBitmap*	fDragBitmap;

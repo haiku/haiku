@@ -10,6 +10,7 @@ UseFreeTypeHeaders ;
 Server app_server :
 	Angle.cpp
 	AppServer.cpp
+	BitfieldRegion.cpp
 	BitmapManager.cpp
 	ClientMemoryAllocator.cpp
 	CursorData.cpp
