@@ -16,6 +16,26 @@
 
 
 bool __gR5Compatibility = false;
+addr_t __gNetworkStart;
+addr_t __gNetworkEnd;
+
+
+static void
+find_own_image()
+{
+	int32 cookie = 0;
+	image_info info;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+		if (((uint32)info.text <= (uint32)find_own_image
+			&& (uint32)info.text + (uint32)info.text_size > (uint32)find_own_image)) {
+			// found us
+			__gNetworkStart = (addr_t)min_c(info.text, info.data);
+			__gNetworkEnd = min_c((addr_t)info.text + info.text_size,
+				(addr_t)info.data + info.data_size);
+			break;
+		}
+	}
+}
 
 
 extern "C" void
@@ -55,6 +75,7 @@ initialize_before()
 
 	if (enable > 0) {
 		__gR5Compatibility = true;
+		find_own_image();
 		debug_printf("libnetwork.so running in R5 compatibility mode.\n");
 	}
 }

@@ -33,6 +33,30 @@ stack_driver_path(void)
 }
 
 
+static inline bool
+check_r5_compatibility()
+{
+	if (!__gR5Compatibility)
+		return false;
+
+#ifndef __INTEL__
+	return false;
+#else
+
+	struct stack_frame {
+		struct stack_frame*	previous;
+		addr_t				return_address;
+	};
+
+	stack_frame* frame = (stack_frame*)get_stack_frame();
+	if (frame->return_address >= __gNetworkStart && frame->return_address < __gNetworkEnd)
+		return false;
+
+	return true;
+#endif
+}
+
+
 static void
 convert_from_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 {
@@ -143,7 +167,7 @@ socket(int family, int type, int protocol)
 	if (socket < 0)
 		return -1;
 
-	if (__gR5Compatibility)
+	if (check_r5_compatibility())
 		convert_from_r5_socket(family, type, protocol);
 
 	socket_args args;
@@ -165,7 +189,7 @@ bind(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
 	struct sockaddr r5addr;
 
-	if (__gR5Compatibility) {
+	if (check_r5_compatibility()) {
 		convert_from_r5_sockaddr(&r5addr, address);
 		address = &r5addr;
 		addressLength = sizeof(struct sockaddr_in);
@@ -191,7 +215,7 @@ connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
 	struct sockaddr r5addr;
 
-	if (__gR5Compatibility) {
+	if (check_r5_compatibility()) {
 		convert_from_r5_sockaddr(&r5addr, address);
 		address = &r5addr;
 		addressLength = sizeof(struct sockaddr_in);
@@ -229,12 +253,13 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 		return -1;
 	}
 
+	bool r5compatible = check_r5_compatibility();
 	struct sockaddr r5addr;
 	accept_args args;
 
 	args.cookie = cookie;
 
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		args.address = &r5addr;
 		args.address_length = sizeof(r5addr);
 	} else {
@@ -247,7 +272,7 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 		return -1;
 	}
 
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		convert_to_r5_sockaddr(address, &r5addr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
@@ -276,6 +301,7 @@ extern "C" ssize_t
 recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *address, socklen_t *_addressLength)
 {
+	bool r5compatible = check_r5_compatibility();
 	struct sockaddr r5addr;
 
 	transfer_args args;
@@ -283,7 +309,7 @@ recvfrom(int socket, void *data, size_t length, int flags,
 	args.data_length = length;
 	args.flags = flags;
 
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		args.address = &r5addr;
 		args.address_length = sizeof(r5addr);
 	} else {
@@ -295,7 +321,7 @@ recvfrom(int socket, void *data, size_t length, int flags,
 	if (bytesReceived < 0)
 		return -1;
 
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		convert_to_r5_sockaddr(address, &r5addr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
@@ -334,7 +360,7 @@ sendto(int socket, const void *data, size_t length, int flags,
 {
 	struct sockaddr r5addr;
 
-	if (__gR5Compatibility) {
+	if (check_r5_compatibility()) {
 		convert_from_r5_sockaddr(&r5addr, address);
 		address = &r5addr;
 		addressLength = sizeof(struct sockaddr_in);
@@ -362,7 +388,7 @@ sendmsg(int socket, const struct msghdr *message, int flags)
 extern "C" int
 getsockopt(int socket, int level, int option, void *value, size_t *_length)
 {
-	if (__gR5Compatibility) {
+	if (check_r5_compatibility()) {
 		if (option == R5_SO_FIONREAD) {
 			// there is no SO_FIONREAD in our stack; we're using FIONREAD instead
 			*_length = sizeof(int);
@@ -391,7 +417,7 @@ getsockopt(int socket, int level, int option, void *value, size_t *_length)
 extern "C" int
 setsockopt(int socket, int level, int option, const void *value, size_t length)
 {
-	if (__gR5Compatibility)
+	if (check_r5_compatibility())
 		convert_from_r5_sockopt(level, option);
 
 	sockopt_args args;
@@ -407,10 +433,11 @@ setsockopt(int socket, int level, int option, const void *value, size_t length)
 extern "C" int
 getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
+	bool r5compatible = check_r5_compatibility();
 	struct sockaddr r5addr;
 
 	sockaddr_args args;
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		args.address = &r5addr;
 		args.address_length = sizeof(r5addr);
 	} else {
@@ -421,7 +448,7 @@ getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 	if (ioctl(socket, NET_STACK_GETPEERNAME, &args, sizeof(args)) < 0)
 		return -1;
 
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		convert_to_r5_sockaddr(address, &r5addr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
@@ -435,10 +462,11 @@ getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 extern "C" int
 getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
+	bool r5compatible = check_r5_compatibility();
 	struct sockaddr r5addr;
 
 	sockaddr_args args;
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		args.address = &r5addr;
 		args.address_length = sizeof(r5addr);
 	} else {
@@ -449,7 +477,7 @@ getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength)
 	if (ioctl(socket, NET_STACK_GETSOCKNAME, &args, sizeof(args)) < 0)
 		return -1;
 
-	if (__gR5Compatibility) {
+	if (r5compatible) {
 		convert_to_r5_sockaddr(address, &r5addr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
