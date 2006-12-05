@@ -20,7 +20,7 @@
 #include <sys/uio.h>
 
 
-#define TRACE_BUFFER
+//#define TRACE_BUFFER
 #ifdef TRACE_BUFFER
 #	define TRACE(x) dprintf x
 #else

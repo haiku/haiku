@@ -453,6 +453,7 @@ FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
 //	#pragma mark -
 
 
+#if 0
 static void
 dump_ipv4_header(ipv4_header &header)
 {
@@ -487,6 +488,7 @@ dump_ipv4_header(ipv4_header &header)
 	dprintf("  source: %d.%d.%d.%d\n", src->a, src->b, src->c, src->d);
 	dprintf("  destination: %d.%d.%d.%d\n", dst->a, dst->b, dst->c, dst->d);
 }
+#endif
 
 
 /*!
@@ -886,7 +888,7 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		header.destination = ((sockaddr_in *)&buffer->destination)->sin_addr.s_addr;
 
 		header.checksum = gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
-		dump_ipv4_header(header);
+		//dump_ipv4_header(header);
 
 		bufferHeader.Detach();
 			// make sure the IP-header is already written to the buffer at this point
@@ -996,7 +998,7 @@ ipv4_receive_data(net_buffer *buffer)
 
 	ipv4_header &header = bufferHeader.Data();
 	bufferHeader.Detach();
-	dump_ipv4_header(header);
+	//dump_ipv4_header(header);
 
 	if (header.version != IP_VERSION)
 		return B_BAD_TYPE;
