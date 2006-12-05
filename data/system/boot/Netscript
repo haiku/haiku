@@ -1,9 +1,6 @@
-# This loads the net_stack_driver that loads and provides the interface to the networking core.
-#ls /dev/net
-
 # That is a static version of the network interface setup.
 # You have to edit it to match your driver/ip/subnet.
-#ifconfig rtl81690 192.168.0.10 up netmask 255.255.255.0
+#ifconfig /dev/net/ipro1000/0 192.168.0.10 up
 
 # This adds the default gateway. Edit it for your needs
-#route add default 192.168.0.1
+#route add /dev/net/ipro1000/0 default gw 192.168.0.1
