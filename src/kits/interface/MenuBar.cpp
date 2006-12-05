@@ -382,13 +382,16 @@ BMenuBar::TrackTask(void *arg)
 	receive_data(&id, &data, sizeof(data));
 	
 	BMenuBar *menuBar = data.menuBar;
+	if (data.useRect)	
+		menuBar->fExtraRect = &data.rect;	
 	menuBar->SetStickyMode(data.sticky);
 	
 	int32 action;
 	menuBar->Track(&action, data.menuIndex, data.showMenu);
 	
 	menuBar->fTracking = false;
-	
+	menuBar->fExtraRect = NULL;
+
 	// Sends a _MENUS_DONE_ message to the BWindow.
 	// Weird: There is a _MENUS_DONE_ message but not a 
 	// _MENUS_BEGINNING_ message, in fact the MenusBeginning()
@@ -399,7 +402,7 @@ BMenuBar::TrackTask(void *arg)
 	_set_menu_sem_(window, B_BAD_SEM_ID);
 	delete_sem(menuBar->fMenuSem);
 	menuBar->fMenuSem = B_BAD_SEM_ID;
-		
+	
 	return 0;
 }
 
