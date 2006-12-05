@@ -24,6 +24,7 @@
 
 
 void socket_delete(net_socket *socket);
+int socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength);
 
 
 static status_t
@@ -128,8 +129,10 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount, size_t *_l
 		return ECONNRESET;
 
 	if (socket->address.ss_len == 0) {
-		// TODO: bind?!
-		return ENETUNREACH;
+		// try to bind first
+		status_t status = socket_bind(socket, NULL, 0);
+		if (status < B_OK)
+			return status;
 	}
 
 	// TODO: useful, maybe even computed header space!
@@ -147,15 +150,18 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount, size_t *_l
 		}
 	}
 
-	//buffer->source = (sockaddr *)&socket->address;
-	//buffer->destination = (sockaddr *)&socket->peer;
 	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
 	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
+	size_t size = buffer->size;
 
 	ssize_t bytesWritten = socket->first_info->send_data(socket->first_protocol,
 		buffer);
 	if (bytesWritten < B_OK) {
-		*_length = 0;
+		if (buffer->size != size) {
+			// this appears to be a partial write
+			*_length = size - buffer->size;
+		}
+		gNetBufferModule.free(buffer);
 		return bytesWritten;
 	}
 
@@ -704,14 +710,20 @@ socket_send(net_socket *socket, const void *data, size_t length, int flags)
 	}
 
 	buffer->flags = flags;
-	//buffer->source = (sockaddr *)&socket->address;
-	//buffer->destination = (sockaddr *)&socket->peer;
 	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
 	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
 
-	status_t status = socket->first_info->send_data(socket->first_protocol, buffer);
+	status_t status = socket->first_info->send_data(socket->first_protocol,
+		buffer);
 	if (status < B_OK) {
+		size_t size = buffer->size;
 		gNetBufferModule.free(buffer);
+
+		if (size != length && (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
+			// this appears to be a partial write
+			return length - size;
+		}
+
 		return status;
 	}
 
@@ -759,9 +771,16 @@ socket_sendto(net_socket *socket, const void *data, size_t length, int flags,
 	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
 	memcpy(&buffer->destination, address, addressLength);
 
-	status_t status = socket->first_info->send_data(socket->first_protocol, buffer);
+	status_t status = socket->first_info->send_data(socket->first_protocol,
+		buffer);
 	if (status < B_OK) {
+		size_t size = buffer->size;
 		gNetBufferModule.free(buffer);
+
+		if (size != length && (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
+			// this appears to be a partial write
+			return length - size;
+		}
 		return status;
 	}
 
