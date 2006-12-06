@@ -859,7 +859,7 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	TRACE(("someone tries to send some actual routed data!\n"));
 
 	sockaddr_in &source = *(sockaddr_in *)&buffer->source;
-	if (source.sin_addr.s_addr == INADDR_ANY) {
+	if (source.sin_addr.s_addr == INADDR_ANY && route->interface->address != NULL) {
 		// replace an unbound source address with the address of the interface
 		// TODO: couldn't we replace all addresses here?
 		source.sin_addr.s_addr = ((sockaddr_in *)route->interface->address)->sin_addr.s_addr;
@@ -883,8 +883,12 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		header.time_to_live = 254;
 		header.protocol = protocol ? protocol->socket->protocol : buffer->protocol;
 		header.checksum = 0;
-		header.source = ((sockaddr_in *)route->interface->address)->sin_addr.s_addr;
-			// always use the actual used source address
+		if (route->interface->address != NULL) {
+			header.source = ((sockaddr_in *)route->interface->address)->sin_addr.s_addr;
+				// always use the actual used source address
+		} else
+			header.source = 0;
+
 		header.destination = ((sockaddr_in *)&buffer->destination)->sin_addr.s_addr;
 
 		header.checksum = gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
