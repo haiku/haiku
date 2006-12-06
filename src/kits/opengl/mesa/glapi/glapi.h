@@ -117,7 +117,7 @@ extern GLint
 _glapi_get_proc_offset(const char *funcName);
 
 
-extern const _glapi_proc
+extern _glapi_proc
 _glapi_get_proc_address(const char *funcName);
 
 

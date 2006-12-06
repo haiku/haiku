@@ -837,7 +837,7 @@ _glapi_get_proc_offset(const char *funcName)
  * in the name of static functions, try generating a new API entrypoint on
  * the fly with assembly language.
  */
-PUBLIC const _glapi_proc
+PUBLIC _glapi_proc
 _glapi_get_proc_address(const char *funcName)
 {
    GLuint i;
