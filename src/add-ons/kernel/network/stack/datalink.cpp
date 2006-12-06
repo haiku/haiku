@@ -379,7 +379,7 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 
 
 bool
-is_local_address(net_domain *_domain, const struct sockaddr *address, 
+datalink_is_local_address(net_domain *_domain, const struct sockaddr *address, 
 	net_interface **_interface, uint32 *_matchedType)
 {
 	net_domain_private *domain = (net_domain_private *)_domain;
@@ -723,8 +723,7 @@ net_datalink_module_info gNetDatalinkModule = {
 
 	datalink_control,
 	datalink_send_data,
-	
-	is_local_address,
+	datalink_is_local_address,
 
 	add_route,
 	remove_route,

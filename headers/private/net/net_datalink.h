@@ -69,8 +69,8 @@ struct net_datalink_module_info {
 
 	bool (*is_local_address)(struct net_domain *domain, 
 					const struct sockaddr *address,
-					net_interface **_interface /* = NULL */, 
-					uint32 *_matchedType /* = NULL*/);
+					net_interface **_interface, 
+					uint32 *_matchedType);
 
 	// routes
 	status_t (*add_route)(struct net_domain *domain,
