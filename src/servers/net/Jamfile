@@ -11,11 +11,14 @@ AddResources net_server : net_server.rdef ;
 Server net_server :
 	NetServer.cpp
 	Settings.cpp
+	AutoconfigLooper.cpp
+	DHCPClient.cpp
 ;
 
 LinkAgainst net_server : 
 	be
 	libnetwork.so
+	$(TARGET_LIBSTDC++)
 
 	# for PPP
 	#libppp.a

@@ -7,6 +7,8 @@
  */
 
 
+#include "AutoconfigLooper.h"
+#include "NetServer.h"
 #include "Settings.h"
 
 #include <Alert.h>
@@ -18,18 +20,22 @@
 #include <TextView.h>
 
 #include <arpa/inet.h>
-#include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/sockio.h>
 
+#include <map>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <unistd.h>
+
+
+typedef std::map<std::string, BLooper*> LooperMap;
 
 
 class NetServer : public BApplication {
@@ -41,15 +47,17 @@ class NetServer : public BApplication {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
-		bool _PrepareRequest(ifreq& request, const char* name);
 		bool _TestForInterface(int socket, const char* name);
 		status_t _ConfigureInterface(int socket, BMessage& interface);
+		bool _QuitLooperForDevice(const char* device);
+		BLooper* _LooperForDevice(const char* device);
 		status_t _ConfigureDevice(int socket, const char* path);
 		void _ConfigureDevices(int socket, const char* path);
 		void _ConfigureInterfaces(int socket);
 		void _BringUpInterfaces();
 
 		Settings	fSettings;
+		LooperMap	fDeviceMap;
 };
 
 
@@ -125,6 +133,51 @@ parse_address(int32 familyIndex, const char* argument, struct sockaddr& address)
 }
 
 
+bool
+prepare_request(ifreq& request, const char* name)
+{
+	if (strlen(name) > IF_NAMESIZE)
+		return false;
+
+	strcpy(request.ifr_name, name);
+	return true;
+}
+
+
+status_t
+get_mac_address(const char* device, uint8* address)
+{
+	int socket = ::socket(AF_LINK, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	ifreq request;
+	if (!prepare_request(request, device)) {
+		close(socket);
+		return B_ERROR;
+	}
+
+	if (ioctl(socket, SIOCGIFADDR, &request, sizeof(struct ifreq)) < 0) {
+		close(socket);
+		return errno;
+	}
+
+	close(socket);
+
+	sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
+	if (link.sdl_type != IFT_ETHER)
+		return B_BAD_TYPE;
+
+	if (link.sdl_alen == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	uint8 *mac = (uint8 *)LLADDR(&link);
+	memcpy(address, mac, 6);
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -181,23 +234,27 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgConfigureInterface:
+		{
+			if (!message->ReturnAddress().IsTargetLocal()) {
+				// for now, we only accept this message from add-ons
+				break;
+			}
+
+			// we need a socket to talk to the networking stack
+			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+			if (socket < 0)
+				break;
+
+			_ConfigureInterface(socket, *message);
+			close(socket);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			return;
 	}
-}
-
-
-bool
-NetServer::_PrepareRequest(ifreq& request, const char* name)
-{
-	if (strlen(name) > IF_NAMESIZE) {
-		fprintf(stderr, "%s: interface name \"%s\" is too long.\n", Name(), name);
-		return false;
-	}
-
-	strcpy(request.ifr_name, name);
-	return true;
 }
 
 
@@ -254,7 +311,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 		return B_BAD_VALUE;
 
 	ifreq request;
-	if (!_PrepareRequest(request, device))
+	if (!prepare_request(request, device))
 		return B_ERROR;
 
 	int32 flags;
@@ -458,20 +515,70 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 }
 
 
+bool
+NetServer::_QuitLooperForDevice(const char* device)
+{
+	LooperMap::iterator iterator = fDeviceMap.find(device);
+	if (iterator == fDeviceMap.end())
+		return false;
+
+	// there is a looper for this device - quit it
+	iterator->second->Lock();
+	iterator->second->Quit();
+
+	fDeviceMap.erase(iterator);
+	return true;
+}
+
+
+BLooper*
+NetServer::_LooperForDevice(const char* device)
+{
+	LooperMap::const_iterator iterator = fDeviceMap.find(device);
+	if (iterator == fDeviceMap.end())
+		return NULL;
+
+	return iterator->second;
+}
+
+
 status_t
 NetServer::_ConfigureDevice(int socket, const char* path)
 {
+	_QuitLooperForDevice(path);
+
+	// bring interface up, but don't configure it just yet
 	BMessage interface;
 	interface.AddString("device", path);
-
-	// TODO: enable DHCP instead
 	BMessage address;
 	address.AddString("family", "inet");
-	address.AddString("address", "192.168.0.56");
-	address.AddString("gateway", "192.168.0.254");
 	interface.AddMessage("address", &address);
 
-	return _ConfigureInterface(socket, interface);
+	status_t status = _ConfigureInterface(socket, interface);
+	if (status < B_OK)
+		return status;
+
+	// add a default route to make the interface accessible, even without an address
+	route_entry route;
+	memset(&route, 0, sizeof(route_entry));
+	route.flags = RTF_STATIC | RTF_DEFAULT;
+
+	ifreq request;
+	if (!prepare_request(request, path))
+		return B_ERROR;
+
+	request.ifr_route = route;
+	if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
+		fprintf(stderr, "%s: Could not add route for %s: %s\n",
+			Name(), path, strerror(errno));
+	}
+
+	AutoconfigLooper* looper = new AutoconfigLooper(this, path);
+	looper->Run();
+
+	fDeviceMap[path] = looper;
+
+	return B_OK;
 }
 
 
