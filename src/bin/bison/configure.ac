@@ -1,6 +1,7 @@
 # Configure template for GNU Bison.                   -*-Autoconf-*-
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+# Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@
 # least Autoconf 2.59.
 AC_PREREQ(2.59)
 
-AC_INIT([GNU Bison], [2.1], [bug-bison@gnu.org])
+AC_INIT([GNU Bison], [2.3], [bug-bison@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -58,11 +59,12 @@ if test "${enableval}" = yes; then
   BISON_WARNING(-Wbad-function-cast)
   BISON_WARNING(-Wmissing-declarations)
   BISON_WARNING(-Wmissing-prototypes)
-  BISON_WARNING(-Wnested-externs)
   BISON_WARNING(-Wshadow)
   BISON_WARNING(-Wstrict-prototypes)
   AC_DEFINE([lint], 1, [Define to 1 if the compiler is checking for lint.])
 fi
+
+BISON_TEST_FOR_WORKING_C_COMPILER
 
 AC_ARG_ENABLE([yacc],
   [AC_HELP_STRING([--disable-yacc],
@@ -133,7 +135,7 @@ O0CXXFLAGS=`echo $CXXFLAGS | sed 's/-O[[0-9]] *//'`
 AC_SUBST([O0CXXFLAGS])
 
 AC_CONFIG_FILES([Makefile
-                 config/Makefile
+                 build-aux/Makefile
                  po/Makefile.in
                  data/Makefile
 		 examples/Makefile

@@ -26,6 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  
 #include "obstack.h"
 #include <stdio.h>
 
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
+#endif
+
 /* Attributes used to select a bitset implementation.  */
 enum bitset_attr {BITSET_FIXED = 1,    /* Bitset size fixed.  */
 		  BITSET_VARIABLE = 2, /* Bitset size variable.  */

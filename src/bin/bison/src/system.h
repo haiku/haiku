@@ -1,7 +1,7 @@
 /* System-dependent definitions for Bison.
 
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software
-   Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,18 +20,28 @@
 #ifndef BISON_SYSTEM_H
 #define BISON_SYSTEM_H
 
-#if HAVE_CONFIG_H
-# include <config.h>
+/* flex 2.5.31 gratutiously defines macros like INT8_MIN.  But this
+   runs afoul of pre-C99 compilers that have <inttypes.h> or
+   <stdint.h>, which are included below if available.  It also runs
+   afoul of pre-C99 compilers that define these macros in <limits.h>.  */
+#if ! defined __STDC_VERSION__ || __STDC_VERSION__ < 199901
+# undef INT8_MIN
+# undef INT16_MIN
+# undef INT32_MIN
+# undef INT8_MAX
+# undef INT16_MAX
+# undef UINT8_MAX
+# undef INT32_MAX
+# undef UINT16_MAX
+# undef UINT32_MAX
 #endif
 
 #include <limits.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Verify a requirement at compile-time (unlike assert, which is runtime).  */
-#define verify(name, assertion) struct name {char name[(assertion) ? 1 : -1];}
+#include "unlocked-io.h"
 
 #if HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -54,6 +64,7 @@
 typedef size_t uintptr_t;
 #endif
 
+#include <verify.h>
 #include <xalloc.h>
 
 
@@ -62,6 +73,9 @@ typedef size_t uintptr_t;
 `---------------------*/
 
 #include <stpcpy.h>
+
+/* From lib/basename.c. */
+char *base_name (char const *name);
 
 
 /*-----------------.
@@ -78,8 +92,8 @@ typedef size_t uintptr_t;
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
-# if !defined (__GNUC__) || __GNUC__ < 2 || \
-(__GNUC__ == 2 && __GNUC_MINOR__ < 5) || __STRICT_ANSI__
+# if (! defined __GNUC__ || __GNUC__ < 2 \
+      || (__GNUC__ == 2 && __GNUC_MINOR__ < 5) || __STRICT_ANSI__)
 #  define __attribute__(Spec) /* empty */
 # endif
 #endif
@@ -198,6 +212,11 @@ do {						\
       free (_node);				\
     }						\
 } while (0)
+
+
+/* Assertions.  <assert.h>'s assertions are too heavyweight, and can
+   be disabled too easily, so implement it separately here.  */
+#define assert(x) ((void) ((x) || (abort (), 0)))
 
 
 /*---------------------------------------------.

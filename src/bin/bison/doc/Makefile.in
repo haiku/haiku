@@ -40,8 +40,8 @@ DIST_COMMON = $(bison_TEXINFOS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/stamp-vti \
 	$(srcdir)/version.texi
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
-	$(top_srcdir)/m4/bison-i18n.m4 $(top_srcdir)/m4/cxx.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/bison-i18n.m4 \
+	$(top_srcdir)/m4/c-working.m4 $(top_srcdir)/m4/cxx.m4 \
 	$(top_srcdir)/m4/dirname.m4 $(top_srcdir)/m4/dmalloc.m4 \
 	$(top_srcdir)/m4/dos.m4 $(top_srcdir)/m4/error.m4 \
 	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
@@ -58,11 +58,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/quote.m4 $(top_srcdir)/m4/quotearg.m4 \
 	$(top_srcdir)/m4/stdbool.m4 $(top_srcdir)/m4/stdint_h_gl.m4 \
 	$(top_srcdir)/m4/stdio-safer.m4 $(top_srcdir)/m4/stpcpy.m4 \
-	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strndup.m4 \
-	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/subpipe.m4 \
+	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strerror.m4 \
+	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
+	$(top_srcdir)/m4/strtol.m4 $(top_srcdir)/m4/strtoul.m4 \
+	$(top_srcdir)/m4/strverscmp.m4 $(top_srcdir)/m4/subpipe.m4 \
 	$(top_srcdir)/m4/timevar.m4 $(top_srcdir)/m4/uintmax_t_gl.m4 \
 	$(top_srcdir)/m4/ulonglong_gl.m4 \
-	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/warning.m4 \
+	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/m4/warning.m4 \
 	$(top_srcdir)/m4/xalloc.m4 $(top_srcdir)/m4/xstrndup.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -91,8 +94,6 @@ NROFF = nroff
 MANS = $(man_MANS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-ALLOCA = @ALLOCA@
-ALLOCA_H = @ALLOCA_H@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -102,6 +103,8 @@ AUTOM4TE = @AUTOM4TE@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BISON_CXX_WORKS = @BISON_CXX_WORKS@
+BISON_CXX_WORKS_FALSE = @BISON_CXX_WORKS_FALSE@
+BISON_CXX_WORKS_TRUE = @BISON_CXX_WORKS_TRUE@
 BISON_LOCALEDIR = @BISON_LOCALEDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -161,6 +164,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STDBOOL_H = @STDBOOL_H@
 STRIP = @STRIP@
+UNISTD_H = @UNISTD_H@
 USE_NLS = @USE_NLS@
 VALGRIND = @VALGRIND@
 VERSION = @VERSION@
@@ -217,7 +221,7 @@ AM_MAKEINFOFLAGS = --no-split
 info_TEXINFOS = bison.texinfo
 man_MANS = bison.1
 bison_TEXINFOS = gpl.texi fdl.texi
-EXTRA_DIST = FAQ bison.1 refcard.tex
+EXTRA_DIST = bison.1 refcard.tex
 CLEANFILES = refcard.dvi refcard.log refcard.ps bison.fns
 all: all-am
 

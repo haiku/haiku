@@ -14,8 +14,6 @@
 
 @SET_MAKE@
 
-# This file is generated automatically by "bootstrap".
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -39,17 +37,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/gnulib.mk alloca.c dirname.c dirname.h dup-safer.c \
-	error.c error.h exitfail.c exitfail.h fd-safer.c fopen-safer.c \
+	$(srcdir)/gnulib.mk dirname.c dirname.h dup-safer.c error.c \
+	error.h exitfail.c exitfail.h fd-safer.c fopen-safer.c \
 	getopt.c getopt1.c hard-locale.c hard-locale.h hash.c hash.h \
 	malloc.c obstack.c obstack.h pipe-safer.c quote.c quote.h \
 	quotearg.c quotearg.h stdio--.h stdio-safer.h stpcpy.c \
-	strdup.c strdup.h strndup.c strndup.h strnlen.c strnlen.h \
-	unistd--.h unistd-safer.h xalloc.h xmalloc.c
+	strdup.c strdup.h strerror.c strndup.c strndup.h strnlen.c \
+	strnlen.h strtol.c strtoul.c strverscmp.c strverscmp.h \
+	unistd--.h unistd-safer.h unlocked-io.h xalloc.h xmalloc.c
 subdir = lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
-	$(top_srcdir)/m4/bison-i18n.m4 $(top_srcdir)/m4/cxx.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/bison-i18n.m4 \
+	$(top_srcdir)/m4/c-working.m4 $(top_srcdir)/m4/cxx.m4 \
 	$(top_srcdir)/m4/dirname.m4 $(top_srcdir)/m4/dmalloc.m4 \
 	$(top_srcdir)/m4/dos.m4 $(top_srcdir)/m4/error.m4 \
 	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
@@ -66,11 +65,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/quote.m4 $(top_srcdir)/m4/quotearg.m4 \
 	$(top_srcdir)/m4/stdbool.m4 $(top_srcdir)/m4/stdint_h_gl.m4 \
 	$(top_srcdir)/m4/stdio-safer.m4 $(top_srcdir)/m4/stpcpy.m4 \
-	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strndup.m4 \
-	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/subpipe.m4 \
+	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strerror.m4 \
+	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
+	$(top_srcdir)/m4/strtol.m4 $(top_srcdir)/m4/strtoul.m4 \
+	$(top_srcdir)/m4/strverscmp.m4 $(top_srcdir)/m4/subpipe.m4 \
 	$(top_srcdir)/m4/timevar.m4 $(top_srcdir)/m4/uintmax_t_gl.m4 \
 	$(top_srcdir)/m4/ulonglong_gl.m4 \
-	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/warning.m4 \
+	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/m4/warning.m4 \
 	$(top_srcdir)/m4/xalloc.m4 $(top_srcdir)/m4/xstrndup.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -91,7 +93,6 @@ AR = ar
 ARFLAGS = cru
 libbison_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 = @LIBOBJS@
-am__DEPENDENCIES_2 = @ALLOCA@
 am__objects_1 = abitset.$(OBJEXT) bitset.$(OBJEXT) \
 	bitset_stats.$(OBJEXT) bitsetv.$(OBJEXT) ebitset.$(OBJEXT) \
 	lbitset.$(OBJEXT) vbitset.$(OBJEXT)
@@ -120,8 +121,6 @@ ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-ALLOCA = @ALLOCA@
-ALLOCA_H = @ALLOCA_H@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -131,6 +130,8 @@ AUTOM4TE = @AUTOM4TE@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BISON_CXX_WORKS = @BISON_CXX_WORKS@
+BISON_CXX_WORKS_FALSE = @BISON_CXX_WORKS_FALSE@
+BISON_CXX_WORKS_TRUE = @BISON_CXX_WORKS_TRUE@
 BISON_LOCALEDIR = @BISON_LOCALEDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -190,6 +191,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STDBOOL_H = @STDBOOL_H@
 STRIP = @STRIP@
+UNISTD_H = @UNISTD_H@
 USE_NLS = @USE_NLS@
 VALGRIND = @VALGRIND@
 VERSION = @VERSION@
@@ -243,20 +245,31 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CFLAGS = $(WARNING_CFLAGS)
-BUILT_SOURCES = $(ALLOCA_H) $(GETOPT_H) $(STDBOOL_H)
-EXTRA_DIST = alloca_.h getopt_.h getopt_int.h stdbool_.h
-MOSTLYCLEANFILES = alloca.h alloca.h-t getopt.h getopt.h-t stdbool.h \
-	stdbool.h-t
+BUILT_SOURCES = $(GETOPT_H) $(STDBOOL_H) $(UNISTD_H)
+EXTRA_DIST = getopt_.h getopt_int.h stdbool_.h
+MOSTLYCLEANFILES = getopt.h getopt.h-t stdbool.h stdbool.h-t unistd.h
 lib_LIBRARIES = $(YACC_LIBRARY)
 EXTRA_LIBRARIES = liby.a
 noinst_LIBRARIES = libbison.a
 liby_a_SOURCES = main.c yyerror.c
 libbison_a_SOURCES = $(lib_SOURCES)
+
+# This file is generated automatically by "bootstrap".
+
+# This is for those projects which use "gettextize --intl" to put a source-code
+# copy of libintl into their package. In such projects, every Makefile.am needs
+# -I$(top_builddir)/intl, so that <libintl.h> can be found in this directory.
+# For the Makefile.ams in other directories it is the maintainer's
+# responsibility; for the one from gnulib we do it here.
+# This option has no effect when the user disables NLS (because then the intl
+# directory contains no libintl.h file) or when the project does not use
+# "gettextize --intl".
+# (commented out by bootstrap) AM_CPPFLAGS += -I$(top_builddir)/intl
 lib_SOURCES = get-errno.h get-errno.c subpipe.h subpipe.c \
 	$(bitsets_sources) $(additional_bitsets_sources) \
 	$(timevars_sources) argmatch.h argmatch.c basename.c \
 	stripslash.c exit.h gettext.h mbswidth.h mbswidth.c stpcpy.h \
-	xalloc-die.c xstrndup.h xstrndup.c
+	verify.h xalloc-die.c xstrndup.h xstrndup.c
 
 # Implementation of bitsets
 bitsets_sources = \
@@ -357,7 +370,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/alloca.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dirname.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dup-safer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/error.Po@am__quote@
@@ -375,8 +387,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/quotearg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/stpcpy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strdup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strerror.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strndup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strnlen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strtol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strtoul.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strverscmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/xmalloc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abitset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/argmatch.Po@am__quote@
@@ -586,12 +602,6 @@ uninstall-am: uninstall-info-am uninstall-libLIBRARIES
 	uninstall-libLIBRARIES
 
 
-# We need the following in order to create <alloca.h> when the system
-# doesn't have one that works with the given compiler.
-alloca.h: alloca_.h
-	cp $(srcdir)/alloca_.h $@-t
-	mv $@-t $@
-
 # We need the following in order to create <getopt.h> when the system
 # doesn't have one that works with the given compiler.
 getopt.h: getopt_.h
@@ -603,6 +613,11 @@ getopt.h: getopt_.h
 stdbool.h: stdbool_.h
 	sed -e 's/@''HAVE__BOOL''@/$(HAVE__BOOL)/g' < $(srcdir)/stdbool_.h > $@-t
 	mv $@-t $@
+
+# We need the following in order to create an empty placeholder for
+# <unistd.h> when the system doesn't have one.
+unistd.h:
+	echo '/* Empty placeholder for $@.  */' >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

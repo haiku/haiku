@@ -24,28 +24,28 @@
 # include "uniqstr.h"
 
 /* File name specified with -o for the output file, or 0 if no -o.  */
-extern char *spec_outfile;
+extern char const *spec_outfile;
 
 /* File name for the parser (i.e., the one above, or its default.) */
-extern char *parser_file_name;
+extern char const *parser_file_name;
 
 /* Symbol prefix specified with -p, or 0 if no -p.  */
 extern const char *spec_name_prefix;
 
 /* File name prefix specified with -b, or 0 if no -b.  */
-extern char *spec_file_prefix;
+extern char const *spec_file_prefix;
 
 /* --verbose. */
-extern char *spec_verbose_file;
+extern char const *spec_verbose_file;
 
 /* File name specified for the output VCG graph.  */
-extern char *spec_graph_file;
+extern char const *spec_graph_file;
 
 /* File name specified with --defines.  */
-extern char *spec_defines_file;
+extern char const *spec_defines_file;
 
-/* Read grammar specifications. */
-extern FILE *finput;
+/* Directory prefix of output file names.  */
+extern char const *dir_prefix;
 
 
 /* If semantic parser, output a .h file that defines YYSTYPE... */
@@ -64,8 +64,5 @@ void compute_output_file_names (void);
 
 FILE *xfopen (const char *name, const char *mode);
 void xfclose (FILE *ptr);
-
-/* Prefix used to generate output file names.  */
-extern char *short_base_name;
 
 #endif /* !FILES_H_ */

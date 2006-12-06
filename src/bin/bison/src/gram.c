@@ -1,7 +1,7 @@
 /* Allocate input grammar variables for Bison.
 
-   Copyright (C) 1984, 1986, 1989, 2001, 2002, 2003 Free Software
-   Foundation, Inc.
+   Copyright (C) 1984, 1986, 1989, 2001, 2002, 2003, 2005, 2006 Free
+   Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -20,7 +20,7 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-
+#include <config.h>
 #include "system.h"
 
 #include <quotearg.h>
@@ -65,7 +65,7 @@ rule_useful_p (rule *r)
 bool
 rule_useless_p (rule *r)
 {
-  return r->number >= nrules;
+  return !rule_useful_p (r);
 }
 
 
@@ -77,7 +77,7 @@ rule_useless_p (rule *r)
 bool
 rule_never_reduced_p (rule *r)
 {
-  return !r->useful && r->number < nrules;
+  return !r->useful && rule_useful_p (r);
 }
 
 
@@ -317,8 +317,7 @@ grammar_rules_never_reduced_report (const char *message)
     if (!rules[r].useful)
       {
 	location_print (stderr, rules[r].location);
-	fprintf (stderr, ": %s: %s: ",
-		 _("warning"), message);
+	fprintf (stderr, ": %s: %s: ", _("warning"), message);
 	rule_print (&rules[r], stderr);
       }
 }
@@ -326,7 +325,8 @@ grammar_rules_never_reduced_report (const char *message)
 void
 grammar_free (void)
 {
-  free (ritem);
+  if (ritem)
+    free (ritem - 1);
   free (rules);
   free (token_translations);
   /* Free the symbol table data structure.  */

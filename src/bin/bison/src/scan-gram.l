@@ -1,6 +1,6 @@
 /* Bison Grammar Scanner                             -*- C -*-
 
-   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -24,10 +24,14 @@
 %option prefix="gram_"
 
 %{
+/* Work around a bug in flex 2.5.31.  See Debian bug 333231
+   <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333231>.  */
+#undef gram_wrap
+#define gram_wrap() 1
+
 #include "system.h"
 
 #include <mbswidth.h>
-#include <get-errno.h>
 #include <quote.h>
 
 #include "complain.h"
@@ -83,8 +87,11 @@ static size_t no_cr_read (FILE *, char *, size_t);
 static struct obstack obstack_for_string;
 
 /* A string representing the most recently saved token.  */
-static char *last_string;
+char *last_string;
 
+/* The location of the most recently saved token, if it was a
+   BRACED_CODE token; otherwise, this has an unspecified value.  */
+location last_braced_code_loc;
 
 #define STRING_GROW   \
   obstack_grow (&obstack_for_string, yytext, yyleng)
@@ -112,9 +119,23 @@ scanner_last_string_free (void)
    Outside of well-formed rules, RULE_LENGTH has an undefined value.  */
 static int rule_length;
 
+static void rule_length_overflow (location) __attribute__ ((__noreturn__));
+
+/* Increment the rule length by one, checking for overflow.  */
+static inline void
+increment_rule_length (location loc)
+{
+  rule_length++;
+
+  /* Don't allow rule_length == INT_MAX, since that might cause
+     confusion with strtol if INT_MAX == LONG_MAX.  */
+  if (rule_length == INT_MAX)
+    rule_length_overflow (loc);
+}
+
 static void handle_dollar (int token_type, char *cp, location loc);
 static void handle_at (int token_type, char *cp, location loc);
-static void handle_syncline (char *args);
+static void handle_syncline (char *, location);
 static unsigned long int scan_integer (char const *p, int base, location loc);
 static int convert_ucn_to_byte (char const *hex_text);
 static void unexpected_eof (boundary, char const *);
@@ -185,7 +206,7 @@ splice	 (\\[ \f\t\v]*\n)*
   /* #line directives are not documented, and may be withdrawn or
      modified in future versions of Bison.  */
   ^"#line "{int}" \"".*"\"\n" {
-    handle_syncline (yytext + sizeof "#line " - 1);
+    handle_syncline (yytext + sizeof "#line " - 1, *loc);
   }
 }
 
@@ -224,6 +245,7 @@ splice	 (\\[ \f\t\v]*\n)*
   "%prec"                 rule_length--; return PERCENT_PREC;
   "%printer"              token_type = PERCENT_PRINTER; BEGIN SC_PRE_CODE;
   "%pure"[-_]"parser"     return PERCENT_PURE_PARSER;
+  "%require"              return PERCENT_REQUIRE;
   "%right"                return PERCENT_RIGHT;
   "%skeleton"             return PERCENT_SKELETON;
   "%start"                return PERCENT_START;
@@ -246,7 +268,7 @@ splice	 (\\[ \f\t\v]*\n)*
   {id} {
     val->symbol = symbol_get (yytext, *loc);
     id_loc = *loc;
-    rule_length++;
+    increment_rule_length (*loc);
     BEGIN SC_AFTER_IDENTIFIER;
   }
 
@@ -270,6 +292,8 @@ splice	 (\\[ \f\t\v]*\n)*
 
   /* Code in between braces.  */
   "{" {
+    if (current_rule && current_rule->action)
+      grammar_midrule_action ();
     STRING_GROW;
     token_type = BRACED_CODE;
     braces_level = 0;
@@ -377,7 +401,7 @@ splice	 (\\[ \f\t\v]*\n)*
     STRING_FINISH;
     loc->start = token_start;
     val->chars = last_string;
-    rule_length++;
+    increment_rule_length (*loc);
     BEGIN INITIAL;
     return STRING;
   }
@@ -400,11 +424,11 @@ splice	 (\\[ \f\t\v]*\n)*
     val->symbol = symbol_get (quotearg_style (escape_quoting_style,
 					      last_string),
 			      *loc);
-    symbol_class_set (val->symbol, token_sym, *loc);
+    symbol_class_set (val->symbol, token_sym, *loc, false);
     last_string_1 = last_string[1];
     symbol_user_token_number_set (val->symbol, last_string_1, *loc);
     STRING_FREE;
-    rule_length++;
+    increment_rule_length (*loc);
     BEGIN INITIAL;
     return ID;
   }
@@ -425,7 +449,7 @@ splice	 (\\[ \f\t\v]*\n)*
 <SC_ESCAPED_STRING,SC_ESCAPED_CHARACTER>
 {
   \\[0-7]{1,3} {
-    unsigned long int c = strtoul (yytext + 1, 0, 8);
+    unsigned long int c = strtoul (yytext + 1, NULL, 8);
     if (UCHAR_MAX < c)
       complain_at (*loc, _("invalid escape sequence: %s"), quote (yytext));
     else if (! c)
@@ -435,10 +459,9 @@ splice	 (\\[ \f\t\v]*\n)*
   }
 
   \\x[0-9abcdefABCDEF]+ {
-    unsigned long int c;
-    set_errno (0);
-    c = strtoul (yytext + 2, 0, 16);
-    if (UCHAR_MAX < c || get_errno ())
+    verify (UCHAR_MAX < ULONG_MAX);
+    unsigned long int c = strtoul (yytext + 2, NULL, 16);
+    if (UCHAR_MAX < c)
       complain_at (*loc, _("invalid escape sequence: %s"), quote (yytext));
     else if (! c)
       complain_at (*loc, _("invalid null character: %s"), quote (yytext));
@@ -597,9 +620,10 @@ splice	 (\\[ \f\t\v]*\n)*
     if (outer_brace)
       {
 	STRING_FINISH;
-	rule_length++;
 	loc->start = code_start;
 	val->chars = last_string;
+	increment_rule_length (*loc);
+	last_braced_code_loc = *loc;
 	BEGIN INITIAL;
 	return token_type;
       }
@@ -611,6 +635,15 @@ splice	 (\\[ \f\t\v]*\n)*
 
   "$"("<"{tag}">")?(-?[0-9]+|"$")  handle_dollar (token_type, yytext, *loc);
   "@"(-?[0-9]+|"$")		   handle_at (token_type, yytext, *loc);
+
+  "$"  {
+    warn_at (*loc, _("stray `$'"));
+    obstack_sgrow (&obstack_for_string, "$][");
+  }
+  "@"  {
+    warn_at (*loc, _("stray `@'"));
+    obstack_sgrow (&obstack_for_string, "@@");
+  }
 
   <<EOF>>  unexpected_eof (code_start, "}"); BEGIN INITIAL;
 }
@@ -678,6 +711,29 @@ splice	 (\\[ \f\t\v]*\n)*
    semantic actions of this grammar. */
 int max_left_semantic_context = 0;
 
+/* If BUF is null, add BUFSIZE (which in this case must be less than
+   INT_MAX) to COLUMN; otherwise, add mbsnwidth (BUF, BUFSIZE, 0) to
+   COLUMN.  If an overflow occurs, or might occur but is undetectable,
+   return INT_MAX.  Assume COLUMN is nonnegative.  */
+
+static inline int
+add_column_width (int column, char const *buf, size_t bufsize)
+{
+  size_t width;
+  unsigned int remaining_columns = INT_MAX - column;
+
+  if (buf)
+    {
+      if (INT_MAX / 2 <= bufsize)
+	return INT_MAX;
+      width = mbsnwidth (buf, bufsize, 0);
+    }
+  else
+    width = bufsize;
+
+  return width <= remaining_columns ? column + width : INT_MAX;
+}
+
 /* Set *LOC and adjust scanner cursor to account for token TOKEN of
    size SIZE.  */
 
@@ -696,22 +752,30 @@ adjust_location (location *loc, char const *token, size_t size)
     switch (*p)
       {
       case '\n':
-	line++;
+	line += line < INT_MAX;
 	column = 1;
 	p0 = p + 1;
 	break;
 
       case '\t':
-	column += mbsnwidth (p0, p - p0, 0);
-	column += 8 - ((column - 1) & 7);
+	column = add_column_width (column, p0, p - p0);
+	column = add_column_width (column, NULL, 8 - ((column - 1) & 7));
 	p0 = p + 1;
+	break;
+
+      default:
 	break;
       }
 
   scanner_cursor.line = line;
-  scanner_cursor.column = column + mbsnwidth (p0, p - p0, 0);
+  scanner_cursor.column = column = add_column_width (column, p0, p - p0);
 
   loc->end = scanner_cursor;
+
+  if (line == INT_MAX && loc->start.line != INT_MAX)
+    warn_at (*loc, _("line number overflow"));
+  if (column == INT_MAX && loc->start.column != INT_MAX)
+    warn_at (*loc, _("column number overflow"));
 }
 
 
@@ -800,19 +864,18 @@ handle_action_dollar (char *text, location loc)
 	type_name = "";
       obstack_fgrow1 (&obstack_for_string,
 		      "]b4_lhs_value([%s])[", type_name);
+      current_rule->used = true;
     }
   else
     {
-      long int num;
-      set_errno (0);
-      num = strtol (cp, 0, 10);
+      long int num = strtol (cp, NULL, 10);
 
-      if (INT_MIN <= num && num <= rule_length && ! get_errno ())
+      if (1 - INT_MAX + rule_length <= num && num <= rule_length)
 	{
 	  int n = num;
-	  if (1-n > max_left_semantic_context)
-	    max_left_semantic_context = 1-n;
-	  if (!type_name && n > 0)
+	  if (max_left_semantic_context < 1 - n)
+	    max_left_semantic_context = 1 - n;
+	  if (!type_name && 0 < n)
 	    type_name = symbol_list_n_type_name_get (current_rule, loc, n);
 	  if (!type_name && typed)
 	    complain_at (loc, _("$%d of `%s' has no declared type"),
@@ -822,6 +885,7 @@ handle_action_dollar (char *text, location loc)
 	  obstack_fgrow3 (&obstack_for_string,
 			  "]b4_rhs_value(%d, %d, [%s])[",
 			  rule_length, n, type_name);
+	  symbol_list_n_used_set (current_rule, n, true);
 	}
       else
 	complain_at (loc, _("integer out of range: %s"), quote (text));
@@ -882,11 +946,9 @@ handle_action_at (char *text, location loc)
     obstack_sgrow (&obstack_for_string, "]b4_lhs_location[");
   else
     {
-      long int num;
-      set_errno (0);
-      num = strtol (cp, 0, 10);
+      long int num = strtol (cp, NULL, 10);
 
-      if (INT_MIN <= num && num <= rule_length && ! get_errno ())
+      if (1 - INT_MAX + rule_length <= num && num <= rule_length)
 	{
 	  int n = num;
 	  obstack_fgrow2 (&obstack_for_string, "]b4_rhs_location(%d, %d)[",
@@ -939,14 +1001,15 @@ handle_at (int token_type, char *text, location loc)
 static unsigned long int
 scan_integer (char const *number, int base, location loc)
 {
-  unsigned long int num;
-  set_errno (0);
-  num = strtoul (number, 0, base);
-  if (INT_MAX < num || get_errno ())
+  verify (INT_MAX < ULONG_MAX);
+  unsigned long int num = strtoul (number, NULL, base);
+
+  if (INT_MAX < num)
     {
       complain_at (loc, _("integer out of range: %s"), quote (number));
       num = INT_MAX;
     }
+
   return num;
 }
 
@@ -960,7 +1023,8 @@ scan_integer (char const *number, int base, location loc)
 static int
 convert_ucn_to_byte (char const *ucn)
 {
-  unsigned long int code = strtoul (ucn + 2, 0, 16);
+  verify (UCHAR_MAX <= INT_MAX);
+  unsigned long int code = strtoul (ucn + 2, NULL, 16);
 
   /* FIXME: Currently we assume Unicode-compatible unibyte characters
      on ASCII hosts (i.e., Latin-1 on hosts with 8-bit bytes).  On
@@ -1012,15 +1076,31 @@ convert_ucn_to_byte (char const *ucn)
 `----------------------------------------------------------------*/
 
 static void
-handle_syncline (char *args)
+handle_syncline (char *args, location loc)
 {
-  int lineno = strtol (args, &args, 10);
-  const char *file = NULL;
-  file = strchr (args, '"') + 1;
-  *strchr (file, '"') = 0;
+  char *after_num;
+  unsigned long int lineno = strtoul (args, &after_num, 10);
+  char *file = strchr (after_num, '"') + 1;
+  *strchr (file, '"') = '\0';
+  if (INT_MAX <= lineno)
+    {
+      warn_at (loc, _("line number overflow"));
+      lineno = INT_MAX;
+    }
   scanner_cursor.file = current_file = uniqstr_new (file);
   scanner_cursor.line = lineno;
   scanner_cursor.column = 1;
+}
+
+
+/*---------------------------------.
+| Report a rule that is too long.  |
+`---------------------------------*/
+
+static void
+rule_length_overflow (location loc)
+{
+  fatal_at (loc, _("rule is too long"));
 }
 
 

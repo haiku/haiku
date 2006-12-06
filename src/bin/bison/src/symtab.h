@@ -1,6 +1,6 @@
 /* Definitions for symtab.c and callers, part of Bison.
 
-   Copyright (C) 1984, 1989, 1992, 2000, 2001, 2002, 2004, 2005
+   Copyright (C) 1984, 1989, 1992, 2000, 2001, 2002, 2004, 2005, 2006
    Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -79,6 +79,7 @@ struct symbol
      identifier-symbol pair for an alias.  */
   symbol *alias;
   symbol_class class;
+  bool declared;
 };
 
 /* Undefined user number.  */
@@ -121,7 +122,8 @@ void symbol_printer_set (symbol *sym, const char *printer, location loc);
 void symbol_precedence_set (symbol *sym, int prec, assoc a, location loc);
 
 /* Set the CLASS associated with SYM.  */
-void symbol_class_set (symbol *sym, symbol_class class, location loc);
+void symbol_class_set (symbol *sym, symbol_class class, location loc,
+		       bool declaring);
 
 /* Set the USER_TOKEN_NUMBER associated with SYM.  */
 void symbol_user_token_number_set (symbol *sym, int user_number, location loc);

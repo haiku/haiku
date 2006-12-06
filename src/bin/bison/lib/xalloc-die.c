@@ -1,6 +1,6 @@
 /* Report a memory allocation failure and exit.
 
-   Copyright (C) 1997, 1998, 1999, 2000, 2002, 2003, 2004 Free
+   Copyright (C) 1997, 1998, 1999, 2000, 2002, 2003, 2004, 2006 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -30,7 +30,6 @@
 
 #include "gettext.h"
 #define _(msgid) gettext (msgid)
-#define N_(msgid) msgid
 
 void
 xalloc_die (void)

@@ -1,5 +1,6 @@
-/* xstrdup.c -- copy a string with out of memory checking
-   Copyright (C) 1990, 1996, 1998, 2001, 2003 Free Software Foundation, Inc.
+/* Compare strings while treating digits characters numerically.
+
+   Copyright (C) 1997, 2003 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,21 +14,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#ifndef STRVERSCMP_H_
+# define STRVERSCMP_H_
 
-/* Specification.  */
-#include "xalloc.h"
+int strverscmp (const char *, const char *);
 
-#include <string.h>
-
-/* Return a newly allocated copy of STRING.  */
-
-char *
-xstrdup (const char *string)
-{
-  return xclone (string, strlen (string) + 1);
-}
+#endif /* not STRVERSCMP_H_ */

@@ -1,6 +1,7 @@
 /* Scan Bison Skeletons.                                       -*- C -*-
 
-   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -23,6 +24,11 @@
 %option prefix="skel_"
 
 %{
+/* Work around a bug in flex 2.5.31.  See Debian bug 333231
+   <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333231>.  */
+#undef skel_wrap
+#define skel_wrap() 1
+
 #include "system.h"
 
 #include <error.h>
@@ -33,8 +39,25 @@
 #include "files.h"
 #include "scan-skel.h"
 
+/* Pacify "gcc -Wmissing-prototypes" when flex 2.5.31 is used.  */
+int skel_lex (void);
+int skel_get_lineno (void);
+FILE *skel_get_in (void);
+FILE *skel_get_out (void);
+int skel_get_leng (void);
+char *skel_get_text (void);
+void skel_set_lineno (int);
+void skel_set_in (FILE *);
+void skel_set_out (FILE *);
+int skel_get_debug (void);
+void skel_set_debug (int);
+int skel_lex_destroy (void);
+
 #define QPUTS(String) \
-   fputs (quotearg_style (c_quoting_style, (String)), yyout)
+   fputs (quotearg_style (c_quoting_style, String), yyout)
+
+#define BASE_QPUTS(File) \
+   QPUTS (base_name (File))
 
 %}
 %%
@@ -48,6 +71,10 @@
   char const *file_name = yytext + sizeof "@output " - 1;
   yytext[yyleng - 1] = '\0';
 
+  /* Decode special file names.  They include the directory part,
+     contrary to their "free" occurrences, used for issuing #includes,
+     which must not include the directory part.  */
+
   if (*file_name == '@')
     {
       if (strcmp (file_name, "@output_header_name@") == 0)
@@ -57,7 +84,6 @@
       else
 	fatal ("invalid token in skeleton: %s", yytext);
     }
-
   if (outname)
     {
       free (outname);
@@ -74,8 +100,9 @@
 
 "@oline@"  fprintf (yyout, "%d", lineno + 1);
 "@ofile@"  QPUTS (outname);
-"@output_parser_name@"	QPUTS (parser_file_name);
-"@output_header_name@"	QPUTS (spec_defines_file);
+"@dir_prefix@" QPUTS (dir_prefix);
+"@output_parser_name@"	BASE_QPUTS (parser_file_name);
+"@output_header_name@"	BASE_QPUTS (spec_defines_file);
 
   /* This pattern must not match more than the previous @ patterns. */
 @[^{}@\n]* fatal ("invalid @ in skeleton: %s", yytext);

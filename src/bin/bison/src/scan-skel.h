@@ -1,6 +1,6 @@
 /* Scan Bison Skeletons.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -26,16 +26,3 @@ extern FILE *skel_in;
 extern FILE *skel_out;
 extern int skel__flex_debug;
 extern int skel_lineno;
-
-/* Pacify "gcc -Wmissing-prototypes" when flex 2.5.31 is used.  */
-int skel_get_lineno (void);
-FILE *skel_get_in (void);
-FILE *skel_get_out (void);
-int skel_get_leng (void);
-char *skel_get_text (void);
-void skel_set_lineno (int);
-void skel_set_in (FILE *);
-void skel_set_out (FILE *);
-int skel_get_debug (void);
-void skel_set_debug (int);
-int skel_lex_destroy (void);

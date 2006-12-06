@@ -53,8 +53,8 @@ bison_SOURCES =					  \
 	reader.c reader.h			  \
 	reduce.c reduce.h			  \
 	relation.c relation.h			  \
-	scan-gram.l				  \
-	scan-skel.h scan-skel.l			  \
+	scan-gram-c.c				  \
+	scan-skel-c.c scan-skel.h		  \
 	state.c state.h				  \
 	symlist.c symlist.h			  \
 	symtab.c symtab.h			  \
@@ -63,6 +63,8 @@ bison_SOURCES =					  \
 	uniqstr.c uniqstr.h			  \
 	vcg.c vcg.h				  \
 	vcg_defaults.h
+
+EXTRA_bison_SOURCES = scan-skel.l scan-gram.l
 
 BUILT_SOURCES = scan-skel.c scan-gram.c parse-gram.c parse-gram.h
 

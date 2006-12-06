@@ -17,7 +17,7 @@
 
 dist_pkgdata_DATA = README \
    c.m4 yacc.c glr.c \
-   c++.m4 lalr1.cc
+   c++.m4 location.cc lalr1.cc glr.cc
 
 m4sugardir = $(pkgdatadir)/m4sugar
 dist_m4sugar_DATA = m4sugar/m4sugar.m4

@@ -1,7 +1,99 @@
 Bison News
 ----------
 
+Changes in version 2.3, 2006-06-05:
+
+* GLR grammars should now use `YYRECOVERING ()' instead of `YYRECOVERING',
+  for compatibility with LALR(1) grammars.
+
+* It is now documented that any definition of YYSTYPE or YYLTYPE should
+  be to a type name that does not contain parentheses or brackets.
+
+Changes in version 2.2, 2006-05-19:
+
+* The distribution terms for all Bison-generated parsers now permit
+  using the parsers in nonfree programs.  Previously, this permission
+  was granted only for Bison-generated LALR(1) parsers in C.
+
+* %name-prefix changes the namespace name in C++ outputs.
+
+* The C++ parsers export their token_type.
+
+* Bison now allows multiple %union declarations, and concatenates
+  their contents together.
+
+* New warning: unused values
+  Right-hand side symbols whose values are not used are reported,
+  if the symbols have destructors.  For instance:
+
+     exp: exp "?" exp ":" exp { $1 ? $1 : $3; }
+	| exp "+" exp
+	;
+
+  will trigger a warning about $$ and $5 in the first rule, and $3 in
+  the second ($1 is copied to $$ by the default rule).  This example
+  most likely contains three errors, and could be rewritten as:
+
+     exp: exp "?" exp ":" exp
+	    { $$ = $1 ? $3 : $5; free ($1 ? $5 : $3); free ($1); }
+	| exp "+" exp
+	    { $$ = $1 ? $1 : $3; if ($1) free ($3); }
+	;
+
+  However, if the original actions were really intended, memory leaks
+  and all, the warnings can be suppressed by letting Bison believe the
+  values are used, e.g.:
+
+     exp: exp "?" exp ":" exp { $1 ? $1 : $3; (void) ($$, $5); }
+	| exp "+" exp         { $$ = $1; (void) $3; }
+	;
+
+  If there are mid-rule actions, the warning is issued if no action
+  uses it.  The following triggers no warning: $1 and $3 are used.
+
+     exp: exp { push ($1); } '+' exp { push ($3); sum (); };
+
+  The warning is intended to help catching lost values and memory leaks.
+  If a value is ignored, its associated memory typically is not reclaimed.
+
+* %destructor vs. YYABORT, YYACCEPT, and YYERROR.
+  Destructors are now called when user code invokes YYABORT, YYACCEPT,
+  and YYERROR, for all objects on the stack, other than objects
+  corresponding to the right-hand side of the current rule.
+
+* %expect, %expect-rr
+  Incorrect numbers of expected conflicts are now actual errors,
+  instead of warnings.
+
+* GLR, YACC parsers.
+  The %parse-params are available in the destructors (and the
+  experimental printers) as per the documentation.
+
+* Bison now warns if it finds a stray `$' or `@' in an action.
+
+* %require "VERSION"
+  This specifies that the grammar file depends on features implemented
+  in Bison version VERSION or higher.
+
+* lalr1.cc: The token and value types are now class members.
+  The tokens were defined as free form enums and cpp macros.  YYSTYPE
+  was defined as a free form union.  They are now class members:
+  tokens are enumerations of the `yy::parser::token' struct, and the
+  semantic values have the `yy::parser::semantic_type' type.
+
+  If you do not want or can update to this scheme, the directive
+  `%define "global_tokens_and_yystype" "1"' triggers the global
+  definition of tokens and YYSTYPE.  This change is suitable both
+  for previous releases of Bison, and this one.
+
+  If you wish to update, then make sure older version of Bison will
+  fail using `%require "2.2"'.
+
+* DJGPP support added.
+
 Changes in version 2.1, 2005-09-16:
+
+* The C++ lalr1.cc skeleton supports %lex-param.
 
 * Bison-generated parsers now support the translation of diagnostics like
   "syntax error" into languages other than English.  The default
@@ -24,7 +116,7 @@ Changes in version 2.1, 2005-09-16:
   a syntax error associated with '%token NUM "number"' they might
   print 'syntax error, unexpected number' instead of 'syntax error,
   unexpected "number"'.
-
+
 Changes in version 2.0, 2004-12-25:
 
 * Possibly-incompatible changes
@@ -619,8 +711,8 @@ End:
 
 -----
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-Free Software Foundation, Inc.
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+2004, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of Bison, the GNU Compiler Compiler.
 

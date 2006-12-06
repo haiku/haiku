@@ -42,8 +42,8 @@ subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in parse-gram.c \
 	scan-gram.c scan-skel.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
-	$(top_srcdir)/m4/bison-i18n.m4 $(top_srcdir)/m4/cxx.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/bison-i18n.m4 \
+	$(top_srcdir)/m4/c-working.m4 $(top_srcdir)/m4/cxx.m4 \
 	$(top_srcdir)/m4/dirname.m4 $(top_srcdir)/m4/dmalloc.m4 \
 	$(top_srcdir)/m4/dos.m4 $(top_srcdir)/m4/error.m4 \
 	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
@@ -60,11 +60,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/quote.m4 $(top_srcdir)/m4/quotearg.m4 \
 	$(top_srcdir)/m4/stdbool.m4 $(top_srcdir)/m4/stdint_h_gl.m4 \
 	$(top_srcdir)/m4/stdio-safer.m4 $(top_srcdir)/m4/stpcpy.m4 \
-	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strndup.m4 \
-	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/subpipe.m4 \
+	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strerror.m4 \
+	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
+	$(top_srcdir)/m4/strtol.m4 $(top_srcdir)/m4/strtoul.m4 \
+	$(top_srcdir)/m4/strverscmp.m4 $(top_srcdir)/m4/subpipe.m4 \
 	$(top_srcdir)/m4/timevar.m4 $(top_srcdir)/m4/uintmax_t_gl.m4 \
 	$(top_srcdir)/m4/ulonglong_gl.m4 \
-	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/warning.m4 \
+	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/m4/warning.m4 \
 	$(top_srcdir)/m4/xalloc.m4 $(top_srcdir)/m4/xstrndup.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -82,7 +85,7 @@ am_bison_OBJECTS = LR0.$(OBJEXT) assoc.$(OBJEXT) closure.$(OBJEXT) \
 	muscle_tab.$(OBJEXT) nullable.$(OBJEXT) output.$(OBJEXT) \
 	parse-gram.$(OBJEXT) print.$(OBJEXT) print_graph.$(OBJEXT) \
 	reader.$(OBJEXT) reduce.$(OBJEXT) relation.$(OBJEXT) \
-	scan-gram.$(OBJEXT) scan-skel.$(OBJEXT) state.$(OBJEXT) \
+	scan-gram-c.$(OBJEXT) scan-skel-c.$(OBJEXT) state.$(OBJEXT) \
 	symlist.$(OBJEXT) symtab.$(OBJEXT) tables.$(OBJEXT) \
 	uniqstr.$(OBJEXT) vcg.$(OBJEXT)
 bison_OBJECTS = $(am_bison_OBJECTS)
@@ -101,14 +104,12 @@ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS)
 YLWRAP = $(top_srcdir)/build-aux/ylwrap
 YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
-SOURCES = $(bison_SOURCES)
-DIST_SOURCES = $(bison_SOURCES)
+SOURCES = $(bison_SOURCES) $(EXTRA_bison_SOURCES)
+DIST_SOURCES = $(bison_SOURCES) $(EXTRA_bison_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-ALLOCA = @ALLOCA@
-ALLOCA_H = @ALLOCA_H@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -118,6 +119,8 @@ AUTOM4TE = @AUTOM4TE@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BISON_CXX_WORKS = @BISON_CXX_WORKS@
+BISON_CXX_WORKS_FALSE = @BISON_CXX_WORKS_FALSE@
+BISON_CXX_WORKS_TRUE = @BISON_CXX_WORKS_TRUE@
 BISON_LOCALEDIR = @BISON_LOCALEDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -178,6 +181,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STDBOOL_H = @STDBOOL_H@
 STRIP = @STRIP@
+UNISTD_H = @UNISTD_H@
 USE_NLS = @USE_NLS@
 VALGRIND = @VALGRIND@
 VERSION = @VERSION@
@@ -261,8 +265,8 @@ bison_SOURCES = \
 	reader.c reader.h			  \
 	reduce.c reduce.h			  \
 	relation.c relation.h			  \
-	scan-gram.l				  \
-	scan-skel.h scan-skel.l			  \
+	scan-gram-c.c				  \
+	scan-skel-c.c scan-skel.h		  \
 	state.c state.h				  \
 	symlist.c symlist.h			  \
 	symtab.c symtab.h			  \
@@ -272,6 +276,7 @@ bison_SOURCES = \
 	vcg.c vcg.h				  \
 	vcg_defaults.h
 
+EXTRA_bison_SOURCES = scan-skel.l scan-gram.l
 BUILT_SOURCES = scan-skel.c scan-gram.c parse-gram.c parse-gram.h
 MOSTLYCLEANFILES = yacc
 all: $(BUILT_SOURCES)
@@ -381,7 +386,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reduce.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/relation.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan-gram-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan-gram.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan-skel-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan-skel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/state.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/symlist.Po@am__quote@

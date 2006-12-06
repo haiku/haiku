@@ -1,6 +1,7 @@
 /* Type definitions for nondeterministic finite state machine for Bison.
 
-   Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -19,7 +20,7 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-
+#include <config.h>
 #include "system.h"
 
 #include <hash.h>
@@ -58,10 +59,12 @@ state *
 transitions_to (transitions *shifts, symbol_number sym)
 {
   int j;
-  for (j = 0; j < shifts->num; j++)
-    if (TRANSITION_SYMBOL (shifts, j) == sym)
-      return shifts->states[j];
-  abort ();
+  for (j = 0; ; j++)
+    {
+      assert (j < shifts->num);
+      if (TRANSITION_SYMBOL (shifts, j) == sym)
+	return shifts->states[j];
+    }
 }
 
 
@@ -132,8 +135,7 @@ state_new (symbol_number accessing_symbol,
   state *res;
   size_t items_size = nitems * sizeof *core;
 
-  if (STATE_NUMBER_MAXIMUM <= nstates)
-    abort ();
+  assert (nstates < STATE_NUMBER_MAXIMUM);
 
   res = xmalloc (offsetof (state, items) + items_size);
   res->number = nstates++;
@@ -174,8 +176,7 @@ state_free (state *s)
 void
 state_transitions_set (state *s, int num, state **trans)
 {
-  if (s->transitions)
-    abort ();
+  assert (!s->transitions);
   s->transitions = transitions_new (num, trans);
 }
 
@@ -187,8 +188,7 @@ state_transitions_set (state *s, int num, state **trans)
 void
 state_reductions_set (state *s, int num, rule **reds)
 {
-  if (s->reductions)
-    abort ();
+  assert (!s->reductions);
   s->reductions = reductions_new (num, reds);
 }
 
@@ -212,8 +212,7 @@ state_reduction_find (state *s, rule *r)
 void
 state_errs_set (state *s, int num, symbol **tokens)
 {
-  if (s->errs)
-    abort ();
+  assert (!s->errs);
   s->errs = errs_new (num, tokens);
 }
 
@@ -248,9 +247,9 @@ state_rule_look_ahead_tokens_print (state *s, rule *r, FILE *out)
 }
 
 
-/*----------------------.
+/*---------------------.
 | A state hash table.  |
-`----------------------*/
+`---------------------*/
 
 /* Initial capacity of states hash table.  */
 #define HT_INITIAL_CAPACITY 257

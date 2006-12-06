@@ -1,5 +1,5 @@
 /* Bitset statistics.
-   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
    Contributed by Michael Hayes (m.hayes@elec.canterbury.ac.nz).
 
    This program is free software; you can redistribute it and/or modify
@@ -13,20 +13,18 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-*/
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* This file is a wrapper bitset implementation for the other bitset
    implementations.  It provides bitset compatibility checking and
    statistics gathering without having to instrument the bitset
    implementations.  When statistics gathering is enabled, the bitset
    operations get vectored through here and we then call the appropriate
-   routines.
-*/
+   routines.  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include <config.h>
 #endif
 
 #include "bbitset.h"
@@ -696,6 +694,9 @@ bitset_stats_init (bitset bset, bitset_bindex n_bits, enum bitset_type type)
      we are a wrapper over.  */
   switch (type)
     {
+    default:
+      abort ();
+
     case BITSET_ARRAY:
       bytes = abitset_bytes (n_bits);
       sbset = xcalloc (1, bytes);
@@ -719,9 +720,6 @@ bitset_stats_init (bitset bset, bitset_bindex n_bits, enum bitset_type type)
       sbset = xcalloc (1, bytes);
       vbitset_init (sbset, n_bits);
       break;
-
-    default:
-      abort ();
     }
 
   bset->s.bset = sbset;

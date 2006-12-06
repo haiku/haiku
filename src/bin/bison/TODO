@@ -87,32 +87,6 @@ we should be able to have:
 
 Or something like this.
 
-** yysymprint interface
-It should be improved, in particular when using Bison features such as
-locations, and YYPARSE_PARAMS.  For the time being, it is almost
-recommended to yyprint to steal internal variables...
-
-** Several %unions
-I think this is a pleasant (but useless currently) feature, but in the
-future, I want a means to %include other bits of grammars, and _then_
-it will be important for the various bits to define their needs in
-%union.
-
-When implementing multiple-%union support, bare the following in mind:
-
-- when --yacc, this must be flagged as an error.  Don't make it fatal
-  though.
-
-- The #line must now appear *inside* the definition of yystype.
-  Something like
-
-	{
-	#line 12 "foo.y"
-	  int ival;
-	#line 23 "foo.y"
-	  char *sval;
-	}
-
 ** %if and the like
 It should be possible to have %if/%else/%endif.  The implementation is
 not clear: should it be lexical or syntactic.  Vadim Maslow thinks it
@@ -203,28 +177,16 @@ Paul notes:
 	the source code.  This should get fixed.
 
 * --graph
-Show reductions.	[]
+Show reductions.
 
 * Broken options ?
-** %no-parser		[]
-** %token-table		[]
-** Skeleton strategy.	[]
-Must we keep %no-parser?
-	     %token-table?
+** %no-parser
+** %token-table
+** Skeleton strategy
+Must we keep %no-parser?  %token-table?
 
 * src/print_graph.c
-Find the best graph parameters.	[]
-
-* doc/bison.texinfo
-** Update
-informations about ERROR_VERBOSE.	[]
-** Add explanations about
-skeleton muscles.	[]
-%skeleton.		[]
-
-* testsuite
-** tests/pure-parser.at	[]
-New tests.
+Find the best graph parameters.
 
 * BTYacc
 See if we can integrate backtracking in Bison.  Charles-Henri de
@@ -345,16 +307,17 @@ the parser with a means to create the (visual) parse tree.
 
 -----
 
-Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+Copyright (C) 2001, 2002, 2003, 2004, 2006 Free Software Foundation,
+Inc.
 
-This file is part of GNU Bison.
+This file is part of Bison, the GNU Compiler Compiler.
 
-GNU Bison is free software; you can redistribute it and/or modify
+Bison is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
 
-GNU Bison is distributed in the hope that it will be useful,
+Bison is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.

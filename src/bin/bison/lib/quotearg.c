@@ -1,7 +1,7 @@
 /* quotearg.c - quote arguments for output
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005 Free Software
-   Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 /* Written by Paul Eggert <eggert@twinsun.com> */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -307,6 +307,9 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 		    STORE ('\\');
 		    STORE ('?');
 		    break;
+
+		  default:
+		    break;
 		  }
 	      break;
 
@@ -454,6 +457,9 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 				case '[': case '\\': case '^':
 				case '`': case '|':
 				  goto use_shell_always_quoting_style;
+
+				default:
+				  break;
 				}
 			  }
 
@@ -586,7 +592,12 @@ quotearg_n_options (int n, char const *arg, size_t argsize,
 
   if (nslots <= n0)
     {
-      unsigned int n1 = n0 + 1;
+      /* FIXME: technically, the type of n1 should be `unsigned int',
+	 but that evokes an unsuppressible warning from gcc-4.0.1 and
+	 older.  If gcc ever provides an option to suppress that warning,
+	 revert to the original type, so that the test in xalloc_oversized
+	 is once again performed only at compile time.  */
+      size_t n1 = n0 + 1;
 
       if (xalloc_oversized (n1, sizeof *slotvec))
 	xalloc_die ();

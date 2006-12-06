@@ -1,7 +1,7 @@
 /* Output the generated parsing program for Bison.
 
-   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004, 2005
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -20,7 +20,7 @@
    Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301, USA.  */
 
-
+#include <config.h>
 #include "system.h"
 
 #include <error.h>
@@ -42,9 +42,6 @@
 
 
 static struct obstack format_obstack;
-
-bool error_verbose = false;
-
 
 
 /*-------------------------------------------------------------------.
@@ -239,8 +236,7 @@ prepare_rules (void)
       /* Merger-function index (GLR).  */
       merger[r] = rules[r].merger;
     }
-  if (i != nritems)
-    abort ();
+  assert (i == nritems);
 
   muscle_insert_item_number_table ("rhs", rhs, ritem[0], 1, nritems);
   muscle_insert_unsigned_int_table ("prhs", prhs, 0, 0, nrules);
@@ -351,8 +347,7 @@ token_definitions_output (FILE *out)
       /* At this stage, if there are literal aliases, they are part of
 	 SYMBOLS, so we should not find symbols which are the aliases
 	 here.  */
-      if (number == USER_NUMBER_ALIAS)
-	abort ();
+      assert (number != USER_NUMBER_ALIAS);
 
       /* Skip error token.  */
       if (sym == errtoken)
@@ -515,7 +510,6 @@ output_skeleton (void)
      cheap sanity check is worthwhile.  */
   char const m4sugar[] = "m4sugar/m4sugar.m4";
   char *full_m4sugar;
-  char *full_cm4;
   char *full_skeleton;
   char const *p;
   char const *m4 = (p = getenv ("M4")) ? p : M4;
@@ -531,28 +525,25 @@ output_skeleton (void)
   full_skeleton[pkgdatadirlen] = '/';
   strcpy (full_skeleton + pkgdatadirlen + 1, m4sugar);
   full_m4sugar = xstrdup (full_skeleton);
-  strcpy (full_skeleton + pkgdatadirlen + 1, "c.m4");
-  full_cm4 = xstrdup (full_skeleton);
   strcpy (full_skeleton + pkgdatadirlen + 1, skeleton);
   xfclose (xfopen (full_m4sugar, "r"));
 
   /* Create an m4 subprocess connected to us via two pipes.  */
 
   if (trace_flag & trace_tools)
-    fprintf (stderr, "running: %s %s - %s %s\n",
-	     m4, full_m4sugar, full_cm4, full_skeleton);
+    fprintf (stderr, "running: %s %s - %s\n",
+	     m4, full_m4sugar, full_skeleton);
 
   argv[0] = m4;
   argv[1] = full_m4sugar;
   argv[2] = "-";
-  argv[3] = full_cm4;
-  argv[4] = full_skeleton;
+  argv[3] = full_skeleton;
+  argv[4] = trace_flag & trace_m4 ? "-dV" : NULL;
   argv[5] = NULL;
 
   init_subpipe ();
   pid = create_subpipe (argv, filter_fd);
   free (full_m4sugar);
-  free (full_cm4);
   free (full_skeleton);
 
   out = fdopen (filter_fd[0], "w");
@@ -577,6 +568,7 @@ output_skeleton (void)
 
   /* Read and process m4's output.  */
   timevar_push (TV_M4);
+  end_of_output_subpipe (pid, filter_fd);
   in = fdopen (filter_fd[1], "r");
   if (! in)
     error (EXIT_FAILURE, get_errno (),
@@ -591,15 +583,25 @@ static void
 prepare (void)
 {
   /* Flags. */
-  MUSCLE_INSERT_BOOL ("debug", debug_flag);
+  MUSCLE_INSERT_BOOL ("debug_flag", debug_flag);
   MUSCLE_INSERT_BOOL ("defines_flag", defines_flag);
-  MUSCLE_INSERT_BOOL ("error_verbose", error_verbose);
+  MUSCLE_INSERT_BOOL ("error_verbose_flag", error_verbose);
   MUSCLE_INSERT_BOOL ("locations_flag", locations_flag);
-  MUSCLE_INSERT_BOOL ("pure", pure_parser);
+  MUSCLE_INSERT_BOOL ("pure_flag", pure_parser);
   MUSCLE_INSERT_BOOL ("synclines_flag", !no_lines_flag);
 
   /* File names.  */
   MUSCLE_INSERT_STRING ("prefix", spec_name_prefix ? spec_name_prefix : "yy");
+#define DEFINE(Name) MUSCLE_INSERT_STRING (#Name, Name ? Name : "")
+  DEFINE (dir_prefix);
+  DEFINE (parser_file_name);
+  DEFINE (spec_defines_file);
+  DEFINE (spec_file_prefix);
+  DEFINE (spec_graph_file);
+  DEFINE (spec_name_prefix);
+  DEFINE (spec_outfile);
+  DEFINE (spec_verbose_file);
+#undef DEFINE
 
   /* User Code.  */
   obstack_1grow (&pre_prologue_obstack, 0);

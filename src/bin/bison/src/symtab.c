@@ -1,7 +1,7 @@
 /* Symbol table manager for Bison.
 
-   Copyright (C) 1984, 1989, 2000, 2001, 2002, 2004, 2005 Free Software
-   Foundation, Inc.
+   Copyright (C) 1984, 1989, 2000, 2001, 2002, 2004, 2005, 2006 Free
+   Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -20,7 +20,7 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-
+#include <config.h>
 #include "system.h"
 
 #include <hash.h>
@@ -65,6 +65,7 @@ symbol_new (uniqstr tag, location loc)
 
   res->alias = NULL;
   res->class = unknown_sym;
+  res->declared = false;
 
   if (nsyms == SYMBOL_NUMBER_MAXIMUM)
     fatal (_("too many symbols in input grammar (limit is %d)"),
@@ -85,10 +86,15 @@ symbol_new (uniqstr tag, location loc)
 void
 symbol_print (symbol *s, FILE *f)
 {
-  fprintf (f, "\"%s\"", s->tag);
-  SYMBOL_ATTR_PRINT (type_name);
-  SYMBOL_ATTR_PRINT (destructor);
-  SYMBOL_ATTR_PRINT (printer);
+  if (s)
+    {
+      fprintf (f, "\"%s\"", s->tag);
+      SYMBOL_ATTR_PRINT (type_name);
+      SYMBOL_ATTR_PRINT (destructor);
+      SYMBOL_ATTR_PRINT (printer);
+    }
+  else
+    fprintf (f, "<NULL>");
 }
 
 #undef SYMBOL_ATTR_PRINT
@@ -177,7 +183,7 @@ symbol_precedence_set (symbol *sym, int prec, assoc a, location loc)
     }
 
   /* Only terminals have a precedence. */
-  symbol_class_set (sym, token_sym, loc);
+  symbol_class_set (sym, token_sym, loc, false);
 }
 
 
@@ -186,10 +192,13 @@ symbol_precedence_set (symbol *sym, int prec, assoc a, location loc)
 `------------------------------------*/
 
 void
-symbol_class_set (symbol *sym, symbol_class class, location loc)
+symbol_class_set (symbol *sym, symbol_class class, location loc, bool declaring)
 {
   if (sym->class != unknown_sym && sym->class != class)
-    complain_at (loc, _("symbol %s redefined"), sym->tag);
+    {
+      complain_at (loc, _("symbol %s redefined"), sym->tag);
+      sym->declared = false;
+    }
 
   if (class == nterm_sym && sym->class != nterm_sym)
     sym->number = nvars++;
@@ -197,6 +206,13 @@ symbol_class_set (symbol *sym, symbol_class class, location loc)
     sym->number = ntokens++;
 
   sym->class = class;
+
+  if (declaring)
+    {
+      if (sym->declared)
+	warn_at (loc, _("symbol %s redeclared"), sym->tag);
+      sym->declared = true;
+    }
 }
 
 
@@ -207,8 +223,7 @@ symbol_class_set (symbol *sym, symbol_class class, location loc)
 void
 symbol_user_token_number_set (symbol *sym, int user_token_number, location loc)
 {
-  if (sym->class != token_sym)
-    abort ();
+  assert (sym->class == token_sym);
 
   if (sym->user_token_number != USER_NUMBER_UNDEFINED
       && sym->user_token_number != user_token_number)
@@ -279,8 +294,7 @@ symbol_make_alias (symbol *sym, symbol *symval, location loc)
       /* sym and symval combined are only one symbol.  */
       nsyms--;
       ntokens--;
-      if (ntokens != sym->number && ntokens != symval->number)
-	abort ();
+      assert (ntokens == sym->number || ntokens == symval->number);
       sym->number = symval->number =
 	(symval->number < sym->number) ? symval->number : sym->number;
       symbol_type_set (symval, sym->type_name, loc);
@@ -373,8 +387,7 @@ symbol_pack (symbol *this)
 	    this->number = this->alias->number = 0;
 	  else
 	    {
-	      if (this->alias->number == NUMBER_UNDEFINED)
-		abort ();
+	      assert (this->alias->number != NUMBER_UNDEFINED);
 	      this->number = this->alias->number;
 	    }
 	}
@@ -383,10 +396,7 @@ symbol_pack (symbol *this)
 	return true;
     }
   else /* this->class == token_sym */
-    {
-      if (this->number == NUMBER_UNDEFINED)
-	abort ();
-    }
+    assert (this->number != NUMBER_UNDEFINED);
 
   symbols[this->number] = this;
   return true;

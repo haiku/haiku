@@ -1,7 +1,7 @@
 m4_divert(-1)                                               -*- Autoconf -*-
 
 # C M4 Macros for Bison.
-# Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
+# Copyright (C) 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,8 +28,9 @@ m4_divert(-1)                                               -*- Autoconf -*-
 m4_define([b4_copyright],
 [/* A Bison parser, made by GNU Bison b4_version.  */
 
-/* $1,
-   Copyright (C) $2 Free Software Foundation, Inc.
+/* $1
+
+m4_text_wrap([Copyright (C) $2 Free Software Foundation, Inc.], [   ])
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +45,20 @@ m4_define([b4_copyright],
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */])
+   Boston, MA 02110-1301, USA.  */
+
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */])
 
 
 # b4_identification
@@ -60,7 +74,7 @@ m4_define([b4_identification],
 [#]define YYSKELETON_NAME b4_skeleton
 
 /* Pure parsers.  */
-[#]define YYPURE b4_pure
+[#]define YYPURE b4_pure_flag
 
 /* Using locations.  */
 [#]define YYLSP_NEEDED b4_locations_flag
@@ -96,6 +110,26 @@ m4_define([b4_parse_param],
 b4_parse_param))
 
 
+# b4_parse_param_for(DECL, FORMAL, BODY)
+# ---------------------------------------
+# Iterate over the user parameters, binding the declaration to DECL,
+# the formal name to FORMAL, and evaluating the BODY.
+m4_define([b4_parse_param_for],
+[m4_foreach([$1_$2], m4_defn([b4_parse_param]),
+[m4_pushdef([$1], m4_fst($1_$2))dnl
+m4_pushdef([$2], m4_shift($1_$2))dnl
+$3[]dnl
+m4_popdef([$2])dnl
+m4_popdef([$1])dnl
+])])
+
+# b4_parse_param_use
+# ------------------
+# `YYUSE' all the parse-params.
+m4_define([b4_parse_param_use],
+[b4_parse_param_for([Decl], [Formal], [  YYUSE (Formal);
+])dnl
+])
 
 ## ------------ ##
 ## Data Types.  ##
@@ -122,7 +156,7 @@ m4_define([b4_int_type],
 
        m4_eval([0 <= $1]),                [1], [unsigned int],
 
-	                                       [int])])
+					       [int])])
 
 
 # b4_int_type_for(NAME)
@@ -137,23 +171,42 @@ m4_define([b4_int_type_for],
 ## Decoding options.  ##
 ## ------------------ ##
 
+# b4_flag_if(FLAG, IF-TRUE, IF-FALSE)
+# -----------------------------------
+# Run IF-TRUE if b4_FLAG_flag is 1, IF-FALSE if FLAG is 0, otherwise fail.
+m4_define([b4_flag_if],
+[m4_case(b4_$1_flag,
+         [0], [$3],
+	 [1], [$2],
+	 [m4_fatal([invalid $1 value: ]$1)])])
 
-# b4_location_if(IF-TRUE, IF-FALSE)
-# ---------------------------------
-# Expand IF-TRUE, if locations are used, IF-FALSE otherwise.
-m4_define([b4_location_if],
-[m4_if(b4_locations_flag, [1],
-       [$1],
-       [$2])])
+
+# b4_define_flag_if(FLAG)
+# -----------------------
+# Define "b4_FLAG_if(IF-TRUE, IF-FALSE)" that depends on the
+# value of the Boolean FLAG.
+m4_define([b4_define_flag_if],
+[_b4_define_flag_if($[1], $[2], [$1])])
+
+# _b4_define_flag_if($1, $2, FLAG)
+# --------------------------------
+# This macro works around the impossibility to define macros
+# inside macros, because issuing `[$1]' is not possible in M4 :(.
+# This sucks hard, GNU M4 should really provide M5 like $$1.
+m4_define([_b4_define_flag_if],
+[m4_if([$1$2], $[1]$[2], [],
+       [m4_fatal([$0: Invalid arguments: $@])])dnl
+m4_define([b4_$3_if], 
+          [b4_flag_if([$3], [$1], [$2])])])
 
 
-# b4_pure_if(IF-TRUE, IF-FALSE)
+# b4_FLAG_if(IF-TRUE, IF-FALSE)
 # -----------------------------
-# Expand IF-TRUE, if %pure-parser, IF-FALSE otherwise.
-m4_define([b4_pure_if],
-[m4_if(b4_pure, [1],
-       [$1],
-       [$2])])
+# Expand IF-TRUE, if FLAG is true, IF-FALSE otherwise.
+b4_define_flag_if([defines])        # Whether headers are requested.
+b4_define_flag_if([error_verbose])  # Wheter error are verbose.
+b4_define_flag_if([locations])      # Whether locations are tracked.
+b4_define_flag_if([pure])           # Whether the interface is pure.
 
 
 
@@ -199,7 +252,7 @@ m4_define([b4_token_enums],
    enum yytokentype {
 m4_map_sep([     b4_token_enum], [,
 ],
-           [$@])
+	   [$@])
    };
 #endif
 ])])
@@ -219,11 +272,25 @@ m4_define([b4_token_enums_defines],
 ## --------------------------------------------- ##
 
 
+# b4_modern_c
+# -----------
+# A predicate useful in #if to determine whether C is ancient or modern.
+#
+# If __STDC__ is defined, the compiler is modern.  IBM xlc 7.0 when run
+# as 'cc' doesn't define __STDC__ (or __STDC_VERSION__) for pedantic
+# reasons, but it defines __C99__FUNC__ so check that as well.
+# Microsoft C normally doesn't define these macros, but it defines _MSC_VER.
+# Consider a C++ compiler to be modern if it defines __cplusplus.
+#
+m4_define([b4_c_modern],
+  [[(defined __STDC__ || defined __C99__FUNC__ \
+     || defined __cplusplus || defined _MSC_VER)]])
+
 # b4_c_function_def(NAME, RETURN-VALUE, [DECL1, NAME1], ...)
 # ----------------------------------------------------------
 # Declare the function NAME.
 m4_define([b4_c_function_def],
-[#if defined (__STDC__) || defined (__cplusplus)
+[#if b4_c_modern
 b4_c_ansi_function_def($@)
 #else
 $2
@@ -247,9 +314,9 @@ $1 (b4_c_ansi_formals(m4_shiftn(2, $@)))[]dnl
 # Output the arguments ANSI-C definition.
 m4_define([b4_c_ansi_formals],
 [m4_case([$@],
-         [],   [void],
-         [[]], [void],
-               [m4_map_sep([b4_c_ansi_formal], [, ], [$@])])])
+	 [],   [void],
+	 [[]], [void],
+	       [m4_map_sep([b4_c_ansi_formal], [, ], [$@])])])
 
 m4_define([b4_c_ansi_formal],
 [$1])
@@ -270,9 +337,9 @@ m4_define([b4_c_knr_formal_name],
 # Output the K&R argument declarations.
 m4_define([b4_c_knr_formal_decls],
 [m4_map_sep([b4_c_knr_formal_decl],
-            [
+	    [
 ],
-            [$@])])
+	    [$@])])
 
 m4_define([b4_c_knr_formal_decl],
 [    $1;])
@@ -288,7 +355,7 @@ m4_define([b4_c_knr_formal_decl],
 # -----------------------------------------------------------
 # Declare the function NAME.
 m4_define([b4_c_function_decl],
-[#if defined (__STDC__) || defined (__cplusplus)
+[#if defined __STDC__ || defined __cplusplus
 b4_c_ansi_function_decl($@)
 #else
 $2 $1 ();
@@ -333,13 +400,16 @@ m4_define([b4_c_arg],
 ## Synclines.  ##
 ## ----------- ##
 
-
 # b4_syncline(LINE, FILE)
 # -----------------------
 m4_define([b4_syncline],
-[m4_if(b4_synclines_flag, 1,
-       [[#]line $1 $2])])
+[b4_flag_if([synclines], [[#]line $1 $2])])
 
+
+
+## -------------- ##
+## User actions.  ##
+## -------------- ##
 
 # b4_symbol_actions(FILENAME, LINENO,
 #                   SYMBOL-TAG, SYMBOL-NUM,
@@ -351,9 +421,9 @@ m4_define([b4_symbol_actions],
 m4_pushdef([b4_at_dollar], [(*yylocationp)])dnl
       case $4: /* $3 */
 b4_syncline([$2], [$1])
-        $5;
+	$5;
 b4_syncline([@oline@], [@ofile@])
-        break;
+	break;
 m4_popdef([b4_at_dollar])dnl
 m4_popdef([b4_dollar_dollar])dnl
 ])
@@ -369,17 +439,20 @@ m4_define_default([b4_yydestruct_generate],
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
+/*ARGSUSED*/
 ]$1([yydestruct],
     [static void],
     [[const char *yymsg],    [yymsg]],
     [[int yytype],           [yytype]],
-    [[YYSTYPE *yyvaluep],    [yyvaluep]]b4_location_if([,
-    [[YYLTYPE *yylocationp], [yylocationp]]]))[
+    [[YYSTYPE *yyvaluep],    [yyvaluep]][]dnl
+b4_locations_if(            [, [[YYLTYPE *yylocationp], [yylocationp]]])[]dnl
+m4_ifset([b4_parse_param], [, b4_parse_param]))[
 {
-  /* Pacify ``unused variable'' warnings.  */
-  (void) yyvaluep;
-]b4_location_if([  (void) yylocationp;
-])[
+  YYUSE (yyvaluep);
+]b4_locations_if([  YYUSE (yylocationp);
+])dnl
+b4_parse_param_use[]dnl
+[
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
@@ -388,53 +461,74 @@ m4_define_default([b4_yydestruct_generate],
     {
 ]m4_map([b4_symbol_actions], m4_defn([b4_symbol_destructors]))[
       default:
-        break;
+	break;
     }
 }]dnl
 ])
 
 
-# b4_yysymprint_generate(FUNCTION-DECLARATOR)
-# -------------------------------------------
-# Generate the "yysymprint" function, which declaration is issued using
+# b4_yy_symbol_print_generate(FUNCTION-DECLARATOR)
+# ------------------------------------------------
+# Generate the "yy_symbol_print" function, which declaration is issued using
 # FUNCTION-DECLARATOR, which may be "b4_c_ansi_function_def" for ISO C
 # or "b4_c_function_def" for K&R.
-m4_define_default([b4_yysymprint_generate],
-[[/*--------------------------------.
+m4_define_default([b4_yy_symbol_print_generate],
+[[
+/*--------------------------------.
 | Print this symbol on YYOUTPUT.  |
 `--------------------------------*/
 
-]$1([yysymprint],
+/*ARGSUSED*/
+]$1([yy_symbol_value_print],
     [static void],
-    [[FILE *yyoutput],       [yyoutput]],
-    [[int yytype],           [yytype]],
-    [[YYSTYPE *yyvaluep],    [yyvaluep]]b4_location_if([,
-    [[YYLTYPE *yylocationp], [yylocationp]]]))
+	       [[FILE *yyoutput],                       [yyoutput]],
+	       [[int yytype],                           [yytype]],
+	       [[YYSTYPE const * const yyvaluep],       [yyvaluep]][]dnl
+b4_locations_if([, [[YYLTYPE const * const yylocationp], [yylocationp]]])[]dnl
+m4_ifset([b4_parse_param], [, b4_parse_param]))[
 {
-  /* Pacify ``unused variable'' warnings.  */
-  (void) yyvaluep;
-b4_location_if([  (void) yylocationp;
+  if (!yyvaluep)
+    return;
+]b4_locations_if([  YYUSE (yylocationp);
 ])dnl
-[
-  if (yytype < YYNTOKENS)
-    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
-  else
-    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
-
-]b4_location_if([  YY_LOCATION_PRINT (yyoutput, *yylocationp);
-  YYFPRINTF (yyoutput, ": ");
-])dnl
-[
-# ifdef YYPRINT
+b4_parse_param_use[]dnl
+[# ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
+# else
+  YYUSE (yyoutput);
 # endif
   switch (yytype)
     {
 ]m4_map([b4_symbol_actions], m4_defn([b4_symbol_printers]))dnl
 [      default:
-        break;
+	break;
     }
-  YYFPRINTF (yyoutput, ")");
 }
-]])
+
+
+/*--------------------------------.
+| Print this symbol on YYOUTPUT.  |
+`--------------------------------*/
+
+]$1([yy_symbol_print],
+    [static void],
+	       [[FILE *yyoutput],                       [yyoutput]],
+	       [[int yytype],                           [yytype]],
+	       [[YYSTYPE const * const yyvaluep],       [yyvaluep]][]dnl
+b4_locations_if([, [[YYLTYPE const * const yylocationp], [yylocationp]]])[]dnl
+m4_ifset([b4_parse_param], [, b4_parse_param]))[
+{
+  if (yytype < YYNTOKENS)
+    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
+  else
+    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
+
+]b4_locations_if([  YY_LOCATION_PRINT (yyoutput, *yylocationp);
+  YYFPRINTF (yyoutput, ": ");
+])dnl
+[  yy_symbol_value_print (yyoutput, yytype, yyvaluep]dnl
+b4_locations_if([, yylocationp])[]b4_user_args[);
+  YYFPRINTF (yyoutput, ")");
+}]dnl
+])

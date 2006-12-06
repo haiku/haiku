@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-## Copyright (C) 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
+## Copyright (C) 2001, 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ info_TEXINFOS = bison.texinfo
 man_MANS = bison.1
 bison_TEXINFOS = gpl.texi fdl.texi
 
-EXTRA_DIST = FAQ bison.1 refcard.tex
+EXTRA_DIST = bison.1 refcard.tex
 
 CLEANFILES = refcard.dvi refcard.log refcard.ps bison.fns
 

@@ -36,17 +36,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.hin \
 	$(top_srcdir)/configure ABOUT-NLS AUTHORS COPYING ChangeLog \
-	INSTALL NEWS THANKS TODO build-aux/config.guess \
-	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
-	build-aux/install-sh build-aux/mdate-sh build-aux/missing \
-	build-aux/mkinstalldirs build-aux/texinfo.tex build-aux/ylwrap
-subdir = .
+	INSTALL NEWS THANKS TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
-	$(top_srcdir)/m4/bison-i18n.m4 $(top_srcdir)/m4/cxx.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/bison-i18n.m4 \
+	$(top_srcdir)/m4/c-working.m4 $(top_srcdir)/m4/cxx.m4 \
 	$(top_srcdir)/m4/dirname.m4 $(top_srcdir)/m4/dmalloc.m4 \
 	$(top_srcdir)/m4/dos.m4 $(top_srcdir)/m4/error.m4 \
 	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
@@ -63,11 +60,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/quote.m4 $(top_srcdir)/m4/quotearg.m4 \
 	$(top_srcdir)/m4/stdbool.m4 $(top_srcdir)/m4/stdint_h_gl.m4 \
 	$(top_srcdir)/m4/stdio-safer.m4 $(top_srcdir)/m4/stpcpy.m4 \
-	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strndup.m4 \
-	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/subpipe.m4 \
+	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strerror.m4 \
+	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
+	$(top_srcdir)/m4/strtol.m4 $(top_srcdir)/m4/strtoul.m4 \
+	$(top_srcdir)/m4/strverscmp.m4 $(top_srcdir)/m4/subpipe.m4 \
 	$(top_srcdir)/m4/timevar.m4 $(top_srcdir)/m4/uintmax_t_gl.m4 \
 	$(top_srcdir)/m4/ulonglong_gl.m4 \
-	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/warning.m4 \
+	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/m4/warning.m4 \
 	$(top_srcdir)/m4/xalloc.m4 $(top_srcdir)/m4/xstrndup.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -109,8 +109,6 @@ GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
-ALLOCA = @ALLOCA@
-ALLOCA_H = @ALLOCA_H@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -120,6 +118,8 @@ AUTOM4TE = @AUTOM4TE@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BISON_CXX_WORKS = @BISON_CXX_WORKS@
+BISON_CXX_WORKS_FALSE = @BISON_CXX_WORKS_FALSE@
+BISON_CXX_WORKS_TRUE = @BISON_CXX_WORKS_TRUE@
 BISON_LOCALEDIR = @BISON_LOCALEDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -179,6 +179,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STDBOOL_H = @STDBOOL_H@
 STRIP = @STRIP@
+UNISTD_H = @UNISTD_H@
 USE_NLS = @USE_NLS@
 VALGRIND = @VALGRIND@
 VERSION = @VERSION@
@@ -234,10 +235,14 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = config po runtime-po lib data src doc examples tests
+SUBDIRS = build-aux po runtime-po lib data src doc examples tests
 aclocal_DATA = m4/bison-i18n.m4
 EXTRA_DIST = GNUmakefile Makefile.cfg Makefile.maint \
-  OChangeLog PACKAGING
+  OChangeLog PACKAGING \
+  djgpp/Makefile.maint djgpp/README.in djgpp/config.bat \
+  djgpp/config.sed djgpp/config.site djgpp/config_h.sed \
+  djgpp/subpipe.c djgpp/subpipe.h djgpp/djunpack.bat \
+  djgpp/fnchange.lst
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -453,7 +458,7 @@ distdir: $(DISTFILES)
 	esac
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/build-aux $(distdir)/m4 $(distdir)/po $(distdir)/runtime-po $(distdir)/tests
+	$(mkdir_p) $(distdir)/djgpp $(distdir)/m4 $(distdir)/po $(distdir)/runtime-po $(distdir)/tests
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

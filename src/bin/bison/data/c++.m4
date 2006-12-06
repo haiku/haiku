@@ -1,8 +1,8 @@
-m4_divert(-1)
+m4_divert(-1)                                               -*- Autoconf -*-
 
 # C++ skeleton for Bison
 
-# Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@ m4_divert(-1)
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301  USA
 
+m4_include(b4_pkgdatadir/[c.m4])
+
 ## ---------------- ##
 ## Default values.  ##
 ## ---------------- ##
@@ -27,21 +29,20 @@ m4_divert(-1)
 m4_define_default([b4_parser_class_name], [parser])
 m4_define_default([b4_location_type], [location])
 m4_define_default([b4_filename_type], [std::string])
-
+m4_define_default([b4_namespace], m4_defn([b4_prefix]))
 
 
 # b4_token_enums(LIST-OF-PAIRS-TOKEN-NAME-TOKEN-NUMBER)
 # -----------------------------------------------------
-# Output the definition of the tokens (if there are) as enums.
+# Output the definition of the tokens as enums.
 m4_define([b4_token_enums],
-[m4_if([$@], [[]], [],
 [/* Tokens.  */
    enum yytokentype {
 m4_map_sep([     b4_token_enum], [,
 ],
            [$@])
    };
-])])
+])
 
 
 ## ----------------- ##
@@ -61,7 +62,7 @@ m4_define([b4_lhs_value],
 # Expansion of $<TYPE>NUM, where the current rule has RULE-LENGTH
 # symbols on RHS.
 m4_define([b4_rhs_value],
-[(yysemantic_stack_@{m4_eval([$1 - $2])@}m4_ifval([$3], [.$3]))])
+[(yysemantic_stack_@{($1) - ($2)@}m4_ifval([$3], [.$3]))])
 
 # b4_lhs_location()
 # -----------------
@@ -75,7 +76,7 @@ m4_define([b4_lhs_location],
 # Expansion of @NUM, where the current rule has RULE-LENGTH symbols
 # on RHS.
 m4_define([b4_rhs_location],
-[(yylocation_stack_@{m4_eval([$1 - $2])@})])
+[(yylocation_stack_@{($1) - ($2)@})])
 
 
 # b4_parse_param_decl

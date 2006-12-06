@@ -1,3 +1,1788 @@
+2006-06-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Version 2.3.
+	* configure.ac (AC_INIT): Likewise.
+
+2006-05-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/glr.c (YYRECOVERING): Define to be a function-like macro
+	with no arguments, not as an object-like macro.  This is for
+	compatibility with data/yacc.c.  Problem reported by John P. Hartmann in
+	<http://lists.gnu.org/archive/html/bug-bison/2006-05/msg00059.html>.
+	* doc/bison.texinfo (Action Features, Error Recovery, Table of Symbols):
+	Document this.
+
+2006-05-30  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* src/getargs.c (usage): Back out yesterday's modification of the
+	--help output so that we don't have to wait for translation before
+	releasing 2.3.
+
+2006-05-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/bison.texinfo (Introduction): Don't say "GLR grammar".
+	Problem reported by Akim Demaille.
+
+2006-05-29  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* src/getargs.c (usage): Mention GLR not just LALR(1) in --help output.
+
+2006-05-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/yacc.c (yy_reduce_print): Omit trailing white space in
+	generated source code.  Problem reported by Frans Englich in
+	<http://lists.gnu.org/archive/html/bug-bison/2006-05/msg00049.html>.
+
+2006-05-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.maint (gzip_rsyncable, GZIP_ENV): Compute within the
+	shell, not within 'make', so that 'make' by an ordinary builder
+	(using GNU make) does not worry about configuring gzip.  This also
+	works around a bug reported independently by Keith Thompson and by
+	Georg Schwarz, whereby gzip 1.2.4 --help would output usage on
+	stderr rather than stdout, messing up the build logs.
+
+2006-05-21  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/yacc.c (yyparse): Wrap the final return from yyparse inside YYID
+	to make sure that YYID will never be unused.  This fixes a 'make
+	maintainer-check' failure caused by the recent changes to the 'Trivial
+	grammars' test case, which caused g++ 4.1.0 to complain that YYID was
+	not used.
+	* data/glr.c (yyparse): Wrap yyparse's return inside YYID just in case.
+
+2006-05-21  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/glr.c (yyresolveLocations): Remove bogus YYASSERT that the
+	state before an empty RHS is always resolved here.  Only the location
+	of that state is guaranteed to be resolved, and that's enough.  This
+	fixes the remaining bug reported by Derek M. Jones in
+	<http://lists.gnu.org/archive/html/bug-bison/2006-05/msg00027.html>.
+	* tests/glr-regression.at (Uninitialized location when reporting
+	ambiguity): Test the above case.
+	Also, the embedded comments in this test case claim it checks the case
+	of an empty RHS that has inherited the initial location.  However, the
+	corresponding LHS was already resolved, so yyresolveLocations didn't
+	actually have reason to modify it.  Fix this by forcing
+	nondeterministic operation at the beginning of the parse.
+
+2006-05-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/c.m4 (b4_yy_symbol_print_generate):
+	(b4_yy_symbol_print_generate): Use 'YYSTYPE const' rather than
+	'const YYSTYPE', and similarly for YYLTYPE.  This fixes one
+	of the bugs reported today by Derek M Jones in
+	<http://lists.gnu.org/archive/html/bug-bison/2006-05/msg00027.html>.
+	* doc/bison.texinfo (Value Type): Document that YYSTYPE must be
+	defined to be a type name without parens or brackets.
+	(Location Type): Similarly for YYLTYPE.
+	* tests/regression.at (Trivial grammars): Put in a test for this
+	bug that will be caught by 'make maintainer-check' (though not,
+	alas, by 'make check' unless your compiler is picky).
+
+2006-05-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Version 2.2.
+	* configure.ac (AC_INIT): Likewise.
+
+2006-05-17  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/glr.c (yyreportTree): Make room in yystates for the state
+	preceding the RHS.  This fixes the segmentation fault reported by Derek
+	M. Jones in
+	<http://lists.gnu.org/archive/html/help-bison/2006-05/msg00035.html>.
+	(yyreportTree, yypdumpstack): Subtract 1 from yyrule before printing
+	to the user.  Reported for yyreportTree by Derek M. Jones later in the
+	same thread.
+	* THANKS: Add Derek M. Jones.
+	Update my email address.
+	Fix typo in Steve Murphy's name.
+
+2006-05-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/glr.c (yyreportSyntaxError): Fix off-by-one error in
+	checking against YYLAST that caused the parser to miss a potential
+	alternative in its diagnostic.
+	Problem reported by Maria Jose Moron Fernandez in
+	<http://lists.gnu.org/archive/html/bug-bison/2006-05/msg00024.html>.
+	* data/lalr1.cc (yysyntax_error_): Likewise.
+	* data/yacc.c (yysyntax_error): Likewise.
+	* tests/regression.at (_AT_DATA_DANCER_Y): Use static array for
+	tokens, in case we run into an older C compiler.
+	(_AT_DATA_EXPECT2_Y, AT_CHECK_EXPECT2): New macros.
+	Use them to check for the off-by-one error fixed above.
+
+	* data/yacc.c (yytnamerr): Fix typo: local var should be of type
+	YYSIZE_T, not size_t.
+	* tests/regression.at (Trivial grammars): New test, to catch
+	the error fixed by the above patch.
+
+2006-05-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	* doc/bison.texinfo (C++ Bison Interface): Clarify the naming
+	scheme.
+	Reported by Steve Murphy.
+
+2006-05-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	* data/glr.cc, data/lalr1.cc: Using %defines is mandatory.
+	* data/glr.cc: b4_location_flag is now b4_locations_flag.
+
+2006-05-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	Implement --trace=m4.
+	* src/getargs.c (trace_types, trace_args): Accept trace_m4.
+	* src/output.c (output_skeleton): When set, pass -dV to m4.
+
+	Factor the handling of flags in m4.
+	* src/output.c (prepare): Rename the muscle names debug, defines,
+	error_verbose to debug_flag, defines_flag, error_verbose_flag.
+	* data/c.m4: Adjust.
+	(_b4_define_flag_if, b4_define_flag_if, b4_defines_if): New.
+	Use b4_define_flag_if to define other b4_FLAG_if macros.
+	(b4_location_if): As a consequence, rename as...
+	(b4_locations_if): this, for consistency.
+	Adjust all the skeletons.
+
+2006-05-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	* etc/bench.pm: Shorten bench names.
+
+2006-05-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	* src/output.h, src/output.c (error_verbose): Move to...
+	* src/getargs.h, src/getargs.c: here.
+	Sort the flags.
+	Adjust dependencies.
+
+2006-05-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/c.m4 (b4_copyright): Put the special exception for Bison
+	skeletons here, so we don't have to put it in each skeleton.  All
+	uses changed.  Suggested by Akim Demaille.  Also, wrap the
+	copyright notice, in case it is longer than 80 columns.  Replace
+	comma by newline after title.
+
+2006-05-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/bison.texinfo (Calc++ Scanner): The flex behavior is an
+	incompatibility, not a bug.  Mention that it wasn't fixed as of
+	flex 2.5.33.
+
+2006-05-11  Akim Demaille  <akim@lrde.epita.fr>
+
+	* examples/extexi: Enforce the precedence of concatenation over
+	>>.
+	Reported by Tommy Nordgren.
+
+2006-05-11  Akim Demaille  <akim@lrde.epita.fr>
+
+	* data/lalr1.cc (yytranslate_): Rename token as t to avoid clashes
+	with the member "token".
+	Reported by Martin Nylin.
+
+2006-05-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/glr.c: Switch to Bison 2.2 special-exception language in
+	the copyright notice.  Use more-regular format for titles and
+	copyright notices.
+	* data/glr.cc: Likewise.
+	* data/location.cc: Likewise.
+	* data/yacc.cc: Likewise.
+	* doc/bison.texinfo (Conditions): Document this.
+	* NEWS: likewise.  Upgrade version to 2.2.
+
+2006-04-27  Akim Demaille  <akim@lrde.epita.fr>
+
+	* data/glr.cc: Remove dead code.
+
+2006-04-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* bootstrap: Comment out the AM_CPPFLAGS line, since we don't use
+	that variable and the line breaks the bootstrap.  Problem reported
+	by Juan M. Guerrero.
+
+2006-04-24  Akim Demaille  <akim@lrde.epita.fr>
+
+	* doc/bison.texinfo (Multiple start-symbols): New.
+
+2006-04-24  Akim Demaille  <akim@lrde.epita.fr>
+
+	* etc/README, etc/bench.pl: New.
+
+2006-04-03  Akim Demaille  <akim@lrde.epita.fr>
+
+	* src/scan-gram.l: Be robust to BRACED_CODE appearing before any
+	rule.
+	Reported by Mickael Labau.
+	* tests/input.at (Torturing the Scanner): Test it.
+
+2006-03-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/bison.texinfo (Decl Summary): Don't mention yylloc twice.
+	Problem reported by Bob Rossi.
+
+2006-03-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/bison.texinfo: Remove @shorttitlepage stuff; it wasn't used
+	and didn't really work.
+	For the index, use @ifnotinfo, not @iftex.
+	Minor cleanups of spacing and terminology.
+
+2006-03-12  Akim Demaille  <akim@lrde.epita.fr>
+
+	* tests/local.at (_AT_BISON_OPTION_PUSHDEFS): Fix the definition
+	of AT_NAME_PREFIX when %name-prefix is not used.
+
+2006-03-12  Akim Demaille  <akim@lrde.epita.fr>
+
+	Apply --prefix to C++ skeletons too: they change the namespace.
+	The test suite already exercize these cases.
+	* data/c++.m4 (b4_namespace): New.
+	* data/lalr1.cc, data/glr.cc, data/location.cc: Use it instead of `yy'.
+	* data/lalr1.cc (yytnameerr_): Move its definition into the namespace.
+	* data/yacc.c, data/glr.c: Remove a useless `[]'.
+	* doc/bison.texinfo: Document it.
+	(Option Cross Key): Use @multitable in all formats.  It looks
+	nicer, even in TeX outputs.
+	(Rules): Use the same code whatever the output type is.
+	* tests/local.at (_AT_BISON_OPTION_PUSHDEFS)
+	(_AT_BISON_OPTION_POPDEFS): Support AT_NAME_PREFIX.
+	* tests/calc.at: Use it, instead of hard coding `yy'.
+
+2006-03-10  Akim Demaille  <akim@lrde.epita.fr>
+
+	* TODO: Remove dead items.
+
+2006-03-10  Akim Demaille  <akim@lrde.epita.fr>
+
+	* doc/FAQ: Remove, merged into...
+	* doc/bison.texinfo (FAQ): this.
+	* doc/Makefile.am (EXTRA_DIST): Adjust.
+
+2006-03-10  Akim Demaille  <akim@lrde.epita.fr>
+
+	* data/c.m4 (b4_token_enum): Always define the enum of tokens,
+	even if empty.
+	* data/lalrl1.cc, data/glr.cc (parser::token_type): New.
+	* doc/bison.texinfo (Calc++ Scanner): Use it.
+
+2006-03-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix two nits reported by twlevo, plus one more that I discovered.
+
+	* src/assoc.h (assoc_to_string): Give a name to the arg, as
+	this is the usual Bison style.
+	* src/location.h (location_print): Likewise.
+
+	* src/reader.h (token_name): Likewise.
+
+2006-03-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix some nits reported by twlevo.
+	* doc/FAQ: Remove ancient Y2K FAQ, replacing it with "secure"
+	and "POSIX".  Use more-modern syntax for URLs.  Mention C++
+	and ask for Java.  Don't hardwire OS version numbers.  Add
+	copyright notice.
+	* m4/.cvsignore: Add unistd_h.m4, for latest gnulib.
+	* src/conflicts.c (solved_conflicts_obstack): Now static.
+
+2006-03-08  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* doc/bison.texinfo (Introduction): Mention GLR and C++ as on the web
+	page.  Say "you can use it" not "you may use it" as on the web page;
+	we're describing capabilities not granting permission.
+
+2006-03-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/glr.c (yyresolveLocations): Rename local variables to avoid
+	shadowing warnings.  Use usual patter for iterating through RHS.
+	* tests/glr-regression.at
+	(Uninitialized location when reporting ambiguity):
+	Modify yylex so that it uses its argument, rather than trying
+	to rely on ARGSUSED (which doesn't work for gcc with warnings).
+	const char -> char const.
+
+	* tests/Makefile.am ($(srcdir)/package.m4, maintainer-check-valgrind):
+	Don't use tabs inside commands; it messes up 'ps'.
+	Problem reported by twlevo.
+
+2006-03-06  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* tests/glr-regression.at (Uninitialized location when reporting
+	ambiguity): New test case.
+	* data/glr.c (yyresolveLocations): New function, which uses
+	YYLLOC_DEFAULT.
+	(yyresolveValue): Invoke yyresolveLocations before reporting an
+	ambiguity.
+	* doc/bison.texinfo (Default Action for Locations): Note
+	YYLLOC_DEFAULT's usage for ambiguity locations.
+	(GLR Semantic Actions): Cross-reference those notes.
+
+2006-03-04  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* tests/glr-regression.at (Leaked semantic values when reporting
+	ambiguity): Remove unnecessary union and type declarations.
+	(Leaked lookahead after nondeterministic parse syntax error): New test
+	case.
+	* data/glr.c (yyparse): Check for zero stacks remaining before
+	attempting to shift the lookahead so that you don't lose it.
+
+2006-03-02  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	Avoid memory leaks by not invoking longjmp in yyreportAmbiguity.
+	* tests/glr-regression.at (Leaked semantic values when reporting
+	ambiguity): New test case.
+	* data/glr.c (yyreportAmbiguity): Invoke yyyerror directly and return
+	yyabort rather than invoking yyFail, which invokes longjmp.  Remove the
+	now unnecessary yystackp parameter.
+	(yyresolveValue): Return yyreportAmbiguity's result.  Now the necessary
+	destructors can be called.
+
+	* tests/glr-regression.at: Don't invoke bison with `-t' unnecessarily
+	in existing testcases.
+
+2006-03-02  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	Don't leak semantic values for parent RHS when a user action cuts the
+	parser, and clean up related code a bit.
+	* tests/glr-regression.at (Leaked merged semantic value if user action
+	cuts parse): Rename to...
+	(Leaked semantic values if user action cuts parse): ... this.  Add check
+	for leaked parent RHS values.
+	* data/glr.c (yydestroyGLRState): In debugging output, distinguish
+	between an unresolved state (non-empty chain of semantic options) and
+	an incomplete one (signaled by an empty chain).
+	(yyresolveStates): Document the interface.  Move all manipulation of a
+	successfully or unsuccessfully resolved yyGLRState to...
+	(yyresolveValue): ... here so that yyresolveValue always leaves a
+	yyGLRState with consistent data and thus is easier to understand.
+	Remove the yyvalp and yylocp parameters since they are always just
+	taken from the yys parameter.  When reporting a discarded merged value
+	in debugging output, note that it is incompletely merged.  Document the
+	interface.
+	(yyresolveAction): If resolving any of the RHS states fails, destroy
+	them all rather than leaking them.  Thus, as long as user actions are
+	written to clean up the RHS correctly, yyresolveAction always cleans up
+	the RHS of a semantic option.  Document the interface.
+
+2006-02-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/glr.c (yyexpandGLRStack): Catch an off-by-one error that
+	led to a segmentation fault in GNU Pascal.  Problem reported
+	by Waldek Hebisch.
+
+2006-02-21  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* doc/bison.texinfo (Mid-Rule Actions): Explain how to bury a
+	mid-rule action inside a nonterminal symbol in order to declare a
+	destructor for its semantic value.
+
+2006-02-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/yacc.c [(! defined yyoverflow || YYERROR_VERBOSE) && !
+	YYSTACK_USE_ALLOCA && ! defined YYSTACK_ALLOC && defined
+	__cplusplus && ! defined _STDLIB_H && !
+	((defined YYMALLOC || defined malloc) && (defined YYFREE ||
+	defined free))]: Include <stdlib.h> rather than rolling our own
+	declarations of malloc and free, to avoid problems with
+	incompatible declarations (using 'throw') C++'s stdlib.h.  This
+	should fix Debian bug 340012
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340012>,
+	reported by Guillaume Melquiond.
+
+2006-02-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Clarify symbols versus types in unused-value warnings.
+
+	* configure.ac (AC_INIT): Bump version number.
+
+2006-02-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Version 2.1a.
+	* tests/headers.at (AT_TEST_CPP_GUARD_H): Declare yyerror and yylex,
+	since C99 requires this.
+
+2006-02-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* m4/c-working.m4: New file.
+	* configure.ac (BISON_TEST_FOR_WORKING_C_COMPILER): Use it.
+
+2006-02-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.maint: Merge from coreutils.
+
+2006-02-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	More portability fixes for problems summarized by Nelson H. F. Beebe.
+
+	* m4/cxx.m4 (BISON_TEST_FOR_WORKING_CXX_COMPILER): Catch a
+	configuration screwup "./configure CC=/opt/SUNWspro/bin/c89
+	CFLAGS="-xarch=generic64" CXX=/opt/SUNWspro/bin/CC
+	LDFLAGS="-xarch=generic64" with Sun C 5.7 on Solaris 10; this
+	messes up because C++ code is compiled in 32-bit mode but linked
+	in 64-bit mode.
+
+2006-02-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	More portability fixes for problems summarized by Nelson H. F. Beebe.
+
+	* doc/bison.texinfo (Calc++ Scanner): Work around a bug in flex
+	2.5.31.  This resembles the 2005-10-10 patch to src/scan-skel.l.
+
+	* examples/calc++/Makefile.am (check_PROGRAMS): Renamed from
+	nodist_PROGRAMS, since we don't need to actually compile the
+	example if we're just doing a plain 'make'.  This avoids bothering
+	the installer unnecessarily about problems due to weird C++
+	compilers.
+
+2006-02-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	More portability fixes for problems summarized by Nelson H. F. Beebe.
+
+	* tests/headers.at (AT_TEST_CPP_GUARD_H): Use #include <...> rather
+	than #include "...", and compile with -I'.'.  The old method was
+	not portable, according to Posix and the C standard, and it does
+	not work with Sun C 5.7, where previous #line directives affect
+	the working directory used in later #include "..." directives.
+
+2006-02-06  Juan Manuel Guerrero  <juan.guerrero@gmx.de>
+
+	Various DJGGP specific issues in /djgpp
+
+2006-02-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	More portability fixes for problems summarized by Nelson H. F. Beebe.
+
+	* m4/cxx.m4 (BISON_TEST_FOR_WORKING_CXX_COMPILER): Check that
+	'#include <map>' works and that you can apply ++ to iterators.
+
+2006-02-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Work around portability problems summarized by Nelson H. F. Beebe in
+	<http://lists.gnu.org/archive/html/bug-bison/2005-09/msg00021.html>.
+
+	* m4/cxx.m4 (BISON_TEST_FOR_WORKING_CXX_COMPILER): Check
+	that '#include <string>' works.
+
+	* data/lalr1.cc (yytranslate_): No longer inline, to work around a
+	porting problem to g++ 3.4.3 on Darwin 7.9.0, where g++ complained
+	"warning: sorry: semantics of inline function static data `const
+	unsigned char translate_table[262]' are wrong (you'll wind up with
+	multiple copies)".
+
+	* lib/bbitset.h (struct bitset_vtable): Rename members not, and,
+	or, xor to not_, and_, or_, and xor_, respectively.  This works
+	around a bug in GCC 3.4.3 on Irix 6.5, which apparently has a
+	random system header somewhere that includes the equivalent of
+	<iso646.h>.
+
+	* tests/headers.at (AT_TEST_CPP_GUARD_H): Don't assume that "$CC
+	-E" works; it apparently doesn't work with PathScale EKO Compiler
+	Suite Version 2.0.
+
+2006-01-30  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	During deterministic GLR operation, user actions should be able to
+	influence the parse by changing yychar.  To make this easier to fix and
+	to make glr.c easier to evolve in general, don't maintain yytoken in
+	parallel with yychar; just compute yytoken when needed.
+	* tests/glr-regression.at (Incorrect lookahead during deterministic
+	GLR): Check that setting yychar in a user action has the intended
+	effect.
+	* data/glr.c (yyGLRStack): Remove yytokenp member.
+	(yyclearin): Don't set *yytokenp.
+	(yyprocessOneStack, yyreportSyntaxError, yyrecoverSyntaxError): Examine
+	yychar rather than *yytokenp to determine the current lookahead.
+	Compute yytoken locally when needed.
+	(yyparse): Likewise.  Remove the local yytoken that yytokenp used to
+	point to.
+
+	* doc/bison.texinfo (Bison Options): Remove stray sentence fragment
+	after `--report' documentation.
+
+2006-01-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/parse-gram.y (grammar_declaration): Location of printer
+	symbol is @1, not list->location.  Bug reported by twlevo.
+	* tests/input.at (Incompatible Aliases): Adjust to above change.
+
+2006-01-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/input.at (AT_CHECK_UNUSED_VALUES): Remove.  Instead, do
+	all the test at once.  This makes the output easier to read in the
+	normal case.
+
+	Fix a longstanding bug uncovered by bro-0.9a9/src/parse.y, which I
+	got from <http://bro-ids.org/download.html>.  The bug is that
+	when two actions appeared in succession, the second one was
+	scanned before the first one was added to the grammar rule
+	as a midrule action.  Bison then output the incorrect warning
+	"parse.y:905.17-906.36: warning: unused value: $3".
+	* src/parse-gram.y (BRACED_CODE, action): These are no longer
+	associated with a value.
+	(rhs): Don't invoke grammar_current_rule_action_append.
+	(action): Invoke it here instead.
+	* src/reader.c (grammar_midrule_action): Now extern.
+	(grammar_current_rule_action_append): Don't invoke
+	grammar_midrule_action; that is now the scanner's job.
+	* src/reader.h (last_string, last_braced_code_loc):
+	(grammar_midrule_action): New decls.
+	* src/scan-gram.l (last_string): Now extern, sigh.
+	(last_braced_code_loc): New extern variable.
+	(<INITIAL>"{"): Invoke grammar_midrule_action if the current
+	rule already has an action.
+	(<SC_BRACED_CODE>"}"): Set last_braced_code_loc before returning.
+	* tests/input.at (AT_CHECK_UNUSED_VALUES):
+	Add some tests to check that the above changes fixed the bug.
+
+2006-01-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/reader.c (symbol_should_be_used): Renamed from symbol_typed_p.
+	All used changed.  Check whether the symbol has a destructor,
+	not whether it is typed.
+	* tests/input.at (AT_CHECK_UNUSED_VALUES): Add a destructor, so
+	that the values are still reported as unused.  All line numbers
+	adjusted.
+
+2006-01-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Work around a bug in bro 0.8, which underparenthesizes its
+	definition of YYLLOC_DEFAULT.
+	* data/glr.c: Change all uses of YYLLOC_DEFAULT to parenthesize
+	their arguments.
+	* data/lalr1.cc: Likewise.
+	* data/yacc.cc: Likewise.
+
+2006-01-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Work around a bug in Pike 7.0, and give the Pike folks a
+	better way to override the usual int widths.
+	* data/yacc.c (b4_int_type): Use yytype_uint8, etc., so that the
+	user can override the types.
+	(short): #undef, to work around a bug in Pike 7.0.
+	(yytype_uint8, yytype_int8, yytype_uint16, yytype_int16): New types.
+	(union yyalloc.yyss): Use yytype_int16 rather than short.
+	All uses changed.
+	(yysigned_char): Remove.
+	* src/parse-gram.y (YYTYPE_UINT8, YYTYPE_INT8, YYTYPE_UINT16):
+	(YYTYPE_INT16): New macros, to test the new facility in yacc.c.
+	* tests/regression.at (Web2c Actions): Adjust to above changes.
+
+	* src/reader.c (check_and_convert_grammar): New function.
+	(reader): Close the input file even if something went wrong during
+	parsing.  Minor file descriptor leak reported by twlevo.
+
+	* src/assoc.c (assoc_to_string): Use a default: abort (); case
+	to pacify gcc -Wswitch-default.
+	* src/scan-gram.l (adjust_location): Use a default: break; case
+	to pacify gcc -Wswitch-default.
+	* src/scan-skel.h (skel_get_lineno, skel_get_in, skel_get_out):
+	(skel_get_leng, skel_get_text, skel_set_lineno, skel_set_in):
+	(skel_set_out, skel_get_debug, skel_set_debug, skel_lex_destroy):
+	Move these decls to scan-skel.l, since they don't need to be
+	visible elsewhere.
+	* src/scan-skel.l: Accept the above decls.
+	(skel_lex): New decl, to pacify GCC when unpatched flex 2.5.31
+	is used.
+
+2006-01-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.cfg (local-checks-to-skip): Add changelog-check,
+	since we don't want to insist on a version number at the start
+	of the changelog every time.
+	* Makefile.maint: Sync from coreutils a bit better.
+	(sc_trailing_blank): Renamed from sc_trailing_space.
+	All uses changed.
+	(sc_no_if_have_config_h, sc_require_config_h):
+	(sc_prohibit_assert_without_use): New rules.
+	(sc_obsolete_symbols): Don't catch Makefile.maint itself.
+	(sc_dd_max_sym_length): Fix leading spaces in rule.
+	(sc_system_h_headers): Prefix with @.
+	(sc_useless_cpp_parens, m4-check): Output line numbers.
+	(changelog-check): Allow version only in head.
+	* data/c.m4: Use "defined FOO" instead of "defined (FOO)", to
+	satisfy new Makefile.maint rule.
+	* data/glr.c: Likewise.
+	* data/glr.cc: Likewise.
+	* data/lalr1.cc: Likewise.
+	* data/yacc.c: Likewise.
+	* lib/ebitsetv.c: Likewise.
+	* lib/lbitset.c: Likewise.
+	* lib/subpipe.c: Likewise.
+	* lib/timevar.c: Likewise.
+	* src/system.h: Likewise.
+	* data/yacc.c (YYSTYPE): Don't generate trailing spaces in output.
+	* djgpp/Makefile.maint: Add copyright notice.
+	* djgpp/README.in: Likewise.
+	* djgpp/config.bat: Likewise.
+	* djgpp/config.site: Likewise.
+	* djgpp/config_h.sed: Likewise.
+	* djgpp/djunpack.bat: Likewise.
+	* djgpp/config.sed: Fix copyright notice to match standard format.
+	* djgpp/subpipe.h: Likewise.
+	* lib/bitsetv-print.c: Likewise.
+	* lib/bitsetv.c: Likewise.
+	* lib/subpipe.h: Likewise.
+	* lib/timevar.c: Likewise.
+	* lib/timevar.h: Likewise.
+	* djgpp/subpipe.c: Use standard recipe for config.h.
+	* lib/abitset.c: Likewise.
+	* lib/bitset.c: Likewise.
+	* lib/bitset_stats.c: Likewise.
+	* lib/bitsetv-print.c: Likewise.
+	* lib/bitsetv.c: Likewise.
+	* lib/ebitsetv.c: Likewise.
+	* lib/get-errno.c: Likewise.
+	* lib/lbitset.c: Likewise.
+	* lib/subpipe.c: Likewise.
+	* lib/timevar.c: Likewise.
+	* lib/vbitset.c: Likewise.
+	* tests/local.at: Likewise.
+	* src/scan-gram.l: Don't include verify.h, since system.h does
+	that for us.
+	* .x-sc_require_config_h: New file.
+	* .x-sc_unmarked_diagnostics: New file.
+
+2006-01-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Be a bit more systematic about using 'abort'.
+	* lib/abitset.c (abitset_test): Remove ATTRIBUTE_UNUSED; not needed.
+	* lib/bitset.c (bitset_bytes, bitset_init, bitset_op4_cmp):
+	Put 'default: abort ();' before some other case, to satisfy older
+	pedantic compilers.
+	* lib/bitset_stats.c (bitset_stats_init): Likewise.
+	* lib/ebitset.c (ebitset_elt_find, ebitset_op3_cmp): Likewise.
+	* lib/lbitset.c (lbitset_elt_find, lbitset_op3_cmp): Likewise.
+	* src/conflicts.c (resolve_sr_conflict): Likewise.
+	* src/vcg.c (get_color_str, get_textmode_str, get_shape_str):
+	(get_decision_str, get_orientation_str, get_node_alignment_str):
+	(get_arrow_mode_str, get_crossing_type_str, get_view_str):
+	(get_linestyle_str, get_arrowstyle_str): Likewise.
+	* src/conflicts.c (resolve_sr_conflict):
+	Use a default case rather than one for the one remaining enum
+	value, to catch invalid enum values as well.
+	* src/lalr.c (set_goto_map, map_goto):
+	Prefer "assert (FOO);" to "if (!FOO) abort ();".
+	* src/nullable.c (nullable_compute, token_definitions_output):
+	Likewise.
+	* src/reader.c (packgram, reader): Likewise.
+	* src/state.c (transitions_to, state_new, state_reduction_find):
+	Likewise.
+	* src/symtab.c (symbol_user_token_number_set, symbol_make_alias):
+	(symbol_pack): Likewise.
+	* src/tables.c (conflict_row, pack_vector): Likewise.
+	* src/scan-skel.l (QPUTS): Remove unnecessary parens.
+	(BASE_QPUTS, "@output ".*\n): Remove unnecessary asserts.
+	* src/system.h: Don't include <assert.h>.
+	(assert): New macro.
+
+	* doc/bison.texinfo (Prologue, Rules, Actions, Union Decl, Action Decl):
+	(Destructor Decl, Parser Function, Pure Calling):
+	Describe rules for braces inside C code more carefully.
+
+2006-01-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix some porting glitches found by Nelson H. F. Beebe.
+	* lib/abitset.c (abitset_resize): Rewrite to avoid warnings from
+	compilers that don't understand that abort () does not return.
+	* src/state.c (transitions_to): Likewise.
+	* m4/cxx.m4 (BISON_TEST_FOR_WORKING_CXX_COMPILER): Check
+	that '#include <cstdlib>' works.
+	* src/system.h (INT8_MIN, INT16_MIN, INT32_MIN, INT8_MAX):
+	(INT16_MAX, UINT8_MAX, INT32_MAX, UINT16_MAX, UINT32_MAX):
+	#undef if ! defined __STDC_VERSION__ || __STDC_VERSION__ < 199901,
+	for the benefit of some pre-C99 compilers.
+
+	* bootstrap: Undo changes to gnulib files that autoreconf made.
+
+	Minor fixups to get 'make maintainer-check' to work.
+	* configure.ac: Don't use -Wnested-externs, as it's incompatible
+	with the new verify.h implementation.
+	* data/c.m4 (b4_yy_symbol_print_generate): YYUSE (yyoutput).
+	* data/glr.c (YYUSE): Depend on __GNUC__ as well.
+	* data/yacc.c (YYUSE): Likewise.
+	* data/lalr1.cc (yysyntax_error_): YYUSE (yystate).
+	* lib/subpipe.c (end_of_output_subpipe): The args are unused.
+	* src/parse-gram.y (declaration): Don't pass a string constant
+	to a function that expects char *, since GCC might complain
+	about the constant value.
+	* src/reader.c (symbol_typed_p): Add parens to pacify GCC.
+	* tests/cxx-type.at (_AT_TEST_GLR_CXXTYPES): #undef yylloc and yylval
+	before #defining them.
+	* tests/glr-regression.at
+	(Incorrectly initialized location for empty right-hand side in GLR):
+	In yyerror, use the msg arg.
+	(Corrupted semantic options if user action cuts parse):
+	(Incorrect lookahead during deterministic GLR):
+	(Incorrect lookahead during nondeterministic GLR):
+	Don't name a local var 'index'; it shadows string.h's 'index'.
+
+2006-01-19  Akim Demaille  <akim@epita.fr>
+
+	* tests/calc.at (_AT_DATA_CALC_Y): Initialize the whole initial
+	location, not just parts of it.
+
+2006-01-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Document the fact that multiple %unions are now allowed.
+	* doc/bison.texinfo (Union Decl): Likewise.
+	* TODO: This feature is now implemented, so remove it from
+	the wishlist.
+
+	* Makefile.maint: Merge with coreutils Makefile.maint.
+	(CVS_LIST): Use build-aux version if available.
+	(VERSION_REGEXP): New macro.
+	(syntax-check-rules): Add sc_no_if_have_config_h,
+	sc_prohibit_assert_without_use, sc_require_config_h,
+	sc_useless_cpp_parens.
+	(sc_obsolete_symbols): Check for O_NDELAY.
+	(sc_dd_max_sym_length): Track coreutils.
+	(sc_unmarked_diagnostics): Look in all files, not just *.c.
+	(sc_useless_cpp_parens): New rule.
+	(news-date-check): Look for version or today's date.
+	(changelog-check): Don't require version number near head.
+	(copyright-check): Use current year instead of hardwiring 2005.
+	(my-distcheck): Depend on $(release_archive_dir)/$(prev-tgz).
+	(announcement): Add --gpg-key-ID.
+
+	* djgpp/config.sed: Add copyright notice, and replace "filesystem"
+	with "file system".
+
+	Avoid undefined behavior that addressed just before the start of an
+	array.  Problem reported by twlevo.
+	* src/reader.c (packgram): Prepend a new sentinel before ritem.
+	* src/lalr.c (build_relations): Rely on new sentinel.
+	* src/gram.c (gram_free): Adjust to new sentinel.
+
+2006-01-12  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/glr.c (yyGLRStateSet): Rename yylookaheadStatuses to
+	yylookaheadNeeds.  All uses updated.
+	(yysplitStack): Rename local yynewLookaheadStatuses to
+	yynewLookaheadNeeds.
+	* data/glr-regression.at (Incorrect lookahead during nondeterministic
+	GLR): In comments, change `lookahead status' to `lookahead need'.
+
+2006-01-11  Paul Hilfinger  <hilfingr@tully.CS.Berkeley.EDU>
+
+	* data/glr.c (yysplitStack): A little stylistic rewrite.
+
+2006-01-11  Paul Hilfinger  <hilfingr@tully.CS.Berkeley.EDU>
+
+	* data/glr.c (yyaddDeferredAction): Flesh out the comment.
+
+2006-01-11  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* doc/bison.texinfo: Fix some typos.
+	(GLR Semantic Actions): New subsection discussing special
+	considerations because GLR semantic actions might be deferred.
+	(Actions): Mention look-ahead usage of yylval.
+	(Actions and Locations): Mention look-ahead usage of yylloc.
+	(Special Features for Use in Actions): Add YYEOF entry and mention it
+	in the yychar entry.
+	In the yychar entry, remove mention of the local yychar case (pure
+	parser) since this is irrelevant information when writing semantic
+	actions and since it's already discussed in `Bison Symbols' where
+	yychar is otherwise described as an external variable.
+	In the yychar entry, don't call it the `current' look-ahead since it
+	isn't when semantic actions are deferred.
+	In the yychar and yyclearin entries, add note about deferred semantic
+	actions.
+	Add yylloc and yylval entries discussing look-ahead usage.
+	(Look-Ahead Tokens): When discussing yychar, don't call it the
+	`current' look-ahead, and do mention yylval and yylloc.
+	(Error Recovery): Cross-reference `Action Features' when mentioning
+	yyclearin.
+	(Bison Symbols): In the yychar entry, don't call it the `current'
+	look-ahead.
+	In the yylloc and yylval entries, mention look-ahead usage.
+
+2006-01-08  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* tests/glr-regression.at: Update copyright year to 2006.
+
+2006-01-06  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/glr.c (yyGLRStateSet): Add yybool* yylookaheadStatuses member to
+	use during nondeterministic operation to track which stacks have
+	actually needed the current lookahead.
+	(yyinitStateSet, yyfreeStateSet, yyremoveDeletes, yysplitStack):
+	Allocate, deallocate, resize, and otherwise shuffle space for
+	yylookaheadStatuses in parallel with yystates member of yyGLRStateSet.
+	(yysplitStack, yyprocessOneStack, yyparse): Set lookahead status
+	appropriately during nondeterministic operation.
+	(yySemanticOption): Add int yyrawchar, YYSTYPE yyval, and YYLTYPE yyloc
+	members to store the current lookahead to be used by the deferred
+	user action.
+	(yyaddDeferredAction): Add size_t yyk parameter specifying the stack
+	from which the RHS is taken.  Set the lookahead members of the new
+	yySemanticOption according to the lookahead status for stack yyk.
+	(yyglrShiftDefer, yyglrReduce): Pass yyk parameter on to
+	yyaddDeferredAction.
+	(yyresolveAction): Set yychar, yylval, and yylloc to the lookahead
+	members of yySemanticOption before invoking yyuserAction, and then set
+	them back to their current values afterward.
+	(yyparse): Set yychar = YYEMPTY where yytoken = YYEMPTY.
+	(yyreportAmbiguity): Add /*ARGSUSED*/ to pacify lint.
+	* tests/glr-regression.at: Remove `.' from the ends of recent test case
+	titles for consistency.
+	(Leaked merged semantic value if user action cuts parse): In order to
+	suppress lint warnings, use arguments in merge function, and assign
+	char value < 128 in main.
+	(Incorrect lookahead during deterministic GLR): New test case.
+	(Incorrect lookahead during nondeterministic GLR): New test case.
+
+2006-01-06  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/c.m4 (b4_yy_symbol_print_generate): In yy_symbol_print, accept
+	!yyvaluep as signal that no semantic value is available to print.
+	* data/glr.c (yydestroyGLRState): If state is not resolved, don't try
+	to print a semantic value.
+
+2006-01-06  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* tests/glr-regression.at: For consistency with my newer test cases,
+	don't thank myself.
+
+2006-01-05  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/glr.c (yyresolveValue): When merging semantic options, if at
+	least one user action succeeds but a later one cuts the parse, then
+	destroy the semantic value before returning rather than leaking it.
+	(yyresolveStates): If a user action cuts the parse and thus
+	yyresolveValue fails, ignore the (unset) semantic value rather than
+	corrupting the yyGLRState, and empty the semantic options list since
+	the user actions should have called all necessary destructors.
+	Simplify code with YYCHK.
+	* tests/glr-regression.at (Corrupted semantic options if user action
+	cuts parse): New test case.
+	(Undesirable destructors if user action cuts parse): New test case.
+	Before applying any of this patch, this test case never actually failed
+	for me... but only because the corrupted semantic options usually
+	masked this bug.
+	(Leaked merged semantic value if user action cuts parse): New test
+	case.
+
+2006-01-05  Akim Demaille  <akim@epita.fr>
+
+	* src/reader.c, src/symlist.h, src/symlist.c: s/mid_rule/midrule/.
+
+2006-01-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/c.m4 (b4_c_modern): New macro, with a new provision for
+	_MSC_VER.  Problem reported by Cenzato Marco.
+	(b4_c_function_def): Use it.
+	* data/yacc.c (YYMODERN_C): Remove.  All uses replaced by
+	b4_c_modern.
+	(yystrlen, yystpcpy, yyparse): Use b4_c_function... macros rather
+	than rolling our own.
+
+2006-01-04  Akim Demaille  <akim@epita.fr>
+
+	Also warn about non-used mid-rule values.
+	* src/symlist.h, src/symlist.c (symbol_list): Add a mid_rule
+	member.
+	(symbol_list_new): Adjust.
+	* src/reader.c (symbol_typed_p): New.
+	(grammar_rule_check): Use it.
+	(grammar_midrule_action): Bind a mid-rule LHS to its rule.
+	Check its rule.
+	* tests/input.at (AT_CHECK_UNUSED_VALUES): New.
+	Use it.
+	* tests/actions.at (Exotic Dollars): Adjust.
+
+2006-01-04  Akim Demaille  <akim@epita.fr>
+
+	* src/reader.c (grammar_midrule_action): If $$ is set in a
+	mid-rule, move the `used' bit to its lhs.
+	* tests/input.at (Unused values): New.
+	* tests/actions.at (Exotic Dollars): Adjust: exp is not typed.
+
+2006-01-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/bison.texinfo (Bison Options): Say more accurately what
+	--yacc does.
+	* src/parse-gram.y (rules_or_grammar_declaration): Don't complain
+	about declarations in the grammar when in Yacc mode, as POSIX does
+	not require a diagnostic when the grammar uses extensions.
+
+	* src/reduce.c (reduce_grammar): Remove unnecessary cast to bool.
+
+	Warn about dubious constructions like "%token T T".
+	Reported by twlevo.
+	* src/symtab.h (struct symbol.declared): New member.
+	* src/symtab.c (symbol_new): Initialize it to false.
+	(symbol_class_set): New arg DECLARING, specifying whether
+	this is a declaration that we want to warn about, if there
+	is more than one of them.  All uses changed.
+
+	* data/glr.c, data/glr.cc, data/lalr1.cc, data/yacc.c:
+	Allow multiple %union directives, whose contents concatenate.
+	* src/parse-gram.y (grammar_declaration): Likewise.
+	Use muscle_code_grow, so that we don't need stype_line any more.
+	All uses changed.
+
+	* src/muscle_tab.c (muscle_grow): Fix comment.
+
+	* ChangeLog, data/c.m4, data/glr.c, data/glr.cc, data/location.cc:
+	* data/yacc.c, src/getargs.c, src/output.c, tests/cxx-type.at:
+	Update copyright year to 2006.
+
+2006-01-03  Akim Demaille  <akim@epita.fr>
+
+	Have glr.cc pass (some of) the calc.at tests.
+	* data/glr.cc (b4_parse_param_orig): New.
+	(b4_parse_param): Improve its definition, and bound it more
+	clearly in the skeleton.
+	(b4_epilogue): Append, instead of prepending, in order to keep
+	#line consistency.
+	Simplify the generation of auxiliary functions: locations and
+	purity are mandated.
+	(b4_global_tokens_and_yystype): Honor it.
+	* data/location.cc (c++.m4): Don't include it.
+	* tests/local.at (_AT_BISON_OPTION_PUSHDEFS): Define AT_GLR_CC_IF
+	and AT_SKEL_CC_IF.
+	* tests/calc.at (AT_CHECK_CALC): Rely on AT_SKEL_CC_IF instead of
+	AT_LALR1_CC_IF.
+	Be sure to initialize the first position's filename.
+	(AT_CHECK_CALC_LALR1_CC): Add %location and %defines, they are
+	mandated anyway.
+	(AT_CHECK_CALC_GLR_CC): New.
+	Use it to exercise glr.cc as a lalr1.cc drop-in replacement.
+
+2006-01-02  Akim Demaille  <akim@epita.fr>
+
+	* src/output.c (output_skeleton): Don't hard wire the inclusion of
+	c.m4.
+	* data/c++.m4, data/glr.c, data/yacc.c: Include c.m4.
+	* data/glr.cc: Do not include stack.hh.
+
+2006-01-02  Joel E. Denny  <jdenny@ces.clemson.edu>
+
+	* data/glr.c: Reformat whitespace with tabs.
+	(b4_lpure_formals): Remove this unused m4 macro.
+	* tests/cxx-type.at: Reformat whitespace with tabs.
+	(_AT_TEST_GLR_CXXTYPES): In union Node, rename node_info to nodeInfo
+	since it's a member.  Rename type to isNterm for clarity.
+
+2005-12-29  Akim  <akim@sulaco.local>
+
+	Let glr.cc catch up with symbol_value_print.
+	* data/glr.cc (b4_yysymprint_generate): Replace by...
+	(b4_yy_symbol_print_generate): this.
+	(yy_symbol_print, yy_symbol_value_print): Declare them.
+
+2005-12-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/location.h (boundary): Note that a line or column equal
+	to INT_MAX indicates an overflow.
+	* src/scan-gram.l: Include verify.h.  Don't include get-errno.h.
+	(rule_length_overflow, increment_rule_length, add_column_width):
+	New functions.
+	(<INITIAL>{id}, <SC_ESCAPED_STRING>"\"", <SC_ESCAPED_CHARACTER>"'"):
+	(<SC_BRACED_CODE>"}"):
+	Use increment_rule_length rather than incrementing it by hand.
+	(adjust_location, handle_syncline): Diagnose overflow.
+	(handle_action_dollar, handle_action_at):
+	Fix bug with monstrosities like $-2147483648.
+	Remove now-unnecessary checks.
+	(scan_integer): Verify assumptions and remove now-unnecessary checks.
+	(convert_ucn_to_byte): Verify assumptions.
+	(handle_syncline): New arg LOC.  All callers changed.
+	Don't store through a value derived from char const * pointer.
+
+	* src/reader.c (grammar_rule_check): Rewrite slightly to avoid
+	GCC warnings.
+
+2005-12-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/reader.c (grammar_midrule_action, grammar_symbol_append):
+	Remove unnecessary forward static decls.
+
+2005-12-27  Akim Demaille  <akim@epita.fr>
+
+	* src/reader.c (grammar_current_rule_check): Also check that $$
+	is used.
+	Take the rule to check as argument, hence rename as...
+	(grammar_rule_check): this.
+	* src/reader.h, src/reader.c (grammar_rule_begin, grammar_rule_end):
+	Rename as...
+	(grammar_rule_begin, grammar_rule_end): these, for consistency.
+	(grammar_midrule_action, grammar_symbol_append): Now static.
+	* tests/torture.at (input): Don't rely on the default action
+	being always performed.
+	* tests/calc.at: "Set" $$ even when the action is "cut" with
+	YYERROR or other.
+	* tests/actions.at (Exotic Dollars): Instead of using unused
+	values, check that the warning is issued.
+
+2005-12-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Improve wording for unused-value warnings.
+
+2005-12-22  Akim Demaille  <akim@epita.fr>
+
+	* data/lalr1.cc, data/yacc.c, data/glr.c, data/c.m4
+	(b4_yysymprint_generate): Rename as...
+	(b4_yy_symbol_print_generate): this.
+	Generate yy_symbol_print instead of yysymprint.
+	Generate also yy_symbol_value_print, and use it.
+
+2005-12-22  Akim Demaille  <akim@epita.fr>
+
+	* NEWS: Warn about unused values.
+	* src/symlist.h, src/symlist.c (symbol_list, symbol_list_new): Add
+	a `used' member.
+	(symbol_list_n_get, symbol_list_n_used_set): New.
+	(symbol_list_n_type_name_get): Use symbol_list_n_get.
+	* src/scan-gram.l (handle_action_dollar): Flag used symbols.
+	* src/reader.c (grammar_current_rule_check): Check that values are
+	used.
+	* src/symtab.c (symbol_print): Accept 0.
+	* tests/existing.at: Remove the type information.
+	Empty the actions.
+	Remove useless actions (beware of mid-rule actions: perl -000
+	-pi -e 's/\s*\{\}(?=[\n\s]*[|;])//g').
+	* tests/actions.at (Exotic Dollars): Use unused values.
+	* tests/calc.at: Likewise.
+	* tests/glr-regression.at (No users destructors if stack 0 deleted):
+	Likewise.
+
+	* src/gram.c (rule_useful_p, rule_never_reduced_p): Use
+	rule_useful_p.
+
+2005-12-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Undo 2005-12-01 tentative license wording change.  The wording is
+	still being reviewed by the lawyers, and we don't want to wait for
+	them before publishing a test release.  For now, revert to the
+	previous wording.
+	* NEWS: Undo 2005-12-01 change.
+	* data/glr.c: Revert to previous license wording.
+	* data/glr.cc: Likewise.
+	* data/lalr1.cc: Likewise.
+	* data/location.cc: Likewise.
+	* data/yacc.c: Likewise.
+
+	* NEWS: Reword %destructor vs YYABORT etc.
+	* data/glr.c: Use American spacing, for consistency.
+	* data/glr.cc: Likewise.
+	* data/lalr1.cc: Likewise.
+	* data/yacc.c: Likewise.
+	* data/yacc.c: Reformat comments slightly.
+	* doc/bison.texinfo: Replace "non-" with "non" when that makes sense,
+	for consistency.  Fix some spelling errors and reword recently-included
+	text slightly.
+	* tests/cxx-type.at: Cast results of malloc, for C++.
+
+2005-12-21  Joel E. Denny  <address@hidden>
+
+	* tests/cxx-type.at: Construct a tree, count the parents of shared
+	nodes, and free each node once and only once.  Previously, the memory
+	for semantic values was leaked instead.
+
+2005-12-21  Joel E. Denny  <address@hidden>
+
+	* data/glr.c (struct yyGLRStack): If pure, add yyval and yyloc members.
+	(yylval, yylloc): If pure, #define to yystackp->yyval and
+	yystackp->yyloc similar to yychar and yynerrs.
+	(yyparse): If pure, remove local yylval and yylloc. Add local
+	yystackp to accommodate pure definitions of yylval and yylloc.
+	(b4_lex_param, b4_lyyerror_args, b4_lpure_args): If pure, change
+	yylvalp and yyllocp to &yylval and &yylloc.
+	(nerrs, char, lval, lloc): If pure, add #define's for b4_prefix[]
+	namespace. Previously, nerrs and char were missing, but lval and lloc
+	weren't necessary.
+	(yyprocessOneStack, yyreportSyntaxError, yyrecoverSyntaxError): Remove
+	yylvalp and yyllocp parameters since, if pure, these are now always
+	accessible through yystackp.  If not pure, they are still accessible
+	globally.
+	* data/glr.c, data/yacc.c (YYLLOC_DEFAULT): Change `if (N)' to
+	`if (YYID (N))' to pacify lint.
+
+2005-12-21  Akim Demaille  <akim@epita.fr>
+
+	YYACCEPT, YYERROR, and YYABORT, as user actions, should not
+	destroy the RHS symbols of a rule.
+	* data/yacc.c (yylen): Initialize to 0.
+	Keep its value to the number of items to possibly shift.
+	In particular, a regular successful parse that ends on YYFINAL by
+	a (internal) YYACCEPT must not have yylen != 0.
+	(yyerrorlab, yyreturn): Pop the RHS.
+	Reorder a bit to emphasize the `shifting' bits of code.
+	(YYPOPSTACK): Now accept a number of items to pop.
+	* data/lalr1.cc: Likewise.
+	* data/glr.c: Formatting changes.
+	Use goto instead of fall through.
+	* doc/bison.texinfo (Destructor Decl): Complete.
+
+2005-12-20  Juan Manuel Guerrero  <juan.guerrero@gmx.de>
+
+	* Makefile.am: DJGPP specific files added to EXTRA_DIST.
+	* djgpp/Makefile.maint: Fix PACKAGE variable computation.
+	* djgpp/config.bat: Replace every occurence of the file name
+	scan-gram-c.c with c-scan-gram.c. The same for scan-skel-c.c with
+	c-scan-skel.c to conform with the 8.3 file name restriction on MSDOS.
+	* djgpp/config.sed: Replace every occurence of the file name
+	scan-gram-c.c with c-scan-gram.c. The same for scan-skel-c.c with
+	c-scan-skel.c to conform with the 8.3 file name restriction on MSDOS.
+	* djgpp/djunpack.bat: DJGPP specific file.
+	* djgpp/fnchange.lst: DJGPP specific file.
+	* djgpp/README.in: Add new information about how to unpack the bison
+	source on MSDOS and other systems which have 8.3 file name restrictions
+	using djunpack.bat and fnchange.lst.
+
+2005-12-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* bootstrap (build_cvs_prefix): Remove; unused.
+	(CVS_PREFIX): Adjust to yesterday's Savannah reorganization
+	when getting gnulib.
+
+2005-12-12  "Joel E. Denny" <jdenny@ces.clemson.edu>
+
+	* data/glr.c: Reorder typedef declarations for structs to match order
+	of struct declarations.
+	Rename yystack everywhere to yystackp except in yyparse where it's not
+	a pointer.
+	(yyglrShift): Change parameter YYSTYPE yysval to YYSTYPE* yyvalp for
+	consistency.
+	(yyis_table_ninf): Change 0 to YYID (0) to pacify lint.
+	(yyreportSyntaxError): Add /*ARGSUSED*/ to pacify lint.
+	(yyparse): Change while (yytrue) to while ( YYID (yytrue)) to pacify
+	lint.
+
+2005-12-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/sets.at (Accept): Fix typos in regular expression used to
+	sed out the final state number.
+
+	Work around portability problem on Solaris 10: flex-generated
+	files include <stdio.h> before <config.h>, which messes up
+	because the latter defines __EXTENSIONS__.  Address the problem
+	by creating two new little files that include <config.h> first,
+	then include the flex-generated files.  Rewrite everyone else
+	to include <config.h> first, as well.
+	* lib/timevar.c: Always include "config.h".
+	* src/Makefile.am (bison_SOURCES): Replace scan-gram.l with
+	scan-gram-c.c, and scan-skel.l with scan-skel-c.c.
+	(EXTRA_bison_SOURCES): New macro.
+	* src/scan-gram-c.c, src/scan-skel-c.c: New files.
+	* src/system.h: Don't include config.h.
+	* src/LR0.c: Include <config.h> first.
+	* src/assoc.c: Likewise.
+	* src/closure.c: Likewise.
+	* src/complain.c: Likewise.
+	* src/conflicts.c: Likewise.
+	* src/derives.c: Likewise.
+	* src/files.c: Likewise.
+	* src/getargs.c: Likewise.
+	* src/gram.c: Likewise.
+	* src/lalr.c: Likewise.
+	* src/location.c: Likewise.
+	* src/main.c: Likewise.
+	* src/muscle_tab.c: Likewise.
+	* src/nullable.c: Likewise.
+	* src/output.c: Likewise.
+	* src/parse-gram.y: Likewise.
+	* src/print.c: Likewise.
+	* src/print_graph.c: Likewise.
+	* src/reader.c: Likewise.
+	* src/reduce.c: Likewise.
+	* src/relation.c: Likewise.
+	* src/state.c: Likewise.
+	* src/symlist.c: Likewise.
+	* src/symtab.c: Likewise.
+	* src/tables.c: Likewise.
+	* src/uniqstr.c: Likewise.
+	* src/vcg.c: Likewise.
+
+	* src/parse-gram.y: Fix minor problems uncovered by lint.
+	(current_lhs, current_lhs_location): Now static.
+	(current_assoc): Remove unused variable.
+
+	Cleanups so that Bison-generated parsers have less lint.
+	* data/c.m4 (b4_yydestruct_generate, b4_yysymprint_generate):
+	Prepend /*ARGSUSED*/, for lint's sake.
+	* data/glr.c (YYUSE): Properly parenthesize, and use an alternate
+	definition if 'lint' is defined.
+	(YYID): New macro (or function, if lint).
+	All uses of /*CONSTCOND*/0 replaced by YYID(0).
+	* data/yacc.c: Likewise.
+	* data/glr.c (yyuserAction, yyuserMerge, yy_reduce_print):
+	(yyrecoverSyntaxError): Prepend /*ARGSUSED*/.
+	* data/glr.cc (YYLLOC_DEFAULT): Omit /*CONSTCOND*/ since this code
+	is C++ only.
+	* data/lalr1.cc (YYUSE): Just use a cast, since this code is C++ only.
+	* data/yacc.c (YYSTACK_FREE) [defined YYSTACK_ALLOC]:
+	Use YYID(0) rather than 0, for lint.
+	(yystrlen): Rewrite to avoid lint warning about ptrdiff_t overflow.
+	(yysyntax_error): Rewrite to avoid lint warnings about parenthesization.
+
+2005-12-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/glr-regression.at
+	(Improper handling of embedded actions and dollar(-N) in GLR parsers):
+	Close memory leak reported by twlevo.
+
+2005-12-06  "Joel E. Denny" <jdenny@ces.clemson.edu>
+
+	* data/glr.c (yyprocessOneStack, yyparse): Synchronize the shift for
+	all stacks.
+	(yyparse): Iterate another stack in order to call user destructors.
+	* tests/glr-regression.at (No users destructors if stack 0 deleted):
+	New test case.
+	(Duplicated user destructor for lookahead): This test now is expected
+	to succeed.
+
+2005-12-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Document the following change.
+	* data/yacc.c: Say "parser skeleton" rather than "file", since
+	it's no longer just a file.
+	* data/glr.c: Grant a special exception for C GLR parsers, that
+	reads like the already-existing exception for C LALR(1) parsers.
+	* data/glr.cc: Likewise.
+	* data/lalr1.cc: Likewise.
+	* data/location.cc: Likewise.
+	* data/yacc.c: Reword the "written by" statement to clarify that
+	it was the parser skeleton, not the entire output file.
+	* data/glr.c: Written by Paul Hilfinger.
+	* data/glr.cc: Written by Akim Demaille.
+	* data/lalr1.cc: Likewise.
+
+2005-11-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/yacc.c (yy_reduce_print, YY_REDUCE_PRINT):
+	Fix typos in previous change that broke 'make check'.
+	YY_REDUCE_PRINT cannot be a pseudo-varargs macro; that isn't
+	supported in C.
+	* tests/calc.at (_AT_CHECK_CALC,_AT_CHECK_CALC_ERROR):
+	Don't check NUM-STDERR-LINES, since the output format is fluctuating.
+	We can revert this once things settle down.
+
+	* src/conflicts.c (conflicts_print): Don't print file name twice
+	when %expect fails because there were no conflicts.
+	* doc/bison.texinfo (Expect Decl): Tighten up wording in previous
+	change.
+	* tests/conflicts.at (%expect not enough, %expect too much):
+	(%expect with reduce conflicts): Adjust to new behavior.
+
+2005-11-18  Akim Demaille  <akim@epita.fr>
+
+	* src/conflicts.c (conflicts_print): Unsatisfied %expectation are
+	errors.
+	* NEWS: Document this.
+	* doc/bison.texinfo (Expect Decl): Likewise.
+
+2005-11-16  Akim Demaille  <akim@epita.fr>
+
+	Generalize the display of semantic values and locations in traces.
+	* data/glr.c (yy_reduce_print): Fix indices (again).
+	* data/c++.m4 (b4_rhs_value, b4_rhs_location): Don't expect
+	literal integers.
+	* data/lalr1.cc (yyreduce_print): Rename as...
+	(yy_reduce_print): this.
+	Display values and locations.
+	* data/yacc.c (yy_reduce_print): Likewise.
+	(YY_REDUCE_PRINT): Adjust to pass the required arguments.
+	(yysymprint): Move higher to be visible from yy_reduce_print).
+	(yyparse): Adjust.
+	* tests/calc.at: Adjust the expected length of the traces.
+
+2005-11-14  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.c (yy_reduce_print): The loop was quite wrong: type are
+	from 1 to N, while values and location start at 0.
+	(b4_rhs_location, b4_rhs_value): Add parens around $1 and $2.
+
+2005-11-14  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.c (yy_reduce_print): Fix the $ number.
+
+2005-11-14  Akim Demaille  <akim@epita.fr>
+
+	"Use" parse parameters.
+	* data/c.m4 (b4_parse_param_for, b4_parse_param_use): New.
+	* data/glr.c, data/glr.cc: Use them.
+	* data/glr.c (YYUSE): Have a C++ definition that supports
+	non-pointer types.
+
+2005-11-14  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.c (yyexpandGLRStack): Declare only if defined.
+
+2005-11-14  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.cc: New.
+	* data/m4sugar/m4sugar.m4 (m4_prepend): New.
+
+2005-11-12  Akim Demaille  <akim@epita.fr>
+
+	Let position and location be PODs.
+	* data/location.cc (position::initialize, location::initialize): New.
+	(position::position, location::location): Define only if
+	b4_location_constructors is defined.
+	* data/lalr1.cc (b4_location_constructors): Define it for backward
+	compatibility.
+	* doc/bison.texinfo (Initial Action Decl): Use initialize.
+
+2005-11-12  Akim Demaille  <akim@epita.fr>
+
+	* data/lalr1.cc: Move the body of the ctor and dtor into the
+	parser file (instead of the header).
+	Wrap the implementations in a "namespace yy".
+
+2005-11-12  Akim Demaille  <akim@epita.fr>
+
+	Have glr.c include its header file when created.
+	* data/glr.c (b4_shared_declarations): New.
+	Output them verbatim in the parser if !%defines, otherwise
+	output then in the header file, and include it instead.
+
+2005-11-11  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.c: Comment changes.
+
+2005-11-11  Akim Demaille  <akim@epita.fr>
+
+	When yydebug, report semantic and location values for reductions.
+	* data/glr.c (yy_reduce_print): Report the semantic values and the
+	locations.
+	(YY_REDUCE_PRINT): Adjust.
+	(yyglrReduce): Use them.
+	(b4_rhs_value, b4_rhs_location): Remove m4_eval invocations.
+	* data/c.m4 (b4_yysymprint_generate): Specify the const arguments.
+	* tests/calc.at (_AT_CHECK_CALC_ERROR): Remove the reduction
+	traces.
+
+2005-11-10  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.c (yynewGLRStackItem, YY_RESERVE_GLRSTACK): New.
+	(yyaddDeferredAction, yyglrShift, yyglrShiftDefer): Use them.
+	(yyexpandGLRStack, YYRELOC): Define only when YYSTACKEXPANDABLE.
+
+2005-11-09  Albert Chin-A-Young  <china@thewrittenword.com>
+
+	* m4/cxx.m4, examples/Makefile.am: Don't build
+	examples/calc++ if no C++ compiler is available.  (trivial change)
+
+2005-11-09  Akim Demaille  <akim@epita.fr>
+
+	* src/scan-skel.l: Use a couple of asserts.
+
+2005-11-03  Akim Demaille  <akim@epita.fr>
+
+	In some (weird) cases, the final state number is incorrect.
+	Reported by Alexandre Duret-Lutz.
+	* src/LR0.c (state_list_append): Remove the computation of
+	final_state.
+	(save_reductions): Do it here.
+	(get_state): Alpha conversion.
+	(generate_states): Use a for loop.
+	* src/gram.h (item_number_is_rule_number)
+	(item_number_is_symbol_number): New.
+	* src/state.c: Use assert.
+	* src/system.h: Include assert.h.
+	* tests/sets.at (Accept): New.
+
+2005-10-30  Paul Hilfinger  <hilfingr@tully.CS.Berkeley.EDU>
+
+	* data/glr.c (yyfill): Adjust comment.
+	(yyresolveAction): Initialize default location properly
+	for empty right-hand sides.
+	(yydoAction): Ditto.
+	Add comment explaining apparently dead code.
+	* tests/glr-regression.at
+	(Incorrectly initialized location for empty right-hand side in GLR):
+	New test.
+
+2005-10-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* bootstrap (cleanup_gnulib): New function.  Use it to clean up
+	gnulib when interrupted.  This fixes some race conditions and
+	works around some portability problems (one noted by Paul
+	Hilfinger).
+
+2005-10-22  Akim  <akim@epita.fr>
+
+	* Makefile.cfg: Adjust to config -> build-aux.
+	Reported by twledo.
+
+2005-10-21  Akim Demaille  <akim@epita.fr>
+
+	* data/c.m4 (b4_yydestruct_generate, b4_yysymprint_generate): Pass
+	the %parse-params.
+	* data/glr.c (YY_SYMBOL_PRINT, yydestroyGLRState): Adjust.
+	* data/yacc.c (b4_Pure_if): Rename as...
+	(b4_yacc_pure_if): this.
+	(YY_SYMBOL_PRINT, yyparse): Adjust.
+	* doc/bison.texinfo: Formatting changes.
+
+2005-10-21  Akim Demaille  <akim@epita.fr>
+
+	Finish the transition config -> build-aux.
+	* configure.ac, Makefile.am: Use build-aux.
+	* config/prev-version, config/announce-gen, config/Makefile.am:
+	Move to...
+	* build-aux/prev-version, build-aux/announce-gen,
+	* build-aux/Makefile.am: here.
+
+2005-10-14  Akim Demaille  <akim@epita.fr>
+
+	* examples/calc++/test: Use set -x only when VERBOSE.
+
+2005-10-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Bison now warns if it finds a stray `$' or `@' in an action.
+	* src/scan-gram.l (<SC_BRACED_CODE>[$@]): Implement this.
+
+2005-10-13  Akim Demaille  <akim@epita.fr>
+
+	* src/scan-skel.l: Output the base name parts of the parser and
+	header file names.
+	* tests/output.at (AT_CHECK_OUTPUT): Support subdirectories, and
+	additional checks.
+	Use this to exercise C++ outputs in subdirs.
+	Reported by Oleg Smolsky.
+
+2005-10-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/c.m4 (b4_c_function_def): Look at __C99_FUNC__, not at
+	__STDC_VERSION__, as IBM cc 7.0 doesn't define the latter either.
+	Problem reported by John P. Hartmann.
+	* data/yacc.c (YYMODERN_C): Likewise.  Don't define if the user has
+	already defined it.
+
+2005-10-12  Akim Demaille  <akim@epita.fr>
+
+	* src/parse-gram.y (version_check): Exit 63 to please missing
+	(stands for "version mismatch).
+	* tests/input.at, doc/bison.texinfo: Adjust.
+
+2005-10-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Work around portability problems with Visual Age C compiler
+	(xlc and xlC_r) reported by John P. Hartmann.
+	* data/location.cc (initial_column, initial_line): Remove.
+	All uses replaced by 0 and 1.
+	* src/scan-gram.l (gram_wrap): Redefine to avoid bug in flex 2.5.31
+	that xlc complains about.
+	* src/scan-skel.l (skel_wrap): Likewise.
+	* data/c.m4 (b4_c_function_def): Look at __STDC_VERSION__ as well
+	as __STDC__.
+	* data/yacc.c (YYMODERN_C): New macro, which also looks at
+	__STDC_VERSION__.  Use it everywhere instead of looking at
+	__STDC__ and __cplusplus.
+
+2005-10-10  Akim Demaille  <akim@epita.fr>
+
+	* examples/calc++/test: Be quiet unless VERBOSE.
+
+2005-10-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/c.m4 (yydestruct, yysymprint):
+	Use YYUSE instead of casting to void.
+	* data/glr.c (YYUSE): New macro.
+	(yyuserMerge, yyreportAmbiguity, yyreportSyntaxError):
+	Use it instead of rolling our own.
+	(YYLLOC_DEFAULT, YYCHK, YYDPRINTF, YY_SYMBOL_PRINT, YY_REDUCE_PRINT):
+	(YYCHK1):
+	Use /*CONSTCOND*/ to suppress lint warnings.
+	* data/lalr1.cc (YYLLOC_DEFAULT, YY_SYMBOL_PRINT, YY_REDUCE_PRINT):
+	(YY_STACK_PRINT): Use 'false' not '0'.
+	(YYUSE): New macro.
+	(yysymprint_, yydestruct_): Use it instead of rolling our own.
+	* data/yacc.c (YYUSE): New macro.
+	(YYCOPY, YYSTACK_RELOCATE, YYBACKUP, YYLLOC_DEFAULT):
+	(YYDPRINTF, YY_SYMBOL_PRINT, YY_STACK_PRINT, YY_REDUCE_PRINT):
+	(yyerrorlab): Use /*CONSTCOND*/ to suppress lint warnings.
+
+
+	* data/m4sugar/m4sugar.m4 (_m4_map): New macro.
+	(m4_map, m4_map_sep): Use it.  Handle the empty list correctly.
+
+2005-10-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Undo the parts of the unlocked-I/O change that substituted
+	putc or puts for printf.  This might hurt performance a bit,
+	but some people prefer the printf style.
+	* data/c.m4 (yysymprint): Prefer printf to puts and putc.
+	* data/glr.c (YYFPUTC, YYFPUTS, YYDPUTS): Remove.
+	All uses replaced by YYFPRINTF and YYDPRINTF.
+	* data/yacc.c: Likewise.
+	* lib/bitset.c (bitset_print): Likewise.
+	* lib/bitsetv.c (bitsetv_dump, debug-bitsetv): Prefer printf to
+	putc and puts.
+	* lib/lbitset.c (debug_lbitset): Likewise.
+	* src/closure.c (print_firsts, print_fderives): Likewise.
+	* src/gram.c (grammar_dump): Likewise.
+	* src/lalr.c (look_ahead_tokens_print): Likewise.
+	* src/output.c (escaped_output): Likewise.
+	(user_actions_output): Break apart two printfs.
+	* src/parse-gram.y (%printer): Prefer printf to putc and puts.
+	* src/reduce.c (reduce_print): Likewise.
+	* src/state.c (state_rule_look_ahead_tokens_print): Likewise.
+	* src/system.h: Include unlocked-io.h rathe than stdio.h.
+
+	* data/glr.c (yyuserMerge, yyreportAmbiguity, yyreportSyntaxError):
+	Use assignments rather than casts-to-void to suppress
+	unused-variable warnings.  This pacifies 'lint'.
+	* data/lalr1.cc (yysymprint_, yydestruct_): Use a call to suppress
+	unused-variable warnings.
+
+2005-10-03  Juan Manuel Guerrero  <juan.guerrero@gmx.de>
+
+	* Makefile.am: DJGPP specific files added to EXTRA_DIST.
+
+2005-10-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Use unlocked I/O for a minor performance improvement on hosts like
+	GNU/Linux and Solaris that support unlocked I/O.  The basic idea
+	is to use the gnlib unlocked-io module, and to prefer putc and
+	puts to printf when either will work (since the latter doesn't
+	come in an unlocked flavor).
+	* bootstrap (gnulib_modules): Add unlocked-io.
+	* data/c.m4 (yysymprint): Prefer puts and putc to printf.
+	* data/glr.c (YYFPUTC, YYFPUTS, YYDPUTS): New macros.
+	Prefer them to YYFPRINTF and YYDPRINTF if either will do,
+	and similarly for puts and putc and printf.
+	* data/yacc.c: Likewise.
+	* lib/bitset.c (bitset_print): Likewise.
+	* lib/bitset.h [USE_UNLOCKED_IO]: Include unlocked-io.h.
+	* lib/bitsetv.c (bitsetv_dump, debug-bitsetv): Prefer putc and puts
+	to printf.
+	* lib/lbitset.c (debug_lbitset): Likewise.
+	* src/closure.c (print_firsts, print_fderives): Likewise.
+	* src/gram.c (grammar_dump): Likewise.
+	* src/lalr.c (look_ahead_tokens_print): Likewise.
+	* src/output.c (escaped_output): Likewise.
+	(user_actions_output): Coalesce two printfs.
+	* src/parse-gram.y (%printer): Prefer putc and puts to printf.
+	* src/reduce.c (reduce_print): Likewise.
+	* src/state.c (state_rule_look_ahead_tokens_print): Likewise.
+	* src/system.h: Include unlocked-io.h rather than stdio.h.
+
+	* data/lalr1.cc: Don't put an unmatched ' in a dnl comment, as
+	this confuses xgettext.
+
+2005-10-02  Akim Demaille  <akim@epita.fr>
+
+	* bootstrap (gnulib_modules): Add strverscmp.
+	* lib/.cvsignore: Add strverscmp.c, strverscmp.h.
+	* m4/.cvsignore: Add strverscmp.m4.
+	* src/parse-gram.y (%require): New token, new rule.
+	(version_check): New.
+	* src/scan-gram.l (%require): Adjust.
+	* tests/input.at (AT_REQUIRE): New.
+	Use it.
+	* doc/bison.texinfo (Require Decl): New.
+	(Calc++ Parser): Use %require.
+
+2005-10-02  Akim Demaille  <akim@epita.fr>
+
+	* data/location.cc: New.
+
+2005-10-02  Paul Eggert  <eggert@cs.ucla.edu>,
+	    Akim Demaille  <akim@epita.fr>
+
+	Make sure -odir/foo.cc creates dir/location.hh etc.
+	* src/files.h (spec_outfile, parser_file_name, spec_name_prefix)
+	(spec_file_prefix, spec_verbose_file, spec_graph_file)
+	(spec_defines_file): Now const.
+	(dir_prefix): New.
+	(short_base_name): Remove.
+	* src/files.c: Adjust.
+	(dirname.h): Include.
+	(base_name): Don't prototype it.
+	(finput): Remove, duplicates gram_in.
+	(full_base_name, short_base_name): Replace by...
+	(all_but_ext, all_but_tab_ext): these.
+	(compute_base_names): Rename as...
+	(compute_file_name_parts): this.
+	Update to compute the new variables, including dir_prefix.
+	Adjust dependencies.
+	* src/output.c (prepare): Output them.
+	* src/reader.c: Adjust to use gram_in, not finput.
+	* src/scan-skel.l (@dir_prefix@): New.
+
+2005-10-02  Juan Manuel Guerrero  <juan.guerrero@gmx.de>
+
+	* lib/subpipe.c: New function end_of_output_subpipe() added
+	to allow support for non-posix systems. This is a no-op function
+	for posix systems.
+
+	* lib/subpipe.h: New function end_of_output_subpipe() added
+	to allow support for non-posix systems. This is a no-op function
+	for posix systems.
+
+	* src/output.c (output_skeleton): Use end_of_output_subpipe() to
+	handle the lack of pipe/fork functionality on non-posix systems.
+
+	* djgpp/Makefile.maint: DJGPP specific file.
+
+	* djgpp/README.in: DJGPP specific file.
+
+	* djgpp/config.bat: DJGPP specific configuration file.
+
+	* djgpp/config.sed: DJGPP specific configuration file.
+
+	* djgpp/config.site: DJGPP specific configuration file.
+
+	* djgpp/config_h.sed: DJGPP specific configuration file.
+
+	* djgpp/subpipe.c: DJGPP specific replacement file for lib/subpipe.c.
+
+	* djgpp/subpipe.h: DJGPP specific replacement file for lib/subpipe.h.
+
+2005-10-02  Akim Demaille  <akim@epita.fr>
+
+	* data/location.cc: New, extract from...
+	* data/lalr1.cc: here.
+	(location.hh): Include it after the user prologue, in case the
+	filename type is defined by the user.
+	Forward declation location and position before the pre-prologue.
+	(yyresult_): Rename as...
+	(yyresult): this, it's a local variable, not an attribute.
+	* data/Makefile.am (dist_pkgdata_DATA): Adjust.
+
+2005-10-01  Akim Demaille  <akim@epita.fr>
+
+	* examples/extexi: Restore the #line generation.
+
+2005-09-30  Akim Demaille  <akim@epita.fr>,
+	    Alexandre Duret-Lutz <adl@gnu.org>
+
+	Move the token type and YYSTYPE in the parser class.
+	* data/lalr1.cc (stack.hh, location.hh): Include earlier.
+	(parser::token): New, from the moved free definition of tokens.
+	(parser::semantic_value): Now a full definition instead of an
+	indirection to YYSTYPE.
+	(b4_post_prologue): No longer included in the header file, but
+	in the implementation file.
+	* doc/bison.texi (C+ Language Interface): Update.
+	* src/parse-gram.y: Support unary %define.
+	* tests/actions.at: Define global_tokens_and_yystype for backward
+	compatibility until we update the tests.
+	* tests/calc.at: Idem.
+	(first_line, first_column, last_line, last_column): Define for lalr1.cc
+	to simplify the code.
+
+2005-09-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Port to SunOS 4.1.4, which lacks strtoul and strerror.
+	Ah, the good old days!  Problem reported by Peter Klein.
+	* bootstrap (gnulib_modules): Add strerror, strtoul.
+	* lib/.cvsignore: Add strerror.c, strtol.c, strtoul.c
+	* m4/.cvsignore: Add strerror.m4, strtol.m4, strtoul.m4.
+
+2005-09-29  Akim Demaille  <akim@epita.fr>
+
+	* data/c.m4 (b4_error_verbose_if): New.
+	* data/lalr1.cc: Use it.
+	(YYERROR_VERBOSE_IF): Remove.
+	(yyn_, yylen_, yystate_, yynerrs_, yyerrstatus_): Remove as
+	parser members, replaced by...
+	(yyn, yylen, yystate, yynerss, yyerrstatus): these parser::parse
+	local variables.
+	(yysyntax_error_): Takes the state number as argument.
+	(yyreduce_print_): Use the argument yyrule, not the former
+	attribute yyn_.
+
+2005-09-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* bootstrap (gnulib_modules): Add verify.
+	* lib/.cvsignore: Add verify.h.
+	* src/getargs.c: Use ARGMATCH_VERIFY rather than verify.
+	* src/system.h (verify): Remove.
+	Include verify.h instead.
+	* src/tables.c (tables_generate): Use new API for 'verify'.
+
+2005-09-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/local.at (_AT_BISON_OPTION_PUSHDEFS): Do not use
+	local variables whose names begin with 'yy'.
+	* tests/calc.at (_AT_DATA_CALC_Y): Likewise.
+	Trivial changes from Joel E. Denny.
+
+	* bootstrap (gnulib_modules): Remove alloca.  Bison doesn't need
+	it itself.
+	* src/main.c (main) [C_ALLOCA]: Don't flush alloca'ed memory; we
+	don't use alloca any more.
+
+	* data/yacc.c [YYSTACK_USE_ALLOCA && !defined __GNUC__ && ! defined
+	__BUILTIN_VA_ARG_INCR && ! defined _AIX && ! defined _MSC_VER &&
+	defined _ALLOCA_H]: Don't include <stdlib.h>; not needed in this case.
+	* tests/torture.at (Exploding the Stack Size with Alloca): Adjust
+	to match yacc.c, to test more hosts.
+
+2005-09-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/yacc.c (YYSIZE_T): Reindent to make it clearer.  This
+	doesn't affect behavior.
+	(YYSTACK_ALLOC) [YYSTACK_USE_ALLOCA]: Improve support for
+	Solaris, AIX, MSC.
+	(_STDLIB_H): Renamed from YYINCLUDED_STDLIB_H.  All uses changed.
+	This works a bit better with glibc, if user code has already included
+	stdlib.h.
+	* doc/bison.texinfo (Bison Parser): Document that users can't
+	arbitrarily use malloc and free for other purposes.  Document
+	that <alloca.h> and <malloc.h> might be included.
+	(Table of Symbols): Under YYSTACK_USE_ALLOCA, Don't claim that the
+	user must declare alloca.
+
+	* HACKING (release): Forwarn the Translation Project about
+	stable releses.
+
+2005-09-20  Akim Demaille  <akim@epita.fr>
+
+	* data/glr.c: Use b4_token_enums, not b4_token_enums_defines.
+
+2005-09-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* data/yacc.c (YYSIZE_MAXIMUM): New macro.
+	(YYSTACK_ALLOC_MAXIMUM): Use it.
+	(yysyntax_error): New function.
+	(yyparse) [YYERROR_VERBOSE]: Don't leak memory indefinitely if
+	multiple syntax errors are reported, and alloca is being used.
+	Instead, reallocate buffers twice as big each time, so that
+	we waste at most half the allocated memory.  Start with a small
+	(128-byte) buffer that will suffice in most cases anyway.
+	Use yysyntax_error to do most of the work.
+
+	* doc/bison.texinfo (Error Reporting, Table of Symbols):
+	yynerrs is the number of errors reported, not the number of
+	errors encountered.
+
+	* tests/glr-regression.at (Duplicated user destructor for lookahead):
+	Mark it as expected to fail.
+	Cast result of malloc; problem reported by twlevo@xs4all.nl.
+	* tests/actions.at, tests/calc.at, tests/glr-regression.at:
+	Don't start user-code symbols with "yy", to avoid name space problems.
+
+2005-09-19  Akim Demaille  <akim@epita.fr>
+
+	Remove the traits, failed experiment.
+	It never proved useful, and anyway because of the current
+	definition, it was not possible to have several specialization of
+	this traits, making it useless.
+	* data/lalr1.cc (yy:traits): Remove.
+	Inline its definitions in the parser class.
+
+2005-09-19  Akim Demaille  <akim@epita.fr>
+
+	* tests/atlocal.in (LIBS): Pass INTLLIBS to address failures on at
+	least Mac OSX with a /usr/local install of gettext.
+
+2005-09-19  Akim Demaille  <akim@epita.fr>
+
+	* data/lalr1.cc (yyparse): Rename yylooka and yyilooka as yychar
+	and yytoken for similarity with the other skeletons.
+
+2005-09-19  Akim Demaille  <akim@epita.fr>
+
+	* NEWS, configure.ac: update version number to 2.1a.
+
 2005-09-16  Paul Eggert  <eggert@cs.ucla.edu>
 
 	* NEWS: Version 2.1.
@@ -5590,7 +7375,7 @@
 	Reported by Charles-Henry de Boysson.
 
 	* tests/calc.at (_AT_CHECK_CALC, _AT_CHECK_CALC_ERROR): Don't
-	check the length of the	traces when %glr.
+	check the length of the traces when %glr.
 	(_AT_CHECK_CALC_ERROR): Also skip `^Stack' lines, coming from
 	GLR's traces.
 	(AT_CHECK_CALC_LALR, AT_CHECK_CALC_GLR): New.
@@ -5735,7 +7520,7 @@
 	struct lbitset_struct, struct bitset_stats_struct): New types.
 	All uses of struct bitset_struct changed to union bitset_union,
 	etc.
-	* lib/abitset.c	(struct abitset_struct, abitset,
+	* lib/abitset.c (struct abitset_struct, abitset,
 	struct bitset_struct): Remove.
 	* lib/bitset_stats.c (struct bitset_stats_struct, bitset_stats,
 	struct bitset_struct): Remove.
@@ -6821,7 +8606,7 @@
 
 2002-06-28  Akim Demaille  <akim@epita.fr>
 
-	* src/reader.h:	s/grammer_current_rule_merge_set/grammar_.../.
+	* src/reader.h: s/grammer_current_rule_merge_set/grammar_.../.
 	* src/conflicts.c (conflicts_total_count): `i' is unsigned, to
 	pacify GCC.
 	* src/output.c (save_row): Initialize all the variables to pacify GCC.
@@ -6851,7 +8636,7 @@
 	* src/getargs.c:
 
 	* src/symlist.h:  Add dprec and merger fields to symbol_list_s.
-	* src/symlist.c	(symbol_list_new): Initialize dprec and merger fields.
+	* src/symlist.c (symbol_list_new): Initialize dprec and merger fields.
 
 	Originally 2002-06-16  Paul Hilfinger  <Hilfinger@CS.Berkeley.EDU>
 
@@ -8858,8 +10643,8 @@
 
 2002-01-20  Marc Autret  <marc@gnu.org>
 
-	* src/system.h: Need to	define __attribute__ away for non-GCC
-	compilers as well (i.e.	the vendor C compiler).
+	* src/system.h: Need to define __attribute__ away for non-GCC
+	compilers as well (i.e., the vendor C compiler).
 	Suggested by Albert Chin-A-Young.
 
 2002-01-11  Tim Van Holder  <tim.van.holder@pandora.be>
@@ -10029,7 +11814,7 @@
 
 	* src/warshall.c (bitmatrix_print): New.
 	(TC): Use it.
-	When performing a transitive closure R(i, j) && R(j, k) => R(i,	k),
+	When performing a transitive closure R(i, j) && R(j, k) => R(i, k),
 	j must be the outer loop.
 	* tests/regression.at (Broken Closure): New.
 
@@ -11614,7 +13399,7 @@
 
 	* src/output.c (output): Delete call to reader_output_yylsp.
 	* src/reader.c (reader): Likewise.
-	* src/reader.h:	Delete declaration of reader_output_yylsp.
+	* src/reader.h: Delete declaration of reader_output_yylsp.
 
 2001-09-02  Marc Autret  <autret_m@epita.fr>
 
@@ -14241,8 +16026,8 @@
 	-----
 
 	Copyright (C) 1987, 1988, 1991, 1992, 1993, 1994, 1995, 1996,
-	1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software
-	Foundation, Inc.
+	1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free
+	Software Foundation, Inc.
 
 	Copying and distribution of this file, with or without
 	modification, are permitted provided the copyright notice and this

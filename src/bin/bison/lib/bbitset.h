@@ -1,5 +1,5 @@
 /* Base bitset stuff.
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2006 Free Software Foundation, Inc.
    Contributed by Michael Hayes (m.hayes@elec.canterbury.ac.nz).
 
 This program is free software; you can redistribute it and/or modify
@@ -126,16 +126,16 @@ struct bitset_vtable
   void (*copy) (bitset, bitset);
   bool (*disjoint_p) (bitset, bitset);
   bool (*equal_p) (bitset, bitset);
-  void (*not) (bitset, bitset);
+  void (*not_) (bitset, bitset);
   bool (*subset_p) (bitset, bitset);
 
-  void (*and) (bitset, bitset, bitset);
+  void (*and_) (bitset, bitset, bitset);
   bool (*and_cmp) (bitset, bitset, bitset);
   void (*andn) (bitset, bitset, bitset);
   bool (*andn_cmp) (bitset, bitset, bitset);
-  void (*or) (bitset, bitset, bitset);
+  void (*or_) (bitset, bitset, bitset);
   bool (*or_cmp) (bitset, bitset, bitset);
-  void (*xor) (bitset, bitset, bitset);
+  void (*xor_) (bitset, bitset, bitset);
   bool (*xor_cmp) (bitset, bitset, bitset);
 
   void (*and_or) (bitset, bitset, bitset, bitset);
@@ -218,14 +218,14 @@ if (!BITSET_COMPATIBLE_ (DST, SRC1) || !BITSET_COMPATIBLE_ (DST, SRC2) \
 #define BITSET_EQUAL_P_(DST, SRC) (SRC)->b.vtable->equal_p (DST, SRC)
 
 /* DST = ~SRC.  */
-#define BITSET_NOT_(DST, SRC) (SRC)->b.vtable->not (DST, SRC)
+#define BITSET_NOT_(DST, SRC) (SRC)->b.vtable->not_ (DST, SRC)
 
 /* Return DST == DST | SRC.  */
 #define BITSET_SUBSET_P_(DST, SRC) (SRC)->b.vtable->subset_p (DST, SRC)
 
 
 /* DST = SRC1 & SRC2.  */
-#define BITSET_AND_(DST, SRC1, SRC2) (SRC1)->b.vtable->and (DST, SRC1, SRC2)
+#define BITSET_AND_(DST, SRC1, SRC2) (SRC1)->b.vtable->and_ (DST, SRC1, SRC2)
 #define BITSET_AND_CMP_(DST, SRC1, SRC2) (SRC1)->b.vtable->and_cmp (DST, SRC1, SRC2)
 
 /* DST = SRC1 & ~SRC2.  */
@@ -233,11 +233,11 @@ if (!BITSET_COMPATIBLE_ (DST, SRC1) || !BITSET_COMPATIBLE_ (DST, SRC2) \
 #define BITSET_ANDN_CMP_(DST, SRC1, SRC2) (SRC1)->b.vtable->andn_cmp (DST, SRC1, SRC2)
 
 /* DST = SRC1 | SRC2.  */
-#define BITSET_OR_(DST, SRC1, SRC2) (SRC1)->b.vtable->or (DST, SRC1, SRC2)
+#define BITSET_OR_(DST, SRC1, SRC2) (SRC1)->b.vtable->or_ (DST, SRC1, SRC2)
 #define BITSET_OR_CMP_(DST, SRC1, SRC2) (SRC1)->b.vtable->or_cmp (DST, SRC1, SRC2)
 
 /* DST = SRC1 ^ SRC2.  */
-#define BITSET_XOR_(DST, SRC1, SRC2) (SRC1)->b.vtable->xor (DST, SRC1, SRC2)
+#define BITSET_XOR_(DST, SRC1, SRC2) (SRC1)->b.vtable->xor_ (DST, SRC1, SRC2)
 #define BITSET_XOR_CMP_(DST, SRC1, SRC2) (SRC1)->b.vtable->xor_cmp (DST, SRC1, SRC2)
 
 

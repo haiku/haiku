@@ -1,5 +1,5 @@
 /* Array bitsets.
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2006 Free Software Foundation, Inc.
    Contributed by Michael Hayes (m.hayes@elec.canterbury.ac.nz).
 
    This program is free software; you can redistribute it and/or modify
@@ -13,12 +13,11 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-*/
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include <config.h>
 #endif
 
 #include "abitset.h"
@@ -34,14 +33,13 @@
 
 
 static bitset_bindex
-abitset_resize (bitset src ATTRIBUTE_UNUSED,
-		bitset_bindex size ATTRIBUTE_UNUSED)
+abitset_resize (bitset src, bitset_bindex size)
 {
-    if (BITSET_SIZE_ (src) == size)
-	return size;
-
     /* These bitsets have a fixed size.  */
-    abort ();
+    if (BITSET_SIZE_ (src) != size)
+      abort ();
+
+    return size;
 }
 
 /* Find list of up to NUM bits set in BSET starting from and including

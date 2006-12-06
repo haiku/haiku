@@ -398,8 +398,11 @@ m4_define([m4_cdr],
 # of LIST (which can be lists themselves, for multiple arguments MACROs).
 m4_define([m4_fst], [$1])
 m4_define([m4_map],
+[m4_if([$2], [[]], [],
+       [_m4_map([$1], [$2])])])
+m4_define([_m4_map],
 [m4_ifval([$2],
-	  [$1(m4_fst($2))[]m4_map([$1], m4_cdr($2))])])
+	  [$1(m4_fst($2))[]_m4_map([$1], m4_cdr($2))])])
 
 
 # m4_map_sep(MACRO, SEPARATOR, LIST)
@@ -408,8 +411,8 @@ m4_define([m4_map],
 # are the elements of LIST (which can be lists themselves, for multiple
 # arguments MACROs).
 m4_define([m4_map_sep],
-[m4_ifval([$3],
-	  [$1(m4_fst($3))[]m4_map([$2[]$1], m4_cdr($3))])])
+[m4_if([$3], [[]], [],
+       [$1(m4_fst($3))[]_m4_map([$2[]$1], m4_cdr($3))])])
 
 
 ## ---------------------------------------- ##
@@ -1512,6 +1515,12 @@ m4_define([m4_append],
 [m4_define([$1],
 	   m4_ifdef([$1], [m4_defn([$1])$3])[$2])])
 
+# m4_prepend(MACRO-NAME, STRING, [SEPARATOR])
+# -------------------------------------------
+# Same, but prepend.
+m4_define([m4_prepend],
+[m4_define([$1],
+	   [$2]m4_ifdef([$1], [$3[]m4_defn([$1])]))])
 
 # m4_append_uniq(MACRO-NAME, STRING, [SEPARATOR])
 # -----------------------------------------------

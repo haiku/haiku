@@ -1,6 +1,6 @@
 %{/* Bison Grammar Parser                             -*- C -*-
 
-   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -20,6 +20,7 @@
    02110-1301  USA
 */
 
+#include <config.h>
 #include "system.h"
 
 #include "complain.h"
@@ -28,32 +29,46 @@
 #include "getargs.h"
 #include "gram.h"
 #include "muscle_tab.h"
-#include "output.h"
 #include "quotearg.h"
 #include "reader.h"
 #include "symlist.h"
+#include "strverscmp.h"
 
 #define YYLLOC_DEFAULT(Current, Rhs, N)  (Current) = lloc_default (Rhs, N)
 static YYLTYPE lloc_default (YYLTYPE const *, int);
 
 #define YY_LOCATION_PRINT(File, Loc) \
-          location_print (File, Loc)
+	  location_print (File, Loc)
+
+static void version_check (location const *loc, char const *version);
 
 /* Request detailed syntax error messages, and pass them to GRAM_ERROR.
    FIXME: depends on the undocumented availability of YYLLOC.  */
 #undef  yyerror
 #define yyerror(Msg) \
-        gram_error (&yylloc, Msg)
+	gram_error (&yylloc, Msg)
 static void gram_error (location const *, char const *);
 
 static void add_param (char const *, char *, location);
 
 static symbol_class current_class = unknown_sym;
 static uniqstr current_type = 0;
-symbol *current_lhs;
-location current_lhs_location;
-assoc current_assoc;
+static symbol *current_lhs;
+static location current_lhs_location;
 static int current_prec = 0;
+
+#ifdef UINT_FAST8_MAX
+# define YYTYPE_UINT8 uint_fast8_t
+#endif
+#ifdef INT_FAST8_MAX
+# define YYTYPE_INT8 int_fast8_t
+#endif
+#ifdef UINT_FAST16_MAX
+# define YYTYPE_UINT16 uint_fast16_t
+#endif
+#ifdef INT_FAST16_MAX
+# define YYTYPE_INT16 int_fast16_t
+#endif
 %}
 
 %debug
@@ -129,10 +144,11 @@ static int current_prec = 0;
   PERCENT_NO_DEFAULT_PREC "%no-default-prec"
   PERCENT_NO_LINES        "%no-lines"
   PERCENT_NONDETERMINISTIC_PARSER
-                          "%nondeterministic-parser"
+			  "%nondeterministic-parser"
   PERCENT_OUTPUT          "%output"
   PERCENT_PARSE_PARAM     "%parse-param {...}"
   PERCENT_PURE_PARSER     "%pure-parser"
+  PERCENT_REQUIRE	  "%require"
   PERCENT_SKELETON        "%skeleton"
   PERCENT_START           "%start"
   PERCENT_TOKEN_TABLE     "%token-table"
@@ -159,10 +175,9 @@ static int current_prec = 0;
 	      "%parse-param {...}"
 	      "%printer {...}"
 	      "%union {...}"
-	      BRACED_CODE action
 	      PROLOGUE EPILOGUE
 %printer { fprintf (stderr, "\"%s\"", $$); }
-              STRING string_content
+	      STRING string_content
 %printer { fprintf (stderr, "{\n%s\n}", $$); }
 	      "%destructor {...}"
 	      "%initial-action {...}"
@@ -170,7 +185,6 @@ static int current_prec = 0;
 	      "%parse-param {...}"
 	      "%printer {...}"
 	      "%union {...}"
-	      BRACED_CODE action
 	      PROLOGUE EPILOGUE
 %type <uniqstr> TYPE
 %printer { fprintf (stderr, "<%s>", $$); } TYPE
@@ -202,6 +216,11 @@ declaration:
   grammar_declaration
 | PROLOGUE                                 { prologue_augment ($1, @1); }
 | "%debug"                                 { debug_flag = true; }
+| "%define" string_content
+    {
+      static char one[] = "1";
+      muscle_insert ($2, one);
+    }
 | "%define" string_content string_content  { muscle_insert ($2, $3); }
 | "%defines"                               { defines_flag = true; }
 | "%error-verbose"                         { error_verbose = true; }
@@ -209,14 +228,14 @@ declaration:
 | "%expect-rr" INT			   { expected_rr_conflicts = $2; }
 | "%file-prefix" "=" string_content        { spec_file_prefix = $3; }
 | "%glr-parser"
-  {
-    nondeterministic_parser = true;
-    glr_parser = true;
-  }
+    {
+      nondeterministic_parser = true;
+      glr_parser = true;
+    }
 | "%initial-action {...}"
-  {
-    muscle_code_grow ("initial_action", $1, @1);
-  }
+    {
+      muscle_code_grow ("initial_action", $1, @1);
+    }
 | "%lex-param {...}"			   { add_param ("lex_param", $1, @1); }
 | "%locations"                             { locations_flag = true; }
 | "%name-prefix" "=" string_content        { spec_name_prefix = $3; }
@@ -225,6 +244,7 @@ declaration:
 | "%output" "=" string_content             { spec_outfile = $3; }
 | "%parse-param {...}"			   { add_param ("parse_param", $1, @1); }
 | "%pure-parser"                           { pure_parser = true; }
+| "%require" string_content                { version_check (&@2, $2); }
 | "%skeleton" string_content               { skeleton = $2; }
 | "%token-table"                           { token_table_flag = true; }
 | "%verbose"                               { report_flag = report_states; }
@@ -241,9 +261,19 @@ grammar_declaration:
     }
 | "%union {...}"
     {
+      char const *body = $1;
+
+      if (typed)
+	{
+	  /* Concatenate the union bodies, turning the first one's
+	     trailing '}' into '\n', and omitting the second one's '{'.  */
+	  char *code = muscle_find ("stype");
+	  code[strlen (code) - 1] = '\n';
+	  body++;
+	}
+
       typed = true;
-      MUSCLE_INSERT_INT ("stype_line", @1.start.line);
-      muscle_insert ("stype", $1);
+      muscle_code_grow ("stype", body, @1);
     }
 | "%destructor {...}" symbols.1
     {
@@ -256,7 +286,7 @@ grammar_declaration:
     {
       symbol_list *list;
       for (list = $2; list; list = list->next)
-	symbol_printer_set (list->sym, $1, list->location);
+	symbol_printer_set (list->sym, $1, @1);
       symbol_list_free ($2);
     }
 | "%default-prec"
@@ -330,24 +360,24 @@ symbol_def:
      }
 | ID
      {
-       symbol_class_set ($1, current_class, @1);
+       symbol_class_set ($1, current_class, @1, true);
        symbol_type_set ($1, current_type, @1);
      }
 | ID INT
     {
-      symbol_class_set ($1, current_class, @1);
+      symbol_class_set ($1, current_class, @1, true);
       symbol_type_set ($1, current_type, @1);
       symbol_user_token_number_set ($1, $2, @2);
     }
 | ID string_as_id
     {
-      symbol_class_set ($1, current_class, @1);
+      symbol_class_set ($1, current_class, @1, true);
       symbol_type_set ($1, current_type, @1);
       symbol_make_alias ($1, $2, @$);
     }
 | ID INT string_as_id
     {
-      symbol_class_set ($1, current_class, @1);
+      symbol_class_set ($1, current_class, @1, true);
       symbol_type_set ($1, current_type, @1);
       symbol_user_token_number_set ($1, $2, @2);
       symbol_make_alias ($1, $3, @$);
@@ -375,10 +405,6 @@ grammar:
 rules_or_grammar_declaration:
   rules
 | grammar_declaration ";"
-    {
-      if (yacc_flag)
-	complain_at (@$, _("POSIX forbids declarations in the grammar"));
-    }
 | error ";"
     {
       yyerrok;
@@ -390,18 +416,17 @@ rules:
 ;
 
 rhses.1:
-  rhs                { grammar_rule_end (@1); }
-| rhses.1 "|" rhs    { grammar_rule_end (@3); }
+  rhs                { grammar_current_rule_end (@1); }
+| rhses.1 "|" rhs    { grammar_current_rule_end (@3); }
 | rhses.1 ";"
 ;
 
 rhs:
   /* Nothing.  */
-    { grammar_rule_begin (current_lhs, current_lhs_location); }
+    { grammar_current_rule_begin (current_lhs, current_lhs_location); }
 | rhs symbol
     { grammar_current_rule_symbol_append ($2, @2); }
 | rhs action
-    { grammar_current_rule_action_append ($2, @2); }
 | rhs "%prec" symbol
     { grammar_current_rule_prec_set ($3, @3); }
 | rhs "%dprec" INT
@@ -415,9 +440,21 @@ symbol:
 | string_as_id    { $$ = $1; }
 ;
 
+/* Handle the semantics of an action specially, with a mid-rule
+   action, so that grammar_current_rule_action_append is invoked
+   immediately after the braced code is read by the scanner.
+
+   This implementation relies on the LALR(1) parsing algorithm.
+   If grammar_current_rule_action_append were executed in a normal
+   action for this rule, then when the input grammar contains two
+   successive actions, the scanner would have to read both actions
+   before reducing this rule.  That wouldn't work, since the scanner
+   relies on all preceding input actions being processed by
+   grammar_current_rule_action_append before it scans the next
+   action.  */
 action:
+    { grammar_current_rule_action_append (last_string, last_braced_code_loc); }
   BRACED_CODE
-    { $$ = $1; }
 ;
 
 /* A string used as an ID: quote it.  */
@@ -425,7 +462,7 @@ string_as_id:
   STRING
     {
       $$ = symbol_get (quotearg_style (c_quoting_style, $1), @1);
-      symbol_class_set ($$, token_sym, @1);
+      symbol_class_set ($$, token_sym, @1, false);
     }
 ;
 
@@ -527,6 +564,17 @@ add_param (char const *type, char *decl, location loc)
     }
 
   scanner_last_string_free ();
+}
+
+static void
+version_check (location const *loc, char const *version)
+{
+  if (strverscmp (version, PACKAGE_VERSION) > 0)
+    {
+      complain_at (*loc, "require bison %s, but have %s",
+		   version, PACKAGE_VERSION);
+      exit (63);
+    }
 }
 
 static void

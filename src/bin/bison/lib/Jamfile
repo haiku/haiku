@@ -32,16 +32,15 @@ StaticLibrary libbison.a :
 	obstack.c
 	quote.c
 	quotearg.c
-	realloc.c
 	stpcpy.c
 	stripslash.c
 	strndup.c
 	strnlen.c
+	strverscmp.c
 	subpipe.c
 	timevar.c
 	vbitset.c
 	xmalloc.c
 	xalloc-die.c
-	xstrdup.c
 	xstrndup.c
 ;

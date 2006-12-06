@@ -18,14 +18,19 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = config po runtime-po lib data src doc examples tests
+SUBDIRS = build-aux po runtime-po lib data src doc examples tests
 
 # Files installed for use by Automake.
 aclocaldir = @aclocaldir@
 aclocal_DATA = m4/bison-i18n.m4
 
 EXTRA_DIST = GNUmakefile Makefile.cfg Makefile.maint \
-  OChangeLog PACKAGING
+  OChangeLog PACKAGING \
+  djgpp/Makefile.maint djgpp/README.in djgpp/config.bat \
+  djgpp/config.sed djgpp/config.site djgpp/config_h.sed \
+  djgpp/subpipe.c djgpp/subpipe.h djgpp/djunpack.bat \
+  djgpp/fnchange.lst
+
 
 .PHONY: maintainer-check
 maintainer-check:

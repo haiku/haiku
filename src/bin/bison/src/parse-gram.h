@@ -1,7 +1,9 @@
-/* A Bison parser, made by GNU Bison 2.1.  */
+/* A Bison parser, made by GNU Bison 2.2a.  */
 
-/* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+/* Skeleton interface for Bison's Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,10 +20,18 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -63,21 +73,22 @@
      PERCENT_OUTPUT = 288,
      PERCENT_PARSE_PARAM = 289,
      PERCENT_PURE_PARSER = 290,
-     PERCENT_SKELETON = 291,
-     PERCENT_START = 292,
-     PERCENT_TOKEN_TABLE = 293,
-     PERCENT_VERBOSE = 294,
-     PERCENT_YACC = 295,
-     TYPE = 296,
-     EQUAL = 297,
-     SEMICOLON = 298,
-     PIPE = 299,
-     ID = 300,
-     ID_COLON = 301,
-     PERCENT_PERCENT = 302,
-     PROLOGUE = 303,
-     EPILOGUE = 304,
-     BRACED_CODE = 305
+     PERCENT_REQUIRE = 291,
+     PERCENT_SKELETON = 292,
+     PERCENT_START = 293,
+     PERCENT_TOKEN_TABLE = 294,
+     PERCENT_VERBOSE = 295,
+     PERCENT_YACC = 296,
+     TYPE = 297,
+     EQUAL = 298,
+     SEMICOLON = 299,
+     PIPE = 300,
+     ID = 301,
+     ID_COLON = 302,
+     PERCENT_PERCENT = 303,
+     PROLOGUE = 304,
+     EPILOGUE = 305,
+     BRACED_CODE = 306
    };
 #endif
 /* Tokens.  */
@@ -115,37 +126,40 @@
 #define PERCENT_OUTPUT 288
 #define PERCENT_PARSE_PARAM 289
 #define PERCENT_PURE_PARSER 290
-#define PERCENT_SKELETON 291
-#define PERCENT_START 292
-#define PERCENT_TOKEN_TABLE 293
-#define PERCENT_VERBOSE 294
-#define PERCENT_YACC 295
-#define TYPE 296
-#define EQUAL 297
-#define SEMICOLON 298
-#define PIPE 299
-#define ID 300
-#define ID_COLON 301
-#define PERCENT_PERCENT 302
-#define PROLOGUE 303
-#define EPILOGUE 304
-#define BRACED_CODE 305
+#define PERCENT_REQUIRE 291
+#define PERCENT_SKELETON 292
+#define PERCENT_START 293
+#define PERCENT_TOKEN_TABLE 294
+#define PERCENT_VERBOSE 295
+#define PERCENT_YACC 296
+#define TYPE 297
+#define EQUAL 298
+#define SEMICOLON 299
+#define PIPE 300
+#define ID 301
+#define ID_COLON 302
+#define PERCENT_PERCENT 303
+#define PROLOGUE 304
+#define EPILOGUE 305
+#define BRACED_CODE 306
 
 
 
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 79 "parse-gram.y"
-typedef union YYSTYPE {
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef union YYSTYPE
+#line 94 "parse-gram.y"
+{
   symbol *symbol;
   symbol_list *list;
   int integer;
   char *chars;
   assoc assoc;
   uniqstr uniqstr;
-} YYSTYPE;
-/* Line 1447 of yacc.c.  */
-#line 149 "parse-gram.h"
+}
+/* Line 1529 of yacc.c.  */
+#line 162 "parse-gram.h"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -153,7 +167,7 @@ typedef union YYSTYPE {
 
 
 
-#if ! defined (YYLTYPE) && ! defined (YYLTYPE_IS_DECLARED)
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
 typedef struct YYLTYPE
 {
   int first_line;
@@ -165,7 +179,5 @@ typedef struct YYLTYPE
 # define YYLTYPE_IS_DECLARED 1
 # define YYLTYPE_IS_TRIVIAL 1
 #endif
-
-
 
 

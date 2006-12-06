@@ -1,7 +1,7 @@
 /* Input parser for Bison
 
    Copyright (C) 1984, 1986, 1989, 1992, 1998, 2000, 2001, 2002, 2003,
-   2005 Free Software Foundation, Inc.
+   2005, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -20,6 +20,7 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
+#include <config.h>
 #include "system.h"
 
 #include <quotearg.h>
@@ -30,16 +31,17 @@
 #include "getargs.h"
 #include "gram.h"
 #include "muscle_tab.h"
-#include "output.h"
 #include "reader.h"
 #include "symlist.h"
 #include "symtab.h"
+
+static void check_and_convert_grammar (void);
 
 static symbol_list *grammar = NULL;
 static bool start_flag = false;
 merger_list *merge_functions;
 
-/* Has %union been seen?  */
+/* Was %union seen?  */
 bool typed = false;
 
 /* Should rules have a default precedence?  */
@@ -103,7 +105,7 @@ get_merge_function (uniqstr name, uniqstr type, location loc)
     type = uniqstr_new ("");
 
   head.next = merge_functions;
-  for (syms = &head, n = 1; syms->next != NULL; syms = syms->next, n += 1)
+  for (syms = &head, n = 1; syms->next; syms = syms->next, n += 1)
     if (UNIQSTR_EQ (name, syms->next->name))
       break;
   if (syms->next == NULL)
@@ -127,11 +129,8 @@ get_merge_function (uniqstr name, uniqstr type, location loc)
 void
 free_merger_functions (void)
 {
-  merger_list *L0;
-  if (! glr_parser)
-    return;
-  L0 = merge_functions;
-  while (L0 != NULL)
+  merger_list *L0 = merge_functions;
+  while (L0)
     {
       merger_list *L1 = L0->next;
       free (L0);
@@ -149,20 +148,13 @@ free_merger_functions (void)
 |                                                                    |
 | All actions are copied out, labelled by the rule number they apply |
 | to.                                                                |
-|                                                                    |
-| Bison used to allow some %directives in the rules sections, but    |
-| this is no longer consider appropriate: (i) the documented grammar |
-| doesn't claim it, (ii), it would promote bad style, (iii), error   |
-| recovery for %directives consists in skipping the junk until a `%' |
-| is seen and helrp synchronizing.  This scheme is definitely wrong  |
-| in the rules section.                                              |
 `-------------------------------------------------------------------*/
 
 /* The (currently) last symbol of GRAMMAR. */
 static symbol_list *grammar_end = NULL;
 
 /* Append SYM to the grammar.  */
-void
+static void
 grammar_symbol_append (symbol *sym, location loc)
 {
   symbol_list *p = symbol_list_new (sym, loc);
@@ -173,6 +165,11 @@ grammar_symbol_append (symbol *sym, location loc)
     grammar = p;
 
   grammar_end = p;
+
+  /* A null SYM stands for an end of rule; it is not an actual
+     part of it.  */
+  if (sym)
+    ++nritems;
 }
 
 /* The rule currently being defined, and the previous rule.
@@ -187,7 +184,7 @@ static symbol_list *previous_rule_end = NULL;
 `----------------------------------------------*/
 
 void
-grammar_rule_begin (symbol *lhs, location loc)
+grammar_current_rule_begin (symbol *lhs, location loc)
 {
   if (!start_flag)
     {
@@ -198,14 +195,11 @@ grammar_rule_begin (symbol *lhs, location loc)
 
   /* Start a new rule and record its lhs.  */
   ++nrules;
-  ++nritems;
-
   previous_rule_end = grammar_end;
   grammar_symbol_append (lhs, loc);
   current_rule = grammar_end;
 
   /* Mark the rule's lhs as a nonterminal if not already so.  */
-
   if (lhs->class == unknown_sym)
     {
       lhs->class = nterm_sym;
@@ -216,39 +210,71 @@ grammar_rule_begin (symbol *lhs, location loc)
     complain_at (loc, _("rule given for %s, which is a token"), lhs->tag);
 }
 
-/* Check that the last rule (CURRENT_RULE) is properly defined.  For
-   instance, there should be no type clash on the default action.  */
+
+/*----------------------------------------------------------------------.
+| A symbol should be used if it has a destructor, or if it is a         |
+| mid-rule symbol (i.e., the generated LHS replacing a mid-rule         |
+| action) that was assigned to, as in "exp: { $$ = 1; } { $$ = $1; }".  |
+`----------------------------------------------------------------------*/
+
+static bool
+symbol_should_be_used (symbol_list const *s)
+{
+  return (s->sym->destructor
+	  || (s->midrule && s->midrule->used));
+}
+
+/*----------------------------------------------------------------.
+| Check that the rule R is properly defined.  For instance, there |
+| should be no type clash on the default action.                  |
+`----------------------------------------------------------------*/
 
 static void
-grammar_current_rule_check (void)
+grammar_rule_check (const symbol_list *r)
 {
-  symbol *lhs = current_rule->sym;
-  char const *lhs_type = lhs->type_name;
-  symbol *first_rhs = current_rule->next->sym;
+  /* Type check.
 
-  /* If there is an action, then there is nothing we can do: the user
-     is allowed to shoot herself in the foot.  */
-  if (current_rule->action)
-    return;
+     If there is an action, then there is nothing we can do: the user
+     is allowed to shoot herself in the foot.
 
-  /* Don't worry about the default action if $$ is untyped, since $$'s
+     Don't worry about the default action if $$ is untyped, since $$'s
      value can't be used.  */
-  if (! lhs_type)
-    return;
-
-  /* If $$ is being set in default way, report if any type mismatch.  */
-  if (first_rhs)
+  if (!r->action && r->sym->type_name)
     {
-      const char *rhs_type = first_rhs->type_name ? first_rhs->type_name : "";
-      if (!UNIQSTR_EQ (lhs_type, rhs_type))
-	warn_at (current_rule->location,
-		 _("type clash on default action: <%s> != <%s>"),
-		 lhs_type, rhs_type);
+      symbol *first_rhs = r->next->sym;
+      /* If $$ is being set in default way, report if any type mismatch.  */
+      if (first_rhs)
+	{
+	  char const *lhs_type = r->sym->type_name;
+	  const char *rhs_type =
+	    first_rhs->type_name ? first_rhs->type_name : "";
+	  if (!UNIQSTR_EQ (lhs_type, rhs_type))
+	    warn_at (r->location,
+		     _("type clash on default action: <%s> != <%s>"),
+		     lhs_type, rhs_type);
+	}
+      /* Warn if there is no default for $$ but we need one.  */
+      else
+	warn_at (r->location,
+		 _("empty rule for typed nonterminal, and no action"));
     }
-  /* Warn if there is no default for $$ but we need one.  */
-  else
-    warn_at (current_rule->location,
-	     _("empty rule for typed nonterminal, and no action"));
+
+  /* Check that symbol values that should be used are in fact used.  */
+  {
+    symbol_list const *l = r;
+    int n = 0;
+    for (; l && l->sym; l = l->next, ++n)
+      if (! (l->used
+	     || !symbol_should_be_used (l)
+	     /* The default action, $$ = $1, `uses' both.  */
+	     || (!r->action && (n == 0 || n == 1))))
+	{
+	  if (n)
+	    warn_at (r->location, _("unused value: $%d"), n);
+	  else
+	    warn_at (r->location, _("unset value: $$"));
+	}
+  }
 }
 
 
@@ -257,12 +283,12 @@ grammar_current_rule_check (void)
 `-------------------------------------*/
 
 void
-grammar_rule_end (location loc)
+grammar_current_rule_end (location loc)
 {
   /* Put an empty link in the list to mark the end of this rule  */
   grammar_symbol_append (NULL, grammar_end->location);
   current_rule->location = loc;
-  grammar_current_rule_check ();
+  grammar_rule_check (current_rule);
 }
 
 
@@ -295,6 +321,10 @@ grammar_midrule_action (void)
   midrule->action = current_rule->action;
   midrule->action_location = dummy_location;
   current_rule->action = NULL;
+  /* If $$ was used in the action, the LHS of the enclosing rule was
+     incorrectly flagged as used.  */
+  midrule->used = current_rule->used;
+  current_rule->used = false;
 
   if (previous_rule_end)
     previous_rule_end->next = midrule;
@@ -302,14 +332,16 @@ grammar_midrule_action (void)
     grammar = midrule;
 
   /* End the dummy's rule.  */
-  previous_rule_end = symbol_list_new (NULL, dummy_location);
-  previous_rule_end->next = current_rule;
+  midrule->next = symbol_list_new (NULL, dummy_location);
+  grammar_rule_check (midrule);
+  midrule->next->next = current_rule;
 
-  midrule->next = previous_rule_end;
+  previous_rule_end = midrule->next;
 
   /* Insert the dummy nonterminal replacing the midrule action into
-     the current rule.  */
+     the current rule.  Bind it to its dedicated rule.  */
   grammar_current_rule_symbol_append (dummy, dummy_location);
+  grammar_end->midrule = midrule;
 }
 
 /* Set the precedence symbol of the current rule to PRECSYM. */
@@ -358,18 +390,16 @@ grammar_current_rule_symbol_append (symbol *sym, location loc)
 {
   if (current_rule->action)
     grammar_midrule_action ();
-  ++nritems;
   grammar_symbol_append (sym, loc);
 }
 
-/* Attach an ACTION to the current rule.  If needed, move the previous
-   action as a mid-rule action.  */
+/* Attach an ACTION to the current rule.  */
 
 void
 grammar_current_rule_action_append (const char *action, location loc)
 {
-  if (current_rule->action)
-    grammar_midrule_action ();
+  /* There's no need to invoke grammar_midrule_action here, since the
+     scanner already did it if necessary.  */
   current_rule->action = action;
   current_rule->action_location = loc;
 }
@@ -387,7 +417,11 @@ packgram (void)
   rule_number ruleno = 0;
   symbol_list *p = grammar;
 
-  ritem = xnmalloc (nritems, sizeof *ritem);
+  ritem = xnmalloc (nritems + 1, sizeof *ritem);
+
+  /* This sentinel is used by build_relations in gram.c.  */
+  *ritem++ = 0;
+
   rules = xnmalloc (nrules, sizeof *rules);
 
   while (p)
@@ -434,8 +468,7 @@ packgram (void)
 	p = p->next;
     }
 
-  if (itemno != nritems)
-    abort ();
+  assert (itemno == nritems);
 
   if (trace_flag & trace_sets)
     ritem_print (stderr);
@@ -474,20 +507,29 @@ reader (void)
   obstack_init (&pre_prologue_obstack);
   obstack_init (&post_prologue_obstack);
 
-  finput = xfopen (grammar_file, "r");
-  gram_in = finput;
+  gram_in = xfopen (grammar_file, "r");
 
   gram__flex_debug = trace_flag & trace_scan;
   gram_debug = trace_flag & trace_parse;
   scanner_initialize ();
   gram_parse ();
 
-  /* If something went wrong during the parsing, don't try to
-     continue.  */
-  if (complaint_issued)
-    return;
+  if (! complaint_issued)
+    check_and_convert_grammar ();
 
-  /* Grammar has been read.  Do some checking */
+  xfclose (gram_in);
+}
+
+
+/*-------------------------------------------------------------.
+| Check the grammar that has just been read, and convert it to |
+| internal form.					       |
+`-------------------------------------------------------------*/
+
+static void
+check_and_convert_grammar (void)
+{
+  /* Grammar has been read.  Do some checking.  */
   if (nrules == 0)
     fatal (_("no rules in the input grammar"));
 
@@ -504,7 +546,7 @@ reader (void)
       endtoken->user_token_number = 0;
     }
 
-  /* Insert the initial rule, which line is that of the first rule
+  /* Insert the initial rule, whose line is that of the first rule
      (not that of the start symbol):
 
      accept: %start EOF.  */
@@ -520,10 +562,7 @@ reader (void)
     grammar = p;
   }
 
-  if (! (nsyms <= SYMBOL_NUMBER_MAXIMUM && nsyms == ntokens + nvars))
-    abort ();
-
-  xfclose (finput);
+  assert (nsyms <= SYMBOL_NUMBER_MAXIMUM && nsyms == ntokens + nvars);
 
   /* Assign the symbols their symbol numbers.  Write #defines for the
      token symbols into FDEFINES if requested.  */

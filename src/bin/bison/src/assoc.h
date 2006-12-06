@@ -1,5 +1,5 @@
 /* Associativity information.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -30,6 +30,6 @@ typedef enum
   non_assoc
 } assoc;
 
-char const *assoc_to_string (assoc);
+char const *assoc_to_string (assoc a);
 
 #endif /* !ASSOC_H_ */

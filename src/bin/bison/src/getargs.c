@@ -1,7 +1,7 @@
 /* Parse command line arguments for Bison.
 
-   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004, 2005
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -20,6 +20,7 @@
    Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301, USA.  */
 
+#include <config.h>
 #include "system.h"
 
 #include <argmatch.h>
@@ -45,18 +46,21 @@
 
 bool debug_flag;
 bool defines_flag;
+bool graph_flag;
 bool locations_flag;
 bool no_lines_flag;
 bool no_parser_flag;
-int report_flag = report_none;
 bool token_table_flag;
 bool yacc_flag;	/* for -y */
-bool graph_flag;
-int trace_flag = trace_none;
+
+bool error_verbose = false;
 
 bool nondeterministic_parser = false;
 bool glr_parser = false;
 bool pure_parser = false;
+
+int report_flag = report_none;
+int trace_flag = trace_none;
 
 const char *skeleton = NULL;
 const char *include = NULL;
@@ -80,7 +84,8 @@ static const char * const trace_args[] =
   "grammar    - reading, reducing of the grammar",
   "resource   - memory consumption (where available)",
   "sets       - grammar sets: firsts, nullable etc.",
-  "tools      - m4 invocation and preserve the temporary file",
+  "tools      - m4 invocation",
+  "m4         - m4 traces",
   "skeleton   - skeleton postprocessing",
   "time       - time consumption",
   "all        - all of the above",
@@ -98,16 +103,17 @@ static const int trace_types[] =
   trace_resource,
   trace_sets,
   trace_tools,
+  trace_m4,
   trace_skeleton,
   trace_time,
   trace_all
 };
 
+ARGMATCH_VERIFY (trace_args, trace_types);
 
 static void
 trace_argmatch (char *args)
 {
-  verify (trace_constraint, ARGMATCH_CONSTRAINT (trace_args, trace_types));
   if (args)
     {
       args = strtok (args, ",");
@@ -156,11 +162,11 @@ static const int report_types[] =
   report_all
 };
 
+ARGMATCH_VERIFY (report_args, report_types);
 
 static void
 report_argmatch (char *args)
 {
-  verify (report_constraint, ARGMATCH_CONSTRAINT (report_args, report_types));
   args = strtok (args, ",");
   do
     {
@@ -270,7 +276,7 @@ version (void)
   putc ('\n', stdout);
 
   fprintf (stdout,
-	   _("Copyright (C) %d Free Software Foundation, Inc.\n"), 2005);
+	   _("Copyright (C) %d Free Software Foundation, Inc.\n"), 2006);
 
   fputs (_("\
 This is free software; see the source for copying conditions.  There is NO\n\
