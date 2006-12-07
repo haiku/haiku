@@ -1712,8 +1712,15 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 		if (frame.bottom > screenFrame.bottom)
 			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
 	} else {
-		if (frame.bottom > screenFrame.bottom)
-			frame.OffsetBy(0, -superItem->Frame().Height() - frame.Height() - 3);
+		if (frame.bottom > screenFrame.bottom) {
+			if (scrollOn != NULL && superMenu != NULL && 
+				dynamic_cast<BMenuBar *>(superMenu) != NULL && 
+				frame.top < (screenFrame.bottom - 80)) {
+				*scrollOn = true;
+			} else {
+				frame.OffsetBy(0, -superItem->Frame().Height() - frame.Height() - 3);
+			}
+		}
 
 		if (frame.right > screenFrame.right)
 			frame.OffsetBy(screenFrame.right - frame.right, 0);
@@ -2094,11 +2101,17 @@ BMenu::UpdateWindowViewSize(bool upWind)
 
 			// If we need scrolling, resize the window to fit the screen and
 			// attach scrollers to our cached MenuWindow.
-			window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - 10);
+			if (dynamic_cast<BMenuBar *>(Supermenu()) == NULL) {
+				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - 10);
+				frame.top = 0;
+			}
+			else {
+			// Or, in case our parent was a BMenuBar enable scrolling with 
+			// normal size.
+				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - frame.top);
+			}
 			
 			static_cast<BMenuWindow *>(window)->AttachScrollers();
-
-			frame.top = 0;
 		}
 	} else {
 		CacheFontInfo();

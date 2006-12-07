@@ -129,13 +129,6 @@ BMenuScroller::Pulse()
 			fMenu->ScrollBy(0, -kScrollStep);
 			fValue -= kScrollStep;
 		}
-
-		// In this case, we need to redraw the lower button because of a
-		// probable bug in ScrollBy handling. The scrolled view is drawing below 
-		// its bounds, dirtying our button in this process.
-		// Redrawing it everytime makes scrolling a little slower.
-		// TODO: Try to find why and fix this.
-		Draw(fLowerButton);
 	}
 }
 
