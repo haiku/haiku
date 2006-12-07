@@ -122,8 +122,6 @@ typedef struct
 /* global varriables */
 
 pid_t sh_pid;
-char tty_name[B_PATH_NAME_LENGTH];
-
 
 int
 spawn_shell(int row, int col, const char *command, const char *coding)
@@ -157,6 +155,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	* which is already in use, so we simply go until the open succeeds.
 	*/
 
+	char tty_name[B_PATH_NAME_LENGTH];
 	DIR *dir = opendir("/dev/pt/");
 	if (dir != NULL) {
 		struct dirent *dirEntry;

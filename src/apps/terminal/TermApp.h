@@ -62,7 +62,7 @@ private:
   /*
    * Public Member functions.
    */
-  void          MakeTermWindow (BRect &frame);
+  status_t      MakeTermWindow (BRect &frame);
   void          SwitchTerm(void);
   void          ActivateTermWindow(team_id id);
 

@@ -47,7 +47,7 @@ class FindDlg;
 
 class TermWindow : public BWindow {
 	public:
-		TermWindow(BRect frame, const char* title);
+		TermWindow(BRect frame, const char* title, int pfd);
 		~TermWindow();
 
   void		Quit (void);
@@ -74,6 +74,7 @@ private:
   /*
    * data member
    */
+  int		fPfd;
   TermParse	*fTermParse;
   BMenuBar	*fMenubar;
   BMenu		*fFilemenu, *fEditmenu, *fEncodingmenu, *fHelpmenu, *fFontMenu, *fWindowSizeMenu, *fNewFontMenu; 

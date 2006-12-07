@@ -2342,6 +2342,7 @@ TermView::GetSelection(BString &str)
 	fTextBuffer->GetStringFromRegion(str);
 }
 
+
 // Send DrawRect data to Draw Engine thread.
 inline void
 TermView::SendDataToDrawEngine(int x1, int y1, int x2, int y2)

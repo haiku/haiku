@@ -107,46 +107,18 @@ TermApp::ReadyToRun()
 	if (usage_requested)
 		return;
 	
-	const char *command = NULL;
-	const char *encoding;
-	int rows, cols;
-	
-	encoding = gTermPref->getString(PREF_TEXT_ENCODING);
-	
-	// Get encoding name (setenv TTYPE in spawn_shell functions)
-	const etable *p = encoding_table;
-	while (p->name) {
-		if (!strcmp(p->name, encoding)) {
-			encoding = p->shortname;
-			break;
-		}
-		p++;
-	}
-	
-	if (CommandLine.Length() > 0)
-		command = CommandLine.String();
-	else
-		command = gTermPref->getString(PREF_SHELL);
-	
-	rows = gTermPref->getInt32(PREF_ROWS);
-	if (rows < 1)
-		gTermPref->setInt32(PREF_ROWS, rows = 1);
-
-	cols = gTermPref->getInt32(PREF_COLS);
-	if (cols < MIN_COLS)
-		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
-
-	pfd = spawn_shell(rows, cols, command, encoding);
+	status_t status = MakeTermWindow(fTermFrame);
 
 	// failed spawn, print stdout and open alert panel
-	if (pfd == -1 ) {
+	if (status < B_OK) {
 		(new BAlert("alert", "Terminal couldn't start the shell. Sorry.",
 			"ok", NULL, NULL, B_WIDTH_FROM_LABEL,
 			B_INFO_ALERT))->Go(NULL);
 		PostMessage(B_QUIT_REQUESTED);
+		return;
 	}
 
-	MakeTermWindow(fTermFrame);
+	
 	// using BScreen::Frame isn't enough
 	if (fStartFullscreen)
 		BMessenger(fTermWindow).SendMessage(FULLSCREEN);
@@ -372,11 +344,43 @@ TermApp::RefsReceived(BMessage *message)
 }  
 
 
-void
+status_t
 TermApp::MakeTermWindow(BRect &frame)
 {
-	fTermWindow = new TermWindow(frame, fWindowTitle.String());
+	const char *encoding = gTermPref->getString(PREF_TEXT_ENCODING);
+	
+	// Get encoding name (setenv TTYPE in spawn_shell functions)
+	const etable *p = encoding_table;
+	while (p->name) {
+		if (!strcmp(p->name, encoding)) {
+			encoding = p->shortname;
+			break;
+		}
+		p++;
+	}
+	
+	const char *command = NULL;
+	if (CommandLine.Length() > 0)
+		command = CommandLine.String();
+	else
+		command = gTermPref->getString(PREF_SHELL);
+	
+	int rows = gTermPref->getInt32(PREF_ROWS);
+	if (rows < 1)
+		gTermPref->setInt32(PREF_ROWS, rows = 1);
+
+	int cols = gTermPref->getInt32(PREF_COLS);
+	if (cols < MIN_COLS)
+		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
+
+	int pfd = spawn_shell(rows, cols, command, encoding);
+	if (pfd < 0)
+		return pfd;
+
+	fTermWindow = new TermWindow(frame, fWindowTitle.String(), pfd);
 	fTermWindow->Show();
+	
+	return B_OK;
 }
 
 

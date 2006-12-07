@@ -16,8 +16,10 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollBar.h>
+#include <String.h>
 #include <TextControl.h>
 #include <WindowScreen.h>
+
 #include <float.h>
 #include <stdio.h>
 #include <string>
@@ -56,8 +58,9 @@ extern int gNowCoding;  /* defined TermParce.cpp */
 void SetCoding(int);
 
 
-TermWindow::TermWindow(BRect frame, const char* title)
-	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
+TermWindow::TermWindow(BRect frame, const char* title, int pfd)
+	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE),
+	fPfd(pfd)
 {
 	InitWindow();
 
@@ -425,7 +428,7 @@ TermWindow::MessageReceived(BMessage *message)
 			}
 			else if (!strcmp("tty", spe.FindString("property", i))) {
 				BMessage reply(B_REPLY);
-				reply.AddString("result", &tty_name[8]);
+				reply.AddString("result", ttyname(fPfd));
 				message->SendReply(&reply);
 			} else {
 				BWindow::MessageReceived(message);
