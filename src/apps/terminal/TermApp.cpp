@@ -373,7 +373,7 @@ TermApp::MakeTermWindow(BRect &frame)
 	if (cols < MIN_COLS)
 		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
 
-	int pfd = spawn_shell(rows, cols, command, encoding);
+	pfd = spawn_shell(rows, cols, command, encoding);
 	if (pfd < 0)
 		return pfd;
 
