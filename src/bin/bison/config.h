@@ -288,7 +288,7 @@
 #define STRERROR_R_CHAR_P 1
 
 /* Version number of package */
-#define VERSION "1.875d"
+#define VERSION "2.3"
 
 /* Define if using the dmalloc debugging malloc package */
 /* #undef WITH_DMALLOC */
