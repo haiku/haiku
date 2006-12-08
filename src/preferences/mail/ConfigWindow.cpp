@@ -239,7 +239,7 @@ ConfigWindow::ConfigWindow()
 		fLastSelectedAccount(NULL),
 		fSaveSettings(false)
 {
-	/*** create controls ***/
+	// create controls
 
 	BRect rect(Bounds());
 	BView *top = new BView(rect,NULL,B_FOLLOW_ALL,0);
@@ -292,20 +292,20 @@ ConfigWindow::ConfigWindow()
 
 	rect = tabView->Bounds();	rect.bottom -= tabView->TabHeight() + 4;
 	tabView->AddTab(view = new CenterContainer(rect));
-	tabView->TabAt(1)->SetLabel(MDR_DIALECT_CHOICE ("General","一般"));
+	tabView->TabAt(1)->SetLabel(MDR_DIALECT_CHOICE ("Settings","一般"));
 
 	rect = view->Bounds().InsetByCopy(8,8);
 	rect.right -= 1;	rect.bottom = rect.top + height * 5 + 15;
 	BBox *box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Retrieval Frequency","メールチェック間隔"));
+	box->SetLabel(MDR_DIALECT_CHOICE ("Mail Checking","メールチェック間隔"));
 	view->AddChild(box);
 
 	rect = box->Bounds().InsetByCopy(8,8);
 	rect.top += 7;	rect.bottom = rect.top + height + 5;
 	BRect tile = rect.OffsetByCopy(0,1);
-	int32 labelWidth = (int32)view->StringWidth(MDR_DIALECT_CHOICE ("Check every:","メールチェック間隔："))+6;
+	int32 labelWidth = (int32)view->StringWidth(MDR_DIALECT_CHOICE ("Check every","メールチェック間隔："))+6;
 	tile.right = 80 + labelWidth;
-	fIntervalControl = new BTextControl(tile,"time",MDR_DIALECT_CHOICE ("Check every:","メールチェック間隔："),
+	fIntervalControl = new BTextControl(tile,"time",MDR_DIALECT_CHOICE ("Check every","メールチェック間隔："),
 	NULL,NULL);
 	fIntervalControl->SetDivider(labelWidth);
 	box->AddChild(fIntervalControl);
@@ -331,24 +331,26 @@ ConfigWindow::ConfigWindow()
 
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveCheckBox = new BCheckBox(rect,"ppp active",
-		MDR_DIALECT_CHOICE ("only when PPP is active","PPP接続中時のみ"), NULL);
+		MDR_DIALECT_CHOICE ("Only When Dial-Up Is Connected","PPP接続中時のみ"), NULL);
 	box->AddChild(fPPPActiveCheckBox);
 	
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveSendCheckBox = new BCheckBox(rect,"ppp activesend",
-		MDR_DIALECT_CHOICE ("Queue outgoing mail when PPP is inactive","PPP切断時、送信メールを送信箱に入れる"), NULL);
+		MDR_DIALECT_CHOICE ("Schedule Outgoing Mail When Dial-Up Is Disconnected","PPP切断時、送信メールを送信箱に入れる"), NULL);
 	box->AddChild(fPPPActiveSendCheckBox);
 
-	rect = box->Frame();  rect.bottom = rect.top + 4*height + 20;
+	// Miscellaneous settings box
+	
+	rect = box->Frame();  rect.bottom = rect.top + 3*height + 30;
 	box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Status Window","送受信状況の表示"));
+	box->SetLabel(MDR_DIALECT_CHOICE ("Miscellaneous","その他の設定"));
 	view->AddChild(box);
 
 	BPopUpMenu *statusPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *statusModes[] = {
 		MDR_DIALECT_CHOICE ("Never","表示しない"),
 		MDR_DIALECT_CHOICE ("While Sending","送信時"),
-		MDR_DIALECT_CHOICE ("While Sending / Fetching","送受信時"),
+		MDR_DIALECT_CHOICE ("While Sending and Receiving","送受信時"),
 		MDR_DIALECT_CHOICE ("Always","常に表示")};
 	BMessage *msg;
 	for (int32 i = 0;i < 4;i++)
@@ -359,73 +361,22 @@ ConfigWindow::ConfigWindow()
 			item->SetMarked(true);
 	}
 	rect = box->Bounds().InsetByCopy(8,8);
-	rect.top += 7;	rect.bottom = rect.top + height + 5;
+	rect.top += 7;
+	rect.bottom = rect.top + height + 5;
 	labelWidth = (int32)view->StringWidth(
-		MDR_DIALECT_CHOICE ("Show Status Window:","ステータスの表示：")) + 8;
+		MDR_DIALECT_CHOICE ("Show Connection Status Window:","ステータスの表示：")) + 8;
 	fStatusModeField = new BMenuField(rect,"show status",
-		MDR_DIALECT_CHOICE ("Show Status Window:","ステータスの表示："),
+		MDR_DIALECT_CHOICE ("Show Connection Status Window:","ステータスの表示："),
 	statusPopUp);
 	fStatusModeField->SetDivider(labelWidth);
 	box->AddChild(fStatusModeField);
 
-	BPopUpMenu *lookPopUp = new BPopUpMenu(B_EMPTY_STRING);
-	const char *windowLookStrings[] = {
-		MDR_DIALECT_CHOICE ("Normal, With Tab","タブ付通常"),
-		MDR_DIALECT_CHOICE ("Normal, Border Only","ボーダーのみ通常"),
-		MDR_DIALECT_CHOICE ("Floating","フローティング"),
-		MDR_DIALECT_CHOICE ("Thin Border","細いボーダー"),
-		MDR_DIALECT_CHOICE ("No Border","ボーダー無し")};
-	for (int32 i = 0;i < 5;i++)
-	{
-		lookPopUp->AddItem(item = new BMenuItem(windowLookStrings[i],msg = new BMessage(kMsgStatusLookChanged)));
-		msg->AddInt32("StatusWindowLook",i);
-		if (i == 0)
-			item->SetMarked(true);
-	}
-	rect.OffsetBy(0, height + 6);
-	fStatusLookField = new BMenuField(rect,"status look",
-		MDR_DIALECT_CHOICE ("Window Look:","ウィンドウ外観："),lookPopUp);
-	fStatusLookField->SetDivider(labelWidth);
-	box->AddChild(fStatusLookField);
-
-	BPopUpMenu *workspacesPopUp = new BPopUpMenu(B_EMPTY_STRING);
-	workspacesPopUp->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Current Workspace","使用中ワークスペース"),
-		msg = new BMessage(kMsgStatusWorkspaceChanged)));
-	msg->AddInt32("StatusWindowWorkSpace", 0);
-	workspacesPopUp->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("All Workspaces","全てのワークスペース"),
-		msg = new BMessage(kMsgStatusWorkspaceChanged)));
-	msg->AddInt32("StatusWindowWorkSpace", -1);
-
-	rect.OffsetBy(0,height + 6);
-	fStatusWorkspaceField = new BMenuField(rect,"status workspace",
-		MDR_DIALECT_CHOICE ("Window visible on:","表示場所："),workspacesPopUp);
-	fStatusWorkspaceField->SetDivider(labelWidth);
-	box->AddChild(fStatusWorkspaceField);
-
-	rect = box->Frame();  rect.bottom = rect.top + 3*height + 13;
-	box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Deskbar Icon","デスクバーアイコンリンク"));
-	view->AddChild(box);
-
-	rect = box->Bounds().InsetByCopy(8,8);
-	rect.top += 7;	rect.bottom = rect.top + height + 5;
-	BStringView *stringView = new BStringView(rect,B_EMPTY_STRING, MDR_DIALECT_CHOICE (
-		"The menu links are links to folders in a real folder like the Be menu.",
-		"デスクバーで表示する項目の設定"));
-	box->AddChild(stringView);
-	stringView->SetAlignment(B_ALIGN_CENTER);
-	stringView->ResizeToPreferred();
-	// BStringView::ResizeToPreferred() changes the width, so that the
-	// alignment has no effect anymore
-	stringView->ResizeTo(rect.Width(), stringView->Bounds().Height());
-
-	rect.left += 100;  rect.right -= 100;
-	rect.OffsetBy(0,height + 1);
+	rect = fStatusModeField->Frame();;
+	rect.OffsetBy(0, rect.Height() + 10);
 	BButton *button = new BButton(rect,B_EMPTY_STRING,
-		MDR_DIALECT_CHOICE ("Configure Menu Links","メニューリンクの設定"),
+		MDR_DIALECT_CHOICE ("Edit Mailbox Menu…","メニューリンクの設定"),
 		msg = new BMessage(B_REFS_RECEIVED));
+	button->ResizeToPreferred();
 	box->AddChild(button);
 	button->SetTarget(BMessenger("application/x-vnd.Be-TRAK"));
 
@@ -441,29 +392,14 @@ ConfigWindow::ConfigWindow()
 	else
 		button->SetEnabled(false);
 
-	rect = box->Frame();  rect.bottom = rect.top + 2*height + 6;
-	box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Misc.","その他の設定"));
-	view->AddChild(box);
-
-	rect = box->Bounds().InsetByCopy(8,8);
-	rect.top += 7;	rect.bottom = rect.top + height + 5;
+	rect = button->Frame();
+	rect.OffsetBy(rect.Width() + 30,0);
 	fAutoStartCheckBox = new BCheckBox(rect,"start daemon",
-		MDR_DIALECT_CHOICE ("Auto-Start Mail Daemon","Mail Daemonを自動起動"),NULL);
+		MDR_DIALECT_CHOICE ("Start Mail Services on Startup","Mail Servicesを自動起動"),NULL);
+	fAutoStartCheckBox->ResizeToPreferred();
 	box->AddChild(fAutoStartCheckBox);
 
-	// about page
-
-	rect = tabView->Bounds();	rect.bottom -= tabView->TabHeight() + 4;
-	tabView->AddTab(view = new BView(rect,NULL,B_FOLLOW_ALL,0));
-	tabView->TabAt(2)->SetLabel(MDR_DIALECT_CHOICE ("About","情報"));
-	view->SetViewColor(top->ViewColor());
-
-	AboutTextView *about = new AboutTextView(rect);
-	about->SetViewColor(top->ViewColor());
-	view->AddChild(about);
-
-	// save/cancel/revert buttons
+	// save/revert buttons
 
 	top->AddChild(tabView);
 
@@ -478,38 +414,12 @@ ConfigWindow::ConfigWindow()
 	saveButton->MoveTo(rect.right - w, rect.top);
 	top->AddChild(saveButton);
 
-	BButton *cancelButton = new BButton(rect,"cancel",
-		MDR_DIALECT_CHOICE ("Cancel","中止"),
-		new BMessage(kMsgCancelSettings));
-	cancelButton->GetPreferredSize(&w,&h);
-	cancelButton->ResizeTo(w,h);
-#ifdef HAVE_APPLY_BUTTON
-	cancelButton->MoveTo(saveButton->Frame().left - w - 5,rect.top);
-#else
-	cancelButton->MoveTo(saveButton->Frame().left - w - 20,rect.top);
-#endif
-	top->AddChild(cancelButton);
-
-#ifdef HAVE_APPLY_BUTTON
-	BButton *applyButton = new BButton(rect,"apply",
-		MDR_DIALECT_CHOICE ("Apply","適用"),
-		new BMessage(kMsgApplySettings));
-	applyButton->GetPreferredSize(&w,&h);
-	applyButton->ResizeTo(w,h);
-	applyButton->MoveTo(cancelButton->Frame().left - w - 20,rect.top);
-	top->AddChild(applyButton);
-#endif
-
 	BButton *revertButton = new BButton(rect,"revert",
 		MDR_DIALECT_CHOICE ("Revert","復元"),
 		new BMessage(kMsgRevertSettings));
 	revertButton->GetPreferredSize(&w,&h);
 	revertButton->ResizeTo(w,h);
-#ifdef HAVE_APPLY_BUTTON
-	revertButton->MoveTo(applyButton->Frame().left - w - 5,rect.top);
-#else
-	revertButton->MoveTo(cancelButton->Frame().left - w - 6,rect.top);
-#endif
+	revertButton->MoveTo(saveButton->Frame().left - 25 - w, rect.top);
 	top->AddChild(revertButton);
 
 	LoadSettings();
@@ -558,9 +468,9 @@ ConfigWindow::MakeHowToView()
 	text->SetViewColor(fConfigView->Parent()->ViewColor());
 	text->SetAlignment(B_ALIGN_CENTER);
 	text->SetText(
-		MDR_DIALECT_CHOICE ("\n\nCreate a new account using the \"Add\" button.\n\n"
-		"Delete accounts (or only the inbound/outbound) by using the \"Remove\" button on the selected item.\n\n"
-		"Select an item in the list to edit its configuration.",
+		MDR_DIALECT_CHOICE ("\n\nMake a new account with the Add button.\n\n"
+		"Remove an account with the Remove button on the selected item.\n\n"
+		"Select an item in the list to change its settings.",
 		"\n\nアカウントの新規作成は\"追加\"ボタンを\n使います。"
 		"\n\nアカウント自体またはアカウントの\n送受信設定を削除するには\n項目を選択して\"削除\"ボタンを使います。"
 		"\n\nアカウント内容の変更は、\nマウスで項目をクリックしてください。"));
@@ -645,21 +555,6 @@ ConfigWindow::SaveSettings()
 		int32 index = fStatusModeField->Menu()->IndexOf(fStatusModeField->Menu()->FindMarked());
 		settings.SetShowStatusWindow(index);
 
-		// status look (border style, ...)
-		index = fStatusLookField->Menu()->IndexOf(fStatusLookField->Menu()->FindMarked());
-		settings.SetStatusWindowLook(index);
-		
-		// status workspaces
-		index = fStatusWorkspaceField->Menu()->IndexOf(fStatusWorkspaceField->Menu()->FindMarked());
-		uint32 workspaces = 0;
-		if (index == 0) {
-			// current workspace
-			workspaces = Workspaces();
-				// ToDo: correct would be to ask the status window which workspace it is on
-		} else
-			workspaces = B_ALL_WORKSPACES;
-			
-		settings.SetStatusWindowWorkspaces(workspaces);
 	} else {
 		// restore status window look
 		settings.SetStatusWindowLook(settings.StatusWindowLook());
@@ -739,8 +634,6 @@ ConfigWindow::MessageReceived(BMessage *msg)
 		}
 
 		case kMsgShowStatusWindowChanged:
-		case kMsgStatusLookChanged:
-		case kMsgStatusWorkspaceChanged:
 		{
 			// the status window stuff is the only "live" setting
 			BMessenger messenger("application/x-vnd.Be-POST");
@@ -752,18 +645,10 @@ ConfigWindow::MessageReceived(BMessage *msg)
 		case kMsgRevertSettings:
 			RevertToLastSettings();
 			break;
-		case kMsgApplySettings:
+		case kMsgSaveSettings:
 			fSaveSettings = true;
 			SaveSettings();
 			MakeHowToView();
-			break;
-		case kMsgSaveSettings:
-			fSaveSettings = true;
-			PostMessage(B_QUIT_REQUESTED);
-			break;
-		case kMsgCancelSettings:
-			fSaveSettings = false;
-			PostMessage(B_QUIT_REQUESTED);
 			break;
 
 		default:
@@ -814,18 +699,6 @@ ConfigWindow::SetToGeneralSettings(BMailSettings *settings)
 
 	if (BMenuItem *item = fStatusModeField->Menu()->ItemAt(settings->ShowStatusWindow()))
 		item->SetMarked(true);
-	if (BMenuItem *item = fStatusLookField->Menu()->ItemAt(settings->StatusWindowLook()))
-		item->SetMarked(true);
-	if (BMenuItem *item = fStatusWorkspaceField->Menu()->ItemAt((uint32)settings->StatusWindowWorkspaces() != B_ALL_WORKSPACES ? 0 : 1))
-		item->SetMarked(true);
-
-	BMessenger messenger("application/x-vnd.Be-POST");
-	if (messenger.IsValid())
-	{
-		BMessage msg(kMsgStatusLookChanged);
-		msg.AddInt32("look", settings->StatusWindowLook());
-		messenger.SendMessage(&msg);
-	}
 
 	return B_OK;
 }

@@ -49,7 +49,7 @@ AccountConfigView::AccountConfigView(BRect rect,Account *account)
 	:	BBox(rect),
 		fAccount(account)
 {
-	SetLabel(MDR_DIALECT_CHOICE ("Account Configuration","アカウント設定"));
+	SetLabel(MDR_DIALECT_CHOICE ("Account Settings","アカウント設定"));
 
 	rect = Bounds().InsetByCopy(8,8);
 	rect.top += 10;
@@ -76,9 +76,9 @@ AccountConfigView::AccountConfigView(BRect rect,Account *account)
 
 	BPopUpMenu *chainsPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *chainModes[] = {
-		MDR_DIALECT_CHOICE ("Inbound Only","受信のみ"),
-		MDR_DIALECT_CHOICE ("Outbound Only","送信のみ"),
-		MDR_DIALECT_CHOICE ("Inbound & Outbound","送受信")};
+		MDR_DIALECT_CHOICE ("Receive Mail Only","受信のみ"),
+		MDR_DIALECT_CHOICE ("Send Mail Only","送信のみ"),
+		MDR_DIALECT_CHOICE ("Send and Receive Mail","送受信")};
 	BMenuItem *item;
 	for (int32 i = 0;i < 3;i++)
 		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i],new BMessage(kMsgAccountTypeChanged)));
@@ -148,7 +148,7 @@ void AccountConfigView::UpdateViews()
 	{
 		if (BMenuItem *item = fTypeField->Menu()->FindMarked())
 			item->SetMarked(false);
-		fTypeField->Menu()->Superitem()->SetLabel(MDR_DIALECT_CHOICE ("<select account type>","<用途を選択してください>"));
+		fTypeField->Menu()->Superitem()->SetLabel(MDR_DIALECT_CHOICE ("Select Account Type","用途を選択してください"));
 		
 		fNameControl->SetEnabled(false);
 		fRealNameControl->SetEnabled(false);
@@ -264,7 +264,7 @@ void FilterConfigView::AttachedToWindow()
 ProtocolsConfigView::ProtocolsConfigView(BMailChain *chain,int32 index,BMessage *msg,entry_ref *ref)
 	:	FilterConfigView(chain,index,msg,ref)
 {
-	BPopUpMenu *menu = new BPopUpMenu("<choose protocol>");
+	BPopUpMenu *menu = new BPopUpMenu("Choose Protocol");
 
 	for (int i = 0; i < 2; i++) {
 		BPath path;
@@ -539,13 +539,13 @@ FiltersConfigView::FiltersConfigView(BRect rect,Account *account)
 	BMessage *msg;
 	if ((fChain = fAccount->Inbound()))
 	{
-		menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Incoming E-mail Filters","受信フィルタ"),msg = new BMessage(kMsgChainSelected)));
+		menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Incoming Mail Filters","受信フィルタ"),msg = new BMessage(kMsgChainSelected)));
 		msg->AddPointer("chain",fChain);
 		item->SetMarked(true);
 	}
 	if (BMailChain *chain = fAccount->Outbound())
 	{
-		menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Outgoing E-mail Filters","送信フィルタ"),msg = new BMessage(kMsgChainSelected)));
+		menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Outgoing Mail Filters","送信フィルタ"),msg = new BMessage(kMsgChainSelected)));
 		msg->AddPointer("chain",chain);
 		if (fChain == NULL)
 		{
@@ -814,8 +814,8 @@ void FiltersConfigView::MessageReceived(BMessage *msg)
 				if (fChain->AddFilter(to,settings,ref) < B_OK)
 				{
 					(new BAlert("E-mail",MDR_DIALECT_CHOICE (
-					"Could not move filter, filter deleted.",
-					"フィルタが削除された為、移動できません"),"Ok"))->Go();
+					"The filter could not be moved. Deleting filter.",
+					"フィルタが削除された為、移動できません"),"OK"))->Go();
 
 					// the filter view belongs to the moved filter
 					if (fFilterView && fFilterView->fIndex == -1)

@@ -256,7 +256,7 @@ void Account::CreateInbound()
 		(new BAlert(
 			MDR_DIALECT_CHOICE ("E-mail","メール"),
 			MDR_DIALECT_CHOICE ("Could not create inbound chain.","受信チェーンは作成できませんでした。"),
-			MDR_DIALECT_CHOICE ("Ok","了解")))->Go();
+			MDR_DIALECT_CHOICE ("OK","了解")))->Go();
 		return;
 	}
 	fInbound->SetChainDirection(inbound);

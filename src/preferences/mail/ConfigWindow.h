@@ -48,7 +48,7 @@ class ConfigWindow : public BWindow
 		BMenuField		*fIntervalUnitField;
 		BCheckBox		*fPPPActiveCheckBox;
 		BCheckBox		*fPPPActiveSendCheckBox;
-		BMenuField		*fStatusModeField,*fStatusLookField,*fStatusWorkspaceField;
+		BMenuField		*fStatusModeField;
 		BCheckBox		*fAutoStartCheckBox;
 
 		bool			fSaveSettings;
