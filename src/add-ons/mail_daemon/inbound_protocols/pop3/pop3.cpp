@@ -725,7 +725,7 @@ BView* instantiate_config_panel(BMessage *settings,BMessage *)
 	view->AddAuthMethod("APOP");
 
         #if USESSL
-            view->AddFlavor("Unencrypted");
+            view->AddFlavor("No Encryption");
             view->AddFlavor("SSL");
         #endif
 
