@@ -24,7 +24,7 @@ IMAPConfig::IMAPConfig(BMessage *archive)
 	#ifdef USESSL
 	 | B_MAIL_PROTOCOL_HAS_FLAVORS)
 {
-		AddFlavor("Unencrypted");
+		AddFlavor("No Encryption");
 		AddFlavor("SSL");
 	#else
 		) {
@@ -45,8 +45,8 @@ IMAPConfig::IMAPConfig(BMessage *archive)
 	/*frame.top += 10;
 	frame.bottom += 10;*/
 	
-	BTextControl *folder = new BTextControl(frame,"root","Mailbox Root: ","",NULL);
-	folder->SetDivider(be_plain_font->StringWidth("Mailbox Root: "));
+	BTextControl *folder = new BTextControl(frame,"root","Top Mailbox Folder: ","",NULL);
+	folder->SetDivider(be_plain_font->StringWidth("Top Mailbox Folder: "));
 		
 	if (archive->HasString("root"))
 		folder->SetText(archive->FindString("root"));
