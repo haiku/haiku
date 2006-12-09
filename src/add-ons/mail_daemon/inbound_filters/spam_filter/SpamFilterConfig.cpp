@@ -178,7 +178,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fAddSpamToSubjectCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"AddToSubject",
-		"Add \"[Spam %]\" in front of Subject.",
+		"Add spam rating to start of Subject",
 		new BMessage (kAddSpamToSubjectPressed));
 	AddChild (fAddSpamToSubjectCheckBoxPntr);
 	fAddSpamToSubjectCheckBoxPntr->ResizeToPreferred ();
@@ -194,7 +194,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fNoWordsMeansSpamCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"NoWordsMeansSpam",
-		"or no words found.",
+		"or empty E-mail",
 		new BMessage (kNoWordsMeansSpam));
 	AddChild (fNoWordsMeansSpamCheckBoxPntr);
 	fNoWordsMeansSpamCheckBoxPntr->ResizeToPreferred ();
@@ -250,7 +250,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fAutoTrainingCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"autoTraining",
-		"Self-training on Incoming Messages.",
+		"Learn from all incoming E-mail",
 		new BMessage (kAutoTrainingPressed));
 	AddChild (fAutoTrainingCheckBoxPntr);
 	fAutoTrainingCheckBoxPntr->ResizeToPreferred ();
@@ -266,7 +266,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fServerSettingsButtonPntr = new BButton (
 		tempRect,
 		"serverSettings",
-		"Edit Server Settings",
+		"Advanced Server Settings…",
 		new BMessage (kServerSettingsPressed));
 	AddChild (fServerSettingsButtonPntr);
 	fServerSettingsButtonPntr->ResizeToPreferred ();
@@ -281,7 +281,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fQuitServerWhenFinishedCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"quitWhenFinished",
-		"Close SpamDBM when Finished.",
+		"Close spam scanner when finished.",
 		new BMessage (kQuitWhenFinishedPressed));
 	AddChild (fQuitServerWhenFinishedCheckBoxPntr);
 	fQuitServerWhenFinishedCheckBoxPntr->ResizeToPreferred ();
