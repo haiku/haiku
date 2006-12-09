@@ -100,7 +100,7 @@ BMailFilter* instantiate_mailfilter(BMessage* settings, BMailChainRunner *runner
 
 BView* instantiate_config_panel(BMessage *settings,BMessage *metadata)
 {
-	BMailFileConfigView *view = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Source Folder:","送信箱："),"path",true,"/boot/home/mail/out");
+	BMailFileConfigView *view = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Location:","送信箱："),"path",true,"/boot/home/mail/out");
 	view->SetTo(settings,metadata);
 
 	return view;
