@@ -544,11 +544,11 @@ directory, available from http://sourceforge.net/projects/bemaildaemon/ */
  */
 
 static float g_MarginBetweenControls; /* Space of a letter "M" between them. */
-static float g_LineOfTextHeight;      /* Height of text the current font. */
+//static float g_LineOfTextHeight;      /* Height of text the current font. */
 static float g_StringViewHeight;      /* Height of a string view text box. */
 static float g_ButtonHeight;          /* How many pixels tall buttons are. */
 static float g_CheckBoxHeight;        /* Same for check boxes. */
-static float g_RadioButtonHeight;     /* Also for radio buttons. */
+//static float g_RadioButtonHeight;     /* Also for radio buttons. */
 static float g_PopUpMenuHeight;       /* Again for pop-up menus. */
 static float g_TextBoxHeight;         /* Ditto for editable text controls. */
 
@@ -896,14 +896,14 @@ typedef enum TokenizeModeEnum
 
 static char * g_TokenizeModeNames [TM_MAX] =
 {
-  "Whole",
-  "PlainText",
-  "PlainTextAndHeader",
-  "AnyText",
-  "AnyTextAndHeader",
-  "AllParts",
-  "AllPartsAndHeader",
-  "JustHeader"
+  "All",
+  "Plain Text",
+  "Plain Text and Header",
+  "Any Text",
+  "Any Text and Header",
+  "All Parts",
+  "All Parts and Header",
+  "Just Header"
 };
 
 
@@ -2878,7 +2878,8 @@ void ABSApp::DefaultSettings ()
     strcpy (TempString, DatabasePath.Path ());
   m_DatabaseFileName.SetTo (TempString);
 
-  m_IgnorePreviousClassification = false;
+  // Users need to be allowed to undo their mistakes...
+  m_IgnorePreviousClassification = true;
   g_ServerMode = true;
   m_PurgeAge = 2000;
   m_PurgePopularity = 2;
@@ -4695,7 +4696,8 @@ bool ABSApp::QuitRequested ()
     return BApplication::QuitRequested ();
 
   if (g_QuitCountdown < 0)
-    g_QuitCountdown = 10; /* Start the countdown. */
+//    g_QuitCountdown = 10; /* Start the countdown. */
+    g_QuitCountdown = 5; /* Quit more quickly */
 
   return false;
 }
@@ -4760,6 +4762,8 @@ status_t ABSApp::PurgeOldWords (char *ErrorMessage)
 
 void ABSApp::ReadyToRun ()
 {
+
+#if 0
   DatabaseWindow *DatabaseWindowPntr;
   float           JunkFloat;
   BButton        *TempButtonPntr;
@@ -4913,6 +4917,11 @@ void ABSApp::ReadyToRun ()
     else
       DatabaseWindowPntr->Show (); /* Starts the window's message loop. */
   }
+
+#endif 	// end all the unnecessary #if 0'ed code
+
+  SetPulseRate (500000);
+
   g_AppReadyToRunCompleted = true;
 }
 
@@ -6150,7 +6159,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.bottom = TempRect.top + g_ButtonHeight;
 
   m_BrowseButtonPntr = new BButton (TempRect, "Browse Button",
-    "Browse", new BMessage (MSG_BROWSE_BUTTON), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+    "Browse…", new BMessage (MSG_BROWSE_BUTTON), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
   if (m_BrowseButtonPntr == NULL) goto ErrorExit;
   AddChild (m_BrowseButtonPntr);
   m_BrowseButtonPntr->SetTarget (this);
@@ -6167,7 +6176,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.bottom = TempRect.top + g_TextBoxHeight;
   TempRect.right = X;
 
-  StringPntr = "Database File Name:";
+  StringPntr = "Word Database:";
   strcpy (m_DatabaseFileNameCachedValue, "Unknown...");
   m_DatabaseFileNameTextboxPntr = new BTextControl (TempRect,
     "File Name",
@@ -6191,8 +6200,7 @@ void ControlsView::AttachedToWindow ()
   RowHeight = g_TextBoxHeight;
   RowHeight = ceilf (RowHeight * 1.1);
 
-  StringPntr = "Purge Age (words added this many or more messages "
-    "ago may get deleted):";
+  StringPntr = "Number of occurrences needed to store a word:";
   m_PurgeAgeCachedValue = 12345678;
 
   Margin = ceilf ((RowHeight - g_TextBoxHeight) / 2);
@@ -6226,8 +6234,7 @@ void ControlsView::AttachedToWindow ()
   RowHeight = g_TextBoxHeight;
   RowHeight = ceilf (RowHeight * 1.1);
 
-  StringPntr = "Purge Popularity (words that occur in this many or fewer "
-    "e-mail messages may get deleted):";
+  StringPntr = "Number of messages to store words from:";
   m_PurgePopularityCachedValue = 87654321;
   Margin = ceilf ((RowHeight - g_TextBoxHeight) / 2);
   TempRect.top = RowTop + Margin;
@@ -6255,7 +6262,7 @@ void ControlsView::AttachedToWindow ()
   /* Make the purge button, which will take up space in the 2nd and 3rd rows,
   on the right side.  Twice as tall as a regular button too. */
 
-  StringPntr = "Purge!";
+  StringPntr = "Remove Old Words";
   Margin = ceilf ((((RowTop + RowHeight) - BigPurgeButtonTop) -
     2 * g_TextBoxHeight) / 2);
   TempRect.top = BigPurgeButtonTop + Margin;
@@ -6269,6 +6276,7 @@ void ControlsView::AttachedToWindow ()
   m_PurgeButtonPntr = new BButton (TempRect, "Purge Button",
     StringPntr, new BMessage (CommandMessage), B_FOLLOW_LEFT | B_FOLLOW_TOP);
   if (m_PurgeButtonPntr == NULL) goto ErrorExit;
+  m_PurgeButtonPntr->ResizeToPreferred();
   AddChild (m_PurgeButtonPntr);
   m_PurgeButtonPntr->SetTarget (be_app);
 
@@ -6280,9 +6288,7 @@ void ControlsView::AttachedToWindow ()
   RowHeight = g_CheckBoxHeight;
   RowHeight = ceilf (RowHeight * 1.1);
 
-  StringPntr = "Ignore Previous Classification (so that previously classified "
-    "messages can be added again, otherwise only a change in classification "
-    "is recognized)";
+  StringPntr = "Allow Retraining on a Message";
   m_IgnorePreviousClassCachedValue = false;
 
   Margin = ceilf ((RowHeight - g_CheckBoxHeight) / 2);
@@ -6308,8 +6314,7 @@ void ControlsView::AttachedToWindow ()
   RowHeight = g_CheckBoxHeight;
   RowHeight = ceilf (RowHeight * 1.1);
 
-  StringPntr = "Server Mode (errors printed on the standard error stream "
-    "rather than in alert boxes, window minimized)";
+  StringPntr = "Print errors to Terminal";
   m_ServerModeCachedValue = false;
 
   Margin = ceilf ((RowHeight - g_CheckBoxHeight) / 2);
@@ -6363,47 +6368,35 @@ void ControlsView::AttachedToWindow ()
     switch (TokenizeMode)
     {
       case TM_WHOLE:
-        strcat (TempString, " - Looks for words in the whole file, so it "
-          "sees everything!  Use this for non-Email files too.  Also does "
-          "a rough quoted-printable decoding.");
+        strcat (TempString, " - Scan everything");
         break;
 
       case TM_PLAIN_TEXT:
-        strcat (TempString, " - Only examines text/plain parts of the "
-          "e-mail (no HTML parts).  But does decode base64 etc. and do "
-          "character set conversions (all but Whole also do that).");
+        strcat (TempString, " - Scan e-mail body text except rich text");
         break;
 
       case TM_PLAIN_TEXT_HEADER:
-        strcat (TempString, " - Examines text/plain parts of the "
-          "e-mail (no HTML parts), and also looks at the headers (from, to, "
-          "subject, names of attached files, etc).");
+        strcat (TempString, " - Scan entire e-mail text except rich text");
         break;
 
       case TM_ANY_TEXT:
-        strcat (TempString, " - Examines all text/* parts of the "
-          "e-mail, including HTML parts.");
+        strcat (TempString, " - Scan e-mail body text and text attachments");
         break;
 
       case TM_ANY_TEXT_HEADER:
-        strcat (TempString, " - Examines all text/* parts of the "
-          "e-mail, including HTML parts.  Also examines the headers.");
+        strcat (TempString, " - Scan entire e-mail text and text attachments (Recommended)");
         break;
 
       case TM_ALL_PARTS:
-        strcat (TempString, " - Examines all parts of the e-mail, including "
-          "HTML parts and binary attachments (mostly useless garbage words).");
+        strcat (TempString, " - Scan e-mail body and all attachments");
         break;
 
       case TM_ALL_PARTS_HEADER:
-        strcat (TempString, " - Examines all parts of the e-mail, including "
-          "HTML parts and binary attachments, plus the headers.");
+        strcat (TempString, " - Scan all parts of the e-mail");
         break;
 
       case TM_JUST_HEADER:
-        strcat (TempString, " - Only examines the first header part of the "
-          "e-mail (from, to, subject, but not MIME subheaders (names of "
-          "attached files and other attachment info)).");
+        strcat (TempString, " - Scan just the header (mail routing information)");
         break;
 
       default:
@@ -6451,19 +6444,30 @@ void ControlsView::AttachedToWindow ()
     CommandMessage.what = B_SET_PROPERTY;
     CommandMessage.AddSpecifier (g_PropertyNames[PN_SCORING_MODE]);
     CommandMessage.AddString (g_DataName, g_ScoringModeNames[ScoringMode]);
+/*
     strcpy (TempString, g_ScoringModeNames[ScoringMode]);
     switch (ScoringMode)
     {
       case SM_ROBINSON:
-        strcat (TempString, " - Gary Robinson's invention.  Score varies "
-          "evenly between 0 and 1, so you get shades of spaminess.  Cutoff "
-          "point varies depending on your training examples.");
+        strcat (TempString, " - Learning Method 1: Naive Bayesian");
         break;
 
       case SM_CHISQUARED:
-        strcat (TempString, " - Uses Chi-Squared statistics test.  Score "
-          "near 0 for genuine, near 1 for spam and inbetween if it is "
-          "unsure.  No shades of spaminess.");
+        strcat (TempString, " - Learning Method 2: Chi-Squared");
+        break;
+
+      default:
+        break;
+    }
+*/
+    switch (ScoringMode)
+    {
+      case SM_ROBINSON:
+        strcpy (TempString, "Learning Method 1: Naive Bayesian");
+        break;
+
+      case SM_CHISQUARED:
+        strcpy (TempString, "Learning Method 2: Chi-Squared");
         break;
 
       default:
@@ -6494,7 +6498,7 @@ void ControlsView::AttachedToWindow ()
   CommandMessage.what = B_EXECUTE_PROPERTY;
   CommandMessage.AddSpecifier (g_PropertyNames[PN_INSTALL_THINGS]);
   m_InstallThingsButtonPntr = new BButton (TempRect, "Install Button",
-    "Install MIME Types & Make Indices on All Drives",
+    "Install Spam Types",
     new BMessage (CommandMessage),
     B_FOLLOW_LEFT | B_FOLLOW_TOP);
   if (m_InstallThingsButtonPntr == NULL) goto ErrorExit;
@@ -6513,7 +6517,7 @@ void ControlsView::AttachedToWindow ()
   CommandMessage.what = B_EXECUTE_PROPERTY;
   CommandMessage.AddSpecifier (g_PropertyNames[PN_RESET_TO_DEFAULTS]);
   m_ResetToDefaultsButtonPntr = new BButton (TempRect, "Reset Button",
-    "Reset Settings to Defaults", new BMessage (CommandMessage),
+    "Default Settings", new BMessage (CommandMessage),
     B_FOLLOW_RIGHT | B_FOLLOW_TOP);
   if (m_ResetToDefaultsButtonPntr == NULL) goto ErrorExit;
   AddChild (m_ResetToDefaultsButtonPntr);
@@ -6536,7 +6540,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.left = X;
 
   m_EstimateSpamButtonPntr = new BButton (TempRect, "Estimate Button",
-    "Estimate Spam Ratio of a New Message",
+    "Scan a Message",
     new BMessage (MSG_ESTIMATE_BUTTON),
     B_FOLLOW_LEFT | B_FOLLOW_TOP);
   if (m_EstimateSpamButtonPntr == NULL) goto ErrorExit;
@@ -6554,7 +6558,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.left = X;
 
   m_AddExampleButtonPntr = new BButton (TempRect, "Example Button",
-    "Add Example of Spam/Genuine",
+    "Train Spam Filter on a Message",
     new BMessage (MSG_BROWSE_BUTTON),
     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
     B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
@@ -6573,7 +6577,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.left = X;
 
   m_AboutButtonPntr = new BButton (TempRect, "About Button",
-    "About this fine program...",
+    "About…",
     new BMessage (B_ABOUT_REQUESTED),
     B_FOLLOW_RIGHT | B_FOLLOW_TOP);
   if (m_AboutButtonPntr == NULL) goto ErrorExit;
@@ -7046,7 +7050,7 @@ void ControlsView::Pulse ()
 
 DatabaseWindow::DatabaseWindow ()
 : BWindow (BRect (30, 30, 620, 400),
-    "Alexander G. M. Smith's Bayesian Spam Database Server",
+    "Haiku Spam Filter Server",
     B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
   BRect TempRect;
@@ -7060,12 +7064,14 @@ DatabaseWindow::DatabaseWindow ()
 
   /* Add the word view in the remaining space under the controls view. */
 
+
   TempRect = Bounds ();
   TempRect.top = m_ControlsViewPntr->Frame().bottom + 1;
   m_WordsViewPntr = new WordsView (TempRect);
   if (m_WordsViewPntr == NULL)
     goto ErrorExit;
   AddChild (m_WordsViewPntr);
+
 
   /* Minimize the window if we are starting up in server mode.  This is done
   before the window is open so it doesn't flash onto the screen, and possibly
