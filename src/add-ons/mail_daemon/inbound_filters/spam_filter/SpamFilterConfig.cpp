@@ -139,7 +139,7 @@ AGMSBayesianSpamFilterConfig::AGMSBayesianSpamFilterConfig (BMessage *settings)
 		fGenuineCutoffRatioTextBoxPntr (NULL),
 		fNoWordsMeansSpam (true),
 		fNoWordsMeansSpamCheckBoxPntr (NULL),
-		fQuitServerWhenFinished (false),
+		fQuitServerWhenFinished (true),
 		fQuitServerWhenFinishedCheckBoxPntr (NULL),
 		fServerSettingsButtonPntr (NULL),
 		fSpamCutoffRatio (0.99f),
@@ -263,7 +263,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 
 	// Button for editing the server settings.
 
-	fServerSettingsButtonPntr = new BButton (
+/*	fServerSettingsButtonPntr = new BButton (
 		tempRect,
 		"serverSettings",
 		"Advanced Server Settings…",
@@ -275,6 +275,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	tempRect = Bounds ();
 	tempRect.top = fServerSettingsButtonPntr->Frame().bottom + 1;
 	tempRect.bottom = tempRect.top + 20;
+
 
     // Checkbox for closing the server when done.
 
@@ -291,6 +292,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	tempRect = Bounds ();
 	tempRect.top = fQuitServerWhenFinishedCheckBoxPntr->Frame().bottom + 1;
 	tempRect.bottom = tempRect.top + 20;
+*/
 }
 
 
