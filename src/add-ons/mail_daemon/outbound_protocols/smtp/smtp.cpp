@@ -1051,7 +1051,7 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 	view->AddAuthMethod(MDR_DIALECT_CHOICE ("POP3 before SMTP","送信前に受信する"), false);
 
 	BTextControl *control = (BTextControl *)(view->FindView("host"));
-	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP Host: ","SMTPサーバ: "));
+	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP Server: ","SMTPサーバ: "));
 	//control->SetDivider(be_plain_font->StringWidth("SMTP Host: "));
 
 	view->SetTo(settings);
