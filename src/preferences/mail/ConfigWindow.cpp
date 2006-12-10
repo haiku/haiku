@@ -405,8 +405,8 @@ ConfigWindow::ConfigWindow()
 
 	rect = tabView->Frame();
 	rect.top = rect.bottom + 5;  rect.bottom = rect.top + height + 5;
-	BButton *saveButton = new BButton(rect,"save",
-		MDR_DIALECT_CHOICE ("Save","保存"),
+	BButton *saveButton = new BButton(rect,"apply",
+		MDR_DIALECT_CHOICE ("Apply","適用"),
 		new BMessage(kMsgSaveSettings));
 	float w,h;
 	saveButton->GetPreferredSize(&w,&h);
