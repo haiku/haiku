@@ -92,11 +92,6 @@ setenv(const char *var, const char *value, bool overwrite)
 
 
 /*
- * reapchild. Child process is out there, let's catch its termination.
- */
-
-
-/*
  *  spawn_shell(): spawn child process, create pty master/slave device and
  *  execute SHELL program.
  */
@@ -119,43 +114,26 @@ typedef struct
 #define PTY_NG	1	/* pty open or set termios NG */
 #define PTY_WS	2	/* pty need WINSIZE (row and col ) */
 
-/* global varriables */
+/* global variables */
 
 pid_t sh_pid;
 
 int
 spawn_shell(int row, int col, const char *command, const char *coding)
 {
-	int done = 0;
-	pid_t pgrp;
-  
-	int master = -1;
-	int slave;
-	struct termios tio;
 	struct winsize ws;
-  
+  	
 	handshake_t handshake;
 
-	int i = 0;
-	time_t now_time_t;
-	struct tm *now_time;
-	int now_hour;
-  
-	char *args[16];
-	char com_line[256];
-	char *ptr;
-
-	char err_msg[256];
-
 	signal(SIGTTOU, SIG_IGN);
-
-   /*
-	* Get a psuedo-tty. We do this by cycling through files in the
-	* directory. The oparationg system will not allow us to open a master
-	* which is already in use, so we simply go until the open succeeds.
-	*/
-
+	
+	/*
+	 * Get a psuedo-tty. We do this by cycling through files in the
+	 * directory. The oparationg system will not allow us to open a master
+	 * which is already in use, so we simply go until the open succeeds.
+	 */
 	char tty_name[B_PATH_NAME_LENGTH];
+	int master = -1;	
 	DIR *dir = opendir("/dev/pt/");
 	if (dir != NULL) {
 		struct dirent *dirEntry;
@@ -181,7 +159,6 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		closedir(dir);
 	}
 
-	// If master is still < 0 then we haven't found a tty we can use
 	if (master < 0) {
     		printf("didn't find any available pesudo ttys.");
     		return -1;
@@ -217,18 +194,19 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		close(pc_pipe[1]);
 
 		/* Set process session leader */
-		if ((pgrp = setsid()) < 0) {
+		if (setsid() < 0) {
 			handshake.status = PTY_NG;
 			sprintf(handshake.msg, "could not set session leader.");
 			write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
 			exit(1);
 		}
 
-		/* change pty owner and asscess mode. */
+		/* change pty owner and access mode. */
 		chown(tty_name, getuid(), getgid());
 		chmod(tty_name, S_IRUSR | S_IWUSR);
 
 		/* open slave pty */
+		int slave = -1;
 		if ((slave = open(tty_name, O_RDWR)) < 0) {
 			handshake.status = PTY_NG;
 			sprintf(handshake.msg, "can't open tty (%s).", tty_name);
@@ -236,7 +214,11 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 			exit(1);
 		}
 
-		/* get tty termios (don't necessary). */
+		struct termios tio;
+	
+		/* get tty termios (not necessary).
+		 * TODO: so why are we doing it ?
+		 */
 		tcgetattr(slave, &tio);
 
 		/* set signal default */
@@ -281,7 +263,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		tio.c_lflag |= ISIG|ICANON|ECHO|ECHOE|ECHONL;
 		tio.c_lflag &= ~(ECHOK | IEXTEN);
 
-		/* set control charactors. */
+		/* set control characters. */
 		tio.c_cc[VINTR]  = 'C' & 0x1f;	/* '^C'	*/
 		tio.c_cc[VQUIT]  = CQUIT;		/* '^\'	*/
 		tio.c_cc[VERASE] = 0x08;		/* '^H'	*/
@@ -343,13 +325,18 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 * to this process group ID (equal process ID).
 		 */
 
-		pgrp = getpid();
-		setpgid(pgrp, pgrp);
-		tcsetpgrp(0, pgrp);
+		pid_t processGroup = getpid();
+		if (setpgid(processGroup, processGroup) < 0) {
+			handshake.status = PTY_NG;
+			sprintf(handshake.msg, "can't set process group id.");
+			write(cp_pipe[1], (char *)&handshake, sizeof(handshake));
+			exit(1);		
+		}
+		tcsetpgrp(0, processGroup);
 
 		/* mark the pipes as close on exec */
-		fcntl(cp_pipe[1], F_SETFD, 1);
-		fcntl(pc_pipe[0], F_SETFD, 1);
+		fcntl(cp_pipe[1], F_SETFD, FD_CLOEXEC);
+		fcntl(pc_pipe[0], F_SETFD, FD_CLOEXEC);
 
 		/* pty open and set termios successful. */
 		handshake.status = PTY_OK;
@@ -367,14 +354,15 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 */
 		if (command == NULL)
 			command = SHELL_COMMAND;
-
-		memcpy (com_line, command, 256);
-		ptr = com_line;
-
+		
 		/*
 		 * split up the arguments in the command into an artv-like structure.
 		 */
-
+		char commandLine[256];
+		memcpy(commandLine, command, 256);
+		char *ptr = commandLine;
+		char *args[16];
+		int i = 0;
 		while (*ptr) {
 			/* Skip white space */
 			while ((*ptr == ' ') || (*ptr == '\t'))
@@ -390,13 +378,15 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 
 		setenv("SHELL", *args, true);
 
+#if 0
 		/*
 		 * Print Welcome Message.
 		 * (But, Only print message when MuTerminal coding is UTF8.)
 		 */
-		now_time_t = time(NULL);
-		now_time = localtime (&now_time_t);
-
+		
+		time_t now_time_t = time(NULL);
+		struct tm *now_time = localtime (&now_time_t);
+		int now_hour = 0;
 		if (now_time->tm_hour >= 5 && now_time->tm_hour < 11) {
 			now_hour = 0;
 		} else if (now_time->tm_hour >= 11 && now_time->tm_hour <= 18 ) {
@@ -404,16 +394,17 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		} else {
 			now_hour = 2;
 		}
-
+#endif
 		execve(*args, args, environ);
 
 		/*
 		 * Exec failed.
 		 */
 		sleep(1);
-		sprintf(err_msg, kSpawnAlertMessage, com_line, strerror(errno));
+		char errorMessage[256];
+		snprintf(errorMessage, sizeof(errorMessage), kSpawnAlertMessage, commandLine, strerror(errno));
 
-		if (system(err_msg) == 0)
+		if (system(errorMessage) == 0)
 			execl("/bin/sh", "/bin/sh", "-login", NULL);
 
 		exit(1);
@@ -432,6 +423,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	 * close parent control tty.
 	 */
 
+	int done = 0;
 	while (!done) {
 		read (cp_pipe[0], (char *)&handshake, sizeof (handshake));
 
