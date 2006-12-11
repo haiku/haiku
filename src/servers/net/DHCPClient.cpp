@@ -308,7 +308,7 @@ DHCPClient::DHCPClient(const char* device)
 
 printf("DHCP message size %lu\n", message.Size());
 
-	ssize_t bytesSent = sendto(socket, &message, message.MinSize(), 0, 
+	ssize_t bytesSent = sendto(socket, &message, message.MinSize(), MSG_BCAST, 
 		(struct sockaddr*)&broadcast, sizeof(broadcast));
 	if (bytesSent < 0) {
 		fStatus = errno;
