@@ -58,9 +58,9 @@ extern int gNowCoding;  /* defined TermParce.cpp */
 void SetCoding(int);
 
 
-TermWindow::TermWindow(BRect frame, const char* title, int pfd)
+TermWindow::TermWindow(BRect frame, const char* title, int gPfd)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE),
-	fPfd(pfd)
+	fPfd(gPfd)
 {
 	InitWindow();
 
@@ -286,11 +286,11 @@ TermWindow::SetupMenu(void)
 void
 TermWindow::MessageReceived(BMessage *message)
 {
-  int32 coding_id;
-  BRect r;
-  BFont halfFont;
-  BFont fullFont;
-  bool findresult;
+	int32 coding_id;
+	BRect r;
+	BFont halfFont;
+	BFont fullFont;
+	bool findresult;
   
 	switch (message->what) {
 		case MENU_SWITCH_TERM: {
@@ -626,7 +626,7 @@ TermWindow::QuitRequested(void)
 //  Get Machine Timezone.
 ////////////////////////////////////////////////////////////////////////////
 int
-TermWindow::GetTimeZone ()
+TermWindow::GetTimeZone()
 {
 	struct timeval tv;
 	struct timezone tm;

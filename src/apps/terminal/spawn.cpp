@@ -183,8 +183,8 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 
 	// If master is still < 0 then we haven't found a tty we can use
 	if (master < 0) {
-    	printf("didn't find any available pesudo ttys.");
-    	return -1;
+    		printf("didn't find any available pesudo ttys.");
+    		return -1;
 	}
 
    /*

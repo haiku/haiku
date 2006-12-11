@@ -47,7 +47,7 @@ class FindDlg;
 
 class TermWindow : public BWindow {
 	public:
-		TermWindow(BRect frame, const char* title, int pfd);
+		TermWindow(BRect frame, const char* title, int gPfd);
 		~TermWindow();
 
   void		Quit (void);

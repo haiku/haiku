@@ -34,8 +34,7 @@
 #include "PrefHandler.h"
 
 /* global varriables */
-int pfd;	/* pesudo tty fd */
-int pfd_no;	/* pfd number */
+int gPfd;	/* pesudo tty fd */
 
 PrefHandler *gTermPref;		/* Preference temporary */
 

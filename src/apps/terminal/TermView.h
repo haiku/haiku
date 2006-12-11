@@ -386,13 +386,13 @@ private:
   // view selection
   CurPos fSelStart;
   CurPos fSelEnd;
-  int fSelected;
-  int fMouseTracking;
+  bool fSelected;
+  bool fMouseTracking;
   
   // thread ID / flags.
   thread_id fViewThread;
   thread_id fMouseThread;
-  int fQuitting;
+  bool fQuitting;
 
   // DrawEngine parameter.
   sem_id fDrawRectSem;

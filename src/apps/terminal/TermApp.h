@@ -34,7 +34,7 @@
 #include <app/Application.h>
 #include <String.h>
 
-extern int pfd;
+extern int gPfd;
 extern char *ptyname;
 
 class TermWindow;

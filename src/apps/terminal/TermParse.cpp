@@ -24,7 +24,7 @@
 #include "TermConst.h"
 #include "CodeConv.h"
 
-extern int pfd; // defined Muterminal.cpp
+extern int gPfd; // defined Muterminal.cpp
 
 /////////////////////////////////////////////////////////////////////////////
 // PtyReader ... Get character from pty device.
@@ -52,7 +52,7 @@ TermParse::PtyReader(void *data)
     /*
      * Read PTY.
      */
-    nread = read (pfd, buf,
+    nread = read (gPfd, buf,
 		  READ_BUF_SIZE - (read_p - theObj->fParser_p));
     if (nread <= 0) {
       be_app->PostMessage(B_QUIT_REQUESTED);

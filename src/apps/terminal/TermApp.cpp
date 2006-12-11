@@ -373,11 +373,11 @@ TermApp::MakeTermWindow(BRect &frame)
 	if (cols < MIN_COLS)
 		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
 
-	pfd = spawn_shell(rows, cols, command, encoding);
-	if (pfd < 0)
-		return pfd;
+	gPfd = spawn_shell(rows, cols, command, encoding);
+	if (gPfd < 0)
+		return gPfd;
 
-	fTermWindow = new TermWindow(frame, fWindowTitle.String(), pfd);
+	fTermWindow = new TermWindow(frame, fWindowTitle.String(), gPfd);
 	fTermWindow->Show();
 	
 	return B_OK;
