@@ -139,8 +139,6 @@ dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size,
 
 	if (gBufferModule->count_iovecs(buffer) > 1) {
 		// TODO: for now, create a new buffer containing the data
-		net_buffer *original = buffer;
-
 		buffer = gBufferModule->duplicate(original);
 		if (buffer == NULL)
 			return ENOBUFS;
@@ -149,6 +147,8 @@ dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size,
 
 		if (gBufferModule->count_iovecs(buffer) > 1) {
 			dprintf("scattered I/O is not yet supported by ethernet device.\n");
+			gBufferModule->free(buffer);
+			device->stats.send.errors++;
 			return B_NOT_SUPPORTED;
 		}
 	}
