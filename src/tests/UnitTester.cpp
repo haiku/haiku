@@ -9,7 +9,7 @@
 
 
 int main(int argc, char *argv[]) {
-	UnitTesterShell shell("OpenBeOS Unit Testing Framework", new SemaphoreSyncObject);
+	UnitTesterShell shell("Haiku Unit Testing Framework", new SemaphoreSyncObject);
 	// ##### Add test suites for statically linked tests here #####
 //	shell.AddTest( "Example", ExampleTest::Suite() );
 
@@ -38,13 +38,13 @@ UnitTesterShell::PrintDescription(int argc, char *argv[]) {
 	cout << endl;
 	cout << "This program is the central testing framework for the purpose" << endl;
 	cout << "of testing and verifying the various kits, classes, functions," << endl;
-	cout << "and the like that comprise OpenBeOS." << endl;
+	cout << "and the like that comprise Haiku." << endl;
 }
 
 void
 UnitTesterShell::PrintValidArguments() {
 	BTestShell::PrintValidArguments();
-	cout << indent << "-obos        Runs tests linked against our OpenBeOS libraries (*default*)" << endl;
+	cout << indent << "-haiku       Runs tests linked against our Haiku libraries (*default*)" << endl;
 	cout << indent << "-r5          Runs tests linked against Be Inc.'s R5 libraries (instead" << endl;
 	cout << indent << "             of our libraries) for the sake of comparison." << endl;
 }
