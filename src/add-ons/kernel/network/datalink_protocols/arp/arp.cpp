@@ -263,11 +263,13 @@ static status_t
 arp_update_local(net_datalink_protocol *protocol)
 {
 	net_interface *interface = protocol->interface;
+	in_addr_t inetAddress;
 
 	if (interface->address == NULL) {
 		// interface has not yet been set
-		return B_OK;
-	}
+		inetAddress = INADDR_ANY;
+	} else
+		inetAddress = ((sockaddr_in *)interface->address)->sin_addr.s_addr;
 
 	sockaddr_dl address;
 	address.sdl_len = sizeof(sockaddr_dl);
@@ -280,8 +282,8 @@ arp_update_local(net_datalink_protocol *protocol)
 	memcpy(LLADDR(&address), interface->device->address.data, address.sdl_alen);
 
 	arp_entry *entry;
-	status_t status = arp_update_entry(((sockaddr_in *)interface->address)->sin_addr.s_addr,
-		&address, ARP_FLAG_LOCAL | ARP_FLAG_PERMANENT, &entry);
+	status_t status = arp_update_entry(inetAddress, &address,
+		ARP_FLAG_LOCAL | ARP_FLAG_PERMANENT, &entry);
 	if (status == B_OK)
 		entry->protocol = protocol;
 
@@ -560,7 +562,11 @@ arp_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry **_ent
 	header.opcode = htons(ARP_OPCODE_REQUEST);
 
 	memcpy(header.hardware_sender, device->address.data, ETHER_ADDRESS_LENGTH);
-	header.protocol_sender = ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
+	if (protocol->interface->address != NULL)
+		header.protocol_sender = ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
+	else
+		header.protocol_sender = 0;
+			// TODO: test if this actually works - maybe we should use INADDR_BROADCAST instead
 	memset(header.hardware_target, 0, ETHER_ADDRESS_LENGTH);
 	header.protocol_target = address;
 
@@ -586,9 +592,6 @@ arp_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry **_ent
 
 	sem_id waitSem = entry->resolved_sem;
 	benaphore_unlock(&sCacheLock);
-
-	// TODO: resend the request periodically via timer
-	//	(and abort it that way, too)
 
 	status = acquire_sem_etc(waitSem, 1, B_RELATIVE_TIMEOUT, 5 * 1000000);
 		// wait for the entry to become resolved
@@ -818,6 +821,7 @@ arp_send_data(net_datalink_protocol *protocol,
 		BenaphoreLocker locker(sCacheLock);
 
 		// Lookup source (us)
+		// TODO: this could be cached - the lookup isn't really needed at all
 
 		arp_entry *entry = arp_entry::Lookup(
 			((struct sockaddr_in *)&buffer->source)->sin_addr.s_addr);
@@ -827,31 +831,33 @@ arp_send_data(net_datalink_protocol *protocol,
 		memcpy(&buffer->source, &entry->hardware_address,
 			entry->hardware_address.sdl_len);
 
-		// Lookup destination (we may need to wait for this)
-		entry = arp_entry::Lookup(
-			((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr);
-		if (entry == NULL) {
-			// The ARP entry does not yet exist, if we're allowed to wait,
-			// we'll send an ARP request and try to change that.
-			if ((buffer->flags & MSG_DONTWAIT) != 0) {
-				// TODO: implement delaying packet send after ARP response!
-				return B_ERROR;
+		if ((buffer->flags & MSG_BCAST) == 0) {
+			// Lookup destination (we may need to wait for this)
+			entry = arp_entry::Lookup(
+				((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr);
+			if (entry == NULL) {
+				// The ARP entry does not yet exist, if we're allowed to wait,
+				// we'll send an ARP request and try to change that.
+				if ((buffer->flags & MSG_DONTWAIT) != 0) {
+					// TODO: implement delaying packet send after ARP response!
+					return B_ERROR;
+				}
+
+				status_t status = arp_resolve(protocol,
+					((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr, &entry);
+				if (status < B_OK)
+					return status;
+			} else {
+				// The entry exists, but we have to check if it has already been
+				// resolved and is valid.
+				status_t status = arp_check_resolved(&entry, buffer->flags);
+				if (status < B_OK)
+					return status;
 			}
 
-			status_t status = arp_resolve(protocol,
-				((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr, &entry);
-			if (status < B_OK)
-				return status;
-		} else {
-			// The entry exists, but we have to check if it has already been
-			// resolved and is valid.
-			status_t status = arp_check_resolved(&entry, buffer->flags);
-			if (status < B_OK)
-				return status;
+			memcpy(&buffer->destination, &entry->hardware_address,
+				entry->hardware_address.sdl_len);
 		}
-
-		memcpy(&buffer->destination, &entry->hardware_address,
-			entry->hardware_address.sdl_len);
 	}
 
 	return protocol->next->module->send_data(protocol->next, buffer);
@@ -905,9 +911,12 @@ arp_control(net_datalink_protocol *protocol,
 	if (op == SIOCSIFADDR && (protocol->interface->flags & IFF_UP) != 0) {
 		// The interface may get a new address, so we need to update our
 		// local entries.
+		bool hasOldAddress = false;
 		in_addr_t oldAddress = 0;
-		if (protocol->interface->address != NULL)
+		if (protocol->interface->address != NULL) {
 			oldAddress = ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
+			hasOldAddress = true;
+		}
 
 		status_t status = protocol->next->module->control(protocol->next,
 			SIOCSIFADDR, argument, length);
@@ -917,7 +926,7 @@ arp_control(net_datalink_protocol *protocol,
 		arp_update_local(protocol);
 
 		if (oldAddress == ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr
-			|| oldAddress == 0)
+			|| !hasOldAddress)
 			return B_OK;
 
 		// remove previous address from cache

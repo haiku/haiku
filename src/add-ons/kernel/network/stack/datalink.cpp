@@ -378,6 +378,12 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 }
 
 
+/*!
+	Tests if \a address is a local address in the domain.
+	\param _interface will be set to the interface belonging to that address
+		if non-NULL.
+	\param _matchedType will be set to either zero or MSG_BCAST if non-NULL.
+*/
 bool
 datalink_is_local_address(net_domain *_domain, const struct sockaddr *address, 
 	net_interface **_interface, uint32 *_matchedType)
@@ -388,17 +394,20 @@ datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 
 	BenaphoreLocker locker(domain->lock);
 
+	net_interface *interface = NULL;
+	net_interface *fallback = NULL;
 	uint32 matchedType = 0;
 
-	net_interface *interface = NULL;
 	while (true) {
 		interface = (net_interface *)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
-		if (interface->address == NULL)
+		if (interface->address == NULL) {
+			fallback = interface;
 			continue;
-		
+		}
+
 		// check for matching unicast address first
 		if (domain->address_module->equal_addresses(interface->address, address))
 			break;
@@ -411,10 +420,13 @@ datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 			break;
 		}
 	}
-	
-	if (interface == NULL)
-		return false;
-	
+
+	if (interface == NULL) {
+		interface = fallback;
+		if (interface == NULL)
+			return false;
+	}
+
 	if (_interface != NULL)
 		*_interface = interface;
 	if (_matchedType != NULL)
