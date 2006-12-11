@@ -10,16 +10,22 @@
 #include "DHCPClient.h"
 #include "NetServer.h"
 
+#include <Message.h>
+
+#include <arpa/inet.h>
 #include <errno.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 
 
 // See RFC 2131 for DHCP, see RFC 1533 for BOOTP/DHCP options
 
 #define DHCP_CLIENT_PORT	68
 #define DHCP_SERVER_PORT	67
+
+#define DEFAULT_TIMEOUT		2	// secs
+#define MAX_TIMEOUT			15	// secs
 
 enum message_opcode {
 	BOOT_REQUEST = 1,
@@ -31,7 +37,11 @@ enum message_option {
 
 	// generic options
 	OPTION_PAD = 0,
-	OPTION_END = 1,
+	OPTION_END = 255,
+	OPTION_SUBNET_MASK = 1,
+	OPTION_ROUTER_ADDRESS = 3,
+	OPTION_DOMAIN_NAME_SERVER = 6,
+	OPTION_HOST_NAME = 12,
 	OPTION_DATAGRAM_SIZE = 22,
 	OPTION_MTU = 26,
 	OPTION_BROADCAST_ADDRESS = 28,
@@ -53,12 +63,13 @@ enum message_option {
 };
 
 enum message_type {
-	DHCP_DISCOVER = 1,
+	DHCP_NONE = 0,
+	DHCP_DISCOVER,
 	DHCP_OFFER,
 	DHCP_REQUEST,
 	DHCP_DECLINE,
 	DHCP_ACK,
-	DHCP_NAK,
+	DHCP_NACK,
 	DHCP_RELEASE,
 	DHCP_INFORM
 };
@@ -98,6 +109,7 @@ struct dhcp_message {
 	bool HasOptions() const;
 	bool NextOption(dhcp_option_cookie& cookie, message_option& option,
 		const uint8*& data, size_t& size) const;
+	message_type Type() const;
 	const uint8* LastOption() const;
 
 	uint8* PutOption(uint8* options, message_option option);
@@ -193,6 +205,23 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 }
 
 
+message_type
+dhcp_message::Type() const
+{
+	dhcp_option_cookie cookie;
+	message_option option;
+	const uint8 *data;
+	size_t size;
+	while (NextOption(cookie, option, data, size)) {
+		// iterate through all options
+		if (option == OPTION_MESSAGE_TYPE)
+			return (message_type)data[0];
+	}
+
+	return DHCP_NONE;
+}
+
+
 const uint8*
 dhcp_message::LastOption() const
 {
@@ -261,19 +290,19 @@ dhcp_message::PutOption(uint8* options, message_option option, uint8* data, uint
 //	#pragma mark -
 
 
-DHCPClient::DHCPClient(const char* device)
+DHCPClient::DHCPClient(BMessenger target, const char* device)
 	: BHandler("dhcp"),
 	fDevice(device)
 {
 	fTransactionID = system_time();
 
-	dhcp_message message(DHCP_DISCOVER);
-	message.opcode = BOOT_REQUEST;
-	message.hardware_type = ARP_HARDWARE_TYPE_ETHER;
-	message.hardware_address_length = 6;
-	message.transaction_id = htonl(fTransactionID);
-	message.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
-	fStatus = get_mac_address(device, message.mac_address);
+	dhcp_message discover(DHCP_DISCOVER);
+	discover.opcode = BOOT_REQUEST;
+	discover.hardware_type = ARP_HARDWARE_TYPE_ETHER;
+	discover.hardware_address_length = 6;
+	discover.transaction_id = htonl(fTransactionID);
+	discover.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
+	fStatus = get_mac_address(device, discover.mac_address);
 	if (fStatus < B_OK)
 		return;
 
@@ -296,6 +325,11 @@ DHCPClient::DHCPClient(const char* device)
 		return;
 	}
 
+	memset(&fServer, 0, sizeof(struct sockaddr_in));
+	fServer.sin_family = AF_INET;
+	fServer.sin_len = sizeof(struct sockaddr_in);
+	fServer.sin_port = htons(DHCP_SERVER_PORT);
+
 	sockaddr_in broadcast;
 	memset(&broadcast, 0, sizeof(struct sockaddr_in));
 	broadcast.sin_family = AF_INET;
@@ -306,14 +340,173 @@ DHCPClient::DHCPClient(const char* device)
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 
-printf("DHCP message size %lu\n", message.Size());
+	_ResetTimeout(socket);
 
-	ssize_t bytesSent = sendto(socket, &message, message.MinSize(), MSG_BCAST, 
-		(struct sockaddr*)&broadcast, sizeof(broadcast));
-	if (bytesSent < 0) {
-		fStatus = errno;
+	fStatus = _SendMessage(socket, discover, broadcast);
+	if (fStatus < B_OK) {
 		close(socket);
 		return;
+	}
+
+	// receive loop until we've got an offer and acknowledged it
+
+	enum {
+		INIT,
+		REQUESTING,
+		ACKNOWLEDGED,
+	} state = INIT;
+
+	dhcp_message request(DHCP_REQUEST);
+		// will be filled when handling a DHCP_OFFER
+
+	while (state != ACKNOWLEDGED) {
+		char buffer[2048];
+		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
+			0, NULL, NULL);
+		if (bytesReceived == B_TIMED_OUT) {
+			// depending on the state, we'll just try again
+			if (!_TimeoutShift(socket)) {
+				fStatus = B_TIMED_OUT;
+				break;
+			}
+
+			if (state == INIT)
+				fStatus = _SendMessage(socket, discover, broadcast);
+			else if (state == REQUESTING)
+				fStatus = _SendMessage(socket, request, broadcast);
+
+			if (fStatus < B_OK)
+				break;
+		} else if (bytesReceived < B_OK)
+			break;
+
+		dhcp_message *message = (dhcp_message *)buffer;
+		if (message->transaction_id != htonl(fTransactionID)
+			|| !message->HasOptions()
+			|| memcmp(message->mac_address, discover.mac_address,
+				discover.hardware_address_length)) {
+			// this message is not for us
+			continue;
+		}
+
+		switch (message->Type()) {
+			case DHCP_NONE:
+			default:
+				// ignore this message
+				break;
+
+			case DHCP_OFFER:
+			{
+				// first offer wins
+				if (state != INIT)
+					break;
+
+				// collect interface options
+
+				fAssignedAddress = message->your_address;
+
+				BMessage configure(kMsgConfigureInterface);
+				configure.AddString("device", fDevice.String());
+
+				BMessage address;
+				address.AddString("family", "inet");
+				address.AddString("address", _ToString(fAssignedAddress));
+
+				dhcp_option_cookie cookie;
+				message_option option;
+				const uint8 *data;
+				size_t size;
+				while (message->NextOption(cookie, option, data, size)) {
+					// iterate through all options
+					switch (option) {
+						case OPTION_ROUTER_ADDRESS:
+							address.AddString("gateway", _ToString(data));
+							break;
+						case OPTION_SUBNET_MASK:
+							address.AddString("mask", _ToString(data));
+							break;
+						case OPTION_DOMAIN_NAME_SERVER:
+							// TODO: for now, write it out to /etc/resolv.conf
+							for (uint32 i = 0; i < size / 4; i++) {
+								printf("DNS: %s\n", _ToString(&data[i*4]).String());
+							}
+							break;
+						case OPTION_SERVER_ADDRESS:
+							fServer.sin_addr.s_addr = *(in_addr_t*)data;
+							break;
+						case OPTION_ADDRESS_LEASE_TIME:
+							printf("lease time of %lu seconds\n", *(uint32*)data);
+							break;
+
+						case OPTION_HOST_NAME:
+							char name[256];
+							memcpy(name, data, size);
+							name[size] = '\0';
+							printf("DHCP host name: \"%s\"\n", name);
+							break;
+
+						case OPTION_MESSAGE_TYPE:
+							break;
+
+						default:
+							printf("unknown option %lu\n", (uint32)option);
+							break;
+					}
+				}
+
+				configure.AddMessage("address", &address);
+
+				// configure interface
+				BMessage reply;
+				target.SendMessage(&configure, &reply);
+
+				status_t status;
+				if (reply.FindInt32("status", &status) == B_OK
+					&& status == B_OK) {
+					// configuration succeeded, request it from the server
+					_ResetTimeout(socket);
+					state = REQUESTING;
+
+					request.opcode = BOOT_REQUEST;
+					request.hardware_type = ARP_HARDWARE_TYPE_ETHER;
+					request.hardware_address_length = 6;
+					request.transaction_id = htonl(fTransactionID);
+					request.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
+					memcpy(request.mac_address, discover.mac_address, 6);
+
+					// add server identifier option
+					uint8* next = request.options;
+					next = request.PutOption(next, OPTION_MESSAGE_TYPE, (uint8)DHCP_REQUEST);
+					next = request.PutOption(next, OPTION_MESSAGE_SIZE,
+						(uint16)sizeof(dhcp_message));
+					next = request.PutOption(next, OPTION_SERVER_ADDRESS,
+						(uint32)fServer.sin_addr.s_addr);
+					next = request.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
+					next = request.PutOption(next, OPTION_END);
+
+					fStatus = _SendMessage(socket, request, broadcast);
+						// we're sending a broadcast so that all offers get an answer
+				}
+			}
+
+			case DHCP_ACK:
+				if (state != REQUESTING)
+					continue;
+
+				// our address request has been acknowledged
+				state = ACKNOWLEDGED;
+				break;
+
+			case DHCP_NACK:
+				if (state != REQUESTING)
+					continue;
+
+				// try again
+				fStatus = _SendMessage(socket, discover, broadcast);
+				if (fStatus == B_OK)
+					state = INIT;
+				break;
+		}
 	}
 
 	close(socket);
@@ -323,6 +516,94 @@ printf("DHCP message size %lu\n", message.Size());
 
 DHCPClient::~DHCPClient()
 {
+	if (fStatus != B_OK)
+		return;
+
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return;
+
+	// release lease
+
+	dhcp_message release(DHCP_RELEASE);
+	release.opcode = BOOT_REQUEST;
+	release.hardware_type = ARP_HARDWARE_TYPE_ETHER;
+	release.hardware_address_length = 6;
+	release.transaction_id = htonl(fTransactionID);
+	release.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
+	get_mac_address(fDevice.String(), release.mac_address);
+
+	// add server identifier option
+	uint8* next = const_cast<uint8*>(release.LastOption());
+	next = release.PutOption(next, OPTION_SERVER_ADDRESS, (uint32)fServer.sin_addr.s_addr);
+	next = release.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
+	next = release.PutOption(next, OPTION_END);
+
+	_SendMessage(socket, release, fServer);
+	close(socket);
+}
+
+
+void
+DHCPClient::_ResetTimeout(int socket)
+{
+	fTimeout = DEFAULT_TIMEOUT;
+	fTries = 0;
+
+	struct timeval value;
+	value.tv_sec = fTimeout;
+	value.tv_usec = 0;
+	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
+}
+
+
+bool
+DHCPClient::_TimeoutShift(int socket)
+{
+	fTimeout += fTimeout;
+	if (fTimeout > MAX_TIMEOUT) {
+		fTimeout = DEFAULT_TIMEOUT;
+
+		if (++fTries > 2)
+			return false;
+	}
+printf("DHCP timeout shift: %lu secs (try %lu)\n", fTimeout, fTries);
+
+	struct timeval value;
+	value.tv_sec = fTimeout;
+	value.tv_usec = 0;
+	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
+
+	return true;
+}
+
+
+BString
+DHCPClient::_ToString(const uint8* data) const
+{
+	BString target = inet_ntoa(*(in_addr*)data);
+	return target;
+}
+
+
+BString
+DHCPClient::_ToString(in_addr_t address) const
+{
+	BString target = inet_ntoa(*(in_addr*)&address);
+	return target;
+}
+
+
+status_t
+DHCPClient::_SendMessage(int socket, dhcp_message& message, sockaddr_in& address) const
+{
+	ssize_t bytesSent = sendto(socket, &message, message.Size(),
+		address.sin_addr.s_addr == INADDR_BROADCAST ? MSG_BCAST : 0,
+		(struct sockaddr*)&address, sizeof(sockaddr_in));
+	if (bytesSent < 0)
+		return errno;
+
+	return B_OK;
 }
 
 

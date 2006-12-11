@@ -10,14 +10,18 @@
 
 
 #include <Handler.h>
+#include <Messenger.h>
 #include <String.h>
 
+#include <netinet/in.h>
 
 class BMessageRunner;
+class dhcp_message;
+
 
 class DHCPClient : public BHandler {
 	public:
-		DHCPClient(const char* device);
+		DHCPClient(BMessenger target, const char* device);
 		virtual ~DHCPClient();
 
 		status_t InitCheck();
@@ -25,9 +29,19 @@ class DHCPClient : public BHandler {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		status_t _SendMessage(int socket, dhcp_message& message, sockaddr_in& address) const;
+		void _ResetTimeout(int socket);
+		bool _TimeoutShift(int socket);
+		BString _ToString(const uint8* data) const;
+		BString _ToString(in_addr_t address) const;
+
 		BString			fDevice;
 		BMessageRunner*	fRunner;
 		uint32			fTransactionID;
+		in_addr_t		fAssignedAddress;
+		sockaddr_in		fServer;
+		time_t			fTimeout;
+		uint32			fTries;
 		status_t		fStatus;
 };
 

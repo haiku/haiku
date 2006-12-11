@@ -42,7 +42,7 @@ AutoconfigLooper::_ReadyToRun()
 {
 	// start with DHCP
 
-	DHCPClient* client = new DHCPClient(fDevice.String());
+	DHCPClient* client = new DHCPClient(fTarget, fDevice.String());
 	if (client->InitCheck() == B_OK) {
 		AddHandler(client);
 		return;

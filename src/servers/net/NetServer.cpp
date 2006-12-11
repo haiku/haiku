@@ -246,7 +246,12 @@ NetServer::MessageReceived(BMessage* message)
 			if (socket < 0)
 				break;
 
-			_ConfigureInterface(socket, *message);
+			status_t status = _ConfigureInterface(socket, *message);
+			
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", status);
+			message->SendReply(&reply);
+
 			close(socket);
 			break;
 		}
