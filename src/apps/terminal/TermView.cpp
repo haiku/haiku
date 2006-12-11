@@ -41,7 +41,7 @@
 #include "PrefView.h"
 #include "spawn.h"
 
-
+using std::nothrow;
 
 // defined VTKeyTbl.c
 extern int function_keycode_table[];
