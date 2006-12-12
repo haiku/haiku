@@ -292,7 +292,8 @@ dhcp_message::PutOption(uint8* options, message_option option, uint8* data, uint
 
 DHCPClient::DHCPClient(BMessenger target, const char* device)
 	: BHandler("dhcp"),
-	fDevice(device)
+	fDevice(device),
+	fConfiguration(kMsgConfigureInterface)
 {
 	fTransactionID = system_time();
 
@@ -409,42 +410,43 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 
 				fAssignedAddress = message->your_address;
 
-				BMessage configure(kMsgConfigureInterface);
-				configure.AddString("device", fDevice.String());
+				fConfiguration.MakeEmpty();
+				fConfiguration.AddString("device", fDevice.String());
 
 				BMessage address;
 				address.AddString("family", "inet");
 				address.AddString("address", _ToString(fAssignedAddress));
 				_ParseOptions(*message, address);
 
-				configure.AddMessage("address", &address);
+				fConfiguration.AddMessage("address", &address);
 
-				// configure interface
-				BMessage reply;
-				target.SendMessage(&configure, &reply);
+				// request configuration from the server
 
-				status_t status;
-				if (reply.FindInt32("status", &status) == B_OK
-					&& status == B_OK) {
-					// configuration succeeded, request it from the server
-					_ResetTimeout(socket);
+				_ResetTimeout(socket);
+				state = REQUESTING;
+				_PrepareMessage(request);
 
-					state = REQUESTING;
-					_PrepareMessage(request);
-
-					fStatus = _SendMessage(socket, request, broadcast);
-						// we're sending a broadcast so that all offers get an answer
-				}
+				fStatus = _SendMessage(socket, request, broadcast);
+					// we're sending a broadcast so that all potential offers get an answer
+				break;
 			}
 
 			case DHCP_ACK:
+			{
 				if (state != REQUESTING)
 					continue;
 
 				// our address request has been acknowledged
 				state = ACKNOWLEDGED;
-				fStatus = B_OK;
+
+				// configure interface
+				BMessage reply;
+				target.SendMessage(&fConfiguration, &reply);
+
+				if (reply.FindInt32("status", &fStatus) != B_OK)
+					fStatus = B_OK;
 				break;
+			}
 
 			case DHCP_NACK:
 				if (state != REQUESTING)

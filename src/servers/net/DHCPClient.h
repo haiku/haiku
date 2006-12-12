@@ -38,6 +38,7 @@ class DHCPClient : public BHandler {
 		BString _ToString(in_addr_t address) const;
 
 		BString			fDevice;
+		BMessage		fConfiguration;
 		BMessageRunner*	fRunner;
 		uint8			fMAC[6];
 		uint32			fTransactionID;
