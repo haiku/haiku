@@ -369,15 +369,8 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 
 			if (state == INIT)
 				fStatus = _SendMessage(socket, discover, broadcast);
-			else if (state == REQUESTING) {
-				if (fTries > 0) {
-					// The server not only didn't acknowledge the address, it did nothing.
-					// So we just ignore this little annoyance and continue with life.
-					fStatus = B_OK;
-					break;
-				}
+			if (state == REQUESTING)
 				fStatus = _SendMessage(socket, request, broadcast);
-			}
 
 			if (fStatus < B_OK)
 				break;

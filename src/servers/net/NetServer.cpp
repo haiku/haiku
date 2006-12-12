@@ -428,6 +428,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 			route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
 			route.gateway = &gateway;
 
+			request.ifr_route = route;
 			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
 				fprintf(stderr, "%s: Could not add route for %s: %s\n",
 					Name(), device, strerror(errno));
