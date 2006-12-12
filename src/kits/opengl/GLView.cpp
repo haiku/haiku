@@ -35,10 +35,6 @@ BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong o
 		fRenderer(NULL)
 {
 	fRoster = new GLRendererRoster(this, options);
-	fRenderer = fRoster->GetRenderer();
-	if (!fRenderer) {
-		fprintf(stderr, "no renderer found! \n");
-	}
 }
 
 
@@ -129,10 +125,10 @@ void BGLView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
+	fRenderer = fRoster->GetRenderer();
 	if (fRenderer) {
 		// Don't paint white window background when resized
 		SetViewColor(B_TRANSPARENT_32_BIT);
-		fRenderer->AttachedToWindow();
 
 		// Set default OpenGL viewport:
 		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
@@ -140,6 +136,8 @@ void BGLView::AttachedToWindow()
 		return;
 	}
 	
+	fprintf(stderr, "no renderer found! \n");
+
 	// No Renderer, no rendering. Setup a minimal "No Renderer" string drawing context
 	SetFont(be_bold_font);
 	// SetFontSize(16);
@@ -148,24 +146,19 @@ void BGLView::AttachedToWindow()
 void BGLView::AllAttached()
 {
 	BView::AllAttached();
-
-	if (fRenderer)
-		fRenderer->AllAttached();
 }
 
 void BGLView::DetachedFromWindow()
 {
 	if (fRenderer)
-		fRenderer->DetachedFromWindow();
+		fRenderer->Release();
+	fRenderer = NULL;
 
 	BView::DetachedFromWindow();
 }
 
 void BGLView::AllDetached()
 {
-	if (fRenderer)
-		fRenderer->AllDetached();
-
 	BView::AllDetached();
 }
 

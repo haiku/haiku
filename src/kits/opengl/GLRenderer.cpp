@@ -78,29 +78,6 @@ BGLRenderer::CopyPixelsIn(BBitmap *source, BPoint dest)
 }
 
 
-void
-BGLRenderer::AttachedToWindow()
-{
-}
-
-
-void
-BGLRenderer::AllAttached()
-{
-}
-
-
-void
-BGLRenderer::DetachedFromWindow()
-{
-}
-
-
-void
-BGLRenderer::AllDetached()
-{
-}
-
 
 void
 BGLRenderer::FrameResized(float width, float height)

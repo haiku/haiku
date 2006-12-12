@@ -35,12 +35,6 @@ public:
 	virtual status_t    CopyPixelsOut(BPoint source, BBitmap *dest);
 	virtual status_t    CopyPixelsIn(BBitmap *source, BPoint dest);
 
-
-	virtual void		AttachedToWindow();
-	virtual void		AllAttached();
-	virtual void		DetachedFromWindow();
-	virtual void		AllDetached();
-
  	virtual void    	FrameResized(float width, float height);
 	
 	void				DirectConnected( direct_buffer_info *info );
