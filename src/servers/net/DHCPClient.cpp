@@ -372,8 +372,15 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 
 			if (state == INIT)
 				fStatus = _SendMessage(socket, discover, broadcast);
-			else if (state == REQUESTING)
+			else if (state == REQUESTING) {
+				if (fTries > 0) {
+					// The server not only didn't acknowledge the address, it did nothing.
+					// So we just ignore this little annoyance and continue with life.
+					fStatus = B_OK;
+					break;
+				}
 				fStatus = _SendMessage(socket, request, broadcast);
+			}
 
 			if (fStatus < B_OK)
 				break;
@@ -435,7 +442,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 							fServer.sin_addr.s_addr = *(in_addr_t*)data;
 							break;
 						case OPTION_ADDRESS_LEASE_TIME:
-							printf("lease time of %lu seconds\n", *(uint32*)data);
+							printf("lease time of %lu seconds\n", htonl(*(uint32*)data));
 							break;
 
 						case OPTION_HOST_NAME:
@@ -495,6 +502,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 
 				// our address request has been acknowledged
 				state = ACKNOWLEDGED;
+				fStatus = B_OK;
 				break;
 
 			case DHCP_NACK:
@@ -510,7 +518,6 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	}
 
 	close(socket);
-	fStatus = B_ERROR;
 }
 
 
