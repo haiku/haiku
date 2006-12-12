@@ -211,7 +211,7 @@ dhcp_message::Type() const
 {
 	dhcp_option_cookie cookie;
 	message_option option;
-	const uint8 *data;
+	const uint8* data;
 	size_t size;
 	while (NextOption(cookie, option, data, size)) {
 		// iterate through all options
@@ -228,7 +228,7 @@ dhcp_message::LastOption() const
 {
 	dhcp_option_cookie cookie;
 	message_option option;
-	const uint8 *data;
+	const uint8* data;
 	size_t size;
 	while (NextOption(cookie, option, data, size)) {
 		// iterate through all options
@@ -444,7 +444,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 				if (state != REQUESTING)
 					continue;
 
-				// try again
+				// try again (maybe we should prefer other servers if this happens more than once)
 				fStatus = _SendMessage(socket, discover, broadcast);
 				if (fStatus == B_OK)
 					state = INIT;
@@ -480,7 +480,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 {
 	dhcp_option_cookie cookie;
 	message_option option;
-	const uint8 *data;
+	const uint8* data;
 	size_t size;
 	while (message.NextOption(cookie, option, data, size)) {
 		// iterate through all options
@@ -492,11 +492,17 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				address.AddString("mask", _ToString(data));
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
-				// TODO: for now, write it out to /etc/resolv.conf
+			{
+				// TODO: for now, we write it just out to /etc/resolv.conf
+				FILE* file = fopen("/etc/resolv.conf", "w");
 				for (uint32 i = 0; i < size / 4; i++) {
 					printf("DNS: %s\n", _ToString(&data[i*4]).String());
+					if (file != NULL)
+						fprintf(file, "nameserver %s\n", _ToString(&data[i*4]).String());
 				}
+				fclose(file);
 				break;
+			}
 			case OPTION_SERVER_ADDRESS:
 				fServer.sin_addr.s_addr = *(in_addr_t*)data;
 				break;
