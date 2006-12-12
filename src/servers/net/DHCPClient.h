@@ -29,6 +29,8 @@ class DHCPClient : public BHandler {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		void _ParseOptions(dhcp_message& message, BMessage& address);
+		void _PrepareMessage(dhcp_message& message);
 		status_t _SendMessage(int socket, dhcp_message& message, sockaddr_in& address) const;
 		void _ResetTimeout(int socket);
 		bool _TimeoutShift(int socket);
@@ -37,6 +39,7 @@ class DHCPClient : public BHandler {
 
 		BString			fDevice;
 		BMessageRunner*	fRunner;
+		uint8			fMAC[6];
 		uint32			fTransactionID;
 		in_addr_t		fAssignedAddress;
 		sockaddr_in		fServer;

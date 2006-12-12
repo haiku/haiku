@@ -48,7 +48,8 @@ class NetServer : public BApplication {
 
 	private:
 		bool _TestForInterface(int socket, const char* name);
-		status_t _ConfigureInterface(int socket, BMessage& interface);
+		status_t _ConfigureInterface(int socket, BMessage& interface,
+			bool fromMessage = false);
 		bool _QuitLooperForDevice(const char* device);
 		BLooper* _LooperForDevice(const char* device);
 		status_t _ConfigureDevice(int socket, const char* path);
@@ -246,8 +247,8 @@ NetServer::MessageReceived(BMessage* message)
 			if (socket < 0)
 				break;
 
-			status_t status = _ConfigureInterface(socket, *message);
-			
+			status_t status = _ConfigureInterface(socket, *message, true);
+
 			BMessage reply(B_REPLY);
 			reply.AddInt32("status", status);
 			message->SendReply(&reply);
@@ -309,7 +310,7 @@ NetServer::_TestForInterface(int socket, const char* name)
 
 
 status_t
-NetServer::_ConfigureInterface(int socket, BMessage& interface)
+NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage)
 {
 	const char *device;
 	if (interface.FindString("device", &device) != B_OK)
@@ -318,6 +319,8 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 	ifreq request;
 	if (!prepare_request(request, device))
 		return B_ERROR;
+
+	bool startAutoConfig = false;
 
 	int32 flags;
 	if (interface.FindInt32("flags", &flags) < B_OK)
@@ -372,38 +375,58 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 
 		// retrieve addresses
 
+		bool autoConfig;
+		if (addressMessage.FindBool("auto config", &autoConfig) != B_OK)
+			autoConfig = false;
+		if (autoConfig && fromMessage) {
+			// we don't accept auto-config messages this way
+			continue;
+		}
+
 		bool hasAddress = false, hasMask = false, hasPeer = false, hasBroadcast = false;
 		struct sockaddr address, mask, peer, broadcast, gateway;
-
 		const char* string;
-		if (addressMessage.FindString("address", &string) == B_OK
-			&& parse_address(familyIndex, string, address)) {
-			hasAddress = true;
 
-			if (addressMessage.FindString("mask", &string) == B_OK
-				&& parse_address(familyIndex, string, mask))
-				hasMask = true;
+		if (!autoConfig) {
+			if (addressMessage.FindString("address", &string) == B_OK
+				&& parse_address(familyIndex, string, address)) {
+				hasAddress = true;
+	
+				if (addressMessage.FindString("mask", &string) == B_OK
+					&& parse_address(familyIndex, string, mask))
+					hasMask = true;
+			}
+			if (addressMessage.FindString("peer", &string) == B_OK
+				&& parse_address(familyIndex, string, peer))
+				hasPeer = true;
+			if (addressMessage.FindString("broadcast", &string) == B_OK
+				&& parse_address(familyIndex, string, broadcast))
+				hasBroadcast = true;
 		}
-		if (addressMessage.FindString("peer", &string) == B_OK
-			&& parse_address(familyIndex, string, peer))
-			hasPeer = true;
-		if (addressMessage.FindString("broadcast", &string) == B_OK
-			&& parse_address(familyIndex, string, broadcast))
-			hasBroadcast = true;
 
-		// add gateway route, if we're asked for it
+		route_entry route;
+		memset(&route, 0, sizeof(route_entry));
+		route.flags = RTF_STATIC | RTF_DEFAULT;
 
-		if (addressMessage.FindString("gateway", &string) == B_OK
+		request.ifr_route = route;
+		ioctl(socket, SIOCDELRT, &request, sizeof(request));
+			// Try to remove a previous default route, doesn't matter
+			// if it fails.
+
+		if (autoConfig) {
+			// add a default route to make the interface accessible, even without an address
+			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
+				fprintf(stderr, "%s: Could not add route for %s: %s\n",
+					Name(), device, strerror(errno));
+			} else {
+				_QuitLooperForDevice(device);
+				startAutoConfig = true;
+			}
+		} else if (addressMessage.FindString("gateway", &string) == B_OK
 			&& parse_address(familyIndex, string, gateway)) {
-			route_entry route;
-			memset(&route, 0, sizeof(route_entry));
+			// add gateway route, if we're asked for it
 			route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
 			route.gateway = &gateway;
-
-			request.ifr_route = route;
-			ioctl(socket, SIOCDELRT, &request, sizeof(request));
-				// Try to remove a previous default route, doesn't matter
-				// if it fails.
 
 			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
 				fprintf(stderr, "%s: Could not add route for %s: %s\n",
@@ -516,6 +539,14 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface)
 		}
 	}
 
+	if (startAutoConfig) {
+		// start auto configuration
+		AutoconfigLooper* looper = new AutoconfigLooper(this, device);
+		looper->Run();
+
+		fDeviceMap[device] = looper;
+	}
+
 	return B_OK;
 }
 
@@ -550,40 +581,16 @@ NetServer::_LooperForDevice(const char* device)
 status_t
 NetServer::_ConfigureDevice(int socket, const char* path)
 {
-	_QuitLooperForDevice(path);
 
 	// bring interface up, but don't configure it just yet
 	BMessage interface;
 	interface.AddString("device", path);
 	BMessage address;
 	address.AddString("family", "inet");
+	address.AddBool("auto config", true);
 	interface.AddMessage("address", &address);
 
-	status_t status = _ConfigureInterface(socket, interface);
-	if (status < B_OK)
-		return status;
-
-	// add a default route to make the interface accessible, even without an address
-	route_entry route;
-	memset(&route, 0, sizeof(route_entry));
-	route.flags = RTF_STATIC | RTF_DEFAULT;
-
-	ifreq request;
-	if (!prepare_request(request, path))
-		return B_ERROR;
-
-	request.ifr_route = route;
-	if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
-		fprintf(stderr, "%s: Could not add route for %s: %s\n",
-			Name(), path, strerror(errno));
-	}
-
-	AutoconfigLooper* looper = new AutoconfigLooper(this, path);
-	looper->Run();
-
-	fDeviceMap[path] = looper;
-
-	return B_OK;
+	return _ConfigureInterface(socket, interface);
 }
 
 

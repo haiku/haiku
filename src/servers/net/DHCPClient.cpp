@@ -296,15 +296,12 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 {
 	fTransactionID = system_time();
 
-	dhcp_message discover(DHCP_DISCOVER);
-	discover.opcode = BOOT_REQUEST;
-	discover.hardware_type = ARP_HARDWARE_TYPE_ETHER;
-	discover.hardware_address_length = 6;
-	discover.transaction_id = htonl(fTransactionID);
-	discover.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
-	fStatus = get_mac_address(device, discover.mac_address);
+	fStatus = get_mac_address(device, fMAC);
 	if (fStatus < B_OK)
 		return;
+
+	dhcp_message discover(DHCP_DISCOVER);
+	_PrepareMessage(discover);
 
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0) {
@@ -418,48 +415,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 				BMessage address;
 				address.AddString("family", "inet");
 				address.AddString("address", _ToString(fAssignedAddress));
-
-				dhcp_option_cookie cookie;
-				message_option option;
-				const uint8 *data;
-				size_t size;
-				while (message->NextOption(cookie, option, data, size)) {
-					// iterate through all options
-					switch (option) {
-						case OPTION_ROUTER_ADDRESS:
-							address.AddString("gateway", _ToString(data));
-							break;
-						case OPTION_SUBNET_MASK:
-							address.AddString("mask", _ToString(data));
-							break;
-						case OPTION_DOMAIN_NAME_SERVER:
-							// TODO: for now, write it out to /etc/resolv.conf
-							for (uint32 i = 0; i < size / 4; i++) {
-								printf("DNS: %s\n", _ToString(&data[i*4]).String());
-							}
-							break;
-						case OPTION_SERVER_ADDRESS:
-							fServer.sin_addr.s_addr = *(in_addr_t*)data;
-							break;
-						case OPTION_ADDRESS_LEASE_TIME:
-							printf("lease time of %lu seconds\n", htonl(*(uint32*)data));
-							break;
-
-						case OPTION_HOST_NAME:
-							char name[256];
-							memcpy(name, data, size);
-							name[size] = '\0';
-							printf("DHCP host name: \"%s\"\n", name);
-							break;
-
-						case OPTION_MESSAGE_TYPE:
-							break;
-
-						default:
-							printf("unknown option %lu\n", (uint32)option);
-							break;
-					}
-				}
+				_ParseOptions(*message, address);
 
 				configure.AddMessage("address", &address);
 
@@ -472,24 +428,9 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 					&& status == B_OK) {
 					// configuration succeeded, request it from the server
 					_ResetTimeout(socket);
+
 					state = REQUESTING;
-
-					request.opcode = BOOT_REQUEST;
-					request.hardware_type = ARP_HARDWARE_TYPE_ETHER;
-					request.hardware_address_length = 6;
-					request.transaction_id = htonl(fTransactionID);
-					request.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
-					memcpy(request.mac_address, discover.mac_address, 6);
-
-					// add server identifier option
-					uint8* next = request.options;
-					next = request.PutOption(next, OPTION_MESSAGE_TYPE, (uint8)DHCP_REQUEST);
-					next = request.PutOption(next, OPTION_MESSAGE_SIZE,
-						(uint16)sizeof(dhcp_message));
-					next = request.PutOption(next, OPTION_SERVER_ADDRESS,
-						(uint32)fServer.sin_addr.s_addr);
-					next = request.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
-					next = request.PutOption(next, OPTION_END);
+					_PrepareMessage(request);
 
 					fStatus = _SendMessage(socket, request, broadcast);
 						// we're sending a broadcast so that all offers get an answer
@@ -533,21 +474,90 @@ DHCPClient::~DHCPClient()
 	// release lease
 
 	dhcp_message release(DHCP_RELEASE);
-	release.opcode = BOOT_REQUEST;
-	release.hardware_type = ARP_HARDWARE_TYPE_ETHER;
-	release.hardware_address_length = 6;
-	release.transaction_id = htonl(fTransactionID);
-	release.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
-	get_mac_address(fDevice.String(), release.mac_address);
-
-	// add server identifier option
-	uint8* next = const_cast<uint8*>(release.LastOption());
-	next = release.PutOption(next, OPTION_SERVER_ADDRESS, (uint32)fServer.sin_addr.s_addr);
-	next = release.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
-	next = release.PutOption(next, OPTION_END);
+	_PrepareMessage(release);
 
 	_SendMessage(socket, release, fServer);
 	close(socket);
+}
+
+
+void
+DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
+{
+	dhcp_option_cookie cookie;
+	message_option option;
+	const uint8 *data;
+	size_t size;
+	while (message.NextOption(cookie, option, data, size)) {
+		// iterate through all options
+		switch (option) {
+			case OPTION_ROUTER_ADDRESS:
+				address.AddString("gateway", _ToString(data));
+				break;
+			case OPTION_SUBNET_MASK:
+				address.AddString("mask", _ToString(data));
+				break;
+			case OPTION_DOMAIN_NAME_SERVER:
+				// TODO: for now, write it out to /etc/resolv.conf
+				for (uint32 i = 0; i < size / 4; i++) {
+					printf("DNS: %s\n", _ToString(&data[i*4]).String());
+				}
+				break;
+			case OPTION_SERVER_ADDRESS:
+				fServer.sin_addr.s_addr = *(in_addr_t*)data;
+				break;
+			case OPTION_ADDRESS_LEASE_TIME:
+				printf("lease time of %lu seconds\n", htonl(*(uint32*)data));
+				break;
+
+			case OPTION_HOST_NAME:
+				char name[256];
+				memcpy(name, data, size);
+				name[size] = '\0';
+				printf("DHCP host name: \"%s\"\n", name);
+				break;
+
+			case OPTION_MESSAGE_TYPE:
+				break;
+
+			default:
+				printf("unknown option %lu\n", (uint32)option);
+				break;
+		}
+	}
+}
+
+
+void
+DHCPClient::_PrepareMessage(dhcp_message& message)
+{
+	message.opcode = BOOT_REQUEST;
+	message.hardware_type = ARP_HARDWARE_TYPE_ETHER;
+	message.hardware_address_length = 6;
+	message.transaction_id = htonl(fTransactionID);
+	message.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
+	memcpy(message.mac_address, fMAC, 6);
+
+	switch (message.Type()) {
+		case DHCP_REQUEST:
+		case DHCP_RELEASE:
+		{
+			// add server identifier option
+			uint8* next = message.options;
+			next = message.PutOption(next, OPTION_MESSAGE_TYPE, (uint8)DHCP_REQUEST);
+			next = message.PutOption(next, OPTION_MESSAGE_SIZE,
+				(uint16)sizeof(dhcp_message));
+			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
+				(uint32)fServer.sin_addr.s_addr);
+			next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
+			next = message.PutOption(next, OPTION_END);
+			break;
+		}
+
+		default:
+			// the default options are fine
+			break;
+	}
 }
 
 
