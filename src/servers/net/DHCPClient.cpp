@@ -119,6 +119,7 @@ struct dhcp_message {
 	uint8* PutOption(uint8* options, message_option option, uint8* data, uint32 size);
 } _PACKED;
 
+#define DHCP_FLAG_BROADCAST		0x8000
 
 #define ARP_HARDWARE_TYPE_ETHER	1
 
@@ -130,7 +131,7 @@ dhcp_message::dhcp_message(message_type type)
 
 	uint8* next = options;
 	next = PutOption(next, OPTION_MESSAGE_TYPE, (uint8)type);
-	next = PutOption(next, OPTION_MESSAGE_SIZE, (uint16)sizeof(dhcp_message));
+	next = PutOption(next, OPTION_MESSAGE_SIZE, (uint16)htons(sizeof(dhcp_message)));
 	next = PutOption(next, OPTION_END);
 }
 
@@ -263,7 +264,6 @@ dhcp_message::PutOption(uint8* options, message_option option, uint8 data)
 uint8*
 dhcp_message::PutOption(uint8* options, message_option option, uint16 data)
 {
-	data = htons(data);
 	return PutOption(options, option, (uint8*)&data, sizeof(data));
 }
 
@@ -271,7 +271,6 @@ dhcp_message::PutOption(uint8* options, message_option option, uint16 data)
 uint8*
 dhcp_message::PutOption(uint8* options, message_option option, uint32 data)
 {
-	data = htonl(data);
 	return PutOption(options, option, (uint8*)&data, sizeof(data));
 }
 
@@ -537,7 +536,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message)
 	message.hardware_type = ARP_HARDWARE_TYPE_ETHER;
 	message.hardware_address_length = 6;
 	message.transaction_id = htonl(fTransactionID);
-	message.seconds_since_boot = htons(max_c(system_time() / 1000000LL, 65535));
+	message.seconds_since_boot = htons(min_c(system_time() / 1000000LL, 65535));
 	memcpy(message.mac_address, fMAC, 6);
 
 	switch (message.Type()) {
@@ -548,7 +547,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message)
 			uint8* next = message.options;
 			next = message.PutOption(next, OPTION_MESSAGE_TYPE, (uint8)DHCP_REQUEST);
 			next = message.PutOption(next, OPTION_MESSAGE_SIZE,
-				(uint16)sizeof(dhcp_message));
+				(uint16)htons(sizeof(dhcp_message)));
 			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
 				(uint32)fServer.sin_addr.s_addr);
 			next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
