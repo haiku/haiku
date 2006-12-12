@@ -11,6 +11,7 @@
 #include "NetServer.h"
 
 #include <Message.h>
+#include <MessageRunner.h>
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -122,6 +123,8 @@ struct dhcp_message {
 #define DHCP_FLAG_BROADCAST		0x8000
 
 #define ARP_HARDWARE_TYPE_ETHER	1
+
+const uint32 kMsgLeaseTime = 'lstm';
 
 
 dhcp_message::dhcp_message(message_type type)
@@ -291,8 +294,11 @@ dhcp_message::PutOption(uint8* options, message_option option, uint8* data, uint
 
 DHCPClient::DHCPClient(BMessenger target, const char* device)
 	: BHandler("dhcp"),
+	fTarget(target),
 	fDevice(device),
-	fConfiguration(kMsgConfigureInterface)
+	fConfiguration(kMsgConfigureInterface),
+	fRunner(NULL),
+	fLeaseTime(0)
 {
 	fTransactionID = system_time();
 
@@ -300,14 +306,49 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	if (fStatus < B_OK)
 		return;
 
-	dhcp_message discover(DHCP_DISCOVER);
-	_PrepareMessage(discover);
+	memset(&fServer, 0, sizeof(struct sockaddr_in));
+	fServer.sin_family = AF_INET;
+	fServer.sin_len = sizeof(struct sockaddr_in);
+	fServer.sin_port = htons(DHCP_SERVER_PORT);
+}
+
+
+DHCPClient::~DHCPClient()
+{
+	if (fStatus != B_OK)
+		return;
+
+	delete fRunner;
 
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0) {
-		fStatus = errno;
+	if (socket < 0)
 		return;
-	}
+
+	// release lease
+
+	dhcp_message release(DHCP_RELEASE);
+	_PrepareMessage(release);
+
+	_SendMessage(socket, release, fServer);
+	close(socket);
+}
+
+
+status_t
+DHCPClient::Initialize()
+{
+	fStatus = _Negotiate(INIT);
+	printf("DHCP for %s, status: %s\n", fDevice.String(), strerror(fStatus));
+	return fStatus;
+}
+
+
+status_t
+DHCPClient::_Negotiate(dhcp_state state)
+{
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
 
 	sockaddr_in local;
 	memset(&local, 0, sizeof(struct sockaddr_in));
@@ -317,15 +358,9 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	local.sin_addr.s_addr = INADDR_ANY;
 
 	if (bind(socket, (struct sockaddr *)&local, sizeof(local)) < 0) {
-		fStatus = errno;
 		close(socket);
-		return;
+		return errno;
 	}
-
-	memset(&fServer, 0, sizeof(struct sockaddr_in));
-	fServer.sin_family = AF_INET;
-	fServer.sin_len = sizeof(struct sockaddr_in);
-	fServer.sin_port = htons(DHCP_SERVER_PORT);
 
 	sockaddr_in broadcast;
 	memset(&broadcast, 0, sizeof(struct sockaddr_in));
@@ -337,42 +372,52 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 
-	_ResetTimeout(socket);
+	dhcp_state initialState = state;
+	bigtime_t previousLeaseTime = fLeaseTime;
+	fLeaseTime = 0;
 
-	fStatus = _SendMessage(socket, discover, broadcast);
-	if (fStatus < B_OK) {
-		close(socket);
-		return;
+	status_t status = B_ERROR;
+	time_t timeout;
+	uint32 tries;
+	_ResetTimeout(socket, timeout, tries);
+
+	dhcp_message discover(DHCP_DISCOVER);
+	_PrepareMessage(discover);
+
+	dhcp_message request(DHCP_REQUEST);
+	_PrepareMessage(request);
+
+	if (state == INIT || state == REQUESTING) {
+		// send discover message
+		status = _SendMessage(socket, state == INIT ? discover : request,
+			state == INIT ? broadcast : fServer);
+		if (status < B_OK) {
+			close(socket);
+			return status;
+		}
 	}
 
 	// receive loop until we've got an offer and acknowledged it
-
-	enum {
-		INIT,
-		REQUESTING,
-		ACKNOWLEDGED,
-	} state = INIT;
-
-	dhcp_message request(DHCP_REQUEST);
-		// will be filled when handling a DHCP_OFFER
 
 	while (state != ACKNOWLEDGED) {
 		char buffer[2048];
 		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
 			0, NULL, NULL);
+printf("recvfrom returned: %ld, %s\n", bytesReceived, strerror(errno));
 		if (bytesReceived == B_TIMED_OUT) {
 			// depending on the state, we'll just try again
-			if (!_TimeoutShift(socket)) {
-				fStatus = B_TIMED_OUT;
-				break;
+			if (!_TimeoutShift(socket, timeout, tries)) {
+				close(socket);
+				return B_TIMED_OUT;
 			}
 
 			if (state == INIT)
-				fStatus = _SendMessage(socket, discover, broadcast);
+				status = _SendMessage(socket, discover, broadcast);
 			if (state == REQUESTING)
-				fStatus = _SendMessage(socket, request, broadcast);
+				status = _SendMessage(socket, request, initialState == INIT
+					? broadcast : fServer);
 
-			if (fStatus < B_OK)
+			if (status < B_OK)
 				break;
 		} else if (bytesReceived < B_OK)
 			break;
@@ -414,11 +459,11 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 
 				// request configuration from the server
 
-				_ResetTimeout(socket);
+				_ResetTimeout(socket, timeout, tries);
 				state = REQUESTING;
 				_PrepareMessage(request);
 
-				fStatus = _SendMessage(socket, request, broadcast);
+				status = _SendMessage(socket, request, broadcast);
 					// we're sending a broadcast so that all potential offers get an answer
 				break;
 			}
@@ -428,15 +473,20 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 				if (state != REQUESTING)
 					continue;
 
+				// TODO: we might want to configure the stuff, don't we?
+				BMessage address;
+				_ParseOptions(*message, address);
+					// TODO: currently, only lease time and DNS is updated this way
+
 				// our address request has been acknowledged
 				state = ACKNOWLEDGED;
 
 				// configure interface
 				BMessage reply;
-				target.SendMessage(&fConfiguration, &reply);
+				fTarget.SendMessage(&fConfiguration, &reply);
 
 				if (reply.FindInt32("status", &fStatus) != B_OK)
-					fStatus = B_OK;
+					status = B_OK;
 				break;
 			}
 
@@ -445,33 +495,36 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 					continue;
 
 				// try again (maybe we should prefer other servers if this happens more than once)
-				fStatus = _SendMessage(socket, discover, broadcast);
-				if (fStatus == B_OK)
+				status = _SendMessage(socket, discover, broadcast);
+				if (status == B_OK)
 					state = INIT;
 				break;
 		}
 	}
 
 	close(socket);
+
+	if (status == B_OK && fLeaseTime > 0) {
+		// notify early enough when the lease is
+		_RestartLease(fLeaseTime * 5/6);
+		fLeaseTime += system_time();
+			// make lease time absolute
+	} else
+		fLeaseTime = previousLeaseTime;
+
+	return status;
 }
 
 
-DHCPClient::~DHCPClient()
+void
+DHCPClient::_RestartLease(bigtime_t leaseTime)
 {
-	if (fStatus != B_OK)
+	if (leaseTime == 0)
 		return;
 
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return;
-
-	// release lease
-
-	dhcp_message release(DHCP_RELEASE);
-	_PrepareMessage(release);
-
-	_SendMessage(socket, release, fServer);
-	close(socket);
+	printf("lease expires in %Ld seconds\n", leaseTime / 1000000);
+	BMessage lease(kMsgLeaseTime);
+	fRunner = new BMessageRunner(this, &lease, leaseTime * 5/6, 1);
 }
 
 
@@ -508,6 +561,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 			case OPTION_ADDRESS_LEASE_TIME:
 				printf("lease time of %lu seconds\n", htonl(*(uint32*)data));
+				fLeaseTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
 
 			case OPTION_HOST_NAME:
@@ -562,32 +616,32 @@ DHCPClient::_PrepareMessage(dhcp_message& message)
 
 
 void
-DHCPClient::_ResetTimeout(int socket)
+DHCPClient::_ResetTimeout(int socket, time_t& timeout, uint32& tries)
 {
-	fTimeout = DEFAULT_TIMEOUT;
-	fTries = 0;
+	timeout = DEFAULT_TIMEOUT;
+	tries = 0;
 
 	struct timeval value;
-	value.tv_sec = fTimeout;
+	value.tv_sec = timeout;
 	value.tv_usec = 0;
 	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
 }
 
 
 bool
-DHCPClient::_TimeoutShift(int socket)
+DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 {
-	fTimeout += fTimeout;
-	if (fTimeout > MAX_TIMEOUT) {
-		fTimeout = DEFAULT_TIMEOUT;
+	timeout += timeout;
+	if (timeout > MAX_TIMEOUT) {
+		timeout = DEFAULT_TIMEOUT;
 
-		if (++fTries > 2)
+		if (++tries > 2)
 			return false;
 	}
-printf("DHCP timeout shift: %lu secs (try %lu)\n", fTimeout, fTries);
+	printf("DHCP timeout shift: %lu secs (try %lu)\n", timeout, tries);
 
 	struct timeval value;
-	value.tv_sec = fTimeout;
+	value.tv_sec = timeout;
 	value.tv_usec = 0;
 	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
 
@@ -624,17 +678,18 @@ DHCPClient::_SendMessage(int socket, dhcp_message& message, sockaddr_in& address
 }
 
 
-status_t
-DHCPClient::InitCheck()
-{
-printf("DHCP for %s, status: %s\n", fDevice.String(), strerror(fStatus));
-	return fStatus;
-}
-
-
 void
 DHCPClient::MessageReceived(BMessage* message)
 {
-	BHandler::MessageReceived(message);
+	switch (message->what) {
+		case kMsgLeaseTime:
+			if (_Negotiate(REQUESTING) != B_OK)
+				_RestartLease((fLeaseTime - system_time()) / 10);
+			break;
+
+		default:
+			BHandler::MessageReceived(message);
+			break;
+	}
 }
 

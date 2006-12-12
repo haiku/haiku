@@ -43,11 +43,15 @@ AutoconfigLooper::_ReadyToRun()
 	// start with DHCP
 
 	DHCPClient* client = new DHCPClient(fTarget, fDevice.String());
-	if (client->InitCheck() == B_OK) {
-		AddHandler(client);
+	AddHandler(client);
+
+	if (client->Initialize() == B_OK)
 		return;
-	}
-puts("DHCP failed miserably!");
+
+	RemoveHandler(client);
+	delete client;
+
+	puts("DHCP failed miserably!");
 
 	// DHCP obviously didn't work out, take some default values for now
 	// TODO: have a look at zeroconf
