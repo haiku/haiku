@@ -138,6 +138,11 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 		B_SYMBOL_TYPE_TEXT, (void**)&instanc);
 	if (status == B_OK) {
 		BGLRenderer *renderer = instanc(fView, fOptions, new BGLDispatcher());
+		if (!renderer) {
+			unload_add_on(image);
+			return B_UNSUPPORTED;
+		}
+		
 		if (AddRenderer(renderer, image, &ref, nodeRef.node) != B_OK) {
 			renderer->Release();
 			// this will delete the renderer
