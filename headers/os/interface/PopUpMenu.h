@@ -79,16 +79,12 @@ virtual	void		_ReservedPopUpMenu3();
 
 /*----- Private or reserved -----------------------------------------*/
 private:
-		BMenuItem	*_go(	BPoint where,
-							bool autoInvoke,
-							bool start_opened,
-							BRect *special_rect,
-							bool async);
-static	int32		entry(void *);
-		BMenuItem	*start_track(BPoint where,
-								bool autoInvoke,
-								bool start_opened,
-								BRect *special_rect);
+		BMenuItem	*_Go(BPoint where, bool autoInvoke, bool startOpened,
+							BRect *specialRect, bool async);
+		BMenuItem	*_StartTrack(BPoint where, bool autoInvoke, bool startOpened, BRect *specialRect);
+		BMenuItem	*_WaitMenu(void *data);
+
+static	int32	_thread_entry(void *);
 
 		BPoint		fWhere;
 		bool		fUseWhere;

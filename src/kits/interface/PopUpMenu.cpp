@@ -89,7 +89,7 @@ BPopUpMenu::Instantiate(BMessage *data)
 BMenuItem *
 BPopUpMenu::Go(BPoint where, bool deliversMessage, bool openAnyway, bool async)
 {
-	return _go(where, deliversMessage, openAnyway, NULL, async);
+	return _Go(where, deliversMessage, openAnyway, NULL, async);
 }
 
 
@@ -97,7 +97,7 @@ BMenuItem *
 BPopUpMenu::Go(BPoint where, bool deliversMessage, bool openAnyway,
 	BRect clickToOpen, bool async)
 {
-	return _go(where, deliversMessage, openAnyway, &clickToOpen, async);
+	return _Go(where, deliversMessage, openAnyway, &clickToOpen, async);
 }
 
 
@@ -264,7 +264,7 @@ BPopUpMenu::operator=(const BPopUpMenu &)
 
 
 BMenuItem *
-BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
+BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
 	popup_menu_data *data = new (nothrow) popup_menu_data;
@@ -299,7 +299,7 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	data->lock = sem;
 
 	// Spawn the tracking thread
-	fTrackThread = spawn_thread(entry, "popup", B_DISPLAY_PRIORITY, data); 
+	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY, data); 
 	if (fTrackThread < B_OK) {
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
@@ -311,32 +311,16 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 
 	resume_thread(fTrackThread);
 
-	BMenuItem *selected = NULL;
-	if (!async) {
-		// Synchronous menu: we update the parent window in a loop,
-		// until the other thread finishes and deletes this semaphore.
-		if (window != NULL) {
-			while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
-				window->UpdateIfNeeded();
-			
-		}
+	if (!async)
+		return _WaitMenu(data);
 
-		status_t unused;
-		while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
-			;
-		
-		fTrackThread = -1;
-		
-		selected = data->selected;
-		delete data;
-	}
-
-	return selected;
+	return 0;
 }
 
 
+/* static */
 int32
-BPopUpMenu::entry(void *arg)
+BPopUpMenu::_thread_entry(void *arg)
 {
 	popup_menu_data *data = static_cast<popup_menu_data *>(arg);
 	BPopUpMenu *menu = data->object;	
@@ -345,7 +329,7 @@ BPopUpMenu::entry(void *arg)
 	if (data->useRect)
 		rect = &data->rect;
 
-	data->selected = menu->start_track(data->where, data->autoInvoke, data->startOpened, rect);
+	data->selected = menu->_StartTrack(data->where, data->autoInvoke, data->startOpened, rect);
 
 	// Reset the window menu semaphore	
 	if (data->async && data->window)
@@ -367,7 +351,7 @@ BPopUpMenu::entry(void *arg)
 
 
 BMenuItem *
-BPopUpMenu::start_track(BPoint where, bool autoInvoke, bool startOpened, BRect *_specialRect)
+BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened, BRect *_specialRect)
 {
 	fWhere = where;
 
@@ -393,3 +377,28 @@ BPopUpMenu::start_track(BPoint where, bool autoInvoke, bool startOpened, BRect *
 	return result;
 }
 
+
+BMenuItem *
+BPopUpMenu::_WaitMenu(void *_data)
+{
+	popup_menu_data *data = (popup_menu_data *)_data;
+	BWindow *window = data->window;
+	sem_id sem = data->lock;
+	if (window != NULL) {
+		while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
+			window->UpdateIfNeeded();
+	}
+
+ 	status_t unused;
+	while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
+		;
+	
+	fTrackThread = -1;
+	
+	BMenuItem *selected = data->selected;
+		// data->selected is filled by the tracking thread
+	
+	delete data;
+	
+	return selected;
+}
