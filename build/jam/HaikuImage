@@ -20,7 +20,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = ;
 }
 
-BEOS_BIN = addattr alert basename beep cat catattr chgrp chmod chop chown clear
+BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
 	dstcheck du echo eject env error factor false fdinfo ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
@@ -95,7 +95,7 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
 ;
 BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
 BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
-	via-rhine wb840 net_stack
+	via-rhine wb840 net_stack vlance
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
