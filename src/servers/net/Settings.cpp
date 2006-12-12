@@ -26,6 +26,7 @@ const static settings_template kInterfaceAddressTemplate[] = {
 	{B_STRING_TYPE, "peer", NULL},
 	{B_STRING_TYPE, "broadcast", NULL},
 	{B_STRING_TYPE, "gateway", NULL},
+	{B_BOOL_TYPE, "auto config", NULL},
 	{0, NULL, NULL}
 };
 
