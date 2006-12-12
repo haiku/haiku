@@ -1257,12 +1257,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
 
 	while (true) {
-		if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
-			&& fExtraMenuData->trackingState != NULL) {
-			bool quit = fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
-			if (quit)
-				break;
-		}
+		if (CustomTrackingWantsToQuit())
+			break;
 		
 		bool locked = LockLooper();
 		if (!locked)
@@ -1276,20 +1272,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		Window()->UpdateIfNeeded();
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
-		if (item != NULL) {
-			if (item != fSelected && system_time() > closeTime + kHysteresis) {
-				_SelectItem(item, false);
-				openTime = system_time();
-			} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
-				&& item->Submenu()->Window() == NULL) {
-				// Open the submenu if it's not opened yet, but only if
-				// the mouse pointer stayed over there for some time
-				// (hysteresis)
-				_SelectItem(item);
-				closeTime = system_time();
-			}
-			fState = MENU_STATE_TRACKING;
-		}
+		if (item != NULL)
+			_UpdateStateOpenSelect(item, openTime, closeTime);
 
 		// Track the submenu
 		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
@@ -1306,11 +1290,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			if (wasSticky && !IsStickyMode()) {
 				buttons = 1;
 					// buttons must have been pressed in the meantime
-				trackTime = 0;
-					// we are already in non-sticky mode
 			}
 			
-			//submenu->Window()->Activate();
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
 				fState = submenuAction;
@@ -1347,27 +1328,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		if (locked)
 			UnlockLooper();
 		
-		if (buttons != 0 && IsStickyMode()) {
-			if (item == NULL)
-				fState = MENU_STATE_CLOSED;
-			else {
-				BMenu *supermenu = Supermenu();
-				for(; supermenu; supermenu = supermenu->Supermenu())
-					supermenu->SetStickyMode(false);
-				SetStickyMode(false);
-				trackTime = 0;
-			}		
-		} else if (buttons == 0 && !IsStickyMode()) {
-/*			TODO: FIXME! trackTime is a hacky workaround for BMenuField. It
-			opens directly under your mouse pointer, so when you release the mouse
-			button the menu closes again because it started in non-sticky mode. */
-/*			if (system_time() < trackTime + 1000000
-				|| (fExtraRect != NULL && fExtraRect->Contains(location))) */
-			if (fExtraRect != NULL && fExtraRect->Contains(location))
-				SetStickyMode(true);
-			else
-				fState = MENU_STATE_CLOSED;
-		}
+		_UpdateStateClose(item, location, buttons);
 
 		if (fState == MENU_STATE_CLOSED)
 			break;
@@ -1390,6 +1351,51 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	DeleteMenuWindow();
 	
 	return item;
+}
+
+
+void
+BMenu::_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &closeTime)
+{
+	if (item != fSelected && system_time() > closeTime + kHysteresis) {
+		_SelectItem(item, false);
+		openTime = system_time();
+	} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
+		&& item->Submenu()->Window() == NULL) {
+		// Open the submenu if it's not opened yet, but only if
+		// the mouse pointer stayed over there for some time
+		// (hysteresis)
+		_SelectItem(item);
+		closeTime = system_time();
+	}
+	if (fState != MENU_STATE_TRACKING)
+		fState = MENU_STATE_TRACKING;
+}
+
+
+void
+BMenu::_UpdateStateClose(BMenuItem *item, const BPoint &where, const uint32 &buttons)
+{
+	if (buttons != 0 && IsStickyMode()) {
+		if (item == NULL)
+			fState = MENU_STATE_CLOSED;
+		else {
+			BMenu *supermenu = Supermenu();
+			for(; supermenu; supermenu = supermenu->Supermenu())
+				supermenu->SetStickyMode(false);
+			SetStickyMode(false);
+		}		
+	} else if (buttons == 0 && !IsStickyMode()) {
+/*		TODO: FIXME! trackTime is a hacky workaround for BMenuField. It
+		opens directly under your mouse pointer, so when you release the mouse
+		button the menu closes again because it started in non-sticky mode. */
+/*		if (system_time() < trackTime + 1000000
+			|| (fExtraRect != NULL && fExtraRect->Contains(location))) */
+		if (fExtraRect != NULL && fExtraRect->Contains(where))
+			SetStickyMode(true);
+		else
+			fState = MENU_STATE_CLOSED;
+	}
 }
 
 
@@ -2156,6 +2162,18 @@ BMenu::OkToProceed(BMenuItem* item)
 	
 
 	return proceed;
+}
+
+
+bool
+BMenu::CustomTrackingWantsToQuit()
+{
+	if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
+		&& fExtraMenuData->trackingState != NULL) {
+		return fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
+	}
+
+	return false;
 }
 
 

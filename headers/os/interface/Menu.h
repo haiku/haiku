@@ -191,6 +191,10 @@ virtual	void			_ReservedMenu6();
 		bool		_show(bool selectFirstItem = false);
 		void		_hide();
 		BMenuItem	*_track(int *action, bigtime_t trackTime, long start = -1);
+
+		void		_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &closeTime);
+		void		_UpdateStateClose(BMenuItem *item, const BPoint &where, const uint32 &buttons);
+		
 		bool		_AddItem(BMenuItem *item, int32 index);
 		bool		RemoveItems(int32 index,
 								int32 count,
@@ -236,8 +240,11 @@ virtual	void			_ReservedMenu6();
 		bool		IsStickyPrefOn();
 		void		RedrawAfterSticky(BRect bounds);
 		bool		OkToProceed(BMenuItem *);
+		
+		bool		CustomTrackingWantsToQuit();
 
 		void		QuitTracking();
+		
 
 		status_t	ParseMsg(BMessage *msg, int32 *sindex, BMessage *spec,
 						int32 *form, const char **prop,
