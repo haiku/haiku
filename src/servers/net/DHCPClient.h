@@ -21,6 +21,9 @@ class dhcp_message;
 enum dhcp_state {
 	INIT,
 	REQUESTING,
+	BOUND,
+	RENEWAL,
+	REBINDING,
 	ACKNOWLEDGED,
 };
 
@@ -37,8 +40,9 @@ class DHCPClient : public BHandler {
 	private:
 		status_t _Negotiate(dhcp_state state);
 		void _ParseOptions(dhcp_message& message, BMessage& address);
-		void _PrepareMessage(dhcp_message& message);
+		void _PrepareMessage(dhcp_message& message, dhcp_state state);
 		status_t _SendMessage(int socket, dhcp_message& message, sockaddr_in& address) const;
+		dhcp_state _CurrentState() const;
 		void _ResetTimeout(int socket, time_t& timeout, uint32& tries);
 		bool _TimeoutShift(int socket, time_t& timeout, uint32& tries);
 		void _RestartLease(bigtime_t lease);
@@ -53,6 +57,9 @@ class DHCPClient : public BHandler {
 		uint32			fTransactionID;
 		in_addr_t		fAssignedAddress;
 		sockaddr_in		fServer;
+		bigtime_t		fStartTime;
+		bigtime_t		fRenewalTime;
+		bigtime_t		fRebindingTime;
 		bigtime_t		fLeaseTime;
 		status_t		fStatus;
 };

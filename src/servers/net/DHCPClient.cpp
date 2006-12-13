@@ -93,7 +93,7 @@ struct dhcp_message {
 	uint8		hardware_address_length;
 	uint8		hop_count;
 	uint32		transaction_id;
-	uint16		seconds_since_boot;
+	uint16		seconds_since_start;
 	uint16		flags;
 	in_addr_t	client_address;
 	in_addr_t	your_address;
@@ -301,7 +301,8 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fRunner(NULL),
 	fLeaseTime(0)
 {
-	fTransactionID = system_time();
+	fStartTime = system_time();
+	fTransactionID = (uint32)fStartTime;
 
 	fStatus = get_mac_address(device, fMAC);
 	if (fStatus < B_OK)
@@ -328,7 +329,7 @@ DHCPClient::~DHCPClient()
 	// release lease
 
 	dhcp_message release(DHCP_RELEASE);
-	_PrepareMessage(release);
+	_PrepareMessage(release, BOUND);
 
 	_SendMessage(socket, release, fServer);
 	close(socket);
@@ -373,9 +374,10 @@ DHCPClient::_Negotiate(dhcp_state state)
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 
-	dhcp_state initialState = state;
 	bigtime_t previousLeaseTime = fLeaseTime;
 	fLeaseTime = 0;
+	fRenewalTime = 0;
+	fRebindingTime = 0;
 
 	status_t status = B_ERROR;
 	time_t timeout;
@@ -383,19 +385,17 @@ DHCPClient::_Negotiate(dhcp_state state)
 	_ResetTimeout(socket, timeout, tries);
 
 	dhcp_message discover(DHCP_DISCOVER);
-	_PrepareMessage(discover);
+	_PrepareMessage(discover, state);
 
 	dhcp_message request(DHCP_REQUEST);
-	_PrepareMessage(request);
+	_PrepareMessage(request, state);
 
-	if (state == INIT || state == REQUESTING) {
-		// send discover message
-		status = _SendMessage(socket, state == INIT ? discover : request,
-			state == INIT ? broadcast : fServer);
-		if (status < B_OK) {
-			close(socket);
-			return status;
-		}
+	// send discover/request message
+	status = _SendMessage(socket, state == INIT ? discover : request,
+		state != RENEWAL ? broadcast : fServer);
+	if (status < B_OK) {
+		close(socket);
+		return status;
 	}
 
 	// receive loop until we've got an offer and acknowledged it
@@ -414,8 +414,8 @@ printf("recvfrom returned: %ld, %s\n", bytesReceived, strerror(errno));
 
 			if (state == INIT)
 				status = _SendMessage(socket, discover, broadcast);
-			if (state == REQUESTING)
-				status = _SendMessage(socket, request, initialState == INIT
+			else
+				status = _SendMessage(socket, request, state != RENEWAL
 					? broadcast : fServer);
 
 			if (status < B_OK)
@@ -462,7 +462,7 @@ printf("recvfrom returned: %ld, %s\n", bytesReceived, strerror(errno));
 
 				_ResetTimeout(socket, timeout, tries);
 				state = REQUESTING;
-				_PrepareMessage(request);
+				_PrepareMessage(request, state);
 
 				status = _SendMessage(socket, request, broadcast);
 					// we're sending a broadcast so that all potential offers get an answer
@@ -471,7 +471,7 @@ printf("recvfrom returned: %ld, %s\n", bytesReceived, strerror(errno));
 
 			case DHCP_ACK:
 			{
-				if (state != REQUESTING)
+				if (state != REQUESTING && state != REBINDING && state != RENEWAL)
 					continue;
 
 				// TODO: we might want to configure the stuff, don't we?
@@ -507,11 +507,24 @@ printf("recvfrom returned: %ld, %s\n", bytesReceived, strerror(errno));
 
 	if (status == B_OK && fLeaseTime > 0) {
 		// notify early enough when the lease is
-		_RestartLease(fLeaseTime * 5/6);
-		fLeaseTime += system_time();
-			// make lease time absolute
-	} else
+		if (fRenewalTime == 0)
+			fRenewalTime = fLeaseTime * 2/3;
+		if (fRebindingTime == 0)
+			fRebindingTime = fLeaseTime * 5/6;
+
+		_RestartLease(fRenewalTime);
+
+		bigtime_t now = system_time();
+		fLeaseTime += now;
+		fRenewalTime += now;
+		fRebindingTime += now;
+			// make lease times absolute
+	} else {
 		fLeaseTime = previousLeaseTime;
+		bigtime_t now = system_time();
+		fRenewalTime = (fLeaseTime - now) * 2/3 + now;
+		fRebindingTime = (fLeaseTime - now) * 5/6 + now;
+	}
 
 	return status;
 }
@@ -523,9 +536,8 @@ DHCPClient::_RestartLease(bigtime_t leaseTime)
 	if (leaseTime == 0)
 		return;
 
-	printf("lease expires in %Ld seconds\n", leaseTime / 1000000);
 	BMessage lease(kMsgLeaseTime);
-	fRunner = new BMessageRunner(this, &lease, leaseTime * 5/6, 1);
+	fRunner = new BMessageRunner(this, &lease, leaseTime, 1);
 }
 
 
@@ -563,15 +575,20 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 			case OPTION_SERVER_ADDRESS:
 				fServer.sin_addr.s_addr = *(in_addr_t*)data;
 				break;
+
 			case OPTION_ADDRESS_LEASE_TIME:
 				printf("lease time of %lu seconds\n", htonl(*(uint32*)data));
 				fLeaseTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
-
 			case OPTION_RENEWAL_TIME:
+				printf("renewal time of %lu seconds\n",
+					htonl(*(uint32*)data));
+				fRenewalTime = htonl(*(uint32*)data) * 1000000LL;
+				break;
 			case OPTION_REBINDING_TIME:
-				printf("renewal/rebinding (%lu) time of %lu seconds\n",
-					(uint32)option, htonl(*(uint32*)data));
+				printf("rebinding time of %lu seconds\n",
+					htonl(*(uint32*)data));
+				fRebindingTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
 
 			case OPTION_HOST_NAME:
@@ -604,16 +621,18 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 
 
 void
-DHCPClient::_PrepareMessage(dhcp_message& message)
+DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 {
 	message.opcode = BOOT_REQUEST;
 	message.hardware_type = ARP_HARDWARE_TYPE_ETHER;
 	message.hardware_address_length = 6;
 	message.transaction_id = htonl(fTransactionID);
-	message.seconds_since_boot = htons(min_c(system_time() / 1000000LL, 65535));
+	message.seconds_since_start = htons(min_c((fStartTime - system_time()) / 1000000LL, 65535));
 	memcpy(message.mac_address, fMAC, 6);
 
-	switch (message.Type()) {
+	message_type type = message.Type();
+
+	switch (type) {
 		case DHCP_REQUEST:
 		case DHCP_RELEASE:
 		{
@@ -624,7 +643,14 @@ DHCPClient::_PrepareMessage(dhcp_message& message)
 				(uint16)htons(sizeof(dhcp_message)));
 			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
 				(uint32)fServer.sin_addr.s_addr);
-			next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
+
+			// In RENEWAL or REBINDING state, we must set the client_address field, and not
+			// use OPTION_REQUEST_IP_ADDRESS for DHCP_REQUEST messages
+			if (type == DHCP_REQUEST && (state == INIT || state == REQUESTING))
+				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
+			else
+				message.client_address = fAssignedAddress;
+
 			next = message.PutOption(next, OPTION_END);
 			break;
 		}
@@ -699,14 +725,56 @@ DHCPClient::_SendMessage(int socket, dhcp_message& message, sockaddr_in& address
 }
 
 
+dhcp_state
+DHCPClient::_CurrentState() const
+{
+	bigtime_t now = system_time();
+	
+	if (now > fLeaseTime || fStatus < B_OK)
+		return INIT;
+	if (now >= fRebindingTime)
+		return REBINDING;
+	if (now >= fRenewalTime)
+		return RENEWAL;
+
+	return BOUND;
+}
+
+
 void
 DHCPClient::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgLeaseTime:
-			if (_Negotiate(REQUESTING) != B_OK)
-				_RestartLease((fLeaseTime - system_time()) / 10);
+		{
+			dhcp_state state = _CurrentState();
+
+			bigtime_t next;
+			if (_Negotiate(state) == B_OK) {
+				switch (state) {
+					case RENEWAL:
+						next = fRebindingTime;
+						break;
+					case REBINDING:
+					default:
+						next = fRenewalTime;
+						break;
+				}
+			} else {
+				switch (state) {
+					case RENEWAL:
+						next = (fLeaseTime - fRebindingTime) / 4 + system_time();
+						break;
+					case REBINDING:
+					default:
+						next = (fLeaseTime - fRenewalTime) / 4 + system_time();
+						break;
+				}
+			}
+
+			_RestartLease(next - system_time());
 			break;
+		}
 
 		default:
 			BHandler::MessageReceived(message);
