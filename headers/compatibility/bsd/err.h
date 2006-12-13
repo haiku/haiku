@@ -49,8 +49,6 @@
 #include <sys/types.h>
 
 #define __dead2
-#define __printflike(a, b)
-#define __printf0like(a, b)
 #define __va_list va_list
 
 __BEGIN_DECLS
