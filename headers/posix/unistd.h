@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UNISTD_H_
@@ -114,6 +114,7 @@ extern long		pathconf(const char *path, int name);
 
 /* process functions */
 extern pid_t	fork(void);
+extern pid_t	vfork(void);
 extern int		execve(const char *path, char * const argv[], char * const envp[]);
 extern int		execl(const char *path, const char *arg, ...);
 extern int		execv(const char *path, char *const *argv);
@@ -143,8 +144,8 @@ extern pid_t	getsid(pid_t pid);
 extern pid_t	getpgid(pid_t pid);
 
 extern pid_t	setsid(void);
-extern int	setpgid(pid_t pid, pid_t pgid);
-extern int 	setpgrp(void);
+extern int		setpgid(pid_t pid, pid_t pgid);
+extern int		setpgrp(void);
 
 /* access permissions */				
 extern gid_t	getegid(void);
