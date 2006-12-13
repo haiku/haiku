@@ -9,6 +9,7 @@
 #include <TextControl.h>
 #include <Entry.h>
 #include <Path.h>
+#include <MenuField.h>
 
 #include <cctype>
 #include <stdlib.h>
@@ -1036,14 +1037,19 @@ instantiate_mailfilter(BMessage *settings, BMailChainRunner *status)
 BView *
 instantiate_config_panel(BMessage *settings, BMessage *)
 {
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
-
-         #ifdef USESSL
-            | B_MAIL_PROTOCOL_HAS_FLAVORS);
-        view->AddFlavor("Unencrypted");
-        view->AddFlavor("SSL");
+	#ifdef USESSL
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | 
+																B_MAIL_PROTOCOL_HAS_USERNAME |
+																B_MAIL_PROTOCOL_HAS_PASSWORD |
+																B_MAIL_PROTOCOL_HAS_HOSTNAME |
+																B_MAIL_PROTOCOL_HAS_FLAVORS);
+	view->AddFlavor("Unencrypted");
+	view->AddFlavor("SSL");
 	#else
-            );
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | 
+																B_MAIL_PROTOCOL_HAS_USERNAME |
+																B_MAIL_PROTOCOL_HAS_PASSWORD |
+																B_MAIL_PROTOCOL_HAS_HOSTNAME);
 	#endif
 
 	view->AddAuthMethod(MDR_DIALECT_CHOICE ("None","無し"), false);
@@ -1052,8 +1058,20 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 
 	BTextControl *control = (BTextControl *)(view->FindView("host"));
 	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP Server: ","SMTPサーバ: "));
-	//control->SetDivider(be_plain_font->StringWidth("SMTP Host: "));
+	
+	// Reset the dividers after changing one
+	float widestLabel=0;
+	for (int32 i = view->CountChildren(); i-- > 0;) {
+		if(BTextControl *text = dynamic_cast<BTextControl *>(view->ChildAt(i)))
+			widestLabel = MAX(widestLabel,text->StringWidth(text->Label()) + 5);
+	}
+	for (int32 i = view->CountChildren(); i-- > 0;) {
+		if(BTextControl *text = dynamic_cast<BTextControl *>(view->ChildAt(i)))
+			text->SetDivider(widestLabel);
+	}
 
+	BMenuField *field = (BMenuField *)(view->FindView("auth_method"));
+	field->SetDivider(widestLabel);
 	view->SetTo(settings);
 
 	return view;
