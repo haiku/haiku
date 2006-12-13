@@ -40,10 +40,10 @@ BFileControl::BFileControl(BRect rect,const char *name,const char *label,const c
 		fText->SetDivider(fText->StringWidth(label) + 6);
 	AddChild(fText);
 
-	rect.left = rect.right + 6;
-	rect.right += labelWidth;
-	rect.OffsetBy(0,-3);
-	fButton = new BButton(rect,"select_file",MDR_DIALECT_CHOICE ("Select","選択") B_UTF8_ELLIPSIS,new BMessage(kMsgSelectButton));
+	fButton = new BButton(BRect(0,0,1,1),"select_file",MDR_DIALECT_CHOICE ("Select","選択") B_UTF8_ELLIPSIS,
+						  new BMessage(kMsgSelectButton));
+	fButton->ResizeToPreferred();
+	fButton->MoveBy(rect.right + 6, (rect.Height() - fButton->Frame().Height()) / 2);
 	AddChild(fButton);
 
 	fPanel = new BFilePanel(B_OPEN_PANEL,NULL,NULL,flavors,false);
