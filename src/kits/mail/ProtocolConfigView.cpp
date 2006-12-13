@@ -97,10 +97,10 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) : BView (B
 	rect.bottom = rect.top - 2 + gItemHeight;
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_HOSTNAME)
-		AddChild(AddTextField(rect,"host",MDR_DIALECT_CHOICE ("Mail Host:","サーバ名　：")));
+		AddChild(AddTextField(rect,"host",MDR_DIALECT_CHOICE ("Mail Server:","サーバ名　：")));
 	
 	if (options_mask & B_MAIL_PROTOCOL_HAS_USERNAME)
-		AddChild(AddTextField(rect,"user",MDR_DIALECT_CHOICE ("User Name:","ユーザーID：")));
+		AddChild(AddTextField(rect,"user",MDR_DIALECT_CHOICE ("Username:","ユーザーID：")));
 	
 	if (options_mask & B_MAIL_PROTOCOL_HAS_PASSWORD) {
 		BTextControl *control = AddTextField(rect,"pass",MDR_DIALECT_CHOICE ("Password:","パスワード："));
@@ -112,7 +112,7 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) : BView (B
 		AddChild(AddMenuField(rect,"flavor","Connection Type:"));
 	
 	if (options_mask & B_MAIL_PROTOCOL_HAS_AUTH_METHODS)
-		AddChild(AddMenuField(rect,"auth_method",MDR_DIALECT_CHOICE ("Authentication Method:","認証方法　：")));
+		AddChild(AddMenuField(rect,"auth_method",MDR_DIALECT_CHOICE ("Login Type:","認証方法　：")));
 
 	// set divider
 	float width = FindWidestLabel(this);
@@ -122,8 +122,8 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) : BView (B
 	}
 
 	if (options_mask & B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER) {
-		AddChild(AddCheckBox(rect,"leave_mail_remote",MDR_DIALECT_CHOICE ("Leave Mail On Server","受信後にサーバ内のメールを削除しない"),new BMessage('lmos')));
-		BCheckBox *box = AddCheckBox(rect,"delete_remote_when_local",MDR_DIALECT_CHOICE ("Delete Mail From Server When Deleted Locally","端末で削除されたらサーバ保存分も削除"));
+		AddChild(AddCheckBox(rect,"leave_mail_remote",MDR_DIALECT_CHOICE ("Leave mail on server","受信後にサーバ内のメールを削除しない"),new BMessage('lmos')));
+		BCheckBox *box = AddCheckBox(rect,"delete_remote_when_local",MDR_DIALECT_CHOICE ("Remove mail from server when deleted","端末で削除されたらサーバ保存分も削除"));
 		box->SetEnabled(false);
 		AddChild(box);
 	}
