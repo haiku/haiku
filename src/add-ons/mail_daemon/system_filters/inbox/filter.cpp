@@ -339,66 +339,45 @@ class FolderConfig : public BView {
 		FolderConfig(BMessage *settings, BMessage *meta_data) :  BView(BRect(0,0,50,50),"folder_config",B_FOLLOW_ALL_SIDES,0) {
 
 			const char *partial_text = MDR_DIALECT_CHOICE (
-				"Partially download messages larger than",
+				"Partially download large messages",
 				"部分ダウンロードする");
 
 			view = new BMailFileConfigView(
-				MDR_DIALECT_CHOICE ("Destination Folder:","受信箱："),
+				MDR_DIALECT_CHOICE ("Location:","受信箱："),
 				"path",true,"/boot/home/mail/in");
 			view->SetTo(settings,meta_data);
 			view->ResizeToPreferred();
-
-			partial_box = new BCheckBox(BRect(view->Frame().left, view->Frame().bottom + 5,
-				view->Frame().left + 18 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 25), "size_if", partial_text, new BMessage('SIZF'));
-			size = new BTextControl(BRect(
-				view->Frame().left + 20 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 5,
-				view->Frame().left + 42 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 25), "size", "", "", NULL);
-			AddChild(new BStringView(BRect(
-				view->Frame().left + 42 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 5, view->Frame().right,view->Frame().bottom+21),
-				"kb", "KB"));
-			size->SetDivider(0);
-			if (settings->HasInt32("size_limit")) {
-				BString kb;
-				kb << int32(settings->FindInt32("size_limit")/1024);
-				size->SetText(kb.String());
-				partial_box->SetValue(B_CONTROL_ON);
-			} else
-				size->SetEnabled(false);
+			
+			BRect r(view->Frame());
+			r.OffsetBy(0,r.Height() + 5);
+			partial_box = new BCheckBox(r, "size_if", partial_text, new BMessage('SIZF'));
+			partial_box->ResizeToPreferred();
+			
 			AddChild(view);
 			SetViewColor(216,216,216);
 			AddChild(partial_box);
-			AddChild(size);
 			ResizeToPreferred();
-		}
-		void MessageReceived(BMessage *msg) {
-			if (msg->what != 'SIZF')
-				return BView::MessageReceived(msg);
-			size->SetEnabled(partial_box->Value());
-		}
-		void AttachedToWindow() {
-			partial_box->SetTarget(this);
 		}
 		void GetPreferredSize(float *width, float *height) {
 			view->GetPreferredSize(width,height);
-			*height += 25;
-			*width += 10;
+			*height = partial_box->Frame().bottom + 5;
+			*width = MAX(partial_box->Frame().right + 5, *width) + 5;
 		}
 		status_t Archive(BMessage *into, bool) const {
 			into->MakeEmpty();
 			view->Archive(into);
+			
+			// 100KB should be a reasonable limit -- the only people that will probably be
+			// concerned about size are dial-up users
 			if (partial_box->Value())
-				into->AddInt32("size_limit",atoi(size->Text()) * 1024);
+				into->AddInt32("size_limit",102400);
 			return B_OK;
 		}
 			
 			
 	private:
 		BMailFileConfigView *view;
-		BTextControl *size;
+//		BTextControl *size;
 		BCheckBox *partial_box;
 };
 
