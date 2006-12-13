@@ -43,6 +43,7 @@ enum message_option {
 	OPTION_ROUTER_ADDRESS = 3,
 	OPTION_DOMAIN_NAME_SERVER = 6,
 	OPTION_HOST_NAME = 12,
+	OPTION_DOMAIN_NAME = 15,
 	OPTION_DATAGRAM_SIZE = 22,
 	OPTION_MTU = 26,
 	OPTION_BROADCAST_ADDRESS = 28,
@@ -544,6 +545,9 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 			case OPTION_SUBNET_MASK:
 				address.AddString("mask", _ToString(data));
 				break;
+			case OPTION_BROADCAST_ADDRESS:
+				address.AddString("broadcast", _ToString(data));
+				break;
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
 				// TODO: for now, we write it just out to /etc/resolv.conf
@@ -571,11 +575,22 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 
 			case OPTION_HOST_NAME:
+			{
 				char name[256];
 				memcpy(name, data, size);
 				name[size] = '\0';
 				printf("DHCP host name: \"%s\"\n", name);
 				break;
+			}
+
+			case OPTION_DOMAIN_NAME:
+			{
+				char name[256];
+				memcpy(name, data, size);
+				name[size] = '\0';
+				printf("DHCP domain name: \"%s\"\n", name);
+				break;
+			}
 
 			case OPTION_MESSAGE_TYPE:
 				break;
