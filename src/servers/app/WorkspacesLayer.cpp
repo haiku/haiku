@@ -216,7 +216,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	//	so that it has only to be recalculated on demand. With double buffered
 	//	windows, this would also open up the door to have a more detailed
 	//	preview.
-#if 1
+#if 0
 	BString title(window->Title());
 
 	ServerFont font = fDrawState->Font();

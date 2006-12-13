@@ -68,7 +68,6 @@ status_t our_image(image_info* image)
 
 BView* instantiate_deskbar_item(void)
 {
-	printf("Ryan was here!\n");
 	return new DeskbarView(BRect(0, 0, 15, 15));
 }
 
@@ -228,11 +227,9 @@ DeskbarView::MessageReceived(BMessage *message)
 			switch (what) {
 				case B_ENTRY_CREATED:
 					fNewMessages++;
-					printf("B_QUERY_UPDATE::B_ENTRY_CREATED, fNewMessages = %d\n", fNewMessages);
 					break;
 				case B_ENTRY_REMOVED:
 					fNewMessages--;
-					printf("B_QUERY_UPDATE::B_ENTRY_REMOVED, fNewMessages = %d\n", fNewMessages);
 					break;
 			}	
 			ChangeIcon((fNewMessages > 0) ? NEW_MAIL : NO_MAIL);
