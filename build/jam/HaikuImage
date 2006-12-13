@@ -249,7 +249,7 @@ AddBootModuleSymlinks $(X86_ONLY)acpi config_manager bfs block_io fast_log gener
 AddFilesToHaikuImage beos system add-ons accelerants
 	: $(BEOS_ADD_ONS_ACCELERANTS) ;
 AddFilesToHaikuImage beos system add-ons opengl 
-	: Mesa\ Software\ Renderer ;
+	: $(X86_ONLY)Mesa\ Software\ Renderer ;
 AddFilesToHaikuImage beos system add-ons Translators
 	: $(BEOS_ADD_ONS_TRANSLATORS) ;
 AddFilesToHaikuImage beos system add-ons media : $(BEOS_ADD_ONS_MEDIA) ;
