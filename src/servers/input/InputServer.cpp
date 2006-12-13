@@ -365,14 +365,26 @@ InputServer::QuitRequested()
 	CALLED();
 	if (!BApplication::QuitRequested())
 		return false;
+	
+	PostMessage(SYSTEM_SHUTTING_DOWN); 
 
-	fAddOnManager->SaveState();
-	gDeviceManager.SaveState();
+	bool shutdown = false;
+	CurrentMessage()->FindBool("_shutdown_", &shutdown);
 
-	delete_port(fEventLooperPort);
-		// the event looper thread will exit after this
-	fEventLooperPort = -1;
-	return true;
+	// Don't actually quit when the system is being shutdown
+	if (shutdown) {
+		PRINT(("****RJL: The system is shutting down, so NOT QUITTING!\n"));
+		return false;
+	} else {
+		PRINT(("****RJL: The system is NOT shutting down, so I AM QUITTING!\n"));
+		fAddOnManager->SaveState();
+		gDeviceManager.SaveState();
+
+		delete_port(fEventLooperPort);
+			// the event looper thread will exit after this
+		fEventLooperPort = -1;
+		return true;
+	}
 }
 
 

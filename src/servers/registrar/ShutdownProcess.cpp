@@ -709,7 +709,7 @@ ShutdownProcess::Init(BMessage *request)
 
 	// get a list of all applications to shut down and sort them
 	error = fRoster->GetShutdownApps(fUserApps, fSystemApps, fBackgroundApps,
-		fVitalSystemApps, fInputServer);
+		fVitalSystemApps);//, fInputServer);
 	if (error != B_OK) {
 		fRoster->RemoveWatcher(this);
 		fRoster->SetShuttingDown(false);
@@ -1275,12 +1275,12 @@ ShutdownProcess::_WorkerDoShutdown()
 	sync();
 
 	// notify the input server we are shutting down
-	if (fInputServer.registration_time != 0) {
+	/*if (fInputServer.registration_time != 0) {
 		// The SYSTEM_SHUTTING_DOWN message is defined in InputServerTypes.h
 		BMessage message(SYSTEM_SHUTTING_DOWN);
 		SingleMessagingTargetSet target(fInputServer.port, B_PREFERRED_TOKEN);
 		MessageDeliverer::Default()->DeliverMessage(&message, target);
-	}
+	}*/
 	
 	// phase 1: terminate the user apps
 	_SetPhase(USER_APP_TERMINATION_PHASE);
@@ -1412,6 +1412,8 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 			PRINT(("ShutdownProcess::_QuitApps() done\n"));
 			return;
 		}
+
+		PRINT(("****RJL: Asking %s to quit\n", appName));
 
 		// set window text
 		char buffer[1024];

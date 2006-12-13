@@ -216,20 +216,20 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	//	so that it has only to be recalculated on demand. With double buffered
 	//	windows, this would also open up the door to have a more detailed
 	//	preview.
-#if 0
-	BString title = window->Name();
+#if 1
+	BString title(window->Title());
 
 	ServerFont font = fDrawState->Font();
 	font.SetSize(7);
 	fDrawState->SetFont(font);
 
 	fDrawState->Font().TruncateString(&title, B_TRUNCATE_END, frame.Width() - 4);
-	float width = GetDrawingEngine()->StringWidth(title.String(), title.Length(),
+	float width = drawingEngine->StringWidth(title.String(), title.Length(),
 		fDrawState, NULL);
-	float height = GetDrawingEngine()->StringHeight(title.String(), title.Length(),
+	float height = drawingEngine->StringHeight(title.String(), title.Length(),
 		fDrawState);
 
-	GetDrawingEngine()->DrawString(title.String(), title.Length(),
+	drawingEngine->DrawString(title.String(), title.Length(),
 		BPoint(frame.left + (frame.Width() - width) / 2,
 			frame.top + (frame.Height() + height) / 2),
 		fDrawState, NULL);

@@ -92,8 +92,7 @@ public:
 
 	void SetShuttingDown(bool shuttingDown);
 	status_t GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
-		AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps,
-		RosterAppInfo &inputServer);
+		AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps);
 
 	status_t AddWatcher(Watcher *watcher);
 	void RemoveWatcher(Watcher *watcher);

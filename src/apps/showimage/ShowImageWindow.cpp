@@ -229,7 +229,7 @@ ShowImageWindow::BuildViewMenu(BMenu *menu)
 	menu->AddSeparatorItem();
 
 	AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, 'W', true);
-	AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '=', 0, 'W', true);
+	AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '+', 0, 'W', true);
 	AddItemMenu(menu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
 
 	menu->AddSeparatorItem();

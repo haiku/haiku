@@ -13,6 +13,8 @@
 #include <PictureDataWriter.h>
 #include <PictureProtocol.h>
 
+#include <stdio.h>
+
 PictureDataWriter::PictureDataWriter(BPositionIO *data)
 	:
 	fData(data)

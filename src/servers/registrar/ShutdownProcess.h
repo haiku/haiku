@@ -97,7 +97,7 @@ private:
 	AppInfoList				fSystemApps;
 	AppInfoList				fUserApps;
 	AppInfoList				fBackgroundApps;
-	RosterAppInfo			fInputServer;
+	//RosterAppInfo			fInputServer;
 	TimeoutEvent			*fTimeoutEvent;
 	InternalEventList		*fInternalEvents;
 	sem_id					fInternalEventSemaphore;

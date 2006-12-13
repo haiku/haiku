@@ -12,6 +12,8 @@
 #include <Size.h>
 #include <String.h>
 
+#include <stdio.h>
+
 #include "SimpleLayouter.h"
 
 // Since the qoca headers are DEBUG and NDEBUG conditional, we get

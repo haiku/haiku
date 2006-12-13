@@ -1595,6 +1595,13 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 		case B_DELETE:
 			// TODO: move image to Trash (script Tracker)
 			break;
+		case '+':
+		case '=':
+			ZoomIn();
+			break;
+		case '-':
+			ZoomOut();
+			break;
 	}	
 }
 

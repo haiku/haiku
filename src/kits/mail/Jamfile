@@ -48,7 +48,7 @@ SharedLibrary libmail.so :
 	tracker
 	$(TARGET_LIBSTDC++)
 	$(NETWORK_LIBS)
-	$(SELECT_UNAME_ETC_LIB)
+#	$(SELECT_UNAME_ETC_LIB)
 ;
 
 Package haiku-maildaemon-cvs :

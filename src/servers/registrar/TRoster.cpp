@@ -177,6 +177,7 @@ PRINT(("full registration: %d\n", fullReg));
 	// check the parameters
 	team_id otherTeam = -1;
 	uint32 token = 0;
+	RosterAppInfo *otherInfo = NULL;
 	
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
 
@@ -187,13 +188,12 @@ PRINT(("full registration: %d\n", fullReg));
 PRINT(("flags: %lx\n", flags));
 PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 			// check single/exclusive launchers
-			RosterAppInfo *info = NULL;
 			if ((launchFlags == B_SINGLE_LAUNCH
 				 || launchFlags ==  B_EXCLUSIVE_LAUNCH)
-				&& (((info = fRegisteredApps.InfoFor(&ref)))
-					|| ((info = fEarlyPreRegisteredApps.InfoFor(&ref))))) {
+				&& (((otherInfo = fRegisteredApps.InfoFor(&ref)))
+					|| ((otherInfo = fEarlyPreRegisteredApps.InfoFor(&ref))))) {
 				SET_ERROR(error, B_ALREADY_RUNNING);
-				otherTeam = info->team;
+				otherTeam = otherInfo->team;
 			}
 		} else
 			SET_ERROR(error, B_ENTRY_NOT_FOUND);
@@ -202,13 +202,12 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	// signature
 	if (error == B_OK && signature) {
 		// check exclusive launchers
-		RosterAppInfo *info = NULL;
 		if (launchFlags == B_EXCLUSIVE_LAUNCH
-			&& (((info = fRegisteredApps.InfoFor(signature)))
-				|| ((info = fEarlyPreRegisteredApps.InfoFor(signature))))) {
+			&& (((otherInfo = fRegisteredApps.InfoFor(signature)))
+				|| ((otherInfo = fEarlyPreRegisteredApps.InfoFor(signature))))) {
 			SET_ERROR(error, B_ALREADY_RUNNING);
-			otherTeam = info->team;
-			token = info->token;
+			otherTeam = otherInfo->team;
+			token = otherInfo->token;
 		}
 	}
 
@@ -275,6 +274,12 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 		if (token > 0)
 			reply.AddInt32("token", (int32)token);
 		request->SendReply(&reply);
+	}
+
+	if (otherInfo) {
+		// Activate the other app
+		printf("Trying to activate other app with team id: %d\n", otherInfo->team);
+		ActivateApp(otherInfo);
 	}
 
 	FUNCTION_END();
@@ -1245,7 +1250,7 @@ TRoster::ActivateApp(RosterAppInfo *info)
 			_AppDeactivated(oldActiveApp);
 		// activate the new app
 		if (info) {
-			info = fActiveApp;
+			fActiveApp = info;
 			_AppActivated(info);
 		}
 	}
@@ -1321,7 +1326,7 @@ TRoster::SetShuttingDown(bool shuttingDown)
 */
 status_t
 TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
-	AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps, RosterAppInfo &inputServer)
+	AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps)
 {
 	BAutolock _(fLock);
 
@@ -1351,12 +1356,12 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	}
 
 	// input server
-	RosterAppInfo *info
-		= fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
+	RosterAppInfo *info;
+/*		= fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
 	if (info) {
 		inputServer = *info;
 		vitalSystemApps.insert(info->team);
-	}
+	}*/
 
 	// debug server
 	info = fRegisteredApps.InfoFor("application/x-vnd.haiku-debug-server");
@@ -1370,11 +1375,11 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 		if (vitalSystemApps.find(info->team) == vitalSystemApps.end()) {
 			RosterAppInfo *clonedInfo = info->Clone();
 			if (clonedInfo) {
-				if (info->flags & B_BACKGROUND_APP) {
-					if (!backgroundApps.AddInfo(clonedInfo))
-						error = B_NO_MEMORY;
-				} else if (_IsSystemApp(info)) {
+				if (_IsSystemApp(info)) {
 					if (!systemApps.AddInfo(clonedInfo))
+						error = B_NO_MEMORY;
+				} else if (info->flags & B_BACKGROUND_APP) {
+					if (!backgroundApps.AddInfo(clonedInfo))
 						error = B_NO_MEMORY;
 				} else {
 					if (!userApps.AddInfo(clonedInfo))
