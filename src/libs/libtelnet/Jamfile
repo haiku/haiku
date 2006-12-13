@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src libs libtelnet ;
+
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+SharedLibrary libtelnet.a :
+	auth.c
+	enc_des.c
+	encrypt.c
+	genget.c
+	getent.c
+	kerberos.c
+	kerberos5.c
+	misc.c
+	#pk.c
+	read_password.c
+	rsaencpwd.c
+	sra.c
+;

@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src bin network telnetd ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
+
+local defines = [ FDefines USE_TERMIO=1 ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+BinCommand telnetd :
+	authenc.c
+	global.c
+	slc.c
+	state.c
+	sys_term.c
+	telnetd.c
+	termstat.c
+	utility.c
+	: libtermcap.a libtelnet.a libutil.a libbsd.so $(NETWORK_LIBS)
+;
