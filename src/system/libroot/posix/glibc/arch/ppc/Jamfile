@@ -92,6 +92,7 @@ local genericSources =
 	w_acos.c w_acosf.c # w_acosl.c
 	w_acosh.c w_acoshf.c # w_acoshl.c
 	w_atan2.c w_atan2f.c # w_atan2l.c
+	w_asin.c w_asinf.c # w_asinl.c
 	w_atanh.c w_atanhf.c # w_atanhl.c
 	w_cosh.c w_coshf.c # w_coshl.c
 	w_drem.c w_dremf.c # w_dreml.c
