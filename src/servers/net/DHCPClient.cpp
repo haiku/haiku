@@ -564,6 +564,12 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				fLeaseTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
 
+			case OPTION_RENEWAL_TIME:
+			case OPTION_REBINDING_TIME:
+				printf("renewal/rebinding (%lu) time of %lu seconds\n",
+					(uint32)option, htonl(*(uint32*)data));
+				break;
+
 			case OPTION_HOST_NAME:
 				char name[256];
 				memcpy(name, data, size);
