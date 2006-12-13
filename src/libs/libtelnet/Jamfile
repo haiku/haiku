@@ -4,7 +4,7 @@ SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-SharedLibrary libtelnet.a :
+StaticLibrary libtelnet.a :
 	auth.c
 	enc_des.c
 	encrypt.c
