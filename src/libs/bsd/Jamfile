@@ -10,6 +10,7 @@ SharedLibrary libbsd.so :
 	getpass.c
 	issetugid.c
 	progname.c
+	signal.c
 	stringlist.c
 	unvis.c
 	vis.c
