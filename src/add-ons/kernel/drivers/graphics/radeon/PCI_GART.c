@@ -1,11 +1,10 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
-	
 
 	Part of Radeon kernel driver
-		
+
 	PCI GART.
-	
+
 	Currently, we use PCI DMA. Changing to AGP would 
 	only affect this file, but AGP-GART is specific to
 	the chipset of the motherboard, and as DMA is really
@@ -15,18 +14,21 @@
 
 
 #include "radeon_driver.h"
-#include <malloc.h>
-#include <image.h>
 #include "mmio.h"
 #include "buscntrl_regs.h"
 #include "memcntrl_regs.h"
 #include "cp_regs.h"
+
+#include <image.h>
+
+#include <stdlib.h>
 #include <string.h>
 
 
 #if 1
-// create actual GART buffer
-static status_t createGARTBuffer( GART_info *gart, size_t size )
+//! create actual GART buffer
+static status_t
+createGARTBuffer(GART_info *gart, size_t size)
 {
 	SHOW_FLOW0( 3, "" );
 	
@@ -46,12 +48,19 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 	
 	// as some variables in accelerant point directly into
 	// the DMA buffer, we have to grant access for all apps
-	gart->buffer.area = create_area( "Radeon PCI GART buffer", 
+	gart->buffer.area = create_area("Radeon PCI GART buffer", 
 		&gart->buffer.ptr, B_ANY_KERNEL_ADDRESS, 
-		size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
-	if( gart->buffer.area < 0 ) {
-		SHOW_ERROR( 1, "cannot create PCI GART buffer (%s)", 
-			strerror( gart->buffer.area ));
+		size, B_FULL_LOCK,
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		// TODO: really user read/write?
+		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA
+#else
+		0
+#endif
+		);
+	if (gart->buffer.area < 0) {
+		SHOW_ERROR(1, "cannot create PCI GART buffer (%s)",
+			strerror(gart->buffer.area));
 		return gart->buffer.area;
 	}
 	
@@ -81,7 +90,7 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 	gart->buffer.unaligned_area = create_area( "Radeon PCI GART buffer", 
 		&unaligned_addr, B_ANY_KERNEL_ADDRESS, 
 		2 * size, B_CONTIGUOUS/*B_FULL_LOCK*/, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
-	if( gart->buffer.unaligned_area < 0 ) {
+	if (gart->buffer.unaligned_area < 0) {
 		SHOW_ERROR( 1, "cannot create PCI GART buffer (%s)", 
 			strerror( gart->buffer.unaligned_area ));
 		return gart->buffer.unaligned_area;
@@ -138,26 +147,33 @@ static status_t initGATT( GART_info *gart )
 	num_pages = (gart->buffer.size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	// GART must be contignuous
-	gart->GATT.area = create_area( "Radeon GATT", (void **)&gart->GATT.ptr, 
+	gart->GATT.area = create_area("Radeon GATT", (void **)&gart->GATT.ptr,
 		B_ANY_KERNEL_ADDRESS, 
 		(num_pages * sizeof( uint32 ) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1), 
-		B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
+		B_CONTIGUOUS,
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		// TODO: really user read/write?
+		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA
+#else
+		0
+#endif
+		);
 		
-	if( gart->GATT.area < 0 ) {
-		SHOW_ERROR( 1, "cannot create GATT table (%s)", 
-			strerror( gart->GATT.area ));
+	if (gart->GATT.area < 0) {
+		SHOW_ERROR(1, "cannot create GATT table (%s)", 
+			strerror(gart->GATT.area));
 		return gart->GATT.area;
 	}
-	
-	get_memory_map( gart->GATT.ptr, B_PAGE_SIZE, PTB_map, 1 );
+
+	get_memory_map(gart->GATT.ptr, B_PAGE_SIZE, PTB_map, 1);
 	gart->GATT.phys = (uint32)PTB_map[0].address;
-	
-	SHOW_INFO( 3, "GATT_ptr=%p, GATT_phys=%p", gart->GATT.ptr, 
-		(void *)gart->GATT.phys );
-	
+
+	SHOW_INFO(3, "GATT_ptr=%p, GATT_phys=%p", gart->GATT.ptr,
+		(void *)gart->GATT.phys);
+
 	// get address mapping
-	memset( gart->GATT.ptr, 0, num_pages * sizeof( uint32 ));
-	
+	memset(gart->GATT.ptr, 0, num_pages * sizeof(uint32));
+
 	map_count = num_pages + 1;
 	
 	// align size to B_PAGE_SIZE
