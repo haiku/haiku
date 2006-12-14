@@ -55,7 +55,6 @@ SimpleTest user_shutdown_reply
 # the registrar itself
 
 UsePrivateHeaders app ;
-UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;

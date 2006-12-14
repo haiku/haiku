@@ -34,7 +34,6 @@
 #include "AppInfoListMessagingTargetSet.h"
 #include "Debug.h"
 #include "EventQueue.h"
-#include "InputServerTypes.h"
 #include "MessageDeliverer.h"
 #include "MessageEvent.h"
 #include "Registrar.h"
