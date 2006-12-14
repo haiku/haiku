@@ -233,7 +233,7 @@ class AboutTextView : public BTextView
 
 
 ConfigWindow::ConfigWindow()
-		: BWindow(BRect(200.0, 200.0, 640.0, 640.0),
+		: BWindow(BRect(100.0, 100.0, 580.0, 540.0),
 				  "E-mail", B_TITLED_WINDOW,
 				  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 		fLastSelectedAccount(NULL),
@@ -259,7 +259,7 @@ ConfigWindow::ConfigWindow()
 	tabView->AddTab(view = new BView(rect,NULL,B_FOLLOW_ALL,0));
 	tabView->TabAt(0)->SetLabel(MDR_DIALECT_CHOICE ("Accounts","アカウント"));
 	view->SetViewColor(top->ViewColor());
-
+	
 	// accounts listview
 
 	rect = view->Bounds().InsetByCopy(8,8);
