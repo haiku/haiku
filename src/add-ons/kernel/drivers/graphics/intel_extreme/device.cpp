@@ -70,7 +70,7 @@ checkDeviceInfo(struct intel_info *info)
 
 
 static status_t
-device_open(const char *name, uint32 flags, void **_cookie)
+device_open(const char *name, uint32 /*flags*/, void **_cookie)
 {
 	TRACE((DEVICE_NAME ": open(name = %s)\n", name));
 	int32 id;

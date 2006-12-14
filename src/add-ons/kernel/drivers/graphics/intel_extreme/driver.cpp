@@ -37,11 +37,14 @@ const struct supported_device {
 	const char	*name;
 } kSupportedDevices[] = {
 	{0x3577, INTEL_TYPE_8xx | INTEL_TYPE_83x, "i830GM"},
+	{0x2562, INTEL_TYPE_8xx | INTEL_TYPE_83x, "i845G"},
 
 	{0x2572, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i865G"},
 	{0x3582, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i855G"},
 
 #if 0
+	{0x2792, INTEL_TYPE_9xx, "i910"},
+	{0x258a, INTEL_TYPE_9xx, "i915"},
 	{0x2582, INTEL_TYPE_9xx, "i915G"},
 	{0x2592, INTEL_TYPE_9xx, "i915GM"},
 	{0x2772, INTEL_TYPE_9xx, "i945G"},
@@ -171,7 +174,8 @@ init_driver(void)
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
 
-		dprintf(DEVICE_NAME ": (%ld) revision = 0x%x\n", found, info->revision);
+		dprintf(DEVICE_NAME ": (%ld) %s, revision = 0x%x\n", found,
+			kSupportedDevices[type].name, info->revision);
 		found++;
 	}
 

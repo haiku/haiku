@@ -6,6 +6,9 @@ UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders graphics kernel ;
 
+SubDirCcFlags -Wall ;
+SubDirC++Flags -Wall ;
+
 KernelAddon intel_extreme :
 	driver.cpp
 	device.cpp

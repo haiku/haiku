@@ -372,6 +372,10 @@ intel_extreme_init(intel_info &info)
 		return info.registers_area;
 	}
 
+	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
+	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci, PCI_command, 2)
+		| PCI_command_io | PCI_command_memory | PCI_command_master);
+
 	// init graphics memory manager
 
 	info.memory_manager = mem_init("intel extreme memory manager", 0, totalSize, 1024, 
