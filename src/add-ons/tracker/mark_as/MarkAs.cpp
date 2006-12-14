@@ -8,7 +8,7 @@
 #include <Message.h>
 #include <Node.h>
 #include <String.h>
-#include <TrackerAddon.h>
+#include <TrackerAddOn.h>
 
 
 extern "C" void
@@ -16,10 +16,10 @@ process_refs(entry_ref dir, BMessage* msg, void* /*reserved*/)
 {
 	int32 refs;
 	entry_ref ref;
-	BString status("!!!STATUS_HERE!!!");
+	BString status(STATUS_HERE);
 		// The above will be substituted with a real value (such as "New" or 
-		// "Read") by some magic in the Jamfile. This is done to avoid duplicate
-		// code.
+		// "Read") by a #define and #include in another file. This is done 
+		// to avoid duplicate code.                                                                
 	BString type;
 
 	for (refs = 0; msg->FindRef("refs", refs, &ref) == B_NO_ERROR; refs++) {
