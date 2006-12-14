@@ -709,7 +709,7 @@ ShutdownProcess::Init(BMessage *request)
 
 	// get a list of all applications to shut down and sort them
 	error = fRoster->GetShutdownApps(fUserApps, fSystemApps, fBackgroundApps,
-		fVitalSystemApps);//, fInputServer);
+		fVitalSystemApps);
 	if (error != B_OK) {
 		fRoster->RemoveWatcher(this);
 		fRoster->SetShuttingDown(false);
@@ -1274,14 +1274,6 @@ ShutdownProcess::_WorkerDoShutdown()
 	// sync
 	sync();
 
-	// notify the input server we are shutting down
-	/*if (fInputServer.registration_time != 0) {
-		// The SYSTEM_SHUTTING_DOWN message is defined in InputServerTypes.h
-		BMessage message(SYSTEM_SHUTTING_DOWN);
-		SingleMessagingTargetSet target(fInputServer.port, B_PREFERRED_TOKEN);
-		MessageDeliverer::Default()->DeliverMessage(&message, target);
-	}*/
-	
 	// phase 1: terminate the user apps
 	_SetPhase(USER_APP_TERMINATION_PHASE);
 	_QuitApps(fUserApps, false);
@@ -1292,13 +1284,11 @@ ShutdownProcess::_WorkerDoShutdown()
 
 	// phase 3: terminate the background apps
 	_SetPhase(BACKGROUND_APP_TERMINATION_PHASE);
-// TODO: _QuitNonApps() and _QuitBackgroundApps() are called in reverse?
-// and don't match the phase
-	_QuitNonApps();
+	_QuitBackgroundApps();
 
 	// phase 4: terminate the other processes
 	_SetPhase(OTHER_PROCESSES_TERMINATION_PHASE);
-	_QuitBackgroundApps();
+	_QuitNonApps();
 	_ScheduleTimeoutEvent(kBackgroundAppQuitTimeout, -1);
 	_WaitForBackgroundApps();
 	_KillBackgroundApps();
@@ -1341,12 +1331,12 @@ ShutdownProcess::_WorkerDoShutdown()
 
 // _QuitApps
 void
-ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
+ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 {
 	PRINT(("ShutdownProcess::_QuitApps(%s)\n",
-		(disableCancel ? "system" : "user")));
+		(systemApps ? "system" : "user")));
 
-	if (disableCancel) {
+	if (systemApps) {
 		_SetShutdownWindowCancelButtonEnabled(false);
 
 		// check one last time for abort events
@@ -1384,7 +1374,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 			if (error != B_OK)
 				throw_error(error);
 
-			if (!disableCancel && event == ABORT_EVENT) {
+			if (!systemApps && event == ABORT_EVENT) {
 				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
 					"team %ld (-1 => user)\n", team));
 
@@ -1412,8 +1402,6 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 			PRINT(("ShutdownProcess::_QuitApps() done\n"));
 			return;
 		}
-
-		PRINT(("****RJL: Asking %s to quit\n", appName));
 
 		// set window text
 		char buffer[1024];
@@ -1448,10 +1436,10 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 				break;
 
 			if (event == ABORT_EVENT) {
-				if (disableCancel) {
+				if (systemApps) {
 					// If the app requests aborting the shutdown, we don't need
 					// to wait any longer. It has processed the request and
-					// won't quit by itself. We'll have to kill it.
+					// won't quit by itself. We ignore this for system apps.
 					if (eventTeam == team)
 						break;
 				} else {
@@ -1474,7 +1462,17 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 		} else {
 			// the app is either blocking on a model alert or blocks for another
 			// reason
-			_QuitBlockingApp(list, team, appName, !disableCancel);
+			if (!systemApps)
+				_QuitBlockingApp(list, team, appName, true);
+			else {
+				// This is a system app: remove it from the list
+				BAutolock _(fWorkerLock);
+
+				if (RosterAppInfo *info = list.InfoFor(team)) {
+					list.RemoveInfo(info);
+					delete info;
+				}
+			}
 		}
 	}
 }

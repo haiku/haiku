@@ -70,7 +70,7 @@ private:
 	status_t _Worker();
 
 	void _WorkerDoShutdown();
-	void _QuitApps(AppInfoList &list, bool disableCancel);
+	void _QuitApps(AppInfoList &list, bool systemApps);
 	void _QuitBackgroundApps();
 	void _WaitForBackgroundApps();
 	void _KillBackgroundApps();
@@ -97,7 +97,6 @@ private:
 	AppInfoList				fSystemApps;
 	AppInfoList				fUserApps;
 	AppInfoList				fBackgroundApps;
-	//RosterAppInfo			fInputServer;
 	TimeoutEvent			*fTimeoutEvent;
 	InternalEventList		*fInternalEvents;
 	sem_id					fInternalEventSemaphore;

@@ -177,7 +177,6 @@ PRINT(("full registration: %d\n", fullReg));
 	// check the parameters
 	team_id otherTeam = -1;
 	uint32 token = 0;
-	RosterAppInfo *otherInfo = NULL;
 	
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
 
@@ -188,12 +187,13 @@ PRINT(("full registration: %d\n", fullReg));
 PRINT(("flags: %lx\n", flags));
 PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 			// check single/exclusive launchers
+			RosterAppInfo *info = NULL;
 			if ((launchFlags == B_SINGLE_LAUNCH
 				 || launchFlags ==  B_EXCLUSIVE_LAUNCH)
-				&& (((otherInfo = fRegisteredApps.InfoFor(&ref)))
-					|| ((otherInfo = fEarlyPreRegisteredApps.InfoFor(&ref))))) {
+				&& (((info = fRegisteredApps.InfoFor(&ref)))
+					|| ((info = fEarlyPreRegisteredApps.InfoFor(&ref))))) {
 				SET_ERROR(error, B_ALREADY_RUNNING);
-				otherTeam = otherInfo->team;
+				otherTeam = info->team;
 			}
 		} else
 			SET_ERROR(error, B_ENTRY_NOT_FOUND);
@@ -202,12 +202,13 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	// signature
 	if (error == B_OK && signature) {
 		// check exclusive launchers
+		RosterAppInfo *info = NULL;
 		if (launchFlags == B_EXCLUSIVE_LAUNCH
-			&& (((otherInfo = fRegisteredApps.InfoFor(signature)))
-				|| ((otherInfo = fEarlyPreRegisteredApps.InfoFor(signature))))) {
+			&& (((info = fRegisteredApps.InfoFor(signature)))
+				|| ((info = fEarlyPreRegisteredApps.InfoFor(signature))))) {
 			SET_ERROR(error, B_ALREADY_RUNNING);
-			otherTeam = otherInfo->team;
-			token = otherInfo->token;
+			otherTeam = info->team;
+			token = info->token;
 		}
 	}
 
@@ -274,12 +275,6 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 		if (token > 0)
 			reply.AddInt32("token", (int32)token);
 		request->SendReply(&reply);
-	}
-
-	if (otherInfo) {
-		// Activate the other app
-		printf("Trying to activate other app with team id: %d\n", otherInfo->team);
-		ActivateApp(otherInfo);
 	}
 
 	FUNCTION_END();
@@ -1336,7 +1331,6 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	// * ourself
 	// * kernel team
 	// * app server
-	// * input server
 	// * debug server
 
 	// ourself
@@ -1355,16 +1349,9 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 		vitalSystemApps.insert(portInfo.team);
 	}
 
-	// input server
-	RosterAppInfo *info;
-/*		= fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
-	if (info) {
-		inputServer = *info;
-		vitalSystemApps.insert(info->team);
-	}*/
-
 	// debug server
-	info = fRegisteredApps.InfoFor("application/x-vnd.haiku-debug-server");
+	RosterAppInfo *info = 
+		fRegisteredApps.InfoFor("application/x-vnd.haiku-debug_server");
 	if (info)
 		vitalSystemApps.insert(info->team);
 
@@ -1395,6 +1382,12 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 		if (error != B_OK)
 			break;
 	}
+
+	// Special case, we add the input server to vital apps here so it is
+	// not excluded in the lists above
+	info = fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
+ 	if (info)
+ 		vitalSystemApps.insert(info->team);
 
 	// clean up on error
 	if (error != B_OK) {
