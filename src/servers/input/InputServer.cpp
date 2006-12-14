@@ -373,10 +373,8 @@ InputServer::QuitRequested()
 
 	// Don't actually quit when the system is being shutdown
 	if (shutdown) {
-		PRINT(("****RJL: The system is shutting down, so NOT QUITTING!\n"));
 		return false;
 	} else {
-		PRINT(("****RJL: The system is NOT shutting down, so I AM QUITTING!\n"));
 		fAddOnManager->SaveState();
 		gDeviceManager.SaveState();
 
