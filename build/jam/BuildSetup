@@ -113,9 +113,9 @@ HAIKU_ASFLAGS = ;
 HAIKU_CCFLAGS += -Wno-multichar ;
 HAIKU_C++FLAGS += -Wno-multichar ;
 
-HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin
+HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin -Wno-multichar
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
-HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
+HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions -Wno-multichar
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
