@@ -137,22 +137,26 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	SetFlags(flags, NULL);
 
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
-		fDecorator = gDecorManager.AllocateDecorator(fDesktop, frame, name, fLook, fFlags);
-		if (fDecorator)
-			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
+		fDecorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
+			frame, name, fLook, fFlags);
+		if (fDecorator) {
+			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight,
+				&fMaxWidth, &fMaxHeight);
+		}
 	}
 
 	// do we need to change our size to let the decorator fit?
 	// _ResizeBy() will adapt the frame for validity before resizing
 	if (feel == kDesktopWindowFeel) {
 		// the desktop window spans over the whole screen
-		// ToDo: this functionality should be moved somewhere else (so that it
-		//	is always used when the workspace is changed)
+		// ToDo: this functionality should be moved somewhere else
+		//  (so that it is always used when the workspace is changed)
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
 		if (fDesktop->ScreenAt(0)) {
-			fDesktop->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+			fDesktop->ScreenAt(0)->GetMode(width, height,
+				colorSpace, frequency);
 // TODO: MOVE THIS AWAY!!! ResizeBy contains calls to virtual methods!
 // Also, there is no TopLayer()!
 			fFrame.OffsetTo(B_ORIGIN);
@@ -797,7 +801,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		visibleBorder->IntersectWith(&VisibleRegion());
 
 		DrawingEngine* engine = fDecorator->GetDrawingEngine();
-		engine->LockExclusiveAccess();
+		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
@@ -808,7 +812,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			fDecorator->SetMinimize(true);
 		}
 
-		engine->UnlockExclusiveAccess();
+		engine->UnlockParallelAccess();
 
 		fRegionPool.Recycle(visibleBorder);
 
@@ -874,7 +878,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		visibleBorder->IntersectWith(&VisibleRegion());
 
 		DrawingEngine* engine = fDecorator->GetDrawingEngine();
-		engine->LockExclusiveAccess();
+		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
@@ -902,7 +906,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 			}
 		}
 
-		engine->UnlockExclusiveAccess();
+		engine->UnlockParallelAccess();
 
 		fRegionPool.Recycle(visibleBorder);
 	}
@@ -962,7 +966,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 		visibleBorder->IntersectWith(&VisibleRegion());
 
 		DrawingEngine* engine = fDecorator->GetDrawingEngine();
-		engine->LockExclusiveAccess();
+		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
@@ -973,7 +977,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 			fDecorator->SetMinimize(_ActionFor(message) == DEC_MINIMIZE);
 		}
 
-		engine->UnlockExclusiveAccess();
+		engine->UnlockParallelAccess();
 		fRegionPool.Recycle(visibleBorder);
 	}
 
@@ -1267,8 +1271,8 @@ WindowLayer::SetLook(window_look look, BRegion* updateRegion)
 {
 	if (fDecorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
-		fDecorator = gDecorManager.AllocateDecorator(fDesktop, Frame(),
-			Title(), fLook, fFlags);
+		fDecorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
+			Frame(), Title(), fLook, fFlags);
 		if (IsFocus())
 			fDecorator->SetFocus(true);
 	}
@@ -1775,11 +1779,11 @@ WindowLayer::_DrawBorder()
 	dirtyBorderRegion->IntersectWith(&fDirtyRegion);
 
 	DrawingEngine* engine = fDecorator->GetDrawingEngine();
-	if (dirtyBorderRegion->CountRects() > 0 && engine->LockExclusiveAccess()) {
+	if (dirtyBorderRegion->CountRects() > 0 && engine->LockParallelAccess()) {
 		engine->ConstrainClippingRegion(dirtyBorderRegion);
 		fDecorator->Draw(dirtyBorderRegion->Frame());
 
-		engine->UnlockExclusiveAccess();
+		engine->UnlockParallelAccess();
 	}
 	fRegionPool.Recycle(dirtyBorderRegion);
 }

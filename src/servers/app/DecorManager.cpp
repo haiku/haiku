@@ -37,13 +37,14 @@ class DecorInfo {
 		image_id			ID() const { return fID; }
 		const char*			Name() const { return fName.String(); }
 
-		Decorator*			Instantiate(Desktop* desktop, BRect rect, const char* title,
+		Decorator*			Instantiate(Desktop* desktop, DrawingEngine* engine,
+								BRect rect, const char* title,
 								window_look look, uint32 flags);
 
 	private:
 		image_id			fID;
 		BString 			fName;
-		create_decorator	*fAllocator;
+		create_decorator*	fAllocator;
 };
 
 
@@ -71,8 +72,8 @@ DecorInfo::~DecorInfo()
 
 
 Decorator *
-DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
-	window_look look, uint32 flags)
+DecorInfo::Instantiate(Desktop* desktop, DrawingEngine* engine, BRect rect,
+	const char *title, window_look look, uint32 flags)
 {
 	if (!desktop->LockSingleWindow())
 		return NULL;
@@ -92,7 +93,7 @@ DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 
 	desktop->UnlockSingleWindow();
 
-	decorator->SetDrawingEngine(desktop->GetDrawingEngine());
+	decorator->SetDrawingEngine(engine);
 	decorator->SetTitle(title);
 
 	return decorator;
@@ -192,10 +193,11 @@ DecorManager::RescanDecorators()
 
 
 Decorator *
-DecorManager::AllocateDecorator(Desktop* desktop, BRect rect, const char *title, 
-	window_look look, uint32 flags)
+DecorManager::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
+	BRect rect, const char* title, window_look look, uint32 flags)
 {
-	// Create a new instance of the current decorator. Ownership is that of the caller
+	// Create a new instance of the current decorator.
+	// Ownership is that of the caller
 
 	if (!fCurrentDecor) {
 		// We should *never* be here. If we do, it's a bug.
@@ -203,7 +205,8 @@ DecorManager::AllocateDecorator(Desktop* desktop, BRect rect, const char *title,
 		return NULL;
 	}
 
-	return fCurrentDecor->Instantiate(desktop, rect, title, look, flags);
+	return fCurrentDecor->Instantiate(desktop, engine, rect, title,
+		look, flags);
 }
 
 
@@ -224,7 +227,7 @@ DecorManager::GetDecorator() const
 bool
 DecorManager::SetDecorator(int32 index)
 {
-	DecorInfo *newDecInfo = (DecorInfo*)fDecorList.ItemAt(index);
+	DecorInfo* newDecInfo = (DecorInfo*)fDecorList.ItemAt(index);
 
 	if (newDecInfo) {
 		fCurrentDecor = newDecInfo;
