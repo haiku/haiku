@@ -157,6 +157,12 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 void
 delete_interface(net_interface_private *interface)
 {
+	if ((interface->flags & IFF_UP) != 0) {
+		// the interface is still up - we need to change that before deleting it
+		interface->flags &= ~IFF_UP;
+		interface->device_interface->module->down(interface->device_interface->device);
+	}
+
 	put_device_interface(interface->device_interface);
 
 	free(interface->address);
