@@ -106,14 +106,14 @@ DrawingEngine::~DrawingEngine()
 bool
 DrawingEngine::LockParallelAccess()
 {
-	return fGraphicsCard->LockExclusiveAccess();
+	return fGraphicsCard->LockParallelAccess();
 }
 
 
 void
 DrawingEngine::UnlockParallelAccess()
 {
-	fGraphicsCard->UnlockExclusiveAccess();
+	fGraphicsCard->UnlockParallelAccess();
 }
 
 
