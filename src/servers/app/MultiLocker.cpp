@@ -210,8 +210,9 @@ MultiLocker::WriteLock()
 				
 				if (readers > 0) {				
 					//readers hold the lock - acquire fWriteSem
-					locked = (acquire_sem_etc(fWriteSem, readers, B_DO_NOT_RESCHEDULE,
-							B_INFINITE_TIMEOUT) == B_OK);
+					locked = (acquire_sem_etc(fWriteSem, readers,
+									B_DO_NOT_RESCHEDULE,
+									B_INFINITE_TIMEOUT) == B_OK);
 					}
 				if (locked) {
 					ASSERT(fWriterThread == -1);
@@ -301,7 +302,8 @@ MultiLocker::WriteUnlock()
 			//increment fReadCount by a large number
 			//this will let new readers acquire the read lock
 			//retrieve the number of current waiters
-			int32 readersWaiting = atomic_add(&fReadCount, LARGE_NUMBER) + LARGE_NUMBER;
+			int32 readersWaiting = atomic_add(&fReadCount, LARGE_NUMBER)
+				+ LARGE_NUMBER;
 			
 			if (readersWaiting > 0) {
 				//readers are waiting to acquire the lock
@@ -373,7 +375,7 @@ MultiLocker::IsWriteLocked(uint32 *the_stack_base, thread_id *the_thread)
 		//this is managed by taking the address of the item on the
 		//stack and dividing it by the size of the memory pages
 		//if it is the same as the cached stack_page, there is a match 
-		stack_base = (uint32) &write_lock_holder/B_PAGE_SIZE;
+		stack_base = (uint32)&write_lock_holder / B_PAGE_SIZE;
 		if (fWriterStackBase == stack_base) {
 			write_lock_holder = true;
 		} else {
@@ -413,8 +415,10 @@ MultiLocker::IsReadLocked()
 	#if DEBUG
 		//determine if the lock is actually held
 		thread_id thread = find_thread(NULL);
-		if (fDebugArray[thread % fMaxThreads] > 0) locked = true;
-		else locked = false;
+		if (fDebugArray[thread % fMaxThreads] > 0)
+			locked = true;
+		else
+			locked = false;
 	#endif
 	
 	return locked;
