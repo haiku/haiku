@@ -550,6 +550,7 @@ ShapeListView::_UpdateMenu()
 
 	fDuplicateMI->SetEnabled(gotSelection);
 	fResetTransformationMI->SetEnabled(gotSelection);
+	fFreezeTransformationMI->SetEnabled(gotSelection);
 	fRemoveMI->SetEnabled(gotSelection);
 }
 

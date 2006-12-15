@@ -167,8 +167,9 @@ SavePanel::MessageReceived(BMessage* message)
 	// Handle messages from controls we've added
 	switch (message->what) {
 		case MSG_FORMAT:
-			// TODO: make this behaviour a setting
+			fExportMode = ExportMode();
 			AdjustExtension();
+				// TODO: make this behaviour a setting
 			_EnableSettings();
 			break;
 		case MSG_SETTINGS:

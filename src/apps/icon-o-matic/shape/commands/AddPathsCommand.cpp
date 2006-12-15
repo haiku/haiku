@@ -60,10 +60,10 @@ AddPathsCommand::Perform()
 {
 	status_t ret = B_OK;
 
-	// add shapes to container
+	// add paths to container
 	int32 index = fIndex;
 	for (int32 i = 0; i < fCount; i++) {
-		if (fPaths[i] && !fContainer->AddPath(fPaths[i]/*, index*/)) {
+		if (fPaths[i] && !fContainer->AddPath(fPaths[i], index)) {
 			ret = B_ERROR;
 			// roll back
 			for (int32 j = i - 1; j >= 0; j--)
@@ -81,7 +81,7 @@ AddPathsCommand::Perform()
 status_t
 AddPathsCommand::Undo()
 {
-	// remove shapes from container
+	// remove paths from container
 	for (int32 i = 0; i < fCount; i++) {
 		fContainer->RemovePath(fPaths[i]);
 	}
