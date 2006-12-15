@@ -1552,10 +1552,10 @@ err0:
 static status_t
 close_hook(void *_data)
 {
-	etherpci_private_t *data = (etherpci_private_t *) _data;
+	etherpci_private_t *data = (etherpci_private_t *)_data;
 	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": close dev=%x\n", data);
 
-	/* 
+	/*
 	 * Force pending reads and writes to terminate
 	 */
 	io_lock(data);
@@ -1613,7 +1613,7 @@ close_hook(void *_data)
 	remove_debugger_command (kDevName, etherpci);
 #endif
 
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
@@ -1621,11 +1621,18 @@ static status_t
 free_hook(void *_data)
 {
 	etherpci_private_t *data = (etherpci_private_t *)_data;
+	int32 mask;
+
 	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": free %s dev=%x\n", data);
 
 #if !__INTEL__
 	delete_area(data->ioarea);
 #endif
+
+	// make sure the device can be reopened again
+	mask = 1L << data->devID;
+	atomic_and(&gOpenMask, ~mask);
+
 	free(data);
 	return B_OK;
 }
