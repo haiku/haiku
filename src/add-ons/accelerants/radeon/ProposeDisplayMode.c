@@ -70,7 +70,17 @@ static const display_mode base_mode_list[] = {
 { { 189000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1600X1200X8.Z1) */
 { { 202500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1600X1200X8.Z1) */
 { { 216000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@80Hz_(1600X1200X8.Z1) */
-{ { 229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}  /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) */
+{ { 229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) */
+// widescreen resolutions, 16:10
+{ { 31300, 800, 848, 928, 1008, 500, 501, 504, 518, T_POSITIVE_SYNC}, B_CMAP8, 800, 500, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X500) */
+{ { 52800, 1024, 1072, 1176, 1328, 640, 641, 644, 663, T_POSITIVE_SYNC}, B_CMAP8, 1024, 640, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X640) */
+{ { 80135, 1280, 1344, 1480, 1680, 768, 769, 772, 795, T_POSITIVE_SYNC}, B_CMAP8, 1280, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X768) */
+{ { 83500, 1280, 1344, 1480, 1680, 800, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 800, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X800) */
+{ { 106500, 1440, 1520, 1672, 1904, 900, 901, 904, 932, T_POSITIVE_SYNC}, B_CMAP8, 1440, 900, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1440X900) */
+{ { 147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
+{ { 193200, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
+// widescreen resolutions, 16:9
+{ { 74520, 1280, 1368, 1424, 1656, 720, 724, 730, 750, T_POSITIVE_SYNC}, B_CMAP8, 1280, 720, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X720) */
 };
 
 
@@ -120,10 +130,10 @@ bool Radeon_GetFormat( int space, int *format, int *bpp )
 	 return B_BAD_VALUE.
 	If the mode is both valid AND falls within the limits, return B_OK.
 */
-status_t Radeon_ProposeDisplayMode( 
-	shared_info *si, crtc_info *crtc, 
-	general_pll_info *pll, display_mode *target, 
-	const display_mode *low, const display_mode *high )
+static status_t
+Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
+	general_pll_info *pll, display_mode *target,
+	const display_mode *low, const display_mode *high)
 {
 	status_t result = B_OK;
 	
@@ -584,16 +594,10 @@ status_t Radeon_CreateModeList( shared_info *si )
 }
 
 
-// cleanup official display mode list
-void Radeon_DisposeModeList( shared_info *si )
-{
-	delete_area( si->mode_list_area );
-}
-
-
-// public function: wraps for internal propose_display_mode
-status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low, 
-	const display_mode *high )
+//! public function: wraps for internal propose_display_mode
+status_t
+PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low,
+	const display_mode *high)
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
