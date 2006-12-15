@@ -3,8 +3,8 @@
 
 #include <unistd.h>
 
-int
-vfork ()
+pid_t
+vfork (void)
 {
   return (fork ());
 }
