@@ -342,66 +342,67 @@ class FolderConfig : public BView {
 				"Partially download messages larger than",
 				"部分ダウンロードする");
 
-			view = new BMailFileConfigView(
-				MDR_DIALECT_CHOICE ("Destination Folder:","受信箱："),
-				"path",true,"/boot/home/mail/in");
-			view->SetTo(settings,meta_data);
-			view->ResizeToPreferred();
-
-			partial_box = new BCheckBox(BRect(view->Frame().left, view->Frame().bottom + 5,
-				view->Frame().left + 18 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 25), "size_if", partial_text, new BMessage('SIZF'));
-			size = new BTextControl(BRect(
-				view->Frame().left + 20 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 5,
-				view->Frame().left + 42 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 25), "size", "", "", NULL);
-			bytes_label = new BStringView(BRect(
-				view->Frame().left + 42 + be_plain_font->StringWidth(partial_text),
-				view->Frame().bottom + 5, view->Frame().right,view->Frame().bottom+21),
-				"kb", "KB");
-			AddChild(bytes_label);
-			size->SetDivider(0);
+			fPathView = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Location:","受信箱："),
+												"path",true,"/boot/home/mail/in");
+			fPathView->SetTo(settings,meta_data);
+			fPathView->ResizeToPreferred();
+			
+			BRect r(fPathView->Frame());
+			r.OffsetBy(0,r.Height() + 5);
+			fPartialBox = new BCheckBox(r, "size_if", partial_text, new BMessage('SIZF'));
+			fPartialBox->ResizeToPreferred();
+			
+			r = fPartialBox->Frame();
+			r.OffsetBy(17,r.Height() + 1);
+			r.right = r.left + be_plain_font->StringWidth("0000") + 10;
+			fSizeBox = new BTextControl(r, "size", "", "", NULL);
+			
+			r.OffsetBy(r.Width() + 5,0);
+			fBytesLabel = new BStringView(r,"kb", "KB");
+			AddChild(fBytesLabel);
+			fSizeBox->SetDivider(0);
 			if (settings->HasInt32("size_limit")) {
 				BString kb;
 				kb << int32(settings->FindInt32("size_limit")/1024);
-				size->SetText(kb.String());
-				partial_box->SetValue(B_CONTROL_ON);
+				fSizeBox->SetText(kb.String());
+				fPartialBox->SetValue(B_CONTROL_ON);
 			} else
-				size->SetEnabled(false);
-			AddChild(view);
-			SetViewColor(216,216,216);
-			AddChild(partial_box);
-			AddChild(size);
+				fSizeBox->SetEnabled(false);
+			AddChild(fPathView);
+			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+			AddChild(fPartialBox);
+			AddChild(fSizeBox);
 			ResizeToPreferred();
 		}
 		void MessageReceived(BMessage *msg) {
 			if (msg->what != 'SIZF')
 				return BView::MessageReceived(msg);
-			size->SetEnabled(partial_box->Value());
+			fSizeBox->SetEnabled(fPartialBox->Value());
 		}
 		void AttachedToWindow() {
-			partial_box->SetTarget(this);
+			fPartialBox->SetTarget(this);
+			fPartialBox->ResizeToPreferred();
 		}
 		void GetPreferredSize(float *width, float *height) {
-			view->GetPreferredSize(width,height);
-			*height = partial_box->Frame().bottom + 5;
-			*width = MAX(bytes_label->Frame().right + 5, *width) + 5;
+			fPathView->GetPreferredSize(width,height);
+//			*height = fPartialBox->Frame().bottom + 5;
+			*height = fBytesLabel->Frame().bottom + 5;
+			*width = MAX(fBytesLabel->Frame().right + 5, *width);
 		}
 		status_t Archive(BMessage *into, bool) const {
 			into->MakeEmpty();
-			view->Archive(into);
-			if (partial_box->Value())
-				into->AddInt32("size_limit",atoi(size->Text()) * 1024);
+			fPathView->Archive(into);
+			if (fPartialBox->Value())
+				into->AddInt32("size_limit",atoi(fSizeBox->Text()) * 1024);
 			return B_OK;
 		}
 			
 			
 	private:
-		BMailFileConfigView *view;
-		BTextControl *size;
-		BCheckBox *partial_box;
-		BStringView *bytes_label;
+		BMailFileConfigView *fPathView;
+		BTextControl *fSizeBox;
+		BCheckBox *fPartialBox;
+		BStringView *fBytesLabel;
 };
 
 BView* instantiate_config_panel(BMessage *settings, BMessage *meta_data)
