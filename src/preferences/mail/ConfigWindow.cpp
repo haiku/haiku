@@ -425,6 +425,7 @@ ConfigWindow::ConfigWindow()
 	LoadSettings();
 
 	fAccountsListView->SetSelectionMessage(new BMessage(kMsgAccountSelected));
+	fAccountsListView->MakeFocus(true);
 }
 
 
