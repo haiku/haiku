@@ -538,10 +538,14 @@ DeskbarView::BuildMenu()
 	menu->AddItem(new BMenuItem(
 		MDR_DIALECT_CHOICE ("Edit Preferences","P) メール環境設定") B_UTF8_ELLIPSIS,
 		new BMessage(MD_OPEN_PREFS)));
-	menu->AddItem(new BMenuItem(
-		MDR_DIALECT_CHOICE ("Quit","Q) 終了"),
-		new BMessage(B_QUIT_REQUESTED)));
 
+	if (modifiers() & B_SHIFT_KEY)
+	{
+		menu->AddItem(new BMenuItem(
+			MDR_DIALECT_CHOICE ("Shutdown Mail Services","Q) 終了"),
+			new BMessage(B_QUIT_REQUESTED)));
+	}
+	
 	// Reset Item Targets (only those which aren't already set)
 
 	for (int32 i = menu->CountItems();i-- > 0;)
