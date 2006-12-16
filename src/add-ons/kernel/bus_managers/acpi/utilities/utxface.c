@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utxface - External interfaces for "global" ACPI functions
- *              $Revision: 1.121 $
+ *              $Revision: 1.124 $
  *
  *****************************************************************************/
 
@@ -149,6 +149,7 @@ AcpiInitializeSubsystem (
     ACPI_FUNCTION_TRACE (AcpiInitializeSubsystem);
 
 
+    AcpiGbl_StartupFlags = ACPI_SUBSYSTEM_INITIALIZE;
     ACPI_DEBUG_EXEC (AcpiUtInitStackPtrTrace ());
 
     /* Initialize the OS-Dependent layer */
@@ -215,22 +216,6 @@ AcpiEnableSubsystem (
 
     ACPI_FUNCTION_TRACE (AcpiEnableSubsystem);
 
-
-    /*
-     * We must initialize the hardware before we can enable ACPI.
-     * The values from the FADT are validated here.
-     */
-    if (!(Flags & ACPI_NO_HARDWARE_INIT))
-    {
-        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
-            "[Init] Initializing ACPI hardware\n"));
-
-        Status = AcpiHwInitialize ();
-        if (ACPI_FAILURE (Status))
-        {
-            return_ACPI_STATUS (Status);
-        }
-    }
 
     /* Enable ACPI mode */
 
@@ -528,7 +513,6 @@ AcpiGetSystemInfo (
 {
     ACPI_SYSTEM_INFO        *InfoPtr;
     ACPI_STATUS             Status;
-    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (AcpiGetSystemInfo);
@@ -563,11 +547,7 @@ AcpiGetSystemInfo (
 
     /* Timer resolution - 24 or 32 bits  */
 
-    if (!AcpiGbl_FADT)
-    {
-        InfoPtr->TimerResolution = 0;
-    }
-    else if (AcpiGbl_FADT->TmrValExt == 0)
+    if (AcpiGbl_FADT.Flags & ACPI_FADT_32BIT_TIMER)
     {
         InfoPtr->TimerResolution = 24;
     }
@@ -585,14 +565,6 @@ AcpiGetSystemInfo (
 
     InfoPtr->DebugLayer = AcpiDbgLayer;
     InfoPtr->DebugLevel = AcpiDbgLevel;
-
-    /* Current status of the ACPI tables, per table type */
-
-    InfoPtr->NumTableTypes = ACPI_TABLE_ID_MAX+1;
-    for (i = 0; i < (ACPI_TABLE_ID_MAX+1); i++)
-    {
-        InfoPtr->TableInfo[i].Count = AcpiGbl_TableLists[i].Count;
-    }
 
     return_ACPI_STATUS (AE_OK);
 }

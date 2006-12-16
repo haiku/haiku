@@ -126,6 +126,12 @@
  * Global interfaces
  */
 ACPI_STATUS
+AcpiInitializeTables (
+    ACPI_TABLE_DESC         *InitialStorage,
+    UINT32                  InitialTableCount,
+    BOOLEAN                 AllowResize);
+
+ACPI_STATUS
 AcpiInitializeSubsystem (
     void);
 
@@ -190,40 +196,33 @@ AcpiFree (
  * ACPI table manipulation interfaces
  */
 ACPI_STATUS
+AcpiReallocateRootTable (
+    void);
+
+ACPI_STATUS
 AcpiFindRootPointer (
-    UINT32                  Flags,
-    ACPI_POINTER            *RsdpAddress);
+    ACPI_NATIVE_UINT        *RsdpAddress);
 
 ACPI_STATUS
 AcpiLoadTables (
     void);
 
 ACPI_STATUS
-AcpiLoadTable (
-    ACPI_TABLE_HEADER       *TablePtr);
-
-ACPI_STATUS
-AcpiUnloadTable (
-    ACPI_TABLE_TYPE         TableType);
-
-ACPI_STATUS
 AcpiGetTableHeader (
-    ACPI_TABLE_TYPE         TableType,
-    UINT32                  Instance,
+    ACPI_STRING             Signature,
+    ACPI_NATIVE_UINT        Instance,
     ACPI_TABLE_HEADER       *OutTableHeader);
 
 ACPI_STATUS
 AcpiGetTable (
-    ACPI_TABLE_TYPE         TableType,
-    UINT32                  Instance,
-    ACPI_BUFFER             *RetBuffer);
+    ACPI_STRING             Signature,
+    ACPI_NATIVE_UINT        Instance,
+    ACPI_TABLE_HEADER       **OutTable);
 
 ACPI_STATUS
-AcpiGetFirmwareTable (
-    ACPI_STRING             Signature,
-    UINT32                  Instance,
-    UINT32                  Flags,
-    ACPI_TABLE_HEADER       **TablePointer);
+AcpiGetTableByIndex (
+    ACPI_NATIVE_UINT        TableIndex,
+    ACPI_TABLE_HEADER       **OutTable);
 
 
 /*
@@ -510,14 +509,12 @@ AcpiResourceToAddress64 (
 ACPI_STATUS
 AcpiGetRegister (
     UINT32                  RegisterId,
-    UINT32                  *ReturnValue,
-    UINT32                  Flags);
+    UINT32                  *ReturnValue);
 
 ACPI_STATUS
 AcpiSetRegister (
     UINT32                  RegisterId,
-    UINT32                  Value,
-    UINT32                  Flags);
+    UINT32                  Value);
 
 ACPI_STATUS
 AcpiSetFirmwareWakingVector (

@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: hwgpe - Low level GPE enable/disable/clear functions
- *              $Revision: 1.73 $
+ *              $Revision: 1.74 $
  *
  *****************************************************************************/
 
@@ -188,16 +188,20 @@ AcpiHwClearGpe (
     ACPI_GPE_EVENT_INFO     *GpeEventInfo)
 {
     ACPI_STATUS             Status;
+    UINT8                   RegisterBit;
 
 
     ACPI_FUNCTION_ENTRY ();
 
 
+    RegisterBit = (UINT8)
+        (1 << (GpeEventInfo->GpeNumber - GpeEventInfo->RegisterInfo->BaseGpeNumber));
+
     /*
      * Write a one to the appropriate bit in the status register to
      * clear this GPE.
      */
-    Status = AcpiHwLowLevelWrite (8, GpeEventInfo->RegisterBit,
+    Status = AcpiHwLowLevelWrite (8, RegisterBit,
                     &GpeEventInfo->RegisterInfo->StatusAddress);
 
     return (Status);
@@ -243,7 +247,8 @@ AcpiHwGetGpeStatus (
 
     /* Get the register bitmask for this GPE */
 
-    RegisterBit = GpeEventInfo->RegisterBit;
+    RegisterBit = (UINT8)
+        (1 << (GpeEventInfo->GpeNumber - GpeEventInfo->RegisterInfo->BaseGpeNumber));
 
     /* GPE currently enabled? (enabled for runtime?) */
 

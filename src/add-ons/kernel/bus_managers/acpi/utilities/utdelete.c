@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utdelete - object deletion and reference count utilities
- *              $Revision: 1.120 $
+ *              $Revision: 1.121 $
  *
  ******************************************************************************/
 
@@ -247,17 +247,20 @@ AcpiUtDeleteInternalObj (
             "***** Mutex %p, OS Mutex %p\n",
             Object, Object->Mutex.OsMutex));
 
-        if (Object->Mutex.OsMutex != ACPI_GLOBAL_LOCK)
+        if (Object->Mutex.OsMutex == AcpiGbl_GlobalLockMutex)
         {
-            AcpiExUnlinkMutex (Object);
-            AcpiOsDeleteMutex (Object->Mutex.OsMutex);
-        }
-        else
-        {
-            /* Global Lock "mutex" is actually a counting semaphore */
+            /* Global Lock has extra semaphore */
 
             (void) AcpiOsDeleteSemaphore (AcpiGbl_GlobalLockSemaphore);
             AcpiGbl_GlobalLockSemaphore = NULL;
+
+            AcpiOsDeleteMutex (Object->Mutex.OsMutex);
+            AcpiGbl_GlobalLockMutex = NULL;
+        }
+        else
+        {
+            AcpiExUnlinkMutex (Object);
+            AcpiOsDeleteMutex (Object->Mutex.OsMutex);
         }
         break;
 

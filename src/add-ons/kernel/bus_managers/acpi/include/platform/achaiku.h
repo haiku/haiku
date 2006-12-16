@@ -161,11 +161,11 @@
 #undef DEBUGGER_THREADING
 #endif /* DEBUGGER_THREADING */
 #define DEBUGGER_THREADING 0    /* integrated with DDB */
-#include "opt_ddb.h"
-#ifdef DDB
+//#include "opt_ddb.h"
+//#ifdef DDB
 #define ACPI_DISASSEMBLER
 #define ACPI_DEBUGGER
-#endif /* DDB */
+//#endif /* DDB */
 #endif /* ACPI_DEBUG */
 
 #else /* _KERNEL_MODE */

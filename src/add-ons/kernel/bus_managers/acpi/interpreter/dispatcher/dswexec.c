@@ -2,7 +2,7 @@
  *
  * Module Name: dswexec - Dispatcher method execution callbacks;
  *                        dispatch to interpreter.
- *              $Revision: 1.130 $
+ *              $Revision: 1.131 $
  *
  *****************************************************************************/
 
@@ -315,7 +315,7 @@ AcpiDsExecBeginOp (
         Status = AcpiDsLoad2BeginOp (WalkState, OutOp);
         if (ACPI_FAILURE (Status))
         {
-            return_ACPI_STATUS (Status);
+            goto ErrorExit;
         }
 
         Op = *OutOp;
@@ -332,7 +332,7 @@ AcpiDsExecBeginOp (
             Status = AcpiDsScopeStackPop (WalkState);
             if (ACPI_FAILURE (Status))
             {
-                return_ACPI_STATUS (Status);
+                goto ErrorExit;
             }
         }
     }
@@ -386,7 +386,7 @@ AcpiDsExecBeginOp (
         Status = AcpiDsResultStackPush (WalkState);
         if (ACPI_FAILURE (Status))
         {
-            return_ACPI_STATUS (Status);
+            goto ErrorExit;
         }
 
         Status = AcpiDsExecBeginControlOp (WalkState, Op);
@@ -432,6 +432,11 @@ AcpiDsExecBeginOp (
 
     /* Nothing to do here during method execution */
 
+    return_ACPI_STATUS (Status);
+
+
+ErrorExit:
+    Status = AcpiDsMethodError (Status, WalkState);
     return_ACPI_STATUS (Status);
 }
 

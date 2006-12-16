@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acdisasm.h - AML disassembler
- *       $Revision: 1.35 $
+ *       $Revision: 1.38 $
  *
  *****************************************************************************/
 
@@ -174,9 +174,11 @@ typedef const struct acpi_dmtable_info
 #define ACPI_DMT_CHKSUM                 20
 #define ACPI_DMT_SPACEID                21
 #define ACPI_DMT_GAS                    22
-#define ACPI_DMT_MADT                   23
-#define ACPI_DMT_SRAT                   24
-#define ACPI_DMT_EXIT                   25
+#define ACPI_DMT_DMAR                   23
+#define ACPI_DMT_MADT                   24
+#define ACPI_DMT_SRAT                   25
+#define ACPI_DMT_EXIT                   26
+#define ACPI_DMT_SIG                    27
 
 typedef
 void (*ACPI_TABLE_HANDLER) (
@@ -187,6 +189,7 @@ typedef struct acpi_dmtable_data
     char                    *Signature;
     ACPI_DMTABLE_INFO        *TableInfo;
     ACPI_TABLE_HANDLER      TableHandler;
+    char                    *Name;
 
 } ACPI_DMTABLE_DATA;
 
@@ -226,7 +229,9 @@ extern const char               *AcpiGbl_MatchOps[];
 
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf0[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf1[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf1a[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf2[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf2a[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf3[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf4[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsfHdr[];
@@ -234,6 +239,11 @@ extern ACPI_DMTABLE_INFO        AcpiDmTableInfoBoot[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoCpep[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoCpep0[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDbgp[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDmar[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDmarHdr[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDmarScope[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDmar0[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDmar1[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoEcdt[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoFacs[];
 extern ACPI_DMTABLE_INFO        AcpiDmTableInfoFadt1[];
@@ -305,6 +315,10 @@ AcpiDmDumpAsf (
 
 void
 AcpiDmDumpCpep (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpDmar (
     ACPI_TABLE_HEADER       *Table);
 
 void
@@ -504,7 +518,7 @@ AcpiDmResourceTemplate (
     UINT8                   *ByteData,
     UINT32                  ByteCount);
 
-BOOLEAN
+ACPI_STATUS
 AcpiDmIsResourceTemplate (
     ACPI_PARSE_OBJECT       *Op);
 

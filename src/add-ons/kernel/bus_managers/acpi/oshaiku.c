@@ -145,6 +145,8 @@ extern pci_module_info *gPCIManager;
 extern FILE                    *AcpiGbl_DebugFile;
 FILE                           *AcpiGbl_OutputFile;
 
+static uint32 acpi_root = 0;
+
 
 /******************************************************************************
  *
@@ -191,18 +193,23 @@ AcpiOsTerminate (void)
  *
  *****************************************************************************/
 
-ACPI_STATUS
-AcpiOsGetRootPointer (
-    UINT32                  Flags,
-    ACPI_POINTER           *Address)
+ACPI_PHYSICAL_ADDRESS
+AcpiOsGetRootPointer (void)
 {
-	#ifdef _KERNEL_MODE
-	return (AcpiFindRootPointer(Flags,Address));
-	
-	#else
+#ifdef _KERNEL_MODE
+	ACPI_NATIVE_UINT address;
+	ACPI_STATUS status;
+	if (acpi_root == 0) {
+		status = AcpiFindRootPointer(&address);
+		if (status == AE_OK)
+			acpi_root = address;
+	}
+	dprintf("AcpiOsGetRootPointer returning %p\n", (void *)acpi_root);
+	return acpi_root;
+#else
 
-    return (AeLocalGetRootPointer(Flags, Address));
-	#endif
+	return (AeLocalGetRootPointer());
+#endif
 }
 
 
@@ -487,25 +494,24 @@ AcpiOsGetLine (
 
 #define ROUNDUP(size, blocksize) 	(((size) + (blocksize) - 1) & ~((blocksize) - 1))
 
-ACPI_STATUS
+void *
 AcpiOsMapMemory (
     ACPI_PHYSICAL_ADDRESS   where,
-    ACPI_SIZE               length,
-    void                    **there)
+    ACPI_NATIVE_UINT	length)
 {
 
 #ifdef _KERNEL_MODE
 	uint32 page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
 	void *map_base = ACPI_ADD_PTR(void,where,0L - page_offset);
 	area_id area;
+	void *there;
 
-	area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
-		
-	*there += page_offset;
-	
+	area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,&there);
+	there += page_offset;
+	return there;
 #endif
 
-    return (area > 0 ? AE_OK : AE_BAD_ADDRESS);
+    return NULL;
 }
 
 

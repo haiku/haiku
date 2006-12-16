@@ -24,9 +24,6 @@ status_t acpi_rescan_stub(void);
 
 
 
-
-
-
 struct acpi_module_info acpi_module = {
 	{
 		{
@@ -68,21 +65,28 @@ acpi_std_ops(int32 op,...)
 				AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
 				AcpiDbgLayer = ACPI_ALL_COMPONENTS;
 			#endif
-			
-			/* Bring up ACPI */
+
 			Status = AcpiInitializeSubsystem();
 			if (Status != AE_OK) {
-				ERROR("AcpiInitializeSubsystem() failed (%s)\n",AcpiFormatException(Status));
+				ERROR("AcpiInitializeSubsystem failed (%s)\n", AcpiFormatException(Status));
 				return B_ERROR;
 			}
+			
+			Status = AcpiInitializeTables(NULL, 0, TRUE);
+			if (Status != AE_OK) {
+				ERROR("AcpiInitializeTables failed (%s)\n", AcpiFormatException(Status));
+				return B_ERROR;
+			}
+
 			Status = AcpiLoadTables();
 			if (Status != AE_OK) {
-				ERROR("AcpiLoadTables failed (%s)\n",AcpiFormatException(Status));
+				ERROR("AcpiLoadTables failed (%s)\n", AcpiFormatException(Status));
 				return B_ERROR;
 			}
+			
 			Status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
 			if (Status != AE_OK) {
-				ERROR("AcpiEnableSubsystem failed (%s)\n",AcpiFormatException(Status));
+				ERROR("AcpiEnableSubsystem failed (%s)\n", AcpiFormatException(Status));
 				return B_ERROR;
 			}
 			

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dsinit - Object initialization namespace walk
- *              $Revision: 1.25 $
+ *              $Revision: 1.27 $
  *
  *****************************************************************************/
 
@@ -119,6 +119,7 @@
 #include "acpi.h"
 #include "acdispat.h"
 #include "acnamesp.h"
+#include "actables.h"
 
 #define _COMPONENT          ACPI_DISPATCHER
         ACPI_MODULE_NAME    ("dsinit")
@@ -173,7 +174,7 @@ AcpiDsInitOneObject (
      * We are only interested in NS nodes owned by the table that
      * was just loaded
      */
-    if (Node->OwnerId != Info->TableDesc->OwnerId)
+    if (Node->OwnerId != Info->OwnerId)
     {
         return (AE_OK);
     }
@@ -240,15 +241,23 @@ AcpiDsInitOneObject (
 
 ACPI_STATUS
 AcpiDsInitializeObjects (
-    ACPI_TABLE_DESC         *TableDesc,
+    ACPI_NATIVE_UINT        TableIndex,
     ACPI_NAMESPACE_NODE     *StartNode)
 {
     ACPI_STATUS             Status;
     ACPI_INIT_WALK_INFO     Info;
+    ACPI_TABLE_HEADER       *Table;
+    ACPI_OWNER_ID           OwnerId;
 
 
     ACPI_FUNCTION_TRACE (DsInitializeObjects);
 
+
+    Status = AcpiTbGetOwnerId (TableIndex, &OwnerId);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
 
     ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
         "**** Starting initialization of namespace objects ****\n"));
@@ -258,7 +267,8 @@ AcpiDsInitializeObjects (
     Info.OpRegionCount  = 0;
     Info.ObjectCount    = 0;
     Info.DeviceCount    = 0;
-    Info.TableDesc      = TableDesc;
+    Info.TableIndex     = TableIndex;
+    Info.OwnerId        = OwnerId;
 
     /* Walk entire namespace from the supplied root */
 
@@ -269,9 +279,15 @@ AcpiDsInitializeObjects (
         ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
     }
 
+    Status = AcpiGetTableByIndex (TableIndex, &Table);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
         "\nTable [%4.4s](id %4.4X) - %hd Objects with %hd Devices %hd Methods %hd Regions\n",
-        TableDesc->Pointer->Signature, TableDesc->OwnerId, Info.ObjectCount,
+        Table->Signature, OwnerId, Info.ObjectCount,
         Info.DeviceCount, Info.MethodCount, Info.OpRegionCount));
 
     ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,

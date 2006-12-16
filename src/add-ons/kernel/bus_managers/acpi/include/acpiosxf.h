@@ -171,10 +171,9 @@ AcpiOsTerminate (
 /*
  * ACPI Table interfaces
  */
-ACPI_STATUS
+ACPI_PHYSICAL_ADDRESS
 AcpiOsGetRootPointer (
-    UINT32                  Flags,
-    ACPI_POINTER            *Address);
+    void);
 
 ACPI_STATUS
 AcpiOsPredefinedOverride (
@@ -272,11 +271,10 @@ void
 AcpiOsFree (
     void *                  Memory);
 
-ACPI_STATUS
+void *
 AcpiOsMapMemory (
-    ACPI_PHYSICAL_ADDRESS   PhysicalAddress,
-    ACPI_SIZE               Size,
-    void                    **LogicalAddress);
+    ACPI_PHYSICAL_ADDRESS   Where,
+    ACPI_NATIVE_UINT        Length);
 
 void
 AcpiOsUnmapMemory (

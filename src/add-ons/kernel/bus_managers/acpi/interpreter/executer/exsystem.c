@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exsystem - Interface to OS services
- *              $Revision: 1.90 $
+ *              $Revision: 1.92 $
  *
  *****************************************************************************/
 
@@ -146,7 +146,6 @@ AcpiExSystemWaitSemaphore (
     UINT16                  Timeout)
 {
     ACPI_STATUS             Status;
-    ACPI_STATUS             Status2;
 
 
     ACPI_FUNCTION_TRACE (ExSystemWaitSemaphore);
@@ -162,7 +161,7 @@ AcpiExSystemWaitSemaphore (
     {
         /* We must wait, so unlock the interpreter */
 
-        AcpiExExitInterpreter ();
+        AcpiExRelinquishInterpreter ();
 
         Status = AcpiOsWaitSemaphore (Semaphore, 1, Timeout);
 
@@ -172,13 +171,7 @@ AcpiExSystemWaitSemaphore (
 
         /* Reacquire the interpreter */
 
-        Status2 = AcpiExEnterInterpreter ();
-        if (ACPI_FAILURE (Status2))
-        {
-            /* Report fatal error, could not acquire interpreter */
-
-            return_ACPI_STATUS (Status2);
-        }
+       AcpiExReacquireInterpreter ();
     }
 
     return_ACPI_STATUS (Status);
@@ -206,7 +199,6 @@ AcpiExSystemWaitMutex (
     UINT16                  Timeout)
 {
     ACPI_STATUS             Status;
-    ACPI_STATUS             Status2;
 
 
     ACPI_FUNCTION_TRACE (ExSystemWaitMutex);
@@ -222,7 +214,7 @@ AcpiExSystemWaitMutex (
     {
         /* We must wait, so unlock the interpreter */
 
-        AcpiExExitInterpreter ();
+        AcpiExRelinquishInterpreter ();
 
         Status = AcpiOsAcquireMutex (Mutex, Timeout);
 
@@ -232,13 +224,7 @@ AcpiExSystemWaitMutex (
 
         /* Reacquire the interpreter */
 
-        Status2 = AcpiExEnterInterpreter ();
-        if (ACPI_FAILURE (Status2))
-        {
-            /* Report fatal error, could not acquire interpreter */
-
-            return_ACPI_STATUS (Status2);
-        }
+        AcpiExReacquireInterpreter ();
     }
 
     return_ACPI_STATUS (Status);
@@ -310,110 +296,19 @@ ACPI_STATUS
 AcpiExSystemDoSuspend (
     ACPI_INTEGER            HowLong)
 {
-    ACPI_STATUS             Status;
-
-
     ACPI_FUNCTION_ENTRY ();
 
 
     /* Since this thread will sleep, we must release the interpreter */
 
-    AcpiExExitInterpreter ();
+    AcpiExRelinquishInterpreter ();
 
     AcpiOsSleep (HowLong);
 
     /* And now we must get the interpreter again */
 
-    Status = AcpiExEnterInterpreter ();
-    return (Status);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiExSystemAcquireMutex
- *
- * PARAMETERS:  TimeDesc        - Maximum time to wait for the mutex
- *              ObjDesc         - The object descriptor for this op
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Provides an access point to perform synchronization operations
- *              within the AML.  This function will cause a lock to be generated
- *              for the Mutex pointed to by ObjDesc.
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiExSystemAcquireMutex (
-    ACPI_OPERAND_OBJECT     *TimeDesc,
-    ACPI_OPERAND_OBJECT     *ObjDesc)
-{
-    ACPI_STATUS             Status = AE_OK;
-
-
-    ACPI_FUNCTION_TRACE_PTR (ExSystemAcquireMutex, ObjDesc);
-
-
-    if (!ObjDesc)
-    {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    /* Support for the _GL_ Mutex object -- go get the global lock */
-
-    if (ObjDesc->Mutex.OsMutex == ACPI_GLOBAL_LOCK)
-    {
-        Status = AcpiEvAcquireGlobalLock ((UINT16) TimeDesc->Integer.Value);
-        return_ACPI_STATUS (Status);
-    }
-
-    Status = AcpiExSystemWaitMutex (ObjDesc->Mutex.OsMutex,
-                (UINT16) TimeDesc->Integer.Value);
-    return_ACPI_STATUS (Status);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiExSystemReleaseMutex
- *
- * PARAMETERS:  ObjDesc         - The object descriptor for this op
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Provides an access point to perform synchronization operations
- *              within the AML.  This operation is a request to release a
- *              previously acquired Mutex.  If the Mutex variable is set then
- *              it will be decremented.
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiExSystemReleaseMutex (
-    ACPI_OPERAND_OBJECT     *ObjDesc)
-{
-    ACPI_STATUS             Status = AE_OK;
-
-
-    ACPI_FUNCTION_TRACE (ExSystemReleaseMutex);
-
-
-    if (!ObjDesc)
-    {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    /* Support for the _GL_ Mutex object -- release the global lock */
-
-    if (ObjDesc->Mutex.OsMutex == ACPI_GLOBAL_LOCK)
-    {
-        Status = AcpiEvReleaseGlobalLock ();
-        return_ACPI_STATUS (Status);
-    }
-
-    AcpiOsReleaseMutex (ObjDesc->Mutex.OsMutex);
-    return_ACPI_STATUS (AE_OK);
+    AcpiExReacquireInterpreter ();
+    return (AE_OK);
 }
 
 

@@ -2,7 +2,7 @@
  *
  * Module Name: dsopcode - Dispatcher Op Region support and handling of
  *                         "control" opcodes
- *              $Revision: 1.108 $
+ *              $Revision: 1.109 $
  *
  *****************************************************************************/
 
@@ -200,7 +200,7 @@ AcpiDsExecuteArguments (
     }
 
     Status = AcpiDsInitAmlWalk (WalkState, Op, NULL, AmlStart,
-                    AmlLength, NULL, 1);
+                    AmlLength, NULL, ACPI_IMODE_LOAD_PASS1);
     if (ACPI_FAILURE (Status))
     {
         AcpiDsDeleteWalkState (WalkState);
@@ -247,7 +247,7 @@ AcpiDsExecuteArguments (
     /* Execute the opcode and arguments */
 
     Status = AcpiDsInitAmlWalk (WalkState, Op, NULL, AmlStart,
-                    AmlLength, NULL, 3);
+                    AmlLength, NULL, ACPI_IMODE_EXECUTE);
     if (ACPI_FAILURE (Status))
     {
         AcpiDsDeleteWalkState (WalkState);

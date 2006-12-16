@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exutils - interpreter/scanner utilities
- *              $Revision: 1.123 $
+ *              $Revision: 1.125 $
  *
  *****************************************************************************/
 
@@ -156,18 +156,20 @@ AcpiExDigitsNeeded (
  *
  * PARAMETERS:  None
  *
- * RETURN:      Status
+ * RETURN:      None
  *
- * DESCRIPTION: Enter the interpreter execution region.  Failure to enter
- *              the interpreter region is a fatal system error
+ * DESCRIPTION: Enter the interpreter execution region. Failure to enter
+ *              the interpreter region is a fatal system error. Used in
+ *              conjunction with ExitInterpreter.
  *
  ******************************************************************************/
 
-ACPI_STATUS
+void
 AcpiExEnterInterpreter (
     void)
 {
     ACPI_STATUS             Status;
+
 
     ACPI_FUNCTION_TRACE (ExEnterInterpreter);
 
@@ -175,10 +177,46 @@ AcpiExEnterInterpreter (
     Status = AcpiUtAcquireMutex (ACPI_MTX_INTERPRETER);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_ERROR ((AE_INFO, "Could not acquire interpreter mutex"));
+        ACPI_ERROR ((AE_INFO, "Could not acquire AML Interpreter mutex"));
     }
 
-    return_ACPI_STATUS (Status);
+    return_VOID;
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiExReacquireInterpreter
+ *
+ * PARAMETERS:  None
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Reacquire the interpreter execution region from within the
+ *              interpreter code. Failure to enter the interpreter region is a
+ *              fatal system error. Used in  conjuction with
+ *              RelinquishInterpreter
+ *
+ ******************************************************************************/
+
+void
+AcpiExReacquireInterpreter (
+    void)
+{
+    ACPI_FUNCTION_TRACE (ExReacquireInterpreter);
+
+
+    /*
+     * If the global serialized flag is set, do not release the interpreter,
+     * since it was not actually released by AcpiExRelinquishInterpreter.
+     * This forces the interpreter to be single threaded.
+     */
+    if (!AcpiGbl_AllMethodsSerialized)
+    {
+        AcpiExEnterInterpreter ();
+    }
+
+    return_VOID;
 }
 
 
@@ -190,17 +228,9 @@ AcpiExEnterInterpreter (
  *
  * RETURN:      None
  *
- * DESCRIPTION: Exit the interpreter execution region
- *
- * Cases where the interpreter is unlocked:
- *      1) Completion of the execution of a control method
- *      2) Method blocked on a Sleep() AML opcode
- *      3) Method blocked on an Acquire() AML opcode
- *      4) Method blocked on a Wait() AML opcode
- *      5) Method blocked to acquire the global lock
- *      6) Method blocked to execute a serialized control method that is
- *          already executing
- *      7) About to invoke a user-installed opregion handler
+ * DESCRIPTION: Exit the interpreter execution region. This is the top level
+ *              routine used to exit the interpreter when all processing has
+ *              been completed.
  *
  ******************************************************************************/
 
@@ -217,7 +247,50 @@ AcpiExExitInterpreter (
     Status = AcpiUtReleaseMutex (ACPI_MTX_INTERPRETER);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_ERROR ((AE_INFO, "Could not release interpreter mutex"));
+        ACPI_ERROR ((AE_INFO, "Could not release AML Interpreter mutex"));
+    }
+
+    return_VOID;
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiExRelinquishInterpreter
+ *
+ * PARAMETERS:  None
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Exit the interpreter execution region, from within the
+ *              interpreter - before attempting an operation that will possibly
+ *              block the running thread.
+ *
+ * Cases where the interpreter is unlocked internally
+ *      1) Method to be blocked on a Sleep() AML opcode
+ *      2) Method to be blocked on an Acquire() AML opcode
+ *      3) Method to be blocked on a Wait() AML opcode
+ *      4) Method to be blocked to acquire the global lock
+ *      5) Method to be blocked waiting to execute a serialized control method
+ *          that is currently executing
+ *      6) About to invoke a user-installed opregion handler
+ *
+ ******************************************************************************/
+
+void
+AcpiExRelinquishInterpreter (
+    void)
+{
+    ACPI_FUNCTION_TRACE (ExRelinquishInterpreter);
+
+
+    /*
+     * If the global serialized flag is set, do not release the interpreter.
+     * This forces the interpreter to be single threaded.
+     */
+    if (!AcpiGbl_AllMethodsSerialized)
+    {
+        AcpiExExitInterpreter ();
     }
 
     return_VOID;
@@ -232,8 +305,8 @@ AcpiExExitInterpreter (
  *
  * RETURN:      none
  *
- * DESCRIPTION: Truncate a number to 32-bits if the currently executing method
- *              belongs to a 32-bit ACPI table.
+ * DESCRIPTION: Truncate an ACPI Integer to 32 bits if the execution mode is
+ *              32-bit, as determined by the revision of the DSDT.
  *
  ******************************************************************************/
 

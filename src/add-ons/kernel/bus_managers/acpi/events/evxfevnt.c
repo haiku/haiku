@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evxfevnt - External Interfaces, ACPI event disable/enable
- *              $Revision: 1.88 $
+ *              $Revision: 1.92 $
  *
  *****************************************************************************/
 
@@ -120,6 +120,7 @@
 #include "acpi.h"
 #include "acevents.h"
 #include "acnamesp.h"
+#include "actables.h"
 
 #define _COMPONENT          ACPI_EVENTS
         ACPI_MODULE_NAME    ("evxfevnt")
@@ -147,13 +148,14 @@ AcpiEnable (
     ACPI_FUNCTION_TRACE (AcpiEnable);
 
 
-    /* Make sure we have the FADT */
+    /* ACPI tables must be present */
 
-    if (!AcpiGbl_FADT)
+    if (!AcpiTbTablesLoaded ())
     {
-        ACPI_WARNING ((AE_INFO, "No FADT information present!"));
         return_ACPI_STATUS (AE_NO_ACPI_TABLES);
     }
+
+    /* Check current mode */
 
     if (AcpiHwGetMode() == ACPI_SYS_MODE_ACPI)
     {
@@ -201,12 +203,6 @@ AcpiDisable (
 
     ACPI_FUNCTION_TRACE (AcpiDisable);
 
-
-    if (!AcpiGbl_FADT)
-    {
-        ACPI_WARNING ((AE_INFO, "No FADT information present!"));
-        return_ACPI_STATUS (AE_NO_ACPI_TABLES);
-    }
 
     if (AcpiHwGetMode() == ACPI_SYS_MODE_LEGACY)
     {
@@ -271,8 +267,7 @@ AcpiEnableEvent (
      * Enable the requested fixed event (by writing a one to the
      * enable register bit)
      */
-    Status = AcpiSetRegister (AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
-                1, ACPI_MTX_LOCK);
+    Status = AcpiSetRegister (AcpiGbl_FixedEventInfo[Event].EnableRegisterId, 1);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -281,7 +276,7 @@ AcpiEnableEvent (
     /* Make sure that the hardware responded */
 
     Status = AcpiGetRegister (AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
-                    &Value, ACPI_MTX_LOCK);
+                    &Value);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -512,15 +507,14 @@ AcpiDisableEvent (
      * Disable the requested fixed event (by writing a zero to the
      * enable register bit)
      */
-    Status = AcpiSetRegister (AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
-                0, ACPI_MTX_LOCK);
+    Status = AcpiSetRegister (AcpiGbl_FixedEventInfo[Event].EnableRegisterId, 0);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
 
     Status = AcpiGetRegister (AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
-                &Value, ACPI_MTX_LOCK);
+                &Value);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -572,8 +566,7 @@ AcpiClearEvent (
      * Clear the requested fixed event (By writing a one to the
      * status register bit)
      */
-    Status = AcpiSetRegister (AcpiGbl_FixedEventInfo[Event].StatusRegisterId,
-            1, ACPI_MTX_LOCK);
+    Status = AcpiSetRegister (AcpiGbl_FixedEventInfo[Event].StatusRegisterId, 1);
 
     return_ACPI_STATUS (Status);
 }
@@ -681,7 +674,7 @@ AcpiGetEventStatus (
     /* Get the status of the requested fixed event */
 
     Status = AcpiGetRegister (AcpiGbl_FixedEventInfo[Event].StatusRegisterId,
-                    EventStatus, ACPI_MTX_LOCK);
+                    EventStatus);
 
     return_ACPI_STATUS (Status);
 }

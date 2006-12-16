@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dswload - Dispatcher namespace load callbacks
- *              $Revision: 1.109 $
+ *              $Revision: 1.116 $
  *
  *****************************************************************************/
 
@@ -281,6 +281,7 @@ AcpiDsLoad1BeginOp (
          */
         switch (Node->Type)
         {
+        case ACPI_TYPE_ANY:
         case ACPI_TYPE_LOCAL_SCOPE:         /* Scope  */
         case ACPI_TYPE_DEVICE:
         case ACPI_TYPE_POWER:
@@ -635,6 +636,7 @@ AcpiDsLoad2BeginOp (
     ACPI_STATUS             Status;
     ACPI_OBJECT_TYPE        ObjectType;
     char                    *BufferPtr;
+    UINT32                  Flags;
 
 
     ACPI_FUNCTION_TRACE (DsLoad2BeginOp);
@@ -766,6 +768,7 @@ AcpiDsLoad2BeginOp (
          */
         switch (Node->Type)
         {
+        case ACPI_TYPE_ANY:
         case ACPI_TYPE_LOCAL_SCOPE:         /* Scope */
         case ACPI_TYPE_DEVICE:
         case ACPI_TYPE_POWER:
@@ -845,11 +848,18 @@ AcpiDsLoad2BeginOp (
             break;
         }
 
-        /* Add new entry into namespace */
+        Flags = ACPI_NS_NO_UPSEARCH;
+        if (WalkState->PassNumber == ACPI_IMODE_EXECUTE)
+        {
+            /* Execution mode, node cannot already exist, node is temporary */
+
+            Flags |= (ACPI_NS_ERROR_IF_FOUND | ACPI_NS_TEMPORARY);
+        }
+
+        /* Add new entry or lookup existing entry */
 
         Status = AcpiNsLookup (WalkState->ScopeInfo, BufferPtr, ObjectType,
-                        ACPI_IMODE_LOAD_PASS2, ACPI_NS_NO_UPSEARCH,
-                        WalkState, &(Node));
+                    ACPI_IMODE_LOAD_PASS2, Flags, WalkState, &Node);
         break;
     }
 
@@ -1154,6 +1164,9 @@ AcpiDsLoad2EndOp (
             /*
              * If we have a valid region, initialize it
              * Namespace is NOT locked at this point.
+             *
+             * TBD: need to unlock interpreter if it is locked, in order
+             * to allow _REG methods to be run.
              */
             Status = AcpiEvInitializeRegion (AcpiNsGetAttachedObject (Node),
                         FALSE);

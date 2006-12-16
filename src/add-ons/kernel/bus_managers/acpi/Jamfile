@@ -34,6 +34,15 @@ local hardware_src =
 	hwtimer.c
 ;
 
+local debugger_src =
+	dbdisply.c
+	dbxface.c
+;
+
+local disassembler_src =
+	dmobject.c
+;
+
 local dispatcher_src =
 	dsfield.c
 	dsinit.c
@@ -121,11 +130,9 @@ local resources_src =
 	;
 
 local tables_src =
-	tbconvrt.c
-	tbget.c
-	tbgetall.c
+	tbfadt.c
+	tbfind.c
 	tbinstal.c
-	tbrsdt.c
 	tbutils.c
 	tbxface.c
 	tbxfroot.c

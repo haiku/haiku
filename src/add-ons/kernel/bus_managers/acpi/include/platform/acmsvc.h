@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acmsvc.h - VC specific defines, etc.
- *       $Revision: 1.25 $
+ *       $Revision: 1.26 $
  *
  *****************************************************************************/
 
@@ -167,9 +167,6 @@
     n_lo >>= 1;    \
 }
 #endif
-
-/* warn C4214: nonstandard extension used : bit field types other than int */
-#pragma warning(disable:4214)
 
 /* warn C4100: unreferenced formal parameter */
 #pragma warning(disable:4100)

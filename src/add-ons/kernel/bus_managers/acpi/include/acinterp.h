@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acinterp.h - Interpreter subcomponent prototypes and defines
- *       $Revision: 1.166 $
+ *       $Revision: 1.168 $
  *
  *****************************************************************************/
 
@@ -427,15 +427,6 @@ AcpiExSystemDoStall (
     UINT32                  Time);
 
 ACPI_STATUS
-AcpiExSystemAcquireMutex(
-    ACPI_OPERAND_OBJECT     *Time,
-    ACPI_OPERAND_OBJECT     *ObjDesc);
-
-ACPI_STATUS
-AcpiExSystemReleaseMutex(
-    ACPI_OPERAND_OBJECT     *ObjDesc);
-
-ACPI_STATUS
 AcpiExSystemSignalEvent(
     ACPI_OPERAND_OBJECT     *ObjDesc);
 
@@ -674,12 +665,20 @@ AcpiExCopyIntegerToBufferField (
 /*
  * exutils - interpreter/scanner utilities
  */
-ACPI_STATUS
+void
 AcpiExEnterInterpreter (
     void);
 
 void
 AcpiExExitInterpreter (
+    void);
+
+void
+AcpiExReacquireInterpreter (
+    void);
+
+void
+AcpiExRelinquishInterpreter (
     void);
 
 void

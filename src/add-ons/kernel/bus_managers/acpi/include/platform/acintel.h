@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acintel.h - VC specific defines, etc.
- *       $Revision: 1.16 $
+ *       $Revision: 1.17 $
  *
  *****************************************************************************/
 
@@ -120,6 +120,8 @@
 
 #define COMPILER_DEPENDENT_INT64   __int64
 #define COMPILER_DEPENDENT_UINT64  unsigned __int64
+
+#define inline                  __inline
 
 /*
  * Calling conventions:

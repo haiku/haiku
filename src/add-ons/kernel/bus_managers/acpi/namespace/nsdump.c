@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsdump - table dumping routines for debug
- *              $Revision: 1.178 $
+ *              $Revision: 1.181 $
  *
  *****************************************************************************/
 
@@ -313,7 +313,7 @@ AcpiNsDumpOneObject (
 
         if (!AcpiUtValidAcpiName (ThisNode->Name.Integer))
         {
-            ThisNode->Name.Integer = AcpiUtRepairName (ThisNode->Name.Integer);
+            ThisNode->Name.Integer = AcpiUtRepairName (ThisNode->Name.Ascii);
 
             ACPI_WARNING ((AE_INFO, "Invalid ACPI Name %08X",
                 ThisNode->Name.Integer));
@@ -332,6 +332,13 @@ AcpiNsDumpOneObject (
     AcpiDbgLevel = 0;
     ObjDesc = AcpiNsGetAttachedObject (ThisNode);
     AcpiDbgLevel = DbgLevel;
+
+    /* Temp nodes are those nodes created by a control method */
+
+    if (ThisNode->Flags & ANOBJ_TEMPORARY)
+    {
+        AcpiOsPrintf ("(T) ");
+    }
 
     switch (Info->DisplayType & ACPI_DISPLAY_MASK)
     {
@@ -728,8 +735,8 @@ AcpiNsDumpObjects (
     Info.DisplayType = DisplayType;
 
     (void) AcpiNsWalkNamespace (Type, StartHandle, MaxDepth,
-                ACPI_NS_WALK_NO_UNLOCK, AcpiNsDumpOneObject,
-                (void *) &Info, NULL);
+                ACPI_NS_WALK_NO_UNLOCK | ACPI_NS_WALK_TEMP_NODES,
+                AcpiNsDumpOneObject, (void *) &Info, NULL);
 }
 
 

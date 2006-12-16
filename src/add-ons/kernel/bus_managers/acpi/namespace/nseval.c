@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nseval - Object evaluation, includes control method execution
- *              $Revision: 1.142 $
+ *              $Revision: 1.143 $
  *
  ******************************************************************************/
 
@@ -237,12 +237,7 @@ AcpiNsEvaluate (
          * Execute the method via the interpreter. The interpreter is locked
          * here before calling into the AML parser
          */
-        Status = AcpiExEnterInterpreter ();
-        if (ACPI_FAILURE (Status))
-        {
-            return_ACPI_STATUS (Status);
-        }
-
+        AcpiExEnterInterpreter ();
         Status = AcpiPsExecuteMethod (Info);
         AcpiExExitInterpreter ();
     }
@@ -268,11 +263,7 @@ AcpiNsEvaluate (
          * resolution, we must lock it because we could access an opregion.
          * The opregion access code assumes that the interpreter is locked.
          */
-        Status = AcpiExEnterInterpreter ();
-        if (ACPI_FAILURE (Status))
-        {
-            return_ACPI_STATUS (Status);
-        }
+        AcpiExEnterInterpreter ();
 
         /* Function has a strange interface */
 

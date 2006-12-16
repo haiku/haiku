@@ -2,7 +2,7 @@
  *
  * Module Name: nsxfeval - Public interfaces to the ACPI subsystem
  *                         ACPI Object evaluation interfaces
- *              $Revision: 1.28 $
+ *              $Revision: 1.29 $
  *
  ******************************************************************************/
 
@@ -255,7 +255,6 @@ AcpiEvaluateObject (
     ACPI_BUFFER             *ReturnBuffer)
 {
     ACPI_STATUS             Status;
-    ACPI_STATUS             Status2;
     ACPI_EVALUATE_INFO      *Info;
     ACPI_SIZE               BufferSpaceNeeded;
     UINT32                  i;
@@ -426,14 +425,12 @@ AcpiEvaluateObject (
          * Delete the internal return object. NOTE: Interpreter must be
          * locked to avoid race condition.
          */
-        Status2 = AcpiExEnterInterpreter ();
-        if (ACPI_SUCCESS (Status2))
-        {
-            /* Remove one reference on the return object (should delete it) */
+        AcpiExEnterInterpreter ();
 
-            AcpiUtRemoveReference (Info->ReturnObject);
-            AcpiExExitInterpreter ();
-        }
+        /* Remove one reference on the return object (should delete it) */
+
+        AcpiUtRemoveReference (Info->ReturnObject);
+        AcpiExExitInterpreter ();
     }
 
 

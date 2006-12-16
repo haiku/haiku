@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exregion - ACPI default OpRegion (address space) handlers
- *              $Revision: 1.98 $
+ *              $Revision: 1.99 $
  *
  *****************************************************************************/
 
@@ -240,15 +240,14 @@ AcpiExSystemMemorySpaceHandler (
 
         /* Create a new mapping starting at the address given */
 
-        Status = AcpiOsMapMemory (Address, WindowSize,
-                    (void **) &MemInfo->MappedLogicalAddress);
-        if (ACPI_FAILURE (Status))
+        MemInfo->MappedLogicalAddress = AcpiOsMapMemory ((ACPI_NATIVE_UINT) Address, WindowSize);
+        if (!MemInfo->MappedLogicalAddress)
         {
             ACPI_ERROR ((AE_INFO,
                 "Could not map memory at %8.8X%8.8X, size %X",
                 ACPI_FORMAT_UINT64 (Address), (UINT32) WindowSize));
             MemInfo->MappedLength = 0;
-            return_ACPI_STATUS (Status);
+            return_ACPI_STATUS (AE_NO_MEMORY);
         }
 
         /* Save the physical address and mapping size */

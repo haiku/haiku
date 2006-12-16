@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acdispat.h - dispatcher (parser to interpreter interface)
- *       $Revision: 1.72 $
+ *       $Revision: 1.73 $
  *
  *****************************************************************************/
 
@@ -343,7 +343,7 @@ AcpiDsMethodError (
  */
 ACPI_STATUS
 AcpiDsInitializeObjects (
-    ACPI_TABLE_DESC         *TableDesc,
+    ACPI_NATIVE_UINT        TableIndex,
     ACPI_NAMESPACE_NODE     *StartNode);
 
 

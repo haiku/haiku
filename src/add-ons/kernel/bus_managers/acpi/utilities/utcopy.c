@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utcopy - Internal to external object translation utilities
- *              $Revision: 1.128 $
+ *              $Revision: 1.129 $
  *
  *****************************************************************************/
 
@@ -842,6 +842,16 @@ AcpiUtCopySimpleObject (
          * to the object pointed to by the reference
          */
         AcpiUtAddReference (SourceDesc->Reference.Object);
+        break;
+
+    case ACPI_TYPE_REGION:
+        /*
+         * We copied the Region Handler, so we now must add a reference
+         */
+        if (DestDesc->Region.Handler)
+        {
+            AcpiUtAddReference (DestDesc->Region.Handler);
+        }
         break;
 
     default:

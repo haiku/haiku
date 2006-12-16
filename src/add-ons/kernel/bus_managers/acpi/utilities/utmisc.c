@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utmisc - common utility procedures
- *              $Revision: 1.146 $
+ *              $Revision: 1.150 $
  *
  ******************************************************************************/
 
@@ -127,6 +127,86 @@
 
 /*******************************************************************************
  *
+ * FUNCTION:    AcpiUtValidateException
+ *
+ * PARAMETERS:  Status       - The ACPI_STATUS code to be formatted
+ *
+ * RETURN:      A string containing the exception text. NULL if exception is
+ *              not valid.
+ *
+ * DESCRIPTION: This function validates and translates an ACPI exception into
+ *              an ASCII string.
+ *
+ ******************************************************************************/
+
+const char *
+AcpiUtValidateException (
+    ACPI_STATUS             Status)
+{
+    ACPI_STATUS             SubStatus;
+    const char              *Exception = NULL;
+
+
+    ACPI_FUNCTION_ENTRY ();
+
+
+    /*
+     * Status is composed of two parts, a "type" and an actual code
+     */
+    SubStatus = (Status & ~AE_CODE_MASK);
+
+    switch (Status & AE_CODE_MASK)
+    {
+    case AE_CODE_ENVIRONMENTAL:
+
+        if (SubStatus <= AE_CODE_ENV_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Env [SubStatus];
+        }
+        break;
+
+    case AE_CODE_PROGRAMMER:
+
+        if (SubStatus <= AE_CODE_PGM_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Pgm [SubStatus -1];
+        }
+        break;
+
+    case AE_CODE_ACPI_TABLES:
+
+        if (SubStatus <= AE_CODE_TBL_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Tbl [SubStatus -1];
+        }
+        break;
+
+    case AE_CODE_AML:
+
+        if (SubStatus <= AE_CODE_AML_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Aml [SubStatus -1];
+        }
+        break;
+
+    case AE_CODE_CONTROL:
+
+        if (SubStatus <= AE_CODE_CTRL_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Ctrl [SubStatus -1];
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return (ACPI_CAST_PTR (const char, Exception));
+}
+
+
+/*******************************************************************************
+ *
  * FUNCTION:    AcpiUtIsAmlTable
  *
  * PARAMETERS:  Table               - An ACPI table
@@ -146,9 +226,9 @@ AcpiUtIsAmlTable (
 
     /* These are the only tables that contain executable AML */
 
-    if (ACPI_COMPARE_NAME (Table->Signature, DSDT_SIG) ||
-        ACPI_COMPARE_NAME (Table->Signature, PSDT_SIG) ||
-        ACPI_COMPARE_NAME (Table->Signature, SSDT_SIG))
+    if (ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_DSDT) ||
+        ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_PSDT) ||
+        ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_SSDT))
     {
         return (TRUE);
     }
@@ -544,7 +624,7 @@ AcpiUtSetIntegerWidth (
     UINT8                   Revision)
 {
 
-    if (Revision <= 1)
+    if (Revision < 2)
     {
         /* 32-bit case */
 
@@ -733,29 +813,28 @@ AcpiUtValidAcpiName (
 
 ACPI_NAME
 AcpiUtRepairName (
-    ACPI_NAME               Name)
+    char                    *Name)
 {
-    char                    *NamePtr = ACPI_CAST_PTR (char, &Name);
-    char                    NewName[ACPI_NAME_SIZE];
     ACPI_NATIVE_UINT        i;
+    char                    NewName[ACPI_NAME_SIZE];
 
 
     for (i = 0; i < ACPI_NAME_SIZE; i++)
     {
-        NewName[i] = NamePtr[i];
+        NewName[i] = Name[i];
 
         /*
          * Replace a bad character with something printable, yet technically
          * still invalid. This prevents any collisions with existing "good"
          * names in the namespace.
          */
-        if (!AcpiUtValidAcpiChar (NamePtr[i], i))
+        if (!AcpiUtValidAcpiChar (Name[i], i))
         {
             NewName[i] = '*';
         }
     }
 
-    return (*ACPI_CAST_PTR (UINT32, NewName));
+    return (*(UINT32 *) NewName);
 }
 
 
@@ -1217,10 +1296,14 @@ AcpiUtInfo (
     va_list                 args;
 
 
-    AcpiOsPrintf ("ACPI (%s-%04d): ", ModuleName, LineNumber);
+    /*
+     * Removed ModuleName, LineNumber, and acpica version, not needed
+     * for info output
+     */
+    AcpiOsPrintf ("ACPI: ");
 
     va_start (args, Format);
     AcpiOsVprintf (Format, args);
-    AcpiOsPrintf (" [%X]\n", ACPI_CA_VERSION);
+    AcpiOsPrintf ("\n");
 }
 

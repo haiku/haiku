@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evxface - External interfaces for ACPI events
- *              $Revision: 1.161 $
+ *              $Revision: 1.162 $
  *
  *****************************************************************************/
 
@@ -906,12 +906,9 @@ AcpiAcquireGlobalLock (
         return (AE_BAD_PARAMETER);
     }
 
-    Status = AcpiExEnterInterpreter ();
-    if (ACPI_FAILURE (Status))
-    {
-        return (Status);
-    }
+    /* Must lock interpreter to prevent race conditions */
 
+    AcpiExEnterInterpreter ();
     Status = AcpiEvAcquireGlobalLock (Timeout);
     AcpiExExitInterpreter ();
 

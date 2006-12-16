@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evrgnini- ACPI AddressSpace (OpRegion) init
- *              $Revision: 1.84 $
+ *              $Revision: 1.87 $
  *
  *****************************************************************************/
 
@@ -123,6 +123,16 @@
 
 #define _COMPONENT          ACPI_EVENTS
         ACPI_MODULE_NAME    ("evrgnini")
+
+/* Local prototypes */
+
+static BOOLEAN
+AcpiEvMatchPciRootBridge (
+    char                    *Id);
+
+static BOOLEAN
+AcpiEvIsPciRootBridge (
+    ACPI_NAMESPACE_NODE     *Node);
 
 
 /*******************************************************************************
@@ -259,8 +269,8 @@ AcpiEvPciConfigRegionSetup (
     ACPI_OPERAND_OBJECT     *HandlerObj;
     ACPI_NAMESPACE_NODE     *ParentNode;
     ACPI_NAMESPACE_NODE     *PciRootNode;
+    ACPI_NAMESPACE_NODE     *PciDeviceNode;
     ACPI_OPERAND_OBJECT     *RegionObj = (ACPI_OPERAND_OBJECT  *) Handle;
-    ACPI_DEVICE_ID          ObjectHID;
 
 
     ACPI_FUNCTION_TRACE (EvPciConfigRegionSetup);
@@ -310,43 +320,35 @@ AcpiEvPciConfigRegionSetup (
         PciRootNode = ParentNode;
         while (PciRootNode != AcpiGbl_RootNode)
         {
-            Status = AcpiUtExecute_HID (PciRootNode, &ObjectHID);
-            if (ACPI_SUCCESS (Status))
-            {
-                /*
-                 * Got a valid _HID string, check if this is a PCI root.
-                 * New for ACPI 3.0: check for a PCI Express root also.
-                 */
-                if (!(ACPI_STRNCMP (ObjectHID.Value, PCI_ROOT_HID_STRING,
-                                    sizeof (PCI_ROOT_HID_STRING))           ||
-                    !(ACPI_STRNCMP (ObjectHID.Value, PCI_EXPRESS_ROOT_HID_STRING,
-                                    sizeof (PCI_EXPRESS_ROOT_HID_STRING)))))
-                {
-                    /* Install a handler for this PCI root bridge */
+            /* Get the _HID/_CID in order to detect a RootBridge */
 
-                    Status = AcpiInstallAddressSpaceHandler ((ACPI_HANDLE) PciRootNode,
-                                        ACPI_ADR_SPACE_PCI_CONFIG,
-                                        ACPI_DEFAULT_HANDLER, NULL, NULL);
-                    if (ACPI_FAILURE (Status))
+            if (AcpiEvIsPciRootBridge (PciRootNode))
+            {
+                /* Install a handler for this PCI root bridge */
+
+                Status = AcpiInstallAddressSpaceHandler (
+                            (ACPI_HANDLE) PciRootNode,
+                            ACPI_ADR_SPACE_PCI_CONFIG,
+                            ACPI_DEFAULT_HANDLER, NULL, NULL);
+                if (ACPI_FAILURE (Status))
+                {
+                    if (Status == AE_SAME_HANDLER)
                     {
-                        if (Status == AE_SAME_HANDLER)
-                        {
-                            /*
-                             * It is OK if the handler is already installed on the root
-                             * bridge.  Still need to return a context object for the
-                             * new PCI_Config operation region, however.
-                             */
-                            Status = AE_OK;
-                        }
-                        else
-                        {
-                            ACPI_EXCEPTION ((AE_INFO, Status,
-                                "Could not install PciConfig handler for Root Bridge %4.4s",
-                                AcpiUtGetNodeName (PciRootNode)));
-                        }
+                        /*
+                         * It is OK if the handler is already installed on the root
+                         * bridge.  Still need to return a context object for the
+                         * new PCI_Config operation region, however.
+                         */
+                        Status = AE_OK;
                     }
-                    break;
+                    else
+                    {
+                        ACPI_EXCEPTION ((AE_INFO, Status,
+                            "Could not install PciConfig handler for Root Bridge %4.4s",
+                            AcpiUtGetNodeName (PciRootNode)));
+                    }
                 }
+                break;
             }
 
             PciRootNode = AcpiNsGetParentNode (PciRootNode);
@@ -379,13 +381,26 @@ AcpiEvPciConfigRegionSetup (
     /*
      * For PCI_Config space access, we need the segment, bus,
      * device and function numbers.  Acquire them here.
+     *
+     * Find the parent device object. (This allows the operation region to be
+     * within a subscope under the device, such as a control method.)
      */
+    PciDeviceNode = RegionObj->Region.Node;
+    while (PciDeviceNode && (PciDeviceNode->Type != ACPI_TYPE_DEVICE))
+    {
+        PciDeviceNode = AcpiNsGetParentNode (PciDeviceNode);
+    }
+
+    if (!PciDeviceNode)
+    {
+        return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
+    }
 
     /*
      * Get the PCI device and function numbers from the _ADR object
      * contained in the parent's scope.
      */
-    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__ADR, ParentNode, &PciValue);
+    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__ADR, PciDeviceNode, &PciValue);
 
     /*
      * The default is zero, and since the allocation above zeroed
@@ -419,6 +434,105 @@ AcpiEvPciConfigRegionSetup (
 
     *RegionContext = PciId;
     return_ACPI_STATUS (AE_OK);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiEvMatchPciRootBridge
+ *
+ * PARAMETERS:  Id              - The HID/CID in string format
+ *
+ * RETURN:      TRUE if the Id is a match for a PCI/PCI-Express Root Bridge
+ *
+ * DESCRIPTION: Determine if the input ID is a PCI Root Bridge ID.
+ *
+ ******************************************************************************/
+
+static BOOLEAN
+AcpiEvMatchPciRootBridge (
+    char                    *Id)
+{
+
+    /*
+     * Check if this is a PCI root.
+     * ACPI 3.0+: check for a PCI Express root also.
+     */
+    if (!(ACPI_STRNCMP (Id,
+            PCI_ROOT_HID_STRING,
+            sizeof (PCI_ROOT_HID_STRING)))      ||
+
+        !(ACPI_STRNCMP (Id,
+            PCI_EXPRESS_ROOT_HID_STRING,
+            sizeof (PCI_EXPRESS_ROOT_HID_STRING))))
+    {
+        return (TRUE);
+    }
+
+    return (FALSE);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiEvIsPciRootBridge
+ *
+ * PARAMETERS:  Node            - Device node being examined
+ *
+ * RETURN:      TRUE if device is a PCI/PCI-Express Root Bridge
+ *
+ * DESCRIPTION: Determine if the input device represents a PCI Root Bridge by
+ *              examining the _HID and _CID for the device.
+ *
+ ******************************************************************************/
+
+static BOOLEAN
+AcpiEvIsPciRootBridge (
+    ACPI_NAMESPACE_NODE     *Node)
+{
+    ACPI_STATUS             Status;
+    ACPI_DEVICE_ID          Hid;
+    ACPI_COMPATIBLE_ID_LIST *Cid;
+    ACPI_NATIVE_UINT        i;
+
+
+    /*
+     * Get the _HID and check for a PCI Root Bridge
+     */
+    Status = AcpiUtExecute_HID (Node, &Hid);
+    if (ACPI_FAILURE (Status))
+    {
+        return (FALSE);
+    }
+
+    if (AcpiEvMatchPciRootBridge (Hid.Value))
+    {
+        return (TRUE);
+    }
+
+    /*
+     * The _HID did not match.
+     * Get the _CID and check for a PCI Root Bridge
+     */
+    Status = AcpiUtExecute_CID (Node, &Cid);
+    if (ACPI_FAILURE (Status))
+    {
+        return (FALSE);
+    }
+
+    /* Check all _CIDs in the returned list */
+
+    for (i = 0; i < Cid->Count; i++)
+    {
+        if (AcpiEvMatchPciRootBridge (Cid->Id[i].Value))
+        {
+            ACPI_FREE (Cid);
+            return (TRUE);
+        }
+    }
+
+    ACPI_FREE (Cid);
+    return (FALSE);
 }
 
 
@@ -541,6 +655,9 @@ AcpiEvDefaultRegionSetup (
  *              example, PCI regions must have an _ADR object that contains
  *              a PCI address in the scope of the definition.  This address is
  *              required to perform an access to PCI config space.
+ *
+ * MUTEX:       Interpreter should be unlocked, because we may run the _REG
+ *              method for this region.
  *
  ******************************************************************************/
 

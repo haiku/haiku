@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: aclocal.h - Internal data types used across the ACPI subsystem
- *       $Revision: 1.236 $
+ *       $Revision: 1.242 $
  *
  *****************************************************************************/
 
@@ -156,8 +156,8 @@ union acpi_parse_object;
  * table below also!
  */
 #define ACPI_MTX_INTERPRETER            0   /* AML Interpreter, main lock */
-#define ACPI_MTX_TABLES                 1   /* Data for ACPI tables */
-#define ACPI_MTX_NAMESPACE              2   /* ACPI Namespace */
+#define ACPI_MTX_NAMESPACE              1   /* ACPI Namespace */
+#define ACPI_MTX_TABLES                 2   /* Data for ACPI tables */
 #define ACPI_MTX_EVENTS                 3   /* Data for ACPI events */
 #define ACPI_MTX_CACHES                 4   /* Internal caches, general purposes */
 #define ACPI_MTX_MEMORY                 5   /* Debug memory tracking lists */
@@ -248,7 +248,7 @@ typedef enum
 {
     ACPI_IMODE_LOAD_PASS1           = 0x01,
     ACPI_IMODE_LOAD_PASS2           = 0x02,
-    ACPI_IMODE_EXECUTE              = 0x0E
+    ACPI_IMODE_EXECUTE              = 0x03
 
 } ACPI_INTERPRETER_MODE;
 
@@ -297,7 +297,7 @@ typedef struct acpi_namespace_node
 /* Namespace Node flags */
 
 #define ANOBJ_END_OF_PEER_LIST          0x01    /* End-of-list, Peer field points to parent */
-#define ANOBJ_RESERVED                  0x02    /* Available for future use */
+#define ANOBJ_TEMPORARY                 0x02    /* Node is create by a method and is temporary */
 #define ANOBJ_METHOD_ARG                0x04    /* Node is a method argument */
 #define ANOBJ_METHOD_LOCAL              0x08    /* Node is a method local */
 #define ANOBJ_SUBTREE_HAS_INI           0x10    /* Used to optimize device initialization */
@@ -313,27 +313,45 @@ typedef struct acpi_namespace_node
  */
 typedef struct acpi_table_desc
 {
-    struct acpi_table_desc          *Prev;
-    struct acpi_table_desc          *Next;
-    struct acpi_table_desc          *InstalledDesc;
+    ACPI_PHYSICAL_ADDRESS           Address;
     ACPI_TABLE_HEADER               *Pointer;
-    UINT8                           *AmlStart;
-    UINT64                          PhysicalAddress;
-    ACPI_SIZE                       Length;
-    UINT32                          AmlLength;
+    UINT32                          Length;     /* Length fixed at 32 bits */
+    ACPI_NAME_UNION                 Signature;
     ACPI_OWNER_ID                   OwnerId;
-    UINT8                           Type;
-    UINT8                           Allocation;
-    BOOLEAN                         LoadedIntoNamespace;
+    UINT8                           Flags;
 
 } ACPI_TABLE_DESC;
 
-typedef struct acpi_table_list
-{
-    struct acpi_table_desc          *Next;
-    UINT32                          Count;
+/* Flags for above */
 
-} ACPI_TABLE_LIST;
+#define ACPI_TABLE_ORIGIN_UNKNOWN       (0)
+#define ACPI_TABLE_ORIGIN_MAPPED        (1)
+#define ACPI_TABLE_ORIGIN_ALLOCATED     (2)
+#define ACPI_TABLE_ORIGIN_MASK          (3)
+#define ACPI_TABLE_IS_LOADED            (4)
+
+/* One internal RSDT for table management */
+
+typedef struct acpi_internal_rsdt
+{
+    ACPI_TABLE_DESC                 *Tables;
+    UINT32                          Count;
+    UINT32                          Size;
+    UINT8                           Flags;
+
+} ACPI_INTERNAL_RSDT;
+
+/* Flags for above */
+
+#define ACPI_ROOT_ORIGIN_UNKNOWN        (0)     /* ~ORIGIN_ALLOCATED */
+#define ACPI_ROOT_ORIGIN_ALLOCATED      (1)
+#define ACPI_ROOT_ALLOW_RESIZE          (2)
+
+
+/* Predefined (fixed) table indexes */
+
+#define ACPI_TABLE_INDEX_DSDT           (0)
+#define ACPI_TABLE_INDEX_FACS           (1)
 
 
 typedef struct acpi_find_context
@@ -472,7 +490,7 @@ typedef struct acpi_gpe_event_info
     union acpi_gpe_dispatch_info    Dispatch;       /* Either Method or Handler */
     struct acpi_gpe_register_info   *RegisterInfo;  /* Backpointer to register info */
     UINT8                           Flags;          /* Misc info about this GPE */
-    UINT8                           RegisterBit;    /* This GPE bit within the register */
+    UINT8                           GpeNumber;      /* This GPE */
 
 } ACPI_GPE_EVENT_INFO;
 

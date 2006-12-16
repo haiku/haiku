@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dsobject - Dispatcher object management routines
- *              $Revision: 1.131 $
+ *              $Revision: 1.133 $
  *
  *****************************************************************************/
 
@@ -347,7 +347,7 @@ AcpiDsBuildInternalBufferObj (
     }
 
     ObjDesc->Buffer.Flags |= AOPOBJ_DATA_VALID;
-    Op->Common.Node = (ACPI_NAMESPACE_NODE *) ObjDesc;
+    Op->Common.Node = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, ObjDesc);
     return_ACPI_STATUS (AE_OK);
 }
 
@@ -358,7 +358,8 @@ AcpiDsBuildInternalBufferObj (
  *
  * PARAMETERS:  WalkState       - Current walk state
  *              Op              - Parser object to be translated
- *              PackageLength   - Number of elements in the package
+ *              ElementCount    - Number of elements in the package - this is
+ *                                the NumElements argument to Package()
  *              ObjDescPtr      - Where the ACPI internal object is returned
  *
  * RETURN:      Status
@@ -366,19 +367,30 @@ AcpiDsBuildInternalBufferObj (
  * DESCRIPTION: Translate a parser Op package object to the equivalent
  *              namespace object
  *
+ * NOTE: The number of elements in the package will be always be the NumElements
+ * count, regardless of the number of elements in the package list. If
+ * NumElements is smaller, only that many package list elements are used.
+ * if NumElements is larger, the Package object is padded out with
+ * objects of type Uninitialized (as per ACPI spec.)
+ *
+ * Even though the ASL compilers do not allow NumElements to be smaller
+ * than the Package list length (for the fixed length package opcode), some
+ * BIOS code modifies the AML on the fly to adjust the NumElements, and
+ * this code compensates for that. This also provides compatibility with
+ * other AML interpreters.
+ *
  ******************************************************************************/
 
 ACPI_STATUS
 AcpiDsBuildInternalPackageObj (
     ACPI_WALK_STATE         *WalkState,
     ACPI_PARSE_OBJECT       *Op,
-    UINT32                  PackageLength,
+    UINT32                  ElementCount,
     ACPI_OPERAND_OBJECT     **ObjDescPtr)
 {
     ACPI_PARSE_OBJECT       *Arg;
     ACPI_PARSE_OBJECT       *Parent;
     ACPI_OPERAND_OBJECT     *ObjDesc = NULL;
-    UINT32                  PackageListLength;
     ACPI_STATUS             Status = AE_OK;
     ACPI_NATIVE_UINT        i;
 
@@ -412,33 +424,13 @@ AcpiDsBuildInternalPackageObj (
         ObjDesc->Package.Node = Parent->Common.Node;
     }
 
-    ObjDesc->Package.Count = PackageLength;
-
-    /* Count the number of items in the package list */
-
-    Arg = Op->Common.Value.Arg;
-    Arg = Arg->Common.Next;
-    for (PackageListLength = 0; Arg; PackageListLength++)
-    {
-        Arg = Arg->Common.Next;
-    }
-
     /*
-     * The package length (number of elements) will be the greater
-     * of the specified length and the length of the initializer list
-     */
-    if (PackageListLength > PackageLength)
-    {
-        ObjDesc->Package.Count = PackageListLength;
-    }
-
-    /*
-     * Allocate the pointer array (array of pointers to the
-     * individual objects). Add an extra pointer slot so
-     * that the list is always null terminated.
+     * Allocate the element array (array of pointers to the individual
+     * objects) based on the NumElements parameter. Add an extra pointer slot
+     * so that the list is always null terminated.
      */
     ObjDesc->Package.Elements = ACPI_ALLOCATE_ZEROED (
-        ((ACPI_SIZE) ObjDesc->Package.Count + 1) * sizeof (void *));
+        ((ACPI_SIZE) ElementCount + 1) * sizeof (void *));
 
     if (!ObjDesc->Package.Elements)
     {
@@ -446,16 +438,21 @@ AcpiDsBuildInternalPackageObj (
         return_ACPI_STATUS (AE_NO_MEMORY);
     }
 
+    ObjDesc->Package.Count = ElementCount;
+
     /*
-     * Initialize all elements of the package
+     * Initialize the elements of the package, up to the NumElements count.
+     * Package is automatically padded with uninitialized (NULL) elements
+     * if NumElements is greater than the package list length. Likewise,
+     * Package is truncated if NumElements is less than the list length.
      */
     Arg = Op->Common.Value.Arg;
     Arg = Arg->Common.Next;
-    for (i = 0; Arg; i++)
+    for (i = 0; Arg && (i < ElementCount); i++)
     {
         if (Arg->Common.AmlOpcode == AML_INT_RETURN_VALUE_OP)
         {
-            /* Object (package or buffer) is already built */
+            /* This package element is already built, just get it */
 
             ObjDesc->Package.Elements[i] =
                 ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, Arg->Common.Node);
@@ -468,8 +465,15 @@ AcpiDsBuildInternalPackageObj (
         Arg = Arg->Common.Next;
     }
 
+    if (!Arg)
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
+            "Package List length larger than NumElements count (%X), truncated\n",
+            ElementCount));
+    }
+
     ObjDesc->Package.Flags |= AOPOBJ_DATA_VALID;
-    Op->Common.Node = (ACPI_NAMESPACE_NODE *) ObjDesc;
+    Op->Common.Node = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, ObjDesc);
     return_ACPI_STATUS (Status);
 }
 
@@ -594,8 +598,8 @@ AcpiDsInitObjectFromOp (
         /*
          * Defer evaluation of Buffer TermArg operand
          */
-        ObjDesc->Buffer.Node      = (ACPI_NAMESPACE_NODE *)
-                                        WalkState->Operands[0];
+        ObjDesc->Buffer.Node      = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE,
+                                        WalkState->Operands[0]);
         ObjDesc->Buffer.AmlStart  = Op->Named.Data;
         ObjDesc->Buffer.AmlLength = Op->Named.Length;
         break;
@@ -606,8 +610,8 @@ AcpiDsInitObjectFromOp (
         /*
          * Defer evaluation of Package TermArg operand
          */
-        ObjDesc->Package.Node      = (ACPI_NAMESPACE_NODE *)
-                                        WalkState->Operands[0];
+        ObjDesc->Package.Node      = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE,
+                                        WalkState->Operands[0]);
         ObjDesc->Package.AmlStart  = Op->Named.Data;
         ObjDesc->Package.AmlLength = Op->Named.Length;
         break;

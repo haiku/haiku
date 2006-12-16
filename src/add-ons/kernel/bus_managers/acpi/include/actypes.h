@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: actypes.h - Common data types for the entire ACPI subsystem
- *       $Revision: 1.308 $
+ *       $Revision: 1.312 $
  *
  *****************************************************************************/
 
@@ -232,6 +232,7 @@ typedef UINT64                          ACPI_PHYSICAL_ADDRESS;
 #define ACPI_MAX_PTR                    ACPI_UINT64_MAX
 #define ACPI_SIZE_MAX                   ACPI_UINT64_MAX
 
+#define ACPI_NATIVE_BOUNDARY            8
 #define ACPI_USE_NATIVE_DIVIDE          /* Has native 64-bit integer support */
 
 /*
@@ -269,10 +270,12 @@ typedef INT32                           ACPI_NATIVE_INT;
 
 typedef UINT64                          ACPI_TABLE_PTR;
 typedef UINT32                          ACPI_IO_ADDRESS;
-typedef UINT64                          ACPI_PHYSICAL_ADDRESS;
+typedef UINT32                          ACPI_PHYSICAL_ADDRESS;
 
 #define ACPI_MAX_PTR                    ACPI_UINT32_MAX
 #define ACPI_SIZE_MAX                   ACPI_UINT32_MAX
+
+#define ACPI_NATIVE_BOUNDARY            4
 
 
 /*******************************************************************************
@@ -302,6 +305,7 @@ typedef char                            *ACPI_PHYSICAL_ADDRESS;
 #define ACPI_MAX_PTR                    ACPI_UINT16_MAX
 #define ACPI_SIZE_MAX                   ACPI_UINT16_MAX
 
+#define ACPI_NATIVE_BOUNDARY            2
 #define ACPI_USE_NATIVE_DIVIDE          /* No 64-bit integers, ok to use native divide */
 
 /* 64-bit integers cannot be supported */
@@ -395,41 +399,6 @@ typedef ACPI_NATIVE_UINT                ACPI_SIZE;
  * Independent types
  *
  ******************************************************************************/
-
-/*
- * Pointer overlays to avoid lots of typecasting for
- * code that accepts both physical and logical pointers.
- */
-typedef union acpi_pointers
-{
-    ACPI_PHYSICAL_ADDRESS           Physical;
-    void                            *Logical;
-    ACPI_TABLE_PTR                  Value;
-
-} ACPI_POINTERS;
-
-typedef struct acpi_pointer
-{
-    UINT32                          PointerType;
-    union acpi_pointers             Pointer;
-
-} ACPI_POINTER;
-
-/* PointerTypes for above */
-
-#define ACPI_PHYSICAL_POINTER           0x01
-#define ACPI_LOGICAL_POINTER            0x02
-
-/* Processor mode */
-
-#define ACPI_PHYSICAL_ADDRESSING        0x04
-#define ACPI_LOGICAL_ADDRESSING         0x08
-#define ACPI_MEMORY_MODE                0x0C
-
-#define ACPI_PHYSMODE_PHYSPTR           ACPI_PHYSICAL_ADDRESSING | ACPI_PHYSICAL_POINTER
-#define ACPI_LOGMODE_PHYSPTR            ACPI_LOGICAL_ADDRESSING  | ACPI_PHYSICAL_POINTER
-#define ACPI_LOGMODE_LOGPTR             ACPI_LOGICAL_ADDRESSING  | ACPI_LOGICAL_POINTER
-
 
 /* Logical defines and NULL */
 
@@ -544,7 +513,8 @@ typedef UINT64                          ACPI_INTEGER;
 /*
  * Initialization state
  */
-#define ACPI_INITIALIZED_OK             0x01
+#define ACPI_SUBSYSTEM_INITIALIZE       0x01
+#define ACPI_INITIALIZED_OK             0x02
 
 /*
  * Power state values
@@ -591,21 +561,6 @@ typedef UINT64                          ACPI_INTEGER;
 #define ACPI_NOTIFY_FREQUENCY_MISMATCH  (UINT8) 5
 #define ACPI_NOTIFY_BUS_MODE_MISMATCH   (UINT8) 6
 #define ACPI_NOTIFY_POWER_FAULT         (UINT8) 7
-
-/*
- *  Table types.  These values are passed to the table related APIs
- */
-typedef UINT32                          ACPI_TABLE_TYPE;
-
-#define ACPI_TABLE_ID_RSDP              (ACPI_TABLE_TYPE) 0
-#define ACPI_TABLE_ID_DSDT              (ACPI_TABLE_TYPE) 1
-#define ACPI_TABLE_ID_FADT              (ACPI_TABLE_TYPE) 2
-#define ACPI_TABLE_ID_FACS              (ACPI_TABLE_TYPE) 3
-#define ACPI_TABLE_ID_PSDT              (ACPI_TABLE_TYPE) 4
-#define ACPI_TABLE_ID_SSDT              (ACPI_TABLE_TYPE) 5
-#define ACPI_TABLE_ID_XSDT              (ACPI_TABLE_TYPE) 6
-#define ACPI_TABLE_ID_MAX               6
-#define ACPI_NUM_TABLE_TYPES            (ACPI_TABLE_ID_MAX+1)
 
 /*
  * Types associated with ACPI names and objects.  The first group of
@@ -740,7 +695,7 @@ typedef UINT32                          ACPI_EVENT_STATUS;
  *  | | |  +--- Type of dispatch -- to method, handler, or none
  *  | | +--- Enabled for runtime?
  *  | +--- Enabled for wake?
- *  +--- System state when GPE ocurred (running/waking)
+ *  +--- Unused
  */
 #define ACPI_GPE_XRUPT_TYPE_MASK        (UINT8) 0x01
 #define ACPI_GPE_LEVEL_TRIGGERED        (UINT8) 0x01
@@ -765,10 +720,6 @@ typedef UINT32                          ACPI_EVENT_STATUS;
 #define ACPI_GPE_WAKE_DISABLED          (UINT8) 0x00    /* Default */
 
 #define ACPI_GPE_ENABLE_MASK            (UINT8) 0x60    /* Both run/wake */
-
-#define ACPI_GPE_SYSTEM_MASK            (UINT8) 0x80
-#define ACPI_GPE_SYSTEM_RUNNING         (UINT8) 0x80
-#define ACPI_GPE_SYSTEM_WAKING          (UINT8) 0x00
 
 /*
  * Flags for GPE and Lock interfaces
@@ -941,16 +892,6 @@ typedef struct acpi_buffer
 
 
 /*
- * ACPI Table Info.  One per ACPI table _type_
- */
-typedef struct acpi_table_info
-{
-    UINT32                          Count;
-
-} ACPI_TABLE_INFO;
-
-
-/*
  * System info returned by AcpiGetSystemInfo()
  */
 typedef struct acpi_system_info
@@ -962,8 +903,6 @@ typedef struct acpi_system_info
     UINT32                          Reserved2;
     UINT32                          DebugLevel;
     UINT32                          DebugLayer;
-    UINT32                          NumTableTypes;
-    ACPI_TABLE_INFO                 TableInfo [ACPI_TABLE_ID_MAX+1];
 
 } ACPI_SYSTEM_INFO;
 

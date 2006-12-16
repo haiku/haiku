@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acnamesp.h - Namespace subcomponent prototypes and defines
- *       $Revision: 1.149 $
+ *       $Revision: 1.151 $
  *
  *****************************************************************************/
 
@@ -139,9 +139,13 @@
 #define ACPI_NS_ERROR_IF_FOUND      0x08
 #define ACPI_NS_PREFIX_IS_SCOPE     0x10
 #define ACPI_NS_EXTERNAL            0x20
+#define ACPI_NS_TEMPORARY           0x40
 
-#define ACPI_NS_WALK_UNLOCK         TRUE
-#define ACPI_NS_WALK_NO_UNLOCK      FALSE
+/* Flags for AcpiNsWalkNamespace */
+
+#define ACPI_NS_WALK_NO_UNLOCK      0
+#define ACPI_NS_WALK_UNLOCK         0x01
+#define ACPI_NS_WALK_TEMP_NODES     0x02
 
 
 /*
@@ -165,7 +169,7 @@ AcpiNsLoadNamespace (
 
 ACPI_STATUS
 AcpiNsLoadTable (
-    ACPI_TABLE_DESC         *TableDesc,
+    ACPI_NATIVE_UINT        TableIndex,
     ACPI_NAMESPACE_NODE     *Node);
 
 
@@ -177,7 +181,7 @@ AcpiNsWalkNamespace (
     ACPI_OBJECT_TYPE        Type,
     ACPI_HANDLE             StartObject,
     UINT32                  MaxDepth,
-    BOOLEAN                 UnlockBeforeCallback,
+    UINT32                  Flags,
     ACPI_WALK_CALLBACK      UserFunction,
     void                    *Context,
     void                    **ReturnValue);
@@ -194,13 +198,13 @@ AcpiNsGetNextNode (
  */
 ACPI_STATUS
 AcpiNsParseTable (
-    ACPI_TABLE_DESC         *TableDesc,
-    ACPI_NAMESPACE_NODE     *Scope);
+    ACPI_NATIVE_UINT        TableIndex,
+    ACPI_NAMESPACE_NODE     *StartNode);
 
 ACPI_STATUS
 AcpiNsOneCompleteParse (
-    UINT8                   PassNumber,
-    ACPI_TABLE_DESC         *TableDesc);
+    ACPI_NATIVE_UINT        PassNumber,
+    ACPI_NATIVE_UINT        TableIndex);
 
 
 /*

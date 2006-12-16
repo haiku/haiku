@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Name: hwtimer.c - ACPI Power Management Timer Interface
- *              $Revision: 1.35 $
+ *              $Revision: 1.36 $
  *
  *****************************************************************************/
 
@@ -145,7 +145,7 @@ AcpiGetTimerResolution (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    if (AcpiGbl_FADT->TmrValExt == 0)
+    if ((AcpiGbl_FADT.Flags & ACPI_FADT_32BIT_TIMER) == 0)
     {
         *Resolution = 24;
     }
@@ -187,7 +187,7 @@ AcpiGetTimer (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    Status = AcpiHwLowLevelRead (32, Ticks, &AcpiGbl_FADT->XPmTmrBlk);
+    Status = AcpiHwLowLevelRead (32, Ticks, &AcpiGbl_FADT.XPmTimerBlock);
 
     return_ACPI_STATUS (Status);
 }
@@ -253,7 +253,7 @@ AcpiGetTimerDuration (
     }
     else if (StartTicks > EndTicks)
     {
-        if (AcpiGbl_FADT->TmrValExt == 0)
+        if ((AcpiGbl_FADT.Flags & ACPI_FADT_32BIT_TIMER) == 0)
         {
             /* 24-bit Timer */
 

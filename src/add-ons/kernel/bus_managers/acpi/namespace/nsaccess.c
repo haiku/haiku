@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsaccess - Top-level functions for accessing ACPI namespace
- *              $Revision: 1.202 $
+ *              $Revision: 1.204 $
  *
  ******************************************************************************/
 
@@ -281,27 +281,25 @@ AcpiNsRootInitialize (
                 ObjDesc->Mutex.Node = NewNode;
                 ObjDesc->Mutex.SyncLevel = (UINT8) (ACPI_TO_INTEGER (Val) - 1);
 
+                /* Create a mutex */
+
+                Status = AcpiOsCreateMutex (&ObjDesc->Mutex.OsMutex);
+                if (ACPI_FAILURE (Status))
+                {
+                    AcpiUtRemoveReference (ObjDesc);
+                    goto UnlockAndExit;
+                }
+
+                /* Special case for ACPI Global Lock */
+
                 if (ACPI_STRCMP (InitVal->Name, "_GL_") == 0)
                 {
-                    /* Create a counting semaphore for the global lock */
+                    AcpiGbl_GlobalLockMutex = ObjDesc->Mutex.OsMutex;
 
-                    Status = AcpiOsCreateSemaphore (ACPI_NO_UNIT_LIMIT, 1,
-                                &AcpiGbl_GlobalLockSemaphore);
-                    if (ACPI_FAILURE (Status))
-                    {
-                        AcpiUtRemoveReference (ObjDesc);
-                        goto UnlockAndExit;
-                    }
+                    /* Create additional counting semaphore for global lock */
 
-                    /* Mark this mutex as very special */
-
-                    ObjDesc->Mutex.OsMutex = ACPI_GLOBAL_LOCK;
-                }
-                else
-                {
-                    /* Create a mutex */
-
-                    Status = AcpiOsCreateMutex (&ObjDesc->Mutex.OsMutex);
+                    Status = AcpiOsCreateSemaphore (
+                                1, 0, &AcpiGbl_GlobalLockSemaphore);
                     if (ACPI_FAILURE (Status))
                     {
                         AcpiUtRemoveReference (ObjDesc);

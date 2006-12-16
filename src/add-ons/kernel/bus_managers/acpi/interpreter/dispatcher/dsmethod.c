@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dsmethod - Parser/Interpreter interface - control method parsing
- *              $Revision: 1.130 $
+ *              $Revision: 1.133 $
  *
  *****************************************************************************/
 
@@ -290,7 +290,7 @@ AcpiDsBeginMethodExecution (
     /*
      * If this method is serialized, we need to acquire the method mutex.
      */
-    if (ObjDesc->Method.MethodFlags & AML_METHOD_SERIALIZED) 
+    if (ObjDesc->Method.MethodFlags & AML_METHOD_SERIALIZED)
     {
         /*
          * Create a mutex for the method if it is defined to be Serialized
@@ -307,11 +307,11 @@ AcpiDsBeginMethodExecution (
         }
 
         /*
-         * The CurrentSyncLevel (per-thread) must be less than or equal to 
+         * The CurrentSyncLevel (per-thread) must be less than or equal to
          * the sync level of the method. This mechanism provides some
          * deadlock prevention
          *
-         * Top-level method invocation has no walk state at this point 
+         * Top-level method invocation has no walk state at this point
          */
         if (WalkState &&
             (WalkState->Thread->CurrentSyncLevel > ObjDesc->Method.Mutex->Mutex.SyncLevel))
@@ -428,7 +428,7 @@ AcpiDsCallControlMethod (
 
     ACPI_FUNCTION_TRACE_PTR (DsCallControlMethod, ThisWalkState);
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Execute method %p, currentstate=%p\n",
+    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Calling method %p, currentstate=%p\n",
         ThisWalkState->PrevOp, ThisWalkState));
 
     /*
@@ -455,51 +455,7 @@ AcpiDsCallControlMethod (
         return_ACPI_STATUS (Status);
     }
 
-    /*
-     * 1) Parse the method. All "normal" methods are parsed for each execution.
-     * Internal methods (_OSI, etc.) do not require parsing.
-     */
-    if (!(ObjDesc->Method.MethodFlags & AML_METHOD_INTERNAL_ONLY))
-    {
-        /* Create a new walk state for the parse */
-
-        NextWalkState = AcpiDsCreateWalkState (ObjDesc->Method.OwnerId,
-                            Op, ObjDesc, NULL);
-        if (!NextWalkState)
-        {
-            Status = AE_NO_MEMORY;
-            goto Cleanup;
-        }
-
-        /* Create and init a parse tree root */
-
-        Op = AcpiPsCreateScopeOp ();
-        if (!Op)
-        {
-            Status = AE_NO_MEMORY;
-            goto Cleanup;
-        }
-
-        Status = AcpiDsInitAmlWalk (NextWalkState, Op, MethodNode,
-                    ObjDesc->Method.AmlStart, ObjDesc->Method.AmlLength,
-                    NULL, 1);
-        if (ACPI_FAILURE (Status))
-        {
-            AcpiPsDeleteParseTree (Op);
-            goto Cleanup;
-        }
-
-        /* Begin AML parse (deletes NextWalkState) */
-
-        Status = AcpiPsParseAml (NextWalkState);
-        AcpiPsDeleteParseTree (Op);
-        if (ACPI_FAILURE (Status))
-        {
-            goto Cleanup;
-        }
-    }
-
-    /* 2) Begin method execution. Create a new walk state */
+    /* Begin method parse/execution. Create a new walk state */
 
     NextWalkState = AcpiDsCreateWalkState (ObjDesc->Method.OwnerId,
                         NULL, ObjDesc, Thread);
@@ -532,7 +488,7 @@ AcpiDsCallControlMethod (
 
     Status = AcpiDsInitAmlWalk (NextWalkState, NULL, MethodNode,
                 ObjDesc->Method.AmlStart, ObjDesc->Method.AmlLength,
-                Info, 3);
+                Info, ACPI_IMODE_EXECUTE);
 
     ACPI_FREE (Info);
     if (ACPI_FAILURE (Status))
@@ -555,7 +511,8 @@ AcpiDsCallControlMethod (
     ThisWalkState->NumOperands = 0;
 
     ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
-        "Starting nested execution, newstate=%p\n", NextWalkState));
+        "**** Begin nested execution of [%4.4s] **** WalkState=%p\n",
+        MethodNode->Name.Ascii, NextWalkState));
 
     /* Invoke an internal method if necessary */
 
@@ -800,6 +757,5 @@ AcpiDsTerminateControlMethod (
 
     return_VOID;
 }
-
 
 

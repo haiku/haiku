@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utinit - Common ACPI subsystem initialization
- *              $Revision: 1.131 $
+ *              $Revision: 1.134 $
  *
  *****************************************************************************/
 
@@ -120,136 +120,15 @@
 #include "acpi.h"
 #include "acnamesp.h"
 #include "acevents.h"
+#include "actables.h"
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utinit")
 
 /* Local prototypes */
 
-static void
-AcpiUtFadtRegisterError (
-    char                    *RegisterName,
-    UINT32                  Value,
-    UINT8                   Offset);
-
 static void AcpiUtTerminate (
     void);
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiUtFadtRegisterError
- *
- * PARAMETERS:  RegisterName            - Pointer to string identifying register
- *              Value                   - Actual register contents value
- *              Offset                  - Byte offset in the FADT
- *
- * RETURN:      AE_BAD_VALUE
- *
- * DESCRIPTION: Display failure message
- *
- ******************************************************************************/
-
-static void
-AcpiUtFadtRegisterError (
-    char                    *RegisterName,
-    UINT32                  Value,
-    UINT8                   Offset)
-{
-
-    ACPI_WARNING ((AE_INFO,
-        "Invalid FADT value %s=%X at offset %X FADT=%p",
-        RegisterName, Value, Offset, AcpiGbl_FADT));
-}
-
-
-/******************************************************************************
- *
- * FUNCTION:    AcpiUtValidateFadt
- *
- * PARAMETERS:  None
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Validate various ACPI registers in the FADT
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiUtValidateFadt (
-    void)
-{
-
-    /*
-     * Verify Fixed ACPI Description Table fields,
-     * but don't abort on any problems, just display error
-     */
-    if (AcpiGbl_FADT->Pm1EvtLen < 4)
-    {
-        AcpiUtFadtRegisterError ("PM1_EVT_LEN",
-                        (UINT32) AcpiGbl_FADT->Pm1EvtLen,
-                        ACPI_FADT_OFFSET (Pm1EvtLen));
-    }
-
-    if (!AcpiGbl_FADT->Pm1CntLen)
-    {
-        AcpiUtFadtRegisterError ("PM1_CNT_LEN", 0,
-                        ACPI_FADT_OFFSET (Pm1CntLen));
-    }
-
-    if (!ACPI_VALID_ADDRESS (AcpiGbl_FADT->XPm1aEvtBlk.Address))
-    {
-        AcpiUtFadtRegisterError ("X_PM1a_EVT_BLK", 0,
-                        ACPI_FADT_OFFSET (XPm1aEvtBlk.Address));
-    }
-
-    if (!ACPI_VALID_ADDRESS (AcpiGbl_FADT->XPm1aCntBlk.Address))
-    {
-        AcpiUtFadtRegisterError ("X_PM1a_CNT_BLK", 0,
-                        ACPI_FADT_OFFSET (XPm1aCntBlk.Address));
-    }
-
-    if (!ACPI_VALID_ADDRESS (AcpiGbl_FADT->XPmTmrBlk.Address))
-    {
-        AcpiUtFadtRegisterError ("X_PM_TMR_BLK", 0,
-                        ACPI_FADT_OFFSET (XPmTmrBlk.Address));
-    }
-
-    if ((ACPI_VALID_ADDRESS (AcpiGbl_FADT->XPm2CntBlk.Address) &&
-        !AcpiGbl_FADT->Pm2CntLen))
-    {
-        AcpiUtFadtRegisterError ("PM2_CNT_LEN",
-                        (UINT32) AcpiGbl_FADT->Pm2CntLen,
-                        ACPI_FADT_OFFSET (Pm2CntLen));
-    }
-
-    if (AcpiGbl_FADT->PmTmLen < 4)
-    {
-        AcpiUtFadtRegisterError ("PM_TM_LEN",
-                        (UINT32) AcpiGbl_FADT->PmTmLen,
-                        ACPI_FADT_OFFSET (PmTmLen));
-    }
-
-    /* Length of GPE blocks must be a multiple of 2 */
-
-    if (ACPI_VALID_ADDRESS (AcpiGbl_FADT->XGpe0Blk.Address) &&
-        (AcpiGbl_FADT->Gpe0BlkLen & 1))
-    {
-        AcpiUtFadtRegisterError ("(x)GPE0_BLK_LEN",
-                        (UINT32) AcpiGbl_FADT->Gpe0BlkLen,
-                        ACPI_FADT_OFFSET (Gpe0BlkLen));
-    }
-
-    if (ACPI_VALID_ADDRESS (AcpiGbl_FADT->XGpe1Blk.Address) &&
-        (AcpiGbl_FADT->Gpe1BlkLen & 1))
-    {
-        AcpiUtFadtRegisterError ("(x)GPE1_BLK_LEN",
-                        (UINT32) AcpiGbl_FADT->Gpe1BlkLen,
-                        ACPI_FADT_OFFSET (Gpe1BlkLen));
-    }
-
-    return (AE_OK);
-}
 
 
 /******************************************************************************
@@ -277,7 +156,6 @@ AcpiUtTerminate (
     ACPI_FUNCTION_TRACE (UtTerminate);
 
 
-    /* Free global tables, etc. */
     /* Free global GPE blocks and related info structures */
 
     GpeXruptInfo = AcpiGbl_GpeXruptListHead;
@@ -345,6 +223,10 @@ AcpiUtSubsystemShutdown (
     /* Close the Namespace */
 
     AcpiNsTerminate ();
+
+    /* Delete the ACPI tables */
+
+    AcpiTbTerminate ();
 
     /* Close the globals */
 

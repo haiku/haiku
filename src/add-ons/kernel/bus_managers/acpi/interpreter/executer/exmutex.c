@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exmutex - ASL Mutex Acquire/Release functions
- *              $Revision: 1.33 $
+ *              $Revision: 1.35 $
  *
  *****************************************************************************/
 
@@ -119,6 +119,7 @@
 
 #include "acpi.h"
 #include "acinterp.h"
+#include "acevents.h"
 
 #define _COMPONENT          ACPI_EXECUTER
         ACPI_MODULE_NAME    ("exmutex")
@@ -245,7 +246,7 @@ AcpiExAcquireMutex (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    /* Sanity check -- we must have a valid thread ID */
+    /* Sanity check: we must have a valid thread ID */
 
     if (!WalkState->Thread)
     {
@@ -271,24 +272,30 @@ AcpiExAcquireMutex (
 
     if (ObjDesc->Mutex.OwnerThread)
     {
-        /* Special case for Global Lock, allow all threads */
-
-        if ((ObjDesc->Mutex.OwnerThread->ThreadId ==
-                WalkState->Thread->ThreadId) ||
-            (ObjDesc->Mutex.OsMutex == ACPI_GLOBAL_LOCK))
+        if (ObjDesc->Mutex.OwnerThread->ThreadId ==
+            WalkState->Thread->ThreadId)
         {
             /*
-             * The mutex is already owned by this thread,
-             * just increment the acquisition depth
+             * The mutex is already owned by this thread, just increment the
+             * acquisition depth
              */
             ObjDesc->Mutex.AcquisitionDepth++;
             return_ACPI_STATUS (AE_OK);
         }
     }
 
-    /* Acquire the mutex, wait if necessary */
+    /* Acquire the mutex, wait if necessary. Special case for Global Lock */
 
-    Status = AcpiExSystemAcquireMutex (TimeDesc, ObjDesc);
+    if (ObjDesc->Mutex.OsMutex == AcpiGbl_GlobalLockMutex)
+    {
+        Status = AcpiEvAcquireGlobalLock ((UINT16) TimeDesc->Integer.Value);
+    }
+    else
+    {
+        Status = AcpiExSystemWaitMutex (ObjDesc->Mutex.OsMutex,
+                    (UINT16) TimeDesc->Integer.Value);
+    }
+
     if (ACPI_FAILURE (Status))
     {
         /* Includes failure from a timeout on TimeDesc */
@@ -298,8 +305,8 @@ AcpiExAcquireMutex (
 
     /* Have the mutex: update mutex and walk info and save the SyncLevel */
 
-    ObjDesc->Mutex.OwnerThread       = WalkState->Thread;
-    ObjDesc->Mutex.AcquisitionDepth  = 1;
+    ObjDesc->Mutex.OwnerThread = WalkState->Thread;
+    ObjDesc->Mutex.AcquisitionDepth = 1;
     ObjDesc->Mutex.OriginalSyncLevel = WalkState->Thread->CurrentSyncLevel;
 
     WalkState->Thread->CurrentSyncLevel = ObjDesc->Mutex.SyncLevel;
@@ -307,7 +314,6 @@ AcpiExAcquireMutex (
     /* Link the mutex to the current thread for force-unlock at method exit */
 
     AcpiExLinkMutex (ObjDesc, WalkState->Thread);
-
     return_ACPI_STATUS (AE_OK);
 }
 
@@ -330,7 +336,7 @@ AcpiExReleaseMutex (
     ACPI_OPERAND_OBJECT     *ObjDesc,
     ACPI_WALK_STATE         *WalkState)
 {
-    ACPI_STATUS             Status;
+    ACPI_STATUS             Status = AE_OK;
 
 
     ACPI_FUNCTION_TRACE (ExReleaseMutex);
@@ -350,7 +356,7 @@ AcpiExReleaseMutex (
         return_ACPI_STATUS (AE_AML_MUTEX_NOT_ACQUIRED);
     }
 
-    /* Sanity check -- we must have a valid thread ID */
+    /* Sanity check: we must have a valid thread ID */
 
     if (!WalkState->Thread)
     {
@@ -364,7 +370,7 @@ AcpiExReleaseMutex (
      * Special case for Global Lock, any thread can release
      */
     if ((ObjDesc->Mutex.OwnerThread->ThreadId != WalkState->Thread->ThreadId) &&
-        (ObjDesc->Mutex.OsMutex != ACPI_GLOBAL_LOCK))
+        (ObjDesc->Mutex.OsMutex != AcpiGbl_GlobalLockMutex))
     {
         ACPI_ERROR ((AE_INFO,
             "Thread %X cannot release Mutex [%4.4s] acquired by thread %X",
@@ -375,8 +381,8 @@ AcpiExReleaseMutex (
     }
 
     /*
-     * The sync level of the mutex must be less than or
-     * equal to the current sync level
+     * The sync level of the mutex must be less than or equal to the current
+     * sync level
      */
     if (ObjDesc->Mutex.SyncLevel > WalkState->Thread->CurrentSyncLevel)
     {
@@ -400,11 +406,18 @@ AcpiExReleaseMutex (
 
     AcpiExUnlinkMutex (ObjDesc);
 
-    /* Release the mutex */
+    /* Release the mutex, special case for Global Lock */
 
-    Status = AcpiExSystemReleaseMutex (ObjDesc);
+    if (ObjDesc->Mutex.OsMutex == AcpiGbl_GlobalLockMutex)
+    {
+        Status = AcpiEvReleaseGlobalLock ();
+    }
+    else
+    {
+        AcpiOsReleaseMutex (ObjDesc->Mutex.OsMutex);
+    }
 
-    /* Update the mutex and walk state, restore SyncLevel before acquire */
+    /* Update the mutex and restore SyncLevel */
 
     ObjDesc->Mutex.OwnerThread = NULL;
     WalkState->Thread->CurrentSyncLevel = ObjDesc->Mutex.OriginalSyncLevel;
@@ -423,6 +436,12 @@ AcpiExReleaseMutex (
  *
  * DESCRIPTION: Release all mutexes held by this thread
  *
+ * NOTE: This function is called as the thread is exiting the interpreter.
+ * Mutexes are not released when an individual control method is exited, but
+ * only when the parent thread actually exits the interpreter. This allows one
+ * method to acquire a mutex, and a different method to release it, as long as
+ * this is performed underneath a single parent control method.
+ *
  ******************************************************************************/
 
 void
@@ -430,8 +449,7 @@ AcpiExReleaseAllMutexes (
     ACPI_THREAD_STATE       *Thread)
 {
     ACPI_OPERAND_OBJECT     *Next = Thread->AcquiredMutexList;
-    ACPI_OPERAND_OBJECT     *This;
-    ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *ObjDesc;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -441,28 +459,33 @@ AcpiExReleaseAllMutexes (
 
     while (Next)
     {
-        This = Next;
-        Next = This->Mutex.Next;
+        ObjDesc = Next;
+        Next = ObjDesc->Mutex.Next;
 
-        This->Mutex.AcquisitionDepth = 1;
-        This->Mutex.Prev             = NULL;
-        This->Mutex.Next             = NULL;
+        ObjDesc->Mutex.Prev = NULL;
+        ObjDesc->Mutex.Next = NULL;
+        ObjDesc->Mutex.AcquisitionDepth = 0;
 
-         /* Release the mutex */
+        /* Release the mutex, special case for Global Lock */
 
-        Status = AcpiExSystemReleaseMutex (This);
-        if (ACPI_FAILURE (Status))
+        if (ObjDesc->Mutex.OsMutex == AcpiGbl_GlobalLockMutex)
         {
-            continue;
+            /* Ignore errors */
+
+            (void) AcpiEvReleaseGlobalLock ();
+        }
+        else
+        {
+            AcpiOsReleaseMutex (ObjDesc->Mutex.OsMutex);
         }
 
         /* Mark mutex unowned */
 
-        This->Mutex.OwnerThread = NULL;
+        ObjDesc->Mutex.OwnerThread = NULL;
 
         /* Update Thread SyncLevel (Last mutex is the important one) */
 
-        Thread->CurrentSyncLevel = This->Mutex.OriginalSyncLevel;
+        Thread->CurrentSyncLevel = ObjDesc->Mutex.OriginalSyncLevel;
     }
 }
 

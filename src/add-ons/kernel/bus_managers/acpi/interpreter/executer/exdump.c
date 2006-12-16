@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exdump - Interpreter debug output routines
- *              $Revision: 1.199 $
+ *              $Revision: 1.200 $
  *
  *****************************************************************************/
 
@@ -143,11 +143,6 @@ AcpiExOutPointer (
     void                    *Value);
 
 static void
-AcpiExOutAddress (
-    char                    *Title,
-    ACPI_PHYSICAL_ADDRESS   Value);
-
-static void
 AcpiExDumpObject (
     ACPI_OPERAND_OBJECT     *ObjDesc,
     ACPI_EXDUMP_INFO        *Info);
@@ -186,11 +181,12 @@ static ACPI_EXDUMP_INFO     AcpiExDumpString[4] =
     {ACPI_EXD_STRING,   0,                                              NULL}
 };
 
-static ACPI_EXDUMP_INFO     AcpiExDumpBuffer[4] =
+static ACPI_EXDUMP_INFO     AcpiExDumpBuffer[5] =
 {
     {ACPI_EXD_INIT,     ACPI_EXD_TABLE_SIZE (AcpiExDumpBuffer),         NULL},
     {ACPI_EXD_UINT32,   ACPI_EXD_OFFSET (Buffer.Length),                "Length"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Buffer.Pointer),               "Pointer"},
+    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Buffer.Node),                  "Parent Node"},
     {ACPI_EXD_BUFFER,   0,                                              NULL}
 };
 
@@ -261,8 +257,8 @@ static ACPI_EXDUMP_INFO     AcpiExDumpPower[5] =
 static ACPI_EXDUMP_INFO     AcpiExDumpProcessor[7] =
 {
     {ACPI_EXD_INIT,     ACPI_EXD_TABLE_SIZE (AcpiExDumpProcessor),      NULL},
-    {ACPI_EXD_UINT32,   ACPI_EXD_OFFSET (Processor.ProcId),             "Processor ID"},
-    {ACPI_EXD_UINT32,   ACPI_EXD_OFFSET (Processor.Length),             "Length"},
+    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Processor.ProcId),             "Processor ID"},
+    {ACPI_EXD_UINT8 ,   ACPI_EXD_OFFSET (Processor.Length),             "Length"},
     {ACPI_EXD_ADDRESS,  ACPI_EXD_OFFSET (Processor.Address),            "Address"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Processor.SystemNotify),       "System Notify"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Processor.DeviceNotify),       "Device Notify"},
@@ -478,13 +474,9 @@ AcpiExDumpObject (
             break;
 
         case ACPI_EXD_POINTER:
-
-            AcpiExOutPointer (Name, *ACPI_CAST_PTR (void *, Target));
-            break;
-
         case ACPI_EXD_ADDRESS:
 
-            AcpiExOutAddress (Name, *ACPI_CAST_PTR (ACPI_PHYSICAL_ADDRESS, Target));
+            AcpiExOutPointer (Name, *ACPI_CAST_PTR (void *, Target));
             break;
 
         case ACPI_EXD_STRING:
@@ -974,19 +966,6 @@ AcpiExOutPointer (
     AcpiOsPrintf ("%20s : %p\n", Title, Value);
 }
 
-static void
-AcpiExOutAddress (
-    char                    *Title,
-    ACPI_PHYSICAL_ADDRESS   Value)
-{
-
-#if ACPI_MACHINE_WIDTH == 16
-    AcpiOsPrintf ("%20s : %p\n", Title, Value);
-#else
-    AcpiOsPrintf ("%20s : %8.8X%8.8X\n", Title, ACPI_FORMAT_UINT64 (Value));
-#endif
-}
-
 
 /*******************************************************************************
  *
@@ -1015,7 +994,6 @@ AcpiExDumpNamespaceNode (
             return;
         }
     }
-
 
     AcpiOsPrintf ("%20s : %4.4s\n",       "Name", AcpiUtGetNodeName (Node));
     AcpiExOutString  ("Type",             AcpiUtGetTypeName (Node->Type));

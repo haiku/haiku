@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: achware.h -- hardware specific interfaces
- *       $Revision: 1.80 $
+ *       $Revision: 1.82 $
  *
  *****************************************************************************/
 
@@ -138,10 +138,6 @@
  * hwacpi - high level functions
  */
 ACPI_STATUS
-AcpiHwInitialize (
-    void);
-
-ACPI_STATUS
 AcpiHwSetMode (
     UINT32                  Mode);
 
@@ -183,7 +179,7 @@ AcpiHwLowLevelWrite (
 
 ACPI_STATUS
 AcpiHwClearAcpiStatus (
-    UINT32                  Flags);
+    void);
 
 
 /*

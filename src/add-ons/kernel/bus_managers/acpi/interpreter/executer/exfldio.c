@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exfldio - Aml Field I/O
- *              $Revision: 1.126 $
+ *              $Revision: 1.127 $
  *
  *****************************************************************************/
 
@@ -359,13 +359,13 @@ AcpiExAccessRegion (
     }
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_BFIELD,
-        " Region [%s:%X], Width %X, ByteBase %X, Offset %X at %8.8X%8.8X\n",
+        " Region [%s:%X], Width %X, ByteBase %X, Offset %X at %p\n",
         AcpiUtGetRegionName (RgnDesc->Region.SpaceId),
         RgnDesc->Region.SpaceId,
         ObjDesc->CommonField.AccessByteWidth,
         ObjDesc->CommonField.BaseByteOffset,
         FieldDatumByteOffset,
-        ACPI_FORMAT_UINT64 (Address)));
+        (void *) Address));
 
     /* Invoke the appropriate AddressSpace/OpRegion handler */
 

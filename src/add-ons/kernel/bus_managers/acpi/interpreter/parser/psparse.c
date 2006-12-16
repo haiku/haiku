@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: psparse - Parser top level AML parse routines
- *              $Revision: 1.168 $
+ *              $Revision: 1.169 $
  *
  *****************************************************************************/
 
@@ -642,6 +642,9 @@ AcpiPsParseAml (
             if ((Status == AE_ALREADY_EXISTS) &&
                 (!WalkState->MethodDesc->Method.Mutex))
             {
+                ACPI_INFO ((AE_INFO, "Marking method %4.4s as Serialized",
+                    WalkState->MethodNode->Name.Ascii));
+
                 /*
                  * Method tried to create an object twice. The probable cause is
                  * that the method cannot handle reentrancy.

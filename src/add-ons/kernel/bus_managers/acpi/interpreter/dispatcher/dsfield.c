@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dsfield - Dispatcher field routines
- *              $Revision: 1.82 $
+ *              $Revision: 1.83 $
  *
  *****************************************************************************/
 
@@ -224,7 +224,8 @@ AcpiDsCreateBufferField (
         }
     }
 
-    /* We could put the returned object (Node) on the object stack for later,
+    /*
+     * We could put the returned object (Node) on the object stack for later,
      * but for now, we will put it in the "op" object that the parser uses,
      * so we can get it again at the end of this scope
      */
@@ -633,8 +634,33 @@ AcpiDsCreateBankField (
 
     /* Third arg is the BankValue */
 
+    /* TBD: This arg is a TermArg, not a constant, and must be evaluated */
+
     Arg = Arg->Common.Next;
-    Info.BankValue = (UINT32) Arg->Common.Value.Integer;
+
+    /* Currently, only the following constants are supported */
+
+    switch (Arg->Common.AmlOpcode)
+    {
+    case AML_ZERO_OP:
+        Info.BankValue = 0;
+        break;
+
+    case AML_ONE_OP:
+        Info.BankValue = 1;
+        break;
+
+    case AML_BYTE_OP:
+    case AML_WORD_OP:
+    case AML_DWORD_OP:
+    case AML_QWORD_OP:
+        Info.BankValue = (UINT32) Arg->Common.Value.Integer;
+        break;
+
+    default:
+        Info.BankValue = 0;
+        ACPI_ERROR ((AE_INFO, "Non-constant BankValue for BankField is not implemented"));
+    }
 
     /* Fourth arg is the field flags */
 

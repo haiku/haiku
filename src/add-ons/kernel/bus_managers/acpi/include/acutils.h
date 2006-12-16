@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acutils.h -- prototypes for the common (subsystem-wide) procedures
- *       $Revision: 1.196 $
+ *       $Revision: 1.199 $
  *
  *****************************************************************************/
 
@@ -245,10 +245,6 @@ AcpiUtHardwareInitialize (
 
 void
 AcpiUtSubsystemShutdown (
-    void);
-
-ACPI_STATUS
-AcpiUtValidateFadt (
     void);
 
 
@@ -740,6 +736,10 @@ AcpiUtShortDivide (
 /*
  * utmisc
  */
+const char *
+AcpiUtValidateException (
+    ACPI_STATUS             Status);
+
 BOOLEAN
 AcpiUtIsAmlTable (
     ACPI_TABLE_HEADER       *Table);
@@ -774,7 +774,7 @@ AcpiUtValidAcpiName (
 
 ACPI_NAME
 AcpiUtRepairName (
-    ACPI_NAME               Name);
+    char                    *Name);
 
 BOOLEAN
 AcpiUtValidAcpiChar (

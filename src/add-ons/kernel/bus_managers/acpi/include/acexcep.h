@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acexcep.h - Exception codes returned by the ACPI subsystem
- *       $Revision: 1.77 $
+ *       $Revision: 1.78 $
  *
  *****************************************************************************/
 
@@ -258,8 +258,10 @@
 #define AE_CTRL_BREAK                   (ACPI_STATUS) (0x0009 | AE_CODE_CONTROL)
 #define AE_CTRL_CONTINUE                (ACPI_STATUS) (0x000A | AE_CODE_CONTROL)
 #define AE_CTRL_SKIP                    (ACPI_STATUS) (0x000B | AE_CODE_CONTROL)
+#define AE_CTRL_PARSE_CONTINUE          (ACPI_STATUS) (0x000C | AE_CODE_CONTROL)
+#define AE_CTRL_PARSE_PENDING           (ACPI_STATUS) (0x000D | AE_CODE_CONTROL)
 
-#define AE_CODE_CTRL_MAX                0x000B
+#define AE_CODE_CTRL_MAX                0x000D
 
 
 #ifdef DEFINE_ACPI_GLOBALS
@@ -378,7 +380,9 @@ char const   *AcpiGbl_ExceptionNames_Ctrl[] =
     "AE_CTRL_TRANSFER",
     "AE_CTRL_BREAK",
     "AE_CTRL_CONTINUE",
-    "AE_CTRL_SKIP"
+    "AE_CTRL_SKIP",
+    "AE_CTRL_PARSE_CONTINUE",
+    "AE_CTRL_PARSE_PENDING"
 };
 
 #endif /* ACPI GLOBALS */

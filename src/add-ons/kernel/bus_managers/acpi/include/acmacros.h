@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acmacros.h - C macros for the entire subsystem.
- *       $Revision: 1.191 $
+ *       $Revision: 1.192 $
  *
  *****************************************************************************/
 
@@ -129,6 +129,7 @@
 #define ACPI_SET_BIT(target,bit)        ((target) |= (bit))
 #define ACPI_CLEAR_BIT(target,bit)      ((target) &= ~(bit))
 #define ACPI_MIN(a,b)                   (((a)<(b))?(a):(b))
+#define ACPI_MAX(a,b)                   (((a)>(b))?(a):(b))
 
 /* Size calculation */
 

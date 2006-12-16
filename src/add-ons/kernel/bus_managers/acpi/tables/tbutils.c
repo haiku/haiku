@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- * Module Name: tbutils - Table manipulation utilities
- *              $Revision: 1.79 $
+ * Module Name: tbutils   - table utilities
+ *              $Revision: 1.87 $
  *
  *****************************************************************************/
 
@@ -119,152 +119,132 @@
 #include "acpi.h"
 #include "actables.h"
 
-
 #define _COMPONENT          ACPI_TABLES
         ACPI_MODULE_NAME    ("tbutils")
 
 /* Local prototypes */
 
-#ifdef ACPI_OBSOLETE_FUNCTIONS
-ACPI_STATUS
-AcpiTbHandleToObject (
-    UINT16                  TableId,
-    ACPI_TABLE_DESC         **TableDesc);
-#endif
+static ACPI_PHYSICAL_ADDRESS
+AcpiTbGetRootTableEntry (
+    UINT8                   *TableEntry,
+    ACPI_NATIVE_UINT        TableEntrySize);
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbIsTableInstalled
+ * FUNCTION:    AcpiTbTablesLoaded
  *
- * PARAMETERS:  NewTableDesc        - Descriptor for new table being installed
+ * PARAMETERS:  None
  *
- * RETURN:      Status - AE_ALREADY_EXISTS if the table is already installed
+ * RETURN:      TRUE if required ACPI tables are loaded
  *
- * DESCRIPTION: Determine if an ACPI table is already installed
- *
- * MUTEX:       Table data structures should be locked
+ * DESCRIPTION: Determine if the minimum required ACPI tables are present
+ *              (FADT, FACS, DSDT)
  *
  ******************************************************************************/
 
-ACPI_STATUS
-AcpiTbIsTableInstalled (
-    ACPI_TABLE_DESC         *NewTableDesc)
+BOOLEAN
+AcpiTbTablesLoaded (
+    void)
 {
-    ACPI_TABLE_DESC         *TableDesc;
 
-
-    ACPI_FUNCTION_TRACE (TbIsTableInstalled);
-
-
-    /* Get the list descriptor and first table descriptor */
-
-    TableDesc = AcpiGbl_TableLists[NewTableDesc->Type].Next;
-
-    /* Examine all installed tables of this type */
-
-    while (TableDesc)
+    if (AcpiGbl_RootTableList.Count >= 3)
     {
-        /*
-         * If the table lengths match, perform a full bytewise compare. This
-         * means that we will allow tables with duplicate OemTableId(s), as
-         * long as the tables are different in some way.
-         *
-         * Checking if the table has been loaded into the namespace means that
-         * we don't check for duplicate tables during the initial installation
-         * of tables within the RSDT/XSDT.
-         */
-        if ((TableDesc->LoadedIntoNamespace) &&
-            (TableDesc->Pointer->Length == NewTableDesc->Pointer->Length) &&
-            (!ACPI_MEMCMP (TableDesc->Pointer, NewTableDesc->Pointer,
-                NewTableDesc->Pointer->Length)))
-        {
-            /* Match: this table is already installed */
-
-            ACPI_DEBUG_PRINT ((ACPI_DB_TABLES,
-                "Table [%4.4s] already installed: Rev %X OemTableId [%8.8s]\n",
-                NewTableDesc->Pointer->Signature,
-                NewTableDesc->Pointer->Revision,
-                NewTableDesc->Pointer->OemTableId));
-
-            NewTableDesc->OwnerId       = TableDesc->OwnerId;
-            NewTableDesc->InstalledDesc = TableDesc;
-
-            return_ACPI_STATUS (AE_ALREADY_EXISTS);
-        }
-
-        /* Get next table on the list */
-
-        TableDesc = TableDesc->Next;
+        return (TRUE);
     }
 
-    return_ACPI_STATUS (AE_OK);
+    return (FALSE);
 }
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbValidateTableHeader
+ * FUNCTION:    AcpiTbPrintTableHeader
  *
- * PARAMETERS:  TableHeader         - Logical pointer to the table
+ * PARAMETERS:  Address             - Table physical address
+ *              Header              - Table header
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Print an ACPI table header. Special cases for FACS and RSDP.
+ *
+ ******************************************************************************/
+
+void
+AcpiTbPrintTableHeader (
+    ACPI_PHYSICAL_ADDRESS   Address,
+    ACPI_TABLE_HEADER       *Header)
+{
+
+    if (ACPI_COMPARE_NAME (Header->Signature, ACPI_SIG_FACS))
+    {
+        /* FACS only has signature and length fields of common table header */
+
+        ACPI_INFO ((AE_INFO, "%4.4s @ 0x%p/0x%04X",
+            Header->Signature, ACPI_CAST_PTR (void, Address), Header->Length));
+    }
+    else if (ACPI_COMPARE_NAME (Header->Signature, ACPI_SIG_RSDP))
+    {
+        /* RSDP has no common fields */
+
+        ACPI_INFO ((AE_INFO, "RSDP @ 0x%p/0x%04X (v%3.3d %6.6s)",
+            ACPI_CAST_PTR (void, Address),
+            (ACPI_CAST_PTR (ACPI_TABLE_RSDP, Header)->Revision > 0) ?
+                ACPI_CAST_PTR (ACPI_TABLE_RSDP, Header)->Length : 20,
+            ACPI_CAST_PTR (ACPI_TABLE_RSDP, Header)->Revision,
+            ACPI_CAST_PTR (ACPI_TABLE_RSDP, Header)->OemId));
+    }
+    else
+    {
+        /* Standard ACPI table with full common header */
+
+        ACPI_INFO ((AE_INFO,
+            "%4.4s @ 0x%p/0x%04X (v%3.3d %6.6s %8.8s 0x%08X %4.4s 0x%08X)",
+            Header->Signature, ACPI_CAST_PTR (void, Address),
+            Header->Length, Header->Revision, Header->OemId,
+            Header->OemTableId, Header->OemRevision, Header->AslCompilerId,
+            Header->AslCompilerRevision));
+    }
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiTbValidateChecksum
+ *
+ * PARAMETERS:  Table               - ACPI table to verify
+ *              Length              - Length of entire table
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check an ACPI table header for validity
- *
- * NOTE:  Table pointers are validated as follows:
- *          1) Table pointer must point to valid physical memory
- *          2) Signature must be 4 ASCII chars, even if we don't recognize the
- *             name
- *          3) Table must be readable for length specified in the header
- *          4) Table checksum must be valid (with the exception of the FACS
- *              which has no checksum because it contains variable fields)
+ * DESCRIPTION: Verifies that the table checksums to zero. Optionally returns
+ *              exception on bad checksum.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiTbValidateTableHeader (
-    ACPI_TABLE_HEADER       *TableHeader)
+AcpiTbVerifyChecksum (
+    ACPI_TABLE_HEADER       *Table,
+    UINT32                  Length)
 {
-    ACPI_NAME               Signature;
+    UINT8                   Checksum;
 
 
-    ACPI_FUNCTION_ENTRY ();
+    /* Compute the checksum on the table */
 
+    Checksum = AcpiTbChecksum (ACPI_CAST_PTR (UINT8, Table), Length);
 
-    /* Verify that this is a valid address */
+    /* Checksum ok? (should be zero) */
 
-    if (!AcpiOsReadable (TableHeader, sizeof (ACPI_TABLE_HEADER)))
+    if (Checksum)
     {
-        ACPI_ERROR ((AE_INFO,
-            "Cannot read table header at %p", TableHeader));
+        ACPI_WARNING ((AE_INFO,
+            "Incorrect checksum in table [%4.4s] -  %2.2X, should be %2.2X",
+            Table->Signature, Table->Checksum, (UINT8) (Table->Checksum - Checksum)));
 
-        return (AE_BAD_ADDRESS);
-    }
-
-    /* Ensure that the signature is 4 ASCII characters */
-
-    ACPI_MOVE_32_TO_32 (&Signature, TableHeader->Signature);
-    if (!AcpiUtValidAcpiName (Signature))
-    {
-        ACPI_ERROR ((AE_INFO, "Invalid table signature 0x%8.8X",
-            Signature));
-
-        ACPI_DUMP_BUFFER (TableHeader, sizeof (ACPI_TABLE_HEADER));
-        return (AE_BAD_SIGNATURE);
-    }
-
-    /* Validate the table length */
-
-    if (TableHeader->Length < sizeof (ACPI_TABLE_HEADER))
-    {
-        ACPI_ERROR ((AE_INFO,
-            "Invalid length 0x%X in table with signature %4.4s",
-            (UINT32) TableHeader->Length,
-            ACPI_CAST_PTR (char, &Signature)));
-
-        ACPI_DUMP_BUFFER (TableHeader, sizeof (ACPI_TABLE_HEADER));
-        return (AE_BAD_HEADER);
+#if (ACPI_CHECKSUM_ABORT)
+        return (AE_BAD_CHECKSUM);
+#endif
     }
 
     return (AE_OK);
@@ -273,184 +253,342 @@ AcpiTbValidateTableHeader (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbSumTable
+ * FUNCTION:    AcpiTbChecksum
  *
- * PARAMETERS:  Buffer              - Buffer to sum
- *              Length              - Size of the buffer
+ * PARAMETERS:  Buffer          - Pointer to memory region to be checked
+ *              Length          - Length of this memory region
  *
- * RETURN:      8 bit sum of buffer
+ * RETURN:      Checksum (UINT8)
  *
- * DESCRIPTION: Computes an 8 bit sum of the buffer(length) and returns it.
+ * DESCRIPTION: Calculates circular checksum of memory region.
  *
  ******************************************************************************/
 
 UINT8
-AcpiTbSumTable (
-    void                    *Buffer,
-    UINT32                  Length)
+AcpiTbChecksum (
+    UINT8                   *Buffer,
+    ACPI_NATIVE_UINT        Length)
 {
-    ACPI_NATIVE_UINT        i;
     UINT8                   Sum = 0;
+    UINT8                   *End = Buffer + Length;
 
 
-    if (!Buffer || !Length)
+    while (Buffer < End)
     {
-        return (0);
+        Sum = (UINT8) (Sum + *(Buffer++));
     }
 
-    for (i = 0; i < Length; i++)
-    {
-        Sum = (UINT8) (Sum + ((UINT8 *) Buffer)[i]);
-    }
-    return (Sum);
+    return Sum;
 }
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbGenerateChecksum
+ * FUNCTION:    AcpiTbInstallTable
  *
- * PARAMETERS:  Table               - Pointer to a valid ACPI table (with a
- *                                    standard ACPI header)
+ * PARAMETERS:  Address                 - Physical address of DSDT or FACS
+ *              Flags                   - Flags
+ *              Signature               - Table signature, NULL if no need to
+ *                                        match
+ *              TableIndex              - Index into root table array
  *
- * RETURN:      8 bit checksum of buffer
+ * RETURN:      None
  *
- * DESCRIPTION: Computes an 8 bit checksum of the table.
- *
- ******************************************************************************/
-
-UINT8
-AcpiTbGenerateChecksum (
-    ACPI_TABLE_HEADER       *Table)
-{
-    UINT8                   Checksum;
-
-
-    /* Sum the entire table as-is */
-
-    Checksum = AcpiTbSumTable (Table, Table->Length);
-
-    /* Subtract off the existing checksum value in the table */
-
-    Checksum = (UINT8) (Checksum - Table->Checksum);
-
-    /* Compute the final checksum */
-
-    Checksum = (UINT8) (0 - Checksum);
-    return (Checksum);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiTbSetChecksum
- *
- * PARAMETERS:  Table               - Pointer to a valid ACPI table (with a
- *                                    standard ACPI header)
- *
- * RETURN:      None. Sets the table checksum field
- *
- * DESCRIPTION: Computes an 8 bit checksum of the table and inserts the
- *              checksum into the table header.
+ * DESCRIPTION: Install an ACPI table into the global data structure.
  *
  ******************************************************************************/
 
 void
-AcpiTbSetChecksum (
-    ACPI_TABLE_HEADER       *Table)
+AcpiTbInstallTable (
+    ACPI_PHYSICAL_ADDRESS   Address,
+    UINT8                   Flags,
+    char                    *Signature,
+    ACPI_NATIVE_UINT        TableIndex)
 {
-
-    Table->Checksum = AcpiTbGenerateChecksum (Table);
-}
+    ACPI_TABLE_HEADER       *Table;
 
 
-/*******************************************************************************
- *
- * FUNCTION:    AcpiTbVerifyTableChecksum
- *
- * PARAMETERS:  *TableHeader            - ACPI table to verify
- *
- * RETURN:      8 bit checksum of table
- *
- * DESCRIPTION: Generates an 8 bit checksum of table and returns and compares
- *              it to the existing checksum value.
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiTbVerifyTableChecksum (
-    ACPI_TABLE_HEADER       *TableHeader)
-{
-    UINT8                   Checksum;
-
-
-    ACPI_FUNCTION_TRACE (TbVerifyTableChecksum);
-
-
-    /* Compute the checksum on the table */
-
-    Checksum = AcpiTbGenerateChecksum (TableHeader);
-
-    /* Checksum ok? */
-
-    if (Checksum == TableHeader->Checksum)
+    if (!Address)
     {
-        return_ACPI_STATUS (AE_OK);
+        ACPI_ERROR ((AE_INFO, "Null physical address for ACPI table [%s]",
+            Signature));
+        return;
     }
 
-    ACPI_WARNING ((AE_INFO,
-        "Incorrect checksum in table [%4.4s] - is %2.2X, should be %2.2X",
-        TableHeader->Signature, TableHeader->Checksum,
-        Checksum));
+    /* Map just the table header */
 
-    return_ACPI_STATUS (AE_BAD_CHECKSUM);
+    Table = AcpiOsMapMemory (Address, sizeof (ACPI_TABLE_HEADER));
+    if (!Table)
+    {
+        return;
+    }
+
+    /* If a particular signature is expected, signature must match */
+
+    if (Signature &&
+        !ACPI_COMPARE_NAME (Table->Signature, Signature))
+    {
+        ACPI_ERROR ((AE_INFO, "Invalid signature 0x%X for ACPI table [%s]",
+            *ACPI_CAST_PTR (UINT32, Table->Signature), Signature));
+        goto UnmapAndExit;
+    }
+
+    /* Initialize the table entry */
+
+    AcpiGbl_RootTableList.Tables[TableIndex].Address = Address;
+    AcpiGbl_RootTableList.Tables[TableIndex].Length = Table->Length;
+    AcpiGbl_RootTableList.Tables[TableIndex].Flags = Flags;
+
+    ACPI_MOVE_32_TO_32 (
+        &(AcpiGbl_RootTableList.Tables[TableIndex].Signature),
+        Table->Signature);
+
+    AcpiTbPrintTableHeader (Address, Table);
+
+    if (TableIndex == ACPI_TABLE_INDEX_DSDT)
+    {
+        /* Global integer width is based upon revision of the DSDT */
+
+        AcpiUtSetIntegerWidth (Table->Revision);
+    }
+
+UnmapAndExit:
+    AcpiOsUnmapMemory (Table, sizeof (ACPI_TABLE_HEADER));
 }
 
 
-#ifdef ACPI_OBSOLETE_FUNCTIONS
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbHandleToObject
+ * FUNCTION:    AcpiTbGetRootTableEntry
  *
- * PARAMETERS:  TableId             - Id for which the function is searching
- *              TableDesc           - Pointer to return the matching table
- *                                      descriptor.
+ * PARAMETERS:  TableEntry          - Pointer to the RSDT/XSDT table entry
+ *              TableEntrySize      - sizeof 32 or 64 (RSDT or XSDT)
  *
- * RETURN:      Search the tables to find one with a matching TableId and
- *              return a pointer to that table descriptor.
+ * RETURN:      Physical address extracted from the root table
+ *
+ * DESCRIPTION: Get one root table entry. Handles 32-bit and 64-bit cases on
+ *              both 32-bit and 64-bit platforms
+ *
+ * NOTE:        ACPI_PHYSICAL_ADDRESS is 32-bit on 32-bit platforms, 64-bit on
+ *              64-bit platforms.
+ *
+ ******************************************************************************/
+
+static ACPI_PHYSICAL_ADDRESS
+AcpiTbGetRootTableEntry (
+    UINT8                   *TableEntry,
+    ACPI_NATIVE_UINT        TableEntrySize)
+{
+    UINT64                  Address64;
+
+
+    /*
+     * Get the table physical address (32-bit for RSDT, 64-bit for XSDT):
+     * Note: Addresses are 32-bit aligned (not 64) in both RSDT and XSDT
+     */
+    if (TableEntrySize == sizeof (UINT32))
+    {
+        /*
+         * 32-bit platform, RSDT: Return 32-bit table entry
+         * 64-bit platform, RSDT: Expand 32-bit to 64-bit and return
+         */
+        return ((ACPI_PHYSICAL_ADDRESS) (*ACPI_CAST_PTR (UINT32, TableEntry)));
+    }
+    else
+    {
+        /*
+         * 32-bit platform, XSDT: Truncate 64-bit to 32-bit and return
+         * 64-bit platform, XSDT: Move (unaligned) 64-bit to local, return 64-bit
+         */
+        ACPI_MOVE_64_TO_64 (&Address64, TableEntry);
+
+#if ACPI_MACHINE_WIDTH == 32
+        if (Address64 > ACPI_UINT32_MAX)
+        {
+            /* Will truncate 64-bit address to 32 bits, issue warning */
+
+            ACPI_WARNING ((AE_INFO,
+                "64-bit Physical Address in XSDT is too large (%8.8X%8.8X), truncating",
+                ACPI_FORMAT_UINT64 (Address64)));
+        }
+#endif
+        return ((ACPI_PHYSICAL_ADDRESS) (Address64));
+    }
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiTbParseRootTable
+ *
+ * PARAMETERS:  Rsdp                    - Pointer to the RSDP
+ *              Flags                   - Flags
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: This function is called to parse the Root System Description
+ *              Table (RSDT or XSDT)
+ *
+ * NOTE:        Tables are mapped (not copied) for efficiency. The FACS must
+ *              be mapped and cannot be copied because it contains the actual
+ *              memory location of the ACPI Global Lock.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiTbHandleToObject (
-    UINT16                  TableId,
-    ACPI_TABLE_DESC         **ReturnTableDesc)
+AcpiTbParseRootTable (
+    ACPI_PHYSICAL_ADDRESS   RsdpAddress,
+    UINT8                   Flags)
 {
-    UINT32                  i;
-    ACPI_TABLE_DESC         *TableDesc;
+    ACPI_TABLE_RSDP         *Rsdp;
+    ACPI_NATIVE_UINT        TableEntrySize;
+    ACPI_NATIVE_UINT        i;
+    UINT32                  TableCount;
+    ACPI_TABLE_HEADER       *Table;
+    ACPI_PHYSICAL_ADDRESS   Address;
+    UINT32                  Length;
+    UINT8                   *TableEntry;
+    ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_NAME (TbHandleToObject);
+    ACPI_FUNCTION_TRACE (TbParseRootTable);
 
 
-    for (i = 0; i < ACPI_TABLE_MAX; i++)
+    /*
+     * Map the entire RSDP and extract the address of the RSDT or XSDT
+     */
+    Rsdp = AcpiOsMapMemory (RsdpAddress, sizeof (ACPI_TABLE_RSDP));
+    if (!Rsdp)
     {
-        TableDesc = AcpiGbl_TableLists[i].Next;
-        while (TableDesc)
-        {
-            if (TableDesc->TableId == TableId)
-            {
-                *ReturnTableDesc = TableDesc;
-                return (AE_OK);
-            }
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
 
-            TableDesc = TableDesc->Next;
+    AcpiTbPrintTableHeader (RsdpAddress, ACPI_CAST_PTR (ACPI_TABLE_HEADER, Rsdp));
+
+    /* Differentiate between RSDT and XSDT root tables */
+
+    if (Rsdp->Revision > 1 && Rsdp->XsdtPhysicalAddress)
+    {
+        /*
+         * Root table is an XSDT (64-bit physical addresses). We must use the
+         * XSDT if the revision is > 1 and the XSDT pointer is present, as per
+         * the ACPI specification.
+         */
+        Address = (ACPI_PHYSICAL_ADDRESS) Rsdp->XsdtPhysicalAddress;
+        TableEntrySize = sizeof (UINT64);
+    }
+    else
+    {
+        /* Root table is an RSDT (32-bit physical addresses) */
+
+        Address = (ACPI_PHYSICAL_ADDRESS) Rsdp->RsdtPhysicalAddress;
+        TableEntrySize = sizeof (UINT32);
+    }
+
+    /*
+     * It is not possible to map more than one entry in some environments,
+     * so unmap the RSDP here before mapping other tables
+     */
+    AcpiOsUnmapMemory (Rsdp, sizeof (ACPI_TABLE_RSDP));
+
+
+    /* Map the RSDT/XSDT table header to get the full table length */
+
+    Table = AcpiOsMapMemory (Address, sizeof (ACPI_TABLE_HEADER));
+    if (!Table)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    AcpiTbPrintTableHeader (Address, Table);
+
+    /* Get the length of the full table, verify length and map entire table */
+
+    Length = Table->Length;
+    AcpiOsUnmapMemory (Table, sizeof (ACPI_TABLE_HEADER));
+
+    if (Length < sizeof (ACPI_TABLE_HEADER))
+    {
+        ACPI_ERROR ((AE_INFO, "Invalid length 0x%X in RSDT/XSDT", Length));
+        return_ACPI_STATUS (AE_INVALID_TABLE_LENGTH);
+    }
+
+    Table = AcpiOsMapMemory (Address, Length);
+    if (!Table)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    /* Validate the root table checksum */
+
+    Status = AcpiTbVerifyChecksum (Table, Length);
+    if (ACPI_FAILURE (Status))
+    {
+        AcpiOsUnmapMemory (Table, Length);
+        return_ACPI_STATUS (Status);
+    }
+
+    /* Calculate the number of tables described in the root table */
+
+    TableCount = (UINT32) ((Table->Length - sizeof (ACPI_TABLE_HEADER)) / TableEntrySize);
+
+    /*
+     * First two entries in the table array are reserved for the DSDT and FACS,
+     * which are not actually present in the RSDT/XSDT - they come from the FADT
+     */
+    TableEntry = ACPI_CAST_PTR (UINT8, Table) + sizeof (ACPI_TABLE_HEADER);
+    AcpiGbl_RootTableList.Count = 2;
+
+    /*
+     * Initialize the root table array from the RSDT/XSDT
+     */
+    for (i = 0; i < TableCount; i++)
+    {
+        if (AcpiGbl_RootTableList.Count >= AcpiGbl_RootTableList.Size)
+        {
+            /* There is no more room in the root table array, attempt resize */
+
+            Status = AcpiTbResizeRootTableList ();
+            if (ACPI_FAILURE (Status))
+            {
+                ACPI_WARNING ((AE_INFO, "Truncating %u table entries!",
+                    (unsigned) (AcpiGbl_RootTableList.Size - AcpiGbl_RootTableList.Count)));
+                break;
+            }
+        }
+
+        /* Get the table physical address (32-bit for RSDT, 64-bit for XSDT) */
+
+        AcpiGbl_RootTableList.Tables[AcpiGbl_RootTableList.Count].Address =
+            AcpiTbGetRootTableEntry (TableEntry, TableEntrySize);
+
+        TableEntry += TableEntrySize;
+        AcpiGbl_RootTableList.Count++;
+    }
+
+    /*
+     * It is not possible to map more than one entry in some environments,
+     * so unmap the root table here before mapping other tables
+     */
+    AcpiOsUnmapMemory (Table, Length);
+
+    /*
+     * Complete the initialization of the root table array by examining
+     * the header of each table
+     */
+    for (i = 2; i < AcpiGbl_RootTableList.Count; i++)
+    {
+        AcpiTbInstallTable (AcpiGbl_RootTableList.Tables[i].Address,
+            Flags, NULL, i);
+
+        /* Special case for FADT - get the DSDT and FACS */
+
+        if (ACPI_COMPARE_NAME (
+                &AcpiGbl_RootTableList.Tables[i].Signature, ACPI_SIG_FADT))
+        {
+            AcpiTbParseFadt (i, Flags);
         }
     }
 
-    ACPI_ERROR ((AE_INFO, "TableId=%X does not exist", TableId));
-    return (AE_BAD_PARAMETER);
+    return_ACPI_STATUS (AE_OK);
 }
-#endif
-
-

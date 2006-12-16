@@ -2,7 +2,7 @@
  *
  * Module Name: evsci - System Control Interrupt configuration and
  *                      legacy to ACPI mode state transition functions
- *              $Revision: 1.100 $
+ *              $Revision: 1.101 $
  *
  ******************************************************************************/
 
@@ -235,8 +235,8 @@ AcpiEvInstallSciHandler (
     ACPI_FUNCTION_TRACE (EvInstallSciHandler);
 
 
-    Status = AcpiOsInstallInterruptHandler ((UINT32) AcpiGbl_FADT->SciInt,
-                        AcpiEvSciXruptHandler, AcpiGbl_GpeXruptListHead);
+    Status = AcpiOsInstallInterruptHandler ((UINT32) AcpiGbl_FADT.SciInterrupt,
+                AcpiEvSciXruptHandler, AcpiGbl_GpeXruptListHead);
     return_ACPI_STATUS (Status);
 }
 
@@ -272,8 +272,8 @@ AcpiEvRemoveSciHandler (
 
     /* Just let the OS remove the handler and disable the level */
 
-    Status = AcpiOsRemoveInterruptHandler ((UINT32) AcpiGbl_FADT->SciInt,
-                                    AcpiEvSciXruptHandler);
+    Status = AcpiOsRemoveInterruptHandler ((UINT32) AcpiGbl_FADT.SciInterrupt,
+                AcpiEvSciXruptHandler);
 
     return_ACPI_STATUS (Status);
 }

@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exresolv - AML Interpreter object resolution
- *              $Revision: 1.139 $
+ *              $Revision: 1.140 $
  *
  *****************************************************************************/
 
@@ -230,7 +230,7 @@ AcpiExResolveObjectToValue (
     ACPI_STATUS             Status = AE_OK;
     ACPI_OPERAND_OBJECT     *StackDesc;
     void                    *TempNode;
-    ACPI_OPERAND_OBJECT     *ObjDesc;
+    ACPI_OPERAND_OBJECT     *ObjDesc = NULL;
     UINT16                  Opcode;
 
 
@@ -397,8 +397,6 @@ AcpiExResolveObjectToValue (
         break;
 
 
-    /* These cases may never happen here, but just in case.. */
-
     case ACPI_TYPE_BUFFER_FIELD:
     case ACPI_TYPE_LOCAL_REGION_FIELD:
     case ACPI_TYPE_LOCAL_BANK_FIELD:
@@ -408,6 +406,10 @@ AcpiExResolveObjectToValue (
             StackDesc, ACPI_GET_OBJECT_TYPE (StackDesc)));
 
         Status = AcpiExReadDataFromField (WalkState, StackDesc, &ObjDesc);
+
+        /* Remove a reference to the original operand, then override */
+
+        AcpiUtRemoveReference (*StackPtr);
         *StackPtr = (void *) ObjDesc;
         break;
 

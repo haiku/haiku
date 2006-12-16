@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- * Module Name: tbrsdt - ACPI RSDT table utilities
- *              $Revision: 1.32 $
+ * Module Name: adfile - Application-level disassembler file support routines
+ *              $Revision: 1.2 $
  *
  *****************************************************************************/
 
@@ -114,309 +114,285 @@
  *
  *****************************************************************************/
 
-#define __TBRSDT_C__
 
 #include "acpi.h"
-#include "actables.h"
+#include "acapps.h"
+
+#include <stdio.h>
+#include <string.h>
 
 
-#define _COMPONENT          ACPI_TABLES
-        ACPI_MODULE_NAME    ("tbrsdt")
+#define _COMPONENT          ACPI_TOOLS
+        ACPI_MODULE_NAME    ("adfile")
 
 
-/*******************************************************************************
+char                        FilenameBuf[20];
+
+/******************************************************************************
  *
- * FUNCTION:    AcpiTbVerifyRsdp
+ * FUNCTION:    AfGenerateFilename
  *
- * PARAMETERS:  Address         - RSDP (Pointer to RSDT)
+ * PARAMETERS:  Prefix      - prefix string
+ *              TableId     - The table ID
  *
- * RETURN:      Status
+ * RETURN:      Pointer to the completed string
  *
- * DESCRIPTION: Load and validate the RSDP (ptr) and RSDT (table)
+ * DESCRIPTION: Build an output filename from an ACPI table ID string
  *
  ******************************************************************************/
 
-ACPI_STATUS
-AcpiTbVerifyRsdp (
-    ACPI_POINTER            *Address)
+char *
+AdGenerateFilename (
+    char                    *Prefix,
+    char                    *TableId)
 {
-    ACPI_TABLE_DESC         TableInfo;
-    ACPI_STATUS             Status;
-    RSDP_DESCRIPTOR         *Rsdp;
+    ACPI_NATIVE_UINT         i;
+    ACPI_NATIVE_UINT         j;
 
 
-    ACPI_FUNCTION_TRACE (TbVerifyRsdp);
-
-
-    switch (Address->PointerType)
+    for (i = 0; Prefix[i]; i++)
     {
-    case ACPI_LOGICAL_POINTER:
-
-        Rsdp = Address->Pointer.Logical;
-        break;
-
-    case ACPI_PHYSICAL_POINTER:
-        /*
-         * Obtain access to the RSDP structure
-         */
-        Status = AcpiOsMapMemory (Address->Pointer.Physical,
-                    sizeof (RSDP_DESCRIPTOR), ACPI_CAST_PTR (void, &Rsdp));
-        if (ACPI_FAILURE (Status))
-        {
-            return_ACPI_STATUS (Status);
-        }
-        break;
-
-    default:
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
+        FilenameBuf[i] = Prefix[i];
     }
 
-    /* Verify RSDP signature and checksum */
+    FilenameBuf[i] = '_';
+    i++;
 
-    Status = AcpiTbValidateRsdp (Rsdp);
-    if (ACPI_FAILURE (Status))
+    for (j = 0; j < 8 && (TableId[j] != ' ') && (TableId[j] != 0); i++, j++)
     {
-        goto Cleanup;
+        FilenameBuf[i] = TableId[j];
     }
 
-    /* RSDP is ok. Init the table info */
-
-    TableInfo.Pointer = ACPI_CAST_PTR (ACPI_TABLE_HEADER, Rsdp);
-    TableInfo.Length = sizeof (RSDP_DESCRIPTOR);
-
-    if (Address->PointerType == ACPI_PHYSICAL_POINTER)
-    {
-        TableInfo.Allocation = ACPI_MEM_MAPPED;
-    }
-    else
-    {
-        TableInfo.Allocation = ACPI_MEM_NOT_ALLOCATED;
-    }
-
-    /* Save the table pointers and allocation info */
-
-    Status = AcpiTbInitTableDescriptor (ACPI_TABLE_ID_RSDP, &TableInfo);
-    if (ACPI_FAILURE (Status))
-    {
-        goto Cleanup;
-    }
-
-    /* Save the RSDP in a global for easy access */
-
-    AcpiGbl_RSDP = ACPI_CAST_PTR (RSDP_DESCRIPTOR, TableInfo.Pointer);
-    return_ACPI_STATUS (Status);
-
-
-    /* Error exit */
-Cleanup:
-
-    if (AcpiGbl_TableFlags & ACPI_PHYSICAL_POINTER)
-    {
-        AcpiOsUnmapMemory (Rsdp, sizeof (RSDP_DESCRIPTOR));
-    }
-    return_ACPI_STATUS (Status);
+    FilenameBuf[i] = 0;
+    strcat (FilenameBuf, ACPI_TABLE_FILE_SUFFIX);
+    return FilenameBuf;
 }
 
 
-/*******************************************************************************
+/******************************************************************************
  *
- * FUNCTION:    AcpiTbGetRsdtAddress
+ * FUNCTION:    AfWriteBuffer
  *
- * PARAMETERS:  OutAddress          - Where the address is returned
+ * PARAMETERS:  Filename        - name of file
+ *              Buffer          - data to write
+ *              Length          - length of data
  *
- * RETURN:      None, Address
+ * RETURN:      Actual number of bytes written
  *
- * DESCRIPTION: Extract the address of either the RSDT or XSDT, depending on the
- *              version of the RSDP and whether the XSDT pointer is valid
+ * DESCRIPTION: Open a file and write out a single buffer
+ *
+ ******************************************************************************/
+
+ACPI_NATIVE_INT
+AdWriteBuffer (
+    char                *Filename,
+    char                *Buffer,
+    UINT32              Length)
+{
+    FILE                *fp;
+    ACPI_SIZE           Actual;
+
+
+    fp = fopen (Filename, "wb");
+    if (!fp)
+    {
+        printf ("Couldn't open %s\n", Filename);
+        return (-1);
+    }
+
+    Actual = fwrite (Buffer, (size_t) Length, 1, fp);
+    fclose (fp);
+    return ((ACPI_NATIVE_INT) Actual);
+}
+
+
+/******************************************************************************
+ *
+ * FUNCTION:    AfWriteTable
+ *
+ * PARAMETERS:  Table       - pointer to the ACPI table
+ *              Length      - length of the table
+ *              TableName   - the table signature
+ *              OemTableID  - from the table header
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Dump the loaded tables to a file (or files)
  *
  ******************************************************************************/
 
 void
-AcpiTbGetRsdtAddress (
-    ACPI_POINTER            *OutAddress)
+AdWriteTable (
+    ACPI_TABLE_HEADER       *Table,
+    UINT32                  Length,
+    char                    *TableName,
+    char                    *OemTableId)
 {
+    char                    *Filename;
 
-    ACPI_FUNCTION_ENTRY ();
 
+    Filename = AdGenerateFilename (TableName, OemTableId);
+    AdWriteBuffer (Filename, (char *) Table, Length);
 
-    OutAddress->PointerType = AcpiGbl_TableFlags | ACPI_LOGICAL_ADDRESSING;
-
-    /* Use XSDT if it is present */
-
-    if ((AcpiGbl_RSDP->Revision >= 2) &&
-        ACPI_GET_ADDRESS (AcpiGbl_RSDP->XsdtPhysicalAddress))
-    {
-        OutAddress->Pointer.Value =
-            ACPI_GET_ADDRESS (AcpiGbl_RSDP->XsdtPhysicalAddress);
-        AcpiGbl_RootTableType = ACPI_TABLE_TYPE_XSDT;
-    }
-    else
-    {
-        /* No XSDT, use the RSDT */
-
-        OutAddress->Pointer.Value = AcpiGbl_RSDP->RsdtPhysicalAddress;
-        AcpiGbl_RootTableType = ACPI_TABLE_TYPE_RSDT;
-    }
+    AcpiOsPrintf ("Table [%s] written to \"%s\"\n", TableName, Filename);
 }
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbValidateRsdt
+ * FUNCTION:    FlGenerateFilename
  *
- * PARAMETERS:  TablePtr        - Addressable pointer to the RSDT.
+ * PARAMETERS:  InputFilename       - Original ASL source filename
+ *              Suffix              - New extension.
+ *
+ * RETURN:      New filename containing the original base + the new suffix
+ *
+ * DESCRIPTION: Generate a new filename from the ASL source filename and a new
+ *              extension.  Used to create the *.LST, *.TXT, etc. files.
+ *
+ ******************************************************************************/
+
+char *
+FlGenerateFilename (
+    char                    *InputFilename,
+    char                    *Suffix)
+{
+    char                    *Position;
+    char                    *NewFilename;
+
+
+    /*
+     * Copy the original filename to a new buffer. Leave room for the worst case
+     * where we append the suffix, an added dot and the null terminator.
+     */
+    NewFilename = ACPI_ALLOCATE_ZEROED (
+        strlen (InputFilename) + strlen (Suffix) + 2);
+    strcpy (NewFilename, InputFilename);
+
+    /* Try to find the last dot in the filename */
+
+    Position = strrchr (NewFilename, '.');
+    if (Position)
+    {
+        /* Tack on the new suffix */
+
+        Position++;
+        *Position = 0;
+        strcat (Position, Suffix);
+    }
+    else
+    {
+        /* No dot, add one and then the suffix */
+
+        strcat (NewFilename, ".");
+        strcat (NewFilename, Suffix);
+    }
+
+    return NewFilename;
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    FlStrdup
+ *
+ * DESCRIPTION: Local strdup function
+ *
+ ******************************************************************************/
+
+static char *
+FlStrdup (
+    char                *String)
+{
+    char                *NewString;
+
+
+    NewString = ACPI_ALLOCATE (strlen (String) + 1);
+    if (!NewString)
+    {
+        return (NULL);
+    }
+
+    strcpy (NewString, String);
+    return (NewString);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    FlSplitInputPathname
+ *
+ * PARAMETERS:  InputFilename       - The user-specified ASL source file to be
+ *                                    compiled
+ *              OutDirectoryPath    - Where the directory path prefix is
+ *                                    returned
+ *              OutFilename         - Where the filename part is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Validate signature for the RSDT or XSDT
+ * DESCRIPTION: Split the input path into a directory and filename part
+ *              1) Directory part used to open include files
+ *              2) Filename part used to generate output filenames
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiTbValidateRsdt (
-    ACPI_TABLE_HEADER       *TablePtr)
+FlSplitInputPathname (
+    char                    *InputPath,
+    char                    **OutDirectoryPath,
+    char                    **OutFilename)
 {
-    char                    *Signature;
+    char                    *Substring;
+    char                    *DirectoryPath;
+    char                    *Filename;
 
 
-    ACPI_FUNCTION_ENTRY ();
+    *OutDirectoryPath = NULL;
+    *OutFilename = NULL;
 
-
-    /* Validate minimum length */
-
-    if (TablePtr->Length < sizeof (ACPI_TABLE_HEADER))
+    if (!InputPath)
     {
-        ACPI_ERROR ((AE_INFO,
-            "RSDT/XSDT length (%X) is smaller than minimum (%X)",
-            TablePtr->Length, sizeof (ACPI_TABLE_HEADER)));
-
-        return (AE_INVALID_TABLE_LENGTH);
+        return (AE_OK);
     }
 
-    /* Search for appropriate signature, RSDT or XSDT */
+    /* Get the path to the input filename's directory */
 
-    if (AcpiGbl_RootTableType == ACPI_TABLE_TYPE_RSDT)
+    DirectoryPath = FlStrdup (InputPath);
+    if (!DirectoryPath)
     {
-        Signature = RSDT_SIG;
+        return (AE_NO_MEMORY);
+    }
+
+    Substring = strrchr (DirectoryPath, '\\');
+    if (!Substring)
+    {
+        Substring = strrchr (DirectoryPath, '/');
+        if (!Substring)
+        {
+            Substring = strrchr (DirectoryPath, ':');
+        }
+    }
+
+    if (!Substring)
+    {
+        DirectoryPath[0] = 0;
+        Filename = FlStrdup (InputPath);
     }
     else
     {
-        Signature = XSDT_SIG;
+        Filename = FlStrdup (Substring + 1);
+        *(Substring+1) = 0;
     }
 
-    if (!ACPI_COMPARE_NAME (TablePtr->Signature, Signature))
+    if (!Filename)
     {
-        /* Invalid RSDT or XSDT signature */
-
-        ACPI_ERROR ((AE_INFO,
-            "Invalid signature where RSDP indicates RSDT/XSDT should be located. RSDP:"));
-
-        ACPI_DUMP_BUFFER (AcpiGbl_RSDP, 20);
-
-        ACPI_ERROR ((AE_INFO,
-            "RSDT/XSDT signature at %X is invalid",
-            AcpiGbl_RSDP->RsdtPhysicalAddress));
-
-        if (AcpiGbl_RootTableType == ACPI_TABLE_TYPE_RSDT)
-        {
-            ACPI_ERROR ((AE_INFO, "Looking for RSDT"));
-        }
-        else
-        {
-            ACPI_ERROR ((AE_INFO, "Looking for XSDT"));
-        }
-
-        ACPI_DUMP_BUFFER (ACPI_CAST_PTR (char, TablePtr), 48);
-        return (AE_BAD_SIGNATURE);
+        return (AE_NO_MEMORY);
     }
+
+    *OutDirectoryPath = DirectoryPath;
+    *OutFilename = Filename;
 
     return (AE_OK);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiTbGetTableRsdt
- *
- * PARAMETERS:  None
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Load and validate the RSDP (ptr) and RSDT (table)
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiTbGetTableRsdt (
-    void)
-{
-    ACPI_TABLE_DESC         TableInfo;
-    ACPI_STATUS             Status;
-    ACPI_POINTER            Address;
-
-
-    ACPI_FUNCTION_TRACE (TbGetTableRsdt);
-
-
-    /* Get the RSDT/XSDT via the RSDP */
-
-    AcpiTbGetRsdtAddress (&Address);
-
-    TableInfo.Type = ACPI_TABLE_ID_XSDT;
-    Status = AcpiTbGetTable (&Address, &TableInfo);
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status, "Could not get the RSDT/XSDT"));
-        return_ACPI_STATUS (Status);
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "RSDP located at %p, points to RSDT physical=%8.8X%8.8X\n",
-        AcpiGbl_RSDP,
-        ACPI_FORMAT_UINT64 (Address.Pointer.Value)));
-
-    /* Check the RSDT or XSDT signature */
-
-    Status = AcpiTbValidateRsdt (TableInfo.Pointer);
-    if (ACPI_FAILURE (Status))
-    {
-        goto ErrorCleanup;
-    }
-
-    /* Get the number of tables defined in the RSDT or XSDT */
-
-    AcpiGbl_RsdtTableCount = AcpiTbGetTableCount (AcpiGbl_RSDP,
-                                TableInfo.Pointer);
-
-    /* Convert and/or copy to an XSDT structure */
-
-    Status = AcpiTbConvertToXsdt (&TableInfo);
-    if (ACPI_FAILURE (Status))
-    {
-        goto ErrorCleanup;
-    }
-
-    /* Save the table pointers and allocation info */
-
-    Status = AcpiTbInitTableDescriptor (ACPI_TABLE_ID_XSDT, &TableInfo);
-    if (ACPI_FAILURE (Status))
-    {
-        goto ErrorCleanup;
-    }
-
-    AcpiGbl_XSDT = ACPI_CAST_PTR (XSDT_DESCRIPTOR, TableInfo.Pointer);
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "XSDT located at %p\n", AcpiGbl_XSDT));
-    return_ACPI_STATUS (Status);
-
-
-ErrorCleanup:
-
-    /* Free table allocated by AcpiTbGetTable */
-
-    AcpiTbDeleteSingleTable (&TableInfo);
-
-    return_ACPI_STATUS (Status);
 }
 
 

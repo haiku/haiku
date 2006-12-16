@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsinit - namespace initialization
- *              $Revision: 1.84 $
+ *              $Revision: 1.85 $
  *
  *****************************************************************************/
 
@@ -314,7 +314,7 @@ AcpiNsInitOneObject (
     void                    **ReturnValue)
 {
     ACPI_OBJECT_TYPE        Type;
-    ACPI_STATUS             Status;
+    ACPI_STATUS             Status = AE_OK;
     ACPI_INIT_WALK_INFO     *Info = (ACPI_INIT_WALK_INFO *) Context;
     ACPI_NAMESPACE_NODE     *Node = (ACPI_NAMESPACE_NODE *) ObjHandle;
     ACPI_OPERAND_OBJECT     *ObjDesc;
@@ -371,11 +371,7 @@ AcpiNsInitOneObject (
     /*
      * Must lock the interpreter before executing AML code
      */
-    Status = AcpiExEnterInterpreter ();
-    if (ACPI_FAILURE (Status))
-    {
-        return (Status);
-    }
+    AcpiExEnterInterpreter ();
 
     /*
      * Each of these types can contain executable AML code within the
