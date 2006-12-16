@@ -119,7 +119,6 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	BMenuField *menu;
 
 	fNewFont = font;			fFont = *fNewFont;
-	fNewLevel = level;			fLevel = *fNewLevel;
 	fNewWrap = wrap;			fWrap = *fNewWrap;
 	fNewAttachAttributes = attachAttributes;	fAttachAttributes = *fNewAttachAttributes;
 	fNewColoredQuotes = cquotes;	fColoredQuotes = *fNewColoredQuotes;
@@ -149,7 +148,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 
 	// group boxes
 
-	r.Set(8,4,Bounds().right - 8,4 + 7 * (height + ITEM_SPACE));
+	r.Set(8,4,Bounds().right - 8,4 + 6 * (height + ITEM_SPACE));
 	BBox *interfaceBox = new BBox(r,NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	interfaceBox->SetLabel(MDR_DIALECT_CHOICE ("User Interface","ユーザーインターフェース"));
 	view->AddChild(interfaceBox);
@@ -220,14 +219,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fLevelMenu = BuildLevelMenu(*level);
-	menu = new BMenuField(r, "level", LEVEL_TEXT, fLevelMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);
-
+	
 	// Mail Accounts
 
 	r = mailBox->Bounds();
@@ -381,7 +373,6 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 				message.what = M_FONT;
 				be_app->PostMessage(&message);
 			}
-			*fNewLevel = fLevel;
 			*fNewWrap = fWrap;
 			*fNewAttachAttributes = fAttachAttributes;
 
@@ -401,15 +392,6 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 
 			if (revert)
 			{
-				if (fLevel == L_EXPERT)
-					strcpy(label, "Expert");
-				else
-					strcpy(label, "Beginner");
-
-				item = fLevelMenu->FindItem(label);
-				if (item)
-					item->SetMarked(true);
-
 				for (int i = fAccountMenu->CountItems();i-- > 0;)
 				{
 					if (BMenuItem *item = fAccountMenu->ItemAt(i))
@@ -495,9 +477,6 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 
-		case P_LEVEL:
-			msg->FindInt32("level", fNewLevel);
-			break;
 		case P_WRAP:
 			msg->FindBool("wrap", fNewWrap);
 			break;
@@ -561,7 +540,6 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 	old_size = (int32) fFont.Size();
 	new_size = (int32) fNewFont->Size();
 	changed = old_size != new_size
-		|| fLevel != *fNewLevel
 		|| fWrap != *fNewWrap
 		|| fAttachAttributes != *fNewAttachAttributes
 		|| fColoredQuotes != *fNewColoredQuotes

@@ -51,7 +51,6 @@ All rights reserved.
 #include <MDRLanguage.h>
 
 extern BRect		signature_window;
-extern int32		level;
 extern const char	*kUndoStrings[];
 extern const char	*kRedoStrings[];
 
@@ -177,7 +176,8 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 		case M_NEW:
 			if (Clear()) {
 				fSigView->fName->SetText("");
-				fSigView->fTextView->SetText(NULL, (int32)0);
+//				fSigView->fTextView->SetText(NULL, (int32)0);
+				fSigView->fTextView->SetText("");
 				fSigView->fName->MakeFocus(true);
 			}
 			break;
@@ -187,16 +187,14 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case M_DELETE:
-			if (level == L_BEGINNER) {
-				beep();
-				if (!(new BAlert("",MDR_DIALECT_CHOICE (
-						"Really delete this signature? This cannot be undone.",
-						"この署名を削除しますか？"),
-						MDR_DIALECT_CHOICE ("Cancel","取消l"), 
-						MDR_DIALECT_CHOICE ("Delete","削除"), NULL, B_WIDTH_AS_USUAL,
-						B_WARNING_ALERT))->Go())
-					break;
-			}
+			if (!(new BAlert("",MDR_DIALECT_CHOICE (
+					"Really delete this signature? This cannot be undone.",
+					"この署名を削除しますか？"),
+					MDR_DIALECT_CHOICE ("Cancel","取消l"), 
+					MDR_DIALECT_CHOICE ("Delete","削除"), NULL, B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT))->Go())
+				break;
+			
 			if (fFile) {
 				delete fFile;
 				fFile = NULL;

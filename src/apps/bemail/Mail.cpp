@@ -144,7 +144,7 @@ bool		gColoredQuotes = true;
 static uint8 sShowButtonBar = true;
 char		*gReplyPreamble;
 char		*signature;
-int32		level = L_BEGINNER;
+// int32		level = L_BEGINNER;
 entry_ref	open_dir;
 BMessage	*print_settings = NULL;
 BPoint		prefs_window;
@@ -425,7 +425,7 @@ TMailApp::MessageReceived(BMessage *msg)
 				fPrefsWindow = new TPrefsWindow(BRect(prefs_window.x,
 						prefs_window.y, prefs_window.x + PREF_WIDTH,
 						prefs_window.y + PREF_HEIGHT),
-						&fFont, &level, &sWrapMode, &attachAttributes_mode,
+						&fFont, NULL, &sWrapMode, &attachAttributes_mode,
 						&gColoredQuotes, &gDefaultChain, &gUseAccountFrom,
 						&gReplyPreamble, &signature, &gMailCharacterSet,
 						&gWarnAboutUnencodableCharacters,
@@ -464,11 +464,11 @@ TMailApp::MessageReceived(BMessage *msg)
 			FontChange();
 			break;
 
-		case M_BEGINNER:
+/*		case M_BEGINNER:
 		case M_EXPERT:
 			level = msg->what - M_BEGINNER;
 			break;
-
+*/
 		case REFS_RECEIVED:
 			if (msg->HasPointer("window"))
 			{
@@ -830,7 +830,7 @@ TMailApp::LoadOldSettings()
 		return status;
 
 	file.Read(&mail_window, sizeof(BRect));
-	file.Read(&level, sizeof(level));
+//	file.Read(&level, sizeof(level));
 
 	font_family	fontFamily;
 	font_style	fontStyle;
@@ -930,7 +930,7 @@ TMailApp::SaveSettings()
 
 	BMessage settings('BeMl');
 	settings.AddRect("MailWindowSize", mail_window);
-	settings.AddInt32("ExperienceLevel", level);
+//	settings.AddInt32("ExperienceLevel", level);
 
 	font_family fontFamily;
 	font_style fontStyle;
@@ -1001,8 +1001,8 @@ TMailApp::LoadSettings()
 		mail_window = rect;
 
 	int32 int32Value;
-	if (settings.FindInt32("ExperienceLevel", &int32Value) == B_OK)
-		level = int32Value;
+//	if (settings.FindInt32("ExperienceLevel", &int32Value) == B_OK)
+//		level = int32Value;
 
 	const char *fontFamily;
 	if (settings.FindString("FontFamily", &fontFamily) == B_OK) {
@@ -2102,7 +2102,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 		case M_DELETE_PREV:
 		case M_DELETE_NEXT:
 		{
-			if (level == L_BEGINNER)
+			// The Trash already provides a level of Undo to prevent loss of data. This
+			// alert is a lot like the infamous "Are you sure?" confirmation dialogs
+			// from Windows 98
+/*			if (level == L_BEGINNER)
 			{
 				beep();
 				if (!(new BAlert("", MDR_DIALECT_CHOICE (
@@ -2114,7 +2117,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 					B_WARNING_ALERT))->Go())
 					break;
 			}
-
+*/
 			if (msg->what == M_DELETE_NEXT && (modifiers() & B_SHIFT_KEY))
 				msg->what = M_DELETE_PREV;
 
@@ -2308,7 +2311,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 						(new BAlert("",	MDR_DIALECT_CHOICE (
 							"Sorry, could not find an application that supports the 'Person' data type.",
 							"Peopleデータ形式をサポートするアプリケーションが見つかりませんでした。"),
-							MDR_DIALECT_CHOICE ("Ok","了解")))->Go();
+							MDR_DIALECT_CHOICE ("OK","了解")))->Go();
 				}
 				free(arg);
 			}
@@ -2540,7 +2543,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 					MDR_DIALECT_CHOICE (
 					"The spell check feature requires the optional \"words\" file on your BeOS CD.",
 					"スペルチェク機能はBeOS CDの optional \"words\" ファイルが必要です"),
-					MDR_DIALECT_CHOICE ("Ok","了解"),
+					MDR_DIALECT_CHOICE ("OK","了解"),
 					NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 					B_STOP_ALERT))->Go();
 			}
@@ -2607,7 +2610,7 @@ TMailWindow::QuitRequested()
 			|| (fEnclosuresView != NULL && fEnclosuresView->fList->CountItems())))
 	{
 		if (fResending) {
-			result = (new BAlert("",
+			BAlert *alert = new BAlert("",
 				MDR_DIALECT_CHOICE (
 				"Do you wish to send this message before closing?",
 				"閉じる前に送信しますか？"),
@@ -2615,7 +2618,10 @@ TMailWindow::QuitRequested()
 				MDR_DIALECT_CHOICE ("Cancel","中止"),
 				MDR_DIALECT_CHOICE ("Send","送信"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-				B_WARNING_ALERT))->Go();
+				B_WARNING_ALERT);
+			alert->SetShortcut(0,'d');
+			alert->SetShortcut(1,B_ESCAPE);
+			result = alert->Go();
 
 			switch (result) {
 				case 0:	// Discard
@@ -2627,7 +2633,7 @@ TMailWindow::QuitRequested()
 					break;
 			}
 		} else {
-			result = (new BAlert("",
+			BAlert *alert = new BAlert("",
 				MDR_DIALECT_CHOICE (
 				"Do you wish to save this message as a draft before closing?",
 				"閉じる前に保存しますか？"),
@@ -2635,7 +2641,10 @@ TMailWindow::QuitRequested()
 				MDR_DIALECT_CHOICE ("Cancel","中止"),
 				MDR_DIALECT_CHOICE ("Save","保存"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-				B_WARNING_ALERT))->Go();
+				B_WARNING_ALERT);
+			alert->SetShortcut(0,'d');
+			alert->SetShortcut(1,B_ESCAPE);
+			result = alert->Go();
 			switch (result) {
 				case 0:	// Don't Save
 					break;
@@ -3159,7 +3168,7 @@ TMailWindow::Send(bool now)
 			beep();
 			(new BAlert("",
 				MDR_DIALECT_CHOICE ("E-mail draft could not be saved!","ドラフトは保存できませんでした。"),
-				MDR_DIALECT_CHOICE ("Ok","了解")))->Go();
+				MDR_DIALECT_CHOICE ("OK","了解")))->Go();
 		}
 		return status;
 	}

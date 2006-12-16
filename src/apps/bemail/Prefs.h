@@ -108,8 +108,6 @@ class TPrefsWindow : public BWindow {
 		char	**fNewPreamble;
 		char	*fSignature;
 		char	**fNewSignature;
-		int32	fLevel;
-		int32	*fNewLevel;
 		BFont	fFont;
 		BFont	*fNewFont;
 		uint32	fEncoding;
@@ -122,7 +120,6 @@ class TPrefsWindow : public BWindow {
 
 		BPopUpMenu *fFontMenu;
 		BPopUpMenu *fSizeMenu;
-		BPopUpMenu *fLevelMenu;
 		BPopUpMenu *fWrapMenu, *fColoredQuotesMenu;
 		BPopUpMenu *fAttachAttributesMenu;
 		BPopUpMenu *fAccountMenu, *fReplyToMenu;
