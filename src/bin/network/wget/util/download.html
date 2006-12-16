@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Wget Gateway</title>
+    <link rev="made" href="mailto:Antonio.Rosella@agip.it">
+  </head>
+
+  <body>
+      <h1>Wget Gateway</h1>
+      <p>
+	Welcome to Wget Gateway, a simple page showing the usage of
+	socksified wget behind a firewall. In my configuration it is
+	very useful because:
+      <ul>
+	<li>Only few users can exit from firewall
+	<li>A lot of users need information that can be reached in Internet
+	<li>I cannot dowload big files during my job time, so, I
+	  have to schedule the requests after the normal work time
+      </ul>
+
+      <p>
+	With the combination of a socksified wget and a simple cgi
+	that schedules the requests can I reach the aim. All you need
+	is:
+      <ul>
+	<li> A socksified copy of
+	  <a href="ftp://gnjilux.cc.fer.hr/pub/unix/util/wget/wget.tar.gz">
+	    wget</a>
+	<li> Perl (available on all the GNU mirroring sites)
+	<li> cgi-lib.pl (available at
+	  <a href="ftp://ftp.switch.ch/mirror/CPAN/ROADMAP.html">CPAN</a>)
+	<li> A customized copy of this html
+	<li> A customized copy of socks.cgi
+      </ul>
+      This is my h/s configuration:
+      <pre>
+
++----------+ +----------------------------------+ +---------------------+
+| Firewall | | Host that can exit from firewall | | Intranet www server |
++----------+ |            htceff                | +---------------------+
+             +----------------------------------+ | Wget.html           |
+             | socksified wget                  | +---------------------+
+	     | cgi-lib.pl                       | 
+	     | perl                             |
+	     | wget.cgi                         |
+	     +----------------------------------+
+      </pre>
+      <p>
+	wget.cgi, wget and cgi-lib.pl are located in the usual
+	cgi-bin directory. The customization of wget.cgi and
+	wget.html has to reflect you installation, i.e.:
+      <ul>
+	<li> download.html requires wget.cgi
+	<li> wget.cgi requires Perl, cgi-lib.pl and wget
+	<li>
+	  wget.cgi has to download the files to a directory writable
+	  by the user submitting the request.  At the moment I have an
+	  anonymous ftp installed on <em>htceff</em>, and wget puts
+	  dowloaded files to /pub/incoming directory (if you look at
+	  wget.cgi, it sets the destdir to "/u/ftp/pub/incoming" if
+	  the user leaves it blank).
+      </ul>
+      <p>
+	You can also add other parameters that you want to pass to wget,
+	but in this case you will also have to modify wget.cgi
+
+      <hr>
+      <form method="get" action="http://localhost/cgi-bin/wget.cgi">
+	<h3>Downloading (optionally recursive)</h3>
+	<ul>
+	  <li>
+	    Recursion:
+	    <Select name=Recursion>
+	      <Option selected value=N>No</Option>
+	      <Option value=Y>Yes</Option>
+	    </Select>
+	  <li>
+	    Depth:
+	    <input type="radio" name=depth value=1 checked>1
+	    <input type="radio" name=depth value=2 >2
+	    <input type="radio" name=depth value=3 >3 
+	    <input type="radio" name=depth value=4 >4
+	    <input type="radio" name=depth value=5 >5
+	  <li>
+	    Url to download: <input name="url" size=50>
+	  <li>
+	    Destination directory: <input name="destdir" size=50>
+	</ul>
+	Now you can <input type="submit" value="download"> the
+	requested URL or <input type="reset" value="reset"> the form.
+      </form>
+      <hr>
+      Feedback is always useful! Please contact me at
+      <address>
+	<a href="mailto:Antonio.Rosella@agip.it">Antonio Rosella&lt;Antonio.Rosella@agip.it&gt;</a>.
+      </address>
+      You can send your suggestions or bug reports for Wget to
+      <address>
+	<a href="mailto:hniksic@arsdigita.com">Hrvoje Niksic &lt;hniksic@arsdigita.com&gt;</a>.
+      </address>
+      <!-- hhmts start -->
+Last modified: October 23, 2000
+<!-- hhmts end -->
+  </body>
+</html>
+

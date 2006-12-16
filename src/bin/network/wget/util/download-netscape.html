@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+  <head>
+    <title>Wget Gateway</title>
+    <link rev="made" href="mailto:Antonio.Rosella@agip.it">
+  </head>
+  
+  <body>
+    <center>
+      <h1>Wget Gateway</h1>
+    </center>
+    <p>
+      Welcome to Wget Gateway, a simple page showing the usage of
+      socksified wget behind a firewall. In my configuration it is
+      very useful because:
+    <ul>
+      <li>Only few users can exit from firewall
+      <li>A lot of users need information that can be reached in Internet
+      <li>I cannot dowload big files during my job time, so, I
+	have to schedule the requests after the normal work time
+    </ul>
+
+    <p>
+      With the combination of a socksified wget and a simple cgi
+      that schedules the requests can I reach the aim. All you need
+      is:
+    <ul>
+      <li> A socksified copy of
+	<a href="ftp://gnjilux.cc.fer.hr/pub/unix/util/wget/wget.tar.gz">
+	  wget</a>
+      <li> Perl (available on all the GNU mirroring sites)
+      <li> cgi-lib.pl (available at
+	<a href="ftp://ftp.switch.ch/mirror/CPAN/ROADMAP.html">CPAN</a>)
+      <li> A customized copy of this html
+      <li> A customized copy of socks.cgi
+    </ul>
+    This is my h/s configuration:
+    <pre>
+
++----------+ +----------------------------------+ +---------------------+
+| Firewall | | Host that can exit from firewall | | Intranet www server |
++----------+ |            htceff                | +---------------------+
+             +----------------------------------+ | Wget.html           |
+             | socksified wget                  | +---------------------+
+	     | cgi-lib.pl                       | 
+	     | perl                             |
+	     | wget.cgi                         |
+	     +----------------------------------+
+    </pre>
+    <p>
+      wget.cgi, wget and cgi-lib.pl are located in the usual
+      cgi-bin directory. The customization of wget.cgi and
+      wget.html has to reflect you installation, i.e.:
+    <ul>
+      <li> download-netscape.html requires wget.cgi
+      <li> wget.cgi requires Perl, cgi-lib.pl and wget
+      <li>
+	wget.cgi has to download the files to a directory writable
+	by the user submitting the request.  At the moment I have an
+	anonymous ftp installed on <em>htceff</em>, and wget puts
+	dowloaded files to /pub/incoming directory (if you look at
+	wget.cgi, it sets the destdir to "/u/ftp/pub/incoming" if
+	the user leaves it blank).
+    </ul>
+    <p>
+      You can also add other parameters that you want to pass to wget,
+      but in this case you will also have to modify wget.cgi
+
+    <hr>
+    <form method="get" action="http://localhost/cgi-bin/wget.cgi">
+      <center>
+	<table border=1>
+	    <td>Recursive Download
+	    <td><select name=Recursion>
+		<Option selected value=N>No</Option>
+		<Option value=Y>Yes</Option>
+	      </select>
+	</table>
+	<hr>
+	<table border=1>
+	    <td>Depth
+	    <td><input type="radio" name=depth value=1 checked> 1
+	    <td><input type="radio" name=depth value=2 > 2
+	    <td><input type="radio" name=depth value=3 > 3 
+	    <td><input type="radio" name=depth value=4 > 4
+	    <td><input type="radio" name=depth value=5 > 5
+	</table>
+	<hr>
+	<table>
+	    <td>Url to download: <td><input name="url" size=50><TR>
+	    <td>Destination directory: <td><input name="destdir" size=50><TR>
+	</table>
+	<hr>
+	Now you can
+	<font color=yellow><input type="submit"	value="download"></font>
+	the requested URL or
+	<font color=yellow><input type="reset" value="reset"></font>
+	the form.
+    </form>
+    <hr>
+    Feedback is always useful! Please contact me at
+    <address>
+      <a href="mailto:Antonio.Rosella@agip.it">Antonio Rosella&lt;Antonio.Rosella@agip.it&gt;</a>.
+    </address>
+    You can send your suggestions or bug reports for Wget to
+    <address>
+      <a href="mailto:hniksic@arsdigita.com">Hrvoje Niksic &lt;hniksic@arsdigita.com&gt;</a>.
+    </address>
+    <!-- hhmts start -->
+Last modified: Mon Oct 23 17:40:03 CEST 2000
+<!-- hhmts end -->
+  </body>
+</html>
+

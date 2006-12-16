@@ -1,0 +1,43 @@
+SubDir HAIKU_TOP src bin network wget ;
+
+UseHeaders [ FDirName $(SUBDIR) src ] : true ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
+
+local defines = [ FDefines HAVE_CONFIG_H=1 ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+BinCommand wget :
+	cmpt.c
+	connect.c
+	convert.c
+	cookies.c
+	ftp-basic.c
+	ftp-ls.c
+	ftp-opie.c
+	ftp.c
+	gen-md5.c
+	gnu-md5.c
+	hash.c
+	host.c
+	html-parse.c
+	html-url.c
+	#http-ntlm.c
+	http.c
+	init.c
+	log.c
+	main.c
+	netrc.c
+	progress.c
+	ptimer.c
+	recur.c
+	res.c
+	retr.c
+	safe-ctype.c
+	url.c
+	utils.c
+	version.c
+	xmalloc.c
+	: $(NETWORK_LIBS)
+;

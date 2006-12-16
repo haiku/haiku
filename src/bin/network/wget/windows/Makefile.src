@@ -1,0 +1,110 @@
+# Makefile for `wget' utility for MSVC
+# Copyright (C) 1995, 1996, 1997, 2004 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# In addition, as a special exception, the Free Software Foundation
+# gives permission to link the code of its release of Wget with the
+# OpenSSL project's "OpenSSL" library (or with modified versions of it
+# that use the same license as the "OpenSSL" library), and distribute
+# the linked executables.  You must obey the GNU General Public License
+# in all respects for all of the code used other than "OpenSSL".  If you
+# modify this file, you may extend this exception to your version of the
+# file, but you are not obligated to do so.  If you do not wish to do
+# so, delete this exception statement from your version.
+
+
+# SSL (https) support requires the OpenSSL library (see http://www.openssl.org/).
+# If you do not have OpenSSL installed or wish to build Wget without SSL
+# support, either comment-out the following lines or define NO_SSL.
+!ifndef NO_SSL
+SSLDEFS	= /DHAVE_SSL
+SSLLIBS	= libeay32.lib ssleay32.lib
+SSLOBJ	= openssl$o http-ntlm$o
+!endif
+
+o = .obj
+
+CC	= cl
+LD	= link
+RM	= -del
+
+DEFS	= /DWINDOWS /D_CONSOLE /DHAVE_CONFIG_H $(SSLDEFS)
+LIBS	= kernel32.lib advapi32.lib wsock32.lib user32.lib gdi32.lib $(SSLLIBS)
+
+!ifdef DEBUG
+CFLAGS	= /nologo /MTd /Od /Zi /I. $(DEFS)
+LDFLAGS	= /debug
+!else
+CFLAGS	= /nologo /MT /O2 /I. $(DEFS)
+LDFLAGS	= /opt:ref #/opt:nowin98
+!endif
+
+
+# The following enables security checks and is recommended if you are using
+# MSVC 7.0 (or later) for 80x86.
+!ifdef SECURITY_CHECKS
+CFLAGS	= $(CFLAGS) /GS
+!endif
+
+# The following enables link-time code generation (Cross-file
+# interprocedural optimizations).
+!ifdef LTCG
+CFLAGS	= $(CFLAGS) /GL
+LDFLAGS	= $(LDFLAGS) /ltcg:status
+!endif
+
+OBJ = cmpt$o safe-ctype$o convert$o connect$o host$o http$o netrc$o \
+      ftp-basic$o ftp$o ftp-ls$o ftp-opie$o getopt$o hash$o \
+      html-parse$o html-url$o progress$o retr$o recur$o res$o url$o cookies$o \
+      init$o utils$o main$o ptimer$o version$o xmalloc$o mswindows$o \
+      gen-md5$o gnu-md5$o log$o $(SSLOBJ)
+
+.SUFFIXES: .c .obj
+
+# If this doesn't work for you, remove the second colon.
+.c.obj::
+	$(CC) $(CFLAGS) /c $<
+
+# Dependencies for building
+
+wget.exe: $(OBJ)
+	$(LD) @<< $(LDFLAGS) /out:$@ $(OBJ) $(LIBS)
+<<
+
+$(OBJ): config-post.h connect.h convert.h cookies.h ftp.h gen-md5.h \
+        getopt.h gnu-md5.h hash.h host.h html-parse.h http-ntlm.h   \
+        init.h log.h mswindows.h netrc.h options.h progress.h       \
+        ptimer.h recur.h res.h retr.h safe-ctype.h ssl.h sysdep.h   \
+        url.h utils.h wget.h xmalloc.h
+
+#
+# Dependencies for cleanup
+#
+
+clean:
+	$(RM) *.bak
+	$(RM) *.obj
+	$(RM) *.exe
+	$(RM) *.pdb
+	$(RM) *.map
+	$(RM) *.ilk
+
+distclean: clean
+	$(RM) Makefile
+	$(RM) config.h
+
+realclean: distclean
+	$(RM) TAGS

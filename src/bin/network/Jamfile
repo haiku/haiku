@@ -10,3 +10,4 @@ SubInclude HAIKU_TOP src bin network route ;
 SubInclude HAIKU_TOP src bin network telnet ;
 SubInclude HAIKU_TOP src bin network telnetd ;
 SubInclude HAIKU_TOP src bin network traceroute ;
+SubInclude HAIKU_TOP src bin network wget ;

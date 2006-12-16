@@ -1,0 +1,28 @@
+Important note:
+
+To reduce bandwidth and needless updates, the Subversion tree does not
+contain automatically-generated files, even when those files are
+normally present in the distribution tarballs.
+
+Therefore, if you're building from the sources obtained via
+Subversion, you'll need to have at least GNU Autoconf (2.59 or newer)
+installed on your system.  To generate the Info documentation, you
+will need the GNU Texinfo package. Those packages are available from
+<ftp://ftp.gnu.org/pub/gnu/<package>/> and its mirrors, listed at
+<http://www.gnu.org/order/ftp.html>.
+
+In case you aren't used to running autoconf manually to generate the
+necessary configure script, a script called autogen.sh has been
+provided, and may be invoked using `./autogen.sh'.  Once the script
+has completed, the configure script will reside in the current
+directory and you can proceed to build Wget as described in the
+`INSTALL' file.
+
+To summarize, once you've checked out wget from the Subversion
+repository, the commands you'll execute will be as follows (barring
+any extra options to `configure' or to `make'):
+
+    cd wget
+    ./autogen.sh
+    ./configure
+    make

@@ -1,0 +1,68 @@
+                                                           -*- text -*-
+
+You can configure the Windows port of Wget by running configure.bat (in
+the main Wget directory).  You can run it with no arguments to see the
+list of possible options.  Run it with the option corresponding to the
+compiler you intend to use to build Wget and follow the (brief)
+instructions printed on the screen.  The instructions bellow are for
+building Wget with Microsoft Visual C++ (MSVC); you may need to make
+appropriate substitutions for your compiler and build environment; 
+currently wget can be built at least with Visual Studio/.Net, free 
+Borland or Watcom compilers, and the free cygnus and mingw environments.
+
+To build Wget with MSVC run configure.bat (in the main Wget directory)
+with the argument --msvc, and then run nmake.  At a certain point in time
+Wget exposed some compiler bugs in MSVC 5.0; later Wget started to 
+expose (at least http.c, retr.c) some other compiler bugs in MSVC 6.0 
+SP6 (cl.exe version 12) which could/can be worked around by compiling 
+completely without optimization or at least partially (by using 
+#pragma optimize("g",on) and "off" around offending functions).
+However, read the rest of this document before continuing.
+
+For MSVC the current default is to build Wget with SSL support.  For this
+to work, you will need to have OpenSSL installed.  First, get OpenSSL
+(http://www.openssl.org), compile it and install the relevant headers and
+libraries where your compiler can find them; currently this could mean
+(presuming default installation directories for MSVC 6.0) copy (from the
+compiled OpenSSL directory) the whole inc32\openssl directory and its
+contents to "C:\Program Files\Microsoft Visual Studio\VC98\Include\openssl",
+and from out32dll (in the OpenSSL directory) the two needed libraries
+(libeay32.lib and ssleay32.lib) to
+"C:\Program Files\Microsoft Visual Studio\VC98\lib".  These locations
+aren't exactly the best but will get you started if you don't know where
+to place these headers and libraries, you should find similar paths for 
+later compiler versions. Usually at run-time some OpenSSL
+libraries (currently ssleay32.dll and libeay32.dll) will need to be
+available in your environment PATH.
+
+If you don't want to/can't compile Wget with OpenSSL comment SSL related
+lines in windows\Makefile.src; then follow the normal instructions
+(configure.bat and so on).
+
+If you want to build the help file you will need a copy of makeinfo to
+convert wget.texi to rtf and html.  I've made a copy available at
+<URL:ftp://sunsite.dk/projects/wget/makeinfo.zip>.  This copy of
+makeinfo is from the miktxt 1.10 archive available from ctan.  You also
+will need perl 5, one possibility is ActivePerl (currently free) from
+<URL:http://www.activestate.com>; you need to locate the download and
+install instructions for the current version available (since the
+packages and installation instructions change from time to time).
+
+Windows contributors:
+
+* Darko Budor <dbudor@zesoi.fer.hr> -- the initial work on the Windows
+  port;
+
+* Tim Charron <tcharron@interlog.com> -- additional cleanup and
+  contribution of the Watcom makefile;
+
+* John Burden <john@futuresguide.com> -- cleanup of the VC++ makefile
+  to get a clean build with VC++ 5.0 on Windows 95;
+
+* Douglas E. Wegscheid -- maintains configure.bat and various Windows
+  makefiles.
+
+* Herold Heiko -- numerous build reports and fixes.
+
+* Gisle Vanem -- many Windows-related improvements to the source and
+  the build system.

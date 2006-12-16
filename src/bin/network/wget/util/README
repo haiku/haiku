@@ -1,0 +1,28 @@
+                                                           -*- text -*-
+
+This directory contains various optional utilities to help you use
+Wget.
+
+
+Socks:
+======
+Antonio Rosella <antonio.rosella@agip.it> has written a sample HTML
+frontend and a Perl script to demonstrate usage of socksified Wget as
+web retriever.
+
+To configure Wget to use socks, do a
+$ ./configure --with-sox.
+
+download.html and download-netscape.html are examples of how you can
+use socksified Wget to schedule the WWW requests.  wget.cgi is a
+CGI Perl script used in conjunction with download.html, which
+schedules request using the "at" command.
+
+To get the script, contact Antonino.
+
+rmold.pl
+========
+This Perl script is used to check which local files are no longer on
+the remote server.  You can use it to get the list of files, or
+$ rmold.pl [dir] | xargs rm
+

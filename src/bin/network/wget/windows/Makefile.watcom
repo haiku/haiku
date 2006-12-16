@@ -1,0 +1,95 @@
+## Compiler, linker, and lib stuff
+## Makefile for use with watcom win95/winnt executable.
+#
+# Copy this file to the ..\src directory (maybe rename to Makefile).
+#
+
+CC=wcc386 /zq
+LINK=wlink
+
+#
+# Note: this will wipe anything in the env.var PATH !
+#
+.BEFORE
+	@SET INCLUDE=$(%WATCOM)\h;$(%WATCOM)\h\nt;.
+
+LFLAGS=op q sys nt op st=32767 op map op de 'GNU Wget' de dw op symf
+#
+# op q              : quiet !
+# sys nt            : producing an NT app
+# op st(ack)=32768  : stack size
+# op vers(ion)=1.7  : "Image version" in the EXE header ( major.minor )
+# op map            : produce a map file
+# op de             : textual description, placed in the executable
+# de dw             : debug info on Dwarf format
+# op symf           : place debug info in a separate wget.sym
+#
+
+CFLAGS=/zp4 /w4 /fpd /5s /fp5 /bm /mf /bt=nt /I. /DWINDOWS /DHAVE_CONFIG_H
+#                    ^^^^^^^^ wget will run on NT. We can safely assume a Pentium :-)
+# /zp4= pack structure members with this alignment
+# /d1 = line number debug info
+# /w4 = warning level
+# /fpd= Pentium floatingpoint bug workaround
+# /5s = Pentium stack-based calling
+# /fp5= Pentium floating point
+# /bm = build multi-threaded
+# /mf = flat memory model
+# /bt = "build target" (nt)
+
+#
+# Choose one of the following three:
+# /od /d2  for no optimization, full debug info
+# /os /d2  to optimize for size, full debug info (or /d1 for line number debug info)
+# /othexan for "heavy-duty" optimizations, no debug info
+#
+#CFLAGS+= /od /d2
+CFLAGS+= /os /d2
+#CFLAGS+= /othexan
+#       ^^-- mind the gap !!
+
+#CFLAGS+= /DDEBUG_MALLOC
+#       ^^-- mind the gap !!
+
+OBJS = cmpt.obj convert.obj connect.obj cookies.obj ftp.obj ftp-basic.obj  &
+      ftp-ls.obj ftp-opie.obj getopt.obj hash.obj host.obj html-parse.obj html-url.obj  &
+      http.obj init.obj log.obj main.obj gen-md5.obj gnu-md5.obj netrc.obj progress.obj  &
+      recur.obj res.obj retr.obj safe-ctype.obj url.obj utils.obj version.obj & 
+      mswindows.obj xmalloc.obj
+
+LIBFILES = 
+#
+# Add extra libs like this :
+#LIBFILES = LIBF lz32.lib,gdi32.lib
+
+BINNAME=wget.exe
+
+all : config.h $(BINNAME) .SYMBOLIC
+
+#
+# We use config.h.ms
+#
+config.h : ..\windows\config.h.ms
+	copy $[@ $^@
+
+#
+# Note: this will pass all the OBJ files to wlink,
+# resulting in a very long command line (410 chars, last I counted)
+# This might fail on Win9x (works with NT's cmd.exe)
+#
+$(BINNAME): $(OBJS) Makefile
+	$(LINK) $(LFLAGS) NAME $(BINNAME) FILE { $(OBJS) } $(LIBPATH) $(LIBFILES)
+
+
+#
+# Explicit dependencies not needed because Watcom C stores
+# dependency information in the object file. Wmake can read this information
+# if prompted by .AUTODEPEND
+#
+
+.c.obj: .AUTODEPEND
+	$(CC) $(CFLAGS) $[@
+
+.c.i: .AUTODEPEND
+	$(CC) $(CFLAGS) -fo=$@ /Pc $[@
+

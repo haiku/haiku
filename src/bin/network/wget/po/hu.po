@@ -1,0 +1,1324 @@
+# Hungarian translation of wget.
+# Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+# Pal Szasz <szpal@Maria.UTCluj.Ro>, 2001-2003.
+# Javitasok: Laszlo Dvornik <dvornik@gnome.hu>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: wget 1.9.1\n"
+"POT-Creation-Date: 2003-10-11 16:21+0200\n"
+"PO-Revision-Date: 2004-07-10 14:58+0200\n"
+"Last-Translator: Szasz Pal <szpal@Maria.UTCluj.Ro>\n"
+"Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/connect.c:88
+#, c-format
+msgid "Unable to convert `%s' to a bind address.  Reverting to ANY.\n"
+msgstr "Nem lehet átalakítani `%s'-t egy bind címmé. Visszaváltok ANY-re.\n"
+
+#: src/connect.c:165
+#, c-format
+msgid "Connecting to %s[%s]:%hu... "
+msgstr "Csatlakozás %s[%s]:%hu-hoz... "
+
+#: src/connect.c:168
+#, c-format
+msgid "Connecting to %s:%hu... "
+msgstr "Csatlakozás %s:%hu-hoz... "
+
+#: src/connect.c:222
+msgid "connected.\n"
+msgstr "kapcsolódva.\n"
+
+#: src/convert.c:171
+#, c-format
+msgid "Converted %d files in %.2f seconds.\n"
+msgstr "%d fájl átalakítva %.2f másodperc alatt.\n"
+
+#: src/convert.c:197
+#, c-format
+msgid "Converting %s... "
+msgstr "%s átalakítása... "
+
+#: src/convert.c:210
+msgid "nothing to do.\n"
+msgstr "nincs mit csinálni.\n"
+
+#: src/convert.c:218 src/convert.c:242
+#, c-format
+msgid "Cannot convert links in %s: %s\n"
+msgstr "Nem lehet átalakítani a linket %s-ben: %s\n"
+
+#: src/convert.c:233
+#, c-format
+msgid "Unable to delete `%s': %s\n"
+msgstr "Nem lehet törölni a(z) `%s'-t: %s\n"
+
+#: src/convert.c:439
+#, c-format
+msgid "Cannot back up %s as %s: %s\n"
+msgstr "Nem lehet lementeni %s-t mint %s: %s\n"
+
+#: src/cookies.c:606
+#, c-format
+msgid "Error in Set-Cookie, field `%s'"
+msgstr "Hiba a Set-Cookie-ban, mezõ `%s'"
+
+#: src/cookies.c:629
+#, c-format
+msgid "Syntax error in Set-Cookie: %s at position %d.\n"
+msgstr "Szintaktikai hiba a Set-Cookie-ban: %s a %d pozíciónál.\n"
+
+#: src/cookies.c:1426
+#, c-format
+msgid "Cannot open cookies file `%s': %s\n"
+msgstr "Nem lehet megnyitni a(z) `%s' cookie-fájlt: %s\n"
+
+#: src/cookies.c:1438
+#, c-format
+msgid "Error writing to `%s': %s\n"
+msgstr "Nem tudok írni `%s'-ba (%s).\n"
+
+#: src/cookies.c:1442
+#, c-format
+msgid "Error closing `%s': %s\n"
+msgstr "Hiba `%s' bezárásánál: %s\n"
+
+#: src/ftp-ls.c:812
+msgid "Unsupported listing type, trying Unix listing parser.\n"
+msgstr "Nem támogatott listatípus, próbálom Unix lista értelmezõvel.\n"
+
+#: src/ftp-ls.c:857 src/ftp-ls.c:859
+#, c-format
+msgid "Index of /%s on %s:%d"
+msgstr "/%s tartalma %s:%d-n"
+
+#: src/ftp-ls.c:882
+msgid "time unknown       "
+msgstr "idõ ismeretlen     "
+
+#: src/ftp-ls.c:886
+msgid "File        "
+msgstr "Fájl        "
+
+#: src/ftp-ls.c:889
+msgid "Directory   "
+msgstr "Könyvtár    "
+
+#: src/ftp-ls.c:892
+msgid "Link        "
+msgstr "Link        "
+
+#: src/ftp-ls.c:895
+msgid "Not sure    "
+msgstr "Nem biztos  "
+
+#: src/ftp-ls.c:913
+#, c-format
+msgid " (%s bytes)"
+msgstr " (%s bájt)"
+
+#. Second: Login with proper USER/PASS sequence.
+#: src/ftp.c:202
+#, c-format
+msgid "Logging in as %s ... "
+msgstr "Belépés mint %s ... "
+
+#: src/ftp.c:215 src/ftp.c:268 src/ftp.c:299 src/ftp.c:353 src/ftp.c:468
+#: src/ftp.c:519 src/ftp.c:551 src/ftp.c:611 src/ftp.c:675 src/ftp.c:748
+#: src/ftp.c:796
+msgid "Error in server response, closing control connection.\n"
+msgstr "Hiba a szerver válaszában, vezérlõ kapcsolat bezárva.\n"
+
+#: src/ftp.c:223
+msgid "Error in server greeting.\n"
+msgstr "Hiba a szerver üdvözlésében.\n"
+
+#: src/ftp.c:231 src/ftp.c:362 src/ftp.c:477 src/ftp.c:560 src/ftp.c:621
+#: src/ftp.c:685 src/ftp.c:758 src/ftp.c:806
+msgid "Write failed, closing control connection.\n"
+msgstr "Írás sikertelen, vezérlõ kapcsolat bezárva.\n"
+
+#: src/ftp.c:238
+msgid "The server refuses login.\n"
+msgstr "A szerver visszautasítja a belépést.\n"
+
+#: src/ftp.c:245
+msgid "Login incorrect.\n"
+msgstr "Belépés sikertelen.\n"
+
+#: src/ftp.c:252
+msgid "Logged in!\n"
+msgstr "Belépve !\n"
+
+#: src/ftp.c:277
+msgid "Server error, can't determine system type.\n"
+msgstr "Szerver hiba, nem lehet meghatározni a rendszer típusát.\n"
+
+#: src/ftp.c:287 src/ftp.c:596 src/ftp.c:659 src/ftp.c:716
+msgid "done.    "
+msgstr "vége.    "
+
+#: src/ftp.c:341 src/ftp.c:498 src/ftp.c:533 src/ftp.c:779 src/ftp.c:827
+msgid "done.\n"
+msgstr "vége.\n"
+
+#: src/ftp.c:370
+#, c-format
+msgid "Unknown type `%c', closing control connection.\n"
+msgstr "Ismeretlen típus `%c', vezérlõ kapcsolat bezárva.\n"
+
+#: src/ftp.c:383
+msgid "done.  "
+msgstr "vége.  "
+
+#: src/ftp.c:389
+msgid "==> CWD not needed.\n"
+msgstr "==> CWD nem szükséges.\n"
+
+#: src/ftp.c:484
+#, c-format
+msgid ""
+"No such directory `%s'.\n"
+"\n"
+msgstr ""
+"Nincs ilyen könyvtár `%s'.\n"
+"\n"
+
+#. do not CWD
+#: src/ftp.c:502
+msgid "==> CWD not required.\n"
+msgstr "==> CWD nem szükséges.\n"
+
+#: src/ftp.c:567
+msgid "Cannot initiate PASV transfer.\n"
+msgstr "Nem tudok kezdeményezni PASV átvitelt.\n"
+
+#: src/ftp.c:571
+msgid "Cannot parse PASV response.\n"
+msgstr "Nem lehet értelmezni a PASV választ.\n"
+
+#: src/ftp.c:588
+#, c-format
+msgid "couldn't connect to %s:%hu: %s\n"
+msgstr "nem tudok csatlakozni %s:%hu-hoz: %s\n"
+
+#: src/ftp.c:638
+#, c-format
+msgid "Bind error (%s).\n"
+msgstr "Hozzárendelési hiba (%s).\n"
+
+#: src/ftp.c:645
+msgid "Invalid PORT.\n"
+msgstr "Hibás PORT.\n"
+
+#: src/ftp.c:698
+#, c-format
+msgid ""
+"\n"
+"REST failed; will not truncate `%s'.\n"
+msgstr ""
+"\n"
+"REST sikertelen; nem fogom tördelni `%s'-t.\n"
+
+#: src/ftp.c:705
+msgid ""
+"\n"
+"REST failed, starting from scratch.\n"
+msgstr ""
+"\n"
+"REST sikertelen, kezdés elölrõl.\n"
+
+#: src/ftp.c:766
+#, c-format
+msgid ""
+"No such file `%s'.\n"
+"\n"
+msgstr ""
+"Nincs ilyen fájl `%s'.\n"
+"\n"
+
+#: src/ftp.c:814
+#, c-format
+msgid ""
+"No such file or directory `%s'.\n"
+"\n"
+msgstr ""
+"Nincs ilyen fájl vagy könyvtár `%s'.\n"
+"\n"
+
+#: src/ftp.c:898 src/ftp.c:906
+#, c-format
+msgid "Length: %s"
+msgstr "Hossz: %s"
+
+#: src/ftp.c:900 src/ftp.c:908
+#, c-format
+msgid " [%s to go]"
+msgstr " [még %s]"
+
+#: src/ftp.c:910
+msgid " (unauthoritative)\n"
+msgstr " (nem hiteles)\n"
+
+#: src/ftp.c:936
+#, c-format
+msgid "%s: %s, closing control connection.\n"
+msgstr "%s: %s, vezérlõ kapcsolat bezárva.\n"
+
+#: src/ftp.c:944
+#, c-format
+msgid "%s (%s) - Data connection: %s; "
+msgstr "%s (%s) - Adat kapcsolat: %s; "
+
+#: src/ftp.c:961
+msgid "Control connection closed.\n"
+msgstr "Vezérlõ kapcsolat bezárva.\n"
+
+#: src/ftp.c:979
+msgid "Data transfer aborted.\n"
+msgstr "Adatátvitel megszakítva.\n"
+
+#: src/ftp.c:1044
+#, c-format
+msgid "File `%s' already there, not retrieving.\n"
+msgstr "A(z) `%s' fájl már létezik, nem töltöm le.\n"
+
+#: src/ftp.c:1114 src/http.c:1716
+#, c-format
+msgid "(try:%2d)"
+msgstr "(próba:%2d)"
+
+#: src/ftp.c:1180 src/http.c:1975
+#, c-format
+msgid ""
+"%s (%s) - `%s' saved [%ld]\n"
+"\n"
+msgstr ""
+"%s (%s) - `%s' lementve [%ld]\n"
+"\n"
+
+#: src/ftp.c:1222 src/main.c:890 src/recur.c:377 src/retr.c:596
+#, c-format
+msgid "Removing %s.\n"
+msgstr "Törlöm %s.\n"
+
+#: src/ftp.c:1264
+#, c-format
+msgid "Using `%s' as listing tmp file.\n"
+msgstr "`%s'-t használom mint ideiglenes listafájlt.\n"
+
+#: src/ftp.c:1279
+#, c-format
+msgid "Removed `%s'.\n"
+msgstr "Törölve `%s'.\n"
+
+#: src/ftp.c:1314
+#, c-format
+msgid "Recursion depth %d exceeded max. depth %d.\n"
+msgstr "Rekurziós határ %d túllépte a maximális %d mélységet.\n"
+
+#. Remote file is older, file sizes can be compared and
+#. are both equal.
+#: src/ftp.c:1384
+#, c-format
+msgid "Remote file no newer than local file `%s' -- not retrieving.\n"
+msgstr "A szerveren lévõ `%s' fájl nem újabb mint a helyi -- nem töltöm le.\n"
+
+#. Remote file is newer or sizes cannot be matched
+#: src/ftp.c:1391
+#, c-format
+msgid ""
+"Remote file is newer than local file `%s' -- retrieving.\n"
+"\n"
+msgstr ""
+"A szerveren lévõ `%s' fájl újabb mint a helyi -- letöltöm.\n"
+"\n"
+
+#. Sizes do not match
+#: src/ftp.c:1398
+#, c-format
+msgid ""
+"The sizes do not match (local %ld) -- retrieving.\n"
+"\n"
+msgstr ""
+"A méretek nem egyeznek (helyi %ld) -- letöltöm.\n"
+"\n"
+
+#: src/ftp.c:1415
+msgid "Invalid name of the symlink, skipping.\n"
+msgstr "Hibás nevû szimbolikus link, kihagyom.\n"
+
+#: src/ftp.c:1432
+#, c-format
+msgid ""
+"Already have correct symlink %s -> %s\n"
+"\n"
+msgstr ""
+"Már létezõ helyes szimbolikus link %s -> %s\n"
+"\n"
+
+#: src/ftp.c:1440
+#, c-format
+msgid "Creating symlink %s -> %s\n"
+msgstr "Létrehozom a(z) %s -> %s szimbolikus linket\n"
+
+#: src/ftp.c:1451
+#, c-format
+msgid "Symlinks not supported, skipping symlink `%s'.\n"
+msgstr "A(z) `%s' szimbolikus linket kihagyom.\n"
+
+#: src/ftp.c:1463
+#, c-format
+msgid "Skipping directory `%s'.\n"
+msgstr "A(z) `%s' könyvtárat kihagyom.\n"
+
+#: src/ftp.c:1472
+#, c-format
+msgid "%s: unknown/unsupported file type.\n"
+msgstr "%s: nem ismert/nem támogatott fájltípus.\n"
+
+#: src/ftp.c:1499
+#, c-format
+msgid "%s: corrupt time-stamp.\n"
+msgstr "%s: hibás idõbejegyzés.\n"
+
+#: src/ftp.c:1524
+#, c-format
+msgid "Will not retrieve dirs since depth is %d (max %d).\n"
+msgstr "Könyvtárakat nem töltöm le, mivel a mélység %d (max %d).\n"
+
+#: src/ftp.c:1574
+#, c-format
+msgid "Not descending to `%s' as it is excluded/not-included.\n"
+msgstr "Nem lépek be `%s'-be mert ki van zárva/nincs kijelölve.\n"
+
+#: src/ftp.c:1639 src/ftp.c:1652
+#, c-format
+msgid "Rejecting `%s'.\n"
+msgstr "Visszautasítom `%s'-t.\n"
+
+#. No luck.
+#. #### This message SUCKS.  We should see what was the
+#. reason that nothing was retrieved.
+#: src/ftp.c:1698
+#, c-format
+msgid "No matches on pattern `%s'.\n"
+msgstr "Nincs találat a(z) `%s' mintához .\n"
+
+#: src/ftp.c:1764
+#, c-format
+msgid "Wrote HTML-ized index to `%s' [%ld].\n"
+msgstr "A HTML-esített indexet a(z) `%s' [%ld] fájlba írtam.\n"
+
+#: src/ftp.c:1769
+#, c-format
+msgid "Wrote HTML-ized index to `%s'.\n"
+msgstr "A HTML-esített indexet a(z) `%s' fájlba írtam.\n"
+
+#: src/gen_sslfunc.c:117
+msgid "Could not seed OpenSSL PRNG; disabling SSL.\n"
+msgstr "Nem lehet az OpenSSL PRNG-t inicializálni; SSL kikapcsolva.\n"
+
+#: src/getopt.c:675
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: a(z) `%s' opció kétes értelmû\n"
+
+#: src/getopt.c:700
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: a `--%s' opcióhoz nem kell argumentum\n"
+
+#: src/getopt.c:705
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: a `%c%s' opcióhoz nem kell argumentum\n"
+
+#: src/getopt.c:723 src/getopt.c:896
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: a(z) `%s' opcióhoz kell argumentum\n"
+
+#. --option
+#: src/getopt.c:752
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: ismeretlen opció `--%s'\n"
+
+#. +option or -option
+#: src/getopt.c:756
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: ismeretlen opció `%c%s'\n"
+
+#. 1003.2 specifies the format of this message.
+#: src/getopt.c:782
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: helytelen opció -- %c\n"
+
+#: src/getopt.c:785
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: hibás opció -- %c\n"
+
+#. 1003.2 specifies the format of this message.
+#: src/getopt.c:815 src/getopt.c:945
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: az opcióhoz szükség van argumentumra -- %c\n"
+
+#: src/getopt.c:862
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: a `-W %s' opció kétes értelmû\n"
+
+#: src/getopt.c:880
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: a `-W %s' opcióhoz nem kell argumentum\n"
+
+#: src/host.c:636
+#, c-format
+msgid "Resolving %s... "
+msgstr "IP keresés %s... "
+
+#: src/host.c:656 src/host.c:672
+#, c-format
+msgid "failed: %s.\n"
+msgstr "sikertelen: %s.\n"
+
+#: src/host.c:674
+msgid "failed: timed out.\n"
+msgstr "sikertelen: idõtúllépés.\n"
+
+#: src/host.c:762
+msgid "Host not found"
+msgstr "Gép nem található"
+
+#: src/host.c:764
+msgid "Unknown error"
+msgstr "Ismeretlen hiba"
+
+#: src/html-url.c:293
+#, c-format
+msgid "%s: Cannot resolve incomplete link %s.\n"
+msgstr "%s: nem lehet megtalálni a hiányos %s linket.\n"
+
+#. this is fatal
+#: src/http.c:674
+msgid "Failed to set up an SSL context\n"
+msgstr "SSL-környezet beállítása sikertelen\n"
+
+#: src/http.c:680
+#, c-format
+msgid "Failed to load certificates from %s\n"
+msgstr "Tanúsítványok betöltése %s-ról sikertelen\n"
+
+#: src/http.c:684 src/http.c:692
+msgid "Trying without the specified certificate\n"
+msgstr "Megpróbálom a megadott igazolás nélkül\n"
+
+#: src/http.c:688
+#, c-format
+msgid "Failed to get certificate key from %s\n"
+msgstr "Tanúsítványkulcs megszerzése %s-ról sikertelen\n"
+
+#: src/http.c:761 src/http.c:1809
+msgid "Unable to establish SSL connection.\n"
+msgstr "Nem lehet létrehozni SSL-kapcsolatot.\n"
+
+#: src/http.c:770
+#, c-format
+msgid "Reusing connection to %s:%hu.\n"
+msgstr "Újrahasználom a kapcsolatot %s:%hu-hoz.\n"
+
+#: src/http.c:1034
+#, c-format
+msgid "Failed writing HTTP request: %s.\n"
+msgstr "A HTTP kérés írása sikertelen: %s.\n"
+
+#: src/http.c:1039
+#, c-format
+msgid "%s request sent, awaiting response... "
+msgstr "%s kérés elküldve, várom a választ... "
+
+#: src/http.c:1083
+msgid "End of file while parsing headers.\n"
+msgstr "Fájl vége miközben a fejlécet olvasom.\n"
+
+#: src/http.c:1093
+#, c-format
+msgid "Read error (%s) in headers.\n"
+msgstr "Olvasási hiba (%s) a fejlécben.\n"
+
+#: src/http.c:1128
+msgid "No data received"
+msgstr "Nem érkezett adat"
+
+#: src/http.c:1130
+msgid "Malformed status line"
+msgstr "Rosszul formázott állapot vonal"
+
+#: src/http.c:1135
+msgid "(no description)"
+msgstr "(nincs leírás)"
+
+#: src/http.c:1267
+msgid "Authorization failed.\n"
+msgstr "Azonosítás sikertelen.\n"
+
+#: src/http.c:1274
+msgid "Unknown authentication scheme.\n"
+msgstr "Ismeretlen azonosítási módszer.\n"
+
+#: src/http.c:1314
+#, c-format
+msgid "Location: %s%s\n"
+msgstr "Hely: %s%s\n"
+
+#: src/http.c:1315 src/http.c:1454
+msgid "unspecified"
+msgstr "nem megadott"
+
+#: src/http.c:1316
+msgid " [following]"
+msgstr " [következik]"
+
+#: src/http.c:1383
+msgid ""
+"\n"
+"    The file is already fully retrieved; nothing to do.\n"
+"\n"
+msgstr ""
+"\n"
+"    A fájl már teljesen le van töltve; nincs mit csinálni.\n"
+"\n"
+
+#: src/http.c:1401
+#, c-format
+msgid ""
+"\n"
+"Continued download failed on this file, which conflicts with `-c'.\n"
+"Refusing to truncate existing file `%s'.\n"
+"\n"
+msgstr ""
+"\n"
+"Folytatott letöltés sikertelen ennél a fájlnál, ami ellentmond `-c'-val.\n"
+"Nem tördelem a létezõ `%s' fájlt.\n"
+"\n"
+
+#. No need to print this output if the body won't be
+#. downloaded at all, or if the original server response is
+#. printed.
+#: src/http.c:1444
+msgid "Length: "
+msgstr "Hossz: "
+
+#: src/http.c:1449
+#, c-format
+msgid " (%s to go)"
+msgstr " (még %s)"
+
+#: src/http.c:1454
+msgid "ignored"
+msgstr "figyelmen kívül hagyva"
+
+#: src/http.c:1598
+msgid "Warning: wildcards not supported in HTTP.\n"
+msgstr "Figyelem: * és ? nem használható HTTP-nél.\n"
+
+#. If opt.noclobber is turned on and file already exists, do not
+#. retrieve the file
+#: src/http.c:1628
+#, c-format
+msgid "File `%s' already there, will not retrieve.\n"
+msgstr "A(z) `%s' fájl már létezik, nem töltöm le.\n"
+
+#: src/http.c:1800
+#, c-format
+msgid "Cannot write to `%s' (%s).\n"
+msgstr "Nem tudok írni `%s'-ba (%s).\n"
+
+#: src/http.c:1819
+#, c-format
+msgid "ERROR: Redirection (%d) without location.\n"
+msgstr "HIBA: Átirányítás (%d) helyzet nélkül.\n"
+
+#: src/http.c:1851
+#, c-format
+msgid "%s ERROR %d: %s.\n"
+msgstr "%s HIBA %d: %s.\n"
+
+#: src/http.c:1864
+msgid "Last-modified header missing -- time-stamps turned off.\n"
+msgstr "Utolsó módosított fejléc hiányzik -- idõbejegyzés kikapcsolva.\n"
+
+#: src/http.c:1872
+msgid "Last-modified header invalid -- time-stamp ignored.\n"
+msgstr "Utolsó módosított fejléc helytelen -- idõbejegyzés figyelmen kívül hagyva.\n"
+
+#: src/http.c:1895
+#, c-format
+msgid ""
+"Server file no newer than local file `%s' -- not retrieving.\n"
+"\n"
+msgstr ""
+"A szerveren lévõ `%s' fájl nem újabb mint a helyi -- nem töltöm le.\n"
+"\n"
+
+#: src/http.c:1903
+#, c-format
+msgid "The sizes do not match (local %ld) -- retrieving.\n"
+msgstr "A méretek nem egyeznek (helyi %ld) -- letöltöm.\n"
+
+#: src/http.c:1907
+msgid "Remote file is newer, retrieving.\n"
+msgstr "Távoli fájl újabb, letöltöm.\n"
+
+#: src/http.c:1948
+#, c-format
+msgid ""
+"%s (%s) - `%s' saved [%ld/%ld]\n"
+"\n"
+msgstr ""
+"%s (%s) - `%s' lementve [%ld/%ld]\n"
+"\n"
+
+#: src/http.c:1998
+#, c-format
+msgid "%s (%s) - Connection closed at byte %ld. "
+msgstr "%s (%s) - Kapcsolat bezárva a %ld. bájtnál. "
+
+#: src/http.c:2007
+#, c-format
+msgid ""
+"%s (%s) - `%s' saved [%ld/%ld])\n"
+"\n"
+msgstr ""
+"%s (%s) - `%s' lementve [%ld/%ld])\n"
+"\n"
+
+#: src/http.c:2028
+#, c-format
+msgid "%s (%s) - Connection closed at byte %ld/%ld. "
+msgstr "%s (%s) - Kapcsolat bezárva a %ld/%ld. bájtnál. "
+
+#: src/http.c:2040
+#, c-format
+msgid "%s (%s) - Read error at byte %ld (%s)."
+msgstr "%s (%s) - Olvasási hiba a %ld. bájtnál (%s). "
+
+#: src/http.c:2049
+#, c-format
+msgid "%s (%s) - Read error at byte %ld/%ld (%s). "
+msgstr "%s (%s) - Olvasási hiba a %ld/%ld. bájtnál (%s). "
+
+#: src/init.c:342
+#, c-format
+msgid "%s: WGETRC points to %s, which doesn't exist.\n"
+msgstr "%s: WGETRC %s-ra mutat, ami nem létezik.\n"
+
+#: src/init.c:398 src/netrc.c:276
+#, c-format
+msgid "%s: Cannot read %s (%s).\n"
+msgstr "%s: Nem lehet olvasni %s-t (%s).\n"
+
+#: src/init.c:416 src/init.c:422
+#, c-format
+msgid "%s: Error in %s at line %d.\n"
+msgstr "%s: Hiba %s-ban a %d-ik sornál.\n"
+
+#: src/init.c:454
+#, c-format
+msgid "%s: Warning: Both system and user wgetrc point to `%s'.\n"
+msgstr "%s: Figyelem: Mind a rendszer és a felhasználói wgetrc `%s'-re mutat.\n"
+
+#: src/init.c:594
+#, c-format
+msgid "%s: Invalid --execute command `%s'\n"
+msgstr "%s: Hibás --execute parancs `%s'\n"
+
+#: src/init.c:630
+#, c-format
+msgid "%s: %s: Invalid boolean `%s', use `on' or `off'.\n"
+msgstr "%s: %s: Hibás boolean `%s', használja az `on' vagy `off' szavakat.\n"
+
+#: src/init.c:673
+#, c-format
+msgid "%s: %s: Invalid boolean `%s', use always, on, off, or never.\n"
+msgstr "%s: %s: Hibás boolean `%s', használja az always, on, off vagy never szavakat.\n"
+
+#: src/init.c:691
+#, c-format
+msgid "%s: %s: Invalid number `%s'.\n"
+msgstr "%s: %s:Hibás szám `%s'.\n"
+
+#: src/init.c:930 src/init.c:949
+#, c-format
+msgid "%s: %s: Invalid byte value `%s'\n"
+msgstr "%s: %s: Hibás bájt érték `%s'.\n"
+
+#: src/init.c:974
+#, c-format
+msgid "%s: %s: Invalid time period `%s'\n"
+msgstr "%s: %s: Hibás idõ intervallum `%s'.\n"
+
+#: src/init.c:1051
+#, c-format
+msgid "%s: %s: Invalid header `%s'.\n"
+msgstr "%s: %s: Hibás fejléc `%s'.\n"
+
+#: src/init.c:1106
+#, c-format
+msgid "%s: %s: Invalid progress type `%s'.\n"
+msgstr "%s: %s: Helytelen típus `%s'.\n"
+
+#: src/init.c:1157
+#, c-format
+msgid "%s: %s: Invalid restriction `%s', use `unix' or `windows'.\n"
+msgstr "%s: %s: Hibás megkötés `%s', használja a `unix'-t vagy `windows'-t.\n"
+
+#: src/init.c:1198
+#, c-format
+msgid "%s: %s: Invalid value `%s'.\n"
+msgstr "%s: %s: Hibás érték `%s'.\n"
+
+#: src/log.c:636
+#, c-format
+msgid ""
+"\n"
+"%s received, redirecting output to `%s'.\n"
+msgstr ""
+"\n"
+"%s-t kaptam, kimenet átirányítása `%s'-ba.\n"
+
+#. Eek!  Opening the alternate log file has failed.  Nothing we
+#. can do but disable printing completely.
+#: src/log.c:643
+#, c-format
+msgid "%s: %s; disabling logging.\n"
+msgstr "%s: %s; naplózás kikapcsolva.\n"
+
+#: src/main.c:127
+#, c-format
+msgid "Usage: %s [OPTION]... [URL]...\n"
+msgstr "Használat: %s [OPCIÓK]... [URL]...\n"
+
+#: src/main.c:135
+#, c-format
+msgid "GNU Wget %s, a non-interactive network retriever.\n"
+msgstr "GNU Wget %s, egy nem-interaktív hálózati letöltõ.\n"
+
+#. Had to split this in parts, so the #@@#%# Ultrix compiler and cpp
+#. don't bitch.  Also, it makes translation much easier.
+#: src/main.c:140
+msgid ""
+"\n"
+"Mandatory arguments to long options are mandatory for short options too.\n"
+"\n"
+msgstr ""
+"\n"
+"A hosszú opciók kötelezõ argumentumai kötelezõek a rövid opcióknak is.\n"
+"\n"
+
+#: src/main.c:144
+msgid ""
+"Startup:\n"
+"  -V,  --version           display the version of Wget and exit.\n"
+"  -h,  --help              print this help.\n"
+"  -b,  --background        go to background after startup.\n"
+"  -e,  --execute=COMMAND   execute a `.wgetrc'-style command.\n"
+"\n"
+msgstr ""
+"Indítás:\n"
+"  -V,  --version           kiírja a Wget verzióját és kilép.\n"
+"  -h,  --help              kiírja ezt a segítséget.\n"
+"  -b,  --background        indítás után háttérben fut.\n"
+"  -e,  --execute=COMMAND   végrehajt egy `.wgetrc'-típusú parancsot.\n"
+"\n"
+
+#: src/main.c:151
+msgid ""
+"Logging and input file:\n"
+"  -o,  --output-file=FILE     log messages to FILE.\n"
+"  -a,  --append-output=FILE   append messages to FILE.\n"
+"  -d,  --debug                print debug output.\n"
+"  -q,  --quiet                quiet (no output).\n"
+"  -v,  --verbose              be verbose (this is the default).\n"
+"  -nv, --non-verbose          turn off verboseness, without being quiet.\n"
+"  -i,  --input-file=FILE      download URLs found in FILE.\n"
+"  -F,  --force-html           treat input file as HTML.\n"
+"  -B,  --base=URL             prepends URL to relative links in -F -i file.\n"
+"\n"
+msgstr ""
+"Naplózás és bemeneti fájl:\n"
+"  -o,  --output-file=FÁJL     üzenetek rögzítése a FÁJL-ban.\n"
+"  -a,  --append-output=FÁJL   üzenetek hozzáadása a FÁJL-hoz.\n"
+"  -d,  --debug                hibakeresési kiírás.\n"
+"  -q,  --quiet                csendes (nincs kimenet).\n"
+"  -v,  --verbose              legyen részletes (alapértelmezett).\n"
+"  -nv, --non-verbose          nem részletes anélkül, hogy csendes legyen.\n"
+"  -i,  --input-file=FÁJL      a FÁJL-ban talált címek letöltése.\n"
+"  -F,  --force-html           a bemenetet kezelje HTML-ként.\n"
+"  -B,  --base=URL             URL hozzáadása relatív linkeknél -F -i fájlban.\n"
+"\n"
+
+#: src/main.c:163
+msgid ""
+"Download:\n"
+"  -t,  --tries=NUMBER           set number of retries to NUMBER (0 unlimits).\n"
+"       --retry-connrefused      retry even if connection is refused.\n"
+"  -O   --output-document=FILE   write documents to FILE.\n"
+"  -nc, --no-clobber             don't clobber existing files or use .# suffixes.\n"
+"  -c,  --continue               resume getting a partially-downloaded file.\n"
+"       --progress=TYPE          select progress gauge type.\n"
+"  -N,  --timestamping           don't re-retrieve files unless newer than local.\n"
+"  -S,  --server-response        print server response.\n"
+"       --spider                 don't download anything.\n"
+"  -T,  --timeout=SECONDS        set all timeout values to SECONDS.\n"
+"       --dns-timeout=SECS       set the DNS lookup timeout to SECS.\n"
+"       --connect-timeout=SECS   set the connect timeout to SECS.\n"
+"       --read-timeout=SECS      set the read timeout to SECS.\n"
+"  -w,  --wait=SECONDS           wait SECONDS between retrievals.\n"
+"       --waitretry=SECONDS      wait 1...SECONDS between retries of a retrieval.\n"
+"       --random-wait            wait from 0...2*WAIT secs between retrievals.\n"
+"  -Y,  --proxy=on/off           turn proxy on or off.\n"
+"  -Q,  --quota=NUMBER           set retrieval quota to NUMBER.\n"
+"       --bind-address=ADDRESS   bind to ADDRESS (hostname or IP) on local host.\n"
+"       --limit-rate=RATE        limit download rate to RATE.\n"
+"       --dns-cache=off          disable caching DNS lookups.\n"
+"       --restrict-file-names=OS restrict chars in file names to ones OS allows.\n"
+"\n"
+msgstr ""
+"Letöltés:\n"
+"  -t,  --tries=SZÁM             a próbálkozások SZÁM-a (0 végtelen).\n"
+"       --retry-connrefused      újrapróbálkozás ha a csatlakozás visszautasítva.\n"
+"  -O   --output-document=FÁJL   dokumentum írása FÁJL-ba.\n"
+"  -nc, --no-clobber             ne változtassa meg a létezõ fájlokat vagy\n"
+"                                használjon .# végzõdést.\n"
+"  -c,  --continue               folytassa egy létezõ fájl letöltését.\n"
+"       --progress=TYPE          letöltési kiírás stílusának beállítása.\n"
+"  -N,  --timestamping           ne töltse a fájlokat ha régebbiek mint a\n"
+"                                helyiek.\n"
+"  -S,  --server-response        szerver válaszának kiírása.\n"
+"       --spider                 ne töltsön le semmit.\n"
+"  -T,  --timeout=SECS           összes idõhatár beállítása SECS másodperce.\n"
+"       --dns-timeout=SECS       DNS keresési idõhatár beállítása SECS\n"
+"                                másodperce.\n"
+"       --connect-timeout=SECS   csatlakozási idõhatár beállítása SECS\n"
+"                                másodperce.\n"
+"       --read-timeout=SECS      olvasási idõhatár beállítása SECS másodperce.\n"
+"  -w,  --wait=SECONDS           várjon SECONDS másodpercet a letöltések között.\n"
+"       --waitretry=SECONDS      várjon 1...SECONDS másodpercet a próbálkozások\n"
+"                                között.\n"
+"  -Y,  --proxy=on/off           proxy ki- vagy bekapcsolása.\n"
+"  -Q,  --quota=SZÁM             a próbálkozások számát SZÁM-ra állítja.\n"
+"       --bind-address=CÍM       hozzárendelés CÍM-hez (gépnév vagy IP).\n"
+"       --limit-rate=RATE        letöltés sebességének korlátozása RATE-re.\n"
+"       --dns-cache=off          DNS keresések tárolásának kikapcsolása \n"
+"       --restrict-file-names=OS fájlnévbeli karakterek korlátozása az\n"
+"                                operációs rendszer által engedélyezettekre.\n"
+"\n"
+
+#: src/main.c:188
+msgid ""
+"Directories:\n"
+"  -nd, --no-directories            don't create directories.\n"
+"  -x,  --force-directories         force creation of directories.\n"
+"  -nH, --no-host-directories       don't create host directories.\n"
+"  -P,  --directory-prefix=PREFIX   save files to PREFIX/...\n"
+"       --cut-dirs=NUMBER           ignore NUMBER remote directory components.\n"
+"\n"
+msgstr ""
+"Könyvtárak:\n"
+"  -nd  --no-directories            ne hozzon létre könyvtárakat.\n"
+"  -x,  --force-directories         erõltesse a könyvtárak létrehozását.\n"
+"  -nH, --no-host-directories       ne hozzon létre könyvtárakat a gépeknek.\n"
+"  -P,  --directory-prefix=PREFIX   mentse le a fájlokat PREFIX/...-be\n"
+"       --cut-dirs=SZÁM             figyelmen kívül hagyjon SZÁM db távoli\n"
+"                                   könyvtárelemet.\n"
+"\n"
+
+#: src/main.c:196
+msgid ""
+"HTTP options:\n"
+"       --http-user=USER      set http user to USER.\n"
+"       --http-passwd=PASS    set http password to PASS.\n"
+"  -C,  --cache=on/off        (dis)allow server-cached data (normally allowed).\n"
+"  -E,  --html-extension      save all text/html documents with .html extension.\n"
+"       --ignore-length       ignore `Content-Length' header field.\n"
+"       --header=STRING       insert STRING among the headers.\n"
+"       --proxy-user=USER     set USER as proxy username.\n"
+"       --proxy-passwd=PASS   set PASS as proxy password.\n"
+"       --referer=URL         include `Referer: URL' header in HTTP request.\n"
+"  -s,  --save-headers        save the HTTP headers to file.\n"
+"  -U,  --user-agent=AGENT    identify as AGENT instead of Wget/VERSION.\n"
+"       --no-http-keep-alive  disable HTTP keep-alive (persistent connections).\n"
+"       --cookies=off         don't use cookies.\n"
+"       --load-cookies=FILE   load cookies from FILE before session.\n"
+"       --save-cookies=FILE   save cookies to FILE after session.\n"
+"       --post-data=STRING    use the POST method; send STRING as the data.\n"
+"       --post-file=FILE      use the POST method; send contents of FILE.\n"
+"\n"
+msgstr ""
+"HTTP-opciók:\n"
+"       --http-user=USER      http felhasználó USER.\n"
+"       --http-passwd=PASS    http kód PASS.\n"
+"  -C,  --cache=on/off        (nem)engedi a szerver-gyorsítótárazott adatokat.\n"
+"  -E,  --html-extension      minden text/html fájlt .html kiterjesztéssel\n"
+"                             ment le.\n"
+"       --ignore-length       figyelmen kívül hagyja a `Content-Length'-t.\n"
+"       --header=STRING       beszúrja a STRING-t a fejlécbe.\n"
+"       --proxy-user=USER     USER a felhasználói név a proxyhoz.\n"
+"       --proxy-passwd=PASS   PASS a kód a proxyhoz.\n"
+"       --referer=URL         beszúrja a `Referer: URL' fejlécet a HTTP kérésbe.\n"
+"  -s,  --save-headers        a HTTP fejlécek mentése fájlba.\n"
+"  -U,  --user-agent=AGENT    azonosítsa magát AGENT-ként Wget/VERSION helyett.\n"
+"       --no-http-keep-alive  HTTP keep-alive (maradandó kapcsolat) kikapcsolása.\n"
+"       --cookies=off         ne használjon cookie-kat.\n"
+"       --load-cookies=FÁJL   cookie-k betöltése FÁJL-ból munka elõtt.\n"
+"       --save-cookies=FÁJL   cookie-k elmentése FÁJL-ba munka után.\n"
+"       --post-data=STRING    használja a POST metódust; küldje STRING-t\n"
+"                             adatként.\n"
+"       --post-file=FÁJL      használja a POST metódust; küldje a FÁJL tartalmát\n"
+"                             adatként.\n"
+"\n"
+
+#: src/main.c:217
+msgid ""
+"HTTPS (SSL) options:\n"
+"       --sslcertfile=FILE     optional client certificate.\n"
+"       --sslcertkey=KEYFILE   optional keyfile for this certificate.\n"
+"       --egd-file=FILE        file name of the EGD socket.\n"
+"       --sslcadir=DIR         dir where hash list of CA's are stored.\n"
+"       --sslcafile=FILE       file with bundle of CA's\n"
+"       --sslcerttype=0/1      Client-Cert type 0=PEM (default) / 1=ASN1 (DER)\n"
+"       --sslcheckcert=0/1     Check the server cert agenst given CA\n"
+"       --sslprotocol=0-3      choose SSL protocol; 0=automatic,\n"
+"                              1=SSLv2 2=SSLv3 3=TLSv1\n"
+"\n"
+msgstr ""
+"HTTPS (SSL) opciók:\n"
+"       --sslcertfile=FÁJL     opcionális kliens igazolás.\n"
+"       --sslcertkey=KULCSFÁJL opcionális kulcsfájl az igazoláshoz.\n"
+"       --egd-file=FÁJL        az EGD csatlakozó fájlneve.\n"
+"       --sslcadir=DIR         könyvtár ahol a CA-k listája található.\n"
+"       --sslcafile=FÁJL       fájl amiben a CA-k találhatóak.\n"
+"       --sslcerttype=0/1      Client-Cert típusa 0=PEM (alapértelmezett) /\n"
+"                              1=ASN1 (DER)\n"
+"       --sslcheckcert=0/1     Ellenõrizze a szerver cert-jét a megadott\n"
+"                              CA-val\n"
+"       --sslprotocol=0-3      SSL protokoll kiválasztása; 0=automatikus,\n"
+"                              1=SSLv2 2=SSLv3 3=TLSv1\n"
+"\n"
+
+#: src/main.c:230
+msgid ""
+"FTP options:\n"
+"  -nr, --dont-remove-listing   don't remove `.listing' files.\n"
+"  -g,  --glob=on/off           turn file name globbing on or off.\n"
+"       --passive-ftp           use the \"passive\" transfer mode.\n"
+"       --retr-symlinks         when recursing, get linked-to files (not dirs).\n"
+"\n"
+msgstr ""
+"FTP opciók:\n"
+"  -nr, --dont-remove-listing   ne törölje le a `.listing' fájlokat.\n"
+"  -g,  --glob=on/off     fájlnév-helyettesítés be/ki.\n"
+"       --passive-ftp     \"passive\" adatátviteli mód használata.\n"
+"       --retr-symlinks   ha rekurzív, akkor töltse le a szimlinkelt\n"
+"                         fájlokat (nem könyvtárakat).\n"
+"\n"
+
+#: src/main.c:237
+msgid ""
+"Recursive retrieval:\n"
+"  -r,  --recursive          recursive download.\n"
+"  -l,  --level=NUMBER       maximum recursion depth (inf or 0 for infinite).\n"
+"       --delete-after       delete files locally after downloading them.\n"
+"  -k,  --convert-links      convert non-relative links to relative.\n"
+"  -K,  --backup-converted   before converting file X, back up as X.orig.\n"
+"  -m,  --mirror             shortcut option equivalent to -r -N -l inf -nr.\n"
+"  -p,  --page-requisites    get all images, etc. needed to display HTML page.\n"
+"       --strict-comments    turn on strict (SGML) handling of HTML comments.\n"
+"\n"
+msgstr ""
+"Rekurzív letöltés:\n"
+"  -r,  --recursive          rekurzív letöltés --  óvatosan használd!.\n"
+"  -l,  --level=SZÁM         maximális rekurziós mélység (inf|0 végtelenért).\n"
+"       --delete-after       törölje le a fájlokat letöltés után.\n"
+"  -k,  --convert-links      nem-relatív linkeket relatív linkekké alakítsa.\n"
+"  -K,  --backup-converted   mielõtt az X fájlt módosítja, mentse le\n"
+"                            mint X.orig.\n"
+"  -m,  --mirror             rövidítés a -r -N -l inf -nr opciókhoz.\n"
+"  -p,  --page-requisites    töltse le az összes képet ami HTML fájlok\n"
+"                            megjelenítéséhez kell.\n"
+"       --strict-comments    a HTML megjegyzések szigorú (SGML) kezelésének\n"
+"                            bekapcsolása.\n"
+"\n"
+
+#: src/main.c:248
+msgid ""
+"Recursive accept/reject:\n"
+"  -A,  --accept=LIST                comma-separated list of accepted extensions.\n"
+"  -R,  --reject=LIST                comma-separated list of rejected extensions.\n"
+"  -D,  --domains=LIST               comma-separated list of accepted domains.\n"
+"       --exclude-domains=LIST       comma-separated list of rejected domains.\n"
+"       --follow-ftp                 follow FTP links from HTML documents.\n"
+"       --follow-tags=LIST           comma-separated list of followed HTML tags.\n"
+"  -G,  --ignore-tags=LIST           comma-separated list of ignored HTML tags.\n"
+"  -H,  --span-hosts                 go to foreign hosts when recursive.\n"
+"  -L,  --relative                   follow relative links only.\n"
+"  -I,  --include-directories=LIST   list of allowed directories.\n"
+"  -X,  --exclude-directories=LIST   list of excluded directories.\n"
+"  -np, --no-parent                  don't ascend to the parent directory.\n"
+"\n"
+msgstr ""
+"Rekurzív elfogadás/visszautasítás:\n"
+"  -A,  --accept=LIST                vesszõvel elválasztott lista az elfogatott\n"
+"                                    kiterjesztésekrõl.\n"
+"  -R,  --reject=LIST                vesszõvel elválasztott lista a \n"
+"                                    visszautasított kiterjesztésekrõl.\n"
+"  -D,  --domains=LIST               vesszõvel elválasztott lista az elfogadott\n"
+"                                    tartományokról.\n"
+"       --exclude-domains=LIST       vesszõvel elválasztott lista a kizárt\n"
+"                                    tartományokról.\n"
+"       --follow-ftp                 kövesse az FTP linkeket HTML dokumentumból.\n"
+"       --follow-tags=LIST           vesszõvel elválasztott lista a követendõ\n"
+"                                    HTML-elemekrõl.\n"
+"  -G,  --ignore-tags=LIST           vesszõvel elválasztott lista a nem\n"
+"                                    követendõ HTML-elemekrõl.\n"
+"  -H,  --span-hosts                 menjen más szerverre mikor rekurzív.\n"
+"  -L,  --relative                   relatív linkeket kövesse csak.\n"
+"  -I,  --include-directories=LIST   lista a megengedett könyvtárakról.\n"
+"  -X,  --exclude-directories=LIST   lista a megengedett könyvtárakról.\n"
+"  -np, --no-parent                  ne mélyedjen bele a szülõ könyvtárba.\n"
+"\n"
+
+#: src/main.c:263
+msgid "Mail bug reports and suggestions to <bug-wget@gnu.org>.\n"
+msgstr "Küldjön hibajelentést és ötleteket a <bug-wget@gnu.org> címre.\n"
+
+#: src/main.c:465
+#, c-format
+msgid "%s: debug support not compiled in.\n"
+msgstr "%s: debug kezelése nincs belefordítva.\n"
+
+#: src/main.c:517
+msgid "Copyright (C) 2003 Free Software Foundation, Inc.\n"
+msgstr "Copyright (C) 2003 Free Software Foundation, Inc.\n"
+
+#: src/main.c:519
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+msgstr ""
+"Ez a program abban a reményben van terjesztve, hogy hasznos legyen,\n"
+"de BÁRMIFÉLE GARANCIA NÉLKÜL; még az ÉRTÉKESÍTHETÕSÉG vagy MEGFELELÉS\n"
+"EGY BIZONYOS CÉLNAK a garanciája nélkül. Nézd meg a \n"
+"GNU General Public License-t bõvebb információért.\n"
+
+#: src/main.c:524
+msgid ""
+"\n"
+"Originally written by Hrvoje Niksic <hniksic@xemacs.org>.\n"
+msgstr ""
+"\n"
+"Eredetileg Hrvoje Niksic <hniksic@xemacs.org> írta.\n"
+
+#: src/main.c:703
+#, c-format
+msgid "%s: illegal option -- `-n%c'\n"
+msgstr "%s: hibás opció -- `-n%c'\n"
+
+#. #### Something nicer should be printed here -- similar to the
+#. pre-1.5 `--help' page.
+#: src/main.c:706 src/main.c:748 src/main.c:794
+#, c-format
+msgid "Try `%s --help' for more options.\n"
+msgstr "Próbálja meg a `%s --help'-t több opcióért.\n"
+
+#: src/main.c:774
+msgid "Can't be verbose and quiet at the same time.\n"
+msgstr "Nem lehetek részletes és csendes egyszerre.\n"
+
+#: src/main.c:780
+msgid "Can't timestamp and not clobber old files at the same time.\n"
+msgstr "Nem tudok idõbejegyzést is tenni egy fájlra és békén is hagyni.\n"
+
+#. No URL specified.
+#: src/main.c:789
+#, c-format
+msgid "%s: missing URL\n"
+msgstr "%s: hiányzó URL\n"
+
+#: src/main.c:905
+#, c-format
+msgid "No URLs found in %s.\n"
+msgstr "Nem találtam URL-t %s-ban.\n"
+
+#: src/main.c:914
+#, c-format
+msgid ""
+"\n"
+"FINISHED --%s--\n"
+"Downloaded: %s bytes in %d files\n"
+msgstr ""
+"\n"
+"BEFEJEZTEM --%s--\n"
+"Letöltve: %s bájt %d fájlban\n"
+
+#: src/main.c:920
+#, c-format
+msgid "Download quota (%s bytes) EXCEEDED!\n"
+msgstr "Letöltési határ (%s bájt) TÚLLÉPVE!\n"
+
+#: src/mswindows.c:147
+msgid "Continuing in background.\n"
+msgstr "Folytatás a háttérben.\n"
+
+#: src/mswindows.c:149 src/utils.c:487
+#, c-format
+msgid "Output will be written to `%s'.\n"
+msgstr "A kimenet a(z) `%s' fájlba lesz kiírva.\n"
+
+#: src/mswindows.c:245
+#, c-format
+msgid "Starting WinHelp %s\n"
+msgstr "WinHelp %s indítása\n"
+
+#: src/mswindows.c:272 src/mswindows.c:279
+#, c-format
+msgid "%s: Couldn't find usable socket driver.\n"
+msgstr "%s: Nem találtam használható csatlakozó eszközkezelõt.\n"
+
+#: src/netrc.c:380
+#, c-format
+msgid "%s: %s:%d: warning: \"%s\" token appears before any machine name\n"
+msgstr "%s: %s:%d: figyelem: \"%s\" tokent találtam a gép neve elõtt\n"
+
+#: src/netrc.c:411
+#, c-format
+msgid "%s: %s:%d: unknown token \"%s\"\n"
+msgstr "%s: %s:%d: ismeretlen token \"%s\"\n"
+
+#: src/netrc.c:475
+#, c-format
+msgid "Usage: %s NETRC [HOSTNAME]\n"
+msgstr "Használat: %s NETRC [GÉPNÉV]\n"
+
+#: src/netrc.c:485
+#, c-format
+msgid "%s: cannot stat %s: %s\n"
+msgstr "%s: nem lehet megvizsgálni %s-t: %s\n"
+
+#. Align the [ skipping ... ] line with the dots.  To do
+#. that, insert the number of spaces equal to the number of
+#. digits in the skipped amount in K.
+#: src/progress.c:234
+#, c-format
+msgid ""
+"\n"
+"%*s[ skipping %dK ]"
+msgstr ""
+"\n"
+"%*s[ kihagyva %dK ]"
+
+#: src/progress.c:401
+#, c-format
+msgid "Invalid dot style specification `%s'; leaving unchanged.\n"
+msgstr "Helytelen stílusmegadás `%s'; változatlanul hagyva.\n"
+
+#: src/recur.c:378
+#, c-format
+msgid "Removing %s since it should be rejected.\n"
+msgstr "Letörlöm %s-t mivel vissza kéne utasítani.\n"
+
+#: src/res.c:549
+msgid "Loading robots.txt; please ignore errors.\n"
+msgstr "robots.txt letöltése; hagyja figyelmen kívül a hibákat.\n"
+
+#: src/retr.c:400
+#, c-format
+msgid "Error parsing proxy URL %s: %s.\n"
+msgstr "Hiba a proxy URL elemzésében: %s: %s.\n"
+
+#: src/retr.c:408
+#, c-format
+msgid "Error in proxy URL %s: Must be HTTP.\n"
+msgstr "Hiba a proxy %s URL-ben: HTTP kell legyen.\n"
+
+#: src/retr.c:493
+#, c-format
+msgid "%d redirections exceeded.\n"
+msgstr "%d átirányítás túllépve.\n"
+
+#: src/retr.c:617
+msgid ""
+"Giving up.\n"
+"\n"
+msgstr ""
+"Feladom.\n"
+"\n"
+
+#: src/retr.c:617
+msgid ""
+"Retrying.\n"
+"\n"
+msgstr ""
+"Újrapróbálom.\n"
+"\n"
+
+#: src/url.c:621
+msgid "No error"
+msgstr "Nincs hiba"
+
+#: src/url.c:623
+msgid "Unsupported scheme"
+msgstr "Nem támogatott scheme"
+
+#: src/url.c:625
+msgid "Empty host"
+msgstr "Üres gép"
+
+#: src/url.c:627
+msgid "Bad port number"
+msgstr "Rossz port szám"
+
+#: src/url.c:629
+msgid "Invalid user name"
+msgstr "Hibás felhasználói név"
+
+#: src/url.c:631
+msgid "Unterminated IPv6 numeric address"
+msgstr "Befejezetlen IPv6 numerikus cím"
+
+#: src/url.c:633
+msgid "IPv6 addresses not supported"
+msgstr "IPv6 címek nincsenek támogatva"
+
+#: src/url.c:635
+msgid "Invalid IPv6 numeric address"
+msgstr "Hibás IPv6 numerikus cím"
+
+#: src/utils.c:120
+#, c-format
+msgid "%s: %s: Not enough memory.\n"
+msgstr "%s: %s: Nincs elég memória.\n"
+
+#. parent, no error
+#: src/utils.c:485
+#, c-format
+msgid "Continuing in background, pid %d.\n"
+msgstr "Folytatás a háttérben, a pid %d.\n"
+
+#: src/utils.c:529
+#, c-format
+msgid "Failed to unlink symlink `%s': %s\n"
+msgstr "Sikertelen a(z) `%s' szimlink törlése: %s\n"

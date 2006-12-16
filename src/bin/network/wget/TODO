@@ -1,0 +1,92 @@
+                                 Hey Emacs, this is -*- outline -*- mode
+
+This is the to-do list for GNU Wget.  There is no timetable of when we
+plan to implement these features -- this is just a list of features
+we'd like to see in Wget, as well as a list of problems that need
+fixing.  Patches to implement these items are likely to be accepted,
+especially if they follow the coding convention outlined in PATCHES
+and if they patch the documentation as well.
+
+The items are not listed in any particular order (except that
+recently-added items may tend towards the top).  Not all of these
+represent user-visible changes.
+
+* Honor `Content-Disposition: XXX; filename="FILE"' when creating the
+  file name.  If possible, try not to break `-nc' and friends when
+  doing that.
+
+* Wget shouldn't delete rejected files that were not downloaded, but
+  just found on disk because of `-nc'.  For example, `wget -r -nc
+  -A.gif URL' should allow the user to get all the GIFs without
+  removing any of the existing HTML files.
+
+* Be careful not to lose username/password information given for the
+  URL on the command line.
+
+* Add a --range parameter allowing you to explicitly specify a range
+  of bytes to get from a file over HTTP (FTP only supports ranges
+  ending at the end of the file, though forcibly disconnecting from
+  the server at the desired endpoint might be workable).
+
+* If multiple FTP URLs are specified that are on the same host, Wget should
+  re-use the connection rather than opening a new one for each file.
+
+* Try to devise a scheme so that, when password is unknown, Wget asks
+  the user for one.
+
+* If -c used with -N, check to make sure a file hasn't changed on the server
+  before "continuing" to download it (preventing a bogus hybrid file).
+
+* Generalize --html-extension to something like --mime-extensions and
+  have it look at mime.types/mimecap file for preferred extension.
+  Non-HTML files with filenames changed this way would be
+  re-downloaded each time despite -N unless .orig files were saved for
+  them.  Since .orig would contain the same data as non-.orig, the
+  latter could be just a link to the former.  Another possibility
+  would be to implement a per-directory database called something like
+  .wget_url_mapping containing URLs and their corresponding filenames.
+
+* When spanning hosts, there's no way to say that you are only interested in
+  files in a certain directory on _one_ of the hosts (-I and -X apply to all).
+  Perhaps -I and -X should take an optional hostname before the directory?
+
+* --retr-symlinks should cause wget to traverse links to directories too.
+
+* Make wget return non-zero status in more situations, like incorrect HTTP auth.
+
+* Make -K compare X.orig to X and move the former on top of the latter if 
+  they're the same, rather than leaving identical .orig files laying around.
+
+* Make `-k' check for files that were downloaded in the past and convert links 
+  to them in newly-downloaded documents.
+
+* Add option to clobber existing file names (no `.N' suffixes).
+
+* Add option to only list wildcard matches without doing the download.
+
+* Handle MIME types correctly.  There should be an option to (not)
+  retrieve files based on MIME types, e.g. `--accept-types=image/*'.
+
+* Allow time-stamping by arbitrary date.
+
+* Allow size limit to files (perhaps with an option to download oversize files 
+  up through the limit or not at all, to get more functionality than [u]limit.
+
+* Download to .in* when mirroring.
+
+* Add an option to delete or move no-longer-existent files when mirroring.
+
+* Implement uploading (--upload URL?) in FTP and HTTP.
+
+* Rewrite FTP code to allow for easy addition of new commands.  It
+  should probably be coded as a simple DFA engine.
+
+* Make HTTP timestamping use If-Modified-Since facility.
+
+* Add more protocols (e.g. gopher and news), implementing them in a
+  modular fashion.
+
+* Add a "rollback" option to have continued retrieval throw away a
+  configurable number of bytes at the end of a file before resuming
+  download.  Apparently, some stupid proxies insert a "transfer
+  interrupted" string we need to get rid of.

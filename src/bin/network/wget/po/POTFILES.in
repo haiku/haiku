@@ -1,0 +1,35 @@
+# List of files which containing translatable strings.
+# Copyright (C) 1998 Free Software Foundation, Inc.
+
+# Package source files
+src/cmpt.c
+src/connect.c
+src/convert.c
+src/cookies.c
+src/ftp-basic.c
+src/ftp-ls.c
+src/ftp-opie.c
+src/ftp.c
+src/gen-md5.c
+src/getopt.c
+src/gnu-md5.c
+src/hash.c
+src/host.c
+src/html-parse.c
+src/html-url.c
+src/http.c
+src/init.c
+src/log.c
+src/main.c
+src/mswindows.c
+src/netrc.c
+src/openssl.c
+src/progress.c
+src/ptimer.c
+src/recur.c
+src/res.c
+src/retr.c
+src/url.c
+src/utils.c
+src/version.c
+src/xmalloc.c

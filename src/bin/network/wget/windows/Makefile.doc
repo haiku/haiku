@@ -1,0 +1,98 @@
+# Makefile for `wget' utility
+# Copyright (C) 1995, 1996, 1997, 2004 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# In addition, as a special exception, the Free Software Foundation
+# gives permission to link the code of its release of Wget with the
+# OpenSSL project's "OpenSSL" library (or with modified versions of it
+# that use the same license as the "OpenSSL" library), and distribute
+# the linked executables.  You must obey the GNU General Public License
+# in all respects for all of the code used other than "OpenSSL".  If you
+# modify this file, you may extend this exception to your version of the
+# file, but you are not obligated to do so.  If you do not wish to do
+# so, delete this exception statement from your version.
+
+# You probably need makeinfo and perl, see the README in the main
+# windows directory.
+
+RM	= -del
+CP	= copy
+ATTRIB	= attrib
+
+MAKEINFO	= makeinfo.exe
+TEXI2POD	= texi2pod.pl
+POD2MAN	= pod2man
+
+SAMPLERCTEXI	= sample.wgetrc.munged_for_texi_inclusion
+WGETHLP		= wget.hlp
+WGETINFO	= wget.info
+WGETTEXI	= wget.texi
+WGETHTML	= wget.html
+WGETPOD		= wget.pod
+manext		= 1
+MAN		= wget.$(manext)
+
+all: $(WGETHLP) $(WGETINFO) $(WGETHTML)
+
+.IGNORE:
+$(SAMPLERCTEXI): sample.wgetrc
+	perl -pne "s/@/@@/g" < $? > $@
+
+$(WGETINFO): $(SAMPLERCTEXI) $(WGETTEXI)
+	$(MAKEINFO) --no-validate --no-warn --force \
+--no-split $(WGETTEXI)
+
+$(WGETHTML): $(SAMPLERCTEXI) $(WGETTEXI)
+	$(MAKEINFO) --no-validate --no-warn --force \
+--no-split --html -o $@ $(WGETTEXI)
+
+$(TEXI2POD): $(TEXI2POD).in
+	$(CP) $? $@
+
+$(WGETPOD): $(WGETTEXI) $(TEXI2POD)
+	$(TEXI2POD) $(WGETTEXI) $@
+
+man:	$(MAN)
+
+$(MAN): $(WGETPOD)
+	$(POD2MAN) --center="GNU Wget" --release="GNU Wget @VERSION@" $? > $@
+
+$(WGETHLP): $(WGETTEXI) $(SAMPLERCTEXI)
+	$(MAKEINFO) --no-validate --no-warn --force \
+--hpj wget.hpj --output wget.rtf $(WGETTEXI)
+	hcrtf -xn wget.hpj
+
+clean:
+	$(RM) *.bak
+	$(RM) *.hpj
+	$(RM) *.rtf
+	$(RM) *.ph
+	$(RM) $(SAMPLERCTEXI)
+	$(RM) $(MAN)
+	$(RM) $(TEXI2POD)
+	$(ATTRIB) -h *.gid
+	$(RM) *.gid
+
+distclean: clean
+	$(RM) $(WGETHTML)
+	$(RM) $(WGETPOD)
+	$(RM) $(WGETHLP)
+	$(RM) $(WGETINFO)
+	$(RM) $(WGETHLP)
+	$(RM) Makefile
+
+realclean: distclean
+

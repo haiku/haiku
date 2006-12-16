@@ -1,0 +1,60 @@
+2005-07-02  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* config.h.mingw: Define HAVE_SELECT.
+
+2005-06-30  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* Makefile.src.bor: Correct location of OBJS dependency.
+
+2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* Makefile.src, Makefile.src.bor, Makefile.src.mingw: Make OBJS
+	depend on all headers.
+
+	* wget.dep: Removed.
+
+2005-04-05  Mauro Tortonesi <mauro@ferrara.linux.it>
+
+	* Makefile.src.mingw: removed string_t.c from list of source files.
+	
+	* Makefile.watcom: removed string_t.c from list of source files.
+
+	* wget.dep: removed string_t.c from list of source files.
+
+2005-02-10  Mauro Tortonesi <mauro@ferrara.linux.it>
+
+	* Makefile.src: Renamed string.{c,h} to string_t.{c,h} to fix 
+	a compilation conflict with the string.h header in the standard 
+	C library.
+
+	* Makefile.src.bor: Renamed string.{c,h} to string_t.{c,h} to fix 
+	a compilation conflict with the string.h header in the standard 
+	C library.
+
+	* Makefile.src.mingw: Renamed string.{c,h} to string_t.{c,h} to fix
+	a compilation conflict with the string.h header in the standard 
+	C library.
+
+	* Makefile.src.watcom: Renamed string.{c,h} to string_t.{c,h} to fix
+	a compilation conflict with the string.h header in the standard 
+	C library.
+
+	* wget.dep: Renamed string.{c,h} to string_t.{c,h} to fix a
+	compilation conflict with the string.h header in the standard C
+	library.
+
+	
+2004-12-31  Mauro Tortonesi <mauro@ferrara.linux.it>
+
+	* Makefile.src: Added string.c to the list of modules to compile.
+
+	* Makefile.src.bor: Added string.c to the list of modules to compile.
+
+	* Makefile.src.mingw: Added string.c to the list of modules to compile.
+
+	* Makefile.src.watcom: Added string.c to the list of modules to compile.
+
+	* wget.dep: Added dependencied for the string.c module.
+
+	* ChangeLog: New file.
+

@@ -1,0 +1,182 @@
+#!/bin/sh
+
+# Copyright (C) 2001 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# In addition, as a special exception, the Free Software Foundation
+# gives permission to link the code of its release of Wget with the
+# OpenSSL project's "OpenSSL" library (or with modified versions of it
+# that use the same license as the "OpenSSL" library), and distribute
+# the linked executables.  You must obey the GNU General Public License
+# in all respects for all of the code used other than "OpenSSL".  If you
+# modify this file, you may extend this exception to your version of the
+# file, but you are not obligated to do so.  If you do not wish to do
+# so, delete this exception statement from your version.
+
+##
+#
+# This script creates a Wget distribution (wget-VERSION.tar.gz).
+# It uses `make dist' to do most of the work, but corrects some
+# things that `make dist' doesn't and can't do.  Specifically:
+#
+# * Checks out the clean source from the Subversion repository to a
+#   temporary directory.
+# * Runs autoconf, configure and `make' in the doc and po subdirs to
+#   make sure that all the generated files, such as `configure',
+#   `wget.info', and translated PO files, end up in the distribution.
+# * Optionally changes src/version.c and doc/version.texi to the
+#   version forced by `--force-version'.
+# * Runs `make dist' to produce the archive.
+# * Removes the checkout.
+#
+# For example, to produce a Wget beta based on the latest sources on
+# the trunk, with version changed to "1.23-beta10", run `dist-wget
+# --force-version 1.23-beta10'.  You can choose which sources will be
+# used by specifying `-b PATH' ("trunk" by default) in combination
+# with one of `-D DATE' or `-r REVISION' (the latest revision by
+# default).
+#
+# Use the MAKE environment variable to specify a different version of
+# make, for example MAKE=gmake dist-wget ...
+#
+##
+
+set -e
+
+SVNURL=http://svn.dotsrc.org/repo/wget/
+SUBDIR=wget.checkout.$$
+DEBUG=no
+
+EXPORT_PATH=trunk
+EXPORT_REVISION=HEAD
+VERSION=
+MAKE=${MAKE-make}
+
+if test x"$TMPDIR" = x
+then
+  TMPDIR=/tmp
+fi
+DEST_DIR=`pwd`
+
+while test x"$*" != x
+do
+  case "$1" in
+    -d)
+      DEBUG=yes
+      ;;
+    -b)
+      shift
+      EXPORT_PATH=$1
+      ;;
+    -D)
+      shift
+      # Subversion uses the -r {DATE} syntax for specifying revisions
+      # based on dates.
+      EXPORT_REVISION={$1}
+      ;;
+    -r)
+      shift
+      EXPORT_REVISION=$1
+      ;;
+    --force-version)
+      shift
+      VERSION=$1
+      ;;
+    *)
+      echo "Usage: $0 [-d] [-b BRANCH-PATH] [-r REVISION | -D DATE]" >&2
+      exit 1
+  esac
+  shift
+done
+
+# Resolve echo -n incompatibilities.
+e_n=-n
+e_c=
+if test x"`(echo -n foo; echo bar)`" != xfoobar; then
+  e_n=
+  e_c='\c'
+fi
+
+# File for output/errors redirection.
+O=$DEST_DIR/dist-output
+
+cd $TMPDIR
+
+echo "Building wget dist in $TMPDIR/$SUBDIR."
+echo "Output from commands is in $O."
+
+echo "-----------" >$O
+
+# Checkout clean sources from the repository.
+echo $e_n "Exporting $SVNURL$EXPORT_PATH/ (-r $EXPORT_REVISION) to $TMPDIR/$SUBDIR... $e_c"
+svn export -r "$EXPORT_REVISION" "$SVNURL/$EXPORT_PATH/" $SUBDIR 1>>$O 2>&1
+echo "done."
+
+cd $SUBDIR
+
+# Force the version if required.
+if test x"$VERSION" != x
+then
+  echo "Forcing version to $VERSION."
+  echo "char *version_string = \"$VERSION\";" > src/version.c
+  echo "@set VERSION $VERSION" > doc/version.texi
+fi
+
+# Create configure and friends.
+if test ! -f configure; then
+  echo $e_n "Creating \`configure' and \`src/config.h'... $e_c"
+  ./autogen.sh 1>>$O 2>&1
+  echo "done."
+fi
+
+# Remove `Makefile' if it already exists.
+if test -f Makefile; then
+  echo $e_n "Cleaning old Makefiles with \`$MAKE distclean'... $e_c"
+  $MAKE distclean 1>>$O 2>&1
+  echo "done."
+fi
+
+# Create a new `Makefile'.
+echo $e_n "Running configure... $e_c"
+CFLAGS=-g ./configure 1>>$O 2>&1
+echo "done."
+
+# Now build the MO files.
+echo $e_n "Building MO files out of PO files... $e_c"
+cd po
+$MAKE 1>>$O 2>&1
+cd ..
+echo "done."
+
+# Now build the Info documentation and the man page.
+echo $e_n "Building Info and man documentation... $e_c"
+cd doc
+$MAKE 1>>$O 2>&1
+cd ..
+echo "done."
+
+# Create the distribution file.
+echo $e_n "Creating distribution tarball... $e_c"
+$MAKE dist 1>>$O 2>&1
+archive=`echo wget-*.tar.gz`
+mv "$archive" $DEST_DIR
+echo "$archive"
+
+cd ..
+
+if test $DEBUG = no; then
+  rm -rf $SUBDIR 1>>$O 2>&1
+fi

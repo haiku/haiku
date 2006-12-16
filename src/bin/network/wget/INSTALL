@@ -1,0 +1,180 @@
+                                                            -*- text -*-
+		   GNU Wget Installation Procedure
+                   ===============================
+
+0. Introduction
+---------------
+
+This document describes how to build Wget from source code on
+Unix-like systems.  If you want to install a precompiled Wget, this
+document is not for you -- refer to the documentation provided by the
+distributors instead.  If you already have Wget and want to learn how
+to use it, refer to Wget's Info documentation or man page which you
+should have received with your system.  If you are using Windows
+(except for Cygwin), read windows/README instead.  If you want to
+compile Wget from source code on a Unix-like system, read on.
+
+The preferred form of building Wget is to get a release archive and
+unpack it (which you have presumably done, since you are reading
+this).  If you have obtained the source code via the Subversion
+repository, please follow the instructions in `README.checkout' before
+continuing.
+
+1. Dependencies
+---------------
+
+To build Wget, your system must support a Unix-like command-line
+development environment, including the text-processing utilities (sh,
+grep, awk, sed, etc.) and a functional C compiler.  On some GNU/Linux
+systems, this means that you will need to install packages such as
+`gcc', `glibc-devel' (or `libc6-dev') and `make'.  Most systems come
+with these packages preinstalled, but it doesn't hurt to check.  If
+you have successfully compiled other software from source, you
+probably have them all.
+
+In addition to the C development environment, Wget can use a number of
+optional libraries to provide additional features, such as translated
+messages and support for "https" URLs.  The "external" dependencies
+include:
+
+  - OpenSSL -- for "https" URLs.
+  - GNU gettext -- for translated messages.
+
+To be usable for building Wget, the listed libraries must be installed
+with their "development" header files.  On GNU/Linux systems this
+typically means installing the corredponsing "lib<name>-devel" or
+"lib<name>-dev" package along with the package with "lib<name>".
+
+2. Configuration
+----------------
+
+Before compiling Wget, you need to "configure" it using the
+`configure' script provided with the distribution.  Configuration
+serves two distinct purposes: it enables Wget's build system to
+inspect certain features of your operating system for more robust
+compilation, and it enables you to choose which features you want the
+resulting Wget to have.
+
+As is the case with most GNU software, Wget's configure script was
+generated with GNU Autoconf.  If you're not familiar with
+Autoconf-generated scripts, read on.
+
+The most straightforward way to configure Wget is by running the
+configure script without any arguments.  After running some
+compilation-related tests, it will create the Makefiles needed to
+build Wget.  However, you may wish to customize Wget's configuration
+by providing arguments to `configure'.  Wget's configure script
+accepts standard Autoconf arguments, the most important ones being:
+
+  --help                  display a help message and exit
+
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          (/usr/local by default)
+  --bindir=DIR            user executables in DIR (PREFIX/bin)
+  --infodir=DIR           info documentation in DIR [PREFIX/info]
+  --mandir=DIR            man documentation in DIR [PREFIX/man]
+
+For example, if you are not root and want to install Wget in
+subdirectories of your home directory, you can use:
+
+    ./configure --prefix=$HOME
+
+In addition to the above generic options, Wget's configuration
+supports a number of options more or less specific to Wget.  Options
+beginning with "--disable", such as `--disable-opie' or
+`--disable-ntlm', allow you to turn off certain built-in functionality
+you don't need in order to reduce the size of the executable.  Options
+beginning with "--with" turning off autodetection and use of external
+software Wget can link with, such as the SSL libraries.  Recognized
+"--enable" and "--with" options include:
+
+  --without-ssl           disable SSL autodetection (used for https support)
+  --with-libssl-prefix=DIR search for libssl in DIR/lib
+  --disable-opie          disable support for opie or s/key FTP login
+  --disable-digest        disable support for HTTP digest authorization
+  --disable-ntlm          disable support for HTTP NTLM authorization
+  --disable-debug         disable support for debugging output
+  --disable-nls           do not use Native Language Support
+  --disable-largefile     omit support for large files
+  --disable-ipv6          disable IPv6 support
+  --disable-rpath         do not hardcode runtime library paths
+
+You can inspect decisions made by configure by editing the generated
+Makefiles and the `src/config.h' include file.  The defaults should
+work without intervention, but if you know what you are doing, editing
+the generated files before compilation is fine -- they will not be
+regenerated until you run configure again.
+
+`configure' will try to find a compiler in your PATH, defaulting to
+`gcc', but falling back to `cc' if the former is unavailable.  This is
+a reasonable default on most Unix-like systems, but sometimes you
+might want to override it.  The compiler choice is overridden by
+setting the `CC' environment variable to the desired compiler file
+name.  For example, to force compilation with the Unix `cc' compiler,
+invoke configure like this:
+
+    ./configure CC=cc
+
+This assumes that `cc' is in your path -- if it is not, simply use
+CC=/path/to/cc instead.  Note that environment variables that affect
+configure can be set with the usual shell syntax `VAR=value
+./configure' (assuming sh syntax), but can also be specified as
+arguments to configure, as shown above.  The latter method, while
+being specific to configure, works unmodified in all shells.
+
+Environment variables that affect `configure' include: CFLAGS for C
+compiler flags, CPPFLAGS for C preprocessor flags, LDFLAGS for linker
+flags, and LIBS for libraries.
+
+Barring the use of --without-* flags, configure will try to autodetect
+external libraries needed by Wget, currently only the OpenSSL
+libraries.  If they are installed in the system library directories or
+in the same prefix where you plan to install Wget, configure should be
+able to autodetect them.  If they are installed elsewhere, use the
+`--with-libNAME' option to specify the root directory under which
+libraries reside in the `lib/' subdirectory and the corresponding
+header files reside in the `include/' subdirectory.  For example, if
+the OpenSSL libraries are installed under the /usr/local/ssl prefix,
+use `--with-libssl=/usr/local/ssl'.
+
+Sometimes external libraries will be installed on the system, but the
+header files will be missing.  This often happens on GNU/Linux if you
+forget to install the "-devel" or "-dev" package that corresponds to
+the library and that is typically *not* installed by default.  In that
+case configure will not find the library and you will not be able to
+use the features provided by the library until you install the devel
+package and rerun configure.  If you believe you have the necessary
+headers, but configure still fails to detect the library, please
+report it as a bug.
+
+3. Compilation
+--------------
+
+To compile GNU Wget after it has been configured, simply type make.
+If your compiler is too old to handle function prototypes, Wget will
+try to K&R-ize its sources on the fly.  This should make GNU Wget
+compilable on almost any Unix-like system you are likely to encounter.
+
+After the compilation a ready-to-use `wget' executable should reside
+in the src directory.  At this point there is no formal test suite for
+testing the binary, but it should be easy enough to test whether the
+basic functionality works.
+
+4. Installation
+---------------
+
+Use `make install' to install GNU Wget to directories specified to
+configure.  To install it in a system directory (which is the
+default), you will need to be root.  The standard prefix is
+"/usr/local/", which can be changed using the `--prefix' configure
+option.
+
+The installation process will copy the wget binary to $PREFIX/bin,
+install the wget.info* info pages to $PREFIX/info, the generated
+manual page (where available) wget.1 to $PREFIX/man/man1, and the
+default config file to $PREFIX/etc, unless a config file already
+exists there.  You can customize these directories either through the
+configuration process or making the necessary changes in the Makefile.
+
+To delete the files created by Wget installation, you can use `make
+uninstall'.

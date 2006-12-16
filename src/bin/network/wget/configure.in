@@ -1,0 +1,480 @@
+dnl Template file for GNU Autoconf
+dnl Copyright (C) 1995, 1996, 1997, 2001 Free Software Foundation, Inc.
+
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+dnl In addition, as a special exception, the Free Software Foundation
+dnl gives permission to link the code of its release of Wget with the
+dnl OpenSSL project's "OpenSSL" library (or with modified versions of it
+dnl that use the same license as the "OpenSSL" library), and distribute
+dnl the linked executables.  You must obey the GNU General Public License
+dnl in all respects for all of the code used other than "OpenSSL".  If you
+dnl modify this file, you may extend this exception to your version of the
+dnl file, but you are not obligated to do so.  If you do not wish to do
+dnl so, delete this exception statement from your version.
+
+dnl
+dnl Process this file with autoconf to produce a configure script.
+dnl
+
+AC_INIT([src/version.c])
+AC_PREREQ(2.59)
+
+dnl Include the M4 macros we use.
+builtin(include, [m4/wget.m4])dnl
+builtin(include, [m4/lib-ld.m4])dnl
+builtin(include, [m4/lib-link.m4])dnl
+builtin(include, [m4/lib-prefix.m4])dnl
+
+dnl
+dnl What version of Wget are we building?
+dnl
+VERSION=`sed -e 's/^.*"\(.*\)";$/\1/' ${srcdir}/src/version.c`
+AC_MSG_NOTICE([configuring for GNU Wget $VERSION])
+AC_SUBST(VERSION)
+PACKAGE=wget
+AC_SUBST(PACKAGE)
+
+dnl
+dnl Get cannonical host
+dnl
+AC_CANONICAL_HOST
+AC_DEFINE_UNQUOTED([OS_TYPE], "$host_os",
+                   [Define to be the name of the operating system.])
+
+dnl
+dnl Process features.
+dnl
+
+AC_ARG_WITH(ssl,
+[[  --without-ssl           disable SSL autodetection]])
+
+AC_ARG_ENABLE(opie,
+[  --disable-opie          disable support for opie or s/key FTP login],
+ENABLE_OPIE=$enableval, ENABLE_OPIE=yes)
+test x"${ENABLE_OPIE}" = xyes && AC_DEFINE([ENABLE_OPIE], 1,
+   [Define if you want the Opie support for FTP compiled in.])
+
+AC_ARG_ENABLE(digest,
+[  --disable-digest        disable support for HTTP digest authorization],
+ENABLE_DIGEST=$enableval, ENABLE_DIGEST=yes)
+test x"${ENABLE_DIGEST}" = xyes && AC_DEFINE([ENABLE_DIGEST], 1,
+   [Define if you want the HTTP Digest Authorization compiled in.])
+
+AC_ARG_ENABLE(ntlm,
+[  --disable-ntlm          disable support for NTLM authorization],
+[ENABLE_NTLM=$enableval], [ENABLE_NTLM=auto])
+
+AC_ARG_ENABLE(debug,
+[  --disable-debug         disable support for debugging output],
+ENABLE_DEBUG=$enableval, ENABLE_DEBUG=yes)
+test x"${ENABLE_DEBUG}" = xyes && AC_DEFINE([ENABLE_DEBUG], 1,
+   [Define if you want the debug output support compiled in.])
+
+wget_need_md5=no
+
+case "${ENABLE_OPIE}${ENABLE_DIGEST}" in
+*yes*)
+	wget_need_md5=yes
+esac
+if test x"$ENABLE_OPIE" = xyes; then
+  OPIE_OBJ='ftp-opie$o'
+fi
+AC_SUBST(OPIE_OBJ)
+
+dnl
+dnl Whether make sets $(MAKE)...
+dnl
+AC_PROG_MAKE_SET
+
+dnl
+dnl Find a good install
+dnl
+AC_PROG_INSTALL
+
+dnl
+dnl Find the compiler
+dnl
+
+dnl We want these before the checks, so the checks can modify their values.
+test -z "$CFLAGS"  && CFLAGS= auto_cflags=1
+test -z "$CC" && cc_specified=yes
+
+AC_PROG_CC
+AC_AIX
+AM_PROG_CC_STDC
+
+dnl Turn on optimization by default.  Specifically:
+dnl
+dnl if the user hasn't specified CFLAGS, then
+dnl   if compiler is gcc, then
+dnl     use -O2 and some warning flags
+dnl   else
+dnl     use os-specific flags or -O
+if test -n "$auto_cflags"; then
+  if test -n "$GCC"; then
+    CFLAGS="$CFLAGS -O2 -Wall -Wno-implicit"
+  else
+    case "$host_os" in
+      *hpux*)  CFLAGS="$CFLAGS +O3"                      ;;
+      *ultrix* | *osf*) CFLAGS="$CFLAGS -O -Olimit 2000" ;;
+      *)       CFLAGS="$CFLAGS -O" ;;
+    esac
+  fi
+fi
+
+dnl
+dnl In case of {cyg,gnu}win32.  Should be a _target_ test.
+dnl Might also be erelevant for DJGPP.
+dnl
+case "$host_os" in
+  *win32) exeext='.exe';;
+  *) exeext='';;
+esac
+AC_SUBST(exeext)
+
+dnl
+dnl Checks for basic compiler characteristics.
+dnl
+AC_C_CONST
+AC_C_INLINE
+AC_C_VOLATILE
+AC_C_BIGENDIAN
+AC_C_PROTOTYPES
+
+if test x"$am_cv_prog_cc_stdc" != xno; then :
+  AC_SUBST(U, [])
+  AC_SUBST(ANSI2KNR, [])
+else
+  AC_SUBST(U, [_])
+  AC_SUBST(ANSI2KNR, [./ansi2knr])
+fi
+
+dnl
+dnl Checks for header files that might be missing.
+dnl
+
+dnl Check for basic headers, even those we assume the presence of.
+dnl This is because Autoconf default includes check for STDC_HEADERS,
+dnl HAVE_SYS_TYPES_H, etc. before including them.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(sys/types.h sys/stat.h)
+dnl Now check for the others.
+AC_CHECK_HEADERS(string.h strings.h stdarg.h limits.h unistd.h sys/time.h)
+AC_CHECK_HEADERS(termios.h sys/ioctl.h sys/select.h utime.h sys/utime.h)
+AC_CHECK_HEADERS(stdint.h inttypes.h signal.h setjmp.h pwd.h)
+AC_HEADER_TIME
+
+dnl
+dnl Check integral type sizes.
+dnl
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+
+dnl
+dnl Check for large file support.  This check needs to come fairly
+dnl early because it could (in principle) affect whether functions and
+dnl headers are available, whether they work, etc.
+dnl
+AC_SYS_LARGEFILE
+AC_CHECK_SIZEOF(off_t)
+
+dnl
+dnl Checks for non-universal or system-specific types.
+dnl
+AC_TYPE_SIZE_T
+AC_TYPE_PID_T
+AC_CHECK_TYPES(uint32_t)
+AC_TYPE_SIGNAL
+AC_CHECK_TYPES(sig_atomic_t, [], [], [
+#include <stdio.h>
+#include <sys/types.h>
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+#ifdef HAVE_SIGNAL_H
+# include <signal.h>
+#endif
+])
+
+dnl
+dnl Checks for library functions.
+dnl
+AC_FUNC_ALLOCA
+AC_FUNC_MMAP
+AC_FUNC_FSEEKO
+AC_CHECK_FUNCS(strdup strstr strcasecmp strncasecmp strpbrk memmove)
+AC_CHECK_FUNCS(gettimeofday mktime strptime timegm strerror snprintf vsnprintf)
+AC_CHECK_FUNCS(usleep select ftello sigblock sigsetjmp signal)
+AC_CHECK_FUNCS(symlink access isatty strtoll strtoimax)
+
+dnl
+dnl Call Wget's local macros defined in aclocal.
+dnl
+WGET_STRUCT_UTIMBUF
+WGET_SOCKLEN_T
+WGET_FNMATCH
+WGET_NANOSLEEP
+WGET_POSIX_CLOCK
+WGET_NSL_SOCKET
+
+dnl
+dnl Check if we need to compile in getopt.c.
+dnl
+AC_CHECK_FUNC(getopt_long, [], [
+  GETOPT_OBJ='getopt$o'
+])
+AC_SUBST(GETOPT_OBJ)
+
+dnl
+dnl Checks for libraries.
+dnl
+
+dnl Check for OpenSSL
+if test x"$with_ssl" != x"no"
+then
+  dnl As of this writing (OpenSSL 0.9.6), the libcrypto shared library
+  dnl doesn't record its dependency on libdl, so we need to make sure
+  dnl -ldl ends up in LIBS on systems that have it.  Most OSes use
+  dnl dlopen(), but HP-UX uses shl_load().
+  AC_CHECK_LIB(dl, dlopen, [], [
+    AC_CHECK_LIB(dl, shl_load)
+  ])
+
+  dnl Now actually check for -lssl
+  AC_LIB_HAVE_LINKFLAGS([ssl], [crypto], [
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/err.h>
+#include <openssl/rand.h>
+#include <openssl/des.h>
+#include <openssl/md4.h>
+#include <openssl/md5.h>
+  ], [SSL_library_init ()])
+  if test x"$LIBSSL" != x
+  then
+    AC_MSG_NOTICE([compiling in support for SSL])
+    AC_DEFINE([HAVE_SSL], 1,
+	      [Define if SSL support is being compiled in.])
+    SSL_OBJ='openssl$o'
+  elif test x"$with_ssl" != x
+  then
+    AC_MSG_ERROR([--with-ssl was given, but OpenSSL is not available.])
+  fi
+fi
+AC_SUBST(SSL_OBJ)
+
+dnl Enable NTLM if requested and if SSL is available.
+NTLM_OBJ=''
+if test x"$LIBSSL" != x
+then
+  if test x"$ENABLE_NTLM" != xno
+  then
+    AC_DEFINE([ENABLE_NTLM], 1,
+     [Define if you want the NTLM authorization support compiled in.])
+    NTLM_OBJ='http-ntlm$o'
+  fi
+else
+  dnl If SSL is unavailable and the user explicitly requested NTLM,
+  dnl abort.
+  if test x"$ENABLE_NTLM" = xyes
+  then
+    AC_MSG_ERROR([NTLM authorization requested and OpenSSL not found; aborting])
+  fi
+fi
+AC_SUBST(NTLM_OBJ)
+
+dnl
+dnl Find an MD5 implementation.  Since Wget rarely needs MD5, we try
+dnl to use an existing library implementation to save on code size.
+dnl
+
+if test x"$wget_need_md5" = xyes
+then
+  dnl This should be moved to an AC_DEFUN, but I'm not sure how to
+  dnl manipulate MD5_OBJ from the defun.
+
+  MD5_OBJ='gen-md5$o'
+  found_md5=no
+
+  dnl Check for the system MD5 library on Solaris.  We don't check for
+  dnl something simple like "MD5Update" because there are a number of
+  dnl MD5 implementations that use that name, but have an otherwise
+  dnl incompatible interface.  md5_calc is, hopefully, specific to the
+  dnl Solaris MD5 library.
+  if test x"$found_md5" = xno; then
+    AC_CHECK_LIB(md5, md5_calc, [
+      dnl Some installations have bogus <md5.h> in the compiler's
+      dnl include path, making the system md5 library useless.
+      AC_MSG_CHECKING([for working md5.h])
+      AC_COMPILE_IFELSE([#include <md5.h>
+                        ], [
+        AC_MSG_RESULT(yes)
+        AC_DEFINE([HAVE_SOLARIS_MD5], 1, [Define to use Solaris MD5.])
+        LIBS="-lmd5 $LIBS"
+        found_md5=yes
+        AC_MSG_NOTICE([using the Solaris MD5 implementation])
+      ], [AC_MSG_RESULT(no)])
+    ])
+  fi
+
+  dnl Then see if we're linking OpenSSL anyway; if yes, use its md5
+  dnl implementation.
+  if test x"$found_md5" = xno; then
+    if test x"$LIBSSL" != x; then
+      AC_DEFINE([HAVE_OPENSSL_MD5], 1, [Define to use OpenSSL MD5.])
+      found_md5=yes
+      AC_MSG_NOTICE([using the OpenSSL MD5 implementation])
+    fi
+  fi
+
+  dnl If none of the above worked, use the one we ship with Wget.
+  if test x"$found_md5" = xno; then
+    AC_DEFINE([HAVE_BUILTIN_MD5], 1, [Define to use built-in MD5.])
+    MD5_OBJ="$MD5_OBJ gnu-md5\$o"
+    found_md5=yes
+    AC_MSG_NOTICE([using the GNU MD5 implementation])
+  fi
+fi
+AC_DEFINE([HAVE_MD5], 1, [Define if we're compiling support for MD5.])
+AC_SUBST(MD5_OBJ)
+
+dnl **********************************************************************
+dnl Checks for IPv6
+dnl **********************************************************************
+
+dnl
+dnl We test for IPv6 by checking, in turn, for availability of
+dnl getaddrinfo, presence of the INET6 address/protocol family, and
+dnl the existence of struct sockaddr_in6.  If any of them is missing,
+dnl IPv6 is disabled, and the code reverts to old-style gethostbyname.
+dnl
+dnl If --enable-ipv6 is explicitly specified on the configure command
+dnl line, we check for IPv6 and abort if not found.  If --disable-ipv6
+dnl is specified, we disable IPv6 and don't check for it.  The default
+dnl is to autodetect IPv6 and use it where available.
+dnl
+
+AC_ARG_ENABLE(ipv6,
+  AC_HELP_STRING([--disable-ipv6],[disable IPv6 support]),
+  [case "${enable_ipv6}" in
+    no)
+      AC_MSG_NOTICE([disabling IPv6 at user request])
+      dnl Disable IPv6 checking
+      ipv6=no
+      ;;
+    yes)
+      dnl IPv6 explicitly enabled: force its use (abort if unavailable).
+      ipv6=yes
+      force_ipv6=yes
+      ;;
+    auto)
+      dnl Auto-detect IPv6, i.e. check for IPv6, but don't force it.
+      ipv6=yes
+      ;;
+    *)
+      AC_MSG_ERROR([Invalid --enable-ipv6 argument \`$enable_ipv6'])
+      ;;
+    esac
+  ], [
+    dnl If nothing is specified, assume auto-detection.
+    ipv6=yes
+  ]
+)
+
+if test "X$ipv6" = "Xyes"; then
+  AC_CHECK_FUNCS(getaddrinfo, [], [
+    AC_MSG_NOTICE([Disabling IPv6 support: your system does not support getaddrinfo(3)])
+    ipv6=no
+  ])
+fi
+
+if test "X$ipv6" = "Xyes"; then
+  PROTO_INET6([], [
+    AC_MSG_NOTICE([Disabling IPv6 support: your system does not support the PF_INET6 protocol family])
+    ipv6=no
+  ])
+fi
+
+if test "X$ipv6" = "Xyes"; then
+  TYPE_STRUCT_SOCKADDR_IN6([],[
+    AC_MSG_NOTICE([Disabling IPv6 support: your system does not support \`struct sockaddr_in6'])
+    ipv6=no
+  ])
+  if test "X$ipv6" = "Xyes"; then
+    WGET_STRUCT_SOCKADDR_STORAGE
+    MEMBER_SIN6_SCOPE_ID
+  fi
+fi
+
+if test "X$ipv6" = "Xyes"; then
+  AC_DEFINE([ENABLE_IPV6], 1, [Define if IPv6 support is enabled.])
+  AC_MSG_NOTICE([Enabling support for IPv6.])
+elif test "x$force_ipv6" = "xyes"; then
+  AC_MSG_ERROR([IPv6 support requested but not found; aborting])
+fi
+
+
+dnl
+dnl Set of available languages.
+dnl
+dnl Originally this used to be static, looking like this:
+dnl     ALL_LINGUAS="cs de hr it ..."
+dnl The downside was that configure needed to be rebuilt whenever a
+dnl new language was added.
+dnl
+ALL_LINGUAS=`(cd ${srcdir}/po && ls *.po | sed -e 's/\.po$//' | tr '\012' ' ')`
+
+dnl internationalization macros
+WGET_WITH_NLS
+
+dnl
+dnl Find makeinfo.  We used to provide support for Emacs processing
+dnl Texinfo using `emacs -batch -eval ...' where makeinfo is
+dnl unavailable, but that broke with the addition of makeinfo-specific
+dnl command-line options, such as `-I'.  Now we depend on makeinfo to
+dnl build the Info documentation.
+dnl
+
+AC_CHECK_PROGS(MAKEINFO, [makeinfo], [true])
+
+dnl
+dnl Find perl and pod2man
+dnl
+
+AC_PATH_PROGS(PERL, [perl5 perl], no)
+AC_PATH_PROG(POD2MAN, pod2man, no)
+
+if test "x${POD2MAN}" = xno; then
+  COMMENT_IF_NO_POD2MAN="# "
+else
+  COMMENT_IF_NO_POD2MAN=
+fi
+AC_SUBST(COMMENT_IF_NO_POD2MAN)
+
+dnl
+dnl Create output
+dnl
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile util/Makefile
+                 po/Makefile.in windows/Makefile])
+AC_CONFIG_HEADERS([src/config.h])
+AH_BOTTOM([
+#include "config-post.h"
+])
+AC_CONFIG_FILES([stamp-h], [echo timestamp > stamp-h])
+AC_CONFIG_COMMANDS([default], [WGET_PROCESS_PO])
+AC_OUTPUT

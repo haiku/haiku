@@ -1,0 +1,160 @@
+* Guidelines for patch submissions.
+===================================
+
+** What is a patch?
+-------------------
+
+A patch file, also known as a "diff", is a textual representation of
+changes to source code.  Patches are readable enough to be reviewed by
+humans and at the same time regular enough to be processed by
+programs.  The `patch' utility is used to change the source code in
+the manner that the patch describes, this being called "applying" the
+patch.  Patches work even on files that have been modified
+independently of the modifications in the patch, as long as those
+other changes do not conflict with the patch.
+
+Because of these properties, patches are the preferred means of
+distributing the changes to a free software project.  If you have made
+a change to Wget and would like to contribute it, you will need to
+create a patch and send it to the developers; please read on.
+
+** Where to send the patches.
+-----------------------------
+
+Patches intended to be applied to Wget should be mailed to
+<wget-patches@sunsite.dk>.  Each patch will be reviewed by the
+developers, and will be acked and added to the distribution, or
+rejected with an explanation.  Unfortunately, the developers are often
+busy with their day jobs, so the review process can take a while.
+
+If you want to discuss your patch with the community of Wget users and
+developers, it is OK to send it to the main list at <wget@sunsite.dk>.
+If the patch is really huge (more than 100K or so), you may want to
+put it on the web and post the URL.
+
+EVERY patch should be accompanied by an explanation of what the patch
+changes, and why the change is desirable or necessary.  The
+explanation need not be long, but please don't just send a patch
+without any accompanying text.
+
+Normally, a patch can be just inserted into the message, after the
+explanation and the ChangeLog entry.  However, if your mail composer
+or gateway is inclined to munge patches, e.g. by wrapping long lines,
+please send them out as a MIME attachment.  It is important that the
+patch survives the travel unchanged so that we can feed it to the
+`patch' utility after reviewing it.
+
+** How to create patches.
+-------------------------
+
+First, please make sure that you are working with the latest version
+of the source -- changing obsolete code is a waste of time.  Working
+on the latest release is acceptable in most cases, but it is better
+yet to download the very latest sources from the public Subversionn
+server and work on those.  The web page at
+<http://www.gnu.org/software/wget/> explains how to get the source
+code from the repository.
+
+Patches are created using the `diff' program.  When making patches,
+please use the `-u' option, or if your diff doesn't support it, `-c'.
+Ordinary (context-free) diffs are notoriously prone to errors, since
+line numbers tend to change when others make changes to the same
+source file.
+
+In the general case, `diff' is used like this:
+
+    diff -u ORIGFILE CHANGEDFILE > patch.txt
+
+Also, it is helpful if you create the patch in the top level of
+the Wget source directory.  For example:
+
+    cp src/http.c src/http.c.orig
+    ... modify src/http.c ....
+    diff -u src/http.c.orig src/http.c > patch.txt
+
+If your patch changes more than one file, feel free to simply
+concatenate the diffs of different files into a large diff:
+
+    (diff -u foo.orig foo; diff -u bar.orig bar) > patch.txt
+
+The alternative is to leave the unchanged source lying around and use
+the `-r' option to compare entire directories:
+
+    diff -ru wget-1.9.orig wget-1.9 > patch.txt
+
+If you do that, please be careful not to include the differences to
+automatically generated files, such as `.info*'.
+
+If you are using Subversion, generating diffs is even simpler -- after
+changing the files, all you need to do is run the following command
+from Wget's top-level directory:
+
+    svn diff > patch.txt
+
+If you run on Windows and don't have `diff' handy, please obtain it.
+It's extremely hard to review changes to files unless they're in the
+form of a patch.  If you really cannot use a variant of `diff', then
+mail us the whole new file and indicate which version of Wget you
+changed; that way we will be able to generate the diff ourselves.
+
+Finally, if your changes introduce new files, or if they change the
+old files past all recognition (e.g. by completely reimplementing the
+old stuff), sending a patch might not make sense.  In that case, just
+attach the files along with an explanation of what is being changed.
+
+** Standards and coding style.
+------------------------------
+
+Wget abides by the GNU coding standards, available at:
+
+    http://www.gnu.org/prep/standards.html
+
+I consider perhaps the most important single point in that entire
+document to be the "no arbitrary limits" rule.  Even where Wget's
+coding is less than exemplary, it respects that rule.  There should be
+no exceptions.
+
+Here is a short recap of the GNU formatting and naming conventions,
+partly borrowed from XEmacs:
+
+  * Put a space after every comma.
+
+  * Put a space before the parenthesis that begins a function call,
+    macro call, function declaration or definition, or control
+    statement (if, while, switch, for).  (DO NOT do this for macro
+    definitions; this is invalid preprocessor syntax.)
+
+  * The brace that begins a control statement (if, while, for, switch,
+    do) or a function definition should go on a line by itself.
+
+  * In function definitions, put the return type and all other
+    qualifiers on a line before the function name.  Thus, the function
+    name is always at the beginning of a line.
+
+  * Indentation level is two spaces.  (However, the first and
+    following statements of a while/for/if/etc. block are indented
+    four spaces from the while/for/if keyword.  The opening and
+    closing braces are indented two spaces.)
+
+  * Variable and function names should be all lowercase, with
+    underscores separating words, except for a prefixing tag, which may
+    be in uppercase.  Do not use the mixed-case convention (e.g.
+    SetVariableToValue ()) and *especially* do not use Microsoft
+    Hungarian notation (char **rgszRedundantTag).
+
+  * Preprocessor constants and enumerations should be all uppercase,
+    and should be prefixed with a tag that groups related constants
+    together.
+
+** ChangeLog policy.
+--------------------
+
+Each patch should be accompanied by an update to the appropriate
+ChangeLog file.  Please don't mail diffs of ChangeLog files because
+they have an extremely high rate of failure; just mail us the new
+entries you added to the ChangeLog.  Patches without a ChangeLog entry
+will be accepted, but this creates additional work for the
+maintainers, so please do take the time to write one.
+
+Guidelines for writing ChangeLog entries are also governed by the GNU
+coding standards, under the "Change Logs" section.

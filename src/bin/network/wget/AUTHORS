@@ -1,0 +1,39 @@
+Authors of GNU Wget.
+
+[ Note that this file does not attempt to list all the contributors to
+  Wget; look at the ChangeLogs for that.  This is a list of people who
+  contributed sizeable amounts of code and assigned the copyright to
+  the FSF. ]
+
+Hrvoje Niksic.  Designed and implemented Wget.
+
+Gordon Matzigkeit.  Wrote netrc.c and netrc.h.
+
+Darko Budor.  Wrote initial support for Windows, wrote wsstartup.c,
+wsstartup.h and windecl.h.  (The files were later renamed, but his
+code and ideas remained present.)
+
+Junio Hamano.  Added support for FTP Opie and HTTP digest
+authentication.
+
+Dan Harkless.  Added --backup-converted, --follow-tags, --html-extension,
+--ignore-tags, and --page-requisites; improved documentation; etc.
+
+Christian Fraenkel.  Initially implemented SSL support.
+
+Thomas Lussnig.  Initially implemented IPv6 support.
+
+Ian Abbott.  Contributed bugfixes, Windows-related fixes, provided a
+prototype implementation of the new recursive code, and more.
+
+Gisle Vanem.  Contributed Windows improvements, including a port of
+run_with_timeout to Windows, additions to Makefiles, and many bug
+reports and fixes.
+
+Mauro Tortonesi.  Improved IPv6 support, adding support for dual
+family systems.  Refactored and enhanced FTP IPv6 code.
+
+Nicolas Schodet.  Contributed to cookie code and documentation.
+
+Daniel Stenberg.  NTLM authentication in http-ntlm.c and http-ntlm.h
+originally written for curl donated for use in GNU Wget.
