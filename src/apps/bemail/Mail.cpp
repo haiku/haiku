@@ -1372,11 +1372,12 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	// View Menu
 	
 	if (!resending && fIncoming) {
-		menu = new BMenu(MDR_DIALECT_CHOICE ("View", "TRANSLATE ME"));
+		menu = new BMenu("View");
 		menu->AddItem(fHeader = new BMenuItem(MDR_DIALECT_CHOICE ("Show Header","H) ヘッダーを表示"),	new BMessage(M_HEADER), 'H'));
 		if (header_flag)
 			fHeader->SetMarked(true);
 		menu->AddItem(fRaw = new BMenuItem(MDR_DIALECT_CHOICE ("Show Raw Message","   メッセージを生で表示"), new BMessage(M_RAW)));
+		menu_bar->AddItem(menu);
 	}
 	
 	//
