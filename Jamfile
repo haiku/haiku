@@ -25,6 +25,8 @@ Depends MailKit :
 	POP3
 	SMTP
 	Fortune
+	Spam\ Filter
+	spamdbm
 ;
 
 # Pseudo-target to build the network kit only
