@@ -124,13 +124,16 @@ static const char *kWordsPath = "/boot/optional/goodies/words";
 static const char *kExact = ".exact";
 static const char *kMetaphone = ".metaphone";
 
+/*
+	// No longer needed if the popup is disabled
 // Text for both the main menu and the pop-up menu.
 static const char *kSpamMenuItemTextArray[] = {
-	"Train as Spam, then Move to Trash",	// M_TRAIN_SPAM_AND_DELETE
-	"Train as Spam",						// M_TRAIN_SPAM
-	"Untrain this Message",					// M_UNTRAIN
-	"Train as Genuine"						// M_TRAIN_GENUINE
+	"Mark as Spam and Move to Trash",		// M_TRAIN_SPAM_AND_DELETE
+	"Mark as Spam",							// M_TRAIN_SPAM
+	"Unmark this Message",					// M_UNTRAIN
+	"Mark as Genuine"						// M_TRAIN_GENUINE
 };
+*/
 
 // global variables
 bool		gHelpOnly = false;
@@ -244,9 +247,8 @@ TMailApp::AboutRequested()
 	(new BAlert("",
 		"BeMail\nBy Robert Polic\n\n"
 		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
-		"Mail.cpp $Revision$\n"
 		"Compiled on " __DATE__ " at " __TIME__ ".",
-		"Close"))->Go();
+		"OK"))->Go();
 }
 
 
@@ -1209,7 +1211,31 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 
 	// Create real menu bar
 	fMenuBar = menu_bar = new BMenuBar(r, "");
-
+	
+	// Program Menu
+	
+	menu = new BMenu(MDR_DIALECT_CHOICE ("Program","TRANSLATE ME"));
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("About BeMail", "A) BeMailについて") B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
+	item->SetTarget(be_app);
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Options","O) BeMailの設定") B_UTF8_ELLIPSIS,
+		new BMessage(M_PREFS),','));
+	item->SetTarget(be_app);
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Signatures","S) 署名の編集") B_UTF8_ELLIPSIS,
+		new BMessage(M_EDIT_SIGNATURE)));
+	item->SetTarget(be_app);
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Quit", "Q) 終了"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
+	item->SetTarget(be_app);
+	menu_bar->AddItem(menu);
+	
 	//
 	//	File Menu
 	//
@@ -1240,9 +1266,25 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		queryMenu->SetPredicate("MAIL:draft==1");
 		menu->AddItem(queryMenu);
 	}
+	
+	if(!fIncoming || resending) {
+		menu->AddItem(fSendLater = new BMenuItem(
+			MDR_DIALECT_CHOICE ("Save as Draft", "S)ドラフトとして保存"),
+			new BMessage(M_SAVE_AS_DRAFT), 'S'));
+	}
+	
 	menu->AddSeparatorItem();
-
-	if (!resending && fIncoming) {
+	menu->AddItem(fPrint = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Page Setup", "G) ページ設定") B_UTF8_ELLIPSIS,
+		new BMessage(M_PRINT_SETUP)));
+	menu->AddItem(fPrint = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Print", "P) 印刷") B_UTF8_ELLIPSIS,
+		new BMessage(M_PRINT), 'P'));
+	menu_bar->AddItem(menu);
+	
+	if(!resending && fIncoming) {	
+		menu->AddSeparatorItem();
+		
 		subMenu = new BMenu(MDR_DIALECT_CHOICE ("Close","C) 閉じる"));
 		if (file.GetAttrInfo(B_MAIL_ATTR_STATUS, &info) == B_NO_ERROR)
 			file.ReadAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, str, info.size);
@@ -1254,10 +1296,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 
 		if (!strcmp(str, "New")) {
 			subMenu->AddItem(item = new BMenuItem(
-				MDR_DIALECT_CHOICE ("Leave as 'New'", "N) 新規<New>のままにする"),
+				MDR_DIALECT_CHOICE ("Leave as New", "N) 新規<New>のままにする"),
 				new BMessage(M_CLOSE_SAME), 'W', B_SHIFT_KEY));
 			subMenu->AddItem(item = new BMenuItem(
-				MDR_DIALECT_CHOICE ("Set to 'Read'", "R) 開封済<Read>に設定"),
+				MDR_DIALECT_CHOICE ("Set to Read", "R) 開封済<Read>に設定"),
 				new BMessage(M_CLOSE_READ), 'W'));
 			message = M_CLOSE_READ;
 		} else {
@@ -1272,46 +1314,20 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		}
 
 		subMenu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Set to 'Saved'", "S) 属性を<Saved>に設定"),
+			MDR_DIALECT_CHOICE ("Set to Saved", "S) 属性を<Saved>に設定"),
 			new BMessage(M_CLOSE_SAVED), 'W', B_CONTROL_KEY));
 		subMenu->AddItem(new BMenuItem(new TMenu(
 			MDR_DIALECT_CHOICE ("Set to", "X) 他の属性に変更")B_UTF8_ELLIPSIS,
 			INDEX_STATUS, M_STATUS, false, false), new BMessage(M_CLOSE_CUSTOM)));
 		menu->AddItem(subMenu);
-
-		subMenu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Move to Trash", "T) 削除"),
-			new BMessage(M_DELETE), 'T', B_CONTROL_KEY));
-		AddShortcut('T', B_SHIFT_KEY | B_COMMAND_KEY, new BMessage(M_DELETE_NEXT));
 	}
 	else
 	{
-		menu->AddItem(fSendLater = new BMenuItem(
-			MDR_DIALECT_CHOICE ("Save as Draft", "S)ドラフトとして保存"),
-			new BMessage(M_SAVE_AS_DRAFT), 'S'));
+		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(
 			MDR_DIALECT_CHOICE ("Close", "W) 閉じる"),
 			new BMessage(B_CLOSE_REQUESTED), 'W'));
 	}
-
-	menu->AddSeparatorItem();
-	menu->AddItem(fPrint = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Page Setup", "G) ページ設定") B_UTF8_ELLIPSIS,
-		new BMessage(M_PRINT_SETUP)));
-	menu->AddItem(fPrint = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Print", "P) 印刷") B_UTF8_ELLIPSIS,
-		new BMessage(M_PRINT), 'P'));
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("About BeMail", "A) BeMailについて") B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
-	item->SetTarget(be_app);
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Quit", "Q) 終了"),
-		new BMessage(B_QUIT_REQUESTED), 'Q'));
-	item->SetTarget(be_app);
-	menu_bar->AddItem(menu);
 
 	//
 	//	Edit Menu
@@ -1328,6 +1344,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	fCopy->SetTarget(NULL, this);
 	menu->AddItem(fPaste = new BMenuItem(MDR_DIALECT_CHOICE ("Paste","V) 貼り付け"), new BMessage(B_PASTE), 'V'));
 	fPaste->SetTarget(NULL, this);
+	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Select All", "A) 全文選択"), new BMessage(M_SELECT), 'A'));
 	menu->AddSeparatorItem();
 	item->SetTarget(NULL, this);
@@ -1342,10 +1359,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		menu->AddItem(fRemoveQuote = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Remove Quote","R) 引用符を削除"),
 			new BMessage(M_REMOVE_QUOTE), B_LEFT_ARROW));
-		fSignature = new TMenu(
-			MDR_DIALECT_CHOICE ("Add Signature", "D) 署名を追加"),
-			INDEX_SIGNATURE, M_SIGNATURE);
-		menu->AddItem(new BMenuItem(fSignature));
+		menu->AddSeparatorItem();
 		fSpelling = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Check Spelling","H) スペルチェック"),
 			new BMessage( M_CHECK_SPELLING ), ';' );
@@ -1353,17 +1367,18 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		if (gStartWithSpellCheckOn)
 			PostMessage (M_CHECK_SPELLING);
 	}
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Preferences","P) BeMailの設定")B_UTF8_ELLIPSIS,
-		new BMessage(M_PREFS)));
-	item->SetTarget(be_app);
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Signatures","S) 署名の編集") B_UTF8_ELLIPSIS,
-		new BMessage(M_EDIT_SIGNATURE)));
-	item->SetTarget(be_app);
 	menu_bar->AddItem(menu);
-
+	
+	// View Menu
+	
+	if (!resending && fIncoming) {
+		menu = new BMenu(MDR_DIALECT_CHOICE ("View", "TRANSLATE ME"));
+		menu->AddItem(fHeader = new BMenuItem(MDR_DIALECT_CHOICE ("Show Header","H) ヘッダーを表示"),	new BMessage(M_HEADER), 'H'));
+		if (header_flag)
+			fHeader->SetMarked(true);
+		menu->AddItem(fRaw = new BMenuItem(MDR_DIALECT_CHOICE ("Show Raw Message","   メッセージを生で表示"), new BMessage(M_RAW)));
+	}
+	
 	//
 	//	Message Menu
 	//
@@ -1382,19 +1397,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		menu->AddItem(menuItem = new BMenuItem(MDR_DIALECT_CHOICE ("Resend","   再送信"), new BMessage(M_RESEND)));
 		menu->AddItem(menuItem = new BMenuItem(MDR_DIALECT_CHOICE ("Copy to New","D) 新規メッセージへコピー"), new BMessage(M_COPY_TO_NEW), 'D'));
 
+		menu->AddSeparatorItem();
 		fDeleteNext = new BMenuItem(MDR_DIALECT_CHOICE ("Move to Trash","T) 削除"), new BMessage(M_DELETE_NEXT), 'T');
 		menu->AddItem(fDeleteNext);
 		menu->AddSeparatorItem();
-
-		if (gShowSpamGUI) {
-			for (int i = 0; i < 4; i++) {
-				int messageCode = M_TRAIN_SPAM_AND_DELETE + i;
-				menu->AddItem(new BMenuItem(kSpamMenuItemTextArray[i], new BMessage(messageCode),
-					(messageCode == M_TRAIN_SPAM || messageCode == M_TRAIN_GENUINE) ? 'K' : 0,
-					(messageCode == M_TRAIN_GENUINE) ? B_SHIFT_KEY : 0));
-			}
-			menu->AddSeparatorItem();
-		}
 
 		fPrevMsg = new BMenuItem(MDR_DIALECT_CHOICE ("Previous Message","B) 前のメッセージ"), new BMessage(M_PREVMSG),
 		 B_UP_ARROW);
@@ -1403,11 +1409,6 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		  B_DOWN_ARROW);
 		menu->AddItem(fNextMsg);
 		menu->AddSeparatorItem();
-		menu->AddItem(fHeader = new BMenuItem(MDR_DIALECT_CHOICE ("Show Header","H) ヘッダーを表示"),	new BMessage(M_HEADER), 'H'));
-		if (header_flag)
-			fHeader->SetMarked(true);
-		menu->AddItem(fRaw = new BMenuItem(MDR_DIALECT_CHOICE ("Show Raw Message","   メッセージを生で表示"), new BMessage(M_RAW)));
-
 		fSaveAddrMenu = subMenu = new BMenu(MDR_DIALECT_CHOICE ("Save Address", "   アドレスを保存"));
 
 		// create the list of addresses
@@ -1444,33 +1445,42 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		}
 
 		menu->AddItem(subMenu);
+		menu_bar->AddItem(menu);
+
+		// Spam Menu
+		
+		if (gShowSpamGUI) {
+			menu = new BMenu("Spam Filtering");
+			menu->AddItem(new BMenuItem("Mark as Spam and Move to Trash",
+										new BMessage(M_TRAIN_SPAM_AND_DELETE), 'K'));
+			menu->AddItem(new BMenuItem("Mark as Spam",
+										new BMessage(M_TRAIN_SPAM), 'K', B_OPTION_KEY));
+			menu->AddSeparatorItem();
+			menu->AddItem(new BMenuItem("Unmark this Message",
+										new BMessage(M_UNTRAIN)));
+			menu->AddSeparatorItem();
+			menu->AddItem(new BMenuItem("Mark as Genuine",
+										new BMessage(M_TRAIN_GENUINE), 'K', B_SHIFT_KEY));
+			menu_bar->AddItem(menu);
+		}
 	} else {
 		menu->AddItem(fSendNow = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Send Message", "M) メッセージを送信"),
 			new BMessage(M_SEND_NOW), 'M'));
-		if (!fResending) {
-			// We want to make alt-shift-M work to send mail as well as just alt-M
-			// Gross hack follows... hey, don't look at me like that... it works.
-			// Create a hidden menu bar with a single "Send Now" item linked to alt-shift-M
-			BMenuBar *fudge_bar;
-			fudge_bar = new BMenuBar(r, "Fudge Bar");
-			fudge_bar->Hide();
-			fudge_bar->AddItem(new BMenuItem("Fudge Send", new BMessage(M_SEND_NOW), 'M', B_SHIFT_KEY) );
-			AddChild(fudge_bar);
+		
+		if(!fIncoming) {
+			menu->AddSeparatorItem();
+			fSignature = new TMenu(
+				MDR_DIALECT_CHOICE ("Add Signature", "D) 署名を追加"),
+				INDEX_SIGNATURE, M_SIGNATURE);
+			menu->AddItem(new BMenuItem(fSignature));
+			menu->AddSeparatorItem();
+			menu->AddItem(fAdd = new BMenuItem(MDR_DIALECT_CHOICE ("Add Enclosure","E) 追加")B_UTF8_ELLIPSIS, new BMessage(M_ADD), 'E'));
+			menu->AddItem(fRemove = new BMenuItem(MDR_DIALECT_CHOICE ("Remove Enclosure","T) 削除"), new BMessage(M_REMOVE), 'T'));
 		}
-	}
-	menu_bar->AddItem(menu);
-
-	//
-	//	Enclosures Menu
-	//
-	if (!fIncoming) {
-		menu = new BMenu(MDR_DIALECT_CHOICE ("Enclosures","N) 添付ファイル"));
-		menu->AddItem(fAdd = new BMenuItem(MDR_DIALECT_CHOICE ("Add","E) 追加")B_UTF8_ELLIPSIS, new BMessage(M_ADD), 'E'));
-		menu->AddItem(fRemove = new BMenuItem(MDR_DIALECT_CHOICE ("Remove","T) 削除"), new BMessage(M_REMOVE), 'T'));
 		menu_bar->AddItem(menu);
 	}
-
+	
 	Lock();
 	AddChild(menu_bar);
 	height = menu_bar->Bounds().bottom + 1;
@@ -1977,7 +1987,17 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 		case M_SPAM_BUTTON:
 		{
-			uint32 buttons;
+			/*
+				A popup from a button is good only when the behavior has some consistency and
+				there is some visual indication that a menu will be shown when clicked. A
+				workable implementation would have an extra button attached to the main one
+				which has a downward-pointing arrow. Mozilla Thunderbird's 'Get Mail' button
+				is a good example of this.
+				
+				Until someone is willing to retool the toolbar class or otherwise do something
+				like this, it is better to just disable the menu for consistency's sake.
+			*/
+/*			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON)
 			{
@@ -1993,6 +2013,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 				break;
 			} else // Default action for left clicking on the spam button.
 				PostMessage (new BMessage (M_TRAIN_SPAM_AND_DELETE));
+*/
+			PostMessage (new BMessage (M_TRAIN_SPAM_AND_DELETE));
 			break;
 		}
 
@@ -2012,7 +2034,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 		case M_REPLY:
 		{
-			uint32 buttons;
+			// Disabled for usability reasons - see listing for spam button
+/*			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON)
 			{
@@ -2032,10 +2055,13 @@ TMailWindow::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
+*/
+			// Fall through
 		}
 		case M_FORWARD:
 		{
-			uint32 buttons;
+			// Disabled for usability reasons - see listing for spam button
+/*			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON) {
 				BPopUpMenu menu("Forward", false, false);
@@ -2055,6 +2081,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
+*/
 		}
 
 		// Fall Through

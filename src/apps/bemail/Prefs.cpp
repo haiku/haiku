@@ -83,7 +83,7 @@ using namespace BPrivate;
 
 #define OK_BUTTON_X1		(PREF_WIDTH - BUTTON_WIDTH - 6)
 #define OK_BUTTON_X2		(OK_BUTTON_X1 + BUTTON_WIDTH)
-#define OK_BUTTON_TEXT		MDR_DIALECT_CHOICE ("Done", "設定")
+#define OK_BUTTON_TEXT		MDR_DIALECT_CHOICE ("OK", "設定")
 #define CANCEL_BUTTON_TEXT	MDR_DIALECT_CHOICE ("Cancel", "中止")
 
 #define REVERT_BUTTON_X1	8

@@ -79,8 +79,6 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 	menu->AddSeparatorItem();
 	menu->AddItem(fSave = new BMenuItem(MDR_DIALECT_CHOICE ("Save","S) 保存"), new BMessage(M_SAVE), 'S'));
 	menu->AddItem(fDelete = new BMenuItem(MDR_DIALECT_CHOICE ("Delete","T) 削除"), new BMessage(M_DELETE), 'T'));
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Close","W) 閉じる"), new BMessage(B_CLOSE_REQUESTED), 'W'));
 	menu_bar->AddItem(menu);
 
 	menu = new BMenu(MDR_DIALECT_CHOICE ("Edit","E) 編集"));
@@ -93,6 +91,7 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 	fCopy->SetTarget(NULL, this);
 	menu->AddItem(fPaste = new BMenuItem(MDR_DIALECT_CHOICE ("Paste","V) 貼り付け"), new BMessage(B_PASTE), 'V'));
 	fPaste->SetTarget(NULL, this);
+	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Select All","A) 全文選択"), new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
 	menu_bar->AddItem(menu);
@@ -191,7 +190,7 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 			if (level == L_BEGINNER) {
 				beep();
 				if (!(new BAlert("",MDR_DIALECT_CHOICE (
-						"Are you sure you want to delete this signature?",
+						"Really delete this signature? This cannot be undone.",
 						"この署名を削除しますか？"),
 						MDR_DIALECT_CHOICE ("Cancel","取消l"), 
 						MDR_DIALECT_CHOICE ("Delete","削除"), NULL, B_WIDTH_AS_USUAL,
@@ -229,9 +228,9 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 					fFile = NULL;
 					beep();
 					(new BAlert("", MDR_DIALECT_CHOICE (
-						"An error occurred trying to open this signature.",
+						"Couldn't open this signature. Sorry.",
 						"署名を開く時にエラーが発生しました。"),
-						MDR_DIALECT_CHOICE ("Sorry","了解")))->Go();
+						MDR_DIALECT_CHOICE ("OK","了解")))->Go();
 				}
 			}
 			break;
@@ -285,12 +284,15 @@ TSignatureWindow::Clear()
 
 	if (IsDirty()) {
 		beep();
-		result = (new BAlert("", 
-			MDR_DIALECT_CHOICE ("Save changes to signature?","変更した署名を保存しますか？"),
-			MDR_DIALECT_CHOICE ("Don't save","保存しない"),
+		BAlert *alert = new BAlert("", 
+			MDR_DIALECT_CHOICE ("Save changes to this signature?","変更した署名を保存しますか？"),
+			MDR_DIALECT_CHOICE ("Don't Save","保存しない"),
 			MDR_DIALECT_CHOICE ("Cancel","中止"),
 			MDR_DIALECT_CHOICE ("Save","保存する"),
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0,'d');
+		alert->SetShortcut(1,B_ESCAPE);
+		result = alert->Go();
 		if (result == 1)
 			return false;
 		if (result == 2)

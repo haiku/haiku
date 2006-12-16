@@ -182,6 +182,7 @@ void FindPanel::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case FINDBUTTON:
 			Find();
+			Window()->PostMessage(B_QUIT_REQUESTED);
 			break;
 		default:
 			BView::MessageReceived(msg);
