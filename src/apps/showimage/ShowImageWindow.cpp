@@ -596,12 +596,14 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			int32 width, height;
 			if (message->FindInt32("width", &width) >= B_OK
 				&& message->FindInt32("height", &height) >= B_OK) {
-				status << width << "x" << height << ", ";
+				status << width << "x" << height;
 				messageProvidesSize = true;
 			}
 			
 			BString str;
-			if (message->FindString("status", &str) == B_OK) {
+			if (message->FindString("status", &str) == B_OK && str.Length() > 0) {
+				if (status.Length() > 0)
+					status << ", ";
 				status << str;
 			}
 			
@@ -822,7 +824,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			if (fImageView->GetBitmap() != NULL)
 			{
 				BRect rect = fImageView->GetBitmap()->Bounds();
-				OpenResizerWindow(rect.Width(), rect.Height());
+				OpenResizerWindow(rect.IntegerWidth()+1, rect.IntegerHeight()+1);
 			}
 			break;
 		case MSG_RESIZE:
@@ -1139,7 +1141,7 @@ ShowImageWindow::Print(BMessage *msg)
 }
 
 void 
-ShowImageWindow::OpenResizerWindow(float width, float height)
+ShowImageWindow::OpenResizerWindow(int32 width, int32 height)
 {
 	if (fResizerWindowMessenger == NULL) {
 		// open window if it is not already opened
@@ -1151,7 +1153,7 @@ ShowImageWindow::OpenResizerWindow(float width, float height)
 }
 
 void 
-ShowImageWindow::UpdateResizerWindow(float width, float height)
+ShowImageWindow::UpdateResizerWindow(int32 width, int32 height)
 {
 	if (fResizerWindowMessenger == NULL) {
 		// window not opened
@@ -1159,8 +1161,8 @@ ShowImageWindow::UpdateResizerWindow(float width, float height)
 	}
 	
 	BMessage updateMsg(ResizerWindow::kUpdateMsg);
-	updateMsg.AddFloat("width", width);
-	updateMsg.AddFloat("height", height);
+	updateMsg.AddInt32("width", width);
+	updateMsg.AddInt32("height", height);
 	fResizerWindowMessenger->SendMessage(&updateMsg);
 }
 

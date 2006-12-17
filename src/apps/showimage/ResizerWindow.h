@@ -41,7 +41,7 @@ class BCheckBox;
 class ResizerWindow : public BWindow
 {
    public:			
-						ResizerWindow(BMessenger target, float width, float height );
+						ResizerWindow(BMessenger target, int32 width, int32 height );
 					
 		virtual void	MessageReceived(BMessage* msg);
 		virtual	bool	QuitRequested();
@@ -53,7 +53,7 @@ class ResizerWindow : public BWindow
 			kActivateMsg = 'RSRa',
 				// activates the window
 			kUpdateMsg,
-				// provides the new size of the image in two float fields "width" and "height"
+				// provides the new size of the image in two "int32" fields "width" and "height"
 		};
    private:
 		enum {
@@ -71,7 +71,10 @@ class ResizerWindow : public BWindow
    		BTextControl*	fHeight;
    		BCheckBox*		fAspectRatio;
    		BButton*		fApply;
-   		float			fRatio;
+   		// the original size of the image use for aspect ratio calculation
+   		// to avoid rounding errors
+   		int32           fOriginalWidth;
+   		int32           fOriginalHeight;
    		BMessenger		fTarget;
 };
 

@@ -78,8 +78,8 @@ class ShowImageWindow : public BWindow {
 		void PrepareForPrint();
 		void Print(BMessage *msg);
 		
-		void OpenResizerWindow(float width, float height);
-		void UpdateResizerWindow(float width, float height);
+		void OpenResizerWindow(int32 width, int32 height);
+		void UpdateResizerWindow(int32 width, int32 height);
 		void CloseResizerWindow();
 
 		BFilePanel *fSavePanel;

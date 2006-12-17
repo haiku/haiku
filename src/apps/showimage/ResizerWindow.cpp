@@ -50,9 +50,10 @@ static const float kLineDistance = 5;
 static const float kHorizontalIndent = 10;
 static const float kVerticalIndent = 10;
 
-ResizerWindow::ResizerWindow(BMessenger target, float width, float height)
+ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	: BWindow(BRect(100, 100, 300, 300), "Resize", B_FLOATING_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
-	, fRatio(width / height)
+	, fOriginalWidth(width)
+	, fOriginalHeight(height)
 	, fTarget(target)
 {
 	BView* back_view = new BBox(Bounds(), "", B_FOLLOW_ALL);
@@ -73,13 +74,13 @@ ResizerWindow::ResizerWindow(BMessenger target, float width, float height)
 	BRect rect(left, top, width2 - kHorizontalIndent, top + 10);
 	
 	BString widthValue;
-	widthValue << (int)width2;
+	widthValue << width;
 	fWidth = new BTextControl(rect, "width", kWidthLabel, widthValue.String(), NULL);
 	fWidth->SetModificationMessage(new BMessage(kWidthModifiedMsg));
 	AddControl(back_view, fWidth, column2, rect);
 					
 	BString heightValue;
-	heightValue << (int)height;	
+	heightValue << height;	
 	fHeight = new BTextControl(rect, "height", kHeightLabel, heightValue.String(), NULL);
 	fHeight->SetModificationMessage(new BMessage(kHeightModifiedMsg));
 	AddControl(back_view, fHeight, column2, rect);
@@ -154,15 +155,16 @@ ResizerWindow::MessageReceived(BMessage* message)
 		case kUpdateMsg:
 		{
 			// update aspect ratio, width and height
-			float width, height;
-			if (message->FindFloat("width", &width) == B_OK &&
-				message->FindFloat("height", &height) == B_OK) {
-								
-				fRatio = width / height;
+			int32 width, height;
+			if (message->FindInt32("width", &width) == B_OK &&
+				message->FindInt32("height", &height) == B_OK) {
+				
+				fOriginalWidth = width;
+				fOriginalHeight = height;				
 
 				BString widthText, heightText;
-				widthText << (int)width;
-				heightText << (int)height;
+				widthText << width;
+				heightText << height;
 				// here the statement order is important:
 				// in case keep aspect ratio is enabled,
 				// the width should determine the height
@@ -186,7 +188,7 @@ ResizerWindow::MessageReceived(BMessage* message)
 			if (fAspectRatio->Value() == B_CONTROL_ON)
 			{
 				int w = atoi(fWidth->Text());
-				int h = (int)(w / fRatio);
+				int h = (int)((int64)w * (int64) fOriginalHeight / (int64) fOriginalWidth);
 				BString height;
 				height << h;
 				BMessage* msg = new BMessage(*fHeight->ModificationMessage());
@@ -199,7 +201,7 @@ ResizerWindow::MessageReceived(BMessage* message)
 			if (fAspectRatio->Value() == B_CONTROL_ON)
 			{
 				int h = atoi(fHeight->Text());
-				int w = (int)(h * fRatio);
+				int w = (int)((int64)h * (int64) fOriginalWidth / (int64) fOriginalHeight);
 				BString width;
 				width << w;
 				BMessage* msg = new BMessage(*fWidth->ModificationMessage());
