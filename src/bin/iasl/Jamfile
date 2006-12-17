@@ -1,0 +1,93 @@
+SubDir HAIKU_TOP src bin iasl ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi include ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi include platform ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi compiler ] ;
+
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi include ] ;
+
+SubDirCcFlags -DACPI_ASL_COMPILER ;
+
+
+local compiler_src =
+	aslcompiler.l
+	aslcompiler.y.y
+	aslanalyze.c aslcodegen.c
+	aslcompile.c aslerror.c aslfiles.c asllength.c
+	asllisting.c aslload.c asllookup.c aslmain.c aslmap.c aslopcodes.c
+	asloperands.c aslresource.c aslrestype1.c aslrestype2.c
+	asltree.c aslutils.c asltransform.c aslfold.c aslstubs.c aslopt.c
+	;
+
+local disassembler_src =
+	dmbuffer.c
+	dmnames.c
+	dmopcode.c
+	dmobject.c
+	dmresrc.c
+	dmresrcl.c
+	dmresrcs.c
+	dmutils.c
+	dmwalk.c
+;
+
+local common_src =
+	getopt.c
+	adfile.c
+	adisasm.c
+	adwalk.c
+	dmrestag.c
+	dmtable.c
+	dmtbinfo.c
+	dmtbdump.c
+;
+
+local utilities_src =
+	utalloc.c utcache.c utcopy.c utdebug.c utdelete.c utglobal.c utobject.c  utmisc.c utmath.c utmutex.c utresrc.c utstate.c
+;
+
+local namespace_src = 
+	nsaccess.c nsalloc.c nsdump.c nsnames.c nsobject.c nsparse.c nssearch.c nsutils.c nswalk.c nsxfobj.c 
+;
+
+local parser_src = 
+	psargs.c psloop.c psopcode.c psparse.c psscope.c pstree.c psutils.c pswalk.c ;
+
+local dispatcher_src = 
+	dswscope.c dswstate.c dsfield.c dsobject.c dsopcode.c dsutils.c dswexec.c dswload.c ;
+
+local executer_src = exconvrt.c	excreate.c exdump.c exmisc.c exmutex.c exnames.c exoparg1.c exoparg2.c exoparg3.c 
+	exoparg6.c exprep.c exregion.c exresnte.c exresolv.c exresop.c exstore.c exstoren.c exstorob.c exsystem.c exutils.c
+;
+
+local tables_src = 
+	tbfadt.c tbinstal.c tbutils.c tbxface.c ;
+
+BinCommand iasl :
+	$(compiler_src)
+	$(disassembler_src)
+	$(common_src)
+	$(utilities_src)
+	$(namespace_src)
+	$(parser_src)
+	$(dispatcher_src)
+	$(executer_src)
+	$(tables_src)
+	osunixxf.c
+	dbfileio.c
+	;
+
+SEARCH on [ FGristFiles $(compiler_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi compiler ] ;
+SEARCH on [ FGristFiles $(disassembler_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi disassembler ] ;
+SEARCH on [ FGristFiles $(common_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi common ] ;
+SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi utilities ] ;
+SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi namespace ] ;
+SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter parser ] ;
+SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter dispatcher ] ;
+SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter executer ] ;
+SEARCH on [ FGristFiles $(tables_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi tables ] ;
+SEARCH on [ FGristFiles dbfileio.c  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi debugger ] ;
+
+
+YACCFLAGS on <src!bin!iasl>aslcompiler.y.c <src!bin!iasl>aslcompiler.y.h = -d -pAslCompiler ;
+LEXFLAGS on <src!bin!iasl>aslcompiler.c = -i -PAslCompiler ;

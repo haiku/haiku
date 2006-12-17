@@ -168,26 +168,6 @@
 //#endif /* DDB */
 #endif /* ACPI_DEBUG */
 
-#else /* _KERNEL_MODE */
-
-#include <ctype.h>
-
-/* Not building kernel code, so use libc */
-#define ACPI_USE_STANDARD_HEADERS
-#define ACPI_FLUSH_CPU_CACHE()
-
-#define __cli()
-#define __sti()
-
-/* XXX */
-#define __inline inline
-
-#endif /* _KERNEL_MODE */
-
-/* Always use Haiku code over our local versions */
-#define ACPI_USE_SYSTEM_CLIBRARY
-#define ACPI_USE_NATIVE_DIVIDE
-
 /* The following Global Lock code stolen from NetBSD
    src/sys/arch/i386/include/acpi_func.h which in turn
    was stolen from Intel's spec document */
@@ -237,4 +217,26 @@ strupr(char *str)
     }
     return(str);
 }
+
+#else /* _KERNEL_MODE */
+
+#include <ctype.h>
+
+/* Not building kernel code, so use libc */
+#define ACPI_USE_STANDARD_HEADERS
+#define ACPI_FLUSH_CPU_CACHE()
+
+#define __cli()
+#define __sti()
+
+/* XXX */
+#define __inline inline
+
+#endif /* _KERNEL_MODE */
+
+/* Always use Haiku code over our local versions */
+#define ACPI_USE_SYSTEM_CLIBRARY
+#define ACPI_USE_NATIVE_DIVIDE
+
+
 #endif /* __ACHAIKU_H__ */

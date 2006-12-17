@@ -151,6 +151,7 @@ SubInclude HAIKU_TOP src bin flex ;
 SubInclude HAIKU_TOP src bin gawk ;
 SubInclude HAIKU_TOP src bin gdb ;
 SubInclude HAIKU_TOP src bin grep ;
+SubInclude HAIKU_TOP src bin iasl ;
 SubInclude HAIKU_TOP src bin ideinfo ;
 SubInclude HAIKU_TOP src bin keymap ;
 SubInclude HAIKU_TOP src bin less ;

@@ -196,7 +196,7 @@ rule Lex
 
 actions Lex
 {
-	$(LEX) -o$(1) $(2)
+	$(LEX) $(LEXFLAGS) -o$(1) $(2)
 }
 
 rule Yacc
