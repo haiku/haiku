@@ -13,6 +13,7 @@ Application ShowImage : ShowImageApp.cpp
 	Filter.cpp
 	EntryMenuItem.cpp
 	BackgroundImage.cpp
+	ResizerWindow.cpp
 	: be tracker translation
 	: ShowImage.rdef
 	;

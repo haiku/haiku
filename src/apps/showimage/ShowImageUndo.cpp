@@ -29,6 +29,7 @@
 #include "ShowImageUndo.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 ShowImageUndo::ShowImageUndo()
 {

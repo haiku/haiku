@@ -64,16 +64,16 @@ ResizerWindow::ResizerWindow(BMessenger target, float width, float height)
 
 	const float textControlWidth = column2 + back_view->StringWidth("999999");
 	const float keepAspectRatioLabelWidth = back_view->StringWidth(kKeepAspectRatioLabel);
-	const float width = 2 * kHorizontalIndent + max_c(textControlWidth, keepAspectRatioLabelWidth);
+	const float width2 = 2 * kHorizontalIndent + max_c(textControlWidth, keepAspectRatioLabelWidth);
 	
-	ResizeTo(width+1, Bounds().Height()+1);
+	ResizeTo(width2+1, Bounds().Height()+1);
 	
 	const float top = kVerticalIndent;
 	const float left = kHorizontalIndent;
-	BRect rect(left, top, width - kHorizontalIndent, top + 10);
+	BRect rect(left, top, width2 - kHorizontalIndent, top + 10);
 	
 	BString widthValue;
-	widthValue << (int)width;
+	widthValue << (int)width2;
 	fWidth = new BTextControl(rect, "width", kWidthLabel, widthValue.String(), NULL);
 	fWidth->SetModificationMessage(new BMessage(kWidthModifiedMsg));
 	AddControl(back_view, fWidth, column2, rect);
@@ -97,7 +97,7 @@ ResizerWindow::ResizerWindow(BMessenger target, float width, float height)
 	
 	fWidth->MakeFocus();
 	
-	ResizeTo(width, rect.top);
+	ResizeTo(width2, rect.top);
 }
 
 void
