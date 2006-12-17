@@ -3,7 +3,6 @@
  */
 
 resource app_signature "application/x-vnd.Haiku-MarkAsNew";
-resource app_flags B_MULTIPLE_LAUNCH;
 
 resource file_types message {
 	"types" = "text/x-email"
@@ -20,8 +19,8 @@ resource app_version {
 
 	internal = 1,
 
-	short_info = "MarkAsNew",
-	long_info = "MarkAsNew, Copyright 2006 Haiku Inc."
+	short_info = "Marks emails as New",
+	long_info = "MarkAsNew, Copyright 2006 Haiku Inc. A Tracker Add-on which marks the status of emails as New."
 };
 
 resource mini_icon array {
