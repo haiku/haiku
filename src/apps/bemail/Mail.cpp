@@ -1221,7 +1221,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	item->SetTarget(be_app);
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Options","O) BeMailの設定") B_UTF8_ELLIPSIS,
+		MDR_DIALECT_CHOICE ("Preferences","P) BeMailの設定") B_UTF8_ELLIPSIS,
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
 	menu->AddSeparatorItem();
