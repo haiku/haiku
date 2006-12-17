@@ -57,5 +57,8 @@ const uint32 MSG_ORIGINAL_SIZE      = 'mOSZ';
 const uint32 MSG_INVALIDATE         = 'mIVD';
 const uint32 MSG_SCALE_BILINEAR     = 'mSBL';
 const uint32 MSG_DESKTOP_BACKGROUND = 'mDBG';
+const uint32 MSG_OPEN_RESIZER_WINDOW   = 'mORS';
+const uint32 MSG_RESIZER_WINDOW_QUITED = 'mRSQ';
+const uint32 MSG_RESIZE                = 'mRSZ';
 
 #endif	// SHOW_IMAGE_CONSTANTS_H

@@ -1,30 +1,14 @@
-/*****************************************************************************/
-// Filter
-// Written by Michael Pfeiffer
-//
-// Filter.cpp
-//
-//
-// Copyright (c) 2003-2005 Haiku Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2006, Haiku.
+ * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
+ * Copyright 2006 Bernd Korz. All Rights Reserved
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer, laplace@haiku-os.org
+ *		yellowTAB GmbH
+ *		Bernd Korz
+ */
 
 #include <scheduler.h>
 #include <Debug.h>
@@ -275,13 +259,14 @@ Scaler::~Scaler()
 {
 	if (GetDestImage() != fScaledImage) {
 		delete fScaledImage;
+		fScaledImage = NULL;
 	}
 }
 
 BBitmap*
 Scaler::CreateDestImage(BBitmap* srcImage)
 {
-	if (srcImage == NULL || srcImage->ColorSpace() != B_RGB32 && srcImage->ColorSpace() !=B_RGBA32) return NULL;
+	if (srcImage == NULL || srcImage->ColorSpace() != B_RGB32 && srcImage->ColorSpace() != B_RGBA32) return NULL;
 
 	BRect dest(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
 	BBitmap* destImage = new BBitmap(dest, fDither ? B_CMAP8 : srcImage->ColorSpace());
@@ -291,9 +276,10 @@ Scaler::CreateDestImage(BBitmap* srcImage)
 		return NULL;
 	}
 	
-	if (fDither) {
-		BRect dest(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
-		fScaledImage = new BBitmap(dest, srcImage->ColorSpace());
+	if (fDither) 
+	{
+		BRect dest_rect(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
+		fScaledImage = new BBitmap(dest_rect, srcImage->ColorSpace());
 		if (!IsBitmapValid(fScaledImage)) {
 			delete destImage;
 			delete fScaledImage; 
@@ -404,6 +390,9 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 				destData[2] = static_cast<uchar>(
 								(a[2] * a0 + b[2] * a1) * alpha0 +
 								(c[2] * a0 + d[2] * a1) * alpha1);
+				destData[3] = static_cast<uchar>(
+								(a[3] * a0 + b[3] * a1) * alpha0 +
+								(c[3] * a0 + d[3] * a1) * alpha1);
 			}
 			
 			// right column
@@ -413,6 +402,7 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 			destData[0] = static_cast<uchar>(a[0] * alpha0 + c[0] * alpha1);
 			destData[1] = static_cast<uchar>(a[1] * alpha0 + c[1] * alpha1);
 			destData[2] = static_cast<uchar>(a[2] * alpha0 + c[2] * alpha1);
+			destData[3] = static_cast<uchar>(a[3] * alpha0 + c[3] * alpha1);
 		} else {
 			float a0, a1;
 			const uchar *a, *b;
@@ -426,6 +416,7 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 				destData[0] = static_cast<uchar>(a[0] * a0 + b[0] * a1);
 				destData[1] = static_cast<uchar>(a[1] * a0 + b[1] * a1);
 				destData[2] = static_cast<uchar>(a[2] * a0 + b[2] * a1);
+				destData[3] = static_cast<uchar>(a[3] * a0 + b[3] * a1);
 			}
 			
 			// bottom, right pixel
@@ -434,6 +425,7 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 			destData[0] = a[0];
 			destData[1] = a[1];
 			destData[2] = a[2];
+			destData[3] = a[3];
 		}
 	
 	}
@@ -538,6 +530,7 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 				destData[0] = I4(0);
 				destData[1] = I4(1);
 				destData[2] = I4(2);
+				destData[3] = I4(3);
 			}
 			
 			// right column
@@ -547,6 +540,7 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 			destData[0] = V2(0);
 			destData[1] = V2(1);
 			destData[2] = V2(2);
+			destData[3] = V2(3);
 		} else {
 			fixed_point a0, a1;
 			const uchar *a, *b;
@@ -560,6 +554,7 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 				destData[0] = H2(0);
 				destData[1] = H2(1);
 				destData[2] = H2(2);
+				destData[3] = H2(3);
 			}
 			
 			// bottom, right pixel
@@ -568,6 +563,7 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 			destData[0] = a[0];
 			destData[1] = a[1];
 			destData[2] = a[2];
+			destData[3] = a[3];
 		}
 	
 	}
@@ -915,8 +911,9 @@ void
 Scaler::Completed()
 {
 	if (GetDestImage() != fScaledImage) {
-		delete fScaledImage; fScaledImage = NULL;
+		delete fScaledImage;
 	}
+	fScaledImage = NULL;
 }
 
 // Implementation of ImageProcessor
@@ -927,7 +924,7 @@ ImageProcessor::ImageProcessor(enum operation op, BBitmap* image, BMessenger lis
 }
 
 BBitmap*
-ImageProcessor::CreateDestImage(BBitmap* srcImage)
+ImageProcessor::CreateDestImage(BBitmap* /* srcImage */)
 {
 	color_space cs;
 	BBitmap* bm;

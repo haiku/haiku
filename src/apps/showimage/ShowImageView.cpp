@@ -1,11 +1,15 @@
 /*
  * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
+ * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
  *		Michael Pfeiffer
+ *		yellowTAB GmbH
+ *		Bernd Korz
  */
 
 
@@ -188,7 +192,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fScaleBilinear = false;
 	fScaler = NULL;
 #if DELAYED_SCALING
-	fScalingCountDown = 10;
+	fScalingCountDown = SCALING_DELAY_TIME;
 #endif
 
 	if (settings->Lock()) {
@@ -303,9 +307,11 @@ ShowImageView::Pulse()
 
 #if DELAYED_SCALING
 	if (fBitmap && (fScaleBilinear || fDither) && fScalingCountDown > 0) {
-		fScalingCountDown --;
-		if (fScalingCountDown == 0) {
+		if (fScalingCountDown == 1) {
+			fScalingCountDown = 0;
 			GetScaler(AlignBitmap());
+		} else {
+			fScalingCountDown --;
 		}
 	}
 #endif	
@@ -383,7 +389,7 @@ ShowImageView::DeleteScaler()
 		fScaler = NULL;
 	}
 #if DELAYED_SCALING
-	fScalingCountDown = 3; // delay for 3/10 seconds
+	fScalingCountDown = SCALING_DELAY_TIME;
 #endif
 }
 
@@ -1634,7 +1640,7 @@ ShowImageView::ShowPopUpMenu(BPoint screen)
 
 	ShowImageWindow* showImage = dynamic_cast<ShowImageWindow*>(Window());
 	if (showImage)
-		showImage->BuildViewMenu(menu);
+		showImage->BuildContextMenu(menu);
 
 	screen -= BPoint(10, 10);
 	menu->Go(screen, true, false, true);
@@ -2427,6 +2433,31 @@ ShowImageView::Invert()
 	}
 }
 
+void
+ShowImageView::ResizeImage(int w, int h)
+{
+	if (fBitmap == NULL || w < 1 || h < 1) 
+		return;
+	
+	Scaler scaler(fBitmap, BRect(0, 0, w-1, h-1), BMessenger(), 0, false);
+	scaler.Start(false);
+	BBitmap* scaled = scaler.DetachBitmap();
+	if (scaled == NULL) {
+		// operation failed
+		return;	
+	}
+		
+	// remove selection
+	SetHasSelection(false);
+	fUndo.Clear();
+	DeleteBitmap();
+	fBitmap = scaled;
+
+	BMessenger msgr(Window());
+	msgr.SendMessage(MSG_MODIFIED);
+
+	Notify(NULL);
+}
 
 void
 ShowImageView::SetIcon(bool clear, icon_size which)

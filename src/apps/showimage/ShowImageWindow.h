@@ -43,17 +43,18 @@ class ShowImageWindow : public BWindow {
 		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
-		virtual	void Zoom(BPoint origin, float width, float height);
+		// virtual	void Zoom(BPoint origin, float width, float height);
 
 		status_t InitCheck();
 		ShowImageView *GetShowImageView() const { return fImageView; }
 
 		void UpdateTitle();
-		void BuildViewMenu(BMenu *menu);
 		void AddMenus(BMenuBar *bar);
+		void BuildContextMenu(BMenu *menu);
 		void WindowRedimension(BBitmap *bitmap);
 
 	private:
+		void BuildViewMenu(BMenu *menu, bool popupMenu);
 		BMenuItem *AddItemMenu(BMenu *menu, char *caption,
 			uint32 command, char shortcut, uint32 modifier,
 			char target, bool enabled);
@@ -76,6 +77,10 @@ class ShowImageWindow : public BWindow {
 		bool PageSetup();
 		void PrepareForPrint();
 		void Print(BMessage *msg);
+		
+		void OpenResizerWindow(float width, float height);
+		void UpdateResizerWindow(float width, float height);
+		void CloseResizerWindow();
 
 		BFilePanel *fSavePanel;
 		BMenuBar *fBar;
@@ -91,6 +96,7 @@ class ShowImageWindow : public BWindow {
 		bool fShowCaption;
 		BMessage *fPrintSettings;
 		PrintOptions fPrintOptions;
+		BMessenger* fResizerWindowMessenger;
 };
 
 #endif	// SHOW_IMAGE_WINDOW_H

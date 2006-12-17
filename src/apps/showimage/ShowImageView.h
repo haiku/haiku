@@ -1,11 +1,15 @@
 /*
  * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
+ * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
  *		Michael Pfeiffer
+ *		yellowTAB GmbH
+ *		Bernd Korz
  */
 #ifndef SHOW_IMAGE_VIEW_H
 #define SHOW_IMAGE_VIEW_H
@@ -24,6 +28,8 @@
 
 // delay scaling operation, so that a sequence of zoom in/out operations works smoother
 #define DELAYED_SCALING 1
+// the delay time in 1/10 seconds
+#define SCALING_DELAY_TIME 3
 // width of the black border stroked arround the bitmap
 #define PEN_SIZE 1.0f
 
@@ -100,6 +106,7 @@ class ShowImageView : public BView {
 		void Rotate(int degree); // 90 and 270 only
 		void Flip(bool vertical);
 		void Invert();
+		void ResizeImage(int w, int h);
 
 		void SetIcon(bool clear);
 

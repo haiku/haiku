@@ -28,6 +28,8 @@
 
 #include "ShowImageUndo.h"
 
+#include <stdio.h>
+
 ShowImageUndo::ShowImageUndo()
 {
 	fWindow = NULL;
@@ -62,10 +64,13 @@ void
 ShowImageUndo::SendUndoStateMessage(bool bCanUndo)
 {
 	if (fWindow) {
+		if (!fWindow->IsLocked()) {
+			fprintf(stderr, "ShowImageUndo::SendUndoStateMessage: window must be locked!");
+			exit(-1);
+		}
 		BMessage msg(MSG_UNDO_STATE);
 		msg.AddBool("can_undo", bCanUndo);
-		BMessenger msgr(fWindow);
-		msgr.SendMessage(&msg);
+		fWindow->PostMessage(&msg);
 	}
 }
 

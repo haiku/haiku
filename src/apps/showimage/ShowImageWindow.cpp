@@ -1,16 +1,21 @@
 /*
  * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
+ * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
  *		Michael Pfeiffer
+ *		yellowTAB GmbH
+ *		Bernd Korz
  */
 
 
 #include "BackgroundImage.h"
 #include "EntryMenuItem.h"
+#include "ResizerWindow.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageStatusView.h"
@@ -91,7 +96,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	fPrintSettings = NULL;
 	fImageView = NULL;
 	fSlideShowDelay = NULL;
-
+	fResizerWindowMessenger = NULL;
+	
 	LoadSettings();	
 
 	// create menu bar	
@@ -145,21 +151,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	fImageView->SetImage(ref);
 	fImageView->SetTrackerMessenger(trackerMessenger);
 
-	if (InitCheck() == B_OK) {
-		// add View menu here so it can access ShowImageView methods 
-		BMenu* menu = new BMenu("View");
-		BuildViewMenu(menu);
-		fBar->AddItem(menu);		
-		MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
-		UpdateTitle();
-
-		SetPulseRate(100000);
-			// every 1/10 second; ShowImageView needs it for marching ants
-
-		WindowRedimension(fImageView->GetBitmap());
-		fImageView->MakeFocus(true); // to receive KeyDown messages
-		Show();
-	} else {
+	if (InitCheck() != B_OK) {
 		BAlert* alert;
 		alert = new BAlert("ShowImage", 
 			"Could not load image! Either the file or an image translator for it does not exist.", 
@@ -171,6 +163,20 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 		Quit();
 		return;
 	}
+
+	// add View menu here so it can access ShowImageView methods 
+	BMenu* menu = new BMenu("View");
+	BuildViewMenu(menu, false);
+	fBar->AddItem(menu);		
+	MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
+	UpdateTitle();
+
+	SetPulseRate(100000);
+		// every 1/10 second; ShowImageView needs it for marching ants
+
+	WindowRedimension(fImageView->GetBitmap());
+	fImageView->MakeFocus(true); // to receive KeyDown messages
+	Show();
 
 	// Tell application object to query the clipboard
 	// and tell this window if it contains interesting data or not
@@ -201,9 +207,14 @@ ShowImageWindow::UpdateTitle()
 	SetTitle(path.String());
 }
 
+void 
+ShowImageWindow::BuildContextMenu(BMenu *menu)
+{
+	BuildViewMenu(menu, true);
+}
 
 void
-ShowImageWindow::BuildViewMenu(BMenu *menu)
+ShowImageWindow::BuildViewMenu(BMenu *menu, bool popupMenu)
 {
 	AddItemMenu(menu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, 'W', true);
 	MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
@@ -265,10 +276,11 @@ ShowImageWindow::BuildViewMenu(BMenu *menu)
 	EnableMenuItem(menu, MSG_ZOOM_IN, enabled);
 	EnableMenuItem(menu, MSG_ZOOM_OUT, enabled);
 	
-	menu->AddSeparatorItem();
+	if (popupMenu) {
+		menu->AddSeparatorItem();
 
-	AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0, 'W',
-		true);
+		AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0, 'W', true);
+	}
 }
 
 
@@ -332,7 +344,11 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	AddItemMenu(menu, "Flip Top To Bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, 'W', true);
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Invert", MSG_INVERT, 0, 0, 'W', true);
+	menu->AddSeparatorItem();
+	AddItemMenu(menu, "Resize " B_UTF8_ELLIPSIS, MSG_OPEN_RESIZER_WINDOW, 0, 0, 'W', true);
 	bar->AddItem(menu);
+	menu->AddSeparatorItem();
+	AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0, 'W', true);
 }
 
 
@@ -576,15 +592,21 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			EnableMenuItem(fBar, MSG_INVERT, (colors != B_CMAP8));
 				
 			BString status;
+			bool messageProvidesSize = false;
 			int32 width, height;
 			if (message->FindInt32("width", &width) >= B_OK
 				&& message->FindInt32("height", &height) >= B_OK) {
 				status << width << "x" << height << ", ";
+				messageProvidesSize = true;
 			}
 			
 			BString str;
 			if (message->FindString("status", &str) == B_OK) {
 				status << str;
+			}
+			
+			if (messageProvidesSize) {
+				UpdateResizerWindow(width, height);
 			}
 			
 			fStatusView->SetText(status);
@@ -796,6 +818,24 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			fImageView->SetScaleBilinear(ToggleMenuItem(message->what));
 			break;
 
+		case MSG_OPEN_RESIZER_WINDOW:
+			if (fImageView->GetBitmap() != NULL)
+			{
+				BRect rect = fImageView->GetBitmap()->Bounds();
+				OpenResizerWindow(rect.Width(), rect.Height());
+			}
+			break;
+		case MSG_RESIZE:
+		{
+			int w = message->FindInt32("w");
+			int h = message->FindInt32("h");
+			fImageView->ResizeImage(w, h);
+			break;
+		}	
+		case MSG_RESIZER_WINDOW_QUITED:
+			fResizerWindowMessenger = NULL;
+			break;
+		
 		case MSG_DESKTOP_BACKGROUND:
 		{
 			BPath path;
@@ -1098,7 +1138,43 @@ ShowImageWindow::Print(BMessage *msg)
 	}
 }
 
+void 
+ShowImageWindow::OpenResizerWindow(float width, float height)
+{
+	if (fResizerWindowMessenger == NULL) {
+		// open window if it is not already opened
+		BWindow* window = new ResizerWindow(this, width, height);
+		fResizerWindowMessenger = new BMessenger(window);
+		window->Show();
+	} else 
+		fResizerWindowMessenger->SendMessage(ResizerWindow::kActivateMsg);
+}
 
+void 
+ShowImageWindow::UpdateResizerWindow(float width, float height)
+{
+	if (fResizerWindowMessenger == NULL) {
+		// window not opened
+		return;
+	}
+	
+	BMessage updateMsg(ResizerWindow::kUpdateMsg);
+	updateMsg.AddFloat("width", width);
+	updateMsg.AddFloat("height", height);
+	fResizerWindowMessenger->SendMessage(&updateMsg);
+}
+
+void 
+ShowImageWindow::CloseResizerWindow()
+{
+	if (fResizerWindowMessenger == NULL) {
+		// window not opened
+		return;
+	}
+	fResizerWindowMessenger->SendMessage(B_QUIT_REQUESTED);
+	fResizerWindowMessenger = NULL;
+}
+		
 bool
 ShowImageWindow::QuitRequested()
 {
@@ -1110,6 +1186,8 @@ ShowImageWindow::QuitRequested()
 	bool quit = ClosePrompt();
 
 	if (quit) {
+		CloseResizerWindow();
+		
 		// tell the app to forget about this window
 		be_app->PostMessage(MSG_WINDOW_QUIT);
 	}
@@ -1118,10 +1196,4 @@ ShowImageWindow::QuitRequested()
 }
 
 
-void
-ShowImageWindow::Zoom(BPoint origin, float width, float height)
-{
-	// just go into fullscreen
-	ToggleFullScreen();
-}
 
