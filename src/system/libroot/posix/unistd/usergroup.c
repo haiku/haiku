@@ -1,14 +1,15 @@
-/* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include <unistd.h>
 #include <syscalls.h>
-#include <string.h>
-#include <stdio.h>
+
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 
 // ToDo: implement the user/group functions for real!
@@ -62,6 +63,9 @@ cuserid(char *s)
 int 
 setgid(gid_t gid)
 {
+	if (gid == 0)
+		return 0;
+
 	return EPERM;
 }
 
@@ -69,6 +73,9 @@ setgid(gid_t gid)
 int 
 setuid(uid_t uid)
 {
+	if (uid == 0)
+		return 0;
+
 	return EPERM;
 }
 
@@ -76,6 +83,9 @@ setuid(uid_t uid)
 int
 setegid(gid_t gid)
 {
+	if (gid == 0)
+		return 0;
+
 	return EPERM;
 }
 
@@ -83,6 +93,9 @@ setegid(gid_t gid)
 int
 seteuid(uid_t uid)
 {
+	if (uid == 0)
+		return 0;
+
 	return EPERM;
 }
 
