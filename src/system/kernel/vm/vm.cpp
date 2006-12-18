@@ -1385,6 +1385,13 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	if (area->id == RESERVED_AREA_ID)
 		return false;
 
+	addressSpace = area->address_space;
+
+	// grab a write lock on the address space around the removal of the area
+	// from the global hash table to avoid a race with vm_soft_fault()
+	if (!aspaceLocked)
+		acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
+
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0, 0);
 	if (atomic_add(&area->ref_count, -1) == 1) {
 		hash_remove(sAreaHash, area);
@@ -1392,10 +1399,22 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	}
 	release_sem_etc(sAreaHashLock, WRITE_COUNT, 0);
 
+	if (!aspaceLocked)
+		release_sem_etc(addressSpace->sem, WRITE_COUNT, 0);
+
 	if (!removeit)
 		return false;
 
-	addressSpace = area->address_space;
+	// at this point the area is removed from the global hash table, but still
+	// exists in the area list. it's ref_count is zero, and is guaranteed not to
+	// be incremented anymore (by a direct hash lookup, or vm_area_lookup()).
+
+	// unmap the virtual address space the area occupied. any page faults at this
+	// point should fail in vm_area_lookup().
+	vm_translation_map *map = &addressSpace->translation_map;
+	(*map->ops->lock)(map);
+	(*map->ops->unmap)(map, area->base, area->base + (area->size - 1));
+	(*map->ops->unlock)(map);
 
 	// ToDo: do that only for vnode stores
 	vm_cache_write_modified(area->cache_ref, false);
@@ -1405,11 +1424,6 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 
 	vm_cache_remove_area(area->cache_ref, area);
 	vm_cache_release_ref(area->cache_ref);
-
-	vm_translation_map *map = &addressSpace->translation_map;
-	(*map->ops->lock)(map);
-	(*map->ops->unmap)(map, area->base, area->base + (area->size - 1));
-	(*map->ops->unlock)(map);
 
 	// now we can give up the area's reference to the address space
 	vm_put_address_space(addressSpace);
@@ -2826,6 +2840,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 }
 
 
+/* NOTE: must have the address space's sem held */
 static vm_area *
 vm_area_lookup(vm_address_space *addressSpace, addr_t address)
 {
@@ -2834,7 +2849,7 @@ vm_area_lookup(vm_address_space *addressSpace, addr_t address)
 	// check the areas list first
 	area = addressSpace->area_hint;
 	if (area && area->base <= address && (area->base + area->size) > address)
-		return area;
+		goto found;
 
 	for (area = addressSpace->areas; area != NULL; area = area->address_space_next) {
 		if (area->id == RESERVED_AREA_ID)
@@ -2844,8 +2859,15 @@ vm_area_lookup(vm_address_space *addressSpace, addr_t address)
 			break;
 	}
 
+found:
+	// if the ref count is zero, the area is in the middle of being
+	// destroyed in _vm_put_area. pretend it doesn't exist.
+	if (area && area->ref_count == 0)
+		return NULL;
+
 	if (area)
 		addressSpace->area_hint = area;
+
 	return area;
 }
 
