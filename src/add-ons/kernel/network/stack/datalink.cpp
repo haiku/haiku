@@ -482,6 +482,17 @@ interface_protocol_send_data(net_datalink_protocol *_protocol,
 	net_buffer *buffer)
 {
 	interface_protocol *protocol = (interface_protocol *)_protocol;
+	net_interface_private *interface = (net_interface_private *)protocol->interface;
+
+	// feed device monitors
+	// TODO: locking!
+	DeviceMonitorList::Iterator iterator =
+		interface->device_interface->monitor_funcs.GetIterator();
+	while (iterator.HasNext()) {
+		net_device_monitor *monitor = iterator.Next();
+		monitor->func(monitor->cookie, buffer);
+	}
+
 	return protocol->device_module->send_data(protocol->device, buffer);
 }
 
