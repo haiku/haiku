@@ -321,11 +321,14 @@ duplicate_buffer(net_buffer *_buffer)
 
 	// copy meta data from source buffer
 
-	memcpy(&duplicate->source, &buffer->source, buffer->source.ss_len);
-	memcpy(&duplicate->destination, &buffer->destination, buffer->destination.ss_len);
+	memcpy(&duplicate->source, &buffer->source,
+		min_c(buffer->source.ss_len, sizeof(sockaddr_storage)));
+	memcpy(&duplicate->destination, &buffer->destination,
+		min_c(buffer->destination.ss_len, sizeof(sockaddr_storage)));
 
 	duplicate->flags = buffer->flags;
 	duplicate->interface = buffer->interface;
+	duplicate->offset = buffer->offset;
 	duplicate->size = buffer->size;
 	duplicate->protocol = buffer->protocol;
 
@@ -346,11 +349,12 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
+	TRACE(("clone_buffer(buffer %p)\n", buffer));
+
 	net_buffer_private *clone = (net_buffer_private *)malloc(sizeof(struct net_buffer_private));
 	if (clone == NULL)
 		return NULL;
 
-	data_node *node = &clone->first_node;
 	data_node *sourceNode = (data_node *)list_get_first_item(&buffer->buffers);
 	if (sourceNode == NULL) {
 		free(clone);
@@ -361,7 +365,8 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 	// grab reference to this buffer - all additional nodes will get
 	// theirs in add_data_node()
-	atomic_add(&sourceNode->header->ref_count, 1);
+	acquire_data_header(sourceNode->header);
+	data_node *node = &clone->first_node;
 	node->header = sourceNode->header;
 	node->located = NULL;
 
@@ -400,11 +405,14 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 	// copy meta data from source buffer
 
-	memcpy(&clone->source, &buffer->source, buffer->source.ss_len);
-	memcpy(&clone->destination, &buffer->destination, buffer->destination.ss_len);
+	memcpy(&clone->source, &buffer->source,
+		min_c(buffer->source.ss_len, sizeof(sockaddr_storage)));
+	memcpy(&clone->destination, &buffer->destination,
+		min_c(buffer->destination.ss_len, sizeof(sockaddr_storage)));
 
 	clone->flags = buffer->flags;
 	clone->interface = buffer->interface;
+	clone->offset = buffer->offset;
 	clone->size = buffer->size;
 	clone->protocol = buffer->protocol;
 
@@ -1058,7 +1066,7 @@ get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 	uint32 count = 0;
 
-	while (count < vecCount) {
+	while (node != NULL && count < vecCount) {
 		if (node->used > 0) {
 			iovecs[count].iov_base = node->start;
 			iovecs[count].iov_len = node->used;
@@ -1066,8 +1074,6 @@ get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
 		}
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			break;
 	}
 
 	return count;
@@ -1081,13 +1087,11 @@ count_iovecs(net_buffer *_buffer)
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 	uint32 count = 0;
 
-	while (true) {
+	while (node != NULL) {
 		if (node->used > 0)
 			count++;
 
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			break;
 	}
 
 	return count;
