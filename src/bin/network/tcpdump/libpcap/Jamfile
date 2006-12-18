@@ -1,0 +1,28 @@
+SubDir HAIKU_TOP src bin network tcpdump libpcap ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bpf net ] ;
+
+local defines = [ FDefines HAVE_CONFIG_H=1 _U_=\"__attribute__((unused))\" yylval=pcap_lval ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+StaticLibrary libpcap.a :
+	fad-gifc.c
+	pcap-haiku.cpp
+
+	bpf_filter.c
+	bpf_image.c
+	bpf_dump.c
+	etherent.c
+	gencode.c
+	grammar.y
+	inet.c
+	nametoaddr.c
+	optimize.c
+	pcap.c
+	savefile.c
+	scanner.l
+	version.c
+;
