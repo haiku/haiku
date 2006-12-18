@@ -54,12 +54,19 @@ POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 
 POP3Protocol::~POP3Protocol()
 {
+#ifdef USESSL
+	if(use_ssl && ssl)
+		SendCommand("QUIT" CRLF);
+#else
 	SendCommand("QUIT" CRLF);
+#endif
 
 #ifdef USESSL
-	if (use_ssl) {
-		SSL_shutdown(ssl);
-		SSL_CTX_free(ctx);
+	if(use_ssl) {
+		if(ssl)
+			SSL_shutdown(ssl);
+		if(ctx)
+			SSL_CTX_free(ctx);
 	}
 #endif
 
