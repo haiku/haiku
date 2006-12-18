@@ -1818,7 +1818,7 @@ dump_cache_ref(int argc, char **argv)
 		return 0;
 	}
 
-	address = atoul(argv[1]);
+	address = strtoul(argv[1], NULL, 0);
 	cache_ref = (vm_cache_ref *)address;
 
 	kprintf("cache_ref at %p:\n", cache_ref);
@@ -1880,7 +1880,7 @@ dump_cache(int argc, char **argv)
 		return 0;
 	}
 
-	address = atoul(argv[1]);
+	address = strtoul(argv[1], NULL, 0);
 	cache = (vm_cache *)address;
 
 	kprintf("cache at %p:\n", cache);
