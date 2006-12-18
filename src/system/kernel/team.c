@@ -84,6 +84,7 @@ _dump_team_info(struct team *team)
 	kprintf("TEAM: %p\n", team);
 	kprintf("id:          0x%lx\n", team->id);
 	kprintf("name:        '%s'\n", team->name);
+	kprintf("args:        '%s'\n", team->args);
 	kprintf("next:        %p\n", team->next);
 	kprintf("parent:      %p", team->parent);
 	if (team->parent != NULL) {
@@ -781,8 +782,25 @@ team_create_thread_start(void *args)
 
 	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
 
-	// TODO: add args
-	strlcpy(team->args, path, sizeof(team->args));
+	// add args to info member
+	sizeLeft = strlcpy(team->args, path, sizeof(team->args));
+	udest = team->args + sizeLeft;
+	sizeLeft = sizeof(team->args) - sizeLeft;
+
+	for (i = 1; i < argCount && sizeLeft > 2; i++) {
+		size_t length;
+
+		udest[0] = ' ';
+		udest++;
+		sizeLeft--;
+
+		length = strlcpy(udest, teamArgs->args[i], sizeLeft);
+		if (length >= sizeLeft)
+			break;
+
+		sizeLeft -= length;
+		udest += length;
+	}
 
 	free_team_arg(teamArgs);
 		// the arguments are already on the user stack, we no longer need them in this form
@@ -1456,6 +1474,36 @@ err:
 }
 
 
+/** Fills the team_info structure with information from the specified
+ *	team.
+ *	The team lock must be held when called.
+ */
+
+static status_t
+fill_team_info(struct team *team, team_info *info, size_t size)
+{
+	if (size != sizeof(team_info))
+		return B_BAD_VALUE;
+
+	// ToDo: Set more informations for team_info
+	memset(info, 0, size);
+
+	info->team = team->id;
+	info->thread_count = team->num_threads;
+	info->image_count = count_images(team);
+	//info->area_count = 
+	info->debugger_nub_thread = team->debug_info.nub_thread;
+	info->debugger_nub_port = team->debug_info.nub_port;
+	//info->uid = 
+	//info->gid = 
+
+	strlcpy(info->args, team->args, sizeof(info->args));
+	info->argc = 1;
+
+	return B_OK;
+}
+
+
 //	#pragma mark - Private kernel API
 
 
@@ -1956,36 +2004,6 @@ kill_team(team_id id)
 	// just kill the main thread in the team. The cleanup code there will
 	// take care of the team
 	return kill_thread(tid);
-}
-
-
-/** Fills the team_info structure with information from the specified
- *	team.
- *	The team lock must be held when called.
- */
-
-static status_t
-fill_team_info(struct team *team, team_info *info, size_t size)
-{
-	if (size != sizeof(team_info))
-		return B_BAD_VALUE;
-
-	// ToDo: Set more informations for team_info
-	memset(info, 0, size);
-
-	info->team = team->id;
-	info->thread_count = team->num_threads;
-	info->image_count = count_images(team);
-	//info->area_count = 
-	info->debugger_nub_thread = team->debug_info.nub_thread;
-	info->debugger_nub_port = team->debug_info.nub_port;
-	//info->uid = 
-	//info->gid = 
-
-	strlcpy(info->args, team->args, sizeof(info->args));
-	info->argc = 1;
-
-	return B_OK;
 }
 
 
