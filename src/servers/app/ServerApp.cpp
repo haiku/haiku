@@ -53,6 +53,7 @@
 #include <ServerProtocol.h>
 #include <WindowPrivate.h>
 
+#include <new>
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
@@ -1346,6 +1347,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 lengthArray[numStrings];
 			char *stringArray[numStrings];
 			for (int32 i = 0; i < numStrings; i++) {
+// TODO: who allocates the strings?!? If the link does it then we are leaking
+// everywhere else!!
 				link.ReadString(&stringArray[i], (size_t *)&lengthArray[i]);
 			}
 
@@ -1504,6 +1507,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 3) float - point size
 			// 4) float - shear
 			// 5) float - rotation
+			// 6) float - false bold width
 			// 6) uint32 - flags
 			// 7) int32 - numChars
 			// 8) int32 - numBytes
@@ -1515,20 +1519,21 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint16 familyID, styleID;
 			uint32 flags;
-			float size, shear, rotation;
+			float size, shear, rotation, falseBoldWidth;
 
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 			link.Read<float>(&size);
 			link.Read<float>(&shear);
 			link.Read<float>(&rotation);
+			link.Read<float>(&falseBoldWidth);
 			link.Read<uint32>(&flags);
 
 			int32 numChars, numBytes;
 			link.Read<int32>(&numChars);
 			link.Read<int32>(&numBytes);
 
-			char *charArray = new char[numBytes];
+			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
 			ServerFont font;
@@ -1537,9 +1542,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetSize(size);
 				font.SetShear(shear);
 				font.SetRotation(rotation);
+				font.SetFalseBoldWidth(falseBoldWidth);
 				font.SetFlags(flags);
 
-				BShape **shapes = new BShape *[numChars];
+				BShape** shapes = new (nothrow) BShape*[numChars];
 				status = font.GetGlyphShapes(charArray, numChars, shapes);
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
@@ -1547,10 +1553,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 						fLink.AttachShape(*shapes[i]);
 						delete shapes[i];
 					}
-
-					delete[] shapes;
 				} else
 					fLink.StartMessage(status);
+
+				delete[] shapes;
 			} else
 				fLink.StartMessage(status);
 
@@ -1575,7 +1581,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 numChars, numBytes;
 			link.Read<int32>(&numChars);
 			link.Read<int32>(&numBytes);
-			char* charArray = new char[numBytes];
+			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
 			ServerFont font;
@@ -1614,7 +1620,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
-			char* charArray = new char[numBytes];
+			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
 			ServerFont font;
@@ -1676,7 +1682,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
-			char *charArray = new char[numBytes];
+			char *charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
 			ServerFont font;
@@ -1687,10 +1693,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				BPoint *escapements = new BPoint[numChars];
+				BPoint *escapements = new (nothrow) BPoint[numChars];
 				BPoint *offsets = NULL;
 				if (wantsOffsets)
-					offsets = new BPoint[numChars];
+					offsets = new (nothrow) BPoint[numChars];
 
 				status = font.GetEscapements(charArray, numChars, delta,
 					escapements, offsets);
@@ -1700,16 +1706,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					for (int32 i = 0; i < numChars; i++)
 						fLink.Attach<BPoint>(escapements[i]);
 
-					delete[] escapements;
-
 					if (wantsOffsets) {
 						for (int32 i = 0; i < numChars; i++)
 							fLink.Attach<BPoint>(offsets[i]);
-
-						delete[] offsets;
 					}
 				} else
 					fLink.StartMessage(status);
+
+				delete[] escapements;
+				delete[] offsets;
+
 			} else
 				fLink.StartMessage(status);
 
@@ -1759,10 +1765,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
-			char* charArray = new char[numBytes];
+			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
-			float* escapements = new float[numChars];
+			float* escapements = new (nothrow) float[numChars];
 
 			// figure out escapements
 
@@ -1801,24 +1807,25 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 3) float - point size
 			// 4) float - rotation
 			// 5) float - shear
-			// 6) uint8 - spacing
-			// 7) uint32 - flags
+			// 6) float - false bold width
+			// 7) uint8 - spacing
+			// 8) uint32 - flags
 			
-			// 8) font_metric_mode - mode
-			// 9) bool - string escapement
+			// 9) font_metric_mode - mode
+			// 10) bool - string escapement
 
-			// 10) escapement_delta - additional delta
+			// 11) escapement_delta - additional delta
 
-			// 11) int32 - numChars
-			// 12) int32 - numBytes
-			// 13) char - the char buffer with size numBytes
+			// 12) int32 - numChars
+			// 13) int32 - numBytes
+			// 14) char - the char buffer with size numBytes
 
 			// Returns:
 			// 1) BRect - rects with numChar entries
 			
 			uint16 famid, styid;
 			uint32 flags;
-			float ptsize, rotation, shear;
+			float ptsize, rotation, shear, falseBoldWidth;
 			uint8 spacing;
 			font_metric_mode mode;
 			bool string_escapement;
@@ -1828,6 +1835,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
 			link.Read<float>(&shear);
+			link.Read<float>(&falseBoldWidth);
 			link.Read<uint8>(&spacing);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
@@ -1842,7 +1850,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
 
-			char *charArray = new char[numBytes];
+			char *charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
 			BRect rectArray[numChars];
@@ -1854,6 +1862,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
 				font.SetShear(shear);
+				font.SetFalseBoldWidth(falseBoldWidth);
 				font.SetSpacing(spacing);
 				font.SetFlags(flags);
 
@@ -1882,22 +1891,23 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 3) float - point size
 			// 4) float - rotation
 			// 5) float - shear
-			// 6) uint8 - spacing
-			// 7) uint32 - flags
+			// 6) float - false bold width
+			// 7) uint8 - spacing
+			// 8) uint32 - flags
 			
-			// 8) font_metric_mode - mode
-			// 9) int32 numStrings
+			// 9) font_metric_mode - mode
+			// 10) int32 numStrings
 
-			// 10) escapement_delta - additional delta (numStrings times)
-			// 11) int32 string length to measure (numStrings times)
-			// 12) string - string (numStrings times)
+			// 11) escapement_delta - additional delta (numStrings times)
+			// 12) int32 string length to measure (numStrings times)
+			// 13) string - string (numStrings times)
 
 			// Returns:
 			// 1) BRect - rects with numStrings entries
 			
 			uint16 famid, styid;
 			uint32 flags;
-			float ptsize, rotation, shear;
+			float ptsize, rotation, shear, falseBoldWidth;
 			uint8 spacing;
 			font_metric_mode mode;
 			
@@ -1906,6 +1916,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
 			link.Read<float>(&shear);
+			link.Read<float>(&falseBoldWidth);
 			link.Read<uint8>(&spacing);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
@@ -1930,6 +1941,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
 				font.SetShear(shear);
+				font.SetFalseBoldWidth(falseBoldWidth);
 				font.SetSpacing(spacing);
 				font.SetFlags(flags);
 
@@ -2456,11 +2468,11 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 		ServerBitmap* bitmap = FindBitmap(bitmapToken);
 
 		if (bitmap != NULL) {
-			window = new OffscreenServerWindow(title, this, clientReplyPort,
+			window = new (nothrow) OffscreenServerWindow(title, this, clientReplyPort,
 				looperPort, token, bitmap);
 		}
 	} else {
-		window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
+		window = new (nothrow) ServerWindow(title, this, clientReplyPort, looperPort, token);
 		STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",
 			Signature(), title, frame.left, frame.top,
 			frame.right, frame.bottom));

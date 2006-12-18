@@ -158,6 +158,12 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 		fFont.SetRotation(rotation);
 	}
 
+	if (mask & B_FONT_FALSE_BOLD_WIDTH) {
+		float falseBoldWidth;
+		link.Read<float>(&falseBoldWidth);
+		fFont.SetFalseBoldWidth(falseBoldWidth);
+	}
+
 	if (mask & B_FONT_SPACING) {
 		uint8 spacing;
 		link.Read<uint8>(&spacing);
@@ -237,6 +243,7 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	link.Attach<float>(fFont.Size());
 	link.Attach<float>(fFont.Shear());
 	link.Attach<float>(fFont.Rotation());
+	link.Attach<float>(fFont.FalseBoldWidth());
 	link.Attach<uint8>(fFont.Spacing());
 	link.Attach<uint8>(fFont.Encoding());
 	link.Attach<uint16>(fFont.Face());

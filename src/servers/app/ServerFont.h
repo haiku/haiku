@@ -25,8 +25,9 @@ class ServerFont {
 								ServerFont();
 								ServerFont(FontStyle& style,
 										   float size = 12.0,
-										   float fRotation = 0.0,
-										   float fShear = 90.0,
+										   float rotation = 0.0,
+										   float shear = 90.0,
+										   float falseBoldWidth = 0.0,
 										   uint16 flags = 0,
 										   uint8 spacing = B_CHAR_SPACING);
 								ServerFont(const ServerFont& font);
@@ -48,6 +49,8 @@ class ServerFont {
 									{ return fShear; }
 			float				Rotation() const
 									{ return fRotation; }
+			float				FalseBoldWidth() const
+									{ return fFalseBoldWidth; }
 			float				Size() const
 									{ return fSize; }
 			uint16				Face() const
@@ -90,6 +93,8 @@ class ServerFont {
 									{ fSize = value; }
 			void				SetRotation(float value)
 									{ fRotation = value; }
+			void				SetFalseBoldWidth(float value)
+									{ fFalseBoldWidth = value; }
 			void				SetFace(uint32 face);
 
 			bool				IsFixedWidth() const
@@ -162,6 +167,7 @@ protected:
 			float				fSize;
 			float				fRotation;
 			float				fShear;
+			float				fFalseBoldWidth;
 			BRect				fBounds;
 			uint32				fFlags;
 			uint32				fSpacing;

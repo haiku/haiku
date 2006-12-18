@@ -153,6 +153,7 @@ class BFont {
 		void			SetSize(float size);
 		void			SetShear(float shear);
 		void			SetRotation(float rotation);
+		void			SetFalseBoldWidth(float width);
 		void			SetSpacing(uint8 spacing);
 		void			SetEncoding(uint8 encoding);
 		void			SetFace(uint16 face);
@@ -164,6 +165,7 @@ class BFont {
 		float			Size() const;
 		float			Shear() const;
 		float			Rotation() const;
+		float			FalseBoldWidth() const;
 		uint8			Spacing() const;
 		uint8			Encoding() const;
 		uint16			Face() const;
@@ -239,13 +241,14 @@ class BFont {
 		float			fSize;
 		float			fShear;
 		float			fRotation;
+		float			fFalseBoldWidth;
 		uint8			fSpacing;
 		uint8			fEncoding;
 		uint16			fFace;
 		uint32			fFlags;
 		mutable font_height	fHeight;
 		mutable uint32	fExtraFlags;
-		uint32			_reserved[2];
+		uint32			_reserved[1];
 
 		void			_GetExtraFlags() const;
 		void			_GetBoundingBoxes(const char charArray[], 

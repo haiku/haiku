@@ -158,14 +158,10 @@ ViewState::UpdateServerFontState(BPrivate::PortLink &link)
 {
 	link.StartMessage(AS_LAYER_SET_FONT_STATE);
 	link.Attach<uint16>(font_flags);
+		// always present
 
-	// always present.
-	if (font_flags & B_FONT_FAMILY_AND_STYLE) {
-		uint32 fontID;
-		fontID = font.FamilyAndStyle();
-
-		link.Attach<uint32>(fontID);
-	}
+	if (font_flags & B_FONT_FAMILY_AND_STYLE)
+		link.Attach<uint32>(font.FamilyAndStyle());
 
 	if (font_flags & B_FONT_SIZE)
 		link.Attach<float>(font.Size());
@@ -175,6 +171,9 @@ ViewState::UpdateServerFontState(BPrivate::PortLink &link)
 
 	if (font_flags & B_FONT_ROTATION)
 		link.Attach<float>(font.Rotation());
+
+	if (font_flags & B_FONT_FALSE_BOLD_WIDTH)
+		link.Attach<float>(font.FalseBoldWidth());
 
 	if (font_flags & B_FONT_SPACING)
 		link.Attach<uint8>(font.Spacing());
@@ -244,6 +243,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	float size;
 	float shear;
 	float rotation;
+	float falseBoldeWidth;
 	uint8 spacing;
 	uint8 encoding;
 	uint16 face;
@@ -254,6 +254,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	link.Read<float>(&size);
 	link.Read<float>(&shear);
 	link.Read<float>(&rotation);
+	link.Read<float>(&falseBoldeWidth);
 	link.Read<int8>((int8 *)&spacing);
 	link.Read<int8>((int8 *)&encoding);
 	link.Read<int16>((int16 *)&face);
@@ -264,6 +265,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	font.SetSize(size);
 	font.SetShear(shear);
 	font.SetRotation(rotation);
+	font.SetFalseBoldWidth(falseBoldeWidth);
 	font.SetSpacing(spacing);
 	font.SetEncoding(encoding);
 	font.SetFace(face);
@@ -2102,6 +2104,9 @@ BView::SetFont(const BFont* font, uint32 mask)
 		if (mask & B_FONT_ROTATION)
 			fState->font.SetRotation(font->Rotation());		
 
+		if (mask & B_FONT_FALSE_BOLD_WIDTH)
+			fState->font.SetFalseBoldWidth(font->FalseBoldWidth());		
+
 		if (mask & B_FONT_SPACING)
 			fState->font.SetSpacing(font->Spacing());
 
@@ -2115,7 +2120,7 @@ BView::SetFont(const BFont* font, uint32 mask)
 			fState->font.SetFlags(font->Flags());
 	}
 
-	fState->font_flags = mask;
+	fState->font_flags |= mask;
 
 	if (fOwner) {
 		check_lock();

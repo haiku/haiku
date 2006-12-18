@@ -6,6 +6,7 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -508,6 +509,7 @@ BFont::BFont()
 	fSize(10.0),
 	fShear(90.0),
 	fRotation(0.0),
+	fFalseBoldWidth(0.0),
 	fSpacing(0),
 	fEncoding(0),
 	fFace(0),
@@ -583,10 +585,11 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 void
 BFont::SetFamilyAndStyle(uint32 fontcode)
 {
-	// R5 has a bug here: the face is not updated even though the IDs are set. This
-	// is a problem because the face flag includes Regular/Bold/Italic information in
-	// addition to stuff like underlining and strikethrough. As a result, this will
-	// need a trip to the server and, thus, be slower than R5's in order to be correct
+	// R5 has a bug here: the face is not updated even though the IDs are set.
+	// This is a problem because the face flag includes Regular/Bold/Italic
+	// information in addition to stuff like underlining and strikethrough.
+	// As a result, this will need a trip to the server and, thus, be slower
+	// than R5's in order to be correct
 
 	uint16 family, style;
 	style = fontcode & 0xFFFF;
@@ -618,9 +621,10 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	\param face Font face to set.
 	\return B_ERROR if family does not exists or face is an invalid value.
 	
-	To comply with the BeBook, this function will only set valid values - i.e. passing a 
-	nonexistent family will cause only the face to be set. Additionally, if a particular 
-	face does not exist in a family, the closest match will be chosen.
+	To comply with the BeBook, this function will only set valid values - i.e.
+	passing a nonexistent family will cause only the face to be set.
+	Additionally, if a particular  face does not exist in a family, the closest
+	match will be chosen.
 */
 
 status_t
@@ -669,6 +673,13 @@ BFont::SetRotation(float rotation)
 {
 	fRotation = rotation;
 	fHeight.ascent = kUninitializedAscent;
+}
+
+
+void
+BFont::SetFalseBoldWidth(float width)
+{
+	fFalseBoldWidth = width;
 }
 
 
@@ -766,6 +777,13 @@ BFont::Rotation() const
 }
 
 
+float
+BFont::FalseBoldWidth() const
+{
+	return fFalseBoldWidth;
+}
+
+
 uint8
 BFont::Spacing() const
 {
@@ -811,10 +829,11 @@ BFont::IsFixed() const
 
 
 /*!
-	\brief Returns true if the font is fixed-width and contains both full and half-width characters
+	\brief Returns true if the font is fixed-width and contains both full
+		   and half-width characters
 	
-	This was left unimplemented as of R5. It was a way to work with both Kanji and Roman 
-	characters in the same fixed-width font.
+	This was left unimplemented as of R5. It was a way to work with both
+	Kanji and Roman characters in the same fixed-width font.
 */
 
 bool
@@ -918,7 +937,8 @@ void
 BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 {
 	// NOTE: Careful, we cannot directly use "inOut->String()" as result
-	// array, because the string length increases by 3 bytes in the worst case scenario.
+	// array, because the string length increases by 3 bytes in the worst
+	// case scenario.
 	const char *string = inOut->String();
 	GetTruncatedStrings(&string, 1, mode, width, inOut);
 }
@@ -935,7 +955,8 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 			truncatedStrings[i] = new char[strlen(stringArray[i]) + 3];
 		}
 
-		GetTruncatedStrings(stringArray, numStrings, mode, width, truncatedStrings);
+		GetTruncatedStrings(stringArray, numStrings, mode, width,
+			truncatedStrings);
 
 		// copy the strings into the BString array and free each one
 		for (int32 i = 0; i < numStrings; i++) {
@@ -963,7 +984,8 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 			GetEscapements(stringArray[i], numChars, NULL, escapementArray);
 
 			truncate_string(stringArray[i], mode, width, resultArray[i],
-							escapementArray, fSize, ellipsisWidth, length, numChars);
+							escapementArray, fSize, ellipsisWidth, length,
+							numChars);
 
 			delete[] escapementArray;
 		}
@@ -1199,6 +1221,7 @@ BFont::_GetBoundingBoxes(const char charArray[], int32 numChars, font_metric_mod
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
 	link.Attach<float>(fShear);
+	link.Attach<float>(fFalseBoldWidth);
 	link.Attach<uint8>(fSpacing);
 	
 	link.Attach<uint32>(fFlags);
@@ -1241,6 +1264,7 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
 	link.Attach<float>(fShear);
+	link.Attach<float>(fFalseBoldWidth);
 	link.Attach<uint8>(fSpacing);
 	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
@@ -1284,6 +1308,7 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	link.Attach<float>(fSize);
 	link.Attach<float>(fShear);
 	link.Attach<float>(fRotation);
+	link.Attach<float>(fFalseBoldWidth);
 	link.Attach<uint32>(fFlags);
 	link.Attach<int32>(numChars);
 
@@ -1334,6 +1359,7 @@ BFont::operator=(const BFont &font)
 	fSize = font.fSize;
 	fShear = font.fShear;
 	fRotation = font.fRotation;
+	fFalseBoldWidth = font.fFalseBoldWidth;
 	fSpacing = font.fSpacing;
 	fEncoding = font.fEncoding;
 	fFace = font.fFace;
@@ -1351,6 +1377,7 @@ BFont::operator==(const BFont &font) const
 		&& fSize == font.fSize
 		&& fShear == font.fShear
 		&& fRotation == font.fRotation
+		&& fFalseBoldWidth == font.fFalseBoldWidth
 		&& fSpacing == font.fSpacing
 		&& fEncoding == font.fEncoding
 		&& fFace == font.fFace;
@@ -1365,6 +1392,7 @@ BFont::operator!=(const BFont &font) const
 		|| fSize != font.fSize
 		|| fShear != font.fShear
 		|| fRotation != font.fRotation
+		|| fFalseBoldWidth != font.fFalseBoldWidth
 		|| fSpacing != font.fSpacing
 		|| fEncoding != font.fEncoding
 		|| fFace != font.fFace;

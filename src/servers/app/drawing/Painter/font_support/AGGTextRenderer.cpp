@@ -120,11 +120,14 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 		-font.Rotation() * PI / 180.0);
 
 	agg::glyph_rendering glyphType =
-		fHinted && fEmbeddedTransformation.IsIdentity() ?
+		fHinted && fEmbeddedTransformation.IsIdentity()
+		&& font.FalseBoldWidth() == 0.0 ?
 			agg::glyph_ren_native_gray8 :
 			agg::glyph_ren_outline;
 
 	fFontEngine.load_font(font, glyphType, font.Size());
+
+	fContour.width(font.FalseBoldWidth() * 2.0);
 
 	return true;
 }
@@ -187,6 +190,11 @@ AGGTextRenderer::RenderString(const char* string,
 	typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>
 		conv_font_trans_type;
 	conv_font_trans_type transformedOutline(fCurves, transform);
+
+	typedef agg::conv_transform<conv_font_contour_type, agg::trans_affine>
+		conv_font_contour_trans_type;
+	conv_font_contour_trans_type transformedContourOutline(fContour, transform);
+	float falseBoldWidth = fContour.width();
 
 	double x  = 0.0;
 	double y0 = 0.0;
@@ -267,6 +275,8 @@ AGGTextRenderer::RenderString(const char* string,
 				glyphBounds.OffsetBy(transformOffset);
 			} else {
 				fFontCache.init_embedded_adaptors(glyph, x, y);
+				if (falseBoldWidth != 0.0)
+					glyphBounds.InsetBy(-falseBoldWidth, -falseBoldWidth);
 				glyphBounds = transform.TransformBounds(glyphBounds);
 			}
 
@@ -284,16 +294,13 @@ AGGTextRenderer::RenderString(const char* string,
 
 					case agg::glyph_data_outline: {
 						fRasterizer.reset();
-						// NOTE: this function can be easily extended to handle
-						// conversion to contours, so that's why there is a lot of
-						// commented out code, I leave it here because I think it
-						// will be needed again.
 
-						//if(fabs(0.0) <= 0.01) {
-							// For the sake of efficiency skip the
-							// contour converter if the weight is about zero.
-
+						if (fContour.width() == 0.0) {
 							fRasterizer.add_path(transformedOutline);
+						} else {
+							fRasterizer.add_path(transformedContourOutline);
+						}
+
 #if SHOW_GLYPH_BOUNDS
 	agg::path_storage p;
 	p.move_to(glyphBounds.left + 0.5, glyphBounds.top + 0.5);
@@ -305,10 +312,6 @@ AGGTextRenderer::RenderString(const char* string,
 	ps.width(1.0);
 	fRasterizer.add_path(ps);
 #endif
-						/*} else {
-							//fRasterizer.add_path(fContour);
-							fRasterizer.add_path(transformedOutline);
-						}*/
 
 						agg::render_scanlines(fRasterizer, fScanline, *solidRenderer);
 						break;

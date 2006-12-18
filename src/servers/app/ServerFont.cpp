@@ -113,12 +113,13 @@ is_white_space(uint32 charCode)
 	\param spacing String spacing flag as defined in <Font.h>
 */
 ServerFont::ServerFont(FontStyle& style, float size,
-					   float rotation, float shear,
+					   float rotation, float shear, float falseBoldWidth,
 					   uint16 flags, uint8 spacing)
 	: fStyle(&style),
 	  fSize(size),
 	  fRotation(rotation),
 	  fShear(shear),
+	  fFalseBoldWidth(falseBoldWidth),
 	  fBounds(0, 0, 0, 0),
 	  fFlags(flags),
 	  fSpacing(spacing),
@@ -168,13 +169,14 @@ ServerFont&
 ServerFont::operator=(const ServerFont& font)
 {
 	if (font.fStyle) {
-		fSize		= font.fSize;
-		fRotation	= font.fRotation;
-		fShear		= font.fShear;
-		fFlags		= font.fFlags;
-		fSpacing	= font.fSpacing;
-		fEncoding	= font.fEncoding;
-		fBounds		= font.fBounds;
+		fSize = font.fSize;
+		fRotation = font.fRotation;
+		fShear = font.fShear;
+		fFalseBoldWidth = font.fFalseBoldWidth;
+		fFlags = font.fFlags;
+		fSpacing = font.fSpacing;
+		fEncoding = font.fEncoding;
+		fBounds = font.fBounds;
 	
 		SetStyle(font.fStyle);
 	}
