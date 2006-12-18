@@ -39,15 +39,15 @@ typedef uint32_t in_addr_t;
 
 /* Protocol definitions - add to as required... */
 enum {
-	IPPROTO_IP      =   0,	/* 0, IPv4 */
-	IPPROTO_ICMP    =   1,	/* 1, ICMP (v4) */
-	IPPROTO_IGMP    =   2,	/* 2, IGMP (group management) */
-	IPPROTO_TCP	    =   6,	/* 6, tcp */
-	IPPROTO_UDP	    =  17,	/* 17, UDP */
-	IPPROTO_IPV6    =  41,   /* 41, IPv6 in IPv6 */
-	IPPROTO_ROUTING =  43,	/* 43, Routing */
-	IPPROTO_ICMPV6  =  58,	/* 58, IPv6 ICMP */
-	IPPROTO_ETHERIP =  97,	/* 97, Ethernet in IPv4 */
+	IPPROTO_IP      = 0,	/* 0, IPv4 */
+	IPPROTO_ICMP    = 1,	/* 1, ICMP (v4) */
+	IPPROTO_IGMP    = 2,	/* 2, IGMP (group management) */
+	IPPROTO_TCP	    = 6,	/* 6, tcp */
+	IPPROTO_UDP	    = 17,	/* 17, UDP */
+	IPPROTO_IPV6    = 41,   /* 41, IPv6 in IPv6 */
+	IPPROTO_ROUTING = 43,	/* 43, Routing */
+	IPPROTO_ICMPV6  = 58,	/* 58, IPv6 ICMP */
+	IPPROTO_ETHERIP = 97,	/* 97, Ethernet in IPv4 */
 	IPPROTO_RAW	    = 255    /* 255 */
 };
 
@@ -155,19 +155,8 @@ struct sockaddr_in {
 #define satosin(sa)     ((struct sockaddr_in *)(sa))
 #define sintosa(sin)    ((struct sockaddr *)(sin))
 
-struct ifnet;	// forward declaration
-
-/* Prototypes... */
-int    in_broadcast  (struct in_addr, struct ifnet *); 
-int    in_canforward (struct in_addr);
-int    in_localaddr  (struct in_addr);
-void   in_socktrim   (struct sockaddr_in*);
-/*  uint16 in_cksum      (struct mbuf *, int); */
-struct mbuf;
-uint16_t in_cksum(struct mbuf *m, int len, int off);
-  
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif
 
 #endif /* NETINET_IN_H */
