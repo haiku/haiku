@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,7 +10,7 @@
 #include "utility.h"
 
 
-#define TRACE_MODE
+//#define TRACE_MODE
 #ifdef TRACE_MODE
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
