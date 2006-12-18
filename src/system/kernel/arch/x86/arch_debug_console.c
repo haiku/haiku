@@ -97,6 +97,7 @@ static bool sKeyboardHandlerInstalled = false;
 static bool sBochsOutput = false;
 #endif
 
+static spinlock sSerialOutputSpinlock = 0;
 
 static void
 put_char(const char c)
@@ -280,8 +281,8 @@ arch_debug_serial_getchar(void)
 }
 
 
-void
-arch_debug_serial_putchar(const char c)
+static void
+_arch_debug_serial_putchar(const char c)
 {
 	if (c == '\n') {
 		put_char('\r');
@@ -290,14 +291,32 @@ arch_debug_serial_putchar(const char c)
 		put_char(c);
 }
 
+void
+arch_debug_serial_putchar(const char c)
+{
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sSerialOutputSpinlock);
+
+	_arch_debug_serial_putchar(c);
+
+	release_spinlock(&sSerialOutputSpinlock);
+	restore_interrupts(state);
+}
+
 
 void
 arch_debug_serial_puts(const char *s)
 {
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sSerialOutputSpinlock);
+
 	while (*s != '\0') {
-		arch_debug_serial_putchar(*s);
+		_arch_debug_serial_putchar(*s);
 		s++;
 	}
+
+	release_spinlock(&sSerialOutputSpinlock);
+	restore_interrupts(state);
 }
 
 
