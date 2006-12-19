@@ -8,6 +8,7 @@
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
  *		Michael Pfeiffer
+ *		Ryan Leavengood
  *		yellowTAB GmbH
  *		Bernd Korz
  */
@@ -42,9 +43,16 @@
 #include <SupportDefs.h>
 #include <TranslatorRoster.h>
 
+#include <tracker_private.h>
+
 #include <math.h>
 #include <new>
 #include <stdio.h>
+
+// TODO: Remove this and use Tracker's Command.h once it is moved into the private headers
+namespace BPrivate {
+	const uint32 kMoveToTrash = 'Ttrs';
+}
 
 using std::nothrow;
 
@@ -1599,8 +1607,22 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 			ClearSelection();
 			break;
 		case B_DELETE:
-			// TODO: move image to Trash (script Tracker)
+		{
+			// Move image to Trash
+			BMessage trash(BPrivate::kMoveToTrash);
+			trash.AddRef("refs", &fCurrentRef);
+			// We create our own messenger because the member fTrackerMessenger
+			// could be invalid
+			BMessenger tracker(kTrackerSignature);
+			if (tracker.SendMessage(&trash) == B_OK)
+				if (!NextFile()) {
+					// This is the last (or only file) in this directory, 
+					// close the window
+					BMessenger msgr(Window());
+					msgr.SendMessage(B_QUIT_REQUESTED);
+				}
 			break;
+		}
 		case '+':
 		case '=':
 			ZoomIn();
