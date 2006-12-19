@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src bin network ;
 SubInclude HAIKU_TOP src bin network arp ;
 SubInclude HAIKU_TOP src bin network ftp ;
 SubInclude HAIKU_TOP src bin network ifconfig ;
+SubInclude HAIKU_TOP src bin network netstat ;
 #SubInclude HAIKU_TOP src bin network pppconfig ;
 #SubInclude HAIKU_TOP src bin network ppp_up ;
 SubInclude HAIKU_TOP src bin network ping ;

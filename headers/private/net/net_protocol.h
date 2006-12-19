@@ -11,10 +11,10 @@
 
 
 // level flags to pass to control()
-#define LEVEL_SET_OPTION	0x10000000
-#define LEVEL_GET_OPTION	0x20000000
-#define LEVEL_DRIVER_IOCTL	0x0f000000
-#define LEVEL_MASK			0x0fffffff
+#define LEVEL_SET_OPTION		0x10000000
+#define LEVEL_GET_OPTION		0x20000000
+#define LEVEL_DRIVER_IOCTL		0x0f000000
+#define LEVEL_MASK				0x0fffffff
 
 typedef struct net_protocol {
 	struct net_protocol				*next;

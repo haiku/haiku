@@ -68,6 +68,8 @@ struct net_socket_module_info {
 	status_t	(*receive_data)(net_socket *socket, size_t length, uint32 flags,
 					net_buffer **_buffer);
 
+	status_t	(*get_next_stat)(uint32 *cookie, int family, struct net_stat *stat);
+
 	// connections
 	status_t	(*spawn_pending_socket)(net_socket *parent, net_socket **_socket);
 	void		(*delete_socket)(net_socket *socket);

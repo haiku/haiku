@@ -12,6 +12,7 @@
 #include "TCPEndpoint.h"
 
 #include <net_protocol.h>
+#include <net_stat.h>
 
 #include <KernelExport.h>
 #include <util/list.h>
@@ -259,6 +260,43 @@ reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
 }
 
 
+static const char *
+name_for_state(tcp_state state)
+{
+	switch (state) {
+		case CLOSED:
+			return "closed";
+		case LISTEN:
+			return "listen";
+		case SYNCHRONIZE_SENT:
+			return "syn-sent";
+		case SYNCHRONIZE_RECEIVED:
+			return "syn-received";
+		case ESTABLISHED:
+			return "established";
+
+		// peer closes the connection
+		case FINISH_RECEIVED:
+			return "close-wait";
+		case WAIT_FOR_FINISH_ACKNOWLEDGE:
+			return "last-ack";
+
+		// we close the connection
+		case FINISH_SENT:
+			return "fin-wait1";
+		case FINISH_ACKNOWLEDGED:
+			return "fin-wait2";
+		case CLOSING:
+			return "closing";
+
+		case TIME_WAIT:
+			return "time-wait";
+	}
+	
+	return "-";
+}
+
+
 //	#pragma mark - protocol API
 
 
@@ -328,11 +366,29 @@ tcp_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
 
 
 status_t
-tcp_control(net_protocol *protocol, int level, int option, void *value,
+tcp_control(net_protocol *_protocol, int level, int option, void *value,
 	size_t *_length)
 {
-	return protocol->next->module->control(protocol->next, level, option,
-		value, _length);
+	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
+
+	switch (level & LEVEL_MASK) {
+		case IPPROTO_TCP:
+			if (option == NET_STAT_SOCKET) {
+				net_stat *stat = (net_stat *)value;
+				strlcpy(stat->state, name_for_state(protocol->State()),
+					sizeof(stat->state));
+				return B_OK;
+			}
+			break;
+		case SOL_SOCKET:
+			break;
+
+		default:
+			return protocol->next->module->control(protocol->next, level, option,
+				value, _length);
+	}
+
+	return B_BAD_VALUE;
 }
 
 

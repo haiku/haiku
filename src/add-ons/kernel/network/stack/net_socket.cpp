@@ -11,6 +11,7 @@
 
 #include <net_protocol.h>
 #include <net_stack.h>
+#include <net_stat.h>
 
 #include <KernelExport.h>
 #include <util/AutoLock.h>
@@ -25,6 +26,9 @@
 
 void socket_delete(net_socket *socket);
 int socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength);
+
+struct list sSocketList;
+benaphore sSocketLock;
 
 
 static status_t
@@ -85,6 +89,10 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 		socket_delete(socket);
 		return status;
 	}
+
+	benaphore_lock(&sSocketLock);
+	list_add_item(&sSocketList, socket);
+	benaphore_unlock(&sSocketLock);
 
 	*_socket = socket;
 	return B_OK;
@@ -209,6 +217,45 @@ socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 }
 
 
+status_t
+socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
+{
+	BenaphoreLocker locker(sSocketLock);
+
+	net_socket *socket = NULL;
+	uint32 cookie = *_cookie;
+	uint32 count = 0;
+	while ((socket = (net_socket *)list_get_next_item(&sSocketList, socket)) != NULL) {
+		if (count == cookie)
+			break;
+
+		if (family == -1 || family == socket->family)
+			count++;
+	}
+
+	if (socket == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	*_cookie = count + 1;
+
+	stat->family = socket->family;
+	stat->type = socket->type;
+	stat->protocol = socket->protocol;
+	stat->owner = -1;
+
+	stat->state[0] = '\0';
+	memcpy(&stat->address, &socket->address, sizeof(struct sockaddr_storage));
+	memcpy(&stat->peer, &socket->peer, sizeof(struct sockaddr_storage));
+
+	// fill in protocol specific data (if supported by the protocol)
+	size_t length = sizeof(net_stat);
+	socket->first_info->control(socket->first_protocol, socket->protocol,
+		NET_STAT_SOCKET, stat, &length);
+
+	return B_OK;
+}
+
+
 //	#pragma mark - connections
 
 
@@ -252,6 +299,10 @@ socket_delete(net_socket *socket)
 	if (socket->parent != NULL)
 		panic("socket still has a parent!");
 
+	benaphore_lock(&sSocketLock);
+	list_remove_item(&sSocketList, socket);
+	benaphore_unlock(&sSocketLock);
+
 	put_domain_protocols(socket);
 	benaphore_destroy(&socket->lock);
 	delete_select_sync_pool(socket->select_pool);
@@ -272,7 +323,15 @@ socket_dequeue_connected(net_socket *parent, net_socket **_socket)
 	}
 
 	benaphore_unlock(&parent->lock);
-	return socket != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+
+	if (socket == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	benaphore_lock(&sSocketLock);
+	list_add_item(&sSocketList, socket);
+	benaphore_unlock(&sSocketLock);
+
+	return B_OK;
 }
 
 
@@ -924,9 +983,12 @@ socket_std_ops(int32 op, ...)
 			// initialize the main stack if not done so already
 			//module_info *module;
 			//return get_module(NET_STARTER_MODULE_NAME, &module);
+			list_init_etc(&sSocketList, offsetof(net_socket, link));
+			return benaphore_init(&sSocketLock, "socket list");
 		}
 		case B_MODULE_UNINIT:
 			//return put_module(NET_STARTER_MODULE_NAME);
+			benaphore_destroy(&sSocketLock);
 			return B_OK;
 
 		default:
@@ -954,6 +1016,8 @@ net_socket_module_info gNetSocketModule = {
 
 	socket_send_data,
 	socket_receive_data,
+
+	socket_get_next_stat,
 
 	// connections
 	socket_spawn_pending,

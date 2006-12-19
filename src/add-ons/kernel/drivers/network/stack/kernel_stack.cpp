@@ -262,6 +262,20 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				// of the file descriptor to use for the new accepted socket
 				return user_memcpy(data, cookie, sizeof(void *));
 
+			case NET_STACK_GET_NEXT_STAT:
+			{
+				get_next_stat_args args;
+				status = check_args(args, data, length);
+				if (status < B_OK)
+					return status;
+
+				status = sSocket->get_next_stat(&args.cookie, args.family, &args.stat);
+				if (status < B_OK)
+					return status;
+
+				return user_memcpy(data, &args, sizeof(get_next_stat_args));
+			}
+
 			default:
 				return B_BAD_VALUE;
 		}

@@ -6,10 +6,9 @@
 #define NET_STACK_DRIVER_H
 
 
-#include <OS.h>			
+#include <net_stat.h>
 
 #include <sys/select.h>
-#include <sys/socket.h>
 
 
 // Forward declaration
@@ -26,8 +25,8 @@ enum {
 	NET_STACK_SOCKET = NET_STACK_IOCTL_BASE,	// socket_args *
 	NET_STACK_GET_COOKIE,                       // void ** 
 	NET_STACK_CONTROL_NET_MODULE,				// control_net_module_args *
-	NET_STACK_SYSCTL,							// sysctl_args *
-	
+	NET_STACK_GET_NEXT_STAT,					// get_next_stat_args *
+
 	// ops acting on an existing socket
 	NET_STACK_BIND,								// sockaddr_args *
 	NET_STACK_RECVFROM,							// struct msghdr *
@@ -43,13 +42,9 @@ enum {
 	NET_STACK_GETSOCKNAME,						// sockaddr_args *
 	NET_STACK_GETPEERNAME,						// sockaddr_args *
 	NET_STACK_SOCKETPAIR,						// socketpair_args *
-	
-	// TODO: remove R5 select() emulation
-	NET_STACK_SELECT,							// select_args *
-	NET_STACK_DESELECT,							// select_args *
-	
+
 	NET_STACK_NOTIFY_SOCKET_EVENT,				// notify_socket_event_args * (userland stack only)
-	
+
 	NET_STACK_IOCTL_MAX
 };
 
@@ -89,13 +84,10 @@ struct accept_args {  // used by NET_STACK_ACCEPT
 	socklen_t address_length; 
 };
 
-struct sysctl_args {	// used by NET_STACK_SYSCTL
-	int		*name;
-	uint	namelen;
-	void	*oldp;
-	size_t	*oldlenp;
-	void	*newp;
-	size_t	newlen;
+struct get_next_stat_args {	// used by NET_STACK_GET_NEXT_STAT
+	uint32	cookie;
+	int		family;
+	struct net_stat stat;
 };
 
 struct control_net_module_args {	// used by NET_STACK_CONTROL_NET_MODULE
