@@ -189,10 +189,10 @@ dump_iospace(int argc, char** argv)
 		for (i = 0; i < max; i++) {
 			kprintf("[%03lx %p %3ld %3ld] ", i, (void *)paddr_desc[i].va,
 				paddr_desc[i].ref_count, paddr_desc[i].last_ref);
-			if (i % 8 == 7)
+			if (i % 4 == 3)
 				kprintf("\n");
 		}
-		if (i % 8)
+		if (i % 4)
 			kprintf("\n");
 	}
 
@@ -204,10 +204,10 @@ dump_iospace(int argc, char** argv)
 		for (i = 0; i < num_virtual_chunks; i++) {
 			kprintf("[%2ld. %03lx] ", i,
 				(virtual_pmappings[i] - paddr_desc) / sizeof(paddr_desc[0]));
-			if (i % 12 == 11)
+			if (i % 8 == 7)
 				kprintf("\n");
 		}
-		if (i % 12)
+		if (i % 8)
 			kprintf("\n");
 	}
 
@@ -222,12 +222,12 @@ dump_iospace(int argc, char** argv)
 		while (descriptor != NULL) {
 			kprintf("[%03lx %p] ",
 				(descriptor - paddr_desc) / sizeof(paddr_desc[0]), descriptor);
-			if (i++ % 12 == 11)
+			if (i++ % 8 == 7)
 				kprintf("\n");
 
 			descriptor = descriptor->next_q;
 		}
-		if (i % 12)
+		if (i % 8)
 			kprintf("\n");
 	}
 
