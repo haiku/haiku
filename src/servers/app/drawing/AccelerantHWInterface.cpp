@@ -1175,13 +1175,13 @@ AccelerantHWInterface::_SetGrayscalePalette()
 
 	if (fFrontBuffer->Width() > fFrontBuffer->BytesPerRow()) {
 		// VGA 16 color grayscale planar mode
-		for (int32 i = 0; i < 16; i++) {
-			colors[j++] = i * 17;
-			colors[j++] = i * 17;
-			colors[j++] = i * 17;
+		for (int32 i = 0; i < 256; i++) {
+			colors[j++] = (i & 0xf) * 17;
+			colors[j++] = (i & 0xf) * 17;
+			colors[j++] = (i & 0xf) * 17;
 		}
 
-		setIndexedColors(16, 0, colors, 0);
+		setIndexedColors(256, 0, colors, 0);
 	} else {
 		for (int32 i = 0; i < 256; i++) {
 			colors[j++] = i;
