@@ -170,15 +170,6 @@ ps2_setup_active_multiplexing(bool *enabled)
 	}
 
 	dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
-	ps2_command(0xa8, NULL, 0, NULL, 0);
-	ps2_command(0x90, NULL, 0, NULL, 0);
-	ps2_command(0xa8, NULL, 0, NULL, 0);
-	ps2_command(0x91, NULL, 0, NULL, 0);
-	ps2_command(0xa8, NULL, 0, NULL, 0);
-	ps2_command(0x92, NULL, 0, NULL, 0);
-	ps2_command(0xa8, NULL, 0, NULL, 0);
-	ps2_command(0x93, NULL, 0, NULL, 0);
-	ps2_command(0xa8, NULL, 0, NULL, 0);
 	*enabled = true;
 	return B_OK;
 
@@ -194,7 +185,7 @@ fail:
 	// just in case it has switched to multiplexed mode
 	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &out, 1);
 	if (res != B_OK || out != 0x55) {
-		dprintf("ps2: controller self test failed, status 0x%08x, data 0x%02x\n", res, out);
+		dprintf("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, out);
 		return B_ERROR;
 	}
 	return B_OK;
