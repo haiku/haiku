@@ -231,8 +231,13 @@ vesa_get_timing_constraints(display_timing_constraints *dtc)
 
 
 void
-vesa_set_indexed_colors(uint count, uint8 first, uint8 *color_data, uint32 flags)
+vesa_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 {
 	TRACE(("vesa_set_indexed_colors()\n"));
+	vga_set_indexed_colors_args args;
+	args.first = first;
+	args.count = count;
+	args.colors = colors;
+	ioctl(gInfo->device, VGA_SET_INDEXED_COLORS, &args, sizeof(args));
 }
 

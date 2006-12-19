@@ -1,8 +1,14 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
+
+#include "device.h"
+#include "driver.h"
+#include "utility.h"
+#include "vesa_info.h"
+#include "vga.h"
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -14,11 +20,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-#include "driver.h"
-#include "device.h"
-#include "vesa_info.h"
-#include "utility.h"
 
 
 //#define TRACE_DEVICE
@@ -140,6 +141,26 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 			if (user_strlcpy((char *)buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 			return B_OK;
+
+		case VGA_SET_INDEXED_COLORS:
+		{
+			vga_set_indexed_colors_args args;
+			if (user_memcpy(&args, buffer, sizeof(args)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return vga_set_indexed_colors(args.first, args.colors, args.count);
+		}
+
+		case VGA_PLANAR_BLIT:
+		{
+			vga_planar_blit_args args;
+			if (user_memcpy(&args, buffer, sizeof(args)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return vga_planar_blit(info->shared_info, args.source,
+				args.source_bytes_per_row, args.left, args.top,
+				args.right, args.bottom);
+		}
 
 		default:
 			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %lu)\n", msg, bufferLength));

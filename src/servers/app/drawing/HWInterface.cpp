@@ -16,6 +16,8 @@
 #include "SystemPalette.h"
 #include "UpdateQueue.h"
 
+#include <vesa/vesa_info.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -39,6 +41,7 @@ HWInterface::HWInterface(bool doubleBuffered)
 	  fCursorObscured(false),
 	  fCursorLocation(0, 0),
 	  fDoubleBuffered(doubleBuffered),
+	  fVGADevice(-1),
 //	  fUpdateExecutor(new UpdateQueue(this))
 	  fUpdateExecutor(NULL),
 	  fListeners(20)
@@ -669,49 +672,54 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 		case B_GRAY8: 
 			if (frontBuffer->Width() > dstBPR) {
 				// VGA 16 color grayscale planar mode
+				if (fVGADevice > 0) {
+					vga_planar_blit_args args;
+					args.source = src;
+					args.source_bytes_per_row = srcBPR;
+					args.left = x;
+					args.top = y;
+					args.right = right;
+					args.bottom = bottom;
+					if (ioctl(fVGADevice, VGA_PLANAR_BLIT, &args, sizeof(args)) == 0)
+						break;
+				}
+
+				// Since we cannot set the plane, we do monochrome output
 				dst += y * dstBPR + x / 8;
-				uint8* dstBase = dst;
-				uint8* srcBase = src;
 				int32 left = x;
 
 				// TODO: this is awfully slow...
 				// TODO: assumes BGR order
-				for (int32 plane = 0; plane < 1; plane++) {
-					// TODO: we need to select the plane here!
-					src = srcBase;
-					dst = dstBase;
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint8* dstHandle = dst;
+					uint8 current8 = dstHandle[0];
+						// we store 8 pixels before writing them back
 
-					for (; y <= bottom; y++) {
-						uint8* srcHandle = src;
-						uint8* dstHandle = dst;
-						uint8 current8 = dstHandle[0];
-							// we store 8 pixels before writing them back
+					for (x = left; x <= right; x++) {
+						uint8 pixel = (308 * srcHandle[2] + 600 * srcHandle[1]
+							+ 116 * srcHandle[0]) / 1024;
+						srcHandle += 4;
 
-						for (x = left; x <= right; x++) {
-							uint8 pixel = (308 * srcHandle[2] + 600 * srcHandle[1]
-								+ 116 * srcHandle[0]) / 1024;
-							srcHandle += 4;
+						if (pixel > 128)
+							current8 |= 0x80 >> (x & 7);
+						else
+							current8 &= ~(0x80 >> (x & 7));
 
-							if (pixel > 128)
-								current8 |= 0x80 >> (x & 7);
-							else
-								current8 &= ~(0x80 >> (x & 7));
-
-							if ((x & 7) == 7) {
-								// last pixel in 8 pixel group
-								dstHandle[0] = current8;
-								dstHandle++;
-								current8 = dstHandle[0];
-							}
-						}
-
-						if (x & 7) {
-							// last pixel has not been written yet
+						if ((x & 7) == 7) {
+							// last pixel in 8 pixel group
 							dstHandle[0] = current8;
+							dstHandle++;
+							current8 = dstHandle[0];
 						}
-						dst += dstBPR;
-						src += srcBPR;
 					}
+
+					if (x & 7) {
+						// last pixel has not been written yet
+						dstHandle[0] = current8;
+					}
+					dst += dstBPR;
+					src += srcBPR;
 				}
 			} else {
 				// offset to left top pixel in dest buffer

@@ -153,14 +153,14 @@ AccelerantHWInterface::Initialize()
 				ATRACE(("Failed to open graphics device\n"));
 				continue;
 			}
-	
+
 			if (_OpenAccelerant(fCardFD) == B_OK)
 				break;
-	
+
 			close(fCardFD);
 			// _OpenAccelerant() failed, try to open next graphics card
 		}
-	
+
 		return fCardFD >= 0 ? B_OK : fCardFD;
 	}
 	return ret;
@@ -214,6 +214,8 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 		if (deviceNumber == 1) {
 			sprintf(path, "/dev/graphics/vesa");
 			device = open(path, B_READ_WRITE);
+			fVGADevice = device;
+				// store the device, so that we can access the planar blitter
 		} else {
 			close(device);
 			device = B_ENTRY_NOT_FOUND;
@@ -528,6 +530,8 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	if (fDisplayMode.space == B_CMAP8)
 		_SetSystemPalette();
+	else if (fDisplayMode.space == B_GRAY8)
+		_SetGrayscalePalette();
 
 	// update acceleration hooks
 	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE, (void *)&fDisplayMode);
@@ -1154,4 +1158,37 @@ AccelerantHWInterface::_SetSystemPalette()
 	}
 
 	setIndexedColors(256, 0, colors, 0);
+}
+
+
+void
+AccelerantHWInterface::_SetGrayscalePalette()
+{
+	set_indexed_colors setIndexedColors = (set_indexed_colors)fAccelerantHook(
+		B_SET_INDEXED_COLORS, NULL);
+	if (setIndexedColors == NULL)
+		return;
+
+	uint8 colors[3 * 256];
+		// the color table is an array with 3 bytes per color
+	uint32 j = 0;
+
+	if (fFrontBuffer->Width() > fFrontBuffer->BytesPerRow()) {
+		// VGA 16 color grayscale planar mode
+		for (int32 i = 0; i < 16; i++) {
+			colors[j++] = i * 17;
+			colors[j++] = i * 17;
+			colors[j++] = i * 17;
+		}
+
+		setIndexedColors(16, 0, colors, 0);
+	} else {
+		for (int32 i = 0; i < 256; i++) {
+			colors[j++] = i;
+			colors[j++] = i;
+			colors[j++] = i;
+		}
+
+		setIndexedColors(256, 0, colors, 0);
+	}
 }

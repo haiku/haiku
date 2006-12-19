@@ -220,6 +220,7 @@ class HWInterface : protected MultiLocker {
 			bool				fCursorObscured;
 			BPoint				fCursorLocation;
 			bool				fDoubleBuffered;
+			int					fVGADevice;
 
  private:
 			UpdateQueue*		fUpdateExecutor;

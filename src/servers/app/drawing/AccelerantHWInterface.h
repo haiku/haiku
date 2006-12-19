@@ -104,6 +104,7 @@ private:
 		uint32					_NativeColor(const RGBColor& color) const;
 		status_t				_SetFallbackMode(display_mode& mode) const;
 		void					_SetSystemPalette();
+		void					_SetGrayscalePalette();
 
 		int						fCardFD;
 		image_id				fAccelerantImage;

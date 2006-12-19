@@ -47,6 +47,24 @@ struct vesa_info {
 enum {
 	VESA_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
 	VESA_GET_DEVICE_NAME,
+
+	VGA_SET_INDEXED_COLORS,
+	VGA_PLANAR_BLIT,
+};
+
+struct vga_set_indexed_colors_args {
+	uint8	first;
+	uint16	count;
+	uint8	*colors;
+};
+
+struct vga_planar_blit_args {
+	uint8	*source;
+	int32	source_bytes_per_row;
+	int32	left;
+	int32	top;
+	int32	right;
+	int32	bottom;
 };
 
 //----------------------------------------------------------

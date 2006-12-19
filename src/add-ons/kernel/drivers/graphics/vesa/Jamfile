@@ -6,5 +6,6 @@ KernelAddon vesa :
 	device.cpp
 	driver.cpp
 	vesa.cpp
+	vga.cpp
 	;
 

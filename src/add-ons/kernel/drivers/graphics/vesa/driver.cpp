@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,6 +32,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 char *gDeviceNames[MAX_CARDS + 1];
 vesa_info *gDeviceInfo[MAX_CARDS];
+isa_module_info *gISA;
 lock gLock;
 
 
@@ -88,10 +89,21 @@ init_driver(void)
 	else
 		return B_NO_MEMORY;
 
+	status_t status = get_module(B_ISA_MODULE_NAME, (module_info **)&gISA);
+	if (status < B_OK)
+		goto err1;
+
 	gDeviceNames[0] = strdup("graphics/vesa");
 	gDeviceNames[1] = NULL;
 
-	return init_lock(&gLock, "vesa lock");
+	status = init_lock(&gLock, "vesa lock");
+	if (status == B_OK)
+		return B_OK;
+
+	put_module(B_ISA_MODULE_NAME);
+err1:
+	free(gDeviceInfo[0]);
+	return status;
 }
 
 
@@ -100,6 +112,7 @@ uninit_driver(void)
 {
 	TRACE((DEVICE_NAME ": uninit_driver()\n"));
 
+	put_module(B_ISA_MODULE_NAME);
 	uninit_lock(&gLock);
 
 	// free device related structures
