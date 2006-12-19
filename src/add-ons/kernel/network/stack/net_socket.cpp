@@ -14,6 +14,7 @@
 #include <net_stat.h>
 
 #include <KernelExport.h>
+#include <team.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
 #include <fs/select_sync_pool.h>
@@ -24,6 +25,19 @@
 #include <sys/time.h>
 
 
+struct net_socket_private : net_socket {
+	struct list_link		link;
+	team_id					owner;
+	uint32					max_backlog;
+	uint32					child_count;
+	struct list				pending_children;
+	struct list				connected_children;
+
+	struct select_sync_pool	*select_pool;
+	benaphore				lock;
+};
+
+
 void socket_delete(net_socket *socket);
 int socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength);
 
@@ -32,13 +46,13 @@ benaphore sSocketLock;
 
 
 static status_t
-create_socket(int family, int type, int protocol, net_socket **_socket)
+create_socket(int family, int type, int protocol, net_socket_private **_socket)
 {
-	struct net_socket *socket = new (std::nothrow) net_socket;
+	struct net_socket_private *socket = new (std::nothrow) net_socket_private;
 	if (socket == NULL)
 		return B_NO_MEMORY;
 
-	memset(socket, 0, sizeof(net_socket));
+	memset(socket, 0, sizeof(net_socket_private));
 	socket->family = family;
 	socket->type = type;
 	socket->protocol = protocol;
@@ -55,8 +69,8 @@ create_socket(int family, int type, int protocol, net_socket **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	list_init_etc(&socket->pending_children, offsetof(net_socket, link));
-	list_init_etc(&socket->connected_children, offsetof(net_socket, link));
+	list_init_etc(&socket->pending_children, offsetof(net_socket_private, link));
+	list_init_etc(&socket->connected_children, offsetof(net_socket_private, link));
 
 	status = get_domain_protocols(socket);
 	if (status < B_OK)
@@ -79,7 +93,7 @@ err1:
 status_t
 socket_open(int family, int type, int protocol, net_socket **_socket)
 {
-	net_socket *socket;
+	net_socket_private *socket;
 	status_t status = create_socket(family, type, protocol, &socket);
 	if (status < B_OK)
 		return status;
@@ -89,6 +103,8 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 		socket_delete(socket);
 		return status;
 	}
+
+	socket->owner = team_get_current_team_id();
 
 	benaphore_lock(&sSocketLock);
 	list_add_item(&sSocketList, socket);
@@ -100,8 +116,10 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 
 
 status_t
-socket_close(net_socket *socket)
+socket_close(net_socket *_socket)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	if (socket->select_pool) {
 		// notify all pending selects
 		notify_select_event_pool(socket->select_pool, ~0);
@@ -222,10 +240,11 @@ socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 {
 	BenaphoreLocker locker(sSocketLock);
 
-	net_socket *socket = NULL;
+	net_socket_private *socket = NULL;
 	uint32 cookie = *_cookie;
 	uint32 count = 0;
-	while ((socket = (net_socket *)list_get_next_item(&sSocketList, socket)) != NULL) {
+	while ((socket = (net_socket_private *)list_get_next_item(&sSocketList, socket)) != NULL) {
+		// TODO: also traverse the pending connections
 		if (count == cookie)
 			break;
 
@@ -241,8 +260,7 @@ socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 	stat->family = socket->family;
 	stat->type = socket->type;
 	stat->protocol = socket->protocol;
-	stat->owner = -1;
-
+	stat->owner = socket->owner;
 	stat->state[0] = '\0';
 	memcpy(&stat->address, &socket->address, sizeof(struct sockaddr_storage));
 	memcpy(&stat->peer, &socket->peer, sizeof(struct sockaddr_storage));
@@ -260,8 +278,10 @@ socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 
 
 status_t
-socket_spawn_pending(net_socket *parent, net_socket **_socket)
+socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 {
+	net_socket_private *parent = (net_socket_private *)_parent;
+
 	BenaphoreLocker locker(parent->lock);
 
 	// We actually accept more pending connections to compensate for those
@@ -270,8 +290,9 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 	if (parent->child_count > 3 * parent->max_backlog / 2)
 		return ENOBUFS;
 
-	net_socket *socket;
-	status_t status = create_socket(parent->family, parent->type, parent->protocol, &socket);
+	net_socket_private *socket;
+	status_t status = create_socket(parent->family, parent->type, parent->protocol,
+		&socket);
 	if (status < B_OK)
 		return status;
 
@@ -280,6 +301,7 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 	socket->receive = parent->receive;
 	socket->options = parent->options & ~SO_ACCEPTCONN;
 	socket->linger = parent->linger;
+	socket->owner = parent->owner;
 	memcpy(&socket->address, &parent->address, parent->address.ss_len);
 	memcpy(&socket->peer, &parent->peer, parent->peer.ss_len);
 
@@ -294,8 +316,10 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 
 
 void
-socket_delete(net_socket *socket)
+socket_delete(net_socket *_socket)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	if (socket->parent != NULL)
 		panic("socket still has a parent!");
 
@@ -311,11 +335,14 @@ socket_delete(net_socket *socket)
 
 
 status_t
-socket_dequeue_connected(net_socket *parent, net_socket **_socket)
+socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 {
+	net_socket_private *parent = (net_socket_private *)_parent;
+
 	benaphore_lock(&parent->lock);
 
-	net_socket *socket = (net_socket *)list_remove_head_item(&parent->connected_children);
+	net_socket_private *socket = (net_socket_private *)list_remove_head_item(
+		&parent->connected_children);
 	if (socket != NULL) {
 		socket->parent = NULL;
 		parent->child_count--;
@@ -336,8 +363,10 @@ socket_dequeue_connected(net_socket *parent, net_socket **_socket)
 
 
 status_t
-socket_set_max_backlog(net_socket *socket, uint32 backlog)
+socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	// we enforce an upper limit of connections waiting to be accepted
 	if (backlog > 256)
 		backlog = 256;
@@ -345,14 +374,14 @@ socket_set_max_backlog(net_socket *socket, uint32 backlog)
 	benaphore_lock(&socket->lock);
 
 	// first remove the pending connections, then the already connected ones as needed	
-	net_socket *child;
+	net_socket_private *child;
 	while (socket->child_count > backlog
-		&& (child = (net_socket *)list_remove_tail_item(&socket->pending_children)) != NULL) {
+		&& (child = (net_socket_private *)list_remove_tail_item(&socket->pending_children)) != NULL) {
 		child->parent = NULL;
 		socket->child_count--;
 	}
 	while (socket->child_count > backlog
-		&& (child = (net_socket *)list_remove_tail_item(&socket->connected_children)) != NULL) {
+		&& (child = (net_socket_private *)list_remove_tail_item(&socket->connected_children)) != NULL) {
 		child->parent = NULL;
 		socket_delete(child);
 		socket->child_count--;
@@ -371,7 +400,7 @@ socket_set_max_backlog(net_socket *socket, uint32 backlog)
 status_t
 socket_connected(net_socket *socket)
 {
-	net_socket *parent = socket->parent;
+	net_socket_private *parent = (net_socket_private *)socket->parent;
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
@@ -389,9 +418,11 @@ socket_connected(net_socket *socket)
 
 
 status_t
-socket_request_notification(net_socket *socket, uint8 event, uint32 ref,
+socket_request_notification(net_socket *_socket, uint8 event, uint32 ref,
 	selectsync *sync)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	benaphore_lock(&socket->lock);
 
 	status_t status = add_select_sync_pool_entry(&socket->select_pool, sync,
@@ -430,8 +461,10 @@ socket_request_notification(net_socket *socket, uint8 event, uint32 ref,
 
 
 status_t
-socket_cancel_notification(net_socket *socket, uint8 event, selectsync *sync)
+socket_cancel_notification(net_socket *_socket, uint8 event, selectsync *sync)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	benaphore_lock(&socket->lock);
 
 	status_t status = remove_select_sync_pool_entry(&socket->select_pool,
@@ -443,8 +476,9 @@ socket_cancel_notification(net_socket *socket, uint8 event, selectsync *sync)
 
 
 status_t
-socket_notify(net_socket *socket, uint8 event, int32 value)
+socket_notify(net_socket *_socket, uint8 event, int32 value)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
 	bool notify = true;
 
 	switch (event) {
@@ -492,7 +526,8 @@ socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressL
 		return status;
 
 	if (address && *_addressLength > 0) {
-		memcpy(address, &accepted->peer, min_c(*_addressLength, accepted->peer.ss_len));
+		memcpy(address, &accepted->peer, min_c(*_addressLength,
+			min_c(accepted->peer.ss_len, sizeof(sockaddr_storage))));
 		*_addressLength = accepted->peer.ss_len;
 	}
 
@@ -983,7 +1018,7 @@ socket_std_ops(int32 op, ...)
 			// initialize the main stack if not done so already
 			//module_info *module;
 			//return get_module(NET_STARTER_MODULE_NAME, &module);
-			list_init_etc(&sSocketList, offsetof(net_socket, link));
+			list_init_etc(&sSocketList, offsetof(net_socket_private, link));
 			return benaphore_init(&sSocketLock, "socket list");
 		}
 		case B_MODULE_UNINIT:

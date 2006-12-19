@@ -55,23 +55,35 @@ inet_print_address(sockaddr* _address)
 	sockaddr_in& address = *(sockaddr_in *)_address;
 	
 	if (address.sin_family != AF_INET || address.sin_len == 0) {
-		printf("%-28s", "-");
+		printf("%-30s", "-");
 		return;
 	}
 
 	hostent* host = gethostbyaddr((const char*)_address, sizeof(sockaddr_in), AF_INET);
 	servent* service = getservbyport(ntohs(address.sin_port), NULL);
 
-	char buffer[128];
-	int length = strlcpy(buffer, host != NULL
-		? host->h_name : inet_ntoa(address.sin_addr), sizeof(buffer));
-
-	if (service != NULL)
-		snprintf(buffer + length, sizeof(buffer) - length, ":%s", service->s_name);
+	const char *hostName;
+	if (host != NULL)
+		hostName = host->h_name;
+	else if (address.sin_addr.s_addr == INADDR_ANY)
+		hostName = "*";
 	else
-		snprintf(buffer + length, sizeof(buffer) - length, ":%u", ntohs(address.sin_port));
+		hostName = inet_ntoa(address.sin_addr);
 
-	printf("%-28s", buffer);
+	char buffer[128];
+	int length = strlcpy(buffer, hostName, sizeof(buffer));
+
+	char port[64];
+	if (service != NULL)
+		strlcpy(port, service->s_name, sizeof(port));
+	else if (address.sin_port == 0)
+		strcpy(port, "*");
+	else
+		snprintf(port, sizeof(port), "%u", ntohs(address.sin_port));
+
+	snprintf(buffer + length, sizeof(buffer) - length, ":%s", port);
+
+	printf("%-30s", buffer);
 }
 
 
@@ -141,7 +153,7 @@ main(int argc, char** argv)
 	bool printProgram = true;
 		// TODO: add some program options... :-)
 
-	printf("Proto  Local Address               Foreign Address             State        Program\n");
+	printf("Proto  Local Address                 Foreign Address               State        Program\n");
 
 	uint32 cookie = 0;
 	int family = -1;

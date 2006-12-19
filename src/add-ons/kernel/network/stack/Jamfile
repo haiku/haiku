@@ -11,7 +11,8 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
-UsePrivateHeaders kernel net ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders net ;
 
 KernelAddon stack :
 	datalink.cpp

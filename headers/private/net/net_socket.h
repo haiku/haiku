@@ -35,17 +35,8 @@ typedef struct net_socket {
 		bigtime_t	timeout;
 	}						send, receive;
 
-	// TODO: could be moved into a private structure
-	struct net_socket		*parent;
-	struct list_link		link;
-	uint32					max_backlog;
-	uint32					child_count;
-	struct list				pending_children;
-	struct list				connected_children;
-
 	status_t				error;
-	struct select_sync_pool	*select_pool;
-	benaphore				lock;
+	struct net_socket		*parent;
 } net_socket;
 
 struct net_socket_module_info {
