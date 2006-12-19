@@ -666,25 +666,73 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 
 			break;
 		}
-		case B_GRAY8: {
-			// offset to left top pixel in dest buffer
-			dst += y * dstBPR + x;
-			int32 left = x;
-			// copy
-			// TODO: assumes BGR order, does this work on big endian as well?
-			for (; y <= bottom; y++) {
-				uint8* srcHandle = src;
-				uint8* dstHandle = dst;
-				for (x = left; x <= right; x++) {
-					*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1] + 116 * srcHandle[0]) / 1024;
-					dstHandle ++;
-					srcHandle += 4;
+		case B_GRAY8: 
+			if (frontBuffer->Width() > dstBPR) {
+				// VGA 16 color grayscale planar mode
+				dst += y * dstBPR + x / 8;
+				uint8* dstBase = dst;
+				uint8* srcBase = src;
+				int32 left = x;
+
+				// TODO: this is awfully slow...
+				// TODO: assumes BGR order
+				for (int32 plane = 0; plane < 1; plane++) {
+					// TODO: we need to select the plane here!
+					src = srcBase;
+					dst = dstBase;
+
+					for (; y <= bottom; y++) {
+						uint8* srcHandle = src;
+						uint8* dstHandle = dst;
+						uint8 current8 = dstHandle[0];
+							// we store 8 pixels before writing them back
+
+						for (x = left; x <= right; x++) {
+							uint8 pixel = (308 * srcHandle[2] + 600 * srcHandle[1]
+								+ 116 * srcHandle[0]) / 1024;
+							srcHandle += 4;
+
+							if (pixel > 128)
+								current8 |= 0x80 >> (x & 7);
+							else
+								current8 &= ~(0x80 >> (x & 7));
+
+							if ((x & 7) == 7) {
+								// last pixel in 8 pixel group
+								dstHandle[0] = current8;
+								dstHandle++;
+								current8 = dstHandle[0];
+							}
+						}
+
+						if (x & 7) {
+							// last pixel has not been written yet
+							dstHandle[0] = current8;
+						}
+						dst += dstBPR;
+						src += srcBPR;
+					}
 				}
-				dst += dstBPR;
-				src += srcBPR;
+			} else {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x;
+				int32 left = x;
+				// copy
+				// TODO: assumes BGR order, does this work on big endian as well?
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint8* dstHandle = dst;
+					for (x = left; x <= right; x++) {
+						*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1] + 116 * srcHandle[0]) / 1024;
+						dstHandle ++;
+						srcHandle += 4;
+					}
+					dst += dstBPR;
+					src += srcBPR;
+				}
 			}
 			break;
-		}
+
 		default:
 			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front buffer format!\n");
 			break;

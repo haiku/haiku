@@ -89,7 +89,8 @@ vesa_init(vesa_info &info)
 	info.shared_info->current_mode.virtual_height = bufferInfo->height;
 	switch (bufferInfo->depth) {
 		case 4:
-			// ???
+			info.shared_info->current_mode.space = B_GRAY8;
+				// the app_server is smart enough to translate this to VGA mode
 			break;
 		case 8:
 			info.shared_info->current_mode.space = B_CMAP8;
