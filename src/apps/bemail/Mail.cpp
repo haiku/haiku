@@ -1212,30 +1212,6 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	// Create real menu bar
 	fMenuBar = menu_bar = new BMenuBar(r, "");
 	
-	// Program Menu
-	
-	menu = new BMenu(MDR_DIALECT_CHOICE ("Program","TRANSLATE ME"));
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("About BeMail", "A) BeMailについて") B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
-	item->SetTarget(be_app);
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Preferences","P) BeMailの設定") B_UTF8_ELLIPSIS,
-		new BMessage(M_PREFS),','));
-	item->SetTarget(be_app);
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Signatures","S) 署名の編集") B_UTF8_ELLIPSIS,
-		new BMessage(M_EDIT_SIGNATURE)));
-	item->SetTarget(be_app);
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Quit", "Q) 終了"),
-		new BMessage(B_QUIT_REQUESTED), 'Q'));
-	item->SetTarget(be_app);
-	menu_bar->AddItem(menu);
-	
 	//
 	//	File Menu
 	//
@@ -1273,19 +1249,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 			new BMessage(M_SAVE_AS_DRAFT), 'S'));
 	}
 	
-	menu->AddSeparatorItem();
-	menu->AddItem(fPrint = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Page Setup", "G) ページ設定") B_UTF8_ELLIPSIS,
-		new BMessage(M_PRINT_SETUP)));
-	menu->AddItem(fPrint = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Print", "P) 印刷") B_UTF8_ELLIPSIS,
-		new BMessage(M_PRINT), 'P'));
-	menu_bar->AddItem(menu);
-	
 	if(!resending && fIncoming) {	
 		menu->AddSeparatorItem();
 		
-		subMenu = new BMenu(MDR_DIALECT_CHOICE ("Close","C) 閉じる"));
+		subMenu = new BMenu(MDR_DIALECT_CHOICE ("Close and ","C) 閉じる"));
 		if (file.GetAttrInfo(B_MAIL_ATTR_STATUS, &info) == B_NO_ERROR)
 			file.ReadAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, str, info.size);
 		else
@@ -1328,6 +1295,27 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 			MDR_DIALECT_CHOICE ("Close", "W) 閉じる"),
 			new BMessage(B_CLOSE_REQUESTED), 'W'));
 	}
+	
+	menu->AddSeparatorItem();
+	menu->AddItem(fPrint = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Page Setup", "G) ページ設定") B_UTF8_ELLIPSIS,
+		new BMessage(M_PRINT_SETUP)));
+	menu->AddItem(fPrint = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Print", "P) 印刷") B_UTF8_ELLIPSIS,
+		new BMessage(M_PRINT), 'P'));
+	menu_bar->AddItem(menu);
+	
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("About BeMail", "A) BeMailについて") B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
+	item->SetTarget(be_app);
+	
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Quit", "Q) 終了"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
+	item->SetTarget(be_app);
 
 	//
 	//	Edit Menu
@@ -1367,6 +1355,11 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		if (gStartWithSpellCheckOn)
 			PostMessage (M_CHECK_SPELLING);
 	}
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Preferences","P) BeMailの設定") B_UTF8_ELLIPSIS,
+		new BMessage(M_PREFS),','));
+	item->SetTarget(be_app);
 	menu_bar->AddItem(menu);
 	
 	// View Menu
@@ -1475,6 +1468,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 				MDR_DIALECT_CHOICE ("Add Signature", "D) 署名を追加"),
 				INDEX_SIGNATURE, M_SIGNATURE);
 			menu->AddItem(new BMenuItem(fSignature));
+			menu->AddItem(item = new BMenuItem(
+				MDR_DIALECT_CHOICE ("Edit Signatures","S) 署名の編集") B_UTF8_ELLIPSIS,
+				new BMessage(M_EDIT_SIGNATURE)));
+			item->SetTarget(be_app);
 			menu->AddSeparatorItem();
 			menu->AddItem(fAdd = new BMenuItem(MDR_DIALECT_CHOICE ("Add Enclosure","E) 追加")B_UTF8_ELLIPSIS, new BMessage(M_ADD), 'E'));
 			menu->AddItem(fRemove = new BMenuItem(MDR_DIALECT_CHOICE ("Remove Enclosure","T) 削除"), new BMessage(M_REMOVE), 'T'));
