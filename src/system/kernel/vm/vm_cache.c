@@ -183,6 +183,11 @@ vm_cache_release_ref(vm_cache_ref *cacheRef)
 
 	// delete this cache
 
+	if (cacheRef->areas != NULL)
+		panic("cache to be deleted still has areas");
+	if (!list_is_empty(&cacheRef->cache->consumers))
+		panic("cache %p to be deleted still has consumers", cacheRef->cache);
+
 	// delete the cache's backing store
 	cacheRef->cache->store->ops->destroy(cacheRef->cache->store);
 
@@ -415,7 +420,7 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 		vm_cache_ref *consumerRef;
 		vm_page *page, *nextPage;
 
-		consumer = list_get_first_item(&cache->consumers);
+		consumer = list_remove_head_item(&cache->consumers);
 		consumerRef = consumer->ref;
 
 		mutex_lock(&consumerRef->lock);
@@ -445,12 +450,8 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 		mutex_unlock(&consumerRef->lock);
 	}
 
-	mutex_unlock(&cacheRef->lock);
-
 	if (newSource != NULL) {
 		// The remaining consumer has gotten a new source
-		mutex_lock(&cacheRef->lock);
-
 		list_remove_item(&newSource->consumers, cache);
 		list_add_item(&newSource->consumers, consumer);
 		consumer->source = newSource;
@@ -461,7 +462,8 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 		// Release the other reference to the cache - we take over
 		// its reference of its source cache
 		vm_cache_release_ref(cacheRef);
-	}
+	} else
+		mutex_unlock(&cacheRef->lock);
 
 	vm_cache_release_ref(cacheRef);
 }
@@ -481,9 +483,9 @@ vm_cache_add_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 	consumer->source = cacheRef->cache;
 	list_add_item(&cacheRef->cache->consumers, consumer);
 
-	mutex_unlock(&cacheRef->lock);
-
 	vm_cache_acquire_ref(cacheRef);
+
+	mutex_unlock(&cacheRef->lock);
 }
 
 
