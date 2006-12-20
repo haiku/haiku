@@ -33,6 +33,9 @@
 // width of the black border stroked arround the bitmap
 #define PEN_SIZE 1.0f
 
+// the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
+#define HIDE_CURSOR_DELAY_TIME 50
+
 class ShowImageView : public BView {
 	public:
 		ShowImageView(BRect rect, const char *name, uint32 resizingMode,
@@ -49,6 +52,7 @@ class ShowImageView : public BView {
 		virtual void Pulse();
 
 		virtual void MessageReceived(BMessage *message);
+		virtual void WindowActivated(bool active);
 
 		void SetTrackerMessenger(const BMessenger& trackerMessenger);
 		status_t SetImage(const entry_ref *ref);
@@ -236,6 +240,9 @@ class ShowImageView : public BView {
 		bool fInverted;
 
 		bool fShowingPopUpMenu;
+
+		int fHideCursorCountDown;	// Hides the cursor when it reaches zero
+		bool fIsActiveWin;			// Is the parent window the active window?
 
 		enum image_orientation fImageOrientation;
 		static enum image_orientation fTransformation[

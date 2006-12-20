@@ -202,6 +202,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 #if DELAYED_SCALING
 	fScalingCountDown = SCALING_DELAY_TIME;
 #endif
+	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 
 	if (settings->Lock()) {
 		fDither = settings->GetBool("Dither", fDither);
@@ -310,8 +311,12 @@ ShowImageView::Pulse()
 	}
 
 	// Hide cursor in full screen mode
-	if (fFullScreen && !fShowingPopUpMenu)
-		be_app->ObscureCursor();
+	if (fFullScreen && !fShowingPopUpMenu && fIsActiveWin) {
+		if (fHideCursorCountDown <= 0)
+			be_app->ObscureCursor();
+		else
+			fHideCursorCountDown--;
+	}
 
 #if DELAYED_SCALING
 	if (fBitmap && (fScaleBilinear || fDither) && fScalingCountDown > 0) {
@@ -624,7 +629,6 @@ ShowImageView::SetFullScreen(bool fullScreen)
 		fFullScreen = fullScreen;
 		if (fFullScreen) {
 			SetLowColor(0, 0, 0, 255);
-			be_app->ObscureCursor();
 		} else
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
@@ -1375,6 +1379,7 @@ ShowImageView::MergeSelection()
 void
 ShowImageView::MouseDown(BPoint position)
 {
+	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 	BPoint point;
 	uint32 buttons;
 	MakeFocus(true);
@@ -1472,6 +1477,7 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final)
 void
 ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *message)
 {
+	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 	if (fMakesSelection) {
 		UpdateSelectionRect(point, false);
 	} else if (fMovesImage) {
@@ -2566,4 +2572,11 @@ ShowImageView::ExitFullScreen()
 	m.SendMessage(MSG_EXIT_FULL_SCREEN);
 }
 
+
+void 
+ShowImageView::WindowActivated(bool active)
+{
+	fIsActiveWin = active;
+	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
+}
 
