@@ -202,7 +202,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 #if DELAYED_SCALING
 	fScalingCountDown = SCALING_DELAY_TIME;
 #endif
+	fShowingPopUpMenu = false;
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
+	fIsActiveWin = true;
 
 	if (settings->Lock()) {
 		fDither = settings->GetBool("Dither", fDither);
@@ -296,7 +298,7 @@ void
 ShowImageView::Pulse()
 {
 	// animate marching ants
-	if (HasSelection() && fAnimateSelection && Window()->IsActive()) {	
+	if (HasSelection() && fAnimateSelection && fIsActiveWin) {	
 		RotatePatterns();
 		DrawSelectionBox();
 	}
@@ -311,7 +313,7 @@ ShowImageView::Pulse()
 	}
 
 	// Hide cursor in full screen mode
-	if (fFullScreen && !fShowingPopUpMenu && fIsActiveWin) {
+	if (fFullScreen && !HasSelection() && !fShowingPopUpMenu && fIsActiveWin) {
 		if (fHideCursorCountDown <= 0)
 			be_app->ObscureCursor();
 		else
@@ -1379,7 +1381,6 @@ ShowImageView::MergeSelection()
 void
 ShowImageView::MouseDown(BPoint position)
 {
-	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 	BPoint point;
 	uint32 buttons;
 	MakeFocus(true);
@@ -2568,6 +2569,7 @@ ShowImageView::ToggleSlideShow()
 void
 ShowImageView::ExitFullScreen()
 {
+	be_app->ShowCursor();
 	BMessenger m(Window());
 	m.SendMessage(MSG_EXIT_FULL_SCREEN);
 }

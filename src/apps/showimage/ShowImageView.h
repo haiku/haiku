@@ -34,7 +34,7 @@
 #define PEN_SIZE 1.0f
 
 // the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
-#define HIDE_CURSOR_DELAY_TIME 50
+#define HIDE_CURSOR_DELAY_TIME 20
 
 class ShowImageView : public BView {
 	public:
