@@ -124,8 +124,7 @@ static const char *kWordsPath = "/boot/optional/goodies/words";
 static const char *kExact = ".exact";
 static const char *kMetaphone = ".metaphone";
 
-/*
-	// No longer needed if the popup is disabled
+
 // Text for both the main menu and the pop-up menu.
 static const char *kSpamMenuItemTextArray[] = {
 	"Mark as Spam and Move to Trash",		// M_TRAIN_SPAM_AND_DELETE
@@ -133,7 +132,6 @@ static const char *kSpamMenuItemTextArray[] = {
 	"Unmark this Message",					// M_UNTRAIN
 	"Mark as Genuine"						// M_TRAIN_GENUINE
 };
-*/
 
 // global variables
 bool		gHelpOnly = false;
@@ -464,11 +462,6 @@ TMailApp::MessageReceived(BMessage *msg)
 			FontChange();
 			break;
 
-/*		case M_BEGINNER:
-		case M_EXPERT:
-			level = msg->what - M_BEGINNER;
-			break;
-*/
 		case REFS_RECEIVED:
 			if (msg->HasPointer("window"))
 			{
@@ -1992,10 +1985,9 @@ TMailWindow::MessageReceived(BMessage *msg)
 				which has a downward-pointing arrow. Mozilla Thunderbird's 'Get Mail' button
 				is a good example of this.
 				
-				Until someone is willing to retool the toolbar class or otherwise do something
-				like this, it is better to just disable the menu for consistency's sake.
+				TODO: Replace this code with a split toolbar button
 			*/
-/*			uint32 buttons;
+			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON)
 			{
@@ -2011,8 +2003,6 @@ TMailWindow::MessageReceived(BMessage *msg)
 				break;
 			} else // Default action for left clicking on the spam button.
 				PostMessage (new BMessage (M_TRAIN_SPAM_AND_DELETE));
-*/
-			PostMessage (new BMessage (M_TRAIN_SPAM_AND_DELETE));
 			break;
 		}
 
@@ -2032,8 +2022,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 		case M_REPLY:
 		{
-			// Disabled for usability reasons - see listing for spam button
-/*			uint32 buttons;
+			// TODO: This needs removed in favor of a split toolbar button. See comments for Spam button
+			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON)
 			{
@@ -2053,13 +2043,12 @@ TMailWindow::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-*/
 			// Fall through
 		}
 		case M_FORWARD:
 		{
-			// Disabled for usability reasons - see listing for spam button
-/*			uint32 buttons;
+			// TODO: This needs removed in favor of a split toolbar button. See comments for Spam button
+			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON) {
 				BPopUpMenu menu("Forward", false, false);
@@ -2079,7 +2068,6 @@ TMailWindow::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-*/
 		}
 
 		// Fall Through
@@ -2100,22 +2088,6 @@ TMailWindow::MessageReceived(BMessage *msg)
 		case M_DELETE_PREV:
 		case M_DELETE_NEXT:
 		{
-			// The Trash already provides a level of Undo to prevent loss of data. This
-			// alert is a lot like the infamous "Are you sure?" confirmation dialogs
-			// from Windows 98
-/*			if (level == L_BEGINNER)
-			{
-				beep();
-				if (!(new BAlert("", MDR_DIALECT_CHOICE (
-					"Are you sure you want to move this message to the trash?",
-					"このメッセージを削除してもよろしいですか？"),
-					MDR_DIALECT_CHOICE ("Cancel","中止"),
-					MDR_DIALECT_CHOICE ("Trash","削除"),
-					NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-					B_WARNING_ALERT))->Go())
-					break;
-			}
-*/
 			if (msg->what == M_DELETE_NEXT && (modifiers() & B_SHIFT_KEY))
 				msg->what = M_DELETE_PREV;
 
