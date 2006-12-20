@@ -990,7 +990,7 @@ SMTPProtocol::SendCommand(const char *cmd)
 	D(bug("C:%s\n", cmd));
 
 #ifdef USESSL
-	if (use_ssl) {
+	if (use_ssl && ssl) {
 		if (SSL_write(ssl,cmd,::strlen(cmd)) < 0)
                     return B_ERROR;
 	} else
