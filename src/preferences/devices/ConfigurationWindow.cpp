@@ -529,6 +529,13 @@ ConfigurationWindow::InitWindow(void)
 				vendor = string;
 				sprintf(string, "%04lx", devicesInfo->GetInfo()->id[1] & 0xffff);
 				cardID = string;
+				
+				for (uint32 i=0; i<PCI_DEVTABLE_LEN; i++)
+					if (PciDevTable[i].VenId == devicesInfo->GetInfo()->id[0] & 0xffff &&
+						PciDevTable[i].DevId == devicesInfo->GetInfo()->id[1] & 0xffff) {
+							cardName = PciDevTable[i].ChipDesc;
+							break;
+					}
 			}						
 			break;
 		case B_PCMCIA_BUS:					vendor = "XX"; break;
