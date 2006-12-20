@@ -1,16 +1,14 @@
 /*
-	Copyright (c) 2003, Thomas Kurschel
-
-
-	Part of DDC driver
-		
-	EDID handling, including decoded EDID data block definitin.
-*/
-
+ * Copyright 2003, Thomas Kurschel. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _EDID_H
 #define _EDID_H
 
+//!	EDID handling, including decoded EDID data block definition.
+
 #include "edid_raw.h"
+
 
 // vendor info
 typedef struct {
@@ -21,13 +19,11 @@ typedef struct {
 	uint16 year;
 } edid1_vendor;
 
-
 // version info
 typedef struct {
 	uint8 version;
 	uint8 revision;
 } edid1_version;
-
 
 // display info
 typedef struct {
@@ -64,7 +60,6 @@ typedef struct {
 	uint16 white_y;
 } edid1_display;
 
-
 // standard timing data
 typedef struct {
 	uint16 h_size;
@@ -74,7 +69,6 @@ typedef struct {
 	uint8 refresh;
 } edid1_std_timing;
 
-
 // additional whitepoint
 typedef struct {
 	uint8 index;
@@ -82,7 +76,6 @@ typedef struct {
 	uint16 white_y;
 	uint8 gamma;	// (x+100)/100
 } edid1_whitepoint;
-
 
 // detailed timing description
 typedef struct {
@@ -108,7 +101,6 @@ typedef struct {
 	);
 } edid1_detailed_timing;
 
-
 // detailed monitor description
 typedef struct {
 	uint8 monitor_desc_type;
@@ -122,7 +114,6 @@ typedef struct {
 		edid1_detailed_timing detailed_timing;
 	} data;
 } edid1_detailed_monitor;
-
 
 // EDID data block
 typedef struct{  
@@ -138,9 +129,16 @@ typedef struct{
 	uint8 num_sections;
 } edid1_info;
 
-// decode raw EDID info into usuable EDID info
-void edid_decode( edid1_info *edid, const edid1_raw *raw );
-// dump EDID info to syslog
-void edid_dump( edid1_info *edid );
 
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+void edid_decode(edid1_info *edid, const edid1_raw *raw);
+void edid_dump(edid1_info *edid);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	// _EDID_H
