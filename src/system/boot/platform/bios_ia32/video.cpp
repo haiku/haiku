@@ -195,12 +195,15 @@ vesa_get_edid(edid1_info *info)
 	regs.edi = 0;
 	call_bios(0x10, &regs);
 
+	dprintf("EDID1: %lx\n", regs.eax);
 	// %ah contains the error code
-	if ((regs.eax & 0xff00) != 0)
+	// %al determines wether or not the function is supported
+	if (regs.eax != 0x4f)
 		return B_NOT_SUPPORTED;
 
-	// test if EDID v1 is supported by the monitor
-	if (((regs.ebx >> 8) & 1) == 0)
+	dprintf("EDID2: ebx %lx\n", regs.ebx);
+	// test if DDC is supported by the monitor
+	if ((regs.ebx & 3) == 0)
 		return B_NOT_SUPPORTED;
 
 	edid1_raw edidRaw;
@@ -213,8 +216,9 @@ vesa_get_edid(edid1_info *info)
 	regs.es = ADDRESS_SEGMENT(&edidRaw);
 	regs.edi = ADDRESS_OFFSET(&edidRaw);
 	call_bios(0x10, &regs);
+	dprintf("EDID3: %lx\n", regs.eax);
 
-	if ((regs.eax & 0xff00) != 0)
+	if (regs.eax != 0x4f)
 		return B_NOT_SUPPORTED;
 
 	// retrieved EDID - now parse it
