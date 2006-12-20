@@ -14,7 +14,9 @@
 
 
 #include "edid.h"
+
 #include <KernelExport.h>
+#include <string.h>
 
 
 //
