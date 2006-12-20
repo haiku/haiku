@@ -11,6 +11,8 @@
 #include "mmu.h"
 #include "images.h"
 
+#include <edid.h>
+
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
@@ -102,15 +104,17 @@ find_video_mode(int32 width, int32 height, int32 depth)
 }
 
 
-static void
+static bool
 get_mode_from_settings(void)
 {
 	if (sSettingsLoaded)
-		return;
+		return true;
 
 	void *handle = load_driver_settings("vesa");
 	if (handle == NULL)
-		return;
+		return false;
+
+	bool found = false;
 
 	const driver_settings *settings = get_driver_settings(handle);
 	if (settings == NULL)
@@ -130,13 +134,16 @@ get_mode_from_settings(void)
 			// search mode that fits
 
 			video_mode *mode = find_video_mode(width, height, depth);
-			if (mode != NULL)
+			if (mode != NULL) {
+				found = true;
 				sMode = mode;
+			}
 		}
 	}
 
 out:
 	unload_driver_settings(handle);
+	return found;
 }
 
 
@@ -174,6 +181,48 @@ vga_enable_bright_background_colors(void)
 
 //	#pragma mark - vesa
 //	VESA functions
+
+
+static status_t
+vesa_get_edid(edid1_info *info)
+{
+	struct bios_regs regs;
+	regs.eax = 0x4f15;
+	regs.ebx = 0;
+		// report DDC service
+	regs.ecx = 0;
+	regs.es = 0;
+	regs.edi = 0;
+	call_bios(0x10, &regs);
+
+	// %ah contains the error code
+	if ((regs.eax & 0xff00) != 0)
+		return B_NOT_SUPPORTED;
+
+	// test if EDID v1 is supported by the monitor
+	if (((regs.ebx >> 8) & 1) == 0)
+		return B_NOT_SUPPORTED;
+
+	edid1_raw edidRaw;
+
+	regs.eax = 0x4f15;
+	regs.ebx = 1;
+		// read EDID
+	regs.ecx = 0;
+	regs.edx = 0;
+	regs.es = ADDRESS_SEGMENT(&edidRaw);
+	regs.edi = ADDRESS_OFFSET(&edidRaw);
+	call_bios(0x10, &regs);
+
+	if ((regs.eax & 0xff00) != 0)
+		return B_NOT_SUPPORTED;
+
+	// retrieved EDID - now parse it
+	dprintf("Got EDID!\n");	
+	edid_decode(info, &edidRaw);
+	edid_dump(info);
+	return B_OK;
+}
 
 
 static status_t
@@ -742,6 +791,9 @@ platform_init_video(void)
 	sMode = sDefaultMode;
 
 	TRACE(("VESA compatible graphics!\n"));
+
+	edid1_info info;
+	vesa_get_edid(&info);
 
 	return B_OK;
 }

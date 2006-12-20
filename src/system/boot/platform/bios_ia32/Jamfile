@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src system boot platform bios_ia32 ;
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
@@ -13,6 +14,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 KernelMergeObject boot_platform_bios_ia32.o :
 	shell.S
@@ -34,6 +37,11 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	
 	# generic
 	text_menu.cpp
+
+	# VESA/DDC EDID
+	decode_edid.c
+	dump_edid.c
+
 	: -fno-pic
 ;
 
