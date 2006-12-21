@@ -364,7 +364,7 @@ static status_t
 notify_probe_by_file(device_node_info *node, const char *fileName)
 {
 	char *bus;
-	int i, suffix_length;
+	size_t i, suffix_length;
 	const char *module_name;
 	const char device_suffix[] = "_device_v1";
 	status_t res;
@@ -382,7 +382,7 @@ notify_probe_by_file(device_node_info *node, const char *fileName)
 	}
 
 	suffix_length = strlen(bus) + sizeof(device_suffix);
-	for (i=0; modules[i]; i++) {
+	for (i = 0; modules[i]; i++) {
 		module_name = modules[i]->name;
 		TRACE(("notify_probe_by_file trying %s %s %s\n", module_name, bus, module_name + (strlen(module_name) - suffix_length + 1)));
 		if (strlen(module_name) > suffix_length
@@ -830,7 +830,7 @@ register_supporting_child_devices(device_node_info *node, struct list *list)
 		}
 
 		entry->support = entry->driver->supports_device(node, &entry->no_connection);
-		dprintf("module: %s, support: %d\n", entry->name, (int)(entry->support * 1000));
+		dprintf("module: %s, support: %f\n", entry->name, entry->support);
 
 		if (!hasConnection)
 			entry->no_connection = true;
