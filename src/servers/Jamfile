@@ -11,4 +11,5 @@ SubInclude HAIKU_TOP src servers net ;
 SubInclude HAIKU_TOP src servers power ;
 SubInclude HAIKU_TOP src servers print ;
 SubInclude HAIKU_TOP src servers registrar ;
+SubInclude HAIKU_TOP src servers services_daemon ;
 SubInclude HAIKU_TOP src servers syslog_daemon ;

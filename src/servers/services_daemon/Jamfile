@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src servers services_daemon ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application services_daemon : 
+	ServicesDaemon.cpp 
+	: be media
+	: ServicesDaemon.rdef
+	;
