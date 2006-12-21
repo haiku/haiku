@@ -16,6 +16,17 @@
 #include <stdio.h>
 
 
+#define ZEROPAD	1		/* pad with zero */
+#define SIGN	2		/* unsigned/signed long */
+#define PLUS	4		/* show plus */
+#define SPACE	8		/* space if plus */
+#define LEFT	16		/* left justified */
+#define SPECIAL	32		/* 0x */
+#define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
+
+#define FLOATING_SUPPORT
+
+
 static int
 skip_atoi(const char **s)
 {
@@ -26,15 +37,6 @@ skip_atoi(const char **s)
 
 	return i;
 }
-
-
-#define ZEROPAD	1		/* pad with zero */
-#define SIGN	2		/* unsigned/signed long */
-#define PLUS	4		/* show plus */
-#define SPACE	8		/* space if plus */
-#define LEFT	16		/* left justified */
-#define SPECIAL	32		/* 0x */
-#define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
 
 
 static uint64
@@ -204,6 +206,68 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 }
 
 
+#ifdef FLOATING_SUPPORT
+/*!
+	This is a very basic floating point to string conversion routine.
+	It prints up to 3 fraction digits, and doesn't support any precision arguments.
+	It's just here for your convenience so that you can use it for debug output.
+*/
+static bool
+floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth, int flags)
+{
+	char buffer[66];
+	bool sign = value < 0.0;
+	uint64 fraction;
+	uint64 integer;
+	int32 length = 0;
+
+	if (sign)
+		value = -value;
+
+	fraction = (uint64)(value * 1000) % 1000;
+	integer = (uint64)value;
+
+	// put fraction part, if any
+
+	if (fraction != 0) {
+		bool first = true;
+		while (fraction != 0) {
+			int digit = do_div(&fraction, 10);
+			if (!first || digit > 0) {
+				buffer[length++] = '0' + digit;
+				first = false;
+			}
+		}
+
+		buffer[length++] = '.';
+	}
+
+	// put integer part
+
+	if (integer == 0)
+		buffer[length++] = '0';
+	else while (integer != 0) {
+		buffer[length++] = '0' + do_div(&integer, 10);
+	}
+
+	// write back to string
+
+	if (!(flags & LEFT) && !put_padding(_string, _bytesLeft, fieldWidth))
+		return false;
+
+	while (length-- > 0) {
+		if (!put_character(_string, _bytesLeft, buffer[length]))
+			return false;
+	}
+
+	if ((flags & LEFT) != 0 && !put_padding(_string, _bytesLeft, fieldWidth))
+		return false;
+
+	return true;
+}
+#endif	// FLOATING_SUPPORT
+
+
 int
 vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 {
@@ -326,6 +390,19 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 					goto out;
 				continue;
 			}
+
+#ifdef FLOATING_SUPPORT
+			case 'f':
+			case 'F':
+			case 'g':
+			case 'G':
+			{
+				double value = va_arg(args, double);
+				if (!floating(&string, &bytesLeft, value, flags, fieldWidth))
+					goto out;
+				continue;
+			}
+#endif	// FLOATING_SUPPORT
 
 			case 'p':
 				if (fieldWidth == -1) {
