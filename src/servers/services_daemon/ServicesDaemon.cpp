@@ -22,8 +22,8 @@ enum {
 	M_RELAUNCH_MIDI
 };
 
-// Time delay in microseconds - 1 seconds
-const bigtime_t kRelaunchDelay = 1000000;
+// Time delay in microseconds - 2 seconds
+const bigtime_t kRelaunchDelay = 2000000;
 
 const char *gSignatures[] = {
 	"application/x-vnd.Be-TSKB",
