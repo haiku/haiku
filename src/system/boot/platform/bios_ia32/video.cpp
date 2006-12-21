@@ -88,6 +88,27 @@ add_video_mode(video_mode *videoMode)
 }
 
 
+//! Finds a video mode with the given resolution, prefers 16 bit modes
+static video_mode *
+find_video_mode(int32 width, int32 height)
+{
+	video_mode *found = NULL;
+	video_mode *mode = NULL;
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+		if (mode->width == width && mode->height == height) {
+			// prefer 16 bit mode
+			if (mode->bits_per_pixel == 16)
+				return mode;
+
+			if (found == NULL || found->bits_per_pixel < mode->bits_per_pixel)
+				found = mode;
+		}
+	}
+
+	return found;
+}
+
+
 static video_mode *
 find_video_mode(int32 width, int32 height, int32 depth)
 {
@@ -792,13 +813,45 @@ platform_init_video(void)
 		return B_ERROR;
 	}
 
-	sMode = sDefaultMode;
-
 	TRACE(("VESA compatible graphics!\n"));
 
 	edid1_info info;
-	vesa_get_edid(&info);
+	if (vesa_get_edid(&info) == B_OK) {
+		// we got EDID information from the monitor, try to find a new default mode
+		video_mode *defaultMode = NULL;
 
+		// try detailed timing first
+		for (int32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
+			edid1_detailed_monitor &monitor = info.detailed_monitor[i];
+
+			if (monitor.monitor_desc_type == edid1_is_detailed_timing) {
+				defaultMode = find_video_mode(monitor.data.detailed_timing.h_active,
+					monitor.data.detailed_timing.v_active);
+				if (defaultMode != NULL)
+					break;
+			}
+		}
+
+		if (defaultMode == NULL) {
+			// try standard timings next
+			for (int32 i = 0; i < EDID1_NUM_STD_TIMING; i++) {
+				if (info.std_timing[i].h_size <= 256)
+					continue;
+
+				defaultMode = find_video_mode(info.std_timing[i].h_size,
+					info.std_timing[i].v_size);
+				if (defaultMode != NULL)
+					break;
+			}
+		}
+
+		if (defaultMode != NULL) {
+			// We found a new default mode to use!
+			sDefaultMode = defaultMode;
+		}
+	}
+
+	sMode = sDefaultMode;
 	return B_OK;
 }
 
