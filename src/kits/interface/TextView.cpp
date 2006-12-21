@@ -534,7 +534,7 @@ BTextView::MouseDown(BPoint where)
 		delete fClickRunner;
 
 		BMessenger messenger(this);
-		fClickRunner = new BMessageRunner(messenger, &message, clickSpeed, 1);
+		fClickRunner = new (nothrow) BMessageRunner(messenger, &message, clickSpeed, 1);
 	}
 
 	
