@@ -38,9 +38,9 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse ProcessController
 	SoundRecorder Magnify DiskProbe AboutHaiku StyledEdit Installer Workspaces
 	$(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost MediaPlayer DeskCalc MidiPlayer
-	Icon-O-Matic BeMail
+	Icon-O-Matic BeMail CDPlayer
 ;
-BEOS_PREFERENCES = Backgrounds DataTranslations E-mail FileTypes Fonts Media Menu
+BEOS_PREFERENCES = Backgrounds DataTranslations Devices E-mail FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Printers Screen ScreenSaver Sounds Time VirtualMemory
 ;
 BEOS_DEMOS = BitmapDrawing Chart $(X86_ONLY)GLTeapot PictureTest Playground
