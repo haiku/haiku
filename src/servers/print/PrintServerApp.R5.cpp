@@ -1,40 +1,11 @@
-/*****************************************************************************/
-// print_server Background Application.
-//
-// Version: 1.0.0d1
-//
-// The print_server manages the communication between applications and the
-// printer and transport drivers.
-//
-// Authors
-//   Ithamar R. Adema
-//   Michael Pfeiffer
-//
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
-// and are:
-//
-// Copyright (c) 2001, 2002 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
-
+/*
+ * Copyright 2002-2006, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar R. Adema
+ *		Michael Pfeiffer
+ */
 #include "PrintServerApp.h"
 
 #include "pr_server.h"
@@ -93,7 +64,7 @@ status_t PrintServerApp::async_thread(void* data)
 						}
 					} else {
 							// If no default printer, give user choice of aborting or setting up a printer
-						BAlert* alert = new BAlert("Info", "Hang on there! You don't have any printers set up!\nYou'll need to do that before trying to print\n\nWould you like to set up a printer now?", "No thanks", "Sure!");
+						BAlert* alert = new BAlert("Info", "There are no printers set up. Would you set one up now?", "No", "Yes");
 						if (alert->Go() == 1) {
 							run_add_printer_panel();
 						}						
@@ -147,7 +118,7 @@ status_t PrintServerApp::async_thread(void* data)
 							transportName.String(), transportPath.String()) == B_OK) {				
 								// If printer was created ok, ask if it needs to be the default
 							char buffer[256];
-							::sprintf(buffer, "Would you like to make %s the default\nprinter?",
+							::sprintf(buffer, "Would you like to make %s the default printer?",
 								printerName.String());
 		
 							BAlert* alert = new BAlert("", buffer, "No", "Yes");
@@ -235,7 +206,7 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 						transportName.String(), transportPath.String()) == B_OK) {				
 							// If printer was created ok, ask if it needs to be the default
 						char buffer[256];
-						::sprintf(buffer, "Would you like to make %s the default\nprinter?",
+						::sprintf(buffer, "Would you like to make %s the default printer?",
 							printerName.String());
 	
 						BAlert* alert = new BAlert("", buffer, "No", "Yes");
