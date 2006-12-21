@@ -1227,17 +1227,19 @@ BMenu::_hide()
 	if (fSelected != NULL)
 		_SelectItem(NULL);
 
-	window->Hide();
+	window->Hide();	
 	window->DetachMenu();
 		// we don't want to be deleted when the window is removed
 
 	// Delete the menu window used by our submenus
 	DeleteMenuWindow();
 
-	window->Unlock();
-
-	if (fSuper == NULL && window->Lock())
+	if (fSuper != NULL)
+		window->Unlock();
+	else {
+		// it's our window, quit it
 		window->Quit();
+	}
 }
 
 
@@ -1269,14 +1271,13 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		ulong buttons;
 		GetMouse(&location, &buttons, true);
 		
-		Window()->UpdateIfNeeded();
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL)
 			_UpdateStateOpenSelect(item, openTime, closeTime);
 
 		// Track the submenu
-		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
+		if (OverSubmenu(fSelected, screenLocation)) {
 			UnlockLooper();
 			locked = false;
 			int submenuAction = MENU_STATE_TRACKING;
@@ -1301,16 +1302,15 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			locked = LockLooper();
 			if (!locked)
 				break;
-		}
 
-		if (item == NULL) {
+		} else if (item == NULL) {
 			if (OverSuper(screenLocation)) {
 				fState = MENU_STATE_TRACKING;
 				UnlockLooper();
 				break;
 			}
 
-			if (fSelected != NULL && !OverSubmenu(fSelected, screenLocation)
+			if (!OverSubmenu(fSelected, screenLocation)
 				&& system_time() > closeTime + kHysteresis
 				&& fState != MENU_STATE_TRACKING_SUBMENU) {
 				_SelectItem(NULL);
@@ -1318,9 +1318,9 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			}
 
 			if (fSuper != NULL) {
-				if (locked)
-					UnlockLooper();
 				*action = fState;
+				if (locked)
+					UnlockLooper();	
 				return NULL;
 			}
 		}
@@ -1357,6 +1357,9 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 void
 BMenu::_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &closeTime)
 {
+	if (fState == MENU_STATE_CLOSED)
+		return;
+
 	if (item != fSelected && system_time() > closeTime + kHysteresis) {
 		_SelectItem(item, false);
 		openTime = system_time();
@@ -1376,6 +1379,9 @@ BMenu::_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &c
 void
 BMenu::_UpdateStateClose(BMenuItem *item, const BPoint &where, const uint32 &buttons)
 {
+	if (fState == MENU_STATE_CLOSED)
+		return;
+
 	if (buttons != 0 && IsStickyMode()) {
 		if (item == NULL)
 			fState = MENU_STATE_CLOSED;
@@ -1808,16 +1814,16 @@ BMenu::OverSuper(BPoint location)
 bool
 BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 {
-	// we assume that loc is in screen coords
+	if (item == NULL)
+		return false;
+
 	BMenu *subMenu = item->Submenu();
 	if (subMenu == NULL || subMenu->Window() == NULL)
 		return false;
-
+	
+	// we assume that loc is in screen coords
 	if (subMenu->Window()->Frame().Contains(loc))
 		return true;
-
-	if (subMenu->fSelected == NULL)
-		return false;
 
 	return subMenu->OverSubmenu(subMenu->fSelected, loc);
 }
@@ -1942,8 +1948,7 @@ BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 				// something went wrong, deselect the item
 				fSelected->Select(false);
 				fSelected = NULL;
-			}	
-			//subMenu->Window()->Activate();
+			}
 		}
 	}
 }

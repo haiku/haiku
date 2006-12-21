@@ -418,10 +418,12 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 	if (startIndex != -1) {
 		be_app->ObscureCursor();
-		window->Lock();
-		_SelectItem(ItemAt(startIndex), true, true);
-		window->Unlock();
+		if (window->Lock()) {
+			_SelectItem(ItemAt(startIndex), true, true);
+			window->Unlock();
+		}
 	}
+
 	while (true) {
 		bigtime_t snoozeAmount = 40000;
 		bool locked = window->Lock();//WithTimeout(200000)
@@ -432,7 +434,6 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		ulong buttons;
 		GetMouse(&where, &buttons, true);
 			
-		window->UpdateIfNeeded();
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
 			// Select item if:
@@ -461,31 +462,29 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			}
 		}
 
-		if (fSelected != NULL && OverSubmenu(fSelected, ConvertToScreen(where))) {
+		if (OverSubmenu(fSelected, ConvertToScreen(where))) {
 			// call _track() from the selected sub-menu when the mouse cursor
 			// is over its window
 			BMenu *menu = fSelected->Submenu();
-			if (menu != NULL) {
-				window->Unlock();
-				locked = false;
-				snoozeAmount = 30000;
-				bool wasSticky = IsStickyMode();
-				if (wasSticky)
-					menu->SetStickyMode(true);
-				int localAction;
-				fChosenItem = menu->_track(&localAction, system_time());
-				
-				// check if the user started holding down a mouse button in a submenu
-				if (wasSticky && !IsStickyMode())
-					buttons = 1;
-						// buttons must have been pressed in the meantime
-				
-				//menu->Window()->Activate();
-				if (localAction == MENU_STATE_CLOSED)
-					fState = MENU_STATE_CLOSED;
-			}
-		} else if (menuItem == NULL && !IsStickyMode()
-				&& fState != MENU_STATE_TRACKING_SUBMENU) {
+			window->Unlock();
+			locked = false;
+			snoozeAmount = 30000;
+			bool wasSticky = IsStickyMode();
+			if (wasSticky)
+				menu->SetStickyMode(true);
+			int localAction;
+			fChosenItem = menu->_track(&localAction, system_time());
+			
+			// check if the user started holding down a mouse button in a submenu
+			if (wasSticky && !IsStickyMode())
+				buttons = 1;
+					// buttons must have been pressed in the meantime
+			
+			if (localAction == MENU_STATE_CLOSED)
+				fState = MENU_STATE_CLOSED;
+			
+		} else if (menuItem == NULL && fSelected != NULL 
+				&& !IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
