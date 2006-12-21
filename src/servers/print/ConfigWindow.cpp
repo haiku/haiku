@@ -126,15 +126,16 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 
 	AddChild(panel);
 	
-	float left = 10, top = 5;
-	BRect r(left, top, 160, 15);
+	float left = 10, top = 10;
+	BRect r(left, top, 160, 20);
 
 		// print selection popup menu
 	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
 	SetupPrintersMenu(menu);
-
-	fPrinters = new BMenuField(r, "Printer", "Printer", menu);
-	fPrinters->SetDivider(40);
+	
+	r.right = r.left + be_plain_font->StringWidth("Printer:") + menu->MaxContentWidth() + 10;
+	fPrinters = new BMenuField(r, "Printer", "Printer:", menu);
+	fPrinters->SetDivider(be_plain_font->StringWidth("Printer:") + 10);
 	panel->AddChild(fPrinters);
 	top += fPrinters->Bounds().Height() + 10;
 	
@@ -142,11 +143,14 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	r.OffsetTo(left, top);
 	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON", "PAGE_SETUP_OFF", MSG_PAGE_SETUP);
 		// add description to button
-	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, top + 5);
-	AddStringView(panel, r, "Setup page format");
-	r.OffsetBy(0, 10);
+	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, fPageSetup->Frame().top);
+	BStringView *stringView = AddStringView(panel, r, "Paper Setup:");
+	stringView->ResizeToPreferred();
+	r = stringView->Frame();
+	r.right = panel->Bounds().right;
+	r.OffsetBy(0, r.Height());
 	fPageFormatText = AddStringView(panel, r, "");
-	top += fPageSetup->Bounds().Height() + 5;
+	top = fPageSetup->Frame().bottom + 15;
 	
 		// page selection button
 	fJobSetup = NULL;
@@ -154,11 +158,12 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 		r.OffsetTo(left, top);
 		fJobSetup = AddPictureButton(panel, r, "Page Selection", "JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
 			// add description to button
-		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top + 5);
-		AddStringView(panel, r, "Setup print job");
-		r.OffsetBy(0, 10);
+		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top);
+		stringView = AddStringView(panel, r, "Pages to Print:");
+		stringView->ResizeToPreferred();
+		r.OffsetBy(0, stringView->Frame().Height());
 		fJobSetupText = AddStringView(panel, r, "");
-		top += fJobSetup->Bounds().Height() + 5;
+		top = fJobSetup->Frame().bottom + 15;
 	}
 	top += 5;
 	
