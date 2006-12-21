@@ -39,10 +39,10 @@ char* JSDSlider :: UpdateText() const
 		float gamma;
 		gamma =  exp((Value() * log(2.0) * 0.01) );    
 		sprintf(string, " %.2f", gamma); 
-	} else if (!strcmp("inkDensity", Name()) ) {        
-		float density;
-		density = 127 - Value();
-		sprintf(string," %.2f", density/127.0 ); 
+	} else if (!strcmp("inkDensity", Name()) ) {    
+		float density = Value();
+		density = (density / 127.0) * 100.0;    
+		sprintf(string," %.0f%%", density); 
 	}
 	
 	*fResult = string;

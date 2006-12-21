@@ -182,13 +182,13 @@ const BRect quality_rect(
 	QUALITY_H + QUALITY_WIDTH,
 	QUALITY_V + QUALITY_HEIGHT);
 
-const BRect bpp_rect(
+BRect bpp_rect(
 	BPP_H,
 	BPP_V,
 	BPP_H + BPP_WIDTH,
 	BPP_V + BPP_HEIGHT);
 
-const BRect dither_rect(
+BRect dither_rect(
 	DITHER_H,
 	DITHER_V,
 	DITHER_H + DITHER_WIDTH,
@@ -248,7 +248,7 @@ const BRect paperfeed_rect(
 	PAPERFEED_H + PAPERFEED_WIDTH,
 	PAPERFEED_V + PAPERFEED_HEIGHT);
 
-const BRect nup_rect(
+BRect nup_rect(
 	NUP_H,
 	NUP_V,
 	NUP_H + NUP_WIDTH,
@@ -340,20 +340,20 @@ static const SurfaceCap gCMAP8("CMAP8", true,  B_CMAP8);
 static const SurfaceCap gGray8("GRAY8", false, B_GRAY8);
 static const SurfaceCap gGray1("GRAY1", false, B_GRAY1);
 
-static const NupCap gNup1("Normal", true,  1);
-static const NupCap gNup2("2-up",   false, 2);
-static const NupCap gNup4("4-up",   false, 4);
-static const NupCap gNup8("8-up",   false, 8);
-static const NupCap gNup9("9-up",   false, 9);
-static const NupCap gNup16("16-up", false, 16);
-static const NupCap gNup25("25-up", false, 25);
-static const NupCap gNup32("32-up", false, 32);
-static const NupCap gNup36("36-up", false, 36);
+static const NupCap gNup1("1", true,  1);
+static const NupCap gNup2("2",   false, 2);
+static const NupCap gNup4("4",   false, 4);
+static const NupCap gNup8("8",   false, 8);
+static const NupCap gNup9("9",   false, 9);
+static const NupCap gNup16("16", false, 16);
+static const NupCap gNup25("25", false, 25);
+static const NupCap gNup32("32", false, 32);
+static const NupCap gNup36("36", false, 36);
 
-static const DitherCap gDitherType1("Type 1", false, Halftone::kType1);
-static const DitherCap gDitherType2("Type 2", false, Halftone::kType2);
-static const DitherCap gDitherType3("Type 3", false, Halftone::kType3);
-static const DitherCap gDitherFloydSteinberg("Floyd Steinberg", false, Halftone::kTypeFloydSteinberg);
+static const DitherCap gDitherType1("Crosshatch", false, Halftone::kType1);
+static const DitherCap gDitherType2("Grid", false, Halftone::kType2);
+static const DitherCap gDitherType3("Stipple", false, Halftone::kType3);
+static const DitherCap gDitherFloydSteinberg("Floyd-Steinberg", false, Halftone::kTypeFloydSteinberg);
 
 const SurfaceCap *gSurfaces[] = {
 	&gRGB32,
@@ -483,6 +483,7 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
+	bpp_rect.right = bpp_rect.left + StringWidth("Color:") + fColorType->MaxContentWidth() + 10;
 	menufield = new BMenuField(bpp_rect, "color", "Color:", fColorType);
 
 	box->AddChild(menufield);
@@ -508,10 +509,11 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	menufield = new BMenuField(dither_rect, "dithering", "Dithering:", fDitherType);
+	dither_rect.right = dither_rect.left + StringWidth("Dot Pattern:") + fDitherType->MaxContentWidth() + 20;
+	menufield = new BMenuField(dither_rect, "dithering", "Dot Pattern:", fDitherType);
 
 	box->AddChild(menufield);
-	width = StringWidth("Dithering:") + 10;
+	width = StringWidth("Dot Pattern:") + 10;
 	menufield->SetDivider(width);
 	fDitherType->SetTargetForItems(this);
 	
@@ -528,7 +530,7 @@ JobSetupView::AttachedToWindow()
 	/* gamma */
 	fGamma = new JSDSlider(gamma_rect, "gamma", "Gamma", new BMessage(kMsgQuality), -300, 300, B_BLOCK_THUMB);
 	
-	fGamma->SetLimitLabels("Brighter", "Darker");
+	fGamma->SetLimitLabels("Lighter", "Darker");
 	fGamma->SetValue((int32)(100 * log(fJobData->getGamma()) / log(2.0)));
 	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
 	fGamma->SetHashMarkCount(7);
@@ -537,11 +539,11 @@ JobSetupView::AttachedToWindow()
 	fGamma->SetTarget(this);
 
 	/* ink density */
-	fInkDensity = new JSDSlider(ink_density_rect, "inkDensity", "Ink Density", new BMessage(kMsgQuality), 0, 127, B_BLOCK_THUMB);
+	fInkDensity = new JSDSlider(ink_density_rect, "inkDensity", "Ink Usage", new BMessage(kMsgQuality), 0, 127, B_BLOCK_THUMB);
 	
-	fInkDensity->SetLimitLabels("Max", "Min");
+	fInkDensity->SetLimitLabels("Min", "Max");
 	fInkDensity->SetValue((int32)fJobData->getInkDensity());
-	fInkDensity->SetHashMarks(B_HASH_MARKS_TOP);
+	fInkDensity->SetHashMarks(B_HASH_MARKS_BOTH);
 	fInkDensity->SetHashMarkCount(10);
 	box->AddChild(fInkDensity);
 	fInkDensity->SetModificationMessage(new BMessage(kMsgQuality));
@@ -636,8 +638,8 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(nup_rect, "pagePerSheet", "Page Per Sheet:", fNup);
-	menufield->SetDivider(width);
+	menufield = new BMenuField(nup_rect, "pagePerSheet", "Pages Per Sheet:", fNup);
+	menufield->SetDivider(StringWidth("Number of Copies:") + 7);
 	AddChild(menufield);
 
 	/* duplex */
@@ -667,6 +669,7 @@ JobSetupView::AttachedToWindow()
 	/* collate */
 
 	fCollate = new BCheckBox(collate_rect, "collate", "Collate", new BMessage(kMsgCollateChanged));
+	fCollate->ResizeToPreferred();
 	AddChild(fCollate);
 	if (fJobData->getCollate()) {
 		fCollate->SetValue(B_CONTROL_ON);
@@ -675,7 +678,8 @@ JobSetupView::AttachedToWindow()
 
 	/* reverse */
 
-	fReverse = new BCheckBox(reverse_rect, "reverse", "Reverse", new BMessage(kMsgReverseChanged));
+	fReverse = new BCheckBox(reverse_rect, "reverse", "Reverse Order", new BMessage(kMsgReverseChanged));
+	fReverse->ResizeToPreferred();
 	AddChild(fReverse);
 	if (fJobData->getReverse()) {
 		fReverse->SetValue(B_CONTROL_ON);
@@ -695,8 +699,8 @@ JobSetupView::AttachedToWindow()
 	pageSelectionBox->SetLabel("Page Selection");
 	
 	fAllPages = AddPageSelectionItem(pageSelectionBox, page_selection_all_pages_rect, "allPages", "All Pages", JobData::kAllPages);
-	fOddNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_odd_pages_rect, "oddPages", "Odd Numbered Pages", JobData::kOddNumberedPages);
-	fEvenNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_even_pages_rect, "evenPages", "Even Numbered Pages", JobData::kEvenNumberedPages);
+	fOddNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_odd_pages_rect, "oddPages", "Odd-Numbered Pages", JobData::kOddNumberedPages);
+	fEvenNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_even_pages_rect, "evenPages", "Even-Numbered Pages", JobData::kEvenNumberedPages);
 
 	/* cancel */
 
@@ -790,7 +794,7 @@ JobSetupView::getGamma()
 float 
 JobSetupView::getInkDensity()
 {
-	const float value = (float)fInkDensity->Value();
+	const float value = (float)(127 - fInkDensity->Value());
 	return value;
 }
 
@@ -880,6 +884,7 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const Pri
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	SetResult(B_ERROR);
+	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
 	
 	fJobSetup = new JobSetupView(Bounds(), job_data, printer_data, printer_cap);
 	AddChild(fJobSetup);
