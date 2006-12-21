@@ -155,7 +155,7 @@ const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true, PCL6Writer::kProt
 "The printer driver supports the following features of protocol class 1.1:\n"
 "* Monochrome and Color Printing.\n"
 "* Paper Formats: Letter, Legal, A4, A3, A5 and Japanese Postcard.\n"
-"* Paper Sources: Auto, Default, Manual Feed, Multi Purpose Tray, Upper and Lower Cassette and Envelope Tray.\n"
+"* Paper Sources: Auto, Default, Manual Feed, Multi-Purpose Tray, Upper and Lower Cassette and Envelope Tray.\n"
 "* Resolutions: 150, 300, 600 and 1200 DPI."
 #if ENABLE_RLE_COMPRESSION
 "\n* Compression Method: RLE."
@@ -165,14 +165,14 @@ const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true, PCL6Writer::kProt
 );
 
 const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false, PCL6Writer::kProtocolClass2_0, 
-"Additionally to features of protocol class 1.1, the printer driver supports the "
+"In addition to features of protocol class 1.1, the printer driver supports the "
 "following features of protocol class 2.0:\n"
 "* Additonal Paper Source: Third Cassette."
 // "\n* JPEG compression (not implemented yet)"
 );
 
 const ProtocolClassCap pc2_1("PCL 6 Protocol Class 2.1", false, PCL6Writer::kProtocolClass2_1, 
-"Additionally to features of previous protocol classes, the printer driver supports the "
+"In addition to features of previous protocol classes, the printer driver supports the "
 "following features of protocol class 2.1:\n"
 "* Additional Paper Format: B5."
 #if ENABLE_DELTA_ROW_COMPRESSION
@@ -247,7 +247,7 @@ const ProtocolClassCap *protocolClasses[] = {
 };
 
 const ColorCap color("Color", false, JobData::kColor);
-const ColorCap monochrome("Monochrome", true, JobData::kMonochrome);
+const ColorCap monochrome("Shades of Gray", true, JobData::kMonochrome);
 
 const ColorCap *colors[] = {
 	&color,

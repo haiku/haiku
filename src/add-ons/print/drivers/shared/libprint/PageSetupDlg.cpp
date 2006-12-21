@@ -432,6 +432,7 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 	oss << printer_data->get_printer_name() << " Setup";
 	SetTitle(title.str().c_str());
 */
+	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
 
 	PageSetupView *view = new PageSetupView(Bounds(), job_data, printer_data, printer_cap);
 	AddChild(view);

@@ -98,6 +98,8 @@ FontsWindow::FontsWindow(Fonts *fonts)
 	BTabView    *tabView;
 	BTab        *tab;
 
+	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	
 	fFonts = fonts;
 	
 	r = Bounds();

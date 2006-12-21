@@ -59,6 +59,8 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	float		x, y, w, h;
 	fSettings = settings;
 	
+	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	
 	// add a *dialog* background
 	r = Bounds();
 	panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
@@ -182,6 +184,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->GetPreferredSize(&w, &h);
+	button->MakeDefault(true);
 	x = r.right - w - 8;
 	y = r.bottom - h - 8;
 	button->MoveTo(x, y);
@@ -197,7 +200,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	panel->AddChild(button);
 	
 	// add a "Open Settings Folder" button
-	button 	= new BButton(r, NULL, "Open Settings Folder", new BMessage(OPEN_SETTINGS_FOLDER_MSG), 
+	button 	= new BButton(r, NULL, "Open Settings Folder…", new BMessage(OPEN_SETTINGS_FOLDER_MSG), 
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();

@@ -152,7 +152,7 @@ const BindingLocationCap *bindinglocations[] = {
 };
 
 const ColorCap color("Color", false, JobData::kColor);
-const ColorCap monochrome("Monochrome", true, JobData::kMonochrome);
+const ColorCap monochrome("Shades of Gray", true, JobData::kMonochrome);
 
 const ColorCap *colors[] = {
 	&color,
