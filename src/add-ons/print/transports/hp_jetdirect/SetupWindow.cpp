@@ -128,7 +128,7 @@ bool SetupView::UpdateViewData()
 			if (ep->Connect(server->Text(), atoi(queue->Text())) != B_OK) {
 				BString text;
 				text << "Fail to connect to " << server->Text() << ":" << (int) port << "!";  
-				BAlert *alert = new BAlert("", text.String(), "Damn");
+				BAlert *alert = new BAlert("", text.String(), "OK");
 				alert->Go();
 				return false;
 			};

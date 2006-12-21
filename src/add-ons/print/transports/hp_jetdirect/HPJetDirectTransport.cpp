@@ -66,7 +66,7 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 
 	fEndpoint = new BNetEndpoint(SOCK_STREAM);
 	if ((fReady = fEndpoint->InitCheck()) != B_OK) {
-		BAlert *alert = new BAlert("", "Fail to create the NetEndpoint!", "Damn");
+		BAlert *alert = new BAlert("", "Fail to create the NetEndpoint!", "OK");
 		alert->Go();
 		return;
 	};
@@ -75,7 +75,7 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 		printf("Connected to HP JetDirect printer port at %s:%d\n", fHost, fPort);
 		fReady = B_OK;
 	} else {
-		BAlert *alert = new BAlert("", "Can't connect to HP JetDirect printer port!", "Bad luck");
+		BAlert *alert = new BAlert("", "Can't connect to HP JetDirect printer port!", "OK");
 		alert->Go();
 	};
 }
