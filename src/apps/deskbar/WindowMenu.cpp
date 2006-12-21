@@ -212,13 +212,13 @@ TWindowMenu::DetachedFromWindow()
 	// in expando mode the teammenu will not call DragStop,
 	// thus, it needs to be called from here
 	TBarView *barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
-	if (barview && barview->Expando()) {
-		BLooper *looper = barview->Looper();
-		if (looper->Lock()) {
-			Window()->Show();		// We changed the show level in AttachedToWindow().  Undo it.
-			barview->DragStop();
-			looper->Unlock();
+	if (barview && barview->LockLooper()) {
+		if (barview->Expando() && barview->Dragging()) {
+			// We changed the show level in AttachedToWindow().  Undo it.			
+			Window()->Show();
+			barview->DragStop();	
 		}
+		barview->UnlockLooper();
 	}
 	
 	BMenu::DetachedFromWindow();
