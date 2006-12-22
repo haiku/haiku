@@ -2624,7 +2624,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 				fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
 		//		StrokeLine(BPoint(0, line + rowHeight - 2), BPoint(Bounds().Width(), line + rowHeight - 2));
 		//		StrokeLine(BPoint(0, line + rowHeight - 1), BPoint(Bounds().Width(), line + rowHeight - 1));
-				fDrawBufferView->StrokeLine(BPoint(0, rowHeight), BPoint(Bounds().Width(), rowHeight));
+				fDrawBufferView->StrokeLine(BPoint(0, rowHeight), BPoint(Bounds().right, rowHeight));
 	
 				fDrawBufferView->Sync();
 				fDrawBuffer->Unlock();
@@ -2679,7 +2679,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 				SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
 		//		StrokeLine(BPoint(0, line + rowHeight - 2), BPoint(Bounds().Width(), line + rowHeight - 2));
 		//		StrokeLine(BPoint(0, line + rowHeight - 1), BPoint(Bounds().Width(), line + rowHeight - 1));
-				StrokeLine(BPoint(0, line + rowHeight), BPoint(Bounds().Width(), line + rowHeight));
+				StrokeLine(BPoint(0, line + rowHeight), BPoint(Bounds().right, line + rowHeight));
 				SetHighColor(color);
 	#endif
 			}
@@ -2857,7 +2857,7 @@ void OutlineView::Draw(BRect invalidBounds)
 		SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
 //		StrokeLine(BPoint(0, line + rowHeight - 2), BPoint(Bounds().Width(), line + rowHeight - 2));
 //		StrokeLine(BPoint(0, line + rowHeight - 1), BPoint(Bounds().Width(), line + rowHeight - 1));
-		StrokeLine(BPoint(0, line + rowHeight), BPoint(Bounds().Width(), line + rowHeight));
+		StrokeLine(BPoint(invalidBounds.left, line + rowHeight), BPoint(invalidBounds.right, line + rowHeight));
 		SetHighColor(color);
 		line += rowHeight + 1;
 	}
@@ -3047,6 +3047,7 @@ void OutlineView::MouseDown(BPoint position)
 
 	} else if (fFocusRow != 0) {
 		// User clicked in open space, unhighlight focus row.
+		FindVisibleRect(fFocusRow, &fFocusRowRect);
 		fFocusRow = 0;
 		Invalidate(fFocusRowRect);
 	}
