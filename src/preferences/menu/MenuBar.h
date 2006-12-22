@@ -1,36 +1,39 @@
-#ifndef __BARMENU_H
-#define __BARMENU_H
+/*
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		<unknown, please fill in who knows>
+ */
+#ifndef MENU_BAR_H
+#define MENU_BAR_H
+
 
 #include <MenuBar.h>
 
 class BMenuItem;
-class FontMenu;
-class FontSizeMenu;
+
 
 class MenuBar : public BMenuBar {
-public:
-			MenuBar();
-	virtual	void	AttachedToWindow();
-		void	set_menu();
-		void	build_menu();
-		void	Update();
-	virtual void 	FrameResized(float width, float height);
+	public:
+		MenuBar();
 
-private:	
-	//seperator submenu
-	BMenu			*separatorStyleMenu;
-	BMenuItem		*separatorStyleZero;
-	BMenuItem		*separatorStyleOne;
-	BMenuItem		*separatorStyleTwo;
-	
-	//others
-	FontMenu		*fontMenu;
-	FontSizeMenu		*fontSizeMenu;
-	BMenuItem		*alwaysShowTriggersItem;
-	BMenuItem		*colorSchemeItem;
-	BMenuItem		*separatorStyleItem;
-	BMenuItem		*ctlAsShortcutItem;
-	BMenuItem		*altAsShortcutItem;
+		virtual	void AttachedToWindow();
+
+		void UpdateMenu();
+		void Update();
+		virtual void FrameResized(float width, float height);
+
+	private:	
+		void _BuildMenu();
+
+		BMenuItem*	separatorStyleZero;
+		BMenuItem*	separatorStyleOne;
+		BMenuItem*	separatorStyleTwo;
+
+		BMenuItem*	fAlwaysShowTriggersItem;
+		BMenuItem*	fControlAsShortcutItem;
+		BMenuItem*	fAltAsShortcutItem;
 };
 
-#endif
+#endif	// MENU_BAR_H

@@ -1,9 +1,18 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		<unknown, please fill in who knows>
+ */
+
+
 #include "FontMenu.h"
 #include "MenuSettings.h"
 #include "msg.h"
 
-#include <Message.h>
 #include <MenuItem.h>
+#include <Message.h>
 #include <String.h>
 #include <Window.h>
 

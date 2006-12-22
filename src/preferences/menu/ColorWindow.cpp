@@ -1,56 +1,56 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		<unknown, please fill in who knows>
  *		Vasilis Kaoutsis, kaoutsis@sch.gr
  */
 
+
+#include "ColorWindow.h"
+#include "msg.h"
 
 #include <Application.h>
 #include <Button.h>
 #include <ColorControl.h>
 #include <Menu.h>	
 
-#include "ColorWindow.h"
-#include "msg.h"
-
 
 ColorWindow::ColorWindow(BMessenger owner)
-	: BWindow(BRect(150,150,350,200), "Menu Color Scheme", B_TITLED_WINDOW,
+	: BWindow(BRect(150, 150, 350, 200), "Menu Color Scheme", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fOwner(owner)
 {
 	// Set and collect the variables for revert
-	get_menu_info(&info);
-	get_menu_info(&revert_info);
+	get_menu_info(&fInfo);
+	get_menu_info(&fRevertInfo);
 
 	BView *colView = new BView(BRect(0,0,1000,100), "menuView",
 		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	
-	colorPicker = new BColorControl(BPoint(10,10), B_CELLS_32x8, 
-				9, "COLOR", new BMessage(MENU_COLOR), true);
-	colorPicker->SetValue(info.background_color);
+	fColorControl = new BColorControl(BPoint(10,10), B_CELLS_32x8, 
+		9, "COLOR", new BMessage(MENU_COLOR), true);
+	fColorControl->SetValue(fInfo.background_color);
 	colView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	colView->AddChild(colorPicker);
+	colView->AddChild(fColorControl);
 	AddChild(colView);
 
 	ResizeTo(383, 130);
 
 	// Create the buttons and add them to the view
-	DefaultButton = new BButton(BRect(10,100,85,110), "Default", "Default",
+	fDefaultButton = new BButton(BRect(10,100,85,110), "Default", "Default",
 		new BMessage(MENU_COLOR_DEFAULT), B_FOLLOW_LEFT | B_FOLLOW_TOP, 
-			B_WILL_DRAW | B_NAVIGABLE);
-	RevertButton = new BButton(BRect(95,100,175,20), "REVERT", "Revert",
+		B_WILL_DRAW | B_NAVIGABLE);
+	fRevertButton = new BButton(BRect(95,100,175,20), "REVERT", "Revert",
 		new BMessage(MENU_REVERT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, 
-			B_WILL_DRAW | B_NAVIGABLE);
+		B_WILL_DRAW | B_NAVIGABLE);
 
-	colView->AddChild(DefaultButton);
-	colView->AddChild(RevertButton);
+	colView->AddChild(fDefaultButton);
+	colView->AddChild(fRevertButton);
 
-	DefaultButton->SetEnabled(false);
-	RevertButton->SetEnabled(false);
+	fDefaultButton->SetEnabled(false);
+	fRevertButton->SetEnabled(false);
 }
 
 
@@ -72,11 +72,11 @@ ColorWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MENU_REVERT:
-			colorPicker->SetValue(revert_info.background_color);
-			info.background_color = colorPicker->ValueAsColor();
-			set_menu_info(&info);
+			fColorControl->SetValue(fRevertInfo.background_color);
+			fInfo.background_color = fColorControl->ValueAsColor();
+			set_menu_info(&fInfo);
 			be_app->PostMessage(UPDATE_WINDOW);
-			RevertButton->SetEnabled(false);
+			fRevertButton->SetEnabled(false);
 			break;
 
 		case MENU_COLOR_DEFAULT:
@@ -87,22 +87,22 @@ ColorWindow::MessageReceived(BMessage *msg)
 			color.blue = 216;
 			color.green = 216;
 			color.alpha = 255;
-			colorPicker->SetValue(color);
-			DefaultButton->SetEnabled(false);
-			get_menu_info(&info);
-			info.background_color = colorPicker->ValueAsColor();
-			set_menu_info(&info);
+			fColorControl->SetValue(color);
+			fDefaultButton->SetEnabled(false);
+			get_menu_info(&fInfo);
+			fInfo.background_color = fColorControl->ValueAsColor();
+			set_menu_info(&fInfo);
 			be_app->PostMessage(MENU_COLOR);
 			break;
 
 		case MENU_COLOR:
-			get_menu_info(&info);
-			revert_info.background_color = info.background_color;
-			info.background_color = colorPicker->ValueAsColor();
-			set_menu_info(&info);
+			get_menu_info(&fInfo);
+			fRevertInfo.background_color = fInfo.background_color;
+			fInfo.background_color = fColorControl->ValueAsColor();
+			set_menu_info(&fInfo);
 			be_app->PostMessage(MENU_COLOR);
-			DefaultButton->SetEnabled(true);
-			RevertButton->SetEnabled(true);
+			fDefaultButton->SetEnabled(true);
+			fRevertButton->SetEnabled(true);
 			break;
 
 		default:

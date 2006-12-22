@@ -1,3 +1,12 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		<unknown, please fill in who knows>
+ */
+
+
 #include "MenuSettings.h"
 
  

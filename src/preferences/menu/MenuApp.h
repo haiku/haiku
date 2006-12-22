@@ -1,8 +1,8 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		<unknown, please fill in who knows>
  *		Jack Burton
  */
@@ -12,12 +12,13 @@
 
 #include <Application.h>
 
-
 class MenuWindow;	
+
 
 class MenuApp : public BApplication {
 	public:
 		MenuApp();
+
 		virtual void MessageReceived(BMessage* msg);
 
 	private:

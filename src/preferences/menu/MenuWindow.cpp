@@ -1,8 +1,8 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		<unknown, please fill in who knows>
  *		Vasilis Kaoutsis, kaoutsis@sch.gr
  */
@@ -29,34 +29,36 @@ MenuWindow::MenuWindow(BRect rect)
 	: BWindow(rect, "Menu", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
-	colorWindow = NULL;
- 	revert = false;
- 
-	menuView = new BBox(Bounds(), "menuView", B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
-	AddChild(menuView);
+	fColorWindow = NULL;
+	fRevert = false;
 
-	menuBar = new MenuBar();
-	menuView->AddChild(menuBar);
+	BView* topView = new BView(Bounds(), "menuView", B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW);
+	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topView);
 
-	// resize the window according to the size of menuBar
-	ResizeTo((menuBar->Frame().right + 40), (menuBar->Frame().bottom + 45));
+	fMenuBar = new MenuBar();
+	topView->AddChild(fMenuBar);
 
-	BRect menuBarFrame = menuBar->Frame();
+	// resize the window according to the size of fMenuBar
+	ResizeTo(fMenuBar->Frame().right + 40, fMenuBar->Frame().bottom + 45);
+
+	BRect menuBarFrame = fMenuBar->Frame();
 	BRect buttonFrame(menuBarFrame.left, menuBarFrame.bottom + 10, 
 		menuBarFrame.left + 75, menuBarFrame.bottom + 30);
 
-	defaultButton = new BButton(buttonFrame, "Default", "Defaults", new BMessage(MENU_DEFAULT),
-		B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
-	menuView->AddChild(defaultButton);
-	
-	buttonFrame.OffsetBy(buttonFrame.Width() + 20, 0);
-	revertButton = new BButton(buttonFrame, "Revert", "Revert", new BMessage(MENU_REVERT),
-		B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
-	revertButton->SetEnabled(false);
-	menuView->AddChild(revertButton);
+	BButton* defaultButton = new BButton(buttonFrame, "Default", "Defaults",
+		new BMessage(MENU_DEFAULT), B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM,
+		B_WILL_DRAW | B_NAVIGABLE);
+	topView->AddChild(defaultButton);
 
-	menuView->MakeFocus();
+	buttonFrame.OffsetBy(buttonFrame.Width() + 20, 0);
+	fRevertButton = new BButton(buttonFrame, "Revert", "Revert", new BMessage(MENU_REVERT),
+		B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
+	fRevertButton->SetEnabled(false);
+	topView->AddChild(fRevertButton);
+
+	topView->MakeFocus();
 
 	Update();	
 }
@@ -75,13 +77,13 @@ MenuWindow::MessageReceived(BMessage *msg)
 
 	switch (msg->what) {
 		case MENU_REVERT:
-			revert = false;
+			fRevert = false;
 			settings->Revert();
 			Update();
 			break;
 
 		case MENU_DEFAULT:
-			revert = true;
+			fRevert = true;
 			settings->ResetToDefaults();
 			Update();
 			break;
@@ -93,7 +95,7 @@ MenuWindow::MessageReceived(BMessage *msg)
 		case MENU_FONT_FAMILY:
 		case MENU_FONT_STYLE:
 		{
-			revert = true;
+			fRevert = true;
 			font_family *family;
 			msg->FindPointer("family", (void**)&family);
 			font_style *style;
@@ -107,7 +109,7 @@ MenuWindow::MessageReceived(BMessage *msg)
 		}
 
 		case MENU_FONT_SIZE:
-			revert = true;
+			fRevert = true;
 			settings->Get(info);
 			msg->FindFloat("size", &info.font_size);
 			settings->Set(info);
@@ -115,7 +117,7 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case MENU_SEP_TYPE:
-			revert = true;
+			fRevert = true;
 			settings->Get(info);
 			msg->FindInt32("sep", &info.separator);
 			settings->Set(info);
@@ -123,16 +125,16 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case ALLWAYS_TRIGGERS_MSG:
-			revert = true;
+			fRevert = true;
 			settings->Get(info);
 			info.triggers_always_shown = !info.triggers_always_shown;
 			settings->Set(info);
-			menuBar->set_menu();
+			fMenuBar->UpdateMenu();
 			Update();
 			break;
 
 		case CTL_MARKED_MSG:
-			revert = true;
+			fRevert = true;
 			// This might not be the same for all keyboards
 			set_modifier_key(B_LEFT_COMMAND_KEY, 0x5c);
 			set_modifier_key(B_RIGHT_COMMAND_KEY, 0x60);
@@ -143,7 +145,7 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case ALT_MARKED_MSG:
-			revert = true;
+			fRevert = true;
 			// This might not be the same for all keyboards
 			set_modifier_key(B_LEFT_COMMAND_KEY, 0x5d);
 			set_modifier_key(B_RIGHT_COMMAND_KEY, 0x5f);
@@ -155,19 +157,19 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case COLOR_SCHEME_OPEN_MSG:
-			if (colorWindow == NULL) {
-				colorWindow = new ColorWindow(this);
-				colorWindow->Show();
+			if (fColorWindow == NULL) {
+				fColorWindow = new ColorWindow(this);
+				fColorWindow->Show();
 			} else
-				colorWindow->Activate();
+				fColorWindow->Activate();
 			break;
 
 		case COLOR_SCHEME_CLOSED_MSG:
-			colorWindow = NULL;
+			fColorWindow = NULL;
 			break;
 
 		case MENU_COLOR:
-			revert = true;
+			fRevert = true;
 			Update();
 			break;
 
@@ -181,9 +183,9 @@ MenuWindow::MessageReceived(BMessage *msg)
 bool
 MenuWindow::QuitRequested()
 {
-	if (colorWindow != NULL && colorWindow->Lock()) {
-		colorWindow->Quit();
-		colorWindow = NULL;
+	if (fColorWindow != NULL && fColorWindow->Lock()) {
+		fColorWindow->Quit();
+		fColorWindow = NULL;
 	}
 
 	return true;
@@ -193,9 +195,9 @@ MenuWindow::QuitRequested()
 void
 MenuWindow::Update()
 {
-	revertButton->SetEnabled(revert);
+	fRevertButton->SetEnabled(fRevert);
 
 	// alert the rest of the application to update	
-	menuBar->Update();
+	fMenuBar->Update();
 }
 

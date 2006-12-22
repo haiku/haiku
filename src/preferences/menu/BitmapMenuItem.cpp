@@ -1,15 +1,22 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		<unknown, please fill in who knows>
+ */
+
+
+#include "BitmapMenuItem.h"
+
 #include <Bitmap.h>
 #include <NodeInfo.h>
-
-// Project Headers
-#include "BitmapMenuItem.h"
 
 
 // BitmapMenuItem class definition
 BitmapMenuItem::BitmapMenuItem(const char* name, BMessage* message, 
-				BBitmap* bmp, char shortcut, uint32 modifiers)
-	: 
-	BMenuItem(name, message, shortcut, modifiers),
+	BBitmap* bmp, char shortcut, uint32 modifiers)
+	: BMenuItem(name, message, shortcut, modifiers),
 	fBitmap(bmp),
 	fName(name)
 {

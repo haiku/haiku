@@ -1,8 +1,8 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		<unknown, please fill in who knows>
  *		Jack Burton
  *		Vasilis Kaoutsis, kaoutsis@sch.gr
@@ -54,4 +54,3 @@ main(int, char**)
 
 	return 0;
 }
-
