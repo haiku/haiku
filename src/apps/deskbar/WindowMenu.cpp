@@ -81,9 +81,7 @@ TWindowMenu::AttachedToWindow()
 {
 	SetFont(be_plain_font);
 	
-	BMenuItem *item = NULL;
-	while ((item = RemoveItem((int32)0)) != NULL)
-		delete (item);
+	RemoveItems(0, CountItems(), true);
 	
 	int32 miniCount = 0;
 	
@@ -212,12 +210,10 @@ TWindowMenu::DetachedFromWindow()
 	// in expando mode the teammenu will not call DragStop,
 	// thus, it needs to be called from here
 	TBarView *barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
-	if (barview && barview->LockLooper()) {
-		if (barview->Expando() && barview->Dragging()) {
-			// We changed the show level in AttachedToWindow().  Undo it.			
-			Window()->Show();
-			barview->DragStop();	
-		}
+	if (barview && barview->Expando() && barview->Dragging() && barview->LockLooper()) {
+		// We changed the show level in AttachedToWindow().  Undo it.			
+		Window()->Show();
+		barview->DragStop();	
 		barview->UnlockLooper();
 	}
 	
