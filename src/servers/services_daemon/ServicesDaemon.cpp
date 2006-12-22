@@ -22,8 +22,8 @@ enum {
 	M_RELAUNCH_MIDI
 };
 
-// Time delay in microseconds - 2 seconds
-const bigtime_t kRelaunchDelay = 2000000;
+// Time delay in microseconds - 1 seconds
+const bigtime_t kRelaunchDelay = 1000000;
 
 const char *gSignatures[] = {
 	"application/x-vnd.Be-TSKB",
@@ -113,75 +113,33 @@ App::MessageReceived(BMessage *msg)
 			break;
 		}
 		case M_RELAUNCH_DESKBAR: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"The Deskbar is no longer running. Restart it?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
-				break;
-			}
+			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
 		case M_RELAUNCH_TRACKER: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"Tracker is no longer running. Restart it?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
-				break;
-			}
+			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
 		case M_RELAUNCH_MAIL: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"Mail services are no longer running. Restart them?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
-				break;
-			}
+			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
 		case M_RELAUNCH_PRINT: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"Print services are no longer running. Restart them?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
-				break;
-			}
+			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
 		case M_RELAUNCH_AUDIO: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"The audio server is no longer running. Restart them?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
-				break;
-			}
+			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
 		case M_RELAUNCH_MEDIA_ADDONS:
 		case M_RELAUNCH_MEDIA: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"Media services are no longer running. Restart them?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				shutdown_media_server();
-				launch_media_server();
-				break;
-			}
+			shutdown_media_server();
+			launch_media_server();
 			break;
 		}
 		case M_RELAUNCH_MIDI: {
-			BAlert *alert = new BAlert("Services Daemon",
-										"The MIDI server is no longer running. Restart them?",
-										"No","Yes");
-			if (alert->Go() == 1) {
-				be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
-				break;
-			}
+			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
 		default:
