@@ -26,31 +26,36 @@ ColorWindow::ColorWindow(BMessenger owner)
 	get_menu_info(&fInfo);
 	get_menu_info(&fRevertInfo);
 
-	BView *colView = new BView(BRect(0,0,1000,100), "menuView",
-		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
-	
-	fColorControl = new BColorControl(BPoint(10,10), B_CELLS_32x8, 
+	BView *topView = new BView(Bounds(), "topView", B_FOLLOW_ALL_SIDES, 0);
+	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topView);
+
+	fColorControl = new BColorControl(BPoint(10, 10), B_CELLS_32x8, 
 		9, "COLOR", new BMessage(MENU_COLOR), true);
 	fColorControl->SetValue(fInfo.background_color);
-	colView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	colView->AddChild(fColorControl);
-	AddChild(colView);
-
-	ResizeTo(383, 130);
+	fColorControl->ResizeToPreferred();
+	topView->AddChild(fColorControl);
 
 	// Create the buttons and add them to the view
-	fDefaultButton = new BButton(BRect(10,100,85,110), "Default", "Default",
+	BRect rect = fColorControl->Frame();
+	rect.top = rect.bottom + 8;
+	rect.bottom = rect.top + 10;
+	fDefaultButton = new BButton(rect, "Default", "Default",
 		new BMessage(MENU_COLOR_DEFAULT), B_FOLLOW_LEFT | B_FOLLOW_TOP, 
 		B_WILL_DRAW | B_NAVIGABLE);
-	fRevertButton = new BButton(BRect(95,100,175,20), "REVERT", "Revert",
-		new BMessage(MENU_REVERT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, 
-		B_WILL_DRAW | B_NAVIGABLE);
-
-	colView->AddChild(fDefaultButton);
-	colView->AddChild(fRevertButton);
-
+	fDefaultButton->ResizeToPreferred();
 	fDefaultButton->SetEnabled(false);
+	topView->AddChild(fDefaultButton);
+
+	rect.OffsetBy(fDefaultButton->Bounds().Width() + 10, 0);
+	fRevertButton = new BButton(rect, "Revert", "Revert",
+		new BMessage(MENU_REVERT), B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+		B_WILL_DRAW | B_NAVIGABLE);
+	fRevertButton->ResizeToPreferred();
 	fRevertButton->SetEnabled(false);
+	topView->AddChild(fRevertButton);
+
+	ResizeTo(fColorControl->Bounds().Width() + 20, fRevertButton->Frame().bottom + 10);
 }
 
 
