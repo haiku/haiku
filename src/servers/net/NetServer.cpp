@@ -665,6 +665,7 @@ NetServer::_BringUpInterfaces()
 		BMessage address;
 		address.AddString("family", "inet");
 		address.AddString("address", "127.0.0.1");
+		address.AddString("mask", "255.0.0.0");
 		interface.AddMessage("address", &address);
 
 		_ConfigureInterface(socket, interface);
