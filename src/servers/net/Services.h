@@ -1,0 +1,50 @@
+/*
+ * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+#ifndef SERVICES_H
+#define SERVICES_H
+
+
+#include <Handler.h>
+#include <Locker.h>
+
+#include <map>
+#include <string>
+
+
+struct service;
+typedef std::map<std::string, service*> ServiceNameMap;
+typedef std::map<int, service*> ServiceSocketMap;
+
+
+class Services : public BHandler {
+	public:
+		Services(const BMessage& services);
+		virtual ~Services();
+
+		status_t InitCheck() const;
+
+		virtual void MessageReceived(BMessage* message);
+
+	private:
+		status_t _StartService(struct service& service);
+		status_t _StopService(struct service& service);
+		status_t _ToService(const BMessage& message, struct service*& service);
+		void _Update(const BMessage& services);
+		int32 _CompareServices(struct service& a, struct service& b);
+		static status_t _Listener(void* self);
+
+		thread_id	fListener;
+		BLocker		fLock;
+		ServiceNameMap fNameMap;
+		ServiceSocketMap fSocketMap;
+		int32		fUpdate;
+};
+
+const static uint32 kMsgUpdateServices = 'srvU';
+
+#endif	// SERVICES_H

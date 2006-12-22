@@ -9,6 +9,7 @@
 
 #include "AutoconfigLooper.h"
 #include "NetServer.h"
+#include "Services.h"
 #include "Settings.h"
 
 #include <Alert.h>
@@ -56,9 +57,11 @@ class NetServer : public BApplication {
 		void _ConfigureDevices(int socket, const char* path);
 		void _ConfigureInterfaces(int socket);
 		void _BringUpInterfaces();
+		void _StartServices();
 
 		Settings	fSettings;
 		LooperMap	fDeviceMap;
+		BMessenger	fServices;
 };
 
 
@@ -212,6 +215,7 @@ NetServer::ReadyToRun()
 {
 	fSettings.StartMonitoring(this);
 	_BringUpInterfaces();
+	_StartServices();
 }
 
 
@@ -232,6 +236,15 @@ NetServer::MessageReceived(BMessage* message)
 
 			_ConfigureInterfaces(socket);
 			close(socket);
+			break;
+		}
+
+		case kMsgServiceSettingsUpdated:
+		{
+			BMessage update = fSettings.Services();
+			update.what = kMsgUpdateServices;
+
+			fServices.SendMessage(&update);
 			break;
 		}
 
@@ -455,7 +468,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		if (!hasMask && hasAddress && kFamilies[familyIndex].family == AF_INET
 			&& ioctl(familySocket, SIOCGIFNETMASK, &request, sizeof(struct ifreq)) == 0
 			&& request.ifr_mask.sa_family == AF_UNSPEC) {
-				// generate standard netmask if it doesn't have one yet
+			// generate standard netmask if it doesn't have one yet
 			sockaddr_in *netmask = (sockaddr_in *)&mask;
 			netmask->sin_len = sizeof(sockaddr_in);
 			netmask->sin_family = AF_INET;
@@ -466,7 +479,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 				|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
 				// class A, or loopback
 				netmask->sin_addr.s_addr = IN_CLASSA_NET;
-			} if (IN_CLASSB(net)) {
+			} else if (IN_CLASSB(net)) {
 				// class B
 				netmask->sin_addr.s_addr = IN_CLASSB_NET;
 			} else {
@@ -665,7 +678,6 @@ NetServer::_BringUpInterfaces()
 		BMessage address;
 		address.AddString("family", "inet");
 		address.AddString("address", "127.0.0.1");
-		address.AddString("mask", "255.0.0.0");
 		interface.AddMessage("address", &address);
 
 		_ConfigureInterface(socket, interface);
@@ -677,6 +689,17 @@ NetServer::_BringUpInterfaces()
 	}
 
 	close(socket);
+}
+
+
+void
+NetServer::_StartServices()
+{
+	BHandler* services = new (std::nothrow) Services(fSettings.Services());
+	if (services != NULL) {
+		AddHandler(services);
+		fServices = BMessenger(services);
+	}
 }
 
 

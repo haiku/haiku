@@ -13,6 +13,7 @@ Server net_server :
 	Settings.cpp
 	AutoconfigLooper.cpp
 	DHCPClient.cpp
+	Services.cpp
 ;
 
 LinkAgainst net_server : 

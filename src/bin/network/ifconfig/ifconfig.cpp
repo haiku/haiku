@@ -526,7 +526,7 @@ configure_interface(int socket, const char* name, char* const* args,
 	if (!hasMask && hasAddress && kFamilies[familyIndex].family == AF_INET
 		&& ioctl(socket, SIOCGIFNETMASK, &request, sizeof(struct ifreq)) == 0
 		&& request.ifr_mask.sa_family == AF_UNSPEC) {
-			// generate standard netmask if it doesn't have one yet
+		// generate standard netmask if it doesn't have one yet
 		sockaddr_in *netmask = (sockaddr_in *)&mask;
 		netmask->sin_len = sizeof(sockaddr_in);
 		netmask->sin_family = AF_INET;
@@ -537,7 +537,7 @@ configure_interface(int socket, const char* name, char* const* args,
 			|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
 			// class A, or loopback
 			netmask->sin_addr.s_addr = IN_CLASSA_NET;
-		} if (IN_CLASSB(net)) {
+		} else if (IN_CLASSB(net)) {
 			// class B
 			netmask->sin_addr.s_addr = IN_CLASSB_NET;
 		} else {

@@ -19,6 +19,8 @@
 #include <string.h>
 
 
+// Interface templates
+
 const static settings_template kInterfaceAddressTemplate[] = {
 	{B_STRING_TYPE, "family", NULL},
 	{B_STRING_TYPE, "address", NULL},
@@ -30,7 +32,7 @@ const static settings_template kInterfaceAddressTemplate[] = {
 	{0, NULL, NULL}
 };
 
-const static settings_template kInterfaceDeviceTemplate[] = {
+const static settings_template kInterfaceTemplate[] = {
 	{B_STRING_TYPE, "device", NULL},
 	{B_MESSAGE_TYPE, "address", kInterfaceAddressTemplate},
 	{B_INT32_TYPE, "flags", NULL},
@@ -39,8 +41,32 @@ const static settings_template kInterfaceDeviceTemplate[] = {
 	{0, NULL, NULL}
 };
 
-const static settings_template kInterfaceTemplate[] = {
-	{B_MESSAGE_TYPE, "interface", kInterfaceDeviceTemplate},
+const static settings_template kInterfacesTemplate[] = {
+	{B_MESSAGE_TYPE, "interface", kInterfaceTemplate},
+	{0, NULL, NULL}
+};
+
+// Service templates
+
+const static settings_template kServiceAddressTemplate[] = {
+	{B_STRING_TYPE, "family", NULL},
+	{B_STRING_TYPE, "address", NULL},
+	{B_INT32_TYPE, "port", NULL},
+	{0, NULL, NULL}
+};
+
+const static settings_template kServiceTemplate[] = {
+	{B_STRING_TYPE, "name", NULL},
+	{B_MESSAGE_TYPE, "address", kServiceAddressTemplate},
+	{B_STRING_TYPE, "user", NULL},
+	{B_STRING_TYPE, "group", NULL},
+	{B_STRING_TYPE, "launch", NULL},
+	{B_INT32_TYPE, "port", NULL},
+	{0, NULL, NULL}
+};
+
+const static settings_template kServicesTemplate[] = {
+	{B_MESSAGE_TYPE, "service", kServiceTemplate},
 	{0, NULL, NULL}
 };
 
@@ -76,7 +102,8 @@ Settings::_GetPath(const char* name, BPath& path)
 	path.Append("network");
 	create_directory(path.Path(), 0755);
 
-	path.Append(name);
+	if (name != NULL)
+		path.Append(name);
 	return B_OK;
 }
 
@@ -147,6 +174,8 @@ status_t
 Settings::_ConvertFromDriverSettings(const driver_settings& settings,
 	const settings_template* settingsTemplate, BMessage& message)
 {
+	message.MakeEmpty();
+
 	for (int32 i = 0; i < settings.parameter_count; i++) {
 		status_t status = _ConvertFromDriverParameter(settings.parameters[i],
 			settingsTemplate, message);
@@ -185,49 +214,67 @@ Settings::_ConvertFromDriverSettings(const char* name,
 
 
 status_t
-Settings::_Load()
+Settings::_Load(const char* name, uint32* _type)
 {
-	return _ConvertFromDriverSettings("interfaces", kInterfaceTemplate, fInterfaces);
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	if (name == NULL || !strcmp(name, "interfaces")) {
+		status = _ConvertFromDriverSettings("interfaces", kInterfacesTemplate,
+			fInterfaces);
+		if (status == B_OK && _type != NULL)
+			*_type = kMsgInterfaceSettingsUpdated;
+	}
+	if (name == NULL || !strcmp(name, "services")) {
+		status = _ConvertFromDriverSettings("services", kServicesTemplate,
+			fServices);
+		if (status == B_OK && _type != NULL)
+			*_type = kMsgServiceSettingsUpdated;
+	}
+
+	return status;
+}
+
+
+status_t
+Settings::_StartWatching(const char* name, const BMessenger& target)
+{
+	BPath path;
+	status_t status = _GetPath(name, path);
+	if (status < B_OK)
+		return status;
+
+	BNode node;
+	status = node.SetTo(path.Path());
+	if (status < B_OK)
+		return status;
+
+	node_ref ref;
+	status = node.GetNodeRef(&ref);
+	if (status < B_OK)
+		return status;
+
+	return watch_node(&ref, name != NULL ? B_WATCH_STAT : B_WATCH_DIRECTORY,
+		target);
 }
 
 
 status_t
 Settings::StartMonitoring(const BMessenger& target)
 {
+	if (_IsWatching(target))
+		return B_OK;
+	if (_IsWatching())
+		StopMonitoring(fListener);
+
 	fListener = target;
 
-	BPath path;
-	status_t status = _GetPath("interfaces", path);
-	if (status < B_OK)
-		return status;
+	status_t status = _StartWatching(NULL, target);
+	if (status == B_OK)
+		status = _StartWatching("interfaces", target);
+	if (status == B_OK)
+		status = _StartWatching("services", target);
 
-	node_ref ref;
-	BNode node;
-
-	BPath parent;
-	if (path.GetParent(&parent) == B_OK) {
-		status = node.SetTo(parent.Path());
-		if (status < B_OK)
-			return status;
-
-		status = node.GetNodeRef(&ref);
-		if (status < B_OK)
-			return status;
-
-		status = watch_node(&ref, B_WATCH_DIRECTORY, target);
-		if (status < B_OK)
-			return status;
-	}
-
-	status = node.SetTo(path.Path());
-	if (status < B_OK)
-		return status;
-
-	status = node.GetNodeRef(&ref);
-	if (status < B_OK)
-		return status;
-
-	return watch_node(&ref, B_WATCH_STAT, target);
+	return status;
 }
 
 
@@ -252,13 +299,9 @@ Settings::Update(BMessage* message)
 	if (opcode == B_ENTRY_REMOVED)
 		return B_OK;
 
-	if (!strcmp(name, "interfaces")) {
-		status_t status = _ConvertFromDriverSettings("interfaces",
-			kInterfaceTemplate, fInterfaces);
-		if (status < B_OK)
-			return status;
-
-		BMessage update(kMsgInterfaceSettingsUpdated);
+	uint32 type;
+	if (_Load(name, &type) == B_OK) {
+		BMessage update(type);
 		fListener.SendMessage(&update);
 	}
 
@@ -275,5 +318,24 @@ Settings::GetNextInterface(uint32& cookie, BMessage& interface)
 
 	cookie++;
 	return B_OK;
+}
+
+
+status_t
+Settings::GetNextService(uint32& cookie, BMessage& service)
+{
+	status_t status = fServices.FindMessage("service", cookie, &service);
+	if (status < B_OK)
+		return status;
+
+	cookie++;
+	return B_OK;
+}
+
+
+const BMessage&
+Settings::Services() const
+{
+	return fServices;
 }
 
