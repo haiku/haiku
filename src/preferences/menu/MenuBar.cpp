@@ -60,34 +60,20 @@ MenuBar::_BuildMenu()
 	BMenuItem* colorSchemeItem = new BMenuItem("Color Scheme...",
 		new BMessage(COLOR_SCHEME_OPEN_MSG), 0, 0);
 
-	// create the separator menu
-	BMenu* separatorStyleMenu = new BMenu("Separator Style", B_ITEMS_IN_COLUMN);
-	separatorStyleMenu->SetRadioMode(true);
-	BMessage *msg = new BMessage(MENU_SEP_TYPE);
-	msg->AddInt32("sep", 0);
-	separatorStyleZero = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
-	msg = new BMessage(MENU_SEP_TYPE);
-	msg->AddInt32("sep", 1);
-	separatorStyleOne = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
-	msg = new BMessage(MENU_SEP_TYPE);
-	msg->AddInt32("sep", 2);
-	separatorStyleTwo = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
-
-	separatorStyleMenu->AddItem(separatorStyleZero);
-	separatorStyleMenu->AddItem(separatorStyleOne);
-	separatorStyleMenu->AddItem(separatorStyleTwo);
-	separatorStyleMenu->SetRadioMode(true);
-	separatorStyleMenu->SetTargetForItems(Window());
-
 	// Add items to menubar	
 	AddItem(fontMenu, 0);
 	AddItem(fontSizeMenu, 1);
+
 	AddSeparatorItem();
-	AddItem(fAlwaysShowTriggersItem);
-	AddSeparatorItem();
+
 	AddItem(colorSchemeItem);
-	AddItem(separatorStyleMenu);
+
 	AddSeparatorItem();
+
+	AddItem(fAlwaysShowTriggersItem);
+
+	AddSeparatorItem();
+
 	AddItem(fControlAsShortcutItem);
 	AddItem(fAltAsShortcutItem);
 }
@@ -113,13 +99,6 @@ MenuBar::UpdateMenu()
 
 	fAltAsShortcutItem->SetMarked(altAsShortcut); 
 	fControlAsShortcutItem->SetMarked(!altAsShortcut); 
-
-	if (info.separator == 0)
-		separatorStyleZero->SetMarked(true);
-	else if (info.separator == 1)
-		separatorStyleOne->SetMarked(true);
-	else if (info.separator == 2)
-		separatorStyleTwo->SetMarked(true);
 }
 
 

@@ -27,10 +27,6 @@ class MenuBar : public BMenuBar {
 	private:	
 		void _BuildMenu();
 
-		BMenuItem*	separatorStyleZero;
-		BMenuItem*	separatorStyleOne;
-		BMenuItem*	separatorStyleTwo;
-
 		BMenuItem*	fAlwaysShowTriggersItem;
 		BMenuItem*	fControlAsShortcutItem;
 		BMenuItem*	fAltAsShortcutItem;
