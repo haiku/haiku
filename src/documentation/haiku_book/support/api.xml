@@ -2,8 +2,10 @@
 <!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
 
+<!ENTITY archivable SYSTEM "Archivable.xml">
 <!ENTITY autolock SYSTEM "Autolock.xml">
 <!ENTITY blockcache SYSTEM "BlockCache.xml">
+<!ENTITY flattenable SYSTEM "Flattenable.xml">
 <!ENTITY list SYSTEM "List.xml">
 <!ENTITY locker SYSTEM "Locker.xml">
 <!ENTITY string SYSTEM "String.xml">
@@ -13,8 +15,10 @@
 <sect1 id="supportapi">
 	<title>Support Kit API</title>
 	
+	&archivable;
 	&autolock;
 	&blockcache;
+	&flattenable;
 	&list;
 	&locker;
 	&string;

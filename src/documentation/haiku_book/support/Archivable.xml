@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="barchivable">
+	<title>BArchivable</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/Archivable.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BArchivable</classname> works on archiving and unarchiving BMessages.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="barchivable_constructor">
+		<title>BArchivable()</title>
+		
+		<constructorsynopsis>
+			<methodname>BArchivable</methodname>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BArchivable</methodname>
+			<methodparam><type>BMessage *</type><parameter>from</parameter></methodparam>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="barchivable_destructor">
+		<title>~BArchivable()</title>
+		
+		<destructorsynopsis>
+			<methodname>~BArchivable</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Static Functions</bridgehead>
+	<sect3 id="barchivable_instantiate">
+		<title>Instantiate()</title>
+		
+		<methodsynopsis>
+			<modifier>static</modifier><type>BArchivable *</type><methodname>Instatiate</methodname>
+			<methodparam><type>BMessage *</type><parameter>from</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="archive">
+		<title>Archive()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>status_t</type><methodname>Archive</methodname>
+			<methodparam><type>BMessage *</type><parameter>into</parameter></methodparam>
+			<methodparam><type>bool</type><parameter>deep</parameter><initializer>true</initializer></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+</sect2>
+
+	
+		

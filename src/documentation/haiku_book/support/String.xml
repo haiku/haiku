@@ -92,6 +92,36 @@
 		</methodsynopsis>
 	</sect3>
 	
+	<sect3 id="bstring_compare">
+		<title>Compare()</title>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>Compare</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>Compare</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+
+		<methodsynopsis>
+			<type>int</type><methodname>Compare</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>n</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>Compare</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>n</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
 	<sect3 id="bstring_copyinto">
 		<title>CopyInto()</title>
 		
@@ -115,6 +145,36 @@
 		
 		<methodsynopsis>
 			<type>int32</type><methodname>CountChars</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_icompare">
+		<title>ICompare()</title>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>ICompare</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>ICompare</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>ICompare</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>n</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>int</type><methodname>ICompare</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>n</parameter></methodparam>
+			<modifier>const</modifier>
 		</methodsynopsis>
 	</sect3>
 	
@@ -379,4 +439,79 @@
 		</methodsynopsis>
 	</sect3>
 	
+	<sect3 id="bstring_operator_comparison">
+		<title>&lt;, &lt;=, ==, &gt;, &gt;=, != (comparison)</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&lt;</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&lt;</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&lt;=</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&lt;=</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator==</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator==</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&gt;=</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&gt;=</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&gt;</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator&gt;</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator!=</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator!=</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
 </sect2>

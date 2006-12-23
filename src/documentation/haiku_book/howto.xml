@@ -26,7 +26,7 @@
 		<revhistory>
 			<revision>
 				<revnumber>1</revnumber>
-				<date>2005-10-26</date>
+				<date>2005-12-23</date>
 				<authorinitials>nielx</authorinitials>
 				<revremark>First section about documenting classes on review.</revremark>
 			</revision>
@@ -236,9 +236,10 @@
 				<para>
 					We can distinguish roughly three parts. First of all, we've got the class
 					summary. This includes a formal block with useful information. Secondly,
-					we document the constructors and destructors. Then we describe
+					we document the constructors and destructors. Thirdly, we describe the static
+					members that the class might have. Then we describe
 					the member functions.  Finally we describe the operators that are overloaded.
-					Note that any section can be left out if it's not available. For example, the
+					Note that any section can be left out if it's not applicable. For example, the
 					<classname>BList</classname> class doesn't have actual overloaded operators,
 					thus that section is not in the actual documentation. The following example
 					gives a rough outline of the <classname>BList</classname> documentation. 
@@ -260,6 +261,10 @@
 					
 ... constructors come here ...
 
+&lt;bridgehead renderas="sect2"&gt;Static Functions&lt;/bridgehead&gt;
+
+... member functions come here ...
+					
 &lt;bridgehead renderas="sect2"&gt;Member Functions&lt;/bridgehead&gt;
 
 ... member functions come here ...
@@ -415,13 +420,15 @@
 					</para>
 				</sect3>
 				<sect3 id="methoddescriptions">
-					<title>Member documentation</title>
+					<title>Static and Member documentation</title>
 					
 					<para>
-						The member documentation starts under the second 
+						Static documentation starts under the second 
 						<literal>&lt;bridgehead&gt;</literal> with the label 
-						<quote>Member Functions</quote>. This <literal>&lt;bridgehead&gt;</literal>
-						has the same properties as the one the one used with the constructors.
+						<quote>Static Functions</quote>. The member functions start under 
+						<quote>Member Functions</quote>. These <literal>&lt;bridgehead&gt;</literal>
+						have the same properties as the one the one used with the constructors.
+						Note that either section can be left out if they are not applicable.
 					</para>
 					
 					<para>
@@ -699,8 +706,12 @@
 					
 					<listitem><para>
 						The last thing you need to be aware of is whether or not the method is
-						modified by a trailing <literal>const</literal>. If so, you need to append
-						<literal>&lt;modifier&gt;const&lt;/modifier&gt;</literal>. The location
+						modified by a trailing <literal>const</literal>, or if the method is a pure
+						virtual. If so, you need to append either 
+						<literal>&lt;modifier&gt;const&lt;/modifier&gt;</literal> or
+						<literal>&lt;modifier&gt;= 0&lt;/modifier&gt;</literal>. Please note the
+						space between the <quote>=</quote> and the <quote>0</quote> in the
+						syntax for the pure virtuals. The location of this modifier
 						depends on whether or not the method has arguments. If it doesn't have
 						any arguments, just append it to the single line you've written. If there are
 						arguments, put this on a newline after the last argument.

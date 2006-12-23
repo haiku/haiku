@@ -20,8 +20,8 @@
 			<listitem><para>
 				Archiving and IO:
 				<itemizedlist>
-					<listitem><para> BArchivable </para></listitem>
-					<listitem><para> BFlattenable </para></listitem>
+					<listitem><para><link linkend="barchivable">BArchivable</link></para></listitem>
+					<listitem><para><link linkend="bflattenable">BFlattenable</link></para></listitem>
 					<listitem><para> BDataIO and BPositionIO </para></listitem>
 					<listitem><para> BMemoryIO and BMallocIO </para></listitem>
 				</itemizedlist>

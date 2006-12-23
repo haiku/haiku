@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bflattenable">
+	<title>BFlattenable</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/Flattenable.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BFlattenable</classname> is a protocol that classes can implement so that they can be written to a stream of bytes.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bflattenable_destructor">
+		<title>~BFlattenable</title>
+		
+		<destructorsynopsis>
+			<modifier>virtual</modifier><methodname>~BFlattenable</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="bflattenable_allowstypecode">
+		<title>AllowsTypeCode()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>bool</type><methodname>AllowsTypeCode</methodname>
+			<methodparam><type>type_code</type><parameter>code</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bflattenable_flatten">
+		<title>Flatten()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>status_t</type><methodname>Flatten</methodname>
+			<methodparam><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>ssize_t</type><parameter>size</parameter></methodparam>
+			<modifier>const</modifier><modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bflattenable_flattenedsize">
+		<title>FlattenedSize()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>FlattenedSize</methodname><modifier>const</modifier><modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bflattenable_isfixedsize">
+		<title>IsFixedSize()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>bool</type><methodname>IsFixedSize</methodname><modifier>const</modifier><modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bflattenable_typecode">
+		<title>TypeCode()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>type_code</type><methodname>TypeCode</methodname><modifier>const</modifier><modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bflattenable_unflatten">
+		<title>Unflatten</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>status_t</type><methodname>Unflatten</methodname>
+			<methodparam><type>type_code</type><parameter>c</parameter></methodparam>
+			<methodparam><modifier>const</modifier><type>void *</type><parameter>buf</parameter></methodparam>
+			<methodparam><type>ssize_t</type><parameter>size</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+</sect2>
+
+	
