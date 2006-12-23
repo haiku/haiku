@@ -82,8 +82,7 @@ fi
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
-	# ToDo: the input_server is supposed to be started by the app_server
-	launch $SERVERS/input_server
+	waitfor _input_server_event_loop_		# wait for input devices
 fi
 
 # Launch Terminal or consoled depending on $SAFEMODE
