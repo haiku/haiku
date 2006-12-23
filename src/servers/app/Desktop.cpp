@@ -36,8 +36,10 @@
 #include <Message.h>
 #include <MessageFilter.h>
 #include <Region.h>
+#include <Roster.h>
 
 #include <stdio.h>
+#include <string.h>
 
 #if TEST_MODE
 #	include "EventStream.h"
@@ -369,7 +371,12 @@ Desktop::Init()
 #if TEST_MODE
 	gInputManager->AddStream(new InputServerStream);
 #endif
+
+	fEventDispatcher.SetDesktop(this);
 	fEventDispatcher.SetTo(gInputManager->GetStream());
+	if (fEventDispatcher.InitCheck() != B_OK)
+		_LaunchInputServer();
+
 	fEventDispatcher.SetHWInterface(fVirtualScreen.HWInterface());
 
 	fEventDispatcher.SetMouseFilter(new MouseFilter(this));
@@ -386,6 +393,19 @@ Desktop::Init()
 	gFontManager->AttachUser(fUserID);
 
 	return B_OK;
+}
+
+
+void
+Desktop::_LaunchInputServer()
+{
+	BRoster roster;
+	status_t err = roster.Launch("application/x-vnd.Be-input_server");
+	if (!(err == B_OK || err == B_ALREADY_RUNNING)) {
+		char str[256];
+		sprintf(str, "Failed to launch the input server (%s)!\n", strerror(err));
+		debugger(str);
+	}
 }
 
 
@@ -554,6 +574,12 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				if (app->ClientTeam() == team)
 					app->PostMessage(AS_APP_CRASHED);
 			}
+			break;
+		}
+
+		case AS_EVENT_STREAM_CLOSED:
+		{
+			_LaunchInputServer();
 			break;
 		}
 

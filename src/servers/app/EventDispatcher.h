@@ -16,6 +16,7 @@
 #include <ObjectList.h>
 
 
+class Desktop;
 class EventStream;
 class HWInterface;
 class ServerBitmap;
@@ -93,6 +94,8 @@ class EventDispatcher : public BLocker {
 			// if the mouse is not pressed, it should
 			// be delivered to the "current" target right away.
 
+		void SetDesktop(Desktop* desktop);
+
 	private:
 		status_t _Run();
 		void _Unset();
@@ -151,6 +154,7 @@ class EventDispatcher : public BLocker {
 
 		BLocker			fCursorLock;
 		HWInterface*	fHWInterface;
+		Desktop*		fDesktop;
 };
 
 #endif	/* EVENT_DISPATCHER_H */

@@ -181,6 +181,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									BPrivate::LinkSender& sender);
 
 	private:
+		void					_LaunchInputServer();
 		void					_SetWorkspace(int32 index);
 		void					_ShowWindow(WindowLayer* window,
 									bool affectsOtherWindows = true);

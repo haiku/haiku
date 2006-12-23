@@ -10,12 +10,14 @@
 #include "EventDispatcher.h"
 
 #include "BitmapManager.h"
+#include "Desktop.h"
 #include "EventStream.h"
 #include "HWInterface.h"
 #include "InputManager.h"
 #include "ServerBitmap.h"
 
 #include <MessagePrivate.h>
+#include <ServerProtocol.h>
 #include <TokenSpace.h>
 
 #include <Autolock.h>
@@ -236,7 +238,8 @@ EventDispatcher::EventDispatcher()
 	fTargets(10),
 	fNextLatestMouseMoved(NULL),
 	fCursorLock("cursor loop lock"),
-	fHWInterface(NULL)
+	fHWInterface(NULL),
+	fDesktop(NULL)
 {
 }
 
@@ -563,6 +566,13 @@ EventDispatcher::SetDragMessage(BMessage& message,
 	fDragMessage = message;
 	fDraggingMessage = true;
 	fDragOffset = offsetFromCursor;
+}
+
+
+void
+EventDispatcher::SetDesktop(Desktop* desktop)
+{
+	fDesktop = desktop;
 }
 
 
@@ -909,6 +919,15 @@ EventDispatcher::_EventLoop()
 			fNextLatestMouseMoved = NULL;
 		delete event;
 	}
+
+	// The loop quit, therefore no more events are coming from the input
+	// server, it must have died. Unset ourselves and notify the desktop.
+	fThread = -1;
+		// Needed to avoid problems with wait_for_thread in _Unset()
+	_Unset();
+
+	if (fDesktop)
+		fDesktop->PostMessage(AS_EVENT_STREAM_CLOSED);
 }
 
 
