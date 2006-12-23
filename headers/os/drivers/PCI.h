@@ -285,7 +285,19 @@ struct pci_module_info {
 #define PCI_floppy			0x02			/* floppy disk controller */
 #define PCI_ipi				0x03			/* IPI bus controller */
 #define PCI_raid			0x04			/* RAID controller */
+#define PCI_ata				0x05			/* ATA controller with ADMA interface */
+#define PCI_sata			0x06			/* Serial ATA controller */
+#define PCI_sas				0x07			/* Serial Attached SCSI controller */
 #define PCI_mass_storage_other 0x80			/* other mass storage controller */
+
+/* ---
+	values of the class_api field for
+		class_base	= 0x01 (mass storage)
+		class_sub	= 0x06 (Serial ATA controller)
+--- */
+
+#define PCI_sata_other			0x00	/* vendor specific interface */
+#define PCI_sata_ahci			0x01	/* AHCI interface */
 
 
 /* ---
