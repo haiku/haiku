@@ -11,6 +11,15 @@ Doc2HTML
 	: -stringparam use.id.as.filename 1 -stringparam language cpp -stringparam chunk.section.depth 2
 	;
 
+Doc2HTML 
+	howto.xml
+	: Haiku_Book_Howto.html
+	: [ FDirName $(HAIKU_TOP) src documentation docbook-xsl html chunk.xsl ]
+	: Haiku_Book_Howto
+	:
+	: -stringparam language cpp
+	;
+
 # Single most ugly string manipulation ever ...
 rule FRelGristFiles 
 {

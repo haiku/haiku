@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="blocker">
+	<title>BLocker</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/Locker.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BLocker</classname> implements a locking mechanism that can be used to protect multithreaded code.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="blocker_constructor">
+		<title>BLocker()</title>
+		
+		<constructorsynopsis>
+			<methodname>BLocker</methodname>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BLocker</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BLocker</methodname>
+			<methodparam><type>bool</type><parameter>benaphore_style</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BLocker</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter></methodparam>
+			<methodparam><type>bool</type><parameter>benaphore_style</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BLocker</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>name</parameter></methodparam>
+			<methodparam><type>bool</type><parameter>benaphore_style</parameter></methodparam>
+			<methodparam><type>bool</type><parameter>bogus</parameter></methodparam>
+		</constructorsynopsis>
+	</sect3>
+
+	<sect3 id="blocker_destructor">
+		<title>~BLocker()</title>
+		
+		<destructorsynopsis>
+			<modifier>virtual</modifier><methodname>~BLocker</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="blocker_countlocks">
+		<title>CountLocks()</title>
+		
+		<methodsynopsis>
+			<type>int32</type><methodname>CountLocks</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_countlockrequest">
+		<title>CountLockRequests()</title>
+		
+		<methodsynopsis>
+			<type>int32</type><methodname>CountLockRequests</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_islocked">
+		<title>IsLocked()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>IsLocked</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_lock">
+		<title>Lock()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>Lock</methodname>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_lockingthread">
+		<title>LockingThread()</title>
+		
+		<methodsynopsis>
+			<type>thread_id</type><methodname>LockingThread</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_lockwithtimeout">
+		<title>LockWithTimeout()</title>
+		
+		<methodsynopsis>
+			<type>status_t</type><methodname>LockWithTimeout</methodname>
+			<methodparam><type>bigtime_t</type><parameter>timeout</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_sem">
+		<title>Sem()</title>
+		
+		<methodsynopsis>
+			<type>sem_id</type><methodname>Sem</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="blocker_unlock">
+		<title>Unlock()</title>
+		
+		<methodsynopsis>
+			<void/><methodname>Unlock</methodname>
+		</methodsynopsis>
+	</sect3>
+	
+</sect2>

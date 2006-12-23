@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+	<!-- license -->
+	<!ENTITY license SYSTEM "../license.xml"> 
+]>
+
+<book id="developerdochowto">
+	<bookinfo>
+		<title>Developer Documentation Writing Howto</title>
+		<pubdate>2005-10-26</pubdate>
+		<authorgroup>
+			<author>
+				<firstname>Niels</firstname>
+				<surname>Reedijk</surname>
+			</author>
+		</authorgroup>
+		
+		<abstract>
+			<para>
+				This guide is for Haiku Developers that need to write developer documentation.
+			</para>
+		</abstract>
+		
+		<revhistory>
+			<revision>
+				<revnumber>1</revnumber>
+				<date>2005-10-26</date>
+				<authorinitials>nielx</authorinitials>
+				<revremark>First section about documenting classes on review.</revremark>
+			</revision>
+		</revhistory>
+	</bookinfo>
+	
+	<chapter id="introduction">
+		<title>Introduction</title>
+		
+		<para>
+			The Haiku project maintains application programming interface (from now on 
+			<acronym>API</acronym>) documentation for developers that want to write and port 
+			applications on the platform. The project strives to create and maintain a uniform and
+			clear book that describes the <acronym>API</acronym>, named the Haiku Book.
+		</para>
+		
+		<para>
+			The tool to help structure and format the Haiku Book is Docbook. Docbook is originally
+			a <acronym>SGML</acronym>-based text that was developed for separating structure
+			and formatting in the age of digital publication. Docbook is basically a document type
+			definition (from now on <acronym>DTD</acronym>) that provides a standard that can be
+			used to generate a whole slew of output formats. The Haiku project chose this format
+			so that the documentation can be transformed into several output formats without any
+			effort. Furthermore, the format is is widely used and understood, and is structured by
+			the well-known <acronym>XML</acronym> standard. 
+		</para>
+		
+		<para>
+			This document is written to prescribe a set of conventions so that the Haiku Book will
+			become a coherent whole. It also serves as a manual for those that are unfamiliar with
+			docbook, who will probably at times feel 'lost'. However, beginners using this manual 
+			when documenting their classes, you will be able to generate proper docbook and create
+			a structure that fits in with the rest. Since the <acronym>DTD</acronym> contains over
+			three hundred elements, this document also selects which elements are used in our
+			documentation. Thus, this manual is also helpful to those more familiar with docbook.
+		</para>
+		
+		<para>
+			At the moment there is only one section finished. <xref  linkend="classes"/>
+		</para>
+	</chapter>
+	
+	<chapter id="classes">
+		<title>Documenting Classes</title>
+		
+		<para>
+			This chapter will outline all the formal docbook structure for documenting classes,
+			as well as give hints on the content of the documentation.
+		</para>
+		
+		<para>
+			If you are documenting a class that hasn't been documented before, please read
+			the <link linkend="newclass">section on documenting a new class</link>. If you are
+			working on an existing class, you can proceed to the 
+			<link linkend="formalformatting">formal 	formatting</link>.
+		</para>
+		
+		<sect1 id="newclass">
+			<title>Documenting a new class</title>
+			
+			<para>
+				This section describes the rules on where to place the documentation of a new
+				class. It discusses
+				the place in the file hierchy, and how to hook it into the existing documentation. 
+				Please read through this desciption carefully if you are adding a new class. For
+				those that are merely modifying classes that already exist, you can skip this
+				section.
+			</para>
+						
+			<sect2 id="filelocation">
+				<title>Where do I place my file?</title>
+				
+				<para>
+					When writing the documentation for a new class, you will create a new file.
+					This file needs to be placed in the hierchy in the subversion repository, that
+					is located at <filename>src/documentation/haiku_book/</filename>. This
+					directory contains a set of subdirectories that correspond with the class
+					division the Haiku project uses. You place your file in the subdirectory that
+					corresponds to the kit the class belongs to.
+				</para>
+			</sect2>
+				
+			<sect2 id="filename">
+				<title>How do I name my file?</title>
+				
+				<para>
+					The naming of the file, consistent with header and source naming, consists
+					of the class name <emphasis>without</emphasis> the <classname>B</classname>
+					prefix and with the <filename>xml</filename> extension. For example, the
+					<classname>BList</classname> class would have the <filename>List.xml</filename>
+					documentation file.
+				</para>
+			</sect2>
+
+			<sect2 id="filecontents">
+				<title>What should be the initial contents of the file?</title>
+				
+				<para>
+					The minimal required content for the file is a line that is required by the
+					<acronym>XML</acronym> standard. Furthermore, you'll have to "open" a new
+					section (and close it), and you'll have to add a title. For example, the
+					<classname>BList</classname> class has the following bare minimum:
+				</para>
+				
+				<programlisting>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;sect2 id="blist"&gt;
+	&lt;title&gt;BList&lt;/title&gt;
+&lt;/sect2&gt;
+				</programlisting>
+				
+				<para>
+					Please note the following. The <literal>sect2</literal> element, like other
+					<literal>sect</literal> elements, has the element <literal>id</literal>. This
+					id contains the classname in lowercase, including the B-prefix. 
+					For notes on the XML formatting style, please see elsewhere in this document.
+				</para>
+			</sect2>
+			
+			<sect2 id="hookinfile">
+				<title>How do I hook in the file into the generated documentation?</title>
+				
+				<para>
+					If you have created the file and put it in the subdirectory that's appropriate
+					for the kit it belongs to, it's time to hook it into the generated documents.
+					The way to do this is by opening the <filename>api.xml</filename> file that's
+					located in that same subdirectory. Hooking in is a two-step process. First, you
+					create an entity in the doctype declaration that refers to the content of the
+					file that describes the class, secondly you refer to that entity in the body of
+					the document.
+				</para>
+				
+				<para>
+					The first step involves adding a line at the top of the file in the doctype
+					declaration. In clase of <classname>BList</classname>, the following has been
+					done.
+				</para>
+				
+				<programlisting>
+&lt;!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+&lt;!ENTITY list SYSTEM "List.xml"&gt;
+
+]&gt;
+				</programlisting>
+				
+				<para>
+					The line with the <literal>ENTITY</literal> in it, is the one that you need to
+					recreate for your own file. There are things you need to adapt. First of all,
+					you need to adapt <literal>list</literal> to reflect the name of the file in
+					lowercase, since entities are lowercase by convention. Secondly, you need
+					to change the filename it refers too. Please make sure you've got the case
+					right!
+				</para>
+				
+				<note><para>
+					Please note that the inclusions are by convention in alphabetical order. So
+					make sure the new line is at the proper spot.
+				</para></note>
+				
+				<para>
+					The second step is calling the entity in the body. For example in the support
+					kit:
+				</para>
+				
+				<programlisting>
+&lt;sect1 id="supportapi"&gt;
+	&lt;title&gt;Support Kit API&lt;/title&gt;
+	
+	&amp;list;
+&lt;/sect1&gt;
+				</programlisting>
+				
+				<para>
+					The main body of the <filename>api.xml</filename> file consists of a list of
+					entities. You place your entity in the list (on a new line). Please remember
+					that entities are refered to by prefixing the name with 
+					<quote><literal>&amp;</literal></quote> and postfixing 
+					<quote><literal>;</literal></quote>. Please note that this also should be in
+					alphabetical order by convention.
+				</para>
+			</sect2>
+		</sect1>
+		
+		<sect1 id="formalformatting">
+			<title>Formal formatting of a class</title>
+			
+			<para>
+				Thersomee are  formal requirements for class documentation to be consistent with
+				the rest of the <acronym>API</acronym> documentation. This section will explain in
+				what order things should be documented, what the formal structural markup
+				for methods is and what sections are required.
+			</para>
+			
+			<sect2 id="structure">
+				<title>What elements should be in class documentation?</title>
+				
+				<para>
+					This sections describes the order in which things should be described. It
+					will touch a little bit of the docbook elements used in the larger structure. It
+					will not describe how you should structure the individual methods. That's for
+					<link linkend="methodsynopsis">the next section</link>.
+				</para>
+				
+				<para>
+					We can distinguish roughly three parts. First of all, we've got the class
+					summary. This includes a formal block with useful information. Secondly,
+					we document the constructors and destructors. Then we describe
+					the member functions.  Finally we describe the operators that are overloaded.
+					Note that any section can be left out if it's not available. For example, the
+					<classname>BList</classname> class doesn't have actual overloaded operators,
+					thus that section is not in the actual documentation. The following example
+					gives a rough outline of the <classname>BList</classname> documentation. 
+				</para>
+				
+				<programlisting>
+&lt;sect2 id="blist"&gt;
+&lt;title&gt;BList&lt;/title&gt;
+
+&lt;itemizedlist&gt;
+	&lt;listitem&gt;&lt;para&gt;&lt;emphasis&gt;Derived from:&lt;/emphasis&gt; none&lt;/para&gt;&lt;/listitem&gt;
+	&lt;listitem&gt;&lt;para&gt;&lt;emphasis&gt;Declared in:&lt;/emphasis&gt; &lt;filename&gt;os/support/List.h&lt;/filename&gt;&lt;/para&gt;&lt;/listitem&gt;
+	&lt;listitem&gt;&lt;para&gt;&lt;emphasis&gt;Library:&lt;/emphasis&gt; &lt;filename&gt;libbe.so&lt;/filename&gt;&lt;/para&gt;&lt;/listitem&gt;
+&lt;/itemizedlist&gt;
+
+... summary comes here ...
+
+&lt;bridgehead renderas="sect2"&gt;Constructors and Destructors&lt;/bridgehead&gt;
+					
+... constructors come here ...
+
+&lt;bridgehead renderas="sect2"&gt;Member Functions&lt;/bridgehead&gt;
+
+... member functions come here ...
+					
+&lt;bridgehead renderas="sect2"&gt;Operators&lt;/bridgehead&gt;
+
+... operators would come here ...
+				</programlisting>
+				
+				<sect3 id="summary">
+					<title>Class Summary</title>
+					
+					<para>
+						The first part of the class description is the summary. In the example
+						above it runs from <literal>&lt;title&gt;BList&lt;/title&gt;</literal> to
+						the first <literal>&lt;bridgehead&gt;</literal>. There is an obligatory
+						<literal>&lt;itemizedlist&gt;</literal>. This list contains three elements:
+						the class it is derived from, the location it is declared in and the
+						library you need to link to.
+					</para>
+					
+					<para>
+						Note that every item in the <literal>&lt;itemizedlist&gt;</literal> begins
+						with <literal>&lt;listitem&gt;</literal>, which also happens to be the
+						final tags. The item is started with the tag <literal>&lt;para&gt;</literal>.
+						The labels to every piece of data is put inside an
+						<literal>&lt;emphasis&gt;</literal> block, including the semicolon! There's
+						a space between the endtag and the actual value.
+					</para>
+					
+					<orderedlist>
+						<listitem><para>
+							The value of the first item, <quote>Derived from:</quote>, is either a
+							classname, or <literal>none</literal>. If it is a class, make sure you link
+							to it using the entity available. For example, if your class is derived
+							from <classname>BList</classname>, use <literal>&amp;BList;</literal>.
+							This generates a nice crosslink within the documentation.
+						</para></listitem>
+					
+						<listitem><para>
+							The value of the second item, <quote>Declared in:</quote>, is wrapped
+							inside a <literal>&lt;filename&gt;</literal> tag. You refer to the path
+							relative to the <filename>header</filename> subdirectory in the Haiku
+							source tree.
+						</para></listitem>
+					
+						<listitem><para>
+							The value of the third item, <quote>Library:</quote>, is also wrapped
+							inside a <literal>&lt;filename&gt;</literal> tag. Stating the name of the
+							library suffices. The example can be found in <filename>libbe.so</filename>.
+						</para></listitem>
+					</orderedlist>
+					
+					<para>
+						After that obligatory block, you can write a summary. This section won't
+						go into details of what good summaries contain (and what they don't).
+						Please remember to wrap every paragraph into a set of 
+						<literal>&lt;para&gt;</literal> tags. Also note that if you link to methods
+						inside your class, that you use the appopriate entities. So if I want to
+						link to <methodname>AddItem</methodname> of my class, I use 
+						<literal>&amp;BList_AddItem;</literal>.
+					</para>
+				</sect3>
+				
+				<sect3 id="constructordescription">
+					<title>Constructor and Destructor</title>
+					
+					<para>
+						The second part focusses on constructors and the
+						destructor, and the third on the actual members. The second section starts
+						after the first <literal>&lt;bridgehead&gt;</literal> with the label
+						<quote>Constructors and Destructors</quote>. See for example the
+						<classname>BList</classname> constructors and destructors:
+					</para>
+					
+					<programlisting>
+&lt;bridgehead renderas="sect2"&gt;Constructors and Destructors&lt;/bridgehead&gt;
+
+&lt;sect3 id="blist_constructor"&gt;
+	&lt;title&gt;BList()&lt;/title&gt;
+	
+	&lt;constructorsynopsis&gt;
+		&lt;methodname&gt;BList&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;type&gt;int32&lt;/type&gt;&lt;parameter&gt;count&lt;/parameter&gt;&lt;initializer&gt;20&lt;/initializer&gt;&lt;/methodparam&gt;
+	&lt;/constructorsynopsis&gt;
+	
+	&lt;constructorsynopsis&gt;
+		&lt;methodname&gt;BList&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;modifier&gt;const&lt;/modifier&gt;&lt;type&gt;BList &amp;amp;&lt;/type&gt;&lt;parameter&gt;list&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/constructorsynopsis&gt;
+
+	... Description of the constructors here ...
+&lt;/sect3&gt;
+
+&lt;sect3 id="blist_destructor"&gt;
+	&lt;title&gt;~BList()&lt;/title&gt;
+	
+	&lt;destructorsynopsis&gt;
+		&lt;methodname&gt;~BList&lt;/methodname&gt;
+	&lt;/destructorsynopsis&gt;
+						
+	... Description of the destructor here ...
+&lt;/sect3&gt;
+					</programlisting>
+					
+					<para>
+						First of all, the <literal>&lt;bridgehead&gt;</literal> element is an
+						element that instructs the stylesheet that transforms the docbook to an
+						output format to place a header in the same style as the header of the
+						section (hence the <literal>renderas="sect2"</literal> attribute). Because
+						of hierchial reasons, we don't actually want to start a new section. A
+						similar <literal>&lt;bridgehead&gt;</literal> is used as the second header
+						for the member functions.
+					</para>
+					
+					<para>
+						As you might notice, the <classname>BList</classname> has two constructors
+						and one destructor. The constructors are bundled together in the
+						<literal>&lt;sect3&gt;</literal> element with the id 
+						<literal>blist_constructor</literal>. Like every other id, this one is
+						lowercase. The label must be the full classname in lowercase, an
+						underscore and the word <literal>constructor</literal>. The destructor
+						section is built up in a similar way. The title is the name of the method,
+						without any of it's arguments. So in case of the constructor, it is
+						BList().
+					</para>
+					
+					<para>
+						As you can see, there is a normal constructor and a copy constructor. The
+						rule is that the copy constructor should always be places last. If you have
+						overloaded constructors, the order is somewhat at will, but please take as
+						guiding principle that it's most logical to order the constructors in order of
+						the amount of parameters (so from most complex to simpler). Feel free to
+						drop this order if your argument in the description or the synopsis requires
+						another order of constructors.
+					</para>
+					
+					<para>
+						The actual descriptions of the constructors are embedded in a
+						<literal>&lt;constructorsynopsis&gt;</literal> element. The destructor
+						is embedded in a <literal>&lt;destructorsynopsis&gt;</literal> element.
+						These are special variations of the <literal>&lt;methodsynopsis&gt;</literal>
+						construction, for they don't require a return type. They do follow the rest of
+						the rules of the <literal>&lt;methodsynopsis&gt;</literal> construction.
+					</para>
+					
+					<para>
+						For a more detailed description about the 
+						<literal>&lt;methodsynopsis&gt;</literal> construction, see 
+						<xref linkend="methodsynopsis"/>. Some guiding lines on writing descriptions
+						will occur in a later section, but please note that you should wrap them in
+						<literal>&lt;para&gt;</literal> tags.
+					</para>
+				</sect3>
+				<sect3 id="methoddescriptions">
+					<title>Member documentation</title>
+					
+					<para>
+						The member documentation starts under the second 
+						<literal>&lt;bridgehead&gt;</literal> with the label 
+						<quote>Member Functions</quote>. This <literal>&lt;bridgehead&gt;</literal>
+						has the same properties as the one the one used with the constructors.
+					</para>
+					
+					<para>
+						In order to illustrate some of the principles, here's a piece of the
+						documentation for the <classname>BList</classname> class:
+					</para>
+					
+					<programlisting>
+&lt;bridgehead renderas="sect2"&gt;Member Functions&lt;/bridgehead&gt;
+&lt;sect3 id="blist_additem"&gt;
+	&lt;title&gt;AddItem()&lt;/title&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;bool&lt;/type&gt;&lt;methodname&gt;AddItem&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;type&gt;void *&lt;/type&gt;&lt;parameter&gt;item&lt;/parameter&gt;&lt;/methodparam&gt;
+		&lt;methodparam&gt;&lt;type&gt;int32&lt;/type&gt;&lt;parameter&gt;index&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;bool&lt;/type&gt;&lt;methodname&gt;AddItem&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;type&gt;void *&lt;/type&gt;&lt;parameter&gt;item&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+						
+	... Here comes documentation for this (or these)  method(s)...
+&lt;/sect3&gt;
+
+&lt;sect3 id="blist_countitems"&gt;
+	&lt;title&gt;CountItems()&lt;/title&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;int32&lt;/type&gt;&lt;methodname&gt;CountItems&lt;/methodname&gt;&lt;modifier&gt;const&lt;/modifier&gt;
+	&lt;/methodsynopsis&gt;
+
+	... Here comes documentation for this (or these)  method(s)...
+&lt;/sect3&gt;
+
+&lt;sect3 id="blist_removeitem"&gt;
+	&lt;title&gt;RemoveItem()&lt;/title&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;bool&lt;/type&gt;&lt;methodname&gt;RemoveItem&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;type&gt;void *&lt;/type&gt;&lt;parameter&gt;item&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;void *&lt;/type&gt;&lt;methodname&gt;RemoveItem&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;type&gt;int32&lt;/type&gt;&lt;parameter&gt;index&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;bool&lt;/type&gt;&lt;methodname&gt;RemoveItems&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;type&gt;int32&lt;/type&gt;&lt;parameter&gt;index&lt;/parameter&gt;&lt;/methodparam&gt;
+		&lt;methodparam&gt;&lt;type&gt;int32&lt;/type&gt;&lt;parameter&gt;count&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+						
+	... Here comes documentation for this (or these)  method(s)...
+&lt;/sect3&gt;
+
+&lt;sect3 id="blist_removeitems"&gt;
+	&lt;title&gt;RemoveItems()&lt;/title&gt;
+	
+	&lt;para&gt;See &amp;BList_RemoveItem;&lt;/para&gt;
+&lt;/sect3&gt;		
+					</programlisting>
+					
+					<para>
+						The first thing that's important is that every distinct method has it's own
+						<literal>&lt;sect3&gt;</literal>. The <literal>id</literal> attribute is build up of the
+						lowercase full classname, an underscore and the name of the method, also in
+						lowercase. There are no braces present. The title of the section is the
+						name of the method with proper casing, followed by closed braces (without a
+						space before or between them). Note that all the sections are ordered
+						alphabetically.
+					</para>
+					
+					<para>
+						Let's take the <methodname>CountItems()</methodname> method as an example.
+						We notice that the prototype of the function is encapsulated in a
+						<literal>&lt;methodsynopsis&gt;</literal> construction. This construction
+						is discussed in more detail in <xref linkend="methodsynopsis"/>. If a
+						method is overloaded, like the <methodname>AddItem()</methodname>
+						method, both the prototypes are given.
+					</para>
+					
+					<para>
+						Important is the fact that multiple methods can be grouped together. For
+						instance, the documentation for the <methodname>RemoveItems()</methodname>
+						method is included in the documentation of the singular
+						<methodname>RemoveItem()</methodname>. Thus that prototype is listed in
+						that location. Please note that it still is obligatory to create a separate
+						section for <methodname>RemoveItems()</methodname>, as you can see in the
+						example. You don't have to put anything in that section, besides the title
+						and one <literal>&lt;para&gt;</literal> with the contents <quote>See</quote>
+						and the entity that refers to the method where it is documented.
+					</para>
+					
+					<para>
+						If you group different methods together, the rule is that they should be in
+						alphabetical order. If you have overloaded method, take the guideline that
+						they should be reverse ordered in complexity (complex first, simple later).
+						The guideline is that this should be done by the amount of parameters, but
+						if your method or documentation would be clearer by another order, you are
+						allowed to order them as you like.
+					</para>
+					
+					<para>
+						After the method synopsis is done, you add the documentation. This section
+						doesn't discuss the guidelines for writing good documentation. Please refer
+						to another section for that. Do remember that you need to wrap it between
+						<literal>&lt;para&gt;</literal> elements.
+					</para>
+				</sect3>
+				
+				<sect3 id="operators">
+					<title>Operators</title>
+					
+					<para>
+						Operator overloading is quite common in the Haiku <acronym>API</acronym>
+						and as such it should be documented. The original Be Book gave operators
+						a special treatment, and we've decided to reproduce it in the Haiku Book as
+						well. As noted before, if there are any overloaded operators, they are placed
+						under a special <literal>bridgehead</literal> with the label Operators. In
+						essence, operators aren't so different from methods in the sense that
+						they both contain a <literal>methodsynopsis</literal> and a description,
+						but there are some oddities you need to be aware of. See the example
+						from the <classname>BString</classname> class:
+					</para>
+					
+					<programlisting>
+&lt;bridgehead renderas=&quot;sect2&quot;&gt;Operators&lt;/bridgehead&gt;
+&lt;sect3 id=&quot;bstring_operator_assignment&quot;&gt;
+	&lt;title&gt;= (assignment)&lt;/title&gt;
+	
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;BString &amp;amp;&lt;/type&gt;&lt;methodname&gt;operator=&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;modifier&gt;const&lt;/modifier&gt;&lt;type&gt;BString &amp;amp;&lt;/type&gt;&lt;parameter&gt;string&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+
+	&lt;methodsynopsis&gt;
+		&lt;type&gt;BString &amp;amp;&lt;/type&gt;&lt;methodname&gt;operator=&lt;/methodname&gt;
+		&lt;methodparam&gt;&lt;modifier&gt;const&lt;/modifier&gt;&lt;type&gt;char *&lt;/type&gt;&lt;parameter&gt;string&lt;/parameter&gt;&lt;/methodparam&gt;
+	&lt;/methodsynopsis&gt;
+					</programlisting>
+					
+					<para>
+						The first thing to note is how the <literal>id</literal> in the
+						<literal>sect3</literal> tag is built up. It starts with the lowercase
+						classname, an underscore, the word <literal>operator</literal> an
+						underscore, and a short description of what the operator does. Later this
+						section I'll try to present some standard operator descriptions which you
+						should follow as much as possible.
+					</para>
+					
+					<para>
+						The next thing is the title. The title is built up of the operator (here the
+						=), and a description of what it does, lowercase in parenthesis.
+					</para>
+					
+					<para>
+						Last thing of note in this example is that the <literal>methodname</literal>
+						is quite literally the name of the method in the header file. This wraps up
+						the conventions we use for individual overloaded operators. 
+					</para>
+					
+					<para>
+						More interesting is the order of the operators. The following list shows
+						the order and the common descriptions of the overloaded operators.
+					</para>
+					
+					<itemizedlist>
+						<listitem><para>= (assignment)</para></listitem>
+						<listitem><para>+= (append)</para></listitem>
+						<listitem><para>&lt;&lt; (stream; formatted append)</para></listitem>
+						<listitem><para>[] (indexing)</para></listitem>
+						<listitem><para> ==, !=, &lt;, &gt;, &lt;=, &gt;= (comparison)</para></listitem>
+					</itemizedlist>
+					
+					<note><para>
+						This list is far from complete. As more classes are documented, more
+						possiblities will be described. Do try to combine the comparison operators
+						into one block: they share the same features. Also, if your description
+						contains a space, substitute it for an underscore in the <literal>id</literal>
+						parameter of the <literal>sect3</literal> tag.
+					</para></note>
+				</sect3>
+			</sect2>
+			
+			<sect2 id="methodsynopsis">
+				<title>How do I write a proper methodsynopsis?</title>
+				
+				<para>
+					Docbook provides several tools for properly documenting methods. It is
+					important that you use the correct markup, to create a uniform format. A
+					synopsis lives inside a <literal>methodsynopsis</literal> block. So open
+					and close the block and follow the following list of instructions step by step
+					to document the methods properly.
+				</para>
+				
+				<orderedlist>
+					<listitem><para>
+						Open the block with <literal>&lt;methodsynopsis&gt;</literal>. Then put in
+						a newline and jump in one tab.
+					</para></listitem>
+					
+					<listitem><para>
+						If the method has a <emphasis>modifier</emphasis>, the first element of
+						the line is this modifier. Modifiers are <literal>virtual</literal>,
+						<literal>inline</literal> and <literal>static</literal>. Enclose the modifier 
+						in a <literal>modifier</literal> block.
+					</para></listitem>
+					
+					<listitem><para>
+						For the return type, there are two options.
+					</para>
+					
+					<para>
+						In case the method doesn't return a value, please use the tag 
+						<literal>&lt;void/&gt;</literal>. Note the trailing slash!
+					</para>
+					
+					<para>
+						In case of a return type, please enclose the return type in a
+						<literal>type</literal> block. Note that if you've got
+						<literal>const BList *</literal> as a return type, that complete segment
+						is the return type. So the <literal>const</literal> is also considered a
+						part of the return type!
+					</para></listitem>
+					
+					<listitem><para>
+						The name of the method is next, which should be enclosed in a
+						<literal>methodname</literal> block. Use the proper
+						capitalisation. Note that you don't need to include the trailing
+						parenthesis. The stylesheet will do this when it processes the block.
+					</para></listitem>
+					
+					<listitem><para>
+						If the method has arguments, put every argument on a new line. Put the line
+						between <literal>&lt;methodparam&gt;</literal> tags.
+					</para>
+					
+					<para>
+						If the argument has a modifier, use the 	<literal>modifier</literal>
+						tag. Modifiers are <literal>const</literal> and <literal>mutable</literal>.
+						<emphasis>Notice that <literal>const</literal> is considered a modifier
+						in arguments, as opposed to <literal>const</literal> in return
+						values.</emphasis> The logic is that you may pass a non-const object
+						in, and the modifier just tells you how the method is going to handle it, as 
+						opposed to the return value which always is the const object when it has
+						that modifier.
+					</para>
+						
+					<para>
+						Put the type of the argument between <literal>type</literal> tags. Note
+						that if the argument is a pointer or a reference, that the asterix (*) and
+						the ampersand (&amp;) are included between the tags. Pay attention
+						to the fact that <acronym>XML</acronym> requires your ampersand to be
+						encoded like this: &amp;amp;.
+					</para>
+					
+					<para>
+						Enclose the the name of the parameter between <literal>parameter</literal>
+						tags. Note that the name of the parameter is obligatory. Use the original
+						name that is in the header file.
+					</para>
+						
+					<para>
+						If the argument has an initialiser, put the value between the
+						<literal>initializer</literal> tags. Note that you should not put the = in
+						front of it.
+					</para>
+					
+					<para>
+						Don't forget to end each line with <literal>&lt;/methodparam&gt;</literal>!
+					</para></listitem>
+					
+					<listitem><para>
+						The last thing you need to be aware of is whether or not the method is
+						modified by a trailing <literal>const</literal>. If so, you need to append
+						<literal>&lt;modifier&gt;const&lt;/modifier&gt;</literal>. The location
+						depends on whether or not the method has arguments. If it doesn't have
+						any arguments, just append it to the single line you've written. If there are
+						arguments, put this on a newline after the last argument.
+					</para></listitem>
+					
+					<listitem><para>
+						And of course, the <literal>&lt;methodsynopsis&gt;</literal> ends with
+						<literal>/&lt;methodsynopsis&gt;</literal>.
+					</para></listitem>
+				</orderedlist>
+				
+				<note><para>
+					Please note that constructors and destructors have a slightly different syntax.
+					Instead of the <literal>&lt;methodsynopsis&gt;</literal> tags, they are
+					enclosed in the <literal>&lt;constructorsynopsis&gt;</literal> or
+					<literal>&lt;destructorsynopsis&gt;</literal> tags. And they don't have return
+					types. The rest of the rules that are described here are valid.
+				</para></note>
+			</sect2>
+		</sect1>
+	</chapter>
+			
+	&license;
+</book>

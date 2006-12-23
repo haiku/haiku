@@ -13,7 +13,7 @@
 			<listitem><para>
 				Threading utility classes:
 				<itemizedlist>
-					<listitem><para> BLocker and BAutoLock </para></listitem>
+					<listitem><para><link linkend="blocker">BLocker</link> and <link linkend="bautolock">BAutoLock</link></para></listitem>
 					<listitem><para> "Thread Local Storage" </para></listitem>
 				</itemizedlist>
 			</para></listitem>
@@ -29,9 +29,9 @@
 			<listitem><para>
 				Container classes:
 				<itemizedlist>
-					<listitem><para> BBlockCache </para></listitem>
-					<listitem><para> <link linkend="blist">BList</link></para></listitem>
-					<listitem><para> BString </para></listitem>
+					<listitem><para><link linkend="bblockcache">BBlockCache</link></para></listitem>
+					<listitem><para><link linkend="blist">BList</link></para></listitem>
+					<listitem><para><link linkend="bstring">BString</link></para></listitem>
 				</itemizedlist>
 			</para></listitem>
 			<listitem><para> BStopWatch </para></listitem>

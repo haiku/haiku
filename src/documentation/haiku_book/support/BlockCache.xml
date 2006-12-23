@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bblockcache">
+	<title>BBlockCache</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/BlockCache.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BBlockCache</classname> is used to manage a pool of memory blocks.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bblockcache_constructor">
+		<title>BBlockCache()</title>
+		
+		<constructorsynopsis>
+			<methodname>BBlockCache</methodname>
+			<methodparam><type>uint32</type><parameter>blockCount</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>blockSize</parameter></methodparam>
+			<methodparam><type>uitn32</type><parameter>allocationType</parameter></methodparam>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="blist_destructor">
+		<title>~BBlockCache()</title>
+		
+		<destructorsynopsis>
+			<methodname>~BBlockCache</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	
+	<sect3 id="bblockcache_get">
+		<title>Get()</title>
+		
+		<methodsynopsis>
+			<type>void *</type><methodname>Get</methodname>
+			<methodparam><type>size_t</type><parameter>blockSize</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bblockcache_save">
+		<title>Save()</title>
+		<methodsynopsis>
+			<void/><methodname>Save</methodname>
+			<methodparam><type>void *</type><parameter>pointer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>blockSize</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+</sect2>

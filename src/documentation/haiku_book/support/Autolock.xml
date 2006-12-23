@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bautolock">
+	<title>BAutolock</title>
+
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/AutoLock.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BAutolock</classname> implements easy locking and unlocking using a <link linkend="blocker">BLocker</link> or a <classname>BLooper</classname> object.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bautolock_constructor">
+		<title>BAutolock()</title>
+		
+		<constructorsynopsis>
+			<modifier>inline</modifier><methodname>BAutolock</methodname>
+			<methodparam><type>BLooper *</type><parameter>looper</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<modifier>inline</modifier><methodname>BAutolock</methodname>
+			<methodparam><type>BLocker *</type><parameter>locker</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<modifier>inline</modifier><methodname>BAutolock</methodname>
+			<methodparam><type>BLocker &amp;</type><parameter>locker</parameter></methodparam>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="bautolock_destructor">
+		<title>~BAutoLock()</title>
+		
+		<destructorsynopsis>
+			<modifier>inline</modifier><methodname>~BAutolock</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="bautolock_islocked">
+		<title>IsLocked()</title>
+		
+		<methodsynopsis>
+			<type>bool</type><methodname>IsLocked</methodname>
+		</methodsynopsis>
+	</sect3>
+</sect2>

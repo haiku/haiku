@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bstring">
+	<title>BString</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/String.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BString</classname> implements a high level string object.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bstring_constructor">
+		<title>BString()</title>
+		
+		<constructorsynopsis>
+			<methodname>BString</methodname>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BString</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BString</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BString</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>maxLength</parameter></methodparam>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_destructor">
+		<title>~BString()</title>
+		
+		<destructorsynopsis>
+			<methodname>~BString()</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="bstring_adopt">
+		<title>Adopt()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Adopt</methodname>
+			<methodparam><type>BString &amp;</type><parameter>from</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Adopt</methodname>
+			<methodparam><type>BString &amp;</type><parameter>from</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_append">
+		<title>Append()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Append</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Append</methodname>
+			<methodparam><modifier>const</modifier><type> char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Append</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Append</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Append</methodname>
+			<methodparam><type>char</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>count</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_copyinto">
+		<title>CopyInto()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>CopyInto</methodname>
+			<methodparam><type>BString &amp;</type><parameter>into</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>fromOffset</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<void/><methodname>CopyInto</methodname>
+			<methodparam><type>char *</type><parameter>into</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>fromOffset</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_countchars">
+		<title>CountChars()</title>
+		
+		<methodsynopsis>
+			<type>int32</type><methodname>CountChars</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_insert">
+		<title>Insert()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Insert</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Insert</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Insert</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>fromOffset</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Insert</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Insert</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Insert</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>fromOffSet</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Inser</methodname>
+			<methodparam><type>char</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>count</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>pos</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_length">
+		<title>Length()</title>
+		
+		<methodsynopsis>
+			<type>int32</type><methodname>Length</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_moveinto">
+		<title>MoveInto()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>MoveInto</methodname>
+			<methodparam><type>BString &amp;</type><parameter>into</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>from</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<void/><methodname>MoveInto</methodname>
+			<methodparam><type>char *</type><parameter>into</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>from</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_prepend">
+		<title>Prepend()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Prepend</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Prepend</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Prepend</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Prepend</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Prepend</methodname>
+			<methodparam><type>char</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>count</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_remove">
+		<title>Remove()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Remove</methodname>
+			<methodparam><type>int32</type><parameter>from</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_removefirst">
+		<title>RemoveFirst()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveFirst</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveFirst</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_removelast">
+		<title>RemoveLast()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveLast</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveLast</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_removeall">
+		<title>RemoveAll</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveAll</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveAll</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_removeset">
+		<title>RemoveSet</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>RemoveSet</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>setOfCharsToRemove</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_setto">
+		<title>SetTo</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>SetTo</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>SetTo</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>SetTo</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>from</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>SetTo</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>from</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>length</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>SetTo</methodname>
+			<methodparam><type>char</type><parameter>string</parameter></methodparam>
+			<methodparam><type>int32</type><parameter>count</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>	
+	
+	<sect3 id="bstring_string">
+		<title>String()</title>
+		
+		<methodsynopsis>
+			<type>const char *</type><methodname>String</methodname>	<modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_truncate">
+		<title>Truncate()</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>Truncate</methodname>
+			<methodparam><type>int32</type><parameter>newLength</parameter></methodparam>
+			<methodparam><type>bool</type><parameter>lazy</parameter><initializer>true</initializer></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Operators</bridgehead>
+	<sect3 id="bstring_operator_assignment">
+		<title>= (assignment)</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator=</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator=</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator=</methodname>
+			<methodparam><type>char</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bstring_operator_append">
+		<title>+= (append)</title>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator+=</methodname>
+			<methodparam><modifier>const</modifier><type>BString &amp;</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator+=</methodname>
+			<methodparam><modifier>const</modifier><type>char *</type><parameter>string</parameter></methodparam>
+		</methodsynopsis>
+		
+		<methodsynopsis>
+			<type>BString &amp;</type><methodname>operator+=</methodname>
+			<methodparam><modifier>const</modifier><type>char</type><parameter>character</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+</sect2>
