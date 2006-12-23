@@ -288,6 +288,9 @@ enum {
 	AS_DIRECT_WINDOW_GET_SYNC_DATA,
 	AS_DIRECT_WINDOW_SET_FULLSCREEN,
 
+	// Notification of event stream closing to restart input_server
+	AS_EVENT_STREAM_CLOSED,
+
 	AS_LAST_CODE
 };
 
