@@ -232,6 +232,7 @@ int_number:
 
 //--------------------------------------------------------------
 
+.globl idt_descriptor
 idt_descriptor:
 	.short	0x7ff				// IDT at 0x0, default real mode location
 	.long	0x0
