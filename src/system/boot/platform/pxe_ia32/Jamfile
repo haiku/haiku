@@ -5,6 +5,7 @@ SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform bios_ia32 ;
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
@@ -32,6 +33,12 @@ local bios_ia32_src =
 	apm.cpp
 ;
 
+local bios_ia32_edid_src = 
+	decode_edid.c
+	dump_edid.c
+;
+
+
 KernelMergeObject boot_platform_pxe_ia32.o :
 	pxe_stage2.S
 	smp_trampoline.S
@@ -39,6 +46,7 @@ KernelMergeObject boot_platform_pxe_ia32.o :
 	network.cpp
 	pxe_undi.cpp
 	$(bios_ia32_src)
+	$(bios_ia32_edid_src)
 	
 	# generic
 	text_menu.cpp
@@ -68,6 +76,9 @@ SEARCH on [ FGristFiles $(bios_ia32_src) ]
 
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+SEARCH on [ FGristFiles $(bios_ia32_edid_src) ]
+	= [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 # We also need the bios_ia32 stage1.bin for building bin/makebootable
 SEARCH on stage1.bin
