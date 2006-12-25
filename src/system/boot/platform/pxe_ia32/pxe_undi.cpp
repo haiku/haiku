@@ -5,6 +5,7 @@
 
 #include <OS.h>
 #include <KernelExport.h>
+#include <string.h>
 
 #include "pxe_undi.h"
 
@@ -16,22 +17,19 @@
 #endif
 
 
-struct pxe_struct 
-{
-	uint32	signature;
-};
-
-pxe_struct *gPxeData;
 
 
-pxe_struct *
+PXE_STRUCT *gPxeData;
+
+
+PXE_STRUCT *
 pxe_undi_find_data()
 {
-	pxe_struct *data = NULL;
+	PXE_STRUCT *data = NULL;
 	for (char *addr = (char *)0x8D000; addr < (char *)0xA0000; addr += 16) {
 		if (*(uint32 *)addr == 'EXP!' /* '!PXE' */) {
 			TRACE("found !PXE at %p\n", addr);
-			data = (pxe_struct *)addr;
+			data = (PXE_STRUCT *)addr;
 			break;
 		}
 	}
@@ -48,5 +46,28 @@ pxe_undi_init()
 	if (!gPxeData)
 		panic("can't find !PXE structure");
 
+	TRACE("entrypoint at %p\n", *(uint32 *)&gPxeData->EntryPointSP);
 
+
+	PXENV_UNDI_GET_INFORMATION get_info;
+
+	memset(&get_info, 0, sizeof(get_info));
+
+	TRACE("PXENV_UNDI_GET_INFORMATION at %p\n", &get_info);
+
+	uint16 res = call_pxe_bios(gPxeData, UNDI_GET_INFORMATION, &get_info);
+
+	TRACE("res = %04x\n", res);
+
+	TRACE("Status = %x\n", get_info.Status);
+	TRACE("BaseIo = %x\n", get_info.BaseIo);
+	TRACE("IntNumber = %x\n", get_info.IntNumber);
+	TRACE("MaxTranUnit = %x\n", get_info.MaxTranUnit);
+	TRACE("HwType = %x\n", get_info.HwType);
+	TRACE("HwAddrLen = %x\n", get_info.HwAddrLen);
+	TRACE("MAC = %02x:%02x:%02x:%02x:%02x:%02x\n", get_info.CurrentNodeAddress[0], get_info.CurrentNodeAddress[1], 
+												   get_info.CurrentNodeAddress[2], get_info.CurrentNodeAddress[3], 
+												   get_info.CurrentNodeAddress[4], get_info.CurrentNodeAddress[5] );
+	TRACE("RxBufCt = %x\n", get_info.RxBufCt);
+	TRACE("TxBufCt = %x\n", get_info.TxBufCt);
 }
