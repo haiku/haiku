@@ -15,6 +15,7 @@ IsInsideGlyph(uchar ch)
 	return (ch & 0xc0) == 0x80;
 }
 
+
 static inline uint32
 UTF8NextCharLenUnsafe(const char *text)
 {
@@ -27,6 +28,7 @@ UTF8NextCharLenUnsafe(const char *text)
 	return ptr - text;
 }
 
+
 static inline uint32
 UTF8NextCharLen(const char *text)
 {
@@ -35,6 +37,7 @@ UTF8NextCharLen(const char *text)
 
 	return UTF8NextCharLenUnsafe(text);
 }
+
 
 static inline uint32
 UTF8PreviousCharLen(const char *text, const char *limit)
@@ -53,54 +56,113 @@ UTF8PreviousCharLen(const char *text, const char *limit)
 	return text - ptr;
 }
 
-// TODO: use this function in other places of this file...
+
+/*!	UTF8CountBytes gets the length (in bytes) of a UTF8 string. Up to
+	numChars characters are read. If numChars is a negative value it is ignored
+	and the string is read up to the terminating NULL.
+*/
 static inline uint32
-count_utf8_bytes(uchar ch)
+UTF8CountBytes(const char *bytes, int32 numChars)
 {
-	// the number of high bits set until the first
-	// unset bit determine the count of bytes used for
-	// this glyph from this byte on
-	uchar bit = 1 << 7;
-	uint32 count = 1;
-	if (ch & bit) {
-		bit = bit >> 1;
-		while (ch & bit) {
-			count++;
-			bit = bit >> 1;
+	if (!bytes)
+		return 0;
+
+	if (numChars < 0)
+		numChars = INT_MAX;
+
+	const char *base = bytes;
+	while (*bytes && numChars-- > 0) {
+		if (bytes[0] & 0x80) {
+			if (bytes[0] & 0x40) {
+				if (bytes[0] & 0x20) {
+					if (bytes[0] & 0x10) {
+						if (bytes[1] == 0 || bytes[2] == 0 || bytes[3] == 0)
+							return (bytes - base);
+
+						bytes += 4;
+						continue;
+					}
+
+					if (bytes[1] == 0 || bytes[2] == 0)
+						return (bytes - base);
+
+					bytes += 3;
+					continue;
+				}
+
+				if (bytes[1] == 0)
+					return (bytes - base);
+
+				bytes += 2;
+				continue;
+			}
+
+			/* Not a startbyte - skip */
+			bytes += 1;
+			continue;
 		}
+
+		bytes += 1;
 	}
-	return count;
+
+	return (bytes - base);
 }
 
+
+/*!	UTF8CountChars gets the length (in characters) of a UTF8 string. Up to
+	numBytes bytes are read. If numBytes is a negative value it is ignored
+	and the string is read up to the terminating NULL.
+*/
 static inline uint32
-UTF8CountBytes(const char *text, uint32 numChars)
+UTF8CountChars(const char *bytes, int32 numBytes)
 {
-	if (text) {
-		// iterate over numChars glyphs incrementing ptr by the
-		// number of bytes for each glyph, which is encoded in
-		// the first byte of any glyph.
-		const char *ptr = text;
-		while (numChars--) {
-			ptr += count_utf8_bytes(*ptr);
+	if (!bytes)
+		return 0;
+
+	uint32 length = 0;
+	const char *last = bytes + numBytes - 1;
+	if (numBytes < 0)
+		last = (const char *)UINT_MAX;
+
+	while (*bytes && bytes <= last) {
+		if (bytes[0] & 0x80) {
+			if (bytes[0] & 0x40) {
+				if (bytes[0] & 0x20) {
+					if (bytes[0] & 0x10) {
+						if (bytes[1] == 0 || bytes[2] == 0 || bytes[3] == 0)
+							return length;
+
+						bytes += 4;
+						length++;
+						continue;
+					}
+
+					if (bytes[1] == 0 || bytes[2] == 0)
+						return length;
+
+					bytes += 3;
+					length++;
+					continue;
+				}
+
+				if (bytes[1] == 0)
+					return length;
+
+				bytes += 2;
+				length++;
+				continue;
+			}
+
+			/* Not a startbyte - skip */
+			bytes += 1;
+			continue;
 		}
-		return ptr - text;
-	}
-	return 0;
-}
 
-static inline uint32
-UTF8CountChars(const char *text, int32 numBytes)
-{
-	const char* ptr = text;
-	const char* last = ptr + numBytes - 1;
-
-	uint32 count = 0;
-	while (ptr <= last) {
-		ptr += UTF8NextCharLen(ptr);
-		count++;
+		bytes += 1;
+		length++;
 	}
 
-	return count;
+	return length;
 }
 
 
@@ -128,6 +190,9 @@ UTF8ToCharCode(const char **bytes)
 						return result;
 					}
 
+					if ((*bytes)[1] == 0 || (*bytes)[2] == 0 || (*bytes)[3] == 0)
+						return 0x00;
+
 					/* A four byte char */
 					result += (*bytes)[0] & 0x07;
 					result <<= 6;
@@ -140,6 +205,9 @@ UTF8ToCharCode(const char **bytes)
 					return result;
 				}
 
+				if ((*bytes)[1] == 0 || (*bytes)[2] == 0)
+					return 0x00;
+
 				/* A three byte char */
 				result += (*bytes)[0] & 0x0f;
 				result <<= 6;
@@ -149,6 +217,9 @@ UTF8ToCharCode(const char **bytes)
 				(*bytes) += 3;
 				return result;
 			}
+
+			if ((*bytes)[1] == 0)
+				return 0x00;
 
 			/* A two byte char */
 			result += (*bytes)[0] & 0x1f;
@@ -173,42 +244,6 @@ UTF8ToCharCode(const char **bytes)
 	result += (*bytes)[0];
 	(*bytes)++;
 	return result;
-}
-
-
-/*!	UTF8ToLength works like strlen() but takes UTF8 encoded multibyte chars
-	into account. It's a quicker version of UTF8CountChars above.
-*/
-static inline int32
-UTF8ToLength(const char *bytes)
-{
-	int32 length = 0;
-	while (*bytes) {
-		length++;
-
-		if (bytes[0] & 0x80) {
-			if (bytes[0] & 0x40) {
-				if (bytes[0] & 0x20) {
-					if (bytes[0] & 0x10) {
-						bytes += 4;
-						continue;
-					}
-
-					bytes += 3;
-					continue;
-				}
-
-				bytes += 2;
-				continue;
-			}
-
-			/* Not a startbyte - skip */
-		}
-
-		bytes += 1;
-	}
-
-	return length;
 }
 
 #endif	// _UTF8_FUNCTIONS_H

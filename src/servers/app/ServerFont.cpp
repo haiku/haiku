@@ -612,7 +612,7 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 	char *result = new char[length + 3];
 
 	// count the individual glyphs
-	int32 numChars = UTF8ToLength(string);
+	int32 numChars = UTF8CountChars(string, -1);
 
 	// get the escapement of each glyph in font units
 	float *escapementArray = new float[numChars];
