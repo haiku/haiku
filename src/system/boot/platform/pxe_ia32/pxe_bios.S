@@ -19,11 +19,7 @@
 #define REAL_MODE_STACK	0x9000
 	// the location of the stack in real mode
 
-#define SAVED_ESP		0x10000
-#define SAVED_CR3		0x10004
-#define SAVED_EAX		0x10008
-#define SAVED_ES		0x1000c
-#define SAVED_FLAGS		0x10010
+#define SAVED_EAX		0x10000
 	// we're overwriting the start of our boot loader to hold some
 	// temporary values - the first 1024 bytes of it are used at
 	// startup only, and we avoid some linking issues this way
@@ -33,76 +29,64 @@
 .code32
 
 
-/** void call_pxe_bios(...)
+/** uint16 call_pxe_bios(void *pxe, uint16 opcode, void *param)
  *	Does a call to the PXE BIOS functions in real mode.
+ *  Both pxe and param must be as linear pointer in lower 1 MB,
+ *  pxe is the pointer to the !PXE structure.
  */
 
 FUNCTION(call_pxe_bios)
+
 	pushal
 	pushfl
 
 	// make sure the correct IDT is in place
 	lidt 	idt_descriptor
 
-	// get the interrupt vector and patch the instruction at the target address
+	// !PXE
 	movl	40(%esp), %eax
+	// entry point SEG:OFS
+	movl	0x10(%eax), %ebx
 
-	// Fills registers from the passed in structure
-	// Since switch_to_real_mode() clobbers %eax, we have to handle
-	// it specially here (by temporarily storing it to an arbitrary
-	// memory location, SAVED_EAX)
-	movl	44(%esp), %ebp
+	// opcode
+	movl	44(%esp), %ecx
 
-	movl	(%ebp), %eax
-	movl	%eax, SAVED_EAX
-	movl	4(%ebp), %ebx
-	movl	8(%ebp), %ecx
-	movl	12(%ebp), %edx
-	movl	16(%ebp), %esi
-	movl	20(%ebp), %edi
-	movw	24(%ebp), %ax
-	movw	%ax, SAVED_ES
+	// param
+	movl	48(%esp), %edx
 
 	call	switch_to_real_mode
 
 	.code16
 
-	// restore %eax and %es from saved location
-	movl	(SAVED_EAX - 0x10000), %eax
-	movw	(SAVED_ES - 0x10000), %es
+	// SEG param 
+	movl	%edx, %eax
+	shrl	$4, %eax
+	pushw	%ax
 
-	// call the PXE hook
+	// OFS param
+	andw	$0xf, %dx
+	pushw	%dx
+	
+	// opcode
+	pushw	%cx
 
+	// call PXE entry point
+	call *	%ebx
 
+	addw	$6, %sp 
 
-	// we're interested in the flags state as well
-	pushf
-
-	// save %eax from the call
-	movl	%eax, (SAVED_EAX - 0x10000)
-
-	// save flags from the call
-	pop		%ax
-	movw	%ax, (SAVED_FLAGS - 0x10000)
+	// save %ax from the call
+	xorl	%ebx, %ebx
+	movw	%ax, %bx
+	movl	%ebx, (SAVED_EAX - 0x10000)
 
 	// back to protected mode
 	call	switch_to_protected_mode
 	.code32
 
-	// store the register state into the structure that has been passed in
-	movl	44(%esp), %eax
-
-	movl	%ebx, 4(%eax)
-	movl	%ecx, 8(%eax)
-	movl	%edx, 12(%eax)
-	movl	%esi, 16(%eax)
-	movl	%edi, 20(%eax)
-	movl	SAVED_EAX, %ecx		// special handling for %eax and flags
-	movl	%ecx, (%eax)
-	movw	SAVED_FLAGS, %cx
-	movw	%cx, 26(%eax)
-
 	popfl
 	popal
+
+	movl	SAVED_EAX, %eax
 
 	ret
