@@ -19,7 +19,7 @@
 #define REAL_MODE_STACK	0x9000
 	// the location of the stack in real mode
 
-#define SAVED_EAX		0x10000
+#define SAVED_EAX		0x10014
 	// we're overwriting the start of our boot loader to hold some
 	// temporary values - the first 1024 bytes of it are used at
 	// startup only, and we avoid some linking issues this way
@@ -31,7 +31,7 @@
 
 /** uint16 call_pxe_bios(void *pxe, uint16 opcode, void *param)
  *	Does a call to the PXE BIOS functions in real mode.
- *  Both pxe and param must be as linear pointer in lower 1 MB,
+ *  Both pxe and param must be as linear pointer into lower 1 MB,
  *  pxe is the pointer to the !PXE structure.
  */
 
@@ -44,9 +44,9 @@ FUNCTION(call_pxe_bios)
 	lidt 	idt_descriptor
 
 	// !PXE
-	movl	40(%esp), %eax
-	// entry point SEG:OFS
-	movl	0x10(%eax), %ebx
+	movl	40(%esp), %ebx
+	// make %ebx a pointer to entry point SEG:OFS
+	addl	$0x10, %ebx
 
 	// opcode
 	movl	44(%esp), %ecx
@@ -54,16 +54,17 @@ FUNCTION(call_pxe_bios)
 	// param
 	movl	48(%esp), %edx
 
+	// enter real mode (clobbers %eax, %ds, %es, %fs, %gs, %ss, %sp)
 	call	switch_to_real_mode
 
 	.code16
 
-	// SEG param 
+	// param (segment)
 	movl	%edx, %eax
 	shrl	$4, %eax
 	pushw	%ax
 
-	// OFS param
+	// param (offset)
 	andw	$0xf, %dx
 	pushw	%dx
 	
@@ -71,16 +72,20 @@ FUNCTION(call_pxe_bios)
 	pushw	%cx
 
 	// call PXE entry point
-	call *	%ebx
+	movl	%ebx, %eax
+	shrl	$4, %eax
+	movw	%ax, %es
+	andw	$0xf, %bx
+	lcall *	%es:(%bx)
 
 	addw	$6, %sp 
 
-	// save %ax from the call
+	// save %ax result
 	xorl	%ebx, %ebx
 	movw	%ax, %bx
 	movl	%ebx, (SAVED_EAX - 0x10000)
 
-	// back to protected mode
+	// back to protected mode (clobbers %eax)
 	call	switch_to_protected_mode
 	.code32
 
