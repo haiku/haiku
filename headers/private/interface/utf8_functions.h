@@ -59,7 +59,7 @@ UTF8PreviousCharLen(const char *text, const char *limit)
 
 /*!	UTF8CountBytes gets the length (in bytes) of a UTF8 string. Up to
 	numChars characters are read. If numChars is a negative value it is ignored
-	and the string is read up to the terminating NULL.
+	and the string is read up to the terminating 0.
 */
 static inline uint32
 UTF8CountBytes(const char *bytes, int32 numChars)
@@ -111,7 +111,7 @@ UTF8CountBytes(const char *bytes, int32 numChars)
 
 /*!	UTF8CountChars gets the length (in characters) of a UTF8 string. Up to
 	numBytes bytes are read. If numBytes is a negative value it is ignored
-	and the string is read up to the terminating NULL.
+	and the string is read up to the terminating 0.
 */
 static inline uint32
 UTF8CountChars(const char *bytes, int32 numBytes)
