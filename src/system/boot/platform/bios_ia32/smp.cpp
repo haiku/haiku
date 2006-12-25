@@ -195,7 +195,7 @@ smp_do_config(void)
 			{
 				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)ptr;
 
-				dprintf("smp: %s int: type %d, source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
+				dprintf("smp: %s int: type %d, source bus %d, irq %3d, dest apic %d, int %3d, polarity %d, trigger mode %d\n",
 					interrupt->type == MP_BASE_IO_INTR ? "I/O" : "local",
 					interrupt->interrupt_type, interrupt->source_bus_id,
 					interrupt->source_bus_irq, interrupt->dest_apic_id,
