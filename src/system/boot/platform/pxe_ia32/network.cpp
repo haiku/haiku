@@ -17,7 +17,7 @@
 
 #include "pxe_undi.h"
 
-#define TRACE_NETWORK
+//#define TRACE_NETWORK
 #ifdef TRACE_NETWORK
 #	define TRACE(x...) dprintf(x)
 #else
@@ -86,7 +86,7 @@ UNDI::UNDI()
 	if (!fPxeData)
 		panic("can't find !PXE structure");
 
-	TRACE("PXE API entrypoint at %04x:%04x\n", fPxeData->EntryPointSP.seg, fPxeData->EntryPointSP.ofs);
+	dprintf("PXE API entrypoint at %04x:%04x\n", fPxeData->EntryPointSP.seg, fPxeData->EntryPointSP.ofs);
 }
 
 
@@ -114,7 +114,7 @@ UNDI::Init()
 	cached_info.Buffer.ofs = 0;
 	res = call_pxe_bios(fPxeData, GET_CACHED_INFO, &cached_info);
 	if (res != 0 || get_state.Status != 0) {
-		TRACE("PXENV_GET_CACHED_INFO failed, res %x, status %x\n", res, undi_open.Status);
+		dprintf("PXENV_GET_CACHED_INFO failed, res %x, status %x\n", res, undi_open.Status);
 		panic("Can't determine our IP address\n");
 	}
 	
@@ -122,7 +122,7 @@ UNDI::Init()
 	ip_addr_t ipClient = ntohl(*(ip_addr_t *)(buf + 16));
 	ip_addr_t ipServer = ntohl(*(ip_addr_t *)(buf + 20));
 
-	TRACE("client-ip: %08x, server-ip: %08x\n", (int)ipClient, (int)ipServer);
+	dprintf("client-ip: %08x, server-ip: %08x\n", (int)ipClient, (int)ipServer);
 
 	SetIPAddress(ipClient);
 
@@ -132,12 +132,12 @@ UNDI::Init()
 
 	res = call_pxe_bios(fPxeData, UNDI_OPEN, &undi_open);
 	if (res != 0 || get_state.Status != 0) {
-		TRACE("PXENV_UNDI_OPEN failed, res %x, status %x\n", res, undi_open.Status);
+		dprintf("PXENV_UNDI_OPEN failed, res %x, status %x\n", res, undi_open.Status);
 	}
 
 	res = call_pxe_bios(fPxeData, UNDI_GET_STATE, &get_state);
 	if (res != 0 || get_state.Status != 0) {
-		TRACE("PXENV_UNDI_GET_STATE failed, res %x, status %x\n", res, get_state.Status);
+		dprintf("PXENV_UNDI_GET_STATE failed, res %x, status %x\n", res, get_state.Status);
 	} else {
 		switch (get_state.UNDIstate) {
 			case PXE_UNDI_GET_STATE_STARTED: 
@@ -157,7 +157,7 @@ UNDI::Init()
 
 	res = call_pxe_bios(fPxeData, UNDI_GET_INFORMATION, &get_info);
 	if (res != 0 || get_info.Status != 0) {
-		TRACE("PXENV_UNDI_GET_INFORMATION failed, res %x, status %x\n", res, get_info.Status);
+		dprintf("PXENV_UNDI_GET_INFORMATION failed, res %x, status %x\n", res, get_info.Status);
 		return B_ERROR;
 	}
 
@@ -227,7 +227,7 @@ UNDI::Send(const void *buffer, size_t size)
 
 	uint16 res = call_pxe_bios(fPxeData, UNDI_TRANSMIT, &undi_tx);
 	if (res != 0 || undi_tx.Status != 0) {
-		TRACE("UNDI_TRANSMIT failed, res %x, status %x\n", res, undi_tx.Status);
+		dprintf("UNDI_TRANSMIT failed, res %x, status %x\n", res, undi_tx.Status);
 		return 0;
 	}
 
@@ -251,7 +251,7 @@ UNDI::Receive(void *buffer, size_t size)
 		undi_isr.FuncFlag = PXENV_UNDI_ISR_IN_GET_NEXT;
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
 		if (res != 0 || undi_isr.Status != 0) {
-			TRACE("PXENV_UNDI_ISR_IN_GET_NEXT failed, res %x, status %x\n", res, undi_isr.Status);
+			dprintf("PXENV_UNDI_ISR_IN_GET_NEXT failed, res %x, status %x\n", res, undi_isr.Status);
 			fRxFinished = true;
 			return 0;
 		}
@@ -262,7 +262,7 @@ UNDI::Receive(void *buffer, size_t size)
 
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
 		if (res != 0 || undi_isr.Status != 0) {
-			TRACE("PXENV_UNDI_ISR_IN_START failed, res %x, status %x\n", res, undi_isr.Status);
+			dprintf("PXENV_UNDI_ISR_IN_START failed, res %x, status %x\n", res, undi_isr.Status);
 			return -1;
 		}
 
@@ -278,7 +278,7 @@ UNDI::Receive(void *buffer, size_t size)
 		undi_isr.FuncFlag = PXENV_UNDI_ISR_IN_PROCESS;
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
 		if (res != 0 || undi_isr.Status != 0) {
-			TRACE("PXENV_UNDI_ISR_IN_PROCESS failed, res %x, status %x\n", res, undi_isr.Status);
+			dprintf("PXENV_UNDI_ISR_IN_PROCESS failed, res %x, status %x\n", res, undi_isr.Status);
 			return -1;
 		}
 	}
