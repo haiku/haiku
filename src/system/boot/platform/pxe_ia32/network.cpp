@@ -208,7 +208,7 @@ UNDI::Send(const void *buffer, size_t size)
 {
 	TRACE("UNDI::Send, buffer %p, size %ld\n", buffer, size);
 
-	hex_dump(buffer, size);
+//	hex_dump(buffer, size);
 
 	PXENV_UNDI_TRANSMIT undi_tx;
 	PXENV_UNDI_TBD undi_tbd;
@@ -273,7 +273,7 @@ UNDI::Receive(void *buffer, size_t size)
 
 		// send EOI to pic ?
 
-		TRACE("PXENV_UNDI_ISR_OUT_OURS\n");
+//		TRACE("PXENV_UNDI_ISR_OUT_OURS\n");
 	
 		undi_isr.FuncFlag = PXENV_UNDI_ISR_IN_PROCESS;
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
@@ -291,13 +291,15 @@ UNDI::Receive(void *buffer, size_t size)
 
 		case PXENV_UNDI_ISR_OUT_RECEIVE:
 			TRACE("PXENV_UNDI_ISR_OUT_RECEIVE\n");
-			TRACE("BufferLength %d\n", undi_isr.BufferLength);
-			TRACE("FrameLength %d\n", undi_isr.FrameLength);
-			TRACE("FrameHeaderLength %d\n", undi_isr.FrameHeaderLength);
+//			TRACE("BufferLength %d\n", undi_isr.BufferLength);
+//			TRACE("FrameLength %d\n", undi_isr.FrameLength);
+//			TRACE("FrameHeaderLength %d\n", undi_isr.FrameHeaderLength);
+			if (undi_isr.FrameLength > undi_isr.BufferLength)
+				panic("UNDI::Receive: multi buffer frames not supported");
 			if (size > undi_isr.BufferLength)
 				size = undi_isr.BufferLength;
 			memcpy(buffer, (const void *)(undi_isr.Frame.seg * 16 + undi_isr.Frame.ofs), size);
-			hex_dump(buffer, size);
+//			hex_dump(buffer, size);
 			fRxFinished = false;
 			return size;
 
