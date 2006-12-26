@@ -17,7 +17,7 @@ extern "C" uint16 call_pxe_bios(void *pxe, uint16 opcode, void *param);
 #define GET_CACHED_INFO			0x0071
 
 #define SEG(ptr)	((uint16)(((uint32)(ptr)) >> 4))
-#define OFS(ptr)	(((uint16)(ptr)) & 15)
+#define OFS(ptr)	((uint16)(((uint32)(ptr)) & 15))
 
 #define MAC_ADDR_LEN 16
 typedef uint8 MAC_ADDR[MAC_ADDR_LEN];
