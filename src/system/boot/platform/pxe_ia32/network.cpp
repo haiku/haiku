@@ -248,12 +248,12 @@ UNDI::Receive(void *buffer, size_t size)
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
 		if (res != 0 || undi_isr.Status != 0) {
 			TRACE("PXENV_UNDI_ISR_IN_START failed, res %x, status %x\n", res, undi_isr.Status);
-			return 0;
+			return -1;
 		}
 
 		if (undi_isr.FuncFlag != PXENV_UNDI_ISR_OUT_OURS) {
 //			TRACE("not ours\n");
-			return 0;
+			return -1;
 		}
 
 		// send EOI to pic ?
@@ -264,7 +264,7 @@ UNDI::Receive(void *buffer, size_t size)
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
 		if (res != 0 || undi_isr.Status != 0) {
 			TRACE("PXENV_UNDI_ISR_IN_PROCESS failed, res %x, status %x\n", res, undi_isr.Status);
-			return 0;
+			return -1;
 		}
 	}
 
@@ -289,16 +289,16 @@ UNDI::Receive(void *buffer, size_t size)
 		case PXENV_UNDI_ISR_OUT_BUSY:
 			TRACE("PXENV_UNDI_ISR_OUT_BUSY\n");
 			fRxFinished = true;
-			return 0;
+			return -1;
 
 		case PXENV_UNDI_ISR_OUT_DONE:
 			TRACE("PXENV_UNDI_ISR_OUT_DONE\n");
 			fRxFinished = true;
-			return 0;
+			return -1;
 
 		default:
 			TRACE("default!!!\n");
-			return 0;
+			return -1;
 	}
 }
 
