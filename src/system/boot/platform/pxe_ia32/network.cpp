@@ -113,9 +113,10 @@ UNDI::Init()
 	cached_info.Buffer.seg = 0;
 	cached_info.Buffer.ofs = 0;
 	res = call_pxe_bios(fPxeData, GET_CACHED_INFO, &cached_info);
-	if (res != 0 || get_state.Status != 0) {
-		dprintf("PXENV_GET_CACHED_INFO failed, res %x, status %x\n", res, undi_open.Status);
-		panic("Can't determine our IP address\n");
+	if (res != 0 || cached_info.Status != 0) {
+		char s[100];
+		snprintf(s, sizeof(s), "Can't determine IP address! PXENV_GET_CACHED_INFO res %x, status %x\n", res, cached_info.Status);
+		panic(s);
 	}
 	
 	char *buf = (char *)(cached_info.Buffer.seg * 16 + cached_info.Buffer.ofs);
@@ -131,13 +132,13 @@ UNDI::Init()
 	undi_open.R_Mcast_Buf.MCastAddrCount = 0;
 
 	res = call_pxe_bios(fPxeData, UNDI_OPEN, &undi_open);
-	if (res != 0 || get_state.Status != 0) {
-		dprintf("PXENV_UNDI_OPEN failed, res %x, status %x\n", res, undi_open.Status);
+	if (res != 0 || undi_open.Status != 0) {
+		dprintf("PXENV_UNDI_OPEN failed, res %x, status %x, ignoring\n", res, undi_open.Status);
 	}
 
 	res = call_pxe_bios(fPxeData, UNDI_GET_STATE, &get_state);
 	if (res != 0 || get_state.Status != 0) {
-		dprintf("PXENV_UNDI_GET_STATE failed, res %x, status %x\n", res, get_state.Status);
+		dprintf("PXENV_UNDI_GET_STATE failed, res %x, status %x, ignoring\n", res, get_state.Status);
 	} else {
 		switch (get_state.UNDIstate) {
 			case PXE_UNDI_GET_STATE_STARTED: 
