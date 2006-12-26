@@ -1,3 +1,11 @@
 SubDir HAIKU_TOP src tools makebootable platform pxe_ia32 ;
 
 # we don't need this tool for creating PXE boot image
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src bin ] ;
+
+BuildPlatformMain <build>makebootable :
+	echo.c
+	:
+;
