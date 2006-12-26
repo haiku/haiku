@@ -6,6 +6,7 @@
 #include <boot/net/Ethernet.h>
 
 #include <stdio.h>
+#include <KernelExport.h>
 
 #include <boot/net/ChainBuffer.h>
 

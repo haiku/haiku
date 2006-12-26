@@ -6,6 +6,7 @@
 #include <boot/net/IP.h>
 
 #include <stdio.h>
+#include <KernelExport.h>
 
 #include <boot/net/ARP.h>
 #include <boot/net/ChainBuffer.h>

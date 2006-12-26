@@ -6,8 +6,7 @@
 #include <boot/net/UDP.h>
 
 #include <stdio.h>
-
-#include <OS.h>
+#include <KernelExport.h>
 
 #include <boot/net/ChainBuffer.h>
 #include <boot/net/NetStack.h>
