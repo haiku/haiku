@@ -100,11 +100,31 @@ status_t
 UNDI::Init()
 {
 	TRACE("UNDI::Init\n");
-
+	
+	PXENV_GET_CACHED_INFO cached_info;
 	PXENV_UNDI_GET_INFORMATION get_info;
 	PXENV_UNDI_GET_STATE get_state;
 	PXENV_UNDI_OPEN undi_open;
 	uint16 res;
+
+	cached_info.PacketType = PXENV_PACKET_TYPE_CACHED_REPLY;
+	cached_info.BufferSize = 0;
+	cached_info.BufferLimit = 0;
+	cached_info.Buffer.seg = 0;
+	cached_info.Buffer.ofs = 0;
+	res = call_pxe_bios(fPxeData, GET_CACHED_INFO, &cached_info);
+	if (res != 0 || get_state.Status != 0) {
+		TRACE("PXENV_GET_CACHED_INFO failed, res %x, status %x\n", res, undi_open.Status);
+		panic("Can't determine our IP address\n");
+	}
+	
+	char *buf = (char *)(cached_info.Buffer.seg * 16 + cached_info.Buffer.ofs);
+	ip_addr_t ipClient = ntohl(*(ip_addr_t *)(buf + 16));
+	ip_addr_t ipServer = ntohl(*(ip_addr_t *)(buf + 20));
+
+	TRACE("client-ip: %08x, server-ip: %08x\n", (int)ipClient, (int)ipServer);
+
+	SetIPAddress(ipClient);
 
 	undi_open.OpenFlag = 0;
 	undi_open.PktFilter = FLTR_DIRECTED | FLTR_BRDCST | FLTR_PRMSCS;

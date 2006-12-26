@@ -14,6 +14,8 @@ extern "C" uint16 call_pxe_bios(void *pxe, uint16 opcode, void *param);
 #define UNDI_ISR				0x0014
 #define UNDI_GET_STATE			0x0015
 
+#define GET_CACHED_INFO			0x0071
+
 #define SEG(ptr)	((uint16)(((uint32)(ptr)) >> 4))
 #define OFS(ptr)	(((uint16)(ptr)) & 15)
 
@@ -58,6 +60,18 @@ struct PXE_STRUCT
 	SEGDESC	BC_Data;
 	SEGDESC	BC_Code;
 	SEGDESC	BC_CodeWrite;
+};
+
+struct PXENV_GET_CACHED_INFO
+{
+	uint16	Status;
+	uint16	PacketType;
+	#define PXENV_PACKET_TYPE_DHCP_DISCOVER 1
+	#define PXENV_PACKET_TYPE_DHCP_ACK      2
+	#define PXENV_PACKET_TYPE_CACHED_REPLY  3
+	uint16	BufferSize;
+	SEGOFF16 Buffer;
+	uint16	BufferLimit;
 };
 
 struct PXENV_UNDI_MCAST_ADDRESS
