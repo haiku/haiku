@@ -223,12 +223,7 @@ UNDI::Send(const void *buffer, size_t size)
 	undi_tbd.ImmedLength = size;
 	undi_tbd.Xmit.seg = SEG(buffer);
 	undi_tbd.Xmit.ofs = OFS(buffer);
-	undi_tbd.DataBlkCount = 1;
-	undi_tbd.DataBlock[0].TDPtrType = 1;
-	undi_tbd.DataBlock[0].TDRsvdByte = 0;
-	undi_tbd.DataBlock[0].TDDataLen = size;
-	undi_tbd.DataBlock[0].TDDataPtr.seg = SEG(buffer);
-	undi_tbd.DataBlock[0].TDDataPtr.ofs = OFS(buffer);
+	undi_tbd.DataBlkCount = 0;
 
 	uint16 res = call_pxe_bios(fPxeData, UNDI_TRANSMIT, &undi_tx);
 	if (res != 0 || undi_tx.Status != 0) {
