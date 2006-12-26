@@ -721,6 +721,10 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 
 	for (int32 i = 0; i < height; i++) {
 		for (int32 j = 0; j < width; j++) {
+			if ((uint8 *)srcBits + sizeof(srcByte) > srcBitsEnd
+				|| (uint8 *)dstBits + sizeof(dstByte) > dstBitsEnd)
+				return B_OK;
+
 			if (srcFunc)
 				source = srcFunc((const uint8 **)&srcBits, srcOffsetX++);
 			else {
@@ -777,9 +781,6 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 				*dstBits = result;
 				dstBits++;
 			}
-
-			if ((uint8*)srcBits > srcBitsEnd || (uint8*)dstBits > dstBitsEnd)
-				return B_OK;
 		}
 
 		srcBits = (srcByte*)((uint8*)srcBits + srcLinePad);
