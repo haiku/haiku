@@ -288,9 +288,12 @@ UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 	if (!data || size < sizeof(udp_header))
 		return;
 
-	// check the header
 	const udp_header *header = (const udp_header*)data;
+	uint16 source = ntohs(header->source);
+	uint16 destination = ntohs(header->destination);
 	uint16 length = ntohs(header->length);
+
+	// check the header
 	if (length < sizeof(udp_header) || length > size
 		|| (header->checksum != 0	// 0 => checksum disabled
 			&& _ChecksumData(data, length, sourceIP, destinationIP) != 0)) {
@@ -300,7 +303,7 @@ UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 	}
 
 	// find the target socket
-	UDPSocket *socket = _FindSocket(destinationIP, header->destination);
+	UDPSocket *socket = _FindSocket(destinationIP, destination);
 	if (!socket)
 		return;
 
@@ -309,8 +312,8 @@ UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 	if (!packet)
 		return;
 	status_t error = packet->SetTo((uint8*)data + sizeof(udp_header),
-		length - sizeof(udp_header), sourceIP, header->source, destinationIP,
-		header->destination);
+		length - sizeof(udp_header), sourceIP, source, destinationIP,
+		destination);
 	if (error == B_OK)
 		socket->PushPacket(packet);
 	else
