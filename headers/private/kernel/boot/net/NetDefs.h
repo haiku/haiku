@@ -45,6 +45,11 @@ struct mac_addr_t {
 			| (uint64)address[5];
 	}
 
+	uint8 operator[](int index)
+	{
+		return address[index];
+	}
+
 	mac_addr_t& operator=(const mac_addr_t& other)
 	{
 		memcpy(address, other.address, sizeof(address));
