@@ -139,7 +139,7 @@ IPService::Send(ip_addr_t destination, uint8 protocol, ChainBuffer *buffer)
 	header.type_of_service = 0;
 	header.total_length = htons(headerBuffer.TotalSize());
 	header.identifier = 0;
-	header.fragment_offset = IP_DONT_FRAGMENT;
+	header.fragment_offset = htons(IP_DONT_FRAGMENT);
 	header.time_to_live = IP_DEFAULT_TIME_TO_LIVE;
 	header.protocol = protocol;
 	header.checksum = 0;
