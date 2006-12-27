@@ -1,0 +1,129 @@
+/*!
+\file TypeConstants.h
+\ingroup support
+*/
+
+/*!
+\var B_ANY_TYPE
+\brief General type when the exact contents is not yet known.
+*/
+
+/*!
+\var B_BOOL_TYPE
+\brief Boolean value
+*/
+
+/*!
+\var B_CHAR_TYPE
+\brief Represents the \c char type
+*/
+
+/*!
+\var B_COLOR_8_BIT_TYPE
+\brief Represents a one-byte colour
+*/
+
+/*!
+\var B_DOUBLE_TYPE
+\brief Represents the \c double type
+*/
+
+/*!
+\var B_FLOAT_TYPE
+\brief Represents the \c float type
+*/
+
+/*!
+\var B_GRAYSCALE_8_BIT_TYPE
+\brief Represents a byte-long grayscale value
+*/
+
+/*!
+\var B_INT16_TYPE
+\brief Represents a \c short type
+*/
+
+/*!
+\var B_INT32_TYPE
+\brief Represents a \c long type
+*/
+
+/*!
+\var B_INT64_TYPE
+\brief Represents a \c long \c long type
+*/
+
+/*!
+\var B_INT8_TYPE
+\brief Represents a \c char type used for integer storage
+*/
+
+
+
+// Todo: the rest of the types
+
+/*! @{
+\name System-wide MIME types for handling URLs
+*/
+
+/*!
+\var B_URL_HTTP
+\brief application/x-vnd.Be.URL.http
+*/
+
+/*!
+\var B_URL_HTTPS
+\brief application/x-vnd.Be.URL.https
+*/
+
+/*!
+\var B_URL_FTP
+\brief application/x-vnd.Be.URL.ftp
+*/
+
+/*!
+\var B_URL_GOPHER
+\brief application/x-vnd.Be.URL.gopher
+*/
+
+/*!
+\var B_URL_MAILTO
+\brief application/x-vnd.Be.URL.mailto
+*/
+
+/*!
+\var B_URL_NEWS
+\brief application/x-vnd.Be.URL.news
+*/
+
+/*!
+\var B_URL_NNTP
+\brief application/x-vnd.Be.URL.nntp
+*/
+
+/*!
+\var B_URL_TELNET
+\brief application/x-vnd.Be.URL.telnet
+*/
+
+/*!
+\var B_URL_RLOGIN
+\brief application/x-vnd.Be.URL.rlogin
+*/
+
+/*!
+\var B_URL_TN3270
+\brief application/x-vnd.Be.URL.tn3270
+*/
+
+/*!
+\var B_URL_WAIS
+\brief application/x-vnd.Be.URL.wais
+*/
+
+/*!
+\var B_URL_FILE
+\brief application/x-vnd.Be.URL.file
+*/
+
+//! @}

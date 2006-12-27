@@ -1,0 +1,186 @@
+/*!
+\file String.h
+\ingroup libbe
+\ingroup support
+\brief Implements the BString class.
+*/
+
+/*!
+\class BString
+\ingroup support
+\ingroup libbe
+\brief String class supporting common string operations.
+
+BString is a string allocation and manipulation class. The object
+takes care to allocate and free memory for you, so it will always be
+"big enough" to store your strings.
+	
+\author <a href='mailto:mflerackers@androme.be>Marc Flerackers</a>
+\author <a href='mailto:burton666@freemail.it>Stefano Ceccherini</a>
+\author <a href='mailto:openbeos@hirschaefer.de>Oliver Tappe</a>
+*/
+
+/*!
+\var char* BString::_privateData
+\brief BString's storage for data
+*/
+
+/*!
+\fn BString::BString()
+\brief Creates an uninitialized BString.
+*/
+
+/*!
+\fn BString::BString(const char* str)
+\brief Creates a BString and initializes it to the given string.
+\param str Pointer to a NULL terminated string.
+*/
+
+/*!
+\fn BString::BString(const BString &string)
+\brief Creates a BString and makes it a copy of the supplied one.
+\param string the BString object to be copied.
+*/
+
+/*!
+\fn BString::BString(const char *str, int32 maxLength)
+\brief Creates a BString and initializes it to the given string.
+\param str Pointer to a NULL terminated string.
+\param maxLength The amount of characters you want to copy from the original
+string.
+*/
+
+/*!
+\fn BString::~BString()
+\brief Frees all resources associated with the object.
+	
+Frees the memory allocated by the BString object.
+*/
+
+/*! @{
+\name Access Methods
+*/
+
+/*!
+\fn const char* BString::String() const
+\brief Returns a pointer to the object string, NULL terminated.
+	
+Returns a pointer to the object string, guaranteed to be NULL
+terminated. You can't modify or free the pointer. Once the BString
+object is deleted, the pointer becomes invalid.
+	
+\return A pointer to the object string.
+*/
+
+/*!
+\fn int32 BString::Length() const
+\brief Returns the length of the string, measured in bytes.
+\return The length of the string, measured in bytes.
+*/
+
+/*!
+\fn int32 BString::CountChars() const
+\brief Returns the length of the object measured in characters.
+	
+Counts the number of UTF8 characters contained in the string.
+\return An integer which is the number of characters in the string.
+*/
+
+//! @}
+
+/*! @{
+\name Assignment Methods
+*/
+
+/*!
+\fn BString& BString::operator=(const BString &string)
+\brief Makes a copy of the given BString object.
+\param string The string object to copy.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::operator=(const char *str)
+\brief Re-initializes the object to the given string.
+\param str Pointer to a string.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::operator=(char c)
+\brief Re-initializes the object to the given character.
+\param c The character which you want to initialize the string to.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::SetTo(const char *str, int32 maxLength)
+\brief Re-initializes the object to the given string.
+\param str Pointer to a string.
+\param maxLength Amount of characters to copy from the original string.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::SetTo(const BString &from)
+\brief Makes a copy of the given BString object.
+\param from The string object to copy.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::Adopt(BString &from)
+\brief Adopt's data of the given BString object, freeing the original object.
+\param from The string object to adopt.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::SetTo(const BString &string, int32 length)
+\brief Makes a copy of the given BString object.
+\param string The string object to copy.
+\param length Amount of characters to copy from the original BString.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::Adopt(BString &from, int32 length)
+\brief Adopt's data of the given BString object, freeing the original object.
+\param from The string object to adopt.
+\param length Amount of characters to get from the original BString.
+\return The function always returns \c *this .
+*/
+
+/*!
+\fn BString& BString::SetTo(char c, int32 count)
+\brief Initializes the object to a string composed by a character you specify.
+\param c The character you want to initialize the BString.
+\param count The number of characters you want the BString to be composed by.
+\return The function always returns \c *this .
+*/
+
+//! @}
+
+
+/*! @{
+\name Substring Copying
+*/
+
+\*!
+\fn BString &BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
+\brief Copy the BString data (or part of it) into another BString.
+\param into The BString where to copy the object.
+\param fromOffset The offset (zero based) where to begin the copy
+\param length The amount of bytes to copy.
+\return This function always returns *this .
+*/
+
+/*!
+\fn void BString::CopyInto(char *into, int32 fromOffset, int32 length) const
+\brief Copy the BString data (or part of it) into the supplied buffer.
+\param into The buffer where to copy the object.
+\param fromOffset The offset (zero based) where to begin the copy
+\param length The amount of bytes to copy.
+*/
+
+//! @}
