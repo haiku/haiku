@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bdataio">
+	<title>BDataIO</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis> none</para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/DataIO.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BDataIO</classname> provides a base interface for reading and writing data.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bdataio_constructor">
+		<title>BDataIO()</title>
+		
+		<constructorsynopsis>
+			<methodname>BDataIO</methodname>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="bdataio_destructor">
+		<title>~BDataIO()</title>
+		
+		<destructorsynopsis>
+			<modifier>virtual</modifier><methodname>~BDataIO</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member Functions</bridgehead>
+	<sect3 id="bdataio_read">
+		<title>Read()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>Read</methodname>
+			<methodparam><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bdataio_write">
+		<title>Write()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>Write</methodname>
+			<methodparam><modifier>const</modifier><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+</sect2>

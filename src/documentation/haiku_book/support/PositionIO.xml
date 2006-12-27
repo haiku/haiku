@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bpositionio">
+	<title>BPositionIO</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis><link linkend="bdataio"><classname>BDataIO</classname></link></para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/DataIO.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BPositionIO</classname> provides an interface for reading, writing and seeking within data.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bpositionio_constructor">
+		<title>BPositionIO()</title>
+		
+		<constructorsynopsis>
+			<methodname>BPositionIO</methodname>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_destructor">
+		<title>~BPositionIO()</title>
+		
+		<destructorsynopsis>
+			<modifier>virtual</modifier><methodname>~BPositionIO</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member functions</bridgehead>
+	<sect3 id="bpositionio_getsize">
+		<title>GetSize()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>status_t</type><methodname>GetSize</methodname>
+			<methodparam><type>off_t *</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_position">
+		<title>Position()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>off_t</type><methodname>Position</methodname><modifier>const</modifier><modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_read">
+		<title>Read()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>Read</methodname>
+			<methodparam><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_readat">
+		<title>ReadAt()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>ReadAt</methodname>
+			<methodparam><type>off_t</type><parameter>position</parameter></methodparam>
+			<methodparam><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_seek">
+		<title>Seek()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>off_t</type><methodname>Seek</methodname>
+			<methodparam><type>off_t</type><parameter>position</parameter></methodparam>
+			<methodparam><type>uint32</type><parameter>seekMode</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_setsize">
+		<title>SetSize()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>status_t</type><methodname>SetSize</methodname>
+			<methodparam><type>off_t</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_write">
+		<title>Write()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>Write</methodname>
+			<methodparam><modifier>const</modifier><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bpositionio_writeat">
+		<title>WriteAt()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>WriteAt</methodname>
+			<methodparam><type>off_t</type><parameter>position</parameter></methodparam>
+			<methodparam><modifier>const</modifier><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+			<modifier>= 0</modifier>
+		</methodsynopsis>
+	</sect3>
+</sect2>

@@ -5,9 +5,14 @@
 <!ENTITY archivable SYSTEM "Archivable.xml">
 <!ENTITY autolock SYSTEM "Autolock.xml">
 <!ENTITY blockcache SYSTEM "BlockCache.xml">
+<!ENTITY dataio SYSTEM "DataIO.xml">
 <!ENTITY flattenable SYSTEM "Flattenable.xml">
 <!ENTITY list SYSTEM "List.xml">
 <!ENTITY locker SYSTEM "Locker.xml">
+<!ENTITY mallocio SYSTEM "MallocIO.xml">
+<!ENTITY memoryio SYSTEM "MemoryIO.xml">
+<!ENTITY positionio SYSTEM "PositionIO.xml">
+<!ENTITY stopwatch SYSTEM "StopWatch.xml">
 <!ENTITY string SYSTEM "String.xml">
 
 ]>
@@ -17,9 +22,14 @@
 	
 	&archivable;
 	&autolock;
+	&dataio;
 	&blockcache;
 	&flattenable;
 	&list;
 	&locker;
+	&mallocio;
+	&memoryio;
+	&positionio;
+	&stopwatch;
 	&string;
 </sect1>

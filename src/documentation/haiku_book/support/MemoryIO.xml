@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="bmemoryio">
+	<title>BMemoryIO</title>
+	
+	<itemizedlist>
+		<listitem><para><emphasis>Derived from:</emphasis><link linkend="bpositionio"><classname>BPositionIO</classname></link></para></listitem>
+		<listitem><para><emphasis>Declared in:</emphasis> <filename>os/support/DataIO.h</filename></para></listitem>
+		<listitem><para><emphasis>Library:</emphasis> <filename>libbe.so</filename></para></listitem>
+	</itemizedlist>
+	
+	<para><classname>BMemoryIO</classname> implements reading, writing and seeking in a data buffer.</para>
+	
+	<bridgehead renderas="sect2">Constructors and Destructors</bridgehead>
+	<sect3 id="bmemoryio_constructor">
+		<title>BMemoryIO()</title>
+		
+		<constructorsynopsis>
+			<methodname>BMemoryIO</methodname>
+			<methodparam><type>void *</type><parameter>data</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>length</parameter></methodparam>
+		</constructorsynopsis>
+		
+		<constructorsynopsis>
+			<methodname>BMemoryIO</methodname>
+			<methodparam><modifier>const</modifier><type>void *</type><parameter>data</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>length</parameter></methodparam>
+		</constructorsynopsis>
+	</sect3>
+	
+	<sect3 id="bmemoryio_destructor">
+		<title>~BMemoryIO()</title>
+		
+		<destructorsynopsis>
+			<modifier>virtual</modifier><methodname>~BMemoryIO</methodname>
+		</destructorsynopsis>
+	</sect3>
+	
+	<bridgehead renderas="sect2">Member functions</bridgehead>
+	<sect3 id="bmemoryio_position">
+		<title>Position()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>off_t</type><methodname>Position</methodname><modifier>const</modifier>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bmemoryio_readat">
+		<title>ReadAt()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>ReadAt</methodname>
+			<methodparam><type>off_t</type><parameter>position</parameter></methodparam>
+			<methodparam><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bmemoryio_seek">
+		<title>Seek()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>off_t</type><methodname>Seek</methodname>
+			<methodparam><type>off_t</type><parameter>position</parameter></methodparam>
+			<methodparam><type>uint32</type><parameter>seekMode</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bmemoryio_setsize">
+		<title>SetSize()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>status_t</type><methodname>SetSize</methodname>
+			<methodparam><type>off_t</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+	
+	<sect3 id="bmemoryio_writeat">
+		<title>WriteAt()</title>
+		
+		<methodsynopsis>
+			<modifier>virtual</modifier><type>ssize_t</type><methodname>WriteAt</methodname>
+			<methodparam><type>off_t</type><parameter>position</parameter></methodparam>
+			<methodparam><modifier>const</modifier><type>void *</type><parameter>buffer</parameter></methodparam>
+			<methodparam><type>size_t</type><parameter>size</parameter></methodparam>
+		</methodsynopsis>
+	</sect3>
+</sect2>
