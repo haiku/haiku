@@ -8,7 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	Class used to encapsulate desktop management */
+/*!	Class used to encapsulate desktop management */
 
 
 #include "Desktop.h"
@@ -40,6 +40,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #if TEST_MODE
 #	include "EventStream.h"
@@ -400,12 +401,9 @@ void
 Desktop::_LaunchInputServer()
 {
 	BRoster roster;
-	status_t err = roster.Launch("application/x-vnd.Be-input_server");
-	if (!(err == B_OK || err == B_ALREADY_RUNNING)) {
-		char str[256];
-		sprintf(str, "Failed to launch the input server (%s)!\n", strerror(err));
-		debugger(str);
-	}
+	status_t status = roster.Launch("application/x-vnd.Be-input_server");
+	if (status != B_OK && status != B_ALREADY_RUNNING)
+		syslog(LOG_ERR, "Failed to launch the input server: %s!\n", strerror(status));
 }
 
 
@@ -578,10 +576,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		case AS_EVENT_STREAM_CLOSED:
-		{
 			_LaunchInputServer();
 			break;
-		}
 
 		case B_QUIT_REQUESTED:
 			// We've been asked to quit, so (for now) broadcast to all

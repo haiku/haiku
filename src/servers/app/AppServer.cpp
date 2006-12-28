@@ -21,6 +21,7 @@
 
 #include <PortLink.h>
 
+#include <syslog.h>
 
 //#define DEBUG_SERVER
 #ifdef DEBUG_SERVER
@@ -49,6 +50,8 @@ AppServer::AppServer()
 	fDesktops(),
 	fDesktopLock("AppServerDesktopLock")
 {
+	openlog("app_server", 0, LOG_DAEMON);
+
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, SERVER_PORT_NAME);
 	if (fMessagePort < B_OK)
 		debugger("app_server could not create message port");
@@ -94,6 +97,8 @@ AppServer::~AppServer()
 
 	gFontManager->Lock();
 	gFontManager->Quit();
+
+	closelog();
 }
 
 
