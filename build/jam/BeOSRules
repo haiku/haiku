@@ -53,7 +53,7 @@ rule AddFileDataResource
 
 	# the resource file
 	local resources
-		= <added-resources>file-data-$(resourceID)-$(dataFile).rsrc ;
+		= <added-resources>file-data-$(resourceID).rsrc ;
 
 	# add it to the resources of the given target
 	AddResources $(target) : $(resources) ;
