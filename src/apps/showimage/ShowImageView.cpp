@@ -747,6 +747,7 @@ ShowImageView::Setup(BRect rect)
 {
 	fLeft = floorf(rect.left);
 	fTop = floorf(rect.top);
+	fZoom = (rect.Width()+1.0) / (fBitmap->Bounds().Width()+1.0);
 }
 
 
