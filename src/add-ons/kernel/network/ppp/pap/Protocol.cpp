@@ -73,7 +73,7 @@ PAPHandler::ParseRequest(const KPPPConfigurePacket& request,
 // PAP
 PAP::PAP(KPPPInterface& interface, driver_parameter *settings)
 	: KPPPProtocol("PAP", PPP_AUTHENTICATION_PHASE, PAP_PROTOCOL, PPP_PROTOCOL_LEVEL,
-		AF_INET, 0, interface, settings, PPP_ALWAYS_ALLOWED,
+		AF_UNSPEC, 0, interface, settings, PPP_ALWAYS_ALLOWED,
 		kAuthenticatorTypeString, new PAPHandler(*this, interface)),
 	fState(INITIAL),
 	fID(system_time() & 0xFF),
