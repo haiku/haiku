@@ -14,29 +14,32 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#ifndef _LCL_P_H_INCLUDED
+#define _LCL_P_H_INCLUDED
 
-/*
- * $Id$
- */
 
 /*
  * lcl_p.h - private include file for the local accessor functions.
  */
 
-#ifndef _LCL_P_H_INCLUDED
-#define _LCL_P_H_INCLUDED
+#include <irs.h>
+
 
 /*
  * Object state.
  */
 struct lcl_p {
 	struct __res_state *	res;
-	void                    (*free_res) __P((void *));
+	void                    (*free_res)(void *);
 };
 
 /*
  * Externs.
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern struct irs_acc *	irs_lcl_acc __P((const char *));
 extern struct irs_gr *	irs_lcl_gr __P((struct irs_acc *));
@@ -46,5 +49,9 @@ extern struct irs_pr *	irs_lcl_pr __P((struct irs_acc *));
 extern struct irs_ho *	irs_lcl_ho __P((struct irs_acc *));
 extern struct irs_nw *	irs_lcl_nw __P((struct irs_acc *));
 extern struct irs_ng *	irs_lcl_ng __P((struct irs_acc *));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*_LCL_P_H_INCLUDED*/

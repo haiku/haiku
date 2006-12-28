@@ -14,36 +14,30 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
-/*
- * $Id$
- */
-
 #ifndef _IRS_P_H_INCLUDED
 #define _IRS_P_H_INCLUDED
 
-#include <stdio.h>
 
 #include "pathnames.h"
 
-#define IRS_SV_MAXALIASES	35
+#include <stdio.h>
 
-struct lcl_sv {
-	FILE *		fp;
-	char		line[BUFSIZ+1];
-	struct servent	serv;
-	char *		serv_aliases[IRS_SV_MAXALIASES];
-};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define	irs_nul_ng	__irs_nul_ng
 #define	map_v4v6_address __map_v4v6_address
 #define	make_group_list	__make_group_list
-#define	irs_lclsv_fnxt	__irs_lclsv_fnxt
 
 extern void		map_v4v6_address(const char *src, char *dst);
 extern int		make_group_list(struct irs_gr *, const char *,
 					gid_t, gid_t *, int *);
 extern struct irs_ng *	irs_nul_ng(struct irs_acc *);
-extern struct servent * irs_lclsv_fnxt(struct lcl_sv *);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif	/* _IRS_P_H_INCLUDED */

@@ -24,7 +24,6 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
 	SubDirC++Flags $(defines) ;
 }
 
-
 MergeObject <libnetwork_dns>dns_dst.o :
 	dst_api.c
 	hmac_link.c
@@ -89,7 +88,7 @@ MergeObject <libnetwork_dns>dns_irs.o :
 	lcl_ng.c
 	lcl_nw.c
 	lcl_pr.c
-	lcl_sv.c
+	lcl_sv.cpp
 	nis.c
 	nul_ng.c
 	util.c

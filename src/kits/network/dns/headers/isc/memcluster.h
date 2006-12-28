@@ -36,6 +36,10 @@
 #define memstats	__memstats
 #define memactive	__memactive
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int	meminit(size_t, size_t);
 void *	__memget(size_t);
 void 	__memput(void *, size_t);
@@ -45,5 +49,9 @@ void *	__memget_record(size_t, const char *, int);
 void 	__memput_record(void *, size_t, const char *, int);
 void 	memstats(FILE *);
 int	memactive(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MEMCLUSTER_H */

@@ -14,11 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
-/*
- * $Id$
- */
-
 #ifndef _IRS_H_INCLUDED
 #define _IRS_H_INCLUDED
 
@@ -30,6 +25,11 @@
 #include <netdb.h>
 #include <resolv.h>
 #include <pwd.h>
+
+#ifdef __cplusplus
+extern "C" {
+#	define private private_data
+#endif
 
 /*
  * This is the group map class.
@@ -341,5 +341,10 @@ extern struct servent 	*getservbyport_p __P((int, const char *,
 					      struct net_data *));
 extern void		setservent_p __P((int, struct net_data *));
 extern void		endservent_p __P((struct net_data *));
+
+#ifdef __cplusplus
+#	undef private
+}
+#endif
 
 #endif /*_IRS_H_INCLUDED*/
