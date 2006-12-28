@@ -46,6 +46,9 @@ rule AddFileDataResource
 	# <resourceID>: A resource ID string as understood by xres (type:id[:name]).
 	# <dataFile>: The data to be written into the resource will be read from
 	#             that file.
+	#             Note that this is supposed to be a build target, not a path
+	#             name - if you need to add a data file in a different path, you
+	#             have to locate it first.
 	#
 	local target = $(1) ;
 	local resourceID = $(2) ;
@@ -53,7 +56,7 @@ rule AddFileDataResource
 
 	# the resource file
 	local resources
-		= <added-resources>file-data-$(resourceID).rsrc ;
+		= <added-resources>file-data-$(resourceID)-$(dataFile).rsrc ;
 
 	# add it to the resources of the given target
 	AddResources $(target) : $(resources) ;

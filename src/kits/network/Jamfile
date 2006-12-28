@@ -2,8 +2,9 @@ SubDir HAIKU_TOP src kits network ;
 
 UsePrivateHeaders libroot net ;
 
-AddFileDataResource libnetwork.so : CSTR:201:services :
-	[ FDirName $(SUBDIR) dns defaults services ] ;
+local services = [ FGristFiles services ] ;
+SEARCH on $(services) = [ FDirName $(SUBDIR) dns defaults ] ;
+AddFileDataResource libnetwork.so : CSTR:201:services : $(services) ;
 
 SharedLibrary libnetwork.so :
 	init.cpp
