@@ -14,6 +14,7 @@
 
 #include <map>
 #include <string>
+#include <sys/select.h>
 
 
 struct service;
@@ -31,11 +32,14 @@ class Services : public BHandler {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		void _NotifyListener(bool quit = false);
+		void _UpdateMaxSocket(int socket);
 		status_t _StartService(struct service& service);
 		status_t _StopService(struct service& service);
 		status_t _ToService(const BMessage& message, struct service*& service);
 		void _Update(const BMessage& services);
 		int32 _CompareServices(struct service& a, struct service& b);
+		status_t _Listener();
 		static status_t _Listener(void* self);
 
 		thread_id	fListener;
@@ -43,6 +47,11 @@ class Services : public BHandler {
 		ServiceNameMap fNameMap;
 		ServiceSocketMap fSocketMap;
 		int32		fUpdate;
+		int			fReadPipe;
+		int			fWritePipe;
+		int			fMinSocket;
+		int			fMaxSocket;
+		fd_set		fSet;
 };
 
 const static uint32 kMsgUpdateServices = 'srvU';

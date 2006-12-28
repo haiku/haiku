@@ -70,17 +70,23 @@ struct address_family {
 	const char*	name;
 	const char*	identifiers[4];
 	bool		(*parse_address)(const char* string, sockaddr* _address);
+	void		(*set_any_address)(sockaddr* address);
+	void		(*set_port)(sockaddr* address, int32 port);
 };
 
 // AF_INET family
 static bool inet_parse_address(const char* string, sockaddr* address);
+static void inet_set_any_address(sockaddr* address);
+static void inet_set_port(sockaddr* address, int32 port);
 
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
 		"inet",
 		{"AF_INET", "inet", "ipv4", NULL},
-		inet_parse_address
+		inet_parse_address,
+		inet_set_any_address,
+		inet_set_port
 	},
 	{ -1, NULL, {NULL}, NULL }
 };
@@ -95,7 +101,7 @@ inet_parse_address(const char* string, sockaddr* _address)
 		return false;
 
 	sockaddr_in& address = *(sockaddr_in *)_address;
-	address.sin_family = AF_INET; 
+	address.sin_family = AF_INET;
 	address.sin_len = sizeof(struct sockaddr_in);
 	address.sin_port = 0;
 	address.sin_addr = inetAddress;
@@ -105,10 +111,30 @@ inet_parse_address(const char* string, sockaddr* _address)
 }
 
 
+void
+inet_set_any_address(sockaddr* _address)
+{
+	sockaddr_in& address = *(sockaddr_in*)_address;
+	address.sin_family = AF_INET;
+	address.sin_len = sizeof(struct sockaddr_in);
+	address.sin_port = 0;
+	address.sin_addr.s_addr = INADDR_ANY;
+	memset(&address.sin_zero[0], 0, sizeof(address.sin_zero));
+}
+
+
+void
+inet_set_port(sockaddr* _address, int32 port)
+{
+	sockaddr_in& address = *(sockaddr_in*)_address;
+	address.sin_port = port;
+}
+
+
 //	#pragma mark -
 
 
-static bool
+bool
 get_family_index(const char* name, int32& familyIndex)
 {
 	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
@@ -127,13 +153,34 @@ get_family_index(const char* name, int32& familyIndex)
 }
 
 
-static bool
+int
+family_at_index(int32 index)
+{
+	return kFamilies[index].family;
+}
+
+
+bool
 parse_address(int32 familyIndex, const char* argument, struct sockaddr& address)
 {
 	if (argument == NULL)
 		return false;
 
 	return kFamilies[familyIndex].parse_address(argument, &address);
+}
+
+
+void
+set_any_address(int32 familyIndex, struct sockaddr& address)
+{
+	kFamilies[familyIndex].set_any_address(&address);
+}
+
+
+void
+set_port(int32 familyIndex, struct sockaddr& address, int32 port)
+{
+	kFamilies[familyIndex].set_port(&address, port);
 }
 
 
@@ -361,8 +408,8 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		}
 
 		int familySocket = socket;
-		if (kFamilies[familyIndex].family != AF_INET)
-			socket = ::socket(kFamilies[familyIndex].family, SOCK_DGRAM, 0);
+		if (family_at_index(familyIndex) != AF_INET)
+			socket = ::socket(family_at_index(familyIndex), SOCK_DGRAM, 0);
 		if (socket < 0) {
 			// the family is not available in this environment
 			continue;
@@ -465,7 +512,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		}
 		int32 currentFlags = request.ifr_flags;
 
-		if (!hasMask && hasAddress && kFamilies[familyIndex].family == AF_INET
+		if (!hasMask && hasAddress && family_at_index(familyIndex) == AF_INET
 			&& ioctl(familySocket, SIOCGIFNETMASK, &request, sizeof(struct ifreq)) == 0
 			&& request.ifr_mask.sa_family == AF_UNSPEC) {
 			// generate standard netmask if it doesn't have one yet
@@ -499,7 +546,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		}
 
 		if (!hasBroadcast && hasAddress && (currentFlags & IFF_BROADCAST)
-			&& kFamilies[familyIndex].family == AF_INET
+			&& family_at_index(familyIndex) == AF_INET
 			&& ioctl(familySocket, SIOCGIFBRDADDR, &request, sizeof(struct ifreq)) == 0
 			&& request.ifr_mask.sa_family == AF_UNSPEC) {
 				// generate standard broadcast address if it doesn't have one yet
@@ -682,6 +729,9 @@ NetServer::_BringUpInterfaces()
 
 		_ConfigureInterface(socket, interface);
 	}
+
+	// TODO: also check if the networking driver is correctly initialized!
+	//	(and check for other devices to take over its configuration)
 
 	if (!_TestForInterface(socket, "/dev/net/")) {
 		// there is no driver configured - see if there is one and try to use it

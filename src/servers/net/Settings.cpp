@@ -50,6 +50,8 @@ const static settings_template kInterfacesTemplate[] = {
 
 const static settings_template kServiceAddressTemplate[] = {
 	{B_STRING_TYPE, "family", NULL},
+	{B_STRING_TYPE, "type", NULL},
+	{B_STRING_TYPE, "protocol", NULL},
 	{B_STRING_TYPE, "address", NULL},
 	{B_INT32_TYPE, "port", NULL},
 	{0, NULL, NULL}
@@ -61,6 +63,9 @@ const static settings_template kServiceTemplate[] = {
 	{B_STRING_TYPE, "user", NULL},
 	{B_STRING_TYPE, "group", NULL},
 	{B_STRING_TYPE, "launch", NULL},
+	{B_STRING_TYPE, "family", NULL},
+	{B_STRING_TYPE, "type", NULL},
+	{B_STRING_TYPE, "protocol", NULL},
 	{B_INT32_TYPE, "port", NULL},
 	{0, NULL, NULL}
 };
