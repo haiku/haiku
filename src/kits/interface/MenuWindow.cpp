@@ -23,8 +23,8 @@ class BMenuScroller : public BView {
 		BMenuScroller(BRect frame, BMenu *menu);
 		virtual ~BMenuScroller();
 
-		virtual void Pulse();
 		virtual void Draw(BRect updateRect);
+		bool Scroll(BPoint cursor);
 
 	private:
 		BMenu *fMenu;
@@ -62,12 +62,11 @@ using namespace BPrivate;
 
 
 const int kScrollerHeight = 10;
-const int kScrollStep = 16;
+const int kScrollStep = 19;
 
 
 BMenuScroller::BMenuScroller(BRect frame, BMenu *menu)
-	: BView(frame, "menu scroller", 0,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
+	: BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS),
 	fMenu(menu),
 	fUpperButton(0, 0, frame.right, kScrollerHeight),
 	fLowerButton(0, frame.bottom - kScrollerHeight, frame.right, frame.bottom),
@@ -88,18 +87,15 @@ BMenuScroller::~BMenuScroller()
 }
 
 
-void
-BMenuScroller::Pulse()
+bool
+BMenuScroller::Scroll(BPoint cursor)
 {
-	// To reduce the overhead even a little, fButton and fPosition were
-	// made private variables.
+	ConvertFromScreen(&cursor);
 
-	// We track the mouse and move the scrollers depending on its position.
-	GetMouse(&fPosition, &fButton);
-	if (fLowerButton.Contains(fPosition) && fLowerEnabled) {
+	if (fLowerEnabled && fLowerButton.Contains(cursor)) {
 		if (fValue == 0) {
 			fUpperEnabled = true;
-			
+		
 			Invalidate(fUpperButton);
 		}
 
@@ -110,11 +106,12 @@ BMenuScroller::Pulse()
 			fValue = fLimit;
 			fLowerEnabled = false;
 			Invalidate(fLowerButton);
+
 		} else {
 			fMenu->ScrollBy(0, kScrollStep);
 			fValue += kScrollStep;
 		}
-	} else if (fUpperButton.Contains(fPosition) && fUpperEnabled) {
+	} else if (fUpperEnabled && fUpperButton.Contains(cursor)) {
 		if (fValue == fLimit) {
 			fLowerEnabled = true;
 			Invalidate(fLowerButton);
@@ -125,11 +122,18 @@ BMenuScroller::Pulse()
 			fValue = 0;
 			fUpperEnabled = false;
 			Invalidate(fUpperButton);
+
 		} else {
 			fMenu->ScrollBy(0, -kScrollStep);
 			fValue -= kScrollStep;
 		}
+	} else {
+		return false;
 	}
+
+	snooze(10000);
+
+	return true;
 }
 
 
@@ -252,7 +256,6 @@ BMenuWindow::BMenuWindow(const char *name)
 	fScroller(NULL),
 	fMenuFrame(NULL)
 {
-	SetPulseRate(200000);
 }
 
 
@@ -325,3 +328,14 @@ BMenuWindow::DetachScrollers()
 	delete fScroller;
 	fScroller = NULL;
 }
+
+
+bool
+BMenuWindow::CheckForScrolling(BPoint cursor)
+{
+	if (!fScroller)
+		return false;
+	
+	return fScroller->Scroll(cursor);
+}
+

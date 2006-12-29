@@ -1270,11 +1270,17 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		BPoint location;
 		ulong buttons;
 		GetMouse(&location, &buttons, true);
-		
+
+		BMenuWindow *window(static_cast<BMenuWindow *>(Window()));
+
 		BPoint screenLocation = ConvertToScreen(location);
-		item = HitTestItems(location, B_ORIGIN);
-		if (item != NULL)
-			_UpdateStateOpenSelect(item, openTime, closeTime);
+		if (window->CheckForScrolling(screenLocation)) {
+			item = NULL;
+		} else {
+			item = HitTestItems(location, B_ORIGIN);
+			if (item != NULL)
+				_UpdateStateOpenSelect(item, openTime, closeTime);
+		}
 
 		// Track the submenu
 		if (OverSubmenu(fSelected, screenLocation)) {

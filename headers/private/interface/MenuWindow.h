@@ -32,6 +32,8 @@ class BMenuWindow : public BWindow {
 		void AttachScrollers();
 		void DetachScrollers();
 
+		bool CheckForScrolling(BPoint cursor);
+
 	private:
 		BMenuScroller *fScroller;
 		BMenuFrame *fMenuFrame;
