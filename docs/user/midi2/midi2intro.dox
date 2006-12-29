@@ -288,7 +288,7 @@ as the BeOS R5 kits, although there are a few small differences in the API
 
 More about the Midi Kit:
 
-- \subpage midi2defs
+- \ref Midi2Defs.h
 - Be Newsletter Volume 3, Issue 47 - Motor Mix sample code
 - Be Newsletter Volume 4, Issue 3 - Overview of the new kit
 - <A HREF="http://open-beos.sourceforge.net/nsl.php?mode=display&id=33">OpenBeOS

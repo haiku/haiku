@@ -257,7 +257,7 @@ void MyView::MessageReceived(BMessage* msg)
 }
 \endcode
 
-\sa \ref bmidiop "The possible be:op codes (BMidiOp)"
+For the possible midi options, see #BMidiOp
 */
 
 /*!
@@ -291,4 +291,13 @@ method to hide a previously published endpoint from other applications.
 There is no real reason use this function, since all BMidiRoster's public 
 function are static.
 
+*/
+
+/*!
+\enum BMidiOp
+\brief Defines the status codes for MIDI Server notification messages.
+
+These codes are used when you request notification as in BMidiRoster::StartWatching().
+Check against these codes to determine what is happening. See the StartWatching() method
+for a more complete description of the codes and their meaning.
 */
