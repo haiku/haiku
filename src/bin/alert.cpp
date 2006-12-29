@@ -1,228 +1,236 @@
-/*********************************************************************
-** Alert Applet
-**********************************************************************
-** 2002-04-28  Mathew Hounsell  Created.
-*/
+/*
+ * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mathew Hounsell
+ *		Vasilis Kaoutsis, kaoutsis@sch.gr
+ */
 
-#include <Application.h>
+
 #include <Alert.h>
+#include <Application.h>
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cassert>
+#include <stdio.h>
+#include <string.h>
 
-/*********************************************************************
-*/
 
-// #define SIGNATURE "application/x-vnd.Be-cmd-alert"
-#define SIGNATURE "application/x-vnd.OBOS.cmd-alert"
-#define APP_NAME "alert"
+const char* kSignature = "application/x-vnd.Haiku.cmd-alert";
 
-#define BUTTON_DEFAULT "OK"
+const char* kButtonDefault = "OK";
 
-#define ERR_INIT_FAIL  127
-#define ERR_ARGS_FAIL  126
-#define ERR_NONE       0
+const int32 kErrorInitFail = 127;
+const int32 kErrorArgumentsFail = 126;
 
-/*********************************************************************
-*/
-class Arguments {
-	bool ok, recved, modal;
-	alert_type icon;
-	char *arg_text, *arg_but0, *arg_but1, *arg_but2;
-	char *choice_text;
-	int32 choice;
-public:
-	Arguments( void ) {
-		ok = recved = modal = false;
-		icon = B_INFO_ALERT;
-		arg_text = arg_but0 = arg_but1 = arg_but2 = 0;
-		choice = 0;
-	}
-	~Arguments( void ) {
-		std::free( arg_text );
-		std::free( arg_but0 );
-		std::free( arg_but1 );
-		std::free( arg_but2 );
-	}
-	
-	inline bool Good( void ) const { return ok; }
-	inline bool Bad( void ) const { return ! ok; }
 
-	void ArgvReceived( int32 argc, char **argv )
-	{
-		recved = true;
-	
-		if( argc < 2 ) return;
-
-		int32 start = 1;
-		bool flag_icon = false;
-		
-		// Look for '--' options'		
-		for( int32 i = 1; i < argc; ++i, ++start ) {
-			if( '-' == argv[i][0] && '-' == argv[i][1] ) {
-				if( 0 == strcmp( argv[i] + 2, "modal" ) ) {
-					modal = true;
-//				} else if( 0 == strcmp( argv[i] + 2, "empty" )
-//				       ||  0 == strcmp( argv[i] + 2, "none" ) ) {
-				} else if( 0 == strcmp( argv[i] + 2, "empty" ) ) {
-					if( flag_icon ) return;
-					icon = B_EMPTY_ALERT;
-					flag_icon = true;
-				} else if( 0 == strcmp( argv[i] + 2, "info" ) ) {
-					if( flag_icon ) return;
-					icon = B_INFO_ALERT;
-					flag_icon = true;
-				} else if( 0 == strcmp( argv[i] + 2, "idea" ) ) {
-					if( flag_icon ) return;
-					icon = B_IDEA_ALERT;
-					flag_icon = true;
-//				} else if( 0 == strcmp( argv[i] + 2, "warning" )
-//				       ||  0 == strcmp( argv[i] + 2, "warn" ) ) {
-				} else if( 0 == strcmp( argv[i] + 2, "warning" ) ) {
-					if( flag_icon ) return;
-					icon = B_WARNING_ALERT;
-					flag_icon = true;
-				} else if( 0 == strcmp( argv[i] + 2, "stop" ) ) {
-					if( flag_icon ) return;
-					icon = B_STOP_ALERT;
-					flag_icon = true;
-				} else {
-					return;
-				}
-			} else break;
-		}
-		
-		if( start >= argc ) { // Nothing but --modal
-			return;
-		}
-		
-		arg_text = strdup( argv[start++] );
-		if( start < argc ) arg_but0 = strdup( argv[start++] );
-		else arg_but0 = strdup( BUTTON_DEFAULT );
-		if( start < argc ) arg_but1 = strdup( argv[start++] );
-		if( start < argc ) arg_but2 = strdup( argv[start++] );
-		
-		ok = true;
-	}
-
-	inline char const * Title( void ) const { return APP_NAME; }
-
-	inline char const * Text( void ) const { return arg_text; }
-	inline char const * ButtonZero( void ) const { return arg_but0; }
-	inline char const * ButtonOne( void ) const { return arg_but1; }
-	inline char const * ButtonTwo( void ) const { return arg_but2; }
-	
-	inline alert_type Type( void ) const { return icon; }
-
-	inline bool IsModal( void ) const { return modal; }
-
-	inline bool Received( void ) const { return recved; }
-
-	inline int32 ChoiceNumber( void ) const { return choice; }
-	inline char const * ChoiceText( void ) const { return choice_text; }
-
-	void SetChoice( int32 but )
-	{
-		assert( but >= 0 && but <= 2 );
-		
-		choice = but;
-		switch( choice ) {
-			case 0: choice_text = arg_but0; break;
-			case 1: choice_text = arg_but1; break;
-			case 2: choice_text = arg_but2; break;
-		}
-	}
-
-	void Usage( void )
-	{
-		fprintf(
-		    stderr,
-			"usage: " APP_NAME " <type> ] [ --modal ] [ --help ] text [ button1 [ button2 [ button3 ]]]\n"
-			  "<type> is --empty | --info | --idea | --warning | --stop\n"
-			  "--modal makes the alert system modal and shows it in all workspaces.\n"
-			  "If any button argument is given, exit status is button number (starting with 0)\n"
-			  " and '" APP_NAME "' will print the title of the button pressed to stdout.\n"
-		);
-	} 
-
-} arguments;
-
-/*********************************************************************
-*/
 class AlertApplication : public BApplication {
-	typedef BApplication super;
+	public:
+		AlertApplication();
+		virtual ~AlertApplication() { }
 
-public:
-	AlertApplication( void ) : super( SIGNATURE ) { }
-	// No destructor as it crashes app.
+		virtual void ReadyToRun();
+		virtual void ArgvReceived(int32 argc, char** argv);
 
-	virtual void ArgvReceived( int32 argc, char **argv )
-	{
-		if( ! arguments.Received() ) {
-			arguments.ArgvReceived( argc, argv );
-		}
-	}
+		bool GoodArguments() const { return fOk; }
+		int32 ChoiceNumber() const { return fChoiceNumber; }
+		char const* ChoiceText() const { return fChoiceText; }
 
-	// Prepare to Run
-	virtual void ReadyToRun(void) {
+	private:
+		void _SetChoice(int32 buttonIndex);
+		void _Usage() const;
 
-		if( arguments.Good() ) {
-			BAlert * alert_p
-				= new BAlert(
-						arguments.Title(),
-						arguments.Text(),
-						arguments.ButtonZero(),
-						arguments.ButtonOne(),
-						arguments.ButtonTwo(),
-						B_WIDTH_AS_USUAL,
-						arguments.Type()
-					);
-	
-			if( arguments.IsModal() ) {
-				alert_p->SetFeel( B_MODAL_ALL_WINDOW_FEEL );
-			}
-			
-			arguments.SetChoice( alert_p->Go() );
-		}
-				
-		Quit();
-	}
+	private:
+		bool fOk;
+		bool fModal;
+		alert_type fIcon;
+		char* fArgumentText;
+		char* fArgumentButton0;
+		char* fArgumentButton1;
+		char* fArgumentButton2;
+		char* fChoiceText;
+		int32 fChoiceNumber; 
 };
 
-/*********************************************************************
-** Acording to the BeBook youm should use the message handling in
-** BApplication for arguments. However that requires the app to
-** be created.
-*/
-int main( int argc, char ** argv )
+
+AlertApplication::AlertApplication()
+	: BApplication(kSignature),
+	fOk(false),
+	fModal(false),
+	fIcon(B_INFO_ALERT),
+	fArgumentText(NULL),
+	fArgumentButton0(NULL),
+	fArgumentButton1(NULL),
+	fArgumentButton2(NULL),
+	fChoiceText(NULL),
+	fChoiceNumber(0)
 {
-	arguments.ArgvReceived( int32(argc), argv );
-	if( ! arguments.Good() ) {
-		arguments.Usage();
-		return ERR_ARGS_FAIL;
-	}
+}
 
-	int errorlevel = ERR_NONE;
-	
-	// App is Automatically assigned to be_app
-	new AlertApplication();
 
-	if( B_OK != be_app->InitCheck() ) {
-		// Cast for the right version.
-		errorlevel = ERR_INIT_FAIL;
-	} else {
-		// Run
-		be_app->Run();
-		if( ! arguments.Good() ) { // In case of Roster start.
-			arguments.Usage();
-			errorlevel = ERR_ARGS_FAIL;
+/*!
+	Invoked when the application receives a B_ARGV_RECEIVED message.
+	The message is sent when command line arguments are used in launching the
+	app from the shell. The function isn't called if there were no command
+	line arguments.
+*/
+void
+AlertApplication::ArgvReceived(int32 argc, char** argv)
+{
+	// Now there is at least one
+	// command line argument option.
+
+	const uint32 kArgCount = argc - 1;
+	uint32 index = 1;
+	bool iconFlag = false;
+
+	// Look for valid '--' options.		
+	for (; index <= kArgCount; ++index) {
+		if (argv[index][0] == '-' && argv[index][1] == '-') {
+			const char* option = argv[index] + 2;
+
+			if (!strcmp(option, "modal"))
+				fModal = true;
+			else if (!strcmp(option, "empty") && !iconFlag) {
+				fIcon = B_EMPTY_ALERT;
+				iconFlag = true;
+			} else if (!strcmp(option, "info") && !iconFlag) {
+				fIcon = B_INFO_ALERT;
+				iconFlag = true;
+			} else if (!strcmp(option, "idea") && !iconFlag) {
+				fIcon = B_IDEA_ALERT;
+				iconFlag = true;
+			} else if (!strcmp(option, "warning") && !iconFlag) {
+				fIcon = B_WARNING_ALERT;
+				iconFlag = true;
+			} else if (!strcmp(option, "stop") && !iconFlag) {
+				fIcon = B_STOP_ALERT;
+				iconFlag = true;
+			} else {
+				// Unrecognized '--' opition.
+				fprintf(stdout, "Unrecognized option %s\n", argv[index]);
+				return;
+			}
 		} else {
-			fprintf( stdout, "%s\n", arguments.ChoiceText() );
-			errorlevel = arguments.ChoiceNumber();
+			// Option doesn't start with '--'
+			break;
+		}
+		
+		if (index == kArgCount) {
+			// User provides arguments that all begins with '--',
+			// so none can be considered as text argument.
+			fprintf(stdout, "Missing the text argument!\n");
+			return;
 		}
 	}
 
-	return errorlevel;
+	fArgumentText = strdup(argv[index]);
+		// First argument that start without --,
+		// so grub it as the text argument.
+
+	if (index == kArgCount) {
+		// No more text argument. Give Button0
+		// the default label.
+		fArgumentButton0 = strdup(kButtonDefault);
+		fOk = true;
+		return;
+	}
+
+	if (index < kArgCount) {
+		// There is another argument,
+		// so let that be the Button0 label.
+		fArgumentButton0 = strdup(argv[++index]);
+	}
+
+	if (index < kArgCount) {
+		// There is another argument,
+		// so let that be the Button1 label.
+		fArgumentButton1 = strdup(argv[++index]);
+	}	
+
+	if (index < kArgCount) {
+		// There is another argument,
+		// so let that be the Button2 label.
+		fArgumentButton2 = strdup(argv[++index]);
+	}
+
+	// Ignore all other arguments if they exist,
+	// since they are useless.
+
+	fOk = true;
+}
+
+
+void
+AlertApplication::_SetChoice(int32 buttonIndex)
+{
+	fChoiceNumber = buttonIndex;
+	switch (fChoiceNumber) {
+		case 0:
+			fChoiceText = fArgumentButton0;
+			break;
+
+		case 1:
+			fChoiceText = fArgumentButton1;
+			break;
+
+		case 2:
+			fChoiceText = fArgumentButton2;
+			break;
+	}
+}
+
+
+void
+AlertApplication::_Usage() const
+{
+	fprintf(stderr,
+		"usage: alert [ <type> ] [ --modal ] [ --help ] text [ button1 [ button2 [ button3 ]]]\n"
+		"<type> is --empty | --info | --idea | --warning | --stop\n"
+		"--modal makes the alert system modal and shows it in all workspaces.\n"
+		"If any button argument is given, exit status is button number (starting with 0)\n"
+		"and 'alert' will print the title of the button pressed to stdout.\n");
+}
+
+
+/*!
+	Is called when the app receives a B_READY_TO_RUN message. The message
+	is sent automatically during the Run() function, and is sent after the
+	initial B_REFS_RECEIVED and B_ARGV_RECEIVED messages (if any) have been
+	handled.
+*/
+void
+AlertApplication::ReadyToRun()
+{
+	if (GoodArguments()) {
+		BAlert* alert = new BAlert("alert", fArgumentText,
+			fArgumentButton0, fArgumentButton1, fArgumentButton2,
+			B_WIDTH_AS_USUAL, fIcon);
+
+		if (fModal)
+			alert->SetFeel(B_MODAL_ALL_WINDOW_FEEL);
+
+		_SetChoice(alert->Go());
+	} else
+		_Usage();
+
+	Quit();
+}
+
+
+//	#pragma mark -
+
+
+int
+main(int argc, char** argv)
+{
+	AlertApplication app;
+	if (app.InitCheck() != B_OK)
+		return kErrorInitFail;
+
+	app.Run();
+	if (!app.GoodArguments())
+		return kErrorArgumentsFail;
+
+	fprintf(stdout, "%s\n", app.ChoiceText());
+	return app.ChoiceNumber();
 }
