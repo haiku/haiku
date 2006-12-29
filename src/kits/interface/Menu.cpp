@@ -1271,7 +1271,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		ulong buttons;
 		GetMouse(&location, &buttons, true);
 
-		BMenuWindow *window(static_cast<BMenuWindow *>(Window()));
+		BMenuWindow *window = static_cast<BMenuWindow *>(Window());
 
 		BPoint screenLocation = ConvertToScreen(location);
 		if (window->CheckForScrolling(screenLocation)) {
