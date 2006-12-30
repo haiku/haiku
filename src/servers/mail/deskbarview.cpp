@@ -113,6 +113,10 @@ void DeskbarView::AttachedToWindow()
 
 void DeskbarView::RefreshMailQuery()
 {
+	for (int32 i = 0; i < fNewMailQueries.CountItems(); i++)
+		delete ((BQuery *)(fNewMailQueries.ItemAt(i)));
+	fNewMailQueries.MakeEmpty();
+
 	BVolumeRoster volumes;
 	BVolume volume;
 	fNewMessages = 0;
@@ -478,7 +482,9 @@ DeskbarView::BuildMenu()
 
 	// Hack for R5's buggy Query Notification
 	#ifdef HAIKU_TARGET_PLATFORM_BEOS
-		menu->AddItem(new BMenuItem("Refresh New Mail Query",
+		menu->AddItem(new BMenuItem(
+			MDR_DIALECT_CHOICE("Refresh New Mail Count",
+				"未読メールカウントを更新"),
 			new BMessage(MD_REFRESH_QUERY)));
 	#endif
 
