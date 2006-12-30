@@ -102,43 +102,48 @@ void DeskbarView::AttachedToWindow()
 {
 	if (be_roster->IsRunning("application/x-vnd.Be-POST"))
 	{
-		BVolumeRoster volumes;
-		BVolume volume;
-		fNewMessages = 0;
-		
-		while (volumes.GetNextVolume(&volume) == B_OK) {
-			BQuery *fNewMailQuery = new BQuery;
-		
-			fNewMailQuery->SetTarget(this);
-			fNewMailQuery->SetVolume(&volume);
-			fNewMailQuery->PushAttr(B_MAIL_ATTR_STATUS);
-			fNewMailQuery->PushString("New");
-			fNewMailQuery->PushOp(B_EQ);
-			fNewMailQuery->PushAttr("BEOS:TYPE");
-			fNewMailQuery->PushString("text/x-email");
-			fNewMailQuery->PushOp(B_EQ);
-			fNewMailQuery->PushAttr("BEOS:TYPE");
-			fNewMailQuery->PushString("text/x-partial-email");
-			fNewMailQuery->PushOp(B_EQ);
-			fNewMailQuery->PushOp(B_OR);
-			fNewMailQuery->PushOp(B_AND);
-			fNewMailQuery->Fetch();
-			
-			BEntry entry;
-			while (fNewMailQuery->GetNextEntry(&entry) == B_OK)
-				if (entry.InitCheck() == B_OK)
-					fNewMessages++;
-			
-			fNewMailQueries.AddItem(fNewMailQuery);
-		}
-
-		ChangeIcon((fNewMessages > 0) ? NEW_MAIL : NO_MAIL);
+		RefreshMailQuery();
 	}
 	else
 	{
 		BDeskbar deskbar;
 		deskbar.RemoveItem("mail_daemon");
 	}
+}
+
+void DeskbarView::RefreshMailQuery()
+{
+	BVolumeRoster volumes;
+	BVolume volume;
+	fNewMessages = 0;
+	
+	while (volumes.GetNextVolume(&volume) == B_OK) {
+		BQuery *newMailQuery = new BQuery;
+	
+		newMailQuery->SetTarget(this);
+		newMailQuery->SetVolume(&volume);
+		newMailQuery->PushAttr(B_MAIL_ATTR_STATUS);
+		newMailQuery->PushString("New");
+		newMailQuery->PushOp(B_EQ);
+		newMailQuery->PushAttr("BEOS:TYPE");
+		newMailQuery->PushString("text/x-email");
+		newMailQuery->PushOp(B_EQ);
+		newMailQuery->PushAttr("BEOS:TYPE");
+		newMailQuery->PushString("text/x-partial-email");
+		newMailQuery->PushOp(B_EQ);
+		newMailQuery->PushOp(B_OR);
+		newMailQuery->PushOp(B_AND);
+		newMailQuery->Fetch();
+		
+		BEntry entry;
+		while (newMailQuery->GetNextEntry(&entry) == B_OK)
+			if (entry.InitCheck() == B_OK)
+				fNewMessages++;
+		
+		fNewMailQueries.AddItem(newMailQuery);
+	}
+
+	ChangeIcon((fNewMessages > 0) ? NEW_MAIL : NO_MAIL);
 }
 
 DeskbarView* DeskbarView::Instantiate(BMessage *data)
@@ -218,6 +223,10 @@ DeskbarView::MessageReceived(BMessage *message)
 		}
 		case MD_OPEN_PREFS:
 			be_roster->Launch("application/x-vnd.Haiku-Mail");
+			break;
+
+		case MD_REFRESH_QUERY:
+			RefreshMailQuery();
 			break;
 
 		case B_QUERY_UPDATE:
@@ -466,6 +475,12 @@ DeskbarView::BuildMenu()
 		if (count > 0)
 			menu->AddSeparatorItem();
 	}
+
+	// Hack for R5's buggy Query Notification
+	#ifdef HAIKU_TARGET_PLATFORM_BEOS
+		menu->AddItem(new BMenuItem("Refresh New Mail Query",
+			new BMessage(MD_REFRESH_QUERY)));
+	#endif
 
 	// The New E-mail query
 

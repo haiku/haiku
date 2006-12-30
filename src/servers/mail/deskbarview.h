@@ -20,7 +20,8 @@ enum MDDeskbarMessages {
 	MD_CHECK_FOR_MAILS,
 	MD_SEND_MAILS,
 	MD_OPEN_NEW,
-	MD_OPEN_PREFS
+	MD_OPEN_PREFS,
+	MD_REFRESH_QUERY
 };
 
 class BPopUpMenu;
@@ -48,6 +49,7 @@ class _EXPORT DeskbarView : public BView {
 		void				ChangeIcon(int32 icon);
 
 	private:
+		void		RefreshMailQuery();
 		bool		CreateMenuLinks(BDirectory &,BPath &);
 		void		CreateNewMailQuery(BEntry &);
 		BPopUpMenu	*BuildMenu();
