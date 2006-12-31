@@ -20,6 +20,11 @@
 #define MAXLEN 65535
 
 
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+typedef int socklen_t;
+#endif
+
+
 static void
 udp_echo_client(int sockFD, const struct sockaddr_in* serverAddr)
 {
