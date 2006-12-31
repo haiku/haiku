@@ -47,6 +47,18 @@ struct cmd_entry {
 	char*	help;
 };
 
+struct net_socket_private : net_socket {
+	struct list_link		link;
+	team_id					owner;
+	uint32					max_backlog;
+	uint32					child_count;
+	struct list				pending_children;
+	struct list				connected_children;
+
+	struct select_sync_pool	*select_pool;
+	benaphore				lock;
+};
+
 
 extern "C" status_t _add_builtin_module(module_info *info);
 extern bool gDebugOutputEnabled;
@@ -197,7 +209,7 @@ static net_stack_module_info gNetStackModule = {
 status_t
 socket_create(int family, int type, int protocol, net_socket **_socket)
 {
-	struct net_socket *socket = new (std::nothrow) net_socket;
+	struct net_socket_private *socket = new (std::nothrow) net_socket_private;
 	if (socket == NULL)
 		return B_NO_MEMORY;
 
@@ -218,8 +230,8 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	list_init_etc(&socket->pending_children, offsetof(net_socket, link));
-	list_init_etc(&socket->connected_children, offsetof(net_socket, link));
+	list_init_etc(&socket->pending_children, offsetof(net_socket_private, link));
+	list_init_etc(&socket->connected_children, offsetof(net_socket_private, link));
 
 	socket->first_protocol = gTCPModule->init_protocol(socket);
 	if (socket->first_protocol == NULL) {
@@ -245,8 +257,10 @@ err1:
 
 
 void
-socket_delete(net_socket *socket)
+socket_delete(net_socket *_socket)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	if (socket->parent != NULL)
 		panic("socket still has a parent!");
 
@@ -400,8 +414,10 @@ socket_recv(net_socket *socket, void *data, size_t length, int flags)
 
 
 status_t
-socket_spawn_pending(net_socket *parent, net_socket **_socket)
+socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 {
+	net_socket_private *parent = (net_socket_private *)_parent;
+
 	BenaphoreLocker locker(parent->lock);
 
 	// We actually accept more pending connections to compensate for those
@@ -410,8 +426,9 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 	if (parent->child_count > 3 * parent->max_backlog / 2)
 		return ENOBUFS;
 
-	net_socket *socket;
-	status_t status = socket_create(parent->family, parent->type, parent->protocol, &socket);
+	net_socket_private *socket;
+	status_t status = socket_create(parent->family, parent->type, parent->protocol,
+		(net_socket **)&socket);
 	if (status < B_OK)
 		return status;
 
@@ -434,8 +451,10 @@ socket_spawn_pending(net_socket *parent, net_socket **_socket)
 
 
 status_t
-socket_dequeue_connected(net_socket *parent, net_socket **_socket)
+socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 {
+	net_socket_private *parent = (net_socket_private *)_parent;
+
 	benaphore_lock(&parent->lock);
 
 	net_socket *socket = (net_socket *)list_remove_head_item(&parent->connected_children);
@@ -451,8 +470,10 @@ socket_dequeue_connected(net_socket *parent, net_socket **_socket)
 
 
 status_t
-socket_set_max_backlog(net_socket *socket, uint32 backlog)
+socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	// we enforce an upper limit of connections waiting to be accepted
 	if (backlog > 256)
 		backlog = 256;
@@ -486,7 +507,7 @@ socket_set_max_backlog(net_socket *socket, uint32 backlog)
 status_t
 socket_connected(net_socket *socket)
 {
-	net_socket *parent = socket->parent;
+	net_socket_private *parent = (net_socket_private *)socket->parent;
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
@@ -501,8 +522,10 @@ socket_connected(net_socket *socket)
 
 
 status_t
-socket_notify(net_socket *socket, uint8 event, int32 value)
+socket_notify(net_socket *_socket, uint8 event, int32 value)
 {
+	net_socket_private *socket = (net_socket_private *)_socket;
+
 	benaphore_lock(&socket->lock);
 
 	bool notify = true;
@@ -552,6 +575,8 @@ net_socket_module_info gNetSocketModule = {
 
 	NULL, //socket_send_data,
 	NULL, //socket_receive_data,
+
+	NULL, //socket_get_next_stat,
 
 	// connections
 	socket_spawn_pending,
