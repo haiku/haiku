@@ -55,8 +55,13 @@ return_address(ArgType &args, void *data)
 {
 	sockaddr_storage *target;
 
-	if (user_memcpy(&target, &((ArgType *)data)->address, sizeof(void *)) < B_OK
-		|| user_memcpy(&((ArgType *)data)->address_length, &args.address_length, sizeof(socklen_t)) < B_OK
+	if (user_memcpy(&target, &((ArgType *)data)->address, sizeof(void *)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	if (target == NULL)
+		return B_OK;
+
+	if (user_memcpy(&((ArgType *)data)->address_length, &args.address_length, sizeof(socklen_t)) < B_OK
 		|| user_memcpy(target, args.address, args.address_length) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -260,7 +265,7 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				// This is needed by accept() call, allowing libnet.so accept() to pass back
 				// in NET_STACK_ACCEPT opcode the cookie (aka the net_stack_cookie!)
 				// of the file descriptor to use for the new accepted socket
-				return user_memcpy(data, cookie, sizeof(void *));
+				return user_memcpy(data, &cookie, sizeof(void *));
 
 			case NET_STACK_GET_NEXT_STAT:
 			{
