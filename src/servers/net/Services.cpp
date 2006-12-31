@@ -439,6 +439,9 @@ Services::_LaunchService(struct service& service, int socket)
 
 	pid_t child = fork();
 	if (child == 0) {
+		setsid();
+			// make sure we're in our own session, and don't accidently quit the net_server
+
 		// We're the child, replace standard input/output
 		dup2(socket, STDIN_FILENO);
 		dup2(socket, STDOUT_FILENO);
