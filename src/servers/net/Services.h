@@ -18,8 +18,9 @@
 
 
 struct service;
+struct service_address;
 typedef std::map<std::string, service*> ServiceNameMap;
-typedef std::map<int, service*> ServiceSocketMap;
+typedef std::map<int, service_address*> ServiceSocketMap;
 
 
 class Services : public BHandler {
@@ -33,12 +34,13 @@ class Services : public BHandler {
 
 	private:
 		void _NotifyListener(bool quit = false);
-		void _UpdateMaxSocket(int socket);
+		void _UpdateMinMaxSocket(int socket);
 		status_t _StartService(struct service& service);
 		status_t _StopService(struct service& service);
 		status_t _ToService(const BMessage& message, struct service*& service);
 		void _Update(const BMessage& services);
 		int32 _CompareServices(struct service& a, struct service& b);
+		status_t _LaunchService(struct service& service, int socket);
 		status_t _Listener();
 		static status_t _Listener(void* self);
 

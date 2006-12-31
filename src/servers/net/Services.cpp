@@ -17,12 +17,14 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <new>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <vector>
 
 using namespace std;
 
 struct service_address {
+	struct service *owner;
 	int		socket;
 	int		family;
 	int		type;
@@ -35,8 +37,6 @@ typedef vector<service_address> AddressList;
 struct service {
 	std::string name;
 	std::string	launch;
-	int		type;
-	int		protocol;
 	uid_t	user;
 	gid_t	group;
 	AddressList addresses;
@@ -109,9 +109,7 @@ bool
 service::operator==(const struct service& other)
 {
 	if (name != other.name
-		|| launch != other.launch
-		|| type != other.type
-		|| protocol != other.protocol)
+		|| launch != other.launch)
 		return false;
 
 	// TODO: compare addresses!
@@ -137,15 +135,18 @@ Services::Services(const BMessage& services)
 		return;
 	}
 
-	fListener = spawn_thread(_Listener, "services listener", B_NORMAL_PRIORITY, this);
-	if (fListener >= B_OK)
-		resume_thread(fListener);
+	fcntl(fReadPipe, F_SETFD, FD_CLOEXEC);
+	fcntl(fWritePipe, F_SETFD, FD_CLOEXEC);
 
 	FD_ZERO(&fSet);
 	FD_SET(fReadPipe, &fSet);
 
-	_UpdateMaxSocket(fWritePipe);
-	fMinSocket = fMaxSocket;
+	fMinSocket = fWritePipe + 1;
+	fMaxSocket = fWritePipe + 1;
+
+	fListener = spawn_thread(_Listener, "services listener", B_NORMAL_PRIORITY, this);
+	if (fListener >= B_OK)
+		resume_thread(fListener);
 }
 
 
@@ -184,10 +185,12 @@ Services::_NotifyListener(bool quit)
 
 
 void
-Services::_UpdateMaxSocket(int socket)
+Services::_UpdateMinMaxSocket(int socket)
 {
 	if (socket >= fMaxSocket)
 		fMaxSocket = socket + 1;
+	if (socket < fMinSocket)
+		fMinSocket = socket;
 }
 
 
@@ -202,19 +205,17 @@ Services::_StartService(struct service& service)
 		service_address& address = *iterator;
 
 		address.socket = socket(address.family, address.type, address.protocol);
-		if (address.socket < 0) {
+		if (address.socket < 0
+			|| bind(address.socket, &address.address, address.address.sa_len) < 0
+			|| fcntl(address.socket, F_SETFD, FD_CLOEXEC) < 0) {
 			failed = true;
 			break;
 		}
 
-		if (bind(address.socket, &address.address, address.address.sa_len) < 0) {
+		if (address.type == SOCK_STREAM && listen(address.socket, 50) < 0) {
 			failed = true;
 			break;
 		}
-
-		fSocketMap[address.socket] = &service;
-		_UpdateMaxSocket(address.socket);
-		FD_SET(address.socket, &fSet);
 	}
 
 	if (failed) {
@@ -222,15 +223,17 @@ Services::_StartService(struct service& service)
 		return errno;
 	}
 
-	// add service to maps
+	// add service to maps and activate it
 
 	fNameMap[service.name] = &service;
 
 	iterator = service.addresses.begin();
 	for (; iterator != service.addresses.end(); iterator++) {
-		const service_address& address = *iterator;
+		service_address& address = *iterator;
 
-		fSocketMap[address.socket] = &service;
+		fSocketMap[address.socket] = &address;
+		_UpdateMinMaxSocket(address.socket);
+		FD_SET(address.socket, &fSet);
 	}
 
 	_NotifyListener();
@@ -286,14 +289,17 @@ Services::_ToService(const BMessage& message, struct service*& service)
 
 	// TODO: user/group is currently ignored!
 
-	// default family/port/protocol/type for all addresses
+	// Default family/port/protocol/type for all addresses
+
+	// we default to inet/tcp/port-from-service-name if nothing is specified
 	const char* string;
 	int32 serviceFamilyIndex;
 	int32 serviceFamily = -1;
-	if (message.FindString("family", &string) == B_OK) {
-		if (get_family_index(string, serviceFamilyIndex))
-			serviceFamily = family_at_index(serviceFamilyIndex);
-	}
+	if (message.FindString("family", &string) != B_OK)
+		string = "inet";
+
+	if (get_family_index(string, serviceFamilyIndex))
+		serviceFamily = family_at_index(serviceFamilyIndex);
 
 	int32 serviceProtocol;
 	if (message.FindString("protocol", &string) == B_OK)
@@ -359,6 +365,7 @@ Services::_ToService(const BMessage& message, struct service*& service)
 		set_port(familyIndex, serviceAddress.address, port);
 		serviceAddress.socket = -1;
 
+		serviceAddress.owner = service;
 		service->addresses.push_back(serviceAddress);
 	}
 
@@ -379,6 +386,7 @@ Services::_ToService(const BMessage& message, struct service*& service)
 		set_port(serviceFamilyIndex, serviceAddress.address, servicePort);
 		serviceAddress.socket = -1;
 
+		serviceAddress.owner = service;
 		service->addresses.push_back(serviceAddress);
 	}
 
@@ -420,6 +428,43 @@ Services::_Update(const BMessage& services)
 
 
 status_t
+Services::_LaunchService(struct service& service, int socket)
+{
+	printf("LAUNCH: %s\n", service.launch.c_str());
+
+	if (fcntl(socket, F_SETFD, 0) < 0) {
+		// could not clear FD_CLOEXEC on socket
+		return errno;
+	}
+
+	pid_t child = fork();
+	if (child == 0) {
+		// We're the child, replace standard input/output
+		dup2(socket, STDIN_FILENO);
+		dup2(socket, STDOUT_FILENO);
+		dup2(socket, STDERR_FILENO);
+		close(socket);
+
+		// build argument array
+		
+		const char** args = (const char**)malloc(2 * sizeof(void *));
+		if (args == NULL)
+			exit(1);
+
+		args[0] = service.launch.c_str();
+		args[1] = NULL;
+		if (execv(service.launch.c_str(), (char* const*)args) < 0)
+			exit(1);
+
+		// we'll never trespass here
+	}
+
+	// TODO: make sure child started successfully...
+	return B_OK;
+}
+
+
+status_t
 Services::_Listener()
 {
 	while (true) {
@@ -449,10 +494,28 @@ printf("select returned!\n");
 			if (iterator == fSocketMap.end())
 				continue;
 
+			struct service_address& address = *iterator->second;
+			int socket;
+
+			if (address.type == SOCK_STREAM) {
+				// accept incoming connection
+				int value = 1;
+				ioctl(i, FIONBIO, &value);
+					// make sure we don't wait for the connection
+
+				socket = accept(address.socket, NULL, NULL);
+
+				value = 0;
+				ioctl(i, FIONBIO, &value);
+
+				if (socket < 0)
+					continue;
+			} else
+				socket = address.socket;
+
 			// launch this service's handler
 
-			struct service* service = iterator->second;
-			printf("LAUNCH: %s\n", service->launch.c_str());
+			_LaunchService(*address.owner, socket);
 		}
 	}
 	return B_OK;
