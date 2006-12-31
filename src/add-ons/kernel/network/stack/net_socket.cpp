@@ -409,6 +409,10 @@ socket_connected(net_socket *socket)
 	list_remove_item(&parent->pending_children, socket);
 	list_add_item(&parent->connected_children, socket);
 
+	// notify parent
+	if (parent->select_pool)
+		notify_select_event_pool(parent->select_pool, B_SELECT_READ);
+
 	benaphore_unlock(&parent->lock);
 	return B_OK;
 }
@@ -483,17 +487,15 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 
 	switch (event) {
 		case B_SELECT_READ:
-		{
 			if ((ssize_t)socket->receive.low_water_mark > value && value >= B_OK)
 				notify = false;
 			break;
-		}
+
 		case B_SELECT_WRITE:
-		{
 			if ((ssize_t)socket->send.low_water_mark > value && value >= B_OK)
 				notify = false;
 			break;
-		}
+
 		case B_SELECT_ERROR:
 			socket->error = value;
 			break;
