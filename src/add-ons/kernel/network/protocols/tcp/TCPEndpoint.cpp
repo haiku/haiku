@@ -1162,30 +1162,38 @@ TCPEndpoint::_SendQueued(bool force)
 		// TODO: we need to trim the segment to the max segment size in case
 		//		the options made it too large
 
-		status = next->module->send_routed_data(next, fRoute, buffer);
-		if (status < B_OK) {
-			gBufferModule->free(buffer);
-			return status;
-		}
+		// Update send status - we need to do this before we send the data
+		// for local connections as the answer is directly handled
 
-		// Only count 1 SYN, the 1 sent when transitioning from CLOSED or LISTEN
 		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0) {
+			// count SYN into sequence length and reset options for the next segment
 			segment.max_segment_size = 0;
 			segment.has_window_shift = false;
 			size++;
 		}
 
-		// Only count 1 FIN, the 1 sent when transitioning from
-		// ESTABLISHED, SYNCHRONIZE_RECEIVED or FINISH_RECEIVED
-		if ((segment.flags & TCP_FLAG_FINISH) != 0)
+		if ((segment.flags & TCP_FLAG_FINISH) != 0) {
+			// count FIN into sequence length
 			size++;
+		}
 
-		if (fSendMax == fSendNext)
-			fSendMax += size;
+		uint32 sendMax = fSendMax;
 		fSendNext += size;
+		if (fSendMax < fSendNext)
+			fSendMax = fSendNext;
 
 		fReceiveMaxAdvertised = fReceiveNext
 			+ ((uint32)segment.advertised_window << fReceiveWindowShift);
+
+		status = next->module->send_routed_data(next, fRoute, buffer);
+		if (status < B_OK) {
+			gBufferModule->free(buffer);
+
+			fSendNext = segment.sequence;
+			fSendMax = sendMax;
+				// restore send status
+			return status;
+		}
 
 		length -= segmentLength;
 		if (length == 0)
