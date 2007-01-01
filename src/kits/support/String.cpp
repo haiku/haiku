@@ -984,7 +984,7 @@ BString::FindLast(char c, int32 beforeOffset) const
 		return B_ERROR;
 
 	const char *start = String();
-	const char *end = String() + beforeOffset;
+	const char *end = String() + min_clamp0(beforeOffset, Length());
 
 	/* Scans the string backwards until we found the character, */
 	/* or we reach the string's start */
