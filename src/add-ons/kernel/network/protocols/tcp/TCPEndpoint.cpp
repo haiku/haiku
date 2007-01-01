@@ -252,6 +252,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	fSendNext = fInitialSendSequence;
 	fSendUnacknowledged = fInitialSendSequence;
 	fSendMax = fInitialSendSequence;
+	fSendQueue.SetInitialSequence(fSendNext + 1);
 
 	// send SYN
 	status = _SendQueued();
@@ -259,8 +260,6 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 		fState = CLOSED;
 		return status;
 	}
-
-	fSendQueue.SetInitialSequence(fSendNext);
 
 	// wait until 3-way handshake is complete (if needed)
 
@@ -368,7 +367,8 @@ TCPEndpoint::Shutdown(int direction)
 status_t
 TCPEndpoint::SendData(net_buffer *buffer)
 {
-	TRACE(("TCP:%p.SendData(buffer %p, size %lu)\n", this, buffer, buffer->size));
+	TRACE(("TCP:%p.SendData(buffer %p, size %lu, flags %lx)\n",
+		this, buffer, buffer->size, buffer->flags));
 
 	size_t bytesLeft = buffer->size;
 
@@ -624,8 +624,8 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	// send SYN+ACK
 	status_t status = endpoint->_SendQueued();
 
-	endpoint->fInitialSendSequence = fSendNext;
-	endpoint->fSendQueue.SetInitialSequence(fSendNext);
+	endpoint->fInitialSendSequence = endpoint->fSendNext;
+	endpoint->fSendQueue.SetInitialSequence(endpoint->fSendNext);
 
 	if (status < B_OK)
 		return DROP;
@@ -702,7 +702,7 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 int32
 TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 {
-	TRACE(("TCP:%p.ReceiveData(): Connection in state %d received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!\n",
+	TRACE(("TCP:%p.Receive(): Connection in state %d received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!\n",
 		this, fState, buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge));
 
 	// TODO: rethink locking!
@@ -891,7 +891,7 @@ dprintf("set retransmit timer!\n");
 			if (fSendNext < fSendUnacknowledged)
 				fSendNext = fSendUnacknowledged;
 
-			if (segment.acknowledge > fSendQueue.LastSequence()) {
+			if (segment.acknowledge > fSendQueue.LastSequence() && fState > ESTABLISHED) {
 				// our TCP_FLAG_FINISH has been acknowledged
 dprintf("FIN has been acknowledged!\n");
 
