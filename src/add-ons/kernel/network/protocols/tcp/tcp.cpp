@@ -297,6 +297,26 @@ name_for_state(tcp_state state)
 }
 
 
+#if 0
+void
+dump_tcp_header(tcp_header &header)
+{
+	dprintf("  source port: %u\n", ntohs(header.source_port));
+	dprintf("  dest port: %u\n", ntohs(header.destination_port));
+	dprintf("  sequence: %lu\n", header.Sequence());
+	dprintf("  ack: %lu\n", header.Acknowledge());
+	dprintf("  flags: %s%s%s%s%s%s\n", (header.flags & TCP_FLAG_FINISH) ? "FIN " : "",
+		(header.flags & TCP_FLAG_SYNCHRONIZE) ? "SYN " : "",
+		(header.flags & TCP_FLAG_RESET) ? "RST " : "",
+		(header.flags & TCP_FLAG_PUSH) ? "PUSH " : "",
+		(header.flags & TCP_FLAG_ACKNOWLEDGE) ? "ACK " : "",
+		(header.flags & TCP_FLAG_URGENT) ? "URG " : "");
+	dprintf("  window: %u\n", header.AdvertisedWindow());
+	dprintf("  urgent offset: %u\n", header.UrgentOffset());
+}
+#endif
+
+
 //	#pragma mark - protocol API
 
 
@@ -507,6 +527,7 @@ tcp_receive_data(net_buffer *buffer)
 	TRACE(("  Looking for: peer %s, local %s\n",
 		AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
 		AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
+	//dump_tcp_header(header);
 
 	tcp_segment_header segment;
 	segment.sequence = header.Sequence();
@@ -530,6 +551,7 @@ tcp_receive_data(net_buffer *buffer)
 		(struct sockaddr *)&buffer->destination, (struct sockaddr *)&buffer->source);
 	if (endpoint != NULL) {
 		RecursiveLocker locker(endpoint->Lock());
+		TRACE(("Endpoint %p in state %s\n", endpoint, name_for_state(endpoint->State())));
 
 		switch (endpoint->State()) {
 			case TIME_WAIT:
