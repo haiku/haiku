@@ -25,7 +25,6 @@
 // debugging macros
 #define LOGID					"net_stack_driver: "
 #define ERROR(format, args...)	dprintf(LOGID "ERROR: " format, ## args)
-#define WARN(format, args...)	dprintf(LOGID "WARNING: " format, ## args)
 
 #ifdef DEBUG
 #	define TRACE(format, args...)	dprintf(format, ## args)
@@ -589,27 +588,9 @@ net_stack_deselect(void *_cookie, uint8 event, selectsync *sync)
 //	#pragma mark - driver
 
 
-/**	Do we init ourselves? If we're in safe mode we'll decline so if things
- *	screw up we can boot and delete the broken driver!
- *	After my experiences earlier - a good idea!
- */
-
 status_t
 init_hardware(void)
 {
-	void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-	if (settings != NULL) {
-		// we got a pointer, now get settings...
-		bool safemode = get_driver_boolean_parameter(settings, B_SAFEMODE_SAFE_MODE, false, false);
-		// now get rid of settings
-		unload_driver_settings(settings);
-
-		if (safemode) {
-			WARN("net_stack: Safemode! Declining offer to join the party.\n");
-			return B_ERROR;
-		}
-	}
-
 	return B_OK;
 }
 
