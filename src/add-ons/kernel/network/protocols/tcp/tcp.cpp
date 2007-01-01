@@ -29,7 +29,7 @@
 #include <NetBufferUtilities.h>
 #include <NetUtilities.h>
 
-#define TRACE_TCP
+//#define TRACE_TCP
 #ifdef TRACE_TCP
 #	define TRACE(x) dprintf x
 #	define TRACE_BLOCK(x) dump_block x
@@ -298,7 +298,7 @@ name_for_state(tcp_state state)
 
 
 #if 0
-void
+static void
 dump_tcp_header(tcp_header &header)
 {
 	dprintf("  source port: %u\n", ntohs(header.source_port));
@@ -528,6 +528,7 @@ tcp_receive_data(net_buffer *buffer)
 		AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
 		AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
 	//dump_tcp_header(header);
+	//gBufferModule->dump(buffer);
 
 	tcp_segment_header segment;
 	segment.sequence = header.Sequence();

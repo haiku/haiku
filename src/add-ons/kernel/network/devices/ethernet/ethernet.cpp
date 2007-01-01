@@ -130,7 +130,7 @@ ethernet_send_data(net_device *_device, net_buffer *buffer)
 {
 	ethernet_device *device = (ethernet_device *)_device;
 
-dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size, buffer->flags);
+//dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size, buffer->flags);
 	if (buffer->size > device->frame_size || buffer->size < ETHER_HEADER_LENGTH)
 		return B_BAD_VALUE;
 
@@ -156,9 +156,9 @@ dprintf("try to send ethernet packet of %lu bytes (flags %ld):\n", buffer->size,
 	struct iovec iovec;
 	gBufferModule->get_iovecs(buffer, &iovec, 1);
 
-dump_block((const char *)iovec.iov_base, buffer->size, "  ");
+//dump_block((const char *)iovec.iov_base, buffer->size, "  ");
 	ssize_t bytesWritten = write(device->fd, iovec.iov_base, iovec.iov_len);
-dprintf("sent: %ld\n", bytesWritten);
+//dprintf("sent: %ld\n", bytesWritten);
 
 	if (bytesWritten < 0) {
 		device->stats.send.errors++;

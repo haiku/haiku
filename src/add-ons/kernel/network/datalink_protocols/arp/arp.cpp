@@ -32,7 +32,7 @@
 #include <sys/sockio.h>
 
 
-#define TRACE_ARP
+//#define TRACE_ARP
 #ifdef TRACE_ARP
 #	define TRACE(x) dprintf x
 #else

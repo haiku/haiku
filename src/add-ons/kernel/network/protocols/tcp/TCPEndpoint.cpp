@@ -41,7 +41,7 @@
 // SACK, Selective Acknowledgment - RFC 2018, RFC 2883, RFC 3517
 // Forward RTO-Recovery, RFC 4138
 
-#define TRACE_TCP
+//#define TRACE_TCP
 #ifdef TRACE_TCP
 #	define TRACE(x) dprintf x
 #else
@@ -380,7 +380,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 				* fSendMaxSegmentSize;
 
 			chunk = gBufferModule->split(buffer, chunkSize);
-dprintf("  TCP::Send() split buffer at %lu (buffer size %lu, mss %lu) -> %p\n", chunkSize, socket->send.buffer_size, fSendMaxSegmentSize, chunk);
+TRACE(("  TCP::Send() split buffer at %lu (buffer size %lu, mss %lu) -> %p\n", chunkSize, socket->send.buffer_size, fSendMaxSegmentSize, chunk));
 			if (chunk == NULL)
 				return B_NO_MEMORY;
 		} else
@@ -475,7 +475,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	RecursiveLocker locker(fLock);
 
-dprintf("read %lu bytes, %lu are available\n", numBytes, fReceiveQueue.Available());
+TRACE(("read %lu bytes, %lu are available\n", numBytes, fReceiveQueue.Available()));
 	if (numBytes < fReceiveQueue.Available())
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 
@@ -722,7 +722,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			// this is a pure acknowledge segment - we're on the sending end
 			if (fSendUnacknowledged < segment.acknowledge
 				&& fSendMax >= segment.acknowledge) {
-dprintf("header prediction send!\n");
+TRACE(("header prediction send!\n"));
 				// and it only acknowledges outstanding data
 
 				// TODO: update RTT estimators
@@ -745,11 +745,11 @@ dprintf("header prediction send!\n");
 		} else if (segment.acknowledge == fSendUnacknowledged
 			&& fReceiveQueue.IsContiguous()
 			&& fReceiveQueue.Free() >= buffer->size) {
-dprintf("header prediction receive!\n");
+TRACE(("header prediction receive!\n"));
 			// we're on the receiving end of the connection, and this segment
 			// is the one we were expecting, in-sequence
 			fReceiveNext += buffer->size;
-dprintf("receive next = %lu!\n", (uint32)fReceiveNext);
+TRACE(("receive next = %lu!\n", (uint32)fReceiveNext));
 			fReceiveQueue.Add(buffer, segment.sequence);
 
 			release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
@@ -805,7 +805,7 @@ dprintf("receive next = %lu!\n", (uint32)fReceiveNext);
 		}
 
 		// remove duplicate data at the start
-dprintf("* remove %ld bytes from the start\n", drop);
+TRACE(("* remove %ld bytes from the start\n", drop));
 		gBufferModule->remove_header(buffer, drop);
 		segment.sequence += drop;
 	}
@@ -830,7 +830,7 @@ dprintf("* remove %ld bytes from the start\n", drop);
 		}
 
 		segment.flags &= ~(TCP_FLAG_FINISH | TCP_FLAG_PUSH);
-dprintf("* remove %ld bytes from the end\n", drop);
+TRACE(("* remove %ld bytes from the end\n", drop));
 		gBufferModule->remove_trailer(buffer, drop);
 	}
 
@@ -859,7 +859,7 @@ dprintf("* remove %ld bytes from the end\n", drop);
 			// TODO: handle this!
 			if (buffer->size == 0 && advertisedWindow == fSendWindow
 				&& (segment.flags & TCP_FLAG_FINISH) == 0) {
-				dprintf("duplicate ack!\n");
+TRACE(("duplicate ack!\n"));
 				fDuplicateAcknowledgeCount++;
 
 				gStackModule->cancel_timer(&fRetransmitTimer);
@@ -876,10 +876,10 @@ dprintf("* remove %ld bytes from the end\n", drop);
 				// there is no outstanding data to be acknowledged
 				// TODO: if the transmit timer function is already waiting
 				//	to acquire this endpoint's lock, we should stop it anyway
-dprintf("all inflight data ack'd!\n");
+TRACE(("all inflight data ack'd!\n"));
 				gStackModule->cancel_timer(&fRetransmitTimer);
 			} else {
-dprintf("set retransmit timer!\n");
+TRACE(("set retransmit timer!\n"));
 				// TODO: set retransmit timer correctly
 				if (!gStackModule->is_timer_active(&fRetransmitTimer))
 					gStackModule->set_timer(&fRetransmitTimer, 1000000LL);
@@ -893,7 +893,7 @@ dprintf("set retransmit timer!\n");
 
 			if (segment.acknowledge > fSendQueue.LastSequence() && fState > ESTABLISHED) {
 				// our TCP_FLAG_FINISH has been acknowledged
-dprintf("FIN has been acknowledged!\n");
+TRACE(("FIN has been acknowledged!\n"));
 
 				switch (fState) {
 					case FINISH_SENT:
@@ -923,7 +923,7 @@ dprintf("FIN has been acknowledged!\n");
 	// TODO: ignore data *after* FIN
 
 	if (segment.flags & TCP_FLAG_FINISH) {
-		dprintf("peer is finishing connection!");
+TRACE(("peer is finishing connection!"));
 		fReceiveNext++;
 		fFlags |= FLAG_NO_RECEIVE;
 
@@ -966,7 +966,7 @@ dprintf("FIN has been acknowledged!\n");
 	if (buffer->size > 0) {
 		if (fReceiveNext == segment.sequence)
 			fReceiveNext += buffer->size;
-dprintf("adding data, receive next = %lu!\n", (uint32)fReceiveNext);
+TRACE(("adding data, receive next = %lu!\n", (uint32)fReceiveNext));
 		fReceiveQueue.Add(buffer, segment.sequence);
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);

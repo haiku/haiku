@@ -12,7 +12,7 @@
 #include <KernelExport.h>
 
 
-#define TRACE_BUFFER_QUEUE
+//#define TRACE_BUFFER_QUEUE
 #ifdef TRACE_BUFFER_QUEUE
 #	define TRACE(x) dprintf x
 #else

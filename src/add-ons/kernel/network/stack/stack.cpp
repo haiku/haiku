@@ -31,7 +31,7 @@
 #include <string.h>
 
 
-#define TRACE_STACK
+//#define TRACE_STACK
 #ifdef TRACE_STACK
 #	define TRACE(x) dprintf x
 #else
@@ -314,9 +314,11 @@ chain::Hash(void *_chain, const void *_key, uint32 range)
 
 // TODO: check if this makes a good hash...
 #define HASH(o) ((uint32)(((o)->family) ^ ((o)->type) ^ ((o)->protocol)) % range)
+#if 0
 	TRACE(("%d.%d.%d: Hash: %lu\n", chain ? chain->family : key->family,
 		chain ? chain->type : key->type, chain ? chain->protocol : key->protocol,
 		chain ? HASH(chain) : HASH(key)));
+#endif
 
 	if (chain != NULL)
 		return HASH(chain);

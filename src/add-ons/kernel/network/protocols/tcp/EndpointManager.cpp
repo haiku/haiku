@@ -17,7 +17,7 @@
 #include <KernelExport.h>
 
 
-#define TRACE_ENDPOINT_MANAGER
+//#define TRACE_ENDPOINT_MANAGER
 #ifdef TRACE_ENDPOINT_MANAGER
 #	define TRACE(x) dprintf x
 #else

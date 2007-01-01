@@ -28,7 +28,7 @@
 #include <string.h>
 
 
-#define TRACE_IPV4
+//#define TRACE_IPV4
 #ifdef TRACE_IPV4
 #	define TRACE(x) dprintf x
 #else

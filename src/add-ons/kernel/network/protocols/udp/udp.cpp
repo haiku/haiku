@@ -27,7 +27,7 @@
 #include <string.h>
 
 
-#define TRACE_UDP
+//#define TRACE_UDP
 #ifdef TRACE_UDP
 #	define TRACE(x) dprintf x
 #	define TRACE_BLOCK(x) dump_block x

@@ -27,7 +27,7 @@
 #include <sys/sockio.h>
 
 
-#define TRACE_ROUTES
+//#define TRACE_ROUTES
 #ifdef TRACE_ROUTES
 #	define TRACE(x) dprintf x
 #else

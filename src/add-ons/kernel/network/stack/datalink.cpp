@@ -49,7 +49,7 @@ device_reader_thread(void *_interface)
 		net_buffer *buffer;
 		status = device->module->receive_data(device, &buffer);
 		if (status == B_OK) {
-			dprintf("received buffer of %ld bytes length\n", buffer->size);
+			//dprintf("received buffer of %ld bytes length\n", buffer->size);
 			tries = 0;
 
 			// feed device monitors
@@ -354,8 +354,8 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 	net_interface *interface = route->interface;
 	net_domain *domain = interface->domain;
 
-	dprintf("send buffer (%ld bytes) to interface %s (route flags %lx)\n",
-		buffer->size, interface->name, route->flags);
+	//dprintf("send buffer (%ld bytes) to interface %s (route flags %lx)\n",
+	//	buffer->size, interface->name, route->flags);
 
 	if (route->flags & RTF_REJECT)
 		return ENETUNREACH;
