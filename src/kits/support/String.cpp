@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -9,7 +9,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*! String class supporting common string operations. */
+/* String class supporting common string operations. */
 
 
 #include <Debug.h>
@@ -34,7 +34,7 @@
 const char *B_EMPTY_STRING = "";
 
 
-//! helper function, returns minimum of two given values (but clamps to 0):
+// helper function, returns minimum of two given values (but clamps to 0):
 static inline int32
 min_clamp0(int32 num1, int32 num2) 
 { 
@@ -45,7 +45,7 @@ min_clamp0(int32 num1, int32 num2)
 }
 
 
-//! helper function, returns length of given string (but clamps to given maximum):
+// helper function, returns length of given string (but clamps to given maximum):
 static inline int32
 strlen_clamp(const char* str, int32 max) 
 {	// this should yield 0 for max<0:
@@ -56,7 +56,7 @@ strlen_clamp(const char* str, int32 max)
 }
 
 
-//! helper function, massages given pointer into a legal c-string:
+// helper function, massages given pointer into a legal c-string:
 static inline const char * 
 safestr(const char* str) 
 {
@@ -64,7 +64,7 @@ safestr(const char* str)
 }
 
 
-//! helper class for BString::_ReplaceAtPositions():
+// helper class for BString::_ReplaceAtPositions():
 struct
 BString::PosVect {
 	PosVect() 
@@ -140,26 +140,8 @@ private:
 //	#pragma mark -
 
 
-/*!
-	\class BString
-	\brief String class supporting common string operations
-	
-	BString is a string allocation and manipulation class. The object
-	takes care to allocate and free memory for you, so it will always be
-	"big enough" to store your strings.
-	
-	\author <a href='mailto:mflerackers@androme.be>Marc Flerackers</a>
-	\author <a href='mailto:burton666@freemail.it>Stefano Ceccherini</a>
-	\author <a href='mailto:openbeos@hirschaefer.de>Oliver Tappe</a>
-*/	
-
-/*!	\var char* BString::_privateData
-	\brief BString's storage for data
-*/
 
 // constructor
-/*!	\brief Creates an uninitialized BString.
-*/
 BString::BString()
 	: _privateData(NULL)	
 {
@@ -167,9 +149,6 @@ BString::BString()
 
 
 // constructor
-/*! \brief Creates a BString and initializes it to the given string.
-	\param str Pointer to a NULL terminated string.
-*/
 BString::BString(const char* str)
 	: _privateData(NULL)
 {
@@ -179,9 +158,6 @@ BString::BString(const char* str)
 
 
 // copy constructor
-/*! \brief Creates a BString and makes it a copy of the supplied one.
-	\param string the BString object to be copied.
-*/
 BString::BString(const BString &string)
 	: _privateData(NULL)			
 {
@@ -190,11 +166,6 @@ BString::BString(const BString &string)
 
 
 // constructor
-/*! \brief Creates a BString and initializes it to the given string.
-	\param str Pointer to a NULL terminated string.
-	\param maxLength The amount of characters you want to copy from the original
-		string.
-*/
 BString::BString(const char *str, int32 maxLength)
 	: _privateData(NULL)		
 {
@@ -204,10 +175,6 @@ BString::BString(const char *str, int32 maxLength)
 
 
 // destructor
-/*! \brief Frees all resources associated with the object.
-	
-	Frees the memory allocated by the BString object.
-*/
 BString::~BString()
 {
 	if (_privateData)
@@ -217,30 +184,11 @@ BString::~BString()
 
 /*---- Access --------------------------------------------------------------*/
 // String, implemented inline in the header
-/*! \fn const char* BString::String() const
-	\brief Returns a pointer to the object string, NULL terminated.
-	
-	Returns a pointer to the object string, guaranteed to be NULL
-	terminated. You can't modify or free the pointer. Once the BString
-	object is deleted, the pointer becomes invalid.
-	
-	\return A pointer to the object string. 
-*/
-
 
 // Length, implemented inline in the header
-/*!	\fn int32 BString::Length() const
-	\brief Returns the length of the string, measured in bytes.
-	\return The length of the string, measured in bytes.
-*/
 
 		
 // CountChars
-/*! \brief Returns the length of the object measured in characters.
-	\return An integer which is the number of characters in the string.
-	
-	Counts the number of UTF8 characters contained in the string.
-*/
 int32
 BString::CountChars() const
 {
@@ -262,11 +210,6 @@ BString::CountChars() const
 
 /*---- Assignment ----------------------------------------------------------*/
 // equal operator
-/*! \brief Makes a copy of the given BString object.
-	\param string The string object to copy.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::operator=(const BString &string)
 {
@@ -277,11 +220,6 @@ BString::operator=(const BString &string)
 
 
 // equal operator
-/*! \brief Re-initializes the object to the given string.
-	\param str Pointer to a string.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::operator=(const char *str)
 {
@@ -295,11 +233,6 @@ BString::operator=(const char *str)
 
 
 // equal operator
-/*! \brief Re-initializes the object to the given character.
-	\param c The character which you want to initialize the string to.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::operator=(char c)
 {
@@ -309,12 +242,6 @@ BString::operator=(char c)
 
 
 // SetTo
-/*! \brief Re-initializes the object to the given string.
-	\param str Pointer to a string.
-	\param length Amount of characters to copy from the original string.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::SetTo(const char *str, int32 maxLength)
 {
@@ -328,11 +255,6 @@ BString::SetTo(const char *str, int32 maxLength)
 
 
 // SetTo
-/*! \brief Makes a copy of the given BString object.
-	\param from The string object to copy.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::SetTo(const BString &from)
 {
@@ -343,11 +265,6 @@ BString::SetTo(const BString &from)
 
 
 // Adopt
-/*! \brief Adopt's data of the given BString object, freeing the original object.
-	\param from The string object to adopt.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::Adopt(BString &from)
 {
@@ -368,12 +285,6 @@ BString::Adopt(BString &from)
 
 
 // SetTo
-/*! \brief Makes a copy of the given BString object.
-	\param from The string object to copy.
-	\param length Amount of characters to copy from the original BString.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::SetTo(const BString &string, int32 length)
 {
@@ -384,12 +295,6 @@ BString::SetTo(const BString &string, int32 length)
 
 
 // Adopt
-/*! \brief Adopt's data of the given BString object, freeing the original object.
-	\param from The string object to adopt.
-	\param length Amount of characters to get from the original BString.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::Adopt(BString &from, int32 length)
 {
@@ -413,12 +318,6 @@ BString::Adopt(BString &from, int32 length)
 
 
 // SetTo
-/*! \brief Initializes the object to a string composed by a character you specify.
-	\param c The character you want to initialize the BString.
-	\param count The number of characters you want the BString to be composed by.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::SetTo(char c, int32 count)
 {
@@ -435,12 +334,6 @@ BString::SetTo(char c, int32 count)
 /*---- Substring copying ---------------------------------------------------*/
 
 // CopyInto
-/*! \brief Copy the BString data (or part of it) into another BString.
-	\param into The BString where to copy the object.
-	\param fromOffset The offset (zero based) where to begin the copy
-	\param length The amount of bytes to copy.
-	\return This function always returns *this .
-*/
 BString &
 BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
 {
@@ -456,11 +349,6 @@ BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
 
 
 // CopyInto
-/*! \brief Copy the BString data (or part of it) into the supplied buffer.
-	\param into The buffer where to copy the object.
-	\param fromOffset The offset (zero based) where to begin the copy
-	\param length The amount of bytes to copy.
-*/
 void
 BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 {
@@ -475,10 +363,6 @@ BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 
 /*---- Appending -----------------------------------------------------------*/
 // plus operator
-/*!	\brief Appends the given string to the object.
-	\param str A pointer to the string to append.
-	\return This function always returns *this .
-*/
 BString&
 BString::operator+=(const char *str)
 {
@@ -489,10 +373,6 @@ BString::operator+=(const char *str)
 
 
 // plus operator
-/*!	\brief Appends the given character to the object.
-	\param c The character to append.
-	\return This function always returns *this .
-*/
 BString&
 BString::operator+=(char c)
 {
@@ -502,11 +382,6 @@ BString::operator+=(char c)
 
 
 // Append
-/*!	\brief Appends the given BString to the object.
-	\param string The BString to append.
-	\param length The maximum bytes to get from the original object.
-	\return This function always returns *this .
-*/
 BString&
 BString::Append(const BString &string, int32 length)
 {
@@ -516,11 +391,6 @@ BString::Append(const BString &string, int32 length)
 
 
 // Append
-/*!	\brief Appends the given string to the object.
-	\param str A pointer to the string to append.
-	\param length The maximum bytes to get from the original string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Append(const char *str, int32 length)
 {
@@ -533,11 +403,6 @@ BString::Append(const char *str, int32 length)
 
 
 // Append
-/*!	\brief Appends the given character to the object.
-	\param c The character to append.
-	\param count The number of characters to append.
-	\return This function always returns *this .
-*/
 BString&
 BString::Append(char c, int32 count)
 {
@@ -552,10 +417,6 @@ BString::Append(char c, int32 count)
 //	#pragma mark - Prepending
 
 
-/*!	\brief Prepends the given string to the object.
-	\param str A pointer to the string to prepend.
-	\return This function always returns *this .
-*/
 BString&
 BString::Prepend(const char *str)
 {
@@ -566,10 +427,6 @@ BString::Prepend(const char *str)
 
 
 // Prepend
-/*!	\brief Prepends the given BString to the object.
-	\param string The BString object to prepend.
-	\return This function always returns *this .
-*/
 BString&
 BString::Prepend(const BString &string)
 {
@@ -580,11 +437,6 @@ BString::Prepend(const BString &string)
 
 
 // Prepend
-/*!	\brief Prepends the given string to the object.
-	\param str A pointer to the string to prepend.
-	\param length The maximum amount of bytes to get from the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Prepend(const char *str, int32 length)
 {
@@ -597,11 +449,6 @@ BString::Prepend(const char *str, int32 length)
 
 
 // Prepend
-/*!	\brief Prepends the given BString to the object.
-	\param string The BString object to prepend.
-	\param len The maximum amount of bytes to get from the BString.
-	\return This function always returns *this .
-*/
 BString&
 BString::Prepend(const BString &string, int32 len)
 {
@@ -612,11 +459,6 @@ BString::Prepend(const BString &string, int32 len)
 
 
 // Prepend
-/*!	\brief Prepends the given character to the object.
-	\param c The character to prepend.
-	\param count The amount of characters to prepend.
-	\return This function always returns *this .
-*/
 BString&
 BString::Prepend(char c, int32 count)
 {
@@ -630,11 +472,6 @@ BString::Prepend(char c, int32 count)
 //	#pragma mark - Inserting
 
 
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param str A pointer to the string to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(const char *str, int32 pos)
 {
@@ -656,12 +493,6 @@ BString::Insert(const char *str, int32 pos)
 
 
 // Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param str A pointer to the string to insert.
-	\param length The amount of bytes to insert.	
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(const char *str, int32 length, int32 pos)
 {
@@ -683,13 +514,6 @@ BString::Insert(const char *str, int32 length, int32 pos)
 
 
 // Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param str A pointer to the string to insert.
-	\param fromOffset
-	\param length The amount of bytes to insert.	
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
 {
@@ -699,11 +523,6 @@ BString::Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
 
 
 // Insert
-/*! \brief Inserts the given BString at the given position into the object's data.
-	\param string The BString object to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(const BString &string, int32 pos)
 {
@@ -714,12 +533,6 @@ BString::Insert(const BString &string, int32 pos)
 
 
 // Insert
-/*! \brief Inserts the given BString at the given position into the object's data.
-	\param string The BString object to insert.
-	\param length The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(const BString &string, int32 length, int32 pos)
 {
@@ -730,13 +543,6 @@ BString::Insert(const BString &string, int32 length, int32 pos)
 
 
 // Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param string The BString object to insert.
-	\param fromOffset
-	\param length The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(const BString &string, int32 fromOffset, int32 length, int32 pos)
 {
@@ -749,12 +555,6 @@ BString::Insert(const BString &string, int32 fromOffset, int32 length, int32 pos
 
 
 // Insert
-/*! \brief Inserts the given character at the given position into the object's data.
-	\param c The character to insert.
-	\param count The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
 BString::Insert(char c, int32 count, int32 pos)
 {
@@ -775,11 +575,6 @@ BString::Insert(char c, int32 count, int32 pos)
 //	#pragma mark - Removing
 
 
-/*! \brief Truncate the string to the new length.
-	\param newLength The new lenght of the string.
-	\param lazy If true, the memory-optimisation is postponed to later
-	\return This function always returns *this .
-*/
 BString&
 BString::Truncate(int32 newLength, bool lazy)
 {
@@ -802,11 +597,6 @@ BString::Truncate(int32 newLength, bool lazy)
 
 
 // Remove
-/*! \brief Removes some bytes, starting at the given offset
-	\param from The offset from which you want to start removing
-	\param length The number of bytes to remove
-	\return This function always returns *this .
-*/
 BString&
 BString::Remove(int32 from, int32 length)
 {
@@ -823,10 +613,6 @@ BString::Remove(int32 from, int32 length)
 
 
 // Remove
-/*! \brief Removes the first occurrence of the given BString.
-	\param string The BString to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveFirst(const BString &string)
 {
@@ -840,10 +626,6 @@ BString::RemoveFirst(const BString &string)
 
 
 // Remove
-/*! \brief Removes the last occurrence of the given BString.
-	\param string The BString to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveLast(const BString &string)
 {
@@ -856,10 +638,6 @@ BString::RemoveLast(const BString &string)
 
 
 // Remove
-/*! \brief Removes all occurrences of the given BString.
-	\param string The BString to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveAll(const BString &string)
 {
@@ -868,10 +646,6 @@ BString::RemoveAll(const BString &string)
 
 
 // Remove
-/*! \brief Removes the first occurrence of the given string.
-	\param str A pointer to the string to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveFirst(const char *string)
 {
@@ -886,10 +660,6 @@ BString::RemoveFirst(const char *string)
 
 
 // Remove
-/*! \brief Removes the last occurrence of the given string.
-	\param str A pointer to the string to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveLast(const char *string)
 {
@@ -904,10 +674,6 @@ BString::RemoveLast(const char *string)
 
 
 // Remove
-/*! \brief Removes all occurrences of the given string.
-	\param str A pointer to the string to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveAll(const char *str)
 {
@@ -916,10 +682,6 @@ BString::RemoveAll(const char *str)
 
 
 // Remove
-/*! \brief Removes all the characters specified.
-	\param setOfCharsToRemove The set of characters to remove.
-	\return This function always returns *this .
-*/
 BString&
 BString::RemoveSet(const char *setOfCharsToRemove)
 {
@@ -928,12 +690,6 @@ BString::RemoveSet(const char *setOfCharsToRemove)
 
 
 // MoveInto
-/*! \brief Move the BString data (or part of it) into another BString.
-	\param into The BString where to move the object.
-	\param from The offset (zero based) where to begin the move
-	\param length The amount of bytes to move.
-	\return This function always returns into.
-*/
 BString&
 BString::MoveInto(BString &into, int32 from, int32 length)
 {
@@ -957,11 +713,6 @@ BString::MoveInto(BString &into, int32 from, int32 length)
 
 
 // MoveInto
-/*! \brief Move the BString data (or part of it) into the given buffer.
-	\param into The buffer where to move the object.
-	\param from The offset (zero based) where to begin the move
-	\param length The amount of bytes to move.
-*/
 void
 BString::MoveInto(char *into, int32 from, int32 length)
 {
@@ -1074,11 +825,6 @@ BString::ICompare(const char *str, int32 n) const
 //	#pragma mark - Searching
 
 
-/*! \brief Find the first occurrence of the given BString.
-	\param string The BString to search for.
-	\return The offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
 BString::FindFirst(const BString &string) const
 {
@@ -1087,11 +833,6 @@ BString::FindFirst(const BString &string) const
 
 
 // FindFirst
-/*! \brief Find the first occurrence of the given string.
-	\param string The string to search for.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
 BString::FindFirst(const char *string) const
 {
@@ -1103,13 +844,6 @@ BString::FindFirst(const char *string) const
 
 
 // FindFirst
-/*! \brief Find the first occurrence of the given BString,
-		starting from the given offset.
-	\param string The BString to search for.
-	\param fromOffset The offset where to start the search.
-	\return An integer which is the offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
 BString::FindFirst(const BString &string, int32 fromOffset) const
 {
@@ -1122,13 +856,6 @@ BString::FindFirst(const BString &string, int32 fromOffset) const
 
 
 // FindFirst
-/*! \brief Find the first occurrence of the given string,
-		starting from the given offset.
-	\param string The string to search for.
-	\param fromOffset The offset where to start the search.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
 BString::FindFirst(const char *string, int32 fromOffset) const
 {
@@ -1143,11 +870,6 @@ BString::FindFirst(const char *string, int32 fromOffset) const
 
 
 // FindFirst
-/*! \brief Find the first occurrence of the given character.
-	\param c The character to search for.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindFirst(char c) const
 {	
@@ -1168,13 +890,6 @@ BString::FindFirst(char c) const
 
 
 // FindFirst
-/*! \brief Find the first occurrence of the given character,
-		starting from the given offset.
-	\param c The character to search for.
-	\param fromOffset The offset where to start the search.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindFirst(char c, int32 fromOffset) const
 {
@@ -1198,11 +913,6 @@ BString::FindFirst(char c, int32 fromOffset) const
 
 
 // FindLast
-/*! \brief Find the last occurrence of the given BString.
-	\param string The BString to search for.
-	\return The offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
 BString::FindLast(const BString &string) const
 {
@@ -1211,11 +921,6 @@ BString::FindLast(const BString &string) const
 
 
 // FindLast
-/*! \brief Find the last occurrence of the given string.
-	\param string The string to search for.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
 BString::FindLast(const char *string) const
 {
@@ -1227,13 +932,6 @@ BString::FindLast(const char *string) const
 
 
 // FindLast
-/*! \brief Find the last occurrence of the given BString,
-		starting from the given offset, and going backwards.
-	\param string The BString to search for.
-	\param beforeOffset The offset where to start the search.
-	\return An integer which is the offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
 BString::FindLast(const BString &string, int32 beforeOffset) const
 {
@@ -1246,12 +944,6 @@ BString::FindLast(const BString &string, int32 beforeOffset) const
 
 
 // FindLast
-/*! \brief Find the last occurrence of the given string,
-		starting from the given offset, and going backwards.
-	\param string The string to search for.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
 BString::FindLast(const char *string, int32 beforeOffset) const
 {
@@ -1265,11 +957,6 @@ BString::FindLast(const char *string, int32 beforeOffset) const
 
 
 // FindLast
-/*! \brief Find the last occurrence of the given character.
-	\param c The character to search for.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindLast(char c) const
 {
@@ -1290,13 +977,6 @@ BString::FindLast(char c) const
 
 
 // FindLast
-/*! \brief Find the last occurrence of the given character,
-		starting from the given offset and going backwards.
-	\param c The character to search for.
-	\param beforeOffset The offset where to start the search.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindLast(char c, int32 beforeOffset) const
 {
@@ -1683,12 +1363,6 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 /*---- Unchecked char access -----------------------------------------------*/
 
 // operator[]
-/*! \brief Returns a reference to the data at the given offset.
-	
-	This function can be used to read a byte or to change its value.
-	\param index The index (zero based) of the byte to get.
-	\return Returns a reference to the specified byte.
-*/
 char &
 BString::operator[](int32 index)
 {
@@ -1737,9 +1411,6 @@ BString::UnlockBuffer(int32 length)
 
 /*---- Uppercase<->Lowercase ------------------------------------------------*/
 // ToLower
-/*! \brief Converts the BString to lowercase
-	\return This function always returns *this .
-*/
 BString&
 BString::ToLower()
 {
@@ -1753,9 +1424,6 @@ BString::ToLower()
 
 
 // ToUpper
-/*! \brief Converts the BString to uppercase
-	\return This function always returns *this .
-*/
 BString&
 BString::ToUpper()
 {			
@@ -1769,9 +1437,6 @@ BString::ToUpper()
 
 
 // Capitalize
-/*! \brief Converts the first character to uppercase, rest to lowercase
-	\return This function always returns *this .
-*/
 BString&
 BString::Capitalize()
 {
@@ -1790,12 +1455,6 @@ BString::Capitalize()
 
 
 // CapitalizeEachWord
-/*! \brief Converts the first character of every word to uppercase, rest to lowercase.
-	
-	Converts the first character of every "word" (series of alpabetical characters
-	separated by non alphabetical characters) to uppercase, and the rest to lowercase.
-	\return This function always returns *this .
-*/
 BString&
 BString::CapitalizeEachWord()
 {
@@ -2310,7 +1969,7 @@ BString::_AssertNotUsingAsCString() const
 //	#pragma mark - backwards compatibility
 
 
-/*!
+/*
 	Translates to (missing const):
 	BString& BString::operator<<(BString& string)
 */
