@@ -1149,6 +1149,6 @@ net_buffer_module_info gNetBufferModule = {
 	get_iovecs,
 	count_iovecs,
 
-	NULL,	// dump
+	dump_buffer,	// dump
 };
 
