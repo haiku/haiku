@@ -64,14 +64,14 @@ main(int32 argc, char** argv)
 			else {	
 				fprintf(stderr,
 					"%s: option %s is not understood (use --help for help)\n", argv[0], argv[i]);
-				return -1;
+				return 1;
 			}
 		} else {
 			volumeDevice = dev_for_path(argv[i]);
 			
 			if (volumeDevice < 0) {
 				fprintf(stderr, "%s: can't get information about volume: %s\n", argv[0], argv[i]);
-				return -1;
+				return 1;
 			}
 		}
 	}
@@ -85,6 +85,6 @@ main(int32 argc, char** argv)
 		return 0;
 	} else {
 		fprintf(stderr, "%s: can't get information about dev_t: %ld\n", argv[0], volumeDevice);
-		return -1;
+		return 1;
 	}
 }
