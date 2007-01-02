@@ -10,17 +10,14 @@ Chapter 2: Getting to Know Haiku
 	Working with Files
 		Opening & Saving
 		Archives
-		Different Kinds of Files
 		Drag and Drop
 	
-Chapter 3: Getting Things Done
-	E-Mail
+Chapter 3: E-Mail
+
+Chapter 4: Getting Things Done
 	The World Wide Web
-	Working with Pictures
-	Gotta Have My Music
-	Video
+	Gotta Have My Music and Movies
 	Keeping an Address Book
-	Keep Your System Running Smoothly
 	Customizing Haiku: Preferences and Tweaks
 	
 Chapter 4: Beyond Your Four Walls -- Haiku Out There
@@ -45,6 +42,7 @@ Chapter 5: Advanced Haiku
 	Queries
 	Workspaces
 	Tracker Add-ons
+	Filesystems
 
 Chapter 6: Installation
 	Before You Install
@@ -64,64 +62,69 @@ Chapter 1: Welcome to Haiku
 
 What is Haiku?
 
-	Haiku is a free operating system designed to get the most out of your computer without requiring you to have a degree in Computer Science. The inner workings of Haiku are designed for ease of use and for speed. If you go back to working with Windows or Linux after using Haiku for quite a while, it will probably feel much slower than it did before. Working with audio and video are easier than elsewhere 
+	Haiku is a free operating system designed to get the most out of your computer without requiring you to have a degree in Computer Science. The inner workings of Haiku are designed for ease of use and speed. In fact, if you go back to working with Windows or Linux after using Haiku for quite a while, it will probably feel much slower than it did before. Working with audio and video are easier than elsewhere 
 	
 Why Haiku?
 
-	You may have heard of a kind of software called an operating system. Operating systems are a piece of software that handles all the technical ugliness that goes with working with the computer's hardware components. It also determines the way that programmers will write programs and provides certain services for them. Here are some reasons why Haiku is better:
+	You may or may not have heard of a kind of software called an operating system. Operating systems are a piece of software that handles all the technical ugliness that goes with working with the computer's hardware components. It also determines the way that programmers will write programs and provides certain services for them. Here are some reasons why Haiku is better:
 
-Fast - Every program is written so that more things are done at the same time. In this day of processors with more than one core, Haiku uses all of them in a way to add even more speed to programs than in other operating systems. Each program even handles more than one task at the same time. It makes programming a little more complicated, but the results are worth it - a much smoother experience and it even *feels* faster. 
+Fast - Every program is written so that more things are done at the same time. In this day of processors with more than one core, Haiku uses all of them in a way to add even more speed to programs than in other operating systems. Each program even handles more than one task at the same time. It makes programming a little more complicated, but the results are worth it: programs are noticeably faster and you have a much smoother experience. 
 
-Usable - Marketing departments put "easy to use" or "intuitive" on packaging when their software really isn't. Haiku may not always be perfect, but it does carry remarkable ease-of-use for everyone.
+Usable - Marketing departments put "easy to use" or "intuitive" on packaging even when their software really isn't. Haiku may have quirks, but it does have remarkable ease-of-use for everyone.
 
-Free - Haiku truly is a gift for each one of us who are sick and tired of paying too much money for software that makes our lives harder instead of easier. Programmers can even take the files used to make Haiku for any purpose they want as long as they mention that they started with Haiku code.
+Free - Haiku truly is a gift for each one of us who are sick and tired of paying too much money for software that makes our lives harder instead of easier. Programmers can even take the files that are used to make Haiku and use them for any purpose they want as long as they mention that they started with Haiku code.
 
 	
 History of BeOS and Haiku
 
 
-In 1990, ex-Apple employees Jean-Louis Gassée and Steve Sakoman created a company: Be Incorporated. Be, Inc. was founded with a purpose in mind: to create a powerful, elegant, media-oriented, friendly computer that addressed the user's needs. They manufactured a product to tackle these goals head-on: a personal computer called the BeBox. This computer and its operating system, the BeOS, were first presented at Agenda 95 in October, 1995. The audience was elated.
+In 1990, ex-Apple employees Jean-Louis Gassée and Steve Sakoman created a company: Be Incorporated. It was founded with a purpose in mind: to create a powerful, elegant, media-oriented, friendly computer that addressed the user's needs. They manufactured a product to tackle these goals head-on: a personal computer called the BeBox. This computer and its operating system, the BeOS, were first presented at Agenda 95 in October, 1995. The audience was elated.
 
-The BeBox and BeOS were outfitted with features that were never seen before in the world of personal computing. The BeBox contained two processors and three additional chips dedicated to sound processing to provide a fast platform for video and audio. In the back of the BeBox was a feature of particular interest to computer enthusiasts and developers -- the GeekPort, which was a multi-purpose port for experimentation.
+The BeBox and BeOS had features that were never before seen in the world of personal computing. The BeBox contained two processors and three additional chips dedicated to sound processing to provide a fast platform for video and audio. In the back of the BeBox was a feature of particular interest to computer enthusiasts and developers -- the GeekPort, which was a multi-purpose port intended for experimentation.
 
-The operating system, BeOS, was equally packed with features. Its design was attractive to many, and its yellow tabbed windows distinguished it from the Macintosh and regular PCs. For many people, it was an operating system that was easy to fall in love with.
+The operating system, BeOS, was equally packed with features. Its design was attractive to many and its yellow tabbed windows distinguished it from the Macintosh and regular PCs. For many people, it was an operating system that was easy to fall in love with.
 
 Unfortunately, Be, Inc. abandoned its stake in the hardware market because of low sales and hardware supply problems. The BeOS was then modified to work on Apple Macintosh systems in 1997 and again to regular PCs in 1998. Although it had many enthusiastic users and developers, it never gained a significant market share for a variety of reasons which included a lack of third party programs, hardware support, and Microsoft's business tactics. In 2000, BeOS saw its fifth release in two versions: a Pro Edition and a Personal Edition. The Personal Edition didn't have quite as much software included as the Pro Edition, but it was free for anyone to download. This undermined the sales of the Pro Edition, increasing Be's financial difficulties.
 
 The company shifted its focus to attempt to use BeOS in Internet appliances. Some claim that this decision eroded the credibility of BeOS as a viable alternative to Windows or Linux. Be, Inc. filed for bankruptcy in 2001 and soon after sold its intellectual property to Palm, Inc.
 
-Be Inc. left behind a legacy: a community of dedicated and loyal users who continued to use BeOS despite the demise of its parent company. Some people added support for newer hardware and others wrote software to keep it current.
+Be, Inc. left behind a legacy: a community of dedicated and loyal users who continued to use BeOS despite the demise of its parent company. Some people added support for newer hardware and others wrote software to keep it current.
 
-Others wanted to recreate the entire operating system. Michael Phipps was one of them and in August 2001, he founded the only one of several projects started with the intention of reviving BeOS. The project was called OpenBeOS. Not only was OpenBeOS going to rewrite the operating system, but it also had the ambitious goal of programs written for BeOS run unmodified on the new software. In June of the following year, OpenBeOS held a convention in Columbus, Ohio where talks were given and a new name for the project was announced: Haiku.
+Others wanted to recreate the entire operating system. Michael Phipps was one of them and in August 2001, he founded one of several projects started with the intention of reviving BeOS. The project was called OpenBeOS. Not only was OpenBeOS going to rewrite the operating system, but it also had the ambitious goal of writing it so that programs written for BeOS would run unmodified on the new software. In June of the following year, OpenBeOS held a convention in Columbus, Ohio where talks were given and a new name for the project was announced: Haiku. The rest, as is often said, is history.
+
 
 
 Chapter 2: Getting to Know Haiku
 
 The Desktop: Tracker and the Deskbar
 
-	Tracker and Deskbar are two programs that tend to fade into the background even though they are used all the time because they are used for starting programs and moving files around. Tracker shows all the icons on the desktop and shows the different windows with files and folders in them. Deskbar is the big gray box which shows the time and programs running and also is home to the Applications and Preferences menus. It is a close cousin to the Start Menu and task bar in Windows operating systems. In this chapter, we will be examining these two programs in order to effectively and comfortably work with the system in day-to-day tasks.
+	Tracker and Deskbar are the two most-used programs that a person will use with Haiku. They tend to fade into the background, however, because they are used for starting programs and managing files. Tracker provides the icons on the desktop and shows the different windows with files and folders in them. Deskbar could be compared to the Windows Start Menu -- it is the big gray box which shows the time and programs running and also is home to the Applications and Preferences menus. In this chapter, we will be examining these two programs in order to effectively and comfortably work with the system in day-to-day tasks.
 
 The Deskbar
 
 What and Why is It?
 
-	The Deskbar is a program that helps you start programs, shows you what programs are running, displays the time and date, and gives you an area, called the system tray, which can hold small icons to show information like if you've got mail or how hard the computer is working. If you've used Windows before, this should be relatively familiar, even if you've never done much with it there.
-	There are three main parts to the Deskbar: the Haiku menu, the system tray, and the list of running programs. Of course, where these parts are on the screen depends on where the Deskbar itself is located. It is possible to have it in any of the four corners of the screen or along the top or bottom edges of the screen. It can also be in an expanded or compacted mode when in one of the screen corners.
-	Each of the modes are fairly simple to understand. In Compact mode, the only things that are visible are the leaf for the Leaf Menu, a man standing at a blackboard, and the system tray (where the time is shown). Clicking on the blackboard guy shows the list of running programs in a menu. The expanded corner mode is a little bigger -- the little blackboard guy has disappeared and, the Leaf Menu is centered in the window, and no clicking is needed to see the list of running programs. The Edge mode works just like the Windows Start menu -- the Leaf Menu on the left side, the system tray on the right, and list of running programs in the middle.
+	The Deskbar is a program that helps you start programs, shows you what programs are running, displays the time and date, and gives you an area, called the system tray, for frequently updated information. If you've used Windows before, this will probably be familiar even if you've never done much with it before.
+	The Deskbar consists of three main parts: the Haiku menu, the system tray, and the list of running programs, but where these parts are on the screen depends on where the Deskbar itself is located. The Deskbar can be in any of the four corners of the screen or along the top or bottom edges of the screen and can also be in an expanded or compacted mode when in one of the screen corners.
+	Each of the Deskbar's display modes is fairly simple to understand. Compact mode, as the name implies, is intended to take up as little desktop space as possible. All that you will see is the button for the Leaf Menu, a man standing at a blackboard, and the system tray (where the time is shown). Clicking on the blackboard guy shows the list of running programs in a menu. The Expanded corner mode is a little bigger -- the little blackboard guy has disappeared, the Leaf Menu is centered in the window, and no clicking is needed to see the list of running programs. Edge mode works just like the Windows Start menu -- the Leaf Menu on the left side, the system tray on the right, and list of running programs in the middle.
 
 The Leaf Menu
 
-	"Just click on the leaf." "What??" Yep. A little quirk of Haiku that I'm sure you'll come to appreciate. Linux has the icon du jour. Windows has the Start button. Mac OS X has... the Apple menu. Sort of. Anyway, clicking on the leaf will pop up a menu chock full of useful little items. Let's just go through them one by one.
+	"Where are all my programs?"
+	"Just click on the leaf."
+	"What??"
+	
+	 Yep. A little quirk of Haiku that I'm sure you'll come to appreciate. Windows has the Start button. Linux has the icon du jour -- the KDE gear, the Gnome footprint, etc. Mac OS X has... the Apple menu. Sort of. Anyway, clicking on the leaf will pop up a menu chock full of useful little items. Let's just go through them one by one.
 
-About Haiku... - This will show the About window for Haiku. The About window shows some nice-to-know information, such as how much RAM your machine has, what kind of processor it has, what version of Haiku you're running, and the people who helped make Haiku possible.
+About Haiku... - Unsuprisingly, this will show the About window for Haiku, which contains some nice-to-know information such as how much RAM your machine has, what kind of processor it has, what version of Haiku you're running, and the people who helped make Haiku possible.
 
 Find... - This brings up Tracker's Find window, which allows you to search for any files on a BeOS, Haiku, or Zeta disk by using a query. We'll hear more about queries later in Chapter 5.
 
-Show/Hide Replicants - Clicking on this particular menu item shows or hides the little handle used to work with replicants, which are a really neat technology which is covered in-depth in Chapter 5. If you don't care about replicants or what they are, you can just ignore this item and nothing bad will happen.
+Show/Hide Replicants - Clicking on this particular menu item shows or hides the little handle used to work with replicants, which are a really neat technology which, like queries, is covered in-depth in Chapter 5. If you don't care about what replicants are or how to use them, you can safely ignore this item.
 
-Deskbar Settings - Items in this submenu are some small ways that you can change how the Deskbar works. We will cover these particulars below.
+Deskbar Settings - Items in this submenu are some small ways that you can change how the Deskbar works. We will cover the particulars in a moment.
 
-Restart / Shutdown - These will restart or shut down your computer. Unlike in BeOS, Haiku will ask you if you're really sure you'd like to restart or shut down your system just in case you accidentally clicked either of these menu items.
+Restart / Shutdown - These will restart or shut down your computer. Unlike in BeOS, Haiku will ask you if you're really sure you'd like to restart or shut down your system just in case you accidentally clicked on either of these menu items.
 
 Recent Documents - This submenu will contain a list of the most recent documents which you have opened in various programs. If you were working with a particular file not that long ago and suddenly need it again, this is an excellent way to bring it back up without starting the app and hunting for it.
 
@@ -132,44 +135,229 @@ Recent Folders - If you were just a moment ago looking in a particular folder, y
 
 The Deskbar Settings Menu
 
-Within the Deskbar is a menu which gives you a few options in its behavior.
+Within the Deskbar is a menu which gives you a few choices in how it behaves.
 
-Configure Be Menu - Add or remove folders from the top level of the Be Menu to share space with the Applications and Preferences menus.
+Change the Leaf Menu - Add or remove folders from the top level of the Leaf Menu. These folders will share the same space as the Applications and Preferences menus.
 
-Always on Top - The Deskbar cannot be covered by other windows
+Always on Top - When checked, the Deskbar cannot be covered by other windows
 
 Sort Running Applications - Puts the list of running programs that the Deskbar shows in alphabetical order.
 
 Tracker Always First - Always put Tracker first in the list of running programs
 
-24 Hour Clock - Show time in 24-hour time instead of AM / PM.
+24 Hour Clock - Show the time in 24-hour time instead of AM / PM.
 
-Show Seconds - Have the time display also show the seconds
+Show Seconds - Also show the seconds in the time display.
 
 European Date - Clicking on the time shows the date. This makes the date display with the day first instead of the month.
 
 Full Date - Show the date with full names instead of just numbers.
 
-Show Application Expander - This feature only works when the Deskbar is placed in a corner (as opposed to somewhere else) and shows the program list without clicking on anything. Enabling this option allows you to show or hide what windows are open in each program just by clicking on a little triangle button.
+Show Application Expander - This feature only works in the Expanded mode where the program list is shown without clicking on anything. Enabling this option allows you to show or hide a list of a program's open windows just by clicking on a little triangle button.
 
-Expand New Applications - This works only when Application Expanders are shown. When a new program is started, the open windows are visible by default.
+Expand New Applications - This works only when Application Expanders are shown. When a new program is started, the list of open windows is visible by default.
 
 
 The Running Programs List
 
-	If you run more than one program at a time, which is quite likely, you will at some point find a need what it provides. By selecting an item in the list in Compact mode or by clicking on an item in the list in Expanded or Edge mode, you can see a list of all the windows belonging to that program. You can also hide, close, or show all of that program's windows. Visible windows will have a little white window with a yellow tab. Hidden program windows will be light gray with a dark gray tab.
-	A hidden -- but very useful -- feature of the program list is being able to force a misbehaving program to quit. On a standard PC keyboard, it's easy: hold down the left Shift, Control, Alt, and Option (Windows) keys and click on the program you wish to force quit. If you don't have this choice available to you, you can still force quit an program by holding Control and Alt and hitting the Delete key and then using the Team Monitor window to quit a program.
+	While you certainly can get away with never using the services of the Running Programs list, you can work more easily if you understand how to use it. By selecting an item in the list in Compact mode or by clicking on an item in the list in Expanded or Edge mode, you can see a list of all the windows belonging to a particular program. You can also hide, close, or show all of that program's windows. Visible windows will have a little white window with a yellow tab. Hidden program windows will be light gray with a dark gray tab.
+	A hidden -- but very useful -- feature of the program list is being able to force a misbehaving program to quit. On a modern PC keyboard, it's easy: hold down the left Shift, Control, Alt, and Option (Windows) keys and click on the program you wish to force quit. If you don't have this choice available to you, you can still force quit an program by holding Control and Alt and hitting the Delete key once. This will show the Team Monitor window, which you can use to force quit a program by selecting it from the list and then clicking the Force Quit button.
 
 
 The System Tray
 
+	If you are familiar with Windows, you already have seen, if not used, what is known as the System Tray. It is a small area of the screen which contains the time and sometimes some small icons which give you frequently updated information and allow you to perform certain tasks very quickly. The most common uses for the System Tray in Haiku are for getting your E-mail by clicking on a little mailbox with the right mouse button, changing the volume by left-clicking on a little speaker, or checking the date by clicking on the time once.
 
 
-Working with Files
-	Opening & Saving
-	Archives
-	Different Kinds of Files
-	Drag and Drop
+Tracker: Managing Your Files
+
+	While the majority of a person's time at the computer is spent working with other programs, knowing how to move your files around is critical in being able to work effectively. Tracker works much like the Finder program used on Macintosh computers, so many people will need a little time to adjust. We will take a look at these differences below to help you get familiarized more easily.
+
+Opening & Saving
+
+	Haiku gives programs a common way to both open and save files. You will see the same basic window over and over again with an occasional difference here and there. There are four parts: the location button, the file list, and two buttons. When you are saving a file, there is also a box which lets you type in the name of your file. 
+	When you are opening or saving a file, you can see what folder in your computer that you are currently looking at. Clicking on the folder button will show a menu that contains the series of folders that you would need to click on to get where you are, starting with the Desktop. This makes it easier to quickly navigate folders. The file list will show the contents of the folder that you are looking at. Often a program will show you just the kinds of files that you can open with that program. Double-clicking on a file in the list will open that file or attempt to save over that file, depending on whether you are opening or saving. If you do try to save over a file, you will be asked to confirm that you really do want to save over a file to prevent accidental loss of your data.
+
+Archives
+
+	Just as there are real-life archives used for storing documents, artifacts, and the like, computers also use archives. However, computer archives just hold files and folders and store them all in a special way so that the archive takes up less space on the hard drive than the original files themselves. Here are a list of common ones that you may find in your comings and goings:
+
+
+ZIP - the most common in BeOS and Windows. ZIP files are special because they can store the attributes of a BeOS file and not just the file's regular data. This is especially important for files like People files, which keep all of their information in attributes. Unless you're sure of what your doing, use ZIP archives to package files together.
+
+TAR - This is a package file used in UNIX operating systems that doesn't compress the files it contains. Instead, a separate program is normally used to compress the package, so most of the time you will see files ending in .tar.bz2, .tar.gz, or .tgz.
+
+BZ2 - BZip2. This is getting to be a more common kind of archive because of its ability to make smaller archives than other types.
+
+GZ - GZip. Like TAR, this kind of archive normally comes from the UNIX / Linux operating system.
+
+RAR - RAR files still appear now and then today, but they are not nearly as common as the ones listed above. They normally contain Windows files, and the software used to make RAR archives is proprietary, so you will not find many of them containing files specific to BeOS and Haiku.
+
+ARJ - An older format which you may still come across now and then. ARJ files nowadays most often contain files from MS-DOS, a predecessor to Windows.
+
+7z - 7-Zip is an becoming an increasingly popular archive type because it is very good at making smaller archives than the others.
+
+DMG - A program archive for the OS X operating system by Apple. Haiku does not support these, but they are listed so that you can be aware of what they are.
+
+SIT - Stuff-It archive. This is an older archive type used in Macintosh computers. Haiku does not support these, either, but are listed for your information.
+
+
+Getting Files into and Out of an Archive
+
+	If you are going to send documents to someone via e-mail, put a lot of files on a floppy disk or keychain drive, or put files on the Internet for others to download, you normally want to package them into an archive to make transport faster. Some files, such as Microsoft Word and Excel documents benefit greatly from this. Others, such as MP3s and photos, don't because the information inside them is already compressed.
+	Haiku makes archiving files about as easy as it could possibly be by way of a Tracker Add-On called Zip-O-Matic. Simply select all the files and/or folders you wish to archive, right-click on one of them to bring up the menu, move down to Add-Ons, and choose Zip-O-Matic. As soon as you click on it, your files will be placed into a ZIP archive. All that you will need to do from there is rename it -- most of the time it will be given the name Archive.zip.
+
+Tip: If you really want speed, hold down the right Control and Alt keys and hit the Z key. Your files will be archived just as if you used the menu, but without all the clicking!
+
+	Getting files out of an archive is almost as easy as putting them in one, thanks to the Expander program. Double-click on an archive and if Expander will open it -- it handles almost all of the kinds of archives listed above -- you will just need to choose where you would like the files places (click on the Destination button to browse for one or just type it in) and click the Expand button. It's that simple!
+
+
+Drag and Drop
+
+	Drag and Drop is a method for opening files and exchanging data between programs that is used in lots of places in the Haiku operating system. Just by clicking on an object -- often a file in Tracker -- and dragging it to a target, you can open files, move them around, rearrange items in lists, and many other things. You will probably use drag and drop most in Tracker to move files, from a Tracker window to a program in order to open it.
+
+Tip: You can drag a file to a program's entry in the Deskbar to open the file with that program. It saves time over using the Open With menu or the Open window.
+
+
+
+Chapter 3: E-Mail
+
+	One neat thing that BeOS did that Haiku does even more is make it easy for programs to read information from files. This is why there are more than a couple different mail programs for BeOS and Haiku. Here we will focus on the mail program included with Haiku, BeMail.
+
+Setting Up E-mail in Haiku
+
+	The first job is to set up your e-mail accounts. BeMail can handle multiple accounts, secure connections, and a host of other features of e-mail providers. You manage your e-mail settings from the E-mail preferences program which is in the Preferences folder in the Leaf menu. When it starts up, go to the Settings tab and make sure that 'Start Mail Services on Startup' is checked. If you have a dial-up Internet account, you will want to check 'Only When Dial-Up is Connected' and 'Schedule Outgoing Mail When Dial-Up is Disconnected' also. Set your mail-checking interval to whatever works best for you.
+	Now go back to the Accounts tab. You start adding an account by clicking on the Add button and filling in the form that pops up on the right. The Account Name is a name you choose, like the name of your Internet provider, your name, or something else. Put your name in the Real Name box and your e-mail address into the Return Address box. Change the account type only if you want to just send mail or just receive it on this account.
+	Now that you have entered in the general settings for your e-mail account, you will need to set the Incoming and Outgoing settings. While we will not go through the nitty-gritty details of these settings because they will depend on your Internet provider, we will go over a summary of what the terms you will probably see when learning about your provider's mail settings to point you in the right direction.
+
+POP3 and IMAP - The Internet uses different ways of communication (called protocols) to get and send mail. POP3 (or just POP) and IMAP are the two major protocols for getting mail, with POP3 being the most common. If your provider says you have to use a specific port number, place a colon and the number after the name of the mail server. If your provider told you that the server name is name.myserver.com and to use port 1400, you will enter "name.myserver.com:1400 " (without the quotes) in the box.
+
+Tip: If you have POP3 e-mail and check your mail from more than one computer, you probably will want to check the "Leave mail on the server" box on every machine that you check mail from except your main one to help you keep it all organized.
+
+SMTP - This is the protocol for sending mail over the Internet. Entering information for this is done the same way as for incoming mail. Your provider may or may not ask your computer for a username and password.
+
+Filters - You can set up mail filters to sort your mail, reduce Spam, and other neat tricks. For more information, see the section on Filters later in this chapter.
+
+
+Getting, Sending, and Reading Your E-mail
+
+
+	Getting e-mail is easy in Haiku. If you enabled automatic mail checking (under the Settings tab in the E-mail preferences program), you don't have to do anything to check your e-mail. If not, all that is needed is to right-click on the mailbox icon in the system tray and choose "Check for E-mail" from the menu.
+
+Tip: If your mouse has a middle button, you can middle-click on the mailbox icon to trigger a mail check. Most mice that have a scroll wheel allow you to push it down like a button in addition to using it to scroll.
+
+	Reading your e-mail under Haiku doesn't require any fancy tricks, either -- just click on the mailbox icon and it will show you everything in Haiku's main mail folder -- new mail, old mail, and everything else. If you have more complicated e-mail needs, you can right-click on the mailbox icon in the system tray and choose the item "<insert number here> new messages". A window will pop up and show you just your new e-mail. This is really nice to have if you prefer to save all your e-mail or if you have more than one account and store each account's mail in a separate folder. Either way, you can just double-click on a piece of mail to read it with Haiku's mail program, BeMail.
+
+Tip: You can customize the columns in your mail window to show just the Subject, the sender, or whatever else you like. See the section on Tracker in Chapter 2 for details.
+
+
+Using BeMail
+
+	BeMail is about as simple as mail programs can get, but even it has some nice features which make life a little nicer. First of all, if you have added a spam filter to your e-mail account, you can mark mail as genuine ("real") mail or as spam -- more on this later. You can place a tagline (called a signature) at the bottom of an e-mail. BeMail lets you have more than one, and clicking on the Signature button pops up a menu which allows you to choose which signature you'd like to add.
+
+
+Filtering Your E-mail
+
+	Some people get tons of e-mail each day. Others don't. Everyone seems to get spam even though its kinda shady and illegal in some places, not to mention highly annoying. E-mail filtering can help with a lot of this. We will look at each of the filters bundled with Haiku, how to set them up, and some possible uses for them. Filtering is a step above basic e-mail and you might not need it or want to be bothered with it. If you don't do that much with e-mail, you can skip this section and be no worse for the wear.
+	First of all, you will be working with the E-mail preferences program to set up filtering. Select the item marked 'Filtering' beneath the name of the account you would like to filter. On the right you will see a list for the filters. Note that the order of this list is important - filters are applied in the order that they are listed. If you would like to change the order, just click on an item, drag it to where you want it, and drop it.
+
+R5 Daemon Filter - This one is kept around more for backwards compatibility. The mail services packaged in with BeOS version 5 and earlier used a different way of storing and using mail filters. If you know what they are all about, then you will know what to do with this filter.
+
+Match Header - This filter replaces the R5 Daemon Filter. It looks for a pattern in some aspect of a piece of mail and performs some action on it. The first box is for what you would like to search. Below is a list of what you can enter and what part of the e-mail it is:
+
+Name - the name of the sender
+
+From - the sender's e-mail address
+
+To - your e-mail address (different for each e-mail account)
+
+Reply To - the e-mail address replies are sent to
+
+When - the date and time received
+
+Subject	- the subject line
+
+Cc - addresses of anyone receiving a carbon copy (CC)
+
+Account - the name of the e-mail's account
+
+Status - The current status of the e-mail. Normally, this can be Read, Replied, Sent, Forwarded, New, or anything you have designated yourself. However, unless you change it yourself in a filter, it will always be New.
+
+Priority - This is often not used and is set by the sender's e-mail program. Most of the time, it is ignored. More often than not, it is used by spammers with an 'urgent' designation or something similar.
+
+Thread - Essentially the same as Subject, but without things like Re: or Fwd:
+
+Classification Group - Depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word Genuine or Spam
+
+Spam/Genuine Estimate - This is a numerical estimate that the spam filter assigned to your e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.
+
+By entering one of these into the first box, you can search it for whatever pattern you enter. What pattern do you put in? It's more than little complicated. You can search around the Internet for a tutorial on UNIX regular expressions, but here are some examples:
+
+\[Spam - matches the word Spam with a left bracket before it.
+[a-z] - matches one lowercase letter
+[A-Za-z] - matches one lowercase or capital letter
+[A-Za-z]+ - matches one or more letters
+[0-9] - matches one number
+. - matches any character
+\. - matches any one period
+
+Because regular expressions are complicated and can be frustrating to get to match only what you want them to, here are some sample filters which you will probably find useful:
+
+What:		Pattern:		Matches:
+Subject		\[Spam			Mail marked as Spam by the spam filter
+Account		MyAccount		Mail sent to the MyAccount account
+From		test@notmail.com	Mail from test@notmail.com
+
+
+Tip: If you want to do more than one action on an e-mail, set up two filters with the same matching pattern and place them one after another.
+
+
+Spam Filter - Eliminating spam is tough because spammers are always coming up with new tricks to be able to send you e-mails. This filter can reduce it by quite a lot, however. It uses statistics to help determine which e-mails are spam and which are not. As it gets used, it needs less and less help in figuring out which is which. For each e-mail, it calculates a decimal rating which runs from 0 to 1 where the bigger the number, the more likely it is spam. The filter itself has options to allow you to change the value range for Spam / Uncertain / Genuine, to treat e-mails with nothing in them as spam, and to automatically learn from all incoming e-mails. There is also an option to add the spam rating to the beginning of the e-mail's Subject which will then, in turn, allow a Match Header filter to act on whether or not it is spam.
+
+
+Add Fortune - This filter adds a fortune from the /boot/beos/etc/fortunes file to all outgoing e-mails.
+
+
+Simple and Not-So-Simple E-mail Filtering Setups
+
+All of this tweaking can be a lot to take in, so here are some in-depth examples of how to use filters effectively.
+
+Example 1:	Place different mail from 2 different accounts into different folders
+
+1) Account names are Account1 and Account2, so create 2 folders -- /boot/home/mail/Account1 and /boot/home/mail/Account2
+2) Add a Match Header filter to Account1: What=Subject, Pattern=Account1, Action=Move to Folder, Folder=/boot/home/mail/Account1
+3) Add a Match Header filter to Account2: What=Subject, Pattern=Account2, Action=Move to Folder, Folder=/boot/home/mail/Account2
+
+Example 2:	Move all Spam to the Trash
+
+1) Add a Spam filter to an account. Make it mark Spam mails with a rating.
+2) Add a Match header filter. What=Subject, Pattern=\[Spam , Action=Mark as Read
+3) Add a Match header filter. What=Subject, Pattern=\[Spam , Action=Move to Folder, Folder=/boot/home/Desktop/Trash
+
+
+Chapter 4: Getting Things Done
+
+	Aside from the complexity from e-mail setup and customization, there are many other things that you will probably do on a fairly frequent basis, including using a Web browser, listening to music, and watching movies.
+
+
+The World Wide Web
+
+	Haiku, along with many other non-Windows operating systems, has a web browser which allows you to go online for learning about the weather, getting news, going shopping, and so forth. Mozilla Firefox (or just Firefox) is the web browser of choice for most Haiku users. While Haiku does not, by default, ship with Firefox, it is relatively simple to download and install. You may find that a small percentage of websites do not work properly. This is not the fault of the Firefox developers. It is because the people responsible for creating the website designed it only for the Internet Explorer browser, which is lazy and a mistake. In these cases, if at all possible, e-mail the webmaster of the site to kindly consider resolving the problem.
+
+
+Gotta Have My Music and Movies
+
+	Haiku has the ability to play most movies and music files, compliments of MediaPlayer. You can take advantage of playing all your favorite MP3s. You can also take advantage of the BFS filesystem's attributes to create custom playlists very quickly in a way similar to iTunes' smart playlists. You can also enjoy other kinds of music and movie files, such as Ogg Vorbis, FLAC, Matroska, Windows Media, and others.
+	
+
+Keeping an Address Book
+
+	An address book is important for anyone who has a lot of friends. You can enter in all the information you like with the People program. To look up information about someone, all you have to do is go to the /boot/home/People folder. You can remove and add columns to view just the information that you want to have at a glance, and if you want to see everything about a person, all that is needed is to double-click on his or her file.
+	How do you do you customize the columns? Check and uncheck items in the Attributes menu. Attributes which are specific to People files can be found in the People submenu of the Attributes menu. You can also rearrange columns just by dragging the column title around. A column can be automatically resized to display all the data in the column by moving the cursor over the divider in between the column title boxes and double-clicking the mouse.
+
+
+Customizing Haiku: Preferences and Tweaks
+
 
 -----------------------------------------------------------------------------
 
