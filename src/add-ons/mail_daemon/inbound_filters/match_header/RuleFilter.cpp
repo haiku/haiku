@@ -21,9 +21,16 @@ RuleFilter::RuleFilter(BMessage *settings) : BMailFilter(settings) {
 	attr.CapitalizeEachWord();
 	attribute = strdup(attr.String());
 
-	const char *regex = NULL;	
+	BString regex;
 	settings->FindString("regex",&regex);
-	matcher.SetPattern(regex,true);
+	
+	int32 index = regex.FindFirst("REGEX:");
+	if (index == B_ERROR || index > 0)
+		EscapeRegexTokens(regex);
+	else
+		regex.RemoveFirst("REGEX:");
+		
+	matcher.SetPattern(regex.String(),false);
 	
 	settings->FindString("argument",&arg);
 	settings->FindInt32("do_what",(long *)&do_what);
@@ -59,10 +66,10 @@ status_t RuleFilter::ProcessMailMessage
 	
 	if (data == NULL) //--- How would this happen? No idea
 		return B_OK;
-
+	
 	if (!matcher.Match(data))
 		return B_OK; //-----There wasn't an error. We're just not supposed to do anything
-		
+	
 	switch (do_what) {
 		case Z_MOVE_TO:
 			if (io_headers->ReplaceString("DESTINATION",arg) != B_OK)

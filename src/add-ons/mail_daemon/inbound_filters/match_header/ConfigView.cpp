@@ -50,8 +50,8 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 		attr->SetText(settings->FindString("attribute"));
 	AddChild(attr);
 	
-	regex = new BTextControl(BRect(104,5,255,20),"attr",MDR_DIALECT_CHOICE (" is "," が "),MDR_DIALECT_CHOICE ("value (can be a regular expression, like *spam*)","値(正規表現対応)"),NULL);
-	regex->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE (" is "," が ")) + 4);
+	regex = new BTextControl(BRect(104,5,255,20),"attr",MDR_DIALECT_CHOICE (" has "," が "),MDR_DIALECT_CHOICE ("value (use REGEX: in from of regular expressions like *spam*)","値(正規表現対応)"),NULL);
+	regex->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE (" has "," が ")) + 4);
 	if (settings->HasString("regex"))
 		regex->SetText(settings->FindString("regex"));
 	AddChild(regex);
