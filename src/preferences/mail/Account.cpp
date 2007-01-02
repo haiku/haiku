@@ -650,6 +650,9 @@ void Accounts::NewAccount()
 	Account *account = new Account();
 	gAccounts.AddItem(account);
 	account->AddToListView();
+	
+	if (gListView)
+		gListView->Select(gListView->IndexOf(account->fAccountItem));
 }
 
 
