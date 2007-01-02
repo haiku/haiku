@@ -39,6 +39,7 @@ All rights reserved.
 
 #include "FindWindow.h"
 #include "Mail.h"
+#include "AutoTextControl.h"
 
 #include <TextView.h>
 #include <Button.h>
@@ -47,6 +48,10 @@ All rights reserved.
 #include <Box.h>
 
 #include <MDRLanguage.h>
+
+enum {
+	M_FIND_STRING_CHANGED = 'fsch'
+};
 
 void TextBevel(BView& view, BRect r);
 
@@ -116,22 +121,20 @@ FindPanel::FindPanel(BRect rect)
 	: BBox(rect, "FindPanel", B_FOLLOW_LEFT_RIGHT,
 		B_WILL_DRAW)
 {
-	BRect r = Bounds();
-	r.InsetBy(8,8);
-	r.bottom -= 44;
-	BRect text = r;
-	text.OffsetTo(B_ORIGIN);
-	text.InsetBy(2,2);
+	BRect r = Bounds().InsetByCopy(10,10);
 
-	mBTextView = new DialogTextView(r,"BTextView",text,B_FOLLOW_ALL,B_WILL_DRAW);
-	mBTextView->DisallowChar('\n');
-	mBTextView->SetText(sPreviousFind.String());
-	mBTextView->MakeFocus();
-	AddChild(mBTextView);
+	mBTextControl = new AutoTextControl(r,"BTextControl",NULL,sPreviousFind.String(),
+									new BMessage(M_FIND_STRING_CHANGED),
+									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	mBTextControl->SetText(sPreviousFind.String());
+	mBTextControl->MakeFocus();
+	mBTextControl->SetEscapeCancel(true);
+	AddChild(mBTextControl);
 	
 	mFindButton = new BButton(BRect(0,0,90,20),"FINDBUTTON",
 		MDR_DIALECT_CHOICE ("Find","検索"),
 		new BMessage(FINDBUTTON),B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	mFindButton->ResizeToPreferred();
 	AddChild(mFindButton);
 	r = mFindButton->Bounds();
 	
@@ -142,7 +145,7 @@ FindPanel::FindPanel(BRect rect)
 
 FindPanel::~FindPanel()
 {
-	sPreviousFind = mBTextView->Text();
+	sPreviousFind = mBTextControl->Text();
 }
 
 void FindPanel::AttachedToWindow()
@@ -151,8 +154,13 @@ void FindPanel::AttachedToWindow()
 	SetViewColor(216,216,216);
 	Window()->SetDefaultButton(mFindButton);
 	mFindButton->SetTarget(this);
-	mBTextView->MakeFocus(true);
-	mBTextView->SelectAll();
+	
+	mBTextControl->SetTarget(this);
+	mBTextControl->ResizeToPreferred();
+	mBTextControl->ResizeTo(Bounds().Width() - 20, mBTextControl->Frame().Height());
+	
+	mBTextControl->MakeFocus(true);
+	mBTextControl->TextView()->SelectAll();
 }
 
 void FindPanel::MouseDown(BPoint point)
@@ -163,12 +171,12 @@ void FindPanel::MouseDown(BPoint point)
 
 void FindPanel::Draw(BRect)
 {
-	TextBevel(*this,mBTextView->Frame());
+//	TextBevel(*this,mBTextView->Frame());
 }
 
 void FindPanel::KeyDown(const char *, int32)
 {
-	int32 length = mBTextView->TextLength();
+	int32 length = mBTextControl->TextView()->TextLength();
 	bool enabled = mFindButton->IsEnabled();
 
 	if (length > 0 && !enabled)
@@ -180,10 +188,18 @@ void FindPanel::KeyDown(const char *, int32)
 void FindPanel::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case FINDBUTTON:
+		case M_FIND_STRING_CHANGED: {
+			if (strlen(mBTextControl->Text()) == 0)
+				mFindButton->SetEnabled(false);
+			else
+				mFindButton->SetEnabled(true);
+			break;
+		}
+		case FINDBUTTON: {
 			Find();
 			Window()->PostMessage(B_QUIT_REQUESTED);
 			break;
+		}
 		default:
 			BView::MessageReceived(msg);
 	}
@@ -191,8 +207,8 @@ void FindPanel::MessageReceived(BMessage *msg)
 
 void FindPanel::Find()
 {
-	mBTextView->SelectAll();
-	const char *text = mBTextView->Text();
+	mBTextControl->TextView()->SelectAll();
+	const char *text = mBTextControl->Text();
 	if (text == NULL || text[0] == 0) return;
 
 	BWindow *window = NULL;
@@ -258,39 +274,4 @@ void FindWindow::SetFindString(const char *string)
 const char *FindWindow::GetFindString()
 {
 	return sPreviousFind.String();
-}
-
-
-DialogTextView::DialogTextView(BRect frame, const char *name, BRect textRect,
-		uint32 resizingMode, uint32 flags)
-	: BTextView(frame, name, textRect, resizingMode, flags)
-{
-}
-
-void DialogTextView::KeyDown(const char *bytes, int32 numBytes)
-{
-	BTextView::KeyDown(bytes, numBytes);
-	if (Parent())
-		Parent()->KeyDown(bytes, numBytes);
-}
-
-void DialogTextView::MouseDown(BPoint point)
-{
-	Window()->Activate();
-	BTextView::MouseDown(point);
-}
-
-void DialogTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
-	const text_run_array *inRuns)
-{
-	BTextView::InsertText(inText, inLength, inOffset, inRuns);
-	if (Parent())
-		Parent()->KeyDown(NULL, 0);
-}
-
-void DialogTextView::DeleteText(int32 fromOffset, int32 toOffset)
-{
-	BTextView::DeleteText(fromOffset, toOffset);
-	if (Parent())
-		Parent()->KeyDown(NULL, 0);
 }

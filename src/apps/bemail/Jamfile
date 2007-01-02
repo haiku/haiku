@@ -12,6 +12,7 @@ UsePrivateHeaders shared ;
 
 AddResources BeMail : BeMail.rdef pictures.rdef  ;
 Application BeMail : 
+	AutoTextControl.cpp
 	BmapButton.cpp
 	ButtonBar.cpp
 	ComboBox.cpp
