@@ -694,7 +694,11 @@ TBarApp::ShowConfigWindow()
 		get_ref_for_path(path.Path(), &startref);	
 	
 		fConfigWindow = new TFavoritesConfigWindow(BRect(0, 0, 320, 240),
+#ifdef __HAIKU__
+			"Configure Leaf Menu", false, B_ANY_NODE,
+#else
 			"Configure Be Menu", false, B_ANY_NODE,
+#endif
 			BMessenger(this), &startref,
 			fSettings.recentAppsCount, fSettings.recentDocsCount,
 			fSettings.recentFoldersCount);

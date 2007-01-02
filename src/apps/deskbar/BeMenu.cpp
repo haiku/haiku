@@ -271,7 +271,11 @@ TBeMenu::AddStandardBeMenuItems()
  	BMenu *subMenu = new BMenu("Deskbar Settings");
 	subMenu->SetEnabled(!dragging);
 
+#ifdef __HAIKU__
+	item = new BMenuItem("Configure Leaf Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
+#else
 	item = new BMenuItem("Configure Be Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
+#endif
  	item->SetTarget(be_app);
 	subMenu->AddItem(item);
 
