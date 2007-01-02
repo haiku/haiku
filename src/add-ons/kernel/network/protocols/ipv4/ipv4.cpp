@@ -127,6 +127,8 @@ class RawSocket : public DoublyLinkedListLinkImpl<RawSocket> {
 
 struct ipv4_protocol : net_protocol {
 	RawSocket	*raw;
+	uint8		service_type;
+	uint8		time_to_live;
 	uint32		flags;
 };
 
@@ -670,6 +672,8 @@ ipv4_init_protocol(net_socket *socket)
 		return NULL;
 
 	protocol->raw = NULL;
+	protocol->service_type = 0;
+	protocol->time_to_live = 254;
 	protocol->flags = 0;
 	return protocol;
 }
@@ -773,7 +777,26 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 				return user_memcpy(value, &headerIncluded, sizeof(headerIncluded));
 			}
 
+			case IP_TTL:
+			{
+				if (*_length != sizeof(int))
+					return B_BAD_VALUE;
+
+				int timeToLive = protocol->time_to_live;
+				return user_memcpy(value, &timeToLive, sizeof(timeToLive));
+			}
+
+			case IP_TOS:
+			{
+				if (*_length != sizeof(int))
+					return B_BAD_VALUE;
+
+				int serviceType = protocol->service_type;
+				return user_memcpy(value, &serviceType, sizeof(serviceType));
+			}
+
 			default:
+				dprintf("IPv4::control(): get unknown option: %d\n", option);
 				return ENOPROTOOPT;
 		}
 	} else {
@@ -795,7 +818,32 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 				break;
 			}
 
+			case IP_TTL:
+			{
+				int timeToLive;
+				if (*_length != sizeof(int))
+					return B_BAD_VALUE;
+				if (user_memcpy(&timeToLive, value, sizeof(timeToLive)) < B_OK)
+					return B_BAD_ADDRESS;
+
+				protocol->time_to_live = timeToLive;
+				break;
+			}
+
+			case IP_TOS:
+			{
+				int serviceType;
+				if (*_length != sizeof(int))
+					return B_BAD_VALUE;
+				if (user_memcpy(&serviceType, value, sizeof(serviceType)) < B_OK)
+					return B_BAD_ADDRESS;
+
+				protocol->service_type = serviceType;
+				break;
+			}
+
 			default:
+				dprintf("IPv4::control(): set unknown option: %d\n", option);
 				return ENOPROTOOPT;
 		}
 	}
@@ -876,11 +924,11 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 		header.version = IP_VERSION;
 		header.header_length = sizeof(ipv4_header) >> 2;
-		header.service_type = 0;
+		header.service_type = protocol ? protocol->service_type : 0;
 		header.total_length = htons(buffer->size);
 		header.id = htons(atomic_add(&sPacketID, 1));
 		header.fragment_offset = 0;
-		header.time_to_live = 254;
+		header.time_to_live = protocol ? protocol->time_to_live : 254;
 		header.protocol = protocol ? protocol->socket->protocol : buffer->protocol;
 		header.checksum = 0;
 		if (route->interface->address != NULL) {
