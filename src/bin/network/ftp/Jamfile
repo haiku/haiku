@@ -21,7 +21,7 @@ BinCommand ftp :
 	progressbar.c
 	ruserpass.c
 	util.c
-	: libtermcap.a libedit.a libncurses.a libutil.a libbsd.so $(NETWORK_LIBS)
+	: libedit.a libncurses.a libutil.a libbsd.so $(NETWORK_LIBS)
 ;
 
 # Installation -- in the test directory for the time being
