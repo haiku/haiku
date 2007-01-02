@@ -518,7 +518,23 @@ TMailApp::QuitRequested()
 
     mail_window = last_window;
     	// Last closed window becomes standard window size.
+	
+	// Shut down the spam server if it's still running. If the user has trained it on a message, it will stay
+	// open. This is actually a good thing if there's quite a bit of spam -- no waiting for the thing to start
+	// up for each message, but it has no business staying that way if the user isn't doing anything with e-mail. :)
+	if (be_roster->IsRunning(kSpamServerSignature)) {
+		team_id serverTeam = be_roster->TeamFor(kSpamServerSignature);
+		if (serverTeam >= 0) {
+			int32 errorCode = B_SERVER_NOT_FOUND;
+			gMessengerToSpamServer = BMessenger (kSpamServerSignature, serverTeam, &errorCode);
+			if (gMessengerToSpamServer.IsValid()) {
+				BMessage quitMessage(B_QUIT_REQUESTED);
+				gMessengerToSpamServer.SendMessage(&quitMessage);
+			}
+		}
 
+	}
+	
 	SaveSettings();
 	return true;
 }
@@ -3606,7 +3622,7 @@ ErrorExit:
 		"Possibly useful error code: %s (%ld).",
 		filePath.Path(), CommandWord, strerror (errorCode), errorCode);
 	(new BAlert("", errorString,
-		MDR_DIALECT_CHOICE("Ok","了解")))->Go();
+		MDR_DIALECT_CHOICE("OK","了解")))->Go();
 	return errorCode;
 }
 
