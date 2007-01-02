@@ -145,10 +145,13 @@ Error::Error(BRect rect,alert_type atype,const char *tag,const char *message,boo
 	array.runs[0].font = *be_bold_font;
 	array.runs[0].color = HighColor();
 	
+	BString msgString(message);
+	msgString.RemoveAll("\r");
+	
 	BTextView *view = new BTextView(BRect(20,0,rect.Width(),rect.Height()),"error_display",BRect(0,3,rect.Width() - 20 - 3,LONG_MAX),B_FOLLOW_ALL_SIDES);
 	view->SetLowColor(bkg);
 	view->SetViewColor(bkg);
-	view->SetText(message);
+	view->SetText(msgString.String());
 	view->MakeSelectable(true);
 	view->SetStylable(true);
 	view->MakeEditable(false);
