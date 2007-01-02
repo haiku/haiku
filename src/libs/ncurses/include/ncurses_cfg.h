@@ -53,8 +53,10 @@
 #define USE_DATABASE 1
 #define TERMINFO_DIRS "/usr/local/share/terminfo"
 #define TERMINFO "/usr/local/share/terminfo"
+#define TERMPATH "/etc/termcap"
 #define HAVE_BIG_CORE 1
-#define PURE_TERMINFO 1
+#define PURE_TERMINFO 0
+#define USE_TERMCAP 1
 #define USE_HOME_TERMINFO 1
 #define USE_ROOT_ENVIRON 1
 #define HAVE_REMOVE 1
