@@ -331,12 +331,12 @@ ConfigWindow::ConfigWindow()
 
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveCheckBox = new BCheckBox(rect,"ppp active",
-		MDR_DIALECT_CHOICE ("Only When Dial-Up Is Connected","PPP接続中時のみ"), NULL);
+		MDR_DIALECT_CHOICE ("Only When Dial-Up is Connected","PPP接続中時のみ"), NULL);
 	box->AddChild(fPPPActiveCheckBox);
 	
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveSendCheckBox = new BCheckBox(rect,"ppp activesend",
-		MDR_DIALECT_CHOICE ("Schedule Outgoing Mail When Dial-Up Is Disconnected","PPP切断時、送信メールを送信箱に入れる"), NULL);
+		MDR_DIALECT_CHOICE ("Schedule Outgoing Mail When Dial-Up is Disconnected","PPP切断時、送信メールを送信箱に入れる"), NULL);
 	box->AddChild(fPPPActiveSendCheckBox);
 
 	// Miscellaneous settings box
