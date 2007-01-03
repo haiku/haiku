@@ -78,48 +78,10 @@ BSeparatorItem::Draw()
 	BRect bounds = Frame();
 	rgb_color oldColor = menu->HighColor();
 
-	// TODO: remove superfluous separators
-	menu_info menuInfo;
-	get_menu_info(&menuInfo);
-	switch (menuInfo.separator) {
-		case 0:
-			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_DARKEN_1_TINT));
-			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
-				BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
-			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_LIGHTEN_2_TINT));
-			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
-				BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
-			break;
-
-		case 1:
-			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_DARKEN_1_TINT));
-			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
-				BPoint(bounds.right - 9.0f, bounds.top + 4.0f));
-			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_LIGHTEN_2_TINT));
-			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 5.0f),
-				BPoint(bounds.right - 9.0f, bounds.top + 5.0f));
-			break;
-
-		case 2:
-			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_DARKEN_1_TINT));
-			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
-				BPoint(bounds.right - 9.0f, bounds.top + 4.0f));
-			menu->StrokeLine(BPoint(bounds.left + 10.0f, bounds.top + 5.0f),
-				BPoint(bounds.right - 10.0f, bounds.top + 5.0f));
-			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_LIGHTEN_2_TINT));
-			menu->StrokeLine(BPoint(bounds.left + 11.0f, bounds.top + 6.0f),
-				BPoint(bounds.right - 11.0f, bounds.top + 6.0f));
-			break;
-
-		default:
-			break;
-	}
+	menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f), BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
+	menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
+	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f), BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
 
 	menu->SetHighColor(oldColor);
 }
