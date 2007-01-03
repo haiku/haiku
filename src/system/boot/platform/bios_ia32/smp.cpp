@@ -392,10 +392,12 @@ smp_boot_other_cpus(void)
 
 	TRACE(("trampolining other cpus\n"));
 
-	// The first 8 MB are identity mapped, 0x9e000-0x9ffff is reserved for this
+	// The first 8 MB are identity mapped, either 0x9e000-0x9ffff is reserved for
+	// this, or when PXE services are used 0x8b000-0x8cfff.
 
 	// allocate a stack and a code area for the smp trampoline
-	// (these have to be < 1M physical, 0xa0000-0xfffff is reserved by the BIOS)
+	// (these have to be < 1M physical, 0xa0000-0xfffff is reserved by the BIOS,
+	// and when PXE services are used, the 0x8d000-0x9ffff is also reserved)
 #ifdef _PXE_ENV
 	trampolineCode = 0x8b000;
 	trampolineStack = 0x8c000;
