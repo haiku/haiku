@@ -203,10 +203,8 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 
 	frame = frame & workspaceFrame;
 	if (frame.IsValid()) {
+		drawingEngine->FillRect(frame.InsetByCopy(1, 1), white);
 		backgroundRegion.Exclude(frame);
-
-		frame.InsetBy(1, 1);
-		drawingEngine->FillRect(frame, white);
 	}
 
 	// draw title
@@ -281,7 +279,7 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 
 	// draw background
 
-	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
+	//drawingEngine->ConstrainClippingRegion(&backgroundRegion);
 	drawingEngine->FillRect(rect, color);
 
 	drawingEngine->ConstrainClippingRegion(&redraw);
