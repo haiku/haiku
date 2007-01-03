@@ -1443,9 +1443,11 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 		&& code == B_OK) {
 		fOwner->fLink->Read<BPoint>(location);
 		fOwner->fLink->Read<uint32>(buttons);
+			// TODO: ServerWindow replies with an int32 here
 
-		// TODO: See above comment about coordinates
 		ConvertFromScreen(location);
+			// TODO: in beos R5, location is already converted to the view local coordinate system,
+			// so if an app checks the window message queue by itself, it might not find what it expects.
 	} else
 		*buttons = 0;
 }
