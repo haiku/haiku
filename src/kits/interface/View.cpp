@@ -1426,7 +1426,7 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 
 					if (deleteMessage)
 						delete message;
-
+					
 					return;
 			}
 		}
@@ -1447,7 +1447,7 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 		// TODO: See above comment about coordinates
 		ConvertFromScreen(location);
 	} else
-		buttons = 0;
+		*buttons = 0;
 }
 
 
