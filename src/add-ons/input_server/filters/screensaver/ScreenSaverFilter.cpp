@@ -20,11 +20,15 @@
 
 #include <Debug.h>
 
+#include <new>
+
 #define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
 
 
 static const int32 kNeverBlankCornerSize = 10;
 static const int32 kBlankCornerSize = 5;
+static const bigtime_t kCornerDelay = 1000000LL;
+	// one second
 
 static const int32 kMsgCheckTime = 'SSCT';
 static const int32 kMsgCornerInvoke = 'Scin';
@@ -38,7 +42,7 @@ extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 BInputServerFilter*
 instantiate_input_filter()
 {
-	return new ScreenSaverFilter();
+	return new (std::nothrow) ScreenSaverFilter();
 }
 
 
@@ -105,11 +109,15 @@ ScreenSaverFilter::ScreenSaverFilter()
 	fEnabled(false),
 	fFrameNum(0),
 	fRunner(NULL),
+	fCornerRunner(NULL),
 	fWatchingDirectory(false), 
 	fWatchingFile(false)
 {
 	CALLED();
-	fController = new ScreenSaverController(this);
+	fController = new (std::nothrow) ScreenSaverController(this);
+	if (fController == NULL)
+		return;
+
 	fController->Run();
 
 	ReloadSettings();
@@ -119,6 +127,7 @@ ScreenSaverFilter::ScreenSaverFilter()
 
 ScreenSaverFilter::~ScreenSaverFilter()
 {
+	delete fCornerRunner;
 	delete fRunner;
 
 	if (fWatchingFile || fWatchingDirectory)
@@ -169,13 +178,15 @@ void
 ScreenSaverFilter::_Invoke()
 {
 	CALLED();
-	if (fCurrentCorner == fNeverBlankCorner || fEnabled
+	if (fCurrentCorner == fNeverBlankCorner && fNeverBlankCorner != NO_CORNER
 		|| fSettings.TimeFlags() == SAVER_DISABLED
+		|| fEnabled
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return;
 
 	SERIAL_PRINT(("we run screenblanker\n"));
-	be_roster->Launch(SCREEN_BLANKER_SIG);
+	if (be_roster->Launch(SCREEN_BLANKER_SIG) == B_OK)
+		fEnabled = true;
 }
 
 
@@ -192,6 +203,10 @@ ScreenSaverFilter::ReloadSettings()
 		return;
 	}
 
+	delete fCornerRunner;
+	delete fRunner;
+	fRunner = fCornerRunner = NULL;
+
 	fSettings.Load();
 
 	fBlankCorner = fSettings.BlankCorner();
@@ -199,10 +214,15 @@ ScreenSaverFilter::ReloadSettings()
 	fBlankTime = fSnoozeTime = fSettings.BlankTime();
 	CheckTime();
 
-	delete fRunner;
+	if (fBlankCorner != NO_CORNER || fNeverBlankCorner != NO_CORNER) {
+		BMessage invoke(kMsgCornerInvoke);
+		fCornerRunner = new (std::nothrow) BMessageRunner(fController,
+			&invoke, B_INFINITE_TIMEOUT);
+			// will be reset in Filter()
+	}
 
 	BMessage check(kMsgCheckTime);
-	fRunner = new BMessageRunner(fController, &check, fSnoozeTime);
+	fRunner = new (std::nothrow) BMessageRunner(fController, &check, fSnoozeTime);
 	if (fRunner->InitCheck() != B_OK) {
 		SERIAL_PRINT(("fRunner init failed\n"));
 	}
@@ -221,6 +241,7 @@ ScreenSaverFilter::_Banish()
 	// Don't care if it fails
 	BMessenger blankerMessenger(SCREEN_BLANKER_SIG, -1, NULL);
 	blankerMessenger.SendMessage(B_QUIT_REQUESTED);
+	fEnabled = false;
 }
 
 
@@ -252,7 +273,10 @@ ScreenSaverFilter::CheckTime()
 void
 ScreenSaverFilter::CheckCornerInvoke()
 {
-	if (fCurrentCorner == fBlankCorner)
+	bigtime_t inactivity = system_time() - fLastEventTime;
+
+	if (fCurrentCorner == fBlankCorner && fBlankCorner != NO_CORNER
+		&& inactivity >= kCornerDelay)
 		_Invoke();
 }
 
@@ -320,9 +344,8 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 			if (fBlankRect.Contains(where)) {
 				fCurrentCorner = fBlankCorner;
 
-				// start screen blanker after one second
-				BMessage invoke(kMsgCornerInvoke);
-				if (BMessageRunner::StartSending(fController, &invoke, 1000000ULL, 1) != B_OK)
+				// start screen blanker after one second of inactivity
+				if (fCornerRunner->SetInterval(kCornerDelay) != B_OK)
 					_Invoke();
 				break;
 			}

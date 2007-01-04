@@ -66,6 +66,7 @@ class ScreenSaverFilter : public BInputServerFilter {
 		ScreenSaverController* fController;
 		node_ref		fNodeRef;
 		BMessageRunner*	fRunner;
+		BMessageRunner*	fCornerRunner;
 		bool			fWatchingDirectory, fWatchingFile;
 };
 
