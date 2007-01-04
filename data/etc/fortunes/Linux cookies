@@ -1,0 +1,367 @@
+A Linux machine! because a 486 is a terrible thing to waste!
+(By jjs@wintermute.ucr.edu, Joe Sloan)
+%
+"Absolutely nothing should be concluded from these figures except that no conclusion can be drawn from them."
+(By Joseph L. Brothers, Linux/PowerPC Project)
+%
+Actually, typing random strings in the Finder does the equivalent of filename completion.
+(Discussion in comp.os.linux.misc on the intuitiveness of commands: file completion vs. the Mac Finder.)
+%
+After watching my newly-retired dad spend two weeks learning how to make a new folder, it became obvious that "intuitive" mostly means "what the writer or speaker of intuitive likes".
+(Bruce Ediger, bediger@teal.csn.org, in comp.os.linux.misc, on X the intuitiveness of a Mac interface.)
+%
+"All language designers are arrogant.  Goes with the territory..."
+(By Larry Wall)
+%
+And 1.1.81 is officially BugFree(tm), so if you receive any bug-reports on it, you know they are just evil lies."
+(By Linus Torvalds, Linus.Torvalds@cs.helsinki.fi)
+%
+"...and scantily clad females, of course.  Who cares if it's below zero outside"
+(By Linus Torvalds)
+%
+"And the next time you consider complaining that running Lucid Emacs 19.05 via NFS from a remote Linux machine in Paraguay doesn't seem to get the background colors right, you'll know who to thank."
+(By Matt Welsh)
+%
+> : Any porters out there should feel happier knowing that DEC is shipping
+> : me an AlphaPC that I intend to try getting linux running on: this will
+> : definitely help flush out some of the most flagrant unportable stuff.
+> : The Alpha is much more different from the i386 than the 68k stuff is, so
+> : it's likely to get most of the stuff fixed.
+>
+> It's posts like this that almost convince us non-believers that there
+> really is a god.
+(A follow-up by alovell@kerberos.demon.co.uk, Anthony Lovell, to Linus's remarks about porting)
+%
+Anyone who thinks UNIX is intuitive should be forced to write 5000 lines of code using nothing but vi or emacs. AAAAACK!
+(Discussion in comp.os.linux.misc on the intuitiveness of commands, especially Emacs.)
+%
+"Are [Linux users] lemmings collectively jumping off of the cliff of reliable, well-engineered commercial software?"
+(By Matt Welsh)
+%
+As usual, this being a 1.3.x release, I haven't even compiled this kernel yet.  So if it works, you should be doubly impressed.
+(Linus Torvalds, announcing kernel 1.3.3 on the linux-kernel mailing list.)
+%
+Avoid the Gates of Hell.  Use Linux
+(Unknown source)
+%
+Be warned that typing \fBkillall \fIname\fP may not have the desired effect on non-Linux systems, especially when done by a privileged user.
+(From the killall manual page)
+%
+"Besides, I think [Slackware] sounds better than 'Microsoft,' don't you?"
+(By Patrick Volkerding)
+%
+But what can you do with it?  -- ubiquitous cry from Linux-user partner.
+(Submitted by Andy Pearce, ajp@hpopd.pwd.hp.com)
+%
+"By golly, I'm beginning to think Linux really *is* the best thing since sliced bread."
+(By Vance Petree, Virginia Power)
+%
+/*
+ * Oops. The kernel tried to access some bad page. We'll have to
+ * terminate things with extreme prejudice.
+*/
+die_if_kernel("Oops", regs, error_code);
+(From linux/arch/i386/mm/fault.c)				   
+%
+"...Deep Hack Mode--that mysterious and frightening state of consciousness where Mortal Users fear to tread."
+(By Matt Welsh)
+%
+Dijkstra probably hates me
+(Linus Torvalds, in kernel/sched.c)
+%
+DOS: n., A small annoying boot virus that causes random spontaneous system crashes, usually just before saving a massive project.  Easily cured by UNIX.  See also MS-DOS, IBM-DOS, DR-DOS.
+(from David Vicker's .plan)
+%
+/*
+ * [...] Note that 120 sec is defined in the protocol as the maximum
+ * possible RTT.  I guess we'll have to use something other than TCP
+ * to talk to the University of Mars.
+ * PAWS allows us longer timeouts and large windows, so once implemented
+ * ftp to mars will work nicely.
+ */
+(from /usr/src/linux/net/inet/tcp.c, concerning RTT [retransmission timeout])
+%
+"Even more amazing was the realization that God has Internet access.  I wonder if He has a full newsfeed?"
+(By Matt Welsh)
+%
+>Ever heard of .cshrc?
+That's a city in Bosnia.  Right?
+(Discussion in comp.os.linux.misc on the intuitiveness of commands.)
+%
+Fatal Error: Found [MS-Windows] System -> Repartitioning Disk for Linux...
+(By cbbrown@io.org, Christopher Browne)
+%
+How do I type "for i in *.dvi do xdvi i done" in a GUI?
+(Discussion in comp.os.linux.misc on the intuitiveness of interfaces.)
+%
+"How should I know if it works?  That's what beta testers are for.  I only coded it."
+(Attributed to Linus Torvalds, somewhere in a posting)
+%
+I develop for Linux for a living, I used to develop for DOS. Going from DOS to Linux is like trading a glider for an F-117.
+(By entropy@world.std.com, Lawrence Foard)
+%
+I did this 'cause Linux gives me a woody.  It doesn't generate revenue.
+(Dave '-ddt->` Taylor, announcing DOOM for Linux)
+%
+Feel free to contact me (flames about my english and the useless of this driver will be redirected to /dev/null, oh no, it's full...).
+(Michael Beck, describing the PC-speaker sound device)
+%
+"I don't know why, but first C programs tend to look a lot worse than first programs in any other language (maybe except for fortran, but then I suspect all fortran programs look like `firsts')"
+(By Olaf Kirch)
+%
+"I once witnessed a long-winded, month-long flamewar over the use of mice vs. trackballs...It was very silly."
+(By Matt Welsh)
+%
+I still maintain the point that designing a monolithic kernel in 1991 is a fundamental error.  Be thankful you are not my student.  You would not get a high grade for such a design :-)
+(Andrew Tanenbaum to Linus Torvalds)
+%
+"I would rather spend 10 hours reading someone else's source code than 10 minutes listening to Musak waiting for technical support which isn't."
+(By Dr. Greg Wettstein, Roger Maris Cancer Center)
+%
+"I'd crawl over an acre of 'Visual This++' and 'Integrated Development That' to get to gcc, Emacs, and gdb.  Thank you."
+(By Vance Petree, Virginia Power)
+%
+"I'm an idiot.. At least this one [bug] took about 5 minutes to find.."
+(Linus Torvalds in response to a bug report.)
+
+> I'm an idiot.. At least this [bug] took about 5 minutes to find..
+Disquieting ...
+(Gonzalo Tornaria in response to Linus Torvalds's mailing about a kernel bug.)
+
+> I'm an idiot.. At least this [bug] took about 5 minutes to find..
+We need to find some new terms to describe the rest of us mere mortals then.
+(Craig Schlenter in response to Linus Torvalds's mailing about a kernel bug.)
+
+> I'm an idiot.. At least this [bug] took about 5 minutes to find..
+Surely, Linus is talking about the kind of idiocy that others aspire to :-).
+(Bruce Perens in response to Linus Torvalds's mailing about a kernel bug.)
+%
+I've run DOOM more in the last few days than I have the last few months.  I just love debugging ;-)
+(Linus Torvalds)
+%
+Microsoft Corp., concerned by the growing popularity of the free 32-bit operating system for Intel systems, Linux, has employed a number of top programmers from the underground world of virus development. Bill Gates stated yesterday: "World domination, fast -- it's either us or Linus". Mr. Torvalds was unavailable for comment ...
+(rjm@swift.eng.ox.ac.uk (Robert Manners), in comp.os.linux.setup)
+%
+    if (argc > 1 && strcmp(argv[1], "-advice") == 0) {
+	printf("Don't Panic!\n");
+	exit(42);
+    }
+(Arnold Robbins in the LJ of February '95, describing RCS)
+%
++#if defined(__alpha__) && defined(CONFIG_PCI)
++       /*
++        * The meaning of life, the universe, and everything. Plus
++        * this makes the year come out right.
++        */
++       year -= 42;
++#endif
+(From the patch for 1.3.2: (kernel/time.c), submitted by Marcus Meissner)
+%
+"If the future navigation system [for interactive networked services on the NII] looks like something from Microsoft, it will never work."
+(Chairman of Walt Disney Television & Telecommunications)
+%
+"If you want to travel around the world and be invited to speak at a lot of different places, just write a Unix operating system."
+(By Linus Torvalds)
+%
+"[In 'Doctor' mode], I spent a good ten minutes telling Emacs what I thought of it.  (The response was, 'Perhaps you could try to be less abusive.')"
+(By Matt Welsh)
+%
+In most countries selling harmful things like drugs is punishable. Then how come people can sell Microsoft software and go unpunished?
+(By hasku@rost.abo.fi, Hasse Skrifvars)
+%
+"It's God.  No, not Richard Stallman, or Linus Torvalds, but God."
+(By Matt Welsh)
+%
+LILO, you've got me on my knees!
+(from David Black, dblack@pilot.njin.net, with apologies to Derek and the Dominos, and Werner Almsberger)
+%
+Linux is obsolete
+(Andrew Tanenbaum)
+%
+"Linux poses a real challenge for those with a taste for late-night hacking (and/or conversations with God)."
+(By Matt Welsh)
+%
+Linux!  Guerrilla UNIX Development     Venimus, Vidimus, Dolavimus.
+(By mah@ka4ybr.com, Mark A. Horton KA4YBR)
+%
+"...[Linux's] capacity to talk via any medium except smoke signals."
+(By Dr. Greg Wettstein, Roger Maris Cancer Center)
+%
+linux: because a PC is a terrible thing to waste
+(ksh@cis.ufl.edu put this on Tshirts in '93)
+%
+Linux: Because a PC is a terrible thing to waste.
+(By komarimf@craft.camp.clarkson.edu, Mark Komarinski)
+%
+linux: the choice of a GNU generation
+(ksh@cis.ufl.edu put this on Tshirts in '93)
+%
+"Linux: the operating system with a CLUE... Command Line User Environment".
+(seen in a posting in comp.software.testing)
+%
+lp1 on fire
+(One of the more obfuscated kernel messages)
+%
+Microsoft is not the answer.
+Microsoft is the question.
+NO (or Linux) is the answer.
+(Taken from a .signature from someone from the UK, source unknown)
+%
+"MSDOS didn't get as bad as it is overnight -- it took over ten years of careful development."
+(By dmeggins@aix1.uottawa.ca)
+%
+"Never make any mistaeks."
+(Anonymous, in a mail discussion about to a kernel bug report.)
+%
+Not me, guy. I read the Bash man page each day like a Jehovah's Witness reads the Bible. No wait, the Bash man page IS the bible. Excuse me...
+(More on confusing aliases, taken from comp.os.linux.misc)
+%
+"Note that if I can get you to \"su and say\" something just by asking, you have a very serious security problem on your system and you should look into it."
+(By Paul Vixie, vixie-cron 3.0.1 installation notes)
+%
+Now I know someone out there is going to claim, "Well then, UNIX is intuitive, because you only need to learn 5000 commands, and then everything else follows from that! Har har har!"
+(Andy Bates in comp.os.linux.misc, on "intuitive interfaces", slightly defending Macs.)
+%
+Now, it we had this sort of thing:
+  yield -a     for yield to all traffic
+  yield -t     for yield to trucks
+  yield -f     for yield to people walking (yield foot)
+  yield -d t*  for yield on days starting with t
+...you'd have a lot of dead people at intersections, and traffic jams you wouldn't believe...
+(Discussion in comp.os.linux.misc on the intuitiveness of commands.)
+%
+"Oh, I've seen copies [of Linux Journal] around the terminal room at The Labs."
+(By Dennis Ritchie)
+%
+"On a normal ascii line, the only safe condition to detect is a 'BREAK' - everything else having been assigned functions by Gnu EMACS."
+(By Tarl Neustaedter)
+%
+"On the Internet, no one knows you're using Windows NT"
+(Submitted by Ramiro Estrugo, restrugo@fateware.com)
+%
+Once upon a time there was a DOS user who saw Unix, and saw that it was good. After typing cp on his DOS machine at home, he downloaded GNU's unix tools ported to DOS and installed them. He rm'd, cp'd, and mv'd happily for many days, and upon finding elvis, he vi'd and was happy. After a long day at work (on a Unix box) he came home, started editing a file, and couldn't figure out why he couldn't suspend vi (w/ ctrl-z) to do a compile.
+(By ewt@tipper.oit.unc.edu (Erik Troan)
+%
+> > Other than the fact Linux has a cool name, could someone explain why I
+> > should use Linux over BSD?
+>
+> No.  That's it.  The cool name, that is.  We worked very hard on
+> creating a name that would appeal to the majority of people, and it
+> certainly paid off: thousands of people are using linux just to be able
+> to say "OS/2? Hah.  I've got Linux.  What a cool name".  386BSD made the
+> mistake of putting a lot of numbers and weird abbreviations into the
+> name, and is scaring away a lot of people just because it sounds too
+> technical.
+(Linus Torvalds' follow-up to a question about Linux)
+%
+Personally, I think my choice in the mostest-superlative-computer wars has to be the HP-48 series of calculators.  They'll run almost anything.  And if they can't, while I'll just plug a Linux box into the serial port and load up the HP-48 VT-100 emulator.
+(By jdege@winternet.com, Jeff Dege)
+%
+"Problem solving under linux has never been the circus that it is under AIX."
+(By Pete Ehlke in comp.unix.aix)
+%
+quit   When the quit statement is read, the  bc  processor
+       is  terminated, regardless of where the quit state-
+       ment is found.  For example, "if  (0  ==  1)  quit"
+       will cause bc to terminate.
+(Seen in the manpage for "bc". Note the "if" statement's logic)
+%
+Running Windows on a Pentium is like having a brand new Porsche but only be able to drive backwards with the handbrake on.
+(Unknown source)
+%
+"sic transit discus mundi"
+(From the System Administrator's Guide, by Lars Wirzenius)
+%
+Sigh.  I like to think it's just the Linux people who want to be on the "leading edge" so bad they walk right off the precipice.
+(Craig E. Groeschel)
+%
+The chat program is in public domain. This is not the GNU public license. If it breaks then you get to keep both pieces.
+(Copyright notice for the chat program)
+%
+> The day people think linux would be better served by somebody else (FSF
+> being the natural alternative), I'll "abdicate".  I don't think that
+> it's something people have to worry about right now - I don't see it
+> happening in the near future.  I enjoy doing linux, even though it does
+> mean some work, and I haven't gotten any complaints (some almost timid
+> reminders about a patch I have forgotten or ignored, but nothing
+> negative so far).
+>
+> Don't take the above to mean that I'll stop the day somebody complains:
+> I'm thick-skinned (Lasu, who is reading this over my shoulder commented
+> that "thick-HEADED is closer to the truth") enough to take some abuse.
+> If I weren't, I'd have stopped developing linux the day ast ridiculed me
+> on c.o.minix.  What I mean is just that while linux has been my baby so
+> far, I don't want to stand in the way if people want to make something
+> better of it (*).
+>
+>                 Linus
+>
+> (*) Hey, maybe I could apply for a saint-hood from the Pope.  Does
+> somebody know what his email-address is? I'm so nice it makes you puke.
+(Taken from Linus's reply to someone worried about the future of Linux)
+%
+The nice thing about Windows is - It does not just crash, it displays a dialog box and lets you press 'OK' first.
+(Arno Schaefer's .sig)
+%
+The only "intuitive" interface is the nipple. After that, it's all learned.
+(Bruce Ediger, bediger@teal.csn.org, in comp.os.linux.misc, on X interfaces.)
+%
+There are two types of Linux developers - those who can spell, and those who can't. There is a constant pitched battle between the two.
+(From one of the post-1.1.54 kernel update messages posted to c.o.l.a)
+%
+"...Unix, MS-DOS, and Windows NT (also known as the Good, the Bad, and the Ugly)."
+(By Matt Welsh)
+%
+"...very few phenomena can pull someone out of Deep Hack Mode, with two noted exceptions: being struck by lightning, or worse, your *computer* being struck by lightning."
+(By Matt Welsh)
+%
+"Waving away a cloud of smoke, I look up, and am blinded by a bright, white light. It's God. No, not Richard Stallman, or Linus Torvalds, but God. In a booming voice, He says: "THIS IS A SIGN. USE LINUX, THE FREE UNIX SYSTEM FOR THE 386."
+(Matt Welsh)
+%
+"We all know Linux is great...it does infinite loops in 5 seconds."
+(Linus Torvalds about the superiority of Linux on the Amterdam Linux Symposium)
+%
+We are MicroSoft.  You will be assimilated.  Resistance is futile.
+(Attributed to B.G., Gill Bates)
+%
+We are Pentium of Borg. Division is futile. You will be approximated.
+(seen in someone's .signature)
+%
+We are using Linux daily to UP our productivity - so UP yours!
+(Adapted from Pat Paulsen by Joe Sloan)
+%
+We come to bury DOS, not to praise it.
+(Paul Vojta, vojta@math.berkeley.edu, paraphrasing a quote of Shakespeare)
+%
+We use Linux for all our mission-critical applications. Having the source code means that we are not held hostage by anyone's support department.
+(Russell Nelson, President of Crynwr Software)
+%
+"What you end up with, after running an operating system concept through these many marketing coffee filters, is something not unlike plain hot water."
+(By Matt Welsh)
+%
+`When you say "I wrote a program that crashed Windows", people just stare at you blankly and say "Hey, I got those with the system, *for free*".'
+(By Linus Torvalds)
+%
+"Whip me.  Beat me.  Make me maintain AIX."
+(By Stephan Zielinski)
+%
+"Who is General Failure and why is he reading my hard disk ?" 
+Microsoft spel chekar vor sail, worgs grate !!
+(By leitner@inf.fu-berlin.de, Felix von Leitner)
+%
+Who wants to remember that escape-x-alt-control-left shift-b puts you into super-edit-debug-compile mode?
+(Discussion in comp.os.linux.misc on the intuitiveness of commands, especially
+Emacs.)
+%
+Why use Windows, since there is a door?
+(By fachat@galileo.rhein-neckar.de, Andre Fachat)
+%
+"World domination.  Fast"
+(By Linus Torvalds)
+%
+..you could spend *all day* customizing the title bar.  Believe me.  I speak from experience."
+(By Matt Welsh)
+%
+"...you might as well skip the Xmas celebration completely, and instead sit in front of your linux computer playing with the all-new-and-improved linux kernel version."
+(By Linus Torvalds)
+%

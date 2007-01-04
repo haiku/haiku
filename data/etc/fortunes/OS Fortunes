@@ -1,0 +1,140 @@
+%
+"It is a relief and a joy when I see a regiment of hackers digging in to hold the line, and I realize, this city may survive--for now."
+
+  -- Richard Stallman (Open Sources, 1999 O'Reilly and Associates)
+%
+"If a machine couldn't run a free operating system, we got rid of it."
+
+  -- Richard Stallman (Open Sources, 1999 O'Reilly and Associates)
+%
+"The straightforward and easy path was to join the proprietary software world, signing nondisclosure agreements and promising not to help my fellow hacker....I could have made money this way, and perhaps had fun programming (if I closed my eyes to how I was treating other people).  But I knew that when my career was over, I would look back on years of building walls to divide people, and feel I had made the world ugly."
+ 
+  -- Richard Stallman (Open Sources, 1999 O'Reilly and Associates)
+%
+"But the most reliable indication of the future of Open Source is its past: in just a few years, we have gone from nothing to a robust body of software that solves many different problems and is reaching the million-user count. There's no reason for us to slow down now."
+
+  -- Bruce Perens, on the future of Open Source software. (Open Sources, 1999 O'Reilly and Associates)
+%
+"The reason for the success of this somewhat communist-sounding strategy, while the failure of communism itself is visible around the world, is that the economics of information are fundamentaly different from those of other products."
+
+  -- Bruce Perens, on Open Source software. (Open Sources, 1999 O'Reilly and Associates)
+%
+"It is easy to sympathize with the MIS staffs around the world, I mean who hasn't lost work due to Windows or a Microsoft application crashing?"
+
+  -- Chris DiBona, happy he's been using Linux and can avoid such things, from the introduction. (Open Sources, 1999 O'Reilly and Associates) 
+%
+"So I decided that if the architecture is fundamentally sane enough, say it follows some basic rules like it supported paging , then I would be able to say, yes, Linux fundamentally supports that model."
+
+  -- Linus Torvalds on Portability (Open Sources, 1999 O'Reilly and Associates)
+%
+"I'm not saying that they were knowingly dishonest, perhaps they were simply stupid. "
+
+  -- Linus Torvalds, commenting on those who really thought Microkernels were wise. (Open Sources, 1999 O'Reilly and Associates)
+%
+"The idea of abstracting away the one thing that must be blindingly fast, the kernel, is inherently counter productive." 
+
+  -- Linus Torvalds on Microkernels (Open Sources, 1999 O'Reilly & Associates)
+%
+"So right now the only vendor that does such a stupid thing is Microsoft."
+
+  -- Linus Torvalds on bad file system interface design. (Open Sources , 1999 O'Reilly and Associates.)
+%
+"Eric also holds a black belt in Tae Kwon Do and shoots pistols for relaxation,  His favorite gun is the classic 1911-pattern .45 semiautomatic"
+
+  -- Chris DiBona on neo-renassaince Homo Heileinias Eric S. Raymond. (Open Sources, 1999 O'Reilly and Associates)
+%
+"The world is beating a path to our door"
+
+  -- Bruce Perens, (Open Sources, 1999 O'Reilly and Associates)
+%
+"If you want an application to be portable, you don't necessarily create an abstraction layer like a microkernel so much as you program intelligently."
+
+  -- Linus Torvalds on Microkernels (Open Sources, 1999 O'Reilly and Associates)
+%
+"Calling EMACS an editor is like calling the Earth a hunk of dirt."
+
+  -- Chris DiBona on Dirt (Open Sources, 1999 O'Reilly and Associates)
+%
+"I am not convinced that they can write solid stable software. Proprietary software is already hobbled by it's secretive cathedral nature, but Microsoft seems to have a corner on incompetent programming as well."
+
+  -- Chris DiBona from the introduction. (Open Sources, 1999 O'Reilly and Associates)
+%
+"The funny thing is if you actually read those papers, you find that, while the researchers were applying thier optomizational tricks on a microkernel, in fact those same tricks could be applied to traditional kernels to accelerate thier execution."
+
+  -- Linus Torvalds on Microkernels (Open Sources, 1999 O'Reilly and Associates)
+%
+"Computers and autmation have become so ingrained and essentaial to day-to-day business that a sensible business should not rely on a single vendor to provide essential services........Thus is is always in a customers' interests to demand that the software they deploy be based on non-proprietary platforms."
+
+  -- Brian Behlendorf on OSS (Open Sources, 1999 O'Reilly and Associates)
+%
+"Nature abhors a Vacuum"
+
+  -- Brian Behlendorf on OSS (Open Sources, 1999 O'Reilly and Associates)
+%
+"While not obviously a business-friendly licensem there are certain aspects of the GNU license which are attractive, believe it or not, for commercial purposes."
+
+  -- Brian Behlendorf on OSS (Open Sources, 1999 O'Reilly and Associates)
+%
+"The open-source approach is not a magic bullet for every type of software development project."
+
+  -- Brian Behlendorf on OSS (Open Sources, 1999 O'Reilly and Associates)
+%
+"For something that does not exist, the Internet Engineering Task Force has has quite an impact."
+
+  -- Scott Bradner (Open Sources, 1999 O'Reilly and Associates)
+%
+"The basic publication series for te IETF is the RFC series. RPF once stood for 'Request for Comments,' but since documents published as RFCs have generally gone through an extensive review process before publication, RFC is now best known understood to mean 'RFC' "
+ 
+  -- Scott Bradner (Open Sources, 1999 O'Reilly and Associates)
+%
+"The IETF motto is 'rouch consesus and running code'"
+  
+  -- Scott Bradner (Open Sources, 1999 O'Reilly and Associates)
+%
+"Open Standars, Open Documents, and Open Source"
+
+  -- Scott Bradner (Open Sources, 1999 O'Reilly and Associates)
+%
+"So here's a picture of reality: (picture of circle with lots of sqiggles in it) As we all know, reality is a mess."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"However, complexity is not always the enemy."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"Suppose I want to take over the world. Simplicity says I should just take over the world by myself."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"People get annoyed when you try to debug them."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"Computers may be stupid, but they're always obedient. Well, almost always."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"You know, how is The Force like duct tape? Answer: it has a light side, a dark side, and it holds the universe together."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"Of course, in Perl culture, almost nothis is prohibited. My feeling is that the rest of the world already has plenty of perfectly good prohibitions, so why invent more?"
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"There are a billion people in China. And I want them to be able to pass notes to each other written in Perl. I want them to be able to write poetry in Perl. 
+
+That is my vision of the Future. My chosen perspective."
+
+  -- Larry Wall (Open Sources, 1999 O'Reilly and Associates)
+%
+"In a way they were right the basics of operating systems, and by extension the Linux kernel, were well understood by the early 70s; anything after that has been to some degree an exercise in self-gratification."
+
+  -- Linus Torvalds (Open Sources, 1999 O'Reilly and Associates)
+%
+"The move was on to 'Free the Lizard'"
+
+  -- Jim Hamerly and Tom Paquin (Open Sources, 1999 O'Reilly and Associates)
+%
+
