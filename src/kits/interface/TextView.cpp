@@ -911,35 +911,8 @@ BTextView::MessageReceived(BMessage *message)
 					delete fClickRunner;
 					fClickRunner = NULL;
 				}
-			} else {
-				// Scroll the view a bit if mouse is outside the view bounds
-				
-				BRect bounds = Bounds();
-				
-				// TODO: Horizontal scrolling
-				/*if (fWhere.x > bounds.right)
-					scrollBy.x = fWhere.x - bounds.right;
-				else if (fWhere.x < bounds.left)
-					scrollBy.x = fWhere.x - bounds.left;
-				*/
-				float lineHeight = 0;
-				float diff = 0;
-				if (fWhere.y > bounds.bottom) {
-					lineHeight = LineHeight(LineAt(bounds.LeftBottom()));
-					diff = fWhere.y - bounds.bottom;
-				} else if (fWhere.y < bounds.top) {
-					lineHeight = LineHeight(LineAt(bounds.LeftTop()));
-					diff = fWhere.y - bounds.top; // negative value					
-				}
-				
-				// Always scroll vertically by multiples of line height,
-				// based on the distance of the cursor from the border of the view
-				// TODO: Refine this, I can't even remember how beos works here
-				BPoint scrollBy;
-				scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(diff) / lineHeight) : 0;
-				if (scrollBy != B_ORIGIN)
-					ScrollBy(scrollBy.x, scrollBy.y);
-			}
+			} else
+				PerformAutoScrolling();
 			break;
 		}
 
@@ -1690,7 +1663,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		// special case: go down one line if inOffset is a newline
 		if (inOffset == textLength && (*fText)[inOffset - 1] == B_ENTER) {
 			float ascent, descent;
-			StyledWidth(inOffset, 1, &ascent, &descent);
+			StyledWidthUTF8Safe(inOffset, 1, &ascent, &descent);
 			
 			result.y += height;
 			height = ascent + descent;
@@ -1698,23 +1671,23 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		} else {
 			int32 offset = line->offset;
 			int32 length = inOffset - line->offset;
-			int32 numChars = length;
+			int32 numBytes = length;
 			bool foundTab = false;		
 			do {
-				foundTab = fText->FindChar(B_TAB, offset, &numChars);
+				foundTab = fText->FindChar(B_TAB, offset, &numBytes);
 				
-				float width = StyledWidth(offset, numChars);	
+				float width = StyledWidth(offset, numBytes);	
 				
 				result.x += width;
 					
 				if (foundTab) {
 					result.x += ActualTabWidth(result.x);
-					numChars++;
+					numBytes++;
 				}
 				
-				offset += numChars;
-				length -= numChars;
-				numChars = length;
+				offset += numBytes;
+				length -= numBytes;
+				numBytes = length;
 			} while (foundTab && length > 0);
 		} 		
 	}
@@ -3497,6 +3470,21 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 }
 
 
+// Unlike the StyledWidth method, this one takes as parameter
+// the number of chars, not the number of bytes.
+float
+BTextView::StyledWidthUTF8Safe(int32 fromOffset, int32 numChars,
+					float *outAscent, float *outDescent) const
+{
+	int32 toOffset = fromOffset;
+	while (numChars--)
+		toOffset = NextInitialByte(toOffset);
+	
+	const int32 length = toOffset - fromOffset;
+	return StyledWidth(fromOffset, length, outAscent, outDescent); 
+}
+
+
 /*! \brief Calculate the actual tab width for the given location.
 	\param location The location to calculate the tab width of.
 	\return The actual tab width for the given location
@@ -4004,6 +3992,41 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 	}
 	
 	return true;
+}
+
+
+void
+BTextView::PerformAutoScrolling()
+{
+	// Scroll the view a bit if mouse is outside the view bounds
+	BRect bounds = Bounds();
+	BPoint scrollBy;
+			
+	// TODO: refine horizontal scrolling, for example by
+	// scrolling char by char and not using fixed values
+	if (fWhere.x > bounds.right) {
+		scrollBy.x = floorf((fWhere.x - bounds.right) / 10);
+	} else if (fWhere.x < bounds.left) {
+		scrollBy.x = floorf((fWhere.x - bounds.left) / 10); // negative value
+	}
+	
+	float lineHeight = 0;
+	float vertDiff = 0;
+	if (fWhere.y > bounds.bottom) {
+		lineHeight = LineHeight(LineAt(bounds.LeftBottom()));
+		vertDiff = fWhere.y - bounds.bottom;
+	} else if (fWhere.y < bounds.top) {
+		lineHeight = LineHeight(LineAt(bounds.LeftTop()));
+		vertDiff = fWhere.y - bounds.top; // negative value					
+	}
+	
+	// Always scroll vertically line by line or by multiples of that
+	// based on the distance of the cursor from the border of the view
+	// TODO: Refine this, I can't even remember how beos works here
+	scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff) / lineHeight) : 0;
+	
+	if (scrollBy != B_ORIGIN)
+		ScrollBy(scrollBy.x, scrollBy.y);
 }
 
 

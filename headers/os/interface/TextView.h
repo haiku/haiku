@@ -311,6 +311,11 @@ virtual void			_ReservedTextView12();
 									int32	length,
 									float	*outAscent = NULL, 
 									float	*outDescent = NULL) const;
+		float			StyledWidthUTF8Safe(int32 fromOffset,
+											int32 numChars,
+											float	*outAscent = NULL, 
+											float	*outDescent = NULL) const;
+		
 		float			ActualTabWidth(float location) const;
 		
 		void			DoInsertText(const char				*inText, 
@@ -343,7 +348,8 @@ virtual void			_ReservedTextView12();
 		bool			MessageDropped(BMessage	*inMessage, 
 									   BPoint	where,
 									   BPoint	offset);
-											
+									   
+		void			PerformAutoScrolling();									
 		void			UpdateScrollbars();
 		void			AutoResize(bool doredraw=true);
 		
