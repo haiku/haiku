@@ -40,7 +40,7 @@ public:
 			void	SetEscapeCancel(const bool &value) { fEscapeCancel = value; }
 			bool	IsEscapeCancel(void) const { return fEscapeCancel; }
 private:
-			friend AutoTextControlFilter;
+			friend class AutoTextControlFilter;
 			
 			AutoTextControlFilter	*fFilter;
 			bool					fEscapeCancel;

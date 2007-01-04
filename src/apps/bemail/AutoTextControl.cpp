@@ -24,8 +24,8 @@ AutoTextControlFilter::~AutoTextControlFilter(void)
 }
 
 filter_result
-AutoTextControlFilter::Filter(BMessage *msg, BHandler **target) {
-
+AutoTextControlFilter::Filter(BMessage *msg, BHandler **target)
+{
 	// This is really slick -- all that is needed to allow Escape key cancelling is
 	// just calling SetEscapeCancel(true) for just *one* AutoTextControl in a window. *heh*
 	int32 rawchar,mod;
