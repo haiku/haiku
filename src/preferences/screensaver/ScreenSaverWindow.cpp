@@ -43,18 +43,19 @@ const int32 kMsgSaverSelected = 'SSEL';
 const int32 kMsgTestSaver = 'TEST';
 const int32 kMsgAddSaver = 'ADD ';
 const int32 kMsgPasswordCheckBox = 'PWCB';
+const int32 kMsgRunSliderChanged = 'RSch';
 const int32 kMsgRunSliderUpdate = 'RSup';
+const int32 kMsgPasswordSliderChanged = 'PWch';
 const int32 kMsgPasswordSliderUpdate = 'PWup';
 const int32 kMsgChangePassword = 'PWBT';
 const int32 kMsgEnableScreenSaverBox = 'ESCH';
 
 const int32 kMsgTurnOffCheckBox = 'TUOF';
+const int32 kMsgTurnOffSliderChanged = 'TUch';
 const int32 kMsgTurnOffSliderUpdate = 'TUup';
 
 const int32 kMsgFadeCornerChanged = 'fdcc';
 const int32 kMsgNeverFadeCornerChanged = 'nfcc';
-
-const uint32 kMsgTimeSliderChanged = 'tsch';
 
 
 class TimeSlider : public BSlider {
@@ -657,7 +658,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(stringView);
 
 	rect.left += labelWidth;
-	fRunSlider = new TimeSlider(rect, "RunSlider", kMsgTimeSliderChanged,
+	fRunSlider = new TimeSlider(rect, "RunSlider", kMsgRunSliderChanged,
 		kMsgRunSliderUpdate);
 	float width, height;
 	fRunSlider->GetPreferredSize(&width, &height);
@@ -673,8 +674,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(fTurnOffCheckBox);
 
 	rect.left += radioButtonOffset + labelWidth;
-	fTurnOffSlider = new TimeSlider(rect, "TurnOffSlider", kMsgTimeSliderChanged,
-		kMsgTurnOffSliderUpdate);
+	fTurnOffSlider = new TimeSlider(rect, "TurnOffSlider",
+		kMsgTurnOffSliderChanged, kMsgTurnOffSliderUpdate);
 	fTurnOffSlider->ResizeTo(fTurnOffSlider->Bounds().Width(), height);
 	box->AddChild(fTurnOffSlider);
 
@@ -687,8 +688,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(fPasswordCheckBox);
 
 	rect.left += radioButtonOffset + labelWidth;
-	fPasswordSlider = new TimeSlider(rect, "PasswordSlider", kMsgTimeSliderChanged,
-		kMsgPasswordSliderUpdate);
+	fPasswordSlider = new TimeSlider(rect, "PasswordSlider",
+		kMsgPasswordSliderChanged, kMsgPasswordSliderUpdate);
 	fPasswordSlider->ResizeTo(fPasswordSlider->Bounds().Width(), height);
 	box->AddChild(fPasswordSlider);
 
@@ -829,9 +830,10 @@ ScreenSaverWindow::SetMinimalSizeLimit(float width, float height)
 void
 ScreenSaverWindow::MessageReceived(BMessage *msg)
 {
-	switch (msg->what) {
-		// "Fade" tab
+	// "Fade" tab, slider updates
 
+	switch (msg->what) {
+		case kMsgRunSliderChanged:
 		case kMsgRunSliderUpdate:
 			if (fRunSlider->Value() > fTurnOffSlider->Value())
 				fTurnOffSlider->SetValue(fRunSlider->Value());
@@ -840,21 +842,29 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 				fPasswordSlider->SetValue(fRunSlider->Value());
 			break;
 
-		case kMsgTurnOffCheckBox:
-			fTurnOffSlider->SetEnabled(fTurnOffCheckBox->Value() == B_CONTROL_ON);
-			break;
-
+		case kMsgTurnOffSliderChanged:
 		case kMsgTurnOffSliderUpdate:
 			if (fRunSlider->Value() > fTurnOffSlider->Value())
 				fRunSlider->SetValue(fTurnOffSlider->Value());
 			break;
 
+		case kMsgPasswordSliderChanged:
 		case kMsgPasswordSliderUpdate:
 			if (fPasswordSlider->Value() < fRunSlider->Value())
 				fRunSlider->SetValue(fPasswordSlider->Value());
 			break;
+	}
 
-		case kMsgTimeSliderChanged:
+	switch (msg->what) {
+		// "Fade" tab
+
+		case kMsgTurnOffCheckBox:
+			fTurnOffSlider->SetEnabled(fTurnOffCheckBox->Value() == B_CONTROL_ON);
+			break;
+
+		case kMsgRunSliderChanged:
+		case kMsgTurnOffSliderChanged:
+		case kMsgPasswordSliderChanged:
 		case kMsgPasswordCheckBox:
 		case kMsgEnableScreenSaverBox:
 		case kMsgFadeCornerChanged:
@@ -872,8 +882,11 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 		case kMsgUpdateList:
 			fModulesView->PopulateScreenSaverList();
 			break;
+
+		default:
+			BWindow::MessageReceived(msg);
+			break;
   	}
-	BWindow::MessageReceived(msg);
 }
 
 
