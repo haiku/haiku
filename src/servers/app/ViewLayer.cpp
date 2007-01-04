@@ -900,6 +900,12 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 			   newFrame.top - fFrame.top, dirtyRegion);
 
 		ResizeBy(widthDiff, heightDiff, dirtyRegion);
+	} else {
+		// TODO: this covers the fact that our screen clipping might change
+		// when the parent changes its size, even though our frame stays
+		// the same - there might be a way to test for this, but axeld doesn't
+		// know, stippi should look into this when he's back :)
+		InvalidateScreenClipping();
 	}
 }
 

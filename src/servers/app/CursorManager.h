@@ -39,7 +39,7 @@ class CursorManager : public BLocker {
 		int32			AddCursor(ServerCursor* cursor, int32 token = -1);
 		void			DeleteCursors(team_id team);
 
-		void			RemoveCursor(ServerCursor* cursor);
+		bool			RemoveCursor(ServerCursor* cursor);
 
 		void			SetCursorSet(const char* path);
 		ServerCursor*	GetCursor(cursor_which which);

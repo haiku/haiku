@@ -50,6 +50,7 @@ class ServerCursor : public ServerBitmap {
 			void			Acquire()
 								{ atomic_add(&fReferenceCount, 1); }
 			bool			Release();
+			int32			ReferenceCount() { return fReferenceCount; }
 
 			void			SetPendingViewCursor(bool pending);
 
@@ -63,7 +64,7 @@ class ServerCursor : public ServerBitmap {
 
 			BPoint			fHotSpot;
 			team_id			fOwningTeam;
-			int32			fReferenceCount;
+			vint32			fReferenceCount;
 			uint8*			fCursorData;
 			CursorManager*	fManager;
 			vint32			fPendingViewCursor;

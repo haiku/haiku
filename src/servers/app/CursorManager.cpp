@@ -133,19 +133,27 @@ CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 
 
 /*!
-	\brief Releases a reference to a cursor
+	\brief Removes a cursor if it's not referenced anymore.
 
 	If this was the last reference to this cursor, it will be deleted.
+	Only if the cursor is deleted, \c true is returned.
 */
-void
+bool
 CursorManager::RemoveCursor(ServerCursor* cursor)
 {
 	if (!Lock())
-		return;
+		return false;
+
+	if (cursor->ReferenceCount() > 0) {
+		// cursor has been referenced again in the mean time
+		Unlock();
+		return false;
+	}
 
 	_RemoveCursor(cursor);
 
 	Unlock();
+	return true;
 }
 
 

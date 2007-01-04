@@ -197,11 +197,10 @@ ServerCursor::Release()
 			return false;
 		}
 
-		if (fManager) {
-			fManager->RemoveCursor(this);
-		}
-		delete this;
+		if (fManager && !fManager->RemoveCursor(this))
+			return false;
 
+		delete this;
 		return true;
 	}
 	return false;
