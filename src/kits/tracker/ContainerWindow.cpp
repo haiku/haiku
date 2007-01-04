@@ -179,9 +179,10 @@ MatchOne(const Model *model, void *castToName)
 	uint32 dummy;
 	StripShortcut(model, buffer, dummy);
 
-	if (strcmp(buffer, (const char *)castToName) == 0) 
+	if (strcmp(buffer, (const char *)castToName) == 0) {
 		// found match, bail out
 		return model;
+	}
 
 	return 0;
 }
@@ -2720,22 +2721,24 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 	dir.Rewind();
 	while (dir.GetNextEntry(&entry) == B_OK) {
-		bool primary = false;
-
-		if (entry.IsSymLink()) {
-			// resolve symlinks if needed
-			entry_ref ref;
-			entry.GetRef(&ref);
-			entry.SetTo(&ref, true);
-		}
-
 		Model *model = new Model(&entry);
-		if (model->InitCheck() != B_OK || !model->IsExecutable()) {
+
+		if (model->InitCheck() == B_OK && model->IsSymLink()) {
+			// resolve symlinks
+			Model* resolved = new Model(model->EntryRef(), true, true);
+			if (resolved->InitCheck() == B_OK)
+				model->SetLinkTo(resolved);
+			else
+				delete resolved;
+		}
+		if (model->InitCheck() != B_OK || !model->ResolveIfLink()->IsExecutable()) {
 			delete model;
 			continue;
 		}
 
 		// check if it supports at least one of the selected entries
+
+		bool primary = false;
 
 		if (mimeTypes.CountItems()) {
 			BFile file(&entry, B_READ_ONLY);
