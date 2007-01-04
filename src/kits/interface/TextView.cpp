@@ -913,21 +913,32 @@ BTextView::MessageReceived(BMessage *message)
 				}
 			} else {
 				// Scroll the view a bit if mouse is outside the view bounds
-				BPoint scrollBy;
-				BRect bounds = Bounds(); // TODO: Use the textrect instead ?
-				if (fWhere.x > bounds.right)
+				
+				BRect bounds = Bounds();
+				
+				// TODO: Horizontal scrolling
+				/*if (fWhere.x > bounds.right)
 					scrollBy.x = fWhere.x - bounds.right;
 				else if (fWhere.x < bounds.left)
 					scrollBy.x = fWhere.x - bounds.left;
+				*/
+				float lineHeight = 0;
+				float diff = 0;
+				if (fWhere.y > bounds.bottom) {
+					lineHeight = LineHeight(LineAt(bounds.LeftBottom()));
+					diff = fWhere.y - bounds.bottom;
+				} else if (fWhere.y < bounds.top) {
+					lineHeight = LineHeight(LineAt(bounds.LeftTop()));
+					diff = fWhere.y - bounds.top; // negative value					
+				}
 				
-				if (fWhere.y > bounds.bottom)
-					scrollBy.y = fWhere.y - bounds.bottom;
-				else if (fWhere.y < bounds.top)
-					scrollBy.y = fWhere.y - bounds.top;
-
-				// TODO: Review this, it's not working correctly
-				//if (scrollBy != B_ORIGIN)
-				//	ScrollBy(scrollBy.x, scrollBy.y);
+				// Always scroll vertically by multiples of line height,
+				// based on the distance of the cursor from the border of the view
+				// TODO: Refine this, I can't even remember how beos works here
+				BPoint scrollBy;
+				scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(diff) / lineHeight) : 0;
+				if (scrollBy != B_ORIGIN)
+					ScrollBy(scrollBy.x, scrollBy.y);
 			}
 			break;
 		}
@@ -1830,8 +1841,7 @@ BTextView::OffsetAt(int32 line) const
 	\param outToOffset A pointer to an integer which will contain the ending offset of the word.
 */
 void 
-BTextView::FindWord(int32 inOffset, int32 *outFromOffset,
-						 int32 *outToOffset)
+BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 {
 	int32 offset;
 	uint32 charType = CharClassification(inOffset);
@@ -2228,7 +2238,7 @@ BTextView::DoesWordWrap() const
 void
 BTextView::SetMaxBytes(int32 max)
 {
-	int32 textLength = fText->Length();
+	const int32 textLength = fText->Length();
 	fMaxBytes = max;
 
 	if (fMaxBytes < textLength)
@@ -3569,6 +3579,10 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	if (fAlignment != B_ALIGN_LEFT)
 		erase = true;
 
+	// Actually hide the caret
+	if (fCaretVisible)
+		DrawCaret(fSelStart);
+		
 	BRect eraseRect = clipRect;
 	long startEraseLine = startLine;
 	STELine* line = (*fLines)[startLine];
@@ -3922,7 +3936,7 @@ BTextView::InitiateDrag()
 
 	BMessenger messenger(this);
 	BMessage message(_DISPOSE_DRAG_);
-	fDragRunner = new (nothrow) BMessageRunner(this, &message, 100000);
+	fDragRunner = new (nothrow) BMessageRunner(messenger, &message, 100000);
 }
 
 
@@ -4401,10 +4415,10 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	int32 selectionEnd = 0;
 	message->FindInt32("be:selection", 0, &selectionStart);
 	message->FindInt32("be:selection", 1, &selectionEnd);
-
+	
 	fInline->SetSelectionOffset(selectionStart);
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
-
+	
 	// Insert the new text
 	InsertText(string, stringLen, fSelStart, NULL);
 	fSelStart += stringLen;
