@@ -148,7 +148,7 @@ class BSlider : public BControl {
 
 				float		_MinPosition() const;
 				float		_MaxPosition() const;
-				bool		_ConstrainPoint(BPoint point, BPoint compare) const;
+				bool		_ConstrainPoint(BPoint& point, BPoint compare) const;
 
 		virtual	void		_ReservedSlider5();
 		virtual	void		_ReservedSlider6();

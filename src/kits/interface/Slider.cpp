@@ -407,14 +407,20 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 	switch (bytes[0]) {
 		case B_LEFT_ARROW:
 		case B_DOWN_ARROW: {
+			int32 oldValue = Value();
+
 			SetValue(Value() - KeyIncrementValue());
-			Invoke();
+			if (oldValue != Value())
+				Invoke();
 			break;
 		}
 		case B_RIGHT_ARROW:
 		case B_UP_ARROW: {
+			int32 oldValue = Value();
+
 			SetValue(Value() + KeyIncrementValue());
-			Invoke();
+			if (oldValue != Value())
+				Invoke();
 			break;
 		}
 		default:
@@ -423,8 +429,13 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 }
 
 
+/*!
+	Makes sure the \a point is within valid bounds.
+	Returns \c true if the relevant coordinate (depending on the orientation
+	of the slider) differs from \a comparePoint.
+*/
 bool
-BSlider::_ConstrainPoint(BPoint point, BPoint comparePoint) const
+BSlider::_ConstrainPoint(BPoint& point, BPoint comparePoint) const
 {
 	if (fOrientation == B_HORIZONTAL) {
 		if (point.x != comparePoint.x) {
@@ -465,7 +476,8 @@ BSlider::MouseDown(BPoint point)
 	_ConstrainPoint(point, fInitialLocation);
 	SetValue(ValueForPoint(point));
 
-	InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
+	if (_Location() != fInitialLocation)
+		InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
 		SetTracking(true);
@@ -481,8 +493,11 @@ BSlider::MouseDown(BPoint point)
 			GetMouse(&point, &buttons, true);
 
 			if (_ConstrainPoint(point, prevPoint)) {
-				SetValue(ValueForPoint(point));
-				InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
+				int32 value = ValueForPoint(point);
+				if (value != Value()) {
+					SetValue(value);
+					InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
+				}
 			}
 		}
 		if (_Location() != fInitialLocation)
@@ -509,8 +524,11 @@ BSlider::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
 	if (IsTracking()) {
 		if (_ConstrainPoint(point, _Location())) {
-			SetValue(ValueForPoint(point));
-			InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
+			int32 value = ValueForPoint(point);
+			if (value != Value()) {
+				SetValue(value);
+				InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
+			}
 		}
 	} else
 		BControl::MouseMoved(point, transit, message);
