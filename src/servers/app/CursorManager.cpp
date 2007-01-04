@@ -144,6 +144,7 @@ CursorManager::RemoveCursor(ServerCursor* cursor)
 	if (!Lock())
 		return false;
 
+	// TODO: this doesn't work as it looks like, and it's not safe!
 	if (cursor->ReferenceCount() > 0) {
 		// cursor has been referenced again in the mean time
 		Unlock();
