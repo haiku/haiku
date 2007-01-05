@@ -76,6 +76,7 @@ handle_signals(struct thread *thread)
 		& ~atomic_get(&thread->sig_block_mask);
 	struct sigaction *handler;
 	bool reschedule = false;
+	bool restart = false;
 	int32 i;
 
 	// If SIGKILL[THR] are pending, we ignore other signals.
@@ -109,6 +110,9 @@ handle_signals(struct thread *thread)
 		handler = &thread->sig_action[i];
 
 		TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[signal]));
+
+		if ((handler->sa_flags & SA_RESTART) != 0)
+			restart = true;
 
 		if (handler->sa_handler == SIG_IGN) {
 			// signal is to be ignored
@@ -197,7 +201,10 @@ handle_signals(struct thread *thread)
 		return reschedule;
 	}
 
-	arch_check_syscall_restart(thread);
+	// only restart if SA_RESTART was set on at least one handler
+	if (restart)
+		arch_check_syscall_restart(thread);
+
 	return reschedule;
 }
 
