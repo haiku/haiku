@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2006, Haiku, Inc.
+ * Copyright (c) 2005-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -30,6 +30,7 @@
 #include <cpu_type.h>
 
 #include <stdio.h>
+#include <time.h>
 
 
 #define SCROLL_CREDITS_VIEW 'mviv'
@@ -261,7 +262,8 @@ AboutView::AboutView(const BRect &rect)
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
-	sprintf(string, "%s %s", systemInfo.kernel_build_date, systemInfo.kernel_build_time);
+	snprintf(string, sizeof(string), "%s %s",
+		systemInfo.kernel_build_date, systemInfo.kernel_build_time);
 
 	stringView = new BStringView(r, "kerneltext", string);
 	fInfoView->AddChild(stringView);
@@ -315,8 +317,16 @@ AboutView::AboutView(const BRect &rect)
 	font.SetSize(be_bold_font->Size());
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
+	time_t time = ::time(NULL);
+	struct tm* tm = localtime(&time);
+	int32 year = tm->tm_year + 1900;
+	if (year < 2007)
+		year = 2007;
+	snprintf(string, sizeof(string),
+		"Copyright " B_UTF8_COPYRIGHT "2001-%ld Haiku, Inc.\n\n", year);
+
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT "2001-2006 Haiku, Inc.\n\n");
+	fCreditsView->Insert(string);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Team Leads:\n");
