@@ -2119,12 +2119,11 @@ BMenu::UpdateWindowViewSize(bool upWind)
 			// If we need scrolling, resize the window to fit the screen and
 			// attach scrollers to our cached MenuWindow.
 			if (dynamic_cast<BMenuBar *>(Supermenu()) == NULL) {
-				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - 10);
+				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom);
 				frame.top = 0;
-			}
-			else {
-			// Or, in case our parent was a BMenuBar enable scrolling with 
-			// normal size.
+			} else {
+				// Or, in case our parent was a BMenuBar enable scrolling with 
+				// normal size.
 				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - frame.top);
 			}
 			
