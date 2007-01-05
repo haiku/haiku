@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1764,7 +1764,7 @@ extern "C" void
 RegisterDevices(input_device_ref** devices)
 {
 	CALLED();
-};
+}
 
 
 BView *
@@ -1774,8 +1774,11 @@ instantiate_deskbar_item()
 }
 
 
+//	#pragma mark -
+
+
 int
-main()
+main(int /*argc*/, char** /*argv*/)
 {
 	InputServer	*inputServer = new InputServer;
 
