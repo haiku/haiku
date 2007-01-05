@@ -181,7 +181,7 @@ scheduler_reschedule(void)
 	prevThread = NULL;
 
 	if (oldThread->cpu->disabled) {
-		// just select an idle thread
+		// CPU is disabled - just select an idle thread
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
 			prevThread = nextThread;
 			nextThread = nextThread->queue_next;
@@ -192,13 +192,13 @@ scheduler_reschedule(void)
 			// always extract real time threads
 			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 				break;
-	
+
 			// never skip last non-idle normal thread
 			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
 				break;
 
-			// skip normal threads sometimes
-			if (_rand() > 0x3000)
+			// skip normal threads sometimes (roughly 12.5%)
+			if (_rand() > 0x1000)
 				break;
 
 			prevThread = nextThread;
