@@ -186,7 +186,7 @@ SEARCH on $(svgFiles) = [ FDirName $(HAIKU_TOP) src tests kits interface picture
 AddFilesToHaikuImage beos etc artwork : $(svgFiles) ;
 
 # TODO: Use data/etc/termcap or src/libs/termcap.src?
-local etcFiles = fortunes profile termcap teapot.data ;
+local etcFiles = profile termcap teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 AddFilesToHaikuImage beos etc : $(etcFiles) ;
