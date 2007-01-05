@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -134,7 +134,9 @@ ScreenSaverFilter::~ScreenSaverFilter()
 		watch_node(&fNodeRef, B_STOP_WATCHING, fController);
 
 	be_roster->StopWatching(fController);
-	delete fController;
+
+	if (fController->Lock())
+		fController->Quit();
 }
 
 
