@@ -1064,11 +1064,8 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 		UnlockLooper();
 	}
 
-	// If sticky is false, pass 0 to the tracking function
-	// so the menu will stay in nonsticky mode
-	const bigtime_t trackTime = sticky ? system_time() : 0;
 	int action;
-	BMenuItem *menuItem = _track(&action, trackTime);
+	BMenuItem *menuItem = _track(&action, 0);
 	
 	SetStickyMode(false);
 	fExtraRect = NULL;
@@ -1398,14 +1395,11 @@ BMenu::_UpdateStateClose(BMenuItem *item, const BPoint &where, const uint32 &but
 			SetStickyMode(false);
 		}		
 	} else if (buttons == 0 && !IsStickyMode()) {
-/*		TODO: FIXME! trackTime is a hacky workaround for BMenuField. It
-		opens directly under your mouse pointer, so when you release the mouse
-		button the menu closes again because it started in non-sticky mode. */
-/*		if (system_time() < trackTime + 1000000
-			|| (fExtraRect != NULL && fExtraRect->Contains(location))) */
-		if (fExtraRect != NULL && fExtraRect->Contains(where))
+		if (fExtraRect != NULL && fExtraRect->Contains(where)) {
 			SetStickyMode(true);
-		else
+			fExtraRect = NULL;
+				// This code should be executed only once		
+		} else
 			fState = MENU_STATE_CLOSED;
 	}
 }
