@@ -70,7 +70,7 @@ actions BuildPXEstage1 {
 	ld --oformat binary --Ttext 0x7C00 -o $(1) $(1).o
 }
 
-BuildPXEstage1 pxe_stage1.bin : pxe_stage1.S ;
+BuildPXEstage1 pxehaiku : pxe_stage1.S ;
 
 SEARCH on [ FGristFiles $(bios_ia32_src) ]
 	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
@@ -85,7 +85,4 @@ SEARCH on [ FGristFiles $(bios_ia32_edid_src) ]
 SEARCH on stage1.bin
  	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
 
-# Tell the build system to where stage1.bin can be found, so it can be used
-# elsewhere.
-# SEARCH on pxe_stage1.bin = $(SUBDIR) ;
-
+SEARCH on pxe_stage1.S = $(SUBDIR) ;

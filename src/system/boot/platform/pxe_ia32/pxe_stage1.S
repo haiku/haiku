@@ -467,7 +467,7 @@ go_unreal:	pushw	%ds
 			ret
 
 
-startmsg:	.asciz	"\r\nHaiku PXE bootloader version 0.1\r\n\r\n"
+startmsg:	.asciz	"\r\nHaiku PXE bootloader version 1.0\r\n\r\n"
 unrealmsg:	.asciz	"Switch to unreal mode done\r\n"
 
 pxenvmsg:	.asciz	"PXENV+ data structure at "
@@ -485,10 +485,10 @@ fsizeis:	.asciz	"Image file size is "
 psizeis:	.asciz	"Packet size is "
 maxfsize:	.asciz	"Maximum TFTP file size is "
 maxs2size:	.asciz	"Maximum stage 2 file size is "
-etoobig: 	.asciz	"haiku-pxe-loader file is too large, loading aborted\r\n"
-sizefailed: .asciz	"\r\nCouldn't get haiku-pxe-loader  file size, loading failed\r\n"
-loadfailed: .asciz	"\r\nLoading haiku-pxe-loader (stage 2) failed\r\n"
-executing:	.asciz	"\r\nExecuting haiku-pxe-loader (stage 2)\r\n"
+etoobig: 	.asciz	"pxehaiku-loader file is too large, loading aborted\r\n"
+sizefailed: .asciz	"\r\nCouldn't get pxehaiku-loader file size, loading failed\r\n"
+loadfailed: .asciz	"\r\nLoading pxehaiku-loader (stage 2) failed\r\n"
+executing:	.asciz	"\r\nExecuting pxehaiku-loader (stage 2)\r\n"
 colon:		.asciz	":"
 dot:		.asciz	"."
 crlf:		.asciz	"\r\n"
@@ -561,8 +561,8 @@ s_PXENV_TFTP_OPEN:
 s_PXENV_TFTP_OPEN_Status:				.word 0
 s_PXENV_TFTP_OPEN_ServerIPAddress:		.long 0
 s_PXENV_TFTP_OPEN_GatewayIPAddress:		.long 0
-s_PXENV_TFTP_OPEN_FileName:				.asciz "haiku-pxe-loader"
-										.fill 111
+s_PXENV_TFTP_OPEN_FileName:				.asciz "pxehaiku-loader"
+										.fill 112
 s_PXENV_TFTP_OPEN_TFTPPort:				.word (69 << 8)
 s_PXENV_TFTP_OPEN_PacketSize:			.word 1456
 
@@ -570,8 +570,8 @@ s_PXENV_TFTP_GET_FSIZE:
 s_PXENV_TFTP_GET_FSIZE_Status:			.word 0
 s_PXENV_TFTP_GET_FSIZE_ServerIPAddress:	.long 0
 s_PXENV_TFTP_GET_FSIZE_GatewayIPAddress:.long 0
-s_PXENV_TFTP_GET_FSIZE_FileName:		.asciz "haiku-pxe-loader"
-										.fill 111
+s_PXENV_TFTP_GET_FSIZE_FileName:		.asciz "pxehaiku-loader"
+										.fill 112
 s_PXENV_TFTP_GET_FSIZE_FileSize:		.long 0
 
 s_PXENV_TFTP_READ:
