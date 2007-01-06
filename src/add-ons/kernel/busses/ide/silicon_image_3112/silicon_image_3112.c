@@ -44,12 +44,13 @@ static const struct {
 	uint16 ctl;
 	uint16 bmdma;
 	uint16 sien;
+	uint16 stat;
 	const char *name;
 } controller_channel_data[] = {
-	{  0x80,  0x8A,  0x00, 0x148, "Primary Channel" },
-	{  0xC0,  0xCA,  0x08, 0x1C8, "Secondary Channel" },
-	{ 0x280, 0x28A, 0x200, 0x348, "Tertiary Channel" },
-	{ 0x2C0, 0x2CA, 0x208, 0x3C8, "Quaternary Channel" },
+	{  0x80,  0x8A,  0x00, 0x148,  0xA0, "Primary Channel" },
+	{  0xC0,  0xCA,  0x08, 0x1C8,  0xE0, "Secondary Channel" },
+	{ 0x280, 0x28A, 0x200, 0x348, 0x2A0, "Tertiary Channel" },
+	{ 0x2C0, 0x2CA, 0x208, 0x3C8, 0x2E0, "Quaternary Channel" },
 };
 
 #define SI_SYSCFG 			0x48
@@ -94,6 +95,8 @@ typedef struct channel_data {
 	volatile uint8 *	bm_status_reg;
 	volatile uint8 *	bm_command_reg;
 	volatile uint32 *	bm_prdt_address;
+
+	volatile uint32 *	stat;
 
 	area_id				prd_area;
 	prd_entry *			prdt;
@@ -487,6 +490,7 @@ channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 	channel->bm_prdt_address = (volatile uint32 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_prdt_address);
 	channel->bm_status_reg = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_status_reg);
 	channel->bm_command_reg = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_command_reg);
+	channel->stat = (volatile uint32 *)(controller->mmio_addr + controller_channel_data[chan_index].stat);
 
 	channel->lost = 0;
 	channel->dma_active = 0;
@@ -812,12 +816,13 @@ handle_interrupt(void *arg)
 	controller_data *controller = arg;
 	ide_bm_status bm_status;
 	uint8 status;
-	int32 ret;
+	int32 result, ret;
 	int i;
 
 	FLOW("handle_interrupt\n");
 
-	// XXX This is bogus
+	result = B_UNHANDLED_INTERRUPT;
+
 	for (i = 0; i <  controller->channel_count; i++) {
 		channel_data *channel = controller->channel[i];
 		if (!channel || channel->lost)
@@ -827,16 +832,20 @@ handle_interrupt(void *arg)
 			*(uint8 *)&bm_status = *channel->bm_status_reg;
 			if (!bm_status.interrupt)
 				continue;
+		} else {
+			// for PIO, read the "Task File Configuration + Status" Interrupt status
+			if (!(*channel->stat & (1 << 11))
+				continue;
 		}
 
 		// acknowledge IRQ
 		status = *(channel->command_block + 7);
 		ret = ide->irq_handler(channel->ide_channel, status);
-		if (ret != B_UNHANDLED_INTERRUPT)
-			return ret;
+		if (ret == B_INVOKE_SHEDULER || result == B_UNHANDLED_INTERRUPT)
+			result = ret;
 	}
 
-	return B_UNHANDLED_INTERRUPT;
+	return result;
 }
 
 
