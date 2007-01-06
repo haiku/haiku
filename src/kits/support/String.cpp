@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,86 +31,6 @@
 #define REPLACE_ALL 0x7FFFFFFF
 
 
-const char *B_EMPTY_STRING = "";
-
-
-// helper function, returns minimum of two given values (but clamps to 0):
-static inline int32
-min_clamp0(int32 num1, int32 num2) 
-{ 
-	if (num1 < num2)
-		return num1 > 0 ? num1 : 0;
-
-	return num2 > 0 ? num2 : 0;
-}
-
-
-// helper function, returns length of given string (but clamps to given maximum):
-static inline int32
-strlen_clamp(const char* str, int32 max) 
-{	// this should yield 0 for max<0:
-	int32 len=0;
-	while( len<max && *str++)
-		len++;
-	return len;
-}
-
-
-// helper function, massages given pointer into a legal c-string:
-static inline const char * 
-safestr(const char* str) 
-{
-	return str ? str : "";
-}
-
-
-// helper class for BString::_ReplaceAtPositions():
-struct
-BString::PosVect {
-	PosVect() 
-		:
-		size(0),
-		bufSize(20),
-		buf(NULL)
-	{
-	}
-
-	~PosVect()
-	{
-		free(buf);
-	}
-
-	bool Add(int32 pos)
-	{
-		if (!buf || size == bufSize) {
-			if (buf)
-				bufSize *= 2;
-			int32 *newBuf = (int32 *)realloc(buf, bufSize * sizeof(int32));
-			if (!newBuf)
-				return false;
-			buf = newBuf;
-		}
-		buf[size++] = pos;
-		return true;
-	}
-
-	inline int32 ItemAt(int32 idx) const
-	{
-		return buf[idx];
-	}
-
-	inline int32 CountItems() const
-	{
-		return size;
-	}
-
-private:
-	int32 size;
-	int32 bufSize;
-	int32 *buf;
-};
-
-
 // helper macro that is used to fall into debugger if a given param check fails:
 #ifdef DEBUG
 	#define CHECK_PARAM( expr, msg) \
@@ -137,65 +57,147 @@ private:
 #endif
 
 
+//! helper class for BString::_ReplaceAtPositions():
+class BString::PosVect {
+	public:
+		PosVect();
+		~PosVect();
+
+		bool Add(int32 pos);
+
+		inline int32 ItemAt(int32 index) const
+			{ return fBuffer[index]; }
+		inline int32 CountItems() const
+			{ return fSize; }
+
+	private:
+		int32	fSize;
+		int32	fBufferSize;
+		int32*	fBuffer;
+};
+
+
+const char *B_EMPTY_STRING = "";
+
+
+// helper function, returns minimum of two given values (but clamps to 0):
+static inline int32
+min_clamp0(int32 num1, int32 num2) 
+{ 
+	if (num1 < num2)
+		return num1 > 0 ? num1 : 0;
+
+	return num2 > 0 ? num2 : 0;
+}
+
+
+//! helper function, returns length of given string (but clamps to given maximum):
+static inline int32
+strlen_clamp(const char* str, int32 max) 
+{
+	// this should yield 0 for max<0:
+	int32 length = 0;
+	while (length < max && *str++) {
+		length++;
+	}
+	return length;
+}
+
+
+//! helper function, massages given pointer into a legal c-string:
+static inline const char * 
+safestr(const char* str) 
+{
+	return str ? str : "";
+}
+
+
 //	#pragma mark -
 
 
+BString::PosVect::PosVect()
+	:
+	fSize(0),
+	fBufferSize(20),
+	fBuffer(NULL)
+{
+}
 
-// constructor
+
+BString::PosVect::~PosVect()
+{
+	free(fBuffer);
+}
+
+
+bool
+BString::PosVect::Add(int32 pos)
+{
+	if (fBuffer == NULL || fSize == fBufferSize) {
+		if (fBuffer != NULL)
+			fBufferSize *= 2;
+
+		int32* newBuffer = (int32 *)realloc(fBuffer, fBufferSize * sizeof(int32));
+		if (newBuffer == NULL)
+			return false;
+
+		fBuffer = newBuffer;
+	}
+
+	fBuffer[fSize++] = pos;
+	return true;
+}
+
+
+//	#pragma mark - BString
+
+
 BString::BString()
-	: _privateData(NULL)	
+	: fPrivateData(NULL)	
 {
 }
 
 
-// constructor
-BString::BString(const char* str)
-	: _privateData(NULL)
+BString::BString(const char* string)
+	: fPrivateData(NULL)
 {
-	if (str != NULL)
-		_Init(str, strlen(str));
+	if (string != NULL)
+		_Init(string, strlen(string));
 }
 
 
-// copy constructor
 BString::BString(const BString &string)
-	: _privateData(NULL)			
+	: fPrivateData(NULL)			
 {
 	_Init(string.String(), string.Length());
 }
 
 
-// constructor
-BString::BString(const char *str, int32 maxLength)
-	: _privateData(NULL)		
+BString::BString(const char *string, int32 maxLength)
+	: fPrivateData(NULL)		
 {
-	if (str != NULL)
-		_Init(str, strlen_clamp(str, maxLength));
+	if (string != NULL)
+		_Init(string, strlen_clamp(string, maxLength));
 }
 
 
-// destructor
 BString::~BString()
 {
-	if (_privateData)
-		free(_privateData - sizeof(int32));
+	if (fPrivateData)
+		free(fPrivateData - sizeof(int32));
 }
 
 
-/*---- Access --------------------------------------------------------------*/
-// String, implemented inline in the header
-
-// Length, implemented inline in the header
+//	#pragma mark - Access
 
 		
-// CountChars
 int32
 BString::CountChars() const
 {
 	int32 count = 0;
 
-	const char *start = _privateData;
-	const char *end = _privateData + Length();
+	const char *start = fPrivateData;
+	const char *end = fPrivateData + Length();
 
 	while (start++ != end) {
 		count++;
@@ -208,8 +210,9 @@ BString::CountChars() const
 }
 
 
-/*---- Assignment ----------------------------------------------------------*/
-// equal operator
+//	#pragma mark - Assignment
+
+
 BString&
 BString::operator=(const BString &string)
 {
@@ -219,7 +222,6 @@ BString::operator=(const BString &string)
 }
 
 
-// equal operator
 BString&
 BString::operator=(const char *str)
 {
@@ -232,7 +234,6 @@ BString::operator=(const char *str)
 }
 
 
-// equal operator
 BString&
 BString::operator=(char c)
 {
@@ -241,7 +242,6 @@ BString::operator=(char c)
 }
 
 
-// SetTo
 BString&
 BString::SetTo(const char *str, int32 maxLength)
 {
@@ -254,17 +254,17 @@ BString::SetTo(const char *str, int32 maxLength)
 }
 
 
-// SetTo
 BString&
 BString::SetTo(const BString &from)
 {
-	if (&from != this) // Avoid auto-assignment
+	if (&from != this) {
+		// Avoid auto-assignment
 		_DoAssign(from.String(), from.Length());
+	}
 	return *this;
 }
 
 
-// Adopt
 BString&
 BString::Adopt(BString &from)
 {
@@ -273,18 +273,17 @@ BString::Adopt(BString &from)
 		return *this;
 	}
 
-	if (_privateData)
-		free(_privateData - sizeof(int32));
+	if (fPrivateData)
+		free(fPrivateData - sizeof(int32));
 
 	/* "steal" the data from the given BString */
-	_privateData = from._privateData;
-	from._privateData = NULL;
+	fPrivateData = from.fPrivateData;
+	from.fPrivateData = NULL;
 
 	return *this;
 }
 
 
-// SetTo
 BString&
 BString::SetTo(const BString &string, int32 length)
 {
@@ -294,7 +293,6 @@ BString::SetTo(const BString &string, int32 length)
 }
 
 
-// Adopt
 BString&
 BString::Adopt(BString &from, int32 length)
 {
@@ -303,12 +301,12 @@ BString::Adopt(BString &from, int32 length)
 
 	int32 len = min_clamp0(length, from.Length());
 
-	if (_privateData)
-		free(_privateData - sizeof(int32));
+	if (fPrivateData)
+		free(fPrivateData - sizeof(int32));
 
 	/* "steal" the data from the given BString */
-	_privateData = from._privateData;
-	from._privateData = NULL;
+	fPrivateData = from.fPrivateData;
+	from.fPrivateData = NULL;
 
 	if (len < Length())
 		_Alloc(len);
@@ -317,7 +315,6 @@ BString::Adopt(BString &from, int32 length)
 }
 
 
-// SetTo
 BString&
 BString::SetTo(char c, int32 count)
 {
@@ -326,14 +323,14 @@ BString::SetTo(char c, int32 count)
 	int32 curLen = Length();
 	
 	if (curLen == count || _GrowBy(count - curLen)) 
-		memset(_privateData, c, count);
+		memset(fPrivateData, c, count);
 	return *this;	
 }
 
 
-/*---- Substring copying ---------------------------------------------------*/
+//	#pragma mark - Substring copying
 
-// CopyInto
+
 BString &
 BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
 {
@@ -348,7 +345,6 @@ BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
 }
 
 
-// CopyInto
 void
 BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 {
@@ -356,13 +352,14 @@ BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 		CHECK_PARAM_VOID(fromOffset >= 0, "'fromOffset' must not be negative!");
 		CHECK_PARAM_VOID(fromOffset <= Length(), "'fromOffset' exceeds length!");
 		int32 len = min_clamp0(length, Length() - fromOffset);
-		memcpy(into, _privateData + fromOffset, len);
+		memcpy(into, fPrivateData + fromOffset, len);
 	}
 }
 
 
-/*---- Appending -----------------------------------------------------------*/
-// plus operator
+//	#pragma mark - Appending
+
+
 BString&
 BString::operator+=(const char *str)
 {
@@ -372,7 +369,6 @@ BString::operator+=(const char *str)
 }
 
 
-// plus operator
 BString&
 BString::operator+=(char c)
 {
@@ -381,7 +377,6 @@ BString::operator+=(char c)
 }
 
 
-// Append
 BString&
 BString::Append(const BString &string, int32 length)
 {
@@ -390,7 +385,6 @@ BString::Append(const BString &string, int32 length)
 }
 
 
-// Append
 BString&
 BString::Append(const char *str, int32 length)
 {
@@ -402,13 +396,12 @@ BString::Append(const char *str, int32 length)
 }
 
 
-// Append
 BString&
 BString::Append(char c, int32 count)
 {
 	int32 len = Length();
 	if (count > 0 && _GrowBy(count))
-		memset(_privateData + len, c, count);
+		memset(fPrivateData + len, c, count);
 
 	return *this;
 }
@@ -463,7 +456,7 @@ BString&
 BString::Prepend(char c, int32 count)
 {
 	if (count > 0 && _OpenAtBy(0, count))
-		memset(_privateData, c, count);
+		memset(fPrivateData, c, count);
 	
 	return *this;
 }
@@ -486,7 +479,7 @@ BString::Insert(const char *str, int32 pos)
 		} else
 			pos = min_clamp0(pos, Length());
 		if (_OpenAtBy(pos, len))
-			memcpy(_privateData + pos, str, len);
+			memcpy(fPrivateData + pos, str, len);
 	}
 	return *this;
 }
@@ -507,7 +500,7 @@ BString::Insert(const char *str, int32 length, int32 pos)
 		} else
 			pos = min_clamp0(pos, Length());
 		if (_OpenAtBy(pos, len))
-			memcpy(_privateData + pos, str, len);
+			memcpy(fPrivateData + pos, str, len);
 	}
 	return *this;
 }
@@ -566,7 +559,7 @@ BString::Insert(char c, int32 count, int32 pos)
 		pos = min_clamp0(pos, Length());
 	
 	if (count > 0 && _OpenAtBy(pos, count))
-		memset(_privateData + pos, c, count);
+		memset(fPrivateData + pos, c, count);
 	
 	return *this;
 }
@@ -587,7 +580,7 @@ BString::Truncate(int32 newLength, bool lazy)
 		if (lazy) {
 			// don't free memory yet, just set new length
 			_SetLength(newLength);
-			_privateData[newLength] = '\0';
+			fPrivateData[newLength] = '\0';
 		} else
 			_Alloc(newLength);
 	}
@@ -699,8 +692,8 @@ BString::MoveInto(BString &into, int32 from, int32 length)
 	if (&into == this) {
 		/* TODO: [zooey]: to be activated later (>R1):
 		// strings are identical, just move the data:
-		if (from>0 && _privateData)
-			memmove( _privateData, _privateData+from, len);
+		if (from>0 && fPrivateData)
+			memmove( fPrivateData, fPrivateData+from, len);
 		Truncate( len);
 		*/
 		return *this;
@@ -1088,7 +1081,7 @@ BString::ReplaceFirst(char replaceThis, char withThis)
 {
 	int32 pos = FindFirst(replaceThis);
 	if (pos >= 0)
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 
 	return *this;
 }
@@ -1099,7 +1092,7 @@ BString::ReplaceLast(char replaceThis, char withThis)
 {
 	int32 pos = FindLast(replaceThis);
 	if (pos >= 0)
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 
 	return *this;
 }
@@ -1113,7 +1106,7 @@ BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 		pos = FindFirst(replaceThis, pos);
 		if (pos < 0)
 			break;
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 	}
 
 	return *this;
@@ -1130,7 +1123,7 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 f
 			pos = FindFirst(replaceThis, pos);
 			if (pos < 0)
 				break;
-			_privateData[pos] = withThis;
+			fPrivateData[pos] = withThis;
 		}
 	}
 	return *this;
@@ -1164,7 +1157,7 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 			if (!_ShrinkAtBy(pos, -difference))
 				return *this;
 		}
-		memcpy(_privateData + pos, withThis, len);
+		memcpy(fPrivateData + pos, withThis, len);
 	}
 		
 	return *this;
@@ -1196,7 +1189,7 @@ BString::IReplaceFirst(char replaceThis, char withThis)
 
 	int32 pos = _IFindAfter(tmp, 0, 1);
 	if (pos >= 0)
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 
 	return *this;
 }
@@ -1209,7 +1202,7 @@ BString::IReplaceLast(char replaceThis, char withThis)
 
 	int32 pos = _IFindBefore(tmp, Length(), 1);
 	if (pos >= 0)
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 	
 	return *this;
 }
@@ -1226,7 +1219,7 @@ BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 		pos = _IFindAfter(tmp, pos, 1);
 		if (pos < 0)
 			break;
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 	}
 	return *this;
 }
@@ -1239,7 +1232,7 @@ BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 
 
 	char tmp[2] = { replaceThis, '\0' };
 	
-	if (_privateData == NULL)
+	if (fPrivateData == NULL)
 		return *this;
 		
 	for (int32 pos = min_clamp0(fromOffset,Length()); 
@@ -1247,7 +1240,7 @@ BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 
 		pos = _IFindAfter(tmp, pos, 1);
 		if (pos < 0)
 			break;
-		_privateData[pos] = withThis;
+		fPrivateData[pos] = withThis;
 	}
 	return *this;
 }
@@ -1280,7 +1273,7 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 			if (!_ShrinkAtBy(pos, -difference))
 				return *this;
 		}
-		memcpy(_privateData + pos, withThis, len);
+		memcpy(fPrivateData + pos, withThis, len);
 	}
 
 	return *this;
@@ -1322,7 +1315,7 @@ BString::ReplaceSet(const char *setOfChars, char with)
 		if (offset >= length)
 			break;
 
-		_privateData[offset] = with;
+		fPrivateData[offset] = with;
 		offset++;
 	}
 
@@ -1339,7 +1332,7 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 		return ReplaceSet(setOfChars, *with);
 	}
 
-	if (setOfChars == NULL || _privateData == NULL)
+	if (setOfChars == NULL || fPrivateData == NULL)
 		return *this;
 
 	PosVect positions;
@@ -1348,7 +1341,7 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 	int32 len = Length();
 	int32 pos = 0;
 	for (int32 offset = 0; offset < len; offset += (pos+searchLen)) {
-		pos = strcspn(_privateData + offset, setOfChars);
+		pos = strcspn(fPrivateData + offset, setOfChars);
 		if (pos + offset >= len)
 			break;
 		if (!positions.Add(offset + pos))
@@ -1366,7 +1359,7 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 char &
 BString::operator[](int32 index)
 {
-	return _privateData[index];
+	return fPrivateData[index];
 }
 
 
@@ -1381,16 +1374,16 @@ BString::LockBuffer(int32 maxLength)
 	if (maxLength > len) {
 		if (!_GrowBy(maxLength - len))
 			return NULL;
-		if (!len && _privateData)
+		if (!len && fPrivateData)
 			// if string was empty before call to LockBuffer(), we make sure the
 			// buffer represents an empty c-string:
-			*_privateData = '\0';
+			*fPrivateData = '\0';
 	} else if (!maxLength && !len) {
 		// special case for unallocated string, we return an empty c-string:
 		return const_cast<char*>(String());
 	}
 
-	return _privateData;
+	return fPrivateData;
 }
 
 
@@ -1400,7 +1393,7 @@ BString::UnlockBuffer(int32 length)
 	_SetUsingAsCString(false);
 
 	if (length < 0)
-		length = (_privateData == NULL) ? 0 : strlen(_privateData);
+		length = (fPrivateData == NULL) ? 0 : strlen(fPrivateData);
 
 	if (length != Length())
 		_GrowBy(length - Length());
@@ -1416,7 +1409,7 @@ BString::ToLower()
 {
 	int32 length = Length();
 	for (int32 count = 0; count < length; count++) {
-		_privateData[count] = tolower(_privateData[count]);
+		fPrivateData[count] = tolower(fPrivateData[count]);
 	}
 
 	return *this;
@@ -1429,7 +1422,7 @@ BString::ToUpper()
 {			
 	int32 length = Length();
 	for (int32 count = 0; count < length; count++) {
-		_privateData[count] = toupper(_privateData[count]);
+		fPrivateData[count] = toupper(fPrivateData[count]);
 	}
 
 	return *this;
@@ -1440,14 +1433,14 @@ BString::ToUpper()
 BString&
 BString::Capitalize()
 {
-	if (_privateData == NULL)
+	if (fPrivateData == NULL)
 		return *this;
 
-	_privateData[0] = toupper(_privateData[0]);
+	fPrivateData[0] = toupper(fPrivateData[0]);
 	int32 length = Length();
 
 	for (int32 count = 1; count < length; count++) {
-		_privateData[count] = tolower(_privateData[count]);
+		fPrivateData[count] = tolower(fPrivateData[count]);
 	}
 
 	return *this;
@@ -1458,7 +1451,7 @@ BString::Capitalize()
 BString&
 BString::CapitalizeEachWord()
 {
-	if (_privateData == NULL)
+	if (fPrivateData == NULL)
 		return *this;
 		
 	int32 count = 0;
@@ -1467,9 +1460,9 @@ BString::CapitalizeEachWord()
 	do {
 		// Find the first alphabetical character...
 		for (; count < length; count++) {
-			if (isalpha(_privateData[count])) {
+			if (isalpha(fPrivateData[count])) {
 				// ...found! Convert it to uppercase.
-				_privateData[count] = toupper(_privateData[count]);
+				fPrivateData[count] = toupper(fPrivateData[count]);
 				count++;
 				break;
 			}
@@ -1478,8 +1471,8 @@ BString::CapitalizeEachWord()
 		// Now find the first non-alphabetical character,
 		// and meanwhile, turn to lowercase all the alphabetical ones
 		for (; count < length; count++) {
-			if (isalpha(_privateData[count]))
-				_privateData[count] = tolower(_privateData[count]);
+			if (isalpha(fPrivateData[count]))
+				fPrivateData[count] = tolower(fPrivateData[count]);
 			else
 				break;
 		}
@@ -1504,14 +1497,14 @@ BString::CharacterEscape(const char *original, const char *setOfCharsToEscape,
 BString&
 BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 {
-	if (setOfCharsToEscape == NULL || _privateData == NULL)
+	if (setOfCharsToEscape == NULL || fPrivateData == NULL)
 		return *this;
 
 	PosVect positions;
 	int32 len = Length();
 	int32 pos = 0;
 	for (int32 offset = 0; offset < len; offset += pos + 1) {
-		if ((pos = strcspn(_privateData + offset, setOfCharsToEscape)) < len - offset) {
+		if ((pos = strcspn(fPrivateData + offset, setOfCharsToEscape)) < len - offset) {
 			if (!positions.Add(offset + pos))
 				return *this;
 		}
@@ -1525,7 +1518,7 @@ BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 	}
 
 	int32 lastPos = 0;
-	char* oldAdr = _privateData;
+	char* oldAdr = fPrivateData;
 	char* newData = (char*)malloc(newLength + sizeof(int32) + 1);
 	if (newData) {
 		newData += sizeof(int32);
@@ -1546,9 +1539,9 @@ BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 		if (len > 0)
 			memcpy(newAdr, oldAdr, len);
 
-		free(_privateData - sizeof(int32));
-		_privateData = newData;
-		_privateData[newLength] = 0;
+		free(fPrivateData - sizeof(int32));
+		fPrivateData = newData;
+		fPrivateData[newLength] = 0;
 		_SetLength( newLength);
 	}
 
@@ -1684,17 +1677,17 @@ BString::operator<<(float f)
 char *
 BString::_Alloc(int32 dataLength)
 {
-	char *dataPtr = _privateData ? _privateData - sizeof(int32) : NULL;
+	char *dataPtr = fPrivateData ? fPrivateData - sizeof(int32) : NULL;
 	if (dataLength <= 0) {
 		// release buffer
 #if 0
 		free(dataPtr);
-		_privateData = NULL;
+		fPrivateData = NULL;
 		return NULL;
 #else
 		// TODO: think about removing this work-around again; it lets
 		//	BeOS R5 NetPositive run on Haiku - this is obviously ignoring
-		//	the fact, that _privateData could be NULL at one point
+		//	the fact, that fPrivateData could be NULL at one point
 		//	(while building the menus from resources).
 		dataLength = 0;
 #endif
@@ -1704,10 +1697,10 @@ BString::_Alloc(int32 dataLength)
 	dataPtr = (char *)realloc(dataPtr, allocLength);
 	if (dataPtr) {
 		dataPtr += sizeof(int32);
-		_privateData = dataPtr;
+		fPrivateData = dataPtr;
 
 		_SetLength(dataLength);
-		_privateData[dataLength] = '\0';
+		fPrivateData[dataLength] = '\0';
 	}
 
 	return dataPtr;
@@ -1717,7 +1710,7 @@ void
 BString::_Init(const char *str, int32 len)
 {
 	if (_Alloc(len))
-		memcpy(_privateData, str, len);
+		memcpy(fPrivateData, str, len);
 }
 
 
@@ -1730,7 +1723,7 @@ BString::_DoAssign(const char *str, int32 len)
 	int32 curLen = Length();
 
 	if (len == curLen || _GrowBy(len - curLen))
-		memcpy(_privateData, str, len);
+		memcpy(fPrivateData, str, len);
 }
 
 
@@ -1742,7 +1735,7 @@ BString::_DoAppend(const char *str, int32 len)
 {
 	int32 length = Length();
 	if (_GrowBy(len))
-		memcpy(_privateData + length, str, len);
+		memcpy(fPrivateData + length, str, len);
 }
 
 
@@ -1760,7 +1753,7 @@ BString::_OpenAtBy(int32 offset, int32 length)
 
 	char* newData = _Alloc(oldLength + length);
 	if (newData != NULL) {
-		memmove(_privateData + offset + length, _privateData + offset,
+		memmove(fPrivateData + offset + length, fPrivateData + offset,
 			oldLength - offset);
 	}
 
@@ -1771,12 +1764,12 @@ BString::_OpenAtBy(int32 offset, int32 length)
 char*
 BString::_ShrinkAtBy(int32 offset, int32 length)
 {	
-	if (!_privateData)
+	if (!fPrivateData)
 		return NULL;
 
 	int32 oldLength = Length();
 
-	memmove(_privateData + offset, _privateData + offset + length,
+	memmove(fPrivateData + offset, fPrivateData + offset + length,
 		oldLength - offset - length);
 
 	// the following actually should never fail, since we are reducing the size...
@@ -1791,7 +1784,7 @@ void
 BString::_DoPrepend(const char *str, int32 count)
 {
 	if (_OpenAtBy(0, count))
-		memcpy(_privateData, str, count);
+		memcpy(fPrivateData, str, count);
 }
 
 
@@ -1835,12 +1828,12 @@ BString::_ShortFindAfter(const char *str, int32 len) const
 int32
 BString::_FindBefore(const char *str, int32 offset, int32 strlen) const
 {
-	if (_privateData) {
-		const char *ptr = _privateData + offset - strlen;
+	if (fPrivateData) {
+		const char *ptr = fPrivateData + offset - strlen;
 		
-		while (ptr >= _privateData) {	
+		while (ptr >= fPrivateData) {	
 			if (!memcmp(ptr, str, strlen))
-				return ptr - _privateData; 
+				return ptr - fPrivateData; 
 			ptr--;
 		}
 	}
@@ -1851,12 +1844,12 @@ BString::_FindBefore(const char *str, int32 offset, int32 strlen) const
 int32
 BString::_IFindBefore(const char *str, int32 offset, int32 strlen) const
 {
-	if (_privateData) {
-		char *ptr1 = _privateData + offset - strlen;
+	if (fPrivateData) {
+		char *ptr1 = fPrivateData + offset - strlen;
 		
-		while (ptr1 >= _privateData) {
+		while (ptr1 >= fPrivateData) {
 			if (!strncasecmp(ptr1, str, strlen))
-				return ptr1 - _privateData; 
+				return ptr1 - fPrivateData; 
 			ptr1--;
 		}
 	}
@@ -1908,7 +1901,7 @@ BString::_ReplaceAtPositions(const PosVect* positions,
 
 	int32 pos;
 	int32 lastPos = 0;
-	char *oldAdr = _privateData;
+	char *oldAdr = fPrivateData;
 	char *newData = (char *)malloc(newLength + sizeof(int32) + 1);
 	if (newData) {
 		newData += sizeof(int32);
@@ -1930,9 +1923,9 @@ BString::_ReplaceAtPositions(const PosVect* positions,
 		if (len > 0)
 			memcpy(newAdr, oldAdr, len);
 
-		free(_privateData - sizeof(int32));
-		_privateData = newData;
-		_privateData[newLength] = 0;
+		free(fPrivateData - sizeof(int32));
+		fPrivateData = newData;
+		fPrivateData[newLength] = 0;
 		_SetLength( newLength);
 	}
 }
@@ -1944,7 +1937,7 @@ inline
 void
 BString::_SetLength(int32 length)
 {
-	*((int32*)_privateData - 1) = length & 0x7fffffff;
+	*((int32*)fPrivateData - 1) = length & 0x7fffffff;
 }
 
 
