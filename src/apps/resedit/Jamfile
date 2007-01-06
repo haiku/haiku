@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps resedit ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared interface ;
+
+Application ResEdit :
+	App.cpp
+	PreviewColumn.cpp
+	ResourceData.cpp
+	ResourceRoster.cpp
+	ResView.cpp
+	ResWindow.cpp
+	: be tracker translation
+;

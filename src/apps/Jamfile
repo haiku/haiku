@@ -22,6 +22,7 @@ SubInclude HAIKU_TOP src apps poorman ;
 SubInclude HAIKU_TOP src apps powerstatus ;
 SubInclude HAIKU_TOP src apps processcontroller ;
 SubInclude HAIKU_TOP src apps pulse ;
+SubInclude HAIKU_TOP src apps resedit ;
 SubInclude HAIKU_TOP src apps showimage ;
 SubInclude HAIKU_TOP src apps soundrecorder ;
 SubInclude HAIKU_TOP src apps stylededit ;
