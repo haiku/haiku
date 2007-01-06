@@ -226,6 +226,8 @@ Queue::AppendDescriptorChain(uhci_td *descriptor)
 
 		element->link_log = descriptor;
 		element->link_phy = descriptor->this_phy | TD_DEPTH_FIRST;
+		if (fQueueHead->element_phy & QH_TERMINATE)
+			fQueueHead->element_phy = descriptor->this_phy;
 		TRACE(("usb_uhci: appended transfer to queue\n"));
 	}
 
@@ -247,11 +249,9 @@ Queue::RemoveDescriptorChain(uhci_td *firstDescriptor, uhci_td *lastDescriptor)
 		if ((lastDescriptor->link_phy & TD_TERMINATE) > 0) {
 			// it is the only chain in this queue
 			fQueueTop = NULL;
-			fQueueHead->element_phy = QH_TERMINATE;
 		} else {
 			// there are still linked transfers
 			fQueueTop = (uhci_td *)lastDescriptor->link_log;
-			fQueueHead->element_phy = fQueueTop->this_phy & TD_LINK_MASK;
 		}
 	} else {
 		// unlink the chain
@@ -265,16 +265,17 @@ Queue::RemoveDescriptorChain(uhci_td *firstDescriptor, uhci_td *lastDescriptor)
 
 			element = (uhci_td *)element->link_log;
 		}
+	}
 
-		element = firstDescriptor;
-		while (element && element != lastDescriptor) {
-			if ((fQueueHead->element_phy & TD_LINK_MASK) == element->this_phy) {
-				fQueueHead->element_phy = lastDescriptor->link_phy;
-				break;
-			}
-
-			element = (uhci_td *)element->link_log;
+	uhci_td *element = firstDescriptor;
+	while (element && element != lastDescriptor->link_log) {
+		if ((fQueueHead->element_phy & TD_LINK_MASK) == element->this_phy) {
+			fQueueHead->element_phy = lastDescriptor->link_phy;
+			TRACE_ERROR(("uhci: queue element pointer still pointing to removed chain\n"));
+			break;
 		}
+
+		element = (uhci_td *)element->link_log;
 	}
 
 	lastDescriptor->link_log = NULL;
@@ -357,8 +358,8 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fPCIInfo->function, PCI_command, 2, command);
 
 	// make sure we gain control of the UHCI controller instead of the BIOS
-	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device, fPCIInfo->function,
-		PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN);
+	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+		fPCIInfo->function, PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN);
 
 	// disable interrupts
 	WriteReg16(UHCI_USBINTR, 0);
@@ -522,9 +523,6 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	TRACE(("usb_uhci: submit transfer called for device %d\n", transfer->TransferPipe()->DeviceAddress()));
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
-
-	if (transfer->VectorCount() == 0)
-		return B_BAD_VALUE;
 
 	Pipe *pipe = transfer->TransferPipe();
 	bool directionIn = (pipe->Direction() == Pipe::In);
@@ -714,7 +712,7 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 
 	if (fLastTransfer)
 		fLastTransfer->link = data;
-	else
+	if (!fFirstTransfer)
 		fFirstTransfer = data;
 
 	fLastTransfer = data;
@@ -1073,7 +1071,7 @@ UHCI::InterruptHandler(void *data)
 int32
 UHCI::Interrupt()
 {
-	spinlock lock = 0;
+	static spinlock lock = 0;
 	acquire_spinlock(&lock);
 
 	// Check if we really had an interrupt
@@ -1259,6 +1257,8 @@ UHCI::CreateDescriptorChain(Pipe *pipe, uhci_td **_firstDescriptor,
 {
 	size_t packetSize = pipe->MaxPacketSize();
 	int32 descriptorCount = (bufferSize + packetSize - 1) / packetSize;
+	if (descriptorCount == 0)
+		descriptorCount = 1;
 
 	bool dataToggle = pipe->DataToggle();
 	uhci_td *firstDescriptor = NULL;
