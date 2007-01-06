@@ -834,14 +834,14 @@ handle_interrupt(void *arg)
 				continue;
 		} else {
 			// for PIO, read the "Task File Configuration + Status" Interrupt status
-			if (!(*channel->stat & (1 << 11))
+			if (!(*channel->stat & (1 << 11)))
 				continue;
 		}
 
 		// acknowledge IRQ
 		status = *(channel->command_block + 7);
 		ret = ide->irq_handler(channel->ide_channel, status);
-		if (ret == B_INVOKE_SHEDULER || result == B_UNHANDLED_INTERRUPT)
+		if (ret == B_INVOKE_SCHEDULER || result == B_UNHANDLED_INTERRUPT)
 			result = ret;
 	}
 
