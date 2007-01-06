@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -92,6 +92,7 @@ enum {
 	AS_WINDOW_MOVE,
 	AS_SET_SIZE_LIMITS,
 	AS_ACTIVATE_WINDOW,
+	AS_IS_FRONT_WINDOW,
 	AS_UPDATE_IF_NEEDED,
 
 	// BPicture definitions

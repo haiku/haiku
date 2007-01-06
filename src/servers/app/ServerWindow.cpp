@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -813,6 +813,11 @@ fDesktop->LockSingleWindow();
 			break;
 		}
 #endif
+		case AS_IS_FRONT_WINDOW:
+			fLink.StartMessage(fDesktop->FrontWindow() == fWindowLayer ? B_OK : B_ERROR);
+			fLink.Flush();
+			break;
+
 		case AS_GET_WORKSPACES:
 		{
 			STRACE(("ServerWindow %s: Message AS_GET_WORKSPACES\n", Title()));

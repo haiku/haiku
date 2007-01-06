@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -647,7 +647,17 @@ BWindow::EndViewTransaction()
 bool
 BWindow::IsFront() const
 {
-	return (IsActive() || IsModal());
+	BAutolock locker(const_cast<BWindow*>(this));
+	if (!locker.IsLocked())
+		return false;
+
+	fLink->StartMessage(AS_IS_FRONT_WINDOW);
+
+	status_t status;
+	if (fLink->FlushWithReply(status) == B_OK)
+		return status >= B_OK;
+
+	return false;
 }
 
 
