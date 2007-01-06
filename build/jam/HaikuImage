@@ -191,6 +191,14 @@ etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 AddFilesToHaikuImage beos etc : $(etcFiles) ;
 
+local fortuneFiles =  Art Computers Education Food Fortunes Goedel Haiku
+	Humorists Kids Law "Linux cookies" Love Magic Medicine Miscellaneous
+	News "One Liners" "OS Fortunes" Pets Platitudes Riddles "Songs & Poems"
+	Sports "Tech Support Excuses" ;
+fortuneFiles = $(fortuneFiles:G=etc!fortunes) ;
+SEARCH on $(fortuneFiles) = [ FDirName $(HAIKU_TOP) data etc fortunes ] ;
+AddFilesToHaikuImage beos etc fortunes : $(fortuneFiles) ;
+
 local fontDir = [ FDirName $(HAIKU_TOP) data etc fonts ] ;
 local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
 local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
