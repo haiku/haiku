@@ -1131,7 +1131,7 @@ status_t
 KDiskDeviceManager::_Scan(const char *path)
 {
 DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
-	status_t error = B_OK;
+	status_t error = B_ENTRY_NOT_FOUND;
 	struct stat st;
 	if (lstat(path, &st) < 0) {
 		return errno;
@@ -1150,7 +1150,8 @@ DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
 				|| entryPath.Append(entry->d_name) != B_OK) {
 				continue;
 			}
-			_Scan(entryPath.Path());
+			if (_Scan(entryPath.Path()) == B_OK)
+				error = B_OK;
 		}
 		closedir(dir);
 	} else {
@@ -1166,7 +1167,7 @@ DBG(OUT("  found device: %s\n", path));
 		if (!device)
 			return B_NO_MEMORY;
 		// init the KDiskDevice
-		status_t error = device->SetTo(path);
+		error = device->SetTo(path);
 		// add the device
 		if (error == B_OK && !_AddDevice(device))
 			error = B_NO_MEMORY;
