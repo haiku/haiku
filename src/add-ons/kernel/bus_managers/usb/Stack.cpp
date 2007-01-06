@@ -36,8 +36,9 @@ Stack::Stack()
 
 	fAllocator = new(std::nothrow) PhysicalMemoryAllocator("USB Stack Allocator",
 		8, B_PAGE_SIZE * 4, 64);
-	if (!fAllocator) {
+	if (!fAllocator || fAllocator->InitCheck() < B_OK) {
 		TRACE_ERROR(("usb stack: failed to allocate the allocator\n"));
+		delete fAllocator;
 		return;
 	}
 

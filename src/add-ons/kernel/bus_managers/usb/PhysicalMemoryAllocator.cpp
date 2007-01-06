@@ -26,7 +26,8 @@
 
 PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	size_t minSize, size_t maxSize, uint32 minCountPerBlock)
-	:	fOverhead(0)
+	:	fOverhead(0),
+		fStatus(B_NO_INIT)
 {
 	fName = strdup(name);
 	if (benaphore_init(&fLock, fName) < B_OK) {
@@ -84,6 +85,7 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	}
 
 	fPhysicalBase = physicalEntry.address;
+	fStatus = B_OK;
 }
 
 

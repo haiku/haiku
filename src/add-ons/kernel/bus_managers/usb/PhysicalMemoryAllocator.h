@@ -21,6 +21,8 @@ public:
 										uint32 minCountPerBlock);
 									~PhysicalMemoryAllocator();
 
+		status_t					InitCheck() { return fStatus; };
+
 		status_t					Allocate(size_t size,
 										void **logicalAddress,
 										void **physicalAddress);
@@ -43,6 +45,7 @@ private:
 
 		size_t						fOverhead;
 		size_t						fManagedMemory;
+		status_t					fStatus;
 
 		benaphore					fLock;
 		area_id						fArea;

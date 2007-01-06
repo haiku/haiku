@@ -117,12 +117,6 @@ Hub::ResetPort(uint8 index)
 		if (result < B_OK)
 			return result;
 
-		if ((fPortStatus[index].status & PORT_STATUS_CONNECTION) == 0) {
-			// device disappeared, this is no error
-			TRACE(("USB Hub: device disappeared on reset\n"));
-			return B_OK;
-		}
-
 		if (fPortStatus[index].change & C_PORT_RESET) {
 			// reset is done
 			break;
@@ -151,13 +145,21 @@ void
 Hub::Explore()
 {
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+		if (i >= 8) {
+			TRACE(("USB Hub: hub supports more ports than we do (%d)\n", fHubDescriptor.num_ports));
+			fHubDescriptor.num_ports = 8;
+			continue;
+		}
+
 		status_t result = UpdatePortStatus(i);
 		if (result < B_OK)
 			continue;
 
 #ifdef TRACE_USB
-		if (fPortStatus[i].change)
+		if (fPortStatus[i].change) {
 			TRACE(("USB Hub: port %d: status: 0x%04x; change: 0x%04x\n", i, fPortStatus[i].status, fPortStatus[i].change));
+			TRACE(("USB Hub: device at port %d: 0x%08x\n", i, fChildren[i]));
+		}
 #endif
 
 		if (fPortStatus[i].change & PORT_STATUS_CONNECTION) {
@@ -184,6 +186,7 @@ Hub::Explore()
 
 				if ((fPortStatus[i].status & PORT_STATUS_CONNECTION) == 0) {
 					// device has vanished after reset, ignore
+					TRACE(("USB Hub: device disappeared on reset\n"));
 					continue;
 				}
 
@@ -211,11 +214,41 @@ Hub::Explore()
 				// Device removed...
 				TRACE(("USB Hub Explore(): Device removed\n"));
 				if (fChildren[i]) {
+					TRACE(("USB Hub: removing device 0x%08x\n", fChildren[i]));
 					GetStack()->NotifyDeviceChange(fChildren[i], false);
 					delete fChildren[i];
 					fChildren[i] = NULL;
 				}
 			}
+		}
+
+		// other port changes we do not really handle, report and clear them
+		if (fPortStatus[i].change & PORT_STATUS_ENABLE) {
+			TRACE_ERROR(("USB Hub Explore(): port %ld %sabled\n", i, (fPortStatus[i].status & PORT_STATUS_ENABLE) ? "en" : "dis"));
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_ENABLE, i + 1,
+				0, NULL, 0, NULL);
+		}
+
+		if (fPortStatus[i].change & PORT_STATUS_SUSPEND) {
+			TRACE_ERROR(("USB Hub Explore(): port %ld is %ssuspended\n", i, (fPortStatus[i].status & PORT_STATUS_SUSPEND) ? "" : "not "));			
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_SUSPEND, i + 1,
+				0, NULL, 0, NULL);
+		}
+
+		if (fPortStatus[i].change & PORT_STATUS_OVER_CURRENT) {
+			TRACE_ERROR(("USB Hub Explore(): port %ld is %sin an over current state\n", i, (fPortStatus[i].status & PORT_STATUS_OVER_CURRENT) ? "" : "not "));			
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_OVER_CURRENT, i + 1,
+				0, NULL, 0, NULL);
+		}
+
+		if (fPortStatus[i].change & PORT_RESET) {
+			TRACE_ERROR(("USB Hub Explore(): port %ld was reset\n", i));
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_RESET, i + 1,
+				0, NULL, 0, NULL);
 		}
 	}
 
