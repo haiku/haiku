@@ -10,6 +10,7 @@
 #include <Alert.h>
 #include <OS.h>
 #include <MediaDefs.h>
+#include <be_apps/ServicesDaemon/ServicesDaemon.h>
 
 enum {
 	M_RELAUNCH_DESKBAR = 'rtsk',
@@ -22,7 +23,7 @@ enum {
 	M_RELAUNCH_MIDI
 };
 
-// Time delay in microseconds - 1 seconds
+// Time delay in microseconds - 1 second
 const bigtime_t kRelaunchDelay = 1000000;
 
 const char *gSignatures[] = {
@@ -75,6 +76,11 @@ App::~App(void)
 	
 	int32 dummyval;
 	wait_for_thread(fRelauncherID, &dummyval);
+	
+	for (int32 i = 0; i < fSignatureList.CountItems(); i++) {
+		BString *item = (BString*) fSignatureList.ItemAt(i);
+		delete item;
+	}
 }
 
 
@@ -87,6 +93,7 @@ App::QuitRequested(void)
 	return true;
 }
 
+
 void
 App::MessageReceived(BMessage *msg)
 {
@@ -95,6 +102,19 @@ App::MessageReceived(BMessage *msg)
 			BString string;
 			if (msg->FindString("be:signature",&string) != B_OK)
 				return;
+			
+			// See if the signature belongs to an app that has requested
+			// a restart
+			for (int32 i = 0; i < fSignatureList.CountItems(); i++) {
+				BString *item = (BString*) fSignatureList.ItemAt(i);
+				if (string.Compare(*item) == 0) {
+					fSignatureList.RemoveItem(item);
+					delete item;
+					
+					be_roster->Launch(string.String());
+					return;
+				}
+			}
 			
 			int i = 0;
 			while (gSignatures[i]) {
@@ -110,6 +130,12 @@ App::MessageReceived(BMessage *msg)
 				}
 				i++;
 			}
+			break;
+		}
+		case B_SERVICES_DAEMON_RESTART: {
+			BString signature;
+			if (msg->FindString("signature",&signature) == B_OK)
+				fSignatureList.AddItem(new BString(signature));
 			break;
 		}
 		case M_RELAUNCH_DESKBAR: {
@@ -142,6 +168,7 @@ App::MessageReceived(BMessage *msg)
 			be_roster->Launch(gSignatures[msg->what - M_RELAUNCH_DESKBAR]);
 			break;
 		}
+		
 		default:
 			BApplication::MessageReceived(msg);
 	}
@@ -175,10 +202,11 @@ App::RelauncherThread(void *data)
 		
 		if (msg) {
 			// Attempt to work around R5 shutdown procedures by checking for 
-			// debug_server running state. If it's shut down, then chances are that
-			// the system is shutting down or has already done so. We use the
-			// debug server in particular because it's one of the few services
-			// that is available in safe mode which is closed on system shutdown.
+			// debug_server running state. If it's shut down, then chances 
+			// are that the system is shutting down or has already done so.
+			// We use the debug server in particular because it's one of 
+			// the few services that is available in safe mode which is 
+			// closed on system shutdown.
 			
 			if (be_roster->IsRunning("application/x-vnd.Be-DBSV")) {
 				snooze(kRelaunchDelay);
@@ -192,6 +220,7 @@ App::RelauncherThread(void *data)
 	
 	return 0;
 }
+
 
 int
 main(void)

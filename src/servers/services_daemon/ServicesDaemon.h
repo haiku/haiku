@@ -19,6 +19,8 @@ private:
 			thread_id		fRelauncherID;
 			status_t		fStatus;
 			BMessageQueue	fRelaunchQueue;
+			
+			BList			fSignatureList;
 };
 
 
