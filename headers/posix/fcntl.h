@@ -1,6 +1,7 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FCNTL_H
 #define _FCNTL_H
 
@@ -17,9 +18,11 @@
 #define	F_GETFL			0x0008		/* get file status flags and access mode */
 #define	F_SETFL			0x0010		/* set file status flags */
 #define F_GETLK         0x0020		/* get locking information */
-#define F_RDLCK         0x0040		/* read or shared lock */
 #define F_SETLK         0x0080		/* set locking information */
 #define F_SETLKW        0x0100		/* as above, but waits if blocked */
+
+/* advisory locking types */
+#define F_RDLCK         0x0040		/* read or shared lock */
 #define F_UNLCK         0x0200		/* unlock */
 #define F_WRLCK         0x0400		/* write or exclusive lock */
 
@@ -50,7 +53,7 @@
 #define O_RSYNC			0x00020000	/* read synchronized I/O file integrity */
 #define O_DSYNC			0x00040000	/* write synchronized I/O data integrity */
 
-// ToDo: currently not implemented additions:
+// TODO: currently not implemented additions:
 #define O_NOFOLLOW		0x00080000
 	/* should we implement this? it's similar to O_NOTRAVERSE but will fail on symlinks */
 #define O_NOCACHE		0x00100000	/* doesn't use the file system cache if possible */
@@ -71,6 +74,7 @@ struct flock {
 	pid_t	l_pid;
 };
 
+/* for use with flock() - TODO: this should be moved to sys/file.h *if* we'll support flock() one day */
 #define	LOCK_SH		0x01	/* shared file lock */
 #define	LOCK_EX		0x02	/* exclusive file lock */
 #define	LOCK_NB		0x04	/* don't block when locking */
