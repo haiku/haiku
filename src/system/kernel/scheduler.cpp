@@ -197,12 +197,17 @@ scheduler_reschedule(void)
 			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
 				break;
 
-			// skip normal threads sometimes (roughly 12.5%)
-			if (_rand() > 0x1000)
+			// skip normal threads sometimes (roughly 4%)
+			if (_rand() > 0x500)
 				break;
 
-			prevThread = nextThread;
-			nextThread = nextThread->queue_next;
+			// skip until next lower priority
+			int32 priority = nextThread->priority;
+			while (nextThread->queue_next && priority == nextThread->queue_next->priority
+				&& nextThread->queue_next->priority > B_IDLE_PRIORITY) {
+				prevThread = nextThread;
+				nextThread = nextThread->queue_next;
+			}
 		}
 	}
 
