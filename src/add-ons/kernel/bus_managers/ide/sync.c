@@ -151,7 +151,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			// if no request is pending, the IRQ was fired wrongly
 			if (bus->num_running_reqs == 0) {
 				IDE_UNLOCK(bus);
-				return B_HANDLED_INTERRUPT;
+				return B_UNHANDLED_INTERRUPT;
 			}
 
 			bus->state = ide_state_accessing;
