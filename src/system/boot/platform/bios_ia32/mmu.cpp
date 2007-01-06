@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Based on code written by Travis Geiselbrecht for NewOS.
  *
  * Distributed under the terms of the MIT License.
@@ -27,7 +27,8 @@
  *	 0x10000 - ?		code (up to ~500 kB)
  *	 0x90000			1st temporary page table (identity maps 0-4 MB)
  *	 0x91000			2nd (4-8 MB)
- *	 0x92000 - 0xa0000	further page tables
+ *	 0x92000 - 0x92000	further page tables
+ *	 0x9e000 - 0xa0000	SMP trampoline code
  *	[0xa0000 - 0x100000	BIOS/ROM/reserved area]
  *	0x100000			page directory
  *	     ...			boot loader heap (32 kB)
@@ -63,23 +64,22 @@ struct extended_memory {
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
-static const uint32 kPageTableRegionEnd = 0x110000;
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
 
-static addr_t sNextPhysicalAddress = 0x110000;
+static addr_t sNextPhysicalAddress = 0x112000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 
-static addr_t sNextPageTableAddress = 0x100000;
+static addr_t sNextPageTableAddress = 0x7d000;
+static const uint32 kPageTableRegionEnd = 0x8b000;
+	// we need to reserve 2 pages for the SMP trampoline code
 
 #else
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
-static const uint32 kPageTableRegionEnd = 0x9e000;
-	// we need to reserve 2 pages for the SMP trampoline code
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
@@ -89,6 +89,8 @@ static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 
 static addr_t sNextPageTableAddress = 0x90000;
+static const uint32 kPageTableRegionEnd = 0x9e000;
+	// we need to reserve 2 pages for the SMP trampoline code
 
 #endif
 
