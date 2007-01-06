@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -29,7 +29,7 @@
 
 #define FLIP_Y false
 
-#define SHOW_GLYPH_BOUNDS 0
+#define SHOW_GLYPH_BOUNDS 1
 
 #if SHOW_GLYPH_BOUNDS
 #	include <agg_conv_stroke.h>
@@ -184,6 +184,7 @@ AGGTextRenderer::RenderString(const char* string,
 
 	fCurves.approximation_scale(transform.scale());
 
+#if 0
 	// use a transformation behind the curves
 	// (only if glyph->data_type == agg::glyph_data_outline)
 	// in the pipeline for the rasterizer
@@ -194,6 +195,7 @@ AGGTextRenderer::RenderString(const char* string,
 	typedef agg::conv_transform<conv_font_contour_type, agg::trans_affine>
 		conv_font_contour_trans_type;
 	conv_font_contour_trans_type transformedContourOutline(fContour, transform);
+#endif
 	float falseBoldWidth = fContour.width();
 
 	double x  = 0.0;
@@ -295,12 +297,15 @@ AGGTextRenderer::RenderString(const char* string,
 					case agg::glyph_data_outline: {
 						fRasterizer.reset();
 
+// TODO: this currently falls into an endless loop - this is a quick fix to keep the
+// app_server running - instead of the characters, their bounding boxes will be shown
+#if 0
 						if (fContour.width() == 0.0) {
 							fRasterizer.add_path(transformedOutline);
 						} else {
 							fRasterizer.add_path(transformedContourOutline);
 						}
-
+#endif
 #if SHOW_GLYPH_BOUNDS
 	agg::path_storage p;
 	p.move_to(glyphBounds.left + 0.5, glyphBounds.top + 0.5);
@@ -327,7 +332,7 @@ AGGTextRenderer::RenderString(const char* string,
 		advanceY = glyph->advance_y;
 
 		firstLoop = false;
-	};
+	}
 
 	// put pen location behind rendered text
 	// (at the baseline of the virtual next glyph)
