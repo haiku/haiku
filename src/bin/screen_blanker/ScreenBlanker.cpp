@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -154,7 +154,7 @@ ScreenBlanker::_QueueTurnOffScreen()
 	delete fStandByScreenRunner;
 	delete fSuspendScreenRunner;
 	delete fTurnOffScreenRunner;
-	
+
 	fStandByScreenRunner = fSuspendScreenRunner = fTurnOffScreenRunner = NULL;
 
 	// figure out which notifiers we need and which of them are supported
@@ -163,19 +163,21 @@ ScreenBlanker::_QueueTurnOffScreen()
 	BScreen screen;
 	uint32 capabilities = screen.DPMSCapabilites();
 	if ((capabilities & B_DPMS_OFF) == 0)
-		flags &= ENABLE_DPMS_OFF;
+		flags &= ~ENABLE_DPMS_OFF;
 	if ((capabilities & B_DPMS_SUSPEND) == 0)
-		flags &= ENABLE_DPMS_SUSPEND;
+		flags &= ~ENABLE_DPMS_SUSPEND;
 	if ((capabilities & B_DPMS_STAND_BY) == 0)
-		flags &= ENABLE_DPMS_STAND_BY;
+		flags &= ~ENABLE_DPMS_STAND_BY;
 
 	if ((flags & ENABLE_DPMS_MASK) == 0)
 		return;
 
-	if (fSettings.OffTime() == fSettings.SuspendTime())
-		flags &= ENABLE_DPMS_SUSPEND;
-	if (fSettings.SuspendTime() == fSettings.StandByTime())
-		flags &= ENABLE_DPMS_STAND_BY;
+	if (fSettings.OffTime() == fSettings.SuspendTime()
+		&& (flags & (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND)) == ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND)
+		flags &= ~ENABLE_DPMS_SUSPEND;
+	if (fSettings.SuspendTime() == fSettings.StandByTime()
+		&& (flags & (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY)) == ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY)
+		flags &= ~ENABLE_DPMS_STAND_BY;
 
 	// start them off again
 
