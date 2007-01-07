@@ -19,7 +19,7 @@ resource app_version {
 	internal = 3,
 
 	short_info = "BeMail",
-	long_info = "BeMail ©2005-2006 Haiku"
+	long_info = "BeMail ©2005-2007 Haiku, Inc."
 };
 
 resource large_icon {

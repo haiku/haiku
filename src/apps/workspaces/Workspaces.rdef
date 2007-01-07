@@ -10,7 +10,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Workspaces",
-	long_info  = "Workspaces ©2002-2006 Haiku"
+	long_info  = "Workspaces ©2002-2007 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

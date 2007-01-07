@@ -1,8 +1,6 @@
 
 resource app_signature "application/x-vnd.Haiku-Pulse";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -12,8 +10,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Pulse",
-	long_info = "Pulse ©2005-2006 Haiku"
+	long_info = "Pulse ©2005-2007 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 

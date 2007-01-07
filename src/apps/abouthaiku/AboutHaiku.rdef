@@ -11,7 +11,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "AboutHaiku",
-	long_info = "AboutHaiku ©2005-2006 Haiku, Inc."
+	long_info = "AboutHaiku ©2005-207 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

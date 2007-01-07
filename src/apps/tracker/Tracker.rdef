@@ -8,8 +8,8 @@ resource app_version {
 	variety    = B_APPV_FINAL,
 	internal   = 0,
 	short_info = "Tracker",
-	long_info  = "Tracker 5.2.1 ©1991-2001 Be Inc.,\n"
-		"©2006 Haiku"
+	long_info  = "Tracker 5.2.1 ©1991-2001 Be, Inc.,\n"
+		"©2006-2007 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

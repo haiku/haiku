@@ -4,8 +4,6 @@
 
 resource app_signature "application/x-vnd.Haiku-ShowImage";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource file_types message {
 	"types" = "image"
 };
@@ -19,8 +17,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "ShowImage",
-	long_info = "ShowImage ©2003-2006 Haiku"
+	long_info = "ShowImage ©2003-2007 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 

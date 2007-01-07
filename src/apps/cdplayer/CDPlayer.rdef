@@ -1,8 +1,6 @@
 
 resource app_signature "application/x-vnd.Haiku-CDPlayer";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -15,8 +13,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "CDPlayer",
-	long_info  = "CDPlayer ©2005-2006 Haiku"
+	long_info  = "CDPlayer ©2005-2007 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 resource large_icon {
 	$"FFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"

@@ -1,8 +1,6 @@
 
 resource app_signature "application/x-vnd.Haiku-GLTeapot";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -15,8 +13,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "GLTeapot",
-	long_info  = "GLTeapot ©2006 Haiku"
+	long_info  = "GLTeapot ©2006-2007 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"

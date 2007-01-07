@@ -1,8 +1,6 @@
 
 resource app_signature "application/x-vnd.Haiku-Expander";
 
-resource app_flags B_MULTIPLE_LAUNCH;
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -12,8 +10,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Expander",
-	long_info  = "Expander ©2004-2006 Haiku"
+	long_info  = "Expander ©2004-2007 Haiku, Inc."
 };
+
+resource app_flags B_MULTIPLE_LAUNCH;
 
 resource(1, "BEOS:FILE_TYPES") message {
 	"types" = "application/x-gzip",

@@ -10,7 +10,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Installer",
-	long_info  = "Installer ©2005-2006 Haiku"
+	long_info  = "Installer ©2005-2007 Haiku, Inc."
 };
 
 resource app_flags B_EXCLUSIVE_LAUNCH;

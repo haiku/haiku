@@ -4,8 +4,6 @@
 
 resource app_signature "application/x-vnd.Haiku-Terminal";
 
-resource app_flags B_MULTIPLE_LAUNCH;
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -15,8 +13,10 @@ resource app_version {
 	internal = 1,
 
 	short_info = "Terminal",
-	long_info = "Terminal ©2002-2006 Haiku Inc."
+	long_info = "Terminal ©2002-2007 Haiku Inc."
 };
+
+resource app_flags B_MULTIPLE_LAUNCH;
 
 resource file_types message {
 	"types" = "application/x-vnd.Be-pref"

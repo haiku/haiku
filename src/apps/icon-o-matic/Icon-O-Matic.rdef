@@ -16,7 +16,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Icon-O-Matic",
-	long_info = "Icon-O-Matic ©2006 Haiku"
+	long_info = "Icon-O-Matic ©2006-2007 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

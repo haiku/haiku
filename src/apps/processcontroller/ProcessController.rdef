@@ -10,8 +10,8 @@ resource app_version {
 	internal = 0,
 
 	short_info = "ProcessController",
-	long_info = "ProcessController ©1997-2001, G.E. Berenger,\n"
-		"©2006 Haiku"
+	long_info = "ProcessController ©1997-2001 G.E. Berenger,\n"
+		"©2006-2007 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

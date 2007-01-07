@@ -10,7 +10,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Magnify",
-	long_info  = "Magnify ©2006 Haiku"
+	long_info  = "Magnify ©2006-2007 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

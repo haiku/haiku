@@ -1,8 +1,6 @@
 
 resource app_signature "application/x-vnd.Haiku-SoundRecorder";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource app_version {
 	major      = 1,
 	middle     = 0,
@@ -10,7 +8,7 @@ resource app_version {
 	variety    = B_APPV_BETA,
 	internal   = 0,
 	short_info = "SoundRecorder",
-	long_info  = "SoundRecorder ©2005-2006 Haiku"
+	long_info  = "SoundRecorder ©2005-2007 Haiku, Inc."
 };
 
 resource file_types message {
@@ -23,6 +21,8 @@ resource file_types message {
 	"types" = "audio/aiff",
 	"types" = "audio/riff"
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 

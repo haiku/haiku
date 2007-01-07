@@ -4,8 +4,6 @@
 
 resource app_signature "application/x-vnd.Haiku-FontDemo";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource app_version {
 	major  = 1, 
 	middle = 0,
@@ -15,8 +13,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "FontDemo",
-	long_info = "FontDemo ©2006 Haiku"
+	long_info = "FontDemo ©2006-2007 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"

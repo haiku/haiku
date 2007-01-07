@@ -1,8 +1,6 @@
 
 resource app_signature "application/x-vnd.Haiku-DeskCalc";
 
-resource app_flags B_SINGLE_LAUNCH;
-
 resource app_version {
 	major  = 2,
 	middle = 1,
@@ -12,8 +10,10 @@ resource app_version {
 	internal = 1,
 
 	short_info = "DeskCalc",
-	long_info = "DeskCalc ©2006 Haiku"
+	long_info = "DeskCalc ©2006-2007 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
