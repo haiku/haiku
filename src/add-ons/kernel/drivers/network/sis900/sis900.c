@@ -37,6 +37,9 @@ int32 sis900_readMode(struct sis_info *info);
 #define PHY_ID1_ICS_1893		0xff40
 #define PHY_ID0_REALTEK_8201	0x0000
 #define PHY_ID1_REALTEK_8201	0x8200
+#define PHY_ID0_VIA_6103		0x0101
+#define PHY_ID1_VIA_6103		0x8f20
+
 #define	MII_HOME	0x0001
 #define MII_LAN		0x0002
 
@@ -59,6 +62,8 @@ const static struct mii_chip_info {
 		0x2000, 0x5C20, MII_LAN | MII_HOME},
 	{"Realtek RTL8201 PHY",
 		PHY_ID0_REALTEK_8201, PHY_ID1_REALTEK_8201, MII_LAN},
+	{"VIA 6103 PHY",
+		PHY_ID0_VIA_6103, PHY_ID1_VIA_6103, MII_LAN},
 	{NULL, 0, 0, 0}
 };
 
