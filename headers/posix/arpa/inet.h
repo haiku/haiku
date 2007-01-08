@@ -97,7 +97,7 @@ char			*inet_cidr_ntop(int, const void *, int, char *, size_t);
 int				inet_cidr_pton(int, const char *, void *, int *);
 char			*inet_ntoa(struct in_addr);
 int				inet_pton(int, const char *, void *);
-const char		*inet_ntop(int, const void *, char *, size_t);
+const char		*inet_ntop(int, const void *, char *, socklen_t);
 u_int			inet_nsap_addr(const char *, u_char *, int);
 char			*inet_nsap_ntoa(int, const u_char *, char *);
 

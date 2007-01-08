@@ -259,8 +259,8 @@ void		setprotoent __P((int));
 void		setservent __P((int));
 int		getaddrinfo __P((const char *, const char *,
 				 const struct addrinfo *, struct addrinfo **));
-int		getnameinfo __P((const struct sockaddr *, size_t, char *,
-				 size_t, char *, size_t, int));
+int		getnameinfo __P((const struct sockaddr *, socklen_t, char *,
+				 socklen_t, char *, socklen_t, int));
 void		freeaddrinfo __P((struct addrinfo *));
 const char	*gai_strerror __P((int));
 struct hostent  *getipnodebyname __P((const char *, int, int, int *));
