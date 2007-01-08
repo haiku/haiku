@@ -1365,7 +1365,7 @@
 #define HAVE_WCTYPE_H 1
 
 /* Define to 1 if you have the `wcwidth' function. */
-/* #undef HAVE_WCWIDTH */
+#define HAVE_WCWIDTH 1
 
 /* Define to 1 if you have the <winsock2.h> header file. */
 /* #undef HAVE_WINSOCK2_H */
