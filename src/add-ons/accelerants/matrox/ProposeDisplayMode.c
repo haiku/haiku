@@ -7,6 +7,8 @@
 	Rudolf Cornelissen 9/2002-5/2006
 */
 
+#include <string.h>
+
 #define MODULE_BIT 0x00400000
 
 #include "acc_std.h"
