@@ -4,6 +4,25 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared interface ;
 
+if $(TARGET_PLATFORM) = r5 {
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+
+Application ResEdit :
+	App.cpp
+	ColumnListView.cpp
+	ColumnTypes.cpp
+	ColorTools.cpp
+	PreviewColumn.cpp
+	ResourceData.cpp
+	ResourceRoster.cpp
+	ResView.cpp
+	ResWindow.cpp
+	: be tracker translation
+;
+
+} else {
+
 Application ResEdit :
 	App.cpp
 	PreviewColumn.cpp
@@ -13,3 +32,5 @@ Application ResEdit :
 	ResWindow.cpp
 	: be tracker translation
 ;
+
+}
