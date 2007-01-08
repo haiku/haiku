@@ -24,7 +24,7 @@
 /* This file is supposed to be used on platforms where <sys/stat.h> is
    incomplete.  It is intended to provide definitions and prototypes
    needed by an application.  Start with what the system provides.  */
-#include "///boot/home/svnhaiku/trunk/headers/posix/sys/stat.h"
+#include_next "sys/stat.h"
 
 #ifndef S_IFMT
 # define S_IFMT 0170000

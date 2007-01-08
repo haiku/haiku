@@ -44,7 +44,7 @@
      Include it before <inttypes.h>, since any "#include <stdint.h>"
      in <inttypes.h> would reinclude us, skipping our contents because
      _GL_STDINT_H is defined.  */
-# include "///boot/home/svnhaiku/trunk/headers/posix/stdint.h"
+# include_next "stdint.h"
 #endif
 
 /* <sys/types.h> defines some of the stdint.h types as well, on glibc,

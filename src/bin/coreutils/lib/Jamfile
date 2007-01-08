@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src bin coreutils6 lib ;
+SubDir HAIKU_TOP src bin coreutils lib ;
 
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)

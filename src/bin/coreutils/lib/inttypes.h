@@ -22,7 +22,7 @@
    which in turn includes this file.  */
 #if ! defined INTTYPES_H || defined _GL_JUST_INCLUDE_ABSOLUTE_INTTYPES_H
 # if 1
-#  include "///boot/home/svnhaiku/trunk/headers/posix/inttypes.h"
+#  include_next "inttypes.h"
 # endif
 #endif
 

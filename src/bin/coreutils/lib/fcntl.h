@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "///boot/home/svnhaiku/trunk/headers/posix/fcntl.h"
+#include_next "fcntl.h"
 
 #if !defined O_DIRECT && defined O_DIRECTIO
 /* Tru64 spells it `O_DIRECTIO'.  */
