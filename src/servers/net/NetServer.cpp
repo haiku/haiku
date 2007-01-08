@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,14 +48,17 @@ class NetServer : public BApplication {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		bool _IsValidInterface(int socket, const char* name);
+		void _RemoveInvalidInterfaces(int socket);
 		bool _TestForInterface(int socket, const char* name);
 		status_t _ConfigureInterface(int socket, BMessage& interface,
 			bool fromMessage = false);
 		bool _QuitLooperForDevice(const char* device);
 		BLooper* _LooperForDevice(const char* device);
 		status_t _ConfigureDevice(int socket, const char* path);
-		void _ConfigureDevices(int socket, const char* path);
-		void _ConfigureInterfaces(int socket);
+		void _ConfigureDevices(int socket, const char* path,
+			BMessage* suggestedInterface = NULL);
+		void _ConfigureInterfaces(int socket, BMessage* _missingDevice = NULL);
 		void _BringUpInterfaces();
 		void _StartServices();
 
@@ -321,6 +324,111 @@ NetServer::MessageReceived(BMessage* message)
 			BApplication::MessageReceived(message);
 			return;
 	}
+}
+
+
+/*!
+	Checks if an interface is valid, that is, if it has an address in any
+	family, and, in case of ethernet, a hardware MAC address.
+*/
+bool
+NetServer::_IsValidInterface(int socket, const char* name)
+{
+	ifreq request;
+	if (!prepare_request(request, name))
+		return B_ERROR;
+
+	// check if it has an address
+
+	int32 addresses = 0;
+
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		int familySocket = ::socket(kFamilies[i].family, SOCK_DGRAM, 0);
+		if (familySocket < 0)
+			continue;
+
+		if (ioctl(familySocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) == 0) {
+			if (request.ifr_addr.sa_family == kFamilies[i].family)
+				addresses++;
+		}
+
+		close(familySocket);
+	}
+
+	if (addresses == 0)
+		return false;
+
+	// check if it has a hardware address, too, in case of ethernet	
+
+	if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq)) < 0)
+		return false;
+
+	int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
+	if (linkSocket < 0)
+		return false;
+
+	prepare_request(request, request.ifr_parameter.device);
+	if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) < 0) {
+		close(linkSocket);
+		return false;
+	}
+
+	close(linkSocket);
+
+	sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
+	if (link.sdl_type == IFT_ETHER && link.sdl_alen < 6)
+		return false;
+
+	return true;
+}
+
+
+void
+NetServer::_RemoveInvalidInterfaces(int socket)
+{
+	// get a list of all interfaces
+
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+		return;
+
+	uint32 count = (uint32)config.ifc_value;
+	if (count == 0) {
+		// there are no interfaces yet
+		return;
+	}
+
+	void *buffer = malloc(count * sizeof(struct ifreq));
+	if (buffer == NULL) {
+		fprintf(stderr, "%s: Out of memory.\n", Name());
+		return;
+	}
+
+	config.ifc_len = count * sizeof(struct ifreq);
+	config.ifc_buf = buffer;
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+		return;
+
+	ifreq *interface = (ifreq *)buffer;
+
+	for (uint32 i = 0; i < count; i++) {
+		if (!_IsValidInterface(socket, interface->ifr_name)) {
+			// remove invalid interface
+			ifreq request;
+			if (!prepare_request(request, interface->ifr_name))
+				return;
+
+			if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
+				fprintf(stderr, "%s: Could not delete interface %s: %s\n",
+					Name(), interface->ifr_name, strerror(errno));
+			}
+		}
+
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + interface->ifr_addr.sa_len);
+	}
+
+	free(buffer);
 }
 
 
@@ -642,7 +750,6 @@ NetServer::_LooperForDevice(const char* device)
 status_t
 NetServer::_ConfigureDevice(int socket, const char* path)
 {
-
 	// bring interface up, but don't configure it just yet
 	BMessage interface;
 	interface.AddString("device", path);
@@ -656,7 +763,8 @@ NetServer::_ConfigureDevice(int socket, const char* path)
 
 
 void
-NetServer::_ConfigureDevices(int socket, const char* startPath)
+NetServer::_ConfigureDevices(int socket, const char* startPath,
+	BMessage* suggestedInterface)
 {
 	BDirectory directory(startPath);
 	BEntry entry;
@@ -670,19 +778,26 @@ NetServer::_ConfigureDevices(int socket, const char* startPath)
 			|| entry.GetStat(&stat) != B_OK)
 			continue;
 
-		if (S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode))
-			_ConfigureDevice(socket, path.Path());
-		else if (entry.IsDirectory())
-			_ConfigureDevices(socket, path.Path());
+		if (S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode)) {
+			if (suggestedInterface != NULL
+				&& suggestedInterface->RemoveName("device") == B_OK
+				&& suggestedInterface->AddString("device", path.Path()) == B_OK
+				&& _ConfigureInterface(socket, *suggestedInterface) == B_OK)
+				suggestedInterface = NULL;
+			else
+				_ConfigureDevice(socket, path.Path());
+		} else if (entry.IsDirectory())
+			_ConfigureDevices(socket, path.Path(), suggestedInterface);
 	}
 }
 
 
 void
-NetServer::_ConfigureInterfaces(int socket)
+NetServer::_ConfigureInterfaces(int socket, BMessage* _missingDevice)
 {
 	BMessage interface;
 	uint32 cookie = 0;
+	bool missing = false;
 	while (fSettings.GetNextInterface(cookie, interface) == B_OK) {
 		const char *device;
 		if (interface.FindString("device", &device) != B_OK)
@@ -691,8 +806,13 @@ NetServer::_ConfigureInterfaces(int socket)
 		if (!strncmp(device, "/dev/net/", 9)) {
 			// it's a kernel device, check if it's present
 			BEntry entry(device);
-			if (!entry.Exists())
+			if (!entry.Exists()) {
+				if (!missing && _missingDevice != NULL) {
+					*_missingDevice = interface;
+					missing = true;
+				}
 				continue;
+			}
 		}
 
 		_ConfigureInterface(socket, interface);
@@ -712,9 +832,12 @@ NetServer::_BringUpInterfaces()
 		return;
 	}
 
+	_RemoveInvalidInterfaces(socket);
+
 	// First, we look into the settings, and try to bring everything up from there
 
-	_ConfigureInterfaces(socket);
+	BMessage missingDevice;
+	_ConfigureInterfaces(socket, &missingDevice);
 
 	// check configuration
 
@@ -735,7 +858,8 @@ NetServer::_BringUpInterfaces()
 
 	if (!_TestForInterface(socket, "/dev/net/")) {
 		// there is no driver configured - see if there is one and try to use it
-		_ConfigureDevices(socket, "/dev/net");
+		_ConfigureDevices(socket, "/dev/net",
+			missingDevice.HasString("device") ? &missingDevice : NULL);
 	}
 
 	close(socket);
