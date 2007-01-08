@@ -1,6 +1,6 @@
 /* utimecmp.c -- compare file time stamps
 
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,38 +18,24 @@
 
 /* Written by Paul Eggert.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "utimecmp.h"
 
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-#if HAVE_STDINT_H
-# include <stdint.h>
-#endif
-
 #include <limits.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "hash.h"
 #include "intprops.h"
 #include "stat-time.h"
 #include "timespec.h"
 #include "utimens.h"
+#include "verify.h"
 #include "xalloc.h"
-
-/* Verify a requirement at compile-time (unlike assert, which is runtime).  */
-#define verify(name, assertion) struct name { char a[(assertion) ? 1 : -1]; }
 
 #ifndef MAX
 # define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
 #endif
 
 enum { BILLION = 1000 * 1000 * 1000 };
@@ -139,8 +125,8 @@ utimecmp (char const *dst_name,
 
      time_t might be unsigned.  */
 
-  verify (time_t_is_integer, TYPE_IS_INTEGER (time_t));
-  verify (twos_complement_arithmetic, TYPE_TWOS_COMPLEMENT (int));
+  verify (TYPE_IS_INTEGER (time_t));
+  verify (TYPE_TWOS_COMPLEMENT (int));
 
   /* Destination and source time stamps.  */
   time_t dst_s = dst_stat->st_mtime;

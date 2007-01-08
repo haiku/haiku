@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a string.
-   Copyright (C) 2000-2005 Free Software Foundation, Inc.
+   Copyright (C) 2000-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@
 
 /* Written by Bruno Haible <haible@clisp.cons.org>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "mbswidth.h"
@@ -32,7 +30,7 @@
 /* Get isprint().  */
 #include <ctype.h>
 
-/* Get mbstate_t, mbrtowc(), mbsinit(), wcwidth().  */
+/* Get mbstate_t, mbrtowc(), mbsinit().  */
 #if HAVE_WCHAR_H
 /* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
    <wchar.h>.
@@ -43,15 +41,15 @@
 # include <wchar.h>
 #endif
 
-/* Get iswprint(), iswcntrl().  */
+/* Get wcwidth().  */
+#include "wcwidth.h"
+
+/* Get iswcntrl().  */
 #if HAVE_WCTYPE_H
 # include <wctype.h>
 #endif
-#if !defined iswprint && !HAVE_ISWPRINT
-# define iswprint(wc) 1
-#endif
 #if !defined iswcntrl && !HAVE_ISWCNTRL
-# define iswcntrl(wc) 0
+# define iswcntrl(wc) (((wc) & ~0x1f) == 0 || (wc) == 0x7f)
 #endif
 
 #ifndef mbsinit
@@ -59,33 +57,6 @@
 #  define mbsinit(ps) 1
 # endif
 #endif
-
-#ifndef HAVE_DECL_WCWIDTH
-"this configure-time declaration test was not run"
-#endif
-#if !HAVE_DECL_WCWIDTH
-int wcwidth ();
-#endif
-
-#ifndef wcwidth
-# if !HAVE_WCWIDTH
-/* wcwidth doesn't exist, so assume all printable characters have
-   width 1.  */
-#  define wcwidth(wc) ((wc) == 0 ? 0 : iswprint (wc) ? 1 : -1)
-# endif
-#endif
-
-/* Get ISPRINT.  */
-#if defined (STDC_HEADERS) || (!defined (isascii) && !defined (HAVE_ISASCII))
-# define IN_CTYPE_DOMAIN(c) 1
-#else
-# define IN_CTYPE_DOMAIN(c) isascii(c)
-#endif
-/* Undefine to protect against the definition in wctype.h of Solaris 2.6.   */
-#undef ISPRINT
-#define ISPRINT(c) (IN_CTYPE_DOMAIN (c) && isprint (c))
-#undef ISCNTRL
-#define ISCNTRL(c) (IN_CTYPE_DOMAIN (c) && iscntrl (c))
 
 /* Returns the number of columns needed to represent the multibyte
    character string pointed to by STRING.  If a non-printable character
@@ -210,10 +181,10 @@ mbsnwidth (const char *string, size_t nbytes, int flags)
     {
       unsigned char c = (unsigned char) *p++;
 
-      if (ISPRINT (c))
+      if (isprint (c))
 	width++;
       else if (!(flags & MBSW_REJECT_UNPRINTABLE))
-	width += (ISCNTRL (c) ? 0 : 1);
+	width += (iscntrl (c) ? 0 : 1);
       else
 	return -1;
     }

@@ -45,9 +45,7 @@
  * SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
@@ -72,30 +70,33 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 #include <unistd.h>
 
 #if ! _LIBC
+# include "fcntl--.h"
 # include "lstat.h"
+# include "openat.h"
+# include "unistd--.h"
+# include "same-inode.h"
 #endif
 
-#if defined _LIBC
-# include <dirent.h>
-# define NAMLEN(dirent) _D_EXACT_NAMLEN (dirent)
-#else
-# if HAVE_DIRENT_H
-#  include <dirent.h>
-#  define NAMLEN(dirent) strlen ((dirent)->d_name)
-# else
-#  define dirent direct
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#  if HAVE_SYS_NDIR_H
-#   include <sys/ndir.h>
-#  endif
-#  if HAVE_SYS_DIR_H
-#   include <sys/dir.h>
-#  endif
-#  if HAVE_NDIR_H
-#   include <ndir.h>
-#  endif
-# endif
+#include <dirent.h>
+#ifndef _D_EXACT_NAMLEN
+# define _D_EXACT_NAMLEN(dirent) strlen ((dirent)->d_name)
 #endif
+
+#if HAVE_STRUCT_DIRENT_D_TYPE
+/* True if the type of the directory entry D is known.  */
+# define DT_IS_KNOWN(d) ((d)->d_type != DT_UNKNOWN)
+/* True if the type of the directory entry D must be T.  */
+# define DT_MUST_BE(d, t) ((d)->d_type == (t))
+#else
+# define DT_IS_KNOWN(d) false
+# define DT_MUST_BE(d, t) false
+#endif
+
+enum Fts_stat
+{
+  FTS_NO_STAT_REQUIRED = 1,
+  FTS_STAT_REQUIRED = 2
+};
 
 #ifdef _LIBC
 # undef close
@@ -129,6 +130,13 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 # define ATTRIBUTE_UNUSED __attribute__ ((__unused__))
 #endif
 
+/* If this host provides the openat function, then we can avoid
+   attempting to open "." in some initialization code below.  */
+#ifdef HAVE_OPENAT
+# define HAVE_OPENAT_SUPPORT 1
+#else
+# define HAVE_OPENAT_SUPPORT 0
+#endif
 
 static FTSENT	*fts_alloc (FTS *, const char *, size_t) internal_function;
 static FTSENT	*fts_build (FTS *, int) internal_function;
@@ -148,7 +156,6 @@ static void leave_dir (FTS *fts, FTSENT *ent) {}
 static bool setup_dir (FTS *fts) { return true; }
 static void free_dir (FTS *fts) {}
 #else
-# include "fcntl--.h"
 # include "fts-cycle.c"
 #endif
 
@@ -165,14 +172,27 @@ static void free_dir (FTS *fts) {}
 #endif
 
 #define ISDOT(a)	(a[0] == '.' && (!a[1] || (a[1] == '.' && !a[2])))
+#define STREQ(a, b)	(strcmp ((a), (b)) == 0)
 
 #define CLR(opt)	(sp->fts_options &= ~(opt))
 #define ISSET(opt)	(sp->fts_options & (opt))
 #define SET(opt)	(sp->fts_options |= (opt))
 
-#define FCHDIR(sp, fd)	(!ISSET(FTS_NOCHDIR) && fchdir(fd))
+/* FIXME: make this a function */
+#define RESTORE_INITIAL_CWD(sp)			\
+  (fd_ring_clear (&((sp)->fts_fd_ring)),	\
+   FCHDIR ((sp), (ISSET (FTS_CWDFD) ? AT_FDCWD : (sp)->fts_rfd)))
+
+/* FIXME: FTS_NOCHDIR is now misnamed.
+   Call it FTS_USE_FULL_RELATIVE_FILE_NAMES instead. */
+#define FCHDIR(sp, fd)					\
+  (!ISSET(FTS_NOCHDIR) && (ISSET(FTS_CWDFD)		\
+			   ? (cwd_advance_fd ((sp), (fd), true), 0) \
+			   : fchdir (fd)))
+
 
 /* fts_build flags */
+/* FIXME: make this an enum */
 #define BCHILD		1		/* fts_children */
 #define BNAMES		2		/* fts_children, names only */
 #define BREAD		3		/* fts_read */
@@ -181,10 +201,13 @@ static void free_dir (FTS *fts) {}
 # include <inttypes.h>
 # include <stdint.h>
 # include <stdio.h>
+# include "getcwdat.h"
 bool fts_debug = false;
-# define Dprintf(x) do { if (fts_debug) printf x; } while (0)
+# define Dprintf(x) do { if (fts_debug) printf x; } while (false)
 #else
 # define Dprintf(x)
+# define fd_ring_check(x)
+# define fd_ring_print(a, b, c)
 #endif
 
 #define LEAVE_DIR(Fts, Ent, Tag)				\
@@ -192,18 +215,100 @@ bool fts_debug = false;
     {								\
       Dprintf (("  %s-leaving: %s\n", Tag, (Ent)->fts_path));	\
       leave_dir (Fts, Ent);					\
+      fd_ring_check (Fts);					\
     }								\
   while (false)
+
+static void
+fd_ring_clear (I_ring *fd_ring)
+{
+  while ( ! i_ring_empty (fd_ring))
+    {
+      int fd = i_ring_pop (fd_ring);
+      if (0 <= fd)
+	close (fd);
+    }
+}
+
+/* Overload the fts_statp->st_size member (otherwise unused, when
+   fts_info is FTS_NSOK) to indicate whether fts_read should stat
+   this entry or not.  */
+static void
+fts_set_stat_required (FTSENT *p, bool required)
+{
+  if (p->fts_info != FTS_NSOK)
+    abort ();
+  p->fts_statp->st_size = (required
+			   ? FTS_STAT_REQUIRED
+			   : FTS_NO_STAT_REQUIRED);
+}
+
+/* file-descriptor-relative opendir.  */
+/* FIXME: if others need this function, move it into lib/openat.c */
+static inline DIR *
+internal_function
+opendirat (int fd, char const *dir)
+{
+  int new_fd = openat (fd, dir, O_RDONLY);
+  DIR *dirp;
+
+  if (new_fd < 0)
+    return NULL;
+  dirp = fdopendir (new_fd);
+  if (dirp == NULL)
+    {
+      int saved_errno = errno;
+      close (new_fd);
+      errno = saved_errno;
+    }
+  return dirp;
+}
+
+/* Virtual fchdir.  Advance SP's working directory file descriptor,
+   SP->fts_cwd_fd, to FD, and push the previous value onto the fd_ring.
+   CHDIR_DOWN_ONE is true if FD corresponds to an entry in the directory
+   open on sp->fts_cwd_fd; i.e., to move the working directory one level
+   down.  */
+static void
+internal_function
+cwd_advance_fd (FTS *sp, int fd, bool chdir_down_one)
+{
+  int old = sp->fts_cwd_fd;
+  if (old == fd && old != AT_FDCWD)
+    abort ();
+
+  if (chdir_down_one)
+    {
+      /* Push "old" onto the ring.
+	 If the displaced file descriptor is non-negative, close it.  */
+      int prev_fd_in_slot = i_ring_push (&sp->fts_fd_ring, old);
+      fd_ring_print (sp, stderr, "post-push");
+      if (0 <= prev_fd_in_slot)
+	close (prev_fd_in_slot); /* ignore any close failure */
+    }
+  else if ( ! ISSET (FTS_NOCHDIR))
+    {
+      if (0 <= old)
+	close (old); /* ignore any close failure */
+    }
+
+  sp->fts_cwd_fd = fd;
+}
 
 /* Open the directory DIR if possible, and return a file
    descriptor.  Return -1 and set errno on failure.  It doesn't matter
    whether the file descriptor has read or write access.  */
 
-static int
+static inline int
 internal_function
-diropen (char const *dir)
+diropen (FTS const *sp, char const *dir)
 {
-  return open (dir, O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
+  int open_flags = (O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK
+		    | (ISSET (FTS_PHYSICAL) ? O_NOFOLLOW : 0));
+
+  return (ISSET (FTS_CWDFD)
+	  ? openat (sp->fts_cwd_fd, dir, open_flags)
+	  : open (dir, open_flags));
 }
 
 FTS *
@@ -214,11 +319,21 @@ fts_open (char * const *argv,
 	register FTS *sp;
 	register FTSENT *p, *root;
 	register size_t nitems;
-	FTSENT *parent, *tmp = NULL;	/* pacify gcc */
+	FTSENT *parent = NULL;
+	FTSENT *tmp = NULL;	/* pacify gcc */
 	size_t len;
+	bool defer_stat;
 
 	/* Options check. */
 	if (options & ~FTS_OPTIONMASK) {
+		__set_errno (EINVAL);
+		return (NULL);
+	}
+	if ((options & FTS_NOCHDIR) && (options & FTS_CWDFD)) {
+		__set_errno (EINVAL);
+		return (NULL);
+	}
+	if ( ! (options & (FTS_LOGICAL | FTS_PHYSICAL))) {
 		__set_errno (EINVAL);
 		return (NULL);
 	}
@@ -231,8 +346,44 @@ fts_open (char * const *argv,
 	sp->fts_options = options;
 
 	/* Logical walks turn on NOCHDIR; symbolic links are too hard. */
-	if (ISSET(FTS_LOGICAL))
+	if (ISSET(FTS_LOGICAL)) {
 		SET(FTS_NOCHDIR);
+		CLR(FTS_CWDFD);
+	}
+
+	/* Initialize fts_cwd_fd.  */
+	sp->fts_cwd_fd = AT_FDCWD;
+	if ( ISSET(FTS_CWDFD) && ! HAVE_OPENAT_SUPPORT)
+	  {
+	    /* While it isn't technically necessary to open "." this
+	       early, doing it here saves us the trouble of ensuring
+	       later (where it'd be messier) that "." can in fact
+	       be opened.  If not, revert to FTS_NOCHDIR mode.  */
+	    int fd = open (".", O_RDONLY);
+	    if (fd < 0)
+	      {
+		/* Even if `.' is unreadable, don't revert to FTS_NOCHDIR mode
+		   on systems like Linux+PROC_FS, where our openat emulation
+		   is good enough.  Note: on a system that emulates
+		   openat via /proc, this technique can still fail, but
+		   only in extreme conditions, e.g., when the working
+		   directory cannot be saved (i.e. save_cwd fails) --
+		   and that happens on Linux only when "." is unreadable
+		   and the CWD would be longer than PATH_MAX.
+		   FIXME: once Linux kernel openat support is well established,
+		   replace the above open call and this entire if/else block
+		   with the body of the if-block below.  */
+		if ( openat_needs_fchdir ())
+		  {
+		    SET(FTS_NOCHDIR);
+		    CLR(FTS_CWDFD);
+		  }
+	      }
+	    else
+	      {
+		close (fd);
+	      }
+	  }
 
 	/*
 	 * Start out with 1K of file name space, and enough, in any case,
@@ -248,9 +399,24 @@ fts_open (char * const *argv,
 	}
 
 	/* Allocate/initialize root's parent. */
-	if ((parent = fts_alloc(sp, "", 0)) == NULL)
-		goto mem2;
-	parent->fts_level = FTS_ROOTPARENTLEVEL;
+	if (*argv != NULL) {
+		if ((parent = fts_alloc(sp, "", 0)) == NULL)
+			goto mem2;
+		parent->fts_level = FTS_ROOTPARENTLEVEL;
+	  }
+
+	/* The classic fts implementation would call fts_stat with
+	   a new entry for each iteration of the loop below.
+	   If the comparison function is not specified or if the
+	   FTS_DEFER_STAT option is in effect, don't stat any entry
+	   in this loop.  This is an attempt to minimize the interval
+	   between the initial stat/lstat/fstatat and the point at which
+	   a directory argument is first opened.  This matters for any
+	   directory command line argument that resides on a file system
+	   without genuine i-nodes.  If you specify FTS_DEFER_STAT along
+	   with a comparison function, that function must not access any
+	   data via the fts_statp pointer.  */
+	defer_stat = (compar == NULL || ISSET(FTS_DEFER_STAT));
 
 	/* Allocate/initialize root(s). */
 	for (root = NULL, nitems = 0; *argv != NULL; ++argv, ++nitems) {
@@ -265,11 +431,15 @@ fts_open (char * const *argv,
 		p->fts_level = FTS_ROOTLEVEL;
 		p->fts_parent = parent;
 		p->fts_accpath = p->fts_name;
-		p->fts_info = fts_stat(sp, p, ISSET(FTS_COMFOLLOW) != 0);
-
-		/* Command-line "." and ".." are real directories. */
-		if (p->fts_info == FTS_DOT)
-			p->fts_info = FTS_D;
+		/* Even when defer_stat is true, be sure to stat the first
+		   command line argument, since fts_read (at least with
+		   FTS_XDEV) requires that.  */
+		if (defer_stat && root != NULL) {
+			p->fts_info = FTS_NSOK;
+			fts_set_stat_required(p, true);
+		} else {
+			p->fts_info = fts_stat(sp, p, false);
+		}
 
 		/*
 		 * If comparison routine supplied, traverse in sorted
@@ -301,7 +471,7 @@ fts_open (char * const *argv,
 	sp->fts_cur->fts_link = root;
 	sp->fts_cur->fts_info = FTS_INIT;
 	if (! setup_dir (sp))
-	  goto mem3;
+		goto mem3;
 
 	/*
 	 * If using chdir(2), grab a file descriptor pointing to dot to ensure
@@ -310,10 +480,11 @@ fts_open (char * const *argv,
 	 * and ".." are all fairly nasty problems.  Note, if we can't get the
 	 * descriptor we run anyway, just more slowly.
 	 */
-	if (!ISSET(FTS_NOCHDIR)
-	    && (sp->fts_rfd = diropen (".")) < 0)
+	if (!ISSET(FTS_NOCHDIR) && !ISSET(FTS_CWDFD)
+	    && (sp->fts_rfd = diropen (sp, ".")) < 0)
 		SET(FTS_NOCHDIR);
 
+	i_ring_init (&sp->fts_fd_ring, -1);
 	return (sp);
 
 mem3:	fts_lfree(root);
@@ -345,7 +516,6 @@ fts_load (FTS *sp, register FTSENT *p)
 		p->fts_namelen = len;
 	}
 	p->fts_accpath = p->fts_path = sp->fts_path;
-	sp->fts_dev = p->fts_statp->st_dev;
 }
 
 int
@@ -371,17 +541,23 @@ fts_close (FTS *sp)
 	/* Free up child linked list, sort array, file name buffer. */
 	if (sp->fts_child)
 		fts_lfree(sp->fts_child);
-	if (sp->fts_array)
-		free(sp->fts_array);
+	free(sp->fts_array);
 	free(sp->fts_path);
 
-	/* Return to original directory, save errno if necessary. */
-	if (!ISSET(FTS_NOCHDIR)) {
-		if (fchdir(sp->fts_rfd))
-			saved_errno = errno;
-		(void)close(sp->fts_rfd);
-	}
+	if (ISSET(FTS_CWDFD))
+	  {
+	    if (0 <= sp->fts_cwd_fd)
+	      close (sp->fts_cwd_fd);
+	  }
+	else if (!ISSET(FTS_NOCHDIR))
+	  {
+	    /* Return to original directory, save errno if necessary. */
+	    if (fchdir(sp->fts_rfd))
+	      saved_errno = errno;
+	    close(sp->fts_rfd);
+	  }
 
+	fd_ring_clear (&sp->fts_fd_ring);
 	free_dir (sp);
 
 	/* Free up the stream pointer. */
@@ -410,7 +586,6 @@ fts_read (register FTS *sp)
 	register FTSENT *p, *tmp;
 	register unsigned short int instr;
 	register char *t;
-	int saved_errno;
 
 	/* If finished or unrecoverable error, return NULL. */
 	if (sp->fts_cur == NULL || ISSET(FTS_STOP))
@@ -441,7 +616,7 @@ fts_read (register FTS *sp)
 	    (p->fts_info == FTS_SL || p->fts_info == FTS_SLNONE)) {
 		p->fts_info = fts_stat(sp, p, true);
 		if (p->fts_info == FTS_D && !ISSET(FTS_NOCHDIR)) {
-			if ((p->fts_symfd = diropen (".")) < 0) {
+			if ((p->fts_symfd = diropen (sp, ".")) < 0) {
 				p->fts_errno = errno;
 				p->fts_info = FTS_ERR;
 			} else
@@ -502,7 +677,6 @@ fts_read (register FTS *sp)
 			   subdirectory, tell the caller.  */
 			if (p->fts_errno)
 				p->fts_info = FTS_ERR;
-			/* FIXME: see if this should be in an else block */
 			LEAVE_DIR (sp, p, "2");
 			return (p);
 		}
@@ -522,7 +696,7 @@ next:	tmp = p;
 		 * root.
 		 */
 		if (p->fts_level == FTS_ROOTLEVEL) {
-			if (FCHDIR(sp, sp->fts_rfd)) {
+			if (RESTORE_INITIAL_CWD(sp)) {
 				SET(FTS_STOP);
 				sp->fts_cur = p;
 				return (NULL);
@@ -541,7 +715,7 @@ next:	tmp = p;
 		if (p->fts_instr == FTS_FOLLOW) {
 			p->fts_info = fts_stat(sp, p, true);
 			if (p->fts_info == FTS_D && !ISSET(FTS_NOCHDIR)) {
-				if ((p->fts_symfd = diropen (".")) < 0) {
+				if ((p->fts_symfd = diropen (sp, ".")) < 0) {
 					p->fts_errno = errno;
 					p->fts_info = FTS_ERR;
 				} else
@@ -554,10 +728,30 @@ name:		t = sp->fts_path + NAPPEND(p->fts_parent);
 		*t++ = '/';
 		memmove(t, p->fts_name, p->fts_namelen + 1);
 check_for_dir:
+		if (p->fts_info == FTS_NSOK)
+		  {
+		    enum Fts_stat need_stat = p->fts_statp->st_size;
+		    switch (need_stat)
+		      {
+		      case FTS_STAT_REQUIRED:
+			p->fts_info = fts_stat(sp, p, false);
+			break;
+		      case FTS_NO_STAT_REQUIRED:
+			break;
+		      default:
+			abort ();
+		      }
+		  }
+
 		sp->fts_cur = p;
 		if (p->fts_info == FTS_D)
 		  {
-		    Dprintf (("  %s-entering: %s\n", sp, p->fts_path));
+		    /* Now that P->fts_statp is guaranteed to be valid,
+		       if this is a command-line directory, record its
+		       device number, to be used for FTS_XDEV.  */
+		    if (p->fts_level == FTS_ROOTLEVEL)
+		      sp->fts_dev = p->fts_statp->st_dev;
+		    Dprintf (("  entering: %s\n", p->fts_path));
 		    if (! enter_dir (sp, p))
 		      {
 			__set_errno (ENOMEM);
@@ -581,22 +775,26 @@ check_for_dir:
 		return (sp->fts_cur = NULL);
 	}
 
+	if (p->fts_info == FTS_NSOK)
+	  abort ();
+
 	/* NUL terminate the file name.  */
 	sp->fts_path[p->fts_pathlen] = '\0';
 
 	/*
-	 * Return to the parent directory.  If at a root node or came through
-	 * a symlink, go back through the file descriptor.  Otherwise, cd up
-	 * one directory.
+	 * Return to the parent directory.  If at a root node, restore
+	 * the initial working directory.  If we came through a symlink,
+	 * go back through the file descriptor.  Otherwise, move up
+	 * one level, via "..".
 	 */
 	if (p->fts_level == FTS_ROOTLEVEL) {
-		if (FCHDIR(sp, sp->fts_rfd)) {
+		if (RESTORE_INITIAL_CWD(sp)) {
 			p->fts_errno = errno;
 			SET(FTS_STOP);
 		}
 	} else if (p->fts_flags & FTS_SYMFOLLOW) {
 		if (FCHDIR(sp, p->fts_symfd)) {
-			saved_errno = errno;
+			int saved_errno = errno;
 			(void)close(p->fts_symfd);
 			__set_errno (saved_errno);
 			p->fts_errno = errno;
@@ -691,16 +889,24 @@ fts_children (register FTS *sp, int instr)
 	    ISSET(FTS_NOCHDIR))
 		return (sp->fts_child = fts_build(sp, instr));
 
-	if ((fd = diropen (".")) < 0)
+	if ((fd = diropen (sp, ".")) < 0)
 		return (sp->fts_child = NULL);
 	sp->fts_child = fts_build(sp, instr);
-	if (fchdir(fd)) {
+	if (ISSET(FTS_CWDFD))
+	  {
+	    cwd_advance_fd (sp, fd, true);
+	  }
+	else
+	  {
+	    if (fchdir(fd))
+	      {
 		int saved_errno = errno;
-		(void)close(fd);
+		close (fd);
 		__set_errno (saved_errno);
-		return (NULL);
-	}
-	(void)close(fd);
+		return NULL;
+	      }
+	    close (fd);
+	  }
 	return (sp->fts_child);
 }
 
@@ -728,7 +934,6 @@ fts_build (register FTS *sp, int type)
 	FTSENT *cur, *tail;
 	DIR *dirp;
 	void *oldaddr;
-	int cderrno;
 	int saved_errno;
 	bool descend;
 	bool doadjust;
@@ -751,7 +956,10 @@ fts_build (register FTS *sp, int type)
 	else
 		oflag = DTF_HIDEW|DTF_NODUP|DTF_REWIND;
 #else
-# define __opendir2(file, flag) opendir(file)
+# define __opendir2(file, flag) \
+	( ! ISSET(FTS_NOCHDIR) && ISSET(FTS_CWDFD) \
+	  ? opendirat(sp->fts_cwd_fd, file)	   \
+	  : opendir(file))
 #endif
        if ((dirp = __opendir2(cur->fts_accpath, oflag)) == NULL) {
 		if (type == BREAD) {
@@ -760,6 +968,11 @@ fts_build (register FTS *sp, int type)
 		}
 		return (NULL);
 	}
+       /* Rather than calling fts_stat for each and every entry encountered
+	  in the readdir loop (below), stat each directory only right after
+	  opening it.  */
+       if (cur->fts_info == FTS_NSOK)
+	 cur->fts_info = fts_stat(sp, cur, false);
 
 	/*
 	 * Nlinks is the number of possible entries of type directory in the
@@ -794,15 +1007,18 @@ fts_build (register FTS *sp, int type)
 	 * needed sorted entries or stat information, they had better be
 	 * checking FTS_NS on the returned nodes.
 	 */
-	cderrno = 0;
 	if (nlinks || type == BREAD) {
-		if (fts_safe_changedir(sp, cur, dirfd(dirp), NULL)) {
+		int dir_fd = dirfd(dirp);
+		if (ISSET(FTS_CWDFD) && 0 <= dir_fd)
+		  dir_fd = dup (dir_fd);
+		if (dir_fd < 0 || fts_safe_changedir(sp, cur, dir_fd, NULL)) {
 			if (nlinks && type == BREAD)
 				cur->fts_errno = errno;
 			cur->fts_flags |= FTS_DONTCHDIR;
 			descend = false;
-			cderrno = errno;
 			closedir(dirp);
+			if (ISSET(FTS_CWDFD) && 0 <= dir_fd)
+				close (dir_fd);
 			dirp = NULL;
 		} else
 			descend = true;
@@ -835,22 +1051,25 @@ fts_build (register FTS *sp, int type)
 	/* Read the directory, attaching each entry to the `link' pointer. */
 	doadjust = false;
 	for (head = tail = NULL, nitems = 0; dirp && (dp = readdir(dirp));) {
+		bool is_dir;
+
 		if (!ISSET(FTS_SEEDOT) && ISDOT(dp->d_name))
 			continue;
 
-		if ((p = fts_alloc(sp, dp->d_name, NAMLEN (dp))) == NULL)
+		if ((p = fts_alloc (sp, dp->d_name,
+				    _D_EXACT_NAMLEN (dp))) == NULL)
 			goto mem1;
-		if (NAMLEN (dp) >= maxlen) {/* include space for NUL */
+		if (_D_EXACT_NAMLEN (dp) >= maxlen) {
+			/* include space for NUL */
 			oldaddr = sp->fts_path;
-			if (! fts_palloc(sp, NAMLEN (dp) + len + 1)) {
+			if (! fts_palloc(sp, _D_EXACT_NAMLEN (dp) + len + 1)) {
 				/*
 				 * No more memory.  Save
 				 * errno, free up the current structure and the
 				 * structures already allocated.
 				 */
 mem1:				saved_errno = errno;
-				if (p)
-					free(p);
+				free(p);
 				fts_lfree(head);
 				closedir(dirp);
 				cur->fts_info = FTS_ERR;
@@ -867,7 +1086,7 @@ mem1:				saved_errno = errno;
 			maxlen = sp->fts_pathlen - len;
 		}
 
-		new_len = len + NAMLEN (dp);
+		new_len = len + _D_EXACT_NAMLEN (dp);
 		if (new_len < len) {
 			/*
 			 * In the unlikely even that we would end up
@@ -892,37 +1111,44 @@ mem1:				saved_errno = errno;
 			p->fts_flags |= FTS_ISW;
 #endif
 
-		if (cderrno) {
-			if (nlinks) {
-				p->fts_info = FTS_NS;
-				p->fts_errno = cderrno;
-			} else
-				p->fts_info = FTS_NSOK;
-			p->fts_accpath = cur->fts_accpath;
-		} else if (nlinks == 0
-#if HAVE_STRUCT_DIRENT_D_TYPE
-			   || (nostat &&
-			       dp->d_type != DT_DIR && dp->d_type != DT_UNKNOWN)
-#endif
-		    ) {
-			p->fts_accpath =
-			    ISSET(FTS_NOCHDIR) ? p->fts_path : p->fts_name;
-			p->fts_info = FTS_NSOK;
-		} else {
-			/* Build a file name for fts_stat to stat. */
-			if (ISSET(FTS_NOCHDIR)) {
-				p->fts_accpath = p->fts_path;
-				memmove(cp, p->fts_name, p->fts_namelen + 1);
-			} else
-				p->fts_accpath = p->fts_name;
-			/* Stat it. */
-			p->fts_info = fts_stat(sp, p, false);
+		/* Build a file name for fts_stat to stat. */
+		if (ISSET(FTS_NOCHDIR)) {
+			p->fts_accpath = p->fts_path;
+			memmove(cp, p->fts_name, p->fts_namelen + 1);
+		} else
+			p->fts_accpath = p->fts_name;
 
-			/* Decrement link count if applicable. */
-			if (nlinks > 0 && (p->fts_info == FTS_D ||
-			    p->fts_info == FTS_DC || p->fts_info == FTS_DOT))
-				nlinks -= nostat;
+		if (sp->fts_compar == NULL || ISSET(FTS_DEFER_STAT)) {
+			/* Record what fts_read will have to do with this
+			   entry. In many cases, it will simply fts_stat it,
+			   but we can take advantage of any d_type information
+			   to optimize away the unnecessary stat calls.  I.e.,
+			   if FTS_NOSTAT is in effect and we're not following
+			   symlinks (FTS_PHYSICAL) and d_type indicates this
+			   is *not* a directory, then we won't have to stat it
+			   at all.  If it *is* a directory, then (currently)
+			   we stat it regardless, in order to get device and
+			   inode numbers.  Some day we might optimize that
+			   away, too, for directories where d_ino is known to
+			   be valid.  */
+			bool skip_stat = (ISSET(FTS_PHYSICAL)
+					  && ISSET(FTS_NOSTAT)
+					  && DT_IS_KNOWN(dp)
+					  && ! DT_MUST_BE(dp, DT_DIR));
+			p->fts_info = FTS_NSOK;
+			fts_set_stat_required(p, !skip_stat);
+			is_dir = (ISSET(FTS_PHYSICAL) && ISSET(FTS_NOSTAT)
+				  && DT_MUST_BE(dp, DT_DIR));
+		} else {
+			p->fts_info = fts_stat(sp, p, false);
+			is_dir = (p->fts_info == FTS_D
+				  || p->fts_info == FTS_DC
+				  || p->fts_info == FTS_DOT);
 		}
+
+		/* Decrement link count if applicable. */
+		if (nlinks > 0 && is_dir)
+			nlinks -= nostat;
 
 		/* We walk in directory order so "ls -f" doesn't get upset. */
 		p->fts_link = NULL;
@@ -962,11 +1188,12 @@ mem1:				saved_errno = errno;
 	 * can't get back, we're done.
 	 */
 	if (descend && (type == BCHILD || !nitems) &&
-	    (cur->fts_level == FTS_ROOTLEVEL ?
-	     FCHDIR(sp, sp->fts_rfd) :
-	     fts_safe_changedir(sp, cur->fts_parent, -1, ".."))) {
+	    (cur->fts_level == FTS_ROOTLEVEL
+	     ? RESTORE_INITIAL_CWD(sp)
+	     : fts_safe_changedir(sp, cur->fts_parent, -1, ".."))) {
 		cur->fts_info = FTS_ERR;
 		SET(FTS_STOP);
+		fts_lfree(head);
 		return (NULL);
 	}
 
@@ -974,6 +1201,7 @@ mem1:				saved_errno = errno;
 	if (!nitems) {
 		if (type == BREAD)
 			cur->fts_info = FTS_DP;
+		fts_lfree(head);
 		return (NULL);
 	}
 
@@ -1044,6 +1272,87 @@ fts_cross_check (FTS const *sp)
 	}
     }
 }
+
+static bool
+same_fd (int fd1, int fd2)
+{
+  struct stat sb1, sb2;
+  return (fstat (fd1, &sb1) == 0
+	  && fstat (fd2, &sb2) == 0
+	  && SAME_INODE (sb1, sb2));
+}
+
+static void
+fd_ring_print (FTS const *sp, FILE *stream, char const *msg)
+{
+  I_ring const *fd_ring = &sp->fts_fd_ring;
+  unsigned int i = fd_ring->fts_front;
+  char *cwd = getcwdat (sp->fts_cwd_fd, NULL, 0);
+  fprintf (stream, "=== %s ========== %s\n", msg, cwd);
+  free (cwd);
+  if (i_ring_empty (fd_ring))
+    return;
+
+  while (true)
+    {
+      int fd = fd_ring->fts_fd_ring[i];
+      if (fd < 0)
+	fprintf (stream, "%d: %d:\n", i, fd);
+      else
+	{
+	  char *wd = getcwdat (fd, NULL, 0);
+	  fprintf (stream, "%d: %d: %s\n", i, fd, wd);
+	  free (wd);
+	}
+      if (i == fd_ring->fts_back)
+	break;
+      i = (i + I_RING_SIZE - 1) % I_RING_SIZE;
+    }
+}
+
+/* Ensure that each file descriptor on the fd_ring matches a
+   parent, grandparent, etc. of the current working directory.  */
+static void
+fd_ring_check (FTS const *sp)
+{
+  if (!fts_debug)
+    return;
+
+  /* Make a writable copy.  */
+  I_ring fd_w = sp->fts_fd_ring;
+
+  int cwd_fd = sp->fts_cwd_fd;
+  cwd_fd = dup (cwd_fd);
+  char *dot = getcwdat (cwd_fd, NULL, 0);
+  error (0, 0, "===== check ===== cwd: %s", dot);
+  free (dot);
+  while ( ! i_ring_empty (&fd_w))
+    {
+      int fd = i_ring_pop (&fd_w);
+      if (0 <= fd)
+	{
+	  int parent_fd = openat (cwd_fd, "..", O_RDONLY);
+	  if (parent_fd < 0)
+	    {
+	      // Warn?
+	      break;
+	    }
+	  if (!same_fd (fd, parent_fd))
+	    {
+	      char *cwd = getcwdat (fd, NULL, 0);
+	      error (0, errno, "ring  : %s", cwd);
+	      char *c2 = getcwdat (parent_fd, NULL, 0);
+	      error (0, errno, "parent: %s", c2);
+	      free (cwd);
+	      free (c2);
+	      abort ();
+	    }
+	  close (cwd_fd);
+	  cwd_fd = parent_fd;
+	}
+    }
+  close (cwd_fd);
+}
 #endif
 
 static unsigned short int
@@ -1052,6 +1361,9 @@ fts_stat(FTS *sp, register FTSENT *p, bool follow)
 {
 	struct stat *sbp = p->fts_statp;
 	int saved_errno;
+
+	if (p->fts_level == FTS_ROOTLEVEL && ISSET(FTS_COMFOLLOW))
+		follow = true;
 
 #if defined FTS_WHITEOUT && 0
 	/* check for whiteout */
@@ -1078,15 +1390,18 @@ fts_stat(FTS *sp, register FTSENT *p, bool follow)
 			p->fts_errno = saved_errno;
 			goto err;
 		}
-	} else if (lstat(p->fts_accpath, sbp)) {
+	} else if (fstatat(sp->fts_cwd_fd, p->fts_accpath, sbp,
+			   AT_SYMLINK_NOFOLLOW)) {
 		p->fts_errno = errno;
 err:		memset(sbp, 0, sizeof(struct stat));
 		return (FTS_NS);
 	}
 
 	if (S_ISDIR(sbp->st_mode)) {
-		if (ISDOT(p->fts_name))
-			return (FTS_DOT);
+		if (ISDOT(p->fts_name)) {
+			/* Command-line "." and ".." are real directories. */
+			return (p->fts_level == FTS_ROOTLEVEL ? FTS_D : FTS_DOT);
+		}
 
 #if _LGPL_PACKAGE
 		{
@@ -1242,10 +1557,7 @@ fts_palloc (FTS *sp, size_t more)
 	 * See if fts_pathlen would overflow.
 	 */
 	if (new_len < sp->fts_pathlen) {
-		if (sp->fts_path) {
-			free(sp->fts_path);
-			sp->fts_path = NULL;
-		}
+		free(sp->fts_path);
 		sp->fts_path = NULL;
 		__set_errno (ENAMETOOLONG);
 		return false;
@@ -1306,34 +1618,93 @@ fts_maxarglen (char * const *argv)
  * Change to dir specified by fd or file name without getting
  * tricked by someone changing the world out from underneath us.
  * Assumes p->fts_statp->st_dev and p->fts_statp->st_ino are filled in.
+ * If FD is non-negative, expect it to be used after this function returns,
+ * and to be closed eventually.  So don't pass e.g., `dirfd(dirp)' and then
+ * do closedir(dirp), because that would invalidate the saved FD.
+ * Upon failure, close FD immediately and return nonzero.
  */
 static int
 internal_function
 fts_safe_changedir (FTS *sp, FTSENT *p, int fd, char const *dir)
 {
-	int ret, oerrno, newfd;
-	struct stat sb;
+	int ret;
+	bool is_dotdot = dir && STREQ (dir, "..");
+	int newfd;
+
+	/* This clause handles the unusual case in which FTS_NOCHDIR
+	   is specified, along with FTS_CWDFD.  In that case, there is
+	   no need to change even the virtual cwd file descriptor.
+	   However, if FD is non-negative, we do close it here.  */
+	if (ISSET (FTS_NOCHDIR))
+	  {
+	    if (ISSET (FTS_CWDFD) && 0 <= fd)
+	      close (fd);
+	    return 0;
+	  }
+
+	if (fd < 0 && is_dotdot && ISSET (FTS_CWDFD))
+	  {
+	    /* When possible, skip the diropen and subsequent fstat+dev/ino
+	       comparison.  I.e., when changing to parent directory
+	       (chdir ("..")), use a file descriptor from the ring and
+	       save the overhead of diropen+fstat, as well as avoiding
+	       failure when we lack "x" access to the virtual cwd.  */
+	    if ( ! i_ring_empty (&sp->fts_fd_ring))
+	      {
+		int parent_fd;
+		fd_ring_print (sp, stderr, "pre-pop");
+		parent_fd = i_ring_pop (&sp->fts_fd_ring);
+		is_dotdot = true;
+		if (0 <= parent_fd)
+		  {
+		    fd = parent_fd;
+		    dir = NULL;
+		  }
+	      }
+	  }
 
 	newfd = fd;
-	if (ISSET(FTS_NOCHDIR))
-		return (0);
-	if (fd < 0 && (newfd = diropen (dir)) < 0)
-		return (-1);
-	if (fstat(newfd, &sb)) {
+	if (fd < 0 && (newfd = diropen (sp, dir)) < 0)
+	  return -1;
+
+	/* The following dev/inode check is necessary if we're doing a
+	   `logical' traversal (through symlinks, a la chown -L), if the
+	   system lacks O_NOFOLLOW support, or if we're changing to ".."
+	   (but not via a popped file descriptor).  When changing to the
+	   name "..", O_NOFOLLOW can't help.  In general, when the target is
+	   not "..", diropen's use of O_NOFOLLOW ensures we don't mistakenly
+	   follow a symlink, so we can avoid the expense of this fstat.  */
+	if (ISSET(FTS_LOGICAL) || ! HAVE_WORKING_O_NOFOLLOW
+	    || (dir && STREQ (dir, "..")))
+	  {
+	    struct stat sb;
+	    if (fstat(newfd, &sb))
+	      {
 		ret = -1;
 		goto bail;
-	}
-	if (p->fts_statp->st_dev != sb.st_dev
-	    || p->fts_statp->st_ino != sb.st_ino) {
+	      }
+	    if (p->fts_statp->st_dev != sb.st_dev
+		|| p->fts_statp->st_ino != sb.st_ino)
+	      {
 		__set_errno (ENOENT);		/* disinformation */
 		ret = -1;
 		goto bail;
-	}
+	      }
+	  }
+
+	if (ISSET(FTS_CWDFD))
+	  {
+	    cwd_advance_fd (sp, newfd, ! is_dotdot);
+	    return 0;
+	  }
+
 	ret = fchdir(newfd);
 bail:
-	oerrno = errno;
 	if (fd < 0)
-		(void)close(newfd);
-	__set_errno (oerrno);
-	return (ret);
+	  {
+	    int oerrno = errno;
+	    (void)close(newfd);
+	    __set_errno (oerrno);
+	  }
+	return ret;
 }

@@ -1,7 +1,7 @@
 /* getugroups.c -- return a list of the groups a user is in
 
-   Copyright (C) 1990, 1991, 1998, 1999, 2000, 2003, 2004, 2005 Free
-   Software Foundation.
+   Copyright (C) 1990, 1991, 1998, 1999, 2000, 2003, 2004, 2005, 2006
+   Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 
 /* Written by David MacKenzie. */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <sys/types.h>
 #include <stdio.h> /* grp.h on alpha OSF1 V2.0 uses "FILE *". */
@@ -34,8 +32,7 @@
 # define EOVERFLOW EINVAL
 #endif
 
-/* setgrent, getgrent, and endgrent are not specified by POSIX.1,
-   so header files might not declare them.
+/* Some old header files might not declare setgrent, getgrent, and endgrent.
    If you don't have them at all, we can't implement this function.
    You lose!  */
 struct group *getgrent ();

@@ -1,7 +1,8 @@
 /* Work around the bug in some systems whereby rename fails when the source
    file has a trailing slash.  The rename functions of SunOS 4.1.1_U1 and
    mips-dec-ultrix4.4 have this bug.
-   Copyright (C) 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
+
+   Copyright (C) 2001, 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,9 +20,7 @@
 
 /* written by Volker Borchert */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 #undef rename
 
 #include <stdio.h>

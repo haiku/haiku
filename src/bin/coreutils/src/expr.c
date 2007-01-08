@@ -1,5 +1,5 @@
 /* expr -- evaluate expressions.
-   Copyright (C) 86, 1991-1997, 1999-2005 Free Software Foundation, Inc.
+   Copyright (C) 86, 1991-1997, 1999-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,12 +50,13 @@
 /* Exit statuses.  */
 enum
   {
-    /* Invalid expression: i.e., its form does not conform to the
+    /* Invalid expression: e.g., its form does not conform to the
        grammar for expressions.  Our grammar is an extension of the
        POSIX grammar.  */
     EXPR_INVALID = 2,
 
-    /* Some other error occurred.  */
+    /* An internal error occurred, e.g., arithmetic overflow, storage
+       exhaustion.  */
     EXPR_FAILURE
   };
 
@@ -174,6 +175,13 @@ syntax_error (void)
   error (EXPR_INVALID, 0, _("syntax error"));
 }
 
+/* Report an integer overflow for operation OP and exit.  */
+static void
+integer_overflow (char op)
+{
+  error (EXPR_FAILURE, ERANGE, "%c", op);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -228,7 +236,7 @@ int_value (intmax_t i)
 /* Return a VALUE for S.  */
 
 static VALUE *
-str_value (char *s)
+str_value (char const *s)
 {
   VALUE *v = xmalloc (sizeof *v);
   v->type = string;
@@ -412,37 +420,29 @@ docolon (VALUE *sv, VALUE *pv)
   VALUE *v IF_LINT (= NULL);
   const char *errmsg;
   struct re_pattern_buffer re_buffer;
+  char fastmap[UCHAR_MAX + 1];
   struct re_registers re_regs;
-  size_t len;
   regoff_t matchlen;
 
   tostring (sv);
   tostring (pv);
 
-  if (pv->u.s[0] == '^')
-    {
-      error (0, 0, _("\
-warning: unportable BRE: %s: using `^' as the first character\n\
-of the basic regular expression is not portable; it is being ignored"),
-	     quote (pv->u.s));
-    }
-
-  len = strlen (pv->u.s);
-  memset (&re_buffer, 0, sizeof (re_buffer));
-  memset (&re_regs, 0, sizeof (re_regs));
-  re_buffer.buffer = xnmalloc (len, 2);
-  re_buffer.allocated = 2 * len;
+  re_buffer.buffer = NULL;
+  re_buffer.allocated = 0;
+  re_buffer.fastmap = fastmap;
   re_buffer.translate = NULL;
-  re_syntax_options = RE_SYNTAX_POSIX_BASIC;
-  errmsg = re_compile_pattern (pv->u.s, len, &re_buffer);
+  re_syntax_options =
+    RE_SYNTAX_POSIX_BASIC & ~RE_CONTEXT_INVALID_DUP & ~RE_NO_EMPTY_RANGES;
+  errmsg = re_compile_pattern (pv->u.s, strlen (pv->u.s), &re_buffer);
   if (errmsg)
-    error (EXPR_FAILURE, 0, "%s", errmsg);
+    error (EXPR_INVALID, 0, "%s", errmsg);
+  re_buffer.newline_anchor = 0;
 
   matchlen = re_match (&re_buffer, sv->u.s, strlen (sv->u.s), 0, &re_regs);
   if (0 <= matchlen)
     {
       /* Were \(...\) used? */
-      if (re_buffer.re_nsub > 0)/* was (re_regs.start[1] >= 0) */
+      if (re_buffer.re_nsub > 0)
 	{
 	  sv->u.s[re_regs.end[1]] = '\0';
 	  v = str_value (sv->u.s + re_regs.start[1]);
@@ -551,21 +551,25 @@ eval6 (bool evaluate)
     }
   else if (nextarg ("substr"))
     {
+      size_t llen;
       l = eval6 (evaluate);
       i1 = eval6 (evaluate);
       i2 = eval6 (evaluate);
       tostring (l);
+      llen = strlen (l->u.s);
       if (!toarith (i1) || !toarith (i2)
-	  || strlen (l->u.s) < i1->u.i
+	  || llen < i1->u.i
 	  || i1->u.i <= 0 || i2->u.i <= 0)
 	v = str_value ("");
       else
 	{
+	  size_t vlen = MIN (i2->u.i, llen - i1->u.i + 1);
+	  char *vlim;
 	  v = xmalloc (sizeof *v);
 	  v->type = string;
-	  v->u.s = strncpy (xmalloc (i2->u.i + 1),
-			    l->u.s + i1->u.i - 1, i2->u.i);
-	  v->u.s[i2->u.i] = 0;
+	  v->u.s = xmalloc (vlen + 1);
+	  vlim = mempcpy (v->u.s, l->u.s + i1->u.i - 1, vlen);
+	  *vlim = '\0';
 	}
       freev (l);
       freev (i1);
@@ -636,14 +640,30 @@ eval4 (bool evaluate)
       if (evaluate)
 	{
 	  if (!toarith (l) || !toarith (r))
-	    error (EXPR_FAILURE, 0, _("non-numeric argument"));
+	    error (EXPR_INVALID, 0, _("non-numeric argument"));
 	  if (fxn == multiply)
-	    val = l->u.i * r->u.i;
+	    {
+	      val = l->u.i * r->u.i;
+	      if (! (l->u.i == 0 || r->u.i == 0
+		     || ((val < 0) == ((l->u.i < 0) ^ (r->u.i < 0))
+			 && val / l->u.i == r->u.i)))
+		integer_overflow ('*');
+	    }
 	  else
 	    {
 	      if (r->u.i == 0)
-		error (EXPR_FAILURE, 0, _("division by zero"));
-	      val = fxn == divide ? l->u.i / r->u.i : l->u.i % r->u.i;
+		error (EXPR_INVALID, 0, _("division by zero"));
+	      if (l->u.i < - INTMAX_MAX && r->u.i == -1)
+		{
+		  /* Some x86-style hosts raise an exception for
+		     INT_MIN / -1 and INT_MIN % -1, so handle these
+		     problematic cases specially.  */
+		  if (fxn == divide)
+		    integer_overflow ('/');
+		  val = 0;
+		}
+	      else
+		val = fxn == divide ? l->u.i / r->u.i : l->u.i % r->u.i;
 	    }
 	}
       freev (l);
@@ -678,8 +698,19 @@ eval3 (bool evaluate)
       if (evaluate)
 	{
 	  if (!toarith (l) || !toarith (r))
-	    error (EXPR_FAILURE, 0, _("non-numeric argument"));
-	  val = fxn == plus ? l->u.i + r->u.i : l->u.i - r->u.i;
+	    error (EXPR_INVALID, 0, _("non-numeric argument"));
+	  if (fxn == plus)
+	    {
+	      val = l->u.i + r->u.i;
+	      if ((val < l->u.i) != (r->u.i < 0))
+		integer_overflow ('+');
+	    }
+	  else
+	    {
+	      val = l->u.i - r->u.i;
+	      if ((l->u.i < val) != (r->u.i < 0))
+		integer_overflow ('-');
+	    }
 	}
       freev (l);
       freev (r);
@@ -740,7 +771,7 @@ eval2 (bool evaluate)
 		{
 		  error (0, errno, _("string comparison failed"));
 		  error (0, 0, _("Set LC_ALL='C' to work around the problem."));
-		  error (EXPR_FAILURE, 0,
+		  error (EXPR_INVALID, 0,
 			 _("The strings compared were %s and %s."),
 			 quotearg_n_style (0, locale_quoting_style, l->u.s),
 			 quotearg_n_style (1, locale_quoting_style, r->u.s));

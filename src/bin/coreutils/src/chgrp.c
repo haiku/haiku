@@ -1,5 +1,5 @@
 /* chgrp -- change group ownership of files
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@
 #include "error.h"
 #include "fts_.h"
 #include "group-member.h"
-#include "lchown.h"
 #include "quote.h"
+#include "root-dev-ino.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -53,6 +53,8 @@ static char *reference_file;
 enum
 {
   DEREFERENCE_OPTION = CHAR_MAX + 1,
+  NO_PRESERVE_ROOT,
+  PRESERVE_ROOT,
   REFERENCE_FILE_OPTION
 };
 
@@ -62,6 +64,8 @@ static struct option const long_options[] =
   {"changes", no_argument, NULL, 'c'},
   {"dereference", no_argument, NULL, DEREFERENCE_OPTION},
   {"no-dereference", no_argument, NULL, 'h'},
+  {"no-preserve-root", no_argument, NULL, NO_PRESERVE_ROOT},
+  {"preserve-root", no_argument, NULL, PRESERVE_ROOT},
   {"quiet", no_argument, NULL, 'f'},
   {"silent", no_argument, NULL, 'f'},
   {"reference", required_argument, NULL, REFERENCE_FILE_OPTION},
@@ -115,8 +119,8 @@ Change the group of each FILE to GROUP.\n\
 With --reference, change the group of each FILE to that of RFILE.\n\
 \n\
   -c, --changes          like verbose but report only when a change is made\n\
-      --dereference      affect the referent of each symbolic link, rather\n\
-                         than the symbolic link itself (this is the default)\n\
+      --dereference      affect the referent of each symbolic link (this is\n\
+                         the default), rather than the symbolic link itself\n\
 "), stdout);
       fputs (_("\
   -h, --no-dereference   affect each symbolic link instead of any referenced\n\
@@ -124,12 +128,12 @@ With --reference, change the group of each FILE to that of RFILE.\n\
                          ownership of a symlink)\n\
 "), stdout);
       fputs (_("\
-      --no-preserve-root do not treat `/' specially (the default)\n\
+      --no-preserve-root  do not treat `/' specially (the default)\n\
       --preserve-root    fail to operate recursively on `/'\n\
 "), stdout);
       fputs (_("\
   -f, --silent, --quiet  suppress most error messages\n\
-      --reference=RFILE  use RFILE's group rather than the specifying\n\
+      --reference=RFILE  use RFILE's group rather than specifying a\n\
                          GROUP value\n\
   -R, --recursive        operate on files and directories recursively\n\
   -v, --verbose          output a diagnostic for every file processed\n\
@@ -164,6 +168,7 @@ Examples:\n\
 int
 main (int argc, char **argv)
 {
+  bool preserve_root = false;
   gid_t gid;
 
   /* Bit flags that control how fts works.  */
@@ -211,6 +216,14 @@ main (int argc, char **argv)
 	case DEREFERENCE_OPTION: /* --dereference: affect the referent
 				    of each symlink */
 	  dereference = 1;
+	  break;
+
+	case NO_PRESERVE_ROOT:
+	  preserve_root = false;
+	  break;
+
+	case PRESERVE_ROOT:
+	  preserve_root = true;
 	  break;
 
 	case REFERENCE_FILE_OPTION:
@@ -286,6 +299,15 @@ main (int argc, char **argv)
       char *group_name = argv[optind++];
       chopt.group_name = (*group_name ? group_name : NULL);
       gid = parse_group (group_name);
+    }
+
+  if (chopt.recurse & preserve_root)
+    {
+      static struct dev_ino dev_ino_buf;
+      chopt.root_dev_ino = get_root_dev_ino (&dev_ino_buf);
+      if (chopt.root_dev_ino == NULL)
+	error (EXIT_FAILURE, errno, _("failed to get attributes of %s"),
+	       quote ("/"));
     }
 
   ok = chown_files (argv + optind, bit_flags,

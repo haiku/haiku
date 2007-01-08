@@ -1,6 +1,6 @@
 /* Host name canonicalization
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 
    Written by Derek Price <derek@ximbiot.com>.
 
@@ -18,9 +18,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "canon-host.h"
 
@@ -71,7 +69,10 @@ canon_host_r (char const *host, int *cherror)
   status = getaddrinfo (host, NULL, &hints, &res);
   if (!status)
     {
-      retval = strdup (res->ai_canonname);
+      /* http://lists.gnu.org/archive/html/bug-coreutils/2006-09/msg00300.html
+	 says Darwin 7.9.0 getaddrinfo returns 0 but sets
+	 res->ai_canonname to NULL.  */
+      retval = strdup (res->ai_canonname ? res->ai_canonname : host);
       if (!retval && cherror)
 	*cherror = EAI_MEMORY;
       freeaddrinfo (res);

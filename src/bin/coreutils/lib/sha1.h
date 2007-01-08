@@ -1,6 +1,6 @@
 /* Declarations of functions and data types used for SHA1 sum
    library functions.
-   Copyright (C) 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2003, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -20,20 +20,20 @@
 # define SHA1_H 1
 
 # include <stdio.h>
-# include "md5.h"
+# include <stdint.h>
 
 /* Structure to save state of computation between the single steps.  */
 struct sha1_ctx
 {
-  md5_uint32 A;
-  md5_uint32 B;
-  md5_uint32 C;
-  md5_uint32 D;
-  md5_uint32 E;
+  uint32_t A;
+  uint32_t B;
+  uint32_t C;
+  uint32_t D;
+  uint32_t E;
 
-  md5_uint32 total[2];
-  md5_uint32 buflen;
-  char buffer[128] __attribute__ ((__aligned__ (__alignof__ (md5_uint32))));
+  uint32_t total[2];
+  uint32_t buflen;
+  uint32_t buffer[32];
 };
 
 

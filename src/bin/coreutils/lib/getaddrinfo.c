@@ -1,5 +1,6 @@
 /* Get address information (partial implementation).
-   Copyright (C) 1997, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
    Contributed by Simon Josefsson <simon@josefsson.org>.
 
    This program is free software; you can redistribute it and/or modify
@@ -16,9 +17,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "getaddrinfo.h"
 
@@ -38,7 +37,68 @@
 #define _(String) gettext (String)
 #define N_(String) String
 
+#include "inet_ntop.h"
+#include "snprintf.h"
 #include "strdup.h"
+
+/* BeOS has AF_INET, but not PF_INET.  */
+#ifndef PF_INET
+# define PF_INET AF_INET
+#endif
+/* BeOS also lacks PF_UNSPEC.  */
+#ifndef PF_UNSPEC
+# define PF_UNSPEC 0
+#endif
+
+#if defined _WIN32 || defined __WIN32__
+# define WIN32_NATIVE
+#endif
+
+#ifdef WIN32_NATIVE
+typedef int (WSAAPI *getaddrinfo_func) (const char*, const char*,
+					const struct addrinfo*,
+					struct addrinfo**);
+typedef void (WSAAPI *freeaddrinfo_func) (struct addrinfo*);
+typedef int (WSAAPI *getnameinfo_func) (const struct sockaddr*,
+					socklen_t, char*, DWORD,
+					char*, DWORD, int);
+
+static getaddrinfo_func getaddrinfo_ptr = NULL;
+static freeaddrinfo_func freeaddrinfo_ptr = NULL;
+static getnameinfo_func getnameinfo_ptr = NULL;
+
+static int
+use_win32_p (void)
+{
+  static int done = 0;
+  HMODULE h;
+
+  if (done)
+    return getaddrinfo_ptr ? 1 : 0;
+
+  done = 1;
+
+  h = GetModuleHandle ("ws2_32.dll");
+
+  if (h)
+    {
+      getaddrinfo_ptr = (getaddrinfo_func) GetProcAddress (h, "getaddrinfo");
+      freeaddrinfo_ptr = (freeaddrinfo_func) GetProcAddress (h, "freeaddrinfo");
+      getnameinfo_ptr = (getnameinfo_func) GetProcAddress (h, "getnameinfo");
+    }
+
+  /* If either is missing, something is odd. */
+  if (!getaddrinfo_ptr || !freeaddrinfo_ptr || !getnameinfo_ptr)
+    {
+      getaddrinfo_ptr = NULL;
+      freeaddrinfo_ptr = NULL;
+      getnameinfo_ptr = NULL;
+      return 0;
+    }
+
+  return 1;
+}
+#endif
 
 static inline bool
 validate_family (int family)
@@ -66,7 +126,7 @@ getaddrinfo (const char *restrict nodename,
 	     struct addrinfo **restrict res)
 {
   struct addrinfo *tmp;
-  struct servent *se = NULL;
+  int port = 0;
   struct hostent *he;
   void *storage;
   size_t size;
@@ -83,7 +143,12 @@ getaddrinfo (const char *restrict nodename,
   };
 #endif
 
-  if (hints && (hints->ai_flags & ~AI_CANONNAME))
+#ifdef WIN32_NATIVE
+  if (use_win32_p ())
+    return getaddrinfo_ptr (nodename, servname, hints, res);
+#endif
+
+  if (hints && (hints->ai_flags & ~(AI_CANONNAME|AI_PASSIVE)))
     /* FIXME: Support more flags. */
     return EAI_BADFLAGS;
 
@@ -96,19 +161,39 @@ getaddrinfo (const char *restrict nodename,
     return EAI_SOCKTYPE; /* FIXME: Better return code? */
 
   if (!nodename)
-    /* FIXME: Support server bind mode. */
-    return EAI_NONAME;
+    {
+      if (!(hints->ai_flags & AI_PASSIVE))
+	return EAI_NONAME;
+
+#ifdef HAVE_IPV6
+      nodename = (hints->ai_family == AF_INET6) ? "::" : "0.0.0.0";
+#else
+      nodename = "0.0.0.0";
+#endif
+    }
 
   if (servname)
     {
+      struct servent *se = NULL;
       const char *proto =
 	(hints && hints->ai_socktype == SOCK_DGRAM) ? "udp" : "tcp";
 
-      /* FIXME: Use getservbyname_r if available. */
-      se = getservbyname (servname, proto);
+      if (!(hints->ai_flags & AI_NUMERICSERV))
+	/* FIXME: Use getservbyname_r if available. */
+	se = getservbyname (servname, proto);
 
       if (!se)
-	return EAI_SERVICE;
+	{
+	  char *c;
+	  if (!(*servname >= '0' && *servname <= '9'))
+	    return EAI_NONAME;
+	  port = strtoul (servname, &c, 10);
+	  if (*c || port > 0xffff)
+	    return EAI_NONAME;
+	  port = htons (port);
+	}
+      else
+	port = se->s_port;
     }
 
   /* FIXME: Use gethostbyname_r if available. */
@@ -147,8 +232,8 @@ getaddrinfo (const char *restrict nodename,
 	struct sockaddr_in6 *sinp = &p->sockaddr_in6;
 	tmp = &p->addrinfo;
 
-	if (se)
-	  sinp->sin6_port = se->s_port;
+	if (port)
+	  sinp->sin6_port = port;
 
 	if (he->h_length != sizeof (sinp->sin6_addr))
 	  {
@@ -171,8 +256,8 @@ getaddrinfo (const char *restrict nodename,
 	struct sockaddr_in *sinp = &p->sockaddr_in;
 	tmp = &p->addrinfo;
 
-	if (se)
-	  sinp->sin_port = se->s_port;
+	if (port)
+	  sinp->sin_port = port;
 
 	if (he->h_length != sizeof (sinp->sin_addr))
 	  {
@@ -212,6 +297,7 @@ getaddrinfo (const char *restrict nodename,
   tmp->ai_protocol = (hints) ? hints->ai_protocol : 0;
   tmp->ai_socktype = (hints) ? hints->ai_socktype : 0;
   tmp->ai_addr->sa_family = he->h_addrtype;
+  tmp->ai_family = he->h_addrtype;
 
   /* FIXME: If more than one address, create linked list of addrinfo's. */
 
@@ -224,6 +310,14 @@ getaddrinfo (const char *restrict nodename,
 void
 freeaddrinfo (struct addrinfo *ai)
 {
+#ifdef WIN32_NATIVE
+  if (use_win32_p ())
+    {
+      freeaddrinfo_ptr (ai);
+      return;
+    }
+#endif
+
   while (ai)
     {
       struct addrinfo *cur;
@@ -234,4 +328,90 @@ freeaddrinfo (struct addrinfo *ai)
       if (cur->ai_canonname) free (cur->ai_canonname);
       free (cur);
     }
+}
+
+int getnameinfo(const struct sockaddr *restrict sa, socklen_t salen,
+		char *restrict node, socklen_t nodelen,
+		char *restrict service, socklen_t servicelen,
+		int flags)
+{
+#ifdef WIN32_NATIVE
+  if (use_win32_p ())
+    return getnameinfo_ptr (sa, salen, node, nodelen,
+			    service, servicelen, flags);
+#endif
+
+  /* FIXME: Support other flags. */
+  if ((node && nodelen > 0 && !(flags & NI_NUMERICHOST)) ||
+      (service && servicelen > 0 && !(flags & NI_NUMERICHOST)) ||
+      (flags & ~(NI_NUMERICHOST|NI_NUMERICSERV)))
+    return EAI_BADFLAGS;
+
+  if (sa == NULL || salen < sizeof (sa->sa_family))
+    return EAI_FAMILY;
+
+  switch (sa->sa_family)
+    {
+#if HAVE_IPV4
+    case AF_INET:
+      if (salen < sizeof (struct sockaddr_in))
+	return EAI_FAMILY;
+      break;
+#endif
+#if HAVE_IPV6
+    case AF_INET6:
+      if (salen < sizeof (struct sockaddr_in6))
+	return EAI_FAMILY;
+      break;
+#endif
+    default:
+      return EAI_FAMILY;
+    }
+
+  if (node && nodelen > 0 && flags & NI_NUMERICHOST)
+    {
+      switch (sa->sa_family)
+	{
+#if HAVE_IPV4
+	case AF_INET:
+	  if (!inet_ntop (AF_INET,
+			  &(((const struct sockaddr_in *) sa)->sin_addr),
+			  node, nodelen))
+	    return EAI_SYSTEM;
+	  break;
+#endif
+
+#if HAVE_IPV6
+	case AF_INET6:
+	  if (!inet_ntop (AF_INET6,
+			  &(((const struct sockaddr_in6 *) sa)->sin6_addr),
+			  node, nodelen))
+	    return EAI_SYSTEM;
+	  break;
+#endif
+
+	default:
+	  return EAI_FAMILY;
+	}
+    }
+
+  if (service && servicelen > 0 && flags & NI_NUMERICSERV)
+    switch (sa->sa_family)
+      {
+#if HAVE_IPV4
+      case AF_INET:
+#endif
+#if HAVE_IPV6
+      case AF_INET6:
+#endif
+	{
+	  unsigned short int port
+	    = ntohs (((const struct sockaddr_in *) sa)->sin_port);
+	  if (servicelen <= snprintf (service, servicelen, "%u", port))
+	    return EAI_OVERFLOW;
+	}
+	break;
+      }
+
+  return 0;
 }

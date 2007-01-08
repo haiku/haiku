@@ -1,5 +1,5 @@
 /* sort - sort lines of text (with all kinds of options).
-   Copyright (C) 1988, 1991-2005 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1991-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,13 +30,16 @@
 #include "error.h"
 #include "hard-locale.h"
 #include "inttostr.h"
+#include "md5.h"
 #include "physmem.h"
 #include "posixver.h"
 #include "quote.h"
-#include "stdlib--.h"
+#include "randread.h"
 #include "stdio--.h"
+#include "stdlib--.h"
 #include "strnumcmp.h"
 #include "xmemcoll.h"
+#include "xmemxfrm.h"
 #include "xstrtol.h"
 
 #if HAVE_SYS_RESOURCE_H
@@ -147,6 +150,7 @@ struct keyfield
   bool numeric;			/* Flag for numeric comparison.  Handle
 				   strings of digits with optional decimal
 				   point, but no exponential notation. */
+  bool random;			/* Sort by random hash of key.  */
   bool general_numeric;		/* Flag for general, numeric comparison.
 				   Handle numbers in exponential notation. */
   bool month;			/* Flag for comparison by month name. */
@@ -303,6 +307,8 @@ Ordering options:\n\
   -i, --ignore-nonprinting    consider only printable characters\n\
   -M, --month-sort            compare (unknown) < `JAN' < ... < `DEC'\n\
   -n, --numeric-sort          compare according to string numerical value\n\
+  -R, --random-sort           sort by random hash of keys\n\
+      --random-source=FILE    get random bytes from FILE (default /dev/urandom)\n\
   -r, --reverse               reverse the result of comparisons\n\
 \n\
 "), stdout);
@@ -331,9 +337,10 @@ Other options:\n\
       fputs (_("\
 \n\
 POS is F[.C][OPTS], where F is the field number and C the character position\n\
-in the field.  OPTS is one or more single-letter ordering options, which\n\
-override global ordering options for that key.  If no key is given, use the\n\
-entire line as the key.\n\
+in the field; both are origin 1.  If neither -t nor -b is in effect, characters\n\
+in a field are counted from the beginning of the preceding whitespace.  OPTS is\n\
+one or more single-letter ordering options, which override global ordering\n\
+options for that key.  If no key is given, use the entire line as the key.\n\
 \n\
 SIZE may be followed by the following multiplicative suffixes:\n\
 "), stdout);
@@ -353,7 +360,14 @@ native byte values.\n\
   exit (status);
 }
 
-static char const short_options[] = "-bcdfgik:mMno:rsS:t:T:uy:z";
+/* For long options that have no equivalent short option, use a
+   non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
+enum
+{
+  RANDOM_SOURCE_OPTION = CHAR_MAX + 1
+};
+
+static char const short_options[] = "-bcdfgik:mMno:rRsS:t:T:uy:z";
 
 static struct option const long_options[] =
 {
@@ -367,6 +381,8 @@ static struct option const long_options[] =
   {"merge", no_argument, NULL, 'm'},
   {"month-sort", no_argument, NULL, 'M'},
   {"numeric-sort", no_argument, NULL, 'n'},
+  {"random-sort", no_argument, NULL, 'R'},
+  {"random-source", required_argument, NULL, RANDOM_SOURCE_OPTION},
   {"output", required_argument, NULL, 'o'},
   {"reverse", no_argument, NULL, 'r'},
   {"stable", no_argument, NULL, 's'},
@@ -566,10 +582,10 @@ inittables (void)
 
   for (i = 0; i < UCHAR_LIM; ++i)
     {
-      blanks[i] = !!ISBLANK (i);
-      nonprinting[i] = !ISPRINT (i);
-      nondictionary[i] = !ISALNUM (i) && !ISBLANK (i);
-      fold_toupper[i] = (ISLOWER (i) ? toupper (i) : i);
+      blanks[i] = !! isblank (i);
+      nonprinting[i] = ! isprint (i);
+      nondictionary[i] = ! isalnum (i) && ! isblank (i);
+      fold_toupper[i] = toupper (i);
     }
 
 #if HAVE_NL_LANGINFO
@@ -1152,6 +1168,119 @@ getmonth (char const *month, size_t len)
   return 0;
 }
 
+/* A source of random data.  */
+static struct randread_source *randread_source;
+
+/* Return the Ith randomly-generated state.  The caller must invoke
+   random_state (H) for all H less than I before invoking random_state
+   (I).  */
+
+static struct md5_ctx
+random_state (size_t i)
+{
+  /* An array of states resulting from the random data, and counts of
+     its used and allocated members.  */
+  static struct md5_ctx *state;
+  static size_t used;
+  static size_t allocated;
+
+  struct md5_ctx *s = &state[i];
+
+  if (used <= i)
+    {
+      unsigned char buf[MD5_DIGEST_SIZE];
+
+      used++;
+
+      if (allocated <= i)
+	{
+	  state = X2NREALLOC (state, &allocated);
+	  s = &state[i];
+	}
+
+      randread (randread_source, buf, sizeof buf);
+      md5_init_ctx (s);
+      md5_process_bytes (buf, sizeof buf, s);
+    }
+
+  return *s;
+}
+
+/* Compare the hashes of TEXTA with length LENGTHA to those of TEXTB
+   with length LENGTHB.  Return negative if less, zero if equal,
+   positive if greater.  */
+
+static int
+cmp_hashes (char const *texta, size_t lena,
+	    char const *textb, size_t lenb)
+{
+  /* Try random hashes until a pair of hashes disagree.  But if the
+     first pair of random hashes agree, check whether the keys are
+     identical and if so report no difference.  */
+  int diff;
+  size_t i;
+  for (i = 0; ; i++)
+    {
+      uint32_t dig[2][MD5_DIGEST_SIZE / sizeof (uint32_t)];
+      struct md5_ctx s[2];
+      s[0] = s[1] = random_state (i);
+      md5_process_bytes (texta, lena, &s[0]);  md5_finish_ctx (&s[0], dig[0]);
+      md5_process_bytes (textb, lenb, &s[1]);  md5_finish_ctx (&s[1], dig[1]);
+      diff = memcmp (dig[0], dig[1], sizeof dig[0]);
+      if (diff != 0)
+	break;
+      if (i == 0 && lena == lenb && memcmp (texta, textb, lena) == 0)
+	break;
+    }
+
+  return diff;
+}
+
+/* Compare the keys TEXTA (of length LENA) and TEXTB (of length LENB)
+   using one or more random hash functions.  */
+
+static int
+compare_random (char *restrict texta, size_t lena,
+		char *restrict textb, size_t lenb)
+{
+  int diff;
+
+  if (! hard_LC_COLLATE)
+    diff = cmp_hashes (texta, lena, textb, lenb);
+  else
+    {
+      /* Transform the text into the basis of comparison, so that byte
+	 strings that would otherwise considered to be equal are
+	 considered equal here even if their bytes differ.  */
+
+      char *buf = NULL;
+      char stackbuf[4000];
+      size_t tlena = xmemxfrm (stackbuf, sizeof stackbuf, texta, lena);
+      bool a_fits = tlena <= sizeof stackbuf;
+      size_t tlenb = xmemxfrm ((a_fits ? stackbuf + tlena : NULL),
+			       (a_fits ? sizeof stackbuf - tlena : 0),
+			       textb, lenb);
+
+      if (a_fits && tlena + tlenb <= sizeof stackbuf)
+	buf = stackbuf;
+      else
+	{
+	  /* Adding 1 to the buffer size lets xmemxfrm run a bit
+	     faster by avoiding the need for an extra buffer copy.  */
+	  buf = xmalloc (tlena + tlenb + 1);
+	  xmemxfrm (buf, tlena + 1, texta, lena);
+	  xmemxfrm (buf + tlena, tlenb + 1, textb, lenb);
+	}
+
+      diff = cmp_hashes (buf, tlena, buf + tlena, tlenb);
+
+      if (buf != stackbuf)
+	free (buf);
+    }
+
+  return diff;
+}
+
 /* Compare two lines A and B trying every key in sequence until there
    are no more keys or a difference is found. */
 
@@ -1179,7 +1308,10 @@ keycompare (const struct line *a, const struct line *b)
       size_t lenb = limb <= textb ? 0 : limb - textb;
 
       /* Actually compare the fields. */
-      if (key->numeric | key->general_numeric)
+
+      if (key->random)
+	diff = compare_random (texta, lena, textb, lenb);
+      else if (key->numeric | key->general_numeric)
 	{
 	  char savea = *lima, saveb = *limb;
 
@@ -1967,12 +2099,13 @@ sort (char * const *files, size_t nfiles, char const *output_file)
     }
 }
 
-/* Insert key KEY at the end of the key list.  */
+/* Insert a malloc'd copy of key KEY_ARG at the end of the key list.  */
 
 static void
-insertkey (struct keyfield *key)
+insertkey (struct keyfield *key_arg)
 {
   struct keyfield **p;
+  struct keyfield *key = xmemdup (key_arg, sizeof *key);
 
   for (p = &keylist; *p; p = &(*p)->next)
     continue;
@@ -1990,6 +2123,49 @@ badfieldspec (char const *spec, char const *msgid)
   error (SORT_FAILURE, 0, _("%s: invalid field specification %s"),
 	 _(msgid), quote (spec));
   abort ();
+}
+
+/* Report incompatible options.  */
+
+static void incompatible_options (char const *) ATTRIBUTE_NORETURN;
+static void
+incompatible_options (char const *opts)
+{
+  error (SORT_FAILURE, 0, _("options `-%s' are incompatible"), opts);
+  abort ();
+}
+
+/* Check compatibility of ordering options.  */
+
+static void
+check_ordering_compatibility (void)
+{
+  struct keyfield const *key;
+
+  for (key = keylist; key; key = key->next)
+    if ((1 < (key->random + key->numeric + key->general_numeric + key->month
+	      + !!key->ignore))
+	|| (key->random && key->translate))
+      {
+	char opts[7];
+	char *p = opts;
+	if (key->ignore == nondictionary)
+	  *p++ = 'd';
+	if (key->translate)
+	  *p++ = 'f';
+	if (key->general_numeric)
+	  *p++ = 'g';
+	if (key->ignore == nonprinting)
+	  *p++ = 'i';
+	if (key->month)
+	  *p++ = 'M';
+	if (key->numeric)
+	  *p++ = 'n';
+	if (key->random)
+	  *p++ = 'R';
+	*p = '\0';
+	incompatible_options (opts);
+      }
 }
 
 /* Parse the leading integer in STRING and store the resulting value
@@ -2081,6 +2257,9 @@ set_ordering (const char *s, struct keyfield *key, enum blanktype blanktype)
 	case 'n':
 	  key->numeric = true;
 	  break;
+	case 'R':
+	  key->random = true;
+	  break;
 	case 'r':
 	  key->reverse = true;
 	  break;
@@ -2093,9 +2272,9 @@ set_ordering (const char *s, struct keyfield *key, enum blanktype blanktype)
 }
 
 static struct keyfield *
-new_key (void)
+key_init (struct keyfield *key)
 {
-  struct keyfield *key = xzalloc (sizeof *key);
+  memset (key, 0, sizeof *key);
   key->eword = SIZE_MAX;
   return key;
 }
@@ -2104,15 +2283,18 @@ int
 main (int argc, char **argv)
 {
   struct keyfield *key;
+  struct keyfield key_buf;
   struct keyfield gkey;
   char const *s;
   int c = 0;
   bool checkonly = false;
   bool mergeonly = false;
+  char *random_source = NULL;
+  bool need_random = false;
   size_t nfiles = 0;
   bool posixly_correct = (getenv ("POSIXLY_CORRECT") != NULL);
   bool obsolete_usage = (posix2_version () < 200112);
-  char *minus = "-", **files;
+  char **files;
   char const *outfile = NULL;
 
   initialize_main (&argc, &argv);
@@ -2187,7 +2369,8 @@ main (int argc, char **argv)
   gkey.sword = gkey.eword = SIZE_MAX;
   gkey.ignore = NULL;
   gkey.translate = NULL;
-  gkey.numeric = gkey.general_numeric = gkey.month = gkey.reverse = false;
+  gkey.numeric = gkey.general_numeric = gkey.random = false;
+  gkey.month = gkey.reverse = false;
   gkey.skipsblanks = gkey.skipeblanks = false;
 
   files = xnmalloc (argc, sizeof *files);
@@ -2218,37 +2401,42 @@ main (int argc, char **argv)
 	{
 	case 1:
 	  key = NULL;
-	  if (obsolete_usage && optarg[0] == '+')
+	  if (optarg[0] == '+')
 	    {
-	      /* Treat +POS1 [-POS2] as a key if possible; but silently
-		 treat an operand as a file if it is not a valid +POS1.  */
-	      key = new_key ();
-	      s = parse_field_count (optarg + 1, &key->sword, NULL);
-	      if (s && *s == '.')
-		s = parse_field_count (s + 1, &key->schar, NULL);
-	      if (! (key->sword | key->schar))
-		key->sword = SIZE_MAX;
-	      if (! s || *set_ordering (s, key, bl_start))
+	      bool minus_pos_usage = (optind != argc && argv[optind][0] == '-'
+				      && ISDIGIT (argv[optind][1]));
+	      obsolete_usage |= minus_pos_usage & ~posixly_correct;
+	      if (obsolete_usage)
 		{
-		  free (key);
-		  key = NULL;
-		}
-	      else
-		{
-		  if (optind != argc && argv[optind][0] == '-'
-		      && ISDIGIT (argv[optind][1]))
+		  /* Treat +POS1 [-POS2] as a key if possible; but silently
+		     treat an operand as a file if it is not a valid +POS1.  */
+		  key = key_init (&key_buf);
+		  s = parse_field_count (optarg + 1, &key->sword, NULL);
+		  if (s && *s == '.')
+		    s = parse_field_count (s + 1, &key->schar, NULL);
+		  if (! (key->sword | key->schar))
+		    key->sword = SIZE_MAX;
+		  if (! s || *set_ordering (s, key, bl_start))
 		    {
-		      char const *optarg1 = argv[optind++];
-		      s = parse_field_count (optarg1 + 1, &key->eword,
-					     N_("invalid number after `-'"));
-		      if (*s == '.')
-			s = parse_field_count (s + 1, &key->echar,
-					       N_("invalid number after `.'"));
-		      if (*set_ordering (s, key, bl_end))
-			badfieldspec (optarg1,
-				      N_("stray character in field spec"));
+		      free (key);
+		      key = NULL;
 		    }
-		  insertkey (key);
+		  else
+		    {
+		      if (minus_pos_usage)
+			{
+			  char const *optarg1 = argv[optind++];
+			  s = parse_field_count (optarg1 + 1, &key->eword,
+					     N_("invalid number after `-'"));
+			  if (*s == '.')
+			    s = parse_field_count (s + 1, &key->echar,
+					       N_("invalid number after `.'"));
+			  if (*set_ordering (s, key, bl_end))
+			    badfieldspec (optarg1,
+				      N_("stray character in field spec"));
+			}
+		      insertkey (key);
+		    }
 		}
 	    }
 	  if (! key)
@@ -2263,6 +2451,7 @@ main (int argc, char **argv)
 	case 'M':
 	case 'n':
 	case 'r':
+	case 'R':
 	  {
 	    char str[2];
 	    str[0] = c;
@@ -2276,7 +2465,7 @@ main (int argc, char **argv)
 	  break;
 
 	case 'k':
-	  key = new_key ();
+	  key = key_init (&key_buf);
 
 	  /* Get POS1. */
 	  s = parse_field_count (optarg, &key->sword,
@@ -2337,6 +2526,12 @@ main (int argc, char **argv)
 	  if (outfile && !STREQ (outfile, optarg))
 	    error (SORT_FAILURE, 0, _("multiple output files specified"));
 	  outfile = optarg;
+	  break;
+
+	case RANDOM_SOURCE_OPTION:
+	  if (random_source && !STREQ (random_source, optarg))
+	    error (SORT_FAILURE, 0, _("multiple random sources specified"));
+	  random_source = optarg;
 	  break;
 
 	case 's':
@@ -2415,26 +2610,46 @@ main (int argc, char **argv)
 
   /* Inheritance of global options to individual keys. */
   for (key = keylist; key; key = key->next)
-    if (! (key->ignore || key->translate
-	   || (key->skipsblanks | key->reverse
-	       | key->skipeblanks | key->month | key->numeric
-	       | key->general_numeric)))
-      {
-	key->ignore = gkey.ignore;
-	key->translate = gkey.translate;
-	key->skipsblanks = gkey.skipsblanks;
-	key->skipeblanks = gkey.skipeblanks;
-	key->month = gkey.month;
-	key->numeric = gkey.numeric;
-	key->general_numeric = gkey.general_numeric;
-	key->reverse = gkey.reverse;
-      }
+    {
+      if (! (key->ignore || key->translate
+             || (key->skipsblanks | key->reverse
+                 | key->skipeblanks | key->month | key->numeric
+                 | key->general_numeric
+                 | key->random)))
+        {
+          key->ignore = gkey.ignore;
+          key->translate = gkey.translate;
+          key->skipsblanks = gkey.skipsblanks;
+          key->skipeblanks = gkey.skipeblanks;
+          key->month = gkey.month;
+          key->numeric = gkey.numeric;
+          key->general_numeric = gkey.general_numeric;
+          key->random = gkey.random;
+          key->reverse = gkey.reverse;
+        }
+
+      need_random |= key->random;
+    }
 
   if (!keylist && (gkey.ignore || gkey.translate
 		   || (gkey.skipsblanks | gkey.skipeblanks | gkey.month
-		       | gkey.numeric | gkey.general_numeric)))
-    insertkey (&gkey);
+		       | gkey.numeric | gkey.general_numeric
+                       | gkey.random)))
+    {
+      insertkey (&gkey);
+      need_random |= gkey.random;
+    }
+
+  check_ordering_compatibility ();
+
   reverse = gkey.reverse;
+
+  if (need_random)
+    {
+      randread_source = randread_new (random_source, MD5_DIGEST_SIZE);
+      if (! randread_source)
+	die (_("open failed"), random_source);
+    }
 
   if (temp_dir_count == 0)
     {
@@ -2444,18 +2659,20 @@ main (int argc, char **argv)
 
   if (nfiles == 0)
     {
+      static char *minus = "-";
       nfiles = 1;
+      free (files);
       files = &minus;
     }
 
   if (checkonly)
     {
       if (nfiles > 1)
-	{
-	  error (0, 0, _("extra operand %s not allowed with -c"),
-		 quote (files[1]));
-	  usage (SORT_FAILURE);
-	}
+	error (SORT_FAILURE, 0, _("extra operand %s not allowed with -c"),
+	       quote (files[1]));
+
+      if (outfile)
+	incompatible_options ("co");
 
       /* POSIX requires that sort return 1 IFF invoked with -c and the
 	 input is not properly sorted.  */

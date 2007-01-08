@@ -1,20 +1,320 @@
 GNU coreutils NEWS                                    -*- outline -*-
 
-* Major changes in release 5.94 (2006-02-13) [stable]
+* Noteworthy changes in release 6.7 (2006-12-08) [stable]
 
-** Feature changes
+** Bug fixes
 
-  df now considers "none" and "proc" file systems to be dummies and
-  therefore does not normally display them.  Also, inaccessible file
-  systems (which can be caused by shadowed mount points or by chrooted
-  bind mounts) are now dummies, too.
+  When cp -p copied a file with special mode bits set, the same bits
+  were set on the copy even when ownership could not be preserved.
+  This could result in files that were setuid to the wrong user.
+  To fix this, special mode bits are now set in the copy only if its
+  ownership is successfully preserved.  Similar problems were fixed
+  with mv when copying across file system boundaries.  This problem
+  affects all versions of coreutils through 6.6.
+
+  cp --preserve=ownership would create output files that temporarily
+  had too-generous permissions in some cases.  For example, when
+  copying a file with group A and mode 644 into a group-B sticky
+  directory, the output file was briefly readable by group B.
+  Fix similar problems with cp options like -p that imply
+  --preserve=ownership, with install -d when combined with either -o
+  or -g, and with mv when copying across file system boundaries.
+  This bug affects coreutils 6.0 through 6.6.
+
+  du --one-file-system (-x) would skip subdirectories of any directory
+  listed as second or subsequent command line argument.  This bug affects
+  coreutils-6.4, 6.5 and 6.6.
+
+
+* Noteworthy changes in release 6.6 (2006-11-22) [stable]
+
+** Bug fixes
+
+  ls would segfault (dereference a NULL pointer) for a file with a
+  nameless group or owner.  This bug was introduced in coreutils-6.5.
+
+  A bug in the latest official m4/gettext.m4 (from gettext-0.15)
+  made configure fail to detect gettext support, due to the unusual
+  way in which coreutils uses AM_GNU_GETTEXT.
+
+** Improved robustness
+
+  Now, du (and the other fts clients: chmod, chgrp, chown) honor a
+  trailing slash in the name of a symlink-to-directory even on
+  Solaris 9, by working around its buggy fstatat implementation.
+
+
+* Major changes in release 6.5 (2006-11-19) [stable]
+
+** Bug fixes
+
+  du (and the other fts clients: chmod, chgrp, chown) would exit early
+  when encountering an inaccessible directory on a system with native
+  openat support (i.e., linux-2.6.16 or newer along with glibc-2.4
+  or newer).  This bug was introduced with the switch to gnulib's
+  openat-based variant of fts, for coreutils-6.0.
+
+  "ln --backup f f" now produces a sensible diagnostic
+
+** New features
+
+  rm accepts a new option: --one-file-system
+
+
+* Major changes in release 6.4 (2006-10-22) [stable]
+
+** Bug fixes
+
+  chgrp and chown would malfunction when invoked with both -R and -H and
+  with one or more of the following: --preserve-root, --verbose, --changes,
+  --from=o:g (chown only).  This bug was introduced with the switch to
+  gnulib's openat-based variant of fts, for coreutils-6.0.
+
+  cp --backup dir1 dir2, would rename an existing dir2/dir1 to dir2/dir1~.
+  This bug was introduced in coreutils-6.0.
+
+  With --force (-f), rm no longer fails for ENOTDIR.
+  For example, "rm -f existing-non-directory/anything" now exits
+  successfully, ignoring the error about a nonexistent file.
+
+
+* Major changes in release 6.3 (2006-09-30) [stable]
+
+** Improved robustness
+
+  pinky no longer segfaults on Darwin 7.9.0 (MacOS X 10.3.9) due to a
+  buggy native getaddrinfo function.
+
+  rm works around a bug in Darwin 7.9.0 (MacOS X 10.3.9) that would
+  sometimes keep it from removing all entries in a directory on an HFS+
+  or NFS-mounted partition.
+
+  sort would fail to handle very large input (around 40GB) on systems with a
+  mkstemp function that returns a file descriptor limited to 32-bit offsets.
+
+** Bug fixes
+
+  chmod would fail unnecessarily in an unusual case: when an initially-
+  inaccessible argument is rendered accessible by chmod's action on a
+  preceding command line argument.  This bug also affects chgrp, but
+  it is harder to demonstrate.  It does not affect chown.  The bug was
+  introduced with the switch from explicit recursion to the use of fts
+  in coreutils-5.1.0 (2003-10-15).
+
+  cp -i and mv -i occasionally neglected to prompt when the copy or move
+  action was bound to fail.  This bug dates back to before fileutils-4.0.
+
+  With --verbose (-v), cp and mv would sometimes generate no output,
+  or neglect to report file removal.
+
+  For the "groups" command:
+
+    "groups" no longer prefixes the output with "user :" unless more
+    than one user is specified; this is for compatibility with BSD.
+
+    "groups user" now exits nonzero when it gets a write error.
+
+    "groups" now processes options like --help more compatibly.
+
+  shuf would infloop, given 8KB or more of piped input
+
+** Portability
+
+  Versions of chmod, chown, chgrp, du, and rm (tools that use openat etc.)
+  compiled for Solaris 8 now also work when run on Solaris 10.
+
+
+* Major changes in release 6.2 (2006-09-18) [stable candidate]
+
+** Changes in behavior
+
+  mkdir -p and install -d (or -D) now use a method that forks a child
+  process if the working directory is unreadable and a later argument
+  uses a relative file name.  This avoids some race conditions, but it
+  means you may need to kill two processes to stop these programs.
+
+  rm now rejects attempts to remove the root directory, e.g., `rm -fr /'
+  now fails without removing anything.  Likewise for any file name with
+  a final `./' or `../' component.
+
+  tail now ignores the -f option if POSIXLY_CORRECT is set, no file
+  operand is given, and standard input is any FIFO; formerly it did
+  this only for pipes.
+
+** Infrastructure changes
+
+  Coreutils now uses gnulib via the gnulib-tool script.
+  If you check the source out from CVS, then follow the instructions
+  in README-cvs.  Although this represents a large change to the
+  infrastructure, it should cause no change in how the tools work.
+
+** Bug fixes
+
+  cp --backup no longer fails when the last component of a source file
+  name is "." or "..".
+
+  "ls --color" would highlight other-writable and sticky directories
+  no differently than regular directories on a file system with
+  dirent.d_type support.
+
+  "mv -T --verbose --backup=t A B" now prints the " (backup: B.~1~)"
+  suffix when A and B are directories as well as when they are not.
+
+  mv and "cp -r" no longer fail when invoked with two arguments
+  where the first one names a directory and the second name ends in
+  a slash and doesn't exist.  E.g., "mv dir B/", for nonexistent B,
+  now succeeds, once more.  This bug was introduced in coreutils-5.3.0.
+
+
+* Major changes in release 6.1 (2006-08-19) [unstable]
+
+** Changes in behavior
+
+  df now considers BSD "kernfs" file systems to be dummies
+
+** New features
+
+  printf now supports the 'I' flag on hosts whose underlying printf
+  implementations support 'I', e.g., "printf %Id 2".
+
+** Bug fixes
+
+  cp --sparse preserves sparseness at the end of a file, even when
+  the file's apparent size is not a multiple of its block size.
+  [introduced with the original design, in fileutils-4.0r, 2000-04-29]
+
+  df (with a command line argument) once again prints its header
+  [introduced in coreutils-6.0]
+
+  ls -CF would misalign columns in some cases involving non-stat'able files
+  [introduced in coreutils-6.0]
+
+* Major changes in release 6.0 (2006-08-15) [unstable]
+
+** Improved robustness
+
+  df: if the file system claims to have more available than total blocks,
+  report the number of used blocks as being "total - available"
+  (a negative number) rather than as garbage.
+
+  dircolors: a new autoconf run-test for AIX's buggy strndup function
+  prevents malfunction on that system;  may also affect cut, expand,
+  and unexpand.
+
+  fts no longer changes the current working directory, so its clients
+  (chmod, chown, chgrp, du) no longer malfunction under extreme conditions.
+
+  pwd and other programs using lib/getcwd.c work even on file systems
+  where dirent.d_ino values are inconsistent with those from stat.st_ino.
+
+  rm's core is now reentrant: rm --recursive (-r) now processes
+  hierarchies without changing the working directory at all.
+
+** Changes in behavior
+
+  basename and dirname now treat // as different from / on platforms
+  where the two are distinct.
+
+  chmod, install, and mkdir now preserve a directory's set-user-ID and
+  set-group-ID bits unless you explicitly request otherwise.  E.g.,
+  `chmod 755 DIR' and `chmod u=rwx,go=rx DIR' now preserve DIR's
+  set-user-ID and set-group-ID bits instead of clearing them, and
+  similarly for `mkdir -m 755 DIR' and `mkdir -m u=rwx,go=rx DIR'.  To
+  clear the bits, mention them explicitly in a symbolic mode, e.g.,
+  `mkdir -m u=rwx,go=rx,-s DIR'.  To set them, mention them explicitly
+  in either a symbolic or a numeric mode, e.g., `mkdir -m 2755 DIR',
+  `mkdir -m u=rwx,go=rx,g+s' DIR.  This change is for convenience on
+  systems where these bits inherit from parents.  Unfortunately other
+  operating systems are not consistent here, and portable scripts
+  cannot assume the bits are set, cleared, or preserved, even when the
+  bits are explicitly mentioned.  For example, OpenBSD 3.9 `mkdir -m
+  777 D' preserves D's setgid bit but `chmod 777 D' clears it.
+  Conversely, Solaris 10 `mkdir -m 777 D', `mkdir -m g-s D', and
+  `chmod 0777 D' all preserve D's setgid bit, and you must use
+  something like `chmod g-s D' to clear it.
+
+  `cp --link --no-dereference' now works also on systems where the
+  link system call cannot create a hard link to a symbolic link.
+  This change has no effect on systems with a Linux-based kernel.
+
+  csplit and nl now use POSIX syntax for regular expressions, not
+  Emacs syntax.  As a result, character classes like [[:print:]] and
+  interval expressions like A\{1,9\} now have their usual meaning,
+  . no longer matches the null character, and \ must precede the + and
+  ? operators.
+
+  date: a command like date -d '2006-04-23 21 days ago' would print
+  the wrong date in some time zones.  (see the test for an example)
+
+  df changes:
+
+    df now considers "none" and "proc" file systems to be dummies and
+    therefore does not normally display them.  Also, inaccessible file
+    systems (which can be caused by shadowed mount points or by
+    chrooted bind mounts) are now dummies, too.
+
+    df now fails if it generates no output, so you can inspect the
+    exit status of a command like "df -t ext3 -t reiserfs DIR" to test
+    whether DIR is on a file system of type "ext3" or "reiserfs".
+
+  expr no longer complains about leading ^ in a regular expression
+  (the anchor is ignored), or about regular expressions like A** (the
+  second "*" is ignored).  expr now exits with status 2 (not 3) for
+  errors it detects in the expression's values; exit status 3 is now
+  used only for internal errors (such as integer overflow, which expr
+  now checks for).
+
+  install and mkdir now implement the X permission symbol correctly,
+  e.g., `mkdir -m a+X dir'; previously the X was ignored.
+
+  install now creates parent directories with mode u=rwx,go=rx (755)
+  instead of using the mode specified by the -m option; and it does
+  not change the owner or group of parent directories.  This is for
+  compatibility with BSD and closes some race conditions.
+
+  ln now uses different (and we hope clearer) diagnostics when it fails.
+  ln -v now acts more like FreeBSD, so it generates output only when
+  successful and the output is easier to parse.
+
+  ls now defaults to --time-style='locale', not --time-style='posix-long-iso'.
+  However, the 'locale' time style now behaves like 'posix-long-iso'
+  if your locale settings appear to be messed up.  This change
+  attempts to have the default be the best of both worlds.
+
+  mkfifo and mknod no longer set special mode bits (setuid, setgid,
+  and sticky) with the -m option.
+
+  nohup's usual diagnostic now more precisely specifies the I/O
+  redirections, e.g., "ignoring input and appending output to
+  nohup.out".  Also, nohup now redirects stderr to nohup.out (or
+  $HOME/nohup.out) if stdout is closed and stderr is a tty; this is in
+  response to Open Group XCU ERN 71.
+
+  rm --interactive now takes an optional argument, although the
+  default of using no argument still acts like -i.
+
+  rm no longer fails to remove an empty, unreadable directory
+
+  seq changes:
+
+    seq defaults to a minimal fixed point format that does not lose
+    information if seq's operands are all fixed point decimal numbers.
+    You no longer need the `-f%.f' in `seq -f%.f 1048575 1024 1050623',
+    for example, since the default format now has the same effect.
+
+    seq now lets you use %a, %A, %E, %F, and %G formats.
+
+    seq now uses long double internally rather than double.
+
+  sort now reports incompatible options (e.g., -i and -n) rather than
+  silently ignoring one of them.
 
   stat's --format=FMT option now works the way it did before 5.3.0:
   FMT is automatically newline terminated.  The first stable release
   containing this change was 5.92.
 
-  stat accepts the new option --printf=PFMT, where PFMT is *not* automatically
-  newline terminated.  Backslash escapes in PFMT *are* interpreted.
+  stat accepts the new option --printf=FMT, where FMT is *not*
+  automatically newline terminated.
 
   stat: backslash escapes are interpreted in a format string specified
   via --printf=FMT, but not one specified via --format=FMT.  That includes
@@ -22,7 +322,80 @@ GNU coreutils NEWS                                    -*- outline -*-
   two hex digits), and the standard sequences (\a, \b, \f, \n, \r, \t,
   \v, \", \\).
 
+  With no operand, 'tail -f' now silently ignores the '-f' only if
+  standard input is a FIFO or pipe and POSIXLY_CORRECT is set.
+  Formerly, it ignored the '-f' when standard input was a FIFO, pipe,
+  or socket.
+
+** Scheduled for removal
+
+  ptx's --copyright (-C) option is scheduled for removal in 2007, and
+  now evokes a warning.  Use --version instead.
+
+  rm's --directory (-d) option is scheduled for removal in 2006.  This
+  option has been silently ignored since coreutils 5.0.  On systems
+  that support unlinking of directories, you can use the "unlink"
+  command to unlink a directory.
+
+  Similarly, we are considering the removal of ln's --directory (-d,
+  -F) option in 2006.  Please write to <bug-coreutils@gnu.org> if this
+  would cause a problem for you.  On systems that support hard links
+  to directories, you can use the "link" command to create one.
+
+** New programs
+
+  base64: base64 encoding and decoding (RFC 3548) functionality.
+  sha224sum: print or check a SHA224 (224-bit) checksum
+  sha256sum: print or check a SHA256 (256-bit) checksum
+  sha384sum: print or check a SHA384 (384-bit) checksum
+  sha512sum: print or check a SHA512 (512-bit) checksum
+  shuf: Shuffle lines of text.
+
+** New features
+
+  chgrp now supports --preserve-root, --no-preserve-root (default),
+  as it was documented to do, and just as chmod, chown, and rm do.
+
+  New dd iflag= and oflag= flags:
+
+    'directory' causes dd to fail unless the file is a directory, on
+    hosts that support this (e.g., Linux kernels, version 2.1.126 and
+    later).  This has limited utility but is present for completeness.
+
+    'noatime' causes dd to read a file without updating its access
+    time, on hosts that support this (e.g., Linux kernels, version
+    2.6.8 and later).
+
+    'nolinks' causes dd to fail if the file has multiple hard links,
+    on hosts that support this (e.g., Solaris 10 and later).
+
+  ls accepts the new option --group-directories-first, to make it
+  list directories before files.
+
+  rm now accepts the -I (--interactive=once) option.  This new option
+  prompts once if rm is invoked recursively or if more than three
+  files are being deleted, which is less intrusive than -i prompting
+  for every file, but provides almost the same level of protection
+  against mistakes.
+
+  shred and sort now accept the --random-source option.
+
+  sort now accepts the --random-sort (-R) option and `R' ordering option.
+
+  sort now supports obsolete usages like "sort +1 -2" unless
+  POSIXLY_CORRECT is set.  However, when conforming to POSIX
+  1003.1-2001 "sort +1" still sorts the file named "+1".
+
+  wc accepts a new option --files0-from=FILE, where FILE contains a
+  list of NUL-terminated file names.
+
 ** Bug fixes
+
+  cat with any of the options, -A -v -e -E -T, when applied to a
+  file in /proc or /sys (linux-specific), would truncate its output,
+  usually printing nothing.
+
+  cp -p would fail in a /proc-less chroot, on some systems
 
   When `cp -RL' encounters the same directory more than once in the
   hierarchy beneath a single command-line argument, it no longer confuses
@@ -36,6 +409,30 @@ GNU coreutils NEWS                                    -*- outline -*-
   a very long symlink chain as a dangling symlink.  Before, such a
   misinterpretation would cause these tools not to diagnose an ELOOP error.
 
+  ls --indicator-style=file-type would sometimes stat a symlink
+  unnecessarily.
+
+  ls --file-type worked like --indicator-style=slash (-p),
+  rather than like --indicator-style=file-type.
+
+  mv: moving a symlink into the place of an existing non-directory is
+  now done atomically;  before, mv would first unlink the destination.
+
+  mv -T DIR EMPTY_DIR no longer fails unconditionally.  Also, mv can
+  now remove an empty destination directory: mkdir -p a b/a; mv a b
+
+  rm (on systems with openat) can no longer exit before processing
+  all command-line arguments.
+
+  rm is no longer susceptible to a few low-probability memory leaks.
+
+  rm -r no longer fails to remove an inaccessible and empty directory
+
+  rm -r's cycle detection code can no longer be tricked into reporting
+  a false positive (introduced in fileutils-4.1.9).
+
+  shred --remove FILE no longer segfaults on Gentoo systems
+
   sort would fail for large inputs (~50MB) on systems with a buggy
   mkstemp function.  sort and tac now use the replacement mkstemp
   function, and hence are no longer subject to limitations (of 26 or 32,
@@ -45,13 +442,19 @@ GNU coreutils NEWS                                    -*- outline -*-
   tail -f once again works on a file with the append-only
   attribute (affects at least Linux ext2, ext3, xfs file systems)
 
+* Major changes in release 5.97 (2006-06-24) [stable]
+* Major changes in release 5.96 (2006-05-22) [stable]
+* Major changes in release 5.95 (2006-05-12) [stable]
+* Major changes in release 5.94 (2006-02-13) [stable]
+
+[see the b5_9x branch for details]
 
 * Major changes in release 5.93 (2005-11-06) [stable]
 
 ** Bug fixes
 
   dircolors no longer segfaults upon an attempt to use the new
-  STICKY_OTHER_WRITABLE (OWT) attribute
+  STICKY_OTHER_WRITABLE (OWT) attribute.
 
   du no longer overflows a counter when processing a file larger than
   2^31-1 on some 32-bit systems (at least some AIX 5.1 configurations).
@@ -65,12 +468,14 @@ GNU coreutils NEWS                                    -*- outline -*-
   rm emits a better diagnostic when (without -r) it fails to remove
   a directory on e.g., Solaris 9/10 systems.
 
-  tac now works when stdin is a tty, even on non-Linux systems
+  tac now works when stdin is a tty, even on non-Linux systems.
 
   "tail -c 2 FILE" and "touch 0101000000" now operate as POSIX
   1003.1-2001 requires, even when coreutils is conforming to older
   POSIX standards, as the newly-required behavior is upward-compatible
   with the old.
+
+  The documentation no longer mentions rm's --directory (-d) option.
 
 ** Build-related bug fixes
 
@@ -84,6 +489,7 @@ GNU coreutils NEWS                                    -*- outline -*-
   chmod now diagnoses an invalid mode string starting with an octal digit
 
   dircolors now properly quotes single-quote characters
+
 
 * Major changes in release 5.91 (2005-10-17) [stable candidate]
 
@@ -301,7 +707,7 @@ GNU coreutils NEWS                                    -*- outline -*-
 
   cp and mv: the --reply=X option is deprecated
 
-  date accepts the new option --rfc-3339=TIMESPEC.  The old --iso-8602 (-I)
+  date accepts the new option --rfc-3339=TIMESPEC.  The old --iso-8601 (-I)
   option is deprecated; it still works, but new applications should avoid it.
   date, du, ls, and pr's time formats now support new %:z, %::z, %:::z
   specifiers for numeric time zone offsets like -07:00, -07:00:00, and -07.
@@ -449,6 +855,8 @@ GNU coreutils NEWS                                    -*- outline -*-
 
   mv (when moving between partitions) no longer fails when
   operating on too many command-line-specified nonempty directories.
+
+  "readlink -f" is more compatible with prior implementations
 
   rm (without -f) no longer hangs when attempting to remove a symlink
   to a file on an off-line NFS-mounted partition.
@@ -632,6 +1040,9 @@ GNU coreutils NEWS                                    -*- outline -*-
     The default output format is now -t oS, not -t o2, i.e., short int
     rather than two-byte int.  This makes a difference only on hosts like
     Cray systems where the C short int type requires more than two bytes.
+
+  readlink accepts new options: --canonicalize-existing (-e)
+  and --canonicalize-missing (-m).
 
   The stat option --filesystem has been renamed to --file-system, for
   consistency with POSIX "file system" and with cp and du --one-file-system.
@@ -1360,3 +1771,15 @@ packages, see ./old/*/NEWS.
 
   This package began as the union of the following:
   textutils-2.1, fileutils-4.1.11, sh-utils-2.0.15.
+
+========================================================================
+
+Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the ``GNU Free
+Documentation License'' file as part of this distribution.

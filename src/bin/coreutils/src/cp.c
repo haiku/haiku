@@ -1,5 +1,5 @@
 /* cp.c  -- file copying (main routines)
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation.
+   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include <config.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <assert.h>
 #include <getopt.h>
 
 #include "system.h"
@@ -29,20 +28,21 @@
 #include "copy.h"
 #include "cp-hash.h"
 #include "error.h"
-#include "dirname.h"
 #include "filenamecat.h"
+#include "lchmod.h"
 #include "quote.h"
 #include "quotearg.h"
 #include "stat-time.h"
 #include "utimens.h"
+#include "acl.h"
 
 #define ASSIGN_BASENAME_STRDUPA(Dest, File_name)	\
   do							\
     {							\
       char *tmp_abns_;					\
       ASSIGN_STRDUPA (tmp_abns_, (File_name));		\
-      strip_trailing_slashes (tmp_abns_);		\
-      Dest = base_name (tmp_abns_);			\
+      Dest = last_component (tmp_abns_);		\
+      strip_trailing_slashes (Dest);			\
     }							\
   while (0)
 
@@ -56,7 +56,8 @@
    need to be fixed after copying. */
 struct dir_attr
 {
-  bool is_new_dir;
+  mode_t mode;
+  bool restore_mode;
   size_t slash_offset;
   struct dir_attr *next;
 };
@@ -167,7 +168,7 @@ Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -a, --archive                same as -dpR\n\
+  -a, --archive                same as -dpPR\n\
       --backup[=CONTROL]       make a backup of each existing destination file\n\
   -b                           like --backup but does not accept an argument\n\
       --copy-contents          copy contents of special files when recursive\n\
@@ -203,7 +204,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
       --sparse=WHEN            control creation of sparse files\n\
-      --strip-trailing-slashes remove any trailing slashes from each SOURCE\n\
+      --strip-trailing-slashes  remove any trailing slashes from each SOURCE\n\
                                  argument\n\
 "), stdout);
       fputs (_("\
@@ -327,9 +328,14 @@ re_protect (char const *const_dst_name, size_t src_offset,
 	    }
 	}
 
-      if (x->preserve_mode | p->is_new_dir)
+      if (x->preserve_mode)
 	{
-	  if (chmod (dst_name, src_sb.st_mode & x->umask_kill))
+	  if (copy_acl (src_name, -1, dst_name, -1, src_sb.st_mode))
+	    return false;
+	}
+      else if (p->restore_mode)
+	{
+	  if (lchmod (dst_name, p->mode) != 0)
 	    {
 	      error (0, errno, _("failed to preserve permissions for %s"),
 		     quote (dst_name));
@@ -347,8 +353,7 @@ re_protect (char const *const_dst_name, size_t src_offset,
 
    SRC_OFFSET is the index in CONST_DIR (which is a destination
    directory) of the beginning of the source directory name.
-   Create any leading directories that don't already exist,
-   giving them permissions MODE.
+   Create any leading directories that don't already exist.
    If VERBOSE_FMT_STRING is nonzero, use it as a printf format
    string for printing a message after successfully making a directory.
    The format should take two string arguments: the names of the
@@ -364,9 +369,9 @@ re_protect (char const *const_dst_name, size_t src_offset,
 
 static bool
 make_dir_parents_private (char const *const_dir, size_t src_offset,
-			  mode_t mode, char const *verbose_fmt_string,
+			  char const *verbose_fmt_string,
 			  struct dir_attr **attr_list, bool *new_dst,
-			  int (*xstat) ())
+			  const struct cp_options *x)
 {
   struct stat stats;
   char *dir;		/* A copy of CONST_DIR we can change.  */
@@ -385,7 +390,7 @@ make_dir_parents_private (char const *const_dir, size_t src_offset,
 
   *attr_list = NULL;
 
-  if ((*xstat) (dst_dir, &stats))
+  if (XSTAT (x, dst_dir, &stats))
     {
       /* A parent of CONST_DIR does not exist.
 	 Make all missing intermediate directories. */
@@ -400,20 +405,39 @@ make_dir_parents_private (char const *const_dir, size_t src_offset,
 	     fixing later. */
 	  struct dir_attr *new = xmalloc (sizeof *new);
 	  new->slash_offset = slash - dir;
+	  new->restore_mode = false;
 	  new->next = *attr_list;
 	  *attr_list = new;
 
 	  *slash = '\0';
-	  if ((*xstat) (dir, &stats))
+	  if (XSTAT (x, dir, &stats))
 	    {
+	      mode_t src_mode;
+	      mode_t omitted_permissions;
+	      mode_t mkdir_mode;
+
 	      /* This component does not exist.  We must set
-		 *new_dst and new->is_new_dir inside this loop because,
+		 *new_dst and new->mode inside this loop because,
 		 for example, in the command `cp --parents ../a/../b/c e_dir',
 		 make_dir_parents_private creates only e_dir/../a if
 		 ./b already exists. */
 	      *new_dst = true;
-	      new->is_new_dir = true;
-	      if (mkdir (dir, mode))
+	      if (XSTAT (x, src, &stats))
+		{
+		  error (0, errno, _("failed to get attributes of %s"),
+			 quote (src));
+		  return false;
+		}
+	      src_mode = stats.st_mode;
+	      omitted_permissions =
+		x->preserve_ownership ? src_mode & (S_IRWXG | S_IRWXO) : 0;
+
+	      /* POSIX says mkdir's behavior is implementation-defined when
+		 (src_mode & ~S_IRWXUGO) != 0.  However, common practice is
+		 to ask mkdir to copy all the CHMOD_MODE_BITS, letting mkdir
+		 decide what to do with S_ISUID | S_ISGID | S_ISVTX.  */
+	      mkdir_mode = src_mode & CHMOD_MODE_BITS & ~omitted_permissions;
+	      if (mkdir (dir, mkdir_mode) != 0)
 		{
 		  error (0, errno, _("cannot make directory %s"),
 			 quote (dir));
@@ -424,6 +448,43 @@ make_dir_parents_private (char const *const_dir, size_t src_offset,
 		  if (verbose_fmt_string != NULL)
 		    printf (verbose_fmt_string, src, dir);
 		}
+
+	      /* We need search and write permissions to the new directory
+	         for writing the directory's contents. Check if these
+		 permissions are there.  */
+
+	      if (lstat (dir, &stats))
+		{
+		  error (0, errno, _("failed to get attributes of %s"),
+			 quote (dir));
+		  return false;
+		}
+
+
+	      if (! x->preserve_mode)
+		{
+		  if (omitted_permissions & ~stats.st_mode)
+		    omitted_permissions &= ~ cached_umask ();
+		  if (omitted_permissions & ~stats.st_mode
+		      || (stats.st_mode & S_IRWXU) != S_IRWXU)
+		    {
+		      new->mode = stats.st_mode | omitted_permissions;
+		      new->restore_mode = true;
+		    }
+		}
+
+	      if ((stats.st_mode & S_IRWXU) != S_IRWXU)
+		{
+		  /* Make the new directory searchable and writable.
+		     The original permissions will be restored later.  */
+
+		  if (lchmod (dir, stats.st_mode | S_IRWXU) != 0)
+		    {
+		      error (0, errno, _("setting permissions for %s"),
+			     quote (dir));
+		      return false;
+		    }
+		}
 	    }
 	  else if (!S_ISDIR (stats.st_mode))
 	    {
@@ -432,10 +493,7 @@ make_dir_parents_private (char const *const_dir, size_t src_offset,
 	      return false;
 	    }
 	  else
-	    {
-	      new->is_new_dir = false;
-	      *new_dst = false;
-	    }
+	    *new_dst = false;
 	  *slash++ = '/';
 
 	  /* Avoid unnecessary calls to `stat' when given
@@ -471,9 +529,6 @@ make_dir_parents_private (char const *const_dir, size_t src_offset,
 static bool
 target_directory_operand (char const *file, struct stat *st, bool *new_dst)
 {
-  char const *b = base_name (file);
-  size_t blen = strlen (b);
-  bool looks_like_a_dir = (blen == 0 || ISSLASH (b[blen - 1]));
   int err = (stat (file, st) == 0 ? 0 : errno);
   bool is_a_dir = !err && S_ISDIR (st->st_mode);
   if (err)
@@ -482,8 +537,6 @@ target_directory_operand (char const *file, struct stat *st, bool *new_dst)
 	error (EXIT_FAILURE, err, _("accessing %s"), quote (file));
       *new_dst = true;
     }
-  if (is_a_dir < looks_like_a_dir)
-    error (EXIT_FAILURE, err, _("target %s is not a directory"), quote (file));
   return is_a_dir;
 }
 
@@ -536,10 +589,6 @@ do_copy (int n_files, char **file, const char *target_directory,
 	 Copy the files `file1' through `filen'
 	 to the existing directory `edir'. */
       int i;
-      int (*xstat)() = (x->dereference == DEREF_COMMAND_LINE_ARGUMENTS
-			|| x->dereference == DEREF_ALWAYS
-			? stat
-			: lstat);
 
       /* Initialize these hash tables only if we'll need them.
 	 The problems they're used to detect can arise only if
@@ -585,9 +634,9 @@ do_copy (int n_files, char **file, const char *target_directory,
 	         leading directories. */
 	      parent_exists =
 		(make_dir_parents_private
-		 (dst_name, arg_in_concat - dst_name, S_IRWXU,
+		 (dst_name, arg_in_concat - dst_name,
 		  (x->verbose ? "%s -> %s\n" : NULL),
-		  &attr_list, &new_dst, xstat));
+		  &attr_list, &new_dst, x));
 	    }
 	  else
 	    {
@@ -697,12 +746,6 @@ cp_option_init (struct cp_options *x)
 
   /* Not used.  */
   x->stdin_tty = false;
-
-  /* Find out the current file creation mask, to knock the right bits
-     when using chmod.  The creation mask is set to be liberal, so
-     that created directories can be written, even if it would not
-     have been allowed with the mask this process was started with.  */
-  x->umask_kill = ~ umask (0);
 
   x->update = false;
   x->verbose = false;
@@ -920,12 +963,7 @@ main (int argc, char **argv)
 	  break;
 
 	case 's':
-#ifdef S_ISLNK
 	  x.symbolic_link = true;
-#else
-	  error (EXIT_FAILURE, 0,
-		 _("symbolic links are not supported on this system"));
-#endif
 	  break;
 
 	case 't':
@@ -987,9 +1025,6 @@ main (int argc, char **argv)
 		   ? xget_version (_("backup type"),
 				   version_control_string)
 		   : no_backups);
-
-  if (x.preserve_mode)
-    x.umask_kill = ~ (mode_t) 0;
 
   if (x.dereference == DEREF_UNDEFINED)
     {

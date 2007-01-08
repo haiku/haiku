@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,92,93,94,95,96,97,98,99,2004,2005 Free Software
+/* Copyright (C) 1991,92,93,94,95,96,97,98,99,2004,2005,2006 Free Software
    Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -16,11 +16,8 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #if !_LIBC
+# include <config.h>
 # include "getcwd.h"
 #endif
 
@@ -36,25 +33,9 @@
 # define __set_errno(val) (errno = (val))
 #endif
 
-#if HAVE_DIRENT_H || _LIBC
-# include <dirent.h>
-# ifndef _D_EXACT_NAMLEN
-#  define _D_EXACT_NAMLEN(d) strlen ((d)->d_name)
-# endif
-#else
-# define dirent direct
-# if HAVE_SYS_NDIR_H
-#  include <sys/ndir.h>
-# endif
-# if HAVE_SYS_DIR_H
-#  include <sys/dir.h>
-# endif
-# if HAVE_NDIR_H
-#  include <ndir.h>
-# endif
-#endif
+#include <dirent.h>
 #ifndef _D_EXACT_NAMLEN
-# define _D_EXACT_NAMLEN(d) ((d)->d_namlen)
+# define _D_EXACT_NAMLEN(d) strlen ((d)->d_name)
 #endif
 #ifndef _D_ALLOC_NAMLEN
 # define _D_ALLOC_NAMLEN(d) (_D_EXACT_NAMLEN (d) + 1)
@@ -73,6 +54,14 @@
 #endif
 
 #include <limits.h>
+
+/* Work around a bug in Solaris 9 and 10: AT_FDCWD is positive.  Its
+   value exceeds INT_MAX, so its use as an int doesn't conform to the
+   C standard, and GCC and Sun C complain in some cases.  */
+#if 0 < AT_FDCWD && AT_FDCWD == 0xffd19553
+# undef AT_FDCWD
+# define AT_FDCWD (-3041965)
+#endif
 
 #ifdef ENAMETOOLONG
 # define is_ENAMETOOLONG(x) ((x) == ENAMETOOLONG)
@@ -203,6 +192,7 @@ __getcwd (char *buf, size_t size)
       int parent_status;
       size_t dirroom;
       size_t namlen;
+      bool use_d_ino = true;
 
       /* Look at the parent directory.  */
 #ifdef AT_FDCWD
@@ -249,11 +239,26 @@ __getcwd (char *buf, size_t size)
 	     NULL.  */
 	  __set_errno (0);
 	  d = __readdir (dirstream);
+
+	  /* When we've iterated through all directory entries without finding
+	     one with a matching d_ino, rewind the stream and consider each
+	     name again, but this time, using lstat.  This is necessary in a
+	     chroot on at least one system (glibc-2.3.6 + linux 2.6.12), where
+	     .., ../.., ../../.., etc. all had the same device number, yet the
+	     d_ino values for entries in / did not match those obtained
+	     via lstat.  */
+	  if (d == NULL && errno == 0 && use_d_ino)
+	    {
+	      use_d_ino = false;
+	      rewinddir (dirstream);
+	      d = __readdir (dirstream);
+	    }
+
 	  if (d == NULL)
 	    {
 	      if (errno == 0)
-		/* EOF on dirstream, which means that the current directory
-		   has been removed.  */
+		/* EOF on dirstream, which can mean e.g., that the current
+		   directory has been removed.  */
 		__set_errno (ENOENT);
 	      goto lose;
 	    }
@@ -261,58 +266,65 @@ __getcwd (char *buf, size_t size)
 	      (d->d_name[1] == '\0' ||
 	       (d->d_name[1] == '.' && d->d_name[2] == '\0')))
 	    continue;
-	  if (MATCHING_INO (d, thisino) || mount_point)
+
+	  if (use_d_ino)
 	    {
-	      int entry_status;
-#ifdef AT_FDCWD
-	      entry_status = fstatat (fd, d->d_name, &st, AT_SYMLINK_NOFOLLOW);
-#else
-	      /* Compute size needed for this file name, or for the file
-		 name ".." in the same directory, whichever is larger.
-	         Room for ".." might be needed the next time through
-		 the outer loop.  */
-	      size_t name_alloc = _D_ALLOC_NAMLEN (d);
-	      size_t filesize = dotlen + MAX (sizeof "..", name_alloc);
-
-	      if (filesize < dotlen)
-		goto memory_exhausted;
-
-	      if (dotsize < filesize)
-		{
-		  /* My, what a deep directory tree you have, Grandma.  */
-		  size_t newsize = MAX (filesize, dotsize * 2);
-		  size_t i;
-		  if (newsize < dotsize)
-		    goto memory_exhausted;
-		  if (dotlist != dots)
-		    free (dotlist);
-		  dotlist = malloc (newsize);
-		  if (dotlist == NULL)
-		    goto lose;
-		  dotsize = newsize;
-
-		  i = 0;
-		  do
-		    {
-		      dotlist[i++] = '.';
-		      dotlist[i++] = '.';
-		      dotlist[i++] = '/';
-		    }
-		  while (i < dotlen);
-		}
-
-	      strcpy (dotlist + dotlen, d->d_name);
-	      entry_status = __lstat (dotlist, &st);
-#endif
-	      /* We don't fail here if we cannot stat() a directory entry.
-		 This can happen when (network) file systems fail.  If this
-		 entry is in fact the one we are looking for we will find
-		 out soon as we reach the end of the directory without
-		 having found anything.  */
-	      if (entry_status == 0 && S_ISDIR (st.st_mode)
-		  && st.st_dev == thisdev && st.st_ino == thisino)
-		break;
+	      bool match = (MATCHING_INO (d, thisino) || mount_point);
+	      if (! match)
+		continue;
 	    }
+
+	  {
+	    int entry_status;
+#ifdef AT_FDCWD
+	    entry_status = fstatat (fd, d->d_name, &st, AT_SYMLINK_NOFOLLOW);
+#else
+	    /* Compute size needed for this file name, or for the file
+	       name ".." in the same directory, whichever is larger.
+	       Room for ".." might be needed the next time through
+	       the outer loop.  */
+	    size_t name_alloc = _D_ALLOC_NAMLEN (d);
+	    size_t filesize = dotlen + MAX (sizeof "..", name_alloc);
+
+	    if (filesize < dotlen)
+	      goto memory_exhausted;
+
+	    if (dotsize < filesize)
+	      {
+		/* My, what a deep directory tree you have, Grandma.  */
+		size_t newsize = MAX (filesize, dotsize * 2);
+		size_t i;
+		if (newsize < dotsize)
+		  goto memory_exhausted;
+		if (dotlist != dots)
+		  free (dotlist);
+		dotlist = malloc (newsize);
+		if (dotlist == NULL)
+		  goto lose;
+		dotsize = newsize;
+
+		i = 0;
+		do
+		  {
+		    dotlist[i++] = '.';
+		    dotlist[i++] = '.';
+		    dotlist[i++] = '/';
+		  }
+		while (i < dotlen);
+	      }
+
+	    memcpy (dotlist + dotlen, d->d_name, _D_ALLOC_NAMLEN (d));
+	    entry_status = __lstat (dotlist, &st);
+#endif
+	    /* We don't fail here if we cannot stat() a directory entry.
+	       This can happen when (network) file systems fail.  If this
+	       entry is in fact the one we are looking for we will find
+	       out soon as we reach the end of the directory without
+	       having found anything.  */
+	    if (entry_status == 0 && S_ISDIR (st.st_mode)
+		&& st.st_dev == thisdev && st.st_ino == thisino)
+	      break;
+	  }
 	}
 
       dirroom = dirp - dir;

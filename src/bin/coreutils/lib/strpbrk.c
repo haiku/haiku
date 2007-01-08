@@ -1,4 +1,6 @@
-/* Copyright (C) 1991, 1994, 2000, 2002-2003 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1994, 2000, 2002-2003, 2006 Free Software
+   Foundation, Inc.
+
    NOTE: The canonical source of this file is maintained with the GNU C Library.
    Bugs can be reported to bug-glibc@prep.ai.mit.edu.
 
@@ -16,9 +18,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <stddef.h>
 #include <string.h>

@@ -1,5 +1,5 @@
 /* provide a chdir function that tries not to fail due to ENAMETOOLONG
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,27 +17,20 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "chdir-long.h"
 
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
 #include <assert.h>
-#include <limits.h>
 
 #include "memrchr.h"
 #include "openat.h"
-
-#ifndef O_DIRECTORY
-# define O_DIRECTORY 0
-#endif
 
 #ifndef PATH_MAX
 # error "compile this file only if your system defines PATH_MAX"
@@ -77,13 +70,10 @@ cdb_free (struct cd_buf const *cdb)
 static int
 cdb_advance_fd (struct cd_buf *cdb, char const *dir)
 {
-  int new_fd = openat (cdb->fd, dir, O_RDONLY | O_DIRECTORY);
+  int new_fd = openat (cdb->fd, dir,
+		       O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
   if (new_fd < 0)
-    {
-      new_fd = openat (cdb->fd, dir, O_WRONLY | O_DIRECTORY);
-      if (new_fd < 0)
-	return -1;
-    }
+    return -1;
 
   cdb_free (cdb);
   cdb->fd = new_fd;
@@ -271,6 +261,6 @@ main (int argc, char *argv[])
 
 /*
 Local Variables:
-compile-command: "gcc -DTEST_CHDIR=1 -DHAVE_CONFIG_H -I.. -g -O -W -Wall chdir-long.c libcoreutils.a"
+compile-command: "gcc -DTEST_CHDIR=1 -g -O -W -Wall chdir-long.c libcoreutils.a"
 End:
 */

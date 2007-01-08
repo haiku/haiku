@@ -1,7 +1,8 @@
 /* sha1.c - Functions to compute SHA1 message digest of files or
    memory blocks according to the NIST specification FIPS-180-1.
 
-   Copyright (C) 2000, 2001, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -22,9 +23,7 @@
       Robert Klep <robert@ilse.nl>  -- Expansion function fix
 */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "sha1.h"
 
@@ -34,9 +33,6 @@
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #endif
-
-/* SWAP does an endian swap on architectures that are little-endian,
-   as SHA1 needs some data in a big-endian form.  */
 
 #ifdef WORDS_BIGENDIAN
 # define SWAP(n) (n)
@@ -55,11 +51,9 @@
 static const unsigned char fillbuf[64] = { 0x80, 0 /* , 0, 0, ...  */ };
 
 
-/*
-  Takes a pointer to a 160 bit block of data (five 32 bit ints) and
-  intializes it to the start constants of the SHA1 algorithm.  This
-  must be called before using hash in the call to sha1_hash.
-*/
+/* Take a pointer to a 160 bit block of data (five 32 bit ints) and
+   initialize it to the start constants of the SHA1 algorithm.  This
+   must be called before using hash in the call to sha1_hash.  */
 void
 sha1_init_ctx (struct sha1_ctx *ctx)
 {
@@ -77,15 +71,15 @@ sha1_init_ctx (struct sha1_ctx *ctx)
    must be in little endian byte order.
 
    IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32 bits value.  */
+   aligned for a 32-bit value.  */
 void *
 sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf)
 {
-  ((md5_uint32 *) resbuf)[0] = SWAP (ctx->A);
-  ((md5_uint32 *) resbuf)[1] = SWAP (ctx->B);
-  ((md5_uint32 *) resbuf)[2] = SWAP (ctx->C);
-  ((md5_uint32 *) resbuf)[3] = SWAP (ctx->D);
-  ((md5_uint32 *) resbuf)[4] = SWAP (ctx->E);
+  ((uint32_t *) resbuf)[0] = SWAP (ctx->A);
+  ((uint32_t *) resbuf)[1] = SWAP (ctx->B);
+  ((uint32_t *) resbuf)[2] = SWAP (ctx->C);
+  ((uint32_t *) resbuf)[3] = SWAP (ctx->D);
+  ((uint32_t *) resbuf)[4] = SWAP (ctx->E);
 
   return resbuf;
 }
@@ -94,29 +88,27 @@ sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf)
    prolog according to the standard and write the result to RESBUF.
 
    IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32 bits value.  */
+   aligned for a 32-bit value.  */
 void *
 sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf)
 {
   /* Take yet unprocessed bytes into account.  */
-  md5_uint32 bytes = ctx->buflen;
-  size_t pad;
+  uint32_t bytes = ctx->buflen;
+  size_t size = (bytes < 56) ? 64 / 4 : 64 * 2 / 4;
 
   /* Now count remaining bytes.  */
   ctx->total[0] += bytes;
   if (ctx->total[0] < bytes)
     ++ctx->total[1];
 
-  pad = bytes >= 56 ? 64 + 56 - bytes : 56 - bytes;
-  memcpy (&ctx->buffer[bytes], fillbuf, pad);
-
   /* Put the 64-bit file length in *bits* at the end of the buffer.  */
-  *(md5_uint32 *) &ctx->buffer[bytes + pad + 4] = SWAP (ctx->total[0] << 3);
-  *(md5_uint32 *) &ctx->buffer[bytes + pad] = SWAP ((ctx->total[1] << 3) |
-						    (ctx->total[0] >> 29));
+  ctx->buffer[size - 2] = SWAP ((ctx->total[1] << 3) | (ctx->total[0] >> 29));
+  ctx->buffer[size - 1] = SWAP (ctx->total[0] << 3);
+
+  memcpy (&((char *) ctx->buffer)[bytes], fillbuf, (size - 2) * 4 - bytes);
 
   /* Process last bytes.  */
-  sha1_process_block (ctx->buffer, bytes + pad + 8, ctx);
+  sha1_process_block (ctx->buffer, size * 4, ctx);
 
   return sha1_read_ctx (ctx, resbuf);
 }
@@ -187,7 +179,7 @@ sha1_stream (FILE *stream, void *resblock)
   return 0;
 }
 
-/* Compute MD5 message digest for LEN bytes beginning at BUFFER.  The
+/* Compute SHA1 message digest for LEN bytes beginning at BUFFER.  The
    result is always in little endian byte order, so that a byte-wise
    output yields to the wanted ASCII representation of the message
    digest.  */
@@ -216,7 +208,7 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
       size_t left_over = ctx->buflen;
       size_t add = 128 - left_over > len ? len : 128 - left_over;
 
-      memcpy (&ctx->buffer[left_over], buffer, add);
+      memcpy (&((char *) ctx->buffer)[left_over], buffer, add);
       ctx->buflen += add;
 
       if (ctx->buflen > 64)
@@ -225,7 +217,8 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 
 	  ctx->buflen &= 63;
 	  /* The regions in the following copy operation cannot overlap.  */
-	  memcpy (ctx->buffer, &ctx->buffer[(left_over + add) & ~63],
+	  memcpy (ctx->buffer,
+		  &((char *) ctx->buffer)[(left_over + add) & ~63],
 		  ctx->buflen);
 	}
 
@@ -238,7 +231,7 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
     {
 #if !_STRING_ARCH_unaligned
 # define alignof(type) offsetof (struct { char c; type x; }, x)
-# define UNALIGNED_P(p) (((size_t) p) % alignof (md5_uint32) != 0)
+# define UNALIGNED_P(p) (((size_t) p) % alignof (uint32_t) != 0)
       if (UNALIGNED_P (buffer))
 	while (len > 64)
 	  {
@@ -260,13 +253,13 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
     {
       size_t left_over = ctx->buflen;
 
-      memcpy (&ctx->buffer[left_over], buffer, len);
+      memcpy (&((char *) ctx->buffer)[left_over], buffer, len);
       left_over += len;
       if (left_over >= 64)
 	{
 	  sha1_process_block (ctx->buffer, 64, ctx);
 	  left_over -= 64;
-	  memcpy (ctx->buffer, &ctx->buffer[64], left_over);
+	  memcpy (ctx->buffer, &ctx->buffer[16], left_over);
 	}
       ctx->buflen = left_over;
     }
@@ -275,10 +268,10 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 /* --- Code below is the primary difference between md5.c and sha1.c --- */
 
 /* SHA1 round constants */
-#define K1 0x5a827999L
-#define K2 0x6ed9eba1L
-#define K3 0x8f1bbcdcL
-#define K4 0xca62c1d6L
+#define K1 0x5a827999
+#define K2 0x6ed9eba1
+#define K3 0x8f1bbcdc
+#define K4 0xca62c1d6
 
 /* Round functions.  Note that F2 is the same as F4.  */
 #define F1(B,C,D) ( D ^ ( B & ( C ^ D ) ) )
@@ -293,15 +286,15 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 void
 sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
 {
-  const md5_uint32 *words = buffer;
-  size_t nwords = len / sizeof (md5_uint32);
-  const md5_uint32 *endp = words + nwords;
-  md5_uint32 x[16];
-  md5_uint32 a = ctx->A;
-  md5_uint32 b = ctx->B;
-  md5_uint32 c = ctx->C;
-  md5_uint32 d = ctx->D;
-  md5_uint32 e = ctx->E;
+  const uint32_t *words = buffer;
+  size_t nwords = len / sizeof (uint32_t);
+  const uint32_t *endp = words + nwords;
+  uint32_t x[16];
+  uint32_t a = ctx->A;
+  uint32_t b = ctx->B;
+  uint32_t c = ctx->C;
+  uint32_t d = ctx->D;
+  uint32_t e = ctx->E;
 
   /* First increment the byte count.  RFC 1321 specifies the possible
      length of the file up to 2^64 bits.  Here we only compute the
@@ -310,7 +303,7 @@ sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
   if (ctx->total[0] < len)
     ++ctx->total[1];
 
-#define rol(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
+#define rol(x, n) (((x) << (n)) | ((uint32_t) (x) >> (32 - (n))))
 
 #define M(I) ( tm =   x[I&0x0f] ^ x[(I-14)&0x0f] \
 		    ^ x[(I-8)&0x0f] ^ x[(I-3)&0x0f] \
@@ -325,7 +318,7 @@ sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
 
   while (words < endp)
     {
-      md5_uint32 tm;
+      uint32_t tm;
       int t;
       for (t = 0; t < 16; t++)
 	{

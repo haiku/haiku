@@ -1,7 +1,9 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Convert a `struct tm' to a time_t value.
-   Copyright (C) 1993-1999, 2002-2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1993-1999, 2002-2005, 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Paul Eggert (eggert@twinsun.com).
+   Contributed by Paul Eggert <eggert@twinsun.com>.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +23,7 @@
    mktime.  */
 /* #define DEBUG 1 */
 
-#ifdef HAVE_CONFIG_H
+#if 1
 # include <config.h>
 #endif
 
@@ -215,10 +217,11 @@ guess_time_tm (long int year, long int yday, int hour, int min, int sec,
   /* Overflow occurred one way or another.  Return the nearest result
      that is actually in range, except don't report a zero difference
      if the actual difference is nonzero, as that would cause a false
-     match.  */
+     match; and don't oscillate between two values, as that would
+     confuse the spring-forward gap detector.  */
   return (*t < TIME_T_MIDPOINT
-	  ? TIME_T_MIN + (*t == TIME_T_MIN)
-	  : TIME_T_MAX - (*t == TIME_T_MAX));
+	  ? (*t <= TIME_T_MIN + 1 ? *t + 1 : TIME_T_MIN)
+	  : (TIME_T_MAX - 1 <= *t ? *t - 1 : TIME_T_MAX));
 }
 
 /* Use CONVERT to convert *T to a broken down time in *TP.

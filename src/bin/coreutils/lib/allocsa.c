@@ -1,5 +1,5 @@
 /* Safe automatic memory allocation.
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2006 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "allocsa.h"
@@ -43,13 +41,13 @@
        must be freed.  The only function that can free it is freesa(), and
        when freesa() frees it, it also removes it from the hash table.  */
 
-# define MAGIC_NUMBER 0x1415fb4a
-# define MAGIC_SIZE sizeof (int)
+#define MAGIC_NUMBER 0x1415fb4a
+#define MAGIC_SIZE sizeof (int)
 /* This is how the header info would look like without any alignment
    considerations.  */
 struct preliminary_header { void *next; char room[MAGIC_SIZE]; };
 /* But the header's size must be a multiple of sa_alignment_max.  */
-# define HEADER_SIZE \
+#define HEADER_SIZE \
   (((sizeof (struct preliminary_header) + sa_alignment_max - 1) / sa_alignment_max) * sa_alignment_max)
 struct header { void *next; char room[HEADER_SIZE - sizeof (struct preliminary_header) + MAGIC_SIZE]; };
 /* Verify that HEADER_SIZE == sizeof (struct header).  */
@@ -58,7 +56,7 @@ typedef int verify1[2 * (HEADER_SIZE == sizeof (struct header)) - 1];
    of empty hash buckets is quite high.  There is no need to make the hash
    table resizable, because when the hash table gets filled so much that the
    lookup becomes slow, it means that the application has memory leaks.  */
-# define HASH_TABLE_SIZE 257
+#define HASH_TABLE_SIZE 257
 static void * mallocsa_results[HASH_TABLE_SIZE];
 
 #endif

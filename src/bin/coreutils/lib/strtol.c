@@ -1,6 +1,6 @@
 /* Convert string representation of a number into an integer value.
 
-   Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003, 2005
+   Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003, 2005, 2006
    Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
@@ -20,19 +20,14 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #ifdef _LIBC
 # define USE_NUMBER_GROUPING
+#else
+# include <config.h>
 #endif
 
 #include <ctype.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 #ifndef __set_errno
 # define __set_errno(Val) errno = (Val)
 #endif
@@ -211,11 +206,6 @@ extern int errno;
 #  define TOUPPER(Ch) towupper (Ch)
 # endif
 #else
-# if defined STDC_HEADERS || (!defined isascii && !defined HAVE_ISASCII)
-#  define IN_CTYPE_DOMAIN(c) 1
-# else
-#  define IN_CTYPE_DOMAIN(c) isascii(c)
-# endif
 # define L_(Ch) Ch
 # define UCHAR_TYPE unsigned char
 # define STRING_TYPE char
@@ -224,9 +214,9 @@ extern int errno;
 #  define ISALPHA(Ch) __isalpha_l ((Ch), loc)
 #  define TOUPPER(Ch) __toupper_l ((Ch), loc)
 # else
-#  define ISSPACE(Ch) (IN_CTYPE_DOMAIN (Ch) && isspace (Ch))
-#  define ISALPHA(Ch) (IN_CTYPE_DOMAIN (Ch) && isalpha (Ch))
-#  define TOUPPER(Ch) (IN_CTYPE_DOMAIN (Ch) ? toupper (Ch) : (Ch))
+#  define ISSPACE(Ch) isspace (Ch)
+#  define ISALPHA(Ch) isalpha (Ch)
+#  define TOUPPER(Ch) toupper (Ch)
 # endif
 #endif
 

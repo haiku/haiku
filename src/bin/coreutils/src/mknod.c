@@ -1,5 +1,5 @@
 /* mknod -- make special files
-   Copyright (C) 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ Create the special file NAME of the given TYPE.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -m, --mode=MODE   set permission mode (as in chmod), not a=rw - umask\n\
+  -m, --mode=MODE   set file permission bits to MODE, not a=rw - umask\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -88,7 +88,7 @@ int
 main (int argc, char **argv)
 {
   mode_t newmode;
-  const char *specified_mode;
+  char const *specified_mode = NULL;
   int optc;
   int expected_operands;
   mode_t node_type;
@@ -100,8 +100,6 @@ main (int argc, char **argv)
   textdomain (PACKAGE);
 
   atexit (close_stdout);
-
-  specified_mode = NULL;
 
   while ((optc = getopt_long (argc, argv, "m:", longopts, NULL)) != -1)
     {
@@ -123,8 +121,11 @@ main (int argc, char **argv)
       struct mode_change *change = mode_compile (specified_mode);
       if (!change)
 	error (EXIT_FAILURE, 0, _("invalid mode"));
-      newmode = mode_adjust (newmode, change, umask (0));
+      newmode = mode_adjust (newmode, false, umask (0), change, NULL);
       free (change);
+      if (newmode & ~S_IRWXUGO)
+	error (EXIT_FAILURE, 0,
+	       _("mode must specify only file permission bits"));
     }
 
   /* If the number of arguments is 0 or 1,
@@ -207,28 +208,13 @@ main (int argc, char **argv)
       break;
 
     case 'p':			/* `pipe' */
-#ifndef S_ISFIFO
-      error (EXIT_FAILURE, 0, _("fifo files not supported"));
-#else
-      if (mkfifo (argv[optind], newmode))
+      if (mkfifo (argv[optind], newmode) != 0)
 	error (EXIT_FAILURE, errno, "%s", quote (argv[optind]));
-#endif
       break;
 
     default:
       error (0, 0, _("invalid device type %s"), quote (argv[optind + 1]));
       usage (EXIT_FAILURE);
-    }
-
-  /* Perform an explicit chmod to ensure the file mode permission bits
-     are set as specified.  This extra step is necessary in some cases
-     when the containing directory has a default ACL.  */
-
-  if (specified_mode)
-    {
-      if (chmod (argv[optind], newmode))
-        error (0, errno, _("cannot set permissions of %s"),
-               quote (argv[optind]));
     }
 
   exit (EXIT_SUCCESS);

@@ -1,5 +1,5 @@
 /* pr -- convert text files for printing.
-   Copyright (C) 88, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 88, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -430,7 +430,7 @@ static void getoptarg (char *arg, char switch_char, char *character,
 void usage (int status);
 static void print_files (int number_of_files, char **av);
 static void init_parameters (int number_of_files);
-static void init_header (char *filename, int desc);
+static void init_header (char const *filename, int desc);
 static bool init_fps (int number_of_files, char **av);
 static void init_funcs (void);
 static void init_store_cols (void);
@@ -1653,7 +1653,7 @@ print_files (int number_of_files, char **av)
    FILENAME for reading.  */
 
 static void
-init_header (char *filename, int desc)
+init_header (char const *filename, int desc)
 {
   char *buf = NULL;
   struct stat st;
@@ -2326,7 +2326,7 @@ print_char (char c)
 	print_white_space ();
 
       /* Nonprintables are assumed to have width 0, except '\b'. */
-      if (!ISPRINT (to_uchar (c)))
+      if (! isprint (to_uchar (c)))
 	{
 	  if (c == '\b')
 	    --output_position;
@@ -2685,7 +2685,7 @@ char_to_clump (char c)
 	}
 
     }
-  else if (!ISPRINT (uc))
+  else if (! isprint (uc))
     {
       if (use_esc_sequence)
 	{
@@ -2848,7 +2848,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                     separate columns by STRING,\n\
                     without -S: Default separator <TAB> with -J and <space>\n\
                     otherwise (same as -S\" \"), no effect on column options\n\
-  -t, --omit-header omit page headers and trailers\n\
+  -t, --omit-header  omit page headers and trailers\n\
 "), stdout);
       fputs (_("\
   -T, --omit-pagination\n\

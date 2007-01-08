@@ -1,7 +1,7 @@
 /* exclude.c -- exclude file names
 
    Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005 Free Software Foundation, Inc.
+   2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,9 +20,7 @@
 
 /* Written by Paul Eggert <eggert@twinsun.com>  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <stdbool.h>
 
@@ -37,25 +35,11 @@
 #include "fnmatch.h"
 #include "strcase.h"
 #include "xalloc.h"
+#include "verify.h"
 
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #endif
-
-#if STDC_HEADERS || (! defined isascii && ! HAVE_ISASCII)
-# define IN_CTYPE_DOMAIN(c) true
-#else
-# define IN_CTYPE_DOMAIN(c) isascii (c)
-#endif
-
-static inline bool
-is_space (unsigned char c)
-{
-  return IN_CTYPE_DOMAIN (c) && isspace (c);
-}
-
-/* Verify a requirement at compile-time (unlike assert, which is runtime).  */
-#define verify(name, assertion) struct name { char a[(assertion) ? 1 : -1]; }
 
 /* Non-GNU systems lack these options, so we don't need to check them.  */
 #ifndef FNM_CASEFOLD
@@ -65,11 +49,10 @@ is_space (unsigned char c)
 # define FNM_LEADING_DIR 0
 #endif
 
-verify (EXCLUDE_macros_do_not_collide_with_FNM_macros,
-	(((EXCLUDE_ANCHORED | EXCLUDE_INCLUDE | EXCLUDE_WILDCARDS)
-	  & (FNM_PATHNAME | FNM_NOESCAPE | FNM_PERIOD | FNM_LEADING_DIR
-	     | FNM_CASEFOLD))
-	 == 0));
+verify (((EXCLUDE_ANCHORED | EXCLUDE_INCLUDE | EXCLUDE_WILDCARDS)
+	 & (FNM_PATHNAME | FNM_NOESCAPE | FNM_PERIOD | FNM_LEADING_DIR
+	    | FNM_CASEFOLD))
+	== 0);
 
 /* An exclude pattern-options pair.  The options are fnmatch options
    ORed with EXCLUDE_* options.  */
@@ -132,6 +115,24 @@ fnmatch_no_wildcards (char const *pattern, char const *f, int options)
     }
 }
 
+bool
+exclude_fnmatch (char const *pattern, char const *f, int options)
+{
+  int (*matcher) (char const *, char const *, int) =
+    (options & EXCLUDE_WILDCARDS
+     ? fnmatch
+     : fnmatch_no_wildcards);
+  bool matched = ((*matcher) (pattern, f, options) == 0);
+  char const *p;
+
+  if (! (options & EXCLUDE_ANCHORED))
+    for (p = f; *p && ! matched; p++)
+      if (*p == '/' && p[1] != '/')
+	matched = ((*matcher) (pattern, p + 1, options) == 0);
+
+  return matched;
+}
+
 /* Return true if EX excludes F.  */
 
 bool
@@ -157,21 +158,7 @@ excluded_file_name (struct exclude const *ex, char const *f)
 	  char const *pattern = exclude[i].pattern;
 	  int options = exclude[i].options;
 	  if (excluded == !! (options & EXCLUDE_INCLUDE))
-	    {
-	      int (*matcher) (char const *, char const *, int) =
-		(options & EXCLUDE_WILDCARDS
-		 ? fnmatch
-		 : fnmatch_no_wildcards);
-	      bool matched = ((*matcher) (pattern, f, options) == 0);
-	      char const *p;
-
-	      if (! (options & EXCLUDE_ANCHORED))
-		for (p = f; *p && ! matched; p++)
-		  if (*p == '/' && p[1] != '/')
-		    matched = ((*matcher) (pattern, p + 1, options) == 0);
-
-	      excluded ^= matched;
-	    }
+	    excluded ^= exclude_fnmatch (pattern, f, options);
 	}
 
       return excluded;
@@ -243,12 +230,12 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
       {
 	char *pattern_end = p;
 
-	if (is_space (line_end))
+	if (isspace ((unsigned char) line_end))
 	  {
 	    for (; ; pattern_end--)
 	      if (pattern_end == pattern)
 		goto next_pattern;
-	      else if (! is_space (pattern_end[-1]))
+	      else if (! isspace ((unsigned char) pattern_end[-1]))
 		break;
 	  }
 

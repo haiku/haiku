@@ -1,7 +1,7 @@
 /* mountlist.c -- return a list of mounted file systems
 
    Copyright (C) 1991, 1992, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005 Free Software Foundation, Inc.
+   2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,12 +17,11 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "mountlist.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,6 +78,10 @@ char *strstr ();
 
 #ifdef MOUNTED_GETMNTINFO	/* 4.4BSD.  */
 # include <sys/mount.h>
+#endif
+
+#ifdef MOUNTED_GETMNTINFO2	/* NetBSD 3.0.  */
+# include <sys/statvfs.h>
 #endif
 
 #ifdef MOUNTED_GETMNT		/* Ultrix.  */
@@ -146,23 +149,26 @@ char *strstr ();
      || strcmp (Fs_type, "none") == 0		\
      || strcmp (Fs_type, "proc") == 0		\
      || strcmp (Fs_type, "subfs") == 0		\
+     /* for NetBSD 3.0 */			\
+     || strcmp (Fs_type, "kernfs") == 0		\
      /* for Irix 6.5 */				\
      || strcmp (Fs_type, "ignore") == 0)
 #endif
 
 #ifndef ME_REMOTE
 /* A file system is `remote' if its Fs_name contains a `:'
-   or if (it is of type smbfs and its Fs_name starts with `//').  */
+   or if (it is of type (smbfs or cifs) and its Fs_name starts with `//').  */
 # define ME_REMOTE(Fs_name, Fs_type)		\
-    (strchr (Fs_name, ':') != 0			\
+    (strchr (Fs_name, ':') != NULL		\
      || ((Fs_name)[0] == '/'			\
 	 && (Fs_name)[1] == '/'			\
-	 && strcmp (Fs_type, "smbfs") == 0))
+	 && (strcmp (Fs_type, "smbfs") == 0	\
+	     || strcmp (Fs_type, "cifs") == 0)))
 #endif
 
 #if MOUNTED_GETMNTINFO
 
-# if ! HAVE_F_FSTYPENAME_IN_STATFS
+# if ! HAVE_STRUCT_STATFS_F_FSTYPENAME
 static char *
 fstype_to_string (short int t)
 {
@@ -256,13 +262,12 @@ fstype_to_string (short int t)
       return "?";
     }
 }
-# endif /* ! HAVE_F_FSTYPENAME_IN_STATFS */
+# endif
 
-/* __NetBSD__ || BSD_NET2 || __OpenBSD__ */
 static char *
 fsp_to_string (const struct statfs *fsp)
 {
-# if defined HAVE_F_FSTYPENAME_IN_STATFS
+# if HAVE_STRUCT_STATFS_F_FSTYPENAME
   return (char *) (fsp->f_fstypename);
 # else
   return fstype_to_string (fsp->f_type);
@@ -284,6 +289,44 @@ fstype_to_string (int t)
     return e->vfsent_name;
 }
 #endif /* MOUNTED_VMOUNT */
+
+
+#if defined MOUNTED_GETMNTENT1 || defined MOUNTED_GETMNTENT2
+
+/* Return the device number from MOUNT_OPTIONS, if possible.
+   Otherwise return (dev_t) -1.  */
+
+static dev_t
+dev_from_mount_options (char const *mount_options)
+{
+  /* GNU/Linux allows file system implementations to define their own
+     meaning for "dev=" mount options, so don't trust the meaning
+     here.  */
+# ifndef __linux__
+
+  static char const dev_pattern[] = ",dev=";
+  char const *devopt = strstr (mount_options, dev_pattern);
+
+  if (devopt)
+    {
+      char const *optval = devopt + sizeof dev_pattern - 1;
+      char *optvalend;
+      unsigned long int dev;
+      errno = 0;
+      dev = strtoul (optval, &optvalend, 16);
+      if (optval != optvalend
+	  && (*optvalend == '\0' || *optvalend == ',')
+	  && ! (dev == ULONG_MAX && errno == ERANGE)
+	  && dev == (dev_t) dev)
+	return dev;
+    }
+
+# endif
+
+  return -1;
+}
+
+#endif
 
 /* Return a list of the currently mounted file systems, or NULL on error.
    Add each entry to the tail of the list so that they stay in order.
@@ -327,12 +370,11 @@ read_file_system_list (bool need_fs_type)
   }
 #endif
 
-#ifdef MOUNTED_GETMNTENT1	/* 4.3BSD, SunOS, HP-UX, Dynix, Irix.  */
+#ifdef MOUNTED_GETMNTENT1 /* GNU/Linux, 4.3BSD, SunOS, HP-UX, Dynix, Irix.  */
   {
     struct mntent *mnt;
     char *table = MOUNTED;
     FILE *fp;
-    char *devopt;
 
     fp = setmntent (table, "r");
     if (fp == NULL)
@@ -347,11 +389,7 @@ read_file_system_list (bool need_fs_type)
 	me->me_type_malloced = 1;
 	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
 	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	devopt = strstr (mnt->mnt_opts, "dev=");
-	if (devopt)
-	  me->me_dev = strtoul (devopt + 4, NULL, 16);
-	else
-	  me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+	me->me_dev = dev_from_mount_options (mnt->mnt_opts);
 
 	/* Add to the linked list. */
 	*mtail = me;
@@ -390,6 +428,32 @@ read_file_system_list (bool need_fs_type)
       }
   }
 #endif /* MOUNTED_GETMNTINFO */
+
+#ifdef MOUNTED_GETMNTINFO2	/* NetBSD 3.0.  */
+  {
+    struct statvfs *fsp;
+    int entries;
+
+    entries = getmntinfo (&fsp, MNT_NOWAIT);
+    if (entries < 0)
+      return NULL;
+    for (; entries-- > 0; fsp++)
+      {
+	me = xmalloc (sizeof *me);
+	me->me_devname = xstrdup (fsp->f_mntfromname);
+	me->me_mountdir = xstrdup (fsp->f_mntonname);
+	me->me_type = xstrdup (fsp->f_fstypename);
+	me->me_type_malloced = 1;
+	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+	me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+
+	/* Add to the linked list. */
+	*mtail = me;
+	mtail = &me->me_next;
+      }
+  }
+#endif /* MOUNTED_GETMNTINFO2 */
 
 #ifdef MOUNTED_GETMNT		/* Ultrix.  */
   {
@@ -625,7 +689,7 @@ read_file_system_list (bool need_fs_type)
   }
 #endif /* MOUNTED_FREAD || MOUNTED_FREAD_FSTYP.  */
 
-#ifdef MOUNTED_GETMNTTBL	/* DolphinOS goes it's own way */
+#ifdef MOUNTED_GETMNTTBL	/* DolphinOS goes its own way.  */
   {
     struct mntent **mnttbl = getmnttbl (), **ent;
     for (ent=mnttbl;*ent;ent++)
@@ -699,7 +763,7 @@ read_file_system_list (bool need_fs_type)
 	    me->me_type_malloced = 1;
 	    me->me_dummy = MNT_IGNORE (&mnt) != 0;
 	    me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	    me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+	    me->me_dev = dev_from_mount_options (mnt.mnt_mntopts);
 
 	    /* Add to the linked list. */
 	    *mtail = me;

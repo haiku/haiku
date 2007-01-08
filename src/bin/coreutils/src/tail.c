@@ -1,5 +1,5 @@
 /* tail -- output the last part of file(s)
-   Copyright (C) 1989, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 1989, 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include "error.h"
 #include "fcntl--.h"
 #include "inttostr.h"
+#include "isapipe.h"
 #include "posixver.h"
 #include "quote.h"
 #include "safe-read.h"
@@ -50,12 +51,6 @@
 
 #define AUTHORS \
   "Paul Rubin", "David MacKenzie, Ian Lance Taylor", "Jim Meyering"
-
-#ifndef ENOSYS
-  /* Some systems don't have ENOSYS -- this should be a big enough
-     value that no valid errno value will match it.  */
-# define ENOSYS 99999
-#endif
 
 /* Number of items to tail.  */
 #define DEFAULT_N_LINES 10
@@ -80,14 +75,9 @@ enum Follow_mode
   Follow_descriptor = 2
 };
 
-/* On Darwin 7.7, when reading from a command-line pipe, standard
-   input is of type S_ISSOCK.  Everywhere else it's S_ISFIFO.  */
-#define IS_PIPE_LIKE_FILE_TYPE(Mode) \
-  (S_ISFIFO (Mode) || S_ISSOCK (Mode))
-
 /* The types of files for which tail works.  */
 #define IS_TAILABLE_FILE_TYPE(Mode) \
-  (S_ISREG (Mode) || IS_PIPE_LIKE_FILE_TYPE (Mode) || S_ISCHR (Mode))
+  (S_ISREG (Mode) || S_ISFIFO (Mode) || S_ISSOCK (Mode) || S_ISCHR (Mode))
 
 static char const *const follow_mode_string[] =
 {
@@ -203,7 +193,7 @@ static struct option const long_options[] =
   {"lines", required_argument, NULL, 'n'},
   {"max-unchanged-stats", required_argument, NULL, MAX_UNCHANGED_STATS_OPTION},
   {"pid", required_argument, NULL, PID_OPTION},
-  {"presume-input-pipe", no_argument, NULL,
+  {"-presume-input-pipe", no_argument, NULL,
    PRESUME_INPUT_PIPE_OPTION}, /* do not document */
   {"quiet", no_argument, NULL, 'q'},
   {"retry", no_argument, NULL, RETRY_OPTION},
@@ -302,7 +292,7 @@ valid_file_spec (struct File_spec const *f)
   return ((f->fd == -1) ^ (f->errnum == 0));
 }
 
-static char *
+static char const *
 pretty_name (struct File_spec const *f)
 {
   return (STREQ (f->name, "-") ? "standard input" : f->name);
@@ -1461,7 +1451,8 @@ parse_options (int argc, char **argv,
 {
   int c;
 
-  while ((c = getopt_long (argc, argv, "c:n:fFqs:v", long_options, NULL))
+  while ((c = getopt_long (argc, argv, "c:n:fFqs:v0123456789",
+			   long_options, NULL))
 	 != -1)
     {
       switch (c)
@@ -1559,13 +1550,18 @@ parse_options (int argc, char **argv,
 
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
+	  error (EXIT_FAILURE, 0,
+		 _("option used in invalid context -- %c"), c);
+
 	default:
 	  usage (EXIT_FAILURE);
 	}
     }
 
   if (reopen_inaccessible_files && follow_mode != Follow_name)
-    error (0, 0, _("warning: --retry is useful only when following by name"));
+    error (0, 0, _("warning: --retry is useful mainly when following by name"));
 
   if (pid && !forever)
     error (0, 0,
@@ -1635,12 +1631,24 @@ main (int argc, char **argv)
       file = &dummy_stdin;
 
       /* POSIX says that -f is ignored if no file operand is specified
-	 and standard input is a pipe.  */
-      if (forever)
+	 and standard input is a pipe.  However, the GNU coding
+	 standards say that program behavior should not depend on
+	 device type, because device independence is an important
+	 principle of the system's design.
+
+	 Follow the POSIX requirement only if POSIXLY_CORRECT is set.  */
+
+      if (forever && getenv ("POSIXLY_CORRECT"))
 	{
-	  struct stat stats;
-	  if (fstat (STDIN_FILENO, &stats) == 0
-	      && IS_PIPE_LIKE_FILE_TYPE (stats.st_mode))
+	  struct stat st;
+	  int is_a_fifo_or_pipe =
+	    (fstat (STDIN_FILENO, &st) != 0 ? -1
+	     : S_ISFIFO (st.st_mode) ? 1
+	     : HAVE_FIFO_PIPES == 1 ? 0
+	     : isapipe (STDIN_FILENO));
+	  if (is_a_fifo_or_pipe < 0)
+	    error (EXIT_FAILURE, errno, _("standard input"));
+	  if (is_a_fifo_or_pipe)
 	    forever = false;
 	}
     }

@@ -1,5 +1,5 @@
 /* getline.c --- Implementation of replacement getline function.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -18,9 +18,7 @@
 
 /* Written by Simon Josefsson. */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "getdelim.h"
 #include "getline.h"

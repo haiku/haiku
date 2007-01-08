@@ -31,11 +31,11 @@
 @c FIXME: the following need documentation
 @c * [: (coreutils)[ invocation.                   File/string tests.
 @c * pinky: (coreutils)pinky invocation.           FIXME.
-@c * shasum: (coreutils)shasum invocation.         Print or check message-digests.
 @c * uptime: (coreutils)uptime invocation.         FIXME.
 
 @dircategory Individual utilities
 @direntry
+* base64: (coreutils)base64 invocation.         Base64 encode/decode data.
 * basename: (coreutils)basename invocation.     Strip directory and suffix.
 * cat: (coreutils)cat invocation.               Concatenate and write files.
 * chgrp: (coreutils)chgrp invocation.           Change file groups.
@@ -74,7 +74,7 @@
 * ln: (coreutils)ln invocation.                 Make links between files.
 * logname: (coreutils)logname invocation.       Print current login name.
 * ls: (coreutils)ls invocation.                 List directory contents.
-* md5sum: (coreutils)md5sum invocation.         Print or check message-digests.
+* md5sum: (coreutils)md5sum invocation.         Print or check MD5 digests.
 * mkdir: (coreutils)mkdir invocation.           Create directories.
 * mkfifo: (coreutils)mkfifo invocation.         Create FIFOs (named pipes).
 * mknod: (coreutils)mknod invocation.           Create special files.
@@ -94,7 +94,10 @@
 * rm: (coreutils)rm invocation.                 Remove files.
 * rmdir: (coreutils)rmdir invocation.           Remove empty directories.
 * seq: (coreutils)seq invocation.               Print numeric sequences
+* sha1sum: (coreutils)sha1sum invocation.       Print or check SHA-1 digests.
+* sha2: (coreutils)sha2 utilities.              Print or check SHA-2 digests.
 * shred: (coreutils)shred invocation.           Remove files more securely.
+* shuf: (coreutils)shuf invocation.             Shuffling text files.
 * sleep: (coreutils)sleep invocation.           Delay for a specified time.
 * sort: (coreutils)sort invocation.             Sort text files.
 * split: (coreutils)split invocation.           Split into fixed-size pieces.
@@ -128,12 +131,12 @@
 This manual documents version @value{VERSION} of the @sc{gnu} core
 utilities, including the standard programs for text and file manipulation.
 
-Copyright @copyright{} 1994, 1995, 1996, 2000, 2001, 2002, 2003, 2004, 2005
-Free Software Foundation, Inc.
+Copyright @copyright{} 1994, 1995, 1996, 2000, 2001, 2002, 2003, 2004,
+2005, 2006 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.1 or
+under the terms of the GNU Free Documentation License, Version 1.2 or
 any later version published by the Free Software Foundation; with no
 Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
 Texts.  A copy of the license is included in the section entitled ``GNU
@@ -171,8 +174,8 @@ Free Documentation License''.
 * Output of entire files::             cat tac nl od
 * Formatting file contents::           fmt pr fold
 * Output of parts of files::           head tail split csplit
-* Summarizing files::                  wc sum cksum md5sum
-* Operating on sorted files::          sort uniq comm ptx tsort
+* Summarizing files::                  wc sum cksum md5sum sha1sum sha2
+* Operating on sorted files::          sort shuf uniq comm ptx tsort
 * Operating on fields within a line::  cut paste join
 * Operating on characters::            tr expand unexpand
 * Directory listing::                  ls dir vdir dircolors
@@ -186,7 +189,7 @@ Free Documentation License''.
 * File name manipulation::             dirname basename pathchk
 * Working context::                    pwd stty printenv tty
 * User information::                   id logname whoami groups users who
-* System context::                     date uname hostname
+* System context::                     date uname hostname hostid
 * Modified command invocation::        chroot env nice nohup su
 * Process control::                    kill
 * Delaying::                           sleep
@@ -194,7 +197,7 @@ Free Documentation License''.
 * File permissions::                   Access modes.
 * Date input formats::                 Specifying date strings.
 * Opening the software toolbox::       The software tools philosophy.
-* GNU Free Documentation License::     The license for this documentation.
+* Copying This Manual::                License for copying this manual.
 * Index::                              General index.
 
 @detailmenu
@@ -205,6 +208,7 @@ Common Options
 * Exit status::                 Indicating program success or failure.
 * Backup options::              Backup options
 * Block size::                  Block size
+* Random sources::              Sources of random data
 * Target directory::            Target directory
 * Trailing slashes::            Trailing slashes
 * Traversing symlinks::         Traversing symlinks to directories
@@ -217,6 +221,7 @@ Output of entire files
 * tac invocation::              Concatenate and write files in reverse.
 * nl invocation::               Number lines and write files.
 * od invocation::               Write files in octal or other formats.
+* base64 invocation::           Transform data into printable data.
 
 Formatting file contents
 
@@ -236,11 +241,14 @@ Summarizing files
 * wc invocation::               Print newline, word, and byte counts.
 * sum invocation::              Print checksum and block counts.
 * cksum invocation::            Print CRC checksum and byte counts.
-* md5sum invocation::           Print or check message-digests.
+* md5sum invocation::           Print or check MD5 digests.
+* sha1sum invocation::          Print or check SHA-1 digests.
+* sha2 utilities::              Print or check SHA-2 digests.
 
 Operating on sorted files
 
 * sort invocation::             Sort text files.
+* shuf invocation::             Shuffle text files.
 * uniq invocation::             Uniquify files.
 * comm invocation::             Compare two sorted files line by line.
 * ptx invocation::              Produce a permuted index of file contents.
@@ -252,7 +260,7 @@ Operating on sorted files
 * Charset selection in ptx::    Underlying character set considerations.
 * Input processing in ptx::     Input fields, contexts, and keyword selection.
 * Output formatting in ptx::    Types of output format, and sizing the fields.
-* Compatibility in ptx::        The GNU extensions to @command{ptx}
+* Compatibility in ptx::        The @acronym{GNU} extensions to @command{ptx}
 
 Operating on fields within a line
 
@@ -398,7 +406,7 @@ System context
 * Time conversion specifiers::   %[HIklMNpPrRsSTXzZ]
 * Date conversion specifiers::   %[aAbBcCdDeFgGhjmuUVwWxyY]
 * Literal conversion specifiers:: %[%nt]
-* Padding and other flags::      Pad with zeroes, spaces, etc.
+* Padding and other flags::      Pad with zeros, spaces, etc.
 * Setting the time::             Changing the system clock.
 * Options for date::             Instead of the current time.
 * Examples of date::             Examples.
@@ -426,9 +434,10 @@ Numeric operations
 
 File permissions
 
-* Mode Structure::               Structure of File Permissions
-* Symbolic Modes::               Mnemonic permissions representation
-* Numeric Modes::                Permissions as octal numbers
+* Mode Structure::               Structure of file mode bits.
+* Symbolic Modes::               Mnemonic representation of file mode bits.
+* Numeric Modes::                File mode bits as octal numbers.
+* Directory Setuid and Setgid::  Set-user-ID and set-group-ID on directories.
 
 Date input formats
 
@@ -453,9 +462,9 @@ Opening the software toolbox
 * The uniq command::             The @command{uniq} command
 * Putting the tools together::   Putting the tools together
 
-GNU Free Documentation License
+Copying This Manual
 
-* How to use this License for your documents::
+* GNU Free Documentation License::  License for copying this manual.
 
 @end detailmenu
 @end menu
@@ -635,6 +644,7 @@ name.
 * Exit status::                 Indicating program success or failure.
 * Backup options::              -b -S, in some programs.
 * Block size::                  BLOCK_SIZE and --block-size, in some programs.
+* Random sources::              --random-source, in some programs.
 * Target directory::            Specifying a target directory, in some programs.
 * Trailing slashes::            --strip-trailing-slashes, in some programs.
 * Traversing symlinks::         -H, -L, or -P, in some programs.
@@ -890,14 +900,14 @@ zettabyte: @math{10^21 = 1,000,000,000,000,000,000,000}
 @item Z
 @itemx ZiB
 @math{2^70 = 1,180,591,620,717,411,303,424}.
-(@samp{Zi} is a GNU extension to IEC 60027-2.)
+(@samp{Zi} is a @acronym{GNU} extension to IEC 60027-2.)
 @item YB
 @cindex yottabyte, definition of
 yottabyte: @math{10^24 = 1,000,000,000,000,000,000,000,000}.
 @item Y
 @itemx YiB
 @math{2^80 = 1,208,925,819,614,629,174,706,176}.
-(@samp{Yi} is a GNU extension to IEC 60027-2.)
+(@samp{Yi} is a @acronym{GNU} extension to IEC 60027-2.)
 @end table
 
 @opindex -k
@@ -913,6 +923,44 @@ is the default unless the @env{POSIXLY_CORRECT} environment variable is
 set.  The @option{-h} or @option{--human-readable} option is equivalent to
 @option{--block-size=human-readable}.  The @option{--si} option is
 equivalent to @option{--block-size=si}.
+
+@node Random sources
+@section Sources of random data
+
+@cindex random sources
+
+The @command{shuf}, @command{shred}, and @command{sort} commands
+sometimes need random data to do their work.  For example, @samp{sort
+-R} must choose a hash function at random, and it needs random data to
+make this selection.
+
+Normally these commands use the device file @file{/dev/urandom} as the
+source of random data.  Typically, this device gathers environmental
+noise from device drivers and other sources into an entropy pool, and
+uses the pool to generate random bits.  If the pool is short of data,
+the device reuses the internal pool to produce more bits, using a
+cryptographically secure pseudorandom number generator.
+
+@file{/dev/urandom} suffices for most practical uses, but applications
+requiring high-value or long-term protection of private data may
+require an alternate data source like @file{/dev/random} or
+@file{/dev/arandom}.  The set of available sources depends on your
+operating system.
+
+To use such a source, specify the @option{--random-source=@var{file}}
+option, e.g., @samp{shuf --random-source=/dev/random}.  The contents
+of @var{file} should be as random as possible.  An error is reported
+if @var{file} does not contain enough bytes to randomize the input
+adequately.
+
+To reproduce the results of an earlier invocation of a command, you
+can save some random data into a file and then use that file as the
+random source in earlier and later invocations of the command.
+
+Some old-fashioned or stripped-down operating systems lack support for
+@command{/dev/urandom}.  On these systems commands like @command{shuf}
+by default fall back on an internal pseudorandom generator initialized
+by a small amount of entropy.
 
 @node Target directory
 @section Target directory
@@ -1089,18 +1137,14 @@ or @option{-P} is specified.
 
 Certain commands can operate destructively on entire hierarchies.
 For example, if a user with appropriate privileges mistakenly runs
-@samp{rm -rf / tmp/junk} or @samp{cd /bin; rm -rf ../}, that may remove
+@samp{rm -rf / tmp/junk}, that may remove
 all files on the entire system.  Since there are so few
-@footnote{If you know of one, please write to @email{bug-coreutils@@gnu.org}.}
 legitimate uses for such a command,
-@sc{gnu} @command{rm} provides the @option{--preserve-root} option
-to make it so @command{rm} declines to operate on any directory
-that resolves to @file{/}.  The default is still to allow
-@samp{rm -rf /} to operate unimpeded.
-Another new option, @option{--no-preserve-root}, cancels the
-effect of any preceding @option{--preserve-root} option.
-Note that the @option{--preserve-root} behavior may become the default
-for @command{rm}.
+@sc{gnu} @command{rm} normally declines to operate on any directory
+that resolves to @file{/}.  If you really want to try to remove all
+the files on your system, you can use the @option{--no-preserve-root}
+option, but the default behavior, specified by the
+@option{--preserve-option}, is safer for most purposes.
 
 The commands @command{chgrp}, @command{chmod} and @command{chown}
 can also operate destructively on entire hierarchies, so they too
@@ -1108,7 +1152,11 @@ support these options.  Although, unlike @command{rm}, they don't
 actually unlink files, these commands are arguably more dangerous
 when operating recursively on @file{/}, since they often work much
 more quickly, and hence damage more files before an alert user can
-interrupt them.
+interrupt them.  Tradition and @acronym{POSIX} require these commands
+to operate recursively on @file{/}, so they default to
+@option{--no-preserve-root}, but using the @option{--preserve-root}
+option makes them safer for most purposes.  For convenience you can
+specify @option{--preserve-root} in an alias or in a shell function.
 
 @node Special built-in utilities
 @section Special built-in utilities
@@ -1183,6 +1231,7 @@ in some way.
 * tac invocation::              Concatenate and write files in reverse.
 * nl invocation::               Number lines and write files.
 * od invocation::               Write files in octal or other formats.
+* base64 invocation::           Transform data into printable data.
 @end menu
 
 @node cat invocation
@@ -1522,7 +1571,7 @@ printed as a single octal number.
 If @var{offset} is given, it specifies how many input bytes to skip
 before formatting and writing.  By default, it is interpreted as an
 octal number, but the optional trailing decimal point causes it to be
-interpretated as decimal.  If no decimal is specified and the offset
+interpreted as decimal.  If no decimal is specified and the offset
 begins with @samp{0x} or @samp{0X} it is interpreted as a hexadecimal
 number.  If there is a trailing @samp{b}, the number of bytes skipped
 will be @var{offset} multiplied by 512.
@@ -1604,7 +1653,7 @@ to the output line generated by the type specification.
 
 @table @samp
 @item a
-named character
+named character, ignoring high-order bit
 @item c
 @acronym{ASCII} character or backslash escape,
 @item d
@@ -1620,7 +1669,9 @@ hexadecimal
 @end table
 
 The type @code{a} outputs things like @samp{sp} for space, @samp{nl} for
-newline, and @samp{nul} for a null (zero) byte.  Type @code{c} outputs
+newline, and @samp{nul} for a null (zero) byte.  Only the least significant
+seven bits of each byte is used; the high-order bit is ignored.
+Type @code{c} outputs
 @samp{ }, @samp{\n}, and @code{\0}, respectively.
 
 @cindex type size
@@ -1739,6 +1790,63 @@ The @var{label} argument is interpreted
 just like @var{offset}, but it specifies an initial pseudo-address.  The
 pseudo-addresses are displayed in parentheses following any normal
 address.
+
+@end table
+
+@exitstatus
+
+@node base64 invocation
+@section @command{base64}: Transform data into printable data.
+
+@pindex base64
+@cindex base64 encoding
+
+@command{base64} transforms data read from a file, or standard input,
+into (or from) base64 encoded form.  The base64 encoded form uses
+printable @acronym{ASCII} characters to represent binary data, see
+@uref{ftp://ftp.rfc-editor.org/in-notes/rfc3548.txt, RFC 3548}.
+Synopses:
+
+@smallexample
+base64 [@var{option}]@dots{} [@var{file}]
+base64 --decode [@var{option}]@dots{} [@var{file}]
+@end smallexample
+
+The base64 encoding expands data to roughly 133% of the original.
+
+The program accepts the following options.  Also see @ref{Common options}.
+
+@table @samp
+
+@item -w @var{COLS}
+@itemx --wrap=@var{COLS}
+@opindex -w
+@opindex --wrap
+@cindex wrap data
+@cindex column to wrap data after
+During encoding, wrap lines after @var{COLS} characters.  This must be
+a positive number.
+
+The default is to wrap after 76 characters.  Use the value 0 to
+disable line wrapping altogether.
+
+@item -d
+@itemx --decode
+@opindex -d
+@opindex --decode
+@cindex Decode base64 data
+@cindex Base64 decoding
+Change the mode of operation, from the default of encoding data, to
+decoding data.  Input is expected to be base64 encoded data, and the
+output will be the original data.
+
+@item -i
+@itemx --ignore-garbage
+@opindex -i
+@opindex --ignore-garbage
+@cindex Ignore garbage in base64 stream
+During decoding, ignore unrecognized characters (including newline),
+to permit distorted data to be decoded.
 
 @end table
 
@@ -2000,7 +2108,7 @@ Double space the output.
 @cindex time formats
 @cindex formatting times
 Format header dates using @var{format}, using the same conventions as
-for the the command @samp{date +@var{format}}; @xref{date invocation}.
+for the command @samp{date +@var{format}}; @xref{date invocation}.
 Except for directives, which start with
 @samp{%}, characters in @var{format} are printed unchanged.  You can use
 this option to specify an arbitrary string in place of the header date,
@@ -2370,8 +2478,11 @@ For compatibility @command{head} also supports an obsolete option syntax
 specified first.  @var{count} is a decimal number optionally followed
 by a size letter (@samp{b}, @samp{k}, @samp{m}) as in @option{-c}, or
 @samp{l} to mean count by lines, or other option letters (@samp{cqv}).
-New scripts should use @option{-c @var{count}} or @option{-n
-@var{count}} instead.
+Scripts intended for standard hosts should use @option{-c @var{count}}
+or @option{-n @var{count}} instead.  If your script must also run on
+hosts that support only the obsolete syntax, it is usually simpler to
+avoid @command{head}, e.g., by using @samp{sed 5q} instead of
+@samp{head -5}.
 
 @exitstatus
 
@@ -2433,8 +2544,7 @@ by 1048576.
 @vindex name @r{follow option}
 @vindex descriptor @r{follow option}
 Loop forever trying to read more characters at the end of the file,
-presumably because the file is growing.  This option is ignored if
-no @var{file} operand is specified and standard input is a pipe.
+presumably because the file is growing.
 If more than one file is given, @command{tail} prints a header whenever it
 gets output from a different file, to indicate which file that output is
 from.
@@ -2466,6 +2576,10 @@ growing.
 The option values @samp{descriptor} and @samp{name} may be specified only
 with the long form of the option, not with @option{-f}.
 
+@vindex POSIXLY_CORRECT
+If @env{POSIXLY_CORRECT} is set, the @option{-f} option is ignored if
+no @var{file} operand is specified and standard input is a FIFO or a pipe.
+
 @item -F
 @opindex -F
 This option is the same as @option{--follow=name --retry}.  That is, tail
@@ -2474,7 +2588,8 @@ will keep trying until it becomes accessible again.
 
 @itemx --retry
 @opindex --retry
-This option is meaningful only when following by name.
+This option is useful mainly when following by name (i.e., with
+@option{--follow=name}).
 Without this option, when tail encounters a file that doesn't
 exist or is otherwise inaccessible, it reports that fact and
 never checks it again.
@@ -2547,14 +2662,13 @@ Always print file name headers.
 @end table
 
 For compatibility @command{tail} also supports an obsolete usage
-@samp{tail -@var{count}[bcl][f] [@var{file}]}, which is recognized
+@samp{tail -[@var{count}][bcl][f] [@var{file}]}, which is recognized
 only if it does not conflict with the usage described
-above.  @var{count} is an optional decimal number optionally
+above.  This obsolete form uses exactly one option and at most one
+file.  In the option, @var{count} is an optional decimal number optionally
 followed by a size letter (@samp{b}, @samp{c}, @samp{l}) to mean count
 by 512-byte blocks, bytes, or lines, optionally followed by @samp{f}
 which has the same meaning as @option{-f}.
-New scripts should use @option{-c @var{count}[b]},
-@option{-n @var{count}}, and/or @option{-f} instead.
 
 @vindex _POSIX2_VERSION
 On older systems, the leading @samp{-} can be replaced by @samp{+} in
@@ -2562,12 +2676,24 @@ the obsolete option syntax with the same meaning as in counts, and
 obsolete usage overrides normal usage when the two conflict.
 This obsolete behavior can be enabled or disabled with the
 @env{_POSIX2_VERSION} environment variable (@pxref{Standards
-conformance}), but portable scripts should avoid commands whose
-behavior depends on this variable.
-For example, use @samp{tail -- - main.c} or @samp{tail main.c} rather than
-the ambiguous @samp{tail - main.c}, @samp{tail -c4} or @samp{tail -c 10
-4} rather than the ambiguous @samp{tail -c 4}, and @samp{tail ./+4}
-or @samp{tail -n +4} rather than the ambiguous @samp{tail +4}.
+conformance}).
+
+Scripts intended for use on standard hosts should avoid obsolete
+syntax and should use @option{-c @var{count}[b]}, @option{-n
+@var{count}}, and/or @option{-f} instead.  If your script must also
+run on hosts that support only the obsolete syntax, you can often
+rewrite it to avoid problematic usages, e.g., by using @samp{sed -n
+'$p'} rather than @samp{tail -1}.  If that's not possible, the script
+can use a test like @samp{if tail -c +1 </dev/null >/dev/null 2>&1;
+then @dots{}} to decide which syntax to use.
+
+Even if your script assumes the standard behavior, you should still
+beware usages whose behaviors differ depending on the @acronym{POSIX}
+version.  For example, avoid @samp{tail - main.c}, since it might be
+interpreted as either @samp{tail main.c} or as @samp{tail -- -
+main.c}; avoid @samp{tail -c 4}, since it might mean either @samp{tail
+-c4} or @samp{tail -c 10 4}; and avoid @samp{tail +4}, since it might
+mean either @samp{tail ./+4} or @samp{tail -n +4}.
 
 @exitstatus
 
@@ -2796,7 +2922,9 @@ contents of files.
 * wc invocation::               Print newline, word, and byte counts.
 * sum invocation::              Print checksum and block counts.
 * cksum invocation::            Print CRC checksum and byte counts.
-* md5sum invocation::           Print or check message-digests.
+* md5sum invocation::           Print or check MD5 digests.
+* sha1sum invocation::          Print or check SHA-1 digests.
+* sha2 utilities::              Print or check SHA-2 digests.
 @end menu
 
 
@@ -2822,7 +2950,8 @@ wc [@var{option}]@dots{} [@var{file}]@dots{}
 given as an argument, it prints the file name following the counts.  If
 more than one @var{file} is given, @command{wc} prints a final line
 containing the cumulative counts, with the file name @file{total}.  The
-counts are printed in this order: newlines, words, characters, bytes.
+counts are printed in this order: newlines, words, characters, bytes,
+maximum line length.
 Each count is printed right-justified in a field with at least one
 space between fields so that the numbers and file names normally line
 up nicely in columns.  The width of the count fields varies depending
@@ -2878,6 +3007,28 @@ Print only the newline counts.
 @opindex -L
 @opindex --max-line-length
 Print only the maximum line lengths.
+
+@itemx --files0-from=@var{FILE}
+@opindex --files0-from=@var{FILE}
+@cindex including files from @command{du}
+Rather than processing files named on the command line, process those
+named in file @var{FILE}; each name is terminated by a null byte.
+This is useful when
+the list of file names is so long that it may exceed a command line
+length limitation.
+In such cases, running @command{wc} via @command{xargs} is undesirable
+because it splits the list into pieces and makes @command{wc} print a
+total for each sublist rather than for the entire list.
+One way to produce a list of null-byte-terminated file names is with @sc{gnu}
+@command{find}, using its @option{-print0} predicate.  For example, to find
+the length of the longest line in any @file{.c} or @file{.h} file in the
+current hierarchy, do this:
+
+@example
+find . -name '*.[ch]' -print0 | wc -L --files0-from=- | tail -n1
+@end example
+
+Do not specify any @var{FILE} on the command line when using this option.
 
 @end table
 
@@ -2970,9 +3121,10 @@ options}.
 
 
 @node md5sum invocation
-@section @command{md5sum}: Print or check message-digests
+@section @command{md5sum}: Print or check MD5 digests
 
 @pindex md5sum
+@cindex MD5
 @cindex 128-bit checksum
 @cindex checksum, 128-bit
 @cindex fingerprint, 128-bit
@@ -2980,6 +3132,19 @@ options}.
 
 @command{md5sum} computes a 128-bit checksum (or @dfn{fingerprint} or
 @dfn{message-digest}) for each specified @var{file}.
+
+Note: The MD5 digest is more reliable than a simple CRC (provided by
+the @command{cksum} command) for detecting accidental file corruption,
+as the chances of accidentally having two files with identical MD5
+are vanishingly small.  However, it should not be considered truly
+secure against malicious tampering: although finding a file with a
+given MD5 fingerprint, or modifying a file so as to retain its MD5 are
+considered infeasible at the moment, it is known how to produce
+different files with identical MD5 (a ``collision''), something which
+can be a security issue in certain contexts.  For more secure hashes,
+consider using SHA-1 or SHA-2.  @xref{sha1sum invocation}, and
+@ref{sha2 utilities}.
+
 If a @var{file} is specified as @samp{-} or if no files are given
 @command{md5sum} computes the checksum for the standard input.
 @command{md5sum} can also determine whether a file and checksum are
@@ -3072,6 +3237,64 @@ are valid.
 @exitstatus
 
 
+@node sha1sum invocation
+@section @command{sha1sum}: Print or check SHA-1 digests
+
+@pindex sha1sum
+@cindex SHA-1
+@cindex 160-bit checksum
+@cindex checksum, 160-bit
+@cindex fingerprint, 160-bit
+@cindex message-digest, 160-bit
+
+@command{sha1sum} computes a 160-bit checksum for each specified
+@var{file}.  The usage and options of this command are precisely the
+same as for @command{md5sum}.  @xref{md5sum invocation}.
+
+Note: The SHA-1 digest is more secure than MD5, and no collisions of
+it are known (different files having the same fingerprint).  However,
+it is known that they can be produced with considerable, but not
+unreasonable, resources.  For this reason, it is generally considered
+that SHA-1 should be gradually phased out in favor of the more secure
+SHA-2 hash algorithms.  @xref{sha2 utilities}.
+
+
+@node sha2 utilities
+@section sha2 utilities: Print or check SHA-2 digests
+
+@pindex sha224sum
+@pindex sha256sum
+@pindex sha384sum
+@pindex sha512sum
+@cindex SHA-2
+@cindex 224-bit checksum
+@cindex 256-bit checksum
+@cindex 384-bit checksum
+@cindex 512-bit checksum
+@cindex checksum, 224-bit
+@cindex checksum, 256-bit
+@cindex checksum, 384-bit
+@cindex checksum, 512-bit
+@cindex fingerprint, 224-bit
+@cindex fingerprint, 256-bit
+@cindex fingerprint, 384-bit
+@cindex fingerprint, 512-bit
+@cindex message-digest, 224-bit
+@cindex message-digest, 256-bit
+@cindex message-digest, 384-bit
+@cindex message-digest, 512-bit
+
+The commands @command{sha224sum}, @command{sha256sum},
+@command{sha384sum} and @command{sha512sum} compute checksums of
+various lengths (respectively 224, 256, 384 and 512 bits),
+collectively known as the SHA-2 hashes.  The usage and options of
+these commands are precisely the same as for @command{md5sum}.
+@xref{md5sum invocation}.
+
+Note: The SHA384 and SHA512 digests are considerably slower to
+compute, especially on 32-bit computers, than SHA224 or SHA256.
+
+
 @node Operating on sorted files
 @chapter Operating on sorted files
 
@@ -3082,6 +3305,7 @@ These commands work with (or produce) sorted files.
 
 @menu
 * sort invocation::             Sort text files.
+* shuf invocation::             Shuffle text files.
 * uniq invocation::             Uniquify files.
 * comm invocation::             Compare two sorted files line by line.
 * ptx invocation::              Produce a permuted index of file contents.
@@ -3200,7 +3424,8 @@ so portable shell scripts should specify global options first.
 @cindex blanks, ignoring leading
 @vindex LC_CTYPE
 Ignore leading blanks when finding sort keys in each line.
-The @env{LC_CTYPE} locale determines character types.
+By default a blank is a space or a tab, but the @env{LC_CTYPE} locale
+can change this.
 
 @item -d
 @itemx --dictionary-order
@@ -3212,7 +3437,8 @@ The @env{LC_CTYPE} locale determines character types.
 @vindex LC_CTYPE
 Sort in @dfn{phone directory} order: ignore all characters except
 letters, digits and blanks when sorting.
-The @env{LC_CTYPE} locale determines character types.
+By default letters and digits are those of @acronym{ASCII} and a blank
+is a space or a tab, but the @env{LC_CTYPE} locale can change this.
 
 @item -f
 @itemx --ignore-case
@@ -3280,6 +3506,8 @@ by a month name abbreviation, is folded to UPPER case and
 compared in the order @samp{JAN} < @samp{FEB} < @dots{} < @samp{DEC}.
 Invalid names compare low to valid names.  The @env{LC_TIME} locale
 category determines the month spellings.
+By default a blank is a space or a tab, but the @env{LC_CTYPE} locale
+can change this.
 
 @item -n
 @itemx --numeric-sort
@@ -3293,6 +3521,8 @@ digits possibly separated by thousands separators, optionally followed
 by a decimal-point character and zero or more digits.  A string of
 no digits is interpreted as @samp{0}.  The @env{LC_NUMERIC}
 locale specifies the decimal-point character and thousands separator.
+By default a blank is a space or a tab, but the @env{LC_CTYPE} locale
+can change this.
 
 Numeric sort uses what might be considered an unconventional method to
 compare strings representing floating point numbers.  Rather than first
@@ -3317,6 +3547,25 @@ To compare such strings numerically, use the
 @cindex reverse sorting
 Reverse the result of comparison, so that lines with greater key values
 appear earlier in the output instead of later.
+
+@item -R
+@itemx --random-sort
+@opindex -R
+@opindex --random-sort
+@cindex random sort
+Sort by hashing the input keys and then sorting the hash values.
+Choose the hash function at random, ensuring that it is free of
+collisions so that differing keys have differing hash values.  This is
+like a random permutation of the inputs (@pxref{shuf invocation}),
+except that keys with the same value sort together.
+
+If multiple random sort fields are specified, the same random hash
+function is used for all fields.  To use different random hash
+functions for different fields, you can invoke @command{sort} more
+than once.
+
+The choice of hash function is affected by the
+@option{--random-source} option.
 
 @end table
 
@@ -3355,6 +3604,13 @@ On newer systems, @option{-o} cannot appear after an input file if
 scripts should specify @option{-o @var{output-file}} before any input
 files.
 
+@item --random-source=@var{file}
+@opindex --random-source
+@cindex random source for sorting
+Use @var{file} as a source of random data used to determine which
+random hash function to use with the @option{-R} option.  @xref{Random
+sources}.
+
 @item -s
 @itemx --stable
 @opindex -s
@@ -3364,7 +3620,7 @@ files.
 
 Make @command{sort} stable by disabling its last-resort comparison.
 This option has no effect if no fields or global ordering options
-other than @option{--reverse} (@option{-R}) are specified.
+other than @option{--reverse} (@option{-r}) are specified.
 
 @item -S @var{size}
 @itemx --buffer-size=@var{size}
@@ -3394,6 +3650,9 @@ than @var{size}.
 Use character @var{separator} as the field separator when finding the
 sort keys in each line.  By default, fields are separated by the empty
 string between a non-blank character and a blank character.
+By default a blank is a space or a tab, but the @env{LC_CTYPE} locale
+can change this.
+
 That is, given the input line @w{@samp{ foo bar}}, @command{sort} breaks it
 into fields @w{@samp{ foo}} and @w{@samp{ bar}}.  The field separator is
 not considered to be part of either the field preceding or the field
@@ -3487,14 +3746,21 @@ numbers of leading blanks in fields can cause confusing results.
 Keys can span multiple fields.
 
 @vindex _POSIX2_VERSION
+@vindex POSIXLY_CORRECT
 On older systems, @command{sort} supports an obsolete origin-zero
 syntax @samp{+@var{pos1} [-@var{pos2}]} for specifying sort keys.
 This obsolete behavior can be enabled or disabled with the
 @env{_POSIX2_VERSION} environment variable (@pxref{Standards
-conformance}), but portable scripts should avoid commands whose
-behavior depends on this variable.
-For example, use @samp{sort ./+2} or @samp{sort -k 3} rather than
-the ambiguous @samp{sort +2}.
+conformance}); it can also be enabled when @env{POSIXLY_CORRECT} is
+not set by using the obsolete syntax with @samp{-@var{pos2}} present.
+
+Scripts intended for use on standard hosts should avoid obsolete
+syntax and should use @option{-k} instead.  For example, avoid
+@samp{sort +2}, since it might be interpreted as either @samp{sort
+./+2} or @samp{sort -k 3}.  If your script must also run on hosts that
+support only the obsolete syntax, it can use a test like @samp{if sort
+-k 1 </dev/null >/dev/null 2>&1; then @dots{}} to decide which syntax
+to use.
 
 Here are some examples to illustrate various combinations of options.
 
@@ -3617,7 +3883,158 @@ by the sort operation.
 @c printf 'c\n\nb\n\na\n'|perl -0pe 's/\n\n/\n\0/g'|sort -z|perl -0pe 's/\0/\n/g'
 @c @end example
 
+@item
+Shuffle a list of directories, but preserve the order of files within
+each directory.  For instance, one could use this to generate a music
+playlist in which albums are shuffled but the songs of each album are
+played in order.
+
+@example
+ls */* | sort -t / -k 1,1R -k 2,2
+@end example
+
 @end itemize
+
+
+@node shuf invocation
+@section @command{shuf}: Shuffling text
+
+@pindex shuf
+@cindex shuffling files
+
+@command{shuf} shuffles its input by outputting a random permutation
+of its input lines.  Each output permutation is equally likely.
+Synopses:
+
+@example
+shuf [@var{option}]@dots{} [@var{file}]
+shuf -e [@var{option}]@dots{} [@var{arg}]@dots{}
+shuf -i @var{lo}-@var{hi} [@var{option}]@dots{}
+@end example
+
+@command{shuf} has three modes of operation that affect where it
+obtains its input lines.  By default, it reads lines from standard
+input.  The following options change the operation mode:
+
+@table @samp
+
+@item -e
+@itemx --echo
+@opindex -c
+@opindex --echo
+@cindex command-line operands to shuffle
+Treat each command-line operand as an input line.
+
+@item -i @var{lo}-@var{hi}
+@itemx --input-range=@var{lo}-@var{hi}
+@opindex -i
+@opindex --input-range
+@cindex input range to shuffle
+Act as if input came from a file containing the range of unsigned
+decimal integers @var{lo}@dots{}@var{hi}, one per line.
+
+@end table
+
+@command{shuf}'s other options can affect its behavior in all
+operation modes:
+
+@table @samp
+
+@item -n @var{lines}
+@itemx --head-lines=@var{lines}
+@opindex -n
+@opindex --head-lines
+@cindex head of output
+Output at most @var{lines} lines.  By default, all input lines are
+output.
+
+@item -o @var{output-file}
+@itemx --output=@var{output-file}
+@opindex -o
+@opindex --output
+@cindex overwriting of input, allowed
+Write output to @var{output-file} instead of standard output.
+@command{shuf} reads all input before opening
+@var{output-file}, so you can safely shuffle a file in place by using
+commands like @code{shuf -o F <F} and @code{cat F | shuf -o F}.
+
+@item --random-source=@var{file}
+@opindex --random-source
+@cindex random source for shuffling
+Use @var{file} as a source of random data used to determine which
+permutation to generate.  @xref{Random sources}.
+
+@item -z
+@itemx --zero-terminated
+@opindex -z
+@opindex --zero-terminated
+@cindex sort zero-terminated lines
+Treat the input and output as a set of lines, each terminated by a zero byte
+(@acronym{ASCII} @sc{nul} (Null) character) instead of an
+@acronym{ASCII} @sc{lf} (Line Feed).
+This option can be useful in conjunction with @samp{perl -0} or
+@samp{find -print0} and @samp{xargs -0} which do the same in order to
+reliably handle arbitrary file names (even those containing blanks
+or other special characters).
+
+@end table
+
+For example:
+
+@example
+shuf <<EOF
+A man,
+a plan,
+a canal:
+Panama!
+EOF
+@end example
+
+@noindent
+might produce the output
+
+@example
+Panama!
+A man,
+a canal:
+a plan,
+@end example
+
+@noindent
+Similarly, the command:
+
+@example
+shuf -e clubs hearts diamonds spades
+@end example
+
+@noindent
+might output:
+
+@example
+clubs
+diamonds
+spades
+hearts
+@end example
+
+@noindent
+and the command @samp{shuf -i 1-4} might output:
+
+@example
+4
+2
+1
+3
+@end example
+
+@noindent
+These examples all have four input lines, so @command{shuf} might
+produce any of the twenty-four possible permutations of the input.  In
+general, if there are @var{N} input lines, there are @var{N}! (i.e.,
+@var{N} factorial, or @var{N} * (@var{N} - 1) * @dots{} * 1) possible
+output permutations.
+
+@exitstatus
 
 
 @node uniq invocation
@@ -4024,11 +4441,6 @@ convention more than once per program invocation.
 
 @table @samp
 
-@item -C
-@itemx --copyright
-Print a short note about the copyright and copying conditions, then
-exit without further processing.
-
 @item -G
 @itemx --traditional
 As already explained, this option disables all @sc{gnu} extensions to
@@ -4052,7 +4464,7 @@ processing.
 
 @c FIXME:  People don't necessarily know what an IBM-PC was these days.
 As it is set up now, the program assumes that the input file is coded
-using 8-bit ISO 8859-1 code, also known as Latin-1 character set,
+using 8-bit @acronym{ISO} 8859-1 code, also known as Latin-1 character set,
 @emph{unless} it is compiled for MS-DOS, in which case it uses the
 character set of the IBM-PC@.  (@sc{gnu} @command{ptx} is not known to work on
 smaller MS-DOS machines anymore.)  Compared to 7-bit @acronym{ASCII}, the set
@@ -4101,11 +4513,6 @@ never be taken as keywords in concordance output.  It is called the
 @dfn{Ignore file}.  The file contains exactly one word in each line; the
 end of line separation of words is not subject to the value of the
 @option{-S} option.
-
-There is a default Ignore file used by @command{ptx} when this option is
-not specified, usually found in @file{/usr/local/lib/eign} if this has
-not been changed at installation time.  If you want to deactivate the
-default Ignore file, specify @code{/dev/null} instead.
 
 @item -o @var{file}
 @itemx --only-file=@var{file}
@@ -4522,7 +4929,7 @@ ranges of selected bytes.
 
 @item --complement
 @opindex --complement
-This option is a GNU extension.
+This option is a @acronym{GNU} extension.
 Select for printing the complement of the bytes, characters or fields
 selected with the @option{-b}, @option{-c} or @option{-f} options.
 In other words, do @emph{not} print the bytes, characters or fields
@@ -4558,7 +4965,7 @@ c
 $ paste num2 let3
 1       a
 2       b
-        c
+       @ c
 @end example
 
 Synopsis:
@@ -4617,11 +5024,11 @@ lines that have identical join fields.  Synopsis:
 join [@var{option}]@dots{} @var{file1} @var{file2}
 @end example
 
-@vindex LC_COLLATE
 Either @var{file1} or @var{file2} (but not both) can be @samp{-},
 meaning standard input.  @var{file1} and @var{file2} should be
 sorted on the join fields.
 
+@vindex LC_COLLATE
 Normally, the sort order is that of the
 collating sequence specified by the @env{LC_COLLATE} locale.  Unless
 the @option{-t} option is given, the sort comparison ignores blanks at
@@ -4629,7 +5036,14 @@ the start of the join field, as in @code{sort -b}.  If the
 @option{--ignore-case} option is given, the sort comparison ignores
 the case of characters in the join field, as in @code{sort -f}.
 
-However, as a GNU extension, if the input has no unpairable lines the
+The @command{sort} and @command{join} commands should use consistent
+locales and options if the output of @command{sort} is fed to
+@command{join}.  You can use a command like @samp{sort -k 1b,1} to
+sort a file on its default join field, but if you select a non-default
+locale, join field, separator, or comparison options, then you should
+do so consistently between @command{join} and @command{sort}.
+
+As a @acronym{GNU} extension, if the input has no unpairable lines the
 sort order can be any order that considers two fields to be equal if and
 only if the sort comparison described above considers them to be equal.
 For example:
@@ -4720,6 +5134,8 @@ option---are subject to the specified @var{field-list}.
 @item -t @var{char}
 Use character @var{char} as the input and output field separator.
 Treat as significant each occurrence of @var{char} in the input file.
+Use @samp{sort -t @var{char}}, without the @option{-b} option of
+@samp{sort}, to produce this ordering.
 
 @item -v @var{file-number}
 Print a line for each unpairable line in file @var{file-number}
@@ -4813,8 +5229,7 @@ used only in @var{set1} or @var{set2}, as noted below.
 @item Backslash escapes
 @cindex backslash escapes
 
-A backslash followed by a character not listed below causes an error
-message.
+The following backslash escape sequences are recognized:
 
 @table @samp
 @item \a
@@ -4837,6 +5252,11 @@ octal digits,
 @item \\
 A backslash.
 @end table
+
+While a backslash followed by a character not listed above is
+interpreted as that character, the backslash also effectively
+removes any special significance, so it is useful to escape
+@samp{[}, @samp{]}, @samp{*}, and @samp{-}.
 
 @item Ranges
 @cindex ranges
@@ -5059,7 +5479,8 @@ tr -s '\n'
 
 @item
 Find doubled occurrences of words in a document.
-For example, people often write ``the the'' with the repeated words
+@c Separate the following two "the"s, so typo checkers don't complain.
+For example, people often write ``the @w{}the'' with the repeated words
 separated by a newline.  The Bourne shell script below works first
 by converting each sequence of punctuation and blank characters to a
 single newline.  That puts each ``word'' on a line by itself.
@@ -5216,7 +5637,7 @@ not imply @option{-a}.)  New scripts should use @option{--first-only -t
 @itemx --all
 @opindex -a
 @opindex --all
-Also convert all sequences of two or more blanks just before a tab stop.
+Also convert all sequences of two or more blanks just before a tab stop,
 even if they occur after non-blank characters in a line.
 
 @end table
@@ -5359,6 +5780,14 @@ option has been specified (@option{--classify} (@option{-F}),
 (@option{-l}),
 @option{--dereference} (@option{-L}), or
 @option{--dereference-command-line} (@option{-H})).
+
+@item --group-directories-first
+@opindex --group-directories-first
+Group all the directories before the files and then sort the
+directories and the files separately using the selected sort key
+(see --sort option).
+That is, this option specifies a primary sort key,
+and the --sort option specifies a secondary key.
 
 @item --hide=PATTERN
 @opindex --hide=@var{pattern}
@@ -5565,10 +5994,11 @@ uniquely identifies each file within a particular file system.)
 @opindex --format
 @opindex long ls @r{format}
 @opindex verbose ls @r{format}
-In addition to the name of each file, print the file type, permissions,
+In addition to the name of each file, print the file type, file mode bits,
 number of hard links, owner name, group name, size, and
 timestamp (@pxref{Formatting file timestamps}), normally
-the modification time.
+the modification time.  Print question marks for information that
+cannot be determined.
 
 Normally the size is printed as a byte count without punctuation, but
 this can be overridden (@pxref{Block size}).  For example, @option{-h}
@@ -5583,24 +6013,73 @@ bytes, but this can be overridden (@pxref{Block size}).
 The @var{blocks} computed counts each hard link separately;
 this is arguably a deficiency.
 
+The file type is one of the following characters:
+
+@c The commented-out entries are ones we're not sure about.
+
+@table @samp
+@item -
+regular file
+@item b
+block special file
+@item c
+character special file
+@item C
+high performance (``contiguous data'') file
+@item d
+directory
+@item D
+door (Solaris 2.5 and up)
+@c @item F
+@c semaphore, if this is a distinct file type
+@item l
+symbolic link
+@c @item m
+@c multiplexed file (7th edition Unix; obsolete)
+@item M
+off-line (``migrated'') file (Cray DMF)
+@item n
+network special file (HP-UX)
+@item p
+FIFO (named pipe)
+@item P
+port (Solaris 10 and up)
+@c @item Q
+@c message queue, if this is a distinct file type
+@item s
+socket
+@c @item S
+@c shared memory object, if this is a distinct file type
+@c @item T
+@c typed memory object, if this is a distinct file type
+@c @item w
+@c whiteout (4.4BSD; not implemented)
+@item ?
+some other file type
+@end table
+
 @cindex permissions, output by @command{ls}
-The permissions listed are similar to symbolic mode specifications
+The file mode bits listed are similar to symbolic mode specifications
 (@pxref{Symbolic Modes}).  But @command{ls} combines multiple bits into the
 third character of each set of permissions as follows:
+
 @table @samp
 @item s
-If the setuid or setgid bit and the corresponding executable bit
+If the set-user-ID or set-group-ID bit and the corresponding executable bit
 are both set.
 
 @item S
-If the setuid or setgid bit is set but the corresponding executable bit
-is not set.
+If the set-user-ID or set-group-ID bit is set but the corresponding
+executable bit is not set.
 
 @item t
-If the sticky bit and the other-executable bit are both set.
+If the restricted deletion flag or sticky bit, and the
+other-executable bit, are both set.  The restricted deletion flag is
+another name for the sticky bit.  @xref{Mode Structure}.
 
 @item T
-If the sticky bit is set but the other-executable bit is not set.
+If the restricted deletion flag or sticky bit is set but the
+other-executable bit is not set.
 
 @item x
 If the executable bit is set and none of the above apply.
@@ -5609,10 +6088,15 @@ If the executable bit is set and none of the above apply.
 Otherwise.
 @end table
 
-Following the permission bits is a single character that specifies
-whether an alternate access method applies to the file.  When that
-character is a space, there is no alternate access method.  When it
-is a printing character (e.g., @samp{+}), then there is such a method.
+Following the file mode bits is a single character that specifies
+whether an alternate access method such as an access control list
+applies to the file.  When the character following the file mode bits is a
+space, there is no alternate access method.  When it is a printing
+character, then there is such a method.
+
+For a file with an extended access control list, a @samp{+} character is
+listed.  Basic access control lists are equivalent to the permissions
+listed, and are not considered an alternate access method.
 
 @item -n
 @itemx --numeric-uid-gid
@@ -5775,7 +6259,7 @@ foo.zml-25.gz      foo.zml-25.gz
 foo.zml-6.gz       foo.zml-100.gz
 @end example
 
-Note also that numeric parts with leading zeroes are considered as
+Note also that numeric parts with leading zeros are considered as
 fractional one:
 
 @example
@@ -5871,6 +6355,7 @@ like @option{-F}, except that executables are not marked.
 @opindex --indicator-style
 Append a character indicator with style @var{word} to entry names,
 as follows:
+
 @table @samp
 @item none
 Do not append any character indicator; this is the default.
@@ -6047,7 +6532,7 @@ and might generate timestamps like @samp{30. M@"ar 2002@ } and
 @vindex LC_TIME
 List @acronym{POSIX}-locale timestamps if the @env{LC_TIME} locale
 category is @acronym{POSIX}, @var{style} timestamps otherwise.  For
-example, the default style, which is @samp{posix-long-iso}, lists
+example, the @samp{posix-long-iso} style lists
 timestamps like @samp{Mar 30@ @ 2002} and @samp{Mar 30 23:45} when in
 the @acronym{POSIX} locale, and like @samp{2002-03-30 23:45} otherwise.
 @end table
@@ -6056,10 +6541,11 @@ the @acronym{POSIX} locale, and like @samp{2002-03-30 23:45} otherwise.
 @vindex TIME_STYLE
 You can specify the default value of the @option{--time-style} option
 with the environment variable @env{TIME_STYLE}; if @env{TIME_STYLE} is not set
-the default style is @samp{posix-long-iso}.  @acronym{GNU} Emacs 21 and
-later can parse @acronym{ISO} dates, but older Emacs versions do not, so if
-you are using an older version of Emacs and specify a non-@acronym{POSIX}
-locale, you may need to set @samp{TIME_STYLE="locale"}.
+the default style is @samp{locale}.  @acronym{GNU} Emacs 21.3 and
+later use the @option{--dired} option and therefore can parse any date
+format, but if you are using Emacs 21.1 or 21.2 and specify a
+non-@acronym{POSIX} locale you may need to set
+@samp{TIME_STYLE="posix-long-iso"}.
 
 To avoid certain denial-of-service attacks, timestamps that would be
 longer than 1000 bytes may be treated as errors.
@@ -6116,6 +6602,7 @@ in C.
 Use style @var{word} to quote file names and other strings that may
 contain arbitrary characters.  The @var{word} should
 be one of the following:
+
 @table @samp
 @item literal
 Output strings as-is; this is the same as the @option{-N} or
@@ -6404,6 +6891,9 @@ tries to open it again.  Contrast this behavior with that enabled by
 is never opened but rather is unlinked unconditionally.  Also see the
 description of @option{--remove-destination}.
 
+This option is independent of the @option{--interactive} or
+@option{-i} option: neither cancels the effect of the other.
+
 @item -H
 @opindex -H
 If a command line argument specifies a symbolic link, then copy the
@@ -6415,7 +6905,8 @@ via recursive traversal.
 @itemx --interactive
 @opindex -i
 @opindex --interactive
-Prompt whether to overwrite existing regular destination files.
+When copying a file other than a directory, prompt whether to
+overwrite an existing destination file.
 
 @item -l
 @itemx --link
@@ -6448,10 +6939,11 @@ of one or more of the following strings:
 
 @table @samp
 @itemx mode
-Preserve the permission attributes.
+Preserve the file mode bits and access control lists.
 @itemx ownership
 Preserve the owner and group.  On most modern systems,
-only the super-user may change the owner of a file, and regular users
+only users with appropriate privileges may change the owner of a file,
+and ordinary users
 may preserve the group ownership of a file only if they happen to be
 a member of the desired group.
 @itemx timestamps
@@ -6464,14 +6956,13 @@ any links between corresponding source files.
 @itemx all
 Preserve all file attributes.
 Equivalent to specifying all of the above.
-@c Mention ACLs here.
 @end table
 
 Using @option{--preserve} with no @var{attribute_list} is equivalent
 to @option{--preserve=mode,ownership,timestamps}.
 
 In the absence of this option, each destination file is created with the
-permissions of the corresponding source file, minus the bits set in the
+mode bits of the corresponding source file, minus the bits set in the
 umask and minus the set-user-ID and set-group-ID bits.
 @xref{File permissions}.
 
@@ -6544,13 +7035,14 @@ Remove each existing destination file before attempting to open it
 @findex read @r{system call, and holes}
 A @dfn{sparse file} contains @dfn{holes}---a sequence of zero bytes that
 does not occupy any physical disk blocks; the @samp{read} system call
-reads these as zeroes.  This can both save considerable disk space and
+reads these as zeros.  This can both save considerable disk space and
 increase speed, since many binary files contain lots of consecutive zero
 bytes.  By default, @command{cp} detects holes in input source files via a crude
 heuristic and makes the corresponding output file sparse as well.
 Only regular files may be sparse.
 
 The @var{when} value can be one of the following:
+
 @table @samp
 @item auto
 The default behavior: if the input file is sparse, attempt to make
@@ -6804,7 +7296,8 @@ argument(s).  (No spaces around any comma(s).)
 Access the output file using the flags specified by the @var{flag}
 argument(s).  (No spaces around any comma(s).)
 
-Flags:
+Here are the flags.  Not every flag is supported on every operating
+system.
 
 @table @samp
 
@@ -6814,11 +7307,21 @@ Flags:
 Write in append mode, so that even if some other process is writing to
 this file, every @command{dd} write will append to the current
 contents of the file.  This flag makes sense only for output.
+If you combine this flag with the @samp{of=@var{file}} operand,
+you should also specify @samp{conv=notrunc} unless you want the
+output file to be truncated before being appended to.
 
 @item direct
 @opindex direct
 @cindex direct I/O
 Use direct I/O for data, avoiding the buffer cache.
+
+@item directory
+@opindex directory
+@cindex directory I/O
+
+Fail unless the file is a directory.  Most operating systems do not
+allow I/O to a directory, so this flag has limited utility.
 
 @item dsync
 @opindex dsync
@@ -6839,10 +7342,10 @@ Use synchronized I/O for both data and metadata.
 @cindex nonblocking I/O
 Use non-blocking I/O.
 
-@item nofollow
-@opindex nofollow
-@cindex symbolic links, following
-Do not follow symbolic links.
+@item noatime
+@opindex noatime
+@cindex access time
+Do not update the file's access time.
 
 @item noctty
 @opindex noctty
@@ -6851,6 +7354,16 @@ Do not assign the file to be a controlling terminal for @command{dd}.
 This has no effect when the file is not a terminal.
 On many hosts (e.g., @acronym{GNU}/Linux hosts), this option has no effect
 at all.
+
+@item nofollow
+@opindex nofollow
+@cindex symbolic links, following
+Do not follow symbolic links.
+
+@item nolinks
+@opindex nolinks
+@cindex hard links
+Fail if the file has multiple hard links.
 
 @item binary
 @opindex binary
@@ -6929,7 +7442,7 @@ environment variable is set.
 @pindex install
 @cindex copying files and setting attributes
 
-@command{install} copies files while setting their permission modes and, if
+@command{install} copies files while setting their file mode bits and, if
 possible, their owner and group.  Synopses:
 
 @example
@@ -6954,7 +7467,10 @@ directory, using the @var{source}s' names.
 @item
 If the @option{--directory} (@option{-d}) option is given,
 @command{install} creates each @var{directory} and any missing parent
-directories.
+directories.  Parent directories are created with mode
+@samp{u=rwx,go=rx} (755), regardless of the @option{-m} option or the
+current umask.  @xref{Directory Setuid and Setgid}, for how the
+set-user-ID and set-group-ID bits of parent directories are inherited.
 @end itemize
 
 @cindex Makefiles, installing programs in
@@ -6980,11 +7496,9 @@ Ignored; for compatibility with old Unix versions of @command{install}.
 @cindex directories, creating with given attributes
 @cindex parent directories, creating missing
 @cindex leading directories, creating missing
-Create each given directory and any missing parent directories, setting
-the owner, group and mode as given on the command line or to the
-defaults.  It also gives any parent directories it creates those
-attributes.  (This is different from the SunOS 4.x @command{install}, which
-gives directories that it creates the default attributes.)
+Create any missing parent directories, giving them the default
+attributes.  Then create each given directory, setting their owner,
+group and mode as given on the command line or to the defaults.
 
 @item -g @var{group}
 @itemx --group=@var{group}
@@ -7000,12 +7514,16 @@ may be either a group name or a numeric group ID.
 @opindex -m
 @opindex --mode
 @cindex permissions of installed files, setting
-Set the permissions for the installed file or directory to @var{mode},
+Set the file mode bits for the installed file or directory to @var{mode},
 which can be either an octal number, or a symbolic mode as in
 @command{chmod}, with @samp{a=} (no access allowed to anyone) as the
 point of departure (@pxref{File permissions}).
-The default mode is @samp{u=rwx,go=rx}---read, write,
-and execute for the owner, and read and execute for group and other.
+The default mode is @samp{u=rwx,go=rx,a-s}---read, write, and
+execute for the owner, read and execute for group and other, and with
+set-user-ID and set-group-ID disabled.
+This default is not quite the same as @samp{755}, since it disables
+instead of preserving set-user-ID and set-group-ID on directories.
+@xref{Directory Setuid and Setgid}.
 
 @item -o @var{owner}
 @itemx --owner=@var{owner}
@@ -7192,11 +7710,20 @@ rm [@var{option}]@dots{} [@var{file}]@dots{}
 @end example
 
 @cindex prompting, and @command{rm}
-If a file is unwritable, standard input is a terminal, and the @option{-f}
-or @option{--force} option is not given, or the @option{-i} or
-@option{--interactive} option @emph{is} given, @command{rm} prompts the user
-for whether to remove the file.
+If the @option{-I} or @option{--interactive=once} option is given,
+and there are more than three files or the @option{-r}, @option{-R},
+or @option{--recursive} are given, then @command{rm} prompts the user
+for whether to proceed with the entire operation.  If the response is
+not affirmative, the entire command is aborted.
+
+Otherwise, if a file is unwritable, standard input is a terminal, and
+the @option{-f} or @option{--force} option is not given, or the
+@option{-i} or @option{--interactive=always} option @emph{is} given,
+@command{rm} prompts the user for whether to remove the file.
 If the response is not affirmative, the file is skipped.
+
+Any attempt to remove a file whose last file name component is
+@file{.} or @file{..} is rejected without any prompting.
 
 @emph{Warning}: If you use @command{rm} to remove a file, it is usually
 possible to recover the contents of that file.  If you want more assurance
@@ -7206,23 +7733,6 @@ The program accepts the following options.  Also see @ref{Common options}.
 
 @table @samp
 
-@item -d
-@itemx --directory
-@opindex -d
-@opindex --directory
-@cindex directories, removing with @code{unlink}
-@findex unlink
-@pindex fsck
-Use the @code{unlink} function unconditionally rather than attempting
-to check whether the file is a directory and using @code{rmdir} if it
-is a directory.  This can be useful on corrupted file systems where
-@code{unlink} works even though other, file-checking functions fail.
-For directories, this works
-only if you have appropriate privileges and if your operating system supports
-@code{unlink} for directories.  Because unlinking a directory causes any files
-in the deleted directory to become unreferenced, it is wise to @command{fsck}
-the file system afterwards.
-
 @item -f
 @itemx --force
 @opindex -f
@@ -7231,25 +7741,70 @@ Ignore nonexistent files and never prompt the user.
 Ignore any previous @option{--interactive} (@option{-i}) option.
 
 @item -i
-@itemx --interactive
 @opindex -i
-@opindex --interactive
 Prompt whether to remove each file.
 If the response is not affirmative, the file is skipped.
 Ignore any previous @option{--force} (@option{-f}) option.
+Equivalent to @option{--interactive=always}.
+
+@item -I
+@opindex -I
+Prompt once whether to proceed with the command, if more than three
+files are named or if a recursive removal is requested.  Ignore any
+previous @option{--force} (@option{-f}) option.  Equivalent to
+@option{--interactive=once}.
+
+@itemx --interactive [=@var{when}]
+@opindex --interactive
+Specify when to issue an interactive prompt.  @var{when} may be
+omitted, or one of:
+@itemize @bullet
+@item never
+@vindex never @r{interactive option}
+- Do not prompt at all.
+@item once
+@vindex once @r{interactive option}
+- Prompt once if more than three files are named or if a recursive
+removal is requested.  Equivalent to @option{-I}.
+@item always
+@vindex always @r{interactive option}
+- Prompt for every file being removed.  Equivalent to @option{-i}.
+@end itemize
+Specifying @option{--interactive} and no @var{when} is equivalent to
+@option{--interactive=always}.
+
+@itemx --one-file-system
+@opindex --one-file-system
+@cindex one file system, restricting @command{rm} to
+When removing a hierarchy recursively, skip any directory that is on a
+file system different from that of the corresponding command line argument.
+
+This option is useful when removing a build ``chroot'' hierarchy,
+which normally contains no valuable data.  However, it is not uncommon
+to bind-mount @file{/home} into such a hierarchy, to make it easier to
+use one's start-up file.  The catch is that it's easy to forget to
+unmount @file{/home}.  Then, when you use @command{rm -rf} to remove
+your normally throw-away chroot, that command will remove everything
+under @file{/home}, too.
+Use the @option{--one-file-system} option, and it will
+warn about and skip directories on other file systems.
+Of course, this will not save your @file{/home} if it and your
+chroot happen to be on the same file system.
 
 @itemx --preserve-root
 @opindex --preserve-root
 @cindex root directory, disallow recursive destruction
-Fail upon any attempt to remove the file system root, @file{/},
+Fail upon any attempt to remove the root directory, @file{/},
 when used with the @option{--recursive} option.
-Without @option{--recursive}, this option has no effect.
+This is the default behavior.
 @xref{Treating / specially}.
 
 @itemx --no-preserve-root
 @opindex --no-preserve-root
 @cindex root directory, allow recursive destruction
-Cancel the effect of any preceding @option{--preserve-root} option.
+Do not treat @file{/} specially when removing recursively.
+This option is not recommended unless you really want to
+remove all the files on your computer.
 @xref{Treating / specially}.
 
 @item -r
@@ -7422,6 +7977,12 @@ By default, @command{shred} uses 25 passes of overwrite.  This is enough
 for all of the useful overwrite patterns to be used at least once.
 You can reduce this to save time, or increase it if you have a lot of
 time to waste.
+
+@item --random-source=@var{file}
+@opindex --random-source
+@cindex random source for shredding
+Use @var{file} as a source of random data used to overwrite and to
+choose pass ordering.  @xref{Random sources}.
 
 @item -s @var{BYTES}
 @itemx --size=@var{BYTES}
@@ -7657,7 +8218,8 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex -F
 @opindex --directory
 @cindex hard links to directories
-Allow the super-user to attempt to make hard links to directories.
+Allow users with appropriate privileges to attempt to make hard links
+to directories.
 However, note that this will probably fail due to
 system restrictions, even for the super-user.
 
@@ -7712,7 +8274,7 @@ an error message on systems that do not support symbolic links.
 @itemx --verbose
 @opindex -v
 @opindex --verbose
-Print the name of each file before linking it.
+Print the name of each file after linking it successfully.
 
 @end table
 
@@ -7760,14 +8322,9 @@ ln -s ../adir/afile yetanotherfile
 mkdir [@var{option}]@dots{} @var{name}@dots{}
 @end example
 
-If a @var{name} is an existing file but not a directory, @command{mkdir} prints
-a warning message on stderr and will exit with a status of 1 after
-processing any remaining @var{name}s.  The same is done when a @var{name} is an
-existing directory and the -p option is not given.  If a @var{name} is an
-existing directory and the -p option is given, @command{mkdir} will ignore it.
-That is, @command{mkdir} will not print a warning, raise an error, or change
-the mode of the directory (even if the -m option is given), and will
-move on to processing any remaining @var{name}s.
+@command{mkdir} creates each directory @var{name} in the order given.
+It reports an error if @var{name} already exists, unless the
+@option{-p} option is given and @var{name} is a directory.
 
 The program accepts the following options.  Also see @ref{Common options}.
 
@@ -7778,18 +8335,30 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex -m
 @opindex --mode
 @cindex modes of created directories, setting
-Set the mode of created directories to @var{mode}, which is symbolic as
+Set the file permission bits of created directories to @var{mode},
+which uses the same syntax as
 in @command{chmod} and uses @samp{a=rwx} (read, write and execute allowed for
 everyone) for the point of the departure.  @xref{File permissions}.
+
+Normally the directory has the desired file mode bits at the moment it
+is created.  As a @acronym{GNU} extension, @var{mode} may also mention
+special mode bits, but in this case there may be a temporary window
+during which the directory exists but its special mode bits are
+incorrect.  @xref{Directory Setuid and Setgid}, for how the
+set-user-ID and set-group-ID bits of directories are inherited unless
+overridden in this way.
 
 @item -p
 @itemx --parents
 @opindex -p
 @opindex --parents
 @cindex parent directories, creating
-Make any missing parent directories for each argument.  The mode for parent
-directories is set to the umask modified by @samp{u+wx}.
-Ignore arguments corresponding to existing directories.
+Make any missing parent directories for each argument.  The file permission
+bits of parent directories are set to the umask modified by @samp{u+wx}.
+@xref{Directory Setuid and Setgid}, for how the set-user-ID and
+set-group-ID bits of parent directories are inherited.
+Ignore arguments corresponding to existing directories, and do not
+change their file mode bits.
 
 @item -v
 @item --verbose
@@ -7833,7 +8402,8 @@ The program accepts the following option.  Also see @ref{Common options}.
 @cindex modes of created FIFOs, setting
 Set the mode of created FIFOs to @var{mode}, which is symbolic as in
 @command{chmod} and uses @samp{a=rw} (read and write allowed for everyone)
-for the point of departure.  @xref{File permissions}.
+for the point of departure.  @var{mode} should specify only file
+permission bits.  @xref{File permissions}.
 
 @end table
 
@@ -7904,6 +8474,7 @@ The program accepts the following option.  Also see @ref{Common options}.
 @opindex --mode
 Set the mode of created files to @var{mode}, which is symbolic as in
 @command{chmod} and uses @samp{a=rw} as the point of departure.
+@var{mode} should specify only file permission bits.
 @xref{File permissions}.
 
 @end table
@@ -8170,7 +8741,8 @@ set-group-ID permission bits.  This behavior depends on the policy and
 functionality of the underlying @code{chown} system call, which may
 make system-dependent file mode modifications outside the control of
 the @command{chown} command.  For example, the @command{chown} command
-might not affect those bits when operated as the superuser, or if the
+might not affect those bits when invoked by a user with appropriate
+privileges, or when the
 bits signify some function other than executable permission (e.g.,
 mandatory locking).
 When in doubt, check the underlying system behavior.
@@ -8254,7 +8826,7 @@ during a recursive traversal, but see @option{--verbose}.
 @itemx --preserve-root
 @opindex --preserve-root
 @cindex root directory, disallow recursive modification
-Fail upon any attempt to recursively change the file system root, @file{/}.
+Fail upon any attempt to recursively change the root directory, @file{/}.
 Without @option{--recursive}, this option has no effect.
 @xref{Treating / specially}.
 
@@ -8376,7 +8948,7 @@ during a recursive traversal, but see @option{--verbose}.
 @itemx --preserve-root
 @opindex --preserve-root
 @cindex root directory, disallow recursive modification
-Fail upon any attempt to recursively change the file system root, @file{/}.
+Fail upon any attempt to recursively change the root directory, @file{/}.
 Without @option{--recursive}, this option has no effect.
 @xref{Treating / specially}.
 
@@ -8456,7 +9028,16 @@ line, @command{chmod} changes the permissions of the pointed-to file.
 In contrast, @command{chmod} ignores symbolic links encountered during
 recursive directory traversals.
 
-If used, @var{mode} specifies the new permissions.
+A successful use of @command{chmod} clears the set-group-ID bit of a
+regular file if the file's group ID does not match the user's
+effective group ID or one of the user's supplementary group IDs,
+unless the user has appropriate privileges.  Additional restrictions
+may cause the set-user-ID and set-group-ID bits of @var{mode} or
+@var{ref_file} to be ignored.  This behavior depends on the policy and
+functionality of the underlying @code{chmod} system call.  When in
+doubt, check the underlying system behavior.
+
+If used, @var{mode} specifies the new file mode bits.
 For details, see the section on @ref{File permissions}.
 If you really want @var{mode} to have a leading @samp{-}, you should
 use @option{--} first, e.g., @samp{chmod -- -w file}.  Typically,
@@ -8488,7 +9069,7 @@ changed.
 @itemx --preserve-root
 @opindex --preserve-root
 @cindex root directory, disallow recursive modification
-Fail upon any attempt to recursively change the file system root, @file{/}.
+Fail upon any attempt to recursively change the root directory, @file{/}.
 Without @option{--recursive}, this option has no effect.
 @xref{Treating / specially}.
 
@@ -8667,11 +9248,9 @@ For example, use @samp{touch ./12312359 main.c} or @samp{touch -t
 
 @cindex disk usage
 
-No disk can hold an infinite amount of data.  These commands report on
-how much disk storage is in use or available.  (This has nothing much to
-do with how much @emph{main memory}, i.e., RAM, a program is using when
-it runs; for that, you want @command{ps} or @command{pstat} or @command{swap}
-or some such command.)
+No disk can hold an infinite amount of data.  These commands report
+how much disk storage is in use or available, report other file and
+file status information, and write buffers to disk.
 
 @menu
 * df invocation::               Report file system disk space usage.
@@ -8873,6 +9452,10 @@ Ignored; for compatibility with System V versions of @command{df}.
 @end table
 
 @exitstatus
+Failure includes the case where no output is generated, so you can
+inspect the exit status of a command like @samp{df -t ext3 -t reiserfs
+@var{dir}} to test whether @var{dir} is on a file system of type
+@samp{ext3} or @samp{reiserfs}.
 
 
 @node du invocation
@@ -9268,7 +9851,7 @@ The valid format sequences for files are:
 The valid format sequences for file systems are:
 
 @itemize @bullet
-@item %a - Free blocks available to non-superuser
+@item %a - Free blocks available to non-super-user
 @item %b - Total data blocks in file system
 @item %c - Total file nodes in file system
 @item %d - Free file nodes in file system
@@ -9507,8 +10090,10 @@ digits) specifying a character to print.
 @cindex Unicode
 @cindex ISO/IEC 10646
 @vindex LC_CTYPE
-@command{printf} interprets two character syntaxes introduced in ISO C 99:
-@samp{\u} for 16-bit Unicode (ISO/IEC 10646) characters, specified as
+@command{printf} interprets two character syntaxes introduced in
+@acronym{ISO} C 99:
+@samp{\u} for 16-bit Unicode (@acronym{ISO}/@acronym{IEC} 10646)
+characters, specified as
 four hexadecimal digits @var{hhhh}, and @samp{\U} for 32-bit Unicode
 characters, specified as eight hexadecimal digits @var{hhhhhhhh}.
 @command{printf} outputs the Unicode characters
@@ -9532,7 +10117,7 @@ $ /usr/local/bin/printf '\u20AC 14.95'
 
 @noindent
 will be output correctly in all locales supporting the Euro symbol
-(ISO-8859-15, UTF-8, and others).  Similarly, a Chinese string
+(@acronym{ISO}-8859-15, UTF-8, and others).  Similarly, a Chinese string
 
 @example
 $ /usr/local/bin/printf '\u4e2d\u6587'
@@ -10047,8 +10632,8 @@ Exit status:
 @display
 0 if the expression is neither null nor 0,
 1 if the expression is null or 0,
-2 if the expression is syntactically invalid,
-3 if an error occurred.
+2 if the expression is invalid,
+3 if an internal error occurred (e.g., arithmetic overflow).
 @end display
 
 @menu
@@ -10130,7 +10715,7 @@ or an operator like @code{/}.
 This makes it possible to test @code{expr length + "$x"} or
 @code{expr + "$x" : '.*/\(.\)'} and have it do the right thing even if
 the value of @var{$x} happens to be (for example) @code{/} or @code{index}.
-This operator is a GNU extension.  Portable shell scripts should use
+This operator is a @acronym{GNU} extension.  Portable shell scripts should use
 @code{@w{" $token"} : @w{' \(.*\)'}} instead of @code{+ "$token"}.
 
 @end table
@@ -10353,8 +10938,25 @@ basename @var{name} [@var{suffix}]
 @end example
 
 If @var{suffix} is specified and is identical to the end of @var{name},
-it is removed from @var{name} as well.  @command{basename} prints the
-result on standard output.
+it is removed from @var{name} as well.  Note that since trailing slashes
+are removed prior to suffix matching, @var{suffix} will do nothing if it
+contains slashes.  @command{basename} prints the result on standard
+output.
+
+@c This test is used both here and in the section on dirname.
+@macro basenameAndDirname
+Together, @command{basename} and @command{dirname} are designed such
+that if @samp{ls "$name"} succeeds, then the command sequence @samp{cd
+"$(dirname "$name")"; ls "$(basename "$name")"} will, too.  This works
+for everything except file names containing a trailing newline.
+@end macro
+@basenameAndDirname
+
+@acronym{POSIX} allows the implementation to define the results if
+@var{name} is empty or @samp{//}.  In the former case, @acronym{GNU}
+@command{basename} returns the empty string.  In the latter case, the
+result is @samp{//} on platforms where @var{//} is distinct from
+@var{/}, and @samp{/} on platforms where there is no difference.
 
 The only options are @option{--help} and @option{--version}.  @xref{Common
 options}.  Options must precede operands.
@@ -10389,6 +10991,13 @@ dirname @var{name}
 
 If @var{name} is a single component, @command{dirname} prints @samp{.}
 (meaning the current directory).
+
+@basenameAndDirname
+
+@acronym{POSIX} allows the implementation to define the results if
+@var{name} is @samp{//}.  With @acronym{GNU} @command{dirname}, the
+result is @samp{//} on platforms where @var{//} is distinct from
+@var{/}, and @samp{/} on platforms where there is no difference.
 
 The only options are @option{--help} and @option{--version}.  @xref{Common
 options}.
@@ -11383,7 +11992,8 @@ options}.
 
 @command{groups} prints the names of the primary and any supplementary
 groups for each given @var{username}, or the current process if no names
-are given.  If names are given, the name of each user is printed before
+are given.  If more than one name is given, the name of each user is
+printed before
 the list of that user's groups.  Synopsis:
 
 @example
@@ -11627,7 +12237,7 @@ described below.
 * Time conversion specifiers::     %[HIklMNpPrRsSTXzZ]
 * Date conversion specifiers::     %[aAbBcCdDeFgGhjmuUVwWxyY]
 * Literal conversion specifiers::  %[%nt]
-* Padding and other flags::        Pad with zeroes, spaces, etc.
+* Padding and other flags::        Pad with zeros, spaces, etc.
 * Setting the time::               Changing the system clock.
 * Options for date::               Instead of the current time.
 * Examples of date::               Examples.
@@ -11745,22 +12355,27 @@ date; same as @samp{%m/%d/%y}
 @item %e
 day of month, space padded; same as @samp{%_d}
 @item %F
-full date in @w{ISO 8601} format; same as @samp{%Y-%m-%d}.
+full date in @acronym{ISO} 8601 format; same as @samp{%Y-%m-%d}.
 This is a good choice for a date format, as it is standard and
 is easy to sort in the usual case where years are in the range
 0000@dots{}9999.
 This is a @acronym{GNU} extension.
 @item %g
-The year corresponding to the ISO week number, but without the century
+year corresponding to the @acronym{ISO} week number, but without the century
 (range @samp{00} through @samp{99}).  This has the same format and value
-as @samp{%y}, except that if the ISO week number (see @samp{%V}) belongs
+as @samp{%y}, except that if the @acronym{ISO} week number (see
+@samp{%V}) belongs
 to the previous or next year, that year is used instead.
 This is a @acronym{GNU} extension.
 @item %G
-The year corresponding to the ISO week number.  This has the same format
-and value as @samp{%Y}, except that if the ISO week number (see
+year corresponding to the @acronym{ISO} week number.  This has the
+same format and value as @samp{%Y}, except that if the @acronym{ISO}
+week number (see
 @samp{%V}) belongs to the previous or next year, that year is used
 instead.
+It is normally useful only if @samp{%V} is also used;
+for example, the format @samp{%G-%m-%d} is probably a mistake,
+since it combines the ISO week number year with the conventional month and day.
 This is a @acronym{GNU} extension.
 @item %h
 same as @samp{%b}
@@ -11771,11 +12386,12 @@ month (@samp{01}@dots{}@samp{12})
 @item %u
 day of week (@samp{1}@dots{}@samp{7}) with @samp{1} corresponding to Monday
 @item %U
-week number of year with Sunday as first day of week
+week number of year, with Sunday as the first day of the week
 (@samp{00}@dots{}@samp{53}).
 Days in a new year preceding the first Sunday are in week zero.
 @item %V
-week number of year with Monday as first day of the week as a decimal
+@acronym{ISO} week number, that is, the
+week number of year, with Monday as the first day of the week
 (@samp{01}@dots{}@samp{53}).
 If the week containing January 1 has four or more days in
 the new year, then it is considered week 1; otherwise, it is week 53 of
@@ -11784,7 +12400,7 @@ standard.)
 @item %w
 day of week (@samp{0}@dots{}@samp{6}) with 0 corresponding to Sunday
 @item %W
-week number of year with Monday as first day of week
+week number of year, with Monday as first day of week
 (@samp{00}@dots{}@samp{53}).
 Days in a new year preceding the first Monday are in week zero.
 @item %x
@@ -11824,7 +12440,7 @@ a horizontal tab
 @cindex fields, padding numeric
 
 Unless otherwise specified, @command{date} normally pads numeric fields
-with zeroes, so that, for
+with zeros, so that, for
 example, numeric months are always output as two digits.
 Seconds since the epoch are not padded, though,
 since there is no natural width for them.
@@ -11838,7 +12454,7 @@ following optional flags after the @samp{%}:
 human consumption.
 @item _
 (underscore) Pad with spaces; useful if you need a fixed
-number of characters in the output, but zeroes are too distracting.
+number of characters in the output, but zeros are too distracting.
 @item 0
 (zero) Pad with zeros even if the conversion specifier
 would normally pad with spaces.
@@ -12181,6 +12797,14 @@ a more readable form, use a command like this:
 @smallexample
 # local time zone used
 date -d '1970-01-01 UTC 946684800 seconds' +"%Y-%m-%d %T %z"
+1999-12-31 19:00:00 -0500
+@end smallexample
+
+Or if you do not mind depending on the @samp{@@} feature present since
+coreutils 5.3.0, you could shorten this to:
+
+@smallexample
+date -d @@946684800 +"%F %T %z"
 1999-12-31 19:00:00 -0500
 @end smallexample
 
@@ -12695,8 +13319,11 @@ Any @file{nohup.out} or @file{$HOME/nohup.out} file created by
 @command{nohup} is made readable and writable only to the user,
 regardless of the current umask settings.
 
-If standard error is a terminal, it is redirected to the same file
+If standard error is a terminal, it is normally redirected to the same file
 descriptor as the (possibly-redirected) standard output.
+However, if standard output is closed, standard error terminal output
+is instead appended to the file @file{nohup.out} or
+@file{$HOME/nohup.out} as above.
 
 @command{nohup} does not automatically put the command it runs in the
 background; you must do that explicitly, by ending the command line
@@ -12824,7 +13451,7 @@ read its login startup file(s).
 Do not change the environment variables @env{HOME}, @env{USER},
 @env{LOGNAME}, or @env{SHELL}.  Run the shell given in the environment
 variable @env{SHELL} instead of the shell from @var{user}'s passwd
-entry, unless the user running @command{su} is not the superuser and
+entry, unless the user running @command{su} is not the super-user and
 @var{user}'s shell is restricted.  A @dfn{restricted shell} is one that
 is not listed in the file @file{/etc/shells}, or in a compiled-in list
 if that file does not exist.  Parts of what this option does can be
@@ -12835,7 +13462,7 @@ overridden by @option{--login} and @option{--shell}.
 @opindex -s
 @opindex --shell
 Run @var{shell} instead of the shell from @var{user}'s passwd entry,
-unless the user running @command{su} is not the superuser and @var{user}'s
+unless the user running @command{su} is not the super-user and @var{user}'s
 shell is restricted (see @option{-m} just above).
 
 @end table
@@ -13081,7 +13708,8 @@ days
 @end table
 
 Historical implementations of @command{sleep} have required that
-@var{number} be an integer.  However, GNU @command{sleep} accepts
+@var{number} be an integer, and only accepted a single argument
+without a suffix.  However, GNU @command{sleep} accepts
 arbitrary floating point numbers (using a period before any fractional
 digits).
 
@@ -13185,9 +13813,16 @@ Options must precede operands.
 @opindex -f @var{format}
 @opindex --format=@var{format}
 @cindex formatting of numbers in @command{seq}
-Print all numbers using @var{format}; default @samp{%g}.
-@var{format} must contain exactly one of the floating point
-output formats @samp{%e}, @samp{%f}, or @samp{%g}.
+Print all numbers using @var{format}.
+@var{format} must contain exactly one of the @samp{printf}-style
+floating point conversion specifications @samp{%a}, @samp{%e},
+@samp{%f}, @samp{%g}, @samp{%A}, @samp{%E}, @samp{%F}, @samp{%G}.
+
+The default format is derived from @var{first}, @var{step}, and
+@var{last}.  If these all use a fixed point decimal representation,
+the default format is @samp{%.@var{p}f}, where @var{p} is the minimum
+precision that can represent the output numbers exactly.  Otherwise,
+the default format is @samp{%g}.
 
 @item -s @var{string}
 @itemx --separator=@var{string}
@@ -13197,35 +13832,18 @@ The output always terminates with a newline.
 
 @item -w
 @itemx --equal-width
-Print all numbers with the same width, by padding with leading zeroes.
+Print all numbers with the same width, by padding with leading zeros.
+@var{first}, @var{step}, and @var{last} should all use a fixed point
+decimal representation.
 (To have other kinds of padding, use @option{--format}).
 
 @end table
 
-If you want to use @command{seq} to print sequences of large integer values,
-don't use the default @samp{%g} format since it can result in
-loss of precision:
-
-@example
-$ seq 1000000 1000001
-1e+06
-1e+06
-@end example
-
-Instead, you can use the format, @samp{%1.f},
-to print large decimal numbers with no exponent and no decimal point.
-
-@example
-$ seq --format=%1.f 1000000 1000001
-1000000
-1000001
-@end example
-
-If you want hexadecimal output, you can use @command{printf}
+If you want hexadecimal integer output, you can use @command{printf}
 to perform the conversion:
 
 @example
-$ printf %x'\n' `seq -f %1.f 1048575 1024 1050623`
+$ printf '%x\n' `seq 1048575 1024 1050623`
 fffff
 1003ff
 1007ff
@@ -13235,55 +13853,49 @@ For very long lists of numbers, use xargs to avoid
 system limitations on the length of an argument list:
 
 @example
-$ seq -f %1.f 1000000 | xargs printf %x'\n' | tail -n 3
+$ seq 1000000 | xargs printf '%x\n' | tail -n 3
 f423e
 f423f
 f4240
 @end example
 
 To generate octal output, use the printf @code{%o} format instead
-of @code{%x}.  Note however that using printf might not work for numbers
-outside the usual 32-bit range:
-
-@example
-$ printf "%x\n" `seq -f %1.f 4294967295 4294967296`
-ffffffff
-bash: printf: 4294967296: Numerical result out of range
-@end example
+of @code{%x}.
 
 On most systems, seq can produce whole-number output for values up to
-@code{2^53}, so here's a more general approach to base conversion that
-also happens to be more robust for such large numbers.  It works by
-using @code{bc} and setting its output radix variable, @var{obase},
-to @samp{16} in this case to produce hexadecimal output.
+at least @code{2^53}.  Larger integers are approximated.  The details
+differ depending on your floating-point implementation, but a common
+case is that @command{seq} works with integers through @code{2^64},
+and larger integers may not be numerically correct:
 
 @example
-$ (echo obase=16; seq -f %1.f 4294967295 4294967296)|bc
-FFFFFFFF
-100000000
+$ seq 18446744073709551616 1 18446744073709551618
+18446744073709551616
+18446744073709551616
+18446744073709551618
 @end example
 
-Be careful when using @command{seq} with a fractional @var{increment},
+Be careful when using @command{seq} with a fractional @var{increment};
 otherwise you may see surprising results.  Most people would expect to
-see @code{0.3} printed as the last number in this example:
+see @code{0.000003} printed as the last number in this example:
 
 @example
-$ seq -s ' ' 0 .1 .3
-0 0.1 0.2
+$ seq -s ' ' 0 0.000001 0.000003
+0.000000 0.000001 0.000002
 @end example
 
-But that doesn't happen on most systems because @command{seq} is
+But that doesn't happen on many systems because @command{seq} is
 implemented using binary floating point arithmetic (via the C
-@code{double} type)---which means some decimal numbers like @code{.1}
+@code{long double} type)---which means decimal fractions like @code{0.000001}
 cannot be represented exactly.  That in turn means some nonintuitive
-conditions like @w{@code{.1 * 3 > .3}} will end up being true.
+conditions like @w{@code{0.000001 * 3 > 0.000003}} will end up being true.
 
 To work around that in the above example, use a slightly larger number as
 the @var{last} value:
 
 @example
-$ seq -s ' ' 0 .1 .31
-0 0.1 0.2 0.3
+$ seq -s ' ' 0 0.000001 0.0000031
+0.000000 0.000001 0.000002 0.000003
 @end example
 
 In general, when using an @var{increment} with a fractional part, where
@@ -13872,7 +14484,14 @@ philosophy, these books are unparalleled, and I recommend them highly.
 Acknowledgment: I would like to express my gratitude to Brian Kernighan
 of Bell Labs, the original Software Toolsmith, for reviewing this column.
 
-@include doclicense.texi
+@node Copying This Manual
+@appendix Copying This Manual
+
+@menu
+* GNU Free Documentation License::  License for copying this manual.
+@end menu
+
+@include fdl.texi
 
 @node Index
 @unnumbered Index

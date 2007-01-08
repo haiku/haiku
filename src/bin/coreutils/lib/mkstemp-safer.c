@@ -1,6 +1,6 @@
 /* Invoke mkstemp, but avoid some glitches.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,20 +18,18 @@
 
 /* Written by Paul Eggert.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "stdlib-safer.h"
 
-#include <stdlib.h>
+#include "mkstemp.h"
 #include "unistd-safer.h"
 
 /* Like mkstemp, but do not return STDIN_FILENO, STDOUT_FILENO, or
    STDERR_FILENO.  */
 
 int
-mkstemp_safer (char *template)
+mkstemp_safer (char *templ)
 {
-  return fd_safer (mkstemp (template));
+  return fd_safer (mkstemp (templ));
 }

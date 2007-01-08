@@ -1,6 +1,6 @@
 /* shred.c - overwrite files and devices to make it harder to recover data
 
-   Copyright (C) 1999-2005 Free Software Foundation, Inc.
+   Copyright (C) 1999-2006 Free Software Foundation, Inc.
    Copyright (C) 1997, 1998, 1999 Colin Plumb.
 
    This program is free software; you can redistribute it and/or modify
@@ -60,9 +60,6 @@
  * If asked to wipe a file, this also unlinks it, renaming it to in a
  * clever way to try to leave no trace of the original filename.
  *
- * The ISAAC code still bears some resemblance to the code written
- * by Bob Jenkins, but he permits pretty unlimited use.
- *
  * This was inspired by a desire to improve on some code titled:
  * Wipe V1.0-- Overwrite and delete files.  S. 2/3/96
  * but I've rewritten everything here so completely that no trace of
@@ -88,9 +85,7 @@
 
 #define AUTHORS "Colin Plumb"
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <getopt.h>
 #include <stdio.h>
@@ -100,21 +95,28 @@
 
 #include "system.h"
 #include "xstrtol.h"
-#include "dirname.h"
 #include "error.h"
 #include "fcntl--.h"
-#include "gethrxtime.h"
 #include "getpagesize.h"
 #include "human.h"
 #include "inttostr.h"
 #include "quotearg.h"		/* For quotearg_colon */
 #include "quote.h"		/* For quotearg_colon */
+#include "randint.h"
+#include "randread.h"
 
-#define DEFAULT_PASSES 25	/* Default */
+/* Default number of times to overwrite.  */
+enum { DEFAULT_PASSES = 25 };
 
 /* How many seconds to wait before checking whether to output another
    verbose output line.  */
-#define VERBOSE_UPDATE 5
+enum { VERBOSE_UPDATE = 5 };
+
+/* Sector size and corresponding mask, for recovering after write failures.
+   The size must be a power of 2.  */
+enum { SECTOR_SIZE = 512 };
+enum { SECTOR_MASK = SECTOR_SIZE - 1 };
+verify (0 < SECTOR_SIZE && (SECTOR_SIZE & SECTOR_MASK) == 0);
 
 struct Options
 {
@@ -127,12 +129,20 @@ struct Options
   bool zero_fill;	/* -z flag: Add a final zero pass */
 };
 
+/* For long options that have no equivalent short option, use a
+   non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
+enum
+{
+  RANDOM_SOURCE_OPTION = CHAR_MAX + 1
+};
+
 static struct option const long_opts[] =
 {
   {"exact", no_argument, NULL, 'x'},
   {"force", no_argument, NULL, 'f'},
   {"iterations", required_argument, NULL, 'n'},
   {"size", required_argument, NULL, 's'},
+  {"random-source", required_argument, NULL, RANDOM_SOURCE_OPTION},
   {"remove", no_argument, NULL, 'u'},
   {"verbose", no_argument, NULL, 'v'},
   {"zero", no_argument, NULL, 'z'},
@@ -164,6 +174,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       printf (_("\
   -f, --force    change permissions to allow writing if necessary\n\
   -n, --iterations=N  Overwrite N times instead of the default (%d)\n\
+      --random-source=FILE  get random bytes from FILE (default /dev/urandom)\n\
   -s, --size=N   shred this many bytes (suffixes like K, M, G accepted)\n\
 "), DEFAULT_PASSES);
       fputs (_("\
@@ -195,20 +206,22 @@ not effective, or is not guaranteed to be effective in all file system modes:\n\
 "), stdout);
       fputs (_("\
 * log-structured or journaled file systems, such as those supplied with\n\
-  AIX and Solaris (and JFS, ReiserFS, XFS, Ext3, etc.)\n\
+AIX and Solaris (and JFS, ReiserFS, XFS, Ext3, etc.)\n\
 \n\
 * file systems that write redundant data and carry on even if some writes\n\
-  fail, such as RAID-based file systems\n\
+fail, such as RAID-based file systems\n\
 \n\
 * file systems that make snapshots, such as Network Appliance's NFS server\n\
 \n\
 "), stdout);
       fputs (_("\
 * file systems that cache in temporary locations, such as NFS\n\
-  version 3 clients\n\
+version 3 clients\n\
 \n\
 * compressed file systems\n\
 \n\
+"), stdout);
+      fputs (_("\
 In the case of ext3 file systems, the above disclaimer applies\n\
 (and shred is thus of limited effectiveness) only in data=journal mode,\n\
 which journals file data in addition to just metadata.  In both the\n\
@@ -217,6 +230,8 @@ Ext3 journaling modes can be changed by adding the data=something option\n\
 to the mount options for a particular file system in the /etc/fstab file,\n\
 as documented in the mount man page (man mount).\n\
 \n\
+"), stdout);
+      fputs (_("\
 In addition, file system backups and remote mirrors may contain copies\n\
 of the file that cannot be removed, and that will allow a shredded file\n\
 to be recovered later.\n\
@@ -226,386 +241,6 @@ to be recovered later.\n\
   exit (status);
 }
 
-/*
- * --------------------------------------------------------------------
- *     Bob Jenkins' cryptographic random number generator, ISAAC.
- *     Hacked by Colin Plumb.
- *
- * We need a source of random numbers for some of the overwrite data.
- * Cryptographically secure is desirable, but it's not life-or-death
- * so I can be a little bit experimental in the choice of RNGs here.
- *
- * This generator is based somewhat on RC4, but has analysis
- * (http://ourworld.compuserve.com/homepages/bob_jenkins/randomnu.htm)
- * pointing to it actually being better.  I like it because it's nice
- * and fast, and because the author did good work analyzing it.
- * --------------------------------------------------------------------
- */
-
-/* Size of the state tables to use.  (You may change ISAAC_LOG) */
-#define ISAAC_LOG 8
-#define ISAAC_WORDS (1 << ISAAC_LOG)
-#define ISAAC_BYTES (ISAAC_WORDS * sizeof (uint32_t))
-
-/* RNG state variables */
-struct isaac_state
-  {
-    uint32_t mm[ISAAC_WORDS];	/* Main state array */
-    uint32_t iv[8];		/* Seeding initial vector */
-    uint32_t a, b, c;		/* Extra index variables */
-  };
-
-/* This index operation is more efficient on many processors */
-#define ind(mm, x) \
-  (* (uint32_t *) ((char *) (mm) \
-	           + ((x) & (ISAAC_WORDS - 1) * sizeof (uint32_t))))
-
-/*
- * The central step.  This uses two temporaries, x and y.  mm is the
- * whole state array, while m is a pointer to the current word.  off is
- * the offset from m to the word ISAAC_WORDS/2 words away in the mm array,
- * i.e. +/- ISAAC_WORDS/2.
- */
-#define isaac_step(mix, a, b, mm, m, off, r) \
-( \
-  a = ((a) ^ (mix)) + (m)[off], \
-  x = *(m), \
-  *(m) = y = ind (mm, x) + (a) + (b), \
-  *(r) = b = ind (mm, (y) >> ISAAC_LOG) + x \
-)
-
-/*
- * Refill the entire R array, and update S.
- */
-static void
-isaac_refill (struct isaac_state *s, uint32_t r[/* ISAAC_WORDS */])
-{
-  uint32_t a, b;		/* Caches of a and b */
-  uint32_t x, y;		/* Temps needed by isaac_step macro */
-  uint32_t *m = s->mm;	/* Pointer into state array */
-
-  a = s->a;
-  b = s->b + (++s->c);
-
-  do
-    {
-      isaac_step (a << 13, a, b, s->mm, m, ISAAC_WORDS / 2, r);
-      isaac_step (a >> 6, a, b, s->mm, m + 1, ISAAC_WORDS / 2, r + 1);
-      isaac_step (a << 2, a, b, s->mm, m + 2, ISAAC_WORDS / 2, r + 2);
-      isaac_step (a >> 16, a, b, s->mm, m + 3, ISAAC_WORDS / 2, r + 3);
-      r += 4;
-    }
-  while ((m += 4) < s->mm + ISAAC_WORDS / 2);
-  do
-    {
-      isaac_step (a << 13, a, b, s->mm, m, -ISAAC_WORDS / 2, r);
-      isaac_step (a >> 6, a, b, s->mm, m + 1, -ISAAC_WORDS / 2, r + 1);
-      isaac_step (a << 2, a, b, s->mm, m + 2, -ISAAC_WORDS / 2, r + 2);
-      isaac_step (a >> 16, a, b, s->mm, m + 3, -ISAAC_WORDS / 2, r + 3);
-      r += 4;
-    }
-  while ((m += 4) < s->mm + ISAAC_WORDS);
-  s->a = a;
-  s->b = b;
-}
-
-/*
- * The basic seed-scrambling step for initialization, based on Bob
- * Jenkins' 256-bit hash.
- */
-#define mix(a,b,c,d,e,f,g,h) \
-   (       a ^= b << 11, d += a, \
-   b += c, b ^= c >>  2, e += b, \
-   c += d, c ^= d <<  8, f += c, \
-   d += e, d ^= e >> 16, g += d, \
-   e += f, e ^= f << 10, h += e, \
-   f += g, f ^= g >>  4, a += f, \
-   g += h, g ^= h <<  8, b += g, \
-   h += a, h ^= a >>  9, c += h, \
-   a += b                        )
-
-/* The basic ISAAC initialization pass.  */
-static void
-isaac_mix (struct isaac_state *s, uint32_t const seed[/* ISAAC_WORDS */])
-{
-  int i;
-  uint32_t a = s->iv[0];
-  uint32_t b = s->iv[1];
-  uint32_t c = s->iv[2];
-  uint32_t d = s->iv[3];
-  uint32_t e = s->iv[4];
-  uint32_t f = s->iv[5];
-  uint32_t g = s->iv[6];
-  uint32_t h = s->iv[7];
-
-  for (i = 0; i < ISAAC_WORDS; i += 8)
-    {
-      a += seed[i];
-      b += seed[i + 1];
-      c += seed[i + 2];
-      d += seed[i + 3];
-      e += seed[i + 4];
-      f += seed[i + 5];
-      g += seed[i + 6];
-      h += seed[i + 7];
-
-      mix (a, b, c, d, e, f, g, h);
-
-      s->mm[i] = a;
-      s->mm[i + 1] = b;
-      s->mm[i + 2] = c;
-      s->mm[i + 3] = d;
-      s->mm[i + 4] = e;
-      s->mm[i + 5] = f;
-      s->mm[i + 6] = g;
-      s->mm[i + 7] = h;
-    }
-
-  s->iv[0] = a;
-  s->iv[1] = b;
-  s->iv[2] = c;
-  s->iv[3] = d;
-  s->iv[4] = e;
-  s->iv[5] = f;
-  s->iv[6] = g;
-  s->iv[7] = h;
-}
-
-#if 0 /* Provided for reference only; not used in this code */
-/*
- * Initialize the ISAAC RNG with the given seed material.
- * Its size MUST be a multiple of ISAAC_BYTES, and may be
- * stored in the s->mm array.
- *
- * This is a generalization of the original ISAAC initialization code
- * to support larger seed sizes.  For seed sizes of 0 and ISAAC_BYTES,
- * it is identical.
- */
-static void
-isaac_init (struct isaac_state *s, uint32_t const *seed, size_t seedsize)
-{
-  static uint32_t const iv[8] =
-  {
-    0x1367df5a, 0x95d90059, 0xc3163e4b, 0x0f421ad8,
-    0xd92a4a78, 0xa51a3c49, 0xc4efea1b, 0x30609119};
-  int i;
-
-# if 0
-  /* The initialization of iv is a precomputed form of: */
-  for (i = 0; i < 7; i++)
-    iv[i] = 0x9e3779b9;		/* the golden ratio */
-  for (i = 0; i < 4; ++i)	/* scramble it */
-    mix (iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7]);
-# endif
-  s->a = s->b = s->c = 0;
-
-  for (i = 0; i < 8; i++)
-    s->iv[i] = iv[i];
-
-  if (seedsize)
-    {
-      /* First pass (as in reference ISAAC code) */
-      isaac_mix (s, seed);
-      /* Second and subsequent passes (extension to ISAAC) */
-      while (seedsize -= ISAAC_BYTES)
-	{
-	  seed += ISAAC_WORDS;
-	  for (i = 0; i < ISAAC_WORDS; i++)
-	    s->mm[i] += seed[i];
-	  isaac_mix (s, s->mm);
-	}
-    }
-  else
-    {
-      /* The no seed case (as in reference ISAAC code) */
-      for (i = 0; i < ISAAC_WORDS; i++)
-	s->mm[i] = 0;
-    }
-
-  /* Final pass */
-  isaac_mix (s, s->mm);
-}
-#endif
-
-/* Start seeding an ISAAC structire */
-static void
-isaac_seed_start (struct isaac_state *s)
-{
-  static uint32_t const iv[8] =
-    {
-      0x1367df5a, 0x95d90059, 0xc3163e4b, 0x0f421ad8,
-      0xd92a4a78, 0xa51a3c49, 0xc4efea1b, 0x30609119
-    };
-  int i;
-
-#if 0
-  /* The initialization of iv is a precomputed form of: */
-  for (i = 0; i < 7; i++)
-    iv[i] = 0x9e3779b9;		/* the golden ratio */
-  for (i = 0; i < 4; ++i)	/* scramble it */
-    mix (iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7]);
-#endif
-  for (i = 0; i < 8; i++)
-    s->iv[i] = iv[i];
-
-  /* Enable the following memset if you're worried about used-uninitialized
-     warnings involving code in isaac_refill from tools like valgrind.
-     Since this buffer is used to accumulate pseudo-random data, there's
-     no harm, and maybe even some benefit, in using it uninitialized.  */
-#if AVOID_USED_UNINITIALIZED_WARNINGS
-  memset (s->mm, 0, sizeof s->mm);
-#endif
-
-  /* s->c gets used for a data pointer during the seeding phase */
-  s->a = s->b = s->c = 0;
-}
-
-/* Add a buffer of seed material */
-static void
-isaac_seed_data (struct isaac_state *s, void const *buffer, size_t size)
-{
-  unsigned char const *buf = buffer;
-  unsigned char *p;
-  size_t avail;
-  size_t i;
-
-  avail = sizeof s->mm - (size_t) s->c;	/* s->c is used as a write pointer */
-
-  /* Do any full buffers that are necessary */
-  while (size > avail)
-    {
-      p = (unsigned char *) s->mm + s->c;
-      for (i = 0; i < avail; i++)
-	p[i] ^= buf[i];
-      buf += avail;
-      size -= avail;
-      isaac_mix (s, s->mm);
-      s->c = 0;
-      avail = sizeof s->mm;
-    }
-
-  /* And the final partial block */
-  p = (unsigned char *) s->mm + s->c;
-  for (i = 0; i < size; i++)
-    p[i] ^= buf[i];
-  s->c = size;
-}
-
-
-/* End of seeding phase; get everything ready to produce output. */
-static void
-isaac_seed_finish (struct isaac_state *s)
-{
-  isaac_mix (s, s->mm);
-  isaac_mix (s, s->mm);
-  /* Now reinitialize c to start things off right */
-  s->c = 0;
-}
-#define ISAAC_SEED(s,x) isaac_seed_data (s, &(x), sizeof (x))
-
-/*
- * Get seed material.  16 bytes (128 bits) is plenty, but if we have
- * /dev/urandom, we get 32 bytes = 256 bits for complete overkill.
- */
-static void
-isaac_seed (struct isaac_state *s)
-{
-  isaac_seed_start (s);
-
-  { pid_t t = getpid ();   ISAAC_SEED (s, t); }
-  { pid_t t = getppid ();  ISAAC_SEED (s, t); }
-  { uid_t t = getuid ();   ISAAC_SEED (s, t); }
-  { gid_t t = getgid ();   ISAAC_SEED (s, t); }
-
-  {
-    xtime_t t = gethrxtime ();
-    ISAAC_SEED (s, t);
-  }
-
-  {
-    char buf[32];
-    int fd = open ("/dev/urandom", O_RDONLY | O_NOCTTY);
-    if (fd >= 0)
-      {
-	read (fd, buf, 32);
-	close (fd);
-	isaac_seed_data (s, buf, 32);
-      }
-    else
-      {
-	fd = open ("/dev/random", O_RDONLY | O_NONBLOCK | O_NOCTTY);
-	if (fd >= 0)
-	  {
-	    /* /dev/random is more precious, so use less */
-	    read (fd, buf, 16);
-	    close (fd);
-	    isaac_seed_data (s, buf, 16);
-	  }
-      }
-  }
-
-  isaac_seed_finish (s);
-}
-
-/* Single-word RNG built on top of ISAAC */
-struct irand_state
-{
-  uint32_t r[ISAAC_WORDS];
-  unsigned int numleft;
-  struct isaac_state *s;
-};
-
-static void
-irand_init (struct irand_state *r, struct isaac_state *s)
-{
-  r->numleft = 0;
-  r->s = s;
-}
-
-/*
- * We take from the end of the block deliberately, so if we need
- * only a small number of values, we choose the final ones which are
- * marginally better mixed than the initial ones.
- */
-static uint32_t
-irand32 (struct irand_state *r)
-{
-  if (!r->numleft)
-    {
-      isaac_refill (r->s, r->r);
-      r->numleft = ISAAC_WORDS;
-    }
-  return r->r[--r->numleft];
-}
-
-/*
- * Return a uniformly distributed random number between 0 and n,
- * inclusive.  Thus, the result is modulo n+1.
- *
- * Theory of operation: as x steps through every possible 32-bit number,
- * x % n takes each value at least 2^32 / n times (rounded down), but
- * the values less than 2^32 % n are taken one additional time.  Thus,
- * x % n is not perfectly uniform.  To fix this, the values of x less
- * than 2^32 % n are disallowed, and if the RNG produces one, we ask
- * for a new value.
- */
-static uint32_t
-irand_mod (struct irand_state *r, uint32_t n)
-{
-  uint32_t x;
-  uint32_t lim;
-
-  if (!++n)
-    return irand32 (r);
-
-  lim = -n % n;			/* == (2**32-n) % n == 2**32 % n */
-  do
-    {
-      x = irand32 (r);
-    }
-  while (x < lim);
-  return x % n;
-}
 
 /*
  * Fill a buffer with a fixed pattern.
@@ -624,31 +259,14 @@ fillpattern (int type, unsigned char *r, size_t size)
   r[1] = (bits >> 8) & 255;
   r[2] = bits & 255;
   for (i = 3; i < size / 2; i *= 2)
-    memcpy ((char *) r + i, (char *) r, i);
+    memcpy (r + i, r, i);
   if (i < size)
-    memcpy ((char *) r + i, (char *) r, size - i);
+    memcpy (r + i, r, size - i);
 
-  /* Invert the first bit of every 512-byte sector. */
+  /* Invert the first bit of every sector. */
   if (type & 0x1000)
-    for (i = 0; i < size; i += 512)
+    for (i = 0; i < size; i += SECTOR_SIZE)
       r[i] ^= 0x80;
-}
-
-/*
- * Fill a buffer, R (of size SIZE_MAX), with random data.
- * SIZE is rounded UP to a multiple of ISAAC_BYTES.
- */
-static void
-fillrand (struct isaac_state *s, uint32_t *r, size_t size_max, size_t size)
-{
-  size = (size + ISAAC_BYTES - 1) / ISAAC_BYTES;
-  assert (size <= size_max);
-
-  while (size--)
-    {
-      isaac_refill (s, r);
-      r += ISAAC_WORDS;
-    }
 }
 
 /*
@@ -739,7 +357,7 @@ direct_mode (int fd, bool enable)
  */
 static int
 dopass (int fd, char const *qname, off_t *sizep, int type,
-	struct isaac_state *s, unsigned long int k, unsigned long int n)
+	struct randread_source *s, unsigned long int k, unsigned long int n)
 {
   off_t size = *sizep;
   off_t offset;			/* Current file posiiton */
@@ -748,9 +366,18 @@ dopass (int fd, char const *qname, off_t *sizep, int type,
   size_t lim;			/* Amount of data to try writing */
   size_t soff;			/* Offset into buffer for next write */
   ssize_t ssize;		/* Return value from write */
-  uint32_t *r;			/* Fill pattern.  */
-  size_t rsize = 3 * MAX (ISAAC_WORDS, 1024) * sizeof *r; /* Fill size.  */
-  size_t ralign = lcm (getpagesize (), sizeof *r); /* Fill alignment.  */
+
+  /* Fill pattern buffer.  Aligning it to a 32-bit boundary speeds up randread
+     in some cases.  */
+  typedef uint32_t fill_pattern_buffer[3 * 1024];
+  union
+  {
+    fill_pattern_buffer buffer;
+    char c[sizeof (fill_pattern_buffer)];
+    unsigned char u[sizeof (fill_pattern_buffer)];
+  } r;
+
+  off_t sizeof_r = sizeof r;
   char pass_string[PASS_NAME_SIZE];	/* Name of current pass */
   bool write_error = false;
   bool first_write = true;
@@ -759,25 +386,18 @@ dopass (int fd, char const *qname, off_t *sizep, int type,
   char previous_offset_buf[LONGEST_HUMAN_READABLE + 1];
   char const *previous_human_offset IF_LINT (= 0);
 
-  if (lseek (fd, (off_t) 0, SEEK_SET) == -1)
+  if (lseek (fd, 0, SEEK_SET) == -1)
     {
       error (0, errno, _("%s: cannot rewind"), qname);
       return -1;
     }
 
-  r = alloca (rsize + ralign - 1);
-  r = ptr_align (r, ralign);
-
   /* Constant fill patterns need only be set up once. */
   if (type >= 0)
     {
-      lim = rsize;
-      if ((off_t) lim > size && size != -1)
-	{
-	  lim = (size_t) size;
-	}
-      fillpattern (type, (unsigned char *) r, lim);
-      passname ((unsigned char *) r, pass_string);
+      lim = (0 <= size && size < sizeof_r ? size : sizeof r);
+      fillpattern (type, r.u, lim);
+      passname (r.u, pass_string);
     }
   else
     {
@@ -796,25 +416,24 @@ dopass (int fd, char const *qname, off_t *sizep, int type,
   for (;;)
     {
       /* How much to write this time? */
-      lim = rsize;
-      if ((off_t) lim > size - offset && size != -1)
+      lim = sizeof r;
+      if (0 <= size && size - offset < sizeof_r)
 	{
 	  if (size < offset)
 	    break;
-	  lim = (size_t) (size - offset);
+	  lim = size - offset;
 	  if (!lim)
 	    break;
 	}
       if (type < 0)
-	fillrand (s, r, rsize, lim);
+	randread (s, &r, lim);
       /* Loop to retry partial writes. */
       for (soff = 0; soff < lim; soff += ssize, first_write = false)
 	{
-	  ssize = write (fd, (char *) r + soff, lim - soff);
+	  ssize = write (fd, r.c + soff, lim - soff);
 	  if (ssize <= 0)
 	    {
-	      if ((ssize == 0 || errno == ENOSPC)
-		  && size == -1)
+	      if (size < 0 && (ssize == 0 || errno == ENOSPC))
 		{
 		  /* Ah, we have found the end of the file */
 		  *sizep = size = offset + soff;
@@ -839,22 +458,20 @@ dopass (int fd, char const *qname, off_t *sizep, int type,
 		      continue;
 		    }
 		  error (0, errnum, _("%s: error writing at offset %s"),
-			 qname, umaxtostr ((uintmax_t) offset + soff, buf));
-		  /*
-		   * I sometimes use shred on bad media, before throwing it
-		   * out.  Thus, I don't want it to give up on bad blocks.
-		   * This code assumes 512-byte blocks and tries to skip
-		   * over them.  It works because lim is always a multiple
-		   * of 512, except at the end.
-		   */
-		  if (errnum == EIO && soff % 512 == 0 && lim >= soff + 512
-		      && size != -1)
+			 qname, umaxtostr (offset + soff, buf));
+
+		  /* 'shred' is often used on bad media, before throwing it
+		     out.  Thus, it shouldn't give up on bad blocks.  This
+		     code works because lim is always a multiple of
+		     SECTOR_SIZE, except at the end.  */
+		  { verify (sizeof r % SECTOR_SIZE == 0); }
+		  if (errnum == EIO && 0 <= size && (soff | SECTOR_MASK) < lim)
 		    {
-		      if (lseek (fd, (off_t) (offset + soff + 512), SEEK_SET)
-			  != -1)
+		      size_t soff1 = (soff | SECTOR_MASK) + 1;
+		      if (lseek (fd, offset + soff1, SEEK_SET) != -1)
 			{
 			  /* Arrange to skip this block. */
-			  ssize = 512;
+			  ssize = soff1 - soff;
 			  write_error = true;
 			  continue;
 			}
@@ -891,7 +508,7 @@ dopass (int fd, char const *qname, off_t *sizep, int type,
 	  if (offset == size
 	      || !STREQ (previous_human_offset, human_offset))
 	    {
-	      if (size == -1)
+	      if (size < 0)
 		error (0, 0, _("%s: pass %lu/%lu (%s)...%s"),
 		       qname, k, n, pass_string, human_offset);
 	      else
@@ -1025,9 +642,8 @@ static int const
  * order.
  */
 static void
-genpattern (int *dest, size_t num, struct isaac_state *s)
+genpattern (int *dest, size_t num, struct randint_source *s)
 {
-  struct irand_state r;
   size_t randpasses;
   int const *p;
   int *d;
@@ -1037,8 +653,6 @@ genpattern (int *dest, size_t num, struct isaac_state *s)
 
   if (!num)
     return;
-
-  irand_init (&r, s);
 
   /* Stage 1: choose the passes to use */
   p = patterns;
@@ -1081,7 +695,7 @@ genpattern (int *dest, size_t num, struct isaac_state *s)
 	{			/* Pad out with k of the n available */
 	  do
 	    {
-	      if (n == (size_t) k-- || irand_mod (&r, k) < n)
+	      if (n == (size_t) k || randint_choose (s, k) < n)
 		{
 		  *d++ = *p;
 		  n--;
@@ -1127,7 +741,7 @@ genpattern (int *dest, size_t num, struct isaac_state *s)
 	}
       else
 	{
-	  swap = n + irand_mod (&r, top - n - 1);
+	  swap = n + randint_choose (s, top - n);
 	  k = dest[n];
 	  dest[n] = dest[swap];
 	  dest[swap] = k;
@@ -1135,8 +749,6 @@ genpattern (int *dest, size_t num, struct isaac_state *s)
       accum -= randpasses;
     }
   /* assert (top == num); */
-
-  memset (&r, 0, sizeof r);	/* Wipe this on general principles */
 }
 
 /*
@@ -1144,7 +756,7 @@ genpattern (int *dest, size_t num, struct isaac_state *s)
  * size bytes of the given fd.  Return true if successful.
  */
 static bool
-do_wipefd (int fd, char const *qname, struct isaac_state *s,
+do_wipefd (int fd, char const *qname, struct randint_source *s,
 	   struct Options const *flags)
 {
   size_t i;
@@ -1153,6 +765,7 @@ do_wipefd (int fd, char const *qname, struct isaac_state *s,
   unsigned long int n;		/* Number of passes for printing purposes */
   int *passarray;
   bool ok = true;
+  struct randread_source *rs;
 
   n = 0;		/* dopass takes n -- 0 to mean "don't print progress" */
   if (flags->verbose)
@@ -1196,7 +809,7 @@ do_wipefd (int fd, char const *qname, struct isaac_state *s,
 	}
       else
 	{
-	  size = lseek (fd, (off_t) 0, SEEK_END);
+	  size = lseek (fd, 0, SEEK_END);
 	  if (size <= 0)
 	    {
 	      /* We are unable to determine the length, up front.
@@ -1219,10 +832,12 @@ do_wipefd (int fd, char const *qname, struct isaac_state *s,
   /* Schedule the passes in random order. */
   genpattern (passarray, flags->n_iterations, s);
 
+  rs = randint_get_source (s);
+
   /* Do the work */
   for (i = 0; i < flags->n_iterations; i++)
     {
-      int err = dopass (fd, qname, &size, passarray[i], s, i + 1, n);
+      int err = dopass (fd, qname, &size, passarray[i], rs, i + 1, n);
       if (err)
 	{
 	  if (err < 0)
@@ -1240,7 +855,7 @@ do_wipefd (int fd, char const *qname, struct isaac_state *s,
 
   if (flags->zero_fill)
     {
-      int err = dopass (fd, qname, &size, 0, s, flags->n_iterations + 1, n);
+      int err = dopass (fd, qname, &size, 0, rs, flags->n_iterations + 1, n);
       if (err)
 	{
 	  if (err < 0)
@@ -1252,7 +867,7 @@ do_wipefd (int fd, char const *qname, struct isaac_state *s,
   /* Okay, now deallocate the data.  The effect of ftruncate on
      non-regular files is unspecified, so don't worry about any
      errors reported for them.  */
-  if (flags->remove_file && ftruncate (fd, (off_t) 0) != 0
+  if (flags->remove_file && ftruncate (fd, 0) != 0
       && S_ISREG (st.st_mode))
     {
       error (0, errno, _("%s: error truncating"), qname);
@@ -1264,7 +879,7 @@ do_wipefd (int fd, char const *qname, struct isaac_state *s,
 
 /* A wrapper with a little more checking for fds on the command line */
 static bool
-wipefd (int fd, char const *qname, struct isaac_state *s,
+wipefd (int fd, char const *qname, struct randint_source *s,
 	struct Options const *flags)
 {
   int fd_flags = fcntl (fd, F_GETFL);
@@ -1344,16 +959,14 @@ static bool
 wipename (char *oldname, char const *qoldname, struct Options const *flags)
 {
   char *newname = xstrdup (oldname);
-  char *base = base_name (newname);
+  char *base = last_component (newname);
   size_t len = base_len (base);
   char *dir = dir_name (newname);
   char *qdir = xstrdup (quotearg_colon (dir));
   bool first = true;
   bool ok = true;
 
-  int dir_fd = open (dir, O_WRONLY | O_NOCTTY);
-  if (dir_fd < 0)
-    dir_fd = open (dir, O_RDONLY | O_NOCTTY);
+  int dir_fd = open (dir, O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
 
   if (flags->verbose)
     error (0, 0, _("%s: removing"), qoldname);
@@ -1437,7 +1050,7 @@ wipename (char *oldname, char const *qoldname, struct Options const *flags)
  */
 static bool
 wipefile (char *name, char const *qname,
-	  struct isaac_state *s, struct Options const *flags)
+	  struct randint_source *s, struct Options const *flags)
 {
   bool ok;
   int fd;
@@ -1464,16 +1077,30 @@ wipefile (char *name, char const *qname,
   return ok;
 }
 
+
+/* Buffers for random data.  */
+static struct randint_source *randint_source;
+
+/* Just on general principles, wipe buffers containing information
+   that may be related to the possibly-pseudorandom values used during
+   shredding.  */
+static void
+clear_random_data (void)
+{
+  randint_all_free (randint_source);
+}
+
+
 int
 main (int argc, char **argv)
 {
-  struct isaac_state s;
   bool ok = true;
-  struct Options flags;
+  struct Options flags = { 0, };
   char **file;
   int n_files;
   int c;
   int i;
+  char const *random_source = NULL;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -1482,10 +1109,6 @@ main (int argc, char **argv)
   textdomain (PACKAGE);
 
   atexit (close_stdout);
-
-  isaac_seed (&s);
-
-  memset (&flags, 0, sizeof flags);
 
   flags.n_iterations = DEFAULT_PASSES;
   flags.size = -1;
@@ -1502,14 +1125,19 @@ main (int argc, char **argv)
 	  {
 	    uintmax_t tmp;
 	    if (xstrtoumax (optarg, NULL, 10, &tmp, NULL) != LONGINT_OK
-		|| (uint32_t) tmp != tmp
-		|| ((size_t) (tmp * sizeof (int)) / sizeof (int) != tmp))
+		|| MIN (UINT32_MAX, SIZE_MAX / sizeof (int)) < tmp)
 	      {
 		error (EXIT_FAILURE, 0, _("%s: invalid number of passes"),
 		       quotearg_colon (optarg));
 	      }
-	    flags.n_iterations = (size_t) tmp;
+	    flags.n_iterations = tmp;
 	  }
+	  break;
+
+	case RANDOM_SOURCE_OPTION:
+	  if (random_source && !STREQ (random_source, optarg))
+	    error (EXIT_FAILURE, 0, _("multiple random sources specified"));
+	  random_source = optarg;
 	  break;
 
 	case 'u':
@@ -1559,23 +1187,25 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
+  randint_source = randint_all_new (random_source, SIZE_MAX);
+  if (! randint_source)
+    error (EXIT_FAILURE, errno, "%s", quotearg_colon (random_source));
+  atexit (clear_random_data);
+
   for (i = 0; i < n_files; i++)
     {
       char *qname = xstrdup (quotearg_colon (file[i]));
       if (STREQ (file[i], "-"))
 	{
-	  ok &= wipefd (STDOUT_FILENO, qname, &s, &flags);
+	  ok &= wipefd (STDOUT_FILENO, qname, randint_source, &flags);
 	}
       else
 	{
 	  /* Plain filename - Note that this overwrites *argv! */
-	  ok &= wipefile (file[i], qname, &s, &flags);
+	  ok &= wipefile (file[i], qname, randint_source, &flags);
 	}
       free (qname);
     }
-
-  /* Just on general principles, wipe s. */
-  memset (&s, 0, sizeof s);
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

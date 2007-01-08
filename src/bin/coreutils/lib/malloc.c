@@ -1,5 +1,6 @@
 /* malloc() function that is glibc compatible.
-   Copyright (C) 1997, 1998 Free Software Foundation, Inc.
+
+   Copyright (C) 1997, 1998, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +18,7 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 #undef malloc
 
 #include <stdlib.h>

@@ -1,0 +1,101 @@
+Index: src/remove.c
+===================================================================
+RCS file: /fetish/cu/src/remove.c,v
+retrieving revision 1.158
+diff --git a/src/remove.c b/src/remove.c
+index 4728bdd..7477da5 100644
+--- a/src/remove.c
++++ b/src/remove.c
+@@ -236,9 +236,10 @@ pop_dir (Dirstack_state *ds)
+ {
+   size_t n_lengths = obstack_object_size (&ds->len_stack) / sizeof (size_t);
+   size_t *length = obstack_base (&ds->len_stack);
++  size_t top_len;
+
+   assert (n_lengths > 0);
+-  size_t top_len = length[n_lengths - 1];
++  top_len = length[n_lengths - 1];
+   assert (top_len >= 2);
+
+   /* Pop the specified length of file name.  */
+@@ -370,10 +371,11 @@ AD_stack_top (Dirstack_state const *ds)
+ static void
+ AD_stack_pop (Dirstack_state *ds)
+ {
++  struct AD_ent *top;
+   assert (0 < AD_stack_height (ds));
+
+   /* operate on Active_dir.  pop and free top entry */
+-  struct AD_ent *top = AD_stack_top (ds);
++  top = AD_stack_top (ds);
+   if (top->unremovable)
+     hash_free (top->unremovable);
+   obstack_blank (&ds->Active_dir, -(int) sizeof (struct AD_ent));
+@@ -1463,6 +1465,7 @@ rm_1 (Dirstack_state *ds, char const *fi
+       return RM_ERROR;
+     }
+
++  {
+   struct stat st;
+   cache_stat_init (&st);
+   cycle_check_init (&ds->cycle_check_state);
+@@ -1485,6 +1488,7 @@ rm_1 (Dirstack_state *ds, char const *fi
+   AD_push_initial (ds);
+   AD_INIT_OTHER_MEMBERS ();
+
++  {
+   enum RM_status status = remove_entry (AT_FDCWD, ds, filename, &st, x, NULL);
+   if (status == RM_NONEMPTY_DIR)
+     {
+@@ -1501,6 +1505,8 @@ rm_1 (Dirstack_state *ds, char const *fi
+
+   ds_clear (ds);
+   return status;
++  }
++  }
+ }
+
+ /* Remove all files and/or directories specified by N_FILES and FILE.
+Index: src/rm.c
+===================================================================
+RCS file: /fetish/cu/src/rm.c,v
+retrieving revision 1.140
+diff --git a/src/rm.c b/src/rm.c
+index 364a21c..7a24014 100644
+--- a/src/rm.c
++++ b/src/rm.c
+@@ -355,6 +355,7 @@ main (int argc, char **argv)
+ 	       quote ("/"));
+     }
+
++  {
+   size_t n_files = argc - optind;
+   char const *const *file = (char const *const *) argv + optind;
+
+@@ -368,7 +369,10 @@ main (int argc, char **argv)
+       if (!yesno ())
+ 	exit (EXIT_SUCCESS);
+     }
++  {
+   enum RM_status status = rm (n_files, file, &x);
+   assert (VALID_STATUS (status));
+   exit (status == RM_ERROR ? EXIT_FAILURE : EXIT_SUCCESS);
++  }
++  }
+ }
+Index: shred.c
+===================================================================
+RCS file: /fetish/cu/src/shred.c,v
+retrieving revision 1.130
+diff -u -p -r1.130 shred.c
+--- shred.c     3 Sep 2006 02:53:16 -0000       1.130
++++ shred.c     3 Oct 2006 13:48:24 -0000
+@@ -464,7 +464,7 @@ dopass (int fd, char const *qname, off_t
+ 		     out.  Thus, it shouldn't give up on bad blocks.  This
+ 		     code works because lim is always a multiple of
+ 		     SECTOR_SIZE, except at the end.  */
+-		  verify (sizeof r % SECTOR_SIZE == 0);
++		  { verify (sizeof r % SECTOR_SIZE == 0); }
+ 		  if (errnum == EIO && 0 <= size && (soff | SECTOR_MASK) < lim)
+ 		    {
+ 		      size_t soff1 = (soff | SECTOR_MASK) + 1;

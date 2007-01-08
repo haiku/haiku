@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 
 ## Copyright (C) 1990, 1991, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-## 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+## 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -24,23 +24,34 @@ bin_PROGRAMS = [ chgrp chown chmod cp dd dircolors du \
   ginstall link ln dir vdir ls mkdir \
   mkfifo mknod mv nohup readlink rm rmdir shred stat sync touch unlink \
   cat cksum comm csplit cut expand fmt fold head join md5sum \
-  nl od paste pr ptx sha1sum sort split sum tac tail tr tsort unexpand uniq wc \
+  nl od paste pr ptx sha1sum sha224sum sha256sum sha384sum sha512sum \
+  shuf sort split sum tac tail tr tsort unexpand uniq wc \
   basename date dirname echo env expr factor false \
   hostname id kill logname pathchk printenv printf pwd seq sleep tee \
   test true tty whoami yes \
+  base64 \
   $(OPTIONAL_BIN_PROGS) $(DF_PROG)
 
 noinst_PROGRAMS = setuidgid
 
 noinst_HEADERS = \
-  system.h checksum.h copy.h cp-hash.h ls.h dircolors.h remove.h \
-  chown-core.h fs.h \
-  wheel.h wheel-size.h
+  chown-core.h \
+  copy.h \
+  cp-hash.h \
+  dircolors.h \
+  fs.h \
+  ls.h \
+  remove.h \
+  system.h \
+  wheel-size.h \
+  wheel.h
+
 EXTRA_DIST = dcgen dircolors.hin tac-pipe.c \
-  groups.sh wheel-gen.pl extract-magic
+  groups.sh wheel-gen.pl extract-magic c99-to-c89.diff
+BUILT_SOURCES =
 CLEANFILES = $(SCRIPTS) su
 
-AM_CPPFLAGS = -I.. -I$(srcdir) -I$(top_srcdir)/lib -I../lib
+AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 # Sometimes, the expansion of $(LIBINTL) includes -lc which may
 # include modules defining variables like `optind', so libcoreutils.a
@@ -65,10 +76,11 @@ dir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
 ls_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
 pr_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
 shred_LDADD = $(LDADD) $(LIB_GETHRXTIME) $(LIB_FDATASYNC)
+shuf_LDADD = $(LDADD) $(LIB_GETHRXTIME)
 vdir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
 
 ## If necessary, add -lm to resolve use of pow in lib/strtod.c.
-sort_LDADD = $(LDADD) $(POW_LIB)
+sort_LDADD = $(LDADD) $(POW_LIB) $(LIB_GETHRXTIME)
 
 # for get_date and gettime
 date_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
@@ -78,8 +90,8 @@ touch_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
 # If necessary, add -liconv to resolve use of iconv in lib/unicodeio.c.
 printf_LDADD = $(LDADD) $(POW_LIB) $(LIBICONV)
 
-# If necessary, add -lm to resolve use of floor, rint, modf.
-seq_LDADD = $(LDADD) $(SEQ_LIBM)
+# If necessary, add -lm to resolve use of pow in lib/strtod.c.
+seq_LDADD = $(LDADD) $(POW_LIB)
 
 # If necessary, add libraries to resolve the `pow' reference in lib/strtod.c
 # and the `nanosleep' reference in lib/xnanosleep.c.
@@ -88,9 +100,17 @@ nanosec_libs = $(LDADD) $(POW_LIB) $(LIB_NANOSLEEP)
 sleep_LDADD = $(nanosec_libs)
 tail_LDADD = $(nanosec_libs)
 
-uptime_LDADD = $(LDADD) $(GETLOADAVG_LIBS)
+# If necessary, add -lm to resolve use of pow in lib/strtod.c.
+uptime_LDADD = $(LDADD) $(POW_LIB) $(GETLOADAVG_LIBS)
 
 su_LDADD = $(LDADD) $(LIB_CRYPT)
+
+dir_LDADD += $(LIB_ACL)
+ls_LDADD += $(LIB_ACL)
+vdir_LDADD += $(LIB_ACL)
+cp_LDADD += $(LIB_ACL)
+mv_LDADD += $(LIB_ACL)
+ginstall_LDADD += $(LIB_ACL)
 
 $(PROGRAMS): ../lib/libcoreutils.a
 
@@ -169,19 +189,20 @@ chgrp_SOURCES = chgrp.c chown-core.c
 mv_SOURCES = mv.c copy.c cp-hash.c remove.c
 rm_SOURCES = rm.c remove.c
 
-md5sum_SOURCES = md5sum.c md5.c
-sha1sum_SOURCES = md5sum.c sha1sum.c
+md5sum_SOURCES = md5sum.c
+md5sum_CPPFLAGS = -DHASH_ALGO_MD5=1 $(AM_CPPFLAGS)
+sha1sum_SOURCES = md5sum.c
+sha1sum_CPPFLAGS = -DHASH_ALGO_SHA1=1 $(AM_CPPFLAGS)
+sha224sum_SOURCES = md5sum.c
+sha224sum_CPPFLAGS = -DHASH_ALGO_SHA224=1 $(AM_CPPFLAGS)
+sha256sum_SOURCES = md5sum.c
+sha256sum_CPPFLAGS = -DHASH_ALGO_SHA256=1 $(AM_CPPFLAGS)
+sha384sum_SOURCES = md5sum.c
+sha384sum_CPPFLAGS = -DHASH_ALGO_SHA384=1 $(AM_CPPFLAGS)
+sha512sum_SOURCES = md5sum.c
+sha512sum_CPPFLAGS = -DHASH_ALGO_SHA512=1 $(AM_CPPFLAGS)
 
 editpl = sed -e 's,@''PERL''@,$(PERL),g'
-
-localedir = $(datadir)/locale
-BUILT_SOURCES = localedir.h
-DISTCLEANFILES = localedir.h
-localedir.h:
-	@rm -f $@ $@-t
-	echo '#define LOCALEDIR "$(localedir)"' >$@-t
-	@chmod a-w $@-t
-	mv $@-t $@
 
 BUILT_SOURCES += dircolors.h
 dircolors.h: dcgen dircolors.hin
@@ -238,7 +259,7 @@ pm = progs-makefile
 pr = progs-readme
 # Ensure that the list of programs in README matches the list
 # of programs we can build.
-check: check-README check-misc check-AUTHORS
+check: check-README check-misc
 .PHONY: check-README
 check-README:
 	rm -rf $(pr) $(pm)
@@ -317,6 +338,7 @@ s2 = '/^\#define AUTHORS \\\\/{;n;$(sed_filter);p;q;}'
 # don't need to be marked.
 #
 # The second nm|grep checks for file-scope variables with `extern' scope.
+.PHONY: sc_tight_scope
 sc_tight_scope: $(all_programs)
 	@t=exceptions-$$$$;						\
 	trap "s=$$?; rm -f $$t; exit $$s" 0 1 2 13 15;			\

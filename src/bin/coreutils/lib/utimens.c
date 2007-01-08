@@ -1,4 +1,6 @@
-/* Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
+/* Set file access and modification times.
+
+   Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -18,9 +20,7 @@
 
 /* derived from a function in touch.c */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "utimens.h"
 
@@ -52,8 +52,10 @@ struct utimbuf
 # endif
 #endif
 
-#if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
-# define __attribute__(x)
+#ifndef __attribute__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
+#  define __attribute__(x)
+# endif
 #endif
 
 #ifndef ATTRIBUTE_UNUSED
@@ -74,6 +76,23 @@ int
 futimens (int fd ATTRIBUTE_UNUSED,
 	  char const *file, struct timespec const timespec[2])
 {
+  /* Some Linux-based NFS clients are buggy, and mishandle time stamps
+     of files in NFS file systems in some cases.  We have no
+     configure-time test for this, but please see
+     <http://bugs.gentoo.org/show_bug.cgi?id=132673> for references to
+     some of the problems with Linux 2.6.16.  If this affects you,
+     compile with -DHAVE_BUGGY_NFS_TIME_STAMPS; this is reported to
+     help in some cases, albeit at a cost in performance.  But you
+     really should upgrade your kernel to a fixed version, since the
+     problem affects many applications.  */
+
+#if HAVE_BUGGY_NFS_TIME_STAMPS
+  if (fd < 0)
+    sync ();
+  else
+    fsync (fd);
+#endif
+
   /* There's currently no interface to set file timestamps with
      nanosecond resolution, so do the best we can, discarding any
      fractional part of the timestamp.  */
@@ -91,34 +110,40 @@ futimens (int fd ATTRIBUTE_UNUSED,
   else
     t = NULL;
 
-# if HAVE_FUTIMESAT
-  return fd < 0 ? futimesat (AT_FDCWD, file, t) : futimesat (fd, NULL, t);
-# elif HAVE_FUTIMES
-  if (0 <= fd)
+
+  if (fd < 0)
     {
+# if HAVE_FUTIMESAT
+      return futimesat (AT_FDCWD, file, t);
+# endif
+    }
+  else
+    {
+      /* If futimesat or futimes fails here, don't try to speed things
+	 up by returning right away.  glibc can incorrectly fail with
+	 errno == ENOENT if /proc isn't mounted.  Also, Mandrake 10.0
+	 in high security mode doesn't allow ordinary users to read
+	 /proc/self, so glibc incorrectly fails with errno == EACCES.
+	 If errno == EIO, EPERM, or EROFS, it's probably safe to fail
+	 right away, but these cases are rare enough that they're not
+	 worth optimizing, and who knows what other messed-up systems
+	 are out there?  So play it safe and fall back on the code
+	 below.  */
+# if HAVE_FUTIMESAT
+      if (futimesat (fd, NULL, t) == 0)
+	return 0;
+# elif HAVE_FUTIMES
       if (futimes (fd, t) == 0)
 	return 0;
-
-      /* Don't worry about trying to speed things up by returning right
-	 away here.  glibc futimes can incorrectly fail with errno ==
-	 ENOENT if /proc isn't mounted.  Also, Mandrake 10.0 in high
-	 security mode doesn't allow ordinary users to read /proc/self, so
-	 glibc futimes incorrectly fails with errno == EACCES.  If futimes
-	 fails with errno == EIO, EPERM, or EROFS, it's probably safe to
-	 fail right away, but these cases are rare enough that they're not
-	 worth optimizing, and who knows what other messed-up systems are
-	 out there?  So play it safe and fall back on the code below.  */
-    }
 # endif
+    }
 #endif
-
-#if ! HAVE_FUTIMESAT
 
   if (!file)
     {
-# if ! (HAVE_WORKING_UTIMES && HAVE_FUTIMES)
+#if ! (HAVE_FUTIMESAT || (HAVE_WORKING_UTIMES && HAVE_FUTIMES))
       errno = ENOSYS;
-# endif
+#endif
 
       /* Prefer EBADF to ENOSYS if both error numbers apply.  */
       if (errno == ENOSYS)
@@ -133,9 +158,9 @@ futimens (int fd ATTRIBUTE_UNUSED,
       return -1;
     }
 
-# if HAVE_WORKING_UTIMES
+#if HAVE_WORKING_UTIMES
   return utimes (file, t);
-# else
+#else
   {
     struct utimbuf utimbuf;
     struct utimbuf const *ut;
@@ -150,8 +175,6 @@ futimens (int fd ATTRIBUTE_UNUSED,
 
     return utime (file, ut);
   }
-# endif
-
 #endif
 }
 

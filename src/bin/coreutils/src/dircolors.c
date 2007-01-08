@@ -1,5 +1,5 @@
 /* dircolors - output commands to set the LS_COLOR environment variable
-   Copyright (C) 1996-2005 Free Software Foundation, Inc.
+   Copyright (C) 1996-2006 Free Software Foundation, Inc.
    Copyright (C) 1994, 1995, 1997, 1998, 1999, 2000 H. Peter Anvin
 
    This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <sys/types.h>
 #include <getopt.h>
@@ -26,7 +24,6 @@
 
 #include "system.h"
 #include "dircolors.h"
-#include "dirname.h"
 #include "error.h"
 #include "getline.h"
 #include "obstack.h"
@@ -137,7 +134,7 @@ guess_shell_syntax (void)
   if (shell == NULL || *shell == '\0')
     return SHELL_SYNTAX_UNKNOWN;
 
-  shell = base_name (shell);
+  shell = last_component (shell);
 
   if (STREQ (shell, "csh") || STREQ (shell, "tcsh"))
     return SHELL_SYNTAX_C;
@@ -155,8 +152,8 @@ parse_line (char const *line, char **keyword, char **arg)
   *keyword = NULL;
   *arg = NULL;
 
-  for (p = line; ISSPACE (to_uchar (*p)); ++p)
-    ;
+  for (p = line; isspace (to_uchar (*p)); ++p)
+    continue;
 
   /* Ignore blank lines and shell-style comments.  */
   if (*p == '\0' || *p == '#')
@@ -164,7 +161,7 @@ parse_line (char const *line, char **keyword, char **arg)
 
   keyword_start = p;
 
-  while (!ISSPACE (to_uchar (*p)) && *p != '\0')
+  while (!isspace (to_uchar (*p)) && *p != '\0')
     {
       ++p;
     }
@@ -177,7 +174,7 @@ parse_line (char const *line, char **keyword, char **arg)
     {
       ++p;
     }
-  while (ISSPACE (to_uchar (*p)));
+  while (isspace (to_uchar (*p)));
 
   if (*p == '\0' || *p == '#')
     return;
@@ -187,10 +184,8 @@ parse_line (char const *line, char **keyword, char **arg)
   while (*p != '\0' && *p != '#')
     ++p;
 
-  for (--p; ISSPACE (to_uchar (*p)); --p)
-    {
-      /* empty */
-    }
+  for (--p; isspace (to_uchar (*p)); --p)
+    continue;
   ++p;
 
   *arg = xstrndup (arg_start, p - arg_start);
@@ -251,7 +246,7 @@ dc_parse_stream (FILE *fp, const char *filename)
   char *input_line = NULL;
   size_t input_line_size = 0;
   char const *line;
-  char *term;
+  char const *term;
   bool ok = true;
 
   /* State for the parser.  */

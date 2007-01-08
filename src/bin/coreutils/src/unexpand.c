@@ -1,5 +1,5 @@
 /* unexpand - convert blanks to tabs
-   Copyright (C) 89, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
   -a, --all        convert all blanks, instead of just initial blanks\n\
-      --first-only convert only leading sequences of blanks (overrides -a)\n\
+      --first-only  convert only leading sequences of blanks (overrides -a)\n\
   -t, --tabs=N     have tabs N characters apart instead of 8 (enables -a)\n\
   -t, --tabs=LIST  use comma separated LIST of tab positions (enables -a)\n\
 "), stdout);
@@ -176,7 +176,7 @@ parse_tab_stops (char const *stops)
 
   for (; *stops; stops++)
     {
-      if (*stops == ',' || ISBLANK (to_uchar (*stops)))
+      if (*stops == ',' || isblank (to_uchar (*stops)))
 	{
 	  if (have_tabval)
 	    add_tab_stop (tabval);
@@ -190,18 +190,17 @@ parse_tab_stops (char const *stops)
 	      have_tabval = true;
 	      num_start = stops;
 	    }
-	  {
-	    /* Detect overflow.  */
-	    if (!DECIMAL_DIGIT_ACCUMULATE (tabval, *stops - '0', uintmax_t))
-	      {
-		size_t len = strspn (num_start, "0123456789");
-		char *bad_num = xstrndup (num_start, len);
-		error (0, 0, _("tab stop is too large %s"), quote (bad_num));
-		free (bad_num);
-		ok = false;
-		stops = num_start + len - 1;
-	      }
-	  }
+
+	  /* Detect overflow.  */
+	  if (!DECIMAL_DIGIT_ACCUMULATE (tabval, *stops - '0', uintmax_t))
+	    {
+	      size_t len = strspn (num_start, "0123456789");
+	      char *bad_num = xstrndup (num_start, len);
+	      error (0, 0, _("tab stop is too large %s"), quote (bad_num));
+	      free (bad_num);
+	      ok = false;
+	      stops = num_start + len - 1;
+	    }
 	}
       else
 	{
@@ -349,7 +348,7 @@ unexpand (void)
 
 	  if (convert)
 	    {
-	      bool blank = ISBLANK (c);
+	      bool blank = !! isblank (c);
 
 	      if (blank)
 		{

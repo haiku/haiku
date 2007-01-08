@@ -1,25 +1,49 @@
-## Process this file with automake to produce Makefile.in -*-Makefile-*-
+# Make coreutils man pages.				-*-Makefile-*-
+
+# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software
+# Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
 dist_man_MANS = \
-  basename.1 cat.1 chgrp.1 chmod.1 chown.1 chroot.1 cksum.1 comm.1 \
+  base64.1 basename.1 cat.1 chgrp.1 chmod.1 chown.1 cksum.1 comm.1 \
   cp.1 csplit.1 cut.1 date.1 dd.1 df.1 dir.1 dircolors.1 dirname.1 du.1 \
   echo.1 env.1 expand.1 expr.1 factor.1 false.1 fmt.1 fold.1 groups.1 \
-  head.1 hostid.1 hostname.1 id.1 install.1 join.1 kill.1 \
+  head.1 hostname.1 id.1 install.1 join.1 kill.1 \
   link.1 ln.1 logname.1 \
-  ls.1 md5sum.1 mkdir.1 mkfifo.1 mknod.1 mv.1 nice.1 nl.1 nohup.1 od.1 \
-  paste.1 pathchk.1 pinky.1 pr.1 printenv.1 printf.1 ptx.1 pwd.1 readlink.1 \
-  rm.1 rmdir.1 seq.1 sha1sum.1 shred.1 sleep.1 sort.1 split.1 stat.1 stty.1 \
+  ls.1 md5sum.1 mkdir.1 mkfifo.1 mknod.1 mv.1 nl.1 nohup.1 od.1 \
+  paste.1 pathchk.1 pr.1 printenv.1 printf.1 ptx.1 pwd.1 readlink.1 \
+  rm.1 rmdir.1 seq.1 sha1sum.1 sha224sum.1 sha256sum.1 sha384sum.1 sha512sum.1 \
+  shred.1 shuf.1 sleep.1 sort.1 split.1 stat.1 \
   su.1 sum.1 sync.1 tac.1 tail.1 tee.1 test.1 touch.1 tr.1 true.1 tsort.1 \
-  tty.1 uname.1 unexpand.1 uniq.1 unlink.1 uptime.1 users.1 vdir.1 wc.1 \
-  who.1 whoami.1 yes.1
+  tty.1 unexpand.1 uniq.1 unlink.1 vdir.1 wc.1 \
+  whoami.1 yes.1 $(MAN)
+optional_mans = \
+  chroot.1 hostid.1 nice.1 pinky.1 stty.1 uname.1 uptime.1 users.1 who.1
 
-man_aux = $(dist_man_MANS:.1=.x)
 
-EXTRA_DIST = $(man_aux) help2man
-MAINTAINERCLEANFILES = $(man_MANS)
+man_aux = $(dist_man_MANS:.1=.x) $(optional_mans:.1=.x)
+
+EXTRA_DIST = $(man_aux) help2man $(optional_mans)
+MAINTAINERCLEANFILES = $(dist_man_MANS)
 
 # Depend on configure.ac to get version number changes.
 common_dep = $(top_srcdir)/configure.ac
 
+base64.1:	$(common_dep)	$(srcdir)/base64.x	../src/base64.c
 basename.1:	$(common_dep)	$(srcdir)/basename.x	../src/basename.c
 cat.1:		$(common_dep)	$(srcdir)/cat.x		../src/cat.c
 chgrp.1:	$(common_dep)	$(srcdir)/chgrp.x	../src/chgrp.c
@@ -83,7 +107,12 @@ rm.1:		$(common_dep)	$(srcdir)/rm.x		../src/rm.c
 rmdir.1:	$(common_dep)	$(srcdir)/rmdir.x	../src/rmdir.c
 seq.1:		$(common_dep)	$(srcdir)/seq.x		../src/seq.c
 sha1sum.1:	$(common_dep)	$(srcdir)/sha1sum.x	../src/md5sum.c
+sha224sum.1:	$(common_dep)	$(srcdir)/sha224sum.x	../src/md5sum.c
+sha256sum.1:	$(common_dep)	$(srcdir)/sha256sum.x	../src/md5sum.c
+sha384sum.1:	$(common_dep)	$(srcdir)/sha384sum.x	../src/md5sum.c
+sha512sum.1:	$(common_dep)	$(srcdir)/sha512sum.x	../src/md5sum.c
 shred.1:	$(common_dep)	$(srcdir)/shred.x	../src/shred.c
+shuf.1:		$(common_dep)	$(srcdir)/shuf.x	../src/shuf.c
 sleep.1:	$(common_dep)	$(srcdir)/sleep.x	../src/sleep.c
 sort.1:		$(common_dep)	$(srcdir)/sort.x	../src/sort.c
 split.1:	$(common_dep)	$(srcdir)/split.x	../src/split.c

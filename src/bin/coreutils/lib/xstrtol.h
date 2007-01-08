@@ -1,7 +1,7 @@
 /* A more useful interface to strtol.
 
-   Copyright (C) 1995, 1996, 1998, 1999, 2001, 2002, 2003, 2004 Free
-   Software Foundation, Inc.
+   Copyright (C) 1995, 1996, 1998, 1999, 2001, 2002, 2003, 2004, 2006
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,12 +22,9 @@
 
 # include "exitfail.h"
 
-# if HAVE_INTTYPES_H
-#  include <inttypes.h>
-# endif
-# if HAVE_STDINT_H
-#  include <stdint.h>
-# endif
+# include <inttypes.h>
+
+# include "gettext.h"
 
 # ifndef _STRTOL_ERROR
 enum strtol_error
@@ -62,18 +59,19 @@ _DECLARE_XSTRTOL (xstrtoumax, uintmax_t)
 	  abort ();							\
 									\
 	case LONGINT_INVALID:						\
-	  error ((Exit_code), 0, "invalid %s `%s'",			\
+	  error ((Exit_code), 0, gettext ("invalid %s `%s'"),		\
 		 (Argument_type_string), (Str));			\
 	  break;							\
 									\
 	case LONGINT_INVALID_SUFFIX_CHAR:				\
 	case LONGINT_INVALID_SUFFIX_CHAR | LONGINT_OVERFLOW:		\
-	  error ((Exit_code), 0, "invalid character following %s in `%s'", \
+	  error ((Exit_code), 0,					\
+		 gettext ("invalid character following %s in `%s'"),	\
 		 (Argument_type_string), (Str));			\
 	  break;							\
 									\
 	case LONGINT_OVERFLOW:						\
-	  error ((Exit_code), 0, "%s `%s' too large",			\
+	  error ((Exit_code), 0, gettext ("%s `%s' too large"),		\
 		 (Argument_type_string), (Str));			\
 	  break;							\
 	}								\

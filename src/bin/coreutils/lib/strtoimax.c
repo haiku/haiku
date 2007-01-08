@@ -1,6 +1,6 @@
 /* Convert string representation of a number into an intmax_t value.
 
-   Copyright (C) 1999, 2001, 2002, 2003, 2004 Free Software
+   Copyright (C) 1999, 2001, 2002, 2003, 2004, 2006 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -19,28 +19,21 @@
 
 /* Written by Paul Eggert. */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-#if HAVE_STDINT_H
-# include <stdint.h>
-#endif
+/* Verify interface.  */
+#include <inttypes.h>
 
 #include <stdlib.h>
 
-/* Verify a requirement at compile-time (unlike assert, which is runtime).  */
-#define verify(name, assertion) struct name { char a[(assertion) ? 1 : -1]; }
+#include "verify.h"
 
 #ifdef UNSIGNED
 # ifndef HAVE_DECL_STRTOULL
 "this configure-time declaration test was not run"
 # endif
-# if !HAVE_DECL_STRTOULL && HAVE_UNSIGNED_LONG_LONG
-unsigned long long strtoull (char const *, char **, int);
+# if !HAVE_DECL_STRTOULL && HAVE_UNSIGNED_LONG_LONG_INT
+unsigned long long int strtoull (char const *, char **, int);
 # endif
 
 #else
@@ -48,35 +41,35 @@ unsigned long long strtoull (char const *, char **, int);
 # ifndef HAVE_DECL_STRTOLL
 "this configure-time declaration test was not run"
 # endif
-# if !HAVE_DECL_STRTOLL && HAVE_UNSIGNED_LONG_LONG
-long long strtoll (char const *, char **, int);
+# if !HAVE_DECL_STRTOLL && HAVE_LONG_LONG_INT
+long long int strtoll (char const *, char **, int);
 # endif
 #endif
 
 #ifdef UNSIGNED
-# undef HAVE_LONG_LONG
-# define HAVE_LONG_LONG HAVE_UNSIGNED_LONG_LONG
-# define INT uintmax_t
+# define Have_long_long HAVE_UNSIGNED_LONG_LONG_INT
+# define Int uintmax_t
+# define Unsigned unsigned
 # define strtoimax strtoumax
 # define strtol strtoul
 # define strtoll strtoull
 #else
-# define INT intmax_t
+# define Have_long_long HAVE_LONG_LONG_INT
+# define Int intmax_t
+# define Unsigned
 #endif
 
-INT
+Int
 strtoimax (char const *ptr, char **endptr, int base)
 {
-#if HAVE_LONG_LONG
-  verify (size_is_that_of_long_or_long_long,
-	  (sizeof (INT) == sizeof (long int)
-	   || sizeof (INT) == sizeof (long long int)));
+#if Have_long_long
+  verify (sizeof (Int) == sizeof (Unsigned long int)
+	  || sizeof (Int) == sizeof (Unsigned long long int));
 
-  if (sizeof (INT) != sizeof (long int))
+  if (sizeof (Int) != sizeof (Unsigned long int))
     return strtoll (ptr, endptr, base);
 #else
-  verify (size_is_that_of_long,
-	  sizeof (INT) == sizeof (long int));
+  verify (sizeof (Int) == sizeof (Unsigned long int));
 #endif
 
   return strtol (ptr, endptr, base);

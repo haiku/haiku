@@ -1,7 +1,7 @@
 /* mkdir-p.h -- Ensure that a directory and its parents exist.
 
-   Copyright (C) 1994, 1995, 1996, 1997, 2000, 2003, 2004, 2005 Free
-   Software Foundation, Inc.
+   Copyright (C) 1994, 1995, 1996, 1997, 2000, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,16 +17,20 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* Written by David MacKenzie <djm@gnu.ai.mit.edu> and Jim Meyering.  */
+/* Written by Paul Eggert, David MacKenzie, and Jim Meyering.  */
 
 #include <stdbool.h>
 #include <sys/types.h>
 
-bool make_dir_parents (char const *argname,
+struct savewd;
+bool make_dir_parents (char *dir,
+		       struct savewd *wd,
+		       int (*make_ancestor) (char const *, char const *,
+					     void *),
+		       void *options,
 		       mode_t mode,
-		       mode_t parent_mode,
+		       void (*announce) (char const *, void *),
+		       mode_t mode_bits,
 		       uid_t owner,
 		       gid_t group,
-		       bool preserve_existing,
-		       char const *verbose_fmt_string,
-		       int *cwd_errno);
+		       bool preserve_existing);

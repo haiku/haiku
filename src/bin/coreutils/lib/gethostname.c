@@ -1,5 +1,6 @@
 /* gethostname emulation for SysV and POSIX.1.
-   Copyright (C) 1992, 2003 Free Software Foundation, Inc.
+
+   Copyright (C) 1992, 2003, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +18,7 @@
 
 /* David MacKenzie <djm@gnu.ai.mit.edu> */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #ifdef HAVE_UNAME
 # include <sys/utsname.h>

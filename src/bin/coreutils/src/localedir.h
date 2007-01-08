@@ -1,1 +1,0 @@
-#define LOCALEDIR "/share/locale"

@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2001, 2005 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2001, 2005, 2006 Free Software Foundation, Inc.
    This file is derived from the one in the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,14 +15,13 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
+#if !_LIBC
 # include <config.h>
+# include "mkstemp.h"
+# include "tempname.h"
+# define __gen_tempname gen_tempname
+# define __GT_FILE GT_FILE
 #endif
-
-/* Disable the definition of mkstemp to rpl_mkstemp (from config.h) in this
-   file.  Otherwise, we'd get conflicting prototypes for rpl_mkstemp on
-   most systems.  */
-#undef mkstemp
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,14 +30,13 @@
 # define __GT_FILE 0
 #endif
 
-int __gen_tempname ();
-
 /* Generate a unique temporary file name from TEMPLATE.
    The last six characters of TEMPLATE must be "XXXXXX";
    they are replaced with a string that makes the file name unique.
    Then open the file and return a fd. */
 int
-rpl_mkstemp (char *template)
+mkstemp (template)
+     char *template;
 {
   return __gen_tempname (template, __GT_FILE);
 }

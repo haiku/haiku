@@ -1,7 +1,7 @@
 /* Remove directory entries.
 
-   Copyright (C) 1998, 2000, 2002, 2003, 2004 Free Software
-   Foundation, Inc.
+   Copyright (C) 1998, 2000, 2002, 2003, 2004, 2005, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,20 +30,23 @@ struct rm_options
   /* If true, query the user about whether to remove each file.  */
   bool interactive;
 
+  /* If true, do not traverse into (or remove) any directory that is
+     on a file system (i.e., that has a different device number) other
+     than that of the corresponding command line argument.  Note that
+     even without this option, rm will fail in the end, due to its
+     probable inability to remove the mount point.  But there, the
+     diagnostic comes too late -- after removing all contents.  */
+  bool one_file_system;
+
   /* If true, recursively remove directories.  */
   bool recursive;
 
-  /* Pointer to the device and inode numbers of `/', when --recursive.
-     Otherwise NULL.  */
+  /* Pointer to the device and inode numbers of `/', when --recursive
+     and preserving `/'.  Otherwise NULL.  */
   struct dev_ino *root_dev_ino;
 
   /* If nonzero, stdin is a tty.  */
   bool stdin_tty;
-
-  /* If true, remove directories with unlink instead of rmdir, and don't
-     require a directory to be empty before trying to unlink it.
-     Only works for the super-user.  */
-  bool unlink_dirs;
 
   /* If true, display the name of each file removed.  */
   bool verbose;

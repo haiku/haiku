@@ -1,7 +1,7 @@
 /* On some systems, mkdir ("foo/", 0700) fails because of the trailing
    slash.  On those systems, this wrapper removes the trailing slash.
 
-   Copyright (C) 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Disable the definition of mkdir to rpl_mkdir (from config.h) in this
    file.  Otherwise, we'd get conflicting prototypes for rpl_mkdir on

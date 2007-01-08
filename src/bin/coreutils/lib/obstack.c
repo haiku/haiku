@@ -1,8 +1,8 @@
 /* obstack.c - subroutines used implicitly by object stack macros
 
    Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1996, 1997,
-   1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation,
-   Inc.
+   1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,14 +18,11 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #ifdef _LIBC
 # include <obstack.h>
 # include <shlib-compat.h>
 #else
+# include <config.h>
 # include "obstack.h"
 #endif
 
@@ -51,21 +48,11 @@
 # endif
 #endif
 
-#if defined _LIBC && defined USE_IN_LIBIO
-# include <wchar.h>
-#endif
-
 #include <stddef.h>
 
 #ifndef ELIDE_CODE
 
-
-# if HAVE_INTTYPES_H
-#  include <inttypes.h>
-# endif
-# if HAVE_STDINT_H || defined _LIBC
-#  include <stdint.h>
-# endif
+# include <stdint.h>
 
 /* Determine default alignment.  */
 union fooround
@@ -355,7 +342,7 @@ _obstack_allocated_p (struct obstack *h, void *obj)
 # undef obstack_free
 
 void
-obstack_free (struct obstack *h, void *obj)
+__obstack_free (struct obstack *h, void *obj)
 {
   register struct _obstack_chunk *lp;	/* below addr of any objects in this chunk */
   register struct _obstack_chunk *plp;	/* point to previous chunk if any */
@@ -433,12 +420,11 @@ print_and_abort (void)
      happen because the "memory exhausted" message appears in other places
      like this and the translation should be reused instead of creating
      a very similar string which requires a separate translation.  */
-# if defined _LIBC && defined USE_IN_LIBIO
-  if (_IO_fwide (stderr, 0) > 0)
-    __fwprintf (stderr, L"%s\n", _("memory exhausted"));
-  else
+# ifdef _LIBC
+  (void) __fxprintf (NULL, "%s\n", _("memory exhausted"));
+# else
+  fprintf (stderr, "%s\n", _("memory exhausted"));
 # endif
-    fprintf (stderr, "%s\n", _("memory exhausted"));
   exit (obstack_exit_failure);
 }
 

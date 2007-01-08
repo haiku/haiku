@@ -1,5 +1,5 @@
 /* cut - remove parts of lines of files
-   Copyright (C) 1997-2005 Free Software Foundation, Inc.
+   Copyright (C) 1997-2006 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
    This program is free software; you can redistribute it and/or modify
@@ -223,6 +223,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 Use one, and only one of -b, -c or -f.  Each LIST is made up of one\n\
 range, or many ranges separated by commas.  Selected input is written\n\
 in the same order that it is read, and is written exactly once.\n\
+"), stdout);
+      fputs (_("\
 Each range is one of:\n\
 \n\
   N     N'th byte, character or field, counted from 1\n\
@@ -372,7 +374,7 @@ set_fields (const char *fieldstr)
 	  else
 	    initial = 1;
 	}
-      else if (*fieldstr == ',' || ISBLANK (*fieldstr) || *fieldstr == '\0')
+      else if (*fieldstr == ',' || isblank (*fieldstr) || *fieldstr == '\0')
 	{
 	  in_digits = false;
 	  /* Ending the string, or this field/byte sublist. */
@@ -702,7 +704,7 @@ cut_stream (FILE *stream)
    Return true if successful.  */
 
 static bool
-cut_file (char *file)
+cut_file (char const *file)
 {
   FILE *stream;
 

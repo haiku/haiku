@@ -1,6 +1,6 @@
 /* calloc() function that is glibc compatible.
    This wrapper function is required at least on Tru64 UNIX 5.1.
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 #undef calloc
 
 #include <stdlib.h>

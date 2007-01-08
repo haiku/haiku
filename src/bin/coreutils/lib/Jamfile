@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src bin coreutils lib ;
+SubDir HAIKU_TOP src bin coreutils6 lib ;
 
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
@@ -7,36 +7,44 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 SubDirCcFlags -DHAVE_CONFIG_H ;
 
 SubDirSysHdrs $(SUBDIR) ;
-SubDirSysHdrs $(SUBDIR) $(DOTDOT) ;
+#SubDirSysHdrs $(SUBDIR) $(DOTDOT) ;
 
 StaticLibrary libfetish.a : 
 	__fpending.c
 	acl.c
 #	alloca.c
+	allocsa.c
 	argmatch.c
+	asnprintf.c
 #	atexit.c
 	backupfile.c
+	base64.c
 	basename.c
+	buffer-lcm.c
+	c-strtod.c
+	c-strtold.c
 	calloc.c
 	canon-host.c
 	canonicalize.c
-	c-strtod.c
-	c-strtold.c
 	chdir-long.c
 	chown.c
 	cloexec.c
+	close-stream.c
 	closeout.c
 	cycle-check.c
 	diacrit.c
+	dirchownmod.c
 #	dirfd.c
 	dirname.c
 	dup-safer.c
 #	dup2.c
 	error.c
+	euidaccess-stat.c
 	euidaccess.c
 	exclude.c
 	exitfail.c
 #	fchdir-stub.c
+	fchmodat.c
 #	fchown-stub.c
 	fd-reopen.c
 	fd-safer.c
@@ -58,13 +66,13 @@ StaticLibrary libfetish.a :
 #	gethostname.c
 	gethrxtime.c
 #	getline.c
-#	getloadavg.c
+	getloadavg.c
 	getndelim2.c
-	getopt.c
-	getopt1.c
+#	getopt.c
+#	getopt1.c
 	getpass.c
 	gettime.c
-#	gettimeofday.c
+	gettimeofday.c
 	getugroups.c
 	getusershell.c
 	group-member.c
@@ -72,8 +80,11 @@ StaticLibrary libfetish.a :
 	hash-pjw.c
 	hash.c
 	human.c
+	i-ring.c
 	idcache.c
 	imaxtostr.c
+	inet_ntop.c
+	isapipe.c
 	lchown.c
 	linebuffer.c
 	localcharset.c
@@ -92,6 +103,8 @@ StaticLibrary libfetish.a :
 	mempcpy.c
 	memrchr.c
 #	memset.c
+	memxfrm.c
+	mkancesdirs.c
 	mkdir.c
 	mkdir-p.c
 #	mkstemp.c
@@ -102,8 +115,10 @@ StaticLibrary libfetish.a :
 	nanosleep.c
 #	obstack.c
 	offtostr.c
-	openat.c
 	open-safer.c
+	openat-die.c
+	openat-proc.c
+	openat.c
 	physmem.c
 	posixtm.c
 	posixver.c
@@ -111,11 +126,16 @@ StaticLibrary libfetish.a :
 	quote.c
 	quotearg.c
 #	raise.c
+	rand-isaac.c
+	randint.c
+	randperm.c
+	randread.c
 #	readlink-stub.c
 	readtokens.c
 	readtokens0.c
 #	realloc.c
-#	regex.c
+	regex.c
+	rename-dest-slash.c
 	rename.c
 	root-dev-ino.c
 #	rmdir.c
@@ -125,9 +145,12 @@ StaticLibrary libfetish.a :
 	same.c
 	save-cwd.c
 	savedir.c
-	setenv.c
+	savewd.c
+#	setenv.c
 	settime.c
 	sha1.c
+	sha256.c
+	sha512.c
 	sig2str.c
 #	stpcpy.c
 	strcasecmp.c
@@ -168,12 +191,14 @@ StaticLibrary libfetish.a :
 	xgethostname.c
 	xmalloc.c
 	xmemcoll.c
+	xmemxfrm.c
 	xnanosleep.c
 	xreadlink.c
 	xstrndup.c
 	xstrtod.c
 	xstrtoimax.c
 	xstrtol.c
+	xstrtold.c
 	xstrtoul.c
 	xstrtoumax.c
 	yesno.c

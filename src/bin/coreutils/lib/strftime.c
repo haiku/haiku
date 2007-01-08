@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1999, 2000, 2001, 2003, 2004, 2005 Free Software
+/* Copyright (C) 1991-1999, 2000, 2001, 2003, 2004, 2005, 2006 Free Software
    Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C Library.
@@ -18,10 +18,6 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #ifdef _LIBC
 # define HAVE_MBLEN 1
 # define HAVE_MBRLEN 1
@@ -32,6 +28,11 @@
 # define HAVE_TZSET 1
 # define MULTIBYTE_IS_FORMAT_SAFE 1
 # include "../locale/localeinfo.h"
+#else
+# include <config.h>
+# if FPRINTFTIME
+#  include "fprintftime.h"
+# endif
 #endif
 
 #include <ctype.h>
@@ -47,7 +48,7 @@
 #  include <time.h>
 # endif
 #endif
-#if HAVE_TZNAME
+#if HAVE_TZNAME && ! defined tzname
 extern char *tzname[];
 #endif
 
@@ -180,6 +181,12 @@ extern char *tzname[];
 # define memset_zero(P, Len) (memset (P, '0', Len), (P) += (Len))
 #endif
 
+#if FPRINTFTIME
+# define advance(P, N)
+#else
+# define advance(P, N) ((P) += (N))
+#endif
+
 #define add(n, f)							      \
   do									      \
     {									      \
@@ -198,7 +205,7 @@ extern char *tzname[];
 		memset_space (p, _delta);				      \
 	    }								      \
 	  f;								      \
-	  p += FPRINTFTIME ? 0 : _n;					      \
+	  advance (p, _n);						      \
 	}								      \
       i += _incr;							      \
     } while (0)
@@ -278,17 +285,12 @@ extern char *tzname[];
 #  define TOLOWER(Ch, L) towlower (Ch)
 # endif
 #else
-# ifdef _LIBC
-#  ifdef USE_IN_EXTENDED_LOCALE_MODEL
-#   define TOUPPER(Ch, L) __toupper_l (Ch, L)
-#   define TOLOWER(Ch, L) __tolower_l (Ch, L)
-#  else
-#   define TOUPPER(Ch, L) toupper (Ch)
-#   define TOLOWER(Ch, L) tolower (Ch)
-#  endif
+# ifdef USE_IN_EXTENDED_LOCALE_MODEL
+#  define TOUPPER(Ch, L) __toupper_l (Ch, L)
+#  define TOLOWER(Ch, L) __tolower_l (Ch, L)
 # else
-#  define TOUPPER(Ch, L) (islower (Ch) ? toupper (Ch) : (Ch))
-#  define TOLOWER(Ch, L) (isupper (Ch) ? tolower (Ch) : (Ch))
+#  define TOUPPER(Ch, L) toupper (Ch)
+#  define TOLOWER(Ch, L) tolower (Ch)
 # endif
 #endif
 /* We don't use `isdigit' here since the locale dependent
@@ -387,21 +389,6 @@ iso_week_days (int yday, int wday)
 }
 
 
-#if !(defined _NL_CURRENT || HAVE_STRFTIME)
-static CHAR_T const weekday_name[][10] =
-  {
-    L_("Sunday"), L_("Monday"), L_("Tuesday"), L_("Wednesday"),
-    L_("Thursday"), L_("Friday"), L_("Saturday")
-  };
-static CHAR_T const month_name[][10] =
-  {
-    L_("January"), L_("February"), L_("March"), L_("April"), L_("May"),
-    L_("June"), L_("July"), L_("August"), L_("September"), L_("October"),
-    L_("November"), L_("December")
-  };
-#endif
-
-
 /* When compiling this file, GNU applications can #define my_strftime
    to a symbol (typically nstrftime) to get an extended strftime with
    extra arguments UT and NS.  Emacs is a special case for now, but
@@ -473,18 +460,6 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 # define aw_len STRLEN (a_wkday)
 # define am_len STRLEN (a_month)
 # define ap_len STRLEN (ampm)
-#else
-# if !HAVE_STRFTIME
-#  define f_wkday (weekday_name[tp->tm_wday])
-#  define f_month (month_name[tp->tm_mon])
-#  define a_wkday f_wkday
-#  define a_month f_month
-#  define ampm (L_("AMPM") + 2 * (tp->tm_hour > 11))
-
-  size_t aw_len = 3;
-  size_t am_len = 3;
-  size_t ap_len = 2;
-# endif
 #endif
   const char *zone;
   size_t i = 0;
@@ -745,7 +720,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	      to_uppcase = true;
 	      to_lowcase = false;
 	    }
-#if defined _NL_CURRENT || !HAVE_STRFTIME
+#ifdef _NL_CURRENT
 	  cpy (aw_len, a_wkday);
 	  break;
 #else
@@ -760,7 +735,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	      to_uppcase = true;
 	      to_lowcase = false;
 	    }
-#if defined _NL_CURRENT || !HAVE_STRFTIME
+#ifdef _NL_CURRENT
 	  cpy (STRLEN (f_wkday), f_wkday);
 	  break;
 #else
@@ -776,7 +751,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	    }
 	  if (modifier != 0)
 	    goto bad_format;
-#if defined _NL_CURRENT || !HAVE_STRFTIME
+#ifdef _NL_CURRENT
 	  cpy (am_len, a_month);
 	  break;
 #else
@@ -791,7 +766,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	      to_uppcase = true;
 	      to_lowcase = false;
 	    }
-#if defined _NL_CURRENT || !HAVE_STRFTIME
+#ifdef _NL_CURRENT
 	  cpy (STRLEN (f_month), f_month);
 	  break;
 #else
@@ -809,11 +784,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 		     != '\0')))
 	    subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(D_T_FMT));
 #else
-# if HAVE_STRFTIME
 	  goto underlying_strftime;
-# else
-	  subfmt = L_("%a %b %e %H:%M:%S %Y");
-# endif
 #endif
 
 	subformat:
@@ -829,7 +800,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	  }
 	  break;
 
-#if HAVE_STRFTIME && ! (defined _NL_CURRENT && HAVE_STRUCT_ERA_ENTRY)
+#if !(defined _NL_CURRENT && HAVE_STRUCT_ERA_ENTRY)
 	underlying_strftime:
 	  {
 	    /* The relevant information is available only via the
@@ -880,9 +851,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 		  break;
 		}
 #else
-# if HAVE_STRFTIME
 	      goto underlying_strftime;
-# endif
 #endif
 	    }
 
@@ -903,11 +872,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	    subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(D_FMT));
 	  goto subformat;
 #else
-# if HAVE_STRFTIME
 	  goto underlying_strftime;
-# else
-	  /* Fall through.  */
-# endif
 #endif
 	case L_('D'):
 	  if (modifier != 0)
@@ -972,9 +937,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 		    }
 		}
 #else
-# if HAVE_STRFTIME
 	      goto underlying_strftime;
-# endif
 #endif
 	    }
 
@@ -1122,7 +1085,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 
 	case L_('P'):
 	  to_lowcase = true;
-#if !defined _NL_CURRENT && HAVE_STRFTIME
+#ifndef _NL_CURRENT
 	  format_char = L_('p');
 #endif
 	  /* FALLTHROUGH */
@@ -1133,7 +1096,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	      to_uppcase = false;
 	      to_lowcase = true;
 	    }
-#if defined _NL_CURRENT || !HAVE_STRFTIME
+#ifdef _NL_CURRENT
 	  cpy (ap_len, ampm);
 	  break;
 #else
@@ -1145,16 +1108,14 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	  goto subformat;
 
 	case L_('r'):
-#if !defined _NL_CURRENT && HAVE_STRFTIME
-	  goto underlying_strftime;
-#else
-# ifdef _NL_CURRENT
+#ifdef _NL_CURRENT
 	  if (*(subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME,
 						       NLW(T_FMT_AMPM)))
 	      == L_('\0'))
-# endif
 	    subfmt = L_("%I:%M:%S %p");
 	  goto subformat;
+#else
+	  goto underlying_strftime;
 #endif
 
 	case L_('S'):
@@ -1201,11 +1162,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 	    subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(T_FMT));
 	  goto subformat;
 #else
-# if HAVE_STRFTIME
 	  goto underlying_strftime;
-# else
-	  /* Fall through.  */
-# endif
 #endif
 	case L_('T'):
 	  subfmt = L_("%H:%M:%S");
@@ -1309,9 +1266,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 		  goto subformat;
 		}
 #else
-# if HAVE_STRFTIME
 	      goto underlying_strftime;
-# endif
 #endif
 	    }
 	  if (modifier == L_('O'))
@@ -1332,9 +1287,7 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 				 + delta * era->absolute_direction));
 		}
 #else
-# if HAVE_STRFTIME
 	      goto underlying_strftime;
-# endif
 #endif
 	    }
 

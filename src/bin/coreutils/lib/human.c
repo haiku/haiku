@@ -1,7 +1,7 @@
 /* human.c -- print human readable file size
 
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-   Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 
 /* Written by Paul Eggert and Larry McVoy.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "human.h"
 
@@ -37,13 +35,6 @@
 #include <error.h>
 #include <intprops.h>
 #include <xstrtol.h>
-
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
-#ifndef UINTMAX_MAX
-# define UINTMAX_MAX ((uintmax_t) -1)
-#endif
 
 /* The maximum length of a suffix like "KiB".  */
 #define HUMAN_READABLE_SUFFIX_LENGTH_MAX 3

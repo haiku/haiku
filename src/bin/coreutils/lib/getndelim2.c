@@ -1,8 +1,8 @@
 /* getndelim2 - Read a line from a stream, stopping at one of 2 delimiters,
    with bounded memory allocation.
 
-   Copyright (C) 1993, 1996, 1997, 1998, 2000, 2003, 2004 Free Software
-   Foundation, Inc.
+   Copyright (C) 1993, 1996, 1997, 1998, 2000, 2003, 2004, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,9 +20,7 @@
 
 /* Originally written by Jan Brittenson, bson@gnu.ai.mit.edu.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "getndelim2.h"
 
@@ -34,18 +32,8 @@
 #endif
 
 #include <limits.h>
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-#if HAVE_STDINT_H
-# include <stdint.h>
-#endif
-#ifndef PTRDIFF_MAX
-# define PTRDIFF_MAX ((ptrdiff_t) (SIZE_MAX / 2))
-#endif
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
+#include <stdint.h>
+
 #ifndef SSIZE_MAX
 # define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif

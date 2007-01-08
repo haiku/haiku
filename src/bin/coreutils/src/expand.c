@@ -1,5 +1,5 @@
 /* expand - convert tabs to spaces
-   Copyright (C) 89, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ parse_tab_stops (char const *stops)
 
   for (; *stops; stops++)
     {
-      if (*stops == ',' || ISBLANK (to_uchar (*stops)))
+      if (*stops == ',' || isblank (to_uchar (*stops)))
 	{
 	  if (have_tabval)
 	    add_tab_stop (tabval);
@@ -172,6 +172,7 @@ parse_tab_stops (char const *stops)
 	      num_start = stops;
 	    }
 
+	  /* Detect overflow.  */
 	  if (!DECIMAL_DIGIT_ACCUMULATE (tabval, *stops - '0', uintmax_t))
 	    {
 	      size_t len = strspn (num_start, "0123456789");
@@ -235,7 +236,7 @@ next_file (FILE *fp)
 	  error (0, errno, "%s", prev_file);
 	  exit_status = EXIT_FAILURE;
 	}
-      if (fp == stdin)
+      if (STREQ (prev_file, "-"))
 	clearerr (fp);		/* Also clear EOF.  */
       else if (fclose (fp) != 0)
 	{
@@ -246,7 +247,7 @@ next_file (FILE *fp)
 
   while ((file = *file_list++) != NULL)
     {
-      if (file[0] == '-' && file[1] == '\0')
+      if (STREQ (file, "-"))
 	{
 	  have_read_stdin = true;
 	  prev_file = file;
@@ -351,7 +352,7 @@ expand (void)
 		    error (EXIT_FAILURE, 0, _("input line is too long"));
 		}
 
-	      convert &= convert_entire_line | ISBLANK (c);
+	      convert &= convert_entire_line | !! isblank (c);
 	    }
 
 	  if (c < 0)

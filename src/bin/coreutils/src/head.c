@@ -1,5 +1,5 @@
 /* head -- output first part of file(s)
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ static struct option const long_options[] =
 {
   {"bytes", required_argument, NULL, 'c'},
   {"lines", required_argument, NULL, 'n'},
-  {"presume-input-pipe", no_argument, NULL,
+  {"-presume-input-pipe", no_argument, NULL,
    PRESUME_INPUT_PIPE_OPTION}, /* do not document */
   {"quiet", no_argument, NULL, 'q'},
   {"silent", no_argument, NULL, 'q'},
@@ -973,7 +973,7 @@ main (int argc, char **argv)
 	      break;
 
 	    default:
-	      error (0, 0, _("unrecognized option `-%c'"), *a);
+	      error (0, 0, _("invalid trailing option -- %c"), *a);
 	      usage (EXIT_FAILURE);
 	    }
 	}
@@ -992,7 +992,8 @@ main (int argc, char **argv)
       argc--;
     }
 
-  while ((c = getopt_long (argc, argv, "c:n:qv", long_options, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "c:n:qv0123456789", long_options, NULL))
+	 != -1)
     {
       switch (c)
 	{
@@ -1029,6 +1030,8 @@ main (int argc, char **argv)
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
 	default:
+	  if (ISDIGIT (c))
+	    error (0, 0, _("invalid trailing option -- %c"), c);
 	  usage (EXIT_FAILURE);
 	}
     }

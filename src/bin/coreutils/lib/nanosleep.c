@@ -1,5 +1,7 @@
 /* Provide a replacement for the POSIX nanosleep function.
-   Copyright (C) 1999, 2000, 2002, 2004, 2005 Free Software Foundation, Inc.
+
+   Copyright (C) 1999, 2000, 2002, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +19,7 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Undefine nanosleep here so any prototype is not redefined to be a
    prototype for rpl_nanosleep. (they'd conflict e.g., on alpha-dec-osf3.2)  */
@@ -28,7 +28,21 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
+#if HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif
 #include <signal.h>
+
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 
 #include <errno.h>
 
@@ -36,16 +50,74 @@
 
 #include "timespec.h"
 
+enum { BILLION = 1000 * 1000 * 1000 };
+
+#if HAVE_BUG_BIG_NANOSLEEP
+
+void
+getnow (struct timespec *t)
+{
+# if defined CLOCK_MONOTONIC && HAVE_CLOCK_GETTIME
+  if (clock_gettime (CLOCK_MONOTONIC, t) == 0)
+    return;
+# endif
+  gettime (t);
+}
+
+int
+rpl_nanosleep (const struct timespec *requested_delay,
+	       struct timespec *remaining_delay)
+{
+  /* nanosleep mishandles large sleeps due to internal overflow
+     problems, so check that the proper amount of time has actually
+     elapsed.  */
+
+  struct timespec delay = *requested_delay;
+  struct timespec t0;
+  getnow (&t0);
+
+  for (;;)
+    {
+      int r = nanosleep (&delay, remaining_delay);
+      if (r == 0)
+	{
+	  time_t secs_sofar;
+	  struct timespec now;
+	  getnow (&now);
+
+	  secs_sofar = now.tv_sec - t0.tv_sec;
+	  if (requested_delay->tv_sec < secs_sofar)
+	    return 0;
+	  delay.tv_sec = requested_delay->tv_sec - secs_sofar;
+	  delay.tv_nsec = requested_delay->tv_nsec - (now.tv_nsec - t0.tv_nsec);
+	  if (delay.tv_nsec < 0)
+	    {
+	      if (delay.tv_sec == 0)
+		return 0;
+	      delay.tv_nsec += BILLION;
+	      delay.tv_sec--;
+	    }
+	  else if (BILLION <= delay.tv_nsec)
+	    {
+	      delay.tv_nsec -= BILLION;
+	      delay.tv_sec++;
+	    }
+	}
+    }
+}
+
+#else
+
 /* Some systems (MSDOS) don't have SIGCONT.
    Using SIGTERM here turns the signal-handling code below
    into a no-op on such systems. */
-#ifndef SIGCONT
-# define SIGCONT SIGTERM
-#endif
+# ifndef SIGCONT
+#  define SIGCONT SIGTERM
+# endif
 
-#if ! HAVE_SIGINTERRUPT
-# define siginterrupt(sig, flag) /* empty */
-#endif
+# if ! HAVE_SIGINTERRUPT
+#  define siginterrupt(sig, flag) /* empty */
+# endif
 
 static sig_atomic_t volatile suspended;
 
@@ -57,7 +129,7 @@ sighandler (int sig)
   suspended = 1;
 }
 
-/* FIXME: comment */
+/* Suspend execution for at least *TS_DELAY seconds.  */
 
 static void
 my_usleep (const struct timespec *ts_delay)
@@ -67,13 +139,20 @@ my_usleep (const struct timespec *ts_delay)
   tv_delay.tv_usec = (ts_delay->tv_nsec + 999) / 1000;
   if (tv_delay.tv_usec == 1000000)
     {
-      tv_delay.tv_sec++;
-      tv_delay.tv_usec = 0;
+      time_t t1 = tv_delay.tv_sec + 1;
+      if (t1 < tv_delay.tv_sec)
+	tv_delay.tv_usec = 1000000 - 1; /* close enough */
+      else
+	{
+	  tv_delay.tv_sec = t1;
+	  tv_delay.tv_usec = 0;
+	}
     }
   select (0, NULL, NULL, NULL, &tv_delay);
 }
 
-/* FIXME: comment */
+/* Suspend execution for at least *REQUESTED_DELAY seconds.  The
+   *REMAINING_DELAY part isn't implemented yet.  */
 
 int
 rpl_nanosleep (const struct timespec *requested_delay,
@@ -84,7 +163,7 @@ rpl_nanosleep (const struct timespec *requested_delay,
   /* set up sig handler */
   if (! initialized)
     {
-#ifdef SA_NOCLDSTOP
+# ifdef SA_NOCLDSTOP
       struct sigaction oldact, newact;
       newact.sa_handler = sighandler;
       sigemptyset (&newact.sa_mask);
@@ -93,13 +172,13 @@ rpl_nanosleep (const struct timespec *requested_delay,
       sigaction (SIGCONT, NULL, &oldact);
       if (oldact.sa_handler != SIG_IGN)
 	sigaction (SIGCONT, &newact, NULL);
-#else
+# else
       if (signal (SIGCONT, SIG_IGN) != SIG_IGN)
 	{
 	  signal (SIGCONT, sighandler);
 	  siginterrupt (SIGCONT, 1);
 	}
-#endif
+# endif
       initialized = true;
     }
 
@@ -120,3 +199,4 @@ rpl_nanosleep (const struct timespec *requested_delay,
 
   return suspended;
 }
+#endif

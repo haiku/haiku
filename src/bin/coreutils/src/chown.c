@@ -1,5 +1,5 @@
 /* chown -- change user and group ownership of files
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 #include "chown-core.h"
 #include "error.h"
 #include "fts_.h"
-#include "lchown.h"
 #include "quote.h"
 #include "root-dev-ino.h"
 #include "userspec.h"
@@ -101,8 +100,8 @@ Change the owner and/or group of each FILE to OWNER and/or GROUP.\n\
 With --reference, change the owner and group of each FILE to those of RFILE.\n\
 \n\
   -c, --changes          like verbose but report only when a change is made\n\
-      --dereference      affect the referent of each symbolic link, rather\n\
-                         than the symbolic link itself (this is the default)\n\
+      --dereference      affect the referent of each symbolic link (this is\n\
+                         the default), rather than the symbolic link itself\n\
 "), stdout);
       fputs (_("\
   -h, --no-dereference   affect each symbolic link instead of any referenced\n\
@@ -117,13 +116,13 @@ With --reference, change the owner and group of each FILE to those of RFILE.\n\
                          is not required for the omitted attribute.\n\
 "), stdout);
       fputs (_("\
-      --no-preserve-root do not treat `/' specially (the default)\n\
+      --no-preserve-root  do not treat `/' specially (the default)\n\
       --preserve-root    fail to operate recursively on `/'\n\
 "), stdout);
       fputs (_("\
   -f, --silent, --quiet  suppress most error messages\n\
       --reference=RFILE  use RFILE's owner and group rather than\n\
-                         the specifying OWNER:GROUP values\n\
+                         specifying OWNER:GROUP values\n\
   -R, --recursive        operate on files and directories recursively\n\
   -v, --verbose          output a diagnostic for every file processed\n\
 \n\

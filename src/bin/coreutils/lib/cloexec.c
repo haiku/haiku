@@ -1,5 +1,6 @@
 /* closexec.c - set or clear the close-on-exec descriptor flag
-   Copyright (C) 1991, 2004, 2005 Free Software Foundation, Inc.
+
+   Copyright (C) 1991, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +18,7 @@
 
    The code is taken from glibc/manual/llio.texi  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "cloexec.h"
 

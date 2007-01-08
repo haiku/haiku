@@ -1,5 +1,5 @@
 /* Decomposed printf argument list.
-   Copyright (C) 1999, 2002-2003 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2003, 2005-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +15,7 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "printf-args.h"
@@ -58,7 +56,7 @@ printf_fetchargs (va_list args, arguments *a)
       case TYPE_ULONGINT:
 	ap->a.a_ulongint = va_arg (args, unsigned long int);
 	break;
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
       case TYPE_LONGLONGINT:
 	ap->a.a_longlongint = va_arg (args, long long int);
 	break;
@@ -79,15 +77,40 @@ printf_fetchargs (va_list args, arguments *a)
 	break;
 #ifdef HAVE_WINT_T
       case TYPE_WIDE_CHAR:
-	ap->a.a_wide_char = va_arg (args, wint_t);
+	/* Although ISO C 99 7.24.1.(2) says that wint_t is "unchanged by
+	   default argument promotions", this is not the case in mingw32,
+	   where wint_t is 'unsigned short'.  */
+	ap->a.a_wide_char =
+	  (sizeof (wint_t) < sizeof (int)
+	   ? va_arg (args, int)
+	   : va_arg (args, wint_t));
 	break;
 #endif
       case TYPE_STRING:
 	ap->a.a_string = va_arg (args, const char *);
+	/* A null pointer is an invalid argument for "%s", but in practice
+	   it occurs quite frequently in printf statements that produce
+	   debug output.  Use a fallback in this case.  */
+	if (ap->a.a_string == NULL)
+	  ap->a.a_string = "(NULL)";
 	break;
 #ifdef HAVE_WCHAR_T
       case TYPE_WIDE_STRING:
 	ap->a.a_wide_string = va_arg (args, const wchar_t *);
+	/* A null pointer is an invalid argument for "%ls", but in practice
+	   it occurs quite frequently in printf statements that produce
+	   debug output.  Use a fallback in this case.  */
+	if (ap->a.a_wide_string == NULL)
+	  {
+	    static const wchar_t wide_null_string[] =
+	      {
+		(wchar_t)'(',
+		(wchar_t)'N', (wchar_t)'U', (wchar_t)'L', (wchar_t)'L',
+		(wchar_t)')',
+		(wchar_t)0
+	      };
+	    ap->a.a_wide_string = wide_null_string;
+	  }
 	break;
 #endif
       case TYPE_POINTER:
@@ -105,7 +128,7 @@ printf_fetchargs (va_list args, arguments *a)
       case TYPE_COUNT_LONGINT_POINTER:
 	ap->a.a_count_longint_pointer = va_arg (args, long int *);
 	break;
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
       case TYPE_COUNT_LONGLONGINT_POINTER:
 	ap->a.a_count_longlongint_pointer = va_arg (args, long long int *);
 	break;

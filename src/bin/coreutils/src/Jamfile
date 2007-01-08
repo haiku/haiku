@@ -4,15 +4,15 @@ SubDir HAIKU_TOP src bin coreutils src ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
-SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirCcFlags -DHAVE_CONFIG_H ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 
 local coreutils_rsrc = [ FGristFiles coreutils.rsrc ] ;
 
 ResComp $(coreutils_rsrc) : [ FGristFiles coreutils.rdef ] ;
 
 StdBinCommands
+	base64.c
 	basename.c
 	cat.c
 	cksum.c
@@ -53,7 +53,9 @@ StdBinCommands
 	rmdir.c
 	seq.c
 	shred.c
+	shuf.c
 	split.c
+	stat.c
 	stty.c
 	su.c
 	sum.c
@@ -69,6 +71,7 @@ StdBinCommands
 	unexpand.c
 	uniq.c
 	unlink.c
+#	uptime.c
 	wc.c
 	whoami.c
 	yes.c
@@ -93,13 +96,10 @@ StdBinCommands
 	sort.c
         : libfetish.a libroot.so : $(coreutils_rsrc) ;
 
-# stat.c
 # chroot.c
 # df.c
 # hostid.c
-# nice.c
 # pinky.c
-# uptime.c
 # users.c
 # who.c
 
@@ -120,15 +120,16 @@ BinCommand chown :
 BinCommand cp : 
 	cp.c copy.c cp-hash.c : libfetish.a : $(coreutils_rsrc) ;
 
-BinCommand md5sum : 
-	md5sum.c md5.c : libfetish.a : $(coreutils_rsrc) ;
-
 BinCommand mv : 
 	mv.c [ FGristFiles copy.o cp-hash.o remove.o ]
 	: libfetish.a libroot.so : $(coreutils_rsrc) ;
 
-BinCommand sha1sum : 
-	md5sum.c sha1sum.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand md5sum : md5sum-md5sum.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand sha1sum : md5sum-sha1sum.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand sha224sum : md5sum-sha224sum.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand sha256sum : md5sum-sha256sum.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand sha384sum : md5sum-sha384sum.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand sha512sum : md5sum-sha512sum.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand vdir : 
 	[ FGristFiles ls.o ] ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;

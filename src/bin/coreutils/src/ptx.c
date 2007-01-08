@@ -1,5 +1,5 @@
 /* Permuted index for GNU, with keywords in their context.
-   Copyright (C) 1990, 1991, 1993, 1998-2005 Free Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1993, 1998-2006 Free Software Foundation, Inc.
    François Pinard <pinard@iro.umontreal.ca>, 1988.
 
    This program is free software; you can redistribute it and/or modify
@@ -95,13 +95,23 @@ static enum Format output_format = UNKNOWN_FORMAT;
 				/* output format */
 
 static bool ignore_case = false;	/* fold lower to upper for sorting */
-static const char *context_regex_string = NULL;
-				/* raw regex for end of context */
-static const char *word_regex_string = NULL;
-				/* raw regex for a keyword */
 static const char *break_file = NULL;	/* name of the `Break characters' file */
 static const char *only_file = NULL;	/* name of the `Only words' file */
 static const char *ignore_file = NULL;	/* name of the `Ignore words' file */
+
+/* Options that use regular expressions.  */
+struct regex_data
+{
+  /* The original regular expression, as a string.  */
+  char const *string;
+
+  /* The compiled regular expression, and its fastmap.  */
+  struct re_pattern_buffer pattern;
+  char fastmap[UCHAR_MAX + 1];
+};
+
+static struct regex_data context_regex;	/* end of context */
+static struct regex_data word_regex;	/* keyword */
 
 /* A BLOCK delimit a region in memory of arbitrary size, like the copy of a
    whole file.  A WORD is something smaller, its length should fit in a
@@ -134,14 +144,8 @@ WORD_TABLE;
 /* For each character, provide its folded equivalent.  */
 static unsigned char folded_chars[CHAR_SET_SIZE];
 
-/* Compiled regex for end of context.  */
-static struct re_pattern_buffer *context_regex;
-
 /* End of context pattern register indices.  */
 static struct re_registers context_regs;
-
-/* Compiled regex for a keyword.  */
-static struct re_pattern_buffer *word_regex;
 
 /* Keyword pattern register indices.  */
 static struct re_registers word_regs;
@@ -176,22 +180,22 @@ static BLOCK text_buffer;	/* file to study */
 /* SKIP_NON_WHITE used only for getting or skipping the reference.  */
 
 #define SKIP_NON_WHITE(cursor, limit) \
-  while (cursor < limit && !ISSPACE(*cursor))				\
+  while (cursor < limit && ! isspace (to_uchar (*cursor)))		\
     cursor++
 
 #define SKIP_WHITE(cursor, limit) \
-  while (cursor < limit && ISSPACE(*cursor))				\
+  while (cursor < limit && isspace (to_uchar (*cursor)))		\
     cursor++
 
 #define SKIP_WHITE_BACKWARDS(cursor, start) \
-  while (cursor > start && ISSPACE(cursor[-1]))				\
+  while (cursor > start && isspace (to_uchar (cursor[-1])))		\
     cursor--
 
 #define SKIP_SOMETHING(cursor, limit) \
-  if (word_regex_string)						\
+  if (word_regex.string)						\
     {									\
       regoff_t count;							\
-      count = re_match (word_regex, cursor, limit - cursor, 0, NULL);	\
+      count = re_match (&word_regex.pattern, cursor, limit - cursor, 0, NULL); \
       if (count == -2)							\
         matcher_error ();						\
       cursor += count == -1 ? 1 : count;				\
@@ -315,7 +319,7 @@ copy_unescaped_string (const char *string)
 	  case 'x':		/* \xhhh escape, 3 chars maximum */
 	    value = 0;
 	    for (length = 0, string++;
-		 length < 3 && ISXDIGIT (*string);
+		 length < 3 && isxdigit (to_uchar (*string));
 		 length++, string++)
 	      value = value * 16 + HEXTOBIN (*string);
 	    if (length == 0)
@@ -397,26 +401,23 @@ copy_unescaped_string (const char *string)
   return result;
 }
 
-/*-------------------------------------------------------------------.
-| Compile the regex represented by STRING, diagnose and abort if any |
-| error.  Returns the compiled regex structure.			     |
-`-------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------.
+| Compile the regex represented by REGEX, diagnose and abort if any error.  |
+`--------------------------------------------------------------------------*/
 
-static struct re_pattern_buffer *
-alloc_and_compile_regex (const char *string)
+static void
+compile_regex (struct regex_data *regex)
 {
-  struct re_pattern_buffer *pattern; /* newly allocated structure */
-  const char *message;		/* error message returned by regex.c */
-
-  pattern = xmalloc (sizeof *pattern);
-  memset (pattern, 0, sizeof *pattern);
+  struct re_pattern_buffer *pattern = &regex->pattern;
+  char const *string = regex->string;
+  char const *message;
 
   pattern->buffer = NULL;
   pattern->allocated = 0;
-  pattern->translate = ignore_case ? (char *) folded_chars : NULL;
-  pattern->fastmap = xmalloc ((size_t) CHAR_SET_SIZE);
+  pattern->fastmap = regex->fastmap;
+  pattern->translate = ignore_case ? folded_chars : NULL;
 
-  message = re_compile_pattern (string, (int) strlen (string), pattern);
+  message = re_compile_pattern (string, strlen (string), pattern);
   if (message)
     error (EXIT_FAILURE, 0, _("%s (for regexp %s)"), message, quote (string));
 
@@ -425,13 +426,6 @@ alloc_and_compile_regex (const char *string)
      and it compiles the fastmap if this has not been done yet.  */
 
   re_compile_fastmap (pattern);
-
-  /* Do not waste extra allocated space.  */
-
-  pattern->buffer = xrealloc (pattern->buffer, pattern->used);
-  pattern->allocated = pattern->used;
-
-  return pattern;
 }
 
 /*------------------------------------------------------------------------.
@@ -448,7 +442,7 @@ initialize_regex (void)
 
   if (ignore_case)
     for (character = 0; character < CHAR_SET_SIZE; character++)
-      folded_chars[character] = TOUPPER (character);
+      folded_chars[character] = toupper (character);
 
   /* Unless the user already provided a description of the end of line or
      end of sentence sequence, select an end of line sequence to compile.
@@ -457,18 +451,18 @@ initialize_regex (void)
      extensions are enabled, use end of sentence like in GNU emacs.  If
      disabled, use end of lines.  */
 
-  if (context_regex_string)
+  if (context_regex.string)
     {
-      if (!*context_regex_string)
-	context_regex_string = NULL;
+      if (!*context_regex.string)
+	context_regex.string = NULL;
     }
   else if (gnu_extensions & !input_reference)
-    context_regex_string = "[.?!][]\"')}]*\\($\\|\t\\|  \\)[ \t\n]*";
+    context_regex.string = "[.?!][]\"')}]*\\($\\|\t\\|  \\)[ \t\n]*";
   else
-    context_regex_string = "\n";
+    context_regex.string = "\n";
 
-  if (context_regex_string)
-    context_regex = alloc_and_compile_regex (context_regex_string);
+  if (context_regex.string)
+    compile_regex (&context_regex);
 
   /* If the user has already provided a non-empty regexp to describe
      words, compile it.  Else, unless this has already been done through
@@ -478,8 +472,8 @@ initialize_regex (void)
      include almost everything, even punctuations; stop only on white
      space.  */
 
-  if (word_regex_string && *word_regex_string)
-    word_regex = alloc_and_compile_regex (word_regex_string);
+  if (word_regex.string)
+    compile_regex (&word_regex);
   else if (!break_file)
     {
       if (gnu_extensions)
@@ -488,7 +482,7 @@ initialize_regex (void)
 	  /* Simulate \w+.  */
 
 	  for (character = 0; character < CHAR_SET_SIZE; character++)
-	    word_fastmap[character] = ISALPHA (character) ? 1 : 0;
+	    word_fastmap[character] = !! isalpha (character);
 	}
       else
 	{
@@ -880,8 +874,9 @@ find_occurs_in_text (void)
 	 sentence at the end of the buffer.  */
 
       next_context_start = text_buffer.end;
-      if (context_regex_string)
-	switch (re_search (context_regex, cursor, text_buffer.end - cursor,
+      if (context_regex.string)
+	switch (re_search (&context_regex.pattern, cursor,
+			   text_buffer.end - cursor,
 			   0, text_buffer.end - cursor, &context_regs))
 	  {
 	  case -2:
@@ -907,14 +902,15 @@ find_occurs_in_text (void)
 
       while (1)
 	{
-	  if (word_regex)
+	  if (word_regex.string)
 
 	    /* If a word regexp has been compiled, use it to skip at the
 	       beginning of the next word.  If there is no such word, exit
 	       the loop.  */
 
 	    {
-	      regoff_t r = re_search (word_regex, cursor, context_end - cursor,
+	      regoff_t r = re_search (&word_regex.pattern, cursor,
+				      context_end - cursor,
 				      0, context_end - cursor, &word_regs);
 	      if (r == -2)
 		matcher_error ();
@@ -1374,7 +1370,7 @@ fix_output_parameters (void)
      form feed as a space character, but we do.  */
 
   for (character = 0; character < CHAR_SET_SIZE; character++)
-    edited_flag[character] = ISSPACE (character) != 0;
+    edited_flag[character] = !! isspace (character);
   edited_flag['\f'] = 1;
 
   /* Complete the special character flagging according to selected output
@@ -1897,7 +1893,6 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
   -A, --auto-reference           output automatically generated references\n\
-  -C, --copyright                display Copyright and copying conditions\n\
   -G, --traditional              behave more like System V `ptx'\n\
   -F, --flag-truncation=STRING   use STRING for flagging line truncations\n\
 "), stdout);
@@ -1942,7 +1937,7 @@ static const struct option long_options[] =
 {
   {"auto-reference", no_argument, NULL, 'A'},
   {"break-file", required_argument, NULL, 'b'},
-  {"copyright", no_argument, NULL, 'C'},
+  {"copyright", no_argument, NULL, 'C'}, /* Deprecated, remove in 2007.  */
   {"flag-truncation", required_argument, NULL, 'F'},
   {"ignore-case", no_argument, NULL, 'f'},
   {"gap-size", required_argument, NULL, 'g'},
@@ -2000,29 +1995,6 @@ main (int argc, char **argv)
 	{
 	default:
 	  usage (EXIT_FAILURE);
-
-	case 'C':
-	  fputs (_("\
-This program is free software; you can redistribute it and/or modify\n\
-it under the terms of the GNU General Public License as published by\n\
-the Free Software Foundation; either version 2, or (at your option)\n\
-any later version.\n\
-\n\
-"), stdout);
-	  fputs (_("\
-This program is distributed in the hope that it will be useful,\n\
-but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-GNU General Public License for more details.\n\
-\n\
-"), stdout);
-	  fputs (_("\
-You should have received a copy of the GNU General Public License\n\
-along with this program; if not, write to the Free Software Foundation,\n\
-Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n"),
-		 stdout);
-
-	  exit (EXIT_SUCCESS);
 
 	case 'G':
 	  gnu_extensions = false;
@@ -2095,7 +2067,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n"),
 	  break;
 
 	case 'S':
-	  context_regex_string = copy_unescaped_string (optarg);
+	  context_regex.string = copy_unescaped_string (optarg);
 	  break;
 
 	case 'T':
@@ -2103,7 +2075,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n"),
 	  break;
 
 	case 'W':
-	  word_regex_string = copy_unescaped_string (optarg);
+	  word_regex.string = copy_unescaped_string (optarg);
+	  if (!*word_regex.string)
+	    word_regex.string = NULL;
 	  break;
 
 	case 10:
@@ -2111,16 +2085,14 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n"),
 				     format_args, format_vals);
 	case_GETOPT_HELP_CHAR;
 
+	case 'C':
+	  error (0, 0, _("\
+the --copyright option is deprecated; use --version instead"));
+          /* fallthrough */
+
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 	}
     }
-
-  /* Change the default Ignore file if one is defined.  */
-
-#ifdef DEFAULT_IGNORE_FILE
-  if (!ignore_file)
-    ignore_file = DEFAULT_IGNORE_FILE;
-#endif
 
   /* Process remaining arguments.  If GNU extensions are enabled, process
      all arguments as input parameters.  If disabled, accept at most two

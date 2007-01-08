@@ -1,5 +1,5 @@
 /* nl -- number lines of files
-   Copyright (C) 89, 92, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 92, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -64,16 +64,16 @@ enum section
 char *program_name;
 
 /* Format of body lines (-b).  */
-static char *body_type = "t";
+static char const *body_type = "t";
 
 /* Format of header lines (-h).  */
-static char *header_type = "n";
+static char const *header_type = "n";
 
 /* Format of footer lines (-f).  */
-static char *footer_type = "n";
+static char const *footer_type = "n";
 
 /* Format currently being used (body, header, or footer).  */
-static char *current_type;
+static char const *current_type;
 
 /* Regex for body lines to number (-bp).  */
 static struct re_pattern_buffer body_regex;
@@ -84,11 +84,16 @@ static struct re_pattern_buffer header_regex;
 /* Regex for footer lines to number (-fp).  */
 static struct re_pattern_buffer footer_regex;
 
+/* Fastmaps for the above.  */
+static char body_fastmap[UCHAR_MAX + 1];
+static char header_fastmap[UCHAR_MAX + 1];
+static char footer_fastmap[UCHAR_MAX + 1];
+
 /* Pointer to current regex, if any.  */
 static struct re_pattern_buffer *current_regex = NULL;
 
 /* Separator string to print after line number (-s).  */
-static char *separator_str = "\t";
+static char const *separator_str = "\t";
 
 /* Input section delimiter string (-d).  */
 static char const *section_del = DEFAULT_SECTION_DELIMITERS;
@@ -230,11 +235,11 @@ FORMAT is one of:\n\
    according to `optarg'.  */
 
 static bool
-build_type_arg (char **typep, struct re_pattern_buffer *regexp)
+build_type_arg (char const **typep,
+		struct re_pattern_buffer *regexp, char *fastmap)
 {
-  const char *errmsg;
+  char const *errmsg;
   bool rval = true;
-  size_t optlen;
 
   switch (*optarg)
     {
@@ -245,13 +250,13 @@ build_type_arg (char **typep, struct re_pattern_buffer *regexp)
       break;
     case 'p':
       *typep = optarg++;
-      optlen = strlen (optarg);
-      regexp->allocated = optlen * 2;
-      regexp->buffer = xnmalloc (optlen, 2);
+      regexp->buffer = NULL;
+      regexp->allocated = 0;
+      regexp->fastmap = fastmap;
       regexp->translate = NULL;
-      regexp->fastmap = xmalloc (256);
-      regexp->fastmap_accurate = 0;
-      errmsg = re_compile_pattern (optarg, optlen, regexp);
+      re_syntax_options =
+	RE_SYNTAX_POSIX_BASIC & ~RE_CONTEXT_INVALID_DUP & ~RE_NO_EMPTY_RANGES;
+      errmsg = re_compile_pattern (optarg, strlen (optarg), regexp);
       if (errmsg)
 	error (EXIT_FAILURE, 0, "%s", errmsg);
       break;
@@ -410,7 +415,7 @@ process_file (FILE *fp)
    Return true if successful.  */
 
 static bool
-nl_file (const char *file)
+nl_file (char const *file)
 {
   FILE *stream;
 
@@ -469,7 +474,7 @@ main (int argc, char **argv)
       switch (c)
 	{
 	case 'h':
-	  if (! build_type_arg (&header_type, &header_regex))
+	  if (! build_type_arg (&header_type, &header_regex, header_fastmap))
 	    {
 	      error (0, 0, _("invalid header numbering style: %s"),
 		     quote (optarg));
@@ -477,7 +482,7 @@ main (int argc, char **argv)
 	    }
 	  break;
 	case 'b':
-	  if (! build_type_arg (&body_type, &body_regex))
+	  if (! build_type_arg (&body_type, &body_regex, body_fastmap))
 	    {
 	      error (0, 0, _("invalid body numbering style: %s"),
 		     quote (optarg));
@@ -485,7 +490,7 @@ main (int argc, char **argv)
 	    }
 	  break;
 	case 'f':
-	  if (! build_type_arg (&footer_type, &footer_regex))
+	  if (! build_type_arg (&footer_type, &footer_regex, footer_fastmap))
 	    {
 	      error (0, 0, _("invalid footer numbering style: %s"),
 		     quote (optarg));

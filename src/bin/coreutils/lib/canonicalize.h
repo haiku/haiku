@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2005 Free Software Foundation, Inc.
+   Copyright (C) 1996-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #ifndef CANONICALIZE_H_
 # define CANONICALIZE_H_
 
+# ifdef PROVIDE_CANONICALIZE_FILENAME_MODE
 enum canonicalize_mode_t
   {
     /* All components must exist.  */
@@ -32,9 +33,21 @@ enum canonicalize_mode_t
   };
 typedef enum canonicalize_mode_t canonicalize_mode_t;
 
+/* Return a malloc'd string containing the canonical absolute name of
+   the named file.  This acts like canonicalize_file_name, except that
+   whether components must exist depends on the canonicalize_mode_t
+   argument.  */
 char *canonicalize_filename_mode (const char *, canonicalize_mode_t);
+# endif
 
-# if !HAVE_CANONICALIZE_FILE_NAME
+# if HAVE_DECL_CANONICALIZE_FILE_NAME
+#  include <stdlib.h>
+# else
+/* Return a malloc'd string containing the canonical absolute name of
+   the named file.  If any file name component does not exist or is a
+   symlink to a nonexistent file, return NULL.  A canonical name does
+   not contain any `.', `..' components nor any repeated file name
+   separators ('/') or symlinks.  */
 char *canonicalize_file_name (const char *);
 # endif
 

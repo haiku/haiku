@@ -23,11 +23,9 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <getopt.h>
-#include <assert.h>
 
 #include "system.h"
 #include "canonicalize.h"
-#include "dirname.h"
 #include "error.h"
 #include "fsusage.h"
 #include "human.h"
@@ -68,6 +66,9 @@ static uintmax_t output_block_size;
 
 /* If true, use the POSIX output format.  */
 static bool posix_format;
+
+/* True if a file system has been processed for output.  */
+static bool file_systems_processed;
 
 /* If true, invoke the `sync' system call before getting any usage data.
    Using this option can make df very slow, especially with many or very
@@ -161,7 +162,7 @@ print_header (void)
 	printf (_("     Size   Used  Avail Use%%"));
     }
   else if (posix_format)
-    printf (_(" %4s-blocks      Used Available Capacity"),
+    printf (_(" %s-blocks      Used Available Capacity"),
 	    umaxtostr (output_block_size, buf));
   else
     {
@@ -232,15 +233,15 @@ excluded_fstype (const char *fstype)
 /* Like human_readable (N, BUF, human_output_opts, INPUT_UNITS, OUTPUT_UNITS),
    except:
 
-    - Return "-" if N is -1,
-    - If NEGATIVE is 1 then N represents a negative number,
-      expressed in two's complement.  */
+    - If NEGATIVE, then N represents a negative number,
+      expressed in two's complement.
+    - Otherwise, return "-" if N is UINTMAX_MAX.  */
 
 static char const *
 df_readable (bool negative, uintmax_t n, char *buf,
 	     uintmax_t input_units, uintmax_t output_units)
 {
-  if (n == UINTMAX_MAX)
+  if (n == UINTMAX_MAX && !negative)
     return "-";
   else
     {
@@ -273,6 +274,7 @@ show_dev (char const *disk, char const *mount_point,
   struct fs_usage fsu;
   char buf[3][LONGEST_HUMAN_READABLE + 2];
   int width;
+  int col1_adjustment = 0;
   int use_width;
   uintmax_t input_units;
   uintmax_t output_units;
@@ -309,6 +311,12 @@ show_dev (char const *disk, char const *mount_point,
 
   if (fsu.fsu_blocks == 0 && !show_all_fs && !show_listed_fs)
     return;
+
+  if (! file_systems_processed)
+    {
+      file_systems_processed = true;
+      print_header ();
+    }
 
   if (! disk)
     disk = "-";			/* unknown */
@@ -348,9 +356,19 @@ show_dev (char const *disk, char const *mount_point,
     }
   else
     {
-      width = (human_output_opts & human_autoscale
-	       ? 5 + ! (human_output_opts & human_base_1024)
-	       : 9);
+      if (human_output_opts & human_autoscale)
+	width = 5 + ! (human_output_opts & human_base_1024);
+      else
+	{
+	  width = 9;
+	  if (posix_format)
+	    {
+	      uintmax_t b;
+	      col1_adjustment = -3;
+	      for (b = output_block_size; 9 < b; b /= 10)
+		col1_adjustment++;
+	    }
+	}
       use_width = ((posix_format
 		    && ! (human_output_opts & human_autoscale))
 		   ? 8 : 4);
@@ -358,25 +376,23 @@ show_dev (char const *disk, char const *mount_point,
       output_units = output_block_size;
       total = fsu.fsu_blocks;
       available = fsu.fsu_bavail;
-      negate_available = fsu.fsu_bavail_top_bit_set;
+      negate_available = (fsu.fsu_bavail_top_bit_set
+			  & (available != UINTMAX_MAX));
       available_to_root = fsu.fsu_bfree;
     }
 
-  used = -1;
+  used = UINTMAX_MAX;
   negate_used = false;
   if (total != UINTMAX_MAX && available_to_root != UINTMAX_MAX)
     {
       used = total - available_to_root;
-      if (total < available_to_root)
-	{
-	  negate_used = true;
-	  used = - used;
-	}
+      negate_used = (total < available_to_root);
     }
 
   printf (" %*s %*s %*s ",
-	  width, df_readable (false, total,
-			      buf[0], input_units, output_units),
+	  width + col1_adjustment,
+	  df_readable (false, total,
+		       buf[0], input_units, output_units),
 	  width, df_readable (negate_used, used,
 			      buf[1], input_units, output_units),
 	  width, df_readable (negate_available, available,
@@ -766,7 +782,6 @@ main (int argc, char **argv)
 {
   int c;
   struct stat *stats IF_LINT (= 0);
-  int n_valid_args = 0;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -786,6 +801,7 @@ main (int argc, char **argv)
 				     &output_block_size);
 
   print_type = false;
+  file_systems_processed = false;
   posix_format = false;
   exit_status = EXIT_SUCCESS;
 
@@ -898,10 +914,6 @@ main (int argc, char **argv)
 	      exit_status = EXIT_FAILURE;
 	      argv[i] = NULL;
 	    }
-	  else
-	    {
-	      ++n_valid_args;
-	    }
 	}
     }
 
@@ -932,18 +944,15 @@ main (int argc, char **argv)
       /* Display explicitly requested empty file systems. */
       show_listed_fs = true;
 
-      if (n_valid_args > 0)
-	print_header ();
-
       for (i = optind; i < argc; ++i)
 	if (argv[i])
 	  show_entry (argv[i], &stats[i - optind]);
     }
   else
-    {
-      print_header ();
-      show_all_entries ();
-    }
+    show_all_entries ();
+
+  if (! file_systems_processed)
+    error (EXIT_FAILURE, 0, _("no file systems processed"));
 
   exit (exit_status);
 }

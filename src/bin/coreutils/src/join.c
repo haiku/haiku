@@ -1,5 +1,5 @@
 /* join - join lines of two files on a common field
-   Copyright (C) 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ by whitespace.  When FILE1 or FILE2 (not both) is -, read standard input.\n\
   -e EMPTY          replace missing input fields with EMPTY\n\
 "), stdout);
       fputs (_("\
-  -i, --ignore-case ignore differences in case when comparing fields\n\
+  -i, --ignore-case  ignore differences in case when comparing fields\n\
   -j FIELD          equivalent to `-1 FIELD -2 FIELD'\n\
   -o FORMAT         obey FORMAT while constructing output line\n\
   -t CHAR           use CHAR as input and output field separator\n\
@@ -167,18 +167,11 @@ the remaining fields from FILE1, the remaining fields from FILE2, all\n\
 separated by CHAR.\n\
 \n\
 Important: FILE1 and FILE2 must be sorted on the join fields.\n\
+E.g., use `sort -k 1b,1' if `join' has no options.\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
-}
-
-/* Return true if C is a blank (a default input field separator).  */
-
-static inline bool
-is_blank (unsigned char c)
-{
-  return ISBLANK (c) != 0;
 }
 
 /* Record a field in LINE, with location FIELD and size LEN.  */
@@ -215,19 +208,19 @@ xfields (struct line *line)
   else
     {
       /* Skip leading blanks before the first field.  */
-      while (is_blank (*ptr))
+      while (isblank (to_uchar (*ptr)))
 	if (++ptr == lim)
 	  return;
 
       do
 	{
 	  char *sep;
-	  for (sep = ptr + 1; sep != lim && ! is_blank (*sep); sep++)
+	  for (sep = ptr + 1; sep != lim && ! isblank (to_uchar (*sep)); sep++)
 	    continue;
 	  extract_field (line, ptr, sep - ptr);
 	  if (sep == lim)
 	    return;
-	  for (ptr = sep + 1; ptr != lim && is_blank (*ptr); ptr++)
+	  for (ptr = sep + 1; ptr != lim && isblank (to_uchar (*ptr)); ptr++)
 	    continue;
 	}
       while (ptr != lim);

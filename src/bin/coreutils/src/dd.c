@@ -1,5 +1,5 @@
 /* dd -- convert a file while copying it.
-   Copyright (C) 85, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 85, 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -263,9 +263,12 @@ static struct symbol_value const flags[] =
   {"append",	O_APPEND},
   {"binary",	O_BINARY},
   {"direct",	O_DIRECT},
+  {"directory",	O_DIRECTORY},
   {"dsync",	O_DSYNC},
+  {"noatime",	HAVE_WORKING_O_NOATIME ? O_NOATIME : 0},
   {"noctty",	O_NOCTTY},
-  {"nofollow",	O_NOFOLLOW},
+  {"nofollow",	HAVE_WORKING_O_NOFOLLOW ? O_NOFOLLOW : 0},
+  {"nolinks",	O_NOLINKS},
   {"nonblock",	O_NONBLOCK},
   {"sync",	O_SYNC},
   {"text",	O_TEXT},
@@ -445,31 +448,39 @@ Each CONV symbol may be:\n\
   notrunc   do not truncate the output file\n\
   ucase     change lower case to upper case\n\
   swab      swap every pair of input bytes\n\
+"), stdout);
+      fputs (_("\
   noerror   continue after read errors\n\
   sync      pad every input block with NULs to ibs-size; when used\n\
               with block or unblock, pad with spaces rather than NULs\n\
-  fdatasync physically write output file data before finishing\n\
+  fdatasync  physically write output file data before finishing\n\
   fsync     likewise, but also write metadata\n\
 "), stdout);
       fputs (_("\
 \n\
 Each FLAG symbol may be:\n\
 \n\
-  append    append mode (makes sense only for output)\n\
+  append    append mode (makes sense only for output; conv=notrunc suggested)\n\
 "), stdout);
       if (O_DIRECT)
 	fputs (_("  direct    use direct I/O for data\n"), stdout);
+      if (O_DIRECTORY)
+	fputs (_("  directory fail unless a directory\n"), stdout);
       if (O_DSYNC)
 	fputs (_("  dsync     use synchronized I/O for data\n"), stdout);
       if (O_SYNC)
 	fputs (_("  sync      likewise, but also for metadata\n"), stdout);
       if (O_NONBLOCK)
 	fputs (_("  nonblock  use non-blocking I/O\n"), stdout);
-      if (O_NOFOLLOW)
-	fputs (_("  nofollow  do not follow symlinks\n"), stdout);
+      if (HAVE_WORKING_O_NOATIME)
+	fputs (_("  noatime   do not update access time\n"), stdout);
       if (O_NOCTTY)
 	fputs (_("  noctty    do not assign controlling terminal from file\n"),
 	       stdout);
+      if (HAVE_WORKING_O_NOFOLLOW)
+	fputs (_("  nofollow  do not follow symlinks\n"), stdout);
+      if (O_NOLINKS)
+	fputs (_("  nolinks   fail if multiply-linked\n"), stdout);
       if (O_BINARY)
 	fputs (_("  binary    use binary I/O for data\n"), stdout);
       if (O_TEXT)
@@ -539,9 +550,9 @@ print_stats (void)
 
   if (r_truncate != 0)
     fprintf (stderr,
-	     ngettext ("1 truncated record\n",
+	     ngettext ("%"PRIuMAX" truncated record\n",
 		       "%"PRIuMAX" truncated records\n",
-		       MIN (r_truncate, ULONG_MAX)),
+		       select_plural (r_truncate)),
 	     r_truncate);
 
   if (status_flags & STATUS_NOXFER)
@@ -551,9 +562,9 @@ print_stats (void)
      since that makes it easy to use SI abbreviations.  */
 
   fprintf (stderr,
-	   ngettext ("1 byte (1 B) copied",
+	   ngettext ("%"PRIuMAX" byte (%s) copied",
 		     "%"PRIuMAX" bytes (%s) copied",
-		     MIN (w_bytes, ULONG_MAX)),
+		     select_plural (w_bytes)),
 	   w_bytes,
 	   human_readable (w_bytes, hbuf, human_opts, 1, 1));
 
@@ -572,10 +583,17 @@ print_stats (void)
       bytes_per_second = _("Infinity B");
     }
 
-  fprintf (stderr,
-	   ngettext (", %g second, %s/s\n",
-		     ", %g seconds, %s/s\n", delta_s == 1),
-	   delta_s, bytes_per_second);
+  /* TRANSLATORS: The two instances of "s" in this string are the SI
+     symbol "s" (meaning second), and should not be translated.
+
+     This format used to be:
+
+     ngettext (", %g second, %s/s\n", ", %g seconds, %s/s\n", delta_s == 1)
+
+     but that was incorrect for languages like Polish.  To fix this
+     bug we now use SI symbols even though they're a bit more
+     confusing in English.  */
+  fprintf (stderr, _(", %g s, %s/s\n"), delta_s, bytes_per_second);
 }
 
 static void
@@ -752,7 +770,6 @@ iwrite (int fd, char const *buf, size_t size)
 	     a device's end.  (Example: Linux 1.2.13 on /dev/fd0.)
 	     Set errno to ENOSPC so they get a sensible diagnostic.  */
 	  errno = ENOSPC;
-	  nwritten = -1;
 	  break;
 	}
       else
@@ -969,15 +986,13 @@ apply_translations (void)
   if (conversions_mask & C_UCASE)
     {
       for (i = 0; i < 256; i++)
-	if (ISLOWER (trans_table[i]))
-	  trans_table[i] = TOUPPER (trans_table[i]);
+	trans_table[i] = toupper (trans_table[i]);
       translation_needed = true;
     }
   else if (conversions_mask & C_LCASE)
     {
       for (i = 0; i < 256; i++)
-	if (ISUPPER (trans_table[i]))
-	  trans_table[i] = TOLOWER (trans_table[i]);
+	trans_table[i] = tolower (trans_table[i]);
       translation_needed = true;
     }
 
@@ -1128,7 +1143,7 @@ skip (int fdesc, char const *file, uintmax_t records, size_t blocksize,
   uintmax_t offset = records * blocksize;
 
   /* Try lseek and if an error indicates it was an inappropriate operation --
-     or if the the file offset is not representable as an off_t --
+     or if the file offset is not representable as an off_t --
      fall back on using read.  */
 
   errno = 0;
@@ -1316,12 +1331,44 @@ copy_with_unblock (char const *buf, size_t nread)
 static void
 set_fd_flags (int fd, int add_flags, char const *name)
 {
+  /* Ignore file creation flags that are no-ops on file descriptors.  */
+  add_flags &= ~ (O_NOCTTY | O_NOFOLLOW);
+
   if (add_flags)
     {
       int old_flags = fcntl (fd, F_GETFL);
       int new_flags = old_flags | add_flags;
-      if (old_flags < 0
-	  || (new_flags != old_flags && fcntl (fd, F_SETFL, new_flags) == -1))
+      bool ok = true;
+      if (old_flags < 0)
+	ok = false;
+      else if (old_flags != new_flags)
+	{
+	  if (new_flags & (O_DIRECTORY | O_NOLINKS))
+	    {
+	      /* NEW_FLAGS contains at least one file creation flag that
+		 requires some checking of the open file descriptor.  */
+	      struct stat st;
+	      if (fstat (fd, &st) != 0)
+		ok = false;
+	      else if ((new_flags & O_DIRECTORY) && ! S_ISDIR (st.st_mode))
+		{
+		  errno = ENOTDIR;
+		  ok = false;
+		}
+	      else if ((new_flags & O_NOLINKS) && 1 < st.st_nlink)
+		{
+		  errno = EMLINK;
+		  ok = false;
+		}
+	      new_flags &= ~ (O_DIRECTORY | O_NOLINKS);
+	    }
+
+	  if (ok && old_flags != new_flags
+	      && fcntl (fd, F_SETFL, new_flags) == -1)
+	    ok = false;
+	}
+
+      if (!ok)
 	error (EXIT_FAILURE, errno, _("setting flags for %s"), quote (name));
     }
 }
@@ -1332,8 +1379,10 @@ static int
 dd_copy (void)
 {
   char *ibuf, *bufstart;	/* Input buffer. */
-  char *real_buf;		/* real buffer address before alignment */
-  char *real_obuf;
+  /* These are declared static so that even though we don't free the
+     buffers, valgrind will recognize that there is no "real" leak.  */
+  static char *real_buf;	/* real buffer address before alignment */
+  static char *real_obuf;
   ssize_t nread;		/* Bytes read in the current block.  */
 
   /* If nonzero, then the previously read block was partial and
@@ -1552,9 +1601,6 @@ dd_copy (void)
 	  return EXIT_FAILURE;
 	}
     }
-
-  free (real_buf);
-  free (real_obuf);
 
   if ((conversions_mask & C_FDATASYNC) && fdatasync (STDOUT_FILENO) != 0)
     {

@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1992, 1997, 1999, 2003 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1992, 1997, 1999, 2003, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,26 +14,11 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 
 #include <ctype.h>
-
-#if defined (STDC_HEADERS) || (!defined (isascii) && !defined (HAVE_ISASCII))
-# define IN_CTYPE_DOMAIN(c) 1
-#else
-# define IN_CTYPE_DOMAIN(c) isascii(c)
-#endif
-
-#define ISSPACE(c) (IN_CTYPE_DOMAIN (c) && isspace (c))
-#define ISDIGIT(c) (IN_CTYPE_DOMAIN (c) && isdigit (c))
-#define TOLOWER(c) (IN_CTYPE_DOMAIN (c) ? tolower(c) : (c))
 
 #include <math.h>
 
@@ -67,7 +52,7 @@ strtod (const char *nptr, char **endptr)
   s = nptr;
 
   /* Eat whitespace.  */
-  while (ISSPACE (*s))
+  while (isspace ((unsigned char) *s))
     ++s;
 
   /* Get the sign.  */
@@ -81,7 +66,7 @@ strtod (const char *nptr, char **endptr)
   exponent = 0;
   for (;; ++s)
     {
-      if (ISDIGIT (*s))
+      if ('0' <= *s && *s <= '9')
 	{
 	  got_digit = 1;
 
@@ -114,7 +99,7 @@ strtod (const char *nptr, char **endptr)
   if (!got_digit)
     goto noconv;
 
-  if (TOLOWER (*s) == 'e')
+  if (tolower ((unsigned char) *s) == 'e')
     {
       /* Get the exponent specified after the `e' or `E'.  */
       int save = errno;

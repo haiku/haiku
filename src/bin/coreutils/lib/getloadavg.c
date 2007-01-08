@@ -1,7 +1,8 @@
 /* Get the system load averages.
 
    Copyright (C) 1985, 1986, 1987, 1988, 1989, 1991, 1992, 1993, 1994,
-   1995, 1997, 1999, 2000, 2003, 2004, 2005 Free Software Foundation, Inc.
+   1995, 1997, 1999, 2000, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with gnulib.
    Bugs can be reported to bug-gnulib@gnu.org.
@@ -80,13 +81,15 @@
    We also #define LDAV_PRIVILEGED if a program will require
    special installation to be able to call getloadavg.  */
 
-/* This should always be first.  */
-#ifdef HAVE_CONFIG_H
+/* "configure" defines CONFIGURING_GETLOADAVG to sidestep problems
+   with partially-configured source directories.  */
+
+#ifndef CONFIGURING_GETLOADAVG
 # include <config.h>
+# include <stdbool.h>
 #endif
 
 #include <errno.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -279,7 +282,7 @@
 # endif
 
 
-# ifndef	FSCALE
+# ifndef FSCALE
 
 /* SunOS and some others define FSCALE in sys/param.h.  */
 
@@ -358,7 +361,7 @@
 
 # ifdef LOAD_AVE_TYPE
 
-#  ifndef VMS
+#  ifndef __VMS
 #   ifndef __linux__
 #    ifndef NLIST_STRUCT
 #     include <a.out.h>
@@ -385,7 +388,7 @@
 #    endif /* LDAV_SYMBOL */
 #   endif /* __linux__ */
 
-#  else /* VMS */
+#  else /* __VMS */
 
 #   ifndef eunice
 #    include <iodef.h>
@@ -393,7 +396,7 @@
 #   else /* eunice */
 #    include <vms/iodef.h>
 #   endif /* eunice */
-#  endif /* VMS */
+#  endif /* __VMS */
 
 #  ifndef LDAV_CVT
 #   define LDAV_CVT(n) ((double) (n))
@@ -473,9 +476,9 @@ static bool getloadavg_initialized;
 /* Offset in kmem to seek to read load average, or 0 means invalid.  */
 static long offset;
 
-#  if !defined (VMS) && !defined (sgi) && !defined (__linux__)
+#  if ! defined __VMS && ! defined sgi && ! defined __linux__
 static struct nlist nl[2];
-#  endif /* Not VMS or sgi */
+#  endif
 
 #  ifdef SUNOS_5
 static kvm_t *kd;
@@ -813,7 +816,7 @@ getloadavg (double loadavg[], int nelem)
 	 : (load_ave.tl_avenrun.l[elem] / (double) load_ave.tl_lscale));
 # endif /* OSF_ALPHA */
 
-# if !defined (LDAV_DONE) && defined (VMS)
+# if ! defined LDAV_DONE && defined __VMS
   /* VMS specific code -- read from the Load Ave driver.  */
 
   LOAD_AVE_TYPE load_ave[3];
@@ -851,9 +854,9 @@ getloadavg (double loadavg[], int nelem)
 
   if (!getloadavg_initialized)
     return -1;
-# endif /* VMS */
+# endif /* ! defined LDAV_DONE && defined __VMS */
 
-# if !defined (LDAV_DONE) && defined (LOAD_AVE_TYPE) && !defined (VMS)
+# if ! defined LDAV_DONE && defined LOAD_AVE_TYPE && ! defined __VMS
 
   /* UNIX-specific code -- read the average from /dev/kmem.  */
 
@@ -953,7 +956,7 @@ getloadavg (double loadavg[], int nelem)
 
   if (offset == 0 || !getloadavg_initialized)
     return -1;
-# endif /* LOAD_AVE_TYPE and not VMS */
+# endif /* ! defined LDAV_DONE && defined LOAD_AVE_TYPE && ! defined __VMS */
 
 # if !defined (LDAV_DONE) && defined (LOAD_AVE_TYPE) /* Including VMS.  */
   if (nelem > 0)

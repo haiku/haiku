@@ -1,11 +1,7 @@
 /* obstack.h - object stack macros
-   Copyright (C) 1988-1994,1996-1999,2003,2004 Free Software Foundation, Inc.
-
-   This file is part of the GNU C Library.  Its master source is NOT part of
-   the C library, however.  The master source lives in /gd/gnu/lib.
-
-   NOTE: The canonical source of this file is maintained with the GNU C Library.
-   Bugs can be reported to bug-glibc@gnu.org.
+   Copyright (C) 1988-1994,1996-1999,2003,2004,2005,2006
+	Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -190,7 +186,12 @@ extern int _obstack_begin_1 (struct obstack *, int, int,
 			     void (*) (void *, void *), void *);
 extern int _obstack_memory_used (struct obstack *);
 
-void obstack_free (struct obstack *obstack, void *block);
+/* The default name of the function for freeing a chunk is 'obstack_free',
+   but gnulib users can override this by defining '__obstack_free'.  */
+#ifndef __obstack_free
+# define __obstack_free obstack_free
+#endif
+extern void __obstack_free (struct obstack *obstack, void *block);
 
 
 /* Error handler called when `obstack_chunk_alloc' failed to allocate
@@ -403,7 +404,7 @@ __extension__								\
    void *__obj = (OBJ);							\
    if (__obj > (void *)__o->chunk && __obj < (void *)__o->chunk_limit)  \
      __o->next_free = __o->object_base = (char *)__obj;			\
-   else (obstack_free) (__o, __obj); })
+   else (__obstack_free) (__o, __obj); })
 
 #else /* not __GNUC__ or not __STDC__ */
 
@@ -464,7 +465,7 @@ __extension__								\
   (((const void **) ((h)->next_free += sizeof (void *)))[-1] = (aptr))
 
 # define obstack_int_grow_fast(h,aint)					\
-  (((int *) ((h)->next_free += sizeof (int)))[-1] = (aptr))
+  (((int *) ((h)->next_free += sizeof (int)))[-1] = (aint))
 
 # define obstack_blank(h,length)					\
 ( (h)->temp.tempint = (length),						\
@@ -501,7 +502,7 @@ __extension__								\
     && (h)->temp.tempint < (h)->chunk_limit - (char *) (h)->chunk))	\
    ? (int) ((h)->next_free = (h)->object_base				\
 	    = (h)->temp.tempint + (char *) (h)->chunk)			\
-   : (((obstack_free) ((h), (h)->temp.tempint + (char *) (h)->chunk), 0), 0)))
+   : (((__obstack_free) ((h), (h)->temp.tempint + (char *) (h)->chunk), 0), 0)))
 
 #endif /* not __GNUC__ or not __STDC__ */
 

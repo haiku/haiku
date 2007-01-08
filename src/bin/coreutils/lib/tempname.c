@@ -1,7 +1,7 @@
 /* tempname.c - generate the name of a temporary file.
 
    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
+   2000, 2001, 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,8 +17,11 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
+/* Extracted from glibc sysdeps/posix/tempname.c.  See also tmpdir.c.  */
+
+#if !_LIBC
 # include <config.h>
+# include "tempname.h"
 #endif
 
 #include <sys/types.h>
@@ -53,27 +56,23 @@
 # include <sys/time.h>
 #endif
 
-#if HAVE_STDINT_H || _LIBC
-# include <stdint.h>
-#endif
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-
+#include <stdint.h>
 #include <unistd.h>
 
 #include <sys/stat.h>
 
 #if _LIBC
 # define struct_stat64 struct stat64
+# define small_open __open
+# define large_open __open64
 #else
-# include "stat-macros.h"
 # define struct_stat64 struct stat
+# define small_open open
+# define large_open open
+# define __gen_tempname gen_tempname
 # define __getpid getpid
 # define __gettimeofday gettimeofday
 # define __mkdir mkdir
-# define __open open
-# define __open64 open
 # define __lxstat64(version, file, buf) lstat (file, buf)
 # define __xstat64(version, file, buf) stat (file, buf)
 #endif
@@ -110,6 +109,7 @@
 # define uint64_t uintmax_t
 #endif
 
+#if _LIBC
 /* Return nonzero if DIR is an existent directory.  */
 static int
 direxists (const char *dir)
@@ -180,6 +180,7 @@ __path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
   sprintf (tmpl, "%.*s/%.*sXXXXXX", (int) dlen, dir, (int) plen, pfx);
   return 0;
 }
+#endif /* _LIBC */
 
 /* These are the characters used in temporary file names.  */
 static const char letters[] =
@@ -217,11 +218,15 @@ __gen_tempname (char *tmpl, int kind)
      necessary to try all these combinations.  Instead if a reasonable
      number of names is tried (we define reasonable as 62**3) fail to
      give the system administrator the chance to remove the problems.  */
-  unsigned int attempts_min = 62 * 62 * 62;
+#define ATTEMPTS_MIN (62 * 62 * 62)
 
   /* The number of times to attempt to generate a temporary file.  To
      conform to POSIX, this must be no smaller than TMP_MAX.  */
-  unsigned int attempts = attempts_min < TMP_MAX ? TMP_MAX : attempts_min;
+#if ATTEMPTS_MIN < TMP_MAX
+  unsigned int attempts = TMP_MAX;
+#else
+  unsigned int attempts = ATTEMPTS_MIN;
+#endif
 
   len = strlen (tmpl);
   if (len < 6 || strcmp (&tmpl[len - 6], "XXXXXX"))
@@ -269,11 +274,11 @@ __gen_tempname (char *tmpl, int kind)
       switch (kind)
 	{
 	case __GT_FILE:
-	  fd = __open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+	  fd = small_open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 	  break;
 
 	case __GT_BIGFILE:
-	  fd = __open64 (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+	  fd = large_open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 	  break;
 
 	case __GT_DIR:

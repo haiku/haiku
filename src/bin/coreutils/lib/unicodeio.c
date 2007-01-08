@@ -1,6 +1,6 @@
 /* Unicode character output to streams with locale dependent encoding.
 
-   Copyright (C) 2000-2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
 /* Note: This file requires the locale_charset() function.  See in
    libiconv-1.8/libcharset/INTEGRATE for how to obtain it.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "unicodeio.h"
 
 #include <stdio.h>
 #include <string.h>
-
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 
 #if HAVE_ICONV
 # include <iconv.h>

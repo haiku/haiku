@@ -1,5 +1,6 @@
 /* gettime -- get the system clock
-   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
+
+   Copyright (C) 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +18,7 @@
 
 /* Written by Paul Eggert.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "timespec.h"
 
@@ -45,8 +44,14 @@ gettime (struct timespec *ts)
     ts->tv_nsec = tv.tv_usec * 1000;
   }
 # else
+
+#  ifndef OK_TO_USE_1S_CLOCK
+#   error "Only 1-second nominal clock resolution found.  Is that intended?" \
+          "If so, compile with the -DOK_TO_USE_1S_CLOCK option."
+#  endif
   ts->tv_sec = time (NULL);
   ts->tv_nsec = 0;
+
 # endif
 
 #endif

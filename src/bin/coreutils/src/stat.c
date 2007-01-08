@@ -1,5 +1,5 @@
 /* stat.c -- display file or file system status
-   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,22 @@
 
 #include <config.h>
 
+/* Keep this conditional in sync with the similar conditional in
+   ../m4/stat-prog.m4.  */
+#if (STAT_STATVFS \
+     && (HAVE_STRUCT_STATVFS_F_BASETYPE || HAVE_STRUCT_STATVFS_F_FSTYPENAME \
+	 || (! HAVE_STRUCT_STATFS_F_FSTYPENAME && HAVE_STRUCT_STATVFS_F_TYPE)))
+# define USE_STATVFS 1
+#else
+# define USE_STATVFS 0
+#endif
+
+#include <stddef.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
-#if HAVE_SYS_STATVFS_H && HAVE_STRUCT_STATVFS_F_BASETYPE
+#if USE_STATVFS
 # include <sys/statvfs.h>
 #elif HAVE_SYS_VFS_H
 # include <sys/vfs.h>
@@ -40,6 +51,8 @@
 #  include <nfs/nfs_clnt.h>
 #  include <nfs/vfs.h>
 # endif
+#elif HAVE_OS_H /* BeOS */
+# include <fs_info.h>
 #endif
 
 #include "system.h"
@@ -56,43 +69,76 @@
 #include "strftime.h"
 #include "xreadlink.h"
 
-#define NAMEMAX_FORMAT PRIuMAX
+#define alignof(type) offsetof (struct { char c; type x; }, x)
 
-#if HAVE_STRUCT_STATVFS_F_BASETYPE
+#if USE_STATVFS
 # define STRUCT_STATVFS struct statvfs
+# define STRUCT_STATXFS_F_FSID_IS_INTEGER STRUCT_STATVFS_F_FSID_IS_INTEGER
 # define HAVE_STRUCT_STATXFS_F_TYPE HAVE_STRUCT_STATVFS_F_TYPE
 # if HAVE_STRUCT_STATVFS_F_NAMEMAX
-#  define SB_F_NAMEMAX(S) ((uintmax_t) ((S)->f_namemax))
+#  define SB_F_NAMEMAX(S) ((S)->f_namemax)
 # endif
-# if STAT_STATVFS
-#  define STATFS statvfs
-#  define STATFS_FRSIZE(S) ((S)->f_frsize)
-# endif
+# define STATFS statvfs
+# define STATFS_FRSIZE(S) ((S)->f_frsize)
 #else
-# define STRUCT_STATVFS struct statfs
 # define HAVE_STRUCT_STATXFS_F_TYPE HAVE_STRUCT_STATFS_F_TYPE
 # if HAVE_STRUCT_STATFS_F_NAMELEN
-#  define SB_F_NAMEMAX(S) ((uintmax_t) ((S)->f_namelen))
+#  define SB_F_NAMEMAX(S) ((S)->f_namelen)
+# endif
+# define STATFS statfs
+# if HAVE_OS_H /* BeOS */
+/* BeOS has a statvfs function, but it does not return sensible values
+   for f_files, f_ffree and f_favail, and lacks f_type, f_basetype and
+   f_fstypename.  Use 'struct fs_info' instead.  */
+static int
+statfs (char const *filename, struct fs_info *buf)
+{
+  dev_t device = dev_for_path (filename);
+  if (device < 0)
+    {
+      errno = (device == B_ENTRY_NOT_FOUND ? ENOENT
+	       : device == B_BAD_VALUE ? EINVAL
+	       : device == B_NAME_TOO_LONG ? ENAMETOOLONG
+	       : device == B_NO_MEMORY ? ENOMEM
+	       : device == B_FILE_ERROR ? EIO
+	       : 0);
+      return -1;
+    }
+  /* If successful, buf->dev will be == device.  */
+  return fs_stat_dev (device, buf);
+}
+#  define f_fsid dev
+#  define f_blocks total_blocks
+#  define f_bfree free_blocks
+#  define f_bavail free_blocks
+#  define f_bsize io_size
+#  define f_files total_nodes
+#  define f_ffree free_nodes
+#  define STRUCT_STATVFS struct fs_info
+#  define STRUCT_STATXFS_F_FSID_IS_INTEGER true
+#  define STATFS_FRSIZE(S) ((S)->block_size)
+# else
+#  define STRUCT_STATVFS struct statfs
+#  define STRUCT_STATXFS_F_FSID_IS_INTEGER STRUCT_STATFS_F_FSID_IS_INTEGER
+#  define STATFS_FRSIZE(S) 0
 # endif
 #endif
 
-#ifndef STATFS
-# define STATFS statfs
-# define STATFS_FRSIZE(S) 0
-#endif
-
-#ifndef SB_F_NAMEMAX
+#ifdef SB_F_NAMEMAX
+# define OUT_NAMEMAX out_uint
+#else
 /* NetBSD 1.5.2 has neither f_namemax nor f_namelen.  */
 # define SB_F_NAMEMAX(S) "*"
-# undef NAMEMAX_FORMAT
-# define NAMEMAX_FORMAT "s"
+# define OUT_NAMEMAX out_string
 #endif
 
 #if HAVE_STRUCT_STATVFS_F_BASETYPE
 # define STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME f_basetype
 #else
-# if HAVE_STRUCT_STATFS_F_FSTYPENAME
+# if HAVE_STRUCT_STATVFS_F_FSTYPENAME || HAVE_STRUCT_STATFS_F_FSTYPENAME
 #  define STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME f_fstypename
+# elif HAVE_OS_H /* BeOS */
+#  define STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME fsh_name
 # endif
 #endif
 
@@ -108,7 +154,7 @@
 
 enum
 {
-  PRINTF_OPTION = CHAR_MAX + 1,
+  PRINTF_OPTION = CHAR_MAX + 1
 };
 
 static struct option const long_options[] = {
@@ -134,9 +180,11 @@ static bool interpret_backslash_escapes;
 static char const *trailing_delim = "";
 
 /* Return the type of the specified file system.
-   Some systems have statfvs.f_basetype[FSTYPSZ]. (AIX, HP-UX, and Solaris)
-   Others have statfs.f_fstypename[MFSNAMELEN]. (NetBSD 1.5.2)
-   Still others have neither and have to get by with f_type (Linux).  */
+   Some systems have statfvs.f_basetype[FSTYPSZ] (AIX, HP-UX, and Solaris).
+   Others have statvfs.f_fstypename[_VFS_NAMELEN] (NetBSD 3.0).
+   Others have statfs.f_fstypename[MFSNAMELEN] (NetBSD 1.5.2).
+   Still others have neither and have to get by with f_type (Linux).
+   But f_type may only exist in statfs (Cygwin).  */
 static char const *
 human_fstype (STRUCT_STATVFS const *statfsbuf)
 {
@@ -293,8 +341,8 @@ human_fstype (STRUCT_STATVFS const *statfsbuf)
 static char *
 human_access (struct stat const *statbuf)
 {
-  static char modebuf[11];
-  mode_string (statbuf->st_mode, modebuf);
+  static char modebuf[12];
+  filemodestring (statbuf, modebuf);
   modebuf[10] = 0;
   return modebuf;
 }
@@ -315,22 +363,40 @@ human_time (struct timespec t)
   return str;
 }
 
-/* Like strcat, but don't return anything and do check that
-   DEST_BUFSIZE is at least a long as strlen (DEST) + strlen (SRC) + 1.
-   The signature is deliberately different from that of strncat.  */
 static void
-xstrcat (char *dest, size_t dest_bufsize, char const *src)
+out_string (char *pformat, size_t prefix_len, char const *arg)
 {
-  size_t dest_len = strlen (dest);
-  size_t src_len = strlen (src);
-  if (dest_bufsize < dest_len + src_len + 1)
-    abort ();
-  memcpy (dest + dest_len, src, src_len + 1);
+  strcpy (pformat + prefix_len, "s");
+  printf (pformat, arg);
+}
+static void
+out_int (char *pformat, size_t prefix_len, intmax_t arg)
+{
+  strcpy (pformat + prefix_len, PRIdMAX);
+  printf (pformat, arg);
+}
+static void
+out_uint (char *pformat, size_t prefix_len, uintmax_t arg)
+{
+  strcpy (pformat + prefix_len, PRIuMAX);
+  printf (pformat, arg);
+}
+static void
+out_uint_o (char *pformat, size_t prefix_len, uintmax_t arg)
+{
+  strcpy (pformat + prefix_len, PRIoMAX);
+  printf (pformat, arg);
+}
+static void
+out_uint_x (char *pformat, size_t prefix_len, uintmax_t arg)
+{
+  strcpy (pformat + prefix_len, PRIxMAX);
+  printf (pformat, arg);
 }
 
 /* print statfs info */
 static void
-print_statfs (char *pformat, size_t buf_len, char m, char const *filename,
+print_statfs (char *pformat, size_t prefix_len, char m, char const *filename,
 	      void const *data)
 {
   STRUCT_STATVFS const *statfsbuf = data;
@@ -338,82 +404,84 @@ print_statfs (char *pformat, size_t buf_len, char m, char const *filename,
   switch (m)
     {
     case 'n':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, filename);
+      out_string (pformat, prefix_len, filename);
       break;
 
     case 'i':
-#if HAVE_STRUCT_STATXFS_F_FSID___VAL
-      xstrcat (pformat, buf_len, "x %-8x");
-      printf (pformat, statfsbuf->f_fsid.__val[0], /* u_long */
-	      statfsbuf->f_fsid.__val[1]);
+      {
+#if STRUCT_STATXFS_F_FSID_IS_INTEGER
+	uintmax_t fsid = statfsbuf->f_fsid;
 #else
-      xstrcat (pformat, buf_len, "Lx");
-      printf (pformat, statfsbuf->f_fsid);
+	typedef unsigned int fsid_word;
+	verify (alignof (STRUCT_STATVFS) % alignof (fsid_word) == 0);
+	verify (offsetof (STRUCT_STATVFS, f_fsid) % alignof (fsid_word) == 0);
+	verify (sizeof statfsbuf->f_fsid % alignof (fsid_word) == 0);
+	fsid_word const *p = (fsid_word *) &statfsbuf->f_fsid;
+
+	/* Assume a little-endian word order, as that is compatible
+	   with glibc's statvfs implementation.  */
+	uintmax_t fsid = 0;
+	int words = sizeof statfsbuf->f_fsid / sizeof *p;
+	int i;
+	for (i = 0; i < words && i * sizeof *p < sizeof fsid; i++)
+	  {
+	    uintmax_t u = p[words - 1 - i];
+	    fsid |= u << (i * CHAR_BIT * sizeof *p);
+	  }
 #endif
+	out_uint_x (pformat, prefix_len, fsid);
+      }
       break;
 
     case 'l':
-      xstrcat (pformat, buf_len, NAMEMAX_FORMAT);
-      printf (pformat, SB_F_NAMEMAX (statfsbuf));
+      OUT_NAMEMAX (pformat, prefix_len, SB_F_NAMEMAX (statfsbuf));
       break;
     case 't':
 #if HAVE_STRUCT_STATXFS_F_TYPE
-      xstrcat (pformat, buf_len, "lx");
-      printf (pformat,
-	      (unsigned long int) (statfsbuf->f_type));  /* no equiv. */
+      out_uint_x (pformat, prefix_len, statfsbuf->f_type);
 #else
-      fputc ('*', stdout);
+      fputc ('?', stdout);
 #endif
       break;
     case 'T':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, human_fstype (statfsbuf));
+      out_string (pformat, prefix_len, human_fstype (statfsbuf));
       break;
     case 'b':
-      xstrcat (pformat, buf_len, PRIdMAX);
-      printf (pformat, (intmax_t) (statfsbuf->f_blocks));
+      out_int (pformat, prefix_len, statfsbuf->f_blocks);
       break;
     case 'f':
-      xstrcat (pformat, buf_len, PRIdMAX);
-      printf (pformat, (intmax_t) (statfsbuf->f_bfree));
+      out_int (pformat, prefix_len, statfsbuf->f_bfree);
       break;
     case 'a':
-      xstrcat (pformat, buf_len, PRIdMAX);
-      printf (pformat, (intmax_t) (statfsbuf->f_bavail));
+      out_int (pformat, prefix_len, statfsbuf->f_bavail);
       break;
     case 's':
-      xstrcat (pformat, buf_len, "lu");
-      printf (pformat, (unsigned long int) (statfsbuf->f_bsize));
+      out_uint (pformat, prefix_len, statfsbuf->f_bsize);
       break;
     case 'S':
       {
-	unsigned long int frsize = STATFS_FRSIZE (statfsbuf);
+	uintmax_t frsize = STATFS_FRSIZE (statfsbuf);
 	if (! frsize)
 	  frsize = statfsbuf->f_bsize;
-	xstrcat (pformat, buf_len, "lu");
-	printf (pformat, frsize);
+	out_uint (pformat, prefix_len, frsize);
       }
       break;
     case 'c':
-      xstrcat (pformat, buf_len, PRIdMAX);
-      printf (pformat, (intmax_t) (statfsbuf->f_files));
+      out_int (pformat, prefix_len, statfsbuf->f_files);
       break;
     case 'd':
-      xstrcat (pformat, buf_len, PRIdMAX);
-      printf (pformat, (intmax_t) (statfsbuf->f_ffree));
+      out_int (pformat, prefix_len, statfsbuf->f_ffree);
       break;
 
     default:
-      xstrcat (pformat, buf_len, "c");
-      printf (pformat, m);
+      fputc ('?', stdout);
       break;
     }
 }
 
 /* print stat info */
 static void
-print_stat (char *pformat, size_t buf_len, char m,
+print_stat (char *pformat, size_t prefix_len, char m,
 	    char const *filename, void const *data)
 {
   struct stat *statbuf = (struct stat *) data;
@@ -423,11 +491,10 @@ print_stat (char *pformat, size_t buf_len, char m,
   switch (m)
     {
     case 'n':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, filename);
+      out_string (pformat, prefix_len, filename);
       break;
     case 'N':
-      xstrcat (pformat, buf_len, "s");
+      out_string (pformat, prefix_len, quote (filename));
       if (S_ISLNK (statbuf->st_mode))
 	{
 	  char *linkname = xreadlink (filename, statbuf->st_size);
@@ -437,120 +504,99 @@ print_stat (char *pformat, size_t buf_len, char m,
 		     quote (filename));
 	      return;
 	    }
-	  /*printf("\"%s\" -> \"%s\"", filename, linkname); */
-	  printf (pformat, quote (filename));
 	  printf (" -> ");
-	  printf (pformat, quote (linkname));
-	}
-      else
-	{
-	  printf (pformat, quote (filename));
+	  out_string (pformat, prefix_len, quote (linkname));
 	}
       break;
     case 'd':
-      xstrcat (pformat, buf_len, PRIuMAX);
-      printf (pformat, (uintmax_t) statbuf->st_dev);
+      out_uint (pformat, prefix_len, statbuf->st_dev);
       break;
     case 'D':
-      xstrcat (pformat, buf_len, PRIxMAX);
-      printf (pformat, (uintmax_t) statbuf->st_dev);
+      out_uint_x (pformat, prefix_len, statbuf->st_dev);
       break;
     case 'i':
-      xstrcat (pformat, buf_len, PRIuMAX);
-      printf (pformat, (uintmax_t) statbuf->st_ino);
+      out_uint (pformat, prefix_len, statbuf->st_ino);
       break;
     case 'a':
-      xstrcat (pformat, buf_len, "lo");
-      printf (pformat,
-	      (unsigned long int) (statbuf->st_mode & CHMOD_MODE_BITS));
+      out_uint_o (pformat, prefix_len, statbuf->st_mode & CHMOD_MODE_BITS);
       break;
     case 'A':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, human_access (statbuf));
+      out_string (pformat, prefix_len, human_access (statbuf));
       break;
     case 'f':
-      xstrcat (pformat, buf_len, "lx");
-      printf (pformat, (unsigned long int) statbuf->st_mode);
+      out_uint_x (pformat, prefix_len, statbuf->st_mode);
       break;
     case 'F':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, file_type (statbuf));
+      out_string (pformat, prefix_len, file_type (statbuf));
       break;
     case 'h':
-      xstrcat (pformat, buf_len, "lu");
-      printf (pformat, (unsigned long int) statbuf->st_nlink);
+      out_uint (pformat, prefix_len, statbuf->st_nlink);
       break;
     case 'u':
-      xstrcat (pformat, buf_len, "lu");
-      printf (pformat, (unsigned long int) statbuf->st_uid);
+      out_uint (pformat, prefix_len, statbuf->st_uid);
       break;
     case 'U':
-      xstrcat (pformat, buf_len, "s");
       setpwent ();
       pw_ent = getpwuid (statbuf->st_uid);
-      printf (pformat, (pw_ent != 0L) ? pw_ent->pw_name : "UNKNOWN");
+      out_string (pformat, prefix_len,
+		  pw_ent ? pw_ent->pw_name : "UNKNOWN");
       break;
     case 'g':
-      xstrcat (pformat, buf_len, "lu");
-      printf (pformat, (unsigned long int) statbuf->st_gid);
+      out_uint (pformat, prefix_len, statbuf->st_gid);
       break;
     case 'G':
-      xstrcat (pformat, buf_len, "s");
       setgrent ();
       gw_ent = getgrgid (statbuf->st_gid);
-      printf (pformat, (gw_ent != 0L) ? gw_ent->gr_name : "UNKNOWN");
+      out_string (pformat, prefix_len,
+		  gw_ent ? gw_ent->gr_name : "UNKNOWN");
       break;
     case 't':
-      xstrcat (pformat, buf_len, "lx");
-      printf (pformat, (unsigned long int) major (statbuf->st_rdev));
+      out_uint_x (pformat, prefix_len, major (statbuf->st_rdev));
       break;
     case 'T':
-      xstrcat (pformat, buf_len, "lx");
-      printf (pformat, (unsigned long int) minor (statbuf->st_rdev));
+      out_uint_x (pformat, prefix_len, minor (statbuf->st_rdev));
       break;
     case 's':
-      xstrcat (pformat, buf_len, PRIuMAX);
-      printf (pformat, (uintmax_t) (statbuf->st_size));
+      out_uint (pformat, prefix_len, statbuf->st_size);
       break;
     case 'B':
-      xstrcat (pformat, buf_len, "lu");
-      printf (pformat, (unsigned long int) ST_NBLOCKSIZE);
+      out_uint (pformat, prefix_len, ST_NBLOCKSIZE);
       break;
     case 'b':
-      xstrcat (pformat, buf_len, PRIuMAX);
-      printf (pformat, (uintmax_t) ST_NBLOCKS (*statbuf));
+      out_uint (pformat, prefix_len, ST_NBLOCKS (*statbuf));
       break;
     case 'o':
-      xstrcat (pformat, buf_len, "lu");
-      printf (pformat, (unsigned long int) statbuf->st_blksize);
+      out_uint (pformat, prefix_len, statbuf->st_blksize);
       break;
     case 'x':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, human_time (get_stat_atime (statbuf)));
+      out_string (pformat, prefix_len, human_time (get_stat_atime (statbuf)));
       break;
     case 'X':
-      xstrcat (pformat, buf_len, TYPE_SIGNED (time_t) ? "ld" : "lu");
-      printf (pformat, (unsigned long int) statbuf->st_atime);
+      if (TYPE_SIGNED (time_t))
+	out_int (pformat, prefix_len, statbuf->st_atime);
+      else
+	out_uint (pformat, prefix_len, statbuf->st_atime);
       break;
     case 'y':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, human_time (get_stat_mtime (statbuf)));
+      out_string (pformat, prefix_len, human_time (get_stat_mtime (statbuf)));
       break;
     case 'Y':
-      xstrcat (pformat, buf_len, TYPE_SIGNED (time_t) ? "ld" : "lu");
-      printf (pformat, (unsigned long int) statbuf->st_mtime);
+      if (TYPE_SIGNED (time_t))
+	out_int (pformat, prefix_len, statbuf->st_mtime);
+      else
+	out_uint (pformat, prefix_len, statbuf->st_mtime);
       break;
     case 'z':
-      xstrcat (pformat, buf_len, "s");
-      printf (pformat, human_time (get_stat_ctime (statbuf)));
+      out_string (pformat, prefix_len, human_time (get_stat_ctime (statbuf)));
       break;
     case 'Z':
-      xstrcat (pformat, buf_len, TYPE_SIGNED (time_t) ? "ld" : "lu");
-      printf (pformat, (unsigned long int) statbuf->st_ctime);
+      if (TYPE_SIGNED (time_t))
+	out_int (pformat, prefix_len, statbuf->st_ctime);
+      else
+	out_uint (pformat, prefix_len, statbuf->st_ctime);
       break;
     default:
-      xstrcat (pformat, buf_len, "c");
-      printf (pformat, m);
+      fputc ('?', stdout);
       break;
     }
 }
@@ -600,7 +646,14 @@ print_it (char const *format, char const *filename,
 {
   /* Add 2 to accommodate our conversion of the stat `%s' format string
      to the longer printf `%llu' one.  */
-  size_t n_alloc = strlen (format) + 2 + 1;
+  enum
+    {
+      MAX_ADDITIONAL_BYTES =
+	(MAX (sizeof PRIdMAX,
+	      MAX (sizeof PRIoMAX, MAX (sizeof PRIuMAX, sizeof PRIxMAX)))
+	 - 1)
+    };
+  size_t n_alloc = strlen (format) + MAX_ADDITIONAL_BYTES + 1;
   char *dest = xmalloc (n_alloc);
   char const *b;
   for (b = format; *b; b++)
@@ -610,9 +663,8 @@ print_it (char const *format, char const *filename,
 	case '%':
 	  {
 	    size_t len = strspn (b + 1, "#-+.I 0123456789");
-	    char const *fmt_char = b + 1 + len;
-	    memcpy (dest, b, 1 + len);
-	    dest[1 + len] = 0;
+	    char const *fmt_char = b + len + 1;
+	    memcpy (dest, b, len + 1);
 
 	    b = fmt_char;
 	    switch (*fmt_char)
@@ -622,12 +674,16 @@ print_it (char const *format, char const *filename,
 		/* fall through */
 	      case '%':
 		if (0 < len)
-		  error (EXIT_FAILURE, 0, _("%s%s: invalid directive"),
-			 quotearg_colon (dest), *fmt_char ? "%" : "");
+		  {
+		    dest[len + 1] = *fmt_char;
+		    dest[len + 2] = '\0';
+		    error (EXIT_FAILURE, 0, _("%s: invalid directive"),
+			   quotearg_colon (dest));
+		  }
 		putchar ('%');
 		break;
 	      default:
-		print_func (dest, n_alloc, *fmt_char, filename, data);
+		print_func (dest, len + 1, *fmt_char, filename, data);
 		break;
 	      }
 	    break;
@@ -652,13 +708,13 @@ print_it (char const *format, char const *filename,
 	      putchar (esc_value);
 	      --b;
 	    }
-	  else if (*b == 'x' && ISXDIGIT (b[1]))
+	  else if (*b == 'x' && isxdigit (to_uchar (b[1])))
 	    {
 	      int esc_value = hextobin (b[1]);	/* Value of \xhh escape. */
 	      /* A hexadecimal \xhh escape sequence must have
 		 1 or 2 hex. digits.  */
 	      ++b;
-	      if (ISXDIGIT (b[1]))
+	      if (isxdigit (to_uchar (b[1])))
 		{
 		  ++b;
 		  esc_value = esc_value * 16 + hextobin (*b);

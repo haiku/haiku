@@ -1,4 +1,6 @@
-/* Copyright (C) 1992-2001, 2003, 2004, 2005 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2001, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
+
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +17,7 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
+#ifndef _LIBC
 # include <config.h>
 #endif
 
@@ -23,14 +25,15 @@
 
 #include <stdio.h>
 
-#if !defined _WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
 
 #include <stdbool.h>
 
-#if HAVE_STDIO_EXT_H
-# include <stdio_ext.h>
-#endif
-#if !HAVE___FSETLOCKING
+#if HAVE_DECL___FSETLOCKING && HAVE___FSETLOCKING
+# if HAVE_STDIO_EXT_H
+#  include <stdio_ext.h>
+# endif
+#else
 # define __fsetlocking(stream, type)	/* empty */
 #endif
 
@@ -170,13 +173,17 @@ getpass (const char *prompt)
   return buf;
 }
 
-#else /* WIN32 */
+#else /* W32 native */
 
 /* Windows implementation by Martin Lambers <marlam@marlam.de>,
    improved by Simon Josefsson. */
 
 /* For PASS_MAX. */
 #include <limits.h>
+/* For _getch(). */
+#include <conio.h>
+/* For strdup(). */
+#include <string.h>
 
 #ifndef PASS_MAX
 # define PASS_MAX 512

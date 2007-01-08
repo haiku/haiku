@@ -1,5 +1,6 @@
 /* readtokens.c  -- Functions for reading tokens from an input stream.
-   Copyright (C) 1990-1991, 1999-2004 Free Software Foundation, Inc.
+
+   Copyright (C) 1990-1991, 1999-2004, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,9 +22,7 @@
    gives the same functionality, except that these functions
    would never return empty lines. */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "readtokens.h"
 

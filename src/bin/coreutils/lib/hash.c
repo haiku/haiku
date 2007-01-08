@@ -1,6 +1,6 @@
 /* hash - hashing table processing.
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 Free
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2006 Free
    Software Foundation, Inc.
 
    Written by Jim Meyering, 1992.
@@ -24,9 +24,7 @@
 /* Define USE_OBSTACK to 1 if you want the allocator to use obstacks instead
    of malloc.  If you change USE_OBSTACK, you have to recompile!  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "hash.h"
 #include "xalloc.h"

@@ -1,42 +1,43 @@
-dnl Process this file with autoconf to produce a configure script. -*-m4-*-
+# -*- autoconf -*-
+# Process this file with autoconf to produce a configure script.
 
-dnl Copyright (C) 1991, 1993-2006 Free Software Foundation, Inc.
+# Copyright (C) 1991, 1993-2006 Free Software Foundation, Inc.
 
-dnl This program is free software; you can redistribute it and/or modify
-dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation; either version 2, or (at your option)
-dnl any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
 
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-dnl GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software Foundation,
-dnl Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 dnl Written by Jim Meyering.
 
-AC_INIT([GNU coreutils],[5.94],[bug-coreutils@gnu.org])
+AC_PREREQ(2.60)
+AC_INIT([GNU coreutils],[6.7],[bug-coreutils@gnu.org])
 AC_CONFIG_SRCDIR(src/ls.c)
 
 AC_CONFIG_AUX_DIR(build-aux)
-AC_CONFIG_HEADERS([config.h:config.hin])
+AC_CONFIG_HEADERS([lib/config.h:lib/config.hin])
 
 AB_INIT()
-AM_INIT_AUTOMAKE([1.8.3 gnits dist-bzip2])
+AM_INIT_AUTOMAKE([1.9.6 gnits dist-bzip2])
 
-gl_DEFAULT_POSIX2_VERSION
-gl_USE_SYSTEM_EXTENSIONS
-gl_PERL
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_RANLIB
 AC_PROG_LN_S
-
+gl_EARLY
+gl_INIT
+coreutils_MACROS
 
 AC_CHECK_FUNCS(uname,
 	OPTIONAL_BIN_PROGS="$OPTIONAL_BIN_PROGS uname\$(EXEEXT)"
@@ -48,8 +49,6 @@ AC_CHECK_FUNCS(gethostid,
 	OPTIONAL_BIN_PROGS="$OPTIONAL_BIN_PROGS hostid\$(EXEEXT)"
 	MAN="$MAN hostid.1")
 
-gl_MACROS
-
 gl_WINSIZE_IN_PTEM
 
 AC_MSG_CHECKING(whether localtime caches TZ)
@@ -60,14 +59,14 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <time.h>
 # include <stdlib.h>
 #endif
 extern char **environ;
-unset_TZ ()
+void unset_TZ (void)
 {
   char **from, **to;
   for (to = from = environ; (*to = *from); from++)
     if (! (to[0][0] == 'T' && to[0][1] == 'Z' && to[0][2] == '='))
       to++;
 }
-main()
+int main()
 {
   time_t now = time ((time_t *) 0);
   int hour_GMT0, hour_unset;
@@ -148,7 +147,7 @@ coreutils_DUMMY_1
 AC_MSG_CHECKING(ut_host in struct utmp)
 AC_CACHE_VAL(su_cv_func_ut_host_in_utmp,
 [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
-#include <utmp.h>]], [[struct utmp ut; ut.ut_host;]])],
+#include <utmp.h>]], [[struct utmp ut; return !sizeof ut.ut_host;]])],
   [su_cv_func_ut_host_in_utmp=yes],
   [su_cv_func_ut_host_in_utmp=no])])
 AC_MSG_RESULT($su_cv_func_ut_host_in_utmp)
@@ -161,7 +160,7 @@ if test -z "$have_ut_host"; then
   AC_MSG_CHECKING(ut_host in struct utmpx)
   AC_CACHE_VAL(su_cv_func_ut_host_in_utmpx,
   [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
-#include <utmpx.h>]], [[struct utmpx ut; ut.ut_host;]])],
+#include <utmpx.h>]], [[struct utmpx ut; return !sizeof ut.ut_host;]])],
     [su_cv_func_ut_host_in_utmpx=yes],
     [su_cv_func_ut_host_in_utmpx=no])])
   AC_MSG_RESULT($su_cv_func_ut_host_in_utmpx)
@@ -203,7 +202,7 @@ yes
 #define _XOPEN_SOURCE
 #endif
 #include <sys/types.h>
-#include <termios.h>]], [[struct termios t; t.c_line;]])],
+#include <termios.h>]], [[struct termios t; return !sizeof t.c_line;]])],
     [su_cv_sys_c_line_in_termios=yes],
     [su_cv_sys_c_line_in_termios=no])])
   AC_MSG_RESULT($su_cv_sys_c_line_in_termios)
@@ -248,8 +247,8 @@ AC_CHECK_DECLS([strtoimax, strtoumax])
 
 cu_LIB_CHECK
 
-AM_GNU_GETTEXT([external], [need-ngettext])
-AM_GNU_GETTEXT_VERSION(0.13.1)
+AM_GNU_GETTEXT([external], [need-formatstring-macros])
+AM_GNU_GETTEXT_VERSION([0.15])
 
 AC_CONFIG_FILES(
   Makefile
@@ -259,7 +258,6 @@ AC_CONFIG_FILES(
   po/Makefile.in
   src/Makefile
   tests/Makefile
-  tests/basename/Makefile
   tests/chgrp/Makefile
   tests/chmod/Makefile
   tests/chown/Makefile

@@ -1,7 +1,7 @@
 /* Parse dates for touch and date.
 
-   Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004, 2005
-   Free Software Foundation Inc.
+   Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006 Free Software Foundation Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,9 +20,7 @@
 /* Yacc-based version written by Jim Kingdon and David MacKenzie.
    Rewritten by Jim Meyering.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <stdbool.h>
 
@@ -44,11 +42,11 @@
 #endif
 
 /* ISDIGIT differs from isdigit, as follows:
-   - Its arg may be any int or unsigned int; it need not be an unsigned char.
-   - It's guaranteed to evaluate its argument exactly once.
+   - Its arg may be any int or unsigned int; it need not be an unsigned char
+     or EOF.
    - It's typically faster.
    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
-   ISDIGIT_LOCALE unless it's important to use the locale's definition
+   isdigit unless it's important to use the locale's definition
    of `digit' even when the host does not conform to POSIX.  */
 #define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
 
@@ -333,6 +331,6 @@ main (void)
 
 /*
 Local Variables:
-compile-command: "gcc -DTEST_POSIXTIME -DHAVE_CONFIG_H -I.. -g -O -Wall -W posixtm.c"
+compile-command: "gcc -DTEST_POSIXTIME -g -O -Wall -W posixtm.c"
 End:
 */

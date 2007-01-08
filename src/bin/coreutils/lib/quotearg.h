@@ -1,7 +1,7 @@
 /* quotearg.h - quote arguments for output
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software
-   Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -133,5 +133,8 @@ char *quotearg_char (char const *arg, char ch);
 
 /* Equivalent to quotearg_char (ARG, ':').  */
 char *quotearg_colon (char const *arg);
+
+/* Free any dynamically allocated memory.  */
+void quotearg_free (void);
 
 #endif /* !QUOTEARG_H_ */

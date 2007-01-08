@@ -1,3 +1,8 @@
+'\" Copyright (C) 1998, 1999, 2001, 2006 Free Software Foundation, Inc.
+'\"
+'\" This is free software.  You may redistribute copies of it under the terms
+'\" of the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
+'\" There is NO WARRANTY, to the extent permitted by law.
 [NAME]
 chown \- change file owner and group
 [DESCRIPTION]
@@ -21,3 +26,5 @@ performs the same function as
 If only a colon is given, or if the entire operand is empty, neither the
 owner nor the group is changed.
 .SH OPTIONS
+[SEE ALSO]
+chown(2)

@@ -1,5 +1,5 @@
 /* od -- dump files in octal and other formats
-   Copyright (C) 92, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 92, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ typedef double LONG_DOUBLE;
 # define LDBL_DIG DBL_DIG
 #endif
 
-#if HAVE_UNSIGNED_LONG_LONG
+#if HAVE_UNSIGNED_LONG_LONG_INT
 typedef unsigned long long int unsigned_long_long_int;
 #else
 /* This is just a place-holder to avoid a few `#if' directives.
@@ -337,7 +337,7 @@ All arguments to long options are mandatory for short options.\n\
       fputs (_("\
 \n\
 Traditional format specifications may be intermixed; they accumulate:\n\
-  -a   same as -t a,  select named characters\n\
+  -a   same as -t a,  select named characters, ignoring high-order bit\n\
   -b   same as -t o1, select octal bytes\n\
   -c   same as -t c,  select ASCII characters or backslash escapes\n\
   -d   same as -t u2, select unsigned decimal 2-byte units\n\
@@ -358,10 +358,12 @@ An OFFSET operand means -j OFFSET.  LABEL is the pseudo-address\n\
 at first byte printed, incremented when dump is progressing.\n\
 For OFFSET and LABEL, a 0x or 0X prefix indicates hexadecimal;\n\
 suffixes may be . for octal and b for multiply by 512.\n\
+"), stdout);
+      fputs (_("\
 \n\
 TYPE is made up of one or more of these specifications:\n\
 \n\
-  a          named character\n\
+  a          named character, ignoring high-order bit\n\
   c          ASCII character or backslash escape\n\
 "), stdout);
       fputs (_("\
@@ -388,7 +390,7 @@ of output.  \
 "), stdout);
       fputs (_("\
 --string without a number implies 3.  --width without a number\n\
-implies 32.  By default, od uses -A o -t d2 -w 16.\n\
+implies 32.  By default, od uses -A o -t d2 -w16.\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
@@ -497,7 +499,7 @@ dump_hexl_mode_trailer (size_t n_bytes, const char *block)
   for (i = n_bytes; i > 0; i--)
     {
       unsigned char c = *block++;
-      unsigned char c2 = (ISPRINT(c) ? c : '.');
+      unsigned char c2 = (isprint (c) ? c : '.');
       putchar (c2);
     }
   putchar ('<');
@@ -576,7 +578,7 @@ print_ascii (size_t n_bytes, void const *block,
 	  break;
 
 	default:
-	  sprintf (buf, (ISPRINT (c) ? "  %c" : "%03o"), c);
+	  sprintf (buf, (isprint (c) ? "  %c" : "%03o"), c);
 	  s = buf;
 	}
 
@@ -1175,7 +1177,7 @@ write_block (uintmax_t current_offset, size_t n_bytes,
   static bool first = true;
   static bool prev_pair_equal = false;
 
-#define EQUAL_BLOCKS(b1, b2) (memcmp ((b1), (b2), bytes_per_block) == 0)
+#define EQUAL_BLOCKS(b1, b2) (memcmp (b1, b2, bytes_per_block) == 0)
 
   if (abbreviate_duplicate_blocks
       && !first && n_bytes == bytes_per_block
@@ -1469,7 +1471,7 @@ dump_strings (void)
 	      free (buf);
 	      return ok;
 	    }
-	  if (!ISPRINT (c))
+	  if (! isprint (c))
 	    /* Found a non-printing.  Try again starting with next char.  */
 	    goto tryline;
 	  buf[i] = c;
@@ -1492,7 +1494,7 @@ dump_strings (void)
 	    }
 	  if (c == '\0')
 	    break;		/* It is; print this string.  */
-	  if (!ISPRINT (c))
+	  if (! isprint (c))
 	    goto tryline;	/* It isn't; give up on this string.  */
 	  buf[i++] = c;		/* String continues; store it all.  */
 	}
@@ -1581,7 +1583,7 @@ main (int argc, char **argv)
   integral_type_size[sizeof (short int)] = SHORT;
   integral_type_size[sizeof (int)] = INT;
   integral_type_size[sizeof (long int)] = LONG;
-#if HAVE_UNSIGNED_LONG_LONG
+#if HAVE_UNSIGNED_LONG_LONG_INT
   /* If `long int' and `long long int' have the same size, it's fine
      to overwrite the entry for `long' with this one.  */
   integral_type_size[sizeof (unsigned_long_long_int)] = LONG_LONG;

@@ -1,5 +1,5 @@
 /* mkfifo -- make fifo's (named pipes)
-   Copyright (C) 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ static struct option const longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-#ifdef S_ISFIFO
 void
 usage (int status)
 {
@@ -61,7 +60,7 @@ Create named pipes (FIFOs) with the given NAMEs.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -m, --mode=MODE   set permission mode (as in chmod), not a=rw - umask\n\
+  -m, --mode=MODE   set file permission bits to MODE, not a=rw - umask\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -69,13 +68,12 @@ Mandatory arguments to long options are mandatory for short options too.\n\
     }
   exit (status);
 }
-#endif
 
 int
 main (int argc, char **argv)
 {
   mode_t newmode;
-  const char *specified_mode;
+  char const *specified_mode = NULL;
   int exit_status = EXIT_SUCCESS;
   int optc;
 
@@ -87,11 +85,6 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  specified_mode = NULL;
-
-#ifndef S_ISFIFO
-  error (EXIT_FAILURE, 0, _("fifo files not supported"));
-#else
   while ((optc = getopt_long (argc, argv, "m:", longopts, NULL)) != -1)
     {
       switch (optc)
@@ -118,31 +111,19 @@ main (int argc, char **argv)
       struct mode_change *change = mode_compile (specified_mode);
       if (!change)
 	error (EXIT_FAILURE, 0, _("invalid mode"));
-      newmode = mode_adjust (newmode, change, umask (0));
+      newmode = mode_adjust (newmode, false, umask (0), change, NULL);
       free (change);
+      if (newmode & ~S_IRWXUGO)
+	error (EXIT_FAILURE, 0,
+	       _("mode must specify only file permission bits"));
     }
 
   for (; optind < argc; ++optind)
-    {
-      int fail = mkfifo (argv[optind], newmode);
-      if (fail)
+    if (mkfifo (argv[optind], newmode) != 0)
+      {
 	error (0, errno, _("cannot create fifo %s"), quote (argv[optind]));
-
-      /* If the containing directory happens to have a default ACL, chmod
-	 ensures the file mode permission bits are still set as desired.  */
-
-      if (fail == 0 && specified_mode)
-	{
-	  fail = chmod (argv[optind], newmode);
-	  if (fail)
-	    error (0, errno, _("cannot set permissions of fifo %s"),
-		   quote (argv[optind]));
-	}
-
-      if (fail)
 	exit_status = EXIT_FAILURE;
-    }
+      }
 
   exit (exit_status);
-#endif
 }

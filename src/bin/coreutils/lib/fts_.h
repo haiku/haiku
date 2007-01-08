@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@
 # include <stddef.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include "i-ring.h"
 
 typedef struct {
 	struct _ftsent *fts_cur;	/* current node */
@@ -73,8 +74,10 @@ typedef struct {
 	dev_t fts_dev;			/* starting device # */
 	char *fts_path;			/* file name for this descent */
 	int fts_rfd;			/* fd for root */
+	int fts_cwd_fd;			/* the file descriptor on which the
+					   virtual cwd is open, or AT_FDCWD */
 	size_t fts_pathlen;		/* sizeof(path) */
-	size_t fts_nitems;			/* elements in the sort array */
+	size_t fts_nitems;		/* elements in the sort array */
 	int (*fts_compar) (struct _ftsent const **, struct _ftsent const **);
 					/* compare fn */
 
@@ -112,7 +115,28 @@ typedef struct {
      mode of cycle detection: FTS_TIGHT_CYCLE_CHECK.  */
 # define FTS_TIGHT_CYCLE_CHECK	0x0100
 
-# define FTS_OPTIONMASK	0x01ff		/* valid user option mask */
+  /* Use this flag to enable semantics with which the parent
+     application may be made both more efficient and more robust.
+     Whereas the default is to visit each directory in a recursive
+     traversal (via chdir), using this flag makes it so the initial
+     working directory is never changed.  Instead, these functions
+     perform the traversal via a virtual working directory, maintained
+     through the file descriptor member, fts_cwd_fd.  */
+# define FTS_CWDFD		0x0200
+
+  /* Historically, for each directory that fts initially encounters, it would
+     open it, read all entries, and stat each entry, storing the results, and
+     then it would process the first entry.  But that behavior is bad for
+     locality of reference, and also causes trouble with inode-simulating
+     file systems like FAT, CIFS, FUSE-based ones, etc., when entries from
+     their name/inode cache are flushed too early.
+     Use this flag to make fts_open and fts_read defer the stat/lstat/fststat
+     of each entry until it actually processed.  However, note that if you use
+     this option and also specify a comparison function, that function may not
+     examine any data via fts_statp.  */
+# define FTS_DEFER_STAT		0x0400
+
+# define FTS_OPTIONMASK	0x07ff		/* valid user option mask */
 
 # define FTS_NAMEONLY	0x1000		/* (private) child names only */
 # define FTS_STOP	0x2000		/* (private) unrecoverable error */
@@ -134,12 +158,18 @@ typedef struct {
 		   of thousands.  */
 		struct hash_table *ht;
 
-		/* This data structure uses lazy checking, as done by rm via
-	           cycle-check.c.  It's the default, but it's not appropriate
-	           for programs like du.  */
+		/* FIXME: rename these two members to have the fts_ prefix */
+		/* This data structure uses a lazy cycle-detection algorithm,
+		   as done by rm via cycle-check.c.  It's the default,
+		   but it's not appropriate for programs like du.  */
 		struct cycle_check_state *state;
 	} fts_cycle;
+
 # endif
+	/* A stack of the file descriptors corresponding to the
+	   most-recently traversed parent directories.
+	   Currently used only in FTS_CWDFD mode.  */
+	I_ring fts_fd_ring;
 } FTS;
 
 typedef struct _ftsent {

@@ -1,5 +1,6 @@
 /* Invoke fopen, but avoid some glitches.
-   Copyright (C) 2001, 2004, 2005 Free Software Foundation, Inc.
+
+   Copyright (C) 2001, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +18,7 @@
 
 /* Written by Paul Eggert.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "stdio-safer.h"
 

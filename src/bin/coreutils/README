@@ -7,13 +7,14 @@ arbitrary limits.
 
 The programs that can be built with this package are:
 
-  [ basename cat chgrp chmod chown chroot cksum comm cp csplit cut date dd
-  df dir dircolors dirname du echo env expand expr factor false fmt fold
+  [ base64 basename cat chgrp chmod chown chroot cksum comm cp csplit cut date
+  dd df dir dircolors dirname du echo env expand expr factor false fmt fold
   ginstall groups head hostid hostname id join kill link ln logname ls
   md5sum mkdir mkfifo mknod mv nice nl nohup od paste pathchk pinky pr
-  printenv printf ptx pwd readlink rm rmdir seq sha1sum shred sleep sort
-  split stat stty su sum sync tac tail tee test touch tr true tsort tty
-  uname unexpand uniq unlink uptime users vdir wc who whoami yes
+  printenv printf ptx pwd readlink rm rmdir seq sha1sum sha224sum sha256sum
+  sha384sum sha512sum shred shuf sleep sort split stat stty su sum sync tac
+  tail tee test touch tr true tsort tty uname unexpand uniq unlink uptime
+  users vdir wc who whoami yes
 
 See the file NEWS for a list of major changes in the current release.
 
@@ -57,6 +58,22 @@ is in texinfo form in the doc directory.
 If you run the tests on a SunOS4.1.4 system, expect the ctime-part of
 the ls `time-1' test to fail.  I believe that is due to a bug in the
 way Sun implemented link(2) and chmod(2).
+
+
+***********************
+Pre-C99 build failure
+-----------------------
+
+There is a new, implicit build requirement:
+To build the coreutils from source, you should have a C99-conforming
+compiler, due to the use of declarations after non-declaration statements
+in several files in src/.  There is code in configure to find and, if
+possible, enable an appropriate compiler.  However, if configure doesn't
+find a C99 compiler, it continues nonetheless, and your build will fail.
+If that happens, simply apply the included patch using the following
+command, and then run make again:
+
+  cd src && patch < c99-to-c89.diff
 
 
 ***********************
@@ -109,7 +126,7 @@ Reporting bugs:
 
 IMPORTANT: if you take the time to report a test failure,
 please be sure to include the output of running `make check'
-in verbose mode for each each failing test.  For example,
+in verbose mode for each failing test.  For example,
 if the test that fails is tests/mv/hard-link-1, then you
 would run this command:
 
@@ -124,7 +141,7 @@ and then include the contents of the file `log' in your bug report.
 
 ***************************************
 
-There are pretty many tests, but nowhere near as many as we need.
+There are many tests, but nowhere near as many as we need.
 Additions and corrections are very welcome.
 
 If you see a problem that you've already reported, feel free to re-report
@@ -150,6 +167,12 @@ as you can.  Based on the feedback that generates, you may be able to
 convince us that it's worth adding.
 
 
+WARNING:  Now that we use the ./bootstrap script, you should not run
+autoreconf manually.  Doing that will overwrite essential source files
+with older versions, which may make the package unbuildable or introduce
+subtle bugs.
+
+
 WARNING:  If you modify files like configure.in, m4/*.m4, aclocal.m4,
 or any Makefile.am, then don't be surprised if what gets regenerated no
 longer works.  To make things work, you'll have to be using appropriate
@@ -171,3 +194,16 @@ http://www.gnu.org/prep/standards_toc.html.
 
 Mail suggestions and bug reports for these programs to
 the address on the last line of --help output.
+
+
+========================================================================
+
+Copyright (C) 1998, 2002, 2003, 2004, 2005, 2006 Free Software
+Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the ``GNU Free
+Documentation License'' file as part of this distribution.

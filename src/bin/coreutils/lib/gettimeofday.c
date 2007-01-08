@@ -2,7 +2,8 @@
    static buffer that localtime uses for it's return value.  The gettimeofday
    function from Mac OS X 10.0.4, i.e. Darwin 1.3.7 has this problem.
    The tzset replacement is necessary for at least Solaris 2.5, 2.5.1, and 2.6.
-   Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
+
+   Copyright (C) 2001, 2002, 2003, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,9 +21,7 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Disable the definitions of these functions (from config.h)
    so we can use the library versions here.  */

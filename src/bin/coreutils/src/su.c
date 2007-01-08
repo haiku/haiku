@@ -1,5 +1,5 @@
 /* su for GNU.  Run a shell with substitute user and group IDs.
-   Copyright (C) 1992-2005 Free Software Foundation, Inc.
+   Copyright (C) 1992-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,28 +38,6 @@
    restricts who can su to UID 0 accounts.  RMS considers that to
    be fascist.
 
-   Options:
-   -, -l, --login	Make the subshell a login shell.
-			Unset all environment variables except
-			TERM, HOME and SHELL (set as above), and USER
-			and LOGNAME (set unconditionally as above), and
-			set PATH to a default value.
-			Change to USER's home directory.
-			Prepend "-" to the shell's name.
-   -c, --commmand=COMMAND
-			Pass COMMAND to the subshell with a -c option
-			instead of starting an interactive shell.
-   -f, --fast		Pass the -f option to the subshell.
-   -m, -p, --preserve-environment
-			Do not change HOME, USER, LOGNAME, SHELL.
-			Run $SHELL instead of USER's shell from /etc/passwd
-			unless not the superuser and USER's shell is
-			restricted.
-			Overridden by --login and --shell.
-   -s, --shell=shell	Run SHELL instead of USER's shell from /etc/passwd
-			unless not the superuser and USER's shell is
-			restricted.
-
    Compile-time options:
    -DSYSLOG_SUCCESS	Log successful su's (by default, to root) with syslog.
    -DSYSLOG_FAILURE	Log failed su's (by default, to root) with syslog.
@@ -82,7 +60,7 @@
 #define getusershell _getusershell_sys_proto_
 
 #include "system.h"
-#include "dirname.h"
+#include "getpass.h"
 
 #undef getusershell
 
@@ -142,7 +120,6 @@
 #define DEFAULT_USER "root"
 
 char *crypt ();
-char *getpass ();
 char *getusershell ();
 void endusershell ();
 void setusershell ();
@@ -219,7 +196,7 @@ log_su (struct passwd const *pw, bool successful)
   if (!tty)
     tty = "none";
   /* 4.2BSD openlog doesn't have the third parameter.  */
-  openlog (base_name (program_name), 0
+  openlog (last_component (program_name), 0
 # ifdef LOG_AUTH
 	   , LOG_AUTH
 # endif
@@ -350,14 +327,14 @@ run_shell (char const *shell, char const *command, char **additional_args,
       char *arg0;
       char *shell_basename;
 
-      shell_basename = base_name (shell);
+      shell_basename = last_component (shell);
       arg0 = xmalloc (strlen (shell_basename) + 2);
       arg0[0] = '-';
       strcpy (arg0 + 1, shell_basename);
       args[0] = arg0;
     }
   else
-    args[0] = base_name (shell);
+    args[0] = last_component (shell);
   if (fast_startup)
     args[argno++] = "-f";
   if (command)
@@ -410,7 +387,7 @@ usage (int status)
 Change the effective user id and group id to that of USER.\n\
 \n\
   -, -l, --login               make the shell a login shell\n\
-  -c, --commmand=COMMAND       pass a single COMMAND to the shell with -c\n\
+  -c, --command=COMMAND        pass a single COMMAND to the shell with -c\n\
   -f, --fast                   pass -f to the shell (for csh or tcsh)\n\
   -m, --preserve-environment   do not reset environment variables\n\
   -p                           same as -m\n\

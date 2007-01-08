@@ -1,5 +1,5 @@
 /* csplit - split a file into sections determined by context lines
-   Copyright (C) 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -61,14 +61,14 @@
 /* A compiled pattern arg. */
 struct control
 {
-  char *regexpr;		/* Non-compiled regular expression. */
-  struct re_pattern_buffer re_compiled;	/* Compiled regular expression. */
   intmax_t offset;		/* Offset from regexp to split at. */
   uintmax_t lines_required;	/* Number of lines required. */
   uintmax_t repeat;		/* Repeat count. */
   int argnum;			/* ARGV index. */
   bool repeat_forever;		/* True if `*' used as a repeat count. */
   bool ignore;			/* If true, produce no output (for regexp). */
+  bool regexpr;			/* True if regular expression was used. */
+  struct re_pattern_buffer re_compiled;	/* Compiled regular expression. */
 };
 
 /* Initial size of data area in buffers. */
@@ -149,13 +149,13 @@ static uintmax_t current_line = 0;
 static bool have_read_eof = false;
 
 /* Name of output files. */
-static char * volatile filename_space = NULL;
+static char *volatile filename_space = NULL;
 
 /* Prefix part of output file names. */
-static char * volatile prefix = NULL;
+static char const *volatile prefix = NULL;
 
 /* Suffix part of output file names. */
-static char * volatile suffix = NULL;
+static char *volatile suffix = NULL;
 
 /* Number of digits to use in output file names. */
 static int volatile digits = 2;
@@ -526,6 +526,8 @@ load_buffer (void)
 
   if (lines_found)
     save_buffer (b);
+  else
+    free (b);
 
   return lines_found != 0;
 }
@@ -1038,7 +1040,7 @@ new_control_record (void)
   if (control_used == control_allocated)
     controls = X2NREALLOC (controls, &control_allocated);
   p = &controls[control_used++];
-  p->regexpr = NULL;
+  p->regexpr = false;
   p->repeat = 0;
   p->repeat_forever = false;
   p->lines_required = 0;
@@ -1097,11 +1099,11 @@ parse_repeat_count (int argnum, struct control *p, char *str)
    Unless IGNORE is true, mark these lines for output. */
 
 static struct control *
-extract_regexp (int argnum, bool ignore, char *str)
+extract_regexp (int argnum, bool ignore, char const *str)
 {
   size_t len;			/* Number of bytes in this regexp. */
   char delim = *str;
-  char *closing_delim;
+  char const *closing_delim;
   struct control *p;
   const char *err;
 
@@ -1115,13 +1117,14 @@ extract_regexp (int argnum, bool ignore, char *str)
   p->argnum = argnum;
   p->ignore = ignore;
 
-  p->regexpr = xmalloc (len + 1);
-  strncpy (p->regexpr, str + 1, len);
-  p->re_compiled.allocated = len * 2;
-  p->re_compiled.buffer = xmalloc (p->re_compiled.allocated);
-  p->re_compiled.fastmap = xmalloc (1 << CHAR_BIT);
+  p->regexpr = true;
+  p->re_compiled.buffer = NULL;
+  p->re_compiled.allocated = 0;
+  p->re_compiled.fastmap = xmalloc (UCHAR_MAX + 1);
   p->re_compiled.translate = NULL;
-  err = re_compile_pattern (p->regexpr, len, &p->re_compiled);
+  re_syntax_options =
+    RE_SYNTAX_POSIX_BASIC & ~RE_CONTEXT_INVALID_DUP & ~RE_NO_EMPTY_RANGES;
+  err = re_compile_pattern (str + 1, len, &p->re_compiled);
   if (err)
     {
       error (0, 0, _("%s: invalid regular expression: %s"), str, err);
@@ -1271,7 +1274,7 @@ get_format_conv_type (char **format_ptr)
       break;
 
     default:
-      if (ISPRINT (ch))
+      if (isprint (ch))
         error (EXIT_FAILURE, 0,
 	       _("invalid conversion specifier in suffix: %c"), ch);
       else

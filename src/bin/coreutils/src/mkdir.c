@@ -1,5 +1,5 @@
 /* mkdir -- make directories
-   Copyright (C) 90, 1995-2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 90, 1995-2002, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@
 #include <sys/types.h>
 
 #include "system.h"
-#include "dirname.h"
 #include "error.h"
+#include "lchmod.h"
 #include "mkdir-p.h"
 #include "modechange.h"
 #include "quote.h"
+#include "savewd.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "mkdir"
@@ -64,7 +65,7 @@ Create the DIRECTORY(ies), if they do not already exist.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -m, --mode=MODE   set permission mode (as in chmod), not rwxrwxrwx - umask\n\
+  -m, --mode=MODE   set file mode (as in chmod), not a=rwx - umask\n\
   -p, --parents     no error if existing, make parent directories as needed\n\
   -v, --verbose     print a message for each created directory\n\
 "), stdout);
@@ -75,17 +76,75 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   exit (status);
 }
 
+/* Options passed to subsidiary functions.  */
+struct mkdir_options
+{
+  /* Function to make an ancestor, or NULL if ancestors should not be
+     made.  */
+  int (*make_ancestor_function) (char const *, char const *, void *);
+
+  /* Mode for ancestor directory.  */
+  mode_t ancestor_mode;
+
+  /* Mode for directory itself.  */
+  mode_t mode;
+
+  /* File mode bits affected by MODE.  */
+  mode_t mode_bits;
+
+  /* If not null, format to use when reporting newly made directories.  */
+  char const *created_directory_format;
+};
+
+/* Report that directory DIR was made, if OPTIONS requests this.  */
+static void
+announce_mkdir (char const *dir, void *options)
+{
+  struct mkdir_options const *o = options;
+  if (o->created_directory_format)
+    error (0, 0, o->created_directory_format, quote (dir));
+}
+
+/* Make ancestor directory DIR, whose last component is COMPONENT,
+   with options OPTIONS.  Assume the working directory is COMPONENT's
+   parent.  Return 0 if successful and the resulting directory is
+   readable, 1 if successful but the resulting directory is not
+   readable, -1 (setting errno) otherwise.  */
+static int
+make_ancestor (char const *dir, char const *component, void *options)
+{
+  struct mkdir_options const *o = options;
+  int r = mkdir (component, o->ancestor_mode);
+  if (r == 0)
+    {
+      r = ! (o->ancestor_mode & S_IRUSR);
+      announce_mkdir (dir, options);
+    }
+  return r;
+}
+
+/* Process a command-line file name.  */
+static int
+process_dir (char *dir, struct savewd *wd, void *options)
+{
+  struct mkdir_options const *o = options;
+  return (make_dir_parents (dir, wd, o->make_ancestor_function, options,
+			    o->mode, announce_mkdir,
+			    o->mode_bits, (uid_t) -1, (gid_t) -1, true)
+	  ? EXIT_SUCCESS
+	  : EXIT_FAILURE);
+}
+
 int
 main (int argc, char **argv)
 {
-  mode_t newmode;
-  mode_t parent_mode IF_LINT (= 0);
   const char *specified_mode = NULL;
-  const char *verbose_fmt_string = NULL;
-  bool create_parents = false;
-  int exit_status = EXIT_SUCCESS;
   int optc;
-  int cwd_errno = 0;
+  struct mkdir_options options;
+  options.make_ancestor_function = NULL;
+  options.mode = S_IRWXUGO;
+  options.mode_bits = 0;
+  options.created_directory_format = NULL;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -100,13 +159,13 @@ main (int argc, char **argv)
       switch (optc)
 	{
 	case 'p':
-	  create_parents = true;
+	  options.make_ancestor_function = make_ancestor;
 	  break;
 	case 'm':
 	  specified_mode = optarg;
 	  break;
 	case 'v': /* --verbose  */
-	  verbose_fmt_string = _("created directory %s");
+	  options.created_directory_format = _("created directory %s");
 	  break;
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -121,13 +180,11 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
-  newmode = S_IRWXUGO;
-
-  if (specified_mode || create_parents)
+  if (options.make_ancestor_function || specified_mode)
     {
       mode_t umask_value = umask (0);
 
-      parent_mode = (S_IRWXUGO & ~umask_value) | (S_IWUSR | S_IXUSR);
+      options.ancestor_mode = (S_IRWXUGO & ~umask_value) | (S_IWUSR | S_IXUSR);
 
       if (specified_mode)
 	{
@@ -135,60 +192,14 @@ main (int argc, char **argv)
 	  if (!change)
 	    error (EXIT_FAILURE, 0, _("invalid mode %s"),
 		   quote (specified_mode));
-	  newmode = mode_adjust (S_IRWXUGO, change, umask_value);
+	  options.mode = mode_adjust (S_IRWXUGO, true, umask_value, change,
+				      &options.mode_bits);
 	  free (change);
 	}
       else
-	umask (umask_value);
+	options.mode = S_IRWXUGO & ~umask_value;
     }
 
-  for (; optind < argc; ++optind)
-    {
-      char *dir = argv[optind];
-      bool ok;
-
-      if (create_parents)
-	{
-	  if (cwd_errno != 0 && IS_RELATIVE_FILE_NAME (dir))
-	    {
-	      error (0, cwd_errno, _("cannot return to working directory"));
-	      ok = false;
-	    }
-	  else
-	    ok = make_dir_parents (dir, newmode, parent_mode,
-				   -1, -1, true, verbose_fmt_string,
-				   &cwd_errno);
-	}
-      else
-	{
-	  ok = (mkdir (dir, newmode) == 0);
-
-	  if (! ok)
-	    error (0, errno, _("cannot create directory %s"), quote (dir));
-	  else if (verbose_fmt_string)
-	    error (0, 0, verbose_fmt_string, quote (dir));
-
-	  /* mkdir(2) is required to honor only the file permission bits.
-	     In particular, it needn't do anything about `special' bits,
-	     so if any were set in newmode, apply them with chmod.
-	     This extra step is necessary in some cases when the containing
-	     directory has a default ACL.  */
-
-	  /* Set the permissions only if this directory has just
-	     been created.  */
-
-	  if (ok && specified_mode
-	      && chmod (dir, newmode) != 0)
-	    {
-	      error (0, errno, _("cannot set permissions of directory %s"),
-		     quote (dir));
-	      ok = false;
-	    }
-	}
-
-      if (! ok)
-	exit_status = EXIT_FAILURE;
-    }
-
-  exit (exit_status);
+  exit (savewd_process_files (argc - optind, argv + optind,
+			      process_dir, &options));
 }

@@ -1,5 +1,5 @@
 /* du -- summarize disk usage
-   Copyright (C) 1988-1991, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 1988-1991, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@
 #include <assert.h>
 #include "system.h"
 #include "argmatch.h"
-#include "dirname.h" /* for strip_trailing_slashes */
 #include "error.h"
 #include "exclude.h"
 #include "fprintftime.h"
@@ -294,6 +293,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                           the apparent size is usually smaller, it may be\n\
                           larger due to holes in (`sparse') files, internal\n\
                           fragmentation, indirect blocks, and the like\n\
+"), stdout);
+      fputs (_("\
   -B, --block-size=SIZE use SIZE-byte blocks\n\
   -b, --bytes           equivalent to `--apparent-size --block-size=1'\n\
   -c, --total           produce a grand total\n\
@@ -306,6 +307,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                           change to be equivalent to --dereference-args (-D)\n\
   -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)\n\
       --si              like -h, but use powers of 1000 not 1024\n\
+"), stdout);
+      fputs (_("\
   -k                    like --block-size=1K\n\
   -l, --count-links     count sizes many times if hard linked\n\
   -m                    like --block-size=1M\n\
@@ -681,7 +684,11 @@ main (int argc, char **argv)
   struct Tokens tok;
 
   /* Bit flags that control how fts works.  */
-  int bit_flags = FTS_PHYSICAL | FTS_TIGHT_CYCLE_CHECK;
+  int bit_flags = FTS_TIGHT_CYCLE_CHECK;
+
+  /* Select one of the three FTS_ options that control if/when
+     to follow a symlink.  */
+  int symlink_deref_bits = FTS_PHYSICAL;
 
   /* If true, display only a total for each argument. */
   bool opt_summarize_only = false;
@@ -803,15 +810,15 @@ main (int argc, char **argv)
 	  break;
 
 	case 'D': /* This will eventually be 'H' (-H), too.  */
-	  bit_flags = FTS_COMFOLLOW;
+	  symlink_deref_bits = FTS_COMFOLLOW | FTS_PHYSICAL;
 	  break;
 
 	case 'L': /* --dereference */
-	  bit_flags = FTS_LOGICAL;
+	  symlink_deref_bits = FTS_LOGICAL;
 	  break;
 
 	case 'P': /* --no-dereference */
-	  bit_flags = FTS_PHYSICAL;
+	  symlink_deref_bits = FTS_PHYSICAL;
 	  break;
 
 	case 'S':
@@ -1000,6 +1007,7 @@ main (int argc, char **argv)
     ok = (i == j);
   }
 
+  bit_flags |= symlink_deref_bits;
   ok &= du_files (files, bit_flags);
 
   /* This isn't really necessary, but it does ensure we

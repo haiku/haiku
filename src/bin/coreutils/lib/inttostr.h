@@ -1,6 +1,7 @@
 /* inttostr.h -- convert integers to printable strings
 
-   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,13 +19,7 @@
 
 /* Written by Paul Eggert */
 
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-#if HAVE_STDINT_H
-# include <stdint.h>
-#endif
-
+#include <stdint.h>
 #include <sys/types.h>
 
 #include "intprops.h"
@@ -32,3 +27,4 @@
 char *offtostr (off_t, char *);
 char *imaxtostr (intmax_t, char *);
 char *umaxtostr (uintmax_t, char *);
+char *uinttostr (unsigned int, char *);

@@ -1,5 +1,5 @@
 /* Decomposed printf argument list.
-   Copyright (C) 1999, 2002-2003 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2003, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ typedef enum
   TYPE_UINT,
   TYPE_LONGINT,
   TYPE_ULONGINT,
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
   TYPE_LONGLONGINT,
   TYPE_ULONGLONGINT,
 #endif
@@ -68,7 +68,7 @@ typedef enum
   TYPE_COUNT_SHORT_POINTER,
   TYPE_COUNT_INT_POINTER,
   TYPE_COUNT_LONGINT_POINTER
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
 , TYPE_COUNT_LONGLONGINT_POINTER
 #endif
 } arg_type;
@@ -87,7 +87,7 @@ typedef struct
     unsigned int		a_uint;
     long int			a_longint;
     unsigned long int		a_ulongint;
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
     long long int		a_longlongint;
     unsigned long long int	a_ulonglongint;
 #endif
@@ -109,7 +109,7 @@ typedef struct
     short *			a_count_short_pointer;
     int *			a_count_int_pointer;
     long int *			a_count_longint_pointer;
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
     long long int *		a_count_longlongint_pointer;
 #endif
   }

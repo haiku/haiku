@@ -1,5 +1,5 @@
 /* pwd - print current directory
-   Copyright (C) 1994-1997, 1999-2005 Free Software Foundation, Inc.
+   Copyright (C) 1994-1997, 1999-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,18 +39,6 @@ struct file_name
   size_t n_alloc;
   char *start;
 };
-
-enum
-{
-  NOT_AN_INODE_NUMBER = 0
-};
-
-#ifdef D_INO_IN_DIRENT
-# define D_INO(dp) ((dp)->d_ino)
-#else
-/* Some systems don't have inodes, so fake them to avoid lots of ifdefs.  */
-# define D_INO(dp) NOT_AN_INODE_NUMBER
-#endif
 
 /* The name this program was run with. */
 char *program_name;
@@ -186,7 +174,6 @@ find_dir_entry (struct stat *dot_sb, struct file_name *file_name,
       struct dirent const *dp;
       struct stat ent_sb;
       ino_t ino;
-      bool ent_sb_valid;
 
       errno = 0;
       if ((dp = readdir_ignoring_dot_and_dotdot (dirp)) == NULL)
@@ -206,7 +193,6 @@ find_dir_entry (struct stat *dot_sb, struct file_name *file_name,
 
       ino = D_INO (dp);
 
-      ent_sb_valid = false;
       if (ino == NOT_AN_INODE_NUMBER || use_lstat)
 	{
 	  if (lstat (dp->d_name, &ent_sb) < 0)
@@ -215,7 +201,6 @@ find_dir_entry (struct stat *dot_sb, struct file_name *file_name,
 	      continue;
 	    }
 	  ino = ent_sb.st_ino;
-	  ent_sb_valid = true;
 	}
 
       if (ino != dot_sb->st_ino)
@@ -225,13 +210,13 @@ find_dir_entry (struct stat *dot_sb, struct file_name *file_name,
 	 match is enough.  */
       if ( ! use_lstat || ent_sb.st_dev == dot_sb->st_dev)
 	{
-	  file_name_prepend (file_name, dp->d_name, NLENGTH (dp));
+	  file_name_prepend (file_name, dp->d_name, _D_EXACT_NAMLEN (dp));
 	  found = true;
 	  break;
 	}
     }
 
-  if (dirp == NULL || CLOSEDIR (dirp) != 0)
+  if (dirp == NULL || closedir (dirp) != 0)
     {
       /* Note that this diagnostic serves for both readdir
 	 and closedir failures.  */
@@ -294,8 +279,9 @@ robust_getcwd (struct file_name *file_name)
       find_dir_entry (&dot_sb, file_name, height++);
     }
 
+  /* See if a leading slash is needed; file_name_prepend adds one.  */
   if (file_name->start[0] == '\0')
-    file_name_prepend (file_name, "/", 1);
+    file_name_prepend (file_name, "", 0);
 }
 
 int

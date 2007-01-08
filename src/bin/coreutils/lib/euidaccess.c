@@ -1,7 +1,7 @@
 /* euidaccess -- check if effective user id can access file
 
-   Copyright (C) 1990, 1991, 1995, 1998, 2000, 2003, 2004, 2005 Free
-   Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1995, 1998, 2000, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -22,11 +22,8 @@
 /* Written by David MacKenzie and Torbjorn Granlund.
    Adapted for GNU C library by Roland McGrath.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #ifndef _LIBC
+# include <config.h>
 # include "euidaccess.h"
 #endif
 
@@ -70,7 +67,6 @@
 #else
 
 # include "group-member.h"
-# include "stat-macros.h"
 
 #endif
 

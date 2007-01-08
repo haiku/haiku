@@ -1,6 +1,6 @@
 #!/bin/sh
 # groups -- print the groups a user is in
-# Copyright (C) 1991, 1997, 2000, 2002, 2004 Free Software Foundation, Inc.
+# Copyright (C) 1991, 1997, 2000, 2002, 2004, 2006 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,39 +32,52 @@ Same as id -Gn.  If no USERNAME, use current process.
 Report bugs to <@PACKAGE_BUGREPORT@>."
 
 version='groups (@GNU_PACKAGE@) @VERSION@
-Written by David MacKenzie.
+Copyright (C) 2006 Free Software Foundation, Inc.
+This is free software.  You may redistribute copies of it under the terms of
+the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
+There is NO WARRANTY, to the extent permitted by law.
 
-Copyright (C) 2004 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.'
+Written by David MacKenzie.'
 
 
-fail=0
+for arg
+do
+  case $arg in
+    --help | --hel | --he | --h)
+      exec echo "$usage" ;;
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      exec echo "$version" ;;
+    --)
+      shift
+      break ;;
+    -*)
+      echo "$0: invalid option: $arg" >&2
+      exit 1 ;;
+  esac
+done
+
+# With fewer than two arguments, simply exec "id".
 case $# in
-  1 )
-    case "z${1}" in
-      z--help )
-	 echo "$usage" || fail=1; exit $fail;;
-      z--version )
-	 echo "$version" || fail=1; exit $fail;;
-      * ) ;;
-    esac
-    ;;
-  * ) ;;
+  0|1) exec id -Gn -- "$@" ;;
 esac
 
-if [ $# -eq 0 ]; then
-  id -Gn
-  fail=$?
-else
-  for name in "$@"; do
-    groups=`id -Gn -- $name`
+# With more, we need a loop, and be sure to exit nonzero upon failure.
+status=0
+write_error=0
+
+for name
+do
+  if groups=`id -Gn -- "$name"`; then
+    echo "$name : $groups" || {
+      status=$?
+      if test $write_error = 0; then
+	echo "$0: write error" >&2
+	write_error=1
+      fi
+    }
+  else
     status=$?
-    if test $status = 0; then
-      echo $name : $groups
-    else
-      fail=$status
-    fi
-  done
-fi
-exit $fail
+  fi
+done
+
+exit $status

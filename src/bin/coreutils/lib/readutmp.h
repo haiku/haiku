@@ -1,7 +1,7 @@
 /* Declarations for GNU's read utmp module.
 
    Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@
 #  undef HAVE_UTMPX_H
 # endif
 
-# ifdef HAVE_UTMPX_H
-#  ifdef HAVE_UTMP_H
+# if HAVE_UTMPX_H
+#  if HAVE_UTMP_H
     /* HPUX 10.20 needs utmp.h, for the definition of e.g., UTMP_FILE.  */
 #   include <utmp.h>
 #  endif
@@ -66,7 +66,8 @@
 #   endif
 #  endif
 
-# else
+# elif HAVE_UTMP_H
+
 #  include <utmp.h>
 #  if !HAVE_DECL_GETUTENT
     struct utmp *getutent();
@@ -103,7 +104,7 @@
 # endif
 
 /* Accessor macro for the member named ut_user or ut_name.  */
-# ifdef HAVE_UTMPX_H
+# if HAVE_UTMPX_H
 
 #  if HAVE_STRUCT_UTMPX_UT_USER
 #   define UT_USER(Utmp) ((Utmp)->ut_user)
@@ -113,7 +114,7 @@
 #   define UT_USER(Utmp) ((Utmp)->ut_name)
 #  endif
 
-# else
+# elif HAVE_UTMP_H
 
 #  if HAVE_STRUCT_UTMP_UT_USER
 #   define UT_USER(Utmp) ((Utmp)->ut_user)
@@ -141,11 +142,11 @@ typedef struct UTMP_STRUCT_NAME STRUCT_UTMP;
 
 enum { UT_USER_SIZE = sizeof UT_USER ((STRUCT_UTMP *) 0) };
 
-# if !defined (UTMP_FILE) && defined (_PATH_UTMP)
+# if !defined UTMP_FILE && defined _PATH_UTMP
 #  define UTMP_FILE _PATH_UTMP
 # endif
 
-# if !defined (WTMP_FILE) && defined (_PATH_WTMP)
+# if !defined WTMP_FILE && defined _PATH_WTMP
 #  define WTMP_FILE _PATH_WTMP
 # endif
 
@@ -201,7 +202,8 @@ enum { UT_USER_SIZE = sizeof UT_USER ((STRUCT_UTMP *) 0) };
 /* Options for read_utmp.  */
 enum
   {
-    READ_UTMP_CHECK_PIDS = 1
+    READ_UTMP_CHECK_PIDS = 1,
+    READ_UTMP_USER_PROCESS = 2
   };
 
 char *extract_trimmed_name (const STRUCT_UTMP *ut);

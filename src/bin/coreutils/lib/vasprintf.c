@@ -1,5 +1,5 @@
 /* Formatted output to strings.
-   Copyright (C) 1999, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,16 +15,21 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "vasprintf.h"
 
+#include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 
 #include "vasnprintf.h"
+
+/* Some systems, like OSF/1 4.0 and Woe32, don't have EOVERFLOW.  */
+#ifndef EOVERFLOW
+# define EOVERFLOW E2BIG
+#endif
 
 int
 vasprintf (char **resultp, const char *format, va_list args)
@@ -34,9 +39,14 @@ vasprintf (char **resultp, const char *format, va_list args)
   if (result == NULL)
     return -1;
 
+  if (length > INT_MAX)
+    {
+      free (result);
+      errno = EOVERFLOW;
+      return -1;
+    }
+
   *resultp = result;
-  /* Return the number of resulting bytes, excluding the trailing NUL.
-     If it wouldn't fit in an 'int', vasnprintf() would have returned NULL
-     and set errno to EOVERFLOW.  */
+  /* Return the number of resulting bytes, excluding the trailing NUL.  */
   return length;
 }

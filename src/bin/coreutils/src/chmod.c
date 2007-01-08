@@ -1,5 +1,5 @@
 /* chmod -- change permission modes of files
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
 
 #include "system.h"
 #include "dev-ino.h"
-#include "dirname.h"
 #include "error.h"
 #include "filemode.h"
 #include "modechange.h"
+#include "openat.h"
 #include "quote.h"
 #include "quotearg.h"
 #include "root-dev-ino.h"
@@ -142,7 +142,7 @@ static void
 describe_change (const char *file, mode_t mode,
 		 enum Change_status changed)
 {
-  char perms[11];		/* "-rwxrwxrwx" ls-style modes. */
+  char perms[12];		/* "-rwxrwxrwx" ls-style modes. */
   const char *fmt;
 
   if (changed == CH_NOT_APPLIED)
@@ -152,8 +152,8 @@ describe_change (const char *file, mode_t mode,
       return;
     }
 
-  mode_string (mode, perms);
-  perms[10] = '\0';		/* `mode_string' does not null terminate. */
+  strmode (mode, perms);
+  perms[10] = '\0';		/* Remove trailing space.  */
   switch (changed)
     {
     case CH_SUCCEEDED:
@@ -193,6 +193,19 @@ process_file (FTS *fts, FTSENT *ent)
       return true;
 
     case FTS_NS:
+      /* For a top-level file or directory, this FTS_NS (stat failed)
+	 indicator is determined at the time of the initial fts_open call.
+	 With programs like chmod, chown, and chgrp, that modify
+	 permissions, it is possible that the file in question is
+	 accessible when control reaches this point.  So, if this is
+	 the first time we've seen the FTS_NS for this file, tell
+	 fts_read to stat it "again".  */
+      if (ent->fts_level == 0 && ent->fts_number == 0)
+	{
+	  ent->fts_number = 1;
+	  fts_set (fts, ent, FTS_AGAIN);
+	  return true;
+	}
       error (0, ent->fts_errno, _("cannot access %s"), quote (file_full_name));
       ok = false;
       break;
@@ -221,11 +234,12 @@ process_file (FTS *fts, FTSENT *ent)
   if (ok)
     {
       old_mode = file_stats->st_mode;
-      new_mode = mode_adjust (old_mode, change, umask_value);
+      new_mode = mode_adjust (old_mode, S_ISDIR (old_mode) != 0, umask_value,
+			      change, NULL);
 
       if (! S_ISLNK (old_mode))
 	{
-	  if (chmod (file, new_mode) == 0)
+	  if (chmodat (fts->fts_cwd_fd, file, new_mode) == 0)
 	    chmod_succeeded = true;
 	  else
 	    {
@@ -255,13 +269,14 @@ process_file (FTS *fts, FTSENT *ent)
 
   if (chmod_succeeded & diagnose_surprises)
     {
-      mode_t naively_expected_mode = mode_adjust (old_mode, change, 0);
+      mode_t naively_expected_mode =
+	mode_adjust (old_mode, S_ISDIR (old_mode) != 0, 0, change, NULL);
       if (new_mode & ~naively_expected_mode)
 	{
-	  char new_perms[11];
-	  char naively_expected_perms[11];
-	  mode_string (new_mode, new_perms);
-	  mode_string (naively_expected_mode, naively_expected_perms);
+	  char new_perms[12];
+	  char naively_expected_perms[12];
+	  strmode (new_mode, new_perms);
+	  strmode (naively_expected_mode, naively_expected_perms);
 	  new_perms[10] = naively_expected_perms[10] = '\0';
 	  error (0, 0,
 		 _("%s: new permissions are %s, not %s"),
@@ -507,7 +522,7 @@ main (int argc, char **argv)
       root_dev_ino = NULL;
     }
 
-  ok = process_files (argv + optind, FTS_COMFOLLOW);
+  ok = process_files (argv + optind, FTS_COMFOLLOW | FTS_PHYSICAL);
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,5 +1,5 @@
 /* userspec.c -- Parse a user and group string.
-   Copyright (C) 1989-1992, 1997-1998, 2000, 2002-2005 Free Software
+   Copyright (C) 1989-1992, 1997-1998, 2000, 2002-2006 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -18,9 +18,7 @@
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "userspec.h"
@@ -76,11 +74,11 @@
 #endif
 
 /* ISDIGIT differs from isdigit, as follows:
-   - Its arg may be any int or unsigned int; it need not be an unsigned char.
-   - It's guaranteed to evaluate its argument exactly once.
+   - Its arg may be any int or unsigned int; it need not be an unsigned char
+     or EOF.
    - It's typically faster.
    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
-   ISDIGIT_LOCALE unless it's important to use the locale's definition
+   isdigit unless it's important to use the locale's definition
    of `digit' even when the host does not conform to POSIX.  */
 #define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
 
@@ -109,8 +107,7 @@ parse_with_separator (char const *spec, char const *separator,
 {
   static const char *E_invalid_user = N_("invalid user");
   static const char *E_invalid_group = N_("invalid group");
-  static const char *E_bad_spec =
-    N_("cannot get the login group of a numeric UID");
+  static const char *E_bad_spec = N_("invalid spec");
 
   const char *error_msg;
   struct passwd *pwd;
@@ -164,7 +161,11 @@ parse_with_separator (char const *spec, char const *separator,
 	{
 	  bool use_login_group = (separator != NULL && g == NULL);
 	  if (use_login_group)
-	    error_msg = E_bad_spec;
+	    {
+	      /* If there is no group,
+		 then there may not be a trailing ":", either.  */
+	      error_msg = E_bad_spec;
+	    }
 	  else
 	    {
 	      unsigned long int tmp;

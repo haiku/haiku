@@ -1,5 +1,8 @@
 /* Diacritics processing for a few character codes.
-   Copyright (C) 1990, 1991, 1992, 1993, 2000 Free Software Foundation, Inc.
+
+   Copyright (C) 1990, 1991, 1992, 1993, 2000, 2006 Free Software
+   Foundation, Inc.
+
    François Pinard <pinard@iro.umontreal.ca>, 1988.
 
    All this file is a temporary hack, waiting for locales in GNU.
@@ -19,9 +22,7 @@
    If not, write to the Free Software Foundation,
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "diacrit.h"
 

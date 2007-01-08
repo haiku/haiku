@@ -1,5 +1,5 @@
 /* Case-insensitive string comparison function.
-   Copyright (C) 1998, 1999, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1998-1999, 2005-2006 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2005,
    based on earlier glibc code.
 
@@ -17,14 +17,13 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "strcase.h"
 
 #include <ctype.h>
+#include <limits.h>
 
 #if HAVE_MBRTOWC
 # include "mbuiter.h"
@@ -93,6 +92,12 @@ strcasecmp (const char *s1, const char *s2)
 	}
       while (c1 == c2);
 
-      return c1 - c2;
+      if (UCHAR_MAX <= INT_MAX)
+	return c1 - c2;
+      else
+	/* On machines where 'char' and 'int' are types of the same size, the
+	   difference of two 'unsigned char' values - including the sign bit -
+	   doesn't fit in an 'int'.  */
+	return (c1 > c2 ? 1 : c1 < c2 ? -1 : 0);
     }
 }

@@ -1,5 +1,7 @@
 /* Provide a stub lchown function for systems that lack it.
-   Copyright (C) 1998, 1999, 2002, 2004 Free Software Foundation, Inc.
+
+   Copyright (C) 1998, 1999, 2002, 2004, 2006 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,20 +19,11 @@
 
 /* written by Jim Meyering */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
+#include <config.h>
 
 #include "lchown.h"
-#include "stat-macros.h"
 
-/* Declare chown to avoid a warning.  Don't include unistd.h,
-   because it may have a conflicting prototype for lchown.  */
-int chown ();
+#include <sys/stat.h>
 
 /* Work just like chown, except when FILE is a symbolic link.
    In that case, set errno to EOPNOTSUPP and return -1.
