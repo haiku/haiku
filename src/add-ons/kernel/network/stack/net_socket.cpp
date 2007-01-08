@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -716,6 +716,7 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 			break;
 	}
 
+	dprintf("socket_getsockopt: unknown option %d\n", option);
 	return ENOPROTOOPT;
 }
 
@@ -996,6 +997,7 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 			break;
 	}
 
+	dprintf("socket_setsockopt: unknown option %d\n", option);
 	return ENOPROTOOPT;
 }
 

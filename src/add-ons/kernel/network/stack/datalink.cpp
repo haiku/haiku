@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -520,13 +520,13 @@ interface_protocol_up(net_datalink_protocol *_protocol)
 	char name[B_OS_NAME_LENGTH];
 	snprintf(name, sizeof(name), "%s reader", device->name);
 
-	thread_id thread = spawn_kernel_thread(device_reader_thread, name,
+	deviceInterface->reader_thread = spawn_kernel_thread(device_reader_thread, name,
 		B_REAL_TIME_DISPLAY_PRIORITY - 10, deviceInterface);
-	if (thread < B_OK)
-		return thread;
+	if (deviceInterface->reader_thread < B_OK)
+		return deviceInterface->reader_thread;
 
 	device->flags |= IFF_UP;
-	resume_thread(thread);
+	resume_thread(deviceInterface->reader_thread);
 
 	deviceInterface->up_count = 1;
 	return B_OK;
@@ -552,6 +552,10 @@ interface_protocol_down(net_datalink_protocol *_protocol)
 
 	device->flags &= ~IFF_UP;
 	protocol->device_module->down(protocol->device);
+
+	// make sure the reader thread is gone before shutting down the interface
+	status_t status;
+	wait_for_thread(deviceInterface->reader_thread, &status);
 }
 
 

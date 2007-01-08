@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,6 +34,7 @@ struct net_device_interface {
 	const char			*name;
 	struct net_device_module_info *module;
 	struct net_device	*device;
+	thread_id			reader_thread;
 	uint32				up_count;
 		// a device can be brought up by more than one interface
 	int32				ref_count;
