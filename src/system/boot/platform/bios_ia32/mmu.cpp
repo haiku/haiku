@@ -9,7 +9,6 @@
 #include "mmu.h"
 #include "bios.h"
 
-#include <OS.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
 #include <boot/kernel_args.h>
@@ -17,6 +16,8 @@
 #include <arch/cpu.h>
 #include <arch_kernel.h>
 #include <kernel.h>
+
+#include <OS.h>
 
 #include <string.h>
 
@@ -279,8 +280,9 @@ init_page_directory(void)
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 
 	// clear out the pgdir
-	for (int32 i = 0; i < 1024; i++)
+	for (int32 i = 0; i < 1024; i++) {
 		sPageDirectory[i] = 0;
+	}
 
 	// Identity map the first 8 MB of memory so that their
 	// physical and virtual address are the same.
@@ -553,41 +555,39 @@ mmu_init(void)
 
 	// figure out the memory map
 	if (extMemoryCount > 0) {
-		uint32 i;
-
 		gKernelArgs.num_physical_memory_ranges = 0;
 
-		for (i = 0; i < extMemoryCount; i++) {
+		for (uint32 i = 0; i < extMemoryCount; i++) {
+			// Type 1 is available memory
 			if (extMemoryBlock[i].type == 1) {
-				// round everything up to page boundaries, exclusive of pages it partially occupies
+				// round everything up to page boundaries, exclusive of pages
+				// it partially occupies
 				extMemoryBlock[i].length -= (extMemoryBlock[i].base_addr % B_PAGE_SIZE)
 					? (B_PAGE_SIZE - (extMemoryBlock[i].base_addr % B_PAGE_SIZE)) : 0;
 				extMemoryBlock[i].base_addr = ROUNDUP(extMemoryBlock[i].base_addr, B_PAGE_SIZE);
 				extMemoryBlock[i].length = ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
 
-				// this is mem we can use
-				if (gKernelArgs.num_physical_memory_ranges == 0) {
-					gKernelArgs.physical_memory_range[0].start = (addr_t)extMemoryBlock[i].base_addr;
-					gKernelArgs.physical_memory_range[0].size = (addr_t)extMemoryBlock[i].length;
-					gKernelArgs.num_physical_memory_ranges++;
-				} else {
-					// we might have to extend the previous hole
-					addr_t previous_end = gKernelArgs.physical_memory_range[gKernelArgs.num_physical_memory_ranges - 1].start
-						+ gKernelArgs.physical_memory_range[gKernelArgs.num_physical_memory_ranges - 1].size;
+				if (gKernelArgs.num_physical_memory_ranges > 0) {
+					// we might want to extend a previous hole
+					addr_t previousEnd = gKernelArgs.physical_memory_range[
+							gKernelArgs.num_physical_memory_ranges - 1].start
+						+ gKernelArgs.physical_memory_range[
+							gKernelArgs.num_physical_memory_ranges - 1].size;
+					addr_t holeSize = extMemoryBlock[i].base_addr - previousEnd;
 
-					if (previous_end <= extMemoryBlock[i].base_addr
-						&& ((extMemoryBlock[i].base_addr - previous_end) < 0x100000)) {
-						// extend the previous buffer
-						gKernelArgs.physical_memory_range[gKernelArgs.num_physical_memory_ranges - 1].size +=
-							(extMemoryBlock[i].base_addr - previous_end) +
-							extMemoryBlock[i].length;
-
-						// mark the gap between the two allocated ranges in use
-						gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].start = previous_end;
-						gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = extMemoryBlock[i].base_addr - previous_end;
-						gKernelArgs.num_physical_allocated_ranges++;
+					// if the hole is smaller than 1 MB, we try to mark the memory
+					// as allocated and extend the previous memory range
+					if (previousEnd <= extMemoryBlock[i].base_addr
+						&& holeSize < 0x100000
+						&& insert_physical_allocated_range(previousEnd,
+							extMemoryBlock[i].base_addr - previousEnd) == B_OK) {
+						gKernelArgs.physical_memory_range[
+							gKernelArgs.num_physical_memory_ranges - 1].size += holeSize;
 					}
 				}
+
+				insert_physical_memory_range(extMemoryBlock[i].base_addr,
+					extMemoryBlock[i].length);
 			}
 		}
 	} else {

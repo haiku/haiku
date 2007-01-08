@@ -36,6 +36,18 @@ remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
 }
 
 
+static status_t
+add_kernel_args_range(void *start, uint32 size)
+{
+	return insert_address_range(gKernelArgs.kernel_args_range, 
+		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
+		(addr_t)start, size);
+}
+
+
+//	#pragma mark - addr_range utility
+
+
 /**	Inserts the specified (start, size) pair (aka range) in the
  *	addr_range array.
  *	It will extend existing ranges in order to have as little
@@ -122,13 +134,80 @@ insert_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
 }
 
 
-static status_t
-add_kernel_args_range(void *start, uint32 size)
+extern "C" status_t
+remove_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
+	addr_t start, uint32 size)
 {
-	return insert_address_range(gKernelArgs.kernel_args_range, 
-		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
-		(addr_t)start, size);
+	uint32 numRanges = *_numRanges;
+
+	addr_t end = ROUNDUP(start + size, B_PAGE_SIZE);
+	start = ROUNDOWN(start, B_PAGE_SIZE);
+
+	for (uint32 i = 0; i < numRanges; i++) {
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeEnd = rangeStart + ranges[i].size;
+
+		if (start <= rangeStart) {
+			if (end <= rangeStart) {
+				// no intersection
+			} else if (end >= rangeEnd) {
+				// remove the complete range
+				remove_range_index(ranges, numRanges, i);
+				i--;
+			} else {
+				// remove the head of the range
+				ranges[i].start = end;
+				ranges[i].size = rangeEnd - end;
+			}
+		} else if (end >= rangeEnd) {
+			if (start < rangeEnd) {
+				// remove the tail
+				ranges[i].size = start - rangeStart;
+			}	// else: no intersection
+		} else {
+			// rangeStart < start < end < rangeEnd
+			// The ugly case: We have to remove something from the middle of
+			// the range. We keep the head of the range and insert its tail
+			// as a new range.
+			ranges[i].size = start - rangeStart;
+			return insert_address_range(ranges, _numRanges, maxRanges,
+				end, rangeEnd - end);
+		}
+	}
+
+	*_numRanges = numRanges;
+	return B_OK;
 }
+
+
+status_t
+insert_physical_memory_range(addr_t start, uint32 size)
+{
+	return insert_address_range(gKernelArgs.physical_memory_range, 
+		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
+		start, size);
+}
+
+
+status_t
+insert_physical_allocated_range(addr_t start, uint32 size)
+{
+	return insert_address_range(gKernelArgs.physical_allocated_range, 
+		&gKernelArgs.num_physical_allocated_ranges, MAX_PHYSICAL_ALLOCATED_RANGE,
+		start, size);
+}
+
+
+status_t
+insert_virtual_allocated_range(addr_t start, uint32 size)
+{
+	return insert_address_range(gKernelArgs.virtual_allocated_range, 
+		&gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
+		start, size);
+}
+
+
+//	#pragma mark - kernel_args allocations
 
 
 /** This function can be used to allocate memory that is going
