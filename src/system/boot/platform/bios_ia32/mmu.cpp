@@ -567,6 +567,12 @@ mmu_init(void)
 				extMemoryBlock[i].base_addr = ROUNDUP(extMemoryBlock[i].base_addr, B_PAGE_SIZE);
 				extMemoryBlock[i].length = ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
 
+				// we ignore all memory beyond 4 GB
+				if (extMemoryBlock[i].base_addr > 0xffffffffULL)
+					continue;
+				if (extMemoryBlock[i].base_addr + extMemoryBlock[i].length > 0xffffffffULL)
+					extMemoryBlock[i].length = 0x100000000ULL - extMemoryBlock[i].base_addr;
+
 				if (gKernelArgs.num_physical_memory_ranges > 0) {
 					// we might want to extend a previous hole
 					addr_t previousEnd = gKernelArgs.physical_memory_range[
