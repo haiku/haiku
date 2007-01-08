@@ -4,26 +4,16 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared interface ;
 
-if $(TARGET_PLATFORM) = r5 {
+local columnViewSources ;
+
+if $(TARGET_PLATFORM) != haiku {
+	columnViewSources = ColumnListView.cpp ColumnTypes.cpp ColorTools.cpp ;
+}
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 
 Application ResEdit :
-	App.cpp
-	ColumnListView.cpp
-	ColumnTypes.cpp
-	ColorTools.cpp
-	PreviewColumn.cpp
-	ResourceData.cpp
-	ResourceRoster.cpp
-	ResView.cpp
-	ResWindow.cpp
-	: be tracker translation
-;
-
-} else {
-
-Application ResEdit :
+	$(columnViewSources)
 	App.cpp
 	PreviewColumn.cpp
 	ResourceData.cpp
@@ -32,5 +22,3 @@ Application ResEdit :
 	ResWindow.cpp
 	: be tracker translation
 ;
-
-}
