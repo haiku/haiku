@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H
@@ -16,9 +16,9 @@
 
 // must match SMP_MAX_CPUS in arch_smp.h
 #define MAX_BOOT_CPUS 4
-#define MAX_PHYSICAL_MEMORY_RANGE 4
-#define MAX_PHYSICAL_ALLOCATED_RANGE 4
-#define MAX_VIRTUAL_ALLOCATED_RANGE 4
+#define MAX_PHYSICAL_MEMORY_RANGE 6
+#define MAX_PHYSICAL_ALLOCATED_RANGE 6
+#define MAX_VIRTUAL_ALLOCATED_RANGE 6
 
 #define MAX_SERIAL_PORTS 4
 
