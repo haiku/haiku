@@ -41,7 +41,7 @@ uhci_std_ops(int32 op, ...)
 
 host_controller_info uhci_module = {
 	{
-		"busses/usb/uhci/nielx",
+		"busses/usb/uhci/v1",
 		0,
 		uhci_std_ops
 	},
@@ -194,7 +194,6 @@ Queue::TerminateByStrayDescriptor()
 
 	fQueueHead->link_phy = fStrayDescriptor->this_phy;
 	fQueueHead->link_log = fStrayDescriptor;
-	fQueueHead->element_phy = QH_TERMINATE;
 	Unlock();
 
 	return B_OK;
@@ -202,33 +201,26 @@ Queue::TerminateByStrayDescriptor()
 
 
 status_t
-Queue::AppendDescriptorChain(uhci_td *descriptor)
+Queue::AppendTransfer(uhci_qh *transfer)
 {
-	TRACE(("usb_uhci: appending descriptor chain\n"));
-
 	if (!Lock())
 		return B_ERROR;
 
-#ifdef TRACE_USB
-	print_descriptor_chain(descriptor);
-#endif
+	transfer->link_log = NULL;
+	transfer->link_phy = fQueueHead->link_phy;
 
-	if (fQueueTop == NULL) {
-		// the queue is empty, make this the first element
-		fQueueTop = descriptor;
-		fQueueHead->element_phy = descriptor->this_phy;
-		TRACE(("usb_uhci: first transfer in queue\n"));
+	if (!fQueueTop) {
+		// the list is empty, make this the first element
+		fQueueTop = transfer;
+		fQueueHead->element_phy = transfer->this_phy | QH_NEXT_IS_QH;
 	} else {
-		// there are transfers linked, append to the queue
-		uhci_td *element = fQueueTop;
-		while ((element->link_phy & TD_TERMINATE) == 0)
-			element = (uhci_td *)element->link_log;
+		// append the transfer queue to the list
+		uhci_qh *element = fQueueTop;
+		while (element && element->link_log)
+			element = (uhci_qh *)element->link_log;
 
-		element->link_log = descriptor;
-		element->link_phy = descriptor->this_phy | TD_DEPTH_FIRST;
-		if (fQueueHead->element_phy & QH_TERMINATE)
-			fQueueHead->element_phy = descriptor->this_phy;
-		TRACE(("usb_uhci: appended transfer to queue\n"));
+		element->link_log = transfer;
+		element->link_phy = transfer->this_phy | QH_NEXT_IS_QH;
 	}
 
 	Unlock();
@@ -237,56 +229,40 @@ Queue::AppendDescriptorChain(uhci_td *descriptor)
 
 
 status_t
-Queue::RemoveDescriptorChain(uhci_td *firstDescriptor, uhci_td *lastDescriptor)
+Queue::RemoveTransfer(uhci_qh *transfer)
 {
-	TRACE(("usb_uhci: removing descriptor chain\n"));
-
 	if (!Lock())
 		return B_ERROR;
 
-	if (fQueueTop == firstDescriptor) {
-		// it is the first chain in this queue
-		if ((lastDescriptor->link_phy & TD_TERMINATE) > 0) {
-			// it is the only chain in this queue
-			fQueueTop = NULL;
+	if (fQueueTop == transfer) {
+		// this was the top element
+		fQueueTop = (uhci_qh *)transfer->link_log;
+		if (!fQueueTop) {
+			// this was the only element, terminate this queue
+			fQueueHead->element_phy = QH_TERMINATE;
 		} else {
-			// there are still linked transfers
-			fQueueTop = (uhci_td *)lastDescriptor->link_log;
+			// there are elements left, adjust the element pointer
+			fQueueHead->element_phy = transfer->link_phy;
 		}
+
+		Unlock();
+		return B_OK;
 	} else {
-		// unlink the chain
-		uhci_td *element = fQueueTop;
+		uhci_qh *element = fQueueTop;
 		while (element) {
-			if (element->link_log == firstDescriptor) {
-				element->link_log = lastDescriptor->link_log;
-				element->link_phy = lastDescriptor->link_phy;
-				break;
+			if (element->link_log == transfer) {
+				element->link_log = transfer->link_log;
+				element->link_phy = transfer->link_phy;
+				Unlock();
+				return B_OK;
 			}
 
-			element = (uhci_td *)element->link_log;
+			element = (uhci_qh *)element->link_log;
 		}
 	}
-
-	uhci_td *element = firstDescriptor;
-	while (element && element != lastDescriptor->link_log) {
-		if ((fQueueHead->element_phy & TD_LINK_MASK) == element->this_phy) {
-			fQueueHead->element_phy = lastDescriptor->link_phy;
-			TRACE_ERROR(("uhci: queue element pointer still pointing to removed chain\n"));
-			break;
-		}
-
-		element = (uhci_td *)element->link_log;
-	}
-
-	lastDescriptor->link_log = NULL;
-	lastDescriptor->link_phy = TD_TERMINATE;
-
-#ifdef TRACE_USB
-	print_descriptor_chain(firstDescriptor);
-#endif
 
 	Unlock();
-	return B_OK;
+	return B_BAD_VALUE;
 }
 
 
@@ -385,6 +361,14 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	WriteReg32(UHCI_FRBASEADD, (uint32)physicalAddress);	
 	WriteReg16(UHCI_FRNUM, 0);
 
+	// Set the max packet size for bandwidth reclamation to 64 bytes
+	WriteReg16(UHCI_USBCMD, ReadReg16(UHCI_USBCMD) | UHCI_USBCMD_MAXP);
+
+	// we will create four queues:
+	// 0: interrupt transfers
+	// 1: low speed control transfers
+	// 2: full speed control transfers
+	// 3: bulk transfers
 	fQueueCount = 4;
 	fQueues = new(std::nothrow) Queue *[fQueueCount];
 	if (!fQueues) {
@@ -419,7 +403,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 	// Create the finisher service thread
 	fFinishThread = spawn_kernel_thread(FinishThread,
-		"uhci finish thread", B_NORMAL_PRIORITY, (void *)this);
+		"uhci finish thread", B_URGENT_DISPLAY_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
 
 	// Install the interrupt handler
@@ -547,22 +531,22 @@ UHCI::SubmitTransfer(Transfer *transfer)
 			transfer->VectorCount());
 	}
 
-	Queue *queue = fQueues[3];
-	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
-		queue = fQueues[2];
+	Queue *queue = NULL;
+	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) {
+		// use interrupt queue
+		queue = fQueues[0];
+	} else {
+		// use bulk queue
+		queue = fQueues[3];
+	}
 
-	result = AddPendingTransfer(transfer, queue, firstDescriptor,
-		firstDescriptor, lastDescriptor, directionIn);
+	uhci_qh *transferQueue = CreateTransferQueue(firstDescriptor);
+	result = AddPendingTransfer(transfer, queue, transferQueue,
+		firstDescriptor, firstDescriptor, directionIn);
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_uhci: failed to add pending transfer\n"));
 		FreeDescriptorChain(firstDescriptor);
-		return result;
-	}
-
-	result = queue->AppendDescriptorChain(firstDescriptor);
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to append descriptor chain\n"));
-		FreeDescriptorChain(firstDescriptor);
+		FreeTransferQueue(transferQueue);
 		return result;
 	}
 
@@ -625,18 +609,22 @@ UHCI::SubmitRequest(Transfer *transfer)
 		LinkDescriptors(setupDescriptor, statusDescriptor);
 	}
 
-	status_t result = AddPendingTransfer(transfer, fQueues[1], setupDescriptor,
-		dataDescriptor, statusDescriptor, directionIn);
+	Queue *queue = NULL;
+	if (pipe->Speed() == USB_SPEED_LOWSPEED) {
+		// use the low speed control queue
+		queue = fQueues[1];
+	} else {
+		// use the full speed control queue
+		queue = fQueues[2];
+	}
+
+	uhci_qh *transferQueue = CreateTransferQueue(setupDescriptor);
+	status_t result = AddPendingTransfer(transfer, queue, transferQueue,
+		setupDescriptor, dataDescriptor, directionIn);
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_uhci: failed to add pending transfer\n"));
 		FreeDescriptorChain(setupDescriptor);
-		return result;
-	}
-
-	result = fQueues[1]->AppendDescriptorChain(setupDescriptor);
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to append descriptor chain\n"));
-		FreeDescriptorChain(setupDescriptor);
+		FreeTransferQueue(transferQueue);
 		return result;
 	}
 
@@ -646,18 +634,21 @@ UHCI::SubmitRequest(Transfer *transfer)
 
 status_t
 UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
-	uhci_td *firstDescriptor, uhci_td *dataDescriptor, uhci_td *lastDescriptor,
+	uhci_qh *transferQueue, uhci_td *firstDescriptor, uhci_td *dataDescriptor,
 	bool directionIn)
 {
+	if (!transfer || !queue || !transferQueue || !firstDescriptor)
+		return B_BAD_VALUE;
+
 	transfer_data *data = new(std::nothrow) transfer_data();
 	if (!data)
 		return B_NO_MEMORY;
 
 	data->transfer = transfer;
 	data->queue = queue;
+	data->transfer_queue = transferQueue;
 	data->first_descriptor = firstDescriptor;
 	data->data_descriptor = dataDescriptor;
-	data->last_descriptor = lastDescriptor;
 	data->user_area = -1;
 	data->incoming = directionIn;
 	data->link = NULL;
@@ -718,6 +709,7 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	fLastTransfer = data;
 	Unlock();
 
+	queue->AppendTransfer(data->transfer_queue);
 	return B_OK;
 }
 
@@ -764,7 +756,7 @@ UHCI::FinishTransfers()
 				}
 
 				if (status & TD_ERROR_MASK) {
-					TRACE_ERROR(("usb_uhci: td (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status));
+					TRACE_ERROR(("usb_uhci: td (0x%08lx) error: status: 0x%08lx; token: 0x%08lx;\n", descriptor->this_phy, status, descriptor->token));
 					// an error occured. we have to remove the
 					// transfer from the queue and clean up
 
@@ -803,25 +795,21 @@ UHCI::FinishTransfers()
 						callbackStatus = B_DEV_STALLED;
 					}
 
-					transfer->queue->RemoveDescriptorChain(
-						transfer->first_descriptor,
-						transfer->last_descriptor);
-
+					transfer->queue->RemoveTransfer(transfer->transfer_queue);
 					FreeDescriptorChain(transfer->first_descriptor);
+					FreeTransferQueue(transfer->transfer_queue);
 					transfer->transfer->Finished(callbackStatus, 0);
 					transferDone = true;
 					break;
 				}
 
 				// either all descriptors are done, or we have a short packet
-				if (descriptor == transfer->last_descriptor
+				if ((descriptor->link_phy & TD_TERMINATE)
 					|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
 					< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
 					TRACE(("usb_uhci: td (0x%08lx) ok\n", descriptor->this_phy));
 					// we got through without errors so we are finished
-					transfer->queue->RemoveDescriptorChain(
-						transfer->first_descriptor,
-						transfer->last_descriptor);
+					transfer->queue->RemoveTransfer(transfer->transfer_queue);
 
 					size_t actualLength = 0;
 					uint8 lastDataToggle = 0;
@@ -863,6 +851,7 @@ UHCI::FinishTransfers()
 					}
 
 					FreeDescriptorChain(transfer->first_descriptor);
+					FreeTransferQueue(transfer->transfer_queue);
 					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
 					transfer->transfer->Finished(B_OK, actualLength);
 					transferDone = true;
@@ -1206,6 +1195,31 @@ UHCI::AddTo(Stack *stack)
 }
 
 
+uhci_qh *
+UHCI::CreateTransferQueue(uhci_td *descriptor)
+{
+	uhci_qh *queueHead;
+	void *physicalAddress;
+	if (fStack->AllocateChunk((void **)&queueHead,
+		&physicalAddress, sizeof(uhci_qh)) < B_OK)
+		return NULL;
+
+	queueHead->this_phy = (addr_t)physicalAddress;
+	queueHead->element_phy = descriptor->this_phy;
+	return queueHead;
+}
+
+
+void
+UHCI::FreeTransferQueue(uhci_qh *queueHead)
+{
+	if (!queueHead)
+		return;
+
+	fStack->FreeChunk(queueHead, (void *)queueHead->this_phy, sizeof(uhci_qh));
+}
+
+
 uhci_td *
 UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 {
@@ -1219,7 +1233,9 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 	}
 
 	result->this_phy = (addr_t)physicalAddress;
-	result->status = TD_STATUS_ACTIVE | TD_CONTROL_3_ERRORS | TD_CONTROL_SPD;
+	result->status = TD_STATUS_ACTIVE | TD_CONTROL_3_ERRORS;
+	if (direction == TD_TOKEN_IN)
+		result->status |= TD_CONTROL_SPD;
 	if (pipe->Speed() == USB_SPEED_LOWSPEED)
 		result->status |= TD_CONTROL_LOWSPEED;
 

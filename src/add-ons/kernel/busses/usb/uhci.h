@@ -32,10 +32,8 @@ public:
 		status_t					LinkTo(Queue *other);
 		status_t					TerminateByStrayDescriptor();
 
-		status_t					AppendDescriptorChain(uhci_td *descriptor);
-		status_t					RemoveDescriptorChain(
-										uhci_td *firstDescriptor,
-										uhci_td *lastDescriptor);
+		status_t					AppendTransfer(uhci_qh *transfer);
+		status_t					RemoveTransfer(uhci_qh *transfer);
 
 		addr_t						PhysicalAddress();
 
@@ -46,7 +44,7 @@ private:
 		Stack						*fStack;
 		uhci_qh						*fQueueHead;
 		uhci_td						*fStrayDescriptor;
-		uhci_td						*fQueueTop;
+		uhci_qh						*fQueueTop;
 		benaphore					fLock;
 };
 
@@ -54,9 +52,9 @@ private:
 typedef struct transfer_data_s {
 	Transfer		*transfer;
 	Queue			*queue;
+	uhci_qh			*transfer_queue;
 	uhci_td			*first_descriptor;
 	uhci_td			*data_descriptor;
-	uhci_td			*last_descriptor;
 	area_id			user_area;
 	bool			incoming;
 	transfer_data_s	*link;
@@ -93,12 +91,16 @@ static	int32						InterruptHandler(void *data);
 		// Transfer functions
 		status_t					AddPendingTransfer(Transfer *transfer,
 										Queue *queue,
+										uhci_qh *transferQueue,
 										uhci_td *firstDescriptor,
 										uhci_td *dataDescriptor,
-										uhci_td *lastDescriptor,
 										bool directionIn);
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
+
+		// Transfer queue functions
+		uhci_qh						*CreateTransferQueue(uhci_td *descriptor);
+		void						FreeTransferQueue(uhci_qh *queueHead);
 
 		// Descriptor functions
 		uhci_td						*CreateDescriptor(Pipe *pipe,

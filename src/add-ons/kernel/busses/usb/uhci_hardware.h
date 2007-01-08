@@ -40,6 +40,7 @@
 #define UHCI_USBCMD_FGR	0x10	// Force Global resume
 #define UHCI_USBCMD_SWDBG 0x20	// Software Debug
 #define UHCI_USBCMD_CF 0x40		// Configure Flag
+#define UHCI_USBCMD_MAXP 0x80	// Max packet
 
 //USBSTS
 #define UHCI_USBSTS_USBINT 0x1	// USB interrupt
