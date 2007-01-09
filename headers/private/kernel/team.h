@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku Inc.
+ * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TEAM_H
@@ -28,6 +28,8 @@ team_id team_get_current_team_id(void);
 status_t team_get_address_space(team_id id, struct vm_address_space **_addressSpace);
 char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
+status_t team_get_death_entry(struct team *team, thread_id child,
+	struct death_entry *death, struct death_entry **_freeDeath);
 bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);

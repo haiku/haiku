@@ -1289,37 +1289,6 @@ register_wait_for_any(struct team *team, thread_id child)
 }
 
 
-static status_t
-get_team_death_entry(struct team *team, thread_id child, struct death_entry *death,
-	struct death_entry **_freeDeath)
-{
-	struct death_entry *entry = NULL;
-
-	// find matching death entry structure
-
-	while ((entry = list_get_next_item(&team->dead_children.list, entry)) != NULL) {
-		if (child != -1 && entry->thread != child)
-			continue;
-
-		// we found one
-
-		*death = *entry;
-
-		// only remove the death entry if there aren't any other interested parties
-		if ((child == -1 && atomic_add(&team->dead_children.wait_for_any, -1) == 1)
-			|| (child != -1 && team->dead_children.wait_for_any == 0)) {
-			list_remove_link(entry);
-			team->dead_children.count--;
-			*_freeDeath = entry;
-		}
-
-		return B_OK;
-	}
-
-	return child > 0 ? B_BAD_THREAD_ID : B_WOULD_BLOCK;
-}
-
-
 /**	Gets the next pending death entry, if any. Also fills in \a _waitSem
  *	to the semaphore the caller have to wait for for other death entries.
  *	Must be called with the team lock held.
@@ -1336,7 +1305,7 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 		// wait for any children or a specific child of this team to die
 		*_waitSem = team->dead_children.sem;
 		*_waitCount = &team->dead_children.waiters;
-		return get_team_death_entry(team, child, death, _freeDeath);
+		return team_get_death_entry(team, child, death, _freeDeath);
 	} else if (child < 0) {
 		// we wait for all children of the specified process group
 		group = team_get_process_group_locked(team->group->session, -child);
@@ -1348,7 +1317,7 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 	}
 
 	for (team = group->teams; team; team = team->group_next) {
-		status = get_team_death_entry(team, -1, death, _freeDeath);
+		status = team_get_death_entry(team, -1, death, _freeDeath);
 		if (status == B_OK) {
 			atomic_add(&group->wait_for_any, -1);
 			return B_OK;
@@ -1565,6 +1534,41 @@ int32
 team_used_teams(void)
 {
 	return sUsedTeams;
+}
+
+
+/** Fills the provided death entry if it's in the team.
+ *	You need to have the team lock held when calling this function.
+ */
+
+status_t
+team_get_death_entry(struct team *team, thread_id child, struct death_entry *death,
+	struct death_entry **_freeDeath)
+{
+	struct death_entry *entry = NULL;
+
+	// find matching death entry structure
+
+	while ((entry = list_get_next_item(&team->dead_children.list, entry)) != NULL) {
+		if (child != -1 && entry->thread != child)
+			continue;
+
+		// we found one
+
+		*death = *entry;
+
+		// only remove the death entry if there aren't any other interested parties
+		if ((child == -1 && atomic_add(&team->dead_children.wait_for_any, -1) == 1)
+			|| (child != -1 && team->dead_children.wait_for_any == 0)) {
+			list_remove_link(entry);
+			team->dead_children.count--;
+			*_freeDeath = entry;
+		}
+
+		return B_OK;
+	}
+
+	return child > 0 ? B_BAD_THREAD_ID : B_WOULD_BLOCK;
 }
 
 

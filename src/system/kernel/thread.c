@@ -1300,15 +1300,15 @@ status_t
 wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_returnCode)
 {
 	sem_id sem = B_BAD_THREAD_ID;
-	struct death_entry death;
+	struct death_entry death, *freeDeath = NULL;
 	struct thread *thread;
 	cpu_status state;
-	status_t status;
+	status_t status = B_OK;
+
+	if (id < B_OK)
+		return B_BAD_THREAD_ID;
 
 	// we need to resume the thread we're waiting for first
-	status = resume_thread(id);
-	if (status != B_OK)
-		return status;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -1321,10 +1321,35 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_re
 	}
 
 	RELEASE_THREAD_LOCK();
+
+	if (thread == NULL) {
+		// we couldn't find this thread - maybe it's already gone, and we'll
+		// find its death entry
+		GRAB_TEAM_LOCK();
+
+		status = team_get_death_entry(thread_get_current_thread()->team,
+			id, &death, &freeDeath);
+
+		RELEASE_TEAM_LOCK();
+	}
+
 	restore_interrupts(state);
+
+	if (thread == NULL && status == B_OK) {
+		// we found the thread's death entry in our team
+		if (_returnCode)
+			*_returnCode = death.status;
+
+		free(freeDeath);
+		return B_OK;
+	}
+
+	// we need to wait for the death of the thread
 
 	if (sem < B_OK)
 		return B_BAD_THREAD_ID;
+
+	resume_thread(id);
 
 	status = acquire_sem_etc(sem, 1, flags, timeout);
 
