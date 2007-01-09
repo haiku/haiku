@@ -362,12 +362,8 @@ Desktop::Init()
 	// TODO: temporary workaround, fActiveScreen will be removed
 	fActiveScreen = fVirtualScreen.ScreenAt(0);
 
-	SetCursor(NULL);
-		// this will set the default cursor
-
 	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
 		fVirtualScreen.Frame().Height() / 2);
-	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 
 #if TEST_MODE
 	gInputManager->AddStream(new InputServerStream);
@@ -392,6 +388,11 @@ Desktop::Init()
 	_SetBackground(stillAvailableOnScreen);
 
 	gFontManager->AttachUser(fUserID);
+
+	SetCursor(NULL);
+		// this will set the default cursor
+
+	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 
 	return B_OK;
 }
