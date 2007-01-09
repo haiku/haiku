@@ -4,7 +4,7 @@
 
 /*
 ** This file is in the public domain, so clarified as of
-** 1996-06-05 by Arthur David Olson (arthur_david_olson@nih.gov).
+** 1996-06-05 by Arthur David Olson.
 */
 
 /*
@@ -21,7 +21,7 @@
 
 #ifndef lint
 #ifndef NOID
-static char	privatehid[] = "@(#)private.h	7.55";
+static char	privatehid[] = "@(#)private.h	8.2";
 #endif /* !defined NOID */
 #endif /* !defined lint */
 
@@ -89,7 +89,7 @@ static char	privatehid[] = "@(#)private.h	7.55";
 #include "stdio.h"
 #include "errno.h"
 #include "string.h"
-#include "limits.h"	/* for CHAR_BIT */
+#include "limits.h"	/* for CHAR_BIT et al. */
 #include "time.h"
 #include "stdlib.h"
 
@@ -125,20 +125,51 @@ static char	privatehid[] = "@(#)private.h	7.55";
 #define is_digit(c) ((unsigned)(c) - '0' <= 9)
 
 /*
+** Define HAVE_STDINT_H's default value here, rather than at the
+** start, since __GLIBC__'s value depends on previously-included
+** files.
+** (glibc 2.1 and later have stdint.h, even with pre-C99 compilers.)
+*/
+#ifndef HAVE_STDINT_H
+#define HAVE_STDINT_H \
+	(199901 <= __STDC_VERSION__ || \
+	2 < (__GLIBC__ + (0 < __GLIBC_MINOR__)))
+#endif /* !defined HAVE_STDINT_H */
+
+#if HAVE_STDINT_H
+#include "stdint.h"
+#endif /* !HAVE_STDINT_H */
+
+#ifndef INT_FAST64_MAX
+/* Pre-C99 GCC compilers define __LONG_LONG_MAX__ instead of LLONG_MAX.  */
+#if defined LLONG_MAX || defined __LONG_LONG_MAX__
+typedef long long	int_fast64_t;
+#else /* ! (defined LLONG_MAX || defined __LONG_LONG_MAX__) */
+#if (LONG_MAX >> 31) < 0xffffffff
+Please use a compiler that supports a 64-bit integer type (or wider);
+you may need to compile with "-DHAVE_STDINT_H".
+#endif /* (LONG_MAX >> 31) < 0xffffffff */
+typedef long		int_fast64_t;
+#endif /* ! (defined LLONG_MAX || defined __LONG_LONG_MAX__) */
+#endif /* !defined INT_FAST64_MAX */
+
+#ifndef INT32_MAX
+#define INT32_MAX 0x7fffffff
+#endif /* !defined INT32_MAX */
+#ifndef INT32_MIN
+#define INT32_MIN (-1 - INT32_MAX)
+#endif /* !defined INT32_MIN */
+
+/*
 ** Workarounds for compilers/systems.
 */
 
 /*
-** SunOS 4.1.1 cc lacks prototypes.
+** If your compiler lacks prototypes, "#define P(x) ()".
 */
 
 #ifndef P
-#ifdef __STDC__
 #define P(x)	x
-#endif /* defined __STDC__ */
-#ifndef __STDC__
-#define P(x)	()
-#endif /* !defined __STDC__ */
 #endif /* !defined P */
 
 /*
@@ -211,14 +242,14 @@ extern char *	asctime_r();
 ** Private function declarations.
 */
 
-char *	icalloc P((int nelem, int elsize));
-char *	icatalloc P((char * old, const char * new));
-char *	icpyalloc P((const char * string));
-char *	imalloc P((int n));
-void *	irealloc P((void * pointer, int size));
-void	icfree P((char * pointer));
-void	ifree P((char * pointer));
-char *	scheck P((const char *string, char *format));
+char *		icalloc P((int nelem, int elsize));
+char *		icatalloc P((char * old, const char * new));
+char *		icpyalloc P((const char * string));
+char *		imalloc P((int n));
+void *		irealloc P((void * pointer, int size));
+void		icfree P((char * pointer));
+void		ifree P((char * pointer));
+const char *	scheck P((const char * string, const char * format));
 
 /*
 ** Finally, some convenience items.
@@ -309,6 +340,26 @@ char *	scheck P((const char *string, char *format));
 char *asctime_r P((struct tm const *, char *));
 char *ctime_r P((time_t const *, char *));
 #endif /* HAVE_INCOMPATIBLE_CTIME_R */
+
+#ifndef YEARSPERREPEAT
+#define YEARSPERREPEAT		400	/* years before a Gregorian repeat */
+#endif /* !defined YEARSPERREPEAT */
+
+/*
+** The Gregorian year averages 365.2425 days, which is 31556952 seconds.
+*/
+
+#ifndef AVGSECSPERYEAR
+#define AVGSECSPERYEAR		31556952L
+#endif /* !defined AVGSECSPERYEAR */
+
+#ifndef SECSPERREPEAT
+#define SECSPERREPEAT		((int_fast64_t) YEARSPERREPEAT * (int_fast64_t) AVGSECSPERYEAR)
+#endif /* !defined SECSPERREPEAT */
+ 
+#ifndef SECSPERREPEAT_BITS
+#define SECSPERREPEAT_BITS	34	/* ceil(log2(SECSPERREPEAT)) */
+#endif /* !defined SECSPERREPEAT_BITS */
 
 /*
 ** UNIX was a registered trademark of The Open Group in 2003.
