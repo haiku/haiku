@@ -10,26 +10,13 @@
 #include <KernelExport.h>
 #include <stdlib.h>
 
-#include <module.h>
+#ifndef COMPILE_FOR_R5
+	#include <stdio.h>	// For snprintf()
+#endif
 
-// #include <dpc.h>
-
-// ----
-// To be moved into a new headers/os/drivers/dpc.h:
-#define DPC_MODULE_NAME "generic/dpc/v1"
-
-typedef void (*dpc_func) (void *arg);
-
-typedef struct {
-	module_info info;
-	void * 		(*new_dpc_thread)(const char *name, long priority, int queue_size);
-	status_t	(*delete_dpc_thread)(void *thread);
-	status_t	(*queue_dpc)(void *thread, dpc_func dpc_name, void *arg);
-} dpc_module_info;
-// ----
+#include <dpc.h>
 
 // Private DPC queue structures
-
 typedef struct {
 	dpc_func 	function;
 	void 		*arg;
@@ -41,6 +28,7 @@ typedef struct {
 	sem_id		wakeup_sem;
 	spinlock	lock;
 	int 		size;
+	int			count;
 	int			head;
 	int 		tail;
 	dpc_slot	slots[0];
@@ -53,9 +41,6 @@ dpc_thread(void *arg)
 {
 	dpc_queue *queue = arg;
 	
-	if (!queue)
-		return -1;
-
 	// Let's wait forever/until semaphore death for new DPC slot to show up
 	while (acquire_sem(queue->wakeup_sem) == B_OK) {
 		cpu_status former;
@@ -67,12 +52,12 @@ dpc_thread(void *arg)
 		
 		call = queue->slots[queue->head];
 		queue->head = (queue->head++) % queue->size;
+		queue->count--;
 
 		release_spinlock(&queue->lock);
 		restore_interrupts(former);
 		
-		if (call.function)
-			call.function(call.arg);
+		call.function(call.arg);
 	}
 
 	// Let's die quietly, ignored by all... sigh.
@@ -93,12 +78,18 @@ new_dpc_thread(const char *name, long priority, int queue_size)
 	
 	queue->head = queue->tail = 0;
 	queue->size = queue_size;
+	queue->count = 0;
 	queue->lock = 0;	// Init the spinlock
-	
-	strncpy(str, name, sizeof(str));
-	strncat(str, "_wakeup_sem", sizeof(str));
 
-	queue->wakeup_sem = create_sem(-1, str);
+#ifdef COMPILE_FOR_R5
+	strncpy(str, name, sizeof(str) - 1);
+	strncat(str, "_wakeup_sem", sizeof(str) - 1);
+	str[sizeof(str) - 1] = '\0';
+#else
+	snprintf(str, sizeof(str), "%.*s_wakeup_sem", (int) sizeof(str) - 11, name);
+#endif
+
+	queue->wakeup_sem = create_sem(0, str);
 	if (queue->wakeup_sem < B_OK) {
 		free(queue);
 		return NULL;
@@ -143,25 +134,35 @@ queue_dpc(void *thread, dpc_func function, void *arg)
 {
 	dpc_queue *queue = thread;
 	cpu_status former;
+	status_t status = B_OK;
 	
-	if (!queue)
+	if (!queue || !function)
 		return B_BAD_VALUE;
 
 	// Try to be safe being called from interrupt handlers:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
 	
-	queue->slots[queue->tail].function = function;
-	queue->slots[queue->tail].arg      = arg;
-	queue->tail = (queue->tail++) % queue->size;
-	
+	if (queue->count == queue->size)
+		// This DPC queue is full, sorry
+		status = B_NO_MEMORY;
+	else {
+		queue->slots[queue->tail].function = function;
+		queue->slots[queue->tail].arg      = arg;
+		queue->tail = (queue->tail++) % queue->size;
+		queue->count++;	
+	}
+
 	release_spinlock(&queue->lock);
 	restore_interrupts(former);
 
-	// Wake up the corresponding dpc thead
-	// Notice that interrupt handlers should returns B_INVOKE_SCHEDULER to
-	// shorten DPC latency as much as possible...
-	return release_sem_etc(queue->wakeup_sem, 1, B_DO_NOT_RESCHEDULE);
+	if (status == B_OK)
+		// Wake up the corresponding dpc thead
+		// Notice that interrupt handlers should returns B_INVOKE_SCHEDULER to
+		// shorten DPC latency as much as possible...
+		status = release_sem_etc(queue->wakeup_sem, 1, B_DO_NOT_RESCHEDULE);
+	
+	return status;
 }
 
 
@@ -182,7 +183,7 @@ std_ops(int32 op, ...)
 
 static dpc_module_info sDPCModule = {
 	{
-		DPC_MODULE_NAME,
+		B_DPC_MODULE_NAME,
 		0,
 		std_ops
 	},
