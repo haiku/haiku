@@ -22,7 +22,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 
 BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
-	dstcheck du echo eject env error factor false fdinfo ffm find finddir fortune ftp funzip gawk
+	dstcheck du echo eject env error expr factor false fdinfo ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex makebootable md5sum mimeset
@@ -30,7 +30,7 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 	playsound playwav ps pwd
 	query quit renice rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
-	tail tar tcpdump tee telnet top touch tput traceroute translate true tty uname unmount unrar unzip
+	tail tar tcpdump tee telnet test top touch tput traceroute translate true tty uname unmount unrar unzip
 	unzipsfx uptime version waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
 	zipcloak zipnote zipsplit zmore znew
 ;
