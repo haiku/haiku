@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 	}
 
 	if (num < 2) {
-		result = 1;
+		result = num;
 	} else {
 		char buffer[64];
 		char* args[]= { argv[0], "-s", buffer, NULL };
