@@ -72,8 +72,9 @@ new_dpc_thread(const char *name, long priority, int max_dpc)
 		queue->list[i].function = NULL;
 		queue->list[i].arg = NULL;		
 	}
-
-	sprintf(str, "%.*s_wakeup_sem", (int) sizeof(str) - 11, name);
+	
+	strncpy(str, name, sizeof(str));
+	strncat(str, "_wakeup_sem", sizeof(str));
 	queue->wakeup_sem = create_sem(-1, str);
 	set_sem_owner(queue->wakeup_sem, B_SYSTEM_TEAM);
 	
