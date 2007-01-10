@@ -56,8 +56,17 @@ main(int argc, char *argv[])
 
 		snprintf(buffer, sizeof(buffer), "%d", num - 1);
 		thread_id threadA = load_image(argCount, (const char**)args, (const char**)environ);
+		if (threadA < B_OK) {
+			fprintf(stderr, "Could not create thread A: %s\n", strerror(threadA));
+			return -1;
+		}
+
 		snprintf(buffer, sizeof(buffer), "%d", num - 2);
 		thread_id threadB = load_image(argCount, (const char**)args, (const char**)environ);
+		if (threadB < B_OK) {
+			fprintf(stderr, "Could not create thread B: %s\n", strerror(threadB));
+			return -1;
+		}
 
 		resume_thread(threadA);
 		resume_thread(threadB);
