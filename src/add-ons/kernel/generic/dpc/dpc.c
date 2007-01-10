@@ -32,52 +32,79 @@ typedef struct {
 typedef struct {
 	dpc_func function;
 	void *arg;
-} dpc;
+} dpc_slot;
 
 typedef struct {
 	thread_id	thread;
 	sem_id		wakeup_sem;
-	int 		max_dpc;
 	spinlock	lock;
-	dpc 		list[1];
-	// max_dpc - 1 follow
+	int 		size;
+	int			head;
+	int 		tail;
+	dpc_slot	slots[0];
+	// size * slots follow
 } dpc_queue;
 
 static int32
 dpc_thread(void *arg)
 {
-	// TODO:
-	// loop on acquire_sem(queue->wakeup_sem), exit on bad sem
-	// inner loop: disable interrupt, find first slot not empty, empty it, restore interrupts
-	// and call the dpc
+	dpc_queue *queue = arg;
+	
+	if (!queue)
+		return -1;
+
+	// Let's wait forever/until sem death for DPC to show up
+	while (acquire_sem(queue->wakeup_sem) == B_OK) {
+		cpu_status former;
+		int i;
+		dpc_slot call;
+	
+		// grab the next dpc slot
+		former = disable_interrupts();
+		acquire_spinlock(&queue->lock);
+		
+		call = queue->slots[queue->head];
+		queue->head = (queue->head++) % queue->size;
+
+		release_spinlock(&queue->lock);
+		restore_interrupts(former);
+		
+		if (call.function)
+			call.function(call.arg);
+	}
+
+	// Let's die quietly, ignored by all...
 	return 0;
 }
 
 // ----
 
 static void *
-new_dpc_thread(const char *name, long priority, int max_dpc)
+new_dpc_thread(const char *name, long priority, int queue_size)
 {
 	char str[64];
 	dpc_queue *queue;
-	int i;
 	
-	queue = malloc(sizeof(dpc_queue) + (max_dpc - 1) * sizeof(dpc));
+	queue = malloc(sizeof(dpc_queue) + queue_size * sizeof(dpc_slot));
 	if (!queue)
 		return NULL;
 	
-	queue->max_dpc = max_dpc;
+	queue->head = queue->tail = 0;
+	queue->size = queue_size;
 	queue->lock = 0;
-	for (i = 0; i < max_dpc; i++) {
-		queue->list[i].function = NULL;
-		queue->list[i].arg = NULL;		
-	}
 	
 	strncpy(str, name, sizeof(str));
 	strncat(str, "_wakeup_sem", sizeof(str));
+
 	queue->wakeup_sem = create_sem(-1, str);
+	if (queue->wakeup_sem < B_OK) {
+		free(queue);
+		return NULL;
+	}
 	set_sem_owner(queue->wakeup_sem, B_SYSTEM_TEAM);
 	
+	// Fire a kernel thread to do actually do
+	// the deferred procedure calls
 	queue->thread = spawn_kernel_thread(dpc_thread, name, priority, queue);
 	if (queue->thread < 0) {
 		delete_sem(queue->wakeup_sem);
@@ -99,6 +126,7 @@ delete_dpc_thread(void *thread)
 	if (!queue)
 		return B_BAD_VALUE;
 
+	// Wakeup the thread by murdering its favorite semaphore 
 	delete_sem(queue->wakeup_sem);
 	wait_for_thread(queue->thread, &exit_value);
 	free(queue);
@@ -111,13 +139,26 @@ static status_t
 queue_dpc(void *thread, dpc_func function, void *arg)
 {
 	dpc_queue *queue = thread;
+	cpu_status former;
 	
 	if (!queue)
 		return B_BAD_VALUE;
 
-	// TODO: acquire queue (spin)lock, find an empty slot, release lock and
-	// wakup the thread (but be interrupt handler safe here: B_DO_NOT_RESCHEDULE flag!
-	return B_ERROR;
+	// Take measure to be safe to be called from interrupt handlers:
+	former = disable_interrupts();
+	acquire_spinlock(&queue->lock);
+	
+	queue->slots[queue->tail].function = function;
+	queue->slots[queue->tail].arg      = arg;
+	queue->tail = (queue->tail++) %  queue->size;
+	
+	release_spinlock(&queue->lock);
+	restore_interrupts(former);
+
+	// wake up the corresponding dpc thead
+	// Notice that the interrupt handler should returns B_INVOKE_SCHEDULER for
+	// shortest DPC latency...
+	return release_sem_etc(queue->wakeup_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
