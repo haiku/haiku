@@ -8,31 +8,33 @@
  */
 
 #include <KernelExport.h>
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 
 #include <module.h>
 
 // #include <dpc.h>
 
+// ----
+// To be moved into a new headers/os/drivers/dpc.h:
 #define DPC_MODULE_NAME "generic/dpc/v1"
 
 typedef void (*dpc_func) (void *arg);
 
 typedef struct {
 	module_info info;
-	void * 		(*new_dpc_thread)(const char *name, long priority, int max_dpc);
+	void * 		(*new_dpc_thread)(const char *name, long priority, int queue_size);
 	status_t	(*delete_dpc_thread)(void *thread);
 	status_t	(*queue_dpc)(void *thread, dpc_func dpc_name, void *arg);
 } dpc_module_info;
-	
 // ----
 
+// Private DPC queue structures
+
 typedef struct {
-	dpc_func function;
-	void *arg;
+	dpc_func 	function;
+	void 		*arg;
 } dpc_slot;
+
 
 typedef struct {
 	thread_id	thread;
@@ -45,6 +47,7 @@ typedef struct {
 	// size * slots follow
 } dpc_queue;
 
+
 static int32
 dpc_thread(void *arg)
 {
@@ -53,10 +56,9 @@ dpc_thread(void *arg)
 	if (!queue)
 		return -1;
 
-	// Let's wait forever/until sem death for DPC to show up
+	// Let's wait forever/until semaphore death for new DPC slot to show up
 	while (acquire_sem(queue->wakeup_sem) == B_OK) {
 		cpu_status former;
-		int i;
 		dpc_slot call;
 	
 		// grab the next dpc slot
@@ -73,11 +75,11 @@ dpc_thread(void *arg)
 			call.function(call.arg);
 	}
 
-	// Let's die quietly, ignored by all...
+	// Let's die quietly, ignored by all... sigh.
 	return 0;
 }
 
-// ----
+// ---- Public API
 
 static void *
 new_dpc_thread(const char *name, long priority, int queue_size)
@@ -91,7 +93,7 @@ new_dpc_thread(const char *name, long priority, int queue_size)
 	
 	queue->head = queue->tail = 0;
 	queue->size = queue_size;
-	queue->lock = 0;
+	queue->lock = 0;	// Init the spinlock
 	
 	strncpy(str, name, sizeof(str));
 	strncat(str, "_wakeup_sem", sizeof(str));
@@ -103,8 +105,8 @@ new_dpc_thread(const char *name, long priority, int queue_size)
 	}
 	set_sem_owner(queue->wakeup_sem, B_SYSTEM_TEAM);
 	
-	// Fire a kernel thread to do actually do
-	// the deferred procedure calls
+	// Fire a kernel thread to actually handle (aka call them!)
+	// the queued/deferred procedure calls
 	queue->thread = spawn_kernel_thread(dpc_thread, name, priority, queue);
 	if (queue->thread < 0) {
 		delete_sem(queue->wakeup_sem);
@@ -129,6 +131,7 @@ delete_dpc_thread(void *thread)
 	// Wakeup the thread by murdering its favorite semaphore 
 	delete_sem(queue->wakeup_sem);
 	wait_for_thread(queue->thread, &exit_value);
+
 	free(queue);
 	
 	return B_OK;
@@ -144,20 +147,20 @@ queue_dpc(void *thread, dpc_func function, void *arg)
 	if (!queue)
 		return B_BAD_VALUE;
 
-	// Take measure to be safe to be called from interrupt handlers:
+	// Try to be safe being called from interrupt handlers:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
 	
 	queue->slots[queue->tail].function = function;
 	queue->slots[queue->tail].arg      = arg;
-	queue->tail = (queue->tail++) %  queue->size;
+	queue->tail = (queue->tail++) % queue->size;
 	
 	release_spinlock(&queue->lock);
 	restore_interrupts(former);
 
-	// wake up the corresponding dpc thead
-	// Notice that the interrupt handler should returns B_INVOKE_SCHEDULER for
-	// shortest DPC latency...
+	// Wake up the corresponding dpc thead
+	// Notice that interrupt handlers should returns B_INVOKE_SCHEDULER to
+	// shorten DPC latency as much as possible...
 	return release_sem_etc(queue->wakeup_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
