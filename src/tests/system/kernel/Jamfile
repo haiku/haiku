@@ -5,7 +5,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 SimpleTest fibo_load_image : fibo_load_image.cpp ;
 SimpleTest fibo_fork : fibo_fork.cpp ;
-#SimpleTest fibo_exec : fibo_exec.cpp ;
+SimpleTest fibo_exec : fibo_exec.cpp ;
 
 SimpleTest port_close_test_1 : port_close_test_1.cpp ;
 SimpleTest port_close_test_2 : port_close_test_2.cpp ;
