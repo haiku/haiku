@@ -103,6 +103,7 @@ StdBinCommands
 # users.c
 # who.c
 
+BinCommand "[" : lbracket.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand ls : 
 	ls.c ls-dir.c : libfetish.a : $(coreutils_rsrc) ;

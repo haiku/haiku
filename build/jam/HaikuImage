@@ -20,7 +20,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = ;
 }
 
-BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
+BEOS_BIN = "[" addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
 	dstcheck du echo eject env error expr factor false fdinfo ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
