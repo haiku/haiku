@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -160,10 +160,11 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 }
 
 
-void
+status_t
 arch_thread_init_tls(struct thread *thread)
 {
-// TODO: Implement!
+	// TODO: Implement!
+	return B_OK;
 }
 
 

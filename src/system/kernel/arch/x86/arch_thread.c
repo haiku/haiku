@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -229,17 +229,19 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
  *	Is called from _create_user_thread_kentry().
  */
 
-void
+status_t
 arch_thread_init_tls(struct thread *thread)
 {
-	uint32 *tls;
+	uint32 tls[TLS_THREAD_ID_SLOT + 1];
+	int32 i;
 
 	thread->user_local_storage = thread->user_stack_base + thread->user_stack_size;
-	tls = (uint32 *)thread->user_local_storage;
 
+	// initialize default TLS fields
 	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
 	tls[TLS_THREAD_ID_SLOT] = thread->id;
-	tls[TLS_ERRNO_SLOT] = 0;
+
+	return user_memcpy((void *)thread->user_local_storage, tls, sizeof(tls));
 }
 
 
