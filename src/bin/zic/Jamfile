@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin zic ;
 
-SubDirCcFlags -DNOID ;
+SubDirCcFlags -DNOID -DHAVE_STDINT_H=0 ;
 
 UsePrivateHeaders [ FDirName libroot time ] ;
 

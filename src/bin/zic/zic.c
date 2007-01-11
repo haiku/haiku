@@ -678,8 +678,8 @@ const char * const	tofile;
 					fromname);
 				result = symlink(symlinkcontents,
 					toname);
-				if (result == 0)
-warning(_("hard link failed, symbolic link used"));
+//				if (result == 0)
+//warning(_("hard link failed, symbolic link used"));
 				ifree(symlinkcontents);
 		}
 #endif /* HAVE_SYMLINK */
