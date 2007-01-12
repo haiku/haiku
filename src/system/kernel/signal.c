@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  *
  * Distributed under the terms of the MIT License.
@@ -316,7 +316,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		// TODO: handle -1 correctly
 		if (id == 0 || id == -1) {
 			// send a signal to the current team
-			id = thread_get_current_thread()->team->main_thread->id;
+			id = thread_get_current_thread()->team->id;
 		} else
 			id = -id;
 
@@ -330,7 +330,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 
 			for (team = group->teams; team != NULL; team = next) {
 				next = team->group_next;
-				id = team->main_thread->id;
+				id = team->id;
 
 				GRAB_THREAD_LOCK();
 

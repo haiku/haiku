@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -898,7 +898,7 @@ thread_exit(void)
 	struct process_group *freeGroup = NULL;
 	struct team *team = thread->team;
 	struct death_entry *death = NULL;
-	thread_id mainParentThread = -1;
+	thread_id parentID = -1;
 	bool deleteTeam = false;
 	sem_id cachedDeathSem = -1;
 	status_t status;
@@ -991,7 +991,7 @@ thread_exit(void)
 			struct team *parent = team->parent;
 
 			// remember who our parent was so we can send a signal
-			mainParentThread = parent->main_thread->id;
+			parentID = parent->id;
 
 			if (death != NULL) {
 				// insert death entry into the parent's list
@@ -1033,7 +1033,7 @@ thread_exit(void)
 		if (death != NULL)
 			free(death);
 
-		send_signal_etc(mainParentThread, SIGCHLD, B_DO_NOT_RESCHEDULE);
+		send_signal_etc(parentID, SIGCHLD, B_DO_NOT_RESCHEDULE);
 		cachedDeathSem = -1;
 	}
 

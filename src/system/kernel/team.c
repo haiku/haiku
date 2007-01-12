@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -404,7 +404,7 @@ reparent_children(struct team *team)
 static bool
 is_process_group_leader(struct team *team)
 {
-	return team->group_id == team->main_thread->id;
+	return team->group_id == team->id;
 }
 
 
@@ -1961,7 +1961,7 @@ wait_for_team(team_id id, status_t *_returnCode)
 	GRAB_TEAM_LOCK();
 
 	team = team_get_team_struct_locked(id);
-	if (team && team->main_thread)
+	if (team != NULL && team->main_thread != NULL)
 		thread = team->main_thread->id;
 	else
 		thread = B_BAD_THREAD_ID;
@@ -1979,33 +1979,33 @@ wait_for_team(team_id id, status_t *_returnCode)
 status_t
 kill_team(team_id id)
 {
-	cpu_status state;
+	status_t status = B_OK;
+	thread_id threadID = -1;
 	struct team *team;
-//	struct thread *t;
-	thread_id tid = -1;
-	int retval = 0;
+	cpu_status state;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
 	team = team_get_team_struct_locked(id);
 	if (team != NULL) {
-		if (team == sKernelTeam)
-			retval = B_NOT_ALLOWED;
-		else
-			tid = team->main_thread->id;
+		if (team != sKernelTeam) {
+			threadID = team->id;
+				// the team ID is the same as the ID of its main thread
+		} else
+			status = B_NOT_ALLOWED;
 	} else
-		retval = B_BAD_THREAD_ID;
+		status = B_BAD_THREAD_ID;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	if (retval < 0)
-		return retval;
+	if (status < B_OK)
+		return status;
 
 	// just kill the main thread in the team. The cleanup code there will
 	// take care of the team
-	return kill_thread(tid);
+	return kill_thread(threadID);
 }
 
 
@@ -2013,7 +2013,7 @@ status_t
 _get_team_info(team_id id, team_info *info, size_t size)
 {
 	cpu_status state;
-	status_t rc = B_OK;
+	status_t status = B_OK;
 	struct team *team;
 
 	state = disable_interrupts();
@@ -2025,17 +2025,17 @@ _get_team_info(team_id id, team_info *info, size_t size)
 		team = team_get_team_struct_locked(id);
 
 	if (team == NULL) {
-		rc = B_BAD_TEAM_ID;
+		status = B_BAD_TEAM_ID;
 		goto err;
 	}
 
-	rc = fill_team_info(team, info, size);
+	status = fill_team_info(team, info, size);
 
 err:
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	
-	return rc;
+
+	return status;
 }
 
 
@@ -2152,7 +2152,7 @@ out:
 pid_t
 getpid(void)
 {
-	return thread_get_current_thread()->team->main_thread->id;
+	return thread_get_current_thread()->team->id;
 }
 
 
@@ -2166,7 +2166,7 @@ getppid(void)
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	parent = team->parent->main_thread->id;
+	parent = team->parent->id;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -2183,7 +2183,7 @@ getpgid(pid_t process)
 	cpu_status state;
 
 	if (process == 0)
-		process = thread_get_current_thread()->team->main_thread->id;
+		process = thread_get_current_thread()->team->id;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -2207,7 +2207,7 @@ getsid(pid_t process)
 	cpu_status state;
 
 	if (process == 0)
-		process = thread_get_current_thread()->team->main_thread->id;
+		process = thread_get_current_thread()->team->id;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -2281,7 +2281,7 @@ _user_process_info(pid_t process, int32 which)
 {
 	// we only allow to return the parent of the current process
 	if (which == PARENT_ID
-		&& process != 0 && process != thread_get_current_thread()->team->main_thread->id)
+		&& process != 0 && process != thread_get_current_thread()->team->id)
 		return B_BAD_VALUE;
 
 	switch (which) {
@@ -2312,9 +2312,9 @@ _user_setpgid(pid_t processID, pid_t groupID)
 		return B_BAD_VALUE;
 
 	if (processID == 0)
-		processID = currentTeam->main_thread->id;
+		processID = currentTeam->id;
 
-	if (processID == currentTeam->main_thread->id) {
+	if (processID == currentTeam->id) {
 		// we set our own group
 		teamID = currentTeam->id;
 
@@ -2420,7 +2420,7 @@ _user_setsid(void)
 	if (is_process_group_leader(team))
 		return B_NOT_ALLOWED;
 
-	group = create_process_group(team->main_thread->id);
+	group = create_process_group(team->id);
 	if (group == NULL)
 		return B_NO_MEMORY;
 
