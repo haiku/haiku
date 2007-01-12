@@ -8,8 +8,9 @@
 #include <ACPI.h>
 #include <KernelExport.h>
 
-#include <stdio.h>
 #include <malloc.h>
+#include <safemode.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "acpi.h"
@@ -57,6 +58,8 @@ status_t
 acpi_std_ops(int32 op,...) 
 {
 	ACPI_STATUS Status;
+	bool acpiDisabled = false;
+	void *settings;
 	
 	switch(op) {
 		case B_MODULE_INIT:
@@ -65,6 +68,19 @@ acpi_std_ops(int32 op,...)
 				AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
 				AcpiDbgLayer = ACPI_ALL_COMPONENTS;
 			#endif
+			
+			// check if safemode settings disable ACPI
+			settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+			if (settings != NULL) {
+				acpiDisabled = get_driver_boolean_parameter(settings, B_SAFEMODE_DISABLE_ACPI,
+					false, false);
+				unload_driver_settings(settings);
+			}
+			
+			if (acpiDisabled) {
+				ERROR("ACPI disabled");
+				return ENOSYS;
+			}
 
 			Status = AcpiInitializeSubsystem();
 			if (Status != AE_OK) {
