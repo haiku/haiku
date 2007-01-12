@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -506,9 +506,8 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	off_t offset, addr_t size, uint32 addressSpec, int wiring, int protection,
 	int mapping, vm_area **_area, const char *areaName)
 {
-	vm_cache *cache;
 	vm_cache_ref *cacheRef;
-
+	vm_cache *cache;
 	status_t status;
 
 	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
@@ -528,7 +527,6 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		vm_cache *newCache;
 		vm_store *newStore;
 
-		// ToDo: panic???
 		// create an anonymous store object
 		newStore = vm_store_create_anonymous_noswap((protection & B_STACK_AREA) != 0,
 			USER_STACK_GUARD_PAGES);
@@ -557,6 +555,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		cache = newCache;
 		cacheRef = newCache->ref;
 		store = newStore;
+		cache->virtual_base = offset;
 		cache->virtual_size = offset + size;
 	}
 
@@ -1658,7 +1657,8 @@ vm_set_area_protection(team_id aspaceID, area_id areaID, uint32 newProtection)
 					count++;
 				}
 
-				status = cache->store->ops->commit(cache->store, count * B_PAGE_SIZE);
+				status = cache->store->ops->commit(cache->store,
+					cache->virtual_base + count * B_PAGE_SIZE);
 
 				// ToDo: we may be able to join with our source cache, if count == 0
 			}
@@ -1905,6 +1905,7 @@ dump_cache(int argc, char **argv)
 		kprintf("  %p\n", consumer);
 	}
 	kprintf("store: %p\n", cache->store);
+	kprintf("virtual_base: 0x%Lx\n", cache->virtual_base);
 	kprintf("virtual_size: 0x%Lx\n", cache->virtual_size);
 	kprintf("temporary: %ld\n", cache->temporary);
 	kprintf("scan_skip: %ld\n", cache->scan_skip);
@@ -2004,6 +2005,15 @@ dump_area_list(int argc, char **argv)
 			(void *)area->size, area->protection, area->wiring, area->name);
 	}
 	hash_close(sAreaHash, &iter, false);
+	return 0;
+}
+
+
+static int
+dump_available_memory(int argc, char **argv)
+{
+	kprintf("Available memory: %Ld/%lu bytes\n",
+		sAvailableMemory, vm_page_num_pages() * B_PAGE_SIZE);
 	return 0;
 }
 
@@ -2356,6 +2366,7 @@ vm_init(kernel_args *args)
 	add_debugger_command("area", &dump_area, "Dump info about a particular area");
 	add_debugger_command("cache_ref", &dump_cache_ref, "Dump cache_ref data structure");
 	add_debugger_command("cache", &dump_cache, "Dump cache_ref data structure");
+	add_debugger_command("avail", &dump_available_memory, "Dump available memory");
 //	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
 	add_debugger_command("dw", &display_mem, "dump memory words (32-bit)");
 	add_debugger_command("ds", &display_mem, "dump memory shorts (16-bit)");
@@ -2971,6 +2982,30 @@ fix_protection(uint32 *protection)
 }
 
 
+static void
+fill_area_info(struct vm_area *area, area_info *info, size_t size)
+{
+	strlcpy(info->name, area->name, B_OS_NAME_LENGTH);
+	info->area = area->id;
+	info->address = (void *)area->base;
+	info->size = area->size;
+	info->protection = area->protection;
+	info->lock = B_FULL_LOCK;
+	info->team = area->address_space->id;
+	info->copy_count = 0;
+	info->in_count = 0;
+	info->out_count = 0;
+		// ToDo: retrieve real values here!
+
+	mutex_lock(&area->cache_ref->lock);
+
+	// Note, this is a simplification; the cache could be larger than this area
+	info->ram_size = area->cache_ref->cache->page_count * B_PAGE_SIZE;
+
+	mutex_unlock(&area->cache_ref->lock);
+}
+
+
 //	#pragma mark -
 
 
@@ -3005,7 +3040,7 @@ user_memset(void *s, char c, size_t count)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - kernel public API
 
 
 long
@@ -3202,30 +3237,6 @@ find_area(const char *name)
 	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
 
 	return id;
-}
-
-
-static void
-fill_area_info(struct vm_area *area, area_info *info, size_t size)
-{
-	strlcpy(info->name, area->name, B_OS_NAME_LENGTH);
-	info->area = area->id;
-	info->address = (void *)area->base;
-	info->size = area->size;
-	info->protection = area->protection & B_USER_PROTECTION;
-	info->lock = B_FULL_LOCK;
-	info->team = area->address_space->id;
-	info->copy_count = 0;
-	info->in_count = 0;
-	info->out_count = 0;
-		// ToDo: retrieve real values here!
-
-	mutex_lock(&area->cache_ref->lock);
-
-	// Note, this is a simplification; the cache could be larger than this area
-	info->ram_size = area->cache_ref->cache->page_count * B_PAGE_SIZE;
-
-	mutex_unlock(&area->cache_ref->lock);
 }
 
 
@@ -3580,7 +3591,7 @@ delete_area(area_id area)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - Userland syscalls
 
 
 status_t
@@ -3647,6 +3658,9 @@ _user_get_area_info(area_id area, area_info *userInfo)
 	if (status < B_OK)
 		return status;
 
+	// TODO: do we want to prevent userland from seeing kernel protections?
+	//info.protection &= B_USER_PROTECTION;
+
 	if (user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -3669,6 +3683,8 @@ _user_get_next_area_info(team_id team, int32 *userCookie, area_info *userInfo)
 	status = _get_next_area_info(team, &cookie, &info, sizeof(area_info));
 	if (status != B_OK)
 		return status;
+
+	//info.protection &= B_USER_PROTECTION;
 
 	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
 		|| user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)

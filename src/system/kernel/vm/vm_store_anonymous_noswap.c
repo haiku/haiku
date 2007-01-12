@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -51,6 +51,9 @@ anonymous_commit(struct vm_store *_store, off_t size)
 	// if we can overcommit, we don't commit here, but in anonymous_fault()
 	if (store->can_overcommit)
 		return B_OK;
+
+	size -= store->vm.cache->virtual_base;
+		// anonymous stores don't need to span over their whole source
 
 	// Check to see how much we could commit - we need real memory
 

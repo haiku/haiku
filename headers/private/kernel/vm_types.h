@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -75,7 +75,9 @@ typedef struct vm_cache {
 	vm_cache_ref		*ref;
 	struct vm_cache		*source;
 	struct vm_store		*store;
+	off_t				virtual_base;
 	off_t				virtual_size;
+		// the size is absolute, and independent from virtual_base
 	uint32				page_count;
 	uint32				temporary : 1;
 	uint32				scan_skip : 1;

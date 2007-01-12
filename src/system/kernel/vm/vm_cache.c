@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -103,6 +103,7 @@ vm_cache_create(vm_store *store)
 	cache->page_list = NULL;
 	cache->ref = NULL;
 	cache->source = NULL;
+	cache->virtual_base = 0;
 	cache->virtual_size = 0;
 	cache->temporary = 0;
 	cache->scan_skip = 0;
