@@ -31,6 +31,8 @@
 typedef struct anonymous_store {
 	vm_store	vm;
 	bool		can_overcommit;
+	bool		has_precommitted;
+	uint8		precommitted_pages;
 	int32		guarded_size;
 } anonymous_store;
 
@@ -49,8 +51,15 @@ anonymous_commit(struct vm_store *_store, off_t size)
 	anonymous_store *store = (anonymous_store *)_store;
 
 	// if we can overcommit, we don't commit here, but in anonymous_fault()
-	if (store->can_overcommit)
-		return B_OK;
+	if (store->can_overcommit) {
+		if (store->has_precommitted)
+			return B_OK;
+
+		// pre-commit some pages to make a later failure less probable
+		store->has_precommitted = true;
+		if (size > store->vm.cache->virtual_base + store->precommitted_pages)
+			size = store->vm.cache->virtual_base + store->precommitted_pages;
+	}
 
 	size -= store->vm.cache->virtual_base;
 		// anonymous stores don't need to span over their whole source
@@ -61,7 +70,7 @@ anonymous_commit(struct vm_store *_store, off_t size)
 		// try to commit
 		if (vm_try_reserve_memory(size - store->vm.committed_size) != B_OK)
 			return B_NO_MEMORY;
-		
+
 		store->vm.committed_size = size;
 	} else {
 		// we can release some
@@ -121,9 +130,12 @@ anonymous_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t 
 			}
 		}
 
-		// try to commit additional memory
-		if (vm_try_reserve_memory(B_PAGE_SIZE) != B_OK)
-			return B_NO_MEMORY;
+		if (store->precommitted_pages == 0) {
+			// try to commit additional memory
+			if (vm_try_reserve_memory(B_PAGE_SIZE) != B_OK)
+				return B_NO_MEMORY;
+		} else
+			store->precommitted_pages--;
 
 		store->vm.committed_size += B_PAGE_SIZE;
 	}
@@ -150,7 +162,7 @@ static vm_store_ops anonymous_ops = {
  */
 
 vm_store *
-vm_store_create_anonymous_noswap(bool canOvercommit, int32 numGuardPages)
+vm_store_create_anonymous_noswap(bool canOvercommit, int32 numPrecommittedPages, int32 numGuardPages)
 {
 	anonymous_store *store = malloc(sizeof(anonymous_store));
 	if (store == NULL)
@@ -163,6 +175,8 @@ vm_store_create_anonymous_noswap(bool canOvercommit, int32 numGuardPages)
 	store->vm.cache = NULL;
 	store->vm.committed_size = 0;
 	store->can_overcommit = canOvercommit;
+	store->has_precommitted = numPrecommittedPages != 0;
+	store->precommitted_pages = min(numPrecommittedPages, 255);
 	store->guarded_size = numGuardPages * B_PAGE_SIZE;
 
 	return &store->vm;

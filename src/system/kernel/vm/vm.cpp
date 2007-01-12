@@ -529,7 +529,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 
 		// create an anonymous store object
 		newStore = vm_store_create_anonymous_noswap((protection & B_STACK_AREA) != 0,
-			USER_STACK_GUARD_PAGES);
+			0, USER_STACK_GUARD_PAGES);
 		if (newStore == NULL) {
 			status = B_NO_MEMORY;
 			goto err1;
@@ -784,8 +784,9 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 	}
 
 	// create an anonymous store object
-	store = vm_store_create_anonymous_noswap(canOvercommit, isStack ?
-		((protection & B_USER_PROTECTION) != 0 ? 
+	// if it's a stack, make sure that two pages are available at least
+	store = vm_store_create_anonymous_noswap(canOvercommit, isStack ? 2 : 0,
+		isStack ? ((protection & B_USER_PROTECTION) != 0 ? 
 			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0);
 	if (store == NULL) {
 		status = B_NO_MEMORY;
@@ -1461,7 +1462,7 @@ vm_copy_on_write_area(vm_area *area)
 	lowerCache = upperCacheRef->cache;
 
 	// create an anonymous store object
-	store = vm_store_create_anonymous_noswap(false, 0);
+	store = vm_store_create_anonymous_noswap(false, 0, 0);
 	if (store == NULL)
 		return B_NO_MEMORY;
 
@@ -2456,8 +2457,8 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 
 	err = vm_soft_fault(address, is_write, is_user);
 	if (err < 0) {
-		dprintf("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
-			err, address, fault_address, is_write, is_user, thread_get_current_thread_id());
+		dprintf("vm_page_fault: vm_soft_fault returned error '%s' on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
+			strerror(err), address, fault_address, is_write, is_user, thread_get_current_thread_id());
 		if (!is_user) {
 			struct thread *t = thread_get_current_thread();
 			if (t && t->fault_handler != 0) {
@@ -2542,8 +2543,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	vm_page dummyPage;
 	vm_page *page = NULL;
 	addr_t address;
-	int change_count;
-	int err;
+	int32 changeCount;
+	status_t status;
 
 	FTRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
 		thread_get_current_thread_id(), originalAddress, isWrite, isUser));
@@ -2604,7 +2605,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	topCacheRef = area->cache_ref;
 	cacheOffset = address - area->base + area->cache_offset;
 	vm_cache_acquire_ref(topCacheRef);
-	change_count = addressSpace->change_count;
+	changeCount = addressSpace->change_count;
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 
 	// See if this cache has a fault handler - this will do all the work for us
@@ -2687,8 +2688,10 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 			addressSpace->translation_map.ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
 			// ToDo: handle errors here
-			err = cacheRef->cache->store->ops->read(cacheRef->cache->store,
+			status = cacheRef->cache->store->ops->read(cacheRef->cache->store,
 				cacheOffset, &vec, 1, &bytesRead, false);
+			if (status < B_OK)
+				panic("hello, dudes!");
 			addressSpace->translation_map.ops->put_physical_page((addr_t)vec.iov_base);
 
 			mutex_lock(&cacheRef->lock);
@@ -2783,8 +2786,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// try to get a mapping for the src and dest page so we can copy it
 		for (;;) {
 			(*addressSpace->translation_map.ops->get_physical_page)(src_page->physical_page_number * B_PAGE_SIZE, (addr_t *)&src, PHYSICAL_PAGE_CAN_WAIT);
-			err = (*addressSpace->translation_map.ops->get_physical_page)(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&dest, PHYSICAL_PAGE_NO_WAIT);
-			if (err == B_NO_ERROR)
+			status = (*addressSpace->translation_map.ops->get_physical_page)(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&dest, PHYSICAL_PAGE_NO_WAIT);
+			if (status == B_NO_ERROR)
 				break;
 
 			// it couldn't map the second one, so sleep and retry
@@ -2822,20 +2825,20 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		}
 	}
 
-	err = B_OK;
+	status = B_OK;
 	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
-	if (change_count != addressSpace->change_count) {
+	if (changeCount != addressSpace->change_count) {
 		// something may have changed, see if the address is still valid
 		area = vm_area_lookup(addressSpace, address);
 		if (area == NULL
 			|| area->cache_ref != topCacheRef
 			|| (address - area->base + area->cache_offset) != cacheOffset) {
 			dprintf("vm_soft_fault: address space layout changed effecting ongoing soft fault\n");
-			err = B_BAD_ADDRESS;
+			status = B_BAD_ADDRESS;
 		}
 	}
 
-	if (err == B_OK) {
+	if (status == B_OK) {
 		// All went fine, all there is left to do is to map the page into the address space
 
 		// If the page doesn't reside in the area's cache, we need to make sure it's
@@ -2868,7 +2871,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	vm_cache_release_ref(topCacheRef);
 	vm_put_address_space(addressSpace);
 
-	return err;
+	return status;
 }
 
 
