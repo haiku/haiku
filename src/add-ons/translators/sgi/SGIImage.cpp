@@ -684,6 +684,9 @@ SGIImage::_ReadRLE8(uint8* row, uint8* rleBuffer, int32 numPixels) const
 	uint32 count;		// RLE count
 	uint32 length = 0;	// number of bytes read
 
+	if (numPixels <= 0)
+		return B_ERROR;
+
 	while (numPixels > 0) {
 
 		ch = *rleBuffer ++;
@@ -713,7 +716,7 @@ SGIImage::_ReadRLE8(uint8* row, uint8* rleBuffer, int32 numPixels) const
 		}
 	}
 
-	return (numPixels > 0 ? B_ERROR : length);
+	return length;
 }
 /*ssize_t
 SGIImage::_ReadRLE8(uint8* row, int32 numPixels) const
@@ -851,6 +854,9 @@ SGIImage::_ReadRLE16(uint16* row, uint16* rleBuffer, int32 numPixels) const
 	uint32 count;		// RLE count
 	uint32 length = 0;	// number of bytes read...
 
+	if (numPixels <= 0)
+		return B_ERROR;
+
 	while (numPixels > 0) {
 
 		ch = *rleBuffer ++;
@@ -879,7 +885,7 @@ SGIImage::_ReadRLE16(uint16* row, uint16* rleBuffer, int32 numPixels) const
 			}
 		}
 	}
-	return (numPixels > 0 ? B_ERROR : length * 2);
+	return length * 2;
 }
 
 // _WriteRLE8
