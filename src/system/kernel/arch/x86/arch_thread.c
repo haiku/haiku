@@ -306,18 +306,22 @@ arch_thread_dump_info(void *info)
 /** Sets up initial thread context and enters user space
  */
 
-void
-arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args2)
+status_t
+arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *args2)
 {
-	addr_t ustack_top = t->user_stack_base + t->user_stack_size;
+	addr_t stackTop = t->user_stack_base + t->user_stack_size;
+	uint32 codeSize = (addr_t)x86_end_userspace_thread_exit
+		- (addr_t)x86_userspace_thread_exit;
 
 	TRACE(("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
-		entry, args1, args2, ustack_top));
+		entry, args1, args2, stackTop));
 
-	// access the new stack to make sure the memory page is present
-	// while interrupts are disabled.
-	// XXX does this belong there, should caller take care of it?
-	*(uint32 *)(ustack_top - 8) = 0;
+	// copy the little stub that calls exit_thread() when the thread entry
+	// function returns
+	stackTop -= codeSize;
+
+	if (user_memcpy((void *)stackTop, x86_userspace_thread_exit, codeSize) < B_OK)
+		return B_BAD_ADDRESS;
 
 	disable_interrupts();
 
@@ -326,7 +330,10 @@ arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args
 	// set the CPU dependent GDT entry for TLS
 	set_tls_context(t);
 
-	i386_enter_uspace(entry, args1, args2, ustack_top - 4);
+	x86_enter_userspace(entry, args1, args2, stackTop);
+
+	return B_OK;
+		// never gets here
 }
 
 

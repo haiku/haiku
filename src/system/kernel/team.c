@@ -819,10 +819,8 @@ team_create_thread_start(void *args)
 	team->state = TEAM_STATE_NORMAL;
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace(t, entry, uspa, NULL);
-
-	// never gets here
-	return B_OK;
+	return arch_thread_enter_userspace(t, entry, uspa, NULL);
+		// only returns in case of error
 }
 
 

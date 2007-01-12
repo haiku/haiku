@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -126,20 +126,20 @@ FUNCTION(i386_swap_pgdir):
 	movl	%eax,%cr3
 	ret
 
-/* thread exit stub */
+/* thread exit stub - is copied to the userspace stack in arch_thread_enter_uspace() */
 	.align 4
-i386_uspace_exit_stub:
+FUNCTION(x86_userspace_thread_exit):
 	pushl	%eax
 	movl	$1, %ecx
-	lea	(%esp), %edx
+	lea		(%esp), %edx
 	movl	$SYSCALL_EXIT_THREAD, %eax;
-	int	$99
+	int		$99
 	.align 4
-i386_uspace_exit_stub_end:
+FUNCTION(x86_end_userspace_thread_exit):
 
 
-/* void i386_enter_uspace(addr entry, void *args1, void *args2, addr ustack_top); */
-FUNCTION(i386_enter_uspace):
+/* void x86_enter_userspace(addr entry, void *args1, void *args2, addr stackTop); */
+FUNCTION(x86_enter_userspace):
 	movl	4(%esp),%eax	// get entry point
 	movl	8(%esp),%edx	// get arguments
 	movl	12(%esp),%edi
@@ -149,16 +149,6 @@ FUNCTION(i386_enter_uspace):
 	movw	%cx,%es
 	//movw	$0x33 + cpu_num,%fs	-> fs points to the TLS storage (CPU dependent segment)
 	movw	%cx,%gs
-
-	// copy exit stub to stack
-	movl	$i386_uspace_exit_stub_end, %esi
-_copy_more:
-	lea	-4(%esi), %esi
-	lea	-4(%ebx), %ebx
-	mov	(%esi), %ecx
-	mov	%ecx, (%ebx)
-	cmp	$i386_uspace_exit_stub, %esi
-	jg	_copy_more
 
 	// push the args onto the user stack
 	movl	%edi,-4(%ebx)	// args1

@@ -309,9 +309,10 @@ _create_user_thread_kentry(void)
 	thread_at_kernel_exit();
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace(thread, (addr_t)thread->entry, thread->args1, thread->args2);
+	arch_thread_enter_userspace(thread, (addr_t)thread->entry,
+		thread->args1, thread->args2);
 
-	// never get here
+	// only get here if the above call fails
 	return 0;
 }
 
@@ -462,14 +463,12 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 				(void **)&thread->user_stack_base, B_BASE_ADDRESS,
 				thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
-		if (thread->user_stack_area < 0) {
-			// great, we have a fully running thread without a stack
-			dprintf("create_thread: unable to create user stack!\n");
+		if (thread->user_stack_area < B_OK
+			|| arch_thread_init_tls(thread) < B_OK) {
+			// great, we have a fully running thread without a (usable) stack
+			dprintf("create_thread: unable to create proper user stack!\n");
 			status = thread->user_stack_area;
 			kill_thread(thread->id);
-		} else {
-			// now that the TLS area is allocated, initialize TLS
-			arch_thread_init_tls(thread);
 		}
 
 		// copy the user entry over to the args field in the thread struct
@@ -603,8 +602,8 @@ dump_thread_info(int argc, char **argv)
 	}
 
 	if (argc == 1) {
-		name = NULL;
-		id = thread_get_current_thread()->id;
+		_dump_thread_info(thread_get_current_thread());
+		return 0;
 	} else {
 		name = argv[1];
 		id = strtoul(argv[1], NULL, 0);

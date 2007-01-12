@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -100,7 +100,9 @@ struct arch_thread;
 
 void __x86_setup_system_time(uint32 cv_factor);
 void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr_t new_pgdir);
-void i386_enter_uspace(addr_t entry, void *args1, void *args2, addr_t ustack_top);
+void x86_userspace_thread_exit(void);
+void x86_end_userspace_thread_exit(void);
+void x86_enter_userspace(addr_t entry, void *args1, void *args2, addr_t ustack_top);
 void i386_set_tss_and_kstack(addr_t kstack);
 void i386_switch_stack_and_call(addr_t stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr_t new_pgdir);

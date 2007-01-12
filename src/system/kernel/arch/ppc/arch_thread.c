@@ -206,10 +206,11 @@ arch_thread_dump_info(void *info)
 }
 
 
-void
-arch_thread_enter_uspace(struct thread *thread, addr_t entry, void *arg1, void *arg2)
+status_t
+arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1, void *arg2)
 {
 	panic("arch_thread_enter_uspace(): not yet implemented\n");
+	return B_ERROR;
 }
 
 
