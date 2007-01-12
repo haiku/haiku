@@ -138,23 +138,16 @@ FUNCTION(x86_userspace_thread_exit):
 FUNCTION(x86_end_userspace_thread_exit):
 
 
-/* void x86_enter_userspace(addr entry, void *args1, void *args2, addr stackTop); */
+/* void x86_enter_userspace(addr_t entry, addr_t stackTop); */
 FUNCTION(x86_enter_userspace):
-	movl	4(%esp),%eax	// get entry point
-	movl	8(%esp),%edx	// get arguments
-	movl	12(%esp),%edi
-	movl	16(%esp),%ebx	// get user stack
-	movw	$USER_DATA_SEG,%cx
-	movw	%cx,%ds
-	movw	%cx,%es
-	//movw	$0x33 + cpu_num,%fs	-> fs points to the TLS storage (CPU dependent segment)
-	movw	%cx,%gs
+	movl	4(%esp), %eax	// get entry point
+	movl	8(%esp), %ebx	// get user stack
+	movw	$USER_DATA_SEG, %cx
+	movw	%cx, %ds
+	movw	%cx, %es
+	//movw	$0x33 + cpu_num, %fs	-> fs points to the TLS storage (CPU dependent segment)
+	movw	%cx, %gs
 
-	// push the args onto the user stack
-	movl	%edi,-4(%ebx)	// args1
-	movl	%edx,-8(%ebx)	// args2
-	movl	%ebx,-12(%ebx)	// fake return address to copied exit stub
-	sub		$12,%ebx
 	xorl	%ebp, %ebp		// this is the last stack frame - we don't need one on return
 							// (%ebp marks the beginning of this stack frame)
 	pushl	$USER_DATA_SEG	// user data segment

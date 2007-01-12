@@ -102,7 +102,7 @@ void __x86_setup_system_time(uint32 cv_factor);
 void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr_t new_pgdir);
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
-void x86_enter_userspace(addr_t entry, void *args1, void *args2, addr_t ustack_top);
+void x86_enter_userspace(addr_t entry, addr_t stackTop);
 void i386_set_tss_and_kstack(addr_t kstack);
 void i386_switch_stack_and_call(addr_t stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr_t new_pgdir);

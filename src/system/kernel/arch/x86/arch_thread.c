@@ -312,15 +312,24 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *a
 	addr_t stackTop = t->user_stack_base + t->user_stack_size;
 	uint32 codeSize = (addr_t)x86_end_userspace_thread_exit
 		- (addr_t)x86_userspace_thread_exit;
+	uint32 args[3];
 
 	TRACE(("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
 		entry, args1, args2, stackTop));
 
 	// copy the little stub that calls exit_thread() when the thread entry
-	// function returns
+	// function returns, as well as the arguments of the entry function
 	stackTop -= codeSize;
 
 	if (user_memcpy((void *)stackTop, x86_userspace_thread_exit, codeSize) < B_OK)
+		return B_BAD_ADDRESS;
+
+	args[0] = stackTop;
+	args[1] = (uint32)args1;
+	args[2] = (uint32)args2;
+	stackTop -= sizeof(args);
+
+	if (user_memcpy((void *)stackTop, args, sizeof(args)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	disable_interrupts();
@@ -330,7 +339,7 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *a
 	// set the CPU dependent GDT entry for TLS
 	set_tls_context(t);
 
-	x86_enter_userspace(entry, args1, args2, stackTop);
+	x86_enter_userspace(entry, stackTop);
 
 	return B_OK;
 		// never gets here
