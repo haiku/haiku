@@ -316,14 +316,16 @@ vfs_bootstrap_file_systems(void)
 }
 
 
-status_t
+void
 vfs_mount_boot_file_system(kernel_args *args)
 {
 	PartitionStack partitions;
 	status_t status = get_boot_partitions(args, partitions);
 	if (status < B_OK) {
-		panic("Did not get any boot partitions!");
-		return status;
+		panic("get_boot_partitions failed!");
+	}
+	if (partitions.IsEmpty()) {
+		panic("did not find any boot partitions!");
 	}
 
 	KPartition *bootPartition;
@@ -332,6 +334,7 @@ vfs_mount_boot_file_system(kernel_args *args)
 		if (bootPartition->GetPath(&path) != B_OK)
 			panic("could not get boot device!\n");
 
+		TRACE(("trying to mount boot partition: %s\n", path.Path()));
 		gBootDevice = _kern_mount("/boot", path.Path(), NULL, 0, NULL, 0);
 		if (gBootDevice >= B_OK)
 			break;
@@ -355,7 +358,5 @@ vfs_mount_boot_file_system(kernel_args *args)
 	// search for other disk systems
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	manager->RescanDiskSystems();
-
-	return B_OK;
 }
 
