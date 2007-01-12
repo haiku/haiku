@@ -179,6 +179,18 @@ RemoteDisk::Size() const
 	return fImageSize;
 }
 
+ip_addr_t
+RemoteDisk::ServerIPAddress() const
+{
+	return fServerAddress;
+}
+
+uint16
+RemoteDisk::ServerPort() const
+{
+	return fServerPort;
+}
+
 // FindAnyRemoteDisk
 RemoteDisk *
 RemoteDisk::FindAnyRemoteDisk()

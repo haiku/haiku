@@ -9,12 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <OS.h>
 #include <KernelExport.h>
 
-#include <boot/net/Ethernet.h>
-#include <boot/net/NetStack.h>
-
+#include "network.h"
 #include "pxe_undi.h"
 
 //#define TRACE_NETWORK
@@ -50,29 +47,6 @@ hex_dump(const void *_data, int length)
 #define hex_dump(data, length)
 
 #endif	// !TRACE_NETWORK
-
-
-class UNDI : public EthernetInterface
-{
-public:
-						UNDI();
-	virtual 			~UNDI();
-
-	status_t 			Init();
-
-	virtual mac_addr_t	MACAddress() const;
-
-	virtual	void *		AllocateSendReceiveBuffer(size_t size);
-	virtual	void 		FreeSendReceiveBuffer(void *buffer);
-
-	virtual ssize_t		Send(const void *buffer, size_t size);
-	virtual ssize_t		Receive(void *buffer, size_t size);
-
-private:
-	mac_addr_t			fMACAddress;
-	bool				fRxFinished;
-	PXE_STRUCT *		fPxeData;
-};
 
 
 UNDI::UNDI()
@@ -123,7 +97,9 @@ UNDI::Init()
 	ip_addr_t ipClient = ntohl(*(ip_addr_t *)(buf + 16));
 	ip_addr_t ipServer = ntohl(*(ip_addr_t *)(buf + 20));
 
-	dprintf("client-ip: %08x, server-ip: %08x\n", (int)ipClient, (int)ipServer);
+	dprintf("client-ip: %lu.%lu.%lu.%lu, server-ip: %lu.%lu.%lu.%lu\n", 
+		(ipClient >> 24) & 0xff, (ipClient >> 16) & 0xff, (ipClient >> 8) & 0xff, ipClient & 0xff,
+		(ipServer >> 24) & 0xff, (ipServer >> 16) & 0xff, (ipServer >> 8) & 0xff, ipServer & 0xff);
 
 	SetIPAddress(ipClient);
 

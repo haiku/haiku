@@ -28,6 +28,9 @@ public:
 	virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
 	virtual off_t Size() const;
 
+	ip_addr_t ServerIPAddress() const;
+	uint16 ServerPort() const;
+
 	static RemoteDisk *FindAnyRemoteDisk();
 
 private:

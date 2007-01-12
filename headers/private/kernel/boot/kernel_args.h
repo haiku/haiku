@@ -46,6 +46,7 @@ typedef struct kernel_args {
 		off_t	partition_offset;
 		bool	user_selected;
 		bool	booted_from_image;
+		bool	booted_from_network;
 		bool	cd;
 	} boot_disk;
 

@@ -184,6 +184,7 @@ is_boot_device(kernel_args *args, KDiskDevice *device, bool strict)
 		case USB_DEVICE:
 		case FIREWIRE_DEVICE:
 		case FIBRE_DEVICE:
+		case NETWORK_DEVICE:
 			// TODO: implement me!
 			break;
 	}
@@ -209,6 +210,12 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 	if (status != B_OK) {
 		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
 		return status;
+	}
+
+	if (args->boot_disk.booted_from_network) {
+		panic("get_boot_partitions: boot from network, server %08lx, client %08lx\n",
+			args->boot_disk.identifier.device.network.server_ip,
+			args->boot_disk.identifier.device.network.client_ip);
 	}
 
 	struct BootPartitionVisitor : KPartitionVisitor {

@@ -23,6 +23,7 @@ enum device_types {
 	USB_DEVICE,
 	FIREWIRE_DEVICE,
 	FIBRE_DEVICE,
+	NETWORK_DEVICE,
 };
 
 #define NUM_DISK_CHECK_SUMS 5
@@ -61,6 +62,11 @@ typedef struct disk_identifier {
 		struct {
 			uint64		wwd;
 		} fibre;
+		struct {
+			uint32		client_ip;
+			uint32		server_ip;
+			uint16		server_port;
+		} network;
 		struct {
 			off_t		size;
 			struct {

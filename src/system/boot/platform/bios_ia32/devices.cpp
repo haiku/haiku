@@ -757,6 +757,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 
 	TRACE(("boot drive size: %Ld bytes\n", drive->Size()));
 	gKernelArgs.boot_disk.booted_from_image = gBootedFromImage;
+	gKernelArgs.boot_disk.booted_from_network = false;
 
 	return B_OK;
 }
