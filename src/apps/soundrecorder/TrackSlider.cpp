@@ -15,7 +15,8 @@
 TrackSlider::TrackSlider(BRect rect, const char *title, BMessage *msg, uint32 resizeFlags)
 	: BControl(rect, "slider", NULL, msg, resizeFlags, B_WILL_DRAW | B_FRAME_EVENTS),
 	fLeftTime(0), fRightTime(1000000), fMainTime(0), fTotalTime(1000000),
-	fLeftTracking(false), fRightTracking(false), fMainTracking(false)
+	fLeftTracking(false), fRightTracking(false), fMainTracking(false),
+	fBitmap(NULL), fBitmapView(NULL)
 {
 	fFont.SetSize(8.0);
 	fFont.SetFlags(B_DISABLE_ANTIALIASING);
