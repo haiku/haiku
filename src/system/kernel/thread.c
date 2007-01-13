@@ -548,6 +548,8 @@ static struct thread *last_thread_dumped = NULL;
 static void
 _dump_thread_info(struct thread *thread)
 {
+	struct death_entry *death = NULL;
+
 	kprintf("THREAD: %p\n", thread);
 	kprintf("id:                 0x%lx\n", thread->id);
 	kprintf("name:               \"%s\"\n", thread->name);
@@ -571,7 +573,15 @@ _dump_thread_info(struct thread *thread)
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);
 	kprintf("entry:              %p\n", (void *)thread->entry);
 	kprintf("team:               %p, \"%s\"\n", thread->team, thread->team->name);
-	kprintf("exit.sem:           0x%lx\n", thread->exit.sem);
+	kprintf("  exit.sem:         0x%lx\n", thread->exit.sem);
+	kprintf("  exit.status:      0x%lx (%s)\n", thread->exit.status, strerror(thread->exit.status));
+	kprintf("  exit.reason:      0x%x\n", thread->exit.reason);
+	kprintf("  exit.signal:      0x%x\n", thread->exit.signal);
+	kprintf("  exit.waiters:\n");
+	while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
+		kprintf("\t%p (team 0x%lx, thread 0x%lx)\n", death, death->team, death->thread);
+	}
+
 	kprintf("kernel_stack_area:  0x%lx\n", thread->kernel_stack_area);
 	kprintf("kernel_stack_base:  %p\n", (void *)thread->kernel_stack_base);
 	kprintf("user_stack_area:    0x%lx\n", thread->user_stack_area);
