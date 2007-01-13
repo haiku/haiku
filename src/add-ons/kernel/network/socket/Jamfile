@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel network socket ;
+
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders net ;
+
+KernelAddon socket :
+	socket.cpp
+;
