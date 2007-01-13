@@ -1308,7 +1308,7 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 status_t
 wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_returnCode)
 {
-	sem_id sem = B_BAD_THREAD_ID;
+	sem_id exitSem = B_BAD_THREAD_ID;
 	struct death_entry death, *freeDeath = NULL;
 	struct thread *thread;
 	cpu_status state;
@@ -1325,7 +1325,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_re
 	thread = thread_get_thread_struct_locked(id);
 	if (thread != NULL) {
 		// remember the semaphore we have to wait on and place our death entry
-		sem = thread->exit.sem;
+		exitSem = thread->exit.sem;
 		list_add_link_to_head(&thread->exit.waiters, &death);
 	}
 
@@ -1355,12 +1355,13 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_re
 
 	// we need to wait for the death of the thread
 
-	if (sem < B_OK)
+	if (exitSem < B_OK)
 		return B_BAD_THREAD_ID;
 
 	resume_thread(id);
+		// make sure we don't wait forever on a suspended thread
 
-	status = acquire_sem_etc(sem, 1, flags, timeout);
+	status = acquire_sem_etc(exitSem, 1, flags, timeout);
 
 	if (status == B_OK) {
 		// this should never happen as the thread deletes the semaphore on exit
@@ -1373,8 +1374,6 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_re
 			*_returnCode = death.status;
 	} else {
 		// We were probably interrupted; we need to remove our death entry now.
-		// When the thread is already gone, we don't have to care
-
 		state = disable_interrupts();
 		GRAB_THREAD_LOCK();
 
@@ -1384,6 +1383,11 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_re
 
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
+
+		// If the thread is already gone, we need to wait for its exit semaphore
+		// to make sure our death entry stays valid - it won't take long
+		if (thread == NULL)
+			acquire_sem(exitSem);
 	}
 
 	return status;
