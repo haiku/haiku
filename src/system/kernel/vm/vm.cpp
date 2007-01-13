@@ -802,6 +802,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 		goto err3;
 
 	cache->temporary = 1;
+	cache->virtual_size = size;
 
 	switch (wiring) {
 		case B_LAZY_LOCK:	// for now
@@ -1003,6 +1004,7 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 
 	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
+	cache->virtual_size = size;
 
 	status = map_backing_store(addressSpace, store, _address, 0, size,
 		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
@@ -1046,7 +1048,8 @@ err1:
 
 
 area_id
-vm_create_null_area(team_id aid, const char *name, void **address, uint32 addressSpec, addr_t size)
+vm_create_null_area(team_id aid, const char *name, void **address,
+	uint32 addressSpec, addr_t size)
 {
 	vm_area *area;
 	vm_cache *cache;
@@ -1078,6 +1081,7 @@ vm_create_null_area(team_id aid, const char *name, void **address, uint32 addres
 
 	// tell the page scanner to skip over this area, no pages will be mapped here
 	cache->scan_skip = 1;
+	cache->virtual_size = size;
 
 	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, 0,
 		B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
@@ -1487,10 +1491,10 @@ vm_copy_on_write_area(vm_area *area)
 	mutex_lock(&upperCacheRef->lock);
 	mutex_lock(&lowerCacheRef->lock);
 
-	// ToDo: add a child counter to vm_cache - so that we can collapse a
-	//		cache layer when possible (ie. "the other" area was deleted)
 	upperCache->temporary = 1;
 	upperCache->scan_skip = lowerCache->scan_skip;
+	upperCache->virtual_base = lowerCache->virtual_base;
+	upperCache->virtual_size = lowerCache->virtual_size;
 	upperCache->source = lowerCache;
 	list_add_item(&lowerCache->consumers, upperCache);
 	upperCache->ref = upperCacheRef;
@@ -1893,8 +1897,8 @@ dump_cache(int argc, char **argv)
 	kprintf("  areas:\n");
 
 	for (vm_area *area = cacheRef->areas; area != NULL; area = area->cache_next) {
-		kprintf("   area 0x%lx, %s: ", area->id, area->name);
-		kprintf("\tbase_addr:  0x%lx, size: 0x%lx", area->base, area->size);
+		kprintf("   area 0x%lx, %s\n", area->id, area->name);
+		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->base, area->size);
 		kprintf("\tprotection: 0x%lx\n", area->protection);
 		kprintf("\towner:      0x%lx ", area->address_space->id);
 	}
