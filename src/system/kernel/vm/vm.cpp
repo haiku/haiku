@@ -1736,7 +1736,8 @@ display_mem(int argc, char **argv)
 	int i, j;
 
 	if (argc < 2) {
-		kprintf("usage: dw/ds/db <address> [num]\n"
+		kprintf("usage: dl/dw/ds/db <address> [num]\n"
+			"\tdl - 8 bytes\n"
 			"\tdw - 4 bytes\n"
 			"\tds - 2 bytes\n"
 			"\tdb - 1 byte\n");
@@ -1760,6 +1761,9 @@ display_mem(int argc, char **argv)
 	} else if (strcmp(argv[0], "dw") == 0) {
 		itemSize = 4;
 		displayWidth = 4;
+	} else if (strcmp(argv[0], "dl") == 0) {
+		itemSize = 8;
+		displayWidth = 2;
 	} else {
 		kprintf("display_mem called in an invalid way!\n");
 		return 0;
@@ -1809,46 +1813,13 @@ display_mem(int argc, char **argv)
 			case 4:
 				kprintf(" 0x%08lx", *(uint32 *)&value);
 				break;
+			case 8:
+				kprintf(" 0x%016Lx", *(uint64 *)&value);
+				break;
 		}
 	}
 
 	kprintf("\n");
-	return 0;
-}
-
-
-static int
-dump_cache_ref(int argc, char **argv)
-{
-	addr_t address;
-	vm_area *area;
-	vm_cache_ref *cache_ref;
-
-	if (argc < 2) {
-		kprintf("cache_ref: not enough arguments\n");
-		return 0;
-	}
-	if (strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
-		kprintf("cache_ref: invalid argument, pass address\n");
-		return 0;
-	}
-
-	address = strtoul(argv[1], NULL, 0);
-	cache_ref = (vm_cache_ref *)address;
-
-	kprintf("cache_ref at %p:\n", cache_ref);
-	kprintf("cache: %p\n", cache_ref->cache);
-	kprintf("lock.holder: %ld\n", cache_ref->lock.holder);
-	kprintf("lock.sem: 0x%lx\n", cache_ref->lock.sem);
-	kprintf("areas:\n");
-	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
-		kprintf(" area 0x%lx: ", area->id);
-		kprintf("base_addr = 0x%lx ", area->base);
-		kprintf("size = 0x%lx ", area->size);
-		kprintf("name = '%s' ", area->name);
-		kprintf("protection = 0x%lx\n", area->protection);
-	}
-	kprintf("ref_count: %ld\n", cache_ref->ref_count);
 	return 0;
 }
 
@@ -1882,46 +1853,87 @@ page_state_to_text(int state)
 static int
 dump_cache(int argc, char **argv)
 {
-	vm_cache *cache, *consumer = NULL;
-	addr_t address;
-	vm_page *page;
+	vm_cache *cache;
+	vm_cache_ref *cacheRef;
+	bool showPages = false;
+	int addressIndex = 1;
 
 	if (argc < 2) {
-		kprintf("cache: not enough arguments\n");
+		kprintf("usage: %s [-p] <address>\n"
+			"  if -p is specified, all pages are shown.", argv[0]);
 		return 0;
 	}
-	if (strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
-		kprintf("cache: invalid argument, pass address\n");
+	if (!strcmp(argv[1], "-p")) {
+		showPages = true;
+		addressIndex++;
+	}
+	if (strlen(argv[addressIndex]) < 2
+		|| argv[addressIndex][0] != '0'
+		|| argv[addressIndex][1] != 'x') {
+		kprintf("%s: invalid argument, pass address\n", argv[0]);
 		return 0;
 	}
 
-	address = strtoul(argv[1], NULL, 0);
-	cache = (vm_cache *)address;
+	addr_t address = strtoul(argv[addressIndex], NULL, 0);
+	if (address == NULL)
+		return 0;
+
+	if (!strcmp(argv[0], "cache")) {
+		cache = (vm_cache *)address;
+		cacheRef = cache->ref;
+	} else {
+		cacheRef = (vm_cache_ref *)address;
+		cache = cacheRef->cache;
+	}
+
+	kprintf("cache_ref at %p:\n", cacheRef);
+	kprintf("  ref_count:    %ld\n", cacheRef->ref_count);
+	kprintf("  lock.holder:  %ld\n", cacheRef->lock.holder);
+	kprintf("  lock.sem:     0x%lx\n", cacheRef->lock.sem);
+	kprintf("  areas:\n");
+
+	for (vm_area *area = cacheRef->areas; area != NULL; area = area->cache_next) {
+		kprintf("   area 0x%lx, %s: ", area->id, area->name);
+		kprintf("\tbase_addr:  0x%lx, size: 0x%lx", area->base, area->size);
+		kprintf("\tprotection: 0x%lx\n", area->protection);
+		kprintf("\towner:      0x%lx ", area->address_space->id);
+	}
 
 	kprintf("cache at %p:\n", cache);
-	kprintf("cache_ref: %p\n", cache->ref);
-	kprintf("source: %p\n", cache->source);
-	kprintf("consumers:\n");
+	kprintf("  source:       %p\n", cache->source);
+	kprintf("  store:        %p\n", cache->store);
+	kprintf("  virtual_base: 0x%Lx\n", cache->virtual_base);
+	kprintf("  virtual_size: 0x%Lx\n", cache->virtual_size);
+	kprintf("  temporary:    %ld\n", cache->temporary);
+	kprintf("  scan_skip:    %ld\n", cache->scan_skip);
+
+	kprintf("  consumers:\n");
+	vm_cache *consumer = NULL;
 	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers, consumer)) != NULL) {
-		kprintf("  %p\n", consumer);
+		kprintf("\t%p\n", consumer);
 	}
-	kprintf("store: %p\n", cache->store);
-	kprintf("virtual_base: 0x%Lx\n", cache->virtual_base);
-	kprintf("virtual_size: 0x%Lx\n", cache->virtual_size);
-	kprintf("temporary: %ld\n", cache->temporary);
-	kprintf("scan_skip: %ld\n", cache->scan_skip);
-	kprintf("page_list:\n");
-	for (page = cache->page_list; page != NULL; page = page->cache_next) {
+
+	kprintf("  pages:\n");
+	int32 count = 0;
+	for (vm_page *page = cache->page_list; page != NULL; page = page->cache_next) {
+		count++;
+		if (!showPages)
+			continue;
+
 		if (page->type == PAGE_TYPE_PHYSICAL) {
-			kprintf(" %p ppn 0x%lx offset 0x%lx type %ld state %ld (%s) ref_count %ld\n",
+			kprintf("\t%p ppn 0x%lx offset 0x%lx type %ld state %ld (%s) ref_count %ld\n",
 				page, page->physical_page_number, page->cache_offset, page->type, page->state, 
 				page_state_to_text(page->state), page->ref_count);
 		} else if(page->type == PAGE_TYPE_DUMMY) {
-			kprintf(" %p DUMMY PAGE state %ld (%s)\n", 
+			kprintf("\t%p DUMMY PAGE state %ld (%s)\n", 
 				page, page->state, page_state_to_text(page->state));
 		} else
-			kprintf(" %p UNKNOWN PAGE type %ld\n", page, page->type);
+			kprintf("\t%p UNKNOWN PAGE type %ld\n", page, page->type);
 	}
+
+	if (!showPages)
+		kprintf("\t%ld in cache\n", count);
+
 	return 0;
 }
 
@@ -2365,10 +2377,10 @@ vm_init(kernel_args *args)
 	// add some debugger commands
 	add_debugger_command("areas", &dump_area_list, "Dump a list of all areas");
 	add_debugger_command("area", &dump_area, "Dump info about a particular area");
-	add_debugger_command("cache_ref", &dump_cache_ref, "Dump cache_ref data structure");
-	add_debugger_command("cache", &dump_cache, "Dump cache_ref data structure");
+	add_debugger_command("cache_ref", &dump_cache, "Dump vm_cache");
+	add_debugger_command("cache", &dump_cache, "Dump vm_cache");
 	add_debugger_command("avail", &dump_available_memory, "Dump available memory");
-//	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
+	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
 	add_debugger_command("dw", &display_mem, "dump memory words (32-bit)");
 	add_debugger_command("ds", &display_mem, "dump memory shorts (16-bit)");
 	add_debugger_command("db", &display_mem, "dump memory bytes (8-bit)");
