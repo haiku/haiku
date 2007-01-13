@@ -63,7 +63,7 @@ typedef struct vm_cache_ref {
 
 	struct vm_area		*areas;
 
-	int32				ref_count;
+	vint32				ref_count;
 } vm_cache_ref;
 
 // vm_cache
