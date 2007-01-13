@@ -444,10 +444,6 @@ add_safe_mode_menu()
 	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
 	
-	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable ACPI"));
-	item->SetData(B_SAFEMODE_DISABLE_ACPI);
-	item->SetType(MENU_ITEM_MARKABLE);
-	
 	platform_add_menus(safeMenu);
 
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Enable on screen debug output"));

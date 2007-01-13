@@ -32,6 +32,11 @@ platform_add_menus(Menu *menu)
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData("disable_apm");
 			item->SetHelpText("This overrides the APM setting in the kernel settings file");
+
+			menu->AddItem(item = new(nothrow) MenuItem("Disable ACPI"));
+			item->SetType(MENU_ITEM_MARKABLE);
+			item->SetData(B_SAFEMODE_DISABLE_ACPI);
+			item->SetHelpText("This overrides the ACPI setting in the kernel settings file");
 			break;
 		default:
 			break;

@@ -63,6 +63,25 @@ acpi_std_ops(int32 op,...)
 	
 	switch(op) {
 		case B_MODULE_INIT:
+			// check if safemode settings disable DMA
+			
+			settings = load_driver_settings("kernel");
+			if (settings != NULL) {
+				acpiDisabled = !get_driver_boolean_parameter(settings, "acpi", true, true);
+				unload_driver_settings(settings);
+			}
+ 
+                	settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+                	if (settings != NULL) {
+                        	acpiDisabled = get_driver_boolean_parameter(settings, B_SAFEMODE_DISABLE_ACPI,
+                                	acpiDisabled, acpiDisabled);
+                        	unload_driver_settings(settings);
+               		}
+
+			if (acpiDisabled) {
+				ERROR("ACPI disabled");
+				return ENOSYS;
+			}
 			
 			#ifdef ACPI_DEBUG_OUTPUT
 				AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;

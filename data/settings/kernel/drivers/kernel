@@ -32,3 +32,5 @@
 	# APM (advanced power management) support
 	# (system shutdown, battery info, ...)
 
+#acpi true
+	# ACPI support
