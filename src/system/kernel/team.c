@@ -560,6 +560,7 @@ create_team_struct(const char *name, bool kernel)
 	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = allocate_thread_id();
 	strlcpy(team->name, name, B_OS_NAME_LENGTH);
+	team->args[0] = '\0';
 	team->num_threads = 0;
 	team->io_context = NULL;
 	team->address_space = NULL;
@@ -1132,6 +1133,8 @@ fork_team(void)
 	team = create_team_struct(parentTeam->name, false);
 	if (team == NULL)
 		return B_NO_MEMORY;
+
+	strlcpy(team->args, parentTeam->args, sizeof(team->args));
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
