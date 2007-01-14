@@ -9,7 +9,7 @@
 #define DRIVER_H
 
 
-#define TRACE(a...) dprintf("VMware: " ##a)
+#define TRACE(a...) dprintf("VMware: " a)
 
 #include "DriverInterface.h"
 

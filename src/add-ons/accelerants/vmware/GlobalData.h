@@ -13,7 +13,7 @@
 
 #include <support/Debug.h>
 #undef TRACE
-#define TRACE(a...) _sPrintf("VMware: " ##a)
+#define TRACE(a...) _sPrintf("VMware: " a)
 
 #include "DriverInterface.h"
 #include "generic.h"
