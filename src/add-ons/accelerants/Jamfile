@@ -12,5 +12,6 @@ SubInclude HAIKU_TOP src add-ons accelerants tdfx ;
 SubInclude HAIKU_TOP src add-ons accelerants skeleton ;
 SubInclude HAIKU_TOP src add-ons accelerants vesa ;
 SubInclude HAIKU_TOP src add-ons accelerants via ;
+SubInclude HAIKU_TOP src add-ons accelerants vmware ;
 
 SubIncludeGPL HAIKU_TOP src add-ons accelerants atimach64 ;

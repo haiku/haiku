@@ -12,5 +12,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers graphics tdfx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics via ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics vmware ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers graphics atimach64 ;

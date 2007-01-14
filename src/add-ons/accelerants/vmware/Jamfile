@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src add-ons accelerants vmware ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders [ FDirName graphics vmware ] ;
+UsePrivateHeaders graphics ;
+
+Addon vmware.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	Fifo.c
+	GetAccelerantHook.c
+	GetModeInfo.c
+	GlobalData.c
+	InitAccelerant.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: false
+;

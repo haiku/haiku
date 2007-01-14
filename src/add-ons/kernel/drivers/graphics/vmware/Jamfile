@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics vmware ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders [ FDirName graphics vmware ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders graphics ;
+
+KernelAddon vmware :
+	driver.c
+	device.c
+;
