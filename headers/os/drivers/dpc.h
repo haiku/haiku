@@ -18,9 +18,9 @@ typedef void (*dpc_func) (void *arg);
 
 typedef struct {
 	module_info info;
-	void * 		(*new_dpc_thread)(const char *name, long priority, int queue_size);
-	status_t	(*delete_dpc_thread)(void *thread);
-	status_t	(*queue_dpc)(void *thread, dpc_func dpc_name, void *arg);
+	void * 		(*new_dpc_queue)(const char *name, long priority, int queue_size);
+	status_t	(*delete_dpc_queue)(void *queue);
+	status_t	(*queue_dpc)(void *queue, dpc_func dpc_name, void *arg);
 } dpc_module_info;
 
 

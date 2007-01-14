@@ -40,34 +40,42 @@ static int32
 dpc_thread(void *arg)
 {
 	dpc_queue *queue = arg;
+	dpc_slot dpc;
 	
 	// Let's wait forever/until semaphore death for new DPC slot to show up
 	while (acquire_sem(queue->wakeup_sem) == B_OK) {
 		cpu_status former;
-		dpc_slot call;
 	
 		// grab the next dpc slot
 		former = disable_interrupts();
 		acquire_spinlock(&queue->lock);
 		
-		call = queue->slots[queue->head];
+		dpc = queue->slots[queue->head];
 		queue->head = (queue->head++) % queue->size;
 		queue->count--;
 
 		release_spinlock(&queue->lock);
 		restore_interrupts(former);
 		
-		call.function(call.arg);
+		dpc.function(dpc.arg);
 	}
 
-	// Let's die quietly, ignored by all... sigh.
+	// Let's finish the pending DPCs, if any.
+	// Otherwise, resource could leaks...
+	while (queue->count--) {
+		dpc = queue->slots[queue->head];
+		queue->head = (queue->head++) % queue->size;
+		dpc.function(dpc.arg);	
+	}
+
+	// Now, let's die quietly, ignored by all... sigh.
 	return 0;
 }
 
 // ---- Public API
 
 static void *
-new_dpc_thread(const char *name, long priority, int queue_size)
+new_dpc_queue(const char *name, long priority, int queue_size)
 {
 	char str[64];
 	dpc_queue *queue;
@@ -111,17 +119,29 @@ new_dpc_thread(const char *name, long priority, int queue_size)
 
 
 static status_t
-delete_dpc_thread(void *thread)
+delete_dpc_queue(void *handle)
 {
-	dpc_queue *queue = thread;
+	dpc_queue *queue = handle;
+	thread_id thread;
 	status_t exit_value;
-	
+	cpu_status former;
+
 	if (!queue)
 		return B_BAD_VALUE;
 
-	// Wakeup the thread by murdering its favorite semaphore 
+	// Close the queue: queue_dpc() should knows we're closing:
+	former = disable_interrupts();
+	acquire_spinlock(&queue->lock);
+	
+	thread = queue->thread;
+	queue->thread = -1;
+	
+	release_spinlock(&queue->lock);
+	restore_interrupts(former);
+
+	// Wakeup the thread by murdering its favorite semaphore
 	delete_sem(queue->wakeup_sem);
-	wait_for_thread(queue->thread, &exit_value);
+	wait_for_thread(thread, &exit_value);
 
 	free(queue);
 	
@@ -130,20 +150,23 @@ delete_dpc_thread(void *thread)
 
 
 static status_t
-queue_dpc(void *thread, dpc_func function, void *arg)
+queue_dpc(void *handle, dpc_func function, void *arg)
 {
-	dpc_queue *queue = thread;
+	dpc_queue *queue = handle;
 	cpu_status former;
 	status_t status = B_OK;
 	
 	if (!queue || !function)
 		return B_BAD_VALUE;
-
+		
 	// Try to be safe being called from interrupt handlers:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
 	
-	if (queue->count == queue->size)
+	if (queue->thread < 0) {
+		// Queue thread is dying...
+		status = B_CANCELED;
+	} else if (queue->count == queue->size)
 		// This DPC queue is full, sorry
 		status = B_NO_MEMORY;
 	else {
@@ -164,7 +187,6 @@ queue_dpc(void *thread, dpc_func function, void *arg)
 	
 	return status;
 }
-
 
 
 static status_t
@@ -188,8 +210,8 @@ static dpc_module_info sDPCModule = {
 		std_ops
 	},
 	
-	new_dpc_thread,
-	delete_dpc_thread,
+	new_dpc_queue,
+	delete_dpc_queue,
 	queue_dpc
 };
 
