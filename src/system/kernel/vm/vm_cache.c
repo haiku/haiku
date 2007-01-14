@@ -407,13 +407,14 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 void
 vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 {
-	vm_cache *cache = cacheRef->cache;
 	vm_cache *newSource = NULL;
+	vm_cache *cache;
 
-	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
+	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cacheRef->cache));
 	ASSERT_LOCKED_MUTEX(&consumer->ref->lock);
 
 	mutex_lock(&cacheRef->lock);
+	cache = cacheRef->cache;
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
 
@@ -423,36 +424,73 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 		// The cache is not really needed anymore - it can be merged with its only
 		// consumer left.
 		vm_cache_ref *consumerRef;
-		vm_page *page, *nextPage;
+		bool merge = false;
 
-		consumer = list_remove_head_item(&cache->consumers);
+		consumer = list_get_first_item(&cache->consumers);
 		consumerRef = consumer->ref;
 
-		mutex_lock(&consumerRef->lock);
-			// TODO: is it okay to lock them in this direction?
+		// Our cache doesn't have a ref to its consumer (only the other way around), 
+		// so we cannot just acquire it here; it might be deleted right now
+		while (true) {
+			int32 count = consumerRef->ref_count;
+			if (count == 0)
+				break;
 
-		TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
-			cache, cacheRef->ref_count, consumer));
-
-		for (page = cache->page_list; page != NULL; page = nextPage) {
-			nextPage = page->cache_next;
-			vm_cache_remove_page(cacheRef, page);
-
-			if (vm_cache_lookup_page(consumerRef,
-					(off_t)page->cache_offset << PAGE_SHIFT) != NULL) {
-				// the page already is in the consumer cache - this copy is no
-				// longer needed, and can be freed
-				vm_page_set_state(page, PAGE_STATE_FREE);
-				continue;
+			if (atomic_test_and_set(&consumerRef->ref_count, count + 1, count) == count) {
+				// we managed to grab a reference to the consumer
+				merge = true;
+				break;
 			}
-
-			// move the page into the consumer cache
-			vm_cache_insert_page(consumerRef, page,
-				(off_t)page->cache_offset << PAGE_SHIFT);
 		}
 
-		newSource = cache->source;
-		mutex_unlock(&consumerRef->lock);
+		if (merge) {
+			// But since we need to keep the locking order upper->lower cache, we
+			// need to unlock our cache now
+			mutex_unlock(&cacheRef->lock);
+
+			mutex_lock(&consumerRef->lock);
+			mutex_lock(&cacheRef->lock);
+
+			// the cache and the situation might have changed
+			cache = cacheRef->cache;
+			if (cacheRef->areas != NULL || cache->source == NULL
+				|| list_is_empty(&cache->consumers)
+				|| cache->consumers.link.next != cache->consumers.link.prev
+				|| consumerRef != list_get_first_item(&cache->consumers)) {
+				merge = false;
+				mutex_unlock(&consumerRef->lock);
+			}
+		}
+
+		if (merge) {
+			vm_page *page, *nextPage;
+
+			consumer = list_remove_head_item(&cache->consumers);
+
+			TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
+				cache, cacheRef->ref_count, consumer));
+
+			for (page = cache->page_list; page != NULL; page = nextPage) {
+				nextPage = page->cache_next;
+				vm_cache_remove_page(cacheRef, page);
+
+				if (vm_cache_lookup_page(consumerRef,
+						(off_t)page->cache_offset << PAGE_SHIFT) != NULL) {
+					// the page already is in the consumer cache - this copy is no
+					// longer needed, and can be freed
+					vm_page_set_state(page, PAGE_STATE_FREE);
+					continue;
+				}
+
+				// move the page into the consumer cache
+				vm_cache_insert_page(consumerRef, page,
+					(off_t)page->cache_offset << PAGE_SHIFT);
+			}
+
+			newSource = cache->source;
+			mutex_unlock(&consumerRef->lock);
+		}
+		vm_cache_release_ref(consumerRef);
 	}
 
 	if (newSource != NULL) {
