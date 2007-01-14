@@ -26,8 +26,8 @@ GET_FRAME_BUFFER_CONFIG(frame_buffer_config *afb)
 {
 	TRACE("GET_FRAME_BUFFER_CONFIG\n");
 
-	afb->frame_buffer = gSi->fb + gSi->fbOffset;
-	afb->frame_buffer_dma = gSi->fbDma + gSi->fbOffset;
+	afb->frame_buffer = (uint8 *)gSi->fb + gSi->fbOffset;
+	afb->frame_buffer_dma = (uint8 *)gSi->fbDma + gSi->fbOffset;
 	afb->bytes_per_row = gSi->bytesPerRow;
 
 	TRACE("fb: %p, fb_dma: %p, row: %d bytes\n", afb->frame_buffer,

@@ -8,14 +8,15 @@
  *		Eric Petit <eric.petit@lapsus.org>
  */
 
+
 #include "GlobalData.h"
 
 
 void
 SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 {
-	int i;
-	blit_params * b;
+	uint32 i;
+	blit_params *b;
 
 	for (i = 0; i < count; i++) {
 		b = &list[i];
@@ -40,8 +41,8 @@ void
 FILL_RECTANGLE(engine_token *et, uint32 colorIndex,
 	fill_rect_params *list, uint32 count)
 {
-	int i;
-	fill_rect_params * f;
+	uint32 i;
+	fill_rect_params *f;
 
 	for (i = 0; i < count; i++) {
 		f = &list[i];

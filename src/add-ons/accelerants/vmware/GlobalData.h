@@ -27,11 +27,11 @@ extern thread_id	gUpdateThread;
 extern volatile int	gUpdateThreadDie;
 
 /* Fifo.c */
-void FifoInit();
-void FifoSync();
-void FifoBeginWrite();
+void FifoInit(void);
+void FifoSync(void);
+void FifoBeginWrite(void);
 void FifoWrite(uint32 value);
-void FifoEndWrite();
-void FifoUpdateFullscreen();
+void FifoEndWrite(void);
+void FifoUpdateFullscreen(void);
 
 #endif	// GLOBAL_DATA_H

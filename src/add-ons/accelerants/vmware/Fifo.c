@@ -49,7 +49,7 @@ FifoPrintCapabilities(int c)
 
 
 void
-FifoInit()
+FifoInit(void)
 {
 	uint32 *fifo = gSi->fifo;
 
@@ -87,14 +87,14 @@ FifoInit()
 
 
 void
-FifoSync()
+FifoSync(void)
 {
 	ioctl(gFd, VMWARE_FIFO_SYNC, NULL, 0);
 }
 
 
 void
-FifoBeginWrite()
+FifoBeginWrite(void)
 {
 	ACQUIRE_BEN(gSi->fifoLock);
 }
@@ -117,7 +117,7 @@ FifoWrite(uint32 value)
 
 
 void
-FifoEndWrite()
+FifoEndWrite(void)
 {
 	uint32 *fifo = gSi->fifo;
 
@@ -127,7 +127,7 @@ FifoEndWrite()
 
 
 void
-FifoUpdateFullscreen()
+FifoUpdateFullscreen(void)
 {
 	FifoBeginWrite();
 	FifoWrite(SVGA_CMD_UPDATE);
