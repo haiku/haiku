@@ -1,11 +1,10 @@
-resource app_version
-{
+resource app_version {
 	major = 6,
 	middle = 7,
 	minor = 0,
-	variety = 5,
+	variety = B_FINAL_VERSION,
 	internal = 0,
-	short_info = "6.7", 
-	long_info  = "6.7 ©2006 The Free Software Foundation"
+	short_info = "coreutils", 
+	long_info  = "coreutils ©2006 The Free Software Foundation"
 };
 

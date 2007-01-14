@@ -8,6 +8,10 @@ UsePrivateHeaders storage ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
+local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
+
+ResComp $(haiku-utils_rsrc) : [ FGristFiles haiku-utils.rdef ] ;
+
 AddResources hey : hey.rdef ;
 
 # standard commands that don't need any additional library
@@ -42,7 +46,7 @@ StdBinCommands
 	uptime.cpp
 	waitfor.c
 #	whoami.c
-	;
+	: : $(haiku-utils_rsrc) ;
 
 # Commands which don't need another library that depend on
 # Haiku-specific code
@@ -55,15 +59,14 @@ StdBinCommands
 	rmindex.cpp
 	safemode.c
 	unmount.c
-	;
+	: : $(haiku-utils_rsrc) ;
 }
 
 # standard commands that need libtermcap.a
 StdBinCommands
 	top.c
 	tput.c
-	: libtermcap.a
-	;
+	: libtermcap.a : $(haiku-utils_rsrc) ;
 
 AddResources mimeset : mimeset.rdef ;
 
@@ -93,48 +96,43 @@ StdBinCommands
 	setversion.cpp
 	version.cpp
 #	yes.cpp
-	: be ;
+	: be : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so
 if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	shutdown.cpp
-	: be ;
+	: be : $(haiku-utils_rsrc) ;
 }
 
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
 	copyattr.cpp
 	xres.cpp
-	: be $(TARGET_LIBSTDC++)
-	;
+	: be $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe., libstdc++.so
 if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	mountvolume.cpp
-	: be $(TARGET_LIBSTDC++)
-	;
+	: be $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 }
 
 # standard commands that need libbe.so, libtranslation.so
 StdBinCommands
 	translate.cpp
-	: be translation
-	;
+	: be translation : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmedia.so
 StdBinCommands
 	installsound.cpp
 	setvolume.cpp
-	: be libmedia.so
-	;
+	: be libmedia.so : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmail.so
 StdBinCommands
 	mail.cpp
-	: be libmail.so
-	;
+	: be libmail.so : $(haiku-utils_rsrc) ;
 
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
