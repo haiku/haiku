@@ -2961,8 +2961,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 }
 
 
-/* NOTE: must have the address space's sem held */
-static vm_area *
+/*! You must have the address space's sem held */
+vm_area *
 vm_area_lookup(vm_address_space *addressSpace, addr_t address)
 {
 	vm_area *area;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -9,7 +9,6 @@
 #define _KERNEL_VM_H
 
 
-//#include <kernel.h>
 #include <vm_types.h>
 #include <arch/vm.h>
 #include <arch/vm_translation_map.h>
@@ -58,6 +57,7 @@ area_id vm_clone_area(team_id team, const char *name, void **address,
 			area_id sourceArea);
 status_t vm_delete_area(team_id aid, area_id id);
 status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
+vm_area *vm_area_lookup(vm_address_space *addressSpace, addr_t address);
 
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 

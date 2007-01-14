@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -12,6 +12,7 @@
 #include <kernel.h>
 #include <kimage.h>
 #include <thread.h>
+#include <vm.h>
 
 #include <arch/debug.h>
 #include <arch_cpu.h>
@@ -91,16 +92,25 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 		status = image_debug_lookup_user_symbol_address(thread->team, eip,
 			&baseAddress, &symbol, &image, &exactMatch);
 	}
+	
+	kprintf("%08lx (+%4ld) %08lx", ebp, diff, eip);
+
 	if (status == B_OK) {
 		if (symbol != NULL) {
-			kprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
-				image, symbol, eip - baseAddress, exactMatch ? "" : " (nearest)");
+			kprintf("   <%s>:%s + 0x%04lx%s\n", image, symbol,
+				eip - baseAddress, exactMatch ? "" : " (nearest)");
 		} else {
-			kprintf("%08lx (+%4ld) %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, diff,
-				eip, image, (void *)baseAddress, eip - baseAddress);
+			kprintf("   <%s@%p>:unknown + 0x%04lx\n", image,
+				(void *)baseAddress, eip - baseAddress);
 		}
-	} else
-		kprintf("%08lx (+%4ld) %08lx\n", ebp, diff, eip);
+	} else {
+		vm_area *area = vm_area_lookup(thread->team->address_space, eip);
+		if (area != NULL) {
+			kprintf("   %ld:%s@%p + %#lx\n", area->id, area->name, (void *)area->base,
+				eip - area->base);
+		} else
+			kprintf("\n");
+	}
 }
 
 
