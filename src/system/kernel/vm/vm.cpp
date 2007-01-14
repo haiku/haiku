@@ -73,7 +73,6 @@ static vm_area *_vm_create_region_struct(vm_address_space *addressSpace, const c
 static status_t map_backing_store(vm_address_space *addressSpace, vm_store *store, void **vaddr,
 	off_t offset, addr_t size, uint32 addressSpec, int wiring, int lock, int mapping, vm_area **_area, const char *area_name);
 static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
-static vm_area *vm_area_lookup(vm_address_space *addressSpace, addr_t address);
 static bool vm_put_area(vm_area *area);
 
 
