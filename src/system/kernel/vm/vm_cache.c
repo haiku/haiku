@@ -185,7 +185,7 @@ vm_cache_release_ref(vm_cache_ref *cacheRef)
 	// delete this cache
 
 	if (cacheRef->areas != NULL)
-		panic("cache to be deleted still has areas");
+		panic("cache_ref %p to be deleted still has areas", cacheRef);
 	if (!list_is_empty(&cacheRef->cache->consumers))
 		panic("cache %p to be deleted still has consumers", cacheRef->cache);
 
@@ -330,14 +330,18 @@ vm_cache_write_modified(vm_cache_ref *ref, bool fsReenter)
 }
 
 
+/*!
+	Commits the memory to the store if the \a commitment is larger than
+	what's committed already.
+	Assumes you have the \a ref's lock held.
+*/
 status_t
-vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
+vm_cache_set_minimal_commitment_locked(vm_cache_ref *ref, off_t commitment)
 {
 	status_t status = B_OK;
-	vm_store *store;
+	vm_store *store = ref->cache->store;
 
-	mutex_lock(&ref->lock);
-	store = ref->cache->store;
+	ASSERT_LOCKED_MUTEX(&ref->lock);
 
 	// If we don't have enough committed space to cover through to the new end of region...
 	if (store->committed_size < commitment) {
@@ -348,7 +352,6 @@ vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
 		status = store->ops->commit(store, commitment);
 	}
 
-	mutex_unlock(&ref->lock);
 	return status;
 }
 
@@ -399,6 +402,7 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 /*!
 	Removes the \a consumer from the \a cacheRef's cache.
 	It will also release the reference to the cacheRef owned by the consumer.
+	Assumes you have the consumer's cache_ref lock held.
 */
 void
 vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
@@ -407,9 +411,9 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 	vm_cache *newSource = NULL;
 
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
+	ASSERT_LOCKED_MUTEX(&consumer->ref->lock);
 
 	mutex_lock(&cacheRef->lock);
-
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
 
@@ -453,19 +457,21 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 
 	if (newSource != NULL) {
 		// The remaining consumer has gotten a new source
+		mutex_lock(&newSource->ref->lock);
+
 		list_remove_item(&newSource->consumers, cache);
 		list_add_item(&newSource->consumers, consumer);
 		consumer->source = newSource;
 		cache->source = NULL;
 
-		mutex_unlock(&cacheRef->lock);
+		mutex_unlock(&newSource->ref->lock);
 
 		// Release the other reference to the cache - we take over
 		// its reference of its source cache
 		vm_cache_release_ref(cacheRef);
-	} else
-		mutex_unlock(&cacheRef->lock);
+	}
 
+	mutex_unlock(&cacheRef->lock);
 	vm_cache_release_ref(cacheRef);
 }
 
@@ -474,26 +480,30 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 	Marks the \a cacheRef's cache as source of the \a consumer cache,
 	and adds the \a consumer to its list.
 	This also grabs a reference to the source cache.
+	Assumes you have the cache_ref and the consumer's lock held.
 */
 void
-vm_cache_add_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
+vm_cache_add_consumer_locked(vm_cache_ref *cacheRef, vm_cache *consumer)
 {
 	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cacheRef->cache));
-	mutex_lock(&cacheRef->lock);
+	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
+	ASSERT_LOCKED_MUTEX(&consumer->ref->lock);
 
 	consumer->source = cacheRef->cache;
 	list_add_item(&cacheRef->cache->consumers, consumer);
 
 	vm_cache_acquire_ref(cacheRef);
-
-	mutex_unlock(&cacheRef->lock);
 }
 
 
+/*!
+	Adds the \a area to the \a cacheRef.
+	Assumes you have the locked the cache_ref.
+*/
 status_t
-vm_cache_insert_area(vm_cache_ref *cacheRef, vm_area *area)
+vm_cache_insert_area_locked(vm_cache_ref *cacheRef, vm_area *area)
 {
-	mutex_lock(&cacheRef->lock);
+	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	area->cache_next = cacheRef->areas;
 	if (area->cache_next)
@@ -501,7 +511,6 @@ vm_cache_insert_area(vm_cache_ref *cacheRef, vm_area *area)
 	area->cache_prev = NULL;
 	cacheRef->areas = area;
 
-	mutex_unlock(&cacheRef->lock);
 	return B_OK;
 }
 

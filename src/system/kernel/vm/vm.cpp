@@ -501,6 +501,9 @@ insert_area(vm_address_space *addressSpace, void **_address,
 }
 
 
+/*!
+	The \a store's owner must be locked when calling this function.
+*/
 static status_t
 map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtualAddress,
 	off_t offset, addr_t size, uint32 addressSpec, int wiring, int protection,
@@ -550,7 +553,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		newCache->temporary = 1;
 		newCache->scan_skip = cache->scan_skip;
 
-		vm_cache_add_consumer(cacheRef, newCache);
+		vm_cache_add_consumer_locked(cacheRef, newCache);
 
 		cache = newCache;
 		cacheRef = newCache->ref;
@@ -559,7 +562,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		cache->virtual_size = offset + size;
 	}
 
-	status = vm_cache_set_minimal_commitment(cacheRef, offset + size);
+	status = vm_cache_set_minimal_commitment_locked(cacheRef, offset + size);
 	if (status != B_OK)
 		goto err2;
 
@@ -581,7 +584,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	area->cache_ref = cacheRef;
 	area->cache_offset = offset;
 	// point the cache back to the area
-	vm_cache_insert_area(cacheRef, area);
+	vm_cache_insert_area_locked(cacheRef, area);
 
 	// insert the area in the global area hash table
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0 ,0);
@@ -817,8 +820,13 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			break;
 	}
 
+	mutex_lock(&cache->ref->lock);
+
 	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, wiring,
 		protection, REGION_NO_PRIVATE_MAP, &area, name);
+
+	mutex_unlock(&cache->ref->lock);
+
 	if (status < B_OK) {
 		vm_cache_release_ref(cache->ref);
 		goto err1;
@@ -1006,8 +1014,13 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	cache->scan_skip = 1;
 	cache->virtual_size = size;
 
+	mutex_lock(&cache->ref->lock);
+
 	status = map_backing_store(addressSpace, store, _address, 0, size,
 		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
+
+	mutex_unlock(&cache->ref->lock);
+
 	if (status < B_OK)
 		vm_cache_release_ref(cache->ref);
 
@@ -1083,8 +1096,12 @@ vm_create_null_area(team_id aid, const char *name, void **address,
 	cache->scan_skip = 1;
 	cache->virtual_size = size;
 
+	mutex_lock(&cache->ref->lock);
+
 	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, 0,
 		B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
+
+	mutex_unlock(&cache->ref->lock);
 	vm_put_address_space(addressSpace);
 
 	if (status < B_OK) {
@@ -1188,8 +1205,12 @@ _vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
 	if (status < B_OK)
 		goto err1;
 
+	mutex_lock(&cacheRef->lock);
+
 	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name);
+
+	mutex_unlock(&cacheRef->lock);
 
 	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -1282,9 +1303,13 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 	} else
 #endif
 	{
+		mutex_lock(&sourceArea->cache_ref->lock);
+
 		status = map_backing_store(addressSpace, sourceArea->cache_ref->cache->store,
 			address, sourceArea->cache_offset, sourceArea->size, addressSpec,
 			sourceArea->wiring, protection, mapping, &newArea, name);
+
+		mutex_unlock(&sourceArea->cache_ref->lock);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
 		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
@@ -1463,22 +1488,28 @@ vm_copy_on_write_area(vm_area *area)
 	// So the old cache gets a new cache_ref and the area a new cache.
 
 	upperCacheRef = area->cache_ref;
+
+	// we will exchange the cache_ref's cache, so we better hold its lock
+	mutex_lock(&upperCacheRef->lock);
+
 	lowerCache = upperCacheRef->cache;
 
 	// create an anonymous store object
 	store = vm_store_create_anonymous_noswap(false, 0, 0);
-	if (store == NULL)
-		return B_NO_MEMORY;
-
-	upperCache = vm_cache_create(store);
-	if (upperCache == NULL) {
+	if (store == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
 	}
 
+	upperCache = vm_cache_create(store);
+	if (upperCache == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
 	status = vm_cache_ref_create(lowerCache);
 	if (status < B_OK)
-		goto err2;
+		goto err3;
 
 	lowerCacheRef = lowerCache->ref;
 
@@ -1488,24 +1519,30 @@ vm_copy_on_write_area(vm_area *area)
 		protection |= B_READ_AREA;
 
 	// we need to hold the cache_ref lock when we want to switch its cache
-	mutex_lock(&upperCacheRef->lock);
 	mutex_lock(&lowerCacheRef->lock);
 
 	upperCache->temporary = 1;
 	upperCache->scan_skip = lowerCache->scan_skip;
 	upperCache->virtual_base = lowerCache->virtual_base;
 	upperCache->virtual_size = lowerCache->virtual_size;
-	upperCache->source = lowerCache;
-	list_add_item(&lowerCache->consumers, upperCache);
+
 	upperCache->ref = upperCacheRef;
 	upperCacheRef->cache = upperCache;
 
 	// we need to manually alter the ref_count (divide it between the two)
-	lowerCacheRef->ref_count = upperCacheRef->ref_count - 1;
-	upperCacheRef->ref_count = 1;
+	// the lower cache_ref has only known refs, so compute them
+	{
+		int32 count = 0;
+		vm_cache *consumer = NULL;
+		while ((consumer = (vm_cache *)list_get_next_item(
+				&lowerCache->consumers, consumer)) != NULL) {
+			count++;
+		}
+		lowerCacheRef->ref_count = count;
+		atomic_add(&upperCacheRef->ref_count, -count);
+	}
 
-	// grab a ref to the cache object we're now linked to as a source
-	vm_cache_acquire_ref(lowerCacheRef);
+	vm_cache_add_consumer_locked(lowerCacheRef, upperCache);
 
 	// We now need to remap all pages from the area read-only, so that
 	// a copy will be created on next write access
@@ -1527,10 +1564,12 @@ vm_copy_on_write_area(vm_area *area)
 
 	return B_OK;
 
-err2:
+err3:
 	free(upperCache);
-err1:
+err2:
 	store->ops->destroy(store);
+err1:
+	mutex_unlock(&upperCacheRef->lock);
 	return status;
 }
 
@@ -1565,10 +1604,14 @@ vm_copy_area(team_id addressSpaceID, const char *name, void **_address, uint32 a
 
 	// First, create a cache on top of the source area
 
+	mutex_lock(&cacheRef->lock);
+
 	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
 		source->cache_offset, source->size, addressSpec, source->wiring, protection,
 		writableCopy ? REGION_PRIVATE_MAP : REGION_NO_PRIVATE_MAP,
 		&target, name);
+
+	mutex_unlock(&cacheRef->lock);
 
 	if (status < B_OK)
 		goto err;
@@ -1640,9 +1683,9 @@ vm_set_area_protection(team_id aspaceID, area_id areaID, uint32 newProtection)
 	}
 
 	cacheRef = area->cache_ref;
-	cache = cacheRef->cache;
-
 	mutex_lock(&cacheRef->lock);
+
+	cache = cacheRef->cache;
 
 	if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0
 		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0) {
@@ -1860,25 +1903,39 @@ dump_cache(int argc, char **argv)
 	vm_cache *cache;
 	vm_cache_ref *cacheRef;
 	bool showPages = false;
-	int addressIndex = 1;
+	bool showCache = true;
+	bool showCacheRef = true;
+	int i = 1;
 
 	if (argc < 2) {
-		kprintf("usage: %s [-p] <address>\n"
-			"  if -p is specified, all pages are shown.", argv[0]);
+		kprintf("usage: %s [-ps] <address>\n"
+			"  if -p is specified, all pages are shown, if -s is used\n"
+			"  only the cache/cache_ref info is shown respectively.\n", argv[0]);
 		return 0;
 	}
-	if (!strcmp(argv[1], "-p")) {
-		showPages = true;
-		addressIndex++;
+	while (argv[i][0] == '-') {
+		char *arg = argv[i] + 1;
+		while (arg[0]) {
+			if (arg[0] == 'p')
+				showPages = true;
+			else if (arg[0] == 's') {
+				if (!strcmp(argv[0], "cache"))
+					showCacheRef = false;
+				else
+					showCache = false;
+			}
+			arg++;
+		}
+		i++;
 	}
-	if (strlen(argv[addressIndex]) < 2
-		|| argv[addressIndex][0] != '0'
-		|| argv[addressIndex][1] != 'x') {
+	if (argv[i] == NULL || strlen(argv[i]) < 2
+		|| argv[i][0] != '0'
+		|| argv[i][1] != 'x') {
 		kprintf("%s: invalid argument, pass address\n", argv[0]);
 		return 0;
 	}
 
-	addr_t address = strtoul(argv[addressIndex], NULL, 0);
+	addr_t address = strtoul(argv[i], NULL, 0);
 	if (address == NULL)
 		return 0;
 
@@ -1890,53 +1947,61 @@ dump_cache(int argc, char **argv)
 		cache = cacheRef->cache;
 	}
 
-	kprintf("cache_ref at %p:\n", cacheRef);
-	kprintf("  ref_count:    %ld\n", cacheRef->ref_count);
-	kprintf("  lock.holder:  %ld\n", cacheRef->lock.holder);
-	kprintf("  lock.sem:     0x%lx\n", cacheRef->lock.sem);
-	kprintf("  areas:\n");
+	if (showCacheRef) {
+		kprintf("cache_ref at %p:\n", cacheRef);
+		if (!showCache)
+			kprintf("  cache:        %p\n", cacheRef->cache);
+		kprintf("  ref_count:    %ld\n", cacheRef->ref_count);
+		kprintf("  lock.holder:  %ld\n", cacheRef->lock.holder);
+		kprintf("  lock.sem:     0x%lx\n", cacheRef->lock.sem);
+		kprintf("  areas:\n");
 
-	for (vm_area *area = cacheRef->areas; area != NULL; area = area->cache_next) {
-		kprintf("   area 0x%lx, %s\n", area->id, area->name);
-		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->base, area->size);
-		kprintf("\tprotection: 0x%lx\n", area->protection);
-		kprintf("\towner:      0x%lx ", area->address_space->id);
+		for (vm_area *area = cacheRef->areas; area != NULL; area = area->cache_next) {
+			kprintf("    area 0x%lx, %s\n", area->id, area->name);
+			kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->base, area->size);
+			kprintf("\tprotection: 0x%lx\n", area->protection);
+			kprintf("\towner:      0x%lx\n", area->address_space->id);
+		}
 	}
 
-	kprintf("cache at %p:\n", cache);
-	kprintf("  source:       %p\n", cache->source);
-	kprintf("  store:        %p\n", cache->store);
-	kprintf("  virtual_base: 0x%Lx\n", cache->virtual_base);
-	kprintf("  virtual_size: 0x%Lx\n", cache->virtual_size);
-	kprintf("  temporary:    %ld\n", cache->temporary);
-	kprintf("  scan_skip:    %ld\n", cache->scan_skip);
+	if (showCache) {
+		kprintf("cache at %p:\n", cache);
+		if (!showCacheRef)
+			kprintf("  cache_ref:    %p\n", cache->ref);
+		kprintf("  source:       %p\n", cache->source);
+		kprintf("  store:        %p\n", cache->store);
+		kprintf("  virtual_base: 0x%Lx\n", cache->virtual_base);
+		kprintf("  virtual_size: 0x%Lx\n", cache->virtual_size);
+		kprintf("  temporary:    %ld\n", cache->temporary);
+		kprintf("  scan_skip:    %ld\n", cache->scan_skip);
 
-	kprintf("  consumers:\n");
-	vm_cache *consumer = NULL;
-	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers, consumer)) != NULL) {
-		kprintf("\t%p\n", consumer);
-	}
+		kprintf("  consumers:\n");
+		vm_cache *consumer = NULL;
+		while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers, consumer)) != NULL) {
+			kprintf("\t%p\n", consumer);
+		}
 
-	kprintf("  pages:\n");
-	int32 count = 0;
-	for (vm_page *page = cache->page_list; page != NULL; page = page->cache_next) {
-		count++;
+		kprintf("  pages:\n");
+		int32 count = 0;
+		for (vm_page *page = cache->page_list; page != NULL; page = page->cache_next) {
+			count++;
+			if (!showPages)
+				continue;
+
+			if (page->type == PAGE_TYPE_PHYSICAL) {
+				kprintf("\t%p ppn 0x%lx offset 0x%lx type %ld state %ld (%s) ref_count %ld\n",
+					page, page->physical_page_number, page->cache_offset, page->type, page->state, 
+					page_state_to_text(page->state), page->ref_count);
+			} else if(page->type == PAGE_TYPE_DUMMY) {
+				kprintf("\t%p DUMMY PAGE state %ld (%s)\n", 
+					page, page->state, page_state_to_text(page->state));
+			} else
+				kprintf("\t%p UNKNOWN PAGE type %ld\n", page, page->type);
+		}
+
 		if (!showPages)
-			continue;
-
-		if (page->type == PAGE_TYPE_PHYSICAL) {
-			kprintf("\t%p ppn 0x%lx offset 0x%lx type %ld state %ld (%s) ref_count %ld\n",
-				page, page->physical_page_number, page->cache_offset, page->type, page->state, 
-				page_state_to_text(page->state), page->ref_count);
-		} else if(page->type == PAGE_TYPE_DUMMY) {
-			kprintf("\t%p DUMMY PAGE state %ld (%s)\n", 
-				page, page->state, page_state_to_text(page->state));
-		} else
-			kprintf("\t%p UNKNOWN PAGE type %ld\n", page, page->type);
+			kprintf("\t%ld in cache\n", count);
 	}
-
-	if (!showPages)
-		kprintf("\t%ld in cache\n", count);
 
 	return 0;
 }
@@ -2624,6 +2689,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	changeCount = addressSpace->change_count;
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 
+	mutex_lock(&topCacheRef->lock);
+
 	// See if this cache has a fault handler - this will do all the work for us
 	if (topCacheRef->cache->store->ops->fault != NULL) {
 		// Note, since the page fault is resolved with interrupts enabled, the
@@ -2631,11 +2698,14 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// the store must take this into account
 		status_t status = (*topCacheRef->cache->store->ops->fault)(topCacheRef->cache->store, addressSpace, cacheOffset);
 		if (status != B_BAD_HANDLER) {
+			mutex_unlock(&topCacheRef->lock);
 			vm_cache_release_ref(topCacheRef);
 			vm_put_address_space(addressSpace);
 			return status;
 		}
 	}
+
+	mutex_unlock(&topCacheRef->lock);
 
 	// The top most cache has no fault handler, so let's see if the cache or its sources
 	// already have the page we're searching for (we're going from top to bottom)
@@ -2833,10 +2903,10 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		if (dummyPage.state == PAGE_STATE_BUSY) {
 			// we had inserted the dummy cache in another cache, so let's remove it from there
-			vm_cache_ref *temp_cache = dummyPage.cache->ref;
-			mutex_lock(&temp_cache->lock);
-			vm_cache_remove_page(temp_cache, &dummyPage);
-			mutex_unlock(&temp_cache->lock);
+			vm_cache_ref *tempRef = dummyPage.cache->ref;
+			mutex_lock(&tempRef->lock);
+			vm_cache_remove_page(tempRef, &dummyPage);
+			mutex_unlock(&tempRef->lock);
 			dummyPage.state = PAGE_STATE_INACTIVE;
 		}
 	}
@@ -2875,10 +2945,10 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (dummyPage.state == PAGE_STATE_BUSY) {
 		// We still have the dummy page in the cache - that happens if we didn't need
 		// to allocate a new page before, but could use one in another cache
-		vm_cache_ref *temp_cache = dummyPage.cache->ref;
-		mutex_lock(&temp_cache->lock);
-		vm_cache_remove_page(temp_cache, &dummyPage);
-		mutex_unlock(&temp_cache->lock);
+		vm_cache_ref *tempRef = dummyPage.cache->ref;
+		mutex_lock(&tempRef->lock);
+		vm_cache_remove_page(tempRef, &dummyPage);
+		mutex_unlock(&tempRef->lock);
 		dummyPage.state = PAGE_STATE_INACTIVE;
 	}
 
@@ -3339,7 +3409,7 @@ set_area_protection(area_id area, uint32 newProtection)
 status_t
 resize_area(area_id areaID, size_t newSize)
 {
-	vm_cache_ref *cache;
+	vm_cache_ref *cacheRef;
 	vm_area *area, *current;
 	status_t status = B_OK;
 	size_t oldSize;
@@ -3352,25 +3422,25 @@ resize_area(area_id areaID, size_t newSize)
 	if (area == NULL)
 		return B_BAD_VALUE;
 
+	cacheRef = area->cache_ref;
+	mutex_lock(&cacheRef->lock);
+
 	// Resize all areas of this area's cache
 
-	cache = area->cache_ref;
 	oldSize = area->size;
 
 	// ToDo: we should only allow to resize anonymous memory areas!
-	if (!cache->cache->temporary) {
+	if (!cacheRef->cache->temporary) {
 		status = B_NOT_ALLOWED;
-		goto err1;
+		goto out;
 	}
 
 	// ToDo: we must lock all address spaces here!
 
-	mutex_lock(&cache->lock);
-
 	if (oldSize < newSize) {
 		// We need to check if all areas of this cache can be resized
 
-		for (current = cache->areas; current; current = current->cache_next) {
+		for (current = cacheRef->areas; current; current = current->cache_next) {
 			if (current->address_space_next && current->address_space_next->base <= (current->base + newSize)) {
 				// if the area was created inside a reserved area, it can also be
 				// resized in that area
@@ -3381,14 +3451,14 @@ resize_area(area_id areaID, size_t newSize)
 					continue;
 
 				status = B_ERROR;
-				goto err2;
+				goto out;
 			}
 		}
 	}
 
 	// Okay, looks good so far, so let's do it
 
-	for (current = cache->areas; current; current = current->cache_next) {
+	for (current = cacheRef->areas; current; current = current->cache_next) {
 		if (current->address_space_next && current->address_space_next->base <= (current->base + newSize)) {
 			vm_area *next = current->address_space_next;
 			if (next->id == RESERVED_AREA_ID && next->cache_offset <= current->base
@@ -3421,17 +3491,16 @@ resize_area(area_id areaID, size_t newSize)
 	}
 
 	if (status == B_OK)
-		status = vm_cache_resize(cache, newSize);
+		status = vm_cache_resize(cacheRef, newSize);
 
 	if (status < B_OK) {
 		// This shouldn't really be possible, but hey, who knows
-		for (current = cache->areas; current; current = current->cache_next)
+		for (current = cacheRef->areas; current; current = current->cache_next)
 			current->size = oldSize;
 	}
 
-err2:
-	mutex_unlock(&cache->lock);
-err1:
+out:
+	mutex_unlock(&cacheRef->lock);
 	vm_put_area(area);
 
 	// ToDo: we must honour the lock restrictions of this area
