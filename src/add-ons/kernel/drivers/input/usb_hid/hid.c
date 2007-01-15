@@ -535,9 +535,8 @@ interpret_mouse_buffer(hid_device_info *device)
 	mouse_movement info;
 	uint8 *report = (uint8*)device->buffer;
 	uint32 i;
-	
-	info.buttons = 0;
-	info.clicks = 0;
+
+	memset(&info, 0, sizeof(info));
 	for (i = 0; i < device->num_insns; i++) {
 		const report_insn *insn = &device->insns [i];
 		int32 value = 
@@ -568,9 +567,7 @@ interpret_mouse_buffer(hid_device_info *device)
 		}
 	}
 
-	info.modifiers = 0;
 	info.timestamp = device->timestamp;
-
 	ring_buffer_write(device->rbuf, (const uint8*)&info, sizeof(info));
 	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
