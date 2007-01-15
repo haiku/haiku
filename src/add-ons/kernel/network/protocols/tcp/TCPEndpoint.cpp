@@ -964,10 +964,9 @@ TRACE(("peer is finishing connection!"));
 	// put it in the receive buffer
 
 	if (buffer->size > 0) {
-		if (fReceiveNext == segment.sequence)
-			fReceiveNext += buffer->size;
-TRACE(("adding data, receive next = %lu!\n", (uint32)fReceiveNext));
 		fReceiveQueue.Add(buffer, segment.sequence);
+		fReceiveNext = fReceiveQueue.NextSequence();
+TRACE(("adding data, receive next = %lu!\n", (uint32)fReceiveNext));
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: real conditional locking needed!
