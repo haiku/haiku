@@ -112,7 +112,8 @@ FifoWrite(uint32 value)
 		FifoSync();
 
 	fifo[gSi->fifoNext / 4] = value;
-	gSi->fifoNext = (gSi->fifoNext + 4) % fifoCapacity;
+	gSi->fifoNext = fifo[SVGA_FIFO_MIN] +
+		(gSi->fifoNext + 4 - fifo[SVGA_FIFO_MIN]) % fifoCapacity;
 }
 
 
