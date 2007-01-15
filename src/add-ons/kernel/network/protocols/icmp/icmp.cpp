@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,13 @@
 #include <new>
 #include <stdlib.h>
 #include <string.h>
+
+//#define TRACE_ICMP
+#ifdef TRACE_ICMP
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
 
 struct icmp_header {
@@ -202,7 +209,7 @@ icmp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 icmp_receive_data(net_buffer *buffer)
 {
-	dprintf("ICMP received some data, buffer length %lu\n", buffer->size);
+	TRACE(("ICMP received some data, buffer length %lu\n", buffer->size));
 
 	NetBufferHeader<icmp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
@@ -212,9 +219,10 @@ icmp_receive_data(net_buffer *buffer)
 	bufferHeader.Detach();
 		// the pointer stays valid after this
 
-	dprintf("  got type %u, code %u, checksum %u\n", header.type, header.code,
-		ntohs(header.checksum));
-	dprintf("  computed checksum: %ld\n", gBufferModule->checksum(buffer, 0, buffer->size, true));
+	TRACE(("  got type %u, code %u, checksum %u\n", header.type, header.code,
+		ntohs(header.checksum)));
+	TRACE(("  computed checksum: %ld\n", gBufferModule->checksum(buffer, 0, buffer->size, true)));
+
 	if (gBufferModule->checksum(buffer, 0, buffer->size, true) != 0)
 		return B_BAD_DATA;
 
