@@ -925,15 +925,12 @@ thread_exit(void)
 	// boost our priority to get this over with
 	thread->priority = thread->next_priority = B_URGENT_DISPLAY_PRIORITY;
 
-	// Stop debugging for this thread, and remove it from the hashtable, so it
-	// cannot be found afterwards anymore
+	// Stop debugging for this thread
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
 	debugInfo = thread->debug_info;
 	clear_thread_debug_info(&thread->debug_info, true);
-	hash_remove(sThreadHash, thread);
-	sUsedThreads--;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -987,6 +984,9 @@ thread_exit(void)
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
+		GRAB_THREAD_LOCK();
+			// removing the thread and putting its death entry to the parent
+			// team needs to be an atomic operation
 
 		// remember how long this thread lasted
 		team->dead_threads_kernel_time += thread->kernel_time;
@@ -996,6 +996,10 @@ thread_exit(void)
 		insert_thread_into_team(team_get_kernel_team(), thread);
 
 		cachedDeathSem = team->death_sem;
+
+		// remove thread from hash, so it's no longer accessible
+		hash_remove(sThreadHash, thread);
+		sUsedThreads--;
 
 		if (deleteTeam) {
 			struct team *parent = team->parent;
@@ -1013,6 +1017,8 @@ thread_exit(void)
 				} else
 					death = NULL;
 
+				RELEASE_THREAD_LOCK();
+
 				// notify listeners that a new death entry is available
 				// TODO: should that be moved to handle_signal() (for SIGCHLD)?
 				release_sem_etc(parent->dead_children.sem,
@@ -1022,16 +1028,30 @@ thread_exit(void)
 
 				parent->dead_children.waiters = 0;
 				team->group->dead_child_waiters = 0;
-			}
+			} else
+				RELEASE_THREAD_LOCK();
 
 			team_remove_team(team, &freeGroup);
-		}
+		} else
+			RELEASE_THREAD_LOCK();
+
 		RELEASE_TEAM_LOCK();
+
 		// swap address spaces, to make sure we're running on the kernel's pgdir
 		vm_swap_address_space(vm_kernel_address_space());
 		restore_interrupts(state);
 
 		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", thread->id));
+	} else {
+		// for kernel threads, we don't need to care about their death entries
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		hash_remove(sThreadHash, thread);
+		sUsedThreads--;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
 	}
 
 	// delete the team if we're its main thread
