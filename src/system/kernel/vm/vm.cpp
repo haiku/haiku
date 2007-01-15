@@ -69,9 +69,6 @@ static off_t sAvailableMemory;
 static benaphore sAvailableMemoryLock;
 
 // function declarations
-static vm_area *_vm_create_region_struct(vm_address_space *addressSpace, const char *name, int wiring, int lock);
-static status_t map_backing_store(vm_address_space *addressSpace, vm_store *store, void **vaddr,
-	off_t offset, addr_t size, uint32 addressSpec, int wiring, int lock, int mapping, vm_area **_area, const char *area_name);
 static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
 static bool vm_put_area(vm_area *area);
 
@@ -500,18 +497,11 @@ insert_area(vm_address_space *addressSpace, void **_address,
 }
 
 
-/*!
-	The \a store's owner must be locked when calling this function.
-*/
 static status_t
-map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtualAddress,
-	off_t offset, addr_t size, uint32 addressSpec, int wiring, int protection,
-	int mapping, vm_area **_area, const char *areaName)
+map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
+	void **_virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
+	int wiring, int protection, int mapping, vm_area **_area, const char *areaName)
 {
-	vm_cache_ref *cacheRef;
-	vm_cache *cache;
-	status_t status;
-
 	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
 		addressSpace, store, *_virtualAddress, offset, size, addressSpec,
 		wiring, protection, _area, areaName));
@@ -520,12 +510,17 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	if (area == NULL)
 		return B_NO_MEMORY;
 
-	cache = store->cache;
-	cacheRef = cache->ref;
+	mutex_lock(&cacheRef->lock);
+
+	vm_cache *cache = cacheRef->cache;
+	vm_store *store = cache->store;
+	bool unlock = true;
+	status_t status;
 
 	// if this is a private map, we need to create a new cache & store object
 	// pair to handle the private copies of pages as they are written to
 	if (mapping == REGION_PRIVATE_MAP) {
+		vm_cache_ref *newCacheRef;
 		vm_cache *newCache;
 		vm_store *newStore;
 
@@ -549,10 +544,14 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 			goto err1;
 		}
 
+		newCacheRef = newCache->ref;
 		newCache->temporary = 1;
 		newCache->scan_skip = cache->scan_skip;
 
 		vm_cache_add_consumer_locked(cacheRef, newCache);
+
+		mutex_unlock(&cacheRef->lock);
+		mutex_lock(&newCacheRef->lock);
 
 		cache = newCache;
 		cacheRef = newCache->ref;
@@ -584,6 +583,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	area->cache_offset = offset;
 	// point the cache back to the area
 	vm_cache_insert_area_locked(cacheRef, area);
+	mutex_unlock(&cacheRef->lock);
 
 	// insert the area in the global area hash table
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0 ,0);
@@ -603,9 +603,13 @@ err3:
 err2:
 	if (mapping == REGION_PRIVATE_MAP) {
 		// we created this cache, so we must delete it again
+		mutex_unlock(&cacheRef->lock);
 		vm_cache_release_ref(cacheRef);
+		unlock = false;
 	}
 err1:
+	if (unlock)
+		mutex_unlock(&cacheRef->lock);
 	free(area->name);
 	free(area);
 	return status;
@@ -819,19 +823,14 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			break;
 	}
 
-	mutex_lock(&cache->ref->lock);
+	cacheRef = cache->ref;
 
-	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, wiring,
-		protection, REGION_NO_PRIVATE_MAP, &area, name);
-
-	mutex_unlock(&cache->ref->lock);
-
+	status = map_backing_store(addressSpace, cacheRef, address, 0, size,
+		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	if (status < B_OK) {
-		vm_cache_release_ref(cache->ref);
+		vm_cache_release_ref(cacheRef);
 		goto err1;
 	}
-
-	cacheRef = store->cache->ref;
 
 	switch (wiring) {
 		case B_NO_LOCK:
@@ -967,6 +966,7 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	uint32 addressSpec, addr_t size, uint32 protection,
 	addr_t physicalAddress)
 {
+	vm_cache_ref *cacheRef;
 	vm_area *area;
 	vm_cache *cache;
 	vm_store *store;
@@ -1013,15 +1013,12 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	cache->scan_skip = 1;
 	cache->virtual_size = size;
 
-	mutex_lock(&cache->ref->lock);
+	cacheRef = cache->ref;
 
-	status = map_backing_store(addressSpace, store, _address, 0, size,
+	status = map_backing_store(addressSpace, cacheRef, _address, 0, size,
 		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
-
-	mutex_unlock(&cache->ref->lock);
-
 	if (status < B_OK)
-		vm_cache_release_ref(cache->ref);
+		vm_cache_release_ref(cacheRef);
 
 	if (status >= B_OK && (addressSpec & B_MTR_MASK) != 0) {
 		// set requested memory type
@@ -1032,11 +1029,15 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	}
 
 	if (status >= B_OK) {
+		mutex_lock(&cacheRef->lock);
+		store = cacheRef->cache->store;
+
 		// make sure our area is mapped in completely
 		// (even if that makes the fault routine pretty much useless)
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 			store->ops->fault(store, addressSpace, offset);
 		}
+		mutex_unlock(&cacheRef->lock);
 	}
 
 	vm_put_address_space(addressSpace);
@@ -1060,16 +1061,16 @@ err1:
 
 
 area_id
-vm_create_null_area(team_id aid, const char *name, void **address,
+vm_create_null_area(team_id team, const char *name, void **address,
 	uint32 addressSpec, addr_t size)
 {
 	vm_area *area;
 	vm_cache *cache;
-	vm_cache_ref *cache_ref;
+	vm_cache_ref *cacheRef;
 	vm_store *store;
 	status_t status;
 
-	vm_address_space *addressSpace = vm_get_address_space_by_id(aid);
+	vm_address_space *addressSpace = vm_get_address_space_by_id(team);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -1095,16 +1096,15 @@ vm_create_null_area(team_id aid, const char *name, void **address,
 	cache->scan_skip = 1;
 	cache->virtual_size = size;
 
-	mutex_lock(&cache->ref->lock);
+	cacheRef = cache->ref;
 
-	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, 0,
+	status = map_backing_store(addressSpace, cacheRef, address, 0, size, addressSpec, 0,
 		B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
 
-	mutex_unlock(&cache->ref->lock);
 	vm_put_address_space(addressSpace);
 
 	if (status < B_OK) {
-		vm_cache_release_ref(cache->ref);
+		vm_cache_release_ref(cacheRef);
 		return status;
 	}
 
@@ -1164,8 +1164,9 @@ err1:
  */
 
 static area_id
-_vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
-	size_t size, uint32 protection, uint32 mapping, const char *path, off_t offset, bool kernel)
+_vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec,
+	size_t size, uint32 protection, uint32 mapping, const char *path,
+	off_t offset, bool kernel)
 {
 	vm_cache_ref *cacheRef;
 	vm_area *area;
@@ -1179,7 +1180,7 @@ _vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
 	//	make it into the mapped copy -- this will need quite some changes
 	//	to be done in a nice way
 
-	vm_address_space *addressSpace = vm_get_address_space_by_id(aid);
+	vm_address_space *addressSpace = vm_get_address_space_by_id(team);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -1204,13 +1205,8 @@ _vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
 	if (status < B_OK)
 		goto err1;
 
-	mutex_lock(&cacheRef->lock);
-
-	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
+	status = map_backing_store(addressSpace, cacheRef, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name);
-
-	mutex_unlock(&cacheRef->lock);
-
 	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
 		vm_cache_release_ref(cacheRef);
@@ -1302,13 +1298,9 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 	} else
 #endif
 	{
-		mutex_lock(&sourceArea->cache_ref->lock);
-
-		status = map_backing_store(addressSpace, sourceArea->cache_ref->cache->store,
+		status = map_backing_store(addressSpace, sourceArea->cache_ref,
 			address, sourceArea->cache_offset, sourceArea->size, addressSpec,
 			sourceArea->wiring, protection, mapping, &newArea, name);
-
-		mutex_unlock(&sourceArea->cache_ref->lock);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
 		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
@@ -1603,15 +1595,10 @@ vm_copy_area(team_id addressSpaceID, const char *name, void **_address, uint32 a
 
 	// First, create a cache on top of the source area
 
-	mutex_lock(&cacheRef->lock);
-
-	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
+	status = map_backing_store(addressSpace, cacheRef, _address,
 		source->cache_offset, source->size, addressSpec, source->wiring, protection,
 		writableCopy ? REGION_PRIVATE_MAP : REGION_NO_PRIVATE_MAP,
 		&target, name);
-
-	mutex_unlock(&cacheRef->lock);
-
 	if (status < B_OK)
 		goto err;
 
