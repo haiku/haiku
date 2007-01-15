@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -71,6 +71,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 {
 	TRACE(("BufferQueue@%p::Add(buffer %p, size %lu, sequence %lu)\n",
 		this, buffer, buffer->size, (uint32)sequence));
+	TRACE(("  in: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 
 	buffer->sequence = sequence;
 
@@ -85,6 +86,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 		fLastSequence = sequence + buffer->size;
 		fNumBytes += buffer->size;
+		TRACE(("  out0: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 		return;
 	}
 
@@ -141,10 +143,13 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 			gBufferModule->remove_trailer(buffer, next->sequence - (sequence + buffer->size));
 	}
 
-	if (buffer == NULL)
+	if (buffer == NULL) {
+		TRACE(("  out1: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 		return;
+	}
 
 	fList.Insert(next, buffer);
+	fNumBytes += buffer->size;
 
 	// we might need to update the number of bytes available
 
@@ -160,6 +165,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 			buffer = (struct net_buffer *)buffer->link.next;
 		} while (buffer != NULL && fFirstSequence + fContiguousBytes == buffer->sequence);
 	}
+
+	TRACE(("  out2: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 }
 
 
