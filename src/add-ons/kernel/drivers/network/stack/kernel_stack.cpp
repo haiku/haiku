@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -126,9 +126,6 @@ opcode_name(int op)
 		C2N(NET_STACK_SETSOCKOPT),
 		C2N(NET_STACK_GETSOCKNAME),
 		C2N(NET_STACK_GETPEERNAME),
-		C2N(NET_STACK_SYSCTL),
-		C2N(NET_STACK_SELECT),
-		C2N(NET_STACK_DESELECT),
 		C2N(NET_STACK_GET_COOKIE),
 		C2N(NET_STACK_NOTIFY_SOCKET_EVENT),
 		C2N(NET_STACK_CONTROL_NET_MODULE),
@@ -139,6 +136,7 @@ opcode_name(int op)
 		// C2N(NET_STACK_NEW_CONNECTION),
 
 		// Standard BeOS opcodes
+		C2N(FIONBIO),
 		C2N(B_SET_BLOCKING_IO),
 		C2N(B_SET_NONBLOCKING_IO),
 
