@@ -121,10 +121,10 @@ convert_from_r5_socket(int& family, int& type, int& protocol)
 			protocol = IPPROTO_UDP;
 			break;
 		case R5_IPPROTO_TCP:
-			protocol = R5_IPPROTO_TCP;
+			protocol = IPPROTO_TCP;
 			break;
 		case R5_IPPROTO_ICMP:
-			protocol = R5_IPPROTO_ICMP;
+			protocol = IPPROTO_ICMP;
 			break;
 	}
 }
