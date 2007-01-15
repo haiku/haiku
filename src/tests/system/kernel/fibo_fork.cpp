@@ -70,14 +70,24 @@ main(int argc, char *argv[])
 			return -1;
 		}
 
-		status_t status;
-		while (wait_for_thread(childA, &status) == B_INTERRUPTED)
-			;
-		result = status;
+		status_t status, returnValue = 0;
+		do {
+			status = wait_for_thread(childA, &returnValue);
+		} while (status == B_INTERRUPTED);
 
-		while (wait_for_thread(childB, &status) == B_INTERRUPTED)
-			;
-		result += status;
+		if (status == B_OK)
+			result = returnValue;
+		else
+			fprintf(stderr, "wait_for_thread(%ld) A failed: %s\n", childA, strerror(status));
+
+		do {
+			status = wait_for_thread(childB, &returnValue);
+		} while (status == B_INTERRUPTED);
+
+		if (status == B_OK)
+			result += returnValue;
+		else
+			fprintf(stderr, "wait_for_thread(%ld) B failed: %s\n", childB, strerror(status));
 	}
 
 	if (gForked) {

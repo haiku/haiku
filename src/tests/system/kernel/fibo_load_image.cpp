@@ -71,13 +71,24 @@ main(int argc, char *argv[])
 		resume_thread(threadA);
 		resume_thread(threadB);
 
-		while (wait_for_thread(threadA, &status) == B_INTERRUPTED)
-			;
-		result = status;
+		status_t returnValue = 0;
+		do {
+			status = wait_for_thread(threadA, &returnValue);
+		} while (status == B_INTERRUPTED);
 
-		while (wait_for_thread(threadB, &status) == B_INTERRUPTED)
-			;
-		result += status;
+		if (status == B_OK)
+			result = returnValue;
+		else
+			fprintf(stderr, "wait_for_thread(%ld) A failed: %s\n", threadA, strerror(status));
+
+		do {
+			status = wait_for_thread(threadB, &returnValue);
+		} while (status == B_INTERRUPTED);
+
+		if (status == B_OK)
+			result += returnValue;
+		else
+			fprintf(stderr, "wait_for_thread(%ld) B failed: %s\n", threadB, strerror(status));
 	}
 
 	if (silent) {
