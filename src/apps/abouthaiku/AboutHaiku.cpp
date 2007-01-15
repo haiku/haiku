@@ -379,6 +379,7 @@ AboutView::AboutView(const BRect &rect)
 		"Matthijs Hollemans\n"
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
+		"Vasilis Kaoutsis\n"
 		"Marcin Konicki\n"
 		"Elad Lahav\n"
 		"Santiago Lema\n"
