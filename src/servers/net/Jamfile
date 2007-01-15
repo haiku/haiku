@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers net ;
 
-UsePrivateHeaders net ;
+UsePrivateHeaders app net ;
 
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
@@ -14,13 +14,8 @@ Server net_server :
 	AutoconfigLooper.cpp
 	DHCPClient.cpp
 	Services.cpp
-;
 
-LinkAgainst net_server : 
-	be
-	libnetwork.so
-	$(TARGET_LIBSTDC++)
-
+	: be libnetwork.so $(TARGET_LIBSTDC++)
 	# for PPP
 	#libppp.a
 ;

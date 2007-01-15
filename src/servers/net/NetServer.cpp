@@ -13,11 +13,11 @@
 #include "Settings.h"
 
 #include <Alert.h>
-#include <Application.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Server.h>
 #include <TextView.h>
 
 #include <arpa/inet.h>
@@ -39,9 +39,9 @@
 typedef std::map<std::string, BLooper*> LooperMap;
 
 
-class NetServer : public BApplication {
+class NetServer : public BServer {
 	public:
-		NetServer();
+		NetServer(status_t& status);
 
 		virtual void AboutRequested();
 		virtual void ReadyToRun();
@@ -235,8 +235,8 @@ get_mac_address(const char* device, uint8* address)
 //	#pragma mark -
 
 
-NetServer::NetServer()
-	: BApplication("application/x-vnd.haiku-net_server")
+NetServer::NetServer(status_t& error)
+	: BServer("application/x-vnd.haiku-net_server", false, &error)
 {
 }
 
@@ -883,9 +883,15 @@ NetServer::_StartServices()
 int
 main()
 {
-	NetServer app;
-	app.Run();
+	status_t status;
+	NetServer server(status);
+	if (status != B_OK) {
+		fprintf(stderr, "net_server: Failed to create application: %s\n",
+			strerror(status));
+		return 1;
+	}
 
+	server.Run();
 	return 0;
 }
 
