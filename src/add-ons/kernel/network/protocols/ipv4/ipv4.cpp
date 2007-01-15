@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -148,6 +148,8 @@ static RawSocketList sRawSockets;
 static benaphore sRawSocketsLock;
 static benaphore sFragmentLock;
 static hash_table *sFragmentHash;
+static net_protocol_module_info *sReceivingProtocol[256];
+static benaphore sReceivingProtocolLock;
 
 
 RawSocket::RawSocket(net_socket *socket)
@@ -661,6 +663,26 @@ raw_receive_data(net_buffer *buffer)
 }
 
 
+static net_protocol_module_info *
+receiving_protocol(uint8 protocol)
+{
+	net_protocol_module_info *module = sReceivingProtocol[protocol];
+	if (module != NULL)
+		return module;
+
+	BenaphoreLocker locker(sReceivingProtocolLock);
+
+	module = sReceivingProtocol[protocol];
+	if (module != NULL)
+		return module;
+
+	if (sStackModule->get_domain_receiving_protocol(sDomain, protocol, &module) == B_OK)
+		sReceivingProtocol[protocol] = module;
+
+	return module;
+}
+
+
 //	#pragma mark -
 
 
@@ -1126,19 +1148,13 @@ ipv4_receive_data(net_buffer *buffer)
 		// the header is of variable size and may include IP options
 		// (that we ignore for now)
 
-	// TODO: since we'll doing this for every packet, we may want to cache the module
-	//	(and only put them when we're about to be unloaded)
-	net_protocol_module_info *module;
-	status = sStackModule->get_domain_receiving_protocol(sDomain, protocol, &module);
-	if (status < B_OK) {
+	net_protocol_module_info *module = receiving_protocol(protocol);
+	if (module == NULL) {
 		// no handler for this packet
-		return status;
+		return EAFNOSUPPORT;
 	}
 
-	status = module->receive_data(buffer);
-	sStackModule->put_domain_receiving_protocol(sDomain, protocol);
-
-	return status;
+	return module->receive_data(buffer);
 }
 
 
@@ -1183,10 +1199,14 @@ init_ipv4()
 	if (status < B_OK)
 		goto err4;
 
+	status = benaphore_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
+	if (status < B_OK)
+		goto err5;
+
 	sFragmentHash = hash_init(MAX_HASH_FRAGMENTS, FragmentPacket::NextOffset(),
 		&FragmentPacket::Compare, &FragmentPacket::Hash);
 	if (sFragmentHash == NULL)
-		goto err5;
+		goto err6;
 
 	new (&sRawSockets) RawSocketList;
 		// static initializers do not work in the kernel,
@@ -1196,17 +1216,19 @@ init_ipv4()
 	status = sStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
 		"network/protocols/ipv4/v1", NULL);
 	if (status < B_OK)
-		goto err6;
+		goto err7;
 
 	status = sStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
 		&gIPv4AddressModule, &sDomain);
 	if (status < B_OK)
-		goto err6;
+		goto err7;
 
 	return B_OK;
 
-err6:
+err7:
 	hash_uninit(sFragmentHash);
+err6:
+	benaphore_destroy(&sReceivingProtocolLock);
 err5:
 	benaphore_destroy(&sFragmentLock);
 err4:
@@ -1224,12 +1246,23 @@ err1:
 status_t
 uninit_ipv4()
 {
+	benaphore_lock(&sReceivingProtocolLock);
+
+	// put all the domain receiving protocols we gathered so far
+	for (uint32 i = 0; i < 256; i++) {
+		if (sReceivingProtocol[i] != NULL)
+			sStackModule->put_domain_receiving_protocol(sDomain, i);
+	}
+
+	sStackModule->unregister_domain(sDomain);
+	benaphore_unlock(&sReceivingProtocolLock);
+
 	hash_uninit(sFragmentHash);
 
 	benaphore_destroy(&sFragmentLock);
 	benaphore_destroy(&sRawSocketsLock);
+	benaphore_destroy(&sReceivingProtocolLock);
 
-	sStackModule->unregister_domain(sDomain);
 	put_module(NET_DATALINK_MODULE_NAME);
 	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);
