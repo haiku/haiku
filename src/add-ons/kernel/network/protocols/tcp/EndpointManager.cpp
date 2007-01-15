@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -272,7 +272,7 @@ EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 	for (int32 i = 1; i < 5; i++) {
 		// try to retrieve a more or less random port
 		uint32 counter = kFirstEphemeralPort;
-		uint32 step = i == 4 ? 1 : system_time() & 0x1f;
+		uint32 step = i == 4 ? 1 : (system_time() & 0x1f) + 1;
 
 		while (counter < max) {
 			uint16 port = counter & 0xffff;
