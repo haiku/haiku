@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -66,6 +66,9 @@ convert_from_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 	memset(to, 0, sizeof(*to));
 	to->sin_len = sizeof(*to);
 
+	if (from == NULL)
+		return;
+
 	if (from->sin_family == R5_AF_INET)
 		to->sin_family = AF_INET;
 	else
@@ -81,6 +84,9 @@ convert_to_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 {
 	const sockaddr_in *from = (sockaddr_in *)_from;
 	r5_sockaddr_in *to = (r5_sockaddr_in *)_to;
+
+	if (to == NULL)
+		return;
 
 	memset(to, 0, sizeof(*to));
 	if (from->sin_family == AF_INET)
@@ -259,7 +265,7 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 
 	args.cookie = cookie;
 
-	if (r5compatible) {
+	if (r5compatible && address != NULL) {
 		args.address = &r5addr;
 		args.address_length = sizeof(r5addr);
 	} else {
@@ -272,7 +278,7 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 		return -1;
 	}
 
-	if (r5compatible) {
+	if (r5compatible && address != NULL) {
 		convert_to_r5_sockaddr(address, &r5addr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
