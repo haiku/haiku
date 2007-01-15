@@ -62,17 +62,17 @@ launchscript $SCRIPTS/SetupEnvironment
 # Sets timezone etc.
 runprog beos/bin/clockconfig
 
-# Init Network
-if [ "$SAFEMODE" != "yes" ]; then
-	launchscript $SCRIPTS/Netscript
-fi
-
 # Launch servers
 
 # We must wait for the app_server and registrar to be ready
 launch $SERVERS/registrar _roster_thread_	# launch registrar
 
 launch $SERVERS/debug_server				# launch debug_server
+
+# Init Network
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/net_server				# launch net_server
+fi
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/app_server picasso		# launch app_server
