@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -61,6 +61,7 @@ device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t cou
 	return B_OK;
 }
 
+
 /** this fault handler should take over the page fault routine and map the page in
  *
  *	setup: the cache that this store is part of has a ref being held and will be
@@ -76,7 +77,6 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 	vm_area *area;
 
 	// figure out which page needs to be mapped where
-	mutex_lock(&cache_ref->lock);
 	map->ops->lock(map);
 
 	// cycle through all of the regions that map this cache and map the page in
@@ -97,8 +97,6 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 	}
 
 	map->ops->unlock(map);
-	mutex_unlock(&cache_ref->lock);
-
 	return B_OK;
 }
 
