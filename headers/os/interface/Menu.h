@@ -190,7 +190,7 @@ virtual	void			_ReservedMenu6();
 		void		InitData(BMessage *data = NULL);
 		bool		_show(bool selectFirstItem = false);
 		void		_hide();
-		BMenuItem	*_track(int *action, bigtime_t trackTime, long start = -1);
+		BMenuItem	*_track(int *action, long start = -1);
 
 		void		_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &closeTime);
 		void		_UpdateStateClose(BMenuItem *item, const BPoint &where, const uint32 &buttons);
@@ -286,7 +286,7 @@ static	bool		sAltAsCommandKey;
 		BRect		*fExtraRect;
 		float		fMaxContentWidth;
 		BPoint		*fInitMatrixSize;
-		_ExtraMenuData_	*fExtraMenuData;	// !!
+		_ExtraMenuData_	*fExtraMenuData;
 
 		uint32		_reserved[2];
 

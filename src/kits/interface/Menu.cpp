@@ -1065,7 +1065,7 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 	}
 
 	int action;
-	BMenuItem *menuItem = _track(&action, 0);
+	BMenuItem *menuItem = _track(&action);
 	
 	SetStickyMode(false);
 	fExtraRect = NULL;
@@ -1244,7 +1244,7 @@ const bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
 	
 
 BMenuItem *
-BMenu::_track(int *action, bigtime_t trackTime, long start)
+BMenu::_track(int *action, long start)
 {
 	// TODO: cleanup
 	BMenuItem *item = NULL;
@@ -1288,7 +1288,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			bool wasSticky = IsStickyMode();
 			if (wasSticky)
 				submenu->SetStickyMode(true);
-			BMenuItem *submenuItem = submenu->_track(&submenuAction, trackTime);
+			BMenuItem *submenuItem = submenu->_track(&submenuAction);
 			
 			// check if the user started holding down a mouse button in a submenu
 			if (wasSticky && !IsStickyMode()) {
