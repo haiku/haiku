@@ -10,7 +10,7 @@
 #define IS_USER_ADDRESS(x)		(((uint32)x & 0x80000000) > 0)
 #define IS_KERNEL_ADDRESS(x)	(((uint32)x & 0x80000000) == 0)
 
-#ifndef B_DEV_INVALID_PIPE
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 enum {
 	B_DEV_INVALID_PIPE = B_DEV_DOOR_OPEN + 1,
 	B_DEV_CRC_ERROR,
