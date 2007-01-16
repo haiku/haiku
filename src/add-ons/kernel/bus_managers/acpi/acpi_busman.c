@@ -6,6 +6,7 @@
  */
 
 #include <ACPI.h>
+#include <dpc.h>
 #include <KernelExport.h>
 
 #include <malloc.h>
@@ -23,7 +24,8 @@ status_t acpi_rescan_stub(void);
 #define TRACE(x...) dprintf("acpi: " x)
 #define ERROR(x...) dprintf("acpi: " x)
 
-
+extern dpc_module_info *gDPC;
+void *gDPChandle = NULL;
 
 struct acpi_module_info acpi_module = {
 	{
@@ -83,23 +85,12 @@ acpi_std_ops(int32 op,...)
 				return ENOSYS;
 			}
 			
+			gDPChandle = gDPC->new_dpc_queue("acpi_task", B_NORMAL_PRIORITY, 10);
+
 			#ifdef ACPI_DEBUG_OUTPUT
 				AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
 				AcpiDbgLayer = ACPI_ALL_COMPONENTS;
 			#endif
-			
-			// check if safemode settings disable ACPI
-			settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-			if (settings != NULL) {
-				acpiDisabled = get_driver_boolean_parameter(settings, B_SAFEMODE_DISABLE_ACPI,
-					false, false);
-				unload_driver_settings(settings);
-			}
-			
-			if (acpiDisabled) {
-				ERROR("ACPI disabled");
-				return ENOSYS;
-			}
 
 			Status = AcpiInitializeSubsystem();
 			if (Status != AE_OK) {
@@ -135,6 +126,11 @@ acpi_std_ops(int32 op,...)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
 			
 				/* This isn't so terrible. We'll just fail silently */
+			if (gDPChandle != NULL) {
+				gDPC->delete_dpc_queue(gDPChandle);
+				gDPChandle = NULL;
+			}
+
 			break;
 		default:
 			return B_ERROR;

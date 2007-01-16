@@ -6,8 +6,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "acpi_priv.h"
+
+#include <dpc.h>
 #include <PCI.h>
+
 
 //#define TRACE_ACPI_MODULE
 #ifdef TRACE_ACPI_MODULE
@@ -18,10 +22,12 @@
 
 device_manager_info *gDeviceManager;
 pci_module_info *gPCIManager;
+dpc_module_info *gDPC;
 
 module_dependency module_dependencies[] = {
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
 	{B_PCI_MODULE_NAME, (module_info **)&gPCIManager},
+	{B_DPC_MODULE_NAME, (module_info **)&gDPC},
 	{}
 };
 

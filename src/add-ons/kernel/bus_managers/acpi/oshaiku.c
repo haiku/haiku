@@ -131,6 +131,9 @@
 #	include <KernelExport.h>
 #include <PCI.h>
 extern pci_module_info *gPCIManager;
+#include <dpc.h>
+extern dpc_module_info *gDPC;
+extern void *gDPChandle;
 #endif
 
 #include "acpi.h"
@@ -844,8 +847,7 @@ AcpiOsExecute (
     ACPI_OSD_EXEC_CALLBACK  Function,
     void                    *Context)
 {
-	int priority = 10;
-	thread_id thread;
+	status_t err;
 
 	switch (Type) {
 		case OSL_GLOBAL_LOCK_HANDLER:
@@ -856,17 +858,10 @@ AcpiOsExecute (
 		case OSL_EC_BURST_HANDLER:
 			break;
 	}
+
+	err = gDPC->queue_dpc(gDPChandle, Function, Context);
 	
-	#ifndef _KERNEL_MODE
-		#define spawn_kernel_thread spawn_thread
-	#endif
-
-	thread = spawn_kernel_thread((thread_func)(Function),"ACPI Worker Thread",priority,Context);
-		/* We're going to cheerfully ignore the fact that ACPI_OSD_EXEC_CALLBACK
-		   routines don't give canonical return values, as we aren't going to
-		   check up on them, and the kernel doesn't care */
-
-	if (thread < B_OK)
+	if (err != B_OK)
 		return AE_ERROR;
 	return AE_OK;
 }
