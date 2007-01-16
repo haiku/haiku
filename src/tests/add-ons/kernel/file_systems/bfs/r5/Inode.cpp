@@ -1,9 +1,10 @@
-/* Inode - inode access functions
-**
-** Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the MIT License.
-*/
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de
+ * This file may be used under the terms of the MIT License.
+ */
 
+//! inode access functions
+ 
 
 #include "Debug.h"
 #include "Inode.h"
@@ -813,6 +814,12 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 			}
 			// ToDo: check if the data fits in the inode now and delete the attribute file if so
 			status = attribute->WriteAt(transaction, pos, buffer, _length);
+			if (status == B_OK) {
+				// The attribute type might have been changed - we need to adopt
+				// the new one
+				attribute->Node()->type = HOST_ENDIAN_TO_BFS_INT32(type);
+				status = attribute->WriteBack(transaction);
+			}
 
 			attribute->Lock().UnlockWrite();
 		} else
