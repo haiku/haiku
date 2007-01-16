@@ -1,8 +1,9 @@
-/* Inode - inode access functions
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//! inode access functions
 
 
 #include "Debug.h"
@@ -321,7 +322,7 @@ Inode::CheckPermissions(int accessMode) const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - attributes
 
 
 void
@@ -753,7 +754,8 @@ Inode::SetName(Transaction &transaction, const char *name)
  */
 
 status_t
-Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, size_t *_length)
+Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
+	size_t *_length)
 {
 	if (pos < 0)
 		pos = 0;
@@ -802,8 +804,8 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, siz
  */
 
 status_t
-Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type, off_t pos,
-	const uint8 *buffer, size_t *_length)
+Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
+	off_t pos, const uint8 *buffer, size_t *_length)
 {
 	// needed to maintain the index
 	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH], *oldData = NULL;
@@ -855,6 +857,11 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type, of
 			}
 			// ToDo: check if the data fits in the inode now and delete the attribute file if so
 			status = attribute->WriteAt(transaction, pos, buffer, _length);
+			if (status == B_OK) {
+				// The attribute type might have been changed - we need to adopt
+				// the new one - the attribute's inode will be written back on close
+				attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
+			}
 
 			attribute->Lock().UnlockWrite();
 		} else
@@ -2313,7 +2320,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AttributeIterator
 
 
 AttributeIterator::AttributeIterator(Inode *inode)
