@@ -1321,9 +1321,11 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			}
 
 			if (fSuper != NULL) {
+				// Give supermenu the chance to continue tracking
 				*action = fState;
 				if (locked)
-					UnlockLooper();	
+					UnlockLooper();
+				
 				return NULL;
 			}
 		}
@@ -1349,7 +1351,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 
 	if (IsStickyMode())
 		SetStickyMode(false);
-
+	
 	// delete the menu window recycled for all the child menus
 	DeleteMenuWindow();
 	
@@ -1770,7 +1772,13 @@ BMenu::DrawItems(BRect updateRect)
 int
 BMenu::State(BMenuItem **item) const
 {
-	return 0;
+	if (fState == MENU_STATE_TRACKING || fState == MENU_STATE_CLOSED)
+		return fState;
+
+	if (fSelected != NULL && fSelected->Submenu() != NULL)
+		return fSelected->Submenu()->State(item);
+		
+	return fState;
 }
 
 
@@ -1933,7 +1941,7 @@ BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 			fSelected->Select(false);
 			BMenu *subMenu = fSelected->Submenu();
 			if (subMenu != NULL && subMenu->Window() != NULL)
-				subMenu->_hide();
+				subMenu->_hide();			
 		}
 		
 		fSelected = menuItem;

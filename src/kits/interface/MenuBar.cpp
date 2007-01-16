@@ -382,7 +382,7 @@ BMenuBar::TrackTask(void *arg)
 	receive_data(&id, &data, sizeof(data));
 	
 	BMenuBar *menuBar = data.menuBar;
-	if (data.useRect)	
+	if (data.useRect)
 		menuBar->fExtraRect = &data.rect;	
 	menuBar->SetStickyMode(data.sticky);
 	
@@ -433,7 +433,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		BPoint where;
 		ulong buttons;
 		GetMouse(&where, &buttons, true);
-			
+
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
 			// Select item if:
@@ -474,17 +474,24 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				menu->SetStickyMode(true);
 			int localAction;
 			fChosenItem = menu->_track(&localAction, system_time());
-			
+			if (menu->State(NULL) == MENU_STATE_TRACKING && menu->IsStickyMode())
+				menu->SetStickyMode(false);
+
 			// check if the user started holding down a mouse button in a submenu
 			if (wasSticky && !IsStickyMode())
 				buttons = 1;
 					// buttons must have been pressed in the meantime
+
+			if (localAction == MENU_STATE_CLOSED) {
+				if (fExtraRect != NULL && fExtraRect->Contains(where)) {
+					SetStickyMode(true);
+					fExtraRect = NULL;				
+				} else
+					fState = MENU_STATE_CLOSED;
+			}
 			
-			if (localAction == MENU_STATE_CLOSED)
-				fState = MENU_STATE_CLOSED;
-			
-		} else if (menuItem == NULL && fSelected != NULL 
-				&& !IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
+		} else if (menuItem == NULL && fSelected != NULL
+			&& !IsStickyMode() /*&& Bounds().Contains(where)*/ && fState != MENU_STATE_TRACKING_SUBMENU) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
@@ -506,10 +513,11 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		if (snoozeAmount > 0)
 			snooze(snoozeAmount);		
 	}
-
+	
 	if (window->Lock()) {
 		if (fSelected != NULL)
-			_SelectItem(NULL);
+			_SelectItem(NULL);	
+		
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
 		RestoreFocus();
@@ -534,7 +542,7 @@ BMenuBar::StealFocus()
 	// We already stole the focus, don't do anything
 	if (fPrevFocusToken != -1)
 		return;
-
+	
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
 		BView *focus = window->CurrentFocus();

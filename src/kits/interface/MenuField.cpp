@@ -282,8 +282,7 @@ BMenuField::MouseDown(BPoint where)
 
 	fMenuBar->StartMenuBar(-1, false, true, &bounds);
 
-	fMenuTaskID = spawn_thread((thread_func)MenuTask, "_m_task_",
-		B_NORMAL_PRIORITY, this);
+	fMenuTaskID = spawn_thread((thread_func)MenuTask, "_m_task_", B_NORMAL_PRIORITY, this);
 	if (fMenuTaskID)
 		resume_thread(fMenuTaskID);
 }
