@@ -2025,8 +2025,10 @@ BTextView::SetTextRect(BRect rect)
 		
 	fTextRect = rect;
 	
-	if (Window() != NULL)
-		Refresh(0, fText->Length(), true, false);
+	if (Window() != NULL) {
+		Invalidate();		
+		Window()->UpdateIfNeeded();	
+	}
 }
 
 
