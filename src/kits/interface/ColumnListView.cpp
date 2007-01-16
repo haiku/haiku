@@ -2603,7 +2603,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 					fDrawBufferView->ConstrainClippingRegion(&clipRegion);
 					fDrawBufferView->PushState();
 		#endif
-					fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_TEXT));
+					fDrawBufferView->SetHighColor(fMasterView->Color(row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT));
 					float baseline = floor(fieldRect.top + fh.ascent
 											+ (fieldRect.Height()+1-(fh.ascent+fh.descent))/2);
 					fDrawBufferView->MovePenTo(fieldRect.left + 8, baseline);
@@ -2616,7 +2616,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 	
 				if (fFocusRow == row) {
 					if(!fEditMode) {
-						fDrawBufferView->SetHighColor(0, 0, 0);
+						SetHighColor(fMasterView->Color(B_COLOR_SELECTION_TEXT));
 						fDrawBufferView->StrokeRect(BRect(-1, sourceRect.top, 10000.0, sourceRect.bottom - 1));
 					}
 				}
@@ -2657,7 +2657,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 					ConstrainClippingRegion(&clipRegion);
 					PushState();
 		#endif
-					SetHighColor(fColorList[B_TEXT_COLOR]);
+					SetHighColor(fColorList[row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT]);
 					float baseline = floor(destRect.top + fh.ascent
 											+ (destRect.Height()+1-(fh.ascent+fh.descent))/2);
 					MovePenTo(destRect.left + 8, baseline);
@@ -2670,7 +2670,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 	
 				if (fFocusRow == row) {
 					if(!fEditMode) {
-						SetHighColor(0, 0, 0);
+						SetHighColor(fColorList[B_COLOR_SELECTION_TEXT]);
 						StrokeRect(BRect(0, destRect.top, 10000.0, destRect.bottom - 1));
 					}
 				}
@@ -2812,7 +2812,7 @@ void OutlineView::Draw(BRect invalidBounds)
 							ConstrainClippingRegion(&clipRegion);
 							PushState();
 #endif
-							SetHighColor(fMasterView->Color(B_COLOR_TEXT));
+							SetHighColor(fMasterView->Color(row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT));
 							float baseline = floor(destRect.top + fh.ascent
 													+ (destRect.Height()+1-(fh.ascent+fh.descent))/2);
 							MovePenTo(destRect.left + 8, baseline);
@@ -2849,7 +2849,7 @@ void OutlineView::Draw(BRect invalidBounds)
 	
 		if (fFocusRow == row && fMasterView->IsFocus() && Window()->IsActive()) {
 			if(!fEditMode) {
-				SetHighColor(0, 0, 0);
+				SetHighColor(fMasterView->Color(B_COLOR_SELECTION_TEXT));
 				StrokeRect(BRect(0, line, 10000.0, line + rowHeight - 1));
 			}
 		}
