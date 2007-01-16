@@ -386,8 +386,13 @@ IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 			__FILE__, __LINE__, fileType));
 
 		BMimeType mime(fileType);
-		char preferredAppSig[B_MIME_TYPE_LENGTH];	
-		if (mime.GetPreferredApp(preferredAppSig) == B_OK) {
+		// try getting the icon directly from the metamime
+		if (mime.GetIcon(lazyBitmap->Get(), size) != B_OK) {
+			// try getting it from the preferred app of this type
+			char preferredAppSig[B_MIME_TYPE_LENGTH];	
+			if (mime.GetPreferredApp(preferredAppSig) != B_OK)
+				return NULL;
+
 			SharedCacheEntry *aliasTo = 0;
 			if (entry)
 				aliasTo = (SharedCacheEntry *)entry->ResolveIfAlias(&fSharedCache);
@@ -408,11 +413,7 @@ IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 				return aliasTo;
 			}
 		}
-		
-		// try getting the icon directly from the metamime
-		if (mime.GetIcon(lazyBitmap->Get(), size) != B_OK)
-			return NULL;
-		
+
 		BBitmap *bitmap = lazyBitmap->Adopt();
 		if (!entry) {
 			PRINT_ADD_ITEM(("File %s; Line %d # adding entry for type %s\n",
