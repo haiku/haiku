@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -340,47 +340,46 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 	// make sure there is enough data to fill the stream header
 	const size_t kStreamHeaderSize = sizeof(TranslatorStyledTextStreamHeader);
 	if (mallocIO.BufferLength() < kStreamHeaderSize)
-		return B_ERROR;
+		return B_BAD_DATA;
 
 	// copy the stream header from the mallio buffer
-	TranslatorStyledTextStreamHeader stm_header =
+	TranslatorStyledTextStreamHeader header =
 		*(reinterpret_cast<const TranslatorStyledTextStreamHeader *>(buffer));
 
 	// convert the stm_header.header struct to the host format
 	const size_t kRecordHeaderSize = sizeof(TranslatorStyledTextRecordHeader);
-	if (swap_data(B_UINT32_TYPE, &stm_header.header, kRecordHeaderSize,
-			B_SWAP_BENDIAN_TO_HOST) != B_OK
-		|| swap_data(B_INT32_TYPE, &stm_header.version, sizeof(int32),
-			B_SWAP_BENDIAN_TO_HOST) != B_OK
-		|| stm_header.header.magic != 'STXT')
-		return B_ERROR;
+	swap_data(B_UINT32_TYPE, &header.header, kRecordHeaderSize, B_SWAP_BENDIAN_TO_HOST);
+	swap_data(B_INT32_TYPE, &header.version, sizeof(int32), B_SWAP_BENDIAN_TO_HOST);
+
+	if (header.header.magic != 'STXT')
+		return B_BAD_TYPE;
 
 	// copy the text header from the mallocIO buffer
 
-	uint32 offset = stm_header.header.header_size +
-		stm_header.header.data_size;
+	uint32 offset = header.header.header_size + header.header.data_size;
 	const size_t kTextHeaderSize = sizeof(TranslatorStyledTextTextHeader);
 	if (mallocIO.BufferLength() < offset + kTextHeaderSize)
-		return B_ERROR;
+		return B_BAD_DATA;
 
 	TranslatorStyledTextTextHeader textHeader = 
 		*(const TranslatorStyledTextTextHeader *)(buffer + offset);
 
 	// convert the stm_header.header struct to the host format
-	if (swap_data(B_UINT32_TYPE, &textHeader.header, kRecordHeaderSize,
-			B_SWAP_BENDIAN_TO_HOST) != B_OK
-		|| swap_data(B_INT32_TYPE, &textHeader.charset, sizeof(int32),
-			B_SWAP_BENDIAN_TO_HOST) != B_OK
-		|| textHeader.header.magic != 'TEXT'
-		|| textHeader.charset != B_UNICODE_UTF8)
-		return B_ERROR;
+	swap_data(B_UINT32_TYPE, &textHeader.header, kRecordHeaderSize, B_SWAP_BENDIAN_TO_HOST);
+	swap_data(B_INT32_TYPE, &textHeader.charset, sizeof(int32), B_SWAP_BENDIAN_TO_HOST);
+
+	if (textHeader.header.magic != 'TEXT' || textHeader.charset != B_UNICODE_UTF8)
+		return B_BAD_TYPE;
 
 	offset += textHeader.header.header_size;
-	if (mallocIO.BufferLength() < offset + textHeader.header.data_size)
-		return B_ERROR;
+	if (mallocIO.BufferLength() < offset + textHeader.header.data_size) {
+		// text buffer misses its end; handle this gracefully
+		textHeader.header.data_size = mallocIO.BufferLength() - offset;
+	}
 
 	const char* text = (const char*)buffer + offset;
 		// point text pointer at the actual character data
+	bool hasStyles = false;
 
 	if (mallocIO.BufferLength() > offset + textHeader.header.data_size) {
 		// If the stream contains information beyond the text data
@@ -389,40 +388,32 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 		offset += textHeader.header.data_size;
 		const size_t kStyleHeaderSize =
 			sizeof(TranslatorStyledTextStyleHeader);
-		if (mallocIO.BufferLength() < offset + kStyleHeaderSize)
-			return B_ERROR;
-
-		TranslatorStyledTextStyleHeader styleHeader = 
-			*(reinterpret_cast<const TranslatorStyledTextStyleHeader *>(buffer + offset));
-		if (swap_data(B_UINT32_TYPE, &styleHeader.header, kRecordHeaderSize,
-				B_SWAP_BENDIAN_TO_HOST) != B_OK
-			|| swap_data(B_UINT32_TYPE, &styleHeader.apply_offset, sizeof(uint32),
-				B_SWAP_BENDIAN_TO_HOST) != B_OK
-			|| swap_data(B_UINT32_TYPE, &styleHeader.apply_length, sizeof(uint32),
-				B_SWAP_BENDIAN_TO_HOST) != B_OK
-			|| styleHeader.header.magic != 'STYL')
-			return B_ERROR;
-
-		offset += styleHeader.header.header_size;
-		if (mallocIO.BufferLength() < offset + styleHeader.header.data_size)
-			return B_ERROR;
-
-		// get the text run array
-
-		text_run_array *runArray = BTextView::UnflattenRunArray(buffer + offset);
-		if (runArray) {
-			intoView->Insert(intoView->TextLength(), text,
-				textHeader.header.data_size, runArray);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-			BTextView::FreeRunArray(runArray);
-#else
-			free(runArray);
-#endif
-		} else {
-			// run array seems to be garbled; the text alone must be enough
-			intoView->Insert(intoView->TextLength(), text,
-				textHeader.header.data_size);
+		if (mallocIO.BufferLength() >= offset + kStyleHeaderSize) {
+			TranslatorStyledTextStyleHeader styleHeader = 
+				*(reinterpret_cast<const TranslatorStyledTextStyleHeader *>(buffer + offset));
+			swap_data(B_UINT32_TYPE, &styleHeader.header, kRecordHeaderSize, B_SWAP_BENDIAN_TO_HOST);
+			swap_data(B_UINT32_TYPE, &styleHeader.apply_offset, sizeof(uint32), B_SWAP_BENDIAN_TO_HOST);
+			swap_data(B_UINT32_TYPE, &styleHeader.apply_length, sizeof(uint32), B_SWAP_BENDIAN_TO_HOST);
+			if (styleHeader.header.magic == 'STYL') {
+				offset += styleHeader.header.header_size;
+				if (mallocIO.BufferLength() >= offset + styleHeader.header.data_size)
+					hasStyles = true;
+			}
 		}
+	}
+
+	text_run_array *runArray = NULL;
+	if (hasStyles)
+		runArray = BTextView::UnflattenRunArray(buffer + offset);
+
+	if (runArray != NULL) {
+		intoView->Insert(intoView->TextLength(),
+			text, textHeader.header.data_size, runArray);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		BTextView::FreeRunArray(runArray);
+#else
+		free(runArray);
+#endif
 	} else {
 		intoView->Insert(intoView->TextLength(), text,
 			textHeader.header.data_size);
