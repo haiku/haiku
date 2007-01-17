@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,17 +40,24 @@ convert_encoding(const char* from, const char* to, const char* src,
 		return B_OK;
 	}
 
+	// TODO: this doesn't work, as the state is reset every time!
 	iconv_t conversion = iconv_open(to, from);
 	if (conversion == (iconv_t)-1) {
 		DEBPRINT(("iconv_open failed\n"));
 		return B_ERROR;
 	}
-	if (state == NULL || *state == 0)
-		iconv(conversion, 0, 0, 0, 0);
+
+	size_t outputLeft = *dstLen;
+
+	if (state == NULL || *state == 0) {
+		if (state != NULL)
+			*state = 1;
+
+		iconv(conversion, NULL, NULL, &dst, &outputLeft);
+	}
 
 	char** inputBuffer = const_cast<char**>(&src);
 	size_t inputLeft = *srcLen;
-	size_t outputLeft = *dstLen;
 	do {
 		size_t nonReversibleConversions = iconv(conversion, inputBuffer,
 			&inputLeft, &dst, &outputLeft);
