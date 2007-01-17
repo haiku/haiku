@@ -136,11 +136,11 @@ typedef struct pci_device_module_info {
 // subvendor id (uint16)
 #define PCI_DEVICE_SUBVENDOR_ID_ITEM "pci/subvendor_id"
 
-// device base class (uint16)
+// device base class (uint8)
 #define PCI_DEVICE_BASE_CLASS_ID_ITEM "pci/class/base_id"
-// device subclass (uint16)
+// device subclass (uint8)
 #define PCI_DEVICE_SUB_CLASS_ID_ITEM "pci/class/sub_id"
-// device api (uint16)
+// device api (uint8)
 #define PCI_DEVICE_API_ID_ITEM "pci/class/api_id"
 
 
