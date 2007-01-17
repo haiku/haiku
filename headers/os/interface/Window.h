@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -343,7 +343,7 @@ private:
 			BView*				_FindNextNavigable(BView *focus, uint32 flags);
 			BView*				_FindPreviousNavigable(BView *focus,
 													   uint32 flags);
-			bool				_HandleKeyDown(char key, uint32 modifiers);
+			bool				_HandleKeyDown(BMessage* event);
 			void				_KeyboardNavigation();
 
 			// Debug (TODO: to be removed)

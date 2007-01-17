@@ -962,20 +962,15 @@ FrameMoved(origin);
 
 		case B_KEY_DOWN:
 		{
-			uint32 modifiers;
-			int32 rawChar;
-			const char *string = NULL;
-			msg->FindInt32("modifiers", (int32*)&modifiers);
-			msg->FindInt32("raw_char", &rawChar);
-			msg->FindString("bytes", &string);
-
-			// TODO: cannot use "string" here if we support having different
-			//	font encoding per view (it's supposed to be converted by
-			//	_HandleKeyDown() one day)
-			if (!_HandleKeyDown(string[0], (uint32)modifiers)) {
-				if (BView* view = dynamic_cast<BView*>(target))
-					view->KeyDown(string, strlen(string));
-				else
+			if (!_HandleKeyDown(msg)) {
+				if (BView* view = dynamic_cast<BView*>(target)) {
+					// TODO: cannot use "string" here if we support having different
+					//	font encoding per view (it's supposed to be converted by
+					//	_HandleKeyDown() one day)
+					const char *string = NULL;
+					if (msg->FindString("bytes", &string) == B_OK)
+						view->KeyDown(string, strlen(string));
+				} else
 					target->MessageReceived(msg);
 			}
 			break;
@@ -3092,9 +3087,17 @@ BWindow::_StealMouseMessage(BMessage* message, bool& deleteMessage)
 	TODO: must also convert the incoming key to the font encoding of the target
 */
 bool
-BWindow::_HandleKeyDown(char key, uint32 modifiers)
+BWindow::_HandleKeyDown(BMessage* event)
 {
-	// TODO: ask people if using 'raw_char' is OK ?
+	const char *string = NULL;
+	if (event->FindString("bytes", &string) != B_OK)
+		return false;
+
+	char key = string[0];
+
+	uint32 modifiers;
+	if (event->FindInt32("modifiers", (int32*)&modifiers) != B_OK)
+		modifiers = 0;
 
 	// handle BMenuBar key
 	if (key == B_ESCAPE && (modifiers & B_COMMAND_KEY) != 0
@@ -3116,9 +3119,13 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 	// Deskbar's Switcher
 	if (key == B_TAB && (modifiers & B_CONTROL_KEY) != 0) {
 		BMessenger deskbar(kDeskbarSignature);
-		if (deskbar.IsValid()) {
+		int32 rawKey;
+		if (event->FindInt32("key", &rawKey) == B_OK
+			&& !event->HasInt32("be:key_repeat")
+			&& deskbar.IsValid()) {
+			// only send the first key press, no repeats
 			BMessage message('TASK');
-			message.AddInt32("key", B_TAB);
+			message.AddInt32("key", rawKey);
 			message.AddInt32("modifiers", modifiers);
 			message.AddInt64("when", system_time());
 			message.AddInt32("team", Team());
