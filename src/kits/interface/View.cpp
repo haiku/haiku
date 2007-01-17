@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -843,7 +843,7 @@ BView::SetFlags(uint32 flags)
 		if (flags & B_PULSE_NEEDED) {
 			check_lock_no_pick();
 			if (fOwner->fPulseRunner == NULL)
-				fOwner->SetPulseRate(500000);
+				fOwner->SetPulseRate(fOwner->PulseRate());
 		}
 
 		if (flags & (B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
@@ -4503,7 +4503,7 @@ BView::_Attach()
 		if (fFlags & B_PULSE_NEEDED) {
 			check_lock_no_pick();
 			if (fOwner->fPulseRunner == NULL)
-				fOwner->SetPulseRate(500000);
+				fOwner->SetPulseRate(fOwner->PulseRate());
 		}
 
 		if (!fOwner->IsHidden())

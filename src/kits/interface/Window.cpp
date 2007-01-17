@@ -1448,7 +1448,6 @@ void
 BWindow::ScreenChanged(BRect screen_size, color_space depth)
 {
 	// Hook function
-	// does nothing
 }
 
 
@@ -1456,7 +1455,7 @@ void
 BWindow::SetPulseRate(bigtime_t rate)
 {
 	// TODO: What about locking?!?
-	if (rate < 0 || rate == fPulseRate)
+	if (rate < 0 || rate == fPulseRate || !(rate == 0 ^ fPulseRunner == NULL))
 		return;
 
 	fPulseRate = rate;
@@ -1480,7 +1479,6 @@ BWindow::SetPulseRate(bigtime_t rate)
 bigtime_t
 BWindow::PulseRate() const
 {
-	// TODO: What about locking?!?
 	return fPulseRate;
 }
 
@@ -2378,11 +2376,9 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	AddShortcut('V', B_COMMAND_KEY, new BMessage(B_PASTE), NULL);
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
 
-	fPulseRate = 0;
+	// We set the default pulse rate, but we don't start the pulse
+	fPulseRate = 500000;
 	fPulseRunner = NULL;
-
-	// TODO: is this correct??? should the thread loop be started???
-	//SetPulseRate( 500000 );
 
 	// TODO:  see if you can use 'fViewsNeedPulse'
 
