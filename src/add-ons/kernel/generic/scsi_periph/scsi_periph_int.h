@@ -109,4 +109,9 @@ status_t periph_simple_exec(scsi_periph_device_info *device, void *cdb,
 
 status_t periph_get_icon(icon_type type, device_icon *data);
 	
+// sync.c
+
+err_res periph_synchronize_cache(scsi_periph_device_info *device,
+	scsi_ccb *request);
+
 #endif	/* __SCSI_PERIPH_INT_H__ */

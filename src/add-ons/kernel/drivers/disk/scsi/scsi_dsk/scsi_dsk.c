@@ -130,6 +130,23 @@ load_eject(das_device_info *device, bool load)
 }
 
 
+static status_t
+synchronize_cache(das_device_info *device)
+{
+	scsi_ccb *ccb;
+	err_res res;
+	
+	SHOW_FLOW0( 0, "" );
+		
+	ccb = device->scsi->alloc_ccb(device->scsi_device);
+
+	res = scsi_periph->synchronize_cache(device->scsi_periph_device, ccb);
+		
+	device->scsi->free_ccb(ccb);
+	
+	return res.error_code;
+}
+
 static int
 log2(uint32 x)
 {
@@ -213,6 +230,10 @@ das_ioctl(das_handle_info *handle, int op, void *buf, size_t len)
 		case B_LOAD_MEDIA:
 			res = load_eject(device, true);
 			break;
+
+	case B_FLUSH_DRIVE_CACHE:
+		res = synchronize_cache(device);
+		break;
 
 		default:
 			res = scsi_periph->ioctl(handle->scsi_periph_handle, op, buf, len);

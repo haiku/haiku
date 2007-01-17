@@ -1,10 +1,6 @@
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-PEPL";
 
-resource(1, "BEOS:FILE_TYPES") message {
-	"types" = "application/x-person"
-};
-
 resource app_version {
 	major  = 1,
 	middle = 0,
@@ -18,6 +14,10 @@ resource app_version {
 };
 
 resource app_flags B_SINGLE_LAUNCH;
+
+resource(1, "BEOS:FILE_TYPES") message {
+	"types" = "application/x-person"
+};
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 

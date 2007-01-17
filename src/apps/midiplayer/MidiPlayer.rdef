@@ -11,11 +11,11 @@ resource app_version {
 	long_info  = "MidiPlayer ©2004-2007 Haiku, Inc."
 };
 
+resource app_flags B_SINGLE_LAUNCH;
+
 resource file_types message {
 	"types" = "audio/x-midi"
 };
-
-resource app_flags B_SINGLE_LAUNCH;
 
 resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"

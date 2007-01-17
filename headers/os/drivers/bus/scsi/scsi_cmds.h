@@ -1023,4 +1023,21 @@ enum {
 												// and Mechanism status page
 } scsi_read_cd_sub_channel_selection;
 
+// SYNCHRONIZE CACHE (10)
+
+typedef struct scsi_cmd_sync_cache {
+	uint8 opcode;
+	LBITFIELD8_4(
+		RelAddr : 1,
+		immed : 1,		// 1 - return immediately, 0 - return on completion
+		res1_1 : 3,
+		LUN : 3
+	);
+	scsi_cd_lba lba;
+	uint8 res2;	
+	uint8 nblocks_high;
+	uint8 nblocks_low;
+	uint8 control;
+} scsi_cmd_sync_cache;
+
 #endif

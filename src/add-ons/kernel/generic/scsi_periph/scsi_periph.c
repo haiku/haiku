@@ -161,7 +161,9 @@ scsi_periph_interface scsi_periph_module = {
 	periph_get_media_status,
 	
 	periph_compose_device_name,
-	periph_get_icon
+	periph_get_icon,
+	
+	periph_synchronize_cache
 };
 
 scsi_periph_interface *modules[] = {

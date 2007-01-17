@@ -16,4 +16,5 @@ KernelAddon scsi_periph :
 	io.c
 	removable.c
 	scsi_periph.c
+	sync.c
 	;

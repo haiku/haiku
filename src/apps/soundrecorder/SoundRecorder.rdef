@@ -11,6 +11,8 @@ resource app_version {
 	long_info  = "SoundRecorder ©2005-2007 Haiku, Inc."
 };
 
+resource app_flags B_SINGLE_LAUNCH;
+
 resource file_types message {
 	"types" = "audio/basic",
 	"types" = "audio/x-wav",
@@ -21,8 +23,6 @@ resource file_types message {
 	"types" = "audio/aiff",
 	"types" = "audio/riff"
 };
-
-resource app_flags B_SINGLE_LAUNCH;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
