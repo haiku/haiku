@@ -11,14 +11,14 @@
 #include <bus/ide/ide_adapter.h>
 #include <block_io.h>
 
-#define TRACE(a...) dprintf("si-3112 " a)
-#define FLOW(a...)	dprintf("si-3112 " a)
+#define TRACE(a...) dprintf("ahci " a)
+#define FLOW(a...)	dprintf("ahci " a)
 
 
-#define DRIVER_PRETTY_NAME		"Silicon Image SATA"
+#define DRIVER_PRETTY_NAME		"AHCI SATA"
 #define CONTROLLER_NAME			DRIVER_PRETTY_NAME
-#define CONTROLLER_MODULE_NAME	"busses/ide/silicon_image_3112/device_v1"
-#define CHANNEL_MODULE_NAME		"busses/ide/silicon_image_3112/channel/v1"
+#define CONTROLLER_MODULE_NAME	"busses/ide/ahci/device_v1"
+#define CHANNEL_MODULE_NAME		"busses/ide/ahci/channel/v1"
 
 enum asic_type {
 	ASIC_SI3112 = 0,
@@ -118,40 +118,48 @@ static float
 controller_supports(device_node_handle parent, bool *_noConnection)
 {
 	char *bus;
-	uint16 vendorID;
-	uint16 deviceID;
+	uint16 vendor_id;
+	uint16 device_id;
+	uint16 base_class;
+	uint16 sub_class;
+	uint16 class_api;
 	
 	FLOW("controller_supports\n");
 
 	// get the bus (should be PCI)
-	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
-			!= B_OK) {
+	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK)
 		return B_ERROR;
-	}
-	
-	// get vendor and device ID
-	if (dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM,
-			&vendorID, false) != B_OK
-		|| dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM,
-			&deviceID, false) != B_OK) {
+	if (strcmp(bus, "pci") != 0) {
 		free(bus);
 		return B_ERROR;
 	}
-	
-	FLOW("controller_supports: checking 0x%04x 0x%04x\n", vendorID, deviceID);
-
-	// check, whether bus, vendor and device ID match
-	if (strcmp(bus, "pci") != 0
-		|| (vendorID != 0x1095)
-		|| (deviceID != 0x3112 && deviceID != 0x3114)) {
-		free(bus);
-		return 0.0;
-	}
-
-	TRACE("controller_supports success\n");
-
 	free(bus);
-	return 0.6;
+	
+	if ( dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendor_id, false) != B_OK
+	  || dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &device_id, false) != B_OK
+	  || dm->get_attr_uint8(parent, PCI_DEVICE_BASE_CLASS_ID_ITEM, &base_class, false) != B_OK
+	  || dm->get_attr_uint8(parent, PCI_DEVICE_SUB_CLASS_ID_ITEM, &sub_class, false) != B_OK
+	  || dm->get_attr_uint8(parent, PCI_DEVICE_API_ID_ITEM, &class_api, false) != B_OK)
+		return B_ERROR;
+
+	FLOW("controller_supports: checking vendor 0x%04x, device 0x%04x, base 0x%02x, sub 0x%02x, api 0x%02x\n",
+		 vendor_id, device_id, base_class, sub_class, class_api);
+
+	#define ID(v,d) (((v)<< 16) | (d))
+	switch (ID(vendor_id,device_id)) {
+		case ID(0x197b, 0x2363): //  JMicron
+			TRACE("controller_supports success, exact match\n");
+			return 0.8;
+		default:
+			break;
+	}
+
+	if (base_class == PCI_mass_storage && sub_class == PCI_sata && class_api == PCI_sata_ahci) {
+		TRACE("controller_supports success, class match\n");
+		return 0.6;
+	}
+
+	return 0.0;
 }
 
 
@@ -169,6 +177,8 @@ controller_probe(device_node_handle parent)
 	status_t res;
 	
 	TRACE("controller_probe\n");
+
+	return B_ERROR;
 
 	if (dm->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
