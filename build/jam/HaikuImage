@@ -110,7 +110,7 @@ BEOS_ADD_ONS_FILESYSTEMS = bfs dos iso9660 ;
 AddFilesToHaikuImage beos system add-ons kernel bus_managers
 	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
-	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
+	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
 AddFilesToHaikuImage beos system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci ;
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
