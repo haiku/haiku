@@ -43,7 +43,7 @@
 
 static const char* kWidthLabel = "Width:";
 static const char* kHeightLabel = "Height:";
-static const char* kKeepAspectRatioLabel = "Keep Aspect Ratio";
+static const char* kKeepAspectRatioLabel = "Keep Proportions";
 static const char* kApplyLabel = "Apply";
 
 static const float kLineDistance = 5;
@@ -56,7 +56,8 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	, fOriginalHeight(height)
 	, fTarget(target)
 {
-	BView* back_view = new BBox(Bounds(), "", B_FOLLOW_ALL);
+	BView* back_view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
+	back_view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(back_view);
 	
 	const float widthLabelWidth = back_view->StringWidth(kWidthLabel);
@@ -64,7 +65,7 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	const float column2 = max_c(widthLabelWidth, heightLabelWidth);
 
 	const float textControlWidth = column2 + back_view->StringWidth("999999");
-	const float keepAspectRatioLabelWidth = back_view->StringWidth(kKeepAspectRatioLabel);
+	const float keepAspectRatioLabelWidth = 15 + back_view->StringWidth(kKeepAspectRatioLabel);
 	const float width2 = 2 * kHorizontalIndent + max_c(textControlWidth, keepAspectRatioLabelWidth);
 	
 	ResizeTo(width2+1, Bounds().Height()+1);
@@ -88,8 +89,6 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	fAspectRatio = new BCheckBox(rect, "Ratio", kKeepAspectRatioLabel, new BMessage(kWidthModifiedMsg));
 	fAspectRatio->SetValue(B_CONTROL_ON);
 	AddControl(back_view, fAspectRatio, column2, rect);
-	
-	AddSeparatorLine(back_view, rect);
 	
 	fApply = new BButton(rect, "apply", kApplyLabel, new BMessage(kApplyMsg));
 	fApply->MakeDefault(true);
