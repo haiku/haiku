@@ -312,19 +312,20 @@ BTranslationUtils::GetBitmap(BPositionIO *stream, BTranslatorRoster *roster)
 	defined in
 	/boot/develop/headers/be/translation/TranslatorFormats.h
 	
-	\param fromStream the stream with the styled text
+	\param source the stream with the styled text
 	\param intoView the view where the test will be inserted
 		roster, BTranslatorRoster used to do the translation
+	\param the encoding to use, defaults to UTF-8
 
 	\return B_BAD_VALUE, if fromStream or intoView is NULL
 	\return B_ERROR, if any other error occurred
 	\return B_OK, if successful
 */
 status_t
-BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
-	BTranslatorRoster *roster)
+BTranslationUtils::GetStyledText(BPositionIO* source, BTextView* intoView,
+	const char* encoding, BTranslatorRoster* roster)
 {
-	if (fromStream == NULL || intoView == NULL)
+	if (source == NULL || intoView == NULL)
 		return B_BAD_VALUE;
 
 	// Use default Translator if none is specified 
@@ -334,10 +335,14 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 			return B_ERROR;
 	}
 
+	BMessage config;
+	if (encoding != NULL && encoding[0])
+		config.AddString("be:encoding", encoding);
+
 	// Translate the file from whatever format it is to B_STYLED_TEXT_FORMAT
 	// we understand
 	BMallocIO mallocIO;
-	if (roster->Translate(fromStream, NULL, NULL, &mallocIO,
+	if (roster->Translate(source, NULL, &config, &mallocIO,
 			B_STYLED_TEXT_FORMAT) < B_OK)
 		return B_BAD_TYPE;
 
@@ -426,6 +431,14 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+BTranslationUtils::GetStyledText(BPositionIO* source, BTextView* intoView,
+	BTranslatorRoster* roster)
+{
+	return GetStyledText(source, intoView, NULL, roster);
 }
 
 
