@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src add-ons translators stxt ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders textencoding ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar ] ;
+	# for the text identification
+
 # Include BaseTranslator code from shared directory
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
@@ -16,7 +20,7 @@ Translator STXTTranslator :
 	STXTTranslator.cpp
 	STXTView.cpp
 
-	: be translation
+	: be translation libtextencoding.so
 ;
 
 Package haiku-translationkit-cvs :
