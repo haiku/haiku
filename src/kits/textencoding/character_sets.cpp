@@ -165,10 +165,10 @@ static const char * unicode2aliases[] = {
 	// IANA aliases
 	"csUnicode",
 	// java aliases
-	"UTF_16BE", "X-UTF-16BE", "UnicodeBigUnmarked",
+	"UTF-16BE", "X-UTF-16BE", "UnicodeBigUnmarked",
 	NULL
 };
-static const BCharacterSet unicode2(16,1000,"Unicode (UTF-16)","ISO-10646-UCS-2",NULL,unicode2aliases);
+static const BCharacterSet unicode2(16,1000,"Unicode (UCS-2)","ISO-10646-UCS-2",NULL,unicode2aliases);
 
 static const char * KOI8Raliases[] = {
 	// IANA aliases
@@ -262,6 +262,16 @@ static const char * gb18030aliases[] = {
 };
 static const BCharacterSet gb18030(26,114,"Chinese GB18030","GB18030",NULL,gb18030aliases);
 
+static const char* kUTF16Aliases[] = {
+	// IANA aliases
+	"UTF-16",
+	// java aliases
+	"UTF-16BE", "X-UTF-16BE", "UnicodeBigUnmarked",
+	NULL
+};
+static const BCharacterSet kUTF16(27, 1000, "Unicode", "UTF-16", "UTF-16",
+	kUTF16Aliases);
+
 /**
  * The following initializes the global character set array.
  * It is organized by id for efficient retrieval using predefined constants in UTF8.h and Font.h.
@@ -281,6 +291,7 @@ const BCharacterSet * character_sets_by_id[] = {
 	&IBM866, &IBM437, &eucKR, &iso13, &iso14, &iso15,
 	// R5 convert_to/from_utf8 encodings end here
 	&big5,&gb18030,
+	&kUTF16,
 };
 const uint32 character_sets_by_id_count = sizeof(character_sets_by_id)/sizeof(const BCharacterSet*);
 
