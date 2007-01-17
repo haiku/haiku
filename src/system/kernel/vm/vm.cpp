@@ -502,8 +502,8 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 	void **_virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
 	int wiring, int protection, int mapping, vm_area **_area, const char *areaName)
 {
-	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
-		addressSpace, store, *_virtualAddress, offset, size, addressSpec,
+	TRACE(("map_backing_store: aspace %p, cacheref %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
+		addressSpace, cacheRef, *_virtualAddress, offset, size, addressSpec,
 		wiring, protection, _area, areaName));
 
 	vm_area *area = _vm_create_area_struct(addressSpace, areaName, wiring, protection);
