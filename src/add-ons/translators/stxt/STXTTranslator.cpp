@@ -1180,6 +1180,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 	off_t outputSize = 0;
 	ssize_t bytesRead;
+	int32 state = 0;
 
 	// output the actual text part of the data
 	do {
@@ -1205,7 +1206,6 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 			// decode text file to UTF-8
 			char* pos = (char*)buffer;
 			int32 encodingLength = encodingIO.BufferLength();
-			int32 state = 0;
 			int32 bytesLeft = bytesRead;
 			int32 bytes;
 			do {
@@ -1229,7 +1229,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 				pos += bytes;
 				bytesLeft -= bytes;
 				outputSize += encodingLength;
-			} while (encodingLength > 0 && bytes > 0);
+			} while (encodingLength > 0 && bytesLeft > 0);
 		}
 	} while (bytesRead > 0);
 
