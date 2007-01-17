@@ -7,7 +7,7 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders translation ;
 }
 
-UsePrivateHeaders translation ;
+UsePrivateHeaders translation textencoding ;
 
 SharedLibrary libtranslation.so :
 	BitmapStream.cpp
@@ -16,7 +16,7 @@ SharedLibrary libtranslation.so :
 	Translator.cpp
 	TranslatorRoster.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be libtextencoding.so $(TARGET_LIBSTDC++)
 ;
 
 Package haiku-translationkit-cvs :

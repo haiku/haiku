@@ -13,6 +13,8 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 #include <Entry.h>
 #include <File.h>
 #include <MenuItem.h>
@@ -24,10 +26,14 @@
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
+#include <UTF8.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+using namespace BPrivate;
 
 
 BTranslationUtils::BTranslationUtils()
@@ -587,13 +593,14 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 
 	\param view the view with the styled text
 	\param file the file where the styled text is written to
+	\param the encoding to use, defaults to UTF-8
 
 	\return B_BAD_VALUE, if either parameter is NULL
 		B_OK, if successful, and any possible file error
 		if writing failed.
 */
 status_t
-BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
+BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file, const char *encoding)
 {
 	if (view == NULL || file == NULL)
 		return B_BAD_VALUE;
@@ -607,19 +614,63 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
 		return B_ERROR;
 
 	// move to the start of the file if not already there
-	status_t result = file->Seek(0, SEEK_SET);
-	if (result != B_OK)
-		return result;	
+	status_t status = file->Seek(0, SEEK_SET);
+	if (status != B_OK)
+		return status;	
 
-	// Write plain text data to file
-	ssize_t bytesWritten = file->Write(text, textLength);
-	if (bytesWritten != textLength)
-		return B_ERROR;
+	const BCharacterSet* characterSet = NULL;
+	if (encoding != NULL && strcmp(encoding, ""))
+		characterSet = BCharacterSetRoster::FindCharacterSetByName(encoding);
+	if (characterSet == NULL) {
+		// default encoding - UTF-8
+		// Write plain text data to file
+		ssize_t bytesWritten = file->Write(text, textLength);
+		if (bytesWritten != textLength) {
+			if (bytesWritten < B_OK)
+				return bytesWritten;
+
+			return B_ERROR;
+		}
+
+		// be:encoding, defaults to UTF-8 (65535)
+		// Note that the B_UNICODE_UTF8 constant is 0 and for some reason
+		// not appropriate for use here.
+		int32 value = 65535;
+		file->WriteAttr("be:encoding", B_INT32_TYPE, 0, &value, sizeof(value));
+	} else {
+		// we need to convert the text
+		uint32 id = characterSet->GetConversionID();
+		const char* outText = view->Text();
+		int32 sourceLength = textLength;
+		int32 state = 0;
+
+		textLength = 0;
+
+		do {
+			char buffer[32768];
+			int32 length = sourceLength;
+			int32 bufferSize = sizeof(buffer);
+			status = convert_from_utf8(id, outText, &length, buffer, &bufferSize, &state);
+			if (status != B_OK)
+				return status;
+
+			ssize_t bytesWritten = file->Write(buffer, bufferSize);
+			if (bytesWritten < B_OK)
+				return bytesWritten;
+
+			sourceLength -= length;
+			textLength += bytesWritten;
+			outText += length;
+		} while (sourceLength > 0);
+
+		file->WriteAttr("be:encoding", B_STRING_TYPE, 0,
+			encoding, strlen(encoding));
+	}
 
 	// truncate any extra text
-	result = file->SetSize(textLength);
-	if (result != B_OK)
-		return result;
+	status = file->SetSize(textLength);
+	if (status != B_OK)
+		return status;
 
 	// Write attributes. We don't report an error anymore after this point,
 	// as attributes aren't that crucial - not all volumes support attributes.
@@ -630,14 +681,13 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
 	char type[B_MIME_TYPE_LENGTH];
 	if (info.GetType(type) != B_OK) {
 		// This file doesn't have a file type yet, so let's set it
-		result = info.SetType("text/plain");
-		if (result < B_OK)
+		if (info.SetType("text/plain") < B_OK)
 			return B_OK;
 	}
 
 	// word wrap setting, turned on by default
 	int32 wordWrap = view->DoesWordWrap() ? 1 : 0;
-	bytesWritten = file->WriteAttr("wrap", B_INT32_TYPE, 0,
+	ssize_t bytesWritten = file->WriteAttr("wrap", B_INT32_TYPE, 0,
 		&wordWrap, sizeof(int32));
 	if (bytesWritten != sizeof(int32))
 		return B_OK;
@@ -646,15 +696,6 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
 	int32 alignment = view->Alignment();
 	bytesWritten = file->WriteAttr("alignment", B_INT32_TYPE, 0,
 		&alignment, sizeof(int32));
-	if (bytesWritten != sizeof(int32))
-		return B_OK;
-
-	// be:encoding, defaults to UTF-8 (65535)
-	// Note that the B_UNICODE_UTF8 constant is 0 and for some reason
-	// not appropriate for use here.
-	int32 encoding = 65535;
-	bytesWritten = file->WriteAttr("be:encoding", B_INT32_TYPE, 0,
-		&encoding, sizeof(int32));
 	if (bytesWritten != sizeof(int32))
 		return B_OK;
 
@@ -678,6 +719,13 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
 	}
 
 	return B_OK;
+}
+
+
+status_t
+BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
+{
+	return WriteStyledEditFile(view, file, NULL);
 }
 
 
