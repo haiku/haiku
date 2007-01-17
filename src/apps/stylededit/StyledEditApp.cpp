@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -84,7 +84,12 @@ StyledEditApp::StyledEditApp()
 	BCharacterSetRoster roster;
 	BCharacterSet charset;
 	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
-		BString name(charset.GetPrintName());
+		BString name;
+		if (charset.GetFontID() == B_UNICODE_UTF8)
+			name = "Default";
+		else
+			name = charset.GetPrintName();
+
 		const char* mime = charset.GetMIMEName();
 		if (mime) {
 			name.Append(" (");

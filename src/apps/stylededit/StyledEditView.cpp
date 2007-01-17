@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -23,17 +24,17 @@
 #include <CharacterSetRoster.h>
 #include <UTF8.h>
 
+
 using namespace BPrivate;
 
 
 StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *handler)
 	: BTextView(viewFrame, "textview", textBounds, 
-		B_FOLLOW_ALL, B_FRAME_EVENTS|B_WILL_DRAW)
+		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
 { 
 	fHandler = handler;
 	fMessenger = new BMessenger(handler);
 	fSuppressChanges = false;
-	fEncoding = 0;
 }
 
 
@@ -79,7 +80,8 @@ status_t
 StyledEditView::GetStyledText(BPositionIO* stream)
 {
 	fSuppressChanges = true;
-	status_t result = BTranslationUtils::GetStyledText(stream, this, NULL);
+	status_t result = BTranslationUtils::GetStyledText(stream, this,
+		fEncoding.String());
 	fSuppressChanges = false;
 
 	if (result != B_OK)
@@ -87,25 +89,29 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 
 	BNode* node = dynamic_cast<BNode*>(stream);
 	if (node != NULL) {
-		ssize_t bytesRead;
-		// decode encoding
-		int32 encoding;
-		bytesRead = node->ReadAttr("be:encoding", 0, 0, &encoding, sizeof(encoding));
-		if (bytesRead == (ssize_t)sizeof(encoding)) {
-			if (encoding == 65535) {
-				// UTF-8
-				fEncoding = 0;
-			} else {
-				const BCharacterSet* characterSet
-					= BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
-				if (characterSet != 0)
-					fEncoding = characterSet->GetFontID();
+		// get encoding
+		if (node->ReadAttrString("be:encoding", &fEncoding) != B_OK) {
+			// try to read as "int32"
+			int32 encoding;
+			ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
+				&encoding, sizeof(encoding));
+			if (bytesRead == (ssize_t)sizeof(encoding)) {
+				if (encoding == 65535) {
+					fEncoding = "UTF-8";
+				} else {
+					const BCharacterSet* characterSet
+						= BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
+					if (characterSet != NULL)
+						fEncoding = characterSet->GetName();
+				}
 			}
 		}
 
+		// TODO: move those into BTranslationUtils::GetStyledText() as well?
+
 		// restore alignment
 		int32 align;
-		bytesRead = node->ReadAttr("alignment", 0, 0, &align, sizeof(align));
+		ssize_t bytesRead = node->ReadAttr("alignment", 0, 0, &align, sizeof(align));
 		if (bytesRead == (ssize_t)sizeof(align))
 			SetAlignment((alignment)align);
 
@@ -126,63 +132,6 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 		}
 	}
 
-	if (fEncoding != 0) {
-		int32 length = stream->Seek(0, SEEK_END);
-
-		// Here we save the run_array before it gets overwritten...
-		text_run_array* runArray = RunArray(0, length);
-		uint32 id = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding)->GetConversionID();
-
-		fSuppressChanges = true;
-		SetText("");
-		fSuppressChanges = false;
-
-		char inBuffer[32768];
-		off_t location = 0;
-		int32 textOffset = 0;
-		int32 state = 0;
-		int32 bytesRead;
-		while ((bytesRead = stream->ReadAt(location, inBuffer, sizeof(inBuffer))) > 0) {
-			char* inPtr = inBuffer;
-			char textBuffer[32768];
-			int32 textLength = sizeof(textBuffer);
-			int32 bytes = bytesRead;
-			while (textLength > 0 && bytes > 0) {
-				result = convert_to_utf8(id, inPtr, &bytes, textBuffer, &textLength, &state);
-				if (result != B_OK)
-					return result;
-
-				fSuppressChanges = true;
-				InsertText(textBuffer, textLength, textOffset);
-				fSuppressChanges = false;
-				textOffset += textLength;
-				inPtr += bytes;
-				location += bytes;
-				bytesRead -= bytes;
-				bytes = bytesRead;
-				if (textLength > 0)
-					textLength = sizeof(textBuffer);
-			}
-		}
-
-		// ... and here we restore it
-		SetRunArray(0, length, runArray);
-		
-		#ifdef HAIKU_TARGET_PLATFORM_BEOS
-		// FreeRunArray does not exist on R5
-		
-		// Call destructors explicitly
-		for (int32 i = 0; i < runArray->count; i++)
-			runArray->runs[i].font.~BFont();
-		
-		free(runArray);
-		
-		#else
-		FreeRunArray(runArray);
-		#endif
-		
-	}
-
 	return result;
 }
 
@@ -190,63 +139,8 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 status_t
 StyledEditView::WriteStyledEditFile(BFile* file)
 {
-	status_t result = B_OK;
-	ssize_t bytes = 0;
-	result = BTranslationUtils::WriteStyledEditFile(this, file);
-	if (result != B_OK)
-		return result;
-
-	if (fEncoding == 0) {
-		int32 encoding = 65535;
-		bytes = file->WriteAttr("be:encoding", B_INT32_TYPE, 0, &encoding, sizeof(encoding));
-		if (bytes < 0)
-			return bytes;
-	} else {
-		result = file->SetSize(0);
-		if (result != B_OK)
-			return result;
-
-		bytes = file->Seek(0, SEEK_SET);
-		if (bytes != 0)
-			return bytes;
-
-		const BCharacterSet* cs = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding);
-		if (cs != 0) {
-			uint32 id = cs->GetConversionID();
-			const char * outText = Text();
-			int32 sourceLength = TextLength();
-			int32 state = 0;
-			char buffer[32768];
-			while (sourceLength > 0) {
-				int32 length = sourceLength;
-				int32 written = 32768;
-				result = convert_from_utf8(id,outText,&length,buffer,&written,&state);
-				if (result != B_OK) {
-					return result;
-				}
-				bytes = file->Write(buffer,written);
-				if (bytes < 0)
-					return bytes;
-				sourceLength -= length;
-				outText += length;
-			}
-			bytes = file->WriteAttr("be:encoding", B_INT32_TYPE, 0, &id, sizeof(id));
-			if (bytes < 0)
-				return bytes;
-		}
-	}
-
-	int32 align = Alignment();
-	bytes = file->WriteAttr("alignment", B_INT32_TYPE, 0, &align, sizeof(align));
-	if (bytes < 0)
-		return bytes;
-
-	bool wrap = DoesWordWrap();
-	bytes = file->WriteAttr("wrap", B_BOOL_TYPE, 0, &wrap, sizeof(wrap));
-	if (bytes < 0)
-		return bytes;
-
-	return result;	
+	return BTranslationUtils::WriteStyledEditFile(this, file,
+		fEncoding.String());
 }
 
 
@@ -255,6 +149,7 @@ StyledEditView::Reset()
 {
 	fSuppressChanges = true;
 	SetText("");
+	fEncoding = "";
 	fSuppressChanges = false;
 }
 
@@ -272,14 +167,30 @@ StyledEditView::Select(int32 start, int32 finish)
 void
 StyledEditView::SetEncoding(uint32 encoding)
 {
-	fEncoding = encoding;
+	if (encoding == 0) {
+		fEncoding = "";
+		return;
+	}
+
+	const BCharacterSet* set = BCharacterSetRoster::GetCharacterSetByFontID(encoding);
+	if (set != NULL)
+		fEncoding = set->GetName();
+	else
+		fEncoding = "";
 }
 
 
 uint32
 StyledEditView::GetEncoding() const
 {
-	return fEncoding;
+	if (fEncoding == "")
+		return 0;
+
+	const BCharacterSet* set = BCharacterSetRoster::FindCharacterSetByName(fEncoding.String());
+	if (set != NULL)
+		return set->GetFontID();
+
+	return 0;
 }
 
 

@@ -1,18 +1,20 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef STYLED_EDIT_VIEW_H
 #define STYLED_EDIT_VIEW_H
 
 
 #include <File.h>
-#include <TextView.h>
 #include <DataIO.h>
+#include <String.h>
+#include <TextView.h>
 
 
 class StyledEditView : public BTextView {
@@ -26,7 +28,7 @@ class StyledEditView : public BTextView {
 		virtual void Reset();
 		virtual status_t GetStyledText(BPositionIO * stream);
 		virtual status_t WriteStyledEditFile(BFile * file);
-	
+
 		virtual void SetEncoding(uint32 encoding);
 		virtual uint32 GetEncoding() const;
 
@@ -39,7 +41,7 @@ class StyledEditView : public BTextView {
 		BMessage	*fChangeMessage;
 		BMessenger 	*fMessenger;
 		bool		fSuppressChanges;
-		uint32		fEncoding;
+		BString		fEncoding;
 };
 
 #endif	// STYLED_EDIT_VIEW_H
