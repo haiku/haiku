@@ -11,8 +11,8 @@
 #include <bus/ide/ide_adapter.h>
 #include <block_io.h>
 
-#define TRACE(a...) dprintf("ahci " a)
-#define FLOW(a...)	dprintf("ahci " a)
+#define TRACE(a...) dprintf("ahci: " a)
+#define FLOW(a...)	dprintf("ahci: " a)
 
 
 #define DRIVER_PRETTY_NAME		"AHCI SATA"
@@ -120,11 +120,9 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 	char *bus;
 	uint16 vendor_id;
 	uint16 device_id;
-	uint16 base_class;
-	uint16 sub_class;
-	uint16 class_api;
-	
-	FLOW("controller_supports\n");
+	uint8 base_class;
+	uint8 sub_class;
+	uint8 class_api;
 
 	// get the bus (should be PCI)
 	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK)
@@ -142,24 +140,12 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 	  || dm->get_attr_uint8(parent, PCI_DEVICE_API_ID_ITEM, &class_api, false) != B_OK)
 		return B_ERROR;
 
-	FLOW("controller_supports: checking vendor 0x%04x, device 0x%04x, base 0x%02x, sub 0x%02x, api 0x%02x\n",
-		 vendor_id, device_id, base_class, sub_class, class_api);
+	if (base_class != PCI_mass_storage || sub_class != PCI_sata || class_api != PCI_sata_ahci)
+		return 0.0f;
 
-	#define ID(v,d) (((v)<< 16) | (d))
-	switch (ID(vendor_id,device_id)) {
-		case ID(0x197b, 0x2363): //  JMicron
-			TRACE("controller_supports success, exact match\n");
-			return 0.8;
-		default:
-			break;
-	}
+	TRACE("controller found! vendor 0x%04x, device 0x%04x\n", vendor_id, device_id);
 
-	if (base_class == PCI_mass_storage && sub_class == PCI_sata && class_api == PCI_sata_ahci) {
-		TRACE("controller_supports success, class match\n");
-		return 0.6;
-	}
-
-	return 0.0;
+	return 0.8f;
 }
 
 

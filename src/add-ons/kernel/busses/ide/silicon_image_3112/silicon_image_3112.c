@@ -11,8 +11,8 @@
 #include <bus/ide/ide_adapter.h>
 #include <block_io.h>
 
-#define TRACE(a...) dprintf("si-3112 " a)
-#define FLOW(a...)	dprintf("si-3112 " a)
+#define TRACE(a...) dprintf("si-3112: " a)
+#define FLOW(a...)	dprintf("si-3112: " a)
 
 
 #define DRIVER_PRETTY_NAME		"Silicon Image SATA"
@@ -118,40 +118,37 @@ static float
 controller_supports(device_node_handle parent, bool *_noConnection)
 {
 	char *bus;
-	uint16 vendorID;
-	uint16 deviceID;
+	uint16 vendor_id;
+	uint16 device_id;
 	
-	FLOW("controller_supports\n");
-
 	// get the bus (should be PCI)
-	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
-			!= B_OK) {
+	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK)
+		return B_ERROR;
+	if (strcmp(bus, "pci") != 0) {
+		free(bus);
 		return B_ERROR;
 	}
+	free(bus);
 	
 	// get vendor and device ID
-	if (dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM,
-			&vendorID, false) != B_OK
-		|| dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM,
-			&deviceID, false) != B_OK) {
-		free(bus);
+	if (dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendor_id, false) != B_OK
+		|| dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &device_id, false) != B_OK) {
 		return B_ERROR;
 	}
 	
-	FLOW("controller_supports: checking 0x%04x 0x%04x\n", vendorID, deviceID);
 
-	// check, whether bus, vendor and device ID match
-	if (strcmp(bus, "pci") != 0
-		|| (vendorID != 0x1095)
-		|| (deviceID != 0x3112 && deviceID != 0x3114)) {
-		free(bus);
-		return 0.0;
+	#define ID(v,d) (((v)<< 16) | (d))
+	switch (ID(vendor_id, device_id)) {
+		case ID(0x1095, 0x3112):
+		case ID(0x1095, 0x3114):
+			break;
+		default:
+			return 0.0f;
 	}
 
-	TRACE("controller_supports success\n");
+	TRACE("controller found! vendor 0x%04x, device 0x%04x\n", vendor_id, device_id);
 
-	free(bus);
-	return 0.6;
+	return 0.8f;
 }
 
 
