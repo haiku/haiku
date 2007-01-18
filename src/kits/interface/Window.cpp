@@ -1455,7 +1455,7 @@ void
 BWindow::SetPulseRate(bigtime_t rate)
 {
 	// TODO: What about locking?!?
-	if (rate < 0 || rate == fPulseRate || !(rate == 0 ^ fPulseRunner == NULL))
+	if (rate < 0 || (rate == fPulseRate && !(rate == 0 ^ fPulseRunner == NULL)))
 		return;
 
 	fPulseRate = rate;
