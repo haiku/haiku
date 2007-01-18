@@ -280,8 +280,6 @@ Queue::PrintToStream()
 	dprintf("USB UHCI Queue:\n");
 	dprintf("link phy: 0x%08lx; link type: %s; terminate: %s\n", fQueueHead->link_phy & 0xfff0, fQueueHead->link_phy & 0x0002 ? "QH" : "TD", fQueueHead->link_phy & 0x0001 ? "yes" : "no");
 	dprintf("elem phy: 0x%08lx; elem type: %s; terminate: %s\n", fQueueHead->element_phy & 0xfff0, fQueueHead->element_phy & 0x0002 ? "QH" : "TD", fQueueHead->element_phy & 0x0001 ? "yes" : "no");
-	dprintf("elements:\n");
-	print_descriptor_chain(fQueueTop);
 #endif
 }
 
@@ -989,6 +987,10 @@ UHCI::ClearPortFeature(uint8 index, uint16 feature)
 
 		case C_PORT_CONNECTION:
 			WriteReg16(portRegister, portStatus | UHCI_PORTSC_STATCHA);
+			return B_OK;
+
+		case C_PORT_ENABLE:
+			WriteReg16(portRegister, portStatus | UHCI_PORTSC_ENABCHA);
 			return B_OK;
 	}
 
