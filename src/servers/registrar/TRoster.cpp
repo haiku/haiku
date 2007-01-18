@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2001-2007, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -718,20 +718,22 @@ TRoster::HandleGetAppList(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleActivateApp
-/*!	\brief Handles a ActivateApp() request.
+
+/*!	\brief Handles a _UpdateActiveApp() request.
+
+	This is sent from a BWindow when it receives a B_WINDOW_ACTIVATED message.
+
 	\param request The request message
 */
 void
-TRoster::HandleActivateApp(BMessage *request)
+TRoster::HandleUpdateActiveApp(BMessage *request)
 {
 	FUNCTION_START();
 
 	BAutolock _(fLock);
 
-	status_t error = B_OK;
-
 	// get the parameters
+	status_t error = B_OK;
 	team_id team;
 	if (request->FindInt32("team", &team) != B_OK)
 		error = B_BAD_VALUE;
@@ -739,7 +741,7 @@ TRoster::HandleActivateApp(BMessage *request)
 	// activate the app
 	if (error == B_OK) {
 		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team))
-			ActivateApp(info);
+			UpdateActiveApp(info);
 		else
 			error = B_BAD_TEAM_ID;
 	}
@@ -1223,7 +1225,7 @@ TRoster::RemoveApp(RosterAppInfo *info)
 	}
 }
 
-// ActivateApp
+
 /*!	\brief Activates the application identified by \a info.
 
 	The currently active application is deactivated and the one whose
@@ -1233,7 +1235,7 @@ TRoster::RemoveApp(RosterAppInfo *info)
 	\param info The info of the app to be activated
 */
 void
-TRoster::ActivateApp(RosterAppInfo *info)
+TRoster::UpdateActiveApp(RosterAppInfo *info)
 {
 	BAutolock _(fLock);
 
@@ -1243,6 +1245,7 @@ TRoster::ActivateApp(RosterAppInfo *info)
 		fActiveApp = NULL;
 		if (oldActiveApp)
 			_AppDeactivated(oldActiveApp);
+
 		// activate the new app
 		if (info) {
 			fActiveApp = info;
@@ -1449,7 +1452,7 @@ TRoster::_AppRemoved(RosterAppInfo *info)
 	if (info) {
 		// deactivate the app, if it was the active one
 		if (info == fActiveApp)
-			ActivateApp(NULL);
+			UpdateActiveApp(NULL);
 		// notify the watchers
 		BMessage message(B_SOME_APP_QUIT);
 		_AddMessageWatchingInfo(&message, info);

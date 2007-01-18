@@ -29,6 +29,7 @@
 #include <MenuPrivate.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
+#include <RosterPrivate.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
 #include <tracker_private.h>
@@ -905,12 +906,18 @@ FrameMoved(origin);
 				if (msg->FindBool("active", &active) == B_OK
 					&& active != fActive) {
 					fActive = active;
+					if (active) {
+						// notify registrar about the active app
+						BRoster::Private roster;
+						roster.UpdateActiveApp(be_app->Team());
+					}
+
 					WindowActivated(active);
-	
+
 					// call hook function 'WindowActivated(bool)' for all
 					// views attached to this window.
 					fTopView->_Activate(active);
-	
+
 					// we notify the input server if we are gaining or losing focus
 					// from a view which has the B_INPUT_METHOD_AWARE on a window 
 					// (de)activation

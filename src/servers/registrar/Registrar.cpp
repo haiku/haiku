@@ -1,15 +1,13 @@
-// Registrar.cpp
+/*
+ * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 
 #include "Debug.h"
-
-#include <stdio.h>
-#include <string.h>
-
-#include <Application.h>
-#include <Message.h>
-#include <OS.h>
-#include <RegistrarDefs.h>
-#include <RosterPrivate.h>
 
 #include "ClipboardHandler.h"
 #include "EventQueue.h"
@@ -21,6 +19,16 @@
 #include "Registrar.h"
 #include "ShutdownProcess.h"
 #include "TRoster.h"
+
+#include <Application.h>
+#include <Message.h>
+#include <OS.h>
+#include <RegistrarDefs.h>
+#include <RosterPrivate.h>
+
+#include <stdio.h>
+#include <string.h>
+
 
 /*!
 	\class Registrar
@@ -38,20 +46,20 @@ static const char *kEventQueueName = "timer_thread";
 //! Time interval between two roster sanity checks (1 s).
 static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 
-// constructor
+
 /*!	\brief Creates the registrar application class.
 	\param error Passed to the BApplication constructor for returning an
 		   error code.
 */
 Registrar::Registrar(status_t *error)
-		 : BServer(kRegistrarSignature, false, error),
-		   fRoster(NULL),
-		   fClipboardHandler(NULL),
-		   fMIMEManager(NULL),
-		   fEventQueue(NULL),
-		   fMessageRunnerManager(NULL),
-		   fSanityEvent(NULL),
-		   fShutdownProcess(NULL)
+	: BServer(kRegistrarSignature, false, error),
+	fRoster(NULL),
+	fClipboardHandler(NULL),
+	fMIMEManager(NULL),
+	fEventQueue(NULL),
+	fMessageRunnerManager(NULL),
+	fSanityEvent(NULL),
+	fShutdownProcess(NULL)
 {
 	FUNCTION_START();
 }
@@ -147,8 +155,8 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_GET_APP_LIST:
 			fRoster->HandleGetAppList(message);
 			break;
-		case B_REG_ACTIVATE_APP:
-			fRoster->HandleActivateApp(message);
+		case B_REG_UPDATE_ACTIVE_APP:
+			fRoster->HandleUpdateActiveApp(message);
 			break;
 		case B_REG_BROADCAST:
 			fRoster->HandleBroadcast(message);
@@ -347,7 +355,10 @@ Registrar::_HandleShutDown(BMessage *request)
 		ShutdownProcess::SendReply(request, error);
 }
 
-// main
+
+//	#pragma mark -
+
+
 /*!	\brief Creates and runs the registrar application.
 
 	The main thread is renamed.

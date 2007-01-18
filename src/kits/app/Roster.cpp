@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold (bonefish@users.sf.net)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /*!	BRoster class lets you launch apps and keeps track of apps
@@ -510,13 +511,14 @@ BRoster::GetRunningAppInfo(team_id team, app_info *info) const
 status_t
 BRoster::GetActiveAppInfo(app_info *info) const
 {
-	status_t error = (info ? B_OK : B_BAD_VALUE);
+	if (info == NULL)
+		return B_BAD_VALUE;
+
 	// compose the request message
 	BMessage request(B_REG_GET_APP_INFO);
 	// send the request
 	BMessage reply;
-	if (error == B_OK)
-		error = fMessenger.SendMessage(&request, &reply);
+	status_t error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS)
@@ -1732,7 +1734,34 @@ BRoster::_ApplicationCrashed(team_id team)
 }
 
 
-// _LaunchApp
+/*!
+	Tells the registrar which application is currently active.
+	It's called from within BWindow on B_WINDOW_ACTIVATED messages.
+*/
+status_t
+BRoster::_UpdateActiveApp(team_id team) const
+{
+	if (team < B_OK)
+		return B_BAD_TEAM_ID;
+
+	// compose the request message
+	BMessage request(B_REG_UPDATE_ACTIVE_APP);
+	status_t status = request.AddInt32("team", team);
+
+	// send the request
+	BMessage reply;
+	if (status == B_OK)
+		status = fMessenger.SendMessage(&request, &reply);
+
+	// evaluate the reply
+	if (status == B_OK && reply.what != B_REG_SUCCESS
+		&& reply.FindInt32("error", &status) != B_OK)
+		status = B_ERROR;
+
+	return status;
+}
+
+
 /*!	\brief Launches the application associated with the supplied MIME type or
 		   the entry referred to by the supplied entry_ref.
 

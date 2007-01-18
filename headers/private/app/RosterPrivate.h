@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -74,6 +74,9 @@ class BRoster::Private {
 		// needed by the debug server
 		void ApplicationCrashed(team_id team) const
 			{ fRoster->_ApplicationCrashed(team); }
+
+		void UpdateActiveApp(team_id team) const
+			{ fRoster->_UpdateActiveApp(team); }
 
 		static void InitBeRoster();
 		static void DeleteBeRoster();

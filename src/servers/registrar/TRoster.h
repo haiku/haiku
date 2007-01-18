@@ -1,44 +1,23 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		TRoster.h
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	TRoster is the incarnation of The Roster. It manages the
-//					running applications.
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright 2001-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef T_ROSTER_H
 #define T_ROSTER_H
 
-#include <hash_set>
-#include <map>
-
-#include <Locker.h>
-#include <MessageQueue.h>
-#include <SupportDefs.h>
 
 #include "AppInfoList.h"
 #include "RecentApps.h"
 #include "RecentEntries.h"
 #include "WatchingService.h"
+
+#include <Locker.h>
+#include <MessageQueue.h>
+#include <SupportDefs.h>
+
+#include <hash_set>
+#include <map>
+
 
 #if __GNUC__ >= 4
 using __gnu_cxx::hash_set;
@@ -65,7 +44,7 @@ public:
 	void HandleSetSignature(BMessage *request);
 	void HandleGetAppInfo(BMessage *request);
 	void HandleGetAppList(BMessage *request);
-	void HandleActivateApp(BMessage *request);
+	void HandleUpdateActiveApp(BMessage *request);
 	void HandleBroadcast(BMessage *request);
 	void HandleStartWatching(BMessage *request);
 	void HandleStopWatching(BMessage *request);
@@ -86,7 +65,7 @@ public:
 
 	status_t AddApp(RosterAppInfo *info);
 	void RemoveApp(RosterAppInfo *info);
-	void ActivateApp(RosterAppInfo *info);
+	void UpdateActiveApp(RosterAppInfo *info);
 
 	void CheckSanity();
 

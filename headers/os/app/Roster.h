@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -146,7 +146,7 @@ class BRoster {
 					const BList *messageList, int argc,
 					const char *const *args,
 					team_id *appTeam) const;
-		bool _UpdateActiveApp(team_id team) const;
+		status_t _UpdateActiveApp(team_id team) const;
 		void _SetAppFlags(team_id team, uint32 flags) const;
 		void _DumpRoster() const;
 		status_t _ResolveApp(const char *inType, entry_ref *ref, entry_ref *appRef,
