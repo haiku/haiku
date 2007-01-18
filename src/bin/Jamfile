@@ -76,6 +76,7 @@ StdBinCommands
 	beep.cpp
 	clipboard.cpp
 	df.cpp
+	dpms.cpp
 	draggers.cpp
 	dstcheck.cpp
 #	factor.cpp
