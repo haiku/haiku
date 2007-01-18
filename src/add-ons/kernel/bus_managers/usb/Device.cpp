@@ -20,16 +20,14 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 		fSpeed(speed),
 		fDeviceAddress(deviceAddress)
 {
-	TRACE(("USB Device: new device\n"));
+	TRACE(("USB Device %d: creating device\n", fDeviceAddress));
 
 	fDefaultPipe = new(std::nothrow) ControlPipe(this, deviceAddress, 0,
 		fSpeed, fDeviceDescriptor.max_packet_size_0);
 	if (!fDefaultPipe) {
-		TRACE_ERROR(("USB Device: could not allocate default pipe\n"));
+		TRACE_ERROR(("USB Device %d: could not allocate default pipe\n", fDeviceAddress));
 		return;
 	}
-
-	fMaxPacketIn[0] = fMaxPacketOut[0] = fDeviceDescriptor.max_packet_size_0; 
 
 	// Get the device descriptor
 	// We already have a part of it, but we want it all
@@ -38,7 +36,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 		(void *)&fDeviceDescriptor, sizeof(fDeviceDescriptor), &actualLength);
 
 	if (status < B_OK || actualLength != sizeof(fDeviceDescriptor)) {
-		TRACE_ERROR(("USB Device: error while getting the device descriptor\n"));
+		TRACE_ERROR(("USB Device %d: error while getting the device descriptor\n", fDeviceAddress));
 		return;
 	}
 
@@ -62,7 +60,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	fConfigurations = (usb_configuration_info *)malloc(
 		fDeviceDescriptor.num_configurations * sizeof(usb_configuration_info));
 	if (fConfigurations == NULL) {
-		TRACE_ERROR(("USB Device: out of memory during config creations!\n"));
+		TRACE_ERROR(("USB Device %d: out of memory during config creations!\n", fDeviceAddress));
 		return;
 	}
 
@@ -77,7 +75,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 			return;
 		}
 
-		TRACE(("USB Device %d: configuration %d\n", fDeviceAddress, i));
+		TRACE(("USB Device %d: configuration %ld\n", fDeviceAddress, i));
 		TRACE(("\tlength:..............%d\n", configDescriptor.length));
 		TRACE(("\tdescriptor_type:.....0x%02x\n", configDescriptor.descriptor_type));
 		TRACE(("\ttotal_length:........%d\n", configDescriptor.total_length));
@@ -263,11 +261,11 @@ Device::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 		USB_REQUEST_GET_DESCRIPTOR,							// request
 		(descriptorType << 8) | index,						// value
 		languageID,											// index
-		dataLength,											// length										
+		dataLength,											// length
 		data,												// buffer
 		dataLength,											// buffer length
 		actualLength);										// actual length
-}			
+}
 
 
 const usb_configuration_info *
@@ -320,7 +318,7 @@ Device::SetConfigurationAt(uint8 index)
 		USB_REQUEST_SET_CONFIGURATION,						// request
 		fConfigurations[index].descr->configuration_value,	// value
 		0,													// index
-		0,													// length										
+		0,													// length
 		NULL,												// buffer
 		0,													// buffer length
 		NULL);												// actual length
@@ -388,7 +386,7 @@ Device::Unconfigure(bool atDeviceLevel)
 			USB_REQUEST_SET_CONFIGURATION,					// request
 			0,												// value
 			0,												// index
-			0,												// length										
+			0,												// length
 			NULL,											// buffer
 			0,												// buffer length
 			NULL);											// actual length
@@ -404,7 +402,7 @@ Device::Unconfigure(bool atDeviceLevel)
 
 	usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[0].active;
 	for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
-		usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];		
+		usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
 		delete (Pipe *)GetStack()->GetObject(endpoint->handle);
 		endpoint->handle = 0;
 	}
@@ -426,11 +424,7 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
 	usb_driver_cookie **cookies, bool added)
 {
-	TRACE(("USB Device ReportDevice\n"));
-	if ((added && hooks->device_added == NULL)
-		|| (!added && hooks->device_removed == NULL))
-		return B_BAD_VALUE;
-
+	TRACE(("USB Device %d: reporting device\n", fDeviceAddress));
 	bool supported = false;
 	if (supportDescriptorCount == 0 || supportDescriptors == NULL)
 		supported = true;
@@ -441,7 +435,7 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 			|| (supportDescriptors[i].product != 0
 			&& fDeviceDescriptor.product_id != supportDescriptors[i].product))
 			continue;
- 
+
 		if ((supportDescriptors[i].dev_class == 0
 			|| fDeviceDescriptor.device_class == supportDescriptors[i].dev_class)
 			&& (supportDescriptors[i].dev_subclass == 0
@@ -469,17 +463,26 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 		}
 	}
 
-	if (supported) {
-		usb_id id = USBID();
-		if (added) {
-			usb_driver_cookie *cookie = new(std::nothrow) usb_driver_cookie;
-			status_t result = hooks->device_added(id, &cookie->cookie);
+	if (!supported)
+		return B_UNSUPPORTED;
+
+	if ((added && hooks->device_added == NULL)
+		|| (!added && hooks->device_removed == NULL)) {
+		// hooks are not installed, but report success to indicate that
+		// the driver supports the device
+		return B_OK;
+	}
+
+	usb_id id = USBID();
+	if (added) {
+		usb_driver_cookie *cookie = new(std::nothrow) usb_driver_cookie;
+		if (hooks->device_added(id, &cookie->cookie) >= B_OK) {
 			cookie->device = id;
 			cookie->link = *cookies;
 			*cookies = cookie;
-			return result;
-		}
-
+		} else
+			delete cookie;
+	} else {
 		usb_driver_cookie **pointer = cookies;
 		usb_driver_cookie *cookie = *cookies;
 		while (cookie) {
@@ -489,15 +492,18 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 			cookie = cookie->link;
 		}
 
-		if (cookie) {
-			hooks->device_removed(cookie->cookie);
-			*pointer = cookie->link;
-			delete cookie;
+		if (!cookie) {
+			// the device is supported, but there is no cookie. this most
+			// probably means that the device_added hook above failed.
 			return B_OK;
 		}
+
+		hooks->device_removed(cookie->cookie);
+		*pointer = cookie->link;
+		delete cookie;
 	}
 
-	return B_UNSUPPORTED;
+	return B_OK;
 }
 
 

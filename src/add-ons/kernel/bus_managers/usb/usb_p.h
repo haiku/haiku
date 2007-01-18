@@ -15,7 +15,6 @@
 #include "BeOSCompatibility.h"
 
 
-//#define TRACE_USB
 #ifdef TRACE_USB
 #define TRACE(x)		dprintf x
 #define TRACE_ERROR(x)	dprintf x
@@ -135,7 +134,6 @@ static	int32							ExploreThread(void *data);
 		bool							fStopThreads;
 
 		benaphore						fLock;
-		benaphore						fExploreLock;
 		PhysicalMemoryAllocator			*fAllocator;
 
 		uint32							fObjectIndex;
@@ -149,7 +147,7 @@ static	int32							ExploreThread(void *data);
 /*
  * This class manages a bus. It is created by the Stack object
  * after a host controller gives positive feedback on whether the hardware
- * is found. 
+ * is found.
  */
 class BusManager {
 public:
@@ -162,8 +160,11 @@ virtual	status_t						InitCheck();
 		void							Unlock();
 
 		int8							AllocateAddress();
-		Device							*AllocateNewDevice(Hub *parent,
+		void							FreeAddress(int8 address);
+
+		Device							*AllocateDevice(Hub *parent,
 											usb_speed speed);
+		void							FreeDevice(Device *device);
 
 virtual	status_t						Start();
 virtual	status_t						Stop();
@@ -185,7 +186,10 @@ private:
 		ControlPipe 					*_GetDefaultPipe(usb_speed);
 
 		benaphore						fLock;
+
 		bool							fDeviceMap[128];
+		int8							fDeviceIndex;
+
 		ControlPipe						*fDefaultPipes[USB_SPEED_MAX + 1];
 		Hub								*fRootHub;
 		Object							*fRootObject;
@@ -410,6 +414,7 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 											void *data, size_t dataLength,
 											size_t *actualLength);
 
+		int8							DeviceAddress() const { return fDeviceAddress; };
 		const usb_device_descriptor		*DeviceDescriptor() const;
 
 		const usb_configuration_info	*Configuration() const;
@@ -442,8 +447,6 @@ private:
 		usb_configuration_info			*fCurrentConfiguration;
 		usb_speed						fSpeed;
 		int8							fDeviceAddress;
-		size_t							fMaxPacketIn[16];
-		size_t							fMaxPacketOut[16];
 		ControlPipe						*fDefaultPipe;
 };
 
@@ -454,6 +457,10 @@ public:
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
 											usb_speed speed);
+virtual									~Hub();
+
+		bool							Lock();
+		void							Unlock();
 
 virtual	uint32							Type() { return USB_OBJECT_DEVICE | USB_OBJECT_HUB; };
 
@@ -480,6 +487,8 @@ virtual	status_t						BuildDeviceName(char *string,
 											Device *device);
 
 private:
+		benaphore						fLock;
+
 		InterruptPipe					*fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 

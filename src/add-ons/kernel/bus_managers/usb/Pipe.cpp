@@ -41,7 +41,7 @@ Pipe::SubmitTransfer(Transfer *transfer)
 status_t
 Pipe::CancelQueuedTransfers()
 {
-	TRACE_ERROR(("Pipe: cancelling transfers is not implemented!\n"));
+	TRACE_ERROR(("USB Pipe: cancelling transfers is not implemented!\n"));
 	return B_ERROR;
 }
 
@@ -120,7 +120,7 @@ InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 	transfer->SetData((uint8 *)data, dataLength);
 	transfer->SetCallback(callback, callbackCookie);
 
-	status_t result = SubmitTransfer(transfer);
+	status_t result = GetBusManager()->SubmitTransfer(transfer);
 	if (result < B_OK)
 		delete transfer;
 	return result;
@@ -151,7 +151,7 @@ BulkPipe::QueueBulk(void *data, size_t dataLength, usb_callback_func callback,
 	transfer->SetData((uint8 *)data, dataLength);
 	transfer->SetCallback(callback, callbackCookie);
 
-	status_t result = SubmitTransfer(transfer);
+	status_t result = GetBusManager()->SubmitTransfer(transfer);
 	if (result < B_OK)
 		delete transfer;
 	return result;
@@ -169,7 +169,7 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 	transfer->SetVector(vector, vectorCount);
 	transfer->SetCallback(callback, callbackCookie);
 
-	status_t result = SubmitTransfer(transfer);
+	status_t result = GetBusManager()->SubmitTransfer(transfer);
 	if (result < B_OK)
 		delete transfer;
 	return result;
@@ -261,7 +261,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	size_t *actualLength)
 {
 	transfer_result_data transferResult;
-	transferResult.notify_sem = create_sem(0, "Send Request Notify Sem");
+	transferResult.notify_sem = create_sem(0, "usb send request notify");
 	if (transferResult.notify_sem < B_OK)
 		return B_NO_MORE_SEMS;
 
@@ -272,11 +272,21 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 		return result;
 	}
 
-	// the sem will be released in the callback after
-	// the result data was filled into the provided struct
-	acquire_sem(transferResult.notify_sem);
-	delete_sem(transferResult.notify_sem);
+	// the sem will be released in the callback after the result data was
+	// filled into the provided struct. use a 5 seconds timeout to avoid
+	// hanging applications.
+	if (acquire_sem_etc(transferResult.notify_sem, 1, B_RELATIVE_TIMEOUT, 5000000) < B_OK) {
+		TRACE_ERROR(("USB ControlPipe: timeout waiting for queued request to complete\n"));
 
+		delete_sem(transferResult.notify_sem);
+		if (actualLength)
+			*actualLength = 0;
+
+		// ToDo: cancel the transfer at the bus manager
+		return B_TIMED_OUT;
+	}
+
+	delete_sem(transferResult.notify_sem);
 	if (actualLength)
 		*actualLength = transferResult.actual_length;
 
@@ -320,7 +330,7 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	transfer->SetData((uint8 *)data, dataLength);
 	transfer->SetCallback(callback, callbackCookie);
 
-	status_t result = SubmitTransfer(transfer);
+	status_t result = GetBusManager()->SubmitTransfer(transfer);
 	if (result < B_OK)
 		delete transfer;
 	return result;

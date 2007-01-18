@@ -41,11 +41,11 @@ struct memory_chunk
 
 struct usb_request_data
 {
-	uint8   RequestType; 
-	uint8   Request; 
-	uint16  Value; 
-	uint16  Index; 
-	uint16  Length; 
+	uint8   RequestType;
+	uint8   Request;
+	uint16  Value;
+	uint16  Index;
+	uint16  Length;
 };
 
 
