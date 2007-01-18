@@ -20,7 +20,7 @@
 
 const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
 
-const char *openWith = kTrackerSignature;
+const char *openWith = NULL;
 
 
 status_t OpenFile(BEntry &entry, int32 line=-1, int32 col=-1)
@@ -29,7 +29,7 @@ status_t OpenFile(BEntry &entry, int32 line=-1, int32 col=-1)
 	entry_ref ref;
 	entry.GetRef(&ref);
 
-	BMessenger target(openWith);
+	BMessenger target(openWith?openWith:kTrackerSignature);
 	if (target.IsValid()) {
 		BMessage message(B_REFS_RECEIVED);
 		message.AddRef("refs", &ref);
@@ -89,7 +89,7 @@ main(int argc, char **argv)
 				mimeType.Append(arg, arg.FindFirst(":"));
 
 			char *args[2] = { *argv, NULL };
-			status = be_roster->Launch(mimeType.String(), 1, args);
+			status = be_roster->Launch(openWith?openWith:mimeType.String(), 1, args);
 			if (status == B_OK)
 				continue;
 			
