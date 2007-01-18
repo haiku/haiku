@@ -41,36 +41,7 @@ All rights reserved.
 #include <Window.h>
 
 
-class TTeamGroup {
-	public:
-		TTeamGroup();
-		TTeamGroup(BList *teams, uint32 flags, char *name, const char *sig);
-		virtual ~TTeamGroup();
-
-		void Draw(BView *, BRect bounds, bool main);
-
-		BList *TeamList() const
-			{ return fTeams; }
-		const char *Name() const
-			{ return fName; }
-		const char *Signature() const
-			{ return fSignature; }
-		uint32 Flags() const
-			{ return fFlags; }
-		const BBitmap *SmallIcon() const
-			{ return fSmallIcon; }
-		const BBitmap *LargeIcon() const
-			{ return fLargeIcon; }
-
-	private:
-		BList *fTeams;
-		uint32 fFlags;
-		char fSignature[B_MIME_TYPE_LENGTH];
-		char *fName;
-		BBitmap	*fSmallIcon;
-		BBitmap	*fLargeIcon;
-};
-
+class TTeamGroup;
 class TIconView;
 class TBox;
 class TWindowView;
@@ -97,9 +68,6 @@ class TSwitchManager : public BHandler {
 		void CycleWindow(bool forward, bool wrap = true);	
 		void SwitchToApp(int32 prevIndex, int32 newIndex, bool forward);	
 
-		void Touch(bool zero = false);
-		bigtime_t IdleTime();
-
 		window_info *WindowInfo(int32 groupIndex, int32 wdIndex);
 		int32 CountWindows(int32 groupIndex, bool inCurrentWorkspace = false);
 		TTeamGroup *FindTeam(team_id, int32 *index);
@@ -121,146 +89,6 @@ class TSwitchManager : public BHandler {
 		int32 fCurrentWindow;
 		int32 fCurrentSlot;
 		int32 fWindowID;
-		bigtime_t fLastActivity;
 };
-
-class TSwitcherWindow : public BWindow {
-	public:
-		TSwitcherWindow(BRect frame, TSwitchManager *mgr);
-		virtual	~TSwitcherWindow();
-
-		virtual	bool QuitRequested();
-		virtual void DispatchMessage(BMessage *message, BHandler *target);
-		virtual void MessageReceived(BMessage *message);
-		virtual	void Show();
-		virtual	void Hide();
-		virtual void WindowActivated(bool state);
-
-		void DoKey(uint32 key, uint32 mods);
-		TIconView *IconView();
-		TWindowView *WindowView();
-		TBox *TopView();
-		bool HairTrigger();
-		void Update(int32 previous, int32 current, int32 prevSlot,
-			int32 currentSlot, bool forward);
-		int32 SlotOf(int32);
-		void Redraw(int32 index);
-
-	private:
-		TSwitchManager *fManager;
-		TIconView *fIconView;
-		TBox *fTopView;
-		TWindowView *fWindowView;
-		bool fHairTrigger;
-};
-
-class TWindowView : public BView {
-	public:
-		TWindowView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcher);
-
-		void UpdateGroup(int32 groupIndex, int32 windowIndex);
-
-		virtual void AttachedToWindow();
-		virtual	void Draw(BRect update);
-		virtual	void Pulse();
-		virtual	void GetPreferredSize(float *w, float *h);
-		void ScrollTo(float x, float y)
-			{ ScrollTo(BPoint(x,y)); }
-		virtual	void ScrollTo(BPoint where);
-
-		void ShowIndex(int32 windex);
-		BRect FrameOf(int32 index) const;
-
-	private:
-		int32 fCurrentToken;
-		float fItemHeight;
-		TSwitcherWindow	*fSwitcher;
-		TSwitchManager *fManager;
-		bool fLocal;
-};
-
-class TIconView : public BView {
-	public:
-		TIconView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcher);
-		~TIconView();
-
-		void Showing();
-		void Hiding();
-
-		virtual void KeyDown(const char *bytes, int32 numBytes);
-		virtual	void Pulse();
-		virtual	void MouseDown(BPoint );
-		virtual	void Draw(BRect );
-
-		void ScrollTo(float x, float y)
-			{ ScrollTo(BPoint(x,y)); }
-		virtual	void ScrollTo(BPoint where);
-		void Update(int32 previous, int32 current, int32 previousSlot,
-			int32 currentSlot, bool forward);
-		void DrawTeams(BRect update);
-		int32 SlotOf(int32) const;
-		BRect FrameOf(int32) const;
-		int32 ItemAtPoint(BPoint) const;
-		int32 IndexAt(int32 slot) const;
-		void CenterOn(int32 index);
-
-	private:
-		void CacheIcons(TTeamGroup *);
-		void AnimateIcon(BBitmap *startIcon, BBitmap *endIcon);
-
-		bool fAutoScrolling;
-		bool fCapsState;
-		TSwitcherWindow	*fSwitcher;
-		TSwitchManager *fManager;
-		BBitmap	*fOffBitmap;
-		BView *fOffView;
-		BBitmap	*fCurrentSmall;
-		BBitmap	*fCurrentLarge;
-};
-
-class TBox : public BBox {
-	public:
-		TBox(BRect bounds, TSwitchManager *manager, TSwitcherWindow *, TIconView *iconView);
-
-		virtual void Draw(BRect update);
-		virtual void AllAttached();
-		virtual	void DrawIconScrollers(bool force);
-		virtual	void DrawWindowScrollers(bool force);
-		virtual	void MouseDown(BPoint where);
-
-	private:
-		TSwitchManager *fManager;
-		TSwitcherWindow	*fWindow;
-		TIconView *fIconView;
-		BRect fCenter;
-		bool fLeftScroller;
-		bool fRightScroller;
-		bool fUpScroller;
-		bool fDownScroller;
-};
-
-inline int32
-TSwitcherWindow::SlotOf(int32 i)
-{
-	return fIconView->SlotOf(i);
-}
-
-inline TIconView *
-TSwitcherWindow::IconView()
-{
-	return fIconView;
-}
-
-inline TWindowView *
-TSwitcherWindow::WindowView()
-{
-	return fWindowView;
-}
-
-inline void
-TSwitchManager::Touch(bool zero)
-{
-	fLastActivity = zero ? 0 : system_time();
-}
 
 #endif	/* SWITCHER_H */

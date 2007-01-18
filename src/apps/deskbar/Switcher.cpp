@@ -32,7 +32,13 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#define _ALLOW_STICKY_ 0
+
+#include "tracker_private.h"
+#include "BarApp.h"
+#include "Switcher.h"
+#include "ResourceSet.h"
+#include "WindowMenuItem.h"
+#include "icons.h"
 
 #include <Bitmap.h>
 #include <Debug.h>
@@ -48,23 +54,176 @@ All rights reserved.
 #include <stdlib.h>
 #include <float.h>
 
-#include "tracker_private.h"
-#include "BarApp.h"
-#include "Switcher.h"
-#include "ResourceSet.h"
-#include "WindowMenuItem.h"
-#include "icons.h"
 
-static bool IsKeyDown(int32 key);
-static bool OKToUse(const TTeamGroup *);
-static bool IsWindowOK(const window_info *);
-static int SmartStrcmp(const char *s1, const char *s2);
+#define _ALLOW_STICKY_ 0
+	// allows you to press 's' to keep the switcher window on screen
 
 #if __HAIKU__
 	static const color_space kIconFormat = B_RGBA32;
 #else
 	static const color_space kIconFormat = B_CMAP8;
 #endif
+
+
+class TTeamGroup {
+	public:
+		TTeamGroup();
+		TTeamGroup(BList *teams, uint32 flags, char *name, const char *sig);
+		virtual ~TTeamGroup();
+
+		void Draw(BView *, BRect bounds, bool main);
+
+		BList *TeamList() const
+			{ return fTeams; }
+		const char *Name() const
+			{ return fName; }
+		const char *Signature() const
+			{ return fSignature; }
+		uint32 Flags() const
+			{ return fFlags; }
+		const BBitmap *SmallIcon() const
+			{ return fSmallIcon; }
+		const BBitmap *LargeIcon() const
+			{ return fLargeIcon; }
+
+	private:
+		BList *fTeams;
+		uint32 fFlags;
+		char fSignature[B_MIME_TYPE_LENGTH];
+		char *fName;
+		BBitmap	*fSmallIcon;
+		BBitmap	*fLargeIcon;
+};
+
+class TSwitcherWindow : public BWindow {
+	public:
+		TSwitcherWindow(BRect frame, TSwitchManager *mgr);
+		virtual	~TSwitcherWindow();
+
+		virtual	bool QuitRequested();
+		virtual void MessageReceived(BMessage *message);
+		virtual	void Show();
+		virtual	void Hide();
+		virtual void WindowActivated(bool state);
+
+		void DoKey(uint32 key, uint32 mods);
+		TIconView *IconView();
+		TWindowView *WindowView();
+		TBox *TopView();
+		bool HairTrigger();
+		void Update(int32 previous, int32 current, int32 prevSlot,
+			int32 currentSlot, bool forward);
+		int32 SlotOf(int32);
+		void Redraw(int32 index);
+
+	private:
+		TSwitchManager *fManager;
+		TIconView *fIconView;
+		TBox *fTopView;
+		TWindowView *fWindowView;
+		bool fHairTrigger;
+		bool fSkipKeyRepeats;
+};
+
+class TWindowView : public BView {
+	public:
+		TWindowView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcher);
+
+		void UpdateGroup(int32 groupIndex, int32 windowIndex);
+
+		virtual void AttachedToWindow();
+		virtual	void Draw(BRect update);
+		virtual	void Pulse();
+		virtual	void GetPreferredSize(float *w, float *h);
+		void ScrollTo(float x, float y)
+			{ ScrollTo(BPoint(x,y)); }
+		virtual	void ScrollTo(BPoint where);
+
+		void ShowIndex(int32 windex);
+		BRect FrameOf(int32 index) const;
+
+	private:
+		int32 fCurrentToken;
+		float fItemHeight;
+		TSwitcherWindow	*fSwitcher;
+		TSwitchManager *fManager;
+		bool fLocal;
+};
+
+class TIconView : public BView {
+	public:
+		TIconView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcher);
+		~TIconView();
+
+		void Showing();
+		void Hiding();
+
+		virtual void KeyDown(const char *bytes, int32 numBytes);
+		virtual	void Pulse();
+		virtual	void MouseDown(BPoint );
+		virtual	void Draw(BRect );
+
+		void ScrollTo(float x, float y)
+			{ ScrollTo(BPoint(x,y)); }
+		virtual	void ScrollTo(BPoint where);
+		void Update(int32 previous, int32 current, int32 previousSlot,
+			int32 currentSlot, bool forward);
+		void DrawTeams(BRect update);
+		int32 SlotOf(int32) const;
+		BRect FrameOf(int32) const;
+		int32 ItemAtPoint(BPoint) const;
+		int32 IndexAt(int32 slot) const;
+		void CenterOn(int32 index);
+
+	private:
+		void CacheIcons(TTeamGroup *);
+		void AnimateIcon(BBitmap *startIcon, BBitmap *endIcon);
+
+		bool fAutoScrolling;
+		bool fCapsState;
+		TSwitcherWindow	*fSwitcher;
+		TSwitchManager *fManager;
+		BBitmap	*fOffBitmap;
+		BView *fOffView;
+		BBitmap	*fCurrentSmall;
+		BBitmap	*fCurrentLarge;
+};
+
+class TBox : public BBox {
+	public:
+		TBox(BRect bounds, TSwitchManager *manager, TSwitcherWindow *, TIconView *iconView);
+
+		virtual void Draw(BRect update);
+		virtual void AllAttached();
+		virtual	void DrawIconScrollers(bool force);
+		virtual	void DrawWindowScrollers(bool force);
+		virtual	void MouseDown(BPoint where);
+
+	private:
+		TSwitchManager *fManager;
+		TSwitcherWindow	*fWindow;
+		TIconView *fIconView;
+		BRect fCenter;
+		bool fLeftScroller;
+		bool fRightScroller;
+		bool fUpScroller;
+		bool fDownScroller;
+};
+
+
+const int32 kHorizontalMargin = 11;
+const int32 kVerticalMargin = 10;
+
+// SLOT_SIZE must be divisible by 4. That's because of the scrolling
+// animation. If this needs to change then look at TIconView::Update()
+
+const int32 kSlotSize = 36;
+const int32 kScrollStep = kSlotSize / 2;
+const int32 kNumSlots = 7;
+const int32 kCenterSlot = 3;
+
+
+//	#pragma mark -
 
 
 static int32
@@ -98,6 +257,89 @@ IsVisibleInCurrentWorkspace(const window_info *windowInfo)
 	 layer < 2 : hidden (0) and non workspace visible window (1)
 	*/
 	return windowInfo->layer > 2;
+}
+
+
+bool
+IsKeyDown(int32 key)
+{
+	key_info keyInfo;
+
+	get_key_info(&keyInfo);
+	return (keyInfo.key_states[key >> 3] & (1 << ((7 - key) & 7))) != 0;
+}
+
+
+bool
+IsWindowOK(const window_info *windowInfo)
+{
+	// is_mini (true means that the window is minimized).
+	// if not, then 
+	// show_hide >= 1 means that the window is hidden.
+	//
+	// If the window is both minimized and hidden, then you get :
+	//	 TWindow->is_mini = false;
+	//	 TWindow->was_mini = true;
+	//	 TWindow->show_hide >= 1;
+
+	if (windowInfo->w_type != _STD_W_TYPE_)
+		return false;
+
+	if (windowInfo->is_mini)
+		return true;
+
+	return windowInfo->show_hide_level <= 0;
+}
+
+
+bool
+OKToUse(const TTeamGroup *teamGroup)
+{
+	if (!teamGroup)
+		return false;
+
+	// skip background applications
+	if ((teamGroup->Flags() & B_BACKGROUND_APP) != 0)
+		return false;
+
+	// skip the Deakbar itself
+	if (strcasecmp(teamGroup->Signature(), kDeskbarSignature) == 0)
+		return false;
+
+	return true;
+}
+
+
+int
+SmartStrcmp(const char *s1, const char *s2)
+{
+	if (strcasecmp(s1, s2) == 0)
+		return 0;
+		
+	// if the strings on differ in spaces or underscores they still match
+	while (*s1 && *s2) {
+		if ((*s1 == ' ') || (*s1 == '_')) {
+			s1++;
+			continue;
+		}
+		if ((*s2 == ' ') || (*s2 == '_')) {
+			s2++;
+			continue;
+		}
+		if (*s1 != *s2)
+			return 1;		// they differ
+		s1++;
+		s2++;
+	}
+
+	// if one of the strings ended before the other
+	// ??? could process trailing spaces & underscores!
+	if (*s1)
+		return 1;
+	if (*s2)
+		return 1;
+
+	return 0;
 }
 
 
@@ -160,12 +402,12 @@ TTeamGroup::Draw(BView *view, BRect bounds, bool main)
 	if (main) {
 		rect = fLargeIcon->Bounds();
 		rect.OffsetTo(bounds.LeftTop());
-		rect.OffsetBy(2,2);
+		rect.OffsetBy(2, 2);
 		view->DrawBitmap(fLargeIcon, rect);
 	} else {
 		rect = fSmallIcon->Bounds();
 		rect.OffsetTo(bounds.LeftTop());
-		rect.OffsetBy(10,10);
+		rect.OffsetBy(10, 10);
 		view->DrawBitmap(fSmallIcon, rect);
 	}
 }
@@ -173,16 +415,6 @@ TTeamGroup::Draw(BView *view, BRect bounds, bool main)
 
 //	#pragma mark -
 
-const int32 kHorizontalMargin = 11;
-const int32 kVerticalMargin = 10;
-
-// SLOT_SIZE must be divisible by 4. That's because of the scrolling
-// animation. If this needs to change then look at TIconView::Update()
-
-const int32 kSlotSize = 36;
-const int32 kScrollStep = kSlotSize / 2;
-const int32 kNumSlots = 7;
-const int32 kCenterSlot = 3;
 
 TSwitchManager::TSwitchManager(BPoint point)
 	: BHandler("SwitchManager"),
@@ -192,8 +424,7 @@ TSwitchManager::TSwitchManager(BPoint point)
 	fGroupList(10),
 	fCurrentIndex(0),
 	fCurrentSlot(0),
-	fWindowID(-1),
-	fLastActivity(0)
+	fWindowID(-1)
 {
 	BRect rect(point.x, point.y,
 		point.x + (kSlotSize * kNumSlots) - 1 + (2 * kHorizontalMargin),
@@ -237,8 +468,6 @@ TSwitchManager::~TSwitchManager()
 void
 TSwitchManager::MessageReceived(BMessage *message)
 {
-	status_t err;
-
 	switch (message->what) {
 		case B_SOME_APP_QUIT:
 		{
@@ -296,7 +525,7 @@ TSwitchManager::MessageReceived(BMessage *message)
 			}
 
 			TTeamGroup *tinfo = new TTeamGroup(teams, flags, strdup(name), signature);
-			
+
 			fGroupList.AddItem(tinfo);
 			if (OKToUse(tinfo)) 
 				fWindow->Redraw(fGroupList.CountItems() - 1);
@@ -307,7 +536,7 @@ TSwitchManager::MessageReceived(BMessage *message)
 		case msg_AddTeam:
 		{
 			const char *signature = message->FindString("sig");
-			team_id team = message->FindInt32("team");			
+			team_id team = message->FindInt32("team");
 
 			int32 numItems = fGroupList.CountItems();
 			for (int32 i = 0; i < numItems; i++) {
@@ -351,18 +580,18 @@ TSwitchManager::MessageReceived(BMessage *message)
 			if (time < fSkipUntil)
 				break;
 
-			err = acquire_sem_etc(fMainMonitor, 1, B_TIMEOUT, 0);
-			if (err != B_OK) {
+			status_t status = acquire_sem_etc(fMainMonitor, 1, B_TIMEOUT, 0);
+			if (status != B_OK) {
 				if (!fWindow->IsHidden() && !fBlock) {
 					// Want to skip TASK msgs posted before the window
 					// was made visible. Better UI feel if we do this.
 					if (time > fSkipUntil) {
-						uint32	mods;
-						message->FindInt32("modifiers", (int32 *)&mods);
-						Process((mods & B_SHIFT_KEY) == 0, (mods & B_OPTION_KEY) != 0);
+						uint32 modifiers;
+						message->FindInt32("modifiers", (int32 *)&modifiers);
+						Process((modifiers & B_SHIFT_KEY) == 0, (modifiers & B_OPTION_KEY) != 0);
 					}
 				}
-			} else 
+			} else
 				MainEntry(message);
 
 			break;
@@ -390,7 +619,6 @@ TSwitchManager::MainEntry(BMessage *message)
 
 	int32 index;
 	fCurrentIndex = (FindTeam(appInfo.team, &index) != NULL) ? index : 0;
-
 	int32 key;
 	message->FindInt32("key", (int32 *)&key);
 
@@ -448,7 +676,6 @@ TSwitchManager::Process(bool forward, bool byWindow)
 		hidden = fWindow->IsHidden();
 		fWindow->Unlock();
 	}
-
 	if (byWindow) {
 		// If hidden we need to get things started by switching to correct app
 		if (hidden)
@@ -606,9 +833,9 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 	// anymore then get info about first window. If that doesn't exist then
 	// do nothing.
 	window_info	*windowInfo = WindowInfo(fCurrentIndex, fCurrentWindow);
-	if (!windowInfo) {
+	if (windowInfo == NULL) {
 		windowInfo = WindowInfo(fCurrentIndex, 0);
-		if (!windowInfo)
+		if (windowInfo == NULL)
 			return false;
 	}
 
@@ -621,19 +848,19 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 			do_window_action(windowInfo->id, B_BRING_TO_FRONT,
 				BRect(0, 0, 0, 0), false);
 		
-		if (!forceShow && windowInfo->is_mini)
+		if (!forceShow && windowInfo->is_mini) {
 			// we aren't unhiding minimized windows, so we can't do
 			// anything here
 			result = false;
-		else if (!allowWorkspaceSwitch
-			&& (windowInfo->workspaces & (1 << currentWorkspace)) == 0)
+		} else if (!allowWorkspaceSwitch
+			&& (windowInfo->workspaces & (1 << currentWorkspace)) == 0) {
 			// we're not supposed to switch workspaces so abort.
 			result = false;
-		else {
+		} else {
 			result = true;
 			be_roster->ActivateApp((team_id)teamGroup->TeamList()->ItemAt(0));
 		}
-		
+
 		ASSERT(windowInfo);
 		free(windowInfo);
 		return result;
@@ -763,12 +990,12 @@ TSwitchManager::WindowInfo(int32 groupIndex, int32 windowIndex)
 	TTeamGroup *teamGroup = (TTeamGroup *) fGroupList.ItemAt(groupIndex);
 	if (!teamGroup)
 		return NULL;
-	
+
 	int32 tokenCount;
 	int32 *tokens = get_token_list(-1, &tokenCount);
 	if (!tokens)
 		return NULL;
-	
+
 	int32 matches = 0;
 
 	// Want to find the "windowIndex'th" window in window order that belongs
@@ -855,10 +1082,10 @@ TSwitchManager::SwitchWindow(team_id team, bool, bool activate)
 	int32 index;
 	TTeamGroup*teamGroup = FindTeam(team, &index);
 
-	// cycle through the window in the active application
+	// cycle through the windows in the active application
 	int32 count;
 	int32 *tokens = get_token_list(-1, &count);
-	for (int32 i = count-1; i>=0; i--) {
+	for (int32 i = count-1; i >= 0; i--) {
 		window_info	*windowInfo;
 		windowInfo = get_window_info(tokens[i]);
 		if (windowInfo && IsVisibleInCurrentWorkspace(windowInfo)
@@ -912,19 +1139,12 @@ TSwitchManager::GroupList()
 }
 
 
-bigtime_t
-TSwitchManager::IdleTime()
-{
-	return system_time() - fLastActivity;
-}
-
-
 //	#pragma mark -
 
 
 TBox::TBox(BRect bounds, TSwitchManager *manager, TSwitcherWindow *window,
 	TIconView *iview)
-	: BBox(bounds, "top", B_FOLLOW_NONE, B_WILL_DRAW, B_PLAIN_BORDER),
+	: BBox(bounds, "top", B_FOLLOW_NONE, B_WILL_DRAW, B_NO_BORDER),
 	fManager(manager),
 	fWindow(window),
 	fIconView(iview),
@@ -1288,29 +1508,20 @@ TSwitcherWindow::~TSwitcherWindow()
 }
 
 
-
-void
-TSwitcherWindow::DispatchMessage(BMessage *message, BHandler *handler)
-{
-	if (message->what == B_KEY_DOWN) {
-		// large timeout - effective kills key repeats
-		if (fManager->IdleTime() < 10000000)
-			return;
-
-		fManager->Touch();
-	} else if (message->what == B_KEY_UP) 
-		fManager->Touch(true);
-
-	BWindow::DispatchMessage(message, handler);
-}
-
-
 void
 TSwitcherWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_KEY_DOWN:
 		{
+			int32 repeats = 0;
+			if (message->FindInt32("be:key_repeat", &repeats) == B_OK
+				&& (fSkipKeyRepeats || (repeats % 6) != 0))
+				break;
+
+			// The first actual key press let's us listening to repeated keys			
+			fSkipKeyRepeats = false;
+
 			uint32 rawChar;
 			uint32 modifiers;
 			message->FindInt32("raw_char", 0, (int32 *)&rawChar);
@@ -1435,9 +1646,9 @@ void
 TSwitcherWindow::Show()
 {
 	fHairTrigger = true;
+	fSkipKeyRepeats = true;
 	fIconView->Showing();
 	SetPulseRate(100000);
-	fManager->Touch();
 	SetLook(B_MODAL_WINDOW_LOOK);
 	BWindow::Show();
 }
@@ -1454,6 +1665,27 @@ bool
 TSwitcherWindow::HairTrigger()
 {
 	return fHairTrigger;
+}
+
+
+inline int32
+TSwitcherWindow::SlotOf(int32 i)
+{
+	return fIconView->SlotOf(i);
+}
+
+
+inline TIconView *
+TSwitcherWindow::IconView()
+{
+	return fIconView;
+}
+
+
+inline TWindowView *
+TSwitcherWindow::WindowView()
+{
+	return fWindowView;
 }
 
 
@@ -1537,7 +1769,7 @@ TIconView::AnimateIcon(BBitmap *startIcon, BBitmap *endIcon)
 	destRect.OffsetBy(BPoint(off, off));
 
 	fOffBitmap->Lock();
-	fOffView->SetDrawingMode(B_OP_OVER);
+	fOffView->SetDrawingMode(B_OP_ALPHA);
 	for (int i = 0; i < 2; i++) {
 		startIconBounds.InsetBy(amount,amount);
 		snooze(20000);
@@ -1995,91 +2227,4 @@ TWindowView::Pulse()
 	} else
 		free(windowInfo);
 }
-
-
-//	#pragma mark -
-
-
-bool
-IsKeyDown(int32 key)
-{
-	key_info keyInfo;
-
-	get_key_info(&keyInfo);
-	return (keyInfo.key_states[key >> 3] & (1 << ((7 - key) & 7))) != 0;
-}
-
-
-bool
-IsWindowOK(const window_info *windowInfo)
-{
-	// is_mini (true means that the window is minimized).
-	// if not, then 
-	// show_hide >= 1 means that the window is hidden.
-	//
-	// If the window is both minimized and hidden, then you get :
-	//	 TWindow->is_mini = false;
-	//	 TWindow->was_mini = true;
-	//	 TWindow->show_hide >= 1;
-
-	if (windowInfo->w_type != _STD_W_TYPE_)
-		return false;
-
-	if (windowInfo->is_mini)
-		return true;
-
-	return windowInfo->show_hide_level <= 0;
-}
-
-
-bool
-OKToUse(const TTeamGroup *teamGroup)
-{
-	if (!teamGroup)
-		return false;
-
-	// skip background applications
-	if ((teamGroup->Flags() & B_BACKGROUND_APP) != 0)
-		return false;
-
-	// skip the Deakbar itself
-	if (strcasecmp(teamGroup->Signature(), kDeskbarSignature) == 0)
-		return false;
-
-	return true;
-}
-
-
-int
-SmartStrcmp(const char *s1, const char *s2)
-{
-	if (strcasecmp(s1, s2) == 0)
-		return 0;
-		
-	// if the strings on differ in spaces or underscores they still match
-	while (*s1 && *s2) {
-		if ((*s1 == ' ') || (*s1 == '_')) {
-			s1++;
-			continue;
-		}
-		if ((*s2 == ' ') || (*s2 == '_')) {
-			s2++;
-			continue;
-		}
-		if (*s1 != *s2)
-			return 1;		// they differ
-		s1++;
-		s2++;
-	}
-
-	// if one of the strings ended before the other
-	// ??? could process trailing spaces & underscores!
-	if (*s1)
-		return 1;
-	if (*s2)
-		return 1;
-
-	return 0;
-}
-
 
