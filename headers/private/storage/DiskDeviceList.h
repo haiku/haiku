@@ -1,11 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2007, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DISK_DEVICE_LIST_H
 #define _DISK_DEVICE_LIST_H
 
 
+#include <DiskDeviceDefs.h>
 #include <DiskDeviceVisitor.h>
 #include <Handler.h>
 #include <ObjectList.h>
