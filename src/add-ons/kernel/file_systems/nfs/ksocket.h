@@ -8,7 +8,7 @@
 
 #include <sys/socket.h>
 
-#ifndef _KERNEL_MODE
+#ifndef _KERNEL_MODE /* userland wrapper */
 
 #define ksocket socket
 #define kbind bind
@@ -16,6 +16,8 @@
 #define kgetsockname getsockname
 #define kgetpeername getpeername
 #define kaccept accept
+#define ksendmsg sendmsg
+#define krecvmsg recvmsg
 #define krecvfrom recvfrom
 #define ksendto sendto
 #define krecv recv
@@ -27,6 +29,43 @@
 #define ksocket_cleanup() ({B_OK;})
 #define kmessage(fmt, ...) printf(fmt "\n", ##__VA_ARGS__)
 #define KSOCKET_MODULE_DECL /* nothing */
+
+#elif defined(__HAIKU__)
+
+/* Haiku socket module */
+#include <os/drivers/socket_interface.h>
+
+extern struct socket_module_info *gSocket;
+#define ksocket (gSocket->socket)
+#define kbind (gSocket->bind)
+#define kconnect (gSocket->connect)
+#define kgetsockname (gSocket->getsockname)
+#define kgetpeername (gSocket->getpeername)
+#define kaccept (gSocket->accept)
+//#define kaccept(_fd, _addr, _sz) ({int thesock; thesock = (gSocket->accept)(_fd, _addr, _sz); dprintf("kaccept(%d, , ) = %d\n", _fd, thesock); thesock; })
+#define ksendmsg (gSocket->sendmsg)
+#define krecvmsg (gSocket->recvmsg)
+#define krecvfrom (gSocket->recvfrom)
+#define ksendto (gSocket->sendto)
+#define krecv (gSocket->recv)
+#define ksend (gSocket->send)
+#define klisten (gSocket->listen)
+#define kshutdown (gSocket->shutdown)
+#define kclosesocket close
+#define kmessage(fmt, ...) dprintf("ksocket: " fmt "\n", ##__VA_ARGS__)
+
+extern status_t ksocket_init ();
+extern status_t ksocket_cleanup ();
+
+#define KSOCKET_MODULE_DECL \
+struct socket_module_info *gSocket; \
+status_t ksocket_init () { \
+	return get_module(B_SOCKET_MODULE_NAME, (module_info **)&gSocket); \
+} \
+ \
+status_t ksocket_cleanup () { \
+	return put_module(B_SOCKET_MODULE_NAME); \
+}
 
 #elif defined(BONE_VERSION)
 
@@ -42,6 +81,8 @@ extern bone_socket_info_t *gSocket;
 #define kgetpeername (gSocket->getpeername)
 #define kaccept (gSocket->accept)
 //#define kaccept(_fd, _addr, _sz) ({int thesock; thesock = (gSocket->accept)(_fd, _addr, _sz); dprintf("kaccept(%d, , ) = %d\n", _fd, thesock); thesock; })
+#define ksendmsg _ERROR_no_sendmsg_in_BONE
+#define krecvmsg _ERROR_no_recvmsg_in_BONE
 #define krecvfrom (gSocket->recvfrom)
 #define ksendto (gSocket->sendto)
 #define krecv (gSocket->recv)
