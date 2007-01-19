@@ -298,6 +298,9 @@ BControl::Label() const
 void
 BControl::SetValue(int32 value)
 {
+	if (value == fValue)
+		return;
+
 	fValue = value;
 	Invalidate();
 }
