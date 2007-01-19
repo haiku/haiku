@@ -32,18 +32,21 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <ctype.h>
-#include <malloc.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdarg.h>
+#include "Attributes.h"
+#include "MimeTypes.h"
+#include "Model.h"
+#include "Utilities.h"
+#include "ContainerWindow.h"
+
+#ifdef __HAIKU__
+#	include <IconUtils.h>
+#endif
 
 #include <Bitmap.h>
 #include <Debug.h>
 #include <Directory.h>
+#include <fs_attr.h>
 #include <fs_info.h>
-#include <IconUtils.h>
 #include <MenuItem.h>
 #include <OS.h>
 #include <PopUpMenu.h>
@@ -54,23 +57,22 @@ All rights reserved.
 #include <VolumeRoster.h>
 #include <Window.h>
 
+#include <ctype.h>
+#include <malloc.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdarg.h>
+
+
 #if B_BEOS_VERSION_DANO
-#define _IMPEXP_BE
+#	define _IMPEXP_BE
 #endif
 extern _IMPEXP_BE const uint32	LARGE_ICON_TYPE;
 extern _IMPEXP_BE const uint32	MINI_ICON_TYPE;
 #if B_BEOS_VERSION_DANO
-#undef _IMPEXP_BE
+#	undef _IMPEXP_BE
 #endif
-
-#include "Attributes.h"
-#include "MimeTypes.h"
-#include "Model.h"
-#include "Utilities.h"
-#include "ContainerWindow.h"
-
-#include <fs_attr.h>
-
 
 
 FILE *logFile = NULL;

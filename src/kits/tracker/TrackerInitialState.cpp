@@ -164,7 +164,7 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 # define B_BITMAP_NO_SERVER_LINK 0
 #endif
 
-#if __HAIKU__
+#ifdef __HAIKU__
 	BBitmap vectorIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_RGB32);
 #endif
 	BBitmap largeIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
@@ -175,7 +175,7 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 	bool installed = mime.IsInstalled();
 	
 	if (!installed
-#if __HAIKU__
+#ifdef __HAIKU__
 		|| (bitsID >= 0 && ((forceMask & kForceLargeIcon)
 			|| mime.GetIcon(&vectorIcon, B_LARGE_ICON) != B_OK))
 #endif
@@ -194,7 +194,7 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 			mime.Install();
 
 		if (bitsID >= 0) {
-#if __HAIKU__
+#ifdef __HAIKU__
 			const uint8* iconData;
 			size_t iconSize;
 			if (GetTrackerResources()->

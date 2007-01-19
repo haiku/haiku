@@ -3428,7 +3428,7 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode *node)
 	if (fContainerWindowFlags & kIsHidden)
 		Minimize(true);
 
-#if __HAIKU__
+#ifdef __HAIKU__
 	// restore window decor settings
 	int32 size = node->Contains(kAttrWindowDecor, B_RAW_TYPE);
 	if (size > 0) {
@@ -3476,7 +3476,7 @@ BContainerWindow::RestoreWindowState(const BMessage &message)
 	if (fContainerWindowFlags & kIsHidden)
 		Minimize(true);
 
-#if __HAIKU__
+#ifdef __HAIKU__
 	// restore window decor settings
 	BMessage decorSettings;
 	if ((fContainerWindowFlags & kRestoreDecor)
@@ -3509,7 +3509,7 @@ BContainerWindow::SaveWindowState(AttributeStreamNode *node)
 	node->Write(workspaceAttributeName, 0, B_INT32_TYPE, sizeof(uint32),
 		&workspaces);
 
-#if __HAIKU__
+#ifdef __HAIKU__
 	BMessage decorSettings;
 	if (GetDecoratorSettings(&decorSettings) == B_OK) {
 		int32 size = decorSettings.FlattenedSize();
@@ -3541,7 +3541,7 @@ BContainerWindow::SaveWindowState(BMessage &message) const
 	message.AddRect(rectAttributeName, frame);
 	message.AddInt32(workspaceAttributeName, (int32)Workspaces());
 
-#if __HAIKU__
+#ifdef __HAIKU__
 	BMessage decorSettings;
 	if (GetDecoratorSettings(&decorSettings) == B_OK) {
 		message.AddMessage(kAttrWindowDecor, &decorSettings);

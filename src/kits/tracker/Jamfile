@@ -17,6 +17,11 @@ SubDirC++Flags
 #	-D_SILENTLY_CORRECT_FILE_NAMES=1 
 	;
 
+local vector_icon_libs ;
+if $(TARGET_PLATFORM) = haiku {
+	vector_icon_libs = libicon.a libagg.a ;
+}
+
 SharedLibrary libtracker.so :
 	AttributeStream.cpp
 	AutoMounter.cpp
@@ -88,7 +93,7 @@ SharedLibrary libtracker.so :
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 
-	: be translation libicon.a libagg.a
+	: be translation $(vector_icon_libs)
 
 	;
 

@@ -32,17 +32,20 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include "Bitmaps.h"
+#include "Utilities.h"
+
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Debug.h>
 #include <DataIO.h>
 #include <File.h>
-#include <IconUtils.h>
 #include <String.h>
 #include <SupportDefs.h>
 
-#include "Bitmaps.h"
-#include "Utilities.h"
+#ifdef __HAIKU__
+#	include <IconUtils.h>
+#endif
 
 
 BImageResources::BImageResources(void *memAddr)
@@ -138,11 +141,12 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	size_t length = 0;
 	const void *data;
 
+#ifdef __HAIKU__
 	// try to load vector icon
 	data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
-
-	if (data && BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK)
+	if (data != NULL && BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK)
 		return B_OK;
+#endif
 
 	// fall back to R5 icon
 	if (size != B_LARGE_ICON && size != B_MINI_ICON)
@@ -151,21 +155,20 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
 	length = 0;
 	data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN', id, &length);
 
-	if (data == 0 || length != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
+	if (data == NULL || length != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
 		TRESPASS();
 		return B_ERROR;
 	}
 
-	status_t ret = B_OK;
-
+#ifdef __HAIKU__
 	if (dest->ColorSpace() != B_CMAP8) {
-		ret = BIconUtils::ConvertFromCMAP8((uint8*)data, size, size,
+		return BIconUtils::ConvertFromCMAP8((uint8*)data, size, size,
 			size, dest);
-	} else {
-		dest->SetBits(data, (int32)length, 0, B_CMAP8);
 	}
+#endif
 
-	return ret;
+	dest->SetBits(data, (int32)length, 0, B_CMAP8);
+	return B_OK;
 }
 
 
@@ -173,17 +176,20 @@ status_t
 BImageResources::GetIconResource(int32 id, const uint8** iconData,
 	size_t* iconSize) const
 {
+#ifdef __HAIKU__
 	// try to load vector icon data from resources
 	size_t length = 0;
 	const void* data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
-
-	if (!data)
+	if (data == NULL)
 		return B_ERROR;
 
 	*iconData = (const uint8*)data;
 	*iconSize = length;
 
 	return B_OK;
+#else
+	return B_ERROR;
+#endif
 }
 
 
