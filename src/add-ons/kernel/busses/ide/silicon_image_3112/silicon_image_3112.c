@@ -816,7 +816,7 @@ handle_interrupt(void *arg)
 	int32 result, ret;
 	int i;
 
-	FLOW("handle_interrupt\n");
+//	FLOW("handle_interrupt\n");
 
 	result = B_UNHANDLED_INTERRUPT;
 
