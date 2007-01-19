@@ -48,23 +48,111 @@ All rights reserved.
 #include "Tracker.h"
 #include "Bitmaps.h"
 
-#if OPEN_TRACKER
-#	include "DeviceMap.h"
+#ifdef __HAIKU__
+#	include <DiskDevice.h>
+#	include <DiskDeviceList.h>
 #else
-#	include <private/storage/DeviceMap.h>
+#	include "DeviceMap.h"
 #endif
 
 #define SHOW_NETWORK_VOLUMES
 
 
-MountMenu::MountMenu(const char *name)
-	: BMenu(name)
+#ifdef __HAIKU__
+//	#pragma mark - Haiku Disk Device API
+
+
+class AddMenuItemVisitor : public BDiskDeviceVisitor {
+	public:
+		AddMenuItemVisitor(BMenu* menu);
+		virtual ~AddMenuItemVisitor();
+
+		virtual bool Visit(BDiskDevice *device);
+		virtual bool Visit(BPartition *partition, int32 level);
+
+	private:
+		BMenu* fMenu;
+};
+
+
+AddMenuItemVisitor::AddMenuItemVisitor(BMenu* menu)
+	:
+	fMenu(menu)
 {
-	SetFont(be_plain_font);
 }
 
 
-#if _INCLUDES_CLASS_DEVICE_MAP
+AddMenuItemVisitor::~AddMenuItemVisitor()
+{
+}
+
+
+bool
+AddMenuItemVisitor::Visit(BDiskDevice *device)
+{
+	return Visit(device, 0);
+}
+
+
+bool
+AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
+{
+	if (!partition->ContainsFileSystem())
+		return NULL;
+
+	// get name (and eventually the type)
+	BString name = partition->ContentName();
+	if (name.Length() == 0) {
+		name = partition->Name();
+		if (name.Length() == 0) {
+			const char *type = partition->ContentType();
+			if (type == NULL)
+				return NULL;
+
+			name = "(unnamed ";
+			name << type;
+			name << ")";
+		}
+	}
+
+	// get icon
+	BBitmap *icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
+		B_CMAP8);
+	if (partition->GetIcon(icon, B_MINI_ICON) != B_OK) {
+		delete icon;
+		icon = NULL;
+	}
+
+	BMessage *message = new BMessage(partition->IsMounted() ?
+		kUnmountVolume : kMountVolume);
+	message->AddInt32("id", partition->ID());
+
+	// TODO: for now, until we actually have disk device icons
+	BMenuItem *item;
+	if (icon != NULL)
+		item = new IconMenuItem(name.String(), message, icon);
+	else
+		item = new BMenuItem(name.String(), message);
+	if (partition->IsMounted()) {
+		item->SetMarked(true);
+
+		BVolume volume;
+		if (partition->GetVolume(&volume) == B_OK) {
+			BVolume bootVolume;
+			BVolumeRoster().GetBootVolume(&bootVolume);
+			if (volume == bootVolume)
+				item->SetEnabled(false);
+		}
+	}
+
+	fMenu->AddItem(item);
+	return false;
+}
+
+#else	// !__HAIKU__
+//	#pragma mark - R5 DeviceMap API
+
+
 struct AddOneAsMenuItemParams {
 	BMenu *mountMenu;
 };
@@ -127,13 +215,23 @@ AddOnePartitionAsMenuItem(Partition *partition, void *castToParams)
 
 	return NULL;
 }
-#endif	// _INCLUDES_CLASS_DEVICE_MAP
+#endif	// !__HAIKU__
+
+
+//	#pragma mark -
+
+
+MountMenu::MountMenu(const char *name)
+	: BMenu(name)
+{
+	SetFont(be_plain_font);
+}
 
 
 bool
 MountMenu::AddDynamicItem(add_state)
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
+	// remove old items
 	for (;;) {
 		BMenuItem *item = RemoveItem(0L);
 		if (item == NULL)
@@ -141,6 +239,14 @@ MountMenu::AddDynamicItem(add_state)
 		delete item;
 	}
 
+#ifdef __HAIKU__
+	BDiskDeviceList devices;
+	status_t status = devices.Fetch();
+	if (status == B_OK) {
+		AddMenuItemVisitor visitor(this);
+		devices.VisitEachPartition(&visitor);
+	}
+#else
 	AddOneAsMenuItemParams params;
 	params.mountMenu = this;
 
@@ -149,6 +255,7 @@ MountMenu::AddDynamicItem(add_state)
 
 	autoMounter->CheckVolumesNow();
 	autoMounter->EachPartition(&AddOnePartitionAsMenuItem, &params);
+#endif
 
 #ifdef SHOW_NETWORK_VOLUMES
 	// iterate the volume roster and look for volumes with the
@@ -185,12 +292,14 @@ MountMenu::AddDynamicItem(add_state)
 
 	AddSeparatorItem();
 
+#ifndef __HAIKU__
 	// add an option to rescan the scsii bus, etc.
 	BMenuItem *rescanItem = NULL;
 	if (modifiers() & B_SHIFT_KEY) {
 		rescanItem = new BMenuItem("Rescan Devices", new BMessage(kAutomounterRescan));
 		AddItem(rescanItem);
 	}
+#endif
 
 	BMenuItem *mountAll = new BMenuItem("Mount All", new BMessage(kMountAllNow));
 	AddItem(mountAll);
@@ -200,9 +309,10 @@ MountMenu::AddDynamicItem(add_state)
 
 	SetTargetForItems(be_app);
 	
+#ifndef __HAIKU__
 	if (rescanItem)
 		rescanItem->SetTarget(autoMounter);
-#endif	// _INCLUDES_CLASS_DEVICE_MAP
+#endif
 
 	return false;
 }
