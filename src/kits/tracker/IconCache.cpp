@@ -393,27 +393,30 @@ IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 			if (mime.GetPreferredApp(preferredAppSig) != B_OK)
 				return NULL;
 
-			SharedCacheEntry *aliasTo = 0;
+			SharedCacheEntry *aliasTo = NULL;
 			if (entry)
 				aliasTo = (SharedCacheEntry *)entry->ResolveIfAlias(&fSharedCache);
+
 			// look for icon defined by preferred app from metamime
 			aliasTo = (SharedCacheEntry *)GetIconForPreferredApp(fileType,
 				preferredAppSig, mode, size, lazyBitmap, aliasTo); 
 	
-			if (aliasTo) {
-				// make an aliased entry so that the next time we get a
-				// hit on the first FindItem in here
-				if (!entry) {
-					PRINT_ADD_ITEM(("File %s; Line %d # adding entry as alias for type %s\n",
-						__FILE__, __LINE__, fileType));
-					entry = fSharedCache.AddItem(&aliasTo, fileType);
-					entry->SetAliasFor(&fSharedCache, aliasTo);
-				}
-				ASSERT(aliasTo->HaveIconBitmap(mode, size));
-				return aliasTo;
+			if (aliasTo == NULL)
+				return NULL;
+
+			// make an aliased entry so that the next time we get a
+			// hit on the first FindItem in here
+			if (!entry) {
+				PRINT_ADD_ITEM(("File %s; Line %d # adding entry as alias for type %s\n",
+					__FILE__, __LINE__, fileType));
+				entry = fSharedCache.AddItem(&aliasTo, fileType);
+				entry->SetAliasFor(&fSharedCache, aliasTo);
 			}
+			ASSERT(aliasTo->HaveIconBitmap(mode, size));
+			return aliasTo;
 		}
 
+		// at this point, we've found an icon for the MIME type
 		BBitmap *bitmap = lazyBitmap->Adopt();
 		if (!entry) {
 			PRINT_ADD_ITEM(("File %s; Line %d # adding entry for type %s\n",
