@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,17 +41,18 @@
 #include "SystemPalette.h"
 #include "WindowLayer.h"
 
+#include <FontPrivate.h>
+#include <MessengerPrivate.h>
+#include <RosterPrivate.h>
+#include <ServerProtocol.h>
+#include <WindowPrivate.h>
+
 #include <AppDefs.h>
 #include <Autolock.h>
 #include <List.h>
 #include <ScrollBar.h>
 #include <Shape.h>
 #include <String.h>
-
-#include <FontPrivate.h>
-#include <MessengerPrivate.h>
-#include <ServerProtocol.h>
-#include <WindowPrivate.h>
 
 #include <new>
 #include <stdio.h>
@@ -298,6 +299,10 @@ ServerApp::Activate(bool value)
 	fIsActive = value;
 
 	if (fIsActive) {
+		// notify registrar about the active app
+		BRoster::Private roster;
+		roster.UpdateActiveApp(ClientTeam());
+
 		if (_HasWindowUnderMouse()) {
 			// Set the cursor to the application cursor, if any
 			fDesktop->SetCursor(CurrentCursor());

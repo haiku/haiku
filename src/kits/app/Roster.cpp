@@ -1736,7 +1736,8 @@ BRoster::_ApplicationCrashed(team_id team)
 
 /*!
 	Tells the registrar which application is currently active.
-	It's called from within BWindow on B_WINDOW_ACTIVATED messages.
+	It's called from within the app_server when the active application is
+	changed.
 */
 status_t
 BRoster::_UpdateActiveApp(team_id team) const

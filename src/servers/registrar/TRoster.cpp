@@ -721,7 +721,8 @@ TRoster::HandleGetAppList(BMessage *request)
 
 /*!	\brief Handles a _UpdateActiveApp() request.
 
-	This is sent from a BWindow when it receives a B_WINDOW_ACTIVATED message.
+	This is sent from the app_server when the current active application
+	is changed.
 
 	\param request The request message
 */
