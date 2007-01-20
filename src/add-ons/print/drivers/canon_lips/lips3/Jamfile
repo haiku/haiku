@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons print drivers canon_lips lips3 ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
 
 AddResources Canon\ LIPS3\ Compatible : Lips3.rdef ;
 
@@ -13,7 +14,11 @@ Addon Canon\ LIPS3\ Compatible : Print :
 	Compress3.cpp
 ;
 
-LinkAgainst Canon\ LIPS3\ Compatible : be libprint.a $(TARGET_LIBSTDC++) ;
+LinkAgainst Canon\ LIPS3\ Compatible : 
+	be 
+	libprint.a 
+	libprintutils.a
+	$(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	Canon\ LIPS3\ Compatible :

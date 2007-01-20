@@ -11,6 +11,7 @@
 #include "PrintProcess.h"
 #include "SpoolMetaData.h"
 #include "Transport.h"
+#include "StatusWindow.h"
 
 class BView;
 class BBitmap;
@@ -26,7 +27,11 @@ class GraphicsDriver {
 public:
 	GraphicsDriver(BMessage *, PrinterData *, const PrinterCap *);
 	virtual ~GraphicsDriver();
+	const JobData *getJobData(BFile *spoolFile);
 	BMessage *takeJob(BFile *spool, uint32 flags = 0);
+	static BPoint getScale(int32 nup, BRect physicalRect, float scaling);
+	static BPoint getOffset(int32 nup, int index, JobData::Orientation orientation, const BPoint *scale, 
+		BRect scaledPhysicalRect, BRect scaledPrintableRect, BRect physicalRect);
 
 protected:
 	virtual bool startDoc();
@@ -58,7 +63,7 @@ protected:
 	GraphicsDriver &operator = (const GraphicsDriver &);
 
 private:
-	void setupData(BFile *file, long page_count);
+	bool setupData(BFile *file);
 	void setupBitmap();
 	void cleanupData();
 	void cleanupBitmap();
@@ -91,6 +96,9 @@ private:
 	int fPixelDepth;
 	int fBandCount;
 	int fInternalCopies;
+	
+	uint32 fPageCount;
+	StatusWindow *fStatusWindow;
 };
 
 inline const JobData *GraphicsDriver::getJobData() const

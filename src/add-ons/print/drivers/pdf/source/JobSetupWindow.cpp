@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include <SupportKit.h>
 #include <stdlib.h>
 
+#include "BeUtils.h"
+
 #include "PrinterDriver.h"
 #include "JobSetupWindow.h"
 #include "DocInfoWindow.h"
@@ -89,7 +91,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		doc_info.AddString("Keywords", "");
 		fSetupMsg->AddMessage("doc_info", &doc_info);
 	}
-	AddFields(&fDocInfo, fSetupMsg, true, NULL, includeKeys);
+	AddFields(&fDocInfo, fSetupMsg, NULL, includeKeys);
 	
 	allPages = firstPage == 1 && lastPage == MAX_INT32;
 

@@ -29,14 +29,13 @@ THE SOFTWARE.
 
 */
 
-#ifndef PRINTER_SETTINGS_H
 #include "PrinterSettings.h"
-#endif
 
 #include <fs_attr.h>
 
+#include "BeUtils.h"
+
 #include "PrinterPrefs.h"
-#include "Utils.h"
 
 /**
  * Constructor
@@ -283,7 +282,7 @@ PrinterSettings::Read(BNode* node, BMessage* msg, Kind kind)
 		// if there were none, then create a default set...
 		ps.GetDefaults(&settings);
 	}
-	AddFields(msg, &settings, false);
+	AddFields(msg, &settings, NULL, NULL, false);
 }
 
 void

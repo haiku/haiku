@@ -1,7 +1,7 @@
 /*
  * PCL6Cap.cpp
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
- * COpyright 2003-2005 Michael Pfeiffer.
+ * Copyright 2003-2007 Michael Pfeiffer.
  */
 
 #include "PCL6Cap.h"
@@ -247,10 +247,12 @@ const ProtocolClassCap *protocolClasses[] = {
 };
 
 const ColorCap color("Color", false, JobData::kColor);
+const ColorCap colorCompressionDisabled("Color (No Compression)", false, JobData::kColorCompressionDisabled);
 const ColorCap monochrome("Shades of Gray", true, JobData::kMonochrome);
 
 const ColorCap *colors[] = {
 	&color,
+	&colorCompressionDisabled,
 	&monochrome
 };
 

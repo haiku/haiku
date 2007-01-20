@@ -48,3 +48,4 @@ PrinterDriver* instantiate_printer_driver(BNode* printerFolder)
 {
 	return new PCL6PrinterDriver(printerFolder);
 }
+

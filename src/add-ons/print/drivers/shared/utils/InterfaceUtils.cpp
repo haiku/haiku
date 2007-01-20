@@ -74,7 +74,12 @@ HWindow::MessageReceived(BMessage* msg)
 void
 HWindow::AboutRequested()
 {
-	BAlert *about = new BAlert("About Preview", kAbout, "Cool");
+	const char* aboutText = AboutText();
+	if (aboutText == NULL) {
+		return;
+	}
+	
+	BAlert *about = new BAlert("About", aboutText, "Cool");
 	BTextView *v = about->TextView();
 	if (v) {
 		rgb_color red = {255, 0, 51, 255};
@@ -123,6 +128,7 @@ BlockingWindow::~BlockingWindow()
 void
 BlockingWindow::Init(const char* title) 
 {
+	fUserQuitResult = B_OK;
 	fResult = NULL;
 	fExitSem = create_sem(0, title);
 	fReadyToQuit = false;
@@ -134,7 +140,7 @@ BlockingWindow::QuitRequested() {
 		return true;
 	} else {
 		// user requested to quit the window
-		*fResult = B_OK;
+		*fResult = fUserQuitResult;
 		release_sem(fExitSem);
 		return false;
 	}
@@ -152,6 +158,11 @@ BlockingWindow::Quit(status_t result) {
 		*fResult = result;
 	}
 	release_sem(fExitSem);
+}
+
+void
+BlockingWindow::SetUserQuitResult(status_t result) {
+	fUserQuitResult = result;
 }
 
 status_t

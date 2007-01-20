@@ -2,7 +2,8 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001-2003 OpenBeOS. 
+Copyright (c) 2001, 2002 OpenBeOS. 
+Copyright (c) 2005 Haiku.
 
 Authors: 
 	Philippe Houdoin
@@ -37,9 +38,12 @@ THE SOFTWARE.
 #include <MessageFilter.h>
 
 
-// adds fields to message or replaces existing fields (copy BeUtils.h)
-void AddFields(BMessage* to, const BMessage* from, bool overwrite = true, const char* excludeList[] = NULL, const char* includeList[] = NULL);
 void AddString(BMessage* m, const char* name, const char* value);
+
+// set or replace a value in a BMessage
+void SetRect(BMessage* msg, const char* name, BRect rect);
+void SetFloat(BMessage* msg, const char* name, float value);
+void SetInt32(BMessage* msg, const char* name, int32 value);
 
 class EscapeMessageFilter : public BMessageFilter 
 {
@@ -124,32 +128,5 @@ void TList<T>::SortItems(int (*comp)(const T**, const T**)) {
 	sort_func sort = (sort_func)comp;
 	fList.SortItems(sort);
 }
-
-// PDF coordinate system
-class PDFSystem {
-private:
-	float fHeight;
-	float fX;
-	float fY;
-	float fScale;
-
-public:
-	PDFSystem()
-		: fHeight(0), fX(0), fY(0), fScale(1) { }
-	PDFSystem(float h, float x, float y, float s)
-		: fHeight(h), fX(x), fY(y), fScale(s) { }
-
-	void   SetHeight(float h)          { fHeight = h; }
-	void   SetOrigin(float x, float y) { fX = x; fY = y; }
-	void   SetScale(float scale)       { fScale = scale; }
-	float  Height() const              { return fHeight; }
-	BPoint Origin() const              { return BPoint(fX, fY); }
-	float  Scale() const               { return fScale; }
-	
-	inline float tx(float x)    { return fX + fScale*x; }
-	inline float ty(float y)    { return fHeight - (fY + fScale * y); }
-	inline float scale(float f) { return fScale * f; }
-};
-
 
 #endif

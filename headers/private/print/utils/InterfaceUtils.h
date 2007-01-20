@@ -46,6 +46,37 @@ public:
 	
 	virtual void MessageReceived(BMessage* m);
 	virtual void AboutRequested();
+	virtual const char* AboutText() const { return NULL; }
+};
+
+// --------------------------------------------------
+class BlockingWindow : public HWindow
+{
+public:
+	BlockingWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
+	BlockingWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
+	~BlockingWindow();
+	
+	bool QuitRequested();
+	// Quit() is called by child class with result code
+	void Quit(status_t result);
+	// Show window and wait for it to quit, returns result code
+	virtual status_t Go();
+	// Or quit window e.g. something went wrong in constructor
+	void Quit();
+	// Sets the result that is returned when the user closes the window.
+	// Default is B_OK.
+	void SetUserQuitResult(status_t result);
+	
+	typedef HWindow 		inherited;
+	
+private:
+	void Init(const char* title);
+	
+	status_t                fUserQuitResult;
+	bool                    fReadyToQuit;
+	sem_id 					fExitSem;
+	status_t* 				fResult;
 };
 
 // --------------------------------------------------

@@ -97,7 +97,7 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		int y = (int)offset->y;
 	
 		PCL6Rasterizer *rasterizer;
-		if (getJobData()->getColor() == JobData::kColor) {
+		if (useColorMode()) {
 			#if COLOR_DEPTH == 8
 				rasterizer = new ColorRGBRasterizer(fHalftone);
 			#elif COLOR_DEPTH == 1
@@ -179,10 +179,12 @@ void PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int 
 #endif
 
 #if ENABLE_RLE_COMPRESSION
-	int rleSize = pack_bits_size(buffer, outSize);
-	if (rleSize < dataSize) {
-		compressionMethod = PCL6Writer::kRLECompression;
-		dataSize = rleSize;
+	if (supportsRLECompression()) {
+		int rleSize = pack_bits_size(buffer, outSize);
+		if (rleSize < dataSize) {
+			compressionMethod = PCL6Writer::kRLECompression;
+			dataSize = rleSize;
+		}
 	}
 #endif
 	
@@ -246,9 +248,8 @@ bool PCL6Driver::startPage(int)
 	// PageOrigin from Windows NT printer driver
 	int x = 142 * getJobData()->getXres() / 600;
 	int y = 100 * getJobData()->getYres() / 600;
-	bool color = getJobData()->getColor() == JobData::kColor;
 	fWriter->SetPageOrigin(x, y);
-	fWriter->SetColorSpace(color ? PCL6Writer::kRGB : PCL6Writer::kGray);
+	fWriter->SetColorSpace(useColorMode() ? PCL6Writer::kRGB : PCL6Writer::kGray);
 	fWriter->SetPaintTxMode(PCL6Writer::kOpaque);
 	fWriter->SetSourceTxMode(PCL6Writer::kOpaque);
 	fWriter->SetROP(204);
@@ -257,9 +258,8 @@ bool PCL6Driver::startPage(int)
 
 void PCL6Driver::startRasterGraphics(int x, int y, int width, int height, PCL6Writer::Compression compressionMethod)
 {
-	bool color = getJobData()->getColor() == JobData::kColor;
 	PCL6Writer::ColorDepth colorDepth;
-	if (color) {
+	if (useColorMode()) {
 		#if COLOR_DEPTH == 8
 			colorDepth = PCL6Writer::k8Bit;
 		#elif COLOR_DEPTH == 1
@@ -352,9 +352,22 @@ void PCL6Driver::move(int x, int y)
 }
 
 bool
+PCL6Driver::supportsRLECompression()
+{
+	return getJobData()->getColor() != JobData::kColorCompressionDisabled;
+}
+
+bool
 PCL6Driver::supportsDeltaRowCompression()
 {
-	return getProtocolClass() >= PCL6Writer::kProtocolClass2_1;
+	return getProtocolClass() >= PCL6Writer::kProtocolClass2_1 &&
+		getJobData()->getColor() != JobData::kColorCompressionDisabled;
+}
+
+bool
+PCL6Driver::useColorMode()
+{
+	return getJobData()->getColor() != JobData::kMonochrome;
 }
 
 PCL6Writer::MediaSize PCL6Driver::mediaSize(JobData::Paper paper)

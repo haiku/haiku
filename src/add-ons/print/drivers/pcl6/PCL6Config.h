@@ -12,6 +12,7 @@
 
 // Run-Length-Encoding Compression
 #define ENABLE_RLE_COMPRESSION       1
+//#define ENABLE_RLE_COMPRESSION       0
 
 // Delta Row Compression
 #define ENABLE_DELTA_ROW_COMPRESSION 1
@@ -21,6 +22,7 @@
 // If 1 bit depth is used, the class Halftone is used for dithering
 // otherwise dithering is not performed.
 #define COLOR_DEPTH 1
+//#define COLOR_DEPTH 8
 
 #define DISPLAY_COMPRESSION_STATISTICS 0
 

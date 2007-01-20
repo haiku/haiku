@@ -354,10 +354,20 @@ PageSetupView::UpdateJobData()
 		resolution_cap++;
 	}
 
+	// rotate paper and physical rectangle if landscape orientation
+	if (JobData::kLandscape == fJobData->getOrientation()) {
+		swap(&paper_rect.left, &paper_rect.top);
+		swap(&paper_rect.right, &paper_rect.bottom);
+		swap(&physical_rect.left, &physical_rect.top);
+		swap(&physical_rect.right, &physical_rect.bottom);
+	}
+
 	// adjust printable rect by margin
 	fJobData->setMarginUnit(fMarginView->GetMarginUnit());
 	BRect margin = fMarginView->GetMargin();
-	BRect printable_rect = margin;
+	BRect printable_rect;
+	printable_rect.left = paper_rect.left + margin.left;
+	printable_rect.top = paper_rect.top + margin.top;
 	printable_rect.right = paper_rect.right - margin.right;
 	printable_rect.bottom = paper_rect.bottom - margin.bottom;
 
@@ -365,16 +375,6 @@ PageSetupView::UpdateJobData()
 	printable_rect.top = max_c(printable_rect.top, physical_rect.top);
 	printable_rect.right = min_c(printable_rect.right, physical_rect.right);
 	printable_rect.bottom = min_c(printable_rect.bottom, physical_rect.bottom);
-
-
-	if (JobData::kLandscape == fJobData->getOrientation()) {
-		swap(&paper_rect.left, &paper_rect.top);
-		swap(&paper_rect.right, &paper_rect.bottom);
-		swap(&printable_rect.left, &printable_rect.top);
-		swap(&printable_rect.right, &printable_rect.bottom);
-		swap(&physical_rect.left, &physical_rect.top);
-		swap(&physical_rect.right, &physical_rect.bottom);
-	}
 
 	float scaling = atoi(fScaling->Text());
 	if (scaling <= 0.0) { // sanity check
@@ -427,11 +427,6 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 		"Page Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-/*
-	ostringstream oss;
-	oss << printer_data->get_printer_name() << " Setup";
-	SetTitle(title.str().c_str());
-*/
 	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
 
 	PageSetupView *view = new PageSetupView(Bounds(), job_data, printer_data, printer_cap);

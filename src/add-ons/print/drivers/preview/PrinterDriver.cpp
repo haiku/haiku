@@ -1,34 +1,13 @@
 /*
-
-Preview printer driver.
-
-Copyright (c) 2003 OpenBeOS. 
-
-Authors: 
-	Philippe Houdoin
-	Simon Gauvin	
-	Michael Pfeiffer
-	
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
+ * Copyright 2003-2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Philippe Houdoin
+ *		Simon Gauvin	
+ *		Michael Pfeiffer
+ *		Dr. Hartmut Reh
+ */
 
 #include <stdio.h>
 #include <string.h>			// for memset()
@@ -104,13 +83,6 @@ PrinterDriver::PrintJob
 
 	if (!fJobFile || !fPrinterNode) 
 		return B_ERROR;
-
-	if (fPrintTransport.Open(fPrinterNode) != B_OK) {
-		return B_ERROR;
-	}
-	if (fPrintTransport.IsPrintToFileCanceled()) {
-		return B_OK;
-	}
 
 	// read print file header	
 	fJobFile->Seek(0, SEEK_SET);

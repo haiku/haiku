@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "Utils.h"
 #include "Link.h"
 #include "ImageCache.h"
+#include "PDFSystem.h"
 
 #include "pdflib.h"
 

@@ -82,4 +82,4 @@ public:
 		virtual void		SetFontFace(int32 flags);
 };
 
-#endif _TEMPLATE_H
+#endif // _TEMPLATE_H

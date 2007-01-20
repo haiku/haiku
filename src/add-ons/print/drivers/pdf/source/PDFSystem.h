@@ -1,10 +1,13 @@
 /*
 
-PrintTransportAddOn
+PDF Writer printer driver.
 
-Copyright (c) 2003, 04 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
+Copyright (c) 2006 Haiku.
 
-Author:
+Authors: 
+	Philippe Houdoin
+	Simon Gauvin	
 	Michael Pfeiffer
 	
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -27,16 +30,34 @@ THE SOFTWARE.
 
 */
 
-#ifndef _PRINT_TRANSPORT_ADD_ON_H
-#define _PRINT_TRANSPORT_ADD_ON_H
+#ifndef _PDF_SYSTEM_H
+#define _PDF_SYSTEM_H
 
-#include <image.h>
-#include <DataIO.h>
-#include <Directory.h>
-#include <Message.h>
+// PDF coordinate system
+class PDFSystem {
+private:
+	float fHeight;
+	float fX;
+	float fY;
+	float fScale;
 
-// to be implemented by the transport add-on
-extern "C" BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg);
+public:
+	PDFSystem()
+		: fHeight(0), fX(0), fY(0), fScale(1) { }
+	PDFSystem(float h, float x, float y, float s)
+		: fHeight(h), fX(x), fY(y), fScale(s) { }
+
+	void   SetHeight(float h)          { fHeight = h; }
+	void   SetOrigin(float x, float y) { fX = x; fY = y; }
+	void   SetScale(float scale)       { fScale = scale; }
+	float  Height() const              { return fHeight; }
+	BPoint Origin() const              { return BPoint(fX, fY); }
+	float  Scale() const               { return fScale; }
+	
+	inline float tx(float x)    { return fX + fScale*x; }
+	inline float ty(float y)    { return fHeight - (fY + fScale * y); }
+	inline float scale(float f) { return fScale * f; }
+};
+
 
 #endif
-

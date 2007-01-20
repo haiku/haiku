@@ -29,8 +29,8 @@ THE SOFTWARE.
 
 */
 
-#ifndef PRINTERDRIVER_H
-#define PRINTERDRIVER_H
+#ifndef _PRINTER_DRIVER_H
+#define _PRINTER_DRIVER_H
 
 #include <AppKit.h>
 #include <InterfaceKit.h>
@@ -49,8 +49,6 @@ extern "C" {
 	typedef void 	(*exit_transport_proc)(void);
 };	
 
-
-class StatusWindow;
 
 // close StatusWindow after pdf generation
 enum CloseOption {
@@ -90,7 +88,6 @@ public:
 	inline BNode			*PrinterNode()	{ return fPrinterNode; }
 	inline BMessage			*JobMsg()		{ return fJobMsg; }
 	inline BDataIO			*Transport()	{ return fPrintTransport.GetDataIO(); }
-	inline StatusWindow		*Status()       { return fStatusWindow; }
 	inline int32            Pass() const    { return fPass; }
 	
 	// publics status code
@@ -104,7 +101,6 @@ private:
 	BFile					*fJobFile;
 	BNode					*fPrinterNode;
 	BMessage				*fJobMsg;
-	StatusWindow	        *fStatusWindow;
 
 	volatile Orientation	fOrientation;
 	
@@ -115,4 +111,4 @@ private:
 	PrintTransport          fPrintTransport;
 };
 
-#endif // #ifndef PRINTERDRIVER_H
+#endif // _PRINTER_DRIVER_H

@@ -34,7 +34,9 @@ THE SOFTWARE.
 #include <Font.h>
 #include <Point.h>
 #include "Utils.h"
+#include "PDFSystem.h"
 
+class PDFSystem;
 class PDFWriter;
 
 class TextLine;

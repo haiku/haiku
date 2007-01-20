@@ -33,7 +33,7 @@ LinkAgainst
 	be 
 	root
 	translation
-	libprint.a
+	libprintutils.a
 	;
 
 Package haiku-printingkit-cvs :

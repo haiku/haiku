@@ -107,7 +107,7 @@ using namespace std;
 	#define TO_HEIGHT			FROM_HEIGHT
 
 #define	PRINT_WIDTH			365
-#define PRINT_HEIGHT		QUALITY_HEIGHT + PAGERABGE_HEIGHT + 20 // 210
+#define PRINT_HEIGHT		QUALITY_HEIGHT + PAGERABGE_HEIGHT + 60
 
 #define PAPERFEED_H			QUALITY_H + QUALITY_WIDTH + 10
 #define PAPERFEED_V			QUALITY_V + 5
@@ -173,7 +173,10 @@ using namespace std;
 #define PRINT_OK_BUTTON_H		(PRINT_WIDTH - PRINT_BUTTON_WIDTH - 10)
 #define PRINT_OK_BUTTON_V		(PRINT_HEIGHT - PRINT_BUTTON_HEIGHT - 11)
 
-#define PRINT_CANCEL_BUTTON_H	(PRINT_OK_BUTTON_H - PRINT_BUTTON_WIDTH - 12)
+#define PREVIEW_H				(PRINT_OK_BUTTON_H - PRINT_BUTTON_WIDTH - 12)
+#define PREVIEW_V				(PRINT_OK_BUTTON_V)
+
+#define PRINT_CANCEL_BUTTON_H		(PREVIEW_H	 - PRINT_BUTTON_WIDTH - 12)
 #define PRINT_CANCEL_BUTTON_V	PRINT_OK_BUTTON_V
 
 const BRect quality_rect(
@@ -320,6 +323,14 @@ const BRect cancel_rect(
 	PRINT_CANCEL_BUTTON_H + PRINT_BUTTON_WIDTH,
 	PRINT_CANCEL_BUTTON_V + PRINT_BUTTON_HEIGHT);
 
+const BRect preview_rect(
+	PREVIEW_H,
+	PREVIEW_V,
+	PREVIEW_H + PRINT_BUTTON_WIDTH,
+	PREVIEW_V + PRINT_BUTTON_HEIGHT);
+
+	
+
 struct SurfaceCap : public BaseCap {
 	color_space surface_type;
 	SurfaceCap(const string &s, bool d, color_space cs) : BaseCap(s, d), surface_type(cs) {}
@@ -384,6 +395,7 @@ const DitherCap *gDitherTypes[] = {
 enum {
 	kMsgRangeAll = 'JSdl',
 	kMsgRangeSelection,
+	kMsgPreview,
 	kMsgCancel,
 	kMsgOK,
 	kMsgQuality,
@@ -525,7 +537,7 @@ JobSetupView::AttachedToWindow()
 	
 	fHalftone = new HalftoneView(rect.OffsetToCopy(1, 1), "halftone", B_FOLLOW_ALL, B_WILL_DRAW); 
 	halftoneBorder->AddChild(fHalftone);
-	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(), fJobData->getDitherType(), fJobData->getColor() == JobData::kColor);
+	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(), fJobData->getDitherType(), fJobData->getColor() != JobData::kMonochrome);
 	
 	/* gamma */
 	fGamma = new JSDSlider(gamma_rect, "gamma", "Gamma", new BMessage(kMsgQuality), -300, 300, B_BLOCK_THUMB);
@@ -702,6 +714,14 @@ JobSetupView::AttachedToWindow()
 	fOddNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_odd_pages_rect, "oddPages", "Odd-Numbered Pages", JobData::kOddNumberedPages);
 	fEvenNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_even_pages_rect, "evenPages", "Even-Numbered Pages", JobData::kEvenNumberedPages);
 
+
+
+	/* preview */
+	
+	button = new BButton(preview_rect, "preview", "Preview ...", new BMessage(kMsgPreview));
+	AddChild(button);
+
+	
 	/* cancel */
 
 	button = new BButton(cancel_rect, "cancel", "Cancel", new BMessage(kMsgCancel));
@@ -709,6 +729,7 @@ JobSetupView::AttachedToWindow()
 
 	/* ok */
 
+	// TODO OK or "Print"?
 	button = new BButton(ok_rect, "ok", "OK", new BMessage(kMsgOK));
 	AddChild(button);
 	button->MakeDefault(true);
@@ -741,7 +762,7 @@ JobSetupView::MessageReceived(BMessage *msg)
 		break;
 
 	case kMsgQuality:
-		fHalftone->preview(getGamma(), getInkDensity(), getDitherType(), getColor() == JobData::kColor); 
+		fHalftone->preview(getGamma(), getInkDensity(), getDitherType(), getColor() != JobData::kMonochrome); 
 		break;
 
 	case kMsgCollateChanged:
@@ -799,7 +820,7 @@ JobSetupView::getInkDensity()
 }
 
 bool 
-JobSetupView::UpdateJobData()
+JobSetupView::UpdateJobData(bool showPreview)
 {
 	int count;
 
@@ -815,6 +836,7 @@ JobSetupView::UpdateJobData()
 		surface_cap++;
 	}
 */
+	fJobData->setShowPreview(showPreview);
 	fJobData->setColor(getColor());	
 	fJobData->setGamma(getGamma());
 	fJobData->setInkDensity(getInkDensity());
@@ -895,7 +917,8 @@ JobSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 	case kMsgOK:
-		fJobSetup->UpdateJobData();
+	case kMsgPreview:
+		fJobSetup->UpdateJobData(msg->what == kMsgPreview);
 		SetResult(B_NO_ERROR);
 		PostMessage(B_QUIT_REQUESTED);
 		break;

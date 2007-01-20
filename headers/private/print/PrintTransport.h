@@ -28,8 +28,8 @@ THE SOFTWARE.
 
 */
 
-#ifndef PRINT_TRANSPORT_H
-#define PRINT_TRANSPORT_H
+#ifndef _PRINT_TRANSPORT_H
+#define _PRINT_TRANSPORT_H
 
 #include <image.h>
 #include <DataIO.h>

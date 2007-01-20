@@ -33,9 +33,7 @@ THE SOFTWARE.
 	
 */
 
-#ifndef MARGIN_VIEW_H
 #include "MarginView.h"
-#endif
 
 #include <AppKit.h>
 #include <SupportKit.h>
@@ -659,8 +657,10 @@ MarginView::CalculateViewSize(uint32 msg)
 	float fleft = atof(fLeft->Text()) * fUnitValue;
 
 	// Check that the margins don't overlap each other...
-	float ph = fPageHeight;
-	float pw = fPageWidth;
+ 	float delta = 72.0;	
+ 		// minimum printable rect = 1 inch * 1 inch
+	float ph = fPageHeight-delta;
+	float pw = fPageWidth-delta;
  	BString str;
 
 	//  Bounds calculation rules: 	

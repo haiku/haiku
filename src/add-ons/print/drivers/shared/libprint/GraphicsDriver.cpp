@@ -14,6 +14,7 @@
 #include <Region.h>
 #include <TextControl.h>
 #include <TextControl.h>
+#include <StopWatch.h>
 #include <View.h>
 #include <Directory.h>
 #include <File.h>
@@ -34,12 +35,17 @@ using namespace std;
 #define std
 #endif
 
+// Measure printJob() time. Either true or false.
+#define MEASURE_PRINT_JOB_TIME false
+
 enum {
 	kMaxMemorySize = (4 *1024 *1024)
 };
 
 GraphicsDriver::GraphicsDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: fMsg(msg), fPrinterData(printer_data), fPrinterCap(printer_cap)
+	: fMsg(msg)
+	, fPrinterData(printer_data)
+	, fPrinterCap(printer_cap)
 {
 	fView          = NULL;
 	fBitmap        = NULL;
@@ -60,9 +66,29 @@ static BRect RotateRect(BRect rect)
 	return rotated;
 }
 
-void 
-GraphicsDriver::setupData(BFile *spool_file, long page_count)
+bool 
+GraphicsDriver::setupData(BFile *spool_file)
 {
+	if (fOrgJobData != NULL) {
+		// already initialized
+		return true;
+	}
+			
+	print_file_header pfh;
+
+	spool_file->Seek(0, SEEK_SET);
+	spool_file->Read(&pfh, sizeof(pfh));
+
+	DBGMSG(("print_file_header::version = 0x%x\n",  pfh.version));
+	DBGMSG(("print_file_header::page_count = %d\n", pfh.page_count));
+	DBGMSG(("print_file_header::first_page = 0x%x\n", (int)pfh.first_page));
+
+	if (pfh.page_count <= 0) {
+		// nothing to print
+		return false;
+	}
+
+	fPageCount = (uint32) pfh.page_count;
 	BMessage *msg = new BMessage();
 	msg->Unflatten(spool_file);
 	fOrgJobData = new JobData(msg, fPrinterCap, JobData::kJobSettings);
@@ -87,7 +113,7 @@ GraphicsDriver::setupData(BFile *spool_file, long page_count)
 		break;
 	}
 
-	if (fOrgJobData->getCollate() && page_count > 1) {
+	if (fOrgJobData->getCollate() && fPageCount > 1) {
 		fRealJobData->setCopies(1);
 		fInternalCopies = fOrgJobData->getCopies();
 	} else {
@@ -95,6 +121,7 @@ GraphicsDriver::setupData(BFile *spool_file, long page_count)
 	}
 	
 	fSpoolMetaData = new SpoolMetaData(spool_file);
+	return true;
 }
 
 void 
@@ -159,8 +186,8 @@ GraphicsDriver::cleanupBitmap()
 	fView   = NULL;
 }
 
-static 
-BPoint get_scale(JobData *org_job_data)
+BPoint 
+GraphicsDriver::getScale(int32 nup, BRect physicalRect, float scaling)
 {
 	float width;
 	float height;
@@ -168,13 +195,13 @@ BPoint get_scale(JobData *org_job_data)
 
 	scale.x = scale.y = 1.0f;
 
-	switch (org_job_data->getNup()) {
+	switch (nup) {
 	case 1:
 		scale.x = scale.y = 1.0f;
 		break;
 	case 2:	/* 1x2 or 2x1 */
-		width  = org_job_data->getPhysicalRect().Width();
-		height = org_job_data->getPhysicalRect().Height();
+		width  = physicalRect.Width();
+		height = physicalRect.Height();
 		if (width < height) {	// portrait
 			scale.x = height / 2.0f / width;
 			scale.y = width / height;
@@ -184,8 +211,8 @@ BPoint get_scale(JobData *org_job_data)
 		}
 		break;
 	case 8:	/* 2x4 or 4x2 */
-		width  = org_job_data->getPhysicalRect().Width();
-		height = org_job_data->getPhysicalRect().Height();
+		width  = physicalRect.Width();
+		height = physicalRect.Height();
 		if (width < height) {
 			scale.x = height / 4.0f / width;
 			scale.y = width / height / 2.0f;
@@ -195,8 +222,8 @@ BPoint get_scale(JobData *org_job_data)
 		}
 		break;
 	case 32:	/* 4x8 or 8x4 */
-		width  = org_job_data->getPhysicalRect().Width();
-		height = org_job_data->getPhysicalRect().Height();
+		width  = physicalRect.Width();
+		height = physicalRect.Height();
 		if (width < height) {
 			scale.x = height / 8.0f / width;
 			scale.y = width / height / 4.0f;
@@ -237,32 +264,30 @@ BPoint get_scale(JobData *org_job_data)
 		break;
 	}
 
-	scale.x = scale.x * org_job_data->getScaling() / 100.0;
-	scale.y = scale.y * org_job_data->getScaling() / 100.0;
+	scale.x = scale.x * scaling / 100.0;
+	scale.y = scale.y * scaling / 100.0;
 
-	DBGMSG(("real scale = %f, %f\n", scale.x, scale.y));
 	return scale;
 }
 
-static BPoint 
-get_offset(
-	int index,
-	const BPoint *scale,
-	JobData *org_job_data)
+BPoint 
+GraphicsDriver::getOffset(int32 nup, int index, JobData::Orientation orientation, 
+	const BPoint *scale, BRect scaledPhysicalRect, BRect scaledPrintableRect,
+	BRect physicalRect)
 {
 	BPoint offset;
 	offset.x = 0;
 	offset.y = 0;
 
-	float width  = org_job_data->getScaledPhysicalRect().Width();
-	float height = org_job_data->getScaledPhysicalRect().Height();
+	float width  = scaledPhysicalRect.Width();
+	float height = scaledPhysicalRect.Height();
 
-	switch (org_job_data->getNup()) {
+	switch (nup) {
 	case 1:
 		break;
 	case 2:
 		if (index == 1) {
-			if (JobData::kPortrait == org_job_data->getOrientation()) {
+			if (JobData::kPortrait == orientation) {
 				offset.x = width;
 			} else {
 				offset.y = height;
@@ -270,7 +295,7 @@ get_offset(
 		}
 		break;
 	case 8:
-		if (JobData::kPortrait == org_job_data->getOrientation()) {
+		if (JobData::kPortrait == orientation) {
 			offset.x = width  * (index / 2);
 			offset.y = height * (index % 2);
 		} else {
@@ -279,7 +304,7 @@ get_offset(
 		}
 		break;
 	case 32:
-		if (JobData::kPortrait == org_job_data->getOrientation()) {
+		if (JobData::kPortrait == orientation) {
 			offset.x = width  * (index / 4);
 			offset.y = height * (index % 4);
 		} else {
@@ -330,10 +355,8 @@ get_offset(
 	}
 
 	// adjust margin
-	offset.x += org_job_data->getScaledPrintableRect().left - 
-		org_job_data->getPhysicalRect().left;
-	offset.y += org_job_data->getScaledPrintableRect().top -
-		org_job_data->getPhysicalRect().top;
+	offset.x += scaledPrintableRect.left - physicalRect.left;
+	offset.y += scaledPrintableRect.top - physicalRect.top;
 
 	float real_scale = min(scale->x, scale->y);
 	if (real_scale != scale->x)
@@ -348,7 +371,6 @@ get_offset(
 bool 
 GraphicsDriver::printPage(PageDataList *pages)
 {
-#ifndef USE_PREVIEW_FOR_DEBUG
 	BPoint offset;
 	offset.x = 0.0f;
 	offset.y = 0.0f;
@@ -364,8 +386,7 @@ GraphicsDriver::printPage(PageDataList *pages)
 		fView->ConstrainClippingRegion(NULL);
 		fView->FillRect(fView->Bounds());
 
-		
-		BPoint scale = get_scale(fOrgJobData);
+		BPoint scale = getScale(fOrgJobData->getNup(), fOrgJobData->getPhysicalRect(), fOrgJobData->getScaling());
 		float real_scale = min(scale.x, scale.y) * fOrgJobData->getXres() / 72.0f;
 		fView->SetScale(real_scale);
 		float x = offset.x / real_scale;
@@ -373,7 +394,7 @@ GraphicsDriver::printPage(PageDataList *pages)
 		int page_index = 0;
 
 		for (PageDataList::iterator it = pages->begin(); it != pages->end(); it++) {
-			BPoint left_top(get_offset(page_index++, &scale, fOrgJobData));
+			BPoint left_top(getOffset(fOrgJobData->getNup(), page_index++, fOrgJobData->getOrientation(), &scale, fOrgJobData->getScaledPhysicalRect(), fOrgJobData->getScaledPrintableRect(), fOrgJobData->getPhysicalRect()));
 			left_top.x -= x;
 			left_top.y -= y;
 			BRect clip(fOrgJobData->getScaledPrintableRect());
@@ -398,46 +419,7 @@ GraphicsDriver::printPage(PageDataList *pages)
 			return false;
 		}
 	} while (offset.x >= 0.0f && offset.y >= 0.0f);
-#else	// !USE_PREVIEW_FOR_DEBUG
-	fView->SetScale(1.0);
-	fView->SetHighColor(255, 255, 255);
-	fView->ConstrainClippingRegion(NULL);
-	fView->FillRect(fView->Bounds());
-
-	BPoint scale = get_scale(fOrgJobData);
-	fView->SetScale(min(scale.x, scale.y));
-
-	int page_index = 0;
-	PageDataList::iterator it;
-
-	for (it = pages->begin() ; it != pages->end() ; it++) {
-		BPoint left_top(get_offset(page_index, &scale, fOrgJobData));
-		BRect clip(fOrgJobData->getScaledPrintableRect());
-		clip.OffsetTo(left_top);
-		BRegion *region = new BRegion();
-		region->Set(clip);
-		fView->ConstrainClippingRegion(region);
-		delete region;
-		if ((*it)->startEnum()) {
-			bool more;
-			do {
-				PictureData	*picture_data;
-				more = (*it)->enumObject(&picture_data);
-				BPoint real_offset = left_top + picture_data->point;
-				fView->DrawPicture(picture_data->picture, real_offset);
-				fView->Sync();
-				delete picture_data;
-			} while (more);
-		}
-		page_index++;
-	}
-
-	BRect rc(fRealJobData->getPhysicalRect());
-	rc.OffsetTo(30.0, 30.0);
-	PreviewWindow *preview = new PreviewWindow(rc, "Preview", fBitmap);
-	preview->Go();
-#endif	// USE_PREVIEW_FOR_DEBUG
-
+	
 	return true;
 }
 
@@ -484,6 +466,7 @@ GraphicsDriver::printDocument(SpoolData *spool_data)
 		// send the page multiple times to the printer
 		copies = fRealJobData->getCopies();
 	}
+	fStatusWindow -> SetPageCopies(copies);						// inform fStatusWindow about number of copies
 	
 	// printing of even/odd numbered pages only is valid in simplex mode
 	bool simplex = fRealJobData->getPrintStyle() == JobData::kSimplex;
@@ -514,6 +497,11 @@ GraphicsDriver::printDocument(SpoolData *spool_data)
 
 			// print each physical page "copies" of times
 			for (copy = 0; success && copy < copies; copy ++) {
+
+				// Update the status / cancel job
+				if (fStatusWindow->UpdateStatusBar(page_index, copy))		
+					return false;	
+
 				success = startPage(page_index);
 				if (!success)
 					break;
@@ -549,20 +537,19 @@ GraphicsDriver::printDocument(SpoolData *spool_data)
 	return success;
 }
 
+const JobData*
+GraphicsDriver::getJobData(BFile *spoolFile)
+{
+	setupData(spoolFile);
+	return fOrgJobData;
+}
+
 bool 
 GraphicsDriver::printJob(BFile *spool_file)
 {
 	bool success = true;
-	print_file_header pfh;
-
-	spool_file->Seek(0, SEEK_SET);
-	spool_file->Read(&pfh, sizeof(pfh));
-
-	DBGMSG(("print_file_header::version = 0x%x\n",  pfh.version));
-	DBGMSG(("print_file_header::page_count = %d\n", pfh.page_count));
-	DBGMSG(("print_file_header::first_page = 0x%x\n", (int)pfh.first_page));
-
-	if (pfh.page_count <= 0) {
+	if (!setupData(spool_file)) {
+		// silently exit if there is nothing to print
 		return true;
 	}
 
@@ -571,11 +558,18 @@ GraphicsDriver::printJob(BFile *spool_file)
 	if (fTransport->check_abort()) {
 		success = false;
 	} else if (!fTransport->is_print_to_file_canceled()) {
-		setupData(spool_file, pfh.page_count);
+		BStopWatch stopWatch("printJob", !MEASURE_PRINT_JOB_TIME);
 		setupBitmap();
-		SpoolData spool_data(spool_file, pfh.page_count, fOrgJobData->getNup(), fOrgJobData->getReverse());
+		SpoolData spool_data(spool_file, fPageCount, fOrgJobData->getNup(), fOrgJobData->getReverse());
 		success = startDoc();
 		if (success) {
+			fStatusWindow = new StatusWindow(
+				fRealJobData->getPageSelection() == JobData::kOddNumberedPages,
+				fRealJobData->getPageSelection() == JobData::kEvenNumberedPages, 												
+				fRealJobData->getFirstPage(),
+				fPageCount, 
+				fInternalCopies,fRealJobData->getNup());
+				
 			while (fInternalCopies--) {
 				success = printDocument(&spool_data);
 				if (success == false) {
@@ -583,6 +577,8 @@ GraphicsDriver::printJob(BFile *spool_file)
 				}
 			}
 			endDoc(success);
+		
+			fStatusWindow -> Quit();
 		}
 		cleanupBitmap();
 		cleanupData();

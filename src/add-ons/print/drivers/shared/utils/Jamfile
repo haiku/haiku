@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src add-ons print drivers shared utils ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
+
+StaticLibrary libprintutils.a :
+	InterfaceUtils.cpp
+	MarginView.cpp
+	Utils.cpp
+;
+

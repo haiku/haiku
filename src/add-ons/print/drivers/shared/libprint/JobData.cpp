@@ -19,6 +19,7 @@ static const char *kJDScaledPrintableRect   = "printable_rect";
 static const char *kJDFirstPage             = "first_page";
 static const char *kJDLastPage              = "last_page";
 
+static const char *kJDShowPreview           = "JJJJ_showPreview";
 static const char *kJDPaper                 = "JJJJ_paper";
 static const char *kJDNup                   = "JJJJ_nup";
 static const char *kJDGamma                 = "JJJJ_gamma";
@@ -49,6 +50,7 @@ JobData::~JobData()
 
 JobData::JobData(const JobData &job_data)
 {
+	fShowPreview           = job_data.fShowPreview;
 	fPaper                 = job_data.fPaper;
 	fXRes                  = job_data.fXRes;
 	fYRes                  = job_data.fYRes;
@@ -82,6 +84,7 @@ JobData::JobData(const JobData &job_data)
 
 JobData &JobData::operator = (const JobData &job_data)
 {
+	fShowPreview           = job_data.fShowPreview;
 	fPaper                 = job_data.fPaper;
 	fXRes                  = job_data.fXRes;
 	fYRes                  = job_data.fYRes;
@@ -120,6 +123,11 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	fSettings = settings;
 
 	const PaperCap *paperCap = NULL;
+ 
+ 	if (msg->HasBool(kJDShowPreview))
+ 		fShowPreview = msg->FindBool(kJDShowPreview);
+ 	else
+ 		fShowPreview = false;
  
 	if (msg->HasInt32(kJDPaper))
 		fPaper = (Paper)msg->FindInt32(kJDPaper);
@@ -263,8 +271,10 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	else
 		fPageOrder = kAcrossFromLeft;
 
-	if (msg->HasBool(kJDColor))
-		fColor = msg->FindBool(kJDColor) ? kColor : kMonochrome;
+	if (msg->HasInt32(kJDColor))
+		fColor = (Color)msg->FindInt32(kJDColor);
+	else if (cap->isSupport(PrinterCap::kColor))
+		fColor = ((const ColorCap *)cap->getDefaultCap(PrinterCap::kColor))->color;
 	else
 		fColor = kMonochrome;
 	
@@ -291,142 +301,108 @@ void JobData::save(BMessage *msg)
 	}
 
 	// page settings
-	if (msg->HasInt32(kJDPaper))
-		msg->ReplaceInt32(kJDPaper, fPaper);
-	else
-		msg->AddInt32(kJDPaper, fPaper);
+	msg->RemoveName(kJDPaper);
+	msg->AddInt32(kJDPaper, fPaper);
 
-	if (msg->HasInt64(kJDXRes))
-		msg->ReplaceInt64(kJDXRes, fXRes);
-	else
-		msg->AddInt64(kJDXRes, fXRes);
+	msg->RemoveName(kJDXRes);
+	msg->AddInt64(kJDXRes, fXRes);
 	
-	if (msg->HasInt64(kJDYRes))
-		msg->ReplaceInt64(kJDYRes, fYRes);
-	else
-		msg->AddInt64(kJDYRes, fYRes);
+	msg->RemoveName(kJDYRes);
+	msg->AddInt64(kJDYRes, fYRes);
 
-	if (msg->HasInt32(kJDOrientation))
-		msg->ReplaceInt32(kJDOrientation, fOrientation);
-	else
-		msg->AddInt32(kJDOrientation, fOrientation);
+	msg->RemoveName(kJDOrientation);
+	msg->AddInt32(kJDOrientation, fOrientation);
 
-	if (msg->HasFloat(kJDScaling))
-		msg->ReplaceFloat(kJDScaling, fScaling);
-	else
-		msg->AddFloat(kJDScaling, fScaling);
+	msg->RemoveName(kJDScaling);
+	msg->AddFloat(kJDScaling, fScaling);
 
-	if (msg->HasRect(kJDPaperRect))
-		msg->ReplaceRect(kJDPaperRect, fPaperRect);
-	else
-		msg->AddRect(kJDPaperRect, fPaperRect);
+	msg->RemoveName(kJDPaperRect);
+	msg->AddRect(kJDPaperRect, fPaperRect);
 
-	if (msg->HasRect(kJDScaledPaperRect))
-		msg->ReplaceRect(kJDScaledPaperRect, fScaledPaperRect);
-	else
-		msg->AddRect(kJDScaledPaperRect, fScaledPaperRect);
+	msg->RemoveName(kJDScaledPaperRect);
+	msg->AddRect(kJDScaledPaperRect, fScaledPaperRect);
 
-	if (msg->HasRect(kJDPrintableRect))
-		msg->ReplaceRect(kJDPrintableRect, fPrintableRect);
-	else
-		msg->AddRect(kJDPrintableRect, fPrintableRect);
+	msg->RemoveName(kJDPrintableRect);
+	msg->AddRect(kJDPrintableRect, fPrintableRect);
 
-	if (msg->HasRect(kJDScaledPrintableRect))
-		msg->ReplaceRect(kJDScaledPrintableRect, fScaledPrintableRect);
-	else
-		msg->AddRect(kJDScaledPrintableRect, fScaledPrintableRect);
+	msg->RemoveName(kJDScaledPrintableRect);
+	msg->AddRect(kJDScaledPrintableRect, fScaledPrintableRect);
 
-	if (msg->HasRect(kJDPhysicalRect))
-		msg->ReplaceRect(kJDPhysicalRect, fPhysicalRect);
-	else
-		msg->AddRect(kJDPhysicalRect, fPhysicalRect);
+	msg->RemoveName(kJDPhysicalRect);
+	msg->AddRect(kJDPhysicalRect, fPhysicalRect);
 
-	if (msg->HasRect(kJDScaledPhysicalRect))
-		msg->ReplaceRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
-	else
-		msg->AddRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
+	msg->RemoveName(kJDScaledPhysicalRect);
+	msg->AddRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
 
-	if (msg->HasInt32(kJDMarginUnit))
-		msg->ReplaceInt32(kJDMarginUnit, fMarginUnit);
-	else
-		msg->AddInt32(kJDMarginUnit, fMarginUnit);
+	msg->RemoveName(kJDMarginUnit);
+	msg->AddInt32(kJDMarginUnit, fMarginUnit);
 
-	// page settings end here; don't store job settings in message
-	if (fSettings == kPageSettings) return;
+	// page settings end here
 	
 	// job settings
-	if (msg->HasInt32(kJDNup))
-		msg->ReplaceInt32(kJDNup, fNup);
-	else
+
+	// make sure job settings are not present in page settings
+	msg->RemoveName(kJDShowPreview);
+	if (fSettings == kJobSettings)
+		msg->AddBool(kJDShowPreview, fShowPreview);
+	
+	msg->RemoveName(kJDNup);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDNup, fNup);
 
-	if (msg->HasInt32(kJDFirstPage))
-		msg->ReplaceInt32(kJDFirstPage, fFirstPage);
-	else
+	msg->RemoveName(kJDFirstPage);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDFirstPage, fFirstPage);
 
-	if (msg->HasInt32(kJDLastPage))
-		msg->ReplaceInt32(kJDLastPage, fLastPage);
-	else
+	msg->RemoveName(kJDLastPage);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDLastPage, fLastPage);
 
-	if (msg->HasFloat(kJDGamma))
-		msg->ReplaceFloat(kJDGamma, fGamma);
-	else
+	msg->RemoveName(kJDGamma);
+	if (fSettings == kJobSettings)
 		msg->AddFloat(kJDGamma, fGamma);
 
-	if (msg->HasFloat(kJDInkDensity))
-		msg->ReplaceFloat(kJDInkDensity, fInkDensity);
-	else
+	msg->RemoveName(kJDInkDensity);
+	if (fSettings == kJobSettings)
 		msg->AddFloat(kJDInkDensity, fInkDensity);
 
-	if (msg->HasInt32(kJDPaperSource))
-		msg->ReplaceInt32(kJDPaperSource, fPaperSource);
-	else
+	msg->RemoveName(kJDPaperSource);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDPaperSource, fPaperSource);
 
-	if (msg->HasInt32(kJDCopies))
-		msg->ReplaceInt32(kJDCopies, fCopies);
-	else
+	msg->RemoveName(kJDCopies);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDCopies, fCopies);
 
-	if (msg->HasBool(kJDCollate))
-		msg->ReplaceBool(kJDCollate, fCollate);
-	else
+	msg->RemoveName(kJDCollate);
+	if (fSettings == kJobSettings)
 		msg->AddBool(kJDCollate, fCollate);
 
-	if (msg->HasBool(kJDReverse))
-		msg->ReplaceBool(kJDReverse, fReverse);
-	else
+	msg->RemoveName(kJDReverse);
+	if (fSettings == kJobSettings)
 		msg->AddBool(kJDReverse, fReverse);
 
-	if (msg->HasInt32(kJDPrintStyle))
-		msg->ReplaceInt32(kJDPrintStyle, fPrintStyle);
-	else
+	msg->RemoveName(kJDPrintStyle);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDPrintStyle, fPrintStyle);
 
-	if (msg->HasInt32(kJDBindingLocation))
-		msg->ReplaceInt32(kJDBindingLocation, fBindingLocation);
-	else
+	msg->RemoveName(kJDBindingLocation);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDBindingLocation, fBindingLocation);
 
-	if (msg->HasInt32(kJDPageOrder))
-		msg->ReplaceInt32(kJDPageOrder, fPageOrder);
-	else
+	msg->RemoveName(kJDPageOrder);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDPageOrder, fPageOrder);
 
-	if (msg->HasBool(kJDColor))
-		msg->ReplaceBool(kJDColor, fColor == kColor);
-	else
-		msg->AddBool(kJDColor, fColor == kColor);
+	msg->RemoveName(kJDColor);
+	if (fSettings == kJobSettings)
+		msg->AddInt32(kJDColor, fColor);
 
-	if (msg->HasInt32(kJDDitherType))
-		msg->ReplaceInt32(kJDDitherType, fDitherType);
-	else
+	msg->RemoveName(kJDDitherType);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDDitherType, fDitherType);
 	
-	if (msg->HasInt32(kJDPageSelection))
-		msg->ReplaceInt32(kJDPageSelection, fPageSelection);
-	else
+	msg->RemoveName(kJDPageSelection);
+	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDPageSelection, fPageSelection);
 }

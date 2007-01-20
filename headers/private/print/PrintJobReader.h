@@ -27,6 +27,9 @@ THE SOFTWARE.
 
 */
 
+#ifndef _PRINT_JOB_READER_H
+#define _PRINT_JOB_READER_H
+
 #include <File.h>
 #include <Message.h>
 
@@ -79,4 +82,6 @@ public:
 		// retrieve page
 	status_t GetPage(int no, PrintJobPage& pjp);
 };
+
+#endif
 

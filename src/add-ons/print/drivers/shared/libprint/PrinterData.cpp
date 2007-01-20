@@ -34,6 +34,7 @@ void PrinterData::load()
 	char buffer[512];
 
 	fNode->ReadAttr(PD_DRIVER_NAME,  B_STRING_TYPE, 0, buffer, sizeof(buffer));
+	// TODO fix possible buffer overrun (not terminated string).
 	fDriverName = buffer;
 	fNode->ReadAttr(PD_PRINTER_NAME, B_STRING_TYPE, 0, buffer, sizeof(buffer));
 	fPrinterName = buffer;
@@ -41,14 +42,18 @@ void PrinterData::load()
 	fComments = buffer;
 	fNode->ReadAttr(PD_TRANSPORT,    B_STRING_TYPE, 0, buffer, sizeof(buffer));
 	fTransport = buffer;
-	fNode->ReadAttr(PD_PROTOCOL_CLASS, B_BOOL_TYPE, 0, &fProtocolClass, sizeof(fProtocolClass));
+	
+	int32 valueI32;
+	fNode->ReadAttr(PD_PROTOCOL_CLASS, B_INT32_TYPE, 0, &valueI32, sizeof(valueI32));
+	fProtocolClass = (int)valueI32;
 }
 
 void PrinterData::save()
 {
 	if (fNode == NULL) return;
 
-	fNode->WriteAttr(PD_PROTOCOL_CLASS, B_BOOL_TYPE, 0, &fProtocolClass, sizeof(fProtocolClass));
+	int32 valueI32 = (int32)fProtocolClass;
+	fNode->WriteAttr(PD_PROTOCOL_CLASS, B_INT32_TYPE, 0, &valueI32, sizeof(valueI32));
 }
 
 bool PrinterData::getPath(string &path) const

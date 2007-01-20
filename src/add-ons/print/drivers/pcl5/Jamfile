@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons print drivers pcl5 ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
 
 AddResources PCL5\ Compatible : PCL5.rsrc ;
 
@@ -12,7 +13,11 @@ Addon PCL5\ Compatible : Print :
 	PCL5Cap.cpp
 ;
 
-LinkAgainst PCL5\ Compatible : be libprint.a $(TARGET_LIBSTDC++) ;
+LinkAgainst PCL5\ Compatible : 
+	be 
+	libprint.a 
+	libprintutils.a
+	$(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	PCL5\ Compatible :

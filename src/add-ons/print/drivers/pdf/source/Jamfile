@@ -2,8 +2,7 @@ SubDir HAIKU_TOP src add-ons print drivers pdf source ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders interface print ;
-
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdflib ] ;
 
 AddResources PDF\ Writer : 
@@ -11,6 +10,7 @@ AddResources PDF\ Writer :
 ;
 
 Addon PDF\ Writer : Print :
+	AboutText.cpp
 	AdvancedSettingsWindow.cpp
 	Bezier.cpp
 	Bookmark.cpp
@@ -22,7 +22,6 @@ Addon PDF\ Writer : Print :
 	FontsWindow.cpp
 	Image.cpp
 	ImageCache.cpp
-	InterfaceUtils.cpp
 	JobSetupWindow.cpp
 	LinePathBuilder.cpp
 	Link.cpp
@@ -42,7 +41,6 @@ Addon PDF\ Writer : Print :
 	Scanner.cpp
 	StatusWindow.cpp
 	SubPath.cpp
-	Utils.cpp
 	XReferences.cpp	
 ;
 
@@ -51,7 +49,7 @@ LinkAgainst PDF\ Writer :
 	textencoding 
 	translation
 	libpdf.a 
-	libprint.a 
+	libprintutils.a 
 ;
 
 Package haiku-pdf_writer-cvs :

@@ -118,8 +118,8 @@ THE SOFTWARE.
 				kUnitPoint, 1 point/point
 */
 
-#ifndef MARGIN_VIEW_H
-#define MARGIN_VIEW_H
+#ifndef _MARGIN_VIEW_H
+#define _MARGIN_VIEW_H
 
 #include <InterfaceKit.h>
 #include <Looper.h>
@@ -222,4 +222,4 @@ public:
 	void MessageReceived(BMessage *msg);
 };
 
-#endif //MARGIN_VIEW_H
+#endif // _MARGIN_VIEW_H

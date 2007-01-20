@@ -1,12 +1,12 @@
 /*
 
-PrintTransportAddOn
+AboutText.cpp
 
-Copyright (c) 2003, 04 OpenBeOS. 
+Copyright (c) 2001-2006 Haiku. 
 
-Author:
+Author: 
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -27,16 +27,20 @@ THE SOFTWARE.
 
 */
 
-#ifndef _PRINT_TRANSPORT_ADD_ON_H
-#define _PRINT_TRANSPORT_ADD_ON_H
+#include <InterfaceDefs.h>
 
-#include <image.h>
-#include <DataIO.h>
-#include <Directory.h>
-#include <Message.h>
-
-// to be implemented by the transport add-on
-extern "C" BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg);
-
-#endif
-
+static const char* 
+kAbout =
+"PDF Writer for BeOS\n"
+B_UTF8_COPYRIGHT " 2001-2004 Haiku\n"
+"\n"
+"Philippe Houdoin\n"
+"\tProject Leader\n\n"
+"Simon Gauvin\n"
+"\tGUI Design\n\n"
+"Michael Pfeiffer\n"
+"\tPDF Generation\n"
+"\tConfiguration\n"
+"\tInteractive Features\n"
+"\t" B_UTF8_ELLIPSIS
+;

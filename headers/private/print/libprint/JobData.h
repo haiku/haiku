@@ -206,7 +206,10 @@ public:
 */
 	enum Color {
 		kMonochrome = 1,
-		kColor
+		kColor,
+		// Some PCL6 printers do not support compressed data
+		// in color mode.
+		kColorCompressionDisabled
 	};
 
 	enum Settings {
@@ -221,6 +224,7 @@ public:
 	};
 
 private:
+	bool        fShowPreview;
 	Paper       fPaper;
 	int32       fXRes;
 	int32       fYRes;
@@ -260,6 +264,9 @@ public:
 
 	void load(BMessage *msg, const PrinterCap *cap, Settings settings);
 	void save(BMessage *msg = NULL);
+
+	bool getShowPreview() const { return fShowPreview; }
+	void setShowPreview(bool showPreview) { fShowPreview = showPreview; }
 
 	Paper getPaper() const { return fPaper; }
 	void  setPaper(Paper paper) { fPaper = paper; }

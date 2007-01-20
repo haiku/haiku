@@ -137,7 +137,7 @@ PrinterDriver::PrintJob
 	Report::Instance();
 
 	// show status window
-	fStatusWindow = new StatusWindow(passes, pfh.page_count, this);
+	StatusWindow* statusWindow = new StatusWindow(passes, pfh.page_count, this);
 
 	status = BeginJob();
 
@@ -146,7 +146,7 @@ PrinterDriver::PrintJob
 		for (copy = 0; copy < copies && status == B_OK && fPrinting; copy++) 
 		{
 			for (page = 1; page <= pfh.page_count && status == B_OK && fPrinting; page++) {
-				fStatusWindow->PostMessage(new BMessage('page'));
+				statusWindow->NextPage();
 				status = PrintPage(page, pfh.page_count);
 			}
 	
@@ -163,10 +163,10 @@ PrinterDriver::PrintJob
 	
 	// close status window
 	if (Report::Instance()->CountItems() != 0) {
-		fStatusWindow->WaitForClose();
+		statusWindow->WaitForClose();
 	}
-	if (fStatusWindow->Lock()) {
-		fStatusWindow->Quit();
+	if (statusWindow->Lock()) {
+		statusWindow->Quit();
 	}
 
 	// delete Report object

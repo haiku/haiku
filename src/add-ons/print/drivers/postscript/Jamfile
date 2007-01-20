@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons print drivers postscript ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
 
 AddResources PS\ Compatible : PS.rsrc ;
 
@@ -12,7 +13,11 @@ Addon PS\ Compatible : Print :
 	PSCap.cpp
 ;
 
-LinkAgainst PS\ Compatible : be libprint.a $(TARGET_LIBSTDC++) ;
+LinkAgainst PS\ Compatible : 
+	be 
+	libprint.a 
+	libprintutils.a
+	$(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	PS\ Compatible :

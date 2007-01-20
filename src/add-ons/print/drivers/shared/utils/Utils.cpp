@@ -1,8 +1,9 @@
 /*
 
-PDF Writer printer driver.
+Preview printer driver.
 
-Copyright (c) 2001-2003 OpenBeOS. 
+Copyright (c) 2001, 2002 OpenBeOS. 
+Copyright (c) 2005 Haiku.
 
 Authors: 
 	Philippe Houdoin
@@ -29,7 +30,6 @@ THE SOFTWARE.
 
 */
 
-#include <string.h>
 #include "Utils.h"
 
 // --------------------------------------------------
@@ -54,51 +54,6 @@ EscapeMessageFilter::Filter(BMessage *msg, BHandler **target)
 	return B_DISPATCH_MESSAGE;
 }
 
-// --------------------------------------------------
-// copied from BeUtils.cpp
-static bool InList(const char* list[], const char* name) {
-	for (int i = 0; list[i] != NULL; i ++) {
-		if (strcmp(list[i], name) == 0) return true;
-	}
-	return false;
-} 
-
-// --------------------------------------------------
-// copied from BeUtils.cpp
-void AddFields(BMessage* to, const BMessage* from, bool overwrite, const char* excludeList[], const char* includeList[]) {
-	if (to == from) return;
-	char* name;
-	type_code type;
-	int32 count;
-	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
-		const void* data;
-		ssize_t size;
-		if (excludeList && InList(excludeList, name)) continue;
-		if (includeList && !InList(includeList, name)) continue;
-
-		if (!overwrite && to->FindData(name, type, 0, &data, &size) == B_OK) {
-			continue;
-		}
-		// replace existing data
-		to->RemoveName(name);
-		
-		for (int32 j = 0; j < count; j ++) {
-			if (from->FindData(name, type, j, &data, &size) == B_OK) {
-				// WTF why works AddData not for B_STRING_TYPE in R5.0.3?
-				if (type == B_STRING_TYPE) {
-					to->AddString(name, (const char*)data);
-				} else if (type == B_MESSAGE_TYPE) {
-					BMessage m;
-					from->FindMessage(name, j, &m);
-					to->AddMessage(name, &m);
-				} else {
-					to->AddData(name, type, data, size);
-				}
-			}
-		}
-	}
-}
-
 void AddString(BMessage* m, const char* name, const char* value) {
 	if (m->HasString(name, 0)) {
 		m->ReplaceString(name, value);
@@ -107,4 +62,26 @@ void AddString(BMessage* m, const char* name, const char* value) {
 	}
 }
 
+void SetRect(BMessage* msg, const char* name, BRect rect) {
+	if (msg->HasRect(name)) {
+		msg->ReplaceRect(name, rect);
+	} else {
+		msg->AddRect(name, rect);
+	}
+}
 
+void SetFloat(BMessage* msg, const char* name, float value) {
+	if (msg->HasFloat(name)) {
+		msg->ReplaceFloat(name, value);
+	} else {
+		msg->AddFloat(name, value);
+	}
+}
+
+void SetInt32(BMessage* msg, const char* name, int32 value) {
+	if (msg->HasInt32(name)) {
+		msg->ReplaceInt32(name, value);
+	} else {
+		msg->AddInt32(name, value);
+	}
+}

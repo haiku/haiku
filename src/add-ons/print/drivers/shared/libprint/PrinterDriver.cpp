@@ -22,6 +22,7 @@
 #include "PrinterCap.h"
 #include "PrinterData.h"
 #include "UIDriver.h"
+#include "Preview.h"
 
 
 // Implementation of PrinterDriver
@@ -138,6 +139,13 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 	DUMP_BNODE(fSpoolFolder);
 
 	fGraphicsDriver = InstantiateGraphicsDriver(settings, fPrinterData, fPrinterCap);
+	const JobData* jobData = fGraphicsDriver->getJobData(printJob);
+	if (jobData != NULL && jobData->getShowPreview()) {
+		PreviewWindow *preview = new PreviewWindow(printJob, true);
+		if (preview->Go() != B_OK) {
+			return new BMessage('okok');
+		}
+	}	
 	BMessage *result = fGraphicsDriver->takeJob(printJob);
 
 	DUMP_BMESSAGE(result);

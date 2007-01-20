@@ -44,14 +44,11 @@ class StatusWindow : public HWindow
 private:
 	int32 fPass;
 	int32 fPages;
-//	BString fCopy;
+	
 	BString fPage;
 	int32 fPageCount;
-//	int fCopyCount;
-//	BStringView *fCopyLabel;
 	BStringView *fPageLabel;
 	BStatusBar *fPageStatus;
-//	BStatusBar *fCopyStatus;
 	BButton *fCancel;
 	PrinterDriver *fPrinterDriver;
 	int32      fReportIndex;
@@ -60,12 +57,14 @@ private:
 	CloseOption fCloseOption;
 
 	void UpdateReport();
+
 public:
 	typedef HWindow inherited;
 	
 	StatusWindow(int32 passes, int32 pages, PrinterDriver *pd);
 	
 	void MessageReceived(BMessage *msg);
+	void NextPage();
 	void WaitForClose();
 };
 #endif

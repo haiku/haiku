@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Link.h"
 #include "XReferences.h"
 #include "Bookmark.h"
+#include "PDFSystem.h"
 #include "PDFWriter.h"
 #include "Log.h"
 #include "Report.h"

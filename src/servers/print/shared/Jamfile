@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders shared interface print ;
 
 StaticLibrary 
-	libprint.a
+	libprintutils.a
 	: 
 	BeUtils.cpp
 	BeUtilsTranslation.cpp

@@ -6,6 +6,8 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ;
 
 # for BeUtils.h
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print ] ; 
+# for Utils.h, InterfaceUtils.h
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
 
 StaticLibrary libprint.a :
 	AboutBox.cpp
@@ -18,7 +20,6 @@ StaticLibrary libprint.a :
 	JSDSlider.cpp
 	JobData.cpp
 	JobSetupDlg.cpp
-	MarginView.cpp
 	PackBits.cpp
 	PageSetupDlg.cpp
 	PagesView.cpp
@@ -28,6 +29,7 @@ StaticLibrary libprint.a :
 	PrinterCap.cpp
 	PrintProcess.cpp
 	SpoolMetaData.cpp
+	StatusWindow.cpp
 	Transport.cpp
 	UIDriver.cpp
 	ValidRect.cpp

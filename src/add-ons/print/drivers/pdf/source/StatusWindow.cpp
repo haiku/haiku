@@ -34,19 +34,20 @@ THE SOFTWARE.
 #include <Message.h>
 #include <Box.h>
 
+static const uint32 kCancelMsg = 'cncl';
+static const uint32 kProgressMsg = 'prgs'; 
 
 // --------------------------------------------------
 StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd) 
-	:	HWindow(BRect(100, 100, 700, 600/*400, 185*/), "PDF Writer", 
+	:	HWindow(BRect(100, 100, 700, 600), "PDF Writer", 
 			B_TITLED_WINDOW, 
 			B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_NOT_CLOSABLE|B_FRAME_EVENTS,
-			B_CURRENT_WORKSPACE, 'cncl') 
+			B_CURRENT_WORKSPACE, kCancelMsg) 
 {
 	fPass = 0;
 	fPages = pages;
 	fPrinterDriver = pd;
 	fPageCount = 0;
-//	fPopyCount = 0;
 	fReportIndex = 0;
 	fCloseSem = -1;
 	int32 closeOption;
@@ -61,21 +62,7 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 					B_PLAIN_BORDER);
 	AddChild(fPanel);
-/*
-	if (fCopies > 1) {
-		pages *= fCopies;
-	}
-	
-	r.Set(10, 0, Frame().Width(), 50);
-	copyLabel = new BStringView(r, "copy_text", "Copy");
-	panel->AddChild(copyLabel);
-	
-	r.Set(10, 55, Frame().Width()-20, 65);
-	copyStatus = new BStatusBar(r, "copyStatus");
-	copyStatus->SetMaxValue(copies);
-	copyStatus->SetBarHeight(12);
-	panel->AddChild(copyStatus);
-*/	
+
 	r.Set(10, 12, Frame().Width()-5, 22);
 	fPageLabel = new BStringView(r, "page_text", "Page", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fPanel->AddChild(fPageLabel);
@@ -86,17 +73,11 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 	fPageStatus->SetBarHeight(12);
 	fPanel->AddChild(fPageStatus);
 
-	// Cancel button
-	// add a separator line...
-//	BBox *line = new BBox(BRect(r.left, 50, r.right, 51), NULL,
-//						 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
-//	panel->AddChild(line);
-
 	// add a "Cancel" button
 	int32 x = 110;
 	int32 y = 55;
 	fCancel 	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", 
-				new BMessage('cncl'), B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
+				new BMessage(kCancelMsg), B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
 	fCancel->ResizeToPreferred();
 	fPanel->AddChild(fCancel);
 
@@ -107,7 +88,6 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 	fReport->SetStylable(true);
 	fReport->MakeEditable(false);
 	fPanel->AddChild(new BScrollView("", fReport, B_FOLLOW_ALL, 0, false, true));
-//	fPanel->AddChild(fReport);
 
 	ResizeTo(300, 85);
 
@@ -119,15 +99,7 @@ void
 StatusWindow::MessageReceived(BMessage *msg) 
 {
 	switch (msg->what) {
-/*
-		case 'copy':
-			copy = "";
-			copy << "Copy: " << ++copyCount;
-			copyLabel->SetText(copy.String());
-			copyStatus->Update(1);
-			break;
-*/
-		case 'cncl':
+		case kCancelMsg:
 			if (fCloseSem == -1) {
 				fPrinterDriver->StopPrinting();
 				fCancel->SetEnabled(false);
@@ -136,7 +108,8 @@ StatusWindow::MessageReceived(BMessage *msg)
 				release_sem(fCloseSem);
 			}
 			break;
-		case 'page':
+			
+		case kProgressMsg:
 			fPage = "";
 			if (fPass == 0) 
 				fPage << "Collecting Patterns Page: " << fPageCount;
@@ -200,7 +173,13 @@ void StatusWindow::UpdateReport() {
 	}
 }
 
-void StatusWindow::WaitForClose() {
+void
+StatusWindow::NextPage() {
+	PostMessage(kProgressMsg);
+}
+
+void 
+StatusWindow::WaitForClose() {
 	fCloseSem = create_sem(0, "close_sem");
 	
 	Lock();
@@ -220,7 +199,7 @@ void StatusWindow::WaitForClose() {
 			fCloseOption == kNoErrors && !hasErrors ||
 			fCloseOption == kNoErrorsOrWarnings && !hasErrorsOrWarnings ||
 			fCloseOption == kNoErrorsWarningsOrInfo && !hasErrorsWarningsOrInfo) {
-			PostMessage('cncl');
+			PostMessage(kCancelMsg);
 		}
 	Unlock();
 	

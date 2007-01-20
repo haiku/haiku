@@ -1,35 +1,13 @@
 /*
-
-Preview printer driver.
-
-Copyright (c) 2003 OpenBeOS. 
-Copyright (c) 2005 Haiku.
-
-Authors: 
-	Philippe Houdoin
-	Simon Gauvin	
-	Michael Pfeiffer
-	Hartmut Reh
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
+ * Copyright 2003-2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Philippe Houdoin
+ *		Simon Gauvin	
+ *		Michael Pfeiffer
+ *		Hartmut Reh
+ */
 
 #include <stdlib.h>
 
@@ -38,8 +16,8 @@ THE SOFTWARE.
 #include "PrinterDriver.h"
 #include "PageSetupWindow.h"
 
+#include "BeUtils.h"
 #include "MarginView.h"
-
 
 // static global variables
 static struct 
@@ -113,7 +91,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	int32       orient;
 	BRect		page;
 	BRect		margin(0, 0, 0, 0);
-	int32 		units = MarginView::UNIT_INCH;
+	MarginUnit	units = kUnitInch;
 	BString 	setting_value;
 
 	// load orientation
@@ -131,7 +109,10 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	}
 	
 	// Load units
-	fSetupMsg->FindInt32("units", &units);
+	int32 unitsValue;
+	if (fSetupMsg->FindInt32("units", &unitsValue) == B_OK) {
+		units = (MarginUnit)unitsValue;
+	}
 	
 	// add a *dialog* background
 	r = Bounds();
@@ -149,7 +130,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		margin.right = page.right - margin.right;
 		margin.bottom = page.bottom - margin.bottom;
 	} else {
-		margin.Set(0, 0, 0, 0);
+		margin.Set(28.34, 28.34, 28.34, 28.34);		// 28.34 dots = 1cm
 	}
 
 	fMarginView = new MarginView(BRect(20,20,200,160), (int32)width, (int32)height,
@@ -340,7 +321,7 @@ PageSetupWindow::UpdateSetupMessage()
 		SetRect(fSetupMsg, "printable_rect", ScaleRect(margin, scaleR));
 
 		// save the units used
-		int32 units = fMarginView->GetUnits();
+		int32 units = fMarginView->GetMarginUnit();
 		SetInt32(fSetupMsg, "units", units);
 	}	
 }

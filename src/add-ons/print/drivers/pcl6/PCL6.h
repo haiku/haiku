@@ -29,7 +29,9 @@ protected:
 	virtual bool endDoc(bool success);
 
 private:
+	bool supportsRLECompression();
 	bool supportsDeltaRowCompression();
+	bool useColorMode();
 	PCL6Writer::MediaSize mediaSize(JobData::Paper paper);
 	PCL6Writer::MediaSource mediaSource(JobData::PaperSource source);
 	void move(int x, int y);

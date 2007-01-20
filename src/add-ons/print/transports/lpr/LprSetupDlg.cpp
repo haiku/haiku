@@ -96,13 +96,15 @@ void LprSetupView::AttachedToWindow()
 
 	/* server name box */
 
-	server = new BTextControl(SERVER_RECT, "", SERVER_TEXT, "", NULL);
+    // TODO remember previous value
+	server = new BTextControl(SERVER_RECT, "", SERVER_TEXT, "192.168.0.0", NULL);
 	AddChild(server);
 	server->SetDivider(width);
 
 	/* queue name box */
 
-	queue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "", NULL);
+    // TODO remember previous value
+	queue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "LPT1_PASSTHRU", NULL);
 	AddChild(queue);
 	queue->SetDivider(width);
 

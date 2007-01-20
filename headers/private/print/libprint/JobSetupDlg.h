@@ -29,7 +29,7 @@ public:
 	JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage *msg);
-	bool UpdateJobData();
+	bool UpdateJobData(bool showPreview);
 
 private:
 	void UpdateButtonEnabledState();

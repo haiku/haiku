@@ -36,8 +36,8 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef BEUTILS_H
-#define BEUTILS_H
+#ifndef _BE_UTILS_H
+#define _BE_UTILS_H
 
 #include <FindDirectory.h>
 #include <Path.h>
@@ -91,7 +91,7 @@ public:
 // mimetype from sender
 bool MimeTypeForSender(BMessage* sender, BString& mime);
 // adds fields to message or replaces existing fields
-void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL);
+void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL, bool overwrite = true);
 // load bitmap from application resources
 BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP);
 // convert bitmap to picture; view must be attached to a window!
