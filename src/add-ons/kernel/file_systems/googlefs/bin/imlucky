@@ -1,0 +1,2 @@
+#!/bin/sh
+query -v /google/ '((name=="*'"$*"'*")&&(BEOS:TYPE=="application/x-vnd.Be-bookmark"))' | xargs catattr META:url | head -1

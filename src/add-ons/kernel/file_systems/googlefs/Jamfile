@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems googlefs ;
+
+UsePrivateHeaders kernel ;
+
+#SubDirCcFlags -DTRACK_FILENAME ;
+#SubDirCcFlags -DDEBUG_GOOGLEFS=1 ;
+
+KernelAddon googlefs :
+	attrs.c
+	google_icon.c
+	google_request.c
+	googlefs.c
+	http_cnx.c
+	lists2.c
+	parse_google_html.c
+	query.c
+	settings.c
+	string_utils.c
+	vnidpool.c
+;

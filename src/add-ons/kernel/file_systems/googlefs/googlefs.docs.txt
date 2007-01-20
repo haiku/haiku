@@ -1,0 +1,10 @@
+======================
+pointers to docs
+
+parsing google results from python (+ diffs on User-Agent ?):
+http://forums.devshed.com/archive/t-154742
+
+perl hack: plain old XML instead of SOAP:
+http://hacks.oreilly.com/pub/h/173
+
+http://www.webmasterworld.com/forum10003/2856.htm

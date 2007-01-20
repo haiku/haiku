@@ -1,0 +1,33 @@
+File:  Search Google a
+Type              Size  Name                                Value                                                            
+----------  ----------  ----------------------------------  -----------------------------------------------------------------
+'MIMS'              35  "BEOS:TYPE"                         "application/x-vnd.Be-queryTemplate"                             
+STRING             191  "_trk/qrystr"                       "((name==\"*[aA][nN][yY] [qQ][uU][eE][sS][tT][iI][oO][nN] [yY][o"
+                                                            "O][uU]\\'[dD] [lL][iI][kK][eE] [tT][oO] [aA][sS][kK] [gG][oO][o"
+                                                            "O][gG][lL][eE] ?*\")&&(BEOS:TYPE==\"application/x-vnd.Be-bookma"
+                                                            "rk\"))"                                                         
+BOOL                 1  "_trk/queryDynamicDate"             TRUE                                                             
+INT32                4  "_trk/recentQuery"                  1 0x00000001                                                     
+MESSAGE            152  "_trk/qryvol1"                      31 42 4F 46 01 00 00 98-98 00 00 00 00 00 00 00 1BOF............ 
+                                                            01 0F 47 4E 4F 4C 04 0C-63 72 65 61 74 69 6F 6E ..GNOL..creation 
+                                                            44 61 74 65 51 EA C7 41-0F 47 4E 4C 4C 08 08 63 DateQ..A.GNLL..c 
+                                                            61 70 61 63 69 74 79 00-00 00 00 00 00 00 00 0B apacity......... 
+                                                            52 54 53 43 08 0A 64 65-76 69 63 65 4E 61 6D 65 RTSC..deviceName 
+                                                            01 00 00 00 00 00 70 41-0B 52 54 53 43 10 0A 76 ......pA.RTSC..v 
+                                                            6F 6C 75 6D 65 4E 61 6D-65 07 00 00 00 47 6F 6F olumeName....Goo 
+                                                            67 6C 65 00 00 00 00 00-00 0B 52 54 53 43 10 07 gle.......RTSC.. 
+                                                            66 73 68 4E 61 6D 65 09-00 00 00 67 6F 6F 67 6C fshName....googl 
+                                                            65 66 73 00 00 00 00 00-                        efs.....         
+STRING               9  "_trk/qryinitmime"                  "Bookmark"                                                       
+INT32                4  "_trk/qryinitmode"                  1180858734 0x4662796E                                            
+RAW                 36  "_trk/qrymoreoptions_le"            00 00 06 EC 00 00 00 00-01 00 00 00 00 00 00 00 ................ 
+                                                            00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00 ................ 
+                                                            00 00 00 00            -                        ....             
+STRING              40  "_trk/qryinitstr"                   "Any question you'd like to ask google ?"                        
+STRING              12  "_trk/focusedView"                  "TextControl"                                                    
+INT32                4  "_trk/focusedSelEnd"                39 0x00000027                                                    
+INT32                4  "_trk/focusedSelStart"              0 0x00000000                                                     
+RAW                 60  "_trk/xtpinfo_le"                   FF FF FF FF 00 00 00 00-00 00 00 00 00 00 00 00 ................ 
+                                                            00 00 00 00 00 00 00 00-00 00 00 00 01 00 00 00 ................ 
+                                                            00 00 82 43 00 00 A0 42-00 00 00 00 00 00 00 00 ...C...B........ 
+                                                            00 E0 9F 44 00 C0 7F 44-FF FF FF FF             ...D...D....     

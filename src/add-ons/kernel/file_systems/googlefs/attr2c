@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ $# -lt 2 ]; then
+	echo "attr2c attrname file"
+	exit 1
+fi
+#for R5 catattr
+/bin/catattr "$1" "$2" | tail +2 | cut -c 10-57 | sed 's/,/, 0x/g;s/ / 0x/;s/   *//;s/$/,/'
+#for zeta ??
+#catattr "$1" "$2" | tail +2 | cut -c 10-57 | sed 's/,/, 0x/g;s/ / 0x/;s/   *//;s/$/,/'
