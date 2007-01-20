@@ -8,6 +8,14 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/socket.h>
+#ifdef __HAIKU__
+#include <fs_volume.h>
+int mount(const char *filesystem, const char *where, const char *device, ulong flags, void *parameters, size_t len)
+{
+	(void) len;
+	return fs_mount_volume(where, device, filesystem, flags, (const char *)parameters);
+}
+#endif
 
 struct mount_nfs_params
 {
@@ -31,7 +39,7 @@ int main (int argc, char **argv)
 	signal(SIGINT, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
 
-	BApplication theApp ("application/x-vnd.barecode-mount_nfs");
+	//BApplication theApp ("application/x-vnd.barecode-mount_nfs");
 	
 	if (argc!=5)
 	{
