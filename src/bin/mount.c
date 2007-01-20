@@ -18,9 +18,11 @@ static void
 usage(const char *programName)
 {
 	
-	printf("usage: %s [-ro] [-t fstype] [-p parameter] device directory\n"
+	printf("usage: %s [-ro] [-t fstype] [-p parameter] [device] directory\n"
 		"\t-ro\tmounts the volume read-only\n"
-		"\t-t\tspecifies the file system to use (defaults to automatic recognition)\n",programName);
+		"\t-t\tspecifies the file system to use (defaults to automatic recognition)\n"
+		"\t-p\tspecifies parameters to pass to the file system (-o also accepted)\n"
+		"\tif device is not specified, NULL is passed (for in-memory filesystems)\n",programName);
 	exit(1);
 }
 
@@ -29,7 +31,8 @@ int
 main(int argc, char **argv)
 {
 	const char *programName = argv[0];
-	const char *device, *mountPoint;
+	const char *device = NULL;
+	const char *mountPoint;
 	const char *parameter = NULL;
 	const char *fs = NULL;
 	struct stat mountStat;
@@ -56,7 +59,7 @@ main(int argc, char **argv)
 				break;
 			fs = *++argv;
 			argc--;
-		} else if (!strcmp(arg, "p") && parameter == NULL) {
+		} else if ((!strcmp(arg, "p") || !strcmp(arg, "o")) && parameter == NULL) {
 			if (argc <= 1)
 				break;
 			parameter = *++argv;
@@ -67,10 +70,14 @@ main(int argc, char **argv)
 
 	/* check the arguments */
 
-	device = argv[0];
-	mountPoint = argv[1];
+	if (argc > 1) {
+		device = argv[0];
+		argv++;
+		argc--;
+	}
+	mountPoint = argv[0];
 
-	if (device == NULL || mountPoint == NULL)
+	if (mountPoint == NULL)
 		usage(programName);
 
 	if (stat(mountPoint, &mountStat) < 0) {
