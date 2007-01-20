@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems nfs ;
+
+UsePrivateHeaders kernel ;
+
+#SubDirCcFlags -DTRACK_FILENAME ;
+
+KernelAddon nfs :
+	RPCPendingCalls.c
+	XDRInPacket.c
+	XDROutPacket.c
+	nfs_add_on.c
+;
