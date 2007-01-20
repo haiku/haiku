@@ -14,8 +14,12 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <SupportDefs.h>
+#include <ByteOrder.h>
 #include <netinet/udp.h>
 
+#ifndef UDP_SIZE_MAX
+#define UDP_SIZE_MAX 65515
+#endif
 #define B_UDP_MAX_SIZE UDP_SIZE_MAX
 
 /* declare gSocket and others */
@@ -50,74 +54,6 @@ bool conf_no_check_ip_xid = false;
 /* *** DEBUG stuff *** */
 //#define my_notify_listener(p_a, p_b, p_c, p_d, p_e, p_f) ({dprintf("nfs: notify_listener(%08lx)\n", p_a); notify_listener(p_a, p_b, p_c, p_d, p_e, p_f); })
 #define my_notify_listener notify_listener
-
-_EXPORT vnode_ops fs_entry =
-{
-	(op_read_vnode *)&fs_read_vnode,
-	(op_write_vnode *)&fs_write_vnode,
-	(op_remove_vnode *)&fs_remove_vnode,
-	(op_secure_vnode *)&fs_secure_vnode,
-	(op_walk *)&fs_walk,
-	(op_access *)&fs_access,
-	(op_create *)&fs_create,
-	(op_mkdir *)&fs_mkdir,
-	(op_symlink *)&fs_symlink,
-	NULL, //	&fs_link,
-	(op_rename *)&fs_rename,
-	(op_unlink *)&fs_unlink,
-	(op_rmdir *)&fs_rmdir,
-	(op_readlink *)&fs_readlink,
-	(op_opendir *)&fs_opendir,
-	(op_closedir *)&fs_closedir,
-	(op_free_cookie *)&fs_free_dircookie,
-	(op_rewinddir *)&fs_rewinddir,
-	(op_readdir *)&fs_readdir,
-	(op_open *)&fs_open,
-	(op_close *)&fs_close,
-	(op_free_cookie *)&fs_free_cookie,
-	(op_read *)&fs_read,
-	(op_write *)&fs_write,
-	NULL, //	&fs_readv,
-	NULL, //	&fs_writev,
-	NULL, //	&fs_ioctl,
-	NULL, //	&fs_setflags,
-	(op_rstat *)&fs_rstat,
-	(op_wstat *)&fs_wstat,
-	NULL, //	&fs_fsync,
-	NULL, //	&fs_initialize,
-	(op_mount *)&fs_mount,
-	(op_unmount *)&fs_unmount,
-	NULL, //	&fs_sync,
-	(op_rfsstat *)&fs_rfsstat,
-	(op_wfsstat *)&fs_wfsstat,
-	NULL, //	&fs_select,
-	NULL, //	&fs_deselect,
-	NULL, //	&fs_open_indexdir,
-	NULL, //	&fs_close_indexdir,
-	NULL, //	&fs_free_indexdircookie,
-	NULL, //	&fs_rewind_indexdir,
-	NULL, //	&fs_read_indexdir,
-	NULL, //	&fs_create_index,
-	NULL, //	&fs_remove_index,
-	NULL, //	&fs_rename_index,
-	NULL, //	&fs_stat_index,
-	NULL, //	&fs_open_attrdir,
-	NULL, //	&fs_close_attrdir,
-	NULL, //	&fs_free_attrdircookie,
-	NULL, //	&fs_rewind_attrdir,
-	NULL, //	&fs_read_attrdir,
-	NULL, //	&fs_write_attr,
-	NULL, //	&fs_read_attr,
-	NULL, //	&fs_remove_attr,
-	NULL, //	&fs_rename_attr,
-	NULL, //	&fs_stat_attr,
-	NULL, //	&fs_open_query,
-	NULL, //	&fs_close_query,
-	NULL, //	&fs_free_querycookie,
-	NULL, //	&fs_read_query	
-};
-
-_EXPORT int32 api_version=B_CUR_FS_API_VERSION;
 
 static vint32 refcount = 0; /* we only want to read the config once ? */
 
@@ -236,7 +172,7 @@ init_postoffice(fs_nspace *ns)
 {
 	status_t result;
 	
-	ns->tid=spawn_kernel_thread ((thread_func)postoffice_func,"Postoffice",B_NORMAL_PRIORITY,ns);
+	ns->tid=spawn_kernel_thread ((thread_func)postoffice_func,"NFSv2 Postoffice",B_NORMAL_PRIORITY,ns);
 
 	if (ns->tid<B_OK)
 		return ns->tid;
@@ -876,7 +812,11 @@ void remove_node (fs_nspace *ns, vnode_id vnid)
 }
 
 extern int 
+#ifdef __HAIKU__
+fs_read_vnode(fs_nspace *ns, vnode_id vnid, fs_node **node, char r)
+#else
 fs_read_vnode(fs_nspace *ns, vnode_id vnid, char r, fs_node **node)
+#endif
 {
 	fs_node *current;
 	
@@ -904,13 +844,29 @@ fs_read_vnode(fs_nspace *ns, vnode_id vnid, char r, fs_node **node)
 }
 
 extern int 
+#ifdef __HAIKU__
+fs_release_vnode(fs_nspace *ns, fs_node *node, char r)
+#else
 fs_write_vnode(fs_nspace *ns, fs_node *node, char r)
+#endif
 {
 	return B_OK;
 }
 
+#ifdef __HAIKU__
+extern int
+fs_get_vnode_name(fs_nspace *ns, fs_node *node, char *buffer, size_t len)
+{
+	return ENOSYS;
+}
+#endif
+
 extern int 
+#ifdef __HAIKU__
+fs_walk(fs_nspace *ns, fs_node *base, const char *file, vnode_id *vnid, int *type)
+#else
 fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id *vnid)
+#endif
 {
 	bool isLink;
 	fs_node *dummy;
@@ -920,6 +876,9 @@ fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id
 	if (!strcmp(".",file))
 	{
 		*vnid=base->vnid;
+#ifdef __HAIKU__
+		*type = S_IFDIR;
+#endif
 		isLink=false;
 	}
 	else
@@ -936,6 +895,9 @@ fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id
 		
 		newNode->vnid=st.st_ino;
 		*vnid=newNode->vnid;
+#ifdef __HAIKU__
+		*type = st.st_mode & S_IFMT;
+#endif
 		
 		insert_node (ns,newNode);
 		
@@ -945,6 +907,7 @@ fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id
 	if ((result=get_vnode (ns->nsid,*vnid,(void **)&dummy))<B_OK)
 		return result;
 
+#ifndef __HAIKU__
 	if ((isLink)&&(newpath))
 	{
 		char path[NFS_MAXPATHLEN+1];
@@ -968,6 +931,7 @@ fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id
 			
 		return put_vnode (ns->nsid,*vnid);
 	}
+#endif
 	
 	return B_OK;
 }
@@ -1005,8 +969,12 @@ fs_rewinddir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
 	return B_OK;
 }
 
-extern int 
+extern int
+#ifdef __HAIKU__
+fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, struct dirent *buf, size_t bufsize, uint32 *num)
+#else
 fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, long *num, struct dirent *buf, size_t bufsize)
+#endif
 {
 	int32 max=*num;
 	int32 eof;
@@ -1171,12 +1139,20 @@ fs_nspaceDestroy(struct fs_nspace *nspace)
 
 
 extern int 
-fs_mount(nspace_id nsid, const char *devname, ulong flags, struct mount_nfs_params *parms, size_t len, fs_nspace **data, vnode_id *vnid)
+#ifdef __HAIKU__
+fs_mount(nspace_id nsid, const char *devname, uint32 flags, const char *_parms, fs_nspace **data, vnode_id *vnid)
+#else
+fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, size_t len, fs_nspace **data, vnode_id *vnid)
+#endif
 {
+	struct mount_nfs_params *parms = (struct mount_nfs_params *)_parms; // XXX: FIXME
 	status_t result;
 	fs_nspace *ns;
 	fs_node *rootNode;
 	struct stat st;
+#ifndef __HAIKU__
+	(void) len;
+#endif
 
 	if (parms==NULL)
 		return EINVAL;
@@ -1213,6 +1189,7 @@ dprintf("nfs: nfs_params(ip:%lu, server:%s, export:%s, uid:%d, gid:%d, hostname:
 	ns->mountAddr.sin_addr.s_addr=htonl(parms->serverIP);
 	memset (ns->mountAddr.sin_zero,0,sizeof(ns->mountAddr.sin_zero));
 
+	// XXX: cleanup error handling
 		
 	if ((result=create_socket(ns))<B_OK)
 	{
@@ -1336,7 +1313,7 @@ dprintf("nfs: nfsd at %08lx:%d\n", ns->nfsAddr.sin_addr.s_addr, ntohs(ns->nfsAdd
 			
 	*vnid=ns->rootid;
 
-	if ((result=new_vnode(nsid,*vnid,rootNode))<B_OK)
+	if ((result=publish_vnode(nsid,*vnid,rootNode))<B_OK)
 	{
 		delete_sem (ns->sem);
 		free(rootNode);
@@ -1372,6 +1349,11 @@ fs_unmount(fs_nspace *ns)
 		free(ns->first);
 		ns->first=next;
 	}
+
+	// Unlike in BeOS, we need to put the reference to our root node ourselves
+#ifdef __HAIKU__
+	put_vnode(ns->nsid, ns->rootid);
+#endif
 
 	delete_sem (ns->sem);
 	shutdown_postoffice(ns);
@@ -1699,8 +1681,11 @@ fs_wfsstat(fs_nspace *ns, struct fs_info *info, long mask)
 }
 
 extern int 
-fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, vnode_id *vnid,
-					fs_file_cookie **cookie)
+#ifdef __HAIKU__
+fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, fs_file_cookie **cookie, vnode_id *vnid)
+#else
+fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, vnode_id *vnid, fs_file_cookie **cookie)
+#endif
 {
 	nfs_fhandle fhandle;
 	struct stat st;
@@ -1931,11 +1916,13 @@ fs_remove_vnode(fs_nspace *ns, fs_node *node, char r)
 	return B_OK;
 }
 
+#ifndef __HAIKU__
 extern int 
 fs_secure_vnode(fs_nspace *ns, fs_node *node)
 {
 	return B_OK;
 }
+#endif
 
 extern int 
 fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
@@ -1959,11 +1946,12 @@ fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
 	if (result==B_OK)
 	{
 		void *dummy;
-		if ((result=get_vnode(ns->nsid,st.st_ino,&dummy))<B_OK)
-			return result;
 
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);
+		// XXX: either OK or not get_vnode !!! ??
+		//if ((result=get_vnode(ns->nsid,st.st_ino,&dummy))<B_OK)
+		//	return result;
 		return EEXIST;
 	}
 	else if (result!=ENOENT)
@@ -2247,7 +2235,11 @@ fs_readlink(fs_nspace *ns, fs_node *node, char *buf, size_t *bufsize)
 }
 
 extern int 
+#ifdef __HAIKU__
+fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path, int mode)
+#else
 fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
+#endif
 {
 	nfs_fhandle fhandle;
 	struct stat st;
@@ -2342,6 +2334,211 @@ fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
 
 int	fs_access(void *ns, void *node, int mode)
 {
+	/* XXX */
 	return B_OK;
 }
 
+#ifdef __HAIKU__
+
+static status_t
+nfs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			dprintf("nfs:std_ops(INIT)\n");
+			return B_OK;
+		case B_MODULE_UNINIT:
+			dprintf("nfs:std_ops(UNINIT)\n");
+			return B_OK;
+		default:
+			return B_ERROR;
+	}
+}
+
+
+static file_system_module_info sNFSModule = {
+	{
+		"file_systems/nfs" B_CURRENT_FS_API_VERSION,
+		0,
+		nfs_std_ops,
+	},
+
+	"Network File System v2",
+
+	// scanning
+	NULL,	// fs_identify_partition,
+	NULL,	// fs_scan_partition,
+	NULL,	// fs_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
+
+	&fs_mount,
+	&fs_unmount,
+	&fs_rfsstat,
+	&fs_wfsstat,
+	NULL,	// &fs_sync,
+
+	/* vnode operations */
+	&fs_walk,
+	&fs_get_vnode_name,
+	&fs_read_vnode,
+	&fs_release_vnode,
+	&fs_remove_vnode,
+
+	/* VM file access */
+	NULL, 	// &fs_can_page
+	NULL,	// &fs_read_pages
+	NULL, 	// &fs_write_pages
+
+	NULL,	// &fs_get_file_map,
+
+	NULL, 	// &fs_ioctl
+	NULL,	// &fs_setflags,
+	NULL,	// &fs_select
+	NULL,	// &fs_deselect
+	NULL, 	// &fs_fsync
+
+	&fs_readlink,
+	NULL,	// &fs_write link,
+	&fs_symlink,
+
+	NULL,	// &fs_link,
+	&fs_unlink,
+	&fs_rename,
+
+	&fs_access,
+	&fs_rstat,
+	&fs_wstat,
+
+	/* file operations */
+	&fs_create,
+	&fs_open,
+	&fs_close,
+	&fs_free_cookie,
+	&fs_read,
+	&fs_write,
+
+	/* directory operations */
+	&fs_mkdir,
+	&fs_rmdir,
+	&fs_opendir,
+	&fs_closedir,
+	&fs_free_dircookie,
+	&fs_readdir,
+	&fs_rewinddir,
+	
+	/* attribute directory operations */
+	NULL,	// &fs_open_attrdir,
+	NULL,	// &fs_close_attrdir,
+	NULL,	// &fs_free_attrdircookie,
+	NULL,	// &fs_read_attrdir,
+	NULL,	// &fs_rewind_attrdir,
+
+	/* attribute operations */
+	NULL,	// &fs_create_attr
+	NULL,	// &fs_open_attr_h,
+	NULL,	// &fs_close_attr_h,
+	NULL,	// &fs_free_attr_cookie_h,
+	NULL,	// &fs_read_attr_h,
+	NULL,	// &fs_write_attr_h,
+
+	NULL,	// &fs_read_attr_stat_h,
+	NULL,	// &fs_write_attr_stat
+	NULL,	// &fs_rename_attr
+	NULL,	// &fs_remove_attr
+
+	/* index directory & index operations */
+	NULL,	// &fs_open_index_dir
+	NULL,	// &fs_close_index_dir
+	NULL,	// &fs_free_index_dir_cookie
+	NULL,	// &fs_read_index_dir
+	NULL,	// &fs_rewind_index_dir
+
+	NULL,	// &fs_create_index
+	NULL,	// &fs_remove_index
+	NULL,	// &fs_stat_index
+
+	/* query operations */
+	NULL,	// &fs_open_query,
+	NULL,	// &fs_close_query,
+	NULL,	// &fs_free_query_cookie,
+	NULL,	// &fs_read_query,
+	NULL,	// &fs_rewind_query,
+};
+
+module_info *modules[] = {
+	(module_info *)&sNFSModule,
+	NULL,
+};
+
+
+#else
+
+_EXPORT vnode_ops fs_entry =
+{
+	(op_read_vnode *)&fs_read_vnode,
+	(op_write_vnode *)&fs_write_vnode,
+	(op_remove_vnode *)&fs_remove_vnode,
+	(op_secure_vnode *)&fs_secure_vnode,
+	(op_walk *)&fs_walk,
+	(op_access *)&fs_access,
+	(op_create *)&fs_create,
+	(op_mkdir *)&fs_mkdir,
+	(op_symlink *)&fs_symlink,
+	NULL, //	&fs_link,
+	(op_rename *)&fs_rename,
+	(op_unlink *)&fs_unlink,
+	(op_rmdir *)&fs_rmdir,
+	(op_readlink *)&fs_readlink,
+	(op_opendir *)&fs_opendir,
+	(op_closedir *)&fs_closedir,
+	(op_free_cookie *)&fs_free_dircookie,
+	(op_rewinddir *)&fs_rewinddir,
+	(op_readdir *)&fs_readdir,
+	(op_open *)&fs_open,
+	(op_close *)&fs_close,
+	(op_free_cookie *)&fs_free_cookie,
+	(op_read *)&fs_read,
+	(op_write *)&fs_write,
+	NULL, //	&fs_readv,
+	NULL, //	&fs_writev,
+	NULL, //	&fs_ioctl,
+	NULL, //	&fs_setflags,
+	(op_rstat *)&fs_rstat,
+	(op_wstat *)&fs_wstat,
+	NULL, //	&fs_fsync,
+	NULL, //	&fs_initialize,
+	(op_mount *)&fs_mount,
+	(op_unmount *)&fs_unmount,
+	NULL, //	&fs_sync,
+	(op_rfsstat *)&fs_rfsstat,
+	(op_wfsstat *)&fs_wfsstat,
+	NULL, //	&fs_select,
+	NULL, //	&fs_deselect,
+	NULL, //	&fs_open_indexdir,
+	NULL, //	&fs_close_indexdir,
+	NULL, //	&fs_free_indexdircookie,
+	NULL, //	&fs_rewind_indexdir,
+	NULL, //	&fs_read_indexdir,
+	NULL, //	&fs_create_index,
+	NULL, //	&fs_remove_index,
+	NULL, //	&fs_rename_index,
+	NULL, //	&fs_stat_index,
+	NULL, //	&fs_open_attrdir,
+	NULL, //	&fs_close_attrdir,
+	NULL, //	&fs_free_attrdircookie,
+	NULL, //	&fs_rewind_attrdir,
+	NULL, //	&fs_read_attrdir,
+	NULL, //	&fs_write_attr,
+	NULL, //	&fs_read_attr,
+	NULL, //	&fs_remove_attr,
+	NULL, //	&fs_rename_attr,
+	NULL, //	&fs_stat_attr,
+	NULL, //	&fs_open_query,
+	NULL, //	&fs_close_query,
+	NULL, //	&fs_free_querycookie,
+	NULL, //	&fs_read_query	
+};
+
+_EXPORT int32 api_version=B_CUR_FS_API_VERSION;
+
+#endif

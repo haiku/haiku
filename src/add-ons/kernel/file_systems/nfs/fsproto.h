@@ -1,7 +1,8 @@
 #ifndef _FSPROTO_H
 #define _FSPROTO_H
 
-#include <sys/dirent.h>
+//#include <sys/dirent.h>
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>

@@ -215,5 +215,5 @@ LANG_FILES		:=
 LANG_FILES_DIR  :=
 
 
-## include $(BUILD_SCRIPT_DIR)/the makefile-engine 
-include $(BUILD_SCRIPT_DIR)/makefile-engine.zeta
+##include $(BUILD_SCRIPT_DIR)/the makefile-engine 
+include $(BUILDHOME)/etc/makefile-engine

@@ -1,7 +1,7 @@
 #include "XDRInPacket.h"
 #include <malloc.h>
 #include <string.h>
-#include <byteorder.h>
+#include <ByteOrder.h>
 
 extern void 
 XDRInPacketInit(struct XDRInPacket *packet)

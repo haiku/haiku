@@ -2,7 +2,7 @@
 
 #include <malloc.h>
 #include <string.h>
-#include <byteorder.h>
+#include <ByteOrder.h>
 
 extern const uint8 *
 XDROutPacketBuffer(struct XDROutPacket *packet)

@@ -2,7 +2,26 @@
 
 #define _NFS_ADD_ON_H
 
-#include "fsproto.h"
+/* wrappers */
+#ifdef __HAIKU__
+#	include <fs_interface.h>
+#	include <fs_info.h>
+#	include <NodeMonitor.h>
+typedef dev_t nspace_id;
+#	define WSTAT_MODE FS_WRITE_STAT_MODE
+#	define WSTAT_UID FS_WRITE_STAT_UID
+#	define WSTAT_GID FS_WRITE_STAT_GID
+#	define WSTAT_SIZE FS_WRITE_STAT_SIZE
+#	define WSTAT_ATIME FS_WRITE_STAT_ATIME
+#	define WSTAT_MTIME FS_WRITE_STAT_MTIME
+#	define WSTAT_CRTIME FS_WRITE_STAT_CRTIME
+	
+#else
+#	include "fsproto.h"
+#	define publish_vnode new_vnode
+#endif
+
+
 #include "RPCPendingCalls.h"
 #include "XDROutPacket.h"
 #include "XDRInPacket.h"
@@ -69,6 +88,7 @@ typedef struct nfs_cookie nfs_cookie;
 typedef struct fs_file_cookie fs_file_cookie;
 typedef struct nfs_fhandle nfs_fhandle;
 
+#if 0
 int	fs_read_vnode(fs_nspace *ns, vnode_id vnid, char r, fs_node **node);
 int	fs_write_vnode(fs_nspace *ns, fs_node *node, char r);
 
@@ -116,6 +136,7 @@ int	fs_readlink(fs_nspace *ns, fs_node *node, char *buf, size_t *bufsize);
 
 int	fs_symlink(fs_nspace *ns, fs_node *dir, const char *name,
 					const char *path);
+#endif
 
 status_t create_socket (fs_nspace *ns);
 status_t init_postoffice (fs_nspace *ns);
