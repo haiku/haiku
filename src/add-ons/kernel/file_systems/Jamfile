@@ -4,5 +4,5 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems dos ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems bfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems googlefs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems iso9660 ;
-#SubInclude HAIKU_TOP src add-ons kernel file_systems nfs ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems nfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems udf ;
