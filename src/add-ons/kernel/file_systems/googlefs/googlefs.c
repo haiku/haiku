@@ -23,7 +23,7 @@
 /* just publish fake entries; for debugging */
 //#define NO_SEARCH
 
-#define DEBUG_GOOGLEFS 1
+//#define DEBUG_GOOGLEFS 1
 
 #if DEBUG_GOOGLEFS
 #define PRINT(a) /*snooze(5000);*/ dprintf a
