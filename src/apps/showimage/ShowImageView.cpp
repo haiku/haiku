@@ -181,7 +181,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	settings = my_app->Settings();
 	
 	InitPatterns();
-	fDither = false;
+	fDither = BScreen().ColorSpace() == B_CMAP8;
 	fBitmap = NULL;
 	fDisplayBitmap = NULL;
 	fSelBitmap = NULL;
@@ -197,7 +197,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fShowCaption = false;
 	fZoom = 1.0;
 	fMovesImage = false;
-	fScaleBilinear = false;
+	fScaleBilinear = true;
 	fScaler = NULL;
 #if DELAYED_SCALING
 	fScalingCountDown = SCALING_DELAY_TIME;

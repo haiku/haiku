@@ -43,6 +43,7 @@ class ShowImageWindow : public BWindow {
 		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
+		virtual void ScreenChanged(BRect frame, color_space mode);
 		// virtual	void Zoom(BPoint origin, float width, float height);
 
 		status_t InitCheck();

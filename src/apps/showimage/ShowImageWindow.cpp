@@ -246,7 +246,6 @@ ShowImageWindow::BuildViewMenu(BMenu *menu, bool popupMenu)
 	menu->AddSeparatorItem();
 
 	AddItemMenu(menu, "High-Quality Zooming", MSG_SCALE_BILINEAR, 0, 0, 'W', true);
-	AddItemMenu(menu, "Stippled Zooming", MSG_DITHER_IMAGE, 0, 0, 'W', true);
 
 	menu->AddSeparatorItem();
 
@@ -1197,4 +1196,9 @@ ShowImageWindow::QuitRequested()
 }
 
 
+void
+ShowImageWindow::ScreenChanged(BRect frame, color_space mode)
+{
+	fImageView->SetDither(mode == B_CMAP8);
+}
 

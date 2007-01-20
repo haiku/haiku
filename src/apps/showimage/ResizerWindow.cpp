@@ -43,7 +43,7 @@
 
 static const char* kWidthLabel = "Width:";
 static const char* kHeightLabel = "Height:";
-static const char* kKeepAspectRatioLabel = "Keep Proportions";
+static const char* kKeepAspectRatioLabel = "Keep Original Proportions";
 static const char* kApplyLabel = "Apply";
 
 static const float kLineDistance = 5;
@@ -65,7 +65,7 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	const float column2 = max_c(widthLabelWidth, heightLabelWidth);
 
 	const float textControlWidth = column2 + back_view->StringWidth("999999");
-	const float keepAspectRatioLabelWidth = 15 + back_view->StringWidth(kKeepAspectRatioLabel);
+	const float keepAspectRatioLabelWidth = 20 + back_view->StringWidth(kKeepAspectRatioLabel);
 	const float width2 = 2 * kHorizontalIndent + max_c(textControlWidth, keepAspectRatioLabelWidth);
 	
 	ResizeTo(width2+1, Bounds().Height()+1);
