@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons print drivers pdf source ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print ] ; 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdflib ] ;
 
