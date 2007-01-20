@@ -407,12 +407,12 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 void
 vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 {
-	vm_cache *newSource = NULL;
 	vm_cache *cache;
 
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cacheRef->cache));
 	ASSERT_LOCKED_MUTEX(&consumer->ref->lock);
 
+	// remove the consumer from the cache, but keep its reference until later
 	mutex_lock(&cacheRef->lock);
 	cache = cacheRef->cache;
 	list_remove_item(&cache->consumers, consumer);
@@ -427,17 +427,22 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 		bool merge = false;
 
 		consumer = list_get_first_item(&cache->consumers);
-		consumerRef = consumer->ref;
 
 		// Our cache doesn't have a ref to its consumer (only the other way around), 
 		// so we cannot just acquire it here; it might be deleted right now
 		while (true) {
-			int32 count = consumerRef->ref_count;
+			int32 count;
+			consumerRef = consumer->ref;
+
+			count = consumerRef->ref_count;
 			if (count == 0)
 				break;
 
 			if (atomic_test_and_set(&consumerRef->ref_count, count + 1, count) == count) {
-				// we managed to grab a reference to the consumer
+				// We managed to grab a reference to the consumerRef.
+				// Since this doesn't guarantee that we get the cache we wanted
+				// to, we need to check if this cache is really the last
+				// consumer of the cache we want to merge it with.
 				merge = true;
 				break;
 			}
@@ -453,10 +458,12 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 
 			// the cache and the situation might have changed
 			cache = cacheRef->cache;
+			consumer = consumerRef->cache;
+
 			if (cacheRef->areas != NULL || cache->source == NULL
 				|| list_is_empty(&cache->consumers)
 				|| cache->consumers.link.next != cache->consumers.link.prev
-				|| consumerRef != list_get_first_item(&cache->consumers)) {
+				|| consumer != list_get_first_item(&cache->consumers)) {
 				merge = false;
 				mutex_unlock(&consumerRef->lock);
 			}
@@ -464,6 +471,7 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 
 		if (merge) {
 			vm_page *page, *nextPage;
+			vm_cache *newSource;
 
 			consumer = list_remove_head_item(&cache->consumers);
 
@@ -488,25 +496,26 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 			}
 
 			newSource = cache->source;
+			if (newSource != NULL) {
+				// The remaining consumer has gotten a new source
+				mutex_lock(&newSource->ref->lock);
+
+				list_remove_item(&newSource->consumers, cache);
+				list_add_item(&newSource->consumers, consumer);
+				consumer->source = newSource;
+				cache->source = NULL;
+
+				mutex_unlock(&newSource->ref->lock);
+
+				// Release the other reference to the cache - we take over
+				// its reference of its source cache; we can do this here
+				// (with the cacheRef locked) since we own another reference
+				// from the first consumer we removed
+				vm_cache_release_ref(cacheRef);
+			}
 			mutex_unlock(&consumerRef->lock);
 		}
 		vm_cache_release_ref(consumerRef);
-	}
-
-	if (newSource != NULL) {
-		// The remaining consumer has gotten a new source
-		mutex_lock(&newSource->ref->lock);
-
-		list_remove_item(&newSource->consumers, cache);
-		list_add_item(&newSource->consumers, consumer);
-		consumer->source = newSource;
-		cache->source = NULL;
-
-		mutex_unlock(&newSource->ref->lock);
-
-		// Release the other reference to the cache - we take over
-		// its reference of its source cache
-		vm_cache_release_ref(cacheRef);
 	}
 
 	mutex_unlock(&cacheRef->lock);
