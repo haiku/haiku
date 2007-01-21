@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -465,6 +465,8 @@ ModulesView::_CloseSaver()
 	if (fSettingsView != NULL)
 		fSettingsBox->RemoveChild(fSettingsView);
 
+	if (fSaverRunner != NULL)
+		fSaverRunner->Quit();
 	if (saver != NULL)
 		saver->StopConfig();
 
@@ -473,6 +475,8 @@ ModulesView::_CloseSaver()
 	delete view;
 	delete fSettingsView;
 	delete fSaverRunner;
+		// the saver runner also unloads the add-on, so it must
+		// be deleted last
 
 	fSettingsView = NULL;
 	fSaverRunner = NULL;
