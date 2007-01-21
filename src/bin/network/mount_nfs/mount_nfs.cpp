@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #ifdef __HAIKU__
 #include <fs_volume.h>
 int mount(const char *filesystem, const char *where, const char *device, ulong flags, void *parameters, size_t len)
@@ -16,6 +17,8 @@ int mount(const char *filesystem, const char *where, const char *device, ulong f
 	return fs_mount_volume(where, device, filesystem, flags, (const char *)parameters);
 }
 #endif
+
+#define BUFSZ 1024
 
 struct mount_nfs_params
 {
@@ -36,6 +39,7 @@ void usage (const char *exename)
 
 int main (int argc, char **argv)
 {
+	char buf[BUFSZ];
 	signal(SIGINT, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
 
@@ -93,8 +97,16 @@ int main (int argc, char **argv)
 	gethostname (hostname,256);
 	
 	params.hostname=hostname;
+	
+	sprintf(buf, "nfs:%s:%s,uid=%u,gid=%u,hostname=%s", 
+		inet_ntoa(*((struct in_addr *)ent->h_addr)),
+		params._export,
+		params.uid,
+		params.gid,
+		params.hostname);
 		
-	int result=mount ("nfs",argv[2],NULL,0,&params,sizeof(params));
+	int result=mount ("nfs",argv[2],NULL,0,buf,sizeof(params));
+	//int result=mount ("nfs",argv[2],NULL,0,&params,sizeof(params));
 
 	delete[] server;
 	
