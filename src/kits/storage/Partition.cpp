@@ -1,12 +1,14 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ */
 
-#include <errno.h>
-#include <new>
-#include <unistd.h>
-#include <sys/stat.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 #include <Directory.h>
 #include <DiskDevice.h>
@@ -21,8 +23,11 @@
 #include <String.h>
 #include <Volume.h>
 
-#include <syscalls.h>
-#include <disk_device_manager/ddm_userland_interface.h>
+#include <errno.h>
+#include <new>
+#include <unistd.h>
+#include <sys/stat.h>
+
 
 using std::nothrow;
 
@@ -537,23 +542,23 @@ BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 status_t
 BPartition::Unmount(uint32 unmountFlags)
 {
-	if (!fPartitionData || !IsMounted())
+	if (fPartitionData == NULL || !IsMounted())
 		return B_BAD_VALUE;
 
 	// get the partition path
-	BPath partitionPath;
-	status_t error = GetPath(&partitionPath);
-	if (error != B_OK)
-		return error;
+	BPath path;
+	status_t status = GetMountPoint(&path);
+	if (status != B_OK)
+		return status;
 
 	// unmount
-	error = fs_unmount_volume(partitionPath.Path(), unmountFlags);
+	status = fs_unmount_volume(path.Path(), unmountFlags);
 
 	// update object, if successful
-	if (error == B_OK)
-		error = Device()->Update();
+	if (status == B_OK)
+		status = Device()->Update();
 
-	return error;
+	return status;
 }
 
 // Device
