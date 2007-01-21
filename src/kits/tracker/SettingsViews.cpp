@@ -152,7 +152,7 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 	rect.OffsetBy(0, itemSpacing);
 	
 	fMountVolumesOntoDesktopRadioButton = new BRadioButton(rect, "",
-		"Show Volumes On Desktop", new BMessage(kVolumesOnDesktopChanged));
+		"Show Volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountVolumesOntoDesktopRadioButton);
 	fMountVolumesOntoDesktopRadioButton->ResizeToPreferred();
 
@@ -443,7 +443,7 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 	: SettingsView(rect, "WindowsSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "", "Show Full Path In Title Bar",
+	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "", "Show Folder Location in Title Bar",
 		new BMessage(kWindowsShowFullPathChanged));
 	fShowFullPathInTitleBarCheckBox->ResizeToPreferred();
 	AddChild(fShowFullPathInTitleBarCheckBox);
@@ -451,7 +451,7 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 	const float itemSpacing = fShowFullPathInTitleBarCheckBox->Bounds().Height() + kItemExtraSpacing;
 	rect.OffsetBy(0, itemSpacing);
 
-	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "", "Single Window Browse",
+	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "", "Single Window Navigation",
 		new BMessage(kSingleWindowBrowseChanged));
 	fSingleWindowBrowseCheckBox->ResizeToPreferred();
 	AddChild(fSingleWindowBrowseCheckBox);
@@ -472,7 +472,7 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "", "Sort Folder Names First",
+	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "", "List Folders First",
 		new BMessage(kSortFolderNamesFirstChanged));
 	fSortFolderNamesFirstCheckBox->ResizeToPreferred();
 	AddChild(fSortFolderNamesFirstCheckBox);
@@ -1029,7 +1029,7 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	: SettingsView(rect, "SpaceBarSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fSpaceBarShowCheckBox = new BCheckBox(rect, "", "Show Space Bars On Volumes",
+	fSpaceBarShowCheckBox = new BCheckBox(rect, "", "Show Space Bars on Volumes",
 		new BMessage(kUpdateVolumeSpaceBar));
 	fSpaceBarShowCheckBox->ResizeToPreferred();
 	AddChild(fSpaceBarShowCheckBox);
@@ -1265,7 +1265,7 @@ TrashSettingsView::TrashSettingsView(BRect rect)
 	: SettingsView(rect, "TrashSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "", "Don't Move Files To Trash",
+	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "", "Don't Move Files to Trash",
 			new BMessage(kDontMoveFilesToTrashChanged));
 	fDontMoveFilesToTrashCheckBox->ResizeToPreferred();
 	AddChild(fDontMoveFilesToTrashCheckBox);

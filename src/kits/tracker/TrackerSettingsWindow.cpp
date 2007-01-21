@@ -64,7 +64,7 @@ const uint32 kRevertButtonPressed = 'Rebp';
 
 
 TrackerSettingsWindow::TrackerSettingsWindow()
-	: BWindow(BRect(80, 80, 450, 350), "Tracker Settings", B_TITLED_WINDOW,
+	: BWindow(BRect(80, 80, 450, 350), "Tracker Preferences", B_TITLED_WINDOW,
 		B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_NO_WORKSPACE_ACTIVATION
 		| B_NOT_ANCHORED_ON_ACTIVATE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
@@ -112,7 +112,7 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 		new DesktopSettingsView(rect)));
 	fSettingsTypeListView->AddItem(new SettingsItem("Windows",
 		new WindowsSettingsView(rect)));
-	fSettingsTypeListView->AddItem(new SettingsItem("Time Format",
+	fSettingsTypeListView->AddItem(new SettingsItem("Date and Time",
 		new TimeFormatSettingsView(rect)));
 	fSettingsTypeListView->AddItem(new SettingsItem("Trash",
 		new TrashSettingsView(rect)));

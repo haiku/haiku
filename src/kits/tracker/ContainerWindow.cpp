@@ -1953,7 +1953,7 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS, new BMessage(kShowSettingsWindow));
+	item = new BMenuItem("Preferences"B_UTF8_ELLIPSIS, new BMessage(kShowSettingsWindow));
 	item->SetTarget(be_app);
 	menu->AddItem(item);
 }

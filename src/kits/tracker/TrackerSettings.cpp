@@ -178,10 +178,10 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fEjectWhenUnmounting = new BooleanValueSetting("EjectWhenUnmounting", true));
 
 	Add(fDesktopFilePanelRoot = new BooleanValueSetting("DesktopFilePanelRoot", true));
-	Add(fShowFullPathInTitleBar = new BooleanValueSetting("ShowFullPathInTitleBar", false));
+	Add(fShowFullPathInTitleBar = new BooleanValueSetting("ShowFullPathInTitleBar", true));
 	Add(fShowSelectionWhenInactive = new BooleanValueSetting("ShowSelectionWhenInactive", true));
 	Add(fTransparentSelection = new BooleanValueSetting("TransparentSelection", true));
-	Add(fSortFolderNamesFirst = new BooleanValueSetting("SortFolderNamesFirst", false));
+	Add(fSortFolderNamesFirst = new BooleanValueSetting("SortFolderNamesFirst", true));
 	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
  	Add(fSingleWindowBrowse = new BooleanValueSetting("SingleWindowBrowse", false));
 	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));
