@@ -67,6 +67,12 @@ extern float	roundf(float value);
 #	define B_BAD_DATA	(B_NOT_ALLOWED + 1)
 #endif
 
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#ifndef B_VECTOR_ICON_TYPE
+#define B_VECTOR_ICON_TYPE 'VICN'
+#endif
+#endif
+
 #ifndef INT64_MAX
 #include <limits.h>
 #define INT64_MAX LONGLONG_MAX
