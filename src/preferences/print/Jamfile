@@ -12,11 +12,13 @@ Preference Printers :
 	JobListView.cpp
 	SpoolFolder.cpp
 	Globals.cpp 
-	: be translation libprint.a
-	: Printers.rdef
+	: 
+	be 
+	translation 
+	libprintutils.a
+	: 
+	Printers.rdef
 	;
-
-# TODO remove dependency to libtranslation (BeUtils) 
 
 Package haiku-printingkit-cvs :
 	Printers :
