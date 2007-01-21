@@ -41,6 +41,13 @@ All rights reserved.
 #include "Tracker.h"
 #include "TrackerSettings.h"
 
+#ifdef __HAIKU__
+#	include <DiskDeviceRoster.h>
+#	include <DiskDevice.h>
+#	include <DiskDeviceList.h>
+#	include <fs_volume.h>
+#endif
+
 #include <Alert.h>
 #include <fs_info.h>
 #include <Message.h>
@@ -52,40 +59,553 @@ All rights reserved.
 #include <string.h>
 
 
-static const uint32 kStartPolling = 'strp';
-#if _INCLUDES_CLASS_DEVICE_MAP
 static const char *kAutoMounterSettings = "automounter_settings";
+
+
+#ifdef __HAIKU__
+//	#pragma mark - Haiku Disk Device API
+
+static const uint32 kMsgInitialScan = 'insc';
+
+
+AutoMounter::AutoMounter()
+	: BLooper("AutoMounter", B_LOW_PRIORITY),
+	fNormalMode(kRestorePreviousVolumes),
+	fRemovableMode(kAllVolumes)
+{
+	if (!BootedInSafeMode()) {
+		_ReadSettings();
+	} else {
+		// defeat automounter in safe mode, don't even care about the settings
+		fNormalMode = kNoVolumes;
+		fRemovableMode = kNoVolumes;
+	}
+
+	if (PostMessage(kMsgInitialScan) != B_OK)
+		debug_printf("AutoMounter: OH NO!\n");
+}
+
+
+AutoMounter::~AutoMounter()
+{
+}
+
+
+void
+AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable)
+{
+	if (normal == kNoVolumes && removable == kNoVolumes)
+		return;
+
+	class InitialMountVisitor : public BDiskDeviceVisitor {
+		public:
+			InitialMountVisitor(mount_mode normalMode, mount_mode removableMode,
+					BMessage& previous)
+				:
+				fNormalMode(normalMode),
+				fRemovableMode(removableMode),
+				fPrevious(previous)
+			{
+			}
+
+			virtual
+			~InitialMountVisitor()
+			{
+			}
+
+			virtual bool
+			Visit(BDiskDevice* device)
+			{
+				return Visit(device, 0);
+			}
+
+			virtual bool
+			Visit(BPartition* partition, int32 level)
+			{
+				mount_mode mode = partition->Device()->IsRemovableMedia()
+					? fRemovableMode : fNormalMode;
+				if (mode == kNoVolumes
+					|| partition->IsMounted()
+					|| !partition->ContainsFileSystem())
+					return false;
+
+				if (mode == kRestorePreviousVolumes) {
+					// mount all volumes that were stored in the settings file
+					const char *volumeName;
+					BPath path;
+					if (partition->GetPath(&path) != B_OK
+						|| partition->ContentName() == NULL
+						|| fPrevious.FindString(path.Path(), &volumeName) != B_OK
+						|| strcmp(volumeName, partition->ContentName()))
+						return false;
+				} else if (mode == kOnlyBFSVolumes) {
+					if (partition->ContentType() == NULL
+						|| strcmp(partition->ContentType(), "BFS"))
+						return false;
+				}
+
+				partition->Mount();
+				return false;
+			}
+
+		private:
+			mount_mode	fNormalMode;
+			mount_mode	fRemovableMode;
+			BMessage&	fPrevious;
+	} visitor(normal, removable, fSettings);
+
+	BDiskDeviceList devices;
+	status_t status = devices.Fetch();
+	if (status == B_OK)
+		devices.VisitEachPartition(&visitor);
+}
+
+
+void
+AutoMounter::_MountVolume(BMessage *message)
+{
+	int32 id;
+	if (message->FindInt32("id", &id) != B_OK)
+		return;
+
+	BDiskDeviceRoster roster;
+	BPartition *partition;
+	BDiskDevice device;
+	if (roster.GetPartitionWithID(id, &device, &partition) != B_OK)
+		return;
+
+	status_t status = partition->Mount();
+	if (status < B_OK) {
+		BString string;
+		string << "Error mounting volume. (" << strerror(status) << ")";
+			(new BAlert("", string.String(), "OK"))->Go(0);
+	}
+}
+
+
+bool
+AutoMounter::_ForceUnmount(const char* name, status_t error)
+{
+	BString text;
+	text << "Could not unmount disk \"" << name << "\":\n\t" << strerror(error);
+	text << "\n\nShould I force unmounting the disk?\n\n"
+		"Note: if an application is currently writing to the volume, unmounting"
+		" it now might result in loss of data.\n";
+
+	int32 choice = (new BAlert("", text.String(), "Cancel", "Force Unmount", NULL,
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+
+	return choice == 1;
+}
+
+
+void
+AutoMounter::_ReportUnmountError(const char* name, status_t error)
+{
+	BString text;
+	text << "Could not unmount disk \"" << name << "\":\n\t" << strerror(error);
+
+	(new BAlert("", text.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, 
+		B_WARNING_ALERT))->Go(NULL);
+}
+
+
+void
+AutoMounter::_UnmountAndEjectVolume(BMessage *message)
+{
+	int32 id;
+	if (message->FindInt32("id", &id) == B_OK) {
+		BDiskDeviceRoster roster;
+		BPartition *partition;
+		BDiskDevice device;
+		if (roster.GetPartitionWithID(id, &device, &partition) != B_OK)
+			return;
+
+		status_t status = partition->Unmount();
+		if (status < B_OK) {
+			if (!_ForceUnmount(partition->ContentName(), status))
+				return;
+
+			status = partition->Unmount(B_FORCE_UNMOUNT);
+		}
+
+		if (status < B_OK)
+			_ReportUnmountError(partition->ContentName(), status);
+
+		return;
+	}
+
+	// see if we got a dev_t
+
+	dev_t device;
+	if (message->FindInt32("device_id", &device) != B_OK)
+		return;
+
+	BVolume volume(device);
+	status_t status = volume.InitCheck();
+
+	char name[B_FILE_NAME_LENGTH];
+	if (status == B_OK)
+		status = volume.GetName(name);
+	if (status < B_OK)
+		snprintf(name, sizeof(name), "device:%ld", device);
+
+	BDirectory mountPoint;
+	if (status == B_OK)
+		status = volume.GetRootDirectory(&mountPoint);
+
+	BPath path;
+	if (status == B_OK)
+		status = path.SetTo(&mountPoint, ".");
+
+	if (status == B_OK) {
+		status = fs_unmount_volume(path.Path(), 0);
+		if (status < B_OK) {
+			if (!_ForceUnmount(name, status))
+				return;
+
+			status = fs_unmount_volume(path.Path(), B_FORCE_UNMOUNT);
+		}
+	}
+
+	if (status == B_OK)
+		rmdir(path.Path());
+
+	if (status < B_OK)
+		_ReportUnmountError(name, status);
+}
+
+
+void
+AutoMounter::_FromMode(mount_mode mode, bool& all, bool& bfs, bool& restore)
+{
+	all = bfs = restore = false;
+
+	switch (mode) {
+		case kAllVolumes:
+			all = true;
+			break;
+		case kOnlyBFSVolumes:
+			bfs = true;
+			break;
+		case kRestorePreviousVolumes:
+			restore = true;
+			break;
+
+		default:
+			break;
+	}
+}
+
+
+AutoMounter::mount_mode
+AutoMounter::_ToMode(bool all, bool bfs, bool restore)
+{
+	if (all)
+		return kAllVolumes;
+	if (bfs)
+		return kOnlyBFSVolumes;
+	if (restore)
+		return kRestorePreviousVolumes;
+
+	return kNoVolumes;
+}
+
+
+void
+AutoMounter::_ReadSettings()
+{
+	BPath directoryPath;
+	if (FSFindTrackerSettingsDir(&directoryPath) != B_OK)
+		return;
+
+	BPath path(directoryPath);
+	path.Append(kAutoMounterSettings);
+	fPrefsFile.SetTo(path.Path(), O_RDWR);
+
+	if (fPrefsFile.InitCheck() != B_OK) {
+		// no prefs file yet, create a new one
+
+		BDirectory dir(directoryPath.Path());
+		dir.CreateFile(kAutoMounterSettings, &fPrefsFile);
+		return;
+	}
+
+	ssize_t settingsSize = (ssize_t)fPrefsFile.Seek(0, SEEK_END);
+	if (settingsSize == 0)
+		return;
+
+	ASSERT(settingsSize != 0);
+	char *buffer = new char[settingsSize];
+
+	fPrefsFile.Seek(0, 0);
+	if (fPrefsFile.Read(buffer, (size_t)settingsSize) != settingsSize) {
+		PRINT(("error reading automounter settings\n"));
+		delete [] buffer;
+		return;
+	}
+
+	BMessage message('stng');
+	status_t result = message.Unflatten(buffer);
+	if (result != B_OK) {
+		PRINT(("error %s unflattening settings, size %d\n", strerror(result), 
+			settingsSize));
+		delete [] buffer;
+		return;
+	}
+
+	delete [] buffer;
+
+	_UpdateSettingsFromMessage(&message);
+	GetSettings(&fSettings);
+}
+
+
+void
+AutoMounter::_WriteSettings()
+{
+	if (fPrefsFile.InitCheck() != B_OK)
+		return;
+
+	BMessage message('stng');
+	GetSettings(&message);
+
+	ssize_t settingsSize = message.FlattenedSize();
+
+	char *buffer = new char[settingsSize];
+	status_t result = message.Flatten(buffer, settingsSize);
+
+	fPrefsFile.Seek(0, 0);
+	result = fPrefsFile.Write(buffer, (size_t)settingsSize);
+	if (result != settingsSize)
+		PRINT(("error writing settings, %s\n", strerror(result)));
+
+	delete [] buffer;
+}
+
+
+void
+AutoMounter::_UpdateSettingsFromMessage(BMessage* message)
+{
+	// auto mounter settings
+
+	bool all, bfs, restore;
+	if (message->FindBool("autoMountAll", &all) != B_OK)
+		all = true;
+	if (message->FindBool("autoMountAllBFS", &bfs) != B_OK)
+		bfs = false;
+
+	fRemovableMode = _ToMode(all, bfs, false);
+
+	// initial mount settings
+
+	if (message->FindBool("initialMountAll", &all) != B_OK)
+		all = false;
+	if (message->FindBool("initialMountAllBFS", &bfs) != B_OK)
+		bfs = false;
+	if (message->FindBool("initialMountRestore", &restore) != B_OK)
+		restore = true;
+
+	fNormalMode = _ToMode(all, bfs, restore);
+}
+
+
+void
+AutoMounter::GetSettings(BMessage *message)
+{
+	message->MakeEmpty();
+
+	bool all, bfs, restore;
+
+	_FromMode(fNormalMode, all, bfs, restore);
+	message->AddBool("initialMountAll", all);
+	message->AddBool("initialMountAllBFS", bfs);
+	message->AddBool("initialMountRestore", restore);
+
+	_FromMode(fRemovableMode, all, bfs, restore);
+	message->AddBool("autoMountAll", all);
+	message->AddBool("autoMountAllBFS", bfs);
+
+	// Save mounted volumes so we can optionally mount them on next
+	// startup
+	BVolumeRoster volumeRoster;
+	BVolume volume;
+	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
+        fs_info info;
+        if (fs_stat_dev(volume.Device(), &info) == 0
+			&& info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT))
+			message->AddString(info.device_name, info.volume_name);
+	}
+}
+
+
+void
+AutoMounter::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgInitialScan:
+			_MountVolumes(fNormalMode, fRemovableMode);
+			break;
+
+		case kMountVolume:
+			_MountVolume(message);
+			break;
+
+		case kUnmountVolume:
+			_UnmountAndEjectVolume(message);
+			break;
+
+		case kSetAutomounterParams:
+		{
+			bool rescanNow = false;
+			message->FindBool("rescanNow", &rescanNow);
+
+			_UpdateSettingsFromMessage(message);
+			GetSettings(&fSettings);
+			_WriteSettings();
+
+			if (rescanNow)
+				_MountVolumes(fNormalMode, fRemovableMode);
+			break;
+		}
+
+		case kMountAllNow:
+			_MountVolumes(kAllVolumes, kAllVolumes);
+			break;
+
+#if 0
+		case B_NODE_MONITOR:
+		{
+			int32 opcode;
+			if (message->FindInt32("opcode", &opcode) != B_OK)
+				break;
+
+			switch (opcode) {
+				//	The name of a mount point has changed
+				case B_ENTRY_MOVED: {
+					WRITELOG(("*** Received Mount Point Renamed Notification"));
+
+					const char *newName;
+					if (message->FindString("name", &newName) != B_OK) {
+						WRITELOG(("ERROR: Couldn't find name field in update message"));
+						PRINT_OBJECT(*message);
+						break ;
+					}
+
+					//
+					// When the node monitor reports a move, it gives the
+					// parent device and inode that moved.  The problem is 
+					// that  the inode is the inode of root *in* the filesystem,
+					// which is generally always the same number for every 
+					// filesystem of a type.
+					//
+					// What we'd really like is the device that the moved	
+					// volume is mounted on.  Find this by using the 
+					// *new* name and directory, and then stat()ing that to
+					// find the device.
+					//
+					dev_t parentDevice;
+					if (message->FindInt32("device", &parentDevice) != B_OK) {
+						WRITELOG(("ERROR: Couldn't find 'device' field in update"
+							" message"));
+						PRINT_OBJECT(*message);
+						break;
+					}
+
+					ino_t toDirectory;	
+					if (message->FindInt64("to directory", &toDirectory)!=B_OK){
+						WRITELOG(("ERROR: Couldn't find 'to directory' field in update"
+						  "message"));
+						PRINT_OBJECT(*message);
+						break;
+					}
+
+					entry_ref root_entry(parentDevice, toDirectory, newName);
+
+					BNode entryNode(&root_entry);
+					if (entryNode.InitCheck() != B_OK) {
+						WRITELOG(("ERROR: Couldn't create mount point entry node: %s/n", 
+							strerror(entryNode.InitCheck())));
+						break;
+					}	
+
+					node_ref mountPointNode;
+					if (entryNode.GetNodeRef(&mountPointNode) != B_OK) {
+						WRITELOG(("ERROR: Couldn't get node ref for new mount point"));
+						break;
+					}
+
+					WRITELOG(("Attempt to rename device %li to %s", mountPointNode.device,
+						newName));
+
+					Partition *partition = FindPartition(mountPointNode.device);
+					if (partition != NULL) {
+						WRITELOG(("Found device, changing name."));
+
+						BVolume mountVolume(partition->VolumeDeviceID());
+						BDirectory mountDir;
+						mountVolume.GetRootDirectory(&mountDir);
+						BPath dirPath(&mountDir, 0);
+
+						partition->SetMountedAt(dirPath.Path());
+						partition->SetVolumeName(newName);					
+						break;
+					} else {
+						WRITELOG(("ERROR: Device %li does not appear to be present",
+							mountPointNode.device));
+					}
+				}
+			}
+			break;
+		}
 #endif
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
+	}
+}
+
+
+bool
+AutoMounter::QuitRequested()
+{
+	if (!BootedInSafeMode()) {
+		// don't write out settings in safe mode - this would overwrite the
+		// normal, non-safe mode settings
+		_WriteSettings();
+	}
+
+	return true;
+}
+
+
+#else	// !__HAIKU__
+//	#pragma mark - R5 DeviceMap API
+
+static const uint32 kStartPolling = 'strp';
+
+static BMessage gSettingsMessage;
+static bool gSilentAutoMounter;
 
 struct OneMountFloppyParams {
 	status_t result;
 };
 
-#if _INCLUDES_CLASS_DEVICE_MAP
-static bool gSilentAutoMounter;
-#endif
-static BMessage gSettingsMessage;
-
-
-#if xDEBUG
-static Partition *
-DumpPartition(Partition *_DEVICE_MAP_ONLY(partition), void*)
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	partition->Dump();
-#endif
-	return 0;
-}
-#endif
-
-
-#if _INCLUDES_CLASS_DEVICE_MAP
-
-
 struct MountPartitionParams {
 	int32 uniqueID;
 	status_t result;
 };
+
+
+#if xDEBUG
+static Partition *
+DumpPartition(Partition *partition, void*)
+{
+	partition->Dump();
+	return 0;
+}
+#endif
 
 
 /** Sets the Tracker Shell's AutoMounter to monitor a node.
@@ -302,671 +822,18 @@ AutomountOne(Partition *partition, void *castToParams)
 }
 
 
-static Partition *
-NotifyFloppyNotMountable(Partition *partition, void *)
-{
-	if (partition->Mounted() != kMounted
-		&& partition->GetDevice()->IsFloppy()
-		&& !partition->Hidden()) {
-		(new BAlert("", "The format of the floppy disk in the disk drive is "
-			"not recognized or the disk has never been formatted.", "OK"))->Go(0);
-		partition->GetDevice()->Eject();
-	}
-	return NULL;
-}
-
-
-#endif // #if _INCLUDES_CLASS_DEVICE_MAP
-
-
-#ifdef MOUNT_MENU_IN_DESKBAR
-
-// just for testing
-
-Partition *
-AddMountableItemToMessage(Partition *partition, void *castToParams)
-{
-	BMessage *message = static_cast<BMessage *>(castToParams);
-
-	message->AddString("DeviceName", partition->GetDevice()->Name());
-	const char *name;
-	if (*partition->VolumeName())
-		name = partition->VolumeName();
-	else if (*partition->Type())
-		name = partition->Type();
-	else
-		name = partition->GetDevice()->DisplayName();
-
-	message->AddString("DisplayName", name);
-	BMessage invokeMsg;
-	if (partition->GetDevice()->IsFloppy())
-		invokeMsg.what = kTryMountingFloppy;
-	else
-		invokeMsg.what = kMountVolume;
-	invokeMsg.AddInt32("id", partition->UniqueID());
-	message->AddMessage("InvokeMessage", &invokeMsg);
-	return NULL;	
-}
-
-#endif // #ifdef MOUNT_MENU_IN_DESKBAR
-
-
-AutoMounter::AutoMounter(bool _DEVICE_MAP_ONLY(checkRemovableOnly),
-	bool _DEVICE_MAP_ONLY(checkCDs), bool _DEVICE_MAP_ONLY(checkFloppies),
-	bool _DEVICE_MAP_ONLY(checkOtherRemovable), bool _DEVICE_MAP_ONLY(autoMountRemovablesOnly),
-	bool _DEVICE_MAP_ONLY(autoMountAll), bool _DEVICE_MAP_ONLY(autoMountAllBFS),
-	bool _DEVICE_MAP_ONLY(autoMountAllHFS),
-	bool initialMountAll, bool initialMountAllBFS, bool initialMountRestore,
-	bool initialMountAllHFS)
-	:	BLooper("DirPoller", B_LOW_PRIORITY),
-		fInitialMountAll(initialMountAll),
-		fInitialMountAllBFS(initialMountAllBFS),
-		fInitialMountRestore(initialMountRestore),
-		fInitialMountAllHFS(initialMountAllHFS),
-		fSuspended(false),
-		fQuitting(false)
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	fScanParams.shortestRescanHartbeat = 5000000;
-	fScanParams.checkFloppies = checkFloppies;
-	fScanParams.checkCDROMs = checkCDs;
-	fScanParams.checkOtherRemovable = checkOtherRemovable;
-	fScanParams.removableOrUnknownOnly = checkRemovableOnly;
-	
-	fAutomountParams.mountAllFS = autoMountAll;
-	fAutomountParams.mountBFS = autoMountAllBFS;
-	fAutomountParams.mountHFS = autoMountAllHFS;
-	fAutomountParams.mountRemovableDisksOnly = autoMountRemovablesOnly;
-
-	gSilentAutoMounter = true;
-	
-	if (!BootedInSafeMode()) {
-		ReadSettings();
-		thread_id rescan = spawn_thread(AutoMounter::InitialRescanBinder, 
-			"AutomountInitialScan", B_DISPLAY_PRIORITY, this);
-		resume_thread(rescan);
-	} else {
-		// defeat automounter in safe mode, don't even care about the settings
-		fAutomountParams.mountAllFS = false;
-		fAutomountParams.mountBFS = false;
-		fAutomountParams.mountHFS = false;
-		fInitialMountAll = false;
-		fInitialMountAllBFS = false;
-		fInitialMountRestore = false;
-		fInitialMountAllHFS = false;
-	}
-
-	//	Watch mount/unmount
-	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
-#endif
-}
-
-
-AutoMounter::~AutoMounter()
-{
-}
-
-
-Partition* AutoMounter::FindPartition(dev_t _DEVICE_MAP_ONLY(dev))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	FindPartitionByDeviceIDParams params;
-	params.dev = dev;
-	return fList.EachMountedPartition(FindPartitionByDeviceID, &params);
-#else
-	return NULL;
-#endif
-}
-
-
-void 
-AutoMounter::RescanDevices()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	stop_watching(this);
-	fList.RescanDevices(true);
-	fList.UpdateMountingInfo();
-	fList.EachMountedPartition(TryWatchMountPoint, 0);
-	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
-	fList.EachMountedPartition(TryWatchMountPoint, 0);
-#endif
-}
-
-
-void
-AutoMounter::MessageReceived(BMessage *message)
-{
-	switch (message->what) {
-#if _INCLUDES_CLASS_DEVICE_MAP
-		case kAutomounterRescan:
-			RescanDevices();
-			break;
-
-		case kStartPolling:	
-			// PRINT(("starting the automounter\n"));
-			
-			fScanThread = spawn_thread(AutoMounter::WatchVolumeBinder, 
-#if DEBUG				
-				"HiroshiLikesAtomountScan",	// long story
-#else
-				"AutomountScan",
-#endif				
-				B_LOW_PRIORITY, this);
-			resume_thread(fScanThread);
-			break;
-
-		case kMountVolume:
-			MountVolume(message);
-			break;
-
-		case kUnmountVolume:
-			UnmountAndEjectVolume(message);
-			break;
-
-		case kSetAutomounterParams:
-			{
-				bool rescanNow = false;
-				message->FindBool("rescanNow", &rescanNow);
-				SetParams(message, rescanNow);
-				WriteSettings();
-				break;
-			}
-
-		case kMountAllNow:
-			RescanDevices();
-			MountAllNow();
-			break;
-
-		case kSuspendAutomounter:
-			SuspendResume(true);
-			break;
-
-		case kResumeAutomounter:
-			SuspendResume(false);
-			break;
-
-		case kTryMountingFloppy:
-			TryMountingFloppy();
-			break;
-
-		case B_NODE_MONITOR:
-			{
-				int32 opcode;
-				if (message->FindInt32("opcode", &opcode) != B_OK)
-					break;
-	
-				switch (opcode) {
-					case B_DEVICE_MOUNTED: {
-						WRITELOG(("** Received Device Mounted Notification"));
-						dev_t device;
-						if (message->FindInt32("new device", &device) == B_OK) {
-							Partition *partition =  FindPartition(device);
-							if (partition == NULL || partition->Mounted() != kMounted) {
-								WRITELOG(("Device %i not in device list.  Someone mounted it outside "
-									"of Tracker", device));
-		
-								//
-								// This is the worst case.  Someone has mounted
-								// something from outside of tracker.  
-								// Unfortunately, there's no easy way to tell which
-								// partition was just mounted (or if we even know about the device),
-								// so stop watching all nodes, rescan to see what is now mounted,
-								// and start watching again.
-								//
-								RescanDevices();
-							} else
-								WRITELOG(("Found partition\n"));
-						} else {
-							WRITELOG(("ERROR: Could not find mounted device ID in message"));
-							PRINT_OBJECT(*message);
-						}
-	
-						break;
-					}
-	
-	
-					case B_DEVICE_UNMOUNTED: {
-						WRITELOG(("*** Received Device Unmounted Notification"));
-						dev_t device;
-						if (message->FindInt32("device", &device) == B_OK) {
-							Partition *partition = FindPartition(device);
-	
-							if (partition != 0) {
-								WRITELOG(("Found device in device list. Updating state to unmounted."));
-								partition->SetMountState(kNotMounted);
-							} else
-								WRITELOG(("Unmounted device %i was not in device list", device));
-						} else {
-							WRITELOG(("ERROR: Could not find unmounted device ID in message"));
-							PRINT_OBJECT(*message);
-						}
-	
-						break;
-					}	
-	
-	
-					//	The name of a mount point has changed
-					case B_ENTRY_MOVED: {
-						WRITELOG(("*** Received Mount Point Renamed Notification"));
-					
-						const char *newName;
-						if (message->FindString("name", &newName) != B_OK) {
-							WRITELOG(("ERROR: Couldn't find name field in update message"));
-							PRINT_OBJECT(*message);
-							break ;
-						}
-	
-						//
-						// When the node monitor reports a move, it gives the
-						// parent device and inode that moved.  The problem is 
-						// that  the inode is the inode of root *in* the filesystem,
-						// which is generally always the same number for every 
-						// filesystem of a type.
-						//
-						// What we'd really like is the device that the moved	
-						// volume is mounted on.  Find this by using the 
-						// *new* name and directory, and then stat()ing that to
-						// find the device.
-						//
-						dev_t parentDevice;
-						if (message->FindInt32("device", &parentDevice) != B_OK) {
-							WRITELOG(("ERROR: Couldn't find 'device' field in update"
-								" message"));
-							PRINT_OBJECT(*message);
-							break;
-						}
-		
-						ino_t toDirectory;	
-						if (message->FindInt64("to directory", &toDirectory)!=B_OK){
-							WRITELOG(("ERROR: Couldn't find 'to directory' field in update"
-							  "message"));
-							PRINT_OBJECT(*message);
-							break;
-						}
-		
-						entry_ref root_entry(parentDevice, toDirectory, newName);
-	
-						BNode entryNode(&root_entry);
-						if (entryNode.InitCheck() != B_OK) {
-							WRITELOG(("ERROR: Couldn't create mount point entry node: %s/n", 
-								strerror(entryNode.InitCheck())));
-							break;
-						}	
-	
-						node_ref mountPointNode;
-						if (entryNode.GetNodeRef(&mountPointNode) != B_OK) {
-							WRITELOG(("ERROR: Couldn't get node ref for new mount point"));
-							break;
-						}
-				
-	
-						WRITELOG(("Attempt to rename device %li to %s", mountPointNode.device,
-							newName));
-
-						Partition *partition = FindPartition(mountPointNode.device);
-						if (partition != NULL) {
-							WRITELOG(("Found device, changing name."));
-
-							BVolume mountVolume(partition->VolumeDeviceID());
-							BDirectory mountDir;
-							mountVolume.GetRootDirectory(&mountDir);
-							BPath dirPath(&mountDir, 0);
-					
-							partition->SetMountedAt(dirPath.Path());
-							partition->SetVolumeName(newName);					
-							break;
-						}
-						else
-							WRITELOG(("ERROR: Device %li does not appear to be present",
-								mountPointNode.device));
-					}
-				}
-			}
-			break;
-
-
-#endif
-		default:
-			BLooper::MessageReceived(message);
-			break;
-	}
-}
-
-
-status_t
-AutoMounter::WatchVolumeBinder(void *_DEVICE_MAP_ONLY(castToThis))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	static_cast<AutoMounter *>(castToThis)->WatchVolumes();
-	return B_OK;
-#else
-	return B_UNSUPPORTED;
-#endif
-}
-
-
-void
-AutoMounter::WatchVolumes()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	for(;;) {
-		snooze(fScanParams.shortestRescanHartbeat);
-		
-		AutoLock<BLooper> lock(this);
-		if (!lock)
-			break;
-			
-		if (fQuitting) {
-			lock.Unlock();
-			break;
-		}
-
-		if (!fSuspended && fList.CheckDevicesChanged(&fScanParams)) {
-			fList.UnmountDisappearedPartitions();
-			fList.UpdateChangedDevices(&fScanParams);
-			fList.EachMountablePartition(AutomountOne, &fAutomountParams);
-		}
-	}
-#endif
-}
-
-
-#if _INCLUDES_CLASS_DEVICE_MAP
-static Device *
-FindFloppyDevice(Device *_DEVICE_MAP_ONLY(device), void *)
-{
-	if (device->IsFloppy())
-		return device;
-
-	return 0;
-}
-#endif
-
-
-void
-AutoMounter::EachMountableItemAndFloppy(EachPartitionFunction _DEVICE_MAP_ONLY(func),
-	void *_DEVICE_MAP_ONLY(passThru))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-
-#if 0
-	//
-	//	Rescan now to see if anything has changed.  
-	//
-	if (fList.CheckDevicesChanged(&fScanParams)) {
-		fList.UpdateChangedDevices(&fScanParams);
-		fList.UnmountDisappearedPartitions();
-	}
-#endif
-
-	//
-	//	If the floppy has never been mounted, it won't have a partition
-	// 	in the device list (but it will have a device entry).  If it has, the 
-	//	partition will appear, but will be set not mounted.  Code here works 
-	//	around this.
-	//
-	if (!IsFloppyMounted() && !FloppyInList()) {
-		Device *floppyDevice = fList.EachDevice(FindFloppyDevice, 0);
-
-		//
-		//	See comments under 'EachPartition'
-		//
-		if (floppyDevice != 0) {
-			Session session(floppyDevice, "floppy", 0, 0, 0);
-			Partition partition(&session, "floppy", "unknown",
-				"unknown", "unknown", "floppy", "", 0, 0, 0, false);
-
-			(func)(&partition, passThru);
-		}
-	}
-	
-	fList.EachMountablePartition(func, passThru);
-#endif
-}
-
-
-void
-AutoMounter::EachMountedItem(EachPartitionFunction _DEVICE_MAP_ONLY(func),
-	void *_DEVICE_MAP_ONLY(passThru))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	fList.EachMountedPartition(func, passThru);
-#endif
-}
-
-
-Partition *
-AutoMounter::EachPartition(EachPartitionFunction _DEVICE_MAP_ONLY(func),
-	void *_DEVICE_MAP_ONLY(passThru))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-
-	if (!IsFloppyMounted() && !FloppyInList()) {
-		Device *floppyDevice = fList.EachDevice(FindFloppyDevice, 0);
-
-		//
-		//	Add a floppy to the list.  It normally doesn't appear
-		//	there when a floppy hasn't been mounted because it
-		//	doesn't have any partitions.  Note that this makes sure
-		//	that a floppy device exists before adding it, because
-		//	some systems don't have floppy drives (unbelievable, but
-		//	true).
-		//
-		if (floppyDevice != 0) {
-			Session session(floppyDevice, "floppy", 0, 0, 0);
-			Partition partition(&session, "floppy", "unknown",
-				"unknown", "unknown", "floppy", "", 0, 0, 0, false);
-	
-			Partition *result = func(&partition, passThru);
-			if (result != NULL)
-				return result;
-		}
-	}
-	
-	return fList.EachPartition(func, passThru);
-#else
-	return NULL;
-#endif
-}
-
-
-void
-AutoMounter::CheckVolumesNow()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	if (fList.CheckDevicesChanged(&fScanParams)) {
-		fList.UnmountDisappearedPartitions();
-		fList.UpdateChangedDevices(&fScanParams);
-		if (!fSuspended)
-			fList.EachMountablePartition(AutomountOne, &fAutomountParams);
-	}
-#endif
-}
-
-
-void 
-AutoMounter::SuspendResume(bool _DEVICE_MAP_ONLY(suspend))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	fSuspended = suspend;
-	if (fSuspended)
-		suspend_thread(fScanThread);
-	else
-		resume_thread(fScanThread);
-#endif
-}
-
-
-void
-AutoMounter::MountAllNow()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	
-	DeviceScanParams mountAllParams;
-	mountAllParams.checkFloppies = true;
-	mountAllParams.checkCDROMs = true;
-	mountAllParams.checkOtherRemovable = true;
-	mountAllParams.removableOrUnknownOnly = true;
-
-	fList.UnmountDisappearedPartitions();
-	fList.UpdateChangedDevices(&mountAllParams);
-	fList.EachMountablePartition(TryMountingEveryOne, 0);
-	fList.EachPartition(NotifyFloppyNotMountable, 0);
-#endif
-}
-
-
-void 
-AutoMounter::TryMountingFloppy()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	
-	DeviceScanParams mountAllParams;
-	mountAllParams.checkFloppies = true;
-	mountAllParams.checkCDROMs = false;
-	mountAllParams.checkOtherRemovable = false;
-	mountAllParams.removableOrUnknownOnly = false;
-
-	fList.UnmountDisappearedPartitions();
-	fList.UpdateChangedDevices(&mountAllParams);
-	OneMountFloppyParams params;
-	params.result = B_ERROR;
-	fList.EachMountablePartition(OneTryMountingFloppy, &params);
-	if (params.result != B_OK)
-		(new BAlert("", "The format of the floppy disk in the disk drive is "
-			"not recognized or the disk has never been formatted.", "OK"))
-			->Go(0);
-#endif
-}
-
-
-bool 
-AutoMounter::IsFloppyMounted()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	return fList.EachMountedPartition(OneMatchFloppy, 0) != NULL;
-#else
-	return false;
-#endif
-}
-
-
-bool 
-AutoMounter::FloppyInList()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	return fList.EachPartition(OneMatchFloppy, 0) != NULL;
-#else
-	return false;
-#endif
-}
-
-
-void
-AutoMounter::MountVolume(BMessage *_DEVICE_MAP_ONLY(message))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	int32 uniqueID;
-	if (message->FindInt32("id", &uniqueID) == B_OK) {
-
-		if (uniqueID == kFloppyID) {
-			TryMountingFloppy();
-			return;
-		}
-
-		MountPartitionParams params;
-		params.uniqueID = uniqueID;
-		params.result = B_OK;
-		
-		if (EachPartition(TryMountVolumeByID, &params) == NULL) 
-			(new BAlert("", "The format of this volume is unrecognized, or it has "
-				"never been formatted", "OK"))->Go(0);
-		else if (params.result != B_OK)	{
-			BString string;
-			string << "Error mounting volume. (" << strerror(params.result) << ")";
-			(new BAlert("", string.String(), "OK"))->Go(0);
-		}
-	}
-#endif
-}
-
-
-status_t 
-AutoMounter::InitialRescanBinder(void *_DEVICE_MAP_ONLY(castToThis))
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	// maybe this can help the strange Tracker lock-up at startup
-	snooze(500000LL);	// wait half a second
-
-	AutoMounter *self = static_cast<AutoMounter *>(castToThis);
-	self->InitialRescan();
-
-	// Start watching nodes that were mounted before tracker started
-	(self->fList).EachMountedPartition(TryWatchMountPoint, 0);
-
-	self->PostMessage(kStartPolling, 0);
-#endif
-	return B_OK;
-}
-
-
-void 
-AutoMounter::InitialRescan()
-{
-#if _INCLUDES_CLASS_DEVICE_MAP
-	AutoLock<BLooper> lock(this);
-	
-	fList.RescanDevices(false);
-	fList.UpdateMountingInfo();
-
-	// if called after spawn_thread, must lock fList
-	if (fInitialMountAll) {
-//+		PRINT(("mounting all volumes\n"));
-		fList.EachMountablePartition(TryMountingEveryOne, NULL);
-	}
-	
-	if (fInitialMountAllHFS) {
-//+		PRINT(("mounting all hfs volumes\n"));
-		fList.EachMountablePartition(TryMountingHFSOne, NULL);
-	}
-	
-	if (fInitialMountAllBFS) {
-//+		PRINT(("mounting all bfs volumes\n"));
-		fList.EachMountablePartition(TryMountingBFSOne, NULL);
-	}
-
-	if (fInitialMountRestore) {
-//+		PRINT(("restoring all volumes\n"));
-		fList.EachMountablePartition(TryMountingRestoreOne, NULL);
-	}
-#endif
-}
-
-
 struct UnmountDeviceParams {
 	dev_t device;
 	status_t result;
 };
 
 
-#if _INCLUDES_CLASS_DEVICE_MAP
 static Partition *
-UnmountIfMatchingID(Partition *_DEVICE_MAP_ONLY(partition),
-	void *_DEVICE_MAP_ONLY(castToParams))
+UnmountIfMatchingID(Partition *partition, void *castToParams)
 {
 	UnmountDeviceParams *params = (UnmountDeviceParams *)castToParams;
-	
-	if (partition->VolumeDeviceID() == params->device) {
 
+	if (partition->VolumeDeviceID() == params->device) {
 		TTracker *tracker = dynamic_cast<TTracker *>(be_app);
 		if (tracker && tracker->QueryActiveForDevice(params->device)) {
 			BString text;
@@ -1011,19 +878,601 @@ UnmountIfMatchingID(Partition *_DEVICE_MAP_ONLY(partition),
 
 	return NULL;
 }
-#endif
+
+
+static Partition *
+NotifyFloppyNotMountable(Partition *partition, void *)
+{
+	if (partition->Mounted() != kMounted
+		&& partition->GetDevice()->IsFloppy()
+		&& !partition->Hidden()) {
+		(new BAlert("", "The format of the floppy disk in the disk drive is "
+			"not recognized or the disk has never been formatted.", "OK"))->Go(0);
+		partition->GetDevice()->Eject();
+	}
+	return NULL;
+}
+
+
+static Device *
+FindFloppyDevice(Device *device, void *)
+{
+	if (device->IsFloppy())
+		return device;
+
+	return 0;
+}
+
+
+#ifdef MOUNT_MENU_IN_DESKBAR
+
+// just for testing
+
+Partition *
+AddMountableItemToMessage(Partition *partition, void *castToParams)
+{
+	BMessage *message = static_cast<BMessage *>(castToParams);
+
+	message->AddString("DeviceName", partition->GetDevice()->Name());
+	const char *name;
+	if (*partition->VolumeName())
+		name = partition->VolumeName();
+	else if (*partition->Type())
+		name = partition->Type();
+	else
+		name = partition->GetDevice()->DisplayName();
+
+	message->AddString("DisplayName", name);
+	BMessage invokeMsg;
+	if (partition->GetDevice()->IsFloppy())
+		invokeMsg.what = kTryMountingFloppy;
+	else
+		invokeMsg.what = kMountVolume;
+	invokeMsg.AddInt32("id", partition->UniqueID());
+	message->AddMessage("InvokeMessage", &invokeMsg);
+	return NULL;	
+}
+
+#endif // #ifdef MOUNT_MENU_IN_DESKBAR
+
+
+AutoMounter::AutoMounter(bool checkRemovableOnly, bool checkCDs,
+		bool checkFloppies, bool checkOtherRemovable, bool autoMountRemovablesOnly,
+		bool autoMountAll, bool autoMountAllBFS, bool autoMountAllHFS,
+		bool initialMountAll, bool initialMountAllBFS, bool initialMountRestore,
+		bool initialMountAllHFS)
+	: BLooper("AutoMounter", B_LOW_PRIORITY),
+	fInitialMountAll(initialMountAll),
+	fInitialMountAllBFS(initialMountAllBFS),
+	fInitialMountRestore(initialMountRestore),
+	fInitialMountAllHFS(initialMountAllHFS),
+	fSuspended(false),
+	fQuitting(false)
+{
+	fScanParams.shortestRescanHartbeat = 5000000;
+	fScanParams.checkFloppies = checkFloppies;
+	fScanParams.checkCDROMs = checkCDs;
+	fScanParams.checkOtherRemovable = checkOtherRemovable;
+	fScanParams.removableOrUnknownOnly = checkRemovableOnly;
+
+	fAutomountParams.mountAllFS = autoMountAll;
+	fAutomountParams.mountBFS = autoMountAllBFS;
+	fAutomountParams.mountHFS = autoMountAllHFS;
+	fAutomountParams.mountRemovableDisksOnly = autoMountRemovablesOnly;
+
+	gSilentAutoMounter = true;
+
+	if (!BootedInSafeMode()) {
+		ReadSettings();
+		thread_id rescan = spawn_thread(AutoMounter::InitialRescanBinder, 
+			"AutomountInitialScan", B_DISPLAY_PRIORITY, this);
+		resume_thread(rescan);
+	} else {
+		// defeat automounter in safe mode, don't even care about the settings
+		fAutomountParams.mountAllFS = false;
+		fAutomountParams.mountBFS = false;
+		fAutomountParams.mountHFS = false;
+		fInitialMountAll = false;
+		fInitialMountAllBFS = false;
+		fInitialMountRestore = false;
+		fInitialMountAllHFS = false;
+	}
+
+	//	Watch mount/unmount
+	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
+}
+
+
+AutoMounter::~AutoMounter()
+{
+}
+
+
+Partition* AutoMounter::FindPartition(dev_t dev)
+{
+	FindPartitionByDeviceIDParams params;
+	params.dev = dev;
+	return fList.EachMountedPartition(FindPartitionByDeviceID, &params);
+}
+
+
+void 
+AutoMounter::RescanDevices()
+{
+	stop_watching(this);
+	fList.RescanDevices(true);
+	fList.UpdateMountingInfo();
+	fList.EachMountedPartition(TryWatchMountPoint, 0);
+	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
+	fList.EachMountedPartition(TryWatchMountPoint, 0);
+}
 
 
 void
-AutoMounter::UnmountAndEjectVolume(BMessage *_DEVICE_MAP_ONLY(message))
+AutoMounter::MessageReceived(BMessage *message)
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
+	switch (message->what) {
+		case kAutomounterRescan:
+			RescanDevices();
+			break;
+
+		case kStartPolling:	
+			// PRINT(("starting the automounter\n"));
+
+			fScanThread = spawn_thread(AutoMounter::WatchVolumeBinder, 
+				"AutomountScan", B_LOW_PRIORITY, this);
+			resume_thread(fScanThread);
+			break;
+
+		case kMountVolume:
+			MountVolume(message);
+			break;
+
+		case kUnmountVolume:
+			UnmountAndEjectVolume(message);
+			break;
+
+		case kSetAutomounterParams:
+		{
+			bool rescanNow = false;
+			message->FindBool("rescanNow", &rescanNow);
+			SetParams(message, rescanNow);
+			WriteSettings();
+			break;
+		}
+
+		case kMountAllNow:
+			RescanDevices();
+			MountAllNow();
+			break;
+
+		case kSuspendAutomounter:
+			SuspendResume(true);
+			break;
+
+		case kResumeAutomounter:
+			SuspendResume(false);
+			break;
+
+		case kTryMountingFloppy:
+			TryMountingFloppy();
+			break;
+
+		case B_NODE_MONITOR:
+		{
+			int32 opcode;
+			if (message->FindInt32("opcode", &opcode) != B_OK)
+				break;
+
+			switch (opcode) {
+				case B_DEVICE_MOUNTED: {
+					WRITELOG(("** Received Device Mounted Notification"));
+					dev_t device;
+					if (message->FindInt32("new device", &device) == B_OK) {
+						Partition *partition =  FindPartition(device);
+						if (partition == NULL || partition->Mounted() != kMounted) {
+							WRITELOG(("Device %i not in device list.  Someone mounted it outside "
+								"of Tracker", device));
+
+							//
+							// This is the worst case.  Someone has mounted
+							// something from outside of tracker.  
+							// Unfortunately, there's no easy way to tell which
+							// partition was just mounted (or if we even know about the device),
+							// so stop watching all nodes, rescan to see what is now mounted,
+							// and start watching again.
+							//
+							RescanDevices();
+						} else
+							WRITELOG(("Found partition\n"));
+					} else {
+						WRITELOG(("ERROR: Could not find mounted device ID in message"));
+						PRINT_OBJECT(*message);
+					}
+
+					break;
+				}
+
+				case B_DEVICE_UNMOUNTED: {
+					WRITELOG(("*** Received Device Unmounted Notification"));
+					dev_t device;
+					if (message->FindInt32("device", &device) == B_OK) {
+						Partition *partition = FindPartition(device);
+
+						if (partition != 0) {
+							WRITELOG(("Found device in device list. Updating state to unmounted."));
+							partition->SetMountState(kNotMounted);
+						} else
+							WRITELOG(("Unmounted device %i was not in device list", device));
+					} else {
+						WRITELOG(("ERROR: Could not find unmounted device ID in message"));
+						PRINT_OBJECT(*message);
+					}
+
+					break;
+				}	
+
+				//	The name of a mount point has changed
+				case B_ENTRY_MOVED: {
+					WRITELOG(("*** Received Mount Point Renamed Notification"));
+
+					const char *newName;
+					if (message->FindString("name", &newName) != B_OK) {
+						WRITELOG(("ERROR: Couldn't find name field in update message"));
+						PRINT_OBJECT(*message);
+						break ;
+					}
+
+					//
+					// When the node monitor reports a move, it gives the
+					// parent device and inode that moved.  The problem is 
+					// that  the inode is the inode of root *in* the filesystem,
+					// which is generally always the same number for every 
+					// filesystem of a type.
+					//
+					// What we'd really like is the device that the moved	
+					// volume is mounted on.  Find this by using the 
+					// *new* name and directory, and then stat()ing that to
+					// find the device.
+					//
+					dev_t parentDevice;
+					if (message->FindInt32("device", &parentDevice) != B_OK) {
+						WRITELOG(("ERROR: Couldn't find 'device' field in update"
+							" message"));
+						PRINT_OBJECT(*message);
+						break;
+					}
+
+					ino_t toDirectory;	
+					if (message->FindInt64("to directory", &toDirectory)!=B_OK){
+						WRITELOG(("ERROR: Couldn't find 'to directory' field in update"
+						  "message"));
+						PRINT_OBJECT(*message);
+						break;
+					}
+
+					entry_ref root_entry(parentDevice, toDirectory, newName);
+
+					BNode entryNode(&root_entry);
+					if (entryNode.InitCheck() != B_OK) {
+						WRITELOG(("ERROR: Couldn't create mount point entry node: %s/n", 
+							strerror(entryNode.InitCheck())));
+						break;
+					}	
+
+					node_ref mountPointNode;
+					if (entryNode.GetNodeRef(&mountPointNode) != B_OK) {
+						WRITELOG(("ERROR: Couldn't get node ref for new mount point"));
+						break;
+					}
+
+					WRITELOG(("Attempt to rename device %li to %s", mountPointNode.device,
+						newName));
+
+					Partition *partition = FindPartition(mountPointNode.device);
+					if (partition != NULL) {
+						WRITELOG(("Found device, changing name."));
+
+						BVolume mountVolume(partition->VolumeDeviceID());
+						BDirectory mountDir;
+						mountVolume.GetRootDirectory(&mountDir);
+						BPath dirPath(&mountDir, 0);
+
+						partition->SetMountedAt(dirPath.Path());
+						partition->SetVolumeName(newName);					
+						break;
+					} else {
+						WRITELOG(("ERROR: Device %li does not appear to be present",
+							mountPointNode.device));
+					}
+				}
+			}
+			break;
+		}
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
+	}
+}
+
+
+status_t
+AutoMounter::WatchVolumeBinder(void *castToThis)
+{
+	static_cast<AutoMounter *>(castToThis)->WatchVolumes();
+	return B_OK;
+}
+
+
+void
+AutoMounter::WatchVolumes()
+{
+	for(;;) {
+		snooze(fScanParams.shortestRescanHartbeat);
+
+		AutoLock<BLooper> lock(this);
+		if (!lock)
+			break;
+
+		if (fQuitting) {
+			lock.Unlock();
+			break;
+		}
+
+		if (!fSuspended && fList.CheckDevicesChanged(&fScanParams)) {
+			fList.UnmountDisappearedPartitions();
+			fList.UpdateChangedDevices(&fScanParams);
+			fList.EachMountablePartition(AutomountOne, &fAutomountParams);
+		}
+	}
+}
+
+
+void
+AutoMounter::EachMountableItemAndFloppy(EachPartitionFunction func, void *passThru)
+{
+	AutoLock<BLooper> lock(this);
+
+#if 0
+	//
+	//	Rescan now to see if anything has changed.  
+	//
+	if (fList.CheckDevicesChanged(&fScanParams)) {
+		fList.UpdateChangedDevices(&fScanParams);
+		fList.UnmountDisappearedPartitions();
+	}
+#endif
+
+	//
+	//	If the floppy has never been mounted, it won't have a partition
+	// 	in the device list (but it will have a device entry).  If it has, the 
+	//	partition will appear, but will be set not mounted.  Code here works 
+	//	around this.
+	//
+	if (!IsFloppyMounted() && !FloppyInList()) {
+		Device *floppyDevice = fList.EachDevice(FindFloppyDevice, 0);
+
+		//
+		//	See comments under 'EachPartition'
+		//
+		if (floppyDevice != 0) {
+			Session session(floppyDevice, "floppy", 0, 0, 0);
+			Partition partition(&session, "floppy", "unknown",
+				"unknown", "unknown", "floppy", "", 0, 0, 0, false);
+
+			(func)(&partition, passThru);
+		}
+	}
+
+	fList.EachMountablePartition(func, passThru);
+}
+
+
+void
+AutoMounter::EachMountedItem(EachPartitionFunction func, void *passThru)
+{
+	AutoLock<BLooper> lock(this);
+	fList.EachMountedPartition(func, passThru);
+}
+
+
+Partition *
+AutoMounter::EachPartition(EachPartitionFunction func, void *passThru)
+{
+	AutoLock<BLooper> lock(this);
+
+	if (!IsFloppyMounted() && !FloppyInList()) {
+		Device *floppyDevice = fList.EachDevice(FindFloppyDevice, 0);
+
+		//
+		//	Add a floppy to the list.  It normally doesn't appear
+		//	there when a floppy hasn't been mounted because it
+		//	doesn't have any partitions.  Note that this makes sure
+		//	that a floppy device exists before adding it, because
+		//	some systems don't have floppy drives (unbelievable, but
+		//	true).
+		//
+		if (floppyDevice != 0) {
+			Session session(floppyDevice, "floppy", 0, 0, 0);
+			Partition partition(&session, "floppy", "unknown",
+				"unknown", "unknown", "floppy", "", 0, 0, 0, false);
+	
+			Partition *result = func(&partition, passThru);
+			if (result != NULL)
+				return result;
+		}
+	}
+	
+	return fList.EachPartition(func, passThru);
+}
+
+
+void
+AutoMounter::CheckVolumesNow()
+{
+	AutoLock<BLooper> lock(this);
+	if (fList.CheckDevicesChanged(&fScanParams)) {
+		fList.UnmountDisappearedPartitions();
+		fList.UpdateChangedDevices(&fScanParams);
+		if (!fSuspended)
+			fList.EachMountablePartition(AutomountOne, &fAutomountParams);
+	}
+}
+
+
+void 
+AutoMounter::SuspendResume(bool suspend)
+{
+	AutoLock<BLooper> lock(this);
+	fSuspended = suspend;
+	if (fSuspended)
+		suspend_thread(fScanThread);
+	else
+		resume_thread(fScanThread);
+}
+
+
+void
+AutoMounter::MountAllNow()
+{
+	AutoLock<BLooper> lock(this);
+
+	DeviceScanParams mountAllParams;
+	mountAllParams.checkFloppies = true;
+	mountAllParams.checkCDROMs = true;
+	mountAllParams.checkOtherRemovable = true;
+	mountAllParams.removableOrUnknownOnly = true;
+
+	fList.UnmountDisappearedPartitions();
+	fList.UpdateChangedDevices(&mountAllParams);
+	fList.EachMountablePartition(TryMountingEveryOne, 0);
+	fList.EachPartition(NotifyFloppyNotMountable, 0);
+}
+
+
+void
+AutoMounter::TryMountingFloppy()
+{
+	AutoLock<BLooper> lock(this);
+
+	DeviceScanParams mountAllParams;
+	mountAllParams.checkFloppies = true;
+	mountAllParams.checkCDROMs = false;
+	mountAllParams.checkOtherRemovable = false;
+	mountAllParams.removableOrUnknownOnly = false;
+
+	fList.UnmountDisappearedPartitions();
+	fList.UpdateChangedDevices(&mountAllParams);
+	OneMountFloppyParams params;
+	params.result = B_ERROR;
+	fList.EachMountablePartition(OneTryMountingFloppy, &params);
+	if (params.result != B_OK)
+		(new BAlert("", "The format of the floppy disk in the disk drive is "
+			"not recognized or the disk has never been formatted.", "OK"))
+			->Go(0);
+}
+
+
+bool
+AutoMounter::IsFloppyMounted()
+{
+	AutoLock<BLooper> lock(this);
+	return fList.EachMountedPartition(OneMatchFloppy, 0) != NULL;
+}
+
+
+bool
+AutoMounter::FloppyInList()
+{
+	AutoLock<BLooper> lock(this);
+	return fList.EachPartition(OneMatchFloppy, 0) != NULL;
+}
+
+
+void
+AutoMounter::MountVolume(BMessage *message)
+{
+	int32 uniqueID;
+	if (message->FindInt32("id", &uniqueID) == B_OK) {
+		if (uniqueID == kFloppyID) {
+			TryMountingFloppy();
+			return;
+		}
+
+		MountPartitionParams params;
+		params.uniqueID = uniqueID;
+		params.result = B_OK;
+
+		if (EachPartition(TryMountVolumeByID, &params) == NULL) {
+			(new BAlert("", "The format of this volume is unrecognized, or it has "
+				"never been formatted", "OK"))->Go(0);
+		} else if (params.result != B_OK)	{
+			BString string;
+			string << "Error mounting volume. (" << strerror(params.result) << ")";
+			(new BAlert("", string.String(), "OK"))->Go(0);
+		}
+	}
+}
+
+
+status_t
+AutoMounter::InitialRescanBinder(void *castToThis)
+{
+	// maybe this can help the strange Tracker lock-up at startup
+	snooze(500000LL);	// wait half a second
+
+	AutoMounter *self = static_cast<AutoMounter *>(castToThis);
+	self->InitialRescan();
+
+	// Start watching nodes that were mounted before tracker started
+	(self->fList).EachMountedPartition(TryWatchMountPoint, 0);
+
+	self->PostMessage(kStartPolling, 0);
+	return B_OK;
+}
+
+
+void
+AutoMounter::InitialRescan()
+{
+	AutoLock<BLooper> lock(this);
+
+	fList.RescanDevices(false);
+	fList.UpdateMountingInfo();
+
+	// if called after spawn_thread, must lock fList
+	if (fInitialMountAll) {
+//+		PRINT(("mounting all volumes\n"));
+		fList.EachMountablePartition(TryMountingEveryOne, NULL);
+	}
+	
+	if (fInitialMountAllHFS) {
+//+		PRINT(("mounting all hfs volumes\n"));
+		fList.EachMountablePartition(TryMountingHFSOne, NULL);
+	}
+	
+	if (fInitialMountAllBFS) {
+//+		PRINT(("mounting all bfs volumes\n"));
+		fList.EachMountablePartition(TryMountingBFSOne, NULL);
+	}
+
+	if (fInitialMountRestore) {
+//+		PRINT(("restoring all volumes\n"));
+		fList.EachMountablePartition(TryMountingRestoreOne, NULL);
+	}
+}
+
+
+void
+AutoMounter::UnmountAndEjectVolume(BMessage *message)
+{
 	dev_t device;
 	if (message->FindInt32("device_id", &device) != B_OK)
 		return;
 
 	PRINT(("Unmount device %i\n", device));
-	
+
 	AutoLock<BLooper> lock(this);
 
 	UnmountDeviceParams params;
@@ -1031,7 +1480,7 @@ AutoMounter::UnmountAndEjectVolume(BMessage *_DEVICE_MAP_ONLY(message))
 	params.result = B_OK;
 	Partition *partition = fList.EachMountedPartition(UnmountIfMatchingID, 
 		&params);
-	
+
 	if (!partition) {
 		PRINT(("Couldn't unmount partition.  Rescan and try again\n"));
 
@@ -1099,20 +1548,18 @@ AutoMounter::UnmountAndEjectVolume(BMessage *_DEVICE_MAP_ONLY(message))
 		(new BAlert("", text.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, 
 			B_WARNING_ALERT))->Go(0);
 	}
-#endif
 }
 
 
 bool
 AutoMounter::QuitRequested()
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
-	if (!BootedInSafeMode())
+	if (!BootedInSafeMode()) {
 		// don't write out settings in safe mode - this would overwrite the
 		// normal, non-safe mode settings
 		WriteSettings();
+	}
 
-#endif
 	return true;
 }
 
@@ -1120,16 +1567,14 @@ AutoMounter::QuitRequested()
 void
 AutoMounter::ReadSettings()
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
 	BPath directoryPath;
-
 	if (FSFindTrackerSettingsDir(&directoryPath) != B_OK)
 		return;
-	
+
 	BPath path(directoryPath);
 	path.Append(kAutoMounterSettings);
 	fPrefsFile.SetTo(path.Path(), O_RDWR);
-	
+
 	if (fPrefsFile.InitCheck() != B_OK) {
 		// no prefs file yet, create a new one
 
@@ -1144,7 +1589,7 @@ AutoMounter::ReadSettings()
 
 	ASSERT(settingsSize != 0);
 	char *buffer = new char[settingsSize];
-	
+
 	fPrefsFile.Seek(0, 0);
 	if (fPrefsFile.Read(buffer, (size_t)settingsSize) != settingsSize) {
 		PRINT(("error reading automounter settings\n"));
@@ -1154,51 +1599,45 @@ AutoMounter::ReadSettings()
 
 	BMessage message('stng');
 	status_t result = message.Unflatten(buffer);
-	
 	if (result != B_OK) {
 		PRINT(("error %s unflattening settings, size %d\n", strerror(result), 
 			settingsSize));
 		delete [] buffer;
 		return;
 	}
-	
+
 	delete [] buffer;
 //	PRINT(("done unflattening settings\n"));
 	SetParams(&message, true);
-#endif
 }
 
 
 void
 AutoMounter::WriteSettings()
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
 	if (fPrefsFile.InitCheck() != B_OK)
 		return;
 
 	BMessage message('stng');
 	GetSettings(&message);
-	
+
 	ssize_t settingsSize = message.FlattenedSize();
 
 	char *buffer = new char[settingsSize];
 	status_t result = message.Flatten(buffer, settingsSize);
-		
+
 	fPrefsFile.Seek(0, 0);
 	result = fPrefsFile.Write(buffer, (size_t)settingsSize);
-	
 	if (result != settingsSize)
 		PRINT(("error writing settings, %s\n", strerror(result)));
-	
+
 	delete [] buffer;
-#endif
 }
 
 
 void
-AutoMounter::GetSettings(BMessage *_DEVICE_MAP_ONLY(message))
+AutoMounter::GetSettings(BMessage *message)
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
 	message->AddBool("checkRemovableOnly", fScanParams.removableOrUnknownOnly);
 	message->AddBool("checkCDs", fScanParams.checkCDROMs);
 	message->AddBool("checkFloppies", fScanParams.checkFloppies);
@@ -1223,15 +1662,12 @@ AutoMounter::GetSettings(BMessage *_DEVICE_MAP_ONLY(message))
 			&& info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT))
 			message->AddString(info.device_name, info.volume_name);
 	}
-#endif
 }
 
 
-void 
-AutoMounter::SetParams(BMessage *_DEVICE_MAP_ONLY(message),
-	bool _DEVICE_MAP_ONLY(rescan))
+void
+AutoMounter::SetParams(BMessage *message, bool rescan)
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
 	bool result;
 	if (message->FindBool("checkRemovableOnly", &result) == B_OK)
 		fScanParams.removableOrUnknownOnly = result;
@@ -1263,9 +1699,9 @@ AutoMounter::SetParams(BMessage *_DEVICE_MAP_ONLY(message),
 
 	if (message->FindBool("suspended", &result) == B_OK)
 		SuspendResume(result);
-	
+
 	if (rescan)
 		CheckVolumesNow();
-#endif
 }
 
+#endif	// !__HAIKU__
