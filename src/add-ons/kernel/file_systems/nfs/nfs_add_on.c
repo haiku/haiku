@@ -1159,22 +1159,27 @@ dprintf("nfs:ip!\n");
 	params->server = malloc(e - p);
 	strncpy(params->server, p, e - p);
 	// hack
+	params->serverIP = 0;
 	v = strtol(p, &p, 10);
+dprintf("IP:%ld.", v);
 	if (!p)
 		return EINVAL;
-	p++;
 	params->serverIP |= (v << 24);
+	p++;
 	v = strtol(p, &p, 10);
+dprintf("%ld.", v);
 	if (!p)
 		return EINVAL;
-	p++;
 	params->serverIP |= (v << 16);
+	p++;
 	v = strtol(p, &p, 10);
+dprintf("%ld.", v);
 	if (!p)
 		return EINVAL;
-	p++;
 	params->serverIP |= (v << 8);
+	p++;
 	v = strtol(p, &p, 10);
+dprintf("%ld\n", v);
 	if (!p)
 		return EINVAL;
 	params->serverIP |= (v);
@@ -1226,7 +1231,9 @@ fs_mount(nspace_id nsid, const char *devname, uint32 flags, const char *_parms, 
 fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, size_t len, fs_nspace **data, vnode_id *vnid)
 #endif
 {
+#ifndef PARAMS_AS_STRING
 	struct mount_nfs_params *parms = (struct mount_nfs_params *)_parms; // XXX: FIXME
+#endif
 	status_t result;
 	fs_nspace *ns;
 	fs_node *rootNode;
@@ -1235,7 +1242,7 @@ fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, s
 	(void) len;
 #endif
 
-	if (parms==NULL)
+	if (_parms==NULL)
 		return EINVAL;
 
 dprintf("nfs: mount(%d, %s, %08lx)\n", nsid, devname, flags);
@@ -1280,14 +1287,12 @@ dprintf("nfs: nfs_params: %s\n", _parms);
 	ns->params.uid=parms->uid;
 	ns->params.gid=parms->gid;
 	ns->params.hostname=strdup(parms->hostname);
+#endif
 	ns->xid=0;
 	ns->mountAddr.sin_family=AF_INET;
-	ns->mountAddr.sin_addr.s_addr=htonl(parms->serverIP);
+	ns->mountAddr.sin_addr.s_addr=htonl(ns->params.serverIP);
 	memset (ns->mountAddr.sin_zero,0,sizeof(ns->mountAddr.sin_zero));
-#endif
 
-	// XXX: cleanup error handling
-		
 	if ((result=create_socket(ns))<B_OK)
 		goto err_socket;
 
