@@ -17,6 +17,9 @@
 #include <ByteOrder.h>
 #include <netinet/udp.h>
 
+/* Haiku requires a string for mount params... */
+#define PARAMS_AS_STRING 1
+
 #ifndef UDP_SIZE_MAX
 #define UDP_SIZE_MAX 65515
 #endif
@@ -1137,6 +1140,84 @@ fs_nspaceDestroy(struct fs_nspace *nspace)
 	RPCPendingCallsDestroy (&nspace->pendingCalls);
 }
 
+#ifdef PARAMS_AS_STRING
+int parse_nfs_params(const char *str, struct mount_nfs_params *params)
+{
+	char *p, *e;
+	long v;
+	int i;
+	// sprintf(buf, "nfs:%s:%s,uid=%u,gid=%u,hostname=%s",
+	if (!str || !params)
+		return EINVAL;
+	if (strncmp(str, "nfs:", 4))
+		return EINVAL;
+dprintf("nfs:ip!\n");
+	p = str + 4;
+	e = strchr(p, ':');
+	if (!e)
+		return EINVAL;
+	params->server = malloc(e - p);
+	strncpy(params->server, p, e - p);
+	// hack
+	v = strtol(p, &p, 10);
+	if (!p)
+		return EINVAL;
+	p++;
+	params->serverIP |= (v << 24);
+	v = strtol(p, &p, 10);
+	if (!p)
+		return EINVAL;
+	p++;
+	params->serverIP |= (v << 16);
+	v = strtol(p, &p, 10);
+	if (!p)
+		return EINVAL;
+	p++;
+	params->serverIP |= (v << 8);
+	v = strtol(p, &p, 10);
+	if (!p)
+		return EINVAL;
+	params->serverIP |= (v);
+	if (*p++ != ':')
+		return EINVAL;
+	
+	e = strchr(p, ',');
+	i = (e) ? (e - p) : (strlen(p));
+	
+	params->_export = malloc(i);
+	strncpy(params->_export, p, i);
+	
+	p = strstr(str, "hostname=");
+	if (!p)
+		return EINVAL;
+dprintf("nfs:hn!\n");
+	p += 9;
+	e = strchr(p, ',');
+	i = (e) ? (e - p) : (strlen(p));
+	
+	params->hostname = malloc(i);
+	strncpy(params->hostname, p, i);
+	
+	p = strstr(str, "uid=");
+dprintf("nfs:uid!\n");
+	if (p) {
+		p += 4;
+		v = strtol(p, &p, 10);
+		params->uid = v;
+	}
+dprintf("nfs:gid!\n");
+	p = strstr(str, "gid=");
+	if (p) {
+		p += 4;
+		v = strtol(p, &p, 10);
+		params->gid = v;
+	}
+	dprintf("nfs: ip:%08lx server:'%s' export:'%s' hostname:'%s' uid=%d gid=%d \n",
+		params->serverIP, params->server, params->_export, 
+		params->hostname, params->uid, params->gid);
+	return B_OK;
+}
+#endif
 
 extern int 
 #ifdef __HAIKU__
@@ -1158,6 +1239,7 @@ fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, s
 		return EINVAL;
 
 dprintf("nfs: mount(%d, %s, %08lx)\n", nsid, devname, flags);
+#ifndef PARAMS_AS_STRING
 dprintf("nfs: nfs_params(ip:%lu, server:%s, export:%s, uid:%d, gid:%d, hostname:%s)\n", 
         parms->serverIP, 
         parms->server, 
@@ -1165,7 +1247,11 @@ dprintf("nfs: nfs_params(ip:%lu, server:%s, export:%s, uid:%d, gid:%d, hostname:
         parms->uid, 
         parms->gid, 
         parms->hostname);
+#else
+dprintf("nfs: nfs_params: %s\n", _parms);
+#endif
 
+	// HAIKU: this should go to std_ops
 	if (!refcount)
 		read_config();
 	
@@ -1173,11 +1259,21 @@ dprintf("nfs: nfs_params(ip:%lu, server:%s, export:%s, uid:%d, gid:%d, hostname:
 	if (result < B_OK)
 		return result;
 
+	result = ENOMEM;
 	ns=(fs_nspace *)malloc(sizeof(fs_nspace));
+	if (!ns)
+		goto err_nspace;
 	fs_nspaceInit (ns);
 
 	ns->nsid=nsid;
 	
+	ns->params.server=NULL;
+	ns->params._export=NULL;
+	ns->params.hostname=NULL;
+#ifdef PARAMS_AS_STRING
+	if ((result = parse_nfs_params(_parms, &ns->params)) < 0)
+		goto err_params;
+#else
 	ns->params.serverIP=parms->serverIP;
 	ns->params.server=strdup(parms->server);
 	ns->params._export=strdup(parms->_export);
@@ -1188,125 +1284,46 @@ dprintf("nfs: nfs_params(ip:%lu, server:%s, export:%s, uid:%d, gid:%d, hostname:
 	ns->mountAddr.sin_family=AF_INET;
 	ns->mountAddr.sin_addr.s_addr=htonl(parms->serverIP);
 	memset (ns->mountAddr.sin_zero,0,sizeof(ns->mountAddr.sin_zero));
+#endif
 
 	// XXX: cleanup error handling
 		
 	if ((result=create_socket(ns))<B_OK)
-	{
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		return result;
-	}
+		goto err_socket;
 
 	if ((result=init_postoffice(ns))<B_OK)
-	{
-		kclosesocket(ns->s);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		return result;
-	}
+		goto err_postoffice;
 
 	if ((result=get_remote_address(ns,MOUNT_PROGRAM,MOUNT_VERSION,PMAP_IPPROTO_UDP,&ns->mountAddr))<B_OK)
-	{
-		shutdown_postoffice(ns);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		dprintf("nfs: error getting mountd address from portmapper: %s\n", strerror(result));
-		return result;		
-	}
+		goto err_sem;
 
 	memcpy (&ns->nfsAddr,&ns->mountAddr,sizeof(ns->mountAddr));
 dprintf("nfs: mountd at %08lx:%d\n", ns->mountAddr.sin_addr.s_addr, ntohs(ns->mountAddr.sin_port));
 	
 	if ((result=get_remote_address(ns,NFS_PROGRAM,NFS_VERSION,PMAP_IPPROTO_UDP,&ns->nfsAddr))<B_OK)
-	{
-		shutdown_postoffice(ns);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		dprintf("nfs: error getting nfsd address from portmapper: %s\n", strerror(result));
-		return result;
-	}
+		goto err_sem;
 dprintf("nfs: nfsd at %08lx:%d\n", ns->nfsAddr.sin_addr.s_addr, ntohs(ns->nfsAddr.sin_port));
 //	result = connect_socket(ns);
 //dprintf("nfs: connect: %s\n", strerror(result));
 
 	if ((result=create_sem(1,"nfs_sem"))<B_OK)
-	{
-		shutdown_postoffice(ns);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		return result;		
-	}
+		goto err_sem;
 
 	ns->sem=result;
 	
 	set_sem_owner (ns->sem,B_SYSTEM_TEAM);
 		
+	result = ENOMEM;
 	rootNode=(fs_node *)malloc(sizeof(fs_node));
+	if (!rootNode)
+		goto err_rootvn;
 	rootNode->next=NULL;
 	
 	if ((result=nfs_mount(ns,ns->params._export,&rootNode->fhandle))<B_OK)
-	{
-		delete_sem (ns->sem);
-		free(rootNode);
-		shutdown_postoffice(ns);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		dprintf("nfs: error in nfs_mount: %s\n", strerror(result));
-		return result;
-	}
+		goto err_mount;
 
 	if ((result=nfs_getattr(ns,&rootNode->fhandle,&st))<B_OK)
-	{
-		delete_sem (ns->sem);
-		free(rootNode);
-		shutdown_postoffice(ns);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		return result;		
-	}
+		goto err_publish;
 
 	ns->rootid=st.st_ino;
 	rootNode->vnid=ns->rootid;
@@ -1314,26 +1331,42 @@ dprintf("nfs: nfsd at %08lx:%d\n", ns->nfsAddr.sin_addr.s_addr, ntohs(ns->nfsAdd
 	*vnid=ns->rootid;
 
 	if ((result=publish_vnode(nsid,*vnid,rootNode))<B_OK)
-	{
-		delete_sem (ns->sem);
-		free(rootNode);
-		shutdown_postoffice(ns);
-		free (ns->params.hostname);
-		free (ns->params._export);
-		free (ns->params.server);
-
-		fs_nspaceDestroy (ns);
-		free(ns);
-
-		ksocket_cleanup();
-		return result;		
-	}
-			
+		goto err_publish;
+	
 	*data=ns;
 
 	ns->first=rootNode;
 
-	return B_OK;	
+	return B_OK;
+
+err_publish:
+	// XXX: unmount ??
+err_mount:
+	free(rootNode);
+err_rootvn:
+	delete_sem (ns->sem);
+err_sem:
+	shutdown_postoffice(ns);
+	goto err_socket;
+err_postoffice:
+	kclosesocket(ns->s);
+err_socket:
+err_params:
+	free (ns->params.hostname);
+	free (ns->params._export);
+	free (ns->params.server);
+
+	fs_nspaceDestroy (ns);
+	free(ns);
+err_nspace:
+
+	ksocket_cleanup();
+	if (result >= 0) {
+		dprintf("nfs:bad error from mount!\n");
+		result = EINVAL;
+	}
+	dprintf("nfs: error in nfs_mount: %s\n", strerror(result));
+	return result;
 }
 
 extern int 
