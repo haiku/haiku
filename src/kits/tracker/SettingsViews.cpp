@@ -599,9 +599,9 @@ WindowsSettingsView::SetDefaults()
 	}
 
 	if (settings.SortFolderNamesFirst()) {
-		settings.SetSortFolderNamesFirst(false);
+		settings.SetSortFolderNamesFirst(true);
 		send_bool_notices(kSortFolderNamesFirstChanged,
-			"SortFolderNamesFirst", false);
+			"SortFolderNamesFirst", true);
 	}
 
 	ShowCurrentSettings();
