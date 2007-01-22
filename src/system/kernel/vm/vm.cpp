@@ -1854,7 +1854,7 @@ display_mem(int argc, char **argv)
 					displayed = j;
 					break;
 				}
-				if (!isalnum(c))
+				if (!isprint(c))
 					c = '.';
 
 				kprintf("%c", c);
@@ -1874,16 +1874,16 @@ display_mem(int argc, char **argv)
 
 		switch (itemSize) {
 			case 1:
-				kprintf(" 0x%02x", *(uint8 *)&value);
+				kprintf(" %02x", *(uint8 *)&value);
 				break;
 			case 2:
-				kprintf(" 0x%04x", *(uint16 *)&value);
+				kprintf(" %04x", *(uint16 *)&value);
 				break;
 			case 4:
-				kprintf(" 0x%08lx", *(uint32 *)&value);
+				kprintf(" %08lx", *(uint32 *)&value);
 				break;
 			case 8:
-				kprintf(" 0x%016Lx", *(uint64 *)&value);
+				kprintf(" %016Lx", *(uint64 *)&value);
 				break;
 		}
 	}
