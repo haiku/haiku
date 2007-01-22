@@ -1,0 +1,31 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
+
+SubDirCcFlags -Wall -Wno-multichar -DHAVE_CONFIG_H=1 -D_BEOS_=1 ;
+
+StaticLibrary libntfs.a :
+	attrib.c
+	attrlist.c
+	bitmap.c
+	bootsect.c
+	collate.c
+	compat.c
+	compress.c
+	debug.c
+	device.c
+	device_io.c
+	dir.c
+	index.c
+	inode.c
+	lcnalloc.c
+	logfile.c
+	logging.c
+	mft.c
+	misc.c
+	mst.c
+	runlist.c
+	security.c
+	unistr.c
+	version.c
+	volume.c
+;
+
