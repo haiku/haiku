@@ -104,7 +104,9 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 				(void *)baseAddress, eip - baseAddress);
 		}
 	} else {
-		vm_area *area = vm_area_lookup(thread->team->address_space, eip);
+		vm_area *area = NULL;
+		if (thread->team->address_space != NULL)
+			area = vm_area_lookup(thread->team->address_space, eip);
 		if (area != NULL) {
 			kprintf("   %ld:%s@%p + %#lx\n", area->id, area->name, (void *)area->base,
 				eip - area->base);
