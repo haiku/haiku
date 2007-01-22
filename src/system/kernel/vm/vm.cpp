@@ -1762,27 +1762,36 @@ vm_get_page_mapping(team_id aid, addr_t vaddr, addr_t *paddr)
 static int
 display_mem(int argc, char **argv)
 {
+	bool physical = false;
+	addr_t copyAddress;
 	int32 displayWidth;
 	int32 itemSize;
-	int32 num = 1;
+	int32 num = -1;
 	addr_t address;
-	int i, j;
+	int i = 1, j;
 
-	if (argc < 2) {
-		kprintf("usage: dl/dw/ds/db <address> [num]\n"
+	if (argc > 1 && argv[1][0] == '-') {
+		if (!strcmp(argv[1], "-p") || !strcmp(argv[1], "--physical")) {
+			physical = true;
+			i++;
+		} else
+			i = 99;
+	}
+
+	if (argc < i + 1 || argc > i + 2) {
+		kprintf("usage: dl/dw/ds/db [-p|--physical] <address> [num]\n"
 			"\tdl - 8 bytes\n"
 			"\tdw - 4 bytes\n"
 			"\tds - 2 bytes\n"
-			"\tdb - 1 byte\n");
+			"\tdb - 1 byte\n"
+			"  -p or --physical only allows memory from a single page to be displayed.\n");
 		return 0;
 	}
 
-	address = strtoul(argv[1], NULL, 0);
+	address = strtoul(argv[i], NULL, 0);
 
-	if (argc >= 3) {
-		num = -1;
-		num = atoi(argv[2]);
-	}
+	if (argc > i + 1)
+		num = atoi(argv[i + 1]);
 
 	// build the format string
 	if (strcmp(argv[0], "db") == 0) {
@@ -1802,6 +1811,33 @@ display_mem(int argc, char **argv)
 		return 0;
 	}
 
+	if (num <= 0)
+		num = displayWidth;
+
+	if (physical) {
+		int32 offset = address & (B_PAGE_SIZE - 1);
+		if (num * itemSize + offset > B_PAGE_SIZE) {
+			num = (B_PAGE_SIZE - offset) / itemSize;
+			kprintf("NOTE: number of bytes has been cut to page size\n");
+		}
+
+		address = ROUNDOWN(address, B_PAGE_SIZE);
+
+		kernel_startup = true;
+			// vm_get_physical_page() needs to lock...
+
+		if (vm_get_physical_page(address, &copyAddress, PHYSICAL_PAGE_NO_WAIT) != B_OK) {
+			kprintf("getting the hardware page failed.");
+			kernel_startup = false;
+			return 0;
+		}
+
+		kernel_startup = false;
+		address += offset;
+		copyAddress += offset;
+	} else
+		copyAddress = address;
+
 	for (i = 0; i < num; i++) {
 		uint32 value;
 
@@ -1814,7 +1850,7 @@ display_mem(int argc, char **argv)
 
 			for (j = 0; j < displayed; j++) {
 				char c;
-				if (user_memcpy(&c, (char *)address + i * itemSize + j, 1) != B_OK) {
+				if (user_memcpy(&c, (char *)copyAddress + i * itemSize + j, 1) != B_OK) {
 					displayed = j;
 					break;
 				}
@@ -1831,7 +1867,7 @@ display_mem(int argc, char **argv)
 			kprintf("  ");
 		}
 
-		if (user_memcpy(&value, (uint8 *)address + i * itemSize, itemSize) != B_OK) {
+		if (user_memcpy(&value, (uint8 *)copyAddress + i * itemSize, itemSize) != B_OK) {
 			kprintf("read fault");
 			break;
 		}
@@ -1853,6 +1889,13 @@ display_mem(int argc, char **argv)
 	}
 
 	kprintf("\n");
+
+	if (physical) {
+		copyAddress = ROUNDOWN(copyAddress, B_PAGE_SIZE);
+		kernel_startup = true;
+		vm_put_physical_page(copyAddress);
+		kernel_startup = false;
+	}
 	return 0;
 }
 
