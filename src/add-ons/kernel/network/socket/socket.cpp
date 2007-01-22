@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 
-static int
+int
 socket(int family, int type, int protocol)
 {
 	int socket = open(NET_STACK_DRIVER_PATH, O_RDWR);
@@ -40,7 +40,7 @@ socket(int family, int type, int protocol)
 }
 
 
-static int
+int
 bind(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
 	sockaddr_args args;
@@ -51,14 +51,14 @@ bind(int socket, const struct sockaddr *address, socklen_t addressLength)
 }
 
 
-static int
+int
 shutdown(int socket, int how)
 {
 	return ioctl(socket, NET_STACK_SHUTDOWN, (void *)how, 0);
 }
 
 
-static int
+int
 connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
 	sockaddr_args args;
@@ -69,14 +69,14 @@ connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 }
 
 
-static int
+int
 listen(int socket, int backlog)
 {
 	return ioctl(socket, NET_STACK_LISTEN, (void *)backlog, 0);
 }
 
 
-static int
+int
 accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
 	int acceptSocket = open(NET_STACK_DRIVER_PATH, O_RDWR);
@@ -110,7 +110,7 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 }
 
 
-static ssize_t
+ssize_t
 recv(int socket, void *data, size_t length, int flags)
 {
 	transfer_args args;
@@ -124,7 +124,7 @@ recv(int socket, void *data, size_t length, int flags)
 }
 
 
-static ssize_t
+ssize_t
 recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *address, socklen_t *_addressLength)
 {
@@ -146,7 +146,7 @@ recvfrom(int socket, void *data, size_t length, int flags,
 }
 
 
-static ssize_t
+ssize_t
 recvmsg(int socket, struct msghdr *message, int flags)
 {
 	// TODO: implement me!
@@ -154,7 +154,7 @@ recvmsg(int socket, struct msghdr *message, int flags)
 }
 
 
-static ssize_t
+ssize_t
 send(int socket, const void *data, size_t length, int flags)
 {
 	transfer_args args;
@@ -168,7 +168,7 @@ send(int socket, const void *data, size_t length, int flags)
 }
 
 
-static ssize_t
+ssize_t
 sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *address, socklen_t addressLength)
 {
@@ -183,7 +183,7 @@ sendto(int socket, const void *data, size_t length, int flags,
 }
 
 
-static ssize_t
+ssize_t
 sendmsg(int socket, const struct msghdr *message, int flags)
 {
 	// TODO: implement me!
@@ -191,7 +191,7 @@ sendmsg(int socket, const struct msghdr *message, int flags)
 }
 
 
-static int
+int
 getsockopt(int socket, int level, int option, void *value, size_t *_length)
 {
 	sockopt_args args;
@@ -210,7 +210,7 @@ getsockopt(int socket, int level, int option, void *value, size_t *_length)
 }
 
 
-static int
+int
 setsockopt(int socket, int level, int option, const void *value, size_t length)
 {
 	sockopt_args args;
@@ -223,7 +223,7 @@ setsockopt(int socket, int level, int option, const void *value, size_t length)
 }
 
 
-static int
+int
 getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
 	sockaddr_args args;
@@ -240,7 +240,7 @@ getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 }
 
 
-static int
+int
 getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
 	sockaddr_args args;
@@ -257,7 +257,7 @@ getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength)
 }
 
 
-static int
+int
 sockatmark(int socket)
 {
 	// TODO: implement me!
@@ -265,7 +265,7 @@ sockatmark(int socket)
 }
 
 
-static int
+int
 socketpair(int family, int type, int protocol, int socketVector[2])
 {
 	socketVector[0] = socket(family, type, protocol);
