@@ -22,6 +22,7 @@
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
 // cpuid eax 1 features
+#define IA32_FEATURE_MSR			(1UL << 5)
 #define IA32_FEATURE_MTRR			(1UL << 12)
 #define IA32_FEATURE_GLOBAL_PAGES	(1UL << 13)
 #define IA32_FEATURE_SSE			(1UL << 25)

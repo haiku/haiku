@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku, Inc.
+ * Copyright 2005-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,7 +48,8 @@ generic_count_mtrrs(void)
 {
 	cpuid_info cpuInfo;
 	if (get_current_cpuid(&cpuInfo, 1) != B_OK
-		|| (cpuInfo.eax_1.features & IA32_FEATURE_MTRR) == 0)
+		|| (cpuInfo.eax_1.features & IA32_FEATURE_MTRR) == 0
+		|| (cpuInfo.eax_1.features & IA32_FEATURE_MSR) == 0)
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
@@ -160,6 +161,9 @@ generic_mtrr_compute_physical_mask(void)
 void
 generic_dump_mtrrs(uint32 count)
 {
+	if (count == 0)
+		return;
+
 	if (x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & IA32_MTRR_ENABLE) {
 		TRACE(("MTRR enabled\n"));
 	} else {
