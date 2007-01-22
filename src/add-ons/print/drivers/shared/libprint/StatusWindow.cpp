@@ -175,7 +175,7 @@ StatusWindow::MessageReceived(BMessage *message)
 			break;
 
 		default:
-			inherited::MessageReceived(message);
+			BWindow::MessageReceived(message);
 			break;
 	}
 

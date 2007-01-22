@@ -386,7 +386,7 @@ PDFWriter::DrawChar(uint16 unicode, const char* utf8, int16 size)
 	if (convert_from_utf8(B_MAC_ROMAN_CONVERSION, utf8, &srcLen, dest, &destLen, &state, 0) != B_OK || dest[0] == 0 ) {
 		// could not convert to MacRoman
 		uint8         enc;
-		uint16        index;
+		uint16        index = 0;
 		font_encoding fenc;
 
 		GetFontName(&fState->beFont, fontName);
