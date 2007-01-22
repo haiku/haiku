@@ -617,23 +617,19 @@ OHCI::InsertEndpointForPipe(Pipe *p)
 	
 	//Check which list we need to add the endpoint in
 	Endpoint *listhead;
-	switch (p->Type()) {
-	case USB_OBJECT_CONTROL_PIPE:
+	if (p->Type() & USB_OBJECT_CONTROL_PIPE)
 		listhead = fDummyControl;
-		break;
-	case USB_OBJECT_BULK_PIPE:
+	else if (p->Type() & USB_OBJECT_BULK_PIPE)
 		listhead = fDummyBulk;
-		break;
-	case USB_OBJECT_ISO_PIPE:
+	else if (p->Type() & USB_OBJECT_ISO_PIPE)
 		listhead = fDummyIsochronous;
-		break;
-	default:
+	else {
 		FreeEndpoint(endpoint);
 		return B_ERROR;
 	}
 
 	//Add the endpoint to the queues
-	if (p->Type() != USB_OBJECT_ISO_PIPE) {
+	if ((p->Type() & USB_OBJECT_ISO_PIPE) == 0) {
 		//Link the endpoint into the head of the list
 		endpoint->SetNext(listhead->next);
 		listhead->SetNext(endpoint);
