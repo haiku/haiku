@@ -1,11 +1,11 @@
 
-#include <USBKit.h>
+#include <usb/USBKit.h>
 #include <stdio.h>
 
-void DumpInterface(const USBInterface *ifc)
+static void DumpInterface(const BUSBInterface *ifc)
 {
 	int i;
-	const USBEndpoint *ept;
+	const BUSBEndpoint *ept;
 	if(!ifc) return;
 	printf("    Class .............. %d\n",ifc->Class());
 	printf("    Subclass ........... %d\n",ifc->Subclass());
@@ -33,7 +33,7 @@ void DumpInterface(const USBInterface *ifc)
 	}
 }
 
-void DumpConfiguration(const USBConfiguration *conf)
+static void DumpConfiguration(const BUSBConfiguration *conf)
 {
 	int i;
 	if(!conf) return;
@@ -43,7 +43,7 @@ void DumpConfiguration(const USBConfiguration *conf)
 	}
 }
 
-void DumpInfo(USBDevice &dev)
+static void DumpInfo(BUSBDevice &dev)
 {
 	int i;
 	
@@ -67,7 +67,7 @@ void DumpInfo(USBDevice &dev)
 int main(int argc, char *argv[])
 {
 	if(argc == 2){
-		USBDevice dev(argv[1]);
+		BUSBDevice dev(argv[1]);
 		if(dev.InitCheck()){
 			printf("Cannot open USB device: %s\n",argv[1]);
 			return 1;
