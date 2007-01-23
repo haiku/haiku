@@ -1,0 +1,58 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# for USBKit.h
+UseLibraryHeaders usb ;
+
+# HOW the F*** do I do that with Jam ?
+#SRCS := $(wildcard *.cpp) \
+#$(wildcard addons/*/*.cpp) \
+#$(wildcard sensors/*/*.cpp) \
+#$(wildcard cstransforms/*.cpp)
+
+
+# source directories
+local sourceDirs =
+	addons/quickcam
+	addons/sonix
+	cstransforms
+	sensors
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons usb_webcam $(sourceDir) ] ;
+}
+
+## addon sources
+local addonSources ;
+addonSources = QuickCamDevice.cpp SonixCamDevice.cpp ;
+
+## colorspace transforms sources
+local csTransformsSources ;
+csTransformsSources = Bayer.cpp ;
+
+## sensors sources
+local sensorsSources ;
+sensorsSources = hdcs1000.cpp hv7131e1.cpp tas5110c1b.cpp ;
+
+Addon usb_webcam.media_addon : media :
+	$(addonSources)
+	$(csTransformsSources)
+	$(sensorsSources)
+	AddOn.cpp
+	Producer.cpp
+	CamBufferedFilterInterface.cpp
+	CamBufferingDeframer.cpp
+	CamColorSpaceTransform.cpp
+	CamDeframer.cpp
+	CamDefs.cpp
+	CamDevice.cpp
+	CamFilterInterface.cpp
+	CamRoster.cpp
+	CamSensor.cpp
+	CamStreamingDeframer.cpp
+;
+
+LinkAgainst usb_webcam.media_addon : be media usb ;
