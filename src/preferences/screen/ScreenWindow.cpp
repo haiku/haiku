@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,25 +11,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-
-#include <Alert.h>
-#include <Application.h>
-#include <Box.h>
-#include <Button.h>
-#include <InterfaceDefs.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
-#include <MenuField.h>
-#include <Messenger.h>
-#include <PopUpMenu.h>
-#include <Screen.h>
-#include <String.h>
-#include <Roster.h>
-#include <Window.h>
-
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 
 #include "AlertWindow.h"
 #include "Constants.h"
@@ -48,8 +29,30 @@
  * It will be replaced as soon as we introduce an updated accelerant interface
  * which may even happen before R1 hits the streets.
  */
-
 #include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
+
+#include <Alert.h>
+#include <Application.h>
+#include <Box.h>
+#include <Button.h>
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <InterfaceDefs.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <MenuField.h>
+#include <Messenger.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <Screen.h>
+#include <String.h>
+#include <Roster.h>
+#include <Window.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 const char* kBackgroundsSignature = "application/x-vnd.haiku-backgrounds";
@@ -208,10 +211,16 @@ stack_and_align_menu_fields(const BList& menuFields)
 ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	: BWindow(settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
+	fIsVesa(false),
+	fVesaApplied(false),
 	fScreenMode(this),
 	fChangingAllWorkspaces(false)
 {
 	BScreen screen(this);
+
+	accelerant_device_info info;
+	if (screen.GetDeviceInfo(&info) == B_OK && !strcasecmp(info.chipset, "VESA"))
+		fIsVesa = true;
 
 	fScreenMode.Get(fOriginal);
 	fActive = fSelected = fOriginal;
@@ -228,7 +237,11 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	fAllWorkspacesItem = new BMenuItem("All Workspaces", new BMessage(WORKSPACE_CHECK_MSG));
 	popUpMenu->AddItem(fAllWorkspacesItem);
 	BMenuItem *item = new BMenuItem("Current Workspace", new BMessage(WORKSPACE_CHECK_MSG));
-	item->SetMarked(true);
+	if (_IsVesa()) {
+		fAllWorkspacesItem->SetMarked(true);
+		item->SetEnabled(false);
+	} else
+		item->SetMarked(true);
 	popUpMenu->AddItem(item);
 
 	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 100, 15),
@@ -351,6 +364,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	}
 
 	fRefreshField = new BMenuField(rect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
+	if (_IsVesa())
+		fRefreshField->Hide();
 	fControlsBox->AddChild(fRefreshField);
 
 	view->AddChild(fControlsBox);
@@ -497,6 +512,17 @@ bool
 ScreenWindow::QuitRequested()
 {
 	fSettings->SetWindowFrame(Frame());
+	if (fVesaApplied) {
+		status_t status = _WriteVesaModeFile(fSelected);
+		if (status < B_OK) {
+			BString warning = "Could not write VESA mode settings file:\n\t";
+			warning << strerror(status);
+			(new BAlert("VesaAlert", warning.String(), "Okay", NULL, NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+
+		}
+	}
+
 	be_app->PostMessage(B_QUIT_REQUESTED);
 
 	return BWindow::QuitRequested();
@@ -708,16 +734,16 @@ ScreenWindow::UpdateControls()
 }
 
 
-/** reflect active mode in chosen settings */
-
+/*! Reflect active mode in chosen settings */
 void
 ScreenWindow::UpdateActiveMode()
 {
-	// usually, this function gets called after a mode
+	// Usually, this function gets called after a mode
 	// has been set manually; still, as the graphics driver
 	// is free to fiddle with mode passed, we better ask 
 	// what kind of mode we actually got
-	fScreenMode.Get(fActive);
+	if (!fVesaApplied)
+		fScreenMode.Get(fActive);
 	fSelected = fActive;
 
 	UpdateControls();
@@ -945,6 +971,37 @@ ScreenWindow::MessageReceived(BMessage* message)
 }
 
 
+status_t
+ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
+	if (status < B_OK)
+		return status;
+
+	path.Append("kernel/drivers");
+	status = create_directory(path.Path(), 0755);
+	if (status < B_OK)
+		return status;
+
+	path.Append("vesa");
+	BFile file;
+	status = file.SetTo(path.Path(), B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE);
+	if (status < B_OK)
+		return status;
+
+	char buffer[256];
+	snprintf(buffer, sizeof(buffer), "mode %ld %ld %ld\n",
+		mode.width, mode.height, mode.BitsPerPixel());
+
+	ssize_t bytesWritten = file.Write(buffer, strlen(buffer));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+
+	return B_OK;
+}
+
+
 bool
 ScreenWindow::CanApply() const
 {
@@ -976,6 +1033,17 @@ ScreenWindow::CheckApplyEnabled()
 void
 ScreenWindow::Apply()
 {
+	if (_IsVesa()) {
+		(new BAlert("VesaAlert",
+			"Your graphics card is not supported. Resolution changes will be "
+			"adopted on next system startup.\n", "Okay", NULL, NULL, B_WIDTH_AS_USUAL,
+			B_INFO_ALERT))->Go(NULL);
+
+		fVesaApplied = true;
+		fActive = fSelected;
+		return;
+	}
+
 	if (fAllWorkspacesItem->IsMarked()) {
 		BAlert *workspacesAlert = new BAlert("WorkspacesAlert",
 			"Change all workspaces? This action cannot be reverted.", "Okay", "Cancel", 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -52,10 +52,15 @@ class ScreenWindow : public BWindow {
 		bool CanApply() const;
 		bool CanRevert() const;
 
+		status_t _WriteVesaModeFile(const screen_mode& mode) const;
+		bool _IsVesa() const { return fIsVesa; }
+
 		void LayoutControls(uint32 flags);
 		BRect LayoutMenuFields(uint32 flags, bool sideBySide = false);
 
 		ScreenSettings*	fSettings;
+		bool			fIsVesa;
+		bool			fVesaApplied;
 
 		BBox*			fScreenBox;
 		BBox*			fControlsBox;
