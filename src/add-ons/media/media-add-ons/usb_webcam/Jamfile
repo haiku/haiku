@@ -5,6 +5,13 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 # for USBKit.h
 UseLibraryHeaders usb ;
 
+# Zeta has a libusb.so, we have a USBKit.a
+if $(TARGET_PLATFORM) = haiku {
+usbKitLibraryName = USBKit.a ;
+} else {
+usbKitLibraryName = usb ;
+}
+
 # HOW the F*** do I do that with Jam ?
 #SRCS := $(wildcard *.cpp) \
 #$(wildcard addons/*/*.cpp) \
@@ -75,7 +82,7 @@ Addon usb_webcam.media_addon : media :
 	CamStreamingDeframer.cpp
 ;
 
-LinkAgainst usb_webcam.media_addon : be media usb ;
+LinkAgainst usb_webcam.media_addon : be media $(usbKitLibraryName) ;
 
 # force dependancies
 Includes [ FGristFiles CamRoster.cpp ] : [ FGristFiles CamInternalAddons.h ] ;
