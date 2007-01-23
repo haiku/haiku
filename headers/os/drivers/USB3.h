@@ -94,7 +94,7 @@ struct usb_module_info {
 	 *	A value of 0 can be used as a wildcard for all fields.
 	 *
 	 *	Would you like to be notified about all added hubs (class 0x09) you
-	 *	would a support descriptor like this to register_driver:
+	 *	would use a support descriptor like this for register_driver:
 	 *		usb_support_descriptor hub_devs = { 9, 0, 0, 0, 0 };
 	 *
 	 *	If you intend to support just any device, or you at least want to be
