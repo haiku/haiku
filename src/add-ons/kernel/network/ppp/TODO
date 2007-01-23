@@ -1,4 +1,0 @@
-- add CHAP
-- add ISDN (CAPI)
-- add PPTP (this is a virtual device that uses TCP/IP to connect to some other PPP server on the net)
-- add L2TP (this is a virtual device that uses TCP/IP to connect to some other PPP server on the net)
