@@ -3,7 +3,6 @@
 #include "AddOn.h"
 #include "CamDevice.h"
 #include "CamDebug.h"
-#include "CamDefs.h"
 
 #include <OS.h>
 
@@ -38,21 +37,21 @@ CamRoster::DeviceAdded(BUSBDevice* _device)
 	status_t err;
 	for( int16 i = fCamerasAddons.CountItems()-1; i >= 0; --i )
 	{
-		PRINT((CH ": checking %s for support..." CT, fCamerasAddons[i]->BrandName()));
-		err = fCamerasAddons[i]->Sniff(_device);
+		CamDeviceAddon *ao = (CamDeviceAddon *)fCamerasAddons.ItemAt(i);
+		PRINT((CH ": checking %s for support..." CT, ao->BrandName()));
+		err = ao->Sniff(_device);
+		if (err < B_OK)
+			continue;
+		CamDevice *cam = ao->Instantiate(*this, _device);
+		PRINT((CH ": found camera %s:%s!" CT, cam->BrandName(), cam->ModelName()));
+		err = cam->InitCheck();
 		if (err >= B_OK)
 		{
-			CamDevice *cam = fCamerasAddons[i]->Instantiate(*this, _device);
-			PRINT((CH ": found camera %s:%s!" CT, cam->BrandName(), cam->ModelName()));
-			err = cam->InitCheck();
-			if (err >= B_OK)
-			{
-				fCameras.AddItem(cam);
-				fAddon->CameraAdded(cam);
-				return B_OK;
-			}
-			PRINT((CH " error 0x%08lx" CT, err));
-		} 
+			fCameras.AddItem(cam);
+			fAddon->CameraAdded(cam);
+			return B_OK;
+		}
+		PRINT((CH " error 0x%08lx" CT, err));
 	}
 	return B_ERROR;
 }
@@ -64,11 +63,11 @@ CamRoster::DeviceRemoved(BUSBDevice* _device)
 	PRINT((CH "()" CT));
 	for(uint32 i = 0; i < fCameras.CountItems(); ++i)
 	{
-		CamDevice* cam = fCameras[i];
+		CamDevice* cam = (CamDevice *)fCameras.ItemAt(i);
 		if( cam->Matches(_device) )
 		{
 			PRINT((CH ": camera %s:%s removed" CT, cam->BrandName(), cam->ModelName()));
-			fCameras.RemoveItemsAt(i, 1);
+			fCameras.RemoveItem(i);
 			fAddon->CameraRemoved(cam);
 			// XXX: B_DONT_DO_THAT!
 			//delete cam;
@@ -83,8 +82,8 @@ uint32
 CamRoster::CountCameras()
 {
 	int32 count;
-	PRINT((CH "(): %d cameras" CT, fCameras.CountItems()));
 	fLocker.Lock();
+	PRINT((CH "(): %d cameras" CT, fCameras.CountItems()));
 	count = fCameras.CountItems();
 	fLocker.Unlock();
 	return count;
@@ -112,7 +111,7 @@ CamDevice*
 CamRoster::CameraAt(int32 index)
 {
 	PRINT((CH "()" CT));
-	return fCameras.ItemAt(index);
+	return (CamDevice *)fCameras.ItemAt(index);
 }
 
 // ---------------------------------------------------------------------------

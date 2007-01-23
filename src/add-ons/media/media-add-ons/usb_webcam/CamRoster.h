@@ -2,7 +2,7 @@
 #define _CAM_ROSTER_H
 
 #include <image.h>
-#include <support/Vector.h>
+#include <List.h>
 #include <Locker.h>
 
 #include "CamDevice.h"
@@ -32,10 +32,8 @@ private:
 
 	BLocker				fLocker;
 	WebCamMediaAddOn*	fAddon;
-	B::Support::
-	BVector<CamDeviceAddon*> fCamerasAddons;
-	B::Support::
-	BVector<CamDevice*> fCameras;
+	BList			fCamerasAddons;
+	BList			fCameras;
 };
 
 #endif

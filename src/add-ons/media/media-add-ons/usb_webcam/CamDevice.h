@@ -11,8 +11,9 @@
 #  include <usb/USBKit.h>
 #endif
 #include <Locker.h>
-#include <media/MediaAddOn.h>
-#include <support/String.h>
+#include <MediaAddOn.h>
+#include <String.h>
+#include <Rect.h>
 
 
 typedef struct {

@@ -68,7 +68,6 @@ Addon usb_webcam.media_addon : media :
 	CamBufferingDeframer.cpp
 	CamColorSpaceTransform.cpp
 	CamDeframer.cpp
-	CamDefs.cpp
 	CamDevice.cpp
 	CamFilterInterface.cpp
 	CamRoster.cpp
