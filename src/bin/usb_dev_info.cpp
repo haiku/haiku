@@ -1,78 +1,110 @@
+/*
+ * Originally released under the Be Sample Code License.
+ * Copyright 2000, Be Incorporated. All rights reserved.
+ *
+ * Modified for Haiku by François Revol and Michael Lotz.
+ * Copyright 2007, Haiku Inc. All rights reserved.
+ */
 
-#include <usb/USBKit.h>
+#include <USBKit.h>
 #include <stdio.h>
 
-static void DumpInterface(const BUSBInterface *ifc)
+
+static void
+DumpInterface(const BUSBInterface *interface)
 {
-	int i;
-	const BUSBEndpoint *ept;
-	if(!ifc) return;
-	printf("    Class .............. %d\n",ifc->Class());
-	printf("    Subclass ........... %d\n",ifc->Subclass());
-	printf("    Protocol ........... %d\n",ifc->Protocol());
-	for(i=0;i<ifc->CountEndpoints();i++){
-		if(ept = ifc->EndpointAt(i)){
-			printf("      [Endpoint %d]\n",i);
-			printf("      MaxPacketSize .... %d\n",ept->MaxPacketSize());
-			printf("      Interval ......... %d\n",ept->Interval());
-			if(ept->IsBulk()){
-				printf("      Type ............. Bulk\n");
-			}	
-			if(ept->IsIsochronous()){
-				printf("      Type ............. Isochronous\n");
-			}	
-			if(ept->IsInterrupt()){
-				printf("      Type ............. Interrupt\n");
-			}	
-			if(ept->IsInput()){
-				printf("      Direction ........ Input\n");
-			} else {
-				printf("      Direction ........ Output\n");
-			}	
-		}
+	if (!interface)
+		return;
+
+	printf("    Class .............. %d\n", interface->Class());
+	printf("    Subclass ........... %d\n", interface->Subclass());
+	printf("    Protocol ........... %d\n", interface->Protocol());
+	printf("    Interface String ... \"%s\"\n", interface->InterfaceString());
+
+	for (int32 i = 0; i < interface->CountEndpoints(); i++) {
+		const BUSBEndpoint *endpoint = interface->EndpointAt(i);
+		if (!endpoint)
+			continue;
+
+		printf("      [Endpoint %d]\n", i);
+		printf("      MaxPacketSize .... %d\n", endpoint->MaxPacketSize());
+		printf("      Interval ......... %d\n", endpoint->Interval());
+
+		if (endpoint->IsControl())
+			printf("      Type ............. Control\n");
+		else if (endpoint->IsBulk())
+			printf("      Type ............. Bulk\n");
+		else if (endpoint->IsIsochronous())
+			printf("      Type ............. Isochronous\n");
+		else if (endpoint->IsInterrupt())
+			printf("      Type ............. Interrupt\n");
+
+		if(endpoint->IsInput())
+			printf("      Direction ........ Input\n");
+		else
+			printf("      Direction ........ Output\n");
+	}
+
+	char buffer[256];
+	usb_descriptor *generic = (usb_descriptor *)buffer;
+	for (int32 i = 0; interface->OtherDescriptorAt(i, generic, 256) == B_OK; i++) {
+		printf("      [Descriptor %d]\n", i);
+		printf("      Type ............. 0x%02x\n", generic->generic.descriptor_type);
+
+		printf("      Data ............. ");
+		for(int32 j = 0; j < generic->generic.length; j++)
+			printf("%02x ", generic->generic.data[j]);
+		printf("\n");
 	}
 }
 
-static void DumpConfiguration(const BUSBConfiguration *conf)
+
+static void
+DumpConfiguration(const BUSBConfiguration *configuration)
 {
-	int i;
-	if(!conf) return;
-	for(i=0;i<conf->CountInterfaces();i++){
-		printf("    [Interface %d]\n",i);
-		DumpInterface(conf->InterfaceAt(i));
+	if (!configuration)
+		return;
+
+	printf("  Configuration String . \"%s\"\n", configuration->ConfigurationString());
+	for (int32 i = 0; i < configuration->CountInterfaces(); i++) {
+		printf("    [Interface %d]\n", i);
+		DumpInterface(configuration->InterfaceAt(i));
 	}
 }
 
-static void DumpInfo(BUSBDevice &dev)
+
+static void
+DumpInfo(BUSBDevice &device)
 {
-	int i;
-	
 	printf("[Device]\n");
-	printf("Class .................. %d\n",dev.Class());
-	printf("Subclass ............... %d\n",dev.Subclass());
-	printf("Protocol ............... %d\n",dev.Protocol());
-	printf("Vendor ID .............. 0x%04x\n",dev.VendorID());
-	printf("Product ID ............. 0x%04x\n",dev.ProductID());
-	printf("Version ................ 0x%04x\n",dev.Version());
-	printf("Manufacturer String .... \"%s\"\n",dev.ManufacturerString());
-	printf("Product String ......... \"%s\"\n",dev.ProductString());
-	printf("Serial Number .......... \"%s\"\n",dev.SerialNumberString());
-	
-	for(i=0;i<dev.CountConfigurations();i++){
-		printf("  [Configuration %d]\n",i);
-		DumpConfiguration(dev.ConfigurationAt(i));
+	printf("Class .................. %d\n", device.Class());
+	printf("Subclass ............... %d\n", device.Subclass());
+	printf("Protocol ............... %d\n", device.Protocol());
+	printf("Vendor ID .............. 0x%04x\n", device.VendorID());
+	printf("Product ID ............. 0x%04x\n", device.ProductID());
+	printf("Version ................ 0x%04x\n", device.Version());
+	printf("Manufacturer String .... \"%s\"\n", device.ManufacturerString());
+	printf("Product String ......... \"%s\"\n", device.ProductString());
+	printf("Serial Number .......... \"%s\"\n", device.SerialNumberString());
+
+	for (int32 i = 0; i < device.CountConfigurations(); i++) {
+		printf("  [Configuration %d]\n", i);
+		DumpConfiguration(device.ConfigurationAt(i));
 	}
 }
 
-int main(int argc, char *argv[])
+
+int
+main(int argc, char *argv[])
 {
-	if(argc == 2){
-		BUSBDevice dev(argv[1]);
-		if(dev.InitCheck()){
-			printf("Cannot open USB device: %s\n",argv[1]);
+	if(argc == 2) {
+		BUSBDevice device(argv[1]);
+
+		if (device.InitCheck() < B_OK) {
+			printf("Cannot open USB device: %s\n", argv[1]);
 			return 1;
 		} else {
-			DumpInfo(dev);
+			DumpInfo(device);
 			return 0;
 		}
 	} else {
