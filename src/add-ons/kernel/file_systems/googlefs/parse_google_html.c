@@ -35,7 +35,7 @@
 int google_parse_results(const char *html, size_t htmlsize, struct google_result **results)
 {
 	struct google_result *res = NULL, *nres = NULL, *prev = NULL;
-	const char *p, *q;
+	char *p, *q;
 	char *nextresult = NULL;
 	long numres = 0;
 	long maxres = 0;
