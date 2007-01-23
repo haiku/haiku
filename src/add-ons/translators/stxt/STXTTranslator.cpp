@@ -1233,9 +1233,10 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 		}
 	} while (bytesRead > 0);
 
-	if (outType == B_STYLED_TEXT_FORMAT) {
-		if (encodingBuffer.Size() == 0 || size == outputSize)
-			return B_OK;
+	if (outType != B_STYLED_TEXT_FORMAT)
+		return B_OK;
+
+	if (encodingBuffer.Size() != 0 && size != outputSize) {
 		if (outputSize > UINT32_MAX)
 			return B_NOT_SUPPORTED;
 
@@ -1243,8 +1244,11 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 		status = destination->Seek(0, SEEK_SET);
 		if (status == B_OK)
 			status = output_headers(destination, (uint32)outputSize);
+		if (status == B_OK)
+			status = destination->Seek(0, SEEK_END);
 
-		return status;
+		if (status < B_OK)
+			return status;
 	}
 
 	// Read file attributes if outputting styled data 
