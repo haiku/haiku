@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -360,7 +360,16 @@ BBox::ResolveSpecifier(BMessage *message, int32 index,
 void
 BBox::ResizeToPreferred()
 {
-	BView::ResizeToPreferred();
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	// make sure the box don't get smaller than it already is
+	if (width < Bounds().Width())
+		width = Bounds().Width();
+	if (height < Bounds().Height())
+		height = Bounds().Height();
+
+	BView::ResizeTo(width, height);
 }
 
 
