@@ -1,6 +1,6 @@
 /* kernel_interface - file system interface to Haiku's vnode layer
  *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -693,10 +693,6 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
-
 	WriteLocked locked(inode->Lock());
 	if (locked.IsLocked() < B_OK)
 		RETURN_ERROR(B_ERROR);
@@ -793,9 +789,6 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode
 	cookie->last_size = 0;
 	cookie->last_notification = system_time();
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	status_t status = Inode::Create(transaction, directory, name, S_FILE | (mode & S_IUMSK),
@@ -834,9 +827,6 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	Inode *link;
@@ -904,9 +894,6 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 	if (status < B_OK)
 		return status;
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
@@ -1274,9 +1261,6 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		&& (needsTrimming
 			|| inode->OldLastModified() != inode->LastModified()
 			|| inode->OldSize() != inode->Size())) {
-#ifdef UNSAFE_GET_VNODE
-		RecursiveLocker locker(volume->Lock());
-#endif
 		ReadLocked locked(inode->Lock());
 
 		// trim the preallocated blocks and update the size,
@@ -1406,9 +1390,6 @@ bfs_create_dir(void *_ns, void *_directory, const char *name, int mode, vnode_id
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	// Inode::Create() locks the inode if we pass the "id" parameter, but we
@@ -1438,9 +1419,6 @@ bfs_remove_dir(void *_ns, void *_directory, const char *name)
 	Volume *volume = (Volume *)_ns;
 	Inode *directory = (Inode *)_directory;
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
@@ -1882,9 +1860,6 @@ bfs_create_index(fs_volume _fs, const char *name, uint32 type, uint32 flags)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, volume->Indices());
 
 	Index index(volume);
@@ -1917,9 +1892,6 @@ bfs_remove_index(void *_ns, const char *name)
 	if ((indices = volume->IndicesNode()) == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-#ifdef UNSAFE_GET_VNODE
-	RecursiveLocker locker(volume->Lock());
-#endif
 	Transaction transaction(volume, volume->Indices());
 
 	status_t status = indices->Remove(transaction, name);

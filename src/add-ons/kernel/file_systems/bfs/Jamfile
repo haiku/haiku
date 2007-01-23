@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
 
-# R5 support is currently disabled!
+# R5 support has been removed!
 #
 # Have a look in src/tests/add-ons/kernel/file_systems/bfs/r5/
 # for an R5 compatible version.
@@ -13,7 +13,6 @@ oldOPTIM = $(OPTIM) ;
 # set some additional defines
 {
 	local defines =
-		UNSAFE_GET_VNODE
 		#BFS_BIG_ENDIAN_ONLY
 		;
 

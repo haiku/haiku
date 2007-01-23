@@ -1,6 +1,6 @@
 /* Inode - inode access functions
  *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -250,9 +250,6 @@ class Vnode {
 		status_t Get(Inode **_inode)
 		{
 			// should we check inode against NULL here? it should not be necessary
-#ifdef UNSAFE_GET_VNODE
-			RecursiveLocker locker(fVolume->Lock());
-#endif
 			return get_vnode(fVolume->ID(), fID, (void **)_inode);
 		}
 

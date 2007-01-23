@@ -1,6 +1,6 @@
 /* BlockAllocator - block bitmap handling and allocation policies
  *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -935,9 +935,6 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 			// get iterator for the next directory
 
-#ifdef UNSAFE_GET_VNODE
-			RecursiveLocker locker(fVolume->Lock());
-#endif
 			Vnode vnode(fVolume, cookie->current);
 			Inode *inode;
 			if (vnode.Get(&inode) < B_OK) {
@@ -1039,9 +1036,6 @@ BlockAllocator::CheckNextNode(check_control *control)
 				// if we are allowed to fix errors, we should remove the file
 				if (control->flags & BFS_REMOVE_WRONG_TYPES
 					&& control->flags & BFS_FIX_BITMAP_ERRORS) {
-#ifdef UNSAFE_GET_VNODE
-					RecursiveLocker locker(fVolume->Lock());
-#endif
 					// it's safe to start a transaction, because Inode::Remove()
 					// won't touch the block bitmap (which we hold the lock for)
 					// if we set the INODE_DONT_FREE_SPACE flag - since we fix
