@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src libs usb ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# for USBKit.h, usb_raw.h and lock.h
+UseLibraryHeaders usb ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers bus usb ] : true ;
+UsePrivateHeaders kernel ;
+
+StaticLibrary USBKit.a :
+	USBRoster.cpp
+	USBDevice.cpp
+	USBConfiguration.cpp
+	USBInterface.cpp
+	USBEndpoint.cpp
+;
