@@ -63,9 +63,7 @@ TTeamMenu::CompareByName(const void *first, const void *second)
 void
 TTeamMenu::AttachedToWindow()
 {
-	BMenuItem *item = NULL;
-	while ((item = RemoveItem((int32)0)) != NULL)
-		delete item;
+	RemoveItems(0, CountItems(), true);
 
 	BMessenger self(this);
 	BList teamList;

@@ -138,14 +138,7 @@ TBeMenu::DetachedFromWindow()
 bool 
 TBeMenu::StartBuildingItemList()
 {
-	int32 count = CountItems()-1;
-	for (int32 index = count; index >= 0; index--) {
-		BMenuItem *item = ItemAt(index);
-		ASSERT(item);
-
-		RemoveItem(index);
-		delete item;
-	}
+	RemoveItems(0, CountItems(), true);
 	fAddState = kStart;
 	return BNavMenu::StartBuildingItemList();
 }
@@ -555,14 +548,7 @@ TRecentsMenu::DetachedFromWindow()
 bool 
 TRecentsMenu::StartBuildingItemList()
 {
-	int32 count = CountItems()-1;
-	for (int32 index = count; index >= 0; index--) {
-		BMenuItem *item = ItemAt(index);
-		ASSERT(item);
-
-		RemoveItem(index);
-		delete item;
-	}
+	RemoveItems(0, CountItems(), true);
 
 	// !! note: don't call inherited from here
 	// the navref is not set for this menu
@@ -732,9 +718,7 @@ MountMenu::MountMenu(const char *name)
 bool
 MountMenu::AddDynamicItem(add_state s)
 {
-	BMenuItem *item;
-	while ((item = RemoveItem(0L)) != NULL)
-		delete item;
+	RemoveItems(0, CountItems(), true);
 
 	// Send message to tracker to get items.
 	BMessage request('gmtv');

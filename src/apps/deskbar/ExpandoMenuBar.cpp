@@ -191,9 +191,7 @@ TExpandoMenuBar::DetachedFromWindow()
 	message.AddMessenger("messenger", self);
 	be_app->PostMessage(&message);
 
-	BMenuItem *item = NULL;
-	while ((item = RemoveItem(0L)) != NULL)
-		delete item;
+	RemoveItems(0, CountItems(), true);
 }
 
 
