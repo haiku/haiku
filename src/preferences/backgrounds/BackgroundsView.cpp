@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -89,8 +89,7 @@ const uint8 kHandCursorData[68] = {
 
 BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 		int32 flags)
-	: BBox(frame, name, resize,
-		flags | B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER),
+	: BBox(frame, name, resize, flags | B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER),
 	fCurrent(NULL),
 	fCurrentInfo(NULL),
 	fLastImageIndex(-1),
@@ -168,30 +167,23 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	rightbox->SetLabel(workspaceMenuField);
 	AddChild(rightbox);
 
-	fPicker = new BColorControl(BPoint(10, 110), B_CELLS_32x8, 5.0, "Picker", 
-		new BMessage(kMsgUpdateColor));
-	rightbox->AddChild(fPicker);
-
-	delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
-	rightbox->ResizeBy(0, delta);
-	fPreview->ResizeBy(0, delta);
-
-	// we're not yet attached to a view, so we need to move them manually
-	fXPlacementText->MoveBy(0, delta);
-	fYPlacementText->MoveBy(0, delta);
-
 	float offset = be_plain_font->StringWidth("Placement:") + 5;
-	rect.Set(offset + 10, 76, 280, 96);
-
-	fIconLabelBackground = new BCheckBox(rect, "iconLabelBackground", 
-		"Icon label background", new BMessage(kMsgIconLabelBackground));
-	fIconLabelBackground->SetValue(B_CONTROL_ON);
-	rightbox->AddChild(fIconLabelBackground);
+	rect.Set(10, 10, rightbox->Bounds().right - 10, 30);
+#ifdef __HAIKU__
+	rect.top = 8 + rightbox->InnerFrame().top;
+#endif
 
 	fImageMenu = new BPopUpMenu("pick one");
 	fImageMenu->AddItem(new BGImageMenuItem("None", -1, new BMessage(kMsgNoImage)));
 	fImageMenu->AddSeparatorItem();
 	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(kMsgOtherImage)));
+
+	BMenuField *imageMenuField = new BMenuField(rect, "imageMenuField", 
+		"Image:", fImageMenu);
+	imageMenuField->SetDivider(offset);
+	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
+	imageMenuField->ResizeToPreferred();
+	rightbox->AddChild(imageMenuField);
 
 	fPlacementMenu = new BPopUpMenu("pick one");
 	fPlacementMenu->AddItem(new BMenuItem("Manual", 
@@ -203,34 +195,53 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	fPlacementMenu->AddItem(new BMenuItem("Tile", 
 		new BMessage(kMsgTilePlacement)));
 
-	rect.OffsetBy(-offset, -25);
+	rect.OffsetBy(0, imageMenuField->Bounds().Height() + 5);
 	BMenuField *placementMenuField = new BMenuField(rect, "placementMenuField",
 		"Placement:", fPlacementMenu);
 	placementMenuField->SetDivider(offset);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
+	placementMenuField->ResizeToPreferred();
 	rightbox->AddChild(placementMenuField);
 
-	rect.OffsetBy(0, -25);
-	rect.right += 40;
-	BMenuField *imageMenuField = new BMenuField(rect, "imageMenuField", 
-		"Image:", fImageMenu);
-	imageMenuField->SetDivider(offset);
-	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
-	rightbox->AddChild(imageMenuField);
+	rect.OffsetBy(offset, placementMenuField->Bounds().Height() + 5);
+	fIconLabelBackground = new BCheckBox(rect, "iconLabelBackground", 
+		"Icon label background", new BMessage(kMsgIconLabelBackground));
+	fIconLabelBackground->SetValue(B_CONTROL_ON);
+	fIconLabelBackground->ResizeToPreferred();
+	rightbox->AddChild(fIconLabelBackground);
+
+	rect.top += fIconLabelBackground->Bounds().Height() + 15;
+	fPicker = new BColorControl(BPoint(10, rect.top), B_CELLS_32x8, 5.0, "Picker", 
+		new BMessage(kMsgUpdateColor));
+	rightbox->AddChild(fPicker);
+
+	float xDelta = max_c(fIconLabelBackground->Frame().right, fPicker->Frame().right)
+		+ 10.0f - rightbox->Bounds().Width();
+	delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
+
+	rightbox->ResizeBy(xDelta, delta);
+	fPreview->ResizeBy(0, delta);
+
+	// we're not yet attached to a view, so we need to move them manually
+	fXPlacementText->MoveBy(0, delta);
+	fYPlacementText->MoveBy(0, delta);
 
 	fRevert = new BButton(BRect(fPreview->Frame().left, fPreview->Frame().bottom + 10,
 		fPreview->Frame().left + 80, Frame().bottom - 10), "RevertButton",
-		"Revert", new BMessage(kMsgRevertSettings), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		"Revert", new BMessage(kMsgRevertSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
 		B_WILL_DRAW | B_NAVIGABLE);
+	fRevert->ResizeToPreferred();
 	AddChild(fRevert);
 
-	fApply = new BButton(BRect(rightbox->Frame().right - 70, fPreview->Frame().bottom
+	fApply = new BButton(BRect(rightbox->Frame().right, fPreview->Frame().bottom
 		+ 10, rightbox->Frame().right, 110), "ApplyButton", "Apply",
-		new BMessage(kMsgApplySettings), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		new BMessage(kMsgApplySettings), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
 		B_WILL_DRAW | B_NAVIGABLE);
+	fApply->ResizeToPreferred();
+	fApply->MoveBy(-fApply->Bounds().Width(), 0);
 	AddChild(fApply);
 
-	ResizeBy(0, delta);
+	ResizeTo(rightbox->Frame().right + 10, fApply->Frame().bottom + 10);
 }
 
 
@@ -238,6 +249,16 @@ BackgroundsView::~BackgroundsView()
 {
 	delete fPanel;
 	delete fFolderPanel;
+}
+
+
+void
+BackgroundsView::GetPreferredSize(float* _width, float* _height)
+{
+	if (_width)
+		*_width = fApply->Frame().right + 10;
+	if (_height)
+		*_height = fApply->Frame().bottom + 10;
 }
 
 
@@ -1217,19 +1238,20 @@ PreviewBox::PreviewBox(BRect frame, const char *name)
 void
 PreviewBox::Draw(BRect rect)
 {
+	// TODO: make view size dependent!
 	rgb_color color = HighColor();
-	BPoint points[] = {
-		BPoint(11,19), BPoint(139,19), BPoint(141,21), 
-		BPoint(141,119), BPoint(139,121), BPoint(118,121), 
-		BPoint(118,126), BPoint(117,127), BPoint(33,127),
-		BPoint(32,126), BPoint(32,121),BPoint(11,121),
-		BPoint(9,119),BPoint(9,21),BPoint(11,19)
-	};
 
 	SetHighColor(LowColor());
 	FillRect(BRect(9,19,141,127));
 
 	if (fIsDesktop) {				
+		BPoint points[] = {
+			BPoint(11,19), BPoint(139,19), BPoint(141,21), 
+			BPoint(141,119), BPoint(139,121), BPoint(118,121), 
+			BPoint(118,126), BPoint(117,127), BPoint(33,127),
+			BPoint(32,126), BPoint(32,121),BPoint(11,121),
+			BPoint(9,119),BPoint(9,21),BPoint(11,19)
+		};
 		SetHighColor(184,184,184);
 		FillPolygon(points, 15);
 		SetHighColor(96,96,96);

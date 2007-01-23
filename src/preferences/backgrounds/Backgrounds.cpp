@@ -59,7 +59,13 @@ BackgroundsWindow::BackgroundsWindow(BRect frame, bool standalone)
 {
 	fBackgroundsView = new BackgroundsView(Bounds(), "BackgroundsView",
 		B_FOLLOW_ALL, B_WILL_DRAW);
+	fBackgroundsView->ResizeToPreferred();
+	ResizeTo(fBackgroundsView->Bounds().Width(), fBackgroundsView->Bounds().Height());
+
 	AddChild(fBackgroundsView);
+
+	// TODO: center on screen
+	// TODO: save window position?
 }
 
 
