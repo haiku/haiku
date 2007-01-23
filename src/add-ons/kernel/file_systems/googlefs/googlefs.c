@@ -1726,7 +1726,6 @@ module_info *modules[] = {
 	NULL,
 };
 
-
 #else /* BeOS fsil api */
 
 _EXPORT vnode_ops fs_entry =

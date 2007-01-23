@@ -199,15 +199,15 @@ struct attr_entry text_attrs[] = {
 };
 
 char *readmestr = \
-"Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku™.
-Copyright© 2004, 2005, François Revol.
-Google is a trademark of Google,Inc.
-BeOS is a trademark of PalmSource.
-Zeta is a trademark of yellowTAB GmbH.
-Haiku is a trademark of Haiku Inc.
-
-Use \"Search Google\" query template in this folder to ask google anything.
-";
+"Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku™.\n"
+"Copyright© 2004, 2005, François Revol.\n"
+"Google is a trademark of Google,Inc.\n"
+"BeOS is a trademark of PalmSource.\n"
+"Zeta is a trademark of yellowTAB GmbH.\n"
+"Haiku is a trademark of Haiku Inc.\n"
+"\n"
+"Use \"Search Google\" query template in this folder to ask google anything.\n"
+"\n";
 
 struct attr_entry mailto_me_bookmark_attrs[] = {
 { "BEOS:TYPE", /*B_MIME_STRING_TYPE*/'MIMS', SZSTR("application/x-person") },
