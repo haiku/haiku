@@ -1,0 +1,2 @@
+B_WEBCAM_MKINTFUNC(quickcam)
+B_WEBCAM_MKINTFUNC(sonix)

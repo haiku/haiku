@@ -1,0 +1,1 @@
+B_WEBCAM_DECLARE_CSTRANSFORM(BayerTransform, bayer)

@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+# note: when adding new addons, sensors
+# or colorspace transforms, one should regenerate
+# the *Internal*.h headers with the makefile.
+
 # for USBKit.h
 UseLibraryHeaders usb ;
 
@@ -45,6 +49,7 @@ local sensorsSources ;
 sensorsSources = hdcs1000.cpp hv7131e1.cpp tas5110c1b.cpp ;
 
 ## how to build header files from sources to include the list of built-in addons.
+# but it doesn't seem to work for some reason...
 
 rule USBWebcamHeaderGen
 {
