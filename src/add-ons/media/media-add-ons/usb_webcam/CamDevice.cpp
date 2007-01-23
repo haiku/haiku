@@ -6,7 +6,6 @@
 
 #include <OS.h>
 #include <Autolock.h>
-#include <usb/USBDevice.h>
 
 //#define DEBUG_WRITE_DUMP
 //#define DEBUG_DISCARD_DATA

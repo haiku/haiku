@@ -3,19 +3,11 @@
 
 #include <OS.h>
 #include <image.h>
-#include <USB.h>
-#include <usb/USBEndpoint.h>
+#include <usb/USBKit.h>
 #include <Locker.h>
 #include <media/MediaAddOn.h>
 #include <support/String.h>
 
-namespace Z {
-	namespace USB {
-		class BUSBDevice;
-	}
-}
-
-using Z::USB::BUSBDevice;
 
 typedef struct {
 	usb_support_descriptor desc;

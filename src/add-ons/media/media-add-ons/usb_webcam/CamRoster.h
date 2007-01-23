@@ -3,20 +3,12 @@
 
 #include <image.h>
 #include <support/Vector.h>
-#include <usb/USBRoster.h>
+#include <usb/USBKit.h>
 #include <Locker.h>
 
 class WebCamMediaAddOn;
 class CamDevice;
 class CamDeviceAddon;
-
-namespace Z {
-namespace USB {
-	class BUSBDevice;
-}
-}
-
-using Z::USB::BUSBDevice;
 
 class CamRoster : public BUSBRoster
 {

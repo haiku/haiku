@@ -5,7 +5,6 @@
 #include "CamDebug.h"
 #include "CamDefs.h"
 
-#include <usb/USBDevice.h>
 #include <OS.h>
 
 #undef B_WEBCAM_MKINTFUNC
