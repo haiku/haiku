@@ -37,6 +37,27 @@ csTransformsSources = Bayer.cpp ;
 local sensorsSources ;
 sensorsSources = hdcs1000.cpp hv7131e1.cpp tas5110c1b.cpp ;
 
+## how to build header files from sources to include teh list of built-in addons.
+
+rule USBWebcamHeaderGen
+{
+	SEARCH on $(3) = $(SEARCH_SOURCE) ;
+
+	Depends $(1) : $(3) ;
+	MakeLocateArch $(<) ;
+	USBWebcamHeaderGen1 $(2) : $(3) : $(1) ;
+	LocalClean clean : $(<) ;
+}
+
+actions USBWebcamHeaderGen1
+{
+	alert 'grep -h $(1) $(2) > $(3) ' ;
+}
+
+USBWebcamHeaderGen [ FGristFiles CamInternalAddons.h ] : B_WEBCAM_MKINTFUNC : $(addonSources) ;
+USBWebcamHeaderGen [ FGristFiles CamInternalSensors.h ] : B_WEBCAM_DECLARE_SENSOR : $(sensorsSources) ;
+USBWebcamHeaderGen [ FGristFiles CamInternalColorSpaceTransforms.h ] : B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
+
 Addon usb_webcam.media_addon : media :
 	$(addonSources)
 	$(csTransformsSources)
@@ -56,3 +77,9 @@ Addon usb_webcam.media_addon : media :
 ;
 
 LinkAgainst usb_webcam.media_addon : be media usb ;
+
+# force dependancies
+Includes [ FGristFiles CamRoster.cpp ] : [ FGristFiles CamInternalAddons.h ] ;
+Includes [ FGristFiles CamDevice.cpp ] : [ FGristFiles CamInternalSensors.h ] ;
+Includes [ FGristFiles CamColorSpaceTransform.cpp ] : [ FGristFiles CamInternalColorSpaceTransforms.h ] ;
+
