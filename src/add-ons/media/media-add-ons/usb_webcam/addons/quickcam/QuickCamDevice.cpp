@@ -1,7 +1,5 @@
 #include "QuickCamDevice.h"
 
-#include <usb/USBDevice.h>
-
 const usb_named_support_descriptor kSupportedDevices[] = {
 {{ 0, 0, 0, 0x046d, 0x0840 }, "Logitech", "QuickCam Express"},
 {{ 0, 0, 0, 0x046d, 0x0850 }, "Logitech", "QuickCam Express LEGO"},

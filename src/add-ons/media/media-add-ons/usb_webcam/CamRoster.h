@@ -3,11 +3,11 @@
 
 #include <image.h>
 #include <support/Vector.h>
-#include <usb/USBKit.h>
 #include <Locker.h>
 
+#include "CamDevice.h"
+
 class WebCamMediaAddOn;
-class CamDevice;
 class CamDeviceAddon;
 
 class CamRoster : public BUSBRoster

@@ -3,7 +3,13 @@
 
 #include <OS.h>
 #include <image.h>
-#include <usb/USBKit.h>
+#ifdef __HAIKU__
+#  include <USB3.h>
+#  include <USBKit.h>
+#else
+#  include <USB.h>
+#  include <usb/USBKit.h>
+#endif
 #include <Locker.h>
 #include <media/MediaAddOn.h>
 #include <support/String.h>

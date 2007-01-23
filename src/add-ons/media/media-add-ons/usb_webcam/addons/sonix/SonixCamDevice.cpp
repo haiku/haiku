@@ -4,10 +4,6 @@
 #include "CamBufferingDeframer.h"
 #include "CamStreamingDeframer.h"
 
-#include <usb/USBDevice.h>
-#include <usb/USBConfiguration.h>
-#include <usb/USBInterface.h>
-
 #include <interface/Bitmap.h>
 #include <media/Buffer.h>
 

@@ -37,7 +37,7 @@ csTransformsSources = Bayer.cpp ;
 local sensorsSources ;
 sensorsSources = hdcs1000.cpp hv7131e1.cpp tas5110c1b.cpp ;
 
-## how to build header files from sources to include teh list of built-in addons.
+## how to build header files from sources to include the list of built-in addons.
 
 rule USBWebcamHeaderGen
 {
