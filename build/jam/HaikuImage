@@ -26,9 +26,9 @@ BEOS_BIN = "[" addattr alert arp basename beep cat catattr chgrp chmod chop chow
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex makebootable md5sum mimeset
-	mkdos mkdir mkindex modifiers mount mountvolume mv netstat open pathchk ping play playfile
+	mkdos mkdir mkindex modifiers mount mount_nfs mountvolume mv netstat open pathchk ping play playfile
 	playsound playwav ps pwd
-	query quit renice rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
+	query quit release renice rescan rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
 	tail tar tcpdump tee telnet test top touch tput traceroute translate true tty uname unmount unrar unzip
 	unzipsfx uptime version waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
@@ -71,6 +71,7 @@ BEOS_ADD_ONS_TRANSLATORS = BMPTranslator GIFTranslator JPEGTranslator
 BEOS_ADD_ONS_MEDIA = mixer.media_addon 
 	hmulti_audio.media_addon tone_producer_demo.media_addon
 	video_producer_demo.media_addon
+	usb_webcam.media_addon
 	#legacy.media_addon
 ;
 BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
