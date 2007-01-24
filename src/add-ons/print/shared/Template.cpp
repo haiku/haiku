@@ -29,183 +29,183 @@ THE SOFTWARE.
 
 #include "Template.h"
 
-virtual void Template::Op(int number) { 
+void Template::Op(int number) { 
 }
 
 
-virtual void Template::MovePenBy(BPoint delta) { 
+void Template::MovePenBy(BPoint delta) { 
 }
 
 
-virtual void Template::StrokeLine(BPoint start, BPoint end) { 
+void Template::StrokeLine(BPoint start, BPoint end) { 
 }
 
 
-virtual void Template::StrokeRect(BRect rect) { 
+void Template::StrokeRect(BRect rect) { 
 }
 
 
-virtual void Template::FillRect(BRect rect) { 
+void Template::FillRect(BRect rect) { 
 }
 
 
-virtual void Template::StrokeRoundRect(BRect rect, BPoint radii) { 
+void Template::StrokeRoundRect(BRect rect, BPoint radii) { 
 }
 
 
-virtual void Template::FillRoundRect(BRect rect, BPoint radii) { 
+void Template::FillRoundRect(BRect rect, BPoint radii) { 
 }
 
 
-virtual void Template::StrokeBezier(BPoint *control) { 
+void Template::StrokeBezier(BPoint *control) { 
 }
 
 
-virtual void Template::FillBezier(BPoint *control) { 
+void Template::FillBezier(BPoint *control) { 
 }
 
 
-virtual void Template::StrokeArc(BPoint center, BPoint radii, float startTheta, float arcTheta) { 
+void Template::StrokeArc(BPoint center, BPoint radii, float startTheta, float arcTheta) { 
 }
 
 
-virtual void Template::FillArc(BPoint center, BPoint radii, float startTheta, float arcTheta) { 
+void Template::FillArc(BPoint center, BPoint radii, float startTheta, float arcTheta) { 
 }
 
 
-virtual void Template::StrokeEllipse(BPoint center, BPoint radii) { 
+void Template::StrokeEllipse(BPoint center, BPoint radii) { 
 }
 
 
-virtual void Template::FillEllipse(BPoint center, BPoint radii) { 
+void Template::FillEllipse(BPoint center, BPoint radii) { 
 }
 
 
-virtual void Template::StrokePolygon(int32 numPoints, BPoint *points, bool isClosed) { 
+void Template::StrokePolygon(int32 numPoints, BPoint *points, bool isClosed) { 
 }
 
 
-virtual void Template::FillPolygon(int32 numPoints, BPoint *points, bool isClosed) { 
+void Template::FillPolygon(int32 numPoints, BPoint *points, bool isClosed) { 
 }
 
 
-virtual void Template::StrokeShape(BShape *shape) { 
+void Template::StrokeShape(BShape *shape) { 
 }
 
 
-virtual void Template::FillShape(BShape *shape) { 
+void Template::FillShape(BShape *shape) { 
 }
 
 
-virtual void Template::DrawString(char *string, float escapement_nospace, float escapement_space) { 
+void Template::DrawString(char *string, float escapement_nospace, float escapement_space) { 
 }
 
 
-virtual void Template::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data) { 
+void Template::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data) { 
 }
 
 
-virtual void Template::SetClippingRects(BRect *rects, uint32 numRects) { 
+void Template::SetClippingRects(BRect *rects, uint32 numRects) { 
 }
 
 
-virtual void Template::ClipToPicture(BPicture *picture, BPoint point, bool clip_to_inverse_picture) { 
+void Template::ClipToPicture(BPicture *picture, BPoint point, bool clip_to_inverse_picture) { 
 }
 
 
-virtual void Template::PushState() { 
+void Template::PushState() { 
 }
 
 
-virtual void Template::PopState() { 
+void Template::PopState() { 
 }
 
 
-virtual void Template::EnterStateChange() { 
+void Template::EnterStateChange() { 
 }
 
 
-virtual void Template::ExitStateChange() { 
+void Template::ExitStateChange() { 
 }
 
 
-virtual void Template::EnterFontState() { 
+void Template::EnterFontState() { 
 }
 
 
-virtual void Template::ExitFontState() { 
+void Template::ExitFontState() { 
 }
 
 
-virtual void Template::SetOrigin(BPoint pt) { 
+void Template::SetOrigin(BPoint pt) { 
 }
 
 
-virtual void Template::SetPenLocation(BPoint pt) { 
+void Template::SetPenLocation(BPoint pt) { 
 }
 
 
-virtual void Template::SetDrawingMode(drawing_mode mode) { 
+void Template::SetDrawingMode(drawing_mode mode) { 
 }
 
 
-virtual void Template::SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit) { 
+void Template::SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit) { 
 }
 
 
-virtual void Template::SetPenSize(float size) { 
+void Template::SetPenSize(float size) { 
 }
 
 
-virtual void Template::SetForeColor(rgb_color color) { 
+void Template::SetForeColor(rgb_color color) { 
 }
 
 
-virtual void Template::SetBackColor(rgb_color color) { 
+void Template::SetBackColor(rgb_color color) { 
 }
 
 
-virtual void Template::SetStipplePattern(pattern p) { 
+void Template::SetStipplePattern(pattern p) { 
 }
 
 
-virtual void Template::SetScale(float scale) { 
+void Template::SetScale(float scale) { 
 }
 
 
-virtual void Template::SetFontFamily(char *family) { 
+void Template::SetFontFamily(char *family) { 
 }
 
 
-virtual void Template::SetFontStyle(char *style) { 
+void Template::SetFontStyle(char *style) { 
 }
 
 
-virtual void Template::SetFontSpacing(int32 spacing) { 
+void Template::SetFontSpacing(int32 spacing) { 
 }
 
 
-virtual void Template::SetFontSize(float size) { 
+void Template::SetFontSize(float size) { 
 }
 
 
-virtual void Template::SetFontRotate(float rotation) { 
+void Template::SetFontRotate(float rotation) { 
 }
 
 
-virtual void Template::SetFontEncoding(int32 encoding) { 
+void Template::SetFontEncoding(int32 encoding) { 
 }
 
 
-virtual void Template::SetFontFlags(int32 flags) { 
+void Template::SetFontFlags(int32 flags) { 
 }
 
 
-virtual void Template::SetFontShear(float shear) { 
+void Template::SetFontShear(float shear) { 
 }
 
 
-virtual void Template::SetFontFace(int32 flags) { 
+void Template::SetFontFace(int32 flags) { 
 }
 
 
