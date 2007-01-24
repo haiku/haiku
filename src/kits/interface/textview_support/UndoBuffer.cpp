@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc.
+ * Copyright 2003-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,14 +41,14 @@ _BUndoBuffer_::_BUndoBuffer_(BTextView *textView, undo_state state)
 	memcpy(fTextData, fTextView->Text() + fStart, fTextLength);
 
 	if (fTextView->IsStylable())
-		fRunArray =  fTextView->RunArray(fStart, fEnd, &fRunArrayLength);
+		fRunArray = fTextView->RunArray(fStart, fEnd, &fRunArrayLength);
 }
 
 
 _BUndoBuffer_::~_BUndoBuffer_()
 {
 	free(fTextData);
-	free(fRunArray);
+	BTextView::FreeRunArray(fRunArray);
 }
 
 
@@ -128,24 +128,20 @@ _BPasteUndoBuffer_::_BPasteUndoBuffer_(BTextView *textView, const char *text,
 	: _BUndoBuffer_(textView, B_UNDO_PASTE),
 	fPasteText(NULL),
 	fPasteTextLength(textLen),
-	fPasteRunArray(NULL),
-	fPasteRunArrayLength(0)
+	fPasteRunArray(NULL)
 {
 	fPasteText = (char *)malloc(fPasteTextLength);
 	memcpy(fPasteText, text, fPasteTextLength);
 
-	if (runArray) {
-		fPasteRunArray = (text_run_array *)malloc(runArrayLen);
-		fPasteRunArrayLength = runArrayLen;
-		memcpy(fPasteRunArray, runArray, runArrayLen);
-	}
+	if (runArray)
+		fPasteRunArray = BTextView::CopyRunArray(runArray);
 }
 
 
 _BPasteUndoBuffer_::~_BPasteUndoBuffer_()
 {
 	free(fPasteText);
-	free(fPasteRunArray);
+	BTextView::FreeRunArray(fPasteRunArray);
 }
 
 
@@ -208,11 +204,8 @@ _BDropUndoBuffer_::_BDropUndoBuffer_(BTextView *textView, char const *text,
 	fDropText = (char *)malloc(fDropTextLength);
 	memcpy(fDropText, text, fDropTextLength);
 
-	if (runArray) {
-		fDropRunArray = (text_run_array *)malloc(runArrayLen);
-		fDropRunArrayLength = runArrayLen;
-		memcpy(fDropRunArray, runArray, runArrayLen);
-	}
+	if (runArray)
+		fDropRunArray = BTextView::CopyRunArray(runArray);
 
 	if (fInternalDrop && fDropLocation >= fEnd)
 		fDropLocation -= fDropTextLength;
@@ -222,7 +215,7 @@ _BDropUndoBuffer_::_BDropUndoBuffer_(BTextView *textView, char const *text,
 _BDropUndoBuffer_::~_BDropUndoBuffer_()
 {
 	free(fDropText);
-	free(fDropRunArray);
+	BTextView::FreeRunArray(fDropRunArray);
 }
 
 

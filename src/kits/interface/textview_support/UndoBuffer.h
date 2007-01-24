@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -67,7 +67,6 @@ private:
 	char *fPasteText;
 	int32 fPasteTextLength;
 	text_run_array *fPasteRunArray;
-	int32 fPasteRunArrayLength;
 };
 
 
@@ -96,7 +95,6 @@ private:
 	char *fDropText;
 	int32 fDropTextLength;
 	text_run_array *fDropRunArray;
-	int32 fDropRunArrayLength;
 	
 	int32 fDropLocation;
 	bool fInternalDrop;
