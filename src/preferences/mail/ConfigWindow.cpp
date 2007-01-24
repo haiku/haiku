@@ -1,8 +1,11 @@
-/* ConfigWindow - main eMail config window
-**
-** Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/* 
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2007, Haiku Inc. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
+//! main E-Mail config window
 
 #include "ConfigWindow.h"
 #include "CenterContainer.h"
@@ -233,11 +236,10 @@ class AboutTextView : public BTextView
 
 
 ConfigWindow::ConfigWindow()
-		: BWindow(BRect(100.0, 100.0, 580.0, 540.0),
-				  "E-mail", B_TITLED_WINDOW,
-				  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
-		fLastSelectedAccount(NULL),
-		fSaveSettings(false)
+	: BWindow(BRect(100.0, 100.0, 580.0, 540.0), "E-mail", B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	fLastSelectedAccount(NULL),
+	fSaveSettings(false)
 {
 	// create controls
 
@@ -423,6 +425,7 @@ ConfigWindow::ConfigWindow()
 	top->AddChild(revertButton);
 
 	LoadSettings();
+		// this will also move our window to the stored position
 
 	fAccountsListView->SetSelectionMessage(new BMessage(kMsgAccountSelected));
 	fAccountsListView->MakeFocus(true);
@@ -438,19 +441,15 @@ void
 ConfigWindow::MakeHowToView()
 {
 	BResources *resources = BApplication::AppResources();
-	if (resources)
-	{
+	if (resources) {
 		size_t length;
-		char *buffer = (char *)resources->FindResource('ICON',101,&length);
-		if (buffer)
-		{
-			BBitmap *bitmap = new BBitmap(BRect(0,0,63,63),B_CMAP8);
-			if (bitmap && bitmap->InitCheck() == B_OK)
-			{
+		char *buffer = (char *)resources->FindResource('ICON', 101, &length);
+		if (buffer) {
+			BBitmap *bitmap = new BBitmap(BRect(0, 0, 63, 63), B_CMAP8);
+			if (bitmap && bitmap->InitCheck() == B_OK) {
 				// copy and enlarge a 32x32 8-bit bitmap
 				char *bits = (char *)bitmap->Bits();
-				for (int32 i=0, j=-64; i<(int32)length; i++)
-				{
+				for (int32 i = 0, j = -64; i < (int32)length; i++) {
 					if ((i % 32) == 0)
 						j += 64;
 
@@ -458,14 +457,13 @@ ConfigWindow::MakeHowToView()
 					b[0] = b[1] = b[64] = b[65] = buffer[i];
 				}
 				fConfigView->AddChild(new BitmapView(bitmap));
-			}
-			else
+			} else
 				delete bitmap;
 		}
 	}
 
 	BRect rect = fConfigView->Bounds();
-	BTextView *text = new BTextView(rect,NULL,rect,B_FOLLOW_NONE,B_WILL_DRAW);
+	BTextView *text = new BTextView(rect, NULL, rect, B_FOLLOW_NONE, B_WILL_DRAW);
 	text->SetViewColor(fConfigView->Parent()->ViewColor());
 	text->SetAlignment(B_ALIGN_CENTER);
 	text->SetText(
@@ -476,7 +474,7 @@ ConfigWindow::MakeHowToView()
 		"\n\nアカウント自体またはアカウントの\n送受信設定を削除するには\n項目を選択して\"削除\"ボタンを使います。"
 		"\n\nアカウント内容の変更は、\nマウスで項目をクリックしてください。"));
 	rect = text->Bounds();
-	text->ResizeTo(rect.Width(),text->TextHeight(0,42));
+	text->ResizeTo(rect.Width(), text->TextHeight(0, 42));
 	text->SetTextRect(rect);
 
 	text->MakeEditable(false);
@@ -492,30 +490,30 @@ void
 ConfigWindow::LoadSettings()
 {
 	Accounts::Delete();
-	Accounts::Create(fAccountsListView,fConfigView);
+	Accounts::Create(fAccountsListView, fConfigView);
 
 	// load in general settings
-	BMailSettings *settings = new BMailSettings();
-	status_t status = SetToGeneralSettings(settings);
-	if (status == B_OK)
-	{
-		// adjust own window frame
-		BScreen screen(this);
-		BRect screenFrame(screen.Frame().InsetByCopy(0,5));
-		BRect frame(settings->ConfigWindowFrame());
-
-		if (screenFrame.Contains(frame.LeftTop()))
-			MoveTo(frame.LeftTop());
-		else // center on screen
-			MoveTo((screenFrame.Width() - frame.Width()) / 2,(screenFrame.Height() - frame.Height()) / 2);
+	BMailSettings settings;
+	status_t status = SetToGeneralSettings(&settings);
+	if (status == B_OK) {
+		// move own window
+		MoveTo(settings.ConfigWindowFrame().LeftTop());
+	} else {
+		fprintf(stderr, MDR_DIALECT_CHOICE("Error retrieving general settings: %s\n",
+			"一般設定の収得に失敗： %s\n"), strerror(status));
 	}
-	else
-		fprintf(stderr, MDR_DIALECT_CHOICE (
-			"Error retrieving general settings: %s\n",
-			"一般設定の収得に失敗： %s\n"),
-			strerror(status));
 
-	delete settings;
+	BScreen screen(this);
+	BRect screenFrame(screen.Frame().InsetByCopy(0, 5));
+	if (!screenFrame.Contains(Frame().LeftTop())
+		|| !screenFrame.Contains(Frame().RightBottom()))
+		status = B_ERROR;
+
+	if (status != B_OK) {
+		// center window on screen
+		MoveTo((screenFrame.Width() - Frame().Width()) / 2,
+			(screenFrame.Height() - Frame().Height()) / 2);
+	}
 }
 
 
