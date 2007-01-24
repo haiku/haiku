@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -454,7 +454,7 @@ DiskProbe::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "DiskProbe\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2004-2006, Haiku.\n\n"
+		"\tCopyright 2004-2007, Haiku.\n\n"
 		"original Be version by Robert Polic\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;

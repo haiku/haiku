@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -256,13 +256,26 @@ IconView::UpdateIcon()
 		status_t status = B_ERROR;
 
 		if (fIsDevice) {
+			BBitmap* icon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+				// TODO: as long as we'll use get_device_icon() for this
+
 			BPath path(&fRef);
-			status = get_device_icon(path.Path(), fBitmap->Bits(), B_LARGE_ICON);
+			status = get_device_icon(path.Path(), icon->Bits(), B_LARGE_ICON);
+			if (status == B_OK) {
+				delete fBitmap;
+				fBitmap = icon;
+			} else
+				delete icon;
 		} else
 			status = BNodeInfo::GetTrackerIcon(&fRef, fBitmap);
 
 		if (status != B_OK) {
-			// ToDo: get a standard generic icon here?
+			// Try to get generic icon
+			BMimeType type(B_FILE_MIME_TYPE);
+			status = type.GetIcon(fBitmap, B_LARGE_ICON);
+		}
+
+		if (status != B_OK) {
 			delete fBitmap;
 			fBitmap = NULL;
 		}
