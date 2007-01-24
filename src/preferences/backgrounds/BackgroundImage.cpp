@@ -88,7 +88,7 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 	delete [] buffer;
 
 	if (error != B_OK)
-		return NULL;
+		return result;
 
 	PRINT_OBJECT(container);
 
