@@ -173,6 +173,7 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	rect.top = 8 + rightbox->InnerFrame().top;
 #else
 	rect.top = 5 + workspaceMenuField->Bounds().Height();
+	rect.bottom = rect.top + workspaceMenuField->Bounds().Height();
 #endif
 
 	fImageMenu = new BPopUpMenu("pick one");
