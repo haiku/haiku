@@ -168,9 +168,11 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	AddChild(rightbox);
 
 	float offset = be_plain_font->StringWidth("Placement:") + 5;
-	rect.Set(10, 10, rightbox->Bounds().right - 10, 30);
+	rect.Set(10, 0, rightbox->Bounds().right - 10, 30);
 #ifdef __HAIKU__
 	rect.top = 8 + rightbox->InnerFrame().top;
+#else
+	rect.top = 5 + workspaceMenuField->Bounds().Height();
 #endif
 
 	fImageMenu = new BPopUpMenu("pick one");
