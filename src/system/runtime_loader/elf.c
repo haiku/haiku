@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -1264,6 +1264,9 @@ load_library(char const *path, uint32 flags, bool addOn)
 	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
 	status_t status;
 
+	if (path == NULL)
+		return B_BAD_VALUE;
+
 	// ToDo: implement flags
 	(void)flags;
 
@@ -1318,6 +1321,9 @@ unload_library(image_id imageID, bool addOn)
 	status_t status = B_BAD_IMAGE_ID;
 	image_t *image;
 	image_type type = addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE;
+
+	if (imageID < B_OK)
+		return B_BAD_IMAGE_ID;
 
 	rld_lock();
 		// for now, just do stupid simple global locking
@@ -1413,6 +1419,11 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType, void **_l
 	status_t status = B_OK;
 	image_t *image;
 
+	if (imageID < B_OK)
+		return B_BAD_IMAGE_ID;
+	if (symbolName == NULL)
+		return B_BAD_VALUE;
+
 	rld_lock();
 		// for now, just do stupid simple global locking
 
@@ -1443,12 +1454,15 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 	struct Elf32_Dyn *dynamicSection;
 	image_t *image;
 
+	if (_name == NULL)
+		return B_BAD_VALUE;
+
 	rld_lock();
 
 	image = find_loaded_image_by_id(id);
 	if (image == NULL) {
 		rld_unlock();
-		return B_BAD_VALUE;
+		return B_BAD_IMAGE_ID;
 	}
 
 	dynamicSection = (struct Elf32_Dyn *)image->dynamic_ptr;

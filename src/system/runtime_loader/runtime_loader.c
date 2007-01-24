@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -268,6 +268,9 @@ test_executable(const char *name, uid_t user, gid_t group, char *invoker)
 	status_t status;
 	ssize_t length;
 	int fd;
+
+	if (name == NULL)
+		return B_BAD_VALUE;
 
 	strlcpy(path, name, sizeof(path));
 
