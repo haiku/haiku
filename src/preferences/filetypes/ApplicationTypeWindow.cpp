@@ -395,6 +395,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 #endif
 
 	rect.top = 4.0f + ceilf(fontHeight.ascent + fontHeight.descent);
+	rect.bottom = rect.top + height;
 	fMajorVersionControl = new BTextControl(rect, "major", "Version:", NULL,
 		NULL);
 	fMajorVersionControl->SetDivider(fMajorVersionControl->StringWidth(
