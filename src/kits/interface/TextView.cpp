@@ -2506,6 +2506,9 @@ BTextView::CopyRunArray(const text_run_array *orig, int32 countDelta)
 void
 BTextView::FreeRunArray(text_run_array *array)
 {
+	if (array == NULL)
+		return;
+
 	// Call destructors explicitly
 	for (int32 i = 0; i < array->count; i++)
 		array->runs[i].font.~BFont();
