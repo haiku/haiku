@@ -14,23 +14,25 @@ get_class_info(uint8 pci_class_base_id, uint8 pci_class_sub_id, uint8 pci_class_
 	if (pci_class_base_id == 0x80)
 		snprintf(classInfo, size, " (Other)");
 	else {
-		PCI_CLASSCODETABLE *s = PciClassCodeTable, *foundItem = NULL;
-		while (s->BaseDesc) {
-			if ((pci_class_base_id == s->BaseClass) 
-				&& (pci_class_sub_id == s->SubClass)) {
-				foundItem = s;
-				if (pci_class_api_id == s->ProgIf)
+		PCI_CLASSCODETABLE *foundItem = NULL;
+		int i;
+		for (i = 0; i < (int)PCI_CLASSCODETABLE_LEN; i++) {
+			if ((pci_class_base_id == PciClassCodeTable[i].BaseClass) 
+				&& (pci_class_sub_id == PciClassCodeTable[i].SubClass)) {
+				foundItem = &PciClassCodeTable[i];
+				if (pci_class_api_id == PciClassCodeTable[i].ProgIf)
 					break;
 			}
-			s++;
 		}
-		if (!s->BaseDesc)
-			s = foundItem;
-		if (pci_class_sub_id != 0x80)
-			snprintf(classInfo, size, "%s (%s%s%s)", s->BaseDesc, s->SubDesc, 
-				(s->ProgDesc && strcmp("", s->ProgDesc)) ? ", " : "", s->ProgDesc);
-		else
-			snprintf(classInfo, size, "%s", s->BaseDesc);
+		if (foundItem) {
+			if (pci_class_sub_id != 0x80)
+				snprintf(classInfo, size, "%s (%s%s%s)", foundItem->BaseDesc, foundItem->SubDesc, 
+					(foundItem->ProgDesc && strcmp("", foundItem->ProgDesc)) ? ", " : "", foundItem->ProgDesc);
+			else
+				snprintf(classInfo, size, "%s", foundItem->BaseDesc);
+		} else
+				snprintf(classInfo, size, "%s (%u:%u:%u)", "(Unknown)", 
+					pci_class_base_id, pci_class_sub_id, pci_class_api_id);
 	}
 }
 
