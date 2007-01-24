@@ -172,7 +172,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fMountSharedVolumesOntoDesktop =
 		new BooleanValueSetting("MountSharedVolumesOntoDesktop", false));
 	Add(fIntegrateNonBootBeOSDesktops = new BooleanValueSetting
-		("IntegrateNonBootBeOSDesktops", false));
+		("IntegrateNonBootBeOSDesktops", true));
 	Add(fIntegrateAllNonBootDesktops = new BooleanValueSetting
 		("IntegrateAllNonBootDesktops", false));
 	Add(fEjectWhenUnmounting = new BooleanValueSetting("EjectWhenUnmounting", true));

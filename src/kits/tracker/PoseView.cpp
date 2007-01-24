@@ -9258,8 +9258,9 @@ BPoseView::ShouldIntegrateDesktop(const BVolume &volume)
 	if (!settings.IntegrateNonBootBeOSDesktops())
 		return false;
 
-	// That's obviously what makes a BeOS desktop :-)
-	return volume.KnowsQuery() && volume.KnowsAttr() && volume.KnowsMime();
+	// Only removable read-only volumes should have their desktops integrated
+	return volume.IsRemovable() && volume.IsReadOnly()
+		&& volume.KnowsQuery() && volume.KnowsAttr() && volume.KnowsMime();
 }
 
 
