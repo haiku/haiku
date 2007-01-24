@@ -850,10 +850,8 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			TRACE("module init\n");
 			return B_OK;
 		case B_MODULE_UNINIT:
-			TRACE("module uninit\n");
 			return B_OK;
 
 		default:
