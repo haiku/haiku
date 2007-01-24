@@ -126,7 +126,7 @@ rule AddFilesToHaikuImage
 		if $(destName) {
 			name = $(destName) ;
 		} else {
-			name = $(target:BS) ;
+			name = $(target:G=:D=) ;
 		}
 
 		local destTarget = $(name:G=HaikuImage__$(directory:G=)) ;
