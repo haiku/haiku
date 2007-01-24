@@ -1,6 +1,6 @@
 /* Operations on file descriptors
  *
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -134,12 +134,13 @@ put_fd(struct file_descriptor *descriptor)
 	// free the descriptor if we don't need it anymore
 	if (previous == 1) {
 		// free the underlying object
-		if (descriptor->ops->fd_free)
+		if (descriptor->ops != NULL && descriptor->ops->fd_free != NULL)
 			descriptor->ops->fd_free(descriptor);
 
 		free(descriptor);
 	} else if ((descriptor->open_mode & O_DISCONNECTED) != 0
-		&& previous - 1 == descriptor->open_count) {
+		&& previous - 1 == descriptor->open_count
+		&& descriptor->ops != NULL) {
 		// the descriptor has been disconnected - it cannot
 		// be accessed anymore, let's close it (no one is
 		// currently accessing this descriptor)
@@ -152,6 +153,7 @@ put_fd(struct file_descriptor *descriptor)
 		// prevent this descriptor from being closed/freed again
 		descriptor->open_count = -1;
 		descriptor->ref_count = -1;
+		descriptor->ops = NULL;
 		descriptor->u.vnode = NULL;
 
 		// the file descriptor is kept intact, so that it's not
@@ -170,7 +172,7 @@ close_fd(struct file_descriptor *descriptor)
 	if (atomic_add(&descriptor->open_count, -1) == 1) {
 		vfs_unlock_vnode_if_locked(descriptor);
 
-		if (descriptor->ops->fd_close)
+		if (descriptor->ops != NULL && descriptor->ops->fd_close != NULL)
 			descriptor->ops->fd_close(descriptor);
 	}
 }
