@@ -2,26 +2,15 @@ SubDir HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# note: when adding new addons, sensors
-# or colorspace transforms, one should regenerate
-# the *Internal*.h headers with the makefile.
-
 # for USBKit.h
 UseLibraryHeaders usb ;
 
 # Zeta has a libusb.so, we have a USBKit.a
 if $(TARGET_PLATFORM) = haiku {
-usbKitLibraryName = USBKit.a ;
+	usbKitLibraryName = USBKit.a ;
 } else {
-usbKitLibraryName = usb ;
+	usbKitLibraryName = usb ;
 }
-
-# HOW the F*** do I do that with Jam ?
-#SRCS := $(wildcard *.cpp) \
-#$(wildcard addons/*/*.cpp) \
-#$(wildcard sensors/*/*.cpp) \
-#$(wildcard cstransforms/*.cpp)
-
 
 # source directories
 local sourceDirs =
@@ -33,7 +22,8 @@ local sourceDirs =
 
 local sourceDir ;
 for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons usb_webcam $(sourceDir) ] ;
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons
+		usb_webcam $(sourceDir) ] ;
 }
 
 ## addon sources
@@ -67,9 +57,12 @@ actions USBWebcamHeaderGen1
 	grep -h $(GREP_DEFINE) $(2) > $(1) ;
 }
 
-USBWebcamHeaderGen [ FGristFiles CamInternalAddons.h ] : B_WEBCAM_MKINTFUNC : $(addonSources) ;
-USBWebcamHeaderGen [ FGristFiles CamInternalSensors.h ] : B_WEBCAM_DECLARE_SENSOR : $(sensorsSources) ;
-USBWebcamHeaderGen [ FGristFiles CamInternalColorSpaceTransforms.h ] : B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
+USBWebcamHeaderGen [ FGristFiles CamInternalAddons.h ]
+	: B_WEBCAM_MKINTFUNC : $(addonSources) ;
+USBWebcamHeaderGen [ FGristFiles CamInternalSensors.h ]
+	: B_WEBCAM_DECLARE_SENSOR : $(sensorsSources) ;
+USBWebcamHeaderGen [ FGristFiles CamInternalColorSpaceTransforms.h ]
+	: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
 
 Addon usb_webcam.media_addon : media :
 	$(addonSources)
@@ -93,5 +86,5 @@ LinkAgainst usb_webcam.media_addon : be media $(usbKitLibraryName) ;
 # force dependancies
 Includes [ FGristFiles CamRoster.cpp ] : [ FGristFiles CamInternalAddons.h ] ;
 Includes [ FGristFiles CamDevice.cpp ] : [ FGristFiles CamInternalSensors.h ] ;
-Includes [ FGristFiles CamColorSpaceTransform.cpp ] : [ FGristFiles CamInternalColorSpaceTransforms.h ] ;
-
+Includes [ FGristFiles CamColorSpaceTransform.cpp ]
+	: [ FGristFiles CamInternalColorSpaceTransforms.h ] ;
