@@ -358,6 +358,16 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 			// open any window
 			if (IsLaunching())
 				Quit();
+		} else if (!strcmp(argv[i], "-")) {
+			activate_workspace(current_workspace() - 1);
+
+			if (IsLaunching())
+				Quit();
+		} else if (!strcmp(argv[i], "+")) {
+			activate_workspace(current_workspace() + 1);
+
+			if (IsLaunching())
+				Quit();
 		} else {
 			// some unknown arguments were specified
 			fprintf(stderr, "Invalid argument: %s\n", argv[i]);
