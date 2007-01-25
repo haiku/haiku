@@ -38,20 +38,18 @@ typedef uint32_t in_addr_t;
 
 
 /* Protocol definitions - add to as required... */
-enum {
-	IPPROTO_IP      = 0,	/* 0, IPv4 */
-	IPPROTO_ICMP    = 1,	/* 1, ICMP (v4) */
-	IPPROTO_IGMP    = 2,	/* 2, IGMP (group management) */
-	IPPROTO_TCP	    = 6,	/* 6, tcp */
-	IPPROTO_UDP	    = 17,	/* 17, UDP */
-	IPPROTO_IPV6    = 41,   /* 41, IPv6 in IPv6 */
-	IPPROTO_ROUTING = 43,	/* 43, Routing */
-	IPPROTO_ICMPV6  = 58,	/* 58, IPv6 ICMP */
-	IPPROTO_ETHERIP = 97,	/* 97, Ethernet in IPv4 */
-	IPPROTO_RAW	    = 255    /* 255 */
-};
+#define IPPROTO_IP                0	/* 0, IPv4 */
+#define IPPROTO_ICMP              1	/* 1, ICMP (v4) */
+#define IPPROTO_IGMP              2	/* 2, IGMP (group management) */
+#define IPPROTO_TCP               6	/* 6, tcp */
+#define IPPROTO_UDP              17	/* 17, UDP */
+#define IPPROTO_IPV6             41	/* 41, IPv6 in IPv6 */
+#define IPPROTO_ROUTING          43	/* 43, Routing */
+#define IPPROTO_ICMPV6           58	/* 58, IPv6 ICMP */
+#define IPPROTO_ETHERIP          97	/* 97, Ethernet in IPv4 */
+#define IPPROTO_RAW             255	/* 255 */
 
-#define IPPROTO_MAX	256
+#define IPPROTO_MAX             256
 
 /* Port numbers...
  * < IPPORT_RESERVED are privileged and should be
