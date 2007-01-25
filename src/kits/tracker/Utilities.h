@@ -75,7 +75,11 @@ const int64 kTBSize = kGBSize * kKBSize;
 
 const int32 kMiniIconSeparator = 3;
 
+#ifdef __HAIKU__
 const color_space kDefaultIconDepth = B_RGBA32;
+#else
+const color_space kDefaultIconDepth = B_CMAP8;
+#endif
 
 // misc typedefs, constants and structs
 
