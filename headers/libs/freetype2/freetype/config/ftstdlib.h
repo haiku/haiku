@@ -168,12 +168,12 @@
 
 #include <setjmp.h>
 
-#define ft_jmp_buf  jmp_buf   /* note: this cannot be a typedef since */
-                              /*       jmp_buf is defined as a macro  */
-                              /*       on certain platforms           */
+#define ft_jmp_buf     jmp_buf  /* note: this cannot be a typedef since */
+                                /*       jmp_buf is defined as a macro  */
+                                /*       on certain platforms           */
 
-#define ft_longjmp  longjmp   /* likewise        */
-#define ft_setjmp   setjmp    /* same thing here */
+#define ft_longjmp     longjmp
+#define ft_setjmp( b ) setjmp( *(jmp_buf*) &(b) )    /* same thing here */
 
 
   /* the following is only used for debugging purposes, i.e., if */

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for validating TrueTyepGX/AAT tables (body).            */
 /*                                                                         */
-/*  Copyright 2004, 2005 by                                                */
+/*  Copyright 2004, 2005, 2006 by                                          */
 /*  Masatake YAMATO, Redhat K.K,                                           */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
@@ -62,7 +62,7 @@
                                  tables,
                                  table_length );
     else
-      error = FT_Err_Invalid_Argument;
+      error = FT_Err_Unimplemented_Feature;
 
   Exit:
     return error;
@@ -108,7 +108,7 @@
                                  validation_flags,
                                  ckern_table );
     else
-      error = FT_Err_Invalid_Argument;
+      error = FT_Err_Unimplemented_Feature;
 
   Exit:
     return error;

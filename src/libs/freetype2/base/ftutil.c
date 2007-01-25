@@ -120,12 +120,16 @@
     FT_Error  error = FT_Err_Ok;
 
 
-    if ( cur_count < 0 || new_count < 0 || item_size <= 0 )
+    /* Note that we now accept `item_size == 0' as a valid parameter, in
+     * order to cover very weird cases where an ALLOC_MULT macro would be
+     * called.
+     */
+    if ( cur_count < 0 || new_count < 0 || item_size < 0 )
     {
       /* may help catch/prevent nasty security issues */
       error = FT_Err_Invalid_Argument;
     }
-    else if ( new_count == 0 )
+    else if ( new_count == 0 || item_size == 0 )
     {
       ft_mem_free( memory, block );
       block = NULL;

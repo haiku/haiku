@@ -209,6 +209,9 @@
     if ( info->is_fixed_pitch )
       root->face_flags |= FT_FACE_FLAG_FIXED_WIDTH;
 
+    /* We only set this flag if we have the patented bytecode interpreter. */
+    /* There are no known `tricky' Type42 fonts that could be loaded with  */
+    /* the unpatented interpreter.                                         */
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
     root->face_flags |= FT_FACE_FLAG_HINTER;
 #endif

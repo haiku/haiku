@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType-specific tables loader (body).                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2004, 2005, 2006 by                         */
+/*  Copyright 1996-2001, 2002, 2004, 2005, 2006, 2007 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -58,7 +58,6 @@
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
-#ifdef FT_OPTIMIZE_MEMORY
 
   FT_LOCAL_DEF( FT_Error )
   tt_face_load_loca( TT_Face    face,
@@ -183,135 +182,6 @@
   }
 
 
-#else /* !FT_OPTIMIZE_MEMORY */
-
-
-  FT_LOCAL_DEF( FT_Error )
-  tt_face_load_loca( TT_Face    face,
-                     FT_Stream  stream )
-  {
-    FT_Error   error;
-    FT_Memory  memory = stream->memory;
-    FT_Short   LongOffsets;
-    FT_ULong   table_len;
-
-
-    /* we need the size of the `glyf' table for malformed `loca' tables */
-    error = face->goto_table( face, TTAG_glyf, stream, &face->glyf_len );
-    if ( error )
-      goto Exit;
-
-    FT_TRACE2(( "Locations " ));
-    LongOffsets = face->header.Index_To_Loc_Format;
-
-    error = face->goto_table( face, TTAG_loca, stream, &table_len );
-    if ( error )
-    {
-      error = TT_Err_Locations_Missing;
-      goto Exit;
-    }
-
-    if ( LongOffsets != 0 )
-    {
-      face->num_locations = (FT_UShort)( table_len >> 2 );
-
-      FT_TRACE2(( "(32bit offsets): %12d ", face->num_locations ));
-
-      if ( FT_NEW_ARRAY( face->glyph_locations, face->num_locations ) )
-        goto Exit;
-
-      if ( FT_FRAME_ENTER( face->num_locations * 4L ) )
-        goto Exit;
-
-      {
-        FT_Long*  loc   = face->glyph_locations;
-        FT_Long*  limit = loc + face->num_locations;
-
-
-        for ( ; loc < limit; loc++ )
-          *loc = FT_GET_LONG();
-      }
-
-      FT_FRAME_EXIT();
-    }
-    else
-    {
-      face->num_locations = (FT_UShort)( table_len >> 1 );
-
-      FT_TRACE2(( "(16bit offsets): %12d ", face->num_locations ));
-
-      if ( FT_NEW_ARRAY( face->glyph_locations, face->num_locations ) )
-        goto Exit;
-
-      if ( FT_FRAME_ENTER( face->num_locations * 2L ) )
-        goto Exit;
-
-      {
-        FT_Long*  loc   = face->glyph_locations;
-        FT_Long*  limit = loc + face->num_locations;
-
-
-        for ( ; loc < limit; loc++ )
-          *loc = (FT_Long)( (FT_ULong)FT_GET_USHORT() * 2 );
-      }
-
-      FT_FRAME_EXIT();
-    }
-
-    FT_TRACE2(( "loaded\n" ));
-
-  Exit:
-    return error;
-  }
-
-
-  FT_LOCAL_DEF( FT_ULong )
-  tt_face_get_location( TT_Face   face,
-                        FT_UInt   gindex,
-                        FT_UInt  *asize )
-  {
-    FT_ULong  offset;
-    FT_UInt   count;
-
-
-    offset = face->glyph_locations[gindex];
-    count  = 0;
-
-    if ( gindex < (FT_UInt)face->num_locations - 1 )
-    {
-      FT_ULong  offset1 = face->glyph_locations[gindex + 1];
-
-
-      /* It isn't mentioned explicitly that the `loca' table must be  */
-      /* ordered, but implicitly it refers to the length of an entry  */
-      /* as the difference between the current and the next position. */
-      /* Anyway, there do exist (malformed) fonts which don't obey    */
-      /* this rule, so we are only able to provide an upper bound for */
-      /* the size.                                                    */
-      if ( offset1 >= offset )
-        count = (FT_UInt)( offset1 - offset );
-      else
-        count = (FT_UInt)( face->glyf_len - offset );
-    }
-
-    *asize = count;
-    return offset;
-  }
-
-
-  FT_LOCAL_DEF( void )
-  tt_face_done_loca( TT_Face  face )
-  {
-    FT_Memory  memory = face->root.memory;
-
-
-    FT_FREE( face->glyph_locations );
-    face->num_locations = 0;
-  }
-
-
-#endif /* !FT_OPTIMIZE_MEMORY */
-
 
   /*************************************************************************/
   /*                                                                       */
@@ -334,7 +204,7 @@
   tt_face_load_cvt( TT_Face    face,
                     FT_Stream  stream )
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Error   error;
     FT_Memory  memory = stream->memory;
@@ -383,7 +253,7 @@
   Exit:
     return error;
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_UNUSED( face   );
     FT_UNUSED( stream );
@@ -415,7 +285,7 @@
   tt_face_load_fpgm( TT_Face    face,
                      FT_Stream  stream )
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Error  error;
     FT_ULong  table_len;
@@ -445,7 +315,7 @@
   Exit:
     return error;
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_UNUSED( face   );
     FT_UNUSED( stream );
@@ -477,7 +347,7 @@
   tt_face_load_prep( TT_Face    face,
                      FT_Stream  stream )
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Error  error;
     FT_ULong  table_len;
@@ -506,7 +376,7 @@
   Exit:
     return error;
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_UNUSED( face   );
     FT_UNUSED( stream );
@@ -533,7 +403,6 @@
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
-#ifdef FT_OPTIMIZE_MEMORY
 
   FT_LOCAL_DEF( FT_Error )
   tt_face_load_hdmx( TT_Face    face,
@@ -562,7 +431,23 @@
     num_records = FT_NEXT_USHORT( p );
     record_size = FT_NEXT_ULONG( p );
 
-    if ( version != 0 || num_records > 255 || record_size > 0x40000 )
+    /* The maximum number of bytes in an hdmx device record is the */
+    /* maximum number of glyphs + 2; this is 0xFFFF + 2; this is   */
+    /* the reason why `record_size' is a long (which we read as    */
+    /* unsigned long for convenience).  In practice, two bytes     */
+    /* sufficient to hold the size value.                          */
+    /*                                                             */
+    /* There are at least two fonts, HANNOM-A and HANNOM-B version */
+    /* 2.0 (2005), which get this wrong: The upper two bytes of    */
+    /* the size value are set to 0xFF instead of 0x00.  We catch   */
+    /* and fix this.                                               */
+
+    if ( record_size >= 0xFFFF0000UL )
+      record_size &= 0xFFFFU;
+
+    /* The limit for `num_records' is a heuristic value. */
+
+    if ( version != 0 || num_records > 255 || record_size > 0x10001L )
     {
       error = TT_Err_Invalid_File_Format;
       goto Fail;
@@ -605,101 +490,6 @@
     FT_FRAME_RELEASE( face->hdmx_table );
   }
 
-#else /* !FT_OPTIMIZE_MEMORY */
-
-  FT_LOCAL_DEF( FT_Error )
-  tt_face_load_hdmx( TT_Face    face,
-                     FT_Stream  stream )
-  {
-    FT_Error   error;
-    FT_Memory  memory = stream->memory;
-
-    TT_Hdmx    hdmx = &face->hdmx;
-    FT_Short   num_records;
-    FT_Long    num_glyphs;
-    FT_Long    record_size;
-
-
-    hdmx->version     = 0;
-    hdmx->num_records = 0;
-    hdmx->records     = 0;
-
-    /* this table is optional */
-    error = face->goto_table( face, TTAG_hdmx, stream, 0 );
-    if ( error )
-      return TT_Err_Ok;
-
-    if ( FT_FRAME_ENTER( 8L ) )
-      goto Exit;
-
-    hdmx->version = FT_GET_USHORT();
-    num_records   = FT_GET_SHORT();
-    record_size   = FT_GET_LONG();
-
-    FT_FRAME_EXIT();
-
-    if ( record_size < 0 || num_records < 0 )
-      return TT_Err_Invalid_File_Format;
-
-    /* Only recognize format 0 */
-    if ( hdmx->version != 0 )
-      goto Exit;
-
-    /* we can't use FT_QNEW_ARRAY here; otherwise tt_face_free_hdmx */
-    /* could fail during deallocation                               */
-    if ( FT_NEW_ARRAY( hdmx->records, num_records ) )
-      goto Exit;
-
-    hdmx->num_records = num_records;
-    num_glyphs        = face->root.num_glyphs;
-    record_size      -= num_glyphs + 2;
-
-    {
-      TT_HdmxEntry  cur   = hdmx->records;
-      TT_HdmxEntry  limit = cur + hdmx->num_records;
-
-
-      for ( ; cur < limit; cur++ )
-      {
-        /* read record */
-        if ( FT_READ_BYTE( cur->ppem      ) ||
-             FT_READ_BYTE( cur->max_width ) )
-          goto Exit;
-
-        if ( FT_QALLOC( cur->widths, num_glyphs )      ||
-             FT_STREAM_READ( cur->widths, num_glyphs ) )
-          goto Exit;
-
-        /* skip padding bytes */
-        if ( record_size > 0 && FT_STREAM_SKIP( record_size ) )
-          goto Exit;
-      }
-    }
-
-  Exit:
-    return error;
-  }
-
-
-  FT_LOCAL_DEF( void )
-  tt_face_free_hdmx( TT_Face  face )
-  {
-    if ( face )
-    {
-      FT_Int     n;
-      FT_Memory  memory = face->root.driver->root.memory;
-
-
-      for ( n = 0; n < face->hdmx.num_records; n++ )
-        FT_FREE( face->hdmx.records[n].widths );
-
-      FT_FREE( face->hdmx.records );
-      face->hdmx.num_records = 0;
-    }
-  }
-
-#endif /* !OPTIMIZE_MEMORY */
-
 
   /*************************************************************************/
   /*                                                                       */
@@ -711,8 +501,6 @@
                               FT_UInt  ppem,
                               FT_UInt  gindex )
   {
-#ifdef FT_OPTIMIZE_MEMORY
-
     FT_UInt   nn;
     FT_Byte*  result      = NULL;
     FT_ULong  record_size = face->hdmx_record_size;
@@ -729,19 +517,6 @@
       }
 
     return result;
-
-#else
-
-    FT_UShort  n;
-
-
-    for ( n = 0; n < face->hdmx.num_records; n++ )
-      if ( face->hdmx.records[n].ppem == ppem )
-        return &face->hdmx.records[n].widths[gindex];
-
-    return NULL;
-
-#endif
   }
 
 

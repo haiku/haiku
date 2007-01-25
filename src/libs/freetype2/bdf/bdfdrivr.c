@@ -435,6 +435,8 @@ THE SOFTWARE.
           /* convert from 722.7 decipoints to 72 points per inch */
           bsize->size =
             (FT_Pos)( ( prop->value.int32 * 64 * 7200 + 36135L ) / 72270L );
+        else
+          bsize->size = bsize->width << 6;
 
         prop = bdf_get_font_property( font, "PIXEL_SIZE" );
         if ( prop )
@@ -646,16 +648,17 @@ THE SOFTWARE.
                   FT_UInt       glyph_index,
                   FT_Int32      load_flags )
   {
-    BDF_Face     face   = (BDF_Face)FT_SIZE_FACE( size );
+    BDF_Face     bdf    = (BDF_Face)FT_SIZE_FACE( size );
+    FT_Face      face   = FT_FACE( bdf );
     FT_Error     error  = BDF_Err_Ok;
     FT_Bitmap*   bitmap = &slot->bitmap;
     bdf_glyph_t  glyph;
-    int          bpp    = face->bdffont->bpp;
+    int          bpp    = bdf->bdffont->bpp;
 
     FT_UNUSED( load_flags );
 
 
-    if ( !face )
+    if ( !face || glyph_index >= (FT_UInt)face->num_glyphs )
     {
       error = BDF_Err_Invalid_Argument;
       goto Exit;
@@ -663,12 +666,12 @@ THE SOFTWARE.
 
     /* index 0 is the undefined glyph */
     if ( glyph_index == 0 )
-      glyph_index = face->default_glyph;
+      glyph_index = bdf->default_glyph;
     else
       glyph_index--;
 
     /* slot, bitmap => freetype, glyph => bdflib */
-    glyph = face->bdffont->glyphs[glyph_index];
+    glyph = bdf->bdffont->glyphs[glyph_index];
 
     bitmap->rows  = glyph.bbx.height;
     bitmap->width = glyph.bbx.width;
@@ -710,7 +713,7 @@ THE SOFTWARE.
      * used here, provided such fonts do exist.
      */
     ft_synthesize_vertical_metrics( &slot->metrics,
-                                    face->bdffont->bbx.height << 6 );
+                                    bdf->bdffont->bbx.height << 6 );
 
   Exit:
     return error;

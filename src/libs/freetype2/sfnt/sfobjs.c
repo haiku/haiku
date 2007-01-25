@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    SFNT object management (base).                                       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -63,37 +63,6 @@
     for ( n = 0; n < len; n++ )
     {
       code = FT_NEXT_USHORT( read );
-      if ( code < 32 || code > 127 )
-        code = '?';
-
-      string[n] = (char)code;
-    }
-
-    string[len] = 0;
-
-    return string;
-  }
-
-
-  /* convert a UCS-4 name entry to ASCII */
-  static FT_String*
-  tt_name_entry_ascii_from_ucs4( TT_NameEntry  entry,
-                                 FT_Memory     memory )
-  {
-    FT_String*  string;
-    FT_UInt     len, code, n;
-    FT_Byte*    read = (FT_Byte*)entry->string;
-    FT_Error    error;
-
-
-    len = (FT_UInt)entry->stringLength / 4;
-
-    if ( FT_NEW_ARRAY( string, len + 1 ) )
-      return NULL;
-
-    for ( n = 0; n < len; n++ )
-    {
-      code = (FT_UInt)FT_NEXT_ULONG( read );
       if ( code < 32 || code > 127 )
         code = '?';
 
@@ -165,9 +134,11 @@
     FT_String*        result = NULL;
     FT_UShort         n;
     TT_NameEntryRec*  rec;
-    FT_Int            found_apple   = -1;
-    FT_Int            found_win     = -1;
-    FT_Int            found_unicode = -1;
+    FT_Int            found_apple         = -1;
+    FT_Int            found_apple_roman   = -1;
+    FT_Int            found_apple_english = -1;
+    FT_Int            found_win           = -1;
+    FT_Int            found_unicode       = -1;
 
     FT_Bool           is_english = 0;
 
@@ -200,9 +171,14 @@
           break;
 
         case TT_PLATFORM_MACINTOSH:
+          /* This is a bit special because some fonts will use either    */
+          /* an English language id, or a Roman encoding id, to indicate */
+          /* the English version of its font name.                       */
+          /*                                                             */
           if ( rec->languageID == TT_MAC_LANGID_ENGLISH )
-            found_apple = n;
-
+            found_apple_english = n;
+          else if ( rec->encodingID == TT_MAC_ID_ROMAN )
+            found_apple_roman = n;
           break;
 
         case TT_PLATFORM_MICROSOFT:
@@ -232,6 +208,10 @@
       }
     }
 
+    found_apple = found_apple_roman;
+    if ( found_apple_english >= 0 )
+      found_apple = found_apple_english;
+
     /* some fonts contain invalid Unicode or Macintosh formatted entries; */
     /* we will thus favor names encoded in Windows formats if available   */
     /* (provided it is an English name)                                   */
@@ -242,13 +222,19 @@
       rec = face->name_table.names + found_win;
       switch ( rec->encodingID )
       {
+        /* all Unicode strings are encoded using UTF-16BE */
       case TT_MS_ID_UNICODE_CS:
       case TT_MS_ID_SYMBOL_CS:
         convert = tt_name_entry_ascii_from_utf16;
         break;
 
       case TT_MS_ID_UCS_4:
-        convert = tt_name_entry_ascii_from_ucs4;
+        /* Apparently, if this value is found in a name table entry, it is */
+        /* documented as `full Unicode repertoire'.  Experience with the   */
+        /* MsGothic font shipped with Windows Vista shows that this really */
+        /* means UTF-16 encoded names (UCS-4 values are only used within   */
+        /* charmaps).                                                      */
+        convert = tt_name_entry_ascii_from_utf16;
         break;
 
       default:
@@ -915,7 +901,7 @@
         FT_UInt  i, count;
 
 
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
         count = face->sbit_num_strikes;
 #else
         count = (FT_UInt)face->num_sbit_strikes;
@@ -1022,7 +1008,7 @@
     }
 
     /* freeing the horizontal metrics */
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
     {
       FT_Stream  stream = FT_FACE_STREAM( face );
 

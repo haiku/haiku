@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (specification).                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -109,7 +109,7 @@ FT_BEGIN_HEADER
   } TT_GraphicsState;
 
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
   FT_LOCAL( void )
   tt_glyphzone_done( TT_GlyphZone  zone );
@@ -120,7 +120,7 @@ FT_BEGIN_HEADER
                     FT_Short      maxContours,
                     TT_GlyphZone  zone );
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
 
@@ -324,7 +324,7 @@ FT_BEGIN_HEADER
 
     FT_ULong           strike_index;      /* 0xFFFFFFFF to indicate invalid */
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_UInt            num_function_defs; /* number of function definitions */
     FT_UInt            max_function_defs;
@@ -358,7 +358,10 @@ FT_BEGIN_HEADER
     FT_Bool            debug;
     TT_ExecContext     context;
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+    FT_Bool            bytecode_ready;
+    FT_Bool            cvt_ready;
+
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
   } TT_SizeRec;
 
@@ -412,7 +415,7 @@ FT_BEGIN_HEADER
   FT_LOCAL( void )
   tt_size_done( FT_Size  ttsize );          /* TT_Size */
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
   FT_LOCAL( FT_Error )
   tt_size_run_fpgm( TT_Size  size );
@@ -420,10 +423,13 @@ FT_BEGIN_HEADER
   FT_LOCAL( FT_Error )
   tt_size_run_prep( TT_Size  size );
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
   FT_LOCAL( FT_Error )
   tt_size_reset( TT_Size  size );
+
+  FT_LOCAL( FT_Error )
+  tt_size_ready_bytecode( TT_Size  size );
 
 
   /*************************************************************************/

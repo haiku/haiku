@@ -460,7 +460,9 @@
     FT_MemSource  node, *pnode;
 
 
-    hash  = (FT_UInt32)(void*)_ft_debug_file +
+    /* cast to FT_PtrDist first since void* can be larger */
+    /* than FT_UInt32 and GCC 4.1.1 emits a warning       */
+    hash  = (FT_UInt32)(FT_PtrDist)(void*)_ft_debug_file +
               (FT_UInt32)( 5 * _ft_debug_lineno );
     pnode = &table->sources[hash % FT_MEM_SOURCE_BUCKETS];
 

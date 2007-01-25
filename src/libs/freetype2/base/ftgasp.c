@@ -1,10 +1,10 @@
 /***************************************************************************/
 /*                                                                         */
-/*  svkern.h                                                               */
+/*  ftgasp.c                                                               */
 /*                                                                         */
-/*    The FreeType Kerning service (specification).                        */
+/*    Access of TrueType's `gasp' table (body).                            */
 /*                                                                         */
-/*  Copyright 2006 by                                                      */
+/*  Copyright 2007 by                                                      */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,36 +16,46 @@
 /***************************************************************************/
 
 
-#ifndef __SVKERN_H__
-#define __SVKERN_H__
-
-#include FT_INTERNAL_SERVICE_H
-#include FT_TRUETYPE_TABLES_H
+#include <ft2build.h>
+#include FT_GASP_H
+#include FT_INTERNAL_TRUETYPE_TYPES_H
 
 
-FT_BEGIN_HEADER
-
-#define FT_SERVICE_ID_KERNING  "kerning"
-
-
-  typedef FT_Error
-  (*FT_Kerning_TrackGetFunc)( FT_Face    face,
-                              FT_Fixed   point_size,
-                              FT_Int     degree,
-                              FT_Fixed*  akerning );
-
-  FT_DEFINE_SERVICE( Kerning )
+  FT_EXPORT_DEF( FT_Int )
+  FT_Get_Gasp( FT_Face  face,
+               FT_UInt  ppem )
   {
-    FT_Kerning_TrackGetFunc  get_track;
-  };
-
-  /* */
+    FT_Int  result = FT_GASP_NO_TABLE;
 
 
-FT_END_HEADER
+    if ( face && FT_IS_SFNT( face ) )
+    {
+      TT_Face  ttface = (TT_Face)face;
 
 
-#endif /* __SVKERN_H__ */
+      if ( ttface->gasp.numRanges > 0 )
+      {
+        TT_GaspRange  range     = ttface->gasp.gaspRanges;
+        TT_GaspRange  range_end = range + ttface->gasp.numRanges;
+
+
+        while ( ppem > range->maxPPEM )
+        {
+          range++;
+          if ( range >= range_end )
+            goto Exit;
+        }
+
+        result = range->gaspFlag;
+
+        /* ensure that we don't have spurious bits */
+        if ( ttface->gasp.version == 0 )
+          result &= 3;
+      }
+    }
+  Exit:
+    return result;
+  }
 
 
 /* END */

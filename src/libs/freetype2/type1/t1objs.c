@@ -201,6 +201,16 @@
 
 #ifndef T1_CONFIG_OPTION_NO_MM_SUPPORT
       /* release multiple masters information */
+      FT_ASSERT( ( face->len_buildchar == 0 ) == ( face->buildchar == NULL ) );
+
+      if ( face->buildchar )
+      {
+        FT_FREE( face->buildchar );
+
+        face->buildchar     = NULL;
+        face->len_buildchar = 0;
+      }
+
       T1_Done_Blend( face );
       face->blend = 0;
 #endif

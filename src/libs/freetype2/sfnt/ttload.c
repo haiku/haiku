@@ -5,7 +5,7 @@
 /*    Load the basic TrueType tables, i.e., tables that can be either in   */
 /*    TTF or OTF fonts (body).                                             */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1137,6 +1137,14 @@
     face->gasp.numRanges = FT_GET_USHORT();
 
     FT_FRAME_EXIT();
+
+    /* only support versions 0 and 1 of the table */
+    if ( face->gasp.version >= 2 )
+    {
+      face->gasp.numRanges = 0;
+      error = SFNT_Err_Invalid_Table;
+      goto Exit;
+    }
 
     num_ranges = face->gasp.numRanges;
     FT_TRACE3(( "numRanges: %u\n", num_ranges ));

@@ -75,15 +75,24 @@ FT_BEGIN_HEADER
    *  NULL if invalid index.
    */
   typedef const char*
-  (*PS_Glyph_NameFunc)( FT_Pointer  data,
-                        FT_UInt     string_index );
+  (*PS_GetGlyphNameFunc)( FT_Pointer  data,
+                          FT_UInt     string_index );
+
+  /*
+   *  A function used to release the glyph name returned by
+   *  PS_GetGlyphNameFunc, when needed
+   */
+  typedef void
+  (*PS_FreeGlyphNameFunc)( FT_Pointer  data,
+                           const char*  name );
 
   typedef FT_Error
-  (*PS_Unicodes_InitFunc)( FT_Memory          memory,
-                           PS_Unicodes        unicodes,
-                           FT_UInt            num_glyphs,
-                           PS_Glyph_NameFunc  get_glyph_name,
-                           FT_Pointer         glyph_data );
+  (*PS_Unicodes_InitFunc)( FT_Memory             memory,
+                           PS_Unicodes           unicodes,
+                           FT_UInt               num_glyphs,
+                           PS_GetGlyphNameFunc   get_glyph_name,
+                           PS_FreeGlyphNameFunc  free_glyph_name,
+                           FT_Pointer            glyph_data );
 
   typedef FT_UInt
   (*PS_Unicodes_CharIndexFunc)( PS_Unicodes  unicodes,

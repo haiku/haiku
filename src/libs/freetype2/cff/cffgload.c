@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType Glyph Loader (body).                                        */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -2275,15 +2275,28 @@
                  FT_UInt        glyph_index,
                  FT_Int32       load_flags )
   {
-    FT_Error      error;
-    CFF_Decoder   decoder;
-    TT_Face       face     = (TT_Face)glyph->root.face;
-    FT_Bool       hinting;
-    CFF_Font      cff      = (CFF_Font)face->extra.data;
+    FT_Error     error;
+    CFF_Decoder  decoder;
+    TT_Face      face     = (TT_Face)glyph->root.face;
+    FT_Bool      hinting;
+    CFF_Font     cff      = (CFF_Font)face->extra.data;
 
-    FT_Matrix     font_matrix;
-    FT_Vector     font_offset;
+    FT_Matrix    font_matrix;
+    FT_Vector    font_offset;
 
+
+    /* in a CID-keyed font, consider `glyph_index' as a CID and map */
+    /* it immediately to the real glyph_index -- if it isn't a      */
+    /* subsetted font, glyph_indices and CIDs are identical, though */
+    if ( cff->top_font.font_dict.cid_registry != 0xFFFFU &&
+         cff->charset.cids )
+    {
+      glyph_index = cff_charset_cid_to_gindex( &cff->charset, glyph_index );
+      if ( glyph_index == 0 )
+        return CFF_Err_Invalid_Argument;
+    }
+    else if ( glyph_index >= cff->num_glyphs )
+      return CFF_Err_Invalid_Argument;
 
     if ( load_flags & FT_LOAD_NO_RECURSE )
       load_flags |= FT_LOAD_NO_SCALE | FT_LOAD_NO_HINTING;
@@ -2376,18 +2389,6 @@
       FT_ULong  charstring_len;
 
 
-      /* in a CID-keyed font, consider `glyph_index' as a CID and map */
-      /* it immediately to the real glyph_index -- if it isn't a      */
-      /* subsetted font, glyph_indices and CIDs are identical, though */
-      if ( cff->top_font.font_dict.cid_registry != 0xFFFFU &&
-           cff->charset.cids )
-      {
-        if ( glyph_index < cff->charset.max_cid )
-          glyph_index = cff->charset.cids[glyph_index];
-        else
-          glyph_index = 0;
-      }
-
       cff_decoder_init( &decoder, face, size, glyph, hinting,
                         FT_LOAD_TARGET_MODE( load_flags ) );
 
@@ -2421,13 +2422,15 @@
         /* See how charstring loads at cff_index_access_element() in      */
         /* cffload.c.                                                     */
         {
-          CFF_IndexRec csindex = cff->charstrings_index;
+          CFF_Index csindex = &cff->charstrings_index;
 
 
-          glyph->root.control_data =
-            csindex.bytes + csindex.offsets[glyph_index] - 1;
-          glyph->root.control_len =
-            charstring_len;
+          if ( csindex->offsets )
+          {
+            glyph->root.control_data = csindex->bytes +
+                                         csindex->offsets[glyph_index] - 1;
+            glyph->root.control_len  = charstring_len;
+          }
         }
       }
 

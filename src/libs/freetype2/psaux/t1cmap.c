@@ -276,7 +276,8 @@
     return psnames->unicodes_init( memory,
                                    unicodes,
                                    face->type1.num_glyphs,
-                                   (PS_Glyph_NameFunc)&t1_get_glyph_name,
+                                   (PS_GetGlyphNameFunc)&t1_get_glyph_name,
+                                   (PS_FreeGlyphNameFunc)NULL,
                                    (FT_Pointer)face );
   }
 

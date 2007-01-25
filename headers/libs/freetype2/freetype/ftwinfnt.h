@@ -64,7 +64,7 @@ FT_BEGIN_HEADER
    *
    * @values:
    *   FT_WinFNT_ID_DEFAULT ::
-   *     This is used for font enumeration and font creation as a 
+   *     This is used for font enumeration and font creation as a
    *     `don't care' value.  Valid font files don't contain this value.
    *     When querying for information about the character set of the font
    *     that is currently selected into a specified device context, this
@@ -95,7 +95,7 @@ FT_BEGIN_HEADER
    *       Windows have.  It is one of the OEM codepages from
    *
    *         http://www.microsoft.com/globaldev/reference/cphome.mspx,
-   *    
+   *
    *       and is used for the `DOS boxes', to support legacy applications.
    *       A German Windows version for example usually uses ANSI codepage
    *       1252 and OEM codepage 850.
@@ -130,10 +130,10 @@ FT_BEGIN_HEADER
    *
    *   FT_WinFNT_ID_CP1253 ::
    *     A superset of Greek ISO 8859-7 (with minor modifications).
-   *     
+   *
    *   FT_WinFNT_ID_CP1254 ::
    *     A superset of Turkish ISO 8859-9.
-   *     
+   *
    *   FT_WinFNT_ID_CP1255 ::
    *     A superset of Hebrew ISO 8859-8 (with some modifications).
    *

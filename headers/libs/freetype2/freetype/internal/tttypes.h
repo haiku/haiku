@@ -5,7 +5,7 @@
 /*    Basic SFNT/TrueType type definitions and interface (specification    */
 /*    only).                                                               */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2004, 2005, 2006 by                         */
+/*  Copyright 1996-2001, 2002, 2004, 2005, 2006, 2007 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1395,7 +1395,6 @@ FT_BEGIN_HEADER
 
     /* since version 2.2 */
 
-#ifdef FT_OPTIMIZE_MEMORY
     FT_Byte*              horz_metrics;
     FT_ULong              horz_metrics_size;
 
@@ -1420,11 +1419,14 @@ FT_BEGIN_HEADER
     FT_UInt               num_kern_tables;
     FT_UInt32             kern_avail_bits;
     FT_UInt32             kern_order_bits;
-#endif
 
 #ifdef TT_CONFIG_OPTION_BDF
     TT_BDFRec             bdf;
 #endif /* TT_CONFIG_OPTION_BDF */
+
+    /* since 2.3.0 */
+    FT_ULong              horz_metrics_offset;
+    FT_ULong              vert_metrics_offset;
 
   } TT_FaceRec;
 
@@ -1458,19 +1460,24 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*     contours     :: The contours end points.                          */
   /*                                                                       */
+  /*     first_point  :: Offset of the current subglyph's first point.     */
+  /*                                                                       */
   typedef struct  TT_GlyphZoneRec_
   {
     FT_Memory   memory;
     FT_UShort   max_points;
     FT_UShort   max_contours;
-    FT_UShort   n_points;   /* number of points in zone    */
-    FT_Short    n_contours; /* number of contours          */
+    FT_UShort   n_points;    /* number of points in zone    */
+    FT_Short    n_contours;  /* number of contours          */
 
-    FT_Vector*  org;        /* original point coordinates  */
-    FT_Vector*  cur;        /* current point coordinates   */
+    FT_Vector*  org;         /* original point coordinates  */
+    FT_Vector*  cur;         /* current point coordinates   */
+    FT_Vector*  orus;        /* original (unscaled) point coordinates */
 
-    FT_Byte*    tags;       /* current touch flags         */
-    FT_UShort*  contours;   /* contour end points          */
+    FT_Byte*    tags;        /* current touch flags         */
+    FT_UShort*  contours;    /* contour end points          */
+
+    FT_UShort   first_point; /* offset of first (#0) point  */
 
   } TT_GlyphZoneRec, *TT_GlyphZone;
 
@@ -1520,6 +1527,10 @@ FT_BEGIN_HEADER
     FT_Int           vadvance;
     FT_Vector        pp3;
     FT_Vector        pp4;
+
+    /* since version 2.2.1 */
+    FT_Byte*         cursor;
+    FT_Byte*         limit;
 
   } TT_LoaderRec;
 

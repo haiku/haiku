@@ -182,11 +182,12 @@
 
   /* Build a table that maps Unicode values to glyph indices. */
   static FT_Error
-  ps_unicodes_init( FT_Memory          memory,
-                    PS_Unicodes        table,
-                    FT_UInt            num_glyphs,
-                    PS_Glyph_NameFunc  get_glyph_name,
-                    FT_Pointer         glyph_data )
+  ps_unicodes_init( FT_Memory             memory,
+                    PS_Unicodes           table,
+                    FT_UInt               num_glyphs,
+                    PS_GetGlyphNameFunc   get_glyph_name,
+                    PS_FreeGlyphNameFunc  free_glyph_name,
+                    FT_Pointer            glyph_data )
   {
     FT_Error  error;
 
@@ -220,6 +221,9 @@
             map->glyph_index = n;
             map++;
           }
+
+          if ( free_glyph_name )
+            free_glyph_name( glyph_data, gname );
         }
       }
 

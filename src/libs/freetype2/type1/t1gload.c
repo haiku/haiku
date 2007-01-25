@@ -155,6 +155,8 @@
     PSAux_Service  psaux = (PSAux_Service)face->psaux;
 
 
+    FT_ASSERT( ( face->len_buildchar == 0 ) == ( face->buildchar == NULL ) );
+
     *max_advance = 0;
 
     /* initialize load decoder */
@@ -173,9 +175,12 @@
     decoder.builder.metrics_only = 1;
     decoder.builder.load_points  = 0;
 
-    decoder.num_subrs = type1->num_subrs;
-    decoder.subrs     = type1->subrs;
-    decoder.subrs_len = type1->subrs_len;
+    decoder.num_subrs     = type1->num_subrs;
+    decoder.subrs         = type1->subrs;
+    decoder.subrs_len     = type1->subrs_len;
+
+    decoder.buildchar     = face->buildchar;
+    decoder.len_buildchar = face->len_buildchar;
 
     *max_advance = 0;
 
@@ -190,6 +195,8 @@
 
       /* ignore the error if one occurred - skip to next glyph */
     }
+
+    psaux->t1_decoder_funcs->done( &decoder );
 
     return T1_Err_Ok;
   }
@@ -212,10 +219,19 @@
     FT_Matrix               font_matrix;
     FT_Vector               font_offset;
     FT_Data                 glyph_data;
+    FT_Bool                 must_finish_decoder = FALSE;
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
     FT_Bool                 glyph_data_loaded = 0;
 #endif
 
+
+    if ( glyph_index >= (FT_UInt)face->root.num_glyphs )
+    {
+      error = T1_Err_Invalid_Argument;
+      goto Exit;
+    }
+
+    FT_ASSERT( ( face->len_buildchar == 0 ) == ( face->buildchar == NULL ) );
 
     if ( load_flags & FT_LOAD_NO_RECURSE )
       load_flags |= FT_LOAD_NO_SCALE | FT_LOAD_NO_HINTING;
@@ -243,12 +259,17 @@
     if ( error )
       goto Exit;
 
+    must_finish_decoder = TRUE;
+
     decoder.builder.no_recurse = FT_BOOL(
                                    ( load_flags & FT_LOAD_NO_RECURSE ) != 0 );
 
-    decoder.num_subrs = type1->num_subrs;
-    decoder.subrs     = type1->subrs;
-    decoder.subrs_len = type1->subrs_len;
+    decoder.num_subrs     = type1->num_subrs;
+    decoder.subrs         = type1->subrs;
+    decoder.subrs_len     = type1->subrs_len;
+
+    decoder.buildchar     = face->buildchar;
+    decoder.len_buildchar = face->len_buildchar;
 
     /* now load the unscaled outline */
     error = T1_Parse_Glyph_And_Get_Char_String( &decoder, glyph_index,
@@ -264,6 +285,8 @@
 
     /* save new glyph tables */
     decoder_funcs->done( &decoder );
+
+    must_finish_decoder = FALSE;
 
     /* now, set the metrics -- this is rather simple, as   */
     /* the left side bearing is the xMin, and the top side */
@@ -310,11 +333,14 @@
 
 #if 1
         /* apply the font matrix, if any */
-        FT_Outline_Transform( &glyph->root.outline, &font_matrix );
+        if ( font_matrix.xx != 0x10000L || font_matrix.yy != font_matrix.xx ||
+             font_matrix.xy != 0        || font_matrix.yx != 0              )
+          FT_Outline_Transform( &glyph->root.outline, &font_matrix );
 
-        FT_Outline_Translate( &glyph->root.outline,
-                              font_offset.x,
-                              font_offset.y );
+        if ( font_offset.x || font_offset.y )
+          FT_Outline_Translate( &glyph->root.outline,
+                                font_offset.x,
+                                font_offset.y );
 
         advance.x = metrics->horiAdvance;
         advance.y = 0;
@@ -385,6 +411,9 @@
       glyph->root.control_len  = 0;
     }
 #endif
+
+    if ( must_finish_decoder )
+      decoder_funcs->done( &decoder );
 
     return error;
   }

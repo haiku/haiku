@@ -30,7 +30,9 @@
     FT_ZERO( loader );
 
     af_glyph_hints_init( &loader->hints, memory );
-
+#ifdef AF_DEBUG
+    _af_debug_hints = &loader->hints;
+#endif
     return FT_GlyphLoader_New( memory, &loader->gloader );
   }
 
@@ -71,6 +73,9 @@
     loader->face    = NULL;
     loader->globals = NULL;
 
+#ifdef AF_DEBUG
+    _af_debug_hints = NULL;
+#endif
     FT_GlyphLoader_Done( loader->gloader );
     loader->gloader = NULL;
   }
@@ -200,6 +205,12 @@
 
           loader->pp1.x = FT_PIX_ROUND( pp1x_uh );
           loader->pp2.x = FT_PIX_ROUND( pp2x_uh );
+
+          if ( loader->pp1.x >= new_lsb )
+            loader->pp1.x -= 64;
+
+          if ( loader->pp2.x <= pp2x_uh )
+            loader->pp2.x += 64;
 
           slot->lsb_delta = loader->pp1.x - pp1x_uh;
           slot->rsb_delta = loader->pp2.x - pp2x_uh;

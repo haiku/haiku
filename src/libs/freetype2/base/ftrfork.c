@@ -647,7 +647,7 @@
     error = raccess_guess_apple_double( library, stream2, file_name,
                                         &nouse, result_offset );
 
-    FT_Stream_Close( stream2 );
+    FT_Stream_Free( stream2, 0 );
 
     return error;
   }

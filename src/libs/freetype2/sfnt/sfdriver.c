@@ -412,9 +412,9 @@
   {
     FT_UNUSED( face );
     FT_UNUSED( stream );
-    
+
     return FT_Err_Unimplemented_Feature;
-  }                          
+  }
 
 
   FT_CALLBACK_DEF( void )
@@ -449,8 +449,8 @@
 
     *astrike_index = 0x7FFFFFFFUL;
 
-    return tt_face_set_sbit_strike( face, &req, astrike_index );    
-  }                                
+    return tt_face_set_sbit_strike( face, &req, astrike_index );
+  }
 
 
   FT_CALLBACK_DEF( FT_Error )
@@ -459,15 +459,15 @@
   {
     FT_UNUSED( face );
     FT_UNUSED( stream );
-    
+
     /*
-     *  This function was originally implemented to load the sbit table. 
+     *  This function was originally implemented to load the sbit table.
      *  However, it has been replaced by `tt_face_load_eblc', and this stub
      *  is only there for some rogue clients which would want to call it
      *  directly (which doesn't make much sense).
      */
     return FT_Err_Unimplemented_Feature;
-  }                          
+  }
 
 
   FT_CALLBACK_DEF( void )
@@ -476,8 +476,8 @@
     /* nothing to do in this stub */
     FT_UNUSED( face );
   }
-  
-  
+
+
   FT_CALLBACK_DEF( FT_Error )
   tt_face_load_charmap_stub( TT_Face    face,
                              void*      cmap,
@@ -486,9 +486,9 @@
     FT_UNUSED( face );
     FT_UNUSED( cmap );
     FT_UNUSED( input );
-    
+
     return FT_Err_Unimplemented_Feature;
-  }                             
+  }
 
 
   FT_CALLBACK_DEF( FT_Error )
@@ -497,10 +497,10 @@
   {
     FT_UNUSED( face );
     FT_UNUSED( cmap );
-    
+
     return 0;
-  }                             
-  
+  }
+
 #endif /* FT_CONFIG_OPTION_OLD_INTERNALS */
 
 
@@ -600,7 +600,7 @@
     0,
     0,
     0,
-#endif    
+#endif
 
     tt_face_get_metrics
   };

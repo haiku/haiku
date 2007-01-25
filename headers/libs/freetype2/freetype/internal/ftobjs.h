@@ -29,6 +29,7 @@
 #include <ft2build.h>
 #include FT_RENDER_H
 #include FT_SIZES_H
+#include FT_LCD_FILTER_H
 #include FT_INTERNAL_MEMORY_H
 #include FT_INTERNAL_GLYPH_LOADER_H
 #include FT_INTERNAL_DRIVER_H
@@ -211,6 +212,12 @@ FT_BEGIN_HEADER
   /*      this data when first opened.  This field exists only if          */
   /*      @FT_CONFIG_OPTION_INCREMENTAL is defined.                        */
   /*                                                                       */
+  /*    ignore_unpatented_hinter ::                                        */
+  /*      This boolean flag instructs the glyph loader to ignore the       */
+  /*      native font hinter, if one is found.  This is exclusively used   */
+  /*      in the case when the unpatented hinter is compiled within the    */
+  /*      library.                                                         */
+  /*                                                                       */
   typedef struct  FT_Face_InternalRec_
   {
 #ifdef FT_CONFIG_OPTION_OLD_INTERNALS
@@ -226,6 +233,8 @@ FT_BEGIN_HEADER
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
     FT_Incremental_InterfaceRec*  incremental_interface;
 #endif
+
+    FT_Bool             ignore_unpatented_hinter;
 
   } FT_Face_InternalRec;
 
@@ -621,10 +630,15 @@ FT_BEGIN_HEADER
 
 
   /* Set this debug hook to a non-null pointer to force unpatented hinting */
-  /* for all faces when both TT_CONFIG_OPTION_BYTECODE_INTERPRETER and     */
-  /* TT_CONFIG_OPTION_UNPATENTED_HINTING are defined. this is only used    */
+  /* for all faces when both TT_USE_BYTECODE_INTERPRETER and               */
+  /* TT_CONFIG_OPTION_UNPATENTED_HINTING are defined.  This is only used   */
   /* during debugging.                                                     */
 #define FT_DEBUG_HOOK_UNPATENTED_HINTING  1
+
+
+  typedef void  (*FT_Bitmap_LcdFilterFunc)( FT_Bitmap*      bitmap,
+                                            FT_Render_Mode  render_mode,
+                                            FT_Library      library );
 
 
   /*************************************************************************/
@@ -699,6 +713,13 @@ FT_BEGIN_HEADER
     FT_ULong           raster_pool_size; /* size of render pool in bytes */
 
     FT_DebugHook_Func  debug_hooks[4];
+
+#ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+    FT_LcdFilter             lcd_filter;
+    FT_Int                   lcd_extra;        /* number of extra pixels */
+    FT_Byte                  lcd_weights[7];   /* filter weights, if any */
+    FT_Bitmap_LcdFilterFunc  lcd_filter_func;  /* filtering callback     */
+#endif
 
   } FT_LibraryRec;
 

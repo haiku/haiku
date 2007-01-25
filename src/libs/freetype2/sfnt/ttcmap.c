@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType character mapping table (cmap) support (body).              */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005, 2006 by                              */
+/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007 by                        */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -708,7 +708,7 @@
   tt_cmap4_next( TT_CMap4  cmap )
   {
     FT_UInt  charcode;
-    
+
 
     if ( cmap->cur_charcode >= 0xFFFFUL )
       goto Fail;
@@ -862,18 +862,19 @@
       FT_UInt  start, end, offset, n;
       FT_UInt  last_start = 0, last_end = 0;
       FT_Int   delta;
+      FT_Byte*  p_start   = starts;
+      FT_Byte*  p_end     = ends;
+      FT_Byte*  p_delta   = deltas;
+      FT_Byte*  p_offset  = offsets;
 
 
       for ( n = 0; n < num_segs; n++ )
       {
-        p = starts + n * 2;
-        start = TT_PEEK_USHORT( p );
-        p = ends + n * 2;
-        end = TT_PEEK_USHORT( p );
-        p = deltas + n * 2;
-        delta = TT_PEEK_SHORT( p );
-        p = offsets + n * 2;
-        offset = TT_PEEK_USHORT( p );
+        p      = p_offset;
+        start  = TT_NEXT_USHORT( p_start );
+        end    = TT_NEXT_USHORT( p_end );
+        delta  = TT_NEXT_SHORT( p_delta );
+        offset = TT_NEXT_USHORT( p_offset );
 
         if ( start > end )
           FT_INVALID_DATA;
@@ -983,7 +984,7 @@
     for ( ; charcode <= 0xFFFFU; charcode++ )
     {
       FT_Byte*  q;
-      
+
 
       p = cmap->data + 14;               /* ends table   */
       q = cmap->data + 16 + num_segs2;   /* starts table */
@@ -1039,7 +1040,7 @@
     FT_UInt   charcode = *pcharcode;
     FT_UInt   gindex   = 0;
     FT_Byte*  p;
-    
+
 
     p = cmap->data + 6;
     num_segs2 = FT_PAD_FLOOR( TT_PEEK_USHORT( p ), 2 );
@@ -1094,14 +1095,19 @@
           /* search in segments before the current segment */
           for ( i = max ; i > 0; i-- )
           {
-            FT_UInt  prev_end;
+            FT_UInt   prev_end;
+            FT_Byte*  old_p;
 
 
-            p = cmap->data + 14 + ( i - 1 ) * 2;
+            old_p    = p;
+            p        = cmap->data + 14 + ( i - 1 ) * 2;
             prev_end = TT_PEEK_USHORT( p );
 
             if ( charcode > prev_end )
+            {
+              p = old_p;
               break;
+            }
 
             end    = prev_end;
             p     += 2 + num_segs2;
@@ -2273,7 +2279,7 @@
 
       if ( offset && offset <= face->cmap_size - 2 )
       {
-        FT_Byte*                       cmap   = table + offset;
+        FT_Byte* volatile              cmap   = table + offset;
         volatile FT_UInt               format = TT_PEEK_USHORT( cmap );
         const TT_CMap_Class* volatile  pclazz = tt_cmap_classes;
         TT_CMap_Class volatile         clazz;

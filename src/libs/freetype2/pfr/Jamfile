@@ -13,7 +13,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = pfrdrivr  pfrgload  pfrload  pfrobjs pfrcmap pfrsbit ;
+    _sources = pfrdrivr pfrgload pfrload pfrobjs pfrcmap pfrsbit ;
   }
   else
   {

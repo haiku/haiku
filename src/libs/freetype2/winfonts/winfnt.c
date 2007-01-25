@@ -649,7 +649,8 @@
     FT_UNUSED( load_flags );
 
 
-    if ( !face || !font )
+    if ( !face || !font ||
+         glyph_index >= (FT_UInt)( FT_FACE( face )->num_glyphs ) )
     {
       error = FNT_Err_Invalid_Argument;
       goto Exit;

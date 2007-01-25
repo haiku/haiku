@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Load the metrics tables common to TTF and OTF fonts (body).          */
 /*                                                                         */
-/*  Copyright 2006 by                                                      */
+/*  Copyright 2006, 2007 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -60,7 +60,7 @@
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
 
   FT_LOCAL_DEF( FT_Error )
   tt_face_load_hmtx( TT_Face    face,
@@ -68,34 +68,30 @@
                      FT_Bool    vertical )
   {
     FT_Error   error;
-    FT_ULong   table_size;
-    FT_Byte**  ptable;
+    FT_ULong   tag, table_size;
+    FT_ULong*  ptable_offset;
     FT_ULong*  ptable_size;
-    
-    
+
+
     if ( vertical )
     {
-      error = face->goto_table( face, TTAG_vmtx, stream, &table_size );
-      if ( error )
-        goto Fail;
-
-      ptable      = &face->vert_metrics;
-      ptable_size = &face->vert_metrics_size;
+      tag           = TTAG_vmtx;
+      ptable_offset = &face->vert_metrics_offset;
+      ptable_size   = &face->vert_metrics_size;
     }
     else
     {
-      error = face->goto_table( face, TTAG_hmtx, stream, &table_size );
-      if ( error )
-        goto Fail;
-
-      ptable      = &face->horz_metrics;
-      ptable_size = &face->horz_metrics_size;
+      tag           = TTAG_hmtx;
+      ptable_offset = &face->horz_metrics_offset;
+      ptable_size   = &face->horz_metrics_size;
     }
-    
-    if ( FT_FRAME_EXTRACT( table_size, *ptable ) )
+
+    error = face->goto_table( face, tag, stream, &table_size );
+    if ( error )
       goto Fail;
-      
-    *ptable_size = table_size;
+
+    *ptable_size   = table_size;
+    *ptable_offset = FT_STREAM_POS();
 
   Fail:
     return error;
@@ -116,6 +112,7 @@
 
     TT_LongMetrics *   longs;
     TT_ShortMetrics**  shorts;
+    FT_Byte*           p;
 
 
     if ( vertical )
@@ -175,6 +172,8 @@
     if ( FT_FRAME_ENTER( table_len ) )
       goto Fail;
 
+    p = stream->cursor;
+
     {
       TT_LongMetrics  cur   = *longs;
       TT_LongMetrics  limit = cur + num_longs;
@@ -182,8 +181,8 @@
 
       for ( ; cur < limit; cur++ )
       {
-        cur->advance = FT_GET_USHORT();
-        cur->bearing = FT_GET_SHORT();
+        cur->advance = FT_NEXT_USHORT( p );
+        cur->bearing = FT_NEXT_SHORT( p );
       }
     }
 
@@ -195,7 +194,7 @@
 
 
       for ( ; cur < limit; cur++ )
-        *cur = FT_GET_SHORT();
+        *cur = FT_NEXT_SHORT( p );
 
       /* We fill up the missing left side bearings with the     */
       /* last valid value.  Since this will occur for buggy CJK */
@@ -313,7 +312,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    tt_face_get_metrics                                                */ 
+  /*    tt_face_get_metrics                                                */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Returns the horizontal or vertical metrics in font units for a     */
@@ -331,7 +330,7 @@
   /*                                                                       */
   /*    advance :: The advance width resp. advance height.                 */
   /*                                                                       */
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
 
   FT_LOCAL_DEF( FT_Error )
   tt_face_get_metrics( TT_Face     face,
@@ -340,24 +339,27 @@
                        FT_Short   *abearing,
                        FT_UShort  *aadvance )
   {
+    FT_Error        error;
+    FT_Stream       stream = face->root.stream;
     TT_HoriHeader*  header;
-    FT_Byte*        p;
-    FT_Byte*        limit;
+    FT_ULong        table_pos, table_size, table_end;
     FT_UShort       k;
 
 
     if ( vertical )
     {
-      header = (TT_HoriHeader*)&face->vertical;
-      p      = face->vert_metrics;
-      limit  = p + face->vert_metrics_size;
+      header     = (TT_HoriHeader*)&face->vertical;
+      table_pos  = face->vert_metrics_offset;
+      table_size = face->vert_metrics_size;
     }
     else
     {
-      header = &face->horizontal;
-      p      = face->horz_metrics;
-      limit  = p + face->horz_metrics_size;
+      header     = &face->horizontal;
+      table_pos  = face->horz_metrics_offset;
+      table_size = face->horz_metrics_size;
     }
+
+    table_end = table_pos + table_size;
 
     k = header->number_Of_HMetrics;
 
@@ -365,25 +367,33 @@
     {
       if ( gindex < (FT_UInt)k )
       {
-        p += 4 * gindex;
-        if ( p + 4 > limit )
+        table_pos += 4 * gindex;
+        if ( table_pos + 6 > table_end )
           goto NoData;
 
-        *aadvance = FT_NEXT_USHORT( p );
-        *abearing = FT_NEXT_SHORT( p );
+        if ( FT_STREAM_SEEK( table_pos ) ||
+             FT_READ_USHORT( *aadvance)  ||
+             FT_READ_SHORT( *abearing )  )
+          goto NoData;
       }
       else
       {
-        p += 4 * ( k - 1 );
-        if ( p + 4 > limit )
+        table_pos += 4 * ( k - 1 );
+        if ( table_pos + 4 > table_end )
           goto NoData;
 
-        *aadvance = FT_NEXT_USHORT( p );
-        p += 2 + 2 * ( gindex - k );
-        if ( p + 2 > limit )
+        if ( FT_STREAM_SEEK( table_pos ) ||
+             FT_READ_USHORT( *aadvance ) )
+          goto NoData;
+
+        table_pos += 4 + 2 * ( gindex - k );
+        if ( table_pos + 2 > table_end )
           *abearing = 0;
         else
-          *abearing = FT_PEEK_SHORT( p );
+        {
+          if ( !FT_STREAM_SEEK( table_pos ) )
+            (void)FT_READ_SHORT( *abearing );
+        }
       }
     }
     else
@@ -396,7 +406,7 @@
     return SFNT_Err_Ok;
   }
 
-#else /* !OPTIMIZE_MEMORY || OLD_INTERNALS */
+#else /* OLD_INTERNALS */
 
   FT_LOCAL_DEF( FT_Error )
   tt_face_get_metrics( TT_Face     face,

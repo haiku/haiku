@@ -414,7 +414,7 @@ FT_BEGIN_HEADER
   /*                                                                    */
   /* Useful to optimize access to memory-based streams transparently.   */
   /*                                                                    */
-  /* All extracted frames must be `freed` with a call to the function   */
+  /* All extracted frames must be `freed' with a call to the function   */
   /* FT_Stream_ReleaseFrame().                                          */
   /*                                                                    */
   FT_BASE( FT_Error )

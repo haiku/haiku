@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter hinting routines (body).                                 */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006 by                                    */
+/*  Copyright 2003, 2004, 2005, 2006, 2007 by                              */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -18,6 +18,7 @@
 
 #include "afhints.h"
 #include "aferrors.h"
+#include FT_INTERNAL_CALC_H
 
 
   FT_LOCAL_DEF( FT_Error )
@@ -53,7 +54,9 @@
     }
 
     segment = axis->segments + axis->num_segments++;
+#if 0
     FT_ZERO( segment );
+#endif
 
   Exit:
     *asegment = segment;
@@ -188,8 +191,7 @@
   void
   af_glyph_hints_dump_segments( AF_GlyphHints  hints )
   {
-    AF_Point  points = hints->points;
-    FT_Int    dimension;
+    FT_Int  dimension;
 
 
     for ( dimension = 1; dimension >= 0; dimension-- )
@@ -203,19 +205,18 @@
       printf ( "Table of %s segments:\n",
                dimension == AF_DIMENSION_HORZ ? "vertical" : "horizontal" );
       printf ( "  [ index |  pos |  dir  | link | serif |"
-               " numl | first | start ]\n" );
+               " height  | extra ]\n" );
 
       for ( seg = segments; seg < limit; seg++ )
       {
-        printf ( "  [ %5d | %4d | %5s | %4d | %5d | %4d | %5d | %5d ]\n",
+        printf ( "  [ %5d | %4d | %5s | %4d | %5d | %5d | %5d ]\n",
                  seg - segments,
                  (int)seg->pos,
-                 af_dir_str( seg->dir ),
+                 af_dir_str( (AF_Direction)seg->dir ),
                  AF_INDEX_NUM( seg->link, segments ),
                  AF_INDEX_NUM( seg->serif, segments ),
-                 (int)seg->num_linked,
-                 seg->first - points,
-                 seg->last - points );
+                 seg->height,
+                 seg->height - ( seg->max_coord - seg->min_coord ) );
       }
       printf( "\n" );
     }
@@ -251,7 +252,7 @@
                  " %5d |   %c  | %5.2f | %5.2f ]\n",
                  edge - edges,
                  (int)edge->fpos,
-                 af_dir_str( edge->dir ),
+                 af_dir_str( (AF_Direction)edge->dir ),
                  AF_INDEX_NUM( edge->link, edges ),
                  AF_INDEX_NUM( edge->serif, edges ),
                  edge->blue_edge ? 'y' : 'n',
@@ -262,8 +263,32 @@
     }
   }
 
-#endif /* AF_DEBUG */
+#else /* !AF_DEBUG */
 
+  /* these empty stubs are only used to link the `ftgrid' test program */
+  /* when debugging is disabled                                        */
+
+  void
+  af_glyph_hints_dump_points( AF_GlyphHints  hints )
+  {
+    FT_UNUSED( hints );
+  }
+
+
+  void
+  af_glyph_hints_dump_segments( AF_GlyphHints  hints )
+  {
+    FT_UNUSED( hints );
+  }
+
+
+  void
+  af_glyph_hints_dump_edges( AF_GlyphHints  hints )
+  {
+    FT_UNUSED( hints );
+  }
+
+#endif /* !AF_DEBUG */
 
 
   /* compute the direction value of a given vector */
@@ -271,50 +296,47 @@
   af_direction_compute( FT_Pos  dx,
                         FT_Pos  dy )
   {
+
 #if 1
-    AF_Direction  dir = AF_DIR_NONE;
+
+    FT_Pos        ll, ss;  /* long and short arm lengths */
+    AF_Direction  dir;     /* candidate direction        */
 
 
-    /* atan(1/12) == 4.7 degrees */
-
-    if ( dx < 0 )
+    if ( dy >= dx )
     {
-      if ( dy < 0 )
+      if ( dy >= -dx )
       {
-        if ( -dx * 12 < -dy )
-          dir = AF_DIR_DOWN;
-
-        else if ( -dy * 12 < -dx )
-          dir = AF_DIR_LEFT;
+        dir = AF_DIR_UP;
+        ll  = dy;
+        ss  = dx;
       }
-      else /* dy >= 0 */
+      else
       {
-        if ( -dx * 12 < dy )
-          dir = AF_DIR_UP;
-
-        else if ( dy * 12 < -dx )
-          dir = AF_DIR_LEFT;
+        dir = AF_DIR_LEFT;
+        ll  = -dx;
+        ss  = dy;
       }
     }
-    else /* dx >= 0 */
+    else /* dy < dx */
     {
-      if ( dy < 0 )
+      if ( dy >= -dx )
       {
-        if ( dx * 12 < -dy )
-          dir = AF_DIR_DOWN;
-
-        else if ( -dy * 12 < dx )
-          dir = AF_DIR_RIGHT;
+        dir = AF_DIR_RIGHT;
+        ll  = dx;
+        ss  = dy;
       }
-      else  /* dy >= 0 */
+      else
       {
-        if ( dx * 12 < dy )
-          dir = AF_DIR_UP;
-
-        else if ( dy * 12 < dx )
-          dir = AF_DIR_RIGHT;
+        dir = AF_DIR_DOWN;
+        ll  = dy;
+        ss  = dx;
       }
     }
+
+    ss *= 12;
+    if ( FT_ABS(ll) <= FT_ABS(ss) )
+      dir = AF_DIR_NONE;
 
     return dir;
 
@@ -348,6 +370,122 @@
 
 
   /* compute all inflex points in a given glyph */
+
+#if 1
+
+  static void
+  af_glyph_hints_compute_inflections( AF_GlyphHints  hints )
+  {
+    AF_Point*  contour       = hints->contours;
+    AF_Point*  contour_limit = contour + hints->num_contours;
+
+
+    /* do each contour separately */
+    for ( ; contour < contour_limit; contour++ )
+    {
+      AF_Point  point = contour[0];
+      AF_Point  first = point;
+      AF_Point  start = point;
+      AF_Point  end   = point;
+      AF_Point  before;
+      AF_Point  after;
+      FT_Pos    in_x, in_y, out_x, out_y;
+      AF_Angle  orient_prev, orient_cur;
+      FT_Int    finished = 0;
+
+
+      /* compute first segment in contour */
+      first = point;
+
+      start = end = first;
+      do
+      {
+        end = end->next;
+        if ( end == first )
+          goto Skip;
+
+        in_x = end->fx - start->fx;
+        in_y = end->fy - start->fy;
+
+      } while ( in_x == 0 && in_y == 0 );
+
+      /* extend the segment start whenever possible */
+      before = start;
+      do
+      {
+        do
+        {
+          start  = before;
+          before = before->prev;
+          if ( before == first )
+            goto Skip;
+
+          out_x = start->fx - before->fx;
+          out_y = start->fy - before->fy;
+
+        } while ( out_x == 0 && out_y == 0 );
+
+        orient_prev = ft_corner_orientation( in_x, in_y, out_x, out_y );
+
+      } while ( orient_prev == 0 );
+
+      first = start;
+
+      in_x = out_x;
+      in_y = out_y;
+
+      /* now process all segments in the contour */
+      do
+      {
+        /* first, extend current segment's end whenever possible */
+        after = end;
+        do
+        {
+          do
+          {
+            end   = after;
+            after = after->next;
+            if ( after == first )
+              finished = 1;
+
+            out_x = after->fx - end->fx;
+            out_y = after->fy - end->fy;
+
+          } while ( out_x == 0 && out_y == 0 );
+
+          orient_cur = ft_corner_orientation( in_x, in_y, out_x, out_y );
+
+        } while ( orient_cur == 0 );
+
+        if ( ( orient_prev + orient_cur ) == 0 )
+        {
+          /* we have an inflection point here */
+          do
+          {
+            start->flags |= AF_FLAG_INFLECTION;
+            start = start->next;
+
+          } while ( start != end );
+
+          start->flags |= AF_FLAG_INFLECTION;
+        }
+
+        start = end;
+        end   = after;
+
+        orient_prev = orient_cur;
+        in_x        = out_x;
+        in_y        = out_y;
+
+      } while ( !finished );
+
+    Skip:
+      ;
+    }
+  }
+
+#else /* old code */
+
   static void
   af_glyph_hints_compute_inflections( AF_GlyphHints  hints )
   {
@@ -454,6 +592,8 @@
       ;
     }
   }
+
+#endif /* old code */
 
 
   FT_LOCAL_DEF( void )
@@ -702,6 +842,17 @@
           }
           else if ( point->out_dir == point->in_dir )
           {
+
+#if 1
+
+            if ( point->out_dir != AF_DIR_NONE )
+              goto Is_Weak_Point;
+
+            if ( ft_corner_is_flat( in_x, in_y, out_x, out_y ) )
+              goto Is_Weak_Point;
+
+#else /* old code */
+
             AF_Angle  angle_in, angle_out, delta;
 
 
@@ -715,6 +866,9 @@
 
             if ( delta < 2 && delta > -2 )
               goto Is_Weak_Point;
+
+#endif /* old code */
+
           }
           else if ( point->in_dir == -point->out_dir )
             goto Is_Weak_Point;
@@ -1152,7 +1306,7 @@
     AF_Point  points       = hints->points;
     AF_Point  points_limit = points + hints->num_points;
     AF_Point  point;
-    
+
 
     if ( dim == AF_DIMENSION_HORZ )
     {

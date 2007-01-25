@@ -38,7 +38,7 @@ UseFreeTypeHeaders ;
   local  _sources =  system  init    glyph  mm      bdf
                      bbox    debug   xf86   type1   pfr
                      stroke  winfnt  otval  bitmap  synth
-                     gxval
+                     gxval   lcdfil  gasp
                      ;
 
   FT2_Library  $(FT2_LIB) : ft$(_sources).c ;

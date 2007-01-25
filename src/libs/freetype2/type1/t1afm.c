@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    AFM support for Type 1 fonts (body).                                 */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -73,7 +73,7 @@
 
 
 #undef  KERN_INDEX
-#define KERN_INDEX( g1, g2 )  ( ( (FT_ULong)g1 << 16 ) | g2 )
+#define KERN_INDEX( g1, g2 )  ( ( (FT_ULong)(g1) << 16 ) | (g2) )
 
 
   /* compare two kerning pairs */
@@ -233,14 +233,9 @@
     T1_Font        t1_font = &( (T1_Face)t1_face )->type1;
 
 
-    if ( FT_NEW( fi ) )
-      return error;
-
-    if ( FT_FRAME_ENTER( stream->size ) )
-    {
-      FT_FREE( fi );
-      return error;
-    }
+    if ( FT_NEW( fi )                   ||
+         FT_FRAME_ENTER( stream->size ) )
+      goto Exit;
 
     fi->FontBBox  = t1_font->font_bbox;
     fi->Ascender  = t1_font->font_bbox.yMax;
@@ -270,8 +265,9 @@
       FT_Byte*  start = stream->cursor;
 
 
+      /* MS Windows allows versions up to 0x3FF without complaining */
       if ( stream->size > 6                              &&
-           start[0] == 0x00 && start[1] == 0x01          &&
+           start[1] < 4                                  &&
            FT_PEEK_ULONG_LE( start + 2 ) == stream->size )
         error = T1_Read_PFM( t1_face, stream, fi );
     }
@@ -292,10 +288,15 @@
       {
         t1_face->face_flags |= FT_FACE_FLAG_KERNING;
         ( (T1_Face)t1_face )->afm_data = fi;
+        fi = NULL;
       }
     }
 
     FT_FRAME_EXIT();
+
+  Exit:
+    if ( fi != NULL )
+      T1_Done_Metrics( memory, fi );
 
     return error;
   }

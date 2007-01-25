@@ -229,11 +229,11 @@ FT_BEGIN_HEADER
    *
    * @struct:
    *   FT_Incremental_FuncsRec
-   * 
+   *
    * @description:
    *   A table of functions for accessing fonts that load data
    *   incrementally.  Used in @FT_Incremental_InterfaceRec.
-   * 
+   *
    * @fields:
    *   get_glyph_data ::
    *     The function to get glyph data.  Must not be null.
@@ -243,7 +243,7 @@ FT_BEGIN_HEADER
    *
    *   get_glyph_metrics ::
    *     The function to get glyph metrics.  May be null if the font does
-   *     not provide overriding glyph metrics. 
+   *     not provide overriding glyph metrics.
    */
   typedef struct  FT_Incremental_FuncsRec_
   {
@@ -293,7 +293,7 @@ FT_BEGIN_HEADER
   {
     const FT_Incremental_FuncsRec*  funcs;
     FT_Incremental                  object;
-  
+
   } FT_Incremental_InterfaceRec;
 
 
@@ -321,7 +321,7 @@ FT_BEGIN_HEADER
   */
 #define FT_PARAM_TAG_INCREMENTAL  FT_MAKE_TAG( 'i', 'n', 'c', 'r' )
 
- /* */  
+ /* */
 
 FT_END_HEADER
 

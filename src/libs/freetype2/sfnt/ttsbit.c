@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType and OpenType embedded bitmap support (body).                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -24,11 +24,11 @@
    *  Alas, the memory-optimized sbit loader can't be used when implementing
    *  the `old internals' hack
    */
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
 
 #include "ttsbit0.c"
 
-#else /* !OPTIMIZE_MEMORY || OLD_INTERNALS */
+#else /* !FT_CONFIG_OPTION_OLD_INTERNALS */
 
 #include <ft2build.h>
 #include FT_INTERNAL_DEBUG_H
@@ -222,7 +222,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Load_SBit_Const_Metrics                                         */
+  /*    Load_SBit_Const_Metrics                                            */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads the metrics for `EBLC' index tables format 2 and 5.          */
@@ -252,7 +252,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Load_SBit_Range_Codes                                           */
+  /*    Load_SBit_Range_Codes                                              */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads the range codes for `EBLC' index tables format 4 and 5.      */
@@ -317,7 +317,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Load_SBit_Range                                                 */
+  /*    Load_SBit_Range                                                    */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads a given `EBLC' index/range table.                            */
@@ -398,7 +398,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    tt_face_load_sbit_strikes                                          */
+  /*    tt_face_load_eblc                                                  */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads the table of embedded bitmap sizes for this face.            */
@@ -598,7 +598,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    tt_face_free_sbit_strikes                                          */
+  /*    tt_face_free_eblc                                                  */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Releases the embedded bitmap tables.                               */
@@ -1495,7 +1495,7 @@
     return error;
   }
 
-#endif /* !OPTIMIZE_MEMORY || OLD_INTERNALS */
+#endif /* !FT_CONFIG_OPTION_OLD_INTERNALS */
 
 
 /* END */

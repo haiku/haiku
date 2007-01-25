@@ -5,7 +5,7 @@
 /*    TrueType and OpenType embedded bitmap support (body).                */
 /*    This is a heap-optimized version.                                    */
 /*                                                                         */
-/*  Copyright 2005, 2006 by                                                */
+/*  Copyright 2005, 2006, 2007 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -15,6 +15,9 @@
 /*  understand and accept it fully.                                        */
 /*                                                                         */
 /***************************************************************************/
+
+
+/* This file is included by ttsbit.c */
 
 
 #include <ft2build.h>
@@ -137,7 +140,7 @@
      *  paranoid there and don't trust the data.
      */
     count = (FT_UInt)num_strikes;
-    if ( 8 +48UL * count > table_size )
+    if ( 8 + 48UL * count > table_size )
       count = (FT_UInt)( ( p_limit - p ) / 48 );
 
     face->sbit_num_strikes = count;
@@ -180,7 +183,7 @@
                                FT_Size_Metrics*  metrics )
   {
     FT_Byte*         strike;
-    
+
 
     if ( strike_index >= (FT_ULong)face->sbit_num_strikes )
       return SFNT_Err_Invalid_Argument;

@@ -5,7 +5,7 @@
 /*    Basic Type 1/Type 2 tables definitions and interface (specification  */
 /*    only).                                                               */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2006 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -255,6 +255,15 @@ FT_BEGIN_HEADER
     FT_ULong         blend_bitflags;
 
     FT_BBox*         bboxes    [T1_MAX_MM_DESIGNS + 1];
+
+    /* since 2.3.0 */
+
+    /* undocumented, optional: the default design instance;   */
+    /* corresponds to default_weight_vector --                */
+    /* num_default_design_vector == 0 means it is not present */
+    /* in the font and associated metrics files               */
+    FT_UInt          default_design_vector[T1_MAX_MM_DESIGNS];
+    FT_UInt          num_default_design_vector;
 
   } PS_BlendRec, *PS_Blend;
 

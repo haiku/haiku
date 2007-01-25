@@ -738,13 +738,13 @@ FT_BEGIN_HEADER
     /* the table directory                                 */
     TT_Load_Table_Func           load_font_dir;
     TT_Load_Metrics_Func         load_hmtx;
-    
+
     TT_Load_Table_Func           load_eblc;
     TT_Free_Table_Func           free_eblc;
-    
+
     TT_Set_SBit_Strike_Func      set_sbit_strike;
     TT_Load_Strike_Metrics_Func  load_strike_metrics;
-    
+
     TT_Get_Metrics_Func          get_metrics;
 
   } SFNT_Interface;
