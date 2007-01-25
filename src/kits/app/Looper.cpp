@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	BLooper class spawns a thread that runs a message loop. */
+/*!	BLooper class spawns a thread that runs a message loop. */
 
 /**
 	@note	Although I'm implementing "by the book" for now, I would like to
@@ -1076,11 +1076,16 @@ BLooper::InitData(const char *name, int32 priority, int32 portCapacity)
 
 
 void
-BLooper::AddMessage(BMessage* msg)
+BLooper::AddMessage(BMessage* message)
 {
-	_AddMessagePriv(msg);
+	_AddMessagePriv(message);
 
-	// ToDo: if called from a different thread, we need to wake up the looper
+	// wakeup looper when being called from other threads if necessary
+	if (find_thread(NULL) != Thread()
+		&& fQueue->IsNextMessage(message) && port_count(fMsgPort) <= 0) {
+		// there is currently no message waiting, and we need to wakeup the looper
+		write_port_etc(fMsgPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
+	}
 }
 
 

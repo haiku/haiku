@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_MESSAGE_QUEUE_H
@@ -30,6 +30,7 @@ class BMessageQueue {
 		bool IsLocked() const;
 
 		BMessage *NextMessage();
+		bool IsNextMessage(const BMessage* message) const;
 
 	private:
 		// Reserved space in the vtable for future changes to BMessageQueue
