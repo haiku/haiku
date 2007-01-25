@@ -51,19 +51,20 @@ sensorsSources = hdcs1000.cpp hv7131e1.cpp tas5110c1b.cpp ;
 ## how to build header files from sources to include the list of built-in addons.
 # but it doesn't seem to work for some reason...
 
-rule USBWebcamHeaderGen
+rule USBWebcamHeaderGen header : macro : sources
 {
-	SEARCH on $(3) = $(SEARCH_SOURCE) ;
+	SEARCH on $(sources) = $(SEARCH_SOURCE) ;
 
-	Depends $(1) : $(3) ;
-	MakeLocateArch $(<) ;
-	USBWebcamHeaderGen1 $(2) : $(3) : $(1) ;
-	LocalClean clean : $(<) ;
+	Depends $(header) : $(sources) ;
+	MakeLocateArch $(header) ;
+	GREP_DEFINE on $(header) = $(macro) ;
+	USBWebcamHeaderGen1 $(header) : $(sources) ;
+	LocalClean clean : $(header) ;
 }
 
 actions USBWebcamHeaderGen1
 {
-	alert 'grep -h $(1) $(2) > $(3) ' ;
+	grep -h $(GREP_DEFINE) $(2) > $(1) ;
 }
 
 USBWebcamHeaderGen [ FGristFiles CamInternalAddons.h ] : B_WEBCAM_MKINTFUNC : $(addonSources) ;
