@@ -19,6 +19,7 @@ class BView;
 class CustomRefFilter : public BRefFilter {
 	public:
 		CustomRefFilter(bool imageFiltering);
+		virtual ~CustomRefFilter() {};
 
 		bool Filter(const entry_ref *ref, BNode* node, struct stat *st, 
 			const char *filetype);

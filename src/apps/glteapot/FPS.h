@@ -17,3 +17,4 @@ private:
 	static void drawChar( GLfloat x, GLfloat y, GLint number );
 
 };
+
