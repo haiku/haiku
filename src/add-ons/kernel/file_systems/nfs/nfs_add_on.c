@@ -82,8 +82,8 @@ static status_t read_config(void)
 	}
 
 	conf_allow_dir_open = get_driver_boolean_parameter(handle, "allow_dir_open", conf_allow_dir_open, true);
-	conf_ls_root_parent = get_driver_boolean_parameter(handle, "ls_root_parent", conf_ls_root_parent, false);
-	conf_no_check_ip_xid = get_driver_boolean_parameter(handle, "no_check_ip_xid", conf_no_check_ip_xid, false);
+	conf_ls_root_parent = get_driver_boolean_parameter(handle, "ls_root_parent", conf_ls_root_parent, true);
+	conf_no_check_ip_xid = get_driver_boolean_parameter(handle, "no_check_ip_xid", conf_no_check_ip_xid, true);
 
 	str = get_driver_parameter(handle, "call_timeout", NULL, NULL);
 	if (str) {
@@ -1156,7 +1156,8 @@ dprintf("nfs:ip!\n");
 	e = strchr(p, ':');
 	if (!e)
 		return EINVAL;
-	params->server = malloc(e - p);
+	params->server = malloc(e - p + 1);
+	params->server[e-p] = '\0';
 	strncpy(params->server, p, e - p);
 	// hack
 	params->serverIP = 0;
@@ -1189,7 +1190,8 @@ dprintf("%ld\n", v);
 	e = strchr(p, ',');
 	i = (e) ? (e - p) : (strlen(p));
 	
-	params->_export = malloc(i);
+	params->_export = malloc(i+1);
+	params->_export[i] = '\0';
 	strncpy(params->_export, p, i);
 	
 	p = strstr(str, "hostname=");
@@ -1200,7 +1202,8 @@ dprintf("nfs:hn!\n");
 	e = strchr(p, ',');
 	i = (e) ? (e - p) : (strlen(p));
 	
-	params->hostname = malloc(i);
+	params->hostname = malloc(i+1);
+	params->hostname[i] = '\0';
 	strncpy(params->hostname, p, i);
 	
 	p = strstr(str, "uid=");
