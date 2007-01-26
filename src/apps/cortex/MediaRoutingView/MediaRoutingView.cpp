@@ -298,9 +298,8 @@ void MediaRoutingView::AttachedToWindow()
 	
 	// attach to manager
 	ASSERT(manager);
-	status_t err = add_observer(this, manager);
-	ASSERT(err == B_OK);
-	
+	add_observer(this, manager);
+
 	// add the context-menu shortcuts to the window
 	_addShortcuts();
 

@@ -105,17 +105,13 @@ RouteApp::RouteApp() :
 	routeWindow->Show();
 }
 
-bool RouteApp::QuitRequested() {
 
+bool
+RouteApp::QuitRequested()
+{
 	// [e.moon 20oct99] make sure the main window is dead before quitting
-	
+
 	// store window positions & other settings
-	app_info ai;
-	status_t err = GetAppInfo(&ai);
-	ASSERT(err == B_OK);
-
-	BFile appFile(&ai.ref, B_READ_WRITE);	
-
 	// write settings file
 	_writeSettings();
 

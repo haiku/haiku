@@ -51,7 +51,6 @@ ConnectionIO::ConnectionIO(
 	ASSERT(con);
 	ASSERT(manager);
 	ASSERT(context);
-	status_t err;
 	
 	if(!con->isValid()) {
 		PRINT((

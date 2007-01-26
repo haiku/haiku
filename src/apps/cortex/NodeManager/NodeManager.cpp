@@ -408,11 +408,8 @@ NodeManager::NodeManager(
 	Run();
 	
 	// initialize connection to the media roster
-	D_ROSTER((
-		"# roster->StartWatching(%p)\n", this));
-	status_t err = roster->StartWatching(
-		BMessenger(this));
-	ASSERT(err == B_OK);
+	D_ROSTER(("# roster->StartWatching(%p)\n", this));
+	roster->StartWatching(BMessenger(this));
 }
 
 // -------------------------------------------------------- //
