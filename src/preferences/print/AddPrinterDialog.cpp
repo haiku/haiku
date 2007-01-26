@@ -1,30 +1,12 @@
-/*****************************************************************************/
-// Printers Preference Application.
-//
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
-// and are:
-//
-// Copyright (c) 2001-2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2002-2007, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer
+ *		Philippe Houdoin
+ */
+
 
 #include "AddPrinterDialog.h"
 #include "PrinterListView.h"
@@ -32,7 +14,6 @@
 #include "Globals.h"
 #include "Messages.h"
 
-// BeOS API
 #include <Box.h>
 #include <Button.h>
 #include <TextControl.h>
@@ -45,10 +26,14 @@
 #include <Application.h>
 #include <StorageKit.h>
 
-status_t AddPrinterDialog::Start() {
-	AddPrinterDialog* dialog = new AddPrinterDialog();
+
+status_t
+AddPrinterDialog::Start()
+{
+	new AddPrinterDialog();
 	return B_OK;
 }
+
 
 AddPrinterDialog::AddPrinterDialog()
 	: Inherited(BRect(78.0, 71.0, 400, 300), "Add Printer",
@@ -60,10 +45,10 @@ AddPrinterDialog::AddPrinterDialog()
 }
 
 
-void AddPrinterDialog::MessageReceived(BMessage* msg)
+void
+AddPrinterDialog::MessageReceived(BMessage* msg)
 {
-	switch(msg->what)
-	{
+	switch(msg->what) {
 		case B_OK: {
 				BMessage m(PSRV_MAKE_PRINTER);
 				BMessenger msgr;
@@ -138,10 +123,12 @@ void AddPrinterDialog::MessageReceived(BMessage* msg)
 	}
 }
 
-void AddPrinterDialog::BuildGUI(int stage)
+
+void
+AddPrinterDialog::BuildGUI(int stage)
 {
 	BRect r, tr;
-	float x, y, w, h;
+	float x, w, h;
 	BButton * ok;
 	BButton * cancel;
 	BTextControl * tc;
@@ -329,16 +316,14 @@ static directory_which gAddonDirs[] = {
 	B_BEOS_ADDONS_DIRECTORY,
 	B_COMMON_ADDONS_DIRECTORY
 	// B_USER_ADDONS_DIRECTORY same as common directory
+	// TODO: not in Haiku!
 };
 
-#ifdef __INTEL__
-static const char* kExecutableType = "application/x-vnd.Be-elfexecutable";
-#else
-static const char* kExecutableType = "application/x-vnd.Be-executable";
-#endif
 
-void AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what) {
-	for (int i = 0; i < sizeof(gAddonDirs) / sizeof(directory_which); i ++) {
+void
+AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what)
+{
+	for (uint32 i = 0; i < sizeof(gAddonDirs) / sizeof(directory_which); i ++) {
 		BPath addonPath;
 		if (find_directory(gAddonDirs[i], &addonPath) != B_OK) continue;
 		if (addonPath.Append(path) != B_OK) continue;
@@ -346,28 +331,36 @@ void AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what) {
 		if (dir.InitCheck() != B_OK) continue;
 		BEntry entry;
 		while (dir.GetNextEntry(&entry, true) == B_OK) {
-			if (!entry.IsFile()) continue;
+			if (!entry.IsFile())
+				continue;
 
 			BNode node(&entry);
-			if (node.InitCheck() != B_OK) continue;
+			if (node.InitCheck() != B_OK)
+				continue;
 
 			BNodeInfo info(&node);
-			if (info.InitCheck() != B_OK) continue;
+			if (info.InitCheck() != B_OK)
+				continue;
 
-			char type[B_MIME_TYPE_LENGTH+1];
+			char type[B_MIME_TYPE_LENGTH + 1];
 			info.GetType(type);
-			if (strcmp(type, kExecutableType) != 0) continue;
+			if (strcmp(type, B_APP_MIME_TYPE) != 0)
+				continue;
 
 			BPath path;
-			if (entry.GetPath(&path) != B_OK) continue;
+			if (entry.GetPath(&path) != B_OK)
+				continue;
 
 			bool addMenuItem = true;
 				// some hard coded special cases for transport add-ons
 			if (menu == fTransport) {
 				const char* transport = path.Leaf();
 					// Network not implemented yet!
-				if (strcmp(transport, "Network") == 0) continue;
+				if (strcmp(transport, "Network") == 0)
+					continue;
+
 				addMenuItem = false;
+
 				if (strcmp(transport, "Serial Port") == 0) {
 					AddPortSubMenu(menu, transport, "/dev/ports");					
 				} else if (strcmp(transport, "Parallel Port") == 0) {
@@ -388,16 +381,22 @@ void AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what) {
 	}
 }
 
-void AddPrinterDialog::AddPortSubMenu(BMenu* menu, const char* transport, const char* port) {
+
+void
+AddPrinterDialog::AddPortSubMenu(BMenu* menu, const char* transport, const char* port)
+{
 	BEntry entry(port);
 	BDirectory dir(&entry);
-	if (dir.InitCheck() != B_OK) return;
+	if (dir.InitCheck() != B_OK)
+		return;
+
 	BMenu* subMenu = NULL;
-	
 	BPath path;
 	while (dir.GetNextEntry(&entry) == B_OK) {
-		if (entry.GetPath(&path) != B_OK) continue;
-			// lazily create sub menu 
+		if (entry.GetPath(&path) != B_OK)
+			continue;
+
+		// lazily create sub menu 
 		if (subMenu == NULL) {
 			subMenu = new BMenu(transport);
 			menu->AddItem(subMenu);
@@ -406,7 +405,8 @@ void AddPrinterDialog::AddPortSubMenu(BMenu* menu, const char* transport, const 
 			BMenuItem* item = menu->ItemAt(index);
 			if (item) item->SetMessage(new BMessage(MSG_TRANSPORT_SELECTED));
 		}
-			// setup menu item for port
+
+		// setup menu item for port
 		BMessage* msg = new BMessage(MSG_TRANSPORT_SELECTED);
 		msg->AddString("name", transport);
 		msg->AddString("path", path.Leaf());
@@ -415,7 +415,10 @@ void AddPrinterDialog::AddPortSubMenu(BMenu* menu, const char* transport, const 
 	}
 }
 
-void AddPrinterDialog::Update() {
+
+void
+AddPrinterDialog::Update()
+{
 	fOk->SetEnabled(fNameText != "" && fPrinterText != "" && 
 		(fTransportText != "" || fPrinterText == "Preview"));
 	fTransport->SetEnabled(fPrinterText != "" &&fPrinterText != "Preview");	
