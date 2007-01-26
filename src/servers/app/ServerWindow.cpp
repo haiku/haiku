@@ -2690,8 +2690,8 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 
 	BMessenger reply;
 	BMessage::Private messagePrivate((BMessage *)msg);
-	return messagePrivate.SendMessage(fClientLooperPort, target, 0,
-		false, reply);
+	return messagePrivate.SendMessage(fClientLooperPort, fClientTeam, target,
+		0, false, reply);
 }
 
 
