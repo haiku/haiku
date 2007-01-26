@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,13 @@
  */
 
 
-#include <string.h>
-#include <sys/utsname.h>
-
 #include <AppMisc.h>
 #include <Entry.h>
 #include <image.h>
 #include <OS.h>
+
+#include <string.h>
+#include <sys/utsname.h>
 
 
 namespace BPrivate {
@@ -117,10 +117,12 @@ get_app_ref(entry_ref *ref, bool traverse)
 team_id
 current_team()
 {
-	team_id team = -1;
-	thread_info info;
-	if (get_thread_info(find_thread(NULL), &info) == B_OK)
-		team = info.team;
+	static team_id team = -1;
+	if (team < 0) {
+		thread_info info;
+		if (get_thread_info(find_thread(NULL), &info) == B_OK)
+			team = info.team;
+	}
 	return team;
 }
 
