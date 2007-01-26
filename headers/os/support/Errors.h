@@ -1,28 +1,21 @@
-/******************************************************************************
-/
-/	File:			Errors.h
-/
-/	Description:	Error code constants.
-/
-/	Copyright 1993-98, Be Incorporated
-/
-******************************************************************************/
-
-
+/*
+ * Copyright 2007, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _ERRORS_H
 #define _ERRORS_H
 
+
 #include <limits.h>
 
-/*-------------------------------------------------------------*/
-/*----- Error baselines ---------------------------------------*/
 
+// Error baselines
 #define B_GENERAL_ERROR_BASE		LONG_MIN
 #define B_OS_ERROR_BASE				B_GENERAL_ERROR_BASE + 0x1000
 #define B_APP_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x2000
 #define B_INTERFACE_ERROR_BASE		B_GENERAL_ERROR_BASE + 0x3000
-#define B_MEDIA_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x4000 /* - 0x41ff */
-#define B_TRANSLATION_ERROR_BASE	B_GENERAL_ERROR_BASE + 0x4800 /* - 0x48ff */
+#define B_MEDIA_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x4000 // - 0x41ff
+#define B_TRANSLATION_ERROR_BASE	B_GENERAL_ERROR_BASE + 0x4800 // - 0x48ff
 #define B_MIDI_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x5000
 #define B_STORAGE_ERROR_BASE		B_GENERAL_ERROR_BASE + 0x6000
 #define B_POSIX_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x7000
@@ -30,13 +23,10 @@
 #define B_PRINT_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x9000
 #define B_DEVICE_ERROR_BASE			B_GENERAL_ERROR_BASE + 0xa000
 
-/*--- Developer-defined errors start at (B_ERRORS_END+1)----*/
-
+// Developer-defined errors start at (B_ERRORS_END+1)
 #define B_ERRORS_END		(B_GENERAL_ERROR_BASE + 0xffff)
 
-
-/*-------------------------------------------------------------*/
-/*----- General Errors ----------------------------------------*/
+// General Errors
 enum {
 	B_NO_MEMORY = B_GENERAL_ERROR_BASE,
 	B_IO_ERROR,
@@ -62,8 +52,7 @@ enum {
 	B_NO_ERROR = 0
 };
 
-/*-------------------------------------------------------------*/
-/*----- Kernel Kit Errors -------------------------------------*/
+// Kernel Kit Errors
 enum {
 	B_BAD_SEM_ID = B_OS_ERROR_BASE,
 	B_NO_MORE_SEMS,
@@ -86,9 +75,7 @@ enum {
 	B_DEBUGGER_ALREADY_INSTALLED = B_OS_ERROR_BASE + 0x400,
 };
 
-
-/*-------------------------------------------------------------*/
-/*----- Application Kit Errors --------------------------------*/
+// Application Kit Errors
 enum {
 	B_BAD_REPLY = B_APP_ERROR_BASE,
 	B_DUPLICATE_REPLY,
@@ -111,12 +98,10 @@ enum {
 	B_SHUTTING_DOWN
 };
 
-
-/*-------------------------------------------------------------*/
-/*----- Storage Kit/File System Errors ------------------------*/
+// Storage Kit/File System Errors
 enum {
 	B_FILE_ERROR = B_STORAGE_ERROR_BASE,
-	B_FILE_NOT_FOUND,	/* discouraged; use B_ENTRY_NOT_FOUND in new code*/
+	B_FILE_NOT_FOUND,	// deprecated: use B_ENTRY_NOT_FOUND instead
 	B_FILE_EXISTS,
 	B_ENTRY_NOT_FOUND,
 	B_NAME_TOO_LONG,
@@ -133,9 +118,7 @@ enum {
 	B_PARTITION_TOO_SMALL
 };
 
-
-/*-------------------------------------------------------------*/
-/*----- POSIX Errors ------------------------------------------*/
+// POSIX Errors
 #define E2BIG			(B_POSIX_ERROR_BASE + 1)
 #define ECHILD			(B_POSIX_ERROR_BASE + 2)
 #define EDEADLK			(B_POSIX_ERROR_BASE + 3)
@@ -196,8 +179,7 @@ enum {
 #define ETIME			(B_POSIX_ERROR_BASE + 58)
 #define ETXTBSY			(B_POSIX_ERROR_BASE + 59)
 
-
-/*---- POSIX errors that can be mapped to BeOS error codes ----*/
+// POSIX errors that can be mapped to BeOS error codes
 #define ENOMEM			B_NO_MEMORY
 #define EACCES			B_PERMISSION_DENIED
 #define EINTR			B_INTERRUPTED
@@ -205,8 +187,8 @@ enum {
 #define EBUSY			B_BUSY
 #define EFAULT			B_BAD_ADDRESS
 #define ETIMEDOUT		B_TIMED_OUT
-#define EAGAIN 			B_WOULD_BLOCK	/* SysV compatibility */
-#define EWOULDBLOCK 	B_WOULD_BLOCK	/* BSD compatibility */
+#define EAGAIN 			B_WOULD_BLOCK	// SysV compatibility
+#define EWOULDBLOCK 	B_WOULD_BLOCK	// BSD compatibility
 #define EBADF			B_FILE_ERROR
 #define EEXIST			B_FILE_EXISTS
 #define EINVAL			B_BAD_VALUE
@@ -224,16 +206,15 @@ enum {
 #define ENOEXEC			B_NOT_AN_EXECUTABLE
 #define EPIPE			B_BUSTED_PIPE
 
-/*---- new error codes that can be mapped to POSIX errors ----*/
+// new error codes that can be mapped to POSIX errors
 #define	B_BUFFER_OVERFLOW	EOVERFLOW
 #define B_TOO_MANY_ARGS		E2BIG
 #define	B_FILE_TOO_LARGE	EFBIG
-#define B_RESULT_NOT_REPRESENTABLE	ERANGE
+#define B_RESULT_NOT_REPRESENTABLE ERANGE
 #define	B_DEVICE_NOT_FOUND	ENODEV
 #define B_NOT_SUPPORTED		EOPNOTSUPP
 
-/*-------------------------------------------------------------*/
-/*----- Media Kit Errors --------------------------------------*/
+// Media Kit Errors
 enum {
 	B_STREAM_NOT_FOUND = B_MEDIA_ERROR_BASE,
 	B_SERVER_NOT_FOUND,
@@ -245,8 +226,7 @@ enum {
 	B_LAST_BUFFER_ERROR
 };
 
-/*-------------------------------------------------------------*/
-/*----- Mail Kit Errors ---------------------------------------*/
+// Mail Kit Errors
 enum {
 	B_MAIL_NO_DAEMON = B_MAIL_ERROR_BASE,
 	B_MAIL_UNKNOWN_USER,
@@ -258,14 +238,12 @@ enum {
 	B_MAIL_INVALID_MAIL
 };
 
-/*-------------------------------------------------------------*/
-/*----- Printing Errors --------------------------------------*/
+// Printing Errors
 enum {
 	B_NO_PRINT_SERVER = B_PRINT_ERROR_BASE
 };
 
-/*-------------------------------------------------------------*/
-/*----- Device Kit Errors -------------------------------------*/
+// Device Kit Errors
 enum {
 	B_DEV_INVALID_IOCTL = B_DEVICE_ERROR_BASE,
 	B_DEV_NO_MEMORY,
@@ -301,4 +279,4 @@ enum {
 	B_DEV_TOO_LATE,
 };
 
-#endif /* _ERRORS_H */
+#endif	// _ERRORS_H
