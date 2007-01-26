@@ -80,9 +80,11 @@ DumpInfo(BUSBDevice &device)
 	printf("Class .................. %d\n", device.Class());
 	printf("Subclass ............... %d\n", device.Subclass());
 	printf("Protocol ............... %d\n", device.Protocol());
+	printf("Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
+	printf("USB Version ............ 0x%04x\n", device.USBVersion());
 	printf("Vendor ID .............. 0x%04x\n", device.VendorID());
 	printf("Product ID ............. 0x%04x\n", device.ProductID());
-	printf("Version ................ 0x%04x\n", device.Version());
+	printf("Product Version ........ 0x%04x\n", device.Version());
 	printf("Manufacturer String .... \"%s\"\n", device.ManufacturerString());
 	printf("Product String ......... \"%s\"\n", device.ProductString());
 	printf("Serial Number .......... \"%s\"\n", device.SerialNumberString());
