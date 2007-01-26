@@ -5,7 +5,7 @@
 ansi|beterm|ANSI BeOS Terminal:\
 	:am:eo:mi:ms:xn:xo:\
 	:Co#8:co#80:it#8:li#25:pa#64:\
-	:&7=^Z:@7=\E[4~:AB=\E[4%p1%dm:AF=\E[3%p1%dm:\
+	:&7=^Z:@7=\E[4~:AB=\E[4%dm:AF=\E[3%dm:\
 	:AL=\E[%dL:DC=\E[%dP:DL=\E[%dM:F1=\E[21~:F2=\E[22~:\
 	:IC=\E[%d@:\
 	:K2=\E[G:Sb=\E[%+(m:Sf=\E[%+^^m:\
