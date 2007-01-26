@@ -123,6 +123,7 @@ BUSBInterface::OtherDescriptorAt(uint32 index, usb_descriptor *descriptor,
 	command.generic.config_index = fConfiguration->Index();
 	command.generic.interface_index = fIndex;
 	command.generic.length = length;
+	command.generic.generic_index = index;
 	if (ioctl(fRawFD, RAW_COMMAND_GET_GENERIC_DESCRIPTOR, &command, sizeof(command))
 		|| command.generic.status != RAW_STATUS_SUCCESS) {
 		return B_ERROR;
