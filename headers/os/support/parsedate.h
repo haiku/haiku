@@ -1,8 +1,9 @@
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _PARSEDATE_H
 #define _PARSEDATE_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <time.h>
@@ -20,10 +21,10 @@
 extern "C" {
 #endif
 
-extern time_t	parsedate(const char *dateString, time_t now);
-extern time_t	parsedate_etc(const char *dateString, time_t now, int *_storedFlags);
+extern time_t parsedate(const char *dateString, time_t now);
+extern time_t parsedate_etc(const char *dateString, time_t now, int *_storedFlags);
 
-extern void		set_dateformats(const char *table[]);
+extern void set_dateformats(const char *table[]);
 extern const char **get_dateformats(void);
 
 #ifdef __cplusplus

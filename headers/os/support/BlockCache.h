@@ -22,52 +22,43 @@
 #ifndef _BLOCK_CACHE_H
 #define _BLOCK_CACHE_H
 
+
 #include <BeBuild.h>
 #include <Locker.h>
 
-/* The OpenBeOS implementation of the BBlockCache.
- * A class used to manage a pool of memory blocks.
- */
 
-/* The allocation type to be used in the constructor
- */
+// The allocation type to be used in the constructor
 enum {
 	B_OBJECT_CACHE = 0,
 	B_MALLOC_CACHE = 1
 };
 
-/* The BBlockCache class:
- */
-class BBlockCache
-{
-public:
-				BBlockCache(uint32 blockCount,
-							size_t blockSize,
-							uint32 allocationType);
-	virtual		~BBlockCache();
+class BBlockCache {
+	public:
+		BBlockCache(uint32 blockCount, size_t blockSize,
+			uint32 allocationType);
+		virtual	~BBlockCache();
 
-	void *		Get(size_t blockSize);
-	void		Save(void *pointer, size_t blockSize);
+		void*	Get(size_t blockSize);
+		void	Save(void *pointer, size_t blockSize);
 
-/* Private or reserved functions and data
- */
-private:
-	virtual	void _ReservedBlockCache1();
-	virtual	void _ReservedBlockCache2();
+	private:
+		virtual	void _ReservedBlockCache1();
+		virtual	void _ReservedBlockCache2();
 
-				BBlockCache(const BBlockCache &);
-	BBlockCache	&operator=(const BBlockCache &);
+		BBlockCache(const BBlockCache &);
+		BBlockCache	&operator=(const BBlockCache &);
 
-	struct _FreeBlock;
+		struct _FreeBlock;
 
-	_FreeBlock *fFreeList;
-	size_t		fBlockSize;
-	int32		fFreeBlocks;
-	int32		fBlockCount;
-	BLocker		fLocker;
-	void *		(*fAlloc)(size_t size);
-	void		(*fFree)(void *pointer);
-	uint32		_reserved[2];
+		_FreeBlock*	fFreeList;
+		size_t		fBlockSize;
+		int32		fFreeBlocks;
+		int32		fBlockCount;
+		BLocker		fLocker;
+		void*		(*fAlloc)(size_t size);
+		void		(*fFree)(void *pointer);
+		uint32		_reserved[2];
 };
 
-#endif
+#endif	// _BLOCK_CACHE_H

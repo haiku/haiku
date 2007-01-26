@@ -1,17 +1,21 @@
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _TLS_H
 #define	_TLS_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 #include <BeBuild.h>
 #include <SupportDefs.h>
+
 
 /* A maximum of 64 keys is allowed to store in TLS - the key is reserved
  * process-wide. Note that tls_allocate() will return B_NO_MEMORY if you
  * try to exceed this limit.
  */
-#define TLS_MAX_KEYS	64
+#define TLS_MAX_KEYS 64
+
 
 #ifdef __cplusplus
 extern "C" {
