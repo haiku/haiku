@@ -22,5 +22,7 @@
 
 /* select emulation */
 
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 #include <net/socket.h>		/* for typedefs and #defines only */
+#endif
 //#include <bone/sys/socket.h>		/* for typedefs and #defines only */
