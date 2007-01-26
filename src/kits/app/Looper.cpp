@@ -11,13 +11,23 @@
 
 /*!	BLooper class spawns a thread that runs a message loop. */
 
-/**
-	@note	Although I'm implementing "by the book" for now, I would like to
-			refactor sLooperList and all of the functions that operate on it
-			into their own class in the BPrivate namespace.
+#include <AppMisc.h>
+#include <LooperList.h>
+#include <MessagePrivate.h>
+#include <ObjectLocker.h>
+#include <TokenSpace.h>
 
-			Also considering adding the thread priority when archiving.
- */
+#include <Autolock.h>
+#include <Looper.h>
+#include <Message.h>
+#include <MessageFilter.h>
+#include <MessageQueue.h>
+#include <Messenger.h>
+#include <PropertyInfo.h>
+
+#include <new>
+#include <stdio.h>
+
 
 // debugging
 //#define DBG(x) x
@@ -35,21 +45,6 @@ static BLocker sDebugPrintLocker("BLooper debug print");
 })
 */
 
-#include <stdio.h>
-
-#include <Autolock.h>
-#include <Looper.h>
-#include <Message.h>
-#include <MessageFilter.h>
-#include <MessageQueue.h>
-#include <Messenger.h>
-#include <PropertyInfo.h>
-
-#include <LooperList.h>
-#include <MessagePrivate.h>
-#include <ObjectLocker.h>
-#include <TokenSpace.h>
-
 
 #define FILTER_LIST_BLOCK_SIZE	5
 #define DATA_BLOCK_SIZE			5
@@ -61,9 +56,6 @@ using BPrivate::BObjectLocker;
 using BPrivate::BLooperList;
 
 port_id _get_looper_port_(const BLooper* looper);
-
-uint32 BLooper::sLooperID = (uint32)B_ERROR;
-team_id BLooper::sTeamID = (team_id)B_ERROR;
 
 enum {
 	BLOOPER_PROCESS_INTERNALLY = 0,
@@ -113,7 +105,7 @@ struct _loop_data_ {
 BLooper::BLooper(const char* name, int32 priority, int32 port_capacity)
 	:	BHandler(name)
 {
-	InitData(name, priority, port_capacity);
+	_InitData(name, priority, port_capacity);
 }
 
 
@@ -136,11 +128,12 @@ BLooper::~BLooper()
 	if (fMsgPort >= 0)
 		close_port(fMsgPort);
 
-	BMessage *msg;
 	// Clear the queue so our call to IsMessageWaiting() below doesn't give
 	// us bogus info
-	while ((msg = fQueue->NextMessage()) != NULL) {
-		delete msg;			// msg will automagically post generic reply
+	BMessage *message;
+	while ((message = fQueue->NextMessage()) != NULL) {
+		delete message;
+			// msg will automagically post generic reply
 	}
 
 	do {
@@ -166,7 +159,7 @@ BLooper::~BLooper()
 	}
 
 	Unlock();
-	RemoveLooper(this);
+	gLooperList.RemoveLooper(this);
 	delete_sem(fLockSem);
 }
 
@@ -179,7 +172,7 @@ BLooper::BLooper(BMessage *data)
 		|| portCapacity < 0)
 		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
 
-	InitData(Name(), B_NORMAL_PRIORITY, portCapacity);
+	_InitData(Name(), B_NORMAL_PRIORITY, portCapacity);
 }
 
 
@@ -204,6 +197,8 @@ BLooper::Archive(BMessage *data, bool deep) const
 	status = get_port_info(fMsgPort, &info);
 	if (status == B_OK)
 		status = data->AddInt32("_port_cap", info.capacity);
+
+	// TODO: what about the thread priority?
 
 	return status;
 }
@@ -245,18 +240,7 @@ void
 BLooper::DispatchMessage(BMessage *message, BHandler *handler)
 {
 	PRINT(("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
-	/** @note
-		Initially, DispatchMessage() was locking the looper, calling the
-		filtering API, determining whether to use fPreferred or not, and
-		deleting the message.  A look at the BeBook, however, reveals that
-		all this function does is handle its own B_QUIT_REQUESTED messages
-		and pass everything else to handler->MessageReceived().  Clearly the
-		rest must be happening in task_looper().  This makes a lot of sense
-		because otherwise every derived class would have to figure out when
-		to use fPreferred, handle the locking and filtering and delete the
-		message.  Even if the BeBook didn't say as much, it would make total
-		sense to hoist that functionality out of here and into task_looper().
-	*/
+
 	switch (message->what) {
 		case _QUIT_:
 			// Can't call Quit() to do this, because of the slight chance
@@ -286,10 +270,7 @@ BLooper::DispatchMessage(BMessage *message, BHandler *handler)
 void
 BLooper::MessageReceived(BMessage *msg)
 {
-	// TODO: verify
-	// The BeBook says this "simply calls the inherited function. ...the BLooper
-	// implementation does nothing of importance."  Which is not the same as
-	// saying it does nothing.  Investigate.
+	// TODO: implement scripting support
 	BHandler::MessageReceived(msg);
 }
 
@@ -325,17 +306,6 @@ BLooper::IsMessageWaiting() const
 	if (!fQueue->IsEmpty())
 		return true;
 
-/**
-	@note:	What we're doing here differs slightly from the R5 implementation.
-			It appears that they probably return count != 0, which gives an
-			incorrect true result when port_buffer_size_etc() would block --
-			which indicates that the port's buffer is empty, so we should return
-			false.  Since we don't actually care about what the error is, we
-			just return count > 0.  This has some interesting consequences in
-			that we will correctly return 'false' if the port is empty
-			(B_WOULD_BLOCK), whereas R5 will return true.  We call that a bug
-			where I come from. ;)
- */
 	int32 count;
 	do {
 		count = port_buffer_size_etc(fMsgPort, B_RELATIVE_TIMEOUT, 0);
@@ -436,12 +406,12 @@ BLooper::Run()
 	if (fRunCalled) {
 		// Not allowed to call Run() more than once
 		debugger("can't call BLooper::Run twice!");
-		return fTaskID;
+		return fThread;
 	}
 
-	fTaskID = spawn_thread(_task0_, Name(), fInitPriority, this);
-	if (fTaskID < B_OK)
-		return fTaskID;
+	fThread = spawn_thread(_task0_, Name(), fInitPriority, this);
+	if (fThread < B_OK)
+		return fThread;
 
 	if (fMsgPort < B_OK)
 		return fMsgPort;
@@ -449,11 +419,11 @@ BLooper::Run()
 	fRunCalled = true;
 	Unlock();
 
-	status_t err = resume_thread(fTaskID);
+	status_t err = resume_thread(fThread);
 	if (err < B_OK)
 		return err;
 
-	return fTaskID;
+	return fThread;
 }
 
 
@@ -479,7 +449,7 @@ BLooper::Quit()
 		PRINT(("  Run() has not been called yet\n"));
 		fTerminating = true;
 		delete this;
-	} else if (find_thread(NULL) == fTaskID) {
+	} else if (find_thread(NULL) == fThread) {
 		PRINT(("  We are the looper thread\n"));
 		fTerminating = true;
 		delete this;
@@ -569,16 +539,7 @@ PRINT(("BLooper::Unlock() done\n"));
 bool
 BLooper::IsLocked() const
 {
-	// We have to lock the list for the call to IsLooperValid().  Has the side
-	// effect of not letting the looper get deleted while we're here.
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-
-	if (!ListLock.IsLocked()) {
-		// If we can't lock the list, our semaphore is probably toast
-		return false;
-	}
-
-	if (!IsLooperValid(this)) {
+	if (!gLooperList.IsLooperValid(this)) {
 		// The looper is gone, so of course it's not locked
 		return false;
 	}
@@ -598,25 +559,21 @@ BLooper::LockWithTimeout(bigtime_t timeout)
 thread_id
 BLooper::Thread() const
 {
-	return fTaskID;
+	return fThread;
 }
 
 
 team_id
 BLooper::Team() const
 {
-	return sTeamID;
+	return BPrivate::current_team();
 }
 
 
 BLooper*
-BLooper::LooperForThread(thread_id tid)
+BLooper::LooperForThread(thread_id thread)
 {
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-	if (ListLock.IsLocked())
-		return gLooperList.LooperForThread(tid);
-
-	return NULL;
+	return gLooperList.LooperForThread(thread);
 }
 
 
@@ -856,7 +813,7 @@ BLooper::BLooper(int32 priority, port_id port, const char* name)
 {
 	// This must be a legacy constructor
 	fMsgPort = port;
-	InitData(name, priority, B_LOOPER_PORT_DEFAULT_CAPACITY);
+	_InitData(name, priority, B_LOOPER_PORT_DEFAULT_CAPACITY);
 }
 
 
@@ -868,7 +825,7 @@ BLooper::_PostMessage(BMessage *msg, BHandler *handler,
 	if (!listLocker.IsLocked())
 		return B_ERROR;
 
-	if (!IsLooperValid(this))
+	if (!gLooperList.IsLooperValid(this))
 		return B_BAD_VALUE;
 
 	// Does handler belong to this looper?
@@ -884,120 +841,66 @@ BLooper::_PostMessage(BMessage *msg, BHandler *handler,
 }
 
 
-status_t
-BLooper::_Lock(BLooper* loop, port_id port, bigtime_t timeout)
-{
-PRINT(("BLooper::_Lock(%p, %lx)\n", loop, port));
-/**
-	@note	The assumption I'm under here is that since we can get the port of
-			the BLooper directly from the BLooper itself, the port parameter is
-			for identifying BLoopers by port_id when a pointer to the BLooper in
-			question is not available.  So this function has two modes:
-				o When loop != NULL, use it directly
-				o When loop == NULL and port is valid, use the port_id to get
-				  the looper
-			I scoured the docs to find out what constitutes a valid port_id to
-			no avail.  Since create_port uses the standard error values in its
-			returned port_id, I'll assume that anything less than zero is a safe
-			bet as an *invalid* port_id.  I'm guessing that, like thread and
-			semaphore ids, anything >= zero is valid.  So, the short version of
-			this reads: if you don't want to find by port_id, make port = -1.
+/*!
+	Locks a looper either by port or using a direct pointer to the looper.
 
-			Another assumption I'm making is that Lock() and LockWithTimeout()
-			are covers for this function.  If it turns out that we don't really
-			need this function, I may refactor this code into LockWithTimeout()
-			and have Lock() call it instead.  This function could then be
-			removed.
- */
+	\param looper looper to lock, if not NULL
+	\param port port to identify the looper in case \a looper is NULL
+	\param timeout timeout for acquiring the lock
+*/
+status_t
+BLooper::_Lock(BLooper* looper, port_id port, bigtime_t timeout)
+{
+	PRINT(("BLooper::_Lock(%p, %lx)\n", looper, port));
 
 	//	Check params (loop, port)
-	if (!loop && port < 0)
-	{
-PRINT(("BLooper::_Lock() done 1\n"));
+	if (looper == NULL && port < 0) {
+		PRINT(("BLooper::_Lock() done 1\n"));
 		return B_BAD_VALUE;
 	}
 
-	// forward declared so I can use BAutolock on sLooperListLock
-	thread_id curThread;
+	thread_id currentThread = find_thread(NULL);
+	int32 oldCount;
 	sem_id sem;
 
-/**
-	@note	We lock the looper list at the start of the lock operation to
-			prevent the looper getting removed from the list while we're
-			doing list operations.  Also ensures that the looper doesn't
-			get deleted here (since ~BLooper() has to lock the list as
-			well to remove itself).
- */
-	int32 oldCount;
 	{
 		BObjectLocker<BLooperList> ListLock(gLooperList);
 		if (!ListLock.IsLocked())
-		{
-			// If we can't lock, the semaphore is probably
-			// gone, which leaves us in no-man's land
-PRINT(("BLooper::_Lock() done 2\n"));
+			return B_BAD_VALUE;
+
+		// Look up looper by port_id, if necessary
+		if (looper == NULL) {
+			looper = gLooperList.LooperForPort(port);
+			if (looper == NULL) {
+				PRINT(("BLooper::_Lock() done 3\n"));
+				return B_BAD_VALUE;
+			}
+		} else if (!gLooperList.IsLooperValid(looper)) {
+			//	Check looper validity
+			PRINT(("BLooper::_Lock() done 4\n"));
 			return B_BAD_VALUE;
 		}
-	
-		//	Look up looper by port_id, if necessary
-		if (!loop)
-		{
-			loop = LooperForPort(port);
-			if (!loop)
-			{
-PRINT(("BLooper::_Lock() done 3\n"));
-				return B_BAD_VALUE;
-			}
-		}
-		else
-		{
-			//	Check looper validity
-			if (!IsLooperValid(loop))
-			{
-PRINT(("BLooper::_Lock() done 4\n"));
-				return B_BAD_VALUE;
-			}
-		}
-	
-		//	Is the looper trying to lock itself?
-		//	Check for nested lock attempt
-		curThread = find_thread(NULL);
-		if (curThread == loop->fOwner)
-		{
-			//	Bump fOwnerCount
-			++loop->fOwnerCount;
-PRINT(("BLooper::_Lock() done 5: fOwnerCount: %ld\n", loop->fOwnerCount));
+
+		// Check for nested lock attempt
+		if (currentThread == looper->fOwner) {
+			++looper->fOwnerCount;
+			PRINT(("BLooper::_Lock() done 5: fOwnerCount: %ld\n", loop->fOwnerCount));
 			return B_OK;
 		}
-	
-		//	Something external to the looper is attempting to lock
-		//	Cache the semaphore
-		sem = loop->fLockSem;
-	
-		//	Validate the semaphore
-		if (sem < 0)
-		{
-PRINT(("BLooper::_Lock() done 6\n"));
+
+		// Cache the semaphore, so that we can safely access it after having
+		// unlocked the looper list
+		sem = looper->fLockSem;
+		if (sem < 0) {
+			PRINT(("BLooper::_Lock() done 6\n"));
 			return B_BAD_VALUE;
 		}
-	
-		//	Bump the requested lock count (using fAtomicCount for this)
-		oldCount = atomic_add(&loop->fAtomicCount, 1);
 
-		// sLooperListLock automatically released here
+		// Bump the requested lock count (using fAtomicCount for this)
+		oldCount = atomic_add(&looper->fAtomicCount, 1);
 	}
 
-/**
-	@note	We have to operate with the looper list unlocked during semaphore
-			acquisition so that the rest of the application doesn't have to
-			wait for this lock to happen.  This is why we cached fLockSem
-			earlier -- with the list unlocked, the looper might get deleted
-			right out from under us.  This is also why we use a raw semaphore
-			instead of the easier-to-deal-with BLocker; you can't cache a
-			BLocker.
- */
-	//	acquire the lock for real
-	return _LockComplete(loop, oldCount, curThread, sem, timeout);
+	return _LockComplete(looper, oldCount, currentThread, sem, timeout);
 }
 
 
@@ -1009,25 +912,24 @@ BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread, sem_id
 #if DEBUG < 1	
 	if (oldCount > 0) {
 #endif
-		do {	
+		do {
 			err = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
 		} while (err == B_INTERRUPTED);
 #if DEBUG < 1
 	}
-#endif	
+#endif
 	if (err == B_OK) {
-		//		Assign current thread to fOwner
 		looper->fOwner = thread;
-		//		Reset fOwnerCount to 1
 		looper->fOwnerCount = 1;
 	}
-PRINT(("BLooper::_LockComplete() done: %lx\n", err));
+
+	PRINT(("BLooper::_LockComplete() done: %lx\n", err));
 	return err;
 }
 
 
 void
-BLooper::InitData()
+BLooper::_InitData(const char *name, int32 priority, int32 portCapacity)
 {
 	fOwner = B_ERROR;
 	fRunCalled = false;
@@ -1035,23 +937,10 @@ BLooper::InitData()
 	fCommonFilters = NULL;
 	fLastMessage = NULL;
 	fPreferred = NULL;
-	fTaskID = B_ERROR;
+	fThread = B_ERROR;
 	fTerminating = false;
 	fMsgPort = -1;
 	fAtomicCount = 0;
-
-	if (sTeamID == -1) {
-		thread_info info;
-		get_thread_info(find_thread(NULL), &info);
-		sTeamID = info.team;
-	}
-}
-
-
-void
-BLooper::InitData(const char *name, int32 priority, int32 portCapacity)
-{
-	InitData();
 
 	if (name == NULL)
 		name = "anonymous looper";
@@ -1069,8 +958,7 @@ BLooper::InitData(const char *name, int32 priority, int32 portCapacity)
 
 	fInitPriority = priority;
 
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-	AddLooper(this);
+	gLooperList.AddLooper(this);
 	AddHandler(this);
 }
 
@@ -1325,7 +1213,7 @@ BLooper::_QuitRequested(BMessage *msg)
 		|| (msg->FindBool("_shutdown_", &shutdown) == B_OK && shutdown)) {
 		BMessage replyMsg(B_REPLY);
 		replyMsg.AddBool("result", isQuitting);
-		replyMsg.AddInt32("thread", fTaskID);
+		replyMsg.AddInt32("thread", fThread);
 		msg->SendReply(&replyMsg);
 	}
 
@@ -1512,61 +1400,6 @@ BLooper::UnlockFully()
 	if (atomicCount > 1)
 #endif
 		release_sem(fLockSem);
-}
-
-
-void
-BLooper::AddLooper(BLooper *looper)
-{
-	if (gLooperList.IsLocked())
-		gLooperList.AddLooper(looper);
-}
-
-
-bool
-BLooper::IsLooperValid(const BLooper *looper)
-{
-	if (gLooperList.IsLocked())
-		return gLooperList.IsLooperValid(looper);
-
-	return false;
-}
-
-
-void
-BLooper::RemoveLooper(BLooper *looper)
-{
-	if (gLooperList.IsLocked())
-		gLooperList.RemoveLooper(looper);
-}
-
-
-void
-BLooper::GetLooperList(BList* list)
-{
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-	if (ListLock.IsLocked())
-		gLooperList.GetLooperList(list);
-}
-
-
-BLooper *
-BLooper::LooperForName(const char* name)
-{
-	if (gLooperList.IsLocked())
-		return gLooperList.LooperForName(name);
-
-	return NULL;
-}
-
-
-BLooper *
-BLooper::LooperForPort(port_id port)
-{
-	if (gLooperList.IsLocked())
-		return gLooperList.LooperForPort(port);
-
-	return NULL;
 }
 
 

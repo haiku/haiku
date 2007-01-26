@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,9 +41,9 @@ public:
 			status_t		PostMessage(uint32 command);
 			status_t		PostMessage(BMessage* message);
 			status_t		PostMessage(uint32 command, BHandler* handler,
-								BHandler* reply_to = NULL);
+								BHandler* replyTo = NULL);
 			status_t		PostMessage(BMessage* message, BHandler* handler,
-								BHandler* reply_to = NULL);
+								BHandler* replyTo = NULL);
 
 	virtual	void			DispatchMessage(BMessage* message, BHandler* handler);
 	virtual	void			MessageReceived(BMessage* msg);
@@ -72,7 +72,7 @@ public:
 			status_t		LockWithTimeout(bigtime_t timeout);
 			thread_id		Thread() const;
 			team_id			Team() const;
-	static	BLooper*		LooperForThread(thread_id tid);
+	static	BLooper*		LooperForThread(thread_id thread);
 
 	// Loop debugging
 			thread_id		LockingThread() const;
@@ -92,7 +92,7 @@ public:
 	virtual	void			SetCommonFilterList(BList* filters);
 			BList*			CommonFilterList() const;
 
-	// Private or reserved ---------------------------------------------------------
+	// Private or reserved
 	virtual status_t		Perform(perform_code d, void* arg);
 
 protected:
@@ -108,8 +108,6 @@ private:
 	friend class BHandler;
 	friend class BPrivate::BLooperList;
 	friend port_id _get_looper_port_(const BLooper* );
-	friend status_t _safe_get_server_token_(const BLooper* , int32* );
-	friend team_id	_find_cur_team_id_();
 
 	virtual	void			_ReservedLooper1();
 	virtual	void			_ReservedLooper2();
@@ -132,8 +130,7 @@ private:
 	static	status_t		_LockComplete(BLooper* loop, int32 old,
 								thread_id this_tid, sem_id sem,
 								bigtime_t timeout);
-			void			InitData();
-			void			InitData(const char* name, int32 prio, int32 capacity);
+			void			_InitData(const char* name, int32 priority, int32 capacity);
 			void			AddMessage(BMessage* msg);
 			void			_AddMessagePriv(BMessage* msg);
 	static	status_t		_task0_(void* arg);
@@ -153,38 +150,21 @@ private:
 			BHandler*		resolve_specifier(BHandler* target, BMessage* msg);
 			void			UnlockFully();
 
-	static	uint32			sLooperID;
-	static	team_id			sTeamID;
-
-// DEPRECATED
-	static	void			AddLooper(BLooper* l);
-	static	bool			IsLooperValid(const BLooper* l);
-	static	void			RemoveLooper(BLooper* l);
-	static	void			GetLooperList(BList* list);
-	static	BLooper*		LooperForName(const char* name);
-	static	BLooper*		LooperForPort(port_id port);
-
-			uint32			fLooperID;
 			BMessageQueue*	fQueue;
 			BMessage*		fLastMessage;
 			port_id			fMsgPort;
-			long			fAtomicCount;
+			int32			fAtomicCount;
 			sem_id			fLockSem;
-			long			fOwnerCount;
+			int32			fOwnerCount;
 			thread_id		fOwner;
-			thread_id		fTaskID;
-			uint32			_unused1;
+			thread_id		fThread;
 			int32			fInitPriority;
 			BHandler*		fPreferred;
 			BList			fHandlers;
 			BList*			fCommonFilters;
 			bool			fTerminating;
 			bool			fRunCalled;
-			thread_id		fCachedPid;
-			size_t			fCachedStack;
-			void*			fMsgBuffer;
-			size_t			fMsgBufferSize;
-			uint32			_reserved[6];
+			uint32			_reserved[12];
 };
 
 #endif	// _LOOPER_H

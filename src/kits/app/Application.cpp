@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Erik Jaesler (erik@cgsoftware.com)
  * 		Jerome Duval
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -483,17 +484,13 @@ BApplication::Run()
 	if (fRunCalled)	
 		debugger("BApplication::Run was already called. Can only be called once.");
 
-	// Note: We need a local variable too (for the return value), since
-	// fTaskID is cleared by Quit().
-// ToDo: actually, it's not clobbered there?!
-	thread_id thread = fTaskID = find_thread(NULL);
-
+	fThread = find_thread(NULL);
 	fRunCalled = true;
 
 	task_looper();
 
 	delete fPulseRunner;
-	return thread;
+	return fThread;
 }
 
 
@@ -514,7 +511,7 @@ BApplication::Quit()
 	// Delete the object, if not running only.
 	if (!fRunCalled) {
 		delete this;
-	} else if (find_thread(NULL) != fTaskID) {
+	} else if (find_thread(NULL) != fThread) {
 // ToDo: why shouldn't we set fTerminating to true directly in this case?
 		// We are not the looper thread.
 		// We push a _QUIT_ into the queue.

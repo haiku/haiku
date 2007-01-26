@@ -1066,7 +1066,7 @@ FrameMoved(origin);
 
 		case _UPDATE_:
 		{
-//bigtime_t now = system_time();
+			//bigtime_t now = system_time();
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
 			BRect updateRect;
 
@@ -1088,14 +1088,14 @@ FrameMoved(origin);
 				if (origin != fFrame.LeftTop()) {
 					// TODO: remove code duplicatation with 
 					// B_WINDOW_MOVED case...
-//printf("window position was not up to date\n");
+					//printf("window position was not up to date\n");
 					fFrame.OffsetTo(origin);
 					FrameMoved(origin);
 				}
 				if (width != fFrame.Width() || height != fFrame.Height()) {
 					// TODO: remove code duplicatation with 
 					// B_WINDOW_RESIZED case...
-//printf("window size was not up to date\n");
+					//printf("window size was not up to date\n");
 					fFrame.right = fFrame.left + width;
 					fFrame.bottom = fFrame.top + height;
 	
@@ -1136,7 +1136,7 @@ FrameMoved(origin);
 			fLink->Flush();
 			fInTransaction = false;
 
-//printf("BWindow(%s) - UPDATE took %lld usecs\n", Title(), system_time() - now);
+			//printf("BWindow(%s) - UPDATE took %lld usecs\n", Title(), system_time() - now);
 			break;
 		}
 
@@ -2194,7 +2194,7 @@ BWindow::Show()
 		if (fLink->SenderPort() < B_OK) {
 			// We don't have valid app_server connection; there is no point
 			// in starting our looper
-			fTaskID = B_ERROR;
+			fThread = B_ERROR;
 			return;
 		} else
 			Run();
@@ -2517,18 +2517,11 @@ BWindow::task_looper()
 	if (IsLocked())
 		debugger("window must not be locked!");
 
-	// loop: As long as we are not terminating.
 	while (!fTerminating) {
-		// TODO: timeout determination algo
-		//	Read from message port (how do we determine what the timeout is?)
-		BMessage* msg = MessageFromPort();
-
 		// Did we get a message?
-		if (msg) {
-			// Add to queue
-			fQueue->AddMessage(msg);
-		} else
-			continue;
+		BMessage* msg = MessageFromPort();
+		if (msg)
+			_AddMessagePriv(msg);
 
 		//	Get message count from port
 		int32 msgCount = port_count(fMsgPort);
@@ -2538,11 +2531,9 @@ BWindow::task_looper()
 			msg = MessageFromPort(0);
 			// Add messages to queue
 			if (msg)
-				fQueue->AddMessage(msg);
+				_AddMessagePriv(msg);
 		}
 
-		// loop: As long as there are messages in the queue and the port is
-		//		 empty... and we are not terminating, of course.
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage) {
 			//	Get next message from queue (assign to fLastMessage)
