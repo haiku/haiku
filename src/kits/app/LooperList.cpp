@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,8 +28,7 @@ typedef vector<BLooperList::LooperData>::iterator LooperDataIterator;
 
 BLooperList::BLooperList()
 	:
-	fLock("BLooperList lock"),
-	fLooperID(0)
+	fLock("BLooperList lock")
 {
 }
 
@@ -63,13 +62,10 @@ BLooperList::AddLooper(BLooper* looper)
 	if (!IsLooperValid(looper)) {
 		LooperDataIterator i = find_if(fData.begin(), fData.end(), EmptySlotPred);
 		if (i == fData.end()) {
-			fData.push_back(LooperData(looper, ++fLooperID));
-			looper->fLooperID = fLooperID;
+			fData.push_back(LooperData(looper));
 			looper->Lock();
 		} else {
 			i->looper = looper;
-			i->id = ++fLooperID;
-			looper->fLooperID = fLooperID;
 			looper->Lock();
 		}
 	}
@@ -201,13 +197,13 @@ BLooperList::AssertLocked()
 
 
 BLooperList::LooperData::LooperData()
-	: looper(NULL), id(0)
+	: looper(NULL)
 {
 }
 
 
-BLooperList::LooperData::LooperData(BLooper* loop, uint32 i)
-	: looper(loop), id(i)
+BLooperList::LooperData::LooperData(BLooper* looper)
+	: looper(looper)
 {
 }
 
@@ -221,10 +217,8 @@ BLooperList::LooperData::LooperData(const LooperData& other)
 BLooperList::LooperData&
 BLooperList::LooperData::operator=(const LooperData& other)
 {
-	if (this != &other) {
+	if (this != &other)
 		looper = other.looper;
-		id = other.id;
-	}
 
 	return *this;
 }
