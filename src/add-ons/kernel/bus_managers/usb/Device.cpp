@@ -191,7 +191,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 						* sizeof(usb_descriptor *));
 
 					/* add this descriptor */
-					currentInterface->generic[currentInterface->generic_count] =
+					currentInterface->generic[currentInterface->generic_count - 1] =
 						(usb_descriptor *)genericDescriptor;
 					break;
 			}

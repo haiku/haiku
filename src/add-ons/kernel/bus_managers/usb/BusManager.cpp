@@ -128,7 +128,7 @@ BusManager::AllocateDevice(Hub *parent, usb_speed speed)
 	ControlPipe *defaultPipe = _GetDefaultPipe(speed);
 
 	if (!defaultPipe) {
-		TRACE(("USB BusManager: error getting the default pipe for speed %d\n", (int)speed));
+		TRACE_ERROR(("USB BusManager: error getting the default pipe for speed %d\n", (int)speed));
 		FreeAddress(deviceAddress);
 		return NULL;
 	}
