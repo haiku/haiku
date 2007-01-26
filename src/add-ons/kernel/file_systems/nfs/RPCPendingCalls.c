@@ -81,8 +81,8 @@ RPCPendingCallsFindAndRemovePendingCall (struct RPCPendingCalls *calls,
 	{
 		if (current->xid==xid)
 		{
-			if ((current->addr.sin_addr.s_addr==addr->sin_addr.s_addr)&&
-				(current->addr.sin_port==addr->sin_port) || conf_no_check_ip_xid)
+			if (((current->addr.sin_addr.s_addr==addr->sin_addr.s_addr)&&
+				(current->addr.sin_port==addr->sin_port)) || conf_no_check_ip_xid)
 			{	
 				if (last)
 					last->next=current->next;
@@ -140,7 +140,7 @@ SemaphorePoolGet(struct SemaphorePool *pool)
 	
 	if (pool->fPoolCount==0)
 	{
-		sem_id sem=create_sem (0,"pending_call");
+		sem=create_sem (0,"pending_call");
 		
 		while (release_sem(pool->fPoolSem)==B_INTERRUPTED)
 		{

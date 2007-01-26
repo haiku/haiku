@@ -64,7 +64,6 @@ static status_t read_config(void)
 {
 	void *handle;
 	const char *str, *endptr;
-	int32 value = 0;
 
 	handle = load_driver_settings("nfs");
 	if (handle == NULL)
@@ -73,12 +72,12 @@ static status_t read_config(void)
 	str = get_driver_parameter(handle, "high_port", NULL, NULL);
 	if (str) {
 		endptr = str + strlen(str);
-		conf_high_port = (int16)strtoul(str, &endptr, 10);
+		conf_high_port = (int16)strtoul(str, (char **)&endptr, 10);
 	}
 	str = get_driver_parameter(handle, "low_port", NULL, NULL);
 	if (str) {
 		endptr = str + strlen(str);
-		conf_low_port = (int16)strtoul(str, &endptr, 10);
+		conf_low_port = (int16)strtoul(str, (char **)&endptr, 10);
 	}
 
 	conf_allow_dir_open = get_driver_boolean_parameter(handle, "allow_dir_open", conf_allow_dir_open, true);
@@ -88,7 +87,7 @@ static status_t read_config(void)
 	str = get_driver_parameter(handle, "call_timeout", NULL, NULL);
 	if (str) {
 		endptr = str + strlen(str);
-		conf_call_timeout = (bigtime_t)1000 * strtoul(str, &endptr, 10);
+		conf_call_timeout = (bigtime_t)1000 * strtoul(str, (char **)&endptr, 10);
 		if (conf_call_timeout < 1000)
 			conf_call_timeout = 1000;
 	}
@@ -96,7 +95,7 @@ static status_t read_config(void)
 	str = get_driver_parameter(handle, "call_tries", NULL, NULL);
 	if (str) {
 		endptr = str + strlen(str);
-		conf_call_tries = strtoul(str, &endptr, 10);
+		conf_call_tries = strtoul(str, (char **)&endptr, 10);
 	}
 		
 	unload_driver_settings(handle);
@@ -197,8 +196,6 @@ init_postoffice(fs_nspace *ns)
 extern void
 shutdown_postoffice(fs_nspace *ns)
 {
-	struct sockaddr addr;
-	int addrSize;
 	status_t result;
 	
 	ns->quit=true;
@@ -215,7 +212,7 @@ postoffice_func(fs_nspace *ns)
 	while (!ns->quit)
 	{		
 		struct sockaddr_in from;
-		int fromLen=sizeof(from);
+		socklen_t fromLen=sizeof(from);
 
 		ssize_t bytes=krecvfrom (ns->s,buffer,B_UDP_MAX_SIZE,0,(struct sockaddr *)&from,&fromLen);
 		
@@ -233,7 +230,7 @@ postoffice_func(fs_nspace *ns)
 				
 				while (release_sem (call->sem)==B_INTERRUPTED);
 			} else {
-				dprintf("nfs: postoffice: can't find pending call to remove for xid %d\n", xid);
+				dprintf("nfs: postoffice: can't find pending call to remove for xid %ld\n", xid);
 			}
 		}
 	}
@@ -331,7 +328,7 @@ uint8 *send_rpc_call (fs_nspace *ns, const struct sockaddr_in *addr,
 
 	call=RPCPendingCallsFindAndRemovePendingCall(&ns->pendingCalls,xid,addr);	
 
-	kmessage ("nfs: xid %d timed out, removing from queue",xid);
+	kmessage ("nfs: xid %ld timed out, removing from queue",xid);
 
 #if 0
 	if (call==NULL)
@@ -375,6 +372,8 @@ bool is_successful_reply (struct XDRInPacket *reply)
 	int32 xid=XDRInPacketGetInt32(reply);
 	rpc_msg_type mtype=(rpc_msg_type)XDRInPacketGetInt32(reply);
 	rpc_reply_stat replyStat=(rpc_reply_stat)XDRInPacketGetInt32(reply);
+	(void)xid;
+	(void)mtype;
 	
 	if (replyStat==RPC_MSG_DENIED)
 	{
@@ -385,7 +384,7 @@ bool is_successful_reply (struct XDRInPacket *reply)
 			int32 low=XDRInPacketGetInt32(reply);
 			int32 high=XDRInPacketGetInt32(reply);
 			
-			kmessage ("RPC_MISMATCH (%d,%d)",low,high);
+			kmessage ("RPC_MISMATCH (%ld,%ld)",low,high);
 		}
 		else
 		{
@@ -401,13 +400,15 @@ bool is_successful_reply (struct XDRInPacket *reply)
 		size_t bodyLength=XDRInPacketGetDynamic(reply,body);
 		
 		rpc_accept_stat acceptStat=(rpc_accept_stat)XDRInPacketGetInt32(reply);
+		(void)flavor;
+		(void)bodyLength;
 		
 		if (acceptStat==RPC_PROG_MISMATCH)
 		{
 			int32 low=XDRInPacketGetInt32(reply);
 			int32 high=XDRInPacketGetInt32(reply);
 			
-			kmessage ("RPC_PROG_MISMATCH (%d,%d)",low,high);				
+			kmessage ("RPC_PROG_MISMATCH (%ld,%ld)",low,high);				
 		}
 		else if (acceptStat!=RPC_SUCCESS)
 			kmessage ("Accepted but failed (%d)",acceptStat);
@@ -662,6 +663,7 @@ nfs_truncate_file(fs_nspace *ns, const nfs_fhandle *fhandle, struct stat *st)
 void get_nfs_attr (struct XDRInPacket *reply, struct stat *st)
 {
 	nfs_ftype ftype=(nfs_ftype)XDRInPacketGetInt32(reply);
+	(void) ftype;
 	st->st_mode=XDRInPacketGetInt32(reply);
 	
 	st->st_dev=0;	// just to be sure
@@ -853,6 +855,9 @@ fs_release_vnode(fs_nspace *ns, fs_node *node, char r)
 fs_write_vnode(fs_nspace *ns, fs_node *node, char r)
 #endif
 {
+	(void) ns;
+	(void) node;
+	(void) r;
 	return B_OK;
 }
 
@@ -889,7 +894,6 @@ fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id
 		fs_node *newNode=(fs_node *)malloc(sizeof(fs_node));
 		struct stat st;
 		
-		status_t result;
 		if ((result=nfs_lookup(ns,&base->fhandle,file,&newNode->fhandle,&st))<B_OK)
 		{
 			free(newNode);
@@ -943,7 +947,6 @@ extern int
 fs_opendir(fs_nspace *ns, fs_node *node, nfs_cookie **cookie)
 {
 	struct stat st;
-	nfs_fhandle fhandle;
 	
 	status_t result;
 	if ((result=nfs_getattr(ns,&node->fhandle,&st))<B_OK)
@@ -961,12 +964,17 @@ fs_opendir(fs_nspace *ns, fs_node *node, nfs_cookie **cookie)
 extern int 
 fs_closedir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
 {
+	(void) ns;
+	(void) node;
+	(void) cookie;
 	return B_OK;
 }
 
 extern int 
 fs_rewinddir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
 {
+	(void) ns;
+	(void) node;
 	memset (cookie->opaque,0,NFS_COOKIESIZE);
 	
 	return B_OK;
@@ -1109,6 +1117,8 @@ fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, long *num, struct d
 extern int 
 fs_free_dircookie(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
 {
+	(void) ns;
+	(void) node;
 	free(cookie);
 	return B_OK;
 }
@@ -1116,8 +1126,6 @@ fs_free_dircookie(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
 extern int 
 fs_rstat(fs_nspace *ns, fs_node *node, struct stat *st)
 {
-	nfs_fhandle fhandle;
-	
 	status_t result;
 	//dprintf("nfs: rstat()\n");//XXX:mmu_man:debug
 	if ((result=nfs_getattr(ns,&node->fhandle,st))<B_OK)
@@ -1143,7 +1151,7 @@ fs_nspaceDestroy(struct fs_nspace *nspace)
 #ifdef PARAMS_AS_STRING
 int parse_nfs_params(const char *str, struct mount_nfs_params *params)
 {
-	char *p, *e;
+	const char *p, *e;
 	long v;
 	int i;
 	// sprintf(buf, "nfs:%s:%s,uid=%u,gid=%u,hostname=%s",
@@ -1161,25 +1169,25 @@ dprintf("nfs:ip!\n");
 	strncpy(params->server, p, e - p);
 	// hack
 	params->serverIP = 0;
-	v = strtol(p, &p, 10);
+	v = strtol(p, (char **)&p, 10);
 dprintf("IP:%ld.", v);
 	if (!p)
 		return EINVAL;
 	params->serverIP |= (v << 24);
 	p++;
-	v = strtol(p, &p, 10);
+	v = strtol(p, (char **)&p, 10);
 dprintf("%ld.", v);
 	if (!p)
 		return EINVAL;
 	params->serverIP |= (v << 16);
 	p++;
-	v = strtol(p, &p, 10);
+	v = strtol(p, (char **)&p, 10);
 dprintf("%ld.", v);
 	if (!p)
 		return EINVAL;
 	params->serverIP |= (v << 8);
 	p++;
-	v = strtol(p, &p, 10);
+	v = strtol(p, (char **)&p, 10);
 dprintf("%ld\n", v);
 	if (!p)
 		return EINVAL;
@@ -1210,17 +1218,17 @@ dprintf("nfs:hn!\n");
 dprintf("nfs:uid!\n");
 	if (p) {
 		p += 4;
-		v = strtol(p, &p, 10);
+		v = strtol(p, (char **)&p, 10);
 		params->uid = v;
 	}
 dprintf("nfs:gid!\n");
 	p = strstr(str, "gid=");
 	if (p) {
 		p += 4;
-		v = strtol(p, &p, 10);
+		v = strtol(p, (char **)&p, 10);
 		params->gid = v;
 	}
-	dprintf("nfs: ip:%08lx server:'%s' export:'%s' hostname:'%s' uid=%d gid=%d \n",
+	dprintf("nfs: ip:%08x server:'%s' export:'%s' hostname:'%s' uid=%d gid=%d \n",
 		params->serverIP, params->server, params->_export, 
 		params->hostname, params->uid, params->gid);
 	return B_OK;
@@ -1248,7 +1256,7 @@ fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, s
 	if (_parms==NULL)
 		return EINVAL;
 
-dprintf("nfs: mount(%d, %s, %08lx)\n", nsid, devname, flags);
+dprintf("nfs: mount(%ld, %s, %08lx)\n", nsid, devname, flags);
 #ifndef PARAMS_AS_STRING
 dprintf("nfs: nfs_params(ip:%lu, server:%s, export:%s, uid:%d, gid:%d, hostname:%s)\n", 
         parms->serverIP, 
@@ -1476,7 +1484,6 @@ extern int
 fs_open(fs_nspace *ns, fs_node *node, int omode, fs_file_cookie **cookie)
 {
 	struct stat st;
-	nfs_fhandle fhandle;
 	
 	status_t result;
 	if ((result=nfs_getattr(ns,&node->fhandle,&st))<B_OK)
@@ -1502,6 +1509,9 @@ fs_open(fs_nspace *ns, fs_node *node, int omode, fs_file_cookie **cookie)
 extern int 
 fs_close(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie)
 {
+	(void) ns;
+	(void) node;
+	(void) cookie;
 /*	//XXX:mmu_man:why that ?? makes Tracker go nuts updating the stats
 	if ((cookie->omode & O_RDWR)||(cookie->omode & O_WRONLY))
 		return my_notify_listener (B_STAT_CHANGED,ns->nsid,0,0,node->vnid,NULL);
@@ -1512,6 +1522,8 @@ fs_close(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie)
 extern int 
 fs_free_cookie(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie)
 {
+	(void) ns;
+	(void) node;
 	if (cookie)
 		free(cookie);
 	return B_OK;
@@ -1718,6 +1730,9 @@ fs_wstat(fs_nspace *ns, fs_node *node, struct stat *st, long mask)
 extern int 
 fs_wfsstat(fs_nspace *ns, struct fs_info *info, long mask)
 {
+	(void) ns;
+	(void) info;
+	(void) mask;
 	return B_OK;
 }
 
@@ -1952,6 +1967,7 @@ fs_unlink(fs_nspace *ns, fs_node *dir, const char *name)
 extern int 
 fs_remove_vnode(fs_nspace *ns, fs_node *node, char r)
 {
+	(void) r;
 	remove_node (ns,node->vnid);
 
 	return B_OK;
@@ -1961,6 +1977,8 @@ fs_remove_vnode(fs_nspace *ns, fs_node *node, char r)
 extern int 
 fs_secure_vnode(fs_nspace *ns, fs_node *node)
 {
+	(void) ns;
+	(void) node;
 	return B_OK;
 }
 #endif
@@ -1986,7 +2004,7 @@ fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
 
 	if (result==B_OK)
 	{
-		void *dummy;
+		//void *dummy;
 
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);
@@ -2375,6 +2393,9 @@ fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
 
 int	fs_access(void *ns, void *node, int mode)
 {
+	(void) ns;
+	(void) node;
+	(void) mode;
 	/* XXX */
 	return B_OK;
 }

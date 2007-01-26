@@ -54,16 +54,16 @@ extern struct socket_module_info *gSocket;
 #define kclosesocket close
 #define kmessage(fmt, ...) dprintf("ksocket: " fmt "\n", ##__VA_ARGS__)
 
-extern status_t ksocket_init ();
-extern status_t ksocket_cleanup ();
+extern status_t ksocket_init (void);
+extern status_t ksocket_cleanup (void);
 
 #define KSOCKET_MODULE_DECL \
 struct socket_module_info *gSocket; \
-status_t ksocket_init () { \
+status_t ksocket_init (void) { \
 	return get_module(B_SOCKET_MODULE_NAME, (module_info **)&gSocket); \
 } \
  \
-status_t ksocket_cleanup () { \
+status_t ksocket_cleanup (void) { \
 	return put_module(B_SOCKET_MODULE_NAME); \
 }
 
@@ -92,16 +92,16 @@ extern bone_socket_info_t *gSocket;
 #define kclosesocket close
 #define kmessage(fmt, ...) dprintf("ksocket: " fmt "\n", ##__VA_ARGS__)
 
-extern status_t ksocket_init ();
-extern status_t ksocket_cleanup ();
+extern status_t ksocket_init (void);
+extern status_t ksocket_cleanup (void);
 
 #define KSOCKET_MODULE_DECL \
 bone_socket_info_t *gSocket; \
-status_t ksocket_init () { \
+status_t ksocket_init (void) { \
 	return get_module(BONE_SOCKET_MODULE, (module_info **)&gSocket); \
 } \
  \
-status_t ksocket_cleanup () { \
+status_t ksocket_cleanup (void) { \
 	return put_module(BONE_SOCKET_MODULE); \
 }
 

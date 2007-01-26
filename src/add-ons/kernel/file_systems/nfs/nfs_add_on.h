@@ -19,6 +19,7 @@ typedef dev_t nspace_id;
 #else
 #	include "fsproto.h"
 #	define publish_vnode new_vnode
+typedef int socklen_t;
 #endif
 
 
