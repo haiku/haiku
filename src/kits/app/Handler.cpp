@@ -596,7 +596,8 @@ void
 BHandler::SetLooper(BLooper *looper)
 {
 	fLooper = looper;
-	
+	gDefaultTokens.SetHandlerTarget(fToken, looper ? looper->fDirectTarget : NULL);
+
 	if (fFilters) {
 		for (int32 i = 0; i < fFilters->CountItems(); i++)
 			static_cast<BMessageFilter *>(fFilters->ItemAtFast(i))->SetLooper(looper);

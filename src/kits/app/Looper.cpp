@@ -12,6 +12,7 @@
 /*!	BLooper class spawns a thread that runs a message loop. */
 
 #include <AppMisc.h>
+#include <DirectMessageTarget.h>
 #include <LooperList.h>
 #include <MessagePrivate.h>
 #include <ObjectLocker.h>
@@ -130,8 +131,10 @@ BLooper::~BLooper()
 
 	// Clear the queue so our call to IsMessageWaiting() below doesn't give
 	// us bogus info
+	fDirectTarget->Close();
+
 	BMessage *message;
-	while ((message = fQueue->NextMessage()) != NULL) {
+	while ((message = fDirectTarget->Queue()->NextMessage()) != NULL) {
 		delete message;
 			// msg will automagically post generic reply
 	}
@@ -141,7 +144,7 @@ BLooper::~BLooper()
 			// msg will automagically post generic reply
 	} while (IsMessageWaiting());
 
-	delete fQueue;
+	fDirectTarget->Release();
 	delete_port(fMsgPort);
 
 	// Clean up our filters
@@ -294,7 +297,7 @@ BLooper::DetachCurrentMessage()
 BMessageQueue*
 BLooper::MessageQueue() const
 {
-	return fQueue;
+	return fDirectTarget->Queue();
 }
 
 
@@ -303,7 +306,7 @@ BLooper::IsMessageWaiting() const
 {
 	AssertLocked();
 
-	if (!fQueue->IsEmpty())
+	if (!fDirectTarget->Queue()->IsEmpty())
 		return true;
 
 	int32 count;
@@ -933,7 +936,7 @@ BLooper::_InitData(const char *name, int32 priority, int32 portCapacity)
 {
 	fOwner = B_ERROR;
 	fRunCalled = false;
-	fQueue = new BMessageQueue();
+	fDirectTarget = new (std::nothrow) BPrivate::BDirectMessageTarget();
 	fCommonFilters = NULL;
 	fLastMessage = NULL;
 	fPreferred = NULL;
@@ -970,7 +973,7 @@ BLooper::AddMessage(BMessage* message)
 
 	// wakeup looper when being called from other threads if necessary
 	if (find_thread(NULL) != Thread()
-		&& fQueue->IsNextMessage(message) && port_count(fMsgPort) <= 0) {
+		&& fDirectTarget->Queue()->IsNextMessage(message) && port_count(fMsgPort) <= 0) {
 		// there is currently no message waiting, and we need to wakeup the looper
 		write_port_etc(fMsgPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
 	}
@@ -984,7 +987,7 @@ BLooper::_AddMessagePriv(BMessage* msg)
 	// Others may want to peek into our message queue, so the preferred
 	// handler must be set correctly already if no token was given
 
-	fQueue->AddMessage(msg);
+	fDirectTarget->Queue()->AddMessage(msg);
 }
 
 
@@ -1122,7 +1125,7 @@ BLooper::task_looper()
 		while (!fTerminating && dispatchNextMessage) {
 			PRINT(("LOOPER: inner loop\n"));
 			// Get next message from queue (assign to fLastMessage)
-			fLastMessage = fQueue->NextMessage();
+			fLastMessage = fDirectTarget->Queue()->NextMessage();
 
 			Lock();
 

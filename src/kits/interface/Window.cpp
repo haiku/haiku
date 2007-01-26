@@ -25,6 +25,7 @@
 #include <input_globals.h>
 #include <AppMisc.h>
 #include <ApplicationPrivate.h>
+#include <DirectMessageTarget.h>
 #include <InputServerTypes.h>
 #include <MenuPrivate.h>
 #include <MessagePrivate.h>
@@ -2488,7 +2489,7 @@ BWindow::_DequeueAll()
 	for (int32 i = 0; i < count; i++) {
 		BMessage *message = MessageFromPort(0);
 		if (message != NULL)
-			fQueue->AddMessage(message);
+			fDirectTarget->Queue()->AddMessage(message);
 	}
 }
 
@@ -2536,8 +2537,8 @@ BWindow::task_looper()
 
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage) {
-			//	Get next message from queue (assign to fLastMessage)
-			fLastMessage = fQueue->NextMessage();
+			// Get next message from queue (assign to fLastMessage)
+			fLastMessage = fDirectTarget->Queue()->NextMessage();
 
 			// Lock the looper
 			if (!Lock())

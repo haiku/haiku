@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,12 +10,12 @@
 #define _TOKEN_SPACE_H
 
 
-#include <map>
-#include <stack>
-
 #include <BeBuild.h>
 #include <Locker.h>
 #include <SupportDefs.h>
+
+#include <map>
+#include <stack>
 
 
 // token types as specified in targets
@@ -30,6 +30,9 @@
 
 namespace BPrivate {
 
+class BDirectMessageTarget;
+
+
 class BTokenSpace : public BLocker {
 	public:
 		BTokenSpace();
@@ -40,12 +43,16 @@ class BTokenSpace : public BLocker {
 
 		bool		RemoveToken(int32 token);
 		bool		CheckToken(int32 token, int16 type) const;
-		status_t	GetToken(int32 token, int16 type, void** object) const;
+		status_t	GetToken(int32 token, int16 type, void** _object) const;
+
+		status_t	SetHandlerTarget(int32 token, BDirectMessageTarget* target);
+		status_t	AcquireHandlerTarget(int32 token, BDirectMessageTarget** _target);
 
 	private:
 		struct token_info {
 			int16	type;
 			void*	object;
+			BDirectMessageTarget* target;
 		};
 		typedef std::map<int32, token_info> TokenMap;
 

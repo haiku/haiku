@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,12 +8,10 @@
  */
 
 
-#include <map>
-#include <stack>
+#include <DirectMessageTarget.h>
+#include <TokenSpace.h>
 
 #include <Autolock.h>
-
-#include "TokenSpace.h"
 
 
 namespace BPrivate {
@@ -39,7 +37,7 @@ BTokenSpace::NewToken(int16 type, void* object)
 {
 	BAutolock locker(this);
 
-	token_info tokenInfo = { type, object };
+	token_info tokenInfo = { type, object, NULL };
 	int32 token = fTokenCount++;
 
 	fTokenMap[token] = tokenInfo;
@@ -59,7 +57,7 @@ BTokenSpace::SetToken(int32 token, int16 type, void* object)
 {
 	BAutolock locker(this);
 
-	token_info tokenInfo = { type, object };
+	token_info tokenInfo = { type, object, NULL };
 	fTokenMap[token] = tokenInfo;
 
 	// this makes sure SetToken() plays more or less nice with NewToken()
@@ -101,17 +99,59 @@ BTokenSpace::CheckToken(int32 token, int16 type) const
 status_t
 BTokenSpace::GetToken(int32 token, int16 type, void** _object) const
 {
-	BAutolock locker(const_cast<BTokenSpace&>(*this));
-
 	if (token < 1)
 		return B_ENTRY_NOT_FOUND;
 
-	TokenMap::const_iterator iterator = fTokenMap.find(token);
+	BAutolock locker(const_cast<BTokenSpace&>(*this));
 
+	TokenMap::const_iterator iterator = fTokenMap.find(token);
 	if (iterator == fTokenMap.end() || iterator->second.type != type)
 		return B_ENTRY_NOT_FOUND;
 
 	*_object = iterator->second.object;
+	return B_OK;
+}
+
+
+status_t
+BTokenSpace::SetHandlerTarget(int32 token, BDirectMessageTarget* target)
+{
+	if (token < 1)
+		return B_ENTRY_NOT_FOUND;
+
+	BAutolock locker(const_cast<BTokenSpace&>(*this));
+
+	TokenMap::iterator iterator = fTokenMap.find(token);
+	if (iterator == fTokenMap.end() || iterator->second.type != B_HANDLER_TOKEN)
+		return B_ENTRY_NOT_FOUND;
+
+	if (iterator->second.target != NULL)
+		iterator->second.target->Release();
+
+	iterator->second.target = target;
+	if (target != NULL)
+		target->Acquire();
+
+	return B_OK;
+}
+
+
+status_t
+BTokenSpace::AcquireHandlerTarget(int32 token, BDirectMessageTarget** _target)
+{
+	if (token < 1)
+		return B_ENTRY_NOT_FOUND;
+
+	BAutolock locker(const_cast<BTokenSpace&>(*this));
+
+	TokenMap::const_iterator iterator = fTokenMap.find(token);
+	if (iterator == fTokenMap.end() || iterator->second.type != B_HANDLER_TOKEN)
+		return B_ENTRY_NOT_FOUND;
+
+	if (iterator->second.target != NULL)
+		iterator->second.target->Acquire();
+
+	*_target = iterator->second.target;
 	return B_OK;
 }
 

@@ -32,6 +32,7 @@ MergeObject <libbe>app_kit.o :
 	Clipboard.cpp
 	dano_message.cpp
 	DesktopLink.cpp
+	DirectMessageTarget.cpp
 	Handler.cpp
 	InitTerminateLibBe.cpp
 	Invoker.cpp

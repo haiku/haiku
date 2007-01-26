@@ -29,9 +29,20 @@ initialize_before()
 
 	BMessage::Private::StaticInit();
 	BRoster::Private::InitBeRoster();
-	BPrivate::init_clipboard();
 
 	DBG(OUT("initialize_before() done\n"));
+}
+
+
+extern "C" void
+initialize_after()
+{
+	DBG(OUT("initialize_after()\n"));
+
+	BPrivate::init_clipboard();
+		// needs to send a message, and that requires gDefaultTokens to be initialized
+
+	DBG(OUT("initialize_after() done\n"));
 }
 
 

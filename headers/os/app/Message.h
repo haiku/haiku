@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,13 +22,8 @@ class BMessenger;
 class BHandler;
 class BString;
 
-// Private or reserved ---------------------------------------------------------
-extern "C" void		_msg_cache_cleanup_();
-extern "C" int		_init_message_();
-extern "C" int		_delete_message_();
-//------------------------------------------------------------------------------
 
-// Name lengths and Scripting specifiers ---------------------------------------
+// Name lengths and Scripting specifiers
 #define B_FIELD_NAME_LENGTH			255
 #define B_PROPERTY_NAME_LENGTH		255
 
@@ -57,7 +52,7 @@ class BMessage {
 
 		BMessage		&operator=(const BMessage &other);
 
-// Statistics and misc info
+		// Statistics and misc info
 		status_t		GetInfo(type_code typeRequested, int32 index,
 							char **nameFound, type_code *typeFound,
 							int32 *countFound = NULL) const;
@@ -74,7 +69,7 @@ class BMessage {
 
 		status_t		Rename(const char *oldEntry, const char *newEntry);
 
-// Delivery info
+		// Delivery info
 		bool			WasDelivered() const;
 		bool			IsSourceWaiting() const;
 		bool			IsSourceRemote() const;
@@ -83,7 +78,7 @@ class BMessage {
 		bool			WasDropped() const;
 		BPoint			DropPoint(BPoint *offset = NULL) const;
 
-// Replying
+		// Replying
 		status_t		SendReply(uint32 command, BHandler *replyTo = NULL);
 		status_t		SendReply(BMessage *reply, BHandler *replyTo = NULL,
 							bigtime_t timeout = B_INFINITE_TIMEOUT);
@@ -95,14 +90,14 @@ class BMessage {
 							bigtime_t sendTimeout = B_INFINITE_TIMEOUT,
 							bigtime_t replyTimeout = B_INFINITE_TIMEOUT);
 
-// Flattening data
+		// Flattening data
 		ssize_t			FlattenedSize() const;
 		status_t		Flatten(char *buffer, ssize_t size) const;
 		status_t		Flatten(BDataIO *stream, ssize_t *size = NULL) const;
 		status_t		Unflatten(const char *flatBuffer);
 		status_t		Unflatten(BDataIO *stream);
 
-// Specifiers (scripting)
+		// Specifiers (scripting)
 		status_t		AddSpecifier(const char *property);
 		status_t		AddSpecifier(const char *property, int32 index);
 		status_t		AddSpecifier(const char *property, int32 index, int32 range);
@@ -116,7 +111,7 @@ class BMessage {
 		bool			HasSpecifiers() const;
 		status_t		PopSpecifier();
 
-// Adding data
+		// Adding data
 		status_t		AddRect(const char *name, BRect aRect);
 		status_t		AddPoint(const char *name, BPoint aPoint);
 		status_t		AddString(const char *name, const char *aString);
@@ -138,12 +133,12 @@ class BMessage {
 							const void *data, ssize_t numBytes,
 							bool isFixedSize = true, int32 count = 1);
 
-// Removing data
+		// Removing data
 		status_t		RemoveData(const char *name, int32 index = 0);
 		status_t		RemoveName(const char *name);
 		status_t		MakeEmpty();
 
-// Finding data
+		// Finding data
 		status_t		FindRect(const char *name, BRect *rect) const;
 		status_t		FindRect(const char *name, int32 index, BRect *rect) const;
 		status_t		FindPoint(const char *name, BPoint *point) const;
@@ -181,7 +176,7 @@ class BMessage {
 		status_t		FindData(const char *name, type_code type, int32 index,
 							const void **data, ssize_t *numBytes) const;
 
-// Replacing data
+		// Replacing data
 		status_t		ReplaceRect(const char *name, BRect aRect);
 		status_t		ReplaceRect(const char *name, int32 index, BRect aRect);
 		status_t		ReplacePoint(const char *name, BPoint aPoint);
@@ -223,7 +218,7 @@ class BMessage {
 		void			*operator new(size_t, void *pointer);
 		void			operator delete(void *pointer, size_t size);
 
-// Private, reserved, or obsolete ----------------------------------------------
+		// Private, reserved, or obsolete
 		bool			HasRect(const char *, int32 n = 0) const;
 		bool			HasPoint(const char *, int32 n = 0) const;
 		bool			HasString(const char *, int32 n = 0) const;
@@ -303,8 +298,9 @@ class BMessage {
 		virtual	void	_ReservedMessage2();
 		virtual	void	_ReservedMessage3();
 
-		status_t		_SendMessage(port_id port, int32 token, bigtime_t timeout,
-							bool replyRequired, BMessenger &replyTo) const;
+		status_t		_SendMessage(port_id port, team_id portOwner, int32 token,
+							bigtime_t timeout, bool replyRequired,
+							BMessenger &replyTo) const;
 		status_t		_SendMessage(port_id port, team_id portOwner,
 							int32 token, BMessage *reply, bigtime_t sendTimeout,
 							bigtime_t replyTimeout) const;

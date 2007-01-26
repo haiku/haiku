@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku Inc. All rights reserved.
+ * Copyright 2005-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,18 +14,21 @@
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
 
+#include <DirectMessageTarget.h>
+#include <MessengerPrivate.h>
+#include <TokenSpace.h>
+#include <util/KMessage.h>
+
 #include <Application.h>
 #include <AppMisc.h>
 #include <BlockCache.h>
 #include <Entry.h>
+#include <MessageQueue.h>
 #include <Messenger.h>
-#include <MessengerPrivate.h>
 #include <Path.h>
 #include <Point.h>
 #include <Rect.h>
 #include <String.h>
-#include <TokenSpace.h>
-#include <util/KMessage.h>
 
 #include <ctype.h>
 #include <malloc.h>
@@ -1837,8 +1840,8 @@ BMessage::_StaticGetCachedReplyPort()
 
 
 status_t
-BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
-	bool replyRequired, BMessenger &replyTo) const
+BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
+	bigtime_t timeout, bool replyRequired, BMessenger &replyTo) const
 {
 	DEBUG_FUNCTION_ENTER;
 	ssize_t size = 0;
@@ -1846,7 +1849,24 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 	message_header *header = NULL;
 	status_t result;
 
-	if (/*fHeader->fields_size + fHeader->data_size > B_PAGE_SIZE*/false) {
+	BPrivate::BDirectMessageTarget* direct = NULL;
+	BMessage* copy = NULL;
+	if (portOwner == BPrivate::current_team())
+		BPrivate::gDefaultTokens.AcquireHandlerTarget(token, &direct);
+
+	if (direct != NULL) {
+		// We have a direct local message target - we can just enqueue the message
+		// in its message queue. This will also prevent possible deadlocks when the
+		// queue is full.
+		copy = new BMessage(*this);
+		if (copy != NULL) {
+			header = copy->fHeader;
+			result = B_OK;
+		} else {
+			direct->Release();
+			result = B_NO_MEMORY;
+		}
+	} else if (/*fHeader->fields_size + fHeader->data_size > B_PAGE_SIZE*/false) {
 		result = _FlattenToArea(&header);
 		buffer = (char *)header;
 		size = sizeof(message_header);
@@ -1892,10 +1912,22 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 	header->reply_target = replyToPrivate.Token();
 	header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 
-	do {
-		result = write_port_etc(port, kPortMessageCode, (void *)buffer, size,
-			B_RELATIVE_TIMEOUT, timeout);
-	} while (result == B_INTERRUPTED);
+	if (direct != NULL) {
+		// this is a local message transmission
+		direct->AddMessage(copy);
+
+		if (direct->Queue()->IsNextMessage(copy) && port_count(port) <= 0) {
+			// there is currently no message waiting, and we need to wakeup the looper
+			write_port_etc(port, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
+		}
+
+		direct->Release();
+	} else {
+		do {
+			result = write_port_etc(port, kPortMessageCode, (void *)buffer, size,
+				B_RELATIVE_TIMEOUT, timeout);
+		} while (result == B_INTERRUPTED);
+	}
 
 	if (result == B_OK && IsSourceWaiting()) {
 		// the forwarded message will handle the reply - we must not do
@@ -1908,6 +1940,9 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 }
 
 
+/*!
+	Sends a message and waits synchronously for a reply.
+*/
 status_t
 BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	BMessage *reply, bigtime_t sendTimeout, bigtime_t replyTimeout) const
@@ -1961,7 +1996,9 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		BMessenger replyTarget;
 		BMessenger::Private(replyTarget).SetTo(team, replyPort,
 			B_PREFERRED_TOKEN);
-		result = _SendMessage(port, token, sendTimeout, true, replyTarget);
+		// TODO: replying could also use a BDirectMessageTarget like mechanism for local targets
+		result = _SendMessage(port, -1, token, sendTimeout, true,
+			replyTarget);
 	}
 
 	if (result < B_OK)

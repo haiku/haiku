@@ -327,7 +327,7 @@ BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 	if (!message)
 		return B_BAD_VALUE;
 
-	return BMessage::Private(message).SendMessage(fPort, fHandlerToken,
+	return BMessage::Private(message).SendMessage(fPort, fTeam, fHandlerToken,
 		timeout, false, replyTo);
 }
 

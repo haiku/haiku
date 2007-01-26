@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All rights reserved.
+ * Copyright 2005-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -200,10 +200,10 @@ class BMessage::Private {
 		}
 
 		status_t
-		SendMessage(port_id port, int32 token, bigtime_t timeout,
-			bool replyRequired, BMessenger &replyTo) const
+		SendMessage(port_id port, team_id portOwner, int32 token,
+			bigtime_t timeout, bool replyRequired, BMessenger &replyTo) const
 		{
-			return fMessage->_SendMessage(port, token,
+			return fMessage->_SendMessage(port, portOwner, token,
 				timeout, replyRequired, replyTo);
 		}
 

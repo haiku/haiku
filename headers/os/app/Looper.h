@@ -18,6 +18,7 @@
 class BMessage;
 class BMessageQueue;
 namespace BPrivate {
+	class BDirectMessageTarget;
 	class BLooperList;
 }
 
@@ -150,7 +151,7 @@ private:
 			BHandler*		resolve_specifier(BHandler* target, BMessage* msg);
 			void			UnlockFully();
 
-			BMessageQueue*	fQueue;
+			BPrivate::BDirectMessageTarget* fDirectTarget;
 			BMessage*		fLastMessage;
 			port_id			fMsgPort;
 			int32			fAtomicCount;
