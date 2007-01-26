@@ -118,7 +118,7 @@ list_domain_interfaces(void *buffer, size_t size)
 			if (interface == NULL)
 				break;
 
-			size = IF_NAMESIZE + (interface->address ? interface->address->sa_len : 1);
+			size = IF_NAMESIZE + (interface->address ? interface->address->sa_len : 2);
 			if (spaceLeft < size)
 				return ENOBUFS;
 
