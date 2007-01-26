@@ -7,6 +7,10 @@ UseLibraryHeaders usb ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers bus usb ] : true ;
 UsePrivateHeaders kernel ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders [ FDirName drivers ] ;
+}
+
 StaticLibrary USBKit.a :
 	USBRoster.cpp
 	USBDevice.cpp
