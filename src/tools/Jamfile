@@ -68,5 +68,6 @@ SubInclude HAIKU_TOP src tools remote_disk_server ;
 SubInclude HAIKU_TOP src tools resattr ;
 SubInclude HAIKU_TOP src tools rman ;
 SubInclude HAIKU_TOP src tools translation ;
+SubInclude HAIKU_TOP src tools vmdkheader ;
 SubInclude HAIKU_TOP src tools unflatten ;
 
