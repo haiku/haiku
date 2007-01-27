@@ -802,7 +802,7 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 			activeDeadKey = newDeadKey;
 		}
 
-		lastKeyCode = keycode;
+		lastKeyCode = isKeyDown ? keycode : 0;
 	}
 
 	return 0;
