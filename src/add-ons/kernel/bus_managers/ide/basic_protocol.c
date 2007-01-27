@@ -64,6 +64,8 @@ reset_bus(ide_device_info *device, ide_qrequest *ignore)
 	ide_controller_interface *controller = bus->controller;
 	ide_channel_cookie channel = bus->channel_cookie;
 
+	dprintf("ide: reset_bus() device %p, bus %p\n", device, bus);
+
 	FAST_LOG0(bus->log, ev_ide_reset_bus);
 
 	if (device->reconnect_timer_installed) {
@@ -109,6 +111,7 @@ reset_bus(ide_device_info *device, ide_qrequest *ignore)
 	finish_all_requests(bus->devices[0], ignore, SCSI_SCSI_BUS_RESET, true);
 	finish_all_requests(bus->devices[1], ignore, SCSI_SCSI_BUS_RESET, true);
 
+	dprintf("ide: reset_bus() device %p, bus %p success\n", device, bus);
 	return true;
 
 err0:
@@ -119,6 +122,8 @@ err1:
 	finish_all_requests(bus->devices[1], ignore, SCSI_SCSI_BUS_RESET, true);
 
 	//xpt->call_async( bus->xpt_cookie, -1, -1, AC_BUS_RESET, NULL, 0 );
+
+	dprintf("ide: reset_bus() device %p, bus %p failed\n", device, bus);
 	return false;
 }
 
@@ -134,6 +139,8 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 	ide_bus_info *bus = device->bus;
 	status_t res;
 	uint8 orig_command;
+
+	dprintf("ide: reset_device() device %p\n", device);
 
 	FAST_LOG1(bus->log, ev_ide_reset_device, device->is_device1);
 	SHOW_FLOW0(3, "");
@@ -173,10 +180,12 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 	finish_all_requests(device, ignore, SCSI_SCSI_BUS_RESET, true);
 
 	SHOW_FLOW0(3, "done");
+	dprintf("ide: reset_device() device %p success\n", device);
 	return true;
 
 err:
 	// do the hard way
+	dprintf("ide: reset_device() device %p failed, calling reset_bus\n", device);
 	return reset_bus(device, ignore);
 }
 

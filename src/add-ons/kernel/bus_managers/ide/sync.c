@@ -263,6 +263,8 @@ ide_timeout_dpc(void *arg)
 	qrequest = bus->active_qrequest;
 	device = qrequest->device;
 
+	dprintf("ide: ide_timeout_dpc() bus %p, decide %p\n", bus, device);
+
 	FAST_LOG1(bus->log, ev_ide_timeout_dpc, (uint32)qrequest);
 
 	// this also resets overlapped commands
@@ -293,6 +295,8 @@ ide_timeout(timer *arg)
 	FAST_LOG0(bus->log, ev_ide_timeout);
 
 	TRACE(("ide_timeout(): %p\n", bus));
+
+	dprintf("ide: ide_timeout() bus %p\n", bus);
 
 	// we need to lock bus to have a solid bus state
 	// (side effect: we lock out the IRQ handler)	
