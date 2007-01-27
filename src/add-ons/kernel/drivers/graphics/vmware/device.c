@@ -92,6 +92,7 @@ MapDevice()
 	SharedInfo *si = gPd->si;
 	int writeCombined = 1;
 
+#if 0
 	/* Map the frame buffer */
 	si->fbArea = map_physical_memory("VMware frame buffer",
 		si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS|B_MTR_WC,
@@ -103,6 +104,14 @@ MapDevice()
 			si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA|B_WRITE_AREA, (void **)&si->fb);
 	}
+#else
+	/* Workaround for KDL problem. Map the frame buffer in 
+       uncached mode, see bug report #994 */
+	writeCombined = 0;
+	si->fbArea = map_physical_memory("VMware frame buffer",
+		si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS|B_MTR_UC,
+		B_READ_AREA|B_WRITE_AREA, (void **)&si->fb);
+#endif
 	if (si->fbArea < 0) {
 		TRACE("failed to map frame buffer\n");
 		return si->fbArea;
