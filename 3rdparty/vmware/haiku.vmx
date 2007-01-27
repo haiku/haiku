@@ -1,0 +1,54 @@
+#!/usr/bin/vmware
+config.version = "8"
+virtualHW.version = "3"
+
+MemAllowAutoScaleDown = "FALSE"
+MemTrimRate = "-1"
+
+uuid.location = "56 4d 20 2e e7 51 21 3a-cf 1f 8c a4 85 aa 04 9b"
+uuid.bios = "56 4d 20 2e e7 51 21 3a-cf 1f 8c a4 85 aa 04 9b"
+
+uuid.action = "create"
+checkpoint.vmState = ""
+
+displayName = "Haiku"
+guestOS = "other"
+memsize = "256"
+
+ethernet0.present= "true"
+ethernet0.startConnected = "true"
+ethernet0.virtualDev = "e1000"
+ethernet0.connectionType = "bridged"
+
+serial0.present = "true"
+serial0.fileType = "file"
+serial0.fileName = "haiku-serial-port.txt"
+serial0.tryNoRxLoss = "FALSE"
+
+usb.present = "FALSE"
+
+sound.present = "FALSE"
+
+scsi0.present = "FALSE"
+
+floppy0.present = "FALSE"
+
+ide0:0.present = "TRUE"
+ide0:0.fileName = "haiku.vmdk"
+ide0:0.deviceType = "disk"
+ide0:0.mode = "persistent"
+ide0:0.redo = ""
+ide0:0.writeThrough = "FALSE"
+ide0:0.startConnected = "FALSE"
+
+ide0:1.present = "FALSE"
+
+ide1:0.present = "FALSE"
+
+ide1:1.present = "FALSE"
+
+ethernet0.addressType = "generated"
+ethernet0.generatedAddress = "00:0c:29:aa:04:9b"
+ethernet0.generatedAddressOffset = "0"
+
+tools.remindInstall = "TRUE"
