@@ -29,6 +29,9 @@ HAIKU_IMAGE_NAME	= walter.image ;
 HAIKU_IMAGE_DIR		= /tmp ;
 HAIKU_IMAGE_SIZE	= 100 ;
 
+# Name the VMWare image walter.vmdk (in directory $(HAIKU_IMAGE_DIR)).
+HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
+
 # Install Haiku in directory /Haiku.
 HAIKU_INSTALL_DIR = /Haiku ;
 

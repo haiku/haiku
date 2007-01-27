@@ -371,3 +371,20 @@ actions BuildHaikuImage1
 	export isImage="$(IS_IMAGE)"
 	$(2[1]) $(2[2-])
 }
+
+rule BuildVMWareImage vmwareImage : plainImage : imageSize
+{
+	# BuildVMWareImage <vmware image> : <plain image> : <image size in MB>
+
+	IMAGE_SIZE on $(vmwareImage) = $(imageSize) ;
+
+	Depends $(vmwareImage) : <build>vmdkheader $(plainImage) ;
+	BuildVMWareImage1 $(vmwareImage) : <build>vmdkheader $(plainImage) ;
+}
+
+actions BuildVMWareImage1
+{
+	rm -f $(1)
+	$(2[1]) -h 64k -i$(IMAGE_SIZE)M $(1) &&
+	cat $(2[2]) >> $(1)
+}

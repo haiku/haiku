@@ -296,7 +296,7 @@ AddDirectoryToHaikuImage beos etc synth ;
 AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
 
 
-#pragma mark -
+#pragma mark - Build The Image
 
 # Set image name and directory defaults and locate the image.
 HAIKU_IMAGE_NAME ?= haiku.image ;
@@ -381,3 +381,15 @@ Depends haiku-image : $(HAIKU_IMAGE) ;
 # install Haiku into a directory
 NotFile install-haiku ;
 _BuildHaikuImage install-haiku : 0 ;
+
+
+#pragma mark - Build The VMWare Image
+
+HAIKU_VMWARE_IMAGE_NAME ?= haiku.vmdk ;
+HAIKU_VMWARE_IMAGE ?= $(HAIKU_VMWARE_IMAGE_NAME) ;
+MakeLocate $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE_DIR) ;
+
+BuildVMWareImage $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE)
+	: $(HAIKU_IMAGE_SIZE) ;
+NotFile haiku-vmware-image ;
+Depends haiku-vmware-image : $(HAIKU_VMWARE_IMAGE) ;
