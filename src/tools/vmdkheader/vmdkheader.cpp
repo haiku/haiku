@@ -101,6 +101,16 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	if (headersize % 512) {
+		fprintf(stderr, "Error: header size must be a multiple of 512 bytes\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (imagesize % 512) {
+		fprintf(stderr, "Error: image size must be a multiple of 512 bytes\n");
+		exit(EXIT_FAILURE);
+	}
+
 	// arbitrary 1 GB limitation
 	if (headersize > 0x40000000u) {
 		fprintf(stderr, "Error: header size too large\n");
