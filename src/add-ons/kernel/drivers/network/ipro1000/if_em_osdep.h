@@ -126,10 +126,10 @@ void contigfree(void *p, int p1, int p2);
 static inline unsigned long vtophys(unsigned long virtual_addr)
 {
 	physical_entry pe;
-	if (get_memory_map((void *)virtual_addr, 2048, &pe, 1) < 0) {
-		ERROROUT1("get_memory_map failed for %p\n", (void *)virtual_addr);
-		return 0;
-	}
+	status_t err;
+	err = get_memory_map((void *)virtual_addr, 2048, &pe, 1);
+	if (err < 0)
+		panic("ipro1000: get_memory_map failed for %p, error %08lx\n", (void *)virtual_addr, err);
 	return (unsigned long) pe.address;
 }
 
