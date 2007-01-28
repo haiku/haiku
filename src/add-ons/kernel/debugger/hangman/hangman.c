@@ -1,6 +1,7 @@
 #ifdef _KERNEL_MODE
 #include <Drivers.h>
 #include <KernelExport.h>
+#include <module.h>
 #endif
 #include <OS.h>
 #include <image.h>
@@ -8,15 +9,24 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+/* as driver or module */
+//#define AS_DRIVER 1
+
 /* do we reboot on loose ? */
-//#define FAIL_IN_BSOD_CAUSE_REBOOT
+//#define FAIL_IN_BSOD_CAUSE_REBOOT 1
 
 /* shortcut to be able to exit (and take a screenshot) */
-#define CAN_EXIT_ON_HYPHEN
+#define CAN_EXIT_ON_DASH
 
 #define MAX_FAILS_BEFORE_BSOD 0
 
+#ifdef __HAIKU__
+#define FORTUNE_FILE "/etc/fortunes/default/Fortunes"
+#else
 #define FORTUNE_FILE "/etc/fortunes/default"
+#endif
+
+#define KCMD_HELP "A funny KDL hangman game :-)"
 
 #define DEV_ENTRY "misc/hangman"
 
@@ -182,7 +192,7 @@ int play_hangman(void)
 					str = bigbuffer;
 					PRINTF("buffer:%s\n", str);
 				}
-#ifdef CAN_EXIT_ON_HYPHEN
+#ifdef CAN_EXIT_ON_DASH
 				if (str[0] == '-') /* emergency exit */
 					return 0;
 #endif
@@ -233,9 +243,6 @@ int play_hangman(void)
 
 #ifdef _KERNEL_MODE /* driver parts */
 
-typedef struct {
-	int dummy;
-} cookie_t;
 
 #ifndef __HAIKU__ /* BeOS intimacy revealed */
 //char *bsod_wrapper_gets(char *p, int len)
@@ -276,6 +283,12 @@ PRINTF("score %d\n", score);
 	return B_KDEBUG_QUIT;
 }
 
+#  ifdef AS_DRIVER
+
+typedef struct {
+	int dummy;
+} cookie_t;
+
 const char * device_names[]={DEV_ENTRY, NULL};
 
 status_t init_hardware(void) {
@@ -289,7 +302,7 @@ status_t init_driver(void) {
 		return B_ERROR;
 	}
 	get_image_symbol(KERNEL_IMAGE_ID, "bsod_gets", B_SYMBOL_TYPE_ANY, (void **)&bsod_gets);
-	add_debugger_command("kdlhangman", kdlhangman, "A funny KDL hangman game :-)");
+	add_debugger_command("kdlhangman", kdlhangman, KCMD_HELP);
 	return B_OK;
 }
 
@@ -359,7 +372,34 @@ device_hooks *find_device(const char *name) {
 	return &khangman_hooks;
 }
 
+#  else /* as module */
 
+status_t std_ops(int32 op, ...)
+{
+	switch (op) {
+	case B_MODULE_INIT:
+		if (init_words(FORTUNE_FILE) < B_OK) {
+			dprintf("hangman: error reading fortune file.\n");
+			return B_ERROR;
+		}
+		add_debugger_command("kdlhangman", kdlhangman, KCMD_HELP);
+		return B_OK;
+	case B_MODULE_UNINIT:
+		remove_debugger_command("kdlhangman", kdlhangman);
+		return B_ERROR;
+	}
+	return B_ERROR;
+}
+
+static module_info minfo = {
+	"debugger/hangman/v1",
+	B_KEEP_LOADED,
+	&std_ops
+};
+
+module_info *modules[] = { &minfo, NULL };
+
+#  endif /* AS_DRIVER */
 
 #else
 
