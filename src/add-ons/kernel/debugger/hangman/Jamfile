@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel debugger ;
+SubDir HAIKU_TOP src add-ons kernel debugger hangman ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
