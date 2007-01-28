@@ -1302,11 +1302,19 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 	struct process_group *group;
 	status_t status;
 
+	// TODO: only *children* are of interest, not any process of a given ID (see bug #996)!
+
 	if (child == -1 || child > 0) {
 		// wait for any children or a specific child of this team to die
-		*_waitSem = team->dead_children.sem;
-		*_waitCount = &team->dead_children.waiters;
-		return team_get_death_entry(team, child, death, _freeDeath);
+		status = team_get_death_entry(team, child, death, _freeDeath);
+		if (status < B_OK) {
+			if (team->children == NULL)
+				return B_BAD_THREAD_ID;
+
+			*_waitSem = team->dead_children.sem;
+			*_waitCount = &team->dead_children.waiters;
+		}
+		return status;
 	} else if (child < 0) {
 		// we wait for all children of the specified process group
 		group = team_get_process_group_locked(team->group->session, -child);
@@ -1324,6 +1332,10 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 			return B_OK;
 		}
 	}
+
+	// does this team have any children we would need to wait for?
+	if (team->children == NULL)
+		return B_BAD_THREAD_ID;
 
 	*_waitSem = group->dead_child_sem;
 	*_waitCount = &group->dead_child_waiters;
@@ -1373,8 +1385,8 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 				if ((flags & WNOHANG) != 0)
 					status = B_WOULD_BLOCK;
 
-				// TODO: check if this check is correct
-				if (childThread->team->group_id != team->group_id)
+				// make sure this child is one of ours
+				if (childThread->team->parent != team)
 					status = ECHILD;
 
 				childExists = true;
@@ -1398,6 +1410,8 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		if (status == B_BAD_THREAD_ID) {
 			if (child <= 0 || !childExists) {
 				status = ECHILD;
+				RELEASE_TEAM_LOCK();
+				restore_interrupts(state);
 				goto err;
 			} else {
 				// the specific child we're waiting for is still running
