@@ -230,15 +230,12 @@ bool
 ShowImageApp::QuitRequested()
 {
 	// Give the windows a chance to prompt the user if there are changes
-	BMessage msg(B_QUIT_REQUESTED);
-	BroadcastToWindows(&msg);
-	if (CountWindows() <= WINDOWS_TO_IGNORE) {
+	bool result = BApplication::QuitRequested();
+	if (result)
 		be_clipboard->StopWatching(be_app_messenger);
 			// tell clipboard we don't want anymore notification
-
-		return true;
-	} else
-		return false;
+	
+	return result;
 }
 
 
