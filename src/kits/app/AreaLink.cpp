@@ -1,213 +1,229 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		AreaLink.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Helper class for managing chunks of small data in an area
-//  
-//------------------------------------------------------------------------------
-#include <Rect.h>
+/*
+ * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ */
+
+
 #include "AreaLink.h"
+
+#include <Rect.h>
+
 #include <string.h>
 
 //#define AL_DEBUG
- 
 #ifdef AL_DEBUG
 #include <stdio.h>
 #endif
 
-class AreaLinkHeader
-{
-public:
-	AreaLinkHeader(void) { MakeEmpty(); lock=B_NAME_NOT_FOUND; }
 
-	void SetAttachmentCount(uint32 size) { attachmentcount=size; }
-	uint32 GetAttachmentCount(void) { return attachmentcount; }
+class AreaLinkHeader {
+	public:
+		AreaLinkHeader() { MakeEmpty(); fLock = B_NAME_NOT_FOUND; }
 
-	void SetAttachmentSize(uint32 size) { attachmentsize=size; }
-	uint32 GetAttachmentSize(void) { return attachmentsize; }
+		void SetAttachmentCount(uint32 size) { fAttachmentCount = size; }
+		uint32 GetAttachmentCount() { return fAttachmentCount; }
+
+		void SetAttachmentSize(uint32 size) { fAttachmentSize = size; }
+		uint32 GetAttachmentSize() { return fAttachmentSize; }
+
+		void AddAttachment(uint32 size) { fAttachmentSize += size; fAttachmentCount++; }
 	
-	void AddAttachment(uint32 size) { attachmentsize+=size; attachmentcount++; }
-	
-	void SetLockSem(sem_id sem) { lock=sem; }
-	sem_id GetLockSem(void) { return lock; }
+		void SetLockSem(sem_id sem) { fLock = sem; }
+		sem_id GetLockSem() { return fLock; }
 
-	void MakeEmpty(void) { attachmentcount=0; attachmentsize=0; }
-	area_info GetInfo(void) { return info; }
-	void SetInfo(const area_info &newinfo) { info=newinfo; }
-private:
-	uint32 attachmentcount;
-	uint32 attachmentsize;
-	sem_id lock;
-	area_info info;
+		void MakeEmpty() { fAttachmentCount = 0; fAttachmentSize = 0; }
+		area_info GetInfo() { return fInfo; }
+		void SetInfo(const area_info &newInfo) { fInfo = newInfo; }
+		
+	private:
+		uint32 fAttachmentCount;
+		uint32 fAttachmentSize;
+		sem_id fLock;
+		area_info fInfo;
 };
 
-AreaLink::AreaLink(area_id area, bool is_arealink_area)
+
+//	#pragma mark -
+
+
+AreaLink::AreaLink(area_id area, bool isAreaLinkArea)
+	:fAttachList(new BList(0)),
+	fHaveLock(false)
 {
-	attachlist=new BList(0);
-	have_lock=false;
-	SetTarget(area,is_arealink_area);
+	SetTarget(area, isAreaLinkArea);
 }
 
-AreaLink::AreaLink(void)
-{
-	attachlist=new BList(0);
-	area_ok=false;
-	have_lock=false;
-	target=B_NAME_NOT_FOUND;
+
+AreaLink::AreaLink()
+	:fAttachList(new BList(0)),
+	fTarget(B_NAME_NOT_FOUND),
+	fAreaIsOk(false),
+	fHaveLock(false)
+	
+{	
 }
 
-AreaLink::~AreaLink(void)
+
+AreaLink::~AreaLink()
 {
-	delete attachlist;
+	delete fAttachList;
 }
 
-void AreaLink::SetTarget(area_id area,bool is_arealink_area)
+
+void
+AreaLink::SetTarget(area_id area, bool isAreaLinkArea)
 {
-	area_info targetinfo;
+	area_info targetInfo;
 
-	if(get_area_info(area,&targetinfo)==B_OK)
-	{
-		target=area;
-		area_ok=true;
-		header=(AreaLinkHeader *)targetinfo.address;
+	if (get_area_info(area, &targetInfo) == B_OK) {
+		fTarget = area;
+		fAreaIsOk = true;
+		fHeader = (AreaLinkHeader *)targetInfo.address;
 
-		if(is_arealink_area)
+		if (isAreaLinkArea)
 			_ReadAttachments();
-		else
-		{
-			header->MakeEmpty();
-			header->SetInfo(targetinfo);
+		else {
+			fHeader->MakeEmpty();
+			fHeader->SetInfo(targetInfo);
 		}
 
-		baseaddress=(int8*)targetinfo.address;
-		baseaddress+=sizeof(AreaLinkHeader);
-	}
-	else
-	{
-		target=B_NAME_NOT_FOUND;
-		area_ok=false;
+		fBaseAddress = (int8*)targetInfo.address;
+		fBaseAddress += sizeof(AreaLinkHeader);
+	} else {
+		fTarget = B_NAME_NOT_FOUND;
+		fAreaIsOk = false;
 	}
 }
 
-void AreaLink::Attach(const void *data, size_t size)
+
+void
+AreaLink::Attach(const void *data, size_t size)
 {
-	if(!data || size==0)
+	if (!data || size == 0)
 		return;
 	
 	Lock();
 	
 	// Will the attachment fit?
-	if(header->GetAttachmentSize()+size>header->GetInfo().size)
-	{
+	if (fHeader->GetAttachmentSize() + size > fHeader->GetInfo().size) {
 		// Being it won't fit, resize the area to fit the thing
-		int32 pagenum=int32(header->GetInfo().size/B_PAGE_SIZE);
-		resize_area(target,pagenum+1);
+		int32 pageNum = int32(fHeader->GetInfo().size / B_PAGE_SIZE);
+		resize_area(fTarget, pageNum + 1);
 	}
 	
 	// Our attachment will fit, so copy the data into the current location
-	// and increment the appropriate header values
-	int8 *currentpointer=(int8*)BaseAddress();
-	currentpointer+=header->GetAttachmentSize();
-	memcpy(currentpointer,data,size);
+	// and increment the appropriate fHeader values
+	int8 *currentpointer = (int8*)BaseAddress();
+	currentpointer += fHeader->GetAttachmentSize();
+	memcpy(currentpointer, data, size);
 
-	attachlist->AddItem(currentpointer);
-	header->AddAttachment(size);
+	fAttachList->AddItem(currentpointer);
+	fHeader->AddAttachment(size);
 	
 	Unlock();
 }
 
-void AreaLink::Attach(const int32 &data)
+
+void
+AreaLink::Attach(const int32 &data)
 {
-	Attach(&data,sizeof(int32));
+	Attach(&data, sizeof(int32));
 }
 
-void AreaLink::Attach(const int16 &data)
+
+void
+AreaLink::Attach(const int16 &data)
 {
-	Attach(&data,sizeof(int16));
+	Attach(&data, sizeof(int16));
 }
 
-void AreaLink::Attach(const int8 &data)
+
+void
+AreaLink::Attach(const int8 &data)
 {
-	Attach(&data,sizeof(int8));
+	Attach(&data, sizeof(int8));
 }
 
-void AreaLink::Attach(const float &data)
+
+void
+AreaLink::Attach(const float &data)
 {
-	Attach(&data,sizeof(float));
+	Attach(&data, sizeof(float));
 }
 
-void AreaLink::Attach(const bool &data)
+
+void
+AreaLink::Attach(const bool &data)
 {
-	Attach(&data,sizeof(bool));
+	Attach(&data, sizeof(bool));
 }
 
-void AreaLink::Attach(const rgb_color &data)
+
+void
+AreaLink::Attach(const rgb_color &data)
 {
-	Attach(&data,sizeof(rgb_color));
+	Attach(&data, sizeof(rgb_color));
 }
 
-void AreaLink::Attach(const BRect &data)
+
+void
+AreaLink::Attach(const BRect &data)
 {
-	Attach(&data,sizeof(BRect));
+	Attach(&data, sizeof(BRect));
 }
 
-void AreaLink::Attach(const BPoint &data)
+
+void
+AreaLink::Attach(const BPoint &data)
 {
-	Attach(&data,sizeof(BPoint));
+	Attach(&data, sizeof(BPoint));
 }
 
-void AreaLink::MakeEmpty(void)
+
+void
+AreaLink::MakeEmpty()
 {
-	attachlist->MakeEmpty();
-	header->MakeEmpty();
+	fAttachList->MakeEmpty();
+	fHeader->MakeEmpty();
 }
 
-void AreaLink::_ReadAttachments(void)
+
+void
+AreaLink::_ReadAttachments()
 {
-	int8 *index=baseaddress;
+	int8 *index = fBaseAddress;
 	uint16 size;
 	
-	for(uint32 i=0; i<header->GetAttachmentCount();i++)
-	{
-		size=*((int16*)index);
-		baseaddress+=SIZE_SIZE;
-		attachlist->AddItem(baseaddress);
-		baseaddress+=size;
+	for (uint32 i = 0; i < fHeader->GetAttachmentCount(); i++) {
+		size = *((int16*)index);
+		fBaseAddress += SIZE_SIZE;
+		fAttachList->AddItem(fBaseAddress);
+		fBaseAddress += size;
 	}
 }
 
-void AreaLink::Lock(void)
+
+void
+AreaLink::Lock()
 {
-	if(!have_lock)
-		acquire_sem(header->GetLockSem());
+	if (!fHaveLock)
+		acquire_sem(fHeader->GetLockSem());
 }
 
-void AreaLink::Unlock(void)
+
+void
+AreaLink::Unlock()
 {
-	if(have_lock)
-		release_sem(header->GetLockSem());
+	if (fHaveLock)
+		release_sem(fHeader->GetLockSem());
 }
 
-bool AreaLink::IsLocked(void)
+
+bool
+AreaLink::IsLocked()
 {
-	return have_lock;
+	return fHaveLock;
 }
