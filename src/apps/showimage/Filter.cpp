@@ -6,6 +6,7 @@
  *
  * Authors:
  *		Michael Pfeiffer, laplace@haiku-os.org
+ *		Ryan Leavengood, leavengood@gmail.com
  *		yellowTAB GmbH
  *		Bernd Korz
  */
@@ -939,7 +940,7 @@ ImageProcessor::CreateDestImage(BBitmap* /* srcImage */)
 	fWidth = GetSrcImage()->Bounds().IntegerWidth();
 	fHeight = GetSrcImage()->Bounds().IntegerHeight();
 	
-	if (fOp == kRotateClockwise || fOp == kRotateAntiClockwise) {
+	if (fOp == kRotateClockwise || fOp == kRotateCounterClockwise) {
 		rect.Set(0, 0, fHeight, fWidth);
 	} else {
 		rect.Set(0, 0, fWidth, fHeight);
@@ -1056,7 +1057,7 @@ ImageProcessor::Run(int32 i, int32 n)
 				}
 			}
 			break;
-		case kRotateAntiClockwise:
+		case kRotateCounterClockwise:
 			for (y = from; y <= to; y ++) {
 				for (x = 0; x <= fWidth; x ++) {
 					destX = y;

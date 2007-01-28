@@ -5,7 +5,6 @@ UsePrivateHeaders tracker ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application ShowImage : ShowImageApp.cpp
-	ShowImageConstants.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp
 	ShowImageUndo.cpp

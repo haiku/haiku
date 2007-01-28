@@ -832,7 +832,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			fImageView->ResizeImage(w, h);
 			break;
 		}	
-		case MSG_RESIZER_WINDOW_QUITED:
+		case MSG_RESIZER_WINDOW_QUIT:
 			fResizerWindowMessenger = NULL;
 			break;
 		

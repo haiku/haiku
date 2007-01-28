@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -8,25 +8,9 @@
  *		yellowTAB GmbH
  *		Bernd Korz
  *      Michael Pfeiffer
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included 
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ *      Ryan Leavengood
  */
+
 
 #include <Box.h>
 #include <Button.h>
@@ -41,6 +25,7 @@
 #include "ResizerWindow.h"
 #include "ShowImageConstants.h"
 
+
 static const char* kWidthLabel = "Width:";
 static const char* kHeightLabel = "Height:";
 static const char* kKeepAspectRatioLabel = "Keep Original Proportions";
@@ -49,6 +34,7 @@ static const char* kApplyLabel = "Apply";
 static const float kLineDistance = 5;
 static const float kHorizontalIndent = 10;
 static const float kVerticalIndent = 10;
+
 
 ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	: BWindow(BRect(100, 100, 300, 300), "Resize", B_FLOATING_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
@@ -100,6 +86,7 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	ResizeTo(width2, rect.top);
 }
 
+
 void
 ResizerWindow::AddControl(BView* view, BControl* control, float column2, BRect& rect)
 {
@@ -119,6 +106,7 @@ ResizerWindow::AddControl(BView* view, BControl* control, float column2, BRect& 
 	}
 }
 
+
 void
 ResizerWindow::AddSeparatorLine(BView* view, BRect& rect)
 {
@@ -133,6 +121,7 @@ ResizerWindow::AddSeparatorLine(BView* view, BRect& rect)
 	rect.OffsetBy(0, kLineDistance + lineWidth);
 }
 
+
 void
 ResizerWindow::LeftAlign(BControl* control)
 {
@@ -140,6 +129,7 @@ ResizerWindow::LeftAlign(BControl* control)
 	float left = Bounds().Width() - frame.Width() - kHorizontalIndent;
 	control->MoveTo(left, frame.top);
 }
+
 
 void 
 ResizerWindow::MessageReceived(BMessage* message)
@@ -175,7 +165,8 @@ ResizerWindow::MessageReceived(BMessage* message)
 			
 		// private actions
 		case kResolutionMsg:
-		{	fAspectRatio->SetValue(B_CONTROL_OFF);
+		{
+			fAspectRatio->SetValue(B_CONTROL_OFF);
 			BString width, height;
 			width << message->FindInt32("w");
 			height << message->FindInt32("h");
@@ -184,8 +175,7 @@ ResizerWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		case kWidthModifiedMsg:
-			if (fAspectRatio->Value() == B_CONTROL_ON)
-			{
+			if (fAspectRatio->Value() == B_CONTROL_ON) {
 				int w = atoi(fWidth->Text());
 				int h = (int)((int64)w * (int64) fOriginalHeight / (int64) fOriginalWidth);
 				BString height;
@@ -197,8 +187,7 @@ ResizerWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		case kHeightModifiedMsg:
-			if (fAspectRatio->Value() == B_CONTROL_ON)
-			{
+			if (fAspectRatio->Value() == B_CONTROL_ON) {
 				int h = atoi(fHeight->Text());
 				int w = (int)((int64)h * (int64) fOriginalWidth / (int64) fOriginalHeight);
 				BString width;
@@ -223,13 +212,16 @@ ResizerWindow::MessageReceived(BMessage* message)
 	}
 }
 
+
 ResizerWindow::~ResizerWindow()
 {
 }
 
+
 bool
 ResizerWindow::QuitRequested()
 {
-	fTarget.SendMessage(MSG_RESIZER_WINDOW_QUITED);
+	fTarget.SendMessage(MSG_RESIZER_WINDOW_QUIT);
 	return true;
 }
+

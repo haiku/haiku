@@ -133,7 +133,9 @@ class ShowImageView : public BView {
 		bool HasSelection() { return fHasSelection; }
 		void SetHasSelection(bool bHasSelection);
 		void AnimateSelection(bool a);
-		void Notify(const char* status);
+		void SendMessageToWindow(BMessage *message);
+		void SendMessageToWindow(uint32 code);
+		void Notify();
 		void AddToRecentDocuments();
 		void AddWhiteRect(BRect &rect);
 		void GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
@@ -236,6 +238,8 @@ class ShowImageView : public BView {
 	
 		bool fShowCaption;			// display caption?
 		BString fCaption;			// caption text
+
+		BString fImageType; 		// Type of image, for use in status bar and caption
 
 		bool fInverted;
 

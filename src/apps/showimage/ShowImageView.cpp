@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -368,20 +368,34 @@ ShowImageView::SetTrackerMessenger(const BMessenger& trackerMessenger)
 }
 
 
+void
+ShowImageView::SendMessageToWindow(BMessage *message)
+{
+	BMessenger msgr(Window());
+	msgr.SendMessage(message);
+}
+
+
+void
+ShowImageView::SendMessageToWindow(uint32 code)
+{
+	BMessage message(code);
+	SendMessageToWindow(&message);
+}
+
+
 //! send message to parent about new image
 void 
-ShowImageView::Notify(const char* status)
+ShowImageView::Notify()
 {
 	BMessage msg(MSG_UPDATE_STATUS);
-	if (status != NULL) {
-		msg.AddString("status", status);
-	}
+
+	msg.AddString("status", fImageType.String());
 	msg.AddInt32("width", fBitmap->Bounds().IntegerWidth() + 1);
 	msg.AddInt32("height", fBitmap->Bounds().IntegerHeight() + 1);
 
 	msg.AddInt32("colors", fBitmap->ColorSpace());
-	BMessenger msgr(Window());
-	msgr.SendMessage(&msg);
+	SendMessageToWindow(&msg);
 
 	FixupScrollBars();
 	Invalidate();
@@ -511,7 +525,7 @@ ShowImageView::SetImage(const entry_ref *ref)
 				DoImageOperation(ImageProcessor::kRotateClockwise, true);
 				break;
 			case k270:
-				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
+				DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
 				break;
 			case k0V:
 				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
@@ -524,7 +538,7 @@ ShowImageView::SetImage(const entry_ref *ref)
 				DoImageOperation(ImageProcessor::ImageProcessor::kFlipLeftToRight, true);
 				break;
 			case k270V:
-				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
+				DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
 				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 		}
@@ -538,15 +552,17 @@ ShowImageView::SetImage(const entry_ref *ref)
 	else
 		fDocumentCount = 1;
 
+	fImageType = info.name;
+	
 	GetPath(&fCaption);
 	if (fDocumentCount > 1)
 		fCaption << ", " << fDocumentIndex << "/" << fDocumentCount;
 
-	fCaption << ", " << info.name;
+	fCaption << ", " << fImageType;
 
 	AddToRecentDocuments();
 
-	Notify(info.name);
+	Notify();
 	return B_OK;
 }
 
@@ -1104,7 +1120,7 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
 		// avoid flickering of dragged bitmap caused by drawing into the window
 		AnimateSelection(false);
-		// only use a transparent bitmap on selections less than 400x400 (taking into account scaling)
+		// only use a transparent bitmap on selections less than 400x400 (taking into account zooming)
 		if ((fSelectionRect.Width() * fZoom) < 400.0 && (fSelectionRect.Height() * fZoom) < 400.0)
 		{
 			sourcePoint -= fSelectionRect.LeftTop();
@@ -1352,8 +1368,7 @@ ShowImageView::MergeWithBitmap(BBitmap *merge, BRect selection)
 		DeleteBitmap();
 		fBitmap = bitmap;
 		
-		BMessenger msgr(Window());
-		msgr.SendMessage(MSG_MODIFIED);
+		SendMessageToWindow(MSG_MODIFIED);
 	} else
 		delete bitmap;
 }
@@ -1466,6 +1481,7 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final)
 		if (fCopyFromRect.Width() < 1.0 && fCopyFromRect.Height() < 1.0)
 			SetHasSelection(false);
 	}
+
 	if (oldSelection != fCopyFromRect || !HasSelection()) {
 		BRect updateRect;
 		updateRect = oldSelection | fCopyFromRect;
@@ -1496,8 +1512,7 @@ ShowImageView::MouseUp(BPoint point)
 		fMakesSelection = false;
 	} else if (fMovesImage) {
 		MoveImage();
-		if (fMovesImage)
-			fMovesImage = false;
+		fMovesImage = false;
 	}
 	AnimateSelection(true);
 }
@@ -1593,10 +1608,10 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 			ScrollRestrictedBy(10, 0);
 			break;
 		case B_ENTER:
-			NextFile();
+			SendMessageToWindow(MSG_FILE_NEXT);
 			break;
 		case B_BACKSPACE:
-			PrevFile();
+			SendMessageToWindow(MSG_FILE_PREV);
 			break;
 		case B_HOME:
 			break;
@@ -1626,8 +1641,7 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 				if (!NextFile()) {
 					// This is the last (or only file) in this directory, 
 					// close the window
-					BMessenger msgr(Window());
-					msgr.SendMessage(B_QUIT_REQUESTED);
+					SendMessageToWindow(B_QUIT_REQUESTED);
 				}
 			break;
 		}
@@ -1889,8 +1903,7 @@ ShowImageView::AddWhiteRect(BRect &rect)
 		DeleteBitmap();
 		fBitmap = bitmap;
 		
-		BMessenger msgr(Window());
-		msgr.SendMessage(MSG_MODIFIED);
+		SendMessageToWindow(MSG_MODIFIED);
 	} else
 		delete bitmap;
 }
@@ -2006,8 +2019,7 @@ ShowImageView::SetHasSelection(bool bHasSelection)
 	
 	BMessage msg(MSG_SELECTION);
 	msg.AddBool("has_selection", fHasSelection);
-	BMessenger msgr(Window());
-	msgr.SendMessage(&msg);
+	SendMessageToWindow(&msg);
 }
 
 
@@ -2377,7 +2389,7 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 	if (op != ImageProcessor::kInvert) {
 		// Note: If one of these fails, check its definition in class ImageProcessor.
 		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kRotateAntiClockwise < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kRotateCounterClockwise < ImageProcessor::kNumberOfAffineTransformations);
 		ASSERT(ImageProcessor::kFlipLeftToRight < ImageProcessor::kNumberOfAffineTransformations);
 		ASSERT(ImageProcessor::kFlipTopToBottom < ImageProcessor::kNumberOfAffineTransformations);
 		fImageOrientation = fTransformation[op][fImageOrientation];
@@ -2404,19 +2416,7 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 	if (!quiet) {
 		// remove selection
 		SetHasSelection(false);
-		// Pull the image type name from fCaption (hackish?)
-		int32 last_comma_index = fCaption.FindLast(',');
-		if (last_comma_index != B_ERROR) {
-			// The -1 at the end is -2 to get rid of the comma and space, +1 for the \0
-			int32 name_size = fCaption.CountChars() - last_comma_index - 1;
-			char *name = new char[name_size];
-			fCaption.CopyInto(name, last_comma_index + 2, name_size - 1);
-			name[name_size - 1] = '\0';
-			Notify(name);
-			delete name;
-		}
-		else
-			Notify(NULL);
+		Notify();
 	}	
 }
 
@@ -2436,7 +2436,7 @@ ShowImageView::Rotate(int degree)
 	if (degree == 90) {
 		UserDoImageOperation(ImageProcessor::kRotateClockwise);
 	} else if (degree == 270) {
-		UserDoImageOperation(ImageProcessor::kRotateAntiClockwise);
+		UserDoImageOperation(ImageProcessor::kRotateCounterClockwise);
 	}
 }
 
@@ -2483,10 +2483,9 @@ ShowImageView::ResizeImage(int w, int h)
 	DeleteBitmap();
 	fBitmap = scaled;
 
-	BMessenger msgr(Window());
-	msgr.SendMessage(MSG_MODIFIED);
+	SendMessageToWindow(MSG_MODIFIED);
 
-	Notify(NULL);
+	Notify();
 }
 
 void
@@ -2562,8 +2561,7 @@ ShowImageView::SetIcon(bool clear)
 void
 ShowImageView::ToggleSlideShow()
 {
-	BMessenger msgr(Window());
-	msgr.SendMessage(MSG_SLIDE_SHOW);
+	SendMessageToWindow(MSG_SLIDE_SHOW);
 }
 
 
@@ -2571,8 +2569,7 @@ void
 ShowImageView::ExitFullScreen()
 {
 	be_app->ShowCursor();
-	BMessenger m(Window());
-	m.SendMessage(MSG_EXIT_FULL_SCREEN);
+	SendMessageToWindow(MSG_EXIT_FULL_SCREEN);
 }
 
 

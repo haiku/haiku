@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
  *		Michael Pfeiffer
+ *		Ryan Leavengood
  */
 
 
@@ -228,10 +229,16 @@ ShowImageApp::CheckClipboard()
 bool
 ShowImageApp::QuitRequested()
 {
-	be_clipboard->StopWatching(be_app_messenger);
-		// tell clipboard we don't want anymore notification
+	// Give the windows a chance to prompt the user if there are changes
+	BMessage msg(B_QUIT_REQUESTED);
+	BroadcastToWindows(&msg);
+	if (CountWindows() <= WINDOWS_TO_IGNORE) {
+		be_clipboard->StopWatching(be_app_messenger);
+			// tell clipboard we don't want anymore notification
 
-	return true;
+		return true;
+	} else
+		return false;
 }
 
 

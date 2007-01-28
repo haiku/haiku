@@ -188,7 +188,7 @@ class ImageProcessor : public Filter {
 public:
 	enum operation {
 		kRotateClockwise,
-		kRotateAntiClockwise,
+		kRotateCounterClockwise,
 		kFlipLeftToRight,
 		kFlipTopToBottom,
 		kInvert,
