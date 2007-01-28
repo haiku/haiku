@@ -4,6 +4,7 @@ SubInclude HAIKU_TOP src add-ons kernel bus_managers ;
 SubInclude HAIKU_TOP src add-ons kernel busses ;
 SubInclude HAIKU_TOP src add-ons kernel console ;
 SubInclude HAIKU_TOP src add-ons kernel cpu ;
+SubInclude HAIKU_TOP src add-ons kernel debugger ;
 SubInclude HAIKU_TOP src add-ons kernel disk_scanner ;
 SubInclude HAIKU_TOP src add-ons kernel drivers ;
 SubInclude HAIKU_TOP src add-ons kernel file_cache ;
