@@ -3,7 +3,21 @@ SubDir HAIKU_TOP src tools docbook libxml2 ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # defines
-local defines = [ FDefines HAVE_CONFIG_H=1 HAVE_BEOS_THREADS _REENTRANT ] ;
+local defines ;
+if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
+	defines = [ FDefines HAVE_CONFIG_H=1 HAVE_BEOS_THREADS _REENTRANT ] ;
+} else {
+	# Assumes non-BeOS host platforms have pthread support
+	defines = [ FDefines HAVE_CONFIG_H=1 HAVE_PTHREAD_H _REENTRANT ] ;
+}
+
+# use different libaries depending on host platform
+local osLibs ;
+if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
+	osLibs = net ;
+} else {
+	osLibs = m ;
+}
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
@@ -62,4 +76,4 @@ BuildPlatformMain <build>xmllint :
 ;
 
 LinkAgainst <build>xmllint
-	: <build>libxml2.a net z ;
+	: <build>libxml2.a $(osLibs) z ;

@@ -20,6 +20,14 @@ for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tools docbook libxslt $(sourceDir) ] ;
 }
 
+# use different libaries depending on host platform
+local osLibs ;
+if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
+	osLibs = net ;
+} else {
+	osLibs = m ;
+}
+
 # system headers
 SubDirSysHdrs [ FDirName $(HAIKU_TOP) src tools docbook libxml2 include ] ;
 SubDirSysHdrs [ FDirName $(HAIKU_TOP) src tools docbook libxslt ] ;
@@ -62,4 +70,4 @@ BuildPlatformMain <build>xsltproc :
 ;
 
 LinkAgainst <build>xsltproc
-	: <build>libxslt.a <build>libxml2.a net z ;
+	: <build>libxslt.a <build>libxml2.a $(osLibs) z ;
