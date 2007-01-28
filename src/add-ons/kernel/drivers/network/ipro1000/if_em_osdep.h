@@ -127,7 +127,11 @@ static inline unsigned long vtophys(unsigned long virtual_addr)
 {
 	physical_entry pe;
 	status_t err;
-	err = get_memory_map((void *)virtual_addr, 2048, &pe, 1);
+	// vtophys is called for the start of any page aligned contiguous large buffer,
+	// and also with offset 2 into 2048 byte aligned (non-contiguous) rx/tx buffer.
+	// Thus we only ask for 2046 bytes to get exactly one physical_entry. If the
+	// next physical page is non-contiguous, using 2048 may return B_BUFFER_OVERFLOW.
+	err = get_memory_map((void *)virtual_addr, 2046, &pe, 1);
 	if (err < 0)
 		panic("ipro1000: get_memory_map failed for %p, error %08lx\n", (void *)virtual_addr, err);
 	return (unsigned long) pe.address;
