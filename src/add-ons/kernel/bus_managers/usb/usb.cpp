@@ -23,12 +23,19 @@ bus_std_ops(int32 op, ...)
 			if (gUSBStack)
 				return B_OK;
 
+			void *address = NULL;
+			area_id shared = find_area("shared usb stack");
+			if (shared >= B_OK && clone_area("usb stack clone", &address,
+				B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, shared) >= B_OK) {
+				gUSBStack = *((Stack **)address);
+				return B_OK;
+			}
+
 #ifdef TRACE_USB
 			set_dprintf_enabled(true);
 			load_driver_symbols("usb");
 			TRACE(("usb_module: init\n"));
 #endif
-
 			Stack *stack = new(std::nothrow) Stack();
 			if (!stack)
 				return B_NO_MEMORY;
@@ -39,6 +46,13 @@ bus_std_ops(int32 op, ...)
 			}
 
 			gUSBStack = stack;
+			shared = create_area("shared usb stack", &address,
+				B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_NO_LOCK,
+				B_KERNEL_WRITE_AREA);
+			if (shared >= B_OK) {
+				*((Stack **)address) = gUSBStack;
+				return B_OK;
+			}
 			break;
 		}
 
