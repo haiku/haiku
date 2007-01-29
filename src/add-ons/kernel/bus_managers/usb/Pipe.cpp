@@ -260,25 +260,25 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,
 	size_t *actualLength)
 {
-	transfer_result_data transferResult;
-	transferResult.notify_sem = create_sem(0, "usb send request notify");
-	if (transferResult.notify_sem < B_OK)
+	transfer_result_data *transferResult = (transfer_result_data *)malloc(sizeof(transfer_result_data));
+	transferResult->notify_sem = create_sem(0, "usb send request notify");
+	if (transferResult->notify_sem < B_OK)
 		return B_NO_MORE_SEMS;
 
 	status_t result = QueueRequest(requestType, request, value, index, length,
-		data, dataLength, SendRequestCallback, &transferResult);
+		data, dataLength, SendRequestCallback, transferResult);
 	if (result < B_OK) {
-		delete_sem(transferResult.notify_sem);
+		delete_sem(transferResult->notify_sem);
 		return result;
 	}
 
 	// the sem will be released in the callback after the result data was
 	// filled into the provided struct. use a 5 seconds timeout to avoid
 	// hanging applications.
-	if (acquire_sem_etc(transferResult.notify_sem, 1, B_RELATIVE_TIMEOUT, 5000000) < B_OK) {
+	if (acquire_sem_etc(transferResult->notify_sem, 1, B_RELATIVE_TIMEOUT, 5000000) < B_OK) {
 		TRACE_ERROR(("USB ControlPipe: timeout waiting for queued request to complete\n"));
 
-		delete_sem(transferResult.notify_sem);
+		delete_sem(transferResult->notify_sem);
 		if (actualLength)
 			*actualLength = 0;
 
@@ -286,11 +286,13 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 		return B_TIMED_OUT;
 	}
 
-	delete_sem(transferResult.notify_sem);
+	delete_sem(transferResult->notify_sem);
 	if (actualLength)
-		*actualLength = transferResult.actual_length;
+		*actualLength = transferResult->actual_length;
 
-	return transferResult.status;
+	result = transferResult->status;
+	free(transferResult);
+	return result;
 }
 
 
@@ -301,7 +303,10 @@ ControlPipe::SendRequestCallback(void *cookie, status_t status, void *data,
 	transfer_result_data *transferResult = (transfer_result_data *)cookie;
 	transferResult->status = status;
 	transferResult->actual_length = actualLength;
-	release_sem(transferResult->notify_sem);
+	if (release_sem(transferResult->notify_sem) < B_OK) {
+		// the request has timed out already - cleanup after us
+		free(transferResult);
+	}
 }
 
 
