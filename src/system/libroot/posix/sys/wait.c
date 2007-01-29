@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,15 +28,22 @@ waitpid(pid_t pid, int *_status, int options)
 	status_t returnCode;
 	int32 reason;
 
+	// TODO: there is no support for WUNTRACED and WCONTINUED yet!
 	thread_id thread = _kern_wait_for_child(pid, options, &reason, &returnCode);
 
-	if (_status != NULL) {
+	if (thread >= B_OK && _status != NULL) {
 		int status = returnCode & 0xff;
+			// WEXITSTATUS()
 
-		// ToDo: fill in _status correctly!
-		// See kernel's wait_for_child() for how the return information is encoded
+		// See kernel's wait_for_child() for how the return information is encoded:
+		// reason = (signal << 16) | reason
+
+		// fill in signal for WIFSIGNALED() and WTERMSIG()
 		if (reason & THREAD_RETURN_INTERRUPTED)
 			status = (reason >> 8) & 0xff00;
+
+		// TODO: fill in _status correctly for WIFSTOPPED(), WSTOPSIG(), WIFCORED(),
+		//	and WIFCONTINUED()
 
 		*_status = status;
 	}
