@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons screen_savers ;
 
+SubInclude HAIKU_TOP src add-ons screen_savers buynow ;
 SubInclude HAIKU_TOP src add-ons screen_savers haiku ;
 SubInclude HAIKU_TOP src add-ons screen_savers ifs ;
 SubInclude HAIKU_TOP src add-ons screen_savers slideshowsaver ;

@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src add-ons screen_savers buynow ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+ScreenSaver BuyNow :
+	BuyNow.cpp : 
+	be libscreensaver.so ;
+
+Package haiku-screensaverkit-cvs :
+	BuyNow :
+	boot home config add-ons Screen\ Savers
+;
+
