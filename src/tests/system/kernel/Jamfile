@@ -33,7 +33,10 @@ SimpleTest lock_node_test :
 	: be
 	;
 
-SimpleTest wait_test : wait_test.c ;
+SimpleTest wait_test_1 : wait_test_1.c ;
+SimpleTest wait_test_2 : wait_test_2.cpp ;
+SimpleTest wait_test_3 : wait_test_3.cpp ;
+SimpleTest wait_test_4 : wait_test_4.cpp ;
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
