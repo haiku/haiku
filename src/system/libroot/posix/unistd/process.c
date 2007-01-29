@@ -1,7 +1,7 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <syscalls.h>
@@ -73,7 +73,7 @@ setpgid(pid_t process, pid_t group)
 }
 
 
-int
+pid_t
 setpgrp(void)
 {
 	return setpgid(0, 0);	
