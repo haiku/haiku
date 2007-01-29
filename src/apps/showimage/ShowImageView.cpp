@@ -402,6 +402,25 @@ ShowImageView::Notify()
 }
 
 
+void 
+ShowImageView::UpdateStatusText()
+{
+	BMessage msg(MSG_UPDATE_STATUS_TEXT);
+	BString status_to_send = fImageType;
+
+	if (fHasSelection) {
+		char size[50];
+		sprintf(size, " (%.0fx%.0f)",
+			fSelectionRect.Width()+1.0,
+			fSelectionRect.Height()+1.0);
+		status_to_send << size;
+	}
+	
+	msg.AddString("status", status_to_send.String());
+	SendMessageToWindow(&msg);
+}
+
+
 void
 ShowImageView::AddToRecentDocuments()
 {
@@ -1480,7 +1499,8 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final)
 		// selection must be at least 2 pixels wide or 2 pixels tall
 		if (fCopyFromRect.Width() < 1.0 && fCopyFromRect.Height() < 1.0)
 			SetHasSelection(false);
-	}
+	} else
+		UpdateStatusText();
 
 	if (oldSelection != fCopyFromRect || !HasSelection()) {
 		BRect updateRect;
@@ -1866,9 +1886,9 @@ ShowImageView::Undo()
 	if (!undoSelection)
 		SetHasSelection(false);
 	else {
-		SetHasSelection(true);
 		fCopyFromRect = BRect();
 		fSelectionRect = fUndo.GetRect();
+		SetHasSelection(true);
 		fSelBitmap = undoSelection;
 	}
 
@@ -1952,10 +1972,10 @@ ShowImageView::PasteBitmap(BBitmap *bitmap, BPoint point)
 	if (bitmap && bitmap->IsValid()) {
 		MergeSelection();
 
-		SetHasSelection(true);
-		fSelBitmap = bitmap;
 		fCopyFromRect = BRect();
 		fSelectionRect = bitmap->Bounds();
+		SetHasSelection(true);
+		fSelBitmap = bitmap;
 
 		BRect offsetRect = fSelectionRect;
 		offsetRect.OffsetBy(point);
@@ -2016,6 +2036,8 @@ ShowImageView::SetHasSelection(bool bHasSelection)
 {
 	DeleteSelBitmap();
 	fHasSelection = bHasSelection;
+
+	UpdateStatusText();
 	
 	BMessage msg(MSG_SELECTION);
 	msg.AddBool("has_selection", fHasSelection);

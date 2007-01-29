@@ -97,6 +97,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	fImageView = NULL;
 	fSlideShowDelay = NULL;
 	fResizerWindowMessenger = NULL;
+	fHeight = fWidth = 0;
 	
 	LoadSettings();	
 
@@ -591,10 +592,9 @@ ShowImageWindow::MessageReceived(BMessage *message)
 				
 			BString status;
 			bool messageProvidesSize = false;
-			int32 width, height;
-			if (message->FindInt32("width", &width) >= B_OK
-				&& message->FindInt32("height", &height) >= B_OK) {
-				status << width << "x" << height;
+			if (message->FindInt32("width", &fWidth) >= B_OK
+				&& message->FindInt32("height", &fHeight) >= B_OK) {
+				status << fWidth << "x" << fHeight;
 				messageProvidesSize = true;
 			}
 			
@@ -606,7 +606,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			}
 			
 			if (messageProvidesSize) {
-				UpdateResizerWindow(width, height);
+				UpdateResizerWindow(fWidth, fHeight);
 			}
 			
 			fStatusView->SetText(status);
@@ -615,6 +615,18 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case MSG_UPDATE_STATUS_TEXT:
+		{
+			BString status;
+			status << fWidth << "x" << fHeight;
+			BString str;
+			if (message->FindString("status", &str) == B_OK && str.Length() > 0) {
+				status << ", " << str;
+				fStatusView->SetText(status);
+			}
+			break;
+		}
+		
 		case MSG_SELECTION:
 		{
 			// The view sends this message when a selection is

@@ -98,6 +98,7 @@ class ShowImageWindow : public BWindow {
 		BMessage *fPrintSettings;
 		PrintOptions fPrintOptions;
 		BMessenger* fResizerWindowMessenger;
+		int32 fHeight, fWidth;
 };
 
 #endif	// SHOW_IMAGE_WINDOW_H

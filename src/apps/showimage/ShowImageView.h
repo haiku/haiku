@@ -136,6 +136,7 @@ class ShowImageView : public BView {
 		void SendMessageToWindow(BMessage *message);
 		void SendMessageToWindow(uint32 code);
 		void Notify();
+		void UpdateStatusText();
 		void AddToRecentDocuments();
 		void AddWhiteRect(BRect &rect);
 		void GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
