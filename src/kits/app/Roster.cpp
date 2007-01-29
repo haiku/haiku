@@ -1738,6 +1738,8 @@ BRoster::_ApplicationCrashed(team_id team)
 	Tells the registrar which application is currently active.
 	It's called from within the app_server when the active application is
 	changed.
+	As it's called in the event loop, it must run asynchronously and cannot
+	wait for a reply.
 */
 status_t
 BRoster::_UpdateActiveApp(team_id team) const
@@ -1748,18 +1750,11 @@ BRoster::_UpdateActiveApp(team_id team) const
 	// compose the request message
 	BMessage request(B_REG_UPDATE_ACTIVE_APP);
 	status_t status = request.AddInt32("team", team);
+	if (status < B_OK)
+		return status;
 
 	// send the request
-	BMessage reply;
-	if (status == B_OK)
-		status = fMessenger.SendMessage(&request, &reply);
-
-	// evaluate the reply
-	if (status == B_OK && reply.what != B_REG_SUCCESS
-		&& reply.FindInt32("error", &status) != B_OK)
-		status = B_ERROR;
-
-	return status;
+	return fMessenger.SendMessage(&request);
 }
 
 
