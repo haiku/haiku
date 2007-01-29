@@ -579,7 +579,7 @@ _dump_thread_info(struct thread *thread)
 	kprintf("  exit.signal:      0x%x\n", thread->exit.signal);
 	kprintf("  exit.waiters:\n");
 	while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
-		kprintf("\t%p (team 0x%lx, thread 0x%lx)\n", death, death->team, death->thread);
+		kprintf("\t%p (group 0x%lx, thread 0x%lx)\n", death, death->group_id, death->thread);
 	}
 
 	kprintf("kernel_stack_area:  0x%lx\n", thread->kernel_stack_area);
@@ -972,7 +972,7 @@ thread_exit(void)
 			// put a death entry into the dead children list of our parent
 			death = (struct death_entry *)malloc(sizeof(struct death_entry));
 			if (death != NULL) {
-				death->team = team->id;
+				death->group_id = team->group_id;
 				death->thread = thread->id;
 				death->status = thread->exit.status;
 				death->reason = thread->exit.reason;
@@ -1023,11 +1023,8 @@ thread_exit(void)
 				// TODO: should that be moved to handle_signal() (for SIGCHLD)?
 				release_sem_etc(parent->dead_children.sem,
 					parent->dead_children.waiters, B_DO_NOT_RESCHEDULE);
-				release_sem_etc(team->group->dead_child_sem,
-					team->group->dead_child_waiters, B_DO_NOT_RESCHEDULE);
 
 				parent->dead_children.waiters = 0;
-				team->group->dead_child_waiters = 0;
 			} else
 				RELEASE_THREAD_LOCK();
 

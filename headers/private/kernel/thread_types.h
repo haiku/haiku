@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku Inc.
+ * Copyright 2004-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -48,7 +48,7 @@ struct image;
 
 struct death_entry {
 	struct list_link	link;
-	team_id				team;
+	pid_t				group_id;
 	thread_id			thread;
 	status_t			status;
 	uint16				reason;
@@ -61,19 +61,16 @@ struct process_session {
 };
 
 struct process_group {
-	struct process_group *next;	// next in hash
+	struct process_group *next;		// next in hash
 	struct process_session *session;
 	pid_t				id;
-	sem_id				dead_child_sem;
-	int32				wait_for_any;
-	int32				dead_child_waiters;	// count of threads waiting for sem
 	struct team			*teams;
 };
 
 struct team_loading_info {
-	struct thread	*thread;	// the waiting thread
-	status_t		result;		// the result of the loading
-	bool			done;		// set when loading is done/aborted
+	struct thread		*thread;	// the waiting thread
+	status_t			result;		// the result of the loading
+	bool				done;		// set when loading is done/aborted
 };
 
 struct team_watcher {
