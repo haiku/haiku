@@ -12,7 +12,9 @@
 
 #include <kernel.h>
 #include <arch/cpu.h>
+#include <thread.h>
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_priv.h>
 #include <vm_page.h>
 #include <vm_cache.h>
@@ -875,24 +877,41 @@ dump_page(int argc, char **argv)
 {
 	struct vm_page *page;
 	addr_t address;
+	bool physical = false;
 	int32 index = 1;
 
-	if (argc > 2 && !strncmp(argv[1], "lookup", strlen(argv[1])))
-		index++;
+	if (argc > 2) {
+		if (!strcmp(argv[1], "-p")) {
+			physical = true;
+			index++;
+		} else if (!strcmp(argv[1], "-v"))
+			index++;
+	}
 
 	if (argc < 2
 		|| strlen(argv[index]) <= 2
 		|| argv[index][0] != '0'
 		|| argv[index][1] != 'x') {
-		kprintf("usage: page [lookup] <address>\n");
+		kprintf("usage: page [-p|-v] <address>\n"
+			"  -v looks up a virtual address for the page, -p a physical address.\n"
+			"  Default is to look for the page structure address directly\n.");
 		return 0;
 	}
 
 	address = strtoul(argv[index], NULL, 0);
 
-	if (index == 2)
+	if (index == 2) {
+		if (!physical) {
+			vm_address_space *addressSpace = vm_kernel_address_space();
+			if (thread_get_current_thread()->team->address_space != NULL)
+				addressSpace = thread_get_current_thread()->team->address_space;
+
+			addressSpace->translation_map.ops->query_interrupt(
+				&addressSpace->translation_map, address, &address);
+
+		}
 		page = vm_lookup_page(address / B_PAGE_SIZE);
-	else
+	} else
 		page = (struct vm_page *)address;
 
 	kprintf("PAGE: %p\n", page);
