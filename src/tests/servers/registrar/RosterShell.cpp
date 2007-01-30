@@ -16,6 +16,7 @@ const char kShellUsage[] =
 "activate, a    [ <team> ]     activates the application specified by <team>\n"
 "exit, e                       exits the roster shell\n"
 "help, h                       prints this help\n"
+"launch         [ <program> ]  Executes <program> via BRoster::Launch()\n"
 "list, l        [ <teams> ]    lists the applications specified by <teams>\n"
 "                              or all registered applications\n"
 "list-long, ll  [ <teams> ]    lists the applications specified by <teams>\n"
@@ -43,6 +44,8 @@ public:
 				CmdExit(cmdLine);
 			else if (command == "help" || command == "h")
 				Usage();
+			else if (command == "launch")
+				CmdLaunch(cmdLine);
 			else if (command == "list" || command == "l")
 				CmdList(cmdLine);
 			else if (command == "list-long" || command == "ll")
@@ -88,6 +91,37 @@ public:
 	void CmdExit(vector<string> &)
 	{
 		fTerminating = true;
+	}
+
+	void CmdLaunch(vector<string> &args)
+	{
+		// check args
+		if (args.size() != 2) {
+			printf("launch: requires exactly one argument\n");
+			return;
+		}
+
+		string program = args[1];
+
+		// get an app ref
+		entry_ref ref;
+		status_t error = get_ref_for_path(program.c_str(), &ref);
+		if (error != B_OK) {
+			printf("launch: Failed to get entry ref for \"%s\": %s\n",
+				program.c_str(), strerror(error));
+			return;
+		}
+
+		// launch the app
+		BRoster roster;
+		team_id teamID;
+		error = roster.Launch(&ref, (const BMessage*)NULL, &teamID);
+		if (error == B_OK) {
+			printf("launched \"%s\", team id: %ld\n", program.c_str(), teamID);
+		} else {
+			printf("launch: Failed to launch \"%s\": %s\n",
+				program.c_str(), strerror(error));
+		}
 	}
 
 	static void ParseTeamList(vector<string> &args, BList *teamList)
