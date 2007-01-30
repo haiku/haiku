@@ -508,7 +508,8 @@ BScrollBar::MouseDown(BPoint where)
 		buttons = B_PRIMARY_MOUSE_BUTTON;
 
 	// hit test for the thumb
-	if (fPrivateData->fThumbFrame.Contains(where)) {
+	if (fPrivateData->fThumbFrame.Contains(where)
+			&& (buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
 		fPrivateData->fButtonDown = THUMB;
 		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
 		Invalidate(fPrivateData->fThumbFrame);
