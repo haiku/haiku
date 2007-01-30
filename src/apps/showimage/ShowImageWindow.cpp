@@ -344,7 +344,7 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Invert Colors", MSG_INVERT, 0, 0, 'W', true);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Resize" B_UTF8_ELLIPSIS, MSG_OPEN_RESIZER_WINDOW, 0, 0, 'W', true);
+	fResizeItem = AddItemMenu(menu, "Resize" B_UTF8_ELLIPSIS, MSG_OPEN_RESIZER_WINDOW, 0, 0, 'W', true);
 	bar->AddItem(menu);
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Use as Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0, 'W', true);
@@ -767,9 +767,11 @@ ShowImageWindow::MessageReceived(BMessage *message)
 				break;
 			if (item->IsMarked()) {
 				item->SetMarked(false);
+				fResizeItem->SetEnabled(true);
 				fImageView->StopSlideShow();
 			} else if (ClosePrompt()) {
 				item->SetMarked(true);
+				fResizeItem->SetEnabled(false);
 				fImageView->StartSlideShow();
 			}
 			break;

@@ -97,7 +97,8 @@ class ShowImageWindow : public BWindow {
 		bool fShowCaption;
 		BMessage *fPrintSettings;
 		PrintOptions fPrintOptions;
-		BMessenger* fResizerWindowMessenger;
+		BMessenger *fResizerWindowMessenger;
+		BMenuItem *fResizeItem;
 		int32 fHeight, fWidth;
 };
 
