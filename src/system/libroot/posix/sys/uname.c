@@ -26,7 +26,13 @@ uname(struct utsname *info)
 	get_system_info(&systemInfo);
 
 	strlcpy(info->sysname, "Haiku", sizeof(info->sysname));
-	strlcpy(info->version, systemInfo.kernel_build_date, sizeof(info->version));
+
+	info->version[0] = '\0';
+#ifdef HAIKU_REVISION
+	snprintf(info->version, sizeof(info->version), "r%d ", HAIKU_REVISION);
+#endif
+	strlcat(info->version, systemInfo.kernel_build_date, sizeof(info->version));
+	strlcat(info->version, " ", sizeof(info->version));
 	strlcat(info->version, systemInfo.kernel_build_time, sizeof(info->version));
 	snprintf(info->release, sizeof(info->release), "%lld", systemInfo.kernel_version);
 
