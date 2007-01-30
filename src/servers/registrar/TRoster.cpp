@@ -539,6 +539,7 @@ PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 				if (info->port >= 0)
 					delete_port(info->port);
 				delete info;
+				info = NULL;
 			}
 			// handle pending IsAppRegistered() requests
 			IARRequestMap::iterator it = fIARRequestsByID.find(team);
