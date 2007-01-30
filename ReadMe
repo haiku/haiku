@@ -1,137 +1,116 @@
-Setting Up
-----------
+Building on BeOS
+================
 
-The build system uses Jam/MR (http://www.perforce.com/jam/jam.html).
-A BeOS executable of Jam 2.5 is available at:
+For building on BeOS you need the development tools from:
 
-  http://haiku-os.org/downloads.php?mode=download&id=10&mirror=0
+  http://haiku-os.org/downloads
 
-Unzip the executable and copy it to /boot/home/config/bin.
-The Jam source code is also included in the source tree. You can as well cd
-into "src/tools/jam" and run "make" to obtain an executable.
+Please always use the most recent versions. They are required to build Haiku.
 
-To build Haiku you also need Oliver Tappe's GCC 2.95.3. You can get it at BeBits:
 
-  http://www.bebits.com/app/4011
+Building on a non-BeOS platform
+===============================
 
-Older versions of GCC 2.95.3 will likely not work.
-
-If you intend to build Haiku from a supported build platform other than BeOS,
-e.g. GNU/Linux, you need to build a jam executable yourself (don't use the
-one coming with your distribution). cd into the "src/tools/jam" subdirectory
-of the Haiku tree and type "make" (or "gmake"). The generated jam executable
-will be found in a platform specific subdirectory, e.g. "bin.linuxx86/".
-The easiest way to use it, is to copy it to a place in your PATH. Furthermore
-you need to build the tools for cross compilation (binutils and gcc). Fear not,
-the configure script will help you with that one; see below.
+Please read the file 'ReadMe.cross-compile' before continuing.
 
 
 Configuring
------------
+===========
 
-Under BeOS:
+Open a Terminal and change to your Haiku trunk folder. To configure the build
+you can run configure like this:
 
-Open a Terminal and change to your Haiku trunk folder. To configure the build you
-can run configure like this:
+  ./configure --target=TARGET
 
-  $ ./configure --target=TARGET
+Where "TARGET" is the target platform that the compiled code should run on:
+  * haiku (default)
+  * r5
+  * bone
+  * dano (also for Zeta)
 
-Where "TARGET" is the target platform for the build. Valid targets are "r5",
-"bone", "dano" and "haiku". If you omit the target it defaults to "haiku". To
-configure for ZETA use the "dano" target.
+When building on Linux and other non-BeOS platforms "haiku" is the
+only supported target platform, so you don't need the "--target" parameter.
 
 The configure script generates a file named "BuildConfig" in the "build"
-directory. As long as configure is not modified (!), there is no need to call it
-again. That is for re-building you only need to invoke jam (see below).
+directory. As long as configure is not modified (!), there is no need to call
+it again. That is for re-building you only need to invoke jam (see below).
 If you don't update the source tree very frequently, you may want to execute
-configure after each update just to be on the safe side.
-
-
-Under Linux or another supported build platform:
-
-You don't need to supply the "--target" option to configure, since the only
-supported target is the default "haiku" anyway. But you have to tell, what
-cross compilation tools to use. The tools installed in the system won't work
-for compiling Haiku itself (they will be used for building some build tools,
-though). The easiest way is to instruct configure to build those tools from the
-sources. Supposing you have checked out the buildutils module from the Haiku
-SVN repository alongside the Haiku source tree, you can do that via:
-
-  $ ./configure --build-cross-tools ../buildtools
-
-One of the last output lines should tell you that the tools have been built
-successfully.
-
-Note, that the old gcc 2.95.3 will be used for building Haiku, required for
-binary compatibility with BeOS R5. If you're not interested in binary
-compatibility (or want to build for the PowerPC architecture), you can instead
-use:
-
-  $ ./configure --build-cross-tools-gcc4 <arch> ../buildtools
-
-Replace "<arch>" with either "x86" or "ppc", depending on which of the two
-architectures you want to build for.
-[At the moment (2005-12-06) the build for PowerPC, or at least the resulting
-Haiku does not work.]
-
+'configure' after each update just to be on the safe side.
 
 
 Building
---------
+========
 
-Haiku can be built in either of two ways, as disk image file (e.g. for use with
-emulators) or as installation in a directory.
+Haiku can be built in either of two ways, as disk image file (e.g. for use
+with emulators) or as installation in a directory.
 
-Image File:
+Image File
+----------
 
-  $ jam -q haiku-image
+  jam -q haiku-image
 
-Generates an image file named "haiku.image" in your output directory (usually
-"generated/"). This method works for all supported build platforms.
+This generates an image file named 'haiku.image' in your output directory
+under 'generated/'.
 
+VMware Image File
+-----------------
 
-Directory Installation:
+  jam -q haiku-vmware-image
 
-  $ HAIKU_INSTALL_DIR=/Haiku jam -q install-haiku
+This generates an image file named 'haiku.vmdk' in your output
+directory under 'generated/'.
 
-Installs all Haiku components into the directory "/Haiku". If that directory
-is the root of a mounted BFS partition, you'll have a Haiku partition afterwards.
-To create a partition in the first place use DriveSetup and initialize it to BFS.
+Directory Installation
+----------------------
 
-Note, that installing Haiku in a directory only works as expected under BeOS.
+  HAIKU_INSTALL_DIR=/Haiku jam -q install-haiku
 
+Installs all Haiku components into the volume mounted at "/Haiku" and
+automatically marks it as bootable. To create a partition in the first place
+use DriveSetup and initialize it to BFS.
 
-Building Components:
+Note that installing Haiku in a directory only works as expected under BeOS,
+but it is not yet supported under Linux and other non-BeOS platforms.
 
-If you don't want to build the complete Haiku, but only a certain app/driver/etc.
-you can specify it as argument to jam, e.g.:
+Building Components
+-------------------
 
-  $ jam Pulse
+If you don't want to build the complete Haiku, but only a certain
+app/driver/etc. you can specify it as argument to jam, e.g.:
+
+  jam Pulse
+
+Alternatively, you can 'cd' to the directory of the component you want to
+build and run 'jam' from there.
+
+You can also force rebuilding of a component by using the "-a" parameter:
+
+  jam -a Pulse
 
 
 Running
--------
+=======
 
-Generally there are two ways of running Haiku. On real hardware using a partition
-and on emulated hardware using an emulator like Bochs or QEmu.
+Generally there are two ways of running Haiku. On real hardware using a
+partition and on emulated hardware using an emulator like Bochs or QEmu.
 
-1. On Real Hardware
+On Real Hardware
+----------------
 
-If you have installed Haiku to it's own partition you can include this partition
-in your bootmanager and try to boot Haiku like any other OS you have installed.
-To include a new partition in the BeOS bootmanager run this in a Terminal:
+If you have installed Haiku to its own partition you can include this
+partition in your bootmanager and try to boot Haiku like any other OS you
+have installed. To include a new partition in the BeOS bootmanager run this
+in a Terminal:
 
-  $ bootman
+  bootman
 
-And follow the steps of the installer.
+On Emulated Hardware
+--------------------
 
-2. On Emulated Hardware
-
-For emulated hardware you should build disk image (see above). How to setup this
-image depends on your emulater. A tutorial for Bochs on BeOS is below. If you
-use QEmu, you can usually just provide the path to the image as command line
-argument to the "qemu" executable.
-
+For emulated hardware you should build disk image (see above). How to setup
+this image depends on your emulater. A tutorial for Bochs on BeOS is below.
+If you use QEmu, you can usually just provide the path to the image as
+command line argument to the "qemu" executable.
 
 Bochs
 -----
@@ -160,15 +139,8 @@ you can select some safe mode options.
 
 
 Docbook documentation
----------------------
+=====================
 
-Requirements :
-- Docbook XML DTD (http://www.oasis-open.org/docbook/xml/4.2/docbook-xml-4.2.zip)
-- Docbook Stylesheets (http://prdownloads.sourceforge.net/docbook/docbook-xsl-1.68.1.tar.bz2)
-- libxml2, xmllin (http://libpak.neoni.net/packages/LibPak_libxml2_dev.zip)
-- libxslt, xsltproc (http://libpak.neoni.net/packages/LibPak_libxslt_dev.zip)
-
-XML catalogs must be configured to avoid internet access :
-- in Docbook Stylesheets directory : sh ./INSTALL
-- in your .profile, add something like this :
-	export XML_CATALOG_FILES="/boot/home/docbook-xsl-1.68.1/catalog.xml /boot/home/docbook-xml-4.2/catalog.xml /etc/xml/catalog"
+Our documentation can be found in 'src/documentation/'. You can build it by
+running 'jam' in that folder. The results will be stored in the 'generated/'
+folder.
