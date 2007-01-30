@@ -49,14 +49,18 @@ HAIKU_DANO_COMPATIBLE_PLATFORMS = haiku dano ;
 
 # haiku target platform settings
 
+#HAIKU_BASE_CCFLAGS ?= -pipe ;
+
 # initial state for flags etc.
 HAIKU_C++ ?= $(HAIKU_CC) ;
 HAIKU_LINK = $(HAIKU_CC) ;
-HAIKU_LINKFLAGS = ;
+HAIKU_LINKFLAGS = $(HAIKU_BASE_CCFLAGS) ;
 
 HAIKU_HDRS = [ FStandardHeaders ] ;
-HAIKU_CCFLAGS = -nostdinc ;
-HAIKU_C++FLAGS = -nostdinc ;
+HAIKU_CCFLAGS = $(HAIKU_BASE_CCFLAGS) -nostdinc ;
+HAIKU_C++FLAGS = $(HAIKU_BASE_CCFLAGS) -nostdinc ;
+HAIKU_KERNEL_CCFLAGS = $(HAIKU_BASE_CCFLAGS) ;
+HAIKU_KERNEL_C++FLAGS = $(HAIKU_BASE_CCFLAGS) ;
 HAIKU_DEFINES = __HAIKU__ ;
 
 # analyze the gcc machine spec to determine HAIKU_CPU
