@@ -1,10 +1,11 @@
 SubDir HAIKU_TOP src tests servers registrar ;
 
-SetSubDirSupportedPlatforms libbe_test ;
-
 UsePublicHeaders [ FDirName add-ons registrar ] ;
 UseArchHeaders $(TARGET_ARCH) ;
 
+# some test programs
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
@@ -18,6 +19,10 @@ SimpleTest RosterShell
 
 SimpleTest message_deliverer_test : message_deliverer_test.cpp : be ;
 
+
+# libbe_test related stuff
+
+SetSubDirSupportedPlatforms libbe_test ;
 
 SimpleTest run_haiku_registrar
 	: run_haiku_registrar.cpp
