@@ -34,6 +34,9 @@ public:
 			BGroupLayoutBuilder& AddGlue(float weight = 1.0f);
 			BGroupLayoutBuilder& AddStrut(float size);
 
+			BGroupLayoutBuilder& SetInsets(float left, float top, float right,
+									float bottom);
+
 								operator BGroupLayout*();
 								operator BView*();
 

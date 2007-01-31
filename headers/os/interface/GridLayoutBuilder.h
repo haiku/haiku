@@ -28,6 +28,9 @@ public:
 			BGridLayoutBuilder& SetColumnWeight(int32 column, float weight);
 			BGridLayoutBuilder& SetRowWeight(int32 row, float weight);
 
+			BGridLayoutBuilder& SetInsets(float left, float top, float right,
+									float bottom);
+
 								operator BGridLayout*();
 								operator BView*();
 

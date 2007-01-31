@@ -98,6 +98,14 @@ BGridLayoutBuilder::SetRowWeight(int32 row, float weight)
 	return *this;
 }
 
+// SetInsets
+BGridLayoutBuilder&
+BGridLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
+{
+	fLayout->SetInsets(left, top, right, bottom);
+	return *this;
+}
+	
 // cast operator BGridLayout*
 BGridLayoutBuilder::operator BGridLayout*()
 {

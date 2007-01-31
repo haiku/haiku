@@ -158,6 +158,16 @@ BGroupLayoutBuilder::AddStrut(float size)
 	return *this;
 }
 
+// SetInsets
+BGroupLayoutBuilder& 
+BGroupLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
+{
+	if (BGroupLayout* layout = TopLayout())
+		layout->SetInsets(left, top, right, bottom);
+
+	return *this;
+}
+	
 // cast operator BGroupLayout*
 BGroupLayoutBuilder::operator BGroupLayout*()
 {
