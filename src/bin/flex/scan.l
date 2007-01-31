@@ -1,36 +1,41 @@
-/* scan.l - scanner for flex input */
+/* scan.l - scanner for flex input -*-C-*- */
 
 %{
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * This code is derived from software contributed to Berkeley by
- * Vern Paxson.
- * 
- * The United States Government has rights in this work pursuant
- * to contract no. DE-AC03-76SF00098 between the United States
- * Department of Energy and the University of California.
- *
- * Redistribution and use in source and binary forms with or without
- * modification are permitted provided that: (1) source distributions retain
- * this entire copyright notice and comment, and (2) distributions including
- * binaries display the following acknowledgement:  ``This product includes
- * software developed by the University of California, Berkeley and its
- * contributors'' in the documentation or other materials provided with the
- * distribution and in all advertising materials mentioning features or use
- * of this software.  Neither the name of the University nor the names of
- * its contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
+/*  Copyright (c) 1990 The Regents of the University of California. */
+/*  All rights reserved. */
 
-/* $Header: /tmp/bonefish/open-beos/current/src/apps/bin/flex/scan.l,v 1.1 2004/06/14 09:18:17 korli Exp $ */
+/*  This code is derived from software contributed to Berkeley by */
+/*  Vern Paxson. */
+
+/*  The United States Government has rights in this work pursuant */
+/*  to contract no. DE-AC03-76SF00098 between the United States */
+/*  Department of Energy and the University of California. */
+
+/*  This file is part of flex. */
+
+/*  Redistribution and use in source and binary forms, with or without */
+/*  modification, are permitted provided that the following conditions */
+/*  are met: */
+
+/*  1. Redistributions of source code must retain the above copyright */
+/*     notice, this list of conditions and the following disclaimer. */
+/*  2. Redistributions in binary form must reproduce the above copyright */
+/*     notice, this list of conditions and the following disclaimer in the */
+/*     documentation and/or other materials provided with the distribution. */
+
+/*  Neither the name of the University nor the names of its contributors */
+/*  may be used to endorse or promote products derived from this software */
+/*  without specific prior written permission. */
+
+/*  THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR */
+/*  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED */
+/*  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR */
+/*  PURPOSE. */
 
 #include "flexdef.h"
 #include "parse.h"
+extern bool tablesverify, tablesext;
+extern int trlcontxt; /* Set in  parse.y for each rule. */
 
 #define ACTION_ECHO add_action( yytext )
 #define ACTION_IFDEF(def, should_define) \
@@ -38,6 +43,14 @@
 	if ( should_define ) \
 		action_define( def, 1 ); \
 	}
+
+#define ACTION_M4_IFDEF(def, should_define) \
+    do{ \
+        if ( should_define ) \
+            buf_m4_define( &m4defs_buf, def, NULL);\
+        else \
+            buf_m4_undefine( &m4defs_buf, def);\
+    } while(0)
 
 #define MARK_END_OF_PROLOG mark_prolog();
 
@@ -49,7 +62,15 @@
 	return CHAR;
 
 #define RETURNNAME \
+	if(yyleng < MAXLINE) \
+         { \
 	strcpy( nmstr, yytext ); \
+	 } \
+	else \
+	 { \
+	   synerr(_("Input line too long\n")); \
+	   FLEX_EXIT(EXIT_FAILURE);  \
+	 }  \
 	return NAME;
 
 #define PUT_BACK_STRING(str, start) \
@@ -63,18 +84,23 @@
 #define CHECK_YYMORE(str) \
 	if ( all_lower( str ) ) \
 		yymore_used = true;
+
+#define YY_USER_INIT \
+	if ( getenv("POSIXLY_CORRECT") ) \
+		posix_compat = true;
+
 %}
 
-%option caseless nodefault outfile="scan.c" stack noyy_top_state
+%option caseless nodefault stack noyy_top_state
 %option nostdinit
 
 %x SECT2 SECT2PROLOG SECT3 CODEBLOCK PICKUPDEF SC CARETISBOL NUM QUOTE
 %x FIRSTCCL CCL ACTION RECOVER COMMENT ACTION_STRING PERCENT_BRACE_ACTION
-%x OPTION LINEDIR
+%x OPTION LINEDIR CODEBLOCK_MATCH_BRACE
 
 WS		[[:blank:]]+
 OPTWS		[[:blank:]]*
-NOT_WS		[^[:blank:]\n]
+NOT_WS		[^[:blank:]\r\n]
 
 NL		\r?\n
 
@@ -97,8 +123,8 @@ LEXOPT		[aceknopr]
 	static int option_sense;
 
 	int doing_codeblock = false;
-	int i;
-	Char nmdef[MAXLINE], myesc();
+	int i, brace_depth=0, brace_start_line=0;
+	Char nmdef[MAXLINE];
 
 
 <INITIAL>{
@@ -113,6 +139,15 @@ LEXOPT		[aceknopr]
 			indented_code = false;
 			BEGIN(CODEBLOCK);
 			}
+    ^"%top"[[:blank:]]*"{"[[:blank:]]*{NL}    {
+                brace_start_line = linenum;
+                ++linenum;
+                buf_linedir( &top_buf, infilename?infilename:"<stdin>", linenum);
+                brace_depth = 1;
+                yy_push_state(CODEBLOCK_MATCH_BRACE);
+            }
+    
+    ^"%top".*   synerr( _("malformed '%top' directive") );
 
 	{WS}		/* discard */
 
@@ -133,10 +168,20 @@ LEXOPT		[aceknopr]
 	^"%"{LEXOPT}{OPTWS}[[:digit:]]*{OPTWS}{NL}	++linenum; /* ignore */
 	^"%"{LEXOPT}{WS}.*{NL}	++linenum;	/* ignore */
 
+	/* xgettext: no-c-format */
 	^"%"[^sxaceknopr{}].*	synerr( _( "unrecognized '%' directive" ) );
 
 	^{NAME}		{
+			if(yyleng < MAXLINE) 
+        		 { 
 			strcpy( nmstr, yytext );
+			 } 
+			else 
+			 { 
+			   synerr( _("Input line too long\n")); 
+			   FLEX_EXIT(EXIT_FAILURE);  
+			 }
+
 			didadef = false;
 			BEGIN(PICKUPDEF);
 			}
@@ -179,13 +224,50 @@ LEXOPT		[aceknopr]
 			}
 }
 
+<CODEBLOCK_MATCH_BRACE>{
+    "}"     {
+                if( --brace_depth == 0){
+                    /* TODO: Matched. */
+                    yy_pop_state();
+                }else
+                    buf_strnappend(&top_buf, yytext, yyleng);
+            }
+
+    "{"     {   
+                brace_depth++;
+                buf_strnappend(&top_buf, yytext, yyleng);
+            }
+
+    {NL}    {
+                ++linenum;
+                buf_strnappend(&top_buf, yytext, yyleng);
+            }
+
+    [^{}\r\n]+  {
+                buf_strnappend(&top_buf, yytext, yyleng);
+                }
+
+    <<EOF>>     {
+                linenum = brace_start_line;
+                synerr(_("Unmatched '{'"));
+                yyterminate();
+                }
+}
+
 
 <PICKUPDEF>{
 	{WS}		/* separates name and definition */
 
-	{NOT_WS}.*	{
+	{NOT_WS}[^\r\n]*	{
+ 		        if(yyleng < MAXLINE)
+ 		         {
 			strcpy( (char *) nmdef, yytext );
-
+ 		         } 
+ 		        else
+ 		         {
+ 		           synerr( _("Input line too long\n"));
+ 		           FLEX_EXIT(EXIT_FAILURE); 
+			 }
 			/* Skip trailing whitespace. */
 			for ( i = strlen( (char *) nmdef ) - 1;
 			      i >= 0 && (nmdef[i] == ' ' || nmdef[i] == '\t');
@@ -220,11 +302,18 @@ LEXOPT		[aceknopr]
 
 	align		long_align = option_sense;
 	always-interactive	{
-			action_define( "YY_ALWAYS_INTERACTIVE", option_sense );
+			ACTION_M4_IFDEF( "M4""_YY_ALWAYS_INTERACTIVE", option_sense );
+            interactive = option_sense;
 			}
 	array		yytext_is_array = option_sense;
+    ansi-definitions ansi_func_defs = option_sense;
+    ansi-prototypes  ansi_func_protos = option_sense;
 	backup		backing_up_report = option_sense;
 	batch		interactive = ! option_sense;
+    bison-bridge     bison_bridge_lval = option_sense;
+    bison-locations  { if((bison_bridge_lloc = option_sense))
+                            bison_bridge_lval = true;
+                     }
 	"c++"		C_plus_plus = option_sense;
 	caseful|case-sensitive		caseins = ! option_sense;
 	caseless|case-insensitive	caseins = option_sense;
@@ -242,42 +331,85 @@ LEXOPT		[aceknopr]
 	input		ACTION_IFDEF("YY_NO_INPUT", ! option_sense);
 	interactive	interactive = option_sense;
 	lex-compat	lex_compat = option_sense;
+	posix-compat	posix_compat = option_sense;
 	main		{
-			action_define( "YY_MAIN", option_sense );
-			do_yywrap = ! option_sense;
+			ACTION_M4_IFDEF( "M4""_YY_MAIN", option_sense);
+            /* Override yywrap */
+            if( option_sense == true )
+                do_yywrap = false;
 			}
 	meta-ecs	usemecs = option_sense;
 	never-interactive	{
-			action_define( "YY_NEVER_INTERACTIVE", option_sense );
+			ACTION_M4_IFDEF( "M4""_YY_NEVER_INTERACTIVE", option_sense );
+            interactive = !option_sense;
 			}
 	perf-report	performance_report += option_sense ? 1 : -1;
 	pointer		yytext_is_array = ! option_sense;
 	read		use_read = option_sense;
+    reentrant   reentrant = option_sense;
 	reject		reject_really_used = option_sense;
-	stack		action_define( "YY_STACK_USED", option_sense );
+	stack		ACTION_M4_IFDEF( "M4""_YY_STACK_USED", option_sense );
 	stdinit		do_stdinit = option_sense;
 	stdout		use_stdout = option_sense;
-	unput		ACTION_IFDEF("YY_NO_UNPUT", ! option_sense);
+    unistd      ACTION_IFDEF("YY_NO_UNISTD_H", ! option_sense);
+	unput		ACTION_M4_IFDEF("M4""_YY_NO_UNPUT", ! option_sense);
 	verbose		printstats = option_sense;
 	warn		nowarn = ! option_sense;
-	yylineno	do_yylineno = option_sense;
+	yylineno	do_yylineno = option_sense; ACTION_M4_IFDEF("M4""_YY_USE_LINENO", option_sense);
 	yymore		yymore_really_used = option_sense;
-	yywrap		do_yywrap = option_sense;
+	yywrap      do_yywrap = option_sense;
 
-	yy_push_state	ACTION_IFDEF("YY_NO_PUSH_STATE", ! option_sense);
-	yy_pop_state	ACTION_IFDEF("YY_NO_POP_STATE", ! option_sense);
-	yy_top_state	ACTION_IFDEF("YY_NO_TOP_STATE", ! option_sense);
+	yy_push_state	ACTION_M4_IFDEF("M4""_YY_NO_PUSH_STATE", ! option_sense);
+	yy_pop_state	ACTION_M4_IFDEF("M4""_YY_NO_POP_STATE", ! option_sense);
+	yy_top_state	ACTION_M4_IFDEF("M4""_YY_NO_TOP_STATE", ! option_sense);
 
-	yy_scan_buffer	ACTION_IFDEF("YY_NO_SCAN_BUFFER", ! option_sense);
-	yy_scan_bytes	ACTION_IFDEF("YY_NO_SCAN_BYTES", ! option_sense);
-	yy_scan_string	ACTION_IFDEF("YY_NO_SCAN_STRING", ! option_sense);
+	yy_scan_buffer	ACTION_M4_IFDEF("M4""_YY_NO_SCAN_BUFFER", ! option_sense);
+	yy_scan_bytes	ACTION_M4_IFDEF("M4""_YY_NO_SCAN_BYTES", ! option_sense);
+	yy_scan_string	ACTION_M4_IFDEF("M4""_YY_NO_SCAN_STRING", ! option_sense);
+
+    yyalloc         ACTION_M4_IFDEF("M4""_YY_NO_FLEX_ALLOC", ! option_sense);
+    yyrealloc       ACTION_M4_IFDEF("M4""_YY_NO_FLEX_REALLOC", ! option_sense);
+    yyfree          ACTION_M4_IFDEF("M4""_YY_NO_FLEX_FREE", ! option_sense);
+
+    yyget_debug     ACTION_M4_IFDEF("M4""_YY_NO_GET_DEBUG", ! option_sense);
+    yyset_debug     ACTION_M4_IFDEF("M4""_YY_NO_SET_DEBUG", ! option_sense);
+    yyget_extra     ACTION_M4_IFDEF("M4""_YY_NO_GET_EXTRA", ! option_sense);
+    yyset_extra     ACTION_M4_IFDEF("M4""_YY_NO_SET_EXTRA", ! option_sense);
+    yyget_leng      ACTION_M4_IFDEF("M4""_YY_NO_GET_LENG", ! option_sense);
+    yyget_text      ACTION_M4_IFDEF("M4""_YY_NO_GET_TEXT", ! option_sense);
+    yyget_lineno    ACTION_M4_IFDEF("M4""_YY_NO_GET_LINENO", ! option_sense);
+    yyset_lineno    ACTION_M4_IFDEF("M4""_YY_NO_SET_LINENO", ! option_sense);
+    yyget_in        ACTION_M4_IFDEF("M4""_YY_NO_GET_IN", ! option_sense);
+    yyset_in        ACTION_M4_IFDEF("M4""_YY_NO_SET_IN", ! option_sense);
+    yyget_out       ACTION_M4_IFDEF("M4""_YY_NO_GET_OUT", ! option_sense);
+    yyset_out       ACTION_M4_IFDEF("M4""_YY_NO_SET_OUT", ! option_sense);
+    yyget_lval      ACTION_M4_IFDEF("M4""_YY_NO_GET_LVAL", ! option_sense);
+    yyset_lval      ACTION_M4_IFDEF("M4""_YY_NO_SET_LVAL", ! option_sense);
+    yyget_lloc      ACTION_M4_IFDEF("M4""_YY_NO_GET_LLOC", ! option_sense);
+    yyset_lloc      ACTION_M4_IFDEF("M4""_YY_NO_SET_LLOC", ! option_sense);
 
 	outfile		return OPT_OUTFILE;
 	prefix		return OPT_PREFIX;
 	yyclass		return OPT_YYCLASS;
+	header(-file)?      return OPT_HEADER;
+	tables-file         return OPT_TABLES;
+	tables-verify   {
+                    tablesverify = option_sense;
+                    if(!tablesext && option_sense)
+                        tablesext = true;
+                    }
+
 
 	\"[^"\n]*\"	{
+			if(yyleng-1 < MAXLINE) 
+        		 { 
 			strcpy( nmstr, yytext + 1 );
+			 } 
+			else 
+			 { 
+			   synerr( _("Input line too long\n")); 
+			   FLEX_EXIT(EXIT_FAILURE);  
+			 }
 			nmstr[strlen( nmstr ) - 1] = '\0';
 			return NAME;
 			}
@@ -333,7 +465,13 @@ LEXOPT		[aceknopr]
 	^{OPTWS}"<"	BEGIN(SC); return '<';
 	^{OPTWS}"^"	return '^';
 	\"		BEGIN(QUOTE); return '"';
-	"{"/[[:digit:]]	BEGIN(NUM); return '{';
+	"{"/[[:digit:]]	{
+			BEGIN(NUM);
+			if ( lex_compat || posix_compat )
+				return BEGIN_REPEAT_POSIX;
+			else
+				return BEGIN_REPEAT_FLEX;
+			}
 	"$"/([[:blank:]]|{NL})	return '$';
 
 	{WS}"%{"		{
@@ -395,13 +533,22 @@ LEXOPT		[aceknopr]
 	^"%%".*		{
 			sectnum = 3;
 			BEGIN(SECT3);
+			outn("/* Begin user sect3 */");
 			yyterminate(); /* to stop the parser */
 			}
 
 	"["({FIRST_CCL_CHAR}|{CCL_EXPR})({CCL_CHAR}|{CCL_EXPR})*	{
 			int cclval;
 
+			if(yyleng < MAXLINE) 
+        		 { 
 			strcpy( nmstr, yytext );
+			 } 
+			else 
+			 { 
+			   synerr( _("Input line too long\n")); 
+			   FLEX_EXIT(EXIT_FAILURE);  
+			 } 
 
 			/* Check to see if we've already encountered this
 			 * ccl.
@@ -432,12 +579,27 @@ LEXOPT		[aceknopr]
 				}
 			}
 
-	"{"{NAME}"}"	{
+    /* Check for :space: at the end of the rule so we don't
+     * wrap the expanded regex in '(' ')' -- breaking trailing
+     * context.
+     */
+	"{"{NAME}"}"[[:space:]]?	 {
 			register Char *nmdefptr;
-			Char *ndlookup();
+            int end_is_ws, end_ch;
+            
+            end_ch = yytext[yyleng-1];
+            end_is_ws = end_ch != '}' ? 1 : 0;
 
+ 			if(yyleng-1 < MAXLINE) 
+         		 { 
 			strcpy( nmstr, yytext + 1 );
-			nmstr[yyleng - 2] = '\0';  /* chop trailing brace */
+ 			 } 
+ 			else 
+ 			 { 
+ 			   synerr( _("Input line too long\n")); 
+ 			   FLEX_EXIT(EXIT_FAILURE);  
+ 			 }			
+nmstr[yyleng - 2 - end_is_ws] = '\0';  /* chop trailing brace */
 
 			if ( (nmdefptr = ndlookup( nmstr )) == 0 )
 				format_synerr(
@@ -447,9 +609,12 @@ LEXOPT		[aceknopr]
 			else
 				{ /* push back name surrounded by ()'s */
 				int len = strlen( (char *) nmdefptr );
+                if (end_is_ws)
+                    unput(end_ch);
 
 				if ( lex_compat || nmdefptr[0] == '^' ||
-				     (len > 0 && nmdefptr[len - 1] == '$') )
+				     (len > 0 && nmdefptr[len - 1] == '$')
+                     || (end_is_ws && trlcontxt))
 					{ /* don't use ()'s after all */
 					PUT_BACK_STRING((char *) nmdefptr, 0);
 
@@ -472,6 +637,7 @@ LEXOPT		[aceknopr]
 
 
 <SC>{
+	{OPTWS}{NL}{OPTWS}	++linenum;	/* Allow blank lines & continuations */
 	[,*]		return (unsigned char) yytext[0];
 	">"		BEGIN(SECT2); return '>';
 	">"/^		BEGIN(CARETISBOL); return '>';
@@ -543,7 +709,13 @@ LEXOPT		[aceknopr]
 			}
 
 	","		return ',';
-	"}"		BEGIN(SECT2); return '}';
+	"}"		{
+			BEGIN(SECT2);
+			if ( lex_compat || posix_compat )
+				return END_REPEAT_POSIX;
+			else
+				return END_REPEAT_FLEX;
+			}
 
 	.		{
 			synerr( _( "bad character inside {}'s" ) );
@@ -619,7 +791,7 @@ LEXOPT		[aceknopr]
 <ACTION_STRING>{
 	[^"\\\n]+	ACTION_ECHO;
 	\\.		ACTION_ECHO;
-	{NL}		++linenum; ACTION_ECHO;
+	{NL}		++linenum; ACTION_ECHO; BEGIN(ACTION);
 	\"		ACTION_ECHO; BEGIN(ACTION);
 	.		ACTION_ECHO;
 }

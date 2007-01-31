@@ -2,10 +2,10 @@ resource app_version
 {
 	major = 2,
 	middle = 5,
-	minor = 4,
-	variety = 5,
+	minor = 33,
+	variety = B_APPV_FINAL,
 	internal = 0,
-	short_info = "2.5.4a", 
-    long_info  = "2.5.4a ©1997 The Free Software Foundation"
+	short_info = "flex", 
+	long_info  = "flex from http://flex.sourceforge.net/"
 };
 

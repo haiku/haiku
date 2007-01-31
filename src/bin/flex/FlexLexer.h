@@ -1,7 +1,6 @@
-// $Header: /tmp/bonefish/open-beos/current/src/apps/bin/flex/FlexLexer.h,v 1.1 2004/06/14 09:18:17 korli Exp $
-
+// -*-C++-*-
 // FlexLexer.h -- define interfaces for lexical analyzer classes generated
-//		  by flex
+// by flex
 
 // Copyright (c) 1993 The Regents of the University of California.
 // All rights reserved.
@@ -9,20 +8,24 @@
 // This code is derived from software contributed to Berkeley by
 // Kent Williams and Tom Epperly.
 //
-// Redistribution and use in source and binary forms with or without
-// modification are permitted provided that: (1) source distributions retain
-// this entire copyright notice and comment, and (2) distributions including
-// binaries display the following acknowledgement:  ``This product includes
-// software developed by the University of California, Berkeley and its
-// contributors'' in the documentation or other materials provided with the
-// distribution and in all advertising materials mentioning features or use
-// of this software.  Neither the name of the University nor the names of
-// its contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
+//  are met:
 
-// THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+//  1. Redistributions of source code must retain the above copyright
+//  notice, this list of conditions and the following disclaimer.
+//  2. Redistributions in binary form must reproduce the above copyright
+//  notice, this list of conditions and the following disclaimer in the
+//  documentation and/or other materials provided with the distribution.
+
+//  Neither the name of the University nor the names of its contributors
+//  may be used to endorse or promote products derived from this software
+//  without specific prior written permission.
+
+//  THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+//  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+//  PURPOSE.
 
 // This file defines FlexLexer, an abstract class which specifies the
 // external interface provided to flex C++ lexer objects, and yyFlexLexer,
@@ -44,7 +47,11 @@
 #ifndef __FLEX_LEXER_H
 // Never included before - need to define base class.
 #define __FLEX_LEXER_H
-#include <iostream.h>
+
+#include <iostream>
+#  ifndef FLEX_STD
+#    define FLEX_STD std::
+#  endif
 
 extern "C++" {
 
@@ -61,14 +68,14 @@ public:
 	virtual void
 		yy_switch_to_buffer( struct yy_buffer_state* new_buffer ) = 0;
 	virtual struct yy_buffer_state*
-		yy_create_buffer( istream* s, int size ) = 0;
+		yy_create_buffer( FLEX_STD istream* s, int size ) = 0;
 	virtual void yy_delete_buffer( struct yy_buffer_state* b ) = 0;
-	virtual void yyrestart( istream* s ) = 0;
+	virtual void yyrestart( FLEX_STD istream* s ) = 0;
 
 	virtual int yylex() = 0;
 
 	// Call yylex with new input/output sources.
-	int yylex( istream* new_in, ostream* new_out = 0 )
+	int yylex( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0 )
 		{
 		switch_streams( new_in, new_out );
 		return yylex();
@@ -76,8 +83,8 @@ public:
 
 	// Switch to new input/output streams.  A nil stream pointer
 	// indicates "keep the current one".
-	virtual void switch_streams( istream* new_in = 0,
-					ostream* new_out = 0 ) = 0;
+	virtual void switch_streams( FLEX_STD istream* new_in = 0,
+					FLEX_STD ostream* new_out = 0 ) = 0;
 
 	int lineno() const		{ return yylineno; }
 
@@ -100,21 +107,26 @@ protected:
 // yyFlexLexer, as discussed in the flex man page.
 #define yyFlexLexerOnce
 
+extern "C++" {
+
 class yyFlexLexer : public FlexLexer {
 public:
 	// arg_yyin and arg_yyout default to the cin and cout, but we
 	// only make that assignment when initializing in yylex().
-	yyFlexLexer( istream* arg_yyin = 0, ostream* arg_yyout = 0 );
+	yyFlexLexer( FLEX_STD istream* arg_yyin = 0, FLEX_STD ostream* arg_yyout = 0 );
 
 	virtual ~yyFlexLexer();
 
 	void yy_switch_to_buffer( struct yy_buffer_state* new_buffer );
-	struct yy_buffer_state* yy_create_buffer( istream* s, int size );
+	struct yy_buffer_state* yy_create_buffer( FLEX_STD istream* s, int size );
 	void yy_delete_buffer( struct yy_buffer_state* b );
-	void yyrestart( istream* s );
+	void yyrestart( FLEX_STD istream* s );
+
+    void yypush_buffer_state( struct yy_buffer_state* new_buffer );
+    void yypop_buffer_state(void);
 
 	virtual int yylex();
-	virtual void switch_streams( istream* new_in, ostream* new_out );
+	virtual void switch_streams( FLEX_STD istream* new_in, FLEX_STD ostream* new_out );
 
 protected:
 	virtual int LexerInput( char* buf, int max_size );
@@ -125,7 +137,7 @@ protected:
 	int yyinput();
 
 	void yy_load_buffer_state();
-	void yy_init_buffer( struct yy_buffer_state* b, istream* s );
+	void yy_init_buffer( struct yy_buffer_state* b, FLEX_STD istream* s );
 	void yy_flush_buffer( struct yy_buffer_state* b );
 
 	int yy_start_stack_ptr;
@@ -140,10 +152,8 @@ protected:
 	yy_state_type yy_try_NUL_trans( yy_state_type current_state );
 	int yy_get_next_buffer();
 
-	istream* yyin;	// input source for default LexerInput
-	ostream* yyout;	// output sink for default LexerOutput
-
-	struct yy_buffer_state* yy_current_buffer;
+	FLEX_STD istream* yyin;	// input source for default LexerInput
+	FLEX_STD ostream* yyout;	// output sink for default LexerOutput
 
 	// yy_hold_char holds the character lost when yytext is formed.
 	char yy_hold_char;
@@ -160,6 +170,12 @@ protected:
 	// Flag which is used to allow yywrap()'s to do buffer switches
 	// instead of setting up a fresh yyin.  A bit of a hack ...
 	int yy_did_buffer_switch_on_eof;
+
+
+    size_t yy_buffer_stack_top; /**< index of top of stack. */
+    size_t yy_buffer_stack_max; /**< capacity of stack. */
+    struct yy_buffer_state ** yy_buffer_stack; /**< Stack as an array. */
+    void yyensure_buffer_stack(void);
 
 	// The following are not always needed, but may be depending
 	// on use of certain flex features (like REJECT or yymore()).
@@ -182,5 +198,7 @@ protected:
 	int yy_more_offset;
 	int yy_prev_more_offset;
 };
+
+}
 
 #endif
