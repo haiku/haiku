@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src bin m4 src ;
+
+#SubDirCcFlags -DHAVE_CONFIG_H   -DPKGDATADIR=\'\"/etc\"\' -DLOCALEDIR=\'\"/etc/locale\"\' ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+BinCommand m4 :
+	builtin.c
+	debug.c
+	eval.c
+	format.c
+	freeze.c
+	input.c
+	m4.c
+	macro.c
+	output.c
+	path.c
+	#stackovf.c
+	symtab.c
+	: libm4.a
+	: m4.rdef
+;
+

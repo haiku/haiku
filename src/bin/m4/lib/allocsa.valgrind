@@ -1,0 +1,7 @@
+# Suppress a valgrind message about use of uninitialized memory in freesa().
+# This use is OK because it provides only a speedup.
+{
+    freesa
+    Memcheck:Cond
+    fun:freesa
+}

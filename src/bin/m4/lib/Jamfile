@@ -1,0 +1,34 @@
+SubDir HAIKU_TOP src bin m4 lib ;
+
+SubDirCcFlags -DHAVE_CONFIG_H ;
+
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+StaticLibrary libm4.a : 
+	__fpending.c
+	allocsa.c
+	clean-temp.c
+	cloexec.c
+	close-stream.c
+	closeout.c
+	dup-safer.c
+	error.c
+	exitfail.c
+	fatal-signal.c
+	fd-safer.c
+	fopen-safer.c
+	gl_avltree_oset.c
+	gl_linkedhash_list.c
+	mkdtemp.c
+	mkstemp-safer.c
+	quotearg.c
+	strstr.c
+	tempname.c
+	tmpdir.c
+	verror.c
+	xalloc-die.c
+	xasprintf.c
+	xmalloc.c
+	xvasprintf.c
+;

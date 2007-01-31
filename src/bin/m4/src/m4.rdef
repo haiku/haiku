@@ -1,0 +1,11 @@
+resource app_version
+{
+	major = 1,
+	middle = 4,
+	minor = 8,
+	variety = B_APPV_FINAL,
+	internal = 0,
+	short_info = "m4", 
+	long_info  = "m4 ©2006 The Free Software Foundation"
+};
+

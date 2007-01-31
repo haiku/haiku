@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src bin m4 ;
+
+SubInclude HAIKU_TOP src bin m4 lib ;
+SubInclude HAIKU_TOP src bin m4 src ;
+

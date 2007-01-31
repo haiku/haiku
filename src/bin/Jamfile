@@ -155,6 +155,7 @@ SubInclude HAIKU_TOP src bin ideinfo ;
 SubInclude HAIKU_TOP src bin keymap ;
 SubInclude HAIKU_TOP src bin less ;
 SubInclude HAIKU_TOP src bin listdev ;
+SubInclude HAIKU_TOP src bin m4 ;
 SubInclude HAIKU_TOP src bin make ;
 SubInclude HAIKU_TOP src bin makebootable ;
 #SubInclude HAIKU_TOP src bin makeudfimage ;
