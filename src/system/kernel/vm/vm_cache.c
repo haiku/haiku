@@ -108,6 +108,7 @@ vm_cache_create(vm_store *store)
 	cache->temporary = 0;
 	cache->scan_skip = 0;
 	cache->page_count = 0;
+	cache->busy = false;
 
 	// connect the store to its cache
 	cache->store = store;
@@ -178,7 +179,29 @@ vm_cache_release_ref(vm_cache_ref *cacheRef)
 		// on the initial one (this is vnode specific)
 		if (cacheRef->cache->store->ops->release_ref)
 			cacheRef->cache->store->ops->release_ref(cacheRef->cache->store);
-
+#if 0
+{
+	// count min references to see if everything is okay
+	int32 min = 0;
+	vm_area *a;
+	vm_cache *c;
+	bool locked = false;
+	if (cacheRef->lock.holder != find_thread(NULL)) {
+		mutex_lock(&cacheRef->lock);
+		locked = true;
+	}
+	for (a = cacheRef->areas; a != NULL; a = a->cache_next)
+		min++;
+	for (c = NULL; (c = list_get_next_item(&cacheRef->cache->consumers, c)) != NULL; )
+		min++;
+dprintf("! %ld release cache_ref %p, ref_count is now %ld (min %ld, called from %p)\n", find_thread(NULL), cacheRef, cacheRef->ref_count,
+	min, ((struct stack_frame *)x86_read_ebp())->return_address);
+	if (cacheRef->ref_count < min)
+		panic("cache_ref %p has too little ref_count!!!!", cacheRef);
+	if (locked)
+		mutex_unlock(&cacheRef->lock);
+}
+#endif
 		return;
 	}
 
@@ -205,6 +228,8 @@ vm_cache_release_ref(vm_cache_ref *cacheRef)
 		acquire_spinlock(&sPageCacheTableLock);
 
 		hash_remove(sPageCacheTable, oldPage);
+		oldPage->cache = NULL;
+		// TODO: we also need to remove all of the page's mappings!
 
 		release_spinlock(&sPageCacheTableLock);
 		restore_interrupts(state);
@@ -451,6 +476,7 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 		if (merge) {
 			// But since we need to keep the locking order upper->lower cache, we
 			// need to unlock our cache now
+			cache->busy = true;
 			mutex_unlock(&cacheRef->lock);
 
 			mutex_lock(&consumerRef->lock);
@@ -465,7 +491,9 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 				|| cache->consumers.link.next != cache->consumers.link.prev
 				|| consumer != list_get_first_item(&cache->consumers)) {
 				merge = false;
+				cache->busy = false;
 				mutex_unlock(&consumerRef->lock);
+				vm_cache_release_ref(consumerRef);
 			}
 		}
 
@@ -480,42 +508,42 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 
 			for (page = cache->page_list; page != NULL; page = nextPage) {
 				nextPage = page->cache_next;
-				vm_cache_remove_page(cacheRef, page);
 
 				if (vm_cache_lookup_page(consumerRef,
-						(off_t)page->cache_offset << PAGE_SHIFT) != NULL) {
-					// the page already is in the consumer cache - this copy is no
-					// longer needed, and can be freed
-					vm_page_set_state(page, PAGE_STATE_FREE);
-					continue;
+						(off_t)page->cache_offset << PAGE_SHIFT) == NULL) {
+					// the page already is not yet in the consumer cache - move it upwards
+					vm_cache_remove_page(cacheRef, page);
+					vm_cache_insert_page(consumerRef, page,
+						(off_t)page->cache_offset << PAGE_SHIFT);
 				}
 
-				// move the page into the consumer cache
-				vm_cache_insert_page(consumerRef, page,
-					(off_t)page->cache_offset << PAGE_SHIFT);
+				// TODO: if we'd remove the pages in the cache, we'd also
+				//	need to remove all of their mappings!
 			}
 
 			newSource = cache->source;
-			if (newSource != NULL) {
-				// The remaining consumer has gotten a new source
-				mutex_lock(&newSource->ref->lock);
 
-				list_remove_item(&newSource->consumers, cache);
-				list_add_item(&newSource->consumers, consumer);
-				consumer->source = newSource;
-				cache->source = NULL;
+			// The remaining consumer has gotten a new source
+			mutex_lock(&newSource->ref->lock);
 
-				mutex_unlock(&newSource->ref->lock);
+			list_remove_item(&newSource->consumers, cache);
+			list_add_item(&newSource->consumers, consumer);
+			consumer->source = newSource;
+			cache->source = NULL;
 
-				// Release the other reference to the cache - we take over
-				// its reference of its source cache; we can do this here
-				// (with the cacheRef locked) since we own another reference
-				// from the first consumer we removed
-				vm_cache_release_ref(cacheRef);
-			}
+			mutex_unlock(&newSource->ref->lock);
+
+			// Release the other reference to the cache - we take over
+			// its reference of its source cache; we can do this here
+			// (with the cacheRef locked) since we own another reference
+			// from the first consumer we removed
+if (cacheRef->ref_count < 2)
+panic("cacheRef %p ref count too low!\n", cacheRef);
+			vm_cache_release_ref(cacheRef);
+
 			mutex_unlock(&consumerRef->lock);
+			vm_cache_release_ref(consumerRef);
 		}
-		vm_cache_release_ref(consumerRef);
 	}
 
 	mutex_unlock(&cacheRef->lock);

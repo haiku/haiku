@@ -81,6 +81,7 @@ typedef struct vm_cache {
 	uint32				page_count;
 	uint32				temporary : 1;
 	uint32				scan_skip : 1;
+	uint32				busy : 1;
 } vm_cache;
 
 // vm area
