@@ -604,4 +604,4 @@
 /* #undef stack_t */
 
 /* Define as a macro for copying va_list variables. */
-/* #undef va_copy */
+#define va_copy gl_va_copy
