@@ -219,7 +219,7 @@ ScreenMode::Revert()
 		return B_OK;
 
 	screen_mode current;
-	if (Get(current) && fOriginal == current)
+	if (Get(current) == B_OK && fOriginal == current)
 		return B_OK;
 
 	BScreen screen(fWindow);

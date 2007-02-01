@@ -17,6 +17,14 @@
 #include <Screen.h>
 
 
+#ifndef __HAIKU__
+inline bool operator!=(const rgb_color& x, const rgb_color& y)
+{
+	return (x.red!=y.red || x.blue!=y.blue || x.green!=y.green);
+}
+#endif
+
+
 MonitorView::MonitorView(BRect rect, char *name, int32 width, int32 height)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
 	fWidth(width),

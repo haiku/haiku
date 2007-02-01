@@ -801,8 +801,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 		case POP_RESOLUTION_MSG:
 		{
+			int32 oldWidth = fSelected.width, oldHeight = fSelected.height;
 			message->FindInt32("width", &fSelected.width);
 			message->FindInt32("height", &fSelected.height);
+			if (fSelected.width == oldWidth && fSelected.height == oldHeight)
+				break;
 
 			CheckColorMenu();
 			CheckRefreshMenu();
@@ -810,29 +813,44 @@ ScreenWindow::MessageReceived(BMessage* message)
 			UpdateMonitorView();
 			UpdateRefreshControl();
 
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 		}
 
 		case POP_COLORS_MSG:
 		{
+			color_space old = fSelected.space;
 			message->FindInt32("space", (int32 *)&fSelected.space);
+			if (fSelected.space == old)
+				break;
 
 			BString string;
 			string << fSelected.BitsPerPixel() << " Bits/Pixel";
 			fColorsMenu->Superitem()->SetLabel(string.String());
 
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 		}
 
 		case POP_REFRESH_MSG:
+		{
+			float old = fSelected.refresh;
 			message->FindFloat("refresh", &fSelected.refresh);
 			fOtherRefresh->SetLabel("Other" B_UTF8_ELLIPSIS);
 				// revert "Other…" label - it might have had a refresh rate prefix
 
+			if (fSelected.refresh == old)
+				break;
+
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();		
 			break;
+		}
 
 		case POP_OTHER_REFRESH_MSG:
 		{
@@ -856,8 +874,13 @@ ScreenWindow::MessageReceived(BMessage* message)
 		{
 			// user pressed "done" in "Other…" refresh dialog;
 			// select the refresh rate chosen
+			float old = fSelected.refresh;
 			message->FindFloat("refresh", &fSelected.refresh);
+			if (fSelected.refresh != old)
+				break;
 
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			UpdateRefreshControl();
 			CheckApplyEnabled();
 			break;
@@ -909,6 +932,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			fSelected.use_laptop_panel = false;
 			fSelected.tv_standard = 0;
 
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			UpdateControls();
 			break;
 		}
@@ -959,7 +984,6 @@ ScreenWindow::MessageReceived(BMessage* message)
 				fChangingAllWorkspaces = false;
 			}
 
-			fScreenMode.UpdateOriginalMode();
 			UpdateActiveMode();
 			break;
 		}
@@ -1005,20 +1029,16 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 bool
 ScreenWindow::CanApply() const
 {
-	if (fAllWorkspacesItem->IsMarked())
-		return true;
-
-	return fSelected != fActive;
+	return fAllWorkspacesItem->IsMarked() || fSelected != fOriginal
+			|| fSelected != fActive;
 }
 
 
 bool
 ScreenWindow::CanRevert() const
 {
-	if (fActive != fOriginal)
-		return true;
-
-	return CanApply();
+	return (fActive != fOriginal && !fAllWorkspacesItem->IsMarked())
+			|| fSelected != fActive;
 }
 
 
