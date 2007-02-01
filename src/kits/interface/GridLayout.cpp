@@ -336,7 +336,7 @@ BGridLayout::AddItem(BLayoutItem* item)
 bool
 BGridLayout::AddItem(int32 index, BLayoutItem* item)
 {
-	return AddItem(index, item);
+	return AddItem(item);
 }
 
 // AddItem
