@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,7 @@
 #include <PropertyInfo.h>
 
 #include <algorithm>
+#include <new>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,7 +30,12 @@ using std::vector;
 using BPrivate::gDefaultTokens;
 
 
-static const char *kArchiveNameField = "_name";
+static const char* kArchiveNameField = "_name";
+
+static const uint32 kMsgStartObserving = '_OBS';
+static const uint32 kMsgStopObserving = '_OBP';
+static const char* kObserveTarget = "be:observe_target";
+
 
 static property_info sHandlerPropInfo[] = {
 	{
@@ -82,27 +88,34 @@ static property_info sHandlerPropInfo[] = {
 
 bool FilterDeleter(void *filter);
 
-typedef map<unsigned long, vector<BHandler *> >	THandlerObserverMap;
-typedef map<unsigned long, vector<BMessenger> >	TMessengerObserverMap;
+namespace BPrivate {
 
-//------------------------------------------------------------------------------
-// TODO: Change to BPrivate::BObserverList if possible
-class _ObserverList {
+class ObserverList {
 	public:
-		_ObserverList(void);
-		~_ObserverList(void);
+		ObserverList();
+		~ObserverList();
 
-		status_t SendNotices(unsigned long, BMessage const *);
-		status_t StartObserving(BHandler *, unsigned long);
-		status_t StartObserving(const BMessenger&, unsigned long);
-		status_t StopObserving(BHandler *, unsigned long);
-		status_t StopObserving(const BMessenger&, unsigned long);
+		status_t SendNotices(uint32 what, const BMessage* notice);
+		status_t Add(const BHandler* handler, uint32 what);
+		status_t Add(const BMessenger& messenger, uint32 what);
+		status_t Remove(const BHandler* handler, uint32 what);
+		status_t Remove(const BMessenger& messenger, uint32 what);
 		bool IsEmpty();
 
 	private:
-		THandlerObserverMap		fHandlerMap;
-		TMessengerObserverMap	fMessengerMap;
+		typedef map<uint32, vector<const BHandler *> > HandlerObserverMap;
+		typedef map<uint32, vector<BMessenger> > MessengerObserverMap;
+
+		void _ValidateHandlers(uint32 what);
+		void _SendNotices(uint32 what, BMessage* notice);
+
+		HandlerObserverMap		fHandlerMap;
+		MessengerObserverMap	fMessengerMap;
 };
+
+}	// namespace BPrivate
+
+using namespace BPrivate;
 
 
 //	#pragma mark -
@@ -112,7 +125,7 @@ BHandler::BHandler(const char *name)
 	: BArchivable(),
 	fName(NULL)
 {
-	InitData(name);
+	_InitData(name);
 }
 
 
@@ -144,7 +157,7 @@ BHandler::BHandler(BMessage *data)
 	if (data)
 		data->FindString(kArchiveNameField, &name);
 
-	InitData(name);
+	_InitData(name);
 }
 
 
@@ -175,7 +188,24 @@ BHandler::MessageReceived(BMessage *message)
 	BMessage reply(B_REPLY);
 
 	switch (message->what) {
-		// ToDo: am I missing something or is the "observed" stuff handshake completely missing?
+		case kMsgStartObserving:
+		case kMsgStopObserving:
+		{
+			BMessenger target;
+			uint32 what;
+			if (message->FindMessenger(kObserveTarget, &target) != B_OK
+				|| message->FindInt32(B_OBSERVE_WHAT_CHANGE, (int32*)&what) != B_OK)
+				break;
+
+			ObserverList* list = _ObserverList();
+			if (list != NULL) {
+				if (message->what == kMsgStartObserving)
+					list->Add(target, what);
+				else
+					list->Remove(target, what);
+			}
+			break;
+		}
 
 		case B_GET_PROPERTY:
 		{
@@ -479,59 +509,67 @@ BMessage: what =  (0x0, or 0)
 
 
 status_t
-BHandler::StartWatching(BMessenger messenger, uint32 what)
+BHandler::StartWatching(BMessenger target, uint32 what)
 {
-	if (fObserverList == NULL)
-		fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(messenger, what);
+	BMessage message(kMsgStartObserving);
+	message.AddMessenger(kObserveTarget, this);
+	message.AddInt32(B_OBSERVE_WHAT_CHANGE, what);
+
+	return target.SendMessage(&message);
 }
 
 
 status_t
-BHandler::StartWatchingAll(BMessenger messenger)
+BHandler::StartWatchingAll(BMessenger target)
 {
-	return StartWatching(messenger, B_OBSERVER_OBSERVE_ALL);
+	return StartWatching(target, B_OBSERVER_OBSERVE_ALL);
 }
 
 
 status_t
-BHandler::StopWatching(BMessenger messenger, uint32 what)
+BHandler::StopWatching(BMessenger target, uint32 what)
 {
-	if (fObserverList == NULL)
-		fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(messenger, what);
+	BMessage message(kMsgStopObserving);
+	message.AddMessenger(kObserveTarget, this);
+	message.AddInt32(B_OBSERVE_WHAT_CHANGE, what);
+
+	return target.SendMessage(&message);
 }
 
 
 status_t
-BHandler::StopWatchingAll(BMessenger messenger)
+BHandler::StopWatchingAll(BMessenger target)
 {
-	return StopWatching(messenger, B_OBSERVER_OBSERVE_ALL);
+	return StopWatching(target, B_OBSERVER_OBSERVE_ALL);
 }
 
 
 status_t
-BHandler::StartWatching(BHandler *handler, uint32 what)
+BHandler::StartWatching(BHandler* handler, uint32 what)
 {
-	if (fObserverList == NULL)
-		fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(handler, what);
+	ObserverList* list = _ObserverList();
+	if (list == NULL)
+		return B_NO_MEMORY;
+
+	return list->Add(handler, what);
 }
 
 
 status_t
-BHandler::StartWatchingAll(BHandler *handler)
+BHandler::StartWatchingAll(BHandler* handler)
 {
 	return StartWatching(handler, B_OBSERVER_OBSERVE_ALL);
 }
 
 
 status_t
-BHandler::StopWatching(BHandler *handler, uint32 what)
+BHandler::StopWatching(BHandler* handler, uint32 what)
 {
-	if (fObserverList == NULL)
-		fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(handler, what);
+	ObserverList* list = _ObserverList();
+	if (list == NULL)
+		return B_NO_MEMORY;
+
+	return list->Remove(handler, what);
 }
 
 
@@ -565,7 +603,7 @@ BHandler::IsWatched() const
 
 
 void
-BHandler::InitData(const char *name)
+BHandler::_InitData(const char *name)
 {
 	SetName(name);
 
@@ -575,6 +613,16 @@ BHandler::InitData(const char *name)
 	fObserverList = NULL;
 
 	fToken = gDefaultTokens.NewToken(B_HANDLER_TOKEN, this);
+}
+
+
+ObserverList*
+BHandler::_ObserverList()
+{
+	if (fObserverList == NULL)
+		fObserverList = new (std::nothrow) BPrivate::ObserverList();
+
+	return fObserverList;
 }
 
 
@@ -618,73 +666,92 @@ void BHandler::_ReservedHandler4() {}
 //	#pragma mark -
 
 
-_ObserverList::_ObserverList(void)
+ObserverList::ObserverList()
 {
 }
 
 
-_ObserverList::~_ObserverList(void)
+ObserverList::~ObserverList()
 {
+}
+
+
+void
+ObserverList::_ValidateHandlers(uint32 what)
+{
+	vector<const BHandler *>& handlers = fHandlerMap[what];
+	vector<const BHandler *>::iterator iterator = handlers.begin();
+
+	for (; iterator != handlers.end(); iterator++) {
+		BMessenger target(*iterator);
+		if (!target.IsValid())
+			continue;
+
+		handlers.erase(iterator);
+		Add(target, what);
+	}
+}
+
+
+void
+ObserverList::_SendNotices(uint32 what, BMessage* message)
+{
+	// first iterate over the list of handlers and try to make valid messengers out of them
+	_ValidateHandlers(what);
+
+	// now send it to all messengers we know
+	vector<BMessenger>& messengers = fMessengerMap[what];
+	vector<BMessenger>::iterator iterator = messengers.begin();
+
+	for (; iterator != messengers.end(); iterator++) {
+		if (!(*iterator).IsValid()) {
+			messengers.erase(iterator);
+			continue;
+		}
+
+		(*iterator).SendMessage(message);
+	}
 }
 
 
 status_t
-_ObserverList::SendNotices(unsigned long what, BMessage const *message)
+ObserverList::SendNotices(uint32 what, const BMessage* message)
 {
-	// Having to new a temporary is really irritating ...
-	BMessage *copyMsg = NULL;
+	BMessage *copy = NULL;
 	if (message) {
-		copyMsg = new BMessage(*message);
-		copyMsg->what = B_OBSERVER_NOTICE_CHANGE;
-		copyMsg->AddInt32(B_OBSERVE_ORIGINAL_WHAT, message->what);
+		copy = new BMessage(*message);
+		copy->what = B_OBSERVER_NOTICE_CHANGE;
+		copy->AddInt32(B_OBSERVE_ORIGINAL_WHAT, message->what);
 	} else
-		copyMsg = new BMessage(B_OBSERVER_NOTICE_CHANGE);
+		copy = new BMessage(B_OBSERVER_NOTICE_CHANGE);
 
-	copyMsg->AddInt32(B_OBSERVE_WHAT_CHANGE, what);
+	copy->AddInt32(B_OBSERVE_WHAT_CHANGE, what);
 
-	vector<BHandler *> &handlers = fHandlerMap[what];
-	for (uint32 i = 0; i < handlers.size(); ++i) {
-		BMessenger msgr(handlers[i]);
-		msgr.SendMessage(copyMsg);
-	}
+	_SendNotices(what, copy);
+	_SendNotices(B_OBSERVER_OBSERVE_ALL, copy);
 
-	vector<BMessenger> &messengers = fMessengerMap[what];
-	for (uint32 i = 0; i < messengers.size(); ++i)
-		messengers[i].SendMessage(copyMsg);
-
-	// We have to send the message also to the handlers
-	// and messengers which were subscribed to ALL events,
-	// since they aren't caught by the above loops.
-	// TODO: cleanup
-	vector<BHandler *> &handlersAll = fHandlerMap[B_OBSERVER_OBSERVE_ALL];
-	for (uint32 i = 0; i < handlersAll.size(); ++i) {
-		BMessenger msgr(handlersAll[i]);
-		msgr.SendMessage(copyMsg);
-	}
-	
-	vector<BMessenger> &messengersAll = fMessengerMap[B_OBSERVER_OBSERVE_ALL];
-	for (uint32 i = 0; i < messengersAll.size(); ++i)
-		messengers[i].SendMessage(copyMsg);
-	
-	// Gotta make sure to clean up the annoying temporary ...
-	delete copyMsg;
-
+	delete copy;
 	return B_OK;
 }
 
 
 status_t
-_ObserverList::StartObserving(BHandler *handler, unsigned long what)
+ObserverList::Add(const BHandler *handler, uint32 what)
 {
 	if (handler == NULL)
 		return B_BAD_HANDLER;
 
-	vector<BHandler*> &handlers = fHandlerMap[what];
+	// if this handler already represents a valid target, add its messenger
+	BMessenger target(handler);
+	if (target.IsValid())
+		return Add(target, what);
 
-	vector<BHandler*>::iterator iter;
+	vector<const BHandler*> &handlers = fHandlerMap[what];
+
+	vector<const BHandler*>::iterator iter;
 	iter = find(handlers.begin(), handlers.end(), handler);
 	if (iter != handlers.end()) {
-		// TODO: verify
+		// TODO: do we want to have a reference count for this?
 		return B_OK;
 	}
 
@@ -694,15 +761,14 @@ _ObserverList::StartObserving(BHandler *handler, unsigned long what)
 
 
 status_t
-_ObserverList::StartObserving(const BMessenger &messenger,
-	unsigned long what)
+ObserverList::Add(const BMessenger &messenger, uint32 what)
 {
 	vector<BMessenger> &messengers = fMessengerMap[what];
 
 	vector<BMessenger>::iterator iter;
 	iter = find(messengers.begin(), messengers.end(), messenger);
 	if (iter != messengers.end()) {
-		// TODO: verify
+		// TODO: do we want to have a reference count for this?
 		return B_OK;
 	}
 
@@ -712,14 +778,19 @@ _ObserverList::StartObserving(const BMessenger &messenger,
 
 
 status_t
-_ObserverList::StopObserving(BHandler *handler, unsigned long what)
+ObserverList::Remove(const BHandler *handler, uint32 what)
 {
 	if (handler == NULL)
 		return B_BAD_HANDLER;
 
-	vector<BHandler*> &handlers = fHandlerMap[what];
+	// look into the list of messengers
+	BMessenger target(handler);
+	if (target.IsValid() && Remove(target, what) == B_OK)
+		return B_OK;
 
-	vector<BHandler*>::iterator iter;
+	vector<const BHandler*> &handlers = fHandlerMap[what];
+
+	vector<const BHandler*>::iterator iter;
 	iter = find(handlers.begin(), handlers.end(), handler);
 	if (iter != handlers.end()) {
 		handlers.erase(iter);
@@ -734,14 +805,8 @@ _ObserverList::StopObserving(BHandler *handler, unsigned long what)
 
 
 status_t
-_ObserverList::StopObserving(const BMessenger &messenger,
-	unsigned long what)
+ObserverList::Remove(const BMessenger &messenger, uint32 what)
 {
-	// ???:	What if you call StartWatching(MyMsngr, aWhat) and then call
-	//		StopWatchingAll(MyMsnger)?  Will MyMsnger be removed from the aWhat
-	//		watcher list?  For now, we'll assume that they're discreet lists
-	//		which do no cross checking; i.e., MyMsnger would *not* be removed in
-	//		this scenario.
 	vector<BMessenger> &messengers = fMessengerMap[what];
 
 	vector<BMessenger>::iterator iter;
@@ -759,7 +824,7 @@ _ObserverList::StopObserving(const BMessenger &messenger,
 
 
 bool
-_ObserverList::IsEmpty()
+ObserverList::IsEmpty()
 {
 	return fHandlerMap.empty() && fMessengerMap.empty();
 }
