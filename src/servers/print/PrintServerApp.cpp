@@ -12,7 +12,7 @@
 #include "Printer.h"
 #include "pr_server.h"
 
-	// BeOS API
+// BeOS API
 #include <Alert.h>
 #include <Autolock.h>
 #include <Directory.h>
@@ -27,9 +27,11 @@
 #include <PrintJob.h>
 #include <String.h>
 
-	// ANSI C
-#include <stdio.h>	//for printf
-#include <unistd.h> //for unlink
+// ANSI C
+#include <stdio.h>
+	// for printf
+#include <unistd.h> 
+	// for unlink
 
 BLocker *gLock = NULL;
 
@@ -47,18 +49,13 @@ typedef char* (*add_printer_func_t)(const char* printer_name);
  *
  * @returns B_OK if application was started, or an errorcode if
  *          application failed to start.
- *
- * @see your favorite C/C++ textbook :P
  */
-
 int
-main()
+main() 
 {
 	status_t rc = B_OK;
 	gLock = new BLocker();
-		// Create our application object
 	PrintServerApp print_server(&rc);
-		// If all went fine, let's start it
 	if (rc == B_OK) {
 		print_server.Run();
 	}
@@ -76,7 +73,6 @@ main()
  *
  * @see BApplication
  */
-
 PrintServerApp::PrintServerApp(status_t* err)
 	: Inherited(PSRV_SIGNATURE_TYPE, err),
 	fSelectedIconMini(NULL),
@@ -88,120 +84,128 @@ PrintServerApp::PrintServerApp(status_t* err)
 {
 	fSettings = Settings::GetSettings();
 	LoadSettings();
-		// If our superclass initialized ok
-	if (*err == B_OK) { 
-		fHasReferences = create_sem(1, "has_references");
+	
+	if (*err != B_OK)
+		return;
 		
-			// let us try as well
-		SetupPrinterList();
-		RetrieveDefaultPrinter();
-		
-		fSelectedIconMini = new BBitmap(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8);
-		fSelectedIconLarge = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
-		
-			// Cache icons for selected printer
-		BMimeType type(PRNT_SIGNATURE_TYPE);
-		type.GetIcon(fSelectedIconMini, B_MINI_ICON);
-		type.GetIcon(fSelectedIconLarge, B_LARGE_ICON);
-		
-			// Start handling of spooled files
-		PostMessage(PSRV_PRINT_SPOOLED_JOB);
-	}
+	fHasReferences = create_sem(1, "has_references");
+	
+	SetupPrinterList();
+	RetrieveDefaultPrinter();
+	
+	// Cache icons for selected printer
+	fSelectedIconMini = new BBitmap(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8);
+	fSelectedIconLarge = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);	
+	BMimeType type(PRNT_SIGNATURE_TYPE);
+	type.GetIcon(fSelectedIconMini, B_MINI_ICON);
+	type.GetIcon(fSelectedIconLarge, B_LARGE_ICON);
+	
+	PostMessage(PSRV_PRINT_SPOOLED_JOB);
+		// Start handling of spooled files
 }
 
-PrintServerApp::~PrintServerApp() {
+
+PrintServerApp::~PrintServerApp()
+{
 	SaveSettings();
 	delete fSettings;
 }
 
-bool PrintServerApp::QuitRequested()
+
+bool 
+PrintServerApp::QuitRequested()
 {
+	// don't quit when user types Command+Q! 
 	BMessage* m = CurrentMessage();
-	bool shortcut;
-		// don't quit when user types Command+Q! 
-	if (m && m->FindBool("shortcut", &shortcut) == B_OK && shortcut) return false;
+	bool shortcut;	
+	if (m != NULL && m->FindBool("shortcut", &shortcut) == B_OK && shortcut) 
+		return false;
 		
-	bool rc = Inherited::QuitRequested();
-	if (rc) {		
-		delete fFolder; fFolder = NULL;
-#if 0
-			// Find directory containing printer definition nodes
-		BPath path;
-		if (::find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK) {
-			BEntry entry(path.Path());
-			node_ref nref;
-			if (entry.InitCheck() == B_OK &&
-				entry.GetNodeRef(&nref) == B_OK) {
-					// Stop watching the printer directory
-				::watch_node(&nref, B_STOP_WATCHING, be_app_messenger);
-			}
-		}
-#endif
+	if (!Inherited::QuitRequested())
+		return false;
 
-			// Release all printers
-		Printer* printer;
-		while ((printer = Printer::At(0)) != NULL) {
-			printer->AbortPrintThread();
-			UnregisterPrinter(printer);
-		}
+	// Stop watching the folder
+	delete fFolder; fFolder = NULL;
 
-			// Wait for printers
-		if (fHasReferences > 0) {
-			acquire_sem(fHasReferences);
-			delete_sem(fHasReferences);
-			fHasReferences = 0;
-		}
-
-		ASSERT(fSelectedIconMini != NULL);
-
-		delete fSelectedIconMini; fSelectedIconMini = NULL;
-		delete fSelectedIconLarge; fSelectedIconLarge = NULL;
+	// Release all printers
+	Printer* printer;
+	while ((printer = Printer::At(0)) != NULL) {
+		printer->AbortPrintThread();
+		UnregisterPrinter(printer);
 	}
-	
-	return rc;
+
+	// Wait for printers
+	if (fHasReferences > 0) {
+		acquire_sem(fHasReferences);
+		delete_sem(fHasReferences);
+		fHasReferences = 0;
+	}
+
+	delete fSelectedIconMini; fSelectedIconMini = NULL;
+	delete fSelectedIconLarge; fSelectedIconLarge = NULL;
+
+	return true;
 }
 
-void PrintServerApp::Acquire() {
-		if (atomic_add(&fReferences, 1) == 0) acquire_sem(fHasReferences);
+
+void
+PrintServerApp::Acquire()
+{
+	if (atomic_add(&fReferences, 1) == 0)
+		acquire_sem(fHasReferences);
 }
 
-void PrintServerApp::Release() {
-		if (atomic_add(&fReferences, -1) == 1) release_sem(fHasReferences);
+
+void
+PrintServerApp::Release()
+{
+	if (atomic_add(&fReferences, -1) == 1)
+		release_sem(fHasReferences);
 }
 
-void PrintServerApp::RegisterPrinter(BDirectory* printer) {
+
+void
+PrintServerApp::RegisterPrinter(BDirectory* printer)
+{
 	BString transport, address, connection, state;
 	
-	if (printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport) == B_OK &&
-		printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address) == B_OK &&
-		printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection) == B_OK &&
-		printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK &&
-		state == "free") {
+	if (printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport) == B_OK 
+		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address) == B_OK
+		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection) == B_OK
+		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK 
+		&& state == "free") {
 	
  		BAutolock lock(gLock);
 		if (lock.IsLocked()) {
-				// check if printer is already registered
+			// check if printer is already registered
 			node_ref node;
-			Printer* p;
-			if (printer->GetNodeRef(&node) != B_OK) return;
-			p = Printer::Find(&node);
-			if (p != NULL) return;
-				// register new printer
+			if (printer->GetNodeRef(&node) != B_OK) 
+				return;
+			
+			if (Printer::Find(&node) != NULL) 
+				return;
+			
+			// register new printer
 			Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
-		 	p = new Printer(printer, r);
-		 	AddHandler(p);
+		 	AddHandler(new Printer(printer, r));
 		 	Acquire();
 		}
 	}
 }
 
-void PrintServerApp::UnregisterPrinter(Printer* printer) {
+
+void
+PrintServerApp::UnregisterPrinter(Printer* printer)
+{
 	RemoveHandler(printer);
 	Printer::Remove(printer);	
 	printer->Release();
 }
 
-void PrintServerApp::NotifyPrinterDeletion(Printer* printer) {
+
+void
+PrintServerApp::NotifyPrinterDeletion(Printer* printer)
+{
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		fResourceManager.Free(printer->GetResource());
@@ -210,7 +214,9 @@ void PrintServerApp::NotifyPrinterDeletion(Printer* printer) {
 }
 
 
-void PrintServerApp::EntryCreated(node_ref* node, entry_ref* entry) {
+void
+PrintServerApp::EntryCreated(node_ref* node, entry_ref* entry)
+{
 	BEntry printer(entry);
 	if (printer.InitCheck() == B_OK && printer.IsDirectory()) {
 		BDirectory dir(&printer);
@@ -218,7 +224,10 @@ void PrintServerApp::EntryCreated(node_ref* node, entry_ref* entry) {
 	}
 }
 
-void PrintServerApp::EntryRemoved(node_ref* node) {
+
+void
+PrintServerApp::EntryRemoved(node_ref* node)
+{
 	Printer* printer = Printer::Find(node);
 	if (printer) {
 		if (printer == fDefaultPrinter) fDefaultPrinter = NULL;
@@ -226,12 +235,16 @@ void PrintServerApp::EntryRemoved(node_ref* node) {
 	}
 }
 
-void PrintServerApp::AttributeChanged(node_ref* node) {
+
+void
+PrintServerApp::AttributeChanged(node_ref* node)
+{
 	BDirectory printer(node);
 	if (printer.InitCheck() == B_OK) {
 		RegisterPrinter(&printer);
 	}
 }
+
 
 // ---------------------------------------------------------------
 // SetupPrinterList
@@ -246,51 +259,45 @@ void PrintServerApp::AttributeChanged(node_ref* node) {
 // Returns:
 //    B_OK if successful, or an errorcode if failed.
 // ---------------------------------------------------------------
-status_t PrintServerApp::SetupPrinterList()
+status_t
+PrintServerApp::SetupPrinterList()
 {
-	BEntry entry;
 	status_t rc;
+
+	// Find directory containing printer definition nodes
 	BPath path;
+	rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path);
+	if (rc != B_OK)
+		return rc;
 	
-		// Find directory containing printer definition nodes
-	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY, &path)) == B_OK) {
-		BDirectory dir(path.Path());
-		
-			// Can we reach the directory?
-		if ((rc=dir.InitCheck()) == B_OK) {
-				// Yes, so loop over it's entries
-			while((rc=dir.GetNextEntry(&entry)) == B_OK) {
-					// If the entry is a directory
-				if (entry.IsDirectory()) {
-						// Check it's Mime type for a spool director
-					BDirectory node(&entry);
-					BNodeInfo info(&node);
-					char buffer[256];
-					
-					if (info.GetType(buffer) == B_OK &&
-						strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
-							// Yes, it is a printer definition node
-						RegisterPrinter(&node);
-					}
-				}
-			}
-		
-		
-			fFolder = new FolderWatcher(this, dir, true);
-			fFolder->SetListener(this);
-#if 0			
-				// If we scanned all entries successfully
-			node_ref nref;
-			if (rc == B_ENTRY_NOT_FOUND &&
-				(rc=dir.GetNodeRef(&nref)) == B_OK) {
-					// Get node to watch
-				rc = ::watch_node(&nref, B_WATCH_DIRECTORY, be_app_messenger);
-			}
-#endif
+	// Directory has to exist in order to watch it
+	mode_t mode = 0777;
+	create_directory(path.Path(), mode);
+
+	BDirectory dir(path.Path());		
+	rc = dir.InitCheck();
+	if (rc != B_OK)
+		return rc;
+
+	// Register printer definition nodes
+	BEntry entry;
+	while(dir.GetNextEntry(&entry) == B_OK) {
+		if (!entry.IsDirectory()) 
+			continue;
+
+		BDirectory node(&entry);
+		BNodeInfo info(&node);
+		char buffer[256];	
+		if (info.GetType(buffer) == B_OK && strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
+			RegisterPrinter(&node);
 		}
 	}
+
+	// Now we are ready to start node watching 
+	fFolder = new FolderWatcher(this, dir, true);
+	fFolder->SetListener(this);
 	
-	return rc;
+	return B_OK;
 }
 
 // ---------------------------------------------------------------
@@ -358,52 +365,57 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 {
 	status_t rc;
 	
-		// Find directory containing printer definitions
+	// Find directory containing printer definitions
 	BPath path;
-	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY,&path,true,NULL)) == B_OK) {
+	rc = ::find_directory(B_USER_PRINTERS_DIRECTORY,&path,true,NULL);
+	if (rc != B_OK)
+		return rc;
 
-			// Create our printer definition/spool directory
-		BDirectory printersDir(path.Path());
-		BDirectory printer;
-		if ((rc=printersDir.CreateDirectory(printerName,&printer)) == B_OK) {
-				// Set its type to a printer
-			BNodeInfo info(&printer);
-			info.SetType(PSRV_PRINTER_FILETYPE);
+	// Create our printer definition/spool directory
+	BDirectory printersDir(path.Path());
+	BDirectory printer;
+
+	rc = printersDir.CreateDirectory(printerName, &printer);
+	if (rc != B_OK) 
+		return rc;
+		
+	// Set its type to a printer
+	BNodeInfo info(&printer);
+	info.SetType(PSRV_PRINTER_FILETYPE);
+	
+	// Store the settings in its attributes
+	printer.WriteAttr(PSRV_PRINTER_ATTR_PRT_NAME, B_STRING_TYPE, 0, printerName, 	::strlen(printerName)+1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_DRV_NAME, B_STRING_TYPE, 0, driverName,	::strlen(driverName)+1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0, transportName,::strlen(transportName)+1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, B_STRING_TYPE, 0, transportPath,::strlen(transportPath)+1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,	::strlen(connection)+1);
+	
+
+	// Notify printer driver that a new printer definition node
+	// has been created.
+	// TODO check why we keep the printer definition node
+	// although printer driver cannot be found or loaded	
+	if (FindPrinterDriver(driverName, path) != B_OK)
+		return B_OK;
+		 
+	image_id id = ::load_add_on(path.Path());
+	if (id <= 0)
+		return B_OK;
+		
+	add_printer_func_t func;
+	if (get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func) == B_OK) {
+		// call the function and check its result
+		if ((*func)(printerName) == NULL) {
+			BEntry entry;
+			if (printer.GetEntry(&entry) == B_OK)
+				entry.Remove();
 			
-				// Store the settings in its attributes
-			printer.WriteAttr(PSRV_PRINTER_ATTR_PRT_NAME, B_STRING_TYPE, 0, printerName, 	::strlen(printerName)+1);
-			printer.WriteAttr(PSRV_PRINTER_ATTR_DRV_NAME, B_STRING_TYPE, 0, driverName,	::strlen(driverName)+1);
-			printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0, transportName,::strlen(transportName)+1);
-			printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, B_STRING_TYPE, 0, transportPath,::strlen(transportPath)+1);
-			printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,	::strlen(connection)+1);
-			
-				// Find printer driver
-			if (FindPrinterDriver(driverName, path) == B_OK) {
-					// Try and load the addon
-				image_id id = ::load_add_on(path.Path());
-				if (id > 0) {
-						// Addon was loaded, so try and get the add_printer symbol
-					add_printer_func_t func;
-					if (get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func) == B_OK) {
-							// call the function and check its result
-						if ((*func)(printerName) == NULL) {
-							BEntry entry;
-							if (printer.GetEntry(&entry) == B_OK) {
-									// Delete the printer if function failed
-								entry.Remove();
-							}
-						} else {
-							printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", 		::strlen("free")+1);
-						}
-					}
-					
-					::unload_add_on(id);
-				}
-			}
-		}
+		} else
+			printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", ::strlen("free")+1);
 	}
 	
-	return rc;
+	::unload_add_on(id);	
+	return B_OK;
 }
 
 // ---------------------------------------------------------------
@@ -427,25 +439,27 @@ PrintServerApp::SelectPrinter(const char* printerName)
 	status_t rc;
 	BNode node;
 	
-		// Find the node of the "old" default printer
-	if (fDefaultPrinter != NULL &&
-		FindPrinterNode(fDefaultPrinter->Name(), node) == B_OK) {
-			// and remove the custom icon
+	// Find the node of the "old" default printer
+	if (fDefaultPrinter != NULL 
+		&& FindPrinterNode(fDefaultPrinter->Name(), node) == B_OK) {
+		// and remove the custom icon
 		BNodeInfo info(&node);
 		info.SetIcon(NULL, B_MINI_ICON);
 		info.SetIcon(NULL, B_LARGE_ICON);
 	}
 
-		// Find the node for the new default printer
-	if ((rc=FindPrinterNode(printerName, node)) == B_OK) {
-			// and add the custom icon
+	// Find the node for the new default printer
+	rc=FindPrinterNode(printerName, node);
+	if (rc == B_OK) {
+		// and add the custom icon
 		BNodeInfo info(&node);
 		info.SetIcon(fSelectedIconMini, B_MINI_ICON);
 		info.SetIcon(fSelectedIconLarge, B_LARGE_ICON);
 	}
 	
 	fDefaultPrinter = Printer::Find(printerName);
-	StoreDefaultPrinter(); // update our pref file
+	StoreDefaultPrinter(); 
+		// update our pref file
 	be_roster->Broadcast(new BMessage(B_PRINTER_CHANGED));
 	
 	return rc;
@@ -466,8 +480,6 @@ PrintServerApp::HandleSpooledJobs()
 		printer->HandleSpooledJob();
 	}
 }
-
-// static const char* kPrinterData = "printer_data";
 
 // ---------------------------------------------------------------
 // RetrieveDefaultPrinter()
@@ -525,18 +537,15 @@ PrintServerApp::StoreDefaultPrinter()
 // ---------------------------------------------------------------
 status_t
 PrintServerApp::FindPrinterNode(const char* name, BNode& node)
-{
-	status_t rc;
-	
-		// Find directory containing printer definitions
+{	
+	// Find directory containing printer definitions
 	BPath path;
-	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY,&path,true,NULL)) == B_OK)
-	{
-		path.Append(name);
-		rc = node.SetTo(path.Path());
-	}
-	
-	return rc;
+	status_t rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path, true, NULL);
+	if (rc != B_OK)
+		return rc;
+
+	path.Append(name);
+	return node.SetTo(path.Path());
 }
 
 // ---------------------------------------------------------------
@@ -557,10 +566,9 @@ PrintServerApp::FindPrinterNode(const char* name, BNode& node)
 status_t
 PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 {
-		// try to locate the driver
-	if (::TestForAddonExistence(name, B_USER_ADDONS_DIRECTORY, "Print", outPath) != B_OK)
-		if (::TestForAddonExistence(name, B_COMMON_ADDONS_DIRECTORY, "Print", outPath) != B_OK)
-			return ::TestForAddonExistence(name, B_BEOS_ADDONS_DIRECTORY, "Print", outPath);
+	if (::TestForAddonExistence(name, B_USER_ADDONS_DIRECTORY, "Print", outPath) != B_OK
+		&& TestForAddonExistence(name, B_COMMON_ADDONS_DIRECTORY, "Print", outPath) != B_OK)
+		return ::TestForAddonExistence(name, B_BEOS_ADDONS_DIRECTORY, "Print", outPath);
 
 	return B_OK;
 }
@@ -569,9 +577,9 @@ PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 bool PrintServerApp::OpenSettings(BFile& file, const char* name, bool forReading) {
 	BPath path;
 	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY;
-	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK &&
-		path.Append(name) == B_OK &&
-		file.SetTo(path.Path(), openMode) == B_OK;
+	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK 
+		&& path.Append(name) == B_OK 
+		&& file.SetTo(path.Path(), openMode) == B_OK;
 }
 
 static const char* kSettingsName = "print_server_settings";

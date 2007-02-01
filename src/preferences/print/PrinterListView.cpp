@@ -44,41 +44,43 @@
 // Implementation of PrinterListView
 
 PrinterListView::PrinterListView(BRect frame)
-	: Inherited(frame, "printers_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL)
-	, fFolder(NULL)
+	: Inherited(frame, "printers_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
+	fFolder(NULL)
 {
 }
 
-void PrinterListView::BuildPrinterList() {	
-		// clear list
-	const BListItem** items = Items();
-	for (int32 i = CountItems()-1; i >= 0; i --) {
-		delete items[i];
-	}
-	MakeEmpty();
 
-		// TODO: Fixup situation in which PrintServer is not running	
-	BEntry entry;
-	status_t rc;
-	BPath path;
+void
+PrinterListView::BuildPrinterList()
+{	
+	// clear list
+	const BListItem** items = Items();
+	for (int32 i = CountItems()-1; i >= 0; i --)
+		delete items[i];
+	MakeEmpty();
 	
-		// Find directory containing printer definition nodes
-	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY, &path)) == B_OK) {
-		BDirectory dir(path.Path());
+	// Find directory containing printer definition nodes
+	BPath path;
+	status_t rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path);
+	if (rc != B_OK) 
+		return;
+			
+	BDirectory dir(path.Path());
+	rc = dir.InitCheck();
+	if (rc != B_OK) 
+		return;
 		
-			// Can we reach the directory?
-		if ((rc = dir.InitCheck()) == B_OK) {
-			fNode = dir;
-				// Yes, so loop over it's entries
-			while((rc = dir.GetNextEntry(&entry)) == B_OK) {
-				BDirectory printer(&entry);
-				AddPrinter(printer);
-			}
-		}
+	fNode = dir;
+	BEntry entry;
+	while(dir.GetNextEntry(&entry) == B_OK) {
+		BDirectory printer(&entry);
+		AddPrinter(printer);
 	}
 }
 
-void PrinterListView::AttachedToWindow()
+
+void 
+PrinterListView::AttachedToWindow()
 {
 	Inherited::AttachedToWindow();
 
@@ -86,18 +88,25 @@ void PrinterListView::AttachedToWindow()
 	SetInvocationMessage(new BMessage(MSG_MKDEF_PRINTER));
 	SetTarget(Window());	
 
+	BPath path;	
+	bool hasPrintersDirectory = find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK;
+	
+	if (hasPrintersDirectory) {
+		create_directory(path.Path(), 0777);
+			// directory has to exist in order to start watching it
+	}
+
 	BuildPrinterList();
 
-		// Select active printer
+	// Select active printer
 	for (int32 i = 0; i < CountItems(); i ++) {
 		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
-		if (item->IsActivePrinter()) {
+		if (item != NULL && item->IsActivePrinter()) {
 			Select(i); break;
 		}
 	}
 
-	BPath path;	
-	if (find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK) {
+	if (hasPrintersDirectory) {
 		BDirectory dir(path.Path());
 		if (dir.InitCheck() == B_OK) {
 			fFolder = new FolderWatcher(this->Window(), dir, true);
@@ -106,12 +115,18 @@ void PrinterListView::AttachedToWindow()
 	}	
 }
 
-bool PrinterListView::QuitRequested() {
+
+bool 
+PrinterListView::QuitRequested() 
+{
 	delete fFolder; fFolder = NULL;
 	return true;
 }
 
-void PrinterListView::AddPrinter(BDirectory& printer) {
+
+void 
+PrinterListView::AddPrinter(BDirectory& printer) 
+{
 	BString state;
 	node_ref node;
 		// If the entry is a directory
@@ -132,7 +147,9 @@ void PrinterListView::AddPrinter(BDirectory& printer) {
 	}
 }
 
-PrinterItem* PrinterListView::FindItem(node_ref* node) {
+
+PrinterItem* PrinterListView::FindItem(node_ref* node) 
+{
 	for (int32 i = CountItems()-1; i >= 0; i --) {
 		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
 		node_ref ref;
@@ -143,12 +160,17 @@ PrinterItem* PrinterListView::FindItem(node_ref* node) {
 	return NULL;
 }
 
-void PrinterListView::EntryCreated(node_ref* node, entry_ref* entry) {
+
+void 
+PrinterListView::EntryCreated(node_ref* node, entry_ref* entry) 
+{
 	BDirectory printer(node);
 	AddPrinter(printer);
 }
 
-void PrinterListView::EntryRemoved(node_ref* node) {
+
+void PrinterListView::EntryRemoved(node_ref* node) 
+{
 	PrinterItem* item = FindItem(node);
 	if (item) {
 		RemoveItem(item);
@@ -156,51 +178,56 @@ void PrinterListView::EntryRemoved(node_ref* node) {
 	}
 }
 
-void PrinterListView::AttributeChanged(node_ref* node) {
+void 
+PrinterListView::AttributeChanged(node_ref* node) 
+{
 	BDirectory printer(node);
 	AddPrinter(printer);
 }
 
-void PrinterListView::UpdateItem(PrinterItem* item) {
+void 
+PrinterListView::UpdateItem(PrinterItem* item)
+{
 	item->UpdatePendingJobs();
 	InvalidateItem(IndexOf(item));
 }
 
-PrinterItem* PrinterListView::SelectedItem() {
+PrinterItem* PrinterListView::SelectedItem()
+{
 	BListItem* item = ItemAt(CurrentSelection());
 	return dynamic_cast<PrinterItem*>(item);
 }
 
+
 BBitmap* PrinterItem::sIcon = NULL;
 BBitmap* PrinterItem::sSelectedIcon = NULL;
 
+
 PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
-	: BListItem(0, false)
-	, fFolder(NULL)
-	, fNode(node)
+	: BListItem(0, false),
+	fFolder(NULL),
+	fNode(node)
 {
-	if (sIcon == NULL)
-	{
+	if (sIcon == NULL) {
 		sIcon = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
 		BMimeType type(PSRV_PRINTER_FILETYPE);
 		type.GetIcon(sIcon, B_LARGE_ICON);
 	}
 
-	if (sSelectedIcon == NULL)
-	{
+	if (sSelectedIcon == NULL) {
 		sSelectedIcon = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
 		BMimeType type(PRNT_SIGNATURE_TYPE);
 		type.GetIcon(sSelectedIcon, B_LARGE_ICON);
 	}
 
-		// Get Name of printer
+	// Get Name of printer
 	GetStringProperty(PSRV_PRINTER_ATTR_PRT_NAME, fName);
 	GetStringProperty(PSRV_PRINTER_ATTR_COMMENTS, fComments);
 	GetStringProperty(PSRV_PRINTER_ATTR_TRANSPORT, fTransport);
 	GetStringProperty(PSRV_PRINTER_ATTR_DRV_NAME, fDriverName);
 
 	BPath path;
-		// Setup spool folder
+	// Setup spool folder
 	if (find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK) {
 		path.Append(fName.String());
 		BDirectory dir(path.Path());
@@ -210,16 +237,22 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 	UpdatePendingJobs();
 }
 
-PrinterItem::~PrinterItem() {
+
+PrinterItem::~PrinterItem() 
+{
 	delete fFolder; fFolder = NULL;
 }
 
-void PrinterItem::GetStringProperty(const char* propName, BString& outString)
+
+void 
+PrinterItem::GetStringProperty(const char* propName, BString& outString)
 {
 	fNode.ReadAttrString(propName, &outString);
 }
 
-void PrinterItem::Update(BView *owner, const BFont *font)
+
+void 
+PrinterItem::Update(BView *owner, const BFont *font)
 {
 	BListItem::Update(owner,font);
 	
@@ -228,6 +261,7 @@ void PrinterItem::Update(BView *owner, const BFont *font)
 	
 	SetHeight( (height.ascent+height.descent+height.leading) * 3.0 +4 );
 }
+
 
 bool PrinterItem::Remove(BListView* view)
 {
@@ -247,104 +281,113 @@ bool PrinterItem::Remove(BListView* view)
 	return false;
 }
 
+
 void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 {
 	BListView* list = dynamic_cast<BListView*>(owner);
-	if (list)
-	{
-		font_height height;
-		BFont font;
-		owner->GetFont(&font);
-		font.GetHeight(&height);
-		float fntheight = height.ascent+height.descent+height.leading;
+	if (list == NULL)
+		return;
 
-		BRect bounds = list->ItemFrame(list->IndexOf(this));
-		
-		rgb_color color = owner->ViewColor();
-		if ( IsSelected() ) 
-			color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
-								
-		rgb_color oldviewcolor = owner->ViewColor();
-		rgb_color oldlowcolor = owner->LowColor();
-		rgb_color oldcolor = owner->HighColor();
-		owner->SetViewColor( color );
-		owner->SetHighColor( color );
-		owner->SetLowColor( color );
-		owner->FillRect(bounds);
-		owner->SetLowColor( oldlowcolor );
-		owner->SetHighColor( oldcolor );
+	font_height height;
+	BFont font;
+	owner->GetFont(&font);
+	font.GetHeight(&height);
+	float fntheight = height.ascent+height.descent+height.leading;
 
-		BPoint iconPt = bounds.LeftTop() + BPoint(2,2);
-		BPoint namePt = iconPt + BPoint(B_LARGE_ICON+8, fntheight);
-		BPoint driverPt = iconPt + BPoint(B_LARGE_ICON+8, fntheight*2);
-		BPoint commentPt = iconPt + BPoint(B_LARGE_ICON+8, fntheight*3);
-		
-		float width = owner->StringWidth("No pending jobs.");
-		BPoint pendingPt(bounds.right - width -8, namePt.y);
-		BPoint transportPt(bounds.right - width -8, driverPt.y);
-		
-		drawing_mode mode = owner->DrawingMode();
-		owner->SetDrawingMode(B_OP_OVER);
-			owner->DrawBitmap(IsActivePrinter() ? sSelectedIcon : sIcon, iconPt);
-		
-			// left of item
-		owner->DrawString(fName.String(), fName.Length(), namePt);
-		owner->DrawString(fDriverName.String(), fDriverName.Length(), driverPt);
-		owner->DrawString(fComments.String(), fComments.Length(), commentPt);
-		
-			// right of item
-		owner->DrawString(fPendingJobs.String(), 16, pendingPt);
-		owner->DrawString(fTransport.String(), fTransport.Length(), transportPt);
-		
-		owner->SetDrawingMode(mode);
-
-		owner->SetViewColor(oldviewcolor);
-	}
-}
-
-bool PrinterItem::IsActivePrinter()
-{
-	bool rc = false;
-	BMessenger msgr;
-
-	if (::GetPrinterServerMessenger(msgr) == B_OK)
-	{
-		BMessage reply, getNameOfActivePrinter(B_GET_PROPERTY);
-		getNameOfActivePrinter.AddSpecifier("ActivePrinter");
+	BRect bounds = list->ItemFrame(list->IndexOf(this));
 	
-		BString activePrinterName;
-		if (msgr.SendMessage(&getNameOfActivePrinter, &reply) == B_OK &&
-			reply.FindString("result", &activePrinterName) == B_OK) {
-				// Compare name of active printer with name of 'this' printer item
-			rc = (fName == activePrinterName);
-		}
-	}
+	rgb_color color = owner->ViewColor();
+	if ( IsSelected() ) 
+		color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
+							
+	rgb_color oldviewcolor = owner->ViewColor();
+	rgb_color oldlowcolor = owner->LowColor();
+	rgb_color oldcolor = owner->HighColor();
+	owner->SetViewColor( color );
+	owner->SetHighColor( color );
+	owner->SetLowColor( color );
+	owner->FillRect(bounds);
+	owner->SetLowColor( oldlowcolor );
+	owner->SetHighColor( oldcolor );
 
-	return rc;	
+	BPoint iconPt = bounds.LeftTop() + BPoint(2,2);
+	BPoint namePt = iconPt + BPoint(B_LARGE_ICON+8, fntheight);
+	BPoint driverPt = iconPt + BPoint(B_LARGE_ICON+8, fntheight*2);
+	BPoint commentPt = iconPt + BPoint(B_LARGE_ICON+8, fntheight*3);
+	
+	float width = owner->StringWidth("No pending jobs.");
+	BPoint pendingPt(bounds.right - width -8, namePt.y);
+	BPoint transportPt(bounds.right - width -8, driverPt.y);
+	
+	drawing_mode mode = owner->DrawingMode();
+	owner->SetDrawingMode(B_OP_OVER);
+	owner->DrawBitmap(IsActivePrinter() ? sSelectedIcon : sIcon, iconPt);
+	
+	// left of item
+	owner->DrawString(fName.String(), fName.Length(), namePt);
+	owner->DrawString(fDriverName.String(), fDriverName.Length(), driverPt);
+	owner->DrawString(fComments.String(), fComments.Length(), commentPt);
+	
+	// right of item
+	owner->DrawString(fPendingJobs.String(), 16, pendingPt);
+	owner->DrawString(fTransport.String(), fTransport.Length(), transportPt);
+	
+	owner->SetDrawingMode(mode);
+
+	owner->SetViewColor(oldviewcolor);
 }
 
-bool PrinterItem::HasPendingJobs() {
+
+bool 
+PrinterItem::IsActivePrinter()
+{
+	BMessenger msgr;
+	if (::GetPrinterServerMessenger(msgr) != B_OK)
+		return false;
+		
+	BMessage getNameOfActivePrinter(B_GET_PROPERTY);
+	getNameOfActivePrinter.AddSpecifier("ActivePrinter");
+
+	BString activePrinterName;
+	BMessage reply;
+	return msgr.SendMessage(&getNameOfActivePrinter, &reply) == B_OK 
+		&& reply.FindString("result", &activePrinterName) == B_OK
+		&& fName == activePrinterName;
+}
+
+
+bool
+PrinterItem::HasPendingJobs() 
+{
 	return fFolder && fFolder->CountJobs() > 0;
 }
 
-SpoolFolder* PrinterItem::Folder() {
+
+SpoolFolder* PrinterItem::Folder() 
+{
 	return fFolder;
 }
 
-BDirectory* PrinterItem::Node() {
+
+BDirectory* 
+PrinterItem::Node() 
+{
 	return &fNode;
 }
 
-void PrinterItem::UpdatePendingJobs() {
+
+void
+PrinterItem::UpdatePendingJobs()
+{
 	if (fFolder) {
 		uint32 pendingJobs = fFolder->CountJobs();
-		fPendingJobs = "";
 		if (pendingJobs == 1) {
 			fPendingJobs = "1 pending job.";
+			return;
 		} else if (pendingJobs > 1) {
 			fPendingJobs << pendingJobs << " pending jobs.h";
+			return;
 		}
-		if (pendingJobs >= 1) return;
 	}
 	fPendingJobs = "No pending jobs.";
 }

@@ -43,65 +43,67 @@ class SpoolFolder;
 class PrinterItem;
 class PrinterListView;
 
-class PrinterListView : public BListView, public FolderListener
-{
-	typedef BListView Inherited;
-	
-	BDirectory fNode;
-	FolderWatcher* fFolder;
-	
-	void AddPrinter(BDirectory& printer);
-	PrinterItem* FindItem(node_ref* node);
-	
-	void EntryCreated(node_ref* node, entry_ref* entry);
-	void EntryRemoved(node_ref* node);
-	void AttributeChanged(node_ref* node);
-
-public:
-	PrinterListView(BRect frame);
-	void AttachedToWindow();
-	bool QuitRequested();
-
-	void BuildPrinterList();
-	PrinterItem* SelectedItem();
+class PrinterListView : public BListView, public FolderListener {
+	private:
+		typedef BListView Inherited;
 		
-	void UpdateItem(PrinterItem* item);
+		void AddPrinter(BDirectory &printer);
+		PrinterItem *FindItem(node_ref *node);
+		
+		void EntryCreated(node_ref *node, entry_ref *entry);
+		void EntryRemoved(node_ref *node);
+		void AttributeChanged(node_ref *node);
+	
+	public:
+		PrinterListView(BRect frame);
+		void AttachedToWindow();
+		bool QuitRequested();
+	
+		void BuildPrinterList();
+		PrinterItem *SelectedItem();
+			
+		void UpdateItem(PrinterItem *item);
+
+	private:
+		BDirectory fNode;
+		FolderWatcher *fFolder;		
 };
 
 class BBitmap;
 class PrintersWindow;
-class PrinterItem : public BListItem
-{
-public:
-	PrinterItem(PrintersWindow* window, const BDirectory& node/*const BMessenger& thePrinter*/);
-	~PrinterItem();
-	
-	void DrawItem(BView *owner, BRect bounds, bool complete);
-	void Update(BView *owner, const BFont *font);
-	
-	bool Remove(BListView* view);
-	bool IsActivePrinter();
-	bool HasPendingJobs();
-	
-	const char* Name() const 
-		{ return fName.String(); }
+class PrinterItem : public BListItem {
+	public:
+		PrinterItem(PrintersWindow *window, const BDirectory &node);
+		~PrinterItem();
 		
-	SpoolFolder* Folder();
-	BDirectory* Node();
-	void UpdatePendingJobs();
+		void DrawItem(BView *owner, BRect bounds, bool complete);
+		void Update(BView *owner, const BFont *font);
+		
+		bool Remove(BListView *view);
+		bool IsActivePrinter();
+		bool HasPendingJobs();
+		
+		const char *Name() const { 
+			return fName.String(); 
+		}
+			
+		SpoolFolder *Folder();
+		BDirectory *Node();
+		void UpdatePendingJobs();
+		
+	private:
+		void GetStringProperty(const char *propName, BString &outString);
 	
-private:
-	void GetStringProperty(const char* propName, BString& outString);
-
-	SpoolFolder *fFolder;
-	BDirectory  fNode;
-	BString		fComments;
-	BString		fTransport;
-	BString		fDriverName;
-	BString		fName;
-	BString     fPendingJobs;
-	static BBitmap* sIcon;
-	static BBitmap* sSelectedIcon;
+		SpoolFolder *fFolder;
+		BDirectory fNode;
+		BString	fComments;
+		BString	fTransport;
+		BString	fDriverName;
+		BString	fName;
+		BString fPendingJobs;
+		
+		static BBitmap *sIcon;
+		static BBitmap *sSelectedIcon;
 };
 
 #endif

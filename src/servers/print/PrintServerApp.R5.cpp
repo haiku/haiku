@@ -185,40 +185,6 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 			}
 			break;
 
-#if 0
-			// Create a new printer
-		case PSRV_MAKE_PRINTER: {
-				BString driverName, transportName, transportPath;
-				BString printerName, connection;
-				
-				if (msg->FindString("driver", &driverName) == B_OK &&
-					msg->FindString("transport", &transportName) == B_OK &&
-					msg->FindString("transport path", &transportPath) == B_OK &&
-					msg->FindString("printer name", &printerName) == B_OK
-					) {
-
-					if (msg->FindString("connection", &connection) != B_OK)
-						connection = "Local";
-
-						// then create the actual printer
-					if (CreatePrinter(printerName.String(), driverName.String(),
-						connection.String(),
-						transportName.String(), transportPath.String()) == B_OK) {				
-							// If printer was created ok, ask if it needs to be the default
-						char buffer[256];
-						::sprintf(buffer, "Would you like to make %s the default printer?",
-							printerName.String());
-	
-						BAlert* alert = new BAlert("", buffer, "No", "Yes");
-						if (alert->Go() == 1) {
-							SelectPrinter(printerName.String());
-						}
-					}
-				}
-			}
-			break;
-#endif
-
 		case PSRV_SHOW_PAGE_SETUP:
 		case PSRV_SHOW_PRINT_SETUP:
 		case PSRV_GET_DEFAULT_SETTINGS:
