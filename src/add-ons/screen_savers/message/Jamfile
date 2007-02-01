@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src add-ons screen_savers message ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+ScreenSaver Message :
+	Message.cpp : 
+	be libscreensaver.so ;
+
+Package haiku-screensaverkit-cvs :
+	Message :
+	boot home config add-ons Screen\ Savers
+;
+
