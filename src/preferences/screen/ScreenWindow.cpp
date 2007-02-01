@@ -1029,8 +1029,8 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 bool
 ScreenWindow::CanApply() const
 {
-	return fAllWorkspacesItem->IsMarked() || fSelected != fOriginal
-			|| fSelected != fActive;
+	return fAllWorkspacesItem->IsMarked() || fSelected != fActive
+			|| (fSelected == fOriginal && fActive != fOriginal);
 }
 
 
