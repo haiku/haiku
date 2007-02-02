@@ -2062,7 +2062,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) screen_id
 			// 2) workspace index
 			// 3) display_mode to set
-			// 4) 'makedefault' boolean
+			// 4) 'makeDefault' boolean
 			// TODO: See above: workspaces support, etc.
 
 			screen_id id;
@@ -2078,11 +2078,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = link.Read<bool>(&makeDefault);
 
 			if (status == B_OK && fDesktop->LockAllWindows()) {
-				status = fDesktop->ScreenAt(0)->SetMode(mode, makeDefault);
-				if (status == B_OK) {
-					gInputManager->UpdateScreenBounds(fDesktop->ScreenAt(0)->Frame());
-					fDesktop->ScreenChanged(fDesktop->ScreenAt(0), makeDefault);
-				}
+				display_mode oldMode;
+				fDesktop->ScreenAt(0)->GetMode(&oldMode);
+				if (memcmp(&oldMode, &mode, sizeof(display_mode))) {
+					status = fDesktop->ScreenAt(0)->SetMode(mode, makeDefault);
+					if (status == B_OK) {
+						gInputManager->UpdateScreenBounds(fDesktop->ScreenAt(0)->Frame());
+						fDesktop->ScreenChanged(fDesktop->ScreenAt(0), makeDefault);
+					}
+				} else
+					status = B_OK;
 				fDesktop->UnlockAllWindows();
 			} else
 				status = B_ERROR;
