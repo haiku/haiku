@@ -350,7 +350,7 @@ status_t
 BScreen::SetMode(display_mode *mode, bool makeDefault)
 {
 	if (fScreen != NULL)
-		return fScreen->SetMode(B_ALL_WORKSPACES, mode, makeDefault);
+		return fScreen->SetMode(current_workspace(), mode, makeDefault);
 	return B_ERROR;
 }
 
