@@ -27,7 +27,7 @@ SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
 
 KernelMergeObject kernel_posix.o :
 	# main
- 	kerrno.c
+ 	kernel_errno.c
  	dirent.c
  	poll.c
  	utime.c
