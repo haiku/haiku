@@ -55,19 +55,20 @@ KernelMergeObject boot_platform_pxe_ia32.o :
 ;
 
 
-rule BuildPXEstage1 {
-	local bin = $(1) ;
-	local source = $(2) ;
-
+rule BuildPXEstage1 bin : source {
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
 	Depends $(bin) : $(source) ;
 	MakeLocateDebug $(bin) ;
+	LocalClean clean : $(bin) ;
 }
 
 
+# TODO: "as" should be replaced by $(TARGET_CC), but it fails for older GNU As
+# versions.
 actions BuildPXEstage1 {
 	rm -f $(1)
-	as -o $(1).o $(2)
-	ld --oformat binary --Ttext 0x7C00 -o $(1) $(1).o
+	as -o $(1).o $(2) &&
+	$(TARGET_LD) --oformat binary --Ttext 0x7C00 -o $(1) $(1).o
 }
 
 BuildPXEstage1 pxehaiku : pxe_stage1.S ;
@@ -84,5 +85,3 @@ SEARCH on [ FGristFiles $(bios_ia32_edid_src) ]
 # We also need the bios_ia32 stage1.bin for building bin/makebootable
 SEARCH on stage1.bin
  	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
-
-SEARCH on pxe_stage1.S = $(SUBDIR) ;
