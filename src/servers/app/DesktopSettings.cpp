@@ -456,8 +456,11 @@ DesktopSettings::DesktopSettings(Desktop* desktop)
 	:
 	fSettings(desktop->fSettings)
 {
-	if (!desktop->fWindowLock.IsReadLocked() && !desktop->fWindowLock.IsWriteLocked())
+#if DEBUG
+	if (!desktop->fWindowLock.IsWriteLocked()
+		&& !desktop->fWindowLock.IsReadLocked())
 		debugger("desktop not locked when trying to access settings");
+#endif
 }
 
 

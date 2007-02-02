@@ -50,7 +50,9 @@ class HWInterface : protected MultiLocker {
 
 	// locking
 			bool				LockParallelAccess() { return ReadLock(); }
+#if DEBUG
 			bool				IsParallelAccessLocked() { return IsReadLocked(); }
+#endif
 			void				UnlockParallelAccess() { ReadUnlock(); }
 
 			bool				LockExclusiveAccess() { return WriteLock(); }
