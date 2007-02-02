@@ -893,6 +893,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("mode", &mode) == B_OK)
 				fSelected.combine = (combine_mode)mode;
 
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckResolutionMenu();
 			CheckApplyEnabled();
 			break;
@@ -900,16 +902,22 @@ ScreenWindow::MessageReceived(BMessage* message)
 		
 		case POP_SWAP_DISPLAYS_MSG:
 			message->FindBool("swap", &fSelected.swap_displays);
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 
 		case POP_USE_LAPTOP_PANEL_MSG:
 			message->FindBool("use", &fSelected.use_laptop_panel);
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 
 		case POP_TV_STANDARD_MSG:
 			message->FindInt32("tv_standard", (int32 *)&fSelected.tv_standard);
+			fScreenMode.Get(fOriginal);
+			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 
@@ -923,6 +931,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 		case BUTTON_DEFAULTS_MSG:
 		{
+			// TODO: get preferred settings of screen
 			fSelected.width = 640;
 			fSelected.height = 480;
 			fSelected.space = B_CMAP8;
