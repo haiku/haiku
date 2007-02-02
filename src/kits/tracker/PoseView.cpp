@@ -9156,7 +9156,7 @@ BPoseView::IsWatchingDateFormatChange()
 void
 BPoseView::StartWatchDateFormatChange()
 {
-// XXX: Workaround for R5 (overful message queue)!
+// TODO: Workaround for R5 (overful message queue)!
 // Unfortunately, this causes a dead-lock under certain circumstances.
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_DANO)
 	if (IsFilePanel()) {
