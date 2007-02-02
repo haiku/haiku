@@ -88,9 +88,7 @@ private:
 status_t Url::ParseAndSplit()
 {
 	int32 v;
-	//host = *this;
 	BString left;
-printf("s:%s\n", String());
 
 	v = FindFirst(":");
 	if (v < 0)
@@ -102,10 +100,17 @@ printf("s:%s\n", String());
 		left.RemoveFirst("//");
 	
 	// path part
+	// actually some apps handle file://[host]/path
+	// but I have no idea what proto it implies...
+	// or maybe it's just to emphasize on "localhost".
 	v = left.FindFirst("/");
 	if (v == 0 || proto == "file") {
 		path = left;
-printf("path:%s\n", path.String());
+		return 0;
+	}
+	// some protos actually implies path if it's the only component
+	if ((v < 0) && (proto == "beshare" || proto == "irc")) { 
+		path = left;
 		return 0;
 	}
 	
@@ -113,20 +118,21 @@ printf("path:%s\n", path.String());
 		left.MoveInto(path, v+1, left.Length()-v);
 		left.Remove(v, 1);
 	}
-printf("path:%s\n", path.String());
 
 	// user:pass@host
 	v = left.FindFirst("@");
 	if (v > -1) {
 		left.MoveInto(user, 0, v);
 		left.Remove(0, 1);
-printf("user:%s\n", user.String());
 		v = user.FindFirst(":");
 		if (v > -1) {
 			user.MoveInto(pass, v, user.Length() - v);
 			pass.Remove(0, 1);
-printf("pass:%s\n", pass.String());
 		}
+	} else if (proto == "finger") {
+		// single component implies user
+		user = left;
+		return 0;
 	}
 
 	// host:port
@@ -134,12 +140,10 @@ printf("pass:%s\n", pass.String());
 	if (v > -1) {
 		left.MoveInto(port, v + 1, left.Length() - v);
 		left.Remove(v, 1);
-printf("port:%s\n", port.String());
 	}
 
 	// not much left...
 	host = left;
-printf("host:%s\n", host.String());
 
 	return 0;
 }
