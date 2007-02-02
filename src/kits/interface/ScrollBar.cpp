@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -493,7 +493,7 @@ BScrollBar::MessageReceived(BMessage *msg)
 	}
 }
 
-// MouseDown
+
 void
 BScrollBar::MouseDown(BPoint where)
 {
@@ -502,19 +502,10 @@ BScrollBar::MouseDown(BPoint where)
 
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 
-	int32 buttons = B_PRIMARY_MOUSE_BUTTON;
-	if (Looper() != NULL && Looper()->CurrentMessage() != NULL
-		&& Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK)
+	int32 buttons;
+	if (Looper() == NULL || Looper()->CurrentMessage() == NULL
+		|| Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK)
 		buttons = B_PRIMARY_MOUSE_BUTTON;
-
-	// hit test for the thumb
-	if (fPrivateData->fThumbFrame.Contains(where)
-			&& (buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
-		fPrivateData->fButtonDown = THUMB;
-		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
-		Invalidate(fPrivateData->fThumbFrame);
-		return;
-	}
 
 	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
 		// special absolute scrolling: move thumb to where we clicked
@@ -526,6 +517,14 @@ BScrollBar::MouseDown(BPoint where)
 			fPrivateData->fClickOffset.y = -fPrivateData->fThumbFrame.Height() / 2;
 
 		SetValue(_ValueFor(where + fPrivateData->fClickOffset));
+		return;
+	}
+
+	// hit test for the thumb
+	if (fPrivateData->fThumbFrame.Contains(where)) {
+		fPrivateData->fButtonDown = THUMB;
+		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
+		Invalidate(fPrivateData->fThumbFrame);
 		return;
 	}
 
