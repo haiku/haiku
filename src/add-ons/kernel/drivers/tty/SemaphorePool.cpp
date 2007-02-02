@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -75,12 +75,6 @@ SemaphorePool::Get(Semaphore *&semaphore)
 	if (!sem)
 		return B_NO_MEMORY;
 
-	status_t error = sem->ZeroCount();
-	if (error != B_OK) {
-		delete sem;
-		return error;
-	}
-
 	semaphore = sem;
 	return B_OK;
 }
@@ -94,7 +88,9 @@ SemaphorePool::Put(Semaphore *semaphore)
 
 	MutexLocker _(fLock);
 
-	if (fCount >= fMaxCount || semaphore->InitCheck() != B_OK) {
+	if (fCount >= fMaxCount
+		|| semaphore->InitCheck() != B_OK
+		|| semaphore->ZeroCount() != B_OK) {
 		delete semaphore;
 		return;
 	}
