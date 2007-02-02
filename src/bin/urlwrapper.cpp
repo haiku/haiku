@@ -361,8 +361,12 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #ifdef HANDLE_BESHARE
 	if (proto == "beshare") {
 		team_id team;
-		be_roster->Launch(kBeShareSig, (BMessage *)NULL, &team);
-		BMessenger msgr(NULL, team);
+		BMessenger msgr(kBeShareSig);
+		// if no instance is running, or we want a specific server, start it.
+		if (!msgr.IsValid() || host.Length()) {
+			be_roster->Launch(kBeShareSig, (BMessage *)NULL, &team);
+			msgr = BMessenger(NULL, team);
+		}
 		if (host.Length()) {
 			BMessage mserver('serv');
 			mserver.AddString("server", host);
