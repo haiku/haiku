@@ -135,6 +135,11 @@ StdBinCommands
 	mail.cpp
 	: be libmail.so : $(haiku-utils_rsrc) ;
 
+# standard commands that need libbe.so, libusb.so
+StdBinCommands
+	usb_dev_info.cpp
+	: be libusb.a : $(haiku-utils_rsrc) ;
+
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
 SubInclude HAIKU_TOP src bin bc ;
