@@ -69,6 +69,7 @@ StdBinCommands
 	: libtermcap.a : $(haiku-utils_rsrc) ;
 
 AddResources mimeset : mimeset.rdef ;
+AddResources urlwrapper : urlwrapper.rdef ;
 
 # standard commands that need libbe.so
 StdBinCommands
@@ -95,6 +96,7 @@ StdBinCommands
 	roster.cpp
 	settype.cpp
 	setversion.cpp
+	urlwrapper.cpp
 	version.cpp
 #	yes.cpp
 	: be : $(haiku-utils_rsrc) ;
