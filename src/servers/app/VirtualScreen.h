@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,6 +37,7 @@ class VirtualScreen {
 		status_t			AddScreen(Screen* screen);
 		status_t			RemoveScreen(Screen* screen);
 
+		void				UpdateFrame();
 		BRect				Frame() const;
 
 		// TODO: we need to play with a real multi-screen configuration to

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -152,6 +152,28 @@ VirtualScreen::RemoveScreen(Screen* screen)
 {
 	// not implemented yet (config changes when running)
 	return B_ERROR;
+}
+
+
+void
+VirtualScreen::UpdateFrame()
+{
+	int32 virtualWidth = 0, virtualHeight = 0;
+
+	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
+		Screen* screen = fScreenList.ItemAt(i)->screen;
+
+		uint16 width, height;
+		uint32 colorSpace;
+		float frequency;
+		screen->GetMode(width, height, colorSpace, frequency);
+
+		// TODO: compute virtual size depending on the actual screen position!
+		virtualWidth += width;
+		virtualHeight += height;
+	}
+
+	fFrame.Set(0, 0, virtualWidth - 1, virtualHeight - 1);
 }
 
 

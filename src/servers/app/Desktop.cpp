@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -960,6 +960,8 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 			window = window->NextWindow(kAllWindowList)) {
 		window->ServerWindow()->SendMessageToClient(&update);
 	}
+
+	fVirtualScreen.UpdateFrame();
 
 	if (makeDefault) {
 		// store settings
