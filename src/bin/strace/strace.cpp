@@ -367,7 +367,8 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 			// if the return type is status_t or ssize_t, print human-readable
 			// error codes
 			if (returnType->TypeName() == "status_t"
-				|| returnType->TypeName() == "ssize_t"
+					|| (returnType->TypeName() == "ssize_t"
+					 || returnType->TypeName() == "int")
 					&& message.return_value < 0) {
 				print_to_string(&string, &length, " %s", strerror(message.return_value));
 			}
