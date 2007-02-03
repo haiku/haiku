@@ -130,9 +130,10 @@ FUNCTION(i386_swap_pgdir):
 	.align 4
 FUNCTION(x86_userspace_thread_exit):
 	pushl	%eax
+	sub		$4, %esp
 	movl	$1, %ecx
 	lea		(%esp), %edx
-	movl	$SYSCALL_EXIT_THREAD, %eax;
+	movl	$SYSCALL_EXIT_THREAD, %eax
 	int		$99
 	.align 4
 FUNCTION(x86_end_userspace_thread_exit):
