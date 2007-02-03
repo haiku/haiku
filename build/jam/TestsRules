@@ -10,8 +10,8 @@ rule UnitTestLib
 	local sources = $(2) ;
 	local libraries = $(3) ;
 	
-	# unless NO_TEST_DEBUG is defined, we turn on debugging
-	if ! $(NO_TEST_DEBUG) {
+	# if TEST_DEBUG is defined, we turn on debugging
+	if $(TEST_DEBUG) {
 		DEBUG on $(lib) [ FGristFiles $(sources:S=$(SUFOBJ)) ] ?= 1 ;
 	}
 
@@ -85,8 +85,8 @@ rule SimpleTest
 {
 	# SimpleTest <target> : <sources> : [ <libraries> ] : [ <resources> ] ;
 
-	# unless NO_TEST_DEBUG is defined, we turn on debugging
-	if ! $(NO_TEST_DEBUG) {
+	# if TEST_DEBUG is defined, we turn on debugging
+	if $(TEST_DEBUG) {
 		DEBUG on $(1) [ FGristFiles $(2:S=$(SUFOBJ)) ] ?= 1 ;
 	}
 
