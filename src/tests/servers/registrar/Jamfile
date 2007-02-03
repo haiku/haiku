@@ -14,7 +14,7 @@ SimpleTest RegistrarTest1
 
 SimpleTest RosterShell
 	: RosterShell.cpp
-	: be stdc++.r4
+	: be $(TARGET_LIBSTDC++)
 ;
 
 SimpleTest message_deliverer_test : message_deliverer_test.cpp : be ;
