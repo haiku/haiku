@@ -238,6 +238,8 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 {
 PRINT(("added ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info->ref.name));
 				addingSuccess = (AddApp(info) == B_OK);
+				if (addingSuccess && fullReg)
+					_AppAdded(info);
 }
 			else {
 				token = info->token = _NextToken();
@@ -324,6 +326,7 @@ TRoster::HandleCompleteRegistration(BMessage *request)
 				info->thread = thread;
 				info->port = port;
 				info->state = APP_STATE_REGISTERED;
+				_AppAdded(info);
 			} else
 				SET_ERROR(error, B_REG_APP_NOT_PRE_REGISTERED);
 		} else
@@ -1202,9 +1205,7 @@ TRoster::AddApp(RosterAppInfo *info)
 
 	status_t error = (info ? B_OK : B_BAD_VALUE);
 	if (info) {
-		if (fRegisteredApps.AddInfo(info))
-			_AppAdded(info);
-		else
+		if (!fRegisteredApps.AddInfo(info))
 			error = B_NO_MEMORY;
 	}
 	return error;
@@ -1223,8 +1224,10 @@ TRoster::RemoveApp(RosterAppInfo *info)
 
 	if (info) {
 		if (fRegisteredApps.RemoveInfo(info)) {
-			info->state = APP_STATE_UNREGISTERED;
-			_AppRemoved(info);
+			if (info->state == APP_STATE_REGISTERED) {
+				info->state = APP_STATE_UNREGISTERED;
+				_AppRemoved(info);
+			}
 		}
 	}
 }
@@ -1433,7 +1436,7 @@ TRoster::RemoveWatcher(Watcher *watcher)
 
 
 // _AppAdded
-/*!	\brief Hook method invoked, when an application has been added.
+/*!	\brief Hook method invoked, when an application has been fully registered.
 	\param info The RosterAppInfo of the added application.
 */
 void
@@ -1447,7 +1450,7 @@ TRoster::_AppAdded(RosterAppInfo *info)
 }
 
 // _AppRemoved
-/*!	\brief Hook method invoked, when an application has been removed.
+/*!	\brief Hook method invoked, when a fully registered application has been removed.
 	\param info The RosterAppInfo of the removed application.
 */
 void
@@ -1457,6 +1460,7 @@ TRoster::_AppRemoved(RosterAppInfo *info)
 		// deactivate the app, if it was the active one
 		if (info == fActiveApp)
 			UpdateActiveApp(NULL);
+
 		// notify the watchers
 		BMessage message(B_SOME_APP_QUIT);
 		_AddMessageWatchingInfo(&message, info);
@@ -1473,8 +1477,7 @@ void
 TRoster::_AppActivated(RosterAppInfo *info)
 {
 	if (info) {
-		if (info->state == APP_STATE_REGISTERED
-			|| info->state == APP_STATE_PRE_REGISTERED) {
+		if (info->state == APP_STATE_REGISTERED) {
 			// send B_APP_ACTIVATED to the app
 			BMessenger messenger;
 			BMessenger::Private messengerPrivate(messenger);
@@ -1501,8 +1504,7 @@ void
 TRoster::_AppDeactivated(RosterAppInfo *info)
 {
 	if (info) {
-		if (info->state == APP_STATE_REGISTERED
-			|| info->state == APP_STATE_PRE_REGISTERED) {
+		if (info->state == APP_STATE_REGISTERED) {
 			// send B_APP_ACTIVATED to the app
 			BMessenger messenger;
 			BMessenger::Private messengerPrivate(messenger);
