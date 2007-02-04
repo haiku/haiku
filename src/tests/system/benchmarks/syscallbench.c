@@ -56,13 +56,13 @@ main(int argc, char *argv[])
 	libcall = test_func((void *)&getpid); // getpid is currently implemented as a library function returning the value of a global
 	syscall = test_func((void *)&is_computer_on);
 
-	printf("overhead time: %ld microseconds\n",
+	printf("overhead time: %ld nanoseconds\n",
 	    (1000*(overhead))/ITERATIONS);
 
-	printf("libcall time: %ld microseconds\n",
+	printf("libcall time: %ld nanoseconds\n",
 	    (1000*(libcall-overhead))/ITERATIONS);
 
-	printf("syscall time: %ld microseconds\n",
+	printf("syscall time: %ld nanoseconds\n",
 	    (1000*(syscall-overhead))/ITERATIONS);
 
 	return (0);
