@@ -2583,7 +2583,7 @@ BView::StrokePolygon(const BPolygon *polygon, bool closed, pattern p)
 	if (!polygon)
 		return;
 
-	StrokePolygon(polygon->fPts, polygon->fCount, polygon->Frame(), closed, p);
+	StrokePolygon(polygon->fPoints, polygon->fCount, polygon->Frame(), closed, p);
 }
 
 
@@ -2592,7 +2592,7 @@ BView::StrokePolygon(const BPoint *ptArray, int32 numPoints, bool closed, patter
 {
 	BPolygon polygon(ptArray, numPoints);
 	
-	StrokePolygon(polygon.fPts, polygon.fCount, polygon.Frame(), closed, p);
+	StrokePolygon(polygon.fPoints, polygon.fCount, polygon.Frame(), closed, p);
 }
 
 
@@ -2617,7 +2617,7 @@ BView::StrokePolygon(const BPoint *ptArray, int32 numPoints, BRect bounds,
 		fOwner->fLink->Attach<BRect>(polygon.Frame());
 		fOwner->fLink->Attach<bool>(closed);
 		fOwner->fLink->Attach<int32>(polygon.fCount);
-		fOwner->fLink->Attach(polygon.fPts, polygon.fCount * sizeof(BPoint));
+		fOwner->fLink->Attach(polygon.fPoints, polygon.fCount * sizeof(BPoint));
 
 		_FlushIfNotInTransaction();
 	} else {
@@ -2642,7 +2642,7 @@ BView::FillPolygon(const BPolygon *polygon, ::pattern pattern)
 			polygon->fCount * sizeof(BPoint) + sizeof(BRect) + sizeof(int32)) == B_OK) {
 		fOwner->fLink->Attach<BRect>(polygon->Frame());
 		fOwner->fLink->Attach<int32>(polygon->fCount);
-		fOwner->fLink->Attach(polygon->fPts, polygon->fCount * sizeof(BPoint));
+		fOwner->fLink->Attach(polygon->fPoints, polygon->fCount * sizeof(BPoint));
 
 		_FlushIfNotInTransaction();
 	} else {
