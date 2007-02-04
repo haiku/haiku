@@ -60,7 +60,6 @@ All rights reserved.
 #define WIND_HEIGHT			400
 #define RIGHT_BOUNDARY 		8191
 #define SEPARATOR_MARGIN	7
-#define	VIEW_COLOR			216
 #define FONT_SIZE			11.0
 #define QUOTE				"> "
 

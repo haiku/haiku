@@ -32,105 +32,109 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//--------------------------------------------------------------------
-//	
-//	Status.cpp
-//
-//--------------------------------------------------------------------
+
+#include "Mail.h"
+#include "Status.h"
+
+#include <Button.h>
+#include <Directory.h>
+#include <FindDirectory.h>
+#include <fs_index.h>
+#include <Node.h>
+#include <NodeInfo.h>
+#include <Path.h>
+#include <Query.h>
+#include <TextControl.h>
+#include <Volume.h>
+#include <VolumeRoster.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <StorageKit.h>
 
-#include "Mail.h"
-#include "Status.h"
+#define STATUS_TEXT			"Status:"
+#define STATUS_FIELD_H		 10
+#define STATUS_FIELD_V		  8
+#define STATUS_FIELD_WIDTH	(STATUS_WIDTH - STATUS_FIELD_H)
+#define STATUS_FIELD_HEIGHT	 16
+
+#define BUTTON_WIDTH		 70
+#define BUTTON_HEIGHT		 20
+
+#define S_OK_BUTTON_X1		(STATUS_WIDTH - BUTTON_WIDTH - 6)
+#define S_OK_BUTTON_Y1		(STATUS_HEIGHT - (BUTTON_HEIGHT + 10))
+#define S_OK_BUTTON_X2		(S_OK_BUTTON_X1 + BUTTON_WIDTH)
+#define S_OK_BUTTON_Y2		(S_OK_BUTTON_Y1 + BUTTON_HEIGHT)
+#define S_OK_BUTTON_TEXT	"OK"
+
+#define S_CANCEL_BUTTON_X1	(S_OK_BUTTON_X1 - (BUTTON_WIDTH + 10))
+#define S_CANCEL_BUTTON_Y1	S_OK_BUTTON_Y1
+#define S_CANCEL_BUTTON_X2	(S_CANCEL_BUTTON_X1 + BUTTON_WIDTH)
+#define S_CANCEL_BUTTON_Y2	S_OK_BUTTON_Y2
+#define S_CANCEL_BUTTON_TEXT	"Cancel"
+
+enum status_messages {
+	STATUS = 128,
+	OK,
+	CANCEL
+};
 
 
-//====================================================================
-
-TStatusWindow::TStatusWindow(BRect rect, BWindow *window, const char *status)
-	: BWindow(rect, "", B_MODAL_WINDOW, B_NOT_RESIZABLE)
+TStatusWindow::TStatusWindow(BRect rect, BMessenger target, const char* status)
+	: BWindow(rect, "", B_MODAL_WINDOW, B_NOT_RESIZABLE),
+	fTarget(target)
 {
-	BRect r(0, 0, STATUS_WIDTH, STATUS_HEIGHT);
+	BView* view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(view);
 
-	r.InsetBy(-1, -1);
-	fView = new TStatusView(r, window, status);
-	Lock();
-	AddChild(fView);
-	Unlock();
-	Show();
-}
-
-
-//====================================================================
-//	#pragma mark -
-
-
-TStatusView::TStatusView(BRect rect, BWindow *window, const char *status)
-	: BBox(rect, "", B_FOLLOW_ALL, B_WILL_DRAW)
-{
-	fWindow = window;
-	fString = status;
-
-	SetViewColor(VIEW_COLOR, VIEW_COLOR, VIEW_COLOR);
-
-	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
-	SetFont(&font);
-}
-
-
-void
-TStatusView::AttachedToWindow()
-{
 	BRect r(STATUS_FIELD_H, STATUS_FIELD_V,
 		STATUS_FIELD_WIDTH, STATUS_FIELD_V + STATUS_FIELD_HEIGHT);
 
-	fStatus = new BTextControl(r, "", STATUS_TEXT, fString, new BMessage(STATUS));
-	AddChild(fStatus);
+	fStatus = new BTextControl(r, "", STATUS_TEXT, status, new BMessage(STATUS));
+	view->AddChild(fStatus);
 
-	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
-	fStatus->SetFont(&font);
-	fStatus->SetDivider(StringWidth(STATUS_TEXT) + 6);
+	fStatus->SetDivider(fStatus->StringWidth(STATUS_TEXT) + 6);
 	fStatus->BTextControl::MakeFocus(true);
 
 	r.Set(S_OK_BUTTON_X1, S_OK_BUTTON_Y1, S_OK_BUTTON_X2, S_OK_BUTTON_Y2);
 	BButton *button = new BButton(r, "", S_OK_BUTTON_TEXT, new BMessage(OK));
-	AddChild(button);
-	button->SetTarget(this);
+	view->AddChild(button);
 	button->MakeDefault(true);
 
 	r.Set(S_CANCEL_BUTTON_X1, S_CANCEL_BUTTON_Y1, S_CANCEL_BUTTON_X2, S_CANCEL_BUTTON_Y2);
 	button = new BButton(r, "", S_CANCEL_BUTTON_TEXT, new BMessage(CANCEL));
-	AddChild(button);
-	button->SetTarget(this);
+	view->AddChild(button);
+
+	Show();
+}
+
+
+TStatusWindow::~TStatusWindow()
+{
 }
 
 
 void
-TStatusView::MessageReceived(BMessage *msg)
+TStatusWindow::MessageReceived(BMessage* msg)
 {
-	char			name[B_FILE_NAME_LENGTH];
-	char			new_name[B_FILE_NAME_LENGTH];
-	int32			index = 0;
-	uint32			loop;
-	status_t		result;
-	BDirectory		dir;
-	BEntry			entry;
-	BFile			file;
-	BNodeInfo		*node;
-	BPath			path;
-
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case STATUS:
 			break;
 
 		case OK:
-			if (!Exists(fStatus->Text())) {
+		{
+			if (!_Exists(fStatus->Text())) {
+				int32 index = 0;
+				uint32 loop;
+				status_t result;
+				BDirectory dir;
+				BEntry entry;
+				BFile file;
+				BNodeInfo* node;
+				BPath path;
+
 				find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 				dir.SetTo(path.Path());
 				if (dir.FindEntry("bemail", &entry) == B_NO_ERROR)
@@ -144,6 +148,9 @@ TStatusView::MessageReceived(BMessage *msg)
 				else
 					dir.CreateDirectory("status", &dir);
 				if (dir.InitCheck() == B_NO_ERROR) {
+					char name[B_FILE_NAME_LENGTH];
+					char newName[B_FILE_NAME_LENGTH];
+
 					sprintf(name, "%s", fStatus->Text());
 					if (strlen(name) > B_FILE_NAME_LENGTH - 10)
 						name[B_FILE_NAME_LENGTH - 10] = 0;
@@ -151,40 +158,41 @@ TStatusView::MessageReceived(BMessage *msg)
 						if (name[loop] == '/')
 							name[loop] = '\\';
 					}
-					strcpy(new_name, name);
+					strcpy(newName, name);
 					while (1) {
-						if ((result = dir.CreateFile(new_name, &file, true)) == B_NO_ERROR)
+						if ((result = dir.CreateFile(newName, &file, true)) == B_NO_ERROR)
 							break;
 						if (result != EEXIST)
 							goto err_exit;
-						sprintf(new_name, "%s_%ld", name, index++);
+						sprintf(newName, "%s_%ld", name, index++);
 					}
-					dir.FindEntry(new_name, &entry);
+					dir.FindEntry(newName, &entry);
 					node = new BNodeInfo(&file);
 					node->SetType("text/plain");
 					delete node;
 					file.Write(fStatus->Text(), strlen(fStatus->Text()) + 1);
 					file.SetSize(file.Position());
 					file.WriteAttr(INDEX_STATUS, B_STRING_TYPE, 0, fStatus->Text(),
-									 strlen(fStatus->Text()) + 1);
+						strlen(fStatus->Text()) + 1);
 				}
 			}
-err_exit:
+		err_exit:
 			{
-				BMessage closeCstmMsg(M_CLOSE_CUSTOM);
-				closeCstmMsg.AddString("status", fStatus->Text());
-				fWindow->PostMessage(&closeCstmMsg);
+				BMessage close(M_CLOSE_CUSTOM);
+				close.AddString("status", fStatus->Text());
+				fTarget.SendMessage(&close);
 				// will fall through
 			}
+		}
 		case CANCEL:
-			Window()->Quit();
+			Quit();
 			break;
 	}
 }
 
 
 bool
-TStatusView::Exists(const char *status)
+TStatusWindow::_Exists(const char* status)
 {
 	BVolume volume;
 	BVolumeRoster().GetBootVolume(&volume);

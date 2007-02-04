@@ -120,19 +120,17 @@ GetTrackerIcon(BMimeType &type, BBitmap *icon, icon_size iconSize)
 
 
 TEnclosuresView::TEnclosuresView(BRect rect, BRect wind_rect)
-	:	BView(rect, "m_enclosures", B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	: BView(rect, "m_enclosures", B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fFocus(false)
 {
-	rgb_color c;
-	c.red = c.green = c.blue = VIEW_COLOR;
-	SetViewColor(c);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BFont font = *be_plain_font;
 	font.SetSize(FONT_SIZE);
 	font_height fHeight;
 	font.GetHeight(&fHeight);
 	fOffset = 12;
-	
+
 	BRect r;
 	r.left = ENCLOSE_TEXT_H + font.StringWidth(
 		MDR_DIALECT_CHOICE ("Enclosures: ","添付ファイル")) + 5;
@@ -166,16 +164,13 @@ TEnclosuresView::~TEnclosuresView()
 void
 TEnclosuresView::Draw(BRect where)
 {
-	float	offset;
-	BFont	font = *be_plain_font;
-
 	BView::Draw(where);
+
+	BFont font = *be_plain_font;
 	font.SetSize(FONT_SIZE);
 	SetFont(&font);
 	SetHighColor(0, 0, 0);
-	SetLowColor(VIEW_COLOR, VIEW_COLOR, VIEW_COLOR);
-
-	offset = 12;
+	SetLowColor(ViewColor());
 
 	font_height fHeight;
 	font.GetHeight(&fHeight);
