@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # parameters <machine> <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
 
 # get and check the parameters
