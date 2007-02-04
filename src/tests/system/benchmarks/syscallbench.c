@@ -9,7 +9,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define ITERATIONS	1000000
+#include <OS.h>
+
+#define ITERATIONS	500000
 
 static void
 usage(void)
@@ -18,34 +20,50 @@ usage(void)
 	exit(1);
 }
 
+static int null_func(void)
+{
+	return 0;
+}
+
+static unsigned long test_func(int (*func)(void))
+{
+	struct timeval before, after;
+	unsigned long elapsed;
+	int i;
+
+	gettimeofday(&before, NULL);
+	for (i=0; i<ITERATIONS; i++) {
+		func();
+	}
+	gettimeofday(&after, NULL);
+
+	elapsed = 1000000 * (after.tv_sec - before.tv_sec);
+	elapsed += after.tv_usec - before.tv_usec;
+	return elapsed;
+}
+
 int
 main(int argc, char *argv[])
 {
-	struct timeval before, after;
-	unsigned long overhead, elapsed;
-	int i;
-	pid_t pid;
+	unsigned long overhead;
+	unsigned long libcall;
+	unsigned long syscall;
 	
 	if (argc > 1)
 		usage();
 
-	gettimeofday(&before, NULL);
-	for (i=0; i<ITERATIONS; i++) {
-	}
-	gettimeofday(&after, NULL);
-	overhead = 1000000 * (after.tv_sec - before.tv_sec);
-	overhead += after.tv_usec - before.tv_usec;
-	
-	gettimeofday(&before, NULL);
-	for (i=0; i<ITERATIONS; i++) {
-		pid = getpid();
-	}
-	gettimeofday(&after, NULL);
-	elapsed = 1000000 * (after.tv_sec - before.tv_sec);
-	elapsed += after.tv_usec - before.tv_usec;
+	overhead = test_func(&null_func);
+	libcall = test_func((void *)&getpid); // getpid is currently implemented as a library function returning the value of a global
+	syscall = test_func((void *)&is_computer_on);
+
+	printf("overhead time: %ld microseconds\n",
+	    (1000*(overhead))/ITERATIONS);
+
+	printf("libcall time: %ld microseconds\n",
+	    (1000*(libcall-overhead))/ITERATIONS);
 
 	printf("syscall time: %ld microseconds\n",
-	    (1000*(elapsed-overhead))/ITERATIONS);
+	    (1000*(syscall-overhead))/ITERATIONS);
 
 	return (0);
 }
