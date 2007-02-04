@@ -21,7 +21,7 @@ _get_system_info(system_info *info, size_t size)
 int32
 is_computer_on(void)
 {
-	return 1;
+	return _kern_is_computer_on();
 }
 
 

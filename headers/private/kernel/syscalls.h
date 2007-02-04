@@ -43,7 +43,7 @@ struct user_disk_system_info;
 #pragma syscalls begin
 #endif
 
-extern int     		_kern_null();
+extern int			_kern_is_computer_on(void);
 extern status_t		_kern_generic_syscall(const char *subsystem, uint32 function,
 						void *buffer, size_t bufferSize);
 

@@ -147,11 +147,10 @@ out:
 
 
 static inline int
-_user_null()
+_user_is_computer_on(void)
 {
-	return 0;
+	return 1;
 }
-
 
 // map to the arch specific call
 
