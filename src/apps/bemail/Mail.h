@@ -319,22 +319,19 @@ class TMailWindow : public BWindow {
 		BMessenger	*fOriginatingWindow;
 };
 
-//====================================================================
-
-class TMenu: public BPopUpMenu
-{
+class TMenu: public BPopUpMenu {
 	public:
-		TMenu(const char *, const char *, int32, bool popup = false, bool addRandom = true);
+		TMenu(const char* name, const char* attribute, int32, bool popup = false,
+			bool addRandom = true);
 		~TMenu();
-						
+
 		virtual BPoint	ScreenLocation(void);
 		virtual void	AttachedToWindow();
 
 		void			BuildMenu();
-	
+
 	private:
-		char	*fAttribute;
-		char	*fPredicate;
+		char*	fAttribute;
 		bool	fPopup, fAddRandom;
 		int32	fMessage;
 };

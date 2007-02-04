@@ -175,6 +175,53 @@ main()
 
 
 int32
+add_query_menu_items(BMenu* menu, const char* attribute, uint32 what,
+	const char* format, bool popup = false)
+{
+	BVolume	volume;
+	BVolumeRoster().GetBootVolume(&volume);
+
+	BQuery query;
+	query.SetVolume(&volume);
+	query.PushAttr(attribute);
+	query.PushString("*");
+	query.PushOp(B_EQ);
+	query.Fetch();
+
+	int32 index = 0;
+	BEntry entry;
+	while (query.GetNextEntry(&entry) == B_OK) {
+		BFile file(&entry, B_READ_ONLY);
+		if (file.InitCheck() == B_OK) {
+			BMessage* message = new BMessage(what);
+
+			entry_ref ref;
+			entry.GetRef(&ref);
+			message->AddRef("ref", &ref);
+
+			BString value;
+			if (file.ReadAttrString(attribute, &value) < B_OK)
+				continue;
+
+			char name[256];
+			if (format != NULL)
+				snprintf(name, sizeof(name), format, value.String());
+			else
+				strlcpy(name, value.String(), sizeof(name));
+
+			if (index < 9 && !popup)
+				menu->AddItem(new BMenuItem(name, message, '1' + index));
+			else
+				menu->AddItem(new BMenuItem(name, message));
+			index++;
+		}
+	}
+
+	return index;
+}
+
+
+int32
 header_len(BFile *file)
 {
 	char	*buffer;
@@ -1260,15 +1307,12 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	
 	if(!resending && fIncoming) {	
 		menu->AddSeparatorItem();
-		
+
 		subMenu = new BMenu(MDR_DIALECT_CHOICE ("Close and ","C) 閉じる"));
 		if (file.GetAttrInfo(B_MAIL_ATTR_STATUS, &info) == B_NO_ERROR)
 			file.ReadAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, str, info.size);
 		else
 			str[0] = 0;
-
-		//if( (strcmp(str, "Pending")==0)||(strcmp(str, "Sent")==0) )
-		//	canResend = true;
 
 		if (!strcmp(str, "New")) {
 			subMenu->AddItem(item = new BMenuItem(
@@ -1289,12 +1333,24 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(M_CLOSE_SAME));
 		}
 
+		subMenu->AddSeparatorItem();
+
 		subMenu->AddItem(new BMenuItem(
 			MDR_DIALECT_CHOICE ("Set to Saved", "S) 属性を<Saved>に設定"),
 			new BMessage(M_CLOSE_SAVED), 'W', B_CONTROL_KEY));
+
+		if (add_query_menu_items(subMenu, INDEX_STATUS, M_STATUS,
+			MDR_DIALECT_CHOICE("Set to %s", "属性を<%s>に設定")) > 0)
+			subMenu->AddSeparatorItem();
+
+		subMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Set to", "X) 他の属性に変更")
+			B_UTF8_ELLIPSIS, new BMessage(M_CLOSE_CUSTOM)));
+
+#if 0
 		subMenu->AddItem(new BMenuItem(new TMenu(
 			MDR_DIALECT_CHOICE ("Set to", "X) 他の属性に変更")B_UTF8_ELLIPSIS,
 			INDEX_STATUS, M_STATUS, false, false), new BMessage(M_CLOSE_CUSTOM)));
+#endif
 		menu->AddItem(subMenu);
 	}
 	else
@@ -3839,17 +3895,14 @@ TMailWindow::FrontmostWindow()
 //	#pragma mark -
 
 
-TMenu::TMenu(const char *name, const char *attribute, int32 message, bool popup, bool addRandom)
-	:	BPopUpMenu(name, false, false),
+TMenu::TMenu(const char *name, const char *attribute, int32 message, bool popup,
+		bool addRandom)
+	: BPopUpMenu(name, false, false),
 	fPopup(popup),
 	fAddRandom(addRandom),
 	fMessage(message)
 {
-	fAttribute = (char *)malloc(strlen(attribute) + 1);
-	strcpy(fAttribute, attribute);
-	fPredicate = (char *)malloc(strlen(fAttribute) + 5);
-	sprintf(fPredicate, "%s = *", fAttribute);
-
+	fAttribute = strdup(attribute);
 	BuildMenu();
 }
 
@@ -3857,7 +3910,6 @@ TMenu::TMenu(const char *name, const char *attribute, int32 message, bool popup,
 TMenu::~TMenu()
 {
 	free(fAttribute);
-	free(fPredicate);
 }
 
 
@@ -3882,45 +3934,12 @@ TMenu::ScreenLocation(void)
 void
 TMenu::BuildMenu()
 {
-	BMenuItem *item;
-	while ((item = RemoveItem((int32)0)) != NULL)
-		delete item;
+	RemoveItems(0, CountItems(), true);
+	add_query_menu_items(this, fAttribute, fMessage, NULL, fPopup);
 
-	BVolume	volume;
-	BVolumeRoster().GetBootVolume(&volume);
-
-	BQuery query;
-	query.SetVolume(&volume);
-	query.SetPredicate(fPredicate);
-	query.Fetch();
-
-	int32 index = 0;
-	BEntry entry;
-	while (query.GetNextEntry(&entry) == B_NO_ERROR)
-	{
-		BFile file(&entry, O_RDONLY);
-		if (file.InitCheck() == B_NO_ERROR)
-		{
-			BMessage *msg = new BMessage(fMessage);
-
-			entry_ref ref;
-			entry.GetRef(&ref);
-			msg->AddRef("ref", &ref);
-
-			char name[B_FILE_NAME_LENGTH];
-			file.ReadAttr(fAttribute, B_STRING_TYPE, 0, name, sizeof(name));
-
-			if (index < 9 && !fPopup)
-				AddItem(new BMenuItem(name, msg, '1' + index));
-			else
-				AddItem(new BMenuItem(name, msg));
-			index++;
-		}
-	}
-	if (fAddRandom && CountItems())
-	{
+	if (fAddRandom && CountItems() > 0) {
 		AddItem(new BSeparatorItem(), 0);
-		//AddSeparatorItem();
+
 		BMessage *msg = new BMessage(M_RANDOM_SIG);
 		if (!fPopup)
 			AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Random","R) 自動決定"), msg, '0'), 0);
