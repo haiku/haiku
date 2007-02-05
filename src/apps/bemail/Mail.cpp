@@ -203,6 +203,8 @@ add_query_menu_items(BMenu* menu, const char* attribute, uint32 what,
 			if (file.ReadAttrString(attribute, &value) < B_OK)
 				continue;
 
+			message->AddString("attribute", value.String());
+
 			char name[256];
 			if (format != NULL)
 				snprintf(name, sizeof(name), format, value.String());
@@ -2284,10 +2286,12 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 		case M_STATUS:
 		{
-			BMenuItem *menu;
-			msg->FindPointer("source", (void **)&menu);
+			const char* attribute;
+			if (msg->FindString("attribute", &attribute) != B_OK)
+				break;
+
 			BMessage message(B_CLOSE_REQUESTED);
-			message.AddString("status", menu->Label());
+			message.AddString("status", attribute);
 			PostMessage(&message);
 			break;
 		}
