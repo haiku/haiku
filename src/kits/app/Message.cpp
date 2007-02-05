@@ -102,6 +102,7 @@ BMessage::BMessage(const BMessage &other)
 BMessage::~BMessage()
 {
 	DEBUG_FUNCTION_ENTER;
+	// TODO: Check why we don't do that in _Clear() and fix or comment it.
 	if (IsSourceWaiting())
 		SendReply(B_NO_REPLY);
 
@@ -118,6 +119,13 @@ BMessage::operator=(const BMessage &other)
 
 	fHeader = (message_header *)malloc(sizeof(message_header));
 	memcpy(fHeader, other.fHeader, sizeof(message_header));
+
+	// Clear some header flags inherited from the original message that don't
+	// apply to the clone.
+	fHeader->flags &= ~(MESSAGE_FLAG_REPLY_REQUIRED | MESSAGE_FLAG_REPLY_DONE
+		| MESSAGE_FLAG_IS_REPLY | MESSAGE_FLAG_WAS_DELIVERED
+		| MESSAGE_FLAG_WAS_DROPPED | MESSAGE_FLAG_PASS_BY_AREA);
+	// Note, that BeOS R5 seems to keep the reply info.
 
 	if (fHeader->fields_size > 0) {
 		fFields = (field_header *)malloc(fHeader->fields_size);
@@ -1988,8 +1996,36 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 #if 0
 	port_info portInfo;
 	if (get_port_info(replyPort, &portInfo) == B_OK
-		&& portInfo.queue_count > 0)
+		&& portInfo.queue_count > 0) {
 		debugger("reply port not empty!");
+		printf("  reply port not empty! %ld message(s) in queue\n",
+			portInfo.queue_count);
+
+		// fetch and print the messages
+		for (int32 i = 0; i < portInfo.queue_count; i++) {
+			char buffer[1024];
+			int32 code;
+			ssize_t size = read_port(replyPort, &code, buffer, sizeof(buffer));
+			if (size < 0) {
+				printf("failed to read message from reply port\n");
+				continue;
+			}
+			if (size >= (ssize_t)sizeof(buffer)) {
+				printf("message from reply port too big\n");
+				continue;
+			}
+
+			BMemoryIO stream(buffer, size);
+			BMessage reply;
+			if (reply.Unflatten(&stream) != B_OK) {
+				printf("failed to unflatten message from reply port\n");
+				continue;
+			}
+
+			printf("message %ld from reply port:\n", i);
+			reply.PrintToStream();
+		}
+	}
 #endif
 
 	{
