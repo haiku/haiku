@@ -101,6 +101,11 @@ enum machine_state {
 
 struct block_address_translation;
 
+typedef struct arch_cpu_info {
+	int null;
+} arch_cpu_info;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -9,6 +9,7 @@
 
 #include <kernel.h>
 #include <smp.h>
+#include <cpu.h>
 #include <arch/system_info.h>
 #include <boot/kernel_args.h>
 
@@ -77,48 +78,54 @@ arch_system_info_init(struct kernel_args *args)
 {
 	// This is what you get if the CPU vendor is not recognized
 	// or the CPU does not support cpuid with eax == 1.
-	uint32 base = B_CPU_x86;
+	uint32 base;
 	uint32 model = 0;
-
-	cpuid_info cpuInfo;
-	if (get_current_cpuid(&cpuInfo, 0) == B_OK) {
-		// set CPU type and revision
-
-		if (!strncmp(cpuInfo.eax_0.vendor_id, "GenuineIntel", 12))
+	cpu_ent *cpu = get_cpu_struct();
+	
+	switch (cpu->arch.vendor) {
+		case VENDOR_INTEL:
 			base = B_CPU_INTEL_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "AuthenticAMD", 12))
+			break;
+		case VENDOR_AMD:
 			base = B_CPU_AMD_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "CyrixInstead", 12))
+			break;
+		case VENDOR_CYRIX:
 			base = B_CPU_CYRIX_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "RiseRiseRise", 12))
-			base = B_CPU_RISE_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "CentaurHauls", 12))
+			break;
+		case VENDOR_UMC:
+			base = B_CPU_INTEL_x86; // XXX
+			break;
+		case VENDOR_NEXGEN:
+			base = B_CPU_INTEL_x86; // XXX
+			break;
+		case VENDOR_CENTAUR:
 			base = B_CPU_VIA_IDT_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "NexGenDriven", 12))
-			// ToDo: add NexGen CPU types
-			base = B_CPU_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "GenuineTMx86", 12))
+			break;
+		case VENDOR_RISE:
+			base = B_CPU_RISE_x86;
+			break;
+		case VENDOR_TRANSMETA:
 			base = B_CPU_TRANSMETA_x86;
-		else if (!strncmp(cpuInfo.eax_0.vendor_id, "Geode by NSC", 12))
+			break;
+		case VENDOR_NSC:
 			base = B_CPU_NATIONAL_x86;
-
-		if (cpuInfo.eax_0.max_eax >= 1) {
-			get_current_cpuid(&cpuInfo, 1);
-			if (base != B_CPU_x86)
-				model = (cpuInfo.eax_1.family << 4) + cpuInfo.eax_1.model;
-
-			sCpuRevision = (cpuInfo.eax_1.type << 12)
-				| (cpuInfo.eax_1.family << 8)
-				| (cpuInfo.eax_1.model << 4)
-				| cpuInfo.eax_1.stepping;
-		}
+			break;
+		default:
+			base = B_CPU_x86;
 	}
+
+	if (base != B_CPU_x86)
+		model = (cpu->arch.family << 4) + cpu->arch.model;
+
+	sCpuRevision = (cpu->arch.type << 12)
+					| (cpu->arch.family << 8)
+					| (cpu->arch.model << 4)
+					| cpu->arch.stepping;
 
 	sCpuType = base + model;
 	sCpuClockSpeed = args->arch_args.cpu_clock_speed;
 	return B_OK;
 }
-
 
 //	#pragma mark -
 

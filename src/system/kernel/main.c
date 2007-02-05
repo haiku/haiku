@@ -95,6 +95,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		// init modules
 		TRACE(("init CPU\n"));
 		cpu_init(&sKernelArgs);
+		cpu_init_percpu(&sKernelArgs, currentCPU);
 		TRACE(("init interrupts\n"));
 		int_init(&sKernelArgs);
 
@@ -165,6 +166,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		resume_thread(thread);
 	} else {
 		// this is run for each non boot processor after they've been set loose
+		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
 		thread_per_cpu_init(currentCPU);
 

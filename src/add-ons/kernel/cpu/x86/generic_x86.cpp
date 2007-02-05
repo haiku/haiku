@@ -14,6 +14,7 @@
 
 #include <KernelExport.h>
 #include <arch_system_info.h>
+#include <arch/x86/arch_cpu.h>
 
 
 //#define TRACE_MTRR
@@ -46,10 +47,8 @@ uint64 gPhysicalMask = 0;
 uint32
 generic_count_mtrrs(void)
 {
-	cpuid_info cpuInfo;
-	if (get_current_cpuid(&cpuInfo, 1) != B_OK
-		|| (cpuInfo.eax_1.features & IA32_FEATURE_MTRR) == 0
-		|| (cpuInfo.eax_1.features & IA32_FEATURE_MSR) == 0)
+	if (!x86_check_feature(IA32_FEATURE_MTRR, FEATURE_COMMON) 
+		|| !x86_check_feature(IA32_FEATURE_MSR, FEATURE_COMMON))
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
@@ -139,9 +138,9 @@ generic_mtrr_compute_physical_mask(void)
 	uint32 bits = 36;
 
 	cpuid_info cpuInfo;
-	if (get_cpuid(&cpuInfo, 0x80000000, 0) == B_OK
+	if (get_current_cpuid(&cpuInfo, 0x80000000) == B_OK
 		&& cpuInfo.eax_0.max_eax & 0xff >= 8) {
-		get_cpuid(&cpuInfo, 0x80000008, 0);
+		get_current_cpuid(&cpuInfo, 0x80000008);
 		bits = cpuInfo.regs.eax & 0xff;
 
 		// Obviously, the bits are not always reported correctly

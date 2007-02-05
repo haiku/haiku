@@ -36,6 +36,11 @@ cpu_init(kernel_args *args)
 	return arch_cpu_init(args);
 }
 
+status_t 
+cpu_init_percpu(kernel_args *args, int curr_cpu)
+{
+	return arch_cpu_init_percpu(args, curr_cpu);
+}
 
 status_t
 cpu_init_post_vm(kernel_args *args)

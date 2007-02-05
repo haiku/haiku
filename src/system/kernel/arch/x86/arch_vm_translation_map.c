@@ -823,7 +823,6 @@ arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
 status_t
 arch_vm_translation_map_init(kernel_args *args)
 {
-	cpuid_info info;
 	status_t error;
 
 	TRACE(("vm_translation_map_init: entry\n"));
@@ -875,8 +874,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	}
 
 	// enable global page feature if available
-	get_current_cpuid(&info, 1);
-	if (info.eax_1.features & IA32_FEATURE_GLOBAL_PAGES) {
+	if (x86_check_feature(IA32_FEATURE_PGE, FEATURE_COMMON)) {
 		// this prevents kernel pages from being flushed from TLB on context-switch
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
 	}

@@ -13,6 +13,7 @@
 #include <vm.h>
 
 #include <arch_system_info.h>
+#include <cpu.h>
 #include <arch/cpu.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
@@ -23,6 +24,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/* cpu vendor info */
+struct cpu_vendor_info {
+	const char *vendor;
+	const char *ident_string[2];
+};
+
+static const struct cpu_vendor_info vendor_info[VENDOR_NUM] = {
+	{ "Intel", { "GenuineIntel" } },
+	{ "AMD", { "AuthenticAMD" } },
+	{ "Cyrix", { "CyrixInstead" } },
+	{ "UMC", { "UMC UMC UMC" } },
+	{ "NexGen", { "NexGenDriven" } },
+	{ "Centaur", { "CentaurHauls" } },
+	{ "Rise", { "RiseRiseRise" } },
+	{ "Transmeta", { "GenuineTMx86", "TransmetaCPU" } },
+	{ "NSC", { "Geode by NSC" } },
+};
 
 #define CR0_CACHE_DISABLE		(1UL << 30)
 #define CR0_NOT_WRITE_THROUGH	(1UL << 29)
@@ -173,10 +192,8 @@ x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 static void
 init_sse(void)
 {
-	cpuid_info info;
-	if (get_current_cpuid(&info, 1) != B_OK
-		|| (info.eax_1.features & IA32_FEATURE_SSE) == 0
-		|| (info.eax_1.features & IA32_FEATURE_FXSR) == 0) {
+	if (!x86_check_feature(IA32_FEATURE_SSE, FEATURE_COMMON)
+		|| !x86_check_feature(IA32_FEATURE_FXSR, FEATURE_COMMON)) {
 		// we don't have proper SSE support
 		return;
 	}
@@ -228,9 +245,205 @@ init_double_fault(int cpuNum)
 //	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_SEGMENT + cpuNum], (addr_t)sDoubleFaultTSS[cpuNum], sizeof(struct tss));
 }
 
+static void make_feature_string(cpu_ent *cpu, char *str, size_t strlen)
+{
+	str[0] = 0;
+
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
+		strlcat(str, "fpu ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_VME)
+		strlcat(str, "vme ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DE)
+		strlcat(str, "de ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE)
+		strlcat(str, "pse ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TSC)
+		strlcat(str, "tsc ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MSR)
+		strlcat(str, "msr ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAE)
+		strlcat(str, "pae ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCE)
+		strlcat(str, "mce ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CX8)
+		strlcat(str, "cx8 ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_APIC)
+		strlcat(str, "apic ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SEP)
+		strlcat(str, "sep ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MTRR)
+		strlcat(str, "mtrr ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PGE)
+		strlcat(str, "pge ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCA)
+		strlcat(str, "mca ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CMOV)
+		strlcat(str, "cmov ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAT)
+		strlcat(str, "pat ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE36)
+		strlcat(str, "pse36 ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSN)
+		strlcat(str, "psn ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CLFSH)
+		strlcat(str, "clfsh ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DS)
+		strlcat(str, "ds ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_ACPI)
+		strlcat(str, "acpi ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MMX)
+		strlcat(str, "mmx ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FXSR)
+		strlcat(str, "fxsr ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE)
+		strlcat(str, "sse ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE2)
+		strlcat(str, "sse2 ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SS)
+		strlcat(str, "ss ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_HTT)
+		strlcat(str, "htt ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TM)
+		strlcat(str, "tm ", strlen);
+	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PBE)
+		strlcat(str, "pbe ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE3)
+		strlcat(str, "sse3 ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MONITOR)
+		strlcat(str, "monitor ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DSCPL)
+		strlcat(str, "dscpl ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_EST)
+		strlcat(str, "est ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TM2)
+		strlcat(str, "tm2 ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CNXTID)
+		strlcat(str, "cnxtid ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_SYSCALL)
+		strlcat(str, "syscall ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_NX)
+		strlcat(str, "nx ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_MMXEXT)
+		strlcat(str, "mmxext ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_FFXSR)
+		strlcat(str, "ffxsr ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_LONG)
+		strlcat(str, "long ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOWEXT)
+		strlcat(str, "3dnowext ", strlen);
+	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOW)
+		strlcat(str, "3dnow ", strlen);
+}
+
+static int detect_cpu(kernel_args *ka, int curr_cpu) 
+{
+	cpuid_info cpuid;
+	unsigned int data[4];
+	char vendor_str[17];
+	int i;
+	cpu_ent *cpu = get_cpu_struct();
+
+	// clear out the cpu info data
+	cpu->arch.vendor = VENDOR_UNKNOWN;
+	cpu->arch.vendor_name = "UNKNOWN VENDOR";
+	cpu->arch.feature[FEATURE_COMMON] = 0;
+	cpu->arch.feature[FEATURE_EXT] = 0;
+	cpu->arch.feature[FEATURE_EXT_AMD] = 0;
+	cpu->arch.model_name[0] = 0;
+
+	// print some fun data
+	get_current_cpuid(&cpuid, 0);
+
+	// build the vendor string
+	memset(vendor_str, 0, sizeof(vendor_str));
+	memcpy(vendor_str, cpuid.eax_0.vendor_id, sizeof(cpuid.eax_0.vendor_id));
+
+	// get the family, model, stepping
+	get_current_cpuid(&cpuid, 1);
+	cpu->arch.type = cpuid.eax_1.type;
+	cpu->arch.family = cpuid.eax_1.family;
+	cpu->arch.model = cpuid.eax_1.model;
+	cpu->arch.stepping = cpuid.eax_1.stepping;
+	dprintf("CPU %d: type %d family %d model %d stepping %d, string '%s'\n",
+		curr_cpu, cpu->arch.type, cpu->arch.family, cpu->arch.model, cpu->arch.stepping, vendor_str);
+
+	// figure out what vendor we have here
+
+	for(i=0; i<VENDOR_NUM; i++) {
+		if(!strcmp(vendor_str, vendor_info[i].ident_string[0])) {
+			cpu->arch.vendor = i;
+			cpu->arch.vendor_name = vendor_info[i].vendor;
+			break;
+		}
+		if(!strcmp(vendor_str, vendor_info[i].ident_string[1])) {
+			cpu->arch.vendor = i;
+			cpu->arch.vendor_name = vendor_info[i].vendor;
+			break;
+		}
+	}
+
+	// see if we can get the model name
+	get_current_cpuid(&cpuid, 0x80000000);
+	if(cpuid.eax_0.max_eax >= 0x80000004) {
+		// build the model string (need to swap ecx/edx data before copying)
+		unsigned int temp;
+		memset(cpu->arch.model_name, 0, sizeof(cpu->arch.model_name));
+		get_current_cpuid(&cpuid, 0x80000002);
+		temp = cpuid.regs.edx; cpuid.regs.edx = cpuid.regs.ecx; cpuid.regs.ecx = temp;
+		memcpy(cpu->arch.model_name, cpuid.as_chars, sizeof(cpuid.as_chars));
+		get_current_cpuid(&cpuid, 0x80000003);
+		temp = cpuid.regs.edx; cpuid.regs.edx = cpuid.regs.ecx; cpuid.regs.ecx = temp;
+		memcpy(cpu->arch.model_name + 16, cpuid.as_chars, sizeof(cpuid.as_chars));
+		get_current_cpuid(&cpuid, 0x80000004);
+		temp = cpuid.regs.edx; cpuid.regs.edx = cpuid.regs.ecx; cpuid.regs.ecx = temp;
+		memcpy(cpu->arch.model_name + 32, cpuid.as_chars, sizeof(cpuid.as_chars));
+
+		// some cpus return a right-justified string
+		for(i = 0; cpu->arch.model_name[i] == ' '; i++)
+			;
+		if(i > 0) {
+			memmove(cpu->arch.model_name, 
+				&cpu->arch.model_name[i], 
+				strlen(&cpu->arch.model_name[i]) + 1);
+		}
+
+		dprintf("CPU %d: vendor '%s' model name '%s'\n", 
+			curr_cpu, cpu->arch.vendor_name, cpu->arch.model_name);
+	} else {
+		strcpy(cpu->arch.model_name, "unknown");
+	}
+
+	// load feature bits
+	get_current_cpuid(&cpuid, 1);
+	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
+	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
+	if(cpu->arch.vendor == VENDOR_AMD) {
+		get_current_cpuid(&cpuid, 0x80000001);
+		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
+	}
+
+	make_feature_string(cpu, cpu->arch.feature_string, sizeof(cpu->arch.feature_string));
+	dprintf("CPU %d: features: %s\n", curr_cpu, cpu->arch.feature_string);
+
+	return 0;
+}
+
+bool x86_check_feature(uint32 feature, enum x86_feature_type type)
+{
+	cpu_ent *cpu = get_cpu_struct();
+
+#if 0
+	int i;
+	dprintf("x86_check_feature: feature 0x%x, type %d\n", feature, type);
+	for (i = 0; i < FEATURE_NUM; i++) {
+		dprintf("features %d: 0x%x\n", i, cpu->arch.feature[i]);
+	}
+#endif
+
+	return (cpu->arch.feature[type] & feature) ? TRUE : FALSE;
+}
 
 //	#pragma mark -
-
 
 status_t
 arch_cpu_preboot_init(kernel_args *args)
@@ -243,6 +456,14 @@ arch_cpu_preboot_init(kernel_args *args)
 	return B_OK;
 }
 
+
+status_t 
+arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
+{
+	detect_cpu(args, curr_cpu);
+
+	return 0;
+}
 
 status_t
 arch_cpu_init(kernel_args *args)

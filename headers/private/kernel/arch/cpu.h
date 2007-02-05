@@ -21,6 +21,7 @@ extern "C" {
 
 status_t arch_cpu_preboot_init(kernel_args *args);
 status_t arch_cpu_init(kernel_args *args);
+status_t arch_cpu_init_percpu(kernel_args *args, int curr_cpu);
 status_t arch_cpu_init_post_vm(kernel_args *args);
 status_t arch_cpu_init_post_modules(kernel_args *args);
 status_t arch_cpu_shutdown(bool reboot);

@@ -17,8 +17,7 @@ static uint32
 via_count_mtrrs(void)
 {
 	cpuid_info cpuInfo;
-	if (get_cpuid(&cpuInfo, 1, 0) != B_OK
-		|| (cpuInfo.eax_1.features & IA32_FEATURE_MTRR) == 0)
+	if (!x86_check_feature(IA32_FEATURE_MTRR, FEATURE_COMMON))
 		return 0;
 
 	// IA32_MSR_MTRR_CAPABILITIES doesn't exist on VIA CPUs
