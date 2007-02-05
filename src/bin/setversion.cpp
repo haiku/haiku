@@ -1,6 +1,6 @@
 /*
  * Copyright 2002, Ryan Fleet.
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT license.
  */
@@ -331,6 +331,18 @@ main(int argc, char *argv[])
 	status = info.SetTo(&file);
 	if (status != B_OK)
 		errorOut(status, argv[1], false);
+
+	if (systemModified ^ appModified) {
+		// clear out other app info if not present - this works around a
+		// bug in BeOS, see bug #681.
+		version_kind kind = systemModified ? B_APP_VERSION_KIND : B_SYSTEM_VERSION_KIND;
+		version_info clean;
+
+		if (info.GetVersionInfo(&clean, kind) != B_OK) {
+			memset(&clean, 0, sizeof(version_info));
+			info.SetVersionInfo(&clean, kind);
+		}
+	}
 
 	if (appModified) {
 		status = info.SetVersionInfo(&appVersion, B_APP_VERSION_KIND);
