@@ -540,7 +540,7 @@ WindowsSettingsView::SetDefaults()
 	TrackerSettings settings;
 
 	if (settings.ShowFullPathInTitleBar()) {
-		settings.SetShowFullPathInTitleBar(true);
+		settings.SetShowFullPathInTitleBar(false);
 		tracker->SendNotices(kWindowsShowFullPathChanged);
 	}
 
