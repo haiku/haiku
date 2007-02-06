@@ -217,3 +217,35 @@ rule ObjectReferences
 	}
 }
 
+rule CopySetHaikuRevision target : source
+{
+	# CopySetHaikuRevision <target> : <source>
+	#
+	# Copy <source> to <target>, writing the SVN revision of the working root
+	# directory into the haiku revision section of <target>.
+	#
+	# <target> - Output file target. Gristed and located target.
+	# <source> - ELF object to be copied. Gristed and located target.
+
+	# If existent, make the target depend on the .svn/entries file in the
+	# root directory, so it gets updated when the revision changes due to
+	# "svn up".
+	if [ Glob [ FDirName $(HAIKU_TOP) .svn ] : entries ] {
+		local svnEntries = <haiku-rootdir-svn>entries ;
+		SEARCH on $(svnEntries) = [ FDirName $(HAIKU_TOP) .svn ] ;
+		Depends $(target) : $(svnEntries) ;
+	}
+
+	Depends $(target) : <build>copyattr <build>set_haiku_revision $(source) ;
+	CopySetHaikuRevision1 $(target)
+		: <build>copyattr <build>set_haiku_revision $(source) ;
+}
+
+actions CopySetHaikuRevision1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	revision=`(svn info $(HAIKU_TOP) 2> /dev/null || echo Revision: 0) |
+		grep Revision | awk '{printf $2}'`
+	$(2[1]) --data $(2[3]) $(1) &&
+	$(2[2]) $(1) ${revision}
+}

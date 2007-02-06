@@ -6,25 +6,6 @@ if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
-rule GenerateRevisionFile
-{
-	MakeLocateCommonPlatform $(1) ;
-	Always $(1) ;
-		# we want to rebuild the resources everytime AboutHaiku
-		# is built to keep them up-to-date
-}
-
-actions GenerateRevisionFile
-{
-	(svn info $(HAIKU_TOP) 2> /dev/null || echo Revision: unknown) |
-		grep Revision | awk '{printf $2}' > $(1)
-}
-
-local revisionFile = [ FGristFiles haiku-revision ] ;
-GenerateRevisionFile $(revisionFile) ;
-
-AddFileDataResource AboutHaiku : CSTR:201:SVN:REVISION : $(revisionFile) ;
-
 Application AboutHaiku :
 	AboutHaiku.cpp
 	: libbe.so libtranslation.so libroot.so

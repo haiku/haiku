@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <sys/utsname.h>
 
 
 #define SCROLL_CREDITS_VIEW 'mviv'
@@ -178,18 +179,17 @@ AboutView::AboutView(const BRect &rect)
 			strcpy(string, versionInfo.short_info);
 	}
 
-	// Add revision from resources
-	BResources* resources = be_app->AppResources();
-	char version[32];
-	size_t size;
-	const char* versionResource = (const char *)resources->LoadResource(
-		B_STRING_TYPE, "SVN:REVISION", &size);
-	if (versionResource != NULL)
-		strlcpy(version, versionResource, min_c(size + 1, sizeof(version)));
-	if (versionResource != NULL && strcmp(version, "unknown") != 0) {
-		strlcat(string, " (Revision ", sizeof(string));
-		strlcat(string, version, sizeof(string));
-		strlcat(string, ")", sizeof(string));
+	// Add revision from uname() info
+	utsname unameInfo;
+	if (uname(&unameInfo) == 0) {
+		long revision;
+		if (sscanf(unameInfo.version, "r%ld", &revision) == 1) {
+			char version[16];
+			snprintf(version, sizeof(version), "%ld", revision);
+			strlcat(string, " (Revision ", sizeof(string));
+			strlcat(string, version, sizeof(string));
+			strlcat(string, ")", sizeof(string));
+		}
 	}
 
 	stringView = new BStringView(r, "ostext", string);
