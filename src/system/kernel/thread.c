@@ -214,6 +214,7 @@ create_thread_struct(const char *name, thread_id threadID)
 	thread->sig_block_mask = 0;
 	memset(thread->sig_action, 0, 32 * sizeof(struct sigaction));
 	thread->in_kernel = true;
+	thread->was_yielded = false;
 	thread->user_time = 0;
 	thread->kernel_time = 0;
 	thread->last_time = 0;
@@ -915,12 +916,12 @@ thread_exit(void)
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
 
-	if (!are_interrupts_enabled())
-		dprintf("thread_exit() called with interrupts disabled!\n");
-
 	TRACE(("thread 0x%lx exiting %s w/return code 0x%x\n", thread->id,
 		thread->exit.reason == THREAD_RETURN_INTERRUPTED ? "due to signal" : "normally",
 		(int)thread->exit.status));
+
+	if (!are_interrupts_enabled())
+		panic("thread_exit() called with interrupts disabled!\n");
 
 	// boost our priority to get this over with
 	thread->priority = thread->next_priority = B_URGENT_DISPLAY_PRIORITY;
@@ -1298,8 +1299,8 @@ thread_yield(void)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	// just add the thread at the end of the run queue
-	thread->next_priority = B_LOWEST_ACTIVE_PRIORITY;
+	// mark the thread as yielded, so it will not be scheduled next
+	thread->was_yielded = true;
 	scheduler_reschedule();
 
 	RELEASE_THREAD_LOCK();

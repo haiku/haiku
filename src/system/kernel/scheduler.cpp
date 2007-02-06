@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
  *
@@ -189,6 +189,13 @@ scheduler_reschedule(void)
 	} else {
 		// select next thread from the run queue
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+			if (oldThread == nextThread && nextThread->was_yielded) {
+				// ignore threads that called thread_yield() once
+				nextThread->was_yielded = false;
+				prevThread = nextThread;
+				nextThread = nextThread->queue_next;
+			}
+
 			// always extract real time threads
 			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 				break;
@@ -222,6 +229,7 @@ scheduler_reschedule(void)
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
+	oldThread->was_yielded = false;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	bigtime_t now = system_time();

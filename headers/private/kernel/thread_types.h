@@ -142,6 +142,7 @@ struct thread {
 	struct sigaction sig_action[32];
 
 	bool			in_kernel;
+	bool			was_yielded;
 
 	struct {
 		sem_id		blocking;
