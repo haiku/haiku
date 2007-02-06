@@ -14,7 +14,12 @@
 #include <algorithm>
 #include <string>
 
-#include <arpa/inet.h>
+// We use htonl(), which is defined in <ByteOrder.h> on BeOS R5.
+#ifdef HAIKU_HOST_PLATFORM_BEOS
+	#include <ByteOrder.h>
+#else
+	#include <arpa/inet.h>
+#endif
 
 
 using std::string;
