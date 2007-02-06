@@ -1254,6 +1254,8 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
+	WriteLocked locked(inode->Lock());
+
 	bool needsTrimming = inode->NeedsTrimming();
 
 	if ((cookie->open_mode & O_RWMASK) != 0
@@ -1261,7 +1263,6 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		&& (needsTrimming
 			|| inode->OldLastModified() != inode->LastModified()
 			|| inode->OldSize() != inode->Size())) {
-		ReadLocked locked(inode->Lock());
 
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
