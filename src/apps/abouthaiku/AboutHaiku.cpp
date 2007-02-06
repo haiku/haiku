@@ -448,7 +448,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("	- GNU C Library,\n");
 	fCreditsView->Insert("	- GNU coretools, diffutils, findutils, gawk, bison, m4, make,\n");
 	fCreditsView->Insert("	- Bourne Again Shell.\n");
-	fCreditsView->Insert("Copyright " B_UTF8_ELLIPSIS " The Free Software Foundation.\n");
+	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
 	fCreditsView->Insert("				www.gnu.org\n\n");
 
@@ -456,7 +456,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("FFMpeg libavcodec\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright " B_UTF8_ELLIPSIS " 2000-2007 Fabrice Bellard, et al.\n");
+	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
 	fCreditsView->Insert("				www.ffmpeg.org\n\n");
 
@@ -464,7 +464,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("AntiGrain Geometry\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright " B_UTF8_ELLIPSIS " 2002-2006 Maxim Shemanarev (McSeem).\n");
+	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
 	fCreditsView->Insert("				www.antigrain.com\n\n");
 
@@ -473,7 +473,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("PDFLib\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1997-2006 PDFlib GmbH and Thomas Merz. "
+		"Copyright " B_UTF8_COPYRIGHT " 1997-2006 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
 		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
@@ -483,7 +483,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("FreeType2\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Portions of this software are copyright " B_UTF8_ELLIPSIS " 1996-2006 The FreeType"
+	fCreditsView->Insert("Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 The FreeType"
 		" Project.  All rights reserved.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
 	fCreditsView->Insert("				www.freetype.org\n\n");
@@ -493,7 +493,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("Mesa\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1999-2006 Brian Paul. "
+		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Brian Paul. "
 		"Mesa3D project.  All rights reserved.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
 	fCreditsView->Insert("				www.mesa3d.org\n\n");
@@ -503,7 +503,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("GLU\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1991-2000 Silicon Graphics, Inc. "
+		"Copyright " B_UTF8_COPYRIGHT " 1991-2000 Silicon Graphics, Inc. "
 		"SGI's Software FreeB license.  All rights reserved.\n\n");
 
 	// GLUT implementation copyrights
@@ -511,17 +511,17 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("GLUT\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1994-1997 Mark Kilgard. "
+		"Copyright " B_UTF8_COPYRIGHT " 1994-1997 Mark Kilgard. "
 		"All rights reserved.\n"
-		"Copyright " B_UTF8_ELLIPSIS " 1997 Be Inc.\n"
-		"Copyright " B_UTF8_ELLIPSIS " 1999 Jake Hamby. \n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 1997 Be Inc.\n"
+		"Copyright " B_UTF8_COPYRIGHT " 1999 Jake Hamby. \n\n");
 
 	// Konatu font
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("Konatu font\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 2002- MASUDA mitiya.\n"
+		"Copyright " B_UTF8_COPYRIGHT " 2002- MASUDA mitiya.\n"
 		"MIT license. All rights reserved.\n\n");
 
 	// expat copyrights
@@ -529,36 +529,36 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("expat\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper.\n"
-		"Copyright " B_UTF8_ELLIPSIS " 2001, 2002, 2003 Expat maintainers.\n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper.\n"
+		"Copyright " B_UTF8_COPYRIGHT " 2001, 2002, 2003 Expat maintainers.\n\n");
 
 	// zlib copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("zlib\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1995-2004 Jean-loup Gailly and Mark Adler.\n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark Adler.\n\n");
 
 	// zip copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("Info-ZIP\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1990-2002 Info-ZIP. All rights reserved.\n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 1990-2002 Info-ZIP. All rights reserved.\n\n");
 
 	// bzip2 copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("bzip2\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " 1996-2005 Julian R Seward. All rights reserved.\n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights reserved.\n\n");
 
 	// VIM copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("Vi IMproved\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright " B_UTF8_ELLIPSIS " Bram Moolenaar et al.\n\n");
+		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.\n\n");
 
 }
 
