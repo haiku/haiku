@@ -10,3 +10,8 @@ KernelAddon vmware :
 	driver.c
 	device.c
 ;
+
+Package haiku-vmware-video-svn :
+	vmware : 
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-vmware-video-svn : graphics vmware ;

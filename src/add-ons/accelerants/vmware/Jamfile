@@ -18,3 +18,7 @@ Addon vmware.accelerant : accelerants :
 	SetDisplayMode.c
 	: false
 ;
+
+Package haiku-vmware-video-svn :
+	vmware.accelerant :
+	boot home config add-ons accelerants ;
