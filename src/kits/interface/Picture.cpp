@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,14 +9,14 @@
 //! BPicture records a series of drawing instructions that can be "replayed" later.
 
 
+#include <AppServerLink.h>
+#include <PicturePlayer.h>
+#include <ServerProtocol.h>
+
 #include <ByteOrder.h>
 #include <List.h>
 #include <Message.h>
 #include <Picture.h>
-
-#include <AppServerLink.h>
-#include <PicturePlayer.h>
-#include <ServerProtocol.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -262,59 +262,78 @@ BPicture::Play(void **callBackTable, int32 tableEntries, void *user)
 status_t
 BPicture::Flatten(BDataIO *stream)
 {
+	// TODO: what about endianess?
+
 	if (!assert_local_copy())
 		return B_ERROR;
 
 	const picture_header header = { 2, 0 };
-	status_t status = stream->Write(&header, sizeof(header));
-	if (status < B_OK)
-		return status;
+	ssize_t bytesWritten = stream->Write(&header, sizeof(header));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != (ssize_t)sizeof(header))
+		return B_IO_ERROR;
 
 	int32 count = extent->CountPictures();
-	if (count > 0) {
-		status = stream->Write(&count, sizeof(count));
+	bytesWritten = stream->Write(&count, sizeof(count));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != (ssize_t)sizeof(count))
+		return B_IO_ERROR;
+
+	for (int32 i = 0; i < count; i++) {
+		status_t status = extent->PictureAt(i)->Flatten(stream);
 		if (status < B_OK)
 			return status;
-	
-		for (int32 i = 0; i < extent->CountPictures(); i++) {
-			status = extent->PictureAt(i)->Flatten(stream);
-			if (status < B_OK)
-				return status;
-		}
 	}
 
 	int32 size = extent->Size();
-	status = stream->Write(&size, sizeof(size));
-	if (status == B_OK)
-		status = stream->Write(extent->Data(), extent->Size());
+	bytesWritten = stream->Write(&size, sizeof(size));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != (ssize_t)sizeof(size))
+		return B_IO_ERROR;
 
-	return status;
+	bytesWritten = stream->Write(extent->Data(), size);
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != size)
+		return B_IO_ERROR;
+
+	return B_OK;
 }
 
 
 status_t
 BPicture::Unflatten(BDataIO *stream)
 {
+	// TODO: clear current picture data?
+
 	picture_header header;
-	if (stream->Read(&header, sizeof(header)) < (ssize_t)sizeof(header)
+	ssize_t bytesRead = stream->Read(&header, sizeof(header));
+	if (bytesRead < B_OK)
+		return bytesRead;
+	if (bytesRead != (ssize_t)sizeof(header)
 		|| header.magic1 != 2 || header.magic2 != 0)
-		return B_ERROR;
+		return B_BAD_TYPE;
 
 	int32 count = 0;
-	status_t status = stream->Read(&count, sizeof(count));
-	if (status < B_OK)
-		return status;
+	bytesRead = stream->Read(&count, sizeof(count));
+	if (bytesRead < B_OK)
+		return bytesRead;
+	if (bytesRead != (ssize_t)sizeof(count))
+		return B_BAD_DATA;
 	
 	for (int32 i = 0; i < count; i++) {
-		BPicture *pic = new BPicture;
-		status = pic->Unflatten(stream);
+		BPicture* picture = new BPicture;
+		status_t status = picture->Unflatten(stream);
 		if (status < B_OK)
 			return status;
 
-		extent->AddPicture(pic);
+		extent->AddPicture(picture);
 	}
 
-	status = extent->ImportData(stream);
+	status_t status = extent->ImportData(stream);
 	if (status < B_OK)
 		return status;
 
