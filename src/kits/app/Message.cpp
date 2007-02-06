@@ -102,9 +102,6 @@ BMessage::BMessage(const BMessage &other)
 BMessage::~BMessage()
 {
 	DEBUG_FUNCTION_ENTER;
-	// TODO: Check why we don't do that in _Clear() and fix or comment it.
-	if (IsSourceWaiting())
-		SendReply(B_NO_REPLY);
 
 	_Clear();
 }
@@ -219,6 +216,12 @@ status_t
 BMessage::_Clear()
 {
 	DEBUG_FUNCTION_ENTER;
+	// We're going to destroy all information of this message. If there's
+	// still someone waiting for a reply to this message, we have to send
+	// one now.
+	if (IsSourceWaiting())
+		SendReply(B_NO_REPLY);
+
 	if (fClonedArea >= B_OK)
 		_Dereference();
 
