@@ -42,6 +42,9 @@ BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
 
+BuildPlatformMain <build>set_haiku_revision : set_haiku_revision.cpp
+	: $(HOST_LIBSTDC++) ;
+
 BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE) ;
