@@ -12,7 +12,7 @@ SimpleTest TestPictureApp :
 LinkAgainst TestPictureApp :
 	be
 	root
-	libprint.a
+	libprintutils.a
 	;
 
 SimpleTest DumpPrintJob :
@@ -22,7 +22,7 @@ SimpleTest DumpPrintJob :
 LinkAgainst DumpPrintJob :
 	be
 	root
-	libprint.a
+	libprintutils.a
 	;
 
 SimpleTest ShowPrintJob :
@@ -32,5 +32,5 @@ SimpleTest ShowPrintJob :
 LinkAgainst ShowPrintJob :
 	be
 	root
-	libprint.a
+	libprintutils.a
 	;
