@@ -394,8 +394,6 @@ frame_buffer_console_init(kernel_args *args)
 	if (sConsole.area < B_OK)
 		return sConsole.area;
 
-	mutex_init(&sConsole.lock, "console_lock");
-
 	int32 bytesPerRow = args->frame_buffer.width;
 	switch (args->frame_buffer.depth) {
 		case 1:
@@ -431,6 +429,8 @@ frame_buffer_console_init(kernel_args *args)
 status_t
 frame_buffer_console_init_post_modules(kernel_args *args)
 {
+	mutex_init(&sConsole.lock, "console_lock");
+
 	// TODO: enable MTRR in VESA mode!
 //	if (sConsole.frame_buffer == NULL)
 		return B_OK;
