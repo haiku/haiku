@@ -16,6 +16,8 @@
 #include <Window.h>
 
 
+static const uint32 kCurrentWorkspaceIndex = ~0;
+
 /*!	\brief Creates a BScreen object which represents the display with the given screen_id
 	\param id The screen_id of the screen to get.
 
@@ -233,7 +235,7 @@ rgb_color
 BScreen::DesktopColor()
 {
 	if (fScreen != NULL)
-		return fScreen->DesktopColor(~0);
+		return fScreen->DesktopColor(kCurrentWorkspaceIndex);
 
 	return rgb_color();
 }
@@ -261,7 +263,7 @@ void
 BScreen::SetDesktopColor(rgb_color rgb, bool stick)
 {
 	if (fScreen != NULL)
-		fScreen->SetDesktopColor(rgb, ~0, stick);
+		fScreen->SetDesktopColor(rgb, kCurrentWorkspaceIndex, stick);
 }
 
 
@@ -322,7 +324,7 @@ status_t
 BScreen::GetMode(display_mode *mode)
 {
 	if (fScreen != NULL)
-		return fScreen->GetMode(~0, mode);
+		return fScreen->GetMode(kCurrentWorkspaceIndex, mode);
 	return B_ERROR;
 }
 
@@ -350,7 +352,7 @@ status_t
 BScreen::SetMode(display_mode *mode, bool makeDefault)
 {
 	if (fScreen != NULL)
-		return fScreen->SetMode(~0, mode, makeDefault);
+		return fScreen->SetMode(kCurrentWorkspaceIndex, mode, makeDefault);
 	return B_ERROR;
 }
 
