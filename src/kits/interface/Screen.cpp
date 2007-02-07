@@ -168,7 +168,7 @@ BScreen::ColorForIndex(const uint8 index)
 }
 
 
-/*!	\brief Returns the "inversion" ov the given 8-bit color.
+/*!	\brief Returns the "inversion" of the given 8-bit color.
 	\param index An 8-bit color index.
 	\return An 8-bit color index that represents the "inversion" of the given color.
 */
@@ -233,7 +233,7 @@ rgb_color
 BScreen::DesktopColor()
 {
 	if (fScreen != NULL)
-		return fScreen->DesktopColor(B_ALL_WORKSPACES);
+		return fScreen->DesktopColor(~0);
 
 	return rgb_color();
 }
@@ -261,7 +261,7 @@ void
 BScreen::SetDesktopColor(rgb_color rgb, bool stick)
 {
 	if (fScreen != NULL)
-		fScreen->SetDesktopColor(rgb, B_ALL_WORKSPACES, stick);
+		fScreen->SetDesktopColor(rgb, ~0, stick);
 }
 
 
@@ -322,7 +322,7 @@ status_t
 BScreen::GetMode(display_mode *mode)
 {
 	if (fScreen != NULL)
-		return fScreen->GetMode(B_ALL_WORKSPACES, mode);
+		return fScreen->GetMode(~0, mode);
 	return B_ERROR;
 }
 
@@ -350,7 +350,7 @@ status_t
 BScreen::SetMode(display_mode *mode, bool makeDefault)
 {
 	if (fScreen != NULL)
-		return fScreen->SetMode(current_workspace(), mode, makeDefault);
+		return fScreen->SetMode(~0, mode, makeDefault);
 	return B_ERROR;
 }
 
