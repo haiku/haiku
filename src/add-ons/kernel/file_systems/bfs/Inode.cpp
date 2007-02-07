@@ -355,7 +355,7 @@ Inode::_RemoveIterator(AttributeIterator *iterator)
  */
 
 status_t
-Inode::MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node, const char *name,
+Inode::_MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node, const char *name,
 	int32 bytes)
 {
 	ASSERT(fSmallDataLock.IsLocked());
@@ -454,12 +454,11 @@ Inode::_RemoveSmallData(bfs_inode *node, small_data *item, int32 index)
 
 
 /**	Removes the given attribute from the small_data section.
- *	Note that you need to write back the inode yourself after having called
- *	that method.
  */
 
 status_t
-Inode::RemoveSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char *name)
+Inode::_RemoveSmallData(Transaction &transaction, NodeGetter &nodeGetter,
+	const char *name)
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
@@ -480,16 +479,20 @@ Inode::RemoveSmallData(Transaction &transaction, NodeGetter &nodeGetter, const c
 		return B_ENTRY_NOT_FOUND;
 
 	nodeGetter.MakeWritable(transaction);
-	return _RemoveSmallData(node, item, index);
+	status_t status = _RemoveSmallData(node, item, index);
+	if (status == B_OK)
+		status = WriteBack(transaction);
+
+	return status;
 }
 
 
 /**	Try to place the given attribute in the small_data section - if the
  *	new attribute is too big to fit in that section, it returns B_DEVICE_FULL.
  *	In that case, the attribute should be written to a real attribute file;
- *	if the attribute was already part of the small_data section, but the new
- *	one wouldn't fit, the old one is automatically removed from the small_data
- *	section.
+ *	it's the caller's responsibility to remove any existing attributes in the small
+ *	data section if that's the case.
+ *
  *	Note that you need to write back the inode yourself after having called that
  *	method - it's a bad API decision that it needs a transaction but enforces you
  *	to write back the inode all by yourself, but it's just more efficient in most
@@ -497,8 +500,8 @@ Inode::RemoveSmallData(Transaction &transaction, NodeGetter &nodeGetter, const c
  */
 
 status_t
-Inode::AddSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char *name,
-	uint32 type, const uint8 *data, size_t length, bool force)
+Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
+	const char *name, uint32 type, const uint8 *data, size_t length, bool force)
 {
 	bfs_inode *node = nodeGetter.WritableNode();
 
@@ -542,7 +545,7 @@ Inode::AddSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char
 				uint32 needed = length - item->DataSize() -
 						(uint32)((uint8 *)node + fVolume->InodeSize() - (uint8 *)last);
 
-				if (MakeSpaceForSmallData(transaction, node, name, needed) < B_OK)
+				if (_MakeSpaceForSmallData(transaction, node, name, needed) < B_OK)
 					return B_ERROR;
 
 				// reset our pointers
@@ -582,11 +585,6 @@ Inode::AddSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char
 			return B_OK;
 		}
 
-		// Could not replace the old attribute, so remove it to let
-		// let the calling function create an attribute file for it
-		if (_RemoveSmallData(node, item, index) < B_OK)
-			return B_ERROR;
-
 		return B_DEVICE_FULL;
 	}
 
@@ -598,7 +596,7 @@ Inode::AddSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char
 			return B_DEVICE_FULL;
 
 		// make room for the new attribute
-		if (MakeSpaceForSmallData(transaction, node, name, spaceNeeded) < B_OK)
+		if (_MakeSpaceForSmallData(transaction, node, name, spaceNeeded) < B_OK)
 			return B_ERROR;
 
 		// get new last item!
@@ -644,7 +642,7 @@ Inode::AddSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char
  */
 
 status_t
-Inode::GetNextSmallData(bfs_inode *node, small_data **_smallData) const
+Inode::_GetNextSmallData(bfs_inode *node, small_data **_smallData) const
 {
 	if (node == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -680,7 +678,7 @@ Inode::FindSmallData(const bfs_inode *node, const char *name) const
 	ASSERT(fSmallDataLock.IsLocked());
 
 	small_data *smallData = NULL;
-	while (GetNextSmallData(const_cast<bfs_inode *>(node), &smallData) == B_OK) {
+	while (_GetNextSmallData(const_cast<bfs_inode *>(node), &smallData) == B_OK) {
 		if (!strcmp(smallData->Name(), name))
 			return smallData;
 	}
@@ -699,7 +697,7 @@ Inode::Name(const bfs_inode *node) const
 	ASSERT(fSmallDataLock.IsLocked());
 
 	small_data *smallData = NULL;
-	while (GetNextSmallData((bfs_inode *)node, &smallData) == B_OK) {
+	while (_GetNextSmallData((bfs_inode *)node, &smallData) == B_OK) {
 		if (*smallData->Name() == FILE_NAME_NAME
 			&& smallData->NameSize() == FILE_NAME_NAME_LENGTH)
 			return (const char *)smallData->Data();
@@ -743,8 +741,55 @@ Inode::SetName(Transaction &transaction, const char *name)
 	NodeGetter node(fVolume, transaction, this);
 	const char nameTag[2] = {FILE_NAME_NAME, 0};
 
-	return AddSmallData(transaction, node, nameTag, FILE_NAME_TYPE,
+	return _AddSmallData(transaction, node, nameTag, FILE_NAME_TYPE,
 		(uint8 *)name, strlen(name), true);
+}
+
+
+status_t
+Inode::_RemoveAttribute(Transaction &transaction, const char *name,
+	bool hasIndex, Index *index)
+{
+	// remove the attribute file if it exists
+	Vnode vnode(fVolume, Attributes());
+	Inode *attributes;
+	status_t status = vnode.Get(&attributes);
+	if (status < B_OK)
+		return status;
+
+	// update index
+	if (index != NULL) {
+		Inode *attribute;
+		if ((hasIndex || fVolume->CheckForLiveQuery(name))
+			&& GetAttribute(name, &attribute) == B_OK) {
+			uint8 data[BPLUSTREE_MAX_KEY_LENGTH];
+			size_t length = BPLUSTREE_MAX_KEY_LENGTH;
+			if (attribute->ReadAt(0, data, &length) == B_OK) {
+				index->Update(transaction, name, attribute->Type(), data,
+					length, NULL, 0, this);
+			}
+
+			ReleaseAttribute(attribute);
+		}
+	}
+
+	if ((status = attributes->Remove(transaction, name)) < B_OK)
+		return status;
+
+	if (attributes->IsEmpty()) {
+		// remove attribute directory (don't fail if that can't be done)
+		if (remove_vnode(fVolume->ID(), attributes->ID()) == B_OK) {
+			// update the inode, so that no one will ever doubt it's deleted :-)
+			attributes->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DELETED);
+			if (attributes->WriteBack(transaction) == B_OK) {
+				Attributes().SetTo(0, 0, 0);
+				WriteBack(transaction);
+			} else
+				unremove_vnode(fVolume->ID(), attributes->ID());
+		}
+	}
+
+	return status;
 }
 
 
@@ -838,9 +883,17 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 		// if the attribute doesn't exist yet (as a file), try to put it in the
 		// small_data section first - if that fails (due to insufficent space),
 		// create a real attribute file
-		status = AddSmallData(transaction, node, name, type, buffer, *_length);
+		status = _AddSmallData(transaction, node, name, type, buffer, *_length);
 		if (status == B_DEVICE_FULL) {
-			status = CreateAttribute(transaction, name, type, &attribute);
+			if (smallData != NULL) {
+				// remove the old attribute from the small data section - there
+				// is no space left for the new data
+				status = _RemoveSmallData(transaction, node, name);
+			} else
+				status = B_OK;
+
+			if (status == B_OK)
+				status = CreateAttribute(transaction, name, type, &attribute);
 			if (status < B_OK)
 				RETURN_ERROR(status);
 		} else if (status == B_OK)
@@ -855,15 +908,23 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
 			}
-			// ToDo: check if the data fits in the inode now and delete the attribute file if so
-			status = attribute->WriteAt(transaction, pos, buffer, _length);
-			if (status == B_OK) {
-				// The attribute type might have been changed - we need to adopt
-				// the new one - the attribute's inode will be written back on close
-				attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
-			}
 
-			attribute->Lock().UnlockWrite();
+			// check if the data fits into the small_data section again
+			NodeGetter node(fVolume, transaction, this);
+			status = _AddSmallData(transaction, node, name, type, buffer, *_length);
+			if (status == B_OK) {
+				// it does - remove its file
+				status = _RemoveAttribute(transaction, name, false, NULL);
+			} else {
+				status = attribute->WriteAt(transaction, pos, buffer, _length);
+				if (status == B_OK) {
+					// The attribute type might have been changed - we need to adopt
+					// the new one - the attribute's inode will be written back on close
+					attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
+				}
+
+				attribute->Lock().UnlockWrite();
+			}
 		} else
 			status = B_ERROR;
 
@@ -914,43 +975,10 @@ Inode::RemoveAttribute(Transaction &transaction, const char *name)
 		fSmallDataLock.Unlock();
 	}
 
-	status_t status = RemoveSmallData(transaction, node, name);
-	if (status == B_OK) {
-		WriteBack(transaction);
-	} else if (status == B_ENTRY_NOT_FOUND && !Attributes().IsZero()) {
+	status_t status = _RemoveSmallData(transaction, node, name);
+	if (status == B_ENTRY_NOT_FOUND && !Attributes().IsZero()) {
 		// remove the attribute file if it exists
-		Vnode vnode(fVolume, Attributes());
-		Inode *attributes;
-		if ((status = vnode.Get(&attributes)) < B_OK)
-			return status;
-
-		// update index
-		Inode *attribute;
-		if ((hasIndex || fVolume->CheckForLiveQuery(name))
-			&& GetAttribute(name, &attribute) == B_OK) {
-			uint8 data[BPLUSTREE_MAX_KEY_LENGTH];
-			size_t length = BPLUSTREE_MAX_KEY_LENGTH;
-			if (attribute->ReadAt(0, data, &length) == B_OK)
-				index.Update(transaction, name, attribute->Type(), data, length, NULL, 0, this);
-
-			ReleaseAttribute(attribute);
-		}
-
-		if ((status = attributes->Remove(transaction, name)) < B_OK)
-			return status;
-
-		if (attributes->IsEmpty()) {
-			// remove attribute directory (don't fail if that can't be done)
-			if (remove_vnode(fVolume->ID(), attributes->ID()) == B_OK) {
-				// update the inode, so that no one will ever doubt it's deleted :-)
-				attributes->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DELETED);
-				if (attributes->WriteBack(transaction) == B_OK) {
-					Attributes().SetTo(0, 0, 0);
-					WriteBack(transaction);
-				} else
-					unremove_vnode(fVolume->ID(), attributes->ID());
-			}
-		}
+		status = _RemoveAttribute(transaction, name, hasIndex, &index);
 	}
 	return status;
 }

@@ -1,5 +1,4 @@
-/* Inode - inode access functions
- *
+/*
  * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -31,6 +30,7 @@
 class BPlusTree;
 class TreeIterator;
 class AttributeIterator;
+class Index;
 class InodeAllocator;
 class NodeGetter;
 
@@ -94,11 +94,6 @@ class Inode {
 		status_t CheckPermissions(int accessMode) const;
 
 		// small_data access methods
-		status_t MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node, const char *name, int32 length);
-		status_t RemoveSmallData(Transaction &transaction, NodeGetter &node, const char *name);
-		status_t AddSmallData(Transaction &transaction, NodeGetter &node, const char *name, uint32 type,
-					const uint8 *data, size_t length, bool force = false);
-		status_t GetNextSmallData(bfs_inode *node, small_data **_smallData) const;
 		small_data *FindSmallData(const bfs_inode *node, const char *name) const;
 		const char *Name(const bfs_inode *node) const;
 		status_t GetName(char *buffer, size_t bufferSize = B_FILE_NAME_LENGTH) const;
@@ -159,7 +154,18 @@ class Inode {
 		friend class AttributeIterator;
 		friend class InodeAllocator;
 
+		// small_data access methods
+		status_t _MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
+					const char *name, int32 length);
+		status_t _RemoveSmallData(Transaction &transaction, NodeGetter &node,
+					const char *name);
+		status_t _AddSmallData(Transaction &transaction, NodeGetter &node,
+					const char *name, uint32 type, const uint8 *data, size_t length,
+					bool force = false);
+		status_t _GetNextSmallData(bfs_inode *node, small_data **_smallData) const;
 		status_t _RemoveSmallData(bfs_inode *node, small_data *item, int32 index);
+		status_t _RemoveAttribute(Transaction &transaction, const char *name,
+					bool hasIndex, Index *index);
 
 		void _AddIterator(AttributeIterator *iterator);
 		void _RemoveIterator(AttributeIterator *iterator);
