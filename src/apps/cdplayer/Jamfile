@@ -8,9 +8,10 @@ Application CDPlayer :
 	CDPlayer.cpp
 	DoubleShotDrawButton.cpp
 	DrawButton.cpp
+	DrawingTidbits.cpp
 	PlayList.cpp
-	TrackMenu.cpp
 	TwoStateDrawButton.cpp
+	VolumeSlider.cpp
 
 	: be $(SELECT_UNAME_ETC_LIB) $(NETAPI_LIB) translation textencoding 
 	: CDPlayer.rdef

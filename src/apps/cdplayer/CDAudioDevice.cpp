@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2006-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #include "CDAudioDevice.h"
 
 #include <unistd.h>
@@ -12,13 +19,15 @@
 #include <errno.h>
 #include "scsi.h"
 
+
 cdaudio_data::cdaudio_data(const int32 &id, const int32 &count, 
-			const int32 &disclength)
+							const int32 &disclength)
  :	disc_id(id),
  	track_count(count),
  	length(disclength)
 {
 }
+
 
 cdaudio_data::cdaudio_data(const cdaudio_data &from)
  :	disc_id(from.disc_id),
@@ -26,6 +35,7 @@ cdaudio_data::cdaudio_data(const cdaudio_data &from)
  	length(from.length)
 {
 }
+
 
 cdaudio_data &
 cdaudio_data::operator=(const cdaudio_data &from)
@@ -37,17 +47,20 @@ cdaudio_data::operator=(const cdaudio_data &from)
 	return *this;
 }
 
+
 cdaudio_time::cdaudio_time(const int32 min,const int32 &sec)
  :	minutes(min),
  	seconds(sec)
 {
 }
 
+
 cdaudio_time::cdaudio_time(const cdaudio_time &from)
  :	minutes(from.minutes),
  	seconds(from.seconds)
 {
 }
+
 
 cdaudio_time &
 cdaudio_time::operator=(const cdaudio_time &from)
@@ -57,6 +70,7 @@ cdaudio_time::operator=(const cdaudio_time &from)
 	return *this;
 }
 
+
 cdaudio_time
 cdaudio_time::operator+(const cdaudio_time &from)
 {
@@ -65,13 +79,13 @@ cdaudio_time::operator+(const cdaudio_time &from)
 	time.minutes = minutes + from.minutes;
 	time.seconds = seconds + from.seconds;
 	
-	while(time.seconds > 59)
-	{
+	while (time.seconds > 59) {
 		time.minutes++;
 		time.seconds-=60;
 	}
 	return time;
 }
+
 
 cdaudio_time
 cdaudio_time::operator-(const cdaudio_time &from)
@@ -79,8 +93,7 @@ cdaudio_time::operator-(const cdaudio_time &from)
 	cdaudio_time time;
 	
 	int32 tsec = ((minutes * 60) + seconds) - ((from.minutes * 60) + from.seconds);
-	if(tsec<0)
-	{
+	if (tsec < 0) {
 		time.minutes = 0;
 		time.seconds = 0;
 		return time;
@@ -92,16 +105,18 @@ cdaudio_time::operator-(const cdaudio_time &from)
 	return time;
 }
 
+
 CDAudioDevice::CDAudioDevice(void)
 {
 	FindDrives("/dev/disk");
-	if(CountDrives()>0)
+	if (CountDrives() > 0)
 		SetDrive(0);
 }
 
+
 CDAudioDevice::~CDAudioDevice(void)
 {
-	for(int32 i=0; i<fDriveList.CountItems(); i++)
+	for (int32 i = 0; i < fDriveList.CountItems(); i++)
 		delete (BString*) fDriveList.ItemAt(i);
 }
 
@@ -110,8 +125,7 @@ CDAudioDevice::~CDAudioDevice(void)
 bool
 CDAudioDevice::Play(const int16 &track)
 {
-	if(GetState() == kNoCD) 
-	{
+	if (GetState() == kNoCD) {
 		// no CD available, bail out
 		ioctl(fFileHandle, B_LOAD_MEDIA, 0, 0);
 		return false;
@@ -125,8 +139,7 @@ CDAudioDevice::Play(const int16 &track)
 	playtrack.end_index = 1;
 
 	status_t result = ioctl(fFileHandle, B_SCSI_PLAY_TRACK, &playtrack);
-	if (result != B_OK) 
-	{
+	if (result != B_OK) {
 		printf("Couldn't play track: %s\n", strerror(errno));
 		return false;
 	}
@@ -134,52 +147,52 @@ CDAudioDevice::Play(const int16 &track)
 	return true;
 }
 
+
 bool
 CDAudioDevice::Pause(void)
 {
 	status_t result = ioctl(fFileHandle, B_SCSI_PAUSE_AUDIO);
-	if (result != B_OK) 
-	{
+	if (result != B_OK) {
 		printf("Couldn't pause track: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
 
+
 bool
 CDAudioDevice::Resume(void)
 {
 	CDState state = GetState();
-	if(state == kNoCD) 
-	{
+	if (state == kNoCD) {
 		// no CD available, bail out
 		ioctl(fFileHandle, B_LOAD_MEDIA, 0, 0);
 		return false;
+	} else {
+		if (state == kStopped)
+			return Play(0);
 	}
-	else
-	if(state == kStopped)
-		return Play(0);
 	
 	status_t result = ioctl(fFileHandle, B_SCSI_RESUME_AUDIO);
-	if (result != B_OK) 
-	{
+	if (result != B_OK) {
 		printf("Couldn't resume track: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
 
+
 bool
 CDAudioDevice::Stop(void)
 {
 	status_t result = ioctl(fFileHandle, B_SCSI_STOP_AUDIO);
-	if (result != B_OK) 
-	{
+	if (result != B_OK) {
 		printf("Couldn't stop CD: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 // open or close the CD tray
 bool
@@ -195,13 +208,13 @@ CDAudioDevice::Eject(void)
 							media_status == B_DEV_DOOR_OPEN ? 
 											B_LOAD_MEDIA : B_EJECT_DEVICE);
 	
-	if (result != B_OK) 
-	{
+	if (result != B_OK) {
 		printf("Couldn't eject CD: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 bool
 CDAudioDevice::StartFastFwd(void)
@@ -210,13 +223,13 @@ CDAudioDevice::StartFastFwd(void)
 	scan.direction = 1;
 	scan.speed = 1;
 	status_t result = ioctl(fFileHandle, B_SCSI_SCAN, &scan);
-	if (result != B_OK)
-	{
+	if (result != B_OK)	{
 		printf("Couldn't fast forward: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 bool
 CDAudioDevice::StopFastFwd(void)
@@ -225,13 +238,13 @@ CDAudioDevice::StopFastFwd(void)
 	scan.direction = 0;
 	scan.speed = 1;
 	status_t result = ioctl(fFileHandle, B_SCSI_SCAN, &scan);
-	if (result != B_OK)
-	{
+	if (result != B_OK)	{
 		printf("Couldn't stop fast forwarding: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 bool
 CDAudioDevice::StartRewind(void)
@@ -240,13 +253,13 @@ CDAudioDevice::StartRewind(void)
 	scan.direction = -1;
 	scan.speed = 1;
 	status_t result = ioctl(fFileHandle, B_SCSI_SCAN, &scan);
-	if (result != B_OK)
-	{
+	if (result != B_OK)	{
 		printf("Couldn't rewind: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 bool
 CDAudioDevice::StopRewind(void)
@@ -255,13 +268,13 @@ CDAudioDevice::StopRewind(void)
 	scan.direction = 0;
 	scan.speed = 1;
 	status_t result = ioctl(fFileHandle, B_SCSI_SCAN, &scan);
-	if (result != B_OK)
-	{
+	if (result != B_OK)	{
 		printf("Couldn't stop rewinding: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 bool
 CDAudioDevice::SetVolume(uint8 value)
@@ -273,13 +286,13 @@ CDAudioDevice::SetVolume(uint8 value)
 	vol.port0_volume=value;
 	
 	status_t result = ioctl(fFileHandle,B_SCSI_SET_VOLUME,&vol);
-	if (result != B_OK)
-	{
+	if (result != B_OK)	{
 		printf("Couldn't set volume: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
 }
+
 
 uint8
 CDAudioDevice::GetVolume(void)
@@ -288,6 +301,7 @@ CDAudioDevice::GetVolume(void)
 	ioctl(fFileHandle, B_SCSI_GET_VOLUME, &vol);
 	return vol.port0_volume;
 }
+
 
 // check the current CD play state
 CDState
@@ -303,16 +317,15 @@ CDAudioDevice::GetState(void)
 	status_t result = ioctl(fFileHandle, B_SCSI_GET_POSITION, &pos);
 	if (result != B_OK)
 		return kNoCD;
-	else
-	if ((!pos.position[1]) || (pos.position[1] >= 0x13) ||
-	   ((pos.position[1] == 0x12) && (!pos.position[6])))
+	else if ((!pos.position[1]) || (pos.position[1] >= 0x13) ||
+		   ((pos.position[1] == 0x12) && (!pos.position[6])))
 		return kStopped;
-	else
-	if (pos.position[1] == 0x11)
+	else if (pos.position[1] == 0x11)
 		return kPlaying;
 	else
 		return kPaused;
 }
+
 
 int16
 CDAudioDevice::CountTracks(void)
@@ -325,6 +338,7 @@ CDAudioDevice::CountTracks(void)
 	
 	return toc.toc_data[3];
 }
+
 
 // Get the 0-based index of the current track
 int16
@@ -349,23 +363,24 @@ CDAudioDevice::GetTrack(void)
 		return pos.position[6];
 }
 
+
 uint8
 CDAudioDevice::CountDrives(void)
 {
 	return fDriveList.CountItems();
 }
 
+
 bool
 CDAudioDevice::SetDrive(const int32 &drive)
 {
 	BString *path = (BString*) fDriveList.ItemAt(drive);
 	
-	if(!path)
+	if (!path)
 		return false;
 	
 	int device = open(path->String(), O_RDONLY);
-	if(device >= 0)
-	{
+	if (device >= 0) {
 		fFileHandle = device;
 		fDrivePath = path;
 		fDriveIndex = drive;
@@ -375,45 +390,46 @@ CDAudioDevice::SetDrive(const int32 &drive)
 	return false;
 }
 
+
 const char *
 CDAudioDevice::GetDrivePath(void) const
 {
-	if(!fDrivePath)
+	if (!fDrivePath)
 		return NULL;
 	
 	return fDrivePath->String();
 }
 
-int32 CDAudioDevice::FindDrives(const char *path)
+
+int32
+CDAudioDevice::FindDrives(const char *path)
 {
 	BDirectory dir(path);
 	
-	if(dir.InitCheck() != B_OK)
+	if (dir.InitCheck() != B_OK)
 		return B_ERROR; 
 
 	dir.Rewind();
 	
 	BEntry entry; 
-	while(dir.GetNextEntry(&entry) >= 0)
-	{
+	while (dir.GetNextEntry(&entry) >= 0) {
 		BPath path;
 		const char *name;
 		entry_ref e;
 		
-		if(entry.GetPath(&path) != B_OK)
+		if (entry.GetPath(&path) != B_OK)
 			continue;
 		
 		name = path.Path();
-		if(entry.GetRef(&e) != B_OK)
+		if (entry.GetRef(&e) != B_OK)
 			continue;
 		
-		if(entry.IsDirectory())
-		{
+		if (entry.IsDirectory()) {
 			// ignore floppy -- it is not silent
-			if(strcmp(e.name, "floppy") == 0)
+			if (strcmp(e.name, "floppy") == 0)
 				continue;
 			else
-			if(strcmp(e.name, "ata") == 0)
+			if (strcmp(e.name, "ata") == 0)
 				continue;
 			
 			// Note that if we check for the count here, we could
@@ -421,23 +437,20 @@ int32 CDAudioDevice::FindDrives(const char *path)
 			// that are available, so we keep searching even if we've found one
 			FindDrives(name);
 			
-		} 
-		else 
-		{
+		} else {
 			int devfd;
 			device_geometry g;
 			
 			// ignore partitions
-			if(strcmp(e.name, "raw") != 0)
+			if (strcmp(e.name, "raw") != 0)
 				continue;
 			
 			devfd = open(name, O_RDONLY);
-			if(devfd < 0)
+			if (devfd < 0)
 				continue;
 			
-			if(ioctl(devfd, B_GET_GEOMETRY, &g, sizeof(g)) >= 0)
-			{
-				if(g.device_type == B_CD)
+			if (ioctl(devfd, B_GET_GEOMETRY, &g, sizeof(g)) >= 0) {
+				if (g.device_type == B_CD)
 					fDriveList.AddItem(new BString(name));
 			}
 			close(devfd);
@@ -445,6 +458,7 @@ int32 CDAudioDevice::FindDrives(const char *path)
 	}
 	return fDriveList.CountItems();
 }
+
 
 bool
 CDAudioDevice::GetTime(cdaudio_time &track, cdaudio_time &disc)
@@ -463,8 +477,7 @@ CDAudioDevice::GetTime(cdaudio_time &track, cdaudio_time &disc)
 		return false;
 	
 	if ((!pos.position[1]) || (pos.position[1] >= 0x13) ||
-		((pos.position[1] == 0x12) && (!pos.position[6])))
-	{
+		((pos.position[1] == 0x12) && (!pos.position[6]))) {
 		// This indicates that we have a CD, but we are stopped.
 		return false;
 	}
@@ -475,6 +488,7 @@ CDAudioDevice::GetTime(cdaudio_time &track, cdaudio_time &disc)
 	track.seconds = pos.position[14];
 	return true;
 }
+
 
 bool
 CDAudioDevice::GetTimeForTrack(const int16 &index, cdaudio_time &track)
@@ -487,7 +501,7 @@ CDAudioDevice::GetTimeForTrack(const int16 &index, cdaudio_time &track)
 	
 	int16 trackcount = toc.toc_data[3] - toc.toc_data[2] + 1;
 	
-	if(index < 1 || index > trackcount)
+	if (index < 1 || index > trackcount)
 		return false;
 	
 	TrackDescriptor *desc = (TrackDescriptor*)&(toc.toc_data[4]);
@@ -500,6 +514,7 @@ CDAudioDevice::GetTimeForTrack(const int16 &index, cdaudio_time &track)
 	
 	return true;
 }
+
 
 bool
 CDAudioDevice::GetTimeForDisc(cdaudio_time &disc)
@@ -519,12 +534,13 @@ CDAudioDevice::GetTimeForDisc(cdaudio_time &disc)
 	return true;
 }
 
-struct ConvertedToc 
-{
+
+struct ConvertedToc {
 	int32 min;
 	int32 sec;
 	int32 frame;
 };
+
 
 static int32
 cddb_sum(int n)
@@ -537,6 +553,7 @@ cddb_sum(int n)
 		ret += (*p - '0');
 	return ret;
 }
+
 
 int32
 CDAudioDevice::GetDiscID(void)
@@ -555,8 +572,7 @@ CDAudioDevice::GetDiscID(void)
 	ConvertedToc tocData[100];
 
 	// figure out the disc ID
-	for (int index = 0; index < 100; index++) 
-	{
+	for (int index = 0; index < 100; index++) {
 		tocData[index].min = toc.toc_data[9 + 8*index];
 		tocData[index].sec = toc.toc_data[10 + 8*index];
 		tocData[index].frame = toc.toc_data[11 + 8*index];
@@ -565,8 +581,7 @@ CDAudioDevice::GetDiscID(void)
 	
 	int32 sum1 = 0;
 	int32 sum2 = 0;
-	for (int index = 0; index < numTracks; index++) 
-	{
+	for (int index = 0; index < numTracks; index++) {
 		sum1 += cddb_sum((tocData[index].min * 60) + tocData[index].sec);
 		
 		// the following is probably running over too far
@@ -578,7 +593,9 @@ CDAudioDevice::GetDiscID(void)
 	return id;
 }
 
-bool CDAudioDevice::IsDataTrack(const int16 &track)
+
+bool
+CDAudioDevice::IsDataTrack(const int16 &track)
 {
 	scsi_toc toc;
 	status_t result = ioctl(fFileHandle, B_SCSI_GET_TOC, &toc);
@@ -587,12 +604,12 @@ bool CDAudioDevice::IsDataTrack(const int16 &track)
 		return false;
 	
 	TrackDescriptor *trackindex = (TrackDescriptor*) &(toc.toc_data[4]);
-	if(track>toc.toc_data[3])
+	if (track > toc.toc_data[3])
 		return false;
 	
 	// At least under R5, the SCSI CD drive has each legitimate audio track
 	// have a value of 0x10. Data tracks have a value of 0x14;
-	if(trackindex[track].adr_control & 4)
+	if (trackindex[track].adr_control & 4)
 		return true;
 	
 	return false;

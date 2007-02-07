@@ -12,14 +12,13 @@
 #include <Window.h>
 #include <View.h>
 #include <Button.h>
-#include <Slider.h>
 #include <TextControl.h>
 #include <StringView.h>
 
-#include "TrackMenu.h"
 #include "CDAudioDevice.h"
 #include "CDDBSupport.h"
 #include "PlayList.h"
+#include "VolumeSlider.h"
 
 class DrawButton;
 class DoubleShotDrawButton;
@@ -38,7 +37,6 @@ public:
 	
 	virtual	void		AttachedToWindow();	
 	virtual void 		Pulse();
-	virtual	void 		FrameResized(float new_width, float new_height);
 	virtual void	 	MessageReceived(BMessage *);
 
 private:
@@ -47,8 +45,7 @@ private:
 			DrawButton			*fStop,
 								*fNextTrack,
 								*fPrevTrack,
-								*fEject,
-								*fSave;
+								*fEject;
 								
 			DoubleShotDrawButton
 								*fFastFwd,
@@ -58,7 +55,7 @@ private:
 								*fRepeat,
 								*fPlay;
 			
-			BSlider				*fVolumeSlider;
+			VolumeSlider		*fVolumeSlider;
 			
 			BStringView			*fCDTitle,
 								*fCurrentTrack,
@@ -68,8 +65,6 @@ private:
 			BBox				*fCDBox,
 								*fTrackBox,
 								*fTimeBox;
-								
-			TrackMenu			*fTrackMenu;
 			
 			CDState				fCDState;
 			

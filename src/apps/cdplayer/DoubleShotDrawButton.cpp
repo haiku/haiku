@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2006-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #include "DoubleShotDrawButton.h"
 #include <stdio.h>
 
@@ -11,6 +18,7 @@ DoubleShotDrawButton::DoubleShotDrawButton(BRect frame, const char *name, BBitma
 	: DrawButton(frame, name, up,down, msg, resize, flags)
 {
 }
+
 
 void
 DoubleShotDrawButton::MouseDown(BPoint point)

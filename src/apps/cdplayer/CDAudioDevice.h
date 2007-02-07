@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2006-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #ifndef CDAUDIODEVICE_H
 #define CDAUDIODEVICE_H
 
@@ -9,8 +16,7 @@
 // descriptors, which are each 8 bytes. We don't really need the first 5 bytes
 // of the track descriptor, so we'll just ignore them. All we really want is the
 // length of each track, which happen to be the last 3 bytes of the descriptor.
-typedef struct
-{
+typedef struct {
 	uint8	reserved;
 	uint8	adr_control;	// bytes 0-3 are control, 4-7 are ADR
 	uint8	track_number;
@@ -20,7 +26,7 @@ typedef struct
 	uint8	min;
 	uint8	sec;
 	uint8	frame;
-}TrackDescriptor;
+} TrackDescriptor;
 
 enum CDState {
 	kNoCD=0,
@@ -35,27 +41,27 @@ enum CDState {
 class cdaudio_time
 {
 public:
-	cdaudio_time(const int32 min=-1,const int32 &sec=-1);
-	cdaudio_time(const cdaudio_time &from);
-	cdaudio_time &operator=(const cdaudio_time &from);
-	cdaudio_time operator+(const cdaudio_time &from);
-	cdaudio_time operator-(const cdaudio_time &from);
+			cdaudio_time(const int32 min=-1,const int32 &sec=-1);
+			cdaudio_time(const cdaudio_time &from);
+			cdaudio_time &operator=(const cdaudio_time &from);
+			cdaudio_time operator+(const cdaudio_time &from);
+			cdaudio_time operator-(const cdaudio_time &from);
 	
-	int32 minutes;
-	int32 seconds;
+	int32	minutes;
+	int32	seconds;
 };
 
 class cdaudio_data
 {
 public:
-	cdaudio_data(const int32 &id=-1, const int32 &count=-1, 
-				const int32 &disclength=-1);
-	cdaudio_data(const cdaudio_data &from);
-	cdaudio_data &operator=(const cdaudio_data &from);
+			cdaudio_data(const int32 &id = -1, const int32 &count = -1, 
+						const int32 &disclength = -1);
+			cdaudio_data(const cdaudio_data &from);
+			cdaudio_data &operator=(const cdaudio_data &from);
 	
-	int32 disc_id;
-	int32 track_count;
-	int32 length;
+	int32	disc_id;
+	int32	track_count;
+	int32	length;
 	
 	BString frame_offsets;
 };

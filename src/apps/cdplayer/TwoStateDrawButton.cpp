@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2006-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #include "TwoStateDrawButton.h"
 
 TwoStateDrawButton::TwoStateDrawButton(BRect frame, const char *name, BBitmap *upone, 
 										BBitmap *downone, BBitmap *uptwo, 
 										BBitmap *downtwo, BMessage *msg, 
 										const int32 &resize, const int32 &flags)
- : BButton(frame, name, "", msg, resize, flags),
+ :	BButton(frame, name, "", msg, resize, flags),
  	fUpOne(upone),
 	fDownOne(downone),
 	fUpTwo(uptwo),
@@ -14,8 +21,9 @@ TwoStateDrawButton::TwoStateDrawButton(BRect frame, const char *name, BBitmap *u
 	fButtonState(true)
 
 {
-	fButtonState=false;
+	fButtonState = false;
 }
+
 
 TwoStateDrawButton::~TwoStateDrawButton(void)
 {
@@ -26,6 +34,7 @@ TwoStateDrawButton::~TwoStateDrawButton(void)
 	delete fDisabledOne;
 	delete fDisabledTwo;
 }
+
 
 void
 TwoStateDrawButton::ResizeToPreferred(void)
@@ -49,9 +58,10 @@ TwoStateDrawButton::ResizeToPreferred(void)
 		ResizeTo(fDisabledTwo->Bounds().Width(),fDisabledTwo->Bounds().Height());
 }
 
+
 void
 TwoStateDrawButton::SetBitmaps(BBitmap *upone, BBitmap *downone, BBitmap *uptwo, 
-									BBitmap *downtwo)
+								BBitmap *downtwo)
 {	
 	delete fUpOne;
 	delete fDownOne;
@@ -64,7 +74,26 @@ TwoStateDrawButton::SetBitmaps(BBitmap *upone, BBitmap *downone, BBitmap *uptwo,
 	fDownTwo = downtwo;
 }
 
-void TwoStateDrawButton::SetDisabled(BBitmap *disabledone, BBitmap *disabledtwo)
+
+void
+TwoStateDrawButton::SetBitmaps(const int32 state, BBitmap *up, BBitmap *down)
+{
+	if (state == 0) {
+		delete fUpOne;
+		delete fDownOne;
+		fUpOne = up;
+		fDownOne = down;
+	} else {
+		delete fUpTwo;
+		delete fDownTwo;
+		fUpTwo = up;
+		fDownTwo = down;
+	}
+}
+
+
+void
+TwoStateDrawButton::SetDisabled(BBitmap *disabledone, BBitmap *disabledtwo)
 {
 	delete fDisabledOne;
 	delete fDisabledTwo;
@@ -73,32 +102,31 @@ void TwoStateDrawButton::SetDisabled(BBitmap *disabledone, BBitmap *disabledtwo)
 	fDisabledTwo = disabledtwo;
 }
 
-void TwoStateDrawButton::MouseUp(BPoint pt)
+
+void
+TwoStateDrawButton::MouseUp(BPoint pt)
 {
 	BButton::MouseUp(pt);
 	fButtonState = fButtonState ? false : true;
 	Invalidate();
 }
 
+
 void
 TwoStateDrawButton::SetState(int32 value)
 {
-	if(fButtonState!=value)
-	{
-		if(value==0)
-			fButtonState = false;
-		else
-			fButtonState = true;
+	if(fButtonState != value) {
+		fButtonState = (value == 0) ? false : true;
 		Invalidate();
 	}
 }
 
-void TwoStateDrawButton::Draw(BRect update)
+
+void
+TwoStateDrawButton::Draw(BRect update)
 {
-	if(fButtonState)
-	{
-		if(!IsEnabled())
-		{
+	if(fButtonState) {
+		if(!IsEnabled()) {
 			if(fDisabledTwo)
 				DrawBitmap(fDisabledTwo, BPoint(0,0));
 			else
@@ -106,25 +134,19 @@ void TwoStateDrawButton::Draw(BRect update)
 			return;
 		}
 		
-		if(Value() == B_CONTROL_ON)
-		{
+		if(Value() == B_CONTROL_ON) {
 			if(fDownTwo)
 				DrawBitmap(fDownTwo, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
-		}
-		else
-		{
+		} else {
 			if(fUpTwo)
 				DrawBitmap(fUpTwo, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
 		}
-	}
-	else
-	{
-		if(!IsEnabled())
-		{
+	} else {
+		if(!IsEnabled()) {
 			if(fDisabledOne)
 				DrawBitmap(fDisabledOne, BPoint(0,0));
 			else
@@ -132,15 +154,12 @@ void TwoStateDrawButton::Draw(BRect update)
 			return;
 		}
 		
-		if(Value() == B_CONTROL_ON)
-		{
+		if(Value() == B_CONTROL_ON) {
 			if(fDownOne)
 				DrawBitmap(fDownOne, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
-		}
-		else
-		{
+		} else 	{
 			if(fUpOne)
 				DrawBitmap(fUpOne, BPoint(0,0));
 			else

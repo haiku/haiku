@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2006-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #ifndef _DRAW_BUTTON_H
 #define _DRAW_BUTTON_H
 
