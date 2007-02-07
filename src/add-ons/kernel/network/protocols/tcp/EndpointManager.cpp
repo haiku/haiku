@@ -314,11 +314,14 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 	TCPEndpoint *other = _LookupEndpoint(gAddressModule->get_port((sockaddr *)&endpoint->socket->address));
 	if (other != endpoint) {
 		// remove endpoint from the list of endpoints with the same port
-		while (other->fEndpointNextWithSamePort != endpoint) {
+		while (other != NULL && other->fEndpointNextWithSamePort != endpoint) {
 			other = other->fEndpointNextWithSamePort;
 		}
 
-		other->fEndpointNextWithSamePort = endpoint->fEndpointNextWithSamePort;
+		if (other != NULL)
+			other->fEndpointNextWithSamePort = endpoint->fEndpointNextWithSamePort;
+		else
+			panic("bound endpoint %p not in hash!", endpoint);
 	} else {
 		// we need to replace the first endpoint in the list
 		hash_remove(fEndpointHash, endpoint);

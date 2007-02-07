@@ -102,6 +102,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 
 TCPEndpoint::~TCPEndpoint()
 {
+	recursive_lock_lock(&fLock);
+
 	gStackModule->cancel_timer(&fRetransmitTimer);
 	gStackModule->cancel_timer(&fPersistTimer);
 	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
@@ -1215,6 +1217,8 @@ TCPEndpoint::_RetransmitTimer(net_timer *timer, void *data)
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(endpoint->Lock());
+	if (!locker.IsLocked())
+		return;
 
 	endpoint->fSendNext = endpoint->fSendUnacknowledged;
 	endpoint->_SendQueued();
@@ -1228,6 +1232,9 @@ TCPEndpoint::_PersistTimer(net_timer *timer, void *data)
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(endpoint->Lock());
+	if (!locker.IsLocked())
+		return;
+
 	endpoint->_SendQueued(true);
 }
 
@@ -1238,6 +1245,9 @@ TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
 	RecursiveLocker locker(endpoint->Lock());
+	if (!locker.IsLocked())
+		return;
+
 	endpoint->_SendQueued(true);
 }
 
@@ -1247,7 +1257,9 @@ TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 {
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	recursive_lock_lock(&endpoint->Lock());
+	if (recursive_lock_lock(&endpoint->Lock()) < B_OK)
+		return;
+
 	gSocketModule->delete_socket(endpoint->socket);
 }
 
