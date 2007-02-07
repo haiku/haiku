@@ -52,7 +52,7 @@ AlertView::AlertView(BRect frame, char *name)
 	AddChild(keepButton);
 
 	BButton* button = new BButton(rect, "undo", "Undo",
-		new BMessage(SET_INITIAL_MODE_MSG), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		new BMessage(BUTTON_UNDO_MSG), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	AddChild(button);
 
@@ -107,7 +107,7 @@ void
 AlertView::Pulse()
 {
 	if (--fSeconds == 0)
-		Window()->PostMessage(SET_INITIAL_MODE_MSG);
+		Window()->PostMessage(BUTTON_UNDO_MSG);
 	else
 		UpdateCountdownView();
 }
@@ -117,7 +117,7 @@ void
 AlertView::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (numBytes == 1 && bytes[0] == B_ESCAPE)
-		Window()->PostMessage(SET_INITIAL_MODE_MSG);
+		Window()->PostMessage(BUTTON_UNDO_MSG);
 }
 
 

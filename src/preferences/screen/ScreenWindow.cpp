@@ -916,7 +916,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case SET_INITIAL_MODE_MSG:
+		case BUTTON_UNDO_MSG:
 			fTempScreenMode.Revert();
 			UpdateActiveMode();
 			break;

@@ -62,7 +62,6 @@ class ScreenMode {
 		uint32			fModeCount;
 
 		bool			fUpdatedModes;
-		// TODO: hard-coded to the current workspace limit
 		display_mode	fOriginalDisplayMode[32];
 		screen_mode		fOriginal[32];
 };

@@ -43,8 +43,8 @@ AlertWindow::MessageReceived(BMessage *message)
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 
-		case SET_INITIAL_MODE_MSG:
-			fTarget.SendMessage(SET_INITIAL_MODE_MSG);
+		case BUTTON_UNDO_MSG:
+			fTarget.SendMessage(BUTTON_UNDO_MSG);
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 
