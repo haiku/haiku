@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -521,10 +521,12 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	int state;
 	status_t status = B_OK;
 
+	if (kernel_startup)
+		return B_OK;
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 
-	if (!kernel_startup && !are_interrupts_enabled())
+	if (!are_interrupts_enabled())
 		panic("acquire_sem_etc: called with interrupts disabled for sem %#lx\n", id);
 
 	if (id < 0)
@@ -691,6 +693,8 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	cpu_status state;
 	status_t status = B_OK;
 
+	if (kernel_startup)
+		return B_OK;
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0)

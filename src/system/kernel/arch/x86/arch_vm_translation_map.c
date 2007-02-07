@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -188,13 +188,14 @@ lock_tmap(vm_translation_map *map)
 {
 	TRACE(("lock_tmap: map %p\n", map));
 
-	if (recursive_lock_lock(&map->lock) == true) {
+	recursive_lock_lock(&map->lock);
+	if (recursive_lock_get_recursion(&map->lock) == 1) {
 		// we were the first one to grab the lock
 		TRACE(("clearing invalidated page count\n"));
 		map->arch_data->num_invalidate_pages = 0;
 	}
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -209,7 +210,7 @@ unlock_tmap(vm_translation_map *map)
 	}
 
 	recursive_lock_unlock(&map->lock);
-	return 0;
+	return B_OK;
 }
 
 
@@ -393,8 +394,8 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
 	page_table_entry *pt;
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	status_t status;
 	int index;
-	int err;
 
 	start = ROUNDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -403,7 +404,7 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 
 restart:
 	if (start >= end)
-		return 0;
+		return B_OK;
 
 	index = VADDR_TO_PDENT(start);
 	if (pd[index].present == 0) {
@@ -413,10 +414,12 @@ restart:
 	}
 
 	do {
-		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr), (addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
-	} while (err < 0);
+		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
+			(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+	} while (status < B_OK);
 
-	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end); index++, start += B_PAGE_SIZE) {
+	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+			index++, start += B_PAGE_SIZE) {
 		if (pt[index].present == 0) {
 			// page mapping not valid
 			continue;
@@ -474,7 +477,7 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical)
 	index = VADDR_TO_PTENT(va);
 	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -517,7 +520,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 	TRACE(("query_tmap: returning pa 0x%lx for va 0x%lx\n", *_physical, va));
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -533,8 +536,8 @@ protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attribute
 {
 	page_table_entry *pt;
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	status_t status;
 	int index;
-	int err;
 
 	start = ROUNDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -543,7 +546,7 @@ protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attribute
 
 restart:
 	if (start >= end)
-		return 0;
+		return B_OK;
 
 	index = VADDR_TO_PDENT(start);
 	if (pd[index].present == 0) {
@@ -553,9 +556,9 @@ restart:
 	}
 
 	do {
-		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
+		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
 				(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
-	} while (err < 0);
+	} while (status < B_OK);
 
 	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end; index++, start += B_PAGE_SIZE) {
 		if (pt[index].present == 0) {
@@ -588,19 +591,20 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 {
 	page_table_entry *pt;
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	status_t status;
 	int index;
-	int err;
 	int tlb_flush = false;
 
 	index = VADDR_TO_PDENT(va);
 	if (pd[index].present == 0) {
 		// no pagetable here
-		return B_NO_ERROR;
+		return B_OK;
 	}
 
 	do {
-		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr), (addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
-	} while (err < 0);
+		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
+			(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+	} while (status < B_OK);
 	index = VADDR_TO_PTENT(va);
 
 	// clear out the flags we've been requested to clear

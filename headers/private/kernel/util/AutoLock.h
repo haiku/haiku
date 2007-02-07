@@ -1,12 +1,13 @@
-/* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+/*
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef KERNEL_UTIL_AUTO_LOCKER_H
 #define KERNEL_UTIL_AUTO_LOCKER_H
 
+
 #include <lock.h>
+
 
 namespace BPrivate {
 
@@ -165,8 +166,7 @@ class MutexLocking {
 public:
 	inline bool Lock(mutex *lockable)
 	{
-		mutex_lock(lockable);
-		return true;
+		return mutex_lock(lockable) == B_OK;
 	}
 
 	inline void Unlock(mutex *lockable)
@@ -183,8 +183,7 @@ class RecursiveLockLocking {
 public:
 	inline bool Lock(recursive_lock *lockable)
 	{
-		recursive_lock_lock(lockable);
-		return true;
+		return recursive_lock_lock(lockable) == B_OK;
 	}
 
 	inline void Unlock(recursive_lock *lockable)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -52,13 +52,13 @@ extern "C" {
 
 extern status_t	recursive_lock_init(recursive_lock *lock, const char *name);
 extern void recursive_lock_destroy(recursive_lock *lock);
-extern bool recursive_lock_lock(recursive_lock *lock);
-extern bool recursive_lock_unlock(recursive_lock *lock);
-extern int	recursive_lock_get_recursion(recursive_lock *lock);
+extern status_t recursive_lock_lock(recursive_lock *lock);
+extern void recursive_lock_unlock(recursive_lock *lock);
+extern int32 recursive_lock_get_recursion(recursive_lock *lock);
 
 extern status_t	mutex_init(mutex *m, const char *name);
 extern void mutex_destroy(mutex *m);
-extern void mutex_lock(mutex *m);
+extern status_t mutex_lock(mutex *m);
 extern void mutex_unlock(mutex *m);
 
 extern status_t benaphore_init(benaphore *ben, const char *name);

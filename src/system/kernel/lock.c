@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -18,12 +18,10 @@
 #include <thread.h>
 
 
-int
+int32
 recursive_lock_get_recursion(recursive_lock *lock)
 {
-	thread_id thid = thread_get_current_thread_id();
-
-	if (lock->holder == thid)
+	if (lock->holder == thread_get_current_thread_id())
 		return lock->recursion;
 
 	return -1;
@@ -61,41 +59,36 @@ recursive_lock_destroy(recursive_lock *lock)
 }
 
 
-bool
+status_t
 recursive_lock_lock(recursive_lock *lock)
 {
-	thread_id thid = thread_get_current_thread_id();
-	bool retval = false;
+	thread_id thread = thread_get_current_thread_id();
 
 	if (!kernel_startup && !are_interrupts_enabled())
 		panic("recursive_lock_lock: called with interrupts disabled for lock %p, sem %#lx\n", lock, lock->sem);
 
-	if (thid != lock->holder) {
-		acquire_sem(lock->sem);
-		
-		lock->holder = thid;
-		retval = true;
+	if (thread != lock->holder) {
+		status_t status = acquire_sem(lock->sem);
+		if (status < B_OK)
+			return status;
+
+		lock->holder = thread;
 	}
 	lock->recursion++;
-	return retval;
+	return B_OK;
 }
 
 
-bool
+void
 recursive_lock_unlock(recursive_lock *lock)
 {
-	thread_id thid = thread_get_current_thread_id();
-	bool retval = false;
-
-	if (thid != lock->holder)
+	if (thread_get_current_thread_id() != lock->holder)
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
 
 	if (--lock->recursion == 0) {
 		lock->holder = -1;
 		release_sem(lock->sem);
-		retval = true;
 	}
-	return retval;
 }
 
 
@@ -135,22 +128,24 @@ mutex_destroy(mutex *mutex)
 }
 
 
-void
+status_t
 mutex_lock(mutex *mutex)
 {
 	thread_id me = thread_get_current_thread_id();
+	status_t status;
 
-	if (!kernel_startup && !are_interrupts_enabled())
-		panic("mutex_lock: called with interrupts disabled for mutex %p, sem %#lx\n", mutex, mutex->sem);
+	if (kernel_startup)
+		return B_OK;
 
-	// ToDo: if acquire_sem() fails, we shouldn't panic - but we should definitely
-	//	change the mutex API to actually return the status code
-	if (acquire_sem(mutex->sem) == B_OK) {
-		if (me == mutex->holder)
-			panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
-	}
+	status = acquire_sem(mutex->sem);
+	if (status < B_OK)
+		return status;
+
+	if (me == mutex->holder)
+		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
 
 	mutex->holder = me;
+	return B_OK;
 }
 
 
@@ -159,9 +154,13 @@ mutex_unlock(mutex *mutex)
 {
 	thread_id me = thread_get_current_thread_id();
 
-	if (me != mutex->holder)
+	if (kernel_startup)
+		return;
+
+	if (me != mutex->holder) {
 		panic("mutex_unlock failure: thread 0x%lx is trying to release mutex %p (current holder 0x%lx)\n",
 			me, mutex, mutex->holder);
+	}
 
 	mutex->holder = -1;
 	release_sem(mutex->sem);
