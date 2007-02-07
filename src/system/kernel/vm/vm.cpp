@@ -1437,7 +1437,6 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	vm_translation_map *map = &addressSpace->translation_map;
 	map->ops->lock(map);
 	map->ops->unmap(map, area->base, area->base + (area->size - 1));
-	map->ops->flush(map);
 	map->ops->unlock(map);
 
 	// ToDo: do that only for vnode stores
@@ -3650,7 +3649,6 @@ resize_area(area_id areaID, size_t newSize)
 
 			map->ops->lock(map);
 			map->ops->unmap(map, current->base + newSize, current->base + oldSize - 1);
-			map->ops->flush(map);
 			map->ops->unlock(map);
 		}
 	}
