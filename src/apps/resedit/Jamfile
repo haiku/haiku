@@ -15,7 +15,13 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 Application ResEdit :
 	$(columnViewSources)
 	App.cpp
+	BitmapView.cpp
+	ImageEditor.cpp
+	InlineEditor.cpp
+	MiscEditors.cpp
+	NumberEditors.cpp
 	PreviewColumn.cpp
+	ResFields.cpp
 	ResourceData.cpp
 	ResourceRoster.cpp
 	ResView.cpp

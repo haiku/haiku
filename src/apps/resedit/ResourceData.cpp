@@ -6,6 +6,7 @@
  *		DarkWyrm <darkwyrm@earthlink.net>
  */
 #include "ResourceData.h"
+#include "ResFields.h"
 #include <stdlib.h>
 
 ResourceData::ResourceData(void)
@@ -16,7 +17,7 @@ ResourceData::ResourceData(void)
   	fName(""),
   	fData(NULL),
   	fLength(0),
-  	fFree(false)
+  	fAttr(false)
 {
 }
 
@@ -29,11 +30,11 @@ ResourceData::ResourceData(const type_code &code, const int32 &id,
 	fName(name),
 	fData(data),
 	fLength(length),
-  	fFree(false)
+  	fAttr(false)
 {
 	fIDString = "";
 	fIDString << fID;
-	MakeTypeString();
+	fTypeString = MakeTypeString(code);
 }
 
 
@@ -45,8 +46,7 @@ ResourceData::ResourceData(const ResourceData &data)
 
 ResourceData::~ResourceData(void)
 {
-	if (fFree)
-		free(fData);
+	free(fData);
 }
 
 
@@ -58,13 +58,9 @@ ResourceData::operator=(const ResourceData &data)
 	fID = data.fID;
 	fIDString = data.fIDString;
 	fName = data.fName;
-	fLength = data.fLength;
-	fFree = data.fFree;
+	fAttr = data.fAttr;
+	SetData(data.fData, data.fLength);
 	
-	// This is an attribute, so we need to allocate and free the data
-	if (fFree) {
-		fData = data.fData;
-	}
 	return *this;
 }
 
@@ -78,11 +74,12 @@ ResourceData::SetFromResource(const int32 &index, BResources &res)
 		return false;
 	}
 	fName = name;
-	MakeTypeString();
+	fTypeString = MakeTypeString(fType);
 	fIDString = "";
 	fIDString << fID;
-	fFree = false;
-	fData = (char *)res.LoadResource(fType,fID,&fLength);
+	fAttr = false;
+	char *data = (char *)res.LoadResource(fType,fID,&fLength);
+	SetData(data,fLength);
 	
 	return true;
 }
@@ -102,9 +99,9 @@ ResourceData::SetFromAttribute(const char *name, BNode &node)
 	fIDString = "(attr)";
 	fName = name;
 	fLength = info.size;
-	fFree = true;
+	fAttr = true;
 
-	MakeTypeString();
+	fTypeString = MakeTypeString(fType);
 	
 	fData = (char *)malloc(fLength);
 	if (fData) {
@@ -125,27 +122,45 @@ ResourceData::SetTo(const type_code &code, const int32 &id,
 					const char *name, char *data, const size_t &length)
 {
 	fType = code;
+	fTypeString = MakeTypeString(code);
 	fID = id;
+	fIDString = "";
+	fIDString << fID;
 	fName = name;
-	fData = data;
-	fLength = length;
+	SetData(data,length);
 	
-	MakeTypeString();
 }
 
 
 void
-ResourceData::MakeTypeString(void)
+ResourceData::SetType(const type_code &code)
 {
-	char typestring[7];
-	char *typeptr = (char *) &fType;
-	typestring[0] = '\'';
-	typestring[1] = typeptr[3];
-	typestring[2] = typeptr[2];
-	typestring[3] = typeptr[1];
-	typestring[4] = typeptr[0];
-	typestring[5] = '\'';
-	typestring[6] = '\0';
-	fTypeString = typestring;
+	fType = code;
+	fTypeString = MakeTypeString(code);
+}
+
+
+void
+ResourceData::SetID(const int32 &id)
+{
+	fID = id;
+	fIDString = "";
+	fIDString << fID;
+}
+
+
+void
+ResourceData::SetData(const char *data, const size_t &size)
+{
+	free(fData);
+	
+	fLength = size;
+	
+	if (size > 0) {
+		fData = (char *)malloc(size);
+		memcpy(fData,data,size);
+	}
+	else
+		fData = NULL;
 }
 

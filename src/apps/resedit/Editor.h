@@ -8,14 +8,25 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-class Editor
+#include <Window.h>
+#include <Handler.h>
+
+class ResourceData;
+
+#define M_UPDATE_RESOURCE 'uprs'
+
+class Editor : public BWindow
 {
 public:
-						Editor(void);
+						Editor(const BRect &frame, ResourceData *data,
+								BHandler *owner);
 	virtual				~Editor(void);
-	virtual	BView *		GetConfigView(void);
-	virtual void		LoadData(unsigned char *data, const size_t &length);
-	virtual unsigned char *	SaveData(size_t *data);
+						
+	ResourceData *		GetData(void) const { return fResData; }
+	BHandler *			GetOwner(void) const { return fOwner; }
+private:
+	ResourceData		*fResData;
+	BHandler			*fOwner;
 };
 
 #endif

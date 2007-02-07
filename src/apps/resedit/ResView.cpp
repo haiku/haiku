@@ -17,8 +17,10 @@
 
 #include "App.h"
 #include "ResourceData.h"
+#include "ResFields.h"
 #include "ResWindow.h"
 #include "PreviewColumn.h"
+#include "Editor.h"
 
 static int32 sUntitled = 1;
 
@@ -29,7 +31,8 @@ enum {
 	M_OPEN_FILE,
 	M_SAVE_FILE,
 	M_SAVE_FILE_AS,
-	M_QUIT
+	M_QUIT,
+	M_EDIT_RESOURCE
 };
 
 ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
@@ -78,6 +81,7 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 	fListView->AddColumn(new BStringColumn("Type",width,width,100,B_TRUNCATE_END),1);
 	fListView->AddColumn(new BStringColumn("Name",150,50,300,B_TRUNCATE_END),2);
 	fListView->AddColumn(new PreviewColumn("Data",150,50,300),3);
+	fListView->SetInvocationMessage(new BMessage(M_EDIT_RESOURCE));
 	
 	width = be_plain_font->StringWidth("1000 bytes") + 20;
 	fListView->AddColumn(new BSizeColumn("Size",width,10,100),4);
@@ -89,6 +93,7 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 
 ResView::~ResView(void)
 {
+	EmptyDataList();
 	delete fRef;
 }
 
@@ -98,12 +103,18 @@ ResView::AttachedToWindow(void)
 {
 	for(int32 i = 0; i < fBar->CountItems(); i++)
 		fBar->SubmenuAt(i)->SetTargetForItems(this);
+	fListView->SetTarget(this);
 }
 
 
 void
 ResView::MessageReceived(BMessage *msg)
 {
+	if (msg->WasDropped()) {
+		be_app->PostMessage(msg);
+		return;
+	}
+	
 	switch (msg->what) {
 		case M_NEW_FILE: {
 			BRect r(100,100,400,400);
@@ -121,6 +132,28 @@ ResView::MessageReceived(BMessage *msg)
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+		case M_EDIT_RESOURCE: {
+			BRow *row = fListView->CurrentSelection();
+			TypeCodeField *field = (TypeCodeField*)row->GetField(1);
+			gResRoster.SpawnEditor(field->GetResourceData(),this);
+			break;
+		}
+		case M_UPDATE_RESOURCE: {
+			ResourceData *item;
+			if (msg->FindPointer("item",(void **)&item) != B_OK)
+				break;
+			
+			for (int32 i = 0; i < fListView->CountRows(); i++) {
+				BRow *row = fListView->RowAt(i);
+				TypeCodeField *field = (TypeCodeField*)row->GetField(1);
+				if (!field || field->GetResourceData() != item)
+					continue;
+				
+				UpdateRow(row);
+				break;
+			}
+			break;
+		}
 		default:
 			BView::MessageReceived(msg);
 	}
@@ -133,86 +166,88 @@ ResView::OpenFile(const entry_ref &ref)
 	// Add all the 133t resources and attributes of the file
 	
 	BFile file(&ref, B_READ_ONLY);
-	if (fResources.SetTo(&file) != B_OK)
+	BResources resources;
+	if (resources.SetTo(&file) != B_OK)
 		return;
 	file.Unset();
 	
-	fResources.PreloadResourceType();
+	resources.PreloadResourceType();
 	
 	int32 index = 0;
-	ResourceData data;
 	BRow *row;
-	while (data.SetFromResource(index, fResources)) {
+	ResourceData *resData = new ResourceData();
+	while (resData->SetFromResource(index, resources)) {
 		row = new BRow();
-		row->SetField(new BStringField(data.GetIDString()),0);
-		row->SetField(new BStringField(data.GetTypeString()),1);
-		row->SetField(new BStringField(data.GetName()),2);
-		BField *field = gResRoster.MakeFieldForType(data.GetType(),
-													data.GetData(),
-													data.GetLength());
+		row->SetField(new BStringField(resData->GetIDString()),0);
+		row->SetField(new TypeCodeField(resData->GetType(),resData),1);
+		row->SetField(new BStringField(resData->GetName()),2);
+		BField *field = gResRoster.MakeFieldForType(resData->GetType(),
+													resData->GetData(),
+													resData->GetLength());
 		if (field)
 			row->SetField(field,3);
-		row->SetField(new BSizeField(data.GetLength()),4);
+		row->SetField(new BSizeField(resData->GetLength()),4);
 		fListView->AddRow(row);
+		fDataList.AddItem(resData);
+		resData = new ResourceData();
 		index++;
 	}
+	delete resData;
 
-//debugger("");	
 	BNode node;
 	if (node.SetTo(&ref) == B_OK) {
 		char attrName[B_ATTR_NAME_LENGTH];
 		node.RewindAttrs();
+		resData = new ResourceData();
 		while (node.GetNextAttrName(attrName) == B_OK) {
-			if (data.SetFromAttribute(attrName, node)) {
+			if (resData->SetFromAttribute(attrName, node)) {
 				row = new BRow();
-				row->SetField(new BStringField(data.GetIDString()),0);
-				row->SetField(new BStringField(data.GetTypeString()),1);
-				row->SetField(new BStringField(data.GetName()),2);
-				BField *field = gResRoster.MakeFieldForType(data.GetType(),
-															data.GetData(),
-															data.GetLength());
+				row->SetField(new BStringField(resData->GetIDString()),0);
+				row->SetField(new TypeCodeField(resData->GetType(),resData),1);
+				row->SetField(new BStringField(resData->GetName()),2);
+				BField *field = gResRoster.MakeFieldForType(resData->GetType(),
+															resData->GetData(),
+															resData->GetLength());
 				if (field)
 					row->SetField(field,3);
-				row->SetField(new BSizeField(data.GetLength()),4);
+				row->SetField(new BSizeField(resData->GetLength()),4);
 				fListView->AddRow(row);
+				fDataList.AddItem(resData);
+				resData = new ResourceData();
 			}
 		}
+		delete resData;
 	}
 }
 
 
-const void *
-ResView::LoadResource(const type_code &type, const int32 &id, size_t *out_size)
+void
+ResView::EmptyDataList(void)
 {
-	return fResources.LoadResource(type, id, out_size);
+	for (int32 i = 0; i < fDataList.CountItems(); i++) {
+		ResourceData *data = (ResourceData*) fDataList.ItemAt(i);
+		delete data;
+	}
+	fDataList.MakeEmpty();
 }
 
 
-const void *
-ResView::LoadResource(const type_code &type, const char *name, size_t *out_size)
+void
+ResView::UpdateRow(BRow *row)
 {
-	return fResources.LoadResource(type, name, out_size);
+	TypeCodeField *typeField = (TypeCodeField*) row->GetField(1);
+	ResourceData *resData = typeField->GetResourceData();
+	BStringField *strField = (BStringField *)row->GetField(0);
+	
+	if (strcmp("(attr)", strField->String()) != 0)
+		strField->SetString(resData->GetIDString());
+	
+	strField = (BStringField *)row->GetField(2);
+	strField->SetString(resData->GetName());
+	
+	PreviewField *preField = (PreviewField*)row->GetField(3);
+	preField->SetData(resData->GetData(), resData->GetLength());
+	
+	BSizeField *sizeField = (BSizeField*)row->GetField(4);
+	sizeField->SetSize(resData->GetLength());
 }
-
-
-status_t
-ResView::AddResource(const type_code &type, const int32 &id, const void *data,
-					const size_t &data_size, const char *name)
-{
-	return fResources.AddResource(type, id, data, data_size, name);
-}
-
-
-bool
-ResView::HasResource(const type_code &type, const int32 &id)
-{
-	return fResources.HasResource(type, id);
-}
-
-
-bool
-ResView::HasResource(const type_code &type, const char *name)
-{
-	return fResources.HasResource(type, name);
-}
-

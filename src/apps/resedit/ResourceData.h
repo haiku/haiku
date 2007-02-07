@@ -31,17 +31,23 @@ public:
 	
 	type_code		GetType(void) const { return fType; }
 	const char *	GetTypeString(void) const { return fTypeString.String(); }
+	void			SetType(const type_code &code);
+	
 	int32			GetID(void) const { return fID; }
 	const char *	GetIDString(void) const { return fIDString.String(); }
+	void			SetID(const int32 &id);
+	
 	const char *	GetName(void) const { return fName.String(); }
+	void			SetName(const char *name) { fName = name; }
+	
 	char *			GetData(void) { return fData; }
 	size_t			GetLength(void) const  { return fLength; }
+	void			SetData(const char *data, const size_t &size);
 	
-	bool			IsAttribute(void) const { return fFree; }
+	bool			IsAttribute(void) const { return fAttr; }
+	void			SetAttribute(const bool &value) { fAttr = value; }
 	
 private:
-	void			MakeTypeString(void);
-	
 	int32			fType;
 	BString			fTypeString;
 	int32			fID;
@@ -49,7 +55,7 @@ private:
 	BString			fName;
 	char			*fData;
 	size_t			fLength;
-	bool			fFree;
+	bool			fAttr;
 };
 
 #endif

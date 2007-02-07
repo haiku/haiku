@@ -13,6 +13,7 @@
 #include <ColumnListView.h>
 
 class Editor;
+class ResourceData;
 
 class ResourceRoster
 {
@@ -21,9 +22,10 @@ public:
 				~ResourceRoster(void);
 	BField *	MakeFieldForType(const int32 &type, const char *data,
 								const size_t &length);
-	
+	void		SpawnEditor(ResourceData *data, BHandler *handler);
+
 private:
-	void	LoadEditors(void);
+	void		LoadEditors(void);
 	
 	BList	fList;
 };

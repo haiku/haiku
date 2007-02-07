@@ -13,6 +13,7 @@
 #include <Entry.h>
 #include <String.h>
 #include <ListItem.h>
+#include <List.h>
 #include <Resources.h>
 #include "ResourceRoster.h"
 
@@ -31,25 +32,16 @@ public:
 	
 	void			OpenFile(const entry_ref &ref);
 	
-	// BResources mirror API
-	const void *	LoadResource(const type_code &type, const int32 &id,
-								size_t *out_size);
-	const void *	LoadResource(const type_code &type, const char *name,
-								size_t *out_size);
-	status_t		AddResource(const type_code &type, const int32 &id, 
-								const void *data, const size_t &data_size, 
-								const char *name = NULL);
-	bool			HasResource(const type_code &type, const int32 &id);
-	bool			HasResource(const type_code &type, const char *name);
-	
 private:
+	void			EmptyDataList(void);
+	void			UpdateRow(BRow *row);
+	
 	BColumnListView	*fListView;
 	entry_ref		*fRef;
 	BString			fFileName;
 	BMenuBar		*fBar;
 	bool			fIsDirty;
-	
-	BResources		fResources;
+	BList			fDataList;
 };
 
 extern ResourceRoster gResRoster;

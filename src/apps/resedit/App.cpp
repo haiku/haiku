@@ -17,7 +17,6 @@ main(void)
 	return 0;
 }
 
-
 App::App(void)
   :	BApplication("application/x-vnd.Haiku-ResEdit"),
   	fWindowCount(0)
@@ -37,8 +36,17 @@ App::~App(void)
 void
 App::ReadyToRun(void)
 {
+/*
 	if (fWindowCount < 1) {
 		ResWindow *win = new ResWindow(BRect(50,100,600,400));
+		win->Show();
+	}
+*/
+	if (fWindowCount < 1) {
+		BEntry entry("/boot/develop/projects/ResEdit/CapitalBe.rsrc");
+		entry_ref ref;
+		entry.GetRef(&ref);
+		ResWindow *win = new ResWindow(BRect(50,100,600,400),&ref);
 		win->Show();
 	}
 }

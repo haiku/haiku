@@ -15,6 +15,10 @@
 #include <Directory.h>
 #include <Bitmap.h>
 
+#include "ResourceData.h"
+#include "InternalEditors.h"
+#include "ResFields.h"
+
 // For the MakeFieldForType temp code
 #include <TranslatorFormats.h>
 #include <TranslationUtils.h>
@@ -77,7 +81,7 @@ ResourceRoster::MakeFieldForType(const int32 &type, const char *data,
 	// temporary code until editors are done
 	switch (type) {
 		case B_MIME_STRING_TYPE:
-			return new BStringField(data);
+			return new StringPreviewField(data);
 		case B_GIF_FORMAT:
 		case B_PPM_FORMAT:
 		case B_TGA_FORMAT:
@@ -88,9 +92,7 @@ ResourceRoster::MakeFieldForType(const int32 &type, const char *data,
 			BMemoryIO memio(data,length);
 			BBitmap *bitmap = BTranslationUtils::GetBitmap(&memio);
 			if (bitmap) {
-				// XXX WARNING! WARNING! Known memory leak
-				// This is temp code, so it's OK for the moment
-				BBitmapField *field = new BBitmapField(bitmap);
+				BitmapPreviewField *field = new BitmapPreviewField(bitmap);
 				return field;
 			}
 			break;
@@ -141,6 +143,34 @@ ResourceRoster::LoadEditors(void)
 			fList.AddItem(new EditorInfo(addon, temp, createFunc));
 		
 		delete temp;
+	}
+}
+
+void
+ResourceRoster::SpawnEditor(ResourceData *data, BHandler *handler)
+{
+	// temporary code until editors are done
+	switch (data->GetType()) {
+		case B_MIME_STRING_TYPE: {
+			StringEditor *strEd = new StringEditor(BRect(100,100,300,200),
+													data, handler);
+			strEd->Show();
+			break;
+		}
+		case B_GIF_FORMAT:
+		case B_PPM_FORMAT:
+		case B_TGA_FORMAT:
+		case B_BMP_FORMAT:
+		case B_TIFF_FORMAT:
+		case B_PNG_FORMAT:
+		case B_JPEG_FORMAT: {
+			ImageEditor *imgEd = new ImageEditor(BRect(100,100,300,200),
+													data, handler);
+			imgEd->Show();
+			break;
+		}
+		default:
+			break;
 	}
 }
 

@@ -16,6 +16,7 @@ public:
 				PreviewColumn(const char *title, float width,
 						 float minWidth, float maxWidth);
 	void		DrawField(BField* field, BRect rect, BView* parent);
+	bool		AcceptsField(const BField* field) const;
 };
 
 #endif
