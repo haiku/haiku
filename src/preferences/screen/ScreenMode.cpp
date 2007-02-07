@@ -9,6 +9,8 @@
 
 #include "ScreenMode.h"
 
+#include <InterfaceDefs.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -152,7 +154,7 @@ screen_mode::SetTo(display_mode& mode)
 ScreenMode::ScreenMode(BWindow* window)
 	:
 	fWindow(window),
-	fUpdatedMode(false)
+	fUpdatedModes(false)
 {
 	BScreen screen(window);
 	if (screen.GetModeList(&fModeList, &fModeCount) == B_OK) {
@@ -173,12 +175,17 @@ ScreenMode::~ScreenMode()
 
 
 status_t
-ScreenMode::Set(const screen_mode& mode)
+ScreenMode::Set(const screen_mode& mode, int32 workspace)
 {
-	if (!fUpdatedMode)
-		UpdateOriginalMode();
+	if (!fUpdatedModes)
+		UpdateOriginalModes();
 
 	BScreen screen(fWindow);
+	
+	if (workspace == ~0)
+		workspace = current_workspace();
+	
+	// TODO: our app_server doesn't fully support workspaces, yet
 	SetSwapDisplays(&screen, mode.swap_displays);
 	SetUseLaptopPanel(&screen, mode.use_laptop_panel);
 	SetTVStandard(&screen, mode.tv_standard);
@@ -187,20 +194,25 @@ ScreenMode::Set(const screen_mode& mode)
 	if (!GetDisplayMode(mode, displayMode))
 		return B_ENTRY_NOT_FOUND;
 
-	return screen.SetMode(&displayMode, true);
+	return screen.SetMode(workspace, &displayMode, true);
 }
 
 
 status_t
-ScreenMode::Get(screen_mode& mode)
+ScreenMode::Get(screen_mode& mode, int32 workspace) const
 {
 	display_mode displayMode;
 	BScreen screen(fWindow);
-	if (screen.GetMode(&displayMode) != B_OK)
+	
+	if (workspace == ~0)
+		workspace = current_workspace();
+	
+	if (screen.GetMode(workspace, &displayMode) != B_OK)
 		return B_ERROR;
-
+	
 	mode.SetTo(displayMode);
-
+	
+	// TODO: our app_server doesn't fully support workspaces, yet
 	if (GetSwapDisplays(&screen, &mode.swap_displays) != B_OK)
 		mode.swap_displays = false;
 	if (GetUseLaptopPanel(&screen, &mode.use_laptop_panel) != B_OK)
@@ -213,31 +225,59 @@ ScreenMode::Get(screen_mode& mode)
 
 
 status_t
+ScreenMode::GetOriginalMode(screen_mode& mode, int32 workspace) const
+{
+	if (workspace == ~0)
+		workspace = current_workspace();
+	else if(workspace > 31)
+		return B_BAD_INDEX;
+	
+	mode = fOriginal[workspace];
+	
+	return B_OK;
+}
+
+
+// this method assumes that you already reverted to the correct number of workspaces
+status_t
 ScreenMode::Revert()
 {
-	if (!fUpdatedMode)
-		return B_OK;
+	if (!fUpdatedModes)
+		return B_ERROR;
 
+	status_t result = B_OK;
 	screen_mode current;
-	if (Get(current) == B_OK && fOriginal == current)
-		return B_OK;
+	for (int32 workspace = 0; workspace < count_workspaces(); workspace++) {
+		if (Get(current, workspace) == B_OK && fOriginal[workspace] == current)
+			continue;
 
-	BScreen screen(fWindow);
-	SetSwapDisplays(&screen, fOriginal.swap_displays);
-	SetUseLaptopPanel(&screen, fOriginal.use_laptop_panel);
-	SetTVStandard(&screen, fOriginal.tv_standard);
+		BScreen screen(fWindow);
 
-	return screen.SetMode(&fOriginalDisplayMode, true);
+		// TODO: our app_server doesn't fully support workspaces, yet
+		if (workspace == current_workspace()) {
+			SetSwapDisplays(&screen, fOriginal[workspace].swap_displays);
+			SetUseLaptopPanel(&screen, fOriginal[workspace].use_laptop_panel);
+			SetTVStandard(&screen, fOriginal[workspace].tv_standard);
+		}
+
+		result = screen.SetMode(workspace, &fOriginalDisplayMode[workspace], true);
+		if (result != B_OK)
+			break;
+	}
+	
+	return result;
 }
 
 
 void
-ScreenMode::UpdateOriginalMode()
+ScreenMode::UpdateOriginalModes()
 {
 	BScreen screen(fWindow);
-	if (screen.GetMode(&fOriginalDisplayMode) == B_OK) {
-		fUpdatedMode = true;
-		Get(fOriginal);
+	for (int32 workspace = 0; workspace < count_workspaces(); workspace++) {
+		if (screen.GetMode(workspace, &fOriginalDisplayMode[workspace]) == B_OK) {
+			Get(fOriginal[workspace], workspace);
+			fUpdatedModes = true;
+		}
 	}
 }
 

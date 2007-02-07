@@ -41,11 +41,12 @@ class ScreenMode {
 		ScreenMode(BWindow* window);
 		~ScreenMode();
 
-		status_t Set(const screen_mode& mode);
-		status_t Get(screen_mode& mode);
-		status_t Revert();
+		status_t Set(const screen_mode& mode, int32 workspace = ~0);
+		status_t Get(screen_mode& mode, int32 workspace = ~0) const;
+		status_t GetOriginalMode(screen_mode &mode, int32 workspace = ~0) const;
 
-		void UpdateOriginalMode();
+		status_t Revert();
+		void UpdateOriginalModes();
 
 		bool SupportsColorSpace(const screen_mode& mode, color_space space);
 		status_t GetRefreshLimits(const screen_mode& mode, float& min, float& max);
@@ -60,9 +61,10 @@ class ScreenMode {
 		display_mode*	fModeList;
 		uint32			fModeCount;
 
-		bool			fUpdatedMode;
-		display_mode	fOriginalDisplayMode;
-		screen_mode		fOriginal;
+		bool			fUpdatedModes;
+		// TODO: hard-coded to the current workspace limit
+		display_mode	fOriginalDisplayMode[32];
+		screen_mode		fOriginal[32];
 };
 
 #endif	/* SCREEN_MODE_H */

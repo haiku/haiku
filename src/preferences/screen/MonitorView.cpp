@@ -18,9 +18,10 @@
 
 
 #ifndef __HAIKU__
-inline bool operator!=(const rgb_color& x, const rgb_color& y)
+inline bool
+operator!=(const rgb_color& x, const rgb_color& y)
 {
-	return (x.red!=y.red || x.blue!=y.blue || x.green!=y.green);
+	return x.red != y.red || x.blue != y.blue || x.green != y.green;
 }
 #endif
 

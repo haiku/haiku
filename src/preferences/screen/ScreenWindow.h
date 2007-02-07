@@ -46,6 +46,7 @@ class ScreenWindow : public BWindow {
 		void UpdateRefreshControl();
 		void UpdateMonitorView();
 		void UpdateControls();
+		void UpdateOriginal();
 
 		void Apply();
 
@@ -93,9 +94,12 @@ class ScreenWindow : public BWindow {
 
 		BButton*		fBackgroundsButton;
 
-		ScreenMode		fScreenMode;
-		bool			fChangingAllWorkspaces;
+		ScreenMode		fScreenMode, fTempScreenMode;
+			// screen modes for all workspaces
+		int32			fOriginalWorkspaceCount;
 		screen_mode		fActive, fSelected, fOriginal;
+			// screen modes for the current workspace
+		bool			fModified;
 };
 
 #endif	/* SCREEN_WINDOW_H */

@@ -214,7 +214,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	fIsVesa(false),
 	fVesaApplied(false),
 	fScreenMode(this),
-	fChangingAllWorkspaces(false)
+	fTempScreenMode(this),
+	fModified(false)
 {
 	BScreen screen(this);
 
@@ -222,7 +223,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	if (screen.GetDeviceInfo(&info) == B_OK && !strcasecmp(info.chipset, "VESA"))
 		fIsVesa = true;
 
-	fScreenMode.Get(fOriginal);
+	UpdateOriginal();
 	fActive = fSelected = fOriginal;
 
 	BView *view = new BView(Bounds(), "ScreenView", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -482,9 +483,10 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	fBackgroundsButton->SetFontSize(be_plain_font->Size() * 0.9);
 	fScreenBox->AddChild(fBackgroundsButton);
 
-	fDefaultsButton = new BButton(buttonRect, "DefaultsButton", "Defaults",
+	// TODO: we don't support getting the screen's preferred settings
+	/* fDefaultsButton = new BButton(buttonRect, "DefaultsButton", "Defaults",
 		new BMessage(BUTTON_DEFAULTS_MSG));
-	view->AddChild(fDefaultsButton);
+	view->AddChild(fDefaultsButton); */
 
 	fRevertButton = new BButton(buttonRect, "RevertButton", "Revert",
 		new BMessage(BUTTON_REVERT_MSG));
@@ -494,7 +496,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	fApplyButton = new BButton(buttonRect, "ApplyButton", "Apply", 
 		new BMessage(BUTTON_APPLY_MSG));
 	fApplyButton->SetEnabled(false);
-	view->AddChild(fApplyButton);
+	fControlsBox->AddChild(fApplyButton);
 
 	UpdateControls();
 
@@ -765,19 +767,9 @@ ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 void
 ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 {
-	if (fChangingAllWorkspaces) {
-		// we're currently changing all workspaces, so there is no need
-		// to update the interface
-		return;
-	}
-
-	fScreenMode.Get(fOriginal);
-	fScreenMode.UpdateOriginalMode();
-
-	// only override current settings if they have not been changed yet
-	if (fSelected == fActive)
-		UpdateActiveMode();
-
+	fScreenMode.GetOriginalMode(fOriginal, workspace);
+	UpdateActiveMode();
+	
 	BMessage message(UPDATE_DESKTOP_COLOR_MSG);
 	PostMessage(&message, fMonitorView);
 }
@@ -793,19 +785,19 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 		case POP_WORKSPACE_CHANGED_MSG:
 		{
+			// update checkpoint state
 			int32 index;
-			if (message->FindInt32("index", &index) == B_OK)
+			if (message->FindInt32("index", &index) == B_OK) {
 				set_workspace_count(index + 1);
+				CheckApplyEnabled();
+			}
 			break;
 		}
 
 		case POP_RESOLUTION_MSG:
 		{
-			int32 oldWidth = fSelected.width, oldHeight = fSelected.height;
 			message->FindInt32("width", &fSelected.width);
 			message->FindInt32("height", &fSelected.height);
-			if (fSelected.width == oldWidth && fSelected.height == oldHeight)
-				break;
 
 			CheckColorMenu();
 			CheckRefreshMenu();
@@ -813,42 +805,29 @@ ScreenWindow::MessageReceived(BMessage* message)
 			UpdateMonitorView();
 			UpdateRefreshControl();
 
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 		}
 
 		case POP_COLORS_MSG:
 		{
-			color_space old = fSelected.space;
 			message->FindInt32("space", (int32 *)&fSelected.space);
-			if (fSelected.space == old)
-				break;
 
 			BString string;
 			string << fSelected.BitsPerPixel() << " Bits/Pixel";
 			fColorsMenu->Superitem()->SetLabel(string.String());
 
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 		}
 
 		case POP_REFRESH_MSG:
 		{
-			float old = fSelected.refresh;
 			message->FindFloat("refresh", &fSelected.refresh);
 			fOtherRefresh->SetLabel("Other" B_UTF8_ELLIPSIS);
 				// revert "Other…" label - it might have had a refresh rate prefix
 
-			if (fSelected.refresh == old)
-				break;
-
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
-			CheckApplyEnabled();		
+			CheckApplyEnabled();
 			break;
 		}
 
@@ -874,13 +853,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 		{
 			// user pressed "done" in "Other…" refresh dialog;
 			// select the refresh rate chosen
-			float old = fSelected.refresh;
 			message->FindFloat("refresh", &fSelected.refresh);
-			if (fSelected.refresh != old)
-				break;
 
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			UpdateRefreshControl();
 			CheckApplyEnabled();
 			break;
@@ -893,8 +867,6 @@ ScreenWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("mode", &mode) == B_OK)
 				fSelected.combine = (combine_mode)mode;
 
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			CheckResolutionMenu();
 			CheckApplyEnabled();
 			break;
@@ -902,22 +874,16 @@ ScreenWindow::MessageReceived(BMessage* message)
 		
 		case POP_SWAP_DISPLAYS_MSG:
 			message->FindBool("swap", &fSelected.swap_displays);
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 
 		case POP_USE_LAPTOP_PANEL_MSG:
 			message->FindBool("use", &fSelected.use_laptop_panel);
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 
 		case POP_TV_STANDARD_MSG:
 			message->FindInt32("tv_standard", (int32 *)&fSelected.tv_standard);
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
 			CheckApplyEnabled();
 			break;
 
@@ -941,61 +907,45 @@ ScreenWindow::MessageReceived(BMessage* message)
 			fSelected.use_laptop_panel = false;
 			fSelected.tv_standard = 0;
 
-			fScreenMode.Get(fOriginal);
-			fScreenMode.UpdateOriginalMode();
+			BMenuItem *item;
+			item = fWorkspaceCountField->Menu()->ItemAt(3);
+			if (item != NULL)
+				item->SetMarked(true);
+
 			UpdateControls();
 			break;
 		}
 
-		case BUTTON_REVERT_MSG:
 		case SET_INITIAL_MODE_MSG:
+			fTempScreenMode.Revert();
+			UpdateActiveMode();
+			break;
+
+		case BUTTON_REVERT_MSG:
+		{
+			fModified = false;
+			BMenuItem *item;
+			item = fWorkspaceCountField->Menu()->ItemAt(fOriginalWorkspaceCount - 1);
+			if (item != NULL)
+				item->SetMarked(true);
+
+			// ScreenMode::Revert() assumes that we first set the correct number
+			// of workspaces
+			set_workspace_count(fOriginalWorkspaceCount);
 			fScreenMode.Revert();
 			UpdateActiveMode();
 			break;
+		}
 
 		case BUTTON_APPLY_MSG:
 			Apply();
 			break;
 
-		case MAKE_INITIAL_MSG: {
-			// user pressed "keep" in confirmation box;
-			// select this mode in dialog and mark it as
-			// previous mode; if "all workspaces" is selected, 
-			// distribute mode to all workspaces 
-
-			// use the mode that has eventually been set and
-			// thus we know to be working; it can differ from 
-			// the mode selected by user due to hardware limitation
-			display_mode newMode;
-			BScreen screen(this);
-			screen.GetMode(&newMode);
-
-			if (fAllWorkspacesItem->IsMarked()) {
-				int32 originatingWorkspace;
-
-				// the original panel activates each workspace in turn;
-				// this is disguisting and there is a SetMode
-				// variant that accepts a workspace id, so let's take
-				// this one
-				originatingWorkspace = current_workspace();
-
-				// well, this "cannot be reverted" message is not
-				// entirely true - at least, you can revert it
-				// for current workspace; to not overwrite original
-				// mode during workspace switch, we use this flag
-				fChangingAllWorkspaces = true;
-
-				for (int32 i = 0; i < count_workspaces(); i++) {
-					if (i != originatingWorkspace)
-						screen.SetMode(i, &newMode, true);
-				}
-
-				fChangingAllWorkspaces = false;
-			}
-
+		case MAKE_INITIAL_MSG:
+			// user pressed "keep" in confirmation dialog
+			fModified = true;
 			UpdateActiveMode();
 			break;
-		}
 		
 		default:
 			BWindow::MessageReceived(message);		
@@ -1045,8 +995,8 @@ ScreenWindow::CanApply() const
 bool
 ScreenWindow::CanRevert() const
 {
-	return (fActive != fOriginal && !fAllWorkspacesItem->IsMarked())
-			|| fSelected != fActive;
+	return fSelected != fActive || count_workspaces() != fOriginalWorkspaceCount
+		|| fModified;
 }
 
 
@@ -1055,6 +1005,15 @@ ScreenWindow::CheckApplyEnabled()
 {
 	fApplyButton->SetEnabled(CanApply());
 	fRevertButton->SetEnabled(CanRevert());
+}
+
+
+void
+ScreenWindow::UpdateOriginal()
+{
+	fOriginalWorkspaceCount = count_workspaces();
+	fScreenMode.Get(fOriginal);
+	fScreenMode.UpdateOriginalModes();
 }
 
 
@@ -1071,21 +1030,29 @@ ScreenWindow::Apply()
 		fActive = fSelected;
 		return;
 	}
-
-	if (fAllWorkspacesItem->IsMarked()) {
-		BAlert *workspacesAlert = new BAlert("WorkspacesAlert",
-			"Change all workspaces? This action cannot be reverted.", "Okay", "Cancel", 
-			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-
-		if (workspacesAlert->Go() == 1)
-			return;
-	}
-
+	
+	// make checkpoint, so we can undo these changes
+	fTempScreenMode.UpdateOriginalModes();
 	status_t status = fScreenMode.Set(fSelected);
 	if (status == B_OK) {
+		// use the mode that has eventually been set and
+		// thus we know to be working; it can differ from
+		// the mode selected by user due to hardware limitation
+		display_mode newMode;
+		BScreen screen(this);
+		screen.GetMode(&newMode);
+		
+		if (fAllWorkspacesItem->IsMarked()) {
+			int32 originatingWorkspace = current_workspace();
+			for (int32 i = 0; i < count_workspaces(); i++) {
+				if (i != originatingWorkspace)
+					screen.SetMode(i, &newMode, true);
+			}
+		}
+		
 		fActive = fSelected;
-
-		// ToDo: only show alert when this is an unknown mode
+		
+		// TODO: only show alert when this is an unknown mode
 		BWindow* window = new AlertWindow(this);
 		window->Show();
 	} else {
@@ -1162,18 +1129,22 @@ ScreenWindow::LayoutControls(uint32 flags)
 	BRect boxFrame = fScreenBox->Frame() | fControlsBox->Frame();
 
 	// layout rest of buttons
-	fDefaultsButton->ResizeToPreferred();
-	fDefaultsButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
-
+	// TODO: we don't support getting the screen's preferred settings
+//	fDefaultsButton->ResizeToPreferred();
+//	fDefaultsButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
+	
 	fRevertButton->ResizeToPreferred();
-	fRevertButton->MoveTo(fDefaultsButton->Frame().right + 10,
-						  fDefaultsButton->Frame().top);
-
+	fRevertButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
+//	fRevertButton->MoveTo(fDefaultsButton->Frame().right + 10,
+//						  fDefaultsButton->Frame().top);
+	
 	fApplyButton->ResizeToPreferred();
-	fApplyButton->MoveTo(boxFrame.right - fApplyButton->Bounds().Width(),
-						 fDefaultsButton->Frame().top);
+	float resolutionFieldRight = fResolutionField->Frame().right;
+	fApplyButton->MoveTo(resolutionFieldRight - fApplyButton->Bounds().Width(),
+				fControlsBox->Bounds().bottom - fApplyButton->Bounds().Height()
+					- (fControlsBox->Bounds().right - resolutionFieldRight));
 
-	ResizeTo(boxFrame.right + 10, fDefaultsButton->Frame().bottom + 10);
+	ResizeTo(boxFrame.right + 10, fRevertButton->Frame().bottom + 10);
 }
 
 
