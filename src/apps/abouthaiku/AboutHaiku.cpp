@@ -38,6 +38,7 @@
 
 
 static const char *UptimeToString(char string[], size_t size);
+static const char *MemUsageToString(char string[], size_t size);
 
 
 class AboutApp : public BApplication {
@@ -65,6 +66,7 @@ class AboutView : public BView {
 		virtual void MouseDown(BPoint pt);
 
 	private:
+		BStringView		*fMemView;
 		BStringView		*fUptimeView;
 		BView			*fInfoView;
 		BTextView		*fCreditsView;
@@ -245,11 +247,11 @@ AboutView::AboutView(const BRect &rect)
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
-	sprintf(string, "%d MB total", int(systemInfo.max_pages / 256.0f + 0.5f));
-
-	stringView = new BStringView(r, "ramtext", string);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
+	fMemView = new BStringView(r, "ramtext", "");
+	fInfoView->AddChild(fMemView);
+	//fMemView->ResizeToPreferred();
+	
+	fMemView->SetText(MemUsageToString(string, sizeof(string)));
 
 	// Kernel build time/date
 	r.OffsetBy(0, textHeight * 1.5);
@@ -284,8 +286,7 @@ AboutView::AboutView(const BRect &rect)
 	fInfoView->AddChild(fUptimeView);
 	// string width changes, so we don't do ResizeToPreferred()
 
-	char uptimeString[255];
-	fUptimeView->SetText(UptimeToString(uptimeString, 255));
+	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
 	
 	// Begin construction of the credits view
 	r = Bounds();
@@ -614,8 +615,10 @@ AboutView::Draw(BRect update)
 void
 AboutView::Pulse(void)
 {
-	char uptime[255];
-	fUptimeView->SetText(UptimeToString(uptime, 255));
+	char string[255];
+	
+	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
+	fMemView->SetText(MemUsageToString(string, sizeof(string)));
 	
 	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
 		BMessage message(SCROLL_CREDITS_VIEW);
@@ -649,6 +652,23 @@ AboutView::MessageReceived(BMessage *msg)
 
 
 //	#pragma mark -
+
+
+static const char *
+MemUsageToString(char string[], size_t size)
+{
+	system_info systemInfo;
+	
+	if (get_system_info(&systemInfo) < B_OK)
+		return "Unknown";
+	
+	snprintf(string, size, "%d MB total, %d MB used (%d%%)", 
+			int(systemInfo.max_pages / 256.0f + 0.5f),
+			int(systemInfo.used_pages / 256.0f + 0.5f),
+			100 * systemInfo.used_pages / systemInfo.max_pages);
+	
+	return string;
+}
 
 
 static const char *
