@@ -73,9 +73,9 @@ ExpanderThread::ThreadStartup()
 	if (fThreadId < 0)
 		return fThreadId; 
     	
-    resume_thread(fThreadId); 
+    	resume_thread(fThreadId); 
     
-    fExpanderOutput = fdopen(fStdOut, "r");
+   	fExpanderOutput = fdopen(fStdOut, "r");
 	
 	return B_OK;
 }
@@ -86,8 +86,7 @@ ExpanderThread::ExecuteUnit (void)
 	// read output from command
 	// send it to window
 	
-	char * output_string;	
-	output_string =	fgets(fExpanderOutputBuffer , 4096-1, fExpanderOutput);
+	char *output_string = fgets(fExpanderOutputBuffer , 4096-1, fExpanderOutput);
 
 	if (output_string == NULL)
 		return EOF;
@@ -109,7 +108,7 @@ status_t
 ExpanderThread::ThreadShutdown(void)
 {
 	close(fStdIn);
-    close(fStdOut);
+    	close(fStdOut);
    	close(fStdErr);
 
 	return B_OK;
@@ -176,7 +175,7 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
     thread_id ret  =  load_image(argc, argv, envp); 
     
     if (ret < B_OK)
-		return ret;
+	return ret;
 		
     // thread ret is now suspended. 
 		
@@ -197,11 +196,9 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 
 status_t
 ExpanderThread::SuspendExternalExpander() 
-{ 
-	status_t status;
+{
 	thread_info thread_info;
-	status = get_thread_info(fThreadId, &thread_info);
-	BString	thread_name = thread_info.name;
+	status_t status = get_thread_info(fThreadId, &thread_info);
 	
 	if (status == B_OK)
 		return send_signal(-fThreadId, SIGSTOP);
@@ -212,10 +209,8 @@ ExpanderThread::SuspendExternalExpander()
 status_t
 ExpanderThread::ResumeExternalExpander() 
 { 
-	status_t status = B_OK;
 	thread_info thread_info;
-	status = get_thread_info(fThreadId, &thread_info);
-	BString	thread_name = thread_info.name;
+	status_t status = get_thread_info(fThreadId, &thread_info);
 	
 	if (status == B_OK)
 		return send_signal(-fThreadId, SIGCONT);
@@ -226,10 +221,8 @@ ExpanderThread::ResumeExternalExpander()
 status_t
 ExpanderThread::InterruptExternalExpander() 
 { 
-	status_t status = B_OK;
 	thread_info thread_info;
-	status = get_thread_info (fThreadId, &thread_info);
-	BString	thread_name = thread_info.name;
+	status_t status = get_thread_info (fThreadId, &thread_info);
 	
 	if (status == B_OK) {
 		status = send_signal(-fThreadId, SIGINT);
@@ -241,10 +234,8 @@ ExpanderThread::InterruptExternalExpander()
 status_t
 ExpanderThread::WaitOnExternalExpander() 
 { 
-	status_t status;
 	thread_info thread_info;
-	status = get_thread_info(fThreadId, &thread_info);
-	BString	thread_name = thread_info.name;
+	status_t status = get_thread_info(fThreadId, &thread_info);
 	
 	if (status == B_OK)
 		return wait_for_thread(fThreadId, &status);

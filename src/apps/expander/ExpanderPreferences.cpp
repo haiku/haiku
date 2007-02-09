@@ -32,11 +32,12 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	rect.OffsetBy(11,9);
 	rect.bottom -= 64;
 	rect.right -= 22;
-	BBox *box = new BBox(rect, "background", B_FOLLOW_ALL, 
+	BBox *box = new BBox(rect, "background", B_FOLLOW_NONE, 
 		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	box->SetLabel("Expander Preferences");
 	background->AddChild(box);
 	
+	float maxWidth=box->Bounds().right;
 	 
 	BRect frameRect = box->Bounds();
 	frameRect.OffsetBy(15,23);
@@ -47,80 +48,131 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	textRect.InsetBy(1,1);
 	BStringView *stringView = new BStringView(frameRect, "expansion", "Expansion:",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	stringView->ResizeToPreferred();
+	if(stringView->Frame().right>maxWidth) maxWidth=stringView->Frame().right;	
 	box->AddChild(stringView);
 	
-	frameRect.OffsetBy(0, 60);
-	stringView = new BStringView(frameRect, "destinationFolder", "Destination Folder:",
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	box->AddChild(stringView);
 	
-	frameRect.OffsetBy(0, 90);
-	stringView = new BStringView(frameRect, "other", "Other:",
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	box->AddChild(stringView);
+	frameRect.top = stringView->Frame().bottom + 5;	
+	frameRect.left += 10;
 	
-	rect = box->Bounds();
-	rect.OffsetBy(25, 42);
-	rect.bottom = rect.top + 20;
-	rect.right = rect.right - 30;
-	fAutoExpand = new BCheckBox(rect, "autoExpand", "Automatically expand files", NULL);
+	fAutoExpand = new BCheckBox(frameRect, "autoExpand", "Automatically expand files", NULL);
+	fAutoExpand->ResizeToPreferred();
+	if(fAutoExpand->Frame().right>maxWidth) maxWidth=fAutoExpand->Frame().right;	
 	box->AddChild(fAutoExpand);
 	
-	rect.OffsetBy(0, 17);
-	fCloseWindow = new BCheckBox(rect, "closeWindowWhenDone", "Close window when done expanding", NULL);
+	frameRect = fAutoExpand->Frame();
+	frameRect.top = fAutoExpand->Frame().bottom + 1;
+	fCloseWindow = new BCheckBox(frameRect, "closeWindowWhenDone", "Close window when done expanding", NULL);
+	fCloseWindow->ResizeToPreferred();
+	if(fCloseWindow->Frame().right>maxWidth) maxWidth=fCloseWindow->Frame().right;	
 	box->AddChild(fCloseWindow);
 	
-	rect.OffsetBy(0, 44);
-	fLeaveDest = new BRadioButton(rect, "leaveDest", "Leave destination folder path empty", 
+	
+	frameRect = stringView->Frame();
+	frameRect.top = fCloseWindow->Frame().bottom + 10;
+	stringView = new BStringView(frameRect, "destinationFolder", "Destination Folder:",
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	stringView->ResizeToPreferred();	
+	if(stringView->Frame().right>maxWidth) maxWidth=stringView->Frame().right;	
+	box->AddChild(stringView);
+	
+	frameRect.top = stringView->Frame().bottom + 5;	
+	frameRect.left += 10;
+	
+	fLeaveDest = new BRadioButton(frameRect, "leaveDest", "Leave destination folder path empty", 
 		new BMessage(MSG_LEAVEDEST));
+	fLeaveDest->ResizeToPreferred();
+	if(fLeaveDest->Frame().right>maxWidth) maxWidth=fLeaveDest->Frame().right;	
 	box->AddChild(fLeaveDest);
 	
-	rect.OffsetBy(0, 20);
-	fSameDest = new BRadioButton(rect, "sameDir", "Same directory as source (archive) file", 
+	frameRect = fLeaveDest->Frame();
+	frameRect.top = fLeaveDest->Frame().bottom + 1;
+	fSameDest = new BRadioButton(frameRect, "sameDir", "Same directory as source (archive) file", 
 		new BMessage(MSG_SAMEDIR));
+	fSameDest->ResizeToPreferred();
+	if(fSameDest->Frame().right>maxWidth) maxWidth=fSameDest->Frame().right;	
 	box->AddChild(fSameDest);
-	
-	rect.OffsetBy(0, 20);
-	BRect useRect = rect;
-	useRect.right = useRect.left + 50;
-	fDestUse = new BRadioButton(useRect, "destUse", "Use:", 
-		new BMessage(MSG_DESTUSE));
+
+	frameRect = fSameDest->Frame();
+	frameRect.top = frameRect.bottom + 1;
+	fDestUse = new BRadioButton(frameRect, "destUse", "Use:",new BMessage(MSG_DESTUSE));
+	fDestUse->ResizeToPreferred();
+	if(fDestUse->Frame().right>maxWidth) maxWidth=fDestUse->Frame().right;	
 	box->AddChild(fDestUse);
 	
-	textRect = rect;
-	textRect.OffsetBy(fDestUse->StringWidth("Use:") + 20, 0);
-	textRect.right = textRect.left + 158;
-	fDestText = new BTextControl(textRect, "destText", "", "", new BMessage(MSG_DESTTEXT));
+	
+	frameRect = fDestUse->Frame();
+	frameRect.left  = fDestUse->Frame().right + 1;
+	frameRect.right  = frameRect.left + 58;
+	frameRect.bottom  = frameRect.top + 38;
+	
+	fDestText = new BTextControl(frameRect, "destText", "", "", new BMessage(MSG_DESTTEXT));
+	box->AddChild(fDestText);
+	fDestText->ResizeToPreferred();
 	fDestText->SetDivider(0);
 	fDestText->TextView()->MakeEditable(false);
-	box->AddChild(fDestText);
+	fDestText->ResizeTo(158,fDestText->Frame().Height());
+	
 	fDestText->SetEnabled(false);
 	
-	textRect.OffsetBy(168, -4);
-	textRect.right = textRect.left + 50;
-	fSelect = new BButton(textRect, "selectButton", "Select", new BMessage(MSG_DESTSELECT));
+	frameRect = fDestText->Frame();
+	frameRect.left = frameRect.right + 5;
+	fSelect = new BButton(frameRect, "selectButton", "Select", new BMessage(MSG_DESTSELECT));
+	fSelect->ResizeToPreferred();
+	if(fSelect->Frame().right>maxWidth) maxWidth=fSelect->Frame().right;	
 	box->AddChild(fSelect);
 	fSelect->SetEnabled(false);
-		
-	rect.OffsetBy(0, 50);
-	fOpenDest = new BCheckBox(rect, "openDestination", "Open destination folder after extraction", NULL);
-	box->AddChild(fOpenDest);
 	
-	rect.OffsetBy(0, 17);
-	fAutoShow = new BCheckBox(rect, "autoShow", "Automatically show contents listing", NULL);
+	fDestText->MoveBy(0,(fSelect->Frame().Height() - fDestText->Frame().Height())/2.0);
+	fDestText->ResizeTo(158,fDestText->Frame().Height());
+	
+	
+	
+	frameRect = stringView->Frame();
+	frameRect.top = fDestUse->Frame().bottom + 10;
+	
+	stringView = new BStringView(frameRect, "other", "Other:",B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	stringView->ResizeToPreferred();
+	if(stringView->Frame().right>maxWidth) maxWidth=stringView->Frame().right;	
+	box->AddChild(stringView);
+	
+	frameRect.top = stringView->Frame().bottom + 5;	
+	frameRect.left += 10;
+
+	fOpenDest = new BCheckBox(frameRect, "openDestination", "Open destination folder after extraction", NULL);
+	fOpenDest->ResizeToPreferred();
+	if(fOpenDest->Frame().right>maxWidth) maxWidth=fOpenDest->Frame().right;	
+	box->AddChild(fOpenDest);
+		
+	frameRect = fOpenDest->Frame();
+	frameRect.top = frameRect.bottom + 1;	
+	fAutoShow = new BCheckBox(frameRect, "autoShow", "Automatically show contents listing", NULL);
+	fAutoShow->ResizeToPreferred();
+	if(fAutoShow->Frame().right>maxWidth) maxWidth=fAutoShow->Frame().right;	
 	box->AddChild(fAutoShow);
 	
-	rect = BRect(Bounds().right-89, Bounds().bottom-40,
-		Bounds().right-14, Bounds().bottom-16);
-	BButton *button = new BButton(rect, "OKButton", "OK", 
-		new BMessage(MSG_OK));
-	background->AddChild(button);
-	button->MakeDefault(true);
 	
-	rect.OffsetBy(-89, 0);
-	button = new BButton(rect, "CancelButton", "Cancel", 
-		new BMessage(MSG_CANCEL));
+	box->ResizeTo(maxWidth + 15,fAutoShow->Frame().bottom + 10);
+	
+	rect = BRect(Bounds().right-89, Bounds().bottom-40, Bounds().right-14, Bounds().bottom-16);
+	
+	rect = Bounds();
+	BButton *button = new BButton(rect, "OKButton", "OK",new BMessage(MSG_OK));
+	button->MakeDefault(true);
+	button->ResizeToPreferred();
+	button->MoveTo(box->Frame().right - button->Frame().Width(),box->Frame().bottom + 10 );
 	background->AddChild(button);
+	
+	
+	rect = button->Frame();
+	BButton *cancel = new BButton(rect, "CancelButton", "Cancel", new BMessage(MSG_CANCEL));
+	cancel->ResizeToPreferred();
+	cancel->MoveBy(-cancel->Frame().Width() - 10, (button->Frame().Height() - cancel->Frame().Height()) /2.0);
+	background->AddChild(cancel);
+	
+	ResizeTo(box->Frame().right + 11 ,button->Frame().bottom + 11);
+	
 	
 	BScreen screen(this);
 	MoveBy((screen.Frame().Width()-Bounds().Width())/2, 
