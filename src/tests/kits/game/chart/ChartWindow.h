@@ -340,7 +340,7 @@ inline	void		CrcStep();
 		
 	/* Various private instance variables. */	
 		/* the next setting, as modified by the UI */
-		setting			next_set;
+		setting			fNextSettings;
 		
 		/* a boolean used to enable a work-around for a bug in
 		   the DirectWindow flags setting. Only needed for the
@@ -416,13 +416,13 @@ inline	void		CrcStep();
 		thread_id		fSecondAnimationThread;
 		
 		/* context of the second processing thread (when used). */
-		float			second_thread_threshold;
-		buffer			*second_thread_buffer;
-		sem_id			second_thread_lock;
-		sem_id			second_thread_release;
-		bigtime_t		second_thread_delay;
-		star_packet		stars2;
-		star_packet		specials2;
+		float			fSecondThreadThreshold;
+		buffer			*fSecondThreadBuffer;
+		sem_id			fSecondThreadLock;
+		sem_id			fSecondThreadRelease;
+		bigtime_t			fSecondThreadDelay;
+		star_packet		fStars2;
+		star_packet		fSpecials2;
 		
 		/* Flag used to terminate the processing threads */
 		bool			fKillThread;

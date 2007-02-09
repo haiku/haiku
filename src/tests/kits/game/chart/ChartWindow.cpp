@@ -422,11 +422,11 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	fCurrentSettings.width = (int32)frame.right+1-LEFT_WIDTH;
 	fCurrentSettings.height = (int32)frame.bottom+1-TOP_LEFT_LIMIT;
 	previous_fullscreen_mode = WINDOW_MODE;
-	next_set.Set(&fCurrentSettings);
+	fNextSettings.Set(&fCurrentSettings);
 
 	/* initialise various global parameters */
 	fInstantLoadLevel = 0;
-	second_thread_threshold = 0.5;
+	fSecondThreadThreshold = 0.5;
 	last_dynamic_delay = 0.0;
 	crc_alea = CRC_START;
 
@@ -864,8 +864,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	
 	/* allocate the semaphores */
 	fDrawingLock = create_sem(1, "chart locker");
-	second_thread_lock = create_sem(0, "chart second locker");
-	second_thread_release = create_sem(0, "chart second release");
+	fSecondThreadLock = create_sem(0, "chart second locker");
+	fSecondThreadRelease = create_sem(0, "chart second release");
 
 	/* spawn the asynchronous animation threads */
 	fKillThread = false;
@@ -883,22 +883,22 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 ChartWindow::~ChartWindow()
 {
-	int32		result;
+	status_t result;
 
 	/* setting this flag force both animation threads to quit */
 	fKillThread = true;
+	
 	/* wait for the two animation threads to quit */
 	wait_for_thread(fAnimationThread, &result);	
 	wait_for_thread(fSecondAnimationThread, &result);	
 
 	/* free the offscreen bitmap if any */
-	if (fOffscreen != NULL)
-		delete fOffscreen;
+	delete fOffscreen;
 		
 	/* release the semaphores used for synchronisation */
 	delete_sem(fDrawingLock);
-	delete_sem(second_thread_lock);
-	delete_sem(second_thread_release);
+	delete_sem(fSecondThreadLock);
+	delete_sem(fSecondThreadRelease);
 	
 	/* free the buffers used to store the starlists */
 	free(stars.list);
@@ -914,7 +914,7 @@ bool
 ChartWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(TRUE);
+	return BWindow::QuitRequested();
 }
 
 
@@ -924,8 +924,6 @@ ChartWindow::MessageReceived(BMessage *message)
 	int32			index, color;
 	BHandler		*handler;
 	BCheckBox		*check_box;
-	//BTextControl	*text_ctrl;
-	//BColorControl	*color_ctrl;
 	BSlider			*slider;
 	
 	message->FindPointer("source", (void**)&handler);
@@ -951,37 +949,37 @@ ChartWindow::MessageReceived(BMessage *message)
 		case ANIM_SLOW_MOVE_MSG :
 		case ANIM_FAST_MOVE_MSG :
 		case ANIM_FREE_MOVE_MSG :
-			next_set.animation = ANIMATION_OFF + (message->what - ANIM_OFF_MSG);
+			fNextSettings.animation = ANIMATION_OFF + (message->what - ANIM_OFF_MSG);
 			break;
 		case DISP_OFF_MSG :
 		case DISP_BITMAP_MSG :
 		case DISP_DIRECT_MSG :
-			next_set.display = DISPLAY_OFF + (message->what - DISP_OFF_MSG);
+			fNextSettings.display = DISPLAY_OFF + (message->what - DISP_OFF_MSG);
 			break;
 		case SPACE_CHAOS_MSG :
 		case SPACE_AMAS_MSG :
 		case SPACE_SPIRAL_MSG :
-			next_set.space_model = SPACE_CHAOS + (message->what - SPACE_CHAOS_MSG);
+			fNextSettings.space_model = SPACE_CHAOS + (message->what - SPACE_CHAOS_MSG);
 			break;
 		case FULL_SCREEN_MSG :
 			check_box = dynamic_cast<BCheckBox*>(handler);
 			if (check_box->Value())
-				next_set.fullscreen_mode = FULLSCREEN_MODE;
+				fNextSettings.fullscreen_mode = FULLSCREEN_MODE;
 			else
-				next_set.fullscreen_mode = WINDOW_MODE;
+				fNextSettings.fullscreen_mode = WINDOW_MODE;
 			break;
 		case AUTO_DEMO_MSG :
-			next_set.fullscreen_mode = FULLDEMO_MODE;
-			next_set.animation = ANIMATION_FREE_MOVE;
-			next_set.special = SPECIAL_COMET;
+			fNextSettings.fullscreen_mode = FULLDEMO_MODE;
+			fNextSettings.animation = ANIMATION_FREE_MOVE;
+			fNextSettings.special = SPECIAL_COMET;
 			LaunchSound();
 			break;
 		case BACK_DEMO_MSG :
-			next_set.fullscreen_mode = previous_fullscreen_mode;
+			fNextSettings.fullscreen_mode = previous_fullscreen_mode;
 			break;
 		case SECOND_THREAD_MSG :
 			check_box = dynamic_cast<BCheckBox*>(handler);
-			next_set.second_thread = check_box->Value();
+			fNextSettings.second_thread =  (check_box->Value()?true:false);
 			break;
 		case COLORS_RED_MSG :
 		case COLORS_GREEN_MSG :
@@ -992,28 +990,28 @@ ChartWindow::MessageReceived(BMessage *message)
 		case COLORS_WHITE_MSG :
 			index = message->what - COLORS_RED_MSG;
 			check_box = dynamic_cast<BCheckBox*>(handler);
-			next_set.colors[index] = (check_box->Value()?true:false);
+			fNextSettings.colors[index] = (check_box->Value()?true:false);
 			break;
 		case SPECIAL_NONE_MSG :
 		case SPECIAL_COMET_MSG :
 		case SPECIAL_NOVAS_MSG :
 		case SPECIAL_BATTLE_MSG :
-			next_set.special = SPECIAL_NONE + (message->what - SPECIAL_NONE_MSG);
+			fNextSettings.special = SPECIAL_NONE + (message->what - SPECIAL_NONE_MSG);
 			break;
 		case COLOR_PALETTE_MSG :
 			message->FindInt32("be:value", &color);
-			next_set.back_color.red = (color >> 24);
-			next_set.back_color.green = (color >> 16);
-			next_set.back_color.blue = (color >> 8);
-			next_set.back_color.alpha = color;
+			fNextSettings.back_color.red = (color >> 24);
+			fNextSettings.back_color.green = (color >> 16);
+			fNextSettings.back_color.blue = (color >> 8);
+			fNextSettings.back_color.alpha = color;
 			break;
 		case STAR_DENSITY_MSG :
 			slider = dynamic_cast<BSlider*>(handler);
-			next_set.star_density = slider->Value();
+			fNextSettings.star_density = slider->Value();
 			break;
 		case REFRESH_RATE_MSG :
 			slider = dynamic_cast<BSlider*>(handler);
-			next_set.refresh_rate = exp(slider->Value()*0.001*(log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)))*
+			fNextSettings.refresh_rate = exp(slider->Value()*0.001*(log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)))*
 									REFRESH_RATE_MIN;
 			break;
 		/* open the three floating window used to do live setting of
@@ -1040,13 +1038,11 @@ ChartWindow::MessageReceived(BMessage *message)
 void
 ChartWindow::ScreenChanged(BRect screen_size, color_space depth)
 {
-	BScreen		my_screen(this);
-
 	/* this is the same principle than the one described for
 	   MessageReceived, to inform the engine that the depth of
 	   the screen changed (needed only for offscreen bitmap.
 	   In DirectWindow, you get a direct notification). */	
-	next_set.depth = my_screen.ColorSpace();
+	fNextSettings.depth = BScreen(this).ColorSpace();
 }
 
 
@@ -1057,8 +1053,8 @@ ChartWindow::FrameResized(float new_width, float new_height)
 	   MessageReceived, to inform the engine that the window
 	   size changed (needed only for offscreen bitmap. In
 	   DirectWindow, you get a direct notification). */	
-	next_set.width = (int32)Frame().Width()+1-LEFT_WIDTH;
-	next_set.height = (int32)Frame().Height()+1-TOP_LEFT_LIMIT;		
+	fNextSettings.width = (int32)Frame().Width()+1-LEFT_WIDTH;
+	fNextSettings.height = (int32)Frame().Height()+1-TOP_LEFT_LIMIT;		
 }
 
 
@@ -1242,11 +1238,12 @@ ChartWindow::OpenRefresh(BPoint here)
 void
 ChartWindow::DrawInstantLoad(float frame_per_second)
 {
-	int32		level, i;
+	int32 i;
 	bigtime_t	timeout;
 	
-	level = (int32)((frame_per_second + 6.0) * (1.0/12.0));
-	if (level > 50) level = 50;
+	int32 level = (int32)((frame_per_second + 6.0) * (1.0/12.0));
+	if (level > 50)
+		level = 50;
 
 	/* if the load level is inchanged, nothing more to do... */	
 	if (level == fInstantLoadLevel)
@@ -1339,10 +1336,8 @@ ChartWindow::PrintStatNumbers(float fps)
 void
 ChartWindow::InitGeometry()
 {
-	float		dz;
-
 	/* calculate some parameters required for the 3d processing */ 
-	dz = sqrt(1.0 - (DH_REF*DH_REF + DV_REF*DV_REF) * (0.5 + 0.5/Z_CUT_RATIO) * (0.5 + 0.5/Z_CUT_RATIO));
+	float dz = sqrt(1.0 - (DH_REF*DH_REF + DV_REF*DV_REF) * (0.5 + 0.5/Z_CUT_RATIO) * (0.5 + 0.5/Z_CUT_RATIO));
 	depth_ref = dz / (1.0 - 1.0/Z_CUT_RATIO);
 	
 	/* set the position of the pyramid of vision, so that it was always
@@ -1372,7 +1367,6 @@ ChartWindow::InitGeometry()
 void
 ChartWindow::ChangeSetting(setting new_set)
 {
-	//star			*s;
 	int32			i, color_count, old_step;
 	int32			color_index[7];
 
@@ -2126,7 +2120,7 @@ ChartWindow::Animation(void *data)
 		timer += w->frame_delay;
 	
 		/* change the settings, if needed */
-		w->ChangeSetting(w->next_set);
+		w->ChangeSetting(w->fNextSettings);
 
 		/* draw the next frame */
 		if (w->fCurrentSettings.display == DISPLAY_BITMAP) {
@@ -2208,31 +2202,28 @@ ChartWindow::Animation(void *data)
 long
 ChartWindow::Animation2(void *data)
 {
-	bigtime_t		before, after;
-	ChartWindow		*w;
-	
-	w = (ChartWindow*)data;
+	ChartWindow *w = (ChartWindow*)data;
 	while (!w->fKillThread) {
 		/* This thread need to both wait for its master to unblock
 		   him to do some real work, or for the main control to
 		   set the fKillThread flag, asking it to quit. */
 		status_t status;
 		do {
-			status = acquire_sem_etc(w->second_thread_lock, 1, B_TIMEOUT, 500000);
+			status = acquire_sem_etc(w->fSecondThreadLock, 1, B_TIMEOUT, 500000);
 			if (w->fKillThread)
 				return 0;
 		} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
 		
 		/* the duration of the processing is needed to control the
 		   dynamic load split (see RefreshStar) */
-		before = system_time();
-		RefreshStarPacket(w->second_thread_buffer, &w->stars2, &w->geo);
-		RefreshStarPacket(w->second_thread_buffer, &w->specials2, &w->geo);
-		after = system_time();
+		bigtime_t before = system_time();
+		RefreshStarPacket(w->fSecondThreadBuffer, &w->fStars2, &w->geo);
+		RefreshStarPacket(w->fSecondThreadBuffer, &w->fSpecials2, &w->geo);
+		bigtime_t after = system_time();
 		
-		w->second_thread_delay = after-before;
+		w->fSecondThreadDelay = after-before;
 		
-		release_sem(w->second_thread_release);
+		release_sem(w->fSecondThreadRelease);
 	}
 	return 0;
 }
@@ -2706,11 +2697,6 @@ ChartWindow::SyncGeo()
 void
 ChartWindow::RefreshStars(buffer *buf, float time_step)
 {
-	float			ratio;
-	int32			star_threshold, special_threshold;
-	bigtime_t		before, after;
-	star_packet		stars1, specials1;
-
 	/* do the specials animation (single-threaded) */
 	AnimSpecials(time_step);
 
@@ -2720,63 +2706,63 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 	   dynamic load split between the two threads, when
 	   needed. */
 	if (fCurrentSettings.second_thread) {
-		star_threshold = (int32)((float)stars.count * second_thread_threshold + 0.5);
-		special_threshold = (int32)((float)specials.count * second_thread_threshold + 0.5);
+		int32 star_threshold = (int32)((float)stars.count * fSecondThreadThreshold + 0.5);
+		int32 special_threshold = (int32)((float)specials.count * fSecondThreadThreshold + 0.5);
 		
 		/* split the work load (star and special animation)
 		   between the two threads, proportionnaly to the
 		   last split factor determined during the last
 		   cycle. */
+		star_packet stars1;
 		stars1.list = stars.list;
 		stars1.count = star_threshold;
 		stars1.erase_count = star_threshold;
 		if (stars1.erase_count > stars.erase_count)
 			stars1.erase_count = stars.erase_count;
 			
-		stars2.list = stars.list + star_threshold;
-		stars2.count = stars.count - star_threshold;
-		stars2.erase_count = stars.erase_count - star_threshold;
-		if (stars2.erase_count < 0)
-			stars2.erase_count = 0;
+		fStars2.list = stars.list + star_threshold;
+		fStars2.count = stars.count - star_threshold;
+		fStars2.erase_count = stars.erase_count - star_threshold;
+		if (fStars2.erase_count < 0)
+			fStars2.erase_count = 0;
 		
+		star_packet specials1;
 		specials1.list = specials.list;
 		specials1.count = special_threshold;
 		specials1.erase_count = special_threshold;
 		if (specials1.erase_count > specials.erase_count)
 			specials1.erase_count = specials.erase_count;
 			
-		specials2.list = specials.list + special_threshold;
-		specials2.count = specials.count - special_threshold;
-		specials2.erase_count = specials.erase_count - special_threshold;
-		if (specials2.erase_count < 0)
-			specials2.erase_count = 0;
+		fSpecials2.list = specials.list + special_threshold;
+		fSpecials2.count = specials.count - special_threshold;
+		fSpecials2.erase_count = specials.erase_count - special_threshold;
+		if (fSpecials2.erase_count < 0)
+			fSpecials2.erase_count = 0;
 			
-		second_thread_buffer = buf;
+		fSecondThreadBuffer = buf;
 		
 		/* release the slave thread */
-		release_sem(second_thread_lock);
+		release_sem(fSecondThreadLock);
 		
 		/* do its own part (time it) */
-		before = system_time();
+		bigtime_t before = system_time();
 		RefreshStarPacket(buf, &stars1, &geo);
 		RefreshStarPacket(buf, &specials1, &geo);
-		after = system_time();
+		bigtime_t after = system_time();
 	
 		/* wait for completion of the second thread */	
-		while (acquire_sem(second_thread_release) == B_INTERRUPTED)
+		while (acquire_sem(fSecondThreadRelease) == B_INTERRUPTED)
 			;
 		
 		/* calculate the new optimal split ratio depending
 		   of the previous one and the time used by both
 		   threads to do their work. */
-		ratio = ((float)second_thread_delay/(float)(after-before)) *
-				(second_thread_threshold/(1.0-second_thread_threshold));
-		second_thread_threshold = ratio / (1.0+ratio);
+		float ratio = ((float)fSecondThreadDelay/(float)(after-before)) *
+				(fSecondThreadThreshold/(1.0-fSecondThreadThreshold));
+		fSecondThreadThreshold = ratio / (1.0+ratio);
 		
-		
-	}
-	/* In single-threaded mode, nothing fancy to be done. */
-	else {
+	} else {
+		 /* In single-threaded mode, nothing fancy to be done. */
 		RefreshStarPacket(buf, &stars, &geo);
 		RefreshStarPacket(buf, &specials, &geo);
 	}
