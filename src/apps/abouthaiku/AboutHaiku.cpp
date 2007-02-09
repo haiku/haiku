@@ -373,6 +373,7 @@ AboutView::AboutView(const BRect &rect)
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
+		"Andrea Anzani\n"
 		"Bruce Cameron\n"
 		"Greg Crain\n"
 		"Tyler Dauwalder\n"
