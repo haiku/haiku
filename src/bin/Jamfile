@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
+UseLibraryHeaders usb ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
@@ -137,10 +138,10 @@ StdBinCommands
 	mail.cpp
 	: be libmail.so : $(haiku-utils_rsrc) ;
 
-# standard commands that need libbe.so, libusb.so
+# standard commands that need libbe.so, and the USB Kit
 StdBinCommands
 	usb_dev_info.cpp
-	: be libusb.a : $(haiku-utils_rsrc) ;
+	: be USBKit.a : $(haiku-utils_rsrc) ;
 
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
