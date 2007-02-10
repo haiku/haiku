@@ -1107,8 +1107,10 @@ ScreenWindow::LayoutControls(uint32 flags)
 	fControlsBox->MoveTo(fScreenBox->Frame().right + 10.0, 10.0);
 
 	// layout the right side
+	fApplyButton->ResizeToPreferred();
 	BRect controlsRect = LayoutMenuFields(flags);
 	controlsRect.InsetBy(-10.0, -10.0);
+	controlsRect.bottom += 8 + fApplyButton->Bounds().Height();
 	// adjust size of controls box and move aligned buttons along
 	float xDiff = controlsRect.right - fControlsBox->Bounds().right;
 	float yDiff = controlsRect.bottom - fControlsBox->Bounds().bottom;
@@ -1138,11 +1140,10 @@ ScreenWindow::LayoutControls(uint32 flags)
 //	fRevertButton->MoveTo(fDefaultsButton->Frame().right + 10,
 //						  fDefaultsButton->Frame().top);
 	
-	fApplyButton->ResizeToPreferred();
+	// Apply button was already resized above
 	float resolutionFieldRight = fResolutionField->Frame().right;
 	fApplyButton->MoveTo(resolutionFieldRight - fApplyButton->Bounds().Width(),
-				fControlsBox->Bounds().bottom - fApplyButton->Bounds().Height()
-					- (fControlsBox->Bounds().right - resolutionFieldRight));
+				fControlsBox->Bounds().bottom - fApplyButton->Bounds().Height() - 10);
 
 	ResizeTo(boxFrame.right + 10, fRevertButton->Frame().bottom + 10);
 }
