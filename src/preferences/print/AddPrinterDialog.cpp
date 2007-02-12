@@ -67,7 +67,7 @@ AddPrinterDialog::MessageReceived(BMessage* msg)
 			break;
 			
 		case kTransportSelectedMsg:
-			
+			HandleChangedTransport(msg);
 			break;
 		
 		
@@ -231,7 +231,6 @@ AddPrinterDialog::BuildGUI(int stage)
 	
 	// add a "OK" button, and make it default
 	fOk = new BButton(r, NULL, "Add", new BMessage(B_OK), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fOk->MakeDefault(true);
 	fOk->ResizeToPreferred();
 	fOk->GetPreferredSize(&w, &h);
 	// put the ok bottom at bottom right corner
@@ -239,7 +238,6 @@ AddPrinterDialog::BuildGUI(int stage)
 	float y = panel->Bounds().bottom - h - kVMargin;
 	fOk->MoveTo(x, y);
 	panel->AddChild(fOk);
-	SetDefaultButton(fOk);
 
 	// add a "Cancel button	
 	BButton *cancel = new BButton(r, NULL, "Cancel", new BMessage(B_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
@@ -250,6 +248,9 @@ AddPrinterDialog::BuildGUI(int stage)
 	y = fOk->Frame().top;
 	cancel->MoveTo(x, y);	
 	panel->AddChild(cancel);
+
+	SetDefaultButton(fOk);
+	fOk->MakeDefault(true);
 
 	// Auto resize window
 	r.bottom = transportMenuField->Frame().bottom + fOk->Bounds().Height() + 2 * kVMargin;
