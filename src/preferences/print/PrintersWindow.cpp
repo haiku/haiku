@@ -162,7 +162,7 @@ void PrintersWindow::BuildGUI()
 	float maxWidth = 0;
 
 		// Add Button
-	BButton* addButton = new BButton(BRect(5,5,5,5), "add", "Add...", new BMessage(MSG_ADD_PRINTER), B_FOLLOW_RIGHT);
+	BButton* addButton = new BButton(BRect(5,5,5,5), "add", "Add " B_UTF8_ELLIPSIS, new BMessage(MSG_ADD_PRINTER), B_FOLLOW_RIGHT);
 	printersBox->AddChild(addButton);
 	addButton->ResizeToPreferred();
 
