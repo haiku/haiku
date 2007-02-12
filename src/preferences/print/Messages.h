@@ -39,7 +39,4 @@ const uint32 MSG_CANCEL_JOB			= 'CncJ';
 const uint32 MSG_RESTART_JOB		= 'RstJ';
 const uint32 MSG_JOB_SELECTED       = 'JSel';
 
-const uint32 MSG_TRANSPORT_SELECTED = 'TSel';
-const uint32 MSG_NAME_CHANGED       = 'NCgd';
-
 #endif
