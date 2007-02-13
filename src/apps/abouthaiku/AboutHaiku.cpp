@@ -331,7 +331,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert(string);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.haiku-os.org\n\n");
+	fCreditsView->Insert("www.haiku-os.org\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Team Leads:\n");
@@ -339,15 +339,15 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
 		"Bruno G. Albuquerque\n"
-		"DarkWyrm\n"
 		"Axel Dörfler\n"
 		"Phil Greenway\n"
 		"Philippe Houdoin\n"
-		"Kurtis Kopf\n"
+		"Waldemar Kornewald\n"
+		"Jorge G. Mare\n"
 		"Marcus Overhagen\n"
 		"Michael Pfeiffer\n"
 		"Ingo Weinhold\n"
-		"Michael Wilber\n"
+		"Jonathan Yoder\n"
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
@@ -387,6 +387,7 @@ AboutView::AboutView(const BRect &rect)
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
 		"Marcin Konicki\n"
+		"Kurtis Kopf\n"
 		"Elad Lahav\n"
 		"Santiago Lema\n"
 		"Oscar Lesta\n"
@@ -419,6 +420,7 @@ AboutView::AboutView(const BRect &rect)
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
 		"Nathan Whitehorn\n"
+		"Michael Wilber\n"
 		"Ulrich Wimboeck\n"
 		"Gabe Yoder\n"
 		"Łukasz Zemczak\n"
@@ -452,7 +454,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("	- Bourne Again Shell.\n");
 	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.gnu.org\n\n");
+	fCreditsView->Insert("www.gnu.org\n\n");
 
 	// FFMpeg copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
@@ -460,7 +462,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.ffmpeg.org\n\n");
+	fCreditsView->Insert("www.ffmpeg.org\n\n");
 
 	// AGG copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
@@ -468,7 +470,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.antigrain.com\n\n");
+	fCreditsView->Insert("www.antigrain.com\n\n");
 
 	// PDFLib copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
@@ -479,7 +481,7 @@ AboutView::AboutView(const BRect &rect)
 		"All rights reserved.\n"
 		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.pdflib.com\n\n");
+	fCreditsView->Insert("www.pdflib.com\n\n");
 
 	// FreeType copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
@@ -488,7 +490,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 The FreeType"
 		" Project.  All rights reserved.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.freetype.org\n\n");
+	fCreditsView->Insert("www.freetype.org\n\n");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
@@ -498,7 +500,7 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Brian Paul. "
 		"Mesa3D project.  All rights reserved.\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("				www.mesa3d.org\n\n");
+	fCreditsView->Insert("www.mesa3d.org\n\n");
 
 	// SGI's GLU implementation copyrights
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
@@ -666,7 +668,7 @@ MemUsageToString(char string[], size_t size)
 	snprintf(string, size, "%d MB total, %d MB used (%d%%)", 
 			int(systemInfo.max_pages / 256.0f + 0.5f),
 			int(systemInfo.used_pages / 256.0f + 0.5f),
-			100 * systemInfo.used_pages / systemInfo.max_pages);
+			int(100 * systemInfo.used_pages / systemInfo.max_pages));
 	
 	return string;
 }
