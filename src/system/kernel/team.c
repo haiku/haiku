@@ -706,7 +706,7 @@ team_create_thread_start(void *args)
 		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
 	if (t->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack region\n");
-		
+
 		free_team_arg(teamArgs);
 		return t->user_stack_area;
 	}
@@ -717,9 +717,10 @@ team_create_thread_start(void *args)
 	argCount = teamArgs->arg_count;
 	envCount = teamArgs->env_count;
 
-	uspa = (struct uspace_program_args *)(t->user_stack_base + t->user_stack_size + TLS_SIZE + ENV_SIZE);
+	uspa = (struct uspace_program_args *)(t->user_stack_base + t->user_stack_size
+		+ TLS_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
-	udest = (char  *)(uargs + argCount + 1);
+	udest = (char *)(uargs + argCount + 1);
 
 	TRACE(("addr: stack base = 0x%lx, uargs = %p, udest = %p, sizeLeft = %lu\n",
 		t->user_stack_base, uargs, udest, sizeLeft));
@@ -740,14 +741,21 @@ team_create_thread_start(void *args)
 	uargs[argCount] = NULL;
 
 	uenv = (char **)(t->user_stack_base + t->user_stack_size + TLS_SIZE);
+	sizeLeft = ENV_SIZE;
 	udest = (char *)uenv + ENV_SIZE - 1;
 		// the environment variables are copied from back to front
 
-	TRACE(("team_create_thread_start: envc: %ld, env: %p\n", teamArgs->env_count, (void *)teamArgs->env));
+	TRACE(("team_create_thread_start: envc: %ld, env: %p\n",
+		teamArgs->env_count, (void *)teamArgs->env));
 
 	for (i = 0; i < envCount; i++) {
 		ssize_t length = strlen(teamArgs->env[i]) + 1;
 		udest -= length;
+		if (udest < (char *)&uenv[envCount]) {
+			envCount = i;
+			break;
+		}
+
 		uenv[i] = udest;
 
 		if (user_memcpy(udest, teamArgs->env[i], length) < B_OK) {
