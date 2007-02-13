@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -601,6 +601,8 @@ IconView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case kMsgIconInvoked:
+		case kMsgEditIcon:
+		case kMsgAddIcon:
 			_AddOrEditIcon();
 			break;
 		case kMsgRemoveIcon:
