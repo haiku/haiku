@@ -1214,31 +1214,30 @@ TMailApp::NewWindow(const entry_ref *ref, const char *to, bool resend,
 }
 
 
-//====================================================================
 //	#pragma mark -
 
 
-TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, const char *to,
-						 const BFont *font, bool resending, BMessenger *messenger)
-		:	BWindow(rect, title, B_DOCUMENT_WINDOW, 0),
-		fFieldState(0),
-		fPanel(NULL),
-		fSendButton(NULL),
-		fSaveButton(NULL),
-		fPrintButton(NULL),
-		fSigButton(NULL),
-		fZoom(rect),
-		fEnclosuresView(NULL),
-		fPrevTrackerPositionSaved(false),
-		fNextTrackerPositionSaved(false),
-		fSigAdded(false),
-		fReplying(false),
-		fResending(resending),
-		fSent(false),
-		fDraft(false),
-		fChanged(false),
-		fStartingText(NULL),
-		fOriginatingWindow(NULL)
+TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
+		const char *to, const BFont *font, bool resending, BMessenger *messenger)
+	: BWindow(rect, title, B_DOCUMENT_WINDOW, 0),
+	fFieldState(0),
+	fPanel(NULL),
+	fSendButton(NULL),
+	fSaveButton(NULL),
+	fPrintButton(NULL),
+	fSigButton(NULL),
+	fZoom(rect),
+	fEnclosuresView(NULL),
+	fPrevTrackerPositionSaved(false),
+	fNextTrackerPositionSaved(false),
+	fSigAdded(false),
+	fReplying(false),
+	fResending(resending),
+	fSent(false),
+	fDraft(false),
+	fChanged(false),
+	fStartingText(NULL),
+	fOriginatingWindow(NULL)
 {
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
@@ -1320,9 +1319,11 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 			subMenu->AddItem(item = new BMenuItem(
 				MDR_DIALECT_CHOICE ("Leave as New", "N) 新規<New>のままにする"),
 				new BMessage(M_CLOSE_SAME), 'W', B_SHIFT_KEY));
+#if 0
 			subMenu->AddItem(item = new BMenuItem(
 				MDR_DIALECT_CHOICE ("Set to Read", "R) 開封済<Read>に設定"),
 				new BMessage(M_CLOSE_READ), 'W'));
+#endif
 			message = M_CLOSE_READ;
 		} else {
 			if (strlen(str))
@@ -1335,11 +1336,14 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(M_CLOSE_SAME));
 		}
 
+		subMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Move to Trash",
+			"T) å‰Šé™¤"), new BMessage(M_DELETE), 'T', B_CONTROL_KEY));
+		AddShortcut('T', B_SHIFT_KEY | B_COMMAND_KEY, new BMessage(M_DELETE_NEXT));
+
 		subMenu->AddSeparatorItem();
 
-		subMenu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Set to Saved", "S) 属性を<Saved>に設定"),
-			new BMessage(M_CLOSE_SAVED), 'W', B_CONTROL_KEY));
+		subMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Set to Saved",
+			"S) 属性を<Saved>に設定"), new BMessage(M_CLOSE_SAVED), 'W', B_CONTROL_KEY));
 
 		if (add_query_menu_items(subMenu, INDEX_STATUS, M_STATUS,
 			MDR_DIALECT_CHOICE("Set to %s", "属性を<%s>に設定")) > 0)
@@ -1896,35 +1900,30 @@ TMailWindow::MenusBeginning()
 	int32		start = 0;
 	BTextView	*textView;
 
-	if (!fIncoming)
-	{
-		enable = strlen(fHeaderView->fTo->Text()) ||
-				 strlen(fHeaderView->fBcc->Text());
+	if (!fIncoming) {
+		enable = strlen(fHeaderView->fTo->Text())
+			|| strlen(fHeaderView->fBcc->Text());
 		fSendNow->SetEnabled(enable);
 		fSendLater->SetEnabled(enable);
 
 		be_clipboard->Lock();
-		fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE) &&
-						   ((fEnclosuresView == NULL) || !fEnclosuresView->fList->IsFocus()));
+		fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE)
+			&& (fEnclosuresView == NULL || !fEnclosuresView->fList->IsFocus()));
 		be_clipboard->Unlock();
 
 		fQuote->SetEnabled(false);
 		fRemoveQuote->SetEnabled(false);
 
 		fAdd->SetEnabled(true);
-		fRemove->SetEnabled((fEnclosuresView != NULL) &&
-							(fEnclosuresView->fList->CurrentSelection() >= 0));
-	}
-	else
-	{
-		if (fResending)
-		{
+		fRemove->SetEnabled(fEnclosuresView != NULL
+			&& fEnclosuresView->fList->CurrentSelection() >= 0);
+	} else {
+		if (fResending) {
 			enable = strlen(fHeaderView->fTo->Text());
 			fSendNow->SetEnabled(enable);
 			// fSendLater->SetEnabled(enable);
 
-			if (fHeaderView->fTo->HasFocus())
-			{
+			if (fHeaderView->fTo->HasFocus()) {
 				textView = fHeaderView->fTo->TextView();
 				textView->GetSelection(&start, &finish);
 
@@ -1932,15 +1931,11 @@ TMailWindow::MenusBeginning()
 				be_clipboard->Lock();
 				fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE));
 				be_clipboard->Unlock();
-			}
-			else
-			{
+			} else {
 				fCut->SetEnabled(false);
 				fPaste->SetEnabled(false);
 			}
-		}
-		else
-		{
+		} else {
 			fCut->SetEnabled(false);
 			fPaste->SetEnabled(false);
 
@@ -1954,16 +1949,13 @@ TMailWindow::MenusBeginning()
 	fPrint->SetEnabled(fContentView->fTextView->TextLength());
 
 	textView = dynamic_cast<BTextView *>(CurrentFocus());
-	if ((NULL != textView) && (dynamic_cast<TTextControl *>(textView->Parent()) != NULL))
-	{
+	if (textView != NULL
+		&& dynamic_cast<TTextControl *>(textView->Parent()) != NULL) {
 		// one of To:, Subject:, Account:, Cc:, Bcc:
 		textView->GetSelection(&start, &finish);
-	}
-	else if (fContentView->fTextView->IsFocus())
-	{
+	} else if (fContentView->fTextView->IsFocus()) {
 		fContentView->fTextView->GetSelection(&start, &finish);
-		if (!fIncoming)
-		{
+		if (!fIncoming) {
 			fQuote->SetEnabled(true);
 			fRemoveQuote->SetEnabled(true);
 		}
@@ -1975,7 +1967,7 @@ TMailWindow::MenusBeginning()
 
 	// Undo stuff
 	bool isRedo = false;
-	undo_state	undoState = B_UNDO_UNAVAILABLE;
+	undo_state undoState = B_UNDO_UNAVAILABLE;
 
 	BTextView *focusTextView = dynamic_cast<BTextView *>(CurrentFocus());
 	if (focusTextView != NULL)
@@ -1995,8 +1987,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			int32 prevState = fFieldState, fieldMask = msg->FindInt32("bitmask");
 			void *source;
 
-			if (msg->FindPointer("source", &source) == B_OK)
-			{
+			if (msg->FindPointer("source", &source) == B_OK) {
 				int32 length;
 
 				if (fieldMask == FIELD_BODY)
@@ -2011,8 +2002,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			}
 
 			// Has anything changed?
-			if (prevState != fFieldState || !fChanged)
-			{
+			if (prevState != fFieldState || !fChanged) {
 				// Change Buttons to reflect this
 				if (fSaveButton)
 					fSaveButton->SetEnabled(fFieldState);
@@ -2024,8 +2014,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			fChanged = true;
 
 			// Update title bar if "subject" has changed
-			if (!fIncoming && fieldMask & FIELD_SUBJECT)
-			{
+			if (!fIncoming && fieldMask & FIELD_SUBJECT) {
 				// If no subject, set to "BeMail"
 				if (!fHeaderView->fSubject->TextView()->TextLength())
 					SetTitle("BeMail");
@@ -2063,8 +2052,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			*/
 			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
-				&& buttons == B_SECONDARY_MOUSE_BUTTON)
-			{
+				&& buttons == B_SECONDARY_MOUSE_BUTTON) {
 				BPopUpMenu menu("Spam Actions", false, false);
 				for (int i = 0; i < 4; i++)
 					menu.AddItem(new BMenuItem(kSpamMenuItemTextArray[i], new BMessage(M_TRAIN_SPAM_AND_DELETE + i)));
@@ -2075,23 +2063,25 @@ TMailWindow::MessageReceived(BMessage *msg)
 				if ((item = menu.Go(where, false, false)) != NULL)
 					PostMessage(item->Message());
 				break;
-			} else // Default action for left clicking on the spam button.
-				PostMessage (new BMessage (M_TRAIN_SPAM_AND_DELETE));
+			} else {
+				// Default action for left clicking on the spam button.
+				PostMessage(new BMessage(M_TRAIN_SPAM_AND_DELETE));
+			}
 			break;
 		}
 
 		case M_TRAIN_SPAM_AND_DELETE:
-			PostMessage (M_DELETE_NEXT);
+			PostMessage(M_DELETE_NEXT);
 		case M_TRAIN_SPAM:
-			TrainMessageAs ("Spam");
+			TrainMessageAs("Spam");
 			break;
 
 		case M_UNTRAIN:
-			TrainMessageAs ("Uncertain");
+			TrainMessageAs("Uncertain");
 			break;
 
 		case M_TRAIN_GENUINE:
-			TrainMessageAs ("Genuine");
+			TrainMessageAs("Genuine");
 			break;
 
 		case M_REPLY:
@@ -2099,8 +2089,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			// TODO: This needs removed in favor of a split toolbar button. See comments for Spam button
 			uint32 buttons;
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
-				&& buttons == B_SECONDARY_MOUSE_BUTTON)
-			{
+				&& buttons == B_SECONDARY_MOUSE_BUTTON) {
 				BPopUpMenu menu("Reply To", false, false);
 				menu.AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Reply","R) 返信"),new BMessage(M_REPLY)));
 				menu.AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Reply to Sender","S) 送信者に返信"),new BMessage(M_REPLY_TO_SENDER)));
@@ -2110,8 +2099,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				msg->FindPoint("where", &where);
 
 				BMenuItem *item;
-				if ((item = menu.Go(where, false, false)) != NULL)
-				{
+				if ((item = menu.Go(where, false, false)) != NULL) {
 					item->SetTarget(this);
 					PostMessage(item->Message());
 				}
@@ -2167,11 +2155,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 			bool foundRef = false;
 			entry_ref nextRef;
-			if ((msg->what == M_DELETE_PREV || msg->what == M_DELETE_NEXT) && fRef)
-			{
-				//
-				//	Find the next message that should be displayed
-				//
+			if ((msg->what == M_DELETE_PREV || msg->what == M_DELETE_NEXT) && fRef) {
+				// Find the next message that should be displayed
 				nextRef = *fRef;
 				foundRef = GetTrackerWindowFile(&nextRef, msg->what ==
 				  M_DELETE_NEXT);
@@ -2180,10 +2165,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 				SetCurrentMessageRead();
 
 			if (!fTrackerMessenger.IsValid() || !fIncoming) {
-				//
-				//	Not associated with a tracker window.  Create a new
-				//	messenger and ask the tracker to delete this entry
-				//
+				// Not associated with a tracker window.  Create a new
+				// messenger and ask the tracker to delete this entry
 				if (fDraft || fIncoming) {
 					BMessenger tracker("application/x-vnd.Be-TRAK");
 					if (tracker.IsValid()) {
@@ -2198,13 +2181,11 @@ TMailWindow::MessageReceived(BMessage *msg)
 					}
 				}
 			} else {
-				//
 				// This is associated with a tracker window.  Ask the
 				// window to delete this entry.  Do it this way if we
 				// can instead of the above way because it doesn't reset
 				// the selection (even though we set selection below, this
 				// still causes problems).
-				//
 				BMessage delmsg(B_DELETE_PROPERTY);
 				BMessage entryspec('sref');
 				entryspec.AddRef("refs", fRef);
@@ -2213,10 +2194,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 				fTrackerMessenger.SendMessage(&delmsg);
 			}
 
-			//
 			// 	If the next file was found, open it.  If it was not,
 			//	we have no choice but to close this window.
-			//
 			if (foundRef) {
 				TMailWindow *window = static_cast<TMailApp *>(be_app)->FindWindow(nextRef);
 				if (window == NULL)
