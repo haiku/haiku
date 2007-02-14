@@ -65,10 +65,6 @@ extern void reboot(void);
 void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
 bool gHasSSE = false;
 
-static struct tss **sTSS;
-//static struct tss **sDoubleFaultTSS;
-struct tss **sDoubleFaultTSS;
-static int *sIsTSSLoaded;
 static vint32 sWaitAllCPUs;
 
 segment_descriptor *gGDT = NULL;
@@ -78,15 +74,6 @@ segment_descriptor *gGDT = NULL;
 static uint32 sDoubleFaultStack[10240];
 
 static x86_cpu_module_info *sCpuModule;
-
-
-struct tss *
-x86_get_main_tss(void)
-{
-	int cpuNum = smp_get_current_cpu();
-	return sTSS[cpuNum];
-}
-
 
 /**	Disable CPU caches, and invalidate them. */
 
@@ -208,13 +195,11 @@ init_sse(void)
 
 
 static void
-load_tss(void *data, int cpu)
+load_tss(int cpu)
 {
 	short seg = ((TSS_BASE_SEGMENT + cpu) << 3) | DPL_KERNEL;
 	asm("movw  %0, %%ax;"
 		"ltr %%ax;" : : "r" (seg) : "eax");
-
-	sIsTSSLoaded[cpu] = true;
 }
 
 
@@ -223,7 +208,7 @@ init_double_fault(int cpuNum)
 {
 	/* set up the double fault tss */
 	/* TODO: Axel - fix SMP support */
-	struct tss *tss = sDoubleFaultTSS[cpuNum];
+	struct tss *tss = &gCPU[cpuNum].arch.tss;
 	
 	memset(tss, 0, sizeof(struct tss));
 	tss->sp0 = (uint32)sDoubleFaultStack + sizeof(sDoubleFaultStack);
@@ -462,6 +447,11 @@ arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
 	detect_cpu(args, curr_cpu);
 
+	// load the TSS for this cpu
+	// note the main cpu gets initialized in arch_cpu_init_post_vm()
+	if (curr_cpu != 0)
+		load_tss(curr_cpu);
+
 	return 0;
 }
 
@@ -490,60 +480,20 @@ arch_cpu_init_post_vm(kernel_args *args)
 	//i386_selector_init(gGDT);  // pass the new gdt
 
 	// setup task-state segments
-
-	sTSS = malloc(sizeof(struct tss *) * args->num_cpus);
-	if (sTSS == NULL) {
-		panic("arch_cpu_init_post_vm: could not allocate buffer for tss pointers\n");
-		return B_NO_MEMORY;
-	}
-	
-	sDoubleFaultTSS = malloc(sizeof(struct tss *) * args->num_cpus);
-	if (sDoubleFaultTSS == NULL) {
-		panic("arch_cpu_init_post_vm: could not allocate buffer for double fault tss pointers\n");
-		return B_NO_MEMORY;
-	}
-
-	sIsTSSLoaded = malloc(sizeof(int) * args->num_cpus);
-	if (sIsTSSLoaded == NULL) {
-		panic("arch_cpu_init_post_vm: could not allocate buffer for tss booleans\n");
-		return B_NO_MEMORY;
-	}
-	memset(sIsTSSLoaded, 0, sizeof(int) * args->num_cpus);
-
 	for (i = 0; i < args->num_cpus; i++) {
-		char tssName[32];
-		area_id area;
-
-		// create standard tasks
-		sprintf(tssName, "tss%lu", i);
-		area = create_area(tssName, (void **)&sTSS[i], B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE,
-			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (area < 0) {
-			panic("arch_cpu_init2: unable to create region for tss\n");
-			return B_NO_MEMORY;
-		}
-
-		// initialize TSS
-		memset(sTSS[i], 0, sizeof(struct tss));
-		sTSS[i]->ss0 = KERNEL_DATA_SEG;
+		// initialize the regular and double fault tss stored in the per-cpu structure
+		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
+		gCPU[i].arch.tss.ss0 = KERNEL_DATA_SEG;
 
 		// add TSS descriptor for this new TSS
-		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i], (addr_t)sTSS[i], sizeof(struct tss));
+		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i], (addr_t)&gCPU[i].arch.tss, sizeof(struct tss));
 
-		// create double-fault task
-		sprintf(tssName, "double_fault_tss%lu", i);
-		area = create_area(tssName, (void **)&sDoubleFaultTSS[i], B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE,
-			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (area < 0) {
-			panic("arch_cpu_init2: unable to create region for tss\n");
-			return B_NO_MEMORY;
-		}
-
-		// initialize TSS
+		// initialize the double fault tss
 		init_double_fault(i);
 	}
 
-	call_all_cpus(&load_tss, NULL);
+	// set the current hardware task on cpu 0
+	load_tss(0);
 
 	x86_set_task_gate(8, DOUBLE_FAULT_TSS_BASE_SEGMENT << 3);
 
@@ -590,18 +540,8 @@ arch_cpu_init_post_modules(kernel_args *args)
 void
 i386_set_tss_and_kstack(addr_t kstack)
 {
-	int32 currentCPU = smp_get_current_cpu();
-
-	if (!sIsTSSLoaded[currentCPU]) {
-		short seg = ((TSS_BASE_SEGMENT + currentCPU) << 3) | DPL_KERNEL;
-		asm("movw  %0, %%ax;"
-			"ltr %%ax;" : : "r" (seg) : "eax");
-		sIsTSSLoaded[currentCPU] = true;
-	}
-
-	sTSS[currentCPU]->sp0 = kstack;
+	get_cpu_struct()->arch.tss.sp0 = kstack;
 }
-
 
 void
 arch_cpu_global_TLB_invalidate(void)

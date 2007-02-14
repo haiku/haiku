@@ -386,13 +386,16 @@ i386_handle_trap(struct iframe frame)
 
 		case 8:		// Double Fault Exception (#DF)
 		{
+#if 0
+			// XXX what is this supposed to do?
 			struct tss *tss = x86_get_main_tss();
 			
 			frame.cs = tss->cs;
 			frame.eip = tss->eip;
 			frame.esp = tss->esp;
 			frame.flags = tss->eflags;
-			
+#endif
+
 			panic("double fault! errorcode = 0x%lx\n", frame.error_code);
 
 			break;

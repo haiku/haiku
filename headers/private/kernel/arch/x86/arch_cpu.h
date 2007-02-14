@@ -158,6 +158,7 @@ enum x86_vendors {
 };
 
 typedef struct arch_cpu_info {
+	// saved cpu info
 	enum x86_vendors vendor;
 	enum x86_feature_type feature[FEATURE_NUM];
 	char model_name[49];
@@ -167,6 +168,10 @@ typedef struct arch_cpu_info {
 	int stepping;
 	int model;
 	char feature_string[256];
+
+	// local TSS for this cpu
+	struct tss tss;
+	struct tss double_fault_tss;
 } arch_cpu_info;
 
 #ifdef __cplusplus
@@ -203,7 +208,6 @@ uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
 status_t x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type);
 bool x86_check_feature(uint32 feature, enum x86_feature_type type);
-struct tss *x86_get_main_tss(void);
 
 
 #define read_cr3(value) \
