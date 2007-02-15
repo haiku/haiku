@@ -26,7 +26,6 @@ int
 ttyname_r(int fd, char *buffer, size_t bufferSize)
 {
 	struct stat fdStat;
-	int err;
 
 	// first, some sanity checks:
 	if (fstat(fd, &fdStat) < 0)
@@ -38,7 +37,7 @@ ttyname_r(int fd, char *buffer, size_t bufferSize)
 	}
 
 	// just ask devfs
-	return ioctl(fd, B_GET_PATH_FOR_DEVICE, name, namesize);
+	return ioctl(fd, B_GET_PATH_FOR_DEVICE, buffer, bufferSize);
 }
 
 
