@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -51,6 +51,10 @@ extern void GLAPIENTRY
 _mesa_GetVertexAttribPointervARB(GLuint index, GLenum pname, GLvoid **pointer);
 
 
+extern GLboolean GLAPIENTRY
+_mesa_IsProgramARB(GLuint id);
+
+
 extern void GLAPIENTRY
 _mesa_ProgramStringARB(GLenum target, GLenum format, GLsizei len,
                        const GLvoid *string);
@@ -77,6 +81,11 @@ _mesa_ProgramEnvParameter4fvARB(GLenum target, GLuint index,
 
 
 extern void GLAPIENTRY
+_mesa_ProgramEnvParameters4fvEXT(GLenum target, GLuint index, GLsizei count,
+				 const GLfloat *params);
+
+
+extern void GLAPIENTRY
 _mesa_ProgramLocalParameter4dARB(GLenum target, GLuint index,
                                  GLdouble x, GLdouble y,
                                  GLdouble z, GLdouble w);
@@ -95,6 +104,11 @@ _mesa_ProgramLocalParameter4fARB(GLenum target, GLuint index,
 extern void GLAPIENTRY
 _mesa_ProgramLocalParameter4fvARB(GLenum target, GLuint index,
                                   const GLfloat *params);
+
+
+extern void GLAPIENTRY
+_mesa_ProgramLocalParameters4fvEXT(GLenum target, GLuint index, GLsizei count,
+				   const GLfloat *params);
 
 
 extern void GLAPIENTRY

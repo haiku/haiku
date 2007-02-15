@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,20 +34,26 @@
 #include "colormac.h"
 #include "context.h"
 #include "image.h"
+#include "mipmap.h"
 #include "texcompress.h"
 #include "texformat.h"
 #include "texstore.h"
 
+
 /**
- * Get the list of supported internal compression formats.
+ * Return list of (and count of) all specific texture compression
+ * formats that are supported.
  *
- * \param ctx GL context.
- * \param formats the resulting format list (may be NULL).
+ * \param ctx  the GL context
+ * \param formats  the resulting format list (may be NULL).
+ * \param all  if true return all formats, even those with  some kind
+ *             of restrictions/limitations (See GL_ARB_texture_compression
+ *             spec for more info).
  *
  * \return number of formats.
  */
 GLuint
-_mesa_get_compressed_formats( GLcontext *ctx, GLint *formats )
+_mesa_get_compressed_formats(GLcontext *ctx, GLint *formats, GLboolean all)
 {
    GLuint n = 0;
    if (ctx->Extensions.ARB_texture_compression) {
@@ -63,16 +69,20 @@ _mesa_get_compressed_formats( GLcontext *ctx, GLint *formats )
       if (ctx->Extensions.EXT_texture_compression_s3tc) {
          if (formats) {
             formats[n++] = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-            /* Skip this one because it has a restriction (all transparent
-             * pixels become black).  See the texture compressions spec for
-             * a detailed explanation.  This is what NVIDIA does.
-            formats[n++] = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-            */
+            /* This format has some restrictions/limitations and so should
+             * not be returned via the GL_COMPRESSED_TEXTURE_FORMATS query.
+             * Specifically, all transparent pixels become black.  NVIDIA
+             * omits this format too.
+             */
+            if (all)
+               formats[n++] = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
             formats[n++] = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             formats[n++] = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
          }
          else {
             n += 3;
+            if (all)
+               n += 1;
          }
       }
       if (ctx->Extensions.S3_s3tc) {
@@ -86,6 +96,19 @@ _mesa_get_compressed_formats( GLcontext *ctx, GLint *formats )
             n += 4;
          }
       }
+#if FEATURE_EXT_texture_sRGB
+      if (ctx->Extensions.EXT_texture_sRGB) {
+         if (formats) {
+            formats[n++] = GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
+            formats[n++] = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+            formats[n++] = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+            formats[n++] = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+         }
+         else {
+            n += 4;
+         }
+      }
+#endif /* FEATURE_EXT_texture_sRGB */
    }
    return n;
 }
@@ -101,23 +124,23 @@ _mesa_get_compressed_formats( GLcontext *ctx, GLint *formats )
  * \param width texture width in texels.
  * \param height texture height in texels.
  * \param depth texture depth in texels.
- * \param format - one of the specific compressed texture formats
+ * \param mesaFormat  one of the MESA_FORMAT_* compressed formats
  *
  * \return size in bytes, or zero if bad format
  */
 GLuint
 _mesa_compressed_texture_size( GLcontext *ctx,
                                GLsizei width, GLsizei height, GLsizei depth,
-                               GLenum format )
+                               GLuint mesaFormat )
 {
    GLuint size;
 
    ASSERT(depth == 1);
    (void) depth;
 
-   switch (format) {
-   case GL_COMPRESSED_RGB_FXT1_3DFX:
-   case GL_COMPRESSED_RGBA_FXT1_3DFX:
+   switch (mesaFormat) {
+   case MESA_FORMAT_RGB_FXT1:
+   case MESA_FORMAT_RGBA_FXT1:
       /* round up width to next multiple of 8, height to next multiple of 4 */
       width = (width + 7) & ~7;
       height = (height + 3) & ~3;
@@ -129,10 +152,8 @@ _mesa_compressed_texture_size( GLcontext *ctx,
       if (size < 16)
          size = 16;
       return size;
-   case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-   case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-   case GL_RGB_S3TC:
-   case GL_RGB4_S3TC:
+   case MESA_FORMAT_RGB_DXT1:
+   case MESA_FORMAT_RGBA_DXT1:
       /* round up width, height to next multiple of 4 */
       width = (width + 3) & ~3;
       height = (height + 3) & ~3;
@@ -144,10 +165,8 @@ _mesa_compressed_texture_size( GLcontext *ctx,
       if (size < 8)
          size = 8;
       return size;
-   case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-   case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-   case GL_RGBA_S3TC:
-   case GL_RGBA4_S3TC:
+   case MESA_FORMAT_RGBA_DXT3:
+   case MESA_FORMAT_RGBA_DXT5:
       /* round up width, height to next multiple of 4 */
       width = (width + 3) & ~3;
       height = (height + 3) & ~3;
@@ -160,42 +179,86 @@ _mesa_compressed_texture_size( GLcontext *ctx,
          size = 16;
       return size;
    default:
-      _mesa_problem(ctx, "bad texformat in compressed_texture_size");
+      _mesa_problem(ctx, "bad mesaFormat in _mesa_compressed_texture_size");
       return 0;
    }
+}
+
+
+/**
+ * As above, but format is specified by a GLenum (GL_COMPRESSED_*) token.
+ *
+ * Note: This function CAN NOT return a padded hardware texture size.
+ * That's why we don't call the ctx->Driver.CompressedTextureSize() function.
+ *
+ * We use this function to validate the <imageSize> parameter
+ * of glCompressedTex[Sub]Image1/2/3D(), which must be an exact match.
+ */
+GLuint
+_mesa_compressed_texture_size_glenum(GLcontext *ctx,
+                                     GLsizei width, GLsizei height,
+                                     GLsizei depth, GLenum glformat)
+{
+   GLuint mesaFormat;
+
+   switch (glformat) {
+   case GL_COMPRESSED_RGB_FXT1_3DFX:
+      mesaFormat = MESA_FORMAT_RGB_FXT1;
+      break;
+   case GL_COMPRESSED_RGBA_FXT1_3DFX:
+      mesaFormat = MESA_FORMAT_RGBA_FXT1;
+      break;
+   case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+   case GL_RGB_S3TC:
+      mesaFormat = MESA_FORMAT_RGB_DXT1;
+      break;
+   case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+   case GL_RGB4_S3TC:
+      mesaFormat = MESA_FORMAT_RGBA_DXT1;
+      break;
+   case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+   case GL_RGBA_S3TC:
+      mesaFormat = MESA_FORMAT_RGBA_DXT3;
+      break;
+   case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+   case GL_RGBA4_S3TC:
+      mesaFormat = MESA_FORMAT_RGBA_DXT5;
+      break;
+   default:
+      return 0;
+   }
+
+   return _mesa_compressed_texture_size(ctx, width, height, depth, mesaFormat);
 }
 
 
 /*
  * Compute the bytes per row in a compressed texture image.
  * We use this for computing the destination address for sub-texture updates.
- * \param format  one of the specific texture compression formats
+ * \param mesaFormat  one of the MESA_FORMAT_* compressed formats
  * \param width  image width in pixels
  * \return stride, in bytes, between rows for compressed image
  */
 GLint
-_mesa_compressed_row_stride(GLenum format, GLsizei width)
+_mesa_compressed_row_stride(GLuint mesaFormat, GLsizei width)
 {
    GLint stride;
 
-   switch (format) {
-   case GL_COMPRESSED_RGB_FXT1_3DFX:
-   case GL_COMPRESSED_RGBA_FXT1_3DFX:
+   switch (mesaFormat) {
+   case MESA_FORMAT_RGB_FXT1:
+   case MESA_FORMAT_RGBA_FXT1:
       stride = ((width + 7) / 8) * 16; /* 16 bytes per 8x4 tile */
       break;
-   case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-   case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-   case GL_RGB_S3TC:
-   case GL_RGB4_S3TC:
+   case MESA_FORMAT_RGB_DXT1:
+   case MESA_FORMAT_RGBA_DXT1:
       stride = ((width + 3) / 4) * 8; /* 8 bytes per 4x4 tile */
       break;
-   case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-   case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-   case GL_RGBA_S3TC:
-   case GL_RGBA4_S3TC:
+   case MESA_FORMAT_RGBA_DXT3:
+   case MESA_FORMAT_RGBA_DXT5:
       stride = ((width + 3) / 4) * 16; /* 16 bytes per 4x4 tile */
       break;
    default:
+      _mesa_problem(NULL, "bad mesaFormat in _mesa_compressed_row_stride");
       return 0;
    }
 
@@ -214,7 +277,7 @@ _mesa_compressed_row_stride(GLenum format, GLsizei width)
  */
 GLubyte *
 _mesa_compressed_image_address(GLint col, GLint row, GLint img,
-                               GLenum format,
+                               GLuint mesaFormat,
                                GLsizei width, const GLubyte *image)
 {
    GLubyte *addr;
@@ -229,25 +292,22 @@ _mesa_compressed_image_address(GLint col, GLint row, GLint img,
     * offset = Z * (((width + X - 1) / X) * (row / Y) + col / X);
     */
 
-   switch (format) {
-   case GL_COMPRESSED_RGB_FXT1_3DFX:
-   case GL_COMPRESSED_RGBA_FXT1_3DFX:
+   switch (mesaFormat) {
+   case MESA_FORMAT_RGB_FXT1:
+   case MESA_FORMAT_RGBA_FXT1:
       addr = (GLubyte *) image + 16 * (((width + 7) / 8) * (row / 4) + col / 8);
       break;
-   case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-   case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-   case GL_RGB_S3TC:
-   case GL_RGB4_S3TC:
+   case MESA_FORMAT_RGB_DXT1:
+   case MESA_FORMAT_RGBA_DXT1:
       addr = (GLubyte *) image + 8 * (((width + 3) / 4) * (row / 4) + col / 4);
       break;
-   case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-   case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-   case GL_RGBA_S3TC:
-   case GL_RGBA4_S3TC:
+   case MESA_FORMAT_RGBA_DXT3:
+   case MESA_FORMAT_RGBA_DXT5:
       addr = (GLubyte *) image + 16 * (((width + 3) / 4) * (row / 4) + col / 4);
       break;
    default:
-      return 0;
+      _mesa_problem(NULL, "bad mesaFormat in _mesa_compressed_image_address");
+      addr = NULL;
    }
 
    return addr;

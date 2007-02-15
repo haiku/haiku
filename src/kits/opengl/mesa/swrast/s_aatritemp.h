@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -51,7 +51,7 @@
    GLboolean ltor;
    GLfloat majDx, majDy;  /* major (i.e. long) edge dx and dy */
    
-   struct sw_span span;
+   SWspan span;
    
 #ifdef DO_Z
    GLfloat zPlane[4];
@@ -127,10 +127,6 @@
 	 return;
       ltor = (GLboolean) (area < 0.0F);
    }
-
-#ifndef DO_OCCLUSION_TEST
-   ctx->OcclusionResult = GL_TRUE;
-#endif
 
    /* Plane equation setup:
     * We evaluate plane equations at window (x,y) coordinates in order
@@ -283,14 +279,14 @@
          while (coverage > 0.0F) {
             /* (cx,cy) = center of fragment */
             const GLfloat cx = ix + 0.5F, cy = iy + 0.5F;
-            struct span_arrays *array = span.array;
+            SWspanarrays *array = span.array;
 #ifdef DO_INDEX
             array->coverage[count] = (GLfloat) compute_coveragei(pMin, pMid, pMax, ix, iy);
 #else
             array->coverage[count] = coverage;
 #endif
 #ifdef DO_Z
-            array->z[count] = (GLdepth) IROUND(solve_plane(cx, cy, zPlane));
+            array->z[count] = (GLuint) solve_plane(cx, cy, zPlane);
 #endif
 #ifdef DO_FOG
 	    array->fog[count] = solve_plane(cx, cy, fogPlane);
@@ -387,14 +383,14 @@
          while (coverage > 0.0F) {
             /* (cx,cy) = center of fragment */
             const GLfloat cx = ix + 0.5F, cy = iy + 0.5F;
-            struct span_arrays *array = span.array;
+            SWspanarrays *array = span.array;
 #ifdef DO_INDEX
             array->coverage[ix] = (GLfloat) compute_coveragei(pMin, pMax, pMid, ix, iy);
 #else
             array->coverage[ix] = coverage;
 #endif
 #ifdef DO_Z
-            array->z[ix] = (GLdepth) IROUND(solve_plane(cx, cy, zPlane));
+            array->z[ix] = (GLuint) solve_plane(cx, cy, zPlane);
 #endif
 #ifdef DO_FOG
             array->fog[ix] = solve_plane(cx, cy, fogPlane);
@@ -456,7 +452,7 @@
          /* shift all values to the left */
          /* XXX this is temporary */
          {
-            struct span_arrays *array = span.array;
+            SWspanarrays *array = span.array;
             GLint j;
             for (j = 0; j < (GLint) n; j++) {
 #ifdef DO_RGBA
@@ -486,7 +482,7 @@
 #ifdef DO_MULTITEX
          /* shift texcoords */
          {
-            struct span_arrays *array = span.array;
+            SWspanarrays *array = span.array;
             GLuint unit;
             for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
                if (ctx->Texture.Unit[unit]._ReallyEnabled) {

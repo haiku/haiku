@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -31,21 +31,25 @@
 #include "macros.h"
 #include "math/m_eval.h"
 #include "t_vtx_api.h"
+#include "dispatch.h"
 
 
 static void clear_active_eval1( TNLcontext *tnl, GLuint attr ) 
 {
-   tnl->vtx.eval.map1[attr].map = 0;
+   ASSERT(attr < _TNL_NUM_EVAL);
+   tnl->vtx.eval.map1[attr].map = NULL;
 }
 
 static void clear_active_eval2( TNLcontext *tnl, GLuint attr ) 
 {
-   tnl->vtx.eval.map2[attr].map = 0;
+   ASSERT(attr < _TNL_NUM_EVAL);
+   tnl->vtx.eval.map2[attr].map = NULL;
 }
 
 static void set_active_eval1( TNLcontext *tnl, GLuint attr, GLuint dim, 
 			      struct gl_1d_map *map )
 {
+   ASSERT(attr < _TNL_NUM_EVAL);
    if (!tnl->vtx.eval.map1[attr].map) {
       tnl->vtx.eval.map1[attr].map = map;
       tnl->vtx.eval.map1[attr].sz = dim;
@@ -55,6 +59,7 @@ static void set_active_eval1( TNLcontext *tnl, GLuint attr, GLuint dim,
 static void set_active_eval2( TNLcontext *tnl, GLuint attr, GLuint dim, 
 			      struct gl_2d_map *map )
 {
+   ASSERT(attr < _TNL_NUM_EVAL);
    if (!tnl->vtx.eval.map2[attr].map) {
       tnl->vtx.eval.map2[attr].map = map;
       tnl->vtx.eval.map2[attr].sz = dim;
@@ -68,19 +73,9 @@ void _tnl_update_eval( GLcontext *ctx )
 
    /* Vertex program maps have priority over conventional attribs */
 
-   for (attr = 0; attr < VERT_ATTRIB_MAX; attr++) {
+   for (attr = 0; attr < _TNL_NUM_EVAL; attr++) {
       clear_active_eval1( tnl, attr );
       clear_active_eval2( tnl, attr );
-   }
-
-   if (ctx->VertexProgram._Enabled) {
-      for (attr = 0; attr < VERT_ATTRIB_MAX; attr++) {
-	 if (ctx->Eval.Map1Attrib[attr]) 
-	    set_active_eval1( tnl, attr, 4, &ctx->EvalMap.Map1Attrib[attr] );
-
-	 if (ctx->Eval.Map2Attrib[attr]) 
-	    set_active_eval2( tnl, attr, 4, &ctx->EvalMap.Map2Attrib[attr] );
-      }
    }
 
    if (ctx->Eval.Map1Color4) 
@@ -123,6 +118,23 @@ void _tnl_update_eval( GLcontext *ctx )
    else if (ctx->Eval.Map2Vertex3) 
       set_active_eval2( tnl, VERT_ATTRIB_POS, 3, &ctx->EvalMap.Map2Vertex3 );
 
+   /* Evaluators with generic attributes is only supported for NV vertex
+    * programs, not ARB vertex programs.  16 evaluator maps are supported.
+    * We do this after the conventional attributes since the spec says that
+    * these generic maps have higher priority.
+    */
+   if (ctx->VertexProgram._Enabled &&
+       ctx->VertexProgram._Current &&
+       ctx->VertexProgram._Current->IsNVProgram) {
+      for (attr = 0; attr < 16; attr++) {
+	 if (ctx->Eval.Map1Attrib[attr]) 
+	    set_active_eval1( tnl, attr, 4, &ctx->EvalMap.Map1Attrib[attr] );
+
+	 if (ctx->Eval.Map2Attrib[attr]) 
+	    set_active_eval2( tnl, attr, 4, &ctx->EvalMap.Map2Attrib[attr] );
+      }
+   }
+
    tnl->vtx.eval.new_state = 0;
 }
 
@@ -133,7 +145,7 @@ void _tnl_do_EvalCoord1f(GLcontext* ctx, GLfloat u)
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    GLuint attr;
 
-   for (attr = 1; attr <= _TNL_ATTRIB_INDEX; attr++) {
+   for (attr = 1; attr < _TNL_NUM_EVAL; attr++) {
       struct gl_1d_map *map = tnl->vtx.eval.map1[attr].map;
       if (map) {
 	 GLfloat uu = (u - map->u1) * map->du;
@@ -165,9 +177,9 @@ void _tnl_do_EvalCoord1f(GLcontext* ctx, GLfloat u)
 				map->Order);
 
       if (tnl->vtx.eval.map1[0].sz == 4) 
-	 GL_CALL(Vertex4fv)( vertex );
+	 CALL_Vertex4fv(GET_DISPATCH(), ( vertex ));
       else
-	 GL_CALL(Vertex3fv)( vertex ); 
+	 CALL_Vertex3fv(GET_DISPATCH(), ( vertex )); 
    }
 }
 
@@ -178,7 +190,7 @@ void _tnl_do_EvalCoord2f( GLcontext* ctx, GLfloat u, GLfloat v )
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    GLuint attr;
 
-   for (attr = 1; attr <= _TNL_ATTRIB_INDEX; attr++) {
+   for (attr = 1; attr < _TNL_NUM_EVAL; attr++) {
       struct gl_2d_map *map = tnl->vtx.eval.map2[attr].map;
       if (map) {
 	 GLfloat uu = (u - map->u1) * map->du;
@@ -244,9 +256,9 @@ void _tnl_do_EvalCoord2f( GLcontext* ctx, GLfloat u, GLfloat v )
       }
 
       if (tnl->vtx.attrsz[0] == 4) 
-	 GL_CALL(Vertex4fv)( vertex );
+	 CALL_Vertex4fv(GET_DISPATCH(), ( vertex ));
       else
-	 GL_CALL(Vertex3fv)( vertex ); 
+	 CALL_Vertex3fv(GET_DISPATCH(), ( vertex )); 
    }
 }
 

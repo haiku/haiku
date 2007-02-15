@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.0.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -58,22 +58,6 @@ extern GLuint	_ASMAPI _mesa_x86_cpuid_ebx(GLuint op);
 extern GLuint	_ASMAPI _mesa_x86_cpuid_ecx(GLuint op);
 extern GLuint	_ASMAPI _mesa_x86_cpuid_edx(GLuint op);
 
-static void message( const char *msg )
-{
-   GLboolean debug;
-#ifdef DEBUG
-   debug = GL_TRUE;
-#else
-   if ( _mesa_getenv( "MESA_DEBUG" ) ) {
-      debug = GL_TRUE;
-   } else {
-      debug = GL_FALSE;
-   }
-#endif
-   if ( debug ) {
-      fprintf( stderr, "%s", msg );
-   }
-}
 
 #if defined(USE_SSE_ASM)
 /*
@@ -102,10 +86,10 @@ extern void _mesa_test_os_sse_support( void );
 extern void _mesa_test_os_sse_exception_support( void );
 
 #if defined(__linux__) && defined(_POSIX_SOURCE) && defined(X86_FXSR_MAGIC) \
-   && !defined(DRI_NEW_INTERFACE_ONLY)
+   && !defined(IN_DRI_DRIVER)
 static void sigill_handler( int signal, struct sigcontext sc )
 {
-   message( "SIGILL, " );
+   /*message( "SIGILL, " );*/
 
    /* Both the "xorps %%xmm0,%%xmm0" and "divps %xmm0,%%xmm1"
     * instructions are 3 bytes long.  We must increment the instruction
@@ -124,7 +108,7 @@ static void sigill_handler( int signal, struct sigcontext sc )
 
 static void sigfpe_handler( int signal, struct sigcontext sc )
 {
-   message( "SIGFPE, " );
+   /*message( "SIGFPE, " );*/
 
    if ( sc.fpstate->magic != 0xffff ) {
       /* Our signal context has the extended FPU state, so reset the
@@ -136,11 +120,42 @@ static void sigfpe_handler( int signal, struct sigcontext sc )
    } else {
       /* If we ever get here, we're completely hosed.
        */
-      message( "\n\n" );
+      /*message( "\n\n" );*/
       _mesa_problem( NULL, "SSE enabling test failed badly!" );
    }
 }
 #endif /* __linux__ && _POSIX_SOURCE && X86_FXSR_MAGIC */
+
+#if defined(WIN32)
+#ifndef STATUS_FLOAT_MULTIPLE_TRAPS
+# define STATUS_FLOAT_MULTIPLE_TRAPS (0xC00002B5L)
+#endif
+static LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS exp)
+{
+   PEXCEPTION_RECORD rec = exp->ExceptionRecord;
+   PCONTEXT ctx = exp->ContextRecord;
+
+   if ( rec->ExceptionCode == EXCEPTION_ILLEGAL_INSTRUCTION ) {
+      _mesa_debug(NULL, "EXCEPTION_ILLEGAL_INSTRUCTION\n" );
+      _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
+   } else if ( rec->ExceptionCode == STATUS_FLOAT_MULTIPLE_TRAPS ) {
+      _mesa_debug(NULL, "STATUS_FLOAT_MULTIPLE_TRAPS\n");
+      /* Windows seems to clear the exception flag itself, we just have to increment Eip */
+   } else {
+      _mesa_debug(NULL, "UNEXPECTED EXCEPTION (0x%08x), terminating!\n" );
+      return EXCEPTION_EXECUTE_HANDLER;
+   }
+
+   if ( (ctx->ContextFlags & CONTEXT_CONTROL) != CONTEXT_CONTROL ) {
+      _mesa_debug(NULL, "Context does not contain control registers, terminating!\n");
+      return EXCEPTION_EXECUTE_HANDLER;
+   }
+   ctx->Eip += 3;
+
+   return EXCEPTION_CONTINUE_EXECUTION;
+}
+#endif /* WIN32 */
+
 
 /* If we're running on a processor that can do SSE, let's see if we
  * are allowed to or not.  This will catch 2.4.0 or later kernels that
@@ -152,7 +167,7 @@ static void sigfpe_handler( int signal, struct sigcontext sc )
  */
 static void check_os_sse_support( void )
 {
-#if defined(__linux__) && !defined(DRI_NEW_INTERFACE_ONLY)
+#if defined(__linux__) && !defined(IN_DRI_DRIVER)
 #if defined(_POSIX_SOURCE) && defined(X86_FXSR_MAGIC)
    struct sigaction saved_sigill;
    struct sigaction saved_sigfpe;
@@ -172,14 +187,14 @@ static void check_os_sse_support( void )
     * does.
     */
    if ( cpu_has_xmm ) {
-      message( "Testing OS support for SSE... " );
+      _mesa_debug(NULL, "Testing OS support for SSE...\n");
 
       _mesa_test_os_sse_support();
 
       if ( cpu_has_xmm ) {
-	 message( "yes.\n" );
+	 _mesa_debug(NULL, "Yes\n");
       } else {
-	 message( "no!\n" );
+	 _mesa_debug(NULL, "No\n");
       }
    }
 
@@ -197,14 +212,14 @@ static void check_os_sse_support( void )
     * and therefore to be safe I'm going to leave this test in here.
     */
    if ( cpu_has_xmm ) {
-      message( "Testing OS support for SSE unmasked exceptions... " );
+      _mesa_debug(NULL, "Testing OS support for SSE unmasked exceptions...\n");
 
       _mesa_test_os_sse_exception_support();
 
       if ( cpu_has_xmm ) {
-	 message( "yes.\n" );
+	 _mesa_debug(NULL, "Yes.\n");
       } else {
-	 message( "no!\n" );
+	 _mesa_debug(NULL, "No!\n");
       }
    }
 
@@ -217,15 +232,15 @@ static void check_os_sse_support( void )
     * safe to go ahead and hook out the SSE code throughout Mesa.
     */
    if ( cpu_has_xmm ) {
-      message( "Tests of OS support for SSE passed.\n" );
+      _mesa_debug(NULL, "Tests of OS support for SSE passed.\n");
    } else {
-      message( "Tests of OS support for SSE failed!\n" );
+      _mesa_debug(NULL, "Tests of OS support for SSE failed!\n");
    }
 #else
    /* We can't use POSIX signal handling to test the availability of
     * SSE, so we disable it by default.
     */
-   message( "Cannot test OS support for SSE, disabling to be safe.\n" );
+   _mesa_debug(NULL, "Cannot test OS support for SSE, disabling to be safe.\n");
    _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
 #endif /* _POSIX_SOURCE && X86_FXSR_MAGIC */
 #elif defined(__FreeBSD__)
@@ -237,10 +252,48 @@ static void check_os_sse_support( void )
       if (ret || !enabled)
          _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
    }
+#elif defined(WIN32)
+   LPTOP_LEVEL_EXCEPTION_FILTER oldFilter;
+   
+   /* Install our ExceptionFilter */
+   oldFilter = SetUnhandledExceptionFilter( ExceptionFilter );
+   
+   if ( cpu_has_xmm ) {
+      _mesa_debug(NULL, "Testing OS support for SSE...\n");
+
+      _mesa_test_os_sse_support();
+
+      if ( cpu_has_xmm ) {
+	 _mesa_debug(NULL, "Yes.\n");
+      } else {
+	 _mesa_debug(NULL, "No!\n");
+      }
+   }
+
+   if ( cpu_has_xmm ) {
+      _mesa_debug(NULL, "Testing OS support for SSE unmasked exceptions...\n");
+
+      _mesa_test_os_sse_exception_support();
+
+      if ( cpu_has_xmm ) {
+	 _mesa_debug(NULL, "Yes.\n");
+      } else {
+	 _mesa_debug(NULL, "No!\n");
+      }
+   }
+
+   /* Restore previous exception filter */
+   SetUnhandledExceptionFilter( oldFilter );
+
+   if ( cpu_has_xmm ) {
+      _mesa_debug(NULL, "Tests of OS support for SSE passed.\n");
+   } else {
+      _mesa_debug(NULL, "Tests of OS support for SSE failed!\n");
+   }
 #else
    /* Do nothing on other platforms for now.
     */
-   message( "Not testing OS support for SSE, leaving enabled.\n" );
+   _mesa_debug(NULL, "Not testing OS support for SSE, leaving enabled.\n");
 #endif /* __linux__ */
 }
 
@@ -249,12 +302,11 @@ static void check_os_sse_support( void )
 
 void _mesa_init_all_x86_transform_asm( void )
 {
-   (void) message; /* silence warning */
 #ifdef USE_X86_ASM
    _mesa_x86_cpu_features = 0;
 
    if (!_mesa_x86_has_cpuid()) {
-       message("CPUID not detected");
+       _mesa_debug(NULL, "CPUID not detected\n");
    }
    else {
        GLuint cpu_features;
@@ -267,9 +319,7 @@ void _mesa_init_all_x86_transform_asm( void )
        _mesa_x86_cpuid(0, &result, (GLuint *)(cpu_vendor + 0), (GLuint *)(cpu_vendor + 8), (GLuint *)(cpu_vendor + 4));
        cpu_vendor[12] = '\0';
 
-       message("cpu vendor: ");
-       message(cpu_vendor);
-       message("\n");
+       _mesa_debug(NULL, "CPU vendor: %s\n", cpu_vendor);
 
        /* get cpu features */
        cpu_features = _mesa_x86_cpuid_edx(1);
@@ -321,9 +371,7 @@ void _mesa_init_all_x86_transform_asm( void )
 		   _mesa_x86_cpuid(0x80000002+ofs, (GLuint *)(cpu_name + (16*ofs)+0), (GLuint *)(cpu_name + (16*ofs)+4), (GLuint *)(cpu_name + (16*ofs)+8), (GLuint *)(cpu_name + (16*ofs)+12));
 	       cpu_name[48] = '\0'; /* the name should be NULL terminated, but just to be sure */
 
-	       message("cpu name: ");
-	       message(cpu_name);
-	       message("\n");
+	       _mesa_debug(NULL, "CPU name: %s\n", cpu_name);
 	   }
        }
 
@@ -340,7 +388,7 @@ void _mesa_init_all_x86_transform_asm( void )
 #ifdef USE_MMX_ASM
    if ( cpu_has_mmx ) {
       if ( _mesa_getenv( "MESA_NO_MMX" ) == 0 ) {
-         message( "MMX cpu detected.\n" );
+         _mesa_debug(NULL, "MMX cpu detected.\n");
       } else {
          _mesa_x86_cpu_features &= ~(X86_FEATURE_MMX);
       }
@@ -350,7 +398,7 @@ void _mesa_init_all_x86_transform_asm( void )
 #ifdef USE_3DNOW_ASM
    if ( cpu_has_3dnow ) {
       if ( _mesa_getenv( "MESA_NO_3DNOW" ) == 0 ) {
-         message( "3DNow! cpu detected.\n" );
+         _mesa_debug(NULL, "3DNow! cpu detected.\n");
          _mesa_init_3dnow_transform_asm();
       } else {
          _mesa_x86_cpu_features &= ~(X86_FEATURE_3DNOW);
@@ -359,15 +407,17 @@ void _mesa_init_all_x86_transform_asm( void )
 #endif
 
 #ifdef USE_SSE_ASM
-   if ( cpu_has_xmm && _mesa_getenv( "MESA_FORCE_SSE" ) == 0 ) {
-      check_os_sse_support();
-   }
    if ( cpu_has_xmm ) {
-      if (_mesa_getenv( "MESA_NO_SSE" ) == 0 ) {
-         message( "SSE cpu detected.\n" );
-         _mesa_init_sse_transform_asm();
+      if ( _mesa_getenv( "MESA_NO_SSE" ) == 0 ) {
+         _mesa_debug(NULL, "SSE cpu detected.\n");
+         if ( _mesa_getenv( "MESA_FORCE_SSE" ) == 0 ) {
+            check_os_sse_support();
+         }
+         if ( cpu_has_xmm ) {
+            _mesa_init_sse_transform_asm();
+         }
       } else {
-          message( "SSE cpu detected, but switched off by user.\n" );
+         _mesa_debug(NULL, "SSE cpu detected, but switched off by user.\n");
          _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
       }
    }

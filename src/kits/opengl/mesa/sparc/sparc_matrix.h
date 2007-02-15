@@ -5,7 +5,7 @@
 #ifndef _SPARC_MATRIX_H
 #define _SPARC_MATRIX_H
 
-#if (defined(__sparc_v9__) && (!defined(__linux__) || defined(__linux_sparc_64__)))
+#ifdef __arch64__
 #define LDPTR		ldx
 #define MAT_M		0x00
 #define MAT_INV		0x08

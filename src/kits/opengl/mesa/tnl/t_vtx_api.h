@@ -1,4 +1,3 @@
-/* $XFree86$ */
 /**************************************************************************
 
 Copyright 2002 Tungsten Graphics Inc., Cedar Park, Texas.
@@ -36,9 +35,6 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define __T_VTX_API_H__
 
 #include "t_context.h"
-
-#define ERROR_ATTRIB 16
-
 
 
 /* t_vtx_api.c:

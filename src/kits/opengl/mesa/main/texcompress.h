@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,21 +28,27 @@
 #include "mtypes.h"
 
 #if _HAVE_FULL_GL
+
 extern GLuint
-_mesa_get_compressed_formats( GLcontext *ctx, GLint *formats );
+_mesa_get_compressed_formats(GLcontext *ctx, GLint *formats, GLboolean all);
 
 extern GLuint
 _mesa_compressed_texture_size( GLcontext *ctx,
                                GLsizei width, GLsizei height, GLsizei depth,
-                               GLenum format );
+                               GLuint mesaFormat );
+
+extern GLuint
+_mesa_compressed_texture_size_glenum(GLcontext *ctx,
+                                     GLsizei width, GLsizei height,
+                                     GLsizei depth, GLenum glformat);
 
 extern GLint
-_mesa_compressed_row_stride(GLenum format, GLsizei width);
+_mesa_compressed_row_stride(GLuint mesaFormat, GLsizei width);
 
 
 extern GLubyte *
 _mesa_compressed_image_address(GLint col, GLint row, GLint img,
-                               GLenum format,
+                               GLuint mesaFormat,
                                GLsizei width, const GLubyte *image);
 
 
@@ -53,13 +59,16 @@ extern void
 _mesa_init_texture_fxt1( GLcontext *ctx );
 
 
+#else /* _HAVE_FULL_GL */
 
-#else
+/* no-op macros */
 #define _mesa_get_compressed_formats( c, f ) 0
 #define _mesa_compressed_texture_size( c, w, h, d, f ) 0
+#define _mesa_compressed_texture_size_glenum( c, w, h, d, f ) 0
 #define _mesa_compressed_row_stride( f, w) 0
 #define _mesa_compressed_image_address(c, r, i, f, w, i2 ) 0
 #define _mesa_compress_teximage( c, w, h, sF, s, sRS, dF, d, drs ) ((void)0)
-#endif
+
+#endif /* _HAVE_FULL_GL */
 
 #endif /* TEXCOMPRESS_H */

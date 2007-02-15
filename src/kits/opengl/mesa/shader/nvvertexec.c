@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,7 +34,7 @@
 #include "macros.h"
 #include "mtypes.h"
 #include "nvvertexec.h"
-#include "nvvertprog.h"
+#include "program_instruction.h"
 #include "program.h"
 #include "math/m_matrix.h"
 
@@ -47,23 +47,23 @@ static const GLfloat ZeroVec[4] = { 0.0F, 0.0F, 0.0F, 0.0F };
  * per-vertex.
  */
 void
-_mesa_init_vp_per_vertex_registers(GLcontext *ctx)
+_mesa_init_vp_per_vertex_registers(GLcontext *ctx, struct vp_machine *machine)
 {
    /* Input registers get initialized from the current vertex attribs */
-   MEMCPY(ctx->VertexProgram.Inputs, ctx->Current.Attrib,
-          VERT_ATTRIB_MAX * 4 * sizeof(GLfloat));
+   MEMCPY(machine->Inputs, ctx->Current.Attrib,
+          MAX_VERTEX_PROGRAM_ATTRIBS * 4 * sizeof(GLfloat));
 
    if (ctx->VertexProgram.Current->IsNVProgram) {
       GLuint i;
       /* Output/result regs are initialized to [0,0,0,1] */
       for (i = 0; i < MAX_NV_VERTEX_PROGRAM_OUTPUTS; i++) {
-         ASSIGN_4V(ctx->VertexProgram.Outputs[i], 0.0F, 0.0F, 0.0F, 1.0F);
+         ASSIGN_4V(machine->Outputs[i], 0.0F, 0.0F, 0.0F, 1.0F);
       }
       /* Temp regs are initialized to [0,0,0,0] */
       for (i = 0; i < MAX_NV_VERTEX_PROGRAM_TEMPS; i++) {
-         ASSIGN_4V(ctx->VertexProgram.Temporaries[i], 0.0F, 0.0F, 0.0F, 0.0F);
+         ASSIGN_4V(machine->Temporaries[i], 0.0F, 0.0F, 0.0F, 0.0F);
       }
-      ASSIGN_4V(ctx->VertexProgram.AddressReg, 0, 0, 0, 0);
+      ASSIGN_4V(machine->AddressReg, 0, 0, 0, 0);
    }
 }
 
@@ -139,13 +139,13 @@ _mesa_init_vp_per_primitive_registers(GLcontext *ctx)
             continue;
          }
 
-         /* load the matrix */
+         /* load the matrix values into sequential registers */
          if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_IDENTITY_NV) {
             load_matrix(ctx->VertexProgram.Parameters, i*4, mat->m);
          }
          else if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_INVERSE_NV) {
             _math_matrix_analyse(mat); /* update the inverse */
-            assert((mat->flags & MAT_DIRTY_INVERSE) == 0);
+            ASSERT(!_math_matrix_is_dirty(mat));
             load_matrix(ctx->VertexProgram.Parameters, i*4, mat->inv);
          }
          else if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_TRANSPOSE_NV) {
@@ -155,17 +155,17 @@ _mesa_init_vp_per_primitive_registers(GLcontext *ctx)
             assert(ctx->VertexProgram.TrackMatrixTransform[i]
                    == GL_INVERSE_TRANSPOSE_NV);
             _math_matrix_analyse(mat); /* update the inverse */
-            assert((mat->flags & MAT_DIRTY_INVERSE) == 0);
+            ASSERT(!_math_matrix_is_dirty(mat));
             load_transpose_matrix(ctx->VertexProgram.Parameters, i*4, mat->inv);
          }
       }
    }
    else {
-      /* Using and ARB vertex program */
-      if (ctx->VertexProgram.Current->Parameters) {
+      /* ARB vertex program */
+      if (ctx->VertexProgram.Current->Base.Parameters) {
          /* Grab the state GL state and put into registers */
          _mesa_load_state_parameters(ctx,
-                                     ctx->VertexProgram.Current->Parameters);
+                                 ctx->VertexProgram.Current->Base.Parameters);
       }
    }
 }
@@ -176,36 +176,37 @@ _mesa_init_vp_per_primitive_registers(GLcontext *ctx)
  * For debugging.  Dump the current vertex program machine registers.
  */
 void
-_mesa_dump_vp_state( const struct gl_vertex_program_state *state )
+_mesa_dump_vp_state( const struct gl_vertex_program_state *state,
+                     const struct vp_machine *machine)
 {
    int i;
    _mesa_printf("VertexIn:\n");
    for (i = 0; i < MAX_NV_VERTEX_PROGRAM_INPUTS; i++) {
       _mesa_printf("%d: %f %f %f %f   ", i,
-                   state->Inputs[i][0],
-                   state->Inputs[i][1],
-                   state->Inputs[i][2],
-                   state->Inputs[i][3]);
+                   machine->Inputs[i][0],
+                   machine->Inputs[i][1],
+                   machine->Inputs[i][2],
+                   machine->Inputs[i][3]);
    }
    _mesa_printf("\n");
 
    _mesa_printf("VertexOut:\n");
    for (i = 0; i < MAX_NV_VERTEX_PROGRAM_OUTPUTS; i++) {
       _mesa_printf("%d: %f %f %f %f   ", i,
-                  state->Outputs[i][0],
-                  state->Outputs[i][1],
-                  state->Outputs[i][2],
-                  state->Outputs[i][3]);
+                  machine->Outputs[i][0],
+                  machine->Outputs[i][1],
+                  machine->Outputs[i][2],
+                  machine->Outputs[i][3]);
    }
    _mesa_printf("\n");
 
    _mesa_printf("Registers:\n");
    for (i = 0; i < MAX_NV_VERTEX_PROGRAM_TEMPS; i++) {
       _mesa_printf("%d: %f %f %f %f   ", i,
-                  state->Temporaries[i][0],
-                  state->Temporaries[i][1],
-                  state->Temporaries[i][2],
-                  state->Temporaries[i][3]);
+                  machine->Temporaries[i][0],
+                  machine->Temporaries[i][1],
+                  machine->Temporaries[i][2],
+                  machine->Temporaries[i][3]);
    }
    _mesa_printf("\n");
 
@@ -227,41 +228,45 @@ _mesa_dump_vp_state( const struct gl_vertex_program_state *state )
  * source register.
  */
 static INLINE const GLfloat *
-get_register_pointer( const struct vp_src_register *source,
-                      const struct gl_vertex_program_state *state )
+get_register_pointer( GLcontext *ctx,
+                      const struct prog_src_register *source,
+                      struct vp_machine *machine,
+                      const struct gl_vertex_program *program )
 {
    if (source->RelAddr) {
-      const GLint reg = source->Index + state->AddressReg[0];
+      const GLint reg = source->Index + machine->AddressReg[0];
       ASSERT( (source->File == PROGRAM_ENV_PARAM) || 
         (source->File == PROGRAM_STATE_VAR) );
       if (reg < 0 || reg > MAX_NV_VERTEX_PROGRAM_PARAMS)
          return ZeroVec;
       else if (source->File == PROGRAM_ENV_PARAM)
-         return state->Parameters[reg];
-      else
-         return state->Current->Parameters->Parameters[reg].Values;
+         return ctx->VertexProgram.Parameters[reg];
+      else {
+         ASSERT(source->File == PROGRAM_LOCAL_PARAM);
+         return program->Base.Parameters->ParameterValues[reg];
+      }
    }
    else {
       switch (source->File) {
          case PROGRAM_TEMPORARY:
             ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_TEMPS);
-            return state->Temporaries[source->Index];
+            return machine->Temporaries[source->Index];
          case PROGRAM_INPUT:
             ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_INPUTS);
-            return state->Inputs[source->Index];
+            return machine->Inputs[source->Index];
          case PROGRAM_OUTPUT:
             /* This is only needed for the PRINT instruction */
             ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_OUTPUTS);
-            return state->Outputs[source->Index];
+            return machine->Outputs[source->Index];
          case PROGRAM_LOCAL_PARAM:
             ASSERT(source->Index < MAX_PROGRAM_LOCAL_PARAMS);
-            return state->Current->Base.LocalParams[source->Index];
+            return program->Base.LocalParams[source->Index];
          case PROGRAM_ENV_PARAM:
             ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_PARAMS);
-            return state->Parameters[source->Index];
+            return ctx->VertexProgram.Parameters[source->Index];
          case PROGRAM_STATE_VAR:
-            ASSERT(source->Index < state->Current->Parameters->NumParameters);
-            return state->Current->Parameters->Parameters[source->Index].Values;
+            ASSERT(source->Index < program->Base.Parameters->NumParameters);
+            return program->Base.Parameters->ParameterValues[source->Index];
          default:
             _mesa_problem(NULL,
                           "Bad source register file in get_register_pointer");
@@ -277,23 +282,23 @@ get_register_pointer( const struct vp_src_register *source,
  * Apply swizzling and negating as needed.
  */
 static INLINE void
-fetch_vector4( const struct vp_src_register *source,
-               const struct gl_vertex_program_state *state,
+fetch_vector4( GLcontext *ctx, 
+               const struct prog_src_register *source,
+               struct vp_machine *machine,
+               const struct gl_vertex_program *program,
                GLfloat result[4] )
 {
-   const GLfloat *src = get_register_pointer(source, state);
-
-   if (source->Negate) {
-      result[0] = -src[source->Swizzle[0]];
-      result[1] = -src[source->Swizzle[1]];
-      result[2] = -src[source->Swizzle[2]];
-      result[3] = -src[source->Swizzle[3]];
-   }
-   else {
-      result[0] = src[source->Swizzle[0]];
-      result[1] = src[source->Swizzle[1]];
-      result[2] = src[source->Swizzle[2]];
-      result[3] = src[source->Swizzle[3]];
+   const GLfloat *src = get_register_pointer(ctx, source, machine, program);
+   ASSERT(src);
+   result[0] = src[GET_SWZ(source->Swizzle, 0)];
+   result[1] = src[GET_SWZ(source->Swizzle, 1)];
+   result[2] = src[GET_SWZ(source->Swizzle, 2)];
+   result[3] = src[GET_SWZ(source->Swizzle, 3)];
+   if (source->NegateBase) {
+      result[0] = -result[0];
+      result[1] = -result[1];
+      result[2] = -result[2];
+      result[3] = -result[3];
    }
 }
 
@@ -303,17 +308,17 @@ fetch_vector4( const struct vp_src_register *source,
  * As above, but only return result[0] element.
  */
 static INLINE void
-fetch_vector1( const struct vp_src_register *source,
-               const struct gl_vertex_program_state *state,
+fetch_vector1( GLcontext *ctx,
+               const struct prog_src_register *source,
+               struct vp_machine *machine,
+               const struct gl_vertex_program *program,
                GLfloat result[4] )
 {
-   const GLfloat *src = get_register_pointer(source, state);
-
-   if (source->Negate) {
-      result[0] = -src[source->Swizzle[0]];
-   }
-   else {
-      result[0] = src[source->Swizzle[0]];
+   const GLfloat *src = get_register_pointer(ctx, source, machine, program);
+   ASSERT(src);
+   result[0] = src[GET_SWZ(source->Swizzle, 0)];
+   if (source->NegateBase) {
+      result[0] = -result[0];
    }
 }
 
@@ -322,19 +327,21 @@ fetch_vector1( const struct vp_src_register *source,
  * Store 4 floats into a register.
  */
 static void
-store_vector4( const struct vp_dst_register *dest,
-               struct gl_vertex_program_state *state,
+store_vector4( const struct prog_instruction *inst,
+               struct vp_machine *machine,
                const GLfloat value[4] )
 {
+   const struct prog_dst_register *dest = &(inst->DstReg);
    GLfloat *dst;
    switch (dest->File) {
-      case PROGRAM_TEMPORARY:
-         dst = state->Temporaries[dest->Index];
-         break;
       case PROGRAM_OUTPUT:
-         dst = state->Outputs[dest->Index];
+         dst = machine->Outputs[dest->Index];
+         break;
+      case PROGRAM_TEMPORARY:
+         dst = machine->Temporaries[dest->Index];
          break;
       case PROGRAM_ENV_PARAM:
+         /* Only for VP state programs */
          {
             /* a slight hack */
             GET_CURRENT_CONTEXT(ctx);
@@ -347,13 +354,13 @@ store_vector4( const struct vp_dst_register *dest,
          return;
    }
 
-   if (dest->WriteMask[0])
+   if (dest->WriteMask & WRITEMASK_X)
       dst[0] = value[0];
-   if (dest->WriteMask[1])
+   if (dest->WriteMask & WRITEMASK_Y)
       dst[1] = value[1];
-   if (dest->WriteMask[2])
+   if (dest->WriteMask & WRITEMASK_Z)
       dst[2] = value[2];
-   if (dest->WriteMask[3])
+   if (dest->WriteMask & WRITEMASK_W)
       dst[3] = value[3];
 }
 
@@ -379,25 +386,27 @@ store_vector4( const struct vp_dst_register *dest,
  * Execute the given vertex program
  */
 void
-_mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
+_mesa_exec_vertex_program(GLcontext *ctx,
+                          struct vp_machine *machine,
+                          const struct gl_vertex_program *program)
 {
-   struct gl_vertex_program_state *state = &ctx->VertexProgram;
-   const struct vp_instruction *inst;
+   const struct prog_instruction *inst;
 
    ctx->_CurrentProgram = GL_VERTEX_PROGRAM_ARB; /* or NV, doesn't matter */
 
-   /* If the program is position invariant, multiply the input
-    * position and the MVP matrix and stick it into the output pos slot
+   /* If the program is position invariant, multiply the input position
+    * by the MVP matrix and store in the vertex position result register.
     */
    if (ctx->VertexProgram.Current->IsPositionInvariant) {
-      TRANSFORM_POINT( ctx->VertexProgram.Outputs[0], 
+      TRANSFORM_POINT( machine->Outputs[VERT_RESULT_HPOS], 
                        ctx->_ModelProjectMatrix.m, 
-                       ctx->VertexProgram.Inputs[0]);
+                       machine->Inputs[VERT_ATTRIB_POS]);
 
       /* XXX: This could go elsewhere */
-      ctx->VertexProgram.Current->OutputsWritten |= 0x1;
+      ctx->VertexProgram.Current->Base.OutputsWritten |= VERT_BIT_POS;
    }
-   for (inst = program->Instructions; ; inst++) {
+
+   for (inst = program->Base.Instructions; ; inst++) {
 
       if (ctx->VertexProgram.CallbackEnabled &&
           ctx->VertexProgram.Callback) {
@@ -407,52 +416,52 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
       }
 
       switch (inst->Opcode) {
-         case VP_OPCODE_MOV:
+         case OPCODE_MOV:
             {
                GLfloat t[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               store_vector4( &inst->DstReg, state, t );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_LIT:
+         case OPCODE_LIT:
             {
                const GLfloat epsilon = 1.0F / 256.0F; /* per NV spec */
                GLfloat t[4], lit[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
                t[0] = MAX2(t[0], 0.0F);
                t[1] = MAX2(t[1], 0.0F);
                t[3] = CLAMP(t[3], -(128.0F - epsilon), (128.0F - epsilon));
                lit[0] = 1.0;
                lit[1] = t[0];
-               lit[2] = (t[0] > 0.0) ? (GLfloat) exp(t[3] * log(t[1])) : 0.0F;
+               lit[2] = (t[0] > 0.0) ? (GLfloat) _mesa_pow(t[1], t[3]) : 0.0F;
                lit[3] = 1.0;
-               store_vector4( &inst->DstReg, state, lit );
+               store_vector4( inst, machine, lit );
             }
             break;
-         case VP_OPCODE_RCP:
+         case OPCODE_RCP:
             {
                GLfloat t[4];
-               fetch_vector1( &inst->SrcReg[0], state, t );
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
                if (t[0] != 1.0F)
                   t[0] = 1.0F / t[0];  /* div by zero is infinity! */
                t[1] = t[2] = t[3] = t[0];
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_RSQ:
+         case OPCODE_RSQ:
             {
                GLfloat t[4];
-               fetch_vector1( &inst->SrcReg[0], state, t );
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
                t[0] = INV_SQRTF(FABSF(t[0]));
                t[1] = t[2] = t[3] = t[0];
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_EXP:
+         case OPCODE_EXP:
             {
                GLfloat t[4], q[4], floor_t0;
-               fetch_vector1( &inst->SrcReg[0], state, t );
-               floor_t0 = (float) floor(t[0]);
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
+               floor_t0 = FLOORF(t[0]);
                if (floor_t0 > FLT_MAX_EXP) {
                   SET_POS_INFINITY(q[0]);
                   SET_POS_INFINITY(q[2]);
@@ -474,14 +483,14 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
                }
                q[1] = t[0] - floor_t0;
                q[3] = 1.0F;
-               store_vector4( &inst->DstReg, state, q );
+               store_vector4( inst, machine, q );
             }
             break;
-         case VP_OPCODE_LOG:
+         case OPCODE_LOG:
             {
                GLfloat t[4], q[4], abs_t0;
-               fetch_vector1( &inst->SrcReg[0], state, t );
-               abs_t0 = (GLfloat) fabs(t[0]);
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
+               abs_t0 = FABSF(t[0]);
                if (abs_t0 != 0.0F) {
                   /* Since we really can't handle infinite values on VMS
                    * like other OSes we'll use __MAXFLOAT to represent
@@ -499,7 +508,7 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
                   }
                   else {
                      int exponent;
-                     double mantissa = frexp(t[0], &exponent);
+                     GLfloat mantissa = FREXPF(t[0], &exponent);
                      q[0] = (GLfloat) (exponent - 1);
                      q[1] = (GLfloat) (2.0 * mantissa); /* map [.5, 1) -> [1, 2) */
                      q[2] = (GLfloat) (q[0] + LOG2(q[1]));
@@ -511,147 +520,147 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
                   SET_NEG_INFINITY(q[2]);
                }
                q[3] = 1.0;
-               store_vector4( &inst->DstReg, state, q );
+               store_vector4( inst, machine, q );
             }
             break;
-         case VP_OPCODE_MUL:
+         case OPCODE_MUL:
             {
                GLfloat t[4], u[4], prod[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                prod[0] = t[0] * u[0];
                prod[1] = t[1] * u[1];
                prod[2] = t[2] * u[2];
                prod[3] = t[3] * u[3];
-               store_vector4( &inst->DstReg, state, prod );
+               store_vector4( inst, machine, prod );
             }
             break;
-         case VP_OPCODE_ADD:
+         case OPCODE_ADD:
             {
                GLfloat t[4], u[4], sum[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                sum[0] = t[0] + u[0];
                sum[1] = t[1] + u[1];
                sum[2] = t[2] + u[2];
                sum[3] = t[3] + u[3];
-               store_vector4( &inst->DstReg, state, sum );
+               store_vector4( inst, machine, sum );
             }
             break;
-         case VP_OPCODE_DP3:
+         case OPCODE_DP3:
             {
                GLfloat t[4], u[4], dot[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                dot[0] = t[0] * u[0] + t[1] * u[1] + t[2] * u[2];
                dot[1] = dot[2] = dot[3] = dot[0];
-               store_vector4( &inst->DstReg, state, dot );
+               store_vector4( inst, machine, dot );
             }
             break;
-         case VP_OPCODE_DP4:
+         case OPCODE_DP4:
             {
                GLfloat t[4], u[4], dot[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                dot[0] = t[0] * u[0] + t[1] * u[1] + t[2] * u[2] + t[3] * u[3];
                dot[1] = dot[2] = dot[3] = dot[0];
-               store_vector4( &inst->DstReg, state, dot );
+               store_vector4( inst, machine, dot );
             }
             break;
-         case VP_OPCODE_DST:
+         case OPCODE_DST:
             {
                GLfloat t[4], u[4], dst[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                dst[0] = 1.0F;
                dst[1] = t[1] * u[1];
                dst[2] = t[2];
                dst[3] = u[3];
-               store_vector4( &inst->DstReg, state, dst );
+               store_vector4( inst, machine, dst );
             }
             break;
-         case VP_OPCODE_MIN:
+         case OPCODE_MIN:
             {
                GLfloat t[4], u[4], min[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                min[0] = (t[0] < u[0]) ? t[0] : u[0];
                min[1] = (t[1] < u[1]) ? t[1] : u[1];
                min[2] = (t[2] < u[2]) ? t[2] : u[2];
                min[3] = (t[3] < u[3]) ? t[3] : u[3];
-               store_vector4( &inst->DstReg, state, min );
+               store_vector4( inst, machine, min );
             }
             break;
-         case VP_OPCODE_MAX:
+         case OPCODE_MAX:
             {
                GLfloat t[4], u[4], max[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                max[0] = (t[0] > u[0]) ? t[0] : u[0];
                max[1] = (t[1] > u[1]) ? t[1] : u[1];
                max[2] = (t[2] > u[2]) ? t[2] : u[2];
                max[3] = (t[3] > u[3]) ? t[3] : u[3];
-               store_vector4( &inst->DstReg, state, max );
+               store_vector4( inst, machine, max );
             }
             break;
-         case VP_OPCODE_SLT:
+         case OPCODE_SLT:
             {
                GLfloat t[4], u[4], slt[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                slt[0] = (t[0] < u[0]) ? 1.0F : 0.0F;
                slt[1] = (t[1] < u[1]) ? 1.0F : 0.0F;
                slt[2] = (t[2] < u[2]) ? 1.0F : 0.0F;
                slt[3] = (t[3] < u[3]) ? 1.0F : 0.0F;
-               store_vector4( &inst->DstReg, state, slt );
+               store_vector4( inst, machine, slt );
             }
             break;
-         case VP_OPCODE_SGE:
+         case OPCODE_SGE:
             {
                GLfloat t[4], u[4], sge[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                sge[0] = (t[0] >= u[0]) ? 1.0F : 0.0F;
                sge[1] = (t[1] >= u[1]) ? 1.0F : 0.0F;
                sge[2] = (t[2] >= u[2]) ? 1.0F : 0.0F;
                sge[3] = (t[3] >= u[3]) ? 1.0F : 0.0F;
-               store_vector4( &inst->DstReg, state, sge );
+               store_vector4( inst, machine, sge );
             }
             break;
-         case VP_OPCODE_MAD:
+         case OPCODE_MAD:
             {
                GLfloat t[4], u[4], v[4], sum[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
-               fetch_vector4( &inst->SrcReg[2], state, v );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
+               fetch_vector4( ctx, &inst->SrcReg[2], machine, program, v );
                sum[0] = t[0] * u[0] + v[0];
                sum[1] = t[1] * u[1] + v[1];
                sum[2] = t[2] * u[2] + v[2];
                sum[3] = t[3] * u[3] + v[3];
-               store_vector4( &inst->DstReg, state, sum );
+               store_vector4( inst, machine, sum );
             }
             break;
-         case VP_OPCODE_ARL:
+         case OPCODE_ARL:
             {
                GLfloat t[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               state->AddressReg[0] = (GLint) floor(t[0]);
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               machine->AddressReg[0] = (GLint) FLOORF(t[0]);
             }
             break;
-         case VP_OPCODE_DPH:
+         case OPCODE_DPH:
             {
                GLfloat t[4], u[4], dot[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                dot[0] = t[0] * u[0] + t[1] * u[1] + t[2] * u[2] + u[3];
                dot[1] = dot[2] = dot[3] = dot[0];
-               store_vector4( &inst->DstReg, state, dot );
+               store_vector4( inst, machine, dot );
             }
             break;
-         case VP_OPCODE_RCC:
+         case OPCODE_RCC:
             {
                GLfloat t[4], u;
-               fetch_vector1( &inst->SrcReg[0], state, t );
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
                if (t[0] == 1.0F)
                   u = 1.0F;
                else
@@ -673,115 +682,120 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
                   }
                }
                t[0] = t[1] = t[2] = t[3] = u;
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_SUB: /* GL_NV_vertex_program1_1 */
+         case OPCODE_SUB: /* GL_NV_vertex_program1_1 */
             {
                GLfloat t[4], u[4], sum[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                sum[0] = t[0] - u[0];
                sum[1] = t[1] - u[1];
                sum[2] = t[2] - u[2];
                sum[3] = t[3] - u[3];
-               store_vector4( &inst->DstReg, state, sum );
+               store_vector4( inst, machine, sum );
             }
             break;
-         case VP_OPCODE_ABS: /* GL_NV_vertex_program1_1 */
+         case OPCODE_ABS: /* GL_NV_vertex_program1_1 */
             {
                GLfloat t[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
                if (t[0] < 0.0)  t[0] = -t[0];
                if (t[1] < 0.0)  t[1] = -t[1];
                if (t[2] < 0.0)  t[2] = -t[2];
                if (t[3] < 0.0)  t[3] = -t[3];
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_FLR: /* GL_ARB_vertex_program */
+         case OPCODE_FLR: /* GL_ARB_vertex_program */
             {
                GLfloat t[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
                t[0] = FLOORF(t[0]);
                t[1] = FLOORF(t[1]);
                t[2] = FLOORF(t[2]);
                t[3] = FLOORF(t[3]);
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_FRC: /* GL_ARB_vertex_program */
+         case OPCODE_FRC: /* GL_ARB_vertex_program */
             {
                GLfloat t[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
                t[0] = t[0] - FLOORF(t[0]);
                t[1] = t[1] - FLOORF(t[1]);
                t[2] = t[2] - FLOORF(t[2]);
                t[3] = t[3] - FLOORF(t[3]);
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_EX2: /* GL_ARB_vertex_program */
+         case OPCODE_EX2: /* GL_ARB_vertex_program */
             {
                GLfloat t[4];
-               fetch_vector1( &inst->SrcReg[0], state, t );
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
                t[0] = t[1] = t[2] = t[3] = (GLfloat)_mesa_pow(2.0, t[0]);
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_LG2: /* GL_ARB_vertex_program */
+         case OPCODE_LG2: /* GL_ARB_vertex_program */
             {
                GLfloat t[4];
-               fetch_vector1( &inst->SrcReg[0], state, t );
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
                t[0] = t[1] = t[2] = t[3] = LOG2(t[0]);
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_POW: /* GL_ARB_vertex_program */
+         case OPCODE_POW: /* GL_ARB_vertex_program */
             {
                GLfloat t[4], u[4];
-               fetch_vector1( &inst->SrcReg[0], state, t );
-               fetch_vector1( &inst->SrcReg[1], state, u );
+               fetch_vector1( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector1( ctx, &inst->SrcReg[1], machine, program, u );
                t[0] = t[1] = t[2] = t[3] = (GLfloat)_mesa_pow(t[0], u[0]);
-               store_vector4( &inst->DstReg, state, t );
+               store_vector4( inst, machine, t );
             }
             break;
-         case VP_OPCODE_XPD: /* GL_ARB_vertex_program */
+         case OPCODE_XPD: /* GL_ARB_vertex_program */
             {
                GLfloat t[4], u[4], cross[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
-               fetch_vector4( &inst->SrcReg[1], state, u );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
+               fetch_vector4( ctx, &inst->SrcReg[1], machine, program, u );
                cross[0] = t[1] * u[2] - t[2] * u[1];
                cross[1] = t[2] * u[0] - t[0] * u[2];
                cross[2] = t[0] * u[1] - t[1] * u[0];
-               store_vector4( &inst->DstReg, state, cross );
+               store_vector4( inst, machine, cross );
             }
             break;
-         case VP_OPCODE_SWZ: /* GL_ARB_vertex_program */
+         case OPCODE_SWZ: /* GL_ARB_vertex_program */
             {
-               const struct vp_src_register *source = &inst->SrcReg[0];
-               const GLfloat *src = get_register_pointer(source, state);
+               const struct prog_src_register *source = &inst->SrcReg[0];
+               const GLfloat *src = get_register_pointer(ctx, source,
+                                                         machine, program);
                GLfloat result[4];
                GLuint i;
 
                /* do extended swizzling here */
-               for (i = 0; i < 3; i++) {
-                  if (source->Swizzle[i] == SWIZZLE_ZERO)
+               for (i = 0; i < 4; i++) {
+                  const GLuint swz = GET_SWZ(source->Swizzle, i);
+                  if (swz == SWIZZLE_ZERO)
                      result[i] = 0.0;
-                  else if (source->Swizzle[i] == SWIZZLE_ONE)
-                     result[i] = -1.0;
-                  else
-                     result[i] = -src[source->Swizzle[i]];
-                  if (source->Negate)
+                  else if (swz == SWIZZLE_ONE)
+                     result[i] = 1.0;
+                  else {
+                     ASSERT(swz >= 0);
+                     ASSERT(swz <= 3);
+                     result[i] = src[swz];
+                  }
+                  if (source->NegateBase & (1 << i))
                      result[i] = -result[i];
                }
-               store_vector4( &inst->DstReg, state, result );
+               store_vector4( inst, machine, result );
             }
             break;
-         case VP_OPCODE_PRINT:
+         case OPCODE_PRINT:
             if (inst->SrcReg[0].File) {
                GLfloat t[4];
-               fetch_vector4( &inst->SrcReg[0], state, t );
+               fetch_vector4( ctx, &inst->SrcReg[0], machine, program, t );
                _mesa_printf("%s%g, %g, %g, %g\n",
                             (char *) inst->Data, t[0], t[1], t[2], t[3]);
             }
@@ -789,7 +803,7 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
                _mesa_printf("%s\n", (char *) inst->Data);
             }
             break;
-         case VP_OPCODE_END:
+         case OPCODE_END:
             ctx->_CurrentProgram = 0;
             return;
          default:
@@ -804,48 +818,18 @@ _mesa_exec_vertex_program(GLcontext *ctx, const struct vertex_program *program)
 }
 
 
-
 /**
-Thoughts on vertex program optimization:
-
-The obvious thing to do is to compile the vertex program into X86/SSE/3DNow!
-assembly code.  That will probably be a lot of work.
-
-Another approach might be to replace the vp_instruction->Opcode field with
-a pointer to a specialized C function which executes the instruction.
-In particular we can write functions which skip swizzling, negating,
-masking, relative addressing, etc. when they're not needed.
-
-For example:
-
-void simple_add( struct vp_instruction *inst )
+ * Execute a vertex state program.
+ * \sa _mesa_ExecuteProgramNV
+ */
+void
+_mesa_exec_vertex_state_program(GLcontext *ctx,
+                                struct gl_vertex_program *vprog,
+                                const GLfloat *params)
 {
-   GLfloat *sum = machine->Registers[inst->DstReg.Register];
-   GLfloat *a = machine->Registers[inst->SrcReg[0].Register];
-   GLfloat *b = machine->Registers[inst->SrcReg[1].Register];
-   sum[0] = a[0] + b[0];
-   sum[1] = a[1] + b[1];
-   sum[2] = a[2] + b[2];
-   sum[3] = a[3] + b[3];
+   struct vp_machine machine;
+   _mesa_init_vp_per_vertex_registers(ctx, &machine);
+   _mesa_init_vp_per_primitive_registers(ctx);
+   COPY_4V(machine.Inputs[VERT_ATTRIB_POS], params);
+   _mesa_exec_vertex_program(ctx, &machine, vprog);
 }
-
-*/
-
-/*
-
-KW:
-
-A first step would be to 'vectorize' the programs in the same way as
-the normal transformation code in the tnl module.  Thus each opcode
-takes zero or more input vectors (registers) and produces one or more
-output vectors.
-
-These operations would intially be coded in C, with machine-specific
-assembly following, as is currently the case for matrix
-transformations in the math/ directory.  The preprocessing scheme for
-selecting simpler operations Brian describes above would also work
-here.
-
-This should give reasonable performance without excessive effort.
-
-*/

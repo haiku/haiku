@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  6.3
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -49,7 +48,8 @@
  * VERT_X(v): Alias for vertex x value.
  * VERT_Y(v): Alias for vertex y value.
  * VERT_Z(v): Alias for vertex z value.
- * DEPTH_SCALE: Scale for offset.
+ * DEPTH_SCALE: Scale for constant offset.
+ * REVERSE_DEPTH: Viewport depth range reversed.
  *
  * VERTEX: Hardware vertex type.
  * GET_VERTEX(n): Retreive vertex with index n.
@@ -108,6 +108,10 @@
 #define VERT_Z_ADD(v,val) VERT_Z(v) += val
 #endif
 
+#ifndef REVERSE_DEPTH
+#define REVERSE_DEPTH 0
+#endif
+
 /* disable twostencil for un-aware drivers */
 #ifndef HAVE_STENCIL_TWOSIDE
 #define HAVE_STENCIL_TWOSIDE 0
@@ -127,10 +131,10 @@ static void TAG(triangle)( GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
 {
    struct vertex_buffer *VB = &TNL_CONTEXT( ctx )->vb;
    VERTEX *v[3];
-   GLfloat offset;
+   GLfloat offset = 0;
    GLfloat z[3];
    GLenum mode = GL_FILL;
-   GLuint facing;
+   GLuint facing = 0;
    LOCAL_VARS(3);
 
 /*     fprintf(stderr, "%s\n", __FUNCTION__); */
@@ -196,20 +200,34 @@ static void TAG(triangle)( GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
 	       }
 	       else {
 		  GLfloat (*vbcolor)[4] = VB->ColorPtr[1]->data;
-		  ASSERT(VB->ColorPtr[1]->stride == 4*sizeof(GLfloat));
 		  (void) vbcolor;
 
 		  if (!DO_FLAT) {
 		     VERT_SAVE_RGBA( 0 );
 		     VERT_SAVE_RGBA( 1 );
-		     VERT_SET_RGBA( v[0], vbcolor[e0] );
-		     VERT_SET_RGBA( v[1], vbcolor[e1] );
 		  }
 		  VERT_SAVE_RGBA( 2 );
-		  VERT_SET_RGBA( v[2], vbcolor[e2] );
+
+		  if (VB->ColorPtr[1]->stride) {
+		     ASSERT(VB->ColorPtr[1]->stride == 4*sizeof(GLfloat));
+
+		     if (!DO_FLAT) {		  
+			VERT_SET_RGBA( v[0], vbcolor[e0] );
+			VERT_SET_RGBA( v[1], vbcolor[e1] );
+		     }
+		     VERT_SET_RGBA( v[2], vbcolor[e2] );
+		  }
+		  else {
+		     if (!DO_FLAT) {		  
+			VERT_SET_RGBA( v[0], vbcolor[0] );
+			VERT_SET_RGBA( v[1], vbcolor[0] );
+		     }
+		     VERT_SET_RGBA( v[2], vbcolor[0] );
+		  }
 
 		  if (HAVE_SPEC && VB->SecondaryColorPtr[1]) {
 		     GLfloat (*vbspec)[4] = VB->SecondaryColorPtr[1]->data;
+		     ASSERT(VB->SecondaryColorPtr[1]->stride == 4*sizeof(GLfloat));
 
 		     if (!DO_FLAT) {
 			VERT_SAVE_SPEC( 0 );
@@ -255,7 +273,7 @@ static void TAG(triangle)( GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
 	    if ( bc < 0.0f ) bc = -bc;
 	    offset += MAX2( ac, bc ) * ctx->Polygon.OffsetFactor;
 	 }
-	 offset *= ctx->MRD;
+	 offset *= ctx->DrawBuffer->_MRD * (REVERSE_DEPTH ? -1.0 : 1.0);
       }
    }
 
@@ -380,10 +398,10 @@ static void TAG(quad)( GLcontext *ctx,
 {
    struct vertex_buffer *VB = &TNL_CONTEXT( ctx )->vb;
    VERTEX *v[4];
-   GLfloat offset;
+   GLfloat offset = 0;
    GLfloat z[4];
    GLenum mode = GL_FILL;
-   GLuint facing;
+   GLuint facing = 0;
    LOCAL_VARS(4);
 
    v[0] = (VERTEX *)GET_VERTEX(e0);
@@ -458,12 +476,25 @@ static void TAG(quad)( GLcontext *ctx,
 		     VERT_SAVE_RGBA( 0 );
 		     VERT_SAVE_RGBA( 1 );
 		     VERT_SAVE_RGBA( 2 );
-		     VERT_SET_RGBA( v[0], vbcolor[e0] );
-		     VERT_SET_RGBA( v[1], vbcolor[e1] );
-		     VERT_SET_RGBA( v[2], vbcolor[e2] );
-	          }
+		  }
 	          VERT_SAVE_RGBA( 3 );
-	          VERT_SET_RGBA( v[3], vbcolor[e3] );
+
+		  if (VB->ColorPtr[1]->stride) {
+		     if (!DO_FLAT) {
+			VERT_SET_RGBA( v[0], vbcolor[e0] );
+			VERT_SET_RGBA( v[1], vbcolor[e1] );
+			VERT_SET_RGBA( v[2], vbcolor[e2] );
+		     }
+		     VERT_SET_RGBA( v[3], vbcolor[e3] );
+		  }
+		  else {
+		     if (!DO_FLAT) {
+			VERT_SET_RGBA( v[0], vbcolor[0] );
+			VERT_SET_RGBA( v[1], vbcolor[0] );
+			VERT_SET_RGBA( v[2], vbcolor[0] );
+		     }
+		     VERT_SET_RGBA( v[3], vbcolor[0] );
+		  }
 
 	          if (HAVE_SPEC && VB->SecondaryColorPtr[1]) {
 		     GLfloat (*vbspec)[4] = VB->SecondaryColorPtr[1]->data;
@@ -518,7 +549,7 @@ static void TAG(quad)( GLcontext *ctx,
 	    if ( bc < 0.0f ) bc = -bc;
 	    offset += MAX2( ac, bc ) * ctx->Polygon.OffsetFactor;
 	 }
-	 offset *= ctx->MRD;
+	 offset *= ctx->DrawBuffer->_MRD * (REVERSE_DEPTH ? -1.0 : 1.0);
       }
    }
 
@@ -717,7 +748,7 @@ static void TAG(line)( GLcontext *ctx, GLuint e0, GLuint e1 )
 static void TAG(points)( GLcontext *ctx, GLuint first, GLuint last )
 {
    struct vertex_buffer *VB = &TNL_CONTEXT( ctx )->vb;
-   int i;
+   GLuint i;
    LOCAL_VARS(1);
 
    if (VB->Elts == 0) {

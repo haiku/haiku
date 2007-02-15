@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,7 +27,6 @@
 #include "context.h"
 #include "colormac.h"
 #include "macros.h"
-#include "nvfragprog.h"
 #include "s_aaline.h"
 #include "s_context.h"
 #include "s_depth.h"
@@ -62,7 +61,7 @@ compute_stipple_mask( GLcontext *ctx, GLuint len, GLubyte mask[] )
  * To draw a wide line we can simply redraw the span N times, side by side.
  */
 static void
-draw_wide_line( GLcontext *ctx, struct sw_span *span, GLboolean xMajor )
+draw_wide_line( GLcontext *ctx, SWspan *span, GLboolean xMajor )
 {
    GLint width, start;
 
@@ -310,7 +309,7 @@ _swrast_choose_line( GLcontext *ctx )
             USE(textured_line);
          }
       }
-      else if (ctx->Depth.Test || ctx->Fog.Enabled || ctx->Line._Width != 1.0
+      else if (ctx->Depth.Test || swrast->_FogEnabled || ctx->Line._Width != 1.0
                || ctx->Line.StippleFlag) {
          /* no texture, but Z, fog, width>1, stipple, etc. */
          if (rgbmode)

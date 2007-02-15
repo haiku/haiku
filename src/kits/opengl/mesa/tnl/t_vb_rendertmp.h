@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  6.5
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -45,10 +44,6 @@
 #define RESET_STIPPLE
 #endif
 
-#ifndef RESET_OCCLUSION
-#define RESET_OCCLUSION
-#endif
-
 #ifndef TEST_PRIM_END
 #define TEST_PRIM_END(flags) (flags & PRIM_END)
 #define TEST_PRIM_BEGIN(flags) (flags & PRIM_BEGIN)
@@ -70,7 +65,6 @@ static void TAG(render_points)( GLcontext *ctx,
    LOCAL_VARS;
    (void) flags;
 
-   RESET_OCCLUSION;
    INIT(GL_POINTS);
    RENDER_POINTS( start, count );
    POSTFIX;
@@ -85,7 +79,6 @@ static void TAG(render_lines)( GLcontext *ctx,
    LOCAL_VARS;
    (void) flags;
 
-   RESET_OCCLUSION;
    INIT(GL_LINES);
    for (j=start+1; j<count; j+=2 ) {
       RESET_STIPPLE;
@@ -104,7 +97,6 @@ static void TAG(render_line_strip)( GLcontext *ctx,
    LOCAL_VARS;
    (void) flags;
 
-   RESET_OCCLUSION;
    INIT(GL_LINE_STRIP);
 
    if (TEST_PRIM_BEGIN(flags)) {
@@ -128,7 +120,6 @@ static void TAG(render_line_loop)( GLcontext *ctx,
 
    (void) flags;
 
-   RESET_OCCLUSION;
    INIT(GL_LINE_LOOP);
 
    if (start+1 < count) {

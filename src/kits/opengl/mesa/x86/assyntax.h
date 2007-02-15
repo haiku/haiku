@@ -1730,11 +1730,17 @@ SECTION _DATA public align=16 class=DATA use32 flat
 #define TLBL(a)		CONCAT(a,$)
 #endif
 
-/* hidden symbol visibility support */
+/* Hidden symbol visibility support.
+ * If we build with gcc's -fvisibility=hidden flag, we'll need to change
+ * the symbol visibility mode to 'default'.
+ */
 #if defined(GNU_ASSEMBLER) && !defined(__DJGPP__) && !defined(__MINGW32__)
-#define HIDDEN(a)       .hidden a
+#  define HIDDEN(x) .hidden x
+#elif defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__) >= 303 && !defined(__DJGPP__) && !defined(__MINGW32__)
+#  pragma GCC visibility push(default)
+#  define HIDDEN(x) .hidden x
 #else
-#define HIDDEN(a)
+#  define HIDDEN(x)
 #endif
 
 #endif /* __ASSYNTAX_H__ */

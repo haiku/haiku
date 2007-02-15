@@ -31,8 +31,8 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libutil/error.c,v 1.1 2001/03/17 00:25:41 brianp Exp $
+** $Date: 2006/06/20 15:30:26 $ $Revision: 1.3 $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libutil/error.c,v 1.3 2006/06/20 15:30:26 brianp Exp $
 */
 
 #include "gluos.h"
@@ -41,47 +41,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char *glErrorStrings[GL_OUT_OF_MEMORY - GL_INVALID_ENUM + 1] = {
-    "invalid enumerant",
-    "invalid value",
-    "invalid operation",
-    "stack overflow",
-    "stack underflow",
-    "out of memory",
+
+struct token_string
+{
+   GLuint Token;
+   const char *String;
 };
 
-static const char *gluErrorStrings[GLU_INVALID_OPERATION - GLU_INVALID_ENUM + 1] = {
-    "invalid enumerant",
-    "invalid value",
-    "out of memory",
-    "",				/* never used but need placeholder */
-    "invalid operation",
+static const struct token_string Errors[] = {
+   { GL_NO_ERROR, "no error" },
+   { GL_INVALID_ENUM, "invalid enumerant" },
+   { GL_INVALID_VALUE, "invalid value" },
+   { GL_INVALID_OPERATION, "invalid operation" },
+   { GL_STACK_OVERFLOW, "stack overflow" },
+   { GL_STACK_UNDERFLOW, "stack underflow" },
+   { GL_OUT_OF_MEMORY, "out of memory" },
+   { GL_TABLE_TOO_LARGE, "table too large" },
+#ifdef GL_EXT_framebuffer_object
+   { GL_INVALID_FRAMEBUFFER_OPERATION_EXT, "invalid framebuffer operation" },
+#endif
+   /* GLU */
+   { GLU_INVALID_ENUM, "invalid enumerant" },
+   { GLU_INVALID_VALUE, "invalid value" },
+   { GLU_OUT_OF_MEMORY, "out of memory" },
+   { GLU_INCOMPATIBLE_GL_VERSION, "incompatible gl version" },
+   { GLU_INVALID_OPERATION, "invalid operation" },
+   { ~0, NULL } /* end of list indicator */
 };
 
-#define NERRORS (sizeof(errorStrings)/sizeof(errorStrings[0]))
+
 
 const GLubyte* GLAPIENTRY
 gluErrorString(GLenum errorCode)
 {
-    if (errorCode == 0) {
-	return (const unsigned char *) "no error";
-    }
-    if ((errorCode >= GL_INVALID_ENUM) && (errorCode <= GL_OUT_OF_MEMORY)) {
-	return (const unsigned char *) glErrorStrings[errorCode - GL_INVALID_ENUM];
-    }
-    if (errorCode == GL_TABLE_TOO_LARGE) {
-        return (const unsigned char *) "table too large";
-    }
-    if ((errorCode >= GLU_INVALID_ENUM) && (errorCode <= GLU_INVALID_OPERATION)) {
-	return (const unsigned char *) gluErrorStrings[errorCode - GLU_INVALID_ENUM];
+    int i;
+    for (i = 0; Errors[i].String; i++) {
+        if (Errors[i].Token == errorCode)
+            return (const GLubyte *) Errors[i].String;
     }
     if ((errorCode >= GLU_NURBS_ERROR1) && (errorCode <= GLU_NURBS_ERROR37)) {
-	return (const unsigned char *) __gluNURBSErrorString(errorCode - (GLU_NURBS_ERROR1 - 1));
+	return (const GLubyte *) __gluNURBSErrorString(errorCode - (GLU_NURBS_ERROR1 - 1));
     }
     if ((errorCode >= GLU_TESS_ERROR1) && (errorCode <= GLU_TESS_ERROR8)) {
-	return (const unsigned char *) __gluTessErrorString(errorCode - (GLU_TESS_ERROR1 - 1));
+	return (const GLubyte *) __gluTessErrorString(errorCode - (GLU_TESS_ERROR1 - 1));
     }
-
-    return 0;
+    return (const GLubyte *) 0;
 }
 

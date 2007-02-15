@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -71,6 +71,11 @@ _mesa_IndexMask( GLuint mask );
 extern void GLAPIENTRY
 _mesa_ColorMask( GLboolean red, GLboolean green,
                  GLboolean blue, GLboolean alpha );
+
+
+extern void GLAPIENTRY
+_mesa_ClampColorARB(GLenum target, GLenum clamp);
+
 
 extern void  
 _mesa_init_color( GLcontext * ctx );

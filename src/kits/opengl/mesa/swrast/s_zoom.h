@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,27 +28,33 @@
 #include "mtypes.h"
 #include "swrast.h"
 
-extern void
-_swrast_write_zoomed_rgba_span( GLcontext *ctx, const struct sw_span *span,
-                                CONST GLchan rgb[][4], GLint y0,
-                                GLint skipPixels );
 
 extern void
-_swrast_write_zoomed_rgb_span( GLcontext *ctx, const struct sw_span *span,
-                               CONST GLchan rgb[][3], GLint y0,
-                               GLint skipPixels );
+_swrast_write_zoomed_rgba_span(GLcontext *ctx, GLint imgX, GLint imgY,
+                               const SWspan *span, const GLvoid *rgba);
 
 extern void
-_swrast_write_zoomed_index_span( GLcontext *ctx, const struct sw_span *span,
-                                 GLint y0, GLint skipPixels );
+_swrast_write_zoomed_rgb_span(GLcontext *ctx, GLint imgX, GLint imgY,
+                              const SWspan *span, const GLvoid *rgb);
 
 extern void
-_swrast_write_zoomed_depth_span( GLcontext *ctx, const struct sw_span *span,
-                                 GLint y0, GLint skipPixels );
+_swrast_write_zoomed_index_span(GLcontext *ctx, GLint imgX, GLint imgY,
+                                const SWspan *span);
 
 extern void
-_swrast_write_zoomed_stencil_span( GLcontext *ctx, GLuint n, GLint x, GLint y,
-                                   const GLstencil stencil[], GLint y0,
-                                   GLint skipPixels );
+_swrast_write_zoomed_depth_span(GLcontext *ctx, GLint imgX, GLint imgY,
+                                const SWspan *span);
+
+
+extern void
+_swrast_write_zoomed_stencil_span(GLcontext *ctx, GLint imgX, GLint imgY,
+                                  GLint width, GLint spanX, GLint spanY,
+                                  const GLstencil stencil[]);
+
+extern void
+_swrast_write_zoomed_z_span(GLcontext *ctx, GLint imgX, GLint imgY,
+                            GLint width, GLint spanX, GLint spanY,
+                            const GLvoid *z);
+
 
 #endif

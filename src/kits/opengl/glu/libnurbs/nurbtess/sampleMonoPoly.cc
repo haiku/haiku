@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2004/05/12 15:29:36 $ $Revision: 1.4 $
+** $Date: 2005/10/28 13:09:23 $ $Revision: 1.5 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleMonoPoly.cc,v 1.4 2004/05/12 15:29:36 brianp Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleMonoPoly.cc,v 1.5 2005/10/28 13:09:23 brianp Exp $
 */
 
 #include "gluos.h"
@@ -976,7 +976,7 @@ void findNeck(vertexArray *leftChain, Int botLeftIndex,
 void findLeftGridIndices(directedLine* topEdge, Int firstGridIndex, Int lastGridIndex, gridWrap* grid,  Int* ret_indices, Int* ret_innerIndices)
 {
 
-  Int i,k,isHoriz;
+  Int i,k,isHoriz = 0;
   Int n_ulines = grid->get_n_ulines();
   Real uMin = grid->get_u_min();
   Real uMax = grid->get_u_max();
@@ -984,7 +984,7 @@ void findLeftGridIndices(directedLine* topEdge, Int firstGridIndex, Int lastGrid
   Real vMin = grid->get_v_min();
   Real vMax = grid->get_v_max();
   */
-  Real slop, uinterc;
+  Real slop = 0.0, uinterc;
 
 #ifdef SHORTEN_GRID_LINE
   //uintercBuf stores all the interction u value for each grid line
@@ -1102,7 +1102,7 @@ void findRightGridIndices(directedLine* topEdge, Int firstGridIndex, Int lastGri
   Real vMin = grid->get_v_min();
   Real vMax = grid->get_v_max();
   */
-  Real slop, uinterc;
+  Real slop = 0.0, uinterc;
 
 #ifdef SHORTEN_GRID_LINE
   //uintercBuf stores all the interction u value for each grid line

@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,7 +28,7 @@
  * This file is #include'd to generate custom triangle rasterizers.
  *
  * The following macros may be defined to indicate what auxillary information
- * must be interplated across the triangle:
+ * must be interpolated across the triangle:
  *    INTERP_Z        - if defined, interpolate vertex Z values
  *    INTERP_W        - if defined, interpolate vertex W values
  *    INTERP_FOG      - if defined, interpolate fog values
@@ -41,6 +41,7 @@
  *    INTERP_TEX      - if defined, interpolate set 0 float STRQ texcoords
  *                         NOTE:  OpenGL STRQ = Mesa STUV (R was taken for red)
  *    INTERP_MULTITEX - if defined, interpolate N units of STRQ texcoords
+ *    INTERP_VARYING  - if defined, interpolate M floats of GLSL varyings
  *
  * When one can directly address pixels in the color buffer the following
  * macros can be defined and used to compute pixel addresses during
@@ -141,6 +142,38 @@
 #endif
 
 
+
+#ifdef INTERP_VARYING
+#define VARYING_LOOP(CODE)\
+   {\
+      GLuint iv, ic;\
+      for (iv = 0; iv < MAX_VARYING_VECTORS; iv++) {\
+         for (ic = 0; ic < VARYINGS_PER_VECTOR; ic++) {\
+            CODE\
+         }\
+      }\
+   }
+#endif
+
+
+
+/*
+ * Some code we unfortunately need to prevent negative interpolated colors.
+ */
+#ifndef CLAMP_INTERPOLANT
+#define CLAMP_INTERPOLANT(CHANNEL, CHANNELSTEP, LEN)		\
+do {								\
+   GLfixed endVal = span.CHANNEL + (LEN) * span.CHANNELSTEP;	\
+   if (endVal < 0) {						\
+      span.CHANNEL -= endVal;					\
+   }								\
+   if (span.CHANNEL < 0) {					\
+      span.CHANNEL = 0;						\
+   }								\
+} while (0)
+#endif
+
+
 static void NAME(GLcontext *ctx, const SWvertex *v0,
                                  const SWvertex *v1,
                                  const SWvertex *v2 )
@@ -169,9 +202,9 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
    } EdgeT;
 
 #ifdef INTERP_Z
-   const GLint depthBits = ctx->Visual.depthBits;
+   const GLint depthBits = ctx->DrawBuffer->Visual.depthBits;
    const GLint fixedToDepthShift = depthBits <= 16 ? FIXED_SHIFT : 0;
-   const GLfloat maxDepth = ctx->DepthMaxF;
+   const GLfloat maxDepth = ctx->DrawBuffer->_DepthMaxF;
 #define FixedToDepth(F)  ((F) >> fixedToDepthShift)
 #endif
    EdgeT eMaj, eTop, eBot;
@@ -183,7 +216,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #endif
    GLinterp vMin_fx, vMin_fy, vMid_fx, vMid_fy, vMax_fx, vMax_fy;
 
-   struct sw_span span;
+   SWspan span;
 
    INIT_SPAN(span, GL_POLYGON, 0, 0, 0);
 
@@ -303,6 +336,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 
       oneOverArea = 1.0F / area;
    }
+
 
    span.facing = ctx->_Facing; /* for 2-sided stencil test */
 
@@ -510,7 +544,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #  endif /* INTERP_ALPHA */
       }
       else {
-         ASSERT (ctx->Light.ShadeModel == GL_FLAT);
+         ASSERT(ctx->Light.ShadeModel == GL_FLAT);
          span.interpMask |= SPAN_FLAT;
          span.drdx = span.drdy = 0.0F;
          span.dgdx = span.dgdy = 0.0F;
@@ -629,6 +663,19 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
          )
       }
 #endif
+#ifdef INTERP_VARYING
+      span.interpMask |= SPAN_VARYING;
+      {
+         /* win[3] is 1/W */
+         const GLfloat wMax = vMax->win[3], wMin = vMin->win[3], wMid = vMid->win[3];
+         VARYING_LOOP(
+            GLfloat eMaj_dvar = vMax->attribute[iv][ic] * wMax - vMin->attribute[iv][ic] * wMin;
+            GLfloat eBot_dvar = vMid->attribute[iv][ic] * wMid - vMin->attribute[iv][ic] * wMin;
+            span.varStepX[iv][ic] = oneOverArea * (eMaj_dvar * eBot.dy - eMaj.dy * eBot_dvar);
+            span.varStepY[iv][ic] = oneOverArea * (eMaj.dx * eBot_dvar - eMaj_dvar * eBot.dx);
+         )
+      }
+#endif
 
       /*
        * We always sample at pixel centers.  However, we avoid
@@ -688,10 +735,13 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #endif
 #ifdef INTERP_Z
 #  ifdef DEPTH_TYPE
+         struct gl_renderbuffer *zrb
+            = ctx->DrawBuffer->Attachment[BUFFER_DEPTH].Renderbuffer;
          DEPTH_TYPE *zRow = NULL;
          GLint dZRowOuter = 0, dZRowInner;  /* offset in bytes */
 #  endif
-         GLfixed zLeft = 0, fdzOuter = 0, fdzInner;
+         GLuint zLeft = 0;
+         GLfixed fdzOuter = 0, fdzInner;
 #endif
 #ifdef INTERP_W
          GLfloat wLeft = 0, dwOuter = 0, dwInner;
@@ -728,6 +778,11 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
          GLfloat dtOuter[MAX_TEXTURE_COORD_UNITS], dtInner[MAX_TEXTURE_COORD_UNITS];
          GLfloat duOuter[MAX_TEXTURE_COORD_UNITS], duInner[MAX_TEXTURE_COORD_UNITS];
          GLfloat dvOuter[MAX_TEXTURE_COORD_UNITS], dvInner[MAX_TEXTURE_COORD_UNITS];
+#endif
+#ifdef INTERP_VARYING
+         GLfloat varLeft[MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
+         GLfloat dvarOuter[MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
+         GLfloat dvarInner[MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
 #endif
 
          for (subTriangle=0; subTriangle<=1; subTriangle++) {
@@ -839,7 +894,8 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                   GLfloat z0 = vLower->win[2];
                   if (depthBits <= 16) {
                      /* interpolate fixed-pt values */
-                     GLfloat tmp = (z0 * FIXED_SCALE + span.dzdx * adjx + span.dzdy * adjy) + FIXED_HALF;
+                     GLfloat tmp = (z0 * FIXED_SCALE + span.dzdx * adjx
+                                    + span.dzdy * adjy) + FIXED_HALF;
                      if (tmp < MAX_GLUINT / 2)
                         zLeft = (GLfixed) tmp;
                      else
@@ -847,13 +903,14 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                      fdzOuter = SignedFloatToFixed(span.dzdy + dxOuter * span.dzdx);
                   }
                   else {
-                     /* interpolate depth values exactly */
-                     zLeft = (GLint) (z0 + span.dzdx * FixedToFloat(adjx) + span.dzdy * FixedToFloat(adjy));
+                     /* interpolate depth values w/out scaling */
+                     zLeft = (GLuint) (z0 + span.dzdx * FixedToFloat(adjx)
+                                       + span.dzdy * FixedToFloat(adjy));
                      fdzOuter = (GLint) (span.dzdy + dxOuter * span.dzdx);
                   }
 #  ifdef DEPTH_TYPE
                   zRow = (DEPTH_TYPE *)
-                    _swrast_zbuffer_address(ctx, InterpToInt(fxLeftEdge), span.y);
+                    zrb->GetPointer(ctx, zrb, InterpToInt(fxLeftEdge), span.y);
                   dZRowOuter = (ctx->DrawBuffer->Width + idxOuter) * sizeof(DEPTH_TYPE);
 #  endif
                }
@@ -898,7 +955,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #  endif
                }
                else {
-                  ASSERT (ctx->Light.ShadeModel == GL_FLAT);
+                  ASSERT(ctx->Light.ShadeModel == GL_FLAT);
 #  if CHAN_TYPE == GL_FLOAT
                   rLeft = v2->color[RCOMP];
                   gLeft = v2->color[GCOMP];
@@ -920,7 +977,8 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #    endif
 #  endif
                }
-#endif
+#endif /* INTERP_RGB */
+
 
 #ifdef INTERP_SPEC
                if (ctx->Light.ShadeModel == GL_SMOOTH) {
@@ -941,6 +999,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #  endif
                }
                else {
+                  ASSERT(ctx->Light.ShadeModel == GL_FLAT);
 #if  CHAN_TYPE == GL_FLOAT
                   srLeft = v2->specular[RCOMP];
                   sgLeft = v2->specular[GCOMP];
@@ -962,6 +1021,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                   diOuter = SignedFloatToFixed(didy + dxOuter * didx);
                }
                else {
+                  ASSERT(ctx->Light.ShadeModel == GL_FLAT);
                   iLeft = FloatToFixed(v2->index);
                   diOuter = 0;
                }
@@ -995,6 +1055,15 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                   dtOuter[u] = span.texStepY[u][1] + dxOuter * span.texStepX[u][1];
                   duOuter[u] = span.texStepY[u][2] + dxOuter * span.texStepX[u][2];
                   dvOuter[u] = span.texStepY[u][3] + dxOuter * span.texStepX[u][3];
+               )
+#endif
+#ifdef INTERP_VARYING
+               VARYING_LOOP(
+                  const GLfloat invW = vLower->win[3];
+                  const GLfloat var0 = vLower->attribute[iv][ic] * invW;
+                  varLeft[iv][ic] = var0 + (span.varStepX[iv][ic] * adjx +
+                     span.varStepY[iv][ic] * adjy) * (1.0f / FIXED_SCALE);
+                  dvarOuter[iv][ic] = span.varStepY[iv][ic] + dxOuter * span.varStepX[iv][ic];
                )
 #endif
             } /*if setupLeft*/
@@ -1059,13 +1128,17 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                dvInner[u] = dvOuter[u] + span.texStepX[u][3];
             )
 #endif
+#ifdef INTERP_VARYING
+            VARYING_LOOP(
+               dvarInner[iv][ic] = dvarOuter[iv][ic] + span.varStepX[iv][ic];
+            )
+#endif
 
             while (lines > 0) {
                /* initialize the span interpolants to the leftmost value */
                /* ff = fixed-pt fragment */
                const GLint right = InterpToInt(fxRightEdge);
                span.x = InterpToInt(fxLeftEdge);
-
                if (right <= span.x)
                   span.end = 0;
                else
@@ -1109,76 +1182,38 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                   span.tex[u][3] = vLeft[u];
                )
 #endif
+#ifdef INTERP_VARYING
+               VARYING_LOOP(
+                  span.var[iv][ic] = varLeft[iv][ic];
+               )
+#endif
 
-               if (span.end > 1) {
-                  /* Under rare circumstances, we might have to fudge the
-                   * colors. XXX does this really happen anymore???
-                   */
+               /* This is where we actually generate fragments */
+               /* XXX the test for span.y > 0 _shouldn't_ be needed but
+                * it fixes a problem on 64-bit Opterons (bug 4842).
+                */
+               if (span.end > 0 && span.y >= 0) {
                   const GLint len = span.end - 1;
                   (void) len;
 #ifdef INTERP_RGB
-                  {
-                     GLfixed ffrend = span.red + len * span.redStep;
-                     GLfixed ffgend = span.green + len * span.greenStep;
-                     GLfixed ffbend = span.blue + len * span.blueStep;
-                     if (ffrend < 0) {
-                        span.red -= ffrend;
-                        if (span.red < 0)
-                           span.red = 0;
-                     }
-                     if (ffgend < 0) {
-                        span.green -= ffgend;
-                        if (span.green < 0)
-                           span.green = 0;
-                     }
-                     if (ffbend < 0) {
-                        span.blue -= ffbend;
-                        if (span.blue < 0)
-                           span.blue = 0;
-                     }
-                  }
+                  CLAMP_INTERPOLANT(red, redStep, len);
+                  CLAMP_INTERPOLANT(green, greenStep, len);
+                  CLAMP_INTERPOLANT(blue, blueStep, len);
 #endif
 #ifdef INTERP_ALPHA
-                  {
-                     GLfixed ffaend = span.alpha + len * span.alphaStep;
-                     if (ffaend < 0) {
-                        span.alpha -= ffaend;
-                        if (span.alpha < 0)
-                           span.alpha = 0;
-                     }
-                  }
+                  CLAMP_INTERPOLANT(alpha, alphaStep, len);
 #endif
 #ifdef INTERP_SPEC
-                  {
-                     GLfixed ffsrend = span.specRed + len * span.specRedStep;
-                     GLfixed ffsgend = span.specGreen + len * span.specGreenStep;
-                     GLfixed ffsbend = span.specBlue + len * span.specBlueStep;
-                     if (ffsrend < 0) {
-                        span.specRed -= ffsrend;
-                        if (span.specRed < 0)
-                           span.specRed = 0;
-                     }
-                     if (ffsgend < 0) {
-                        span.specGreen -= ffsgend;
-                        if (span.specGreen < 0)
-                           span.specGreen = 0;
-                     }
-                     if (ffsbend < 0) {
-                        span.specBlue -= ffsbend;
-                        if (span.specBlue < 0)
-                           span.specBlue = 0;
-                     }
-                  }
+                  CLAMP_INTERPOLANT(specRed, specRedStep, len);
+                  CLAMP_INTERPOLANT(specGreen, specGreenStep, len);
+                  CLAMP_INTERPOLANT(specBlue, specBlueStep, len);
 #endif
 #ifdef INTERP_INDEX
-                  if (span.index < 0)
-                     span.index = 0;
+                  CLAMP_INTERPOLANT(index, indexStep, len);
 #endif
-               } /* span.end > 1 */
-
-               /* This is where we actually generate fragments */
-               if (span.end > 0) {
-                  RENDER_SPAN( span );
+                  {
+                     RENDER_SPAN( span );
+                  }
                }
 
                /*
@@ -1240,6 +1275,11 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                      vLeft[u] += dvOuter[u];
                   )
 #endif
+#ifdef INTERP_VARYING
+                  VARYING_LOOP(
+                     varLeft[iv][ic] += dvarOuter[iv][ic];
+                  )
+#endif
                }
                else {
 #ifdef PIXEL_ADDRESS
@@ -1285,6 +1325,11 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
                      vLeft[u] += dvInner[u];
                   )
 #endif
+#ifdef INTERP_VARYING
+                  VARYING_LOOP(
+                     varLeft[iv][ic] += dvarInner[iv][ic];
+                  )
+#endif
                }
             } /*while lines>0*/
 
@@ -1304,6 +1349,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #undef PIXEL_TYPE
 #undef BYTES_PER_ROW
 #undef PIXEL_ADDRESS
+#undef DEPTH_TYPE
 
 #undef INTERP_Z
 #undef INTERP_W
@@ -1315,7 +1361,9 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #undef INTERP_INT_TEX
 #undef INTERP_TEX
 #undef INTERP_MULTITEX
+#undef INTERP_VARYING
 #undef TEX_UNIT_LOOP
+#undef VARYING_LOOP
 
 #undef S_SCALE
 #undef T_SCALE

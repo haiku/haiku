@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
+** $Date: 2005/10/28 13:09:23 $ $Revision: 1.2 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/dataTransform.cc,v 1.1 2001/03/17 00:25:40 brianp Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/dataTransform.cc,v 1.2 2005/10/28 13:09:23 brianp Exp $
 */
 
 #include <stdlib.h>
@@ -47,6 +47,7 @@
 
 extern directedLine* arcLoopToDLineLoop(Arc_ptr loop);
 
+#if 0 // UNUSED
 static directedLine* copy_loop(Arc_ptr loop, Real2* vertArray, int& index, directedLine dline_buf[], sampledLine sline_buf[], int& index_dline)
 {
   directedLine *ret;
@@ -95,7 +96,9 @@ static directedLine* copy_loop(Arc_ptr loop, Real2* vertArray, int& index, direc
     }
   return ret;
 }
+#endif
 
+#if 0 // UNUSED
 static int num_edges(Bin& bin)
 {
   int sum=0;
@@ -103,6 +106,8 @@ static int num_edges(Bin& bin)
     sum += jarc->pwlArc->npts-1;
   return sum;
 }
+#endif
+
 /*
 directedLine* bin_to_DLineLoops(Bin& bin)
 {

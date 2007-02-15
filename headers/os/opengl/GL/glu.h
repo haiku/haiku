@@ -30,6 +30,10 @@
 #ifndef __glu_h__
 #define __glu_h__
 
+#if defined(USE_MGL_NAMESPACE)
+#include "glu_mangle.h"
+#endif
+
 #include <GL/gl.h>
 
 #ifndef GLAPIENTRY
@@ -41,9 +45,12 @@
 #endif
 
 #ifndef GLAPI
-#define GLAPI	_IMPEXP_GL
+#define GLAPI
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*************************************************************/
 
@@ -250,17 +257,16 @@
 class GLUnurbs;
 class GLUquadric;
 class GLUtesselator;
-extern "C" {
 #else
 typedef struct GLUnurbs GLUnurbs;
 typedef struct GLUquadric GLUquadric;
 typedef struct GLUtesselator GLUtesselator;
 #endif
 
-typedef struct GLUnurbs GLUnurbsObj;
-typedef struct GLUquadric GLUquadricObj;
-typedef struct GLUtesselator GLUtesselatorObj;
-typedef struct GLUtesselator GLUtriangulatorObj;
+typedef GLUnurbs GLUnurbsObj;
+typedef GLUquadric GLUquadricObj;
+typedef GLUtesselator GLUtesselatorObj;
+typedef GLUtesselator GLUtriangulatorObj;
 
 #define GLU_TESS_MAX_COORD 1.0e150
 

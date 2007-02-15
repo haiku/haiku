@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -83,7 +83,22 @@ enum _format {
    MESA_FORMAT_CI8,		/*                               CCCC CCCC */
    MESA_FORMAT_YCBCR,		/*                     YYYY YYYY UorV UorV */
    MESA_FORMAT_YCBCR_REV,	/*                     UorV UorV YYYY YYYY */
+   MESA_FORMAT_Z24_S8,          /* ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ SSSS SSSS */
+   MESA_FORMAT_Z16,             /*                     ZZZZ ZZZZ ZZZZ ZZZZ */
+   MESA_FORMAT_Z32,             /* ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ */
    /*@}*/
+
+#if FEATURE_EXT_texture_sRGB
+   /**
+    * \name 8-bit/channel sRGB formats
+    */
+   /*@{*/
+   MESA_FORMAT_SRGB8,
+   MESA_FORMAT_SRGBA8,
+   MESA_FORMAT_SL8,
+   MESA_FORMAT_SLA8,
+   /*@}*/
+#endif
 
    /**
     * \name Compressed texture formats.
@@ -117,14 +132,6 @@ enum _format {
    /*@}*/
 
    /**
-    * Depth textures
-    */
-   /*@{*/
-   MESA_FORMAT_DEPTH_COMPONENT_FLOAT32,
-   MESA_FORMAT_DEPTH_COMPONENT16,
-   /*@}*/
-
-   /**
     * \name Floating point texture formats.
     */
    /*@{*/
@@ -154,11 +161,15 @@ extern const struct gl_texture_format _mesa_texformat_luminance_alpha;
 extern const struct gl_texture_format _mesa_texformat_intensity;
 /*@}*/
 
-/** Depth textures */
+#if FEATURE_EXT_texture_sRGB
+/** sRGB (nonlinear) formats */
 /*@{*/
-extern const struct gl_texture_format _mesa_texformat_depth_component_float32;
-extern const struct gl_texture_format _mesa_texformat_depth_component16;
+extern const struct gl_texture_format _mesa_texformat_srgb8;
+extern const struct gl_texture_format _mesa_texformat_srgba8;
+extern const struct gl_texture_format _mesa_texformat_sl8;
+extern const struct gl_texture_format _mesa_texformat_sla8;
 /*@}*/
+#endif
 
 /** Floating point texture formats */
 /*@{*/
@@ -197,7 +208,9 @@ extern const struct gl_texture_format _mesa_texformat_a8;
 extern const struct gl_texture_format _mesa_texformat_l8;
 extern const struct gl_texture_format _mesa_texformat_i8;
 extern const struct gl_texture_format _mesa_texformat_ci8;
-
+extern const struct gl_texture_format _mesa_texformat_z24_s8;
+extern const struct gl_texture_format _mesa_texformat_z16;
+extern const struct gl_texture_format _mesa_texformat_z32;
 /*@}*/
 
 /** \name YCbCr formats */

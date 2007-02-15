@@ -35,8 +35,8 @@
 /*
  * patch.c++
  *
- * $Date: 2002/11/01 23:35:07 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/patch.cc,v 1.3 2002/11/01 23:35:07 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.4 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/patch.cc,v 1.4 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include <stdio.h>
@@ -439,7 +439,7 @@ Patch::getstepsize( void )
     }
 
 #ifdef DEBUG
-    dprintf( "sidesteps %g %g %g %g, stepsize %g %g\n",
+    _glu_dprintf( "sidesteps %g %g %g %g, stepsize %g %g\n",
 	pspec[0].sidestep[0], pspec[0].sidestep[1],
 	pspec[1].sidestep[0], pspec[1].sidestep[1],
 	pspec[0].stepsize, pspec[1].stepsize );

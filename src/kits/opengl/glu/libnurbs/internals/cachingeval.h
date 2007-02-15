@@ -35,8 +35,8 @@
 /*
  * cachingeval.h
  *
- * $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/cachingeval.h,v 1.1 2001/03/17 00:25:40 brianp Exp $
+ * $Date: 2006/03/29 18:54:00 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/cachingeval.h,v 1.2 2006/03/29 18:54:00 brianp Exp $
  */
 
 #ifndef __glucachingval_h_
@@ -44,6 +44,7 @@
 
 class CachingEvaluator {
 public:
+    virtual             ~CachingEvaluator() { /* silence warning*/ }
     enum ServiceMode 	{ play, record, playAndRecord };
     virtual int		canRecord( void );
     virtual int		canPlayAndRecord( void );

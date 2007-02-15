@@ -1,4 +1,4 @@
-/* $Id: 3dnow_xform2.S,v 1.3 2005/01/04 14:33:47 brianp Exp $ */
+/* $Id: 3dnow_xform2.S,v 1.4 2006/04/17 18:58:24 krh Exp $ */
 
 /*
  * Mesa 3-D graphics library
@@ -470,4 +470,8 @@ LLBL( G3TPIR_4 ):
     POP_L     ( EDI )
     POP_L     ( ESI )
     RET
+#endif
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
 #endif

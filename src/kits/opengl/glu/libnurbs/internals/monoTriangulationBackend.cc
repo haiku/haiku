@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2004/05/12 15:29:36 $ $Revision: 1.2 $
+** $Date: 2005/10/28 13:09:23 $ $Revision: 1.3 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/monoTriangulationBackend.cc,v 1.2 2004/05/12 15:29:36 brianp Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/monoTriangulationBackend.cc,v 1.3 2005/10/28 13:09:23 brianp Exp $
 */
 
 #include "monoTriangulation.h"
@@ -86,7 +86,7 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
 {
   Int i,j,k;
   Int isReflex;
-  TrimVertex trimVert;
+  /*TrimVertex trimVert;*/
   /*if there are at most one vertex in the queue, then simply insert
    */
   if(index_queue <=1){

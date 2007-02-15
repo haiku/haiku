@@ -1,6 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, korli@users.berlios.de
+ * 		Philippe Houdoin, philippe.houdoin@free.fr
  */
 /*
  * Mesa 3-D graphics library
@@ -18,6 +22,9 @@ extern "C" {
 	#include "drivers/common/driverfuncs.h"
 	#include "main/colormac.h"
 	#include "main/buffers.h"
+	#include "main/framebuffer.h"
+	#include "main/renderbuffer.h"
+	#include "main/state.h"
 	#include "main/version.h"
 	#include "swrast/swrast.h"
 	#include "swrast_setup/swrast_setup.h"
@@ -77,6 +84,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 	fVisual(NULL),
 	fFrameBuffer(NULL)
 {
+	CALLED();
 
 	fClearColor[BE_RCOMP] = 0;
 	fClearColor[BE_GCOMP] = 0;
@@ -85,12 +93,12 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 
 	fClearIndex = 0;
 
-	// We don't support single buffering (yet): double buffering forced.
-	options |= BGL_DOUBLE;
+	// We force single buffering for the time being
+	//options &= !BGL_DOUBLE;
 
 	const GLboolean rgbFlag = ((options & BGL_INDEX) == 0);
 	const GLboolean alphaFlag = ((options & BGL_ALPHA) == BGL_ALPHA);
-	const GLboolean dblFlag = ((options & BGL_DOUBLE) == BGL_DOUBLE);
+	const GLboolean dblFlag = false; //((options & BGL_DOUBLE) == BGL_DOUBLE);
 	const GLboolean stereoFlag = false;
 	const GLint depth = (options & BGL_DEPTH) ? 16 : 0;
 	const GLint stencil = (options & BGL_STENCIL) ? 8 : 0;
@@ -112,7 +120,6 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 
 	functions.GetString 	= GetString;
 	functions.UpdateState 	= UpdateState;
-	functions.GetBufferSize = GetBufferSize;
 	functions.Clear 	= Clear;
 	functions.ClearIndex 	= ClearIndex;
 	functions.ClearColor 	= ClearColor;
@@ -126,14 +133,8 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 		return;
 	}
 
-	_mesa_enable_sw_extensions(fContext);
-	_mesa_enable_1_3_extensions(fContext);
-	_mesa_enable_1_4_extensions(fContext);
-	_mesa_enable_1_5_extensions(fContext);
-
 	// create core framebuffer
-	fFrameBuffer = _mesa_create_framebuffer(fVisual, depth > 0 ? GL_TRUE : GL_FALSE,
-		stencil > 0 ? GL_TRUE: GL_FALSE, accum > 0 ? GL_TRUE : GL_FALSE, alphaFlag);
+	fFrameBuffer = _mesa_create_framebuffer(fVisual);
 
 	/* Initialize the software rasterizer and helper modules. */
 	_swrast_CreateContext(fContext);
@@ -142,19 +143,39 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 	_swsetup_CreateContext(fContext);
 	_swsetup_Wakeup(fContext);
 
-	MesaSoftwareRenderer * mr = (MesaSoftwareRenderer *) fContext->DriverCtx;
-	struct swrast_device_driver * swdd = _swrast_GetDeviceDriverReference( fContext );
-	TNLcontext * tnl = TNL_CONTEXT(fContext);
+	fRenderBuffer = _mesa_new_renderbuffer(fContext, BUFFER_FRONT_LEFT);
 
-	assert(mr->fContext == fContext );
-	assert(tnl);
-	assert(swdd);
+	fRenderBuffer->InternalFormat = GL_RGBA;
+	fRenderBuffer->_BaseFormat = GL_RGBA;
+	fRenderBuffer->DataType = GL_UNSIGNED_BYTE;
+	fRenderBuffer->Data = NULL;
+	fRenderBuffer->AllocStorage = RenderbufferStorage;
+
+	fRenderBuffer->GetRow = ReadRGBASpan;
+	fRenderBuffer->GetValues = ReadRGBAPixels;
+	fRenderBuffer->PutRow = WriteRGBASpan;
+	fRenderBuffer->PutRowRGB = WriteRGBSpan;
+	fRenderBuffer->PutMonoRow = WriteMonoRGBASpan;
+	fRenderBuffer->PutValues = WriteMonoRGBAPixels;
+
+	_mesa_add_renderbuffer(fFrameBuffer, BUFFER_FRONT_LEFT, fRenderBuffer);
+
+	_mesa_add_soft_renderbuffers(fFrameBuffer,
+                                   GL_FALSE,
+                                   fVisual->haveDepthBuffer,
+                                   fVisual->haveStencilBuffer,
+                                   fVisual->haveAccumBuffer,
+                                   GL_FALSE,
+                                   GL_FALSE );
 
 	// Use default TCL pipeline
-	tnl->Driver.RunPipeline = _tnl_run_pipeline;
+	TNL_CONTEXT( fContext )->Driver.RunPipeline = _tnl_run_pipeline;
+
+	_mesa_enable_sw_extensions(fContext);
+	_mesa_enable_1_3_extensions(fContext);
+	_mesa_enable_1_4_extensions(fContext);
+	_mesa_enable_1_5_extensions(fContext);
  
-	swdd->SetBuffer = this->SetBuffer;
-	
 	// some stupid applications (Quake2) don't even think about calling LockGL()
 	// before using glGetString and its glGet*() friends...
 	// so make sure there is at least a valid context.
@@ -166,6 +187,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 
 MesaSoftwareRenderer::~MesaSoftwareRenderer()
 {
+	CALLED();
 	_mesa_destroy_visual(fVisual);
 	_mesa_destroy_framebuffer(fFrameBuffer);
 	_mesa_destroy_context(fContext);
@@ -176,18 +198,38 @@ MesaSoftwareRenderer::~MesaSoftwareRenderer()
 
 void
 MesaSoftwareRenderer::LockGL()
-{	
+{
+	CALLED();
 	BGLRenderer::LockGL();
+
+	_mesa_make_current(fContext, fFrameBuffer, fFrameBuffer);
+
+	BRect b = GLView()->Bounds();
+	uint32 width = b.IntegerWidth() + 1;
+	uint32 height = b.IntegerHeight() + 1;
+	if (width != fWidth || height != fHeight || !fBitmap) {
+		// allocate new size of back buffer bitmap
+		if (fBitmap)
+			delete fBitmap;
+		BRect rect(0.0, 0.0, width - 1, height - 1);
+		fBitmap = new BBitmap(rect, B_RGBA32);
+		_mesa_resize_framebuffer(fContext, fFrameBuffer, width, height);
+	}
+	fWidth = width;
+	fHeight = height;
+	fBottom = (GLint) b.bottom;
+	fRenderBuffer->Data = fBitmap->Bits();
 	
-	UpdateState(fContext, 0);
-	_mesa_make_current(fContext, fFrameBuffer);
+	fBitmap->LockBits();
 }
 
 
 void
 MesaSoftwareRenderer::UnlockGL()
 {
-
+	CALLED();
+	fBitmap->UnlockBits();
+	_mesa_make_current(fContext, NULL, NULL);
 	BGLRenderer::UnlockGL();
 }
 
@@ -195,10 +237,10 @@ MesaSoftwareRenderer::UnlockGL()
 void
 MesaSoftwareRenderer::SwapBuffers(bool VSync)
 {
+	CALLED();
 	_mesa_notifySwapBuffers(fContext);
 
 	if (fBitmap) {
-		CALLED();
 		GLView()->LockLooper();
 		GLView()->DrawBitmap(fBitmap);
 		GLView()->UnlockLooper();
@@ -389,26 +431,27 @@ MesaSoftwareRenderer::ClearColor(GLcontext *ctx, const GLfloat color[4])
 
 
 void 
-MesaSoftwareRenderer::Clear(GLcontext *ctx, GLbitfield mask,
-                               GLboolean all, GLint x, GLint y,
-                               GLint width, GLint height)
+MesaSoftwareRenderer::Clear(GLcontext *ctx, GLbitfield mask)
 {
 	CALLED();
-	if (mask & DD_FRONT_LEFT_BIT)
-		ClearFront(ctx, all, x, y, width, height);
-	if (mask & DD_BACK_LEFT_BIT)
-		ClearBack(ctx, all, x, y, width, height);
+#if 0
+	if (mask & BUFFER_BIT_FRONT_LEFT)
+		ClearFront(ctx);
+	if (mask & BUFFER_BIT_BACK_LEFT)
+		ClearBack(ctx);
+#else
+	if (mask & BUFFER_BIT_FRONT_LEFT)
+		ClearBack(ctx);
+#endif
 
-	mask &= ~(DD_FRONT_LEFT_BIT | DD_BACK_LEFT_BIT);
+	mask &= ~(BUFFER_BIT_FRONT_LEFT | BUFFER_BIT_BACK_LEFT);
 	if (mask)
-		_swrast_Clear( ctx, mask, all, x, y, width, height );
+		_swrast_Clear( ctx, mask);
 }
 
 
 void 
-MesaSoftwareRenderer::ClearFront(GLcontext *ctx,
-                         GLboolean all, GLint x, GLint y,
-                         GLint width, GLint height)
+MesaSoftwareRenderer::ClearFront(GLcontext *ctx)
 {
 	CALLED();
 	
@@ -424,6 +467,13 @@ MesaSoftwareRenderer::ClearFront(GLcontext *ctx,
 			mr->fClearColor[BE_GCOMP],
 			mr->fClearColor[BE_BCOMP],
 			mr->fClearColor[BE_ACOMP]);
+	
+	int x = ctx->DrawBuffer->_Xmin;
+	int y = ctx->DrawBuffer->_Ymin;
+	int width = ctx->DrawBuffer->_Xmax - x;
+	int height = ctx->DrawBuffer->_Ymax - y;
+	GLboolean all = (width == ctx->DrawBuffer->Width && height == ctx->DrawBuffer->Height);
+
 	if (all) {
 		BRect b = bglview->Bounds();
 		bglview->FillRect(b);
@@ -452,9 +502,7 @@ MesaSoftwareRenderer::ClearFront(GLcontext *ctx,
 
 
 void 
-MesaSoftwareRenderer::ClearBack(GLcontext *ctx,
-                        GLboolean all, GLint x, GLint y,
-                        GLint width, GLint height)
+MesaSoftwareRenderer::ClearBack(GLcontext *ctx)
 {
 	CALLED();
 	
@@ -466,6 +514,12 @@ MesaSoftwareRenderer::ClearBack(GLcontext *ctx,
 	GLuint *start = (GLuint *) bitmap->Bits();
 	const GLuint *clearPixelPtr = (const GLuint *) mr->fClearColor;
 	const GLuint clearPixel = B_LENDIAN_TO_HOST_INT32(*clearPixelPtr);
+
+	int x = ctx->DrawBuffer->_Xmin;
+	int y = ctx->DrawBuffer->_Ymin;
+	int width = ctx->DrawBuffer->_Xmax - x;
+	int height = ctx->DrawBuffer->_Ymax - y;
+	GLboolean all = (width == ctx->DrawBuffer->Width && height == ctx->DrawBuffer->Height);
 
 	if (all) {
 		const int numPixels = mr->fWidth * mr->fHeight;
@@ -492,91 +546,22 @@ MesaSoftwareRenderer::ClearBack(GLcontext *ctx,
 void 
 MesaSoftwareRenderer::UpdateState( GLcontext *ctx, GLuint new_state )
 {
-	struct swrast_device_driver *	swdd = _swrast_GetDeviceDriverReference( ctx );
+	if (!ctx)
+		return;
 
+	CALLED();
 	_swrast_InvalidateState( ctx, new_state );
 	_swsetup_InvalidateState( ctx, new_state );
 	_ac_InvalidateState( ctx, new_state );
 	_tnl_InvalidateState( ctx, new_state );
-
-	if (ctx->Color.DrawBuffer[0] == GL_FRONT) {
-		/* read/write front buffer */
-		swdd->WriteRGBASpan = WriteRGBASpanFront;
-		swdd->WriteRGBSpan = WriteRGBSpanFront;
-		swdd->WriteRGBAPixels = WriteRGBAPixelsFront;
-		swdd->WriteMonoRGBASpan = WriteMonoRGBASpanFront;
-		swdd->WriteMonoRGBAPixels = WriteMonoRGBAPixelsFront;
-		swdd->WriteCI32Span = WriteCI32SpanFront;
-		swdd->WriteCI8Span = WriteCI8SpanFront;
-		swdd->WriteMonoCISpan = WriteMonoCISpanFront;
-		swdd->WriteCI32Pixels = WriteCI32PixelsFront;
-		swdd->WriteMonoCIPixels = WriteMonoCIPixelsFront;
-		swdd->ReadRGBASpan = ReadRGBASpanFront;
-		swdd->ReadRGBAPixels = ReadRGBAPixelsFront;
-		swdd->ReadCI32Span = ReadCI32SpanFront;
-		swdd->ReadCI32Pixels = ReadCI32PixelsFront;
-	} else {
-		/* read/write back buffer */
-		swdd->WriteRGBASpan = WriteRGBASpanBack;
-		swdd->WriteRGBSpan = WriteRGBSpanBack;
-		swdd->WriteRGBAPixels = WriteRGBAPixelsBack;
-		swdd->WriteMonoRGBASpan = WriteMonoRGBASpanBack;
-		swdd->WriteMonoRGBAPixels = WriteMonoRGBAPixelsBack;
-		swdd->WriteCI32Span = WriteCI32SpanBack;
-		swdd->WriteCI8Span = WriteCI8SpanBack;
-		swdd->WriteMonoCISpan = WriteMonoCISpanBack;
-		swdd->WriteCI32Pixels = WriteCI32PixelsBack;
-		swdd->WriteMonoCIPixels = WriteMonoCIPixelsBack;
-		swdd->ReadRGBASpan = ReadRGBASpanBack;
-		swdd->ReadRGBAPixels = ReadRGBAPixelsBack;
-		swdd->ReadCI32Span = ReadCI32SpanBack;
-		swdd->ReadCI32Pixels = ReadCI32PixelsBack;
-	}
 }
 
 
-void 
-MesaSoftwareRenderer::GetBufferSize(GLframebuffer * framebuffer, GLuint *width,
-                            GLuint *height)
+GLboolean
+MesaSoftwareRenderer::RenderbufferStorage(GLcontext *ctx, struct gl_renderbuffer *render,
+                        GLenum internalFormat, GLuint width, GLuint height )
 {
-	GET_CURRENT_CONTEXT(ctx);
-	if (!ctx)
-		return;
-
-	MesaSoftwareRenderer * mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
-	assert(bglview);
-
-	BRect b = bglview->Bounds();
-	*width = (GLuint) b.IntegerWidth() + 1; // (b.right - b.left + 1);
-	*height = (GLuint) b.IntegerHeight() + 1; // (b.bottom - b.top + 1);
-	mr->fBottom = (GLint) b.bottom;
-
-	if (ctx->Visual.doubleBufferMode) {
-		if (*width != mr->fWidth || *height != mr->fHeight) {
-			// allocate new size of back buffer bitmap
-			if (mr->fBitmap)
-				delete mr->fBitmap;
-			BRect rect(0.0, 0.0, *width - 1, *height - 1);
-			mr->fBitmap = new BBitmap(rect, B_RGBA32);
-		}
-	} else {
-		mr->fBitmap = NULL;
-	}
-
-	mr->fWidth = *width;
-	mr->fHeight = *height;
-}
-
-
-void 
-MesaSoftwareRenderer::SetBuffer(GLcontext *ctx, GLframebuffer *buffer,
-                            GLenum mode)
-{
-   /* TODO */
-	(void) ctx;
-	(void) buffer;
-	(void) mode;
+     return GL_TRUE;
 }
 
 
@@ -591,346 +576,224 @@ inline void Plot(BGLView *bglview, int x, int y)
 
 
 void
-MesaSoftwareRenderer::WriteRGBASpanFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteRGBASpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
                                  GLint x, GLint y,
-                                 CONST GLubyte rgba[][4],
+                                 const void *values,
                                  const GLubyte mask[])
 {
-	CALLED();
+	//CALLED();
 	
+	CONST GLubyte (*rgba)[4] = (CONST GLubyte (*)[4])values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
-	assert(bglview);
-	int flippedY = mr->fBottom - y;
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
+
+	//printf("WriteRGBASpan 1 n %ld x %ld y %ld mask %ld rb %p %p\n", n, x ,y, mask, rb, rgba);
+	
+	/*if (rb->Name == BUFFER_FRONT_LEFT) {
+		BGLView *bglview = mr->GLView();
+		assert(bglview);
+		int flippedY = mr->fBottom - y;
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2], rgba[i][3]);
+					Plot(bglview, x++, flippedY);
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
 				bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2], rgba[i][3]);
 				Plot(bglview, x++, flippedY);
 			}
 		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2], rgba[i][3]);
-			Plot(bglview, x++, flippedY);
-		}
-	}
+	} else {*/
+		BBitmap *bitmap = mr->fBitmap;
+
+		assert(bitmap);
+
+		int row = mr->fBottom - y;
+		uint8 * ptr = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + x * 4;
+		uint32 * pixel = (uint32 *) ptr;
+		
+		if (mask) {
+			while(n--) {
+				if (*mask++)
+					*pixel = PACK_B_RGBA32(rgba[0]);
+				pixel++;
+				rgba++;
+			};
+		} else {
+			while(n--) {
+				*pixel++ = PACK_B_RGBA32(rgba[0]);
+				rgba++;
+			};
+		};
+	//}
 }
 
 
 void
-MesaSoftwareRenderer::WriteRGBSpanFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteRGBSpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
                                 GLint x, GLint y,
-                                CONST GLubyte rgba[][3],
+                                const void *values,
                                 const GLubyte mask[])
 {
 	CALLED();
+
+	//printf("WriteRGBSpan 1 n %ld x %ld y %ld mask %ld\n", n, x ,y, mask);
 	
+	CONST GLubyte **rgba = (CONST GLubyte **)values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
-	assert(bglview);
-	int flippedY = mr->fBottom - y;
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
+
+	/*if (rb->Name == BUFFER_FRONT_LEFT) {
+		BGLView *bglview = mr->GLView();
+		assert(bglview);
+		int flippedY = mr->fBottom - y;
+
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2]);
+					Plot(bglview, x++, flippedY);
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
 				bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2]);
 				Plot(bglview, x++, flippedY);
 			}
 		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2]);
-			Plot(bglview, x++, flippedY);
-		}
-	}
+	} else {*/
+		BBitmap *bitmap = mr->fBitmap;
+
+		assert(bitmap);
+	
+		int row = mr->fBottom - y;
+		uint8 * ptr = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + x * 4;
+		uint32 * pixel = (uint32 *) ptr;
+		
+		if (mask) {
+			while(n--) {
+				if (*mask++)
+					*pixel = PACK_B_RGB32(rgba[0]);
+				pixel++;
+				rgba++;
+			};
+		} else {
+			while(n--) {
+				*pixel++ = PACK_B_RGB32(rgba[0]);
+				rgba++;
+			};
+		};
+	//}
 }
 
 
 void
-MesaSoftwareRenderer::WriteMonoRGBASpanFront(const GLcontext *ctx, GLuint n,
+MesaSoftwareRenderer::WriteMonoRGBASpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
                                      GLint x, GLint y,
-                                     const GLchan color[4],
+                                     const void *values,
                                      const GLubyte mask[])
 {
 	CALLED();
 	
+	const GLchan *color = (const GLchan *)values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
-	assert(bglview);
-	int flippedY = mr->fBottom - y;
-	bglview->SetHighColor(color[RCOMP], color[GCOMP], color[BCOMP]);
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
+
+	/*if (rb->Name == BUFFER_FRONT_LEFT) {
+		BGLView *bglview = mr->GLView();
+		assert(bglview);
+		int flippedY = mr->fBottom - y;
+		bglview->SetHighColor(color[RCOMP], color[GCOMP], color[BCOMP]);
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					Plot(bglview, x++, flippedY);
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
 				Plot(bglview, x++, flippedY);
 			}
 		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			Plot(bglview, x++, flippedY);
-		}
-	}
+	} else {*/
+		BBitmap *bitmap = mr->fBitmap;
+
+		assert(bitmap);
+	
+		int row = mr->fBottom - y;
+		uint8 * ptr = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + x * 4;
+		uint32 * pixel = (uint32 *) ptr;
+		uint32 pixel_color = PACK_B_RGBA32(color);
+		
+		if (mask) {
+			while(n--) {
+				if (*mask++)
+					*pixel = pixel_color;
+				pixel++;
+			};
+		} else {
+			while(n--) {
+				*pixel++ = pixel_color;
+			};
+		};
+	//}
 }
 
 void
-MesaSoftwareRenderer::WriteRGBAPixelsFront(const GLcontext *ctx,
+MesaSoftwareRenderer::WriteRGBAPixels(GLcontext *ctx, struct gl_renderbuffer *rb, 
                                    GLuint n, const GLint x[], const GLint y[],
-                                   CONST GLubyte rgba[][4],
+                                   const void *values,
                                    const GLubyte mask[] )
 {
 	CALLED();
+	CONST GLubyte **rgba = (CONST GLubyte **)values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
-	assert(bglview);
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
+
+	/*if (rb->Name == BUFFER_FRONT_LEFT) {
+		BGLView *bglview = mr->GLView();
+		assert(bglview);
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2]);
+					Plot(bglview, x[i], mr->fBottom - y[i]);
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
 				bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2]);
 				Plot(bglview, x[i], mr->fBottom - y[i]);
 			}
 		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			bglview->SetHighColor(rgba[i][0], rgba[i][1], rgba[i][2]);
-			Plot(bglview, x[i], mr->fBottom - y[i]);
-		}
-	}
-}
+	} else {*/
+		BBitmap *bitmap = mr->fBitmap;
 
-
-void
-MesaSoftwareRenderer::WriteMonoRGBAPixelsFront(const GLcontext *ctx, GLuint n,
-                                       const GLint x[], const GLint y[],
-                                       const GLchan color[4],
-                                       const GLubyte mask[])
-{
-	CALLED();
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
-	assert(bglview);
-	// plot points using current color
-	bglview->SetHighColor(color[RCOMP], color[GCOMP], color[BCOMP]);
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
-				Plot(bglview, x[i], mr->fBottom - y[i]);
-			}
-		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			Plot(bglview, x[i], mr->fBottom - y[i]);
-		}
-	}
-}
-
-
-void
-MesaSoftwareRenderer::WriteCI32SpanFront( const GLcontext *ctx, GLuint n, GLint x, GLint y,
-                             const GLuint index[], const GLubyte mask[] )
-{
- 	printf("WriteCI32SpanFront() not implemented yet!\n");
-   // TODO
-}
-
-void
-MesaSoftwareRenderer::WriteCI8SpanFront( const GLcontext *ctx, GLuint n, GLint x, GLint y,
-                            const GLubyte index[], const GLubyte mask[] )
-{
- 	printf("WriteCI8SpanFront() not implemented yet!\n");
-   // TODO
-}
-
-void
-MesaSoftwareRenderer::WriteMonoCISpanFront( const GLcontext *ctx, GLuint n,
-                                    GLint x, GLint y,
-                                    GLuint colorIndex, const GLubyte mask[] )
-{
- 	printf("WriteMonoCISpanFront() not implemented yet!\n");
-   // TODO
-}
-
-
-void
-MesaSoftwareRenderer::WriteCI32PixelsFront( const GLcontext *ctx, GLuint n,
-                                    const GLint x[], const GLint y[],
-                                    const GLuint index[], const GLubyte mask[] )
-{
- 	printf("WriteCI32PixelsFront() not implemented yet!\n");
-   // TODO
-}
-
-void
-MesaSoftwareRenderer::WriteMonoCIPixelsFront( const GLcontext *ctx, GLuint n,
-                                      const GLint x[], const GLint y[],
-                                      GLuint colorIndex, const GLubyte mask[] )
-{
- 	printf("WriteMonoCIPixelsFront() not implemented yet!\n");
-   // TODO
-}
-
-
-void
-MesaSoftwareRenderer::ReadCI32SpanFront( const GLcontext *ctx,
-                                 GLuint n, GLint x, GLint y, GLuint index[] )
-{
- 	printf("ReadCI32SpanFront() not implemented yet!\n");
-  // TODO
-}
-
-
-void
-MesaSoftwareRenderer::ReadRGBASpanFront( const GLcontext *ctx, GLuint n,
-                                 GLint x, GLint y, GLubyte rgba[][4] )
-{
- 	printf("ReadRGBASpanFront() not implemented yet!\n");
-   // TODO
-}
-
-
-void
-MesaSoftwareRenderer::ReadCI32PixelsFront( const GLcontext *ctx,
-                                   GLuint n, const GLint x[], const GLint y[],
-                                   GLuint indx[], const GLubyte mask[] )
-{
- 	printf("ReadCI32PixelsFront() not implemented yet!\n");
-   // TODO
-}
-
-
-void
-MesaSoftwareRenderer::ReadRGBAPixelsFront( const GLcontext *ctx,
-                                   GLuint n, const GLint x[], const GLint y[],
-                                   GLubyte rgba[][4], const GLubyte mask[] )
-{
- 	printf("ReadRGBAPixelsFront() not implemented yet!\n");
-   // TODO
-}
-
-
-
-
-void
-MesaSoftwareRenderer::WriteRGBASpanBack(const GLcontext *ctx, GLuint n,
-                                 GLint x, GLint y,
-                                 CONST GLubyte rgba[][4],
-                                 const GLubyte mask[])
-{
-	//CALLED();
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BBitmap *bitmap = mr->fBitmap;
-
-	assert(bitmap);
-
-	int row = mr->fBottom - y;
-	uint8 * ptr = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + x * 4;
- 	uint32 * pixel = (uint32 *) ptr;
-	
-	if (mask) {
-		while(n--) {
-			if (*mask++)
-				*pixel = PACK_B_RGBA32(rgba[0]);
-			pixel++;
-			rgba++;
-		};
-	} else {
-		while(n--) {
-			*pixel++ = PACK_B_RGBA32(rgba[0]);
-			rgba++;
-		};
-	};
- }
-
-
-void
-MesaSoftwareRenderer::WriteRGBSpanBack(const GLcontext *ctx, GLuint n,
-                                GLint x, GLint y,
-                                CONST GLubyte rgb[][3],
-                                const GLubyte mask[])
-{
-	CALLED();
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BBitmap *bitmap = mr->fBitmap;
-
-	assert(bitmap);
-
-	int row = mr->fBottom - y;
-	uint8 * ptr = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + x * 4;
- 	uint32 * pixel = (uint32 *) ptr;
-	
-	if (mask) {
-		while(n--) {
-			if (*mask++)
-				*pixel = PACK_B_RGB32(rgb[0]);
-			pixel++;
-			rgb++;
-		};
-	} else {
-		while(n--) {
-			*pixel++ = PACK_B_RGB32(rgb[0]);
-			rgb++;
-		};
-	};
-}
-
-
-
-
-void
-MesaSoftwareRenderer::WriteMonoRGBASpanBack(const GLcontext *ctx, GLuint n,
-                                    GLint x, GLint y,
-                                    const GLchan color[4], const GLubyte mask[])
-{
-	CALLED();
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BBitmap *bitmap = mr->fBitmap;
-
-	assert(bitmap);
-
-	int row = mr->fBottom - y;
-	uint8 * ptr = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + x * 4;
- 	uint32 * pixel = (uint32 *) ptr;
-	uint32 pixel_color = PACK_B_RGBA32(color);
-	
-	if (mask) {
-		while(n--) {
-			if (*mask++)
-				*pixel = pixel_color;
-			pixel++;
-		};
-	} else {
-		while(n--) {
-			*pixel++ = pixel_color;
-		};
-	};
-}
-
-
-void
-MesaSoftwareRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
-                                   GLuint n, const GLint x[], const GLint y[],
-                                   CONST GLubyte rgba[][4],
-                                   const GLubyte mask[] )
-{
-	//CALLED();
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BBitmap *bitmap = mr->fBitmap;
-
-	assert(bitmap);
+		assert(bitmap);
 #if 0
-	while(n--) {
-		if (*mask++) {
-			int row = md->m_bottom - *y;
-			uint8 * pixel = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + *x * 4;
-			*((uint32 *) pixel) = PACK_B_RGBA32(rgba[0]);
+		while(n--) {
+			if (*mask++) {
+				int row = md->m_bottom - *y;
+				uint8 * pixel = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + *x * 4;
+				*((uint32 *) pixel) = PACK_B_RGBA32(rgba[0]);
+			};
+			x++;
+			y++;
+			rgba++;
 		};
-		x++;
-		y++;
-		rgba++;
-	};
 #else
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					GLubyte *pixel = (GLubyte *) bitmap->Bits()
+						+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+					pixel[BE_RCOMP] = rgba[i][RCOMP];
+					pixel[BE_GCOMP] = rgba[i][GCOMP];
+					pixel[BE_BCOMP] = rgba[i][BCOMP];
+					pixel[BE_ACOMP] = rgba[i][ACOMP];
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
 				GLubyte *pixel = (GLubyte *) bitmap->Bits()
 					+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
 				pixel[BE_RCOMP] = rgba[i][RCOMP];
@@ -939,125 +802,135 @@ MesaSoftwareRenderer::WriteRGBAPixelsBack(const GLcontext *ctx,
 				pixel[BE_ACOMP] = rgba[i][ACOMP];
 			}
 		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			GLubyte *pixel = (GLubyte *) bitmap->Bits()
-				+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-			pixel[BE_RCOMP] = rgba[i][RCOMP];
-			pixel[BE_GCOMP] = rgba[i][GCOMP];
-			pixel[BE_BCOMP] = rgba[i][BCOMP];
-			pixel[BE_ACOMP] = rgba[i][ACOMP];
-		}
-	}
 #endif
+	//}
 }
 
 
 void
-MesaSoftwareRenderer::WriteMonoRGBAPixelsBack(const GLcontext *ctx, GLuint n,
-                                      const GLint x[], const GLint y[],
-                                      const GLchan color[4],
-                                      const GLubyte mask[])
+MesaSoftwareRenderer::WriteMonoRGBAPixels(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
+                                       const GLint x[], const GLint y[],
+                                       const void *values,
+                                       const GLubyte mask[])
 {
-	CALLED();
+	//CALLED();
+	const GLchan *color = (const GLchan *)values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BBitmap *bitmap = mr->fBitmap;
 
-	assert(bitmap);
+	/*if (rb->Name == BUFFER_FRONT_LEFT) {
+		BGLView *bglview = mr->GLView();
+		assert(bglview);
+		// plot points using current color
+		bglview->SetHighColor(color[RCOMP], color[GCOMP], color[BCOMP]);
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					Plot(bglview, x[i], mr->fBottom - y[i]);
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
+				Plot(bglview, x[i], mr->fBottom - y[i]);
+			}
+		}
+	} else {*/
+		BBitmap *bitmap = mr->fBitmap;
 
-	uint32 pixel_color = PACK_B_RGBA32(color);
+		assert(bitmap);
+	
+		uint32 pixel_color = PACK_B_RGBA32(color);
 #if 0	
-	while(n--) {
-		if (*mask++) {
-			int row = md->m_bottom - *y;
-			uint8 * pixel = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + *x * 4;
-
-			*((uint32 *) pixel) = pixel_color;
+		while(n--) {
+			if (*mask++) {
+				int row = md->m_bottom - *y;
+				uint8 * pixel = (uint8 *) bitmap->Bits() + (row * bitmap->BytesPerRow()) + *x * 4;
+	
+				*((uint32 *) pixel) = pixel_color;
+			};
+			x++;
+			y++;
 		};
-		x++;
-		y++;
-	};
 #else
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
+		if (mask) {
+			for (GLuint i = 0; i < n; i++) {
+				if (mask[i]) {
+					GLubyte * ptr = (GLubyte *) bitmap->Bits()
+						+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+					*((uint32 *) ptr) = pixel_color;
+				}
+			}
+		} else {
+			for (GLuint i = 0; i < n; i++) {
 				GLubyte * ptr = (GLubyte *) bitmap->Bits()
 					+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
 				*((uint32 *) ptr) = pixel_color;
 			}
 		}
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			GLubyte * ptr = (GLubyte *) bitmap->Bits()
-				+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-			*((uint32 *) ptr) = pixel_color;
-		}
-	}
 #endif
+	//}
 }
 
 
 void
-MesaSoftwareRenderer::WriteCI32SpanBack( const GLcontext *ctx, GLuint n,
-                                 GLint x, GLint y,
-                                 const GLuint index[], const GLubyte mask[] )
+MesaSoftwareRenderer::WriteCI32Span( const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n, GLint x, GLint y,
+                             const GLuint index[], const GLubyte mask[] )
 {
- 	printf("WriteCI32SpanBack() not implemented yet!\n");
+ 	printf("WriteCI32Span() not implemented yet!\n");
    // TODO
 }
 
 void
-MesaSoftwareRenderer::WriteCI8SpanBack( const GLcontext *ctx, GLuint n,
-                                GLint x, GLint y,
-                                const GLubyte index[], const GLubyte mask[] )
+MesaSoftwareRenderer::WriteCI8Span( const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n, GLint x, GLint y,
+                            const GLubyte index[], const GLubyte mask[] )
 {
-  	printf("WriteCI8SpanBack() not implemented yet!\n");
+ 	printf("WriteCI8Span() not implemented yet!\n");
+   // TODO
+}
+
+void
+MesaSoftwareRenderer::WriteMonoCISpan( const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
+                                    GLint x, GLint y,
+                                    GLuint colorIndex, const GLubyte mask[] )
+{
+ 	printf("WriteMonoCISpan() not implemented yet!\n");
+   // TODO
+}
+
+
+void
+MesaSoftwareRenderer::WriteCI32Pixels( const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
+                                    const GLint x[], const GLint y[],
+                                    const GLuint index[], const GLubyte mask[] )
+{
+ 	printf("WriteCI32Pixels() not implemented yet!\n");
+   // TODO
+}
+
+void
+MesaSoftwareRenderer::WriteMonoCIPixels( const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
+                                      const GLint x[], const GLint y[],
+                                      GLuint colorIndex, const GLubyte mask[] )
+{
+ 	printf("WriteMonoCIPixels() not implemented yet!\n");
+   // TODO
+}
+
+
+void
+MesaSoftwareRenderer::ReadCI32Span( const GLcontext *ctx, struct gl_renderbuffer *rb, 
+                                 GLuint n, GLint x, GLint y, GLuint index[] )
+{
+ 	printf("ReadCI32Span() not implemented yet!\n");
   // TODO
 }
 
-void
-MesaSoftwareRenderer::WriteMonoCISpanBack( const GLcontext *ctx, GLuint n,
-                                   GLint x, GLint y,
-                                   GLuint colorIndex, const GLubyte mask[] )
-{
- 	printf("WriteMonoCISpanBack() not implemented yet!\n");
-   // TODO
-}
-
 
 void
-MesaSoftwareRenderer::WriteCI32PixelsBack( const GLcontext *ctx, GLuint n,
-                                   const GLint x[], const GLint y[],
-                                   const GLuint index[], const GLubyte mask[] )
+MesaSoftwareRenderer::ReadRGBASpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
+                                 GLint x, GLint y, void *values )
 {
- 	printf("WriteCI32PixelsBack() not implemented yet!\n");
-   // TODO
-}
-
-void
-MesaSoftwareRenderer::WriteMonoCIPixelsBack( const GLcontext *ctx, GLuint n,
-                                     const GLint x[], const GLint y[],
-                                     GLuint colorIndex, const GLubyte mask[] )
-{
- 	printf("WriteMonoCIPixelsBack() not implemented yet!\n");
-   // TODO
-}
-
-
-void
-MesaSoftwareRenderer::ReadCI32SpanBack( const GLcontext *ctx,
-                                GLuint n, GLint x, GLint y, GLuint index[] )
-{
- 	printf("ReadCI32SpanBack() not implemented yet!\n");
-   // TODO
-}
-
-
-void
-MesaSoftwareRenderer::ReadRGBASpanBack( const GLcontext *ctx, GLuint n,
-                                GLint x, GLint y, GLubyte rgba[][4] )
-{
-	CALLED();
+	//CALLED();
+	GLubyte (*rgba)[4] = (GLubyte (*)[4])values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	const BBitmap *bitmap = mr->fBitmap;
 	assert(bitmap);
@@ -1076,45 +949,33 @@ MesaSoftwareRenderer::ReadRGBASpanBack( const GLcontext *ctx, GLuint n,
 
 
 void
-MesaSoftwareRenderer::ReadCI32PixelsBack( const GLcontext *ctx,
+MesaSoftwareRenderer::ReadCI32Pixels( const GLcontext *ctx, struct gl_renderbuffer *rb, 
                                    GLuint n, const GLint x[], const GLint y[],
                                    GLuint indx[], const GLubyte mask[] )
 {
- 	printf("ReadCI32PixelsBack() not implemented yet!\n");
+ 	printf("ReadCI32Pixels() not implemented yet!\n");
    // TODO
 }
 
 
 void
-MesaSoftwareRenderer::ReadRGBAPixelsBack( const GLcontext *ctx,
-                                  GLuint n, const GLint x[], const GLint y[],
-                                  GLubyte rgba[][4], const GLubyte mask[] )
+MesaSoftwareRenderer::ReadRGBAPixels(GLcontext *ctx, struct gl_renderbuffer *rb, 
+                                   GLuint n, const GLint x[], const GLint y[],
+                                   void *values)
 {
 	CALLED();
+	GLubyte (*rgba)[4] = (GLubyte (*)[4])values;
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	const BBitmap *bitmap = mr->fBitmap;
 	assert(bitmap);
 
-	if (mask) {
-		for (GLuint i = 0; i < n; i++) {
-			if (mask[i]) {
-				GLubyte *pixel = (GLubyte *) bitmap->Bits()
-					+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-				rgba[i][RCOMP] = pixel[BE_RCOMP];
-				rgba[i][GCOMP] = pixel[BE_GCOMP];
-				rgba[i][BCOMP] = pixel[BE_BCOMP];
-				rgba[i][ACOMP] = pixel[BE_ACOMP];
-			};
-		};
-	} else {
-		for (GLuint i = 0; i < n; i++) {
-			GLubyte *pixel = (GLubyte *) bitmap->Bits()
-				+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
-			rgba[i][RCOMP] = pixel[BE_RCOMP];
-			rgba[i][GCOMP] = pixel[BE_GCOMP];
-			rgba[i][BCOMP] = pixel[BE_BCOMP];
-			rgba[i][ACOMP] = pixel[BE_ACOMP];
-		};
+	for (GLuint i = 0; i < n; i++) {
+		GLubyte *pixel = (GLubyte *) bitmap->Bits()
+			+ ((mr->fBottom - y[i]) * bitmap->BytesPerRow()) + x[i] * 4;
+		rgba[i][RCOMP] = pixel[BE_RCOMP];
+		rgba[i][GCOMP] = pixel[BE_GCOMP];
+		rgba[i][BCOMP] = pixel[BE_BCOMP];
+		rgba[i][ACOMP] = pixel[BE_ACOMP];
 	};
 }
 

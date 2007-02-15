@@ -96,7 +96,7 @@ static void _ac_fallbacks_init( GLcontext *ctx )
    cl->Type = GL_FLOAT;
    cl->Stride = 0;
    cl->StrideB = 0;
-   cl->Ptr = (GLubyte *) &ctx->Current.Index;
+   cl->Ptr = (GLubyte *) &ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX];
    cl->Enabled = 1;
    cl->Flags = CA_CLIENT_DATA;	/* hack */
 #if FEATURE_ARB_vertex_buffer_object
@@ -292,7 +292,7 @@ static void _ac_raw_init( GLcontext *ctx )
    ac->Raw.Index = ac->Fallback.Index;
    ac->Raw.Normal = ac->Fallback.Normal;
    ac->Raw.SecondaryColor = ac->Fallback.SecondaryColor;
-   ac->Raw.Vertex = ctx->Array.Vertex;
+   ac->Raw.Vertex = ctx->Array.ArrayObj->Vertex;
 
    ac->IsCached.Color = GL_FALSE;
    ac->IsCached.EdgeFlag = GL_FALSE;

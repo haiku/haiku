@@ -35,8 +35,8 @@
 /*
  * bin.c++
  *
- * $Date: 2004/05/12 15:29:36 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/bin.cc,v 1.2 2004/05/12 15:29:36 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.3 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/bin.cc,v 1.3 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -123,7 +123,7 @@ void
 Bin::show( char *name )
 {
 #ifndef NDEBUG
-    dprintf( "%s\n", name );
+    _glu_dprintf( "%s\n", name );
     for( Arc_ptr jarc = firstarc(); jarc; jarc = nextarc() )
         jarc->show( );
 #endif
@@ -160,7 +160,7 @@ Bin::listBezier( void )
     	    REAL t1 = pts[0].param[1];
     	    REAL s2 = pts[1].param[0];
     	    REAL t2 = pts[1].param[1];
-	   dprintf( "arc (%g,%g) (%g,%g)\n", s1, t1, s2, t2 );
+	   _glu_dprintf( "arc (%g,%g) (%g,%g)\n", s1, t1, s2, t2 );
 #endif
 	}
     }

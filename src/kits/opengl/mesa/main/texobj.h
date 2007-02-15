@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  4.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -41,6 +41,9 @@
 /*@{*/
 
 extern struct gl_texture_object *
+_mesa_lookup_texture(GLcontext *ctx, GLuint id);
+
+extern struct gl_texture_object *
 _mesa_new_texture_object( GLcontext *ctx, GLuint name, GLenum target );
 
 extern void
@@ -51,18 +54,15 @@ extern void
 _mesa_delete_texture_object( GLcontext *ctx, struct gl_texture_object *obj );
 
 extern void
-_mesa_save_texture_object( GLcontext *ctx, struct gl_texture_object *obj );
-
-extern void
-_mesa_remove_texture_object( GLcontext *ctx, struct gl_texture_object *obj );
-
-extern void
 _mesa_copy_texture_object( struct gl_texture_object *dest,
                            const struct gl_texture_object *src );
 
 extern void
 _mesa_test_texobj_completeness( const GLcontext *ctx,
                                 struct gl_texture_object *obj );
+
+extern void _mesa_unlock_context_textures( GLcontext *ctx );
+extern void _mesa_lock_context_textures( GLcontext *ctx );
 
 /*@}*/
 
@@ -97,5 +97,6 @@ extern GLboolean GLAPIENTRY
 _mesa_IsTexture( GLuint texture );
 
 /*@}*/
+
 
 #endif

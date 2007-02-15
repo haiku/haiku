@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -70,7 +70,7 @@
 static void
 NAME( GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1 )
 {
-   struct sw_span span;
+   SWspan span;
    GLuint interpFlags = 0;
    GLint x0 = (GLint) vert0->win[0];
    GLint x1 = (GLint) vert1->win[0];
@@ -82,6 +82,7 @@ NAME( GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1 )
 #if defined(DEPTH_TYPE)
    const GLint depthBits = ctx->Visual.depthBits;
    const GLint fixedToDepthShift = depthBits <= 16 ? FIXED_SHIFT : 0;
+   struct gl_renderbuffer *zrb = ctx->DrawBuffer->Attachment[BUFFER_DEPTH].Renderbuffer;
 #define FixedToDepth(F)  ((F) >> fixedToDepthShift)
    GLint zPtrXstep, zPtrYstep;
    DEPTH_TYPE *zPtr;
@@ -151,7 +152,7 @@ NAME( GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1 )
       return;
 
 #ifdef DEPTH_TYPE
-   zPtr = (DEPTH_TYPE *) _swrast_zbuffer_address(ctx, x0, y0);
+   zPtr = (DEPTH_TYPE *) zrb->GetPointer(ctx, zrb, x0, y0);
 #endif
 #ifdef PIXEL_ADDRESS
    pixelPtr = (PIXEL_TYPE *) PIXEL_ADDRESS(x0,y0);
@@ -353,7 +354,7 @@ NAME( GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1 )
 
       for (i = 0; i < dx; i++) {
 #ifdef DEPTH_TYPE
-         GLdepth Z = FixedToDepth(span.z);
+         GLuint Z = FixedToDepth(span.z);
 #endif
 #ifdef PLOT
          PLOT( x0, y0 );
@@ -393,7 +394,7 @@ NAME( GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1 )
 
       for (i=0;i<dy;i++) {
 #ifdef DEPTH_TYPE
-         GLdepth Z = FixedToDepth(span.z);
+         GLuint Z = FixedToDepth(span.z);
 #endif
 #ifdef PLOT
          PLOT( x0, y0 );

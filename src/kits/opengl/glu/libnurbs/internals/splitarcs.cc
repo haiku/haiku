@@ -35,8 +35,8 @@
 /*
  * splitarcs.c++
  *
- * $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/splitarcs.cc,v 1.1 2001/03/17 00:25:41 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/splitarcs.cc,v 1.2 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -133,14 +133,14 @@ Subdivider::check_s( Arc_ptr jarc1, Arc_ptr jarc2 )
 	     undersampling */
     if( ! ( jarc1->tail()[0] < (jarc1)->head()[0] ) ) {
 #ifndef NDEBUG
-	dprintf( "s difference %f\n",  (jarc1)->tail()[0] - (jarc1)->head()[0] );
+	_glu_dprintf( "s difference %f\n",  (jarc1)->tail()[0] - (jarc1)->head()[0] );
 #endif
 	::mylongjmp( jumpbuffer, 28 );
     }
 
     if( ! ( jarc2->tail()[0] > (jarc2)->head()[0] ) ) { 
 #ifndef NDEBUG
-	dprintf( "s difference %f\n",  (jarc2)->tail()[0] - (jarc2)->head()[0] );
+	_glu_dprintf( "s difference %f\n",  (jarc2)->tail()[0] - (jarc2)->head()[0] );
 #endif
 	::mylongjmp( jumpbuffer, 28 );
     }
@@ -232,14 +232,14 @@ Subdivider::check_t( Arc_ptr jarc1, Arc_ptr jarc2 )
 	     undersampling */
     if( ! ( jarc1->tail()[1] < (jarc1)->head()[1] ) ) {
 #ifndef NDEBUG
-	dprintf( "t difference %f\n",  jarc1->tail()[1] - (jarc1)->head()[1] );
+	_glu_dprintf( "t difference %f\n",  jarc1->tail()[1] - (jarc1)->head()[1] );
 #endif
 	::mylongjmp( jumpbuffer, 28 );
     }
 
     if( ! ( jarc2->tail()[1] > (jarc2)->head()[1] ) ) { 
 #ifndef NDEBUG
-	dprintf( "t difference %f\n",  jarc2->tail()[1] - (jarc2)->head()[1] );
+	_glu_dprintf( "t difference %f\n",  jarc2->tail()[1] - (jarc2)->head()[1] );
 #endif
 	::mylongjmp( jumpbuffer, 28 );
     }

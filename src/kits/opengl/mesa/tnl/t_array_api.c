@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,6 +43,7 @@
 #include "t_save_api.h"
 #include "t_context.h"
 #include "t_pipeline.h"
+#include "dispatch.h"
 
 static void fallback_drawarrays( GLcontext *ctx, GLenum mode, GLint start,
 				 GLsizei count )
@@ -50,12 +51,12 @@ static void fallback_drawarrays( GLcontext *ctx, GLenum mode, GLint start,
    GLint i;
 
    assert(!ctx->CompileFlag);
-   assert(ctx->Driver.CurrentExecPrimitive == GL_POLYGON+1);
+   assert(ctx->Driver.CurrentExecPrimitive == PRIM_OUTSIDE_BEGIN_END);
 
-   GL_CALL(Begin)(mode);
+   CALL_Begin(GET_DISPATCH(), (mode));
    for (i = 0; i < count; i++) 
-       GL_CALL(ArrayElement)( start + i );
-   GL_CALL(End)();
+       CALL_ArrayElement(GET_DISPATCH(), ( start + i ));
+   CALL_End(GET_DISPATCH(), ());
 }
 
 
@@ -65,15 +66,15 @@ static void fallback_drawelements( GLcontext *ctx, GLenum mode, GLsizei count,
    GLint i;
 
    assert(!ctx->CompileFlag);
-   assert(ctx->Driver.CurrentExecPrimitive == GL_POLYGON+1);
+   assert(ctx->Driver.CurrentExecPrimitive == PRIM_OUTSIDE_BEGIN_END);
 
    /* Here, indices will already reflect the buffer object if active */
 
-   GL_CALL(Begin)(mode);
+   CALL_Begin(GET_DISPATCH(), (mode));
    for (i = 0 ; i < count ; i++) {
-      GL_CALL(ArrayElement)( indices[i] );
+      CALL_ArrayElement(GET_DISPATCH(), ( indices[i] ));
    }
-   GL_CALL(End)();
+   CALL_End(GET_DISPATCH(), ());
 }
 
 
@@ -91,9 +92,6 @@ static void _tnl_draw_range_elements( GLcontext *ctx, GLenum mode,
    struct tnl_prim prim;
    FLUSH_CURRENT( ctx, 0 );
    
-   if (tnl->pipeline.build_state_changes)
-      _tnl_validate_pipeline( ctx );
-
    _tnl_vb_bind_arrays( ctx, 0, max_index );
 
    tnl->vb.Primitive = &prim;
@@ -104,20 +102,7 @@ static void _tnl_draw_range_elements( GLcontext *ctx, GLenum mode,
 
    tnl->vb.Elts = (GLuint *)indices;
 
-   if (ctx->Array.LockCount)
-      tnl->Driver.RunPipeline( ctx );
-   else {
-      /* The lower 16 bits represent the conventional arrays while the
-       * upper 16 bits represent the generic arrays.  OR those bits
-       * together to indicate which vertex attribs are in effect.
-       */
-      GLuint enabledArrays = ctx->Array._Enabled | (ctx->Array._Enabled >> 16);
-      /* Note that arrays may have changed before/after execution.
-       */
-      tnl->pipeline.run_input_changes |= enabledArrays & 0xffff;
-      tnl->Driver.RunPipeline( ctx );
-      tnl->pipeline.run_input_changes |= enabledArrays & 0xffff;
-   }
+   tnl->Driver.RunPipeline( ctx );
 }
 
 
@@ -130,8 +115,13 @@ _tnl_DrawArrays(GLenum mode, GLint start, GLsizei count)
 {
    GET_CURRENT_CONTEXT(ctx);
    TNLcontext *tnl = TNL_CONTEXT(ctx);
+   /* It's tempting to get rid of this threshold value because we take
+    * very different paths if 'count' is less than or greater than 'thresh'.
+    * I've found/fixed at least one bug which only occured for particular
+    * array sizes.  Also, several conformance tests use very short arrays
+    * which means the long-array path doesn't get tested.  -Brian
+    */
    GLuint thresh = (ctx->Driver.NeedFlush & FLUSH_STORED_VERTICES) ? 30 : 10;
-   GLuint enabledArrays;
    
    if (MESA_VERBOSE & VERBOSE_API)
       _mesa_debug(NULL, "_tnl_DrawArrays %d %d\n", start, count); 
@@ -140,9 +130,6 @@ _tnl_DrawArrays(GLenum mode, GLint start, GLsizei count)
     */
    if (!_mesa_validate_DrawArrays( ctx, mode, start, count ))
       return;
-
-   if (tnl->pipeline.build_state_changes)
-      _tnl_validate_pipeline( ctx );
 
    assert(!ctx->CompileFlag);
 
@@ -266,16 +253,7 @@ _tnl_DrawArrays(GLenum mode, GLint start, GLsizei count)
 	 tnl->vb.Primitive[0].count = nr + minimum;
 	 tnl->vb.PrimitiveCount = 1;
 
-         /* The lower 16 bits represent the conventional arrays while the
-          * upper 16 bits represent the generic arrays.  OR those bits
-          * together to indicate which vertex attribs are in effect.
-          */
-         enabledArrays = ctx->Array._Enabled | (ctx->Array._Enabled >> 16);
-         /* Note that arrays may have changed before/after execution.
-          */
-	 tnl->pipeline.run_input_changes |= enabledArrays;
 	 tnl->Driver.RunPipeline( ctx );
-	 tnl->pipeline.run_input_changes |= enabledArrays;
       }
    }
 }
@@ -317,6 +295,18 @@ _tnl_DrawRangeElements(GLenum mode,
    ui_indices = (GLuint *)_ac_import_elements( ctx, GL_UNSIGNED_INT,
 					       count, type, indices );
 
+#ifdef DEBUG
+   /* check that array indices really fall inside [start, end] range */
+   {
+      GLuint i;
+      for (i = 0; i < count; i++) {
+         if (ui_indices[i] < start || ui_indices[i] > end) {
+            _mesa_warning(ctx, "Invalid array index in "
+                          "glDrawRangeElements(index=%u)", ui_indices[i]);
+         }
+      }
+   }
+#endif
 
    assert(!ctx->CompileFlag);
 
@@ -422,13 +412,13 @@ void _tnl_array_init( GLcontext *ctx )
 
    /* Setup vector pointers that will be used to bind arrays to VB's.
     */
-   _mesa_vector4f_init( &tmp->Obj, 0, 0 );
-   _mesa_vector4f_init( &tmp->Normal, 0, 0 );   
-   _mesa_vector4f_init( &tmp->FogCoord, 0, 0 );
-   _mesa_vector4f_init( &tmp->Index, 0, 0 );
+   _mesa_vector4f_init( &tmp->Obj, 0, NULL);
+   _mesa_vector4f_init( &tmp->Normal, 0, NULL);   
+   _mesa_vector4f_init( &tmp->FogCoord, 0, NULL);
+   _mesa_vector4f_init( &tmp->Index, 0, NULL);
 
-   for (i = 0; i < ctx->Const.MaxTextureUnits; i++)
-      _mesa_vector4f_init( &tmp->TexCoord[i], 0, 0);
+   for (i = 0; i < ctx->Const.MaxTextureCoordUnits; i++)
+      _mesa_vector4f_init( &tmp->TexCoord[i], 0, NULL);
 }
 
 

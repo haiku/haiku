@@ -10,9 +10,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -31,7 +31,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/* $XFree86: xc/extras/Mesa/src/mesa/main/enums.h,v 1.2 2004/06/23 19:40:14 tsi Exp $ */
+
 
 #ifndef _ENUMS_H_
 #define _ENUMS_H_

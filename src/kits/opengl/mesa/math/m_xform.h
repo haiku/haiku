@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -99,7 +99,7 @@ _math_init_transformation(void);
 #define CLIP_FAR_BIT     0x20
 #define CLIP_USER_BIT    0x40
 #define CLIP_CULL_BIT    0x80
-#define CLIP_ALL_BITS    0x3f
+#define CLIP_FRUSTUM_BITS    0x3f
 
 
 typedef GLvector4f * (_XFORMAPIP clip_func)( GLvector4f *vClip,

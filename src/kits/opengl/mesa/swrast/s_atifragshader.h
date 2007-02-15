@@ -31,7 +31,7 @@
 
 
 extern void
-_swrast_exec_fragment_shader( GLcontext *ctx, struct sw_span *span );
+_swrast_exec_fragment_shader( GLcontext *ctx, SWspan *span );
 
 
 #endif

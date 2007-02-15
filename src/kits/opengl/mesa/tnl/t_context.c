@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -35,24 +35,15 @@
 #include "dlist.h"
 #include "light.h"
 #include "vtxfmt.h"
-#include "nvfragprog.h"
 
-#include "t_context.h"
-#include "t_array_api.h"
-#include "t_vtx_api.h"
-#include "t_save_api.h"
-#include "t_pipeline.h"
 #include "tnl.h"
+#include "t_array_api.h"
+#include "t_context.h"
+#include "t_pipeline.h"
+#include "t_save_api.h"
+#include "t_vp_build.h"
+#include "t_vtx_api.h"
 
-
-
-void
-_tnl_MakeCurrent( GLcontext *ctx,
-		  GLframebuffer *drawBuffer,
-		  GLframebuffer *readBuffer )
-{
-   (void) ctx; (void) drawBuffer; (void) readBuffer;
-}
 
 
 static void
@@ -62,7 +53,6 @@ install_driver_callbacks( GLcontext *ctx )
    ctx->Driver.EndList = _tnl_EndList;
    ctx->Driver.FlushVertices = _tnl_FlushVertices;
    ctx->Driver.SaveFlushVertices = _tnl_SaveFlushVertices;
-   ctx->Driver.MakeCurrent = _tnl_MakeCurrent;
    ctx->Driver.BeginCallList = _tnl_BeginCallList;
    ctx->Driver.EndCallList = _tnl_EndCallList;
 }
@@ -82,7 +72,7 @@ _tnl_CreateContext( GLcontext *ctx )
       return GL_FALSE;
    }
 
-   if (getenv("MESA_CODEGEN"))
+   if (_mesa_getenv("MESA_CODEGEN"))
       tnl->AllowCodegen = GL_TRUE;
 
    /* Initialize the VB.
@@ -95,7 +85,13 @@ _tnl_CreateContext( GLcontext *ctx )
    _tnl_save_init( ctx );
    _tnl_array_init( ctx );
    _tnl_vtx_init( ctx );
-   _tnl_install_pipeline( ctx, _tnl_default_pipeline );
+
+   if (ctx->_MaintainTnlProgram) {
+      _tnl_ProgramCacheInit( ctx );
+      _tnl_install_pipeline( ctx, _tnl_vp_pipeline );
+   } else {
+      _tnl_install_pipeline( ctx, _tnl_default_pipeline );
+   }
 
    /* Initialize the arrayelt helper
     */
@@ -124,7 +120,7 @@ _tnl_CreateContext( GLcontext *ctx )
    tnl->Driver.Render.PrimTabElts = _tnl_render_tab_elts;
    tnl->Driver.Render.PrimTabVerts = _tnl_render_tab_verts;
    tnl->Driver.NotifyMaterialChange = _mesa_validate_all_lighting_tables;
-   
+
    return GL_TRUE;
 }
 
@@ -140,8 +136,11 @@ _tnl_DestroyContext( GLcontext *ctx )
    _tnl_destroy_pipeline( ctx );
    _ae_destroy_context( ctx );
 
+   if (ctx->_MaintainTnlProgram)
+      _tnl_ProgramCacheDestroy( ctx );
+
    FREE(tnl);
-   ctx->swtnl_context = 0;
+   ctx->swtnl_context = NULL;
 }
 
 
@@ -156,45 +155,52 @@ _tnl_InvalidateState( GLcontext *ctx, GLuint new_state )
          || !tnl->AllowPixelFog;
    }
 
-   if (new_state & _NEW_ARRAY) {
-      tnl->pipeline.run_input_changes |= ctx->Array.NewState; /* overkill */
-   }
-
    _ae_invalidate_state(ctx, new_state);
 
-   tnl->pipeline.run_state_changes |= new_state;
-   tnl->pipeline.build_state_changes |= (new_state &
-					 tnl->pipeline.build_state_trigger);
-
+   tnl->pipeline.new_state |= new_state;
    tnl->vtx.eval.new_state |= new_state;
 
    /* Calculate tnl->render_inputs:
     */
    if (ctx->Visual.rgbMode) {
-      tnl->render_inputs = (_TNL_BIT_POS|
-			    _TNL_BIT_COLOR0|
-			    (ctx->Texture._EnabledCoordUnits << _TNL_ATTRIB_TEX0));
+      GLuint i;
+
+      RENDERINPUTS_ZERO( tnl->render_inputs_bitset );
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_POS );
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_COLOR0 );
+      for (i = 0; i < ctx->Const.MaxTextureCoordUnits; i++) {
+         if (ctx->Texture._EnabledCoordUnits & (1 << i)) {
+            RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_TEX(i) );
+         }
+      }
 
       if (NEED_SECONDARY_COLOR(ctx))
-	 tnl->render_inputs |= _TNL_BIT_COLOR1;
+         RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_COLOR1 );
    }
    else {
-      tnl->render_inputs |= (_TNL_BIT_POS|_TNL_BIT_INDEX);
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_POS );
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_COLOR_INDEX );
    }
-    
-   if (ctx->Fog.Enabled)
-      tnl->render_inputs |= _TNL_BIT_FOG;
+
+   if (ctx->Fog.Enabled ||
+       (ctx->FragmentProgram._Active &&
+        (ctx->FragmentProgram._Current->FogOption != GL_NONE ||
+         ctx->FragmentProgram._Current->Base.InputsRead & FRAG_BIT_FOGC)))
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_FOG );
 
    if (ctx->Polygon.FrontMode != GL_FILL || 
        ctx->Polygon.BackMode != GL_FILL)
-      tnl->render_inputs |= _TNL_BIT_EDGEFLAG;
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_EDGEFLAG );
 
    if (ctx->RenderMode == GL_FEEDBACK)
-      tnl->render_inputs |= _TNL_BIT_TEX0;
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_TEX0 );
 
    if (ctx->Point._Attenuated ||
        (ctx->VertexProgram._Enabled && ctx->VertexProgram.PointSizeEnabled))
-      tnl->render_inputs |= _TNL_BIT_POINTSIZE;
+      RENDERINPUTS_SET( tnl->render_inputs_bitset, _TNL_ATTRIB_POINTSIZE );
+
+   if (ctx->ShaderObjects._VertexShaderPresent || ctx->ShaderObjects._FragmentShaderPresent)
+      RENDERINPUTS_SET_RANGE( tnl->render_inputs_bitset, _TNL_FIRST_GENERIC, _TNL_LAST_GENERIC );
 }
 
 
@@ -210,14 +216,9 @@ _tnl_wakeup_exec( GLcontext *ctx )
     */
    _mesa_install_exec_vtxfmt( ctx, &tnl->exec_vtxfmt );
 
-   /* Call all appropriate driver callbacks to revive state.
-    */
-   _tnl_MakeCurrent( ctx, ctx->DrawBuffer, ctx->ReadBuffer );
-
    /* Assume we haven't been getting state updates either:
     */
    _tnl_InvalidateState( ctx, ~0 );
-   tnl->pipeline.run_input_changes = ~0;
 
    if (ctx->Light.ColorMaterialEnabled) {
       _mesa_update_color_material( ctx, 
@@ -245,10 +246,7 @@ void
 _tnl_need_projected_coords( GLcontext *ctx, GLboolean mode )
 {
    TNLcontext *tnl = TNL_CONTEXT(ctx);
-   if (tnl->NeedNdcCoords != mode) {
-      tnl->NeedNdcCoords = mode;
-      _tnl_InvalidateState( ctx, _NEW_PROJECTION );
-   }
+   tnl->NeedNdcCoords = mode;
 }
 
 void
@@ -277,6 +275,9 @@ _tnl_allow_vertex_fog( GLcontext *ctx, GLboolean value )
 {
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    tnl->AllowVertexFog = value;
+   tnl->_DoVertexFog = (tnl->AllowVertexFog && (ctx->Hint.Fog != GL_NICEST))
+      || !tnl->AllowPixelFog;
+
 }
 
 void
@@ -284,5 +285,7 @@ _tnl_allow_pixel_fog( GLcontext *ctx, GLboolean value )
 {
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    tnl->AllowPixelFog = value;
+   tnl->_DoVertexFog = (tnl->AllowVertexFog && (ctx->Hint.Fog != GL_NICEST))
+      || !tnl->AllowPixelFog;
 }
 

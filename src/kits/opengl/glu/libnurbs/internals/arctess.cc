@@ -335,7 +335,7 @@ ArcTessellator::tessellateNonlinear( Arc *arc, REAL geo_stepsize, REAL arc_steps
       REAL min_u, min_v, max_u,max_v;
       min_u = max_u = bezierArc->cpts[0];
       min_v = max_v = bezierArc->cpts[1];
-      for(i=1, j=2; i<bezierArc->order; i++, j+= bezierArc->stride)
+      for(i=1, j=bezierArc->stride; i<bezierArc->order; i++, j+= bezierArc->stride)
 	{
 	  if(bezierArc->cpts[j] < min_u)
 	    min_u = bezierArc->cpts[j];

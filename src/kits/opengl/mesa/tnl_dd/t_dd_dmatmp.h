@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,9 @@
  */
 
 
-/* Template for render stages which build and emit vertices directly
+/**
+ * \file t_dd_dmatmp.h
+ * Template for render stages which build and emit vertices directly
  * to fixed-size dma buffers.  Useful for rendering strips and other
  * native primitives where clipping and per-vertex tweaks such as
  * those in t_dd_tritmp.h are not required.
@@ -400,7 +402,7 @@ static void TAG(render_poly_verts)( GLcontext *ctx,
 
       FLUSH();
    }
-   else if (HAVE_TRI_FANS && !(ctx->_TriangleCaps & DD_FLATSHADE)) {
+   else if (HAVE_TRI_FANS && ctx->Light.ShadeModel == GL_SMOOTH) {
       TAG(render_tri_fan_verts)( ctx, start, count, flags );
    } else {
       fprintf(stderr, "%s - cannot draw primitive\n", __FUNCTION__);
@@ -440,7 +442,7 @@ static void TAG(render_quad_strip_verts)( GLcontext *ctx,
       FLUSH();
 
    } else if (HAVE_TRI_STRIPS && 
-	      (ctx->_TriangleCaps & DD_FLATSHADE) &&
+	      ctx->Light.ShadeModel == GL_FLAT &&
 	      TNL_CONTEXT(ctx)->vb.ColorPtr[0]->stride) {
       if (HAVE_ELTS) {
 	 LOCAL_VARS;
@@ -623,7 +625,7 @@ static void TAG(render_quads_verts)( GLcontext *ctx,
 
       INIT(GL_TRIANGLES);
 
-      for (j = start; j < count; j += 4) {
+      for (j = start; j < count-3; j += 4) {
 	 void *tmp = ALLOC_VERTS( 6 );
 	 /* Send v0, v1, v3
 	  */
@@ -984,7 +986,7 @@ static void TAG(render_poly_elts)( GLcontext *ctx,
 	 FLUSH();
 	 currentsz = dmasz;
       }
-   } else if (HAVE_TRI_FANS && !(ctx->_TriangleCaps & DD_FLATSHADE)) {
+   } else if (HAVE_TRI_FANS && ctx->Light.ShadeModel == GL_SMOOTH) {
       TAG(render_tri_fan_verts)( ctx, start, count, flags );
    } else {
       fprintf(stderr, "%s - cannot draw primitive\n", __FUNCTION__);
@@ -1018,7 +1020,7 @@ static void TAG(render_quad_strip_elts)( GLcontext *ctx,
       if (currentsz < 12)
 	 currentsz = dmasz;
 
-      if (ctx->_TriangleCaps & DD_FLATSHADE) {
+      if (ctx->Light.ShadeModel == GL_FLAT) {
 	 ELT_INIT( GL_TRIANGLES );
 
 	 currentsz = currentsz/6*2;
@@ -1207,8 +1209,9 @@ static GLboolean TAG(validate_render)( GLcontext *ctx,
 	 if (HAVE_POLYGONS) {
 	    ok = GL_TRUE;
 	 }
-	 else 
-	    ok =  (HAVE_TRI_FANS && !(ctx->_TriangleCaps & DD_FLATSHADE));
+	 else {
+	    ok = (HAVE_TRI_FANS && ctx->Light.ShadeModel == GL_SMOOTH);
+         }
 	 break;
       case GL_QUAD_STRIP:
 	 if (VB->Elts) {
@@ -1217,7 +1220,7 @@ static GLboolean TAG(validate_render)( GLcontext *ctx,
 	 else if (HAVE_QUAD_STRIPS) {
 	    ok = GL_TRUE;
 	 } else if (HAVE_TRI_STRIPS && 
-		    (ctx->_TriangleCaps & DD_FLATSHADE) &&
+		    ctx->Light.ShadeModel == GL_FLAT &&
 		    VB->ColorPtr[0]->stride != 0) {
 	    if (HAVE_ELTS) {
 	       ok = (GLint) count < GET_SUBSEQUENT_VB_MAX_ELTS();
@@ -1236,7 +1239,7 @@ static GLboolean TAG(validate_render)( GLcontext *ctx,
 	    ok = (GLint) count < GET_SUBSEQUENT_VB_MAX_ELTS();
 	 }
 	 else {
-	    ok = HAVE_TRIANGLES; /* for gears... */
+	    ok = HAVE_TRIANGLES; /* flatshading is ok. */
 	 }
 	 break;
       default:

@@ -57,7 +57,9 @@
 
 static void normalize(float vec[3]);
 static void crossProduct(float x[3], float y[3], float ret[3]);
+#if 0 // UNUSED
 static void bezierCurveEvalfast(float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retpoint[]);
+#endif
 
 static float binomialCoefficients[8][8] = {
   {1,0,0,0,0,0,0,0},
@@ -91,7 +93,7 @@ void bezierCurveEval(float u0, float u1, int order, float *ctlpoints, int stride
 }
 
 
-
+#if 0 // UNUSED
 /*order = degree +1 >=1.
  */
 void bezierCurveEvalfast(float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retpoint[])
@@ -115,7 +117,7 @@ void bezierCurveEvalfast(float u0, float u1, int order, float *ctlpoints, int st
   for(j=0; j<dimension; j++)
     retpoint[j] = buf[order-1][0][j];
 }
-
+#endif
 
 
 /*order = degree +1 >=1.

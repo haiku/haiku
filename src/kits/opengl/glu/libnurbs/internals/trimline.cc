@@ -35,8 +35,8 @@
 /*
  * trimline.c++
  *
- * $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/trimline.cc,v 1.1 2001/03/17 00:25:41 brianp Exp $
+ * $Date: 2005/10/28 13:09:23 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/trimline.cc,v 1.2 2005/10/28 13:09:23 brianp Exp $
  */
 
 #include "glimports.h"
@@ -162,10 +162,11 @@ Trimline::getNextPts( Arc_ptr botarc )
 {
     reset(); swap(); append( tinterp );
 
+#ifndef NDEBUG
     PwlArc *lastpwl = botarc->prev->pwlArc;
     TrimVertex *lastpt1 = &lastpwl->pts[lastpwl->npts-1];
+#endif
     TrimVertex *lastpt2 = botarc->pwlArc->pts;
-
     register TrimVertex *p = jarcl.getnextpt();
     for( append( p ); p != lastpt2; append( p ) ) {
 	assert( p != lastpt1 );
@@ -180,7 +181,9 @@ Trimline::getPrevPts( Arc_ptr botarc )
 
     PwlArc *lastpwl = botarc->prev->pwlArc;
     TrimVertex *lastpt1 = &lastpwl->pts[lastpwl->npts-1];
+#ifndef NDEBUG
     TrimVertex *lastpt2 = botarc->pwlArc->pts;
+#endif
 
     register TrimVertex *q =  jarcl.getprevpt();
     for( append( q ); q != lastpt1; append( q ) ) {

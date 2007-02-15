@@ -110,13 +110,9 @@ void _mesa_init_all_sparc_transform_asm(void)
    ASSIGN_XFORM_GROUP(sparc, 3)
    ASSIGN_XFORM_GROUP(sparc, 4)
 
-#if 0
-   /* Disabled for now.  See Mesa bug report # 544665.  Evidently these
-    * functions are using SPARC registers that shouldn't be touched.
-    */
    _mesa_clip_tab[4] = _mesa_sparc_cliptest_points4;
    _mesa_clip_np_tab[4] = _mesa_sparc_cliptest_points4_np;
-#endif
+
 #if 0
    /* disable these too.  See bug 673938 */
    _mesa_normal_tab[NORM_TRANSFORM | NORM_NORMALIZE] =
@@ -137,7 +133,7 @@ void _mesa_init_all_sparc_transform_asm(void)
 	   _mesa_sparc_rescale_normals;
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
    _math_test_all_transform_functions("sparc");
    _math_test_all_cliptest_functions("sparc");
    _math_test_all_normal_transform_functions("sparc");
@@ -162,7 +158,7 @@ void _mesa_init_sparc_glapi_relocs(void)
 	disp_addr = (unsigned long) &_glapi_Dispatch;
 
 	while (insn_ptr < end_ptr) {
-#if (defined(__sparc_v9__) && (!defined(__linux__) || defined(__linux_sparc_64__)))
+#ifdef __arch64__
 		insn_ptr[0] |= (disp_addr >> (32 + 10));
 		insn_ptr[1] |= ((disp_addr & 0xffffffff) >> 10);
 		__glapi_sparc_icache_flush(&insn_ptr[0]);

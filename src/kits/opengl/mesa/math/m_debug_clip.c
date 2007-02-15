@@ -41,7 +41,7 @@
 static char dummy;
 #endif
 
-#ifdef DEBUG  /* This code only used for debugging */
+#ifdef DEBUG_MATH  /* This code only used for debugging */
 
 static clip_func *clip_tab[2] = {
    _mesa_clip_tab,
@@ -245,7 +245,7 @@ static int test_cliptest_function( clip_func func, int np,
    ref->flags = 0;
 
    dco = rco = 0;
-   dca = rca = CLIP_ALL_BITS;
+   dca = rca = CLIP_FRUSTUM_BITS;
 
    ref_cliptest[psize]( source, ref, rm, &rco, &rca );
 
@@ -368,4 +368,4 @@ void _math_test_all_cliptest_functions( char *description )
 }
 
 
-#endif /* DEBUG */
+#endif /* DEBUG_MATH */

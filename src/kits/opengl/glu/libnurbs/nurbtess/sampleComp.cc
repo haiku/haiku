@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
+** $Date: 2005/10/28 13:09:23 $ $Revision: 1.2 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleComp.cc,v 1.1 2001/03/17 00:25:41 brianp Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleComp.cc,v 1.2 2005/10/28 13:09:23 brianp Exp $
 */
 
 #include <stdlib.h>
@@ -159,7 +159,7 @@ void sampleCompLeft(Real* topVertex, Real* botVertex,
    */
   Int midIndex1;
   Int midIndex2;
-  Int gridMidIndex1, gridMidIndex2;
+  Int gridMidIndex1 = 0, gridMidIndex2 = 0;
   //midIndex1: array[i] <= v, array[i-1] > v
   //midIndex2: array[i] >= v, array[i+1] < v
   // v(gridMidIndex1) >= v(midindex1) > v(gridMidIndex1+1)

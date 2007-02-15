@@ -35,8 +35,8 @@
 /*
  * bufpool.h
  *
- * $Date: 2001/03/22 11:38:36 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/bufpool.h,v 1.2 2001/03/22 11:38:36 joukj Exp $
+ * $Date: 2006/03/29 18:46:46 $ $Revision: 1.3 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/bufpool.h,v 1.3 2006/03/29 18:46:46 brianp Exp $
  */
 
 #ifndef __glubufpool_h_
@@ -128,6 +128,7 @@ public:
     inline void * 	operator new( size_t s)
 				{ return ::new char[s]; }
     inline void 	operator delete( void * ) { assert( 0 ); }
+    inline void         operator delete( void *, Pool & ) { assert( 0 ); }
     inline void		deleteMe( Pool & );
 };
 

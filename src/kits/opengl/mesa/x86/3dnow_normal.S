@@ -1,4 +1,4 @@
-/* $Id: 3dnow_normal.S,v 1.9 2005/01/04 14:33:47 brianp Exp $ */
+/* $Id: 3dnow_normal.S,v 1.10 2006/04/17 18:58:24 krh Exp $ */
 
 /*
  * Mesa 3-D graphics library
@@ -845,4 +845,8 @@ LLBL (G3R_end):
     POP_L      ( EDI )
     RET
 
+#endif
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
 #endif

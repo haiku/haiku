@@ -35,8 +35,8 @@
 /*
  * slicer.c++
  *
- * $Date: 2002/11/01 23:35:07 $ $Revision: 1.4 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/slicer.cc,v 1.4 2002/11/01 23:35:07 brianp Exp $
+ * $Date: 2005/10/28 13:09:23 $ $Revision: 1.5 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/slicer.cc,v 1.5 2005/10/28 13:09:23 brianp Exp $
  */
 
 #include <stdlib.h>
@@ -84,6 +84,7 @@ Int num_quads = 0;
 #define ZERO 0.00001 /*determing whether a loop is a rectngle or not*/
 #define equalRect(a,b) ((glu_abs(a-b) <= ZERO)? 1:0) //only used in tessellating a rectangle
 
+#if 0 // UNUSED
 static Int is_Convex(Arc_ptr loop)
 {
   if(area(loop->tail(), loop->head(), loop->next->head()) <0 )
@@ -95,9 +96,11 @@ static Int is_Convex(Arc_ptr loop)
     }
   return 1;
 }
+#endif
 
 /******triangulate a monotone polygon**************/
 #include "monoTriangulation.h"
+#if 0 // UNUSED
 static int is_U_monotone(Arc_ptr loop)
 {
   int n_changes=0;
@@ -126,6 +129,7 @@ static int is_U_monotone(Arc_ptr loop)
   else
     return 0;
 }
+#endif
 
 inline int compInY(REAL a[2], REAL b[2])
 {
@@ -259,6 +263,7 @@ if(loop->next->tail()[1] == loop->next->head()[1])
 
 
 //a line with the same u for opt
+#ifdef USE_OPTTT
 static void evalLineNOGE_BU(TrimVertex *verts, int n, Backend& backend)
 {
   int i;
@@ -266,8 +271,10 @@ static void evalLineNOGE_BU(TrimVertex *verts, int n, Backend& backend)
   for(i=0; i<n; i++)
     backend.tmeshvertNOGE_BU(&verts[i]);
 }
+#endif
 
 //a line with the same v for opt
+#ifdef USE_OPTTT
 static void evalLineNOGE_BV(TrimVertex *verts, int n, Backend& backend)
 {
   int i;
@@ -276,6 +283,9 @@ static void evalLineNOGE_BV(TrimVertex *verts, int n, Backend& backend)
   for(i=0; i<n; i++)
     backend.tmeshvertNOGE_BV(&verts[i]);
 }
+#endif
+
+#ifdef USE_OPTTT
 static void evalLineNOGE(TrimVertex *verts, int n, Backend& backend)
 {
 
@@ -290,7 +300,7 @@ static void evalLineNOGE(TrimVertex *verts, int n, Backend& backend)
 	backend.tmeshvertNOGE(&verts[i]);
     }
 }
-
+#endif
 
 inline void  OPT_OUTVERT(TrimVertex& vv, Backend& backend) 
 {
@@ -861,6 +871,7 @@ return;
   
 
 /**********for reading newtess_flag from a file**********/
+#ifdef USE_READ_FLAG
 static Int read_flag(char* name)
 {
   Int ret;
@@ -874,7 +885,7 @@ static Int read_flag(char* name)
   fclose(fp);
   return ret;
 }
-  
+#endif  
 
 /***********nextgen tess****************/
 #include "sampleMonoPoly.h"

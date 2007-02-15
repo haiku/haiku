@@ -63,10 +63,8 @@ public:
   GLUTpassiveCB passive;  /* passive motion  (x,y) */
   GLUTentryCB entry;    /* window entry/exit  (state) */
   GLUTkeyboardCB keyboard;  /* keyboard  (ASCII,x,y) */
-  GLUTkeyboardCB keyboardUp;  /* keyboard up (ASCII,x,y) */
   GLUTvisibilityCB visibility;  /* visibility  */
   GLUTspecialCB special;  /* special key  */
-  GLUTspecialCB specialUp;  /* special key up */
   GLUTwindowStatusCB windowStatus;  /* window status */
 
 	bool anyevents;		// were any events received?

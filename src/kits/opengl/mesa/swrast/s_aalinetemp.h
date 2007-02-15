@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -58,7 +58,7 @@ NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
     * solving the plane equations at (ix,iy).
     */
 #ifdef DO_Z
-   line->span.array->z[i] = (GLdepth) IROUND(solve_plane(fx, fy, line->zPlane));
+   line->span.array->z[i] = (GLuint) solve_plane(fx, fy, line->zPlane);
 #endif
 #ifdef DO_FOG
    line->span.array->fog[i] = solve_plane(fx, fy, line->fPlane);
@@ -80,7 +80,7 @@ NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
 #ifdef DO_TEX
    {
       GLfloat invQ;
-      if (ctx->FragmentProgram._Enabled) {
+      if (ctx->FragmentProgram._Active) {
          invQ = 1.0F;
       }
       else {
@@ -100,7 +100,7 @@ NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
       for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
          if (ctx->Texture.Unit[unit]._ReallyEnabled) {
             GLfloat invQ;
-            if (ctx->FragmentProgram._Enabled) {
+            if (ctx->FragmentProgram._Active) {
                invQ = 1.0F;
             }
             else {

@@ -35,8 +35,8 @@
 /*
 ** Author: Eric Veach, July 1994.
 **
-** $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libtess/dict.c,v 1.1 2001/03/17 00:25:41 brianp Exp $
+** $Date: 2006/04/19 14:42:01 $ $Revision: 1.3 $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libtess/dict.c,v 1.3 2006/04/19 14:42:01 brianp Exp $
 */
 
 #include <stddef.h>
@@ -67,9 +67,10 @@ Dict *dictNewDict( void *frame,
 /* really __gl_dictListDeleteDict */
 void dictDeleteDict( Dict *dict )
 {
-  DictNode *node;
+  DictNode *node, *next;
 
-  for( node = dict->head.next; node != &dict->head; node = node->next ) {
+  for( node = dict->head.next; node != &dict->head; node = next ) {
+    next = node->next;
     memFree( node );
   }
   memFree( dict );

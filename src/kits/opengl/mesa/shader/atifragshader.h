@@ -32,7 +32,6 @@ struct atifragshader_dst_register
    GLuint Index;
    GLuint dstMod;
    GLuint dstMask;
-   GLuint Swizzle;
 };
 
 #define ATI_FRAGMENT_SHADER_COLOR_OP 0
@@ -40,7 +39,7 @@ struct atifragshader_dst_register
 #define ATI_FRAGMENT_SHADER_PASS_OP  2
 #define ATI_FRAGMENT_SHADER_SAMPLE_OP 3
 
-/* two opcodes - one for color/one for alpha - also pass/sample */
+/* two opcodes - one for color/one for alpha */
 /* up to three source registers for most ops */
 struct atifs_instruction
 {
@@ -49,6 +48,23 @@ struct atifs_instruction
    struct atifragshader_src_register SrcReg[2][3];
    struct atifragshader_dst_register DstReg[2];
 };
+
+/* different from arithmetic shader instruction */
+struct atifs_setupinst
+{
+   GLenum Opcode;
+   GLuint src;
+   GLenum swizzle;
+};
+
+
+extern struct ati_fragment_shader *
+_mesa_new_ati_fragment_shader(GLcontext *ctx, GLuint id);
+
+extern void
+_mesa_delete_ati_fragment_shader(GLcontext *ctx,
+                                 struct ati_fragment_shader *s);
+
 
 extern GLuint GLAPIENTRY _mesa_GenFragmentShadersATI(GLuint range);
 

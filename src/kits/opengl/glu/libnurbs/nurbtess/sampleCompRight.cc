@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2001/03/22 11:41:40 $ $Revision: 1.2 $
+** $Date: 2006/08/30 19:02:45 $ $Revision: 1.4 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleCompRight.cc,v 1.2 2001/03/22 11:41:40 joukj Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleCompRight.cc,v 1.4 2006/08/30 19:02:45 brianp Exp $
 */
 
 #include <stdlib.h>
@@ -72,7 +72,7 @@ void sampleCompRight(Real* topVertex, Real* botVertex,
    */
   Int midIndex1;
   Int midIndex2;
-  Int gridMidIndex1, gridMidIndex2;
+  Int gridMidIndex1 = 0, gridMidIndex2 = 0;
   //midIndex1: array[i] <= v, array[i+1] > v
   //midIndex2: array[i] >= v,  array[i+1] < v
   midIndex1 = rightChain->findIndexBelowGen(rightGridChain->get_v_value(gridIndex1),

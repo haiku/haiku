@@ -35,8 +35,8 @@
 /*
  * quilt.c++
  *
- * $Date: 2002/11/01 23:35:07 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/quilt.cc,v 1.2 2002/11/01 23:35:07 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.3 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/quilt.cc,v 1.3 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -91,12 +91,12 @@ Quilt::show( void )
     for( int i=0; i!= qspec[0].order * qspec[0].width; i++ ) {
 	for( int j = 0; j!= qspec[1].order * qspec[1].width; j++ ) {
 	    for( int k=0; k < nc; k++ )
-		dprintf(  "%g ", ps[i*qspec[0].stride + j*qspec[1].stride + k] );
-	    dprintf(  "\n" );
+		_glu_dprintf(  "%g ", ps[i*qspec[0].stride + j*qspec[1].stride + k] );
+	    _glu_dprintf(  "\n" );
 	}
-	dprintf(  "\n" );
+	_glu_dprintf(  "\n" );
     }
-    dprintf( "\n" );
+    _glu_dprintf( "\n" );
 #endif
 }
 

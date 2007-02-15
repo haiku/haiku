@@ -43,12 +43,16 @@
 #include "mathmod.h"
 
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
 #include "m_debug.h"
 #endif
 
 #ifdef USE_X86_ASM
 #include "x86/common_x86_asm.h"
+#endif
+
+#ifdef USE_X86_64_ASM
+#include "x86-64/x86-64.h"
 #endif
 
 #ifdef USE_SPARC_ASM
@@ -200,7 +204,7 @@ _math_init_transformation( void )
    init_copy0();
    init_dotprod();
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
    _math_test_all_transform_functions( "default" );
    _math_test_all_normal_transform_functions( "default" );
    _math_test_all_cliptest_functions( "default" );
@@ -212,6 +216,8 @@ _math_init_transformation( void )
    _mesa_init_all_sparc_transform_asm();
 #elif defined( USE_PPC_ASM )
    _mesa_init_all_ppc_transform_asm();
+#elif defined( USE_X86_64_ASM )
+   _mesa_init_all_x86_64_transform_asm();
 #endif
 }
 

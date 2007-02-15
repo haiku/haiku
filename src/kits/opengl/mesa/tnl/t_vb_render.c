@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -45,9 +44,6 @@
 #include "macros.h"
 #include "imports.h"
 #include "mtypes.h"
-#include "nvfragprog.h"
-#include "math/m_matrix.h"
-#include "math/m_xform.h"
 
 #include "t_pipeline.h"
 
@@ -77,7 +73,8 @@
 #define EDGEFLAG_SET(idx, val) VB->EdgeFlag[idx] = val
 
 
-#define CLIPMASK (CLIP_ALL_BITS|CLIP_CULL_BIT)
+/* This does NOT include the CLIP_USER_BIT! */
+#define CLIPMASK (CLIP_FRUSTUM_BITS | CLIP_CULL_BIT)
 
 
 /* Vertices, with the possibility of clipping.
@@ -133,7 +130,6 @@ do {							\
 #define TAG(x) clip_##x##_verts
 #define INIT(x) tnl->Driver.Render.PrimitiveNotify( ctx, x )
 #define RESET_STIPPLE if (stipple) tnl->Driver.Render.ResetLineStipple( ctx )
-#define RESET_OCCLUSION ctx->OcclusionResult = GL_TRUE
 #define PRESERVE_VB_DEFS
 #include "t_vb_rendertmp.h"
 
@@ -220,7 +216,6 @@ static void clip_elt_triangles( GLcontext *ctx,
    (void) elt; (void) stipple
 
 #define RESET_STIPPLE if (stipple) tnl->Driver.Render.ResetLineStipple( ctx )
-#define RESET_OCCLUSION ctx->OcclusionResult = GL_TRUE
 #define INIT(x) tnl->Driver.Render.PrimitiveNotify( ctx, x )
 #define RENDER_TAB_QUALIFIER
 #define PRESERVE_VB_DEFS
@@ -268,7 +263,6 @@ static GLboolean run_render( GLcontext *ctx,
 {
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    struct vertex_buffer *VB = &tnl->vb;
-   GLuint new_inputs = stage->changed_inputs;
    tnl_render_func *tab;
    GLint pass = 0;
 
@@ -293,7 +287,7 @@ static GLboolean run_render( GLcontext *ctx,
    ASSERT(tnl->Driver.Render.ClippedPolygon);
    ASSERT(tnl->Driver.Render.Finish);
 
-   tnl->Driver.Render.BuildVertices( ctx, 0, VB->Count, new_inputs );
+   tnl->Driver.Render.BuildVertices( ctx, 0, VB->Count, ~0 );
 
    if (VB->ClipOrMask) {
       tab = VB->Elts ? clip_render_tab_elts : clip_render_tab_verts;
@@ -315,7 +309,7 @@ static GLboolean run_render( GLcontext *ctx,
 	 GLuint start = VB->Primitive[i].start;
 	 GLuint length = VB->Primitive[i].count;
 
-	 assert((prim & PRIM_MODE_MASK) < GL_POLYGON+1);
+	 assert((prim & PRIM_MODE_MASK) <= GL_POLYGON);
 
 	 if (MESA_VERBOSE & VERBOSE_PRIMS) 
 	    _mesa_debug(NULL, "MESA prim %s %d..%d\n", 
@@ -340,42 +334,14 @@ static GLboolean run_render( GLcontext *ctx,
 
 
 
-/* Quite a bit of work involved in finding out the inputs for the
- * render stage.
- */
-static void check_render( GLcontext *ctx, struct tnl_pipeline_stage *stage )
-{
-   stage->inputs = TNL_CONTEXT(ctx)->render_inputs;
-}
-
-
-
-
-static void dtr( struct tnl_pipeline_stage *stage )
-{
-   (void) stage;
-}
 
 
 const struct tnl_pipeline_stage _tnl_render_stage =
 {
    "render",			/* name */
-   (_NEW_BUFFERS |
-    _DD_NEW_SEPARATE_SPECULAR |
-    _DD_NEW_FLATSHADE |
-    _NEW_TEXTURE|
-    _NEW_LIGHT|
-    _NEW_POINT|
-    _NEW_FOG|
-    _DD_NEW_TRI_UNFILLED |
-    _NEW_RENDERMODE),		/* re-check (new inputs, interp function) */
-   0,				/* re-run (always runs) */
-   GL_TRUE,			/* active? */
-   0,				/* inputs (set in check_render) */
-   0,				/* outputs */
-   0,				/* changed_inputs */
    NULL,			/* private data */
-   dtr,				/* destructor */
-   check_render,		/* check */
+   NULL,			/* creator */
+   NULL,			/* destructor */
+   NULL,			/* validate */
    run_render			/* run */
 };

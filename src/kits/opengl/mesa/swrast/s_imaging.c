@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -38,20 +38,25 @@ _swrast_CopyColorTable( GLcontext *ctx,
 			GLenum target, GLenum internalformat,
 			GLint x, GLint y, GLsizei width)
 {
+   SWcontext *swrast = SWRAST_CONTEXT(ctx);
    GLchan data[MAX_WIDTH][4];
    struct gl_buffer_object *bufferSave;
 
-   /* Select buffer to read from */
-   _swrast_use_read_buffer(ctx);
+   if (!ctx->ReadBuffer->_ColorReadBuffer) {
+      /* no readbuffer - OK */
+      return;
+   }
 
    if (width > MAX_WIDTH)
       width = MAX_WIDTH;
 
-   /* read the data from framebuffer */
-   _swrast_read_rgba_span( ctx, ctx->ReadBuffer, width, x, y, data );
+   RENDER_START( swrast, ctx );
 
-   /* Restore reading from draw buffer (the default) */
-   _swrast_use_draw_buffer(ctx);
+   /* read the data from framebuffer */
+   _swrast_read_rgba_span( ctx, ctx->ReadBuffer->_ColorReadBuffer,
+                           width, x, y, CHAN_TYPE, data );
+
+   RENDER_FINISH(swrast,ctx);
 
    /* save PBO binding */
    bufferSave = ctx->Unpack.BufferObj;
@@ -68,20 +73,25 @@ void
 _swrast_CopyColorSubTable( GLcontext *ctx,GLenum target, GLsizei start,
 			   GLint x, GLint y, GLsizei width)
 {
+   SWcontext *swrast = SWRAST_CONTEXT(ctx);
    GLchan data[MAX_WIDTH][4];
    struct gl_buffer_object *bufferSave;
 
-   /* Select buffer to read from */
-   _swrast_use_read_buffer(ctx);
+   if (!ctx->ReadBuffer->_ColorReadBuffer) {
+      /* no readbuffer - OK */
+      return;
+   }
 
    if (width > MAX_WIDTH)
       width = MAX_WIDTH;
 
-   /* read the data from framebuffer */
-   _swrast_read_rgba_span( ctx, ctx->ReadBuffer, width, x, y, data );
+   RENDER_START( swrast, ctx );
 
-   /* Restore reading from draw buffer (the default) */
-   _swrast_use_draw_buffer(ctx);
+   /* read the data from framebuffer */
+   _swrast_read_rgba_span( ctx, ctx->ReadBuffer->_ColorReadBuffer,
+                           width, x, y, CHAN_TYPE, data );
+
+   RENDER_FINISH(swrast,ctx);
 
    /* save PBO binding */
    bufferSave = ctx->Unpack.BufferObj;
@@ -103,19 +113,18 @@ _swrast_CopyConvolutionFilter1D(GLcontext *ctx, GLenum target,
    GLchan rgba[MAX_CONVOLUTION_WIDTH][4];
    struct gl_buffer_object *bufferSave;
 
-   /* Select buffer to read from */
-   _swrast_use_read_buffer(ctx);
+   if (!ctx->ReadBuffer->_ColorReadBuffer) {
+      /* no readbuffer - OK */
+      return;
+   }
 
    RENDER_START( swrast, ctx );
 
    /* read the data from framebuffer */
-   _swrast_read_rgba_span( ctx, ctx->ReadBuffer, width, x, y,
-				(GLchan (*)[4]) rgba );
+   _swrast_read_rgba_span( ctx, ctx->ReadBuffer->_ColorReadBuffer,
+                           width, x, y, CHAN_TYPE, rgba );
    
    RENDER_FINISH( swrast, ctx );
-
-   /* Restore reading from draw buffer (the default) */
-   _swrast_use_draw_buffer(ctx);
 
    /* save PBO binding */
    bufferSave = ctx->Unpack.BufferObj;
@@ -141,21 +150,20 @@ _swrast_CopyConvolutionFilter2D(GLcontext *ctx, GLenum target,
    GLint i;
    struct gl_buffer_object *bufferSave;
 
-   /* Select buffer to read from */
-   _swrast_use_read_buffer(ctx);
+   if (!ctx->ReadBuffer->_ColorReadBuffer) {
+      /* no readbuffer - OK */
+      return;
+   }
 
    RENDER_START(swrast,ctx);
    
    /* read pixels from framebuffer */
    for (i = 0; i < height; i++) {
-      _swrast_read_rgba_span( ctx, ctx->ReadBuffer, width, x, y + i,
-				(GLchan (*)[4]) rgba[i] );
+      _swrast_read_rgba_span( ctx, ctx->ReadBuffer->_ColorReadBuffer,
+                              width, x, y + i, CHAN_TYPE, rgba[i] );
    }
 
    RENDER_FINISH(swrast,ctx);
-
-   /* Restore reading from draw buffer (the default) */
-   _swrast_use_draw_buffer(ctx);
 
    /*
     * HACK: save & restore context state so we can store this as a

@@ -35,8 +35,8 @@
 /*
  * intersect.c++
  *
- * $Date: 2004/05/12 15:29:36 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/intersect.cc,v 1.2 2004/05/12 15:29:36 brianp Exp $
+ * $Date: 2005/10/28 13:09:23 $ $Revision: 1.3 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/intersect.cc,v 1.3 2005/10/28 13:09:23 brianp Exp $
  */
 
 #include "glimports.h"
@@ -53,7 +53,9 @@
 enum i_result { INTERSECT_VERTEX, INTERSECT_EDGE };
 
 /* local functions */
+#ifndef NDEBUG  // for asserts only
 static int		arc_classify( Arc_ptr, int, REAL );
+#endif
 static enum i_result	pwlarc_intersect( PwlArc *, int, REAL, int, int[3] );
 
 
@@ -400,6 +402,7 @@ pwlarc_intersect(
  *----------------------------------------------------------------------------
  */
 
+#ifndef NDEBUG  // for asserts only
 static int
 arc_classify( Arc_ptr jarc, int param, REAL value )
 {
@@ -438,6 +441,7 @@ arc_classify( Arc_ptr jarc, int param, REAL value )
 	}
     }
 }
+#endif
 
 void
 Subdivider::classify_tailonleft_s( Bin& bin, Bin& in, Bin& out, REAL val )

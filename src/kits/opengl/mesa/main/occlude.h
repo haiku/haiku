@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.0.2
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,11 +27,14 @@
 #define OCCLUDE_H
 
 
-extern void
-_mesa_init_occlude(GLcontext *ctx);
+extern struct gl_query_object *
+_mesa_new_query_object(GLcontext *ctx, GLuint id);
 
 extern void
-_mesa_free_occlude_data(GLcontext *ctx);
+_mesa_init_query(GLcontext *ctx);
+
+extern void
+_mesa_free_query_data(GLcontext *ctx);
 
 extern void GLAPIENTRY
 _mesa_GenQueriesARB(GLsizei n, GLuint *ids);
@@ -56,6 +59,12 @@ _mesa_GetQueryObjectivARB(GLuint id, GLenum pname, GLint *params);
 
 extern void GLAPIENTRY
 _mesa_GetQueryObjectuivARB(GLuint id, GLenum pname, GLuint *params);
+
+extern void GLAPIENTRY
+_mesa_GetQueryObjecti64vEXT(GLuint id, GLenum pname, GLint64EXT *params);
+
+extern void GLAPIENTRY
+_mesa_GetQueryObjectui64vEXT(GLuint id, GLenum pname, GLuint64EXT *params);
 
 
 #endif /* OCCLUDE_H */

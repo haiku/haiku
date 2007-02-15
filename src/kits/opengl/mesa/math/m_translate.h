@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,6 +29,21 @@
 #include "config.h"
 #include "mtypes.h"		/* hack for GLchan */
 
+
+/**
+ * Array translation.
+ * For example, convert array of GLushort[3] to GLfloat[4].
+ * The function name specifies the destination format/size.
+ * \param  to  the destination address
+ * \param  ptr  the source address
+ * \param  stride  the source stride (in bytes) between elements
+ * \param  type  the source datatype (GL_SHORT, GL_UNSIGNED_INT, etc)
+ * \param  size  number of values per element in source array (1,2,3 or 4)
+ * \param  start  first element in source array to convert
+ * \param  n  number of elements to convert
+ *
+ * Note: "element" means a tuple like GLfloat[3] or GLubyte[4].
+ */
 
 
 extern void _math_trans_1f(GLfloat *to,
@@ -77,6 +91,7 @@ extern void _math_trans_4us(GLushort (*to)[4],
 			    GLuint start,
 			    GLuint n );
 
+/** Convert to floats w/out normalization (i.e. just cast) */
 extern void _math_trans_4f(GLfloat (*to)[4],
 			   CONST void *ptr,
 			   GLuint stride,
@@ -85,7 +100,8 @@ extern void _math_trans_4f(GLfloat (*to)[4],
 			   GLuint start,
 			   GLuint n );
 
-extern void _math_trans_4fc(GLfloat (*to)[4],
+/** Convert to normalized floats in [0,1] or [-1, 1] */
+extern void _math_trans_4fn(GLfloat (*to)[4],
 			    CONST void *ptr,
 			    GLuint stride,
 			    GLenum type,
@@ -93,7 +109,7 @@ extern void _math_trans_4fc(GLfloat (*to)[4],
 			    GLuint start,
 			    GLuint n );
 
-extern void _math_trans_3f(GLfloat (*to)[3],
+extern void _math_trans_3fn(GLfloat (*to)[3],
 			   CONST void *ptr,
 			   GLuint stride,
 			   GLenum type,

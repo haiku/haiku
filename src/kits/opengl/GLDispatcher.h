@@ -19,8 +19,6 @@ class BGLDispatcher
 		BGLDispatcher();
 		~BGLDispatcher();
 		
-		const char *			Version();
-		
 		void 					SetCurrentContext(void * context);
 		void *					CurrentContext();
 		
@@ -36,12 +34,6 @@ class BGLDispatcher
 };
 
 // Inlines methods
-inline const char * BGLDispatcher::Version()
-{
-	return _glapi_get_version();
-}
-
-
 inline void BGLDispatcher::SetCurrentContext(void * context)
 {
 	_glapi_set_context(context);

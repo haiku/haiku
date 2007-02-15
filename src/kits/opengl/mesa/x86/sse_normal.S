@@ -1,4 +1,4 @@
-/* $Id: sse_normal.S,v 1.5 2005/01/04 14:33:47 brianp Exp $ */
+/* $Id: sse_normal.S,v 1.6 2006/04/17 18:58:24 krh Exp $ */
 
 /*
  * Mesa 3-D graphics library
@@ -254,4 +254,8 @@ LLBL(K_G3TNNRR_finish):
 	POP_L	( ESI )
 	RET
 #undef FRAME_OFFSET
+#endif
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
 #endif

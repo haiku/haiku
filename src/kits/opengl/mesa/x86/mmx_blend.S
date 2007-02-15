@@ -364,3 +364,7 @@ TWO(MOVQ       ( MM1, REGIND(rgba) ))
 #include "mmx_blendtmp.h"
 
 #endif
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif

@@ -466,7 +466,7 @@ raster_pos4f(GLcontext *ctx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
                                    + ctx->Viewport._WindowMap.m[MAT_TY]);
       ctx->Current.RasterPos[2] = (ndc[2] * ctx->Viewport._WindowMap.m[MAT_SZ]
                                    + ctx->Viewport._WindowMap.m[MAT_TZ])
-                                  / ctx->DepthMaxF;
+                                  / ctx->DrawBuffer->_DepthMaxF;
       ctx->Current.RasterPos[3] = clip[3];
 
       /* compute raster distance */
@@ -503,7 +503,8 @@ raster_pos4f(GLcontext *ctx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
                      ctx->Current.Attrib[VERT_ATTRIB_COLOR1]);
          }
          else {
-            ctx->Current.RasterIndex = ctx->Current.Index;
+            ctx->Current.RasterIndex
+               = ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX][0];
          }
       }
 
@@ -756,7 +757,8 @@ window_pos3f(GLfloat x, GLfloat y, GLfloat z)
          = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3], 0.0F, 1.0F);
    }
    else {
-      ctx->Current.RasterIndex = ctx->Current.Index;
+      ctx->Current.RasterIndex
+         = ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX][0];
    }
 
    /* raster texcoord = current texcoord */
@@ -992,6 +994,7 @@ void _mesa_init_rastpos( GLcontext * ctx )
    ASSIGN_4V( ctx->Current.RasterPos, 0.0, 0.0, 0.0, 1.0 );
    ctx->Current.RasterDistance = 0.0;
    ASSIGN_4V( ctx->Current.RasterColor, 1.0, 1.0, 1.0, 1.0 );
+   ASSIGN_4V( ctx->Current.RasterSecondaryColor, 0.0, 0.0, 0.0, 1.0 );
    ctx->Current.RasterIndex = 1.0;
    for (i=0; i<MAX_TEXTURE_UNITS; i++)
       ASSIGN_4V( ctx->Current.RasterTexCoords[i], 0.0, 0.0, 0.0, 1.0 );

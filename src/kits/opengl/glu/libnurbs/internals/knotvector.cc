@@ -129,11 +129,11 @@ int Knotvector::validate( void )
 void Knotvector::show( char *msg )
 {
 #ifndef NDEBUG
-    dprintf( "%s\n", msg );
-    dprintf( "order = %ld, count = %ld\n", order, knotcount );
+    _glu_dprintf( "%s\n", msg );
+    _glu_dprintf( "order = %ld, count = %ld\n", order, knotcount );
 
     for( int i=0; i<knotcount; i++ )
-	dprintf( "knot[%d] = %g\n", i, knotlist[i] );
+	_glu_dprintf( "knot[%d] = %g\n", i, knotlist[i] );
 #endif
 }
 

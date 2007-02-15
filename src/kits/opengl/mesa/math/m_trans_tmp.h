@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,16 +22,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * New (3.1) transformation code written by Keith Whitwell.
+/**
+ * \brief  Templates for vector conversions.
+ * \author Keith Whitwell.
  */
-
-
-/* KW: This file also included by tnl/trans_elt.c to build code
- *     specific to the implementation of array-elements in the
- *     tnl module.
- */
-
 
 #ifdef DEST_4F
 static void DEST_4F( GLfloat (*t)[4],
@@ -59,8 +53,8 @@ static void DEST_4F( GLfloat (*t)[4],
 
 
 
-#ifdef DEST_4FC
-static void DEST_4FC( GLfloat (*t)[4],
+#ifdef DEST_4FN
+static void DEST_4FN( GLfloat (*t)[4],
 		      CONST void *ptr,
 		      GLuint stride,
 		      ARGS )
@@ -74,18 +68,18 @@ static void DEST_4FC( GLfloat (*t)[4],
    for (i = DST_START ; i < n ; i++, NEXT_F) {
       CHECK {
          NEXT_F2;
-	 if (SZ >= 1) t[i][0] = TRX_4FC(f, 0);
-	 if (SZ >= 2) t[i][1] = TRX_4FC(f, 1);
-	 if (SZ >= 3) t[i][2] = TRX_4FC(f, 2);
-	 if (SZ == 4) t[i][3] = TRX_4FC(f, 3); else t[i][3] = 1.0;
+	 if (SZ >= 1) t[i][0] = TRX_4FN(f, 0);
+	 if (SZ >= 2) t[i][1] = TRX_4FN(f, 1);
+	 if (SZ >= 3) t[i][2] = TRX_4FN(f, 2);
+	 if (SZ == 4) t[i][3] = TRX_4FN(f, 3); else t[i][3] = 1.0;
       }
    }
 }
 #endif
 
 
-#ifdef DEST_3F
-static void DEST_3F( GLfloat (*t)[3],
+#ifdef DEST_3FN
+static void DEST_3FN( GLfloat (*t)[3],
 		     CONST void *ptr,
 		     GLuint stride,
 		     ARGS )
@@ -98,9 +92,9 @@ static void DEST_3F( GLfloat (*t)[3],
    for (i = DST_START ; i < n ; i++, NEXT_F) {
       CHECK {
          NEXT_F2;
-	 t[i][0] = TRX_3F(f, 0);
-	 t[i][1] = TRX_3F(f, 1);
-	 t[i][2] = TRX_3F(f, 2);
+	 t[i][0] = TRX_3FN(f, 0);
+	 t[i][1] = TRX_3FN(f, 1);
+	 t[i][2] = TRX_3FN(f, 2);
       }
    }
 }
@@ -231,9 +225,9 @@ static void INIT(void)
    ASSERT(SZ == 1);
    TAB(_1f)[SRC_IDX] = DEST_1F;
 #endif
-#ifdef DEST_3F
+#ifdef DEST_3FN
    ASSERT(SZ == 3);
-   TAB(_3f)[SRC_IDX] = DEST_3F;
+   TAB(_3fn)[SRC_IDX] = DEST_3FN;
 #endif
 #ifdef DEST_4UB
    TAB(_4ub)[SZ][SRC_IDX] = DEST_4UB;
@@ -244,8 +238,8 @@ static void INIT(void)
 #ifdef DEST_4F
    TAB(_4f)[SZ][SRC_IDX] = DEST_4F;
 #endif
-#ifdef DEST_4FC
-   TAB(_4fc)[SZ][SRC_IDX] = DEST_4FC;
+#ifdef DEST_4FN
+   TAB(_4fn)[SZ][SRC_IDX] = DEST_4FN;
 #endif
 
 }
@@ -266,14 +260,14 @@ static void INIT(void)
 #ifdef DEST_4US
 #undef DEST_4US
 #endif
-#ifdef DEST_3F
-#undef DEST_3F
+#ifdef DEST_3FN
+#undef DEST_3FN
 #endif
 #ifdef DEST_4F
 #undef DEST_4F
 #endif
-#ifdef DEST_4FC
-#undef DEST_4FC
+#ifdef DEST_4FN
+#undef DEST_4FN
 #endif
 #ifdef DEST_1F
 #undef DEST_1F

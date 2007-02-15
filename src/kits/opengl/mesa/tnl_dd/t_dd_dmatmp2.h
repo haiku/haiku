@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  4.0.3
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,7 +26,9 @@
  */
 
 
-/* Template for render stages which build and emit vertices directly
+/**
+ * \file t_dd_dmatmp2.h
+ * Template for render stages which build and emit vertices directly
  * to fixed-size dma buffers.  Useful for rendering strips and other
  * native primitives where clipping and per-vertex tweaks such as
  * those in t_dd_tritmp.h are not required.
@@ -422,7 +423,7 @@ static void TAG(render_quad_strip_verts)( GLcontext *ctx,
    if (HAVE_QUAD_STRIPS) {
       EMIT_PRIM( ctx, GL_QUAD_STRIP, HW_QUAD_STRIP, start, count );
    } 
-   else if (ctx->_TriangleCaps & DD_FLATSHADE) {
+   else if (ctx->Light.ShadeModel == GL_FLAT) {
       LOCAL_VARS;
       int dmasz = GET_MAX_HW_ELTS();
       GLuint j, nr;
@@ -810,7 +811,7 @@ static void TAG(render_quad_strip_elts)( GLcontext *ctx,
       dmasz -= dmasz & 1;
       count -= (count-start) & 1;
 
-      if (ctx->_TriangleCaps & DD_FLATSHADE) {
+      if (ctx->Light.ShadeModel == GL_FLAT) {
 	 ELT_INIT( GL_TRIANGLES, HW_TRIANGLES );
 
 	 dmasz = dmasz/6*2;

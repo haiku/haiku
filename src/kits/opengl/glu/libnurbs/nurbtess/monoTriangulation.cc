@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2004/05/12 15:29:36 $ $Revision: 1.3 $
+** $Date: 2006/03/29 18:46:46 $ $Revision: 1.5 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/monoTriangulation.cc,v 1.3 2004/05/12 15:29:36 brianp Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/monoTriangulation.cc,v 1.5 2006/03/29 18:46:46 brianp Exp $
 */
 
 #include <stdlib.h>
@@ -619,8 +619,10 @@ void monoTriangulationFun(directedLine* monoPolygon, Int (*compFun)(Real*, Real*
     dec_chain.appendVertex(tempV->getVertex(i));
   }
   
-  monoTriangulationRecFun(topV->head(), botV->head(), &inc_chain, 0, &dec_chain, 0, compFun, pStream);
-
+  if (!(0 == inc_chain.getNumElements() && 0 == dec_chain.getNumElements())) {
+     monoTriangulationRecFun(topV->head(), botV->head(), &inc_chain, 0,
+                             &dec_chain, 0, compFun, pStream);
+  }
 }  
 
 void monoTriangulation(directedLine* monoPolygon, primStream* pStream)
@@ -1037,8 +1039,8 @@ void monoTriangulationRec(directedLine* inc_chain, Int inc_index,
 			  primStream* pStream)
 {
   Int i;
-  directedLine *temp, *oldtemp;
-  Int tempIndex, oldtempIndex;
+  directedLine *temp, *oldtemp = NULL;
+  Int tempIndex, oldtempIndex = 0;
   
   assert(inc_chain != NULL && dec_chain != NULL);
   

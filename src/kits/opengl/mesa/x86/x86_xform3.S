@@ -1,4 +1,4 @@
-/* $Id: x86_xform3.S,v 1.3 2005/01/04 14:33:47 brianp Exp $ */
+/* $Id: x86_xform3.S,v 1.4 2006/04/17 18:58:24 krh Exp $ */
 
 /*
  * Mesa 3-D graphics library
@@ -638,3 +638,7 @@ LLBL(x86_p3_ir_done):
 	POP_L( EDI )
 	POP_L( ESI )
 	RET
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif

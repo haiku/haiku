@@ -193,13 +193,11 @@ WGLAPI int   GLAPIENTRY SetPixelFormat(HDC,int,const PIXELFORMATDESCRIPTOR *);
 #else /* _WIN32 not defined */
 
 /* Define GLUTAPIENTRY and GLUTCALLBACK to nothing if we aren't on Win32. */
-#  define GLUTAPIENTRY
+#  define GLUTAPIENTRY GLAPIENTRY
 #  define GLUTAPIENTRYV
-#  define GLUT_APIENTRY_DEFINED
 #  define GLUTCALLBACK
 #  define GLUTAPI extern
-/* Prototype exit for the non-Win32 case (see above). */
-/*extern void exit(int);  this screws up gcc -ansi -pedantic! */
+
 #endif
 
 
@@ -745,28 +743,6 @@ GLUTAPI int GLUTAPIENTRY glutGameModeGet(GLenum mode);
 
 #ifdef __cplusplus
 }
-#endif
-
-#if 0
-#ifdef GLUT_APIENTRY_DEFINED
-# undef GLUT_APIENTRY_DEFINED
-# undef APIENTRY
-#endif
-
-#ifdef GLUT_WINGDIAPI_DEFINED
-# undef GLUT_WINGDIAPI_DEFINED
-# undef WINGDIAPI
-#endif
-
-#ifdef GLUT_DEFINED___CDECL
-# undef GLUT_DEFINED___CDECL
-# undef __cdecl
-#endif
-
-#ifdef GLUT_DEFINED__CRTIMP
-# undef GLUT_DEFINED__CRTIMP
-# undef _CRTIMP
-#endif
 #endif
 
 #endif                  /* __glut_h__ */

@@ -35,8 +35,8 @@
 /*
  * nurbstess.c++
  *
- * $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/nurbstess.cc,v 1.1 2001/03/17 00:25:41 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/nurbstess.cc,v 1.2 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -79,7 +79,7 @@ void
 NurbsTessellator::makeobj( int )
 {
 #ifndef NDEBUG
-   dprintf( "makeobj\n" );
+   _glu_dprintf( "makeobj\n" );
 #endif
 }
 
@@ -87,7 +87,7 @@ void
 NurbsTessellator::closeobj( void )
 {
 #ifndef NDEBUG
-   dprintf( "closeobj\n" );
+   _glu_dprintf( "closeobj\n" );
 #endif
 }
 
@@ -95,7 +95,7 @@ void
 NurbsTessellator::bgnrender( void )
 {
 #ifndef NDEBUG
-   dprintf( "bgnrender\n" );
+   _glu_dprintf( "bgnrender\n" );
 #endif
 }
 
@@ -103,7 +103,7 @@ void
 NurbsTessellator::endrender( void )
 {
 #ifndef NDEBUG
-    dprintf( "endrender\n" );
+    _glu_dprintf( "endrender\n" );
 #endif
 }
 

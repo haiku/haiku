@@ -31,10 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2004/05/12 15:29:36 $ $Revision: 1.2 $
+** $Date: 2005/10/28 13:09:23 $ $Revision: 1.3 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/monoChain.cc,v 1.2 2004/05/12 15:29:36 brianp Exp $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/monoChain.cc,v 1.3 2005/10/28 13:09:23 brianp Exp $
 */
 
 #include "gluos.h"
@@ -61,6 +61,7 @@ extern Int isCusp(directedLine *v);
 extern Int deleteRepeatDiagonals(Int num_diagonals, directedLine** diagonal_vertices, directedLine** new_vertices);
 
 //for debug purpose only
+#if 0 // UNUSED
 static void drawDiagonals(Int num_diagonals, directedLine** diagonal_vertices)
 {
   Int i;
@@ -72,6 +73,7 @@ static void drawDiagonals(Int num_diagonals, directedLine** diagonal_vertices)
       glEnd();
     }
 }
+#endif
 
 /*given (x_1, y_1) and (x_2, y_2), and y
  *return x such that (x,y) is on the line

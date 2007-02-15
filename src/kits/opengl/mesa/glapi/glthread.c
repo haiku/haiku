@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  4.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -186,11 +185,23 @@ _glthread_SetTSD(_glthread_TSD *tsd, void *ptr)
  */
 #ifdef WIN32_THREADS
 
+void FreeTSD(_glthread_TSD *p)
+{
+   if (p->initMagic==INIT_MAGIC) {
+      TlsFree(p->key);
+      p->initMagic=0;
+   }
+}
+
+void InsteadOf_exit(int nCode)
+{
+   DWORD dwErr=GetLastError();
+}
+
 unsigned long
 _glthread_GetID(void)
 {
-   abort();   /* XXX not implemented yet */
-   return (unsigned long) 0;
+   return GetCurrentThreadId();
 }
 
 
@@ -198,11 +209,9 @@ void
 _glthread_InitTSD(_glthread_TSD *tsd)
 {
    tsd->key = TlsAlloc();
-   if (tsd->key == 0xffffffff) {
-      /* Can Windows handle stderr messages for non-console
-         applications? Does Windows have perror? */
-      /* perror(SET_INIT_ERROR);*/
-      exit(-1);
+   if (tsd->key == TLS_OUT_OF_INDEXES) {
+      perror("Mesa:_glthread_InitTSD");
+      InsteadOf_exit(-1);
    }
    tsd->initMagic = INIT_MAGIC;
 }
@@ -227,10 +236,8 @@ _glthread_SetTSD(_glthread_TSD *tsd, void *ptr)
       _glthread_InitTSD(tsd);
    }
    if (TlsSetValue(tsd->key, ptr) == 0) {
-      /* Can Windows handle stderr messages for non-console
-         applications? Does Windows have perror? */
-      /* perror(SET_TSD_ERROR);*/
-      exit(-1);
+	  perror("Mesa:_glthread_SetTSD");
+	  InsteadOf_exit(-1);
    }
 }
 
@@ -242,7 +249,7 @@ _glthread_SetTSD(_glthread_TSD *tsd, void *ptr)
  * XFree86 has its own thread wrapper, Xthreads.h
  * We wrap it again for GL.
  */
-#ifdef XTHREADS
+#ifdef USE_XTHREADS
 
 unsigned long
 _glthread_GetID(void)

@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -37,48 +37,42 @@
 
 #include "mtypes.h"
 
-/* Macro just to save some typing */
-#define STORE_PARAMS \
-	GLcontext *ctx, GLuint dims, \
-	GLenum baseInternalFormat, \
-	const struct gl_texture_format *dstFormat, \
-	GLvoid *dstAddr, \
-	GLint dstXoffset, GLint dstYoffset, GLint dstZoffset, \
-	GLint dstRowStride, GLint dstImageStride, \
-	GLint srcWidth, GLint srcHeight, GLint srcDepth, \
-	GLenum srcFormat, GLenum srcType, \
-	const GLvoid *srcAddr, \
-	const struct gl_pixelstore_attrib *srcPacking
 
-
-extern GLboolean _mesa_texstore_rgba(STORE_PARAMS);
-extern GLboolean _mesa_texstore_color_index(STORE_PARAMS);
-extern GLboolean _mesa_texstore_depth_component16(STORE_PARAMS);
-extern GLboolean _mesa_texstore_depth_component_float32(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba8888(STORE_PARAMS);
-extern GLboolean _mesa_texstore_argb8888(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgb888(STORE_PARAMS);
-extern GLboolean _mesa_texstore_bgr888(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgb565(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgb565_rev(STORE_PARAMS);
-extern GLboolean _mesa_texstore_argb4444(STORE_PARAMS);
-extern GLboolean _mesa_texstore_argb4444_rev(STORE_PARAMS);
-extern GLboolean _mesa_texstore_argb1555(STORE_PARAMS);
-extern GLboolean _mesa_texstore_argb1555_rev(STORE_PARAMS);
-extern GLboolean _mesa_texstore_al88(STORE_PARAMS);
-extern GLboolean _mesa_texstore_al88_rev(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgb332(STORE_PARAMS);
-extern GLboolean _mesa_texstore_a8(STORE_PARAMS);
-extern GLboolean _mesa_texstore_ci8(STORE_PARAMS);
-extern GLboolean _mesa_texstore_ycbcr(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba_float32(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba_float16(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgb_fxt1(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba_fxt1(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgb_dxt1(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba_dxt1(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba_dxt3(STORE_PARAMS);
-extern GLboolean _mesa_texstore_rgba_dxt5(STORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_color_index(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba8888(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_argb8888(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgb888(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_bgr888(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgb565(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgb565_rev(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_argb4444(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_argb4444_rev(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_argb1555(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_argb1555_rev(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_al88(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_al88_rev(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgb332(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_a8(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_ci8(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_ycbcr(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_z24_s8(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_z16(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_z32(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba_float32(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba_float16(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgb_fxt1(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba_fxt1(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgb_dxt1(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba_dxt1(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba_dxt3(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_rgba_dxt5(TEXSTORE_PARAMS);
+#if FEATURE_EXT_texture_sRGB
+extern GLboolean _mesa_texstore_srgb8(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_srgba8(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_sl8(TEXSTORE_PARAMS);
+extern GLboolean _mesa_texstore_sla8(TEXSTORE_PARAMS);
+#endif
 
 
 extern GLchan *
@@ -207,31 +201,10 @@ _mesa_store_compressed_texsubimage3d(GLcontext *ctx, GLenum target,
 
 
 extern void
-_mesa_generate_mipmap(GLcontext *ctx, GLenum target,
-                      const struct gl_texture_unit *texUnit,
-                      struct gl_texture_object *texObj);
-
-
-extern void
-_mesa_rescale_teximage2d(GLuint bytesPerPixel,
-                         GLuint srcStrideInPixels,
-                         GLuint dstRowStride,
-                         GLint srcWidth, GLint srcHeight,
-                         GLint dstWidth, GLint dstHeight,
-                         const GLvoid *srcImage, GLvoid *dstImage);
-
-extern void
-_mesa_upscale_teximage2d(GLsizei inWidth, GLsizei inHeight,
-                         GLsizei outWidth, GLsizei outHeight,
-                         GLint comps, const GLchan *src, GLint srcRowStride,
-                         GLchan *dest);
-
-
-extern void
 _mesa_get_teximage(GLcontext *ctx, GLenum target, GLint level,
                    GLenum format, GLenum type, GLvoid *pixels,
-                   const struct gl_texture_object *texObj,
-                   const struct gl_texture_image *texImage);
+                   struct gl_texture_object *texObj,
+                   struct gl_texture_image *texImage);
 
 
 extern void
@@ -239,6 +212,23 @@ _mesa_get_compressed_teximage(GLcontext *ctx, GLenum target, GLint level,
                               GLvoid *img,
                               const struct gl_texture_object *texObj,
                               const struct gl_texture_image *texImage);
+
+extern const GLvoid *
+_mesa_validate_pbo_teximage(GLcontext *ctx, GLuint dimensions,
+			    GLsizei width, GLsizei height, GLsizei depth,
+			    GLenum format, GLenum type, const GLvoid *pixels,
+			    const struct gl_pixelstore_attrib *unpack,
+			    const char *funcName);
+
+extern const GLvoid *
+_mesa_validate_pbo_compressed_teximage(GLcontext *ctx,
+                                    GLsizei imageSize, const GLvoid *pixels,
+                                    const struct gl_pixelstore_attrib *packing,
+                                    const char *funcName);
+
+extern void
+_mesa_unmap_teximage_pbo(GLcontext *ctx,
+                         const struct gl_pixelstore_attrib *unpack);
 
 
 #endif

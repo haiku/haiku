@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -275,13 +275,6 @@ _mesa_BlendEquation( GLenum mode )
    ctx->Color.BlendEquationRGB = mode;
    ctx->Color.BlendEquationA = mode;
 
-   /* This is needed to support 1.1's RGB logic ops AND
-    * 1.0's blending logicops.
-    */
-   ctx->Color._LogicOpEnabled = (ctx->Color.ColorLogicOpEnabled ||
-                                 (ctx->Color.BlendEnabled &&
-                                  mode == GL_LOGIC_OP));
-
    if (ctx->Driver.BlendEquationSeparate)
       (*ctx->Driver.BlendEquationSeparate)( ctx, mode, mode );
 }
@@ -322,12 +315,6 @@ _mesa_BlendEquationSeparateEXT( GLenum modeRGB, GLenum modeA )
    FLUSH_VERTICES(ctx, _NEW_COLOR);
    ctx->Color.BlendEquationRGB = modeRGB;
    ctx->Color.BlendEquationA = modeA;
-
-   /* This is needed to support 1.1's RGB logic ops AND
-    * 1.0's blending logicops.  This test is simplified over glBlendEquation
-    * because modeRGB cannot be GL_LOGIC_OP.
-    */
-   ctx->Color._LogicOpEnabled = (ctx->Color.ColorLogicOpEnabled);
 
    if (ctx->Driver.BlendEquationSeparate)
       (*ctx->Driver.BlendEquationSeparate)( ctx, modeRGB, modeA );
@@ -529,6 +516,37 @@ _mesa_ColorMask( GLboolean red, GLboolean green,
 }
 
 
+extern void GLAPIENTRY
+_mesa_ClampColorARB(GLenum target, GLenum clamp)
+{
+   GET_CURRENT_CONTEXT(ctx);
+
+   ASSERT_OUTSIDE_BEGIN_END(ctx);
+
+   if (clamp != GL_TRUE && clamp != GL_FALSE && clamp != GL_FIXED_ONLY_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glClampColorARB(clamp)");
+      return;
+   }
+
+   switch (target) {
+   case GL_CLAMP_VERTEX_COLOR_ARB:
+      ctx->Light.ClampVertexColor = clamp;
+      break;
+   case GL_CLAMP_FRAGMENT_COLOR_ARB:
+      ctx->Color.ClampFragmentColor = clamp;
+      break;
+   case GL_CLAMP_READ_COLOR_ARB:
+      ctx->Color.ClampReadColor = clamp;
+      break;
+   default:
+      _mesa_error(ctx, GL_INVALID_ENUM, "glClampColorARB(target)");
+      return;
+   }
+}
+
+
+
+
 /**********************************************************************/
 /** \name Initialization */
 /*@{*/
@@ -570,12 +588,13 @@ void _mesa_init_color( GLcontext * ctx )
 
    if (ctx->Visual.doubleBufferMode) {
       ctx->Color.DrawBuffer[0] = GL_BACK;
-      ctx->Color._DrawDestMask[0] = DD_BACK_LEFT_BIT;
    }
    else {
       ctx->Color.DrawBuffer[0] = GL_FRONT;
-      ctx->Color._DrawDestMask[0] = DD_FRONT_LEFT_BIT;
    }
+
+   ctx->Color.ClampFragmentColor = GL_FIXED_ONLY_ARB;
+   ctx->Color.ClampReadColor = GL_FIXED_ONLY_ARB;
 }
 
 /*@}*/

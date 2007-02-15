@@ -1,4 +1,4 @@
-/* $Id: x86.c,v 1.25 2002/04/09 14:58:03 keithw Exp $ */
+/* $Id: x86.c,v 1.26 2005/10/07 17:18:52 brianp Exp $ */
 
 /*
  * Mesa 3-D graphics library
@@ -36,7 +36,7 @@
 #include "x86.h"
 #include "common_x86_macros.h"
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
 #include "math/m_debug.h"
 #endif
 
@@ -87,7 +87,7 @@ void _mesa_init_x86_transform_asm( void )
    _mesa_clip_tab[4] = _mesa_x86_cliptest_points4;
    _mesa_clip_np_tab[4] = _mesa_x86_cliptest_points4_np;
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
    _math_test_all_transform_functions( "x86" );
    _math_test_all_cliptest_functions( "x86" );
 #endif

@@ -232,7 +232,7 @@ NurbsTessellator::pwlcurve( long count, INREAL array[], long byte_stride, long t
 	}
 	if( i != count ) {
 	    do_nurbserror( 37 );
-	    dprintf( "point %d (%f,%f)\n", i, x, y );
+	    _glu_dprintf( "point %d (%f,%f)\n", i, x, y );
 	    isDataValid = 0;
 	    return;
 	}
@@ -247,7 +247,7 @@ NurbsTessellator::pwlcurve( long count, INREAL array[], long byte_stride, long t
 	}
 	if( i != count ) {
 	    do_nurbserror( 37 );
-	    dprintf( "point %d (%f,%f)\n", i, x, y );
+	    _glu_dprintf( "point %d (%f,%f)\n", i, x, y );
 	    isDataValid = 0;
 	    return;
 	}
@@ -460,7 +460,7 @@ NurbsTessellator::setnurbsproperty( long type, long purpose, INREAL *mat )
 	mapdesc->setBboxsize( mat );
     } else {
 #ifndef NDEBUG
-        dprintf( "ERRORRORRORR!!!\n");
+        _glu_dprintf( "ERRORRORRORR!!!\n");
 #endif
     }
 }
@@ -488,7 +488,7 @@ NurbsTessellator::setnurbsproperty( long type, long purpose, INREAL *mat,
 	mapdesc->setBmat( mat, rstride, cstride );
     } else {
 #ifndef NDEBUG
-        dprintf( "ERRORRORRORR!!!\n");
+        _glu_dprintf( "ERRORRORRORR!!!\n");
 #endif
     }
 }

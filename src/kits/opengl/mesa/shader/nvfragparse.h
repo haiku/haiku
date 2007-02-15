@@ -34,11 +34,11 @@
 extern void
 _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum target,
                                 const GLubyte *str, GLsizei len,
-                                struct fragment_program *program);
+                                struct gl_fragment_program *program);
 
 
 extern void
-_mesa_print_nv_fragment_program(const struct fragment_program *program);
+_mesa_print_nv_fragment_program(const struct gl_fragment_program *program);
 
 
 extern const char *

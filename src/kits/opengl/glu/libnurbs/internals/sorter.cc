@@ -35,8 +35,8 @@
 /*
  * sorter.c++
  *
- * $Date: 2001/11/29 16:16:55 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/sorter.cc,v 1.2 2001/11/29 16:16:55 kschultz Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.3 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/sorter.cc,v 1.3 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -57,7 +57,7 @@ Sorter::qsort( void *a, int n )
 int
 Sorter::qscmp( char *, char * )
 {
-    dprintf( "Sorter::qscmp: pure virtual called\n" );
+    _glu_dprintf( "Sorter::qscmp: pure virtual called\n" );
     return 0;
 }
 
@@ -65,14 +65,14 @@ Sorter::qscmp( char *, char * )
 void
 Sorter::qsexc( char *, char * )
 {
-    dprintf( "Sorter::qsexc: pure virtual called\n" );
+    _glu_dprintf( "Sorter::qsexc: pure virtual called\n" );
 }
 
 
 void
 Sorter::qstexc( char *, char *, char * )
 {
-    dprintf( "Sorter::qstexc: pure virtual called\n" );
+    _glu_dprintf( "Sorter::qstexc: pure virtual called\n" );
 }
 
 void

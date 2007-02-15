@@ -35,8 +35,8 @@
 /*
  * basiccurveeval.h
  *
- * $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/basiccrveval.h,v 1.1 2001/03/17 00:25:40 brianp Exp $
+ * $Date: 2006/03/29 18:54:00 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/basiccrveval.h,v 1.2 2006/03/29 18:54:00 brianp Exp $
  */
 
 #ifndef __glubasiccrveval_h_
@@ -48,6 +48,7 @@
 
 class BasicCurveEvaluator : public CachingEvaluator {
 public:
+    virtual             ~BasicCurveEvaluator() { /* silence warning*/ }
     virtual void	domain1f( REAL, REAL );
     virtual void	range1f( long, REAL *, REAL * );
 

@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -98,23 +98,8 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
                         GLuint n, GLfloat rgba[][4]);
 
 extern void
-_mesa_lookup_rgba_chan(const struct gl_color_table *table,
-                       GLuint n, GLchan rgba[][4]);
-
-
-extern void
-_mesa_shift_and_offset_ci(const GLcontext *ctx, GLuint n,
-                          GLuint indexes[]);
-
-
-extern void
-_mesa_map_ci(const GLcontext *ctx, GLuint n, GLuint index[]);
-
-
-extern void
-_mesa_map_ci_to_rgba_chan(const GLcontext *ctx,
-                          GLuint n, const GLuint index[],
-                          GLchan rgba[][4]);
+_mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
+                        GLuint n, GLubyte rgba[][4]);
 
 
 extern void
@@ -123,23 +108,13 @@ _mesa_map_ci_to_rgba(const GLcontext *ctx,
 
 
 extern void
-_mesa_map_ci8_to_rgba(const GLcontext *ctx,
-                      GLuint n, const GLubyte index[],
-                      GLchan rgba[][4]);
+_mesa_map_ci8_to_rgba8(const GLcontext *ctx, GLuint n, const GLubyte index[],
+                       GLubyte rgba[][4]);
 
 
 extern void
-_mesa_shift_and_offset_stencil(const GLcontext *ctx, GLuint n,
-                               GLstencil indexes[]);
-
-
-extern void
-_mesa_map_stencil(const GLcontext *ctx, GLuint n, GLstencil index[]);
-
-
-extern void
-_mesa_chan_to_float_span(const GLcontext *ctx, GLuint n,
-                         CONST GLchan rgba[][4], GLfloat rgbaf[][4]);
+_mesa_scale_and_bias_depth(const GLcontext *ctx, GLuint n,
+                           GLfloat depthValues[]);
 
 
 extern void 

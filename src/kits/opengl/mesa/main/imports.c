@@ -23,7 +23,6 @@
  * \todo Functions still needed:
  * - scanf
  * - qsort
- * - bsearch
  * - rand and RAND_MAX
  *
  * \note When compiled into a XFree86 module these functions wrap around
@@ -32,9 +31,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -72,6 +71,14 @@ extern int vsnprintf(char *str, size_t count, const char *fmt, va_list arg);
 #endif
 #endif
 
+/* If we don't actually want to use the libcwrapper junk (even though we're
+ * building an Xorg server module), then just undef IN_MODULE to signal that to
+ * the following code.  It's left around for now to allow compiling of newish
+ * Mesa with older servers, but this whole mess should go away at some point.
+ */
+#ifdef NO_LIBCWRAPPER
+#undef IN_MODULE
+#endif
 
 /**********************************************************************/
 /** \name Memory */
@@ -124,16 +131,22 @@ _mesa_free(void *ptr)
 void *
 _mesa_align_malloc(size_t bytes, unsigned long alignment)
 {
-   unsigned long ptr, buf;
+#if defined(HAVE_POSIX_MEMALIGN) && !(defined(XFree86LOADER) && defined(IN_MODULE))
+   void *mem;
+
+   (void) posix_memalign(& mem, alignment, bytes);
+   return mem;
+#else
+   uintptr_t ptr, buf;
 
    ASSERT( alignment > 0 );
 
-   ptr = (unsigned long) _mesa_malloc(bytes + alignment + sizeof(void *));
+   ptr = (uintptr_t) _mesa_malloc(bytes + alignment + sizeof(void *));
    if (!ptr)
       return NULL;
 
-   buf = (ptr + alignment + sizeof(void *)) & ~(unsigned long)(alignment - 1);
-   *(unsigned long *)(buf - sizeof(void *)) = ptr;
+   buf = (ptr + alignment + sizeof(void *)) & ~(uintptr_t)(alignment - 1);
+   *(uintptr_t *)(buf - sizeof(void *)) = ptr;
 
 #ifdef DEBUG
    /* mark the non-aligned area */
@@ -144,23 +157,36 @@ _mesa_align_malloc(size_t bytes, unsigned long alignment)
 #endif
 
    return (void *) buf;
+#endif /* defined(HAVE_POSIX_MEMALIGN) && !(defined(XFree86LOADER) && defined(IN_MODULE)) */
 }
 
-/** Same as _mesa_align_malloc(), but using _mesa_calloc() instead of
- * _mesa_malloc() */
+/**
+ * Same as _mesa_align_malloc(), but using _mesa_calloc() instead of
+ * _mesa_malloc()
+ */
 void *
 _mesa_align_calloc(size_t bytes, unsigned long alignment)
 {
-   unsigned long ptr, buf;
+#if defined(HAVE_POSIX_MEMALIGN) && !(defined(XFree86LOADER) && defined(IN_MODULE))
+   void *mem;
+   
+   mem = _mesa_align_malloc(bytes, alignment);
+   if (mem != NULL) {
+      (void) memset(mem, 0, bytes);
+   }
+
+   return mem;
+#else
+   uintptr_t ptr, buf;
 
    ASSERT( alignment > 0 );
 
-   ptr = (unsigned long) _mesa_calloc(bytes + alignment + sizeof(void *));
+   ptr = (uintptr_t) _mesa_calloc(bytes + alignment + sizeof(void *));
    if (!ptr)
       return NULL;
 
-   buf = (ptr + alignment + sizeof(void *)) & ~(unsigned long)(alignment - 1);
-   *(unsigned long *)(buf - sizeof(void *)) = ptr;
+   buf = (ptr + alignment + sizeof(void *)) & ~(uintptr_t)(alignment - 1);
+   *(uintptr_t *)(buf - sizeof(void *)) = ptr;
 
 #ifdef DEBUG
    /* mark the non-aligned area */
@@ -171,42 +197,61 @@ _mesa_align_calloc(size_t bytes, unsigned long alignment)
 #endif
 
    return (void *)buf;
+#endif /* defined(HAVE_POSIX_MEMALIGN) && !(defined(XFree86LOADER) && defined(IN_MODULE)) */
 }
 
 /**
- * Free memory allocated with _mesa_align_malloc() or _mesa_align_calloc().
- *
+ * Free memory which was allocated with either _mesa_align_malloc()
+ * or _mesa_align_calloc().
  * \param ptr pointer to the memory to be freed.
- * 
  * The actual address to free is stored in the word immediately before the
  * address the client sees.
  */
 void
 _mesa_align_free(void *ptr)
 {
-#if 0
-   _mesa_free( (void *)(*(unsigned long *)((unsigned long)ptr - sizeof(void *))) );
+#if defined(HAVE_POSIX_MEMALIGN) && !(defined(XFree86LOADER) && defined(IN_MODULE))
+   free(ptr);
 #else
    void **cubbyHole = (void **) ((char *) ptr - sizeof(void *));
    void *realAddr = *cubbyHole;
    _mesa_free(realAddr);
-#endif
+#endif /* defined(HAVE_POSIX_MEMALIGN) && !(defined(XFree86LOADER) && defined(IN_MODULE)) */
 }
 
-/** Wrapper around either memcpy() or xf86memcpy() */
+/**
+ * Reallocate memory, with alignment.
+ */
+void *
+_mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
+                    unsigned long alignment)
+{
+   const size_t copySize = (oldSize < newSize) ? oldSize : newSize;
+   void *newBuf = _mesa_align_malloc(newSize, alignment);
+   if (newBuf && oldBuffer && copySize > 0) {
+      _mesa_memcpy(newBuf, oldBuffer, copySize);
+   }
+   if (oldBuffer)
+      _mesa_align_free(oldBuffer);
+   return newBuf;
+}
+
+
+
+/** Reallocate memory */
 void *
 _mesa_realloc(void *oldBuffer, size_t oldSize, size_t newSize)
 {
    const size_t copySize = (oldSize < newSize) ? oldSize : newSize;
    void *newBuffer = _mesa_malloc(newSize);
-   if (newBuffer && copySize > 0)
+   if (newBuffer && oldBuffer && copySize > 0)
       _mesa_memcpy(newBuffer, oldBuffer, copySize);
    if (oldBuffer)
       _mesa_free(oldBuffer);
    return newBuffer;
 }
 
-
+/** memcpy wrapper */
 void *
 _mesa_memcpy(void *dest, const void *src, size_t n)
 {
@@ -232,8 +277,8 @@ _mesa_memset( void *dst, int val, size_t n )
 #endif
 }
 
-/** Fill memory with a constant 16bit word.
- *
+/**
+ * Fill memory with a constant 16bit word.
  * \param dst destination pointer.
  * \param val value.
  * \param n number of words.
@@ -258,6 +303,19 @@ _mesa_bzero( void *dst, size_t n )
 #endif
 }
 
+/** Wrapper around either memcmp() or xf86memcmp() */
+int
+_mesa_memcmp( const void *s1, const void *s2, size_t n )
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   return xf86memcmp( s1, s2, n );
+#elif defined(SUNOS4)
+   return memcmp( (char *) s1, (char *) s2, (int) n );
+#else
+   return memcmp(s1, s2, n);
+#endif
+}
+
 /*@}*/
 
 
@@ -276,6 +334,17 @@ _mesa_sin(double a)
 #endif
 }
 
+/** Single precision wrapper around either sin() or xf86sin() */
+float
+_mesa_sinf(float a)
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   return (float) xf86sin((double) a);
+#else
+   return (float) sin((double) a);
+#endif
+}
+
 /** Wrapper around either cos() or xf86cos() */
 double
 _mesa_cos(double a)
@@ -284,6 +353,28 @@ _mesa_cos(double a)
    return xf86cos(a);
 #else
    return cos(a);
+#endif
+}
+
+/** Single precision wrapper around either asin() or xf86asin() */
+float
+_mesa_asinf(float x)
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   return (float) xf86asin((double) x);
+#else
+   return (float) asin((double) x);
+#endif
+}
+
+/** Single precision wrapper around either atan() or xf86atan() */
+float
+_mesa_atanf(float x)
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   return (float) xf86atan((double) x);
+#else
+   return (float) atan((double) x);
 #endif
 }
 
@@ -516,6 +607,41 @@ _mesa_pow(double x, double y)
 
 
 /**
+ * Find the first bit set in a word.
+ */
+int
+_mesa_ffs(int i)
+{
+#if (defined(_WIN32) && !defined(__MINGW32__) ) || defined(__IBMC__) || defined(__IBMCPP__)
+   register int bit = 0;
+   if (i != 0) {
+      if ((i & 0xffff) == 0) {
+         bit += 16;
+         i >>= 16;
+      }
+      if ((i & 0xff) == 0) {
+         bit += 8;
+         i >>= 8;
+      }
+      if ((i & 0xf) == 0) {
+         bit += 4;
+         i >>= 4;
+      }
+      while ((i & 1) == 0) {
+         bit++;
+         i >>= 1;
+      }
+   }
+   return bit;
+#elif defined(XFree86LOADER) && defined(IN_MODULE)
+   return xf86ffs(i);
+#else
+   return ffs(i);
+#endif
+}
+
+
+/**
  * Return number of bits set in given GLuint.
  */
 unsigned int
@@ -671,6 +797,27 @@ _mesa_half_to_float(GLhalfARB val)
 
 
 /**********************************************************************/
+/** \name Sort & Search */
+/*@{*/
+
+/**
+ * Wrapper for bsearch().
+ */
+void *
+_mesa_bsearch( const void *key, const void *base, size_t nmemb, size_t size, 
+               int (*compar)(const void *, const void *) )
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   return xf86bsearch(key, base, nmemb, size, compar);
+#else
+   return bsearch(key, base, nmemb, size, compar);
+#endif
+}
+
+/*@}*/
+
+
+/**********************************************************************/
 /** \name Environment vars */
 /*@{*/
 
@@ -682,6 +829,8 @@ _mesa_getenv( const char *var )
 {
 #if defined(XFree86LOADER) && defined(IN_MODULE)
    return xf86getenv(var);
+#elif defined(_XBOX)
+   return NULL;
 #else
    return getenv(var);
 #endif
@@ -775,7 +924,7 @@ _mesa_strncmp( const char *s1, const char *s2, size_t n )
 char *
 _mesa_strdup( const char *s )
 {
-   int l = _mesa_strlen(s);
+   size_t l = _mesa_strlen(s);
    char *s2 = (char *) _mesa_malloc(l + 1);
    if (s2)
       _mesa_strcpy(s2, s);
@@ -818,12 +967,12 @@ _mesa_sprintf( char *str, const char *fmt, ... )
    int r;
    va_list args;
    va_start( args, fmt );  
-   va_end( args );
 #if defined(XFree86LOADER) && defined(IN_MODULE)
    r = xf86vsprintf( str, fmt, args );
 #else
    r = vsprintf( str, fmt, args );
 #endif
+   va_end( args );
    return r;
 }
 
@@ -840,7 +989,18 @@ _mesa_printf( const char *fmtString, ... )
 #if defined(XFree86LOADER) && defined(IN_MODULE)
    xf86printf("%s", s);
 #else
-   printf("%s", s);
+   fprintf(stderr,"%s", s);
+#endif
+}
+
+/** Wrapper around either vsprintf() or xf86vsprintf() */
+int
+_mesa_vsprintf( char *str, const char *fmt, va_list args )
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   return xf86vsprintf( str, fmt, args );
+#else
+   return vsprintf( str, fmt, args );
 #endif
 }
 
@@ -982,6 +1142,9 @@ _mesa_error( GLcontext *ctx, GLenum error, const char *fmtString, ... )
          case GL_TABLE_TOO_LARGE:
             errstr = "GL_TABLE_TOO_LARGE";
             break;
+         case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
+            errstr = "GL_INVALID_FRAMEBUFFER_OPERATION";
+            break;
 	 default:
 	    errstr = "unknown";
 	    break;
@@ -1003,9 +1166,9 @@ _mesa_error( GLcontext *ctx, GLenum error, const char *fmtString, ... )
 void
 _mesa_debug( const GLcontext *ctx, const char *fmtString, ... )
 {
+#ifdef DEBUG
    char s[MAXSTRING];
    va_list args;
-   (void) ctx;
    va_start(args, fmtString);
    vsnprintf(s, MAXSTRING, fmtString, args);
    va_end(args);
@@ -1013,6 +1176,29 @@ _mesa_debug( const GLcontext *ctx, const char *fmtString, ... )
    xf86fprintf(stderr, "Mesa: %s", s);
 #else
    fprintf(stderr, "Mesa: %s", s);
+#endif
+#endif /* DEBUG */
+   (void) ctx;
+   (void) fmtString;
+}
+
+/*@}*/
+
+
+/**********************************************************************/
+/** \name Exit */
+/*@{*/
+
+/**
+ * Wrapper for exit().
+ */
+void
+_mesa_exit( int status )
+{
+#if defined(XFree86LOADER) && defined(IN_MODULE)
+   xf86exit(status);
+#else
+   exit(status);
 #endif
 }
 
@@ -1163,20 +1349,6 @@ _mesa_init_default_imports(__GLimports *imports, void *driverCtx)
    static GLboolean initialized = GL_FALSE;
    if (!initialized) {
       init_sqrt_table();
-
-#if defined(_FPU_GETCW) && defined(_FPU_SETCW)
-      {
-         const char *debug = _mesa_getenv("MESA_DEBUG");
-         if (debug && _mesa_strcmp(debug, "FP")==0) {
-            /* die on FP exceptions */
-            fpu_control_t mask;
-            _FPU_GETCW(mask);
-            mask &= ~(_FPU_MASK_IM | _FPU_MASK_DM | _FPU_MASK_ZM
-                      | _FPU_MASK_OM | _FPU_MASK_UM);
-            _FPU_SETCW(mask);
-         }
-      }
-#endif
       initialized = GL_TRUE;
    }
 

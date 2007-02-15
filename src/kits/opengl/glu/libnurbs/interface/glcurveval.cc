@@ -35,8 +35,8 @@
 /*
  * glcurveval.c++
  *
- * $Date: 2004/05/12 15:29:36 $ $Revision: 1.6 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/glcurveval.cc,v 1.6 2004/05/12 15:29:36 brianp Exp $
+ * $Date: 2006/03/29 18:46:46 $ $Revision: 1.7 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/glcurveval.cc,v 1.7 2006/03/29 18:46:46 brianp Exp $
  */
 
 /* Polynomial Evaluator Interface */
@@ -74,6 +74,7 @@ OpenGLCurveEvaluator::OpenGLCurveEvaluator(void)
   em_normal.uprime = -1.0;
   em_color.uprime = -1.0;
   em_texcoord.uprime = -1.0;
+  output_triangles = 0; // don't output triangles by default
 }
 
 OpenGLCurveEvaluator::~OpenGLCurveEvaluator(void) 

@@ -1,4 +1,3 @@
-/* $XFree86: xc/lib/GL/include/GL/internal/glcore.h,v 1.7 2001/03/25 05:32:00 tsi Exp $ */
 #ifndef __gl_core_h_
 #define __gl_core_h_
 
@@ -37,9 +36,7 @@
 **
 */
 
-#ifndef XFree86LOADER
 #include <sys/types.h>
-#endif
 
 #ifdef CAPI
 #undef CAPI
@@ -64,12 +61,18 @@ typedef struct __GLinterfaceRec __GLinterface;
 ** and used by the "operating system".
 */
 
-/*
-** Mode and limit information for a context.  This information is
-** kept around in the context so that values can be used during
-** command execution, and for returning information about the
-** context to the application.
-*/
+/**
+ * Mode and limit information for a context.  This information is
+ * kept around in the context so that values can be used during
+ * command execution, and for returning information about the
+ * context to the application.
+ * 
+ * Instances of this structure are shared by the driver and the loader.  To
+ * maintain binary compatability, new fields \b must be added only to the
+ * end of the structure.
+ * 
+ * \sa _gl_context_modes_create
+ */
 typedef struct __GLcontextModesRec {
     struct __GLcontextModesRec * next;
 
@@ -137,6 +140,13 @@ typedef struct __GLcontextModesRec {
     GLint swapMethod;
 
     GLint screen;
+
+    /* EXT_texture_from_pixmap */
+    GLint bindToTextureRgb;
+    GLint bindToTextureRgba;
+    GLint bindToMipmapTexture;
+    GLint bindToTextureTargets;
+    GLint yInverted;
 } __GLcontextModes;
 
 /* Several fields of __GLcontextModes can take these as values.  Since
@@ -165,6 +175,17 @@ typedef struct __GLcontextModesRec {
 #define GLX_WINDOW_BIT                     0x00000001
 #define GLX_PIXMAP_BIT                     0x00000002
 #define GLX_PBUFFER_BIT                    0x00000004
+
+#define GLX_BIND_TO_TEXTURE_RGB_EXT        0x20D0
+#define GLX_BIND_TO_TEXTURE_RGBA_EXT       0x20D1
+#define GLX_BIND_TO_MIPMAP_TEXTURE_EXT     0x20D2
+#define GLX_BIND_TO_TEXTURE_TARGETS_EXT    0x20D3
+#define GLX_Y_INVERTED_EXT                 0x20D4
+
+#define GLX_TEXTURE_1D_BIT_EXT             0x00000001
+#define GLX_TEXTURE_2D_BIT_EXT             0x00000002
+#define GLX_TEXTURE_RECTANGLE_BIT_EXT      0x00000004
+
 
 /************************************************************************/
 

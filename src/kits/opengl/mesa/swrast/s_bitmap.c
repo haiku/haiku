@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,8 +39,10 @@
 
 
 
-/*
+/**
  * Render a bitmap.
+ * Called via ctx->Driver.Bitmap()
+ * All parameter error checking will have been done before this is called.
  */
 void
 _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
@@ -51,7 +53,7 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
    GLint row, col;
    GLuint count = 0;
-   struct sw_span span;
+   SWspan span;
 
    ASSERT(ctx->RenderMode == GL_RENDER);
 
@@ -82,28 +84,15 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
 
    INIT_SPAN(span, GL_BITMAP, width, 0, SPAN_XY);
 
-   if (ctx->Visual.rgbMode) {
-      span.interpMask |= SPAN_RGBA;
-      span.red   = FloatToFixed(ctx->Current.RasterColor[0] * CHAN_MAXF);
-      span.green = FloatToFixed(ctx->Current.RasterColor[1] * CHAN_MAXF);
-      span.blue  = FloatToFixed(ctx->Current.RasterColor[2] * CHAN_MAXF);
-      span.alpha = FloatToFixed(ctx->Current.RasterColor[3] * CHAN_MAXF);
-      span.redStep = span.greenStep = span.blueStep = span.alphaStep = 0;
-   }
-   else {
-      span.interpMask |= SPAN_INDEX;
-      span.index = FloatToFixed(ctx->Current.RasterIndex);
-      span.indexStep = 0;
-   }
-
+   _swrast_span_default_color(ctx, &span);
    if (ctx->Depth.Test)
       _swrast_span_default_z(ctx, &span);
-   if (ctx->Fog.Enabled)
+   if (swrast->_FogEnabled)
       _swrast_span_default_fog(ctx, &span);
    if (ctx->Texture._EnabledCoordUnits)
       _swrast_span_default_texcoords(ctx, &span);
 
-   for (row = 0; row < height; row++, span.y++) {
+   for (row = 0; row < height; row++) {
       const GLubyte *src = (const GLubyte *) _mesa_image_address2d(unpack,
                  bitmap, width, height, GL_COLOR_INDEX, GL_BITMAP, row, 0);
 
@@ -177,7 +166,7 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
 #if 0
 /*
  * XXX this is another way to implement Bitmap.  Use horizontal runs of
- * fragments, initializing the mask array to indicate which fragmens to
+ * fragments, initializing the mask array to indicate which fragments to
  * draw or skip.
  */
 void
@@ -188,7 +177,7 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
    GLint row, col;
-   struct sw_span span;
+   SWspan span;
 
    ASSERT(ctx->RenderMode == GL_RENDER);
    ASSERT(bitmap);
@@ -204,23 +193,11 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
    span.x = px;
    span.y = py;
    /*span.end = width;*/
-   if (ctx->Visual.rgbMode) {
-      span.interpMask |= SPAN_RGBA;
-      span.red   = FloatToFixed(ctx->Current.RasterColor[0] * CHAN_MAXF);
-      span.green = FloatToFixed(ctx->Current.RasterColor[1] * CHAN_MAXF);
-      span.blue  = FloatToFixed(ctx->Current.RasterColor[2] * CHAN_MAXF);
-      span.alpha = FloatToFixed(ctx->Current.RasterColor[3] * CHAN_MAXF);
-      span.redStep = span.greenStep = span.blueStep = span.alphaStep = 0;
-   }
-   else {
-      span.interpMask |= SPAN_INDEX;
-      span.index = FloatToFixed(ctx->Current.RasterIndex);
-      span.indexStep = 0;
-   }
 
+   _swrast_span_default_color(ctx, &span);
    if (ctx->Depth.Test)
       _swrast_span_default_z(ctx, &span);
-   if (ctx->Fog.Enabled)
+   if (swrast->_FogEnabled)
       _swrast_span_default_fog(ctx, &span);
    if (ctx->Texture._EnabledCoordUnits)
       _swrast_span_default_texcoords(ctx, &span);

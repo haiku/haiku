@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -50,8 +50,8 @@ reset_texcoord( GLcontext *ctx, GLuint unit )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.TexCoord[unit].Enabled) {
-      ac->Raw.TexCoord[unit] = ctx->Array.TexCoord[unit];
+   if (ctx->Array.ArrayObj->TexCoord[unit].Enabled) {
+      ac->Raw.TexCoord[unit] = ctx->Array.ArrayObj->TexCoord[unit];
       STRIDE_ARRAY(ac->Raw.TexCoord[unit], ac->start);
    }
    else {
@@ -73,9 +73,9 @@ static void
 reset_vertex( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
-   ASSERT(ctx->Array.Vertex.Enabled
-          || (ctx->VertexProgram._Enabled && ctx->Array.VertexAttrib[0].Enabled));
-   ac->Raw.Vertex = ctx->Array.Vertex;
+   ASSERT(ctx->Array.ArrayObj->Vertex.Enabled
+          || (ctx->VertexProgram._Enabled && ctx->Array.ArrayObj->VertexAttrib[0].Enabled));
+   ac->Raw.Vertex = ctx->Array.ArrayObj->Vertex;
    STRIDE_ARRAY(ac->Raw.Vertex, ac->start);
    ac->IsCached.Vertex = GL_FALSE;
    ac->NewArrayState &= ~_NEW_ARRAY_VERTEX;
@@ -87,8 +87,8 @@ reset_normal( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.Normal.Enabled) {
-      ac->Raw.Normal = ctx->Array.Normal;
+   if (ctx->Array.ArrayObj->Normal.Enabled) {
+      ac->Raw.Normal = ctx->Array.ArrayObj->Normal;
       STRIDE_ARRAY(ac->Raw.Normal, ac->start);
    }
    else {
@@ -105,8 +105,8 @@ reset_color( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.Color.Enabled) {
-      ac->Raw.Color = ctx->Array.Color;
+   if (ctx->Array.ArrayObj->Color.Enabled) {
+      ac->Raw.Color = ctx->Array.ArrayObj->Color;
       STRIDE_ARRAY(ac->Raw.Color, ac->start);
    }
    else
@@ -122,8 +122,8 @@ reset_secondarycolor( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.SecondaryColor.Enabled) {
-      ac->Raw.SecondaryColor = ctx->Array.SecondaryColor;
+   if (ctx->Array.ArrayObj->SecondaryColor.Enabled) {
+      ac->Raw.SecondaryColor = ctx->Array.ArrayObj->SecondaryColor;
       STRIDE_ARRAY(ac->Raw.SecondaryColor, ac->start);
    }
    else
@@ -139,8 +139,8 @@ reset_index( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.Index.Enabled) {
-      ac->Raw.Index = ctx->Array.Index;
+   if (ctx->Array.ArrayObj->Index.Enabled) {
+      ac->Raw.Index = ctx->Array.ArrayObj->Index;
       STRIDE_ARRAY(ac->Raw.Index, ac->start);
    }
    else
@@ -156,8 +156,8 @@ reset_fogcoord( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.FogCoord.Enabled) {
-      ac->Raw.FogCoord = ctx->Array.FogCoord;
+   if (ctx->Array.ArrayObj->FogCoord.Enabled) {
+      ac->Raw.FogCoord = ctx->Array.ArrayObj->FogCoord;
       STRIDE_ARRAY(ac->Raw.FogCoord, ac->start);
    }
    else
@@ -173,8 +173,8 @@ reset_edgeflag( GLcontext *ctx )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.EdgeFlag.Enabled) {
-      ac->Raw.EdgeFlag = ctx->Array.EdgeFlag;
+   if (ctx->Array.ArrayObj->EdgeFlag.Enabled) {
+      ac->Raw.EdgeFlag = ctx->Array.ArrayObj->EdgeFlag;
       STRIDE_ARRAY(ac->Raw.EdgeFlag, ac->start);
    }
    else
@@ -185,13 +185,16 @@ reset_edgeflag( GLcontext *ctx )
 }
 
 
+/**
+ * \param index  the generic vertex array number.
+ */
 static void
 reset_attrib( GLcontext *ctx, GLuint index )
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   if (ctx->Array.VertexAttrib[index].Enabled) {
-      ac->Raw.Attrib[index] = ctx->Array.VertexAttrib[index];
+   if (ctx->Array.ArrayObj->VertexAttrib[index].Enabled) {
+      ac->Raw.Attrib[index] = ctx->Array.ArrayObj->VertexAttrib[index];
       STRIDE_ARRAY(ac->Raw.Attrib[index], ac->start);
    }
    else
@@ -218,7 +221,7 @@ import( const GLcontext *ctx,
 
    switch (destType) {
    case GL_FLOAT:
-      _math_trans_4fc( (GLfloat (*)[4]) to->Ptr,
+      _math_trans_4fn( (GLfloat (*)[4]) to->Ptr,
                        from->Ptr,
 		       from->StrideB,
 		       from->Type,
@@ -340,7 +343,7 @@ import_normal( GLcontext *ctx, GLenum type, GLuint stride )
    ASSERT(type == GL_FLOAT);
    ASSERT(stride == 3*sizeof(GLfloat) || stride == 0);
 
-   _math_trans_3f( (GLfloat (*)[3]) to->Ptr,
+   _math_trans_3fn((GLfloat (*)[3]) to->Ptr,
 		   from->Ptr,
 		   from->StrideB,
 		   from->Type,
@@ -453,6 +456,9 @@ import_edgeflag( GLcontext *ctx, GLenum type, GLuint stride )
    ac->IsCached.EdgeFlag = GL_TRUE;
 }
 
+/**
+ * \param index  the generic vertex array number
+ */
 static void
 import_attrib( GLcontext *ctx, GLuint index, GLenum type, GLuint stride )
 {
@@ -469,13 +475,24 @@ import_attrib( GLcontext *ctx, GLuint index, GLenum type, GLuint stride )
    ASSERT(stride == 4*sizeof(GLfloat) || stride == 0);
    ASSERT(ac->count - ac->start < ctx->Const.MaxArrayLockSize);
 
-   _math_trans_4f( (GLfloat (*)[4]) to->Ptr,
-		   from->Ptr,
-		   from->StrideB,
-		   from->Type,
-		   from->Size,
-		   0,
-		   ac->count - ac->start);
+   if (from->Normalized) {
+      _math_trans_4fn( (GLfloat (*)[4]) to->Ptr,
+                      from->Ptr,
+                      from->StrideB,
+                      from->Type,
+                      from->Size,
+                      0,
+                      ac->count - ac->start);
+   }
+   else {
+      _math_trans_4f( (GLfloat (*)[4]) to->Ptr,
+                      from->Ptr,
+                      from->StrideB,
+                      from->Type,
+                      from->Size,
+                      0,
+                      ac->count - ac->start);
+   }
 
    to->Size = from->Size;
    to->StrideB = 4 * sizeof(GLfloat);
@@ -501,7 +518,7 @@ _ac_import_texcoord( GLcontext *ctx,
 {
    ACcontext *ac = AC_CONTEXT(ctx);
 
-   ASSERT(unit < ctx->Const.MaxTextureCoordUnits);
+   ASSERT(unit < MAX_TEXTURE_COORD_UNITS);
 
    /* Can we keep the existing version?
     */
@@ -511,7 +528,7 @@ _ac_import_texcoord( GLcontext *ctx,
    /* Is the request impossible?
     */
    if (reqsize != 0 && ac->Raw.TexCoord[unit].Size > (GLint) reqsize)
-      return 0;
+      return NULL;
 
    /* Do we need to pull in a copy of the client data:
     */
@@ -548,7 +565,7 @@ _ac_import_vertex( GLcontext *ctx,
    /* Is the request impossible?
     */
    if (reqsize != 0 && ac->Raw.Vertex.Size > (GLint) reqsize)
-      return 0;
+      return NULL;
 
    /* Do we need to pull in a copy of the client data:
     */
@@ -616,7 +633,7 @@ _ac_import_color( GLcontext *ctx,
    /* Is the request impossible?
     */
    if (reqsize != 0 && ac->Raw.Color.Size > (GLint) reqsize) {
-      return 0;
+      return NULL;
    }
 
    /* Do we need to pull in a copy of the client data:
@@ -687,7 +704,7 @@ _ac_import_secondarycolor( GLcontext *ctx,
    /* Is the request impossible?
     */
    if (reqsize != 0 && ac->Raw.SecondaryColor.Size > (GLint) reqsize)
-      return 0;
+      return NULL;
 
    /* Do we need to pull in a copy of the client data:
     */
@@ -768,7 +785,10 @@ _ac_import_edgeflag( GLcontext *ctx,
    }
 }
 
-/* GL_NV_vertex_program */
+/**
+ * For GL_ARB/NV_vertex_program
+ * \param index  index of the vertex array, starting at zero.
+ */
 struct gl_client_array *
 _ac_import_attrib( GLcontext *ctx,
                    GLuint index,
@@ -831,7 +851,7 @@ _ac_import_range( GLcontext *ctx, GLuint start, GLuint count )
        * the whole locked range always be dealt with, otherwise hard to
        * maintain cached data in the face of clipping.
        */
-      ac->NewArrayState |= ~ctx->Array._Enabled;
+      ac->NewArrayState |= ~ctx->Array.ArrayObj->_Enabled;
       ac->start = ctx->Array.LockFirst;
       ac->count = ctx->Array.LockCount;
       ASSERT(ac->start == start); /* hmm? */
@@ -866,10 +886,10 @@ _ac_import_elements( GLcontext *ctx,
    switch (new_type) {
    case GL_UNSIGNED_BYTE:
       ASSERT(0);
-      return 0;
+      return NULL;
    case GL_UNSIGNED_SHORT:
       ASSERT(0);
-      return 0;
+      return NULL;
    case GL_UNSIGNED_INT: {
       GLuint *out = (GLuint *)ac->Elts;
       GLuint i;
@@ -898,5 +918,5 @@ _ac_import_elements( GLcontext *ctx,
       break;
    }
 
-   return 0;
+   return NULL;
 }

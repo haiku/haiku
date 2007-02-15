@@ -213,3 +213,7 @@ GLNAME( _mesa_test_os_sse_exception_support ):
 
 #endif
 
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif

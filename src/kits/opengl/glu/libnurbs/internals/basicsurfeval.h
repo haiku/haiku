@@ -35,8 +35,8 @@
 /*
  * basicsurfeval.h
  *
- * $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/basicsurfeval.h,v 1.1 2001/03/17 00:25:40 brianp Exp $
+ * $Date: 2006/03/29 18:54:00 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/basicsurfeval.h,v 1.2 2006/03/29 18:54:00 brianp Exp $
  */
 
 #ifndef __glubasicsurfeval_h_
@@ -48,6 +48,7 @@
 
 class BasicSurfaceEvaluator : public CachingEvaluator {
 public:
+    virtual             ~BasicSurfaceEvaluator() { /* silence warning*/ }
     virtual void	range2f( long, REAL *, REAL * );
     virtual void	domain2f( REAL, REAL, REAL, REAL );
 

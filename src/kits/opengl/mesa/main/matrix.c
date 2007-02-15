@@ -1,18 +1,8 @@
-/**
- * \file matrix.c
- * Matrix operations.
- *
- * \note
- * -# 4x4 transformation matrices are stored in memory in column major order.
- * -# Points/vertices are to be thought of as column vectors.
- * -# Transformation of a point p by a matrix M is: p' = M * p
- */
-
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.3
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,6 +20,17 @@
  * BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+
+/**
+ * \file matrix.c
+ * Matrix operations.
+ *
+ * \note
+ * -# 4x4 transformation matrices are stored in memory in column major order.
+ * -# Points/vertices are to be thought of as column vectors.
+ * -# Transformation of a point p by a matrix M is: p' = M * p
  */
 
 
@@ -159,6 +160,10 @@ _mesa_MatrixMode( GLenum mode )
       ctx->CurrentStack = &ctx->ProjectionMatrixStack;
       break;
    case GL_TEXTURE:
+      if (ctx->Texture.CurrentUnit >= ctx->Const.MaxTextureCoordUnits) {
+         _mesa_error(ctx, GL_INVALID_OPERATION, "glMatrixMode(texcoord unit)");
+         return;
+      }
       ctx->CurrentStack = &ctx->TextureMatrixStack[ctx->Texture.CurrentUnit];
       break;
    case GL_COLOR:
@@ -551,6 +556,7 @@ _mesa_Viewport( GLint x, GLint y, GLsizei width, GLsizei height )
    _mesa_set_viewport(ctx, x, y, width, height);
 }
 
+
 /**
  * Set new viewport parameters and update derived state (the _WindowMap
  * matrix).  Usually called from _mesa_Viewport().
@@ -559,19 +565,11 @@ _mesa_Viewport( GLint x, GLint y, GLsizei width, GLsizei height )
  * \param x, y coordinates of the lower left corner of the viewport rectangle.
  * \param width width of the viewport rectangle.
  * \param height height of the viewport rectangle.
- *
- * Verifies the parameters, clamps them to the implementation dependent range
- * and updates __GLcontextRec::Viewport. Computes the scale and bias values for
- * the drivers and notifies the driver via the dd_function_table::Viewport
- * callback.
  */
 void
 _mesa_set_viewport( GLcontext *ctx, GLint x, GLint y,
                     GLsizei width, GLsizei height )
 {
-   const GLfloat n = ctx->Viewport.Near;
-   const GLfloat f = ctx->Viewport.Far;
-
    if (MESA_VERBOSE & VERBOSE_API)
       _mesa_debug(ctx, "glViewport %d %d %d %d\n", x, y, width, height);
 
@@ -581,36 +579,27 @@ _mesa_set_viewport( GLcontext *ctx, GLint x, GLint y,
       return;
    }
 
-   /* clamp width, and height to implementation dependent range */
-   width  = CLAMP( width,  1, MAX_WIDTH );
-   height = CLAMP( height, 1, MAX_HEIGHT );
+   /* clamp width and height to the implementation dependent range */
+   width  = CLAMP(width,  1, (GLsizei) ctx->Const.MaxViewportWidth);
+   height = CLAMP(height, 1, (GLsizei) ctx->Const.MaxViewportHeight);
 
-   /* Save viewport */
    ctx->Viewport.X = x;
    ctx->Viewport.Width = width;
    ctx->Viewport.Y = y;
    ctx->Viewport.Height = height;
-
-   /* XXX send transposed width/height to Driver.Viewport() below??? */
-   if (ctx->_RotateMode) {
-      GLint tmp, tmps;
-      tmp = x; x = y; y = tmp;
-      tmps = width; width = height; height = tmps;
-   }
-
-   /* compute scale and bias values :: This is really driver-specific
-    * and should be maintained elsewhere if at all.  NOTE: RasterPos
-    * uses this.
-    */
-   ctx->Viewport._WindowMap.m[MAT_SX] = (GLfloat) width / 2.0F;
-   ctx->Viewport._WindowMap.m[MAT_TX] = ctx->Viewport._WindowMap.m[MAT_SX] + x;
-   ctx->Viewport._WindowMap.m[MAT_SY] = (GLfloat) height / 2.0F;
-   ctx->Viewport._WindowMap.m[MAT_TY] = ctx->Viewport._WindowMap.m[MAT_SY] + y;
-   ctx->Viewport._WindowMap.m[MAT_SZ] = ctx->DepthMaxF * ((f - n) / 2.0F);
-   ctx->Viewport._WindowMap.m[MAT_TZ] = ctx->DepthMaxF * ((f - n) / 2.0F + n);
-   ctx->Viewport._WindowMap.flags = MAT_FLAG_GENERAL_SCALE|MAT_FLAG_TRANSLATION;
-   ctx->Viewport._WindowMap.type = MATRIX_3D_NO_ROT;
    ctx->NewState |= _NEW_VIEWPORT;
+
+#if 1
+   /* XXX remove this someday.  Currently the DRI drivers rely on
+    * the WindowMap matrix being up to date in the driver's Viewport
+    * and DepthRange functions.
+    */
+   _math_matrix_viewport(&ctx->Viewport._WindowMap,
+                         ctx->Viewport.X, ctx->Viewport.Y,
+                         ctx->Viewport.Width, ctx->Viewport.Height,
+                         ctx->Viewport.Near, ctx->Viewport.Far,
+                         ctx->DrawBuffer->_DepthMaxF);
+#endif
 
    if (ctx->Driver.Viewport) {
       /* Many drivers will use this call to check for window size changes
@@ -622,35 +611,38 @@ _mesa_set_viewport( GLcontext *ctx, GLint x, GLint y,
 
 
 #if _HAVE_FULL_GL
+/**
+ * Called by glDepthRange
+ *
+ * \param nearval  specifies the Z buffer value which should correspond to
+ *                 the near clip plane
+ * \param farval  specifies the Z buffer value which should correspond to
+ *                the far clip plane
+ */
 void GLAPIENTRY
 _mesa_DepthRange( GLclampd nearval, GLclampd farval )
 {
-   /*
-    * nearval - specifies mapping of the near clipping plane to window
-    *   coordinates, default is 0
-    * farval - specifies mapping of the far clipping plane to window
-    *   coordinates, default is 1
-    *
-    * After clipping and div by w, z coords are in -1.0 to 1.0,
-    * corresponding to near and far clipping planes.  glDepthRange
-    * specifies a linear mapping of the normalized z coords in
-    * this range to window z coords.
-    */
-   GLfloat n, f;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
    if (MESA_VERBOSE&VERBOSE_API)
       _mesa_debug(ctx, "glDepthRange %f %f\n", nearval, farval);
 
-   n = (GLfloat) CLAMP( nearval, 0.0, 1.0 );
-   f = (GLfloat) CLAMP( farval, 0.0, 1.0 );
-
-   ctx->Viewport.Near = n;
-   ctx->Viewport.Far = f;
-   ctx->Viewport._WindowMap.m[MAT_SZ] = ctx->DepthMaxF * ((f - n) / 2.0F);
-   ctx->Viewport._WindowMap.m[MAT_TZ] = ctx->DepthMaxF * ((f - n) / 2.0F + n);
+   ctx->Viewport.Near = (GLfloat) CLAMP( nearval, 0.0, 1.0 );
+   ctx->Viewport.Far = (GLfloat) CLAMP( farval, 0.0, 1.0 );
    ctx->NewState |= _NEW_VIEWPORT;
+
+#if 1
+   /* XXX remove this someday.  Currently the DRI drivers rely on
+    * the WindowMap matrix being up to date in the driver's Viewport
+    * and DepthRange functions.
+    */
+   _math_matrix_viewport(&ctx->Viewport._WindowMap,
+                         ctx->Viewport.X, ctx->Viewport.Y,
+                         ctx->Viewport.Width, ctx->Viewport.Height,
+                         ctx->Viewport.Near, ctx->Viewport.Far,
+                         ctx->DrawBuffer->_DepthMaxF);
+#endif
 
    if (ctx->Driver.DepthRange) {
       (*ctx->Driver.DepthRange)( ctx, nearval, farval );
@@ -910,6 +902,8 @@ void _mesa_init_transform( GLcontext *ctx )
  */
 void _mesa_init_viewport( GLcontext *ctx )
 {
+   GLfloat depthMax = 65535.0F; /* sorf of arbitrary */
+
    /* Viewport group */
    ctx->Viewport.X = 0;
    ctx->Viewport.Y = 0;
@@ -919,15 +913,8 @@ void _mesa_init_viewport( GLcontext *ctx )
    ctx->Viewport.Far = 1.0;
    _math_matrix_ctr(&ctx->Viewport._WindowMap);
 
-#define Sz 10
-#define Tz 14
-   ctx->Viewport._WindowMap.m[Sz] = 0.5F * ctx->DepthMaxF;
-   ctx->Viewport._WindowMap.m[Tz] = 0.5F * ctx->DepthMaxF;
-#undef Sz
-#undef Tz
-
-   ctx->Viewport._WindowMap.flags = MAT_FLAG_GENERAL_SCALE|MAT_FLAG_TRANSLATION;
-   ctx->Viewport._WindowMap.type = MATRIX_3D_NO_ROT;
+   _math_matrix_viewport(&ctx->Viewport._WindowMap, 0, 0, 0, 0,
+                         0.0F, 1.0F, depthMax);
 }
 
 

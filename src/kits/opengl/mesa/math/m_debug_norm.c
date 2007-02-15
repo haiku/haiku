@@ -43,7 +43,7 @@
 static char dummy;
 #endif
 
-#ifdef DEBUG  /* This code only used for debugging */
+#ifdef DEBUG_MATH  /* This code only used for debugging */
 
 
 static int m_norm_identity[16] = {
@@ -165,7 +165,7 @@ static void ref_norm_transform_normalize( const GLmatrix *mat,
 	    /* Hmmm, don't know how we could test the precalculated
 	     * length case...
 	     */
-            scale = 1.0 / sqrt( len );
+            scale = 1.0 / SQRTF( len );
 	    SCALE_SCALAR_3V( out[i], scale, t );
          } else {
             out[i][0] = out[i][1] = out[i][2] = 0;
@@ -230,7 +230,7 @@ static int test_norm_function( normal_func func, int mtype, long *cycles )
          case VAR:
             break;
          default:
-            abort();
+            _mesa_exit(1);
          }
       }
    }
@@ -241,7 +241,7 @@ static int test_norm_function( normal_func func, int mtype, long *cycles )
       ASSIGN_3V( d2[i], 0.0, 0.0, 0.0 );
       for ( j = 0 ; j < 3 ; j++ )
          s[i][j] = rnd();
-      length[i] = 1 / sqrt( LEN_SQUARED_3FV( s[i] ) );
+      length[i] = 1 / SQRTF( LEN_SQUARED_3FV( s[i] ) );
    }
 
    source->data = (GLfloat(*)[4]) s;
@@ -339,7 +339,7 @@ void _math_test_all_normal_transform_functions( char *description )
 
    if ( first_time ) {
       first_time = 0;
-      mesa_profile = getenv( "MESA_PROFILE" );
+      mesa_profile = _mesa_getenv( "MESA_PROFILE" );
    }
 
 #ifdef RUN_DEBUG_BENCHMARK
@@ -375,10 +375,9 @@ void _math_test_all_normal_transform_functions( char *description )
 #ifdef RUN_DEBUG_BENCHMARK
    if ( mesa_profile ) {
       _mesa_printf( "\n" );
-      fflush( stdout );
    }
 #endif
 }
 
 
-#endif /* DEBUG */
+#endif /* DEBUG_MATH */

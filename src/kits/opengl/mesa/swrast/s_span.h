@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,19 +32,19 @@
 
 
 extern void
-_swrast_span_default_z( GLcontext *ctx, struct sw_span *span );
+_swrast_span_default_z( GLcontext *ctx, SWspan *span );
 
 extern void
-_swrast_span_interpolate_z( const GLcontext *ctx, struct sw_span *span );
+_swrast_span_interpolate_z( const GLcontext *ctx, SWspan *span );
 
 extern void
-_swrast_span_default_fog( GLcontext *ctx, struct sw_span *span );
+_swrast_span_default_fog( GLcontext *ctx, SWspan *span );
 
 extern void
-_swrast_span_default_color( GLcontext *ctx, struct sw_span *span );
+_swrast_span_default_color( GLcontext *ctx, SWspan *span );
 
 extern void
-_swrast_span_default_texcoords( GLcontext *ctx, struct sw_span *span );
+_swrast_span_default_texcoords( GLcontext *ctx, SWspan *span );
 
 extern GLfloat
 _swrast_compute_lambda(GLfloat dsdx, GLfloat dsdy, GLfloat dtdx, GLfloat dtdy,
@@ -52,19 +52,39 @@ _swrast_compute_lambda(GLfloat dsdx, GLfloat dsdy, GLfloat dtdx, GLfloat dtdy,
                        GLfloat s, GLfloat t, GLfloat q, GLfloat invQ);
 
 extern void
-_swrast_write_index_span( GLcontext *ctx, struct sw_span *span);
+_swrast_write_index_span( GLcontext *ctx, SWspan *span);
 
 
 extern void
-_swrast_write_rgba_span( GLcontext *ctx, struct sw_span *span);
+_swrast_write_rgba_span( GLcontext *ctx, SWspan *span);
 
 
 extern void
-_swrast_read_rgba_span( GLcontext *ctx, GLframebuffer *buffer,
-                        GLuint n, GLint x, GLint y, GLchan rgba[][4] );
+_swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
+                       GLuint n, GLint x, GLint y, GLenum type, GLvoid *rgba);
 
 extern void
-_swrast_read_index_span( GLcontext *ctx, GLframebuffer *buffer,
+_swrast_read_index_span( GLcontext *ctx, struct gl_renderbuffer *rb,
                          GLuint n, GLint x, GLint y, GLuint indx[] );
+
+extern void
+_swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
+                   GLuint count, const GLint x[], const GLint y[],
+                   void *values, GLuint valueSize);
+
+extern void
+_swrast_put_row(GLcontext *ctx, struct gl_renderbuffer *rb,
+                GLuint count, GLint x, GLint y,
+                const GLvoid *values, GLuint valueSize);
+
+extern void
+_swrast_get_row(GLcontext *ctx, struct gl_renderbuffer *rb,
+                GLuint count, GLint x, GLint y,
+                GLvoid *values, GLuint valueSize);
+
+
+extern void *
+_swrast_get_dest_rgba(GLcontext *ctx, struct gl_renderbuffer *rb,
+                      SWspan *span);
 
 #endif

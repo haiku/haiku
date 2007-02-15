@@ -92,7 +92,7 @@ _generic_read_RGBA_span_BGRA8888_REV_MMX:
 	movl	12(%esp), %ecx	/* destination pointer */
 
 	testl	%edx, %edx
-	je	.L20		/* Bail if there's nothing to do. */
+	jle	.L20		/* Bail if there's nothing to do. */
 
 	movl	%ebx, %eax
 
@@ -188,6 +188,9 @@ _generic_read_RGBA_span_BGRA8888_REV_SSE:
 	movl	16(%esp), %ebx	/* source pointer */
 	movl	24(%esp), %edx	/* number of pixels to copy */
 	movl	20(%esp), %ecx	/* destination pointer */
+
+	testl	%edx, %edx
+	jle	.L35		/* Bail if there's nothing to do. */
 
 	movl	%esp, %ebp
 	subl	$16, %esp
@@ -347,6 +350,9 @@ _generic_read_RGBA_span_BGRA8888_REV_SSE2:
 
 	movl	%ebx, %eax
 	movl	%edx, %esi
+
+	testl	%edx, %edx
+	jle	.L46		/* Bail if there's nothing to do. */
 
 	/* If the source pointer isn't a multiple of 16 we have to process
 	 * a few pixels the "slow" way to get the address aligned for
@@ -528,7 +534,8 @@ _generic_read_RGBA_span_RGB565_MMX:
 	movq	prescale, %mm6
 	movq	scale, %mm7
 
-	shrl	$2, %ecx
+	sarl	$2, %ecx
+	jle	.L01		/* Bail early if the count is negative. */
 	jmp	.L02
 
 .L03:
@@ -680,3 +687,7 @@ _generic_read_RGBA_span_RGB565_MMX:
 #endif
 	ret
 #endif /* !defined(__DJGPP__) && !defined(__MINGW32__) */
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif

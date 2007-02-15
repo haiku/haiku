@@ -35,28 +35,28 @@
 /*
  * mystdio.h
  *
- * $Date: 2001/03/19 17:52:02 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/mystdio.h,v 1.3 2001/03/19 17:52:02 pesco Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.4 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/mystdio.h,v 1.4 2006/03/14 15:08:52 brianp Exp $
  */
 
 #ifndef __glumystdio_h_
 #define __glumystdio_h_
 
 #ifdef STANDALONE
-inline void dprintf( char *, ... ) { }
+inline void _glu_dprintf( char *, ... ) { }
 #endif
 
 #ifdef LIBRARYBUILD
 #ifndef NDEBUG
 #include <stdio.h>
-#define dprintf printf
+#define _glu_dprintf printf
 #else
-inline void dprintf( char *, ... ) { }
+inline void _glu_dprintf( char *, ... ) { }
 #endif
 #endif
 
 #ifdef GLBUILD
-inline void dprintf( char *, ... ) { }
+inline void _glu_dprintf( char *, ... ) { }
 #endif
 
 #ifndef NULL

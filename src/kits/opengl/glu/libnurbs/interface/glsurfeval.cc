@@ -779,8 +779,8 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
       else
 	auto_normal_flag = 0;
 	*/
+	  glPushAttrib((GLbitfield) GL_EVAL_BIT);
 
-      //NEWCALLBACK: no need to worry about gl states when gling clalback
     }
   else
     {
@@ -842,12 +842,12 @@ OpenGLSurfaceEvaluator::endmap2f(void)
     bezierPatchMeshListDelete(global_bpm);
     global_bpm = NULL;
 #endif
-
+	glPopAttrib();
   }
 else
   {
 #ifndef USE_LOD
-glPopAttrib();
+    glPopAttrib();
 #endif
 
 #ifdef STATISTICS

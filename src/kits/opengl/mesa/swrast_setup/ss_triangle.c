@@ -299,7 +299,7 @@ void _swsetup_choose_trifuncs( GLcontext *ctx )
     */
    if (ctx->Polygon.FrontMode != GL_FILL ||
        ctx->Polygon.BackMode != GL_FILL ||
-       (ctx->Stencil.Enabled && ctx->Stencil.TestTwoSide))
+       (ctx->Stencil.Enabled && ctx->Stencil._TestTwoSide))
       ind |= SS_UNFILLED_BIT;
 
    if (ctx->Visual.rgbMode)

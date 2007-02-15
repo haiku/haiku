@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -131,46 +131,6 @@ _mesa_ActiveTextureARB( GLenum target );
 
 extern void GLAPIENTRY
 _mesa_ClientActiveTextureARB( GLenum target );
-
-
-/*
- * Pixel Texture Extensions
- */
-
-extern void GLAPIENTRY
-_mesa_PixelTexGenSGIX(GLenum mode);
-
-extern void GLAPIENTRY
-_mesa_PixelTexGenParameterfSGIS(GLenum target, GLfloat value);
-
-#ifdef VMS
-#define _mesa_PixelTexGenParameterfvSGIS _mesa_PixelTexGenParameterfv
-#endif
-extern void GLAPIENTRY
-_mesa_PixelTexGenParameterfvSGIS(GLenum target, const GLfloat *value);
-
-extern void GLAPIENTRY
-_mesa_PixelTexGenParameteriSGIS(GLenum target, GLint value);
-
-#ifdef VMS
-#define _mesa_PixelTexGenParameterivSGIS _mesa_PixelTexGenParameteriv
-#endif
-extern void GLAPIENTRY
-_mesa_PixelTexGenParameterivSGIS(GLenum target, const GLint *value);
-
-#ifdef VMS
-#define _mesa_GetPixelTexGenParameterfvSGIS _mesa_GetPixelTexGenParameterfv
-#endif
-extern void GLAPIENTRY
-_mesa_GetPixelTexGenParameterfvSGIS(GLenum target, GLfloat *value);
-
-#ifdef VMS
-#define _mesa_GetPixelTexGenParameterivSGIS _mesa_GetPixelTexGenParameteriv
-#endif
-extern void GLAPIENTRY
-_mesa_GetPixelTexGenParameterivSGIS(GLenum target, GLint *value);
-
-/*@}*/
 
 
 /**

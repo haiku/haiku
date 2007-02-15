@@ -35,8 +35,8 @@
 /*
  * arcsorter.c++
  *
- * $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/arcsorter.cc,v 1.1 2001/03/17 00:25:40 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/arcsorter.cc,v 1.2 2006/03/14 15:08:52 brianp Exp $
  */
 
 #ifndef __gluarcsorter_c_
@@ -54,7 +54,7 @@ ArcSorter::ArcSorter(Subdivider &s) : Sorter( sizeof( Arc ** ) ), subdivider(s)
 int
 ArcSorter::qscmp( char *, char * )
 {
-    dprintf( "ArcSorter::qscmp: pure virtual called\n" );
+    _glu_dprintf( "ArcSorter::qscmp: pure virtual called\n" );
     return 0;
 }
 

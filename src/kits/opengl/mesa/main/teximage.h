@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -35,6 +35,13 @@
 #include "mtypes.h"
 
 
+extern void *
+_mesa_alloc_texmemory(GLsizei bytes);
+
+extern void
+_mesa_free_texmemory(void *m);
+
+
 /** \name Internal functions */
 /*@{*/
 
@@ -42,12 +49,20 @@ extern GLint
 _mesa_base_tex_format( GLcontext *ctx, GLint internalFormat );
 
 
+extern GLboolean
+_mesa_is_proxy_texture(GLenum target);
+
+
 extern struct gl_texture_image *
 _mesa_new_texture_image( GLcontext *ctx );
 
 
 extern void
-_mesa_delete_texture_image( struct gl_texture_image *teximage );
+_mesa_delete_texture_image( GLcontext *ctx, struct gl_texture_image *teximage );
+
+extern void
+_mesa_free_texture_image_data( GLcontext *ctx, 
+			       struct gl_texture_image *texImage );
 
 
 extern void
@@ -69,12 +84,12 @@ _mesa_select_tex_object(GLcontext *ctx, const struct gl_texture_unit *texUnit,
 
 
 extern struct gl_texture_image *
-_mesa_select_tex_image(GLcontext *ctx, const struct gl_texture_unit *texUnit,
+_mesa_select_tex_image(GLcontext *ctx, const struct gl_texture_object *texObj,
                        GLenum target, GLint level);
 
 
 extern struct gl_texture_image *
-_mesa_get_tex_image(GLcontext *ctx, const struct gl_texture_unit *texUnit,
+_mesa_get_tex_image(GLcontext *ctx, struct gl_texture_object *texObj,
                     GLenum target, GLint level);
 
 
@@ -90,6 +105,23 @@ extern GLboolean
 _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
                          GLint internalFormat, GLenum format, GLenum type,
                          GLint width, GLint height, GLint depth, GLint border);
+
+
+/* Lock a texture for updating.  See also _mesa_lock_context_textures().
+ */
+static INLINE void _mesa_lock_texture(GLcontext *ctx,
+				      struct gl_texture_object *texObj)
+{
+   _glthread_LOCK_MUTEX(ctx->Shared->TexMutex);
+   ctx->Shared->TextureStateStamp++;
+   (void) texObj;
+}
+
+static INLINE void _mesa_unlock_texture(GLcontext *ctx,
+					struct gl_texture_object *texObj)
+{
+   _glthread_UNLOCK_MUTEX(ctx->Shared->TexMutex);
+}
 
 /*@}*/
 

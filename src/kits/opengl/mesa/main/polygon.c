@@ -313,7 +313,8 @@ void GLAPIENTRY
 _mesa_PolygonOffsetEXT( GLfloat factor, GLfloat bias )
 {
    GET_CURRENT_CONTEXT(ctx);
-   _mesa_PolygonOffset(factor, bias * ctx->DepthMaxF );
+   /* XXX mult by DepthMaxF here??? */
+   _mesa_PolygonOffset(factor, bias * ctx->DrawBuffer->_DepthMaxF );
 }
 
 #endif

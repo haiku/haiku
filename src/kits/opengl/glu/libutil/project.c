@@ -31,8 +31,8 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2002/11/01 23:45:31 $ $Revision: 1.5 $
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libutil/project.c,v 1.5 2002/11/01 23:45:31 brianp Exp $
+** $Date: 2006/05/01 16:01:17 $ $Revision: 1.6 $
+** $Header: /cvs/mesa/Mesa/src/glu/sgi/libutil/project.c,v 1.6 2006/05/01 16:01:17 brianp Exp $
 */
 
 #include "gluos.h"
@@ -169,70 +169,73 @@ static void __gluMultMatrixVecd(const GLdouble matrix[16], const GLdouble in[4],
 
 /*
 ** inverse = invert(src)
+** New, faster implementation by Shan Hao Bo, April 2006.
 */
 static int __gluInvertMatrixd(const GLdouble src[16], GLdouble inverse[16])
 {
-    int i, j, k, swap;
-    double t;
-    GLdouble temp[4][4];
-
-    for (i=0; i<4; i++) {
-	for (j=0; j<4; j++) {
-	    temp[i][j] = src[i*4+j];
-	}
-    }
-    __gluMakeIdentityd(inverse);
-
-    for (i = 0; i < 4; i++) {
-	/*
-	** Look for largest element in column
-	*/
-	swap = i;
-	for (j = i + 1; j < 4; j++) {
-	    if (fabs(temp[j][i]) > fabs(temp[i][i])) {
-		swap = j;
-	    }
-	}
-
-	if (swap != i) {
-	    /*
-	    ** Swap rows.
-	    */
-	    for (k = 0; k < 4; k++) {
-		t = temp[i][k];
-		temp[i][k] = temp[swap][k];
-		temp[swap][k] = t;
-
-		t = inverse[i*4+k];
-		inverse[i*4+k] = inverse[swap*4+k];
-		inverse[swap*4+k] = t;
-	    }
-	}
-
-	if (temp[i][i] == 0) {
-	    /*
-	    ** No non-zero pivot.  The matrix is singular, which shouldn't
-	    ** happen.  This means the user gave us a bad matrix.
-	    */
-	    return GL_FALSE;
-	}
-
-	t = temp[i][i];
-	for (k = 0; k < 4; k++) {
-	    temp[i][k] /= t;
-	    inverse[i*4+k] /= t;
-	}
-	for (j = 0; j < 4; j++) {
-	    if (j != i) {
-		t = temp[j][i];
-		for (k = 0; k < 4; k++) {
-		    temp[j][k] -= temp[i][k]*t;
-		    inverse[j*4+k] -= inverse[i*4+k]*t;
+	int i, j, k;
+	double t;
+	GLdouble temp[4][4];
+	 
+	for (i=0; i<4; i++) {
+		for (j=0; j<4; j++) {
+		    temp[i][j] = src[i*4+j];
 		}
-	    }
 	}
-    }
-    return GL_TRUE;
+	__gluMakeIdentityd(inverse);
+	
+	for (i = 0; i < 4; i++) {
+		if (temp[i][i] == 0.0f) {
+		    /*
+		    ** Look for non-zero element in column
+		    */
+		    for (j = i + 1; j < 4; j++) {
+				if (temp[j][i] != 0.0f) {
+				    break;
+				}
+		    }
+		
+		    if (j != 4) {
+				/*
+				 ** Swap rows.
+				 */
+				for (k = 0; k < 4; k++) {
+				    t = temp[i][k];
+				    temp[i][k] = temp[j][k];
+				    temp[j][k] = t;
+			
+				    t = inverse[i*4+k];
+				    inverse[i*4+k] = inverse[j*4+k];
+				    inverse[j*4+k] = t;
+				}
+		    }
+		    else {
+				/*
+				** No non-zero pivot.  The matrix is singular, 
+which shouldn't
+				** happen.  This means the user gave us a bad 
+matrix.
+				*/
+				return GL_FALSE;
+		    }
+		}
+		
+		t = 1.0f / temp[i][i];
+		for (k = 0; k < 4; k++) {
+		    temp[i][k] *= t;
+		    inverse[i*4+k] *= t;
+		}
+		for (j = 0; j < 4; j++) {
+		    if (j != i) {
+				t = temp[j][i];
+				for (k = 0; k < 4; k++) {
+					    temp[j][k] -= temp[i][k]*t;
+					    inverse[j*4+k] -= inverse[i*4+k]*t;
+				}
+		    }
+		}
+	}
+	return GL_TRUE;
 }
 
 static void __gluMultMatricesd(const GLdouble a[16], const GLdouble b[16],

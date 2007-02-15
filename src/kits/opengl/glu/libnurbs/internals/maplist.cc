@@ -35,8 +35,8 @@
 /*
  * maplist.c++
  *
- * $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/maplist.cc,v 1.1 2001/03/17 00:25:41 brianp Exp $
+ * $Date: 2005/10/28 13:09:23 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/maplist.cc,v 1.2 2005/10/28 13:09:23 brianp Exp $
  */
 
 #include "glimports.h"
@@ -73,8 +73,10 @@ Maplist::add( long type, int israt, int ncoords )
 void 
 Maplist::define( long type, int israt, int ncoords )
 {
+#ifndef NDEBUG // to avoid warning
     Mapdesc *m = locate( type );
     assert( m == NULL || ( m->isrational == israt && m->ncoords == ncoords ) );
+#endif
     add( type, israt, ncoords );
 }
 

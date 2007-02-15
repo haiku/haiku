@@ -1,8 +1,8 @@
 /*
  * mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -82,18 +82,21 @@
 
 #define MAX_PIPELINE_STAGES     30
 
-
 /*
  * Note: The first attributes match the VERT_ATTRIB_* definitions
  * in mtypes.h.  However, the tnl module has additional attributes
  * for materials, color indexes, edge flags, etc.
  */
-/* Note: These are currently being used to define both inputs and
- * outputs from the tnl pipeline.  A better solution (which would also
- * releive the congestion to slightly prolong the life of the bitmask
- * below) is to have the fixed function pipeline populate a set of
- * arrays named after those produced by the vertex program stage, and
- * have the rest the mesa backend work on those.
+/* Although it's nice to use these as bit indexes in a DWORD flag, we
+ * could manage without if necessary.  Another limit currently is the
+ * number of bits allocated for these numbers in places like vertex
+ * program instruction formats and register layouts.
+ */
+/* The bit space exhaustion is a fact now, done by _TNL_ATTRIB_ATTRIBUTE* for
+ * GLSL vertex shader which cannot be aliased with conventional vertex attribs.
+ * Compacting _TNL_ATTRIB_MAT_* attribs would not work, they would not give
+ * as many free bits (11 plus already 1 free bit) as _TNL_ATTRIB_ATTRIBUTE*
+ * attribs want (16).
  */
 enum {
 	_TNL_ATTRIB_POS = 0,
@@ -102,7 +105,7 @@ enum {
 	_TNL_ATTRIB_COLOR0 = 3,
 	_TNL_ATTRIB_COLOR1 = 4,
 	_TNL_ATTRIB_FOG = 5,
-	_TNL_ATTRIB_SIX = 6,
+	_TNL_ATTRIB_COLOR_INDEX = 6,
 	_TNL_ATTRIB_SEVEN = 7,
 	_TNL_ATTRIB_TEX0 = 8,
 	_TNL_ATTRIB_TEX1 = 9,
@@ -112,99 +115,65 @@ enum {
 	_TNL_ATTRIB_TEX5 = 13,
 	_TNL_ATTRIB_TEX6 = 14,
 	_TNL_ATTRIB_TEX7 = 15,
-	_TNL_ATTRIB_MAT_FRONT_AMBIENT = 16,
-	_TNL_ATTRIB_MAT_BACK_AMBIENT = 17,
-	_TNL_ATTRIB_MAT_FRONT_DIFFUSE = 18,
-	_TNL_ATTRIB_MAT_BACK_DIFFUSE = 19,
-	_TNL_ATTRIB_MAT_FRONT_SPECULAR = 20,
-	_TNL_ATTRIB_MAT_BACK_SPECULAR = 21,
-	_TNL_ATTRIB_MAT_FRONT_EMISSION = 22,
-	_TNL_ATTRIB_MAT_BACK_EMISSION = 23,
-	_TNL_ATTRIB_MAT_FRONT_SHININESS = 24,
-	_TNL_ATTRIB_MAT_BACK_SHININESS = 25,
-	_TNL_ATTRIB_MAT_FRONT_INDEXES = 26,
-	_TNL_ATTRIB_MAT_BACK_INDEXES = 27, 
-	_TNL_ATTRIB_INDEX = 28,        
-	_TNL_ATTRIB_EDGEFLAG = 29,     
-	_TNL_ATTRIB_POINTSIZE = 30,
-	_TNL_ATTRIB_MAX = 31
+	_TNL_ATTRIB_GENERIC0 = 16,
+	_TNL_ATTRIB_GENERIC1 = 17,
+	_TNL_ATTRIB_GENERIC2 = 18,
+	_TNL_ATTRIB_GENERIC3 = 19,
+	_TNL_ATTRIB_GENERIC4 = 20,
+	_TNL_ATTRIB_GENERIC5 = 21,
+	_TNL_ATTRIB_GENERIC6 = 22,
+	_TNL_ATTRIB_GENERIC7 = 23,
+	_TNL_ATTRIB_GENERIC8 = 24,
+	_TNL_ATTRIB_GENERIC9 = 25,
+	_TNL_ATTRIB_GENERIC10 = 26,
+	_TNL_ATTRIB_GENERIC11 = 27,
+	_TNL_ATTRIB_GENERIC12 = 28,
+	_TNL_ATTRIB_GENERIC13 = 29,
+	_TNL_ATTRIB_GENERIC14 = 30,
+	_TNL_ATTRIB_GENERIC15 = 31,
+	_TNL_ATTRIB_MAT_FRONT_AMBIENT = 32,
+	_TNL_ATTRIB_MAT_BACK_AMBIENT = 33,
+	_TNL_ATTRIB_MAT_FRONT_DIFFUSE = 34,
+	_TNL_ATTRIB_MAT_BACK_DIFFUSE = 35,
+	_TNL_ATTRIB_MAT_FRONT_SPECULAR = 36,
+	_TNL_ATTRIB_MAT_BACK_SPECULAR = 37,
+	_TNL_ATTRIB_MAT_FRONT_EMISSION = 38,
+	_TNL_ATTRIB_MAT_BACK_EMISSION = 39,
+	_TNL_ATTRIB_MAT_FRONT_SHININESS = 40,
+	_TNL_ATTRIB_MAT_BACK_SHININESS = 41,
+	_TNL_ATTRIB_MAT_FRONT_INDEXES = 42,
+	_TNL_ATTRIB_MAT_BACK_INDEXES = 43,
+	_TNL_ATTRIB_EDGEFLAG = 44,
+	_TNL_ATTRIB_POINTSIZE = 45,
+	_TNL_ATTRIB_MAX = 46
 } ;
 
-/* Will probably have to revise this scheme fairly shortly, eg. by
- * compacting all the MAT flags down to one bit, or by using two
- * dwords to store the flags.
+#define _TNL_ATTRIB_TEX(u)       (_TNL_ATTRIB_TEX0 + (u))
+#define _TNL_ATTRIB_GENERIC(n) (_TNL_ATTRIB_GENERIC0 + (n))
+
+/* special index used for handing invalid glVertexAttribute() indices */
+#define _TNL_ATTRIB_ERROR    (_TNL_ATTRIB_GENERIC15 + 1)
+
+/**
+ * Handy attribute ranges:
  */
-#define _TNL_BIT_POS                 (1<<0)
-#define _TNL_BIT_WEIGHT              (1<<1)
-#define _TNL_BIT_NORMAL              (1<<2)
-#define _TNL_BIT_COLOR0              (1<<3)
-#define _TNL_BIT_COLOR1              (1<<4)
-#define _TNL_BIT_FOG                 (1<<5)
-#define _TNL_BIT_SIX                 (1<<6)
-#define _TNL_BIT_SEVEN               (1<<7)
-#define _TNL_BIT_TEX0                (1<<8)
-#define _TNL_BIT_TEX1                (1<<9)
-#define _TNL_BIT_TEX2                (1<<10)
-#define _TNL_BIT_TEX3                (1<<11)
-#define _TNL_BIT_TEX4                (1<<12)
-#define _TNL_BIT_TEX5                (1<<13)
-#define _TNL_BIT_TEX6                (1<<14)
-#define _TNL_BIT_TEX7                (1<<15)
-#define _TNL_BIT_MAT_FRONT_AMBIENT   (1<<16)
-#define _TNL_BIT_MAT_BACK_AMBIENT    (1<<17)
-#define _TNL_BIT_MAT_FRONT_DIFFUSE   (1<<18)
-#define _TNL_BIT_MAT_BACK_DIFFUSE    (1<<19)
-#define _TNL_BIT_MAT_FRONT_SPECULAR  (1<<20)
-#define _TNL_BIT_MAT_BACK_SPECULAR   (1<<21)
-#define _TNL_BIT_MAT_FRONT_EMISSION  (1<<22)
-#define _TNL_BIT_MAT_BACK_EMISSION   (1<<23)
-#define _TNL_BIT_MAT_FRONT_SHININESS (1<<24)
-#define _TNL_BIT_MAT_BACK_SHININESS  (1<<25)
-#define _TNL_BIT_MAT_FRONT_INDEXES   (1<<26)
-#define _TNL_BIT_MAT_BACK_INDEXES    (1<<27)
-#define _TNL_BIT_INDEX               (1<<28)
-#define _TNL_BIT_EDGEFLAG            (1<<29)
-#define _TNL_BIT_POINTSIZE           (1<<30)
+#define _TNL_FIRST_PROG      _TNL_ATTRIB_WEIGHT
+#define _TNL_LAST_PROG       _TNL_ATTRIB_TEX7
 
-#define _TNL_BIT_TEX(u)  (1 << (_TNL_ATTRIB_TEX0 + (u)))
+#define _TNL_FIRST_TEX       _TNL_ATTRIB_TEX0
+#define _TNL_LAST_TEX        _TNL_ATTRIB_TEX7
 
+#define _TNL_FIRST_GENERIC _TNL_ATTRIB_GENERIC0
+#define _TNL_LAST_GENERIC  _TNL_ATTRIB_GENERIC15
 
+#define _TNL_FIRST_MAT       _TNL_ATTRIB_MAT_FRONT_AMBIENT
+#define _TNL_LAST_MAT        _TNL_ATTRIB_MAT_BACK_INDEXES
 
-#define _TNL_BITS_MAT_ANY  (_TNL_BIT_MAT_FRONT_AMBIENT   | 	\
-			    _TNL_BIT_MAT_BACK_AMBIENT    | 	\
-			    _TNL_BIT_MAT_FRONT_DIFFUSE   | 	\
-			    _TNL_BIT_MAT_BACK_DIFFUSE    | 	\
-			    _TNL_BIT_MAT_FRONT_SPECULAR  | 	\
-			    _TNL_BIT_MAT_BACK_SPECULAR   | 	\
-			    _TNL_BIT_MAT_FRONT_EMISSION  | 	\
-			    _TNL_BIT_MAT_BACK_EMISSION   | 	\
-			    _TNL_BIT_MAT_FRONT_SHININESS | 	\
-			    _TNL_BIT_MAT_BACK_SHININESS  | 	\
-			    _TNL_BIT_MAT_FRONT_INDEXES   | 	\
-			    _TNL_BIT_MAT_BACK_INDEXES)
+/* Number of available generic attributes */
+#define _TNL_NUM_GENERIC 16
 
-
-#define _TNL_BITS_TEX_ANY  (_TNL_BIT_TEX0 |	\
-                            _TNL_BIT_TEX1 |	\
-                            _TNL_BIT_TEX2 |	\
-                            _TNL_BIT_TEX3 |	\
-                            _TNL_BIT_TEX4 |	\
-                            _TNL_BIT_TEX5 |	\
-                            _TNL_BIT_TEX6 |	\
-                            _TNL_BIT_TEX7)
-
-
-#define _TNL_BITS_PROG_ANY   (_TNL_BIT_POS    |		\
-			      _TNL_BIT_WEIGHT |		\
-			      _TNL_BIT_NORMAL |		\
-			      _TNL_BIT_COLOR0 |		\
-			      _TNL_BIT_COLOR1 |		\
-			      _TNL_BIT_FOG    |		\
-			      _TNL_BIT_SIX    |		\
-			      _TNL_BIT_SEVEN  |		\
-			      _TNL_BITS_TEX_ANY)
-
-
+/* Number of attributes used for evaluators */
+#define _TNL_NUM_EVAL 16
 
 #define PRIM_BEGIN     0x10
 #define PRIM_END       0x20
@@ -233,8 +202,8 @@ struct tnl_eval2_map {
 
 struct tnl_eval {
    GLuint new_state;
-   struct tnl_eval1_map map1[_TNL_ATTRIB_INDEX + 1];
-   struct tnl_eval2_map map2[_TNL_ATTRIB_INDEX + 1];
+   struct tnl_eval1_map map1[_TNL_NUM_EVAL];
+   struct tnl_eval2_map map2[_TNL_NUM_EVAL];
 };
 
 
@@ -267,10 +236,11 @@ struct _tnl_dynfn_generators {
    struct _tnl_dynfn *(*Attribute[4])( GLcontext *ctx, int key );
 };
 
-#define _TNL_MAX_ATTR_CODEGEN 16 
+#define _TNL_MAX_ATTR_CODEGEN 32
 
 
-/* The assembly of vertices in immediate mode is separated from
+/**
+ * The assembly of vertices in immediate mode is separated from
  * display list compilation.  This allows a simpler immediate mode
  * treatment and a display list compiler better suited to
  * hardware-acceleration.
@@ -278,6 +248,7 @@ struct _tnl_dynfn_generators {
 struct tnl_vtx {
    GLfloat buffer[VERT_BUFFER_SIZE];
    GLubyte attrsz[_TNL_ATTRIB_MAX];
+   GLubyte active_sz[_TNL_ATTRIB_MAX];
    GLuint vertex_size;
    struct tnl_prim prim[TNL_MAX_PRIM];
    GLuint prim_count;
@@ -285,10 +256,12 @@ struct tnl_vtx {
    GLfloat vertex[_TNL_ATTRIB_MAX*4]; /* current vertex */
    GLfloat *attrptr[_TNL_ATTRIB_MAX]; /* points into vertex */
    GLfloat *current[_TNL_ATTRIB_MAX]; /* points into ctx->Current, etc */
+   GLfloat CurrentFloatEdgeFlag;
    GLuint counter, initial_counter;
    struct tnl_copied_vtx copied;
 
-   tnl_attrfv_func tabfv[_TNL_MAX_ATTR_CODEGEN+1][4]; /* plus 1 for ERROR_ATTRIB */
+   /** Note extra space for error handler: */
+   tnl_attrfv_func tabfv[_TNL_ATTRIB_ERROR+1][4];
 
    struct _tnl_dynfn_lists cache;
    struct _tnl_dynfn_generators gen;
@@ -364,6 +337,7 @@ struct tnl_save {
    GLfloat *buffer;
    GLuint count;
    GLuint wrap_count;
+   GLuint replay_flags;
 
    struct tnl_prim *prim;
    GLuint prim_count, prim_max;
@@ -381,6 +355,8 @@ struct tnl_save {
    GLuint opcode_vertex_list;
 
    struct tnl_copied_vtx copied;
+   
+   GLfloat CurrentFloatEdgeFlag;
 
    GLfloat *current[_TNL_ATTRIB_MAX]; /* points into ctx->ListState */
    GLubyte *currentsz[_TNL_ATTRIB_MAX];
@@ -389,6 +365,9 @@ struct tnl_save {
 };
 
 
+/**
+ * A collection of vertex arrays.
+ */
 struct tnl_vertex_arrays
 {
    /* Conventional vertex attribute arrays */
@@ -407,6 +386,7 @@ struct tnl_vertex_arrays
     * The GL_NV_vertex_program extension defines 16 extra sets of vertex
     * arrays which have precedent over the conventional arrays when enabled.
     */
+   /* XXX I think the array size is wronge (47 vs. 16) */
    GLvector4f  Attribs[_TNL_ATTRIB_MAX];
 };
 
@@ -416,15 +396,15 @@ struct tnl_vertex_arrays
  */
 struct vertex_buffer
 {
-   /* Constant over life of the vertex_buffer.
-    */
-   GLuint      Size;
+   GLuint Size;  /**< Max vertices per vertex buffer, constant */
 
    /* Constant over the pipeline.
     */
-   GLuint      Count;		              /* for everything except Elts */
+   GLuint Count;  /**< Number of vertices currently in buffer */
 
    /* Pointers to current data.
+    * XXX some of these fields alias AttribPtr below and should be removed
+    * such as NormalPtr, TexCoordPtr, FogCoordPtr, etc.
     */
    GLuint      *Elts;		                
    GLvector4f  *ObjPtr;		                /* _TNL_BIT_POS */
@@ -441,64 +421,41 @@ struct vertex_buffer
    GLvector4f  *IndexPtr[2];	                /* _TNL_BIT_INDEX */
    GLvector4f  *ColorPtr[2];	                /* _TNL_BIT_COLOR0 */
    GLvector4f  *SecondaryColorPtr[2];           /* _TNL_BIT_COLOR1 */
-   GLvector4f  *PointSizePtr;	                /* _TNL_BIT_POS */
    GLvector4f  *FogCoordPtr;	                /* _TNL_BIT_FOG */
+   GLvector4f  *VaryingPtr[MAX_VARYING_VECTORS];
 
    struct tnl_prim  *Primitive;	              
    GLuint      PrimitiveCount;	      
 
    /* Inputs to the vertex program stage */
+   /* XXX This array may be too large (47 vs. 16) */
    GLvector4f *AttribPtr[_TNL_ATTRIB_MAX];      /* GL_NV_vertex_program */
-
-   GLuint LastClipped;
-   /* Private data from _tnl_render_stage that has no business being
-    * in this struct.
-    */
 };
 
 
-/** Describes an individual operation on the pipeline.
+/**
+ * Describes an individual operation on the pipeline.
  */
 struct tnl_pipeline_stage
 {
    const char *name;
-   GLuint check_state;		/* All state referenced in check() --
-				 * When is the pipeline_stage struct
-				 * itself invalidated?  Must be
-				 * constant.
-				 */
-
-   /* Usually constant or set by the 'check' callback:
-    */
-   GLuint run_state;		/* All state referenced in run() --
-				 * When is the cached output of the
-				 * stage invalidated?
-				 */
-
-   GLboolean active;		/* True if runnable in current state */
-   GLuint inputs;		/* VERT_* inputs to the stage */
-   GLuint outputs;		/* VERT_* outputs of the stage */
-
-   /* Set in _tnl_run_pipeline():
-    */
-   GLuint changed_inputs;	/* Generated value -- inputs to the
-				 * stage that have changed since last
-				 * call to 'run'.
-				 */
-
 
    /* Private data for the pipeline stage:
     */
    void *privatePtr;
 
-   /* Free private data.  May not be null.
+   /* Allocate private data
+    */
+   GLboolean (*create)( GLcontext *ctx, struct tnl_pipeline_stage * );
+
+   /* Free private data.
     */
    void (*destroy)( struct tnl_pipeline_stage * );
 
-   /* Called from _tnl_validate_pipeline().  Must update all fields in
-    * the pipeline_stage struct for the current state.
+   /* Called on any statechange or input array size change or
+    * input array change to/from zero stride.
     */
-   void (*check)( GLcontext *ctx, struct tnl_pipeline_stage * );
+   void (*validate)( GLcontext *ctx, struct tnl_pipeline_stage * );
 
    /* Called from _tnl_run_pipeline().  The stage.changed_inputs value
     * encodes all inputs to thee struct which have changed.  If
@@ -511,15 +468,18 @@ struct tnl_pipeline_stage
    GLboolean (*run)( GLcontext *ctx, struct tnl_pipeline_stage * );
 };
 
+
+
 /** Contains the array of all pipeline stages.
- * The default values are defined at the end of t_pipeline.c */
+ * The default values are defined at the end of t_pipeline.c 
+ */
 struct tnl_pipeline {
-   GLuint build_state_trigger;	  /**< state changes which require build */
-   GLuint build_state_changes;    /**< state changes since last build */
-   GLuint run_state_changes;	  /**< state changes since last run */
-   GLuint run_input_changes;	  /**< VERT_* changes since last run */
-   GLuint inputs;		  /**< VERT_* inputs to pipeline */
-   /** This array has to end with a NULL-pointer. */
+   
+   GLuint last_attrib_stride[_TNL_ATTRIB_MAX];
+   GLuint last_attrib_size[_TNL_ATTRIB_MAX];
+   GLuint input_changes;
+   GLuint new_state;
+
    struct tnl_pipeline_stage stages[MAX_PIPELINE_STAGES+1];
    GLuint nr_stages;
 };
@@ -552,45 +512,13 @@ struct tnl_clipspace_attr
    GLuint vertattrsize;    /* size of the attribute in bytes */
    GLubyte *inputptr;
    GLuint inputstride;
-   tnl_insert_func *insert;
+   GLuint inputsize;
+   const tnl_insert_func *insert;
    tnl_insert_func emit;
    tnl_extract_func extract;
    const GLfloat *vp;   /* NDC->Viewport mapping matrix */
 };
 
-
-struct tnl_clipspace_codegen {
-   GLboolean (*emit_header)( struct tnl_clipspace_codegen *,
-			     struct tnl_clipspace *);
-   GLboolean (*emit_footer)( struct tnl_clipspace_codegen * );
-   GLboolean (*emit_attr_header)( struct tnl_clipspace_codegen *,
-				  struct tnl_clipspace_attr *,
-				  GLint j, GLenum out_type, 
-				  GLboolean need_vp );
-   GLboolean (*emit_attr_footer)( struct tnl_clipspace_codegen * );
-   GLboolean (*emit_mov)( struct tnl_clipspace_codegen *, 
-			  GLint, GLint );
-   GLboolean (*emit_const)( struct tnl_clipspace_codegen *, 
-			    GLint, GLfloat );
-   GLboolean (*emit_mad)( struct tnl_clipspace_codegen *,
-			  GLint, GLint, GLint, GLint );
-   GLboolean (*emit_float_to_chan)( struct tnl_clipspace_codegen *, 
-				    GLint, GLint );
-   GLboolean (*emit_const_chan)( struct tnl_clipspace_codegen *, 
-				 GLint, GLchan );
-   GLboolean (*emit_float_to_ubyte)( struct tnl_clipspace_codegen *, 
-				     GLint, GLint );
-   GLboolean (*emit_const_ubyte)( struct tnl_clipspace_codegen *, 
-				  GLint, GLubyte );
-   tnl_emit_func (*emit_store_func)( struct tnl_clipspace_codegen * );
-   
-   struct _tnl_dynfn codegen_list;
-   
-   char *buf;
-   int buf_size;
-   int buf_used;
-   int out_offset;
-};
 
 
 
@@ -610,6 +538,24 @@ typedef void (*tnl_setup_func)( GLcontext *ctx,
 				GLuint start, GLuint end,
 				GLuint new_inputs);
 
+
+struct tnl_attr_type {
+   GLuint format;
+   GLuint size;
+   GLuint stride;
+   GLuint offset;
+};
+
+struct tnl_clipspace_fastpath {
+   GLuint vertex_size;
+   GLuint attr_count;
+   GLboolean match_strides;
+
+   struct tnl_attr_type *attr;
+
+   tnl_emit_func func;
+   struct tnl_clipspace_fastpath *next;
+};
 
 /**
  * Used to describe conversion of vertex arrays to vertex structures.
@@ -632,7 +578,30 @@ struct tnl_clipspace
    tnl_interp_func interp;
    tnl_copy_pv_func copy_pv;
 
-   struct tnl_clipspace_codegen codegen;
+   /* Parameters and constants for codegen:
+    */
+   GLboolean need_viewport;
+   GLfloat vp_scale[4];		
+   GLfloat vp_xlate[4];
+   GLfloat chan_scale[4];
+   GLfloat identity[4];
+
+   struct tnl_clipspace_fastpath *fastpath;
+   
+   void (*codegen_emit)( GLcontext *ctx );
+};
+
+
+struct tnl_cache_item {
+   GLuint hash;
+   void *key;
+   void *data;
+   struct tnl_cache_item *next;
+};
+
+struct tnl_cache {
+   struct tnl_cache_item **items;
+   GLuint size, n_items;
 };
 
 
@@ -650,6 +619,11 @@ struct tnl_device_driver
 
    void (*NotifyMaterialChange)(GLcontext *ctx);
    /* Alert tnl-aware drivers of changes to material.
+    */
+
+   void (*NotifyInputChanges)(GLcontext *ctx, GLuint bitmask);
+   /* Alert tnl-aware drivers of changes to size and stride of input
+    * arrays.
     */
 
    GLboolean (*NotifyBegin)(GLcontext *ctx, GLenum p);
@@ -739,7 +713,20 @@ struct tnl_device_driver
        */
    } Render;
 };
-   
+
+
+#define DECLARE_RENDERINPUTS(name) BITSET64_DECLARE(name, _TNL_ATTRIB_MAX)
+#define RENDERINPUTS_COPY BITSET64_COPY
+#define RENDERINPUTS_EQUAL BITSET64_EQUAL
+#define RENDERINPUTS_ZERO BITSET64_ZERO
+#define RENDERINPUTS_ONES BITSET64_ONES
+#define RENDERINPUTS_TEST BITSET64_TEST
+#define RENDERINPUTS_SET BITSET64_SET
+#define RENDERINPUTS_CLEAR BITSET64_CLEAR
+#define RENDERINPUTS_TEST_RANGE BITSET64_TEST_RANGE
+#define RENDERINPUTS_SET_RANGE BITSET64_SET_RANGE
+#define RENDERINPUTS_CLEAR_RANGE BITSET64_CLEAR_RANGE
+
 
 /**
  * Context state for T&L context.
@@ -786,26 +773,28 @@ typedef struct
 
    GLboolean _DoVertexFog;  /* eval fog function at each vertex? */
 
-   GLuint render_inputs;
+   /* If True, it means we started a glBegin/End primtive with an invalid
+    * vertex/fragment program or incomplete framebuffer.  In that case,
+    * discard any buffered vertex data.
+    */
+   GLboolean DiscardPrimitive;
+
+   DECLARE_RENDERINPUTS(render_inputs_bitset);
 
    GLvertexformat exec_vtxfmt;
    GLvertexformat save_vtxfmt;
+
+   struct tnl_cache *vp_cache;
 
 } TNLcontext;
 
 
 
-#define TNL_CONTEXT(ctx) ((TNLcontext *)(ctx->swtnl_context))
+#define TNL_CONTEXT(ctx) ((TNLcontext *)((ctx)->swtnl_context))
 
 
 #define TYPE_IDX(t) ((t) & 0xf)
 #define MAX_TYPES TYPE_IDX(GL_DOUBLE)+1      /* 0xa + 1 */
-
-extern void _tnl_MakeCurrent( GLcontext *ctx,
-			      GLframebuffer *drawBuffer,
-			      GLframebuffer *readBuffer );
-
-
 
 
 #endif

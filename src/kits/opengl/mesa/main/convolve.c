@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -560,9 +560,10 @@ _mesa_CopyConvolutionFilter2D(GLenum target, GLenum internalFormat, GLint x, GLi
 
 
 void GLAPIENTRY
-_mesa_GetConvolutionFilter(GLenum target, GLenum format, GLenum type, GLvoid *image)
+_mesa_GetConvolutionFilter(GLenum target, GLenum format, GLenum type,
+                           GLvoid *image)
 {
-   const struct gl_convolution_attrib *filter;
+   struct gl_convolution_attrib *filter;
    GLuint row;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -623,10 +624,9 @@ _mesa_GetConvolutionFilter(GLenum target, GLenum format, GLenum type, GLvoid *im
       GLvoid *dst = _mesa_image_address2d(&ctx->Pack, image, filter->Width,
                                           filter->Height, format, type,
                                           row, 0);
-      const GLfloat *src = filter->Filter + row * filter->Width * 4;
-      _mesa_pack_rgba_span_float(ctx, filter->Width,
-                                 (const GLfloat (*)[4]) src,
-                                 format, type, dst, &ctx->Pack, 0);
+      GLfloat (*src)[4] = (GLfloat (*)[4]) (filter->Filter + row * filter->Width * 4);
+      _mesa_pack_rgba_span_float(ctx, filter->Width, src,
+                                 format, type, dst, &ctx->Pack, 0x0);
    }
 
    if (ctx->Pack.BufferObj->Name) {
@@ -768,10 +768,11 @@ _mesa_GetConvolutionParameteriv(GLenum target, GLenum pname, GLint *params)
 
 
 void GLAPIENTRY
-_mesa_GetSeparableFilter(GLenum target, GLenum format, GLenum type, GLvoid *row, GLvoid *column, GLvoid *span)
+_mesa_GetSeparableFilter(GLenum target, GLenum format, GLenum type,
+                         GLvoid *row, GLvoid *column, GLvoid *span)
 {
    const GLint colStart = MAX_CONVOLUTION_WIDTH * 4;
-   const struct gl_convolution_attrib *filter;
+   struct gl_convolution_attrib *filter;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
@@ -785,7 +786,8 @@ _mesa_GetSeparableFilter(GLenum target, GLenum format, GLenum type, GLvoid *row,
    }
 
    if (!_mesa_is_legal_format_and_type(ctx, format, type)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glGetConvolutionFilter(format or type)");
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "glGetConvolutionFilter(format or type)");
       return;
    }
 
@@ -833,18 +835,17 @@ _mesa_GetSeparableFilter(GLenum target, GLenum format, GLenum type, GLvoid *row,
       GLvoid *dst = _mesa_image_address1d(&ctx->Pack, row, filter->Width,
                                           format, type, 0);
       _mesa_pack_rgba_span_float(ctx, filter->Width,
-                                 (const GLfloat (*)[4]) filter->Filter,
-                                 format, type, dst, &ctx->Pack, 0);
+                                 (GLfloat (*)[4]) filter->Filter,
+                                 format, type, dst, &ctx->Pack, 0x0);
    }
 
    /* Column filter */
    if (column) {
       GLvoid *dst = _mesa_image_address1d(&ctx->Pack, column, filter->Height,
                                           format, type, 0);
-      const GLfloat *src = filter->Filter + colStart;
-      _mesa_pack_rgba_span_float(ctx, filter->Height,
-                                 (const GLfloat (*)[4]) src,
-                                 format, type, dst, &ctx->Pack, 0);
+      GLfloat (*src)[4] = (GLfloat (*)[4]) (filter->Filter + colStart);
+      _mesa_pack_rgba_span_float(ctx, filter->Height, src,
+                                 format, type, dst, &ctx->Pack, 0x0);
    }
 
    (void) span;  /* unused at this time */

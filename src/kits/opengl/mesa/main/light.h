@@ -78,6 +78,10 @@ extern void GLAPIENTRY
 _mesa_GetMaterialiv( GLenum face, GLenum pname, GLint *params );
 
 
+extern void
+_mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params);
+
+
 /* Lerp between adjacent values in the f(x) lookup table, giving a
  * continuous function, with adequeate overall accuracy.  (Though
  * still pretty good compared to a straight lookup).

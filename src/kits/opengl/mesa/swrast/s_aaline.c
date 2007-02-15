@@ -76,7 +76,7 @@ struct LineInfo
    GLfloat texWidth[MAX_TEXTURE_COORD_UNITS];
    GLfloat texHeight[MAX_TEXTURE_COORD_UNITS];
 
-   struct sw_span span;
+   SWspan span;
 };
 
 
@@ -210,7 +210,7 @@ compute_lambda(const GLfloat sPlane[4], const GLfloat tPlane[4],
    if (rho2 == 0.0F)
       return 0.0;
    else
-      return (GLfloat) (log(rho2) * 1.442695 * 0.5);/* 1.442695 = 1/log(2) */
+      return (GLfloat) (LOGF(rho2) * 1.442695 * 0.5);/* 1.442695 = 1/log(2) */
 }
 
 

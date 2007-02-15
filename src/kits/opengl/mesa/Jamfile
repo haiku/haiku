@@ -17,6 +17,8 @@ UseHeaders [ FDirName $(SUBDIR) glapi ] ;
 UseHeaders [ FDirName $(SUBDIR) math ] ;
 UseHeaders [ FDirName $(SUBDIR) tnl ] ;
 UseHeaders [ FDirName $(SUBDIR) shader ] ;
+UseHeaders [ FDirName $(SUBDIR) shader grammar ] ;
+UseHeaders [ FDirName $(SUBDIR) shader slang ] ;
 UseHeaders [ FDirName $(SUBDIR) swrast ] ;
 UseHeaders [ FDirName $(SUBDIR) swrast_setup ] ;
 
@@ -26,6 +28,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) glapi ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) main ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) math ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) shader ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) shader grammar ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) shader slang ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast_setup ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
@@ -78,8 +82,17 @@ if $(TARGET_ARCH) = x86 {
 		sse_normal.S
 		read_rgba_span_x86.S
 
+		t_vertex_sse.c
+		t_vb_arbprogram_sse.c
+		t_vtx_x86.c
 		t_vtx_x86_gcc.S
+
+		slang_execute_x86.c
+
+		x86sse.c
 		;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) x86 rtasm ] ;
 
 } else if $(TARGET_ARCH) = ppc {
 
@@ -110,6 +123,7 @@ StaticLibrary libmesa.a :
 	api_noop.c
 	api_validate.c
 	accum.c
+	arrayobj.c
 	attrib.c
 	blend.c
 	bufferobj.c
@@ -120,16 +134,21 @@ StaticLibrary libmesa.a :
 	convolve.c
 	debug.c
 	depth.c
+	depthstencil.c
 	dlist.c
 	drawpix.c
 	driverfuncs.c
 	enable.c
 	enums.c
 	eval.c
+	execmem.c
 	extensions.c
+	fbobject.c
 	feedback.c
 	fog.c
+	framebuffer.c
 	get.c
+	getstring.c
 	hash.c
 	hint.c
 	histogram.c
@@ -138,19 +157,23 @@ StaticLibrary libmesa.a :
 	light.c
 	lines.c
 	matrix.c
+	mipmap.c
 	occlude.c
 	pixel.c
 	points.c
 	polygon.c
 	rastpos.c
+	renderbuffer.c
 	state.c
 	stencil.c
 	texcompress.c
 	texcompress_s3tc.c
 	texcompress_fxt1.c
+	texenvprogram.c
 	texformat.c
 	teximage.c
 	texobj.c
+	texrender.c
 	texstate.c
 	texstore.c
 	varray.c
@@ -178,6 +201,8 @@ StaticLibrary libmesa.a :
 	t_save_api.c
 	t_save_loopback.c
 	t_save_playback.c
+	t_vb_arbprogram.c
+	t_vb_arbshader.c
 	t_vb_cull.c
 	t_vb_fog.c
 	t_vb_light.c
@@ -188,26 +213,24 @@ StaticLibrary libmesa.a :
 	t_vb_texgen.c
 	t_vb_texmat.c
 	t_vb_vertex.c
+	t_vp_build.c
 	t_vertex.c
-	t_vertex_c.c
-	t_vertex_codegen.c
+	t_vertex_generic.c
 	t_vtx_api.c
 	t_vtx_generic.c
-	t_vtx_x86.c
 	t_vtx_eval.c
 	t_vtx_exec.c 
 
 	# swrast
-	s_fragprog_to_c.c
 	s_aaline.c
 	s_aatriangle.c
 	s_accum.c
 	s_alpha.c
-	s_alphabuf.c
+	s_arbshader.c
 	s_atifragshader.c
-	s_auxbuffer.c
 	s_bitmap.c
 	s_blend.c
+	s_blit.c
 	s_buffers.c
 	s_copypix.c
 	s_context.c
@@ -220,13 +243,12 @@ StaticLibrary libmesa.a :
 	s_logic.c
 	s_masking.c
 	s_nvfragprog.c
-	s_pixeltex.c
 	s_points.c
 	s_readpix.c
 	s_span.c
 	s_stencil.c
-	s_tcc.c
-	s_texture.c
+	s_texcombine.c
+	s_texfilter.c
 	s_texstore.c
 	s_triangle.c
 	s_zoom.c
@@ -236,18 +258,40 @@ StaticLibrary libmesa.a :
 	ss_triangle.c 	
 
 	# shader
-	arbfragparse.c
 	arbprogparse.c
 	arbprogram.c
-	arbvertparse.c
 	atifragshader.c
-	grammar_mesa.c
 	nvfragparse.c
 	nvprogram.c
 	nvvertexec.c
 	nvvertparse.c
 	program.c
 	shaderobjects.c
+	shaderobjects_3dlabs.c
+
+	# shader/grammar
+	grammar_mesa.c
+
+	# shader/slang
+	slang_analyse.c
+	slang_assemble.c
+	slang_assemble_assignment.c
+	slang_assemble_conditional.c
+	slang_assemble_constructor.c
+	slang_assemble_typeinfo.c
+	slang_compile.c
+	slang_compile_function.c
+	slang_compile_operation.c
+	slang_compile_struct.c
+	slang_compile_variable.c
+	slang_execute.c
+	slang_export.c
+	slang_library_noise.c
+	slang_library_texsample.c
+	slang_link.c
+	slang_preprocess.c
+	slang_storage.c
+	slang_utility.c
 
 	$(arch_sources)
 

@@ -35,6 +35,7 @@
 #include "mtypes.h"
 #include "t_context.h"
 #include "t_save_api.h"
+#include "dispatch.h"
 
 /* If someone compiles a display list like:
  *      glBegin(Triangles)
@@ -70,22 +71,22 @@ typedef void (*attr_func)( GLcontext *ctx, GLint target, const GLfloat * );
 /* Wrapper functions in case glVertexAttrib*fvNV doesn't exist */
 static void VertexAttrib1fvNV(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib1fvNV(target, v);
+   CALL_VertexAttrib1fvNV(ctx->Exec, (target, v));
 }
 
 static void VertexAttrib2fvNV(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib2fvNV(target, v);
+   CALL_VertexAttrib2fvNV(ctx->Exec, (target, v));
 }
 
 static void VertexAttrib3fvNV(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib3fvNV(target, v);
+   CALL_VertexAttrib3fvNV(ctx->Exec, (target, v));
 }
 
 static void VertexAttrib4fvNV(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib4fvNV(target, v);
+   CALL_VertexAttrib4fvNV(ctx->Exec, (target, v));
 }
 
 static attr_func vert_attrfunc[4] = {
@@ -98,22 +99,22 @@ static attr_func vert_attrfunc[4] = {
 
 static void VertexAttrib1fvARB(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib1fvARB(target, v);
+   CALL_VertexAttrib1fvARB(ctx->Exec, (target, v));
 }
 
 static void VertexAttrib2fvARB(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib2fvARB(target, v);
+   CALL_VertexAttrib2fvARB(ctx->Exec, (target, v));
 }
 
 static void VertexAttrib3fvARB(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib3fvARB(target, v);
+   CALL_VertexAttrib3fvARB(ctx->Exec, (target, v));
 }
 
 static void VertexAttrib4fvARB(GLcontext *ctx, GLint target, const GLfloat *v)
 {
-   ctx->Exec->VertexAttrib4fvARB(target, v);
+   CALL_VertexAttrib4fvARB(ctx->Exec, (target, v));
 }
 
 static attr_func vert_attrfunc_arb[4] = {
@@ -133,10 +134,10 @@ static void mat_attr1fv( GLcontext *ctx, GLint target, const GLfloat *v )
 {
    switch (target) {
    case _TNL_ATTRIB_MAT_FRONT_SHININESS:
-      ctx->Exec->Materialfv( GL_FRONT, GL_SHININESS, v );
+      CALL_Materialfv(ctx->Exec, ( GL_FRONT, GL_SHININESS, v ));
       break;
    case _TNL_ATTRIB_MAT_BACK_SHININESS:
-      ctx->Exec->Materialfv( GL_BACK, GL_SHININESS, v );
+      CALL_Materialfv(ctx->Exec, ( GL_BACK, GL_SHININESS, v ));
       break;
    }
 }
@@ -146,10 +147,10 @@ static void mat_attr3fv( GLcontext *ctx, GLint target, const GLfloat *v )
 {
    switch (target) {
    case _TNL_ATTRIB_MAT_FRONT_INDEXES:
-      ctx->Exec->Materialfv( GL_FRONT, GL_COLOR_INDEXES, v );
+      CALL_Materialfv(ctx->Exec, ( GL_FRONT, GL_COLOR_INDEXES, v ));
       break;
    case _TNL_ATTRIB_MAT_BACK_INDEXES:
-      ctx->Exec->Materialfv( GL_BACK, GL_COLOR_INDEXES, v );
+      CALL_Materialfv(ctx->Exec, ( GL_BACK, GL_COLOR_INDEXES, v ));
       break;
    }
 }
@@ -159,28 +160,28 @@ static void mat_attr4fv( GLcontext *ctx, GLint target, const GLfloat *v )
 {
    switch (target) {
    case _TNL_ATTRIB_MAT_FRONT_EMISSION:
-      ctx->Exec->Materialfv( GL_FRONT, GL_EMISSION, v );
+      CALL_Materialfv(ctx->Exec, ( GL_FRONT, GL_EMISSION, v ));
       break;
    case _TNL_ATTRIB_MAT_BACK_EMISSION:
-      ctx->Exec->Materialfv( GL_BACK, GL_EMISSION, v );
+      CALL_Materialfv(ctx->Exec, ( GL_BACK, GL_EMISSION, v ));
       break;
    case _TNL_ATTRIB_MAT_FRONT_AMBIENT:
-      ctx->Exec->Materialfv( GL_FRONT, GL_AMBIENT, v );
+      CALL_Materialfv(ctx->Exec, ( GL_FRONT, GL_AMBIENT, v ));
       break;
    case _TNL_ATTRIB_MAT_BACK_AMBIENT:
-      ctx->Exec->Materialfv( GL_BACK, GL_AMBIENT, v );
+      CALL_Materialfv(ctx->Exec, ( GL_BACK, GL_AMBIENT, v ));
       break;
    case _TNL_ATTRIB_MAT_FRONT_DIFFUSE:
-      ctx->Exec->Materialfv( GL_FRONT, GL_DIFFUSE, v );
+      CALL_Materialfv(ctx->Exec, ( GL_FRONT, GL_DIFFUSE, v ));
       break;
    case _TNL_ATTRIB_MAT_BACK_DIFFUSE:
-      ctx->Exec->Materialfv( GL_BACK, GL_DIFFUSE, v );
+      CALL_Materialfv(ctx->Exec, ( GL_BACK, GL_DIFFUSE, v ));
       break;
    case _TNL_ATTRIB_MAT_FRONT_SPECULAR:
-      ctx->Exec->Materialfv( GL_FRONT, GL_SPECULAR, v );
+      CALL_Materialfv(ctx->Exec, ( GL_FRONT, GL_SPECULAR, v ));
       break;
    case _TNL_ATTRIB_MAT_BACK_SPECULAR:
-      ctx->Exec->Materialfv( GL_BACK, GL_SPECULAR, v );
+      CALL_Materialfv(ctx->Exec, ( GL_BACK, GL_SPECULAR, v ));
       break;
    }
 }
@@ -188,22 +189,16 @@ static void mat_attr4fv( GLcontext *ctx, GLint target, const GLfloat *v )
 
 static attr_func mat_attrfunc[4] = {
    mat_attr1fv,
-   0,
+   NULL,
    mat_attr3fv,
    mat_attr4fv
 };
 
 
-static void index_attr1fv(GLcontext *ctx, GLint target, const GLfloat *v)
-{
-   (void) target;
-   ctx->Exec->Indexf(v[0]);
-}
-
 static void edgeflag_attr1fv(GLcontext *ctx, GLint target, const GLfloat *v)
 {
    (void) target;
-   ctx->Exec->EdgeFlag((GLboolean)(v[0] == 1.0));
+   CALL_EdgeFlag(ctx->Exec, ((GLboolean)(v[0] == 1.0)));
 }
 
 struct loopback_attr {
@@ -228,7 +223,7 @@ static void loopback_prim( GLcontext *ctx,
    GLuint k;
 
    if (prim->mode & PRIM_BEGIN) {
-      GL_CALL(Begin)( prim->mode & PRIM_MODE_MASK );
+      CALL_Begin(GET_DISPATCH(), ( prim->mode & PRIM_MODE_MASK ));
    }
    else {
       assert(i == 0);
@@ -253,7 +248,7 @@ static void loopback_prim( GLcontext *ctx,
    }
 
    if (prim->mode & PRIM_END) {
-      GL_CALL(End)();
+      CALL_End(GET_DISPATCH(), ());
    }
    else {
       assert (i == list->prim_count-1);
@@ -296,7 +291,8 @@ void _tnl_loopback_vertex_list( GLcontext *ctx,
    struct loopback_attr la[_TNL_ATTRIB_MAX];
    GLuint i, nr = 0;
 
-   for (i = 0 ; i <= _TNL_ATTRIB_TEX7 ; i++) {
+   /* conventional + generic attributes */
+   for (i = 0 ; i <= _TNL_ATTRIB_GENERIC15 ; i++) {
       if (list->attrsz[i]) {
 	 la[nr].target = i;
 	 la[nr].sz = list->attrsz[i];
@@ -305,6 +301,7 @@ void _tnl_loopback_vertex_list( GLcontext *ctx,
       }
    }
 
+   /* material attributes */
    for (i = _TNL_ATTRIB_MAT_FRONT_AMBIENT ; 
 	i <= _TNL_ATTRIB_MAT_BACK_INDEXES ; 
 	i++) {
@@ -316,21 +313,13 @@ void _tnl_loopback_vertex_list( GLcontext *ctx,
       }
    }
 
+   /* special-case: edgeflag */
    if (list->attrsz[_TNL_ATTRIB_EDGEFLAG]) {
       la[nr].target = _TNL_ATTRIB_EDGEFLAG;
       la[nr].sz = list->attrsz[_TNL_ATTRIB_EDGEFLAG];
       la[nr].func = edgeflag_attr1fv;
       nr++;
    }
-
-   if (list->attrsz[_TNL_ATTRIB_INDEX]) {
-      la[nr].target = _TNL_ATTRIB_INDEX;
-      la[nr].sz = list->attrsz[_TNL_ATTRIB_INDEX];
-      la[nr].func = index_attr1fv;
-      nr++;
-   }
-
-   /* XXX ARB vertex attribs */
 
    for (i = 0 ; i < list->prim_count ; i++) {
       if (list->prim[i].mode & PRIM_WEAK)

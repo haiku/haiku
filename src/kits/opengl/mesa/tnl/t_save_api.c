@@ -1,4 +1,3 @@
-/* $XFree86$ */
 /**************************************************************************
 
 Copyright 2002 Tungsten Graphics Inc., Cedar Park, Texas.
@@ -33,7 +32,8 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-/* Display list compiler attempts to store lists of vertices with the
+/**
+ * The display list compiler attempts to store lists of vertices with the
  * same vertex layout.  Additionally it attempts to minimize the need
  * for execute-time fixup of these vertex lists, allowing them to be
  * cached on hardware.
@@ -77,6 +77,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "api_arrayelt.h"
 #include "vtxfmt.h"
 #include "t_save_api.h"
+#include "dispatch.h"
 
 /*
  * NOTE: Old 'parity' issue is gone, but copying can still be
@@ -242,14 +243,15 @@ static void _save_compile_vertex_list( GLcontext *ctx )
    _mesa_memcpy(node->attrsz, tnl->save.attrsz, sizeof(node->attrsz));
    node->vertex_size = tnl->save.vertex_size;
    node->buffer = tnl->save.buffer;
-   node->wrap_count = tnl->save.copied.nr;
    node->count = tnl->save.initial_counter - tnl->save.counter;
+   node->wrap_count = tnl->save.copied.nr;
+   node->have_materials = tnl->save.have_materials;
+   node->dangling_attr_ref = tnl->save.dangling_attr_ref;
+   node->normal_lengths = NULL;
    node->prim = tnl->save.prim;
    node->prim_count = tnl->save.prim_count;
    node->vertex_store = tnl->save.vertex_store;
    node->prim_store = tnl->save.prim_store;
-   node->dangling_attr_ref = tnl->save.dangling_attr_ref;
-   node->normal_lengths = 0;
 
    node->vertex_store->refcount++;
    node->prim_store->refcount++;
@@ -257,12 +259,16 @@ static void _save_compile_vertex_list( GLcontext *ctx )
    assert(node->attrsz[_TNL_ATTRIB_POS] != 0 ||
 	  node->count == 0);
 
+   if (tnl->save.dangling_attr_ref)
+      ctx->ListState.CurrentList->flags |= MESA_DLIST_DANGLING_REFS;
+
    /* Maybe calculate normal lengths:
     */
    if (tnl->CalcDListNormalLengths && 
        node->attrsz[_TNL_ATTRIB_NORMAL] == 3 &&
-       !node->dangling_attr_ref)
+       !(ctx->ListState.CurrentList->flags & MESA_DLIST_DANGLING_REFS))
       build_normal_lengths( node );
+
 
    tnl->save.vertex_store->used += tnl->save.vertex_size * node->count;
    tnl->save.prim_store->used += node->prim_count;
@@ -365,22 +371,26 @@ static void _save_copy_to_current( GLcontext *ctx )
    TNLcontext *tnl = TNL_CONTEXT(ctx); 
    GLuint i;
 
-   for (i = _TNL_ATTRIB_POS+1 ; i <= _TNL_ATTRIB_INDEX ; i++) {
+   /* XXX Use _TNL_FIRST_* and _TNL_LAST_* values instead? */
+   for (i = _TNL_ATTRIB_POS+1 ; i <= _TNL_ATTRIB_EDGEFLAG ; i++) {
       if (tnl->save.attrsz[i]) {
 	 tnl->save.currentsz[i][0] = tnl->save.attrsz[i];
-	 ASSIGN_4V(tnl->save.current[i], 0, 0, 0, 1);
-	 COPY_SZ_4V(tnl->save.current[i], 
+	 COPY_CLEAN_4V(tnl->save.current[i], 
 		    tnl->save.attrsz[i], 
 		    tnl->save.attrptr[i]);
       }
    }
 
-   /* Edgeflag requires special treatment:
+   /* Edgeflag requires special treatment: 
+    *
+    * TODO: change edgeflag to GLfloat in Mesa.
     */
    if (tnl->save.attrsz[_TNL_ATTRIB_EDGEFLAG]) {
       ctx->ListState.ActiveEdgeFlag = 1;
+      tnl->save.CurrentFloatEdgeFlag = 
+	 tnl->save.attrptr[_TNL_ATTRIB_EDGEFLAG][0];
       ctx->ListState.CurrentEdgeFlag = 
-	 (tnl->save.attrptr[_TNL_ATTRIB_EDGEFLAG][0] == 1.0);
+	 (tnl->save.CurrentFloatEdgeFlag == 1.0);
    }
 }
 
@@ -390,7 +400,7 @@ static void _save_copy_from_current( GLcontext *ctx )
    TNLcontext *tnl = TNL_CONTEXT(ctx); 
    GLint i;
 
-   for (i = _TNL_ATTRIB_POS+1 ; i <= _TNL_ATTRIB_INDEX ; i++) 
+   for (i = _TNL_ATTRIB_POS+1 ; i <= _TNL_ATTRIB_EDGEFLAG ; i++) 
       switch (tnl->save.attrsz[i]) {
       case 4: tnl->save.attrptr[i][3] = tnl->save.current[i][3];
       case 3: tnl->save.attrptr[i][2] = tnl->save.current[i][2];
@@ -401,9 +411,10 @@ static void _save_copy_from_current( GLcontext *ctx )
 
    /* Edgeflag requires special treatment:
     */
-   if (tnl->save.attrsz[_TNL_ATTRIB_EDGEFLAG]) 
-      tnl->save.attrptr[_TNL_ATTRIB_EDGEFLAG][0] = 
-	 (GLfloat)ctx->ListState.CurrentEdgeFlag;
+   if (tnl->save.attrsz[_TNL_ATTRIB_EDGEFLAG]) {
+      tnl->save.CurrentFloatEdgeFlag = (GLfloat)ctx->ListState.CurrentEdgeFlag;
+      tnl->save.attrptr[_TNL_ATTRIB_EDGEFLAG][0] = tnl->save.CurrentFloatEdgeFlag;
+   }
 }
 
 
@@ -454,7 +465,7 @@ static void _save_upgrade_vertex( GLcontext *ctx,
 	 tmp += tnl->save.attrsz[i];
       }
       else 
-	 tnl->save.attrptr[i] = 0; /* will not be dereferenced. */
+	 tnl->save.attrptr[i] = NULL; /* will not be dereferenced. */
    }
 
    /* Copy from current to repopulate the vertex with correct values.
@@ -478,8 +489,9 @@ static void _save_upgrade_vertex( GLcontext *ctx,
       if (tnl->save.currentsz[attr][0] == 0) {
 	 assert(oldsz == 0);
 	 tnl->save.dangling_attr_ref = GL_TRUE;
-	 _mesa_debug(0, "_save_upgrade_vertex: dangling reference attr %d\n", 
-                     attr); 
+
+/* 	 _mesa_debug(NULL, "_save_upgrade_vertex: dangling reference attr %d\n",  */
+/* 		     attr);  */
 
 #if 0
 	 /* The current strategy is to punt these degenerate cases
@@ -499,8 +511,7 @@ static void _save_upgrade_vertex( GLcontext *ctx,
 	    if (tnl->save.attrsz[j]) {
 	       if (j == attr) {
 		  if (oldsz) {
-		     ASSIGN_4V( dest, 0, 0, 0, 1 );
-		     COPY_SZ_4V( dest, oldsz, data );
+		     COPY_CLEAN_4V( dest, oldsz, data );
 		     data += oldsz;
 		     dest += newsz;
 		  }
@@ -926,7 +937,7 @@ static void GLAPIENTRY _save_MultiTexCoord4fv( GLenum target, const GLfloat *v )
 
 static void GLAPIENTRY _save_VertexAttrib1fNV( GLuint index, GLfloat x )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR1F( index, x );
    else
       enum_error(); 
@@ -934,7 +945,7 @@ static void GLAPIENTRY _save_VertexAttrib1fNV( GLuint index, GLfloat x )
 
 static void GLAPIENTRY _save_VertexAttrib1fvNV( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR1FV( index, v );
    else
       enum_error();
@@ -942,7 +953,7 @@ static void GLAPIENTRY _save_VertexAttrib1fvNV( GLuint index, const GLfloat *v )
 
 static void GLAPIENTRY _save_VertexAttrib2fNV( GLuint index, GLfloat x, GLfloat y )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR2F( index, x, y );
    else
       enum_error();
@@ -950,7 +961,7 @@ static void GLAPIENTRY _save_VertexAttrib2fNV( GLuint index, GLfloat x, GLfloat 
 
 static void GLAPIENTRY _save_VertexAttrib2fvNV( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR2FV( index, v );
    else
       enum_error();
@@ -959,7 +970,7 @@ static void GLAPIENTRY _save_VertexAttrib2fvNV( GLuint index, const GLfloat *v )
 static void GLAPIENTRY _save_VertexAttrib3fNV( GLuint index, GLfloat x, GLfloat y, 
 				  GLfloat z )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR3F( index, x, y, z );
    else
       enum_error();
@@ -967,7 +978,7 @@ static void GLAPIENTRY _save_VertexAttrib3fNV( GLuint index, GLfloat x, GLfloat 
 
 static void GLAPIENTRY _save_VertexAttrib3fvNV( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR3FV( index, v );
    else
       enum_error();
@@ -976,7 +987,7 @@ static void GLAPIENTRY _save_VertexAttrib3fvNV( GLuint index, const GLfloat *v )
 static void GLAPIENTRY _save_VertexAttrib4fNV( GLuint index, GLfloat x, GLfloat y,
 				  GLfloat z, GLfloat w )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR4F( index, x, y, z, w );
    else
       enum_error();
@@ -984,7 +995,7 @@ static void GLAPIENTRY _save_VertexAttrib4fNV( GLuint index, GLfloat x, GLfloat 
 
 static void GLAPIENTRY _save_VertexAttrib4fvNV( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
       DISPATCH_ATTR4FV( index, v );
    else
       enum_error();
@@ -994,7 +1005,7 @@ static void GLAPIENTRY _save_VertexAttrib4fvNV( GLuint index, const GLfloat *v )
 static void GLAPIENTRY
 _save_VertexAttrib1fARB( GLuint index, GLfloat x )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR1F( index, x );
    else
       enum_error(); 
@@ -1003,7 +1014,7 @@ _save_VertexAttrib1fARB( GLuint index, GLfloat x )
 static void GLAPIENTRY
 _save_VertexAttrib1fvARB( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR1FV( index, v );
    else
       enum_error();
@@ -1012,7 +1023,7 @@ _save_VertexAttrib1fvARB( GLuint index, const GLfloat *v )
 static void GLAPIENTRY
 _save_VertexAttrib2fARB( GLuint index, GLfloat x, GLfloat y )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR2F( index, x, y );
    else
       enum_error();
@@ -1021,7 +1032,7 @@ _save_VertexAttrib2fARB( GLuint index, GLfloat x, GLfloat y )
 static void GLAPIENTRY
 _save_VertexAttrib2fvARB( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR2FV( index, v );
    else
       enum_error();
@@ -1030,7 +1041,7 @@ _save_VertexAttrib2fvARB( GLuint index, const GLfloat *v )
 static void GLAPIENTRY
 _save_VertexAttrib3fARB( GLuint index, GLfloat x, GLfloat y, GLfloat z )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR3F( index, x, y, z );
    else
       enum_error();
@@ -1039,7 +1050,7 @@ _save_VertexAttrib3fARB( GLuint index, GLfloat x, GLfloat y, GLfloat z )
 static void GLAPIENTRY
 _save_VertexAttrib3fvARB( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR3FV( index, v );
    else
       enum_error();
@@ -1048,7 +1059,7 @@ _save_VertexAttrib3fvARB( GLuint index, const GLfloat *v )
 static void GLAPIENTRY
 _save_VertexAttrib4fARB( GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR4F( index, x, y, z, w );
    else
       enum_error();
@@ -1057,7 +1068,7 @@ _save_VertexAttrib4fARB( GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat 
 static void GLAPIENTRY
 _save_VertexAttrib4fvARB( GLuint index, const GLfloat *v )
 {
-   if (index < VERT_ATTRIB_MAX)
+   if (index < MAX_VERTEX_ATTRIBS)
       DISPATCH_ATTR4FV( index, v );
    else
       enum_error();
@@ -1163,19 +1174,15 @@ static void GLAPIENTRY _save_EdgeFlag( GLboolean b )
    IDX_ATTR( _TNL_ATTRIB_EDGEFLAG, (GLfloat)b );
 }
 
-static void GLAPIENTRY _save_EdgeFlagv( const GLboolean *v )
-{
-   IDX_ATTR( _TNL_ATTRIB_EDGEFLAG, (GLfloat)(v[0]) );
-}
 
 static void GLAPIENTRY _save_Indexf( GLfloat f )
 {
-   IDX_ATTR( _TNL_ATTRIB_INDEX, f );
+   IDX_ATTR( _TNL_ATTRIB_COLOR_INDEX, f );
 }
 
 static void GLAPIENTRY _save_Indexfv( const GLfloat *f )
 {
-   IDX_ATTR( _TNL_ATTRIB_INDEX, f[0] );
+   IDX_ATTR( _TNL_ATTRIB_COLOR_INDEX, f[0] );
 }
 
 
@@ -1188,8 +1195,6 @@ static void GLAPIENTRY _save_Indexfv( const GLfloat *f )
 #define FALLBACK(ctx) 							\
 do {									\
    TNLcontext *tnl = TNL_CONTEXT(ctx);					\
-									\
-   /*fprintf(stderr, "fallback %s inside begin/end\n", __FUNCTION__);*/	\
 									\
    if (tnl->save.initial_counter != tnl->save.counter ||		\
        tnl->save.prim_count) 						\
@@ -1205,63 +1210,71 @@ static void GLAPIENTRY _save_EvalCoord1f( GLfloat u )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->EvalCoord1f( u );
+   CALL_EvalCoord1f(ctx->Save, ( u ));
 }
 
 static void GLAPIENTRY _save_EvalCoord1fv( const GLfloat *v )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->EvalCoord1fv( v );
+   CALL_EvalCoord1fv(ctx->Save, ( v ));
 }
 
 static void GLAPIENTRY _save_EvalCoord2f( GLfloat u, GLfloat v )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->EvalCoord2f( u, v );
+   CALL_EvalCoord2f(ctx->Save, ( u, v ));
 }
 
 static void GLAPIENTRY _save_EvalCoord2fv( const GLfloat *v )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->EvalCoord2fv( v );
+   CALL_EvalCoord2fv(ctx->Save, ( v ));
 }
 
 static void GLAPIENTRY _save_EvalPoint1( GLint i )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->EvalPoint1( i );
+   CALL_EvalPoint1(ctx->Save, ( i ));
 }
 
 static void GLAPIENTRY _save_EvalPoint2( GLint i, GLint j )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->EvalPoint2( i, j );
+   CALL_EvalPoint2(ctx->Save, ( i, j ));
 }
 
 static void GLAPIENTRY _save_CallList( GLuint l )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->CallList( l );
+   CALL_CallList(ctx->Save, ( l ));
 }
 
 static void GLAPIENTRY _save_CallLists( GLsizei n, GLenum type, const GLvoid *v )
 {
    GET_CURRENT_CONTEXT(ctx);
    FALLBACK(ctx);
-   ctx->Save->CallLists( n, type, v );
+   CALL_CallLists(ctx->Save, ( n, type, v ));
 }
 
 
 
 
-/* This begin is hooked into ...  Updating of
- * ctx->Driver.CurrentSavePrimitive is already taken care of.
+/**
+ * Called via ctx->Driver.NotifySaveBegin(ctx, mode) when we get a
+ * glBegin() call while compiling a display list.
+ * See save_Begin() in dlist.c
+ *
+ * This plugs in our special TNL-related display list functions.
+ * All subsequent glBegin/glVertex/glEnd()s found while compiling a
+ * display list will get routed to the functions in this file.
+ *
+ * Updating of ctx->Driver.CurrentSavePrimitive is already taken care of.
  */
 static GLboolean _save_NotifyBegin( GLcontext *ctx, GLenum mode )
 {
@@ -1292,6 +1305,9 @@ static void GLAPIENTRY _save_End( void )
    GLint i = tnl->save.prim_count - 1;
 
    ctx->Driver.CurrentSavePrimitive = PRIM_OUTSIDE_BEGIN_END;
+   if (ctx->ExecuteFlag)
+      ctx->Driver.CurrentExecPrimitive = PRIM_OUTSIDE_BEGIN_END;
+
    tnl->save.prim[i].mode |= PRIM_END;
    tnl->save.prim[i].count = ((tnl->save.initial_counter - tnl->save.counter) - 
 			      tnl->save.prim[i].start);
@@ -1360,11 +1376,16 @@ static void GLAPIENTRY _save_EvalMesh2( GLenum mode, GLint i1, GLint i2,
    _mesa_compile_error( ctx, GL_INVALID_OPERATION, "glEvalMesh2" );
 }
 
+/**
+ * This is only called if someone tries to compile nested glBegin()s 
+ * in their display list.
+ */
 static void GLAPIENTRY _save_Begin( GLenum mode )
 {
    GET_CURRENT_CONTEXT( ctx );
    (void) mode;
-   _mesa_compile_error( ctx, GL_INVALID_OPERATION, "Recursive glBegin" );
+   _mesa_compile_error(ctx, GL_INVALID_OPERATION,
+                       "glBegin(called inside glBegin/End)");
 }
 
 
@@ -1376,11 +1397,11 @@ static void GLAPIENTRY _save_OBE_Rectf( GLfloat x1, GLfloat y1, GLfloat x2, GLfl
 {
    GET_CURRENT_CONTEXT(ctx);
    _save_NotifyBegin( ctx, GL_QUADS | PRIM_WEAK );
-   GL_CALL(Vertex2f)( x1, y1 );
-   GL_CALL(Vertex2f)( x2, y1 );
-   GL_CALL(Vertex2f)( x2, y2 );
-   GL_CALL(Vertex2f)( x1, y2 );
-   GL_CALL(End)();
+   CALL_Vertex2f(GET_DISPATCH(), ( x1, y1 ));
+   CALL_Vertex2f(GET_DISPATCH(), ( x2, y1 ));
+   CALL_Vertex2f(GET_DISPATCH(), ( x2, y2 ));
+   CALL_Vertex2f(GET_DISPATCH(), ( x1, y2 ));
+   CALL_End(GET_DISPATCH(), ());
 }
 
 
@@ -1392,10 +1413,14 @@ static void GLAPIENTRY _save_OBE_DrawArrays(GLenum mode, GLint start, GLsizei co
    if (!_mesa_validate_DrawArrays( ctx, mode, start, count ))
       return;
 
+   _ae_map_vbos( ctx );
+
    _save_NotifyBegin( ctx, mode | PRIM_WEAK );
    for (i = 0; i < count; i++)
-       GL_CALL(ArrayElement)(start + i);
-   GL_CALL(End)();
+       CALL_ArrayElement(GET_DISPATCH(), (start + i));
+   CALL_End(GET_DISPATCH(), ());
+
+   _ae_unmap_vbos( ctx );
 }
 
 
@@ -1408,27 +1433,31 @@ static void GLAPIENTRY _save_OBE_DrawElements(GLenum mode, GLsizei count, GLenum
    if (!_mesa_validate_DrawElements( ctx, mode, count, type, indices ))
       return;
 
+   _ae_map_vbos( ctx );
+
    _save_NotifyBegin( ctx, mode | PRIM_WEAK );
 
    switch (type) {
    case GL_UNSIGNED_BYTE:
       for (i = 0 ; i < count ; i++)
-	  GL_CALL(ArrayElement)( ((GLubyte *)indices)[i] );
+	  CALL_ArrayElement(GET_DISPATCH(), ( ((GLubyte *)indices)[i] ));
       break;
    case GL_UNSIGNED_SHORT:
       for (i = 0 ; i < count ; i++)
-	  GL_CALL(ArrayElement)( ((GLushort *)indices)[i] );
+	  CALL_ArrayElement(GET_DISPATCH(), ( ((GLushort *)indices)[i] ));
       break;
    case GL_UNSIGNED_INT:
       for (i = 0 ; i < count ; i++)
-	  GL_CALL(ArrayElement)( ((GLuint *)indices)[i] );
+	  CALL_ArrayElement(GET_DISPATCH(), ( ((GLuint *)indices)[i] ));
       break;
    default:
       _mesa_error( ctx, GL_INVALID_ENUM, "glDrawElements(type)" );
       break;
    }
 
-   GL_CALL(End)();
+   CALL_End(GET_DISPATCH(), ());
+
+   _ae_unmap_vbos( ctx );
 }
 
 static void GLAPIENTRY _save_OBE_DrawRangeElements(GLenum mode,
@@ -1459,7 +1488,6 @@ static void _save_vtxfmt_init( GLcontext *ctx )
    vfmt->Color4f = _save_Color4f;
    vfmt->Color4fv = _save_Color4fv;
    vfmt->EdgeFlag = _save_EdgeFlag;
-   vfmt->EdgeFlagv = _save_EdgeFlagv;
    vfmt->End = _save_End;
    vfmt->FogCoordfEXT = _save_FogCoordfEXT;
    vfmt->FogCoordfvEXT = _save_FogCoordfvEXT;
@@ -1577,14 +1605,19 @@ void _tnl_EndList( GLcontext *ctx )
    assert(TNL_CONTEXT(ctx)->save.vertex_size == 0);
 }
  
-void _tnl_BeginCallList( GLcontext *ctx, GLuint list )
+void _tnl_BeginCallList( GLcontext *ctx, struct mesa_display_list *dlist )
 {
-   (void) ctx; (void) list;
+   TNLcontext *tnl = TNL_CONTEXT(ctx);
+   tnl->save.replay_flags |= dlist->flags;
+   tnl->save.replay_flags |= tnl->LoopbackDListCassettes;
 }
 
 void _tnl_EndCallList( GLcontext *ctx )
 {
-   (void) ctx;
+   TNLcontext *tnl = TNL_CONTEXT(ctx);
+   
+   if (ctx->ListState.CallDepth == 1)
+      tnl->save.replay_flags = 0;
 }
 
 
@@ -1610,14 +1643,14 @@ static void _tnl_print_vertex_list( GLcontext *ctx, void *data )
    GLuint i;
    (void) ctx;
 
-   _mesa_debug(0, "TNL-VERTEX-LIST, %u vertices %d primitives, %d vertsize\n",
+   _mesa_debug(NULL, "TNL-VERTEX-LIST, %u vertices %d primitives, %d vertsize\n",
                node->count,
 	       node->prim_count,
 	       node->vertex_size);
 
    for (i = 0 ; i < node->prim_count ; i++) {
       struct tnl_prim *prim = &node->prim[i];
-      _mesa_debug(0, "   prim %d: %s %d..%d %s %s\n",
+      _mesa_debug(NULL, "   prim %d: %s %d..%d %s %s\n",
 		  i, 
 		  _mesa_lookup_enum_by_nr(prim->mode & PRIM_MODE_MASK),
 		  prim->start, 
@@ -1639,17 +1672,15 @@ static void _save_current_init( GLcontext *ctx )
       tnl->save.current[i] = ctx->ListState.CurrentAttrib[i];
    }
 
-   for (i = _TNL_ATTRIB_MAT_FRONT_AMBIENT; i < _TNL_ATTRIB_INDEX; i++) {
-      const GLuint j = i - _TNL_ATTRIB_MAT_FRONT_AMBIENT;
+   for (i = _TNL_FIRST_MAT; i <= _TNL_LAST_MAT; i++) {
+      const GLuint j = i - _TNL_FIRST_MAT;
       ASSERT(j < MAT_ATTRIB_MAX);
       tnl->save.currentsz[i] = &ctx->ListState.ActiveMaterialSize[j];
       tnl->save.current[i] = ctx->ListState.CurrentMaterial[j];
    }
 
-   tnl->save.currentsz[_TNL_ATTRIB_INDEX] = &ctx->ListState.ActiveIndex;
-   tnl->save.current[_TNL_ATTRIB_INDEX] = &ctx->ListState.CurrentIndex;
-
-   /* Current edgeflag is handled individually */
+   tnl->save.currentsz[_TNL_ATTRIB_EDGEFLAG] = &ctx->ListState.ActiveEdgeFlag;
+   tnl->save.current[_TNL_ATTRIB_EDGEFLAG] = &tnl->save.CurrentFloatEdgeFlag;
 }
 
 /**
@@ -1663,7 +1694,7 @@ void _tnl_save_init( GLcontext *ctx )
 
 
    for (i = 0; i < _TNL_ATTRIB_MAX; i++)
-      _mesa_vector4f_init( &tmp->Attribs[i], 0, 0);
+      _mesa_vector4f_init( &tmp->Attribs[i], 0, NULL);
 
    tnl->save.opcode_vertex_list =
       _mesa_alloc_opcode( ctx,
@@ -1694,5 +1725,17 @@ void _tnl_save_init( GLcontext *ctx )
  */
 void _tnl_save_destroy( GLcontext *ctx )
 {
-   (void) ctx;
+   TNLcontext *tnl = TNL_CONTEXT(ctx);
+
+   /* Decrement the refcounts.  References may still be held by
+    * display lists yet to be destroyed, so it may not yet be time to
+    * free these items.
+    */
+   if (tnl->save.prim_store &&
+       --tnl->save.prim_store->refcount == 0 )
+      FREE( tnl->save.prim_store );
+
+   if (tnl->save.vertex_store &&
+       --tnl->save.vertex_store->refcount == 0 )
+      FREE( tnl->save.vertex_store );
 }

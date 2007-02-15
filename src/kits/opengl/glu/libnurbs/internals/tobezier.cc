@@ -35,8 +35,8 @@
 /* 
  * tobezier.c++
  *
- * $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/tobezier.cc,v 1.1 2001/03/17 00:25:41 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.2 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/tobezier.cc,v 1.2 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -360,7 +360,7 @@ Knotspec::showpts( REAL *outpt )
 	    next->showpts( outpt );
     } else {
         for( REAL *lpt=outpt+prewidth; outpt != lpt; outpt += poststride )
-	    dprintf(  "show %g %g %g\n", outpt[0], outpt[1], outpt[2] );
+	    _glu_dprintf(  "show %g %g %g\n", outpt[0], outpt[1], outpt[2] );
     }
 }
 

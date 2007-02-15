@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.2
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,15 +22,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/** XXX This file should be named s_clear.c */
 
 #include "glheader.h"
 #include "colormac.h"
 #include "macros.h"
 #include "imports.h"
+#include "mtypes.h"
 
 #include "s_accum.h"
-#include "s_alphabuf.h"
-#include "s_auxbuffer.h"
 #include "s_context.h"
 #include "s_depth.h"
 #include "s_masking.h"
@@ -38,98 +38,200 @@
 
 
 /**
- * Clear the color buffer when glColorMask or glIndexMask is in effect.
- * We'll have specified which color buffer to clear by previously
- * calling Driver.SetBuffer().
+ * Clear the color buffer when glColorMask is in effect.
  */
 static void
-clear_color_buffer_with_masking( GLcontext *ctx )
+clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
 {
-   SWcontext *swrast = SWRAST_CONTEXT(ctx);
    const GLint x = ctx->DrawBuffer->_Xmin;
    const GLint y = ctx->DrawBuffer->_Ymin;
    const GLint height = ctx->DrawBuffer->_Ymax - ctx->DrawBuffer->_Ymin;
    const GLint width  = ctx->DrawBuffer->_Xmax - ctx->DrawBuffer->_Xmin;
+   SWspan span;
+   GLint i;
 
-   if (ctx->Visual.rgbMode) {
-      /* RGBA mode */
-      GLchan clearColor[4];
-      GLint i;
-      CLAMPED_FLOAT_TO_CHAN(clearColor[RCOMP], ctx->Color.ClearColor[0]);
-      CLAMPED_FLOAT_TO_CHAN(clearColor[GCOMP], ctx->Color.ClearColor[1]);
-      CLAMPED_FLOAT_TO_CHAN(clearColor[BCOMP], ctx->Color.ClearColor[2]);
-      CLAMPED_FLOAT_TO_CHAN(clearColor[ACOMP], ctx->Color.ClearColor[3]);
-      for (i = 0; i < height; i++) {
-         GLchan rgba[MAX_WIDTH][4];
-         GLint j;
-         for (j = 0; j < width; j++) {
-            COPY_CHAN4(rgba[j], clearColor);
-         }
-         _swrast_mask_rgba_array( ctx, width, x, y + i, rgba );
-         (*swrast->Driver.WriteRGBASpan)( ctx, width, x, y + i,
-                                          (CONST GLchan (*)[4]) rgba, NULL );
+   ASSERT(ctx->Visual.rgbMode);
+   ASSERT(rb->PutRow);
+
+   /* Initialize color span with clear color */
+   /* XXX optimize for clearcolor == black/zero (bzero) */
+   INIT_SPAN(span, GL_BITMAP, width, 0, SPAN_RGBA);
+   span.array->ChanType = rb->DataType;
+   if (span.array->ChanType == GL_UNSIGNED_BYTE) {
+      GLubyte clearColor[4];
+      UNCLAMPED_FLOAT_TO_UBYTE(clearColor[RCOMP], ctx->Color.ClearColor[0]);
+      UNCLAMPED_FLOAT_TO_UBYTE(clearColor[GCOMP], ctx->Color.ClearColor[1]);
+      UNCLAMPED_FLOAT_TO_UBYTE(clearColor[BCOMP], ctx->Color.ClearColor[2]);
+      UNCLAMPED_FLOAT_TO_UBYTE(clearColor[ACOMP], ctx->Color.ClearColor[3]);
+      for (i = 0; i < width; i++) {
+         COPY_4UBV(span.array->rgba[i], clearColor);
+      }
+   }
+   else if (span.array->ChanType == GL_UNSIGNED_SHORT) {
+      GLushort clearColor[4];
+      UNCLAMPED_FLOAT_TO_USHORT(clearColor[RCOMP], ctx->Color.ClearColor[0]);
+      UNCLAMPED_FLOAT_TO_USHORT(clearColor[GCOMP], ctx->Color.ClearColor[1]);
+      UNCLAMPED_FLOAT_TO_USHORT(clearColor[BCOMP], ctx->Color.ClearColor[2]);
+      UNCLAMPED_FLOAT_TO_USHORT(clearColor[ACOMP], ctx->Color.ClearColor[3]);
+      for (i = 0; i < width; i++) {
+         COPY_4V(span.array->rgba[i], clearColor);
       }
    }
    else {
-      /* Color index mode */
-      GLuint span[MAX_WIDTH];
-      GLubyte mask[MAX_WIDTH];
-      GLint i, j;
-      MEMSET( mask, 1, width );
-      for (i=0;i<height;i++) {
-         for (j=0;j<width;j++) {
-            span[j] = ctx->Color.ClearIndex;
-         }
-         _swrast_mask_index_array( ctx, width, x, y + i, span );
-         (*swrast->Driver.WriteCI32Span)( ctx, width, x, y + i, span, mask );
+      ASSERT(span.array->ChanType == GL_FLOAT);
+      for (i = 0; i < width; i++) {
+         COPY_4V(span.array->rgba[i], ctx->Color.ClearColor);
       }
+   }
+
+   /* Note that masking will change the color values, but only the
+    * channels for which the write mask is GL_FALSE.  The channels
+    * which which are write-enabled won't get modified.
+    */
+   for (i = 0; i < height; i++) {
+      span.x = x;
+      span.y = y + i;
+      _swrast_mask_rgba_span(ctx, rb, &span);
+      /* write masked row */
+      rb->PutRow(ctx, rb, width, x, y + i, span.array->rgba, NULL);
    }
 }
 
 
 /**
- * Clear a color buffer without index/channel masking.
- * We'll have specified which color buffer to clear by previously
- * calling Driver.SetBuffer().
+ * Clear color index buffer with masking.
  */
 static void
-clear_color_buffer(GLcontext *ctx)
+clear_ci_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
 {
-   SWcontext *swrast = SWRAST_CONTEXT(ctx);
    const GLint x = ctx->DrawBuffer->_Xmin;
    const GLint y = ctx->DrawBuffer->_Ymin;
    const GLint height = ctx->DrawBuffer->_Ymax - ctx->DrawBuffer->_Ymin;
    const GLint width  = ctx->DrawBuffer->_Xmax - ctx->DrawBuffer->_Xmin;
+   SWspan span;
+   GLint i;
 
-   if (ctx->Visual.rgbMode) {
-      /* RGBA mode */
-      GLchan clearColor[4];
-      GLint i;
+   ASSERT(!ctx->Visual.rgbMode);
+   ASSERT(rb->PutRow);
+   ASSERT(rb->DataType == GL_UNSIGNED_INT);
 
-      CLAMPED_FLOAT_TO_CHAN(clearColor[RCOMP], ctx->Color.ClearColor[0]);
-      CLAMPED_FLOAT_TO_CHAN(clearColor[GCOMP], ctx->Color.ClearColor[1]);
-      CLAMPED_FLOAT_TO_CHAN(clearColor[BCOMP], ctx->Color.ClearColor[2]);
-      CLAMPED_FLOAT_TO_CHAN(clearColor[ACOMP], ctx->Color.ClearColor[3]);
-
-      ASSERT(*((GLuint *) &ctx->Color.ColorMask) == 0xffffffff);
-      ASSERT(swrast->Driver.WriteRGBASpan);
-
-      for (i = 0; i < height; i++) {
-         (*swrast->Driver.WriteMonoRGBASpan)( ctx, width, x, y + i,
-                                              clearColor, NULL );
-      }
+   /* Initialize index span with clear index */
+   INIT_SPAN(span, GL_BITMAP, width, 0, SPAN_RGBA);
+   for (i = 0; i < width;i++) {
+      span.array->index[i] = ctx->Color.ClearIndex;
    }
-   else {
-      /* Color index mode */
-      GLint i;
-      ASSERT((ctx->Color.IndexMask & ((1 << ctx->Visual.indexBits) - 1))
-             == (GLuint) ((1 << ctx->Visual.indexBits) - 1));
-      ASSERT(swrast->Driver.WriteMonoCISpan);
-      for (i = 0; i < height; i++) {
-         (*swrast->Driver.WriteMonoCISpan)( ctx, width, x, y + i,
-                                            ctx->Color.ClearIndex, NULL);
-      }
+
+   /* Note that masking will change the color indexes, but only the
+    * bits for which the write mask is GL_FALSE.  The bits
+    * which are write-enabled won't get modified.
+    */
+   for (i = 0; i < height;i++) {
+      span.x = x;
+      span.y = y + i;
+      _swrast_mask_ci_span(ctx, rb, &span);
+      /* write masked row */
+      rb->PutRow(ctx, rb, width, x, y + i, span.array->index, NULL);
    }
+}
+
+
+/**
+ * Clear an rgba color buffer without channel masking.
+ */
+static void
+clear_rgba_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
+{
+   const GLint x = ctx->DrawBuffer->_Xmin;
+   const GLint y = ctx->DrawBuffer->_Ymin;
+   const GLint height = ctx->DrawBuffer->_Ymax - ctx->DrawBuffer->_Ymin;
+   const GLint width  = ctx->DrawBuffer->_Xmax - ctx->DrawBuffer->_Xmin;
+   GLubyte clear8[4];
+   GLushort clear16[4];
+   GLvoid *clearVal;
+   GLint i;
+
+   ASSERT(ctx->Visual.rgbMode);
+
+   ASSERT(ctx->Color.ColorMask[0] &&
+          ctx->Color.ColorMask[1] &&
+          ctx->Color.ColorMask[2] &&
+          ctx->Color.ColorMask[3]);             
+
+   ASSERT(rb->PutMonoRow);
+
+   switch (rb->DataType) {
+      case GL_UNSIGNED_BYTE:
+         UNCLAMPED_FLOAT_TO_UBYTE(clear8[0], ctx->Color.ClearColor[0]);
+         UNCLAMPED_FLOAT_TO_UBYTE(clear8[1], ctx->Color.ClearColor[1]);
+         UNCLAMPED_FLOAT_TO_UBYTE(clear8[2], ctx->Color.ClearColor[2]);
+         UNCLAMPED_FLOAT_TO_UBYTE(clear8[3], ctx->Color.ClearColor[3]);
+         clearVal = clear8;
+         break;
+      case GL_UNSIGNED_SHORT:
+         UNCLAMPED_FLOAT_TO_USHORT(clear16[0], ctx->Color.ClearColor[0]);
+         UNCLAMPED_FLOAT_TO_USHORT(clear16[1], ctx->Color.ClearColor[1]);
+         UNCLAMPED_FLOAT_TO_USHORT(clear16[2], ctx->Color.ClearColor[2]);
+         UNCLAMPED_FLOAT_TO_USHORT(clear16[3], ctx->Color.ClearColor[3]);
+         clearVal = clear16;
+         break;
+      case GL_FLOAT:
+         clearVal = ctx->Color.ClearColor;
+         break;
+      default:
+         _mesa_problem(ctx, "Bad rb DataType in clear_color_buffer");
+         return;
+   }
+
+   for (i = 0; i < height; i++) {
+      rb->PutMonoRow(ctx, rb, width, x, y + i, clearVal, NULL);
+   }
+}
+
+
+/**
+ * Clear color index buffer without masking.
+ */
+static void
+clear_ci_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
+{
+   const GLint x = ctx->DrawBuffer->_Xmin;
+   const GLint y = ctx->DrawBuffer->_Ymin;
+   const GLint height = ctx->DrawBuffer->_Ymax - ctx->DrawBuffer->_Ymin;
+   const GLint width  = ctx->DrawBuffer->_Xmax - ctx->DrawBuffer->_Xmin;
+   GLubyte clear8;
+   GLushort clear16;
+   GLuint clear32;
+   GLvoid *clearVal;
+   GLint i;
+
+   ASSERT(!ctx->Visual.rgbMode);
+
+   ASSERT((ctx->Color.IndexMask & ((1 << rb->IndexBits) - 1))
+          == (GLuint) ((1 << rb->IndexBits) - 1));
+
+   ASSERT(rb->PutMonoRow);
+
+   /* setup clear value */
+   switch (rb->DataType) {
+      case GL_UNSIGNED_BYTE:
+         clear8 = (GLubyte) ctx->Color.ClearIndex;
+         clearVal = &clear8;
+         break;
+      case GL_UNSIGNED_SHORT:
+         clear16 = (GLushort) ctx->Color.ClearIndex;
+         clearVal = &clear16;
+         break;
+      case GL_UNSIGNED_INT:
+         clear32 = ctx->Color.ClearIndex;
+         clearVal = &clear32;
+         break;
+      default:
+         _mesa_problem(ctx, "Bad rb DataType in clear_color_buffer");
+         return;
+   }
+
+   for (i = 0; i < height; i++)
+      rb->PutMonoRow(ctx, rb, width, x, y + i, clearVal, NULL);
 }
 
 
@@ -141,191 +243,101 @@ clear_color_buffer(GLcontext *ctx)
 static void
 clear_color_buffers(GLcontext *ctx)
 {
-   SWcontext *swrast = SWRAST_CONTEXT(ctx);
-   const GLuint colorMask = *((GLuint *) &ctx->Color.ColorMask);
-   GLuint bufferBit;
+   GLboolean masking;
+   GLuint i;
 
-   /* loop over four possible dest color buffers */
-   for (bufferBit = 1; bufferBit <= DD_AUX3_BIT; bufferBit <<= 1) {
-      if (bufferBit & ctx->Color._DrawDestMask[0]) {
-         (*swrast->Driver.SetBuffer)(ctx, ctx->DrawBuffer, bufferBit);
-
-         if (colorMask != 0xffffffff) {
-            clear_color_buffer_with_masking(ctx);
-         }
-         else {
-            clear_color_buffer(ctx);
-         }
+   if (ctx->Visual.rgbMode) {
+      if (ctx->Color.ColorMask[0] && 
+          ctx->Color.ColorMask[1] && 
+          ctx->Color.ColorMask[2] && 
+          ctx->Color.ColorMask[3]) {
+         masking = GL_FALSE;
+      }
+      else {
+         masking = GL_TRUE;
+      }
+   }
+   else {
+      struct gl_renderbuffer *rb = ctx->DrawBuffer->_ColorDrawBuffers[0][0];
+      const GLuint indexBits = (1 << rb->IndexBits) - 1;
+      if ((ctx->Color.IndexMask & indexBits) == indexBits) {
+         masking = GL_FALSE;
+      }
+      else {
+         masking = GL_TRUE;
       }
    }
 
-   /* restore default read/draw buffer */
-   _swrast_use_draw_buffer(ctx);
+   for (i = 0; i < ctx->DrawBuffer->_NumColorDrawBuffers[0]; i++) {
+      struct gl_renderbuffer *rb = ctx->DrawBuffer->_ColorDrawBuffers[0][i];
+      if (ctx->Visual.rgbMode) {
+         if (masking) {
+            clear_rgba_buffer_with_masking(ctx, rb);
+         }
+         else {
+            clear_rgba_buffer(ctx, rb);
+         }
+      }
+      else {
+         if (masking) {
+            clear_ci_buffer_with_masking(ctx, rb);
+         }
+         else {
+            clear_ci_buffer(ctx, rb);
+         }
+      }
+   }
 }
 
 
 /**
  * Called via the device driver's ctx->Driver.Clear() function if the
  * device driver can't clear one or more of the buffers itself.
- * \param mask  bitwise-OR of DD_*_BIT flags.
+ * \param buffers  bitfield of BUFFER_BIT_* values indicating which
+ *                 renderbuffers are to be cleared.
  * \param all  if GL_TRUE, clear whole buffer, else clear specified region.
  */
 void
-_swrast_Clear( GLcontext *ctx, GLbitfield mask,
-	       GLboolean all,
-	       GLint x, GLint y, GLint width, GLint height )
+_swrast_Clear(GLcontext *ctx, GLbitfield buffers)
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
-   (void) all; (void) x; (void) y; (void) width; (void) height;
-#ifdef DEBUG
+
+#ifdef DEBUG_FOO
    {
       const GLbitfield legalBits =
-         DD_FRONT_LEFT_BIT |
-	 DD_FRONT_RIGHT_BIT |
-	 DD_BACK_LEFT_BIT |
-	 DD_BACK_RIGHT_BIT |
-	 DD_DEPTH_BIT |
-	 DD_STENCIL_BIT |
-	 DD_ACCUM_BIT |
-         DD_AUX0_BIT |
-         DD_AUX1_BIT |
-         DD_AUX2_BIT |
-         DD_AUX3_BIT;
-      assert((mask & (~legalBits)) == 0);
+         BUFFER_BIT_FRONT_LEFT |
+	 BUFFER_BIT_FRONT_RIGHT |
+	 BUFFER_BIT_BACK_LEFT |
+	 BUFFER_BIT_BACK_RIGHT |
+	 BUFFER_BIT_DEPTH |
+	 BUFFER_BIT_STENCIL |
+	 BUFFER_BIT_ACCUM |
+         BUFFER_BIT_AUX0 |
+         BUFFER_BIT_AUX1 |
+         BUFFER_BIT_AUX2 |
+         BUFFER_BIT_AUX3;
+      assert((buffers & (~legalBits)) == 0);
    }
 #endif
 
    RENDER_START(swrast,ctx);
 
    /* do software clearing here */
-   if (mask) {
-      if (mask & ctx->Color._DrawDestMask[0]) {
+   if (buffers) {
+      if (buffers & ctx->DrawBuffer->_ColorDrawBufferMask[0]) {
          clear_color_buffers(ctx);
-         /* clear software-based alpha buffer(s) */
-         if (ctx->DrawBuffer->UseSoftwareAlphaBuffers
-             && ctx->Color.ColorMask[ACOMP]) {
-            _swrast_clear_alpha_buffers( ctx );
-         }
       }
-      if (mask & DD_DEPTH_BIT) {
-         _swrast_clear_depth_buffer(ctx);
+      if (buffers & BUFFER_BIT_DEPTH) {
+         _swrast_clear_depth_buffer(ctx, ctx->DrawBuffer->_DepthBuffer);
       }
-      if (mask & DD_ACCUM_BIT) {
-         _swrast_clear_accum_buffer(ctx);
+      if (buffers & BUFFER_BIT_ACCUM) {
+         _swrast_clear_accum_buffer(ctx,
+                       ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer);
       }
-      if (mask & DD_STENCIL_BIT) {
-         _swrast_clear_stencil_buffer(ctx);
+      if (buffers & BUFFER_BIT_STENCIL) {
+         _swrast_clear_stencil_buffer(ctx, ctx->DrawBuffer->_StencilBuffer);
       }
    }
 
    RENDER_FINISH(swrast,ctx);
-}
-
-
-/**
- * Typically called via ctx->Driver.ResizeBuffers().
- * Reallocate all software-based depth/stencil/accum/etc buffers
- * to match current window dimensions.
- */
-void
-_swrast_alloc_buffers( GLframebuffer *buffer )
-{
-   /* Reallocate other buffers if needed. */
-   if (buffer->UseSoftwareDepthBuffer) {
-      _swrast_alloc_depth_buffer( buffer );
-   }
-   if (buffer->UseSoftwareStencilBuffer) {
-      _swrast_alloc_stencil_buffer( buffer );
-   }
-   if (buffer->UseSoftwareAccumBuffer) {
-      _swrast_alloc_accum_buffer( buffer );
-   }
-   if (buffer->UseSoftwareAlphaBuffers) {
-      _swrast_alloc_alpha_buffers( buffer );
-   }
-   if (buffer->UseSoftwareAuxBuffers) {
-      _swrast_alloc_aux_buffers( buffer );
-   }
-}
-
-
-/*
- * Fallback for ctx->Driver.DrawBuffer()
- */
-void
-_swrast_DrawBuffer( GLcontext *ctx, GLenum mode )
-{
-   (void) mode;
-   _swrast_use_draw_buffer(ctx);
-}
-
-
-/*
- * Fallback for ctx->Driver.DrawBuffers()
- */
-void
-_swrast_DrawBuffers( GLcontext *ctx, GLsizei n, const GLenum *buffers )
-{
-   _swrast_use_draw_buffer(ctx);
-}
-
-
-/*
- * Setup things so that we read/write spans from the user-designated
- * read buffer (set via glReadPixels).  We usually just have to call
- * this for glReadPixels, glCopyPixels, etc.
- */
-void
-_swrast_use_read_buffer( GLcontext *ctx )
-{
-   SWcontext *swrast = SWRAST_CONTEXT(ctx);
-
-   /* Do this so the software-emulated alpha plane span functions work! */
-   swrast->CurrentBufferBit = ctx->Pixel._ReadSrcMask;
-   /* Tell the device driver where to read/write spans */
-   swrast->Driver.SetBuffer(ctx, ctx->ReadBuffer, swrast->CurrentBufferBit);
-}
-
-
-/*
- * Setup things so that we read/write spans from the default draw buffer.
- * This is the usual mode that Mesa's software rasterizer operates in.
- */
-void
-_swrast_use_draw_buffer( GLcontext *ctx )
-{
-   SWcontext *swrast = SWRAST_CONTEXT(ctx);
-
-   /* The user can specify rendering to zero, one, two, or four color
-    * buffers simultaneously with glDrawBuffer()!
-    * We don't expect the span/point/line/triangle functions to deal with
-    * that mess so we'll iterate over the multiple buffers as needed.
-    * But usually we only render to one color buffer at a time.
-    * We set ctx->Color._DriverDrawBuffer to that buffer and tell the
-    * device driver to use that buffer.
-    * Look in s_span.c's multi_write_rgba_span() function to see how
-    * we loop over multiple color buffers when needed.
-    */
-
-   if (ctx->Color._DrawDestMask[0] & DD_FRONT_LEFT_BIT)
-      swrast->CurrentBufferBit = DD_FRONT_LEFT_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_BACK_LEFT_BIT)
-      swrast->CurrentBufferBit = DD_BACK_LEFT_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_FRONT_RIGHT_BIT)
-      swrast->CurrentBufferBit = DD_FRONT_RIGHT_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_BACK_RIGHT_BIT)
-      swrast->CurrentBufferBit = DD_BACK_RIGHT_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_AUX0_BIT)
-      swrast->CurrentBufferBit = DD_AUX0_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_AUX1_BIT)
-      swrast->CurrentBufferBit = DD_AUX1_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_AUX2_BIT)
-      swrast->CurrentBufferBit = DD_AUX2_BIT;
-   else if (ctx->Color._DrawDestMask[0] & DD_AUX3_BIT)
-      swrast->CurrentBufferBit = DD_AUX3_BIT;
-   else
-      /* glDrawBuffer(GL_NONE) */
-      swrast->CurrentBufferBit = DD_FRONT_LEFT_BIT; /* we always have this buffer */
-
-   swrast->Driver.SetBuffer(ctx, ctx->DrawBuffer, swrast->CurrentBufferBit);
 }

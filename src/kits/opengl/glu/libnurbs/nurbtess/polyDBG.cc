@@ -621,6 +621,7 @@ directedLine* DBG_cutIntersectionPoly(directedLine *polygon, int& cutOccur)
 //given a polygon, cut the edges off and finally obtain a
 //a polygon without intersections. The cut-off edges are
 //dealloated. The new polygon is returned.
+#if 0 // UNUSED
 static directedLine* DBG_cutIntersectionPoly_notwork(directedLine *polygon)
 {
   directedLine *crt;//current polygon
@@ -673,6 +674,7 @@ static directedLine* DBG_cutIntersectionPoly_notwork(directedLine *polygon)
 	find = 0;    //go to next loop
 }
 }
+#endif
 
 directedLine* DBG_cutIntersectionAllPoly(directedLine* list)
 {

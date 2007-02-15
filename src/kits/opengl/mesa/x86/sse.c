@@ -35,7 +35,7 @@
 #include "sse.h"
 #include "common_x86_macros.h"
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
 #include "math/m_debug.h"
 #endif
 
@@ -114,7 +114,7 @@ void _mesa_init_sse_transform_asm( void )
    ASSIGN_NORM_GROUP( sse );
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUG_MATH
    _math_test_all_transform_functions( "SSE" );
    _math_test_all_normal_transform_functions( "SSE" );
 #endif

@@ -1,4 +1,4 @@
-/* $Id: sse_xform4.S,v 1.3 2005/01/04 14:33:47 brianp Exp $ */
+/* $Id: sse_xform4.S,v 1.4 2006/04/17 18:58:24 krh Exp $ */
 
 /*
  * Mesa 3-D graphics library
@@ -228,4 +228,8 @@ LLBL( sse_identity_done ):
 	POP_L( EDI )
 	POP_L( ESI )
 	RET
+#endif
+	
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
 #endif

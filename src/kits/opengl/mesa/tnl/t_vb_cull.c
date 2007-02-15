@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -52,10 +52,17 @@ static GLboolean run_cull_stage( GLcontext *ctx,
    const GLfloat a = ctx->Transform.CullObjPos[0];
    const GLfloat b = ctx->Transform.CullObjPos[1];
    const GLfloat c = ctx->Transform.CullObjPos[2];
-   GLfloat *norm = (GLfloat *)VB->NormalPtr->data;
-   GLuint stride = VB->NormalPtr->stride;
+   GLfloat *norm = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
+   GLuint stride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
    GLuint count = VB->Count;
    GLuint i;
+
+   if (ctx->ShaderObjects._VertexShaderPresent)
+      return GL_TRUE;
+
+   if (ctx->VertexProgram._Enabled ||
+       !ctx->Transform.CullVertexFlag) 
+      return GL_TRUE;
 
    VB->ClipOrMask &= ~CLIP_CULL_BIT;
    VB->ClipAndMask |= CLIP_CULL_BIT;
@@ -81,31 +88,13 @@ static GLboolean run_cull_stage( GLcontext *ctx,
 }
 
 
-static void check_cull( GLcontext *ctx, struct tnl_pipeline_stage *stage )
-{
-   stage->active = (!ctx->VertexProgram._Enabled &&
-		    ctx->Transform.CullVertexFlag);
-}
-
-
-static void dtr( struct tnl_pipeline_stage *stage )
-{
-}
-
 
 const struct tnl_pipeline_stage _tnl_vertex_cull_stage =
 {
    "EXT_cull_vertex",
-   _NEW_PROGRAM | 
-   _NEW_TRANSFORM,  
-   _NEW_TRANSFORM,
-   GL_TRUE,			/* active */
-   _TNL_BIT_NORMAL | 
-   _TNL_BIT_POS,		/* inputs */
-   _TNL_BIT_POS,		/* outputs */
-   0,				/* changed_inputs */
    NULL,			/* private data */
-   dtr,				/* destructor */
-   check_cull,		/* check */
+   NULL,				/* ctr */
+   NULL,				/* destructor */
+   NULL,
    run_cull_stage		/* run -- initially set to init */
 };

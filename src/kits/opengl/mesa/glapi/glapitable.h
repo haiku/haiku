@@ -1,4 +1,4 @@
-/* DO NOT EDIT - This file generated automatically by a script */
+/* DO NOT EDIT - This file generated automatically by gl_table.py (from Mesa) script */
 
 /*
  * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
@@ -26,12 +26,14 @@
  * SOFTWARE.
  */
 
-#ifndef _GLAPI_TABLE_H_
-#define _GLAPI_TABLE_H_
+#if !defined( _GLAPI_TABLE_H_ )
+#  define _GLAPI_TABLE_H_
 
 #ifndef GLAPIENTRYP
 #define GLAPIENTRYP
 #endif
+
+typedef void (*_glapi_proc)(void); /* generic function pointer */
 
 struct _glapi_table
 {
@@ -443,394 +445,370 @@ struct _glapi_table
    void (GLAPIENTRYP MultiTexCoord4ivARB)(GLenum target, const GLint * v); /* 405 */
    void (GLAPIENTRYP MultiTexCoord4sARB)(GLenum target, GLshort s, GLshort t, GLshort r, GLshort q); /* 406 */
    void (GLAPIENTRYP MultiTexCoord4svARB)(GLenum target, const GLshort * v); /* 407 */
-   void (GLAPIENTRYP LoadTransposeMatrixfARB)(const GLfloat * m); /* 408 */
-   void (GLAPIENTRYP LoadTransposeMatrixdARB)(const GLdouble * m); /* 409 */
-   void (GLAPIENTRYP MultTransposeMatrixfARB)(const GLfloat * m); /* 410 */
-   void (GLAPIENTRYP MultTransposeMatrixdARB)(const GLdouble * m); /* 411 */
-   void (GLAPIENTRYP SampleCoverageARB)(GLclampf value, GLboolean invert); /* 412 */
-   void (GLAPIENTRYP DrawBuffersARB)(GLsizei n, const GLenum * bufs); /* 413 */
-   void (GLAPIENTRYP PolygonOffsetEXT)(GLfloat factor, GLfloat bias); /* 414 */
-   void (GLAPIENTRYP GetTexFilterFuncSGIS)(GLenum target, GLenum filter, GLfloat * weights); /* 415 */
-   void (GLAPIENTRYP TexFilterFuncSGIS)(GLenum target, GLenum filter, GLsizei n, const GLfloat * weights); /* 416 */
-   void (GLAPIENTRYP GetHistogramEXT)(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid * values); /* 417 */
-   void (GLAPIENTRYP GetHistogramParameterfvEXT)(GLenum target, GLenum pname, GLfloat * params); /* 418 */
-   void (GLAPIENTRYP GetHistogramParameterivEXT)(GLenum target, GLenum pname, GLint * params); /* 419 */
-   void (GLAPIENTRYP GetMinmaxEXT)(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid * values); /* 420 */
-   void (GLAPIENTRYP GetMinmaxParameterfvEXT)(GLenum target, GLenum pname, GLfloat * params); /* 421 */
-   void (GLAPIENTRYP GetMinmaxParameterivEXT)(GLenum target, GLenum pname, GLint * params); /* 422 */
-   void (GLAPIENTRYP GetConvolutionFilterEXT)(GLenum target, GLenum format, GLenum type, GLvoid * image); /* 423 */
-   void (GLAPIENTRYP GetConvolutionParameterfvEXT)(GLenum target, GLenum pname, GLfloat * params); /* 424 */
-   void (GLAPIENTRYP GetConvolutionParameterivEXT)(GLenum target, GLenum pname, GLint * params); /* 425 */
-   void (GLAPIENTRYP GetSeparableFilterEXT)(GLenum target, GLenum format, GLenum type, GLvoid * row, GLvoid * column, GLvoid * span); /* 426 */
-   void (GLAPIENTRYP GetColorTableSGI)(GLenum target, GLenum format, GLenum type, GLvoid * table); /* 427 */
-   void (GLAPIENTRYP GetColorTableParameterfvSGI)(GLenum target, GLenum pname, GLfloat * params); /* 428 */
-   void (GLAPIENTRYP GetColorTableParameterivSGI)(GLenum target, GLenum pname, GLint * params); /* 429 */
-   void (GLAPIENTRYP PixelTexGenSGIX)(GLenum mode); /* 430 */
-   void (GLAPIENTRYP PixelTexGenParameteriSGIS)(GLenum pname, GLint param); /* 431 */
-   void (GLAPIENTRYP PixelTexGenParameterivSGIS)(GLenum pname, const GLint * params); /* 432 */
-   void (GLAPIENTRYP PixelTexGenParameterfSGIS)(GLenum pname, GLfloat param); /* 433 */
-   void (GLAPIENTRYP PixelTexGenParameterfvSGIS)(GLenum pname, const GLfloat * params); /* 434 */
-   void (GLAPIENTRYP GetPixelTexGenParameterivSGIS)(GLenum pname, GLint * params); /* 435 */
-   void (GLAPIENTRYP GetPixelTexGenParameterfvSGIS)(GLenum pname, GLfloat * params); /* 436 */
-   void (GLAPIENTRYP TexImage4DSGIS)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLsizei size4d, GLint border, GLenum format, GLenum type, const GLvoid * pixels); /* 437 */
-   void (GLAPIENTRYP TexSubImage4DSGIS)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint woffset, GLsizei width, GLsizei height, GLsizei depth, GLsizei size4d, GLenum format, GLenum type, const GLvoid * pixels); /* 438 */
-   GLboolean (GLAPIENTRYP AreTexturesResidentEXT)(GLsizei n, const GLuint * textures, GLboolean * residences); /* 439 */
-   void (GLAPIENTRYP GenTexturesEXT)(GLsizei n, GLuint * textures); /* 440 */
-   GLboolean (GLAPIENTRYP IsTextureEXT)(GLuint texture); /* 441 */
-   void (GLAPIENTRYP DetailTexFuncSGIS)(GLenum target, GLsizei n, const GLfloat * points); /* 442 */
-   void (GLAPIENTRYP GetDetailTexFuncSGIS)(GLenum target, GLfloat * points); /* 443 */
-   void (GLAPIENTRYP SharpenTexFuncSGIS)(GLenum target, GLsizei n, const GLfloat * points); /* 444 */
-   void (GLAPIENTRYP GetSharpenTexFuncSGIS)(GLenum target, GLfloat * points); /* 445 */
-   void (GLAPIENTRYP SampleMaskSGIS)(GLclampf value, GLboolean invert); /* 446 */
-   void (GLAPIENTRYP SamplePatternSGIS)(GLenum pattern); /* 447 */
-   void (GLAPIENTRYP ColorPointerEXT)(GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 448 */
-   void (GLAPIENTRYP EdgeFlagPointerEXT)(GLsizei stride, GLsizei count, const GLboolean * pointer); /* 449 */
-   void (GLAPIENTRYP IndexPointerEXT)(GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 450 */
-   void (GLAPIENTRYP NormalPointerEXT)(GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 451 */
-   void (GLAPIENTRYP TexCoordPointerEXT)(GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 452 */
-   void (GLAPIENTRYP VertexPointerEXT)(GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 453 */
-   void (GLAPIENTRYP SpriteParameterfSGIX)(GLenum pname, GLfloat param); /* 454 */
-   void (GLAPIENTRYP SpriteParameterfvSGIX)(GLenum pname, const GLfloat * params); /* 455 */
-   void (GLAPIENTRYP SpriteParameteriSGIX)(GLenum pname, GLint param); /* 456 */
-   void (GLAPIENTRYP SpriteParameterivSGIX)(GLenum pname, const GLint * params); /* 457 */
-   void (GLAPIENTRYP PointParameterfEXT)(GLenum pname, GLfloat param); /* 458 */
-   void (GLAPIENTRYP PointParameterfvEXT)(GLenum pname, const GLfloat * params); /* 459 */
-   GLint (GLAPIENTRYP GetInstrumentsSGIX)(void); /* 460 */
-   void (GLAPIENTRYP InstrumentsBufferSGIX)(GLsizei size, GLint * buffer); /* 461 */
-   GLint (GLAPIENTRYP PollInstrumentsSGIX)(GLint * marker_p); /* 462 */
-   void (GLAPIENTRYP ReadInstrumentsSGIX)(GLint marker); /* 463 */
-   void (GLAPIENTRYP StartInstrumentsSGIX)(void); /* 464 */
-   void (GLAPIENTRYP StopInstrumentsSGIX)(GLint marker); /* 465 */
-   void (GLAPIENTRYP FrameZoomSGIX)(GLint factor); /* 466 */
-   void (GLAPIENTRYP TagSampleBufferSGIX)(void); /* 467 */
-   void (GLAPIENTRYP ReferencePlaneSGIX)(const GLdouble * equation); /* 468 */
-   void (GLAPIENTRYP FlushRasterSGIX)(void); /* 469 */
-   void (GLAPIENTRYP GetListParameterfvSGIX)(GLuint list, GLenum pname, GLfloat * params); /* 470 */
-   void (GLAPIENTRYP GetListParameterivSGIX)(GLuint list, GLenum pname, GLint * params); /* 471 */
-   void (GLAPIENTRYP ListParameterfSGIX)(GLuint list, GLenum pname, GLfloat param); /* 472 */
-   void (GLAPIENTRYP ListParameterfvSGIX)(GLuint list, GLenum pname, const GLfloat * params); /* 473 */
-   void (GLAPIENTRYP ListParameteriSGIX)(GLuint list, GLenum pname, GLint param); /* 474 */
-   void (GLAPIENTRYP ListParameterivSGIX)(GLuint list, GLenum pname, const GLint * params); /* 475 */
-   void (GLAPIENTRYP FragmentColorMaterialSGIX)(GLenum face, GLenum mode); /* 476 */
-   void (GLAPIENTRYP FragmentLightfSGIX)(GLenum light, GLenum pname, GLfloat param); /* 477 */
-   void (GLAPIENTRYP FragmentLightfvSGIX)(GLenum light, GLenum pname, const GLfloat * params); /* 478 */
-   void (GLAPIENTRYP FragmentLightiSGIX)(GLenum light, GLenum pname, GLint param); /* 479 */
-   void (GLAPIENTRYP FragmentLightivSGIX)(GLenum light, GLenum pname, const GLint * params); /* 480 */
-   void (GLAPIENTRYP FragmentLightModelfSGIX)(GLenum pname, GLfloat param); /* 481 */
-   void (GLAPIENTRYP FragmentLightModelfvSGIX)(GLenum pname, const GLfloat * params); /* 482 */
-   void (GLAPIENTRYP FragmentLightModeliSGIX)(GLenum pname, GLint param); /* 483 */
-   void (GLAPIENTRYP FragmentLightModelivSGIX)(GLenum pname, const GLint * params); /* 484 */
-   void (GLAPIENTRYP FragmentMaterialfSGIX)(GLenum face, GLenum pname, GLfloat param); /* 485 */
-   void (GLAPIENTRYP FragmentMaterialfvSGIX)(GLenum face, GLenum pname, const GLfloat * params); /* 486 */
-   void (GLAPIENTRYP FragmentMaterialiSGIX)(GLenum face, GLenum pname, GLint param); /* 487 */
-   void (GLAPIENTRYP FragmentMaterialivSGIX)(GLenum face, GLenum pname, const GLint * params); /* 488 */
-   void (GLAPIENTRYP GetFragmentLightfvSGIX)(GLenum light, GLenum pname, GLfloat * params); /* 489 */
-   void (GLAPIENTRYP GetFragmentLightivSGIX)(GLenum light, GLenum pname, GLint * params); /* 490 */
-   void (GLAPIENTRYP GetFragmentMaterialfvSGIX)(GLenum face, GLenum pname, GLfloat * params); /* 491 */
-   void (GLAPIENTRYP GetFragmentMaterialivSGIX)(GLenum face, GLenum pname, GLint * params); /* 492 */
-   void (GLAPIENTRYP LightEnviSGIX)(GLenum pname, GLint param); /* 493 */
-   void (GLAPIENTRYP VertexWeightfEXT)(GLfloat weight); /* 494 */
-   void (GLAPIENTRYP VertexWeightfvEXT)(const GLfloat * weight); /* 495 */
-   void (GLAPIENTRYP VertexWeightPointerEXT)(GLsizei size, GLenum type, GLsizei stride, const GLvoid * pointer); /* 496 */
-   void (GLAPIENTRYP FlushVertexArrayRangeNV)(void); /* 497 */
-   void (GLAPIENTRYP VertexArrayRangeNV)(GLsizei length, const GLvoid * pointer); /* 498 */
-   void (GLAPIENTRYP CombinerParameterfvNV)(GLenum pname, const GLfloat * params); /* 499 */
-   void (GLAPIENTRYP CombinerParameterfNV)(GLenum pname, GLfloat param); /* 500 */
-   void (GLAPIENTRYP CombinerParameterivNV)(GLenum pname, const GLint * params); /* 501 */
-   void (GLAPIENTRYP CombinerParameteriNV)(GLenum pname, GLint param); /* 502 */
-   void (GLAPIENTRYP CombinerInputNV)(GLenum stage, GLenum portion, GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage); /* 503 */
-   void (GLAPIENTRYP CombinerOutputNV)(GLenum stage, GLenum portion, GLenum abOutput, GLenum cdOutput, GLenum sumOutput, GLenum scale, GLenum bias, GLboolean abDotProduct, GLboolean cdDotProduct, GLboolean muxSum); /* 504 */
-   void (GLAPIENTRYP FinalCombinerInputNV)(GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage); /* 505 */
-   void (GLAPIENTRYP GetCombinerInputParameterfvNV)(GLenum stage, GLenum portion, GLenum variable, GLenum pname, GLfloat * params); /* 506 */
-   void (GLAPIENTRYP GetCombinerInputParameterivNV)(GLenum stage, GLenum portion, GLenum variable, GLenum pname, GLint * params); /* 507 */
-   void (GLAPIENTRYP GetCombinerOutputParameterfvNV)(GLenum stage, GLenum portion, GLenum pname, GLfloat * params); /* 508 */
-   void (GLAPIENTRYP GetCombinerOutputParameterivNV)(GLenum stage, GLenum portion, GLenum pname, GLint * params); /* 509 */
-   void (GLAPIENTRYP GetFinalCombinerInputParameterfvNV)(GLenum variable, GLenum pname, GLfloat * params); /* 510 */
-   void (GLAPIENTRYP GetFinalCombinerInputParameterivNV)(GLenum variable, GLenum pname, GLint * params); /* 511 */
-   void (GLAPIENTRYP ResizeBuffersMESA)(void); /* 512 */
-   void (GLAPIENTRYP WindowPos2dMESA)(GLdouble x, GLdouble y); /* 513 */
-   void (GLAPIENTRYP WindowPos2dvMESA)(const GLdouble * v); /* 514 */
-   void (GLAPIENTRYP WindowPos2fMESA)(GLfloat x, GLfloat y); /* 515 */
-   void (GLAPIENTRYP WindowPos2fvMESA)(const GLfloat * v); /* 516 */
-   void (GLAPIENTRYP WindowPos2iMESA)(GLint x, GLint y); /* 517 */
-   void (GLAPIENTRYP WindowPos2ivMESA)(const GLint * v); /* 518 */
-   void (GLAPIENTRYP WindowPos2sMESA)(GLshort x, GLshort y); /* 519 */
-   void (GLAPIENTRYP WindowPos2svMESA)(const GLshort * v); /* 520 */
-   void (GLAPIENTRYP WindowPos3dMESA)(GLdouble x, GLdouble y, GLdouble z); /* 521 */
-   void (GLAPIENTRYP WindowPos3dvMESA)(const GLdouble * v); /* 522 */
-   void (GLAPIENTRYP WindowPos3fMESA)(GLfloat x, GLfloat y, GLfloat z); /* 523 */
-   void (GLAPIENTRYP WindowPos3fvMESA)(const GLfloat * v); /* 524 */
-   void (GLAPIENTRYP WindowPos3iMESA)(GLint x, GLint y, GLint z); /* 525 */
-   void (GLAPIENTRYP WindowPos3ivMESA)(const GLint * v); /* 526 */
-   void (GLAPIENTRYP WindowPos3sMESA)(GLshort x, GLshort y, GLshort z); /* 527 */
-   void (GLAPIENTRYP WindowPos3svMESA)(const GLshort * v); /* 528 */
-   void (GLAPIENTRYP WindowPos4dMESA)(GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 529 */
-   void (GLAPIENTRYP WindowPos4dvMESA)(const GLdouble * v); /* 530 */
-   void (GLAPIENTRYP WindowPos4fMESA)(GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 531 */
-   void (GLAPIENTRYP WindowPos4fvMESA)(const GLfloat * v); /* 532 */
-   void (GLAPIENTRYP WindowPos4iMESA)(GLint x, GLint y, GLint z, GLint w); /* 533 */
-   void (GLAPIENTRYP WindowPos4ivMESA)(const GLint * v); /* 534 */
-   void (GLAPIENTRYP WindowPos4sMESA)(GLshort x, GLshort y, GLshort z, GLshort w); /* 535 */
-   void (GLAPIENTRYP WindowPos4svMESA)(const GLshort * v); /* 536 */
-   void (GLAPIENTRYP BlendFuncSeparateEXT)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha); /* 537 */
-   void (GLAPIENTRYP IndexMaterialEXT)(GLenum face, GLenum mode); /* 538 */
-   void (GLAPIENTRYP IndexFuncEXT)(GLenum func, GLclampf ref); /* 539 */
-   void (GLAPIENTRYP LockArraysEXT)(GLint first, GLsizei count); /* 540 */
-   void (GLAPIENTRYP UnlockArraysEXT)(void); /* 541 */
-   void (GLAPIENTRYP CullParameterdvEXT)(GLenum pname, GLdouble * params); /* 542 */
-   void (GLAPIENTRYP CullParameterfvEXT)(GLenum pname, GLfloat * params); /* 543 */
-   void (GLAPIENTRYP HintPGI)(GLenum target, GLint mode); /* 544 */
-   void (GLAPIENTRYP FogCoordfEXT)(GLfloat coord); /* 545 */
-   void (GLAPIENTRYP FogCoordfvEXT)(const GLfloat * coord); /* 546 */
-   void (GLAPIENTRYP FogCoorddEXT)(GLdouble coord); /* 547 */
-   void (GLAPIENTRYP FogCoorddvEXT)(const GLdouble * coord); /* 548 */
-   void (GLAPIENTRYP FogCoordPointerEXT)(GLenum type, GLsizei stride, const GLvoid * pointer); /* 549 */
-   void (GLAPIENTRYP GetColorTableEXT)(GLenum target, GLenum format, GLenum type, GLvoid * data); /* 550 */
-   void (GLAPIENTRYP GetColorTableParameterivEXT)(GLenum target, GLenum pname, GLint * params); /* 551 */
-   void (GLAPIENTRYP GetColorTableParameterfvEXT)(GLenum target, GLenum pname, GLfloat * params); /* 552 */
-   void (GLAPIENTRYP TbufferMask3DFX)(GLuint mask); /* 553 */
-   void (GLAPIENTRYP CompressedTexImage3DARB)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid * data); /* 554 */
-   void (GLAPIENTRYP CompressedTexImage2DARB)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data); /* 555 */
-   void (GLAPIENTRYP CompressedTexImage1DARB)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid * data); /* 556 */
-   void (GLAPIENTRYP CompressedTexSubImage3DARB)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid * data); /* 557 */
-   void (GLAPIENTRYP CompressedTexSubImage2DARB)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid * data); /* 558 */
-   void (GLAPIENTRYP CompressedTexSubImage1DARB)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid * data); /* 559 */
-   void (GLAPIENTRYP GetCompressedTexImageARB)(GLenum target, GLint level, GLvoid * img); /* 560 */
-   void (GLAPIENTRYP SecondaryColor3bEXT)(GLbyte red, GLbyte green, GLbyte blue); /* 561 */
-   void (GLAPIENTRYP SecondaryColor3bvEXT)(const GLbyte * v); /* 562 */
-   void (GLAPIENTRYP SecondaryColor3dEXT)(GLdouble red, GLdouble green, GLdouble blue); /* 563 */
-   void (GLAPIENTRYP SecondaryColor3dvEXT)(const GLdouble * v); /* 564 */
-   void (GLAPIENTRYP SecondaryColor3fEXT)(GLfloat red, GLfloat green, GLfloat blue); /* 565 */
-   void (GLAPIENTRYP SecondaryColor3fvEXT)(const GLfloat * v); /* 566 */
-   void (GLAPIENTRYP SecondaryColor3iEXT)(GLint red, GLint green, GLint blue); /* 567 */
-   void (GLAPIENTRYP SecondaryColor3ivEXT)(const GLint * v); /* 568 */
-   void (GLAPIENTRYP SecondaryColor3sEXT)(GLshort red, GLshort green, GLshort blue); /* 569 */
-   void (GLAPIENTRYP SecondaryColor3svEXT)(const GLshort * v); /* 570 */
-   void (GLAPIENTRYP SecondaryColor3ubEXT)(GLubyte red, GLubyte green, GLubyte blue); /* 571 */
-   void (GLAPIENTRYP SecondaryColor3ubvEXT)(const GLubyte * v); /* 572 */
-   void (GLAPIENTRYP SecondaryColor3uiEXT)(GLuint red, GLuint green, GLuint blue); /* 573 */
-   void (GLAPIENTRYP SecondaryColor3uivEXT)(const GLuint * v); /* 574 */
-   void (GLAPIENTRYP SecondaryColor3usEXT)(GLushort red, GLushort green, GLushort blue); /* 575 */
-   void (GLAPIENTRYP SecondaryColor3usvEXT)(const GLushort * v); /* 576 */
-   void (GLAPIENTRYP SecondaryColorPointerEXT)(GLint size, GLenum type, GLsizei stride, const GLvoid * pointer); /* 577 */
-   GLboolean (GLAPIENTRYP AreProgramsResidentNV)(GLsizei n, const GLuint * ids, GLboolean * residences); /* 578 */
-   void (GLAPIENTRYP BindProgramNV)(GLenum target, GLuint id); /* 579 */
-   void (GLAPIENTRYP DeleteProgramsNV)(GLsizei n, const GLuint * ids); /* 580 */
-   void (GLAPIENTRYP ExecuteProgramNV)(GLenum target, GLuint id, const GLfloat * params); /* 581 */
-   void (GLAPIENTRYP GenProgramsNV)(GLsizei n, GLuint * ids); /* 582 */
-   void (GLAPIENTRYP GetProgramParameterdvNV)(GLenum target, GLuint index, GLenum pname, GLdouble * params); /* 583 */
-   void (GLAPIENTRYP GetProgramParameterfvNV)(GLenum target, GLuint index, GLenum pname, GLfloat * params); /* 584 */
-   void (GLAPIENTRYP GetProgramivNV)(GLuint id, GLenum pname, GLint * params); /* 585 */
-   void (GLAPIENTRYP GetProgramStringNV)(GLuint id, GLenum pname, GLubyte * program); /* 586 */
-   void (GLAPIENTRYP GetTrackMatrixivNV)(GLenum target, GLuint address, GLenum pname, GLint * params); /* 587 */
-   void (GLAPIENTRYP GetVertexAttribdvARB)(GLuint index, GLenum pname, GLdouble * params); /* 588 */
-   void (GLAPIENTRYP GetVertexAttribfvARB)(GLuint index, GLenum pname, GLfloat * params); /* 589 */
-   void (GLAPIENTRYP GetVertexAttribivARB)(GLuint index, GLenum pname, GLint * params); /* 590 */
-   void (GLAPIENTRYP GetVertexAttribPointervNV)(GLuint index, GLenum pname, GLvoid ** pointer); /* 591 */
-   GLboolean (GLAPIENTRYP IsProgramNV)(GLuint id); /* 592 */
-   void (GLAPIENTRYP LoadProgramNV)(GLenum target, GLuint id, GLsizei len, const GLubyte * program); /* 593 */
-   void (GLAPIENTRYP ProgramParameter4dNV)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 594 */
-   void (GLAPIENTRYP ProgramParameter4dvNV)(GLenum target, GLuint index, const GLdouble * params); /* 595 */
-   void (GLAPIENTRYP ProgramParameter4fNV)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 596 */
-   void (GLAPIENTRYP ProgramParameter4fvNV)(GLenum target, GLuint index, const GLfloat * params); /* 597 */
-   void (GLAPIENTRYP ProgramParameters4dvNV)(GLenum target, GLuint index, GLuint num, const GLdouble * params); /* 598 */
-   void (GLAPIENTRYP ProgramParameters4fvNV)(GLenum target, GLuint index, GLuint num, const GLfloat * params); /* 599 */
-   void (GLAPIENTRYP RequestResidentProgramsNV)(GLsizei n, const GLuint * ids); /* 600 */
-   void (GLAPIENTRYP TrackMatrixNV)(GLenum target, GLuint address, GLenum matrix, GLenum transform); /* 601 */
-   void (GLAPIENTRYP VertexAttribPointerNV)(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer); /* 602 */
-   void (GLAPIENTRYP VertexAttrib1dARB)(GLuint index, GLdouble x); /* 603 */
-   void (GLAPIENTRYP VertexAttrib1dvARB)(GLuint index, const GLdouble * v); /* 604 */
-   void (GLAPIENTRYP VertexAttrib1fARB)(GLuint index, GLfloat x); /* 605 */
-   void (GLAPIENTRYP VertexAttrib1fvARB)(GLuint index, const GLfloat * v); /* 606 */
-   void (GLAPIENTRYP VertexAttrib1sARB)(GLuint index, GLshort x); /* 607 */
-   void (GLAPIENTRYP VertexAttrib1svARB)(GLuint index, const GLshort * v); /* 608 */
-   void (GLAPIENTRYP VertexAttrib2dARB)(GLuint index, GLdouble x, GLdouble y); /* 609 */
-   void (GLAPIENTRYP VertexAttrib2dvARB)(GLuint index, const GLdouble * v); /* 610 */
-   void (GLAPIENTRYP VertexAttrib2fARB)(GLuint index, GLfloat x, GLfloat y); /* 611 */
-   void (GLAPIENTRYP VertexAttrib2fvARB)(GLuint index, const GLfloat * v); /* 612 */
-   void (GLAPIENTRYP VertexAttrib2sARB)(GLuint index, GLshort x, GLshort y); /* 613 */
-   void (GLAPIENTRYP VertexAttrib2svARB)(GLuint index, const GLshort * v); /* 614 */
-   void (GLAPIENTRYP VertexAttrib3dARB)(GLuint index, GLdouble x, GLdouble y, GLdouble z); /* 615 */
-   void (GLAPIENTRYP VertexAttrib3dvARB)(GLuint index, const GLdouble * v); /* 616 */
-   void (GLAPIENTRYP VertexAttrib3fARB)(GLuint index, GLfloat x, GLfloat y, GLfloat z); /* 617 */
-   void (GLAPIENTRYP VertexAttrib3fvARB)(GLuint index, const GLfloat * v); /* 618 */
-   void (GLAPIENTRYP VertexAttrib3sARB)(GLuint index, GLshort x, GLshort y, GLshort z); /* 619 */
-   void (GLAPIENTRYP VertexAttrib3svARB)(GLuint index, const GLshort * v); /* 620 */
-   void (GLAPIENTRYP VertexAttrib4dARB)(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 621 */
-   void (GLAPIENTRYP VertexAttrib4dvARB)(GLuint index, const GLdouble * v); /* 622 */
-   void (GLAPIENTRYP VertexAttrib4fARB)(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 623 */
-   void (GLAPIENTRYP VertexAttrib4fvARB)(GLuint index, const GLfloat * v); /* 624 */
-   void (GLAPIENTRYP VertexAttrib4sARB)(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w); /* 625 */
-   void (GLAPIENTRYP VertexAttrib4svARB)(GLuint index, const GLshort * v); /* 626 */
-   void (GLAPIENTRYP VertexAttrib4NubARB)(GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w); /* 627 */
-   void (GLAPIENTRYP VertexAttrib4NubvARB)(GLuint index, const GLubyte * v); /* 628 */
-   void (GLAPIENTRYP VertexAttribs1dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 629 */
-   void (GLAPIENTRYP VertexAttribs1fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 630 */
-   void (GLAPIENTRYP VertexAttribs1svNV)(GLuint index, GLsizei n, const GLshort * v); /* 631 */
-   void (GLAPIENTRYP VertexAttribs2dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 632 */
-   void (GLAPIENTRYP VertexAttribs2fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 633 */
-   void (GLAPIENTRYP VertexAttribs2svNV)(GLuint index, GLsizei n, const GLshort * v); /* 634 */
-   void (GLAPIENTRYP VertexAttribs3dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 635 */
-   void (GLAPIENTRYP VertexAttribs3fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 636 */
-   void (GLAPIENTRYP VertexAttribs3svNV)(GLuint index, GLsizei n, const GLshort * v); /* 637 */
-   void (GLAPIENTRYP VertexAttribs4dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 638 */
-   void (GLAPIENTRYP VertexAttribs4fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 639 */
-   void (GLAPIENTRYP VertexAttribs4svNV)(GLuint index, GLsizei n, const GLshort * v); /* 640 */
-   void (GLAPIENTRYP VertexAttribs4ubvNV)(GLuint index, GLsizei n, const GLubyte * v); /* 641 */
-   void (GLAPIENTRYP PointParameteriNV)(GLenum pname, GLint params); /* 642 */
-   void (GLAPIENTRYP PointParameterivNV)(GLenum pname, const GLint * params); /* 643 */
-   void (GLAPIENTRYP MultiDrawArraysEXT)(GLenum mode, GLint * first, GLsizei * count, GLsizei primcount); /* 644 */
-   void (GLAPIENTRYP MultiDrawElementsEXT)(GLenum mode, const GLsizei * count, GLenum type, const GLvoid ** indices, GLsizei primcount); /* 645 */
-   void (GLAPIENTRYP ActiveStencilFaceEXT)(GLenum face); /* 646 */
-   void (GLAPIENTRYP DeleteFencesNV)(GLsizei n, const GLuint * fences); /* 647 */
-   void (GLAPIENTRYP GenFencesNV)(GLsizei n, GLuint * fences); /* 648 */
-   GLboolean (GLAPIENTRYP IsFenceNV)(GLuint fence); /* 649 */
-   GLboolean (GLAPIENTRYP TestFenceNV)(GLuint fence); /* 650 */
-   void (GLAPIENTRYP GetFenceivNV)(GLuint fence, GLenum pname, GLint * params); /* 651 */
-   void (GLAPIENTRYP FinishFenceNV)(GLuint fence); /* 652 */
-   void (GLAPIENTRYP SetFenceNV)(GLuint fence, GLenum condition); /* 653 */
-   void (GLAPIENTRYP VertexAttrib4bvARB)(GLuint index, const GLbyte * v); /* 654 */
-   void (GLAPIENTRYP VertexAttrib4ivARB)(GLuint index, const GLint * v); /* 655 */
-   void (GLAPIENTRYP VertexAttrib4ubvARB)(GLuint index, const GLubyte * v); /* 656 */
-   void (GLAPIENTRYP VertexAttrib4usvARB)(GLuint index, const GLushort * v); /* 657 */
-   void (GLAPIENTRYP VertexAttrib4uivARB)(GLuint index, const GLuint * v); /* 658 */
-   void (GLAPIENTRYP VertexAttrib4NbvARB)(GLuint index, const GLbyte * v); /* 659 */
-   void (GLAPIENTRYP VertexAttrib4NsvARB)(GLuint index, const GLshort * v); /* 660 */
-   void (GLAPIENTRYP VertexAttrib4NivARB)(GLuint index, const GLint * v); /* 661 */
-   void (GLAPIENTRYP VertexAttrib4NusvARB)(GLuint index, const GLushort * v); /* 662 */
-   void (GLAPIENTRYP VertexAttrib4NuivARB)(GLuint index, const GLuint * v); /* 663 */
-   void (GLAPIENTRYP VertexAttribPointerARB)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer); /* 664 */
-   void (GLAPIENTRYP EnableVertexAttribArrayARB)(GLuint index); /* 665 */
-   void (GLAPIENTRYP DisableVertexAttribArrayARB)(GLuint index); /* 666 */
-   void (GLAPIENTRYP ProgramStringARB)(GLenum target, GLenum format, GLsizei len, const GLvoid * string); /* 667 */
-   void (GLAPIENTRYP ProgramEnvParameter4dARB)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 668 */
-   void (GLAPIENTRYP ProgramEnvParameter4dvARB)(GLenum target, GLuint index, const GLdouble * params); /* 669 */
-   void (GLAPIENTRYP ProgramEnvParameter4fARB)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 670 */
-   void (GLAPIENTRYP ProgramEnvParameter4fvARB)(GLenum target, GLuint index, const GLfloat * params); /* 671 */
-   void (GLAPIENTRYP ProgramLocalParameter4dARB)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 672 */
-   void (GLAPIENTRYP ProgramLocalParameter4dvARB)(GLenum target, GLuint index, const GLdouble * params); /* 673 */
-   void (GLAPIENTRYP ProgramLocalParameter4fARB)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 674 */
-   void (GLAPIENTRYP ProgramLocalParameter4fvARB)(GLenum target, GLuint index, const GLfloat * params); /* 675 */
-   void (GLAPIENTRYP GetProgramEnvParameterdvARB)(GLenum target, GLuint index, GLdouble * params); /* 676 */
-   void (GLAPIENTRYP GetProgramEnvParameterfvARB)(GLenum target, GLuint index, GLfloat * params); /* 677 */
-   void (GLAPIENTRYP GetProgramLocalParameterdvARB)(GLenum target, GLuint index, GLdouble * params); /* 678 */
-   void (GLAPIENTRYP GetProgramLocalParameterfvARB)(GLenum target, GLuint index, GLfloat * params); /* 679 */
-   void (GLAPIENTRYP GetProgramivARB)(GLenum target, GLenum pname, GLint * params); /* 680 */
-   void (GLAPIENTRYP GetProgramStringARB)(GLenum target, GLenum pname, GLvoid * string); /* 681 */
-   void (GLAPIENTRYP ProgramNamedParameter4fNV)(GLuint id, GLsizei len, const GLubyte * name, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 682 */
-   void (GLAPIENTRYP ProgramNamedParameter4dNV)(GLuint id, GLsizei len, const GLubyte * name, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 683 */
-   void (GLAPIENTRYP ProgramNamedParameter4fvNV)(GLuint id, GLsizei len, const GLubyte * name, const GLfloat * v); /* 684 */
-   void (GLAPIENTRYP ProgramNamedParameter4dvNV)(GLuint id, GLsizei len, const GLubyte * name, const GLdouble * v); /* 685 */
-   void (GLAPIENTRYP GetProgramNamedParameterfvNV)(GLuint id, GLsizei len, const GLubyte * name, GLfloat * params); /* 686 */
-   void (GLAPIENTRYP GetProgramNamedParameterdvNV)(GLuint id, GLsizei len, const GLubyte * name, GLdouble * params); /* 687 */
-   void (GLAPIENTRYP BindBufferARB)(GLenum target, GLuint buffer); /* 688 */
-   void (GLAPIENTRYP BufferDataARB)(GLenum target, GLsizeiptrARB size, const GLvoid * data, GLenum usage); /* 689 */
-   void (GLAPIENTRYP BufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid * data); /* 690 */
-   void (GLAPIENTRYP DeleteBuffersARB)(GLsizei n, const GLuint * buffer); /* 691 */
-   void (GLAPIENTRYP GenBuffersARB)(GLsizei n, GLuint * buffer); /* 692 */
-   void (GLAPIENTRYP GetBufferParameterivARB)(GLenum target, GLenum pname, GLint * params); /* 693 */
-   void (GLAPIENTRYP GetBufferPointervARB)(GLenum target, GLenum pname, GLvoid ** params); /* 694 */
-   void (GLAPIENTRYP GetBufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, GLvoid * data); /* 695 */
-   GLboolean (GLAPIENTRYP IsBufferARB)(GLuint buffer); /* 696 */
-   GLvoid * (GLAPIENTRYP MapBufferARB)(GLenum target, GLenum access); /* 697 */
-   GLboolean (GLAPIENTRYP UnmapBufferARB)(GLenum target); /* 698 */
-   void (GLAPIENTRYP DepthBoundsEXT)(GLclampd zmin, GLclampd zmax); /* 699 */
-   void (GLAPIENTRYP GenQueriesARB)(GLsizei n, GLuint * ids); /* 700 */
-   void (GLAPIENTRYP DeleteQueriesARB)(GLsizei n, const GLuint * ids); /* 701 */
-   GLboolean (GLAPIENTRYP IsQueryARB)(GLuint id); /* 702 */
-   void (GLAPIENTRYP BeginQueryARB)(GLenum target, GLuint id); /* 703 */
-   void (GLAPIENTRYP EndQueryARB)(GLenum target); /* 704 */
-   void (GLAPIENTRYP GetQueryivARB)(GLenum target, GLenum pname, GLint * params); /* 705 */
-   void (GLAPIENTRYP GetQueryObjectivARB)(GLuint id, GLenum pname, GLint * params); /* 706 */
-   void (GLAPIENTRYP GetQueryObjectuivARB)(GLuint id, GLenum pname, GLuint * params); /* 707 */
-   void (GLAPIENTRYP MultiModeDrawArraysIBM)(const GLenum * mode, const GLint * first, const GLsizei * count, GLsizei primcount, GLint modestride); /* 708 */
-   void (GLAPIENTRYP MultiModeDrawElementsIBM)(const GLenum * mode, const GLsizei * count, GLenum type, const GLvoid * const * indices, GLsizei primcount, GLint modestride); /* 709 */
-   void (GLAPIENTRYP BlendEquationSeparateEXT)(GLenum modeRGB, GLenum modeA); /* 710 */
-   void (GLAPIENTRYP DeleteObjectARB)(GLhandleARB obj); /* 711 */
-   GLhandleARB (GLAPIENTRYP GetHandleARB)(GLenum pname); /* 712 */
-   void (GLAPIENTRYP DetachObjectARB)(GLhandleARB containerObj, GLhandleARB attachedObj); /* 713 */
-   GLhandleARB (GLAPIENTRYP CreateShaderObjectARB)(GLenum shaderType); /* 714 */
-   void (GLAPIENTRYP ShaderSourceARB)(GLhandleARB shaderObj, GLsizei count, const GLcharARB ** string, const GLint * length); /* 715 */
-   void (GLAPIENTRYP CompileShaderARB)(GLhandleARB shaderObj); /* 716 */
-   GLhandleARB (GLAPIENTRYP CreateProgramObjectARB)(void); /* 717 */
-   void (GLAPIENTRYP AttachObjectARB)(GLhandleARB containerObj, GLhandleARB obj); /* 718 */
-   void (GLAPIENTRYP LinkProgramARB)(GLhandleARB programObj); /* 719 */
-   void (GLAPIENTRYP UseProgramObjectARB)(GLhandleARB programObj); /* 720 */
-   void (GLAPIENTRYP ValidateProgramARB)(GLhandleARB programObj); /* 721 */
-   void (GLAPIENTRYP Uniform1fARB)(GLint location, GLfloat v0); /* 722 */
-   void (GLAPIENTRYP Uniform2fARB)(GLint location, GLfloat v0, GLfloat v1); /* 723 */
-   void (GLAPIENTRYP Uniform3fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2); /* 724 */
-   void (GLAPIENTRYP Uniform4fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3); /* 725 */
-   void (GLAPIENTRYP Uniform1iARB)(GLint location, GLint v0); /* 726 */
-   void (GLAPIENTRYP Uniform2iARB)(GLint location, GLint v0, GLint v1); /* 727 */
-   void (GLAPIENTRYP Uniform3iARB)(GLint location, GLint v0, GLint v1, GLint v2); /* 728 */
-   void (GLAPIENTRYP Uniform4iARB)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3); /* 729 */
-   void (GLAPIENTRYP Uniform1fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 730 */
-   void (GLAPIENTRYP Uniform2fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 731 */
-   void (GLAPIENTRYP Uniform3fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 732 */
-   void (GLAPIENTRYP Uniform4fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 733 */
-   void (GLAPIENTRYP Uniform1ivARB)(GLint location, GLsizei count, const GLint * value); /* 734 */
-   void (GLAPIENTRYP Uniform2ivARB)(GLint location, GLsizei count, const GLint * value); /* 735 */
-   void (GLAPIENTRYP Uniform3ivARB)(GLint location, GLsizei count, const GLint * value); /* 736 */
-   void (GLAPIENTRYP Uniform4ivARB)(GLint location, GLsizei count, const GLint * value); /* 737 */
-   void (GLAPIENTRYP UniformMatrix2fvARB)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 738 */
-   void (GLAPIENTRYP UniformMatrix3fvARB)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 739 */
-   void (GLAPIENTRYP UniformMatrix4fvARB)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 740 */
-   void (GLAPIENTRYP GetObjectParameterfvARB)(GLhandleARB obj, GLenum pname, GLfloat * params); /* 741 */
-   void (GLAPIENTRYP GetObjectParameterivARB)(GLhandleARB obj, GLenum pname, GLint * params); /* 742 */
-   void (GLAPIENTRYP GetInfoLogARB)(GLhandleARB obj, GLsizei maxLength, GLsizei * length, GLcharARB * infoLog); /* 743 */
-   void (GLAPIENTRYP GetAttachedObjectsARB)(GLhandleARB containerObj, GLsizei maxLength, GLsizei * length, GLhandleARB * infoLog); /* 744 */
-   GLint (GLAPIENTRYP GetUniformLocationARB)(GLhandleARB programObj, const GLcharARB * name); /* 745 */
-   void (GLAPIENTRYP GetActiveUniformARB)(GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei * length, GLint * size, GLenum * type, GLcharARB * name); /* 746 */
-   void (GLAPIENTRYP GetUniformfvARB)(GLhandleARB programObj, GLint location, GLfloat * params); /* 747 */
-   void (GLAPIENTRYP GetUniformivARB)(GLhandleARB programObj, GLint location, GLint * params); /* 748 */
-   void (GLAPIENTRYP GetShaderSourceARB)(GLhandleARB obj, GLsizei maxLength, GLsizei * length, GLcharARB * source); /* 749 */
-   void (GLAPIENTRYP BindAttribLocationARB)(GLhandleARB programObj, GLuint index, const GLcharARB * name); /* 750 */
-   void (GLAPIENTRYP GetActiveAttribARB)(GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei * length, GLint * size, GLenum * type, GLcharARB * name); /* 751 */
-   GLint (GLAPIENTRYP GetAttribLocationARB)(GLhandleARB programObj, const GLcharARB * name); /* 752 */
-   void (GLAPIENTRYP GetVertexAttribdvNV)(GLuint index, GLenum pname, GLdouble * params); /* 753 */
-   void (GLAPIENTRYP GetVertexAttribfvNV)(GLuint index, GLenum pname, GLfloat * params); /* 754 */
-   void (GLAPIENTRYP GetVertexAttribivNV)(GLuint index, GLenum pname, GLint * params); /* 755 */
-   void (GLAPIENTRYP VertexAttrib1dNV)(GLuint index, GLdouble x); /* 756 */
-   void (GLAPIENTRYP VertexAttrib1dvNV)(GLuint index, const GLdouble * v); /* 757 */
-   void (GLAPIENTRYP VertexAttrib1fNV)(GLuint index, GLfloat x); /* 758 */
-   void (GLAPIENTRYP VertexAttrib1fvNV)(GLuint index, const GLfloat * v); /* 759 */
-   void (GLAPIENTRYP VertexAttrib1sNV)(GLuint index, GLshort x); /* 760 */
-   void (GLAPIENTRYP VertexAttrib1svNV)(GLuint index, const GLshort * v); /* 761 */
-   void (GLAPIENTRYP VertexAttrib2dNV)(GLuint index, GLdouble x, GLdouble y); /* 762 */
-   void (GLAPIENTRYP VertexAttrib2dvNV)(GLuint index, const GLdouble * v); /* 763 */
-   void (GLAPIENTRYP VertexAttrib2fNV)(GLuint index, GLfloat x, GLfloat y); /* 764 */
-   void (GLAPIENTRYP VertexAttrib2fvNV)(GLuint index, const GLfloat * v); /* 765 */
-   void (GLAPIENTRYP VertexAttrib2sNV)(GLuint index, GLshort x, GLshort y); /* 766 */
-   void (GLAPIENTRYP VertexAttrib2svNV)(GLuint index, const GLshort * v); /* 767 */
-   void (GLAPIENTRYP VertexAttrib3dNV)(GLuint index, GLdouble x, GLdouble y, GLdouble z); /* 768 */
-   void (GLAPIENTRYP VertexAttrib3dvNV)(GLuint index, const GLdouble * v); /* 769 */
-   void (GLAPIENTRYP VertexAttrib3fNV)(GLuint index, GLfloat x, GLfloat y, GLfloat z); /* 770 */
-   void (GLAPIENTRYP VertexAttrib3fvNV)(GLuint index, const GLfloat * v); /* 771 */
-   void (GLAPIENTRYP VertexAttrib3sNV)(GLuint index, GLshort x, GLshort y, GLshort z); /* 772 */
-   void (GLAPIENTRYP VertexAttrib3svNV)(GLuint index, const GLshort * v); /* 773 */
-   void (GLAPIENTRYP VertexAttrib4dNV)(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 774 */
-   void (GLAPIENTRYP VertexAttrib4dvNV)(GLuint index, const GLdouble * v); /* 775 */
-   void (GLAPIENTRYP VertexAttrib4fNV)(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 776 */
-   void (GLAPIENTRYP VertexAttrib4fvNV)(GLuint index, const GLfloat * v); /* 777 */
-   void (GLAPIENTRYP VertexAttrib4sNV)(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w); /* 778 */
-   void (GLAPIENTRYP VertexAttrib4svNV)(GLuint index, const GLshort * v); /* 779 */
-   void (GLAPIENTRYP VertexAttrib4ubNV)(GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w); /* 780 */
-   void (GLAPIENTRYP VertexAttrib4ubvNV)(GLuint index, const GLubyte * v); /* 781 */
-   GLuint (GLAPIENTRYP GenFragmentShadersATI)(GLuint range); /* 782 */
-   void (GLAPIENTRYP BindFragmentShaderATI)(GLuint id); /* 783 */
-   void (GLAPIENTRYP DeleteFragmentShaderATI)(GLuint id); /* 784 */
-   void (GLAPIENTRYP BeginFragmentShaderATI)(void); /* 785 */
-   void (GLAPIENTRYP EndFragmentShaderATI)(void); /* 786 */
-   void (GLAPIENTRYP PassTexCoordATI)(GLuint dst, GLuint coord, GLenum swizzle); /* 787 */
-   void (GLAPIENTRYP SampleMapATI)(GLuint dst, GLuint interp, GLenum swizzle); /* 788 */
-   void (GLAPIENTRYP ColorFragmentOp1ATI)(GLenum op, GLuint dst, GLuint dstMask, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod); /* 789 */
-   void (GLAPIENTRYP ColorFragmentOp2ATI)(GLenum op, GLuint dst, GLuint dstMask, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod); /* 790 */
-   void (GLAPIENTRYP ColorFragmentOp3ATI)(GLenum op, GLuint dst, GLuint dstMask, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod, GLuint arg3, GLuint arg3Rep, GLuint arg3Mod); /* 791 */
-   void (GLAPIENTRYP AlphaFragmentOp1ATI)(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod); /* 792 */
-   void (GLAPIENTRYP AlphaFragmentOp2ATI)(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod); /* 793 */
-   void (GLAPIENTRYP AlphaFragmentOp3ATI)(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod, GLuint arg3, GLuint arg3Rep, GLuint arg3Mod); /* 794 */
-   void (GLAPIENTRYP SetFragmentShaderConstantATI)(GLuint dst, const GLfloat * value); /* 795 */
+   void (GLAPIENTRYP AttachShader)(GLuint program, GLuint shader); /* 408 */
+   GLuint (GLAPIENTRYP CreateProgram)(void); /* 409 */
+   GLuint (GLAPIENTRYP CreateShader)(GLenum type); /* 410 */
+   void (GLAPIENTRYP DeleteProgram)(GLuint program); /* 411 */
+   void (GLAPIENTRYP DeleteShader)(GLuint program); /* 412 */
+   void (GLAPIENTRYP DetachShader)(GLuint program, GLuint shader); /* 413 */
+   void (GLAPIENTRYP GetAttachedShaders)(GLuint program, GLsizei maxCount, GLsizei * count, GLuint * obj); /* 414 */
+   void (GLAPIENTRYP GetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei * length, GLchar * infoLog); /* 415 */
+   void (GLAPIENTRYP GetProgramiv)(GLuint program, GLenum pname, GLint * params); /* 416 */
+   void (GLAPIENTRYP GetShaderInfoLog)(GLuint shader, GLsizei bufSize, GLsizei * length, GLchar * infoLog); /* 417 */
+   void (GLAPIENTRYP GetShaderiv)(GLuint shader, GLenum pname, GLint * params); /* 418 */
+   GLboolean (GLAPIENTRYP IsProgram)(GLuint program); /* 419 */
+   GLboolean (GLAPIENTRYP IsShader)(GLuint shader); /* 420 */
+   void (GLAPIENTRYP StencilFuncSeparate)(GLenum face, GLenum func, GLint ref, GLuint mask); /* 421 */
+   void (GLAPIENTRYP StencilMaskSeparate)(GLenum face, GLuint mask); /* 422 */
+   void (GLAPIENTRYP StencilOpSeparate)(GLenum face, GLenum fail, GLenum zfail, GLenum zpass); /* 423 */
+   void (GLAPIENTRYP UniformMatrix2x3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 424 */
+   void (GLAPIENTRYP UniformMatrix2x4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 425 */
+   void (GLAPIENTRYP UniformMatrix3x2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 426 */
+   void (GLAPIENTRYP UniformMatrix3x4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 427 */
+   void (GLAPIENTRYP UniformMatrix4x2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 428 */
+   void (GLAPIENTRYP UniformMatrix4x3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 429 */
+   void (GLAPIENTRYP LoadTransposeMatrixdARB)(const GLdouble * m); /* 430 */
+   void (GLAPIENTRYP LoadTransposeMatrixfARB)(const GLfloat * m); /* 431 */
+   void (GLAPIENTRYP MultTransposeMatrixdARB)(const GLdouble * m); /* 432 */
+   void (GLAPIENTRYP MultTransposeMatrixfARB)(const GLfloat * m); /* 433 */
+   void (GLAPIENTRYP SampleCoverageARB)(GLclampf value, GLboolean invert); /* 434 */
+   void (GLAPIENTRYP CompressedTexImage1DARB)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid * data); /* 435 */
+   void (GLAPIENTRYP CompressedTexImage2DARB)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data); /* 436 */
+   void (GLAPIENTRYP CompressedTexImage3DARB)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid * data); /* 437 */
+   void (GLAPIENTRYP CompressedTexSubImage1DARB)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid * data); /* 438 */
+   void (GLAPIENTRYP CompressedTexSubImage2DARB)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid * data); /* 439 */
+   void (GLAPIENTRYP CompressedTexSubImage3DARB)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid * data); /* 440 */
+   void (GLAPIENTRYP GetCompressedTexImageARB)(GLenum target, GLint level, GLvoid * img); /* 441 */
+   void (GLAPIENTRYP DisableVertexAttribArrayARB)(GLuint index); /* 442 */
+   void (GLAPIENTRYP EnableVertexAttribArrayARB)(GLuint index); /* 443 */
+   void (GLAPIENTRYP GetProgramEnvParameterdvARB)(GLenum target, GLuint index, GLdouble * params); /* 444 */
+   void (GLAPIENTRYP GetProgramEnvParameterfvARB)(GLenum target, GLuint index, GLfloat * params); /* 445 */
+   void (GLAPIENTRYP GetProgramLocalParameterdvARB)(GLenum target, GLuint index, GLdouble * params); /* 446 */
+   void (GLAPIENTRYP GetProgramLocalParameterfvARB)(GLenum target, GLuint index, GLfloat * params); /* 447 */
+   void (GLAPIENTRYP GetProgramStringARB)(GLenum target, GLenum pname, GLvoid * string); /* 448 */
+   void (GLAPIENTRYP GetProgramivARB)(GLenum target, GLenum pname, GLint * params); /* 449 */
+   void (GLAPIENTRYP GetVertexAttribdvARB)(GLuint index, GLenum pname, GLdouble * params); /* 450 */
+   void (GLAPIENTRYP GetVertexAttribfvARB)(GLuint index, GLenum pname, GLfloat * params); /* 451 */
+   void (GLAPIENTRYP GetVertexAttribivARB)(GLuint index, GLenum pname, GLint * params); /* 452 */
+   void (GLAPIENTRYP ProgramEnvParameter4dARB)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 453 */
+   void (GLAPIENTRYP ProgramEnvParameter4dvARB)(GLenum target, GLuint index, const GLdouble * params); /* 454 */
+   void (GLAPIENTRYP ProgramEnvParameter4fARB)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 455 */
+   void (GLAPIENTRYP ProgramEnvParameter4fvARB)(GLenum target, GLuint index, const GLfloat * params); /* 456 */
+   void (GLAPIENTRYP ProgramLocalParameter4dARB)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 457 */
+   void (GLAPIENTRYP ProgramLocalParameter4dvARB)(GLenum target, GLuint index, const GLdouble * params); /* 458 */
+   void (GLAPIENTRYP ProgramLocalParameter4fARB)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 459 */
+   void (GLAPIENTRYP ProgramLocalParameter4fvARB)(GLenum target, GLuint index, const GLfloat * params); /* 460 */
+   void (GLAPIENTRYP ProgramStringARB)(GLenum target, GLenum format, GLsizei len, const GLvoid * string); /* 461 */
+   void (GLAPIENTRYP VertexAttrib1dARB)(GLuint index, GLdouble x); /* 462 */
+   void (GLAPIENTRYP VertexAttrib1dvARB)(GLuint index, const GLdouble * v); /* 463 */
+   void (GLAPIENTRYP VertexAttrib1fARB)(GLuint index, GLfloat x); /* 464 */
+   void (GLAPIENTRYP VertexAttrib1fvARB)(GLuint index, const GLfloat * v); /* 465 */
+   void (GLAPIENTRYP VertexAttrib1sARB)(GLuint index, GLshort x); /* 466 */
+   void (GLAPIENTRYP VertexAttrib1svARB)(GLuint index, const GLshort * v); /* 467 */
+   void (GLAPIENTRYP VertexAttrib2dARB)(GLuint index, GLdouble x, GLdouble y); /* 468 */
+   void (GLAPIENTRYP VertexAttrib2dvARB)(GLuint index, const GLdouble * v); /* 469 */
+   void (GLAPIENTRYP VertexAttrib2fARB)(GLuint index, GLfloat x, GLfloat y); /* 470 */
+   void (GLAPIENTRYP VertexAttrib2fvARB)(GLuint index, const GLfloat * v); /* 471 */
+   void (GLAPIENTRYP VertexAttrib2sARB)(GLuint index, GLshort x, GLshort y); /* 472 */
+   void (GLAPIENTRYP VertexAttrib2svARB)(GLuint index, const GLshort * v); /* 473 */
+   void (GLAPIENTRYP VertexAttrib3dARB)(GLuint index, GLdouble x, GLdouble y, GLdouble z); /* 474 */
+   void (GLAPIENTRYP VertexAttrib3dvARB)(GLuint index, const GLdouble * v); /* 475 */
+   void (GLAPIENTRYP VertexAttrib3fARB)(GLuint index, GLfloat x, GLfloat y, GLfloat z); /* 476 */
+   void (GLAPIENTRYP VertexAttrib3fvARB)(GLuint index, const GLfloat * v); /* 477 */
+   void (GLAPIENTRYP VertexAttrib3sARB)(GLuint index, GLshort x, GLshort y, GLshort z); /* 478 */
+   void (GLAPIENTRYP VertexAttrib3svARB)(GLuint index, const GLshort * v); /* 479 */
+   void (GLAPIENTRYP VertexAttrib4NbvARB)(GLuint index, const GLbyte * v); /* 480 */
+   void (GLAPIENTRYP VertexAttrib4NivARB)(GLuint index, const GLint * v); /* 481 */
+   void (GLAPIENTRYP VertexAttrib4NsvARB)(GLuint index, const GLshort * v); /* 482 */
+   void (GLAPIENTRYP VertexAttrib4NubARB)(GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w); /* 483 */
+   void (GLAPIENTRYP VertexAttrib4NubvARB)(GLuint index, const GLubyte * v); /* 484 */
+   void (GLAPIENTRYP VertexAttrib4NuivARB)(GLuint index, const GLuint * v); /* 485 */
+   void (GLAPIENTRYP VertexAttrib4NusvARB)(GLuint index, const GLushort * v); /* 486 */
+   void (GLAPIENTRYP VertexAttrib4bvARB)(GLuint index, const GLbyte * v); /* 487 */
+   void (GLAPIENTRYP VertexAttrib4dARB)(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 488 */
+   void (GLAPIENTRYP VertexAttrib4dvARB)(GLuint index, const GLdouble * v); /* 489 */
+   void (GLAPIENTRYP VertexAttrib4fARB)(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 490 */
+   void (GLAPIENTRYP VertexAttrib4fvARB)(GLuint index, const GLfloat * v); /* 491 */
+   void (GLAPIENTRYP VertexAttrib4ivARB)(GLuint index, const GLint * v); /* 492 */
+   void (GLAPIENTRYP VertexAttrib4sARB)(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w); /* 493 */
+   void (GLAPIENTRYP VertexAttrib4svARB)(GLuint index, const GLshort * v); /* 494 */
+   void (GLAPIENTRYP VertexAttrib4ubvARB)(GLuint index, const GLubyte * v); /* 495 */
+   void (GLAPIENTRYP VertexAttrib4uivARB)(GLuint index, const GLuint * v); /* 496 */
+   void (GLAPIENTRYP VertexAttrib4usvARB)(GLuint index, const GLushort * v); /* 497 */
+   void (GLAPIENTRYP VertexAttribPointerARB)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer); /* 498 */
+   void (GLAPIENTRYP BindBufferARB)(GLenum target, GLuint buffer); /* 499 */
+   void (GLAPIENTRYP BufferDataARB)(GLenum target, GLsizeiptrARB size, const GLvoid * data, GLenum usage); /* 500 */
+   void (GLAPIENTRYP BufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid * data); /* 501 */
+   void (GLAPIENTRYP DeleteBuffersARB)(GLsizei n, const GLuint * buffer); /* 502 */
+   void (GLAPIENTRYP GenBuffersARB)(GLsizei n, GLuint * buffer); /* 503 */
+   void (GLAPIENTRYP GetBufferParameterivARB)(GLenum target, GLenum pname, GLint * params); /* 504 */
+   void (GLAPIENTRYP GetBufferPointervARB)(GLenum target, GLenum pname, GLvoid ** params); /* 505 */
+   void (GLAPIENTRYP GetBufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, GLvoid * data); /* 506 */
+   GLboolean (GLAPIENTRYP IsBufferARB)(GLuint buffer); /* 507 */
+   GLvoid * (GLAPIENTRYP MapBufferARB)(GLenum target, GLenum access); /* 508 */
+   GLboolean (GLAPIENTRYP UnmapBufferARB)(GLenum target); /* 509 */
+   void (GLAPIENTRYP BeginQueryARB)(GLenum target, GLuint id); /* 510 */
+   void (GLAPIENTRYP DeleteQueriesARB)(GLsizei n, const GLuint * ids); /* 511 */
+   void (GLAPIENTRYP EndQueryARB)(GLenum target); /* 512 */
+   void (GLAPIENTRYP GenQueriesARB)(GLsizei n, GLuint * ids); /* 513 */
+   void (GLAPIENTRYP GetQueryObjectivARB)(GLuint id, GLenum pname, GLint * params); /* 514 */
+   void (GLAPIENTRYP GetQueryObjectuivARB)(GLuint id, GLenum pname, GLuint * params); /* 515 */
+   void (GLAPIENTRYP GetQueryivARB)(GLenum target, GLenum pname, GLint * params); /* 516 */
+   GLboolean (GLAPIENTRYP IsQueryARB)(GLuint id); /* 517 */
+   void (GLAPIENTRYP AttachObjectARB)(GLhandleARB containerObj, GLhandleARB obj); /* 518 */
+   void (GLAPIENTRYP CompileShaderARB)(GLhandleARB shader); /* 519 */
+   GLhandleARB (GLAPIENTRYP CreateProgramObjectARB)(void); /* 520 */
+   GLhandleARB (GLAPIENTRYP CreateShaderObjectARB)(GLenum shaderType); /* 521 */
+   void (GLAPIENTRYP DeleteObjectARB)(GLhandleARB obj); /* 522 */
+   void (GLAPIENTRYP DetachObjectARB)(GLhandleARB containerObj, GLhandleARB attachedObj); /* 523 */
+   void (GLAPIENTRYP GetActiveUniformARB)(GLhandleARB program, GLuint index, GLsizei bufSize, GLsizei * length, GLint * size, GLenum * type, GLcharARB * name); /* 524 */
+   void (GLAPIENTRYP GetAttachedObjectsARB)(GLhandleARB containerObj, GLsizei maxLength, GLsizei * length, GLhandleARB * infoLog); /* 525 */
+   GLhandleARB (GLAPIENTRYP GetHandleARB)(GLenum pname); /* 526 */
+   void (GLAPIENTRYP GetInfoLogARB)(GLhandleARB obj, GLsizei maxLength, GLsizei * length, GLcharARB * infoLog); /* 527 */
+   void (GLAPIENTRYP GetObjectParameterfvARB)(GLhandleARB obj, GLenum pname, GLfloat * params); /* 528 */
+   void (GLAPIENTRYP GetObjectParameterivARB)(GLhandleARB obj, GLenum pname, GLint * params); /* 529 */
+   void (GLAPIENTRYP GetShaderSourceARB)(GLhandleARB shader, GLsizei bufSize, GLsizei * length, GLcharARB * source); /* 530 */
+   GLint (GLAPIENTRYP GetUniformLocationARB)(GLhandleARB program, const GLcharARB * name); /* 531 */
+   void (GLAPIENTRYP GetUniformfvARB)(GLhandleARB program, GLint location, GLfloat * params); /* 532 */
+   void (GLAPIENTRYP GetUniformivARB)(GLhandleARB program, GLint location, GLint * params); /* 533 */
+   void (GLAPIENTRYP LinkProgramARB)(GLhandleARB program); /* 534 */
+   void (GLAPIENTRYP ShaderSourceARB)(GLhandleARB shader, GLsizei count, const GLcharARB ** string, const GLint * length); /* 535 */
+   void (GLAPIENTRYP Uniform1fARB)(GLint location, GLfloat v0); /* 536 */
+   void (GLAPIENTRYP Uniform1fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 537 */
+   void (GLAPIENTRYP Uniform1iARB)(GLint location, GLint v0); /* 538 */
+   void (GLAPIENTRYP Uniform1ivARB)(GLint location, GLsizei count, const GLint * value); /* 539 */
+   void (GLAPIENTRYP Uniform2fARB)(GLint location, GLfloat v0, GLfloat v1); /* 540 */
+   void (GLAPIENTRYP Uniform2fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 541 */
+   void (GLAPIENTRYP Uniform2iARB)(GLint location, GLint v0, GLint v1); /* 542 */
+   void (GLAPIENTRYP Uniform2ivARB)(GLint location, GLsizei count, const GLint * value); /* 543 */
+   void (GLAPIENTRYP Uniform3fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2); /* 544 */
+   void (GLAPIENTRYP Uniform3fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 545 */
+   void (GLAPIENTRYP Uniform3iARB)(GLint location, GLint v0, GLint v1, GLint v2); /* 546 */
+   void (GLAPIENTRYP Uniform3ivARB)(GLint location, GLsizei count, const GLint * value); /* 547 */
+   void (GLAPIENTRYP Uniform4fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3); /* 548 */
+   void (GLAPIENTRYP Uniform4fvARB)(GLint location, GLsizei count, const GLfloat * value); /* 549 */
+   void (GLAPIENTRYP Uniform4iARB)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3); /* 550 */
+   void (GLAPIENTRYP Uniform4ivARB)(GLint location, GLsizei count, const GLint * value); /* 551 */
+   void (GLAPIENTRYP UniformMatrix2fvARB)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 552 */
+   void (GLAPIENTRYP UniformMatrix3fvARB)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 553 */
+   void (GLAPIENTRYP UniformMatrix4fvARB)(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value); /* 554 */
+   void (GLAPIENTRYP UseProgramObjectARB)(GLhandleARB program); /* 555 */
+   void (GLAPIENTRYP ValidateProgramARB)(GLhandleARB program); /* 556 */
+   void (GLAPIENTRYP BindAttribLocationARB)(GLhandleARB program, GLuint index, const GLcharARB * name); /* 557 */
+   void (GLAPIENTRYP GetActiveAttribARB)(GLhandleARB program, GLuint index, GLsizei bufSize, GLsizei * length, GLint * size, GLenum * type, GLcharARB * name); /* 558 */
+   GLint (GLAPIENTRYP GetAttribLocationARB)(GLhandleARB program, const GLcharARB * name); /* 559 */
+   void (GLAPIENTRYP DrawBuffersARB)(GLsizei n, const GLenum * bufs); /* 560 */
+   void (GLAPIENTRYP PolygonOffsetEXT)(GLfloat factor, GLfloat bias); /* 561 */
+   void (GLAPIENTRYP GetPixelTexGenParameterfvSGIS)(GLenum pname, GLfloat * params); /* 562 */
+   void (GLAPIENTRYP GetPixelTexGenParameterivSGIS)(GLenum pname, GLint * params); /* 563 */
+   void (GLAPIENTRYP PixelTexGenParameterfSGIS)(GLenum pname, GLfloat param); /* 564 */
+   void (GLAPIENTRYP PixelTexGenParameterfvSGIS)(GLenum pname, const GLfloat * params); /* 565 */
+   void (GLAPIENTRYP PixelTexGenParameteriSGIS)(GLenum pname, GLint param); /* 566 */
+   void (GLAPIENTRYP PixelTexGenParameterivSGIS)(GLenum pname, const GLint * params); /* 567 */
+   void (GLAPIENTRYP SampleMaskSGIS)(GLclampf value, GLboolean invert); /* 568 */
+   void (GLAPIENTRYP SamplePatternSGIS)(GLenum pattern); /* 569 */
+   void (GLAPIENTRYP ColorPointerEXT)(GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 570 */
+   void (GLAPIENTRYP EdgeFlagPointerEXT)(GLsizei stride, GLsizei count, const GLboolean * pointer); /* 571 */
+   void (GLAPIENTRYP IndexPointerEXT)(GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 572 */
+   void (GLAPIENTRYP NormalPointerEXT)(GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 573 */
+   void (GLAPIENTRYP TexCoordPointerEXT)(GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 574 */
+   void (GLAPIENTRYP VertexPointerEXT)(GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid * pointer); /* 575 */
+   void (GLAPIENTRYP PointParameterfEXT)(GLenum pname, GLfloat param); /* 576 */
+   void (GLAPIENTRYP PointParameterfvEXT)(GLenum pname, const GLfloat * params); /* 577 */
+   void (GLAPIENTRYP LockArraysEXT)(GLint first, GLsizei count); /* 578 */
+   void (GLAPIENTRYP UnlockArraysEXT)(void); /* 579 */
+   void (GLAPIENTRYP CullParameterdvEXT)(GLenum pname, GLdouble * params); /* 580 */
+   void (GLAPIENTRYP CullParameterfvEXT)(GLenum pname, GLfloat * params); /* 581 */
+   void (GLAPIENTRYP SecondaryColor3bEXT)(GLbyte red, GLbyte green, GLbyte blue); /* 582 */
+   void (GLAPIENTRYP SecondaryColor3bvEXT)(const GLbyte * v); /* 583 */
+   void (GLAPIENTRYP SecondaryColor3dEXT)(GLdouble red, GLdouble green, GLdouble blue); /* 584 */
+   void (GLAPIENTRYP SecondaryColor3dvEXT)(const GLdouble * v); /* 585 */
+   void (GLAPIENTRYP SecondaryColor3fEXT)(GLfloat red, GLfloat green, GLfloat blue); /* 586 */
+   void (GLAPIENTRYP SecondaryColor3fvEXT)(const GLfloat * v); /* 587 */
+   void (GLAPIENTRYP SecondaryColor3iEXT)(GLint red, GLint green, GLint blue); /* 588 */
+   void (GLAPIENTRYP SecondaryColor3ivEXT)(const GLint * v); /* 589 */
+   void (GLAPIENTRYP SecondaryColor3sEXT)(GLshort red, GLshort green, GLshort blue); /* 590 */
+   void (GLAPIENTRYP SecondaryColor3svEXT)(const GLshort * v); /* 591 */
+   void (GLAPIENTRYP SecondaryColor3ubEXT)(GLubyte red, GLubyte green, GLubyte blue); /* 592 */
+   void (GLAPIENTRYP SecondaryColor3ubvEXT)(const GLubyte * v); /* 593 */
+   void (GLAPIENTRYP SecondaryColor3uiEXT)(GLuint red, GLuint green, GLuint blue); /* 594 */
+   void (GLAPIENTRYP SecondaryColor3uivEXT)(const GLuint * v); /* 595 */
+   void (GLAPIENTRYP SecondaryColor3usEXT)(GLushort red, GLushort green, GLushort blue); /* 596 */
+   void (GLAPIENTRYP SecondaryColor3usvEXT)(const GLushort * v); /* 597 */
+   void (GLAPIENTRYP SecondaryColorPointerEXT)(GLint size, GLenum type, GLsizei stride, const GLvoid * pointer); /* 598 */
+   void (GLAPIENTRYP MultiDrawArraysEXT)(GLenum mode, GLint * first, GLsizei * count, GLsizei primcount); /* 599 */
+   void (GLAPIENTRYP MultiDrawElementsEXT)(GLenum mode, const GLsizei * count, GLenum type, const GLvoid ** indices, GLsizei primcount); /* 600 */
+   void (GLAPIENTRYP FogCoordPointerEXT)(GLenum type, GLsizei stride, const GLvoid * pointer); /* 601 */
+   void (GLAPIENTRYP FogCoorddEXT)(GLdouble coord); /* 602 */
+   void (GLAPIENTRYP FogCoorddvEXT)(const GLdouble * coord); /* 603 */
+   void (GLAPIENTRYP FogCoordfEXT)(GLfloat coord); /* 604 */
+   void (GLAPIENTRYP FogCoordfvEXT)(const GLfloat * coord); /* 605 */
+   void (GLAPIENTRYP PixelTexGenSGIX)(GLenum mode); /* 606 */
+   void (GLAPIENTRYP BlendFuncSeparateEXT)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha); /* 607 */
+   void (GLAPIENTRYP FlushVertexArrayRangeNV)(void); /* 608 */
+   void (GLAPIENTRYP VertexArrayRangeNV)(GLsizei length, const GLvoid * pointer); /* 609 */
+   void (GLAPIENTRYP CombinerInputNV)(GLenum stage, GLenum portion, GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage); /* 610 */
+   void (GLAPIENTRYP CombinerOutputNV)(GLenum stage, GLenum portion, GLenum abOutput, GLenum cdOutput, GLenum sumOutput, GLenum scale, GLenum bias, GLboolean abDotProduct, GLboolean cdDotProduct, GLboolean muxSum); /* 611 */
+   void (GLAPIENTRYP CombinerParameterfNV)(GLenum pname, GLfloat param); /* 612 */
+   void (GLAPIENTRYP CombinerParameterfvNV)(GLenum pname, const GLfloat * params); /* 613 */
+   void (GLAPIENTRYP CombinerParameteriNV)(GLenum pname, GLint param); /* 614 */
+   void (GLAPIENTRYP CombinerParameterivNV)(GLenum pname, const GLint * params); /* 615 */
+   void (GLAPIENTRYP FinalCombinerInputNV)(GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage); /* 616 */
+   void (GLAPIENTRYP GetCombinerInputParameterfvNV)(GLenum stage, GLenum portion, GLenum variable, GLenum pname, GLfloat * params); /* 617 */
+   void (GLAPIENTRYP GetCombinerInputParameterivNV)(GLenum stage, GLenum portion, GLenum variable, GLenum pname, GLint * params); /* 618 */
+   void (GLAPIENTRYP GetCombinerOutputParameterfvNV)(GLenum stage, GLenum portion, GLenum pname, GLfloat * params); /* 619 */
+   void (GLAPIENTRYP GetCombinerOutputParameterivNV)(GLenum stage, GLenum portion, GLenum pname, GLint * params); /* 620 */
+   void (GLAPIENTRYP GetFinalCombinerInputParameterfvNV)(GLenum variable, GLenum pname, GLfloat * params); /* 621 */
+   void (GLAPIENTRYP GetFinalCombinerInputParameterivNV)(GLenum variable, GLenum pname, GLint * params); /* 622 */
+   void (GLAPIENTRYP ResizeBuffersMESA)(void); /* 623 */
+   void (GLAPIENTRYP WindowPos2dMESA)(GLdouble x, GLdouble y); /* 624 */
+   void (GLAPIENTRYP WindowPos2dvMESA)(const GLdouble * v); /* 625 */
+   void (GLAPIENTRYP WindowPos2fMESA)(GLfloat x, GLfloat y); /* 626 */
+   void (GLAPIENTRYP WindowPos2fvMESA)(const GLfloat * v); /* 627 */
+   void (GLAPIENTRYP WindowPos2iMESA)(GLint x, GLint y); /* 628 */
+   void (GLAPIENTRYP WindowPos2ivMESA)(const GLint * v); /* 629 */
+   void (GLAPIENTRYP WindowPos2sMESA)(GLshort x, GLshort y); /* 630 */
+   void (GLAPIENTRYP WindowPos2svMESA)(const GLshort * v); /* 631 */
+   void (GLAPIENTRYP WindowPos3dMESA)(GLdouble x, GLdouble y, GLdouble z); /* 632 */
+   void (GLAPIENTRYP WindowPos3dvMESA)(const GLdouble * v); /* 633 */
+   void (GLAPIENTRYP WindowPos3fMESA)(GLfloat x, GLfloat y, GLfloat z); /* 634 */
+   void (GLAPIENTRYP WindowPos3fvMESA)(const GLfloat * v); /* 635 */
+   void (GLAPIENTRYP WindowPos3iMESA)(GLint x, GLint y, GLint z); /* 636 */
+   void (GLAPIENTRYP WindowPos3ivMESA)(const GLint * v); /* 637 */
+   void (GLAPIENTRYP WindowPos3sMESA)(GLshort x, GLshort y, GLshort z); /* 638 */
+   void (GLAPIENTRYP WindowPos3svMESA)(const GLshort * v); /* 639 */
+   void (GLAPIENTRYP WindowPos4dMESA)(GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 640 */
+   void (GLAPIENTRYP WindowPos4dvMESA)(const GLdouble * v); /* 641 */
+   void (GLAPIENTRYP WindowPos4fMESA)(GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 642 */
+   void (GLAPIENTRYP WindowPos4fvMESA)(const GLfloat * v); /* 643 */
+   void (GLAPIENTRYP WindowPos4iMESA)(GLint x, GLint y, GLint z, GLint w); /* 644 */
+   void (GLAPIENTRYP WindowPos4ivMESA)(const GLint * v); /* 645 */
+   void (GLAPIENTRYP WindowPos4sMESA)(GLshort x, GLshort y, GLshort z, GLshort w); /* 646 */
+   void (GLAPIENTRYP WindowPos4svMESA)(const GLshort * v); /* 647 */
+   void (GLAPIENTRYP MultiModeDrawArraysIBM)(const GLenum * mode, const GLint * first, const GLsizei * count, GLsizei primcount, GLint modestride); /* 648 */
+   void (GLAPIENTRYP MultiModeDrawElementsIBM)(const GLenum * mode, const GLsizei * count, GLenum type, const GLvoid * const * indices, GLsizei primcount, GLint modestride); /* 649 */
+   void (GLAPIENTRYP DeleteFencesNV)(GLsizei n, const GLuint * fences); /* 650 */
+   void (GLAPIENTRYP FinishFenceNV)(GLuint fence); /* 651 */
+   void (GLAPIENTRYP GenFencesNV)(GLsizei n, GLuint * fences); /* 652 */
+   void (GLAPIENTRYP GetFenceivNV)(GLuint fence, GLenum pname, GLint * params); /* 653 */
+   GLboolean (GLAPIENTRYP IsFenceNV)(GLuint fence); /* 654 */
+   void (GLAPIENTRYP SetFenceNV)(GLuint fence, GLenum condition); /* 655 */
+   GLboolean (GLAPIENTRYP TestFenceNV)(GLuint fence); /* 656 */
+   GLboolean (GLAPIENTRYP AreProgramsResidentNV)(GLsizei n, const GLuint * ids, GLboolean * residences); /* 657 */
+   void (GLAPIENTRYP BindProgramNV)(GLenum target, GLuint program); /* 658 */
+   void (GLAPIENTRYP DeleteProgramsNV)(GLsizei n, const GLuint * programs); /* 659 */
+   void (GLAPIENTRYP ExecuteProgramNV)(GLenum target, GLuint id, const GLfloat * params); /* 660 */
+   void (GLAPIENTRYP GenProgramsNV)(GLsizei n, GLuint * programs); /* 661 */
+   void (GLAPIENTRYP GetProgramParameterdvNV)(GLenum target, GLuint index, GLenum pname, GLdouble * params); /* 662 */
+   void (GLAPIENTRYP GetProgramParameterfvNV)(GLenum target, GLuint index, GLenum pname, GLfloat * params); /* 663 */
+   void (GLAPIENTRYP GetProgramStringNV)(GLuint id, GLenum pname, GLubyte * program); /* 664 */
+   void (GLAPIENTRYP GetProgramivNV)(GLuint id, GLenum pname, GLint * params); /* 665 */
+   void (GLAPIENTRYP GetTrackMatrixivNV)(GLenum target, GLuint address, GLenum pname, GLint * params); /* 666 */
+   void (GLAPIENTRYP GetVertexAttribPointervNV)(GLuint index, GLenum pname, GLvoid ** params); /* 667 */
+   void (GLAPIENTRYP GetVertexAttribdvNV)(GLuint index, GLenum pname, GLdouble * params); /* 668 */
+   void (GLAPIENTRYP GetVertexAttribfvNV)(GLuint index, GLenum pname, GLfloat * params); /* 669 */
+   void (GLAPIENTRYP GetVertexAttribivNV)(GLuint index, GLenum pname, GLint * params); /* 670 */
+   GLboolean (GLAPIENTRYP IsProgramNV)(GLuint program); /* 671 */
+   void (GLAPIENTRYP LoadProgramNV)(GLenum target, GLuint id, GLsizei len, const GLubyte * program); /* 672 */
+   void (GLAPIENTRYP ProgramParameter4dNV)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 673 */
+   void (GLAPIENTRYP ProgramParameter4dvNV)(GLenum target, GLuint index, const GLdouble * params); /* 674 */
+   void (GLAPIENTRYP ProgramParameter4fNV)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 675 */
+   void (GLAPIENTRYP ProgramParameter4fvNV)(GLenum target, GLuint index, const GLfloat * params); /* 676 */
+   void (GLAPIENTRYP ProgramParameters4dvNV)(GLenum target, GLuint index, GLuint num, const GLdouble * params); /* 677 */
+   void (GLAPIENTRYP ProgramParameters4fvNV)(GLenum target, GLuint index, GLuint num, const GLfloat * params); /* 678 */
+   void (GLAPIENTRYP RequestResidentProgramsNV)(GLsizei n, const GLuint * ids); /* 679 */
+   void (GLAPIENTRYP TrackMatrixNV)(GLenum target, GLuint address, GLenum matrix, GLenum transform); /* 680 */
+   void (GLAPIENTRYP VertexAttrib1dNV)(GLuint index, GLdouble x); /* 681 */
+   void (GLAPIENTRYP VertexAttrib1dvNV)(GLuint index, const GLdouble * v); /* 682 */
+   void (GLAPIENTRYP VertexAttrib1fNV)(GLuint index, GLfloat x); /* 683 */
+   void (GLAPIENTRYP VertexAttrib1fvNV)(GLuint index, const GLfloat * v); /* 684 */
+   void (GLAPIENTRYP VertexAttrib1sNV)(GLuint index, GLshort x); /* 685 */
+   void (GLAPIENTRYP VertexAttrib1svNV)(GLuint index, const GLshort * v); /* 686 */
+   void (GLAPIENTRYP VertexAttrib2dNV)(GLuint index, GLdouble x, GLdouble y); /* 687 */
+   void (GLAPIENTRYP VertexAttrib2dvNV)(GLuint index, const GLdouble * v); /* 688 */
+   void (GLAPIENTRYP VertexAttrib2fNV)(GLuint index, GLfloat x, GLfloat y); /* 689 */
+   void (GLAPIENTRYP VertexAttrib2fvNV)(GLuint index, const GLfloat * v); /* 690 */
+   void (GLAPIENTRYP VertexAttrib2sNV)(GLuint index, GLshort x, GLshort y); /* 691 */
+   void (GLAPIENTRYP VertexAttrib2svNV)(GLuint index, const GLshort * v); /* 692 */
+   void (GLAPIENTRYP VertexAttrib3dNV)(GLuint index, GLdouble x, GLdouble y, GLdouble z); /* 693 */
+   void (GLAPIENTRYP VertexAttrib3dvNV)(GLuint index, const GLdouble * v); /* 694 */
+   void (GLAPIENTRYP VertexAttrib3fNV)(GLuint index, GLfloat x, GLfloat y, GLfloat z); /* 695 */
+   void (GLAPIENTRYP VertexAttrib3fvNV)(GLuint index, const GLfloat * v); /* 696 */
+   void (GLAPIENTRYP VertexAttrib3sNV)(GLuint index, GLshort x, GLshort y, GLshort z); /* 697 */
+   void (GLAPIENTRYP VertexAttrib3svNV)(GLuint index, const GLshort * v); /* 698 */
+   void (GLAPIENTRYP VertexAttrib4dNV)(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 699 */
+   void (GLAPIENTRYP VertexAttrib4dvNV)(GLuint index, const GLdouble * v); /* 700 */
+   void (GLAPIENTRYP VertexAttrib4fNV)(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 701 */
+   void (GLAPIENTRYP VertexAttrib4fvNV)(GLuint index, const GLfloat * v); /* 702 */
+   void (GLAPIENTRYP VertexAttrib4sNV)(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w); /* 703 */
+   void (GLAPIENTRYP VertexAttrib4svNV)(GLuint index, const GLshort * v); /* 704 */
+   void (GLAPIENTRYP VertexAttrib4ubNV)(GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w); /* 705 */
+   void (GLAPIENTRYP VertexAttrib4ubvNV)(GLuint index, const GLubyte * v); /* 706 */
+   void (GLAPIENTRYP VertexAttribPointerNV)(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer); /* 707 */
+   void (GLAPIENTRYP VertexAttribs1dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 708 */
+   void (GLAPIENTRYP VertexAttribs1fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 709 */
+   void (GLAPIENTRYP VertexAttribs1svNV)(GLuint index, GLsizei n, const GLshort * v); /* 710 */
+   void (GLAPIENTRYP VertexAttribs2dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 711 */
+   void (GLAPIENTRYP VertexAttribs2fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 712 */
+   void (GLAPIENTRYP VertexAttribs2svNV)(GLuint index, GLsizei n, const GLshort * v); /* 713 */
+   void (GLAPIENTRYP VertexAttribs3dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 714 */
+   void (GLAPIENTRYP VertexAttribs3fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 715 */
+   void (GLAPIENTRYP VertexAttribs3svNV)(GLuint index, GLsizei n, const GLshort * v); /* 716 */
+   void (GLAPIENTRYP VertexAttribs4dvNV)(GLuint index, GLsizei n, const GLdouble * v); /* 717 */
+   void (GLAPIENTRYP VertexAttribs4fvNV)(GLuint index, GLsizei n, const GLfloat * v); /* 718 */
+   void (GLAPIENTRYP VertexAttribs4svNV)(GLuint index, GLsizei n, const GLshort * v); /* 719 */
+   void (GLAPIENTRYP VertexAttribs4ubvNV)(GLuint index, GLsizei n, const GLubyte * v); /* 720 */
+   void (GLAPIENTRYP AlphaFragmentOp1ATI)(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod); /* 721 */
+   void (GLAPIENTRYP AlphaFragmentOp2ATI)(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod); /* 722 */
+   void (GLAPIENTRYP AlphaFragmentOp3ATI)(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod, GLuint arg3, GLuint arg3Rep, GLuint arg3Mod); /* 723 */
+   void (GLAPIENTRYP BeginFragmentShaderATI)(void); /* 724 */
+   void (GLAPIENTRYP BindFragmentShaderATI)(GLuint id); /* 725 */
+   void (GLAPIENTRYP ColorFragmentOp1ATI)(GLenum op, GLuint dst, GLuint dstMask, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod); /* 726 */
+   void (GLAPIENTRYP ColorFragmentOp2ATI)(GLenum op, GLuint dst, GLuint dstMask, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod); /* 727 */
+   void (GLAPIENTRYP ColorFragmentOp3ATI)(GLenum op, GLuint dst, GLuint dstMask, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod, GLuint arg3, GLuint arg3Rep, GLuint arg3Mod); /* 728 */
+   void (GLAPIENTRYP DeleteFragmentShaderATI)(GLuint id); /* 729 */
+   void (GLAPIENTRYP EndFragmentShaderATI)(void); /* 730 */
+   GLuint (GLAPIENTRYP GenFragmentShadersATI)(GLuint range); /* 731 */
+   void (GLAPIENTRYP PassTexCoordATI)(GLuint dst, GLuint coord, GLenum swizzle); /* 732 */
+   void (GLAPIENTRYP SampleMapATI)(GLuint dst, GLuint interp, GLenum swizzle); /* 733 */
+   void (GLAPIENTRYP SetFragmentShaderConstantATI)(GLuint dst, const GLfloat * value); /* 734 */
+   void (GLAPIENTRYP PointParameteriNV)(GLenum pname, GLint param); /* 735 */
+   void (GLAPIENTRYP PointParameterivNV)(GLenum pname, const GLint * params); /* 736 */
+   void (GLAPIENTRYP ActiveStencilFaceEXT)(GLenum face); /* 737 */
+   void (GLAPIENTRYP BindVertexArrayAPPLE)(GLuint array); /* 738 */
+   void (GLAPIENTRYP DeleteVertexArraysAPPLE)(GLsizei n, const GLuint * arrays); /* 739 */
+   void (GLAPIENTRYP GenVertexArraysAPPLE)(GLsizei n, GLuint * arrays); /* 740 */
+   GLboolean (GLAPIENTRYP IsVertexArrayAPPLE)(GLuint array); /* 741 */
+   void (GLAPIENTRYP GetProgramNamedParameterdvNV)(GLuint id, GLsizei len, const GLubyte * name, GLdouble * params); /* 742 */
+   void (GLAPIENTRYP GetProgramNamedParameterfvNV)(GLuint id, GLsizei len, const GLubyte * name, GLfloat * params); /* 743 */
+   void (GLAPIENTRYP ProgramNamedParameter4dNV)(GLuint id, GLsizei len, const GLubyte * name, GLdouble x, GLdouble y, GLdouble z, GLdouble w); /* 744 */
+   void (GLAPIENTRYP ProgramNamedParameter4dvNV)(GLuint id, GLsizei len, const GLubyte * name, const GLdouble * v); /* 745 */
+   void (GLAPIENTRYP ProgramNamedParameter4fNV)(GLuint id, GLsizei len, const GLubyte * name, GLfloat x, GLfloat y, GLfloat z, GLfloat w); /* 746 */
+   void (GLAPIENTRYP ProgramNamedParameter4fvNV)(GLuint id, GLsizei len, const GLubyte * name, const GLfloat * v); /* 747 */
+   void (GLAPIENTRYP DepthBoundsEXT)(GLclampd zmin, GLclampd zmax); /* 748 */
+   void (GLAPIENTRYP BlendEquationSeparateEXT)(GLenum modeRGB, GLenum modeA); /* 749 */
+   void (GLAPIENTRYP BindFramebufferEXT)(GLenum target, GLuint framebuffer); /* 750 */
+   void (GLAPIENTRYP BindRenderbufferEXT)(GLenum target, GLuint renderbuffer); /* 751 */
+   GLenum (GLAPIENTRYP CheckFramebufferStatusEXT)(GLenum target); /* 752 */
+   void (GLAPIENTRYP DeleteFramebuffersEXT)(GLsizei n, const GLuint * framebuffers); /* 753 */
+   void (GLAPIENTRYP DeleteRenderbuffersEXT)(GLsizei n, const GLuint * renderbuffers); /* 754 */
+   void (GLAPIENTRYP FramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer); /* 755 */
+   void (GLAPIENTRYP FramebufferTexture1DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level); /* 756 */
+   void (GLAPIENTRYP FramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level); /* 757 */
+   void (GLAPIENTRYP FramebufferTexture3DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset); /* 758 */
+   void (GLAPIENTRYP GenFramebuffersEXT)(GLsizei n, GLuint * framebuffers); /* 759 */
+   void (GLAPIENTRYP GenRenderbuffersEXT)(GLsizei n, GLuint * renderbuffers); /* 760 */
+   void (GLAPIENTRYP GenerateMipmapEXT)(GLenum target); /* 761 */
+   void (GLAPIENTRYP GetFramebufferAttachmentParameterivEXT)(GLenum target, GLenum attachment, GLenum pname, GLint * params); /* 762 */
+   void (GLAPIENTRYP GetRenderbufferParameterivEXT)(GLenum target, GLenum pname, GLint * params); /* 763 */
+   GLboolean (GLAPIENTRYP IsFramebufferEXT)(GLuint framebuffer); /* 764 */
+   GLboolean (GLAPIENTRYP IsRenderbufferEXT)(GLuint renderbuffer); /* 765 */
+   void (GLAPIENTRYP RenderbufferStorageEXT)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height); /* 766 */
+   void (GLAPIENTRYP BlitFramebufferEXT)(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter); /* 767 */
+   void (GLAPIENTRYP ProgramEnvParameters4fvEXT)(GLenum target, GLuint index, GLsizei count, const GLfloat * params); /* 768 */
+   void (GLAPIENTRYP ProgramLocalParameters4fvEXT)(GLenum target, GLuint index, GLsizei count, const GLfloat * params); /* 769 */
+   void (GLAPIENTRYP GetQueryObjecti64vEXT)(GLuint id, GLenum pname, GLint64EXT * params); /* 770 */
+   void (GLAPIENTRYP GetQueryObjectui64vEXT)(GLuint id, GLenum pname, GLuint64EXT * params); /* 771 */
 };
 
-#endif
+#endif /* !defined( _GLAPI_TABLE_H_ ) */

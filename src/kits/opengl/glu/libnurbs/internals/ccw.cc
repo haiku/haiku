@@ -35,8 +35,8 @@
 /*
  * ccw.c++
  *
- * $Date: 2002/11/01 23:35:07 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/ccw.cc,v 1.2 2002/11/01 23:35:07 brianp Exp $
+ * $Date: 2006/03/14 15:08:52 $ $Revision: 1.3 $
+ * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/ccw.cc,v 1.3 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"
@@ -70,7 +70,7 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
     assert( v2 != v2last );
 
 #ifndef NDEBUG
-    dprintf( "arc_ccw_turn, p = %d\n", 0 );
+    _glu_dprintf( "arc_ccw_turn, p = %d\n", 0 );
 #endif
 
     // the arcs lie on the line (0 == v1->param[0])
@@ -88,7 +88,7 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
     while( 1 ) {
 	if( v1next->param[0] < v2next->param[0] ) {
 #ifndef NDEBUG
-	    dprintf( "case a\n" );
+	    _glu_dprintf( "case a\n" );
 #endif
 	    assert( v1->param[0] <= v1next->param[0] );
 	    assert( v2->param[0] <= v1next->param[0] );
@@ -101,12 +101,12 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 			return sgn;
 		   } else {
 #ifdef DEBUG
-			dprintf( "decr\n" );
+			_glu_dprintf( "decr\n" );
 #endif
 			v1 = v1next--;
 			if( v1 == v1last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -117,7 +117,7 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 	    }
 	} else if( v1next->param[0] > v2next->param[0] ) {
 #ifndef NDEBUG
-	    dprintf( "case b\n" );
+	    _glu_dprintf( "case b\n" );
 #endif
 	    assert( v1->param[0] <= v2next->param[0] );
 	    assert( v2->param[0] <= v2next->param[0] );
@@ -130,12 +130,12 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 			return sgn;
 		   } else {
 #ifdef DEBUG
-			dprintf( "incr\n" );
+			_glu_dprintf( "incr\n" );
 #endif
 			v2 = v2next++;
 			if( v2 == v2last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -146,7 +146,7 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 	    }
 	} else {
 #ifndef NDEBUG
-	    dprintf( "case ab\n" );
+	    _glu_dprintf( "case ab\n" );
 #endif
 	    if( v1next->param[1] < v2next->param[1] )
 		return 0;
@@ -154,12 +154,12 @@ Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 		return 1;
 	    else {
 #ifdef DEBUG
-		dprintf( "incr\n" );
+		_glu_dprintf( "incr\n" );
 #endif
 		v2 = v2next++;
 		if( v2 == v2last ) {
 #ifdef DEBUG
-		    dprintf( "no good results\n" );
+		    _glu_dprintf( "no good results\n" );
 #endif
 		    return 0; // ill-conditioned, guess answer
 		}
@@ -183,7 +183,7 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
     assert( v2 != v2last );
 
 #ifndef NDEBUG
-    dprintf( "arc_ccw_turn, p = %d\n", 0 );
+    _glu_dprintf( "arc_ccw_turn, p = %d\n", 0 );
 #endif
 
     // the arcs lie on the line (0 == v1->param[0])
@@ -201,7 +201,7 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
     while( 1 ) {
 	if( v1next->param[0] > v2next->param[0] ) {
 #ifndef NDEBUG
-	    dprintf( "case c\n" );
+	    _glu_dprintf( "case c\n" );
 #endif
 	    assert( v1->param[0] >= v1next->param[0] );
 	    assert( v2->param[0] >= v1next->param[0] );
@@ -215,11 +215,11 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
 		    else {
 			v1 = v1next--;
 #ifdef DEBUG
-			dprintf( "decr\n" );
+			_glu_dprintf( "decr\n" );
 #endif
 			if( v1 == v1last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -230,7 +230,7 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
 	    }
 	} else if( v1next->param[0] < v2next->param[0] ) {
 #ifndef NDEBUG
-	    dprintf( "case d\n" );
+	    _glu_dprintf( "case d\n" );
 #endif
 	    assert( v1->param[0] >= v2next->param[0] );
 	    assert( v2->param[0] >= v2next->param[0] );
@@ -244,11 +244,11 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
 		    else {
 			v2 = v2next++;
 #ifdef DEBUG
-			dprintf( "incr\n" );
+			_glu_dprintf( "incr\n" );
 #endif
 			if( v2 == v2last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -259,7 +259,7 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
 	    }
 	} else {
 #ifdef DEBUG
-	    dprintf( "case cd\n" );
+	    _glu_dprintf( "case cd\n" );
 #endif
 	    if( v1next->param[1] < v2next->param[1] )
 		return 1;
@@ -268,11 +268,11 @@ Subdivider::ccwTurn_sl( Arc_ptr j1, Arc_ptr j2 ) // dir = 0
 	    else {
 		v2 = v2next++;
 #ifdef DEBUG
-		dprintf( "incr\n" );
+		_glu_dprintf( "incr\n" );
 #endif
 		if( v2 == v2last ) {
 #ifdef DEBUG
-		    dprintf( "no good results\n" );
+		    _glu_dprintf( "no good results\n" );
 #endif
 		    return 0; // ill-conditioned, guess answer
 		}
@@ -296,7 +296,7 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
     assert( v2 != v2last );
 
 #ifndef NDEBUG
-    dprintf( "arc_ccw_turn, p = %d\n", 1 );
+    _glu_dprintf( "arc_ccw_turn, p = %d\n", 1 );
 #endif
 
     // the arcs lie on the line (1 == v1->param[1])
@@ -314,7 +314,7 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
     while( 1 ) {
 	if( v1next->param[1] < v2next->param[1] ) {
 #ifndef NDEBUG
-	    dprintf( "case a\n" );
+	    _glu_dprintf( "case a\n" );
 #endif
 	    assert( v1->param[1] <= v1next->param[1] );
 	    assert( v2->param[1] <= v1next->param[1] );
@@ -327,12 +327,12 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 			return sgn;
 		   } else {
 #ifdef DEBUG
-			dprintf( "decr\n" );
+			_glu_dprintf( "decr\n" );
 #endif
 			v1 = v1next--;
 			if( v1 == v1last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -343,7 +343,7 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 	    }
 	} else if( v1next->param[1] > v2next->param[1] ) {
 #ifndef NDEBUG
-	    dprintf( "case b\n" );
+	    _glu_dprintf( "case b\n" );
 #endif
 	    assert( v1->param[1] <= v2next->param[1] );
 	    assert( v2->param[1] <= v2next->param[1] );
@@ -356,12 +356,12 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 			return sgn;
 		   } else {
 #ifdef DEBUG
-			dprintf( "incr\n" );
+			_glu_dprintf( "incr\n" );
 #endif
 			v2 = v2next++;
 			if( v2 == v2last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -372,7 +372,7 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 	    }
 	} else {
 #ifdef DEBUG
-	    dprintf( "case ab\n" );
+	    _glu_dprintf( "case ab\n" );
 #endif
 	    if( v1next->param[0] < v2next->param[0] )
 		return 1;
@@ -380,12 +380,12 @@ Subdivider::ccwTurn_tr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
 		return 0;
 	    else {
 #ifdef DEBUG
-		dprintf( "incr\n" );
+		_glu_dprintf( "incr\n" );
 #endif
 		v2 = v2next++;
 		if( v2 == v2last ) {
 #ifdef DEBUG
-		    dprintf( "no good results\n" );
+		    _glu_dprintf( "no good results\n" );
 #endif
 		    return 0; // ill-conditioned, guess answer
 		}
@@ -409,7 +409,7 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
     assert( v2 != v2last );
 
 #ifndef NDEBUG
-    dprintf( "arc_ccw_turn, p = %d\n", 1 );
+    _glu_dprintf( "arc_ccw_turn, p = %d\n", 1 );
 #endif
 
     // the arcs lie on the line (1 == v1->param[1])
@@ -427,7 +427,7 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
     while( 1 ) {
 	if( v1next->param[1] > v2next->param[1] ) {
 #ifndef NDEBUG
-	    dprintf( "case c\n" );
+	    _glu_dprintf( "case c\n" );
 #endif
 	    assert( v1->param[1] >= v1next->param[1] );
 	    assert( v2->param[1] >= v1next->param[1] );
@@ -441,11 +441,11 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
 		    else {
 			v1 = v1next--;
 #ifdef DEBUG
-			dprintf( "decr\n" );
+			_glu_dprintf( "decr\n" );
 #endif
 			if( v1 == v1last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -456,7 +456,7 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
 	    }
 	} else if( v1next->param[1] < v2next->param[1] ) {
 #ifndef NDEBUG
-	    dprintf( "case d\n" );
+	    _glu_dprintf( "case d\n" );
 	    assert( v1->param[1] >= v2next->param[1] );
 	    assert( v2->param[1] >= v2next->param[1] );
 #endif
@@ -470,11 +470,11 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
 		    else {
 			v2 = v2next++;
 #ifdef DEBUG
-			dprintf( "incr\n" );
+			_glu_dprintf( "incr\n" );
 #endif
 			if( v2 == v2last ) {
 #ifdef DEBUG
-			    dprintf( "no good results\n" );
+			    _glu_dprintf( "no good results\n" );
 #endif
 			    return 0; // ill-conditioned, guess answer
 			}
@@ -485,7 +485,7 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
 	    }
 	} else {
 #ifdef DEBUG
-	    dprintf( "case cd\n" );
+	    _glu_dprintf( "case cd\n" );
 #endif
 	    if( v1next->param[0] < v2next->param[0] )
 		return 0;
@@ -494,11 +494,11 @@ Subdivider::ccwTurn_tl( Arc_ptr j1, Arc_ptr j2 )
 	    else {
 		v2 = v2next++;
 #ifdef DEBUG
-		dprintf( "incr\n" );
+		_glu_dprintf( "incr\n" );
 #endif
 		if( v2 == v2last ) {
 #ifdef DEBUG
-		    dprintf( "no good results\n" );
+		    _glu_dprintf( "no good results\n" );
 #endif
 		    return 0; // ill-conditioned, guess answer
 		}

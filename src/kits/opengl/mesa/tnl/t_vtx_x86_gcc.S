@@ -555,3 +555,7 @@ GLOBL( _tnl_x86_dispatch_vertexattribfv )
 	ret	$8		/* return */
 GLOBL( _tnl_x86_dispatch_vertexattribfv_end )
 #endif /* defined (STDCALL_API) */
+
+#if defined (__ELF__) && defined (__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif

@@ -27,9 +27,20 @@
 #include "macros.h"
 #include "program.h"
 
-#include "s_nvfragprog.h"
-#include "s_span.h"
-#include "s_texture.h"
+#include "s_atifragshader.h"
+
+
+/**
+ * State for executing ATI fragment shader.
+ */
+struct atifs_machine
+{
+   GLfloat Registers[6][4];         /** six temporary registers */
+   GLfloat PrevPassRegisters[6][4];
+   GLfloat Inputs[2][4];   /** Primary, secondary input colors */
+};
+
+
 
 /**
  * Fetch a texel.
@@ -42,9 +53,9 @@ fetch_texel(GLcontext * ctx, const GLfloat texcoord[4], GLfloat lambda,
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
    /* XXX use a float-valued TextureSample routine here!!! */
-   swrast->TextureSample[unit] (ctx, unit, ctx->Texture.Unit[unit]._Current,
-				1, (const GLfloat(*)[4]) texcoord,
-				&lambda, &rgba);
+   swrast->TextureSample[unit](ctx, ctx->Texture.Unit[unit]._Current,
+                               1, (const GLfloat(*)[4]) texcoord,
+                               &lambda, &rgba);
    color[0] = CHAN_TO_FLOAT(rgba[0]);
    color[1] = CHAN_TO_FLOAT(rgba[1]);
    color[2] = CHAN_TO_FLOAT(rgba[2]);
@@ -52,38 +63,40 @@ fetch_texel(GLcontext * ctx, const GLfloat texcoord[4], GLfloat lambda,
 }
 
 static void
-apply_swizzle(struct atifs_machine *machine, GLuint reg, GLuint swizzle)
+apply_swizzle(GLfloat values[4], GLuint swizzle)
 {
    GLfloat s, t, r, q;
 
-   s = machine->Registers[reg][0];
-   t = machine->Registers[reg][1];
-   r = machine->Registers[reg][2];
-   q = machine->Registers[reg][3];
+   s = values[0];
+   t = values[1];
+   r = values[2];
+   q = values[3];
 
    switch (swizzle) {
    case GL_SWIZZLE_STR_ATI:
-      machine->Registers[reg][0] = s;
-      machine->Registers[reg][1] = t;
-      machine->Registers[reg][2] = r;
+      values[0] = s;
+      values[1] = t;
+      values[2] = r;
       break;
    case GL_SWIZZLE_STQ_ATI:
-      machine->Registers[reg][0] = s;
-      machine->Registers[reg][1] = t;
-      machine->Registers[reg][2] = q;
+      values[0] = s;
+      values[1] = t;
+      values[2] = q;
       break;
    case GL_SWIZZLE_STR_DR_ATI:
-      machine->Registers[reg][0] = s / r;
-      machine->Registers[reg][1] = t / r;
-      machine->Registers[reg][2] = 1 / r;
+      values[0] = s / r;
+      values[1] = t / r;
+      values[2] = 1 / r;
       break;
    case GL_SWIZZLE_STQ_DQ_ATI:
-      machine->Registers[reg][0] = s / q;
-      machine->Registers[reg][1] = t / q;
-      machine->Registers[reg][2] = 1 / q;
+/* make sure q is not 0 to avoid problems later with infinite values (texture lookup)? */
+      if (q == 0.0F) q = 0.000000001;
+      values[0] = s / q;
+      values[1] = t / q;
+      values[2] = 1 / q;
       break;
    }
-   machine->Registers[reg][3] = 0.0;
+   values[3] = 0.0;
 }
 
 static void
@@ -95,7 +108,7 @@ apply_src_rep(GLint optype, GLuint rep, GLfloat * val)
       return;
 
    start = optype ? 3 : 0;
-   end = optype ? 4 : 3;
+   end = 4;
 
    for (i = start; i < end; i++) {
       switch (rep) {
@@ -125,7 +138,7 @@ apply_src_mod(GLint optype, GLuint mod, GLfloat * val)
       return;
 
    start = optype ? 3 : 0;
-   end = optype ? 4 : 3;
+   end = 4;
 
    for (i = start; i < end; i++) {
       if (mod & GL_COMP_BIT_ATI)
@@ -219,7 +232,7 @@ write_dst_addr(GLuint optype, GLuint mod, GLuint mask, GLfloat * src,
       dst[3] = src[3];
 }
 
-void
+static void
 finish_pass(struct atifs_machine *machine)
 {
    GLint i;
@@ -228,17 +241,6 @@ finish_pass(struct atifs_machine *machine)
       COPY_4V(machine->PrevPassRegisters[i], machine->Registers[i]);
    }
 }
-
-/**
- * Execute the given fragment shader
- * NOTE: we do everything in single-precision floating point; we don't
- * currently observe the single/half/fixed-precision qualifiers.
- * \param ctx - rendering context
- * \param program - the fragment program to execute
- * \param machine - machine state (register file)
- * \param maxInst - max number of instructions to execute
- * \return GL_TRUE if program completed or GL_FALSE if program executed KIL.
- */
 
 struct ati_fs_opcode_st ati_fs_opcodes[] = {
    {GL_ADD_ATI, 2},
@@ -257,95 +259,92 @@ struct ati_fs_opcode_st ati_fs_opcodes[] = {
 
 
 static void
-handle_pass_op(struct atifs_machine *machine, struct atifs_instruction *inst,
-	       const struct sw_span *span, GLuint column)
+handle_pass_op(struct atifs_machine *machine, struct atifs_setupinst *texinst,
+	       const SWspan *span, GLuint column, GLuint idx)
 {
-   GLuint idx = inst->DstReg[0].Index - GL_REG_0_ATI;
-   GLuint swizzle = inst->DstReg[0].Swizzle;
-   GLuint pass_tex = inst->SrcReg[0][0].Index;
+   GLuint swizzle = texinst->swizzle;
+   GLuint pass_tex = texinst->src;
 
-   /* if we get here after passing pass one then we are starting pass two - backup the registers */
-   if (machine->pass == 1) {
-      finish_pass(machine);
-      machine->pass = 2;
-   }
    if (pass_tex >= GL_TEXTURE0_ARB && pass_tex <= GL_TEXTURE7_ARB) {
       pass_tex -= GL_TEXTURE0_ARB;
       COPY_4V(machine->Registers[idx],
 	      span->array->texcoords[pass_tex][column]);
    }
-   else if (pass_tex >= GL_REG_0_ATI && pass_tex <= GL_REG_5_ATI
-	    && machine->pass == 2) {
+   else if (pass_tex >= GL_REG_0_ATI && pass_tex <= GL_REG_5_ATI) {
       pass_tex -= GL_REG_0_ATI;
       COPY_4V(machine->Registers[idx], machine->PrevPassRegisters[pass_tex]);
    }
-   apply_swizzle(machine, idx, swizzle);
+   apply_swizzle(machine->Registers[idx], swizzle);
 
 }
 
 static void
 handle_sample_op(GLcontext * ctx, struct atifs_machine *machine,
-		 struct atifs_instruction *inst, const struct sw_span *span,
-		 GLuint column)
+		 struct atifs_setupinst *texinst, const SWspan *span,
+		 GLuint column, GLuint idx)
 {
-   GLuint idx = inst->DstReg[0].Index - GL_REG_0_ATI;
-   GLuint swizzle = inst->DstReg[0].Swizzle;
-   GLuint sample_tex = inst->SrcReg[0][0].Index;
+/* sample from unit idx using texinst->src as coords */
+   GLuint swizzle = texinst->swizzle;
+   GLuint coord_source = texinst->src;
+   GLfloat tex_coords[4];
 
-   /* if we get here after passing pass one then we are starting pass two - backup the registers */
-   if (machine->pass == 1) {
-      finish_pass(machine);
-      machine->pass = 2;
+   if (coord_source >= GL_TEXTURE0_ARB && coord_source <= GL_TEXTURE7_ARB) {
+      coord_source -= GL_TEXTURE0_ARB;
+      COPY_4V(tex_coords, span->array->texcoords[coord_source][column]);
    }
-
-   if (sample_tex >= GL_TEXTURE0_ARB && sample_tex <= GL_TEXTURE7_ARB) {
-      sample_tex -= GL_TEXTURE0_ARB;
-      fetch_texel(ctx, span->array->texcoords[sample_tex][column], 0.0F,
-		  sample_tex, machine->Registers[idx]);
+   else if (coord_source >= GL_REG_0_ATI && coord_source <= GL_REG_5_ATI) {
+      coord_source -= GL_REG_0_ATI;
+      COPY_4V(tex_coords, machine->PrevPassRegisters[coord_source]);
    }
-   else if (sample_tex >= GL_REG_0_ATI && sample_tex <= GL_REG_5_ATI) {
-      /* this is wrong... */
-      sample_tex -= GL_REG_0_ATI;
-      fetch_texel(ctx, machine->Registers[sample_tex], 0, sample_tex,
-		  machine->Registers[idx]);
-   }
-
-   apply_swizzle(machine, idx, swizzle);
+   apply_swizzle(tex_coords, swizzle);
+   fetch_texel(ctx, tex_coords, 0.0F, idx, machine->Registers[idx]);
 }
 
-#define SETUP_SRC_REG(optype, i, x)	     do {	\
-    if (optype) \
-      src[optype][i][3] = x[3]; \
-    else \
-      COPY_3V(src[optype][i], x); \
-  } while (0)
+#define SETUP_SRC_REG(optype, i, x)		\
+do {						\
+   COPY_4V(src[optype][i], x); 			\
+} while (0)
 
-static GLboolean
-execute_shader(GLcontext * ctx,
-	       const struct ati_fragment_shader *shader, GLuint maxInst,
-	       struct atifs_machine *machine, const struct sw_span *span,
-	       GLuint column)
+
+
+/**
+ * Execute the given fragment shader.
+ * NOTE: we do everything in single-precision floating point
+ * \param ctx - rendering context
+ * \param shader - the shader to execute
+ * \param machine - virtual machine state
+ * \param span - the SWspan we're operating on
+ * \param column - which pixel [i] we're operating on in the span
+ */
+static void
+execute_shader(GLcontext *ctx, const struct ati_fragment_shader *shader,
+	       struct atifs_machine *machine, const SWspan *span,
+               GLuint column)
 {
    GLuint pc;
    struct atifs_instruction *inst;
+   struct atifs_setupinst *texinst;
    GLint optype;
-   GLint i;
+   GLint i, j, pass;
    GLint dstreg;
    GLfloat src[2][3][4];
    GLfloat zeros[4] = { 0.0, 0.0, 0.0, 0.0 };
    GLfloat ones[4] = { 1.0, 1.0, 1.0, 1.0 };
    GLfloat dst[2][4], *dstp;
 
-   for (pc = 0; pc < shader->Base.NumInstructions; pc++) {
-      inst = &shader->Instructions[pc];
+   for (pass = 0; pass < shader->NumPasses; pass++) {
+      if (pass > 0)
+	 finish_pass(machine);
+      for (j = 0; j < MAX_NUM_FRAGMENT_REGISTERS_ATI; j++) {
+	 texinst = &shader->SetupInst[pass][j];
+	 if (texinst->Opcode == ATI_FRAGMENT_SHADER_PASS_OP)
+	    handle_pass_op(machine, texinst, span, column, j);
+	 else if (texinst->Opcode == ATI_FRAGMENT_SHADER_SAMPLE_OP)
+	    handle_sample_op(ctx, machine, texinst, span, column, j);
+      }
 
-      if (inst->Opcode[0] == ATI_FRAGMENT_SHADER_PASS_OP)
-	 handle_pass_op(machine, inst, span, column);
-      else if (inst->Opcode[0] == ATI_FRAGMENT_SHADER_SAMPLE_OP)
-	 handle_sample_op(ctx, machine, inst, span, column);
-      else {
-	 if (machine->pass == 0)
-	    machine->pass = 1;
+      for (pc = 0; pc < shader->numArithInstr[pass]; pc++) {
+	 inst = &shader->Instructions[pass][pc];
 
 	 /* setup the source registers for color and alpha ops */
 	 for (optype = 0; optype < 2; optype++) {
@@ -355,9 +354,15 @@ execute_shader(GLcontext * ctx,
 	       if (index >= GL_REG_0_ATI && index <= GL_REG_5_ATI)
 		  SETUP_SRC_REG(optype, i,
 				machine->Registers[index - GL_REG_0_ATI]);
-	       else if (index >= GL_CON_0_ATI && index <= GL_CON_7_ATI)
-		  SETUP_SRC_REG(optype, i,
+	       else if (index >= GL_CON_0_ATI && index <= GL_CON_7_ATI) {
+		  if (shader->LocalConstDef & (1 << (index - GL_CON_0_ATI))) {
+		     SETUP_SRC_REG(optype, i,
 				shader->Constants[index - GL_CON_0_ATI]);
+		  } else {
+		     SETUP_SRC_REG(optype, i,
+				ctx->ATIFragmentShader.GlobalConstants[index - GL_CON_0_ATI]);
+		  }
+	       }
 	       else if (index == GL_ONE)
 		  SETUP_SRC_REG(optype, i, ones);
 	       else if (index == GL_ZERO)
@@ -478,6 +483,7 @@ execute_shader(GLcontext * ctx,
 		     GLfloat result;
 
 		     /* DOT 2 always uses the source from the color op */
+		     /* could save recalculation of dot products for alpha inst */
 		     result = src[0][0][0] * src[0][1][0] +
 			src[0][0][1] * src[0][1][1] + src[0][2][2];
 		     if (!optype) {
@@ -487,7 +493,6 @@ execute_shader(GLcontext * ctx,
 		     }
 		     else
 			dst[optype][3] = result;
-
 		  }
 		  break;
 	       case GL_DOT3_ATI:
@@ -513,7 +518,7 @@ execute_shader(GLcontext * ctx,
 		     GLfloat result;
 
 		     /* DOT 4 always uses the source from the color op */
-		     result = src[optype][0][0] * src[0][1][0] +
+		     result = src[0][0][0] * src[0][1][0] +
 			src[0][0][1] * src[0][1][1] +
 			src[0][0][2] * src[0][1][2] +
 			src[0][0][3] * src[0][1][3];
@@ -537,88 +542,72 @@ execute_shader(GLcontext * ctx,
 	       dstreg = inst->DstReg[optype].Index;
 	       dstp = machine->Registers[dstreg - GL_REG_0_ATI];
 
-	       write_dst_addr(optype, inst->DstReg[optype].dstMod,
+	       if ((optype == 0) || ((inst->Opcode[1] != GL_DOT2_ADD_ATI) &&
+		  (inst->Opcode[1] != GL_DOT3_ATI) && (inst->Opcode[1] != GL_DOT4_ATI)))
+	          write_dst_addr(optype, inst->DstReg[optype].dstMod,
 			      inst->DstReg[optype].dstMask, dst[optype],
 			      dstp);
+	       else
+		  write_dst_addr(1, inst->DstReg[0].dstMod, 0, dst[1], dstp);
 	    }
 	 }
       }
    }
-   return GL_TRUE;
 }
 
+
+/**
+ * Init fragment shader virtual machine state.
+ */
 static void
 init_machine(GLcontext * ctx, struct atifs_machine *machine,
 	     const struct ati_fragment_shader *shader,
-	     const struct sw_span *span, GLuint col)
+	     const SWspan *span, GLuint col)
 {
+   GLfloat (*inputs)[4] = machine->Inputs;
    GLint i, j;
 
    for (i = 0; i < 6; i++) {
       for (j = 0; j < 4; j++)
-	 ctx->ATIFragmentShader.Machine.Registers[i][j] = 0.0;
-
+	 machine->Registers[i][j] = 0.0;
    }
 
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_PRIMARY][0] =
-      CHAN_TO_FLOAT(span->array->rgba[col][0]);
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_PRIMARY][1] =
-      CHAN_TO_FLOAT(span->array->rgba[col][1]);
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_PRIMARY][2] =
-      CHAN_TO_FLOAT(span->array->rgba[col][2]);
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_PRIMARY][3] =
-      CHAN_TO_FLOAT(span->array->rgba[col][3]);
-
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_SECONDARY][0] =
-      CHAN_TO_FLOAT(span->array->spec[col][0]);
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_SECONDARY][1] =
-      CHAN_TO_FLOAT(span->array->spec[col][1]);
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_SECONDARY][2] =
-      CHAN_TO_FLOAT(span->array->spec[col][2]);
-   ctx->ATIFragmentShader.Machine.Inputs[ATI_FS_INPUT_SECONDARY][3] =
-      CHAN_TO_FLOAT(span->array->spec[col][3]);
-
-   ctx->ATIFragmentShader.Machine.pass = 0;
+   COPY_4V(inputs[ATI_FS_INPUT_PRIMARY], span->array->color.sz4.rgba[col]);
+   COPY_4V(inputs[ATI_FS_INPUT_SECONDARY], span->array->color.sz4.spec[col]);
 }
 
 
 
 /**
- * Execute the current fragment program, operating on the given span.
+ * Execute the current ATI shader program, operating on the given span.
  */
 void
-_swrast_exec_fragment_shader(GLcontext * ctx, struct sw_span *span)
+_swrast_exec_fragment_shader(GLcontext * ctx, SWspan *span)
 {
    const struct ati_fragment_shader *shader = ctx->ATIFragmentShader.Current;
+   struct atifs_machine machine;
    GLuint i;
+
+   /* incoming colors should be floats */
+   ASSERT(span->array->ChanType == GL_FLOAT);
 
    ctx->_CurrentProgram = GL_FRAGMENT_SHADER_ATI;
 
    for (i = 0; i < span->end; i++) {
       if (span->array->mask[i]) {
-	 init_machine(ctx, &ctx->ATIFragmentShader.Machine,
-		      ctx->ATIFragmentShader.Current, span, i);
+	 init_machine(ctx, &machine, shader, span, i);
 
-	 if (execute_shader(ctx, shader, ~0,
-			    &ctx->ATIFragmentShader.Machine, span, i)) {
-	    span->array->mask[i] = GL_FALSE;
-	 }
+	 execute_shader(ctx, shader, &machine, span, i);
 
+         /* store result color */
 	 {
-	    const GLfloat *colOut =
-	       ctx->ATIFragmentShader.Machine.Registers[0];
-
-	    /*fprintf(stderr,"outputs %f %f %f %f\n", colOut[0], colOut[1], colOut[2], colOut[3]); */
-	    UNCLAMPED_FLOAT_TO_CHAN(span->array->rgba[i][RCOMP], colOut[0]);
-	    UNCLAMPED_FLOAT_TO_CHAN(span->array->rgba[i][GCOMP], colOut[1]);
-	    UNCLAMPED_FLOAT_TO_CHAN(span->array->rgba[i][BCOMP], colOut[2]);
-	    UNCLAMPED_FLOAT_TO_CHAN(span->array->rgba[i][ACOMP], colOut[3]);
+	    const GLfloat *colOut = machine.Registers[0];
+            /*fprintf(stderr,"outputs %f %f %f %f\n",
+              colOut[0], colOut[1], colOut[2], colOut[3]); */
+            COPY_4V(span->array->color.sz4.rgba[i], colOut);
 	 }
       }
-
    }
 
-
    ctx->_CurrentProgram = 0;
-
 }
