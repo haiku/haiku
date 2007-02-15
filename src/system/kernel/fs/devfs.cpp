@@ -1616,6 +1616,8 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 				 */
 				strcpy(path, "/dev/");
 				get_device_name(vnode, path + 5, sizeof(path) - 5);
+				if (length && (length <= strlen(path)))
+					return ERANGE;
 				return user_strlcpy((char *)buffer, path, sizeof(path));
 			}
 
