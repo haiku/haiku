@@ -38,7 +38,7 @@ options:
   --target=TARGET             Select build target platform. [default=${target}]
                               valid targets=r5,bone,dano,haiku
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
-                              build process, but uses more memory.
+                              process, but uses more memory.
 
 environment variables:
   HAIKU_AR                    The static library archiver. Defaults to "ar".
