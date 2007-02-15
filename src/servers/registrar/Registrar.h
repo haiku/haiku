@@ -52,6 +52,7 @@ public:
 	static Registrar *App();
 
 private:
+	void _MessageReceived(BMessage *message);
 	void _HandleShutDown(BMessage *message);
 
 	TRoster					*fRoster;

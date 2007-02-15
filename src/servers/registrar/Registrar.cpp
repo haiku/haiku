@@ -6,19 +6,12 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  */
 
-
-#include "Debug.h"
-
-#include "ClipboardHandler.h"
-#include "EventQueue.h"
-#include "MessageDeliverer.h"
-#include "MessageEvent.h"
-#include "MessageRunnerManager.h"
-#include "MessagingService.h"
-#include "MIMEManager.h"
 #include "Registrar.h"
-#include "ShutdownProcess.h"
-#include "TRoster.h"
+
+#include <stdio.h>
+#include <string.h>
+
+#include <exception>
 
 #include <Application.h>
 #include <Message.h>
@@ -26,8 +19,16 @@
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 
-#include <stdio.h>
-#include <string.h>
+#include "ClipboardHandler.h"
+#include "Debug.h"
+#include "EventQueue.h"
+#include "MessageDeliverer.h"
+#include "MessageEvent.h"
+#include "MessageRunnerManager.h"
+#include "MessagingService.h"
+#include "MIMEManager.h"
+#include "ShutdownProcess.h"
+#include "TRoster.h"
 
 
 /*!
@@ -96,6 +97,108 @@ Registrar::~Registrar()
 */
 void
 Registrar::MessageReceived(BMessage *message)
+{
+	try {
+		_MessageReceived(message);
+	} catch (std::exception& exception) {
+		char buffer[1024];
+		snprintf(buffer, sizeof(buffer),
+			"Registrar::MessageReceived() caught exception: %s",
+			exception.what());
+		debugger(buffer);
+	} catch (...) {
+		debugger("Registrar::MessageReceived() caught unknown exception");
+	}
+}
+
+// ReadyToRun
+/*!	\brief Overrides the super class version to initialize the registrar
+		   services.
+*/
+void
+Registrar::ReadyToRun()
+{
+	FUNCTION_START();
+
+	// create message deliverer
+	status_t error = MessageDeliverer::CreateDefault();
+	if (error != B_OK) {
+		FATAL(("Registrar::ReadyToRun(): Failed to create the message "
+			"deliverer: %s\n", strerror(error)));
+	}
+
+	// create event queue
+	fEventQueue = new EventQueue(kEventQueueName);
+
+	// create roster
+	fRoster = new TRoster;
+	fRoster->Init();
+
+	// create clipboard handler
+	fClipboardHandler = new ClipboardHandler;
+	AddHandler(fClipboardHandler);
+
+	// create MIME manager
+	fMIMEManager = new MIMEManager;
+	fMIMEManager->Run();
+
+	// create message runner manager
+	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);
+
+	// init the global be_roster
+	BRoster::Private().SetTo(be_app_messenger, BMessenger(NULL, fMIMEManager));
+
+	// create the messaging service
+	error = MessagingService::CreateDefault();
+	if (error != B_OK) {
+		ERROR(("Registrar::ReadyToRun(): Failed to init messaging service "
+			"(that's by design when running under R5): %s\n", strerror(error)));
+	}
+
+	// create and schedule the sanity message event
+	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
+									this, B_REG_ROSTER_SANITY_EVENT);
+	fSanityEvent->SetAutoDelete(false);
+	fEventQueue->AddEvent(fSanityEvent);
+
+	FUNCTION_END();
+}
+
+// QuitRequested
+/*!	\brief Overrides the super class version to avoid termination of the
+		   registrar until the system shutdown.
+*/
+bool
+Registrar::QuitRequested()
+{
+	FUNCTION_START();
+	// The final registrar must not quit. At least not that easily. ;-)
+	return BApplication::QuitRequested();
+}
+
+// GetEventQueue
+/*!	\brief Returns the registrar's event queue.
+	\return The registrar's event queue.
+*/
+EventQueue*
+Registrar::GetEventQueue() const
+{
+	return fEventQueue;
+}
+
+// App
+/*!	\brief Returns the Registrar application object.
+	\return The Registrar application object.
+*/
+Registrar*
+Registrar::App()
+{
+	return dynamic_cast<Registrar*>(be_app);
+}
+
+// _MessageReceived
+void
+Registrar::_MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		// general requests
@@ -235,91 +338,6 @@ Registrar::MessageReceived(BMessage *message)
 	}
 }
 
-// ReadyToRun
-/*!	\brief Overrides the super class version to initialize the registrar
-		   services.
-*/
-void
-Registrar::ReadyToRun()
-{
-	FUNCTION_START();
-
-	// create message deliverer
-	status_t error = MessageDeliverer::CreateDefault();
-	if (error != B_OK) {
-		FATAL(("Registrar::ReadyToRun(): Failed to create the message "
-			"deliverer: %s\n", strerror(error)));
-	}
-
-	// create event queue
-	fEventQueue = new EventQueue(kEventQueueName);
-
-	// create roster
-	fRoster = new TRoster;
-	fRoster->Init();
-
-	// create clipboard handler
-	fClipboardHandler = new ClipboardHandler;
-	AddHandler(fClipboardHandler);
-
-	// create MIME manager
-	fMIMEManager = new MIMEManager;
-	fMIMEManager->Run();
-
-	// create message runner manager
-	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);
-
-	// init the global be_roster
-	BRoster::Private().SetTo(be_app_messenger, BMessenger(NULL, fMIMEManager));
-
-	// create the messaging service
-	error = MessagingService::CreateDefault();
-	if (error != B_OK) {
-		ERROR(("Registrar::ReadyToRun(): Failed to init messaging service "
-			"(that's by design when running under R5): %s\n", strerror(error)));
-	}
-
-	// create and schedule the sanity message event
-	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
-									this, B_REG_ROSTER_SANITY_EVENT);
-	fSanityEvent->SetAutoDelete(false);
-	fEventQueue->AddEvent(fSanityEvent);
-
-	FUNCTION_END();
-}
-
-// QuitRequested
-/*!	\brief Overrides the super class version to avoid termination of the
-		   registrar until the system shutdown.
-*/
-bool
-Registrar::QuitRequested()
-{
-	FUNCTION_START();
-	// The final registrar must not quit. At least not that easily. ;-)
-	return BApplication::QuitRequested();
-}
-
-// GetEventQueue
-/*!	\brief Returns the registrar's event queue.
-	\return The registrar's event queue.
-*/
-EventQueue*
-Registrar::GetEventQueue() const
-{
-	return fEventQueue;
-}
-
-// App
-/*!	\brief Returns the Registrar application object.
-	\return The Registrar application object.
-*/
-Registrar*
-Registrar::App()
-{
-	return dynamic_cast<Registrar*>(be_app);
-}
-
 // _HandleShutDown
 /*!	\brief Handle a shut down request message.
 	\param request The request to be handled.
@@ -383,7 +401,17 @@ main()
 	rename_thread(find_thread(NULL), kRosterThreadName);
 
 PRINT(("app->Run()...\n"));
-	app->Run();
+
+	try {
+		app->Run();
+	} catch (std::exception& exception) {
+		char buffer[1024];
+		snprintf(buffer, sizeof(buffer),
+			"registrar main() caught exception: %s", exception.what());
+		debugger(buffer);
+	} catch (...) {
+		debugger("registrar main() caught unknown exception");
+	}
 
 PRINT(("delete app...\n"));
 	delete app;
