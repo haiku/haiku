@@ -42,7 +42,6 @@ struct console {
 	int tty_num;
 	thread_id keyboard_reader;
 	thread_id console_writer;
-	sem_id wait_sem;
 };
 
 
@@ -143,7 +142,6 @@ keyboard_reader(void *arg)
 	}
 #endif	// USE_INPUT_SERVER
 
-	release_sem(con->wait_sem);
 	return 0;
 }
 
@@ -164,7 +162,6 @@ console_writer(void *arg)
 		write_len = write(con->console_fd, buf, len);
 	}
 
-	release_sem(con->wait_sem);
 	return 0;
 }
 
@@ -175,10 +172,12 @@ start_console(struct console *con)
 	DIR *dir;
 
 	memset(con, 0, sizeof(struct console));
-
-	con->wait_sem = create_sem(0, "console wait sem");
-	if (con->wait_sem < 0)
-		return -1;
+	con->console_fd = -1;
+	con->keyboard_fd = -1;
+	con->tty_master_fd = -1;
+	con->tty_slave_fd = -1;
+	con->keyboard_reader = -1;
+	con->console_writer = -1;
 
 	con->console_fd = open("/dev/console", O_WRONLY);
 	if (con->console_fd < 0)
@@ -258,6 +257,27 @@ start_console(struct console *con)
 #endif
 
 	return 0;
+}
+
+
+static void
+stop_console(struct console* con)
+{
+	// close TTY FDs; this will also unblock the threads
+	close(con->tty_master_fd);
+	close(con->tty_slave_fd);
+
+	// close console and keyboard
+	close(con->console_fd);
+#ifndef USE_INPUT_SERVER
+	close(con->keyboard_fd);
+	// TODO: USE_INPUT_SERVER case.
+#endif
+
+	// wait for the threads
+	status_t returnCode;
+	wait_for_thread(con->console_writer, &returnCode);
+	wait_for_thread(con->keyboard_reader, &returnCode);
 }
 
 
@@ -344,7 +364,7 @@ main(int argc, char **argv)
 		}
 	}
 
-	acquire_sem(gConsole.wait_sem);
+	stop_console(&gConsole);
 
 	return 0;
 }
