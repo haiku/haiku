@@ -76,7 +76,7 @@ ControlView::AttachedToWindow()
 	rect.OffsetBy(0.0, 29.0);
 	fFontsizeSlider = new BSlider(rect, "Fontsize", "Size: 50", NULL, 4, 360);
 	fFontsizeSlider->SetModificationMessage(new BMessage(FONTSIZE_MSG));
-	fFontsizeSlider->SetValue(50.0);
+	fFontsizeSlider->SetValue(50);
 	AddChild(fFontsizeSlider);
 
 	// Get the preferred size for the sliders
@@ -86,19 +86,19 @@ ControlView::AttachedToWindow()
 	rect.OffsetBy(0.0, offsetX);
 	fShearSlider = new BSlider(rect, "Shear", "Shear: 90", NULL, 45, 135);
 	fShearSlider->SetModificationMessage(new BMessage(FONTSHEAR_MSG));
-	fShearSlider->SetValue(90.0);
+	fShearSlider->SetValue(90);
 	AddChild(fShearSlider);
 
 	rect.OffsetBy(0.0, offsetX);
 	fRotationSlider = new BSlider(rect, "Rotation", "Rotation: 0", NULL, 0, 360);
 	fRotationSlider->SetModificationMessage( new BMessage(ROTATION_MSG));
-	fRotationSlider->SetValue(0.0);
+	fRotationSlider->SetValue(0);
 	AddChild(fRotationSlider);
 
 	rect.OffsetBy(0.0, offsetX);
 	fSpacingSlider = new BSlider(rect, "Spacing", "Spacing: 0", NULL, -5, 50);
 	fSpacingSlider->SetModificationMessage(new BMessage(SPACING_MSG));
-	fSpacingSlider->SetValue(0.0);
+	fSpacingSlider->SetValue(0);
 	AddChild(fSpacingSlider);
 
 	rect.OffsetBy(0.0, offsetX);
@@ -410,10 +410,10 @@ ControlView::_UpdateAndSendFamily(const BMessage* message)
 {
 	_DeselectOldItems();
 
-	const char* family;
+	font_family family;
 	font_style style;
 
-	if (message->FindString("_family", &family) == B_OK) {
+	if (message->FindString("_family", (const char **)&family) == B_OK) {
 		printf("Family:%s\n\n", family);
 
 		BMenuItem* markedItem = fFontFamilyMenu->FindItem(family);
@@ -422,7 +422,7 @@ ControlView::_UpdateAndSendFamily(const BMessage* message)
 
 		markedItem->SetMarked(true);
 
-		get_font_style(font_family(family), 0, &style);
+		get_font_style(family, 0, &style);
 
 		BString string;
 		string << family << " " << style;
