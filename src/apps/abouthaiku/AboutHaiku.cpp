@@ -382,6 +382,7 @@ AboutView::AboutView(const BRect &rect)
 		"Cian Duffy\n"
 		"Marc Flerackers\n"
 		"Daniel Furrer\n"
+		"Troeglazov Gerasim\n"
 		"Matthijs Hollemans\n"
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
