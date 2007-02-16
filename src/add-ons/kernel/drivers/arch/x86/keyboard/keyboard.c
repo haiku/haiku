@@ -1,7 +1,7 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <KernelExport.h>
@@ -250,7 +250,7 @@ handle_keyboard_interrupt(void *data)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - device hooks
 
 
 static status_t
@@ -333,6 +333,8 @@ retry:
 		*_length = 0;
 		return B_OK;
 	}
+	if (status < B_OK)
+		return status;
 
 	// critical section
 	mutex_lock(&keyboard_read_mutex);
@@ -403,8 +405,7 @@ device_hooks keyboard_hooks = {
 };
 
 
-//	#pragma mark -
-/***** driver hooks *****/
+//	#pragma mark - driver hooks
 
 
 status_t
