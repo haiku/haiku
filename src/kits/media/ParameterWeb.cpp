@@ -782,6 +782,21 @@ BParameterGroup::MakeNullParameter(int32 id, media_type mediaType, const char *n
 }
 
 
+BTextParameter *
+BParameterGroup::MakeTextParameter(int32 id, media_type mediaType, const char *name,
+	const char *kind, size_t max_bytes)
+{
+	CALLED();
+	ASSERT(mControls != NULL);
+
+	BTextParameter *parameter = new BTextParameter(id, mediaType, mWeb, name, kind, max_bytes);
+	parameter->mGroup = this;
+	mControls->AddItem(parameter);
+
+	return parameter;
+}
+
+
 BContinuousParameter *
 BParameterGroup::MakeContinuousParameter(int32 id, media_type mediaType,
 	const char *name, const char *kind, const char *unit,
@@ -1245,6 +1260,9 @@ BParameterGroup::MakeControl(int32 type)
 
 		case BParameter::B_CONTINUOUS_PARAMETER:
 			return new BContinuousParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, NULL, 0, 0, 0);
+
+		case BParameter::B_TEXT_PARAMETER:
+			return new BTextParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, NULL);
 
 		default:
 			ERROR("BParameterGroup::MakeControl unknown type %ld\n", type);
@@ -2387,6 +2405,125 @@ BNullParameter::~BNullParameter()
 
 
 //	#pragma mark -
+
+/*************************************************************
+ * public BTextParameter
+ *************************************************************/
+
+
+size_t
+BTextParameter::MaxBytes() const
+{
+	// NULL parameters have no value type
+	return mMaxBytes;
+}
+
+
+type_code
+BTextParameter::ValueType()
+{
+	// NULL parameters have no value type
+	return 0;
+}
+
+
+ssize_t
+BTextParameter::FlattenedSize() const
+{
+	return BParameter::FlattenedSize() + sizeof(mMaxBytes);
+}
+
+
+status_t
+BTextParameter::Flatten(void *buffer, ssize_t size) const
+{
+	if (buffer == NULL) {
+		ERROR("BTextParameter::Flatten(): buffer is NULL\n");
+		return B_NO_INIT;
+	}
+
+	ssize_t parameterSize = BParameter::FlattenedSize();
+	if (size < static_cast<ssize_t>(parameterSize + sizeof(mMaxBytes))) {
+		ERROR("BContinuousParameter::Flatten(): size to small\n");
+		return B_NO_MEMORY;
+	}
+
+	status_t status = BParameter::Flatten(buffer, size);
+	if (status != B_OK) {
+		ERROR("BTextParameter::Flatten(): BParameter::Flatten() failed\n");
+		return status;
+	}
+
+	// add our data to the general flattened BParameter
+
+	skip_in_buffer(&buffer, parameterSize);
+
+	write_to_buffer<uint32>(&buffer, mMaxBytes);
+
+	return B_OK;
+}
+
+
+status_t
+BTextParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
+{
+	// we try to check if the buffer size is long enough to hold an object
+	// as early as possible.
+
+	if (!AllowsTypeCode(code)) {
+		ERROR("BTextParameter::Unflatten wrong type code\n");
+		return B_BAD_TYPE;
+	}
+
+	if (buffer == NULL) {
+		ERROR("BTextParameter::Unflatten buffer is NULL\n");
+		return B_NO_INIT;
+	}
+
+	if (size < static_cast<ssize_t>(sizeof(mMaxBytes))) {
+		ERROR("BTextParameter::Unflatten size too small\n");
+		return B_ERROR;
+	}
+
+	status_t status = BParameter::Unflatten(code, buffer, size);
+	if (status != B_OK) {
+		ERROR("BTextParameter::Unflatten(): BParameter::Unflatten failed\n");
+		return status;
+	}
+
+	ssize_t parameterSize = BParameter::FlattenedSize();
+	skip_in_buffer(&buffer, parameterSize);
+
+	if (size < static_cast<ssize_t>(parameterSize + sizeof(mMaxBytes))) {
+		ERROR("BTextParameter::Unflatten(): buffer too small\n");
+		return B_BAD_VALUE;
+	}
+
+	mMaxBytes = read_from_buffer_swap32<uint32>(&buffer, SwapOnUnflatten());
+
+	return B_OK;
+}
+
+
+/*************************************************************
+ * private BTextParameter
+ *************************************************************/
+
+
+BTextParameter::BTextParameter(int32 id, media_type mediaType, BParameterWeb *web,
+	const char *name, const char *kind, size_t max_bytes)
+	: BParameter(id, mediaType, B_NULL_PARAMETER, web, name, kind, NULL)
+{
+	mMaxBytes = max_bytes;
+}
+
+
+BTextParameter::~BTextParameter()
+{
+}
+
+
+//	#pragma mark -
 //	reserved functions
 
 
@@ -2443,5 +2580,14 @@ status_t BNullParameter::_Reserved_NullParameter_4(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_5(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_6(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_7(void *) { return B_ERROR; }
+
+status_t BTextParameter::_Reserved_TextParameter_0(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_1(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_2(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_3(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_4(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_5(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_6(void *) { return B_ERROR; }
+status_t BTextParameter::_Reserved_TextParameter_7(void *) { return B_ERROR; }
 
 

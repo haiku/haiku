@@ -85,6 +85,7 @@ class BParameter;
 class BNullParameter;
 class BContinuousParameter;
 class BDiscreteParameter;
+class BTextParameter;
 
 
 /*	Set these flags on parameters and groups to control how a Theme will	*/
@@ -192,6 +193,12 @@ public:
 				media_type m_type,
 				const char * name,
 				const char * kind);
+		BTextParameter * MakeTextParameter(
+				int32 id,
+				media_type m_type,
+				const char * name,
+				const char * kind,
+				size_t max_bytes);
 		BParameterGroup * MakeGroup(
 				const char * name);
 
@@ -253,7 +260,8 @@ public:
 		{
 			B_NULL_PARAMETER,
 			B_DISCRETE_PARAMETER,
-			B_CONTINUOUS_PARAMETER
+			B_CONTINUOUS_PARAMETER,
+			B_TEXT_PARAMETER
 		};
 
 		media_parameter_type Type() const;
@@ -307,6 +315,7 @@ private:
 	friend class BNullParameter;
 	friend class BContinuousParameter;
 	friend class BDiscreteParameter;
+	friend class BTextParameter;
 	friend class BParameterGroup;
 	friend class BParameterWeb;
 
@@ -519,5 +528,44 @@ virtual		status_t _Reserved_NullParameter_7(void *);
 
 };
 
+
+class BTextParameter :
+	public BParameter
+{
+public:
+
+	size_t	MaxBytes() const;
+virtual	type_code ValueType();
+
+virtual	ssize_t		FlattenedSize() const;
+virtual	status_t	Flatten(void *buffer, ssize_t size) const;
+virtual	status_t	Unflatten(type_code c, const void *buf, ssize_t size);
+
+private:
+		/* Mmmh, stuffing! */
+virtual		status_t _Reserved_TextParameter_0(void *);
+virtual		status_t _Reserved_TextParameter_1(void *);
+virtual		status_t _Reserved_TextParameter_2(void *);
+virtual		status_t _Reserved_TextParameter_3(void *);
+virtual		status_t _Reserved_TextParameter_4(void *);
+virtual		status_t _Reserved_TextParameter_5(void *);
+virtual		status_t _Reserved_TextParameter_6(void *);
+virtual		status_t _Reserved_TextParameter_7(void *);
+
+	friend class BParameterGroup;
+
+		uint32 mMaxBytes;
+		uint32 _reserved_control_junction_[8];
+
+		BTextParameter(
+				int32 id,
+				media_type m_type,
+				BParameterWeb * web,
+				const char * name,
+				const char * kind,
+				size_t max_bytes);
+		~BTextParameter();
+
+};
 
 #endif /* _CONTROL_WEB_H */
