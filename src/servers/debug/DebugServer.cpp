@@ -29,7 +29,7 @@
 
 //#define TRACE_DEBUG_SERVER
 #ifdef TRACE_DEBUG_SERVER
-#	define TRACE(x) printf x
+#	define TRACE(x) debug_printf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -54,15 +54,15 @@ KillTeam(team_id team, const char *appName = NULL)
 	if (!appName) {
 		status_t error = get_team_info(team, &info);
 		if (error != B_OK) {
-			printf("debug_server: KillTeam(): Error getting info for team %ld: "
-				"%s\n", team, strerror(error));
+			debug_printf("debug_server: KillTeam(): Error getting info for "
+				"team %ld: %s\n", team, strerror(error));
 			info.args[0] = '\0';
 		}
 
 		appName = info.args;
 	}
 
-	printf("debug_server: Killing team %ld (%s)\n", team, appName);
+	debug_printf("debug_server: Killing team %ld (%s)\n", team, appName);
 
 	kill_team(team);
 }
@@ -328,15 +328,15 @@ TeamDebugHandler::Init(port_id nubPort)
 	// get the team info for the team
 	status_t error = get_team_info(fTeam, &fTeamInfo);
 	if (error != B_OK) {
-		printf("debug_server: TeamDebugHandler::Init(): Failed to get info "
-			"for team %ld: %s\n", fTeam, strerror(error));
+		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to get "
+			"info for team %ld: %s\n", fTeam, strerror(error));
 		return error;
 	}
 
 	// get the executable path
 	error = BPrivate::get_app_path(fTeam, fExecutablePath);
 	if (error != B_OK) {
-		printf("debug_server: TeamDebugHandler::Init(): Failed to get "
+		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to get "
 			"executable path of team %ld: %s\n", fTeam, strerror(error));
 
 		fExecutablePath[0] = '\0';
@@ -345,7 +345,7 @@ TeamDebugHandler::Init(port_id nubPort)
 	// init a debug context for the handler
 	error = init_debug_context(&fDebugContext, fTeam, nubPort);
 	if (error != B_OK) {
-		printf("debug_server: TeamDebugHandler::Init(): Failed to init "
+		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to init "
 			"debug context for team %ld, port %ld: %s\n", fTeam, nubPort,
 			strerror(error));
 		return error;
@@ -356,7 +356,7 @@ TeamDebugHandler::Init(port_id nubPort)
 	snprintf(name, sizeof(name), "team %ld message count", fTeam);
 	fMessageCountSem = create_sem(0, name);
 	if (fMessageCountSem < 0) {
-		printf("debug_server: TeamDebugHandler::Init(): Failed to create "
+		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to create "
 			"message count semaphore: %s\n", strerror(fMessageCountSem));
 		return fMessageCountSem;
 	}
@@ -366,7 +366,7 @@ TeamDebugHandler::Init(port_id nubPort)
 	fHandlerThread = spawn_thread(&_HandlerThreadEntry, name, B_NORMAL_PRIORITY,
 		this);
 	if (fHandlerThread < 0) {
-		printf("debug_server: TeamDebugHandler::Init(): Failed to spawn "
+		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to spawn "
 			"handler thread: %s\n", strerror(fHandlerThread));
 		return fHandlerThread;
 	}
@@ -425,20 +425,7 @@ TeamDebugHandler::_EnterDebugger()
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld\n",
 		fTeam));
 
-	bool debugInConsoled = _IsAppServer();
-
-	if (debugInConsoled) {
-		TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld is "
-			"the app server. Killing input_server...\n", fTeam));
-
-		// kill the input server
-		team_id isTeam = _FindTeam("input_server");
-		if (isTeam >= 0) {
-			printf("debug_server: preparing for debugging the app server: "
-				"killing the input server\n");
-			kill_team(isTeam);
-		}
-	}
+	bool debugInConsoled = _IsGUIServer() || !_AreGUIServersAlive();
 
 	// prepare a debugger handover
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): preparing "
@@ -447,7 +434,7 @@ TeamDebugHandler::_EnterDebugger()
 	status_t error = send_debug_message(&fDebugContext,
 		B_DEBUG_MESSAGE_PREPARE_HANDOVER, NULL, 0, NULL, 0);
 	if (error != B_OK) {
-		printf("debug_server: Failed to prepare debugger handover: %s\n",
+		debug_printf("debug_server: Failed to prepare debugger handover: %s\n",
 			strerror(error));
 		return error;
 	}
@@ -482,7 +469,7 @@ TeamDebugHandler::_EnterDebugger()
 
 	thread_id thread = load_image(argc, argv, (const char**)environ);
 	if (thread < 0) {
-		printf("debug_server: Failed to start consoled + gdb: %s\n",
+		debug_printf("debug_server: Failed to start consoled + gdb: %s\n",
 			strerror(thread));
 		return thread;
 	}
@@ -519,7 +506,7 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	switch (message->Code()) {
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 			// This shouldn't happen.
-			printf("debug_server: Got a spurious "
+			debug_printf("debug_server: Got a spurious "
 				"B_DEBUGGER_MESSAGE_TEAM_DELETED message for team %ld\n",
 				fTeam);
 			return true;
@@ -556,7 +543,7 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 			break;
 	}
 
-	printf("debug_server: Thread %ld entered the debugger: %s\n", thread,
+	debug_printf("debug_server: Thread %ld entered the debugger: %s\n", thread,
 		buffer);
 
 	_PrintStackTrace(thread);
@@ -565,10 +552,8 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 	// ask the user whether to debug or kill the team
 	if (_IsGUIServer()) {
-		// App or input server. If it's the app server, we'll try to debug it.
-		kill = !(_IsAppServer() && strlen(fExecutablePath) > 0);
-		debug_printf("*** GUI server died: thread %ld, %s: %s\n", thread, fExecutablePath, buffer);
-			// TODO: for now, so that we know what's going on
+		// App server, input server, or registrar. We always debug those.
+		kill = !(strlen(fExecutablePath) > 0);
 	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
 		// normal app
 
@@ -666,8 +651,8 @@ TeamDebugHandler::_PrintStackTrace(thread_id thread)
 		error = debug_create_symbol_lookup_context(&fDebugContext,
 			&lookupContext);
 		if (error != B_OK) {
-			printf("debug_server: Failed to create symbol lookup context: %s\n",
-				strerror(error));
+			debug_printf("debug_server: Failed to create symbol lookup "
+				"context: %s\n", strerror(error));
 		}
 
 		// lookup the IP
@@ -675,7 +660,7 @@ TeamDebugHandler::_PrintStackTrace(thread_id thread)
 		_LookupSymbolAddress(lookupContext, ip, symbolBuffer,
 			sizeof(symbolBuffer) - 1);
 
-		printf("stack trace, current PC %p  %s:\n", ip, symbolBuffer);
+		debug_printf("stack trace, current PC %p  %s:\n", ip, symbolBuffer);
 
 		for (int32 i = 0; i < 50; i++) {
 			debug_stack_frame_info stackFrameInfo;
@@ -689,7 +674,7 @@ TeamDebugHandler::_PrintStackTrace(thread_id thread)
 			_LookupSymbolAddress(lookupContext, stackFrameInfo.return_address,
 				symbolBuffer, sizeof(symbolBuffer) - 1);
 
-			printf("  (%p)  %p  %s\n", stackFrameInfo.frame,
+			debug_printf("  (%p)  %p  %s\n", stackFrameInfo.frame,
 				stackFrameInfo.return_address, symbolBuffer);
 
 			stackFrameAddress = stackFrameInfo.parent_frame;
@@ -746,8 +731,8 @@ TeamDebugHandler::_HandlerThread()
 		kill = _HandleMessage(message);
 		delete message;
 	} else {
-		printf("TeamDebugHandler::_HandlerThread(): Failed to pop initial "
-			"message: %s", strerror(error));
+		debug_printf("TeamDebugHandler::_HandlerThread(): Failed to pop "
+			"initial message: %s", strerror(error));
 		kill = true;
 	}
 
@@ -763,8 +748,8 @@ TeamDebugHandler::_HandlerThread()
 		do {
 			error = _PopMessage(message);
 			if (error != B_OK) {
-				printf("TeamDebugHandler::_HandlerThread(): Failed to pop "
-					"message: %s", strerror(error));
+				debug_printf("TeamDebugHandler::_HandlerThread(): Failed to "
+					"pop message: %s", strerror(error));
 				kill = true;
 				break;
 			}
@@ -784,8 +769,8 @@ TeamDebugHandler::_HandlerThread()
 				thread_info threadInfo;
 				if (get_thread_info(debuggerThread, &threadInfo) != B_OK) {
 					// the debugger is gone
-					printf("debug_server: The debugger for team %ld seems to "
-						"be gone.", fTeam);
+					debug_printf("debug_server: The debugger for team %ld "
+						"seems to be gone.", fTeam);
 
 					kill = true;
 					terminate = true;
@@ -948,8 +933,8 @@ DebugServer::_Listener()
 		} while (bytesRead == B_INTERRUPTED);
 
 		if (bytesRead < 0) {
-			fprintf(stderr, "debug_server: Failed to read from listener port: "
-				"%s\n", strerror(bytesRead));
+			debug_printf("debug_server: Failed to read from listener port: "
+				"%s. Terminating!\n", strerror(bytesRead));
 			exit(1);
 		}
 TRACE(("debug_server: Got debug message: team: %ld, code: %ld\n",
@@ -976,7 +961,7 @@ main()
 	// for the time being let the debug server print to the syslog
 	int console = open("/dev/dprintf", O_RDONLY);
 	if (console < 0) {
-		fprintf(stderr, "debug_server: Failed to open console: %s\n",
+		debug_printf("debug_server: Failed to open console: %s\n",
 			strerror(errno));
 	}
 	dup2(console, STDOUT_FILENO);
@@ -985,7 +970,7 @@ main()
 
 	// create the team debug handler roster
 	if (!TeamDebugHandlerRoster::CreateDefault()) {
-		fprintf(stderr, "debug_server: Failed to create team debug handler "
+		debug_printf("debug_server: Failed to create team debug handler "
 			"roster.\n");
 		exit(1);
 	}
@@ -993,7 +978,7 @@ main()
 	// create application
 	DebugServer server(error);
 	if (error != B_OK) {
-		fprintf(stderr, "debug_server: Failed to create BApplication: %s\n",
+		debug_printf("debug_server: Failed to create BApplication: %s\n",
 			strerror(error));
 		exit(1);
 	}
@@ -1001,7 +986,7 @@ main()
 	// init application
 	error = server.Init();
 	if (error != B_OK) {
-		fprintf(stderr, "debug_server: Failed to init application: %s\n",
+		debug_printf("debug_server: Failed to init application: %s\n",
 			strerror(error));
 		exit(1);
 	}
