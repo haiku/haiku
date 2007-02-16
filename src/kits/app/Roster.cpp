@@ -2416,11 +2416,17 @@ BRoster::_InitMessengers()
 	port_info info;
 	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
 		DBG(OUT("  found roster port\n"));
-		// ask for the MIME messenger
+
 		BMessenger::Private(fMessenger).SetTo(info.team, rosterPort,
 			B_PREFERRED_TOKEN);
+
+		// ask for the MIME messenger
+		// Generous 1s + 1s timeouts. It could actually be synchronous, but
+		// timeouts allow us to debug the registrar main thread.
+		BMessage request(B_REG_GET_MIME_MESSENGER);
 		BMessage reply;
-		status_t error = fMessenger.SendMessage(B_REG_GET_MIME_MESSENGER, &reply);
+		status_t error = fMessenger.SendMessage(&request, &reply, 1000000LL,
+			1000000LL);
 		if (error == B_OK && reply.what == B_REG_SUCCESS) {
 			DBG(OUT("  got reply from roster\n"));
 				reply.FindMessenger("messenger", &fMimeMessenger);
@@ -2429,6 +2435,7 @@ BRoster::_InitMessengers()
 				strerror(error)));
 			if (error == B_OK)
 				DBG(reply.PrintToStream());
+			fMessenger = BMessenger();
 		}
 	}
 	DBG(OUT("BRoster::InitMessengers() done\n"));
