@@ -244,7 +244,7 @@ rule CopySetHaikuRevision target : source
 actions CopySetHaikuRevision1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	revision=`(svn info $(HAIKU_TOP) 2> /dev/null || echo Revision: 0) |
+	revision=`(LANG=EN_en svn info $(HAIKU_TOP) 2> /dev/null || echo Revision: 0) |
 		grep Revision | awk '{printf $2}'`
 	$(2[1]) --data $(2[3]) $(1) &&
 	$(2[2]) $(1) ${revision}
