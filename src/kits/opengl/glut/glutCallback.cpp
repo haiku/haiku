@@ -38,9 +38,21 @@ glutKeyboardFunc(GLUTkeyboardCB keyboardFunc)
 }
 
 void APIENTRY 
+glutKeyboardUpFunc(GLUTkeyboardCB keyboardUpFunc)
+{
+  gState.currentWindow->keyboardUp = keyboardUpFunc;
+}
+
+void APIENTRY 
 glutSpecialFunc(GLUTspecialCB specialFunc)
 {
   gState.currentWindow->special = specialFunc;
+}
+
+void APIENTRY 
+glutSpecialUpFunc(GLUTspecialCB specialUpFunc)
+{
+  gState.currentWindow->specialUp = specialUpFunc;
 }
 
 void APIENTRY 
@@ -132,6 +144,11 @@ glutIdleFunc(GLUTidleCB idleFunc)
  ***********************************************************/
 void APIENTRY
 glutOverlayDisplayFunc(GLUTdisplayCB displayFunc)
+{
+}
+
+void APIENTRY
+glutJoystickFunc(GLUTjoystickCB joystickFunc, int pollInterval)
 {
 }
 

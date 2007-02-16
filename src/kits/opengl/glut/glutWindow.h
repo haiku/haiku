@@ -31,8 +31,10 @@ class GlutWindow : public BGLView {
 public:
 	GlutWindow(GlutWindow *nparent, char *name, int x, int y, int width,
 				int height, ulong options);
-	
+				
+	virtual void MessageReceived(BMessage *message);
 	void KeyDown(const char *bytes, int32 numBytes);
+	void KeyUp(const char *bytes, int32 numBytes);
 	void MouseDown(BPoint point);
 	void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
 	void FrameResized(float width, float height);
@@ -63,8 +65,10 @@ public:
   GLUTpassiveCB passive;  /* passive motion  (x,y) */
   GLUTentryCB entry;    /* window entry/exit  (state) */
   GLUTkeyboardCB keyboard;  /* keyboard  (ASCII,x,y) */
+  GLUTkeyboardCB keyboardUp;  /* keyboard up (ASCII,x,y) */
   GLUTvisibilityCB visibility;  /* visibility  */
   GLUTspecialCB special;  /* special key  */
+  GLUTspecialCB specialUp;  /* special key up */
   GLUTwindowStatusCB windowStatus;  /* window status */
 
 	bool anyevents;		// were any events received?
@@ -75,8 +79,10 @@ public:
 	bool passiveEvent;		// call passive
 	bool entryEvent;		// call entry
 	bool keybEvent;			// call keyboard
+	bool keybUpEvent;			// call keyboard
 	bool windowStatusEvent;		// call visibility
 	bool specialEvent;		// call special
+	bool specialUpEvent;		// call special
 	bool statusEvent;		// menu status changed
 	bool menuEvent;			// menu selected
 	

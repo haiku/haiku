@@ -120,8 +120,10 @@ GlutWindow::GlutWindow(GlutWindow *nparent, char *name,
 	passive = 0;
 	entry = 0;
 	keyboard = 0;
+	keyboardUp = 0;
 	visibility = 0;
 	special = 0;
+	specialUp = 0;
 	windowStatus = 0;
 		
 	// clear event counters
@@ -133,9 +135,11 @@ GlutWindow::GlutWindow(GlutWindow *nparent, char *name,
 	passiveEvent = 0;
 	entryEvent = 0;
 	keybEvent = 0;
+	keybUpEvent = 0;
 	windowStatusEvent = 0; // DirectConnected() will report change in 
 	visState = -1;         // visibility
 	specialEvent = 0;
+	specialUpEvent = 0;
 	statusEvent = 0;
 	menuEvent = 0;
 	visible = true;

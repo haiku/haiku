@@ -18,6 +18,10 @@
 #include "glutint.h"
 #include "glutState.h"
 #include "glutBlocker.h"
+#include <stdio.h>
+
+#define MOUSE_WHEEL_UP   3
+#define MOUSE_WHEEL_DOWN 4
 
 /***********************************************************
  *	CLASS:	GLUTtimer
@@ -221,6 +225,31 @@ processEventsAndTimeouts(void)
 				}
 				if (!gState.windowList[i])
 					continue;	// window was destroyed by callback!
+
+				if (win->keybUpEvent) {
+					win->keybUpEvent = false;
+					__glutSetWindow(win);
+					if (win->keyboardUp) {
+						gState.modifierKeys = win->modifierKeys;
+						win->keyboardUp(win->key, win->keyX, win->keyY);
+						gState.modifierKeys = ~0;
+					}
+				}
+				if (!gState.windowList[i])
+					continue;	// window was destroyed by callback!
+
+				if (win->specialUpEvent) {
+					win->specialUpEvent = false;
+					__glutSetWindow(win);
+					if (win->specialUp) {
+						gState.modifierKeys = win->modifierKeys;
+						win->specialUp(win->specialKey, win->specialX, win->specialY);
+						gState.modifierKeys = ~0;
+					}
+				}
+				if (!gState.windowList[i])
+					continue;	// window was destroyed by callback!
+
 
 				if (win->entryEvent) {
 					win->entryEvent = false;
@@ -461,6 +490,127 @@ setModifiers:
 /***********************************************************
  *	CLASS:		GlutWindow
  *
+ *	FUNCTION:	KeyUp
+ *
+ *	DESCRIPTION:  handles keyboard and special events
+ ***********************************************************/
+void GlutWindow::KeyUp(const char *s, int32 slen)
+{
+  ulong aChar = s[0];
+  BGLView::KeyUp(s,slen);
+  
+  BPoint p;
+	
+	switch (aChar) {
+		case B_FUNCTION_KEY:
+		switch(Window()->CurrentMessage()->FindInt32("key")) {
+			case B_F1_KEY:
+				aChar = GLUT_KEY_F1;
+				goto specialLabel;
+			case B_F2_KEY:
+				aChar = GLUT_KEY_F2;
+				goto specialLabel;
+			case B_F3_KEY:
+				aChar = GLUT_KEY_F3;
+				goto specialLabel;
+			case B_F4_KEY:
+				aChar = GLUT_KEY_F4;
+				goto specialLabel;
+			case B_F5_KEY:
+				aChar = GLUT_KEY_F5;
+				goto specialLabel;
+			case B_F6_KEY:
+				aChar = GLUT_KEY_F6;
+				goto specialLabel;
+			case B_F7_KEY:
+				aChar = GLUT_KEY_F7;
+				goto specialLabel;
+			case B_F8_KEY:
+				aChar = GLUT_KEY_F8;
+				goto specialLabel;
+			case B_F9_KEY:
+				aChar = GLUT_KEY_F9;
+				goto specialLabel;
+			case B_F10_KEY:
+				aChar = GLUT_KEY_F10;
+				goto specialLabel;
+			case B_F11_KEY:
+				aChar = GLUT_KEY_F11;
+				goto specialLabel;
+			case B_F12_KEY:
+				aChar = GLUT_KEY_F12;
+				goto specialLabel;
+			default:
+				return;
+		}
+		case B_LEFT_ARROW:
+			aChar = GLUT_KEY_LEFT;
+			goto specialLabel;
+		case B_UP_ARROW:
+			aChar = GLUT_KEY_UP;
+			goto specialLabel;
+		case B_RIGHT_ARROW:
+			aChar = GLUT_KEY_RIGHT;
+			goto specialLabel;
+		case B_DOWN_ARROW:
+			aChar = GLUT_KEY_DOWN;
+			goto specialLabel;
+		case B_PAGE_UP:
+			aChar = GLUT_KEY_PAGE_UP;
+			goto specialLabel;
+		case B_PAGE_DOWN:
+			aChar = GLUT_KEY_PAGE_DOWN;
+			goto specialLabel;
+		case B_HOME:
+			aChar = GLUT_KEY_HOME;
+			goto specialLabel;
+		case B_END:
+			aChar = GLUT_KEY_END;
+			goto specialLabel;
+		case B_INSERT:
+            aChar = GLUT_KEY_INSERT;
+specialLabel:	
+			if (specialUp!=0) {
+				anyevents = specialUpEvent = true;
+				GetMouse(&p,&m_buttons);
+				specialKey = aChar;
+				specialX = (int)p.x;
+				specialY = (int)p.y;
+				goto setModifiers;	// set the modifier variable
+			}
+			return;
+
+		default:
+			break;
+	}
+		
+	if (keyboardUp!=0) {
+		anyevents = keybUpEvent = true;
+		GetMouse(&p,&m_buttons);
+		key = aChar;
+		keyX = (int)p.x;
+		keyY = (int)p.y;
+setModifiers:
+		modifierKeys = 0;
+		uint32 beMod = Window()->CurrentMessage()->FindInt32("modifiers");
+		if(beMod & B_SHIFT_KEY)
+			modifierKeys |= GLUT_ACTIVE_SHIFT;
+		if(beMod & B_CONTROL_KEY)
+			modifierKeys |= GLUT_ACTIVE_CTRL;
+		if(beMod & B_OPTION_KEY) {
+			// since the window traps B_COMMAND_KEY, we'll have to settle
+			// for the option key.. but we need to get the raw character,
+			// not the Unicode-enhanced version
+			key = Window()->CurrentMessage()->FindInt32("raw_char");
+			modifierKeys |= GLUT_ACTIVE_ALT;
+		}
+		gBlock.NewEvent();
+	}
+}
+
+/***********************************************************
+ *	CLASS:		GlutWindow
+ *
  *	FUNCTION:	MouseDown
  *
  *	DESCRIPTION:  handles mouse and menustatus events
@@ -593,6 +743,35 @@ void GlutWindow::MouseMoved(BPoint point,
 			gBlock.NewEvent();
 		}
 	}
+}
+
+/***********************************************************
+ *	CLASS:		GlutWindow
+ *
+ *	FUNCTION:	MessageReceived
+ *
+ *	DESCRIPTION:  handles mouse wheel events
+ ***********************************************************/
+ 
+void GlutWindow::MessageReceived(BMessage *message)
+{
+	switch(message->what){
+	case B_MOUSE_WHEEL_CHANGED:
+	{
+	 	float shift=0;
+	 	if(message->FindFloat("be:wheel_delta_y",&shift)==B_OK) {
+	 	if(shift>0)button = MOUSE_WHEEL_UP;
+	 	if(shift<0)button = MOUSE_WHEEL_DOWN;
+	 	if(shift!=0) {
+		  anyevents = mouseEvent = true;
+		  gBlock.NewEvent();
+		 }
+		}
+	 	break;
+	}
+	default:
+	 	break;
+	}			
 }
 
 /***********************************************************
