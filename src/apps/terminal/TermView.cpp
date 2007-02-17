@@ -2229,52 +2229,54 @@ TermView::Find (const BString &str, bool forwardSearch, bool matchCase, bool mat
 			offset = (selectionstart.y) * fTermColumns + selectionstart.x;
 	}
 
-restart:		
-	//Actual search
-	if (forwardSearch) {
-		if (matchCase) {
-			result = buffer.FindFirst(str, offset);
-		} else {
-			result = buffer.IFindFirst(str, offset);
-		}
-	} else {
-		if (matchCase) {
-			result = buffer.FindLast(str, offset);
-		} else {
-			result = buffer.IFindLast(str, offset);
-		}
-	}
-	if (result == B_ERROR) { //Wrap search like Be's Terminal
+	for (;;) {		
+		//Actual search
 		if (forwardSearch) {
-			if (matchCase) {
-				result = buffer.FindFirst(str, 0);
-			} else {
-				result = buffer.IFindFirst(str, 0);
-			}
-		} else {
-			if (matchCase) {
-				result = buffer.FindLast(str, buffer.Length());
-			} else {
-				result = buffer.IFindLast(str, buffer.Length());
-			}
-		}
-	}
-	
-	if (result < 0)
-		return false;
-	
-	if (matchWord) {
-		if (isalnum(buffer.ByteAt(result - 1)) || isalnum(buffer.ByteAt(result + str.Length()))) {
-			if (initialresult == -1) //Set the initial offset to the first result to aid word matching
-				initialresult = result;
-			else if (initialresult == result) //We went round the buffer, nothing found
-				return false;
-			if (forwardSearch)
-				offset = result + str.Length();
+			if (matchCase) 
+				result = buffer.FindFirst(str, offset);
 			else
-				offset = result;
-			goto restart;
+				result = buffer.IFindFirst(str, offset);
+		} else {
+			if (matchCase)
+				result = buffer.FindLast(str, offset);
+			else
+				result = buffer.IFindLast(str, offset);
 		}
+		
+		if (result == B_ERROR) { //Wrap search like Be's Terminal
+			if (forwardSearch) {
+				if (matchCase)
+					result = buffer.FindFirst(str, 0);
+				else
+					result = buffer.IFindFirst(str, 0);
+			} else {
+				if (matchCase)
+					result = buffer.FindLast(str, buffer.Length());
+				else
+					result = buffer.IFindLast(str, buffer.Length());
+			}
+		}
+
+		if (result < 0)
+			return false;
+	
+		if (matchWord) {
+			if (isalnum(buffer.ByteAt(result - 1)) || isalnum(buffer.ByteAt(result + str.Length()))) {
+				if (initialresult == -1) //Set the initial offset to the first result to aid word matching
+					initialresult = result;
+				else if (initialresult == result) //We went round the buffer, nothing found
+					return false;
+				if (forwardSearch)
+					offset = result + str.Length();
+				else
+					offset = result;
+				continue;
+			}
+			else
+				break;
+		}
+		else
+			break;
 	}
 	
 	//Select the found text
