@@ -357,6 +357,14 @@ actions C++
 	$(C++) -c "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
+actions together Archive
+{
+	# Force recreation of the archive to avoid build errors caused by
+	# stale dependencies after renaming or deleting object files.
+	$(RM) $(<)
+	$(AR) $(<) $(>)
+}
+
 rule Library
 {
 	local lib = $(1) ;
