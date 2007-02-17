@@ -244,6 +244,8 @@ get_capability_name(uint8 cap_id)
 			return "cpci_rsrcctl";
 		case PCI_cap_id_hotplug:
 			return "HotPlug";
+		case PCI_cap_id_sata:
+			return "SATA";
 		default:
 			return NULL;
 	}
