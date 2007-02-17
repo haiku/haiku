@@ -221,7 +221,8 @@ static struct pci_module_info sOldPCIModule = {
 	&pci_get_nth_pci_info,
 	&pci_read_config,
 	&pci_write_config,
-	&pci_ram_address
+	&pci_ram_address,
+	&pci_find_capability
 };
 
 static struct pci_root_info sPCIModule = {

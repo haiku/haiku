@@ -147,6 +147,14 @@ struct pci_module_info {
 					);
 
 	void *			(*ram_address) (const void *physical_address_in_system_memory);
+
+	status_t		(*find_pci_capability) (
+						uchar	bus,
+						uchar	device,
+						uchar	function,
+						uchar	cap_id,
+						uchar	*offset
+					);
 };
 
 #define	B_PCI_MODULE_NAME		"bus_managers/pci/v1"
@@ -617,6 +625,7 @@ struct pci_module_info {
 #define PCI_cap_id_debugport    0x0a
 #define PCI_cap_id_cpci_rsrcctl 0x0b
 #define PCI_cap_id_hotplug      0x0c
+#define PCI_cap_id_sata         0x12      /* Serial ATA Capability */
 
 /** Power Management Control Status Register settings */
 #define PCI_pm_mask             0x03

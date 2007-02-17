@@ -64,6 +64,64 @@ pci_write_config(uint8 virt_bus, uint8 device, uint8 function, uint8 offset, uin
 }
 
 
+status_t 
+pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar *offset)
+{
+	uint16 status;
+	uint8 header_type;
+	uint8 cap_ptr;
+	int i;
+
+	if (!offset) {
+		dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x offset NULL pointer\n", bus, device, function, cap_id);
+		return B_BAD_VALUE;
+	}
+
+	status = pci_read_config(bus, device, function, PCI_status, 2);
+	if (!(status & PCI_status_capabilities)) {
+		dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x not supported\n", bus, device, function, cap_id);
+		return B_ERROR;
+	}
+
+	header_type = pci_read_config(bus, device, function, PCI_header_type, 1);
+	switch (header_type & PCI_header_type_mask) {
+		case PCI_header_type_generic:
+		case PCI_header_type_PCI_to_PCI_bridge:
+			cap_ptr = pci_read_config(bus, device, function, PCI_capabilities_ptr, 1);
+			break;
+		case PCI_header_type_cardbus:
+			cap_ptr = pci_read_config(bus, device, function, PCI_capabilities_ptr_2, 1);
+			break;
+		default:
+			dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x unknown header type\n", bus, device, function, cap_id);
+			return B_ERROR;
+	}
+
+	cap_ptr &= ~3;
+	if (!cap_ptr) {
+		dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x empty list\n", bus, device, function, cap_id);
+		return B_NAME_NOT_FOUND;
+	}
+
+	for (i = 0; i < 48; i++) {
+		uint8 this_cap_id = pci_read_config(bus, device, function, cap_ptr, 1);
+		if (this_cap_id == cap_id) {
+			*offset = cap_ptr;
+			return B_OK;
+		}
+
+		cap_ptr = pci_read_config(bus, device, function, cap_ptr + 1, 1);
+		cap_ptr &= ~3;
+
+		if (!cap_ptr)
+			return B_NAME_NOT_FOUND;
+	}
+
+	dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x circular list\n", bus, device, function, cap_id);
+	return B_ERROR;
+}
+
+
 // #pragma mark bus manager init/uninit
 
 status_t
