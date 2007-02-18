@@ -158,11 +158,20 @@ controller_probe(device_node_handle parent)
 	uint32 mmio_base;
 	uint16 device_id;
 	uint8 int_num;
+	uint8 cap_ofs;
 	int asic_index;
 	int chan_index;
 	status_t res;
 	
 	TRACE("controller_probe\n");
+
+	res = pci->find_pci_capability(device, PCI_cap_id_sata, &cap_ofs);
+	if (res == B_OK) {
+		TRACE("PCI SATA capability found at offset 0x%x\n", cap_ofs);
+		uint32 satacr0 = pci->read_pci_config(device, cap_ofs, 4);
+		uint32 satacr1 = pci->read_pci_config(device, cap_ofs + 4, 4);
+		TRACE("satacr0 = 0x%08x, satacr1 = 0x%08x\n", satacr0, satacr1);
+	}
 
 	return B_ERROR;
 
