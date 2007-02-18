@@ -355,7 +355,7 @@ process_pending_ici(int32 currentCPU)
 	if (msg == NULL)
 		return retval;
 
-	TRACE(("  cpu %d message = %d\n", curr_cpu, msg->message));
+	TRACE(("  cpu %d message = %d\n", currentCPU, msg->message));
 
 	switch (msg->message) {
 		case SMP_MSG_INVALIDATE_PAGE_RANGE:
@@ -428,7 +428,7 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 d
 	struct smp_msg *msg;
 
 	TRACE(("smp_send_ici: target 0x%x, mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
-		target_cpu, message, data, data2, data3, data_ptr, flags));
+		targetCPU, message, data, data2, data3, data_ptr, flags));
 
 	if (sICIEnabled) {
 		int state;
