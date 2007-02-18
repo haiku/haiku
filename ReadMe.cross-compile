@@ -6,9 +6,8 @@ We currently support these non-BeOS platforms:
  * FreeBSD
 
 To build Haiku on a non-BeOS platform you must first check out and build the
-cross-compiler. The easiest method for doing so is to check it out in a
-directory just below that of the Haiku root. Navigate to the parent directory
-of Haiku and use a command such as:
+cross-compiler. The easiest method for doing so is to check it out in the
+parent directory of your Haiku repository:
 
   svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools
 
