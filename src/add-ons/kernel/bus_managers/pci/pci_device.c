@@ -117,6 +117,14 @@ pci_device_get_pci_info(pci_device device, struct pci_info *info)
 }
 
 
+static status_t 
+pci_device_find_capability(pci_device device, uchar cap_id, uchar *offset)
+{
+	return pci_find_capability(device->bus, device->device, 
+		device->function, cap_id, offset);
+}
+
+
 static status_t
 pci_device_init_driver(device_node_handle node, void *user_cookie, void **cookie)
 {
@@ -226,4 +234,6 @@ pci_device_module_info gPCIDeviceModule = {
 	pci_device_ram_address,
 
 	pci_device_get_pci_info,
+
+	pci_device_find_capability
 };

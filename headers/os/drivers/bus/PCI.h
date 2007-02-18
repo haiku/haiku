@@ -112,7 +112,10 @@ typedef struct pci_device_module_info {
 	status_t (*release_ioports)( uint16 ioport_base, size_t len );*/
 
 	status_t (*get_pci_info)(pci_device device, struct pci_info *info);
-
+	
+	status_t (*find_pci_capability)(pci_device device,
+				uchar	cap_id,
+				uchar	*offset);
 } pci_device_module_info;
 
 
