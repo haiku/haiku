@@ -165,6 +165,9 @@ controller_probe(device_node_handle parent)
 	
 	TRACE("controller_probe\n");
 
+	if (dm->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
+		return B_ERROR;
+
 	res = pci->find_pci_capability(device, PCI_cap_id_sata, &cap_ofs);
 	if (res == B_OK) {
 		TRACE("PCI SATA capability found at offset 0x%x\n", cap_ofs);
@@ -173,10 +176,7 @@ controller_probe(device_node_handle parent)
 		TRACE("satacr0 = 0x%08x, satacr1 = 0x%08x\n", satacr0, satacr1);
 	}
 
-	return B_ERROR;
-
-	if (dm->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
-		return B_ERROR;
+	goto err;
 		
 	device_id = pci->read_pci_config(device, PCI_device_id, 2);
 	int_num = pci->read_pci_config(device, PCI_interrupt_line, 1);
