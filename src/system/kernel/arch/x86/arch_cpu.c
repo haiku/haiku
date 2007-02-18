@@ -355,12 +355,12 @@ static int detect_cpu(kernel_args *ka, int curr_cpu)
 	// figure out what vendor we have here
 
 	for(i=0; i<VENDOR_NUM; i++) {
-		if(!strcmp(vendor_str, vendor_info[i].ident_string[0])) {
+		if(vendor_info[i].ident_string[0] && !strcmp(vendor_str, vendor_info[i].ident_string[0])) {
 			cpu->arch.vendor = i;
 			cpu->arch.vendor_name = vendor_info[i].vendor;
 			break;
 		}
-		if(!strcmp(vendor_str, vendor_info[i].ident_string[1])) {
+		if(vendor_info[i].ident_string[1] && !strcmp(vendor_str, vendor_info[i].ident_string[1])) {
 			cpu->arch.vendor = i;
 			cpu->arch.vendor_name = vendor_info[i].vendor;
 			break;
