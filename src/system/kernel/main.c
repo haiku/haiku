@@ -166,9 +166,14 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		resume_thread(thread);
 	} else {
 		// this is run for each non boot processor after they've been set loose
+
+		// the order here is pretty important, and kind of arch specific, so it's sort of a hack at the moment.
+		// thread_* will set the current thread pointer, which lets low level code know what cpu it's on
+		// cpu_* will detect the current cpu and do any pending low level setup
+		// smp_* will set up the low level smp routines
+		thread_per_cpu_init(currentCPU);
 		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
-		thread_per_cpu_init(currentCPU);
 
 		enable_interrupts();
 	}
