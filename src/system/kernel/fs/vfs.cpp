@@ -3263,7 +3263,7 @@ vfs_new_io_context(void *_parentContext)
 	context->table_size = tableSize;
 
 	list_init(&context->node_monitors);
-	context->max_monitors = MAX_NODE_MONITORS;
+	context->max_monitors = DEFAULT_NODE_MONITORS;
 
 	return context;
 }
@@ -3352,6 +3352,29 @@ out:
 }
 
 
+static status_t
+vfs_resize_monitor_table(struct io_context *context, const int newSize)
+{
+	void *fds;
+	int	status = B_OK;
+
+	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
+		return EINVAL;
+
+	mutex_lock(&context->io_mutex);
+
+	if ((size_t)newSize < context->num_monitors) {
+		status = EBUSY;
+		goto out;
+	}
+	context->max_monitors = newSize;
+
+out:
+	mutex_unlock(&context->io_mutex);
+	return status;
+}
+
+
 int
 vfs_getrlimit(int resource, struct rlimit * rlp)
 {
@@ -3373,6 +3396,20 @@ vfs_getrlimit(int resource, struct rlimit * rlp)
 			return 0;
 		}
 
+		case RLIMIT_NOVMON:
+		{
+			struct io_context *ioctx = get_current_io_context(false);
+
+			mutex_lock(&ioctx->io_mutex);
+
+			rlp->rlim_cur = ioctx->max_monitors;
+			rlp->rlim_max = MAX_NODE_MONITORS;
+
+			mutex_unlock(&ioctx->io_mutex);
+
+			return 0;
+		}
+
 		default:
 			return -1;
 	}
@@ -3387,7 +3424,16 @@ vfs_setrlimit(int resource, const struct rlimit * rlp)
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
+			if (rlp->rlim_max != RLIM_SAVED_MAX && 
+			    rlp->rlim_max != MAX_FD_TABLE_SIZE)
+				return EINVAL;
 			return vfs_resize_fd_table(get_current_io_context(false), rlp->rlim_cur);
+
+		case RLIMIT_NOVMON:
+			if (rlp->rlim_max != RLIM_SAVED_MAX && 
+			    rlp->rlim_max != MAX_NODE_MONITORS)
+				return EINVAL;
+			return vfs_resize_monitor_table(get_current_io_context(false), rlp->rlim_cur);
 
 		default:
 			return -1;

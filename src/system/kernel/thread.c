@@ -2016,6 +2016,7 @@ getrlimit(int resource, struct rlimit * rlp)
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
+		case RLIMIT_NOVMON:
 			return vfs_getrlimit(resource, rlp);
 
 		default:
@@ -2034,6 +2035,7 @@ setrlimit(int resource, const struct rlimit * rlp)
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
+		case RLIMIT_NOVMON:
 			return vfs_setrlimit(resource, rlp);
 
 		default:

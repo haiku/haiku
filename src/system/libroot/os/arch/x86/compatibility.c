@@ -36,6 +36,7 @@ _kset_mon_limit_(int num)
 	if (num < 1)
 		return EINVAL;
 	rl.rlim_cur = num;
+	rl.rlim_max = RLIM_SAVED_MAX;
 	if (setrlimit(RLIMIT_NOVMON, &rl) < 0)
 		return errno;
 	return B_OK;
@@ -49,6 +50,7 @@ _kset_fd_limit_(int num)
 	if (num < 1)
 		return EINVAL;
 	rl.rlim_cur = num;
+	rl.rlim_max = RLIM_SAVED_MAX;
 	if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
 		return errno;
 	return B_OK;
