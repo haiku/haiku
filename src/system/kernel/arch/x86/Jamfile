@@ -31,6 +31,8 @@ KernelStaticLibrary libx86 :
 	apm.cpp
 	bios.cpp
 	cpuid.S
+	commpage.c
+	syscall.S
 
 	generic_vm_physical_page_mapper.cpp
 	:

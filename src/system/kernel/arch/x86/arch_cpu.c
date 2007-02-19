@@ -17,6 +17,7 @@
 #include <arch/cpu.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
+#include <arch/x86/commpage.h>
 
 #include "interrupts.h"
 
@@ -504,6 +505,9 @@ arch_cpu_init_post_vm(kernel_args *args)
 
 	// setup SSE2/3 support
 	init_sse();
+
+	// initialize the commpage support
+	commpage_init();
 
 	return B_OK;
 }
