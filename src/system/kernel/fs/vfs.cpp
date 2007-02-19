@@ -3379,7 +3379,7 @@ int
 vfs_getrlimit(int resource, struct rlimit * rlp)
 {
 	if (!rlp)
-		return -1;
+		return B_BAD_ADDRESS;
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
@@ -3411,7 +3411,7 @@ vfs_getrlimit(int resource, struct rlimit * rlp)
 		}
 
 		default:
-			return -1;
+			return EINVAL;
 	}
 }
 
@@ -3420,23 +3420,25 @@ int
 vfs_setrlimit(int resource, const struct rlimit * rlp)
 {
 	if (!rlp)
-		return -1;
+		return B_BAD_ADDRESS;
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
+			/* TODO: check getuid() */
 			if (rlp->rlim_max != RLIM_SAVED_MAX && 
 			    rlp->rlim_max != MAX_FD_TABLE_SIZE)
-				return EINVAL;
+				return EPERM;
 			return vfs_resize_fd_table(get_current_io_context(false), rlp->rlim_cur);
 
 		case RLIMIT_NOVMON:
+			/* TODO: check getuid() */
 			if (rlp->rlim_max != RLIM_SAVED_MAX && 
 			    rlp->rlim_max != MAX_NODE_MONITORS)
-				return EINVAL;
+				return EPERM;
 			return vfs_resize_monitor_table(get_current_io_context(false), rlp->rlim_cur);
 
 		default:
-			return -1;
+			return EINVAL;
 	}
 }
 

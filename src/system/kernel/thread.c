@@ -2008,11 +2008,12 @@ spawn_kernel_thread(thread_func function, const char *name, int32 priority,
 }
 
 
+/* TODO: split this; have kernel version set kerrno */
 int
 getrlimit(int resource, struct rlimit * rlp)
 {
 	if (!rlp)
-		return -1;
+		return B_BAD_ADDRESS;
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
@@ -2020,18 +2021,19 @@ getrlimit(int resource, struct rlimit * rlp)
 			return vfs_getrlimit(resource, rlp);
 
 		default:
-			return -1;
+			return EINVAL;
 	}
 
 	return 0;
 }
 
 
+/* TODO: split this; have kernel version set kerrno */
 int
 setrlimit(int resource, const struct rlimit * rlp)
 {
 	if (!rlp)
-		return -1;
+		return B_BAD_ADDRESS;
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
@@ -2039,7 +2041,7 @@ setrlimit(int resource, const struct rlimit * rlp)
 			return vfs_setrlimit(resource, rlp);
 
 		default:
-			return -1;
+			return EINVAL;
 	}
 
 	return 0;
