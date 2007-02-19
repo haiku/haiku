@@ -63,7 +63,7 @@ static status_t receive_data_etc(thread_id *_sender, void *buffer,
 spinlock thread_spinlock = 0;
 
 // thread list
-static struct thread *sIdleThreads[B_MAX_CPU_COUNT];
+static struct thread sIdleThreads[B_MAX_CPU_COUNT];
 static void *sThreadHash = NULL;
 static thread_id sNextThreadID = 1;
 
@@ -162,30 +162,36 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 	return (uint32)key->id % range;
 }
 
-
-/**	Allocates a thread structure (or reuses one from the dead queue).
+/**	Allocates and fills in thread structure (or reuses one from the dead queue).
  *
  * \param threadID The ID to be assigned to the new thread. If
  *		  \code < 0 \endcode a fresh one is allocated.
+ * \param thread initialize this thread struct if nonnull
  */
 
 static struct thread *
-create_thread_struct(const char *name, thread_id threadID)
+create_thread_struct(struct thread *inthread, const char *name, thread_id threadID)
 {
 	struct thread *thread;
 	cpu_status state;
 	char temp[64];
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-	thread = thread_dequeue(&dead_q);
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
+	if (inthread == NULL) {
+		// try to recycle one from the dead queue first
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+		thread = thread_dequeue(&dead_q);
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
 
-	if (thread == NULL) {
-		thread = (struct thread *)malloc(sizeof(struct thread));
-		if (thread == NULL)
-			return NULL;
+		// if not, create a new one
+		if (thread == NULL) {
+			thread = (struct thread *)malloc(sizeof(struct thread));
+			if (thread == NULL)
+				return NULL;
+		}
+	} else {
+		thread = inthread;
 	}
 
 	if (name != NULL)
@@ -195,7 +201,8 @@ create_thread_struct(const char *name, thread_id threadID)
 
 	thread->id = threadID >= 0 ? threadID : allocate_thread_id();
 	thread->team = NULL;
-	thread->cpu = NULL;
+	// XXX terrible hack, this is to leave the early boot cpu pointers alone while being initialized
+//	thread->cpu = NULL;				
 	thread->sem.blocking = -1;
 	thread->fault_handler = 0;
 	thread->page_faults_allowed = 1;
@@ -251,7 +258,8 @@ err2:
 	delete_sem(thread->exit.sem);
 err1:
 	// ToDo: put them in the dead queue instead?
-	free(thread);
+	if (inthread == NULL)
+		free(thread);
 	return NULL;
 }
 
@@ -352,7 +360,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID, kernel ? "kernel" : "user"));
 
-	thread = create_thread_struct(name, threadID);
+	thread = create_thread_struct(NULL, name, threadID);
 	if (thread == NULL)
 		return B_NO_MEMORY;
 
@@ -1461,7 +1469,7 @@ thread_init(kernel_args *args)
 		char name[64];
 
 		sprintf(name, "idle thread %lu", i + 1);
-		thread = create_thread_struct(name,
+		thread = create_thread_struct(&sIdleThreads[i], name,
 			i == 0 ? team_get_kernel_team_id() : -1);
 		if (thread == NULL) {
 			panic("error creating idle thread struct\n");
@@ -1483,11 +1491,6 @@ thread_init(kernel_args *args)
 
 		hash_insert(sThreadHash, thread);
 		insert_thread_into_team(thread->team, thread);
-		sIdleThreads[i] = thread;
-
-		if (i == 0)
-			arch_thread_set_current_thread(thread);
-
 		thread->cpu = &gCPU[i];
 	}
 	sUsedThreads = args->num_cpus;
@@ -1539,12 +1542,15 @@ thread_init(kernel_args *args)
 
 
 status_t
-thread_per_cpu_init(int32 cpuNum)
+thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum)
 {
-	arch_thread_set_current_thread(sIdleThreads[cpuNum]);
+	// set up the cpu pointer in the not yet initialized per-cpu idle thread
+	// so that get_current_cpu and friends will work, which is crucial for 
+	// a lot of low level routines
+	sIdleThreads[cpuNum].cpu = &gCPU[cpuNum];
+	arch_thread_set_current_thread(&sIdleThreads[cpuNum]);
 	return B_OK;
 }
-
 
 //	#pragma mark - public kernel API
 

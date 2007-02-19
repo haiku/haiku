@@ -320,7 +320,7 @@ static void make_feature_string(cpu_ent *cpu, char *str, size_t strlen)
 		strlcat(str, "3dnow ", strlen);
 }
 
-static int detect_cpu(kernel_args *ka, int curr_cpu) 
+static int detect_cpu(int curr_cpu) 
 {
 	cpuid_info cpuid;
 	unsigned int data[4];
@@ -431,10 +431,8 @@ bool x86_check_feature(uint32 feature, enum x86_feature_type type)
 //	#pragma mark -
 
 status_t
-arch_cpu_preboot_init(kernel_args *args)
+arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
-	write_dr3(0);
-
 	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 	gX86SwapFPUFunc = i386_fnsave_swap;
 
@@ -445,7 +443,7 @@ arch_cpu_preboot_init(kernel_args *args)
 status_t 
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
-	detect_cpu(args, curr_cpu);
+	detect_cpu(curr_cpu);
 
 	// load the TSS for this cpu
 	// note the main cpu gets initialized in arch_cpu_init_post_vm()

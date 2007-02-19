@@ -42,9 +42,9 @@
 
 //#define TRACE_BOOT
 #ifdef TRACE_BOOT
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("INIT : " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 bool kernel_startup;
@@ -75,7 +75,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 	smp_set_num_cpus(sKernelArgs.num_cpus);
 
 	// do any pre-booting cpu config
-	cpu_preboot_init(&sKernelArgs);
+	cpu_preboot_init_percpu(&sKernelArgs, currentCPU);
+	thread_preboot_init_percpu(&sKernelArgs, currentCPU);
 
 	// if we're not a boot cpu, spin here until someone wakes us up
 	if (smp_trap_non_boot_cpus(currentCPU)) {
@@ -93,92 +94,90 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		smp_wait_for_non_boot_cpus();
 
 		// init modules
-		TRACE(("init CPU\n"));
+		TRACE("init CPU\n");
 		cpu_init(&sKernelArgs);
 		cpu_init_percpu(&sKernelArgs, currentCPU);
-		TRACE(("init interrupts\n"));
+		TRACE("init interrupts\n");
 		int_init(&sKernelArgs);
 
-		TRACE(("init VM\n"));
+		TRACE("init VM\n");
 		vm_init(&sKernelArgs);
 			// Before vm_init_post_sem() is called, we have to make sure that
 			// the boot loader allocated region is not used anymore
 
 		// now we can use the heap and create areas
 		arch_platform_init_post_vm(&sKernelArgs);
-		TRACE(("init driver_settings\n"));
+		TRACE("init driver_settings\n");
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);
 		debug_init_post_vm(&sKernelArgs);
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
-		TRACE(("init system info\n"));
+		TRACE("init system info\n");
 		system_info_init(&sKernelArgs);
 
-		TRACE(("init SMP\n"));
+		TRACE("init SMP\n");
 		smp_init(&sKernelArgs);
-		TRACE(("init timer\n"));
+		TRACE("init timer\n");
 		timer_init(&sKernelArgs);
-		TRACE(("init real time clock\n"));
+		TRACE("init real time clock\n");
 		rtc_init(&sKernelArgs);
 
-		TRACE(("init semaphores\n"));
+		TRACE("init semaphores\n");
 		sem_init(&sKernelArgs);
 
 		// now we can create and use semaphores
-		TRACE(("init VM semaphores\n"));
+		TRACE("init VM semaphores\n");
 		vm_init_post_sem(&sKernelArgs);
-		TRACE(("init driver_settings\n"));
+		TRACE("init driver_settings\n");
 		driver_settings_init_post_sem(&sKernelArgs);
-		TRACE(("init generic syscall\n"));
+		TRACE("init generic syscall\n");
 		generic_syscall_init();
-		TRACE(("init cbuf\n"));
+		TRACE("init cbuf\n");
 		cbuf_init();
-		TRACE(("init teams\n"));
+		TRACE("init teams\n");
 		team_init(&sKernelArgs);
-		TRACE(("init threads\n"));
+		TRACE("init threads\n");
 		thread_init(&sKernelArgs);
-		TRACE(("init ports\n"));
+		TRACE("init ports\n");
 		port_init(&sKernelArgs);
-		TRACE(("init kernel daemons\n"));
+		TRACE("init kernel daemons\n");
 		kernel_daemon_init();
 		arch_platform_init_post_thread(&sKernelArgs);
 
-		TRACE(("init VM threads\n"));
+		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
-		TRACE(("init ELF loader\n"));
+		TRACE("init ELF loader\n");
 		elf_init(&sKernelArgs);
-		TRACE(("init scheduler\n"));
+		TRACE("init scheduler\n");
 		scheduler_init();
-		TRACE(("init VFS\n"));
+		TRACE("init VFS\n");
 		vfs_init(&sKernelArgs);
 
-		// start a thread to finish initializing the rest of the system
-		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
-
-		smp_wake_up_non_boot_cpus();
-
-		TRACE(("enable interrupts, exit kernel startup\n"));
+		TRACE("enable interrupts, exit kernel startup\n");
 		kernel_startup = false;
-		enable_interrupts();
 
+		TRACE("waking up AP cpus\n");
+		smp_wake_up_non_boot_cpus();		
+
+		enable_interrupts();
 		scheduler_start();
+
+		// start a thread to finish initializing the rest of the system
+		TRACE("starting main2 thread\n");
+		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
 		resume_thread(thread);
 	} else {
 		// this is run for each non boot processor after they've been set loose
-
-		// the order here is pretty important, and kind of arch specific, so it's sort of a hack at the moment.
-		// thread_* will set the current thread pointer, which lets low level code know what cpu it's on
-		// cpu_* will detect the current cpu and do any pending low level setup
-		// smp_* will set up the low level smp routines
-		thread_per_cpu_init(currentCPU);
 		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
 
+		// welcome to the machine
 		enable_interrupts();
+		scheduler_start();
 	}
 
-	TRACE(("main: done... begin idle loop on cpu %d\n", currentCPU));
+	TRACE("main: done... begin idle loop on cpu %d\n", currentCPU);
 	for (;;)
 		arch_cpu_idle();
 
@@ -191,9 +190,9 @@ main2(void *unused)
 {
 	(void)(unused);
 
-	TRACE(("start of main2: initializing devices\n"));
+	TRACE("start of main2: initializing devices\n");
 
-	TRACE(("Init modules\n"));
+	TRACE("Init modules\n");
 	module_init(&sKernelArgs);
 
 	// ToDo: the preloaded image debug data is placed in the kernel args, and
@@ -208,18 +207,18 @@ main2(void *unused)
 	}
 
 	// init userland debugging
-	TRACE(("Init Userland debugging\n"));
+	TRACE("Init Userland debugging\n");
 	init_user_debug();
 
 	// init the messaging service
-	TRACE(("Init Messaging Service\n"));
+	TRACE("Init Messaging Service\n");
 	init_messaging_service();
 
 	/* bootstrap all the filesystems */
-	TRACE(("Bootstrap file systems\n"));
+	TRACE("Bootstrap file systems\n");
 	vfs_bootstrap_file_systems();
 
-	TRACE(("Init Device Manager\n"));
+	TRACE("Init Device Manager\n");
 	device_manager_init(&sKernelArgs);
 
 	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
@@ -227,7 +226,7 @@ main2(void *unused)
 
 	int_init_post_device_manager(&sKernelArgs);
 
-	TRACE(("Mount boot file system\n"));
+	TRACE("Mount boot file system\n");
 	vfs_mount_boot_file_system(&sKernelArgs);
 
 	// CPU specific modules may now be available
@@ -259,7 +258,7 @@ main2(void *unused)
 		thread = load_image(argc, args, NULL);
 		if (thread >= B_OK) {
 			resume_thread(thread);
-			TRACE(("Bootscript started\n"));
+			TRACE("Bootscript started\n");
 		} else
 			dprintf("error starting \"%s\" error = %ld \n", args[0], thread);
 	}

@@ -209,6 +209,7 @@ extern status_t		register_kernel_daemon(daemon_hook hook, void *arg, int frequen
 extern status_t		unregister_kernel_daemon(daemon_hook hook, void *arg);
 
 extern void			call_all_cpus(void (*f)(void *, int), void *cookie);
+extern void			call_all_cpus_sync(void (*f)(void *, int), void *cookie);
 
 /* safe methods to access user memory without having to lock it */
 extern status_t		user_memcpy(void *to, const void *from, size_t size);

@@ -43,7 +43,7 @@ extern cpu_ent gCPU[MAX_BOOT_CPUS];
 extern "C" {
 #endif
 
-status_t cpu_preboot_init(struct kernel_args *args);
+status_t cpu_preboot_init_percpu(struct kernel_args *args, int curr_cpu);
 status_t cpu_init(struct kernel_args *args);
 status_t cpu_init_percpu(kernel_args *ka, int curr_cpu);
 status_t cpu_init_post_vm(struct kernel_args *args);

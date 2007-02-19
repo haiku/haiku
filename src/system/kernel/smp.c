@@ -551,8 +551,14 @@ smp_trap_non_boot_cpus(int32 cpu)
 {
 	if (cpu > 0) {
 		boot_cpu_spin[cpu] = 1;
-		acquire_spinlock(&boot_cpu_spin[cpu]);
+		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
 		return false;
+
+		// lets make sure we're in sync with the main cpu
+		// the boot processor has probably been sending us 
+		// tlb sync messages all along the way, but we've 
+		// been ignoring them
+		arch_cpu_global_TLB_invalidate();
 	}
 
 	return true;
@@ -562,23 +568,16 @@ smp_trap_non_boot_cpus(int32 cpu)
 void
 smp_wake_up_non_boot_cpus()
 {
-	// resume non boot CPUs
 	int i;
-	for (i = 1; i < sNumCPUs; i++) {
-		release_spinlock(&boot_cpu_spin[i]);
-	}
 
 	// ICIs were previously being ignored
 	if (sNumCPUs > 1)
 		sICIEnabled = true;
 
-	// invalidate all of the other processors' TLB caches
-	arch_cpu_global_TLB_invalidate();
-	smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0, NULL,
-		SMP_MSG_FLAG_SYNC);
-
-	// start the other processors
-	smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_ASYNC);
+	// resume non boot CPUs
+	for (i = 1; i < sNumCPUs; i++) {
+		release_spinlock(&boot_cpu_spin[i]);
+	}
 }
 
 
@@ -651,13 +650,7 @@ smp_get_num_cpus()
 int32
 smp_get_current_cpu(void)
 {
-	struct thread *thread = thread_get_current_thread();
-	if (thread)
-		return thread->cpu->cpu_num;
-
-	// this is not always correct during early boot, but it's okay
-	// for the boot process
-	return 0;
+	return thread_get_current_thread()->cpu->cpu_num;
 }
 
 
@@ -673,6 +666,22 @@ call_all_cpus(void (*func)(void *, int), void *cookie)
 	if (smp_get_num_cpus() > 1) {
 		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
 			0, 0, (void *)func, SMP_MSG_FLAG_ASYNC);
+	}
+
+	// we need to call this function ourselves as well
+	func(cookie, smp_get_current_cpu());
+
+	restore_interrupts(state);
+}
+
+void
+call_all_cpus_sync(void (*func)(void *, int), void *cookie)
+{
+	cpu_status state = disable_interrupts();
+
+	if (smp_get_num_cpus() > 1) {
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
+			0, 0, (void *)func, SMP_MSG_FLAG_SYNC);
 	}
 
 	// we need to call this function ourselves as well

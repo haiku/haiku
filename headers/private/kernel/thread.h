@@ -30,7 +30,7 @@ void thread_at_kernel_entry(void);
 void thread_at_kernel_exit(void);
 
 status_t thread_init(struct kernel_args *args);
-status_t thread_per_cpu_init(int32 cpuNum);
+status_t thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum);
 void thread_yield(void);
 void thread_exit(void);
 

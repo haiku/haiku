@@ -17,7 +17,7 @@
 static bool sHasTlbia;
 
 status_t 
-arch_cpu_preboot_init(kernel_args *args)
+arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
 	// enable FPU
 	set_msr(get_msr() | MSR_FP_AVAILABLE);

@@ -26,13 +26,6 @@ static spinlock sSetCpuLock;
 status_t
 cpu_init(kernel_args *args)
 {
-	int i;
-
-	memset(gCPU, 0, sizeof(gCPU));
-	for (i = 0; i < MAX_BOOT_CPUS; i++) {
-		gCPU[i].cpu_num = i;
-	}
-
 	return arch_cpu_init(args);
 }
 
@@ -57,11 +50,15 @@ cpu_init_post_modules(kernel_args *args)
 
 
 status_t
-cpu_preboot_init(kernel_args *args)
+cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
-	return arch_cpu_preboot_init(args);
-}
+	// set the cpu number in the local cpu structure so that
+	// we can use it for get_current_cpu
+	memset(&gCPU[curr_cpu], 0, sizeof(gCPU[curr_cpu]));
+	gCPU[curr_cpu].cpu_num = curr_cpu;
 
+	return arch_cpu_preboot_init_percpu(args, curr_cpu);
+}
 
 bigtime_t
 cpu_get_active_time(int32 cpu)
