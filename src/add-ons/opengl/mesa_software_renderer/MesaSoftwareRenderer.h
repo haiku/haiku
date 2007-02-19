@@ -34,70 +34,22 @@ public:
 
 	virtual	void 		SwapBuffers(bool VSync = false);
 	virtual	void		Draw(BRect updateRect);
-	virtual status_t    CopyPixelsOut(BPoint source, BBitmap *dest);
-	virtual status_t    CopyPixelsIn(BBitmap *source, BPoint dest);
+	virtual status_t    	CopyPixelsOut(BPoint source, BBitmap *dest);
+	virtual status_t    	CopyPixelsIn(BBitmap *source, BPoint dest);
+
+	GLvoid **		GetRows() { return fRowAddr; };
 
 private:
-	static void	Error(GLcontext *ctx);
+	static void		Error(GLcontext *ctx);
 	static const GLubyte *	GetString(GLcontext *ctx, GLenum name);
-	static void	Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h);
-	static void	UpdateState(GLcontext *ctx, GLuint new_state);
-	static void 	ClearFront(GLcontext *ctx);
-	static void 	ClearBack(GLcontext *ctx);
-	static void 	ClearIndex(GLcontext *ctx, GLuint index);
-	static void 	ClearColor(GLcontext *ctx, const GLfloat color[4]);
-	static void 	Clear(GLcontext *ctx, GLbitfield mask);
-	static GLboolean RenderbufferStorage(GLcontext *ctx, struct gl_renderbuffer *render, 
+	static void		Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h);
+	static void		UpdateState(GLcontext *ctx, GLuint new_state);
+	static void 		ClearFront(GLcontext *ctx);
+	static void 		ClearIndex(GLcontext *ctx, GLuint index);
+	static void 		ClearColor(GLcontext *ctx, const GLfloat color[4]);
+	static void 		Clear(GLcontext *ctx, GLbitfield mask);
+	static GLboolean 	RenderbufferStorage(GLcontext *ctx, struct gl_renderbuffer *render, 
 			GLenum internalFormat, GLuint width, GLuint height );
-
-	// Buffer functions
-   static void 		WriteRGBASpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                  GLint x, GLint y,
-                                  const void *values,
-                                  const GLubyte mask[]);
-   static void 		WriteRGBSpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                 GLint x, GLint y,
-                                 const void *values,
-                                 const GLubyte mask[]);
-   static void 		WriteMonoRGBASpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                      GLint x, GLint y,
-                                      const void *values,
-                                      const GLubyte mask[]);
-   static void 		WriteRGBAPixels(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                    const GLint x[], const GLint y[],
-                                    const void *values,
-                                    const GLubyte mask[]);
-   static void 		WriteMonoRGBAPixels(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                        const GLint x[], const GLint y[],
-                                        const void *values,
-                                        const GLubyte mask[]);
-   static void 		WriteCI32Span(const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                  GLint x, GLint y,
-                                  const GLuint index[], const GLubyte mask[]);
-   static void 		WriteCI8Span(const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                 GLint x, GLint y,
-                                 const GLubyte index[], const GLubyte mask[]);
-   static void 		WriteMonoCISpan(const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                    GLint x, GLint y,
-                                    GLuint colorIndex, const GLubyte mask[]);
-   static void 		WriteCI32Pixels(const GLcontext *ctx, struct gl_renderbuffer *rb, 
-                                    GLuint n, const GLint x[], const GLint y[],
-                                    const GLuint index[], const GLubyte mask[]);
-   static void 		WriteMonoCIPixels(const GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                      const GLint x[], const GLint y[],
-                                      GLuint colorIndex, const GLubyte mask[]);
-   static void 		ReadCI32Span(const GLcontext *ctx, struct gl_renderbuffer *rb, 
-                                 GLuint n, GLint x, GLint y, GLuint index[]);
-   static void 		ReadRGBASpan(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
-                                 GLint x, GLint y,
-                                 void *values);
-   static void 		ReadCI32Pixels(const GLcontext *ctx, struct gl_renderbuffer *rb, 
-                                   GLuint n, const GLint x[], const GLint y[],
-                                   GLuint indx[], const GLubyte mask[]);
-   static void 		ReadRGBAPixels(GLcontext *ctx, struct gl_renderbuffer *rb, 
-                                   GLuint n, const GLint x[], const GLint y[],
-                                   void *values);
-
 	
 	BBitmap		*fBitmap;
 
@@ -108,9 +60,10 @@ private:
 
 	GLchan 		fClearColor[4];  // buffer clear color
 	GLuint 		fClearIndex;      // buffer clear color index
-	GLint		fBottom;	// used for flipping Y coords
 	GLuint 		fWidth;
 	GLuint		fHeight;
+
+	GLvoid *	fRowAddr[MAX_HEIGHT];	/*< address of first pixel in each image row */
 };
 
 #endif	// MESASOFTWARERENDERER_H
