@@ -21,9 +21,11 @@
 #include <sys/select.h>
 
 
+/* R5 figures, but we don't use a table for monitors anyway */
 #define DEFAULT_FD_TABLE_SIZE	128
-#define MAX_FD_TABLE_SIZE		2048
-#define MAX_NODE_MONITORS		4096
+#define MAX_FD_TABLE_SIZE		8192
+#define DEFAULT_NODE_MONITORS		4096 
+#define MAX_NODE_MONITORS		65536
 
 struct kernel_args;
 struct vm_cache_ref;
