@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src ;
+
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	kernel_add_on ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	server ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	test ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	ufs_mount ;

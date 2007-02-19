@@ -1,0 +1,37 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test
+	reiserfs ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+DEFINES += USER=1 ;
+
+if $(OSPLAT) = X86 {
+#	SubDirC++Flags -include [ FDirName $(UFS_TOP) src kernel_add_on
+#		kernel-cpp.h ] ;
+	SubDirC++Flags -include [ FDirName $(SUBDIR) cpp.h ] ;
+	SubDirC++Flags -include [ FDirName $(SUBDIR) compatibility.h ] ;
+}
+
+Addon <test>reiserfs
+	: # relpath - obsolete
+	: 
+	Block.cpp
+	BlockCache.cpp
+	cpp.cpp
+	hashes.cpp
+	Item.cpp
+	Iterators.cpp
+	kernel_interface.cpp
+	Locker.cpp
+	Tree.cpp
+	VNode.cpp
+	Volume.cpp 
+
+	Debug.cpp
+	Settings.cpp
+	String.cpp
+	SuperBlock.cpp
+
+	: false		# is executable
+	: <test>UserlandFSServer
+;

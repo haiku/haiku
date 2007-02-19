@@ -1,0 +1,42 @@
+# netfs server settings
+#
+# Lives in /boot/home/config/settings/kernel/drivers/.
+
+# users
+user bonefish {
+	password	password
+}
+
+user anonymous
+
+# shares
+share ttttt {
+	path /boot/home/Desktop/ttttt
+	user bonefish {
+		permissions	mount query read write
+	}
+}
+
+share sub-ttttt {
+	path /boot/home/Desktop/ttttt/rmessage
+	user bonefish {
+		permissions	mount query read write
+	}
+}
+
+#share home {
+#	path /boot/home
+#	user bonefish {
+#		permissions	mount query read write
+#	}
+#}
+
+#share tmp {
+#	path /boot/home/tmp
+#	user bonefish {
+#		permissions	mount query read write
+#	}
+#	user anonymous {
+#		permissions	mount query read
+#	}
+#}

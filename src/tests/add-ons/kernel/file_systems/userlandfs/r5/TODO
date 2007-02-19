@@ -1,0 +1,9 @@
+TODO
+====
+
+* The "brilliant" way to ensure that there is only one UserlandFS (dispatcher)
+  server doesn't work. BClipboard::Lock() is only application local.
+* support for reading multiple directory entries, even if the client FS doesn't
+  support it
+* pass UID and GID with each request to make them available in userland
+

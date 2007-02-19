@@ -1,0 +1,88 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test netfs server ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 ] ;
+local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+SubDirHdrs [ FDirName $(userlandFSTop) src test netfs headers server ] ;
+SubDirHdrs [ FDirName $(userlandFSTop) src test netfs headers shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src test netfs shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"NetFSServer\\\"" ;
+
+Application <test>NetFSServer
+	: Debug.cpp
+	  DriverSettings.cpp
+	  driver_settings.c
+	  Locker.cpp
+	  ObjectTracker.cpp
+	  Referencable.cpp
+	  String.cpp
+
+	  AbstractConnection.cpp
+	  AttrDirInfo.cpp
+	  Blocker.cpp
+	  BlockerPool.cpp
+	  Channel.cpp
+	  Connection.cpp
+	  ConnectionFactory.cpp
+	  EntryInfo.cpp
+	  FSObject.cpp
+	  InsecureChannel.cpp
+	  InsecureConnection.cpp
+	  NetAddress.cpp
+	  NetFSDefs.cpp
+	  NetFSServerRosterDefs.cpp
+	  NodeInfo.cpp
+	  PortChannel.cpp
+	  PortConnection.cpp
+	  Request.cpp
+	  RequestChannel.cpp
+	  RequestConnection.cpp
+	  RequestDumper.cpp
+	  RequestFactory.cpp
+	  RequestFlattener.cpp
+	  RequestHandler.cpp
+	  Requests.cpp
+	  RequestUnflattener.cpp
+	  ServerInfo.cpp
+	  ServerNodeID.cpp
+	  TaskManager.cpp
+	  ThreadLocal.cpp
+
+	  AttributeDirectory.cpp
+	  ClientConnection.cpp
+	  ClientVolume.cpp
+	  ConnectionListener.cpp
+	  ConnectionListenerFactory.cpp
+	  Directory.cpp
+	  Entry.cpp
+	  EntryRef.cpp
+	  FDManager.cpp
+	  GlobalBlockerPool.cpp
+	  InsecureConnectionListener.cpp
+	  Lockable.cpp
+	  NetFSServer.cpp
+	  Node.cpp
+	  NodeHandle.cpp
+	  NodeHandleMap.cpp
+	  NodeMonitor.cpp
+	  NodeMonitoringEvent.cpp
+	  Path.cpp
+	  PortConnectionListener.cpp
+	  QueryDomain.cpp
+	  RequestBufferReplacer.cpp
+	  SecurityContext.cpp
+	  StatisticsManager.cpp
+	  UserSecurityContext.cpp
+	  Volume.cpp
+	  VolumeManager.cpp
+	: be $(NETWORK_LIBS)
+;

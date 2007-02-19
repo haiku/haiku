@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test
+	netfs ;
+
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	test netfs authentication_server ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	test netfs client ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	test netfs netfs_config ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	test netfs netfs_server_prefs ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	test netfs server ;

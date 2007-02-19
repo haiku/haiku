@@ -1,0 +1,93 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test
+	netfs client ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 ] ;
+local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+SubDirHdrs [ FDirName $(userlandFSTop) src test netfs headers
+					  authentication_server ] ;
+SubDirHdrs [ FDirName $(userlandFSTop) src test netfs headers fs ] ;
+SubDirHdrs [ FDirName $(userlandFSTop) src test netfs headers shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src test netfs shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"netfs\\\"" ;
+
+# If defined this doesn't remove the local machine from the servers accessible
+# via netfs. For debugging purposes only.
+if $(NETFS_ADD_SERVER_LOCALHOST) {
+	DEFINES += ADD_SERVER_LOCALHOST=$(NETFS_ADD_SERVER_LOCALHOST) ;
+}
+
+Addon <test>netfs
+	: # relpath - obsolete
+	: Debug.cpp
+	  Locker.cpp
+	  ObjectTracker.cpp
+	  Referencable.cpp
+
+	  AbstractConnection.cpp
+	  AttrDirInfo.cpp
+	  AuthenticationServerDefs.cpp
+#	  Blocker.cpp
+#	  BlockerPool.cpp
+	  Channel.cpp
+	  Connection.cpp
+	  ConnectionFactory.cpp
+	  EntryInfo.cpp
+	  FSObject.cpp
+	  InsecureChannel.cpp
+	  InsecureConnection.cpp
+	  KMessage.cpp
+	  NetAddress.cpp
+	  NetFSDefs.cpp
+	  NodeInfo.cpp
+	  PortChannel.cpp
+	  PortConnection.cpp
+	  Request.cpp
+	  RequestChannel.cpp
+	  RequestConnection.cpp
+	  RequestDumper.cpp
+	  RequestFactory.cpp
+	  RequestFlattener.cpp
+	  RequestHandler.cpp
+	  Requests.cpp
+	  RequestUnflattener.cpp
+	  ServerInfo.cpp
+	  ServerNodeID.cpp
+	  TaskManager.cpp
+	  ThreadLocal.cpp
+
+	  AuthenticationServer.cpp
+	  ExtendedServerInfo.cpp
+	  netfs.cpp
+	  Node.cpp
+	  QueryIterator.cpp
+	  QueryManager.cpp
+	  RootVolume.cpp
+	  ServerConnection.cpp
+	  ServerConnectionProvider.cpp
+	  ServerManager.cpp
+	  ServerQueryIterator.cpp
+	  ServerVolume.cpp
+	  ShareAttrDir.cpp
+	  ShareAttrDirIterator.cpp
+	  ShareNode.cpp
+	  ShareVolume.cpp
+	  VirtualDir.cpp
+	  VirtualVolume.cpp
+	  Volume.cpp
+	  VolumeEvent.cpp
+	  VolumeManager.cpp
+
+	: false		# is executable
+	: <test>UserlandFSServer
+	  $(NETWORK_LIBS)
+;
