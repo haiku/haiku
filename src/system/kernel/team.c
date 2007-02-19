@@ -777,23 +777,10 @@ team_create_thread_start(void *args)
 	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
 
 	// add args to info member
-	sizeLeft = strlcpy(team->args, path, sizeof(team->args));
-	udest = team->args + sizeLeft;
-	sizeLeft = sizeof(team->args) - sizeLeft;
-
-	for (i = 1; i < argCount && sizeLeft > 2; i++) {
-		size_t length;
-
-		udest[0] = ' ';
-		udest++;
-		sizeLeft--;
-
-		length = strlcpy(udest, teamArgs->args[i], sizeLeft);
-		if (length >= sizeLeft)
-			break;
-
-		sizeLeft -= length;
-		udest += length;
+	team->args[0] = 0;
+	for (i = 1; i < argCount; i++) {
+		strlcat(team->args, " ", sizeof(team->args));
+		strlcat(team->args, teamArgs->args[i], sizeof(team->args));
 	}
 
 	free_team_arg(teamArgs);
