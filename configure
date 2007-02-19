@@ -260,7 +260,6 @@ case "${platform}" in
 				5.1)	buildPlatform=dano ;;
 				5.0.4)	buildPlatform=bone ;;
 				5.0*)	buildPlatform=r5 ;;
-				6.*)	buildPlatform=dano ;;
 				*)		echo Unknown BeOS version: $revision
 						exit 1 ;;
 			esac
