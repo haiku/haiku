@@ -13,7 +13,6 @@
 #include "BaseView.h"
 #include "Time.h"
 #include "TimeMessages.h"
-#include "TimeView.h"
 #include "TimeWindow.h"
 
 #define TIME_WINDOW_RIGHT	361 //332
@@ -51,17 +50,16 @@ TTimeWindow::MessageReceived(BMessage *message)
 			bool istime;
 			if (message->FindBool("time", &istime) == B_OK)
 				f_BaseView->ChangeTime(message);
+			break;
 		}
-		break;
+		
 		case H_RTC_CHANGE:
-		{
 			f_BaseView->SetGMTime(f_TimeSettings->GMTime());
-		}
-		break;
+			break;
 		
 		default:
 			BWindow::MessageReceived(message);
-		break;
+			break;
 	}
 }
 

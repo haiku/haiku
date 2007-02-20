@@ -24,7 +24,7 @@ class TZoneItem: public BStringItem {
 		const char *Path() const;
 		
 	private:
-		BPath *f_zone;
+		BPath *fZone;
 };
 
 
@@ -36,7 +36,6 @@ class TZoneView: public BView{
 		
 		virtual void AttachedToWindow();
 		virtual void AllAttached();
-		virtual void Draw(BRect);
 		virtual void MessageReceived(BMessage *message);
 	protected:
 		void UpdateDateTime(BMessage *message);

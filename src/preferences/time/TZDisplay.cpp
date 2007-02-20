@@ -91,12 +91,14 @@ TTZDisplay::SetLabel(const char *label)
 	Draw(Bounds());
 }
 
+
 void
 TTZDisplay::SetText(const char *text)
 {
 	f_text->SetTo(text);
 	Draw(Bounds());
 }
+
 
 void
 TTZDisplay::SetTo(int32 hour, int32 minute)
@@ -124,8 +126,9 @@ TTZDisplay::SetTo(int32 hour, int32 minute)
 	sprintf(time, "%02lu:%02lu %s", ahour, minute, ap);
 	f_time->UnlockBuffer(8);
 	
-	Draw(Bounds());
+	Invalidate();
 }
+
 
 const char *
 TTZDisplay::Text() const
@@ -133,17 +136,16 @@ TTZDisplay::Text() const
 	return f_text->String();
 }
 
+
 const char *
 TTZDisplay::Label() const
 {
 	return f_label->String();
 }
 
+
 const char *
 TTZDisplay::Time() const
 {
 	return f_time->String();
 }
-
-
-

@@ -13,8 +13,7 @@ Preference Time :
 	SettingsView.cpp 
 	Time.cpp 
 	TimeSettings.cpp 
-	TimeView.cpp 
-	TimeWindow.cpp 
+	TimeWindow.cpp
 	TZDisplay.cpp 
 	ZoneView.cpp 
 	: be

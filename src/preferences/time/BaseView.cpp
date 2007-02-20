@@ -49,10 +49,9 @@ TTimeBaseView::SetGMTime(bool gmt)
 void
 TTimeBaseView::DispatchMessage()
 {
-	time_t current;
+	time_t current = time(0);
+	
 	struct tm *ltime;
-
-	current = time(0);
 
 	if (f_gmtime)
 		ltime = gmtime(&current);
@@ -85,12 +84,8 @@ TTimeBaseView::ChangeTime(BMessage *message)
 	if (!(message->FindBool("time", &istime) == B_OK))
 		return;
 
-	time_t atime;
-	struct tm *_tm;
-	
-	
-	atime = time(0);
-	_tm = localtime(&atime);
+	time_t atime = time(0);
+	struct tm *_tm = localtime(&atime);
 	
 	int32 hour = 0;
 	int32 minute = 0;
@@ -121,6 +116,5 @@ TTimeBaseView::ChangeTime(BMessage *message)
 	
 	time_t atime2 = mktime(_tm);
 	set_real_time_clock(atime2);
-	DispatchMessage();
 }
 

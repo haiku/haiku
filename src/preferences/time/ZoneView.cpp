@@ -33,28 +33,29 @@
 
 /*=====> TZoneItem <=====*/
 TZoneItem::TZoneItem(const char *text, const char *zone)
-	: BStringItem(text)
+	:BStringItem(text),
+	fZone(new BPath(zone))
 {
-	f_zone = new BPath(zone);
 }
 
 
 TZoneItem::~TZoneItem()
 {
-	delete f_zone;
+	delete fZone;
 }
+
 
 const char *
 TZoneItem::Zone() const
 {
-	return f_zone->Leaf();
+	return fZone->Leaf();
 }
 
 
 const char *
 TZoneItem::Path() const
 {
-	return f_zone->Path();
+	return fZone->Path();
 }
 
 
@@ -78,8 +79,7 @@ TZoneView::~TZoneView()
 void
 TZoneView::AllAttached()
 {
-	
-
+	BView::AllAttached();
 }
 
 
@@ -109,14 +109,6 @@ TZoneView::AttachedToWindow()
 
 
 void
-TZoneView::Draw(BRect updaterect)
-{
-	f_current->Draw(updaterect);
-	f_preview->Draw(updaterect);
-}
-
-
-void
 TZoneView::MessageReceived(BMessage *message)
 {
 	int32 change;
@@ -126,28 +118,28 @@ TZoneView::MessageReceived(BMessage *message)
 			switch(change) {
 				case H_TM_CHANGED:
 					UpdateDateTime(message);
-				break;
+					break;
 				
 				default:
 					BView::MessageReceived(message);
-				break;
+					break;
 			}
-		break;
+			break;
 		case H_REGION_CHANGED:
 			ChangeRegion(message);
-		break;
+			break;
 		
 		case H_SET_TIME_ZONE:
 			SetTimeZone();
-		break;
+			break;
 		
 		case H_CITY_CHANGED:
 			SetPreview();
-		break;	
+			break;	
 		
 		default:
 			BView::MessageReceived(message);
-		break;
+			break;
 	}
 }
 
@@ -175,7 +167,7 @@ TZoneView::UpdateDateTime(BMessage *message)
 
 
 void
-TZoneView:: InitView()
+TZoneView::InitView()
 {
 	font_height finfo;
 	be_plain_font->GetHeight(&finfo);
@@ -231,13 +223,13 @@ TZoneView:: InitView()
 	frame.bottom = frame.top +text_height *2;
 	frame.right = bounds.right -6;
 	f_current = new TTZDisplay(frame, "current", 
-			B_FOLLOW_LEFT|B_FOLLOW_TOP, 0,
+			B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW,
 			"Current time zone:", B_EMPTY_STRING);
 	f_current->ResizeToPreferred();
 	
 	frame.OffsetBy(0, (text_height *3) +2);
 	f_preview = new TTZDisplay(frame, "timein", 
-			B_FOLLOW_LEFT|B_FOLLOW_TOP, 0,
+			B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW,
 			"Time in: ", B_EMPTY_STRING);
 	f_preview->ResizeToPreferred();
 	
@@ -299,7 +291,8 @@ TZoneView::BuildRegionMenu(float *widest)
 			itemtext = itemtext.ReplaceAll('_', ' ');		// underscores are spaces
 			
 			width = be_plain_font->StringWidth(itemtext.String());
-			if (width> *widest) *widest = width;
+			if (width > *widest)
+				 *widest = width;
 
 			BMessage *msg = new BMessage(H_REGION_CHANGED);
 			msg->AddString("region", path.Path());
@@ -383,6 +376,16 @@ TZoneView::ChangeRegion(BMessage *message)
 void
 TZoneView::ReadTimeZoneLink()
 {
+	BEntry tzLink;
+
+#if TARGET_PLATFORM_HAIKU
+	extern status_t _kern_get_tzfilename(char *filename, size_t length, bool *_isGMT);
+	
+	char tzFileName[B_OS_PATH_LENGTH];
+	bool isGMT;
+	_kern_get_tzfilename(tzFileName, B_OS_PATH_LENGTH, &isGMT);
+	tzLink.SetTo(tzFileName);
+#else
 	/* reads the timezone symlink from B_USER_SETTINGS_DIRECTORY
 		currently this sets f_currentzone to the symlink value.
 		this is wrong.  the original can get users timezone without 
@@ -393,9 +396,8 @@ TZoneView::ReadTimeZoneLink()
 	  	EST is set when the settings dir can't be found **should never happen**	
 	*/
 	
- 	BPath path;
- 	BEntry tzLink;
  	
+ 	BPath path;
  	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 
  		path.Append("timezone");
@@ -409,7 +411,7 @@ TZoneView::ReadTimeZoneLink()
  		// set tzlink to a default
  		tzLink.SetTo("/boot/beos/etc/timezones/EST");
  	}
- 				
+#endif
 	// we need something in the current zone
 	f_currentzone.SetTo(&tzLink);
 }
@@ -446,11 +448,9 @@ TZoneView::SetPreview()
 void
 TZoneView::SetCurrent(const char *text)
 {
-	time_t current;
-	struct tm *ltime;
 	SetTimeZone(f_currentzone.Path());
-	current = time(0);
-	ltime = localtime(&current);
+	time_t current = time(0);
+	struct tm *ltime = localtime(&current);
 	
 	f_current->SetTo(ltime->tm_hour, ltime->tm_min);
 	f_current->SetText(text);
