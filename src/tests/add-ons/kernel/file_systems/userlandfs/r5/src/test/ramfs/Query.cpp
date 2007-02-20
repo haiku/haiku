@@ -1,27 +1,23 @@
 /* Query - query parsing and evaluation
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** The pattern matching is roughly based on code originally written
-** by J. Kercheval, and on code written by Kenneth Almquist, though
-** it shares no code.
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * The pattern matching is roughly based on code originally written
+ * by J. Kercheval, and on code written by Kenneth Almquist, though
+ * it shares no code.
+ *
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 // Adjusted by Ingo Weinhold <bonefish@cs.tu-berlin.de> for usage in RAM FS.
 
 
 #include "Query.h"
-//#include "bfs.h"
 #include "Debug.h"
 #include "Directory.h"
 #include "Entry.h"
 #include "Misc.h"
 #include "Node.h"
-#include "Stack.h"
 #include "Volume.h"
-//#include "Inode.h"
-//#include "BPlusTree.h"
 #include "Index.h"
 
 #include <SupportDefs.h>
@@ -32,12 +28,6 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-
-
-
-
-
-
 
 
 // IndexWrapper
@@ -1196,15 +1186,7 @@ Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 // TODO: Check the buffer size.
 			strncpy(dirent->d_name, entry->GetName(), B_FILE_NAME_LENGTH);
 			dirent->d_name[B_FILE_NAME_LENGTH - 1] = '\0';
-
-#ifdef KEEP_WRONG_DIRENT_RECLEN
-			// ToDo: The available file systems in BeOS apparently don't set the
-			// correct d_reclen - we are copying that behaviour if requested, but
-			// if it doesn't break compatibility, we will remove it.
-			dirent->d_reclen = strlen(dirent->d_name);
-#else
 			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
-#endif
 		}
 
 		if (status == MATCH_OK)
@@ -1559,6 +1541,33 @@ Query::Query(Volume *volume, Expression *expression, uint32 flags)
 	fExpression->Root()->CalculateScore(fIndex);
 	fIndex.Unset();
 
+	Rewind();
+
+	if (fFlags & B_LIVE_QUERY)
+		volume->AddQuery(this);
+}
+
+
+Query::~Query()
+{
+	if (fFlags & B_LIVE_QUERY)
+		fVolume->RemoveQuery(this);
+}
+
+
+status_t
+Query::Rewind()
+{
+	// free previous stuff
+
+	fStack.MakeEmpty();
+
+	delete fIterator;
+	fIterator = NULL;
+	fCurrent = NULL;
+
+	// put the whole expression on the stack
+
 	Stack<Term *> stack;
 	stack.Push(fExpression->Root());
 
@@ -1581,15 +1590,7 @@ Query::Query(Volume *volume, Expression *expression, uint32 flags)
 			FATAL(("Unknown term on stack or stack error"));
 	}
 
-	if (fFlags & B_LIVE_QUERY)
-		volume->AddQuery(this);
-}
-
-
-Query::~Query()
-{
-	if (fFlags & B_LIVE_QUERY)
-		fVolume->RemoveQuery(this);
+	return B_OK;
 }
 
 
@@ -1648,6 +1649,7 @@ Query::LiveUpdate(Entry *entry, const char *attribute, int32 type, const uint8 *
 
 	status_t oldStatus = fExpression->Root()->Match(entry, attribute, type, oldKey, oldLength);
 	status_t newStatus = fExpression->Root()->Match(entry, attribute, type, newKey, newLength);
+
 	int32 op;
 	if (oldStatus == MATCH_OK && newStatus == MATCH_OK) {
 		// only send out a notification if the name was changed 

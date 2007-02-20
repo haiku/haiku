@@ -1,12 +1,12 @@
+/* Query - query parsing and evaluation
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ *
+ * Adjusted by Ingo Weinhold <bonefish@cs.tu-berlin.de> for usage in RAM FS.
+ */
 #ifndef QUERY_H
 #define QUERY_H
-/* Query - query parsing and evaluation
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
-
-// Adjusted by Ingo Weinhold <bonefish@cs.tu-berlin.de> for usage in RAM FS.
 
 
 #include <OS.h>
@@ -14,7 +14,6 @@
 
 #include "Index.h"
 #include "Stack.h"
-//#include "Chain.h"
 #include "ramfs.h"
 
 class Entry;
@@ -23,9 +22,6 @@ class IndexIterator;
 class Query;
 class Term;
 class Volume;
-
-
-
 
 
 #define B_QUERY_NON_INDEXED	0x00000002
@@ -69,11 +65,6 @@ private:
 };
 
 
-
-
-
-
-
 class Expression {
 	public:
 		Expression(char *expr);
@@ -104,10 +95,12 @@ class Query {
 		Query(Volume *volume, Expression *expression, uint32 flags);
 		~Query();
 
-		status_t GetNextEntry(struct dirent *,size_t size);
+		status_t Rewind();
+		status_t GetNextEntry(struct dirent *, size_t size);
 
-		void SetLiveMode(port_id port,int32 token);
-		void LiveUpdate(Entry *entry,const char *attribute,int32 type,const uint8 *oldKey,size_t oldLength,const uint8 *newKey,size_t newLength);
+		void SetLiveMode(port_id port, int32 token);
+		void LiveUpdate(Entry *entry, const char *attribute, int32 type,
+			const uint8 *oldKey, size_t oldLength, const uint8 *newKey, size_t newLength);
 
 		Expression *GetExpression() const { return fExpression; }
 
@@ -122,10 +115,6 @@ class Query {
 		uint32			fFlags;
 		port_id			fPort;
 		int32			fToken;
-
-	private:
-//		friend Chain<Query>;
-//		Query			*fNext;
 };
 
 #endif	/* QUERY_H */

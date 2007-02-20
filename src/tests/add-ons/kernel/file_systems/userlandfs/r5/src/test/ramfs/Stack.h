@@ -1,10 +1,10 @@
-#ifndef STACK_H
-#define STACK_H
-/* Stack - a template stack class
-**
-** Copyright 2001 pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
-*/
+/* Stack - a template stack class (plus some handy methods)
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
+#ifndef KERNEL_UTIL_STACK_H
+#define KERNEL_UTIL_STACK_H
 
 
 #include <SupportDefs.h>
@@ -19,18 +19,28 @@ template<class T> class Stack {
 			fMax(0)
 		{
 		}
-		
+
 		~Stack()
 		{
-			if (fArray)
-				free(fArray);
+			free(fArray);
 		}
-		
+
+		bool IsEmpty() const
+		{
+			return fUsed == 0;
+		}
+
+		void MakeEmpty()
+		{
+			// could also free the memory
+			fUsed = 0;
+		}
+
 		status_t Push(T value)
 		{
 			if (fUsed >= fMax) {
 				fMax += 16;
-				T *newArray = (T *)realloc(fArray,fMax * sizeof(T));
+				T *newArray = (T *)realloc(fArray, fMax * sizeof(T));
 				if (newArray == NULL)
 					return B_NO_MEMORY;
 
@@ -39,7 +49,7 @@ template<class T> class Stack {
 			fArray[fUsed++] = value;
 			return B_OK;
 		}
-		
+
 		bool Pop(T *value)
 		{
 			if (fUsed == 0)
@@ -48,11 +58,21 @@ template<class T> class Stack {
 			*value = fArray[--fUsed];
 			return true;
 		}
-		
+
+		T *Array()
+		{
+			return fArray;
+		}
+
+		int32 CountItems() const
+		{
+			return fUsed;
+		}
+
 	private:
 		T		*fArray;
 		int32	fUsed;
 		int32	fMax;
 };
 
-#endif	/* STACK_H */
+#endif	/* KERNEL_UTIL_STACK_H */
