@@ -14,7 +14,7 @@
  * branch to the syscall vector in the commpage
  */
 
-#include <os/kernel/arch/x86/commpage.h>
+#include <arch/x86/commpage.h>
 
 #define _SYSCALL(name, n) \
 .globl name; \

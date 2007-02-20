@@ -8,8 +8,6 @@
 #include <KernelExport.h>
 #include <string.h>
 
-#include <os/kernel/arch/x86/commpage.h>
-
 static area_id comm_area;
 static area_id user_comm_area;
 static unsigned long *comm_ptr;
