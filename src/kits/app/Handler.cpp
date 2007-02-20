@@ -688,6 +688,7 @@ ObserverList::_ValidateHandlers(uint32 what)
 			continue;
 
 		handlers.erase(iterator);
+		iterator--;
 		Add(target, what);
 	}
 }
