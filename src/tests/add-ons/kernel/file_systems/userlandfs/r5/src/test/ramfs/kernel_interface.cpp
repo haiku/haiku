@@ -652,7 +652,6 @@ ramfs_create(void *ns, void *_dir, const char *name, int openMode,
 					node->SetMode(mode);
 					node->SetUID(geteuid());
 					node->SetGID(getegid());
-// Don't we need to invoke new_vnode()?
 				}
 			}
 			// set result / cleanup on failure
