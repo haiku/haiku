@@ -601,6 +601,13 @@ ClientConnection::VisitMountRequest(MountRequest* request)
 		reply.sharePermissions = sharePermissions.GetPermissions();
 		reply.volumeID = volume->GetID();
 	}
+
+	// make sure, the volume is removed on error
+	if (result != B_OK && volume) {
+		AutoLocker<VolumeMap> volumeMapLocker(fVolumes);
+		volume->MarkRemoved();
+	}
+
 	securityContextLocker.Unlock();
 	managerLocker.Unlock();
 
