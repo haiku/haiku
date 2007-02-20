@@ -12,22 +12,16 @@
 
 
 TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_PULSE_NEEDED)
+	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_PULSE_NEEDED),
+	fMessage(NULL)
 {
-	InitView();
+	fMessage = new BMessage(H_TIME_UPDATE);
 }
 
 
 TTimeBaseView::~TTimeBaseView()
 {
-}
-
-
-
-void
-TTimeBaseView::InitView()
-{
-	f_message = new BMessage(H_TIME_UPDATE);
+	delete fMessage;
 }
 
 
@@ -42,18 +36,21 @@ TTimeBaseView::Pulse()
 void
 TTimeBaseView::SetGMTime(bool gmt)
 {
-	f_gmtime = gmt;
+	fIsGMT = gmt;
 }
 
 
 void
 TTimeBaseView::DispatchMessage()
 {
-	time_t current = time(0);
+	if (fMessage == NULL)
+		return;
+
+	time_t current = time(NULL);
 	
 	struct tm *ltime;
 
-	if (f_gmtime)
+	if (fIsGMT)
 		ltime = gmtime(&current);
 	else
 		ltime = localtime(&current);
@@ -65,15 +62,15 @@ TTimeBaseView::DispatchMessage()
 	int32 minute = ltime->tm_min;
 	int32 second = ltime->tm_sec;
 	
-	f_message->MakeEmpty();
-	f_message->AddInt32("month", month);
-	f_message->AddInt32("day", day);
-	f_message->AddInt32("year", year);
-	f_message->AddInt32("hour", hour);
-	f_message->AddInt32("minute", minute);
-	f_message->AddInt32("second", second);
+	fMessage->MakeEmpty();
+	fMessage->AddInt32("month", month);
+	fMessage->AddInt32("day", day);
+	fMessage->AddInt32("year", year);
+	fMessage->AddInt32("hour", hour);
+	fMessage->AddInt32("minute", minute);
+	fMessage->AddInt32("second", second);
 
-	SendNotices(H_TM_CHANGED, f_message);
+	SendNotices(H_TM_CHANGED, fMessage);
 }
 
 
@@ -81,10 +78,10 @@ void
 TTimeBaseView::ChangeTime(BMessage *message)
 {
 	bool istime;
-	if (!(message->FindBool("time", &istime) == B_OK))
+	if (message->FindBool("time", &istime) != B_OK)
 		return;
 
-	time_t atime = time(0);
+	time_t atime = time(NULL);
 	struct tm *_tm = localtime(&atime);
 	
 	int32 hour = 0;
@@ -117,4 +114,3 @@ TTimeBaseView::ChangeTime(BMessage *message)
 	time_t atime2 = mktime(_tm);
 	set_real_time_clock(atime2);
 }
-
