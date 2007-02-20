@@ -49,32 +49,34 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	BStringView *stringView = new BStringView(frameRect, "expansion", "Expansion:",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	stringView->ResizeToPreferred();
-	if(stringView->Frame().right>maxWidth) maxWidth=stringView->Frame().right;	
+	if (stringView->Frame().right > maxWidth)
+		maxWidth = stringView->Frame().right;	
 	box->AddChild(stringView);
-	
 	
 	frameRect.top = stringView->Frame().bottom + 5;	
 	frameRect.left += 10;
 	
 	fAutoExpand = new BCheckBox(frameRect, "autoExpand", "Automatically expand files", NULL);
 	fAutoExpand->ResizeToPreferred();
-	if(fAutoExpand->Frame().right>maxWidth) maxWidth=fAutoExpand->Frame().right;	
+	if (fAutoExpand->Frame().right > maxWidth)
+		maxWidth = fAutoExpand->Frame().right;	
 	box->AddChild(fAutoExpand);
 	
 	frameRect = fAutoExpand->Frame();
 	frameRect.top = fAutoExpand->Frame().bottom + 1;
 	fCloseWindow = new BCheckBox(frameRect, "closeWindowWhenDone", "Close window when done expanding", NULL);
 	fCloseWindow->ResizeToPreferred();
-	if(fCloseWindow->Frame().right>maxWidth) maxWidth=fCloseWindow->Frame().right;	
+	if (fCloseWindow->Frame().right > maxWidth)
+		maxWidth = fCloseWindow->Frame().right;	
 	box->AddChild(fCloseWindow);
-	
 	
 	frameRect = stringView->Frame();
 	frameRect.top = fCloseWindow->Frame().bottom + 10;
 	stringView = new BStringView(frameRect, "destinationFolder", "Destination Folder:",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	stringView->ResizeToPreferred();	
-	if(stringView->Frame().right>maxWidth) maxWidth=stringView->Frame().right;	
+	if (stringView->Frame().right > maxWidth)
+		maxWidth = stringView->Frame().right;	
 	box->AddChild(stringView);
 	
 	frameRect.top = stringView->Frame().bottom + 5;	
@@ -83,7 +85,8 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	fLeaveDest = new BRadioButton(frameRect, "leaveDest", "Leave destination folder path empty", 
 		new BMessage(MSG_LEAVEDEST));
 	fLeaveDest->ResizeToPreferred();
-	if(fLeaveDest->Frame().right>maxWidth) maxWidth=fLeaveDest->Frame().right;	
+	if (fLeaveDest->Frame().right > maxWidth)
+		maxWidth = fLeaveDest->Frame().right;	
 	box->AddChild(fLeaveDest);
 	
 	frameRect = fLeaveDest->Frame();
@@ -91,17 +94,18 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	fSameDest = new BRadioButton(frameRect, "sameDir", "Same directory as source (archive) file", 
 		new BMessage(MSG_SAMEDIR));
 	fSameDest->ResizeToPreferred();
-	if(fSameDest->Frame().right>maxWidth) maxWidth=fSameDest->Frame().right;	
+	if (fSameDest->Frame().right > maxWidth)
+		maxWidth = fSameDest->Frame().right;	
 	box->AddChild(fSameDest);
 
 	frameRect = fSameDest->Frame();
 	frameRect.top = frameRect.bottom + 1;
 	fDestUse = new BRadioButton(frameRect, "destUse", "Use:",new BMessage(MSG_DESTUSE));
 	fDestUse->ResizeToPreferred();
-	if(fDestUse->Frame().right>maxWidth) maxWidth=fDestUse->Frame().right;	
+	if (fDestUse->Frame().right > maxWidth)
+		maxWidth = fDestUse->Frame().right;	
 	box->AddChild(fDestUse);
-	
-	
+		
 	frameRect = fDestUse->Frame();
 	frameRect.left  = fDestUse->Frame().right + 1;
 	frameRect.right  = frameRect.left + 58;
@@ -120,21 +124,21 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	frameRect.left = frameRect.right + 5;
 	fSelect = new BButton(frameRect, "selectButton", "Select", new BMessage(MSG_DESTSELECT));
 	fSelect->ResizeToPreferred();
-	if(fSelect->Frame().right>maxWidth) maxWidth=fSelect->Frame().right;	
+	if (fSelect->Frame().right > maxWidth)
+		maxWidth = fSelect->Frame().right;	
 	box->AddChild(fSelect);
 	fSelect->SetEnabled(false);
 	
 	fDestText->MoveBy(0,(fSelect->Frame().Height() - fDestText->Frame().Height())/2.0);
 	fDestText->ResizeTo(158,fDestText->Frame().Height());
 	
-	
-	
 	frameRect = stringView->Frame();
 	frameRect.top = fDestUse->Frame().bottom + 10;
 	
 	stringView = new BStringView(frameRect, "other", "Other:",B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	stringView->ResizeToPreferred();
-	if(stringView->Frame().right>maxWidth) maxWidth=stringView->Frame().right;	
+	if (stringView->Frame().right > maxWidth)
+		maxWidth = stringView->Frame().right;	
 	box->AddChild(stringView);
 	
 	frameRect.top = stringView->Frame().bottom + 5;	
@@ -142,17 +146,18 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 
 	fOpenDest = new BCheckBox(frameRect, "openDestination", "Open destination folder after extraction", NULL);
 	fOpenDest->ResizeToPreferred();
-	if(fOpenDest->Frame().right>maxWidth) maxWidth=fOpenDest->Frame().right;	
+	if (fOpenDest->Frame().right > maxWidth)
+		maxWidth = fOpenDest->Frame().right;	
 	box->AddChild(fOpenDest);
 		
 	frameRect = fOpenDest->Frame();
 	frameRect.top = frameRect.bottom + 1;	
 	fAutoShow = new BCheckBox(frameRect, "autoShow", "Automatically show contents listing", NULL);
 	fAutoShow->ResizeToPreferred();
-	if(fAutoShow->Frame().right>maxWidth) maxWidth=fAutoShow->Frame().right;	
+	if (fAutoShow->Frame().right > maxWidth)
+		maxWidth = fAutoShow->Frame().right;	
 	box->AddChild(fAutoShow);
-	
-	
+		
 	box->ResizeTo(maxWidth + 15,fAutoShow->Frame().bottom + 10);
 	
 	rect = BRect(Bounds().right-89, Bounds().bottom-40, Bounds().right-14, Bounds().bottom-16);
@@ -164,7 +169,6 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	button->MoveTo(box->Frame().right - button->Frame().Width(),box->Frame().bottom + 10 );
 	background->AddChild(button);
 	
-	
 	rect = button->Frame();
 	BButton *cancel = new BButton(rect, "CancelButton", "Cancel", new BMessage(MSG_CANCEL));
 	cancel->ResizeToPreferred();
@@ -172,8 +176,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	background->AddChild(cancel);
 	
 	ResizeTo(box->Frame().right + 11 ,button->Frame().bottom + 11);
-	
-	
+		
 	BScreen screen(this);
 	MoveBy((screen.Frame().Width()-Bounds().Width())/2, 
 		(screen.Frame().Height()-Bounds().Height())/2);
