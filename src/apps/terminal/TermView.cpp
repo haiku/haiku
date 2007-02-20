@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
- * Distributed under the terms of the MIT license.
+ * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Kian Duffy <myob@users.sourceforge.net>
+ *		Kian Duffy, myob@users.sourceforge.net
+ *		Y.Hayakawa, hida@sawada.riec.tohoku.ac.jp
  */
 
 
@@ -802,7 +803,7 @@ TermView::ViewThread(void *data)
 		BRect r(pos.x1 * width, pos.y1 * height,
 		(pos.x2 + 1) * width -1,(pos.y2 + 1) * height -1);
 		
-		if(theObj->LockLooper()) {
+		if (theObj->LockLooper()) {
 			theObj->Invalidate(r);
 			theObj->UnlockLooper();
 		}
@@ -857,23 +858,23 @@ TermView::MouseTracking(void *data)
 	
 	while(!theObj->fQuitting) {
   
-	if(1) {
+	if (1) {
 #ifdef CHANGE_CURSOR_IMAGE    
-		if(!has_data(find_thread(NULL))) {
+		if (!has_data(find_thread(NULL))) {
 			BRect r;
 			
-			if(theObj->fSelected
+			if (theObj->fSelected
 				&& ( gTermPref->getInt32(PREF_DRAGN_COPY)
 						|| modifiers() & B_CONTROL_KEY)) {
 			
-			if(theObj->LockLooper()) {
+			if (theObj->LockLooper()) {
 				theObj->GetMouse(&stpoint, &button);
 				r = theObj->Bounds();
 				theObj->UnlockLooper();
 			}
-			if(r.Contains(stpoint)) {
+			if (r.Contains(stpoint)) {
 				CurPos tmppos = theObj->BPointToCurPos(stpoint);
-				if(theObj->fSelStart > theObj->fSelEnd) {
+				if (theObj->fSelStart > theObj->fSelEnd) {
 					stpos = theObj->fSelEnd;
 					edpos = theObj->fSelStart;
 				} else {
@@ -881,7 +882,7 @@ TermView::MouseTracking(void *data)
 					edpos = theObj->fSelEnd;
 				}
 				
-				if(tmppos > stpos && tmppos < edpos)
+				if (tmppos > stpos && tmppos < edpos)
 					be_app->SetCursor(M_ADD_CURSOR);
 				else 
 					be_app->SetCursor(B_HAND_CURSOR);
@@ -894,7 +895,7 @@ TermView::MouseTracking(void *data)
 		code = receive_data(&sender,(void *)&stpoint, sizeof(BPoint));
 	}
 
-	if(code != MOUSE_THR_CODE)
+	if (code != MOUSE_THR_CODE)
 		continue;
 
 	selected = theObj->fSelected;
@@ -906,7 +907,7 @@ TermView::MouseTracking(void *data)
 		
 		snooze(40 * 1000);
 		
-		if(theObj->LockLooper()) {
+		if (theObj->LockLooper()) {
 			theObj->GetMouse(&edpoint, &button);
 			theObj->UnlockLooper();
 		}
@@ -915,51 +916,51 @@ TermView::MouseTracking(void *data)
 	if (edpos.y < 0)
 		continue;
 
-		if(stpoint == edpoint) {
+		if (stpoint == edpoint) {
 			continue;
 		} else {
-			if(!selected) {
+			if (!selected) {
 				theObj->Select(stpos, edpos);
 				selected = true;
 			} else {
 			
 				// Align cursor point to text.
-				if(stpos == edpos)
+				if (stpos == edpos)
 					continue;
 				
-				if(edpos > stpos) {
+				if (edpos > stpos) {
 					edpoint.x -= theObj->fFontWidth / 2;
 					edpos = theObj->BPointToCurPos(edpoint);
 					//edpos.x--;
-					if(edpos.x < 0)
+					if (edpos.x < 0)
 						edpos.x = 0;
 				}
 				else
-				if(edpos < stpos) {
+				if (edpos < stpos) {
 					edpoint.x += theObj->fFontWidth / 2;
 					edpos = theObj->BPointToCurPos(edpoint);
 					//edpos.x++;
-					if(edpos.x > theObj->fTermColumns)
+					if (edpos.x > theObj->fTermColumns)
 						edpos.x = theObj->fTermColumns;
 				}
 				
 				// Scroll check
-				if(theObj->LockLooper()) {
+				if (theObj->LockLooper()) {
 					
 					// Get now scroll point
 					theObj->fScrollBar->GetRange(&scr_start, &scr_end);
 					scr_pos = theObj->fScrollBar->Value();
 					
-					if(edpoint.y < theObj->Bounds().LeftTop().y )
+					if (edpoint.y < theObj->Bounds().LeftTop().y )
 					
 						// mouse point left of window
-						if(scr_pos != scr_start)
+						if (scr_pos != scr_start)
 							theObj->ScrollTo(0, edpoint.y);
 						
-						if(edpoint.y > theObj->Bounds().LeftBottom().y) {
+						if (edpoint.y > theObj->Bounds().LeftBottom().y) {
 						
 						// mouse point left of window
-						if(scr_pos != scr_end)
+						if (scr_pos != scr_end)
 							theObj->ScrollTo(0, edpoint.y);
 					}
 					theObj->UnlockLooper();
@@ -1128,10 +1129,7 @@ TermView::UpdateSIGWINCH()
 }
 
 
-/*!	Device Status.
-	Q & D hack by Y.Hayakawa(hida@sawada.riec.tohoku.ac.jp)
-	21-JUL-99
-*/
+//!	Device Status.
 void
 TermView::DeviceStatusReport(int n)
 {
@@ -1320,7 +1318,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	// send signal to shell process group.
 	tcgetattr(gPfd, &tio);
 	if (*bytes == tio.c_cc[VINTR]) {
-		if(tio.c_lflag & ISIG)
+		if (tio.c_lflag & ISIG)
 			kill(-sh_pid, SIGINT);
 	}
 
@@ -1547,7 +1545,7 @@ TermView::MessageReceived(BMessage *msg)
 //    {
    //   int32 op;
   //    msg->FindInt32("be:opcode", &op);
-   //   switch(op){ 
+   //   switch (op){ 
    //   case B_INPUT_METHOD_STARTED:
 	//DoIMStart(msg);
 //	break;
@@ -1610,7 +1608,7 @@ TermView::DoCopy()
 	// Deselecting the current selection is not the behavior that
 	// R5's Terminal app displays. We want to mimic the behavior, so we will
 	// no longer do the deselection
-//	if(!fMouseTracking)
+//	if (!fMouseTracking)
 //		DeSelect();
 }
 
@@ -1651,7 +1649,7 @@ TermView::DoSelectAll(void)
 	start.x = 0;
 	end.x = fTermColumns -1;
 	
-	if(start_pos > 0)
+	if (start_pos > 0)
 		start.y = start_pos;
 	else
 		start.y = 0;
@@ -1671,7 +1669,7 @@ TermView::DoClearAll(void)
 	fTop = 0;
 	ScrollTo(0, 0);
 	
-	if(LockLooper()) {
+	if (LockLooper()) {
 		SetHighColor(fTextBackColor);
 		
 		FillRect(Bounds());
@@ -1701,7 +1699,7 @@ TermView::SubstMetaChar(const char *p, char *q)
 		char *mp = metachar;
 		for(int i = 0; i < 22; i++){
 			
-			if(*p == *mp++) {
+			if (*p == *mp++) {
 				*q++ = '\\';
 				num_char++;
 				break;
@@ -1879,7 +1877,7 @@ TermView::MouseDown(BPoint where)
 		if (clicks == 0)
 			clicks = 3;
 	    
-		switch(clicks) {
+		switch (clicks) {
 			case 1:
 				fMouseTracking = true;
 				send_data(fMouseThread, MOUSE_THR_CODE, (void *)&where, sizeof(BPoint));
@@ -1897,7 +1895,7 @@ TermView::MouseDown(BPoint where)
   	}
   
 	// Sub menu(coding popup menu)
-	if(buttons == mSubMenuButton){
+	if (buttons == mSubMenuButton){
 		ConvertToScreen(&where); 
 		SetupPop();
 		fPopMenu->Go(where, true); 
@@ -1911,10 +1909,10 @@ TermView::MouseDown(BPoint where)
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *)
 {
-	if(fMouseImage && Window()->IsActive()) {
-		if(transit == B_ENTERED_VIEW)
+	if (fMouseImage && Window()->IsActive()) {
+		if (transit == B_ENTERED_VIEW)
 			be_app->SetCursor(B_I_BEAM_CURSOR);
-		if(transit == B_EXITED_VIEW)
+		if (transit == B_EXITED_VIEW)
 			be_app->SetCursor(B_HAND_CURSOR);
 	}
 }
@@ -1927,19 +1925,19 @@ TermView::Select(CurPos start, CurPos end)
 	uchar buf[4];
 	ushort attr;
 	
-	if(start.x < 0)
+	if (start.x < 0)
 		start.x = 0;
-	if(end.x >= fTermColumns)
+	if (end.x >= fTermColumns)
 		end.x = fTermColumns - 1;
 	
-	if(fTextBuffer->GetChar(start.y, start.x, buf, &attr) == IN_STRING) {
+	if (fTextBuffer->GetChar(start.y, start.x, buf, &attr) == IN_STRING) {
 		start.x--;
-		if(start.x < 0) start.x = 0;
+		if (start.x < 0) start.x = 0;
 	}
 	
-	if(fTextBuffer->GetChar(end.y, end.x, buf, &attr) == IN_STRING) {
+	if (fTextBuffer->GetChar(end.y, end.x, buf, &attr) == IN_STRING) {
 		end.x++;
-		if(end.x >= fTermColumns) end.x = fTermColumns;
+		if (end.x >= fTermColumns) end.x = fTermColumns;
 	}
 	
 	fSelStart = start;
@@ -1958,14 +1956,14 @@ TermView::AddSelectRegion(CurPos pos)
 	ushort attr;
 	CurPos start, end, inPos;
 	
-	if(!fSelected)
+	if (!fSelected)
 		return;
 	
 	// error check, and if mouse point to a plase full width character,
 	// select point decliment.
-	if(pos.x >= fTermColumns)
+	if (pos.x >= fTermColumns)
 		pos.x = fTermColumns - 1;
-	else if(pos.x < 0)
+	else if (pos.x < 0)
 		pos.x = 0;
 	
 	if (pos.y < 0)
@@ -1973,7 +1971,7 @@ TermView::AddSelectRegion(CurPos pos)
 	
 	if (fTextBuffer->GetChar(pos.y, pos.x, buf, &attr) == IN_STRING) {
 		pos.x++;
-		if(pos.x >= fTermColumns)
+		if (pos.x >= fTermColumns)
 			pos.x = fTermColumns - 1;
 	}
 	
@@ -2052,10 +2050,10 @@ TermView::ResizeSelectRegion(CurPos pos)
 		
 		pos.x++;
 		
-		if(pos == inPos)
+		if (pos == inPos)
 			return;
 		
-		if(pos.x >= fTermColumns)
+		if (pos.x >= fTermColumns)
 			pos.x = fTermColumns - 1;
 	}
 	fSelEnd = pos;
@@ -2305,18 +2303,16 @@ TermView::GetSelection(BString &str)
 inline void
 TermView::SendDataToDrawEngine(int x1, int y1, int x2, int y2)
 {
-	// TODO: remove the goto
-	
 	sem_info info;
 	
-	retry:
+	for (;;) {
+		get_sem_info(fDrawRectSem, &info);
 	
-	get_sem_info(fDrawRectSem, &info);
-	
-	if((RECT_BUF_SIZE - info.count) < 2) {
-		
-		snooze(10 * 1000);
-		goto retry;
+		if ((RECT_BUF_SIZE - info.count) < 2) {
+			snooze(10 * 1000);
+			continue;
+		} else
+			break;
 	}
 	
 	fDrawRectBuffer[fDrawRect_p].x1 = x1;
