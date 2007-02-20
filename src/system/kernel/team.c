@@ -778,6 +778,7 @@ team_create_thread_start(void *args)
 
 	// add args to info member
 	team->args[0] = 0;
+	strlcpy(team->args, path, sizeof(team->args));
 	for (i = 1; i < argCount; i++) {
 		strlcat(team->args, " ", sizeof(team->args));
 		strlcat(team->args, teamArgs->args[i], sizeof(team->args));
