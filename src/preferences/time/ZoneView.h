@@ -29,7 +29,7 @@ class TZoneItem: public BStringItem {
 
 
 
-class TZoneView: public BView{
+class TZoneView: public BView {
 	public:
 		TZoneView(BRect frame);
 		virtual ~TZoneView();

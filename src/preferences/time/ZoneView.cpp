@@ -89,8 +89,8 @@ TZoneView::AttachedToWindow()
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
 
-	if (f_first) // stupid hack
-	{
+	if (f_first) {
+		// stupid hack
 		f_regionpopup->SetTargetForItems(this);
 		f_setzone->SetTarget(this);
 		f_citylist->SetTarget(this);

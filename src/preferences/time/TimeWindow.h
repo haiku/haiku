@@ -3,24 +3,21 @@
 
 #include <Window.h>
 
-#include "BaseView.h"
-#include "SettingsView.h"
-#include "TimeSettings.h"
-#include "ZoneView.h"
-
+class TSettingsView;
+class TTimeBaseView;
+class TZoneView;
 class TTimeWindow : public BWindow {
 	public:
 		TTimeWindow();
-		~TTimeWindow();
 	
 		bool QuitRequested();
-		void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage *message);
 	private:
 		void InitWindow();
 
-		TTimeBaseView *f_BaseView;
-		TSettingsView *f_TimeSettings;
-		TZoneView *f_TimeZones;
+		TTimeBaseView *fBaseView;
+		TSettingsView *fTimeSettings;
+		TZoneView *fTimeZones;
 };
 
 #endif

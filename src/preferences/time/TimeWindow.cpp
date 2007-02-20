@@ -8,36 +8,34 @@
 #include <Message.h>
 #include <Screen.h>
 #include <TabView.h>
+
 #include <stdio.h>
 
 #include "BaseView.h"
+#include "SettingsView.h"
 #include "Time.h"
 #include "TimeMessages.h"
 #include "TimeWindow.h"
+#include "TimeSettings.h"
+#include "ZoneView.h"
 
 #define TIME_WINDOW_RIGHT	361 //332
 #define TIME_WINDOW_BOTTOM	227 //208
 
 
 TTimeWindow::TTimeWindow()
-	: BWindow(BRect(0,0,TIME_WINDOW_RIGHT,TIME_WINDOW_BOTTOM), 
+	: BWindow(BRect(0, 0, TIME_WINDOW_RIGHT, TIME_WINDOW_BOTTOM), 
 		"Time & Date", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
 {
-	BScreen screen;
-
 	MoveTo(dynamic_cast<TimeApplication *>(be_app)->WindowCorner());
 
+	BScreen screen;
 	// Code to make sure that the window doesn't get drawn off screen...
 	if (!(screen.Frame().right >= Frame().right && screen.Frame().bottom >= Frame().bottom))
 		MoveTo((screen.Frame().right-Bounds().right)*.5,(screen.Frame().bottom-Bounds().bottom)*.5);
 	
 	InitWindow(); 
 	SetPulseRate(500000);
-}
-
-
-TTimeWindow::~TTimeWindow()
-{
 }
 
 
@@ -49,12 +47,12 @@ TTimeWindow::MessageReceived(BMessage *message)
 		{
 			bool istime;
 			if (message->FindBool("time", &istime) == B_OK)
-				f_BaseView->ChangeTime(message);
+				fBaseView->ChangeTime(message);
 			break;
 		}
 		
 		case H_RTC_CHANGE:
-			f_BaseView->SetGMTime(f_TimeSettings->GMTime());
+			fBaseView->SetGMTime(fTimeSettings->GMTime());
 			break;
 		
 		default:
@@ -69,12 +67,12 @@ TTimeWindow::QuitRequested()
 {
 	dynamic_cast<TimeApplication *>(be_app)->SetWindowCorner(BPoint(Frame().left,Frame().top));
 	
-	f_BaseView->StopWatchingAll(f_TimeSettings);
-	f_BaseView->StopWatchingAll(f_TimeZones);
+	fBaseView->StopWatchingAll(fTimeSettings);
+	fBaseView->StopWatchingAll(fTimeZones);
 	
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	
-	return(true);
+	return BWindow::QuitRequested();
 	
 }
 
@@ -84,9 +82,8 @@ TTimeWindow::InitWindow()
 {
 	BRect bounds(Bounds());
 	
-	f_BaseView = new TTimeBaseView(bounds, "background view");
-	f_BaseView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(f_BaseView);
+	fBaseView = new TTimeBaseView(bounds, "background view");
+	AddChild(fBaseView);
 	
 	bounds.top = 9;
 	BTabView *tabview = new BTabView(bounds, "tab_view");
@@ -95,24 +92,22 @@ TTimeWindow::InitWindow()
 	bounds.InsetBy(4, 6);
 	bounds.bottom -= tabview->TabHeight();
 	
-	f_TimeSettings = new TSettingsView(bounds);
-	if (f_BaseView->StartWatchingAll(f_TimeSettings) != B_OK)
+	fTimeSettings = new TSettingsView(bounds);
+	if (fBaseView->StartWatchingAll(fTimeSettings) != B_OK)
 		printf("StartWatchingAll(TimeSettings) failed!!!\n");
 
-	f_TimeZones = new TZoneView(bounds);
-	if (f_BaseView->StartWatchingAll(f_TimeZones) != B_OK)
-		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!\n");	
+	fTimeZones = new TZoneView(bounds);
+	if (fBaseView->StartWatchingAll(fTimeZones) != B_OK)
+		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!\n");
+	
 	// add tabs
-	BTab *tab;
-	tab = new BTab();
-	tabview->AddTab(f_TimeSettings, tab);
+	BTab *tab = new BTab();
+	tabview->AddTab(fTimeSettings, tab);
 	tab->SetLabel("Settings");
 	
 	tab = new BTab();
-	tabview->AddTab(f_TimeZones, tab);
+	tabview->AddTab(fTimeZones, tab);
 	tab->SetLabel("Time Zone");
 	
-	f_BaseView->AddChild(tabview);
-	f_BaseView->Pulse();
-	
+	fBaseView->AddChild(tabview);
 }

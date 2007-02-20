@@ -11,7 +11,8 @@ class TTimeBaseView: public BView {
 		virtual ~TTimeBaseView();
 		
 		virtual void Pulse();
-		
+		virtual void AttachedToWindow();
+
 		void ChangeTime(BMessage *);
 		void SetGMTime(bool);
 	protected:

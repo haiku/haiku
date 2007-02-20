@@ -5,7 +5,6 @@
 
 #include <Alert.h>
 #include <OS.h>
-#include <stdio.h>
 
 #include "BaseView.h"
 #include "TimeMessages.h"
@@ -30,6 +29,13 @@ TTimeBaseView::Pulse()
 {
 	if (IsWatched())
 		DispatchMessage();
+}
+
+
+void
+TTimeBaseView::AttachedToWindow()
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
