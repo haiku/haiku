@@ -115,6 +115,7 @@ void dbg_printf_end();
 	#define FUNCTION(x) TFUNCTION(x)
 	#define FUNCTION_START() TFUNCTION_START()
 	#define FUNCTION_END() TFUNCTION_END()
+	#define DARG(x) x
 	#define D(x) {x;};
 #else
 	#define PRINT(x) ;
@@ -128,6 +129,7 @@ void dbg_printf_end();
 	#define FUNCTION(x) ;
 	#define FUNCTION_START() ;
 	#define FUNCTION_END() ;
+	#define DARG(x)
 	#define D(x) ;
 #endif
 

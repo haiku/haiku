@@ -12,7 +12,7 @@
 
 #define ENABLE_BA_PANIC	1
 #if ENABLE_BA_PANIC
-#define BA_PANIC(x)	{ DEBUGGER(x); BlockAllocator::fPanic = true; }
+#define BA_PANIC(x)	{ PANIC(x); BlockAllocator::fPanic = true; }
 #endif
 
 class AllocationInfo;

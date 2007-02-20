@@ -30,6 +30,8 @@
 
 #include <SupportDefs.h>
 
+#include "String.h"
+
 // min and max
 // We don't want to include <algobase.h> otherwise we also get <iostream.h>
 // and other undesired things.
@@ -92,23 +94,6 @@ fls(uint32 value)
 		index++;
 #endif	// HAND_OPTIMIZED_FLS
 	return index;
-}
-
-// string_hash
-//
-// from the Dragon Book: a slightly modified hashpjw()
-static inline
-uint32
-string_hash(const char *name)
-{
-	uint32 h = 0;
-	for (; *name; name++) {
-		uint32 g = h & 0xf0000000;
-		if (g)
-			h ^= g >> 24;
-		h = (h << 4) + *name;
-	}
-	return h;
 }
 
 // node_child_hash

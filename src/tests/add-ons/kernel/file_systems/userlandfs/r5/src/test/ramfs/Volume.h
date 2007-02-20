@@ -181,8 +181,8 @@ private:
 	IndexDirectory			*fIndexDirectory;
 	Directory				*fRootDirectory;
 	String					fName;
-	BLocker					fLocker;
-	BLocker					fIteratorLocker;
+	Locker					fLocker;
+	Locker					fIteratorLocker;
 	NodeListenerTree		*fNodeListeners;
 	NodeListenerList		fAnyNodeListeners;
 	EntryListenerTree		*fEntryListeners;

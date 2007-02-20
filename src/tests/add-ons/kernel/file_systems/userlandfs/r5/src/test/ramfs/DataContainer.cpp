@@ -306,7 +306,7 @@ D(if (!fVolume->CheckBlock(block, offset + size)) return NULL;);
 D(
 if (offset + size > kSmallDataContainerSize) {
 	FATAL(("DataContainer: Data access exceeds small buffer.\n"));
-	DEBUGGER("DataContainer: Data access exceeds small buffer.");
+	PANIC("DataContainer: Data access exceeds small buffer.");
 	return NULL;
 }
 );
@@ -347,7 +347,7 @@ DataContainer::_ResizeLastBlock(size_t newSize)
 D(
 if (!_IsBlockMode()) {
 	FATAL(("Call of _ResizeLastBlock() in small buffer mode.\n"));
-	DEBUGGER("Call of _ResizeLastBlock() in small buffer mode.");
+	PANIC("Call of _ResizeLastBlock() in small buffer mode.");
 	return B_ERROR;
 }
 );

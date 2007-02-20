@@ -47,17 +47,17 @@ public:
 template<typename Element>
 class DLListLinkImpl {
 private:
-	typedef DLListLink<Element> Link;
+	typedef DLListLink<Element> MyLink;
 
 public:
 	DLListLinkImpl() : fDLListLink()	{}
 	~DLListLinkImpl()					{}
 
-	Link *GetDLListLink()				{ return &fDLListLink; }
-	const Link *GetDLListLink() const	{ return &fDLListLink; }
+	MyLink *GetDLListLink()				{ return &fDLListLink; }
+	const MyLink *GetDLListLink() const	{ return &fDLListLink; }
 
 private:
-	Link	fDLListLink;
+	MyLink	fDLListLink;
 };
 
 // DLListStandardGetLink
