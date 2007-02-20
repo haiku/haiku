@@ -8,23 +8,22 @@
 #include <String.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <Debug.h>
 
 #define HANDLE_FILE
+//#define HANDLE_MID_CID // http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid
 #define HANDLE_SH
 #define HANDLE_BESHARE
 //#define HANDLE_IM
 #define HANDLE_VLC
 
 const char *kAppSig = "application/x-vnd.haiku.urlwrapper";
+const char *kTrackerSig = "application/x-vnd.Be-TRAK";
 
 #ifdef __HAIKU__
 const char *kTerminalSig = "application/x-vnd.Haiku-Terminal";
 #else
 const char *kTerminalSig = "application/x-vnd.Be-SHEL";
-#endif
-
-#ifdef HANDLE_FILE
-const char *kTrackerSig = "application/x-vnd.Be-TRAK";
 #endif
 
 #ifdef HANDLE_BESHARE
@@ -53,12 +52,14 @@ bool		HasUser() const { return user.Length(); };
 bool		HasPass() const { return pass.Length(); };
 bool		HasPath() const { return path.Length(); };
 BString		Proto() const { return BString(proto); };
+BString		Full() const { return BString(full); }; // RFC1738's "sheme-part"
 BString		Host() const { return BString(host); };
 BString		Port() const { return BString(port); };
 BString		User() const { return BString(user); };
 BString		Pass() const { return BString(pass); };
 
 BString		proto;
+BString		full;
 BString		host;
 BString		port;
 BString		user;
@@ -82,8 +83,6 @@ private:
 
 };
 
-// TODO: handle ":port" as well
-// TODO: handle "/path" as well
 // proto:[//]user:pass@host:port/path
 status_t Url::ParseAndSplit()
 {
@@ -98,6 +97,7 @@ status_t Url::ParseAndSplit()
 	CopyInto(left, v + 1, Length() - v);
 	if (left.FindFirst("//") == 0)
 		left.RemoveFirst("//");
+	full = left;
 	
 	// path part
 	// actually some apps handle file://[host]/path
@@ -223,56 +223,40 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	const char *pausec = "; read -p 'Press any key'";
 	char *args[] = { "/bin/sh", "-c", NULL, NULL};
 
-	BString proto;
-	BString host;
-	BString port;
-	BString user;
-	BString pass;
-	BString path;
-
 	Url u(argv[1]);
-	BString rawurl(argv[1]);
-	BString url = rawurl;
-	if (url.FindFirst(":") < 0) {
-		fprintf(stderr, "malformed url: '%s'\n", url.String());
+	BString url = u.Full();
+	if (u.InitCheck() < 0) {
+		fprintf(stderr, "malformed url: '%s'\n", u.String());
 		return;
 	}
-	url.MoveInto(proto, 0, url.FindFirst(":"));
-	url.Remove(0, 1);
-	if (url.FindFirst("//") == 0)
-		url.RemoveFirst("//");
-	
-	// pre-slice the url, but you're not forced to use the result.
-	// original still in rawurl.
-	SplitUrl(u.String(), host, port, user, pass, path);
 	
 	// XXX: debug
-	printf("PROTO='%s'\n", proto.String());
-	printf("HOST='%s'\n", host.String());
-	printf("PORT='%s'\n", port.String());
-	printf("USER='%s'\n", user.String());
-	printf("PASS='%s'\n", pass.String());
-	printf("PATH='%s'\n", path.String());
+	PRINT(("PROTO='%s'\n", u.proto.String()));
+	PRINT(("HOST='%s'\n", u.host.String()));
+	PRINT(("PORT='%s'\n", u.port.String()));
+	PRINT(("USER='%s'\n", u.user.String()));
+	PRINT(("PASS='%s'\n", u.pass.String()));
+	PRINT(("PATH='%s'\n", u.path.String()));
 	
-	if (proto == "telnet") {
+	if (u.proto == "telnet") {
 		BString cmd("telnet ");
-		if (user.Length())
-			cmd << "-l " << user << " ";
-		cmd << host;
-		printf("CMD='%s'\n", cmd.String());
+		if (u.HasUser())
+			cmd << "-l " << u.user << " ";
+		cmd << u.host;
+		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
 		be_roster->Launch(kTerminalSig, 3, args);
 		return;
 	}
 	
-	if (proto == "ssh") {
+	if (u.proto == "ssh") {
 		BString cmd("ssh ");
 		
-		if (user.Length())
-			cmd << "-l " << user << " ";
-		cmd << host;
-		printf("CMD='%s'\n", cmd.String());
+		if (u.HasUser())
+			cmd << "-l " << u.user << " ";
+		cmd << u.host;
+		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
 		be_roster->Launch(kTerminalSig, 3, args);
@@ -280,7 +264,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
-	if (proto == "ftp") {
+	if (u.proto == "ftp") {
 		BString cmd("ftp ");
 		
 		/*
@@ -288,8 +272,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 			cmd << "-l " << user << " ";
 		cmd << host;
 		*/
-		cmd << url;
-		printf("CMD='%s'\n", cmd.String());
+		cmd << u.full;
+		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
 		be_roster->Launch(kTerminalSig, 3, args);
@@ -297,16 +281,16 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 	
-	if (proto == "sftp") {
+	if (u.proto == "sftp") {
 		BString cmd("sftp ");
 		
-		/*
-		if (user.Length())
-			cmd << "-l " << user << " ";
-		cmd << host;
-		*/
-		cmd << url;
-		printf("CMD='%s'\n", cmd.String());
+		//cmd << url;
+		if (u.HasUser())
+			cmd << u.user << "@";
+		cmd << u.host;
+		if (u.HasPath())
+			cmd << ":" << u.path;
+		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
 		be_roster->Launch(kTerminalSig, 3, args);
@@ -314,16 +298,15 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
-	if (proto == "finger") {
+	if (u.proto == "finger") {
 		BString cmd("finger ");
 		
-		// TODO: SplitUrl thinks the user is host when it's not present... FIXME.
-		if (user.Length())
-			cmd << user;
-		if (host.Length() == 0)
-			host = "127.0.0.1";
-		cmd << "@" << host;
-		printf("CMD='%s'\n", cmd.String());
+		if (u.HasUser())
+			cmd << u.user;
+		if (u.HasHost() == 0)
+			u.host = "127.0.0.1";
+		cmd << "@" << u.host;
+		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << pausec;
 		args[2] = (char *)cmd.String();
 		be_roster->Launch(kTerminalSig, 3, args);
@@ -332,11 +315,11 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	}
 
 #ifdef HANDLE_FILE
-	if (proto == "file") {
+	if (u.proto == "file") {
 		BMessage m(B_REFS_RECEIVED);
 		entry_ref ref;
 		// UnurlString(path);
-		if (get_ref_for_path(path.String(), &ref) < B_OK)
+		if (get_ref_for_path(u.path.String(), &ref) < B_OK)
 			return;
 		m.AddRef("refs", &ref);
 		be_roster->Launch(kTrackerSig, &m);
@@ -345,11 +328,11 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_SH
-	if (proto == "sh") {
-		BString cmd(url);
-		if (Warn(rawurl.String()) != B_OK)
+	if (u.proto == "sh") {
+		BString cmd(u.Full());
+		if (Warn(u.String()) != B_OK)
 			return;
-		printf("CMD='%s'\n", cmd.String());
+		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << pausec;
 		args[2] = (char *)cmd.String();
 		be_roster->Launch(kTerminalSig, 3, args);
@@ -359,26 +342,24 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_BESHARE
-	if (proto == "beshare") {
+	if (u.proto == "beshare") {
 		team_id team;
 		BMessenger msgr(kBeShareSig);
 		// if no instance is running, or we want a specific server, start it.
-		if (!msgr.IsValid() || host.Length()) {
+		if (!msgr.IsValid() || u.HasHost()) {
 			be_roster->Launch(kBeShareSig, (BMessage *)NULL, &team);
 			msgr = BMessenger(NULL, team);
 		}
-		if (host.Length()) {
+		if (u.HasHost()) {
 			BMessage mserver('serv');
-			mserver.AddString("server", host);
-			//msgs.AddItem(&mserver);
-			msgr.SendMessage(mserver);
+			mserver.AddString("server", u.host);
+			msgr.SendMessage(&mserver);
 			
 		}
-		if (path.Length()) {
+		if (u.HasPath()) {
 			BMessage mquery('quer');
-			mquery.AddString("query", path);
-			//msgs.AddItem(&mquery);
-			msgr.SendMessage(mquery);
+			mquery.AddString("query", u.path);
+			msgr.SendMessage(&mquery);
 		}
 		// TODO: handle errors
 		return;
@@ -386,16 +367,15 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_IM
-	if (proto == "icq" || proto == "msn") {
+	if (u.proto == "icq" || u.proto == "msn") {
 		// TODO
 		team_id team;
 		be_roster->Launch(kIMSig, (BMessage *)NULL, &team);
 		BMessenger msgr(NULL, team);
-		if (host.Length()) {
+		if (u.HasHost()) {
 			BMessage mserver(B_REFS_RECEIVED);
-			mserver.AddString("server", host);
-			//msgs.AddItem(&mserver);
-			msgr.SendMessage(mserver);
+			mserver.AddString("server", u.host);
+			msgr.SendMessage(&httpmserver);
 			
 		}
 		// TODO: handle errors
@@ -404,9 +384,9 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_VLC
-	if (proto == "mms" || proto == "rtp" || proto == "rtsp") {
+	if (u.proto == "mms" || u.proto == "rtp" || u.proto == "rtsp") {
 		args[0] = "vlc";
-		args[1] = (char *)rawurl.String();
+		args[1] = (char *)u.String();
 		be_roster->Launch(kVLCSig, 2, args);
 		return;
 	}
@@ -417,8 +397,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	// 
 	// svn: ?
 	// cvs: ?
-	// smb: ?
-	// nfs: ?
+	// smb: cifsmount ?
+	// nfs: mount_nfs ?
 
 }
 
