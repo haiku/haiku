@@ -675,7 +675,7 @@ const char * const	tofile;
 						"../");
 				symlinkcontents =
 					ecatalloc(symlinkcontents,
-					fromname);
+					fromfile);
 				result = symlink(symlinkcontents,
 					toname);
 //				if (result == 0)
