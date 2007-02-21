@@ -299,6 +299,17 @@ fi
 # prepare gcc settings
 standard_gcc_settings
 
+# check whether the Haiku compiler really targets Haiku or BeOS
+case "$haikuGCCMachine" in
+	*-*-haiku)	;;
+	*-*-beos)	;;
+	*) echo The compiler specified as Haiku target compiler is not a valid \
+			Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
+	   echo compiler: $HAIKU_CC
+	   echo compiler is configured for target: $haikuGCCMachine
+	   exit 1 ;;
+esac
+
 # Generate BuildConfig
 cat << EOF > "$buildOutputDir/BuildConfig"
 # BuildConfig
