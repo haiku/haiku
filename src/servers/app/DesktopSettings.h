@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,6 +26,7 @@ enum {
 	kFontSettings		= 0x02,
 	kAppearanceSettings	= 0x04,
 	kMouseSettings		= 0x08,
+	kDraggerSettings	= 0x10,
 };
 
 class DesktopSettings {
@@ -44,16 +45,16 @@ class DesktopSettings {
 		mode_mouse		MouseMode() const;
 		bool			FocusFollowsMouse() const;
 
+		bool			ShowAllDraggers() const;
+
 		int32			WorkspacesCount() const;
 		const BMessage*	WorkspacesMessage(int32 index) const;
 
-	private:
-//		friend class Desktop;
-
+	protected:
 		DesktopSettingsPrivate*	fSettings;
 };
 
-class LockedDesktopSettings {
+class LockedDesktopSettings : public DesktopSettings {
 	public:
 		LockedDesktopSettings(Desktop* desktop);
 		~LockedDesktopSettings();
@@ -67,10 +68,9 @@ class LockedDesktopSettings {
 
 		void			SetMouseMode(mode_mouse mode);
 
-	private:
-//		friend class Desktop;
+		void			SetShowAllDraggers(bool show);
 
-		DesktopSettingsPrivate*	fSettings;
+	private:
 		Desktop*		fDesktop;
 };
 

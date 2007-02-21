@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,9 @@
 
 //!	BDragger represents a replicant "handle".
 
+
+#include <AppServerLink.h>
+#include <ServerProtocol.h>
 #include <ViewPrivate.h>
 
 #include <Alert.h>
@@ -46,14 +49,14 @@ kHandBitmap[] = {
 
 
 BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
-	:	BView(bounds, "_dragger_", rmask, flags),
-		fTarget(target),
-		fRelation(TARGET_UNKNOWN),
-		fShelf(NULL),
-		fTransition(false),
-		fIsZombie(false),
-		fErrCount(0),
-		fPopUp(NULL)
+	: BView(bounds, "_dragger_", rmask, flags),
+	fTarget(target),
+	fRelation(TARGET_UNKNOWN),
+	fShelf(NULL),
+	fTransition(false),
+	fIsZombie(false),
+	fErrCount(0),
+	fPopUp(NULL)
 {
 	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
 	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
@@ -61,14 +64,14 @@ BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
 
 
 BDragger::BDragger(BMessage *data)
-	:	BView(data),
-		fTarget(NULL),
-		fRelation(TARGET_UNKNOWN),
-		fShelf(NULL),
-		fTransition(false),
-		fIsZombie(false),
-		fErrCount(0),
-		fPopUp(NULL)
+	: BView(data),
+	fTarget(NULL),
+	fRelation(TARGET_UNKNOWN),
+	fShelf(NULL),
+	fTransition(false),
+	fIsZombie(false),
+	fErrCount(0),
+	fPopUp(NULL)
 {
 	data->FindInt32("_rel", (int32 *)&fRelation);
 
@@ -270,8 +273,8 @@ BDragger::MessageReceived(BMessage *msg)
 				"Can't delete this replicant from its original application. Life goes on.",
 				"OK", NULL, NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT))->Go(NULL);
 		}
-	} else if (msg->what == B_SCREEN_CHANGED) {
-		// TODO: this code is to be called whenever the "are draggers drawn" option is changed
+	} else if (msg->what == _SHOW_DRAG_HANDLES_) {
+		// this code is used whenever the "are draggers drawn" option is changed
 		if (fRelation == TARGET_IS_CHILD) {
 			fTransition = true;
 			Invalidate();
@@ -306,16 +309,34 @@ BDragger::FrameResized(float newWidth, float newHeight)
 status_t
 BDragger::ShowAllDraggers()
 {
-	// TODO: Implement. Should ask the registrar or the app server
-	return B_OK;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_SHOW_ALL_DRAGGERS);
+	link.Attach<bool>(true);
+
+	status_t status = link.Flush();
+	if (status == B_OK) {
+		sVisible = true;
+		sVisibleInitialized = true;
+	}
+
+	return status;
 }
 
 
 status_t
 BDragger::HideAllDraggers()
 {
-	// TODO: Implement. Should ask the registrar or the app server
-	return B_OK;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_SHOW_ALL_DRAGGERS);
+	link.Attach<bool>(false);
+
+	status_t status = link.Flush();
+	if (status == B_OK) {
+		sVisible = false;
+		sVisibleInitialized = true;
+	}
+
+	return status;
 }
 
 
@@ -325,10 +346,17 @@ BDragger::AreDraggersDrawn()
 	BAutolock _(sLock);
 
 	if (!sVisibleInitialized) {
-		// TODO: Implement. Should ask the registrar or the app server
-		sVisible = true;
-		sVisibleInitialized = true;
+		BPrivate::AppServerLink link;
+		link.StartMessage(AS_GET_SHOW_ALL_DRAGGERS);
+
+		status_t status;
+		if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+			link.Read<bool>(&sVisible);
+			sVisibleInitialized = true;
+		} else
+			return false;
 	}
+
 	return sVisible;
 }
 
@@ -451,6 +479,22 @@ BDragger::operator=(const BDragger &)
 }
 
 
+/*static*/ void
+BDragger::_UpdateShowAllDraggers(bool visible)
+{
+	BAutolock _(sLock);
+
+	sVisibleInitialized = true;
+	sVisible = visible;
+
+	for (int32 i = sList.CountItems(); i-- > 0;) {
+		BDragger* dragger = (BDragger*)sList.ItemAt(i);
+		BMessenger target(dragger);
+		target.SendMessage(_SHOW_DRAG_HANDLES_);
+	}	
+}
+
+
 void
 BDragger::_AddToList()
 {
@@ -482,8 +526,6 @@ BDragger::_RemoveFromList()
 status_t
 BDragger::_DetermineRelationship()
 {
-	status_t err = B_OK;
-
 	if (fTarget) {
 		if (fTarget == Parent())
 			fRelation = TARGET_IS_PARENT;
@@ -497,10 +539,10 @@ BDragger::_DetermineRelationship()
 		else if (fRelation == TARGET_IS_CHILD)
 			fTarget = ChildAt(0);
 		else
-			err = B_ERROR;
+			return B_ERROR;
 	}
 
-	return err;
+	return B_OK;
 }
 
 

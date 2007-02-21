@@ -77,6 +77,7 @@
 
 using std::nothrow;
 
+static const uint32 kMsgUpdateShowAllDraggers = '_adg';
 static const uint32 kMsgAppQuit = 'appQ';
 
 
@@ -1022,7 +1023,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
-			
+
 			if (fDesktop->LockSingleWindow()) {
 				DesktopSettings settings(fDesktop);
 
@@ -1034,6 +1035,58 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.StartMessage(B_ERROR);
 
 			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_SHOW_ALL_DRAGGERS:
+		{
+			STRACE(("ServerApp %s: Get Show All Draggers\n", Signature()));
+
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<bool>(settings.ShowAllDraggers());
+
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
+			break;
+		}
+
+		case AS_SET_SHOW_ALL_DRAGGERS:
+		{
+			STRACE(("ServerApp %s: Set Show All Draggers\n", Signature()));
+
+			bool changed = false;
+			bool show;
+			if (link.Read<bool>(&show) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				if (show != settings.ShowAllDraggers()) {
+					settings.SetShowAllDraggers(show);
+					changed = true;
+				}
+			}
+
+			if (changed)
+				fDesktop->BroadcastToAllApps(kMsgUpdateShowAllDraggers);
+			break;
+		}
+
+		case kMsgUpdateShowAllDraggers:
+		{
+			bool show = false;
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
+				show = settings.ShowAllDraggers();
+				fDesktop->UnlockSingleWindow();
+			}
+			BMessage update(_SHOW_DRAG_HANDLES_);
+			update.AddBool("show", show);
+
+			SendMessageToClient(&update);
 			break;
 		}
 

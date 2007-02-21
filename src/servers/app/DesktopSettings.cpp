@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,12 +46,13 @@ DesktopSettingsPrivate::_SetDefaults()
 	fFixedFont = *gFontManager->DefaultFixedFont();
 
 	fMouseMode = B_NORMAL_MOUSE;
+	fShowAllDraggers = true;
 
 	// init scrollbar info
 	fScrollBarInfo.proportional = true;
 	fScrollBarInfo.double_arrows = false;
-	// look of the knob (R5: (0, 1, 2), 1 = default)
 	fScrollBarInfo.knob = 1;
+		// look of the knob (R5: (0, 1, 2), 1 = default)
 	fScrollBarInfo.min_knob_size = 15;
 
 	// init menu info
@@ -60,9 +61,8 @@ DesktopSettingsPrivate::_SetDefaults()
 	fMenuInfo.font_size = fPlainFont.Size();
 	fMenuInfo.background_color.set_to(216, 216, 216);
 	
-	// look of the separator (R5: (0, 1, 2), default 0)
-	// TODO: we could just choose a nice one and remove the others
 	fMenuInfo.separator = 0;
+		// look of the separator (R5: (0, 1, 2), default 0)
 	fMenuInfo.click_to_open = true; // always true
 	fMenuInfo.triggers_always_shown = false;
 
@@ -288,6 +288,20 @@ DesktopSettingsPrivate::Save(uint32 mask)
 		}
 	}
 
+	if (mask & kDraggerSettings) {
+		BPath path(basePath);
+		if (path.Append("dragger") == B_OK) {
+			BMessage settings('asdg');
+			settings.AddBool("show", fShowAllDraggers);
+
+			BFile file;
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			if (status == B_OK) {
+				status = settings.Flatten(&file, NULL);
+			}
+		}
+	}
+
 	if (mask & kAppearanceSettings) {
 		BPath path(basePath);
 		if (path.Append("appearance") == B_OK) {
@@ -411,6 +425,21 @@ DesktopSettingsPrivate::FocusFollowsMouse() const
 
 
 void
+DesktopSettingsPrivate::SetShowAllDraggers(bool show)
+{
+	fShowAllDraggers = show;
+	Save(kDraggerSettings);
+}
+
+
+bool
+DesktopSettingsPrivate::ShowAllDraggers() const
+{
+	return fShowAllDraggers;
+}
+
+
+void
 DesktopSettingsPrivate::SetWorkspacesCount(int32 number)
 {
 	if (number < 1)
@@ -513,6 +542,13 @@ DesktopSettings::FocusFollowsMouse() const
 }
 
 
+bool
+DesktopSettings::ShowAllDraggers() const
+{
+	return fSettings->ShowAllDraggers();
+}
+
+
 int32
 DesktopSettings::WorkspacesCount() const
 {
@@ -531,12 +567,10 @@ DesktopSettings::WorkspacesMessage(int32 index) const
 
 
 LockedDesktopSettings::LockedDesktopSettings(Desktop* desktop)
-	:
-	fSettings(desktop->fSettings),
+	: DesktopSettings(desktop),
 	fDesktop(desktop)
 {
-	// TODO: this only works in MultiLocker's DEBUG mode
-#if 0
+#if DEBUG
 	if (desktop->fWindowLock.IsReadLocked())
 		debugger("desktop read locked when trying to change settings");
 #endif
@@ -592,4 +626,10 @@ LockedDesktopSettings::SetMouseMode(const mode_mouse mode)
 	fSettings->SetMouseMode(mode);
 }
 
+
+void
+LockedDesktopSettings::SetShowAllDraggers(bool show)
+{
+	fSettings->SetShowAllDraggers(show);
+}
 

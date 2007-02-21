@@ -67,17 +67,22 @@ class BDragger : public BView {
 
 		virtual	BBitmap*	DragBitmap(BPoint* offset, drawing_mode *mode);
 
+		class Private;
+
 	protected:
 				bool		IsVisibilityChanging() const;
 
 	private:
 		friend class BPrivate::ShelfContainerViewFilter;
 		friend class BPrivate::replicant_data;
+		friend class Private;
 		friend class BShelf;
 
 		virtual	void		_ReservedDragger2();
 		virtual	void		_ReservedDragger3();
 		virtual	void		_ReservedDragger4();
+
+		static	void		_UpdateShowAllDraggers(bool visible);
 
 				BDragger&	operator=(const BDragger& other);
 

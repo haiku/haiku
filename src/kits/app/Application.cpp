@@ -9,16 +9,20 @@
  */
 
 
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <AppMisc.h>
+#include <AppServerLink.h>
+#include <DraggerPrivate.h>
+#include <LooperList.h>
+#include <MenuWindow.h>
+#include <ObjectLocker.h>
+#include <PortLink.h>
+#include <RosterPrivate.h>
+#include <ServerMemoryAllocator.h>
+#include <ServerProtocol.h>
 
 #include <Alert.h>
 #include <AppFileInfo.h>
 #include <Application.h>
-#include <AppMisc.h>
 #include <MessageRunner.h>
 #include <Cursor.h>
 #include <Debug.h>
@@ -30,20 +34,16 @@
 #include <RegistrarDefs.h>
 #include <Resources.h>
 #include <Roster.h>
-#include <RosterPrivate.h>
 #include <Window.h>
 
-#include <AppServerLink.h>
-#include <LooperList.h>
-#include <MenuWindow.h>
-#include <ObjectLocker.h>
-#include <PortLink.h>
-#include <ServerMemoryAllocator.h>
-#include <ServerProtocol.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 using namespace BPrivate;
 
-// Globals ---------------------------------------------------------------------
 BApplication *be_app = NULL;
 BMessenger be_app_messenger;
 
@@ -953,12 +953,14 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		
 		case _SHOW_DRAG_HANDLES_:
 		{
-			bool visible = false;
-			message->FindBool("visible", &visible);
-			// TODO: Call the registrar or whoever is responsible for this
+			bool show;
+			if (message->FindBool("show", &show) != B_OK)
+				break;
+
+			BDragger::Private::UpdateShowAllDraggers(show);
 			break;
 		}
-		
+
 		// TODO: Handle these as well
 		case _DISPOSE_DRAG_: 
 		case _PING_:	

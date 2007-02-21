@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,9 @@ class DesktopSettingsPrivate {
 		mode_mouse		MouseMode() const;
 		bool			FocusFollowsMouse() const;
 
+		void			SetShowAllDraggers(bool show);
+		bool			ShowAllDraggers() const;
+
 		void			SetWorkspacesCount(int32 number);
 		int32			WorkspacesCount() const;
 
@@ -61,6 +64,7 @@ class DesktopSettingsPrivate {
 		scroll_bar_info	fScrollBarInfo;
 		menu_info		fMenuInfo;
 		mode_mouse		fMouseMode;
+		bool			fShowAllDraggers;
 		int32			fWorkspacesCount;
 		BMessage		fWorkspaceMessages[kMaxWorkspaces];
 

@@ -17,9 +17,9 @@
 // Server port names. The input port is the port which is used to receive
 // input messages from the Input Server. The other is the "main" port for
 // the server and is utilized mostly by BApplication objects.
-#define SERVER_PORT_NAME "OBappserver"
+#define SERVER_PORT_NAME "haiku app_server"
 #if TEST_MODE
-#	define SERVER_INPUT_PORT "OBinputport"
+#	define SERVER_INPUT_PORT "haiku input port"
 #endif
 
 #define AS_REQUEST_COLOR_KEY 0x00010000
@@ -29,8 +29,10 @@ enum {
 	// NOTE: all defines have to start with "AS_" to let the "code_to_name"
 	// utility work correctly
 
-	AS_REGISTER_INPUT_SERVER = 1,
 	AS_GET_DESKTOP,
+	AS_REGISTER_INPUT_SERVER = 1,
+	AS_EVENT_STREAM_CLOSED,
+		// Notification of event stream closing to restart input_server
 
 	// Desktop definitions (through the ServerApp, though)
 	AS_GET_WINDOW_LIST,
@@ -93,7 +95,6 @@ enum {
 	AS_SET_SIZE_LIMITS,
 	AS_ACTIVATE_WINDOW,
 	AS_IS_FRONT_WINDOW,
-	AS_UPDATE_IF_NEEDED,
 
 	// BPicture definitions
 	AS_CREATE_PICTURE,
@@ -176,14 +177,13 @@ enum {
 	AS_GET_MENU_INFO,
 	AS_SET_MENU_INFO,
 	AS_IDLE_TIME,
-	AS_SELECT_PRINTER_PANEL,
-	AS_ADD_PRINTER_PANEL,
-	AS_RUN_BE_ABOUT,
 	AS_SET_MOUSE_MODE,
 	AS_GET_MOUSE_MODE,
 	AS_GET_MOUSE,
 	AS_SET_DECORATOR_SETTINGS,
 	AS_GET_DECORATOR_SETTINGS,
+	AS_GET_SHOW_ALL_DRAGGERS,
+	AS_SET_SHOW_ALL_DRAGGERS,
 
 	// Graphics calls
 	AS_SET_HIGH_COLOR,
@@ -288,9 +288,6 @@ enum {
 	// BDirectWindow codes
 	AS_DIRECT_WINDOW_GET_SYNC_DATA,
 	AS_DIRECT_WINDOW_SET_FULLSCREEN,
-
-	// Notification of event stream closing to restart input_server
-	AS_EVENT_STREAM_CLOSED,
 
 	AS_LAST_CODE
 };
