@@ -617,14 +617,16 @@ struct pci_module_info {
 #define PCI_cap_id_agp          0x02      /* AGP */
 #define PCI_cap_id_vpd          0x03      /* Vital product data */
 #define PCI_cap_id_slotid       0x04      /* Slot ID */
-#define PCI_cap_id_msi          0x05      /* Message signalled interrupt ??? */
+#define PCI_cap_id_msi          0x05      /* Message signalled interrupt */
 #define PCI_cap_id_chswp        0x06      /* Compact PCI HotSwap */
-#define PCI_cap_id_pcix         0x07
+#define PCI_cap_id_pcix         0x07      /* PCI-X */
 #define PCI_cap_id_ldt          0x08
 #define PCI_cap_id_vendspec     0x09
 #define PCI_cap_id_debugport    0x0a
 #define PCI_cap_id_cpci_rsrcctl 0x0b
 #define PCI_cap_id_hotplug      0x0c
+#define PCI_cap_id_pcie			0x10	  /* PCIe (PCI express) */
+#define PCI_cap_id_msix			0x11      /* MSI-X */
 #define PCI_cap_id_sata         0x12      /* Serial ATA Capability */
 
 /** Power Management Control Status Register settings */
