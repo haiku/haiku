@@ -11,6 +11,17 @@
 #			directory paths and the like.
 
 
+# If the target to be built is "all" (i.e. the default) and we're in the output
+# directory, the root directory of the build system, or in "src/", we change the
+# target to be built to "haiku-image".
+HAIKU_ORIGINAL_JAM_TARGETS = $(JAM_TARGETS) ;
+if $(JAM_TARGETS) = all {
+	if ! $(INVOCATION_SUBDIR) || $(INVOCATION_SUBDIR) = src {
+		JAM_TARGETS = haiku-image ;
+	}
+}
+
+
 # Include BuildConfig/Timezones/libgccObjects
 {
 	local buildConfig = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : BuildConfig ] ;
