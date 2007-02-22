@@ -53,7 +53,8 @@ GCC 4.x
   cd haiku
   ./configure --build-cross-tools-gcc4 x86 ../buildtools/
 
-The process can take quite some time, but when it finishes you are ready to
-compile your first Haiku image.
+The process can take quite some time, but when it finishes the build system is
+fully configured and you are ready to compile your first Haiku image.
 
-Instructions on how to build Haiku can be found in the 'ReadMe' document.
+Instructions on how to build Haiku can be found in the section Building in the
+'ReadMe' document.

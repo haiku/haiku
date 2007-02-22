@@ -11,11 +11,14 @@ Please always use the most recent versions. They are required to build Haiku.
 Building on a non-BeOS platform
 ===============================
 
-Please read the file 'ReadMe.cross-compile' before continuing.
+Please read the file 'ReadMe.cross-compile' before continuing. It describes
+how to build the cross-compilation tools and configure the build system for
+building Haiku. After following the instructions you can directly continue
+with the section Building.
 
 
-Configuring
-===========
+Configuring on BeOS
+===================
 
 Open a Terminal and change to your Haiku trunk folder. To configure the build
 you can run configure like this:
