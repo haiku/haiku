@@ -552,13 +552,14 @@ smp_trap_non_boot_cpus(int32 cpu)
 	if (cpu > 0) {
 		boot_cpu_spin[cpu] = 1;
 		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
-		return false;
 
 		// lets make sure we're in sync with the main cpu
 		// the boot processor has probably been sending us 
 		// tlb sync messages all along the way, but we've 
 		// been ignoring them
 		arch_cpu_global_TLB_invalidate();
+
+		return false;
 	}
 
 	return true;
