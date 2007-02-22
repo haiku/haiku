@@ -142,7 +142,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 	struct dd_function_table functions;
 
 	fVisual = _mesa_create_visual( rgbFlag, dblFlag, stereoFlag, red, green, blue, alpha,
-				index, depth, stencil, accum, accum, accum, accum, 1);
+				index, depth, stencil, accum, accum, accum, alpha ? accum : 0, 1);
 
 	// Initialize device driver function table
 	_mesa_init_driver_functions(&functions);
@@ -195,7 +195,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
                                    fVisual->haveDepthBuffer,
                                    fVisual->haveStencilBuffer,
                                    fVisual->haveAccumBuffer,
-                                   GL_FALSE,
+                                   alphaFlag,
                                    GL_FALSE );
 
 	// Use default TCL pipeline
