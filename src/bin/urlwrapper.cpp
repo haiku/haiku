@@ -16,6 +16,7 @@
 #define HANDLE_BESHARE
 //#define HANDLE_IM
 #define HANDLE_VLC
+#define HANDLE_AUDIO
 
 const char *kAppSig = "application/x-vnd.haiku.urlwrapper";
 const char *kTrackerSig = "application/x-vnd.Be-TRAK";
@@ -38,7 +39,7 @@ const char *kIMSig = "application/x-vnd.m_eiman.sample_im_client";
 const char *kVLCSig = "application/x-vnd.videolan-vlc";
 #endif
 
-// TODO: make a Url class
+// TODO: make a public BUrl class for use by apps ?
 class Url : public BString {
 public:
 		Url(const char *url) : BString(url) { fStatus = ParseAndSplit(); };
@@ -93,8 +94,12 @@ status_t Url::ParseAndSplit()
 	if (v < 0)
 		return EINVAL;
 	
+	// TODO: proto and host should be lowercased.
+	// see http://en.wikipedia.org/wiki/URL_normalization
+	
 	CopyInto(proto, 0, v);
 	CopyInto(left, v + 1, Length() - v);
+	// TODO: RFC1738 says the // part should indicate the uri follows the u:p@h:p/path convention, so it should be used to check for special cases.
 	if (left.FindFirst("//") == 0)
 		left.RemoveFirst("//");
 	full = left;
@@ -131,6 +136,7 @@ status_t Url::ParseAndSplit()
 		}
 	} else if (proto == "finger") {
 		// single component implies user
+		// see also: http://www.subir.com/lynx/lynx_help/lynx_url_support.html
 		user = left;
 		return 0;
 	}
@@ -250,6 +256,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 	
+	// see draft: http://tools.ietf.org/wg/secsh/draft-ietf-secsh-scp-sftp-ssh-uri/
 	if (u.proto == "ssh") {
 		BString cmd("ssh ");
 		
@@ -391,6 +398,10 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 #endif
+
+#ifdef HANDLE_AUDIO
+	// TODO
+#endif
 	
 	// vnc: ?
 	// irc: ?
@@ -399,6 +410,12 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	// cvs: ?
 	// smb: cifsmount ?
 	// nfs: mount_nfs ?
+	//
+	// mailto: ? but BeMail & Beam both handle it already (not fully though).
+	//
+	// itps: pcast: podcast: s//http/ + parse xml to get url to mp3 stream...
+	// audio: s//http:/ + default MediaPlayer -- see http://forums.winamp.com/showthread.php?threadid=233130
+	// 
 
 }
 
