@@ -12,6 +12,7 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
+#include "DLList.h"
 #include "Index.h"
 #include "Stack.h"
 #include "ramfs.h"
@@ -19,6 +20,7 @@
 class Entry;
 class Equation;
 class IndexIterator;
+class Node;
 class Query;
 class Term;
 class Volume;
@@ -90,7 +92,7 @@ class Expression {
 		Term *fTerm;
 };
 
-class Query {
+class Query : public DLListLinkImpl<Query> {
 	public:
 		Query(Volume *volume, Expression *expression, uint32 flags);
 		~Query();
@@ -99,10 +101,14 @@ class Query {
 		status_t GetNextEntry(struct dirent *, size_t size);
 
 		void SetLiveMode(port_id port, int32 token);
-		void LiveUpdate(Entry *entry, const char *attribute, int32 type,
-			const uint8 *oldKey, size_t oldLength, const uint8 *newKey, size_t newLength);
+		void LiveUpdate(Entry *entry, Node* node, const char *attribute,
+			int32 type, const uint8 *oldKey, size_t oldLength,
+			const uint8 *newKey, size_t newLength);
 
 		Expression *GetExpression() const { return fExpression; }
+
+	private:
+//		void SendNotification(Entry* entry)
 
 	private:
 		Volume			*fVolume;
@@ -115,6 +121,7 @@ class Query {
 		uint32			fFlags;
 		port_id			fPort;
 		int32			fToken;
+		bool			fNeedsEntry;
 };
 
 #endif	/* QUERY_H */

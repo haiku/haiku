@@ -22,12 +22,14 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
+#include <fsproto.h>
 #include <SupportDefs.h>
 
+#include "DLList.h"
 #include "Entry.h"
-#include "fsproto.h"
 #include "List.h"
 #include "Locker.h"
+#include "Query.h"
 #include "String.h"
 
 class AllocationInfo;
@@ -48,7 +50,6 @@ class NodeAttributeTable;
 class NodeListener;
 class NodeListenerTree;
 class NodeTable;
-class Query;
 class SizeIndex;
 
 const vnode_id kRootParentID = 0;
@@ -146,11 +147,11 @@ public:
 	AttributeIndex *FindAttributeIndex(const char *name, uint32 type);
 
 	// queries
-// TODO: Implement.
-//	status_t AddQuery(Query */*query*/)		{ return B_ERROR; }
-//	status_t RemoveQuery(Query */*query*/)	{ return B_ERROR; }
-	status_t AddQuery(Query */*query*/)		{ return B_OK; }
-	status_t RemoveQuery(Query */*query*/)	{ return B_OK; }
+	void AddQuery(Query *query);
+	void RemoveQuery(Query *query);
+	void UpdateLiveQueries(Entry *entry, Node* node, const char *attribute,
+			int32 type, const uint8 *oldKey, size_t oldLength,
+			const uint8 *newKey, size_t newLength);
 
 	vnode_id NextNodeID() { return fNextNodeID++; }
 
@@ -173,6 +174,8 @@ public:
 	void IteratorUnlock();
 
 private:
+	typedef DLList<Query>	QueryList;
+
 	nspace_id				fID;
 	vnode_id				fNextNodeID;
 	NodeTable				*fNodeTable;
@@ -183,10 +186,12 @@ private:
 	String					fName;
 	Locker					fLocker;
 	Locker					fIteratorLocker;
+	Locker					fQueryLocker;
 	NodeListenerTree		*fNodeListeners;
 	NodeListenerList		fAnyNodeListeners;
 	EntryListenerTree		*fEntryListeners;
 	EntryListenerList		fAnyEntryListeners;
+	QueryList				fQueries;
 	BlockAllocator			*fBlockAllocator;
 	off_t					fBlockSize;
 	off_t					fAllocatedBlocks;

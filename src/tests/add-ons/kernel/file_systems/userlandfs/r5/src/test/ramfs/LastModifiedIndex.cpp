@@ -157,9 +157,15 @@ LastModifiedIndex::Changed(Node *node, time_t oldModified)
 				if (iterator->GetCurrentNode() == node)
 					iterator->NodeRemoved(node);
 			}
-			// remove the node
+			// remove and re-insert the node
 			fNodes->Remove(it);
 			error = fNodes->Insert(node);
+
+			// udpate live queries
+			time_t newModified = node->GetMTime();
+			fVolume->UpdateLiveQueries(NULL, node, GetName(), GetType(),
+				(const uint8*)&oldModified, sizeof(oldModified),
+				(const uint8*)&newModified, sizeof(newModified));
 		}
 	}
 	return error;

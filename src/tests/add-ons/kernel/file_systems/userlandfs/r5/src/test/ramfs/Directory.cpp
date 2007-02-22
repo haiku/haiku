@@ -156,17 +156,17 @@ Directory::CreateEntry(Node *node, const char *name, Entry **_entry)
 		if (entry) {
 			error = entry->InitCheck();
 			if (error == B_OK) {
-				// add the entry
-				error = AddEntry(entry);
+				// link to the node
+				error = entry->Link(node);
 				if (error == B_OK) {
-					// link to the node
-					error = entry->Link(node);
+					// add the entry
+					error = AddEntry(entry);
 					if (error == B_OK) {
 						if (_entry)
 							*_entry = entry;
 					} else {
-						// failure: remove the entry
-						RemoveEntry(entry);
+						// failure: unlink the node
+						entry->Unlink();
 					}
 				}
 			}

@@ -139,6 +139,9 @@ NameIndex::Changed(Entry *entry, const char *oldName)
 		if (foundEntry && *foundEntry == entry) {
 			fEntries->Remove(it);
 			error = fEntries->Insert(entry);
+
+			// udpate live queries
+			_UpdateLiveQueries(entry, oldName, entry->GetName());
 		}
 	}
 	return error;
@@ -148,16 +151,24 @@ NameIndex::Changed(Entry *entry, const char *oldName)
 void
 NameIndex::EntryAdded(Entry *entry)
 {
-	if (entry)
+	if (entry) {
 		fEntries->Insert(entry);
+
+		// udpate live queries
+		_UpdateLiveQueries(entry, NULL, entry->GetName());
+	}
 }
 
 // EntryRemoved
 void
 NameIndex::EntryRemoved(Entry *entry)
 {
-	if (entry)
+	if (entry) {
 		fEntries->Remove(entry, entry);
+
+		// udpate live queries
+		_UpdateLiveQueries(entry, entry->GetName(), NULL);
+	}
 }
 
 // InternalGetIterator
@@ -188,6 +199,16 @@ NameIndex::InternalFind(const uint8 *key, size_t length)
 		}
 	}
 	return iterator;
+}
+
+// _UpdateLiveQueries
+void
+NameIndex::_UpdateLiveQueries(Entry* entry, const char* oldName,
+	const char* newName)
+{
+	fVolume->UpdateLiveQueries(entry, entry->GetNode(), GetName(),
+		GetType(), (const uint8*)oldName, (oldName ? strlen(oldName) : 0),
+		(const uint8*)newName, (newName ? strlen(newName) : 0));
 }
 
 

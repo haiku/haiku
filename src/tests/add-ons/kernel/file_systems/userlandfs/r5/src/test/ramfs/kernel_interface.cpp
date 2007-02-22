@@ -43,6 +43,7 @@
 #include "AllocationInfo.h"
 #include "AttributeIndex.h"
 #include "AttributeIterator.h"
+#include "AutoDeleter.h"
 #include "Debug.h"
 #include "Directory.h"
 #include "Entry.h"
@@ -249,6 +250,10 @@ notify_if_stat_changed(Volume *volume, Node *node)
 	}
 }
 
+
+// #pragma mark - FS
+
+
 // ramfs_mount
 static
 int
@@ -323,6 +328,10 @@ ramfs_sync(void */*_ns*/)
 	return B_OK;
 }
 
+
+// #pragma mark - VNodes
+
+
 // ramfs_read_vnode
 static
 int
@@ -374,6 +383,10 @@ FUNCTION(("node: %Ld\n", ((Node*)_node)->GetID()));
 		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
 }
+
+
+// #pragma mark - Nodes
+
 
 // ramfs_walk
 static
@@ -561,6 +574,10 @@ ramfs_write_stat(void *ns, void *_node, struct stat *st, long mask)
 		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
 }
+
+
+// #pragma mark - Files
+
 
 // FileCookie
 class FileCookie {
@@ -840,6 +857,11 @@ ramfs_access(void *ns, void *_node, int mode)
 		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
 }
+
+
+
+// #pragma mark - Directories
+
 
 // ramfs_rename
 static
@@ -1330,7 +1352,11 @@ ramfs_free_dir_cookie(void */*ns*/, void */*_node*/, void *_cookie)
 	delete cookie;
 	return B_OK;
 }
-			
+
+
+// #pragma mark - FS Stats
+
+
 // ramfs_read_fs_stat
 static
 int
@@ -1354,6 +1380,7 @@ ramfs_read_fs_stat(void *ns, struct fs_info *info)
 	return B_OK;
 }
 
+
 // ramfs_write_fs_stat
 static
 int
@@ -1369,6 +1396,10 @@ ramfs_write_fs_stat(void *ns, struct fs_info *info, long mask)
 		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
 }
+
+
+// #pragma mark - Symlinks
+
 
 // ramfs_symlink
 static
@@ -1454,6 +1485,10 @@ ramfs_read_link(void *ns, void *_node, char *buffer, size_t *bufferSize)
 		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
 }
+
+
+// #pragma mark - Attributes
+
 
 // ramfs_open_attrdir
 static
@@ -1703,6 +1738,10 @@ ramfs_stat_attr(void *ns, void *_node, const char *name,
 	RETURN_ERROR(error);
 }
 
+
+// #pragma mark - Indices
+
+
 // IndexDirCookie
 class IndexDirCookie {
 public:
@@ -1905,9 +1944,9 @@ ramfs_stat_index(void *ns, const char *name, struct index_info *indexInfo)
 }
 
 
+// #pragma mark - Queries
+
 // Query implementation by Axel Dörfler. Slightly adjusted.
-//
-// TODO: Locking!
 
 // ramfs_open_query
 int
@@ -1922,21 +1961,30 @@ ramfs_open_query(void *ns, const char *queryString, ulong flags, port_id port,
 
 	Volume *volume = (Volume *)ns;
 
+	// lock the volume
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	// parse the query expression
 	Expression *expression = new Expression((char *)queryString);
 	if (expression == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<Expression> expressionDeleter(expression);
 
 	if (expression->InitCheck() < B_OK) {
-		FATAL(("Could not parse query, stopped at: \"%s\"\n", expression->Position()));
-		delete expression;
+		WARN(("Could not parse query, stopped at: \"%s\"\n",
+			expression->Position()));
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
+	// create the query
 	Query *query = new Query(volume, expression, flags);
-	if (query == NULL) {
-		delete expression;
+	if (query == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	}
+	expressionDeleter.Detach();
+	// TODO: The Query references an Index, but nothing prevents the Index
+	// from being deleted, while the Query is in existence.
 
 	if (flags & B_LIVE_QUERY)
 		query->SetLiveMode(port, token);
@@ -1956,11 +2004,18 @@ ramfs_close_query(void */*ns*/, void */*cookie*/)
 
 // ramfs_free_query_cookie
 int
-ramfs_free_query_cookie(void */*ns*/, void */*node*/, void *cookie)
+ramfs_free_query_cookie(void *ns, void */*node*/, void *cookie)
 {
 	FUNCTION_START();
-	if (cookie == NULL)
+	if (ns == NULL || cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
+
+	Volume *volume = (Volume *)ns;
+
+	// lock the volume
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
 	Query *query = (Query *)cookie;
 	Expression *expression = query->GetExpression();
@@ -1972,13 +2027,20 @@ ramfs_free_query_cookie(void */*ns*/, void */*node*/, void *cookie)
 
 // ramfs_read_query
 int
-ramfs_read_query(void */*ns*/, void *cookie, long *count,
+ramfs_read_query(void *ns, void *cookie, long *count,
 				 struct dirent *buffer, size_t bufferSize)
 {
 	FUNCTION_START();
 	Query *query = (Query *)cookie;
-	if (query == NULL)
+	if (ns == NULL || query == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
+
+	Volume *volume = (Volume *)ns;
+
+	// lock the volume
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
 	status_t status = query->GetNextEntry(buffer, bufferSize);
 	if (status == B_OK)

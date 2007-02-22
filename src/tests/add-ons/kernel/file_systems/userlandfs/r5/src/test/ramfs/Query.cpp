@@ -128,8 +128,6 @@ IndexIterator::GetNextEntry(uint8 *buffer, uint16 *_keyLength,
 }
 
 
-
-
 // compare_integral
 template<typename Key>
 static inline
@@ -258,14 +256,17 @@ class Term {
 		void		SetParent(Term *parent) { fParent = parent; }
 		Term		*Parent() const { return fParent; }
 
-		virtual status_t Match(Entry *entry,const char *attribute = NULL,int32 type = 0,
-				const uint8 *key = NULL,size_t size = 0) = 0;
+		virtual status_t Match(Entry *entry, Node* node,
+			const char *attribute = NULL, int32 type = 0,
+			const uint8 *key = NULL, size_t size = 0) = 0;
 		virtual void Complement() = 0;
 
 		virtual void CalculateScore(IndexWrapper &index) = 0;
 		virtual int32 Score() const = 0;
 
 		virtual status_t InitCheck() = 0;
+
+		virtual bool NeedsEntry() = 0;
 
 #ifdef DEBUG
 		virtual void	PrintToStream() = 0;
@@ -295,8 +296,9 @@ class Equation : public Term {
 		status_t	ParseQuotedString(char **_start, char **_end);
 		char		*CopyString(char *start, char *end);
 
-		virtual status_t Match(Entry *entry, const char *attribute = NULL, int32 type = 0,
-						const uint8 *key = NULL, size_t size = 0);
+		virtual status_t Match(Entry *entry, Node* node,
+			const char *attribute = NULL, int32 type = 0,
+			const uint8 *key = NULL, size_t size = 0);
 		virtual void Complement();
 
 		status_t	PrepareQuery(Volume *volume, IndexWrapper &index, IndexIterator **iterator,
@@ -306,6 +308,8 @@ class Equation : public Term {
 
 		virtual void CalculateScore(IndexWrapper &index);
 		virtual int32 Score() const { return fScore; }
+
+		virtual bool NeedsEntry();
 
 #ifdef DEBUG
 		virtual void PrintToStream();
@@ -340,7 +344,8 @@ class Operator : public Term {
 		Term		*Left() const { return fLeft; }
 		Term		*Right() const { return fRight; }
 
-		virtual status_t Match(Entry *entry, const char *attribute = NULL, int32 type = 0,
+		virtual status_t Match(Entry *entry, Node* node,
+			const char *attribute = NULL, int32 type = 0,
 			const uint8 *key = NULL, size_t size = 0);
 		virtual void Complement();
 
@@ -348,6 +353,8 @@ class Operator : public Term {
 		virtual int32 Score() const;
 
 		virtual status_t InitCheck();
+
+		virtual bool NeedsEntry();
 
 		//Term		*Copy() const;
 #ifdef DEBUG
@@ -940,7 +947,8 @@ Equation::MatchEmptyString()
  */
 
 status_t
-Equation::Match(Entry *entry, const char *attributeName, int32 type, const uint8 *key, size_t size)
+Equation::Match(Entry *entry, Node* node, const char *attributeName, int32 type,
+	const uint8 *key, size_t size)
 {
 	// get a pointer to the attribute in question
 	union value value;
@@ -949,14 +957,23 @@ Equation::Match(Entry *entry, const char *attributeName, int32 type, const uint8
 	// first, check if we are matching for a live query and use that value
 	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
 		if (key == NULL) {
-			if (type == B_STRING_TYPE)
+			if (type == B_STRING_TYPE) {
+				// special case: a NULL "name" means the entry has been removed
+				// or not yet been added -- we refuse to match, whatever the
+				// pattern
+				if (!strcmp(fAttribute, "name"))
+					return NO_MATCH;
+
 				return MatchEmptyString();
+			}
 
 			return NO_MATCH;
 		}
 		buffer = const_cast<uint8 *>(key);
 	} else if (!strcmp(fAttribute, "name")) {
 		// if not, check for "fake" attributes, "name", "size", "last_modified",
+		if (!entry)
+			return B_ERROR;
 		buffer = (uint8 *)entry->GetName();
 		if (buffer == NULL)
 			return B_ERROR;
@@ -964,18 +981,18 @@ Equation::Match(Entry *entry, const char *attributeName, int32 type, const uint8
 		type = B_STRING_TYPE;
 		size = strlen((const char *)buffer);
 	} else if (!strcmp(fAttribute,"size")) {
-		value.Int64 = entry->GetNode()->GetSize();
+		value.Int64 = node->GetSize();
 		buffer = (uint8 *)&value;
 		type = B_INT64_TYPE;
 	} else if (!strcmp(fAttribute,"last_modified")) {
-		value.Int32 = entry->GetNode()->GetMTime();
+		value.Int32 = node->GetMTime();
 		buffer = (uint8 *)&value;
 		type = B_INT32_TYPE;
 	} else {
 		// then for attributes
 		Attribute *attribute = NULL;
 
-		if (entry->GetNode()->FindAttribute(fAttribute, &attribute) == B_OK) {
+		if (node->FindAttribute(fAttribute, &attribute) == B_OK) {
 			attribute->GetKey(&buffer, &size);
 			type = attribute->GetType();
 		} else
@@ -1151,7 +1168,7 @@ Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 		status = MATCH_OK;
 
 		if (!fHasIndex)
-			status = Match(entry);
+			status = Match(entry, entry->GetNode());
 
 		while (term != NULL && status == MATCH_OK) {
 			Operator *parent = (Operator *)term->Parent();
@@ -1168,7 +1185,7 @@ Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 					FATAL(("&&-operator has only one child... (parent = %p)\n", parent));
 					break;
 				}
-				status = other->Match(entry);
+				status = other->Match(entry, entry->GetNode());
 				if (status < 0) {
 					REPORT_ERROR(status);
 					status = NO_MATCH;
@@ -1196,6 +1213,13 @@ Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 }
 
 
+bool
+Equation::NeedsEntry()
+{
+	return strcmp(fAttribute, "name") == 0;
+}
+
+
 //	#pragma mark -
 
 
@@ -1219,22 +1243,24 @@ Operator::~Operator()
 
 
 status_t
-Operator::Match(Entry *entry, const char *attribute, int32 type, const uint8 *key, size_t size)
+Operator::Match(Entry *entry, Node* node, const char *attribute,
+	int32 type, const uint8 *key, size_t size)
 {
 	if (fOp == OP_AND) {
-		status_t status = fLeft->Match(entry, attribute, type, key, size);
+		status_t status = fLeft->Match(entry, node, attribute, type, key, size);
 		if (status != MATCH_OK)
 			return status;
 
-		return fRight->Match(entry, attribute, type, key, size);
+		return fRight->Match(entry, node, attribute, type, key, size);
 	} else {
 		// choose the term with the better score for OP_OR
 		if (fRight->Score() > fLeft->Score()) {
-			status_t status = fRight->Match(entry, attribute, type, key, size);
+			status_t status = fRight->Match(entry, node, attribute, type, key,
+				size);
 			if (status != NO_MATCH)
 				return status;
 		}
-		return fLeft->Match(entry, attribute, type, key, size);
+		return fLeft->Match(entry, node, attribute, type, key, size);
 	}
 }
 
@@ -1288,6 +1314,13 @@ Operator::InitCheck()
 		return B_ERROR;
 
 	return B_OK;
+}
+
+
+bool
+Operator::NeedsEntry()
+{
+	return ((fLeft && fLeft->NeedsEntry()) || (fRight && fRight->NeedsEntry()));
 }
 
 
@@ -1529,7 +1562,8 @@ Query::Query(Volume *volume, Expression *expression, uint32 flags)
 	fIterator(NULL),
 	fIndex(volume),
 	fFlags(flags),
-	fPort(-1)
+	fPort(-1),
+	fNeedsEntry(false)
 {
 	// if the expression has a valid root pointer, the whole tree has
 	// already passed the sanity check, so that we don't have to check
@@ -1540,6 +1574,8 @@ Query::Query(Volume *volume, Expression *expression, uint32 flags)
 	// create index on the stack and delete it afterwards
 	fExpression->Root()->CalculateScore(fIndex);
 	fIndex.Unset();
+
+	fNeedsEntry = fExpression->Root()->NeedsEntry();
 
 	Rewind();
 
@@ -1639,16 +1675,35 @@ Query::SetLiveMode(port_id port, int32 token)
 
 
 void 
-Query::LiveUpdate(Entry *entry, const char *attribute, int32 type, const uint8 *oldKey,
-	size_t oldLength, const uint8 *newKey, size_t newLength)
+Query::LiveUpdate(Entry *entry, Node* node, const char *attribute, int32 type,
+	const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
+	size_t newLength)
 {
-	if (fPort < 0 || fExpression == NULL || attribute == NULL)
+PRINT(("%p->Query::LiveUpdate(%p, %p, \"%s\", 0x%lx, %p, %lu, %p, %lu)\n",
+this, entry, node, attribute, type, oldKey, oldLength, newKey, newLength));
+	if (fPort < 0 || fExpression == NULL || node == NULL || attribute == NULL)
 		return;
 
 	// ToDo: check if the attribute is part of the query at all...
 
-	status_t oldStatus = fExpression->Root()->Match(entry, attribute, type, oldKey, oldLength);
-	status_t newStatus = fExpression->Root()->Match(entry, attribute, type, newKey, newLength);
+	// If no entry has been supplied, but the we need one for the evaluation
+	// (i.e. the "name" attribute is used), we invoke ourselves for all entries
+	// referring to the given node.
+	if (!entry && fNeedsEntry) {
+		entry = node->GetFirstReferrer();
+		while (entry) {
+			LiveUpdate(entry, node, attribute, type, oldKey, oldLength, newKey,
+				newLength);
+			entry = node->GetNextReferrer(entry);
+		}
+		return;
+	}
+
+	status_t oldStatus = fExpression->Root()->Match(entry, node, attribute,
+		type, oldKey, oldLength);
+	status_t newStatus = fExpression->Root()->Match(entry, node, attribute,
+		type, newKey, newLength);
+PRINT(("  oldStatus: 0x%lx, newStatus: 0x%lx\n", oldStatus, newStatus));
 
 	int32 op;
 	if (oldStatus == MATCH_OK && newStatus == MATCH_OK) {
@@ -1656,8 +1711,14 @@ Query::LiveUpdate(Entry *entry, const char *attribute, int32 type, const uint8 *
 		if (oldKey == NULL || strcmp(attribute,"name"))
 			return;
 
-		send_notification(fPort, fToken, B_QUERY_UPDATE, B_ENTRY_REMOVED, fVolume->GetID(), 0,
-			entry->GetParent()->GetID(), 0, entry->GetNode()->GetID(), (const char *)oldKey);
+		if (entry) {
+			// entry should actually always be given, when the changed
+			// attribute is the entry name
+PRINT(("send_notification(): old: B_ENTRY_REMOVED\n"));
+			send_notification(fPort, fToken, B_QUERY_UPDATE, B_ENTRY_REMOVED,
+				fVolume->GetID(), 0, entry->GetParent()->GetID(), 0,
+				entry->GetNode()->GetID(), (const char *)oldKey);
+		}
 		op = B_ENTRY_CREATED;
 	} else if (oldStatus != MATCH_OK && newStatus != MATCH_OK) {
 		// nothing has changed
@@ -1667,12 +1728,21 @@ Query::LiveUpdate(Entry *entry, const char *attribute, int32 type, const uint8 *
 	else
 		op = B_ENTRY_CREATED;
 
-	// if "value" is NULL, send_notification() crashes...
-	const char *value = (const char *)newKey;
-	if (type != B_STRING_TYPE || value == NULL)
-		value = "";
-
-	send_notification(fPort, fToken, B_QUERY_UPDATE, op, fVolume->GetID(), 0,
-		entry->GetParent()->GetID(), 0, entry->GetNode()->GetID(), value);
+	// We send a notification for the given entry, if any, or otherwise for
+	// all entries referring to the node;
+	if (entry) {
+PRINT(("send_notification(): new: %s\n", (op == B_ENTRY_REMOVED ? "B_ENTRY_REMOVED" : "B_ENTRY_CREATED")));
+		send_notification(fPort, fToken, B_QUERY_UPDATE, op, fVolume->GetID(),
+			0, entry->GetParent()->GetID(), 0, entry->GetNode()->GetID(),
+			entry->GetName());
+	} else {
+		entry = node->GetFirstReferrer();
+		while (entry) {
+			send_notification(fPort, fToken, B_QUERY_UPDATE, op,
+				fVolume->GetID(), 0, entry->GetParent()->GetID(), 0,
+				entry->GetNode()->GetID(), entry->GetName());
+			entry = node->GetNextReferrer(entry);
+		}
+	}
 }
 

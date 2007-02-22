@@ -33,6 +33,7 @@
 #include "Entry.h"
 #include "EntryListener.h"
 #include "IndexDirectory.h"
+#include "Locking.h"
 #include "Misc.h"
 #include "NameIndex.h"
 #include "Node.h"
@@ -140,8 +141,9 @@ Volume::Volume()
 	  fIndexDirectory(NULL),
 	  fRootDirectory(NULL),
 	  fName(kDefaultVolumeName),
-	  fLocker(),
-	  fIteratorLocker(),
+	  fLocker("volume"),
+	  fIteratorLocker("iterators"),
+	  fQueryLocker("queries"),
 	  fNodeListeners(NULL),
 	  fAnyNodeListeners(),
 	  fEntryListeners(NULL),
@@ -165,6 +167,15 @@ status_t
 Volume::Mount(nspace_id id)
 {
 	Unmount();
+
+	// check the locker's semaphores
+	if (fLocker.Sem() < 0)
+		return fLocker.Sem();
+	if (fIteratorLocker.Sem() < 0)
+		return fIteratorLocker.Sem();
+	if (fQueryLocker.Sem() < 0)
+		return fQueryLocker.Sem();
+
 	status_t error = B_OK;
 	fID = id;
 	// create a block allocator
@@ -659,6 +670,15 @@ Volume::NodeAttributeRemoved(vnode_id id, Attribute *attribute)
 				index->Removed(attribute);
 			}
 		}
+
+		// update live queries
+		if (error == B_OK && attribute->GetNode()) {
+			const uint8* oldKey;
+			size_t oldLength;
+			attribute->GetKey(&oldKey, &oldLength);
+			UpdateLiveQueries(NULL, attribute->GetNode(), attribute->GetName(),
+				attribute->GetType(), oldKey, oldLength, NULL, 0);
+		}
 	}
 	return error;
 }
@@ -710,6 +730,42 @@ Volume::FindAttributeIndex(const char *name, uint32 type)
 {
 	return (fIndexDirectory
 			? fIndexDirectory->FindAttributeIndex(name, type) : NULL);
+}
+
+// AddQuery
+void
+Volume::AddQuery(Query *query)
+{
+	AutoLocker<Locker> _(fQueryLocker);
+
+	if (query)
+		fQueries.Insert(query);
+}
+
+// RemoveQuery
+void
+Volume::RemoveQuery(Query *query)
+{
+	AutoLocker<Locker> _(fQueryLocker);
+
+	if (query)
+		fQueries.Remove(query);
+}
+
+// UpdateLiveQueries
+void
+Volume::UpdateLiveQueries(Entry *entry, Node* node, const char *attribute,
+	int32 type, const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
+	size_t newLength)
+{
+	AutoLocker<Locker> _(fQueryLocker);
+
+	for (Query* query = fQueries.GetFirst();
+		 query;
+		 query = fQueries.GetNext(query)) {
+		query->LiveUpdate(entry, node, attribute, type, oldKey, oldLength,
+			newKey, newLength);
+	}
 }
 
 // AllocateBlock

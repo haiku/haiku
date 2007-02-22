@@ -155,9 +155,16 @@ SizeIndex::Changed(Node *node, off_t oldSize)
 				if (iterator->GetCurrentNode() == node)
 					iterator->NodeRemoved(node);
 			}
-			// remove the node
+
+			// remove and re-insert the node
 			fNodes->Remove(it);
 			error = fNodes->Insert(node);
+
+			// udpate live queries
+			off_t newSize = node->GetSize();
+			fVolume->UpdateLiveQueries(NULL, node, GetName(), GetType(),
+				(const uint8*)&oldSize, sizeof(oldSize), (const uint8*)&newSize,
+				sizeof(newSize));
 		}
 	}
 	return error;

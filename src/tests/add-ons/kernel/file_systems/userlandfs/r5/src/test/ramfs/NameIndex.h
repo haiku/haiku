@@ -32,6 +32,9 @@ private:
 	class EntryTree;
 	friend class NameIndexEntryIterator;
 
+	void _UpdateLiveQueries(Entry* entry, const char* oldName,
+		const char* newName);
+
 private:
 	EntryTree	*fEntries;
 };

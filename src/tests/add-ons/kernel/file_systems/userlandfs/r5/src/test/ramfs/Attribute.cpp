@@ -52,19 +52,30 @@ status_t
 Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
 				   size_t *bytesWritten)
 {
-	status_t error = B_OK;
-	if (offset < kMaxIndexKeyLength && size > 0 && fIndex) {
-		// There is an index and a change will be made within the key.
-		uint8 oldKey[kMaxIndexKeyLength];
-		size_t oldLength;
-		GetKey(oldKey, &oldLength);
-		error = DataContainer::WriteAt(offset, buffer, size, bytesWritten);
+	// get the current key for the attribute
+	uint8 oldKey[kMaxIndexKeyLength];
+	size_t oldLength;
+	GetKey(oldKey, &oldLength);
+
+	// write the new value
+	status_t error = DataContainer::WriteAt(offset, buffer, size, bytesWritten);
+
+	// If there is an index and a change has been made within the key, notify
+	// the index.
+	if (offset < kMaxIndexKeyLength && size > 0 && fIndex)
 		fIndex->Changed(this, oldKey, oldLength);
-	} else
-		error = DataContainer::WriteAt(offset, buffer, size, bytesWritten);
+
+	// update live queries
+	const uint8* newKey;
+	size_t newLength;
+	GetKey(&newKey, &newLength);
+	GetVolume()->UpdateLiveQueries(NULL, fNode, GetName(), fType, oldKey,
+		oldLength, newKey, newLength);
+
 	// node has been changed
-	if (fNode)
+	if (fNode && size > 0)
 		fNode->MarkModified();
+
 	return error;
 }
 
