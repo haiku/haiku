@@ -14,6 +14,8 @@
 
 enum {
 	B_ANY_TYPE						= 'ANYT',
+	B_ATOM_TYPE						= 'ATOM',
+	B_ATOMREF_TYPE					= 'ATMR',
 	B_BOOL_TYPE						= 'BOOL',
 	B_CHAR_TYPE						= 'CHAR',
 	B_COLOR_8_BIT_TYPE				= 'CLRB',
