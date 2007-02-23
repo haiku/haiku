@@ -85,7 +85,7 @@ status_t
 Node::AddReference()
 {
 	if (++fRefCount == 1) {
-		status_t error = GetVolume()->NewNode(this);
+		status_t error = GetVolume()->NewVNode(this);
 		if (error != B_OK) {
 			fRefCount--;
 			return error;
@@ -102,7 +102,7 @@ void
 Node::RemoveReference()
 {
 	if (--fRefCount == 0) {
-		GetVolume()->RemoveNode(this);
+		GetVolume()->RemoveVNode(this);
 		fRefCount++;
 	}
 }

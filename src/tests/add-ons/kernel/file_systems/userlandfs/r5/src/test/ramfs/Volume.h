@@ -107,14 +107,13 @@ public:
 
 	Directory *GetRootDirectory() const		{ return fRootDirectory; }
 
-// TODO: Rename these to *VNode()?
-	status_t NewNode(Node *node);
-	status_t GetNode(vnode_id id, Node **node);
-	status_t GetNode(Node *node);
-	status_t PutNode(vnode_id id);
-	status_t PutNode(Node *node);
-	status_t RemoveNode(Node *node);
-	status_t UnremoveNode(Node *node);
+	status_t NewVNode(Node *node);
+	status_t GetVNode(vnode_id id, Node **node);
+	status_t GetVNode(Node *node);
+	status_t PutVNode(vnode_id id);
+	status_t PutVNode(Node *node);
+	status_t RemoveVNode(Node *node);
+	status_t UnremoveVNode(Node *node);
 
 	// node table and listeners
 	status_t NodeAdded(Node *node);

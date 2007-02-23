@@ -280,7 +280,7 @@ Directory::FindAndGetNode(const char *name, Node **node, Entry **_entry) const
 		*node = entry->GetNode();
 		if (_entry)
 			*_entry = entry;
-		error = GetVolume()->GetNode(*node);
+		error = GetVolume()->GetVNode(*node);
 	}
 	return error;
 }

@@ -338,9 +338,9 @@ Volume::GetName() const
 	return fName.GetString();
 }
 
-// NewNode
+// NewVNode
 status_t
-Volume::NewNode(Node *node)
+Volume::NewVNode(Node *node)
 {
 	status_t error = NodeAdded(node);
 	if (error == B_OK) {
@@ -351,45 +351,45 @@ Volume::NewNode(Node *node)
 	return error;
 }
 
-// GetNode
+// GetVNode
 status_t
-Volume::GetNode(vnode_id id, Node **node)
+Volume::GetVNode(vnode_id id, Node **node)
 {
 	return (fMounted ? get_vnode(GetID(), id, (void**)node) : B_BAD_VALUE);
 }
 
-// GetNode
+// GetVNode
 status_t
-Volume::GetNode(Node *node)
+Volume::GetVNode(Node *node)
 {
 	Node *dummy = NULL;
-	status_t error = (fMounted ? GetNode(node->GetID(), &dummy)
+	status_t error = (fMounted ? GetVNode(node->GetID(), &dummy)
 							   : B_BAD_VALUE );
 	if (error == B_OK && dummy != node) {
 		FATAL(("Two Nodes have the same ID: %Ld!\n", node->GetID()));
-		PutNode(dummy);
+		PutVNode(dummy);
 		error = B_ERROR;
 	}
 	return error;
 }
 
-// PutNode
+// PutVNode
 status_t
-Volume::PutNode(vnode_id id)
+Volume::PutVNode(vnode_id id)
 {
 	return (fMounted ? put_vnode(GetID(), id) : B_BAD_VALUE);
 }
 
-// PutNode
+// PutVNode
 status_t
-Volume::PutNode(Node *node)
+Volume::PutVNode(Node *node)
 {
 	return (fMounted ? put_vnode(GetID(), node->GetID()) : B_BAD_VALUE);
 }
 
-// RemoveNode
+// RemoveVNode
 status_t
-Volume::RemoveNode(Node *node)
+Volume::RemoveVNode(Node *node)
 {
 	if (fMounted)
 		return remove_vnode(GetID(), node->GetID());
@@ -399,9 +399,9 @@ Volume::RemoveNode(Node *node)
 	return error;
 }
 
-// UnremoveNode
+// UnremoveVNode
 status_t
-Volume::UnremoveNode(Node *node)
+Volume::UnremoveVNode(Node *node)
 {
 	return (fMounted ? unremove_vnode(GetID(), node->GetID()) : B_BAD_VALUE);
 }

@@ -407,11 +407,11 @@ FUNCTION(("dir: (%Lu), entry: `%s'\n", (dir ? dir->GetID() : -1), entryName));
 		// special entries: "." and ".."
 		} else if (!strcmp(entryName, ".")) {
 			*vnid = dir->GetID();
-			if (volume->GetNode(*vnid, &node) != B_OK)
+			if (volume->GetVNode(*vnid, &node) != B_OK)
 				error = B_BAD_VALUE;
 		} else if (!strcmp(entryName, "..")) {
 			Directory *parent = dir->GetParent();
-			if (parent && volume->GetNode(parent->GetID(), &node) == B_OK)
+			if (parent && volume->GetVNode(parent->GetID(), &node) == B_OK)
 				*vnid = node->GetID();
 			else
 				error = B_BAD_VALUE;
@@ -428,7 +428,7 @@ SET_ERROR(error, error);
 				*resolvedPath = strdup(symLink->GetLinkedPath());
 				if (!*resolvedPath)
 					SET_ERROR(error, B_NO_MEMORY);
-				volume->PutNode(*vnid);
+				volume->PutVNode(*vnid);
 			}
 		}
 	} else
@@ -654,7 +654,7 @@ ramfs_create(void *ns, void *_dir, const char *name, int openMode,
 					// get vnode
 					if (error == B_OK) {
 						*vnid = node->GetID();
-						error = volume->GetNode(node->GetID(), &node);
+						error = volume->GetVNode(node->GetID(), &node);
 					}
 				}
 			// the user must have dir write permission to create a new entry
@@ -974,9 +974,9 @@ oldDir->GetID(), oldName, newDir->GetID(), newName));
 
 			// release the entries
 			if (clobberEntry)
-				volume->PutNode(clobberNode);
+				volume->PutVNode(clobberNode);
 			if (entry)
-				volume->PutNode(node);
+				volume->PutVNode(node);
 		}
 
 		// notify listeners
@@ -1062,7 +1062,7 @@ ramfs_unlink(void *ns, void *_dir, const char *name)
 					SET_ERROR(error, B_DIRECTORY_NOT_EMPTY);
 				} else
 					error = dir->DeleteEntry(entry);
-				volume->PutNode(node);
+				volume->PutVNode(node);
 			} else
 				SET_ERROR(error, B_ENTRY_NOT_FOUND);
 		}
@@ -1108,7 +1108,7 @@ ramfs_rmdir(void *ns, void *_dir, const char *name)
 					SET_ERROR(error, B_DIRECTORY_NOT_EMPTY);
 				} else
 					error = dir->DeleteEntry(entry);
-				volume->PutNode(node);
+				volume->PutVNode(node);
 			} else
 				SET_ERROR(error, B_ENTRY_NOT_FOUND);
 		}
@@ -1237,7 +1237,7 @@ ramfs_mkdir(void *ns, void *_dir, const char *name, int mode)
 					node->SetUID(geteuid());
 					node->SetGID(getegid());
 					// put the node
-					volume->PutNode(node->GetID());
+					volume->PutVNode(node->GetID());
 				}
 			}
 		}
@@ -1460,7 +1460,7 @@ ramfs_symlink(void *ns, void *_dir, const char *name, const char *path)
 					node->SetUID(geteuid());
 					node->SetGID(getegid());
 					// put the node
-					volume->PutNode(node->GetID());
+					volume->PutVNode(node->GetID());
 				}
 			}
 		}
