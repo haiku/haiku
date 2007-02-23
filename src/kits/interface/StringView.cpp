@@ -82,6 +82,9 @@ BStringView::~BStringView()
 void
 BStringView::SetText(const char* text)
 {
+	if ((text && fText && !strcmp(text, fText))
+		|| (!text && !fText))
+		return;
 	free(fText);
 	fText = text ? strdup(text) : NULL;
 	Invalidate();
