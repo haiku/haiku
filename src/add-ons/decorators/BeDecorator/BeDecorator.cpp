@@ -126,7 +126,7 @@ BeDecorator::SetTitle(const char* string, BRegion* updateRegion)
 	BRect rect = TabRect();
 
 	Decorator::SetTitle(string);
-	
+
 	if (updateRegion == NULL)
 		return;
 
@@ -213,7 +213,7 @@ BeDecorator::MoveBy(BPoint pt)
 	fResizeRect.OffsetBy(pt);
 	fZoomRect.OffsetBy(pt);
 	fBorderRect.OffsetBy(pt);
-	
+
 	fLeftBorder.OffsetBy(pt);
 	fRightBorder.OffsetBy(pt);
 	fTopBorder.OffsetBy(pt);
@@ -270,13 +270,13 @@ BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 	fBorderRect.right	+= pt.x;
 	fBorderRect.bottom	+= pt.y;
-	
+
 	fLeftBorder.bottom	+= pt.y;
 	fTopBorder.right	+= pt.x;
 
 	fRightBorder.OffsetBy(pt.x, 0.0);
 	fRightBorder.bottom	+= pt.y;
-	
+
 	fBottomBorder.OffsetBy(0.0, pt.y);
 	fBottomBorder.right	+= pt.x;
 
@@ -479,7 +479,7 @@ BeDecorator::GetFootprint(BRegion *region)
 	region->Include(fRightBorder);
 	region->Include(fTopBorder);
 	region->Include(fBottomBorder);
-	
+
 	if (fLook == B_BORDERED_WINDOW_LOOK)
 		return;
 
@@ -770,7 +770,7 @@ BeDecorator::_DrawFrame(BRect invalid)
 			}
 			break;
 		}
-		
+
 		case B_FLOATING_WINDOW_LOOK:
 		case kLeftTitledWindowLook:
 		{
@@ -876,7 +876,7 @@ BeDecorator::_DrawFrame(BRect invalid)
 						fBottomBorder.bottom - 22, fRightBorder.right - 1,
 						fBottomBorder.bottom - 1)))
 					break;
-		
+
 				fDrawingEngine->StrokeLine(BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
 									BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
 									fFrameColors[0]);
@@ -905,10 +905,8 @@ BeDecorator::_DrawTab(BRect invalid)
 		return;
 
 	// TODO: cache these
-	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),
-												 (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
-	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),
-												  B_DARKEN_2_TINT));
+	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),B_LIGHTEN_2_TINT));
+	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),B_DARKEN_2_TINT));
 
 	// outer frame
 	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(), fFrameColors[0]);
@@ -945,7 +943,7 @@ BeDecorator::_DrawTab(BRect invalid)
 
 	_DrawTitle(fTabRect);
 
-	// Draw the buttons if we're supposed to	
+	// Draw the buttons if we're supposed to
 	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
 		_DrawClose(fCloseRect);
 	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
@@ -1015,7 +1013,7 @@ BeDecorator::_SetFocus()
 {
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
-	
+
 	if (IsFocus() || ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
 			&& (fFlags & B_AVOID_FOCUS) != 0)) {
 		fTabColor = UIColor(B_WINDOW_TAB_COLOR);
@@ -1059,7 +1057,19 @@ BeDecorator::_SetColors()
 void
 BeDecorator::_DrawBlendedRect(BRect r, bool down)
 {
-	// Actually just draws a blended square
+	BRect r1 = r;
+	BRect r2 = r;
+
+	r1.left += 1.0;
+	r1.top  += 1.0;
+
+	r2.bottom -= 1.0;
+	r2.right  -= 1.0;
+
+	// TODO: replace these with cached versions? does R5 use different colours?
+	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),B_LIGHTEN_2_TINT));
+	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),B_DARKEN_2_TINT));
+
 	int32 w = r.IntegerWidth();
 	int32 h = r.IntegerHeight();
 
@@ -1087,7 +1097,7 @@ BeDecorator::_DrawBlendedRect(BRect r, bool down)
 		temprgbcol.SetColor(uint8(startColor.red - (i * rstep)),
 							uint8(startColor.green - (i * gstep)),
 							uint8(startColor.blue - (i * bstep)));
-		
+
 		fDrawingEngine->StrokeLine(BPoint(r.left, r.top + i),
 							BPoint(r.left + i, r.top), temprgbcol);
 
@@ -1098,7 +1108,11 @@ BeDecorator::_DrawBlendedRect(BRect r, bool down)
 		fDrawingEngine->StrokeLine(BPoint(r.left + steps, r.top + i),
 							BPoint(r.left + i, r.top + steps), temprgbcol);
 	}
-	fDrawingEngine->StrokeRect(r, fFrameColors[3]);
+
+	// draw bevelling effect on box
+	fDrawingEngine->StrokeRect(r2, tabColorShadow); // inner dark box
+	fDrawingEngine->StrokeRect(r,  tabColorShadow); // outer dark box
+	fDrawingEngine->StrokeRect(r1, tabColorLight);  // light box
 }
 
 // _GetButtonSizeAndOffset
