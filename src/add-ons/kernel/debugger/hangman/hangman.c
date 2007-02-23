@@ -21,7 +21,7 @@
 #define MAX_FAILS_BEFORE_BSOD 0
 
 #ifdef __HAIKU__
-#define FORTUNE_FILE "/etc/fortunes/default/Fortunes"
+#define FORTUNE_FILE "/etc/fortunes/Fortunes"
 #else
 #define FORTUNE_FILE "/etc/fortunes/default"
 #endif
@@ -69,7 +69,7 @@ status_t init_words(char *from);
 # ifdef __HAIKU__
 extern int kgets(char *buf, int len);
 #  define PRINTF kprintf
-#  define GETS(a) ({kprintf("hangman> "); kgets(a, sizeof(a));})
+#  define GETS(a) ({int l; kprintf("hangman> "); l = kgets(a, sizeof(a)); l?a:NULL;})
 #  define HIDDEN_LETTER '_'
 #  define HUNGMAN hungman_ansi
 # else
@@ -112,7 +112,7 @@ status_t init_words(char *from)
 //	sz = (size_t)lseek(fd, 0, SEEK_END);
 //	dprintf("khangman: lseek(): %ld\n", sz);
 	if (sz < 30) {
-		dprintf("khangman: fortune file too small\n");
+		dprintf("hangman: fortune file too small\n");
 		return B_ERROR;
 	}
 //	lseek(fd, 0, SEEK_SET);
@@ -296,9 +296,11 @@ status_t init_hardware(void) {
 }
 
 status_t init_driver(void) {
-
-	if (init_words(FORTUNE_FILE) < B_OK) {
-		dprintf("error reading fortune file\n");
+	status_t err;
+	
+	err = init_words(FORTUNE_FILE);
+	if (err < B_OK) {
+		dprintf("hangman: error reading fortune file: %s\n", strerror(err));
 		return B_ERROR;
 	}
 	get_image_symbol(KERNEL_IMAGE_ID, "bsod_gets", B_SYMBOL_TYPE_ANY, (void **)&bsod_gets);
@@ -376,10 +378,13 @@ device_hooks *find_device(const char *name) {
 
 status_t std_ops(int32 op, ...)
 {
+	status_t err;
+
 	switch (op) {
 	case B_MODULE_INIT:
-		if (init_words(FORTUNE_FILE) < B_OK) {
-			dprintf("hangman: error reading fortune file.\n");
+		err = init_words(FORTUNE_FILE);
+		if (err < B_OK) {
+			dprintf("hangman: error reading fortune file: %s\n", strerror(err));
 			return B_ERROR;
 		}
 		add_debugger_command("kdlhangman", kdlhangman, KCMD_HELP);
