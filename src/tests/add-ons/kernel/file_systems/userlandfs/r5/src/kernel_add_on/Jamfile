@@ -42,11 +42,11 @@ KernelAddon <test>userlandfs
 	  userlandfs_ioctl.cpp
 
 	  FileSystem.cpp
+	  kernel_interface.cpp
 	  KernelDebug.cpp
 	  KernelRequestHandler.cpp
 	  Settings.cpp
 	  UserlandFS.cpp
-	  userlandfs.cpp
 	  Volume.cpp
 
 	  $(kernelC++)

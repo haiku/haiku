@@ -1,4 +1,4 @@
-// userlandfs.cpp
+// kernel_interface.cpp
 
 #include <KernelExport.h>
 #include <fsproto.h>
