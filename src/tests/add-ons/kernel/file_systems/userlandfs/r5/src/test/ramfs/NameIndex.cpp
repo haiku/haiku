@@ -244,7 +244,6 @@ NameIndexEntryIterator::GetCurrent(uint8 *buffer, size_t *keyLength)
 	Entry *entry = GetCurrent();
 	if (entry) {
 		strncpy((char*)buffer, entry->GetName(), kMaxIndexKeyLength);
-// TODO: + 1 ?
 		*keyLength = strlen(entry->GetName());
 	}
 	return entry;

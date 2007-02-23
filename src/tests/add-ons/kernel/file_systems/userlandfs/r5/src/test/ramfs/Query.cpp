@@ -67,8 +67,9 @@ IndexWrapper::Type() const
 off_t
 IndexWrapper::GetSize() const
 {
-// TODO: That's not exactly what should be returned.
-	return (fIndex ? fIndex->CountEntries() + 1 : 0);
+	// Compute a fake "index size" based on the number of entries
+	// (1024 + 16 * entry count), so we don't need to adjust the code using it.
+	return 1024LL + (fIndex ? fIndex->CountEntries() : 0) * 16LL;
 }
 
 // KeySize
@@ -1126,7 +1127,7 @@ Equation::PrepareQuery(Volume */*volume*/, IndexWrapper &index, IndexIterator **
 
 status_t 
 Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
-	struct dirent *dirent, size_t /*bufferSize*/)
+	struct dirent *dirent, size_t bufferSize)
 {
 	while (true) {
 		union value indexValue;
@@ -1195,15 +1196,22 @@ Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 		}
 
 		if (status == MATCH_OK) {
+			size_t nameLen = strlen(entry->GetName());
+
+			// check, whether the entry fits into the buffer,
+			// and fill it in
+			size_t length = (dirent->d_name + nameLen + 1) - (char*)dirent;
+			if (length > bufferSize)
+				RETURN_ERROR(B_BUFFER_OVERFLOW);
+
 			dirent->d_dev = volume->GetID();
 			dirent->d_ino = entry->GetNode()->GetID();
 			dirent->d_pdev = volume->GetID();
 			dirent->d_pino = entry->GetParent()->GetID();
 
-// TODO: Check the buffer size.
-			strncpy(dirent->d_name, entry->GetName(), B_FILE_NAME_LENGTH);
-			dirent->d_name[B_FILE_NAME_LENGTH - 1] = '\0';
-			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
+			memcpy(dirent->d_name, entry->GetName(), nameLen);
+			dirent->d_name[nameLen] = '\0';
+			dirent->d_reclen = length;
 		}
 
 		if (status == MATCH_OK)

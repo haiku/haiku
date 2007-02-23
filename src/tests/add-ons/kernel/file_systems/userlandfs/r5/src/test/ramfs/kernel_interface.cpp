@@ -1324,8 +1324,7 @@ PRINT(("  entry: `%s'\n", name));
 #endif
 					*count = 1;
 				} else {
-					// TODO: Check, if that's the correct behavior.
-					SET_ERROR(error, B_BAD_VALUE);
+					SET_ERROR(error, B_BUFFER_OVERFLOW);
 				}
 	 		} else
 	 			*count = 0;
@@ -1616,8 +1615,7 @@ ramfs_read_attrdir(void *ns, void */*_node*/, void *cookie, long *count,
 #endif
 					*count = 1;
 				} else {
-					// TODO: Check, if that's the correct behavior.
-					SET_ERROR(error, B_BAD_VALUE);
+					SET_ERROR(error, B_BUFFER_OVERFLOW);
 				}
 			} else
 				*count = 0;
@@ -1858,8 +1856,7 @@ ramfs_read_indexdir(void *ns, void *_cookie, long *count,
 #endif
 				*count = 1;
 			} else {
-				// TODO: Check, if that's the correct behavior.
-				SET_ERROR(error, B_BAD_VALUE);
+				SET_ERROR(error, B_BUFFER_OVERFLOW);
 			}
 		} else
 			*count = 0;
@@ -1951,9 +1948,12 @@ ramfs_stat_index(void *ns, const char *name, struct index_info *indexInfo)
 			// find the index
 			if (Index *index = indexDir->FindIndex(name)) {
 				indexInfo->type = index->GetType();
-				indexInfo->size = 0;				// TODO
-				indexInfo->modification_time = 0;	// TODO
-				indexInfo->creation_time = 0;		// TODO
+				if (index->HasFixedKeyLength())
+					indexInfo->size = index->GetKeyLength();
+				else
+					indexInfo->size = kMaxIndexKeyLength;
+				indexInfo->modification_time = 0;	// TODO: index times
+				indexInfo->creation_time = 0;		// ...
 				indexInfo->uid = 0;		// root owns the indices
 				indexInfo->gid = 0;		//
 			} else
