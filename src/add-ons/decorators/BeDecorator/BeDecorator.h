@@ -1,77 +1,109 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		BeDecorator.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Fallback decorator for the app_server
-//  
-//------------------------------------------------------------------------------
-#ifndef _DEFAULT_DECORATOR_H_
-#define _DEFAULT_DECORATOR_H_
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+#ifndef DEFAULT_DECORATOR_H
+#define DEFAULT_DECORATOR_H
+
 
 #include "Decorator.h"
 #include <Region.h>
 
-class BeDecorator: public Decorator
-{
-public:
-	BeDecorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags);
-	~BeDecorator(void);
-	
-	void MoveBy(float x, float y);
-	void MoveBy(BPoint pt);
-	void Draw(BRect r);
-	void Draw(void);
-	void GetFootprint(BRegion *region);
-	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
-	BRect SlideTab(float dx, float dy=0);
-protected:
-	void _DrawClose(BRect r);
-	void _DrawFrame(BRect r);
-	void _DrawTab(BRect r);
-	void _DrawTitle(BRect r);
-	void _DrawZoom(BRect r);
-	void _DoLayout(void);
-	void _SetFocus(void);
-	void _SetColors(void);
-	void DrawBlendedRect(BRect r, bool down);
-	uint32 taboffset;
+class Desktop;
 
-	RGBColor tab_highcol, tab_lowcol;
-	RGBColor button_highcol, button_lowcol;
-	RGBColor frame_highcol, frame_midcol, frame_lowcol, frame_highercol,
-		frame_lowercol;
-	RGBColor textcol;
 
-	RGBColor *framecolors;
-	
-	// Individual rects for handling window frame rendering the proper way
-	BRect rightborder,leftborder,topborder,bottomborder;
-	uint64 solidhigh, solidlow;
-	
-	int32 borderwidth;
+class BeDecorator: public Decorator {
+ public:
+								BeDecorator(DesktopSettings& settings,
+												 BRect frame,
+												 window_look look,
+												 uint32 flags);
+	virtual						~BeDecorator();
 
-	bool slidetab;
-	int textoffset;
-	float titlepixelwidth;
+	virtual	void				SetTitle(const char* string,
+										 BRegion* updateRegion = NULL);
+	virtual void				SetLook(DesktopSettings& settings,
+										window_look look,
+										BRegion* updateRegion = NULL);
+	virtual void				SetFlags(uint32 flags,
+										 BRegion* updateRegion = NULL);
+
+	virtual	void				MoveBy(BPoint offset);
+	virtual	void				ResizeBy(BPoint offset, BRegion* dirty);
+
+	virtual bool				SetTabLocation(float location,
+											   BRegion* updateRegion = NULL);
+	virtual float				TabLocation() const
+									{ return (float)fTabOffset; }
+
+	virtual	bool				SetSettings(const BMessage& settings,
+											BRegion* updateRegion = NULL);
+	virtual	bool				GetSettings(BMessage* settings) const;
+
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				Draw();
+
+	virtual	void				GetSizeLimits(int32* minWidth,
+											  int32* minHeight,
+											  int32* maxWidth,
+											  int32* maxHeight) const;
+
+	virtual	void				GetFootprint(BRegion* region);
+
+	virtual	click_type			Clicked(BPoint pt, int32 buttons,
+										int32 modifiers);
+
+ protected:
+	virtual void				_DoLayout();
+
+	virtual void				_DrawFrame(BRect r);
+	virtual void				_DrawTab(BRect r);
+
+	virtual void				_DrawClose(BRect r);
+	virtual void				_DrawTitle(BRect r);
+	virtual void				_DrawZoom(BRect r);
+
+	virtual void				_SetFocus();
+	virtual void				_SetColors();
+
+ private:
+			void				_DrawBlendedRect(BRect r, bool down);
+			void				_GetButtonSizeAndOffset(const BRect& tabRect,
+														float* offset,
+														float*size) const;
+			void				_LayoutTabItems(const BRect& tabRect);
+
+			RGBColor			fButtonHighColor;
+			RGBColor			fButtonLowColor;
+			RGBColor			fTextColor;
+			RGBColor			fTabColor;
+	
+			RGBColor*			fFrameColors;
+	
+			// Individual rects for handling window frame
+			// rendering the proper way
+			BRect				fRightBorder;
+			BRect				fLeftBorder;
+			BRect				fTopBorder;
+			BRect				fBottomBorder;
+	
+			int32				fBorderWidth;
+	
+			uint32				fTabOffset;
+			float				fTabLocation;
+			float				fTextOffset;
+	
+			float				fMinTabSize;
+			float				fMaxTabSize;
+			BString				fTruncatedTitle;
+			int32				fTruncatedTitleLength;
+	
+			bigtime_t			fLastClicked;
+			bool				fWasDoubleClick;
 };
 
-#endif
+#endif	// DEFAULT_DECORATOR_H

@@ -1,42 +1,32 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		BeDecorator.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Fallback decorator for the app_server
-//  
-//------------------------------------------------------------------------------
-#include <Rect.h>
-#include "DisplayDriver.h"
-#include <View.h>
-#include "LayerData.h"
-#include "ColorUtils.h"
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+// This one is more like the classic R5 look
+
+
 #include "BeDecorator.h"
+
+#include "DesktopSettings.h"
+#include "DrawingEngine.h"
+#include "DrawState.h"
+#include "FontManager.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
+
+#include "WindowPrivate.h"
+
+#include <Rect.h>
+#include <View.h>
+
 #include <stdio.h>
 
-#define USE_VIEW_FILL_HACK
-
-#//#define DEBUG_DECORATOR
+//#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -44,336 +34,401 @@
 #	define STRACE(x) ;
 #endif
 
-BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
- : Decorator(rect,wlook,wfeel,wflags)
+
+static inline uint8
+blend_color_value(uint8 a, uint8 b, float position)
 {
+	int16 delta = (int16)b - a;
+	int32 value = a + (int32)(position * delta);
+	if (value > 255)
+		return 255;
+	if (value < 0)
+		return 0;
 
-	taboffset=0;
-	titlepixelwidth=0;
+	return (uint8)value;
+}
 
-	framecolors=new RGBColor[5];
-	framecolors[0].SetColor(255,255,255);
-	framecolors[1].SetColor(216,216,216);
-	framecolors[2].SetColor(152,152,152);
-	framecolors[3].SetColor(136,136,136);
-	framecolors[4].SetColor(96,96,96);
+
+/*!
+	\brief Function mostly for calculating gradient colors
+	\param col Start color
+	\param col2 End color
+	\param position A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
+		start color and 1.0 results in the end color.
+	\return The blended color. If an invalid position was given, {0,0,0,0} is returned.
+*/
+static rgb_color
+make_blend_color(rgb_color colorA, rgb_color colorB, float position)
+{
+	if (position < 0)
+		return colorA;
+	if (position > 1)
+		return colorB;
+
+	rgb_color blendColor;
+	blendColor.red = blend_color_value(colorA.red, colorB.red, position);
+	blendColor.green = blend_color_value(colorA.green, colorB.green, position);
+	blendColor.blue = blend_color_value(colorA.blue, colorB.blue, position);
+	blendColor.alpha = blend_color_value(colorA.alpha, colorB.alpha, position);
+
+	return blendColor;
+}
+
+
+//	#pragma mark -
+
+
+// TODO: get rid of DesktopSettings here, and introduce private accessor
+//	methods to the Decorator base class
+
+BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect,
+		window_look look, uint32 flags)
+	: Decorator(settings, rect, look, flags),
+	fTabOffset(0),
+	fTabLocation(0.0),
+	fLastClicked(0)
+{
+	BeDecorator::SetLook(settings, look);
+
+	fFrameColors = new RGBColor[6];
+	fFrameColors[0].SetColor(152, 152, 152);
+	fFrameColors[1].SetColor(255, 255, 255);
+	fFrameColors[2].SetColor(216, 216, 216);
+	fFrameColors[3].SetColor(136, 136, 136);
+	fFrameColors[4].SetColor(152, 152, 152);
+	fFrameColors[5].SetColor(96, 96, 96);
 
 	// Set appropriate colors based on the current focus value. In this case, each decorator
 	// defaults to not having the focus.
 	_SetFocus();
-	
+
 	// Do initial decorator setup
 	_DoLayout();
-	
-	// This flag is used to determine whether or not we're moving the tab
-	slidetab=false;
 
-//	tab_highcol=_colors->window_tab;
-//	tab_lowcol=_colors->window_tab;
+	// ToDo: if the decorator was created with a frame too small, it should resize itself!
 
-STRACE(("BeDecorator:\n"));
-STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
+	STRACE(("BeDecorator:\n"));
+	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
+		rect.left, rect.top, rect.right, rect.bottom));
 }
 
-BeDecorator::~BeDecorator(void)
+
+BeDecorator::~BeDecorator()
 {
-STRACE(("BeDecorator: ~BeDecorator()\n"));
-	delete [] framecolors;
+	STRACE(("BeDecorator: ~BeDecorator()\n"));
+	delete [] fFrameColors;
 }
 
-click_type BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
+
+void
+BeDecorator::SetTitle(const char* string, BRegion* updateRegion)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("BeDecorator: Clicked\n");
-	printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
-	printf("\tButtons:\n");
-	if(buttons==0)
-		printf("\t\tNone\n");
-	else
-	{
-		if(buttons & B_PRIMARY_MOUSE_BUTTON)
-			printf("\t\tPrimary\n");
-		if(buttons & B_SECONDARY_MOUSE_BUTTON)
-			printf("\t\tSecondary\n");
-		if(buttons & B_TERTIARY_MOUSE_BUTTON)
-			printf("\t\tTertiary\n");
-	}
-	printf("\tModifiers:\n");
-	if(modifiers==0)
-		printf("\t\tNone\n");
-	else
-	{
-		if(modifiers & B_CAPS_LOCK)
-			printf("\t\tCaps Lock\n");
-		if(modifiers & B_NUM_LOCK)
-			printf("\t\tNum Lock\n");
-		if(modifiers & B_SCROLL_LOCK)
-			printf("\t\tScroll Lock\n");
-		if(modifiers & B_LEFT_COMMAND_KEY)
-			printf("\t\t Left Command\n");
-		if(modifiers & B_RIGHT_COMMAND_KEY)
-			printf("\t\t Right Command\n");
-		if(modifiers & B_LEFT_CONTROL_KEY)
-			printf("\t\tLeft Control\n");
-		if(modifiers & B_RIGHT_CONTROL_KEY)
-			printf("\t\tRight Control\n");
-		if(modifiers & B_LEFT_OPTION_KEY)
-			printf("\t\tLeft Option\n");
-		if(modifiers & B_RIGHT_OPTION_KEY)
-			printf("\t\tRight Option\n");
-		if(modifiers & B_LEFT_SHIFT_KEY)
-			printf("\t\tLeft Shift\n");
-		if(modifiers & B_RIGHT_SHIFT_KEY)
-			printf("\t\tRight Shift\n");
-		if(modifiers & B_MENU_KEY)
-			printf("\t\tMenu\n");
-	}
-	#endif
+	BRect rect = TabRect();
+
+	Decorator::SetTitle(string);
 	
-	// In checking for hit test stuff, we start with the smallest rectangles the user might
-	// be clicking on and gradually work our way out into larger rectangles.
-	if(_closerect.Contains(pt))
-		return DEC_CLOSE;
+	if (updateRegion == NULL)
+		return;
 
-	if(_zoomrect.Contains(pt))
-		return DEC_ZOOM;
-	
-	if(_resizerect.Contains(pt) && _look==B_DOCUMENT_WINDOW_LOOK)
-		return DEC_RESIZE;
+	BRect updatedRect = TabRect();
+	if (rect.left > updatedRect.left)
+		rect.left = updatedRect.left;
+	if (rect.right < updatedRect.right)
+		rect.right = updatedRect.right;
 
-	// Clicking in the tab?
-	if(_tabrect.Contains(pt))
-	{
-		// Here's part of our window management stuff
-		if(buttons==B_SECONDARY_MOUSE_BUTTON)
-			return DEC_MOVETOBACK;
-		return DEC_DRAG;
-	}
+	rect.bottom++;
+		// the border will look differently when the title is adjacent
 
-	// We got this far, so user is clicking on the border?
-	BRect brect(_frame);
-	brect.top+=19;
-	BRect clientrect(brect.InsetByCopy(3,3));
-	if(brect.Contains(pt) && !clientrect.Contains(pt))
-	{
-		if(_resizerect.Contains(pt))
-			return DEC_RESIZE;
-		
-		return DEC_DRAG;
-	}
-
-	// Guess user didn't click anything
-	return DEC_NONE;
+	updateRegion->Include(rect);
 }
 
-void BeDecorator::_DoLayout(void)
+
+void
+BeDecorator::SetLook(DesktopSettings& settings,
+	window_look look, BRegion* updateRegion)
 {
-	STRACE(("BeDecorator: Do Layout\n"));
-	// Here we determine the size of every rectangle that we use
-	// internally when we are given the size of the client rectangle.
+	// TODO: we could be much smarter about the update region
 
-	switch(GetLook())
-	{
-		case B_FLOATING_WINDOW_LOOK:
-		case B_MODAL_WINDOW_LOOK:
-		
-		// We're going to make the frame 5 pixels wide, no matter what. R5's decorator frame
-		// requires the skills of a gaming master to click on the tiny frame if resizing is necessary,
-		// and there *are* apps which do this
-//			borderwidth=3;
-//			break;
-
-		case B_BORDERED_WINDOW_LOOK:
-		case B_TITLED_WINDOW_LOOK:
-		case B_DOCUMENT_WINDOW_LOOK:
-			borderwidth = 5;
-			break;
-		default:
-			borderwidth = 0;
-	}
-	
-	// distance from one item of the tab bar to another. In this case the text and close/zoom rects
-	textoffset = (_look==B_FLOATING_WINDOW_LOOK) ? 7 : 10;
-	
-	// calculate our tab rect
-	_tabrect.Set( 	_frame.left - borderwidth,
-					_frame.top - borderwidth - 19.0,
-					((_frame.right - _frame.left) < 35.0 ?
-							_frame.left + 35.0 : _frame.right) + borderwidth,
-					_frame.top - (borderwidth-1) );
-
-	// make it text width sensitive
-	if(strlen(GetTitle())>1)
-	{
-		if(_driver)
-			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_drawdata);
-		else
-			titlepixelwidth=10;
-		
-		int32	tabLength	= 	int32(14 + // _closerect width
-								textoffset + titlepixelwidth + textoffset +
-								14 + // _zoomrect width
-								8); // margins
-		int32	tabWidth	= (int32)_tabrect.Width();
-		if ( tabLength < tabWidth )
-			_tabrect.right	= _tabrect.left + tabLength;
-	}
-	else
-		_tabrect.right		= _tabrect.left + _tabrect.Width()/2;
-
-	// calculate left/top/right/bottom borders
-	if ( borderwidth != 0 ){
-		_borderrect		= _frame.InsetByCopy( -borderwidth, -borderwidth );
-		leftborder.Set( _borderrect.left, _frame.top - borderwidth,
-						_frame.left, _frame.bottom + borderwidth );
-		rightborder.Set( _frame.right, _frame.top - borderwidth,
-						 _borderrect.right, _frame.bottom + borderwidth );
-		topborder.Set( 	_borderrect.left, _borderrect.top,
-						_borderrect.right, _frame.top );
-		bottomborder.Set( _borderrect.left, _frame.bottom,
-						  _borderrect.right, _borderrect.bottom );
-	}
-	else{
-		// no border ... (?) useful when displaying windows that are just images
-		_borderrect	= _frame;
-		leftborder.Set( 0.0, 0.0, -1.0, -1.0 );
-		rightborder.Set( 0.0, 0.0, -1.0, -1.0 );
-		topborder.Set( 0.0, 0.0, -1.0, -1.0 );
-		bottomborder.Set( 0.0, 0.0, -1.0, -1.0 );						
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
 	}
 
-	// calculate resize rect
-	_resizerect.Set(	_borderrect.right - 19.0, _borderrect.bottom - 19.0,
-						_borderrect.right, _borderrect.bottom);
+	ServerFont font;
+	if (look == B_FLOATING_WINDOW_LOOK || look == kLeftTitledWindowLook) {
+		settings.GetDefaultPlainFont(font);
+		if (look == kLeftTitledWindowLook)
+			font.SetRotation(90.0f);
+	} else
+		settings.GetDefaultBoldFont(font);
 
-	// format tab rect for a floating window - make the rect smaller
-	if ( _look == B_FLOATING_WINDOW_LOOK ){
-		_tabrect.InsetBy( 0, 2 );
-		_tabrect.OffsetBy( 0, 2 );
-	}	
+	font.SetFlags(B_FORCE_ANTIALIASING);
+	font.SetSpacing(B_STRING_SPACING);
+	SetFont(&font);
 
-	// calulate close rect based on the tab rectangle
-	_closerect.Set(	_tabrect.left + 4.0, _tabrect.top + 4.0,
-					_tabrect.left + 4.0 + 13.0, _tabrect.top + 4.0 + 13.0 );
-					
-	// calulate zoom rect based on the tab rectangle
-	_zoomrect.Set(  _tabrect.right - 4.0 - 13.0, _tabrect.top + 4.0,
-					_tabrect.right - 4.0, _tabrect.top + 4.0 + 13.0 );
+	Decorator::SetLook(settings, look, updateRegion);
+	_DoLayout();
 
-	// format close and zoom rects for a floating window - make rectangles smaller
-	if ( _look == B_FLOATING_WINDOW_LOOK ){
-		_closerect.InsetBy( 1, 1 );
-		_zoomrect.InsetBy( 1, 1 );
-		_closerect.OffsetBy( 0, -2 );
-		_zoomrect.OffsetBy( 0, -2 );
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
 	}
 }
 
-void BeDecorator::MoveBy(float x, float y)
+
+void
+BeDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
 {
-	MoveBy(BPoint(x,y));
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+
+	Decorator::SetFlags(flags, updateRegion);
+	_DoLayout();
+
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
 }
 
-void BeDecorator::MoveBy(BPoint pt)
+
+void
+BeDecorator::MoveBy(BPoint pt)
 {
 	STRACE(("BeDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
 	// Move all internal rectangles the appropriate amount
-	_frame.OffsetBy(pt);
-	_closerect.OffsetBy(pt);
-	_tabrect.OffsetBy(pt);
-	_resizerect.OffsetBy(pt);
-	_borderrect.OffsetBy(pt);
-	_zoomrect.OffsetBy(pt);
+	fFrame.OffsetBy(pt);
+	fCloseRect.OffsetBy(pt);
+	fTabRect.OffsetBy(pt);
+	fResizeRect.OffsetBy(pt);
+	fZoomRect.OffsetBy(pt);
+	fBorderRect.OffsetBy(pt);
 	
-	leftborder.OffsetBy(pt);
-	rightborder.OffsetBy(pt);
-	topborder.OffsetBy(pt);
-	bottomborder.OffsetBy(pt);
-}
-
-void BeDecorator::GetFootprint(BRegion *region)
-{
-	STRACE(("BeDecorator: Get Footprint\n"));
-	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WinBorder
-	// object's visible region.
-	if(!region)
-		return;
-
-	if(_look == B_NO_BORDER_WINDOW_LOOK)
-	{
-		region->Set(_frame);
-		return;
-	}
-	
-	if(_look == B_BORDERED_WINDOW_LOOK)
-	{
-		region->Set(_borderrect);
-		return;
-	}
-
-	region->Set(_borderrect);
-	region->Include(_tabrect);
-
+	fLeftBorder.OffsetBy(pt);
+	fRightBorder.OffsetBy(pt);
+	fTopBorder.OffsetBy(pt);
+	fBottomBorder.OffsetBy(pt);
 }
 
 
-BRect BeDecorator::SlideTab(float dx, float dy)
+void
+BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 {
-	//return Decorator::SlideTab(dx,dy);
-	return _tabrect;
+	STRACE(("BeDecorator: Resize By (%.1f, %.1f)\n", pt.x, pt.y));
+	// Move all internal rectangles the appropriate amount
+	fFrame.right += pt.x;
+	fFrame.bottom += pt.y;
+
+	// handle invalidation of resize rect
+	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
+		BRect realResizeRect;
+		switch (fLook) {
+			case B_DOCUMENT_WINDOW_LOOK:
+				realResizeRect = fResizeRect;
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+				break;
+			case B_TITLED_WINDOW_LOOK:
+			case B_FLOATING_WINDOW_LOOK:
+			case B_MODAL_WINDOW_LOOK:
+			case kLeftTitledWindowLook:
+				realResizeRect.Set(fRightBorder.right - 22, fBottomBorder.top,
+								   fRightBorder.right - 22, fBottomBorder.bottom - 1);
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+
+				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - 22,
+								   fRightBorder.right - 1, fBottomBorder.bottom - 22);
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+				break;
+			default:
+				break;
+		}
+	}
+
+	fResizeRect.OffsetBy(pt);
+
+	fBorderRect.right	+= pt.x;
+	fBorderRect.bottom	+= pt.y;
+	
+	fLeftBorder.bottom	+= pt.y;
+	fTopBorder.right	+= pt.x;
+
+	fRightBorder.OffsetBy(pt.x, 0.0);
+	fRightBorder.bottom	+= pt.y;
+	
+	fBottomBorder.OffsetBy(0.0, pt.y);
+	fBottomBorder.right	+= pt.x;
+
+	if (dirty) {
+		if (pt.x > 0.0) {
+			BRect t(fRightBorder.left - pt.x, fTopBorder.top,
+					fRightBorder.right, fTopBorder.bottom);
+			dirty->Include(t);
+			t.Set(fRightBorder.left - pt.x, fBottomBorder.top,
+				  fRightBorder.right, fBottomBorder.bottom);
+			dirty->Include(t);
+			dirty->Include(fRightBorder);
+		} else if (pt.x < 0.0) {
+			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
+								 fRightBorder.right, fBottomBorder.bottom));
+		}
+		if (pt.y > 0.0) {
+			BRect t(fLeftBorder.left, fLeftBorder.bottom - pt.y,
+					fLeftBorder.right, fLeftBorder.bottom);
+			dirty->Include(t);
+			t.Set(fRightBorder.left, fRightBorder.bottom - pt.y,
+				  fRightBorder.right, fRightBorder.bottom);
+			dirty->Include(t);
+			dirty->Include(fBottomBorder);
+		} else if (pt.y < 0.0) {
+			dirty->Include(fBottomBorder);
+		}
+	}
+
+	// resize tab and layout tab items
+	if (fTabRect.IsValid()) {
+		BRect oldTabRect(fTabRect);
+
+		float tabSize;
+		float maxLocation;
+		if (fLook != kLeftTitledWindowLook) {
+			tabSize = fRightBorder.right - fLeftBorder.left;
+		} else {
+			tabSize = fBottomBorder.bottom - fTopBorder.top;
+		}
+		maxLocation = tabSize - fMaxTabSize;
+		if (maxLocation < 0)
+			maxLocation = 0;
+
+		float tabOffset = floorf(fTabLocation * maxLocation);
+		float delta = tabOffset - fTabOffset;
+		fTabOffset = (uint32)tabOffset;
+		if (fLook != kLeftTitledWindowLook)
+			fTabRect.OffsetBy(delta, 0.0);
+		else
+			fTabRect.OffsetBy(0.0, delta);
+
+		if (tabSize < fMinTabSize)
+			tabSize = fMinTabSize;
+		if (tabSize > fMaxTabSize)
+			tabSize = fMaxTabSize;
+
+		if (fLook != kLeftTitledWindowLook && tabSize != fTabRect.Width()) {
+			fTabRect.right = fTabRect.left + tabSize;
+		} else if (fLook == kLeftTitledWindowLook && tabSize != fTabRect.Height()) {
+			fTabRect.bottom = fTabRect.top + tabSize;
+		}
+
+		if (oldTabRect != fTabRect) {
+			_LayoutTabItems(fTabRect);
+
+			if (dirty) {
+				// NOTE: the tab rect becoming smaller only would
+				// handled be the Desktop anyways, so it is sufficient
+				// to include it into the dirty region in it's
+				// final state
+				BRect redraw(fTabRect);
+				if (delta != 0.0) {
+					redraw = redraw | oldTabRect;
+					if (fLook != kLeftTitledWindowLook)
+						redraw.bottom++;
+					else
+						redraw.right++;
+				}
+				dirty->Include(redraw);
+			}
+		}
+	}
 }
 
-void BeDecorator::_DrawTitle(BRect r)
-{
-	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
-	// Designed simply to redraw the title when it has changed on
-	// the client side.
-	_drawdata.SetHighColor(_colors->window_tab_text);
-	_drawdata.SetLowColor((GetFocus())?_colors->window_tab:_colors->inactive_window_tab);
 
-	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
-	BString titlestr( GetTitle() );
-	
-	if(titlecount<titlestr.CountChars())
-	{
-		titlestr.Truncate(titlecount-1);
-		titlestr+="...";
-		titlecount+=2;
-	}
-	
-	// The text position needs tweaked when working as a floating window because the closerect placement
-	// is a little different. If it isn't moved, title placement looks really funky
-	if(_look==B_FLOATING_WINDOW_LOOK)
-	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_drawdata);
-	else	
-	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom),&_drawdata);
+bool
+BeDecorator::SetTabLocation(float location, BRegion* updateRegion)
+{
+	STRACE(("BeDecorator: Set Tab Location(%.1f)\n", location));
+	if (!fTabRect.IsValid())
+		return false;
+
+	if (location < 0)
+		location = 0;
+
+	float maxLocation = fRightBorder.right - fLeftBorder.left - fTabRect.Width();
+	if (location > maxLocation)
+		location = maxLocation;
+
+	float delta = location - fTabOffset;
+	if (delta == 0.0)
+		return false;
+
+	// redraw old rect (1 pix on the border also must be updated)
+	BRect trect(fTabRect);
+	trect.bottom++;
+	updateRegion->Include(trect);
+
+	fTabRect.OffsetBy(delta, 0);
+	fTabOffset = (int32)location;
+	_LayoutTabItems(fTabRect);
+
+	fTabLocation = maxLocation > 0.0 ? fTabOffset / maxLocation : 0.0;
+
+	// redraw new rect as well
+	trect = fTabRect;
+	trect.bottom++;
+	updateRegion->Include(trect);
+	return true;
 }
 
-void BeDecorator::_SetFocus(void)
+
+bool
+BeDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
-	// SetFocus() performs necessary duties for color swapping and
-	// other things when a window is deactivated or activated.
-	
-	if(GetFocus())
-	{
-		button_highcol.SetColor(tint_color(_colors->window_tab,B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
-		textcol=_colors->window_tab_text;
-	}
-	else
-	{
-		button_highcol.SetColor(tint_color(_colors->inactive_window_tab,B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab,B_DARKEN_1_TINT));
-		textcol=_colors->inactive_window_tab_text;
-	}
+	float tabLocation;
+	if (settings.FindFloat("tab location", &tabLocation) == B_OK)
+		return SetTabLocation(tabLocation, updateRegion);
+
+	return false;
 }
 
-void BeDecorator::Draw(BRect update)
+
+bool
+BeDecorator::GetSettings(BMessage* settings) const
 {
-	STRACE(("BeDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom));
+	if (!fTabRect.IsValid())
+		return false;
+
+	return settings->AddFloat("tab location", (float)fTabOffset) == B_OK;
+}
+
+
+// #pragma mark -
+
+
+void
+BeDecorator::Draw(BRect update)
+{
+	STRACE(("BeDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",
+		update.left, update.top, update.right, update.bottom));
 
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
@@ -382,489 +437,732 @@ void BeDecorator::Draw(BRect update)
 	_DrawTab(update);
 }
 
-void BeDecorator::Draw(void)
+// Draw
+void
+BeDecorator::Draw()
 {
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
-	_DrawFrame(_borderrect);
-	_DrawTab(_tabrect);
 
+	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
+	_DrawTab(fTabRect);
 }
 
-void BeDecorator::_DrawZoom(BRect r)
+// GetSizeLimits
+void
+BeDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
+								int32* maxWidth, int32* maxHeight) const
+{
+	if (fTabRect.IsValid())
+		*minWidth = (int32)roundf(max_c(*minWidth, fMinTabSize - 2 * fBorderWidth));
+	if (fResizeRect.IsValid())
+		*minHeight = (int32)roundf(max_c(*minHeight, fResizeRect.Height() - fBorderWidth));
+}
+
+// GetFootprint
+void
+BeDecorator::GetFootprint(BRegion *region)
+{
+	STRACE(("BeDecorator: Get Footprint\n"));
+	// This function calculates the decorator's footprint in coordinates
+	// relative to the layer. This is most often used to set a WindowLayer
+	// object's visible region.
+	if (!region)
+		return;
+
+	region->MakeEmpty();
+
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
+		return;
+
+	region->Include(fLeftBorder);
+	region->Include(fRightBorder);
+	region->Include(fTopBorder);
+	region->Include(fBottomBorder);
+	
+	if (fLook == B_BORDERED_WINDOW_LOOK)
+		return;
+
+	region->Include(fTabRect);
+
+	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
+		// include the rectangular resize knob on the bottom right
+		region->Include(BRect(fFrame.right - 13.0f, fFrame.bottom - 13.0f,
+							  fFrame.right, fFrame.bottom));
+	}
+}
+
+
+click_type
+BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
+{
+#ifdef DEBUG_DECORATOR
+	printf("BeDecorator: Clicked\n");
+	printf("\tPoint: (%.1f,%.1f)\n", pt.x,pt.y);
+	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
+#endif // DEBUG_DECORATOR
+
+	// TODO: have a real double-click mechanism, ie. take user settings into account
+	bigtime_t now = system_time();
+	if (buttons != 0) {
+		fWasDoubleClick = now - fLastClicked < 200000;
+		fLastClicked = now;
+	}
+
+	// In checking for hit test stuff, we start with the smallest rectangles the user might
+	// be clicking on and gradually work our way out into larger rectangles.
+	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(pt))
+		return DEC_CLOSE;
+
+	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(pt))
+		return DEC_ZOOM;
+
+	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(pt))
+		return DEC_RESIZE;
+
+	bool clicked = false;
+
+	// Clicking in the tab?
+	if (fTabRect.Contains(pt)) {
+		// tab sliding in any case if either shift key is held down
+		// except sliding up-down by moving mouse left-right would look strange
+		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
+			return DEC_SLIDETAB;
+
+		clicked = true;
+	} else if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
+		|| fTopBorder.Contains(pt) || fBottomBorder.Contains(pt)) {
+		// Clicked on border
+
+		// check resize area
+		if (!(fFlags & B_NOT_RESIZABLE)
+			&& (fLook == B_TITLED_WINDOW_LOOK
+				|| fLook == B_FLOATING_WINDOW_LOOK
+				|| fLook == B_MODAL_WINDOW_LOOK
+				|| fLook == kLeftTitledWindowLook)) {
+			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
+					   fBottomBorder.RightBottom());
+			if (temp.Contains(pt))
+				return DEC_RESIZE;
+		}
+
+		clicked = true;
+	}
+
+	if (clicked) {
+		// NOTE: On R5, windows are not moved to back if clicked inside the resize area
+		// with the second mouse button. So we check this after the check above
+		if (buttons == B_SECONDARY_MOUSE_BUTTON)
+			return DEC_MOVETOBACK;
+
+		if (fWasDoubleClick)
+			return DEC_MINIMIZE;
+
+		return DEC_DRAG;
+	}
+
+	// Guess user didn't click anything
+	return DEC_NONE;
+}
+
+
+void
+BeDecorator::_DoLayout()
+{
+	STRACE(("BeDecorator: Do Layout\n"));
+	// Here we determine the size of every rectangle that we use
+	// internally when we are given the size of the client rectangle.
+
+	bool hasTab = false;
+
+	switch (Look()) {
+		case B_MODAL_WINDOW_LOOK:
+			fBorderWidth = 5;
+			break;
+
+		case B_TITLED_WINDOW_LOOK:
+		case B_DOCUMENT_WINDOW_LOOK:
+			hasTab = true;
+			fBorderWidth = 5;
+			break;
+		case B_FLOATING_WINDOW_LOOK:
+		case kLeftTitledWindowLook:
+			hasTab = true;
+			fBorderWidth = 3;
+			break;
+
+		case B_BORDERED_WINDOW_LOOK:
+			fBorderWidth = 1;
+			break;
+
+		default:
+			fBorderWidth = 0;
+	}
+
+	// calculate our tab rect
+	if (hasTab) {
+		// distance from one item of the tab bar to another.
+		// In this case the text and close/zoom rects
+		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
+			? 10 : 18;
+
+		font_height fontHeight;
+		fDrawState.Font().GetHeight(fontHeight);
+
+		if (fLook != kLeftTitledWindowLook) {
+			fTabRect.Set(fFrame.left - fBorderWidth,
+				fFrame.top - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
+				((fFrame.right - fFrame.left) < 35.0 ?
+					fFrame.left + 35.0 : fFrame.right) + fBorderWidth,
+				fFrame.top - fBorderWidth);
+		} else {
+			fTabRect.Set(fFrame.left - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
+				fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
+				fFrame.bottom + fBorderWidth);
+		}
+
+		// format tab rect for a floating window - make the rect smaller
+		if (fLook == B_FLOATING_WINDOW_LOOK) {
+			fTabRect.InsetBy(0, 2);
+			fTabRect.OffsetBy(0, 2);
+		}
+
+		float offset;
+		float size;
+		_GetButtonSizeAndOffset(fTabRect, &offset, &size);
+
+		// fMinTabSize contains just the room for the buttons
+		fMinTabSize = 4.0 + fTextOffset;
+		if ((fFlags & B_NOT_CLOSABLE) == 0)
+			fMinTabSize += offset + size;
+		if ((fFlags & B_NOT_ZOOMABLE) == 0)
+			fMinTabSize += offset + size;
+
+		// fMaxTabSize contains fMinWidth + the width required for the title
+		fMaxTabSize = fDrawingEngine ? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title()),
+			&fDrawState)) : 0.0;
+		if (fMaxTabSize > 0.0)
+			fMaxTabSize += fTextOffset;
+		fMaxTabSize += fMinTabSize;
+
+		float tabSize = fLook != kLeftTitledWindowLook ? fFrame.Width() : fFrame.Height();
+		if (tabSize < fMinTabSize)
+			tabSize = fMinTabSize;
+		if (tabSize > fMaxTabSize)
+			tabSize = fMaxTabSize;
+
+		// layout buttons and truncate text
+		if (fLook != kLeftTitledWindowLook)
+			fTabRect.right = fTabRect.left + tabSize;
+		else
+			fTabRect.bottom = fTabRect.top + tabSize;
+	} else {
+		// no tab
+		fMinTabSize = 0.0;
+		fMaxTabSize = 0.0;
+		fTabRect.Set(0.0, 0.0, -1.0, -1.0);
+		fCloseRect.Set(0.0, 0.0, -1.0, -1.0);
+		fZoomRect.Set(0.0, 0.0, -1.0, -1.0);
+	}
+
+	// calculate left/top/right/bottom borders
+	if (fBorderWidth > 0) {
+		// NOTE: no overlapping, the left and right border rects
+		// don't include the corners!
+		fLeftBorder.Set(fFrame.left - fBorderWidth, fFrame.top,
+			fFrame.left - 1, fFrame.bottom);
+
+		fRightBorder.Set(fFrame.right + 1, fFrame.top ,
+			fFrame.right + fBorderWidth, fFrame.bottom);
+
+		fTopBorder.Set(fFrame.left - fBorderWidth, fFrame.top - fBorderWidth,
+			fFrame.right + fBorderWidth, fFrame.top - 1);
+
+		fBottomBorder.Set(fFrame.left - fBorderWidth, fFrame.bottom + 1,
+			fFrame.right + fBorderWidth, fFrame.bottom + fBorderWidth);
+	} else {
+		// no border
+		fLeftBorder.Set(0.0, 0.0, -1.0, -1.0);
+		fRightBorder.Set(0.0, 0.0, -1.0, -1.0);
+		fTopBorder.Set(0.0, 0.0, -1.0, -1.0);
+		fBottomBorder.Set(0.0, 0.0, -1.0, -1.0);
+	}
+
+	// calculate resize rect
+	fResizeRect.Set(fBottomBorder.right - 18.0, fBottomBorder.bottom - 18.0,
+					fBottomBorder.right, fBottomBorder.bottom);
+
+	if (hasTab) {
+		// make sure fTabOffset is within limits and apply it to
+		// the fTabRect
+		if (fTabOffset < 0)
+			fTabOffset = 0;
+		if (fTabLocation != 0.0
+			&& fTabOffset > (fRightBorder.right - fLeftBorder.left - fTabRect.Width()))
+			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left - fTabRect.Width());
+		fTabRect.OffsetBy(fTabOffset, 0);
+
+		// finally, layout the buttons and text within the tab rect
+		_LayoutTabItems(fTabRect);
+	}
+}
+
+// _DrawFrame
+void
+BeDecorator::_DrawFrame(BRect invalid)
+{
+	STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
+		invalid.right, invalid.bottom));
+
+	// NOTE: the DrawingEngine needs to be locked for the entire
+	// time for the clipping to stay valid for this decorator
+
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
+		return;
+
+	if (fBorderWidth <= 0)
+		return;
+
+	// Draw the border frame
+	BRect r = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
+	switch (fLook) {
+		case B_TITLED_WINDOW_LOOK:
+		case B_DOCUMENT_WINDOW_LOOK:
+		case B_MODAL_WINDOW_LOOK:
+		{
+			// top
+			if (invalid.Intersects(fTopBorder)) {
+				for (int8 i = 0; i < 5; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.right - i, r.top + i),
+										fFrameColors[i]);
+				}
+				if (fTabRect.IsValid()) {
+					// grey along the bottom of the tab (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
+										BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+										fFrameColors[2]);
+				}
+			}
+			// left
+			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
+				for (int8 i = 0; i < 5; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.left + i, r.bottom - i),
+										fFrameColors[i]);
+				}
+			}
+			// bottom
+			if (invalid.Intersects(fBottomBorder)) {
+				for (int8 i = 0; i < 5; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+				}
+			}
+			// right
+			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
+				for (int8 i = 0; i < 5; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+				}
+			}
+			break;
+		}
+		
+		case B_FLOATING_WINDOW_LOOK:
+		case kLeftTitledWindowLook:
+		{
+			// top
+			if (invalid.Intersects(fTopBorder)) {
+				for (int8 i = 0; i < 3; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.right - i, r.top + i),
+										fFrameColors[i * 2]);
+				}
+				if (fTabRect.IsValid() && fLook != kLeftTitledWindowLook) {
+					// grey along the bottom of the tab (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
+										BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+										fFrameColors[2]);
+				}
+			}
+			// left
+			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
+				for (int8 i = 0; i < 3; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.left + i, r.bottom - i),
+										fFrameColors[i * 2]);
+				}
+				if (fLook == kLeftTitledWindowLook && fTabRect.IsValid()) {
+					// grey along the right side of the tab (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(BPoint(fTabRect.right + 1, fTabRect.top + 2),
+										BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
+										fFrameColors[2]);
+				}
+			}
+			// bottom
+			if (invalid.Intersects(fBottomBorder)) {
+				for (int8 i = 0; i < 3; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+				}
+			}
+			// right
+			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
+				for (int8 i = 0; i < 3; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+				}
+			}
+			break;
+		}
+
+		case B_BORDERED_WINDOW_LOOK:
+			fDrawingEngine->StrokeRect(r, fFrameColors[5]);
+			break;
+
+		default:
+			// don't draw a border frame
+			break;
+	}
+
+	// Draw the resize thumb if we're supposed to
+	if (!(fFlags & B_NOT_RESIZABLE)) {
+		r = fResizeRect;
+
+		switch (fLook) {
+			case B_DOCUMENT_WINDOW_LOOK:
+			{
+				if (!invalid.Intersects(r))
+					break;
+
+				float x = r.right - 3;
+				float y = r.bottom - 3;
+
+				fDrawingEngine->FillRect(BRect(x - 13, y - 13, x, y), fFrameColors[2]);
+				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 15, y - 2),
+					fFrameColors[0]);
+				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 14, y - 1),
+					fFrameColors[1]);
+				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 2, y - 15),
+					fFrameColors[0]);
+				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 1, y - 14),
+					fFrameColors[1]);
+
+				if (!IsFocus())
+					break;
+
+				for (int8 i = 1; i <= 4; i++) {
+					for (int8 j = 1; j <= i; j++) {
+						BPoint		pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
+						BPoint		pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
+						fDrawingEngine->StrokePoint(pt1, fFrameColors[0]);
+						fDrawingEngine->StrokePoint(pt2, fFrameColors[1]);
+					}
+				}
+				break;
+			}
+
+			case B_TITLED_WINDOW_LOOK:
+			case B_FLOATING_WINDOW_LOOK:
+			case B_MODAL_WINDOW_LOOK:
+			case kLeftTitledWindowLook:
+			{
+				if (!invalid.Intersects(BRect(fRightBorder.right - 22,
+						fBottomBorder.bottom - 22, fRightBorder.right - 1,
+						fBottomBorder.bottom - 1)))
+					break;
+		
+				fDrawingEngine->StrokeLine(BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
+									BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
+									fFrameColors[0]);
+				fDrawingEngine->StrokeLine(BPoint(fRightBorder.right - 22, fBottomBorder.top),
+									BPoint(fRightBorder.right - 22, fBottomBorder.bottom - 1),
+									fFrameColors[0]);
+				break;
+			}
+
+			default:
+				// don't draw resize corner
+				break;
+		}
+	}
+}
+
+// _DrawTab
+void
+BeDecorator::_DrawTab(BRect invalid)
+{
+	STRACE(("_DrawTab(%.1f,%.1f,%.1f,%.1f)\n",
+			invalid.left, invalid.top, invalid.right, invalid.bottom));
+	// If a window has a tab, this will draw it and any buttons which are
+	// in it.
+	if (!fTabRect.IsValid() || !invalid.Intersects(fTabRect))
+		return;
+
+	// TODO: cache these
+	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),
+												 (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
+	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),
+												  B_DARKEN_2_TINT));
+
+	// outer frame
+	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(), fFrameColors[0]);
+	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(), fFrameColors[0]);
+	if (fLook != kLeftTitledWindowLook)
+		fDrawingEngine->StrokeLine(fTabRect.RightTop(),fTabRect.RightBottom(), fFrameColors[5]);
+	else
+		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),fTabRect.RightBottom(), fFrameColors[5]);
+
+	// bevel
+	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
+		BPoint(fTabRect.left + 1, fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
+		tabColorLight);
+	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
+		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1), fTabRect.top + 1),
+		tabColorLight);
+
+	if (fLook != kLeftTitledWindowLook) {
+		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
+			BPoint(fTabRect.right - 1, fTabRect.bottom), tabColorShadow);
+	} else {
+		fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
+			BPoint(fTabRect.right, fTabRect.bottom - 1), tabColorShadow);
+	}
+
+	// fill
+	if (fLook != kLeftTitledWindowLook) {
+		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
+			fTabRect.right - 2, fTabRect.bottom), fTabColor);
+	} else {
+		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
+			fTabRect.right, fTabRect.bottom - 2), fTabColor);
+	}
+
+	_DrawTitle(fTabRect);
+
+	// Draw the buttons if we're supposed to	
+	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
+		_DrawClose(fCloseRect);
+	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
+		_DrawZoom(fZoomRect);
+}
+
+// _DrawClose
+void
+BeDecorator::_DrawClose(BRect r)
+{
+	STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	// Just like DrawZoom, but for a close button
+	_DrawBlendedRect(r, GetClose());
+}
+
+// _DrawTitle
+void
+BeDecorator::_DrawTitle(BRect r)
+{
+	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+
+	fDrawState.SetHighColor(fTextColor);
+	fDrawState.SetLowColor(fTabColor);
+
+	// figure out position of text
+	font_height fontHeight;
+	fDrawState.Font().GetHeight(fontHeight);
+
+	BPoint titlePos;
+	if (fLook != kLeftTitledWindowLook) {
+		titlePos.x = fCloseRect.IsValid() ? fCloseRect.right + fTextOffset
+			: fTabRect.left + fTextOffset;
+		titlePos.y = floorf(((fTabRect.top + 2.0) + fTabRect.bottom + fontHeight.ascent
+			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+	} else {
+		titlePos.x = floorf(((fTabRect.left + 2.0) + fTabRect.right + fontHeight.ascent
+			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+		titlePos.y = fZoomRect.IsValid() ? fZoomRect.top - fTextOffset
+			: fTabRect.bottom - fTextOffset;
+	}
+
+	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos, &fDrawState);
+}
+
+// _DrawZoom
+void
+BeDecorator::_DrawZoom(BRect r)
 {
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
-	BRect zr( r );
-	
-	zr.left		+= 3.0;
-	zr.top		+= 3.0;
-	DrawBlendedRect( zr, GetZoom() );
-	
-	zr			= r;
-	zr.right	-= 5.0;
-	zr.bottom	-= 5.0;
-	DrawBlendedRect( zr, GetZoom() );
+
+	BRect zr(r);
+	zr.left += 3.0;
+	zr.top += 3.0;
+	_DrawBlendedRect(zr, GetZoom());
+
+	zr = r;
+	zr.right -= 5.0;
+	zr.bottom -= 5.0;
+	_DrawBlendedRect(zr, GetZoom());
 }
 
-void BeDecorator::_DrawClose(BRect r)
+// _SetFocus
+void
+BeDecorator::_SetFocus()
 {
-	STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
-	// Just like DrawZoom, but for a close button
-	DrawBlendedRect( r, GetClose());
+	// SetFocus() performs necessary duties for color swapping and
+	// other things when a window is deactivated or activated.
+	
+	if (IsFocus() || ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
+			&& (fFlags & B_AVOID_FOCUS) != 0)) {
+		fTabColor = UIColor(B_WINDOW_TAB_COLOR);
+		fTextColor = UIColor(B_WINDOW_TEXT_COLOR);
+		fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(), B_LIGHTEN_2_TINT));
+		fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(), B_DARKEN_1_TINT));
+
+//		fFrameColors[0].SetColor(152, 152, 152);
+//		fFrameColors[1].SetColor(255, 255, 255);
+		fFrameColors[2].SetColor(216, 216, 216);
+		fFrameColors[3].SetColor(136, 136, 136);
+//		fFrameColors[4].SetColor(152, 152, 152);
+//		fFrameColors[5].SetColor(96, 96, 96);
+	} else {
+		fTabColor = UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
+		fTextColor = UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
+		fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(), B_LIGHTEN_2_TINT));
+		fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(), B_DARKEN_1_TINT));
+
+//		fFrameColors[0].SetColor(152, 152, 152);
+//		fFrameColors[1].SetColor(255, 255, 255);
+		fFrameColors[2].SetColor(232, 232, 232);
+		fFrameColors[3].SetColor(148, 148, 148);
+//		fFrameColors[4].SetColor(152, 152, 152);
+//		fFrameColors[5].SetColor(96, 96, 96);
+	}
 }
 
-void BeDecorator::_DrawTab(BRect r)
-{
-	STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
-	// If a window has a tab, this will draw it and any buttons which are
-	// in it.
-	if(_look == B_NO_BORDER_WINDOW_LOOK || _look == B_BORDERED_WINDOW_LOOK)
-		return;
-	
-	_driver->FillRect(_tabrect,(GetFocus())?_colors->window_tab:_colors->inactive_window_tab);
-	
-	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),framecolors[2]);
-	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),framecolors[2]);
-
-	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),framecolors[4]);
-
-	_driver->StrokeLine( BPoint( _tabrect.left + 2, _tabrect.bottom ),
-						 BPoint( _tabrect.right - 2, _tabrect.bottom ),
-						 framecolors[1]);
-	
-	_DrawTitle(_tabrect);
-
-	// Draw the buttons if we're supposed to	
-	if(!(_flags & B_NOT_CLOSABLE))
-		_DrawClose(_closerect);
-	if(!(_flags & B_NOT_ZOOMABLE) && _look != B_MODAL_WINDOW_LOOK)
-		_DrawZoom(_zoomrect);
-}
-
-void BeDecorator::_SetColors(void)
+// _SetColors
+void
+BeDecorator::_SetColors()
 {
 	_SetFocus();
 }
 
-void BeDecorator::DrawBlendedRect(BRect r, bool down)
+
+/*!
+	\brief Draws a framed rectangle with a gradient.
+	\param down The rectangle should be drawn recessed or not
+*/
+void
+BeDecorator::_DrawBlendedRect(BRect r, bool down)
 {
-	// This bad boy is used to draw a rectangle with a gradient.
-	// Note that it is not part of the Decorator API - it's specific
-	// to just the BeDecorator. Called by DrawZoom and DrawClose
-
 	// Actually just draws a blended square
-	int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-	
+	int32 w = r.IntegerWidth();
+	int32 h = r.IntegerHeight();
+
 	RGBColor temprgbcol;
-	rgb_color halfcol, startcol, endcol;
-	float rstep,gstep,bstep,i;
+	rgb_color halfColor, startColor, endColor;
+	float rstep, gstep, bstep;
 
-	int steps=(w<h)?w:h;
+	int steps = w < h ? w : h;
 
-	if(down)
-	{
-		startcol=button_lowcol.GetColor32();
-		endcol=button_highcol.GetColor32();
-	}
-	else
-	{
-		startcol=button_highcol.GetColor32();
-		endcol=button_lowcol.GetColor32();
+	if (down) {
+		startColor = fButtonLowColor.GetColor32();
+		endColor = fButtonHighColor.GetColor32();
+	} else {
+		startColor = fButtonHighColor.GetColor32();
+		endColor = fButtonLowColor.GetColor32();
 	}
 
-	halfcol=MakeBlendColor(startcol,endcol,0.5);
+	halfColor = make_blend_color(startColor, endColor, 0.5);
 
-	rstep=float(startcol.red-halfcol.red)/steps;
-	gstep=float(startcol.green-halfcol.green)/steps;
-	bstep=float(startcol.blue-halfcol.blue)/steps;
+	rstep = float(startColor.red - halfColor.red) / steps;
+	gstep = float(startColor.green - halfColor.green) / steps;
+	bstep = float(startColor.blue - halfColor.blue) / steps;
 
-	for(i=0;i<=steps; i++)
-	{
-		temprgbcol.SetColor(uint8(startcol.red-(i*rstep)),
-			uint8(startcol.green-(i*gstep)),
-			uint8(startcol.blue-(i*bstep)));
+	for (int32 i = 0; i <= steps; i++) {
+		temprgbcol.SetColor(uint8(startColor.red - (i * rstep)),
+							uint8(startColor.green - (i * gstep)),
+							uint8(startColor.blue - (i * bstep)));
 		
-		_driver->StrokeLine(BPoint(r.left,r.top+i),
-			BPoint(r.left+i,r.top),temprgbcol);
+		fDrawingEngine->StrokeLine(BPoint(r.left, r.top + i),
+							BPoint(r.left + i, r.top), temprgbcol);
 
-		temprgbcol.SetColor(uint8(halfcol.red-(i*rstep)),
-			uint8(halfcol.green-(i*gstep)),
-			uint8(halfcol.blue-(i*bstep)));
+		temprgbcol.SetColor(uint8(halfColor.red - (i * rstep)),
+							uint8(halfColor.green - (i * gstep)),
+							uint8(halfColor.blue - (i * bstep)));
 
-		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-			BPoint(r.left+i,r.top+steps),temprgbcol);
+		fDrawingEngine->StrokeLine(BPoint(r.left + steps, r.top + i),
+							BPoint(r.left + i, r.top + steps), temprgbcol);
 	}
-
-//	_drawdata.SetHighColor(startcol);
-//	_driver->FillRect(r,&_drawdata,pat_solidhigh);
-	_driver->StrokeRect(r,framecolors[3]);
+	fDrawingEngine->StrokeRect(r, fFrameColors[3]);
 }
 
-void BeDecorator::_DrawFrame(BRect invalid)
+// _GetButtonSizeAndOffset
+void
+BeDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
+	float* _size) const
 {
+	*_offset = fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook ? 4.0 : 5.0;
 
-	// We need to test each side to determine whether or not it needs drawn. Additionally,
-	// we must clip the lines drawn by this function to the invalid rectangle we are given
-	
-	#ifdef USE_VIEW_FILL_HACK
-	_drawdata.SetHighColor(RGBColor(192,192,192 ));
-	_driver->FillRect(_frame,_drawdata.HighColor());
-	#endif
-
-	if(!borderwidth)
-		return;
-	
-	// Data specifically for the StrokeLineArray call.
-	int32 numlines=0, maxlines=20;
-	
-	LineArrayData linedata[maxlines], *currentdata;
-	
-	// For quick calculation of gradients for each side. Top is same as left, right is same as
-	// bottom
-//	int8 rightindices[borderwidth],leftindices[borderwidth];
-	int8 *rightindices=new int8[borderwidth],
-		*leftindices=new int8[borderwidth];
-	
-	if(borderwidth==5)
-	{
-		leftindices[0]=2;
-		leftindices[1]=0;
-		leftindices[2]=1;
-		leftindices[3]=3;
-		leftindices[4]=2;
-
-		rightindices[0]=2;
-		rightindices[1]=0;
-		rightindices[2]=1;
-		rightindices[3]=3;
-		rightindices[4]=4;
-	}
+	// "+ 2" so that the rects are centered within the solid area
+	// (without the 2 pixels for the top border)
+	if (fLook != kLeftTitledWindowLook)
+		*_size = tabRect.Height() - 2.0 * *_offset + 2.0f;
 	else
-	{
-		// TODO: figure out border colors for floating window look
-		leftindices[0]=2;
-		leftindices[1]=2;
-		leftindices[2]=1;
-		leftindices[3]=1;
-		leftindices[4]=4;
+		*_size = tabRect.Width() - 2.0 * *_offset + 2.0f;
+}
 
-		rightindices[0]=2;
-		rightindices[1]=2;
-		rightindices[2]=1;
-		rightindices[3]=1;
-		rightindices[4]=4;
-	}
-	
-	// Variables used in each calculation
-	int32 startx,endx,starty,endy,i;
-	bool topcorner,bottomcorner,leftcorner,rightcorner;
-	int8 step,colorindex;
-	BRect r;
-	BPoint start, end;
-	
-	// Right side
-	if(rightborder.Intersects(invalid))
-	{
-		
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		startx=(int32) MAX(invalid.left,rightborder.left);
-		endx=(int32) MIN(invalid.right,rightborder.right);
+// _LayoutTabItems
+void
+BeDecorator::_LayoutTabItems(const BRect& tabRect)
+{
+	float offset;
+	float size;
+	_GetButtonSizeAndOffset(tabRect, &offset, &size);
 
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=(rightborder);
-		r.bottom=r.top+borderwidth;
-		topcorner=invalid.Intersects(r);
+	// calulate close rect based on the tab rectangle
+	if (fLook != kLeftTitledWindowLook) {
+		fCloseRect.Set(tabRect.left + offset, tabRect.top + offset,
+			tabRect.left + offset + size, tabRect.top + offset + size);
 
-		r=rightborder;
-		r.top=r.bottom-borderwidth;
-		bottomcorner=invalid.Intersects(r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=startx+1; i<=endx; i++)
-		{
-			start.x=end.x=i;
-			
-			if(topcorner)
-			{
-				start.y=rightborder.top+(borderwidth-(i-rightborder.left));
-				start.y=MAX(start.y,invalid.top);
-			}
-			else
-				start.y=MAX(start.y+borderwidth,invalid.top);
+		fZoomRect.Set(tabRect.right - offset - size, tabRect.top + offset,
+			tabRect.right - offset, tabRect.top + offset + size);
 
-			if(bottomcorner)
-			{
-				end.y=rightborder.bottom-(borderwidth-(i-rightborder.left));
-				end.y=MIN(end.y,invalid.bottom);
-			}
-			else
-				end.y=MIN(end.y-borderwidth,invalid.bottom);
-							
-			// Make the appropriate 
-			currentdata=&(linedata[numlines]);
-			currentdata->pt1=start;
-			currentdata->pt2=end;
-			currentdata->color=framecolors[rightindices[colorindex]].GetColor32();
-			colorindex+=step;
-			numlines++;
-		}
+		// hidden buttons have no width
+		if ((Flags() & B_NOT_CLOSABLE) != 0)
+			fCloseRect.right = fCloseRect.left - offset;
+		if ((Flags() & B_NOT_ZOOMABLE) != 0)
+			fZoomRect.left = fZoomRect.right + offset;
+	} else {
+		fCloseRect.Set(tabRect.left + offset, tabRect.top + offset,
+			tabRect.left + offset + size, tabRect.top + offset + size);
+
+		fZoomRect.Set(tabRect.left + offset, tabRect.bottom - offset - size,
+			tabRect.left + size + offset, tabRect.bottom - offset);
+
+		// hidden buttons have no height
+		if ((Flags() & B_NOT_CLOSABLE) != 0)
+			fCloseRect.bottom = fCloseRect.top - offset;
+		if ((Flags() & B_NOT_ZOOMABLE) != 0)
+			fZoomRect.top = fZoomRect.bottom + offset;
 	}
 
-	// Left side
-	if(leftborder.Intersects(invalid))
-	{
-		
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		startx=(int32) MAX(invalid.left,leftborder.left);
-		endx=(int32) MIN(invalid.right,leftborder.right);
+	// calculate room for title
+	// ToDo: the +2 is there because the title often appeared
+	//	truncated for no apparent reason - OTOH the title does
+	//	also not appear perfectly in the middle
+	if (fLook != kLeftTitledWindowLook)
+		size = (fZoomRect.left - fCloseRect.right) - fTextOffset * 2 + 2;
+	else
+		size = (fZoomRect.top - fCloseRect.bottom) - fTextOffset * 2 + 2;
 
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=leftborder;
-		r.bottom=r.top+borderwidth;
-		topcorner=invalid.Intersects(r);
-
-		r=leftborder;
-		r.top=r.bottom-borderwidth;
-		bottomcorner=invalid.Intersects(r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=startx; i<endx; i++)
-		{
-			start.x=end.x=i;
-			
-			if(topcorner)
-			{
-				start.y=leftborder.top+(i-leftborder.left);
-				start.y=MAX(start.y,invalid.top);
-			}
-			else
-				start.y=MAX(start.y+borderwidth,invalid.top);
-
-			if(bottomcorner)
-			{
-				end.y=leftborder.bottom-(i-leftborder.left);
-				end.y=MIN(end.y,invalid.bottom);
-			}
-			else
-				end.y=MIN(end.y-borderwidth,invalid.bottom);
-							
-			// Make the appropriate 
-			currentdata=&(linedata[numlines]);
-			currentdata->pt1=start;
-			currentdata->pt2=end;
-			currentdata->color=framecolors[leftindices[colorindex]].GetColor32();
-			colorindex+=step;
-			numlines++;
-		}
-	}
-
-	// Top side
-	if(topborder.Intersects(invalid))
-	{
-		
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		starty=(int32) MAX(invalid.top,topborder.top);
-		endy=(int32) MIN(invalid.bottom,topborder.bottom);
-
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=topborder;
-		r.bottom=r.top+borderwidth;
-		r.right=r.left+borderwidth;
-		leftcorner=invalid.Intersects(r);
-
-		r=topborder;
-		r.top=r.bottom-borderwidth;
-		r.left=r.right-borderwidth;
-		
-		rightcorner=invalid.Intersects(r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=starty; i<endy; i++)
-		{
-			start.y=end.y=i;
-			
-			if(leftcorner)
-			{
-				start.x=topborder.left+(i-topborder.top);
-				start.x=MAX(start.x,invalid.left);
-			}
-			else
-				start.x=MAX(start.x+borderwidth,invalid.left);
-
-			if(rightcorner)
-			{
-				end.x=topborder.right-(i-topborder.top);
-				end.x=MIN(end.x,invalid.right);
-			}
-			else
-				end.x=MIN(end.x-borderwidth,invalid.right);
-							
-			// Make the appropriate 
-			currentdata=&(linedata[numlines]);
-			currentdata->pt1=start;
-			currentdata->pt2=end;
-			
-			// Top side uses the same color order as the left one
-			currentdata->color=framecolors[leftindices[colorindex]].GetColor32();
-			colorindex+=step;
-			numlines++;
-		}
-	}
-
-	// Bottom side
-	if(bottomborder.Intersects(invalid))
-	{
-		
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		starty=(int32) MAX(invalid.top,bottomborder.top);
-		endy=(int32) MIN(invalid.bottom,bottomborder.bottom);
-
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=bottomborder;
-		r.bottom=r.top+borderwidth;
-		r.right=r.left+borderwidth;
-		leftcorner=invalid.Intersects(r);
-
-		r=bottomborder;
-		r.top=r.bottom-borderwidth;
-		r.left=r.right-borderwidth;
-		
-		rightcorner=invalid.Intersects(r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=starty+1; i<=endy; i++)
-		{
-			start.y=end.y=i;
-			
-			if(leftcorner)
-			{
-				start.x=bottomborder.left+(borderwidth-(i-bottomborder.top));
-				start.x=MAX(start.x,invalid.left);
-			}
-			else
-				start.x=MAX(start.x+borderwidth,invalid.left);
-
-			if(rightcorner)
-			{
-				end.x=bottomborder.right-(borderwidth-(i-bottomborder.top));
-				end.x=MIN(end.x,invalid.right);
-			}
-			else
-				end.x=MIN(end.x-borderwidth,invalid.right);
-							
-			// Make the appropriate 
-			currentdata=&(linedata[numlines]);
-			currentdata->pt1=start;
-			currentdata->pt2=end;
-			
-			// Top side uses the same color order as the right one
-			currentdata->color=framecolors[rightindices[colorindex]].GetColor32();
-			colorindex+=step;
-			numlines++;
-		}
-	}
-
-	_driver->StrokeLineArray(numlines,linedata,&_drawdata);
-	
-	delete [] rightindices;
-	delete [] leftindices;
-	
-	// Draw the resize thumb if we're supposed to
-	if(!(_flags & B_NOT_RESIZABLE))
-	{
-		r=_resizerect;
-
-//		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-		
-		// This code is strictly for B_DOCUMENT_WINDOW looks
-		if(_look==B_DOCUMENT_WINDOW_LOOK)
-		{
-			r.right-=4;
-			r.bottom-=4;
-
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),framecolors[2]);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),framecolors[2]);
-
-			r.OffsetBy(1,1);
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),framecolors[0]);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),framecolors[0]);
-			
-			r.OffsetBy(1,1);
-			_driver->FillRect(r,framecolors[1]);
-			
-/*			r.left+=2;
-			r.top+=2;
-			r.right-=3;
-			r.bottom-=3;
-*/
-			r.right-=2;
-			r.bottom-=2;
-			int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-		
-			rgb_color halfcol, startcol, endcol;
-			float rstep,gstep,bstep,i;
-			
-			int steps=(w<h)?w:h;
-		
-			startcol=framecolors[0].GetColor32();
-			endcol=framecolors[4].GetColor32();
-		
-			halfcol=framecolors[0].MakeBlendColor(framecolors[4],0.5).GetColor32();
-		
-			rstep=(startcol.red-halfcol.red)/steps;
-			gstep=(startcol.green-halfcol.green)/steps;
-			bstep=(startcol.blue-halfcol.blue)/steps;
-			
-			// Explicitly locking the driver is normally unnecessary. However, we need to do
-			// this because we are rapidly drawing a series of calls which would not necessarily
-			// draw correctly if we didn't do so.
-			_driver->Lock();
-			for(i=0;i<=steps; i++)
-			{
-				_drawdata.SetHighColor(RGBColor(uint8(startcol.red-(i*rstep)),
-					uint8(startcol.green-(i*gstep)),
-					uint8(startcol.blue-(i*bstep))));
-				
-				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),_drawdata.HighColor());
-		
-				_drawdata.SetHighColor(RGBColor(uint8(halfcol.red-(i*rstep)),
-					uint8(halfcol.green-(i*gstep)),
-					uint8(halfcol.blue-(i*bstep))));
-				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),_drawdata.HighColor());			
-			}
-			_driver->Unlock();
-//			_drawdata.SetHighColor(framecolors[4]);
-//			_driver->StrokeRect(r,&_drawdata,pat_solidhigh);
-		}
-		else
-		{
-			_drawdata.SetHighColor(framecolors[4]);
-			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
-				_drawdata.HighColor());
-			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
-				_drawdata.HighColor());
-		}
-	}
+	fTruncatedTitle = Title();
+	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, size);
+	fTruncatedTitleLength = fTruncatedTitle.Length();
 }
 
 extern "C" float get_decorator_version(void)
@@ -872,7 +1170,8 @@ extern "C" float get_decorator_version(void)
 	return 1.00;
 }
 
-extern "C" Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
+extern "C" Decorator *(create_decorator)(DesktopSettings &desktopSetting, BRect rec,
+										window_look loo, uint32 flag)
 {
-	return new BeDecorator(rect,wlook,wfeel,wflags);
+	return (new BeDecorator(desktopSetting, rec, loo, flag));
 }
