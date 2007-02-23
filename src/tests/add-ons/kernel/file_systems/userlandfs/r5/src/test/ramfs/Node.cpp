@@ -80,23 +80,44 @@ Node::InitCheck() const
 	return (fVolume && fID >= 0 ? B_OK : B_NO_INIT);
 }
 
+// AddReference
+status_t
+Node::AddReference()
+{
+	if (++fRefCount == 1) {
+		status_t error = GetVolume()->NewNode(this);
+		if (error != B_OK) {
+			fRefCount--;
+			return error;
+		}
+
+		fIsKnownToVFS = true;
+	}
+
+	return B_OK;
+}
+	
+// RemoveReference
+void
+Node::RemoveReference()
+{
+	if (--fRefCount == 0) {
+		GetVolume()->RemoveNode(this);
+		fRefCount++;
+	}
+}
+
 // Link
 status_t
 Node::Link(Entry *entry)
 {
 PRINT(("Node[%Ld]::Link(): %ld ->...\n", fID, fRefCount));
-	status_t error = B_OK;
 	fReferrers.Insert(entry);
-	if (++fRefCount == 1) {
-//		error = GetVolume()->NodeAdded(this);
-		error = GetVolume()->NewNode(this);
-		if (error == B_OK)
-			fIsKnownToVFS = true;
-		else {
-			fRefCount--;
-			fReferrers.Remove(entry);
-		}
-	}
+
+	status_t error = AddReference();
+	if (error != B_OK)
+		fReferrers.Remove(entry);
+
 	return error;
 }
 
@@ -105,16 +126,10 @@ status_t
 Node::Unlink(Entry *entry)
 {
 PRINT(("Node[%Ld]::Unlink(): %ld ->...\n", fID, fRefCount));
-	status_t error = B_OK;
-	if (--fRefCount == 0) {
-//		error = GetVolume()->NodeRemoved(this);
-		error = GetVolume()->RemoveNode(this);
-		if (error != B_OK)
-			fRefCount++;
-	}
-	if (error == B_OK)
-		fReferrers.Remove(entry);
-	return error;
+	RemoveReference();
+	fReferrers.Remove(entry);
+
+	return B_OK;
 }
 
 // SetMTime

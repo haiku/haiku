@@ -32,7 +32,7 @@ Directory::~Directory()
 status_t
 Directory::Link(Entry *entry)
 {
-	if (GetRefCount() == 0)
+	if (fReferrers.IsEmpty())
 		return Node::Link(entry);
 	return B_IS_A_DIRECTORY;
 }

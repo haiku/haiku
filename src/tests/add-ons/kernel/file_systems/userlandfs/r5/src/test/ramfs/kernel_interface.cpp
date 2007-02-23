@@ -873,15 +873,18 @@ ramfs_rename(void *ns, void *_oldDir, const char *oldName,
 	Directory *oldDir = dynamic_cast<Directory*>((Node*)_oldDir);
 	Directory *newDir = dynamic_cast<Directory*>((Node*)_newDir);
 	status_t error = B_OK;
+
 	// check name
 	if (!oldName || *oldName == '\0'
 		|| !strcmp(oldName, ".")  || !strcmp(oldName, "..")
 		|| !newName || *newName == '\0'
 		|| !strcmp(newName, ".")  || !strcmp(newName, "..")) {
 		SET_ERROR(error, B_BAD_VALUE);
+
 	// check nodes
 	} else if (!oldDir || !newDir) {
 		SET_ERROR(error, B_BAD_VALUE);
+
 	// check if the entry isn't actually moved or renamed
 	} else if (oldDir == newDir && !strcmp(oldName, newName)) {
 		SET_ERROR(error, B_BAD_VALUE);
@@ -890,14 +893,17 @@ FUNCTION(("old dir: %Ld, old name: `%s', new dir: %Ld, new name: `%s'\n",
 oldDir->GetID(), oldName, newDir->GetID(), newName));
 		NodeMTimeUpdater mTimeUpdater1(oldDir);
 		NodeMTimeUpdater mTimeUpdater2(newDir);
+
 		// target directory deleted?
 		if (is_vnode_removed(volume->GetID(), newDir->GetID()) > 0)
 			SET_ERROR(error, B_NOT_ALLOWED);
+
 		// check directory write permissions
 		if (error == B_OK)
 			error = oldDir->CheckPermissions(ACCESS_W);
 		if (error == B_OK)
 			error = newDir->CheckPermissions(ACCESS_W);
+
 		Node *node = NULL;
 		Entry *entry = NULL;
 		if (error == B_OK) {
@@ -919,6 +925,7 @@ oldDir->GetID(), oldName, newDir->GetID(), newName));
 					}
 				}
 			}
+
 			// check the target directory situation
 			Node *clobberNode = NULL;
 			Entry *clobberEntry = NULL;
@@ -931,33 +938,47 @@ oldDir->GetID(), oldName, newDir->GetID(), newName));
 					}
 				}
 			}
+
 			// do the job
 			if (error == B_OK) {
-				if (clobberEntry) {
-					error = clobberEntry->Link(node);
-					// notify listeners
+				// temporarily acquire an additional reference to make
+				// sure the node isn't deleted when we remove the entry
+				error = node->AddReference();
+				if (error == B_OK) {
+					// delete the original entry
+					error = oldDir->DeleteEntry(entry);
 					if (error == B_OK) {
-						notify_listener(B_ENTRY_REMOVED,
-							volume->GetID(), newDir->GetID(), 0,
-							clobberNode->GetID(), NULL);
+						// create the new one/relink the target entry
+						if (clobberEntry)
+							error = clobberEntry->Link(node);
+						else
+							error = newDir->CreateEntry(node, newName);
+
+						if (error == B_OK) {
+							// send a "removed" notification for the clobbered
+							// entry
+							if (clobberEntry) {
+								notify_listener(B_ENTRY_REMOVED,
+									volume->GetID(), newDir->GetID(), 0,
+									clobberNode->GetID(), newName);
+							}
+						} else {
+							// try to recreate the original entry, in case of
+							// failure
+							newDir->CreateEntry(node, oldName);
+						}
 					}
-				} else {
-					Entry *newEntry = NULL;
-// TODO: If the node is a directory, this does fail!!!
-					error = newDir->CreateEntry(node, newName, &newEntry);
-					if (error == B_OK) {
-						error = oldDir->DeleteEntry(entry);
-						if (error != B_OK)
-							newDir->DeleteEntry(newEntry);
-					}
+					node->RemoveReference();
 				}
 			}
+
 			// release the entries
 			if (clobberEntry)
 				volume->PutNode(clobberNode);
 			if (entry)
 				volume->PutNode(node);
 		}
+
 		// notify listeners
 		if (error == B_OK) {
 			notify_listener(B_ENTRY_MOVED, volume->GetID(), oldDir->GetID(),
@@ -965,6 +986,7 @@ oldDir->GetID(), oldName, newDir->GetID(), newName));
 		}
 	} else
 		SET_ERROR(error, B_ERROR);
+
 	RETURN_ERROR(error);
 }
 

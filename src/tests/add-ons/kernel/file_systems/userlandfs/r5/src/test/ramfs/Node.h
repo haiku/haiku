@@ -41,9 +41,12 @@ public:
 
 	inline vnode_id GetID() const	{ return fID; }
 
+	status_t AddReference();
+	void RemoveReference();
+	int32 GetRefCount()	{ return fRefCount; }
+
 	virtual status_t Link(Entry *entry);
 	virtual status_t Unlink(Entry *entry);
-	int32 GetRefCount()	{ return fRefCount; }
 
 	inline bool IsDirectory() const	{ return S_ISDIR(fMode); }
 	inline bool IsFile() const		{ return S_ISREG(fMode); }
