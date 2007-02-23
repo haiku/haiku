@@ -20,6 +20,9 @@
 #include "ServerConfig.h"
 #include "DecorManager.h"
 
+typedef float get_version(void);
+typedef Decorator* create_decorator(DesktopSettings& desktopSettings, BRect rect,
+	window_look look, uint32 flags);
 
 // Globals
 DecorManager gDecorManager;

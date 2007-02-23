@@ -165,8 +165,8 @@ class Decorator {
 };
 
 // add-on stuff
-typedef float get_version(void);
-typedef Decorator* create_decorator(DesktopSettings& desktopSettings, BRect rect,
-	window_look look, uint32 flags);
+//typedef float get_version(void);
+//typedef Decorator* create_decorator(DesktopSettings& desktopSettings, BRect rect,
+//	window_look look, uint32 flags);
 
 #endif	/* _DECORATOR_H_ */
