@@ -163,8 +163,8 @@ copy_attributes(int fromFd, int toFd)
 static int
 copy_attributes_by_name(const char *from, const char *to, int resolveLinks)
 {
-	int fromFd, toFd;
-	printf("%s -> %s\n", from, to);
+	int fromFd, toFd, result;
+
 	fromFd = open(from, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
 	if (fromFd < 0)
 		return -1;
@@ -175,7 +175,12 @@ copy_attributes_by_name(const char *from, const char *to, int resolveLinks)
 		return -1;
 	}
 
-	return copy_attributes(fromFd, toFd);
+	result = copy_attributes(fromFd, toFd);
+	
+	close(fromFd);
+	close(toFd);
+
+	return result;
 }
 
 
