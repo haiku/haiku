@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	ufs_mount ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 ] ;
+local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
+
+SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+
+Application <test>ufs_mount : ufs_mount.cpp : be ;
+

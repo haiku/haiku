@@ -1,0 +1,54 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
+	server ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 ] ;
+local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src private ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"UserlandFSServer\\\"" ;
+
+Application <test>UserlandFSServer
+	: AreaSupport.cpp
+	  Debug.cpp
+	  DispatcherDefs.cpp
+	  driver_settings.c
+	  LazyInitializable.cpp
+	  Locker.cpp
+	  ObjectTracker.cpp
+	  Port.cpp
+	  Referencable.cpp
+	  Request.cpp
+	  RequestAllocator.cpp
+	  RequestHandler.cpp
+	  RequestPort.cpp
+	  Requests.cpp
+	  SingleReplyRequestHandler.cpp
+	  String.cpp
+
+	  cache.c
+	  sysdep.c
+
+	  FileSystem.cpp
+	  kernel_emu.cpp
+	  KernelUserFileSystem.cpp
+	  KernelUserVolume.cpp
+	  main.cpp
+	  RequestThread.cpp
+	  ServerDefs.cpp
+	  UserFileSystem.cpp
+	  UserlandFSDispatcher.cpp
+	  UserlandFSServer.cpp
+	  UserlandRequestHandler.cpp
+	  UserVolume.cpp
+	: be
+;
