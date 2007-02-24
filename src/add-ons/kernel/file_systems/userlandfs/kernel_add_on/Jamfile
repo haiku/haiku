@@ -1,18 +1,15 @@
-SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
-	kernel_add_on ;
+SubDir HAIKU_TOP src add-ons kernel file_systems userlandfs kernel_add_on ;
 
-SetSubDirSupportedPlatforms r5 bone dano ;
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	userlandfs  ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
-	file_systems userlandfs r5 ] ;
-local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
-
-SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+#SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
-SEARCH_SOURCE += [ FDirName $(userlandFSTop) src private ] ;
-SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 DEFINES += DEBUG_APP="\\\"userlandfs\\\"" ;
 
@@ -22,7 +19,7 @@ if $(OSPLAT) = X86 {
 	SubDirC++Flags -include [ FDirName $(SUBDIR) kernel-cpp.h ] ;
 }
 
-KernelAddon <test>userlandfs
+KernelAddon userlandfs
 	: AreaSupport.cpp
 	  Debug.cpp
 	  DispatcherDefs.cpp
@@ -49,9 +46,7 @@ KernelAddon <test>userlandfs
 	  UserlandFS.cpp
 	  Volume.cpp
 
-	  $(kernelC++)
+#	  $(kernelC++)
 
-	: $(HAIKU_GCC_LIBGCC)
-		# TARGET_GCC_LIBGCC is not defined for TARGET_PLATFORM != haiku,
-		# but the compiler is the same in this case anyway.
+	: $(TARGET_GCC_LIBGCC)
 ;

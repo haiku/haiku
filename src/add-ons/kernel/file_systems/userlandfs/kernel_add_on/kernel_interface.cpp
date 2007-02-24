@@ -9,221 +9,21 @@
 #include "UserlandFS.h"
 #include "Volume.h"
 
-#if USER
-
-// disable_interrupts
-static inline
-cpu_status
-disable_interrupts()
-{
-	return 0;
-}
-
-// restore_interrupts
-static inline
-void
-restore_interrupts(cpu_status status)
-{
-}
-
-#endif	// USER
-
-// #pragma mark -
-// #pragma mark ----- prototypes -----
-
-extern "C" {
-
-// fs
-static int userlandfs_mount(nspace_id nsid, const char *device, ulong flags,
-				void *parameters, size_t len, void **data, vnode_id *rootID);
-static int userlandfs_unmount(void *ns);
-static int userlandfs_initialize(const char *deviceName, void *parameters,
-				size_t len);
-static int userlandfs_sync(void *ns);
-static int userlandfs_read_fs_stat(void *ns, struct fs_info *info);
-static int userlandfs_write_fs_stat(void *ns, struct fs_info *info, long mask);
-
-// vnodes
-static int userlandfs_read_vnode(void *ns, vnode_id vnid, char reenter,
-				void **node);
-static int userlandfs_write_vnode(void *ns, void *node, char reenter);
-static int userlandfs_remove_vnode(void *ns, void *node, char reenter);
-
-// nodes
-static int userlandfs_fsync(void *ns, void *node);
-static int userlandfs_read_stat(void *ns, void *node, struct stat *st);
-static int userlandfs_write_stat(void *ns, void *node, struct stat *st,
-				long mask);
-static int userlandfs_access(void *ns, void *node, int mode);
-
-// files
-static int userlandfs_create(void *ns, void *dir, const char *name,
-				int openMode, int mode, vnode_id *vnid, void **cookie);
-static int userlandfs_open(void *ns, void *node, int openMode, void **cookie);
-static int userlandfs_close(void *ns, void *node, void *cookie);
-static int userlandfs_free_cookie(void *ns, void *node, void *cookie);
-static int userlandfs_read(void *ns, void *node, void *cookie, off_t pos,
-				void *buffer, size_t *bufferSize);
-static int userlandfs_write(void *ns, void *node, void *cookie, off_t pos,
-				const void *buffer, size_t *bufferSize);
-static int userlandfs_ioctl(void *ns, void *node, void *cookie, int cmd,
-				void *buffer, size_t bufferSize);
-static int userlandfs_setflags(void *ns, void *node, void *cookie, int flags);
-static int userlandfs_select(void *ns, void *node, void *cookie, uint8 event,
-				uint32 ref, selectsync *sync);
-static int userlandfs_deselect(void *ns, void *node, void *cookie, uint8 event,
-				selectsync *sync);
-
-// hard links / symlinks
-static int userlandfs_link(void *ns, void *dir, const char *name, void *node);
-static int userlandfs_unlink(void *ns, void *dir, const char *name);
-static int userlandfs_symlink(void *ns, void *dir, const char *name,
-				const char *path);
-static int userlandfs_read_link(void *ns, void *node, char *buffer,
-				size_t *bufferSize);
-static int userlandfs_rename(void *ns, void *oldDir, const char *oldName,
-				void *newDir, const char *newName);
-
-// directories
-static int userlandfs_mkdir(void *ns, void *dir, const char *name, int mode);
-static int userlandfs_rmdir(void *ns, void *dir, const char *name);
-static int userlandfs_open_dir(void *ns, void *node, void **cookie);
-static int userlandfs_close_dir(void *ns, void *node, void *cookie);
-static int userlandfs_free_dir_cookie(void *ns, void *node, void *cookie);
-static int userlandfs_read_dir(void *ns, void *node, void *cookie,
-				long *count, struct dirent *buffer, size_t bufferSize);
-static int userlandfs_rewind_dir(void *ns, void *node, void *cookie);
-static int userlandfs_walk(void *ns, void *dir, const char *entryName,
-				char **resolvedPath, vnode_id *vnid);
-
-// attributes
-static int userlandfs_open_attrdir(void *ns, void *node, void **cookie);
-static int userlandfs_close_attrdir(void *ns, void *node, void *cookie);
-static int userlandfs_free_attrdir_cookie(void *ns, void *node, void *cookie);
-static int userlandfs_read_attrdir(void *ns, void *node, void *cookie,
-				long *count, struct dirent *buffer, size_t bufferSize);
-static int userlandfs_read_attr(void *ns, void *node, const char *name,
-				int type, void *buffer, size_t *bufferSize, off_t pos);
-static int userlandfs_rewind_attrdir(void *ns, void *node, void *cookie);
-static int userlandfs_write_attr(void *ns, void *node, const char *name,
-				int type, const void *buffer, size_t *bufferSize, off_t pos);
-static int userlandfs_remove_attr(void *ns, void *node, const char *name);
-static int userlandfs_rename_attr(void *ns, void *node, const char *oldName,
-				const char *newName);
-static int userlandfs_stat_attr(void *ns, void *node, const char *name,
-				struct attr_info *attrInfo);
-
-// indices
-static int userlandfs_open_indexdir(void *ns, void **cookie);
-static int userlandfs_close_indexdir(void *ns, void *cookie);
-static int userlandfs_free_indexdir_cookie(void *ns, void *node, void *cookie);
-static int userlandfs_read_indexdir(void *ns, void *cookie, long *count,
-				struct dirent *buffer, size_t bufferSize);
-static int userlandfs_rewind_indexdir(void *ns, void *cookie);
-static int userlandfs_create_index(void *ns, const char *name, int type, int flags);
-static int userlandfs_remove_index(void *ns, const char *name);
-static int userlandfs_rename_index(void *ns, const char *oldName,
-				const char *newName);
-static int userlandfs_stat_index(void *ns, const char *name,
-				struct index_info *indexInfo);
-
-// queries
-static int userlandfs_open_query(void *ns, const char *queryString, ulong flags,
-				port_id port, long token, void **cookie);
-static int userlandfs_close_query(void *ns, void *cookie);
-static int userlandfs_free_query_cookie(void *ns, void *node, void *cookie);
-static int userlandfs_read_query(void *ns, void *cookie, long *count,
-				struct dirent *buffer, size_t bufferSize);
-
-} // extern "C"
-
-/* vnode_ops struct. Fill this in to tell the kernel how to call
-	functions in your driver.
-*/
-vnode_ops fs_entry =  {
-	&userlandfs_read_vnode,			// read_vnode
-	&userlandfs_write_vnode,		// write_vnode
-	&userlandfs_remove_vnode,		// remove_vnode
-	NULL,							// secure_vnode (not needed)
-	&userlandfs_walk,				// walk
-	&userlandfs_access,				// access
-	&userlandfs_create,				// create
-	&userlandfs_mkdir,				// mkdir
-	&userlandfs_symlink,			// symlink
-	&userlandfs_link,				// link
-	&userlandfs_rename,				// rename
-	&userlandfs_unlink,				// unlink
-	&userlandfs_rmdir,				// rmdir
-	&userlandfs_read_link,			// readlink
-	&userlandfs_open_dir,			// opendir
-	&userlandfs_close_dir,			// closedir
-	&userlandfs_free_dir_cookie,	// free_dircookie
-	&userlandfs_rewind_dir,			// rewinddir
-	&userlandfs_read_dir,			// readdir
-	&userlandfs_open,				// open file
-	&userlandfs_close,				// close file
-	&userlandfs_free_cookie,		// free cookie
-	&userlandfs_read,				// read file
-	&userlandfs_write,				// write file
-	NULL,							// readv
-	NULL,							// writev
-	&userlandfs_ioctl,				// ioctl
-	&userlandfs_setflags,			// setflags file
-	&userlandfs_read_stat,			// read stat
-	&userlandfs_write_stat,			// write stat
-	&userlandfs_fsync,				// fsync
-	&userlandfs_initialize,			// initialize
-	&userlandfs_mount,				// mount
-	&userlandfs_unmount,			// unmount
-	&userlandfs_sync,				// sync
-	&userlandfs_read_fs_stat,		// read fs stat
-	&userlandfs_write_fs_stat,		// write fs stat
-	&userlandfs_select,				// select
-	&userlandfs_deselect,			// deselect
-
-	&userlandfs_open_indexdir,		// open index dir
-	&userlandfs_close_indexdir,		// close index dir
-	&userlandfs_free_indexdir_cookie,	// free index dir cookie
-	&userlandfs_rewind_indexdir,	// rewind index dir
-	&userlandfs_read_indexdir,		// read index dir
-	&userlandfs_create_index,		// create index
-	&userlandfs_remove_index,		// remove index
-	&userlandfs_rename_index,		// rename index
-	&userlandfs_stat_index,			// stat index
-
-	&userlandfs_open_attrdir,		// open attr dir
-	&userlandfs_close_attrdir,		// close attr dir
-	&userlandfs_free_attrdir_cookie,	// free attr dir cookie
-	&userlandfs_rewind_attrdir,		// rewind attr dir
-	&userlandfs_read_attrdir,		// read attr dir
-	&userlandfs_write_attr,			// write attr
-	&userlandfs_read_attr,			// read attr
-	&userlandfs_remove_attr,		// remove attr
-	&userlandfs_rename_attr,		// rename attr
-	&userlandfs_stat_attr,			// stat attr
-
-	&userlandfs_open_query,			// open query
-	&userlandfs_close_query,		// close query
-	&userlandfs_free_query_cookie,	// free query cookie
-	&userlandfs_read_query,			// read query
-};
-
-int32 api_version = B_CUR_FS_API_VERSION;
 
 // #pragma mark -
 // #pragma mark ----- fs -----
 
 // parse_parameters
-static
-status_t
-parse_parameters(const void *_parameters, int32 _len, String &fsName,
+static status_t
+parse_parameters(const char *parameters, String &fsName,
 	const char **fsParameters, int32 *fsParameterLength)
 {
 	// check parameters
-	if (!_parameters || _len <= 0)
+	if (!parameters)
 		return B_BAD_VALUE;
-	const char* parameters = (const char*)_parameters;
-	int32 len = strnlen(parameters, _len);
+
+	int32 len = strlen(parameters);
+
 	// skip leading white space
 	for (; len > 0; parameters++, len--) {
 		if (*parameters != ' ' && *parameters != '\t' && *parameters != '\n')
@@ -231,6 +31,7 @@ parse_parameters(const void *_parameters, int32 _len, String &fsName,
 	}
 	if (len == 0)
 		return B_BAD_VALUE;
+
 	// get the file system name
 	int32 fsNameLen = len;
 	for (int32 i = 0; i < len; i++) {
@@ -240,6 +41,7 @@ parse_parameters(const void *_parameters, int32 _len, String &fsName,
 			break;
 		}
 	}
+
 	fsName.SetTo(parameters, fsNameLen);
 	if (fsName.GetLength() == 0) {
 		exit_debugging();
@@ -247,67 +49,59 @@ parse_parameters(const void *_parameters, int32 _len, String &fsName,
 	}
 	parameters += fsNameLen;
 	len -= fsNameLen;
+
 	// skip leading white space of the FS parameters
 	for (; len > 0; parameters++, len--) {
 		if (*parameters != ' ' && *parameters != '\t' && *parameters != '\n')
 			break;
 	}
 	*fsParameters = parameters;
-	*fsParameterLength = len;
+
 	return B_OK;
 }
 
 // userlandfs_mount
-static
-int
-userlandfs_mount(nspace_id nsid, const char *device, ulong flags,
-	void *parameters, size_t len, void **data, vnode_id *rootID)
+static status_t
+userlandfs_mount(mount_id id, const char *device, uint32 flags, 
+	const char *args, fs_volume *fsCookie, vnode_id *rootVnodeID)
 {
 	status_t error = B_OK;
-	init_debugging();
+
 	// get the parameters
+// TODO: The parameters are in driver settings format now.
 	String fsName;
 	const char* fsParameters;
-	int32 fsParameterLength;
-	error = parse_parameters(parameters, len, fsName, &fsParameters,
-		&fsParameterLength);
-	if (error != B_OK) {
-		exit_debugging();
+	error = parse_parameters(args, fsName, &fsParameters);
+	if (error != B_OK)
 		return error;
-	}
-	// make sure there is a UserlandFS we can work with
-	UserlandFS* userlandFS = NULL;
-	error = UserlandFS::RegisterUserlandFS(&userlandFS);
-	if (error != B_OK) {
-		exit_debugging();
-		return error;
-	}
+
+	// get the UserlandFS object
+	UserlandFS* userlandFS = UserlandFS::GetUserlandFS();
+	if (!userlandFS)
+		return B_ERROR;
+
 	// get the file system
 	FileSystem* fileSystem = NULL;
 	error = userlandFS->RegisterFileSystem(fsName.GetString(), &fileSystem);
-	if (error != B_OK) {
-		UserlandFS::UnregisterUserlandFS();
-		exit_debugging();
+	if (error != B_OK)
 		return error;
-	}
+
 	// mount the volume
 	Volume* volume = NULL;
-	error = fileSystem->Mount(nsid, device, flags, fsParameters,
-		fsParameterLength, &volume);
+	error = fileSystem->Mount(id, device, flags, fsParameters, &volume);
 	if (error != B_OK) {
 		userlandFS->UnregisterFileSystem(fileSystem);
-		UserlandFS::UnregisterUserlandFS();
-		exit_debugging();
 		return error;
 	}
-	*data = volume;
-	*rootID = volume->GetRootID();
+
+	*fsCookie = volume;
+	*rootVnodeID = volume->GetRootID();
+
 	return error;
 }
 
 // userlandfs_unmount
-static
-int
+static status_t
 userlandfs_unmount(void *ns)
 {
 	Volume* volume = (Volume*)ns;
@@ -317,18 +111,15 @@ userlandfs_unmount(void *ns)
 	// the VFS. It considers the volume unmounted in any case.
 	volume->RemoveReference();
 	UserlandFS::GetUserlandFS()->UnregisterFileSystem(fileSystem);
-	UserlandFS::UnregisterUserlandFS();
-	exit_debugging();
 	return error;
 }
 
 // userlandfs_initialize
-static
+/*static
 int
 userlandfs_initialize(const char *deviceName, void *parameters,
 	size_t len)
 {
-	init_debugging();
 	// get the parameters
 	String fsName;
 	const char* fsParameters;
@@ -355,9 +146,8 @@ userlandfs_initialize(const char *deviceName, void *parameters,
 	if (fileSystem)
 		userlandFS->UnregisterFileSystem(fileSystem);
 	UserlandFS::UnregisterUserlandFS();
-	exit_debugging();
 	return error;
-}
+}*/
 
 // userlandfs_sync
 static
@@ -1138,3 +928,147 @@ userlandfs_read_query(void *ns, void *cookie, long *count,
 	return error;
 }
 
+
+// #pragma mark ----- module -----
+
+
+static status_t
+userlandfs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			init_debugging();
+
+			// make sure there is a UserlandFS we can work with
+			UserlandFS* userlandFS = NULL;
+			error = UserlandFS::RegisterUserlandFS(&userlandFS);
+			if (error != B_OK) {
+				exit_debugging();
+				return error;
+			}
+
+			return B_OK;
+
+		case B_MODULE_UNINIT:
+			exit_debugging();
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+static file_system_module_info sUserlandFSModuleInfo = {
+	{
+		"file_systems/userlandfs" B_CURRENT_FS_API_VERSION,
+		0,
+		userlandfs_std_ops,
+	},
+
+	"Userland File System",
+
+	// scanning
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
+
+	&userlandfs_mount,
+	&userlandfs_unmount,
+	&userlandfs_read_fs_stat,
+	&userlandfs_write_fs_stat,
+	&userlandfs_sync,
+
+	/* vnode operations */
+	&userlandfs_lookup,
+	&userlandfs_get_vnode_name,
+	&userlandfs_read_vnode,
+	&userlandfs_release_vnode,
+	&userlandfs_remove_vnode,
+
+	/* VM file access */
+	&userlandfs_can_page,
+	&userlandfs_read_pages,
+	&userlandfs_write_pages,
+
+	&userlandfs_get_file_map,
+
+	&userlandfs_ioctl,
+	&userlandfs_set_flags,
+	NULL,	// &userlandfs_select
+	NULL,	// &userlandfs_deselect
+	&userlandfs_fsync,
+
+	&userlandfs_read_link,
+	NULL,						// write link
+	&userlandfs_create_symlink,
+
+	&userlandfs_link,
+	&userlandfs_unlink,
+	&userlandfs_rename,
+
+	&userlandfs_access,
+	&userlandfs_read_stat,
+	&userlandfs_write_stat,
+
+	/* file operations */
+	&userlandfs_create,
+	&userlandfs_open,
+	&userlandfs_close,
+	&userlandfs_free_cookie,
+	&userlandfs_read,
+	&userlandfs_write,
+
+	/* directory operations */
+	&userlandfs_create_dir,
+	&userlandfs_remove_dir,
+	&userlandfs_open_dir,
+	&userlandfs_close_dir,
+	&userlandfs_free_dir_cookie,
+	&userlandfs_read_dir,
+	&userlandfs_rewind_dir,
+	
+	/* attribute directory operations */
+	&userlandfs_open_attr_dir,
+	&userlandfs_close_attr_dir,
+	&userlandfs_free_attr_dir_cookie,
+	&userlandfs_read_attr_dir,
+	&userlandfs_rewind_attr_dir,
+
+	/* attribute operations */
+	&userlandfs_create_attr,
+	&userlandfs_open_attr,
+	&userlandfs_close_attr,
+	&userlandfs_free_attr_cookie,
+	&userlandfs_read_attr,
+	&userlandfs_write_attr,
+
+	&userlandfs_read_attr_stat,
+	&userlandfs_write_attr_stat,
+	&userlandfs_rename_attr,
+	&userlandfs_remove_attr,
+
+	/* index directory & index operations */
+	&userlandfs_open_index_dir,
+	&userlandfs_close_index_dir,
+	&userlandfs_free_index_dir_cookie,
+	&userlandfs_read_index_dir,
+	&userlandfs_rewind_index_dir,
+
+	&userlandfs_create_index,
+	&userlandfs_remove_index,
+	&userlandfs_stat_index,
+
+	/* query operations */
+	&userlandfs_open_query,
+	&userlandfs_close_query,
+	&userlandfs_free_query_cookie,
+	&userlandfs_read_query,
+	&userlandfs_rewind_query,
+};
+
+module_info *modules[] = {
+	(module_info *)&sUserlandFSModuleInfo,
+	NULL,
+};

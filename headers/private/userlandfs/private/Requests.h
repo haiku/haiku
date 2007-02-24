@@ -5,10 +5,15 @@
 
 #include <fs_attr.h>
 #include <fs_index.h>
-#include <fsproto.h>
+#include <fs_info.h>
+#include <fs_interface.h>
 
 #include "Compatibility.h"
 #include "Request.h"
+
+// TODO: Actually rename:
+typedef mount_id nspace_id;
+
 
 enum {
 	MAX_REQUEST_ADDRESS_COUNT	= 4,
