@@ -67,6 +67,7 @@ struct dir_attr
 enum
 {
   COPY_CONTENTS_OPTION = CHAR_MAX + 1,
+  IGNORE_ATTRIBUTES,
   NO_PRESERVE_ATTRIBUTES_OPTION,
   PARENTS_OPTION,
   PRESERVE_ATTRIBUTES_OPTION,
@@ -121,6 +122,7 @@ static struct option const long_opts[] =
   {"copy-contents", no_argument, NULL, COPY_CONTENTS_OPTION},
   {"dereference", no_argument, NULL, 'L'},
   {"force", no_argument, NULL, 'f'},
+  {"ignore-attributes", no_argument, NULL, IGNORE_ATTRIBUTES},
   {"interactive", no_argument, NULL, 'i'},
   {"link", no_argument, NULL, 'l'},
   {"no-dereference", no_argument, NULL, 'P'},
@@ -177,6 +179,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (_("\
   -f, --force                  if an existing destination file cannot be\n\
                                  opened, remove it and try again\n\
+      --ignore-attributes      do not copy attributes\n\
   -i, --interactive            prompt before overwrite\n\
   -H                           follow command-line symbolic links\n\
 "), stdout);
@@ -897,6 +900,10 @@ main (int argc, char **argv)
 
 	case 'H':
 	  x.dereference = DEREF_COMMAND_LINE_ARGUMENTS;
+	  break;
+
+	case IGNORE_ATTRIBUTES:
+	  x.ignore_attributes = true;
 	  break;
 
 	case 'i':
