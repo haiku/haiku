@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -452,12 +452,14 @@ BDirectory::Contains(const char *path, int32 nodeFlags) const
 		return false;
 	if (!path)
 		return true;	// mimic R5 behavior
+
 	// turn the path into a BEntry and let the other version do the work
 	BEntry entry;
 	if (BPrivate::Storage::is_absolute_path(path))
 		entry.SetTo(path);
 	else
 		entry.SetTo(this, path);
+
 	return Contains(&entry, nodeFlags);
 }
 
@@ -480,32 +482,34 @@ BDirectory::Contains(const char *path, int32 nodeFlags) const
 bool
 BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 {
-	bool result = (entry);
 	// check, if the entry exists at all
-	if (result)
-		result = entry->Exists();
+	if (entry == NULL || !entry->Exists() || InitCheck() != B_OK)
+		return false;
+
+	bool result = true;
+
 	// test the node kind
-	if (result) {
-		switch (nodeFlags) {
-			case B_FILE_NODE:
-				result = entry->IsFile();
-				break;
-			case B_DIRECTORY_NODE:
-				result = entry->IsDirectory();
-				break;
-			case B_SYMLINK_NODE:
-				result = entry->IsSymLink();
-				break;
-			case B_ANY_NODE:
-				break;
-			default:
-				result = false;
-				break;
-		}
+	switch (nodeFlags) {
+		case B_FILE_NODE:
+			result = entry->IsFile();
+			break;
+		case B_DIRECTORY_NODE:
+			result = entry->IsDirectory();
+			break;
+		case B_SYMLINK_NODE:
+			result = entry->IsSymLink();
+			break;
+		case B_ANY_NODE:
+			break;
+
+		default:
+			result = false;
+			break;
 	}
+
 	// If the directory is initialized, get the canonical paths of the dir and
 	// the entry and check, if the latter is a prefix of the first one.
-	if (result && InitCheck() == B_OK) {
+	if (result) {
 		BPath dirPath(this, ".", true);
 		BPath entryPath(entry);
 		if (dirPath.InitCheck() == B_OK && entryPath.InitCheck() == B_OK) {
@@ -514,6 +518,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 		} else
 			result = false;
 	}
+
 	return result;
 }
 
