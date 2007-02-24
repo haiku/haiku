@@ -18,6 +18,7 @@
 #include <ScrollBar.h>
 #include <String.h>
 #include <Menu.h>
+#include <MenuField.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <StringView.h>
@@ -60,6 +61,8 @@ protected:
 
 	ColorSet		fCurrentSet;
 	ColorSet		fPrevSet;
+	
+	BMenu			*fDecorMenu;
 };
 
 #endif

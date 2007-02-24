@@ -8,6 +8,7 @@
 #include <OS.h>
 #include <Directory.h>
 #include <Alert.h>
+#include <Messenger.h>
 #include <storage/Path.h>
 #include <Entry.h>
 #include <File.h>
@@ -30,18 +31,57 @@
 #endif
 
 #define COLOR_DROPPED 'cldp'
+#define DECORATOR_CHANGED 'dcch'
+
+namespace BPrivate
+{
+	int32 count_decorators(void);
+	status_t set_decorator(const int32 &index);
+	int32 get_decorator(void);
+	status_t get_decorator_name(const int32 &index, BString &name);
+	status_t get_decorator_preview(const int32 &index, BBitmap *bitmap);
+}
 
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
- :	BView(frame,name,resize,flags)
+ :	BView(frame,name,resize,flags),
+ 	fDecorMenu(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	// Set up list of color fAttributes
-	BRect rect(10,10,200,85);
-	fAttrList = new BListView(rect,"AttributeList");
 	
-	fScrollView = new BScrollView("ScrollView",fAttrList, B_FOLLOW_LEFT |	B_FOLLOW_TOP,
-								 0, false, true);
+	BRect rect(Bounds().InsetByCopy(10,10));
+	
+	#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	fDecorMenu = new BMenu("Window Style");
+	int32 decorCount = BPrivate::count_decorators();
+	if (decorCount > 1) {
+		for (int32 i = 0; i < decorCount; i++) {
+			BString name;
+			BPrivate::get_decorator_name(i, name);
+			fDecorMenu->AddItem(new BMenuItem(name.String(),
+								new BMessage(DECORATOR_CHANGED)));
+		}
+		
+		BMenuField *field = new BMenuField(rect, "menufield", "Window Style",
+										fDecorMenu, B_FOLLOW_RIGHT | 
+										B_FOLLOW_TOP);
+		AddChild(field);
+		field->SetDivider(be_plain_font->StringWidth("Window style: ") + 5);
+		field->ResizeToPreferred();
+		field->MoveTo(Bounds().right - field->Bounds().Width(), 10);
+		rect = Bounds().InsetByCopy(10,10);
+		rect.OffsetTo(10, field->Frame().bottom + 10);
+	}
+	fDecorMenu->ItemAt(BPrivate::get_decorator())->SetMarked(true);
+	#endif
+	
+	// Set up list of color fAttributes
+	rect.right -= B_V_SCROLL_BAR_WIDTH;
+	rect.bottom = rect.top + 75;
+	fAttrList = new BListView(rect,"AttributeList", B_SINGLE_SELECTION_LIST,
+							B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	
+	fScrollView = new BScrollView("ScrollView",fAttrList, B_FOLLOW_LEFT_RIGHT | 
+									B_FOLLOW_TOP, 0, false, true);
 	AddChild(fScrollView);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
@@ -88,12 +128,12 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	rect.OffsetTo((Bounds().Width()-rect.Width())/2,rect.top);
 	
 	fPicker = new BColorControl(BPoint(10,fScrollView->Frame().bottom+20),B_CELLS_32x8,5.0,"fPicker",
-							new BMessage(UPDATE_COLOR));
+								new BMessage(UPDATE_COLOR));
 	AddChild(fPicker);
 	
 	fDefaults = new BButton(BRect(0,0,1,1),"DefaultsButton","Defaults",
-						new BMessage(DEFAULT_SETTINGS),
-						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+							new BMessage(DEFAULT_SETTINGS),
+							B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	fDefaults->ResizeToPreferred(); 
 	fDefaults->MoveTo((fPicker->Frame().right-(fDefaults->Frame().Width()*2)-20)/2,fPicker->Frame().bottom+20);
 	AddChild(fDefaults);
@@ -126,6 +166,8 @@ APRView::AttachedToWindow(void)
 
 	fPicker->SetValue(fCurrentSet.StringToColor(fAttrString.String()));
 	
+	fDecorMenu->SetTargetForItems(BMessenger(this));
+	
 	Window()->ResizeTo(MAX(fPicker->Frame().right,fPicker->Frame().right) + 10,
 					   fDefaults->Frame().bottom + 10);
 	LoadSettings();
@@ -135,11 +177,11 @@ APRView::AttachedToWindow(void)
 void
 APRView::MessageReceived(BMessage *msg)
 {
-	if(msg->WasDropped()) {
+	if (msg->WasDropped()) {
 		rgb_color *col;
 		ssize_t size;
 		
-		if(msg->FindData("RGBColor",(type_code)'RGBC',(const void**)&col,&size)==B_OK) {
+		if (msg->FindData("RGBColor",(type_code)'RGBC',(const void**)&col,&size)==B_OK) {
 			fPicker->SetValue(*col);
 			fColorWell->SetColor(*col);
 			fColorWell->Invalidate();
@@ -147,6 +189,14 @@ APRView::MessageReceived(BMessage *msg)
 	}
 
 	switch(msg->what) {
+		case DECORATOR_CHANGED: {
+			int32 index = fDecorMenu->IndexOf(fDecorMenu->FindMarked());
+			#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			if (index >= 0)
+				BPrivate::set_decorator(index);
+			#endif
+			break;
+		}
 		case UPDATE_COLOR: {
 			// Received from the color fPicker when its color changes
 			
@@ -168,7 +218,7 @@ APRView::MessageReceived(BMessage *msg)
 			ColorWhichItem *whichitem = (ColorWhichItem*)
 										fAttrList->ItemAt(fAttrList->CurrentSelection());
 			
-			if(!whichitem)
+			if (!whichitem)
 				break;
 			
 			fAttrString=whichitem->Text();
@@ -187,6 +237,14 @@ APRView::MessageReceived(BMessage *msg)
 			fCurrentSet.SetToDefaults();
 			
 			UpdateControlsFromAttr(fAttrString.String());
+			BMenuItem *item = fDecorMenu->FindItem("Default");
+			if (item)
+			{
+				item->SetMarked(true);
+				#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+				BPrivate::set_decorator(fDecorMenu->IndexOf(item));
+				#endif
+			}
 			break;
 		}
 		default:
@@ -204,7 +262,7 @@ void APRView::LoadSettings(void)
 	//BPrivate::get_system_colors(&fCurrentSet);
 	
 	// TODO: remove this and enable the get_system_colors() call
-	if(ColorSet::LoadColorSet("/boot/home/config/settings/app_server/system_colors",&fCurrentSet)!=B_OK) {
+	if (ColorSet::LoadColorSet("/boot/home/config/settings/app_server/system_colors",&fCurrentSet) != B_OK) {
 		fCurrentSet.SetToDefaults();
 		ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",fCurrentSet);
 	}
@@ -214,7 +272,7 @@ void APRView::LoadSettings(void)
 
 void APRView::UpdateControlsFromAttr(const char *string)
 {
-	if(!string)
+	if (!string)
 		return;
 	STRACE(("Update color for %s\n",string));
 
