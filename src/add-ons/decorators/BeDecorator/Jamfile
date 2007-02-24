@@ -8,5 +8,5 @@ UsePrivateHeaders app shared interface graphics ;
 Addon ClassicBe : decorators :
 	BeDecorator.cpp
 	: false
-	: be [ FDirName $(HAIKU_ARCH_OBJECT_DIR) release servers app app_server ]
+	: be <nogrist>app_server
 ;
