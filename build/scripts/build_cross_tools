@@ -65,7 +65,7 @@ mkdir -p $installDir/lib/gcc-lib/i586-pc-beos/$haikuRequiredLegacyGCCVersion
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 	--prefix=$installDir --target=i586-pc-beos --disable-nls \
-	--enable-shared=yes || exit 1
+	--enable-shared=yes --disable-werror || exit 1
 make || exit 1
 make install || exit 1
 
