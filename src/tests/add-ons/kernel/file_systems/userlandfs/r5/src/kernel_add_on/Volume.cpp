@@ -583,6 +583,7 @@ Volume::Create(void* dir, const char* name, int openMode, int mode,
 	*cookie = reply->fileCookie;
 	if (error == B_OK)
 		_DecrementVNodeCount(*vnid);
+			// The VFS will balance the new_vnode() call for the FS.
 	return error;
 }
 
@@ -1400,6 +1401,7 @@ Volume::Walk(void* dir, const char* entryName, char** resolvedPath,
 		if (GetVNode(fRootID, &entryNode) != B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
 		*vnid = fRootID;
+		// The VFS will balance the get_vnode() call for the FS.
 		_DecrementVNodeCount(*vnid);
 		return B_OK;
 	}
@@ -2447,6 +2449,7 @@ Volume::_Walk(void* dir, const char* entryName, char** resolvedPath,
 			_DecrementVNodeCount(*vnid);
 	} else
 		_DecrementVNodeCount(*vnid);
+			// The VFS will balance the get_vnode() call for the FS.
 	return error;
 }
 

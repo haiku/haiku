@@ -201,6 +201,9 @@ private:
 			vint32				fOpenIndexDirectories;
 			vint32				fOpenQueries;
 			VNodeCountMap*		fVNodeCountMap;
+									// Tracks the number of new/get_vnode()
+									// calls to be balanced by the FS by
+									// corresponding put_vnode()s.
 	volatile bool				fVNodeCountingEnabled;
 };
 
