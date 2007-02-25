@@ -63,11 +63,9 @@ rule BuildPXEstage1 bin : source {
 }
 
 
-# TODO: "as" should be replaced by $(TARGET_CC), but it fails for older GNU As
-# versions.
 actions BuildPXEstage1 {
 	rm -f $(1)
-	as -o $(1).o $(2) &&
+	$(TARGET_CC) -c -o $(1).o $(2) &&
 	$(TARGET_LD) --oformat binary --Ttext 0x7C00 -o $(1) $(1).o
 }
 
