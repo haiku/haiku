@@ -27,11 +27,11 @@
 
 
 #define PIT_CLOCK_RATE 1193180
-#define PIT_MAX_TIMER_INTERVAL ((long long)0xffff * 1000000 / PIT_CLOCK_RATE)
+#define PIT_MAX_TIMER_INTERVAL (0xffff * 1000000ll / PIT_CLOCK_RATE)
 
 
 static void
-set_isa_hardware_timer(long long relative_timeout)
+set_isa_hardware_timer(bigtime_t relative_timeout)
 {
 	uint16 next_event_clocks;
 
@@ -76,7 +76,7 @@ void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
 	// try the apic timer first
-	if (arch_smp_set_apic_timer(timeout) < 0)
+	if (arch_smp_set_apic_timer(timeout) != B_OK)
 		set_isa_hardware_timer(timeout);
 }
 
@@ -84,7 +84,7 @@ arch_timer_set_hardware_timer(bigtime_t timeout)
 void
 arch_timer_clear_hardware_timer(void)
 {
-	if (arch_smp_clear_apic_timer() < 0)
+	if (arch_smp_clear_apic_timer() != B_OK)
 		clear_isa_hardware_timer();
 }
 

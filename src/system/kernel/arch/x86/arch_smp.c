@@ -32,12 +32,19 @@
 #	define TRACE(x) ;
 #endif
 
+//#define TRACE_ARCH_SMP_TIMER
+#ifdef TRACE_ARCH_SMP_TIMER
+#	define TRACE_TIMER(x) dprintf x
+#else
+#	define TRACE_TIMER(x) ;
+#endif
 
-static uint32 *apic = NULL;
+
+static void *apic = NULL;
 static uint32 cpu_apic_id[B_MAX_CPU_COUNT] = {0, 0};
 static uint32 cpu_os_id[B_MAX_CPU_COUNT] = {0, 0};
 static uint32 cpu_apic_version[B_MAX_CPU_COUNT] = {0, 0};
-static uint32 *ioapic = NULL;
+static void *ioapic = NULL;
 static uint32 apic_timer_tics_per_sec = 0;
 
 
@@ -54,7 +61,7 @@ static int32
 i386_ici_interrupt(void *data)
 {
 	// genuine inter-cpu interrupt
-	TRACE(("inter-cpu interrupt on cpu %d\n", smp_get_current_cpu()));
+	TRACE(("inter-cpu interrupt on cpu %ld\n", smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return smp_intercpu_int_handler();
@@ -65,7 +72,7 @@ static int32
 i386_spurious_interrupt(void *data)
 {
 	// spurious interrupt
-	TRACE(("spurious interrupt on cpu %d\n", smp_get_current_cpu()));
+	TRACE(("spurious interrupt on cpu %ld\n", smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return B_HANDLED_INTERRUPT;
@@ -76,7 +83,7 @@ static int32
 i386_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
-	TRACE(("smp error interrupt on cpu %d\n", smp_get_current_cpu()));
+	TRACE(("smp error interrupt on cpu %ld\n", smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return B_HANDLED_INTERRUPT;
@@ -86,15 +93,14 @@ i386_smp_error_interrupt(void *data)
 static uint32
 apic_read(uint32 offset)
 {
-	return *(uint32 *)((uint32)apic + offset);
+	return *(volatile uint32 *)((char *)apic + offset);
 }
 
 
 static void
 apic_write(uint32 offset, uint32 data)
 {
-	uint32 *addr = (uint32 *)((uint32)apic + offset);
-	*addr = data;
+	*(volatile uint32 *)((char *)apic + offset) = data;
 }
 
 
@@ -173,17 +179,17 @@ arch_smp_init(kernel_args *args)
 
 	if (args->num_cpus > 1) {
 		// setup some globals
-		apic = (uint32 *)args->arch_args.apic;
-		ioapic = (uint32 *)args->arch_args.ioapic;
+		apic = (void *)args->arch_args.apic;
+		ioapic = (void *)args->arch_args.ioapic;
 		memcpy(cpu_apic_id, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
 		memcpy(cpu_os_id, args->arch_args.cpu_os_id, sizeof(args->arch_args.cpu_os_id));
 		memcpy(cpu_apic_version, args->arch_args.cpu_apic_version, sizeof(args->arch_args.cpu_apic_version));
 		apic_timer_tics_per_sec = args->arch_args.apic_time_cv_factor;
 
 		// setup regions that represent the apic & ioapic
-		create_area("local apic", (void *)&apic, B_EXACT_ADDRESS, B_PAGE_SIZE,
+		create_area("local apic", &apic, B_EXACT_ADDRESS, B_PAGE_SIZE,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		create_area("ioapic", (void *)&ioapic, B_EXACT_ADDRESS, B_PAGE_SIZE,
+		create_area("ioapic", &ioapic, B_EXACT_ADDRESS, B_PAGE_SIZE,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 		// set up the local apic on the boot cpu
@@ -230,7 +236,10 @@ void
 arch_smp_send_ici(int32 target_cpu)
 {
 	uint32 config;
-	int state = disable_interrupts();
+	uint32 timeout;
+	cpu_status state;
+
+	state = disable_interrupts();
 
 	config = apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK;
 	apic_write(APIC_INTR_COMMAND_2, config | cpu_apic_id[target_cpu] << 24);
@@ -241,9 +250,12 @@ arch_smp_send_ici(int32 target_cpu)
 		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
 		| APIC_INTR_COMMAND_1_DEST_FIELD);
 
+	timeout = 100000000;
 	// wait for message to be sent
-	while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
+	while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0 && --timeout != 0)
 		;
+	if (timeout == 0)
+		panic("arch_smp_send_ici: timeout, target_cpu %ld", target_cpu);
 
 	restore_interrupts(state);
 }
@@ -283,7 +295,7 @@ arch_smp_set_apic_timer(bigtime_t relativeTimeout)
 	config = apic_read(APIC_LVT_TIMER) & ~APIC_LVT_MASKED; // unmask the timer
 	apic_write(APIC_LVT_TIMER, config);
 
-	TRACE(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
+	TRACE_TIMER(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
 		config, relativeTimeout, apic_timer_tics_per_sec, ticks));
 
 	apic_write(APIC_INITIAL_TIMER_COUNT, ticks); // start it up
@@ -294,14 +306,14 @@ arch_smp_set_apic_timer(bigtime_t relativeTimeout)
 }
 
 
-int
+status_t
 arch_smp_clear_apic_timer(void)
 {
 	cpu_status state;
 	uint32 config;
 
 	if (apic == NULL)
-		return -1;
+		return B_ERROR;
 
 	state = disable_interrupts();
 
@@ -311,6 +323,6 @@ arch_smp_clear_apic_timer(void)
 	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
 
 	restore_interrupts(state);
-	return 0;
+	return B_OK;
 }
 
