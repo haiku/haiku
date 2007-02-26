@@ -67,7 +67,7 @@ extern float	roundf(float value);
 #	define B_BAD_DATA	(B_NOT_ALLOWED + 1)
 #endif
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 #ifndef B_VECTOR_ICON_TYPE
 #define B_VECTOR_ICON_TYPE 'VICN'
 #endif
