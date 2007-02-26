@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
- *
- * Distributed unter the terms of the MIT License.
+ * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef APPEARANCE_PREF_VIEW_H
 #define APPEARANCE_PREF_VIEW_H
@@ -14,14 +14,13 @@ class BColorControl;
 class BMenu;
 class BMenuField;
 
-class TermWindow;
 class TTextControl;
 
 
 class AppearancePrefView : public PrefView {
 	public:
 		AppearancePrefView(BRect frame, const char *name, 
-			TermWindow *window);
+			BMessenger messenger);
 
 		virtual	void	Revert();
 		virtual void	MessageReceived(BMessage *message);
@@ -39,7 +38,7 @@ class AppearancePrefView : public PrefView {
 		BMenuField		*fColorField;
 		BColorControl	*fColorControl;
 
-		TermWindow		*fTermWindow;
+		BMessenger fAppearancePrefViewMessenger;
 };
 
 #endif	// APPEARANCE_PREF_VIEW_H

@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
- *
- * Distributed unter the terms of the MIT License.
+ * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
 #include "AppearPrefView.h"
 #include "MenuUtil.h"
 #include "PrefHandler.h"
-#include "TermWindow.h"
 #include "TermConst.h"
 
 #include <View.h>
@@ -23,9 +22,9 @@
 
 
 AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
-	TermWindow *window)
+	BMessenger messenger)
 	: PrefView(frame, name),
-	fTermWindow(window)
+	fAppearancePrefViewMessenger(messenger)
 {
   	const char *color_tbl[] = {
     	PREF_TEXT_FORE_COLOR,
@@ -134,8 +133,13 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 	}
 
 	if (modified) {
-		fTermWindow->PostMessage(msg);
-		Window()->PostMessage(MSG_PREF_MODIFIED);
+		fAppearancePrefViewMessenger.SendMessage(msg);
+			// send message to fTermWindow
+		
+		// send the MSG_PREF_MODIFIED message
+		// to fPrefWindow
+		BMessenger messenger(this);
+		messenger.SendMessage(MSG_PREF_MODIFIED);
 	}
 }
 
@@ -182,4 +186,3 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 
 	return menu;
 }
-

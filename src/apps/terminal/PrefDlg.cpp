@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
- *
- * Distributed unter the terms of the MIT License.
+ * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
@@ -17,8 +17,6 @@
 #include "PrefHandler.h"
 #include "PrefDlg.h"
 #include "TermConst.h"
-#include "TermView.h"
-#include "TermWindow.h"
 #include "MenuUtil.h"
 
 #include "AppearPrefView.h"
@@ -29,12 +27,12 @@
 // Global Preference Handler
 extern PrefHandler *gTermPref;
 
-PrefDlg::PrefDlg(TermWindow *inWindow)
+PrefDlg::PrefDlg(BMessenger messenger)
 	: BWindow(CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
+		B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
+	fPrefDlgMessenger(messenger)
 {
-	fTermWindow = inWindow;
 	fPrefTemp = new PrefHandler(gTermPref);
 	fDirty = false;
 	fSavePanel = NULL;
@@ -48,7 +46,7 @@ PrefDlg::PrefDlg(TermWindow *inWindow)
 	r=top->Bounds();
 	r.bottom *= .75;
 	AppearancePrefView *prefView= new AppearancePrefView(r, "Appearance", 
-														fTermWindow);
+		fPrefDlgMessenger);
 	top->AddChild(prefView);
 	
 	fSaveAsFileButton = new BButton(BRect(0,0,1,1), "savebutton", 
@@ -95,7 +93,7 @@ PrefDlg::~PrefDlg()
 void
 PrefDlg::Quit()
 {
-	fTermWindow->PostMessage(MSG_PREF_CLOSED);
+	fPrefDlgMessenger.SendMessage(MSG_PREF_CLOSED);
 	delete fPrefTemp;
 	delete fSavePanel;
 	BWindow::Quit();
@@ -121,14 +119,14 @@ PrefDlg::QuitRequested()
 		return false;
 
 	if (index == 2)
-		doSave();
+		_Save();
 
 	return true;
 }
 
 
 void
-PrefDlg::doSaveAs()
+PrefDlg::_SaveAs()
 {
 	if (!fSavePanel)
 		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this));
@@ -138,7 +136,7 @@ PrefDlg::doSaveAs()
 
 
 void
-PrefDlg::SaveRequested(BMessage *msg)
+PrefDlg::_SaveRequested(BMessage *msg)
 {
 	entry_ref dirref;
 	const char *filename;
@@ -154,7 +152,7 @@ PrefDlg::SaveRequested(BMessage *msg)
 
 
 void
-PrefDlg::doSave()
+PrefDlg::_Save()
 {
 	delete fPrefTemp;
 	fPrefTemp = new PrefHandler(gTermPref);
@@ -168,16 +166,14 @@ PrefDlg::doSave()
 
 
 void
-PrefDlg::doRevert()
+PrefDlg::_Revert()
 {
-	BMessenger messenger (fTermWindow);
-
 	delete gTermPref;
 	gTermPref = new PrefHandler(fPrefTemp);
 
-	messenger.SendMessage(MSG_HALF_FONT_CHANGED);
-	messenger.SendMessage(MSG_COLOR_CHANGED);
-	messenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
+	fPrefDlgMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
+	fPrefDlgMessenger.SendMessage(MSG_COLOR_CHANGED);
+	fPrefDlgMessenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
 
 	fDirty = false;
 }
@@ -188,37 +184,30 @@ PrefDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MSG_SAVE_PRESSED:
-		{
-			doSave();
+			_Save();
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-		}
+
 		case MSG_SAVEAS_PRESSED:
-		{
-			doSaveAs();
+			_SaveAs();
 			break;
-		}
+
 		case MSG_REVERT_PRESSED:
-		{
-			doRevert();
+			_Revert();
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-		}
+
 		case MSG_PREF_MODIFIED:
-		{
 			fDirty = true;
 			break;
-		}
+
 		case B_SAVE_REQUESTED:
-		{
-			SaveRequested(msg);
+			_SaveRequested(msg);
 			break;
-		}
+
 		default:
-		{
 			BWindow::MessageReceived(msg);
-			break;      
-		}
+			break;
 	}
 }
 

@@ -1,31 +1,8 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef PREFDLG_H_INCLUDED
 #define PREFDLG_H_INCLUDED
@@ -46,38 +23,38 @@ const ulong MSG_PREF_CLOSED = 'mspc';
 class BRect;
 class BMessage;
 class BTextControl;
-class TermWindow;
-class PrefView;
 class BButton;
 class PrefHandler;
 class BFilePanel;
 
 class PrefDlg : public BWindow
 {
-public:
-					PrefDlg(TermWindow *inWindow);
-					~PrefDlg();
-			void	Quit();
-private:
-			void	doSave (void);
-			void	doSaveAs (void);
-			void	doRevert (void);
-			void	SaveRequested(BMessage *msg);
-			
-			bool	QuitRequested();
-			void	MessageReceived (BMessage *msg);
+	public:
+		PrefDlg(BMessenger messenger);
+		virtual ~PrefDlg();
+		
+		virtual void Quit();
+		virtual bool QuitRequested();
+		virtual void MessageReceived(BMessage *msg);
+
+	private:
+		void _Save();
+		void _SaveAs();
+		void _Revert();
+		void _SaveRequested(BMessage *msg);
+
+		static BRect CenteredRect(BRect r);
+
+		PrefHandler		*fPrefTemp;
+		BFilePanel		*fSavePanel;
 	
-	static	BRect	CenteredRect(BRect r);
-	
-	TermWindow		*fTermWindow;
-	PrefHandler		*fPrefTemp;
-	BFilePanel		*fSavePanel;
-	
-	BButton			*fSaveAsFileButton,
-					*fRevertButton,
-					*fSaveButton;
-	
-	bool			fDirty;
+		BButton			*fSaveAsFileButton,
+						*fRevertButton,
+						*fSaveButton;
+
+		bool			fDirty;
+
+		BMessenger		fPrefDlgMessenger;
 };
 
 #endif //PREFDLG_H_INCLUDED
