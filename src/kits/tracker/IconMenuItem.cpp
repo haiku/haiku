@@ -42,6 +42,27 @@ All rights reserved.
 #include <NodeInfo.h>
 
 
+static void
+DimmedIconBlitter(BView *view, BPoint where, BBitmap *bitmap, void *)
+{
+	if (bitmap->ColorSpace() == B_RGBA32) {
+		rgb_color oldHighColor = view->HighColor();
+		view->SetHighColor(0, 0, 0, 128);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		view->DrawBitmap(bitmap, where);
+		view->SetHighColor(oldHighColor);
+	} else {
+		view->SetDrawingMode(B_OP_BLEND);
+		view->DrawBitmap(bitmap, where);
+	}
+	view->SetDrawingMode(B_OP_OVER);
+}
+
+
+//	#pragma mark -
+
+
 ModelMenuItem::ModelMenuItem(const Model *model, const char *title,
 		BMessage *message, char shortcut, uint32 modifiers,
 		bool drawText, bool extraPad)
@@ -117,24 +138,6 @@ ModelMenuItem::Highlight(bool hilited)
 }
 
 
-static void
-DimmedIconBlitter(BView *view, BPoint where, BBitmap *bitmap, void *)
-{
-	if (bitmap->ColorSpace() == B_RGBA32) {
-		rgb_color oldHighColor = view->HighColor();
-		view->SetHighColor(0, 0, 0, 128);
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
-		view->DrawBitmap(bitmap, where);
-		view->SetHighColor(oldHighColor);
-	} else {
-		view->SetDrawingMode(B_OP_BLEND);
-		view->DrawBitmap(bitmap, where);
-	}
-	view->SetDrawingMode(B_OP_OVER);
-}
-
-
 void
 ModelMenuItem::DrawIcon()
 {
@@ -144,25 +147,25 @@ ModelMenuItem::DrawIcon()
 	// center icon with text.
 	
 	float deltaHeight = fHeightDelta < 0 ? -fHeightDelta : 0;
-	where.y += ceil( deltaHeight/2 );
+	where.y += ceil(deltaHeight / 2);
 
 	if (fExtraPad)
 		where.x += 6;
 
 	Menu()->SetDrawingMode(B_OP_OVER);
 	Menu()->SetLowColor(B_TRANSPARENT_32_BIT);
-	
+
 	// draw small icon, synchronously
-	if (IsEnabled())
+	if (IsEnabled()) {
 		IconCache::sIconCache->Draw(fModel.ResolveIfLink(), Menu(), where,
 			kNormalIcon, B_MINI_ICON);
-	else {
+	} else {
 		// dimmed, for now use a special blitter; icon cache should
 		// know how to blit one eventually
 		IconCache::sIconCache->SyncDraw(fModel.ResolveIfLink(), Menu(), where,
 			kNormalIcon, B_MINI_ICON, DimmedIconBlitter);
 	}
-	
+
 	Menu()->PopState();
 }
 
@@ -211,8 +214,13 @@ ModelMenuItem::Invoke(BMessage *message)
 //	#pragma mark -
 
 
-SpecialModelMenuItem::SpecialModelMenuItem(const Model *model,BMenu *menu)
-	: ModelMenuItem(model,menu)
+/*!
+	A ModelMenuItem subclass that draws its label in italics.
+	It's used for example in the "Copy To" menu to indicate some special
+	folders like the parent folder.
+*/
+SpecialModelMenuItem::SpecialModelMenuItem(const Model *model, BMenu *menu)
+	: ModelMenuItem(model, menu)
 {
 }
 
@@ -235,9 +243,14 @@ SpecialModelMenuItem::DrawContent()
 //	#pragma mark -
 
 
+/*!
+	A menu item that draws an icon alongside the label.
+	It's currently used in the mount and new file template menus.
+*/
 IconMenuItem::IconMenuItem(const char *label, BMessage *message, BBitmap *icon)
 	: PositionPassingMenuItem(label, message),
-	fDeviceIcon(icon)
+	fDeviceIcon(icon),
+	fHeightDelta(0)
 {
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout
@@ -248,10 +261,16 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message, BBitmap *icon)
 IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 		const BNodeInfo *nodeInfo, icon_size which)
 	: PositionPassingMenuItem(label, message),
-	fDeviceIcon(NULL)
+	fDeviceIcon(NULL),
+	fHeightDelta(0)
 {
 	if (nodeInfo) {
+#ifdef __HAIKU__
+		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGB32);
+#else
 		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
+#endif
+
 		if (nodeInfo->GetTrackerIcon(fDeviceIcon, B_MINI_ICON)) {
 			delete fDeviceIcon;
 			fDeviceIcon = NULL;
@@ -267,10 +286,15 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 		const char *iconType, icon_size which)
 	: PositionPassingMenuItem(label, message),
-	fDeviceIcon(NULL)
+	fDeviceIcon(NULL),
+	fHeightDelta(0)
 {
-	BMimeType mime(iconType);
+	BMimeType mime(iconType);	
+#ifdef __HAIKU__
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGB32);
+#else
 	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
+#endif
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
 		delete fDeviceIcon;
@@ -286,10 +310,15 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 IconMenuItem::IconMenuItem(BMenu *submenu, BMessage *message,
 		const char *iconType, icon_size which)
 	: PositionPassingMenuItem(submenu, message),
-	fDeviceIcon(NULL)
+	fDeviceIcon(NULL),
+	fHeightDelta(0)
 {
 	BMimeType mime(iconType);
+#ifdef __HAIKU__
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGB32);
+#else
 	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
+#endif
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
 		delete fDeviceIcon;
@@ -312,8 +341,12 @@ void
 IconMenuItem::GetContentSize(float *width, float *height)
 {
 	_inherited::GetContentSize(width, height);
+
+	fHeightDelta = 16 - *height;
+	if (*height < 16)
+		*height = 16;
+
 	*width += 20;
-	*height += 3;
 }
 
 
@@ -322,19 +355,34 @@ IconMenuItem::DrawContent()
 {
 	BPoint drawPoint(ContentLocation());
 	drawPoint.x += 20;
+	if (fHeightDelta > 0)
+		drawPoint.y += ceil(fHeightDelta / 2);
 	Menu()->MovePenTo(drawPoint);
 	_inherited::DrawContent();
-	
+
+	Menu()->PushState();
+
 	BPoint where(ContentLocation());
-	where.y = Frame().top;
-	
+	float deltaHeight = fHeightDelta < 0 ? -fHeightDelta : 0;
+	where.y += ceil(deltaHeight / 2);
+
 	if (fDeviceIcon) {
 		if (IsEnabled())
+#ifdef __HAIKU__
+			Menu()->SetDrawingMode(B_OP_ALPHA);
+		else {
+			Menu()->SetDrawingMode(B_OP_ALPHA);
+			Menu()->SetHighColor(0, 0, 0, 64);
+			Menu()->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		}		
+#else
 			Menu()->SetDrawingMode(B_OP_OVER);
 		else
 			Menu()->SetDrawingMode(B_OP_BLEND);	
-		
+#endif		
 		Menu()->DrawBitmapAsync(fDeviceIcon, where);
 	}
+
+	Menu()->PopState();
 }
 

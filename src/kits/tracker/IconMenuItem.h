@@ -49,9 +49,11 @@ const bigtime_t kSynchMenuInvokeTimeout = 5000000;
 
 class IconMenuItem : public PositionPassingMenuItem {
 	public:
-		IconMenuItem(const char *, BMessage *, BBitmap *);
-		IconMenuItem(const char *, BMessage *, const char *iconType, icon_size which);
-		IconMenuItem(const char *, BMessage *, const BNodeInfo *nodeInfo, icon_size which);
+		IconMenuItem(const char *label, BMessage *message, BBitmap *icon);
+		IconMenuItem(const char *label, BMessage *message, const char *iconType,
+			icon_size which);
+		IconMenuItem(const char *label, BMessage *message,
+			const BNodeInfo *nodeInfo, icon_size which);
 		IconMenuItem(BMenu *, BMessage *, const char *iconType, icon_size which);
 		virtual ~IconMenuItem();
 
@@ -60,6 +62,7 @@ class IconMenuItem : public PositionPassingMenuItem {
 
 	private:
 		BBitmap *fDeviceIcon;
+		float fHeightDelta;
 
 		typedef BMenuItem _inherited;
 };
@@ -104,7 +107,7 @@ ModelMenuItem::TargetModel() const
 
 class SpecialModelMenuItem : public ModelMenuItem {
 	public:
-		SpecialModelMenuItem(const Model *model,BMenu *menu);
+		SpecialModelMenuItem(const Model *model, BMenu *menu);
 
 		virtual	void DrawContent();
 
@@ -116,4 +119,4 @@ class SpecialModelMenuItem : public ModelMenuItem {
 
 using namespace BPrivate;
 
-#endif
+#endif	// ICON_MENU_ITEM_H
