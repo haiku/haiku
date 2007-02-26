@@ -7,8 +7,8 @@
 
 namespace UserlandFS {
 
+class FileSystem;
 class RequestThread;
-class UserFileSystem;
 
 class UserlandFSServer : public BApplication {
 public:
@@ -18,13 +18,13 @@ public:
 			status_t			Init(const char* fileSystem);
 
 	static	RequestPort*		GetNotificationRequestPort();
-	static	UserFileSystem*		GetFileSystem();
+	static	FileSystem*			GetFileSystem();
 
 private:
 			status_t			_RegisterWithDispatcher(const char* fsName);
 private:
 			image_id			fAddOnImage;
-			UserFileSystem*		fFileSystem;
+			FileSystem*			fFileSystem;
 			RequestPort*		fNotificationRequestPort;
 			RequestThread*		fRequestThreads;
 			bool				fBlockCacheInitialized;
@@ -32,8 +32,8 @@ private:
 
 }	// namespace UserlandFS
 
+using UserlandFS::FileSystem;
 using UserlandFS::RequestThread;
-using UserlandFS::UserFileSystem;
 using UserlandFS::UserlandFSServer;
 
 #endif	// USERLAND_FS_SERVER_H

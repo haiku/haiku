@@ -1,18 +1,18 @@
-// KernelUserVolume.cpp
+// BeOSKernelVolume.cpp
 
-#include "KernelUserVolume.h"
+#include "BeOSKernelVolume.h"
 
 // constructor
-KernelUserVolume::KernelUserVolume(UserFileSystem* fileSystem, nspace_id id,
+BeOSKernelVolume::BeOSKernelVolume(FileSystem* fileSystem, nspace_id id,
 	vnode_ops* fsOps)
-	: UserVolume(fileSystem, id),
+	: Volume(fileSystem, id),
 	  fFSOps(fsOps),
 	  fVolumeCookie(NULL)
 {
 }
 
 // destructor
-KernelUserVolume::~KernelUserVolume()
+BeOSKernelVolume::~BeOSKernelVolume()
 {
 }
 
@@ -21,7 +21,7 @@ KernelUserVolume::~KernelUserVolume()
 
 // Mount
 status_t
-KernelUserVolume::Mount(const char* device, ulong flags, const char* parameters,
+BeOSKernelVolume::Mount(const char* device, ulong flags, const char* parameters,
 	int32 len, vnode_id* rootID)
 {
 	if (!fFSOps->mount)
@@ -32,7 +32,7 @@ KernelUserVolume::Mount(const char* device, ulong flags, const char* parameters,
 
 // Unmount
 status_t
-KernelUserVolume::Unmount()
+BeOSKernelVolume::Unmount()
 {
 	if (!fFSOps->unmount)
 		return B_BAD_VALUE;
@@ -41,7 +41,7 @@ KernelUserVolume::Unmount()
 
 // Sync
 status_t
-KernelUserVolume::Sync()
+BeOSKernelVolume::Sync()
 {
 	if (!fFSOps->sync)
 		return B_BAD_VALUE;
@@ -50,7 +50,7 @@ KernelUserVolume::Sync()
 
 // ReadFSStat
 status_t
-KernelUserVolume::ReadFSStat(fs_info* info)
+BeOSKernelVolume::ReadFSStat(fs_info* info)
 {
 	if (!fFSOps->rfsstat)
 		return B_BAD_VALUE;
@@ -59,7 +59,7 @@ KernelUserVolume::ReadFSStat(fs_info* info)
 
 // WriteFSStat
 status_t
-KernelUserVolume::WriteFSStat(struct fs_info *info, long mask)
+BeOSKernelVolume::WriteFSStat(struct fs_info *info, long mask)
 {
 	if (!fFSOps->wfsstat)
 		return B_BAD_VALUE;
@@ -71,7 +71,7 @@ KernelUserVolume::WriteFSStat(struct fs_info *info, long mask)
 
 // ReadVNode
 status_t
-KernelUserVolume::ReadVNode(vnode_id vnid, char reenter, void** node)
+BeOSKernelVolume::ReadVNode(vnode_id vnid, char reenter, void** node)
 {
 	if (!fFSOps->read_vnode)
 		return B_BAD_VALUE;
@@ -80,7 +80,7 @@ KernelUserVolume::ReadVNode(vnode_id vnid, char reenter, void** node)
 
 // WriteVNode
 status_t
-KernelUserVolume::WriteVNode(void* node, char reenter)
+BeOSKernelVolume::WriteVNode(void* node, char reenter)
 {
 	if (!fFSOps->write_vnode)
 		return B_BAD_VALUE;
@@ -89,7 +89,7 @@ KernelUserVolume::WriteVNode(void* node, char reenter)
 
 // RemoveVNode
 status_t
-KernelUserVolume::RemoveVNode(void* node, char reenter)
+BeOSKernelVolume::RemoveVNode(void* node, char reenter)
 {
 	if (!fFSOps->remove_vnode)
 		return B_BAD_VALUE;
@@ -101,7 +101,7 @@ KernelUserVolume::RemoveVNode(void* node, char reenter)
 
 // FSync
 status_t
-KernelUserVolume::FSync(void* node)
+BeOSKernelVolume::FSync(void* node)
 {
 	if (!fFSOps->fsync)
 		return B_BAD_VALUE;
@@ -110,7 +110,7 @@ KernelUserVolume::FSync(void* node)
 
 // ReadStat
 status_t
-KernelUserVolume::ReadStat(void* node, struct stat* st)
+BeOSKernelVolume::ReadStat(void* node, struct stat* st)
 {
 	if (!fFSOps->rstat)
 		return B_BAD_VALUE;
@@ -119,7 +119,7 @@ KernelUserVolume::ReadStat(void* node, struct stat* st)
 
 // WriteStat
 status_t
-KernelUserVolume::WriteStat(void* node, struct stat* st, long mask)
+BeOSKernelVolume::WriteStat(void* node, struct stat* st, long mask)
 {
 	if (!fFSOps->wstat)
 		return B_BAD_VALUE;
@@ -128,7 +128,7 @@ KernelUserVolume::WriteStat(void* node, struct stat* st, long mask)
 
 // Access
 status_t
-KernelUserVolume::Access(void* node, int mode)
+BeOSKernelVolume::Access(void* node, int mode)
 {
 	if (!fFSOps->access)
 		return B_BAD_VALUE;
@@ -140,7 +140,7 @@ KernelUserVolume::Access(void* node, int mode)
 
 // Create
 status_t
-KernelUserVolume::Create(void* dir, const char* name, int openMode, int mode,
+BeOSKernelVolume::Create(void* dir, const char* name, int openMode, int mode,
 	vnode_id* vnid, void** cookie)
 {
 	if (!fFSOps->create)
@@ -151,7 +151,7 @@ KernelUserVolume::Create(void* dir, const char* name, int openMode, int mode,
 
 // Open
 status_t
-KernelUserVolume::Open(void* node, int openMode, void** cookie)
+BeOSKernelVolume::Open(void* node, int openMode, void** cookie)
 {
 	if (!fFSOps->open)
 		return B_BAD_VALUE;
@@ -160,7 +160,7 @@ KernelUserVolume::Open(void* node, int openMode, void** cookie)
 
 // Close
 status_t
-KernelUserVolume::Close(void* node, void* cookie)
+BeOSKernelVolume::Close(void* node, void* cookie)
 {
 	if (!fFSOps->close)
 		return B_OK;
@@ -169,7 +169,7 @@ KernelUserVolume::Close(void* node, void* cookie)
 
 // FreeCookie
 status_t
-KernelUserVolume::FreeCookie(void* node, void* cookie)
+BeOSKernelVolume::FreeCookie(void* node, void* cookie)
 {
 	if (!fFSOps->free_cookie)
 		return B_OK;
@@ -178,7 +178,7 @@ KernelUserVolume::FreeCookie(void* node, void* cookie)
 
 // Read
 status_t
-KernelUserVolume::Read(void* node, void* cookie, off_t pos, void* buffer,
+BeOSKernelVolume::Read(void* node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
 	if (!fFSOps->read)
@@ -189,7 +189,7 @@ KernelUserVolume::Read(void* node, void* cookie, off_t pos, void* buffer,
 
 // Write
 status_t
-KernelUserVolume::Write(void* node, void* cookie, off_t pos, const void* buffer,
+BeOSKernelVolume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 	size_t bufferSize, size_t* bytesWritten)
 {
 	if (!fFSOps->write)
@@ -201,7 +201,7 @@ KernelUserVolume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 
 // IOCtl
 status_t
-KernelUserVolume::IOCtl(void* node, void* cookie, int command, void *buffer,
+BeOSKernelVolume::IOCtl(void* node, void* cookie, int command, void *buffer,
 	size_t size)
 {
 	if (!fFSOps->ioctl)
@@ -211,7 +211,7 @@ KernelUserVolume::IOCtl(void* node, void* cookie, int command, void *buffer,
 
 // SetFlags
 status_t
-KernelUserVolume::SetFlags(void* node, void* cookie, int flags)
+BeOSKernelVolume::SetFlags(void* node, void* cookie, int flags)
 {
 	if (!fFSOps->setflags)
 		return B_BAD_VALUE;
@@ -220,7 +220,7 @@ KernelUserVolume::SetFlags(void* node, void* cookie, int flags)
 
 // Select
 status_t
-KernelUserVolume::Select(void* node, void* cookie, uint8 event, uint32 ref,
+BeOSKernelVolume::Select(void* node, void* cookie, uint8 event, uint32 ref,
 	selectsync* sync)
 {
 	if (!fFSOps->select) {
@@ -232,7 +232,7 @@ KernelUserVolume::Select(void* node, void* cookie, uint8 event, uint32 ref,
 
 // Deselect
 status_t
-KernelUserVolume::Deselect(void* node, void* cookie, uint8 event,
+BeOSKernelVolume::Deselect(void* node, void* cookie, uint8 event,
 	selectsync* sync)
 {
 	if (!fFSOps->select || !fFSOps->deselect)
@@ -245,7 +245,7 @@ KernelUserVolume::Deselect(void* node, void* cookie, uint8 event,
 
 // Link
 status_t
-KernelUserVolume::Link(void* dir, const char* name, void* node)
+BeOSKernelVolume::Link(void* dir, const char* name, void* node)
 {
 	if (!fFSOps->link)
 		return B_BAD_VALUE;
@@ -254,7 +254,7 @@ KernelUserVolume::Link(void* dir, const char* name, void* node)
 
 // Unlink
 status_t
-KernelUserVolume::Unlink(void* dir, const char* name)
+BeOSKernelVolume::Unlink(void* dir, const char* name)
 {
 	if (!fFSOps->unlink)
 		return B_BAD_VALUE;
@@ -263,7 +263,7 @@ KernelUserVolume::Unlink(void* dir, const char* name)
 
 // Symlink
 status_t
-KernelUserVolume::Symlink(void* dir, const char* name, const char* target)
+BeOSKernelVolume::Symlink(void* dir, const char* name, const char* target)
 {
 	if (!fFSOps->symlink)
 		return B_BAD_VALUE;
@@ -272,7 +272,7 @@ KernelUserVolume::Symlink(void* dir, const char* name, const char* target)
 
 // ReadLink
 status_t
-KernelUserVolume::ReadLink(void* node, char* buffer, size_t bufferSize,
+BeOSKernelVolume::ReadLink(void* node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
 	if (!fFSOps->readlink)
@@ -283,7 +283,7 @@ KernelUserVolume::ReadLink(void* node, char* buffer, size_t bufferSize,
 
 // Rename
 status_t
-KernelUserVolume::Rename(void* oldDir, const char* oldName, void* newDir,
+BeOSKernelVolume::Rename(void* oldDir, const char* oldName, void* newDir,
 	const char* newName)
 {
 	if (!fFSOps->rename)
@@ -296,7 +296,7 @@ KernelUserVolume::Rename(void* oldDir, const char* oldName, void* newDir,
 
 // MkDir
 status_t
-KernelUserVolume::MkDir(void* dir, const char* name, int mode)
+BeOSKernelVolume::MkDir(void* dir, const char* name, int mode)
 {
 	if (!fFSOps->mkdir)
 		return B_BAD_VALUE;
@@ -305,7 +305,7 @@ KernelUserVolume::MkDir(void* dir, const char* name, int mode)
 
 // RmDir
 status_t
-KernelUserVolume::RmDir(void* dir, const char* name)
+BeOSKernelVolume::RmDir(void* dir, const char* name)
 {
 	if (!fFSOps->rmdir)
 		return B_BAD_VALUE;
@@ -314,7 +314,7 @@ KernelUserVolume::RmDir(void* dir, const char* name)
 
 // OpenDir
 status_t
-KernelUserVolume::OpenDir(void* node, void** cookie)
+BeOSKernelVolume::OpenDir(void* node, void** cookie)
 {
 	if (!fFSOps->opendir)
 		return B_BAD_VALUE;
@@ -323,7 +323,7 @@ KernelUserVolume::OpenDir(void* node, void** cookie)
 
 // CloseDir
 status_t
-KernelUserVolume::CloseDir(void* node, void* cookie)
+BeOSKernelVolume::CloseDir(void* node, void* cookie)
 {
 	if (!fFSOps->closedir)
 		return B_OK;
@@ -332,7 +332,7 @@ KernelUserVolume::CloseDir(void* node, void* cookie)
 
 // FreeDirCookie
 status_t
-KernelUserVolume::FreeDirCookie(void* node, void* cookie)
+BeOSKernelVolume::FreeDirCookie(void* node, void* cookie)
 {
 	if (!fFSOps->free_dircookie)
 		return B_OK;
@@ -341,7 +341,7 @@ KernelUserVolume::FreeDirCookie(void* node, void* cookie)
 
 // ReadDir
 status_t
-KernelUserVolume::ReadDir(void* node, void* cookie, void* buffer,
+BeOSKernelVolume::ReadDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, int32 count, int32* countRead)
 {
 	if (!fFSOps->readdir)
@@ -353,7 +353,7 @@ KernelUserVolume::ReadDir(void* node, void* cookie, void* buffer,
 
 // RewindDir
 status_t
-KernelUserVolume::RewindDir(void* node, void* cookie)
+BeOSKernelVolume::RewindDir(void* node, void* cookie)
 {
 	if (!fFSOps->rewinddir)
 		return B_BAD_VALUE;
@@ -362,7 +362,7 @@ KernelUserVolume::RewindDir(void* node, void* cookie)
 
 // Walk
 status_t
-KernelUserVolume::Walk(void* dir, const char* entryName, char** resolvedPath,
+BeOSKernelVolume::Walk(void* dir, const char* entryName, char** resolvedPath,
 	vnode_id* vnid)
 {
 	if (!fFSOps->walk)
@@ -375,7 +375,7 @@ KernelUserVolume::Walk(void* dir, const char* entryName, char** resolvedPath,
 
 // OpenAttrDir
 status_t
-KernelUserVolume::OpenAttrDir(void* node, void** cookie)
+BeOSKernelVolume::OpenAttrDir(void* node, void** cookie)
 {
 	if (!fFSOps->open_attrdir)
 		return B_BAD_VALUE;
@@ -384,7 +384,7 @@ KernelUserVolume::OpenAttrDir(void* node, void** cookie)
 
 // CloseAttrDir
 status_t
-KernelUserVolume::CloseAttrDir(void* node, void* cookie)
+BeOSKernelVolume::CloseAttrDir(void* node, void* cookie)
 {
 	if (!fFSOps->close_attrdir)
 		return B_OK;
@@ -393,7 +393,7 @@ KernelUserVolume::CloseAttrDir(void* node, void* cookie)
 
 // FreeAttrDirCookie
 status_t
-KernelUserVolume::FreeAttrDirCookie(void* node, void* cookie)
+BeOSKernelVolume::FreeAttrDirCookie(void* node, void* cookie)
 {
 	if (!fFSOps->free_attrdircookie)
 		return B_OK;
@@ -402,7 +402,7 @@ KernelUserVolume::FreeAttrDirCookie(void* node, void* cookie)
 
 // ReadAttrDir
 status_t
-KernelUserVolume::ReadAttrDir(void* node, void* cookie, void* buffer,
+BeOSKernelVolume::ReadAttrDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, int32 count, int32* countRead)
 {
 	if (!fFSOps->read_attrdir)
@@ -414,7 +414,7 @@ KernelUserVolume::ReadAttrDir(void* node, void* cookie, void* buffer,
 
 // RewindAttrDir
 status_t
-KernelUserVolume::RewindAttrDir(void* node, void* cookie)
+BeOSKernelVolume::RewindAttrDir(void* node, void* cookie)
 {
 	if (!fFSOps->rewind_attrdir)
 		return B_BAD_VALUE;
@@ -423,7 +423,7 @@ KernelUserVolume::RewindAttrDir(void* node, void* cookie)
 
 // ReadAttr
 status_t
-KernelUserVolume::ReadAttr(void* node, const char* name, int type, off_t pos,
+BeOSKernelVolume::ReadAttr(void* node, const char* name, int type, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
 	if (!fFSOps->read_attr)
@@ -435,7 +435,7 @@ KernelUserVolume::ReadAttr(void* node, const char* name, int type, off_t pos,
 
 // WriteAttr
 status_t
-KernelUserVolume::WriteAttr(void* node, const char* name, int type, off_t pos,
+BeOSKernelVolume::WriteAttr(void* node, const char* name, int type, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	if (!fFSOps->write_attr)
@@ -447,7 +447,7 @@ KernelUserVolume::WriteAttr(void* node, const char* name, int type, off_t pos,
 
 // RemoveAttr
 status_t
-KernelUserVolume::RemoveAttr(void* node, const char* name)
+BeOSKernelVolume::RemoveAttr(void* node, const char* name)
 {
 	if (!fFSOps->remove_attr)
 		return B_BAD_VALUE;
@@ -456,7 +456,7 @@ KernelUserVolume::RemoveAttr(void* node, const char* name)
 
 // RenameAttr
 status_t
-KernelUserVolume::RenameAttr(void* node, const char* oldName, const char* newName)
+BeOSKernelVolume::RenameAttr(void* node, const char* oldName, const char* newName)
 {
 	if (!fFSOps->rename_attr)
 		return B_BAD_VALUE;
@@ -465,7 +465,7 @@ KernelUserVolume::RenameAttr(void* node, const char* oldName, const char* newNam
 
 // StatAttr
 status_t
-KernelUserVolume::StatAttr(void* node, const char* name,
+BeOSKernelVolume::StatAttr(void* node, const char* name,
 	struct attr_info* attrInfo)
 {
 	if (!fFSOps->stat_attr)
@@ -478,7 +478,7 @@ KernelUserVolume::StatAttr(void* node, const char* name,
 
 // OpenIndexDir
 status_t
-KernelUserVolume::OpenIndexDir(void** cookie)
+BeOSKernelVolume::OpenIndexDir(void** cookie)
 {
 	if (!fFSOps->open_indexdir)
 		return B_BAD_VALUE;
@@ -487,7 +487,7 @@ KernelUserVolume::OpenIndexDir(void** cookie)
 
 // CloseIndexDir
 status_t
-KernelUserVolume::CloseIndexDir(void* cookie)
+BeOSKernelVolume::CloseIndexDir(void* cookie)
 {
 	if (!fFSOps->close_indexdir)
 		return B_OK;
@@ -496,7 +496,7 @@ KernelUserVolume::CloseIndexDir(void* cookie)
 
 // FreeIndexDirCookie
 status_t
-KernelUserVolume::FreeIndexDirCookie(void* cookie)
+BeOSKernelVolume::FreeIndexDirCookie(void* cookie)
 {
 	if (!fFSOps->free_indexdircookie)
 		return B_OK;
@@ -505,7 +505,7 @@ KernelUserVolume::FreeIndexDirCookie(void* cookie)
 
 // ReadIndexDir
 status_t
-KernelUserVolume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
+BeOSKernelVolume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
 	int32 count, int32* countRead)
 {
 	if (!fFSOps->read_indexdir)
@@ -517,7 +517,7 @@ KernelUserVolume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
 
 // RewindIndexDir
 status_t
-KernelUserVolume::RewindIndexDir(void* cookie)
+BeOSKernelVolume::RewindIndexDir(void* cookie)
 {
 	if (!fFSOps->rewind_indexdir)
 		return B_BAD_VALUE;
@@ -526,7 +526,7 @@ KernelUserVolume::RewindIndexDir(void* cookie)
 
 // CreateIndex
 status_t
-KernelUserVolume::CreateIndex(const char* name, int type, int flags)
+BeOSKernelVolume::CreateIndex(const char* name, int type, int flags)
 {
 	if (!fFSOps->create_index)
 		return B_BAD_VALUE;
@@ -535,7 +535,7 @@ KernelUserVolume::CreateIndex(const char* name, int type, int flags)
 
 // RemoveIndex
 status_t
-KernelUserVolume::RemoveIndex(const char* name)
+BeOSKernelVolume::RemoveIndex(const char* name)
 {
 	if (!fFSOps->remove_index)
 		return B_BAD_VALUE;
@@ -544,7 +544,7 @@ KernelUserVolume::RemoveIndex(const char* name)
 
 // RenameIndex
 status_t
-KernelUserVolume::RenameIndex(const char* oldName, const char* newName)
+BeOSKernelVolume::RenameIndex(const char* oldName, const char* newName)
 {
 	if (!fFSOps->rename_index)
 		return B_BAD_VALUE;
@@ -553,7 +553,7 @@ KernelUserVolume::RenameIndex(const char* oldName, const char* newName)
 
 // StatIndex
 status_t
-KernelUserVolume::StatIndex(const char *name, struct index_info* indexInfo)
+BeOSKernelVolume::StatIndex(const char *name, struct index_info* indexInfo)
 {
 	if (!fFSOps->stat_index)
 		return B_BAD_VALUE;
@@ -565,7 +565,7 @@ KernelUserVolume::StatIndex(const char *name, struct index_info* indexInfo)
 
 // OpenQuery
 status_t
-KernelUserVolume::OpenQuery(const char* queryString, ulong flags, port_id port,
+BeOSKernelVolume::OpenQuery(const char* queryString, ulong flags, port_id port,
 	long token, void** cookie)
 {
 	if (!fFSOps->open_query)
@@ -576,7 +576,7 @@ KernelUserVolume::OpenQuery(const char* queryString, ulong flags, port_id port,
 
 // CloseQuery
 status_t
-KernelUserVolume::CloseQuery(void* cookie)
+BeOSKernelVolume::CloseQuery(void* cookie)
 {
 	if (!fFSOps->close_query)
 		return B_OK;
@@ -585,7 +585,7 @@ KernelUserVolume::CloseQuery(void* cookie)
 
 // FreeQueryCookie
 status_t
-KernelUserVolume::FreeQueryCookie(void* cookie)
+BeOSKernelVolume::FreeQueryCookie(void* cookie)
 {
 	if (!fFSOps->free_querycookie)
 		return B_OK;
@@ -594,7 +594,7 @@ KernelUserVolume::FreeQueryCookie(void* cookie)
 
 // ReadQuery
 status_t
-KernelUserVolume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
+BeOSKernelVolume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
 	int32 count, int32* countRead)
 {
 	if (!fFSOps->read_query)

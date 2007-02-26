@@ -7,23 +7,23 @@
 
 namespace UserlandFS {
 
+class FileSystem;
 class RequestThread;
-class UserFileSystem;
-class UserVolume;
+class Volume;
 
 // RequestThreadContext
 class RequestThreadContext {
 public:
-								RequestThreadContext(UserVolume* volume);
+								RequestThreadContext(Volume* volume);
 								~RequestThreadContext();
 
 			RequestThread*		GetThread() const;
-			UserVolume*			GetVolume() const;
+			Volume*				GetVolume() const;
 
 private:
 			RequestThreadContext*	fPreviousContext;
 			RequestThread*		fThread;
-			UserVolume*			fVolume;
+			Volume*				fVolume;
 };
 
 // RequestThread
@@ -32,13 +32,13 @@ public:
 								RequestThread();
 								~RequestThread();
 
-			status_t			Init(UserFileSystem* fileSystem);
+			status_t			Init(FileSystem* fileSystem);
 			void				Run();
 			void				PrepareTermination();
 			void				Terminate();
 
 			const Port::Info*	GetPortInfo() const;
-			UserFileSystem*		GetFileSystem() const;
+			FileSystem*			GetFileSystem() const;
 			RequestPort*		GetPort() const;
 			RequestThreadContext*	GetContext() const;
 
@@ -55,7 +55,7 @@ private:
 			friend class RequestThreadContext;
 
 			thread_id			fThread;
-			UserFileSystem*		fFileSystem;
+			FileSystem*			fFileSystem;
 			RequestPort*		fPort;
 			RequestThreadContext* fContext;
 			bool				fTerminating;

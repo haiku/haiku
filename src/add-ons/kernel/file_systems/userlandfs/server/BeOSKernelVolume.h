@@ -1,23 +1,19 @@
-// UserVolume.h
+// BeOSKernelVolume.h
 
-#ifndef USERLAND_FS_USER_VOLUME_H
-#define USERLAND_FS_USER_VOLUME_H
+#ifndef USERLAND_FS_BEOS_KERNEL_VOLUME_H
+#define USERLAND_FS_BEOS_KERNEL_VOLUME_H
 
-#include <fsproto.h>
-#include <SupportDefs.h>
+#include "Volume.h"
+
+struct vnode_ops;
 
 namespace UserlandFS {
 
-class UserFileSystem;
-
-class UserVolume {
+class BeOSKernelVolume : public Volume {
 public:
-								UserVolume(UserFileSystem* fileSystem,
-									nspace_id id);
-	virtual						~UserVolume();
-
-			UserFileSystem*		GetFileSystem() const;
-			nspace_id			GetID() const;
+								BeOSKernelVolume(FileSystem* fileSystem,
+									nspace_id id, vnode_ops* fsOps);
+	virtual						~BeOSKernelVolume();
 
 	// FS
 	virtual	status_t			Mount(const char* device, ulong flags,
@@ -131,13 +127,13 @@ public:
 									size_t bufferSize, int32 count,
 									int32* countRead);
 
-protected:
-			UserFileSystem*		fFileSystem;
-			nspace_id			fID;
+private:
+			vnode_ops*			fFSOps;
+			void*				fVolumeCookie;
 };
 
 }	// namespace UserlandFS
 
-using UserlandFS::UserVolume;
+using UserlandFS::BeOSKernelVolume;
 
-#endif	// USERLAND_FS_USER_VOLUME_H
+#endif	// USERLAND_FS_BEOS_KERNEL_VOLUME_H

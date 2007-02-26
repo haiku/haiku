@@ -1,18 +1,19 @@
 // UserlandRequestHandler.cpp
 
+#include "UserlandRequestHandler.h"
+
 #include "AutoDeleter.h"
 #include "Compatibility.h"
 #include "Debug.h"
-#include "UserVolume.h"
+#include "FileSystem.h"
 #include "RequestPort.h"
 #include "Requests.h"
 #include "RequestThread.h"
 #include "SingleReplyRequestHandler.h"
-#include "UserFileSystem.h"
-#include "UserlandRequestHandler.h"
+#include "Volume.h"
 
 // constructor
-UserlandRequestHandler::UserlandRequestHandler(UserFileSystem* fileSystem)
+UserlandRequestHandler::UserlandRequestHandler(FileSystem* fileSystem)
 	: RequestHandler(),
 	  fFileSystem(fileSystem),
 	  fExpectReply(false),
@@ -21,7 +22,7 @@ UserlandRequestHandler::UserlandRequestHandler(UserFileSystem* fileSystem)
 }
 
 // constructor
-UserlandRequestHandler::UserlandRequestHandler(UserFileSystem* fileSystem,
+UserlandRequestHandler::UserlandRequestHandler(FileSystem* fileSystem,
 	uint32 expectedReply)
 	: RequestHandler(),
 	  fFileSystem(fileSystem),
@@ -207,7 +208,7 @@ UserlandRequestHandler::_HandleRequest(MountVolumeRequest* request)
 	}
 
 	// create the volume
-	UserVolume* volume = NULL;
+	Volume* volume = NULL;
 	if (result == B_OK)
 		result = fFileSystem->CreateVolume(&volume, request->nsid);
 
@@ -244,7 +245,7 @@ UserlandRequestHandler::_HandleRequest(UnmountVolumeRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -268,7 +269,7 @@ UserlandRequestHandler::_HandleRequest(SyncVolumeRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -292,7 +293,7 @@ UserlandRequestHandler::_HandleRequest(ReadFSStatRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	fs_info info;
@@ -318,7 +319,7 @@ UserlandRequestHandler::_HandleRequest(WriteFSStatRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -346,7 +347,7 @@ UserlandRequestHandler::_HandleRequest(ReadVNodeRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* node;
@@ -372,7 +373,7 @@ UserlandRequestHandler::_HandleRequest(WriteVNodeRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -396,7 +397,7 @@ UserlandRequestHandler::_HandleRequest(FSRemoveVNodeRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -424,7 +425,7 @@ UserlandRequestHandler::_HandleRequest(FSyncRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -448,7 +449,7 @@ UserlandRequestHandler::_HandleRequest(ReadStatRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	struct stat st;
@@ -474,7 +475,7 @@ UserlandRequestHandler::_HandleRequest(WriteStatRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -498,7 +499,7 @@ UserlandRequestHandler::_HandleRequest(AccessRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -526,7 +527,7 @@ UserlandRequestHandler::_HandleRequest(CreateRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	vnode_id vnid;
@@ -556,7 +557,7 @@ UserlandRequestHandler::_HandleRequest(OpenRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* fileCookie;
@@ -582,7 +583,7 @@ UserlandRequestHandler::_HandleRequest(CloseRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -606,7 +607,7 @@ UserlandRequestHandler::_HandleRequest(FreeCookieRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -630,7 +631,7 @@ UserlandRequestHandler::_HandleRequest(ReadRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* node = request->node;
@@ -668,7 +669,7 @@ UserlandRequestHandler::_HandleRequest(WriteRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	size_t bytesWritten;
@@ -696,7 +697,7 @@ UserlandRequestHandler::_HandleRequest(IOCtlRequest* request)
 {
 	// get the request parameters
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* buffer = request->bufferParameter;
@@ -746,7 +747,7 @@ UserlandRequestHandler::_HandleRequest(SetFlagsRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -771,7 +772,7 @@ UserlandRequestHandler::_HandleRequest(SelectRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -796,7 +797,7 @@ UserlandRequestHandler::_HandleRequest(DeselectRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -825,7 +826,7 @@ UserlandRequestHandler::_HandleRequest(LinkRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -850,7 +851,7 @@ UserlandRequestHandler::_HandleRequest(UnlinkRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -875,7 +876,7 @@ UserlandRequestHandler::_HandleRequest(SymlinkRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -901,7 +902,7 @@ UserlandRequestHandler::_HandleRequest(ReadLinkRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* node = request->node;
@@ -937,7 +938,7 @@ UserlandRequestHandler::_HandleRequest(RenameRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -967,7 +968,7 @@ UserlandRequestHandler::_HandleRequest(MkDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -992,7 +993,7 @@ UserlandRequestHandler::_HandleRequest(RmDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1017,7 +1018,7 @@ UserlandRequestHandler::_HandleRequest(OpenDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* dirCookie;
@@ -1043,7 +1044,7 @@ UserlandRequestHandler::_HandleRequest(CloseDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1067,7 +1068,7 @@ UserlandRequestHandler::_HandleRequest(FreeDirCookieRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1091,7 +1092,7 @@ UserlandRequestHandler::_HandleRequest(ReadDirRequest* request)
 {
 	// check the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* node = request->node;
@@ -1139,7 +1140,7 @@ UserlandRequestHandler::_HandleRequest(RewindDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1163,7 +1164,7 @@ UserlandRequestHandler::_HandleRequest(WalkRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	vnode_id vnid;
@@ -1199,7 +1200,7 @@ UserlandRequestHandler::_HandleRequest(OpenAttrDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* attrDirCookie;
@@ -1225,7 +1226,7 @@ UserlandRequestHandler::_HandleRequest(CloseAttrDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1249,7 +1250,7 @@ UserlandRequestHandler::_HandleRequest(FreeAttrDirCookieRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1274,7 +1275,7 @@ UserlandRequestHandler::_HandleRequest(ReadAttrDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* node = request->node;
@@ -1313,7 +1314,7 @@ UserlandRequestHandler::_HandleRequest(RewindAttrDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1337,7 +1338,7 @@ UserlandRequestHandler::_HandleRequest(ReadAttrRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* node = request->node;
@@ -1375,7 +1376,7 @@ UserlandRequestHandler::_HandleRequest(WriteAttrRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	size_t bytesWritten;
@@ -1404,7 +1405,7 @@ UserlandRequestHandler::_HandleRequest(RemoveAttrRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1429,7 +1430,7 @@ UserlandRequestHandler::_HandleRequest(RenameAttrRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1455,7 +1456,7 @@ UserlandRequestHandler::_HandleRequest(StatAttrRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	attr_info info;
@@ -1486,7 +1487,7 @@ UserlandRequestHandler::_HandleRequest(OpenIndexDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* indexDirCookie;
@@ -1512,7 +1513,7 @@ UserlandRequestHandler::_HandleRequest(CloseIndexDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1536,7 +1537,7 @@ UserlandRequestHandler::_HandleRequest(FreeIndexDirCookieRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1560,7 +1561,7 @@ UserlandRequestHandler::_HandleRequest(ReadIndexDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* indexDirCookie = request->indexDirCookie;
@@ -1598,7 +1599,7 @@ UserlandRequestHandler::_HandleRequest(RewindIndexDirRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1622,7 +1623,7 @@ UserlandRequestHandler::_HandleRequest(CreateIndexRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1647,7 +1648,7 @@ UserlandRequestHandler::_HandleRequest(RemoveIndexRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1671,7 +1672,7 @@ UserlandRequestHandler::_HandleRequest(RenameIndexRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1696,7 +1697,7 @@ UserlandRequestHandler::_HandleRequest(StatIndexRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	index_info info;
@@ -1726,7 +1727,7 @@ UserlandRequestHandler::_HandleRequest(OpenQueryRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* queryCookie;
@@ -1753,7 +1754,7 @@ UserlandRequestHandler::_HandleRequest(CloseQueryRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1777,7 +1778,7 @@ UserlandRequestHandler::_HandleRequest(FreeQueryCookieRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	if (result == B_OK) {
@@ -1801,7 +1802,7 @@ UserlandRequestHandler::_HandleRequest(ReadQueryRequest* request)
 {
 	// check and execute the request
 	status_t result = B_OK;
-	UserVolume* volume = (UserVolume*)request->volume;
+	Volume* volume = (Volume*)request->volume;
 	if (!volume)
 		result = B_BAD_VALUE;
 	void* queryCookie = request->queryCookie;

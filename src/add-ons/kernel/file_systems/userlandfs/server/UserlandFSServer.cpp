@@ -14,14 +14,14 @@
 #include <Path.h>
 
 #include "AutoLocker.h"
+#include "BeOSKernelFileSystem.h"
 #include "Compatibility.h"
 #include "Debug.h"
 #include "DispatcherDefs.h"
+#include "FileSystem.h"
 #include "FSInfo.h"
-#include "KernelUserFileSystem.h"
 #include "RequestThread.h"
 #include "ServerDefs.h"
-#include "UserFileSystem.h"
 #include "UserlandFSServer.h"
 
 static const int32 kRequestThreadCount = 10;
@@ -91,7 +91,7 @@ UserlandFSServer::Init(const char* fileSystem)
 	if (*apiVersion != B_CUR_FS_API_VERSION)
 		RETURN_ERROR(B_ERROR);
 	// create the file system
-	fFileSystem = new(nothrow) KernelUserFileSystem(fsOps);
+	fFileSystem = new(nothrow) BeOSKernelFileSystem(fsOps);
 	if (!fileSystem)
 		RETURN_ERROR(B_NO_MEMORY);
 	// init the block cache
@@ -136,7 +136,7 @@ UserlandFSServer::GetNotificationRequestPort()
 }
 
 // GetFileSystem
-UserFileSystem*
+FileSystem*
 UserlandFSServer::GetFileSystem()
 {
 	if (UserlandFSServer* server = dynamic_cast<UserlandFSServer*>(be_app))

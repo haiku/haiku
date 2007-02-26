@@ -106,7 +106,7 @@ free_path(char *p)
 // get_port_and_fs
 static
 status_t
-get_port_and_fs(RequestPort** port, UserFileSystem** fileSystem)
+get_port_and_fs(RequestPort** port, FileSystem** fileSystem)
 {
 	// get the request thread
 	RequestThread* thread = RequestThread::GetCurrentThread();
@@ -129,7 +129,7 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida, vnode_id vnidb,
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -166,7 +166,7 @@ notify_select_event(selectsync *sync, uint32 ref)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return;
@@ -196,7 +196,7 @@ send_notification(port_id targetPort, long token, ulong what, long op,
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -240,7 +240,7 @@ get_vnode(nspace_id nsid, vnode_id vnid, void** data)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -273,7 +273,7 @@ put_vnode(nspace_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -305,7 +305,7 @@ new_vnode(nspace_id nsid, vnode_id vnid, void* data)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -338,7 +338,7 @@ remove_vnode(nspace_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -370,7 +370,7 @@ unremove_vnode(nspace_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
@@ -402,7 +402,7 @@ is_vnode_removed(nspace_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
-	UserFileSystem* fileSystem;
+	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;

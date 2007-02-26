@@ -11,7 +11,7 @@
 static const int32 sTLSVariable = tls_allocate();
 
 // constructor
-RequestThreadContext::RequestThreadContext(UserVolume* volume)
+RequestThreadContext::RequestThreadContext(Volume* volume)
 	: fPreviousContext(NULL),
 	  fThread(NULL),
 	  fVolume(volume)
@@ -38,7 +38,7 @@ RequestThreadContext::GetThread() const
 }
 
 // GetVolume
-UserlandFS::UserVolume*
+UserlandFS::Volume*
 RequestThreadContext::GetVolume() const
 {
 	return fVolume;
@@ -67,7 +67,7 @@ RequestThread::~RequestThread()
 
 // Init
 status_t
-RequestThread::Init(UserFileSystem* fileSystem)
+RequestThread::Init(FileSystem* fileSystem)
 {
 	if (!fileSystem)
 		return B_BAD_VALUE;
@@ -124,7 +124,7 @@ RequestThread::GetPortInfo() const
 }
 
 // GetFileSystem
-UserlandFS::UserFileSystem*
+UserlandFS::FileSystem*
 RequestThread::GetFileSystem() const
 {
 	return fFileSystem;

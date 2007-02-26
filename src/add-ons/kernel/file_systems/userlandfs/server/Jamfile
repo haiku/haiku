@@ -1,23 +1,20 @@
-SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src
-	server ;
+SubDir HAIKU_TOP src add-ons kernel file_systems userlandfs server ;
 
-SetSubDirSupportedPlatforms r5 bone dano ;
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
+	file_systems userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
-	file_systems userlandfs r5 ] ;
-local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
-
-SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+#SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
-SEARCH_SOURCE += [ FDirName $(userlandFSTop) src private ] ;
-SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 DEFINES += USER=1 ;
 DEFINES += DEBUG_APP="\\\"UserlandFSServer\\\"" ;
 
-Application <test>UserlandFSServer
+Application UserlandFSServer
 	: AreaSupport.cpp
 	  Debug.cpp
 	  DispatcherDefs.cpp
@@ -35,20 +32,20 @@ Application <test>UserlandFSServer
 	  SingleReplyRequestHandler.cpp
 	  String.cpp
 
-	  cache.c
-	  sysdep.c
+#	  cache.c
+#	  sysdep.c
 
-	  FileSystem.cpp
-	  kernel_emu.cpp
-	  KernelUserFileSystem.cpp
-	  KernelUserVolume.cpp
+#	  BeOSKernelFileSystem.cpp
+#	  BeOSKernelVolume.cpp
+	  DispatcherFileSystem.cpp
+#	  FileSystem.cpp
+#	  kernel_emu.cpp
 	  main.cpp
-	  RequestThread.cpp
+#	  RequestThread.cpp
 	  ServerDefs.cpp
-	  UserFileSystem.cpp
 	  UserlandFSDispatcher.cpp
-	  UserlandFSServer.cpp
-	  UserlandRequestHandler.cpp
-	  UserVolume.cpp
+#	  UserlandFSServer.cpp
+#	  UserlandRequestHandler.cpp
+#	  Volume.cpp
 	: be
 ;

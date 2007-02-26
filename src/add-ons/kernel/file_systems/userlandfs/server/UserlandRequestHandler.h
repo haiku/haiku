@@ -30,14 +30,12 @@ class ReadLinkRequest;
 
 namespace UserlandFS {
 
-class UserFileSystem;
+class FileSystem;
 
 class UserlandRequestHandler : public RequestHandler {
 public:
-								UserlandRequestHandler(
-									UserFileSystem* fileSystem);
-								UserlandRequestHandler(
-									UserFileSystem* fileSystem,
+								UserlandRequestHandler(FileSystem* fileSystem);
+								UserlandRequestHandler(FileSystem* fileSystem,
 									uint32 expectedReply);
 	virtual						~UserlandRequestHandler();
 
@@ -126,7 +124,7 @@ private:
 									bool expectsReceipt);
 
 private:
-			UserFileSystem*		fFileSystem;
+			FileSystem*			fFileSystem;
 			bool				fExpectReply;
 			uint32				fExpectedReply;
 };

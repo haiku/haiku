@@ -1,7 +1,7 @@
 // FileSystem.h
 
-#ifndef USERLAND_FS_FILE_SYSTEM_H
-#define USERLAND_FS_FILE_SYSTEM_H
+#ifndef USERLAND_FS_DISPATCHER_FILE_SYSTEM_H
+#define USERLAND_FS_DISPATCHER_FILE_SYSTEM_H
 
 #include <Locker.h>
 
@@ -45,4 +45,4 @@ private:
 
 using UserlandFS::Dispatcher::FileSystem;
 
-#endif	// USERLAND_FS_FILE_SYSTEM_H
+#endif	// USERLAND_FS_DISPATCHER_FILE_SYSTEM_H

@@ -1,19 +1,23 @@
-// KernelUserVolume.h
+// Volume.h
 
-#ifndef USERLAND_FS_KERNEL_FS_VOLUME_H
-#define USERLAND_FS_KERNEL_FS_VOLUME_H
+#ifndef USERLAND_FS_VOLUME_H
+#define USERLAND_FS_VOLUME_H
 
-#include "UserVolume.h"
-
-struct vnode_ops;
+#include <fsproto.h>
+#include <SupportDefs.h>
 
 namespace UserlandFS {
 
-class KernelUserVolume : public UserVolume {
+class FileSystem;
+
+class Volume {
 public:
-								KernelUserVolume(UserFileSystem* fileSystem,
-									nspace_id id, vnode_ops* fsOps);
-	virtual						~KernelUserVolume();
+								Volume(FileSystem* fileSystem,
+									nspace_id id);
+	virtual						~Volume();
+
+			FileSystem*		GetFileSystem() const;
+			nspace_id			GetID() const;
 
 	// FS
 	virtual	status_t			Mount(const char* device, ulong flags,
@@ -127,13 +131,13 @@ public:
 									size_t bufferSize, int32 count,
 									int32* countRead);
 
-private:
-			vnode_ops*			fFSOps;
-			void*				fVolumeCookie;
+protected:
+			FileSystem*			fFileSystem;
+			nspace_id			fID;
 };
 
 }	// namespace UserlandFS
 
-using UserlandFS::KernelUserVolume;
+using UserlandFS::Volume;
 
-#endif	// USERLAND_FS_KERNEL_FS_VOLUME_H
+#endif	// USERLAND_FS_VOLUME_H
