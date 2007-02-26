@@ -6,21 +6,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#if IPPROTO_TCP != 6
-/* net_server */
-
-#else
-
+#if defined(__HAIKU__) || defined(BONE_VERSION)
 # define closesocket close
-
-# ifdef BONE_VERSION
-/* BONE */
-
-# else
-/* Haiku ? */
-
-# endif
-
 #endif
+/* net_server */
 
 #endif /* _COMPAT_H */

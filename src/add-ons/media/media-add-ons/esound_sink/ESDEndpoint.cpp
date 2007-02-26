@@ -327,6 +327,8 @@ ssize_t ESDEndpoint::Write(const void *buffer, size_t size)
 	err = write(fSocket, buffer, size);
 	if (err != size) {
 		fprintf(stderr, "ESDEndpoint::Write: sent only %d of %d!\n", err, size);
+		if (err < 0)
+			fprintf(stderr, "ESDEndpoint::Write: %s\n", strerror(errno));
 	}
 	//PRINT(("write(fSocket, buffer, %d): %s\n", size, strerror(err)));
 	if (err < B_OK)
