@@ -14,18 +14,14 @@
 
 typedef AutoLocker<UserlandFS::FileSystemMap> FileSystemLocker;
 
-UserlandFS* volatile UserlandFS::sUserlandFS = NULL;
-spinlock UserlandFS::sUserlandFSLock = 0;
-vint32 UserlandFS::sMountedFileSystems = 0;		
+UserlandFS* UserlandFS::sUserlandFS = NULL;
 
 // constructor
 UserlandFS::UserlandFS()
-	: LazyInitializable(),
-	  fPort(NULL),
+	: fPort(NULL),
 	  fFileSystems(NULL),
 	  fDebuggerCommandsAdded(false)
 {
-	// beware what you do here: the caller holds a spin lock
 }
 
 // destructor
@@ -50,88 +46,34 @@ PRINT(("UserlandFS::~UserlandFS()\n"))
 		KernelDebug::RemoveDebuggerCommands();
 }
 
-// RegisterUserlandFS
+// InitUserlandFS
 status_t
-UserlandFS::RegisterUserlandFS(UserlandFS** _userlandFS)
+UserlandFS::InitUserlandFS(UserlandFS** _userlandFS)
 {
-	// first check, if there's already an instance
-	bool create = false;
+	// create the singleton instance
+	sUserlandFS = new(nothrow) UserlandFS;
+	if (!sUserlandFS)
+		return B_NO_MEMORY;
 
-	cpu_status cpuStatus = disable_interrupts();
-	acquire_spinlock(&sUserlandFSLock);
-
-	if (sUserlandFS)
-		sMountedFileSystems++;
-	else
-		create = true;
-
-	release_spinlock(&sUserlandFSLock);
-	restore_interrupts(cpuStatus);
-
-	// if there's not, create a new
-	status_t error = B_OK;
-	if (create) {
-		// first create an instance
-		// Note, that we can't even construct a LazyInitializable with a
-		// spinlock being held, since it allocates a semaphore, which may
-		// allocate memory, which will acquire a semaphore.
-		UserlandFS* userlandFS = new(nothrow) UserlandFS;
-		if (userlandFS) {
-			// now set the instance unless someone else beat us to it
-			bool deleteInstance = false;
-
-			cpu_status cpuStatus = disable_interrupts();
-			acquire_spinlock(&sUserlandFSLock);
-
-			sMountedFileSystems++;
-			if (sUserlandFS)
-				deleteInstance = true;
-			else
-				sUserlandFS = userlandFS;
-
-			release_spinlock(&sUserlandFSLock);
-			restore_interrupts(cpuStatus);
-
-			// delete the new instance, if there was one already
-			if (deleteInstance)
-				delete userlandFS;
-		} else
-			error = B_NO_MEMORY;
-	}
-	if (error != B_OK)
+	// init the thing
+	status_t error = sUserlandFS->_Init();
+	if (error != B_OK) {
+		delete sUserlandFS;
+		sUserlandFS = NULL;
 		return error;
+	}
 
-	// init the thing, if necessary
-	error = sUserlandFS->Access();
-	if (error == B_OK)
-		*_userlandFS = sUserlandFS;
-	else
-		UnregisterUserlandFS();
-	return error;
+	*_userlandFS = sUserlandFS;
+
+	return B_OK;
 }
 
-// UnregisterUserlandFS
+// UninitUserlandFS
 void
-UserlandFS::UnregisterUserlandFS()
+UserlandFS::UninitUserlandFS()
 {
-	cpu_status cpuStatus = disable_interrupts();
-	acquire_spinlock(&sUserlandFSLock);
-
-	--sMountedFileSystems;
-	UserlandFS* userlandFS = NULL;
-	if (sMountedFileSystems == 0 && sUserlandFS) {
-		userlandFS = sUserlandFS;
-		sUserlandFS = NULL;
-	}
-
-	release_spinlock(&sUserlandFSLock);
-	restore_interrupts(cpuStatus);
-
-	// delete, if the last FS has been unmounted
-	if (userlandFS) {
-		userlandFS->~UserlandFS();
-		delete[] (uint8*)userlandFS;
-	}
+	delete sUserlandFS;
+	sUserlandFS = NULL;
 }
 
 // GetUserlandFS
@@ -145,11 +87,10 @@ UserlandFS::GetUserlandFS()
 status_t
 UserlandFS::RegisterFileSystem(const char* name, FileSystem** _fileSystem)
 {
-	// check initialization and parameters
-	if (InitCheck() != B_OK)
-		return InitCheck();
+	// check parameters
 	if (!name || !_fileSystem)
 		return B_BAD_VALUE;
+
 	// check, if we do already know this file system, and create it, if not
 	FileSystem* fileSystem;
 	{
@@ -170,12 +111,14 @@ UserlandFS::RegisterFileSystem(const char* name, FileSystem** _fileSystem)
 			}
 		}
 	}
+
 	// prepare the file system
 	status_t error = fileSystem->Access();
 	if (error != B_OK) {
 		UnregisterFileSystem(fileSystem);
 		return error;
 	}
+
 	*_fileSystem = fileSystem;
 	return error;
 }
@@ -186,6 +129,7 @@ UserlandFS::UnregisterFileSystem(FileSystem* fileSystem)
 {
 	if (!fileSystem)
 		return B_BAD_VALUE;
+
 	// find the FS and decrement its reference counter
 	bool deleteFS = false;
 	{
@@ -197,6 +141,7 @@ UserlandFS::UnregisterFileSystem(FileSystem* fileSystem)
 		if (deleteFS)
 			fFileSystems->Remove(fileSystem->GetName());
 	}
+
 	// delete the FS, if the last reference has been removed
 	if (deleteFS)
 		delete fileSystem;
@@ -210,13 +155,14 @@ UserlandFS::CountFileSystems() const
 	return fFileSystems->Size();
 }
 
-// FirstTimeInit
+// _Init
 status_t
-UserlandFS::FirstTimeInit()
+UserlandFS::_Init()
 {
 	// add debugger commands
 	KernelDebug::AddDebuggerCommands();
 	fDebuggerCommandsAdded = true;
+
 	// create file system map
 	fFileSystems = new(nothrow) FileSystemMap;
 	if (!fFileSystems)
@@ -224,6 +170,7 @@ UserlandFS::FirstTimeInit()
 	status_t error = fFileSystems->InitCheck();
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	// find the dispatcher ports
 	port_id port = find_port(kUserlandFSDispatcherPortName);
 	if (port < 0)
@@ -231,11 +178,13 @@ UserlandFS::FirstTimeInit()
 	port_id replyPort = find_port(kUserlandFSDispatcherReplyPortName);
 	if (replyPort < 0)
 		RETURN_ERROR(B_ERROR);
+
 	// create a reply port
 	// send a connection request
 	error = write_port(port, UFS_DISPATCHER_CONNECT, NULL, 0);
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	// receive the reply
 	int32 replyCode;
 	Port::Info portInfo;
@@ -247,12 +196,14 @@ UserlandFS::FirstTimeInit()
 		RETURN_ERROR(B_BAD_DATA);
 	if (bytesRead != sizeof(Port::Info))
 		RETURN_ERROR(B_BAD_DATA);
+
 	// create a request port
 	fPort = new(nothrow) RequestPort(&portInfo);
 	if (!fPort)
 		RETURN_ERROR(B_NO_MEMORY);
 	if ((error = fPort->InitCheck()) != B_OK)
 		RETURN_ERROR(error);
+
 	RETURN_ERROR(error);
 }
 

@@ -81,26 +81,29 @@ FileSystem::GetPortPool()
 
 // Mount
 status_t
-FileSystem::Mount(nspace_id id, const char* device, ulong flags,
-	const char* parameters, int32 len, Volume** _volume)
+FileSystem::Mount(mount_id id, const char* device, uint32 flags,
+	const char* parameters, Volume** _volume)
 {
 	// check initialization and parameters
 	if (InitCheck() != B_OK)
 		return InitCheck();
 	if (!_volume)
 		return B_BAD_VALUE;
+
 	// create volume
 	Volume* volume = new(nothrow) Volume(this, id);
 	if (!volume)
 		return B_NO_MEMORY;
+
 	// add volume to the volume list
 	fVolumeLock.Lock();
 	status_t error = fVolumes.PushBack(volume);
 	fVolumeLock.Unlock();
 	if (error != B_OK)
 		return error;
+
 	// mount volume
-	error = volume->Mount(device, flags, parameters, len);
+	error = volume->Mount(device, flags, parameters);
 	if (error != B_OK) {
 		fVolumeLock.Lock();
 		fVolumes.Remove(volume);
@@ -108,12 +111,13 @@ FileSystem::Mount(nspace_id id, const char* device, ulong flags,
 		volume->RemoveReference();
 		return error;
 	}
+
 	*_volume = volume;
 	return error;
 }
 
 // Initialize
-status_t
+/*status_t
 FileSystem::Initialize(const char* deviceName, const char* parameters,
 	size_t len)
 {
@@ -144,7 +148,7 @@ FileSystem::Initialize(const char* deviceName, const char* parameters,
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
-}
+}*/
 
 // VolumeUnmounted
 void
@@ -157,7 +161,7 @@ FileSystem::VolumeUnmounted(Volume* volume)
 
 // GetVolume
 Volume*
-FileSystem::GetVolume(nspace_id id)
+FileSystem::GetVolume(mount_id id)
 {
 	AutoLocker<Locker> _(fVolumeLock);
 	for (Vector<Volume*>::Iterator it = fVolumes.Begin();

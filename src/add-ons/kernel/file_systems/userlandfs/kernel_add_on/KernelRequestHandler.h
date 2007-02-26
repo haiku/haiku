@@ -3,7 +3,7 @@
 #ifndef USERLAND_FS_KERNEL_REQUEST_HANDLER_H
 #define USERLAND_FS_KERNEL_REQUEST_HANDLER_H
 
-#include <fsproto.h>
+#include <fs_interface.h>
 
 #include "RequestHandler.h"
 
@@ -59,7 +59,7 @@ private:
 			status_t			_HandleRequest(UnremoveVNodeRequest* request);
 			status_t			_HandleRequest(IsVNodeRemovedRequest* request);
 
-			status_t			_GetVolume(nspace_id id, Volume** volume);
+			status_t			_GetVolume(mount_id id, Volume** volume);
 
 private:
 			FileSystem*			fFileSystem;

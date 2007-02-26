@@ -3,7 +3,7 @@
 #ifndef USERLAND_FS_FILE_SYSTEM_H
 #define USERLAND_FS_FILE_SYSTEM_H
 
-#include <fsproto.h>
+#include <fs_interface.h>
 
 #include "LazyInitializable.h"
 #include "Locker.h"
@@ -35,14 +35,14 @@ public:
 
 			RequestPortPool*	GetPortPool();
 
-			status_t			Mount(nspace_id id, const char* device,
+			status_t			Mount(mount_id id, const char* device,
 									ulong flags, const char* parameters,
-									int32 len, Volume** volume);
-			status_t		 	Initialize(const char* deviceName,
-									const char* parameters, size_t len);
+									Volume** volume);
+//			status_t		 	Initialize(const char* deviceName,
+//									const char* parameters, size_t len);
 			void				VolumeUnmounted(Volume* volume);
 
-			Volume*				GetVolume(nspace_id id);
+			Volume*				GetVolume(mount_id id);
 
 			const IOCtlInfo*	GetIOCtlInfo(int command) const;
 

@@ -6,7 +6,6 @@
 #include <SupportDefs.h>
 
 #include "HashMap.h"
-#include "LazyInitializable.h"
 #include "String.h"
 
 namespace UserlandFSUtil {
@@ -19,14 +18,14 @@ using UserlandFSUtil::RequestPort;
 
 class FileSystem;
 
-class UserlandFS : public LazyInitializable {
+class UserlandFS {
 private:
 								UserlandFS();
 								~UserlandFS();
 
 public:
-	static	status_t			RegisterUserlandFS(UserlandFS** userlandFS);
-	static	void				UnregisterUserlandFS();
+	static	status_t			InitUserlandFS(UserlandFS** userlandFS);
+	static	void				UninitUserlandFS();
 	static	UserlandFS*			GetUserlandFS();
 
 			status_t			RegisterFileSystem(const char* name,
@@ -35,16 +34,14 @@ public:
 
 			int32				CountFileSystems() const;
 
-protected:
-	virtual	status_t			FirstTimeInit();
+private:
+			status_t			_Init();
 
 private:
 			friend class KernelDebug;
 			typedef SynchronizedHashMap<String, FileSystem*> FileSystemMap;
 
-	static	UserlandFS*	volatile sUserlandFS;
-	static	spinlock			sUserlandFSLock;
-	static	vint32				sMountedFileSystems;		
+	static	UserlandFS*			sUserlandFS;
 
 			RequestPort*		fPort;
 			FileSystemMap*		fFileSystems;

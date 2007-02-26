@@ -11,9 +11,6 @@
 #include "Compatibility.h"
 #include "Request.h"
 
-// TODO: Actually rename:
-typedef mount_id nspace_id;
-
 
 enum {
 	MAX_REQUEST_ADDRESS_COUNT	= 4,
@@ -27,35 +24,61 @@ enum {
 	UFS_DISCONNECT_REQUEST = 0,
 	FS_CONNECT_REQUEST,
 	FS_CONNECT_REPLY,
+
 	// FS
 	MOUNT_VOLUME_REQUEST,
 	MOUNT_VOLUME_REPLY,
 	UNMOUNT_VOLUME_REQUEST,
 	UNMOUNT_VOLUME_REPLY,
-	INITIALIZE_VOLUME_REQUEST,
-	INITIALIZE_VOLUME_REPLY,
+//	INITIALIZE_VOLUME_REQUEST,
+//	INITIALIZE_VOLUME_REPLY,
 	SYNC_VOLUME_REQUEST,
 	SYNC_VOLUME_REPLY,
-	READ_FS_STAT_REQUEST,
-	READ_FS_STAT_REPLY,
-	WRITE_FS_STAT_REQUEST,
-	WRITE_FS_STAT_REPLY,
+	READ_FS_INFO_REQUEST,
+	READ_FS_INFO_REPLY,
+	WRITE_FS_INFO_REQUEST,
+	WRITE_FS_INFO_REPLY,
+
 	// vnodes
+	LOOKUP_REQUEST,
+	LOOKUP_REPLY,
 	READ_VNODE_REQUEST,
 	READ_VNODE_REPLY,
 	WRITE_VNODE_REQUEST,
 	WRITE_VNODE_REPLY,
 	FS_REMOVE_VNODE_REQUEST,
 	FS_REMOVE_VNODE_REPLY,
+
 	// nodes
+	IOCTL_REQUEST,
+	IOCTL_REPLY,
+	SET_FLAGS_REQUEST,
+	SET_FLAGS_REPLY,
+	SELECT_REQUEST,
+	SELECT_REPLY,
+	DESELECT_REQUEST,
+	DESELECT_REPLY,
 	FSYNC_REQUEST,
 	FSYNC_REPLY,
+
+	READ_SYMLINK_REQUEST,
+	READ_SYMLINK_REPLY,
+	CREATE_SYMLINK_REQUEST,
+	CREATE_SYMLINK_REPLY,
+	LINK_REQUEST,
+	LINK_REPLY,
+	UNLINK_REQUEST,
+	UNLINK_REPLY,
+	RENAME_REQUEST,
+	RENAME_REPLY,
+
+	ACCESS_REQUEST,
+	ACCESS_REPLY,
 	READ_STAT_REQUEST,
 	READ_STAT_REPLY,
 	WRITE_STAT_REQUEST,
 	WRITE_STAT_REPLY,
-	ACCESS_REQUEST,
-	ACCESS_REPLY,
+
 	// files
 	CREATE_REQUEST,
 	CREATE_REPLY,
@@ -69,30 +92,12 @@ enum {
 	READ_REPLY,
 	WRITE_REQUEST,
 	WRITE_REPLY,
-	IOCTL_REQUEST,
-	IOCTL_REPLY,
-	SET_FLAGS_REQUEST,
-	SET_FLAGS_REPLY,
-	SELECT_REQUEST,
-	SELECT_REPLY,
-	DESELECT_REQUEST,
-	DESELECT_REPLY,
-	// hard links / symlinks
-	LINK_REQUEST,
-	LINK_REPLY,
-	SYMLINK_REQUEST,
-	SYMLINK_REPLY,
-	UNLINK_REQUEST,
-	UNLINK_REPLY,
-	READ_LINK_REQUEST,
-	READ_LINK_REPLY,
-	RENAME_REQUEST,
-	RENAME_REPLY,
+
 	// directories
-	MKDIR_REQUEST,
-	MKDIR_REPLY,
-	RMDIR_REQUEST,
-	RMDIR_REPLY,
+	CREATE_DIR_REQUEST,
+	CREATE_DIR_REPLY,
+	REMOVE_DIR_REQUEST,
+	REMOVE_DIR_REPLY,
 	OPEN_DIR_REQUEST,
 	OPEN_DIR_REPLY,
 	CLOSE_DIR_REQUEST,
@@ -103,9 +108,8 @@ enum {
 	READ_DIR_REPLY,
 	REWIND_DIR_REQUEST,
 	REWIND_DIR_REPLY,
-	WALK_REQUEST,
-	WALK_REPLY,
-	// attributes
+
+	// attribute directories
 	OPEN_ATTR_DIR_REQUEST,
 	OPEN_ATTR_DIR_REPLY,
 	CLOSE_ATTR_DIR_REQUEST,
@@ -116,16 +120,19 @@ enum {
 	READ_ATTR_DIR_REPLY,
 	REWIND_ATTR_DIR_REQUEST,
 	REWIND_ATTR_DIR_REPLY,
+
+	// attributes
 	READ_ATTR_REQUEST,
 	READ_ATTR_REPLY,
 	WRITE_ATTR_REQUEST,
 	WRITE_ATTR_REPLY,
-	REMOVE_ATTR_REQUEST,
-	REMOVE_ATTR_REPLY,
+	READ_ATTR_STAT_REQUEST,
+	READ_ATTR_STAT_REPLY,
 	RENAME_ATTR_REQUEST,
 	RENAME_ATTR_REPLY,
-	STAT_ATTR_REQUEST,
-	STAT_ATTR_REPLY,
+	REMOVE_ATTR_REQUEST,
+	REMOVE_ATTR_REPLY,
+
 	// indices
 	OPEN_INDEX_DIR_REQUEST,
 	OPEN_INDEX_DIR_REPLY,
@@ -141,10 +148,9 @@ enum {
 	CREATE_INDEX_REPLY,
 	REMOVE_INDEX_REQUEST,
 	REMOVE_INDEX_REPLY,
-	RENAME_INDEX_REQUEST,
-	RENAME_INDEX_REPLY,
-	STAT_INDEX_REQUEST,
-	STAT_INDEX_REPLY,
+	READ_INDEX_STAT_REQUEST,
+	READ_INDEX_STAT_REPLY,
+
 	// queries
 	OPEN_QUERY_REQUEST,
 	OPEN_QUERY_REPLY,
@@ -163,6 +169,7 @@ enum {
 	NOTIFY_SELECT_EVENT_REPLY,
 	SEND_NOTIFICATION_REQUEST,
 	SEND_NOTIFICATION_REPLY,
+
 	// vnodes
 	GET_VNODE_REQUEST,
 	GET_VNODE_REPLY,
@@ -194,15 +201,16 @@ public:
 	status_t	error;
 };
 
-// #pragma mark -
-// #pragma mark ----- kernel requests -----
+
+// #pragma mark - kernel requests
+
 
 // VolumeRequest
 class VolumeRequest : public Request {
 public:
 	VolumeRequest(uint32 type) : Request(type) {}
 
-	void*		volume;
+	fs_volume	volume;
 };
 
 // NodeRequest
@@ -210,7 +218,7 @@ class NodeRequest : public VolumeRequest {
 public:
 	NodeRequest(uint32 type) : VolumeRequest(type) {}
 
-	void*		node;
+	fs_vnode	node;
 };
 
 // FileRequest
@@ -218,7 +226,7 @@ class FileRequest : public NodeRequest {
 public:
 	FileRequest(uint32 type) : NodeRequest(type) {}
 
-	void*		fileCookie;
+	fs_cookie	fileCookie;
 };
 
 // DirRequest
@@ -226,7 +234,7 @@ class DirRequest : public NodeRequest {
 public:
 	DirRequest(uint32 type) : NodeRequest(type) {}
 
-	void*		dirCookie;
+	fs_cookie	dirCookie;
 };
 
 // AttrDirRequest
@@ -234,7 +242,15 @@ class AttrDirRequest : public NodeRequest {
 public:
 	AttrDirRequest(uint32 type) : NodeRequest(type) {}
 
-	void*		attrDirCookie;
+	fs_cookie	attrDirCookie;
+};
+
+// AttributeRequest
+class AttributeRequest : public NodeRequest {
+public:
+	AttributeRequest(uint32 type) : NodeRequest(type) {}
+
+	fs_cookie	attrCookie;
 };
 
 // IndexDirRequest
@@ -242,11 +258,20 @@ class IndexDirRequest : public VolumeRequest {
 public:
 	IndexDirRequest(uint32 type) : VolumeRequest(type) {}
 
-	void*		indexDirCookie;
+	fs_cookie	indexDirCookie;
 };
 
-// #pragma mark -
-// #pragma mark ----- administrative -----
+// QueryRequest
+class QueryRequest : public VolumeRequest {
+public:
+	QueryRequest(uint32 type) : VolumeRequest(type) {}
+
+	fs_cookie	queryCookie;
+};
+
+
+// #pragma mark - administrative
+
 
 // UFSDisconnectRequest
 class UFSDisconnectRequest : public Request {
@@ -273,8 +298,9 @@ public:
 	int32		portInfoCount;
 };
 
-// #pragma mark -
-// #pragma mark ----- FS -----
+
+// #pragma mark - FS
+
 
 // MountVolumeRequest
 class MountVolumeRequest : public Request {
@@ -282,10 +308,10 @@ public:
 	MountVolumeRequest() : Request(MOUNT_VOLUME_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	Address		cwd;			// current working dir of the mount() caller
 	Address		device;
-	ulong		flags;
+	uint32		flags;
 	Address		parameters;
 };
 
@@ -295,7 +321,7 @@ public:
 	MountVolumeReply() : ReplyRequest(MOUNT_VOLUME_REPLY) {}
 
 	vnode_id	rootID;
-	void*		volume;
+	fs_volume	volume;
 };
 
 // UnmountVolumeRequest
@@ -310,7 +336,7 @@ public:
 	UnmountVolumeReply() : ReplyRequest(UNMOUNT_VOLUME_REPLY) {}
 };
 
-// InitializeVolumeRequest
+/*// InitializeVolumeRequest
 class InitializeVolumeRequest : public Request {
 public:
 	InitializeVolumeRequest() : Request(INITIALIZE_VOLUME_REQUEST) {}
@@ -324,7 +350,7 @@ public:
 class InitializeVolumeReply : public ReplyRequest {
 public:
 	InitializeVolumeReply() : ReplyRequest(INITIALIZE_VOLUME_REPLY) {}
-};
+};*/
 
 // SyncVolumeRequest
 class SyncVolumeRequest : public VolumeRequest {
@@ -338,37 +364,58 @@ public:
 	SyncVolumeReply() : ReplyRequest(SYNC_VOLUME_REPLY) {}
 };
 
-// ReadFSStatRequest
-class ReadFSStatRequest : public VolumeRequest {
+// ReadFSInfoRequest
+class ReadFSInfoRequest : public VolumeRequest {
 public:
-	ReadFSStatRequest() : VolumeRequest(READ_FS_STAT_REQUEST) {}
+	ReadFSInfoRequest() : VolumeRequest(READ_FS_INFO_REQUEST) {}
 };
 
-// ReadFSStatReply
-class ReadFSStatReply : public ReplyRequest {
+// ReadFSInfoReply
+class ReadFSInfoReply : public ReplyRequest {
 public:
-	ReadFSStatReply() : ReplyRequest(READ_FS_STAT_REPLY) {}
+	ReadFSInfoReply() : ReplyRequest(READ_FS_INFO_REPLY) {}
 
 	fs_info		info;
 };
 
-// WriteFSStatRequest
-class WriteFSStatRequest : public VolumeRequest {
+// WriteFSInfoRequest
+class WriteFSInfoRequest : public VolumeRequest {
 public:
-	WriteFSStatRequest() : VolumeRequest(WRITE_FS_STAT_REQUEST) {}
+	WriteFSInfoRequest() : VolumeRequest(WRITE_FS_INFO_REQUEST) {}
 
 	fs_info		info;
 	long		mask;
 };
 
-// WriteFSStatReply
-class WriteFSStatReply : public ReplyRequest {
+// WriteFSInfoReply
+class WriteFSInfoReply : public ReplyRequest {
 public:
-	WriteFSStatReply() : ReplyRequest(WRITE_FS_STAT_REPLY) {}
+	WriteFSInfoReply() : ReplyRequest(WRITE_FS_INFO_REPLY) {}
 };
 
-// #pragma mark -
-// #pragma mark ----- vnodes -----
+
+// #pragma mark - vnodes
+
+
+// LookupRequest
+class LookupRequest : public NodeRequest {
+public:
+	LookupRequest() : NodeRequest(LOOKUP_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		entryName;
+	bool		traverseLink;
+};
+
+// LookupReply
+class LookupReply : public ReplyRequest {
+public:
+	LookupReply() : ReplyRequest(LOOKUP_REPLY) {}
+
+	Address		resolvedPath;
+	vnode_id	vnid;
+	int			type;
+};
 
 // ReadVNodeRequest
 class ReadVNodeRequest : public VolumeRequest {
@@ -384,7 +431,7 @@ class ReadVNodeReply : public ReplyRequest {
 public:
 	ReadVNodeReply() : ReplyRequest(READ_VNODE_REPLY) {}
 
-	void*		node;
+	fs_vnode	node;
 };
 
 // WriteVNodeRequest
@@ -415,163 +462,9 @@ public:
 	FSRemoveVNodeReply() : ReplyRequest(FS_REMOVE_VNODE_REPLY) {}
 };
 
-// #pragma mark -
-// #pragma mark ----- nodes -----
 
-// FSyncRequest
-class FSyncRequest : public NodeRequest {
-public:
-	FSyncRequest() : NodeRequest(FSYNC_REQUEST) {}
-};
+// #pragma mark - nodes
 
-// FSyncReply
-class FSyncReply : public ReplyRequest {
-public:
-	FSyncReply() : ReplyRequest(FSYNC_REPLY) {}
-};
-
-// ReadStatRequest
-class ReadStatRequest : public NodeRequest {
-public:
-	ReadStatRequest() : NodeRequest(READ_STAT_REQUEST) {}
-};
-
-// ReadStatReply
-class ReadStatReply : public ReplyRequest {
-public:
-	ReadStatReply() : ReplyRequest(READ_STAT_REPLY) {}
-
-	struct stat	st;
-};
-
-// WriteStatRequest
-class WriteStatRequest : public NodeRequest {
-public:
-	WriteStatRequest() : NodeRequest(WRITE_STAT_REQUEST) {}
-
-	struct stat	st;
-	long		mask;
-};
-
-// WriteStatReply
-class WriteStatReply : public ReplyRequest {
-public:
-	WriteStatReply() : ReplyRequest(WRITE_STAT_REPLY) {}
-};
-
-// AccessRequest
-class AccessRequest : public NodeRequest {
-public:
-	AccessRequest() : NodeRequest(ACCESS_REQUEST) {}
-
-	int			mode;
-};
-
-// AccessReply
-class AccessReply : public ReplyRequest {
-public:
-	AccessReply() : ReplyRequest(ACCESS_REPLY) {}
-};
-
-// #pragma mark -
-// #pragma mark ----- files -----
-
-// CreateRequest
-class CreateRequest : public NodeRequest {
-public:
-	CreateRequest() : NodeRequest(CREATE_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		name;
-	int			openMode;
-	int			mode;
-};
-
-// CreateReply
-class CreateReply : public ReplyRequest {
-public:
-	CreateReply() : ReplyRequest(CREATE_REPLY) {}
-
-	vnode_id	vnid;
-	void*		fileCookie;
-};
-
-// OpenRequest
-class OpenRequest : public NodeRequest {
-public:
-	OpenRequest() : NodeRequest(OPEN_REQUEST) {}
-
-	int			openMode;
-};
-
-// OpenReply
-class OpenReply : public ReplyRequest {
-public:
-	OpenReply() : ReplyRequest(OPEN_REPLY) {}
-
-	void*		fileCookie;
-};
-
-// CloseRequest
-class CloseRequest : public FileRequest {
-public:
-	CloseRequest() : FileRequest(CLOSE_REQUEST) {}
-};
-
-// CloseReply
-class CloseReply : public ReplyRequest {
-public:
-	CloseReply() : ReplyRequest(CLOSE_REPLY) {}
-};
-
-// FreeCookieRequest
-class FreeCookieRequest : public FileRequest {
-public:
-	FreeCookieRequest() : FileRequest(FREE_COOKIE_REQUEST) {}
-};
-
-// FreeCookieReply
-class FreeCookieReply : public ReplyRequest {
-public:
-	FreeCookieReply() : ReplyRequest(FREE_COOKIE_REPLY) {}
-};
-
-// ReadRequest
-class ReadRequest : public FileRequest {
-public:
-	ReadRequest() : FileRequest(READ_REQUEST) {}
-
-	off_t		pos;
-	size_t		size;
-};
-
-// ReadReply
-class ReadReply : public ReplyRequest {
-public:
-	ReadReply() : ReplyRequest(READ_REPLY) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		buffer;
-	size_t		bytesRead;
-};
-
-// WriteRequest
-class WriteRequest : public FileRequest {
-public:
-	WriteRequest() : FileRequest(WRITE_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		buffer;
-	off_t		pos;
-};
-
-// WriteReply
-class WriteReply : public ReplyRequest {
-public:
-	WriteReply() : ReplyRequest(WRITE_REPLY) {}
-
-	size_t		bytesWritten;
-};
 
 // IOCtlRequest
 class IOCtlRequest : public FileRequest {
@@ -579,7 +472,7 @@ public:
 	IOCtlRequest() : FileRequest(IOCTL_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	int			command;
+	uint32		command;
 	void*		bufferParameter;
 	size_t		lenParameter;
 	bool		isBuffer;	// if false, just pass bufferParameter
@@ -645,8 +538,52 @@ public:
 	DeselectReply() : ReplyRequest(DESELECT_REPLY) {}
 };
 
-// #pragma mark -
-// #pragma mark ----- hard links / symlinks -----
+// FSyncRequest
+class FSyncRequest : public NodeRequest {
+public:
+	FSyncRequest() : NodeRequest(FSYNC_REQUEST) {}
+};
+
+// FSyncReply
+class FSyncReply : public ReplyRequest {
+public:
+	FSyncReply() : ReplyRequest(FSYNC_REPLY) {}
+};
+
+// ReadSymlinkRequest
+class ReadSymlinkRequest : public NodeRequest {
+public:
+	ReadSymlinkRequest() : NodeRequest(READ_SYMLINK_REQUEST) {}
+
+	size_t		size;
+};
+
+// ReadSymlinkReply
+class ReadSymlinkReply : public ReplyRequest {
+public:
+	ReadSymlinkReply() : ReplyRequest(READ_SYMLINK_REPLY) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
+	size_t		bytesRead;
+};
+
+// CreateSymlinkRequest
+class CreateSymlinkRequest : public NodeRequest {
+public:
+	CreateSymlinkRequest() : NodeRequest(CREATE_SYMLINK_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		name;
+	Address		target;
+	int			mode;
+};
+
+// CreateSymlinkReply
+class CreateSymlinkReply : public ReplyRequest {
+public:
+	CreateSymlinkReply() : ReplyRequest(CREATE_SYMLINK_REPLY) {}
+};
 
 // LinkRequest
 class LinkRequest : public NodeRequest {
@@ -655,7 +592,7 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		name;
-	void*		target;
+	fs_vnode	target;
 };
 
 // LinkReply
@@ -679,49 +616,15 @@ public:
 	UnlinkReply() : ReplyRequest(UNLINK_REPLY) {}
 };
 
-// SymlinkRequest
-class SymlinkRequest : public NodeRequest {
-public:
-	SymlinkRequest() : NodeRequest(SYMLINK_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		name;
-	Address		target;
-};
-
-// SymlinkReply
-class SymlinkReply : public ReplyRequest {
-public:
-	SymlinkReply() : ReplyRequest(SYMLINK_REPLY) {}
-};
-
-// ReadLinkRequest
-class ReadLinkRequest : public NodeRequest {
-public:
-	ReadLinkRequest() : NodeRequest(READ_LINK_REQUEST) {}
-
-	size_t		size;
-};
-
-// ReadLinkReply
-class ReadLinkReply : public ReplyRequest {
-public:
-	ReadLinkReply() : ReplyRequest(READ_LINK_REPLY) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		buffer;
-	size_t		bytesRead;
-};
-
 // RenameRequest
 class RenameRequest : public VolumeRequest {
 public:
 	RenameRequest() : VolumeRequest(RENAME_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	void*		oldDir;
+	fs_vnode	oldDir;
 	Address		oldName;
-	void*		newDir;
+	fs_vnode	newDir;
 	Address		newName;
 };
 
@@ -731,38 +634,185 @@ public:
 	RenameReply() : ReplyRequest(RENAME_REPLY) {}
 };
 
-// #pragma mark -
-// #pragma mark ----- directories -----
-
-// MkDirRequest
-class MkDirRequest : public NodeRequest {
+// AccessRequest
+class AccessRequest : public NodeRequest {
 public:
-	MkDirRequest() : NodeRequest(MKDIR_REQUEST) {}
+	AccessRequest() : NodeRequest(ACCESS_REQUEST) {}
+
+	int			mode;
+};
+
+// AccessReply
+class AccessReply : public ReplyRequest {
+public:
+	AccessReply() : ReplyRequest(ACCESS_REPLY) {}
+};
+
+// ReadStatRequest
+class ReadStatRequest : public NodeRequest {
+public:
+	ReadStatRequest() : NodeRequest(READ_STAT_REQUEST) {}
+};
+
+// ReadStatReply
+class ReadStatReply : public ReplyRequest {
+public:
+	ReadStatReply() : ReplyRequest(READ_STAT_REPLY) {}
+
+	struct stat	st;
+};
+
+// WriteStatRequest
+class WriteStatRequest : public NodeRequest {
+public:
+	WriteStatRequest() : NodeRequest(WRITE_STAT_REQUEST) {}
+
+	struct stat	st;
+	uint32		mask;
+};
+
+// WriteStatReply
+class WriteStatReply : public ReplyRequest {
+public:
+	WriteStatReply() : ReplyRequest(WRITE_STAT_REPLY) {}
+};
+
+
+// #pragma mark - files
+
+
+// CreateRequest
+class CreateRequest : public NodeRequest {
+public:
+	CreateRequest() : NodeRequest(CREATE_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		name;
+	int			openMode;
+	int			mode;
+};
+
+// CreateReply
+class CreateReply : public ReplyRequest {
+public:
+	CreateReply() : ReplyRequest(CREATE_REPLY) {}
+
+	vnode_id	vnid;
+	fs_cookie	fileCookie;
+};
+
+// OpenRequest
+class OpenRequest : public NodeRequest {
+public:
+	OpenRequest() : NodeRequest(OPEN_REQUEST) {}
+
+	int			openMode;
+};
+
+// OpenReply
+class OpenReply : public ReplyRequest {
+public:
+	OpenReply() : ReplyRequest(OPEN_REPLY) {}
+
+	fs_cookie	fileCookie;
+};
+
+// CloseRequest
+class CloseRequest : public FileRequest {
+public:
+	CloseRequest() : FileRequest(CLOSE_REQUEST) {}
+};
+
+// CloseReply
+class CloseReply : public ReplyRequest {
+public:
+	CloseReply() : ReplyRequest(CLOSE_REPLY) {}
+};
+
+// FreeCookieRequest
+class FreeCookieRequest : public FileRequest {
+public:
+	FreeCookieRequest() : FileRequest(FREE_COOKIE_REQUEST) {}
+};
+
+// FreeCookieReply
+class FreeCookieReply : public ReplyRequest {
+public:
+	FreeCookieReply() : ReplyRequest(FREE_COOKIE_REPLY) {}
+};
+
+// ReadRequest
+class ReadRequest : public FileRequest {
+public:
+	ReadRequest() : FileRequest(READ_REQUEST) {}
+
+	off_t		pos;
+	size_t		size;
+};
+
+// ReadReply
+class ReadReply : public ReplyRequest {
+public:
+	ReadReply() : ReplyRequest(READ_REPLY) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
+	size_t		bytesRead;
+};
+
+// WriteRequest
+class WriteRequest : public FileRequest {
+public:
+	WriteRequest() : FileRequest(WRITE_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
+	off_t		pos;
+};
+
+// WriteReply
+class WriteReply : public ReplyRequest {
+public:
+	WriteReply() : ReplyRequest(WRITE_REPLY) {}
+
+	size_t		bytesWritten;
+};
+
+
+// #pragma mark - directories
+
+
+// CreateDirRequest
+class CreateDirRequest : public NodeRequest {
+public:
+	CreateDirRequest() : NodeRequest(CREATE_DIR_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		name;
 	int			mode;
 };
 
-// MkDirReply
-class MkDirReply : public ReplyRequest {
+// CreateDirReply
+class CreateDirReply : public ReplyRequest {
 public:
-	MkDirReply() : ReplyRequest(MKDIR_REPLY) {}
+	CreateDirReply() : ReplyRequest(CREATE_DIR_REPLY) {}
+
+	vnode_id	newDir;
 };
 
-// RmDirRequest
-class RmDirRequest : public NodeRequest {
+// RemoveDirRequest
+class RemoveDirRequest : public NodeRequest {
 public:
-	RmDirRequest() : NodeRequest(RMDIR_REQUEST) {}
+	RemoveDirRequest() : NodeRequest(REMOVE_DIR_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		name;
 };
 
-// RmDirReply
-class RmDirReply : public ReplyRequest {
+// RemoveDirReply
+class RemoveDirReply : public ReplyRequest {
 public:
-	RmDirReply() : ReplyRequest(RMDIR_REPLY) {}
+	RemoveDirReply() : ReplyRequest(REMOVE_DIR_REPLY) {}
 };
 
 // OpenDirRequest
@@ -776,7 +826,7 @@ class OpenDirReply : public ReplyRequest {
 public:
 	OpenDirReply() : ReplyRequest(OPEN_DIR_REPLY) {}
 
-	void*		dirCookie;
+	fs_cookie	dirCookie;
 };
 
 // CloseDirRequest
@@ -809,7 +859,7 @@ public:
 	ReadDirRequest() : DirRequest(READ_DIR_REQUEST) {}
 
 	size_t		bufferSize;
-	int32		count;
+	uint32		count;
 };
 
 // ReadDirReply
@@ -818,7 +868,7 @@ public:
 	ReadDirReply() : ReplyRequest(READ_DIR_REPLY) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	int32		count;
+	uint32		count;
 	Address		buffer;
 };
 
@@ -834,28 +884,9 @@ public:
 	RewindDirReply() : ReplyRequest(REWIND_DIR_REPLY) {}
 };
 
-// WalkRequest
-class WalkRequest : public NodeRequest {
-public:
-	WalkRequest() : NodeRequest(WALK_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	Address		entryName;
-	bool		traverseLink;
-};
+// #pragma mark - attribute directories
 
-// WalkReply
-class WalkReply : public ReplyRequest {
-public:
-	WalkReply() : ReplyRequest(WALK_REPLY) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		resolvedPath;
-	vnode_id	vnid;
-};
-
-// #pragma mark -
-// #pragma mark ----- attributes -----
 
 // OpenAttrDirRequest
 class OpenAttrDirRequest : public NodeRequest {
@@ -868,7 +899,7 @@ class OpenAttrDirReply : public ReplyRequest {
 public:
 	OpenAttrDirReply() : ReplyRequest(OPEN_ATTR_DIR_REPLY) {}
 
-	void*		attrDirCookie;
+	fs_cookie	attrDirCookie;
 };
 
 // CloseAttrDirRequest
@@ -901,7 +932,7 @@ public:
 	ReadAttrDirRequest() : AttrDirRequest(READ_ATTR_DIR_REQUEST) {}
 
 	size_t		bufferSize;
-	int32		count;
+	uint32		count;
 };
 
 // ReadAttrDirReply
@@ -910,7 +941,7 @@ public:
 	ReadAttrDirReply() : ReplyRequest(READ_ATTR_DIR_REPLY) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	int32		count;
+	uint32		count;
 	Address		buffer;
 };
 
@@ -926,14 +957,15 @@ public:
 	RewindAttrDirReply() : ReplyRequest(REWIND_ATTR_DIR_REPLY) {}
 };
 
-// ReadAttrRequest
-class ReadAttrRequest : public NodeRequest {
-public:
-	ReadAttrRequest() : NodeRequest(READ_ATTR_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	Address		name;
-	int			type;
+// #pragma mark - attributes
+
+
+// ReadAttrRequest
+class ReadAttrRequest : public AttributeRequest {
+public:
+	ReadAttrRequest() : AttributeRequest(READ_ATTR_REQUEST) {}
+
 	off_t		pos;
 	size_t		size;
 };
@@ -949,13 +981,11 @@ public:
 };
 
 // WriteAttrRequest
-class WriteAttrRequest : public NodeRequest {
+class WriteAttrRequest : public AttributeRequest {
 public:
-	WriteAttrRequest() : NodeRequest(WRITE_ATTR_REQUEST) {}
+	WriteAttrRequest() : AttributeRequest(WRITE_ATTR_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	Address		name;
-	int			type;
 	Address		buffer;
 	off_t		pos;
 	size_t		size;
@@ -967,6 +997,38 @@ public:
 	WriteAttrReply() : ReplyRequest(WRITE_ATTR_REPLY) {}
 
 	size_t		bytesWritten;
+};
+
+// ReadAttrStatRequest
+class ReadAttrStatRequest : public AttributeRequest {
+public:
+	ReadAttrStatRequest() : AttributeRequest(READ_ATTR_STAT_REQUEST) {}
+};
+
+// ReadAttrStatReply
+class ReadAttrStatReply : public ReplyRequest {
+public:
+	ReadAttrStatReply() : ReplyRequest(READ_ATTR_STAT_REPLY) {}
+
+	struct stat	st;
+};
+
+// RenameAttrRequest
+class RenameAttrRequest : public VolumeRequest {
+public:
+	RenameAttrRequest() : VolumeRequest(RENAME_ATTR_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	fs_vnode	oldNode;
+	fs_vnode	newNode;
+	Address		oldName;
+	Address		newName;
+};
+
+// RenameAttrReply
+class RenameAttrReply : public ReplyRequest {
+public:
+	RenameAttrReply() : ReplyRequest(RENAME_ATTR_REPLY) {}
 };
 
 // RemoveAttrRequest
@@ -984,41 +1046,9 @@ public:
 	RemoveAttrReply() : ReplyRequest(REMOVE_ATTR_REPLY) {}
 };
 
-// RenameAttrRequest
-class RenameAttrRequest : public NodeRequest {
-public:
-	RenameAttrRequest() : NodeRequest(RENAME_ATTR_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	Address		oldName;
-	Address		newName;
-};
+// #pragma mark - indices
 
-// RenameAttrReply
-class RenameAttrReply : public ReplyRequest {
-public:
-	RenameAttrReply() : ReplyRequest(RENAME_ATTR_REPLY) {}
-};
-
-// StatAttrRequest
-class StatAttrRequest : public NodeRequest {
-public:
-	StatAttrRequest() : NodeRequest(STAT_ATTR_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		name;
-};
-
-// StatAttrReply
-class StatAttrReply : public ReplyRequest {
-public:
-	StatAttrReply() : ReplyRequest(STAT_ATTR_REPLY) {}
-
-	attr_info	info;
-};
-
-// #pragma mark -
-// #pragma mark ----- indices -----
 
 // OpenIndexDirRequest
 class OpenIndexDirRequest : public VolumeRequest {
@@ -1031,7 +1061,7 @@ class OpenIndexDirReply : public ReplyRequest {
 public:
 	OpenIndexDirReply() : ReplyRequest(OPEN_INDEX_DIR_REPLY) {}
 
-	void*		indexDirCookie;
+	fs_cookie	indexDirCookie;
 };
 
 // CloseIndexDirRequest
@@ -1065,7 +1095,7 @@ public:
 	ReadIndexDirRequest() : IndexDirRequest(READ_INDEX_DIR_REQUEST) {}
 
 	size_t		bufferSize;
-	int32		count;
+	uint32		count;
 };
 
 // ReadIndexDirReply
@@ -1074,7 +1104,7 @@ public:
 	ReadIndexDirReply() : ReplyRequest(READ_INDEX_DIR_REPLY) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	int32		count;
+	uint32		count;
 	Address		buffer;
 };
 
@@ -1097,8 +1127,8 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		name;
-	int			type;
-	int			flags;
+	uint32		type;
+	uint32		flags;
 };
 
 // CreateIndexReply
@@ -1122,41 +1152,26 @@ public:
 	RemoveIndexReply() : ReplyRequest(REMOVE_INDEX_REPLY) {}
 };
 
-// RenameIndexRequest
-class RenameIndexRequest : public VolumeRequest {
+// ReadIndexStatRequest
+class ReadIndexStatRequest : public VolumeRequest {
 public:
-	RenameIndexRequest() : VolumeRequest(RENAME_INDEX_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
-
-	Address		oldName;
-	Address		newName;
-};
-
-// RenameIndexReply
-class RenameIndexReply : public ReplyRequest {
-public:
-	RenameIndexReply() : ReplyRequest(RENAME_INDEX_REPLY) {}
-};
-
-// StatIndexRequest
-class StatIndexRequest : public VolumeRequest {
-public:
-	StatIndexRequest() : VolumeRequest(STAT_INDEX_REQUEST) {}
+	ReadIndexStatRequest() : VolumeRequest(READ_INDEX_STAT_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		name;
 };
 
-// StatIndexReply
-class StatIndexReply : public ReplyRequest {
+// ReadIndexStatReply
+class ReadIndexStatReply : public ReplyRequest {
 public:
-	StatIndexReply() : ReplyRequest(STAT_INDEX_REPLY) {}
+	ReadIndexStatReply() : ReplyRequest(READ_INDEX_STAT_REPLY) {}
 
-	index_info	info;
+	struct stat	st;
 };
 
-// #pragma mark -
-// #pragma mark ----- queries -----
+
+// #pragma mark - queries
+
 
 // OpenQueryRequest
 class OpenQueryRequest : public VolumeRequest {
@@ -1165,9 +1180,9 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		queryString;
-	ulong		flags;
+	uint32		flags;
 	port_id		port;
-	long		token;
+	uint32		token;
 };
 
 // OpenQueryReply
@@ -1175,15 +1190,13 @@ class OpenQueryReply : public ReplyRequest {
 public:
 	OpenQueryReply() : ReplyRequest(OPEN_QUERY_REPLY) {}
 
-	void*		queryCookie;
+	fs_cookie	queryCookie;
 };
 
 // CloseQueryRequest
-class CloseQueryRequest : public VolumeRequest {
+class CloseQueryRequest : public QueryRequest {
 public:
-	CloseQueryRequest() : VolumeRequest(CLOSE_QUERY_REQUEST) {}
-
-	void*		queryCookie;
+	CloseQueryRequest() : QueryRequest(CLOSE_QUERY_REQUEST) {}
 };
 
 // CloseQueryReply
@@ -1193,11 +1206,9 @@ public:
 };
 
 // FreeQueryCookieRequest
-class FreeQueryCookieRequest : public VolumeRequest {
+class FreeQueryCookieRequest : public QueryRequest {
 public:
-	FreeQueryCookieRequest() : VolumeRequest(FREE_QUERY_COOKIE_REQUEST) {}
-
-	void*		queryCookie;
+	FreeQueryCookieRequest() : QueryRequest(FREE_QUERY_COOKIE_REQUEST) {}
 };
 
 // FreeQueryCookieReply
@@ -1207,13 +1218,12 @@ public:
 };
 
 // ReadQueryRequest
-class ReadQueryRequest : public VolumeRequest {
+class ReadQueryRequest : public QueryRequest {
 public:
-	ReadQueryRequest() : VolumeRequest(READ_QUERY_REQUEST) {}
+	ReadQueryRequest() : QueryRequest(READ_QUERY_REQUEST) {}
 
-	void*		queryCookie;
 	size_t		bufferSize;
-	int32		count;
+	uint32		count;
 };
 
 // ReadQueryReply
@@ -1222,7 +1232,7 @@ public:
 	ReadQueryReply() : ReplyRequest(READ_QUERY_REPLY) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	int32		count;
+	uint32		count;
 	Address		buffer;
 };
 
@@ -1233,6 +1243,8 @@ public:
 // #pragma mark -
 // #pragma mark ----- notifications -----
 
+// TODO: notify_listener() and send_notifications() are obsolete!
+
 // NotifyListenerRequest
 class NotifyListenerRequest : public Request {
 public:
@@ -1240,7 +1252,7 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	int32		operation;
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnida;
 	vnode_id	vnidb;
 	vnode_id	vnidc;
@@ -1260,6 +1272,7 @@ public:
 
 	selectsync*	sync;
 	uint32		ref;
+	uint8		event;
 };
 
 // NotifySelectEventReply
@@ -1278,8 +1291,8 @@ public:
 	int32		token;
 	uint32		what;
 	int32		operation;
-	nspace_id	nsida;
-	nspace_id	nsidb;
+	mount_id	nsida;
+	mount_id	nsidb;
 	vnode_id	vnida;
 	vnode_id	vnidb;
 	vnode_id	vnidc;
@@ -1301,7 +1314,7 @@ class GetVNodeRequest : public Request {
 public:
 	GetVNodeRequest() : Request(GET_VNODE_REQUEST) {}
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnid;
 };
 
@@ -1310,7 +1323,7 @@ class GetVNodeReply : public ReplyRequest {
 public:
 	GetVNodeReply() : ReplyRequest(GET_VNODE_REPLY) {}
 
-	void*		node;
+	fs_vnode	node;
 };
 
 // PutVNodeRequest
@@ -1318,7 +1331,7 @@ class PutVNodeRequest : public Request {
 public:
 	PutVNodeRequest() : Request(PUT_VNODE_REQUEST) {}
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnid;
 };
 
@@ -1333,9 +1346,9 @@ class NewVNodeRequest : public Request {
 public:
 	NewVNodeRequest() : Request(NEW_VNODE_REQUEST) {}
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnid;
-	void*		node;
+	fs_vnode	node;
 };
 
 // NewVNodeReply
@@ -1349,7 +1362,7 @@ class RemoveVNodeRequest : public Request {
 public:
 	RemoveVNodeRequest() : Request(REMOVE_VNODE_REQUEST) {}
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnid;
 };
 
@@ -1364,7 +1377,7 @@ class UnremoveVNodeRequest : public Request {
 public:
 	UnremoveVNodeRequest() : Request(UNREMOVE_VNODE_REQUEST) {}
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnid;
 };
 
@@ -1379,7 +1392,7 @@ class IsVNodeRemovedRequest : public Request {
 public:
 	IsVNodeRemovedRequest() : Request(IS_VNODE_REMOVED_REQUEST) {}
 
-	nspace_id	nsid;
+	mount_id	nsid;
 	vnode_id	vnid;
 };
 
@@ -1431,23 +1444,27 @@ do_for_request(Request* request, Task& task)
 			return task((UnmountVolumeRequest*)request);
 		case UNMOUNT_VOLUME_REPLY:
 			return task((UnmountVolumeReply*)request);
-		case INITIALIZE_VOLUME_REQUEST:
-			return task((InitializeVolumeRequest*)request);
-		case INITIALIZE_VOLUME_REPLY:
-			return task((InitializeVolumeReply*)request);
+//		case INITIALIZE_VOLUME_REQUEST:
+//			return task((InitializeVolumeRequest*)request);
+//		case INITIALIZE_VOLUME_REPLY:
+//			return task((InitializeVolumeReply*)request);
 		case SYNC_VOLUME_REQUEST:
 			return task((SyncVolumeRequest*)request);
 		case SYNC_VOLUME_REPLY:
 			return task((SyncVolumeReply*)request);
-		case READ_FS_STAT_REQUEST:
-			return task((ReadFSStatRequest*)request);
-		case READ_FS_STAT_REPLY:
-			return task((ReadFSStatReply*)request);
-		case WRITE_FS_STAT_REQUEST:
-			return task((WriteFSStatRequest*)request);
-		case WRITE_FS_STAT_REPLY:
-			return task((WriteFSStatReply*)request);
+		case READ_FS_INFO_REQUEST:
+			return task((ReadFSInfoRequest*)request);
+		case READ_FS_INFO_REPLY:
+			return task((ReadFSInfoReply*)request);
+		case WRITE_FS_INFO_REQUEST:
+			return task((WriteFSInfoRequest*)request);
+		case WRITE_FS_INFO_REPLY:
+			return task((WriteFSInfoReply*)request);
 		// vnodes
+		case LOOKUP_REQUEST:
+			return task((LookupRequest*)request);
+		case LOOKUP_REPLY:
+			return task((LookupReply*)request);
 		case READ_VNODE_REQUEST:
 			return task((ReadVNodeRequest*)request);
 		case READ_VNODE_REPLY:
@@ -1461,10 +1478,50 @@ do_for_request(Request* request, Task& task)
 		case FS_REMOVE_VNODE_REPLY:
 			return task((FSRemoveVNodeReply*)request);
 		// nodes
+		case IOCTL_REQUEST:
+			return task((IOCtlRequest*)request);
+		case IOCTL_REPLY:
+			return task((IOCtlReply*)request);
+		case SET_FLAGS_REQUEST:
+			return task((SetFlagsRequest*)request);
+		case SET_FLAGS_REPLY:
+			return task((SetFlagsReply*)request);
+		case SELECT_REQUEST:
+			return task((SelectRequest*)request);
+		case SELECT_REPLY:
+			return task((SelectReply*)request);
+		case DESELECT_REQUEST:
+			return task((DeselectRequest*)request);
+		case DESELECT_REPLY:
+			return task((DeselectReply*)request);
 		case FSYNC_REQUEST:
 			return task((FSyncRequest*)request);
 		case FSYNC_REPLY:
 			return task((FSyncReply*)request);
+		case READ_SYMLINK_REQUEST:
+			return task((ReadSymlinkRequest*)request);
+		case READ_SYMLINK_REPLY:
+			return task((ReadSymlinkReply*)request);
+		case CREATE_SYMLINK_REQUEST:
+			return task((CreateSymlinkRequest*)request);
+		case CREATE_SYMLINK_REPLY:
+			return task((CreateSymlinkReply*)request);
+		case LINK_REQUEST:
+			return task((LinkRequest*)request);
+		case LINK_REPLY:
+			return task((LinkReply*)request);
+		case UNLINK_REQUEST:
+			return task((UnlinkRequest*)request);
+		case UNLINK_REPLY:
+			return task((UnlinkReply*)request);
+		case RENAME_REQUEST:
+			return task((RenameRequest*)request);
+		case RENAME_REPLY:
+			return task((RenameReply*)request);
+		case ACCESS_REQUEST:
+			return task((AccessRequest*)request);
+		case ACCESS_REPLY:
+			return task((AccessReply*)request);
 		case READ_STAT_REQUEST:
 			return task((ReadStatRequest*)request);
 		case READ_STAT_REPLY:
@@ -1473,10 +1530,6 @@ do_for_request(Request* request, Task& task)
 			return task((WriteStatRequest*)request);
 		case WRITE_STAT_REPLY:
 			return task((WriteStatReply*)request);
-		case ACCESS_REQUEST:
-			return task((AccessRequest*)request);
-		case ACCESS_REPLY:
-			return task((AccessReply*)request);
 		// files
 		case CREATE_REQUEST:
 			return task((CreateRequest*)request);
@@ -1502,52 +1555,15 @@ do_for_request(Request* request, Task& task)
 			return task((WriteRequest*)request);
 		case WRITE_REPLY:
 			return task((WriteReply*)request);
-		case IOCTL_REQUEST:
-			return task((IOCtlRequest*)request);
-		case IOCTL_REPLY:
-			return task((IOCtlReply*)request);
-		case SET_FLAGS_REQUEST:
-			return task((SetFlagsRequest*)request);
-		case SET_FLAGS_REPLY:
-			return task((SetFlagsReply*)request);
-		case SELECT_REQUEST:
-			return task((SelectRequest*)request);
-		case SELECT_REPLY:
-			return task((SelectReply*)request);
-		case DESELECT_REQUEST:
-			return task((DeselectRequest*)request);
-		case DESELECT_REPLY:
-			return task((DeselectReply*)request);
-		// hard links / symlinks
-		case LINK_REQUEST:
-			return task((LinkRequest*)request);
-		case LINK_REPLY:
-			return task((LinkReply*)request);
-		case UNLINK_REQUEST:
-			return task((UnlinkRequest*)request);
-		case UNLINK_REPLY:
-			return task((UnlinkReply*)request);
-		case SYMLINK_REQUEST:
-			return task((SymlinkRequest*)request);
-		case SYMLINK_REPLY:
-			return task((SymlinkReply*)request);
-		case READ_LINK_REQUEST:
-			return task((ReadLinkRequest*)request);
-		case READ_LINK_REPLY:
-			return task((ReadLinkReply*)request);
-		case RENAME_REQUEST:
-			return task((RenameRequest*)request);
-		case RENAME_REPLY:
-			return task((RenameReply*)request);
 		// directories
-		case MKDIR_REQUEST:
-			return task((MkDirRequest*)request);
-		case MKDIR_REPLY:
-			return task((MkDirReply*)request);
-		case RMDIR_REQUEST:
-			return task((RmDirRequest*)request);
-		case RMDIR_REPLY:
-			return task((RmDirReply*)request);
+		case CREATE_DIR_REQUEST:
+			return task((CreateDirRequest*)request);
+		case CREATE_DIR_REPLY:
+			return task((CreateDirReply*)request);
+		case REMOVE_DIR_REQUEST:
+			return task((RemoveDirRequest*)request);
+		case REMOVE_DIR_REPLY:
+			return task((RemoveDirReply*)request);
 		case OPEN_DIR_REQUEST:
 			return task((OpenDirRequest*)request);
 		case OPEN_DIR_REPLY:
@@ -1568,11 +1584,7 @@ do_for_request(Request* request, Task& task)
 			return task((RewindDirRequest*)request);
 		case REWIND_DIR_REPLY:
 			return task((RewindDirReply*)request);
-		case WALK_REQUEST:
-			return task((WalkRequest*)request);
-		case WALK_REPLY:
-			return task((WalkReply*)request);
-		// attributes
+		// attribute directories
 		case OPEN_ATTR_DIR_REQUEST:
 			return task((OpenAttrDirRequest*)request);
 		case OPEN_ATTR_DIR_REPLY:
@@ -1593,6 +1605,7 @@ do_for_request(Request* request, Task& task)
 			return task((RewindAttrDirRequest*)request);
 		case REWIND_ATTR_DIR_REPLY:
 			return task((RewindAttrDirReply*)request);
+		// attributes
 		case READ_ATTR_REQUEST:
 			return task((ReadAttrRequest*)request);
 		case READ_ATTR_REPLY:
@@ -1601,18 +1614,18 @@ do_for_request(Request* request, Task& task)
 			return task((WriteAttrRequest*)request);
 		case WRITE_ATTR_REPLY:
 			return task((WriteAttrReply*)request);
-		case REMOVE_ATTR_REQUEST:
-			return task((RemoveAttrRequest*)request);
-		case REMOVE_ATTR_REPLY:
-			return task((RemoveAttrReply*)request);
+		case READ_ATTR_STAT_REQUEST:
+			return task((ReadAttrStatRequest*)request);
+		case READ_ATTR_STAT_REPLY:
+			return task((ReadAttrStatReply*)request);
 		case RENAME_ATTR_REQUEST:
 			return task((RenameAttrRequest*)request);
 		case RENAME_ATTR_REPLY:
 			return task((RenameAttrReply*)request);
-		case STAT_ATTR_REQUEST:
-			return task((StatAttrRequest*)request);
-		case STAT_ATTR_REPLY:
-			return task((StatAttrReply*)request);
+		case REMOVE_ATTR_REQUEST:
+			return task((RemoveAttrRequest*)request);
+		case REMOVE_ATTR_REPLY:
+			return task((RemoveAttrReply*)request);
 		// indices
 		case OPEN_INDEX_DIR_REQUEST:
 			return task((OpenIndexDirRequest*)request);
@@ -1642,14 +1655,10 @@ do_for_request(Request* request, Task& task)
 			return task((RemoveIndexRequest*)request);
 		case REMOVE_INDEX_REPLY:
 			return task((RemoveIndexReply*)request);
-		case RENAME_INDEX_REQUEST:
-			return task((RenameIndexRequest*)request);
-		case RENAME_INDEX_REPLY:
-			return task((RenameIndexReply*)request);
-		case STAT_INDEX_REQUEST:
-			return task((StatIndexRequest*)request);
-		case STAT_INDEX_REPLY:
-			return task((StatIndexReply*)request);
+		case READ_INDEX_STAT_REQUEST:
+			return task((ReadIndexStatRequest*)request);
+		case READ_INDEX_STAT_REPLY:
+			return task((ReadIndexStatReply*)request);
 		// queries
 		case OPEN_QUERY_REQUEST:
 			return task((OpenQueryRequest*)request);
@@ -1742,15 +1751,17 @@ using UserlandFSUtil::MountVolumeRequest;
 using UserlandFSUtil::MountVolumeReply;
 using UserlandFSUtil::UnmountVolumeRequest;
 using UserlandFSUtil::UnmountVolumeReply;
-using UserlandFSUtil::InitializeVolumeRequest;
-using UserlandFSUtil::InitializeVolumeReply;
+//using UserlandFSUtil::InitializeVolumeRequest;
+//using UserlandFSUtil::InitializeVolumeReply;
 using UserlandFSUtil::SyncVolumeRequest;
 using UserlandFSUtil::SyncVolumeReply;
-using UserlandFSUtil::ReadFSStatRequest;
-using UserlandFSUtil::ReadFSStatReply;
-using UserlandFSUtil::WriteFSStatRequest;
-using UserlandFSUtil::WriteFSStatReply;
+using UserlandFSUtil::ReadFSInfoRequest;
+using UserlandFSUtil::ReadFSInfoReply;
+using UserlandFSUtil::WriteFSInfoRequest;
+using UserlandFSUtil::WriteFSInfoReply;
 // vnodes
+using UserlandFSUtil::LookupRequest;
+using UserlandFSUtil::LookupReply;
 using UserlandFSUtil::ReadVNodeRequest;
 using UserlandFSUtil::ReadVNodeReply;
 using UserlandFSUtil::WriteVNodeRequest;
@@ -1758,14 +1769,32 @@ using UserlandFSUtil::WriteVNodeReply;
 using UserlandFSUtil::FSRemoveVNodeRequest;
 using UserlandFSUtil::FSRemoveVNodeReply;
 // nodes
+using UserlandFSUtil::IOCtlRequest;
+using UserlandFSUtil::IOCtlReply;
+using UserlandFSUtil::SetFlagsRequest;
+using UserlandFSUtil::SetFlagsReply;
+using UserlandFSUtil::SelectRequest;
+using UserlandFSUtil::SelectReply;
+using UserlandFSUtil::DeselectRequest;
+using UserlandFSUtil::DeselectReply;
 using UserlandFSUtil::FSyncRequest;
 using UserlandFSUtil::FSyncReply;
+using UserlandFSUtil::ReadSymlinkRequest;
+using UserlandFSUtil::ReadSymlinkReply;
+using UserlandFSUtil::CreateSymlinkRequest;
+using UserlandFSUtil::CreateSymlinkReply;
+using UserlandFSUtil::LinkRequest;
+using UserlandFSUtil::LinkReply;
+using UserlandFSUtil::UnlinkRequest;
+using UserlandFSUtil::UnlinkReply;
+using UserlandFSUtil::RenameRequest;
+using UserlandFSUtil::RenameReply;
+using UserlandFSUtil::AccessRequest;
+using UserlandFSUtil::AccessReply;
 using UserlandFSUtil::ReadStatRequest;
 using UserlandFSUtil::ReadStatReply;
 using UserlandFSUtil::WriteStatRequest;
 using UserlandFSUtil::WriteStatReply;
-using UserlandFSUtil::AccessRequest;
-using UserlandFSUtil::AccessReply;
 // files
 using UserlandFSUtil::CreateRequest;
 using UserlandFSUtil::CreateReply;
@@ -1779,30 +1808,11 @@ using UserlandFSUtil::ReadRequest;
 using UserlandFSUtil::ReadReply;
 using UserlandFSUtil::WriteRequest;
 using UserlandFSUtil::WriteReply;
-using UserlandFSUtil::IOCtlRequest;
-using UserlandFSUtil::IOCtlReply;
-using UserlandFSUtil::SetFlagsRequest;
-using UserlandFSUtil::SetFlagsReply;
-using UserlandFSUtil::SelectRequest;
-using UserlandFSUtil::SelectReply;
-using UserlandFSUtil::DeselectRequest;
-using UserlandFSUtil::DeselectReply;
-// hard links / symlinks
-using UserlandFSUtil::LinkRequest;
-using UserlandFSUtil::LinkReply;
-using UserlandFSUtil::UnlinkRequest;
-using UserlandFSUtil::UnlinkReply;
-using UserlandFSUtil::SymlinkRequest;
-using UserlandFSUtil::SymlinkReply;
-using UserlandFSUtil::ReadLinkRequest;
-using UserlandFSUtil::ReadLinkReply;
-using UserlandFSUtil::RenameRequest;
-using UserlandFSUtil::RenameReply;
 // directories
-using UserlandFSUtil::MkDirRequest;
-using UserlandFSUtil::MkDirReply;
-using UserlandFSUtil::RmDirRequest;
-using UserlandFSUtil::RmDirReply;
+using UserlandFSUtil::CreateDirRequest;
+using UserlandFSUtil::CreateDirReply;
+using UserlandFSUtil::RemoveDirRequest;
+using UserlandFSUtil::RemoveDirReply;
 using UserlandFSUtil::OpenDirRequest;
 using UserlandFSUtil::OpenDirReply;
 using UserlandFSUtil::CloseDirRequest;
@@ -1813,9 +1823,7 @@ using UserlandFSUtil::ReadDirRequest;
 using UserlandFSUtil::ReadDirReply;
 using UserlandFSUtil::RewindDirRequest;
 using UserlandFSUtil::RewindDirReply;
-using UserlandFSUtil::WalkRequest;
-using UserlandFSUtil::WalkReply;
-// attributes
+// attribute directories
 using UserlandFSUtil::OpenAttrDirRequest;
 using UserlandFSUtil::OpenAttrDirReply;
 using UserlandFSUtil::CloseAttrDirRequest;
@@ -1826,16 +1834,17 @@ using UserlandFSUtil::ReadAttrDirRequest;
 using UserlandFSUtil::ReadAttrDirReply;
 using UserlandFSUtil::RewindAttrDirRequest;
 using UserlandFSUtil::RewindAttrDirReply;
+// attributes
 using UserlandFSUtil::ReadAttrRequest;
 using UserlandFSUtil::ReadAttrReply;
 using UserlandFSUtil::WriteAttrRequest;
 using UserlandFSUtil::WriteAttrReply;
-using UserlandFSUtil::RemoveAttrRequest;
-using UserlandFSUtil::RemoveAttrReply;
+using UserlandFSUtil::ReadAttrStatRequest;
+using UserlandFSUtil::ReadAttrStatReply;
 using UserlandFSUtil::RenameAttrRequest;
 using UserlandFSUtil::RenameAttrReply;
-using UserlandFSUtil::StatAttrRequest;
-using UserlandFSUtil::StatAttrReply;
+using UserlandFSUtil::RemoveAttrRequest;
+using UserlandFSUtil::RemoveAttrReply;
 // indices
 using UserlandFSUtil::OpenIndexDirRequest;
 using UserlandFSUtil::OpenIndexDirReply;
@@ -1851,10 +1860,8 @@ using UserlandFSUtil::CreateIndexRequest;
 using UserlandFSUtil::CreateIndexReply;
 using UserlandFSUtil::RemoveIndexRequest;
 using UserlandFSUtil::RemoveIndexReply;
-using UserlandFSUtil::RenameIndexRequest;
-using UserlandFSUtil::RenameIndexReply;
-using UserlandFSUtil::StatIndexRequest;
-using UserlandFSUtil::StatIndexReply;
+using UserlandFSUtil::ReadIndexStatRequest;
+using UserlandFSUtil::ReadIndexStatReply;
 // queries
 using UserlandFSUtil::OpenQueryRequest;
 using UserlandFSUtil::OpenQueryReply;

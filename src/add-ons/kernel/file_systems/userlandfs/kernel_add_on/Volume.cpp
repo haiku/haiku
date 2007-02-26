@@ -17,6 +17,12 @@
 #include "userlandfs_ioctl.h"
 #include "Volume.h"
 
+// missing ioctl()s
+// TODO: Place somewhere else.
+#define		IOCTL_FILE_UNCACHED_IO	10000
+#define		IOCTL_CREATE_TIME		10002
+#define		IOCTL_MODIFIED_TIME		10003
+
 // If a thread of the userland server enters userland FS kernel code and
 // is sending a request, this is the time after which it shall time out
 // waiting for a reply.
@@ -57,7 +63,7 @@ private:
 };
 
 // constructor
-Volume::Volume(FileSystem* fileSystem, nspace_id id)
+Volume::Volume(FileSystem* fileSystem, mount_id id)
 	: Referencable(true),
 	  fFileSystem(fileSystem),
 	  fID(id),
@@ -88,7 +94,7 @@ Volume::GetFileSystem() const
 }
 
 // GetID
-nspace_id
+mount_id
 Volume::GetID() const
 {
 	return fID;
@@ -116,12 +122,11 @@ Volume::IsMounting() const
 }
 
 
-// #pragma mark -
-// #pragma mark ----- client methods -----
+// #pragma mark - client methods
 
 // GetVNode
 status_t
-Volume::GetVNode(vnode_id vnid, void** node)
+Volume::GetVNode(vnode_id vnid, fs_vnode* node)
 {
 PRINT(("get_vnode(%ld, %Ld)\n", fID, vnid));
 	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
@@ -147,7 +152,7 @@ PRINT(("put_vnode(%ld, %Ld)\n", fID, vnid));
 
 // NewVNode
 status_t
-Volume::NewVNode(vnode_id vnid, void* node)
+Volume::NewVNode(vnode_id vnid, fs_vnode node)
 {
 PRINT(("new_vnode(%ld, %Ld)\n", fID, vnid));
 	status_t error = new_vnode(fID, vnid, node);
@@ -187,16 +192,18 @@ status_t
 Volume::IsVNodeRemoved(vnode_id vnid)
 {
 PRINT(("is_vnode_removed(%ld, %Ld)\n", fID, vnid));
-	return is_vnode_removed(fID, vnid);
+//	return is_vnode_removed(fID, vnid);
+// TODO: Add this function?
+return false;
 }
 
-// #pragma mark -
-// #pragma mark ----- FS -----
+
+// #pragma mark - FS
+
 
 // Mount
 status_t
-Volume::Mount(const char* device, ulong flags, const char* parameters,
-	int32 len)
+Volume::Mount(const char* device, uint32 flags, const char* parameters)
 {
 	// Create a map that holds vnode_id->void* mappings of all vnodes
 	// created while mounting. We need it to get the root node.
@@ -204,8 +211,9 @@ Volume::Mount(const char* device, ulong flags, const char* parameters,
 	status_t error = vnodeMap.InitCheck();
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	fMountVNodes = &vnodeMap;
-	error = _Mount(device, flags, parameters, len);
+	error = _Mount(device, flags, parameters);
 	fMountVNodes = NULL;
 	if (error == B_OK) {
 		// fetch the root node, so that we can serve Walk() requests on it,
@@ -254,13 +262,16 @@ Volume::Sync()
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	SyncVolumeRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
+
 	// send the request
 	KernelRequestHandler handler(this, SYNC_VOLUME_REPLY);
 	SyncVolumeReply* reply;
@@ -268,35 +279,40 @@ Volume::Sync()
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// ReadFSStat
+// ReadFSInfo
 status_t
-Volume::ReadFSStat(fs_info* info)
+Volume::ReadFSInfo(fs_info* info)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	ReadFSStatRequest* request;
+	ReadFSInfoRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
+
 	// send the request
-	KernelRequestHandler handler(this, READ_FS_STAT_REPLY);
-	ReadFSStatReply* reply;
+	KernelRequestHandler handler(this, READ_FS_INFO_REPLY);
+	ReadFSInfoReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -304,58 +320,88 @@ Volume::ReadFSStat(fs_info* info)
 	return error;
 }
 
-// WriteFSStat
+// WriteFSInfo
 status_t
-Volume::WriteFSStat(struct fs_info *info, long mask)
+Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	WriteFSStatRequest* request;
+	WriteFSInfoRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->info = *info;
 	request->mask = mask;
+
 	// send the request
-	KernelRequestHandler handler(this, WRITE_FS_STAT_REPLY);
-	WriteFSStatReply* reply;
+	KernelRequestHandler handler(this, WRITE_FS_INFO_REPLY);
+	WriteFSInfoReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// #pragma mark -
-// #pragma mark ----- vnodes -----
+
+// #pragma mark - vnodes
+
+
+// Lookup
+status_t
+Volume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
+{
+	// When the connection to the userland server is lost, we serve
+	// lookup(fRootNode, `.') requests manually to allow clean unmounting.
+	status_t error = _Lookup(dir, entryName, vnid, type);
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()
+		&& dir == fRootNode && strcmp(entryName, ".") == 0) {
+		WARN(("Volume::Lookup(): connection lost, emulating lookup `.'\n"));
+		void* entryNode;
+		if (GetVNode(fRootID, &entryNode) != B_OK)
+			RETURN_ERROR(B_BAD_VALUE);
+		*vnid = fRootID;
+		*type = S_IFDIR;
+		// The VFS will balance the get_vnode() call for the FS.
+		_DecrementVNodeCount(*vnid);
+		return B_OK;
+	}
+	return error;
+}
 
 // ReadVNode
 status_t
-Volume::ReadVNode(vnode_id vnid, char reenter, void** node)
+Volume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	ReadVNodeRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->vnid = vnid;
 	request->reenter = reenter;
+
 	// send the request
 	KernelRequestHandler handler(this, READ_VNODE_REPLY);
 	ReadVNodeReply* reply;
@@ -363,6 +409,7 @@ Volume::ReadVNode(vnode_id vnid, char reenter, void** node)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -372,7 +419,7 @@ Volume::ReadVNode(vnode_id vnid, char reenter, void** node)
 
 // WriteVNode
 status_t
-Volume::WriteVNode(void* node, char reenter)
+Volume::WriteVNode(fs_vnode node, bool reenter)
 {
 	status_t error = _WriteVNode(node, reenter);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -387,22 +434,25 @@ Volume::WriteVNode(void* node, char reenter)
 
 // RemoveVNode
 status_t
-Volume::RemoveVNode(void* node, char reenter)
+Volume::RemoveVNode(fs_vnode node, bool reenter)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FSRemoveVNodeRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->reenter = reenter;
+
 	// send the request
 	KernelRequestHandler handler(this, FS_REMOVE_VNODE_REPLY);
 	FSRemoveVNodeReply* reply;
@@ -410,335 +460,20 @@ Volume::RemoveVNode(void* node, char reenter)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// #pragma mark -
-// #pragma mark ----- nodes -----
 
-// FSync
-status_t
-Volume::FSync(void* node)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	FSyncRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	// send the request
-	KernelRequestHandler handler(this, FSYNC_REPLY);
-	FSyncReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
+// #pragma mark - nodes
 
-// ReadStat
-status_t
-Volume::ReadStat(void* node, struct stat* st)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	ReadStatRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	// send the request
-	KernelRequestHandler handler(this, READ_STAT_REPLY);
-	ReadStatReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	*st = reply->st;
-	return error;
-}
-
-// WriteStat
-status_t
-Volume::WriteStat(void* node, struct stat* st, long mask)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	WriteStatRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	request->st = *st;
-	request->mask = mask;
-	// send the request
-	KernelRequestHandler handler(this, WRITE_STAT_REPLY);
-	WriteStatReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
-
-// Access
-status_t
-Volume::Access(void* node, int mode)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	AccessRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	request->mode = mode;
-	// send the request
-	KernelRequestHandler handler(this, ACCESS_REPLY);
-	AccessReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
-
-// #pragma mark -
-// #pragma mark ----- files -----
-
-// Create
-status_t
-Volume::Create(void* dir, const char* name, int openMode, int mode,
-	vnode_id* vnid, void** cookie)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	CreateRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = dir;
-	error = allocator.AllocateString(request->name, name);
-	request->openMode = openMode;
-	request->mode = mode;
-	if (error != B_OK)
-		return error;
-	// send the request
-	KernelRequestHandler handler(this, CREATE_REPLY);
-	CreateReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	*vnid = reply->vnid;
-	*cookie = reply->fileCookie;
-	if (error == B_OK)
-		_DecrementVNodeCount(*vnid);
-	return error;
-}
-
-// Open
-status_t
-Volume::Open(void* node, int openMode, void** cookie)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	AutoIncrementer incrementer(&fOpenFiles);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	OpenRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	request->openMode = openMode;
-	// send the request
-	KernelRequestHandler handler(this, OPEN_REPLY);
-	OpenReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	incrementer.Keep();
-	*cookie = reply->fileCookie;
-	return error;
-}
-
-// Close
-status_t
-Volume::Close(void* node, void* cookie)
-{
-	status_t error = _Close(node, cookie);
-	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
-		// This isn't really necessary, as the return value is irrelevant to
-		// the VFS. OBOS ignores it completely. The fsshell returns it to the
-		// userland, but considers the node closed anyway.
-		WARN(("Volume::Close(): connection lost, forcing close\n"));
-		return B_OK;
-	}
-	return error;
-}
-
-// FreeCookie
-status_t
-Volume::FreeCookie(void* node, void* cookie)
-{
-	status_t error = _FreeCookie(node, cookie);
-	bool disconnected = false;
-	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
-		// This isn't really necessary, as the return value is irrelevant to
-		// the VFS. It's completely ignored by OBOS as well as by the fsshell.
-		WARN(("Volume::FreeCookie(): connection lost, forcing free cookie\n"));
-		error = B_OK;
-		disconnected = true;
-	}
-	int32 openFiles = atomic_add(&fOpenFiles, -1);
-	if (openFiles <= 1 && disconnected)
-		_PutAllPendingVNodes();
-	return error;
-}
-
-// Read
-status_t
-Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
-	size_t bufferSize, size_t* bytesRead)
-{
-	*bytesRead = 0;
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	ReadRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	request->fileCookie = cookie;
-	request->pos = pos;
-	request->size = bufferSize;
-	// send the request
-	KernelRequestHandler handler(this, READ_REPLY);
-	ReadReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	void* readBuffer = reply->buffer.GetData();
-	if (reply->bytesRead > (uint32)reply->buffer.GetSize()
-		|| reply->bytesRead > bufferSize) {
-		return B_BAD_DATA;
-	}
-	if (reply->bytesRead > 0)
-		memcpy(buffer, readBuffer, reply->bytesRead);
-	*bytesRead = reply->bytesRead;
-	_SendReceiptAck(port);
-	return error;
-}
-
-// Write
-status_t
-Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
-	size_t size, size_t* bytesWritten)
-{
-	*bytesWritten = 0;
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	WriteRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = node;
-	request->fileCookie = cookie;
-	request->pos = pos;
-	error = allocator.AllocateData(request->buffer, buffer, size, 1);
-	if (error != B_OK)
-		return error;
-	// send the request
-	KernelRequestHandler handler(this, WRITE_REPLY);
-	WriteReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	*bytesWritten = reply->bytesWritten;
-	return error;
-}
 
 // IOCtl
 status_t
-Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
+Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
 	size_t len)
 {
 	// check the command and its parameters
@@ -786,31 +521,37 @@ Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
 				PRINT(("Volume::IOCtl(): unknown command\n"));
 				return B_BAD_VALUE;
 			}
+
 			isBuffer = info->isBuffer;
 			bufferSize = info->bufferSize;
 			writeSize = info->writeBufferSize;
+
 			// If the buffer shall indeed specify a buffer, check it.
 			if (info->isBuffer) {
 				if (!buffer) {
 					PRINT(("Volume::IOCtl(): buffer is NULL\n"));
 					return B_BAD_VALUE;
 				}
+
 				area_id area = area_for(buffer);
 				if (area < 0) {
 					PRINT(("Volume::IOCtl(): bad area\n"));
 					return B_BAD_VALUE;
 				}
+
 				area_info info;
 				if (get_area_info(area, &info) != B_OK) {
 					PRINT(("Volume::IOCtl(): failed to get area info\n"));
 					return B_BAD_VALUE;
 				}
+
 				int32 areaSize = info.size - ((uint8*)buffer
 					- (uint8*)info.address);
 				if (bufferSize > areaSize || writeSize > areaSize) {
 					PRINT(("Volume::IOCtl(): bad buffer size\n"));
 					return B_BAD_VALUE;
 				}
+
 				if (writeSize > 0 && !(info.protection & B_WRITE_AREA)) {
 					PRINT(("Volume::IOCtl(): buffer not writable\n"));
 					return B_BAD_VALUE;
@@ -819,17 +560,20 @@ Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
 			break;
 		}
 	}
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	IOCtlRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->fileCookie = cookie;
@@ -838,11 +582,13 @@ Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
 	request->isBuffer = isBuffer;
 	request->lenParameter = len;
 	request->writeSize = writeSize;
+
 	if (isBuffer && bufferSize > 0) {
 		error = allocator.AllocateData(request->buffer, buffer, bufferSize, 8);
 		if (error != B_OK)
 			return error;
 	}
+
 	// send the request
 	KernelRequestHandler handler(this, IOCTL_REPLY);
 	IOCtlReply* reply;
@@ -850,9 +596,11 @@ Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
+
 	// Copy back the buffer even if the result is not B_OK. The protocol
 	// is defined by the FS developer and may include writing data into
 	// the buffer in some error cases.
@@ -867,23 +615,26 @@ Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
 
 // SetFlags
 status_t
-Volume::SetFlags(void* node, void* cookie, int flags)
+Volume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	SetFlagsRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->fileCookie = cookie;
 	request->flags = flags;
+
 	// send the request
 	KernelRequestHandler handler(this, SET_FLAGS_REPLY);
 	SetFlagsReply* reply;
@@ -891,6 +642,7 @@ Volume::SetFlags(void* node, void* cookie, int flags)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -899,7 +651,7 @@ Volume::SetFlags(void* node, void* cookie, int flags)
 
 // Select
 status_t
-Volume::Select(void* node, void* cookie, uint8 event, uint32 ref,
+Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 	selectsync* sync)
 {
 	// get a free port
@@ -907,22 +659,26 @@ Volume::Select(void* node, void* cookie, uint8 event, uint32 ref,
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	SelectRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->fileCookie = cookie;
 	request->event = event;
 	request->ref = ref;
 	request->sync = sync;
+
 	// add a selectsync entry
 	error = fFileSystem->AddSelectSyncEntry(sync);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, SELECT_REPLY);
 	SelectReply* reply;
@@ -932,6 +688,7 @@ Volume::Select(void* node, void* cookie, uint8 event, uint32 ref,
 		return error;
 	}
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK) {
 		fFileSystem->RemoveSelectSyncEntry(sync);
@@ -942,7 +699,7 @@ Volume::Select(void* node, void* cookie, uint8 event, uint32 ref,
 
 // Deselect
 status_t
-Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
+Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
 {
 	struct SyncRemover {
 		SyncRemover(FileSystem* fs, selectsync* sync)
@@ -952,22 +709,26 @@ Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 		FileSystem*	fs;
 		selectsync*	sync;
 	} syncRemover(fFileSystem, sync);
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	DeselectRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->fileCookie = cookie;
 	request->event = event;
 	request->sync = sync;
+
 	// send the request
 	KernelRequestHandler handler(this, DESELECT_REPLY);
 	DeselectReply* reply;
@@ -975,120 +736,51 @@ Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// #pragma mark -
-// #pragma mark ----- hard links / symlinks -----
-
-// Link
+// FSync
 status_t
-Volume::Link(void* dir, const char* name, void* node)
+Volume::FSync(fs_vnode node)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	LinkRequest* request;
+	FSyncRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
-	request->node = dir;
-	error = allocator.AllocateString(request->name, name);
-	request->target = node;
-	if (error != B_OK)
-		return error;
+	request->node = node;
+
 	// send the request
-	KernelRequestHandler handler(this, LINK_REPLY);
-	LinkReply* reply;
+	KernelRequestHandler handler(this, FSYNC_REPLY);
+	FSyncReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// Unlink
+// ReadSymlink
 status_t
-Volume::Unlink(void* dir, const char* name)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	UnlinkRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = dir;
-	error = allocator.AllocateString(request->name, name);
-	if (error != B_OK)
-		return error;
-	// send the request
-	KernelRequestHandler handler(this, UNLINK_REPLY);
-	UnlinkReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
-
-// Symlink
-status_t
-Volume::Symlink(void* dir, const char* name, const char* target)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	SymlinkRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = dir;
-	error = allocator.AllocateString(request->name, name);
-	if (error == B_OK)
-		error = allocator.AllocateString(request->target, target);
-	if (error != B_OK)
-		return error;
-	// send the request
-	KernelRequestHandler handler(this, SYMLINK_REPLY);
-	SymlinkReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
-
-// ReadLink
-status_t
-Volume::ReadLink(void* node, char* buffer, size_t bufferSize, size_t* bytesRead)
+Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
+	size_t* bytesRead)
 {
 	*bytesRead = 0;
 	// get a free port
@@ -1096,22 +788,26 @@ Volume::ReadLink(void* node, char* buffer, size_t bufferSize, size_t* bytesRead)
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	ReadLinkRequest* request;
+	ReadSymlinkRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->size = bufferSize;
+
 	// send the request
-	KernelRequestHandler handler(this, READ_LINK_REPLY);
-	ReadLinkReply* reply;
+	KernelRequestHandler handler(this, READ_SYMLINK_REPLY);
+	ReadSymlinkReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1127,9 +823,125 @@ Volume::ReadLink(void* node, char* buffer, size_t bufferSize, size_t* bytesRead)
 	return error;
 }
 
+// CreateSymlink
+status_t
+Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
+	int mode)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	CreateSymlinkRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = dir;
+	error = allocator.AllocateString(request->name, name);
+	if (error == B_OK)
+		error = allocator.AllocateString(request->target, target);
+	if (error != B_OK)
+		return error;
+	request->mode = mode;
+
+	// send the request
+	KernelRequestHandler handler(this, CREATE_SYMLINK_REPLY);
+	CreateSymlinkReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
+// Link
+status_t
+Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	LinkRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = dir;
+	error = allocator.AllocateString(request->name, name);
+	request->target = node;
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, LINK_REPLY);
+	LinkReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
+// Unlink
+status_t
+Volume::Unlink(fs_vnode dir, const char* name)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	UnlinkRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = dir;
+	error = allocator.AllocateString(request->name, name);
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, UNLINK_REPLY);
+	UnlinkReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
 // Rename
 status_t
-Volume::Rename(void* oldDir, const char* oldName, void* newDir,
+Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 	const char* newName)
 {
 	// get a free port
@@ -1137,12 +949,14 @@ Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RenameRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->oldDir = oldDir;
 	request->newDir = newDir;
@@ -1151,6 +965,7 @@ Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 		error = allocator.AllocateString(request->newName, newName);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, RENAME_REPLY);
 	RenameReply* reply;
@@ -1158,76 +973,403 @@ Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// #pragma mark -
-// #pragma mark ----- directories -----
-
-// MkDir
+// Access
 status_t
-Volume::MkDir(void* dir, const char* name, int mode)
+Volume::Access(fs_vnode node, int mode)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	MkDirRequest* request;
+	AccessRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->mode = mode;
+
+	// send the request
+	KernelRequestHandler handler(this, ACCESS_REPLY);
+	AccessReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
+// ReadStat
+status_t
+Volume::ReadStat(fs_vnode node, struct stat* st)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	ReadStatRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+
+	// send the request
+	KernelRequestHandler handler(this, READ_STAT_REPLY);
+	ReadStatReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	*st = reply->st;
+	return error;
+}
+
+// WriteStat
+status_t
+Volume::WriteStat(fs_vnode node, const struct stat* st, uint32 mask)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	WriteStatRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->st = *st;
+	request->mask = mask;
+
+	// send the request
+	KernelRequestHandler handler(this, WRITE_STAT_REPLY);
+	WriteStatReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
+
+// #pragma mark - files
+
+// Create
+status_t
+Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
+	void** cookie, vnode_id* vnid)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	CreateRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = dir;
+	error = allocator.AllocateString(request->name, name);
+	request->openMode = openMode;
+	request->mode = mode;
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, CREATE_REPLY);
+	CreateReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	*vnid = reply->vnid;
+	*cookie = reply->fileCookie;
+	// The VFS will balance the new_vnode() call for the FS.
+	if (error == B_OK)
+		_DecrementVNodeCount(*vnid);
+	return error;
+}
+
+// Open
+status_t
+Volume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+	AutoIncrementer incrementer(&fOpenFiles);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	OpenRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->openMode = openMode;
+
+	// send the request
+	KernelRequestHandler handler(this, OPEN_REPLY);
+	OpenReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	incrementer.Keep();
+	*cookie = reply->fileCookie;
+	return error;
+}
+
+// Close
+status_t
+Volume::Close(fs_vnode node, fs_cookie cookie)
+{
+	status_t error = _Close(node, cookie);
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
+		// This isn't really necessary, as the return value is irrelevant to
+		// the VFS. OBOS ignores it completely. The fsshell returns it to the
+		// userland, but considers the node closed anyway.
+		WARN(("Volume::Close(): connection lost, forcing close\n"));
+		return B_OK;
+	}
+	return error;
+}
+
+// FreeCookie
+status_t
+Volume::FreeCookie(fs_vnode node, fs_cookie cookie)
+{
+	status_t error = _FreeCookie(node, cookie);
+	bool disconnected = false;
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
+		// This isn't really necessary, as the return value is irrelevant to
+		// the VFS. It's completely ignored by OBOS as well as by the fsshell.
+		WARN(("Volume::FreeCookie(): connection lost, forcing free cookie\n"));
+		error = B_OK;
+		disconnected = true;
+	}
+	int32 openFiles = atomic_add(&fOpenFiles, -1);
+	if (openFiles <= 1 && disconnected)
+		_PutAllPendingVNodes();
+	return error;
+}
+
+// Read
+status_t
+Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+	size_t bufferSize, size_t* bytesRead)
+{
+	*bytesRead = 0;
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	ReadRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->fileCookie = cookie;
+	request->pos = pos;
+	request->size = bufferSize;
+
+	// send the request
+	KernelRequestHandler handler(this, READ_REPLY);
+	ReadReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	void* readBuffer = reply->buffer.GetData();
+	if (reply->bytesRead > (uint32)reply->buffer.GetSize()
+		|| reply->bytesRead > bufferSize) {
+		return B_BAD_DATA;
+	}
+	if (reply->bytesRead > 0)
+		memcpy(buffer, readBuffer, reply->bytesRead);
+	*bytesRead = reply->bytesRead;
+	_SendReceiptAck(port);
+	return error;
+}
+
+// Write
+status_t
+Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
+	size_t size, size_t* bytesWritten)
+{
+	*bytesWritten = 0;
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	WriteRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->fileCookie = cookie;
+	request->pos = pos;
+	error = allocator.AllocateData(request->buffer, buffer, size, 1);
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, WRITE_REPLY);
+	WriteReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	*bytesWritten = reply->bytesWritten;
+	return error;
+}
+
+
+// #pragma mark - directories
+
+// CreateDir
+status_t
+Volume::CreateDir(fs_vnode dir, const char* name, int mode, vnode_id *newDir)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	CreateDirRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = dir;
 	error = allocator.AllocateString(request->name, name);
 	request->mode = mode;
 	if (error != B_OK)
 		return error;
+
 	// send the request
-	KernelRequestHandler handler(this, MKDIR_REPLY);
-	MkDirReply* reply;
+	KernelRequestHandler handler(this, CREATE_DIR_REPLY);
+	CreateDirReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
+	*newDir = reply->newDir;
 	return error;
 }
 
-// RmDir
+// RemoveDir
 status_t
-Volume::RmDir(void* dir, const char* name)
+Volume::RemoveDir(fs_vnode dir, const char* name)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	RmDirRequest* request;
+	RemoveDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = dir;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
+
 	// send the request
-	KernelRequestHandler handler(this, RMDIR_REPLY);
-	RmDirReply* reply;
+	KernelRequestHandler handler(this, REMOVE_DIR_REPLY);
+	RemoveDirReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1236,7 +1378,7 @@ Volume::RmDir(void* dir, const char* name)
 
 // OpenDir
 status_t
-Volume::OpenDir(void* node, void** cookie)
+Volume::OpenDir(fs_vnode node, fs_cookie* cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -1244,14 +1386,17 @@ Volume::OpenDir(void* node, void** cookie)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
 	AutoIncrementer incrementer(&fOpenDirectories);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	OpenDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
+
 	// send the request
 	KernelRequestHandler handler(this, OPEN_DIR_REPLY);
 	OpenDirReply* reply;
@@ -1259,6 +1404,7 @@ Volume::OpenDir(void* node, void** cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1269,7 +1415,7 @@ Volume::OpenDir(void* node, void** cookie)
 
 // CloseDir
 status_t
-Volume::CloseDir(void* node, void* cookie)
+Volume::CloseDir(fs_vnode node, fs_vnode cookie)
 {
 	status_t error = _CloseDir(node, cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1304,26 +1450,30 @@ Volume::FreeDirCookie(void* node, void* cookie)
 
 // ReadDir
 status_t
-Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
-	int32 count, int32* countRead)
+Volume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer, size_t bufferSize,
+	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	ReadDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->dirCookie = cookie;
 	request->bufferSize = bufferSize;
 	request->count = count;
+
 	// send the request
 	KernelRequestHandler handler(this, READ_DIR_REPLY);
 	ReadDirReply* reply;
@@ -1331,6 +1481,7 @@ Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1340,12 +1491,13 @@ Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 		return B_BAD_DATA;
 PRINT(("Volume::ReadDir(): buffer returned: %ld bytes\n",
 reply->buffer.GetSize()));
+
 	*countRead = reply->count;
 	if (*countRead > 0) {
 		// copy the buffer -- limit the number of bytes to copy
-		int32 maxBytes = *countRead
+		uint32 maxBytes = *countRead
 			* (sizeof(struct dirent) + B_FILE_NAME_LENGTH);
-		int32 copyBytes = reply->buffer.GetSize();
+		uint32 copyBytes = reply->buffer.GetSize();
 		if (copyBytes > maxBytes)
 			copyBytes = maxBytes;
 		memcpy(buffer, reply->buffer.GetData(), copyBytes);
@@ -1356,22 +1508,25 @@ reply->buffer.GetSize()));
 
 // RewindDir
 status_t
-Volume::RewindDir(void* node, void* cookie)
+Volume::RewindDir(fs_vnode node, fs_vnode cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RewindDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->dirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, REWIND_DIR_REPLY);
 	RewindDirReply* reply;
@@ -1379,39 +1534,20 @@ Volume::RewindDir(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// Walk
-status_t
-Volume::Walk(void* dir, const char* entryName, char** resolvedPath,
-	vnode_id* vnid)
-{
-	// When the connection to the userland server is lost, we serve
-	// walk(fRootNode, `.') requests manually to allow clean unmounting.
-	status_t error = _Walk(dir, entryName, resolvedPath, vnid);
-	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()
-		&& dir == fRootNode && strcmp(entryName, ".") == 0) {
-		WARN(("Volume::Walk(): connection lost, emulating walk `.'\n"));
-		void* entryNode;
-		if (GetVNode(fRootID, &entryNode) != B_OK)
-			RETURN_ERROR(B_BAD_VALUE);
-		*vnid = fRootID;
-		_DecrementVNodeCount(*vnid);
-		return B_OK;
-	}
-	return error;
-}
 
-// #pragma mark -
-// #pragma mark ----- attributes -----
+// #pragma mark - attribute directories
+
 
 // OpenAttrDir
 status_t
-Volume::OpenAttrDir(void* node, void** cookie)
+Volume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -1419,14 +1555,17 @@ Volume::OpenAttrDir(void* node, void** cookie)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
 	AutoIncrementer incrementer(&fOpenAttributeDirectories);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	OpenAttrDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
+
 	// send the request
 	KernelRequestHandler handler(this, OPEN_ATTR_DIR_REPLY);
 	OpenAttrDirReply* reply;
@@ -1434,6 +1573,7 @@ Volume::OpenAttrDir(void* node, void** cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1444,7 +1584,7 @@ Volume::OpenAttrDir(void* node, void** cookie)
 
 // CloseAttrDir
 status_t
-Volume::CloseAttrDir(void* node, void* cookie)
+Volume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
 {
 	status_t error = _CloseAttrDir(node, cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1472,6 +1612,7 @@ Volume::FreeAttrDirCookie(void* node, void* cookie)
 		error = B_OK;
 		disconnected = true;
 	}
+
 	int32 openAttrDirs = atomic_add(&fOpenAttributeDirectories, -1);
 	if (openAttrDirs <= 1 && disconnected)
 		_PutAllPendingVNodes();
@@ -1480,8 +1621,8 @@ Volume::FreeAttrDirCookie(void* node, void* cookie)
 
 // ReadAttrDir
 status_t
-Volume::ReadAttrDir(void* node, void* cookie, void* buffer, size_t bufferSize,
-	int32 count, int32* countRead)
+Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
+	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	*countRead = 0;
 	// get a free port
@@ -1489,17 +1630,20 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	ReadAttrDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->attrDirCookie = cookie;
 	request->bufferSize = bufferSize;
 	request->count = count;
+
 	// send the request
 	KernelRequestHandler handler(this, READ_ATTR_DIR_REPLY);
 	ReadAttrDirReply* reply;
@@ -1507,6 +1651,7 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1514,12 +1659,13 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 		return B_BAD_DATA;
 	if ((int32)bufferSize < reply->buffer.GetSize())
 		return B_BAD_DATA;
+
 	*countRead = reply->count;
 	if (*countRead > 0) {
 		// copy the buffer -- limit the number of bytes to copy
-		int32 maxBytes = *countRead
+		uint32 maxBytes = *countRead
 			* (sizeof(struct dirent) + B_ATTR_NAME_LENGTH);
-		int32 copyBytes = reply->buffer.GetSize();
+		uint32 copyBytes = reply->buffer.GetSize();
 		if (copyBytes > maxBytes)
 			copyBytes = maxBytes;
 		memcpy(buffer, reply->buffer.GetData(), copyBytes);
@@ -1530,22 +1676,25 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 
 // RewindAttrDir
 status_t
-Volume::RewindAttrDir(void* node, void* cookie)
+Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RewindAttrDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->attrDirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, REWIND_ATTR_DIR_REPLY);
 	RewindAttrDirReply* reply;
@@ -1553,37 +1702,43 @@ Volume::RewindAttrDir(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
+
+// #pragma mark - attributes
+
+
 // ReadAttr
 status_t
-Volume::ReadAttr(void* node, const char* name, int type, off_t pos,
+Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
 	*bytesRead = 0;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	ReadAttrRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
-	error = allocator.AllocateString(request->name, name);
-	request->type = type;
+	request->attrCookie = node;
 	request->pos = pos;
 	request->size = bufferSize;
-	if (error != B_OK)
-		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, READ_ATTR_REPLY);
 	ReadAttrReply* reply;
@@ -1591,6 +1746,7 @@ Volume::ReadAttr(void* node, const char* name, int type, off_t pos,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1608,30 +1764,32 @@ Volume::ReadAttr(void* node, const char* name, int type, off_t pos,
 
 // WriteAttr
 status_t
-Volume::WriteAttr(void* node, const char* name, int type, off_t pos,
+Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	*bytesWritten = 0;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	WriteAttrRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
-	error = allocator.AllocateString(request->name, name);
-	request->type = type;
+	request->attrCookie = cookie;
 	request->pos = pos;
-	if (error == B_OK)
-		error = allocator.AllocateData(request->buffer, buffer, bufferSize, 1);
+	error = allocator.AllocateData(request->buffer, buffer, bufferSize, 1);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, WRITE_ATTR_REPLY);
 	WriteAttrReply* reply;
@@ -1639,6 +1797,7 @@ Volume::WriteAttr(void* node, const char* name, int type, off_t pos,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1646,61 +1805,69 @@ Volume::WriteAttr(void* node, const char* name, int type, off_t pos,
 	return error;
 }
 
-// RemoveAttr
+// ReadAttrStat
 status_t
-Volume::RemoveAttr(void* node, const char* name)
+Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	RemoveAttrRequest* request;
+	ReadAttrStatRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
-	error = allocator.AllocateString(request->name, name);
-	if (error != B_OK)
-		return error;
+	request->attrCookie = cookie;
+
 	// send the request
-	KernelRequestHandler handler(this, REMOVE_ATTR_REPLY);
-	RemoveAttrReply* reply;
+	KernelRequestHandler handler(this, READ_ATTR_STAT_REPLY);
+	ReadAttrStatReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
+	*st = reply->st;
 	return error;
 }
 
 // RenameAttr
 status_t
-Volume::RenameAttr(void* node, const char* oldName, const char* newName)
+Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
+	const char* newName)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RenameAttrRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->oldNode = oldNode;
+	request->newNode = newNode;
 	error = allocator.AllocateString(request->oldName, oldName);
 	if (error == B_OK)
 		error = allocator.AllocateString(request->newName, newName);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, RENAME_ATTR_REPLY);
 	RenameAttrReply* reply;
@@ -1708,52 +1875,57 @@ Volume::RenameAttr(void* node, const char* oldName, const char* newName)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// StatAttr
+// RemoveAttr
 status_t
-Volume::StatAttr(void* node, const char* name, struct attr_info* attrInfo)
+Volume::RemoveAttr(fs_vnode node, const char* name)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	StatAttrRequest* request;
+	RemoveAttrRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
+
 	// send the request
-	KernelRequestHandler handler(this, STAT_ATTR_REPLY);
-	StatAttrReply* reply;
+	KernelRequestHandler handler(this, REMOVE_ATTR_REPLY);
+	RemoveAttrReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
-	*attrInfo = reply->info;
 	return error;
 }
 
-// #pragma mark -
-// #pragma mark ----- indices -----
+
+// #pragma mark - indices
+
 
 // OpenIndexDir
 status_t
-Volume::OpenIndexDir(void** cookie)
+Volume::OpenIndexDir(fs_cookie *cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -1761,13 +1933,16 @@ Volume::OpenIndexDir(void** cookie)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
 	AutoIncrementer incrementer(&fOpenIndexDirectories);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	OpenIndexDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
+
 	// send the request
 	KernelRequestHandler handler(this, OPEN_INDEX_DIR_REPLY);
 	OpenIndexDirReply* reply;
@@ -1775,6 +1950,7 @@ Volume::OpenIndexDir(void** cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1785,7 +1961,7 @@ Volume::OpenIndexDir(void** cookie)
 
 // CloseIndexDir
 status_t
-Volume::CloseIndexDir(void* cookie)
+Volume::CloseIndexDir(fs_cookie cookie)
 {
 	status_t error = _CloseIndexDir(cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1801,7 +1977,7 @@ Volume::CloseIndexDir(void* cookie)
 
 // FreeIndexDirCookie
 status_t
-Volume::FreeIndexDirCookie(void* cookie)
+Volume::FreeIndexDirCookie(fs_cookie cookie)
 {
 	status_t error = _FreeIndexDirCookie(cookie);
 	bool disconnected = false;
@@ -1813,6 +1989,7 @@ Volume::FreeIndexDirCookie(void* cookie)
 		error = B_OK;
 		disconnected = true;
 	}
+
 	int32 openIndexDirs = atomic_add(&fOpenIndexDirectories, -1);
 	if (openIndexDirs <= 1 && disconnected)
 		_PutAllPendingVNodes();
@@ -1821,25 +1998,29 @@ Volume::FreeIndexDirCookie(void* cookie)
 
 // ReadIndexDir
 status_t
-Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize, int32 count,
-	int32* countRead)
+Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
+	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	ReadIndexDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->indexDirCookie = cookie;
 	request->bufferSize = bufferSize;
 	request->count = count;
+
 	// send the request
 	KernelRequestHandler handler(this, READ_INDEX_DIR_REPLY);
 	ReadIndexDirReply* reply;
@@ -1847,6 +2028,7 @@ Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize, int32 count,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1854,12 +2036,13 @@ Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize, int32 count,
 		return B_BAD_DATA;
 	if ((int32)bufferSize < reply->buffer.GetSize())
 		return B_BAD_DATA;
+
 	*countRead = reply->count;
 	if (*countRead > 0) {
 		// copy the buffer -- limit the number of bytes to copy
-		int32 maxBytes = *countRead
+		uint32 maxBytes = *countRead
 			* (sizeof(struct dirent) + B_FILE_NAME_LENGTH);
-		int32 copyBytes = reply->buffer.GetSize();
+		uint32 copyBytes = reply->buffer.GetSize();
 		if (copyBytes > maxBytes)
 			copyBytes = maxBytes;
 		memcpy(buffer, reply->buffer.GetData(), copyBytes);
@@ -1870,21 +2053,24 @@ Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize, int32 count,
 
 // RewindIndexDir
 status_t
-Volume::RewindIndexDir(void* cookie)
+Volume::RewindIndexDir(fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RewindIndexDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->indexDirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, REWIND_INDEX_DIR_REPLY);
 	RewindIndexDirReply* reply;
@@ -1892,6 +2078,7 @@ Volume::RewindIndexDir(void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1900,25 +2087,28 @@ Volume::RewindIndexDir(void* cookie)
 
 // CreateIndex
 status_t
-Volume::CreateIndex(const char* name, int type, int flags)
+Volume::CreateIndex(const char* name, uint32 type, uint32 flags)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	CreateIndexRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	error = allocator.AllocateString(request->name, name);
 	request->type = type;
 	request->flags = flags;
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, CREATE_INDEX_REPLY);
 	CreateIndexReply* reply;
@@ -1926,6 +2116,7 @@ Volume::CreateIndex(const char* name, int type, int flags)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -1941,16 +2132,19 @@ Volume::RemoveIndex(const char* name)
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RemoveIndexRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	KernelRequestHandler handler(this, REMOVE_INDEX_REPLY);
 	RemoveIndexReply* reply;
@@ -1958,86 +2152,58 @@ Volume::RemoveIndex(const char* name)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// RenameIndex
+// ReadIndexStat
 status_t
-Volume::RenameIndex(const char* oldName, const char* newName)
+Volume::ReadIndexStat(const char* name, struct stat *st)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	RenameIndexRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	error = allocator.AllocateString(request->oldName, oldName);
-	if (error == B_OK)
-		error = allocator.AllocateString(request->newName, newName);
-	if (error != B_OK)
-		return error;
-	// send the request
-	KernelRequestHandler handler(this, RENAME_INDEX_REPLY);
-	RenameIndexReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
 
-// StatIndex
-status_t
-Volume::StatIndex(const char *name, struct index_info* indexInfo)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	StatIndexRequest* request;
+	ReadIndexStatRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
+
 	// send the request
-	KernelRequestHandler handler(this, STAT_INDEX_REPLY);
-	StatIndexReply* reply;
+	KernelRequestHandler handler(this, READ_INDEX_STAT_REPLY);
+	ReadIndexStatReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
-	*indexInfo = reply->info;
+	*st = reply->st;
 	return error;
 }
 
-// #pragma mark -
-// #pragma mark ----- queries -----
+
+// #pragma mark - queries
+
 
 // OpenQuery
 status_t
-Volume::OpenQuery(const char* queryString, ulong flags, port_id targetPort,
-	long token, void** cookie)
+Volume::OpenQuery(const char* queryString, uint32 flags, port_id targetPort,
+	uint32 token, fs_cookie *cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -2045,12 +2211,14 @@ Volume::OpenQuery(const char* queryString, ulong flags, port_id targetPort,
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
 	AutoIncrementer incrementer(&fOpenQueries);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	OpenQueryRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	error = allocator.AllocateString(request->queryString, queryString);
 	if (error != B_OK)
@@ -2058,6 +2226,7 @@ Volume::OpenQuery(const char* queryString, ulong flags, port_id targetPort,
 	request->flags = flags;
 	request->port = targetPort;
 	request->token = token;
+
 	// send the request
 	KernelRequestHandler handler(this, OPEN_QUERY_REPLY);
 	OpenQueryReply* reply;
@@ -2065,6 +2234,7 @@ Volume::OpenQuery(const char* queryString, ulong flags, port_id targetPort,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2075,7 +2245,7 @@ Volume::OpenQuery(const char* queryString, ulong flags, port_id targetPort,
 
 // CloseQuery
 status_t
-Volume::CloseQuery(void* cookie)
+Volume::CloseQuery(fs_cookie cookie)
 {
 	status_t error = _CloseQuery(cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -2090,7 +2260,7 @@ Volume::CloseQuery(void* cookie)
 
 // FreeQueryCookie
 status_t
-Volume::FreeQueryCookie(void* cookie)
+Volume::FreeQueryCookie(fs_cookie cookie)
 {
 	status_t error = _FreeQueryCookie(cookie);
 	bool disconnected = false;
@@ -2102,6 +2272,7 @@ Volume::FreeQueryCookie(void* cookie)
 		error = B_OK;
 		disconnected = true;
 	}
+
 	int32 openQueries = atomic_add(&fOpenQueries, -1);
 	if (openQueries <= 1 && disconnected)
 		_PutAllPendingVNodes();
@@ -2110,25 +2281,29 @@ Volume::FreeQueryCookie(void* cookie)
 
 // ReadQuery
 status_t
-Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize, int32 count,
-	int32* countRead)
+Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
+	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	ReadQueryRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->queryCookie = cookie;
 	request->bufferSize = bufferSize;
 	request->count = count;
+
 	// send the request
 	KernelRequestHandler handler(this, READ_QUERY_REPLY);
 	ReadQueryReply* reply;
@@ -2136,6 +2311,7 @@ Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize, int32 count,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2143,12 +2319,13 @@ Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize, int32 count,
 		return B_BAD_DATA;
 	if ((int32)bufferSize < reply->buffer.GetSize())
 		return B_BAD_DATA;
+
 	*countRead = reply->count;
 	if (*countRead > 0) {
 		// copy the buffer -- limit the number of bytes to copy
-		int32 maxBytes = *countRead
+		uint32 maxBytes = *countRead
 			* (sizeof(struct dirent) + B_FILE_NAME_LENGTH);
-		int32 copyBytes = reply->buffer.GetSize();
+		uint32 copyBytes = reply->buffer.GetSize();
 		if (copyBytes > maxBytes)
 			copyBytes = maxBytes;
 		memcpy(buffer, reply->buffer.GetData(), copyBytes);
@@ -2162,8 +2339,7 @@ Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize, int32 count,
 
 // _Mount
 status_t
-Volume::_Mount(const char* device, ulong flags, const char* parameters,
-	int32 len)
+Volume::_Mount(const char* device, uint32 flags, const char* parameters)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -2182,13 +2358,14 @@ Volume::_Mount(const char* device, ulong flags, const char* parameters,
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = fID;
 	error = allocator.AllocateString(request->cwd, cwd);
 	if (error == B_OK)
 		error = allocator.AllocateString(request->device, device);
 	request->flags = flags;
 	if (error == B_OK)
-		error = allocator.AllocateData(request->parameters, parameters, len, 1);
+		error = allocator.AllocateString(request->parameters, parameters);
 	if (error != B_OK)
 		return error;
 
@@ -2224,13 +2401,16 @@ Volume::_Unmount()
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	UnmountVolumeRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
+
 	// send the request
 	KernelRequestHandler handler(this, UNMOUNT_VOLUME_REPLY);
 	UnmountVolumeReply* reply;
@@ -2238,21 +2418,64 @@ Volume::_Unmount()
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
-// _WriteVNode
+// _Lookup
 status_t
-Volume::_WriteVNode(void* node, char reenter)
+Volume::_Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	LookupRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+	request->volume = fUserlandVolume;
+	request->node = dir;
+	error = allocator.AllocateString(request->entryName, entryName);
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, LOOKUP_REPLY);
+	LookupReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	*vnid = reply->vnid;
+	*type = reply->type;
+
+	// The VFS will balance the get_vnode() call for the FS.
+	_DecrementVNodeCount(*vnid);
+	return error;
+}
+
+// _WriteVNode
+status_t
+Volume::_WriteVNode(fs_vnode node, bool reenter)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	WriteVNodeRequest* request;
@@ -2262,6 +2485,7 @@ Volume::_WriteVNode(void* node, char reenter)
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->reenter = reenter;
+
 	// send the request
 	KernelRequestHandler handler(this, WRITE_VNODE_REPLY);
 	WriteVNodeReply* reply;
@@ -2269,6 +2493,7 @@ Volume::_WriteVNode(void* node, char reenter)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2277,22 +2502,25 @@ Volume::_WriteVNode(void* node, char reenter)
 
 // _Close
 status_t
-Volume::_Close(void* node, void* cookie)
+Volume::_Close(fs_vnode node, fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	CloseRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->fileCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, CLOSE_REPLY);
 	CloseReply* reply;
@@ -2300,6 +2528,7 @@ Volume::_Close(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2308,22 +2537,25 @@ Volume::_Close(void* node, void* cookie)
 
 // _FreeCookie
 status_t
-Volume::_FreeCookie(void* node, void* cookie)
+Volume::_FreeCookie(fs_vnode node, fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FreeCookieRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->fileCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, FREE_COOKIE_REPLY);
 	FreeCookieReply* reply;
@@ -2331,6 +2563,7 @@ Volume::_FreeCookie(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2339,22 +2572,25 @@ Volume::_FreeCookie(void* node, void* cookie)
 
 // _CloseDir
 status_t
-Volume::_CloseDir(void* node, void* cookie)
+Volume::_CloseDir(fs_vnode node, fs_vnode cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	CloseDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->dirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, CLOSE_DIR_REPLY);
 	CloseDirReply* reply;
@@ -2362,6 +2598,7 @@ Volume::_CloseDir(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2370,22 +2607,25 @@ Volume::_CloseDir(void* node, void* cookie)
 
 // _FreeDirCookie
 status_t
-Volume::_FreeDirCookie(void* node, void* cookie)
+Volume::_FreeDirCookie(fs_vnode node, fs_vnode cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FreeDirCookieRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->dirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, FREE_DIR_COOKIE_REPLY);
 	FreeDirCookieReply* reply;
@@ -2393,81 +2633,34 @@ Volume::_FreeDirCookie(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return error;
-}
 
-// _Walk
-status_t
-Volume::_Walk(void* dir, const char* entryName, char** resolvedPath,
-	vnode_id* vnid)
-{
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	WalkRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
-	request->volume = fUserlandVolume;
-	request->node = dir;
-	error = allocator.AllocateString(request->entryName, entryName);
-	request->traverseLink = resolvedPath;
-	if (error != B_OK)
-		return error;
-	// send the request
-	KernelRequestHandler handler(this, WALK_REPLY);
-	WalkReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
-	*vnid = reply->vnid;
-	if (resolvedPath) {
-		const char* readPath = (const char*)reply->resolvedPath.GetData();
-		if (readPath) {
-			int32 len = strnlen(readPath, reply->resolvedPath.GetSize());
-			*resolvedPath = (char*)malloc(len + 1);
-			if (*resolvedPath) {
-				memcpy(*resolvedPath, readPath, len);
-				(*resolvedPath)[len] = '\0';
-			} else
-				error = B_NO_MEMORY;
-			_SendReceiptAck(port);
-		} else
-			_DecrementVNodeCount(*vnid);
-	} else
-		_DecrementVNodeCount(*vnid);
 	return error;
 }
 
 // _CloseAttrDir
 status_t
-Volume::_CloseAttrDir(void* node, void* cookie)
+Volume::_CloseAttrDir(fs_vnode node, fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	CloseAttrDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->attrDirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, CLOSE_ATTR_DIR_REPLY);
 	CloseAttrDirReply* reply;
@@ -2475,6 +2668,7 @@ Volume::_CloseAttrDir(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2483,22 +2677,25 @@ Volume::_CloseAttrDir(void* node, void* cookie)
 
 // _FreeAttrDirCookie
 status_t
-Volume::_FreeAttrDirCookie(void* node, void* cookie)
+Volume::_FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FreeAttrDirCookieRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->node = node;
 	request->attrDirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, FREE_ATTR_DIR_COOKIE_REPLY);
 	FreeAttrDirCookieReply* reply;
@@ -2506,6 +2703,7 @@ Volume::_FreeAttrDirCookie(void* node, void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2514,21 +2712,24 @@ Volume::_FreeAttrDirCookie(void* node, void* cookie)
 
 // _CloseIndexDir
 status_t
-Volume::_CloseIndexDir(void* cookie)
+Volume::_CloseIndexDir(fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	CloseIndexDirRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->indexDirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, CLOSE_INDEX_DIR_REPLY);
 	CloseIndexDirReply* reply;
@@ -2536,6 +2737,7 @@ Volume::_CloseIndexDir(void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2544,21 +2746,24 @@ Volume::_CloseIndexDir(void* cookie)
 
 // _FreeIndexDirCookie
 status_t
-Volume::_FreeIndexDirCookie(void* cookie)
+Volume::_FreeIndexDirCookie(fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FreeIndexDirCookieRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->indexDirCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, FREE_INDEX_DIR_COOKIE_REPLY);
 	FreeIndexDirCookieReply* reply;
@@ -2566,6 +2771,7 @@ Volume::_FreeIndexDirCookie(void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2574,21 +2780,24 @@ Volume::_FreeIndexDirCookie(void* cookie)
 
 // _CloseQuery
 status_t
-Volume::_CloseQuery(void* cookie)
+Volume::_CloseQuery(fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	CloseQueryRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->queryCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, CLOSE_QUERY_REPLY);
 	CloseQueryReply* reply;
@@ -2596,6 +2805,7 @@ Volume::_CloseQuery(void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -2604,21 +2814,24 @@ Volume::_CloseQuery(void* cookie)
 
 // _FreeQueryCookie
 status_t
-Volume::_FreeQueryCookie(void* cookie)
+Volume::_FreeQueryCookie(fs_cookie cookie)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FreeQueryCookieRequest* request;
 	status_t error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->volume = fUserlandVolume;
 	request->queryCookie = cookie;
+
 	// send the request
 	KernelRequestHandler handler(this, FREE_QUERY_COOKIE_REPLY);
 	FreeQueryCookieReply* reply;
@@ -2626,6 +2839,7 @@ Volume::_FreeQueryCookie(void* cookie)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;

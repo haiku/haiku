@@ -44,14 +44,14 @@ MountVolumeRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
-// InitializeVolumeRequest
-status_t
-InitializeVolumeRequest::GetAddressInfos(AddressInfo* infos, int32* count)
-{
-	ADD_STRING(device);
-	ADD_STRING(parameters);
-	return B_OK;
-}
+//// InitializeVolumeRequest
+//status_t
+//InitializeVolumeRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+//{
+//	ADD_STRING(device);
+//	ADD_STRING(parameters);
+//	return B_OK;
+//}
 
 // CreateRequest
 status_t
@@ -109,18 +109,18 @@ UnlinkRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
-// SymlinkRequest
+// CreateSymlinkRequest
 status_t
-SymlinkRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+CreateSymlinkRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_NON_NULL_STRING(name);
 	ADD_NON_NULL_STRING(target);
 	return B_OK;
 }
 
-// ReadLinkReply
+// ReadSymlinkReply
 status_t
-ReadLinkReply::GetAddressInfos(AddressInfo* infos, int32* count)
+ReadSymlinkReply::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_STRING(buffer);
 	return B_OK;
@@ -135,17 +135,17 @@ RenameRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
-// MkDirRequest
+// CreateDirRequest
 status_t
-MkDirRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+CreateDirRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_NON_NULL_STRING(name);
 	return B_OK;
 }
 
-// RmDirRequest
+// RemoveDirRequest
 status_t
-RmDirRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+RemoveDirRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_NON_NULL_STRING(name);
 	return B_OK;
@@ -159,19 +159,11 @@ ReadDirReply::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
-// WalkRequest
+// LookupRequest
 status_t
-WalkRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+LookupRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_NON_NULL_STRING(entryName);
-	return B_OK;
-}
-
-// WalkReply
-status_t
-WalkReply::GetAddressInfos(AddressInfo* infos, int32* count)
-{
-	ADD_STRING(resolvedPath);
 	return B_OK;
 }
 
@@ -180,14 +172,6 @@ status_t
 ReadAttrDirReply::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_ADDRESS(buffer);
-	return B_OK;
-}
-
-// ReadAttrRequest
-status_t
-ReadAttrRequest::GetAddressInfos(AddressInfo* infos, int32* count)
-{
-	ADD_NON_NULL_STRING(name);
 	return B_OK;
 }
 
@@ -203,7 +187,6 @@ ReadAttrReply::GetAddressInfos(AddressInfo* infos, int32* count)
 status_t
 WriteAttrRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
-	ADD_NON_NULL_STRING(name);
 	ADD_ADDRESS(buffer);
 	return B_OK;
 }
@@ -222,14 +205,6 @@ RenameAttrRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_NON_NULL_STRING(oldName);
 	ADD_NON_NULL_STRING(newName);
-	return B_OK;
-}
-
-// StatAttrRequest
-status_t
-StatAttrRequest::GetAddressInfos(AddressInfo* infos, int32* count)
-{
-	ADD_NON_NULL_STRING(name);
 	return B_OK;
 }
 
@@ -257,18 +232,9 @@ RemoveIndexRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
-// RenameIndexRequest
+// ReadIndexStatRequest
 status_t
-RenameIndexRequest::GetAddressInfos(AddressInfo* infos, int32* count)
-{
-	ADD_NON_NULL_STRING(oldName);
-	ADD_NON_NULL_STRING(newName);
-	return B_OK;
-}
-
-// StatIndexRequest
-status_t
-StatIndexRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+ReadIndexStatRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_NON_NULL_STRING(name);
 	return B_OK;
@@ -499,37 +465,57 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		// FS
 		case MOUNT_VOLUME_REQUEST:
 		case UNMOUNT_VOLUME_REQUEST:
-		case INITIALIZE_VOLUME_REQUEST:
+//		case INITIALIZE_VOLUME_REQUEST:
 		case SYNC_VOLUME_REQUEST:
-		case READ_FS_STAT_REQUEST:
-		case WRITE_FS_STAT_REQUEST:
+		case READ_FS_INFO_REQUEST:
+		case WRITE_FS_INFO_REQUEST:
 			return true;
 		case MOUNT_VOLUME_REPLY:
 		case UNMOUNT_VOLUME_REPLY:
-		case INITIALIZE_VOLUME_REPLY:
+//		case INITIALIZE_VOLUME_REPLY:
 		case SYNC_VOLUME_REPLY:
-		case READ_FS_STAT_REPLY:
-		case WRITE_FS_STAT_REPLY:
+		case READ_FS_INFO_REPLY:
+		case WRITE_FS_INFO_REPLY:
 			return false;
 		// vnodes
+		case LOOKUP_REQUEST:
 		case READ_VNODE_REQUEST:
 		case WRITE_VNODE_REQUEST:
 		case FS_REMOVE_VNODE_REQUEST:
 			return true;
+		case LOOKUP_REPLY:
 		case READ_VNODE_REPLY:
 		case WRITE_VNODE_REPLY:
 		case FS_REMOVE_VNODE_REPLY:
 			return false;
 		// nodes
+		case IOCTL_REQUEST:
+		case SET_FLAGS_REQUEST:
+		case SELECT_REQUEST:
+		case DESELECT_REQUEST:
 		case FSYNC_REQUEST:
+		case READ_SYMLINK_REQUEST:
+		case CREATE_SYMLINK_REQUEST:
+		case LINK_REQUEST:
+		case UNLINK_REQUEST:
+		case RENAME_REQUEST:
+		case ACCESS_REQUEST:
 		case READ_STAT_REQUEST:
 		case WRITE_STAT_REQUEST:
-		case ACCESS_REQUEST:
 			return true;
+		case IOCTL_REPLY:
+		case SET_FLAGS_REPLY:
+		case SELECT_REPLY:
+		case DESELECT_REPLY:
 		case FSYNC_REPLY:
+		case READ_SYMLINK_REPLY:
+		case CREATE_SYMLINK_REPLY:
+		case LINK_REPLY:
+		case UNLINK_REPLY:
+		case RENAME_REPLY:
+		case ACCESS_REPLY:
 		case READ_STAT_REPLY:
 		case WRITE_STAT_REPLY:
-		case ACCESS_REPLY:
 			return false;
 		// files
 		case CREATE_REQUEST:
@@ -538,10 +524,6 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case FREE_COOKIE_REQUEST:
 		case READ_REQUEST:
 		case WRITE_REQUEST:
-		case IOCTL_REQUEST:
-		case SET_FLAGS_REQUEST:
-		case SELECT_REQUEST:
-		case DESELECT_REQUEST:
 			return true;
 		case CREATE_REPLY:
 		case OPEN_REPLY:
@@ -549,65 +531,49 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case FREE_COOKIE_REPLY:
 		case READ_REPLY:
 		case WRITE_REPLY:
-		case IOCTL_REPLY:
-		case SET_FLAGS_REPLY:
-		case SELECT_REPLY:
-		case DESELECT_REPLY:
-			return false;
-		// hard links / symlinks
-		case LINK_REQUEST:
-		case UNLINK_REQUEST:
-		case SYMLINK_REQUEST:
-		case READ_LINK_REQUEST:
-		case RENAME_REQUEST:
-			return true;
-		case LINK_REPLY:
-		case UNLINK_REPLY:
-		case SYMLINK_REPLY:
-		case READ_LINK_REPLY:
-		case RENAME_REPLY:
 			return false;
 		// directories
-		case MKDIR_REQUEST:
-		case RMDIR_REQUEST:
+		case CREATE_DIR_REQUEST:
+		case REMOVE_DIR_REQUEST:
 		case OPEN_DIR_REQUEST:
 		case CLOSE_DIR_REQUEST:
 		case FREE_DIR_COOKIE_REQUEST:
 		case READ_DIR_REQUEST:
 		case REWIND_DIR_REQUEST:
-		case WALK_REQUEST:
 			return true;
-		case MKDIR_REPLY:
-		case RMDIR_REPLY:
+		case CREATE_DIR_REPLY:
+		case REMOVE_DIR_REPLY:
 		case OPEN_DIR_REPLY:
 		case CLOSE_DIR_REPLY:
 		case FREE_DIR_COOKIE_REPLY:
 		case READ_DIR_REPLY:
 		case REWIND_DIR_REPLY:
-		case WALK_REPLY:
 			return false;
-		// attributes
+		// attribute directories
 		case OPEN_ATTR_DIR_REQUEST:
 		case CLOSE_ATTR_DIR_REQUEST:
 		case FREE_ATTR_DIR_COOKIE_REQUEST:
 		case READ_ATTR_DIR_REQUEST:
 		case REWIND_ATTR_DIR_REQUEST:
-		case READ_ATTR_REQUEST:
-		case WRITE_ATTR_REQUEST:
-		case REMOVE_ATTR_REQUEST:
-		case RENAME_ATTR_REQUEST:
-		case STAT_ATTR_REQUEST:
 			return true;
 		case OPEN_ATTR_DIR_REPLY:
 		case CLOSE_ATTR_DIR_REPLY:
 		case FREE_ATTR_DIR_COOKIE_REPLY:
 		case READ_ATTR_DIR_REPLY:
 		case REWIND_ATTR_DIR_REPLY:
+			return false;
+		// attributes
+		case READ_ATTR_REQUEST:
+		case WRITE_ATTR_REQUEST:
+		case READ_ATTR_STAT_REQUEST:
+		case RENAME_ATTR_REQUEST:
+		case REMOVE_ATTR_REQUEST:
+			return true;
 		case READ_ATTR_REPLY:
 		case WRITE_ATTR_REPLY:
-		case REMOVE_ATTR_REPLY:
+		case READ_ATTR_STAT_REPLY:
 		case RENAME_ATTR_REPLY:
-		case STAT_ATTR_REPLY:
+		case REMOVE_ATTR_REPLY:
 			return false;
 		// indices
 		case OPEN_INDEX_DIR_REQUEST:
@@ -617,8 +583,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case REWIND_INDEX_DIR_REQUEST:
 		case CREATE_INDEX_REQUEST:
 		case REMOVE_INDEX_REQUEST:
-		case RENAME_INDEX_REQUEST:
-		case STAT_INDEX_REQUEST:
+		case READ_INDEX_STAT_REQUEST:
 			return true;
 		case OPEN_INDEX_DIR_REPLY:
 		case CLOSE_INDEX_DIR_REPLY:
@@ -627,8 +592,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case REWIND_INDEX_DIR_REPLY:
 		case CREATE_INDEX_REPLY:
 		case REMOVE_INDEX_REPLY:
-		case RENAME_INDEX_REPLY:
-		case STAT_INDEX_REPLY:
+		case READ_INDEX_STAT_REPLY:
 			return false;
 		// queries
 		case OPEN_QUERY_REQUEST:
@@ -691,37 +655,57 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		// FS
 		case MOUNT_VOLUME_REQUEST:
 		case UNMOUNT_VOLUME_REQUEST:
-		case INITIALIZE_VOLUME_REQUEST:
+//		case INITIALIZE_VOLUME_REQUEST:
 		case SYNC_VOLUME_REQUEST:
-		case READ_FS_STAT_REQUEST:
-		case WRITE_FS_STAT_REQUEST:
+		case READ_FS_INFO_REQUEST:
+		case WRITE_FS_INFO_REQUEST:
 			return false;
 		case MOUNT_VOLUME_REPLY:
 		case UNMOUNT_VOLUME_REPLY:
-		case INITIALIZE_VOLUME_REPLY:
+//		case INITIALIZE_VOLUME_REPLY:
 		case SYNC_VOLUME_REPLY:
-		case READ_FS_STAT_REPLY:
-		case WRITE_FS_STAT_REPLY:
+		case READ_FS_INFO_REPLY:
+		case WRITE_FS_INFO_REPLY:
 			return true;
 		// vnodes
+		case LOOKUP_REQUEST:
 		case READ_VNODE_REQUEST:
 		case WRITE_VNODE_REQUEST:
 		case FS_REMOVE_VNODE_REQUEST:
 			return false;
+		case LOOKUP_REPLY:
 		case READ_VNODE_REPLY:
 		case WRITE_VNODE_REPLY:
 		case FS_REMOVE_VNODE_REPLY:
 			return true;
 		// nodes
+		case IOCTL_REQUEST:
+		case SET_FLAGS_REQUEST:
+		case SELECT_REQUEST:
+		case DESELECT_REQUEST:
 		case FSYNC_REQUEST:
+		case READ_SYMLINK_REQUEST:
+		case CREATE_SYMLINK_REQUEST:
+		case LINK_REQUEST:
+		case UNLINK_REQUEST:
+		case RENAME_REQUEST:
+		case ACCESS_REQUEST:
 		case READ_STAT_REQUEST:
 		case WRITE_STAT_REQUEST:
-		case ACCESS_REQUEST:
 			return false;
+		case IOCTL_REPLY:
+		case SET_FLAGS_REPLY:
+		case SELECT_REPLY:
+		case DESELECT_REPLY:
 		case FSYNC_REPLY:
+		case READ_SYMLINK_REPLY:
+		case CREATE_SYMLINK_REPLY:
+		case LINK_REPLY:
+		case UNLINK_REPLY:
+		case RENAME_REPLY:
+		case ACCESS_REPLY:
 		case READ_STAT_REPLY:
 		case WRITE_STAT_REPLY:
-		case ACCESS_REPLY:
 			return true;
 		// files
 		case CREATE_REQUEST:
@@ -730,10 +714,6 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case FREE_COOKIE_REQUEST:
 		case READ_REQUEST:
 		case WRITE_REQUEST:
-		case IOCTL_REQUEST:
-		case SET_FLAGS_REQUEST:
-		case SELECT_REQUEST:
-		case DESELECT_REQUEST:
 			return false;
 		case CREATE_REPLY:
 		case OPEN_REPLY:
@@ -741,65 +721,49 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case FREE_COOKIE_REPLY:
 		case READ_REPLY:
 		case WRITE_REPLY:
-		case IOCTL_REPLY:
-		case SET_FLAGS_REPLY:
-		case SELECT_REPLY:
-		case DESELECT_REPLY:
-			return true;
-		// hard links / symlinks
-		case LINK_REQUEST:
-		case UNLINK_REQUEST:
-		case SYMLINK_REQUEST:
-		case READ_LINK_REQUEST:
-		case RENAME_REQUEST:
-			return false;
-		case LINK_REPLY:
-		case UNLINK_REPLY:
-		case SYMLINK_REPLY:
-		case READ_LINK_REPLY:
-		case RENAME_REPLY:
 			return true;
 		// directories
-		case MKDIR_REQUEST:
-		case RMDIR_REQUEST:
+		case CREATE_DIR_REQUEST:
+		case REMOVE_DIR_REQUEST:
 		case OPEN_DIR_REQUEST:
 		case CLOSE_DIR_REQUEST:
 		case FREE_DIR_COOKIE_REQUEST:
 		case READ_DIR_REQUEST:
 		case REWIND_DIR_REQUEST:
-		case WALK_REQUEST:
 			return false;
-		case MKDIR_REPLY:
-		case RMDIR_REPLY:
+		case CREATE_DIR_REPLY:
+		case REMOVE_DIR_REPLY:
 		case OPEN_DIR_REPLY:
 		case CLOSE_DIR_REPLY:
 		case FREE_DIR_COOKIE_REPLY:
 		case READ_DIR_REPLY:
 		case REWIND_DIR_REPLY:
-		case WALK_REPLY:
 			return true;
-		// attributes
+		// attribute directories
 		case OPEN_ATTR_DIR_REQUEST:
 		case CLOSE_ATTR_DIR_REQUEST:
 		case FREE_ATTR_DIR_COOKIE_REQUEST:
 		case READ_ATTR_DIR_REQUEST:
 		case REWIND_ATTR_DIR_REQUEST:
-		case READ_ATTR_REQUEST:
-		case WRITE_ATTR_REQUEST:
-		case REMOVE_ATTR_REQUEST:
-		case RENAME_ATTR_REQUEST:
-		case STAT_ATTR_REQUEST:
 			return false;
 		case OPEN_ATTR_DIR_REPLY:
 		case CLOSE_ATTR_DIR_REPLY:
 		case FREE_ATTR_DIR_COOKIE_REPLY:
 		case READ_ATTR_DIR_REPLY:
 		case REWIND_ATTR_DIR_REPLY:
+			return true;
+		// attributes
+		case READ_ATTR_REQUEST:
+		case WRITE_ATTR_REQUEST:
+		case RENAME_ATTR_REQUEST:
+		case READ_ATTR_STAT_REQUEST:
+		case REMOVE_ATTR_REQUEST:
+			return false;
 		case READ_ATTR_REPLY:
 		case WRITE_ATTR_REPLY:
-		case REMOVE_ATTR_REPLY:
+		case READ_ATTR_STAT_REPLY:
 		case RENAME_ATTR_REPLY:
-		case STAT_ATTR_REPLY:
+		case REMOVE_ATTR_REPLY:
 			return true;
 		// indices
 		case OPEN_INDEX_DIR_REQUEST:
@@ -809,8 +773,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case REWIND_INDEX_DIR_REQUEST:
 		case CREATE_INDEX_REQUEST:
 		case REMOVE_INDEX_REQUEST:
-		case RENAME_INDEX_REQUEST:
-		case STAT_INDEX_REQUEST:
+		case READ_INDEX_STAT_REQUEST:
 			return false;
 		case OPEN_INDEX_DIR_REPLY:
 		case CLOSE_INDEX_DIR_REPLY:
@@ -819,8 +782,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case REWIND_INDEX_DIR_REPLY:
 		case CREATE_INDEX_REPLY:
 		case REMOVE_INDEX_REPLY:
-		case RENAME_INDEX_REPLY:
-		case STAT_INDEX_REPLY:
+		case READ_INDEX_STAT_REPLY:
 			return true;
 		// queries
 		case OPEN_QUERY_REQUEST:

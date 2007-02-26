@@ -8,6 +8,8 @@
 #include "Requests.h"
 #include "Volume.h"
 
+#include <NodeMonitor.h>
+
 // VolumePutter
 class VolumePutter {
 public:
@@ -140,7 +142,7 @@ KernelRequestHandler::_HandleRequest(NotifySelectEventRequest* request)
 	status_t result = B_OK;
 	if (fFileSystem->KnowsSelectSyncEntry(request->sync)) {
 		PRINT(("notify_select_event(%p, %lu)\n", request->sync, request->ref));
-		notify_select_event(request->sync, request->ref);
+		notify_select_event(request->sync, request->ref, request->event);
 	} else
 		result = B_BAD_VALUE;
 	// prepare the reply
@@ -338,7 +340,7 @@ KernelRequestHandler::_HandleRequest(IsVNodeRemovedRequest* request)
 
 // _GetVolume
 status_t
-KernelRequestHandler::_GetVolume(nspace_id id, Volume** volume)
+KernelRequestHandler::_GetVolume(mount_id id, Volume** volume)
 {
 	if (fVolume) {
 		if (fVolume->GetID() != id) {

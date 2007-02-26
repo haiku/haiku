@@ -202,16 +202,18 @@ Settings::GetIOCtlInfo(int command) const
 void
 Settings::Dump() const
 {
-	PRINT(("Settings:\n"));
-	if (fIOCtlInfos) {
-		for (IOCtlInfoMap::Iterator it = fIOCtlInfos->GetIterator();
-			 it.HasNext();) {
-			IOCtlInfoMap::Entry entry = it.Next();
-			IOCtlInfo* info = entry.value;
-			PRINT(("  ioctl %d: buffer size: %ld, write buffer size: %ld\n",
-				info->command, info->bufferSize, info->writeBufferSize));
+	D(
+		PRINT(("Settings:\n"));
+		if (fIOCtlInfos) {
+			for (IOCtlInfoMap::Iterator it = fIOCtlInfos->GetIterator();
+				 it.HasNext();) {
+				IOCtlInfoMap::Entry entry = it.Next();
+				IOCtlInfo* info = entry.value;
+				PRINT(("  ioctl %d: buffer size: %ld, write buffer size: %ld\n",
+					info->command, info->bufferSize, info->writeBufferSize));
+			}
 		}
-	}
+	)
 }
 
 // _Init
