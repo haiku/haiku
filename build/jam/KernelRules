@@ -105,7 +105,7 @@ rule KernelAddon
 
 	# compile and link
 	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) : false ;
-	local linkFlags = -nostdlib -Xlinker -soname=\"$(target)\" ;
+	local linkFlags = -nostdlib -Xlinker -soname=\"$(target:G=)\" ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
 	Main $(target) : $(sources) ;
 	LinkAgainst $(target) : $(libs) $(kernel) ;

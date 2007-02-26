@@ -116,7 +116,7 @@ rule Addon
 	
 	Main $(1) : $(3) ;
 
-	local linkFlags = -Xlinker -soname=\"$(1)\" ;
+	local linkFlags = -Xlinker -soname=\"$(1:G=)\" ;
 	if $(isExecutable) != true {
 		linkFlags = -nostart $(linkFlags) ;
 	}
@@ -282,7 +282,7 @@ rule SharedLibraryFromObjects
 
 	MainFromObjects $(_lib) : $(2) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
-						   -nostart -Xlinker -soname=\"$(_lib)\" ;
+						   -nostart -Xlinker -soname=\"$(_lib:G=)\" ;
 	LinkAgainst $(_lib) : $(3) ;
 
 	AddSharedObjectGlueCode $(_lib) : false ;
@@ -464,7 +464,7 @@ rule BuildPlatformSharedLibrary
 	
 	BuildPlatformMain $(target) : $(sources) : $(libs) ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
-		-shared -Xlinker -soname=\"$(target)\" ;
+		-shared -Xlinker -soname=\"$(target:G=)\" ;
 }
 
 rule BuildPlatformMergeObject
