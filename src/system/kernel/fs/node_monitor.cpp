@@ -837,8 +837,10 @@ notify_entry_moved(mount_id device, vnode_id fromDirectory,
 	get_interested_monitor_listeners(device, fromDirectory, B_WATCH_DIRECTORY,
 		interestedListeners, interestedListenerCount);
 	// ... for the target directory
-	get_interested_monitor_listeners(device, toDirectory, B_WATCH_DIRECTORY,
-		interestedListeners, interestedListenerCount);
+	if (toDirectory != fromDirectory) {
+		get_interested_monitor_listeners(device, toDirectory, B_WATCH_DIRECTORY,
+			interestedListeners, interestedListenerCount);
+	}
 
 	if (interestedListenerCount == 0)
 		return B_OK;
