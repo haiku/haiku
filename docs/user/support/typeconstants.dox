@@ -58,7 +58,15 @@
 \brief Represents a \c char type used for integer storage
 */
 
+/*!
+\var B_ATOM_TYPE
+\brief Reference to a BAtomic class that was going to be in BeOS R6. Unused in Haiku. 
+*/
 
+/*!
+\var B_ATOMREF_TYPE
+\brief Reference to a BAtomic class that was going to be in BeOS R6. Unused in Haiku. 
+*/
 
 // Todo: the rest of the types
 

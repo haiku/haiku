@@ -15,3 +15,10 @@
 \defgroup libbe (libbe.so)
 \defgroup libroot (libroot.so)
 */
+
+// Subgroups
+
+/*!
+\defgroup support_globals Global functions in the support kit
+\ingroup support
+*/

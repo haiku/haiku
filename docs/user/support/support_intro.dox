@@ -9,7 +9,7 @@ use in your applications.
 	<li>Threading utility classes:</li>
 	<ul>
 		<li>BLocker</li>
-		<li>BAutoLock</li>
+		<li>BAutolock</li>
 		<li>Thread Local Storage</li>
 	</ul>
 	<li>Archiving and IO:</li>

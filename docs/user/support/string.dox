@@ -1,8 +1,12 @@
+// Documentation by: 
+//   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+// Corresponds to:
+//   /trunk/headers/os/support/String.h  rev 19731
+//   /trunk/src/kits/support/String.cpp  rev 19731
+
 /*!
 \file String.h
-\ingroup libbe
-\ingroup support
-\brief Implements the BString class.
+\brief Implements the BString class and global operators and functions for handling strings.
 */
 
 /*!
@@ -21,30 +25,33 @@ takes care to allocate and free memory for you, so it will always be
 */
 
 /*!
-\var char* BString::_privateData
+\var char* BString::fPrivateData
 \brief BString's storage for data
+
+If you are planning to derive from this object and you want to manipulate the raw
+string data, please have a look at LockBuffer() and UnlockBuffer().
 */
 
 /*!
 \fn BString::BString()
-\brief Creates an uninitialized BString.
+\brief Create an uninitialized BString.
 */
 
 /*!
 \fn BString::BString(const char* str)
-\brief Creates a BString and initializes it to the given string.
+\brief Create a BString and initializes it to the given string.
 \param str Pointer to a NULL terminated string.
 */
 
 /*!
 \fn BString::BString(const BString &string)
-\brief Creates a BString and makes it a copy of the supplied one.
+\brief Create a BString and makes it a copy of the supplied one.
 \param string the BString object to be copied.
 */
 
 /*!
 \fn BString::BString(const char *str, int32 maxLength)
-\brief Creates a BString and initializes it to the given string.
+\brief Create a BString and initializes it to the given string.
 \param str Pointer to a NULL terminated string.
 \param maxLength The amount of characters you want to copy from the original
 string.
@@ -52,9 +59,9 @@ string.
 
 /*!
 \fn BString::~BString()
-\brief Frees all resources associated with the object.
+\brief Free all resources associated with the object.
 	
-Frees the memory allocated by the BString object.
+The destructor frees the internal buffer associated with the string.
 */
 
 
@@ -66,27 +73,35 @@ Frees the memory allocated by the BString object.
 
 /*!
 \fn const char* BString::String() const
-\brief Returns a pointer to the object string, NULL terminated.
-	
-Returns a pointer to the object string, guaranteed to be NULL
+\brief Return a pointer to the object string, NULL terminated.
+
+The pointer to the object string is guaranteed to be NULL
 terminated. You can't modify or free the pointer. Once the BString
 object is deleted, the pointer becomes invalid.
+
+If you want to manipulate the internal C-string of the object directly, have
+a look at LockBuffer().
 	
 \return A pointer to the object string.
 */
 
 /*!
 \fn int32 BString::Length() const
-\brief Returns the length of the string, measured in bytes.
-\return The length of the string, measured in bytes.
+\brief Get the length of the string in bytes.
+
+\return An integer with the length of the string, measured in bytes.
+\sa CountChars()
 */
 
 /*!
 \fn int32 BString::CountChars() const
 \brief Returns the length of the object measured in characters.
 	
-Counts the number of UTF8 characters contained in the string.
+BString is somewhat aware of UTF8 characters, so this method will count
+the actual number of characters in the string.
+
 \return An integer which is the number of characters in the string.
+\sa Length()
 */
 
 //! @}
@@ -94,79 +109,121 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \name Assignment Methods
+
+To assign a string to the object, thus overriding the previous string
+that was stored, there are different methods to use. Use one of the
+overloaded Adopt() methods to take over data from another object. Use
+one of the assignment operators to copy data from another object, or
+use one of the SetTo() methods for more advanced copying.
 */
 
 //! @{
 
 /*!
 \fn BString& BString::operator=(const BString &string)
-\brief Makes a copy of the given BString object.
+\brief Re-initialize the object to a copy  of the data of a BString.
 \param string The string object to copy.
 \return The function always returns \c *this .
+\sa Adopt(BString &from)
+\sa SetTo(const BString &string, int32 length)
 */
 
 /*!
 \fn BString& BString::operator=(const char *str)
-\brief Re-initializes the object to the given string.
-\param str Pointer to a string.
+\brief Re-initialize the object to a copy of the data of a C-string.
+\param str Pointer to a C-string.
 \return The function always returns \c *this .
+\sa SetTo(const char *str, int32 maxLength)
 */
 
 /*!
 \fn BString& BString::operator=(char c)
-\brief Re-initializes the object to the given character.
+\brief Re-initialize the object to a character.
 \param c The character which you want to initialize the string to.
 \return The function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::SetTo(const char *str, int32 maxLength)
-\brief Re-initializes the object to the given string.
+\brief Re-initialize the object to a copy of the data of a C-string.
 \param str Pointer to a string.
 \param maxLength Amount of characters to copy from the original string.
 \return The function always returns \c *this .
+\sa operator=(const char *str)
 */
 
 /*!
 \fn BString& BString::SetTo(const BString &from)
-\brief Makes a copy of the given BString object.
+\brief Re-initialize the object to a copy  of the data of a BString.
 \param from The string object to copy.
 \return The function always returns \c *this .
+\sa SetTo(const BString &string, int32 length)
+\sa Adopt(BString &from)
+*/
+
+/*!
+\fn BString& BString::SetTo(const char *str)
+\brief Re-initialize the object to a copy of the data of a C-string.
+
+This method calls operator=(const char *str).
+
+\param str Pointer to a C-string.
+\return The function always returns \c *this .
+\sa SetTo(const char *str, int32 maxLength)
 */
 
 /*!
 \fn BString& BString::Adopt(BString &from)
-\brief Adopt's data of the given BString object, freeing the original object.
+\brief Adopt the data of the given BString object.
+
+This method adopts the data. Please note that the object that is adopted
+from is not deleted, only its private data is initialized to a null
+string. So if the from object was created on the heap, you need to
+clean it up yourself. 
+
 \param from The string object to adopt.
 \return The function always returns \c *this .
+\sa operator=(const BString &string)
+\sa SetTo(const BString &string, int32 length)
 */
 
 /*!
 \fn BString& BString::SetTo(const BString &string, int32 length)
-\brief Makes a copy of the given BString object.
+\brief Re-initialize the string to a copy of the given BString object.
 \param string The string object to copy.
 \param length Amount of characters to copy from the original BString.
 \return The function always returns \c *this .
+\sa operator=(const BString &string)
+\sa Adopt(BString &from, int32 length)
 */
 
 /*!
 \fn BString& BString::Adopt(BString &from, int32 length)
-\brief Adopt's data of the given BString object, freeing the original object.
+\brief Adopt the data of the given BString object.
+
+This method adopts the data. Please note that the object that is adopted
+from is not deleted, only its private data is initialized to a null
+string. So if the from object was created on the heap, you need to
+clean it up yourself. 
+
 \param from The string object to adopt.
 \param length Amount of characters to get from the original BString.
 \return The function always returns \c *this .
+\sa operator=(const BString &string)
+\sa SetTo(const BString &string, int32 length)
 */
 
 /*!
 \fn BString& BString::SetTo(char c, int32 count)
-\brief Initializes the object to a string composed by a character you specify.
-\param c The character you want to initialize the BString.
-\param count The number of characters you want the BString to be composed by.
-\return The function always returns \c *this .
-*/
+\brief Re-initialize the object to a string composed of a character you specify.
 
-/*!
-\fn BString &BString::SetTo(const char *str)
+This method lets you specify the length of a string and what character you want the
+string to contain repeatedly.
+
+\param c The character you want to initialize the BString.
+\param count The length of the string.
+\return The function always returns \c *this .
+\sa operator=(char c)
 */
 
 //! @}
@@ -180,18 +237,30 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \fn BString &BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
-\brief Copy the BString data (or part of it) into another BString.
-\param into The BString where to copy the object.
-\param fromOffset The offset (zero based) where to begin the copy
+\brief Copy the object's data (or part of it)  into another BString.
+
+This methods makes sure you don't copy more bytes than are available in the string. If
+the length exceeds the length of the string, it only copies the number of characters that
+are actually available.
+
+\param into The BString to where to copy the object.
+\param fromOffset The zero-based offset where to begin the copy.
 \param length The amount of bytes to copy.
-\return This function always returns *this .
+\return This method always returns a pointer to the string passed as the \c into parameter.
 */
 
 /*!
 \fn void BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 \brief Copy the BString data (or part of it) into the supplied buffer.
+
+This methods makes sure you don't copy more bytes than are available in the string. If
+the length exceeds the length of the string, it only copies the number of characters that
+are actually available.
+
+It's up to you to make sure your buffer is large enough.
+
 \param into The buffer where to copy the object.
-\param fromOffset The offset (zero based) where to begin the copy
+\param fromOffset The zero-based offset where to begin the copy.
 \param length The amount of bytes to copy.
 */
 
@@ -205,52 +274,69 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \fn BString& BString::operator+=(const char *str)
-\brief Appends the given string to the object.
-\param str A pointer to the string to append.
-\return This function always returns *this .
+\brief Append the given string to the object.
+\param str A pointer to the NULL-terminated C-string to append.
+\return This method always returns \c *this .
+\sa Append(const char *str, int32 length)
 */
 
 /*!
 \fn BString& BString::operator+=(char c)
-\brief Appends the given character to the object.
+\brief Append the given character to the object.
 \param c The character to append.
-\return This function always returns *this .
+\return This method always returns \c *this .
+\sa Append(char c, int32 count)
 */
 
 /*!
 \fn BString & BString::operator+=(const BString &string)
+\brief Append the given string to the object
+\param string The string to append
+\return This method always returns \c *this .
+\sa Append(const BString &string, int32 length)
 */
 
 /*!
 \fn BString &BString::Append(const BString &string)
+\brief Append the given string to the object
+\param string The string to append
+\return This method always returns \c *this .
+\sa Append(const BString &string, int32 length)
 */
 
 /*!
 \fn BString &BString::Append(const char *str)
+\brief Append the given string to the object.
+
+This method calls operator+=(const char *str).
+\sa Append(const char *str, int32 length)
 */
 
 /*!
 \fn BString& BString::Append(const BString &string, int32 length)
-\brief Appends the given BString to the object.
+\brief Append a part of the given BString to the object.
 \param string The BString to append.
-\param length The maximum bytes to get from the original object.
-\return This function always returns *this .
+\param length The maximum number ofbytes to get from the original object.
+\return This method always returns \c *this .
+\sa operator+=(const BString &string)
 */
 
 /*!
 \fn BString& BString::Append(const char *str, int32 length)
-\brief Appends the given string to the object.
+\brief Append a part of the given string to the object.
 \param str A pointer to the string to append.
 \param length The maximum bytes to get from the original string.
-\return This function always returns *this .
+\return This method always returns \c *this .
+\sa operator+=(const char *str)
 */
 
 /*!
 \fn BString& BString::Append(char c, int32 count)
-\brief Appends the given character to the object.
+\brief Append the given character repeatedly to the object.
 \param c The character to append.
-\param count The number of characters to append.
-\return This function always returns *this .
+\param count The number of times this character should be appended.
+\return This method always returns \c *this .
+\sa operator+=(char c)
 */
 
 //! @}
@@ -264,40 +350,44 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \fn BString& BString::Prepend(const char *str)
-\brief Prepends the given string to the object.
+\brief Prepend the given string to the object.
 \param str A pointer to the string to prepend.
-\return This function always returns *this .
+\return This method always returns \c *this .
+\sa Prepend(const char *str, int32 length)
 */
 
 /*!
 \fn BString& BString::Prepend(const BString &string)
-\brief Prepends the given BString to the object.
+\brief Prepend the given BString to the object.
 \param string The BString object to prepend.
-\return This function always returns *this .
+\return This method always returns \c *this .
+\sa Prepend(const BString &string, int32 len)
 */
 
 /*!
 \fn BString& BString::Prepend(const char *str, int32 length)
-\brief Prepends the given string to the object.
+\brief Prepend the given string to the object.
 \param str A pointer to the string to prepend.
 \param length The maximum amount of bytes to get from the string.
-\return This function always returns *this .
+\return This method always returns \c *this .
+\sa Prepend(const char *str)
 */
 
 /*!
 \fn BString& BString::Prepend(const BString &string, int32 len)
-\brief Prepends the given BString to the object.
+\brief Prepend the given BString to the object.
 \param string The BString object to prepend.
 \param len The maximum amount of bytes to get from the BString.
-\return This function always returns *this .
+\return This method always returns \c *this .
+\sa Prepend(const BString &string)
 */
 
 /*!
 \fn BString& BString::Prepend(char c, int32 count)
-\brief Prepends the given character to the object.
+\brief Prepend the given character repeatedly to the object.
 \param c The character to prepend.
-\param count The amount of characters to prepend.
-\return This function always returns *this .
+\param count The number of times this character should be prepended.
+\return This method always returns \c *this .
 */
 
 //! @}
@@ -311,10 +401,12 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \fn BString& BString::Insert(const char *str, int32 pos)
-\brief Inserts the given string at the given position into the object's data.
+\brief Insert the given string at the given position into the object's data.
 \param str A pointer to the string to insert.
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
+\sa Insert(const char *str, int32 length, int32 pos)
+\sa Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
 */
 
 /*!
@@ -322,54 +414,64 @@ Counts the number of UTF8 characters contained in the string.
 \brief Inserts the given string at the given position into the object's data.
 \param str A pointer to the string to insert.
 \param length The amount of bytes to insert.	
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
+\sa Insert(const char *str, int32 pos)
+\sa Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
 */
 
 /*!
 \fn BString& BString::Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
-\brief Inserts the given string at the given position into the object's data.
+\brief Insert the given string at the given position into the object's data.
 \param str A pointer to the string to insert.
-\param fromOffset
+\param fromOffset The offset in the string that is to be inserted
 \param length The amount of bytes to insert.	
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
+\sa Insert(const char *str, int32 pos)
+\sa Insert(const char *str, int32 length, int32 pos)
 */
 
 /*!
 \fn BString& BString::Insert(const BString &string, int32 pos)
-\brief Inserts the given BString at the given position into the object's data.
+\brief Insert the given BString at the given position into the object's data.
 \param string The BString object to insert.
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
+\sa Insert(const BString &string, int32 length, int32 pos)
+\sa Insert(const BString &string, int32 fromOffset, int32 length, int32 pos)
 */
 
 /*!
 \fn BString& BString::Insert(const BString &string, int32 length, int32 pos)
-\brief Inserts the given BString at the given position into the object's data.
+\brief Insert the given BString at the given position into the object's data.
 \param string The BString object to insert.
 \param length The amount of bytes to insert.
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
+\sa Insert(const BString &string, int32 pos)
+\sa Insert(const BString &string, int32 fromOffset, int32 length, int32 pos)
 */
 
 /*!
 \fn BString& BString::Insert(const BString &string, int32 fromOffset, int32 length, int32 pos)
-\brief Inserts the given string at the given position into the object's data.
+\brief Insert the given string at the given position into the object's data.
 \param string The BString object to insert.
-\param fromOffset
+\param fromOffset The offset in the string that is to be inserted
 \param length The amount of bytes to insert.
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
+\sa Insert(const BString &string, int32 pos)
+\sa Insert(const BString &string, int32 length, int32 pos)
 */
 
 /*!
 \fn BString& BString::Insert(char c, int32 count, int32 pos)
-\brief Inserts the given character at the given position into the object's data.
+\brief Insert the given character repeatedly at the given position into the object's data.
 \param c The character to insert.
-\param count The amount of bytes to insert.
-\param pos The offset into the BString's data where to insert the string.
-\return This function always returns *this .
+\param count The number of times to insert the character.
+\param pos The offset in bytes into the BString's data where to insert the string.
+\return This method always returns \c *this .
 */
 
 //! @}
@@ -386,64 +488,64 @@ Counts the number of UTF8 characters contained in the string.
 \brief Truncate the string to the new length.
 \param newLength The new lenght of the string.
 \param lazy If true, the memory-optimisation is postponed to later
-\return This function always returns *this .
+\return This method always returns \c *this .
 */
 
 /*!
 \fn BString& BString::Remove(int32 from, int32 length)
-\brief Removes some bytes, starting at the given offset
+\brief Remove some bytes, starting at the given offset
 \param from The offset from which you want to start removing
 \param length The number of bytes to remove
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveFirst(const BString &string)
-\brief Removes the first occurrence of the given BString.
+\brief Remove the first occurrence of the given BString.
 \param string The BString to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveLast(const BString &string)
-\brief Removes the last occurrence of the given BString.
+\brief Remove the last occurrence of the given BString.
 \param string The BString to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveAll(const BString &string)
-\brief Removes all occurrences of the given BString.
+\brief Remove all occurrences of the given BString.
 \param string The BString to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveFirst(const char *string)
-\brief Removes the first occurrence of the given string.
+\brief Remove the first occurrence of the given string.
 \param string A pointer to the string to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveLast(const char *string)
-\brief Removes the last occurrence of the given string.
+\brief Remove the last occurrence of the given string.
 \param string A pointer to the string to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveAll(const char *str)
-\brief Removes all occurrences of the given string.
+\brief Remove all occurrences of the given string.
 \param str A pointer to the string to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
 \fn BString& BString::RemoveSet(const char *setOfCharsToRemove)
-\brief Removes all the characters specified.
+\brief Remove all the characters specified.
 \param setOfCharsToRemove The set of characters to remove.
-\return This function always returns *this .
+\return This function always returns \c *this .
 */
 
 /*!
@@ -452,7 +554,7 @@ Counts the number of UTF8 characters contained in the string.
 \param into The BString where to move the object.
 \param from The offset (zero based) where to begin the move
 \param length The amount of bytes to move.
-\return This function always returns into.
+\return This method always returns \c into .
 */
 
 /*!
@@ -468,88 +570,142 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \name Comparison Methods
+
+There are two different comparison methods. First of all there
+is the whole range of operators that return a boolean value, secondly
+there are methods that return an integer value, both case sensitive
+and case insensitive. 
+
+There are also global comparison operators and global compare functions.
+You might need these in case you have a sort routine that takes a generic
+comparison function, such as BList::SortItems().
+See the String.h documentation file to see the specifics, though basically
+there are the same as implemented in this class.
 */
 
 //! @{
 
 /*!
 \fn bool BString::operator<(const char *string) const
+\brief Lexographically compare if this string is less than a given string.
 */
 
 /*!
 \fn bool BString::operator<(const BString &string) const
+\brief Lexographically compare if this string is less than a given string.
 */
 
 /*!
 \fn bool BString::operator<=(const char *string) const
+\brief Lexographically compare if this string is less than or equal to a given string.
 */
 
 /*!
 \fn bool BString::operator<=(const BString &string) const
+\brief Lexographically compare if this string is less than or equal to a given string.
 */
 
 /*!
 \fn bool BString::operator==(const char *string) const
+\brief Lexographically compare if this string is equal to a given string.
 */
 
 /*!
 \fn bool BString::operator==(const BString &string) const
+\brief Lexographically compare if this string is equal to a given string.
 */
 
 /*!
 \fn bool BString::operator>=(const char *string) const
+\brief Lexographically compare if this string is more than or equal to a given string.
 */
 
 /*!
 \fn bool BString::operator>=(const BString &string) const
+\brief Lexographically compare if this string is more than or equal to a given string.
 */
 
 /*!
 \fn bool BString::operator>(const char *string) const
+\brief Lexographically compare if this string is more than a given string.
 */
 
 /*!
 \fn bool BString::operator>(const BString &string) const
+\brief Lexographically compare if this string is more than a given string.
 */
 
 /*!
 \fn bool BString::operator!=(const BString &string) const
+\brief Lexographically compare if this string is not equal to a given string.
 */
 
 /*!
 \fn bool BString::operator!=(const char *str) const
+\brief Lexographically compare if this string is not equal to a given string.
 */
 
 /*!
 \fn int BString::Compare(const BString &string) const
+\brief Lexographically compare this string to another.
+
+\param string The string to compare to.
+\retval >0 The object sorts lexographically after \c string.
+\retval =0 The object is equal to \c string.
+\retval <0 The object sorts lexographically before \c string.
 */
 
 /*!
-\fn int BString::Compare(const char *string) const
+\fn int BString::Compare(const char *str) const
+\brief Lexographically compare this string to another.
+
+\sa Compare(const BString &string) const
 */
 
 /*!
 \fn int BString::Compare(const BString &string, int32 n) const
+\brief Lexographically compare a number of characters of this string to another.
+
+\param string The string to compare to.
+\param n The number of characters to compare
+\retval >0 The object sorts lexographically after \c string.
+\retval =0 The object is equal to \c string.
+\retval <0 The object sorts lexographically before \c string.
 */
 
 /*!
-\fn int BString::Compare(const char *string, int32 n) const
+\fn int BString::Compare(const char *str, int32 n) const
+\brief Lexographically compare a number of characters of this string to another.
+
+\sa Compare(const BString &string, int32 n) const
 */
 
 /*!
 \fn int BString::ICompare(const BString &string) const
+\brief Lexographically compare this string to another in a case-insensitive way.
+
+\sa Compare(const BString &string) const
 */
 
 /*!
 \fn int BString::ICompare(const char *str) const
+\brief Lexographically compare this string to another in a case-insensitive way.
+
+\sa Compare(const BString &string) const
 */
 
 /*!
 \fn int BString::ICompare(const BString &string, int32 n) const
+\brief Lexographically compare a number of characters of this string to another.
+
+\sa Compare(const BString &string, int32 n) const
 */
 
 /*!
 \fn int BString::ICompare(const char *str, int32 n) const
+\brief Lexographically compare a number of characters of this string to another.
+
+\sa Compare(const BString &string, int32 n) const
 */
 
 //! @}
@@ -565,16 +721,21 @@ Counts the number of UTF8 characters contained in the string.
 \fn int32 BString::FindFirst(const BString &string) const
 \brief Find the first occurrence of the given BString.
 \param string The BString to search for.
-\return The offset(zero based) into the data
+\return  The offset(zero based) into the data
 	where the given BString has been found.
+\retval B_ERROR Could not find \c string.
+\sa IFindFirst(const BString &string) const
 */
 
 /*!
-\fn int32 BString::FindFirst(const char *string) const
+\fn int32 BString::FindFirst(const char *str) const
 \brief Find the first occurrence of the given string.
-\param string The string to search for.
+\param str The string to search for.
 \return The offset(zero based) into the data
 	where the given string has been found.
+\retval B_BAD_VALUE The \c str pointer is invalid.
+\retval B_ERROR Could not find \c str.
+\sa IFindFirst(const char *str) const
 */
 
 /*!
@@ -585,16 +746,21 @@ Counts the number of UTF8 characters contained in the string.
 \param fromOffset The offset where to start the search.
 \return An integer which is the offset(zero based) into the data
 	where the given BString has been found.
+\retval B_ERROR Could not find \c string.
+\sa IFindFirst(const BString &string, int32 fromOffset) const
 */
 
 /*!
-\fn int32 BString::FindFirst(const char *string, int32 fromOffset) const
+\fn int32 BString::FindFirst(const char *str, int32 fromOffset) const
 \brief Find the first occurrence of the given string,
 	starting from the given offset.
-\param string The string to search for.
+\param str The string to search for.
 \param fromOffset The offset where to start the search.
 \return The offset(zero based) into the data
 	where the given string has been found.
+\retval B_BAD_VALUE The \c str pointer is invalid.
+\retval B_ERROR Could not find \c str.
+\sa IFindFirst(const char *str, int32 fromOffset) const
 */
 
 /*!
@@ -603,6 +769,7 @@ Counts the number of UTF8 characters contained in the string.
 \param c The character to search for.
 \return The offset(zero based) into the data
 	where the given character has been found.
+\retval B_ERROR Could not find \c c.
 */
 
 /*!
@@ -613,6 +780,7 @@ Counts the number of UTF8 characters contained in the string.
 \param fromOffset The offset where to start the search.
 \return The offset(zero based) into the data
 	where the given character has been found.
+\retval B_ERROR Could not find \c c.
 */
 
 /*!
@@ -621,15 +789,19 @@ Counts the number of UTF8 characters contained in the string.
 \param string The BString to search for.
 \return The offset(zero based) into the data
 	where the given BString has been found.
+\retval B_ERROR Could not find \c string.
+\sa IFindLast(const BString &string) const
 */
 
 /*!
-\fn int32 BString::FindLast(const char *string) const
+\fn int32 BString::FindLast(const char *str) const
 \brief Find the last occurrence of the given string.
-\param string The string to search for.
+\param str The string to search for.
 \return The offset(zero based) into the data
 	where the given string has been found.
-*/
+\retval B_BAD_VALUE The \c str pointer is invalid.
+\retval B_ERROR Could not find \c str.
+\sa IFindLast(const char *str) const
 
 /*!
 \fn int32 BString::FindLast(const BString &string, int32 beforeOffset) const
@@ -639,16 +811,21 @@ Counts the number of UTF8 characters contained in the string.
 \param beforeOffset The offset where to start the search.
 \return An integer which is the offset(zero based) into the data
 	where the given BString has been found.
+\retval B_ERROR Could not find \c string.
+\sa IFindLast(const BString &string, int32 beforeOffset) const
 */
 
 /*!
-\fn int32 BString::FindLast(const char *string, int32 beforeOffset) const
+\fn int32 BString::FindLast(const char *str, int32 beforeOffset) const
 \brief Find the last occurrence of the given string,
 	starting from the given offset, and going backwards.
-\param string The string to search for.
+\param str The string to search for.
 \param beforeOffset The offset where to start the search.
 \return The offset(zero based) into the data
 	where the given string has been found.
+\retval B_BAD_VALUE The \c str pointer is invalid.
+\retval B_ERROR Could not find \c str.
+\sa IFindLast(const char *str, int32 beforeOffset) const
 */
 
 /*!
@@ -657,6 +834,7 @@ Counts the number of UTF8 characters contained in the string.
 \param c The character to search for.
 \return The offset(zero based) into the data
 	where the given character has been found.
+\retval B_ERROR Could not find \c c.
 */
 
 /*!
@@ -667,38 +845,67 @@ Counts the number of UTF8 characters contained in the string.
 \param beforeOffset The offset where to start the search.
 \return The offset(zero based) into the data
 	where the given character has been found.
+\retval B_ERROR Could not find \c c.
 */
 
 /*!
 \fn int32 BString::IFindFirst(const BString &string) const
+\brief Find the first occurrence of the given BString case-insensitively.
+
+\sa FindFirst(const BString &string) const
 */
 
 /*!
-\fn int32 BString::IFindFirst(const char *string) const
+\fn int32 BString::IFindFirst(const char *str) const
+\brief Find the first occurrence of the given BString case-insensitively.
+
+\sa FindFirst(const char *str) const
 */
 
 /*!
 \fn int32 BString::IFindFirst(const BString &string, int32 fromOffset) const
+\brief Find the first occurrence of the given BString case-insensitively,
+	starting from the given offset.
+
+\sa FindFirst(const BString &string, int32 fromOffset) const
 */
 
 /*!
-\fn int32 BString::IFindFirst(const char *string, int32 fromOffset) const
+\fn int32 BString::IFindFirst(const char *str, int32 fromOffset) const
+\brief Find the first occurrence of the given string case-insensitively,
+	starting from the given offset.
+
+\sa FindFirst(const char *str, int32 fromOffset) const
 */
 
 /*!
 \fn int32 BString::IFindLast(const BString &string) const
+\brief Find the last occurrence of the given BString case-insensitively.
+
+\sa FindLast(const BString &string) const
 */
 
 /*!
-\fn int32 BString::IFindLast(const char *string) const
+\fn int32 BString::IFindLast(const char *str) const
+\brief Find the last occurrence of the given string case-insensitively.
+
+\sa FindLast(const char *str) const
 */
 
 /*!
 \fn int32 BString::IFindLast(const BString &string, int32 beforeOffset) const
+\brief Find the last occurrence of the given BString case-insensitively,
+	starting from the given offset, and going backwards.
+
+\sa FindLast(const BString &string, int32 beforeOffset) const
 */
 
 /*!
-\fn int32 BString::IFindLast(const char *string, int32 beforeOffset) const
+\fn int32 BString::IFindLast(const char *str, int32 beforeOffset) const
+\brief Find the last occurrence of the given string case-insensitively,
+	starting from the given offset, and going backwards.
+
+\sa FindLast(const char *str, int32 beforeOffset) const
 */
 
 //! @}
@@ -712,74 +919,151 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \fn BString& BString::ReplaceFirst(char replaceThis, char withThis)
+\brief Replace the first occurance of a character with another character.
+\param replaceThis The character to replace.
+\param withThis The character to put in that place
+\return This method always returns \c *this.
+\sa IReplaceFirst(char replaceThis, char withThis)
 */
 
 /*!
 \fn BString& BString::ReplaceLast(char replaceThis, char withThis)
+\brief Replace the last occurance of a character with another character.
+\param replaceThis The character to replace.
+\param withThis The character to put in that place
+\return This method always returns \c *this.
+\sa ReplaceLast(char replaceThis, char withThis)
 */
 
 /*!
 \fn BString& BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
+\brief Replace all occurances of a character with another character.
+\param replaceThis The character to replace.
+\param withThis The character to put in that place
+\param fromOffset The offset where to start looking for the character
+\return This method always returns \c *this.
+\sa IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
+\brief Replace a number of occurances of a character with another character.
+\param replaceThis The character to replace.
+\param withThis The character to put in that place
+\param maxReplaceCount The maximum number of characters that should be replaced.
+\param fromOffset The offset where to start looking for the character
+\return This method always returns \c *this.
+\sa IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::ReplaceFirst(const char *replaceThis, const char *withThis)
+\brief Replace the first occurance of a string with another string.
+\param replaceThis The C-string to replace.
+\param withThis The C-string to put in that place
+\return This method always returns \c *this.
+\sa IReplaceFirst(const char *replaceThis, const char *withThis)
 */
 
 /*!
 \fn BString& BString::ReplaceLast(const char *replaceThis, const char *withThis)
+\brief Replace the last occurance of a string with another string.
+\param replaceThis The C-string to replace.
+\param withThis The C-string to put in that place
+\return This method always returns \c *this.
+\sa IReplaceLast(const char *replaceThis, const char *withThis)
 */
 
 /*!
 \fn BString& BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+\brief Replace all occurances of a string with another string.
+\param replaceThis The string to replace.
+\param withThis The string to put in that place
+\param fromOffset The offset where to start looking for the string.
+\return This method always returns \c *this.
+\sa IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+\brief Replace a number of occurances of a string with another string.
+\param replaceThis The string to replace.
+\param withThis The string to put in that place
+\param maxReplaceCount The maximum number of occurences that should be replaced.
+\param fromOffset The offset where to start looking for the string
+\return This method always returns \c *this.
+\sa IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::IReplaceFirst(char replaceThis, char withThis)
+\brief Replace the first occurance of a character with another character. Case insensitive.
+\sa ReplaceFirst(char replaceThis, char withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceLast(char replaceThis, char withThis)
+\brief Replace the last occurance of a character with another character. Case-insensitive.
+
+\sa ReplaceLast(char replaceThis, char withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset) 
+\brief Replace all occurances of a character with another character. Case-insensitive.
+
+\sa ReplaceAll(char replaceThis, char withThis, int32 fromOffset) 
 */
 
 /*!
 \fn BString& BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
+\brief Replace a number of occurances of a character with another character. Case-insensive.
+
+\sa Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::IReplaceFirst(const char *replaceThis, const char *withThis)
+\brief Replace the first occurance of a string with another string. Case-insensitive.
+
+\sa ReplaceFirst(const char *replaceThis, const char *withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceLast(const char *replaceThis, const char *withThis)
+\brief Replace the last occurance of a string with another string. Case-insensitive.
+
+\sa ReplaceLast(const char *replaceThis, const char *withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+\brief Replace all occurances of a string with another string. Case-insensitive.
+
+\sa ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+\brief Replace a number of occurances of a string with another string. Case-insensitive.
+
+\sa Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::ReplaceSet(const char *setOfChars, char with)
+\brief Replaces characters that are in a certain set with a chosen character.
+\param setOfChars The set of characters that need to be replaced.
+\param with The character to replace the occurences with.
+\return This method always returns \c *this.
 */
 
 /*!
 \fn BString& BString::ReplaceSet(const char *setOfChars, const char *with)
+\brief Replaces characters that are in a certain set with a chosen string.
+\param setOfChars The set of characters that need to be replaced.
+\param with The string to replace the occurences with.
+\return This method always returns \c *this.
 */
 
 // @}
@@ -793,13 +1077,14 @@ Counts the number of UTF8 characters contained in the string.
 
 /*!
 \fn char & BString::operator[](int32 index)
-\brief Returns a reference to the data at the given offset.
+\brief Return a reference to the data at the given offset.
 
-This function can be used to read a byte or to change its value.
+This function can be used to read a byte.
 There is no bounds checking though, so make sure the \c index
 you supply is valid.
 \param index The index (zero based) of the byte to get.
 \return Returns a reference to the specified byte.
+\sa ByteAt(int32 index) for a safer version.
 */
 
 /*!
@@ -819,7 +1104,8 @@ valid.
 
 This function can be used to read a byte. 
 \param index The index (zero based) of the byte to get.
-\return Returns a reference to the specified byte.
+\return Returns a reference to the specified byte. If you are out of bounds, 
+  it will return 0. 
 */
 
 //! @}
@@ -833,10 +1119,28 @@ This function can be used to read a byte.
 
 /*!
 \fn char* BString::LockBuffer(int32 maxLength)
+\brief Locks the buffer and return the internal C-string for manipulation.
+
+If you want to do any lowlevel string manipulation on  the internal buffer,
+you should call this method. This method includes the possibility to grow the
+buffer so that you don't have to worry about that yourself.
+
+Make sure you call UnlockBuffer() when you're done with the manipulation.
+
+\param maxLength The size of the buffer. If you don't want a bigger buffer, passing
+  anything under the length of the string will simply return it as is.
+\return A pointer to the buffer you may manipulate.
+\sa UnlockBuffer()
 */
 
 /*!
 \fn BString& BString::UnlockBuffer(int32 length)
+\brief Unlocks the buffer after you are done with lowlevel manipulation.
+
+\param length The length to trim the string to in order to keep the internal
+  buffer sane. If you don't pass a value in it, a \c strlen call will be used to
+  determine the length.
+\return This method always returns \c *this.
 */
 
 //! @}
@@ -850,29 +1154,29 @@ This function can be used to read a byte.
 
 /*!
 \fn BString& BString::ToLower()
-\brief Converts the BString to lowercase
-\return This function always returns *this .
+\brief Convert the BString to lowercase.
+\return This method always returns \c *this .
 */
 
 /*!
 \fn BString& BString::ToUpper()
-\brief Converts the BString to uppercase
-\return This function always returns *this .
+\brief Convert the BString to uppercase.
+\return This method always returns \c *this .
 */
 
 /*!
 \fn BString& BString::Capitalize()
-\brief Converts the first character to uppercase, rest to lowercase
-\return This function always returns *this .
+\brief Convert the first character to uppercase, rest to lowercase
+\return This method always returns \c *this .
 */
 
 /*!
 \fn BString& BString::CapitalizeEachWord()
-\brief Converts the first character of every word to uppercase, rest to lowercase.
+\brief Convert the first character of every word to uppercase, rest to lowercase.
 
 Converts the first character of every "word" (series of alpabetical characters
 separated by non alphabetical characters) to uppercase, and the rest to lowercase.
-\return This function always returns *this .
+\return This method always returns \c *this .
 */
 
 //! @}
@@ -880,24 +1184,58 @@ separated by non alphabetical characters) to uppercase, and the rest to lowercas
 
 /*!
 \name Escaping and Deescaping Methods
+
+This class contains some methods to help you with escaping and de-escaping
+certain characters. Note that this is the C-style of escaping, where you place a character
+before the character that is to be escaped, and not HTML style escaping,
+where certain characters are replaced by something else.
 */
 
 //! @{
 
 /*!
 \fn BString& BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith)
+\brief Escape selected characters on a given string.
+
+This version sets itself to the string supplied in the \c original paramater, and
+then escapes the selected characters with a supplied character.
+
+\param original The string to be escaped.
+\param setOfCharsToEscape The set of characters that need to be escaped.
+\param escapeWith The character to escape with.
+\return This method always returns \c *this.
+\sa CharacterDeescape(char escapeChar)
+\sa CharacterDeescape(const char *original, char escapeChar)
 */
 
 /*!
 \fn BString& BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
+\brief Escape selected characters of this string.
+\param setOfCharsToEscape The set of characters that need to be escaped.
+\param escapeWith The character to escape with.
+\return This method always returns \c *this.
+\sa CharacterDeescape(char escapeChar)
 */
 
 /*!
 \fn BString& BString::CharacterDeescape(const char *original, char escapeChar)
+\brief Remove the character to escape with from a given string.
+
+This version sets itself to the string supplied in the \c original parameter, and
+then removes the escape characters. 
+
+\param original The string to be escaped.
+\param escapeChar The character that was used to escape with.
+\return This method always returns \c *this.
+\sa CharacterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith)
 */
 
 /*!
 \fn BString& BString::CharacterDeescape(char escapeChar)
+\brief Remove the character to escape with from this string.
+\param escapeChar The character that was used to escape with.
+\return This method always returns \c *this.
+\sa CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 */
 
 //! @}
@@ -913,83 +1251,137 @@ These methods may be slower than sprintf(), but they are overflow safe.
 
 /*!
 \fn BString& BString::operator<<(const char *str)
+\brief Append the string \c str to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(const BString &string)
+\brief Append the string \c string to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(char c)
+\brief Append the character \c c to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(int i)
+\brief Convert the integer \c i to a string and append it to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(unsigned int i)
+\brief Convert the unsigned integer \c i to a string and append it to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(uint32 i)
+\brief Convert the unsigned integer \c i to a string and append it to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(int32 i)
+\brief Convert the integer \c i to a string and append it to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(uint64 i)
+\brief Convert the unsigned integer \c i to a string and append it to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(int64 i)
+\brief Convert the integer \c i to a string and append it to the object.
 */
 
 /*!
 \fn BString& BString::operator<<(float f)
+\brief Convert the float \c f to a string and append it to the object.
 */
 
 //! @}
 
 /************************ end of class BString, start of general operators ************/
 /*!
+\addtogroup support_globals
+@{
+*/
+
+
+/*!
 \fn bool operator<(const char *str, const BString &string)
+\brief Lexographically compare if \c str is less than a given BString.
+\sa BString::operator<(const char *string) const
 */
 
 /*!
 \fn bool operator<=(const char *str, const BString &string)
+\brief Lexographically compare if \c str is less than or equal to a given BString.
+\sa BString::operator<=(const char *string) const
 */
 
 /*!
 \fn bool operator==(const char *str, const BString &string)
+\brief Lexographically compare if \c str is equal to a given BString.
+\sa BString::operator==(const char *string) const
 */
 
 /*!
 \fn bool operator>(const char *str, const BString &string)
+\brief Lexographically compare if \c str is more than a given BString.
+\sa BString::operator>(const char *string) const
 */
 
 /*!
 \fn bool operator>=(const char *str, const BString &string)
+\brief Lexographically compare if \c str is more than or equal to a given BString.
+\sa BString::operator>=(const char *string) const
 */
 
 /*!
 \fn bool operator!=(const char *str, const BString &string)
+\brief Lexographically compare if \c str is not equal to given BString.
+\sa BString::operator!=(const char *string) const
 */
 
 /*!
 \fn int Compare(const BString &, const BString &)
+\brief Lexographically compare two strings.
+
+This function is useful if you need a global compare function to feed to
+BList::SortItems() for example.
+
+\sa BString::Compare(const BString &string) const
 */
 
 /*!
 \fn int ICompare(const BString &, const BString &)
+\brief Lexographically compare two strings in a case insensitive way.
+
+This function is useful if you need a global compare function to feed to
+BList::SortItems() for example.
+
+\sa BString::Compare(const BString &string) const
 */
 
 /*!
 \fn int Compare(const BString *, const BString *)
+\brief Lexographically compare two strings.
+
+This function is useful if you need a global compare function to feed to
+BList::SortItems() for example.
+
+\sa BString::Compare(const BString &string) const
 */
 
 /*!
 \fn int ICompare(const BString *, const BString *)
+
+This function is useful if you need a global compare function to feed to
+BList::SortItems() for example.
+
+\brief Lexographically compare two strings in a case insensitive way.
+\sa BString::Compare(const BString &string) const
 */
+
+//! @}

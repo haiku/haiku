@@ -35,14 +35,14 @@ To make MIDI data stream through your application, you create a "network" of
 BMidi-derived objects that send and receive MIDI messages.
 
 The old Midi Kit is slowly fading into obscurity. You may want to use the
-\ref midi2 "new kit" instead. Also note that the OpenBeOS implementation
+\ref midi2 "new kit" instead. Also note that the Haiku implementation
 of the kit sometimes behaves differently than the one from BeOS R5 or what
-the BeBook says, but usually for the better ;-)
+the BeBook says, but usually for the better.
 
 Especially the synth classes are not completely functional, but enough to
 play back General MIDI tunes. They should be backwards compatible with the
 majority of BeOS MIDI applications. Not all methods of BSynth, BMidiSynth,
 and BMidiSynthFile are implemented because some of them are rather obscure. 
-BSamples is a complete no-op; in other words, with the OpenBeOS Midi Kit 
+BSamples is a complete no-op; in other words, with the Haiku Midi Kit 
 you cannot push waveform data into the output stream of the softsynth.
 */

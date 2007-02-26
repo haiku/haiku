@@ -1,7 +1,5 @@
 /*!
 \file StopWatch.h
-\ingroup support
-\ingroup libbe
 \brief Provides the BStopWatch class.
 */
 
