@@ -1,5 +1,7 @@
 // FileSystem.cpp
 
+#include "DispatcherFileSystem.h"
+
 #include <Application.h>
 #include <Autolock.h>
 #include <Entry.h>
@@ -9,7 +11,6 @@
 
 #include "Debug.h"
 #include "DispatcherDefs.h"
-#include "FileSystem.h"
 #include "ServerDefs.h"
 
 // constructor

@@ -21,7 +21,10 @@ using UserlandFSUtil::String;
 
 namespace UserlandFS {
 
+namespace Dispatcher {
 class FileSystem;
+}
+using Dispatcher::FileSystem;
 
 class UserlandFSDispatcher : public BApplication {
 public:

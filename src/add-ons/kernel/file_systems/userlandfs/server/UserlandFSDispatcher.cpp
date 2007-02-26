@@ -13,7 +13,7 @@
 #include "Compatibility.h"
 #include "Debug.h"
 #include "DispatcherDefs.h"
-#include "FileSystem.h"
+#include "DispatcherFileSystem.h"
 #include "FSInfo.h"
 #include "RequestAllocator.h"
 #include "RequestPort.h"

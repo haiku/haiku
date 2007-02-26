@@ -11,6 +11,7 @@
 #include "String.h"
 
 namespace UserlandFS {
+namespace Dispatcher {
 
 class FileSystem : public LazyInitializable, public Referencable {
 public:
@@ -39,8 +40,9 @@ private:
 	mutable	BLocker				fTeamLock;
 };
 
+}	// namespace Dispatcher
 }	// namespace UserlandFS
 
-using UserlandFS::FileSystem;
+using UserlandFS::Dispatcher::FileSystem;
 
 #endif	// USERLAND_FS_FILE_SYSTEM_H
