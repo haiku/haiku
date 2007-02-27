@@ -21,13 +21,15 @@ struct team;
 extern "C" {
 #endif
 
-//void vm_dump_areas(vm_address_space *aspace);
+// startup only
 status_t vm_init(kernel_args *args);
 status_t vm_init_post_sem(struct kernel_args *args);
 status_t vm_init_post_thread(struct kernel_args *args);
 status_t vm_init_post_modules(struct kernel_args *args);
 void vm_free_kernel_args(kernel_args *args);
 void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
+addr_t vm_allocate_early(kernel_args *args, size_t virtualSize,
+			size_t physicalSize, uint32 attributes);
 
 // to protect code regions with interrupts turned on
 void permit_page_faults(void);

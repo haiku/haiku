@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -65,8 +65,7 @@ static void clear_page(addr_t pa);
 static int32 page_scrubber(void *);
 
 
-/**	Dequeues a page from the tail of the given queue */
-
+/*!	Dequeues a page from the tail of the given queue */
 static vm_page *
 dequeue_page(page_queue *q)
 {
@@ -87,8 +86,7 @@ dequeue_page(page_queue *q)
 }
 
 
-/**	Enqueues a page to the head of the given queue */
-
+/*!	Enqueues a page to the head of the given queue */
 static void
 enqueue_page(page_queue *q, vm_page *page)
 {
@@ -165,10 +163,14 @@ write_page(vm_page *page, bool fsReenter)
 }
 
 
+/*!
+	You need to hold the vm_cache lock when calling this function.
+*/
 status_t
 vm_page_write_modified(vm_cache *cache, bool fsReenter)
 {
 	vm_page *page = cache->page_list;
+	vm_cache_ref *ref = cache->ref;
 
 	// ToDo: join adjacent pages into one vec list
 
@@ -202,7 +204,7 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 
 		pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
 
-		for (area = page->cache->ref->areas; area; area = area->cache_next) {
+		for (area = ref->areas; area; area = area->cache_next) {
 			if (pageOffset >= area->cache_offset
 				&& pageOffset < area->cache_offset + area->size) {
 				vm_translation_map *map = &area->address_space->translation_map;
@@ -231,9 +233,12 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 		if (!gotPage)
 			continue;
 
-		mutex_unlock(&cache->ref->lock);
+		mutex_unlock(&ref->lock);
+
 		status = write_page(page, fsReenter);
-		mutex_lock(&cache->ref->lock);
+
+		mutex_lock(&ref->lock);
+		cache = ref->cache;
 
 		if (status == B_OK) {
 			if (dequeuedPage) {
@@ -386,8 +391,8 @@ vm_page_init(kernel_args *args)
 	page_active_queue.count = 0;
 
 	// map in the new free page table
-	sPages = (vm_page *)vm_alloc_from_kernel_args(args, sNumPages * sizeof(vm_page),
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	sPages = (vm_page *)vm_allocate_early(args, sNumPages * sizeof(vm_page),
+		~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("vm_init: putting free_page_table @ %p, # ents %d (size 0x%x)\n",
 		sPages, sNumPages, (unsigned int)(sNumPages * sizeof(vm_page))));
@@ -453,12 +458,12 @@ vm_page_init_post_thread(kernel_args *args)
 }
 
 
-/**	This is a background thread that wakes up every now and then (every 100ms)
- *	and moves some pages from the free queue over to the clear queue.
- *	Given enough time, it will clear out all pages from the free queue - we
- *	could probably slow it down after having reached a certain threshold.
- */
-
+/*!
+	This is a background thread that wakes up every now and then (every 100ms)
+	and moves some pages from the free queue over to the clear queue.
+	Given enough time, it will clear out all pages from the free queue - we
+	could probably slow it down after having reached a certain threshold.
+*/
 static int32
 page_scrubber(void *unused)
 {
@@ -696,12 +701,12 @@ vm_page_allocate_page(int page_state)
 }
 
 
-/**	Allocates a number of pages and puts their pointers into the provided
- *	array. All pages are marked busy.
- *	Returns B_OK on success, and B_NO_MEMORY when there aren't any free
- *	pages left to allocate.
- */
-
+/*!
+	Allocates a number of pages and puts their pointers into the provided
+	array. All pages are marked busy.
+	Returns B_OK on success, and B_NO_MEMORY when there aren't any free
+	pages left to allocate.
+*/
 status_t
 vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 {
@@ -1048,125 +1053,3 @@ static int dump_free_page_table(int argc, char **argv)
 }
 #endif
 
-
-addr_t
-vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size)
-{
-	addr_t spot = 0;
-	uint32 i;
-	int last_valloc_entry = 0;
-
-	size = PAGE_ALIGN(size);
-	// find a slot in the virtual allocation addr range
-	for (i = 1; i < ka->num_virtual_allocated_ranges; i++) {
-		addr_t previousRangeEnd = ka->virtual_allocated_range[i-1].start
-			+ ka->virtual_allocated_range[i-1].size;
-		last_valloc_entry = i;
-		// check to see if the space between this one and the last is big enough
-		if (previousRangeEnd >= KERNEL_BASE
-			&& ka->virtual_allocated_range[i].start
-				- previousRangeEnd >= size) {
-			spot = previousRangeEnd;
-			ka->virtual_allocated_range[i-1].size += size;
-			goto out;
-		}
-	}
-	if (spot == 0) {
-		// we hadn't found one between allocation ranges. this is ok.
-		// see if there's a gap after the last one
-		addr_t lastRangeEnd
-			= ka->virtual_allocated_range[last_valloc_entry].start 
-				+ ka->virtual_allocated_range[last_valloc_entry].size;
-		if (KERNEL_BASE + (KERNEL_SIZE - 1) - lastRangeEnd >= size) {
-			spot = lastRangeEnd;
-			ka->virtual_allocated_range[last_valloc_entry].size += size;
-			goto out;
-		}
-		// see if there's a gap before the first one
-		if (ka->virtual_allocated_range[0].start > KERNEL_BASE) {
-			if (ka->virtual_allocated_range[0].start - KERNEL_BASE >= size) {
-				ka->virtual_allocated_range[0].start -= size;
-				spot = ka->virtual_allocated_range[0].start;
-				goto out;
-			}
-		}
-	}
-
-out:
-	return spot;
-}
-
-
-static bool
-is_page_in_phys_range(kernel_args *ka, addr_t paddr)
-{
-	// XXX horrible brute-force method of determining if the page can be allocated
-	unsigned int i;
-
-	for (i = 0; i < ka->num_physical_memory_ranges; i++) {
-		if (paddr >= ka->physical_memory_range[i].start 
-			&& paddr < ka->physical_memory_range[i].start 
-						+ ka->physical_memory_range[i].size) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-static addr_t
-vm_alloc_physical_page_from_kernel_args(kernel_args *ka)
-{
-	uint32 i;
-
-	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
-		addr_t next_page;
-
-		next_page = ka->physical_allocated_range[i].start
-			+ ka->physical_allocated_range[i].size;
-		// see if the page after the next allocated paddr run can be allocated
-		if (i + 1 < ka->num_physical_allocated_ranges
-			&& ka->physical_allocated_range[i+1].size != 0) {
-			// see if the next page will collide with the next allocated range
-			if (next_page >= ka->physical_allocated_range[i+1].start)
-				continue;
-		}
-		// see if the next physical page fits in the memory block
-		if (is_page_in_phys_range(ka, next_page)) {
-			// we got one!
-			ka->physical_allocated_range[i].size += B_PAGE_SIZE;
-			return (next_page / B_PAGE_SIZE);
-		}
-	}
-
-	return 0;	// could not allocate a block
-}
-
-
-/**	This one uses the kernel_args' physical and virtual memory ranges to
- *	allocate some pages before the VM is completely up.
- */
-
-addr_t
-vm_alloc_from_kernel_args(kernel_args *args, size_t size, uint32 lock)
-{
-	addr_t virtualBase, physicalAddress;
-	uint32 i;
-
-	// find the vaddr to allocate at
-	virtualBase = vm_alloc_virtual_from_kernel_args(args, size);
-	//dprintf("alloc_from_ka_struct: vaddr 0x%lx\n", virtualAddress);
-
-	// map the pages
-	for (i = 0; i < PAGE_ALIGN(size) / B_PAGE_SIZE; i++) {
-		physicalAddress = vm_alloc_physical_page_from_kernel_args(args);
-		//dprintf("alloc_from_ka_struct: paddr 0x%lx\n", physicalAddress);
-
-		if (physicalAddress == 0)
-			panic("error allocating page from ka_struct!\n");
-		arch_vm_translation_map_early_map(args, virtualBase + i * B_PAGE_SIZE,
-			physicalAddress * B_PAGE_SIZE, lock, &vm_alloc_physical_page_from_kernel_args);
-	}
-
-	return virtualBase;
-}

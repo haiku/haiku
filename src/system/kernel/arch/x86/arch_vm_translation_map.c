@@ -845,8 +845,9 @@ arch_vm_translation_map_init(kernel_args *args)
 	tmap_list = NULL;
 
 	// allocate some space to hold physical page mapping info
-	iospace_pgtables = (page_table_entry *)vm_alloc_from_kernel_args(args,
-		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	iospace_pgtables = (page_table_entry *)vm_allocate_early(args,
+		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)), ~0L,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("iospace_pgtables %p\n", iospace_pgtables));
 

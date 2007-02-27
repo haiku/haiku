@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, The Haiku Team. All rights reserved.
+ * Copyright 2002-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -52,9 +52,6 @@ status_t vm_daemon_init(void);
 // used by the page daemon to walk the list of address spaces
 void vm_address_space_walk_start(struct hash_iterator *i);
 vm_address_space *vm_address_space_walk_next(struct hash_iterator *i);
-
-// allocates memory from the kernel_args structure
-addr_t vm_alloc_from_kernel_args(kernel_args *args, size_t size, uint32 lock);
 
 #ifdef __cplusplus
 }

@@ -1,18 +1,17 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include "generic_vm_physical_page_mapper.h"
 
 #include <vm_address_space.h>
 #include <vm_page.h>
 #include <vm_priv.h>
-//#include <smp.h>
-//#include <memheap.h>
 #include <thread.h>
 #include <util/queue.h>
 
@@ -253,8 +252,8 @@ generic_vm_physical_page_mapper_init(kernel_args *args,
 	// reserve virtual space for the IO space
 	// We reserve (ioSpaceChunkSize - B_PAGE_SIZE) bytes more, so that we
 	// can guarantee to align the base address to ioSpaceChunkSize.
-	sIOSpaceBase = vm_alloc_virtual_from_kernel_args(args,
-		sIOSpaceSize + ioSpaceChunkSize - B_PAGE_SIZE);
+	sIOSpaceBase = vm_allocate_early(args,
+		sIOSpaceSize + ioSpaceChunkSize - B_PAGE_SIZE, 0, 0);
 	if (sIOSpaceBase == 0) {
 		panic("generic_vm_physical_page_mapper_init(): Failed to reserve IO "
 			"space in virtual address space!");
@@ -267,11 +266,13 @@ generic_vm_physical_page_mapper_init(kernel_args *args,
 	*ioSpaceBase = sIOSpaceBase;
 
 	// allocate some space to hold physical page mapping info
-	paddr_desc = (paddr_chunk_desc *)vm_alloc_from_kernel_args(args,
-		sizeof(paddr_chunk_desc) * 1024, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	paddr_desc = (paddr_chunk_desc *)vm_allocate_early(args,
+		sizeof(paddr_chunk_desc) * 1024, ~0L,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	num_virtual_chunks = sIOSpaceSize / sIOSpaceChunkSize;
-	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_kernel_args(args,
-		sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	virtual_pmappings = (paddr_chunk_desc **)vm_allocate_early(args,
+		sizeof(paddr_chunk_desc *) * num_virtual_chunks, ~0L,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("paddr_desc %p, virtual_pmappings %p"/*", iospace_pgtables %p"*/"\n",
 		paddr_desc, virtual_pmappings/*, iospace_pgtables*/));

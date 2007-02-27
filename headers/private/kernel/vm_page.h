@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -23,8 +23,6 @@ void vm_page_init_num_pages(kernel_args *args);
 status_t vm_page_init(struct kernel_args *args);
 status_t vm_page_init_post_area(struct kernel_args *args);
 status_t vm_page_init_post_thread(struct kernel_args *args);
-
-addr_t vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size);
 
 status_t vm_mark_page_inuse(addr_t page);
 status_t vm_mark_page_range_inuse(addr_t startPage, addr_t length);

@@ -962,9 +962,8 @@ err1:
 
 
 area_id
-vm_map_physical_memory(team_id areaID, const char *name, void **_address,
-	uint32 addressSpec, addr_t size, uint32 protection,
-	addr_t physicalAddress)
+vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
+	uint32 addressSpec, addr_t size, uint32 protection, addr_t physicalAddress)
 {
 	vm_cache_ref *cacheRef;
 	vm_area *area;
@@ -975,13 +974,13 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %ld,"
 		" size = %lu, protection = %ld, phys = %p)\n",
-		areaID, name, _address, addressSpec, size, protection,
+		aspaceID, name, _address, addressSpec, size, protection,
 		(void *)physicalAddress));
 
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
-	vm_address_space *addressSpace = vm_get_address_space_by_id(areaID);
+	vm_address_space *addressSpace = vm_get_address_space_by_id(aspaceID);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -2421,6 +2420,128 @@ reserve_boot_loader_ranges(kernel_args *args)
 }
 
 
+static addr_t
+allocate_early_virtual(kernel_args *args, size_t size)
+{
+	addr_t spot = 0;
+	uint32 i;
+	int last_valloc_entry = 0;
+
+	size = PAGE_ALIGN(size);
+	// find a slot in the virtual allocation addr range
+	for (i = 1; i < args->num_virtual_allocated_ranges; i++) {
+		addr_t previousRangeEnd = args->virtual_allocated_range[i - 1].start
+			+ args->virtual_allocated_range[i - 1].size;
+		last_valloc_entry = i;
+		// check to see if the space between this one and the last is big enough
+		if (previousRangeEnd >= KERNEL_BASE
+			&& args->virtual_allocated_range[i].start
+				- previousRangeEnd >= size) {
+			spot = previousRangeEnd;
+			args->virtual_allocated_range[i - 1].size += size;
+			goto out;
+		}
+	}
+	if (spot == 0) {
+		// we hadn't found one between allocation ranges. this is ok.
+		// see if there's a gap after the last one
+		addr_t lastRangeEnd
+			= args->virtual_allocated_range[last_valloc_entry].start 
+				+ args->virtual_allocated_range[last_valloc_entry].size;
+		if (KERNEL_BASE + (KERNEL_SIZE - 1) - lastRangeEnd >= size) {
+			spot = lastRangeEnd;
+			args->virtual_allocated_range[last_valloc_entry].size += size;
+			goto out;
+		}
+		// see if there's a gap before the first one
+		if (args->virtual_allocated_range[0].start > KERNEL_BASE) {
+			if (args->virtual_allocated_range[0].start - KERNEL_BASE >= size) {
+				args->virtual_allocated_range[0].start -= size;
+				spot = args->virtual_allocated_range[0].start;
+				goto out;
+			}
+		}
+	}
+
+out:
+	return spot;
+}
+
+
+static bool
+is_page_in_physical_memory_range(kernel_args *args, addr_t address)
+{
+	// TODO: horrible brute-force method of determining if the page can be allocated
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		if (address >= args->physical_memory_range[i].start 
+			&& address < args->physical_memory_range[i].start 
+				+ args->physical_memory_range[i].size)
+			return true;
+	}
+	return false;
+}
+
+
+static addr_t
+allocate_early_physical_page(kernel_args *args)
+{
+	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
+		addr_t nextPage;
+
+		nextPage = args->physical_allocated_range[i].start
+			+ args->physical_allocated_range[i].size;
+		// see if the page after the next allocated paddr run can be allocated
+		if (i + 1 < args->num_physical_allocated_ranges
+			&& args->physical_allocated_range[i + 1].size != 0) {
+			// see if the next page will collide with the next allocated range
+			if (nextPage >= args->physical_allocated_range[i+1].start)
+				continue;
+		}
+		// see if the next physical page fits in the memory block
+		if (is_page_in_physical_memory_range(args, nextPage)) {
+			// we got one!
+			args->physical_allocated_range[i].size += B_PAGE_SIZE;
+			return nextPage / B_PAGE_SIZE;
+		}
+	}
+
+	return 0;
+		// could not allocate a block
+}
+
+
+/*!
+	This one uses the kernel_args' physical and virtual memory ranges to
+	allocate some pages before the VM is completely up.
+*/
+addr_t
+vm_allocate_early(kernel_args *args, size_t virtualSize, size_t physicalSize,
+	uint32 attributes)
+{
+	if (physicalSize > virtualSize)
+		physicalSize = virtualSize;
+
+	// find the vaddr to allocate at
+	addr_t virtualBase = allocate_early_virtual(args, virtualSize);
+	//dprintf("vm_allocate_early: vaddr 0x%lx\n", virtualAddress);
+
+	// map the pages
+	for (uint32 i = 0; i < PAGE_ALIGN(physicalSize) / B_PAGE_SIZE; i++) {
+		addr_t physicalAddress = allocate_early_physical_page(args);
+		if (physicalAddress == 0)
+			panic("error allocating early page!\n");
+
+		//dprintf("vm_allocate_early: paddr 0x%lx\n", physicalAddress);
+
+		arch_vm_translation_map_early_map(args, virtualBase + i * B_PAGE_SIZE,
+			physicalAddress * B_PAGE_SIZE, attributes,
+			&allocate_early_physical_page);
+	}
+
+	return virtualBase;
+}
+
+
 status_t
 vm_init(kernel_args *args)
 {
@@ -2449,7 +2570,7 @@ vm_init(kernel_args *args)
 		heapSize /= 2;
 
 	// map in the new heap and initialize it
-	addr_t heapBase = vm_alloc_from_kernel_args(args, heapSize,
+	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
@@ -2628,7 +2749,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				area ? area->name : "???", faultAddress - (area ? area->base : 0x0));
 
 			// We can print a stack trace of the userland thread here.
-#if 0
+#if 1
 			if (area) {
 				struct stack_frame {
 					#ifdef __INTEL__
@@ -3099,15 +3220,18 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		atomic_add(&page->ref_count, 1);
 
+		//vm_page_map(area, page, newProtection);
 		map->ops->lock(map);
 		map->ops->map(map, address, page->physical_page_number * B_PAGE_SIZE,
 			newProtection);
 		map->ops->unlock(map);
 	}
 
+	vm_page_set_state(page, area->wiring == B_NO_LOCK
+		? PAGE_STATE_ACTIVE : PAGE_STATE_WIRED);
+
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 
-	vm_page_set_state(page, PAGE_STATE_ACTIVE);
 	mutex_unlock(&pageSourceRef->lock);
 	vm_cache_release_ref(pageSourceRef);
 
@@ -3405,8 +3529,8 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 
 		if (interrupts) {
 			uint32 flags;
-			status = map->ops->query(map, (addr_t)address + offset, &physicalAddress,
-				&flags);
+			status = map->ops->query(map, (addr_t)address + offset,
+				&physicalAddress, &flags);
 		} else {
 			status = map->ops->query_interrupt(map, (addr_t)address + offset,
 				&physicalAddress);
@@ -3421,7 +3545,8 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 		}
 
 		// need to switch to the next physical_entry?
-		if (index < 0 || (addr_t)table[index].address != physicalAddress - table[index].size) {
+		if (index < 0 || (addr_t)table[index].address
+				!= physicalAddress - table[index].size) {
 			if (++index + 1 > numEntries) {
 				// table to small
 				status = B_BUFFER_OVERFLOW;
@@ -3604,12 +3729,15 @@ resize_area(area_id areaID, size_t newSize)
 		// We need to check if all areas of this cache can be resized
 
 		for (current = cacheRef->areas; current; current = current->cache_next) {
-			if (current->address_space_next && current->address_space_next->base <= (current->base + newSize)) {
+			if (current->address_space_next
+				&& current->address_space_next->base <= (current->base
+					+ newSize)) {
 				// if the area was created inside a reserved area, it can also be
 				// resized in that area
 				// ToDo: if there is free space after the reserved area, it could be used as well...
 				vm_area *next = current->address_space_next;
-				if (next->id == RESERVED_AREA_ID && next->cache_offset <= current->base
+				if (next->id == RESERVED_AREA_ID
+					&& next->cache_offset <= current->base
 					&& next->base - 1 + next->size >= current->base - 1 + newSize)
 					continue;
 
@@ -3622,9 +3750,11 @@ resize_area(area_id areaID, size_t newSize)
 	// Okay, looks good so far, so let's do it
 
 	for (current = cacheRef->areas; current; current = current->cache_next) {
-		if (current->address_space_next && current->address_space_next->base <= (current->base + newSize)) {
+		if (current->address_space_next
+			&& current->address_space_next->base <= (current->base + newSize)) {
 			vm_area *next = current->address_space_next;
-			if (next->id == RESERVED_AREA_ID && next->cache_offset <= current->base
+			if (next->id == RESERVED_AREA_ID
+				&& next->cache_offset <= current->base
 				&& next->base - 1 + next->size >= current->base - 1 + newSize) {
 				// resize reserved area
 				addr_t offset = current->base + newSize - next->base;
