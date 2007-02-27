@@ -38,14 +38,14 @@ Application UserlandFSServer
 #	  BeOSKernelFileSystem.cpp
 #	  BeOSKernelVolume.cpp
 	  DispatcherFileSystem.cpp
-#	  FileSystem.cpp
+	  FileSystem.cpp
 #	  kernel_emu.cpp
 	  main.cpp
-#	  RequestThread.cpp
+	  RequestThread.cpp
 	  ServerDefs.cpp
 	  UserlandFSDispatcher.cpp
 #	  UserlandFSServer.cpp
-#	  UserlandRequestHandler.cpp
-#	  Volume.cpp
+	  UserlandRequestHandler.cpp
+	  Volume.cpp
 	: be
 ;

@@ -384,7 +384,7 @@ public:
 	WriteFSInfoRequest() : VolumeRequest(WRITE_FS_INFO_REQUEST) {}
 
 	fs_info		info;
-	long		mask;
+	uint32		mask;
 };
 
 // WriteFSInfoReply
@@ -412,7 +412,6 @@ class LookupReply : public ReplyRequest {
 public:
 	LookupReply() : ReplyRequest(LOOKUP_REPLY) {}
 
-	Address		resolvedPath;
 	vnode_id	vnid;
 	int			type;
 };

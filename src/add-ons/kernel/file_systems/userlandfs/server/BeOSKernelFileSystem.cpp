@@ -19,13 +19,12 @@ BeOSKernelFileSystem::~BeOSKernelFileSystem()
 
 // CreateVolume
 status_t
-BeOSKernelFileSystem::CreateVolume(Volume** volume, nspace_id id)
+BeOSKernelFileSystem::CreateVolume(Volume** volume, mount_id id)
 {
 	// check initialization and parameters
-	if (!fFSOps)
+	if (!fFSOps || !volume)
 		return B_BAD_VALUE;
-	if (!volume)
-		return B_BAD_VALUE;
+
 	// create the volume
 	*volume = new(nothrow) BeOSKernelVolume(this, id, fFSOps);
 	if (!*volume)

@@ -8,7 +8,7 @@
 #include <cache.h>
 #include <Clipboard.h>
 #include <FindDirectory.h>
-#include <fsproto.h>
+#include <fs_interface.h>
 #include <image.h>
 #include <Locker.h>
 #include <Path.h>

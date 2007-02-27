@@ -3,7 +3,7 @@
 #include "Volume.h"
 
 // constructor
-Volume::Volume(FileSystem* fileSystem, nspace_id id)
+Volume::Volume(FileSystem* fileSystem, mount_id id)
 	: fFileSystem(fileSystem),
 	  fID(id)
 {
@@ -22,19 +22,20 @@ Volume::GetFileSystem() const
 }
 
 // GetID
-nspace_id
+mount_id
 Volume::GetID() const
 {
 	return fID;
 }
 
-// #pragma mark -
-// #pragma mark ----- FS -----
+
+// #pragma mark - FS
+
 
 // Mount
 status_t
-Volume::Mount(const char* device, ulong flags, const char* parameters,
-	int32 len, vnode_id* rootID)
+Volume::Mount(const char* device, uint32 flags, const char* parameters,
+	vnode_id* rootID)
 {
 	return B_BAD_VALUE;
 }
@@ -53,126 +54,59 @@ Volume::Sync()
 	return B_BAD_VALUE;
 }
 
-// ReadFSStat
+// ReadFSInfo
 status_t
-Volume::ReadFSStat(fs_info* info)
+Volume::ReadFSInfo(fs_info* info)
 {
 	return B_BAD_VALUE;
 }
 
-// WriteFSStat
+// WriteFSInfo
 status_t
-Volume::WriteFSStat(struct fs_info *info, long mask)
+Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
 {
 	return B_BAD_VALUE;
 }
 
-// #pragma mark -
-// #pragma mark ----- vnodes -----
+
+// #pragma mark - vnodes
+
+
+// Lookup
+status_t
+Volume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
+{
+	return B_BAD_VALUE;
+}
 
 // ReadVNode
 status_t
-Volume::ReadVNode(vnode_id vnid, char reenter, void** node)
+Volume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
 {
 	return B_BAD_VALUE;
 }
 
 // WriteVNode
 status_t
-Volume::WriteVNode(void* node, char reenter)
+Volume::WriteVNode(fs_vnode node, bool reenter)
 {
 	return B_BAD_VALUE;
 }
 
 // RemoveVNode
 status_t
-Volume::RemoveVNode(void* node, char reenter)
+Volume::RemoveVNode(fs_vnode node, bool reenter)
 {
 	return B_BAD_VALUE;
 }
 
-// #pragma mark -
-// #pragma mark ----- nodes -----
 
-// FSync
-status_t
-Volume::FSync(void* node)
-{
-	return B_BAD_VALUE;
-}
+// #pragma mark - nodes
 
-// ReadStat
-status_t
-Volume::ReadStat(void* node, struct stat* st)
-{
-	return B_BAD_VALUE;
-}
-
-// WriteStat
-status_t
-Volume::WriteStat(void* node, struct stat* st, long mask)
-{
-	return B_BAD_VALUE;
-}
-
-// Access
-status_t
-Volume::Access(void* node, int mode)
-{
-	return B_BAD_VALUE;
-}
-
-// #pragma mark -
-// #pragma mark ----- files -----
-
-// Create
-status_t
-Volume::Create(void* dir, const char* name, int openMode, int mode,
-	vnode_id* vnid, void** cookie)
-{
-	return B_BAD_VALUE;
-}
-
-// Open
-status_t
-Volume::Open(void* node, int openMode, void** cookie)
-{
-	return B_BAD_VALUE;
-}
-
-// Close
-status_t
-Volume::Close(void* node, void* cookie)
-{
-	return B_BAD_VALUE;
-}
-
-// FreeCookie
-status_t
-Volume::FreeCookie(void* node, void* cookie)
-{
-	return B_BAD_VALUE;
-}
-
-// Read
-status_t
-Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
-	size_t bufferSize, size_t* bytesRead)
-{
-	return B_BAD_VALUE;
-}
-
-// Write
-status_t
-Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
-	size_t bufferSize, size_t* bytesWritten)
-{
-	return B_BAD_VALUE;
-}
 
 // IOCtl
 status_t
-Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
+Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
 	size_t size)
 {
 	return B_BAD_VALUE;
@@ -180,14 +114,14 @@ Volume::IOCtl(void* node, void* cookie, int command, void *buffer,
 
 // SetFlags
 status_t
-Volume::SetFlags(void* node, void* cookie, int flags)
+Volume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
 {
 	return B_BAD_VALUE;
 }
 
 // Select
 status_t
-Volume::Select(void* node, void* cookie, uint8 event, uint32 ref,
+Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 	selectsync* sync)
 {
 	return B_BAD_VALUE;
@@ -195,230 +129,305 @@ Volume::Select(void* node, void* cookie, uint8 event, uint32 ref,
 
 // Deselect
 status_t
-Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
+Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
 {
 	return B_BAD_VALUE;
 }
 
-// #pragma mark -
-// #pragma mark ----- hard links / symlinks -----
+// FSync
+status_t
+Volume::FSync(fs_vnode node)
+{
+	return B_BAD_VALUE;
+}
+
+// ReadSymlink
+status_t
+Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
+	size_t* bytesRead)
+{
+	return B_BAD_VALUE;
+}
+
+// CreateSymlink
+status_t
+Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
+	int mode)
+{
+	return B_BAD_VALUE;
+}
 
 // Link
 status_t
-Volume::Link(void* dir, const char* name, void* node)
+Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
 {
 	return B_BAD_VALUE;
 }
 
 // Unlink
 status_t
-Volume::Unlink(void* dir, const char* name)
-{
-	return B_BAD_VALUE;
-}
-
-// Symlink
-status_t
-Volume::Symlink(void* dir, const char* name, const char* target)
-{
-	return B_BAD_VALUE;
-}
-
-// ReadLink
-status_t
-Volume::ReadLink(void* node, char* buffer, size_t bufferSize,
-	size_t* bytesRead)
+Volume::Unlink(fs_vnode dir, const char* name)
 {
 	return B_BAD_VALUE;
 }
 
 // Rename
 status_t
-Volume::Rename(void* oldDir, const char* oldName, void* newDir,
+Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 	const char* newName)
 {
 	return B_BAD_VALUE;
 }
 
-// #pragma mark -
-// #pragma mark ----- directories -----
-
-// MkDir
+// Access
 status_t
-Volume::MkDir(void* dir, const char* name, int mode)
+Volume::Access(fs_vnode node, int mode)
 {
 	return B_BAD_VALUE;
 }
 
-// RmDir
+// ReadStat
 status_t
-Volume::RmDir(void* dir, const char* name)
+Volume::ReadStat(fs_vnode node, struct stat* st)
+{
+	return B_BAD_VALUE;
+}
+
+// WriteStat
+status_t
+Volume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
+{
+	return B_BAD_VALUE;
+}
+
+
+// #pragma mark - files
+
+
+// Create
+status_t
+Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
+	fs_cookie* cookie, vnode_id* vnid)
+{
+	return B_BAD_VALUE;
+}
+
+// Open
+status_t
+Volume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
+{
+	return B_BAD_VALUE;
+}
+
+// Close
+status_t
+Volume::Close(fs_vnode node, fs_cookie cookie)
+{
+	return B_BAD_VALUE;
+}
+
+// FreeCookie
+status_t
+Volume::FreeCookie(fs_vnode node, fs_cookie cookie)
+{
+	return B_BAD_VALUE;
+}
+
+// Read
+status_t
+Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+	size_t bufferSize, size_t* bytesRead)
+{
+	return B_BAD_VALUE;
+}
+
+// Write
+status_t
+Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
+	size_t bufferSize, size_t* bytesWritten)
+{
+	return B_BAD_VALUE;
+}
+
+
+// #pragma mark - directories
+
+
+// CreateDir
+status_t
+Volume::CreateDir(fs_vnode dir, const char* name, int mode, vnode_id *newDir)
+{
+	return B_BAD_VALUE;
+}
+
+// RemoveDir
+status_t
+Volume::RemoveDir(fs_vnode dir, const char* name)
 {
 	return B_BAD_VALUE;
 }
 
 // OpenDir
 status_t
-Volume::OpenDir(void* node, void** cookie)
+Volume::OpenDir(fs_vnode node, fs_cookie* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseDir
 status_t
-Volume::CloseDir(void* node, void* cookie)
+Volume::CloseDir(fs_vnode node, fs_vnode cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeDirCookie
 status_t
-Volume::FreeDirCookie(void* node, void* cookie)
+Volume::FreeDirCookie(fs_vnode node, fs_vnode cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadDir
 status_t
-Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
-	int32 count, int32* countRead)
+Volume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer, size_t bufferSize,
+	uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
 }
 
 // RewindDir
 status_t
-Volume::RewindDir(void* node, void* cookie)
+Volume::RewindDir(fs_vnode node, fs_vnode cookie)
 {
 	return B_BAD_VALUE;
 }
 
-// Walk
-status_t
-Volume::Walk(void* dir, const char* entryName, char** resolvedPath,
-	vnode_id* vnid)
-{
-	return B_BAD_VALUE;
-}
 
-// #pragma mark -
-// #pragma mark ----- attributes -----
+// #pragma mark - attribute directories
+
 
 // OpenAttrDir
 status_t
-Volume::OpenAttrDir(void* node, void** cookie)
+Volume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseAttrDir
 status_t
-Volume::CloseAttrDir(void* node, void* cookie)
+Volume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeAttrDirCookie
 status_t
-Volume::FreeAttrDirCookie(void* node, void* cookie)
+Volume::FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadAttrDir
 status_t
-Volume::ReadAttrDir(void* node, void* cookie, void* buffer, size_t bufferSize,
-	int32 count, int32* countRead)
+Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
+	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
 }
 
 // RewindAttrDir
 status_t
-Volume::RewindAttrDir(void* node, void* cookie)
+Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
+
+// #pragma mark - attributes
+
+
 // ReadAttr
 status_t
-Volume::ReadAttr(void* node, const char* name, int type, off_t pos,
-	void* buffer, size_t bufferSize, size_t* bytesRead)
+Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+	size_t bufferSize, size_t* bytesRead)
 {
 	return B_BAD_VALUE;
 }
 
 // WriteAttr
 status_t
-Volume::WriteAttr(void* node, const char* name, int type, off_t pos,
+Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
-{
-	return B_BAD_VALUE;
-}
-
-// RemoveAttr
-status_t
-Volume::RemoveAttr(void* node, const char* name)
-{
-	return B_BAD_VALUE;
-}
-
-// RenameAttr
-status_t
-Volume::RenameAttr(void* node, const char* oldName, const char* newName)
 {
 	return B_BAD_VALUE;
 }
 
 // StatAttr
 status_t
-Volume::StatAttr(void* node, const char* name, struct attr_info* attrInfo)
+Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
 {
 	return B_BAD_VALUE;
 }
 
-// #pragma mark -
-// #pragma mark ----- indices -----
+// RenameAttr
+status_t
+Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
+	const char* newName)
+{
+	return B_BAD_VALUE;
+}
+
+// RemoveAttr
+status_t
+Volume::RemoveAttr(fs_vnode node, const char* name)
+{
+	return B_BAD_VALUE;
+}
+
+
+// #pragma mark - indices
+
 
 // OpenIndexDir
 status_t
-Volume::OpenIndexDir(void** cookie)
+Volume::OpenIndexDir(fs_cookie *cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseIndexDir
 status_t
-Volume::CloseIndexDir(void* cookie)
+Volume::CloseIndexDir(fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeIndexDirCookie
 status_t
-Volume::FreeIndexDirCookie(void* cookie)
+Volume::FreeIndexDirCookie(fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadIndexDir
 status_t
-Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
-	int32 count, int32* countRead)
+Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
+	uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
 }
 
 // RewindIndexDir
 status_t
-Volume::RewindIndexDir(void* cookie)
+Volume::RewindIndexDir(fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CreateIndex
 status_t
-Volume::CreateIndex(const char* name, int type, int flags)
+Volume::CreateIndex(const char* name, uint32 type, uint32 flags)
 {
 	return B_BAD_VALUE;
 }
@@ -430,49 +439,43 @@ Volume::RemoveIndex(const char* name)
 	return B_BAD_VALUE;
 }
 
-// RenameIndex
+// ReadIndexStat
 status_t
-Volume::RenameIndex(const char* oldName, const char* newName)
+Volume::ReadIndexStat(const char *name, struct stat *st)
 {
 	return B_BAD_VALUE;
 }
 
-// StatIndex
-status_t
-Volume::StatIndex(const char *name, struct index_info* indexInfo)
-{
-	return B_BAD_VALUE;
-}
 
-// #pragma mark -
-// #pragma mark ----- queries -----
+// #pragma mark - queries
+
 
 // OpenQuery
 status_t
-Volume::OpenQuery(const char* queryString, ulong flags, port_id port,
-	long token, void** cookie)
+Volume::OpenQuery(const char* queryString, uint32 flags, port_id port,
+	uint32 token, fs_cookie *cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseQuery
 status_t
-Volume::CloseQuery(void* cookie)
+Volume::CloseQuery(fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeQueryCookie
 status_t
-Volume::FreeQueryCookie(void* cookie)
+Volume::FreeQueryCookie(fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadQuery
 status_t
-Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize, int32 count,
-	int32* countRead)
+Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
+	uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
 }

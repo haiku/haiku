@@ -12,7 +12,7 @@ public:
 								BeOSKernelFileSystem(vnode_ops* fsOps);
 	virtual						~BeOSKernelFileSystem();
 
-	virtual	status_t			CreateVolume(Volume** volume, nspace_id id);
+	virtual	status_t			CreateVolume(Volume** volume, mount_id id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
 private:
