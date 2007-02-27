@@ -66,92 +66,92 @@ const uint32 kRestoreBackgroundImage = 'Tbgr';
 const uint32 kChangeBackgroundImage = 'Cbgr';
 
 class BackgroundImage {
-	// This class knows everything about which bitmap to use for a given
-	// view and how.
-	// Unlike other windows, the Desktop window can have different backgrounds
-	// for each workspace
-public:
-	
-	enum Mode {
-		kAtOffset,
-		kCentered,			// only works on Desktop
-		kScaledToFit,		// only works on Desktop
-		kTiled
-	};
-	
-	class BackgroundImageInfo {
-		// element of the per-workspace list
+		// This class knows everything about which bitmap to use for a given
+		// view and how.
+		// Unlike other windows, the Desktop window can have different backgrounds
+		// for each workspace
 	public:
-		BackgroundImageInfo(uint32 workspace, int32 imageIndex, Mode mode, 
-			BPoint offset, bool eraseTextWidget, uint32 imageSet, 
-			uint32 cacheMode);
-		~BackgroundImageInfo();
-		
-		void LoadBitmap();
-		void UnloadBitmap(uint32 globalCacheMode);
 
-		uint32 fWorkspace;
-		int32 fImageIndex;
-		Mode fMode;
-		BPoint fOffset;
-		bool fEraseTextWidgetBackground;
-		uint32 fImageSet;
-		uint32 fCacheMode;		// image cache strategy (0 cache , 1 no cache)
-	};
-	
-	static BackgroundImage *GetBackgroundImage(const BNode *node,
-		bool isDesktop, BackgroundsView* view);
+		enum Mode {
+			kAtOffset,
+			kCentered,			// only works on Desktop
+			kScaledToFit,		// only works on Desktop
+			kTiled
+		};
+
+		class BackgroundImageInfo {
+				// element of the per-workspace list
+			public:
+				BackgroundImageInfo(uint32 workspace, int32 imageIndex, Mode mode,
+					BPoint offset, bool eraseTextWidget, uint32 imageSet,
+					uint32 cacheMode);
+				~BackgroundImageInfo();
+
+				void LoadBitmap();
+				void UnloadBitmap(uint32 globalCacheMode);
+
+				uint32 fWorkspace;
+				int32 fImageIndex;
+				Mode fMode;
+				BPoint fOffset;
+				bool fEraseTextWidgetBackground;
+				uint32 fImageSet;
+				uint32 fCacheMode;		// image cache strategy (0 cache , 1 no cache)
+		};
+
+		static BackgroundImage *GetBackgroundImage(const BNode *node,
+			bool isDesktop, BackgroundsView* view);
 		// create a BackgroundImage object by reading it from a node
 
-	virtual ~BackgroundImage();
+		virtual ~BackgroundImage();
 
-	void Show(BView *view, int32 workspace);
+		void Show(BView *view, int32 workspace);
 		// display the right background for a given workspace
-	void Remove();
+		void Remove();
 		// remove the background from it's current view
 
-	void WorkspaceActivated(BView *view, int32 workspace, bool state);
+		void WorkspaceActivated(BView *view, int32 workspace, bool state);
 		// respond to a workspace change
-	void ScreenChanged(BRect rect, color_space space);
+		void ScreenChanged(BRect rect, color_space space);
 		// respond to a screen size change
-	/*static BackgroundImage *Refresh(BackgroundImage *oldBackgroundImage,
-		const BNode *fromNode, bool desktop, BPoseView *poseView);
-		// respond to a background image setting change
-	void ChangeImageSet(BPoseView *poseView);
-		// change to the next imageSet if any, no refresh*/
-	BackgroundImageInfo *ImageInfoForWorkspace(int32) const;
-	
-		// return fIsDesktop
-	bool IsDesktop() { return fIsDesktop;}
-	
-	status_t SetBackgroundImage(BNode *node);
-	
-	void Show(BackgroundImageInfo *, BView *view);
-	
-	uint32 GetShowingImageSet() { return fShowingImageSet; }
-	
-	void Add(BackgroundImageInfo *);
-	void Remove(BackgroundImageInfo *);
-	void RemoveAll();
+		/*static BackgroundImage *Refresh(BackgroundImage *oldBackgroundImage,
+			const BNode *fromNode, bool desktop, BPoseView *poseView);
+			// respond to a background image setting change
+		void ChangeImageSet(BPoseView *poseView);
+			// change to the next imageSet if any, no refresh*/
+		BackgroundImageInfo *ImageInfoForWorkspace(int32) const;
 
-private:
-	BackgroundImage(const BNode *node, bool isDesktop, BackgroundsView* view);
+		// return fIsDesktop
+		bool IsDesktop() { return fIsDesktop;}
+
+		status_t SetBackgroundImage(BNode *node);
+
+		void Show(BackgroundImageInfo *, BView *view);
+
+		uint32 GetShowingImageSet() { return fShowingImageSet; }
+
+		void Add(BackgroundImageInfo *);
+		void Remove(BackgroundImageInfo *);
+		void RemoveAll();
+
+	private:
+		BackgroundImage(const BNode *node, bool isDesktop, BackgroundsView* view);
 		// no public constructor, GetBackgroundImage factory function is
 		// used instead
 
-	bool fIsDesktop;
-	BNode fDefinedByNode;
-	BView *fView;
-	BackgroundsView* fBackgroundsView;
-	BackgroundImageInfo *fShowingBitmap;
-		
-	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
-	
-	uint32 fImageSetPeriod;		// period between imagesets, 0 if none
-	uint32 fShowingImageSet;	// current imageset
-	uint32 fImageSetCount;		// imageset count
-	uint32 fCacheMode;// image cache strategy (0 all, 1 none, 2 own strategy)
-	bool fRandomChange; 		// random or sequential change
+		bool fIsDesktop;
+		BNode fDefinedByNode;
+		BView *fView;
+		BackgroundsView* fBackgroundsView;
+		BackgroundImageInfo *fShowingBitmap;
+
+		BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
+
+		uint32 fImageSetPeriod;		// period between imagesets, 0 if none
+		uint32 fShowingImageSet;	// current imageset
+		uint32 fImageSetCount;		// imageset count
+		uint32 fCacheMode;// image cache strategy (0 all, 1 none, 2 own strategy)
+		bool fRandomChange; 		// random or sequential change
 };
 
 class Image {
@@ -159,7 +159,7 @@ class Image {
 	public:
 		Image(BPath path);
 		~Image();
-		
+
 		void UnloadBitmap();
 		const char* GetName() {return name.String();}
 		BBitmap* GetBitmap();

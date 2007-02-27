@@ -21,7 +21,7 @@ class CustomRefFilter : public BRefFilter {
 		CustomRefFilter(bool imageFiltering);
 		virtual ~CustomRefFilter() {};
 
-		bool Filter(const entry_ref *ref, BNode* node, struct stat *st, 
+		bool Filter(const entry_ref *ref, BNode* node, struct stat *st,
 			const char *filetype);
 
 	protected:
@@ -44,7 +44,7 @@ class ImageFilePanel : public BFilePanel {
 	protected:
 		BView*			fImageView;
 		BStringView*	fResolutionView;
-		BStringView*	fImageTypeView;	
+		BStringView*	fImageTypeView;
 };
 
 #endif	// IMAGE_FILE_PANEL_H

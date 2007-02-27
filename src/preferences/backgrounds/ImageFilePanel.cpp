@@ -36,13 +36,13 @@ ImageFilePanel::Show()
 	if (fImageView == NULL) {
 		Window()->Lock();
 		BView *background = Window()->ChildAt(0);
-		uint32 poseViewResizingMode = 
+		uint32 poseViewResizingMode =
 			background->FindView("PoseView")->ResizingMode();
-		uint32 countVwResizingMode = 
+		uint32 countVwResizingMode =
 			background->FindView("CountVw")->ResizingMode();
-		uint32 vScrollBarResizingMode = 
+		uint32 vScrollBarResizingMode =
 			background->FindView("VScrollBar")->ResizingMode();
-		uint32 hScrollBarResizingMode = 
+		uint32 hScrollBarResizingMode =
 			background->FindView("HScrollBar")->ResizingMode();
 
 		background->FindView("PoseView")->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
@@ -57,19 +57,19 @@ ImageFilePanel::Show()
 
 		BRect rect(background->Bounds().left + 15, background->Bounds().bottom - 94,
 			background->Bounds().left + 122, background->Bounds().bottom - 15);
-		fImageView = new BView(rect, "ImageView", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, 
+		fImageView = new BView(rect, "ImageView", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
 			B_SUBPIXEL_PRECISE);
 		fImageView->SetViewColor(background->ViewColor());
 		background->AddChild(fImageView);
 
 		rect = BRect(background->Bounds().left + 132, background->Bounds().bottom - 85,
 			background->Bounds().right, background->Bounds().bottom - 65);
-		fResolutionView = new BStringView(rect, "ResolutionView", NULL, 
+		fResolutionView = new BStringView(rect, "ResolutionView", NULL,
 			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 		background->AddChild(fResolutionView);
 
 		rect.OffsetBy(0, -16);
-		fImageTypeView = new BStringView(rect, "ImageTypeView", NULL, 
+		fImageTypeView = new BStringView(rect, "ImageTypeView", NULL,
 			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 		background->AddChild(fImageTypeView);
 
@@ -96,20 +96,20 @@ ImageFilePanel::SelectionChanged()
 
 			if (bitmap != NULL) {
 				BRect dest(fImageView->Bounds());
-				if (bitmap->Bounds().Width()>bitmap->Bounds().Height()) {
-					dest.InsetBy(0, (dest.Height()+1 - 
-						((bitmap->Bounds().Height()+1) / 
-						(bitmap->Bounds().Width()+1) * (dest.Width()+1)))/2);
+				if (bitmap->Bounds().Width() > bitmap->Bounds().Height()) {
+					dest.InsetBy(0, (dest.Height() + 1 -
+						((bitmap->Bounds().Height() + 1) /
+						 (bitmap->Bounds().Width() + 1) *(dest.Width() + 1))) / 2);
 				} else {
-					dest.InsetBy((dest.Width()+1 - 
-						((bitmap->Bounds().Width()+1) / 
-						(bitmap->Bounds().Height()+1) * (dest.Height()+1)))/2, 0);
+					dest.InsetBy((dest.Width() + 1 -
+						((bitmap->Bounds().Width() + 1) /
+						 (bitmap->Bounds().Height() + 1) *(dest.Height() + 1))) / 2, 0);
 				}
-				fImageView->SetViewBitmap(bitmap, bitmap->Bounds(), dest, 
+				fImageView->SetViewBitmap(bitmap, bitmap->Bounds(), dest,
 					B_FOLLOW_LEFT | B_FOLLOW_TOP, 0);
 
 				BString resolution;
-				resolution << "Resolution: " << (int)(bitmap->Bounds().Width() + 1) 
+				resolution << "Resolution: " << (int)(bitmap->Bounds().Width() + 1)
 					<< "x" << (int)(bitmap->Bounds().Height() + 1);
 				fResolutionView->SetText(resolution.String());
 				delete bitmap;
@@ -120,13 +120,13 @@ ImageFilePanel::SelectionChanged()
 				if (nodeInfo.GetType(type) == B_OK) {
 					BMimeType mimeType(type);
 					mimeType.GetShortDescription(type);
-						// if this fails, the MIME type will be displayed
+					// if this fails, the MIME type will be displayed
 					fImageTypeView->SetText(type);
 				} else {
 					BMimeType refType;
 					if (BMimeType::GuessMimeType(&ref, &refType) == B_OK) {
 						refType.GetShortDescription(type);
-							// if this fails, the MIME type will be displayed
+						// if this fails, the MIME type will be displayed
 						fImageTypeView->SetText(type);
 					} else
 						fImageTypeView->SetText("");

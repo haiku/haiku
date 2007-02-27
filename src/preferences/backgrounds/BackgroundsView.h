@@ -37,7 +37,7 @@ class ImageFilePanel;
 
 class BGImageMenuItem : public BMenuItem {
 	public:
-		BGImageMenuItem(const char *label, int32 imageIndex, BMessage *message, 
+		BGImageMenuItem(const char *label, int32 imageIndex, BMessage *message,
 			char shortcut = 0, uint32 modifiers = 0);
 
 		int32 ImageIndex() { return fImageIndex; }
@@ -73,7 +73,7 @@ class PreView : public BControl {
 		void AttachedToWindow();
 
 		BPoint fOldPoint;
-		float x_ratio,y_ratio;
+		float x_ratio, y_ratio;
 		display_mode mode;
 
 		BCursor fMoveHandCursor;
@@ -128,7 +128,7 @@ class BackgroundsView : public BBox {
 
 		BackgroundImage *fCurrent;		// the current BackgroundImage object
 		BackgroundImage::BackgroundImageInfo *fCurrentInfo;//the current BackgroundImageInfo object
-		entry_ref fCurrentRef;			// the entry for the node which holds current 
+		entry_ref fCurrentRef;			// the entry for the node which holds current
 		int32 fLastImageIndex, fLastWorkspaceIndex;		// last indexes for cancel
 		BMessage fSettings;				// settings loaded from settings directory
 

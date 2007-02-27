@@ -53,9 +53,9 @@ BackgroundsApplication::BackgroundsApplication()
 
 
 BackgroundsWindow::BackgroundsWindow(BRect frame, bool standalone)
-	: BWindow(frame, "Backgrounds", B_TITLED_WINDOW, 
+	: BWindow(frame, "Backgrounds", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
-		fIsStandalone(standalone)
+	fIsStandalone(standalone)
 {
 	fBackgroundsView = new BackgroundsView(Bounds(), "BackgroundsView",
 		B_FOLLOW_ALL, B_WILL_DRAW);
@@ -87,7 +87,7 @@ BackgroundsWindow::WorkspaceActivated(int32 oldWorkspaces, bool active)
 }
 
 
-void 
+void
 BackgroundsWindow::ProcessRefs(entry_ref dir, BMessage* refs)
 {
 	fBackgroundsView->ProcessRefs(dir, refs);
