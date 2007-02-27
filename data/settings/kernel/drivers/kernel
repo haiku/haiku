@@ -8,7 +8,7 @@
 	# debug output and the kernel debugger
 
 #serial_debug_speed 115200
-	# possibe values: <9600|19200|38400|57600|115200>
+	# possible values: <9600|19200|38400|57600|115200>
 
 #syslog_debug_output false
 	# enables syslog debug output - all debug output is also sent to
