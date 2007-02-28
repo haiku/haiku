@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs ;
+
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs reiserfs ;

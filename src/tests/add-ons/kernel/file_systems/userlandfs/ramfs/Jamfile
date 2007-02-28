@@ -1,0 +1,61 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
+	file_systems userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
+local ramFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 src test ramfs ] ;
+
+DEFINES += USER=1 ;
+
+# avoid inclusion of <drivers/Select.h>
+DEFINES += _DRIVERS_SELECT_H ;
+
+SubDirC++Flags -include
+	[ FDirName $(userlandFSIncludes) shared Compatibility.h ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+SEARCH_SOURCE += $(ramFSTop) ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
+
+Addon <userland>ramfs
+	: # relpath - obsolete
+	: Debug.cpp
+	  Locker.cpp
+	  String.cpp
+
+	  AllocationInfo.cpp
+	  AreaUtils.cpp
+	  Attribute.cpp
+	  AttributeIndex.cpp
+	  AttributeIndexImpl.cpp
+	  AttributeIterator.cpp
+	  BlockAllocator.cpp
+	  BlockAllocatorArea.cpp
+	  BlockAllocatorAreaBucket.cpp
+	  BlockReferenceManager.cpp
+	  DataContainer.cpp
+	  Directory.cpp
+	  Entry.cpp
+	  EntryIterator.cpp
+	  EntryListener.cpp
+	  File.cpp
+	  Index.cpp
+	  IndexDirectory.cpp
+	  kernel_interface.cpp
+	  LastModifiedIndex.cpp
+	  NameIndex.cpp
+	  Node.cpp
+	  NodeListener.cpp
+	  NodeTable.cpp
+	  Query.cpp
+	  SizeIndex.cpp
+	  SymLink.cpp
+	  Volume.cpp
+	: false		# is executable
+	: libuserlandfs_beos_kernel.so
+;
