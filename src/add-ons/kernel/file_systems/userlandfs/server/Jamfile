@@ -4,7 +4,7 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 	file_systems userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-#SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
@@ -13,6 +13,7 @@ SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 DEFINES += USER=1 ;
 DEFINES += DEBUG_APP="\\\"UserlandFSServer\\\"" ;
+DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 
 Application UserlandFSServer
 	: AreaSupport.cpp
@@ -48,4 +49,10 @@ Application UserlandFSServer
 	  UserlandRequestHandler.cpp
 	  Volume.cpp
 	: be
+;
+
+# the library providing the BeOS kernel interface for add-ons
+SharedLibrary libuserlandfs_beos_kernel.so
+	: beos_kernel_emu.cpp
+	: <nogrist>UserlandFSServer
 ;

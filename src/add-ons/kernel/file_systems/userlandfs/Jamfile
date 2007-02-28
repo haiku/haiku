@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems userlandfs ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs kernel_add_on ;
-#SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs server ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs server ;
 #SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs ufs_mount ;

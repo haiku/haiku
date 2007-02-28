@@ -8,7 +8,7 @@
 
 #include <BeBuild.h>
 
-#include "lock.h"
+#include <legacy/lock.h>
 
 #ifndef _IMPEXP_KERNEL
 #define _IMPEXP_KERNEL

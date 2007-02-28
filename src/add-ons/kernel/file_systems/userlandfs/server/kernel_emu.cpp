@@ -99,7 +99,9 @@ UserlandFS::KernelEmu::free_path(char *p)
 	free(p);
 }
 
+
 // #pragma mark -
+
 
 // get_port_and_fs
 static status_t
@@ -120,7 +122,7 @@ get_port_and_fs(RequestPort** port, FileSystem** fileSystem)
 }
 
 // notify_listener
-int
+status_t
 UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 	vnode_id vnidb, vnode_id vnidc, const char *name)
 {
@@ -130,12 +132,14 @@ UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	NotifyListenerRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->operation = op;
 	request->nsid = nsid;
 	request->vnida = vnida;
@@ -144,6 +148,7 @@ UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, NOTIFY_LISTENER_REPLY);
 	NotifyListenerReply* reply;
@@ -151,6 +156,7 @@ UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -159,7 +165,8 @@ UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 
 // notify_select_event
 void
-UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref)
+UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
+	uint8 event)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -167,14 +174,18 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	NotifySelectEventRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return;
+
 	request->sync = sync;
 	request->ref = ref;
+	request->event = event;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, NOTIFY_SELECT_EVENT_REPLY);
 	NotifySelectEventReply* reply;
@@ -182,11 +193,12 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref)
 	if (error != B_OK)
 		return;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply: nothing to do
 }
 
 // send_notification
-int
+status_t
 UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
 	ulong what, long op, mount_id nsida, mount_id nsidb, vnode_id vnida,
 	vnode_id vnidb, vnode_id vnidc, const char *name)
@@ -197,12 +209,14 @@ UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	SendNotificationRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->port = targetPort;
 	request->token = token;
 	request->what = what;
@@ -215,6 +229,7 @@ UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, SEND_NOTIFICATION_REPLY);
 	SendNotificationReply* reply;
@@ -222,17 +237,20 @@ UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
+
 // #pragma mark -
 
+
 // get_vnode
-int
-UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, void** data)
+status_t
+UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, fs_vnode* data)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -240,14 +258,17 @@ UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, void** data)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	GetVNodeRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = nsid;
 	request->vnid = vnid;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, GET_VNODE_REPLY);
 	GetVNodeReply* reply;
@@ -255,6 +276,7 @@ UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, void** data)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -263,7 +285,7 @@ UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, void** data)
 }
 
 // put_vnode
-int
+status_t
 UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
@@ -272,14 +294,17 @@ UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	PutVNodeRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = nsid;
 	request->vnid = vnid;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, PUT_VNODE_REPLY);
 	PutVNodeReply* reply;
@@ -287,6 +312,7 @@ UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -294,8 +320,8 @@ UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
 }
 
 // new_vnode
-int
-UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, void* data)
+status_t
+UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, fs_vnode data)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -303,15 +329,18 @@ UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, void* data)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	NewVNodeRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = nsid;
 	request->vnid = vnid;
 	request->node = data;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, NEW_VNODE_REPLY);
 	NewVNodeReply* reply;
@@ -319,14 +348,24 @@ UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, void* data)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
 }
 
+// publish_vnode
+status_t
+UserlandFS::KernelEmu::publish_vnode(mount_id nsid, vnode_id vnid,
+	fs_vnode data)
+{
+	// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
 // remove_vnode
-int
+status_t
 UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
@@ -335,14 +374,17 @@ UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	RemoveVNodeRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = nsid;
 	request->vnid = vnid;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, REMOVE_VNODE_REPLY);
 	RemoveVNodeReply* reply;
@@ -350,6 +392,7 @@ UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -357,7 +400,7 @@ UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
 }
 
 // unremove_vnode
-int
+status_t
 UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
@@ -366,14 +409,17 @@ UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	UnremoveVNodeRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = nsid;
 	request->vnid = vnid;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, UNREMOVE_VNODE_REPLY);
 	UnremoveVNodeReply* reply;
@@ -381,6 +427,7 @@ UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
@@ -388,7 +435,7 @@ UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 }
 
 // is_vnode_removed
-int
+status_t
 UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
@@ -397,14 +444,17 @@ UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
 		return error;
+
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	IsVNodeRemovedRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
+
 	request->nsid = nsid;
 	request->vnid = vnid;
+
 	// send the request
 	UserlandRequestHandler handler(fileSystem, IS_VNODE_REMOVED_REPLY);
 	IsVNodeRemovedReply* reply;
@@ -412,6 +462,7 @@ UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
+
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;

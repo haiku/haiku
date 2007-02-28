@@ -1,7 +1,7 @@
 #ifndef _FSPROTO_H
 #define _FSPROTO_H
 
-#include <sys/dirent.h>
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -9,10 +9,12 @@
 #include <iovec.h>
 
 #include <OS.h>
-#include <fs_attr.h>
-#include <fs_info.h>
-#include <BeBuild.h>
-#include <Drivers.h>
+
+#ifndef BUILDING_USERLAND_FS_SERVER
+#	include <fs_attr.h>
+#	include <fs_info.h>
+#	include <fs_volume.h>
+#endif	// ! BUILDING_USERLAND_FS_SERVER
 
 #ifndef _IMPEXP_KERNEL
 #define _IMPEXP_KERNEL
@@ -62,6 +64,7 @@ typedef ino_t		vnode_id;
 
 struct attr_info;
 struct index_info;
+typedef struct selectsync selectsync;
 
 typedef int	op_read_vnode(void *ns, vnode_id vnid, char r, void **node);
 typedef int	op_write_vnode(void *ns, void *node, char r);
