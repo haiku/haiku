@@ -714,8 +714,8 @@ vm_page_init(kernel_args *args)
 		sPages[i].type = PAGE_TYPE_PHYSICAL;
 		sPages[i].state = PAGE_STATE_FREE;
 		sPages[i].ref_count = 0;
-		sPages[i].wired_count = 0;
-		sPages[i].usage_count = 0;
+		//sPages[i].wired_count = 0;
+		//sPages[i].usage_count = 0;
 		enqueue_page(&page_free_queue, &sPages[i]);
 	}
 
