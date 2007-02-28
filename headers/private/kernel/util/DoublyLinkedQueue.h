@@ -54,7 +54,7 @@ class DoublyLinkedQueue {
 				{
 					fCurrent = fNext;
 					if (fNext)
-						fNext = fList->GetNext(fNext);
+						fNext = fQueue->GetNext(fNext);
 					return fCurrent;
 				}
 
@@ -62,7 +62,7 @@ class DoublyLinkedQueue {
 				{
 					Element *element = fCurrent;
 					if (fCurrent) {
-						fList->Remove(fCurrent);
+						fQueue->Remove(fCurrent);
 						fCurrent = NULL;
 					}
 					return element;
@@ -111,7 +111,7 @@ class DoublyLinkedQueue {
 				{
 					Element *element = fNext;
 					if (fNext)
-						fNext = fList->GetNext(fNext);
+						fNext = fQueue->GetNext(fNext);
 					return element;
 				}
 
@@ -282,8 +282,12 @@ DOUBLY_LINKED_QUEUE_CLASS_NAME::MoveFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromLis
 {
 	if (fromList && fromList->fFirst) {
 		if (fFirst) {
-			sGetLink(fLast)->next = fromList->fFirst;
-			sGetLink(fFirst)->previous = fLast;
+			Element *element = fFirst;
+			Link *elLink;
+			while ((elLink = sGetLink(element))->next) {
+				element = elLink->next;
+			}
+			elLink->next = fromList->fFirst;
 		} else {
 			fFirst = fromList->fFirst;
 		}
