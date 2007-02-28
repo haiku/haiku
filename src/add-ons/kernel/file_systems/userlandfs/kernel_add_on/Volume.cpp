@@ -192,9 +192,7 @@ status_t
 Volume::IsVNodeRemoved(vnode_id vnid)
 {
 PRINT(("is_vnode_removed(%ld, %Ld)\n", fID, vnid));
-//	return is_vnode_removed(fID, vnid);
-// TODO: Add this function?
-return false;
+	return is_vnode_removed(fID, vnid);
 }
 
 
