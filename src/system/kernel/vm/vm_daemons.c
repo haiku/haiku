@@ -22,6 +22,7 @@ static addr_t free_memory_low_water;
 static addr_t free_memory_high_water;
 
 
+#if 0
 static void
 scan_pages(vm_address_space *aspace, addr_t free_target)
 {
@@ -202,6 +203,7 @@ page_daemon(void *unused)
 		}
 	}
 }
+#endif
 
 
 status_t

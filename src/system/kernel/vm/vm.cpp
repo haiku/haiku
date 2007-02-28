@@ -117,7 +117,7 @@ vm_get_area(area_id id)
 
 
 static vm_area *
-_vm_create_reserved_region_struct(vm_address_space *addressSpace, uint32 flags)
+create_reserved_area_struct(vm_address_space *addressSpace, uint32 flags)
 {
 	vm_area *reserved = (vm_area *)malloc(sizeof(vm_area));
 	if (reserved == NULL)
@@ -134,7 +134,7 @@ _vm_create_reserved_region_struct(vm_address_space *addressSpace, uint32 flags)
 
 
 static vm_area *
-_vm_create_area_struct(vm_address_space *addressSpace, const char *name,
+create_area_struct(vm_address_space *addressSpace, const char *name,
 	uint32 wiring, uint32 protection)
 {
 	vm_area *area = NULL;
@@ -234,7 +234,7 @@ find_reserved_area(vm_address_space *addressSpace, addr_t start,
 	} else {
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
-		vm_area *reserved = _vm_create_reserved_region_struct(addressSpace,
+		vm_area *reserved = create_reserved_area_struct(addressSpace,
 			next->protection);
 		if (reserved == NULL)
 			return B_NO_MEMORY;
@@ -258,8 +258,7 @@ find_reserved_area(vm_address_space *addressSpace, addr_t start,
 }
 
 
-/**	must be called with this address space's sem held */
-
+/*!	Must be called with this address space's sem held */
 static status_t
 find_and_insert_area_slot(vm_address_space *addressSpace, addr_t start,
 	addr_t size, addr_t end, uint32 addressSpec, vm_area *area)
@@ -268,7 +267,7 @@ find_and_insert_area_slot(vm_address_space *addressSpace, addr_t start,
 	vm_area *next;
 	bool foundSpot = false;
 
-	TRACE(("find_and_insert_region_slot: address space %p, start 0x%lx, "
+	TRACE(("find_and_insert_area_slot: address space %p, start 0x%lx, "
 		"size %ld, end 0x%lx, addressSpec %ld, area %p\n", addressSpace, start,
 		size, end, addressSpec, area));
 
@@ -506,7 +505,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 		addressSpace, cacheRef, *_virtualAddress, offset, size, addressSpec,
 		wiring, protection, _area, areaName));
 
-	vm_area *area = _vm_create_area_struct(addressSpace, areaName, wiring, protection);
+	vm_area *area = create_area_struct(addressSpace, areaName, wiring, protection);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
@@ -581,6 +580,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 	// attach the cache to the area
 	area->cache_ref = cacheRef;
 	area->cache_offset = offset;
+
 	// point the cache back to the area
 	vm_cache_insert_area_locked(cacheRef, area);
 	mutex_unlock(&cacheRef->lock);
@@ -682,7 +682,7 @@ vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	area = _vm_create_reserved_region_struct(addressSpace, flags);
+	area = create_reserved_area_struct(addressSpace, flags);
 	if (area == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
@@ -808,17 +808,17 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 		goto err3;
 
 	cache->temporary = 1;
+	cache->type = CACHE_TYPE_RAM;
 	cache->virtual_size = size;
 
 	switch (wiring) {
-		case B_LAZY_LOCK:	// for now
+		case B_LAZY_LOCK:
 		case B_FULL_LOCK:
 		case B_CONTIGUOUS:
 		case B_ALREADY_WIRED:
 			cache->scan_skip = 1;
 			break;
 		case B_NO_LOCK:
-		//case B_LAZY_LOCK:
 			cache->scan_skip = 0;
 			break;
 	}
@@ -840,22 +840,33 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 
 		case B_FULL_LOCK:
 		{
-			// Pages aren't mapped at this point, but we just simulate a fault on
-			// every page, which should allocate them
-			// ToDo: at this point, it would probably be cheaper to allocate 
-			// and map the pages directly
-			addr_t va;
-			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE) {
+			// Allocate and map all pages for this area
+			mutex_lock(&cacheRef->lock);
+
+			off_t offset = 0;
+			for (addr_t address = area->base; address < area->base + (area->size - 1);
+					address += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
-				if (isStack && va < area->base + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
+				if (isStack && address < area->base + KERNEL_STACK_GUARD_PAGES
+						* B_PAGE_SIZE)
 #	else
-				if (isStack && va >= area->base + area->size - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
+				if (isStack && address >= area->base + area->size
+						- KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 #	endif
 					continue;
 #endif
-				vm_soft_fault(va, false, false);
+				vm_page *page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+				if (page == NULL) {
+					// this shouldn't really happen, as we reserve the memory upfront
+					panic("couldn't fulfill B_FULL lock!");
+				}
+
+				vm_cache_insert_page(cacheRef, page, offset);
+				vm_map_page(area, page, address, protection);
 			}
+
+			mutex_unlock(&cacheRef->lock);
 			break;
 		}
 
@@ -865,33 +876,38 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			// boot time. Find the appropriate vm_page objects and stick them in
 			// the cache object.
 			vm_translation_map *map = &addressSpace->translation_map;
-			addr_t va;
-			addr_t pa;
-			uint32 flags;
-			int err;
 			off_t offset = 0;
 
 			if (!kernel_startup)
 				panic("ALREADY_WIRED flag used outside kernel startup\n");
 
 			mutex_lock(&cacheRef->lock);
-			(*map->ops->lock)(map);
-			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
-				err = (*map->ops->query)(map, va, &pa, &flags);
-				if (err < 0) {
-//					dprintf("vm_create_anonymous_area: error looking up mapping for va 0x%x\n", va);
-					continue;
+			map->ops->lock(map);
+
+			for (addr_t virtualAddress = area->base; virtualAddress < area->base
+					+ (area->size - 1); virtualAddress += B_PAGE_SIZE,
+					offset += B_PAGE_SIZE) {
+				addr_t physicalAddress;
+				uint32 flags;
+				status = map->ops->query(map, virtualAddress,
+					&physicalAddress, &flags);
+				if (status < B_OK) {
+					panic("looking up mapping failed for va 0x%lx\n",
+						virtualAddress);
 				}
-				page = vm_lookup_page(pa / B_PAGE_SIZE);
+				page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 				if (page == NULL) {
-//					dprintf("vm_create_anonymous_area: error looking up vm_page structure for pa 0x%x\n", pa);
-					continue;
+					panic("looking up page failed for pa 0x%lx\n",
+						physicalAddress);
 				}
-				atomic_add(&page->ref_count, 1);
+
+				page->wired_count++;
+					// TODO: needs to be atomic on all platforms!
 				vm_page_set_state(page, PAGE_STATE_WIRED);
 				vm_cache_insert_page(cacheRef, page, offset);
 			}
-			(*map->ops->unlock)(map);
+
+			map->ops->unlock(map);
 			mutex_unlock(&cacheRef->lock);
 			break;
 		}
@@ -906,25 +922,27 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			off_t offset = 0;
 
 			mutex_lock(&cacheRef->lock);
-			(*map->ops->lock)(map);
+			map->ops->lock(map);
 
-			for (virtualAddress = area->base; virtualAddress < area->base + area->size;
-					virtualAddress += B_PAGE_SIZE, offset += B_PAGE_SIZE,
-					physicalAddress += B_PAGE_SIZE) {
+			for (virtualAddress = area->base; virtualAddress < area->base
+					+ (area->size - 1); virtualAddress += B_PAGE_SIZE,
+					offset += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
 				page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 				if (page == NULL)
 					panic("couldn't lookup physical page just allocated\n");
 
-				atomic_add(&page->ref_count, 1);
-				status = (*map->ops->map)(map, virtualAddress, physicalAddress, protection);
-				if (status < 0)
+				status = map->ops->map(map, virtualAddress, physicalAddress,
+					protection);
+				if (status < B_OK)
 					panic("couldn't map physical page in page run\n");
 
+				page->wired_count++;
+					// TODO: needs to be atomic on all platforms!
 				vm_page_set_state(page, PAGE_STATE_WIRED);
 				vm_cache_insert_page(cacheRef, page, offset);
 			}
 
-			(*map->ops->unlock)(map);
+			map->ops->unlock(map);
 			mutex_unlock(&cacheRef->lock);
 			break;
 		}
@@ -1010,6 +1028,7 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 
 	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
+	cache->type = CACHE_TYPE_DEVICE;
 	cache->virtual_size = size;
 
 	cacheRef = cache->ref;
@@ -1029,13 +1048,18 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 
 	if (status >= B_OK) {
 		mutex_lock(&cacheRef->lock);
-		store = cacheRef->cache->store;
 
 		// make sure our area is mapped in completely
-		// (even if that makes the fault routine pretty much useless)
+
+		vm_translation_map *map = &addressSpace->translation_map;
+		map->ops->lock(map);
+
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
-			store->ops->fault(store, addressSpace, offset);
+			map->ops->map(map, area->base + offset, physicalAddress + offset,
+				protection);
 		}
+
+		map->ops->unlock(map);
 		mutex_unlock(&cacheRef->lock);
 	}
 
@@ -1093,6 +1117,7 @@ vm_create_null_area(team_id team, const char *name, void **address,
 
 	// tell the page scanner to skip over this area, no pages will be mapped here
 	cache->scan_skip = 1;
+	cache->type = CACHE_TYPE_NULL;
 	cache->virtual_size = size;
 
 	cacheRef = cache->ref;
@@ -1144,6 +1169,8 @@ vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 	status = vm_cache_ref_create(cache);
 	if (status < B_OK)
 		goto err2;
+
+	cache->type = CACHE_TYPE_VNODE;
 
 	*_cacheRef = cache->ref;
 	vfs_acquire_vnode(vnode);
@@ -1433,10 +1460,7 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 
 	// unmap the virtual address space the area occupied. any page faults at this
 	// point should fail in vm_area_lookup().
-	vm_translation_map *map = &addressSpace->translation_map;
-	map->ops->lock(map);
-	map->ops->unmap(map, area->base, area->base + (area->size - 1));
-	map->ops->unlock(map);
+	vm_unmap_pages(area, area->base, area->size);
 
 	// ToDo: do that only for vnode stores
 	vm_cache_write_modified(area->cache_ref, false);
@@ -1765,6 +1789,61 @@ vm_get_page_mapping(team_id aid, addr_t vaddr, addr_t *paddr)
 }
 
 
+status_t
+vm_unmap_pages(vm_area *area, addr_t base, size_t size)
+{
+	vm_translation_map *map = &area->address_space->translation_map;
+
+	map->ops->lock(map);
+
+	if (area->wiring != B_NO_LOCK && area->cache_ref->cache->type != CACHE_TYPE_DEVICE) {
+		// iterate through all pages and decrease their wired count
+		for (addr_t virtualAddress = base; virtualAddress < base + (size - 1);
+				virtualAddress += B_PAGE_SIZE) {
+			addr_t physicalAddress;
+			uint32 flags;
+			status_t status = map->ops->query(map, virtualAddress,
+				&physicalAddress, &flags);
+			if (status < B_OK || (flags & PAGE_PRESENT) == 0)
+				continue;
+
+			vm_page *page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+			if (page == NULL) {
+				panic("area %p looking up page failed for pa 0x%lx\n", area,
+					physicalAddress);
+			}
+
+			page->wired_count--;
+				// TODO: needs to be atomic on all platforms!
+		}
+	}
+
+	map->ops->unmap(map, base, base + (size - 1));
+	map->ops->unlock(map);
+	return B_OK;
+}
+
+
+status_t
+vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
+{
+	vm_translation_map *map = &area->address_space->translation_map;
+
+	map->ops->lock(map);
+	map->ops->map(map, address, page->physical_page_number * B_PAGE_SIZE,
+		protection);
+	map->ops->unlock(map);
+
+	if (area->wiring != B_NO_LOCK) {
+		page->wired_count++;
+			// TODO: needs to be atomic on all platforms!
+	}
+
+	vm_page_set_state(page, PAGE_STATE_ACTIVE);
+	return B_OK;
+}
+
+
 static int
 display_mem(int argc, char **argv)
 {
@@ -2048,14 +2127,14 @@ dump_cache(int argc, char **argv)
 				continue;
 
 			if (page->type == PAGE_TYPE_PHYSICAL) {
-				kprintf("\t%p ppn 0x%lx offset 0x%lx type %ld state %ld (%s) ref_count %ld\n",
-					page, page->physical_page_number, page->cache_offset, page->type, page->state, 
-					page_state_to_text(page->state), page->ref_count);
+				kprintf("\t%p ppn 0x%lx offset 0x%lx type %u state %u (%s) wired_count %u\n",
+					page, page->physical_page_number, page->cache_offset, page->type, page->state,
+					page_state_to_text(page->state), page->wired_count);
 			} else if(page->type == PAGE_TYPE_DUMMY) {
-				kprintf("\t%p DUMMY PAGE state %ld (%s)\n", 
+				kprintf("\t%p DUMMY PAGE state %u (%s)\n", 
 					page, page->state, page_state_to_text(page->state));
 			} else
-				kprintf("\t%p UNKNOWN PAGE type %ld\n", page, page->type);
+				kprintf("\t%p UNKNOWN PAGE type %u\n", page, page->type);
 		}
 
 		if (!showPages)
@@ -2211,7 +2290,6 @@ vm_area_for(team_id team, addr_t address)
 {
 	vm_address_space *addressSpace;
 	area_id id = B_ERROR;
-	vm_area *area;
 
 	addressSpace = vm_get_address_space_by_id(team);
 	if (addressSpace == NULL)
@@ -2219,17 +2297,9 @@ vm_area_for(team_id team, addr_t address)
 
 	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
 
-	area = addressSpace->areas;
-	for (; area != NULL; area = area->address_space_next) {
-		// ignore reserved space regions
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
-		if (address >= area->base && address < area->base + area->size) {
-			id = area->id;
-			break;
-		}
-	}
+	vm_area *area = vm_area_lookup(addressSpace, address);
+	if (area != NULL)
+		id = area->id;
 
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 	vm_put_address_space(addressSpace);
@@ -3218,17 +3288,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		if (page->cache != topCacheRef->cache && !isWrite)
 			newProtection &= ~(isUser ? B_WRITE_AREA : B_KERNEL_WRITE_AREA);
 
-		atomic_add(&page->ref_count, 1);
-
-		//vm_page_map(area, page, newProtection);
-		map->ops->lock(map);
-		map->ops->map(map, address, page->physical_page_number * B_PAGE_SIZE,
-			newProtection);
-		map->ops->unlock(map);
+		vm_map_page(area, page, address, newProtection);
 	}
-
-	vm_page_set_state(page, area->wiring == B_NO_LOCK
-		? PAGE_STATE_ACTIVE : PAGE_STATE_WIRED);
 
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 
@@ -3256,14 +3317,14 @@ vm_area_lookup(vm_address_space *addressSpace, addr_t address)
 
 	// check the areas list first
 	area = addressSpace->area_hint;
-	if (area && area->base <= address && (area->base + area->size) > address)
+	if (area && area->base <= address && area->base + (area->size - 1) >= address)
 		goto found;
 
 	for (area = addressSpace->areas; area != NULL; area = area->address_space_next) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
-		if (area->base <= address && (area->base + area->size) > address)
+		if (area->base <= address && area->base + (area->size - 1) >= address)
 			break;
 	}
 
@@ -3382,6 +3443,39 @@ fill_area_info(struct vm_area *area, area_info *info, size_t size)
 }
 
 
+/*!
+	Tests wether or not the area that contains the specified address
+	needs any kind of locking, and actually exists.
+	Used by both lock_memory() and unlock_memory().
+*/
+status_t
+test_lock_memory(vm_address_space *addressSpace, addr_t address,
+	bool &needsLocking)
+{
+	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
+
+	vm_area *area = vm_area_lookup(addressSpace, address);
+	if (area != NULL) {
+		mutex_lock(&area->cache_ref->lock);
+
+		// This determines if we need to lock the memory at all
+		needsLocking = area->cache_ref->cache->type != CACHE_TYPE_NULL
+			&& area->cache_ref->cache->type != CACHE_TYPE_DEVICE
+			&& area->wiring != B_FULL_LOCK
+			&& area->wiring != B_CONTIGUOUS;
+
+		mutex_unlock(&area->cache_ref->lock);
+	}
+
+	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
+
+	if (area == NULL)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -3427,19 +3521,7 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 	addr_t base = (addr_t)address;
 	addr_t end = base + numBytes;
 	bool isUser = IS_USER_ADDRESS(address);
-
-	// ToDo: Our VM currently doesn't support locking, this function
-	//	will now at least make sure that the memory is paged in, but
-	//	that's about it.
-	//	Nevertheless, it must be implemented as soon as we're able to
-	//	swap pages out of memory.
-
-	// ToDo: this is a hack, too; the iospace area is a null region and
-	//	officially cannot be written to or read; ie. vm_soft_fault() will
-	//	fail there. Furthermore, this is x86 specific as well.
-	#define IOSPACE_SIZE (256 * 1024 * 1024)
-	if (base >= KERNEL_BASE + IOSPACE_SIZE && base + numBytes < KERNEL_BASE + 2 * IOSPACE_SIZE)
-		return B_OK;
+	bool needsLocking = true;
 
 	if (isUser)
 		addressSpace = vm_get_current_user_address_space();
@@ -3448,7 +3530,15 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 	if (addressSpace == NULL)
 		return B_ERROR;
 
+	// test if we're on an area that allows faults at all
+
 	map = &addressSpace->translation_map;
+
+	status_t status = test_lock_memory(addressSpace, base, needsLocking);
+	if (status < B_OK)
+		goto out;
+	if (!needsLocking)
+		goto out;
 
 	for (; base < end; base += B_PAGE_SIZE) {
 		addr_t physicalAddress;
@@ -3456,36 +3546,109 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 		status_t status;
 
 		map->ops->lock(map);
-		map->ops->query(map, base, &physicalAddress, &protection);
+		status = map->ops->query(map, base, &physicalAddress, &protection);
 		map->ops->unlock(map);
+
+		if (status < B_OK)
+			goto out;
 
 		if ((protection & PAGE_PRESENT) != 0) {
 			// if B_READ_DEVICE is set, the caller intents to write to the locked
 			// memory, so if it hasn't been mapped writable, we'll try the soft
 			// fault anyway
 			if ((flags & B_READ_DEVICE) == 0
-				|| (protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
-			continue;
+				|| (protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
+				// update wiring
+				vm_page *page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+				if (page == NULL)
+					panic("couldn't lookup physical page just allocated\n");
+
+				page->wired_count++;
+					// TODO: needs to be atomic on all platforms!
+				continue;
+			}
 		}
 
 		status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
 		if (status != B_OK)	{
 			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) failed: %s\n",
 				address, numBytes, flags, strerror(status));
-			vm_put_address_space(addressSpace);
-			return status;
+			goto out;
 		}
+
+		map->ops->lock(map);
+		status = map->ops->query(map, base, &physicalAddress, &protection);
+		map->ops->unlock(map);
+
+		if (status < B_OK)
+			goto out;
+
+		// update wiring
+		vm_page *page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+		if (page == NULL)
+			panic("couldn't lookup physical page");
+
+		page->wired_count++;
+			// TODO: needs to be atomic on all platforms!
 	}
 
+out:
 	vm_put_address_space(addressSpace);
-	return B_OK;
+	return status;
 }
 
 
 long
-unlock_memory(void *buffer, ulong numBytes, ulong flags)
+unlock_memory(void *address, ulong numBytes, ulong flags)
 {
-	return B_OK;
+	vm_address_space *addressSpace = NULL;
+	struct vm_translation_map *map;
+	addr_t base = (addr_t)address;
+	addr_t end = base + numBytes;
+	bool needsLocking = true;
+
+	if (IS_USER_ADDRESS(address))
+		addressSpace = vm_get_current_user_address_space();
+	else
+		addressSpace = vm_get_kernel_address_space();
+	if (addressSpace == NULL)
+		return B_ERROR;
+
+	map = &addressSpace->translation_map;
+
+	status_t status = test_lock_memory(addressSpace, base, needsLocking);
+	if (status < B_OK)
+		goto out;
+	if (!needsLocking)
+		goto out;
+
+	for (; base < end; base += B_PAGE_SIZE) {
+		map->ops->lock(map);
+
+		addr_t physicalAddress;
+		uint32 protection;
+		status = map->ops->query(map, base, &physicalAddress,
+			&protection);
+
+		map->ops->unlock(map);
+
+		if (status < B_OK)
+			goto out;
+		if ((protection & PAGE_PRESENT) == 0)
+			panic("calling unlock_memory() on unmapped memory!");
+
+		// update wiring
+		vm_page *page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+		if (page == NULL)
+			panic("couldn't lookup physical page");
+
+		page->wired_count--;
+			// TODO: needs to be atomic on all platforms!
+	}
+
+out:
+	vm_put_address_space(addressSpace);
+	return status;
 }
 
 
@@ -3832,7 +3995,7 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	sourceAddressSpace = area->address_space;
 
-	reserved = _vm_create_reserved_region_struct(sourceAddressSpace, 0);
+	reserved = create_reserved_area_struct(sourceAddressSpace, 0);
 	if (reserved == NULL) {
 		status = B_NO_MEMORY;
 		goto err2;

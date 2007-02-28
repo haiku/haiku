@@ -182,9 +182,11 @@ dump_page(int argc, char **argv)
 	kprintf("cache:           %p\n", page->cache);
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next,prev: %p, %p\n", page->cache_next, page->cache_prev);
-	kprintf("ref_count:       %ld\n", page->ref_count);
+	kprintf("mappings:        %p\n", page->mappings);
 	kprintf("type:            %d\n", page->type);
 	kprintf("state:           %d\n", page->state);
+	kprintf("wired_count:     %u\n", page->wired_count);
+	kprintf("usage_count:     %u\n", page->usage_count);
 
 	return 0;
 }
@@ -637,7 +639,7 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 				state = disable_interrupts();
 				acquire_spinlock(&sPageLock);
 
-				if (page->ref_count > 0)
+				if (page->mappings != NULL || page->wired_count)
 					page->state = PAGE_STATE_ACTIVE;
 				else
 					page->state = PAGE_STATE_INACTIVE;
@@ -650,6 +652,16 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 		} else {
 			// We don't have to put the PAGE_MODIFIED bit back, as it's still
 			// in the modified pages list.
+			if (dequeuedPage) {
+				state = disable_interrupts();
+				acquire_spinlock(&sPageLock);
+
+				page->state = PAGE_STATE_MODIFIED;
+				enqueue_page(&page_modified_queue, page);
+
+				release_spinlock(&sPageLock);
+				restore_interrupts(state);
+			}
 		}
 	}
 
@@ -713,9 +725,9 @@ vm_page_init(kernel_args *args)
 		sPages[i].physical_page_number = sPhysicalPageOffset + i;
 		sPages[i].type = PAGE_TYPE_PHYSICAL;
 		sPages[i].state = PAGE_STATE_FREE;
-		sPages[i].ref_count = 0;
-		//sPages[i].wired_count = 0;
-		//sPages[i].usage_count = 0;
+		sPages[i].mappings = NULL;
+		sPages[i].wired_count = 0;
+		sPages[i].usage_count = 0;
 		enqueue_page(&page_free_queue, &sPages[i]);
 	}
 

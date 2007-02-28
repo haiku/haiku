@@ -10,10 +10,60 @@
 
 
 #include <kernel.h>
-#include <sys/uio.h>
 #include <arch/vm_types.h>
 #include <arch/vm_translation_map.h>
+#include <util/DoublyLinkedQueue.h>
 
+#include <sys/uio.h>
+
+
+#ifdef __cplusplus
+struct vm_page_mapping;
+typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
+#else
+typedef struct { void *previous; void *next; } vm_page_mapping_link;
+#endif
+
+typedef struct vm_page_mapping {
+	vm_page_mapping_link page_link;
+	vm_page_mapping_link area_link;
+	struct vm_page *page;
+	struct vm_area *area;
+} vm_page_mapping;
+
+#ifdef __cplusplus
+class DoublyLinkedPageLink {
+	public:
+		inline vm_page_mapping_link *operator()(vm_page_mapping *element) const
+		{
+			return &element->page_link;
+		}
+
+		inline const vm_page_mapping_link *operator()(const vm_page_mapping *element) const
+		{
+			return &element->page_link;
+		}
+};
+
+class DoublyLinkedAreaLink {
+	public:
+		inline vm_page_mapping_link *operator()(vm_page_mapping *element) const
+		{
+			return &element->area_link;
+		}
+
+		inline const vm_page_mapping_link *operator()(const vm_page_mapping *element) const
+		{
+			return &element->area_link;
+		}
+};
+
+typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink> vm_page_mappings;
+typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink> vm_area_mappings;
+#else	// !__cplusplus
+typedef void *vm_page_mappings;
+typedef void *vm_area_mappings;
+#endif
 
 // vm page
 typedef struct vm_page {
@@ -31,12 +81,15 @@ typedef struct vm_page {
 	struct vm_page		*cache_prev;
 	struct vm_page		*cache_next;
 
-	int32				ref_count;
+	vm_page_mappings	mappings;
 
-	uint32				type : 2;
-	uint32				state : 3;
-	uint32				busy_reading : 1;
-	uint32				busy_writing : 1;
+	uint8				type : 2;
+	uint8				state : 3;
+	uint8				busy_reading : 1;
+	uint8				busy_writing : 1;
+
+	uint16				wired_count;
+	int8				usage_count;
 } vm_page;
 
 enum {
@@ -54,6 +107,13 @@ enum {
 	PAGE_STATE_CLEAR,
 	PAGE_STATE_WIRED,
 	PAGE_STATE_UNUSED
+};
+
+enum {
+	CACHE_TYPE_RAM = 0,
+	CACHE_TYPE_VNODE,
+	CACHE_TYPE_DEVICE,
+	CACHE_TYPE_NULL
 };
 
 // vm_cache_ref
@@ -82,6 +142,7 @@ typedef struct vm_cache {
 	uint32				temporary : 1;
 	uint32				scan_skip : 1;
 	uint32				busy : 1;
+	uint32				type : 5;
 } vm_cache;
 
 // vm area
@@ -97,6 +158,7 @@ typedef struct vm_area {
 
 	struct vm_cache_ref	*cache_ref;
 	off_t				cache_offset;
+	vm_area_mappings	mappings;
 
 	struct vm_address_space *address_space;
 	struct vm_area		*address_space_next;

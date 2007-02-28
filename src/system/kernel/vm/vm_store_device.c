@@ -62,42 +62,11 @@ device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t cou
 }
 
 
-/** this fault handler should take over the page fault routine and map the page in
- *
- *	setup: the cache that this store is part of has a ref being held and will be
- *	released after this handler is done
- */
-
 static status_t
 device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t offset)
 {
-	struct device_store *store = (struct device_store *)_store;
-	vm_cache_ref *cache_ref = store->vm.cache->ref;
-	vm_translation_map *map = &aspace->translation_map;
-	vm_area *area;
-
-	// figure out which page needs to be mapped where
-	map->ops->lock(map);
-
-	// cycle through all of the regions that map this cache and map the page in
-	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
-		// make sure this page in the cache that was faulted on is covered in this area
-		if (offset >= area->cache_offset && (offset - area->cache_offset) < area->size) {
-			// don't map already mapped pages
-			addr_t physicalAddress;
-			uint32 flags;
-			map->ops->query(map, area->base + (offset - area->cache_offset),
-				&physicalAddress, &flags);
-			if (flags & PAGE_PRESENT)
-				continue;
-
-			map->ops->map(map, area->base + (offset - area->cache_offset),
-				store->base_address + offset, area->protection);
-		}
-	}
-
-	map->ops->unlock(map);
-	return B_OK;
+	// devices are mapped in completely, so we shouldn't experience faults
+	return B_BAD_ADDRESS;
 }
 
 
