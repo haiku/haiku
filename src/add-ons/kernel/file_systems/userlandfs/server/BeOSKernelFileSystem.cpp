@@ -1,12 +1,13 @@
 // BeOSKernelFileSystem.cpp
 
+#include "BeOSKernelFileSystem.h"
+
 #include <new>
 
-#include "BeOSKernelFileSystem.h"
 #include "BeOSKernelVolume.h"
 
 // constructor
-BeOSKernelFileSystem::BeOSKernelFileSystem(vnode_ops* fsOps)
+BeOSKernelFileSystem::BeOSKernelFileSystem(beos_vnode_ops* fsOps)
 	: FileSystem(),
 	  fFSOps(fsOps)
 {

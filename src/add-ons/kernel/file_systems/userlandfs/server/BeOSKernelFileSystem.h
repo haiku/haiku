@@ -5,18 +5,20 @@
 
 #include "FileSystem.h"
 
+struct beos_vnode_ops;
+
 namespace UserlandFS {
 
 class BeOSKernelFileSystem : public FileSystem {
 public:
-								BeOSKernelFileSystem(vnode_ops* fsOps);
+								BeOSKernelFileSystem(beos_vnode_ops* fsOps);
 	virtual						~BeOSKernelFileSystem();
 
 	virtual	status_t			CreateVolume(Volume** volume, mount_id id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
 private:
-			vnode_ops*			fFSOps;
+			beos_vnode_ops*		fFSOps;
 };
 
 }	// namespace UserlandFS

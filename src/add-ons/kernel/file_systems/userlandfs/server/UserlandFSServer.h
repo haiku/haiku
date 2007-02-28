@@ -5,6 +5,11 @@
 
 #include <Application.h>
 
+namespace UserlandFSUtil {
+	class RequestPort;
+}
+using UserlandFSUtil::RequestPort;
+
 namespace UserlandFS {
 
 class FileSystem;

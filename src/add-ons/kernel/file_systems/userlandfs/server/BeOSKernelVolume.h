@@ -5,130 +5,138 @@
 
 #include "Volume.h"
 
-struct vnode_ops;
+struct beos_vnode_ops;
 
 namespace UserlandFS {
 
 class BeOSKernelVolume : public Volume {
 public:
 								BeOSKernelVolume(FileSystem* fileSystem,
-									nspace_id id, vnode_ops* fsOps);
+									mount_id id, beos_vnode_ops* fsOps);
 	virtual						~BeOSKernelVolume();
 
 	// FS
-	virtual	status_t			Mount(const char* device, ulong flags,
-									const char* parameters, int32 len,
-									vnode_id* rootID);
+	virtual	status_t			Mount(const char* device, uint32 flags,
+									const char* parameters, vnode_id* rootID);
 	virtual	status_t			Unmount();
 	virtual	status_t			Sync();
-	virtual	status_t			ReadFSStat(fs_info* info);
-	virtual	status_t			WriteFSStat(struct fs_info *info, long mask);
+	virtual	status_t			ReadFSInfo(fs_info* info);
+	virtual	status_t			WriteFSInfo(const struct fs_info* info,
+									uint32 mask);
 
 	// vnodes
-	virtual	status_t			ReadVNode(vnode_id vnid, char reenter,
-									void** node);
-	virtual	status_t			WriteVNode(void* node, char reenter);
-	virtual	status_t			RemoveVNode(void* node, char reenter);
+	virtual	status_t			Lookup(fs_vnode dir, const char* entryName,
+									vnode_id* vnid, int* type);
+	virtual	status_t			ReadVNode(vnode_id vnid, bool reenter,
+									fs_vnode* node);
+	virtual	status_t			WriteVNode(fs_vnode node, bool reenter);
+	virtual	status_t			RemoveVNode(fs_vnode node, bool reenter);
 
 	// nodes
-	virtual	status_t			FSync(void* node);
-	virtual	status_t			ReadStat(void* node, struct stat* st);
-	virtual	status_t			WriteStat(void* node, struct stat* st,
-									long mask);
-	virtual	status_t			Access(void* node, int mode);
+	virtual	status_t			IOCtl(fs_vnode node, fs_cookie cookie,
+									uint32 command, void* buffer, size_t size);
+	virtual	status_t			SetFlags(fs_vnode node, fs_cookie cookie,
+									int flags);
+	virtual	status_t			Select(fs_vnode node, fs_cookie cookie,
+									uint8 event, uint32 ref, selectsync* sync);
+	virtual	status_t			Deselect(fs_vnode node, fs_cookie cookie,
+									uint8 event, selectsync* sync);
+
+	virtual	status_t			FSync(fs_vnode node);
+
+	virtual	status_t			ReadSymlink(fs_vnode node, char* buffer,
+									size_t bufferSize, size_t* bytesRead);
+	virtual	status_t			CreateSymlink(fs_vnode dir, const char* name,
+									const char* target, int mode);
+
+	virtual	status_t			Link(fs_vnode dir, const char* name,
+									fs_vnode node);
+	virtual	status_t			Unlink(fs_vnode dir, const char* name);
+	virtual	status_t			Rename(fs_vnode oldDir, const char* oldName,
+									fs_vnode newDir, const char* newName);
+
+	virtual	status_t			Access(fs_vnode node, int mode);
+	virtual	status_t			ReadStat(fs_vnode node, struct stat* st);
+	virtual	status_t			WriteStat(fs_vnode node, const struct stat *st,
+									uint32 mask);
 
 	// files
-	virtual	status_t			Create(void* dir, const char* name,
-									int openMode, int mode, vnode_id* vnid,
-									void** cookie);
-	virtual	status_t			Open(void* node, int openMode, void** cookie);
-	virtual	status_t			Close(void* node, void* cookie);
-	virtual	status_t			FreeCookie(void* node, void* cookie);
-	virtual	status_t			Read(void* node, void* cookie, off_t pos,
+	virtual	status_t			Create(fs_vnode dir, const char* name,
+									int openMode, int mode, fs_cookie* cookie,
+									vnode_id* vnid);
+	virtual	status_t			Open(fs_vnode node, int openMode,
+									fs_cookie* cookie);
+	virtual	status_t			Close(fs_vnode node, fs_cookie cookie);
+	virtual	status_t			FreeCookie(fs_vnode node, fs_cookie cookie);
+	virtual	status_t			Read(fs_vnode node, fs_cookie cookie, off_t pos,
 									void* buffer, size_t bufferSize,
 									size_t* bytesRead);
-	virtual	status_t			Write(void* node, void* cookie, off_t pos,
-									const void* buffer, size_t bufferSize,
-									size_t* bytesWritten);
-	virtual	status_t			IOCtl(void* node, void* cookie, int command,
-									void *buffer, size_t size);
-	virtual	status_t			SetFlags(void* node, void* cookie, int flags);
-	virtual	status_t			Select(void* node, void* cookie, uint8 event,
-									uint32 ref, selectsync* sync);
-	virtual	status_t			Deselect(void* node, void* cookie, uint8 event,
-									selectsync* sync);
-
-	// hard links / symlinks
-	virtual	status_t			Link(void* dir, const char* name, void* node);
-	virtual	status_t			Unlink(void* dir, const char* name);
-	virtual	status_t			Symlink(void* dir, const char* name,
-									const char* target);
-	virtual	status_t			ReadLink(void* node, char* buffer,
-									size_t bufferSize, size_t* bytesRead);
-	virtual	status_t			Rename(void* oldDir, const char* oldName,
-									void* newDir, const char* newName);
+	virtual	status_t			Write(fs_vnode node, fs_cookie cookie,
+									off_t pos, const void* buffer,
+									size_t bufferSize, size_t* bytesWritten);
 
 	// directories
-	virtual	status_t			MkDir(void* dir, const char* name, int mode);
-	virtual	status_t			RmDir(void* dir, const char* name);
-	virtual	status_t			OpenDir(void* node, void** cookie);
-	virtual	status_t			CloseDir(void* node, void* cookie);
-	virtual	status_t			FreeDirCookie(void* node, void* cookie);
-	virtual	status_t			ReadDir(void* node, void* cookie,
+	virtual	status_t			CreateDir(fs_vnode dir, const char* name,
+									int mode, vnode_id *newDir);
+	virtual	status_t			RemoveDir(fs_vnode dir, const char* name);
+	virtual	status_t			OpenDir(fs_vnode node, fs_cookie* cookie);
+	virtual	status_t			CloseDir(fs_vnode node, fs_vnode cookie);
+	virtual	status_t			FreeDirCookie(fs_vnode node, fs_vnode cookie);
+	virtual	status_t			ReadDir(fs_vnode node, fs_vnode cookie,
 									void* buffer, size_t bufferSize,
-									int32 count, int32* countRead);
-	virtual	status_t			RewindDir(void* node, void* cookie);
-	virtual	status_t			Walk(void* dir, const char* entryName,
-									char** resolvedPath, vnode_id* vnid);
+									uint32 count, uint32* countRead);
+	virtual	status_t			RewindDir(fs_vnode node, fs_vnode cookie);
+
+	// attribute directories
+	virtual	status_t			OpenAttrDir(fs_vnode node, fs_cookie *cookie);
+	virtual	status_t			CloseAttrDir(fs_vnode node, fs_cookie cookie);
+	virtual	status_t			FreeAttrDirCookie(fs_vnode node,
+									fs_cookie cookie);
+	virtual	status_t			ReadAttrDir(fs_vnode node, fs_cookie cookie,
+									void* buffer, size_t bufferSize,
+									uint32 count, uint32* countRead);
+	virtual	status_t			RewindAttrDir(fs_vnode node, fs_cookie cookie);
 
 	// attributes
-	virtual	status_t			OpenAttrDir(void* node, void** cookie);
-	virtual	status_t			CloseAttrDir(void* node, void* cookie);
-	virtual	status_t			FreeAttrDirCookie(void* node, void* cookie);
-	virtual	status_t			ReadAttrDir(void* node, void* cookie,
-									void* buffer, size_t bufferSize,
-									int32 count, int32* countRead);
-	virtual	status_t			RewindAttrDir(void* node, void* cookie);
-	virtual	status_t			ReadAttr(void* node, const char* name,
-									int type, off_t pos, void* buffer,
-									size_t bufferSize, size_t* bytesRead);
-	virtual	status_t			WriteAttr(void* node, const char* name,
-									int type, off_t pos, const void* buffer,
+	virtual	status_t			ReadAttr(fs_vnode node, fs_cookie cookie,
+									off_t pos, void* buffer, size_t bufferSize,
+									size_t* bytesRead);
+	virtual	status_t			WriteAttr(fs_vnode node, fs_cookie cookie,
+									off_t pos, const void* buffer,
 									size_t bufferSize, size_t* bytesWritten);
-	virtual	status_t			RemoveAttr(void* node, const char* name);
-	virtual	status_t			RenameAttr(void* node, const char* oldName,
+	virtual	status_t			ReadAttrStat(fs_vnode node, fs_cookie cookie,
+									struct stat *st);
+	virtual	status_t			RenameAttr(fs_vnode oldNode,
+									const char* oldName, fs_vnode newNode,
 									const char* newName);
-	virtual	status_t			StatAttr(void* node, const char* name,
-									struct attr_info* attrInfo);
+	virtual	status_t			RemoveAttr(fs_vnode node, const char* name);
 
 	// indices
-	virtual	status_t			OpenIndexDir(void** cookie);
-	virtual	status_t			CloseIndexDir(void* cookie);
-	virtual	status_t			FreeIndexDirCookie(void* cookie);
-	virtual	status_t			ReadIndexDir(void* cookie, void* buffer,
-									size_t bufferSize, int32 count,
-									int32* countRead);
-	virtual	status_t			RewindIndexDir(void* cookie);
-	virtual	status_t			CreateIndex(const char* name, int type,
-									int flags);
+	virtual	status_t			OpenIndexDir(fs_cookie *cookie);
+	virtual	status_t			CloseIndexDir(fs_cookie cookie);
+	virtual	status_t			FreeIndexDirCookie(fs_cookie cookie);
+	virtual	status_t			ReadIndexDir(fs_cookie cookie, void* buffer,
+									size_t bufferSize, uint32 count,
+									uint32* countRead);
+	virtual	status_t			RewindIndexDir(fs_cookie cookie);
+	virtual	status_t			CreateIndex(const char* name, uint32 type,
+									uint32 flags);
 	virtual	status_t			RemoveIndex(const char* name);
-	virtual	status_t			RenameIndex(const char* oldName,
-									const char* newName);
-	virtual	status_t			StatIndex(const char *name,
-									struct index_info* indexInfo);
+	virtual	status_t			ReadIndexStat(const char *name,
+									struct stat *st);
 
 	// queries
 	virtual	status_t			OpenQuery(const char* queryString,
-									ulong flags, port_id port, long token,
-									void** cookie);
-	virtual	status_t			CloseQuery(void* cookie);
-	virtual	status_t			FreeQueryCookie(void* cookie);
-	virtual	status_t			ReadQuery(void* cookie, void* buffer,
-									size_t bufferSize, int32 count,
-									int32* countRead);
+									uint32 flags, port_id port, uint32 token,
+									fs_cookie *cookie);
+	virtual	status_t			CloseQuery(fs_cookie cookie);
+	virtual	status_t			FreeQueryCookie(fs_cookie cookie);
+	virtual	status_t			ReadQuery(fs_cookie cookie, void* buffer,
+									size_t bufferSize, uint32 count,
+									uint32* countRead);
 
 private:
-			vnode_ops*			fFSOps;
+			beos_vnode_ops*		fFSOps;
 			void*				fVolumeCookie;
 };
 

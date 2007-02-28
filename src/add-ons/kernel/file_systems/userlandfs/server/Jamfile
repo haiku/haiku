@@ -32,19 +32,19 @@ Application UserlandFSServer
 	  SingleReplyRequestHandler.cpp
 	  String.cpp
 
-#	  cache.c
-#	  sysdep.c
+	  beos_fs_cache.c
 
-#	  BeOSKernelFileSystem.cpp
-#	  BeOSKernelVolume.cpp
+	  beos_lock.cpp
+	  BeOSKernelFileSystem.cpp
+	  BeOSKernelVolume.cpp
 	  DispatcherFileSystem.cpp
 	  FileSystem.cpp
-#	  kernel_emu.cpp
+	  kernel_emu.cpp
 	  main.cpp
 	  RequestThread.cpp
 	  ServerDefs.cpp
 	  UserlandFSDispatcher.cpp
-#	  UserlandFSServer.cpp
+	  UserlandFSServer.cpp
 	  UserlandRequestHandler.cpp
 	  Volume.cpp
 	: be

@@ -1,11 +1,12 @@
 // UserlandFSServer.cpp
 
+#include "UserlandFSServer.h"
+
 #include <new>
 #include <stdio.h>
 #include <string.h>
 
 #include <Application.h>
-#include <cache.h>
 #include <Clipboard.h>
 #include <FindDirectory.h>
 #include <fs_interface.h>
@@ -14,6 +15,8 @@
 #include <Path.h>
 
 #include "AutoLocker.h"
+#include "beos_fs_cache.h"
+#include "beos_fs_interface.h"
 #include "BeOSKernelFileSystem.h"
 #include "Compatibility.h"
 #include "Debug.h"
@@ -22,7 +25,6 @@
 #include "FSInfo.h"
 #include "RequestThread.h"
 #include "ServerDefs.h"
-#include "UserlandFSServer.h"
 
 static const int32 kRequestThreadCount = 10;
 
@@ -52,7 +54,7 @@ UserlandFSServer::~UserlandFSServer()
 	delete fNotificationRequestPort;
 	delete fFileSystem;
 	if (fBlockCacheInitialized)
-		shutdown_block_cache();
+		beos_shutdown_block_cache();
 	if (fAddOnImage >= 0)
 		unload_add_on(fAddOnImage);
 }
@@ -72,12 +74,14 @@ UserlandFSServer::Init(const char* fileSystem)
 	error = addOnPath.Append(fileSystem);
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	// load the add-on
 	fAddOnImage = load_add_on(addOnPath.Path());
 	if (fAddOnImage < 0)
 		RETURN_ERROR(fAddOnImage);
+
 	// get the symbols "fs_entry" and "api_version"
-	vnode_ops* fsOps;
+	beos_vnode_ops* fsOps;
 	error = get_image_symbol(fAddOnImage, "fs_entry", B_SYMBOL_TYPE_TEXT,
 		(void**)&fsOps);
 	if (error != B_OK)
@@ -87,18 +91,22 @@ UserlandFSServer::Init(const char* fileSystem)
 		(void**)&apiVersion);
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	// check api version
-	if (*apiVersion != B_CUR_FS_API_VERSION)
+	if (*apiVersion != BEOS_FS_API_VERSION)
 		RETURN_ERROR(B_ERROR);
+
 	// create the file system
 	fFileSystem = new(nothrow) BeOSKernelFileSystem(fsOps);
 	if (!fileSystem)
 		RETURN_ERROR(B_NO_MEMORY);
+
 	// init the block cache
-	error = init_block_cache(kMaxBlockCacheBlocks, 0);
+	error = beos_init_block_cache(kMaxBlockCacheBlocks, 0);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 	fBlockCacheInitialized = true;
+
 	// create the notification request port
 	fNotificationRequestPort = new(nothrow) RequestPort(kRequestPortSize);
 	if (!fNotificationRequestPort)
@@ -106,6 +114,7 @@ UserlandFSServer::Init(const char* fileSystem)
 	error = fNotificationRequestPort->InitCheck();
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	// now create the request threads
 	fRequestThreads = new(nothrow) RequestThread[kRequestThreadCount];
 	if (!fRequestThreads)
@@ -115,12 +124,15 @@ UserlandFSServer::Init(const char* fileSystem)
 		if (error != B_OK)
 			RETURN_ERROR(error);
 	} 
+
 	// run the threads
 	for (int32 i = 0; i < kRequestThreadCount; i++)
 		fRequestThreads[i].Run();
+
 	// enter the debugger here, if desired
 	if (gServerSettings.ShallEnterDebugger())
 		debugger("File system ready to use.");
+
 	// finally register with the dispatcher
 	error = _RegisterWithDispatcher(fileSystem);
 	RETURN_ERROR(error);

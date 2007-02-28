@@ -63,7 +63,7 @@ Volume::ReadFSInfo(fs_info* info)
 
 // WriteFSInfo
 status_t
-Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
+Volume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 {
 	return B_BAD_VALUE;
 }

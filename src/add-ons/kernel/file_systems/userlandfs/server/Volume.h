@@ -24,7 +24,7 @@ public:
 	virtual	status_t			Unmount();
 	virtual	status_t			Sync();
 	virtual	status_t			ReadFSInfo(fs_info* info);
-	virtual	status_t			WriteFSInfo(const struct fs_info *info,
+	virtual	status_t			WriteFSInfo(const struct fs_info* info,
 									uint32 mask);
 
 	// vnodes

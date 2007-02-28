@@ -6,11 +6,11 @@
 #include "Debug.h"
 #include "ServerDefs.h"
 #include "UserlandFSDispatcher.h"
-#include "UserlandFSServer.h"
+//#include "UserlandFSServer.h"
 
 // server signature
 static const char* kServerSignature
-	= "application/x-vnd.bonefish.userlandfs-server";
+	= "application/x-vnd.haiku.userlandfs-server";
 
 // usage
 static const char* kUsage =
@@ -46,15 +46,16 @@ main(int argc, char** argv)
 {
 	kArgC = argc;
 	kArgV = argv;
+
 	// init debugging
 	init_debugging();
 	struct DebuggingExiter {
 		DebuggingExiter()	{}
 		~DebuggingExiter()	{ exit_debugging(); }
 	} _;
+
 	// parse arguments
 	int argi = 1;
-	// parse options
 	for (; argi < argc; argi++) {
 		const char* arg = argv[argi];
 		int32 argLen = strlen(arg);
@@ -71,6 +72,7 @@ main(int argc, char** argv)
 			gServerSettings.SetEnterDebugger(true);
 		}
 	}
+
 	// get file system, if any
 	bool dispatcher = true;
 	const char* fileSystem = NULL;
@@ -82,6 +84,7 @@ main(int argc, char** argv)
 		print_usage();
 		return 1;
 	}
+
 	// create and init the application
 	BApplication* app = NULL;
 	status_t error = B_OK;
@@ -95,19 +98,19 @@ main(int argc, char** argv)
 		error = dispatcher->Init();
 		app = dispatcher;
 	} else {
-		UserlandFSServer* server
-			= new(nothrow) UserlandFSServer(kServerSignature);
-		if (!server) {
-			fprintf(stderr, "Failed to create server.\n");
-			return 1;
-		}
-		error = server->Init(fileSystem);
-		app = server;
+//		UserlandFSServer* server
+//			= new(nothrow) UserlandFSServer(kServerSignature);
+//		if (!server) {
+//			fprintf(stderr, "Failed to create server.\n");
+//			return 1;
+//		}
+//		error = server->Init(fileSystem);
+//		app = server;
 	}
+
 	// run it, if everything went fine
 	if (error == B_OK)
 		app->Run();
 	delete app;
 	return 0;
 }
-

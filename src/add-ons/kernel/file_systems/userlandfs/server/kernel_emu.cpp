@@ -1,12 +1,10 @@
 // kernel_emu.cpp
 
+#include "kernel_emu.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <fsproto.h>
-#include <KernelExport.h>
-#include <OS.h>
 
 #include "RequestPort.h"
 #include "Requests.h"
@@ -14,7 +12,8 @@
 #include "UserlandFSServer.h"
 #include "UserlandRequestHandler.h"
 
-// Taken from the OBOS Storage Kit (storage_support.cpp)
+
+// Taken from the Haiku Storage Kit (storage_support.cpp)
 /*! The length of the first component is returned as well as the index at
 	which the next one starts. These values are only valid, if the function
 	returns \c B_OK.
@@ -25,8 +24,7 @@
 		   written into. \c 0 is returned, if there is no next component.
 	\return \c B_OK, if \a path is not \c NULL, \c B_BAD_VALUE otherwise
 */
-static
-status_t
+static status_t
 parse_first_path_component(const char *path, int32& length,
 						   int32& nextComponent)
 {
@@ -51,7 +49,7 @@ parse_first_path_component(const char *path, int32& length,
 
 // new_path
 int
-new_path(const char *path, char **copy)
+UserlandFS::KernelEmu::new_path(const char *path, char **copy)
 {
 	// check errors and special cases
 	if (!copy)
@@ -96,7 +94,7 @@ new_path(const char *path, char **copy)
 
 // free_path
 void
-free_path(char *p)
+UserlandFS::KernelEmu::free_path(char *p)
 {
 	free(p);
 }
@@ -104,8 +102,7 @@ free_path(char *p)
 // #pragma mark -
 
 // get_port_and_fs
-static
-status_t
+static status_t
 get_port_and_fs(RequestPort** port, FileSystem** fileSystem)
 {
 	// get the request thread
@@ -124,8 +121,8 @@ get_port_and_fs(RequestPort** port, FileSystem** fileSystem)
 
 // notify_listener
 int
-notify_listener(int op, nspace_id nsid, vnode_id vnida, vnode_id vnidb,
-	vnode_id vnidc, const char *name)
+UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
+	vnode_id vnidb, vnode_id vnidc, const char *name)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -162,7 +159,7 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida, vnode_id vnidb,
 
 // notify_select_event
 void
-notify_select_event(selectsync *sync, uint32 ref)
+UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -190,9 +187,9 @@ notify_select_event(selectsync *sync, uint32 ref)
 
 // send_notification
 int
-send_notification(port_id targetPort, long token, ulong what, long op,
-	nspace_id nsida, nspace_id nsidb, vnode_id vnida, vnode_id vnidb,
-	vnode_id vnidc, const char *name)
+UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
+	ulong what, long op, mount_id nsida, mount_id nsidb, vnode_id vnida,
+	vnode_id vnidb, vnode_id vnidc, const char *name)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -234,9 +231,8 @@ send_notification(port_id targetPort, long token, ulong what, long op,
 // #pragma mark -
 
 // get_vnode
-_EXPORT
 int
-get_vnode(nspace_id nsid, vnode_id vnid, void** data)
+UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, void** data)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -267,9 +263,8 @@ get_vnode(nspace_id nsid, vnode_id vnid, void** data)
 }
 
 // put_vnode
-_EXPORT
 int
-put_vnode(nspace_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -299,9 +294,8 @@ put_vnode(nspace_id nsid, vnode_id vnid)
 }
 
 // new_vnode
-_EXPORT
 int
-new_vnode(nspace_id nsid, vnode_id vnid, void* data)
+UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, void* data)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -332,9 +326,8 @@ new_vnode(nspace_id nsid, vnode_id vnid, void* data)
 }
 
 // remove_vnode
-_EXPORT
 int
-remove_vnode(nspace_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -364,9 +357,8 @@ remove_vnode(nspace_id nsid, vnode_id vnid)
 }
 
 // unremove_vnode
-_EXPORT
 int
-unremove_vnode(nspace_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -396,9 +388,8 @@ unremove_vnode(nspace_id nsid, vnode_id vnid)
 }
 
 // is_vnode_removed
-_EXPORT
 int
-is_vnode_removed(nspace_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -430,17 +421,15 @@ is_vnode_removed(nspace_id nsid, vnode_id vnid)
 // #pragma mark -
 
 // kernel_debugger
-_EXPORT
 void
-kernel_debugger(const char *message)
+UserlandFS::KernelEmu::kernel_debugger(const char *message)
 {
 	debugger(message);
 }
 
 // panic
-_EXPORT
 void
-panic(const char *format, ...)
+UserlandFS::KernelEmu::panic(const char *format, ...)
 {
 	char buffer[1024];
 	strcpy(buffer, "PANIC: ");
@@ -460,42 +449,38 @@ panic(const char *format, ...)
 }
 
 // parse_expression
-_EXPORT
-ulong
-parse_expression(char *str)
-{
-	return 0;
-}
+//ulong
+//parse_expression(char *str)
+//{
+//	return 0;
+//}
 
 // add_debugger_command
-_EXPORT
 int
-add_debugger_command(char *name, int (*func)(int argc, char **argv),
-	char *help)
+UserlandFS::KernelEmu::add_debugger_command(char *name,
+	int (*func)(int argc, char **argv), char *help)
 {
 	return B_OK;
 }
 
 // remove_debugger_command
-_EXPORT
 int
-remove_debugger_command(char *name, int (*func)(int argc, char **argv))
+UserlandFS::KernelEmu::remove_debugger_command(char *name,
+	int (*func)(int argc, char **argv))
 {
 	return B_OK;
 }
 
 // kprintf
-_EXPORT
-void
-kprintf(const char *format, ...)
-{
-}
+//void
+//kprintf(const char *format, ...)
+//{
+//}
 
 // spawn_kernel_thread
 thread_id
-spawn_kernel_thread(thread_entry function, const char *threadName,
-	long priority, void *arg)
+UserlandFS::KernelEmu::spawn_kernel_thread(thread_entry function,
+	const char *threadName, long priority, void *arg)
 {
 	return spawn_thread(function, threadName, priority, arg);
 }
-
