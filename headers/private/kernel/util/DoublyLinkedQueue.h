@@ -166,7 +166,6 @@ class DoublyLinkedQueue {
 
 	private:
 		Element	*fFirst;
-		Element	*fLast;
 	
 		static GetLink	sGetLink;
 };
