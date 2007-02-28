@@ -2631,6 +2631,26 @@ unremove_vnode(mount_id mountID, vnode_id vnodeID)
 }
 
 
+extern "C" status_t 
+is_vnode_removed(mount_id mountID, vnode_id vnodeID)
+{
+	struct vnode *vnode;
+
+	mutex_lock(&sVnodeMutex);
+
+	status_t result;
+
+	vnode = lookup_vnode(mountID, vnodeID);
+	if (vnode)
+		result = vnode->remove ? 1 : 0;
+	else
+		result = B_BAD_VALUE;
+
+	mutex_unlock(&sVnodeMutex);
+	return result;
+}
+
+
 //	#pragma mark - private VFS API
 //	Functions the VFS exports for other parts of the kernel
 
