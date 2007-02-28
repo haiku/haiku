@@ -3,14 +3,14 @@ SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test
 
 SetSubDirSupportedPlatforms r5 bone dano ;
 
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 ] ;
+local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
+
 DEFINES += USER=1 ;
 
-if $(OSPLAT) = X86 {
-#	SubDirC++Flags -include [ FDirName $(UFS_TOP) src kernel_add_on
-#		kernel-cpp.h ] ;
-	SubDirC++Flags -include [ FDirName $(SUBDIR) cpp.h ] ;
-	SubDirC++Flags -include [ FDirName $(SUBDIR) compatibility.h ] ;
-}
+SubDirHdrs [ FDirName $(userlandFSIncludes) public ] ;
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
 
 Addon <test>reiserfs
 	: # relpath - obsolete

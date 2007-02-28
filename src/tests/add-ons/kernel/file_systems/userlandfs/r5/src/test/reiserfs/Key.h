@@ -22,12 +22,16 @@
 #ifndef KEY_H
 #define KEY_H
 
+#include <new>
+
 #include <stdio.h>
 
 #include <SupportDefs.h>
 
 #include "Debug.h"
 #include "endianess.h"
+
+using std::nothrow;
 
 // Key
 /*!
