@@ -1,5 +1,7 @@
 // kernel_interface.cpp
 
+#include <dirent.h>
+
 #include <KernelExport.h>
 #include <fs_interface.h>
 
@@ -440,7 +442,7 @@ userlandfs_read(fs_volume fs, fs_vnode node, fs_cookie cookie, off_t pos,
 	void *buffer, size_t *length)
 {
 	Volume* volume = (Volume*)fs;
-	PRINT(("userlandfs_read(%p, %p, %p, %Ld, %p, %lu)\n", nf, node, cookie, pos,
+	PRINT(("userlandfs_read(%p, %p, %p, %Ld, %p, %lu)\n", fs, node, cookie, pos,
 		buffer, *length));
 	status_t error = volume->Read(node, cookie, pos, buffer, *length,
 		length);
@@ -535,7 +537,7 @@ userlandfs_read_dir(fs_volume fs, fs_vnode node, fs_cookie cookie,
 	PRINT(("userlandfs_read_dir() done: (%lx, %lu)\n", error, *count));
 	#if DEBUG
 		dirent* entry = buffer;
-		for (int32 i = 0; i < *count; i++) {
+		for (uint32 i = 0; i < *count; i++) {
 			// R5's kernel vsprintf() doesn't seem to know `%.<number>s', so
 			// we need to work around.
 			char name[B_FILE_NAME_LENGTH];
@@ -835,7 +837,7 @@ static status_t
 userlandfs_read_index_stat(fs_volume fs, const char *name, struct stat *st)
 {
 	Volume* volume = (Volume*)fs;
-	PRINT(("userlandfs_read_index_stat(%p, `%s', %p)\n", s, name, st));
+	PRINT(("userlandfs_read_index_stat(%p, `%s', %p)\n", fs, name, st));
 	status_t error = volume->ReadIndexStat(name, st);
 	PRINT(("userlandfs_read_index_stat() done: (%lx)\n", error));
 	return error;
