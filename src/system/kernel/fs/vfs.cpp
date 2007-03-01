@@ -5716,16 +5716,21 @@ fs_read_info(dev_t device, struct fs_info *info)
 	if (status < B_OK)
 		return status;
 
-	// fill in info the file system doesn't (have to) know about
 	memset(info, 0, sizeof(struct fs_info));
-	info->dev = mount->id;
-	info->root = mount->root_vnode->id;
-	strlcpy(info->fsh_name, mount->fs_name, sizeof(info->fsh_name));
-	if (mount->device_name != NULL)
-		strlcpy(info->device_name, mount->device_name, sizeof(info->device_name));
 
 	if (FS_MOUNT_CALL(mount, read_fs_info))
 		status = FS_MOUNT_CALL(mount, read_fs_info)(mount->cookie, info);
+
+	// fill in info the file system doesn't (have to) know about
+	if (status == B_OK) {
+		info->dev = mount->id;
+		info->root = mount->root_vnode->id;
+		strlcpy(info->fsh_name, mount->fs_name, sizeof(info->fsh_name));
+		if (mount->device_name != NULL) {
+			strlcpy(info->device_name, mount->device_name,
+				sizeof(info->device_name));
+		}
+	}
 
 	// if the call is not supported by the file system, there are still
 	// the parts that we filled out ourselves
