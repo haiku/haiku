@@ -7,6 +7,7 @@
 
 class ServerApp;
 class ViewLayer;
+class BPrivate::LinkReceiver;
 class ServerPicture : public PictureDataWriter {
 public:	
 		int32		Token() { return fToken; }
@@ -23,6 +24,8 @@ public:
 		
 		const void	*Data() const { return fData.Buffer(); }
 		int32		DataLength() const { return fData.BufferLength(); }
+		
+		status_t	ImportData(BPrivate::LinkReceiver &link);
 
 private:
 friend class	ServerApp;
@@ -30,7 +33,7 @@ friend class	ServerApp;
 		ServerPicture();
 		ServerPicture(const ServerPicture &);
 		~ServerPicture();
-		
+
 		int32		fToken;
 		BMallocIO	fData;
 		// DrawState	*fState;

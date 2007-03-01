@@ -15,6 +15,7 @@
 #include "ViewLayer.h"
 #include "WindowLayer.h"
 
+#include <LinkReceiver.h>
 #include <PicturePlayer.h>
 #include <PictureProtocol.h>
 #include <ServerProtocol.h>
@@ -660,4 +661,28 @@ ServerPicture::Play(ViewLayer *view)
 {
 	PicturePlayer player(const_cast<void *>(fData.Buffer()), fData.BufferLength(), NULL);
 	player.Play(const_cast<void **>(tableEntries), sizeof(tableEntries) / sizeof(void *), view);
+}
+
+
+status_t
+ServerPicture::ImportData(BPrivate::LinkReceiver &link)
+{
+	int32 subPicturesCount = 0;
+	link.Read<int32>(&subPicturesCount);
+	for (int32 c = 0; c < subPicturesCount; c++) {
+		// TODO: Support nested pictures
+	} 
+	
+	int32 size = 0;
+	link.Read<int32>(&size);
+	if (fData.SetSize(size) != B_OK)
+		return B_ERROR;
+
+	// TODO: The best way to do this would be to read the data into
+	// a temporary buffer, and then use the BMallocIO::Write() method,
+	// but this way we avoid an extra copy. Unfortunately BMallocIO::Write()
+	// only accepts a pointer to raw data...
+	link.Read(const_cast<void *>(fData.Buffer()), size);
+
+	return B_OK;
 }

@@ -686,18 +686,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			// TODO: Maybe rename this to AS_UPLOAD_PICTURE ?
 			STRACE(("ServerApp %s: Create Picture\n", Signature()));
+			status_t status = B_ERROR;			
 			ServerPicture *picture = CreatePicture();
-			if (picture != NULL) {
-				int32 subPicturesCount = 0;
-				link.Read<int32>(&subPicturesCount);
-				for (int32 c = 0; c < subPicturesCount; c++) {
-					// TODO: Support nested pictures
-				} 
-				
-				int32 size = 0;
-				link.Read<int32>(&size);
-				link.Read(const_cast<void *>(picture->Data()), size);
-				
+			if (picture != NULL)
+				status = picture->ImportData(link);
+			
+			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(picture->Token());
 			} else
