@@ -241,8 +241,9 @@ BPicture::Play(void **callBackTable, int32 tableEntries, void *user)
 	if (!assert_local_copy())
 		return B_ERROR;
 
-	return do_playback(const_cast<void *>(extent->Data()), extent->Size(),
-			extent->Pictures(), callBackTable, tableEntries, user);
+	PicturePlayer player(extent->Data(), extent->Size(), extent->Pictures());
+
+	return player.Play(callBackTable, tableEntries, user);
 }
 
 
@@ -518,16 +519,6 @@ BPicture &
 BPicture::operator=(const BPicture &)
 {
 	return *this;
-}
-
-
-status_t
-do_playback(void * data, int32 size, BList* pictures,
-	void **callBackTable, int32 tableEntries, void *user)
-{
-	PicturePlayer player(data, size, pictures);
-
-	return player.Play(callBackTable, tableEntries, user);
 }
 
 

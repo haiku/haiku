@@ -85,8 +85,5 @@ private:
 		int32		fSize;
 		BList		*fPictures;
 };
-//------------------------------------------------------------------------------
-
-status_t do_playback(void *, long, BList *, void **, long, void *);
 
 #endif // _TPICTURE_H
