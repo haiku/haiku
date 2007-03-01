@@ -74,6 +74,7 @@ Volume::Volume(FileSystem* fileSystem, mount_id id)
 	  fOpenFiles(0),
 	  fOpenDirectories(0),
 	  fOpenAttributeDirectories(0),
+	  fOpenAttributes(0),
 	  fOpenIndexDirectories(0),
 	  fOpenQueries(0),
 	  fVNodeCountMap(NULL),
@@ -1097,6 +1098,7 @@ Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
 	if (!port)
 		return B_ERROR;
 	PortReleaser _(fFileSystem->GetPortPool(), port);
+	AutoIncrementer incrementer(&fOpenFiles);
 
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
@@ -1124,6 +1126,7 @@ Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
+	incrementer.Keep();
 	*vnid = reply->vnid;
 	*cookie = reply->fileCookie;
 	// The VFS will balance the new_vnode() call for the FS.
@@ -1197,6 +1200,7 @@ Volume::FreeCookie(fs_vnode node, fs_cookie cookie)
 		error = B_OK;
 		disconnected = true;
 	}
+
 	int32 openFiles = atomic_add(&fOpenFiles, -1);
 	if (openFiles <= 1 && disconnected)
 		_PutAllPendingVNodes();
@@ -1710,6 +1714,126 @@ Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 
 // #pragma mark - attributes
 
+// CreateAttr
+status_t
+Volume::CreateAttr(fs_vnode node, const char* name, uint32 type, int openMode,
+	fs_cookie* cookie)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+	AutoIncrementer incrementer(&fOpenAttributes);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	CreateAttrRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	error = allocator.AllocateString(request->name, name);
+	request->type = type;
+	request->openMode = openMode;
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, CREATE_ATTR_REPLY);
+	CreateAttrReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	incrementer.Keep();
+	*cookie = reply->attrCookie;
+	return error;
+}
+
+// OpenAttr
+status_t
+Volume::OpenAttr(fs_vnode node, const char* name, int openMode,
+	fs_cookie* cookie)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+	AutoIncrementer incrementer(&fOpenAttributes);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	OpenAttrRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	error = allocator.AllocateString(request->name, name);
+	request->openMode = openMode;
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	KernelRequestHandler handler(this, OPEN_ATTR_REPLY);
+	OpenAttrReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	incrementer.Keep();
+	*cookie = reply->attrCookie;
+	return error;
+}
+
+// CloseAttr
+status_t
+Volume::CloseAttr(fs_vnode node, fs_cookie cookie)
+{
+	status_t error = _CloseAttr(node, cookie);
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
+		// This isn't really necessary, as the return value is irrelevant to
+		// the VFS. OBOS ignores it completely. The fsshell returns it to the
+		// userland, but considers the node closed anyway.
+		WARN(("Volume::CloseAttr(): connection lost, forcing close attr\n"));
+		return B_OK;
+	}
+	return error;
+}
+
+// FreeAttrCookie
+status_t
+Volume::FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+{
+	status_t error = _FreeAttrCookie(node, cookie);
+	bool disconnected = false;
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
+		// This isn't really necessary, as the return value is irrelevant to
+		// the VFS. It's completely ignored by OBOS as well as by the fsshell.
+		WARN(("Volume::FreeAttrCookie(): connection lost, forcing free attr "
+			"cookie\n"));
+		error = B_OK;
+		disconnected = true;
+	}
+
+	int32 openAttributes = atomic_add(&fOpenAttributes, -1);
+	if (openAttributes <= 1 && disconnected)
+		_PutAllPendingVNodes();
+	return error;
+}
 
 // ReadAttr
 status_t
@@ -2708,6 +2832,76 @@ Volume::_FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 	return error;
 }
 
+// _CloseAttr
+status_t
+Volume::_CloseAttr(fs_vnode node, fs_cookie cookie)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	CloseAttrRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->attrCookie = cookie;
+
+	// send the request
+	KernelRequestHandler handler(this, CLOSE_ATTR_REPLY);
+	CloseAttrReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
+// _FreeAttrCookie
+status_t
+Volume::_FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FreeAttrCookieRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->attrCookie = cookie;
+
+	// send the request
+	KernelRequestHandler handler(this, FREE_ATTR_COOKIE_REPLY);
+	FreeAttrCookieReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
 // _CloseIndexDir
 status_t
 Volume::_CloseIndexDir(fs_cookie cookie)
@@ -2981,6 +3175,10 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 		if (fOpenAttributeDirectories > 0) {
 			PRINT(("Volume::_PutAllPendingVNodes() failed: open attr dirs\n"));
 			return USERLAND_IOCTL_OPEN_ATTRIBUTE_DIRECTORIES;
+		}
+		if (fOpenAttributes > 0) {
+			PRINT(("Volume::_PutAllPendingVNodes() failed: open attributes\n"));
+			return USERLAND_IOCTL_OPEN_ATTRIBUTES;
 		}
 		if (fOpenIndexDirectories > 0) {
 			PRINT(("Volume::_PutAllPendingVNodes() failed: open index dirs\n"));

@@ -347,6 +347,36 @@ Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 // #pragma mark - attributes
 
 
+// CreateAttr
+status_t
+Volume::CreateAttr(fs_vnode node, const char* name, uint32 type, int openMode,
+	fs_cookie* cookie)
+{
+	return B_BAD_VALUE;
+}
+
+// OpenAttr
+status_t
+Volume::OpenAttr(fs_vnode node, const char* name, int openMode,
+	fs_cookie* cookie)
+{
+	return B_BAD_VALUE;
+}
+
+// CloseAttr
+status_t
+Volume::CloseAttr(fs_vnode node, fs_cookie cookie)
+{
+	return B_BAD_VALUE;
+}
+
+// FreeAttrCookie
+status_t
+Volume::FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+{
+	return B_BAD_VALUE;
+}
+
 // ReadAttr
 status_t
 Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,

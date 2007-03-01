@@ -175,6 +175,22 @@ ReadAttrDirReply::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
+// CreateAttrRequest
+status_t
+CreateAttrRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_NON_NULL_STRING(name);
+	return B_OK;
+}
+
+// OpenAttrRequest
+status_t
+OpenAttrRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_NON_NULL_STRING(name);
+	return B_OK;
+}
+
 // ReadAttrReply
 status_t
 ReadAttrReply::GetAddressInfos(AddressInfo* infos, int32* count)
@@ -563,12 +579,21 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case REWIND_ATTR_DIR_REPLY:
 			return false;
 		// attributes
+		case CREATE_ATTR_REQUEST:
+		case OPEN_ATTR_REQUEST:
+		case CLOSE_ATTR_REQUEST:
+		case FREE_ATTR_COOKIE_REQUEST:
 		case READ_ATTR_REQUEST:
 		case WRITE_ATTR_REQUEST:
 		case READ_ATTR_STAT_REQUEST:
 		case RENAME_ATTR_REQUEST:
 		case REMOVE_ATTR_REQUEST:
 			return true;
+		case CREATE_ATTR_REPLY:
+		case OPEN_ATTR_REPLY:
+		case CLOSE_ATTR_REPLY:
+		case FREE_ATTR_COOKIE_REPLY:
+
 		case READ_ATTR_REPLY:
 		case WRITE_ATTR_REPLY:
 		case READ_ATTR_STAT_REPLY:
@@ -753,12 +778,20 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case REWIND_ATTR_DIR_REPLY:
 			return true;
 		// attributes
+		case CREATE_ATTR_REQUEST:
+		case OPEN_ATTR_REQUEST:
+		case CLOSE_ATTR_REQUEST:
+		case FREE_ATTR_COOKIE_REQUEST:
 		case READ_ATTR_REQUEST:
 		case WRITE_ATTR_REQUEST:
 		case RENAME_ATTR_REQUEST:
 		case READ_ATTR_STAT_REQUEST:
 		case REMOVE_ATTR_REQUEST:
 			return false;
+		case CREATE_ATTR_REPLY:
+		case OPEN_ATTR_REPLY:
+		case CLOSE_ATTR_REPLY:
+		case FREE_ATTR_COOKIE_REPLY:
 		case READ_ATTR_REPLY:
 		case WRITE_ATTR_REPLY:
 		case READ_ATTR_STAT_REPLY:

@@ -629,10 +629,53 @@ userlandfs_rewind_attr_dir(fs_volume fs, fs_vnode node, fs_cookie cookie)
 // #pragma mark - attributes
 
 
-// TODO: create_attr()
-// TODO: open_attr()
-// TODO: close_attr()
-// TODO: free_attr_cookie()
+// userlandfs_create_attr
+status_t
+userlandfs_create_attr(fs_volume fs, fs_vnode node, const char *name,
+	uint32 type, int openMode, fs_cookie *cookie)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_create_attr(%p, %p, \"%s\", 0x%lx, %d, %p)\n", fs, node,
+		name, type, openMode, cookie));
+	status_t error = volume->CreateAttr(node, name, type, openMode, cookie);
+	PRINT(("userlandfs_create_attr() done: (%lx, %p)\n", error, *cookie));
+	return error;
+}
+
+// userlandfs_open_attr
+status_t
+userlandfs_open_attr(fs_volume fs, fs_vnode node, const char *name,
+	int openMode, fs_cookie *cookie)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_open_attr(%p, %p, \"%s\", %d, %p)\n", fs, node, name,
+		openMode, cookie));
+	status_t error = volume->OpenAttr(node, name, openMode, cookie);
+	PRINT(("userlandfs_open_attr() done: (%lx, %p)\n", error, *cookie));
+	return error;
+}
+
+// userlandfs_close_attr
+status_t
+userlandfs_close_attr(fs_volume fs, fs_vnode node, fs_cookie cookie)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_close_attr(%p, %p, %p)\n", fs, node, cookie));
+	status_t error = volume->CloseAttr(node, cookie);
+	PRINT(("userlandfs_close_attr() done: %lx\n", error));
+	return error;
+}
+
+// userlandfs_free_attr_cookie
+status_t
+userlandfs_free_attr_cookie(fs_volume fs, fs_vnode node, fs_cookie cookie)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_close_attr(%p, %p, %p)\n", fs, node, cookie));
+	status_t error = volume->FreeAttrCookie(node, cookie);
+	PRINT(("userlandfs_close_attr() done: %lx\n", error));
+	return error;
+}
 
 // userlandfs_read_attr
 static status_t
@@ -1016,10 +1059,10 @@ static file_system_module_info sUserlandFSModuleInfo = {
 	&userlandfs_rewind_attr_dir,
 
 	/* attribute operations */
-	NULL,	// &userlandfs_create_attr,
-	NULL,	// &userlandfs_open_attr,
-	NULL,	// &userlandfs_close_attr,
-	NULL,	// &userlandfs_free_attr_cookie,
+	&userlandfs_create_attr,
+	&userlandfs_open_attr,
+	&userlandfs_close_attr,
+	&userlandfs_free_attr_cookie,
 	&userlandfs_read_attr,
 	&userlandfs_write_attr,
 

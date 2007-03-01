@@ -54,6 +54,10 @@ class FreeAttrDirCookieRequest;
 class ReadAttrDirRequest;
 class RewindAttrDirRequest;
 // attributes
+class CreateAttrRequest;
+class OpenAttrRequest;
+class CloseAttrRequest;
+class FreeAttrCookieRequest;
 class ReadAttrRequest;
 class WriteAttrRequest;
 class ReadAttrStatRequest;
@@ -148,6 +152,10 @@ private:
 			status_t			_HandleRequest(RewindAttrDirRequest* request);
 
 			// attributes
+			status_t			_HandleRequest(CreateAttrRequest* request);
+			status_t			_HandleRequest(OpenAttrRequest* request);
+			status_t			_HandleRequest(CloseAttrRequest* request);
+			status_t			_HandleRequest(FreeAttrCookieRequest* request);
 			status_t			_HandleRequest(ReadAttrRequest* request);
 			status_t			_HandleRequest(WriteAttrRequest* request);
 			status_t			_HandleRequest(ReadAttrStatRequest* request);

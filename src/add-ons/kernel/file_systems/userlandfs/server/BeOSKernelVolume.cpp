@@ -2,8 +2,40 @@
 
 #include "BeOSKernelVolume.h"
 
+#include <new>
+
+#include <fcntl.h>
+#include <unistd.h>
+
 #include "beos_fs_interface.h"
 #include "kernel_emu.h"
+
+
+using std::nothrow;
+
+static int open_mode_to_access(int openMode);
+
+
+// AttributeCookie
+class BeOSKernelVolume::AttributeCookie {
+public:
+	AttributeCookie(const char* name, uint32 type, int openMode, bool exists,
+		bool create)
+		: fType(type),
+		  fOpenMode(openMode),
+		  fExists(exists),
+		  fCreate(create)
+	{
+		strcpy(fName, name);
+	}
+
+	char	fName[B_ATTR_NAME_LENGTH];
+	uint32	fType;
+	int		fOpenMode;
+	bool	fExists;
+	bool	fCreate;
+};
+
 
 // constructor
 BeOSKernelVolume::BeOSKernelVolume(FileSystem* fileSystem, mount_id id,
@@ -503,43 +535,106 @@ BeOSKernelVolume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 // #pragma mark - attributes
 
 
+// CreateAttr
+status_t
+BeOSKernelVolume::CreateAttr(fs_vnode node, const char* name, uint32 type,
+	int openMode, fs_cookie* cookie)
+{
+	return _OpenAttr(node, name, type, openMode, true, cookie);
+}
+
+// OpenAttr
+status_t
+BeOSKernelVolume::OpenAttr(fs_vnode node, const char* name, int openMode,
+	fs_cookie* cookie)
+{
+	return _OpenAttr(node, name, 0, openMode, false, cookie);
+}
+
+// CloseAttr
+status_t
+BeOSKernelVolume::CloseAttr(fs_vnode node, fs_cookie cookie)
+{
+	return B_OK;
+}
+
+// FreeAttrCookie
+status_t
+BeOSKernelVolume::FreeAttrCookie(fs_vnode node, fs_cookie _cookie)
+{
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	// If the attribute doesn't exist yet and it was opened with
+	// CreateAttr(), we could create it now. We have a race condition here
+	// though, since someone else could have created it in the meantime.
+
+	delete cookie;
+
+	return B_OK;
+}
+
 // ReadAttr
 status_t
-BeOSKernelVolume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+BeOSKernelVolume::ReadAttr(fs_vnode node, fs_cookie _cookie, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
-// TODO: Implement!
-return B_BAD_VALUE;
-//	if (!fFSOps->read_attr)
-//		return B_BAD_VALUE;
-//	*bytesRead = bufferSize;
-//	return fFSOps->read_attr(fVolumeCookie, node, name, type, buffer, bytesRead,
-//		pos);
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	// check, if open mode allows reading
+	if ((open_mode_to_access(cookie->fOpenMode) | R_OK) == 0)
+		return B_FILE_ERROR;
+
+	// read
+	if (!fFSOps->read_attr)
+		return B_BAD_VALUE;
+
+	*bytesRead = bufferSize;
+	return fFSOps->read_attr(fVolumeCookie, node, cookie->fName, cookie->fType,
+		buffer, bytesRead, pos);
 }
 
 // WriteAttr
 status_t
-BeOSKernelVolume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+BeOSKernelVolume::WriteAttr(fs_vnode node, fs_cookie _cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
-// TODO: Implement!
-return B_BAD_VALUE;
-//	if (!fFSOps->write_attr)
-//		return B_BAD_VALUE;
-//	*bytesWritten = bufferSize;
-//	return fFSOps->write_attr(fVolumeCookie, node, name, type, buffer,
-//		bytesWritten, pos);
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	// check, if open mode allows writing
+	if ((open_mode_to_access(cookie->fOpenMode) | W_OK) == 0)
+		return B_FILE_ERROR;
+
+	// write
+	if (!fFSOps->write_attr)
+		return B_BAD_VALUE;
+
+	*bytesWritten = bufferSize;
+	return fFSOps->write_attr(fVolumeCookie, node, cookie->fName, cookie->fType,
+		buffer, bytesWritten, pos);
 }
 
 // ReadAttrStat
 status_t
-BeOSKernelVolume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
+BeOSKernelVolume::ReadAttrStat(fs_vnode node, fs_cookie _cookie,
+	struct stat *st)
 {
-// TODO: Implement!
-return B_BAD_VALUE;
-//	if (!fFSOps->stat_attr)
-//		return B_BAD_VALUE;
-//	return fFSOps->stat_attr(fVolumeCookie, node, name, attrInfo);
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	// get the stats
+	beos_attr_info attrInfo;
+	if (!fFSOps->stat_attr)
+		return B_BAD_VALUE;
+
+	status_t error = fFSOps->stat_attr(fVolumeCookie, node, cookie->fName,
+		&attrInfo);
+	if (error != B_OK)
+		return error;
+
+	// translate to struct stat
+	st->st_size = attrInfo.size;
+	st->st_type = attrInfo.type;
+
+	return B_OK;
 }
 
 // RenameAttr
@@ -706,5 +801,67 @@ BeOSKernelVolume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 	// Haiku's struct dirent equals BeOS's version
 	return fFSOps->read_query(fVolumeCookie, cookie, (long*)countRead,
 		(struct beos_dirent*)buffer, bufferSize);
+}
+
+
+// #pragma mark - Private
+
+
+// _OpenAttr
+status_t
+BeOSKernelVolume::_OpenAttr(fs_vnode node, const char* name, uint32 type,
+	int openMode, bool create, fs_cookie* _cookie)
+{
+	// check permissions first
+	int accessMode = open_mode_to_access(openMode) | (create ? W_OK : 0);
+	status_t error = Access(node, accessMode);
+	if (error != B_OK)
+		return error;
+
+	// check whether the attribute already exists
+	beos_attr_info attrInfo;
+	if (!fFSOps->stat_attr)
+		return B_BAD_VALUE;
+	bool exists
+		= (fFSOps->stat_attr(fVolumeCookie, node, name, &attrInfo) == B_OK);
+
+	if (create) {
+		// create: fail, if attribute exists and non-existence was required
+		if (exists && (openMode & O_EXCL))
+			return B_FILE_EXISTS;
+	} else {
+		// open: fail, if attribute doesn't exist
+		if (!exists)
+			return B_ENTRY_NOT_FOUND;
+
+		// keep the attribute type
+		type = attrInfo.type;
+	}
+
+	// create an attribute cookie
+	AttributeCookie* cookie = new(nothrow) AttributeCookie(name, type,
+		openMode, exists, create);
+	if (!cookie)
+		return B_NO_MEMORY;
+
+	// TODO: If we want to support O_TRUNC, we should do that here.
+
+	*_cookie = cookie;
+	return B_OK;
+}
+
+// open_mode_to_access
+static int
+open_mode_to_access(int openMode)
+{
+ 	switch (openMode & O_RWMASK) {
+		case O_RDONLY:
+			return R_OK;
+		case O_WRONLY:
+			return W_OK;
+		case O_RDWR:
+		default:
+			return W_OK | R_OK;
+ 	}
 }
 

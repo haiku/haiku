@@ -122,6 +122,14 @@ enum {
 	REWIND_ATTR_DIR_REPLY,
 
 	// attributes
+	CREATE_ATTR_REQUEST,
+	CREATE_ATTR_REPLY,
+	OPEN_ATTR_REQUEST,
+	OPEN_ATTR_REPLY,
+	CLOSE_ATTR_REQUEST,
+	CLOSE_ATTR_REPLY,
+	FREE_ATTR_COOKIE_REQUEST,
+	FREE_ATTR_COOKIE_REPLY,
 	READ_ATTR_REQUEST,
 	READ_ATTR_REPLY,
 	WRITE_ATTR_REQUEST,
@@ -960,6 +968,67 @@ public:
 // #pragma mark - attributes
 
 
+// CreateAttrRequest
+class CreateAttrRequest : public NodeRequest {
+public:
+	CreateAttrRequest() : NodeRequest(CREATE_ATTR_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		name;
+	uint32		type;
+	int			openMode;
+};
+
+// CreateAttrReply
+class CreateAttrReply : public ReplyRequest {
+public:
+	CreateAttrReply() : ReplyRequest(CREATE_ATTR_REPLY) {}
+
+	fs_cookie	attrCookie;
+};
+
+// OpenAttrRequest
+class OpenAttrRequest : public NodeRequest {
+public:
+	OpenAttrRequest() : NodeRequest(OPEN_ATTR_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		name;
+	int			openMode;
+};
+
+// OpenAttrReply
+class OpenAttrReply : public ReplyRequest {
+public:
+	OpenAttrReply() : ReplyRequest(OPEN_ATTR_REPLY) {}
+
+	fs_cookie	attrCookie;
+};
+
+// CloseAttrRequest
+class CloseAttrRequest : public AttributeRequest {
+public:
+	CloseAttrRequest() : AttributeRequest(CLOSE_ATTR_REQUEST) {}
+};
+
+// CloseAttrReply
+class CloseAttrReply : public ReplyRequest {
+public:
+	CloseAttrReply() : ReplyRequest(CLOSE_ATTR_REPLY) {}
+};
+
+// FreeAttrCookieRequest
+class FreeAttrCookieRequest : public AttributeRequest {
+public:
+	FreeAttrCookieRequest() : AttributeRequest(FREE_ATTR_COOKIE_REQUEST) {}
+};
+
+// FreeAttrCookieReply
+class FreeAttrCookieReply : public ReplyRequest {
+public:
+	FreeAttrCookieReply() : ReplyRequest(FREE_ATTR_COOKIE_REPLY) {}
+};
+
 // ReadAttrRequest
 class ReadAttrRequest : public AttributeRequest {
 public:
@@ -1605,6 +1674,22 @@ do_for_request(Request* request, Task& task)
 		case REWIND_ATTR_DIR_REPLY:
 			return task((RewindAttrDirReply*)request);
 		// attributes
+		case CREATE_ATTR_REQUEST:
+			return task((CreateAttrRequest*)request);
+		case CREATE_ATTR_REPLY:
+			return task((CreateAttrReply*)request);
+		case OPEN_ATTR_REQUEST:
+			return task((OpenAttrRequest*)request);
+		case OPEN_ATTR_REPLY:
+			return task((OpenAttrReply*)request);
+		case CLOSE_ATTR_REQUEST:
+			return task((CloseAttrRequest*)request);
+		case CLOSE_ATTR_REPLY:
+			return task((CloseAttrReply*)request);
+		case FREE_ATTR_COOKIE_REQUEST:
+			return task((FreeAttrCookieRequest*)request);
+		case FREE_ATTR_COOKIE_REPLY:
+			return task((FreeAttrCookieReply*)request);
 		case READ_ATTR_REQUEST:
 			return task((ReadAttrRequest*)request);
 		case READ_ATTR_REPLY:
@@ -1834,6 +1919,14 @@ using UserlandFSUtil::ReadAttrDirReply;
 using UserlandFSUtil::RewindAttrDirRequest;
 using UserlandFSUtil::RewindAttrDirReply;
 // attributes
+using UserlandFSUtil::CreateAttrRequest;
+using UserlandFSUtil::CreateAttrReply;
+using UserlandFSUtil::OpenAttrRequest;
+using UserlandFSUtil::OpenAttrReply;
+using UserlandFSUtil::CloseAttrRequest;
+using UserlandFSUtil::CloseAttrReply;
+using UserlandFSUtil::FreeAttrCookieRequest;
+using UserlandFSUtil::FreeAttrCookieReply;
 using UserlandFSUtil::ReadAttrRequest;
 using UserlandFSUtil::ReadAttrReply;
 using UserlandFSUtil::WriteAttrRequest;

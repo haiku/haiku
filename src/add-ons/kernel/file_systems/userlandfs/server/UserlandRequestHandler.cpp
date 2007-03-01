@@ -138,6 +138,14 @@ UserlandRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((RewindAttrDirRequest*)request);
 
 		// attributes
+		case CREATE_ATTR_REQUEST:
+			return _HandleRequest((CreateAttrRequest*)request);
+		case OPEN_ATTR_REQUEST:
+			return _HandleRequest((OpenAttrRequest*)request);
+		case CLOSE_ATTR_REQUEST:
+			return _HandleRequest((CloseAttrRequest*)request);
+		case FREE_ATTR_COOKIE_REQUEST:
+			return _HandleRequest((FreeAttrCookieRequest*)request);
 		case READ_ATTR_REQUEST:
 			return _HandleRequest((ReadAttrRequest*)request);
 		case WRITE_ATTR_REQUEST:
@@ -1492,6 +1500,126 @@ UserlandRequestHandler::_HandleRequest(RewindAttrDirRequest* request)
 
 // #pragma mark - attributes
 
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(CreateAttrRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	fs_cookie attrCookie;
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->CreateAttr(request->node,
+			(const char*)request->name.GetData(), request->type,
+			request->openMode, &attrCookie);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	CreateAttrReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+	reply->attrCookie = attrCookie;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(OpenAttrRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	fs_cookie attrCookie;
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->OpenAttr(request->node,
+			(const char*)request->name.GetData(), request->openMode,
+			&attrCookie);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	OpenAttrReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+	reply->attrCookie = attrCookie;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(CloseAttrRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->CloseAttr(request->node, request->attrCookie);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	CloseAttrReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(FreeAttrCookieRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->FreeAttrCookie(request->node, request->attrCookie);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FreeAttrCookieReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
 
 // _HandleRequest
 status_t

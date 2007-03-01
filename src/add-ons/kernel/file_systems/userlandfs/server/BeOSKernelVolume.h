@@ -98,6 +98,13 @@ public:
 	virtual	status_t			RewindAttrDir(fs_vnode node, fs_cookie cookie);
 
 	// attributes
+	virtual	status_t			CreateAttr(fs_vnode node, const char *name,
+									uint32 type, int openMode,
+									fs_cookie *cookie);
+	virtual	status_t			OpenAttr(fs_vnode node, const char *name,
+									int openMode, fs_cookie *cookie);
+	virtual	status_t			CloseAttr(fs_vnode node, fs_cookie cookie);
+	virtual	status_t			FreeAttrCookie(fs_vnode node, fs_cookie cookie);
 	virtual	status_t			ReadAttr(fs_vnode node, fs_cookie cookie,
 									off_t pos, void* buffer, size_t bufferSize,
 									size_t* bytesRead);
@@ -134,6 +141,14 @@ public:
 	virtual	status_t			ReadQuery(fs_cookie cookie, void* buffer,
 									size_t bufferSize, uint32 count,
 									uint32* countRead);
+
+private:
+	class AttributeCookie;
+
+private:
+			status_t			_OpenAttr(fs_vnode node, const char* name,
+									uint32 type, int openMode, bool create,
+									fs_cookie* cookie);
 
 private:
 			beos_vnode_ops*		fFSOps;

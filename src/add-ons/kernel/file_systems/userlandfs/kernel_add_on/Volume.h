@@ -125,6 +125,13 @@ public:
 			status_t			RewindAttrDir(fs_vnode node, fs_cookie cookie);
 
 			// attributes
+			status_t			CreateAttr(fs_vnode node, const char* name,
+									uint32 type, int openMode,
+									fs_cookie* cookie);
+			status_t			OpenAttr(fs_vnode node, const char* name,
+									int openMode, fs_cookie* cookie);
+			status_t			CloseAttr(fs_vnode node, fs_cookie cookie);
+			status_t			FreeAttrCookie(fs_vnode node, fs_cookie cookie);
 			status_t			ReadAttr(fs_vnode node, fs_cookie cookie,
 									off_t pos, void* buffer, size_t bufferSize,
 									size_t* bytesRead);
@@ -176,6 +183,9 @@ private:
 			status_t			_CloseAttrDir(fs_vnode node, fs_cookie cookie);
 			status_t			_FreeAttrDirCookie(fs_vnode node,
 									fs_cookie cookie);
+			status_t			_CloseAttr(fs_vnode node, fs_cookie cookie);
+			status_t			_FreeAttrCookie(fs_vnode node,
+									fs_cookie cookie);
 			status_t			_CloseIndexDir(fs_cookie cookie);
 			status_t			_FreeIndexDirCookie(fs_cookie cookie);
 			status_t			_CloseQuery(fs_cookie cookie);
@@ -208,6 +218,7 @@ private:
 			vint32				fOpenFiles;
 			vint32				fOpenDirectories;
 			vint32				fOpenAttributeDirectories;
+			vint32				fOpenAttributes;
 			vint32				fOpenIndexDirectories;
 			vint32				fOpenQueries;
 			VNodeCountMap*		fVNodeCountMap;
