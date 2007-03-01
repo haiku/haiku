@@ -11,7 +11,7 @@
 
 #include <KernelExport.h>
 #include <GraphicsDefs.h>
-
+#include "AGP.h"
 
 // logging helpers
 extern int debug_level_flow;
@@ -108,6 +108,7 @@ typedef struct device_info {
 	bool		new_pll;
 	bool		has_vip;
 	bool		is_igp;
+	bool		has_no_i2c;
 	//display_type_e disp_type[2];
 	fp_info		fp_info;
 	
@@ -116,7 +117,8 @@ typedef struct device_info {
 	char		ram_type[32];	// human-readable name of ram type
 	uint32		local_mem_size;
 
-	rom_info	rom;		
+	rom_info	rom;
+	bool 		is_atombios;	// legacy ROM, or "AtomBios"
 	
 	GART_info	pci_gart;		// PCI GART
 	GART_info	agp_gart;		// AGP GART (unsupported)

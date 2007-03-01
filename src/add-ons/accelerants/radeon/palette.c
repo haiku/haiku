@@ -14,7 +14,7 @@
 #include "GlobalData.h"
 #include "dac_regs.h"
 #include "CP.h"
-
+#include "generic.h"
 
 // Radeon's DACs share same public registers, this function
 // selects the DAC you'll talk to

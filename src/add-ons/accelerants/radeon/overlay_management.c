@@ -14,6 +14,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include "overlay_regs.h"
+#include "generic.h"
 
 // we could add support of planar modes and YUV modes
 // but I neither know how planar modes are defined nor
@@ -148,7 +149,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER( color_space cs, uint16 width, uin
 	node->mem_handle = am.handle;
 	node->mem_offset = am.offset;
 	buffer->buffer = si->local_mem + am.offset;
-	buffer->buffer_dma = si->framebuffer_pci + am.offset;
+	buffer->buffer_dma = (void *) ((unsigned long) si->framebuffer_pci + am.offset);
 	
 	// add to list of overlays
 	node->next = vc->overlay_buffers;

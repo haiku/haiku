@@ -16,11 +16,13 @@
 #include "config_regs.h"
 #include "ddc_regs.h"
 #include "gpiopad_regs.h"
+#include "fp_regs.h"
 #include "pll_access.h"
 #include "theatre_regs.h"
 #include "set_mode.h"
 #include "ddc.h"
 #include <malloc.h>
+#include "string.h"
 
 typedef struct {
 	accelerator_info *ai;
@@ -294,34 +296,31 @@ static bool Radeon_DetectTVCRT_R300( accelerator_info *ai )
 // check whether there is a CRT connected to TV-DAC
 static bool Radeon_DetectTVCRT( accelerator_info *ai )
 {
+	if (ai->si->is_mobility)
+		return dd_none;
+		
 	switch( ai->si->asic ) {
 	case rt_r100:
-	case rt_m6:
-	case rt_m7:
-	case rt_m9:
-	case rt_m9plus:
-	case rt_m10:
 		// original Radeons have pure DVI only and mobility chips
 		// have no DVI connector
 		// TBD: can they have a docking station for CRT on TV-DAC?
 		return dd_none;
 		
-	case rt_ve:
+	case rt_rv100:
 	case rt_rv200:
 	case rt_rv250:
 	case rt_rv280:
 	// IGP is guessed
 	case rt_rs100:
 	case rt_rs200:
+	case rt_rs300:
 		return Radeon_DetectTVCRT_RV200( ai );
 		
 	case rt_r300:
-	case rt_r300_4p:
-	case rt_rv350:
-	case rt_rv360:
 	case rt_r350:
-	case rt_r360:
-	case rt_m11:
+	case rt_rv350:
+	case rt_rv380:
+	case rt_r420:
 		return Radeon_DetectTVCRT_R300( ai );
 		
 	case rt_r200:
@@ -662,27 +661,21 @@ static display_device_e Radeon_DetectTV( accelerator_info *ai, bool tv_crt_found
 	case rt_r200:
 		return Radeon_DetectTV_Theatre( ai );
 		
-	case rt_ve:
-	case rt_m6:
+	case rt_rv100:
 	case rt_rv200:
-	case rt_m7:
 	case rt_rv250:
-	case rt_m9:
 	case rt_rv280:
-	case rt_m9plus:
 	// IGP method is guessed
 	case rt_rs100:
 	case rt_rs200:
+	case rt_rs300:
 		return Radeon_DetectTV_RV200( ai, tv_crt_found );
 		
 	case rt_r300:
-	case rt_r300_4p:
-	case rt_rv350:
-	case rt_rv360:
-	case rt_m10:
-	case rt_m11:
 	case rt_r350:
-	case rt_r360:
+	case rt_rv350:
+	case rt_rv380:
+	case rt_r420:
 		return Radeon_DetectTV_R300( ai );
 	}
 			
@@ -812,8 +805,8 @@ static status_t Radeon_StoreFPEDID( accelerator_info *ai, const edid1_info *edid
 	fp_info *fp = &ai->si->flatpanels[0];
 	uint32 max_hsize, max_vsize;
 
-	SHOW_FLOW0( 2, "EDID data read from DVI port via DDC2:" );
-	edid_dump( edid );
+	//SHOW_FLOW0( 2, "EDID data read from DVI port via DDC2:" );
+	//edid_dump( edid );
 
 	// find detailed timing with maximum resolution
 	max_hsize = max_vsize = 0;

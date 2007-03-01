@@ -17,8 +17,10 @@
 #include "bios_regs.h"
 #include "config_regs.h"
 #include "memcntrl_regs.h"
+#include "buscntrl_regs.h"
 #include "fp_regs.h"
 #include "crtc_regs.h"
+#include "ddc_regs.h"
 #include "radeon_bios.h"
 #include "utils.h"
 
@@ -483,7 +485,7 @@ static void Radeon_DetectRAM( device_info *di )
 	else {
 		uint32 tom;
 		
-		tom = INREG( regs, RADEON_GC_NB_TOM );
+		tom = INREG( regs, RADEON_NB_TOM );
 		di->local_mem_size = ((tom >> 16) + 1 - (tom & 0xffff)) << 16;
 	}
 

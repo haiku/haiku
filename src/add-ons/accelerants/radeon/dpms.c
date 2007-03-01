@@ -16,6 +16,7 @@
 #include "tv_out_regs.h"
 #include "theatre_regs.h"
 #include "GlobalData.h"
+#include "generic.h"
 
 
 // public function: set DPMS mode
@@ -78,13 +79,13 @@ static void Radeon_SetDPMS_LVDS( accelerator_info *ai, int mode )
 		old_pixclks_cntl = Radeon_INPLL( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL);
 		
 		// ASIC bug: when LVDS_ON is reset, LVDS_ALWAYS_ON must be zero
-		if( ai->si->is_mobility || ai->si->asic == rt_rs100 ) 
+		if( ai->si->is_mobility || ai->si->is_igp ) 
 			Radeon_OUTPLLP( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL, 0, ~RADEON_PIXCLK_LVDS_ALWAYS_ONb );
 
 		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, RADEON_LVDS_DISPLAY_DIS,
 			~(RADEON_LVDS_DISPLAY_DIS | RADEON_LVDS_BLON | RADEON_LVDS_ON) );
 			
-		if( ai->si->is_mobility || ai->si->asic == rt_rs100 ) 
+		if( ai->si->is_mobility || ai->si->is_igp ) 
 			Radeon_OUTPLL( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL, old_pixclks_cntl );
 
 		break; }

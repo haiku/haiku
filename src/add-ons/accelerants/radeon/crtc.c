@@ -12,6 +12,7 @@
 #include "crtc_regs.h"
 #include "GlobalData.h"
 #include "set_mode.h"
+#include "generic.h"
 
 
 // hammer CRTC registers

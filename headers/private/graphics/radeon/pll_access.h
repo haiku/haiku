@@ -13,10 +13,15 @@
 #include "mmio.h"
 
 
-// r300: to be called after each CLOCK_CNTL_INDEX access;
+// to be called after each CLOCK_CNTL_INDEX access;
 // all functions declared in this header take care of that
 // (hardware bug fix suggested by XFree86)
-void R300_PLLFix( vuint8 *regs, radeon_type asic );
+void RADEONPllErrataAfterIndex( vuint8 *regs, radeon_type asic );
+
+// to be called after each CLOCK_CNTL_DATA access;
+// all functions declared in this header take care of that
+// (hardware bug fix suggested by XFree86)
+void RADEONPllErrataAfterData( vuint8 *regs, radeon_type asic );
 
 // in general:
 // - the PLL is connected via special port

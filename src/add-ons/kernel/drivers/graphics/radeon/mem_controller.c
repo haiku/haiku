@@ -17,6 +17,7 @@
 
 #include "radeon_driver.h"
 #include "buscntrl_regs.h"
+#include "config_regs.h"
 #include "mmio.h"
 #include "memcntrl_regs.h"
 
@@ -109,7 +110,7 @@ static void Radeon_SetupMCAddresses_IGP( device_info *di )
 	
 	// the frame buffer memory address range is read from TOM register
 	// it located at end of physical RAM (at least it seems so)
-	tom = INREG( di->regs, RADEON_GC_NB_TOM );
+	tom = INREG( di->regs, RADEON_NB_TOM );
 	si->memory[mt_local].virtual_addr_start = (tom & 0xffff) << 16;
 	si->memory[mt_local].virtual_size =
 		(((tom >> 16) + 1) << 16) -

@@ -27,6 +27,8 @@
 #include "pll_regs.h"
 #include "rbbm_regs.h"
 #include "buscntrl_regs.h"
+#include "config_regs.h"
+#include "memcntrl_regs.h"
 #include "utils.h"
 #include "pll_access.h"
 
@@ -209,28 +211,9 @@ void Radeon_ResetEngine( device_info *di )
 	Radeon_FlushPixelCache( di );
 
 	clock_cntl_index = INREG( regs, RADEON_CLOCK_CNTL_INDEX );
-	R300_PLLFix( di->regs, di->asic );
-	
-	// OUCH!
-	// XFree disables any kind of automatic power power management 
-	// because of bugs of some ASIC revision (seems like the revisions
-	// cannot be read out)
-	// -> this is a very bad idea, especially when it comes to laptops
-	// I comment it out for now, let's hope noone takes notice
-    if( di->num_crtc > 1 ) {
-		Radeon_OUTPLLP( regs, di->asic, RADEON_SCLK_CNTL, 
-			RADEON_CP_MAX_DYN_STOP_LAT |
-			RADEON_SCLK_FORCEON_MASK,
-			~RADEON_DYN_STOP_LAT_MASK );
-	
-/*		if( ai->si->asic == rt_rv200 ) {
-		    Radeon_OUTPLLP( ai, RADEON_SCLK_MORE_CNTL, 
-		    	RADEON_SCLK_MORE_FORCEON, ~0 );
-		}*/
-    }
-
+	RADEONPllErrataAfterIndex( regs, di->asic );	// drm has no errata here!
 	mclk_cntl = Radeon_INPLL( regs, di->asic, RADEON_MCLK_CNTL );
-
+			
 	// enable clock of units to be reset
 	Radeon_OUTPLL( regs, di->asic, RADEON_MCLK_CNTL, mclk_cntl |
       RADEON_FORCEON_MCLKA |
@@ -288,7 +271,7 @@ void Radeon_ResetEngine( device_info *di )
 	OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset);
 
 	OUTREG( regs, RADEON_CLOCK_CNTL_INDEX, clock_cntl_index );
-	R300_PLLFix( regs, di->asic );
+	//R300_PLLFix( regs, di->asic );
 	Radeon_OUTPLL( regs, di->asic, RADEON_MCLK_CNTL, mclk_cntl );
 	
 	// reset ring buffer
@@ -323,17 +306,13 @@ static void loadMicroEngineRAMData( device_info *di )
 	
 	switch( di->asic ) {
 	case rt_r300:
-	case rt_r300_4p:
 	case rt_rv350:
-	case rt_rv360:
-	case rt_m11:
 	case rt_r350:
-	case rt_r360:
+	case rt_rv380:
+	case rt_r420:
 		microcode = r300_cp_microcode;
 		break;
 	case rt_r200:
-	//case rt_rv250:
-	//case rt_m9:
 		microcode = r200_cp_microcode;
 		break;
 	case rt_rs100:
@@ -342,16 +321,6 @@ static void loadMicroEngineRAMData( device_info *di )
 	}
 
 	Radeon_WaitForIdle( di, false, false );
-
-/*	
-	// HACK start
-	Radeon_ResetEngine( di );
-	OUTREG( di->regs, 0x30, 0x5133a3a0 );	// bus_cntl
-	OUTREGP( di->regs, 0xf0c, 0xff00, ~0xff );	// latency
-	Radeon_WaitForIdle( di, false, false );
-	Radeon_ResetEngine( di );
-	// HACK end
-*/
 
 	OUTREG( di->regs, RADEON_CP_ME_RAM_ADDR, 0 );
 	

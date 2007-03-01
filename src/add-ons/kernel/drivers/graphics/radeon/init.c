@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2002-2004, Thomas Kurschel
+ * Copyright (c) 2006-2007, Euan Kirkhope
+ *
  * Distributed under the terms of the MIT license.
  */
 
@@ -13,8 +15,9 @@
 */
 
 #include "dac_regs.h"
-#include "radeon_driver.h"
+#include "fp_regs.h"
 #include "mmio.h"
+#include "radeon_driver.h"
 
 #include <PCI.h>
 
@@ -242,6 +245,12 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->is_mobility = di->is_mobility;
 	si->tv_chip = di->tv_chip;
 	si->new_pll = di->new_pll;
+	si->is_igp = di->is_igp;
+	si->has_no_i2c = di->has_no_i2c;
+	si->is_atombios = di->is_atombios;
+	si->is_mobility = di->is_mobility;
+	si->panel_pwr_delay = di->si->panel_pwr_delay;
+
 	
 	// detecting theatre channel in kernel would lead to code duplication,
 	// so we let the first accelerant take care of it
@@ -302,7 +311,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	// save dac2_cntl register
 	// on M6, we need to restore that during uninit, else you only get
 	// garbage on screen on reboot if both CRTCs are used
-	if( di->asic == rt_m6 )
+	if( di->asic == rt_rv100 && di->is_mobility)
 		di->dac2_cntl = INREG( di->regs, RADEON_DAC_CNTL2 );
 	
 	result = Radeon_InitPCIGART( di );
@@ -347,7 +356,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	di->memmgr[mt_AGP] = NULL;
 	
 	// fix AGP settings for IGP chipset
-	if( di->asic == rt_rs100 || di->asic == rt_rs200 )
+	if( di->asic == rt_rs100 || di->asic == rt_rs200 || di->asic == rt_rs300)
 		Radeon_Fix_AGP();
 
 	// time to init Command Processor
@@ -397,9 +406,9 @@ void Radeon_LastClose( device_info *di )
 
 	// M6 fix - unfortunately, the device is never closed by app_server,
 	// not even before reboot
-	if( di->asic == rt_m6 )
-		OUTREG( di->regs, RADEON_DAC_CNTL2, di->dac2_cntl );
-		
+	if( di->asic == rt_rv100 && di->is_mobility)
+		OUTREG( di->regs, RADEON_DAC_CNTL2, di->dac2_cntl );	
+
 
 	mem_destroy( di->memmgr[mt_local] );
 	

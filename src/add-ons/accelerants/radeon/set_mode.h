@@ -25,19 +25,19 @@ typedef struct {
 // TV-timing
 typedef struct {
 	uint32 freq;				// TV sub carrier frequency x12
-    uint16 h_total;
-    uint16 h_sync_len;
-    uint16 h_genclk_delay;
-    uint16 h_setup_delay;
-    uint16 h_active_delay;
-    uint16 h_active_len;
-    uint16 v_total;
-    uint16 v_active_lines;
-    uint16 v_field_total;
-    uint16 v_fields;
-    uint16 f_total;
-    uint16 frame_size_adjust;
-    uint32 scale;
+	uint16 h_total;
+	uint16 h_sync_len;
+	uint16 h_genclk_delay;
+	uint16 h_setup_delay;
+	uint16 h_active_delay;
+	uint16 h_active_len;
+	uint16 v_total;
+	uint16 v_active_lines;
+	uint16 v_field_total;
+	uint16 v_fields;
+	uint16 f_total;
+	uint16 frame_size_adjust;
+	uint32 scale;
 } tv_timing;
 
 
@@ -64,7 +64,7 @@ typedef struct {
 	pll_dividers	tv_dividers;
 	pll_dividers	crt_dividers;
 	
-	tv_timing timing;
+	tv_timing		timing;
 } impactv_params;
 
 
@@ -88,9 +88,9 @@ typedef struct {
 	
 	// pure information
 	uint32		dot_clock_freq;	// in 10 kHz
-    uint32		pll_output_freq;// in 10 kHz
-    int			feedback_div;
-    int			post_div;
+	uint32		pll_output_freq;// in 10 kHz
+	int			feedback_div;
+	int			post_div;
 } pll_regs;
 
 

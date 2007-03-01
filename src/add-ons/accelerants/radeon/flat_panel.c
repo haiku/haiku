@@ -13,6 +13,8 @@
 #include "memcntrl_regs.h"
 #include "utils.h"
 #include "set_mode.h"
+#include "pll_regs.h"
+#include "pll_access.h"
 
 
 void Radeon_ReadRMXRegisters( 
@@ -125,7 +127,7 @@ void Radeon_ReadFPRegisters(
 	values->fp2_h_sync_strt_wid = INREG( regs, RADEON_FP_H2_SYNC_STRT_WID );
 	values->fp2_v_sync_strt_wid = INREG( regs, RADEON_FP_V2_SYNC_STRT_WID );
 
-    SHOW_FLOW( 2, "before: fp_gen_cntl=%lx, horz=%lx, vert=%lx, lvds_gen_cntl=%lx",
+    SHOW_FLOW( 2, "before: fp_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
     	values->fp_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
     	values->lvds_gen_cntl );
 }
@@ -185,7 +187,7 @@ void Radeon_CalcFPRegisters(
 			values->fp2_gen_cntl |= RADEON_FP2_DV0_EN;
 	}
 		
-    SHOW_FLOW( 2, "after: fp_gen_cntl=%lx, horz=%lx, vert=%lx, lvds_gen_cntl=%lx",
+    SHOW_FLOW( 2, "after: fp_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
     	values->fp_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
     	values->lvds_gen_cntl );
 }

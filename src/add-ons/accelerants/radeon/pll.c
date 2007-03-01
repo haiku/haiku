@@ -477,6 +477,8 @@ void Radeon_ProgramPLL(
     OUTREGP( regs, RADEON_CLOCK_CNTL_INDEX,
 	    RADEON_PLL_DIV_SEL_DIV3,
 	    ~RADEON_PLL_DIV_SEL_MASK );
+	   
+	RADEONPllErrataAfterIndex(regs, asic);
 
 	if( ai->si->new_pll && crtc_idx == 0 ) {
 		// starting with r300, the reference divider of the first PLL was 

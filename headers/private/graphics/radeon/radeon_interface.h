@@ -17,7 +17,7 @@
 #include <OS.h>
 #include "video_overlay.h"
 #include "benaphore.h"
-
+#include "ddc.h"
 
 // magic code for ioctls
 #define RADEON_PRIVATE_DATA_MAGIC	'TKRA'
@@ -94,31 +94,46 @@ typedef enum {
 // type of ASIC
 typedef enum {
 	rt_r100,		// original Radeon
-	rt_ve,			// original VE version
-	rt_m6,			// original mobile Radeon
+	rt_rv100,		// original VE version
 	rt_rs100,		// IGP 320M
 	rt_rv200,		// Radeon 7500
-	rt_m7,			// mobile Radeon 7500
 	rt_rs200,		// IGP 330M/340M/350M
 	rt_r200,		// Radeon 8500/9100
 	rt_rv250,		// Radeon 9000
-	rt_m9,			// mobile Radeon 9000
-	rt_rv280,		// Radeon 9200
-	rt_m9plus,		// mobile Radeon 9200
-	
-	// from here on, r300 and up must be located as ATI modified the PLL
-	// with r300 and the code only tests for >= rt_r300
+	rt_rs300,		// IGP rs300
+	rt_rv280,		// Radeon 9200	
+	// from here on, r300 and up must be located as ATI modified the 
+	// PLL design and the PLL code only tests for >= rt_r300
 	rt_r300,		// Radeon 9700
-	rt_r300_4p,		// Radeon 9500
-	rt_rv350,		// Radeon 9600
-	rt_m10,			// mobile Radeon 9600
-	rt_rv360,		// Radeon 9600
 	rt_r350,		// Radeon 9800
-	rt_r360,		// Radeon 9800
-	rt_m11			// Radeon 9700 Mobility
+	rt_rv350,		// Radeon 9600
+	rt_rv380,		// X600
+	rt_r420			// X800
 } radeon_type;
 
+#define IS_RV100_VARIANT ( \
+		(ai->si->asic == rt_rv100)  ||  \
+        (ai->si->asic == rt_rv200)  ||  \
+        (ai->si->asic == rt_rs100)  ||  \
+        (ai->si->asic == rt_rs200)  ||  \
+        (ai->si->asic == rt_rv250)  ||  \
+        (ai->si->asic == rt_rv280)  ||  \
+        (ai->si->asic == rt_rs300))
 
+#define IS_DI_R300_VARIANT ( \
+		(di->asic == rt_r300)  ||  \
+        (di->asic == rt_r350)  || \
+        (di->asic == rt_rv350) || \
+        (di->asic == rt_rv380) || \
+        (di->asic == rt_r420))
+        
+#define IS_R300_VARIANT ( \
+		(ai->si->asic == rt_r300)  ||  \
+        (ai->si->asic == rt_r350)  || \
+        (ai->si->asic == rt_rv350) || \
+        (ai->si->asic == rt_rv380) || \
+        (ai->si->asic == rt_r420))
+        
 // TV standard
 typedef enum {
 	ts_off,
@@ -390,22 +405,25 @@ typedef struct {
 		benaphore	lock;		// engine lock
 	} engine;	
 
-	uint16		vendor_id;	// PCI vendor id
-	uint16		device_id;	// PCI device id
-	uint8		revision;	// PCI device revision
+	uint16		vendor_id;		// PCI vendor id
+	uint16		device_id;		// PCI device id
+	uint8		revision;		// PCI device revision
 	
-	//bool 		has_crtc2;	// has second CRTC
-	radeon_type	asic;		// ASIC version
-	bool		is_mobility; // mobility version
-	tv_chip_type tv_chip;	// type of TV-Out encoder
-	bool		new_pll;	// r300 style PLL
-	
-	uint8		theatre_channel;	// VIP channel of Rage Theatre (if applicable)
+	//bool 		has_crtc2;		// has second CRTC
+	radeon_type	asic;			// ASIC version
+	bool		is_mobility;	// mobility version
+	bool		is_igp;			//	might need to know if it's an integrated chip
+	bool		is_atombios;
+	tv_chip_type tv_chip;		// type of TV-Out encoder
+	bool		new_pll;		// r300 style PLL
+	bool		has_no_i2c; 	// I2C is broken
+	uint16		panel_pwr_delay;// delay for LCD backlight to stabilise
+	uint8		theatre_channel;// VIP channel of Rage Theatre (if applicable)
 		
 	general_pll_info	pll;
 	
-	area_id		regs_area;	// area of memory mapped registers
-	area_id		ROM_area;	// area of ROM
+	area_id		regs_area;		// area of memory mapped registers
+	area_id		ROM_area;		// area of ROM
 	//area_id		fb_area;	// area of frame buffer
 	void		*framebuffer_pci;	// physical address of frame buffer (aka local memory)
 								// this is a hack needed by BeOS

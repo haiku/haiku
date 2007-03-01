@@ -9,6 +9,9 @@
 
 #include "radeon_accelerant.h"
 #include <sys/ioctl.h>
+#include "rbbm_regs.h"
+#include "mmio.h"
+
 
 status_t Radeon_WaitForIdle( accelerator_info *ai, bool keep_lock )
 {

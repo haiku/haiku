@@ -11,9 +11,16 @@
 #define _CONFIG_REGS_H
 
 // mmio registers
+#define RADEON_CONFIG_APER_0_BASE           0x0100
+#define RADEON_CONFIG_APER_1_BASE           0x0104
+#define RADEON_CONFIG_APER_SIZE             0x0108
+
 #define RADEON_CONFIG_CNTL                  0x00e0
-#define		RADEON_CFG_ATI_REV_ID_SHIFT		16
-#define		RADEON_CFG_ATI_REV_ID_MASK		(0xf << 16)
+#       define RADEON_CFG_ATI_REV_A11       (0   << 16)
+#       define RADEON_CFG_ATI_REV_A12       (1   << 16)
+#       define RADEON_CFG_ATI_REV_A13       (2   << 16)
+#       define RADEON_CFG_ATI_REV_ID_MASK   (0xf << 16)
+#define	RADEON_CFG_ATI_REV_ID_SHIFT		16
 #define RADEON_CONFIG_MEMSIZE               0x00f8
 #       define RADEON_CONFIG_MEMSIZE_MASK   0x1ff00000
 

@@ -78,7 +78,7 @@ extern const size_t vesa_mode_list_count;
 // SetDisplayMode.c
 uint32 Radeon_RoundVWidth( int virtual_width, int bpp );
 status_t Radeon_MoveDisplay( accelerator_info *ai, uint16 h_display_start, uint16 v_display_start );
-
+void Radeon_EnableIRQ( accelerator_info *ai, bool enable );
 
 // multimon.c
 void Radeon_HideMultiMode( virtual_card *vc, display_mode *mode );
@@ -130,7 +130,7 @@ void Radeon_WriteSettings( virtual_card *vc );
 // overlay.c
 void Radeon_HideOverlay( accelerator_info *ai );
 status_t Radeon_UpdateOverlay( accelerator_info *ai );
-
+void Radeon_InitOverlay( accelerator_info *ai, int crtc_idx );
 
 // EngineManagement.c
 void Radeon_Spin( uint32 delay );
@@ -138,6 +138,7 @@ void Radeon_Spin( uint32 delay );
 
 // monitor_detection.c
 void Radeon_DetectDisplays( accelerator_info *ai );
+bool Radeon_ReadEDID( accelerator_info *ai, uint32 ddc_port, edid1_info *edid );
 
 
 // palette.c

@@ -20,11 +20,15 @@
 #include "overlay_regs.h"
 #include "rbbm_regs.h"
 #include "dac_regs.h"
+#include "fp_regs.h"
+#include "gpiopad_regs.h"
 
 #include "set_mode.h"
 
 #include <string.h>
 
+void Radeon_SetMode( 
+	accelerator_info *ai, crtc_info *crtc, display_mode *mode, impactv_params *tv_params );
 
 // round virtual width up to next valid size
 uint32 Radeon_RoundVWidth( 

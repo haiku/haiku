@@ -40,14 +40,14 @@
 #       define  RADEON_SCALER_ADAPTIVE_DEINT       0x00001000L
 #       define  R200_SCALER_TEMPORAL_DEINT         0x00002000L
 #       define  RADEON_SCALER_CRTC_SEL             0x00004000L
-//#       define  RADEON_SCALER_SMART_SWITCH         0x00008000L
+#       define  RADEON_SCALER_SMART_SWITCH         0x00008000L
 #       define  RADEON_SCALER_BURST_PER_PLANE      0x007F0000L
 #       define  RADEON_SCALER_DOUBLE_BUFFER        0x01000000L
 #       define  RADEON_SCALER_DIS_LIMIT            0x08000000L
+#		define  RADEON_SCALER_LIN_TRANS_BYPASS	   0x10000000L
 #       define  RADEON_SCALER_INT_EMU              0x20000000L
 #       define  RADEON_SCALER_ENABLE               0x40000000L
 #       define  RADEON_SCALER_SOFT_RESET           0x80000000L
-#       define  RADEON_SCALER_ADAPTIVE_DEINT       0x00001000L
 #define RADEON_OV0_V_INC                    0x0424
 #define RADEON_OV0_P1_V_ACCUM_INIT          0x0428
 #       define  RADEON_OV0_P1_MAX_LN_IN_PER_LN_OUT 0x00000003L

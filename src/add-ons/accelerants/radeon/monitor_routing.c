@@ -37,16 +37,13 @@ void Radeon_ReadMonitorRoutingRegs(
 	values->vclk_ecp_cntl = Radeon_INPLL( ai->regs, ai->si->asic, RADEON_VCLK_ECP_CNTL );
 	
 	switch( ai->si->asic ) {
-	case rt_ve:
-	case rt_m6:
+	case rt_rv100:
 	case rt_rv200:	
-	case rt_m7:
 	case rt_rv250:
-	case rt_m9:
 	case rt_rv280:
-	case rt_m9plus:
 	case rt_rs100:
 	case rt_rs200:
+	case rt_rs300:
 		values->disp_hw_debug = INREG( regs, RADEON_DISP_HW_DEBUG );
 		break;
 
@@ -55,13 +52,10 @@ void Radeon_ReadMonitorRoutingRegs(
 		break;
 
 	case rt_r300:
-	case rt_r300_4p:
 	case rt_rv350:
-	case rt_m10:
-	case rt_rv360:
 	case rt_r350:
-	case rt_r360:
-	case rt_m11:
+	case rt_rv380:
+	case rt_r420:
 		values->gpiopad_a = INREG( regs, RADEON_GPIOPAD_A );
 		break;
 		
@@ -137,29 +131,23 @@ void Radeon_CalcMonitorRouting(
 		values->crtc_ext_cntl |= RADEON_CRTC_CRT_ON;
 
 		switch( ai->si->asic ) {
-		case rt_ve:
-		case rt_m6:
-		case rt_rv200:	
-		case rt_m7:
+		case rt_rv100:
+		case rt_rv200:
 		case rt_rv250:
-		case rt_m9:
 		case rt_rv280:
-		case rt_m9plus:
 		case rt_rs100:
 		case rt_rs200:
+		case rt_rs300:
 			values->dac_cntl2 &= ~RADEON_DAC_CLK_SEL_MASK;
 			values->dac_cntl2 |= crtc_idx == 0 ? 0 : RADEON_DAC_CLK_SEL_CRTC2;
 			break;
 
 		case rt_r200:
 		case rt_r300:
-		case rt_r300_4p:
 		case rt_rv350:
-		case rt_m10:
-		case rt_m11:
-		case rt_rv360:
 		case rt_r350:
-		case rt_r360:
+		case rt_rv380:
+		case rt_r420:
 			values->disp_output_cntl &= ~RADEON_DISP_DAC_SOURCE_MASK;
 			values->disp_output_cntl |=
 				(crtc_idx == 0 ? 0 : RADEON_DISP_DAC_SOURCE_CRTC2);
@@ -203,22 +191,9 @@ void Radeon_CalcMonitorRouting(
 			(2 << RADEON_TV_DAC_CNTL_DACADJ_SHIFT);
 		
 		// at least r300 needs magic bit set to switch between TV-CRT and TV-Out
-		switch( ai->si->asic ) {
-			case rt_r200:
-			case rt_r300:
-			case rt_r300_4p:
-			case rt_rv350:
-			case rt_m10:
-			case rt_m11:
-			case rt_rv360:
-			case rt_r350:
-			case rt_r360:
+		if (IS_R300_VARIANT)
 				values->gpiopad_a |= 1;
-				break;
-			default:
-				;
-		}
-		
+				
 	} else if( (controlled_devices & dd_tv_crt) != 0 ) {
 		values->crtc2_gen_cntl &= ~RADEON_CRTC2_CRT2_ON;
 	}
@@ -239,21 +214,9 @@ void Radeon_CalcMonitorRouting(
 		values->dac_cntl2 |= RADEON_DAC2_CLK_SEL_TV;
 		
 		// at least r300 needs magic bit set to switch between TV-CRT and TV-Out
-		switch( ai->si->asic ) {
-			case rt_r200:
-			case rt_r300:
-			case rt_r300_4p:
-			case rt_rv350:
-			case rt_rv360:
-			case rt_m10:
-			case rt_m11:
-			case rt_r350:
-			case rt_r360:
+		if(IS_R300_VARIANT)
 				values->gpiopad_a &= ~1;
-				break;
-			default:
-				;
-		}
+		
 		
 		// the TV-DAC itself is under control of the TV-Out code
 		values->skip_tv_dac = true;
@@ -330,17 +293,14 @@ void Radeon_CalcMonitorRouting(
 		int crtc_idx = (display_devices[1] & (dd_tv_crt | dd_ctv | dd_stv)) != 0;
 		
 		switch( ai->si->asic ) {
-		case rt_ve:
-		case rt_m6:
+		case rt_rv100:
 		case rt_rv200:	
-		case rt_m7:
 		case rt_rv250:
-		case rt_m9:
 		case rt_rv280:
-		case rt_m9plus:
 		case rt_rs100:
 		case rt_rs200:
-			values->disp_hw_debug &= ~RADEON_CRT2_DISP1_SEL;
+		case rt_rs300:
+					values->disp_hw_debug &= ~RADEON_CRT2_DISP1_SEL;
 			// warning: meaning is wrong way around - 0 means crtc2, 1 means crtc1
 			values->disp_hw_debug |= crtc_idx == 0 ? RADEON_CRT2_DISP1_SEL : 0;
 			break;
@@ -354,13 +314,10 @@ void Radeon_CalcMonitorRouting(
 			break;
 
 		case rt_r300:
-		case rt_r300_4p:
 		case rt_rv350:
-		case rt_m10:
-		case rt_m11:
-		case rt_rv360:
 		case rt_r350:
-		case rt_r360:
+		case rt_rv380:
+		case rt_r420:
 			values->disp_output_cntl &= ~RADEON_DISP_TVDAC_SOURCE_MASK;
 			values->disp_output_cntl |=
 				crtc_idx == 0 ? 0 : RADEON_DISP_TVDAC_SOURCE_CRTC2;
@@ -444,7 +401,8 @@ void Radeon_CalcMonitorRouting(
 		case rt_r300:
 		case rt_r350:
 		case rt_rv350:	
-		case rt_m10:
+		case rt_rv380:
+		case rt_r420:
 			values->fp2_gen_cntl &= ~RADEON_FP2_SOURCE_SEL_CRTC2;
 		    values->fp2_gen_cntl |= 
 		    	crtc_idx == 0 ? 0 : RADEON_FP2_SOURCE_SEL_CRTC2;
@@ -470,16 +428,13 @@ void Radeon_ProgramMonitorRouting(
 	OUTREG( regs, RADEON_DISP_OUTPUT_CNTL, values->disp_output_cntl );
 
 	switch( ai->si->asic ) {
-	case rt_ve:
-	case rt_m6:
+	case rt_rv100:
 	case rt_rv200:	
-	case rt_m7:
 	case rt_rv250:
-	case rt_m9:
 	case rt_rv280:
-	case rt_m9plus:
 	case rt_rs100:
 	case rt_rs200:
+	case rt_rs300:
 		OUTREG( regs, RADEON_DISP_HW_DEBUG, values->disp_hw_debug );
 		break;
 		
@@ -488,13 +443,10 @@ void Radeon_ProgramMonitorRouting(
 		break;
 
 	case rt_r300:
-	case rt_r300_4p:
 	case rt_rv350:
-	case rt_m10:
-	case rt_m11:
-	case rt_rv360:
 	case rt_r350:
-	case rt_r360:
+	case rt_rv380:
+	case rt_r420:
 		OUTREGP( regs, RADEON_GPIOPAD_A, values->gpiopad_a, ~1 );
 		break;
 		
@@ -589,7 +541,7 @@ void Radeon_ProgramMonitorRouting(
 
 // internal version of SetupDefaultMonitorRouting;
 // input and output are written to local variables
-void assignDefaultMonitorRoute( 
+static void assignDefaultMonitorRoute( 
 	accelerator_info *ai,
 	display_device_e display_devices, int whished_num_heads, bool use_laptop_panel,
 	display_device_e *crtc1, display_device_e *crtc2 )

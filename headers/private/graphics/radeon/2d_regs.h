@@ -183,7 +183,7 @@
 #define RADEON_DST_LINE_START               0x1600
 #define RADEON_DST_LINE_END                 0x1604
 #define RADEON_DST_LINE_PATCOUNT            0x1608
-
+#		define RADEON_BRES_CNTL_SHIFT		8
 #define RADEON_DEFAULT_OFFSET               0x16e0
 #define RADEON_DEFAULT_PITCH                0x16e4
 

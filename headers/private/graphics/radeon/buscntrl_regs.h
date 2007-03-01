@@ -56,6 +56,6 @@
 
 #define RADEON_HOST_PATH_CNTL               0x0130
 #       define RADEON_HDP_SOFT_RESET        (1 << 26)
-
+#       define RADEON_HDP_APER_CNTL         (1 << 23)
 
 #endif

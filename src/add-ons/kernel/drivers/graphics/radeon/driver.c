@@ -14,8 +14,11 @@
 #include <graphic_driver.h>
 #include <stdio.h>
 #include <string.h>
+#include "AGP.h"
 #include "mmio.h"
 #include "version.h"
+#include <driver_settings.h>
+#include <stdlib.h> // for strtoXX
 
 // tell the kernel what revision of the driver API we support
 int32	api_version = 2;

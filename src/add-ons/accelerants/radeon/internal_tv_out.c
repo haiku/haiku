@@ -122,6 +122,7 @@ static void writePLLRegList(
 
 
 // read timing FIFO
+#if 0
 static uint32 Radeon_InternalTVOutReadFIFO( 
 	accelerator_info *ai, uint16 addr )
 {
@@ -151,7 +152,7 @@ static uint32 Radeon_InternalTVOutReadFIFO(
 	
 	return res;
 }
-
+#endif
 
 // write to timing FIFO
 static void Radeon_InternalTVOutWriteFIFO( 
