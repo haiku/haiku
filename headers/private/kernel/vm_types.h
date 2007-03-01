@@ -158,6 +158,7 @@ typedef struct vm_area {
 
 	struct vm_cache_ref	*cache_ref;
 	off_t				cache_offset;
+	uint32				cache_type;
 	vm_area_mappings	mappings;
 
 	struct vm_address_space *address_space;

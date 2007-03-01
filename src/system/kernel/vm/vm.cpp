@@ -954,6 +954,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 
 	TRACE(("vm_create_anonymous_area: done\n"));
 
+	area->cache_type = CACHE_TYPE_RAM;
 	return area->id;
 
 err3:
@@ -1034,7 +1035,8 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 	cacheRef = cache->ref;
 
 	status = map_backing_store(addressSpace, cacheRef, _address, 0, size,
-		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
+		addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
+		REGION_NO_PRIVATE_MAP, &area, name);
 	if (status < B_OK)
 		vm_cache_release_ref(cacheRef);
 
@@ -1047,8 +1049,6 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 	}
 
 	if (status >= B_OK) {
-		mutex_lock(&cacheRef->lock);
-
 		// make sure our area is mapped in completely
 
 		vm_translation_map *map = &addressSpace->translation_map;
@@ -1060,7 +1060,6 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 		}
 
 		map->ops->unlock(map);
-		mutex_unlock(&cacheRef->lock);
 	}
 
 	vm_put_address_space(addressSpace);
@@ -1071,6 +1070,7 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 	// the same way the physical address in was offset
 	*_address = (void *)((addr_t)*_address + mapOffset);
 
+	area->cache_type = CACHE_TYPE_DEVICE;
 	return area->id;
 
 err3:
@@ -1132,6 +1132,7 @@ vm_create_null_area(team_id team, const char *name, void **address,
 		return status;
 	}
 
+	area->cache_type = CACHE_TYPE_NULL;
 	return area->id;
 
 err3:
@@ -1241,6 +1242,7 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 		goto err1;
 
 	vm_put_address_space(addressSpace);
+	area->cache_type = CACHE_TYPE_VNODE;
 	return area->id;
 
 err1:
@@ -1325,7 +1327,9 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 		status = B_NOT_ALLOWED;
 	} else
 #endif
-	{
+	if (sourceArea->cache_type == CACHE_TYPE_NULL)
+		status = B_NOT_ALLOWED;
+	else {
 		status = map_backing_store(addressSpace, sourceArea->cache_ref,
 			address, sourceArea->cache_offset, sourceArea->size, addressSpec,
 			sourceArea->wiring, protection, mapping, &newArea, name);
@@ -1337,6 +1341,42 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 		// one.
 		vm_cache_acquire_ref(sourceArea->cache_ref);
 	}
+	if (status == B_OK && newArea->wiring == B_FULL_LOCK) {
+		// we need to map in everything at this point
+		if (newArea->cache_type == CACHE_TYPE_DEVICE) {
+			// we don't have actual pages to map but a physical area
+			vm_translation_map *map = &addressSpace->translation_map;
+			map->ops->lock(map);
+
+			addr_t physicalAddress;
+			uint32 oldProtection;
+			map->ops->query(map, sourceArea->base, &physicalAddress,
+				&oldProtection);
+
+			for (addr_t offset = 0; offset < newArea->size;
+					offset += B_PAGE_SIZE) {
+				map->ops->map(map, newArea->base + offset,
+					physicalAddress + offset, protection);
+			}
+
+			map->ops->unlock(map);
+		} else {
+			// map in all pages from source
+			mutex_lock(&sourceArea->cache_ref->lock);
+
+			for (vm_page *page = sourceArea->cache_ref->cache->page_list;
+					page != NULL; page = page->cache_next) {
+				vm_map_page(newArea, page, newArea->base
+					+ ((page->cache_offset << PAGE_SHIFT) - newArea->cache_offset),
+					protection);
+			}
+
+			mutex_unlock(&sourceArea->cache_ref->lock);
+		}
+	}
+	if (status == B_OK)
+		newArea->cache_type = sourceArea->cache_type;
+
 	vm_cache_release_ref(sourceArea->cache_ref);
 
 	vm_put_area(sourceArea);
@@ -1796,7 +1836,7 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 
 	map->ops->lock(map);
 
-	if (area->wiring != B_NO_LOCK && area->cache_ref->cache->type != CACHE_TYPE_DEVICE) {
+	if (area->wiring != B_NO_LOCK && area->cache_type != CACHE_TYPE_DEVICE) {
 		// iterate through all pages and decrease their wired count
 		for (addr_t virtualAddress = base; virtualAddress < base + (size - 1);
 				virtualAddress += B_PAGE_SIZE) {
@@ -1986,7 +2026,7 @@ display_mem(int argc, char **argv)
 
 
 static const char *
-page_state_to_text(int state)
+page_state_to_string(int state)
 {
 	switch(state) {
 		case PAGE_STATE_ACTIVE:
@@ -2149,10 +2189,10 @@ dump_cache(int argc, char **argv)
 			if (page->type == PAGE_TYPE_PHYSICAL) {
 				kprintf("\t%p ppn 0x%lx offset 0x%lx type %u state %u (%s) wired_count %u\n",
 					page, page->physical_page_number, page->cache_offset, page->type, page->state,
-					page_state_to_text(page->state), page->wired_count);
+					page_state_to_string(page->state), page->wired_count);
 			} else if(page->type == PAGE_TYPE_DUMMY) {
 				kprintf("\t%p DUMMY PAGE state %u (%s)\n", 
-					page, page->state, page_state_to_text(page->state));
+					page, page->state, page_state_to_string(page->state));
 			} else
 				kprintf("\t%p UNKNOWN PAGE type %u\n", page, page->type);
 		}
@@ -2179,6 +2219,7 @@ _dump_area(vm_area *area)
 	kprintf("memory_type:\t0x%x\n", area->memory_type);
 	kprintf("ref_count:\t%ld\n", area->ref_count);
 	kprintf("cache_ref:\t%p\n", area->cache_ref);
+	kprintf("cache_type:\t%s\n", cache_type_to_string(area->cache_type));
 	kprintf("cache_offset:\t0x%Lx\n", area->cache_offset);
 	kprintf("cache_next:\t%p\n", area->cache_next);
 	kprintf("cache_prev:\t%p\n", area->cache_prev);
@@ -3476,15 +3517,11 @@ test_lock_memory(vm_address_space *addressSpace, addr_t address,
 
 	vm_area *area = vm_area_lookup(addressSpace, address);
 	if (area != NULL) {
-		mutex_lock(&area->cache_ref->lock);
-
 		// This determines if we need to lock the memory at all
-		needsLocking = area->cache_ref->cache->type != CACHE_TYPE_NULL
-			&& area->cache_ref->cache->type != CACHE_TYPE_DEVICE
+		needsLocking = area->cache_type != CACHE_TYPE_NULL
+			&& area->cache_type != CACHE_TYPE_DEVICE
 			&& area->wiring != B_FULL_LOCK
 			&& area->wiring != B_CONTIGUOUS;
-
-		mutex_unlock(&area->cache_ref->lock);
 	}
 
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
