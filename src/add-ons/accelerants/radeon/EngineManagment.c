@@ -65,21 +65,30 @@ static void writeSyncToken( accelerator_info *ai )
 	if( ai->si->engine.count == ai->si->engine.written )
 		return;
 
-	START_IB();
-
-	// flush pending data
-	WRITE_IB_REG( RADEON_RB2D_DSTCACHE_CTLSTAT, RADEON_RB2D_DC_FLUSH_ALL );
+	if( ai->si->acc_dma ) {
+		START_IB();
 	
-	// make sure commands are finished
-	WRITE_IB_REG( RADEON_WAIT_UNTIL, RADEON_WAIT_2D_IDLECLEAN |
-		RADEON_WAIT_3D_IDLECLEAN | RADEON_WAIT_HOST_IDLECLEAN );
+		// flush pending data
+		WRITE_IB_REG( RADEON_RB2D_DSTCACHE_CTLSTAT, RADEON_RB2D_DC_FLUSH_ALL );
 		
-	// write scratch register
-	WRITE_IB_REG( RADEON_SCRATCH_REG0, ai->si->engine.count );
-	
-	ai->si->engine.written = ai->si->engine.count;
-	
-	SUBMIT_IB();
+		// make sure commands are finished
+		WRITE_IB_REG( RADEON_WAIT_UNTIL, RADEON_WAIT_2D_IDLECLEAN |
+			RADEON_WAIT_3D_IDLECLEAN | RADEON_WAIT_HOST_IDLECLEAN );
+			
+		// write scratch register
+		WRITE_IB_REG( RADEON_SCRATCH_REG0, ai->si->engine.count );
+		
+		ai->si->engine.written = ai->si->engine.count;
+		
+		SUBMIT_IB();
+	} else {
+		Radeon_WaitForFifo( ai, 2 );
+		OUTREG( ai->regs, RADEON_RB2D_DSTCACHE_CTLSTAT, RADEON_RB2D_DC_FLUSH_ALL);
+		OUTREG( ai->regs, RADEON_WAIT_UNTIL, RADEON_WAIT_2D_IDLECLEAN |
+		   RADEON_WAIT_3D_IDLECLEAN |
+		   RADEON_WAIT_HOST_IDLECLEAN);
+		ai->si->engine.written = ai->si->engine.count;
+	}
 }
 
 // public function: acquire engine for future use
@@ -177,6 +186,13 @@ status_t SYNC_TO_TOKEN( sync_token *st )
 	bigtime_t start_time, sample_time;
 	
 	SHOW_FLOW0( 4, "" );
+	
+	if ( !ai->si->acc_dma )
+	{
+		Radeon_WaitForFifo( ai, 64 );
+		Radeon_WaitForIdle( ai, false );
+		return B_OK;
+	}
 	
 	start_time = system_time();
 

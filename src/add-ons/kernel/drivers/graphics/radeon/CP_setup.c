@@ -227,71 +227,54 @@ void Radeon_ResetEngine( device_info *di )
     host_path_cntl = INREG( regs, RADEON_HOST_PATH_CNTL );
 	rbbm_soft_reset = INREG( regs, RADEON_RBBM_SOFT_RESET );
 
-	switch( di->asic ) {
-	case rt_r300:
-		OUTREG( regs, RADEON_RBBM_SOFT_RESET, (rbbm_soft_reset |
-			RADEON_SOFT_RESET_CP |
-			RADEON_SOFT_RESET_HI |
-			RADEON_SOFT_RESET_E2 |
-			RADEON_SOFT_RESET_AIC ));
-		INREG( regs, RADEON_RBBM_SOFT_RESET);
-		OUTREG( regs, RADEON_RBBM_SOFT_RESET, 0);
-		// this bit has no description
-		OUTREGP( regs, RADEON_RB2D_DSTCACHE_MODE, (1 << 17), ~0 );
-
-		break;
-	default:
-		OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset |
+	OUTREG( regs, RADEON_RBBM_SOFT_RESET, (rbbm_soft_reset |
 			RADEON_SOFT_RESET_CP |
 			RADEON_SOFT_RESET_HI |
 			RADEON_SOFT_RESET_SE |
 			RADEON_SOFT_RESET_RE |
 			RADEON_SOFT_RESET_PP |
 			RADEON_SOFT_RESET_E2 |
-			RADEON_SOFT_RESET_RB |
-			RADEON_SOFT_RESET_AIC );
-		INREG( regs, RADEON_RBBM_SOFT_RESET );
-		OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset &
-			~( RADEON_SOFT_RESET_CP |
-			RADEON_SOFT_RESET_HI |
-			RADEON_SOFT_RESET_SE |
-			RADEON_SOFT_RESET_RE |
-			RADEON_SOFT_RESET_PP |
-			RADEON_SOFT_RESET_E2 |
-			RADEON_SOFT_RESET_RB |
-			RADEON_SOFT_RESET_AIC ) );
-		INREG( regs, RADEON_RBBM_SOFT_RESET );
-	}
-
+			RADEON_SOFT_RESET_RB ) );
+	INREG( regs, RADEON_RBBM_SOFT_RESET);
+	OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset &
+		~( RADEON_SOFT_RESET_CP |
+		   RADEON_SOFT_RESET_HI |
+		   RADEON_SOFT_RESET_SE |
+		   RADEON_SOFT_RESET_RE |
+		   RADEON_SOFT_RESET_PP |
+		   RADEON_SOFT_RESET_E2 |
+		   RADEON_SOFT_RESET_RB ) );
+	INREG( regs, RADEON_RBBM_SOFT_RESET);
+	
     OUTREG( regs, RADEON_HOST_PATH_CNTL, host_path_cntl | RADEON_HDP_SOFT_RESET );
     INREG( regs, RADEON_HOST_PATH_CNTL );
     OUTREG( regs, RADEON_HOST_PATH_CNTL, host_path_cntl );
 
-	// restore regs
-	OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset);
-
-	OUTREG( regs, RADEON_CLOCK_CNTL_INDEX, clock_cntl_index );
-	//R300_PLLFix( regs, di->asic );
 	Radeon_OUTPLL( regs, di->asic, RADEON_MCLK_CNTL, mclk_cntl );
+   	OUTREG( regs, RADEON_CLOCK_CNTL_INDEX, clock_cntl_index );
+   	//RADEONPllErrataAfterIndex( regs, di->asic ); // drm doesn't do this here!
+   	OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset);
+   	
+	if ( di->acc_dma )
+	{
+		// reset ring buffer
+		cur_read_ptr = INREG( regs, RADEON_CP_RB_RPTR );
+		OUTREG( regs, RADEON_CP_RB_WPTR, cur_read_ptr );
+		
+		//if( si->cp.ring.head ) {
+		// during init, there are no feedback data
+		if( si->cp.feedback.mem_handle != 0 ) {
+			*(uint32 *)MEM2CPU( si->cp.feedback.mem_type, si->cp.feedback.head_mem_offset) = 
+				cur_read_ptr;
+			//	*si->cp.ring.head = cur_read_ptr;
+			si->cp.ring.tail = cur_read_ptr;
+		}
 	
-	// reset ring buffer
-	cur_read_ptr = INREG( regs, RADEON_CP_RB_RPTR );
-	OUTREG( regs, RADEON_CP_RB_WPTR, cur_read_ptr );
-	
-	//if( si->cp.ring.head ) {
-	// during init, there are no feedback data
-	if( si->cp.feedback.mem_handle != 0 ) {
-		*(uint32 *)MEM2CPU( si->cp.feedback.mem_type, si->cp.feedback.head_mem_offset) = 
-			cur_read_ptr;
-		//	*si->cp.ring.head = cur_read_ptr;
-		si->cp.ring.tail = cur_read_ptr;
+		// mark all buffers as being finished
+		Radeon_DiscardAllIndirectBuffers( di );
 	}
 
 	++si->engine.count;
-	
-	// mark all buffers as being finished
-	Radeon_DiscardAllIndirectBuffers( di );
-
 	return;
 }
 
@@ -522,7 +505,7 @@ status_t Radeon_InitCP( device_info *di )
     set_sem_owner( di->si->cp.lock.sem, thinfo.team );
 	
 	// init raw CP
-	loadMicroEngineRAMData( di );
+	if ( di->acc_dma ) loadMicroEngineRAMData( di );
 
 	// do soft-reset
 	Radeon_ResetEngine( di );
@@ -536,26 +519,30 @@ status_t Radeon_InitCP( device_info *di )
 	// reset CP to make disabling active
 	Radeon_ResetEngine( di );
 
-	res = initRingBuffer( di, CP_RING_SIZE );
-	if( res < 0 )
-		goto err4;
-	
-	res = initCPFeedback( di );
-	if( res < 0 )
-		goto err3;
+	if ( di->acc_dma )
+	{
+		res = initRingBuffer( di, CP_RING_SIZE );
+		if( res < 0 )
+			goto err4;
 		
-	res = initIndirectBuffers( di );
-	if( res < 0 )
-		goto err2;
+		res = initCPFeedback( di );
+		if( res < 0 )
+			goto err3;
+			
+		res = initIndirectBuffers( di );
+		if( res < 0 )
+			goto err2;
+			
+		// tell CP to use BM
+		Radeon_WaitForIdle( di, false, false );
 		
-	// tell CP to use BM
-	Radeon_WaitForIdle( di, false, false );
-	
-	// enable direct and indirect CP bus mastering
-	OUTREG( di->regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIBM_INDBM );
-	
-	// allow bus mastering in general
-	OUTREGP( di->regs, RADEON_BUS_CNTL, 0, ~RADEON_BUS_MASTER_DIS );
+		// enable direct and indirect CP bus mastering
+		OUTREG( di->regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIBM_INDBM );
+		
+		// allow bus mastering in general
+		OUTREGP( di->regs, RADEON_BUS_CNTL, 0, ~RADEON_BUS_MASTER_DIS );
+	}
+
 
 	// don't allow mixing of 2D/3D/scratch/wait_until commands
 	// (in fact, this doesn't seem to make any difference as we do a
@@ -596,11 +583,14 @@ void Radeon_UninitCP( device_info *di )
 	OUTREG( regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIDIS_INDDIS );	
 	// read-back for flushing
 	INREG( regs, RADEON_CP_CSQ_CNTL );
-
-	uninitRingBuffer( di );
-	uninitCPFeedback( di );
-	uninitIndirectBuffers( di );
 	
+	if ( di->acc_dma )
+	{
+		uninitRingBuffer( di );
+		uninitCPFeedback( di );
+		uninitIndirectBuffers( di );
+	}
+		
 	DELETE_BEN( di->si->cp.lock );
 }
 

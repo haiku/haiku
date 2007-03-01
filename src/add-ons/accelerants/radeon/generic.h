@@ -49,6 +49,18 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
 
 void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
 
+void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count);
+void FILL_RECTANGLE_DMA(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
+void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count);
+
+void FILL_SPAN_DMA(engine_token *et, uint32 color, uint16 *list, uint32 count);
+
+void SCREEN_TO_SCREEN_BLIT_PIO(engine_token *et, blit_params *list, uint32 count);
+void FILL_RECTANGLE_PIO(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
+void INVERT_RECTANGLE_PIO(engine_token *et, fill_rect_params *list, uint32 count);
+
+void FILL_SPAN_PIO(engine_token *et, uint32 color, uint16 *list, uint32 count);
+
 uint32 OVERLAY_COUNT(const display_mode *dm);
 const uint32 *OVERLAY_SUPPORTED_SPACES(const display_mode *dm);
 uint32 OVERLAY_SUPPORTED_FEATURES(uint32 a_color_space);

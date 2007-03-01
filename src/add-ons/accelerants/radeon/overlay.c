@@ -973,17 +973,27 @@ static void Radeon_ReplaceOverlayBuffer(
 	shared_info *si = ai->si;
 	uint32 offset;
 	
-	START_IB();
-
-	offset = si->pending_overlay.on->mem_offset + si->active_overlay.rel_offset;
+	if ( ai->si->acc_dma )
+	{
+		START_IB();
 	
-	WRITE_IB_REG( RADEON_OV0_VID_BUF0_BASE_ADRS, offset);
-	
-	si->overlay_mgr.auto_flip_reg ^= RADEON_OV0_SOFT_EOF_TOGGLE;
-	WRITE_IB_REG( RADEON_OV0_AUTO_FLIP_CNTRL, si->overlay_mgr.auto_flip_reg );
-	
-	SUBMIT_IB();
-	
+		offset = si->pending_overlay.on->mem_offset + si->active_overlay.rel_offset;
+		
+		WRITE_IB_REG( RADEON_OV0_VID_BUF0_BASE_ADRS, offset);
+		
+		si->overlay_mgr.auto_flip_reg ^= RADEON_OV0_SOFT_EOF_TOGGLE;
+		WRITE_IB_REG( RADEON_OV0_AUTO_FLIP_CNTRL, si->overlay_mgr.auto_flip_reg );
+		
+		SUBMIT_IB();
+	} else {
+		Radeon_WaitForFifo( ai, 2 );
+		offset = si->pending_overlay.on->mem_offset + si->active_overlay.rel_offset;
+		
+		OUTREG( ai->regs, RADEON_OV0_VID_BUF0_BASE_ADRS, offset);
+		
+		si->overlay_mgr.auto_flip_reg ^= RADEON_OV0_SOFT_EOF_TOGGLE;
+		OUTREG( ai->regs, RADEON_OV0_AUTO_FLIP_CNTRL, si->overlay_mgr.auto_flip_reg );
+	}	
 	ai->si->active_overlay.on = ai->si->pending_overlay.on;
 #endif
 }

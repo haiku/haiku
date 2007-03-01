@@ -8,4 +8,4 @@
 */
 
 // current version
-#define RADEON_DRIVER_VERSION "Version: 5.1.2.1"
+#define RADEON_DRIVER_VERSION "Version: 5.1.3.1"

@@ -273,6 +273,16 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 			result = B_OK;
 		} break;
 		
+		case RADEON_WAITFORFIFO: {
+			radeon_wait_for_fifo *wff = (radeon_wait_for_fifo *)buf;
+			
+			if( wff->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			Radeon_WaitForFifo( di, wff->entries );
+			result = B_OK;
+		} break;
+		
 		case RADEON_RESETENGINE: {
 			radeon_no_arg *na = (radeon_no_arg *)buf;
 			

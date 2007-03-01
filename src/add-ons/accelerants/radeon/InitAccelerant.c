@@ -111,7 +111,8 @@ err:
 static void uninit_common( void )
 {
 	if( !ai->accelerant_is_clone ) {
-		Radeon_FreeVirtualCardStateBuffer( ai );
+		if ( ai->si->acc_dma ) 
+			Radeon_FreeVirtualCardStateBuffer( ai );
 
 		// the last accelerant should must wait for the card to become quite,
 		// else some nasty command could lunger in some FIFO
@@ -200,7 +201,8 @@ status_t INIT_ACCELERANT( int the_fd )
 	// mark engine as having no state
 	//si->cp.active_state_buffer = -1;
 	
-	Radeon_AllocateVirtualCardStateBuffer( ai );
+	if ( ai->si->acc_dma )
+		Radeon_AllocateVirtualCardStateBuffer( ai );
 
 	// everything else is initialized upon set_display_mode
 	return B_OK;

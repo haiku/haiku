@@ -115,6 +115,7 @@ void Radeon_FillStateBuffer( accelerator_info *ai, uint32 datatype );
 
 // driver_wrapper.c
 status_t Radeon_WaitForIdle( accelerator_info *ai, bool keep_lock );
+status_t Radeon_WaitForFifo( accelerator_info *ai, int entries );
 void Radeon_ResetEngine( accelerator_info *ai );
 
 status_t Radeon_VIPRead( accelerator_info *ai, uint channel, uint address, uint32 *data );

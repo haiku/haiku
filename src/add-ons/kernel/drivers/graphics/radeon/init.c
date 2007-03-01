@@ -250,6 +250,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->is_atombios = di->is_atombios;
 	si->is_mobility = di->is_mobility;
 	si->panel_pwr_delay = di->si->panel_pwr_delay;
+	si->acc_dma = di->acc_dma;
 
 	
 	// detecting theatre channel in kernel would lead to code duplication,
@@ -359,15 +360,22 @@ status_t Radeon_FirstOpen( device_info *di )
 	if( di->asic == rt_rs100 || di->asic == rt_rs200 || di->asic == rt_rs300)
 		Radeon_Fix_AGP();
 
-	// time to init Command Processor
-	result = Radeon_InitCP( di );
-	if( result != B_OK )
-		goto err;
+	if ( di->acc_dma )
+	{
+		// time to init Command Processor
+		result = Radeon_InitCP( di );
+		if( result != B_OK )
+			goto err;
+			
+		result = Radeon_InitDMA( di );
+		if( result != B_OK )
+			goto err0;
+	}
+	else
+	{
+		SHOW_INFO0( 0, "DMA is diabled using PIO mode");
+	}
 		
-	result = Radeon_InitDMA( di );
-	if( result != B_OK )
-		goto err0;
-	
 //	mem_alloc( di->local_memmgr, 0x100000, (void *)-1, &dma_block, &dma_offset );
 /*	dma_offset = 15 * 1024 * 1024;
 	
@@ -402,7 +410,8 @@ err8:
 // during tests)
 void Radeon_LastClose( device_info *di )
 {
-	Radeon_UninitCP( di );
+	if ( di->acc_dma )
+		Radeon_UninitCP( di );
 
 	// M6 fix - unfortunately, the device is never closed by app_server,
 	// not even before reboot

@@ -592,6 +592,60 @@ static bool probeDevice( device_info *di )
 				
 			}
 
+			// disable 2d DMA engine for chips that don't work with our 
+			// dma code (yet).  I would have used asic type, but R410s are
+			// treated same asic as r420s in code, and the AGP x800 works fine. 
+			switch ( device->device_id )
+			{
+				// rv370                   
+				case DEVICE_ID_RADEON_5b60:
+				case DEVICE_ID_RADEON_5b62:
+				case DEVICE_ID_RADEON_5b64:
+				case DEVICE_ID_RADEON_5b65:
+				case DEVICE_ID_RADEON_5460:
+				case DEVICE_ID_RADEON_5464:
+				                           
+				// rv380                   
+				case DEVICE_ID_RADEON_3e50:
+				case DEVICE_ID_RADEON_3e54:
+				case DEVICE_ID_RADEON_3150:
+				case DEVICE_ID_RADEON_3154:
+				case DEVICE_ID_RADEON_5462:
+				                           
+				// rv410                   
+				case DEVICE_ID_RADEON_5e48:
+				case DEVICE_ID_RADEON_564a:
+				case DEVICE_ID_RADEON_564b:
+				case DEVICE_ID_RADEON_564f:
+				case DEVICE_ID_RADEON_5652:
+				case DEVICE_ID_RADEON_5653:
+				case DEVICE_ID_RADEON_5e4b:
+				case DEVICE_ID_RADEON_5e4a:
+				case DEVICE_ID_RADEON_5e4d:
+				case DEVICE_ID_RADEON_5e4c:
+				case DEVICE_ID_RADEON_5e4f:
+
+				// rs400                  
+				case DEVICE_ID_RS400_5a41:
+				case DEVICE_ID_RS400_5a42:
+				                          
+				// rs410                  
+				case DEVICE_ID_RS410_5a61:
+				case DEVICE_ID_RS410_5a62:
+				                          
+				// rs480                  
+				case DEVICE_ID_RS480_5954:
+				case DEVICE_ID_RS480_5955:
+				case DEVICE_ID_RS482_5974:
+				case DEVICE_ID_RS482_5975:
+
+					di->acc_dma = false;
+					break;
+				default:
+					di->acc_dma = true;
+					break;
+			}
+			
 			if( Radeon_MapBIOS( &di->pcii, &di->rom ) != B_OK )
 				// give up checking this device - no BIOS, no fun
 				return false;

@@ -536,58 +536,142 @@ static void Radeon_GetFPData( device_info *di )
 	SHOW_INFO( 2, "pixel_clock=%d", di->fp_info.dot_clock );
 }
 
+
+// Depending on card genertation, chipset bugs, etc... the amount of vram
+// accessible to the CPU can vary. This function is our best shot at figuring
+// it out. Returns a value in KB.
+static uint32 RADEON_GetAccessibleVRAM( device_info *di )
+{
+	vuint8 *regs = di->regs;
+	pci_info *pcii = &(di->pcii);
+
+    uint32 aper_size = INREG( regs, RADEON_CONFIG_APER_SIZE );
+
+    // Set HDP_APER_CNTL only on cards that are known not to be broken,
+    // that is has the 2nd generation multifunction PCI interface
+    if (di->asic == rt_rv280 ||
+		di->asic == rt_rv350 ||
+		di->asic == rt_rv380 ||
+		di->asic == rt_r420  ) {
+			OUTREGP( regs, RADEON_HOST_PATH_CNTL, RADEON_HDP_APER_CNTL,
+		     ~RADEON_HDP_APER_CNTL);
+	    SHOW_INFO0( 0, "Generation 2 PCI interface, using max accessible memory");
+	    return aper_size * 2;
+    }
+
+    // Older cards have all sorts of funny issues to deal with. First
+    // check if it's a multifunction card by reading the PCI config
+    // header type... Limit those to one aperture size
+    if (get_pci(PCI_header_type, 1) & 0x80) {
+		SHOW_INFO0( 0, "Generation 1 PCI interface in multifunction mode"
+				", accessible memory limited to one aperture\n");
+		return aper_size;
+    }
+
+    // Single function older card. We read HDP_APER_CNTL to see how the BIOS
+    // have set it up. We don't write this as it's broken on some ASICs but
+    // we expect the BIOS to have done the right thing (might be too optimistic...)
+    if (INREG( regs, RADEON_HOST_PATH_CNTL ) & RADEON_HDP_APER_CNTL )
+        return aper_size * 2;
+    
+    return aper_size;
+}
+
+
 // detect amount of graphics memory
 static void Radeon_DetectRAM( device_info *di )
 {
 	vuint8 *regs = di->regs;
-
-	if( !di->is_igp	)
-		di->local_mem_size = INREG( regs, RADEON_CONFIG_MEMSIZE ) & RADEON_CONFIG_MEMSIZE_MASK;
-	else {
+	uint32 accessible, bar_size, tmp = 0;
+	
+	if( di->is_igp	) {
 		uint32 tom;
 		
 		tom = INREG( regs, RADEON_NB_TOM );
 		di->local_mem_size = ((tom >> 16) + 1 - (tom & 0xffff)) << 16;
+		OUTREG( regs, RADEON_CONFIG_MEMSIZE, di->local_mem_size * 1024);
+	} else {
+		di->local_mem_size = INREG( regs, RADEON_CONFIG_MEMSIZE ) & RADEON_CONFIG_MEMSIZE_MASK;
 	}
 
 	// some production boards of m6 will return 0 if it's 8 MB
-	if( di->local_mem_size == 0 )
+	if( di->local_mem_size == 0 ) {
 		di->local_mem_size = 8 * 1024 *1024;
+		OUTREG( regs, RADEON_CONFIG_MEMSIZE, di->local_mem_size);
+	}
 
-	switch( INREG( regs, RADEON_MEM_SDRAM_MODE_REG ) & RADEON_MEM_CFG_TYPE_MASK ) {
-		case RADEON_MEM_CFG_SDR:
-			// SDR SGRAM (2:1)
-			strcpy(di->ram_type, "SDR SGRAM");
-			di->ram.ml = 4;
-			di->ram.MB = 4;
-			di->ram.Trcd = 1;
-			di->ram.Trp = 2;
-			di->ram.Twr = 1;
-			di->ram.CL = 2;
-			di->ram.loop_latency = 16;
-			di->ram.Rloop = 16;
-			di->ram.Tr2w = 0;			
-			break;
-			
-		case RADEON_MEM_CFG_DDR:
-			// DDR SGRAM
-			strcpy(di->ram_type, "DDR SGRAM");
-			di->ram.ml = 4;
-			di->ram.MB = 4;
-			di->ram.Trcd = 3;
-			di->ram.Trp = 3;
-			di->ram.Twr = 2;
-			di->ram.CL = 3;
-			di->ram.Tr2w = 1;
-			di->ram.loop_latency = 16;
-			di->ram.Rloop = 16;
-			break;
-			
-		// only one bit, so there's no default
+
+	// Get usable Vram, after asic bugs, configuration screw ups etc
+	accessible = RADEON_GetAccessibleVRAM( di );
+
+	// Crop it to the size of the PCI BAR 
+	bar_size = di->pcii.u.h0.base_register_sizes[0];
+	if (bar_size == 0)
+	    bar_size = 0x200000;
+	if (accessible > bar_size)
+	    accessible = bar_size;
+
+	SHOW_INFO( 0, "Detected total video RAM=%ldK, accessible=%ldK (PCI BAR=%ldK)"
+		, di->local_mem_size/1024, accessible/1024, bar_size/1024);
+	if (di->local_mem_size > accessible) 
+	    di->local_mem_size = accessible;
+
+	// detect ram bus width only used by dynamic clocks for now.
+	tmp = INREG( regs, RADEON_MEM_CNTL );
+	if (IS_DI_R300_VARIANT) {
+		tmp &=  R300_MEM_NUM_CHANNELS_MASK;
+		switch (tmp) {
+			case 0: di->ram.width = 64; break;
+			case 1: di->ram.width = 128; break;
+			case 2: di->ram.width = 256; break;
+			default: di->ram.width = 128; break;
+		}
+	} else if ( (di->asic >= rt_rv100) ||
+				(di->asic >= rt_rs100) ||
+				(di->asic >= rt_rs200)) {
+		if (tmp & RV100_HALF_MODE) 
+			di->ram.width = 32;
+		else 
+			di->ram.width = 64;
+	} else {
+		if (tmp & RADEON_MEM_NUM_CHANNELS_MASK) 
+			di->ram.width = 128;
+		else 
+			di->ram.width = 64;
+	}
+
+	if (di->is_igp || (di->asic >= rt_r300))
+	{
+		uint32 mem_type = INREG( regs, RADEON_MEM_SDRAM_MODE_REG ) & RADEON_MEM_CFG_TYPE_MASK;
+		if ( mem_type == RADEON_MEM_CFG_SDR) {
+				// SDR SGRAM (2:1)
+				strcpy(di->ram_type, "SDR SGRAM");
+				di->ram.ml = 4;
+				di->ram.MB = 4;
+				di->ram.Trcd = 1;
+				di->ram.Trp = 2;
+				di->ram.Twr = 1;
+				di->ram.CL = 2;
+				di->ram.loop_latency = 16;
+				di->ram.Rloop = 16;
+				di->ram.Tr2w = 0;			
+		} else {  // RADEON_MEM_CFG_DDR		
+				// DDR SGRAM
+				strcpy(di->ram_type, "DDR SGRAM");
+				di->ram.ml = 4;
+				di->ram.MB = 4;
+				di->ram.Trcd = 3;
+				di->ram.Trp = 3;
+				di->ram.Twr = 2;
+				di->ram.CL = 3;
+				di->ram.Tr2w = 1;
+				di->ram.loop_latency = 16;
+				di->ram.Rloop = 16;
+		}
 	}
 	
-	SHOW_INFO( 1, "%ld MB %s found", di->local_mem_size / 1024 / 1024, 
-		di->ram_type );
+	SHOW_INFO( 1, "%ld MB %s found on %d wide bus", 
+		di->local_mem_size / 1024 / 1024, di->ram_type, di->ram.width);
 		
 /*	if( di->local_mem_size > 64 * 1024 * 1024 ) {
 		di->local_mem_size = 64 * 1024 * 1024;

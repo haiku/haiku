@@ -13,16 +13,9 @@
 
 #include "GlobalData.h"
 #include "dac_regs.h"
+#include "mmio.h"
 #include "CP.h"
 #include "generic.h"
-
-// Radeon's DACs share same public registers, this function
-// selects the DAC you'll talk to
-#define selectPalette( crtc_idx ) \
-	WRITE_IB_REG( RADEON_DAC_CNTL2, \
-		(crtc_idx == 0 ? 0 : RADEON_DAC2_PALETTE_ACC_CTL) | \
-		(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
-
 
 // set standard colour palette (needed for non-palette modes)
 void Radeon_InitPalette( 
@@ -30,16 +23,31 @@ void Radeon_InitPalette(
 {
 	int i;
 	
-	START_IB();
-	
-	selectPalette( crtc_idx );
-	
-	WRITE_IB_REG( RADEON_PALETTE_INDEX, 0 );
-	
-	for( i = 0; i < 256; ++i )
-		WRITE_IB_REG( RADEON_PALETTE_DATA, (i << 16) | (i << 8) | i );
+	if ( ai->si->acc_dma ) {
+		START_IB();
 		
-	SUBMIT_IB();
+		WRITE_IB_REG( RADEON_DAC_CNTL2,
+			(crtc_idx == 0 ? 0 : RADEON_DAC2_PALETTE_ACC_CTL) |
+			(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
+		
+		WRITE_IB_REG( RADEON_PALETTE_INDEX, 0 );
+		
+		for( i = 0; i < 256; ++i )
+			WRITE_IB_REG( RADEON_PALETTE_DATA, (i << 16) | (i << 8) | i );
+			
+		SUBMIT_IB();
+	} else {
+		Radeon_WaitForFifo ( ai , 1 );
+		OUTREG( ai->regs, RADEON_DAC_CNTL2,
+			(crtc_idx == 0 ? 0 : RADEON_DAC2_PALETTE_ACC_CTL) |
+			(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
+
+		OUTREG( ai->regs, RADEON_PALETTE_INDEX, 0 );
+		for( i = 0; i < 256; ++i ) {
+			Radeon_WaitForFifo ( ai , 1 );  // TODO FIXME good god this is gonna be slow...
+			OUTREG( ai->regs, RADEON_PALETTE_DATA, (i << 16) | (i << 8) | i );
+		}
+	}
 }
 
 static void setPalette( 
@@ -75,17 +83,35 @@ static void setPalette(
 {
 	uint i;
 	
-	START_IB();
-	
-	selectPalette( crtc_idx );
-	
-	WRITE_IB_REG( RADEON_PALETTE_INDEX, first );
-	
-	for( i = 0; i < count; ++i, color_data += 3 )
-		WRITE_IB_REG( RADEON_PALETTE_DATA, 
-			((uint32)color_data[0] << 16) | 
-			((uint32)color_data[1] << 8) | 
-			 color_data[2] );
-			 
-	SUBMIT_IB();
+	if ( ai->si->acc_dma ) {
+		START_IB();
+		
+		WRITE_IB_REG( RADEON_DAC_CNTL2,
+			(crtc_idx == 0 ? 0 : RADEON_DAC2_PALETTE_ACC_CTL) |
+			(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
+		
+		WRITE_IB_REG( RADEON_PALETTE_INDEX, first );
+		
+		for( i = 0; i < count; ++i, color_data += 3 )
+			WRITE_IB_REG( RADEON_PALETTE_DATA, 
+				((uint32)color_data[0] << 16) | 
+				((uint32)color_data[1] << 8) | 
+				 color_data[2] );
+				 
+		SUBMIT_IB();
+	} else {
+		Radeon_WaitForFifo ( ai , 1 );
+		OUTREG( ai->regs, RADEON_DAC_CNTL2,
+			(crtc_idx == 0 ? 0 : RADEON_DAC2_PALETTE_ACC_CTL) |
+			(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
+
+		OUTREG( ai->regs, RADEON_PALETTE_INDEX, first );
+		for( i = 0; i < count; ++i, color_data += 3 ) {
+			Radeon_WaitForFifo ( ai , 1 );  // TODO FIXME good god this is gonna be slow...
+			OUTREG( ai->regs, RADEON_PALETTE_DATA, 
+				((uint32)color_data[0] << 16) | 
+				((uint32)color_data[1] << 8) | 
+				 color_data[2] );
+		}
+	}
 }

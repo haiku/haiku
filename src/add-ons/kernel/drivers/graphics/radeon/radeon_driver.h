@@ -67,6 +67,7 @@ typedef struct {
 	int Tr2w;
 	int loop_latency;
 	int Rloop;
+	int width;
 } ram_info;
 
 // ROM information
@@ -109,7 +110,8 @@ typedef struct device_info {
 	bool		has_vip;
 	bool		is_igp;
 	bool		has_no_i2c;
-	//display_type_e disp_type[2];
+	bool		acc_dma;
+
 	fp_info		fp_info;
 	
 	general_pll_info pll;

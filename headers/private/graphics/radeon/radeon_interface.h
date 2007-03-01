@@ -20,7 +20,8 @@
 #include "ddc.h"
 
 // magic code for ioctls
-#define RADEON_PRIVATE_DATA_MAGIC	'TKRA'
+// changed from TKRA to TKR1 for RADEON_WAITFORFIFO ioctl
+#define RADEON_PRIVATE_DATA_MAGIC	'TKR1'
 
 #define MAX_RADEON_DEVICE_NAME_LENGTH MAXPATHLEN
 
@@ -35,6 +36,7 @@ enum {
 	RADEON_FREE_MEM,
 	
 	RADEON_WAITFORIDLE,
+	RADEON_WAITFORFIFO,
 	RADEON_RESETENGINE,
 	RADEON_VIPREAD,
 	RADEON_VIPWRITE,
@@ -396,6 +398,7 @@ typedef struct {
 typedef struct {
 	// filled out by kernel
 	CP_info	cp;				// info concerning command processor
+	bool	acc_dma;			// prevent use of dma engine
 	
 	// set by accelerant
 	struct {
@@ -498,6 +501,12 @@ typedef struct {
 	uint32 			magic;
 	bool			keep_lock;	// keep lock after engine is idle
 } radeon_wait_for_idle;
+
+// wait for idle
+typedef struct {
+	uint32 			magic;
+	int				entries;	// keep lock after engine is idle
+} radeon_wait_for_fifo;
 
 // read VIP register
 typedef struct {

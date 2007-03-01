@@ -39,10 +39,21 @@ static uint32 getTopOfRam()
 static void Radeon_SetupMCAddresses_Direct( device_info *di )
 {
 	shared_info *si = di->si;
+	uint32 mc_fb_location;
+	uint32 aper0 = INREG( di->regs, RADEON_CONFIG_APER_0_BASE );
+	
+	// bug in asics mean memory must be aligned to memory size... 
+	if ( IS_DI_R300_VARIANT || di->asic == rt_rv280 ) {
+		aper0 &= ~( di->local_mem_size - 1 );
+	}
+	
+	mc_fb_location = ( aper0 >> 16 ) || 
+		(aper0 + di->local_mem_size - 1 ) & 0xffff0000;
+	
 	
 	// set address range of video memory;
 	// use the same addresses the CPU sees
-	si->memory[mt_local].virtual_addr_start = (uint32)si->framebuffer_pci;
+	si->memory[mt_local].virtual_addr_start = mc_fb_location;
 	si->memory[mt_local].virtual_size = di->local_mem_size;
 
 	// PCI GART has no corresponding CPU address space, so we must find an unused
@@ -148,6 +159,10 @@ void Radeon_InitMemController( device_info *di )
 		si->memory[mt_AGP].virtual_size, si->memory[mt_AGP].virtual_addr_start );
 	
 	//si->nonlocal_mem = di->DMABuffer.ptr;
+	
+	// Turn on PCI GART
+	OUTREGP( regs, RADEON_AIC_CNTL, RADEON_PCIGART_TRANSLATE_EN, 
+		~RADEON_PCIGART_TRANSLATE_EN );
 		
 	// set PCI GART page-table base address
 	OUTREG( regs, RADEON_AIC_PT_BASE, di->pci_gart.GATT.phys );
@@ -159,9 +174,12 @@ void Radeon_InitMemController( device_info *di )
 		si->memory[mt_PCI].virtual_size/*di->pci_gart.buffer.size*/ - 1 );
 
 	// set AGP address range
-	OUTREG( regs, RADEON_MC_AGP_LOCATION, 
+	OUTREG( regs, RADEON_MC_AGP_LOCATION, 0xffffffc0 /* EK magic numbers from X.org
 		(si->memory[mt_AGP].virtual_addr_start >> 16) |
-		((si->memory[mt_AGP].virtual_addr_start + si->memory[mt_AGP].virtual_size - 1) & 0xffff0000 ));
+		((si->memory[mt_AGP].virtual_addr_start + si->memory[mt_AGP].virtual_size - 1) & 0xffff0000 )*/);
+
+	// disable AGP
+	OUTREG( regs, RADEON_AGP_COMMAND, 0 );
 	
 	// set address range of video memory
 	// (lower word = begin >> 16
@@ -175,19 +193,11 @@ void Radeon_InitMemController( device_info *di )
 	OUTREG( regs, RADEON_DISPLAY_BASE_ADDRESS, si->memory[mt_local].virtual_addr_start );
 	OUTREG( regs, RADEON_CRTC2_DISPLAY_BASE_ADDRESS, si->memory[mt_local].virtual_addr_start );
 	OUTREG( regs, RADEON_OV0_BASE_ADDRESS, si->memory[mt_local].virtual_addr_start );
-
-	// disable AGP
-	OUTREG( regs, RADEON_AGP_COMMAND, 0 );
 		 
-	// Turn on PCI GART
-	OUTREGP( regs, RADEON_AIC_CNTL, RADEON_PCIGART_TRANSLATE_EN, 
-		~RADEON_PCIGART_TRANSLATE_EN );
-
-
 	// fix some bus controller setting
 	// I reckon this takes care of discarding data unnecessarily read 
 	// during a burst; let's hope this will fix the nasty CP crashing problem
-	OUTREGP( regs, RADEON_BUS_CNTL, RADEON_BUS_RD_DISCARD_EN, ~RADEON_BUS_RD_DISCARD_EN );
+	// EK this seems unecessary. OUTREGP( regs, RADEON_BUS_CNTL, RADEON_BUS_RD_DISCARD_EN, ~RADEON_BUS_RD_DISCARD_EN );
 	
 //	SHOW_FLOW0( 3, "done" );
 }

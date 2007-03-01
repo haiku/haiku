@@ -23,6 +23,27 @@ status_t Radeon_WaitForIdle( accelerator_info *ai, bool keep_lock )
 	return ioctl( ai->fd, RADEON_WAITFORIDLE, &wfi, sizeof( wfi ));
 }
 
+// wait until "entries" FIFO entries are empty
+// lock must be hold
+status_t Radeon_WaitForFifo( accelerator_info *ai, int entries )
+{
+	while( 1 ) {
+		bigtime_t start_time = system_time();
+	
+		do {
+			int slots = INREG( ai->regs, RADEON_RBBM_STATUS ) & RADEON_RBBM_FIFOCNT_MASK;
+			
+			if ( slots >= entries ) 
+				return B_OK;
+
+			snooze( 1 );
+		} while( system_time() - start_time < 1000000 );
+			
+		Radeon_ResetEngine( ai );
+	}
+	
+	return B_ERROR;
+}
 
 void Radeon_ResetEngine( accelerator_info *ai )
 {
