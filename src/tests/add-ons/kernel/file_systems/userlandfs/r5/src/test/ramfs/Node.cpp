@@ -159,7 +159,7 @@ Node::CheckPermissions(int mode) const
 		// root has always read/write permission, but at least one of the
 		// X bits must be set for execute permission
 		permissions = userPermissions | groupPermissions | otherPermissions
-			| S_IROTH | S_IWOTH;
+			| ACCESS_R | ACCESS_W;
 	// user is node owner
 	} else if (uid == fUID)
 		permissions = userPermissions;

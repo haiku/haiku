@@ -230,9 +230,12 @@ Volume::Mount(nspace_id id)
 	// create the root dir
 	if (error == B_OK) {
 		fRootDirectory = new(nothrow) Directory(this);
-		if (fRootDirectory)
+		if (fRootDirectory) {
+			// set permissions: -rwxr-xr-x
+			fRootDirectory->SetMode(
+				S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 			error = fRootDirectory->Link(NULL);
-		else
+		} else
 			SET_ERROR(error, B_NO_MEMORY);
 	}
 	// set mounted flag / cleanup on error

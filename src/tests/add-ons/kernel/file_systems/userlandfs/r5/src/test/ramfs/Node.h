@@ -57,8 +57,8 @@ public:
 
 	// stat data
 
-//	void SetMode(mode_t mode) { fMode = mode; }
-	inline void SetMode(mode_t mode) { fMode = fMode & S_IFMT | mode & ~S_IFMT; }
+	inline void SetMode(mode_t mode)
+		{ fMode = fMode & ~S_IUMSK | mode & S_IUMSK; }
 	inline mode_t GetMode() const	{ return fMode; }
 
 	inline void SetUID(uid_t uid)	{ fUID = uid; }
