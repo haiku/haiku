@@ -103,12 +103,26 @@ PictureView::~PictureView()
 
 void
 PictureView::AllAttached()
-{
+{	
 	BeginPicture(new BPicture);
 	
 	DrawStuff(this);
 
-	fPicture = EndPicture();
+	BPicture *picture = EndPicture();
+	
+	BMallocIO stream;
+	
+	status_t status = picture->Flatten(&stream);
+	if (status != B_OK)
+		printf("Error flattening BPicture: %s\n", strerror(status));
+	if (status == B_OK) {
+		fPicture = new BPicture();
+		status = fPicture->Unflatten(&stream);
+		if (status != B_OK)
+			printf("Error unflattening BPicture: %s\n", strerror(status));
+	}
+
+	delete picture;
 }
 
 void
