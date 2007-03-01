@@ -42,13 +42,11 @@ struct _BPictureExtent_ {
 			{ return static_cast<BPicture *>(fPictures.ItemAt(index)); }
 	
 	int32 CountPictures() const { return fPictures.CountItems(); }
-	BList &Pictures() { return fPictures; }
+	BList *Pictures() { return &fPictures; }
 
 private:
 	void	*fNewData;
 	int32	fNewSize;
-	void	*fOldStyleData;
-	int32	fOldStyleSize;
 
 	BList	fPictures;	// In R5 this is a BArray<BPicture*> which is completely inline.
 };
@@ -98,13 +96,7 @@ BPicture::BPicture(const BPicture &otherPicture)
 			BPicture *picture = new BPicture(*otherPicture.extent->PictureAt(i));
 			extent->AddPicture(picture);
 		}
-	} /*else if (otherPicture.extent->fOldStyleData != NULL) {
-		extent->fOldStyleSize = otherPicture.extent->fOldStyleSize;
-		extent->fOldStyleData = malloc(extent->fOldStyleSize);
-		memcpy(extent->fOldStyleData, otherPicture.extent->fOldStyleData, extent->fOldStyleSize);
-
-		// In old data the sub pictures are inside the data
-	}*/
+	}
 }
 
 
@@ -137,9 +129,10 @@ BPicture::BPicture(BMessage *archive)
 		extent->AddPicture(pic);
 	}
 
-	if (version == 0)
-		import_old_data(data, size);
-	else if (version == 1) {
+	if (version == 0) {
+		// TODO: For now. We'll see if it's worth to support old style data
+		debugger("old style BPicture data is not supported");
+	} else if (version == 1) {
 		extent->ImportData(data, size);
 
 //		swap_data(extent->fNewData, extent->fNewSize);
@@ -152,12 +145,6 @@ BPicture::BPicture(BMessage *archive)
 	if (extent->Size() > 0)
 		extent->SetSize(0);
 
-	/*if (extent->fOldStyleData) {
-		free(extent->fOldStyleData);
-		extent->fOldStyleData = NULL;
-		extent->fOldStyleSize = 0;
-	}*/
-
 	// What with the sub pictures?
 	for (i = extent->CountPictures() - 1; i >= 0; i--)
 		extent->DeletePicture(i);
@@ -167,7 +154,8 @@ BPicture::BPicture(BMessage *archive)
 BPicture::BPicture(const void *data, int32 size)
 {
 	init_data();
-	import_old_data(data, size);
+	// TODO: For now. We'll see if it's worth to support old style data
+	debugger("old style BPicture data is not supported");
 }
 
 
@@ -253,9 +241,8 @@ BPicture::Play(void **callBackTable, int32 tableEntries, void *user)
 	if (!assert_local_copy())
 		return B_ERROR;
 
-	BList &pictures = extent->Pictures();
-	return do_playback(const_cast<void *>(extent->Data()), extent->Size(), &pictures,
-		callBackTable, tableEntries, user);
+	return do_playback(const_cast<void *>(extent->Data()), extent->Size(),
+			extent->Pictures(), callBackTable, tableEntries, user);
 }
 
 
@@ -380,31 +367,7 @@ BPicture::import_data(const void *data, int32 size, BPicture **subs,
 void
 BPicture::import_old_data(const void *data, int32 size)
 {
-	// TODO: do we need to support old data, what is old data?
-	/*if (data == NULL)
-		return;
-
-	if (size == 0)
-		return;
-		
-	convert_old_to_new(data, size, &extent->fNewData, &extent->fNewSize);
-
-	BPrivate::BAppServerLink link;
-	link.StartMessage(AS_CREATE_PICTURE);
-	link.Attach<int32>(0L);
-	link.Attach<int32>(extent->fNewSize);
-	link.Attach(extent->fNewData,extent->fNewSize);
-	link.FlushWithReply(&code);
-	if (code == B_OK)
-		link.Read<int32>(&token)
-
-	// Do we free all data now?
-	free(extent->fNewData);
-	extent->fNewData = 0;
-	extent->fNewSize = 0;
-	free(extent->fOldStyleData);
-	extent->fOldStyleData = 0;
-	extent->fOldStyleSize = 0;*/
+	// TODO: We don't support old data for now
 }
 
 
@@ -455,16 +418,9 @@ BPicture::assert_local_copy()
 bool
 BPicture::assert_old_local_copy()
 {
-	//if (extent->fOldStyleData != NULL)
-	//	return true;
+	// TODO: We don't support old data for now
 
-	if (!assert_local_copy())
-		return false;
-
-//	convert_new_to_old(extent->fNewData, extent->fNewSize, extent->fOldStyleData,
-//		extent->fOldStyleSize);
-
-	return true;
+	return false;
 }
 
 
@@ -505,10 +461,8 @@ BPicture::assert_server_copy()
 const void *
 BPicture::Data() const
 {
-	if (extent->Data() == NULL) {
+	if (extent->Data() == NULL)
 		const_cast<BPicture*>(this)->assert_local_copy();
-		//convert_new_to_old(void *, long, void **, long *);
-	}
 
 	return extent->Data();
 }
@@ -517,10 +471,8 @@ BPicture::Data() const
 int32
 BPicture::DataSize() const
 {
-	if (extent->Data() == NULL) {
+	if (extent->Data() == NULL)
 		const_cast<BPicture*>(this)->assert_local_copy();
-		//convert_new_to_old(void *, long, void **, long *);
-	}
 
 	return extent->Size();
 }
@@ -536,13 +488,7 @@ BPicture::usurp(BPicture *lameDuck)
 		link.Attach<int32>(token);
 		link.Flush();
 	}
-/*
-	if (extent->fOldStyleData != NULL) {
-		free(extent->fOldStyleData);
-		extent->fOldStyleData = NULL;
-		extent->fOldStyleSize = 0;
-	}
-*/
+
 	delete extent;
 
 	// Reinitializes the BPicture
@@ -589,9 +535,7 @@ do_playback(void * data, int32 size, BList* pictures,
 _BPictureExtent_::_BPictureExtent_(const int32 &size)
 	:
 	fNewData(NULL),
-	fNewSize(0),
-	fOldStyleData(NULL),
-	fOldStyleSize(0)
+	fNewSize(0)
 {
 	SetSize(size);
 }
@@ -600,7 +544,6 @@ _BPictureExtent_::_BPictureExtent_(const int32 &size)
 _BPictureExtent_::~_BPictureExtent_()
 {
 	free(fNewData);
-	free(fOldStyleData);
 	for (int32 i = 0; i < fPictures.CountItems(); i++)
 		delete static_cast<BPicture *>(fPictures.ItemAtFast(i));
 }
