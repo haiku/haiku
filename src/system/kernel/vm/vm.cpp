@@ -1345,13 +1345,18 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 		// we need to map in everything at this point
 		if (newArea->cache_type == CACHE_TYPE_DEVICE) {
 			// we don't have actual pages to map but a physical area
-			vm_translation_map *map = &addressSpace->translation_map;
+			vm_translation_map *map = &sourceArea->address_space->translation_map;
 			map->ops->lock(map);
 
 			addr_t physicalAddress;
 			uint32 oldProtection;
 			map->ops->query(map, sourceArea->base, &physicalAddress,
 				&oldProtection);
+
+			map->ops->unlock(map);
+
+			map = &addressSpace->translation_map;
+			map->ops->lock(map);
 
 			for (addr_t offset = 0; offset < newArea->size;
 					offset += B_PAGE_SIZE) {
