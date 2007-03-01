@@ -27,32 +27,17 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char ati_rom_sig[] = "761295520";
-static const char *radeon_sig[] = {
-	"RADEON",		// r100
-	"RV100",		// rv100
-	"U1",			// rs100 (IGP320M)
-	"M6",			// mobile version of r100
-	// probably an M6P; 
-	// anyway - this is the card I wrote this driver for!
-	// (perhaps ATI tries to make the card incompatible to standard drivers)
-	"P6",
-	"RV200",		// rv200
-	"M7",			// m7
-	"RG6",			// r200 (according to spec)
-	"RS200",		// rs200
-	"R200",			// r200 (8500 LE)
-	"R200AGP",		// Fire GL E1
-	"M9"			// guess: m9
-	"RV250",		// rv250 R9100
-	"V280",			// RV280 R9200
-	"R300",			// R300 R9500 / R9700
-	"R350",			// R350 R9800
-	"R360",			// R360 R9800 XT
-	"V350",			// RV350 R9600
-	"V360",			// RV350 R9600 XT :guess
-};
+#define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 
+#define RADEON_BIOS8(v) 	 (di->rom.rom_ptr[v])
+#define RADEON_BIOS16(v) 	((di->rom.rom_ptr[v]) | \
+						  	 (di->rom.rom_ptr[(v) + 1] << 8))
+#define RADEON_BIOS32(v) 	((di->rom.rom_ptr[v]) | \
+							 (di->rom.rom_ptr[(v) + 1] << 8) \
+							 (di->rom.rom_ptr[(v) + 2] << 16) \
+							 (di->rom.rom_ptr[(v) + 3] << 24))
+
+static const char ati_rom_sig[] = "761295520";
 
 // find address of ROM;
 // this code is really nasty as maintaining the radeon signatures
@@ -70,7 +55,7 @@ static char *Radeon_FindRom( rom_info *ri )
 	uint32 segstart;
 	uint8 *rom_base;
 	char *rom;
-	int i,j;
+	int i;
 	
 	for( segstart = 0x000c0000; segstart < 0x000f0000; segstart += 0x00001000 ) {
 		bool found = false;
@@ -98,24 +83,8 @@ static char *Radeon_FindRom( rom_info *ri )
 		if( !found )
 			continue;
 
-		// find signature of card
-		found = false;
-		
-		for( i = 0; i < 512; i++ ) {
-			for( j = 0; j < sizeof( radeon_sig ) / sizeof( radeon_sig[0] ); j++ ) {
-				if( radeon_sig[j][0] == rom_base[i] ) {
-					if( strncmp( radeon_sig[j], rom_base + i, strlen( radeon_sig[j] )) == 0 ) {
-						SHOW_INFO( 2, "Signature: %s", radeon_sig[j] );
-						found = true;
-						break;
-					}
-				}
-			}
-		}
-		
-		if( !found )
-			continue;
-		
+		// EK don't bother looking for signiture now, due to lack of consistancy.
+				
 		SHOW_INFO( 2, "found ROM @0x%lx", segstart );
 		return rom_base;
 	}
@@ -130,22 +99,70 @@ static char *Radeon_FindRom( rom_info *ri )
 static void Radeon_GetPLLInfo( device_info *di )
 {
 	uint8 *bios_header;
+	uint8 *tmp;
 	PLL_BLOCK pll, *pll_info;
 	
 	bios_header = di->rom.rom_ptr + *(uint16 *)(di->rom.rom_ptr + 0x48);
 	pll_info = (PLL_BLOCK *)(di->rom.rom_ptr + *(uint16 *)(bios_header + 0x30));
 
-	memcpy( &pll, pll_info, sizeof( pll ));
+	// determine type of ROM
+
+	tmp = bios_header + 4;
+
+    if ((	*tmp 	== 'A' 
+   		&& *(tmp+1) == 'T' 
+   		&& *(tmp+2) == 'O' 
+   		&& *(tmp+3) == 'M'
+   		) 
+   		|| 
+   		(	*tmp	== 'M' 
+   		&& *(tmp+1) == 'O' 
+   		&& *(tmp+2) == 'T' 
+   		&& *(tmp+3) == 'A'
+   		))
+	{
+		int bios_header, master_data_start, pll_start;
+		di->is_atombios = true;
 	
-	di->pll.xclk = (uint32)pll.XCLK;
-	di->pll.ref_freq = (uint32)pll.PCLK_ref_freq;
-	di->pll.ref_div = (uint32)pll.PCLK_ref_divider;
-	di->pll.min_pll_freq = pll.PCLK_min_freq;
-	di->pll.max_pll_freq = pll.PCLK_max_freq;
-	
-	SHOW_INFO( 2, "ref_clk=%ld, ref_div=%ld, xclk=%ld, min_freq=%ld, max_freq=%ld from BIOS",
+		bios_header 	  	 = RADEON_BIOS16(0x48);
+		master_data_start 	 = RADEON_BIOS16(bios_header + 32);
+		pll_start 		  	 = RADEON_BIOS16(master_data_start + 12);
+		
+		di->pll.ref_div 	 = 0; 
+		di->pll.max_pll_freq = RADEON_BIOS16(pll_start + 32);
+		di->pll.xclk 		 = RADEON_BIOS16(pll_start + 72);
+		di->pll.min_pll_freq = RADEON_BIOS16(pll_start + 78);
+		di->pll.ref_freq 	 = RADEON_BIOS16(pll_start + 82);
+
+		SHOW_INFO( 2, "TESTING ref_clk=%ld, ref_div=%ld, xclk=%ld, min_freq=%ld, max_freq=%ld from ATOM Bios",
 		di->pll.ref_freq, di->pll.ref_div, di->pll.xclk, 
 		di->pll.min_pll_freq, di->pll.max_pll_freq );
+			
+		// Unused by beos driver so it appears...
+		// info->sclk = RADEON_BIOS32(pll_info_block + 8) / 100.0;
+		// info->mclk = RADEON_BIOS32(pll_info_block + 12) / 100.0;
+		// if (info->sclk == 0) info->sclk = 200;
+		// if (info->mclk == 0) info->mclk = 200;
+			
+	}
+    else
+	{
+		di->is_atombios = false;
+			
+		memcpy( &pll, pll_info, sizeof( pll ));
+	
+		di->pll.xclk 		 = (uint32)pll.XCLK;
+		di->pll.ref_freq 	 = (uint32)pll.PCLK_ref_freq;
+		di->pll.ref_div 	 = (uint32)pll.PCLK_ref_divider;
+		di->pll.min_pll_freq = pll.PCLK_min_freq;
+		di->pll.max_pll_freq = pll.PCLK_max_freq;
+		
+		SHOW_INFO( 2, "ref_clk=%ld, ref_div=%ld, xclk=%ld, min_freq=%ld, max_freq=%ld from Legacy BIOS",
+		di->pll.ref_freq, di->pll.ref_div, di->pll.xclk, 
+		di->pll.min_pll_freq, di->pll.max_pll_freq );
+		
+	}
+	
 }
 
 /*
@@ -247,74 +264,118 @@ static void Radeon_GetMonType( device_info *di )
 // who knows which strange kind of combination is out there?)
 static bool Radeon_GetBIOSDFPInfo( device_info *di )
 {
-	uint8 *bios_header;
+	uint16 bios_header;
 	uint16 fpi_offset;
 	FPI_BLOCK fpi;
 	char panel_name[30];
 	int i;
 	
-	bios_header = di->rom.rom_ptr + *(uint16 *)(di->rom.rom_ptr + 0x48);
+	uint16 tmp;
 	
-	fpi_offset = *(uint16 *)(bios_header + 0x40);
+	bios_header = RADEON_BIOS16( 0x48 );
+
+	if (di->is_atombios)
+	{
+		int master_data_start;
+		master_data_start = RADEON_BIOS16( bios_header + 32 );
+
+		tmp = RADEON_BIOS16( master_data_start + 16 );
+		if( tmp )
+		{
 	
-	if( !fpi_offset ) {
-		di->fp_info.panel_pwr_delay = 200;
-		SHOW_ERROR0( 2, "No Panel Info Table found in BIOS" );
-		return false;
-	} 
+		    di->fp_info.panel_xres		= RADEON_BIOS16( tmp +  6 );
+		    di->fp_info.panel_yres		= RADEON_BIOS16( tmp + 10 );
+		    di->fp_info.dot_clock		= RADEON_BIOS16( tmp +  4 ) * 10;
+		    di->fp_info.h_blank			= RADEON_BIOS16( tmp +  8 );
+		    di->fp_info.h_over_plus		= RADEON_BIOS16( tmp + 14 );
+		    di->fp_info.h_sync_width	= RADEON_BIOS16( tmp + 16 );
+		    di->fp_info.v_blank      	= RADEON_BIOS16( tmp + 12 );
+			di->fp_info.v_over_plus		= RADEON_BIOS16( tmp + 18 );
+		    di->fp_info.h_sync_width	= RADEON_BIOS16( tmp + 20 );
+		    di->fp_info.panel_pwr_delay	= RADEON_BIOS16( tmp + 40 );
+	
+		    SHOW_INFO( 2, "Panel Info from ATOMBIOS:\n" 
+					"XRes: %d, YRes: %d, DotClock: %d\n" 
+					"HBlank: %d, HOverPlus: %d, HSyncWidth: %d\n" 
+					"VBlank: %d, VOverPlus: %d, VSyncWidth: %d\n" 
+					"PanelPowerDelay: %d\n",
+					di->fp_info.panel_xres,	di->fp_info.panel_yres,	di->fp_info.dot_clock,
+					di->fp_info.h_blank, di->fp_info.h_over_plus, di->fp_info.h_sync_width,
+					di->fp_info.v_blank, di->fp_info.v_over_plus, di->fp_info.h_sync_width,
+					di->fp_info.panel_pwr_delay	);
+			       
+		} 
+		else 
+		{
+		    di->fp_info.panel_pwr_delay = 200;
+			SHOW_ERROR0( 2, "No Panel Info Table found in BIOS" );
+			return false;
+		}
+	} // is_atombios
+	else
+	{
+	
+		fpi_offset = RADEON_BIOS16(bios_header + 0x40);
 		
-	memcpy( &fpi, di->rom.rom_ptr + fpi_offset, sizeof( fpi ));
-	
-	memcpy( panel_name, &fpi.name, sizeof( fpi.name ) );
-	panel_name[sizeof( fpi.name )] = 0;
-	
-	SHOW_INFO( 2, "Panel ID string: %s", panel_name );
+		if( !fpi_offset ) {
+			di->fp_info.panel_pwr_delay = 200;
+			SHOW_ERROR0( 2, "No Panel Info Table found in BIOS" );
+			return false;
+		} 
 			
-	di->fp_info.panel_xres = fpi.panel_xres;
-	di->fp_info.panel_yres = fpi.panel_yres;
-	
-	SHOW_INFO( 2, "Panel Size from BIOS: %dx%d", 
-		di->fp_info.panel_xres, di->fp_info.panel_yres);
+		memcpy( &fpi, di->rom.rom_ptr + fpi_offset, sizeof( fpi ));
 		
-	di->fp_info.panel_pwr_delay = fpi.panel_pwr_delay;	
-	if( di->fp_info.panel_pwr_delay > 2000 || di->fp_info.panel_pwr_delay < 0 )
-		di->fp_info.panel_pwr_delay = 2000;
-
-	di->fp_info.ref_div = fpi.ref_div;
-	di->fp_info.post_div = fpi.post_div;
-	di->fp_info.feedback_div = fpi.feedback_div;
-	
-	di->fp_info.fixed_dividers =
-		di->fp_info.ref_div != 0 && di->fp_info.feedback_div > 3;
-
-
-	// there might be multiple supported resolutions stored;
-	// we are looking for native resolution
-	for( i = 0; i < 20; ++i ) {
-		uint16 fpi_timing_ofs;
-		FPI_TIMING_BLOCK fpi_timing;
+		memcpy( panel_name, &fpi.name, sizeof( fpi.name ) );
+		panel_name[sizeof( fpi.name )] = 0;
 		
-		fpi_timing_ofs = fpi.fpi_timing_ofs[i];
+		SHOW_INFO( 2, "Panel ID string: %s", panel_name );
+				
+		di->fp_info.panel_xres = fpi.panel_xres;
+		di->fp_info.panel_yres = fpi.panel_yres;
 		
-		if( fpi_timing_ofs == 0 )
-			break;
+		SHOW_INFO( 2, "Panel Size from BIOS: %dx%d", 
+			di->fp_info.panel_xres, di->fp_info.panel_yres);
 			
-		memcpy( &fpi_timing, di->rom.rom_ptr + fpi_timing_ofs, sizeof( fpi_timing ));
-
-		if( fpi_timing.panel_xres != di->fp_info.panel_xres ||
-			fpi_timing.panel_yres != di->fp_info.panel_yres )
-			continue;
+		di->fp_info.panel_pwr_delay = fpi.panel_pwr_delay;	
+		if( di->fp_info.panel_pwr_delay > 2000 || di->fp_info.panel_pwr_delay < 0 )
+			di->fp_info.panel_pwr_delay = 2000;
+			
+		di->fp_info.ref_div = fpi.ref_div;
+		di->fp_info.post_div = fpi.post_div;
+		di->fp_info.feedback_div = fpi.feedback_div;
+	
+		di->fp_info.fixed_dividers =
+			di->fp_info.ref_div != 0 && di->fp_info.feedback_div > 3;
 		
-		di->fp_info.h_blank = (fpi_timing.h_total - fpi_timing.h_display) * 8;
-		// TBD: seems like upper four bits of hsync_start contain garbage
-		di->fp_info.h_over_plus = ((fpi_timing.h_sync_start & 0xfff) - fpi_timing.h_display - 1) * 8;
-		di->fp_info.h_sync_width = fpi_timing.h_sync_width * 8;
-		di->fp_info.v_blank = fpi_timing.v_total - fpi_timing.v_display;
-		di->fp_info.v_over_plus = (fpi_timing.v_sync & 0x7ff) - fpi_timing.v_display;
-		di->fp_info.v_sync_width = (fpi_timing.v_sync & 0xf800) >> 11;          
-		di->fp_info.dot_clock = fpi_timing.dot_clock * 10;
-		return true;
-	}
+	
+		// there might be multiple supported resolutions stored;
+		// we are looking for native resolution
+		for( i = 0; i < 20; ++i ) {
+			uint16 fpi_timing_ofs;
+			FPI_TIMING_BLOCK fpi_timing;
+			
+			fpi_timing_ofs = fpi.fpi_timing_ofs[i];
+			
+			if( fpi_timing_ofs == 0 )
+				break;
+				
+			memcpy( &fpi_timing, di->rom.rom_ptr + fpi_timing_ofs, sizeof( fpi_timing ));
+	
+			if( fpi_timing.panel_xres != di->fp_info.panel_xres ||
+				fpi_timing.panel_yres != di->fp_info.panel_yres )
+				continue;
+			
+			di->fp_info.h_blank			= (fpi_timing.h_total - fpi_timing.h_display) * 8;
+			// TBD: seems like upper four bits of hsync_start contain garbage
+			di->fp_info.h_over_plus 	= ((fpi_timing.h_sync_start & 0xfff) - fpi_timing.h_display - 1) * 8;
+			di->fp_info.h_sync_width 	= fpi_timing.h_sync_width * 8;
+			di->fp_info.v_blank			= fpi_timing.v_total - fpi_timing.v_display;
+			di->fp_info.v_over_plus 	= (fpi_timing.v_sync & 0x7ff) - fpi_timing.v_display;
+			di->fp_info.v_sync_width 	= (fpi_timing.v_sync & 0xf800) >> 11;          
+			di->fp_info.dot_clock 		= fpi_timing.dot_clock * 10;
+			return true;
+		}
+	} // not is_atombios
 	
 	SHOW_ERROR0( 2, "Radeon: couldn't get Panel Timing from BIOS" );
 	return false;
