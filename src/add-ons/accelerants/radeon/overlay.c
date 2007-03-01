@@ -102,6 +102,14 @@ void Radeon_InitOverlay(
 	Radeon_OUTPLLP( regs, si->asic, RADEON_VCLK_ECP_CNTL, 
 		ecp_div << RADEON_ECP_DIV_SHIFT, ~RADEON_ECP_DIV_MASK );
 
+	// Force the overlay clock on for integrated chips
+	if ((si->asic == rt_rs100) || 
+	(si->asic == rt_rs200) ||
+	(si->asic == rt_rs300)) {
+		Radeon_OUTPLL( regs, si->asic, RADEON_VCLK_ECP_CNTL,
+        	(Radeon_INPLL( regs, si->asic, RADEON_VCLK_ECP_CNTL) | (1<<18)));
+    }
+    
 	si->active_overlay.crtc_idx = si->pending_overlay.crtc_idx;
 	
 	// invalidate active colour space
@@ -442,6 +450,7 @@ static space_params space_params_table[16] = {
 
 // get appropriate scaling/filter parameters
 static hscale_factor *getHScaleFactor( 
+	accelerator_info *ai,
 	space_params *params, 
 	uint32 src_left, uint32 src_right, uint32 *h_inc )
 {
@@ -450,64 +459,67 @@ static hscale_factor *getHScaleFactor(
 	uint i;
 	uint num_factors;
 	hscale_factor *factors;
-	
+
 	SHOW_FLOW0( 3, "" );
 
 	// check whether fifo is large enough to feed vertical 4-tap-filter
-	
+
 	words_per_p1_line = 
 		ceilShiftDiv( (src_right - 1) << params->bpp_shift, 4 ) - 
 		((src_left << params->bpp_shift) >> 4) + 1;
 	words_per_p23_line = 
 		ceilShiftDiv( (src_right - 1) << params->bpuv_shift, 4 ) - 
 		((src_left << params->bpuv_shift) >> 4) + 1;
-		
-	// overlay buffer for one line; this value is probably 
-	// higher on newer Radeons (or smaller on older Radeons?)
-	max_words_per_line = 96;
 
-	switch( params->num_planes ) {
-	case 3:
-		p1_4tap_allowed = words_per_p1_line < max_words_per_line / 2;
-		p23_4tap_allowed = words_per_p23_line < max_words_per_line / 4;
-		break;
-	case 2:
-		p1_4tap_allowed = words_per_p1_line < max_words_per_line / 2;
-		p23_4tap_allowed = words_per_p23_line < max_words_per_line / 2;
-		break;
-	case 1:
-	default:
-		p1_4tap_allowed = p23_4tap_allowed = words_per_p1_line < max_words_per_line;
-		break;
+	// overlay scaler line length differs for different revisions 
+	// this needs to be maintained by hand 
+	if (ai->si->asic == rt_r200 || ai->si->asic >= rt_r300)
+		max_words_per_line = 1920 / 16;
+	else
+		max_words_per_line = 1536 / 16;
+
+	switch (params->num_planes) {
+		case 3:
+			p1_4tap_allowed = words_per_p1_line < max_words_per_line / 2;
+			p23_4tap_allowed = words_per_p23_line < max_words_per_line / 4;
+			break;
+		case 2:
+			p1_4tap_allowed = words_per_p1_line < max_words_per_line / 2;
+			p23_4tap_allowed = words_per_p23_line < max_words_per_line / 2;
+			break;
+		case 1:
+		default:
+			p1_4tap_allowed = p23_4tap_allowed = words_per_p1_line < max_words_per_line;
+			break;
 	}
-	
+
 	SHOW_FLOW( 3, "p1_4tap_allowed=%d, p23_4t_allowed=%d", 
 		(int)p1_4tap_allowed, (int)p23_4tap_allowed );
 
 	// search for proper scaling/filter entry
 	factors = params->factors;
 	num_factors = params->num_factors;
-		
-	if( factors == NULL || num_factors == 0 )
+
+	if (factors == NULL || num_factors == 0)
 		return NULL;
-		
-	for( i = 0; i < num_factors; ++i, ++factors ) {
-		if( *h_inc <= factors->max_scale && 
-			(factors->p1_step_by > 0 || p1_4tap_allowed) &&
-			(factors->p23_step_by > 0 || p23_4tap_allowed))
+
+	for (i = 0; i < num_factors; ++i, ++factors) {
+		if (*h_inc <= factors->max_scale
+			&& (factors->p1_step_by > 0 || p1_4tap_allowed)
+			&& (factors->p23_step_by > 0 || p23_4tap_allowed))
 			break;
 	}
-	
-	if( i == num_factors ) {
+
+	if (i == num_factors) {
 		// overlay is asked to be scaled down more than allowed,
 		// so use least scaling factor supported
 		--factors;
 		*h_inc = factors->max_scale;
 	}
-	
+
 	SHOW_FLOW( 3, "group_size=%d, p1_step_by=%d, p23_step_by=%d", 
 		factors->group_size, factors->p1_step_by, factors->p23_step_by );
-	
+
 	return factors;
 }			
 
@@ -542,6 +554,8 @@ static status_t Radeon_ShowOverlay(
 	uint32 p1_x_start, p1_x_end;
 	uint32 p23_x_start, p23_x_end;
 	
+	uint scale_ctrl;
+		
 	/*uint32 buffer[20*2];
 	uint idx = 0;*/
 	
@@ -646,7 +660,7 @@ static status_t Radeon_ShowOverlay(
 
 	// choose proper scaler
 	{
-		factors = getHScaleFactor( params, src_left >> 16, src_right >> 16, &h_inc );
+		factors = getHScaleFactor( ai, params, src_left >> 16, src_right >> 16, &h_inc );
 		if( factors == NULL )
 			return B_ERROR;
 			
@@ -871,12 +885,31 @@ static status_t Radeon_ShowOverlay(
 	OUTREG( regs, RADEON_OV0_P23_V_ACCUM_INIT, p23_v_accum_init );
 	
 	OUTREG( regs, RADEON_OV0_TEST, node->test_reg );
-	OUTREG( regs, RADEON_OV0_SCALE_CNTL, 
-		RADEON_SCALER_ENABLE | 
+	
+	scale_ctrl = RADEON_SCALER_ENABLE | 
 		RADEON_SCALER_DOUBLE_BUFFER | 
 		(node->ati_space << 8) | 
-		/*RADEON_SCALER_ADAPTIVE_DEINT |*/ 
-		(crtc->crtc_idx == 0 ? 0 : RADEON_SCALER_CRTC_SEL ));
+		RADEON_SCALER_ADAPTIVE_DEINT |
+		RADEON_SCALER_BURST_PER_PLANE |
+		(crtc->crtc_idx == 0 ? 0 : RADEON_SCALER_CRTC_SEL );
+		
+	switch (node->ati_space << 8) {
+		case RADEON_SCALER_SOURCE_15BPP: // RGB15
+		case RADEON_SCALER_SOURCE_16BPP:
+		case RADEON_SCALER_SOURCE_32BPP:
+			OUTREG( regs, RADEON_OV0_SCALE_CNTL, scale_ctrl | 
+							RADEON_SCALER_LIN_TRANS_BYPASS);
+			break;
+		case RADEON_SCALER_SOURCE_VYUY422: // VYUY422
+		case RADEON_SCALER_SOURCE_YVYU422: // YVYU422
+			OUTREG( regs, RADEON_OV0_SCALE_CNTL, scale_ctrl);
+			break;
+		default:
+			SHOW_FLOW(4, "What overlay format is this??? %d", node->ati_space);
+			OUTREG( regs, RADEON_OV0_SCALE_CNTL, scale_ctrl |
+			 (( ai->si->asic >= rt_r200) ? R200_SCALER_TEMPORAL_DEINT : 0));
+		
+	}
 	
 	si->overlay_mgr.auto_flip_reg ^= RADEON_OV0_SOFT_EOF_TOGGLE;
 	
