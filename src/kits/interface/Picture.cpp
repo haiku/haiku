@@ -165,7 +165,7 @@ BPicture::init_data()
 	token = -1;
 	usurped = NULL;
 
-	extent = new (nothrow) _BPictureExtent_;
+	extent = new (std::nothrow) _BPictureExtent_;
 }
 
 
