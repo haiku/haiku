@@ -55,6 +55,19 @@ enum {
 // buffers in one chunk, the size per buffer in bytes must be a multiple of 4k
 #define INDIRECT_BUFFER_SIZE (4096/4)
 
+typedef struct {
+	uint32	loginfo;
+	uint32	logflow;
+	uint32	logerror;
+	bool	switchhead;
+	bool	force_lcd;
+	bool	dynamic_clocks; // power saving / management for mobility chips
+	bool	force_pci;
+	bool	unhide_fastwrites;
+	bool	force_acc_dma;	// one or the other
+	bool	force_acc_mmio; // one or the other
+	bool	acc_writeback;
+} radeon_settings;
 
 // type of memory
 typedef enum {
@@ -459,6 +472,8 @@ typedef struct {
 	int		refresh_period;		// duration of one frame in ms
 	int		blank_period;		// vertical blank period of a frame in ms
 	int		enable_virtual_irq;	// true, to enable virtual interrupts
+	
+	radeon_settings	settings;	// settings from radeon.settings file
 	
 	struct log_info_t *log;		// fast logger data
 } shared_info;

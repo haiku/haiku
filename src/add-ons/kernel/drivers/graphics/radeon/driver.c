@@ -45,6 +45,89 @@ static device_hooks graphics_device_hooks = {
 	NULL
 };
 
+radeon_settings def_settings = { // see comments in radeon.settings
+	2,			 		// loginfo
+	2,			 		// logflow
+	2,			 		// logerror
+	false,				// switchhead
+	false,				// force_lcd
+	true,				// dynamic_clocks
+	true,				// force_pci
+	false,				// unhide_fw
+	false,				// acc_dma
+	false,				// acc_mmio
+	true,				// acc_wb
+};
+
+radeon_settings current_settings;
+
+static void GetDriverSettings(void)
+{
+
+	void *settings_handle  = NULL;
+
+	SHOW_FLOW0( 1, "" );
+	
+	// init settings to defaults;
+	current_settings = def_settings;
+	
+	// get driver/accelerant settings, apsed
+	settings_handle  = load_driver_settings ("radeon.settings");
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "loginfo", "2", "2");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0' && value <= 4) {
+			current_settings.loginfo = value;
+			SHOW_INFO( 1, "Log Info Level now %ld/4", value );
+		}
+		
+		item = get_driver_parameter (settings_handle, "logflow", "2", "2");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0' && value <= 4) {
+			current_settings.logflow = value;
+			SHOW_INFO( 1, "Log Flow Level now %ld/4", value );
+		}
+
+		item = get_driver_parameter (settings_handle, "logerror", "2", "2");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0' && value <= 4) {
+			current_settings.logerror = value;
+			SHOW_INFO( 1, "Log Error Level now %ld/4", value );
+		}
+		
+		current_settings.switchhead = get_driver_boolean_parameter (settings_handle, "switchhead", false, false);
+		current_settings.force_lcd = get_driver_boolean_parameter (settings_handle, "force_lcd", false, false);
+		current_settings.dynamic_clocks = get_driver_boolean_parameter (settings_handle, "dynamic_clocks", true, true);
+		current_settings.force_pci = get_driver_boolean_parameter (settings_handle, "force_pci", true, true);
+		current_settings.unhide_fastwrites = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
+		current_settings.force_acc_dma = get_driver_boolean_parameter (settings_handle, "force_acc_dma", false, false);
+		current_settings.force_acc_mmio = get_driver_boolean_parameter (settings_handle, "force_acc_mmio", false, false);
+		current_settings.acc_writeback = get_driver_boolean_parameter (settings_handle, "acc_writeback", false, false);
+
+		if ( current_settings.switchhead != def_settings.switchhead )
+			SHOW_INFO0( 1, "Switch Head = True" );
+		if ( current_settings.force_lcd != def_settings.force_lcd )
+			SHOW_INFO0( 1, "Force LCD ON" );
+		if ( current_settings.dynamic_clocks != def_settings.dynamic_clocks )
+			SHOW_INFO0( 1, "Mobility Power Saving Disabled (Dynamic Clocks)" );
+		if ( current_settings.force_pci != def_settings.force_pci )
+			SHOW_INFO0( 1, "Force PCI = True" );
+		if ( current_settings.unhide_fastwrites != def_settings.unhide_fastwrites )
+			SHOW_INFO0( 1, "use Fastwrites ON" );
+		if ( current_settings.force_acc_dma != def_settings.force_acc_dma )
+			SHOW_INFO0( 1, "DMA ACC Enabled" );
+		if ( current_settings.force_acc_mmio != def_settings.force_acc_mmio )
+			SHOW_INFO0( 1, "DMA ACC Disabled" );
+		if ( current_settings.acc_writeback != def_settings.acc_writeback )
+			SHOW_INFO0( 1, "DMA WriteBack Disabled" );
+			
+		unload_driver_settings (settings_handle);
+	}
+}
 
 // public function: check whether there is *any* supported hardware
 status_t init_hardware( void )
@@ -74,6 +157,7 @@ status_t init_driver( void )
 	
 	(void)INIT_BEN( devices->kernel, "Radeon Kernel" );
 	
+	GetDriverSettings();
 	Radeon_ProbeDevices();
 	return B_OK;
 }

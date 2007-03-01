@@ -28,6 +28,7 @@
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 #define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
 
+extern radeon_settings current_settings;
 
 // map frame buffer and registers
 // mmio_only - true = map registers only (used during detection)
@@ -229,7 +230,14 @@ status_t Radeon_FirstOpen( device_info *di )
 	memset( di->si, 0, sizeof( *di->si ));
 	
 	si = di->si;
+	
+	si->settings = di->settings = current_settings;
 
+	if (di->settings.force_acc_dma)
+		di->acc_dma = true;
+	if (di->settings.force_acc_mmio) // force mmio will override dma... a tristate fuzzylogic, grey bool would be nice...
+		di->acc_dma = false;
+	
 #ifdef ENABLE_LOGGING
 #ifdef LOG_INCLUDE_STARTUP	
 	si->log = log_init( 1000000 );

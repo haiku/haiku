@@ -650,6 +650,11 @@ void Radeon_SetupDefaultMonitorRouting(
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
 	display_device_e display_devices = vc->connected_displays;
+
+	if (ai->si->settings.force_lcd) {	
+		use_laptop_panel = true;
+		SHOW_FLOW0( 2, 	"LCD Forced Used by Kernel Settings");
+	}
 	
 	SHOW_FLOW( 2, "display_devices=%x, whished_num_heads=%d, use_laptop_panel=%d", 
 		display_devices, whished_num_heads, use_laptop_panel );

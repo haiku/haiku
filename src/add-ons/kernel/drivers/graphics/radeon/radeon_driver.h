@@ -154,6 +154,8 @@ typedef struct device_info {
     
 	uint32		dac2_cntl;		// original dac2_cntl register content
 
+	radeon_settings	settings;	// overrides read from radeon.settings
+
 	pci_info	pcii;
 	char		name[MAX_RADEON_DEVICE_NAME_LENGTH];
 	char		video_name[MAX_RADEON_DEVICE_NAME_LENGTH];
