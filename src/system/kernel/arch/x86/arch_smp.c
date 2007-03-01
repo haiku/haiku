@@ -187,10 +187,10 @@ arch_smp_init(kernel_args *args)
 		apic_timer_tics_per_sec = args->arch_args.apic_time_cv_factor;
 
 		// setup regions that represent the apic & ioapic
-		create_area("local apic", &apic, B_EXACT_ADDRESS, B_PAGE_SIZE,
-			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		create_area("ioapic", &ioapic, B_EXACT_ADDRESS, B_PAGE_SIZE,
-			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		map_physical_memory("local apic", (void *)args->arch_args.apic, B_PAGE_SIZE,
+			B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &apic);
+		map_physical_memory("ioapic", (void *)args->arch_args.ioapic, B_PAGE_SIZE,
+			B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &ioapic);
 
 		// set up the local apic on the boot cpu
 		arch_smp_per_cpu_init(args, 0);
