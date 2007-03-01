@@ -1,85 +1,78 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2007, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
+#include "AppearPrefView.h"
+#include "MenuUtil.h"
+#include "PrefHandler.h"
+#include "PrefDlg.h"
+#include "PrefView.h"
+#include "spawn.h"
+#include "TermConst.h"
+
+#include <Alert.h>
 #include <Box.h>
 #include <Button.h>
 #include <FilePanel.h>
+#include <Path.h>
 #include <Screen.h>
-#include <Alert.h>
-#include <storage/Path.h>
+
 #include <stdio.h>
 
-#include "PrefHandler.h"
-#include "PrefDlg.h"
-#include "TermConst.h"
-#include "MenuUtil.h"
 
-#include "AppearPrefView.h"
-#include "PrefView.h"
-#include "spawn.h"
-
-
-// Global Preference Handler
 extern PrefHandler *gTermPref;
+	// Global Preference Handler
 
 PrefDlg::PrefDlg(BMessenger messenger)
-	: BWindow(CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
+	: BWindow(_CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
+	fPrefTemp(new PrefHandler(gTermPref)),
+	fSavePanel(NULL),
+	fDirty(false),
 	fPrefDlgMessenger(messenger)
 {
-	fPrefTemp = new PrefHandler(gTermPref);
-	fDirty = false;
-	fSavePanel = NULL;
-	
-	BRect r;
+	BRect rect;
 	
 	BView *top = new BView(Bounds(), "topview", B_FOLLOW_NONE, B_WILL_DRAW);
-							top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(top);
 	
-	r=top->Bounds();
-	r.bottom *= .75;
-	AppearancePrefView *prefView= new AppearancePrefView(r, "Appearance", 
+	rect = top->Bounds();
+	rect.bottom *= .75;
+	AppearancePrefView *prefView= new AppearancePrefView(rect, "Appearance", 
 		fPrefDlgMessenger);
 	top->AddChild(prefView);
 	
-	fSaveAsFileButton = new BButton(BRect(0,0,1,1), "savebutton", 
-									"Save to File", 
-									new BMessage(MSG_SAVEAS_PRESSED),
-									B_FOLLOW_TOP, B_WILL_DRAW);
+	fSaveAsFileButton = new BButton(BRect(0, 0, 1, 1), "savebutton", "Save to File", 
+		new BMessage(MSG_SAVEAS_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	fSaveAsFileButton->ResizeToPreferred();
 	fSaveAsFileButton->MoveTo(5, top->Bounds().Height() - 5 - 
-								fSaveAsFileButton->Bounds().Height());
+		fSaveAsFileButton->Bounds().Height());
 	top->AddChild(fSaveAsFileButton);
-	
-	
-	fSaveButton = new BButton(BRect(0,0,1,1), "okbutton", "OK", 
-								new BMessage(MSG_SAVE_PRESSED), B_FOLLOW_TOP, 
-								B_WILL_DRAW);
+
+	fSaveButton = new BButton(BRect(0, 0, 1, 1), "okbutton", "OK",
+		new BMessage(MSG_SAVE_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	fSaveButton->ResizeToPreferred();
 	fSaveButton->MoveTo(top->Bounds().Width() - 5 - fSaveButton->Bounds().Width(),
-						top->Bounds().Height() - 5 - fSaveButton->Bounds().Height());
+		top->Bounds().Height() - 5 - fSaveButton->Bounds().Height());
 	fSaveButton->MakeDefault(true);
 	top->AddChild(fSaveButton);
-	
-	fRevertButton = new BButton(BRect(0,0,1,1), "revertbutton",
-								"Cancel", new BMessage(MSG_REVERT_PRESSED), 
-								B_FOLLOW_TOP, B_WILL_DRAW);
+
+	fRevertButton = new BButton(BRect(0, 0, 1, 1), "revertbutton",
+		"Cancel", new BMessage(MSG_REVERT_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	fRevertButton->ResizeToPreferred();
-	fRevertButton->MoveTo(fSaveButton->Frame().left - 10 - 
-							fRevertButton->Bounds().Width(),
-							top->Bounds().Height() - 5 - 
-							fRevertButton->Bounds().Height());
+	fRevertButton->MoveTo(fSaveButton->Frame().left - 10 -
+		fRevertButton->Bounds().Width(), top->Bounds().Height() - 5 - 
+		fRevertButton->Bounds().Height());
 	top->AddChild(fRevertButton);
 
-	AddShortcut ((ulong)'Q', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	AddShortcut ((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	AddShortcut((ulong)'Q', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	Show();
 }
@@ -213,16 +206,16 @@ PrefDlg::MessageReceived(BMessage *msg)
 
 
 BRect
-PrefDlg::CenteredRect(BRect r)
+PrefDlg::_CenteredRect(BRect rect)
 {
 	BRect screenRect = BScreen().Frame();
 	
 	screenRect.InsetBy(10,10);
 	
-	float x = screenRect.left + (screenRect.Width() - r.Width()) / 2;
-	float y = screenRect.top + (screenRect.Height() - r.Height()) / 3;
+	float x = screenRect.left + (screenRect.Width() - rect.Width()) / 2;
+	float y = screenRect.top + (screenRect.Height() - rect.Height()) / 3;
 	
-	r.OffsetTo(x, y);
+	rect.OffsetTo(x, y);
 	
-	return r;
+	return rect;
 }
