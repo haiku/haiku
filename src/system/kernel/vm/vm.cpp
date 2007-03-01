@@ -1343,7 +1343,7 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 	}
 	if (status == B_OK && newArea->wiring == B_FULL_LOCK) {
 		// we need to map in everything at this point
-		if (newArea->cache_type == CACHE_TYPE_DEVICE) {
+		if (sourceArea->cache_type == CACHE_TYPE_DEVICE) {
 			// we don't have actual pages to map but a physical area
 			vm_translation_map *map = &sourceArea->address_space->translation_map;
 			map->ops->lock(map);
