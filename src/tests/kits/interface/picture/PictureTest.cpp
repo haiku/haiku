@@ -109,12 +109,21 @@ PictureView::AllAttached()
 	DrawStuff(this);
 
 	BPicture *picture = EndPicture();
-	
+	if (picture == NULL)
+		return;
+
+	BMessage message;
+	picture->Archive(&message);
+	message.PrintToStream();
+
 	BMallocIO stream;
 	
 	status_t status = picture->Flatten(&stream);
+	delete picture;
+
 	if (status != B_OK)
 		printf("Error flattening BPicture: %s\n", strerror(status));
+	
 	if (status == B_OK) {
 		stream.Seek(0, SEEK_SET);
 		fPicture = new BPicture();
@@ -123,7 +132,9 @@ PictureView::AllAttached()
 			printf("Error unflattening BPicture: %s\n", strerror(status));
 	}
 
-	delete picture;
+	BMessage message2;
+	//fPicture->Archive(&message2);
+	message2.PrintToStream();
 }
 
 void
