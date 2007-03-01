@@ -110,6 +110,7 @@ setup_apic(kernel_args *args, int32 cpu)
 	uint32 config;
 
 	TRACE(("setting up the APIC for CPU %ld...\n", cpu));
+	TRACE(("	apic id %d, version %d\n", apic_read(APIC_ID), apic_read(APIC_VERSION)));
 
 	/* set spurious interrupt vector to 0xff */
 	config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
@@ -187,9 +188,9 @@ arch_smp_init(kernel_args *args)
 		apic_timer_tics_per_sec = args->arch_args.apic_time_cv_factor;
 
 		// setup regions that represent the apic & ioapic
-		map_physical_memory("local apic", (void *)args->arch_args.apic, B_PAGE_SIZE,
+		map_physical_memory("local apic", (void *)args->arch_args.apic_phys, B_PAGE_SIZE,
 			B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &apic);
-		map_physical_memory("ioapic", (void *)args->arch_args.ioapic, B_PAGE_SIZE,
+		map_physical_memory("ioapic", (void *)args->arch_args.ioapic_phys, B_PAGE_SIZE,
 			B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &ioapic);
 
 		// set up the local apic on the boot cpu
