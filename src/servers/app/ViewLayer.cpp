@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Adi Oanca <adioanca@gmail.com>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Marcus Overhagen <marcus@overhagen.de>
  */
 
 
@@ -645,7 +646,7 @@ ViewLayer::ConvertToScreen(BRegion* region) const
 	BPoint offset(0.0, 0.0);
 	ConvertToScreen(&offset);
 
-	region->OffsetBy(offset.x, offset.y);
+	region->OffsetBy((int)offset.x, (int)offset.y);
 }
 
 
@@ -689,7 +690,7 @@ ViewLayer::ConvertFromScreen(IntRect* rect) const
 	BPoint offset(0.0, 0.0);
 	ConvertFromScreen(&offset);
 
-	rect->OffsetBy(offset.x, offset.y);
+	rect->OffsetBy((int)offset.x, (int)offset.y);
 }
 
 
@@ -700,7 +701,7 @@ ViewLayer::ConvertFromScreen(BRegion* region) const
 	BPoint offset(0.0, 0.0);
 	ConvertFromScreen(&offset);
 
-	region->OffsetBy(offset.x, offset.y);
+	region->OffsetBy((int)offset.x, (int)offset.y);
 }
 
 
@@ -734,6 +735,57 @@ ViewLayer::ConvertToScreenForDrawing(BRegion* region) const
 	// NOTE: from here on, don't use the
 	// "*ForDrawing()" versions of the parent!
 	ConvertToScreen(region);
+}
+
+
+//! converts points from local *drawing* to screen coordinate system 
+void
+ViewLayer::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
+{
+	// TODO: optimize this, it should be smarter
+	while (num--) {
+		*dst = *src;
+		fDrawState->Transform(dst);
+		// NOTE: from here on, don't use the
+		// "*ForDrawing()" versions of the parent!
+		ConvertToScreen(dst);
+		src++;
+		dst++;
+	}
+}
+
+
+//! converts rects from local *drawing* to screen coordinate system 
+void
+ViewLayer::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
+{
+	// TODO: optimize this, it should be smarter
+	while (num--) {
+		*dst = *src;
+		fDrawState->Transform(dst);
+		// NOTE: from here on, don't use the
+		// "*ForDrawing()" versions of the parent!
+		ConvertToScreen(dst);
+		src++;
+		dst++;
+	}
+}
+
+
+//! converts regions from local *drawing* to screen coordinate system 
+void
+ViewLayer::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
+{
+	// TODO: optimize this, it should be smarter
+	while (num--) {
+		*dst = *src;
+		fDrawState->Transform(dst);
+		// NOTE: from here on, don't use the
+		// "*ForDrawing()" versions of the parent!
+		ConvertToScreen(dst);
+		src++;
+		dst++;
+	}
 }
 
 

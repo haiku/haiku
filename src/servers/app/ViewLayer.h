@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Adi Oanca <adioanca@gmail.com>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Marcus Overhagen <marcus@overhagen.de>
  */
 #ifndef	VIEW_LAYER_H
 #define VIEW_LAYER_H
@@ -131,6 +132,10 @@ class ViewLayer {
 			void			ConvertToScreenForDrawing(BPoint* point) const;
 			void			ConvertToScreenForDrawing(BRect* rect) const;
 			void			ConvertToScreenForDrawing(BRegion* region) const;
+
+			void			ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const;
+			void			ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const;
+			void			ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const;
 
 			void			ConvertFromScreenForDrawing(BPoint* point) const;
 				// used when updating the pen position

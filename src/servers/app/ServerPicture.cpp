@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Marcus Overhagen <marcus@overhagen.de>
  */
 
 
@@ -34,6 +35,8 @@ class ShapePainter : public BShapeIterator {
 		ShapePainter();
 		virtual ~ShapePainter();
 
+		status_t Iterate(const BShape *shape);
+
 		virtual status_t IterateMoveTo(BPoint *point);
 		virtual status_t IterateLineTo(int32 lineCount, BPoint *linePts);
 		virtual status_t IterateBezierTo(int32 bezierCount, BPoint *bezierPts);
@@ -53,6 +56,13 @@ ShapePainter::ShapePainter()
 
 ShapePainter::~ShapePainter()
 {
+}
+
+status_t
+ShapePainter::Iterate(const BShape *shape)
+{
+	// this class doesn't modify the shape data
+	return BShapeIterator::Iterate(const_cast<BShape *>(shape));
 }
 
 status_t
@@ -178,20 +188,20 @@ fill_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 
 
 static void
-stroke_bezier(ViewLayer *view, BPoint *points)
+stroke_bezier(ViewLayer *view, const BPoint *viewPoints)
 {
-	for (int32 i = 0; i < 4; i++)
-		view->ConvertToScreenForDrawing(&points[i]);
+	BPoint points[4];
+	view->ConvertToScreenForDrawing(points, viewPoints, 4);
 
 	view->Window()->GetDrawingEngine()->DrawBezier(points, view->CurrentState(), false);
 }
 
 
 static void
-fill_bezier(ViewLayer *view, BPoint *points)
+fill_bezier(ViewLayer *view, const BPoint *viewPoints)
 {
-	for (int32 i = 0; i < 4; i++)
-		view->ConvertToScreenForDrawing(&points[i]);
+	BPoint points[4];
+	view->ConvertToScreenForDrawing(points, viewPoints, 4);
 
 	view->Window()->GetDrawingEngine()->DrawBezier(points, view->CurrentState(), true);
 }
@@ -240,10 +250,13 @@ fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 
 
 static void
-stroke_polygon(ViewLayer *view, int32 numPoints, BPoint *points, bool isClosed)
+stroke_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints, bool isClosed)
 {
-	for (int32 i = 0; i < numPoints; i++)
-		view->ConvertToScreenForDrawing(&points[i]);
+	BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
+	if (!points)
+		return;
+
+	view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
 
 	BRect polyFrame = BRect(points[0], points[0]);
 
@@ -260,14 +273,19 @@ stroke_polygon(ViewLayer *view, int32 numPoints, BPoint *points, bool isClosed)
 
 	view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, view->CurrentState(),
 							false, isClosed && numPoints > 2);
+
+	free(points);
 }
 
 
 static void
-fill_polygon(ViewLayer *view, int32 numPoints, BPoint *points)
+fill_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints)
 {
-	for (int32 i = 0; i < numPoints; i++)
-		view->ConvertToScreenForDrawing(&points[i]);
+	BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
+	if (!points)
+		return;
+
+	view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
 
 	BRect polyFrame = BRect(points[0], points[0]);
 
@@ -284,11 +302,13 @@ fill_polygon(ViewLayer *view, int32 numPoints, BPoint *points)
 
 	view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, view->CurrentState(),
 							true, true);
+
+	free(points);
 }
 
 
 static void
-stroke_shape(ViewLayer *view, BShape *shape)
+stroke_shape(ViewLayer *view, const BShape *shape)
 {
 	ShapePainter drawShape;
 
@@ -298,7 +318,7 @@ stroke_shape(ViewLayer *view, BShape *shape)
 
 
 static void
-fill_shape(ViewLayer *view, BShape *shape)
+fill_shape(ViewLayer *view, const BShape *shape)
 {
 	ShapePainter drawShape;
 
@@ -308,7 +328,7 @@ fill_shape(ViewLayer *view, BShape *shape)
 
 
 static void
-draw_string(ViewLayer *view, char *string, float deltaSpace, float deltaNonSpace)
+draw_string(ViewLayer *view, const char *string, float deltaSpace, float deltaNonSpace)
 {
 	BPoint location = view->CurrentState()->PenLocation();
 	escapement_delta delta = {deltaSpace, deltaNonSpace };
@@ -322,7 +342,7 @@ draw_string(ViewLayer *view, char *string, float deltaSpace, float deltaNonSpace
 
 static void
 draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
-				 int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
+				 int32 bytesPerRow, int32 pixelFormat, int32 flags, const void *data)
 {
 	// TODO: Review this
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1), (color_space)pixelFormat, flags, bytesPerRow);
@@ -330,13 +350,7 @@ draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 	if (!bitmap.IsValid())
 		return;
 	
-	uint8 *pixels = (uint8 *)data;
-	uint8 *destPixels = (uint8 *)bitmap.Bits();
-	for (int32 h = 0; h < height; h++) {
-		memcpy(destPixels, pixels, bytesPerRow);
-		pixels += bytesPerRow;
-		destPixels += bytesPerRow;
-	}
+	memcpy(bitmap.Bits(), data, height * bytesPerRow);
 
 	view->ConvertToScreenForDrawing(&dest);
 	
@@ -345,7 +359,7 @@ draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 
 
 static void
-set_clipping_rects(ViewLayer *view, BRect *rects, uint32 numRects)
+set_clipping_rects(ViewLayer *view, const BRect *rects, uint32 numRects)
 {
 	// TODO: This is too slow, we should copy the rects directly to BRegion's internal data
 	BRegion region;
@@ -473,14 +487,14 @@ set_scale(ViewLayer *view, float scale)
 
 
 static void
-set_font_family(ViewLayer *view, char *family)
+set_font_family(ViewLayer *view, const char *family)
 {
 	printf("SetFontFamily(%s)\n", family);
 }
 
 
 static void
-set_font_style(ViewLayer *view, char *style)
+set_font_style(ViewLayer *view, const char *style)
 {
 	printf("SetFontStyle(%s)\n", style);
 }

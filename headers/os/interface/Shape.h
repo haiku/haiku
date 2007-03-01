@@ -81,7 +81,7 @@ virtual	void			_ReservedShape4();
 		friend class	BPrivate::ServerLink;
 
 		void			GetData(int32 *opCount, int32 *ptCount, uint32 **opList, BPoint **ptList);
-		void			SetData(int32 opCount, int32 ptCount, uint32 *opList, BPoint *ptList);
+		void			SetData(int32 opCount, int32 ptCount, const uint32 *opList, const BPoint *ptList);
 		void			InitData();
 		void			AllocatePts(int32 count);
 		void			AllocateOps(int32 count);

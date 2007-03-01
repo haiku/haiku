@@ -173,10 +173,11 @@ PictureDataWriter::WriteDrawString(const BPoint &where, const char *string,
 	EndOp();
 		
 	BeginOp(B_PIC_DRAW_STRING);
-	Write<int32>(length);
-	WriteData(string, length);
 	Write<float>(escapement.space);
 	Write<float>(escapement.nonspace);
+	//WriteData(string, length + 1); // TODO: is string 0 terminated? why is length given?
+	WriteData(string, length);
+	Write<uint8>(0);
 	EndOp();
 
 	return B_OK;
@@ -189,8 +190,8 @@ PictureDataWriter::WriteDrawShape(const int32 &opCount, const void *opList,
 {
 	BeginOp(fill ? B_PIC_FILL_SHAPE : B_PIC_STROKE_SHAPE);
 	Write<int32>(opCount);
-	WriteData(opList, opCount * sizeof(uint32));
 	Write<int32>(ptCount);
+	WriteData(opList, opCount * sizeof(uint32));
 	WriteData(ptList, ptCount * sizeof(BPoint));
 	EndOp();
 	
@@ -203,6 +204,8 @@ PictureDataWriter::WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, c
 				const int32 &bytesPerRow, const int32 &colorSpace, const int32 &flags,
 				const void *data, const int32 &length)
 {
+	if (length != height * bytesPerRow)
+		debugger("PictureDataWriter::WriteDrawBitmap: invalid length");
 	BeginOp(B_PIC_DRAW_PIXELS);
 	Write<BRect>(srcRect);
 	Write<BRect>(dstRect);
@@ -211,7 +214,6 @@ PictureDataWriter::WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, c
 	Write<int32>(bytesPerRow);
 	Write<int32>(colorSpace);
 	Write<int32>(flags);
-	Write<int32>(length);
 	WriteData(data, length);
 	EndOp();
 	return B_OK;

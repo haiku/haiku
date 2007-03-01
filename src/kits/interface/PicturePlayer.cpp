@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Marcus Overhagen (marcus@overhagen.de)
  */
 
 /**	PicturePlayer is used to create and play picture data. */
@@ -21,12 +22,12 @@ typedef void (*fnc_BPoint)(void*, BPoint);
 typedef void (*fnc_BPointBPoint)(void*, BPoint, BPoint);
 typedef void (*fnc_BRect)(void*, BRect);
 typedef void (*fnc_BRectBPoint)(void*, BRect, BPoint);
-typedef void (*fnc_PBPoint)(void*, BPoint*);
+typedef void (*fnc_PBPoint)(void*, const BPoint*);
 typedef void (*fnc_i)(void*, int32);
-typedef void (*fnc_iPBPointb)(void*, int32, BPoint*, bool);
-typedef void (*fnc_iPBPoint)(void*, int32, BPoint*);
-typedef void (*fnc_Pc)(void*, char*);
-typedef void (*fnc_Pcff)(void*, char*, float, float);
+typedef void (*fnc_iPBPointb)(void*, int32, const BPoint*, bool);
+typedef void (*fnc_iPBPoint)(void*, int32, const BPoint*);
+typedef void (*fnc_Pc)(void*, const char*);
+typedef void (*fnc_Pcff)(void*, const char*, float, float);
 typedef void (*fnc_BPointBPointff)(void*, BPoint, BPoint, float, float);
 typedef void (*fnc_s)(void*, int16);
 typedef void (*fnc_ssf)(void*, int16, int16, float);
@@ -34,14 +35,15 @@ typedef void (*fnc_f)(void*, float);
 typedef void (*fnc_Color)(void*, rgb_color);
 typedef void (*fnc_Pattern)(void*, pattern);
 typedef void (*fnc_ss)(void *, int16, int16);
-typedef void (*fnc_PBRecti)(void*, BRect*, int32);
+typedef void (*fnc_PBRecti)(void*, const BRect*, int32);
 typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
-							   int32, int32, void*);
+							   int32, int32, const void *);
 typedef void (*fnc_BShape)(void*, BShape*);
 
 
-PicturePlayer::PicturePlayer(const void *data, int32 size, BList *pictures)
-	:	fData(data, size),
+PicturePlayer::PicturePlayer(const void *data, size_t size, BList *pictures)
+	:	fData(data),
+		fSize(size),
 		fPictures(pictures)
 {
 }
@@ -52,290 +54,177 @@ PicturePlayer::~PicturePlayer()
 }
 
 
-int16
-PicturePlayer::GetOp()
-{
-	int16 data;
-
-	fData.Read(&data, sizeof(int16));
-	
-	return data;
-}
-
-
-int8
-PicturePlayer::GetInt8()
-{
-	int8 data;
-
-	fData.Read(&data, sizeof(int8));
-	
-	return data;
-}
-
-
-int16
-PicturePlayer::GetInt16()
-{
-	int16 data;
-
-	fData.Read(&data, sizeof(int16));
-	
-	return data;
-}
-
-
-int32
-PicturePlayer::GetInt32()
-{
-	int32 data;
-
-	fData.Read(&data, sizeof(int32));
-	
-	return data;
-}
-
-
-float
-PicturePlayer::GetFloat()
-{
-	float data;
-
-	fData.Read(&data, sizeof(float));
-	
-	return data;
-}
-
-
-BPoint
-PicturePlayer::GetCoord()
-{
-	BPoint data;
-
-	fData.Read(&data, sizeof(BPoint));
-	
-	return data;
-}
-
-
-BRect
-PicturePlayer::GetRect()
-{
-	BRect data;
-
-	fData.Read(&data, sizeof(BRect));
-	
-	return data;
-}
-
-
-rgb_color
-PicturePlayer::GetColor()
-{
-	rgb_color data;
-
-	fData.Read(&data, sizeof(rgb_color));
-	
-	return data;
-}
-
-
-void
-PicturePlayer::GetData(void *data, int32 size)
-{
-	fData.Read(data, size);
-}
-
-
 status_t
 PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 {
 	// TODO: we should probably check if the functions in the table are not NULL
 	//       before calling them.
 
-	// lenght of the stream
-	size_t length = fData.Seek(0, SEEK_END);
-	fData.Seek(0, SEEK_SET);
+	const char *data = reinterpret_cast<const char *>(fData);
+	size_t pos = 0;
 
-	while (fData.Position() < length) {
-		int16 op = GetOp();
-		int32 size = GetInt32();
-		off_t pos = fData.Position();
+	while ((pos + 6) <= fSize) {
+		int16 op = *reinterpret_cast<const int16 *>(data);
+		int32 size = *reinterpret_cast<const int32 *>(data + 2);
+		pos += 6;
+		data += 6;
+
+		if (pos + size > fSize)
+			debugger("PicturePlayer::Play: buffer overrun\n");
 
 		switch (op) {
 			case B_PIC_MOVE_PEN_BY:
 			{
-				BPoint where = GetCoord();
-				((fnc_BPoint)callBackTable[1])(userData, where);
+				((fnc_BPoint)callBackTable[1])(userData,
+					*reinterpret_cast<const BPoint *>(data)); /* where */
 				break;
 			}
 
 			case B_PIC_STROKE_LINE:
 			{
-				BPoint start = GetCoord();
-				BPoint end = GetCoord();
-				((fnc_BPointBPoint)callBackTable[2])(userData, start, end);
+				((fnc_BPointBPoint)callBackTable[2])(userData, 
+					*reinterpret_cast<const BPoint *>(data), /* start */
+					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint))); /* end */
 				break;
 			}
 
 			case B_PIC_STROKE_RECT:
 			{
-				BRect rect = GetRect();
-				((fnc_BRect)callBackTable[3])(userData, rect);
+				((fnc_BRect)callBackTable[3])(userData,
+					*reinterpret_cast<const BRect *>(data)); /* rect */
 				break;
 			}
 
 			case B_PIC_FILL_RECT:
 			{
-				BRect rect = GetRect();
-				((fnc_BRect)callBackTable[4])(userData, rect);
+				((fnc_BRect)callBackTable[4])(userData,
+					*reinterpret_cast<const BRect *>(data)); /* rect */
 				break;
 			}
 
 			case B_PIC_STROKE_ROUND_RECT:
 			{
-				BRect rect = GetRect();
-				BPoint radii = GetCoord();
-				((fnc_BRectBPoint)callBackTable[5])(userData, rect, radii);
+				((fnc_BRectBPoint)callBackTable[5])(userData,
+					*reinterpret_cast<const BRect *>(data), /* rect */
+					*reinterpret_cast<const BPoint *>(data + sizeof(BRect))); /* radii */
 				break;
 			}
 
 			case B_PIC_FILL_ROUND_RECT:
 			{
-				BRect rect = GetRect();
-				BPoint radii = GetCoord();
-				((fnc_BRectBPoint)callBackTable[6])(userData, rect, radii);
+				((fnc_BRectBPoint)callBackTable[6])(userData,
+					*reinterpret_cast<const BRect *>(data), /* rect */
+					*reinterpret_cast<const BPoint *>(data + sizeof(BRect))); /* radii */
 				break;
 			}
 
 			case B_PIC_STROKE_BEZIER:
 			{
-				BPoint control[4];
-				GetData(control, sizeof(control));
-				((fnc_PBPoint)callBackTable[7])(userData, control);
+				((fnc_PBPoint)callBackTable[7])(userData,
+					reinterpret_cast<const BPoint *>(data));
 				break;
 			}
 
 			case B_PIC_FILL_BEZIER:
 			{
-				BPoint control[4];
-				GetData(control, sizeof(control));
-				((fnc_PBPoint)callBackTable[8])(userData, control);
+				((fnc_PBPoint)callBackTable[8])(userData,
+					reinterpret_cast<const BPoint *>(data));
 				break;
 			}
 
 			case B_PIC_STROKE_ARC:
 			{
-				BPoint center = GetCoord();
-				BPoint radii = GetCoord();
-				float startTheta = GetFloat();
-				float arcTheta = GetFloat();
-				((fnc_BPointBPointff)callBackTable[9])(userData, center, radii,
-					startTheta, arcTheta);
+				((fnc_BPointBPointff)callBackTable[9])(userData, 
+					*reinterpret_cast<const BPoint *>(data), /* center */
+					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint)), /* radii */
+					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint)), /* startTheta */
+					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint) + sizeof(float))); /* arcTheta */
 				break;
 			}
 
 			case B_PIC_FILL_ARC:
 			{
-				BPoint center = GetCoord();
-				BPoint radii = GetCoord();
-				float startTheta = GetFloat();
-				float arcTheta = GetFloat();
-				((fnc_BPointBPointff)callBackTable[10])(userData, center, radii,
-					startTheta, arcTheta);
+				((fnc_BPointBPointff)callBackTable[10])(userData,
+					*reinterpret_cast<const BPoint *>(data), /* center */
+					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint)), /* radii */
+					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint)), /* startTheta */
+					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint) + sizeof(float))); /* arcTheta */
 				break;
 			}
 
 			case B_PIC_STROKE_ELLIPSE:
 			{
-				BRect rect = GetRect();
-				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				BPoint center = rect.LeftTop() + radii;
+				const BRect *rect = reinterpret_cast<const BRect *>(data);
+				BPoint radii((rect->Width() + 1) / 2.0f, (rect->Height() + 1) / 2.0f);
+				BPoint center = rect->LeftTop() + radii;
 				((fnc_BPointBPoint)callBackTable[11])(userData, center, radii);
 				break;
 			}
 
 			case B_PIC_FILL_ELLIPSE:
 			{
-				BRect rect = GetRect();
-				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				BPoint center = rect.LeftTop() + radii;
+				const BRect *rect = reinterpret_cast<const BRect *>(data);
+				BPoint radii((rect->Width() + 1) / 2.0f, (rect->Height() + 1) / 2.0f);
+				BPoint center = rect->LeftTop() + radii;
 				((fnc_BPointBPoint)callBackTable[12])(userData, center, radii);
 				break;
 			}
 
 			case B_PIC_STROKE_POLYGON:
 			{
-				int32 numPoints = GetInt32();
-				BPoint *points = new BPoint[numPoints];
-				GetData(points, numPoints * sizeof(BPoint));
-				bool isClosed = (bool)GetInt8();
-				((fnc_iPBPointb)callBackTable[13])(userData, numPoints, points, isClosed);
-				delete[] points;
+				int32 numPoints = *reinterpret_cast<const int32 *>(data);
+				((fnc_iPBPointb)callBackTable[13])(userData, 
+					numPoints,
+					reinterpret_cast<const BPoint *>(data + sizeof(int32)), /* points */
+					*reinterpret_cast<const uint8 *>(data + sizeof(int32) + numPoints * sizeof(BPoint))); /* is-closed */
 				break;
 			}
 
 			case B_PIC_FILL_POLYGON:
 			{
-				int32 numPoints = GetInt32();
-				BPoint *points = new BPoint[numPoints];
-				GetData(points, numPoints * sizeof(BPoint));
-				((fnc_iPBPoint)callBackTable[14])(userData, numPoints, points);
-				delete[] points;
+				((fnc_iPBPoint)callBackTable[14])(userData, 
+					*reinterpret_cast<const int32 *>(data), /* numPoints */
+					reinterpret_cast<const BPoint *>(data + sizeof(int32))); /* points */
 				break;
 			}
 
 			case B_PIC_STROKE_SHAPE:
 			case B_PIC_FILL_SHAPE:
 			{
-				int32 opCount = GetInt32();
-				uint32 *opList = new uint32[opCount];
-				GetData(opList, opCount * sizeof(uint32));
-				
-				int32 ptCount = GetInt32();
-				BPoint *ptList = new BPoint[ptCount];
-				GetData(ptList, ptCount * sizeof(BPoint));
+				int32 opCount = *reinterpret_cast<const int32 *>(data);
+				int32 ptCount = *reinterpret_cast<const int32 *>(data + sizeof(int32));
+				const uint32 *opList = reinterpret_cast<const uint32 *>(data + 2 * sizeof(int32));
+				const BPoint *ptList = reinterpret_cast<const BPoint *>(data + 2 * sizeof(int32) + opCount * sizeof(uint32));
 
-				BShape shape;
+				// TODO: remove BShape data copying
+				BShape shape; 
 				shape.SetData(opCount, ptCount, opList, ptList);
 
 				const int32 tableIndex = (op == B_PIC_STROKE_SHAPE) ? 15 : 16;
 				((fnc_BShape)callBackTable[tableIndex])(userData, &shape);
-				
-				delete[] opList;
-				delete[] ptList;
-
 				break;
 			}
 			
 			case B_PIC_DRAW_STRING:
 			{
-				int32 len = GetInt32();
-				char *string = new char[len + 1];
-				GetData(string, len);
-				string[len] = '\0';
-				float deltax = GetFloat();
-				float deltay = GetFloat();
-				((fnc_Pcff)callBackTable[17])(userData, string, deltax, deltay);
-				delete[] string;
+				((fnc_Pcff)callBackTable[17])(userData, 
+					reinterpret_cast<const char *>(data + 2 * sizeof(float)), /* string */
+					*reinterpret_cast<const float *>(data), /* escapement.space */
+					*reinterpret_cast<const float *>(data + sizeof(float))); /* escapement.nonspace */
 				break;
 			}
 
 			case B_PIC_DRAW_PIXELS:
 			{
-				BRect src = GetRect();
-				BRect dest = GetRect();
-				int32 width = GetInt32();
-				int32 height = GetInt32();
-				int32 bytesPerRow = GetInt32();
-				int32 pixelFormat = GetInt32();
-				int32 flags = GetInt32();
-				int32 length = GetInt32();
-				char *data = new char[length];
-				GetData(data, length);
-				((fnc_DrawPixels)callBackTable[18])(userData, src, dest,
-					width, height, bytesPerRow, pixelFormat, flags, data);
-				delete[] data;
+				((fnc_DrawPixels)callBackTable[18])(userData,
+					*reinterpret_cast<const BRect *>(data), /* src */
+					*reinterpret_cast<const BRect *>(data + 1 * sizeof(BRect)), /* dst */
+					*reinterpret_cast<const int32 *>(data + 2 * sizeof(BRect)), /* width */
+					*reinterpret_cast<const int32 *>(data + 2 * sizeof(BRect) + 1 * sizeof(int32)), /* height */
+					*reinterpret_cast<const int32 *>(data + 2 * sizeof(BRect) + 2 * sizeof(int32)), /* bytesPerRow */
+					*reinterpret_cast<const int32 *>(data + 2 * sizeof(BRect) + 3 * sizeof(int32)), /* pixelFormat */
+					*reinterpret_cast<const int32 *>(data + 2 * sizeof(BRect) + 4 * sizeof(int32)), /* flags */
+					reinterpret_cast<const void *>(data + 2 * sizeof(BRect) + 5 * sizeof(int32))); /* data */
 				break;
 			}
 
@@ -386,148 +275,142 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_SET_ORIGIN:
 			{
-				BPoint pt = GetCoord();
-				((fnc_BPoint)callBackTable[28])(userData, pt);
+				((fnc_BPoint)callBackTable[28])(userData,
+					*reinterpret_cast<const BPoint *>(data)); /* origin */
 				break;
 			}
 
 			case B_PIC_SET_PEN_LOCATION:
 			{
-				BPoint pt = GetCoord();
-				((fnc_BPoint)callBackTable[29])(userData, pt);
+				((fnc_BPoint)callBackTable[29])(userData,
+					*reinterpret_cast<const BPoint *>(data)); /* location */
 				break;
 			}
 
 			case B_PIC_SET_DRAWING_MODE:
 			{
-				int16 mode = GetInt16();
-				((fnc_s)callBackTable[30])(userData, mode);
+				((fnc_s)callBackTable[30])(userData,
+					*reinterpret_cast<const int16 *>(data)); /* mode */
 				break;
 			}
 
 			case B_PIC_SET_LINE_MODE:
 			{
-				int16 capMode = GetInt16();
-				int16 joinMode = GetInt16();
-				float miterLimit = GetFloat();
-				((fnc_ssf)callBackTable[31])(userData, capMode, joinMode, miterLimit);
+				((fnc_ssf)callBackTable[31])(userData,
+					*reinterpret_cast<const int16 *>(data), /* cap-mode */
+					*reinterpret_cast<const int16 *>(data + 1 * sizeof(int16)), /* join-mode */
+					*reinterpret_cast<const float *>(data + 2 * sizeof(int16))); /* miter-limit */
 				break;
 			}
 
 			case B_PIC_SET_PEN_SIZE:
 			{
-				float size = GetFloat();
-				((fnc_f)callBackTable[32])(userData, size);
+				((fnc_f)callBackTable[32])(userData,
+					*reinterpret_cast<const float *>(data)); /* size */
 				break;
 			}
 
 			case B_PIC_SET_FORE_COLOR:
 			{			
-				rgb_color color = GetColor();
-				((fnc_Color)callBackTable[33])(userData, color);
+				((fnc_Color)callBackTable[33])(userData,
+					*reinterpret_cast<const rgb_color *>(data)); /* color */
 				break;
 			}
 
 			case B_PIC_SET_BACK_COLOR:
 			{			
-				rgb_color color = GetColor();
-				((fnc_Color)callBackTable[34])(userData, color);
+				((fnc_Color)callBackTable[34])(userData,
+					*reinterpret_cast<const rgb_color *>(data)); /* color */
 				break;
 			}
 
 			case B_PIC_SET_STIPLE_PATTERN:
 			{
-				pattern p;
-				GetData(&p, sizeof(p));
-				((fnc_Pattern)callBackTable[35])(userData, p);
+				((fnc_Pattern)callBackTable[35])(userData,
+					*reinterpret_cast<const pattern *>(data)); /* pattern */
 				break;
 			}
 
 			case B_PIC_SET_SCALE:
 			{
-				float scale = GetFloat();
-				((fnc_f)callBackTable[36])(userData, scale);
+				((fnc_f)callBackTable[36])(userData,
+					*reinterpret_cast<const float *>(data)); /* scale */
 				break;
 			}
 
 			case B_PIC_SET_FONT_FAMILY:
 			{
-				int32 len = GetInt32();
-				char *string = new char[len + 1];
-				GetData(string, len);
-				string[len] = '\0';
-				((fnc_Pc)callBackTable[37])(userData, string);
-				delete[] string;
+				debugger("B_PIC_SET_FONT_FAMILY"); // TODO: is this unused?
+				((fnc_Pc)callBackTable[37])(userData,
+					reinterpret_cast<const char *>(data)); /* string */
 				break;
 			}
 
 			case B_PIC_SET_FONT_STYLE:
 			{
-				int32 len = GetInt32();
-				char *string = new char[len + 1];
-				GetData(string, len);
-				string[len] = '\0';
-				((fnc_Pc)callBackTable[38])(userData, string);
-				delete[] string;
+				debugger("B_PIC_SET_FONT_STYLE"); // TODO: is this unused?
+				((fnc_Pc)callBackTable[38])(userData,
+					reinterpret_cast<const char *>(data)); /* string */
 				break;
 			}
 
 			case B_PIC_SET_FONT_SPACING:
 			{
-				int32 spacing = GetInt32();
-				((fnc_i)callBackTable[39])(userData, spacing);
+				((fnc_i)callBackTable[39])(userData,
+					*reinterpret_cast<const int32 *>(data)); /* spacing */
 				break;
 			}
 
 			case B_PIC_SET_FONT_SIZE:
 			{
-				float size = GetFloat();
-				((fnc_f)callBackTable[40])(userData, size);
+				((fnc_f)callBackTable[40])(userData,
+					*reinterpret_cast<const float *>(data)); /* size */
 				break;
 			}
 
 			case B_PIC_SET_FONT_ROTATE:
 			{
-				float rotation = GetFloat();
-				((fnc_f)callBackTable[41])(userData, rotation);
+				((fnc_f)callBackTable[41])(userData,
+					*reinterpret_cast<const float *>(data)); /* rotation */
 				break;
 			}
 
 			case B_PIC_SET_FONT_ENCODING:
 			{
-				int32 encoding = GetInt32();
-				((fnc_i)callBackTable[42])(userData, encoding);
+				((fnc_i)callBackTable[42])(userData,
+					*reinterpret_cast<const int32 *>(data)); /* encoding */
 				break;
 			}
 
 			case B_PIC_SET_FONT_FLAGS:
 			{
-				int32 flags = GetInt32();
-				((fnc_i)callBackTable[43])(userData, flags);
+				((fnc_i)callBackTable[43])(userData,
+					*reinterpret_cast<const int32 *>(data)); /* flags */
 				break;
 			}
 			
 			case B_PIC_SET_FONT_SHEAR:
 			{
-				float shear = GetFloat();
-				((fnc_f)callBackTable[44])(userData, shear);
+				((fnc_f)callBackTable[44])(userData,
+					*reinterpret_cast<const float *>(data)); /* shear */
 				break;
 			}
 
 			case B_PIC_SET_FONT_FACE:
 			{
-				int32 flags = GetInt32();
-				((fnc_i)callBackTable[46])(userData, flags);
+				((fnc_i)callBackTable[46])(userData,
+					*reinterpret_cast<const int32 *>(data)); /* flags */
 				break;
 			}
+
 			// TODO: Looks like R5 function table only exports 47 functions...
 			// I added this here as a temporary workaround, because there seems to be
 			// no room for this op, although it's obviously implemented in some way...
 			case B_PIC_SET_BLENDING_MODE:
 			{
-				int16 alphaSrcMode = GetInt16();
-				int16 alphaFncMode = GetInt16();
-				((fnc_ss)callBackTable[47])(userData, alphaSrcMode, alphaFncMode);
+				((fnc_ss)callBackTable[47])(userData,
+					*reinterpret_cast<const int16 *>(data), /* alphaSrcMode */
+					*reinterpret_cast<const int16 *>(data + sizeof(int16))); /* alphaFncMode */
 				break;
 			}
 
@@ -535,11 +418,8 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				break;
 		}
 
-		// If we didn't read enough bytes, skip them. This is not a error
-		// since the instructions can change over time.
-		// Don't do that for state change ops, they don't have a fixed size
-		if (op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE && fData.Position() - pos < size)
-			fData.Seek(size - (fData.Position() - pos), SEEK_CUR);
+		pos += size;
+		data += size;
 
 		// TODO: what if too much was read, should we return B_ERROR?
 	}

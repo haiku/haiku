@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Marcus Overhagen <marcus@overhagen.de>
  */
 
 /*! BShape encapsulates a Postscript-style "path" */
@@ -410,8 +411,8 @@ BShape::GetData(int32 *opCount, int32 *ptCount, uint32 **opList,
 
 
 void
-BShape::SetData(int32 opCount, int32 ptCount, uint32 *opList,
-				BPoint *ptList)
+BShape::SetData(int32 opCount, int32 ptCount, const uint32 *opList,
+				const BPoint *ptList)
 {
 	Clear();
 
