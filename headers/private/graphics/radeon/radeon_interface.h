@@ -20,8 +20,8 @@
 #include "ddc.h"
 
 // magic code for ioctls
-// changed from TKRA to TKR1 for RADEON_WAITFORFIFO ioctl
-#define RADEON_PRIVATE_DATA_MAGIC	'TKR1'
+// changed from TKRA to TKR2 for VIP FIFO ioctls
+#define RADEON_PRIVATE_DATA_MAGIC	'TKR2'
 
 #define MAX_RADEON_DEVICE_NAME_LENGTH MAXPATHLEN
 
@@ -40,7 +40,10 @@ enum {
 	RADEON_RESETENGINE,
 	RADEON_VIPREAD,
 	RADEON_VIPWRITE,
+	RADEON_VIPFIFOREAD,
+	RADEON_VIPFIFOWRITE,
 	RADEON_FINDVIPDEVICE,
+	RADEON_VIPRESET,
 
 	RADEON_WAIT_FOR_CAP_IRQ,	
 	RADEON_DMACOPY,
@@ -633,12 +636,39 @@ typedef struct {
 	bool			lock;		// true, if CP lock must be acquired
 } radeon_vip_write;
 
+// read VIP fifo
+typedef struct {
+	uint32 			magic;
+	uint 			channel;	// channel, i.e. device
+	uint 			address;	// address
+	uint32			count;		// size of buffer
+	uint8 			*data;		// read data
+	bool			lock;		// true, if CP lock must be acquired
+} radeon_vip_fifo_read;
+
+// write VIP fifo
+typedef struct {
+	uint32 			magic;
+	uint 			channel;	// channel, i.e. device
+	uint 			address;	// address
+	uint32			count;		// size of buffer
+	uint8 			*data;		// data to write
+	bool			lock;		// true, if CP lock must be acquired
+} radeon_vip_fifo_write;
+
 // find channel of device with given ID
 typedef struct {
 	uint32 			magic;
 	uint32 			device_id;	// id of device
 	uint 			channel;	// channel of device (-1 if not found)
 } radeon_find_vip_device;
+
+// reset / init VIP
+typedef struct {
+	uint32 			magic;
+	bool			lock;
+} radeon_vip_reset;
+
 
 // wait for capture interrupt and get status about
 typedef struct {

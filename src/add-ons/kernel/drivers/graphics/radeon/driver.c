@@ -400,6 +400,26 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 				vw->lock ) ? B_OK : B_ERROR;
 		} break;
 		
+		case RADEON_VIPFIFOREAD: {
+			radeon_vip_fifo_read *vr = (radeon_vip_fifo_read *)buf;
+			
+			if( vr->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			result = Radeon_VIPFifoRead( di, vr->channel, vr->address, vr->count, vr->data,
+				vr->lock ) ? B_OK : B_ERROR;
+		} break;
+		
+		case RADEON_VIPFIFOWRITE: {
+			radeon_vip_fifo_write *vw = (radeon_vip_fifo_write *)buf;
+			
+			if( vw->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			result = Radeon_VIPFifoWrite( di, vw->channel, vw->address, vw->count, vw->data,
+				vw->lock ) ? B_OK : B_ERROR;
+		} break;
+		
 		case RADEON_FINDVIPDEVICE: {
 			radeon_find_vip_device *fvd = (radeon_find_vip_device *)buf;
 			
@@ -409,7 +429,18 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 			fvd->channel = Radeon_FindVIPDevice( di, fvd->device_id );
 			result = B_OK;
 		} break;
+		
+		
+		case RADEON_VIPRESET: {
+			radeon_vip_reset *fvd = (radeon_vip_reset *)buf;
 
+			if( fvd->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+			
+			Radeon_VIPReset( di, fvd->lock );
+			result = B_OK;
+		} break;
+		
 		case RADEON_WAIT_FOR_CAP_IRQ: {
 			radeon_wait_for_cap_irq *wvc = (radeon_wait_for_cap_irq *)buf;
 			

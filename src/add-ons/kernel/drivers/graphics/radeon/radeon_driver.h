@@ -225,7 +225,10 @@ void Radeon_SetDynamicClock( device_info *di, int mode );
 // vip.c
 bool Radeon_VIPRead( device_info *di, uint channel, uint address, uint32 *data, bool lock );
 bool Radeon_VIPWrite( device_info *di, uint8 channel, uint address, uint32 data, bool lock );
+bool Radeon_VIPFifoRead(device_info *di, uint8 channel, uint32 address, uint32 count, uint8 *buffer, bool lock);
+bool Radeon_VIPFifoWrite(device_info *di, uint8 channel, uint32 address, uint32 count, uint8 *buffer, bool lock);
 int Radeon_FindVIPDevice( device_info *di, uint32 device_id );
+void Radeon_VIPReset( device_info *di, bool lock );
 
 
 // dma.c
