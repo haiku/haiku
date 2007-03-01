@@ -105,6 +105,97 @@ typedef enum {
 	dd_dvi_ext = 64	// external DVI (only provided by few models)
 } display_device_e;
 
+typedef enum
+{
+    ddc_none_detected,
+    ddc_monid,
+    ddc_dvi,
+    ddc_vga,
+    ddc_crt2
+} radeon_ddc_type;
+
+typedef enum
+{
+    mt_unknown = -1,
+    mt_none    = 0,
+    mt_crt     = 1,
+    mt_lcd     = 2,
+    mt_dfp     = 3,
+    mt_ctv     = 4,
+    mt_stv     = 5
+} radeon_monitor_type;
+
+typedef enum
+{
+    connector_none,
+    connector_proprietary,
+    connector_crt,
+    connector_dvi_i,
+    connector_dvi_d,
+    connector_ctv,
+    connector_stv,
+    connector_unsupported
+} radeon_connector_type;
+
+typedef enum
+{
+    connector_none_atom,
+    connector_vga_atom,
+    connector_dvi_i_atom,
+    connector_dvi_d_atom,
+    connector_dvi_a_atom,
+    connector_stv_atom,
+    connector_ctv_atom,
+    connector_lvds_atom,
+    connector_digital_atom,
+    connector_unsupported_atom
+} radeon_connector_type_atom;
+
+typedef enum
+{
+    dac_unknown = -1,
+    dac_primary = 0,
+    dac_tvdac   = 1
+} radeon_dac_type;
+
+typedef enum
+{
+    tmds_unknown = -1,
+    tmds_int     = 0,
+    tmds_ext     = 1
+} radeon_tmds_type;
+
+typedef struct
+{
+    radeon_ddc_type ddc_type;
+    radeon_dac_type dac_type;
+    radeon_tmds_type tmds_type;
+    radeon_connector_type connector_type;
+    radeon_monitor_type mon_type;
+    edid1_info edid;
+    bool edid_valid;
+} radeon_connector;
+
+typedef struct
+{
+    bool has_secondary;
+
+    /*
+     * The next two are used to make sure CRTC2 is restored before CRTC_EXT,
+     * otherwise it could lead to blank screens.
+     */
+    bool is_secondary_restored;
+    bool restore_primary;
+
+    int mon_type1;
+    int mon_type2;
+        
+    bool reversed_DAC;	/* TVDAC used as primary dac */
+    bool reversed_TMDS;	/* DDC_DVI is used for external TMDS */
+    
+    radeon_connector port_info[2];
+} disp_entity, *ptr_disp_entity;
+
 
 // type of ASIC
 typedef enum {
@@ -448,6 +539,7 @@ typedef struct {
 	uint8		num_crtc;		// number of physical heads
 	
 	fp_info		flatpanels[2];	// info about connected flat panels (if any)
+	disp_entity	routing;		// info if display connector routings eg DVI-I <- EXT TMDS <- DAC2 <- CRTC2
 
 	memory_type_info	memory[mt_last];	// info about memory types
 	memory_type_e	nonlocal_type;	// default type of non-local memory

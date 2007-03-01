@@ -259,6 +259,223 @@ static void Radeon_GetMonType( device_info *di )
 }
 */
 
+
+static bool Radeon_GetConnectorInfoFromBIOS ( device_info* di )
+{
+
+	ptr_disp_entity ptr_entity = &di->routing;
+	int i = 0, j, tmp, tmp0=0, tmp1=0;
+	
+	int bios_header, master_data_start;
+	
+	bios_header = RADEON_BIOS16(0x48);
+	
+	if (di->is_atombios)
+	{
+		master_data_start = RADEON_BIOS16( bios_header + 32 );
+		tmp = RADEON_BIOS16( master_data_start + 22);
+		if (tmp) {
+			int crtc = 0, id[2];
+			tmp1 = RADEON_BIOS16( tmp + 4 );
+			for (i=0; i<8; i++) {
+				if(tmp1 & (1<<i)) {
+					uint16 portinfo = RADEON_BIOS16( tmp + 6 + i * 2 );
+					if (crtc < 2) {
+						if ((i == 2) || (i == 6)) continue; /* ignore TV here */
+
+						if ( crtc == 1 ) {
+							/* sharing same port with id[0] */
+							if ((( portinfo >> 8) & 0xf) == id[0] ) {
+								if (i == 3)
+									ptr_entity->port_info[0].tmds_type = tmds_int;
+								else if (i == 7)
+									ptr_entity->port_info[0].tmds_type = tmds_ext;
+
+								if (ptr_entity->port_info[0].dac_type == dac_unknown)
+									ptr_entity->port_info[0].dac_type = (portinfo & 0xf) - 1;
+								continue;
+							}
+						}
+
+						id[crtc] = (portinfo>>8) & 0xf;
+						ptr_entity->port_info[crtc].dac_type = (portinfo & 0xf) - 1;
+						ptr_entity->port_info[crtc].connector_type = (portinfo>>4) & 0xf;
+						if (i == 3)
+							ptr_entity->port_info[crtc].tmds_type = tmds_int;
+						else if (i == 7)
+							ptr_entity->port_info[crtc].tmds_type = tmds_ext;
+						
+						tmp0 = RADEON_BIOS16( master_data_start + 24);
+						if( tmp0 && id[crtc] ) {
+							switch (RADEON_BIOS16(tmp0 + 4 + 27 * id[crtc]) * 4)
+							{
+								case RADEON_GPIO_MONID:
+									ptr_entity->port_info[crtc].ddc_type = ddc_monid;
+									break;
+								case RADEON_GPIO_DVI_DDC:
+									ptr_entity->port_info[crtc].ddc_type = ddc_dvi;
+									break;
+								case RADEON_GPIO_VGA_DDC:
+									ptr_entity->port_info[crtc].ddc_type = ddc_vga;
+									break;
+								case RADEON_GPIO_CRT2_DDC:
+									ptr_entity->port_info[crtc].ddc_type = ddc_crt2;
+									break;
+								default:
+									ptr_entity->port_info[crtc].ddc_type = ddc_none_detected;
+									break;
+							}
+
+						} else {
+							ptr_entity->port_info[crtc].ddc_type = ddc_none_detected;
+						}
+						crtc++;
+					} else {
+						/* we have already had two CRTCs assigned. the rest may share the same
+						* port with the existing connector, fill in them accordingly.
+						*/
+						for ( j = 0; j < 2; j++ ) {
+							if ((( portinfo >> 8 ) & 0xf ) == id[j] ) {
+								if ( i == 3 )
+								ptr_entity->port_info[j].tmds_type = tmds_int;
+								else if (i == 7)
+								ptr_entity->port_info[j].tmds_type = tmds_ext;
+
+								if ( ptr_entity->port_info[j].dac_type == dac_unknown )
+									ptr_entity->port_info[j].dac_type = ( portinfo & 0xf ) - 1;
+							}
+						}
+					}
+				}
+			}
+
+			for (i=0; i<2; i++) {
+				SHOW_INFO( 2, "Port%d: DDCType-%d, DACType-%d, TMDSType-%d, ConnectorType-%d",
+					i, ptr_entity->port_info[i].ddc_type, ptr_entity->port_info[i].dac_type,
+					ptr_entity->port_info[i].tmds_type, ptr_entity->port_info[i].connector_type);
+		    }
+		} else {
+			SHOW_INFO0( 4 , "No Device Info Table found!");
+			return FALSE;
+		}
+	} else {
+		/* Some laptops only have one connector (VGA) listed in the connector table,
+		* we need to add LVDS in as a non-DDC display.
+		* Note, we can't assume the listed VGA will be filled in PortInfo[0],
+		* when walking through connector table. connector_found has following meaning:
+		* 0 -- nothing found,
+		* 1 -- only PortInfo[0] filled,
+		* 2 -- only PortInfo[1] filled,
+		* 3 -- both are filled.
+		*/
+		int connector_found = 0;
+
+		if ((tmp = RADEON_BIOS16( bios_header + 0x50 ))) {
+			for ( i = 1; i < 4; i++ ) {
+
+				if (!(RADEON_BIOS16( tmp + i * 2 )))
+					break; /* end of table */
+
+				tmp0 = RADEON_BIOS16( tmp + i * 2 );
+				if ((( tmp0 >> 12 ) & 0x0f ) == 0 )
+					continue;     /* no connector */
+				if (connector_found > 0) {
+					if (ptr_entity->port_info[tmp1].ddc_type == (( tmp0 >> 8 ) & 0x0f ))
+						continue;	/* same connector */
+				}
+
+				/* internal ddc_dvi port will get assigned to portinfo[0], or if there is no ddc_dvi (like in some igps). */
+				tmp1 = (((( tmp0 >> 8 ) & 0xf ) == ddc_dvi ) || ( tmp1 == 1 )) ? 0 : 1; /* determine port info index */
+
+				ptr_entity->port_info[tmp1].ddc_type = (tmp0 >> 8) & 0x0f;
+				if (ptr_entity->port_info[tmp1].ddc_type > ddc_crt2) 
+					ptr_entity->port_info[tmp1].ddc_type = ddc_none_detected;
+				ptr_entity->port_info[tmp1].dac_type = (tmp0 & 0x01) ? dac_tvdac : dac_primary;
+				ptr_entity->port_info[tmp1].connector_type = (tmp0 >> 12) & 0x0f;
+				if (ptr_entity->port_info[tmp1].connector_type > connector_unsupported) 
+					ptr_entity->port_info[tmp1].connector_type = connector_unsupported;
+				ptr_entity->port_info[tmp1].tmds_type = ((tmp0 >> 4) & 0x01) ? tmds_ext : tmds_int;
+
+				/* some sanity checks */
+				if (((ptr_entity->port_info[tmp1].connector_type != connector_dvi_d) &&
+				(ptr_entity->port_info[tmp1].connector_type != connector_dvi_i)) &&
+				ptr_entity->port_info[tmp1].tmds_type == tmds_int)
+				ptr_entity->port_info[tmp1].tmds_type = tmds_unknown;
+
+				connector_found += (tmp1 + 1);
+			}
+		} else {
+			SHOW_INFO0(4, "No Connector Info Table found!");
+			return FALSE;
+		}
+
+		if (di->is_mobility) 
+		{
+			/* For the cases where only one VGA connector is found,
+			we assume LVDS is not listed in the connector table,
+			add it in here as the first port.
+			*/
+			if ((connector_found < 3) && (ptr_entity->port_info[tmp1].connector_type == connector_crt)) {
+				if (connector_found == 1) {
+					memcpy (&ptr_entity->port_info[1], 
+						&ptr_entity->port_info[0],
+							sizeof (ptr_entity->port_info[0]));
+				}
+				ptr_entity->port_info[0].dac_type = dac_tvdac;
+				ptr_entity->port_info[0].tmds_type = tmds_unknown;
+				ptr_entity->port_info[0].ddc_type = ddc_none_detected;
+				ptr_entity->port_info[0].connector_type = connector_proprietary;
+
+				SHOW_INFO0( 4 , "lvds port is not in connector table, added in.");
+				if (connector_found == 0) 
+					connector_found = 1;
+				else 
+					connector_found = 3;
+			}
+
+			if ((tmp = RADEON_BIOS16( bios_header + 0x42 ))) {
+				if ((tmp0 = RADEON_BIOS16( tmp + 0x15 ))) {
+					if ((tmp1 = RADEON_BIOS16( tmp0 + 2 ) & 0x07)) {
+						ptr_entity->port_info[0].ddc_type	= tmp1;
+						if (ptr_entity->port_info[0].ddc_type > ddc_crt2) {
+							SHOW_INFO( 4, "unknown ddctype %d found",
+								ptr_entity->port_info[0].ddc_type);
+							ptr_entity->port_info[0].ddc_type = ddc_none_detected;
+						}
+						SHOW_INFO0( 4, "lcd ddc info table found!");
+					}
+				}
+			}
+		} else if (connector_found == 2) {
+			memcpy (&ptr_entity->port_info[0],
+				&ptr_entity->port_info[1],
+					sizeof (ptr_entity->port_info[0]));
+			ptr_entity->port_info[1].dac_type = dac_unknown;
+			ptr_entity->port_info[1].tmds_type = tmds_unknown;
+			ptr_entity->port_info[1].ddc_type = ddc_none_detected;
+			ptr_entity->port_info[1].connector_type = connector_none;
+			connector_found = 1;
+		}
+
+		if (connector_found == 0) {
+			SHOW_INFO0( 4, "no connector found in connector info table.");
+		} else {
+			SHOW_INFO( 2, "Port%d: DDCType-%d, DACType-%d, TMDSType-%d, ConnectorType-%d",
+				0, ptr_entity->port_info[0].ddc_type, ptr_entity->port_info[0].dac_type,
+				ptr_entity->port_info[0].tmds_type, ptr_entity->port_info[0].connector_type);
+		    
+		}
+		if (connector_found == 3) {
+			SHOW_INFO( 2, "Port%d: DDCType-%d, DACType-%d, TMDSType-%d, ConnectorType-%d",
+				1, ptr_entity->port_info[1].ddc_type, ptr_entity->port_info[1].dac_type,
+				ptr_entity->port_info[1].tmds_type, ptr_entity->port_info[1].connector_type);
+		}
+
+	}
+	return TRUE;
+}
+
+
 // get flat panel info (does only make sense for Laptops
 // with integrated display, but looking for it doesn't hurt,
 // who knows which strange kind of combination is out there?)
@@ -740,6 +957,29 @@ status_t Radeon_ReadBIOSData( device_info *di )
 		goto err1;
 
 	Radeon_GetPLLInfo( di );
+	
+	// setup defaults
+	di->routing.port_info[0].mon_type = mt_unknown;
+	di->routing.port_info[0].ddc_type = ddc_none_detected;
+	di->routing.port_info[0].dac_type = dac_unknown;
+	di->routing.port_info[0].tmds_type = tmds_unknown;
+	di->routing.port_info[0].connector_type = connector_none;
+	
+	if ( !Radeon_GetConnectorInfoFromBIOS( di ) )
+	{
+		di->routing.port_info[0].mon_type = mt_unknown;
+		di->routing.port_info[0].ddc_type = ddc_none_detected;
+		di->routing.port_info[0].dac_type = dac_tvdac;
+		di->routing.port_info[0].tmds_type = tmds_unknown;
+		di->routing.port_info[0].connector_type = connector_proprietary;
+	
+		di->routing.port_info[1].mon_type = mt_unknown;
+		di->routing.port_info[1].ddc_type = ddc_none_detected;
+		di->routing.port_info[1].dac_type = dac_primary;
+		di->routing.port_info[1].tmds_type = tmds_ext;
+		di->routing.port_info[1].connector_type = connector_crt;
+
+	}
 	Radeon_GetFPData( di );
 	Radeon_DetectRAM( di );
 	

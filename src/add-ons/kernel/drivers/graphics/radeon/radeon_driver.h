@@ -113,6 +113,7 @@ typedef struct device_info {
 	bool		acc_dma;
 
 	fp_info		fp_info;
+	disp_entity	routing;
 	
 	general_pll_info pll;
 	ram_info	ram;	

@@ -834,59 +834,246 @@ static status_t Radeon_StoreFPEDID( accelerator_info *ai, const edid1_info *edid
 	return B_OK;
 }
 
+static void Radeon_ConnectorInfo( accelerator_info *ai, int port, disp_entity* ptr_entity )
+{
+	const char* mon;
+	const char* ddc =	ptr_entity->port_info[port].ddc_type == ddc_none_detected	? "None" :
+						ptr_entity->port_info[port].ddc_type == ddc_monid			? "Mon ID" :
+						ptr_entity->port_info[port].ddc_type == ddc_dvi				? "DVI DDC" :
+						ptr_entity->port_info[port].ddc_type == ddc_vga				? "VGA DDC" :
+						ptr_entity->port_info[port].ddc_type == ddc_crt2			? "CRT2 DDC" : "Error";
+							
+	const char* tmds =	ptr_entity->port_info[port].tmds_type == tmds_unknown		? "None" :
+						ptr_entity->port_info[port].tmds_type == tmds_int			? "Internal" :
+						ptr_entity->port_info[port].tmds_type == tmds_ext			? "External" : "??? ";
+
+	const char* dac =	ptr_entity->port_info[port].dac_type == dac_unknown			? "Unknown" :
+						ptr_entity->port_info[port].dac_type == dac_primary			? "Primary" :
+						ptr_entity->port_info[port].dac_type == dac_tvdac			? "TV / External" : "Error";
+
+	const char* con;
+	if (ai->si->is_atombios) {
+				con =	ptr_entity->port_info[port].connector_type == connector_none_atom			? "None" :
+						ptr_entity->port_info[port].connector_type == connector_vga_atom			? "VGA" :
+						ptr_entity->port_info[port].connector_type == connector_dvi_i_atom			? "DVI-I" :
+						ptr_entity->port_info[port].connector_type == connector_dvi_d_atom			? "DVI-D" :
+						ptr_entity->port_info[port].connector_type == connector_dvi_a_atom			? "DVI-A" :
+						ptr_entity->port_info[port].connector_type == connector_stv_atom			? "S-Video TV" :
+						ptr_entity->port_info[port].connector_type == connector_ctv_atom			? "Composite TV" :
+						ptr_entity->port_info[port].connector_type == connector_lvds_atom			? "LVDS" :
+						ptr_entity->port_info[port].connector_type == connector_digital_atom		? "Digital" :
+						ptr_entity->port_info[port].connector_type == connector_unsupported_atom	? "N/A  " : "Err  ";
+	} else {
+				con =	ptr_entity->port_info[port].connector_type == connector_none		? "None" :
+						ptr_entity->port_info[port].connector_type == connector_crt			? "VGA" :
+						ptr_entity->port_info[port].connector_type == connector_dvi_i		? "DVI-I" :
+						ptr_entity->port_info[port].connector_type == connector_dvi_d		? "DVI-D" :
+						ptr_entity->port_info[port].connector_type == connector_proprietary ? "Proprietary" :
+						ptr_entity->port_info[port].connector_type == connector_stv			? "S-Video TV" :
+						ptr_entity->port_info[port].connector_type == connector_ctv			? "Composite TV" :
+						ptr_entity->port_info[port].connector_type == connector_unsupported ? "N/A" : "Err";
+	}
+	
+				mon = 	ptr_entity->port_info[port].mon_type == mt_unknown ? "???" :
+						ptr_entity->port_info[port].mon_type == mt_none    ? "None" :
+						ptr_entity->port_info[port].mon_type == mt_crt     ? "CRT " :
+						ptr_entity->port_info[port].mon_type == mt_lcd     ? "LCD " :
+						ptr_entity->port_info[port].mon_type == mt_dfp     ? "DVI " :
+						ptr_entity->port_info[port].mon_type == mt_ctv     ? "Composite TV" :
+						ptr_entity->port_info[port].mon_type == mt_stv     ? "S-Video TV" : "Err ?";
+
+	SHOW_INFO( 2 , "Port %d:- \nMonitor:    %s\nConn Type:  %s\nDDC Port:   %s\nTMDS Type:  %s\nDAC Type:   %s",
+					port, mon, con, ddc, tmds, dac);
+}
+
 
 // detect connected displays devices
 // whished_num_heads - how many heads the requested display mode needs
 void Radeon_DetectDisplays( accelerator_info *ai )
 {
 	shared_info *si = ai->si;
+	
+	disp_entity* routes = &si->routing;
 	display_device_e displays = 0;
 	display_device_e controlled_displays = ai->vc->controlled_displays;
-	edid1_info edid;
+	int i;
+		
+	uint32 edid_regs[] = {
+		0, 
+		RADEON_GPIO_MONID, 
+		RADEON_GPIO_DVI_DDC,
+		RADEON_GPIO_VGA_DDC,
+		RADEON_GPIO_CRT2_DDC
+	};
 	
 	// lock hardware so noone bothers us
 	Radeon_WaitForIdle( ai, true );
-
-	// mobile chips are for use in laptops - there must be a laptop panel	
-	if( si->is_mobility )
-		displays |= dd_lvds;
-
-	// use DDC to detect monitors - if we can read DDC, there must be a monitor
 	
-	// all non-mobility versions have a DVI port
-	if( (displays & dd_lvds) == 0 && 
-		Radeon_ReadEDID( ai, RADEON_GPIO_DVI_DDC, &edid ))
-	{
-		SHOW_FLOW0( 2, "Found monitor on DVI DDC port" );
-		// there may be an analog monitor connected to DVI-I;
-		// we must check EDID to see whether it's really a digital monitor
-		if( edid.display.input_type == 1 ) {
-			SHOW_FLOW0( 2, "Must be a DVI monitor" );
-			
-			// store info about DVI-connected flat-panel
-			if( Radeon_StoreFPEDID( ai, &edid ) == B_OK ) {
-				displays |= dd_dvi;
-			} else {
-				SHOW_ERROR0( 2, "Disabled DVI - invalid EDID" );
-			}
-		} else {
-			// must be the analog portion of DVI
-			// I'm not sure about Radeons with one CRTC - do they have DVI-I or DVI-D?
-			// anyway - if there are two CRTC, analog portion must be connected 
-			// to TV-DAC; if there is one CRTC, it must be the normal VGA-DAC
-			if( si->num_crtc > 1 ) {
-				SHOW_FLOW0( 2, "Must be an analog monitor on DVI port" );
-				displays |= dd_tv_crt;
-			} else {
-				SHOW_FLOW0( 2, "Seems to be a CRT on VGA port!?" );
-				displays |= dd_crt;
-			}
+	// alwats make TMDS_INT port first
+	if (routes->port_info[1].tmds_type == tmds_int) {
+	
+		radeon_connector swap_entity;
+		swap_entity = routes->port_info[0];
+		routes->port_info[0] = routes->port_info[1];
+		routes->port_info[1] = swap_entity;
+		SHOW_FLOW0( 2, "Swapping TMDS_INT to first port");
+	}
+	else if ( routes->port_info[0].tmds_type != tmds_int &&
+			  routes->port_info[1].tmds_type != tmds_int ) {
+	
+		// no TMDS_INT port, make primary DAC port first
+		// On my Inspiron 8600 both internal and external ports are
+		// marked DAC_PRIMARY in BIOS. So be extra careful - only
+		// swap when the first port is not DAC_PRIMARY
+		if ( routes->port_info[1].dac_type == dac_primary &&
+			 routes->port_info[0].dac_type != dac_primary ) {	
+		
+			radeon_connector swap_entity;
+			swap_entity = routes->port_info[0];
+			routes->port_info[0] = routes->port_info[1];
+			routes->port_info[1] = swap_entity;
+			SHOW_FLOW0( 2, "Swapping Primary Dac to front");
 		}
 	}
 	
-	// all chips have a standard VGA port
-	if( Radeon_ReadEDID( ai, RADEON_GPIO_VGA_DDC, &edid ))
-		displays |= dd_crt;
+	if ( si->asic == rt_rs300 )  // RS300 only has single Dac of TV type  
+	{
+		// For RS300/RS350/RS400 chips, there is no primary DAC. Force VGA port to use TVDAC
+		if ( routes->port_info[0].connector_type == connector_crt ) {
+			routes->port_info[0].dac_type = dac_tvdac;
+			routes->port_info[1].dac_type = dac_primary;
+		} else {
+			routes->port_info[1].dac_type = dac_primary;
+			routes->port_info[0].dac_type = dac_tvdac;
+		}
+	} else if ( si->num_crtc == 1 )	{
+
+		routes->port_info[0].dac_type = dac_primary;	
+	}
+
+	// use DDC to detect monitors - if we can read DDC, there must be a monitor
+	for ( i = 0; i < 2; i++ )
+	{
+		if (routes->port_info[i].mon_type != mt_unknown ) {
+			SHOW_FLOW0( 2, "known type, skpping detection" );	
+			continue;
+		}
+		
+		memset( &routes->port_info[i].edid , 0, sizeof(edid1_info) );
+		switch ( routes->port_info[i].ddc_type ) {
+			case ddc_monid:
+			case ddc_dvi:
+			case ddc_vga:
+			case ddc_crt2:
+				if ( Radeon_ReadEDID( ai, edid_regs[routes->port_info[i].ddc_type], &routes->port_info[i].edid ))
+				{
+					routes->port_info[i].edid_valid = true;
+					SHOW_FLOW( 2, "Edid Data for CRTC %d on line %d", i, routes->port_info[i].ddc_type );
+					edid_dump ( &routes->port_info[i].edid );
+				} else {
+					routes->port_info[i].mon_type = mt_none;
+				}
+				
+				break;
+			default:
+				SHOW_FLOW( 2, "No Edid Pin Assigned to CRTC %d ", i );
+				routes->port_info[i].mon_type = mt_none;
+		}
+		
+		if ( routes->port_info[i].edid_valid ) {
+		
+			if( routes->port_info[i].edid.display.input_type == 1 ) {
+				SHOW_FLOW0( 2, "Must be a DVI monitor" );
+				
+				// Note some laptops have a DVI output that uses internal TMDS,
+				// when its DVI is enabled by hotkey, LVDS panel is not used.
+				// In this case, the laptop is configured as DVI+VGA as a normal 
+				// desktop card.
+				// Also for laptop, when X starts with lid closed (no DVI connection)
+				// both LDVS and TMDS are disable, we still need to treat it as a LVDS panel.
+				if ( routes->port_info[i].tmds_type == tmds_ext ){
+					// store info about DVI-connected flat-panel
+					if( Radeon_StoreFPEDID( ai, &routes->port_info[i].edid ) == B_OK ) {
+						SHOW_INFO0( 2, "Found Ext Laptop DVI" );
+						routes->port_info[i].mon_type = mt_dfp;
+						displays |= dd_dvi_ext;
+					} else {
+						SHOW_ERROR0( 2, "Disabled Ext DVI - invalid EDID" );
+					}
+				} else {
+					if( INREG( ai->regs, RADEON_FP_GEN_CNTL) & (1 << 7) || ( !si->is_mobility ) ) {
+						// store info about DVI-connected flat-panel
+						if( Radeon_StoreFPEDID( ai, &routes->port_info[i].edid ) == B_OK ) {
+							SHOW_INFO0( 2, "Found DVI" );
+							routes->port_info[i].mon_type = mt_dfp;
+							displays |= dd_dvi;
+						} else {
+							SHOW_ERROR0( 2, "Disabled DVI - invalid EDID" );
+						}		
+					} else {
+						SHOW_INFO0( 2, "Laptop Panel Found" );
+						routes->port_info[i].mon_type = mt_lcd;
+						displays |= dd_lvds;
+					}
+				}
+			} else {
+				// must be the analog portion of DVI
+				// I'm not sure about Radeons with one CRTC - do they have DVI-I or DVI-D?
+				// anyway - if there are two CRTC, analog portion must be connected 
+				// to TV-DAC; if there is one CRTC, it must be the normal VGA-DAC
+				if( si->num_crtc > 1 ) {
+					SHOW_FLOW0( 2, "Must be an analog monitor on DVI port" );
+					routes->port_info[i].mon_type = mt_crt;
+					displays |= dd_tv_crt;
+				} else {
+					SHOW_FLOW0( 2, "Seems to be a CRT on VGA port!?" );
+					routes->port_info[i].mon_type = mt_crt;
+					displays |= dd_crt;
+				}
+			}
+		}
+	}
+										
+	
+	if ( !routes->port_info[0].edid_valid ) {
+		SHOW_INFO0( 2, "Searching port 0" );
+		if ( si->is_mobility && (INREG( ai->regs, RADEON_BIOS_4_SCRATCH) & 4)) {
+			SHOW_INFO0( 2, "Found Laptop Panel" );
+			routes->port_info[0].mon_type = mt_lcd;
+			displays |= dd_lvds;
+		}
+	}
+	
+	if ( !routes->port_info[1].edid_valid ) {
+		
+		if ( si->is_mobility && (INREG( ai->regs, RADEON_FP2_GEN_CNTL) & RADEON_FP2_FPON)) {
+			SHOW_INFO0( 2, "Found Ext Laptop DVI" );
+			routes->port_info[1].mon_type = mt_dfp;
+			displays |= dd_dvi;
+		}
+	}
+	
+	if ( routes->port_info[0].mon_type == mt_none )
+	{
+		if ( routes->port_info[1].mon_type == mt_none ) {
+			routes->port_info[0].mon_type = mt_crt;
+		} else {
+			radeon_connector swap_entity;
+			swap_entity = routes->port_info[0];
+			routes->port_info[0] = routes->port_info[1];
+			routes->port_info[1] = swap_entity;
+			SHOW_ERROR0( 2, "swapping active port 2 to free port 1" );
+		}
+			
+	}
+	
+	routes->reversed_DAC = false;
+	if ( routes->port_info[1].dac_type == dac_tvdac ) {
+		SHOW_ERROR0( 2, "Reversed dac detected (not impl. yet)" );
+		routes->reversed_DAC = true;
+	}
+	
+	
 		
 	// we may have overseen monitors if they don't support DDC or 
 	// have broken DDC data (like mine);
@@ -898,14 +1085,14 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 
 	// all versions have a standard VGA port	
 	if( (displays & dd_crt) == 0 &&
-		(controlled_displays && dd_crt) != 0 &&
+		(controlled_displays & dd_crt) != 0 &&
 		Radeon_DetectCRT( ai ))
 		displays |= dd_crt;
 		
 	// check VGA signal routed to DVI port
 	// (the detection code checks whether there is hardware for that)
 	if( (displays & dd_tv_crt) == 0 &&
-		(controlled_displays && dd_tv_crt) != 0 &&
+		(controlled_displays & dd_tv_crt) != 0 &&
 		Radeon_DetectTVCRT( ai ))
 		displays |= dd_tv_crt;
 
@@ -920,7 +1107,10 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 	// if no monitor found, we define to have a CRT connected to CRT-DAC
 	if( displays == 0 )
 		displays = dd_crt;
-		
+
+	Radeon_ConnectorInfo( ai, 0, routes);
+	Radeon_ConnectorInfo( ai, 1, routes);	
+	
 	ai->vc->connected_displays = displays;
 	
 	RELEASE_BEN( si->cp.lock );

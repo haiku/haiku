@@ -260,6 +260,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->panel_pwr_delay = di->si->panel_pwr_delay;
 	si->acc_dma = di->acc_dma;
 
+	memcpy(&si->routing, &di->routing, sizeof(disp_entity));
 	
 	// detecting theatre channel in kernel would lead to code duplication,
 	// so we let the first accelerant take care of it
