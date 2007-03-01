@@ -6,7 +6,7 @@
 #include "Debug.h"
 #include "ServerDefs.h"
 #include "UserlandFSDispatcher.h"
-//#include "UserlandFSServer.h"
+#include "UserlandFSServer.h"
 
 // server signature
 static const char* kServerSignature
@@ -98,14 +98,14 @@ main(int argc, char** argv)
 		error = dispatcher->Init();
 		app = dispatcher;
 	} else {
-//		UserlandFSServer* server
-//			= new(nothrow) UserlandFSServer(kServerSignature);
-//		if (!server) {
-//			fprintf(stderr, "Failed to create server.\n");
-//			return 1;
-//		}
-//		error = server->Init(fileSystem);
-//		app = server;
+		UserlandFSServer* server
+			= new(nothrow) UserlandFSServer(kServerSignature);
+		if (!server) {
+			fprintf(stderr, "Failed to create server.\n");
+			return 1;
+		}
+		error = server->Init(fileSystem);
+		app = server;
 	}
 
 	// run it, if everything went fine
