@@ -82,7 +82,7 @@ UserlandFSServer::Init(const char* fileSystem)
 
 	// get the symbols "fs_entry" and "api_version"
 	beos_vnode_ops* fsOps;
-	error = get_image_symbol(fAddOnImage, "fs_entry", B_SYMBOL_TYPE_TEXT,
+	error = get_image_symbol(fAddOnImage, "fs_entry", B_SYMBOL_TYPE_DATA,
 		(void**)&fsOps);
 	if (error != B_OK)
 		RETURN_ERROR(error);
