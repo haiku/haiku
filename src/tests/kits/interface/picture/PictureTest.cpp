@@ -116,6 +116,7 @@ PictureView::AllAttached()
 	if (status != B_OK)
 		printf("Error flattening BPicture: %s\n", strerror(status));
 	if (status == B_OK) {
+		stream.Seek(0, SEEK_SET);
 		fPicture = new BPicture();
 		status = fPicture->Unflatten(&stream);
 		if (status != B_OK)
