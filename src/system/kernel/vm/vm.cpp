@@ -2035,6 +2035,25 @@ dump_cache_chain(int argc, char **argv)
 }
 
 
+static const char *
+cache_type_to_string(int32 type)
+{
+	switch (type) {
+		case CACHE_TYPE_RAM:
+			return "RAM";
+		case CACHE_TYPE_DEVICE:
+			return "device";
+		case CACHE_TYPE_VNODE:
+			return "vnode";
+		case CACHE_TYPE_NULL:
+			return "null";
+
+		default:
+			return "unknown";
+	}
+}
+
+
 static int
 dump_cache(int argc, char **argv)
 {
@@ -2086,7 +2105,7 @@ dump_cache(int argc, char **argv)
 	}
 
 	if (showCacheRef) {
-		kprintf("cache_ref at %p:\n", cacheRef);
+		kprintf("CACHE_REF %p:\n", cacheRef);
 		if (!showCache)
 			kprintf("  cache:        %p\n", cacheRef->cache);
 		kprintf("  ref_count:    %ld\n", cacheRef->ref_count);
@@ -2103,11 +2122,12 @@ dump_cache(int argc, char **argv)
 	}
 
 	if (showCache) {
-		kprintf("cache at %p:\n", cache);
+		kprintf("CACHE %p:\n", cache);
 		if (!showCacheRef)
 			kprintf("  cache_ref:    %p\n", cache->ref);
 		kprintf("  source:       %p\n", cache->source);
 		kprintf("  store:        %p\n", cache->store);
+		kprintf("  type:         %s\n", cache_type_to_string(cache->type));
 		kprintf("  virtual_base: 0x%Lx\n", cache->virtual_base);
 		kprintf("  virtual_size: 0x%Lx\n", cache->virtual_size);
 		kprintf("  temporary:    %ld\n", cache->temporary);
