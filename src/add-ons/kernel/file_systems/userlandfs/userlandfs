@@ -1,0 +1,80 @@
+# userlandfs settings
+#
+# Lives in /boot/home/config/settings/kernel/drivers/.
+
+# OpenBFS
+file_system obfs {
+	# BFS_IOCTL_VERSION
+	ioctl 14200 {
+		buffer_size			0
+		write_buffer_size	4
+		is_buffer			true
+	}
+
+	# BFS_IOCTL_START_CHECKING
+	ioctl 14201 {
+		buffer_size			312
+		write_buffer_size	312
+		is_buffer			true
+	}
+
+	# BFS_IOCTL_STOP_CHECKING
+	ioctl 14202 {
+		buffer_size			312
+		write_buffer_size	312
+		is_buffer			true
+	}
+
+	# BFS_IOCTL_CHECK_NEXT_NODE
+	ioctl 14203 {
+		buffer_size			312
+		write_buffer_size	312
+		is_buffer			true
+	}
+
+	# allocate and zero all free blocks
+	ioctl 56742 {
+		buffer_size			0
+		write_buffer_size	0
+		is_buffer			false
+	}
+
+	# dump super block
+	ioctl 56743 {
+		buffer_size			0
+		write_buffer_size	0
+		is_buffer			false
+	}
+
+	# dump inode
+	ioctl 56744 {
+		buffer_size			0
+		write_buffer_size	0
+		is_buffer			false
+	}
+
+	# dump inode block
+	ioctl 56745 {
+		buffer_size			0
+		write_buffer_size	0
+		is_buffer			false
+	}
+
+}
+
+# NetFS
+file_system netfs {
+	# NET_FS_IOCTL_ADD_SERVER
+	ioctl 11000 {
+		buffer_size			256
+		write_buffer_size	0
+		is_buffer			true
+	}
+
+	# NET_FS_IOCTL_REMOVE_SERVER
+	ioctl 11001 {
+		buffer_size			256
+		write_buffer_size	0
+		is_buffer			true
+	}
+}

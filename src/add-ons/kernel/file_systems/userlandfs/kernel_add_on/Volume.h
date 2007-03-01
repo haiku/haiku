@@ -35,9 +35,10 @@ public:
 			bool				IsMounting() const;
 
 			// client methods
-			status_t			GetVNode(vnode_id vnid, void** node);
+			status_t			GetVNode(vnode_id vnid, fs_vnode* node);
 			status_t			PutVNode(vnode_id vnid);
-			status_t			NewVNode(vnode_id vnid, void* node);
+			status_t			NewVNode(vnode_id vnid, fs_vnode node);
+			status_t			PublishVNode(vnode_id vnid, fs_vnode node);
 			status_t			RemoveVNode(vnode_id vnid);
 			status_t			UnremoveVNode(vnode_id vnid);
 			status_t			IsVNodeRemoved(vnode_id vnid);

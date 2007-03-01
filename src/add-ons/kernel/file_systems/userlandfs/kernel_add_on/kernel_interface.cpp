@@ -67,6 +67,9 @@ static status_t
 userlandfs_mount(mount_id id, const char *device, uint32 flags, 
 	const char *args, fs_volume *fsCookie, vnode_id *rootVnodeID)
 {
+	PRINT(("userlandfs_mount(%ld, %s, 0x%lx, %s, %p, %p)\n", id, device, flags,
+		args, fsCookie, rootVnodeID));
+
 	status_t error = B_OK;
 
 	// get the parameters
@@ -75,44 +78,50 @@ userlandfs_mount(mount_id id, const char *device, uint32 flags,
 	const char* fsParameters;
 	error = parse_parameters(args, fsName, &fsParameters);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	// get the UserlandFS object
 	UserlandFS* userlandFS = UserlandFS::GetUserlandFS();
 	if (!userlandFS)
-		return B_ERROR;
+		RETURN_ERROR(B_ERROR);
 
 	// get the file system
 	FileSystem* fileSystem = NULL;
 	error = userlandFS->RegisterFileSystem(fsName.GetString(), &fileSystem);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	// mount the volume
 	Volume* volume = NULL;
 	error = fileSystem->Mount(id, device, flags, fsParameters, &volume);
 	if (error != B_OK) {
 		userlandFS->UnregisterFileSystem(fileSystem);
-		return error;
+		RETURN_ERROR(error);
 	}
 
 	*fsCookie = volume;
 	*rootVnodeID = volume->GetRootID();
+
+	PRINT(("userlandfs_mount() done: %p, %lld\n", *fsCookie, *rootVnodeID));
 
 	return error;
 }
 
 // userlandfs_unmount
 static status_t
-userlandfs_unmount(fs_volume ns)
+userlandfs_unmount(fs_volume fs)
 {
-	Volume* volume = (Volume*)ns;
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_unmount(%p)\n", fs));
+
 	FileSystem* fileSystem = volume->GetFileSystem();
 	status_t error = volume->Unmount();
 	// The error code the FS's unmount hook returns is completely irrelevant to
 	// the VFS. It considers the volume unmounted in any case.
 	volume->RemoveReference();
 	UserlandFS::GetUserlandFS()->UnregisterFileSystem(fileSystem);
+
+	PRINT(("userlandfs_unmount() done: %lx\n", error));
 	return error;
 }
 
@@ -960,6 +969,7 @@ userlandfs_std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 		{
 			init_debugging();
+			PRINT(("userlandfs_std_ops(): B_MODULE_INIT\n"));
 
 			// make sure there is a UserlandFS we can work with
 			UserlandFS* userlandFS = NULL;
@@ -973,6 +983,7 @@ userlandfs_std_ops(int32 op, ...)
 		}
 
 		case B_MODULE_UNINIT:
+			PRINT(("userlandfs_std_ops(): B_MODULE_UNINIT\n"));
 			UserlandFS::UninitUserlandFS();
 			exit_debugging();
 			return B_OK;

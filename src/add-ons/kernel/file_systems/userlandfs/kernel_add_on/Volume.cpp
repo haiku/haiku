@@ -163,6 +163,29 @@ PRINT(("new_vnode(%ld, %Ld)\n", fID, vnid));
 			if (error != B_OK) {
 				ERROR(("Volume::NewVNode(): Failed to add vnode to mount "
 					"vnode map!\n"));
+				publish_vnode(fID, vnid, node);
+				put_vnode(fID, vnid);
+				return error;
+			}
+		}
+// TODO: Check what need to do according to the new semantics.
+//		_IncrementVNodeCount(vnid);
+	}
+	return error;
+}
+
+// PublishVNode
+status_t
+Volume::PublishVNode(vnode_id vnid, fs_vnode node)
+{
+PRINT(("publish_vnode(%ld, %Ld)\n", fID, vnid));
+	status_t error = publish_vnode(fID, vnid, node);
+	if (error == B_OK) {
+		if (IsMounting()) {
+			error = fMountVNodes->Put(vnid, node);
+			if (error != B_OK) {
+				ERROR(("Volume::PublishVNode(): Failed to add vnode to mount "
+					"vnode map!\n"));
 				put_vnode(fID, vnid);
 				return error;
 			}

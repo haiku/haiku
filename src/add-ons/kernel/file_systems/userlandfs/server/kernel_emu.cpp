@@ -360,8 +360,36 @@ status_t
 UserlandFS::KernelEmu::publish_vnode(mount_id nsid, vnode_id vnid,
 	fs_vnode data)
 {
-	// TODO: Implement!
-	return B_BAD_VALUE;
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	PublishVNodeRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = nsid;
+	request->vnid = vnid;
+	request->node = data;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, PUBLISH_VNODE_REPLY);
+	PublishVNodeReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
 }
 
 // remove_vnode

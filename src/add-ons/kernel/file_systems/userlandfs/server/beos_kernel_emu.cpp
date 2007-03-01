@@ -83,7 +83,9 @@ put_vnode(nspace_id nsid, vnode_id vnid)
 int
 new_vnode(nspace_id nsid, vnode_id vnid, void *data)
 {
-	return UserlandFS::KernelEmu::new_vnode(nsid, vnid, data);
+	// The semantics of new_vnode() has changed. The new publish_vnode()
+	// should work like the former new_vnode().
+	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data);
 }
 
 // remove_vnode

@@ -185,6 +185,8 @@ enum {
 	PUT_VNODE_REPLY,
 	NEW_VNODE_REQUEST,
 	NEW_VNODE_REPLY,
+	PUBLISH_VNODE_REQUEST,
+	PUBLISH_VNODE_REPLY,
 	REMOVE_VNODE_REQUEST,
 	REMOVE_VNODE_REPLY,
 	UNREMOVE_VNODE_REQUEST,
@@ -1425,6 +1427,22 @@ public:
 	NewVNodeReply() : ReplyRequest(NEW_VNODE_REPLY) {}
 };
 
+// PublishVNodeRequest
+class PublishVNodeRequest : public Request {
+public:
+	PublishVNodeRequest() : Request(PUBLISH_VNODE_REQUEST) {}
+
+	mount_id	nsid;
+	vnode_id	vnid;
+	fs_vnode	node;
+};
+
+// PublishVNodeReply
+class PublishVNodeReply : public ReplyRequest {
+public:
+	PublishVNodeReply() : ReplyRequest(PUBLISH_VNODE_REPLY) {}
+};
+
 // RemoveVNodeRequest
 class RemoveVNodeRequest : public Request {
 public:
@@ -1788,6 +1806,10 @@ do_for_request(Request* request, Task& task)
 			return task((NewVNodeRequest*)request);
 		case NEW_VNODE_REPLY:
 			return task((NewVNodeReply*)request);
+		case PUBLISH_VNODE_REQUEST:
+			return task((PublishVNodeRequest*)request);
+		case PUBLISH_VNODE_REPLY:
+			return task((PublishVNodeReply*)request);
 		case REMOVE_VNODE_REQUEST:
 			return task((RemoveVNodeRequest*)request);
 		case REMOVE_VNODE_REPLY:
@@ -1979,6 +2001,8 @@ using UserlandFSUtil::PutVNodeRequest;
 using UserlandFSUtil::PutVNodeReply;
 using UserlandFSUtil::NewVNodeRequest;
 using UserlandFSUtil::NewVNodeReply;
+using UserlandFSUtil::PublishVNodeRequest;
+using UserlandFSUtil::PublishVNodeReply;
 using UserlandFSUtil::RemoveVNodeRequest;
 using UserlandFSUtil::RemoveVNodeReply;
 using UserlandFSUtil::UnremoveVNodeRequest;

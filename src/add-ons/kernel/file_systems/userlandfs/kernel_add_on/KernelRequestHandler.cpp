@@ -71,6 +71,8 @@ KernelRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((PutVNodeRequest*)request);
 		case NEW_VNODE_REQUEST:
 			return _HandleRequest((NewVNodeRequest*)request);
+		case PUBLISH_VNODE_REQUEST:
+			return _HandleRequest((PublishVNodeRequest*)request);
 		case REMOVE_VNODE_REQUEST:
 			return _HandleRequest((RemoveVNodeRequest*)request);
 		case UNREMOVE_VNODE_REQUEST:
@@ -270,6 +272,30 @@ KernelRequestHandler::_HandleRequest(NewVNodeRequest* request)
 	if (error != B_OK)
 		return error;
 	reply->error = result;
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(PublishVNodeRequest* request)
+{
+	// check and executed the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+	if (result == B_OK)
+		result = volume->PublishVNode(request->vnid, request->node);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	PublishVNodeReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+
+	reply->error = result;
+
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }

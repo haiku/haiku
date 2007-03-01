@@ -14,6 +14,7 @@ class IsVNodeRemovedRequest;
 class NewVNodeRequest;
 class NotifyListenerRequest;
 class NotifySelectEventRequest;
+class PublishVNodeRequest;
 class PutVNodeRequest;
 class RemoveVNodeRequest;
 class SendNotificationRequest;
@@ -26,11 +27,11 @@ using UserlandFSUtil::IsVNodeRemovedRequest;
 using UserlandFSUtil::NewVNodeRequest;
 using UserlandFSUtil::NotifyListenerRequest;
 using UserlandFSUtil::NotifySelectEventRequest;
+using UserlandFSUtil::PublishVNodeRequest;
 using UserlandFSUtil::PutVNodeRequest;
 using UserlandFSUtil::RemoveVNodeRequest;
 using UserlandFSUtil::SendNotificationRequest;
 using UserlandFSUtil::UnremoveVNodeRequest;
-using UserlandFSUtil::GetVNodeRequest;
 
 class Volume;
 
@@ -55,6 +56,7 @@ private:
 			status_t			_HandleRequest(GetVNodeRequest* request);
 			status_t			_HandleRequest(PutVNodeRequest* request);
 			status_t			_HandleRequest(NewVNodeRequest* request);
+			status_t			_HandleRequest(PublishVNodeRequest* request);
 			status_t			_HandleRequest(RemoveVNodeRequest* request);
 			status_t			_HandleRequest(UnremoveVNodeRequest* request);
 			status_t			_HandleRequest(IsVNodeRemovedRequest* request);

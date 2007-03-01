@@ -645,6 +645,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case GET_VNODE_REQUEST:
 		case PUT_VNODE_REQUEST:
 		case NEW_VNODE_REQUEST:
+		case PUBLISH_VNODE_REQUEST:
 		case REMOVE_VNODE_REQUEST:
 		case UNREMOVE_VNODE_REQUEST:
 		case IS_VNODE_REMOVED_REQUEST:
@@ -652,6 +653,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case GET_VNODE_REPLY:
 		case PUT_VNODE_REPLY:
 		case NEW_VNODE_REPLY:
+		case PUBLISH_VNODE_REPLY:
 		case REMOVE_VNODE_REPLY:
 		case UNREMOVE_VNODE_REPLY:
 		case IS_VNODE_REMOVED_REPLY:
@@ -843,6 +845,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case GET_VNODE_REQUEST:
 		case PUT_VNODE_REQUEST:
 		case NEW_VNODE_REQUEST:
+		case PUBLISH_VNODE_REQUEST:
 		case REMOVE_VNODE_REQUEST:
 		case UNREMOVE_VNODE_REQUEST:
 		case IS_VNODE_REMOVED_REQUEST:
@@ -850,6 +853,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case GET_VNODE_REPLY:
 		case PUT_VNODE_REPLY:
 		case NEW_VNODE_REPLY:
+		case PUBLISH_VNODE_REPLY:
 		case REMOVE_VNODE_REPLY:
 		case UNREMOVE_VNODE_REPLY:
 		case IS_VNODE_REMOVED_REPLY:
