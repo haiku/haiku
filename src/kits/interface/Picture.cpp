@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <new>
 
 struct _BPictureExtent_ {
 	_BPictureExtent_(const int32 &size = 0);
@@ -115,23 +116,22 @@ BPicture::BPicture(BMessage *archive)
 {
 	init_data();
 
-	int32 version, size;
-	int8 endian;
-	const void *data;
-
+	int32 version;
 	if (archive->FindInt32("_ver", &version) != B_OK)
 		version = 0;
 
+	int8 endian;
 	if (archive->FindInt8("_endian", &endian) != B_OK)
 		endian = 0;
 
+	const void *data;
+	int32 size;
 	if (archive->FindData("_data", B_RAW_TYPE, &data, (ssize_t*)&size) != B_OK)
 		return;
 	
 	// Load sub pictures
 	BMessage picMsg;
 	int32 i = 0;
-
 	while (archive->FindMessage("piclib", i++, &picMsg) == B_OK) {
 		BPicture *pic = new BPicture(&picMsg);
 		extent->AddPicture(pic);
@@ -144,25 +144,8 @@ BPicture::BPicture(BMessage *archive)
 
 //		swap_data(extent->fNewData, extent->fNewSize);
 
-		if (extent->Size() > 0) {
-			BPrivate::AppServerLink link;
-
-			link.StartMessage(AS_CREATE_PICTURE);
-			link.Attach<int32>(extent->CountPictures());
-
-			for (int32 i = 0; i < extent->CountPictures(); i++) {
-				BPicture *picture = extent->PictureAt(i);
-				if (picture != NULL)
-					link.Attach<int32>(picture->token);
-			}
-			link.Attach<int32>(extent->Size());
-			link.Attach(extent->Data(), extent->Size());
-
-			status_t status = B_ERROR;
-			if (link.FlushWithReply(status) == B_OK
-				&& status == B_OK)
-				link.Read<int32>(&token);
-		}
+		if (extent->Size() > 0)
+			assert_server_copy();
 	}
 
 	// Do we just free the data now?
@@ -178,6 +161,23 @@ BPicture::BPicture(BMessage *archive)
 	// What with the sub pictures?
 	for (i = extent->CountPictures() - 1; i >= 0; i--)
 		extent->DeletePicture(i);
+}
+
+
+BPicture::BPicture(const void *data, int32 size)
+{
+	init_data();
+	import_old_data(data, size);
+}
+
+
+void
+BPicture::init_data()
+{
+	token = -1;
+	usurped = NULL;
+
+	extent = new (nothrow) _BPictureExtent_;
 }
 
 
@@ -232,8 +232,8 @@ BPicture::Archive(BMessage *archive, bool deep) const
 
 		extent->PictureAt(i)->Archive(&picMsg, deep);
 		err = archive->AddMessage("piclib", &picMsg);
-			if (err != B_OK)
-				break;
+		if (err != B_OK)
+			break;
 	}
 
 	return err;
@@ -339,24 +339,10 @@ BPicture::Unflatten(BDataIO *stream)
 
 //	swap_data(extent->fNewData, extent->fNewSize);
 
-	BPrivate::AppServerLink link;
+	if (!assert_server_copy())
+		return B_ERROR;
 
-	link.StartMessage(AS_CREATE_PICTURE);
-	link.Attach<int32>(extent->CountPictures());
-
-	for (int32 i = 0; i < extent->CountPictures(); i++) {
-		BPicture *picture = extent->PictureAt(i);
-		if (picture)
-			link.Attach<int32>(picture->token);
-	}
-	link.Attach<int32>(extent->Size());
-	link.Attach(extent->Data(), extent->Size());
-
-	status = B_ERROR;
-	if (link.FlushWithReply(status) == B_OK
-		&& status == B_OK)
-		link.Read<int32>(&token);
-
+	// Data is now kept server side, remove the local copy
 	if (extent->Data() != NULL)
 		extent->SetSize(0);
 
@@ -364,32 +350,12 @@ BPicture::Unflatten(BDataIO *stream)
 }
 
 
-void BPicture::_ReservedPicture1() {}
-void BPicture::_ReservedPicture2() {}
-void BPicture::_ReservedPicture3() {}
-
-
-BPicture &
-BPicture::operator=(const BPicture &)
-{
-	return *this;
-}
-
-
-void
-BPicture::init_data()
-{
-	token = -1;
-	usurped = NULL;
-
-	extent = new _BPictureExtent_;
-}
-
 
 void
 BPicture::import_data(const void *data, int32 size, BPicture **subs,
 	int32 subCount)
 {
+	/*
 	if (data == NULL || size == 0)
 		return;
 
@@ -407,7 +373,7 @@ BPicture::import_data(const void *data, int32 size, BPicture **subs,
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK
 		&& status == B_OK)
-		link.Read<int32>(&token);
+		link.Read<int32>(&token);*/
 }
 
 
@@ -467,7 +433,7 @@ BPicture::assert_local_copy()
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
 		int32 count = 0;
 		link.Read<int32>(&count);
-
+		
 		// Read sub picture tokens
 		for (int32 i = 0; i < count; i++) {
 			BPicture *pic = new BPicture;
@@ -479,7 +445,7 @@ BPicture::assert_local_copy()
 		link.Read<int32>(&size);
 		status = extent->SetSize(size);
 		if (status == B_OK)
-			link.Read(const_cast<void *>(extent->Data()), extent->Size());
+			link.Read(const_cast<void *>(extent->Data()), size);
 	}
 
 	return status == B_OK;
@@ -515,25 +481,24 @@ BPicture::assert_server_copy()
 		extent->PictureAt(i)->assert_server_copy();
 
 	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_CREATE_PICTURE);
 	link.Attach<int32>(extent->CountPictures());
-	for (int32 i = 0; i < extent->CountPictures(); i++)
-		link.Attach<int32>(extent->PictureAt(i)->token);
+
+	for (int32 i = 0; i < extent->CountPictures(); i++) {
+		BPicture *picture = extent->PictureAt(i);
+		if (picture)
+			link.Attach<int32>(picture->token);
+	}
 	link.Attach<int32>(extent->Size());
 	link.Attach(extent->Data(), extent->Size());
-	
+
 	status_t status = B_ERROR;
-	if (link.FlushWithReply(status) == B_OK && status == B_OK)
+	if (link.FlushWithReply(status) == B_OK
+		&& status == B_OK)
 		link.Read<int32>(&token);
 
 	return token != -1;
-}
-
-
-BPicture::BPicture(const void *data, int32 size)
-{
-	init_data();
-	import_old_data(data, size);
 }
 
 
@@ -598,6 +563,18 @@ BPicture::step_down()
 }
 
 
+void BPicture::_ReservedPicture1() {}
+void BPicture::_ReservedPicture2() {}
+void BPicture::_ReservedPicture3() {}
+
+
+BPicture &
+BPicture::operator=(const BPicture &)
+{
+	return *this;
+}
+
+
 status_t
 do_playback(void * data, int32 size, BList* pictures,
 	void **callBackTable, int32 tableEntries, void *user)
@@ -608,7 +585,7 @@ do_playback(void * data, int32 size, BList* pictures,
 }
 
 
-
+// _BPictureExtent_
 _BPictureExtent_::_BPictureExtent_(const int32 &size)
 	:
 	fNewData(NULL),
@@ -652,16 +629,27 @@ _BPictureExtent_::ImportData(BDataIO *stream)
 	if (stream == NULL)
 		return B_BAD_VALUE;
 	
-	status_t status = B_OK;
 	int32 size;
-	stream->Read(&size, sizeof(size));
+	ssize_t bytesRead = stream->Read(&size, sizeof(size));
+	if (bytesRead < B_OK)
+		return bytesRead;
+	if (bytesRead != (ssize_t)sizeof(size))
+		return B_IO_ERROR;
+
+	status_t status = B_OK;
 	if (Size() != size)
 		status = SetSize(size);
 	
-	if (status == B_OK)
-		stream->Read(fNewData, size);
+	if (status < B_OK)
+		return status;
+	
+	bytesRead = stream->Read(fNewData, size);
+	if (bytesRead < B_OK)
+		return bytesRead;
+	if (bytesRead != (ssize_t)size)
+		return B_IO_ERROR;
 
-	return status;
+	return B_OK;
 }
 
 
