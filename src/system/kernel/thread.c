@@ -170,7 +170,7 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
  */
 
 static struct thread *
-create_thread_struct(struct thread *inthread, const char *name, thread_id threadID)
+create_thread_struct(struct thread *inthread, const char *name, thread_id threadID, struct cpu_ent *cpu)
 {
 	struct thread *thread;
 	cpu_status state;
@@ -201,8 +201,7 @@ create_thread_struct(struct thread *inthread, const char *name, thread_id thread
 
 	thread->id = threadID >= 0 ? threadID : allocate_thread_id();
 	thread->team = NULL;
-	// XXX terrible hack, this is to leave the early boot cpu pointers alone while being initialized
-//	thread->cpu = NULL;				
+	thread->cpu = cpu;
 	thread->sem.blocking = -1;
 	thread->fault_handler = 0;
 	thread->page_faults_allowed = 1;
@@ -360,7 +359,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID, kernel ? "kernel" : "user"));
 
-	thread = create_thread_struct(NULL, name, threadID);
+	thread = create_thread_struct(NULL, name, threadID, NULL);
 	if (thread == NULL)
 		return B_NO_MEMORY;
 
@@ -1470,7 +1469,7 @@ thread_init(kernel_args *args)
 
 		sprintf(name, "idle thread %lu", i + 1);
 		thread = create_thread_struct(&sIdleThreads[i], name,
-			i == 0 ? team_get_kernel_team_id() : -1);
+			i == 0 ? team_get_kernel_team_id() : -1, &gCPU[i]);
 		if (thread == NULL) {
 			panic("error creating idle thread struct\n");
 			return B_NO_MEMORY;
@@ -1491,7 +1490,6 @@ thread_init(kernel_args *args)
 
 		hash_insert(sThreadHash, thread);
 		insert_thread_into_team(thread->team, thread);
-		thread->cpu = &gCPU[i];
 	}
 	sUsedThreads = args->num_cpus;
 

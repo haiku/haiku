@@ -40,26 +40,25 @@
 #include <string.h>
 
 
-//#define TRACE_BOOT
+#define TRACE_BOOT
 #ifdef TRACE_BOOT
 #	define TRACE(x...) dprintf("INIT : " x)
 #else
 #	define TRACE(x...) ;
 #endif
 
-bool kernel_startup;
+bool kernel_startup = true;
 
 static kernel_args sKernelArgs;
+static uint32 sCpuRendezvous;
+static uint32 sCpuRendezvous2;
 
 static int32 main2(void *);
 int _start(kernel_args *bootKernelArgs, int cpu);	/* keep compiler happy */
 
-
 int
 _start(kernel_args *bootKernelArgs, int currentCPU)
 {
-	kernel_startup = true;
-
 	if (bootKernelArgs->kernel_args_size != sizeof(kernel_args)
 		|| bootKernelArgs->version != CURRENT_KERNEL_ARGS_VERSION) {
 		// This is something we cannot handle right now - release kernels
@@ -69,10 +68,16 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		return -1;
 	}
 
-	memcpy(&sKernelArgs, bootKernelArgs, sizeof(kernel_args));
-		// the passed in kernel args are in a non-allocated range of memory
+	smp_set_num_cpus(bootKernelArgs->num_cpus);
 
-	smp_set_num_cpus(sKernelArgs.num_cpus);
+	// wait for all the cpus to get here
+	smp_cpu_rendezvous(&sCpuRendezvous, currentCPU);
+
+	// the passed in kernel args are in a non-allocated range of memory
+	if (currentCPU == 0)
+		memcpy(&sKernelArgs, bootKernelArgs, sizeof(kernel_args));
+
+	smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
 
 	// do any pre-booting cpu config
 	cpu_preboot_init_percpu(&sKernelArgs, currentCPU);
@@ -89,9 +94,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		debug_init(&sKernelArgs);
 		set_dprintf_enabled(true);
 		dprintf("Welcome to kernel debugger output!\n");
-
-		// we're the boot processor, so wait for all of the APs to enter the kernel
-		smp_wait_for_non_boot_cpus();
 
 		// init modules
 		TRACE("init CPU\n");
@@ -154,23 +156,41 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init VFS\n");
 		vfs_init(&sKernelArgs);
 
-		TRACE("enable interrupts, exit kernel startup\n");
+		// bring up the AP cpus in a lock step fashion
+		TRACE("waking up AP cpus\n");
+		sCpuRendezvous = sCpuRendezvous2 = 0;
+		smp_wake_up_non_boot_cpus();
+		smp_cpu_rendezvous(&sCpuRendezvous, 0); // wait until they're booted
+
+		// exit the kernel startup phase (mutexes, etc work from now on out)
+		TRACE("exiting kernel startup\n");
 		kernel_startup = false;
 
-		TRACE("waking up AP cpus\n");
-		smp_wake_up_non_boot_cpus();		
+		smp_cpu_rendezvous(&sCpuRendezvous2, 0); // release the AP cpus to go enter the scheduler
 
+		TRACE("enabling interrupts and starting scheduler on cpu 0\n");
 		enable_interrupts();
 		scheduler_start();
 
 		// start a thread to finish initializing the rest of the system
 		TRACE("starting main2 thread\n");
 		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
+		TRACE("resuming main2 thread...\n");
 		resume_thread(thread);
 	} else {
+		// lets make sure we're in sync with the main cpu
+		// the boot processor has probably been sending us 
+		// tlb sync messages all along the way, but we've 
+		// been ignoring them
+		arch_cpu_global_TLB_invalidate();
+	
 		// this is run for each non boot processor after they've been set loose
 		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
+
+		// wait for all other AP cpus to get to this point
+		smp_cpu_rendezvous(&sCpuRendezvous, currentCPU);
+		smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
 
 		// welcome to the machine
 		enable_interrupts();

@@ -42,7 +42,7 @@ status_t smp_init(struct kernel_args *args);
 status_t smp_per_cpu_init(struct kernel_args *args, int32 cpu);
 bool smp_trap_non_boot_cpus(int32 cpu);
 void smp_wake_up_non_boot_cpus(void);
-void smp_wait_for_non_boot_cpus(void);
+void smp_cpu_rendezvous(volatile uint32 *var, int current_cpu);
 void smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 data3,
 		void *data_ptr, uint32 flags);
 void smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,

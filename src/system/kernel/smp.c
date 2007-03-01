@@ -553,12 +553,6 @@ smp_trap_non_boot_cpus(int32 cpu)
 		boot_cpu_spin[cpu] = 1;
 		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
 
-		// lets make sure we're in sync with the main cpu
-		// the boot processor has probably been sending us 
-		// tlb sync messages all along the way, but we've 
-		// been ignoring them
-		arch_cpu_global_TLB_invalidate();
-
 		return false;
 	}
 
@@ -581,21 +575,15 @@ smp_wake_up_non_boot_cpus()
 	}
 }
 
-
+/* have all cpus spin until all have run */
 void
-smp_wait_for_non_boot_cpus(void)
+smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 {
-	bool retry;
-	int32 i;
-	do {
-		retry = false;
-		for (i = 1; i < sNumCPUs; i++) {
-			if (boot_cpu_spin[i] != 1)
-				retry = true;
-		}
-	} while (retry == true);
-}
+	atomic_or(var, 1<<current_cpu);
 
+	while (*var != ((1<<sNumCPUs) - 1))
+		;
+}
 
 status_t
 smp_init(kernel_args *args)
