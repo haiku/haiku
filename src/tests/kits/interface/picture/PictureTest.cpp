@@ -133,7 +133,7 @@ PictureView::AllAttached()
 	}
 
 	BMessage message2;
-	//fPicture->Archive(&message2);
+	fPicture->Archive(&message2);
 	message2.PrintToStream();
 }
 
