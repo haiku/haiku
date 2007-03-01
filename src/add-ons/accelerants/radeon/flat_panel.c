@@ -126,6 +126,9 @@ void Radeon_ReadFPRegisters(
 	values->fp_v_sync_strt_wid = INREG( regs, RADEON_FP_V_SYNC_STRT_WID );
 	values->fp2_h_sync_strt_wid = INREG( regs, RADEON_FP_H2_SYNC_STRT_WID );
 	values->fp2_v_sync_strt_wid = INREG( regs, RADEON_FP_V2_SYNC_STRT_WID );
+	values->bios_4_scratch =  INREG( regs, RADEON_BIOS_4_SCRATCH );
+	values->bios_5_scratch =  INREG( regs, RADEON_BIOS_5_SCRATCH );
+	values->bios_6_scratch =  INREG( regs, RADEON_BIOS_6_SCRATCH );
 
     SHOW_FLOW( 2, "before: fp_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
     	values->fp_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
@@ -222,8 +225,54 @@ void Radeon_ProgramFPRegisters(
 			INREG( regs, RADEON_GRPH_BUFFER_CNTL) & ~0x7f0000);
 	}
 	
+	if ( ai->si->is_mobility ) {
+		OUTREG( regs, RADEON_BIOS_4_SCRATCH, values->bios_4_scratch);
+		OUTREG( regs, RADEON_BIOS_5_SCRATCH, values->bios_5_scratch);
+		OUTREG( regs, RADEON_BIOS_6_SCRATCH, values->bios_6_scratch);
+    }
+
 	if( (crtc->chosen_displays & dd_lvds) != 0 ) {
-		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, values->lvds_gen_cntl, 
-			RADEON_LVDS_ON | RADEON_LVDS_BLON );
+
+		//OUTREGP( regs, RADEON_LVDS_GEN_CNTL, values->lvds_gen_cntl, 
+		//	RADEON_LVDS_ON | RADEON_LVDS_BLON );
+
+		uint32 old_pixclks_cntl;
+		uint32 tmp;
+
+		old_pixclks_cntl = Radeon_INPLL( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL);
+		
+		// ASIC bug: when LVDS_ON is reset, LVDS_ALWAYS_ON must be zero
+		if( ai->si->is_mobility || ai->si->is_igp ) 
+		{
+			if (!(values->lvds_gen_cntl & RADEON_LVDS_ON)) {
+				Radeon_OUTPLLP( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL, 0, ~RADEON_PIXCLK_LVDS_ALWAYS_ONb );
+			}
+		}
+
+		// get current state of LCD
+		tmp = INREG( regs, RADEON_LVDS_GEN_CNTL);
+		
+		// if LCD is on, and previous state was on, just write the state directly.
+		if (( tmp & ( RADEON_LVDS_ON | RADEON_LVDS_BLON )) == 
+			( values->lvds_gen_cntl & ( RADEON_LVDS_ON | RADEON_LVDS_BLON ))) {
+			OUTREG( regs, RADEON_LVDS_GEN_CNTL, values->lvds_gen_cntl );
+		} else {
+			if ( values->lvds_gen_cntl & ( RADEON_LVDS_ON | RADEON_LVDS_BLON )) {
+				snooze( ai->si->panel_pwr_delay * 1000 );
+				OUTREG( regs, RADEON_LVDS_GEN_CNTL, values->lvds_gen_cntl );
+			} else { 
+			
+				//turn on backlight, wait for stable before turning on data ???
+				OUTREG( regs, RADEON_LVDS_GEN_CNTL,	values->lvds_gen_cntl | RADEON_LVDS_BLON );
+				snooze( ai->si->panel_pwr_delay * 1000 );
+				OUTREG( regs, RADEON_LVDS_GEN_CNTL, values->lvds_gen_cntl );
+			}
+		}
+		
+		if( ai->si->is_mobility || ai->si->is_igp ) {
+			if (!(values->lvds_gen_cntl & RADEON_LVDS_ON)) {
+				Radeon_OUTPLL( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL, old_pixclks_cntl );
+			}
+		}
 	}
 }

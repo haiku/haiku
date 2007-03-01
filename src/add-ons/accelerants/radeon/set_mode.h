@@ -109,6 +109,11 @@ typedef struct {
 	// RMX registers
 	uint32		fp_horz_stretch;
     uint32		fp_vert_stretch;
+
+	// Bios values used by Mobility Asics
+	uint32		bios_4_scratch;
+	uint32		bios_5_scratch;
+	uint32		bios_6_scratch;
 } fp_regs;
 
 

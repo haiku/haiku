@@ -324,6 +324,14 @@ status_t Radeon_FirstOpen( device_info *di )
 	if( di->asic == rt_rv100 && di->is_mobility)
 		di->dac2_cntl = INREG( di->regs, RADEON_DAC_CNTL2 );
 	
+	// print these out to capture bios status...
+	if ( di->is_mobility ) {
+		SHOW_INFO0( 4, "Copy of Laptop Display Regs for Reference:");
+		SHOW_INFO( 4, "LVDS CNTL = %8lx", INREG( di->regs, RADEON_LVDS_GEN_CNTL ));
+		SHOW_INFO( 4, "FP1  CNTL = %8lx", INREG( di->regs, RADEON_FP_GEN_CNTL ));
+		SHOW_INFO( 4, "FP2  CNTL = %8lx", INREG( di->regs, RADEON_FP2_GEN_CNTL ));
+	}
+	
 	result = Radeon_InitPCIGART( di );
 	if( result < 0 )
 		goto err5;
@@ -391,6 +399,10 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->nonlocal_mem = (uint32 *)((uint32)si->framebuffer + dma_offset);
 	si->nonlocal_vm_start = (uint32)si->framebuffer_pci + dma_offset;*/
 	
+	// set dynamic clocks for Mobilty chips
+	if (di->is_mobility && di->settings.dynamic_clocks)
+		Radeon_SetDynamicClock( di, 1);
+		
 	return B_OK;
 
 err0:

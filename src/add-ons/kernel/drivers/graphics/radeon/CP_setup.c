@@ -627,3 +627,356 @@ void Radeon_DiscardAllIndirectBuffers( device_info *di )
 		cp->buffers.oldest = tmp_oldest_buffer;
 	}
 }
+
+// lets hide this in here, as it's got lots of lovely register headers already...
+// does it go here, or in the accelerant anyway?
+// for now i'm assuming you turn on dynamic clocks, and they take care of themselves onwards...
+// so doing it at driver init seems sensible after a valid detection of course...
+void Radeon_SetDynamicClock( device_info *di, int mode)
+{
+    vuint8 *regs = di->regs;
+    radeon_type asic = di->asic;
+    uint32 tmp;
+    
+    switch(mode) {
+	case 0: /* Turn everything OFF (ForceON to everything)*/
+		if ( di->num_crtc != 2 ) {
+			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+			tmp |= (RADEON_SCLK_FORCE_CP   | RADEON_SCLK_FORCE_HDP |
+				RADEON_SCLK_FORCE_DISP1 | RADEON_SCLK_FORCE_TOP |
+				RADEON_SCLK_FORCE_E2   | RADEON_SCLK_FORCE_SE  |
+				RADEON_SCLK_FORCE_IDCT | RADEON_SCLK_FORCE_VIP |
+				RADEON_SCLK_FORCE_RE   | RADEON_SCLK_FORCE_PB  |
+				RADEON_SCLK_FORCE_TAM  | RADEON_SCLK_FORCE_TDM |
+				RADEON_SCLK_FORCE_RB);
+			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+		} else if (asic == rt_rv350) {
+			/* for RV350/M10, no delays are required. */
+			tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
+			tmp |= (R300_SCLK_FORCE_TCL |
+				R300_SCLK_FORCE_GA  |
+				R300_SCLK_FORCE_CBA);
+			Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+			tmp |= (RADEON_SCLK_FORCE_DISP2 | RADEON_SCLK_FORCE_CP      |
+				RADEON_SCLK_FORCE_HDP   | RADEON_SCLK_FORCE_DISP1   |
+				RADEON_SCLK_FORCE_TOP   | RADEON_SCLK_FORCE_E2      |
+				R300_SCLK_FORCE_VAP     | RADEON_SCLK_FORCE_IDCT    |
+				RADEON_SCLK_FORCE_VIP   | R300_SCLK_FORCE_SR        |
+				R300_SCLK_FORCE_PX      | R300_SCLK_FORCE_TX        |
+				R300_SCLK_FORCE_US      | RADEON_SCLK_FORCE_TV_SCLK |
+				R300_SCLK_FORCE_SU      | RADEON_SCLK_FORCE_OV0);
+			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
+			tmp |= RADEON_SCLK_MORE_FORCEON;
+			Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
+			tmp |= (RADEON_FORCEON_MCLKA |
+				RADEON_FORCEON_MCLKB |
+				RADEON_FORCEON_YCLKA |
+				RADEON_FORCEON_YCLKB |
+				RADEON_FORCEON_MC);
+			Radeon_OUTPLL(regs, asic, RADEON_MCLK_CNTL, tmp);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
+			tmp &= ~(RADEON_PIXCLK_ALWAYS_ONb  |
+				RADEON_PIXCLK_DAC_ALWAYS_ONb |
+			R300_DISP_DAC_PIXCLK_DAC_BLANK_OFF);
+			Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
+			tmp &= ~(RADEON_PIX2CLK_ALWAYS_ONb         |
+				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
+				RADEON_DISP_TVOUT_PIXCLK_TV_ALWAYS_ONb |
+				R300_DVOCLK_ALWAYS_ONb            |
+				RADEON_PIXCLK_BLEND_ALWAYS_ONb    |
+				RADEON_PIXCLK_GV_ALWAYS_ONb       |
+				R300_PIXCLK_DVO_ALWAYS_ONb        |
+				RADEON_PIXCLK_LVDS_ALWAYS_ONb     |
+				RADEON_PIXCLK_TMDS_ALWAYS_ONb     |
+				R300_PIXCLK_TRANS_ALWAYS_ONb      |
+				R300_PIXCLK_TVO_ALWAYS_ONb        |
+				R300_P2G2CLK_ALWAYS_ONb            |
+				R300_P2G2CLK_ALWAYS_ONb           |
+				R300_DISP_DAC_PIXCLK_DAC2_BLANK_OFF);
+			Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
+		}  else {
+			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+			tmp |= (RADEON_SCLK_FORCE_CP | RADEON_SCLK_FORCE_E2);
+			tmp |= RADEON_SCLK_FORCE_SE;
+	
+			if ( di->num_crtc != 2 ) {
+				tmp |= ( RADEON_SCLK_FORCE_RB    |
+				RADEON_SCLK_FORCE_TDM   |
+				RADEON_SCLK_FORCE_TAM   |
+				RADEON_SCLK_FORCE_PB    |
+				RADEON_SCLK_FORCE_RE    |
+				RADEON_SCLK_FORCE_VIP   |
+				RADEON_SCLK_FORCE_IDCT  |
+				RADEON_SCLK_FORCE_TOP   |
+				RADEON_SCLK_FORCE_DISP1 |
+				RADEON_SCLK_FORCE_DISP2 |
+				RADEON_SCLK_FORCE_HDP    );
+			} else if ((asic == rt_r300) || (asic == rt_r350)) {
+				tmp |= ( RADEON_SCLK_FORCE_HDP   |
+					RADEON_SCLK_FORCE_DISP1 |
+					RADEON_SCLK_FORCE_DISP2 |
+					RADEON_SCLK_FORCE_TOP   |
+					RADEON_SCLK_FORCE_IDCT  |
+					RADEON_SCLK_FORCE_VIP);
+			}
+			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+	
+			snooze(16000);
+	
+			if ((asic == rt_r300) || (asic == rt_r350)) {
+				tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
+				tmp |= ( R300_SCLK_FORCE_TCL |
+					R300_SCLK_FORCE_GA  |
+					R300_SCLK_FORCE_CBA);
+				Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
+				snooze(16000);
+			}
+	
+			if (di->is_igp) {
+				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
+				tmp &= ~(RADEON_FORCEON_MCLKA |
+					RADEON_FORCEON_YCLKA);
+				Radeon_OUTPLL(regs, asic, RADEON_MCLK_CNTL, tmp);
+				snooze(16000);
+			}
+	
+			if ((asic == rt_rv200) ||
+				(asic == rt_rv250) ||
+				(asic == rt_rv280)) {
+				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
+				tmp |= RADEON_SCLK_MORE_FORCEON;
+				Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
+				snooze(16000);
+			}
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
+			tmp &= ~(RADEON_PIX2CLK_ALWAYS_ONb         |
+				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
+				RADEON_PIXCLK_BLEND_ALWAYS_ONb    |
+				RADEON_PIXCLK_GV_ALWAYS_ONb       |
+				RADEON_PIXCLK_DIG_TMDS_ALWAYS_ONb |
+				RADEON_PIXCLK_LVDS_ALWAYS_ONb     |
+				RADEON_PIXCLK_TMDS_ALWAYS_ONb);
+		
+			Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
+			snooze(16000);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
+			tmp &= ~(RADEON_PIXCLK_ALWAYS_ONb  |
+				RADEON_PIXCLK_DAC_ALWAYS_ONb);
+			Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
+		}
+		SHOW_FLOW0( 3, "Dynamic Clock Scaling Disabled" );
+		break;
+	case 1:
+		if ( di->num_crtc != 2 ) {
+			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+			if ((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) > RADEON_CFG_ATI_REV_A13) {
+				tmp &= ~(RADEON_SCLK_FORCE_CP | RADEON_SCLK_FORCE_RB);
+			}
+			tmp &= ~(RADEON_SCLK_FORCE_HDP  | RADEON_SCLK_FORCE_DISP1 |
+				RADEON_SCLK_FORCE_TOP  | RADEON_SCLK_FORCE_SE   |
+				RADEON_SCLK_FORCE_IDCT | RADEON_SCLK_FORCE_RE   |
+				RADEON_SCLK_FORCE_PB   | RADEON_SCLK_FORCE_TAM  |
+				RADEON_SCLK_FORCE_TDM);
+			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+		} else if ((asic == rt_r300) 
+				|| (asic == rt_r350) 
+				|| (asic == rt_rv350)) {
+			if (asic == rt_rv350) {
+				tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
+				tmp &= ~(R300_SCLK_FORCE_TCL |
+					R300_SCLK_FORCE_GA  |
+					R300_SCLK_FORCE_CBA);
+				tmp |=  (R300_SCLK_TCL_MAX_DYN_STOP_LAT |
+					R300_SCLK_GA_MAX_DYN_STOP_LAT  |
+					R300_SCLK_CBA_MAX_DYN_STOP_LAT);
+				Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
+	
+				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+				tmp &= ~(RADEON_SCLK_FORCE_DISP2 | RADEON_SCLK_FORCE_CP      |
+					RADEON_SCLK_FORCE_HDP   | RADEON_SCLK_FORCE_DISP1   |
+					RADEON_SCLK_FORCE_TOP   | RADEON_SCLK_FORCE_E2      |
+					R300_SCLK_FORCE_VAP     | RADEON_SCLK_FORCE_IDCT    |
+					RADEON_SCLK_FORCE_VIP   | R300_SCLK_FORCE_SR        |
+					R300_SCLK_FORCE_PX      | R300_SCLK_FORCE_TX        |
+					R300_SCLK_FORCE_US      | RADEON_SCLK_FORCE_TV_SCLK |
+					R300_SCLK_FORCE_SU      | RADEON_SCLK_FORCE_OV0);
+					tmp |=  RADEON_DYN_STOP_LAT_MASK;
+				Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+	
+				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
+				tmp &= ~RADEON_SCLK_MORE_FORCEON;
+				tmp |=  RADEON_SCLK_MORE_MAX_DYN_STOP_LAT;
+				Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
+	
+				tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
+				tmp |= (RADEON_PIXCLK_ALWAYS_ONb |
+					RADEON_PIXCLK_DAC_ALWAYS_ONb);
+				Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
+	
+				tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
+				tmp |= (RADEON_PIX2CLK_ALWAYS_ONb         |
+				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
+					RADEON_DISP_TVOUT_PIXCLK_TV_ALWAYS_ONb |
+					R300_DVOCLK_ALWAYS_ONb            |
+					RADEON_PIXCLK_BLEND_ALWAYS_ONb    |
+					RADEON_PIXCLK_GV_ALWAYS_ONb       |
+					R300_PIXCLK_DVO_ALWAYS_ONb        |
+					RADEON_PIXCLK_LVDS_ALWAYS_ONb     |
+					RADEON_PIXCLK_TMDS_ALWAYS_ONb     |
+					R300_PIXCLK_TRANS_ALWAYS_ONb      |
+					R300_PIXCLK_TVO_ALWAYS_ONb        |
+					R300_P2G2CLK_ALWAYS_ONb           |
+					R300_P2G2CLK_ALWAYS_ONb);
+				Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
+	
+				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_MISC);
+				tmp |= (RADEON_MC_MCLK_DYN_ENABLE |
+					RADEON_IO_MCLK_DYN_ENABLE);
+				Radeon_OUTPLL(regs, asic, RADEON_MCLK_MISC, tmp);
+	
+				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
+				tmp |= (RADEON_FORCEON_MCLKA |
+					RADEON_FORCEON_MCLKB);
+	
+				tmp &= ~(RADEON_FORCEON_YCLKA  |
+					RADEON_FORCEON_YCLKB  |
+					RADEON_FORCEON_MC);
+	
+				/* Some releases of vbios have set DISABLE_MC_MCLKA
+				and DISABLE_MC_MCLKB bits in the vbios table.  Setting these
+				bits will cause H/W hang when reading video memory with dynamic clocking
+				enabled. */
+				if ((tmp & R300_DISABLE_MC_MCLKA) &&
+				(tmp & R300_DISABLE_MC_MCLKB)) {
+					/* If both bits are set, then check the active channels */
+					tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
+					if (di->ram.width == 64) {
+						if (INREG( regs, RADEON_MEM_CNTL) & R300_MEM_USE_CD_CH_ONLY)
+						tmp &= ~R300_DISABLE_MC_MCLKB;
+						else
+						tmp &= ~R300_DISABLE_MC_MCLKA;
+					} else {
+						tmp &= ~(R300_DISABLE_MC_MCLKA |
+						R300_DISABLE_MC_MCLKB);
+					}
+				}
+	
+				Radeon_OUTPLL(regs, asic, RADEON_MCLK_CNTL, tmp);
+			} else {
+				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+				tmp &= ~(R300_SCLK_FORCE_VAP);
+				tmp |= RADEON_SCLK_FORCE_CP;
+				Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+				snooze(15000);
+	
+				tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
+				tmp &= ~(R300_SCLK_FORCE_TCL |
+				R300_SCLK_FORCE_GA  |
+				R300_SCLK_FORCE_CBA);
+				Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
+			}
+		} else {
+			tmp = Radeon_INPLL(regs, asic, RADEON_CLK_PWRMGT_CNTL);
+	
+			tmp &= ~(RADEON_ACTIVE_HILO_LAT_MASK     |
+				RADEON_DISP_DYN_STOP_LAT_MASK   |
+				RADEON_DYN_STOP_MODE_MASK);
+	
+			tmp |= (RADEON_ENGIN_DYNCLK_MODE |
+			(0x01 << RADEON_ACTIVE_HILO_LAT_SHIFT));
+			Radeon_OUTPLL(regs, asic, RADEON_CLK_PWRMGT_CNTL, tmp);
+			snooze(15000);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_CLK_PIN_CNTL);
+			tmp |= RADEON_SCLK_DYN_START_CNTL;
+			Radeon_OUTPLL(regs, asic, RADEON_CLK_PIN_CNTL, tmp);
+			snooze(15000);
+	
+			/* When DRI is enabled, setting DYN_STOP_LAT to zero can cause some R200
+			to lockup randomly, leave them as set by BIOS.
+			*/
+			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
+			/*tmp &= RADEON_SCLK_SRC_SEL_MASK;*/
+			tmp &= ~RADEON_SCLK_FORCEON_MASK;
+	
+			/*RAGE_6::A11 A12 A12N1 A13, RV250::A11 A12, R300*/
+			if (((asic == rt_rv250) &&
+				((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <
+				  RADEON_CFG_ATI_REV_A13)) ||
+				((asic == rt_rv100) &&
+				((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <=
+				  RADEON_CFG_ATI_REV_A13)))
+			{
+				tmp |= RADEON_SCLK_FORCE_CP;
+				tmp |= RADEON_SCLK_FORCE_VIP;
+			}
+	
+			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
+	
+			if ((asic == rt_rv200) ||
+				(asic == rt_rv250) ||
+				(asic == rt_rv280)) {
+				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
+				tmp &= ~RADEON_SCLK_MORE_FORCEON;
+	
+				/* RV200::A11 A12 RV250::A11 A12 */
+				if (((asic == rt_rv200) ||
+					 (asic == rt_rv250)) &&
+					((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <
+					  RADEON_CFG_ATI_REV_A13)) 
+				{
+					tmp |= RADEON_SCLK_MORE_FORCEON;
+				}
+				Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
+				snooze(15000);
+			}
+	
+			/* RV200::A11 A12, RV250::A11 A12 */
+			if (((asic == rt_rv200) ||
+				 (asic == rt_rv250)) &&
+				((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <
+				  RADEON_CFG_ATI_REV_A13)) 
+			{
+				tmp = Radeon_INPLL(regs, asic, RADEON_PLL_PWRMGT_CNTL);
+				tmp |= RADEON_TCL_BYPASS_DISABLE;
+				Radeon_OUTPLL(regs, asic, RADEON_PLL_PWRMGT_CNTL, tmp);
+			}
+			snooze(15000);
+	
+			/*enable dynamic mode for display clocks (PIXCLK and PIX2CLK)*/
+			tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
+			tmp |=  (RADEON_PIX2CLK_ALWAYS_ONb         |
+				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
+				RADEON_PIXCLK_BLEND_ALWAYS_ONb    |
+				RADEON_PIXCLK_GV_ALWAYS_ONb       |
+				RADEON_PIXCLK_DIG_TMDS_ALWAYS_ONb |
+				RADEON_PIXCLK_LVDS_ALWAYS_ONb     |
+				RADEON_PIXCLK_TMDS_ALWAYS_ONb);
+	
+			Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
+			snooze(15000);
+	
+			tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
+			tmp |= (RADEON_PIXCLK_ALWAYS_ONb  |
+				RADEON_PIXCLK_DAC_ALWAYS_ONb);
+	
+			Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
+			snooze(15000);
+		}
+		SHOW_FLOW0( 3, "Dynamic Clock Scaling Enabled" );
+		break;
+	default:
+		break;
+	}
+}

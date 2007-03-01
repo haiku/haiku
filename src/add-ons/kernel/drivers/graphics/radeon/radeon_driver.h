@@ -219,6 +219,7 @@ void Radeon_WaitForFifo( device_info *di, int entries );
 void Radeon_ResetEngine( device_info *di );
 status_t Radeon_InitCP( device_info *di );
 void Radeon_UninitCP( device_info *di );
+void Radeon_SetDynamicClock( device_info *di, int mode );
 
 
 // vip.c

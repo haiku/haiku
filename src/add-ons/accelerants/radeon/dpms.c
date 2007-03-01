@@ -66,9 +66,8 @@ static void Radeon_SetDPMS_LVDS( accelerator_info *ai, int mode )
 		// (you get a dark picture first that becomes brighter step by step,
 		//  after a couple of seconds you have full brightness again)
 		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, RADEON_LVDS_BLON, ~RADEON_LVDS_BLON );
-		//snooze( ai->si->fp_port.panel_pwr_delay * 1000 );
-		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, RADEON_LVDS_BLON | RADEON_LVDS_ON, 
-			~(RADEON_LVDS_DISPLAY_DIS | RADEON_LVDS_BLON | RADEON_LVDS_ON) );
+		snooze( ai->si->panel_pwr_delay * 1000 ); 
+		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, RADEON_LVDS_ON, ~RADEON_LVDS_ON );
 		break;
 		
 	case B_DPMS_STAND_BY:
@@ -82,8 +81,7 @@ static void Radeon_SetDPMS_LVDS( accelerator_info *ai, int mode )
 		if( ai->si->is_mobility || ai->si->is_igp ) 
 			Radeon_OUTPLLP( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL, 0, ~RADEON_PIXCLK_LVDS_ALWAYS_ONb );
 
-		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, RADEON_LVDS_DISPLAY_DIS,
-			~(RADEON_LVDS_DISPLAY_DIS | RADEON_LVDS_BLON | RADEON_LVDS_ON) );
+		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, 0,	~(RADEON_LVDS_BLON | RADEON_LVDS_ON) );
 			
 		if( ai->si->is_mobility || ai->si->is_igp ) 
 			Radeon_OUTPLL( ai->regs, ai->si->asic, RADEON_PIXCLKS_CNTL, old_pixclks_cntl );
@@ -125,15 +123,20 @@ static void Radeon_SetDPMS_FP2( accelerator_info *ai, int mode )
 	// *should* be supported as well)
 	switch( mode ) {
 	case B_DPMS_ON:
-		OUTREGP( regs, RADEON_FP2_GEN_CNTL, 
-			RADEON_FP_FPON |
-			(ai->si->asic >= rt_r200 ? RADEON_FP2_DV0_EN : 0), 
-			~(RADEON_FP2_BLANK_EN | RADEON_FP2_BLANK_EN) );
+		OUTREGP( regs, RADEON_FP2_GEN_CNTL, 0, ~RADEON_FP2_BLANK_EN);
+		OUTREGP( regs, RADEON_FP2_GEN_CNTL, RADEON_FP2_FPON, ~RADEON_FP2_FPON);
+		if (ai->si->asic >= rt_r200) {
+			OUTREGP( regs, RADEON_FP2_GEN_CNTL, RADEON_FP2_DV0_EN, ~RADEON_FP2_DV0_EN);
+		}
 		break;
 	case B_DPMS_STAND_BY:
 	case B_DPMS_SUSPEND:
 	case B_DPMS_OFF:
-		OUTREGP( regs, RADEON_FP2_GEN_CNTL, 0, ~(RADEON_FP2_BLANK_EN | RADEON_FP2_BLANK_EN) );
+		OUTREGP( regs, RADEON_FP2_GEN_CNTL, RADEON_FP2_BLANK_EN, ~RADEON_FP2_BLANK_EN );
+		OUTREGP( regs, RADEON_FP2_GEN_CNTL, 0, ~RADEON_FP2_FPON);
+		if (ai->si->asic >= rt_r200) {
+			OUTREGP( regs, RADEON_FP2_GEN_CNTL, 0, ~RADEON_FP2_DV0_EN);
+		}
 		break;
 	}
 }
@@ -170,14 +173,20 @@ static void Radeon_SetDPMS_TVCRT( accelerator_info *ai, int mode )
 	
 	switch( mode ) {
 	case B_DPMS_ON:
-		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 0, ~RADEON_CRTC2_DISP_DIS );
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 0, 
+			~(RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS) );
 		break;
-		
 	case B_DPMS_STAND_BY:
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, (RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_HSYNC_DIS), 
+			~(RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS) );
+		break;
 	case B_DPMS_SUSPEND:
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, (RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS), 
+			~(RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS) );
+		break;
 	case B_DPMS_OFF:
-		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL,
-			RADEON_CRTC2_DISP_DIS, ~RADEON_CRTC2_DISP_DIS );
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, (RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS), 
+			~(RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS) );
 		break;
 	}
 }
@@ -188,26 +197,23 @@ static void Radeon_SetDPMS_CRTC1( accelerator_info *ai, int mode )
 {
 	vuint8 *regs = ai->regs;
 	
-	uint32 mask = RADEON_CRTC_HSYNC_DIS | RADEON_CRTC_VSYNC_DIS;
+	uint32 mask = ~(RADEON_CRTC_DISPLAY_DIS | RADEON_CRTC_VSYNC_DIS | RADEON_CRTC_HSYNC_DIS);
 		
 	switch( mode ) {
 	case B_DPMS_ON:
-		/* Screen: On; HSync: On, VSync: On */
-		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, 0, ~mask );
+		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, 0, mask );
 		break;
 	case B_DPMS_STAND_BY:
-		/* Screen: Off; HSync: Off, VSync: On */
-		OUTREGP( regs, RADEON_CRTC_EXT_CNTL,
-			RADEON_CRTC_HSYNC_DIS, ~mask );
+		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, 
+			(RADEON_CRTC_DISPLAY_DIS | RADEON_CRTC_HSYNC_DIS), mask );
 		break;
 	case B_DPMS_SUSPEND:
-		/* Screen: Off; HSync: On, VSync: Off */
-		OUTREGP( regs, RADEON_CRTC_EXT_CNTL,
-			RADEON_CRTC_VSYNC_DIS, ~mask );
+		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, 
+			(RADEON_CRTC_DISPLAY_DIS | RADEON_CRTC_VSYNC_DIS), mask );
 		break;
 	case B_DPMS_OFF:
-		/* Screen: Off; HSync: Off, VSync: Off */
-		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, mask, ~mask );
+		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, 
+			(RADEON_CRTC_DISPLAY_DIS | RADEON_CRTC_VSYNC_DIS | RADEON_CRTC_HSYNC_DIS), mask );
 		break;
 	}
 	
@@ -233,26 +239,21 @@ static void Radeon_SetDPMS_CRTC2( accelerator_info *ai, int mode )
 {
 	vuint8 *regs = ai->regs;
 	
-	int mask = RADEON_CRTC2_HSYNC_DIS | RADEON_CRTC2_VSYNC_DIS;
+	int mask = ~(RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS);
 		
 	switch( mode ) {
 	case B_DPMS_ON:
-		/* Screen: On; HSync: On, VSync: On */
-		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 0, ~mask );
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 0, mask );
 		break;
 	case B_DPMS_STAND_BY:
-		/* Screen: Off; HSync: Off, VSync: On */
-		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL,
-			RADEON_CRTC2_HSYNC_DIS, ~mask );
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, (RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_HSYNC_DIS), mask );
 		break;
 	case B_DPMS_SUSPEND:
-		/* Screen: Off; HSync: On, VSync: Off */
-		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL,
-			RADEON_CRTC2_VSYNC_DIS, ~mask );
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, (RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS), mask);
 		break;
 	case B_DPMS_OFF:
-		/* Screen: Off; HSync: Off, VSync: Off */
-		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, mask, ~mask );
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 
+			(RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS | RADEON_CRTC2_HSYNC_DIS), mask);
 		break;
 	}
 	
