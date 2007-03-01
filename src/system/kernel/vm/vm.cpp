@@ -2888,20 +2888,31 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 #if 1
 			if (area) {
 				struct stack_frame {
-					#ifdef __INTEL__
+					#if defined(__INTEL__) || defined(__POWERPC__)
 						struct stack_frame*	previous;
 						void*				return_address;
 					#else
 						// ...
 					#endif
-				};
+				} frame;
+#ifdef __INTEL__
 				struct iframe *iframe = i386_get_user_iframe();
 				if (iframe == NULL)
 					panic("iframe is NULL!");
 
-				struct stack_frame frame;
 				status_t status = user_memcpy(&frame, (void *)iframe->ebp,
 					sizeof(struct stack_frame));
+#elif defined(__POWERPC__)
+				struct iframe *iframe = ppc_get_user_iframe();
+				if (iframe == NULL)
+					panic("iframe is NULL!");
+
+				status_t status = user_memcpy(&frame, (void *)iframe->r1,
+					sizeof(struct stack_frame));
+#else
+#	warn "vm_page_fault() stack trace won't work"
+				status = B_ERROR;
+#endif
 
 				dprintf("stack trace:\n");
 				while (status == B_OK) {
