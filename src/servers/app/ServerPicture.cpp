@@ -134,6 +134,35 @@ ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
 }
 
 static void
+get_polygon_frame(const BPoint *points, int32 numPoints, BRect *_frame)
+{
+	float l, t, r, b;
+
+	ASSERT(numPoints > 0);
+	
+	l = r = points->x;
+	t = b = points->y;
+
+	points++;
+	numPoints--;
+
+	while (numPoints--) {
+		if (points->x < l)
+			l = points->x;
+		if (points->x > r)
+			r = points->x;
+		if (points->y < t)
+			t = points->y;
+		if (points->y > b)
+			b = points->y;
+		points++;
+	}
+
+	_frame->Set(l, t, r, b);
+}
+
+
+static void
 nop()
 {
 }
@@ -252,58 +281,72 @@ fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 static void
 stroke_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints, bool isClosed)
 {
-	BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
-	if (!points)
+	if (numPoints <= 0) {
 		return;
+	} else if (numPoints <= 200) {
+		// fast path: no malloc/free, also avoid constructor/destructor calls
+		char data[200 * sizeof(BPoint)];
+		BPoint *points = (BPoint *)data;
 
-	view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
+		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
 
-	BRect polyFrame = BRect(points[0], points[0]);
+		BRect polyFrame;
+		get_polygon_frame(points, numPoints, &polyFrame);
 
-	for (int32 i = 1; i < numPoints; i++) {
-		if (points[i].x < polyFrame.left)
-			polyFrame.left = points[i].x;
-		if (points[i].y < polyFrame.top)
-			polyFrame.top = points[i].y;
-		if (points[i].x > polyFrame.right)
-			polyFrame.right = points[i].x;
-		if (points[i].y > polyFrame.bottom)
-			polyFrame.bottom = points[i].y;
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+														view->CurrentState(), false,
+														isClosed && numPoints > 2);
+	} else {
+		 // avoid constructor/destructor calls by using malloc instead of new []
+		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
+		if (!points)
+			return;
+
+		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
+
+		BRect polyFrame;
+		get_polygon_frame(points, numPoints, &polyFrame);
+
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+														view->CurrentState(), false,
+														isClosed && numPoints > 2);
+		free(points);
 	}
-
-	view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, view->CurrentState(),
-							false, isClosed && numPoints > 2);
-
-	free(points);
 }
 
 
 static void
 fill_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints)
 {
-	BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
-	if (!points)
+	if (numPoints <= 0) {
 		return;
+	} else if (numPoints <= 200) {
+		// fast path: no malloc/free, also avoid constructor/destructor calls
+		char data[200 * sizeof(BPoint)];
+		BPoint *points = (BPoint *)data;
 
-	view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
+		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
 
-	BRect polyFrame = BRect(points[0], points[0]);
+		BRect polyFrame;
+		get_polygon_frame(points, numPoints, &polyFrame);
 
-	for (int32 i = 1; i < numPoints; i++) {
-		if (points[i].x < polyFrame.left)
-			polyFrame.left = points[i].x;
-		if (points[i].y < polyFrame.top)
-			polyFrame.top = points[i].y;
-		if (points[i].x > polyFrame.right)
-			polyFrame.right = points[i].x;
-		if (points[i].y > polyFrame.bottom)
-			polyFrame.bottom = points[i].y;
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+														view->CurrentState(), true, true);
+	} else {
+		 // avoid constructor/destructor calls by using malloc instead of new []
+		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint)); 
+		if (!points)
+			return;
+
+		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
+
+		BRect polyFrame;
+		get_polygon_frame(points, numPoints, &polyFrame);
+
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+														view->CurrentState(), true, true);
+		free(points);
 	}
-
-	view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, view->CurrentState(),
-							true, true);
-
-	free(points);
 }
 
 
