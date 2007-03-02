@@ -92,6 +92,7 @@ private:
 	void					StopThreads();
 	
 private:
+	friend class InfoWin;
 
 	enum {
 		MAX_AUDIO_BUFFERS = 8,

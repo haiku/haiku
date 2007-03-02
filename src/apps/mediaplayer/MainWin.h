@@ -27,6 +27,7 @@
 #include <FilePanel.h>
 #include "Controller.h"
 #include "ControllerView.h"
+#include "InfoWin.h"
 #include "VideoView.h"
 #include "Player.h"
 #include "Playlist.h"
@@ -57,6 +58,7 @@ public:
 	void				ResizeVideoView(int x, int y, int width, int height);
 	
 	void				ShowFileInfo();
+	void				MaybeUpdateFileInfo(uint32 which=INFO_ALL);
 
 						// from Player
 	void				OpenFile(const entry_ref &ref);
@@ -78,6 +80,8 @@ public:
 	VideoView *			fVideoView;
 	BFilePanel *		fFilePanel;
 	ControllerView *	fControls;
+	InfoWin *			fInfoWin;
+	bool				fInfoWinShowing;
 
 	BMenu *				fFileMenu;
 	BMenu *				fViewMenu;

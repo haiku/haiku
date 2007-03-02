@@ -87,6 +87,8 @@ enum
 MainWin::MainWin()
  :	BWindow(BRect(100,100,350,300), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,  fFilePanel(NULL)
+ ,	fInfoWin(NULL)
+ ,	fInfoWinShowing(false)
  ,	fHasFile(false)
  ,	fHasVideo(false)
  ,	fPlaylist(new Playlist)
@@ -159,6 +161,10 @@ MainWin::~MainWin()
 	delete fPlaylist;
 	delete fController;
 	delete fFilePanel;
+	if (fInfoWin) {
+		fInfoWin->Lock();
+		fInfoWin->Quit();
+	}
 }
 
 
@@ -189,7 +195,7 @@ MainWin::SetupWindow()
 {
 	printf("MainWin::SetupWindow\n");	
 
-	// Pupulate the track menus
+	// Populate the track menus
 	SetupTrackMenus();
 	// Enable both if a file was loaded
 	fAudioMenu->SetEnabled(fHasFile);
@@ -212,6 +218,8 @@ MainWin::SetupWindow()
 	ResizeWindow(100);
 
 	fVideoView->MakeFocus();
+	
+	MaybeUpdateFileInfo();
 }
 
 
@@ -582,8 +590,26 @@ MainWin::FrameResized(float new_width, float new_height)
 void
 MainWin::ShowFileInfo()
 {
+	if (!fInfoWin)
+		fInfoWin = new InfoWin(this);
+	BMessenger msgr(fInfoWin);
+	BMessage m(M_UPDATE_INFO);
+	m.AddInt32("which", INFO_ALL);
+	msgr.SendMessage(&m);
+	msgr.SendMessage(B_WINDOW_ACTIVATED);
 }
 
+void
+MainWin::MaybeUpdateFileInfo(uint32 which)
+{
+	// Update the Info Window if it's displayed.
+	if (!fInfoWinShowing)
+		return;
+	BMessenger msgr(fInfoWin);
+	BMessage m(M_UPDATE_INFO);
+	m.AddInt32("which", which);
+	msgr.SendMessage(&m);
+}
 
 void
 MainWin::ResizeVideoView(int x, int y, int width, int height)
@@ -1149,6 +1175,9 @@ MainWin::MessageReceived(BMessage *msg)
 				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
 				break;
 			}
-*/			
+*/
+		default:
+			// let BWindow handle the rest
+			BWindow::MessageReceived(msg);
 	}
 }

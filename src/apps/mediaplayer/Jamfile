@@ -8,6 +8,7 @@ Application MediaPlayer :
 	Controller.cpp
 	ControllerView.cpp
 	DrawingTidbits.cpp
+	InfoWin.cpp
 	MainApp.cpp
 	MainWin.cpp
 	Playlist.cpp
