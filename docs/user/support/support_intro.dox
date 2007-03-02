@@ -1,10 +1,11 @@
 /*!
-\ingroup support
-\page supportintro The Support Kit
+\page support_intro Introduction to the Support Kit
 
 The Support Kit provides a handy set of functions and classes that you can
-use in your applications.
+use in your applications. Have a look at the overview, or go straight to
+the complete \link support list of components \endlink of this kit. 
 
+\section Overview
 <ul>
 	<li>Threading utility classes:</li>
 	<ul>
@@ -14,12 +15,13 @@ use in your applications.
 	</ul>
 	<li>Archiving and IO:</li>
 	<ul>
-		<li>BArchivable</li>
+		<li>BArchivable (\link support_archiving tutorial\endlink)</li>
 		<li>BFlattenable</li>
 		<li>BDataIO</li>
 		<ul>
 			<li>BPositionIO</li>
 			<ul>
+				<li>BBufferIO</li>
 				<li>BMemoryIO</li>
 				<li>BMallocIO</li>
 			</ul>
@@ -32,8 +34,20 @@ use in your applications.
 		<li>BString</li>
 	</ul>
 	<li>BStopWatch</li>
+	<li>\ref support_globals "Global functions"</li>
 	<li>\ref TypeConstants.h "Common types and constants"</li>
 	<li>Error codes for all kits</li>
 </ul>
+*/
+
+// Short listing of documents that belong to this module so that people can
+// find these from the module overview. 
+// This should become standardized in Doxygen though. There is an item on
+// the todo list on this.
+
+/*!
+\addtogroup support
+
+For a better overview, have a look at \ref support_intro .
 */
 

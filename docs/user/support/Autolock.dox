@@ -64,7 +64,7 @@ Receiver::HandleCall(Call *call)
 Since the object is created on stack, it is destroyed as soon as we leave
 the function. Because the destruction of the object causes it to unlock
 the BLocker or BLooper, you don't have to manually make sure that every
-exit from the function is properly written.
+exit from the function is properly unlocked.
 */
 
 /*!
@@ -96,8 +96,8 @@ almost always sure the actual locking succeeds. It might fail if the
 BLocker or BLooper are destroyed though. The semaphore will be
 released and the Lock() call will fail. 
 
-If you might get this behaviour, you can use this method to help you
-protect yourself from it.
+If you expect this to happen, you can use this method to help you
+protect yourself from any harm.
 \retval true The lock was acquired.
 \retval false Failed to acquire the lock.
 */

@@ -28,6 +28,8 @@ takes care to allocate and free memory for you, so it will always be
 \var char* BString::fPrivateData
 \brief BString's storage for data
 
+This member is deprecated and might even go \c private in future releases.
+
 If you are planning to derive from this object and you want to manipulate the raw
 string data, please have a look at LockBuffer() and UnlockBuffer().
 */
@@ -1309,38 +1311,56 @@ These methods may be slower than sprintf(), but they are overflow safe.
 
 
 /*!
-\fn bool operator<(const char *str, const BString &string)
-\brief Lexographically compare if \c str is less than a given BString.
+\fn bool operator<(const char *a, const BString &b)
+\brief Lexographically compare if \c a is less than a given BString.
+
+From String.h and in libbe.so.
+
 \sa BString::operator<(const char *string) const
 */
 
 /*!
-\fn bool operator<=(const char *str, const BString &string)
-\brief Lexographically compare if \c str is less than or equal to a given BString.
+\fn bool operator<=(const char *a, const BString &b)
+\brief Lexographically compare if \c a is less than or equal to a given BString.
+
+From String.h and in libbe.so.
+
 \sa BString::operator<=(const char *string) const
 */
 
 /*!
-\fn bool operator==(const char *str, const BString &string)
-\brief Lexographically compare if \c str is equal to a given BString.
+\fn bool operator==(const char *a, const BString &b)
+\brief Lexographically compare if \c a is equal to a given BString.
+
+From String.h and in libbe.so.
+
 \sa BString::operator==(const char *string) const
 */
 
 /*!
-\fn bool operator>(const char *str, const BString &string)
-\brief Lexographically compare if \c str is more than a given BString.
+\fn bool operator>(const char *a, const BString &b)
+\brief Lexographically compare if \c a is more than a given BString.
+
+From String.h and in libbe.so.
+
 \sa BString::operator>(const char *string) const
 */
 
 /*!
-\fn bool operator>=(const char *str, const BString &string)
-\brief Lexographically compare if \c str is more than or equal to a given BString.
+\fn bool operator>=(const char *a, const BString &b)
+\brief Lexographically compare if \c a is more than or equal to a given BString.
+
+From String.h and in libbe.so.
+
 \sa BString::operator>=(const char *string) const
 */
 
 /*!
-\fn bool operator!=(const char *str, const BString &string)
-\brief Lexographically compare if \c str is not equal to given BString.
+\fn bool operator!=(const char *a, const BString &b)
+\brief Lexographically compare if \c a is not equal to given BString.
+
+From String.h and in libbe.so.
+
 \sa BString::operator!=(const char *string) const
 */
 
@@ -1350,6 +1370,8 @@ These methods may be slower than sprintf(), but they are overflow safe.
 
 This function is useful if you need a global compare function to feed to
 BList::SortItems() for example.
+
+From String.h and in libbe.so.
 
 \sa BString::Compare(const BString &string) const
 */
@@ -1361,6 +1383,8 @@ BList::SortItems() for example.
 This function is useful if you need a global compare function to feed to
 BList::SortItems() for example.
 
+From String.h and in libbe.so.
+
 \sa BString::Compare(const BString &string) const
 */
 
@@ -1371,16 +1395,20 @@ BList::SortItems() for example.
 This function is useful if you need a global compare function to feed to
 BList::SortItems() for example.
 
+From String.h and in libbe.so.
+
 \sa BString::Compare(const BString &string) const
 */
 
 /*!
 \fn int ICompare(const BString *, const BString *)
+\brief Lexographically compare two strings in a case insensitive way.
 
 This function is useful if you need a global compare function to feed to
 BList::SortItems() for example.
 
-\brief Lexographically compare two strings in a case insensitive way.
+From String.h and in libbe.so.
+
 \sa BString::Compare(const BString &string) const
 */
 

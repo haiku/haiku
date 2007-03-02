@@ -1,16 +1,12 @@
 /*!
-\ingroup midi2
-*/
-
-/*\{*/
-
-/*!
-\page midi2intro
+\page midi2_intro Introduction to the MIDI2 Kit
 
 The Midi Kit is the API that implements support for generating, processing, and 
 playing music in MIDI format. <A HREF="http://www.midi.org/">MIDI</A>, which 
 stands for 'Musical Instrument Digital Interface', is a well-established 
-standard for representing and communicating musical data. 
+standard for representing and communicating musical data. This document serves
+as an overview. If you would like to see all the components, please look at
+\link midi2 the list with classes \endlink .
 
 \section midi2twokits The two kits
 
@@ -273,7 +269,7 @@ event as quickly as possible and be done with it. Do not
 
 \section midi2apidiffs API differences
 
-As far as the end user is concerned, the OpenBeOS Midi Kit is mostly the same 
+As far as the end user is concerned, the Haiku Midi Kit is mostly the same 
 as the BeOS R5 kits, although there are a few small differences in the API 
 (mostly bug fixes):
 
@@ -308,4 +304,9 @@ Information about MIDI in general:
 
 */
 
-/*\}*/
+/*!
+\addtogroup midi2
+
+Please have a look at the \link midi2_intro introduction \endlink for a more
+comprehensive overview on how everything ties together.
+*/

@@ -1,0 +1,32 @@
+/*!
+\file Beep.h
+\brief Functions to generate sounds from the computer.
+*/
+
+/*!
+\addtogroup support_globals
+@{
+*/
+
+/*!
+\fn status_t beep()
+\brief TODO: Not implemented nor documented.
+
+From Beep.h and in libbe.so.
+*/
+
+/*!
+\fn status_t system_beep(const char* eventName)
+\brief TODO: Not implemented nor documented.
+
+From Beep.h and in libbe.so.
+*/
+
+/*!
+\fn status_t add_system_beep_event(const char* eventName, uint32 flags = 0)
+\brief TODO: Not implemented nor documented.
+
+From Beep.h and in libbe.so.
+*/
+
+//! @}

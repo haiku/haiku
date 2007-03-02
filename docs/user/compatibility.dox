@@ -1,0 +1,45 @@
+/*!
+\page compatibility Application Level API Incompatibilities with BeOS
+
+\author Ingo Weinhold
+
+Haiku R1 (x86) was designed and is being implemented to be binary and source 
+compatible with applications written for BeOS R5 (x86) to a large extent, but 
+not the other way around. In some cases we deliberately broke source 
+compatibility while at the same time maintaining binary compatibility. Here are
+some specific examples:
+
+- The \c "be" header path is gone - it's called \c "os" in Haiku; since it is 
+  always part of the default header search path anyway, you can always just 
+  remove it to let your software compile on both platforms, ie. replace:
+\code
+#include <be/interface/View.h>
+\endcode
+  with: 
+\code
+#include <interface/View.h>
+\endcode
+  or rather use the preferred method of omitting the first part and use:
+\code
+#include <View.h>
+\endcode
+
+- BeOS contains a deprecated \c add-ons/TrackerAddons.h header, and a 
+  header called \c add-ons/TrackerAddOns.h - Haiku only contains the 
+  latter.
+- Likewise, you'll find \c support/byteorder.h and \c support/ByteOrder.h
+  in BeOS; Haiku only has ByteOrder.h.
+- If you have subclassed BString and if you are using its \c _privateData 
+  member, you might notice that it has been renamed to \link BString::fPrivateData
+  fPrivateData \endlink.  However, it's use is deprecated, and it might even be 
+  made private in the future.
+- The undocumented functions defined in the headers are not implemented.
+- The private Device Map API (used by OpenTracker) has been replaced by a 
+  different API (Disk Device API).
+- The application debugging interface is conceptually similar, but nevertheless
+  source and binary incompatible.
+- The file system API has changed; file systems that worked on BeOS will no 
+  longer work on Haiku.
+- In several places we also dropped compatibility support for older BeOS 
+  versions (PR2, R3, R4), which BeOS R5 still featured.
+*/

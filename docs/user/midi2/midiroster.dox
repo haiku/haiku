@@ -1,4 +1,10 @@
 /*!
+\var B_MIDI_EVENT
+\ingroup midi2
+\brief BMessage identifier of MIDI messages.
+*/
+
+/*!
 \class BMidiRoster MidiRoster.h
 \ingroup midi2
 \ingroup libmidi2

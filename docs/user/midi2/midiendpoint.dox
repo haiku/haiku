@@ -1,5 +1,5 @@
 /*!
-\class BMidiEndpoint MidiEndpoint.h
+\class BMidiEndpoint
 \ingroup midi2
 \ingroup libmidi2
 \brief Base class for all MIDI endpoints
