@@ -409,7 +409,8 @@ s64 ntfs_cluster_read(const ntfs_volume *vol, const s64 lcn, const s64 count,
 	if (vol->nr_clusters < lcn + count) {
 		errno = ESPIPE;
 		ntfs_log_perror("Trying to read outside of volume "
-				"(%lld < %lld)", vol->nr_clusters, lcn + count);
+				"(%lld < %lld)", (long long)vol->nr_clusters,
+			        (long long)lcn + count);
 		return -1;
 	}
 	br = ntfs_pread(vol->dev, lcn << vol->cluster_size_bits,
@@ -444,7 +445,8 @@ s64 ntfs_cluster_write(const ntfs_volume *vol, const s64 lcn,
 	if (vol->nr_clusters < lcn + count) {
 		errno = ESPIPE;
 		ntfs_log_perror("Trying to write outside of volume "
-				"(%lld < %lld)", vol->nr_clusters, lcn + count);
+				"(%lld < %lld)", (long long)vol->nr_clusters,
+			        (long long)lcn + count);
 		return -1;
 	}
 	if (!NVolReadOnly(vol))

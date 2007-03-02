@@ -44,21 +44,6 @@
 #include "security.h"
 #include "misc.h"
 
-#ifdef _BEOS_
-int be_snprintf(char *buff, size_t size, const char *format, ...)
-{
-	int ret;
-	char temp[1024];	
-	va_list args;
-	va_start(args, format);
-	ret = sprintf(temp, format, args);
-	va_end(args);
-	strncpy(buff,temp,size);
-	return ret;
-}
-#define snprintf be_snprintf
-#endif	
-
 /*
  * The zero GUID.
  */

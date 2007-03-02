@@ -1,6 +1,6 @@
 /*
- * endians.h - Definitions related to handling of byte ordering. Part of the
- *	       Linux-NTFS project.
+ * endians.h - Definitions related to handling of byte ordering. 
+ *             Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2000-2005 Anton Altaparmakov
  *
@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program (in the main directory of the Linux-NTFS
+ * along with this program (in the main directory of the NTFS-3G
  * distribution in the file COPYING); if not, write to the Free Software
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
@@ -47,6 +47,9 @@
 #endif
 #ifdef HAVE_SYS_BYTEORDER_H
 #include <sys/byteorder.h>
+#endif
+#ifdef HAVE_BYTEORDER_H
+#include <byteorder.h>
 #endif
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>

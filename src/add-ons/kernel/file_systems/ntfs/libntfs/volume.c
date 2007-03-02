@@ -203,7 +203,8 @@ static int ntfs_mft_load(ntfs_volume *vol)
 	NInoSetAttrList(vol->mft_ni);
 	l = ntfs_get_attribute_value_length(ctx->attr);
 	if (l <= 0 || l > 0x40000) {
-		ntfs_log_error("$MFT/$ATTR_LIST invalid length (%lld).\n", l);
+		ntfs_log_error("$MFT/$ATTR_LIST invalid length (%lld).\n",
+			       (long long)l);
 		goto io_error_exit;
 	}
 	vol->mft_ni->attr_list_size = l;
@@ -218,7 +219,8 @@ static int ntfs_mft_load(ntfs_volume *vol)
 	}
 	if (l != vol->mft_ni->attr_list_size) {
 		ntfs_log_error("Partial read of $MFT/$ATTR_LIST (%lld != "
-			       "%u).\n", l, vol->mft_ni->attr_list_size);
+			       "%u).\n", (long long)l,
+			       vol->mft_ni->attr_list_size);
 		goto io_error_exit;
 	}
 
@@ -774,7 +776,8 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 			ntfs_log_perror("Failed to read $MFT");
 		else {
 			ntfs_log_error("Failed to read $MFT, unexpected length "
-				       "(%lld != %d).\n", l, vol->mftmirr_size);
+				       "(%lld != %d).\n", (long long)l,
+				       vol->mftmirr_size);
 			errno = EIO;
 		}
 		goto error_exit;
@@ -790,7 +793,8 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 			else {
 				ntfs_log_error("Failed to read $MFTMirr "
 					       "unexpected length (%d != %lld)."
-					       "\n", vol->mftmirr_size, l);
+					       "\n", vol->mftmirr_size,
+					       (long long)l);
 				errno = EIO;
 			}
 			goto error_exit;
@@ -917,7 +921,8 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	if (l != na->data_size) {
 		ntfs_log_debug(FAILED);
 		ntfs_log_error("Failed to read $UpCase, unexpected length "
-			       "(%lld != %lld).\n", l, na->data_size);
+			       "(%lld != %lld).\n", (long long)l,
+			       (long long)na->data_size);
 		errno = EIO;
 		goto error_exit;
 	}
@@ -1076,7 +1081,8 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	if (l != na->data_size) {
 		ntfs_log_debug(FAILED);
 		ntfs_log_error("Failed to read $AttrDef, unexpected length "
-			       "(%lld != %lld).\n", l, na->data_size);
+			       "(%lld != %lld).\n", (long long)l,
+			       (long long)na->data_size);
 		errno = EIO;
 		goto error_exit;
 	}

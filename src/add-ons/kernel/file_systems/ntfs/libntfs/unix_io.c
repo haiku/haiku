@@ -112,7 +112,8 @@ static int ntfs_device_unix_io_open(struct ntfs_device *dev, int flags)
 	if ((flags & O_RDWR) != O_RDWR)
 		NDevSetReadOnly(dev);
 
-#ifndef _BEOS_		
+/* locking not implemented in BeOS */
+#if !defined(__BEOS__) && !defined(__HAIKU__)	
 	memset(&flk, 0, sizeof(flk));
 	if (NDevReadOnly(dev))
 		flk.l_type = F_RDLCK;
@@ -128,8 +129,7 @@ static int ntfs_device_unix_io_open(struct ntfs_device *dev, int flags)
 			ntfs_log_perror("Failed to close '%s'", dev->d_name);
 		goto err_out;
 	}
-#endif
-	
+#endif	
 	NDevSetOpen(dev);
 	return 0;
 err_out:
@@ -157,8 +157,10 @@ static int ntfs_device_unix_io_close(struct ntfs_device *dev)
 	}
 	if (NDevDirty(dev))
 		fsync(DEV_FD(dev));
-	/* Release exclusive (mandatory) lock on the whole device. */
-#ifndef _BEOS_		
+
+/* locking not implemented in BeOS */
+#if !defined(__BEOS__) && !defined(__HAIKU__)		
+	/* Release exclusive (mandatory) lock on the whole device. */	
 	memset(&flk, 0, sizeof(flk));
 	flk.l_type = F_UNLCK;
 	flk.l_whence = SEEK_SET;
@@ -243,7 +245,7 @@ static s64 ntfs_device_unix_io_write(struct ntfs_device *dev, const void *buf,
 static s64 ntfs_device_unix_io_pread(struct ntfs_device *dev, void *buf,
 		s64 count, s64 offset)
 {
-#ifdef _BEOS_
+#if defined(__BEOS__) || defined(__HAIKU__)
 	return read_pos(DEV_FD(dev), offset, buf,count);
 #else
 	return pread(DEV_FD(dev), buf, count, offset);
@@ -269,11 +271,11 @@ static s64 ntfs_device_unix_io_pwrite(struct ntfs_device *dev, const void *buf,
 		return -1;
 	}
 	NDevSetDirty(dev);
-#ifdef _BEOS_
+#if defined(__BEOS__) || defined(__HAIKU__)
 	return write_pos(DEV_FD(dev), offset, buf,count);
 #else	
 	return pwrite(DEV_FD(dev), buf, count, offset);
-#endif	
+#endif
 }
 
 /**

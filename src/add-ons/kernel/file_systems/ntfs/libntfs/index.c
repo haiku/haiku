@@ -88,7 +88,8 @@ static int ntfs_ib_write(ntfs_index_context *icx, VCN vcn, void *buf)
 				   1, icx->block_size, buf);
 	if (ret != 1) {
 		ntfs_log_perror("Failed to write index block %lld of inode "
-				"%llu", vcn, icx->ni->mft_no);
+				"%llu", (long long)vcn,
+				(unsigned long long)icx->ni->mft_no);
 		return STATUS_ERROR;
 	}
 	
@@ -397,7 +398,8 @@ static int ntfs_ia_check(ntfs_index_context *icx, INDEX_BLOCK *ib, VCN vcn)
 	if (!ntfs_is_indx_record(ib->magic)) {
 		
 		ntfs_log_error("Corrupt index block signature: vcn %lld inode "
-			       "%llu\n", (long long)vcn, icx->ni->mft_no);
+			       "%llu\n", (long long)vcn,
+			       (unsigned long long)icx->ni->mft_no);
 		return -1;
 	}
 	
@@ -405,8 +407,9 @@ static int ntfs_ia_check(ntfs_index_context *icx, INDEX_BLOCK *ib, VCN vcn)
 		
 		ntfs_log_error("Corrupt index block: VCN (%lld) is different "
 			       "from expected VCN (%lld) in inode %llu\n",
-			       (long long) sle64_to_cpu(ib->index_block_vcn),
-			       (long long)vcn, icx->ni->mft_no);
+			       (long long)sle64_to_cpu(ib->index_block_vcn),
+			       (long long)vcn,
+			       (unsigned long long)icx->ni->mft_no);
 		return -1;
 	}
 	
@@ -415,7 +418,8 @@ static int ntfs_ia_check(ntfs_index_context *icx, INDEX_BLOCK *ib, VCN vcn)
 		ntfs_log_error("Corrupt index block : VCN (%lld) of inode %llu "
 			       "has a size (%u) differing from the index "
 			       "specified size (%u)\n", (long long)vcn, 
-			       icx->ni->mft_no, ib_size, icx->block_size);
+			       (unsigned long long)icx->ni->mft_no, ib_size,
+			       icx->block_size);
 		return -1;
 	}
 	return 0;
@@ -489,7 +493,8 @@ static int ntfs_ie_lookup(const void *key, const int key_len,
 		    (u8 *)ie + le16_to_cpu(ie->length) > index_end) {
 			errno = ERANGE;
 			ntfs_log_error("Index entry out of bounds in inode "
-				       "%llu.\n", icx->ni->mft_no);
+				       "%llu.\n",
+				       (unsigned long long)icx->ni->mft_no);
 			return STATUS_ERROR;
 		}
 		/*
@@ -543,7 +548,8 @@ static int ntfs_ie_lookup(const void *key, const int key_len,
 	*vcn = ntfs_ie_get_vcn(ie);
 	if (*vcn < 0) {
 		errno = EINVAL;
-		ntfs_log_perror("Negative vcn in inode %llu\n", icx->ni->mft_no);
+		ntfs_log_perror("Negative vcn in inode %llu\n",
+			       	(unsigned long long)icx->ni->mft_no);
 		return STATUS_ERROR;
 	}
 
@@ -560,7 +566,7 @@ static ntfs_attr *ntfs_ia_open(ntfs_index_context *icx, ntfs_inode *ni)
 	na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, icx->name, icx->name_len);
 	if (!na) {
 		ntfs_log_perror("Failed to open index allocation of inode "
-				"%llu", ni->mft_no);
+				"%llu", (unsigned long long)ni->mft_no);
 		return NULL;
 	}
 	
@@ -581,7 +587,7 @@ static int ntfs_ib_read(ntfs_index_context *icx, VCN vcn, INDEX_BLOCK *dst)
 			ntfs_log_perror("Failed to read index block");
 		else 
 			ntfs_log_error("Failed to read full index block at "
-				       "%lld\n", pos);
+				       "%lld\n", (long long)pos);
 		return -1;
 	}
 	
@@ -755,7 +761,8 @@ descend_into_child_node:
 
 	if ((ib->index.ih_flags & NODE_MASK) == LEAF_NODE) {
 		ntfs_log_error("Index entry with child node found in a leaf "
-			       "node in inode 0x%llx.\n", ni->mft_no);
+			       "node in inode 0x%llx.\n",
+			       (unsigned long long)ni->mft_no);
 		goto err_out;
 	}
 	

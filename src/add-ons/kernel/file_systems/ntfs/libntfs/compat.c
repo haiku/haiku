@@ -20,7 +20,7 @@
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-//#ifdef WINDOWS
+#if defined(WINDOWS) || defined(__BEOS__) || defined (__HAIKU__)
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -69,5 +69,5 @@ int ffs(int x)
 }
 #endif /* HAVE_FFS */
 
-//#endif /* WINDOWS */
+#endif /* defined(WINDOWS) || defined(__BEOS__) || defined (__HAIKU__) */
 

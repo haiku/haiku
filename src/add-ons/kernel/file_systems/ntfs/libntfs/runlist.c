@@ -1040,7 +1040,8 @@ s64 ntfs_rl_pread(const ntfs_volume *vol, const runlist_element *rl,
 	if (!vol || !rl || pos < 0 || count < 0) {
 		errno = EINVAL;
 		ntfs_log_perror("Failed to read runlist [vol: %p rl: %p "
-				"pos: %lld count: %lld]", vol, rl, pos, count);
+				"pos: %lld count: %lld]", vol, rl,
+				(long long)pos, (long long)count);
 		return -1;
 	}
 	if (!count)
@@ -1127,7 +1128,8 @@ s64 ntfs_rl_pwrite(const ntfs_volume *vol, const runlist_element *rl,
 	if (!vol || !rl || pos < 0 || count < 0) {
 		errno = EINVAL;
 		ntfs_log_perror("Failed to write runlist [vol: %p rl: %p "
-				"pos: %lld count: %lld]", vol, rl, pos, count);
+				"pos: %lld count: %lld]", vol, rl,
+				(long long)pos, (long long)count);
 		goto errno_set;
 	}
 	if (!count)

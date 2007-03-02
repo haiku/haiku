@@ -655,19 +655,16 @@ BOOL ntfs_is_logfile_clean(ntfs_attr *log_na, RESTART_PAGE_HEADER *rp)
 	ntfs_log_trace("Entering.\n");
 	/* An empty $LogFile must have been clean before it got emptied. */
 	if (NVolLogFileEmpty(log_na->ni->vol)) {
-		ntfs_log_trace("Done.  ($LogFile is empty.)\n");
+		ntfs_log_trace("$LogFile is empty\n");
 		return TRUE;
 	}
 	if (!rp) {
-		ntfs_log_error("Restart page header is NULL.\n");
+		ntfs_log_error("Restart page header is NULL\n");
 		return FALSE;
 	}
 	if (!ntfs_is_rstr_record(rp->magic) &&
 			!ntfs_is_chkd_record(rp->magic)) {
-		ntfs_log_error("Restart page buffer is invalid.  This is "
-			   "probably a bug in that the $LogFile should "
-			   "have been consistency checked before calling "
-			   "this function.\n");
+		ntfs_log_error("Restart page buffer is invalid\n");
 		return FALSE;
 	}
 
@@ -679,11 +676,13 @@ BOOL ntfs_is_logfile_clean(ntfs_attr *log_na, RESTART_PAGE_HEADER *rp)
 	 */
 	if (ra->client_in_use_list != LOGFILE_NO_CLIENT &&
 			!(ra->flags & RESTART_VOLUME_IS_CLEAN)) {
-		ntfs_log_debug("Done.  $LogFile indicates a dirty shutdown.\n");
+		ntfs_log_error("$LogFile indicates unclean shutdown (%d, %d)\n",
+			       le16_to_cpu(ra->client_in_use_list),
+			       le16_to_cpu(ra->flags));
 		return FALSE;
 	}
 	/* $LogFile indicates a clean shutdown. */
-	ntfs_log_trace("Done.  $LogFile indicates a clean shutdown.\n");
+	ntfs_log_trace("$LogFile indicates a clean shutdown\n");
 	return TRUE;
 }
 

@@ -195,9 +195,9 @@ u32 ntfs_log_clear_flags(u32 flags)
  */
 static FILE * ntfs_log_get_stream(u32 level)
 {
-#ifdef _BEOS_
+#if defined(__BEOS__) || defined(__HAIKU__)
 	return NULL;
-#else
+#elif
 	FILE *stream;
 
 	switch (level) {
@@ -220,7 +220,7 @@ static FILE * ntfs_log_get_stream(u32 level)
 	}
 
 	return stream;
-#endif
+#endif	
 }
 
 /**
@@ -415,9 +415,9 @@ int ntfs_log_handler_syslog(const char *function  __attribute__((unused)),
 int ntfs_log_handler_fprintf(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
-#ifdef _BEOS_
+#if defined(__BEOS__) || defined(__HAIKU__)
 	return 0;
-#else
+#elif
 	int ret = 0;
 	int olderr = errno;
 	FILE *stream;
@@ -487,7 +487,7 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 	fflush(stream);
 	errno = olderr;
 	return ret;
-#endif
+#endif	
 }
 
 /**
@@ -536,13 +536,13 @@ int ntfs_log_handler_null(const char *function __attribute__((unused)), const ch
 int ntfs_log_handler_stdout(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
-#ifndef _BEOS_
+#if defined(__BEOS__) || defined(__HAIKU__)
+	return 0;
+#elif
 	if (!data)
 		data = stdout;
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
-#else
-	return NULL;
 #endif	
 }
 
@@ -571,10 +571,14 @@ int ntfs_log_handler_stdout(const char *function, const char *file,
 int ntfs_log_handler_outerr(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
+#if defined(__BEOS__) || defined(__HAIKU__)
+	return 0;
+#elif
 	if (!data)
 		data = ntfs_log_get_stream(level);
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
+#endif
 }
 
 /**
@@ -601,10 +605,14 @@ int ntfs_log_handler_outerr(const char *function, const char *file,
 int ntfs_log_handler_stderr(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
+#if defined(__BEOS__) || defined(__HAIKU__)
+	return 0;
+#elif
 	if (!data)
 		data = stderr;
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
+#endif	
 }
 
 

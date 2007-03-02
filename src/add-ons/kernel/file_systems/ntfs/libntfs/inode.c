@@ -1099,12 +1099,11 @@ void ntfs_inode_update_atime(ntfs_inode *ni)
  */
 void ntfs_inode_update_time(ntfs_inode *ni)
 {
-	if (!NVolReadOnly(ni->vol) && !NVolNoATime(ni->vol) && (ni->mft_no >=
-			FILE_first_user || ni->mft_no == FILE_root)) {
+	if (!NVolReadOnly(ni->vol) && 
+	    (ni->mft_no >= FILE_first_user || ni->mft_no == FILE_root)) {
 		time_t now;
 
 		now = time(NULL);
-		ni->last_access_time = now;
 		ni->last_data_change_time = now;
 		ni->last_mft_change_time = now;
 		NInoFileNameSetDirty(ni);

@@ -373,27 +373,28 @@ int ntfs_file_values_compare(const FILE_NAME_ATTR *file_name_attr1,
 			err_val, ic, upcase, upcase_len);
 }
 
-#ifdef _BEOS_
-
-
+#if defined(__BEOS__) || defined(__HAIKU__)
+/* Encode a single wide character into a sequence of utf8 bytes.
+ * Returns the number of bytes consumed, or 0 on error.
+ */
 static int
-to_utf8(wchar_t c,unsigned char* buf)
+ntfs_wc_to_utf8(wchar_t c,unsigned char* buf)
 {
 	if(c==0)
 		return 0; /* No support for embedded 0 runes */
-	if(c<0x80){
+	if(c<0x80) {
 		if(buf)buf[0]=(unsigned char)c;
 		return 1;
 	}
-	if(c<0x800){
-		if(buf){
+	if(c<0x800) {
+		if(buf) {
 			buf[0] = 0xc0 | (c>>6);
 			buf[1] = 0x80 | (c & 0x3f);
 		}
 		return 2;
 	}
-	if(c<0x10000){
-		if(buf){
+	if(c<0x10000) {
+		if(buf) {
 			buf[0] = 0xe0 | (c>>12);
 			buf[1] = 0x80 | ((c>>6) & 0x3f);
 			buf[2] = 0x80 | (c & 0x3f);
@@ -410,30 +411,30 @@ to_utf8(wchar_t c,unsigned char* buf)
  * Returns the number of bytes consumed, or 0 on error.
  */
 static int
-from_utf8(const unsigned char* str,wchar_t *c)
+ntfs_wc_from_utf8(const unsigned char* str,wchar_t *c)
 {
 	int l=0,i;
 
-	if(*str<0x80){
+	if(*str<0x80) {
 		*c = *str;
 		return 1;
 	}
 	if(*str<0xc0) /* lead byte must not be 10xxxxxx */
 		return 0;   /* is c0 a possible lead byte? */
-	if(*str<0xe0){         /* 110xxxxx */
+	if(*str<0xe0) {         /* 110xxxxx */
 		*c = *str & 0x1f;
 		l=2;
-	}else if(*str<0xf0){   /* 1110xxxx */
+	} else if(*str<0xf0) {   /* 1110xxxx */
 		*c = *str & 0xf;
 		l=3;
-	}else if(*str<0xf8){   /* 11110xxx */
+	} else if(*str<0xf8) {   /* 11110xxx */
 		*c = *str & 7;
 		l=4;
-	}else /* We don't support characters above 0xFFFF in NTFS */
+	} else /* We don't support characters above 0xFFFF in NTFS */
 		return 0;
 	 
 
-	for(i=1;i<l;i++){
+	for(i=1;i<l;i++) {
 		/* all other bytes must be 10xxxxxx */
 		if((str[i] & 0xc0) != 0x80)
 			return 0;
@@ -449,15 +450,15 @@ from_utf8(const unsigned char* str,wchar_t *c)
  * The caller has to free the result string.
  * There is no support for UTF-16, yet
  */
-static int ntfs_dupuni2utf8(wchar_t* in, int in_len,char **out,int *out_len)
+static inline int ntfs_dupuni2utf8(wchar_t* in, int in_len,char **out,int *out_len)
 {
 	int i,tmp;
 	int len8;
 	unsigned char *result;
 
 	/* count the length of the resulting UTF-8 */
-	for(i=len8=0;i<in_len;i++){
-		tmp=to_utf8(le16_to_cpu( *(in+i) ),0);
+	for(i=len8=0;i<in_len;i++) {
+		tmp=ntfs_wc_to_utf8(le16_to_cpu( *(in+i) ),0);
 		if(!tmp)
 			/* invalid character */
 			return EILSEQ;
@@ -470,22 +471,22 @@ static int ntfs_dupuni2utf8(wchar_t* in, int in_len,char **out,int *out_len)
 	result[len8]='\0';
 	*out_len=len8;
 	for(i=len8=0;i<in_len;i++)
-		len8+=to_utf8(le16_to_cpu( *(in+i) ),result+len8);
+		len8+=ntfs_wc_to_utf8(le16_to_cpu( *(in+i) ),result+len8);
 	return 0;
 }
 
 /* Converts an UTF-8 sequence to a wide string. Same conventions as the
  * previous function
  */
-static int ntfs_duputf82uni(unsigned char* in, int in_len,wchar_t** out,int *out_len)
+static inline int ntfs_duputf82uni(unsigned char* in, int in_len,wchar_t** out,int *out_len)
 {
 	int i,tmp;
 	int len16;
 
 	wchar_t* result;
 	wchar_t wtmp;
-	for(i=len16=0;i<in_len;i+=tmp,len16++){
-		tmp=from_utf8(in+i,&wtmp);
+	for(i=len16=0;i<in_len;i+=tmp,len16++) {
+		tmp=ntfs_wc_from_utf8(in+i,&wtmp);
 		if(!tmp)
 			return EILSEQ;
 	}
@@ -496,7 +497,7 @@ static int ntfs_duputf82uni(unsigned char* in, int in_len,wchar_t** out,int *out
 	*out_len=len16;
 	for(i=len16=0;i<in_len;i+=tmp,len16++)
 	{
-		tmp=from_utf8(in+i, &wtmp);
+		tmp=ntfs_wc_from_utf8(in+i, &wtmp);
 		*(result+len16) = cpu_to_le16(wtmp);
 	}
 	return 0;
@@ -531,7 +532,7 @@ static int ntfs_duputf82uni(unsigned char* in, int in_len,wchar_t** out,int *out
 int ntfs_ucstombs(const ntfschar *ins, const int ins_len, char **outs,	int outs_len)
 {
 	int out_len = outs_len;
-	if(ntfs_dupuni2utf8(ins,ins_len,outs,&out_len)==0)
+	if(ntfs_dupuni2utf8((wchar_t*)ins,ins_len,outs,&out_len)==0)
 	  	return out_len;
 	else
 		return EINVAL;
@@ -565,7 +566,7 @@ int ntfs_mbstoucs(const char *ins, ntfschar **outs, int outs_len)
 {
 	int in_len = strlen(ins);
 	int out_len = outs_len;	
-	if(ntfs_duputf82uni(ins,in_len,outs,&out_len)==0)
+	if(ntfs_duputf82uni((unsigned char*)ins,in_len,outs,&out_len)==0)
 		return out_len;
 	else
 		return EILSEQ;
@@ -838,7 +839,7 @@ err_out:
 	return -1;
 }
 
-#endif
+#endif // defined(__BEOS__) || defined(__HAIKU__)
 
 /**
  * ntfs_upcase_table_build - build the default upcase table for NTFS

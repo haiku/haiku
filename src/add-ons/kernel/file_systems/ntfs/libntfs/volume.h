@@ -61,6 +61,8 @@
 #endif
 #endif
 
+#define MS_EXCLUSIVE 0x08000000
+
 /* Forward declaration */
 typedef struct _ntfs_volume ntfs_volume;
 

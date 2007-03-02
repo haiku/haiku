@@ -259,7 +259,8 @@ descend_into_child_node:
 	if (br != 1) {
 		if (br != -1)
 			errno = EIO;
-		ntfs_log_perror("Failed to read vcn 0x%llx", vcn);
+		ntfs_log_perror("Failed to read vcn 0x%llx",
+			       	(unsigned long long)vcn);
 		goto close_err_out;
 	}
 
@@ -1047,10 +1048,7 @@ static ntfs_inode *__ntfs_create(ntfs_inode *dir_ni,
 	/* Allocate MFT record for new file. */
 	ni = ntfs_mft_record_alloc(dir_ni->vol, NULL);
 	if (!ni) {
-		err = errno;
-		ntfs_log_error("Could not allocate new MFT record: %s.\n",
-				strerror(err));
-		errno = err;
+		ntfs_log_perror("Could not allocate new MFT record");
 		return NULL;
 	}
 	/*
@@ -1158,12 +1156,10 @@ static ntfs_inode *__ntfs_create(ntfs_inode *dir_ni,
 				memcpy(data->target, target,
 						target_len * sizeof(ntfschar));
 				break;
-#ifndef _BEOS_
 			case S_IFSOCK:
 				data = NULL;
 				data_len = 1;
 				break;
-#endif
 			default: /* FIFO or regular file. */
 				data = NULL;
 				data_len = 0;
@@ -1258,7 +1254,8 @@ err_out:
 ntfs_inode *ntfs_create(ntfs_inode *dir_ni, ntfschar *name, u8 name_len,
 		dev_t type)
 {
-	if (type != S_IFREG && type != S_IFDIR && type != S_IFIFO /*&& type != S_IFSOCK*/) {
+	if (type != S_IFREG && type != S_IFDIR && type != S_IFIFO &&
+			type != S_IFSOCK) {
 		ntfs_log_error("Invalid arguments.\n");
 		return NULL;
 	}
@@ -1302,7 +1299,7 @@ int ntfs_check_empty_dir(ntfs_inode *ni)
 	}
 	
 	/* Non-empty directory? */
-	if ((na->data_size != sizeof(INDEX_ROOT) + sizeof(INDEX_ENTRY_HEADER))){
+	if ((na->data_size != sizeof(INDEX_ROOT) + sizeof(INDEX_ENTRY_HEADER))) {
 		/* Both ENOTEMPTY and EEXIST are ok. We use the more common. */
 		errno = EEXIST;
 		ntfs_log_debug("Directory is not empty\n");
@@ -1419,7 +1416,7 @@ search:
 		
 		if (ntfs_names_are_equal(fn->file_name, fn->file_name_length,
 					 name, name_len, case_sensitive, 
-					 ni->vol->upcase, ni->vol->upcase_len)){
+					 ni->vol->upcase, ni->vol->upcase_len)) {
 			
 			if (fn->file_name_type == FILE_NAME_WIN32) {
 				looking_for_dos_name = TRUE;
@@ -1532,7 +1529,7 @@ out:
 		ntfs_inode_close(ni);
 	if (err) {
 		errno = err;
-		ntfs_log_perror("Could not delete file");
+		ntfs_log_debug("Could not delete file: %s\n", strerror(errno));
 		return -1;
 	}
 	ntfs_log_trace("Done.\n");

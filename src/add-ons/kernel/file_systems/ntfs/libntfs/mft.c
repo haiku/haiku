@@ -92,8 +92,8 @@ int ntfs_mft_records_read(const ntfs_volume *vol, const MFT_REF mref,
 			vol->mft_record_size_bits) {
 		errno = ESPIPE;
 		ntfs_log_perror("Trying to read non-allocated mft records "
-				"(%lld > %lld)", m + count, 
-				vol->mft_na->initialized_size >> 
+				"(%lld > %lld)", (long long)m + count,
+				(long long)vol->mft_na->initialized_size >>
 				vol->mft_record_size_bits);
 		return -1;
 	}
@@ -155,8 +155,8 @@ int ntfs_mft_records_write(const ntfs_volume *vol, const MFT_REF mref,
 			vol->mft_record_size_bits) {
 		errno = ESPIPE;
 		ntfs_log_perror("Trying to write non-allocated mft records "
-				"(%lld > %lld)", m + count, 
-				vol->mft_na->initialized_size >> 
+				"(%lld > %lld)", (long long)m + count,
+				(long long)vol->mft_na->initialized_size >>
 				vol->mft_record_size_bits);
 		return -1;
 	}

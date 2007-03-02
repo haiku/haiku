@@ -49,10 +49,10 @@
 
 #define NTFS_LCNALLOC_SKIP  4096
 
-void ntfs_cluster_set_zone_pos(u8 zone, LCN zone_start, LCN zone_end, 
-			       LCN *zone_pos, LCN tc, LCN bmp_initial_pos)
+static void ntfs_cluster_set_zone_pos(LCN zone_start, LCN zone_end, 
+			LCN *zone_pos, LCN tc, LCN bmp_initial_pos)
 {
-	ntfs_log_trace("Before: zone %d = %lld\n", zone, (long long)*zone_pos);
+	ntfs_log_trace("Before: zone_pos: %lld\n", (long long)*zone_pos);
 
 	if (tc >= zone_end) {
 		*zone_pos = zone_start;
@@ -63,29 +63,29 @@ void ntfs_cluster_set_zone_pos(u8 zone, LCN zone_start, LCN zone_end,
 		   tc >= zone_start)
 		*zone_pos = tc;
 
-	ntfs_log_trace("After: zone %d = %lld\n", zone, (long long)*zone_pos);
+	ntfs_log_trace("After: zone_pos: %lld\n", (long long)*zone_pos);
 }
 
-int ntfs_cluster_update_zone_pos(ntfs_volume *vol, u8 zone, LCN tc, 
-				 LCN bmp_initial_pos)
+static int ntfs_cluster_update_zone_pos(ntfs_volume *vol, u8 zone, LCN tc,
+					LCN bmp_initial_pos)
 {
 	ntfs_log_trace("tc = %lld, zone = %d\n", (long long)tc, zone);
 	
 	switch (zone) {
 	case 1:
-		ntfs_cluster_set_zone_pos(zone, vol->mft_lcn, 
+		ntfs_cluster_set_zone_pos(vol->mft_lcn, 
 					  vol->mft_zone_end,
 					  &vol->mft_zone_pos, 
 					  tc, bmp_initial_pos);
 		break;
 	case 2:
-		ntfs_cluster_set_zone_pos(zone, vol->mft_zone_end, 
+		ntfs_cluster_set_zone_pos(vol->mft_zone_end, 
 					  vol->nr_clusters, 
 					  &vol->data1_zone_pos,
 					  tc, bmp_initial_pos);
 		break;
 	case 4:
-		ntfs_cluster_set_zone_pos(zone, 0, 
+		ntfs_cluster_set_zone_pos(0, 
 					  vol->mft_zone_start, 
 					  &vol->data2_zone_pos, 
 					  tc, bmp_initial_pos);
