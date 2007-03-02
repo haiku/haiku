@@ -175,8 +175,8 @@ enum {
 	NOTIFY_LISTENER_REPLY,
 	NOTIFY_SELECT_EVENT_REQUEST,
 	NOTIFY_SELECT_EVENT_REPLY,
-	SEND_NOTIFICATION_REQUEST,
-	SEND_NOTIFICATION_REPLY,
+	NOTIFY_QUERY_REQUEST,
+	NOTIFY_QUERY_REPLY,
 
 	// vnodes
 	GET_VNODE_REQUEST,
@@ -191,8 +191,8 @@ enum {
 	REMOVE_VNODE_REPLY,
 	UNREMOVE_VNODE_REQUEST,
 	UNREMOVE_VNODE_REPLY,
-	IS_VNODE_REMOVED_REQUEST,
-	IS_VNODE_REMOVED_REPLY,
+	GET_VNODE_REMOVED_REQUEST,
+	GET_VNODE_REMOVED_REPLY,
 
 	// general reply
 	RECEIPT_ACK_REPLY,
@@ -1313,8 +1313,6 @@ public:
 // #pragma mark -
 // #pragma mark ----- notifications -----
 
-// TODO: notify_listener() and send_notifications() are obsolete!
-
 // NotifyListenerRequest
 class NotifyListenerRequest : public Request {
 public:
@@ -1322,10 +1320,13 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	int32		operation;
-	mount_id	nsid;
-	vnode_id	vnida;
-	vnode_id	vnidb;
-	vnode_id	vnidc;
+	uint32		details;			// for B_STAT_CHANGED:statFields
+									// and B_ATTRIBUTE_CHANGED:cause
+	mount_id	device;
+	vnode_id	oldDirectory;
+	vnode_id	directory;
+	vnode_id	node;
+	Address		oldName;
 	Address		name;
 };
 
@@ -1343,6 +1344,7 @@ public:
 	selectsync*	sync;
 	uint32		ref;
 	uint8		event;
+	bool		unspecifiedEvent;
 };
 
 // NotifySelectEventReply
@@ -1351,28 +1353,25 @@ public:
 	NotifySelectEventReply() : ReplyRequest(NOTIFY_SELECT_EVENT_REPLY) {}
 };
 
-// SendNotificationRequest
-class SendNotificationRequest : public Request {
+// NotifyQueryRequest
+class NotifyQueryRequest : public Request {
 public:
-	SendNotificationRequest() : Request(SEND_NOTIFICATION_REQUEST) {}
+	NotifyQueryRequest() : Request(NOTIFY_QUERY_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	port_id		port;
 	int32		token;
-	uint32		what;
-	int32		operation;
-	mount_id	nsida;
-	mount_id	nsidb;
-	vnode_id	vnida;
-	vnode_id	vnidb;
-	vnode_id	vnidc;
+	int32		operation;			// B_ENTRY_{CREATED,REMOVED}
+	mount_id	device;
+	vnode_id	directory;
+	vnode_id	node;
 	Address		name;
 };
 
-// SendNotificationReply
-class SendNotificationReply : public ReplyRequest {
+// NotifyQueryReply
+class NotifyQueryReply : public ReplyRequest {
 public:
-	SendNotificationReply() : ReplyRequest(SEND_NOTIFICATION_REPLY) {}
+	NotifyQueryReply() : ReplyRequest(NOTIFY_QUERY_REPLY) {}
 };
 
 
@@ -1473,21 +1472,21 @@ public:
 	UnremoveVNodeReply() : ReplyRequest(UNREMOVE_VNODE_REPLY) {}
 };
 
-// IsVNodeRemovedRequest
-class IsVNodeRemovedRequest : public Request {
+// GetVNodeRemovedRequest
+class GetVNodeRemovedRequest : public Request {
 public:
-	IsVNodeRemovedRequest() : Request(IS_VNODE_REMOVED_REQUEST) {}
+	GetVNodeRemovedRequest() : Request(GET_VNODE_REMOVED_REQUEST) {}
 
 	mount_id	nsid;
 	vnode_id	vnid;
 };
 
-// IsVNodeRemovedReply
-class IsVNodeRemovedReply : public ReplyRequest {
+// GetVNodeRemovedReply
+class GetVNodeRemovedReply : public ReplyRequest {
 public:
-	IsVNodeRemovedReply() : ReplyRequest(IS_VNODE_REMOVED_REPLY) {}
+	GetVNodeRemovedReply() : ReplyRequest(GET_VNODE_REMOVED_REPLY) {}
 
-	int			result;
+	bool		removed;
 };
 
 
@@ -1789,10 +1788,10 @@ do_for_request(Request* request, Task& task)
 			return task((NotifySelectEventRequest*)request);
 		case NOTIFY_SELECT_EVENT_REPLY:
 			return task((NotifySelectEventReply*)request);
-		case SEND_NOTIFICATION_REQUEST:
-			return task((SendNotificationRequest*)request);
-		case SEND_NOTIFICATION_REPLY:
-			return task((SendNotificationReply*)request);
+		case NOTIFY_QUERY_REQUEST:
+			return task((NotifyQueryRequest*)request);
+		case NOTIFY_QUERY_REPLY:
+			return task((NotifyQueryReply*)request);
 		// vnodes
 		case GET_VNODE_REQUEST:
 			return task((GetVNodeRequest*)request);
@@ -1818,10 +1817,10 @@ do_for_request(Request* request, Task& task)
 			return task((UnremoveVNodeRequest*)request);
 		case UNREMOVE_VNODE_REPLY:
 			return task((UnremoveVNodeReply*)request);
-		case IS_VNODE_REMOVED_REQUEST:
-			return task((IsVNodeRemovedRequest*)request);
-		case IS_VNODE_REMOVED_REPLY:
-			return task((IsVNodeRemovedReply*)request);
+		case GET_VNODE_REMOVED_REQUEST:
+			return task((GetVNodeRemovedRequest*)request);
+		case GET_VNODE_REMOVED_REPLY:
+			return task((GetVNodeRemovedReply*)request);
 		// general reply
 		case RECEIPT_ACK_REPLY:
 			return task((ReceiptAckReply*)request);
@@ -1992,8 +1991,8 @@ using UserlandFSUtil::NotifyListenerRequest;
 using UserlandFSUtil::NotifyListenerReply;
 using UserlandFSUtil::NotifySelectEventRequest;
 using UserlandFSUtil::NotifySelectEventReply;
-using UserlandFSUtil::SendNotificationRequest;
-using UserlandFSUtil::SendNotificationReply;
+using UserlandFSUtil::NotifyQueryRequest;
+using UserlandFSUtil::NotifyQueryReply;
 // vnodes
 using UserlandFSUtil::GetVNodeRequest;
 using UserlandFSUtil::GetVNodeReply;
@@ -2007,8 +2006,8 @@ using UserlandFSUtil::RemoveVNodeRequest;
 using UserlandFSUtil::RemoveVNodeReply;
 using UserlandFSUtil::UnremoveVNodeRequest;
 using UserlandFSUtil::UnremoveVNodeReply;
-using UserlandFSUtil::IsVNodeRemovedRequest;
-using UserlandFSUtil::IsVNodeRemovedReply;
+using UserlandFSUtil::GetVNodeRemovedRequest;
+using UserlandFSUtil::GetVNodeRemovedReply;
 // general reply
 using UserlandFSUtil::ReceiptAckReply;
 

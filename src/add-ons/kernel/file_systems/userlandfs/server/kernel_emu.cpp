@@ -123,8 +123,9 @@ get_port_and_fs(RequestPort** port, FileSystem** fileSystem)
 
 // notify_listener
 status_t
-UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
-	vnode_id vnidb, vnode_id vnidc, const char *name)
+UserlandFS::KernelEmu::notify_listener(int32 operation, uint32 details,
+	mount_id device, vnode_id oldDirectory, vnode_id directory,
+	vnode_id node, const char* oldName, const char* name)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -140,11 +141,15 @@ UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 	if (error != B_OK)
 		return error;
 
-	request->operation = op;
-	request->nsid = nsid;
-	request->vnida = vnida;
-	request->vnidb = vnidb;
-	request->vnidc = vnidc;
+	request->operation = operation;
+	request->details = details;
+	request->device = device;
+	request->oldDirectory = oldDirectory;
+	request->directory = directory;
+	request->node = node;
+	error = allocator.AllocateString(request->oldName, oldName);
+	if (error != B_OK)
+		return error;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
@@ -166,7 +171,7 @@ UserlandFS::KernelEmu::notify_listener(int op, mount_id nsid, vnode_id vnida,
 // notify_select_event
 void
 UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
-	uint8 event)
+	uint8 event, bool unspecifiedEvent)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -185,6 +190,7 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 	request->sync = sync;
 	request->ref = ref;
 	request->event = event;
+	request->unspecifiedEvent = unspecifiedEvent;
 
 	// send the request
 	UserlandRequestHandler handler(fileSystem, NOTIFY_SELECT_EVENT_REPLY);
@@ -199,9 +205,9 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 
 // send_notification
 status_t
-UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
-	ulong what, long op, mount_id nsida, mount_id nsidb, vnode_id vnida,
-	vnode_id vnidb, vnode_id vnidc, const char *name)
+UserlandFS::KernelEmu::notify_query(port_id targetPort, int32 token,
+	int32 operation, mount_id device, vnode_id directory, const char* name,
+	vnode_id node)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -212,27 +218,24 @@ UserlandFS::KernelEmu::send_notification(port_id targetPort, long token,
 
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	SendNotificationRequest* request;
+	NotifyQueryRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
 
 	request->port = targetPort;
 	request->token = token;
-	request->what = what;
-	request->operation = op;
-	request->nsida = nsida;
-	request->nsidb = nsidb;
-	request->vnida = vnida;
-	request->vnidb = vnidb;
-	request->vnidc = vnidc;
+	request->operation = operation;
+	request->device = device;
+	request->directory = directory;
+	request->node = node;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
 
 	// send the request
-	UserlandRequestHandler handler(fileSystem, SEND_NOTIFICATION_REPLY);
-	SendNotificationReply* reply;
+	UserlandRequestHandler handler(fileSystem, NOTIFY_QUERY_REPLY);
+	NotifyQueryReply* reply;
 	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
@@ -462,9 +465,10 @@ UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 	return error;
 }
 
-// is_vnode_removed
+// get_vnode_removed
 status_t
-UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::get_vnode_removed(mount_id nsid, vnode_id vnid,
+	bool* removed)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -475,7 +479,7 @@ UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
 
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
-	IsVNodeRemovedRequest* request;
+	GetVNodeRemovedRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
 		return error;
@@ -484,17 +488,16 @@ UserlandFS::KernelEmu::is_vnode_removed(mount_id nsid, vnode_id vnid)
 	request->vnid = vnid;
 
 	// send the request
-	UserlandRequestHandler handler(fileSystem, IS_VNODE_REMOVED_REPLY);
-	IsVNodeRemovedReply* reply;
+	UserlandRequestHandler handler(fileSystem, GET_VNODE_REMOVED_REPLY);
+	GetVNodeRemovedReply* reply;
 	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
 	RequestReleaser requestReleaser(port, reply);
 
 	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	return reply->result;
+	*removed = reply->removed;
+	return reply->error;
 }
 
 // #pragma mark -

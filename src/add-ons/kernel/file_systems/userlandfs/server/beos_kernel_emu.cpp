@@ -4,12 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <NodeMonitor.h>
+
 #include <legacy/cache.h>
 #include <legacy/fsproto.h>
 #include <legacy/lock.h>
 
 #include "beos_fs_cache.h"
 #include "beos_lock.h"
+#include "Debug.h"
 #include "kernel_emu.h"
 
 
@@ -39,26 +42,83 @@ int
 notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb,
 	vnode_id vnidc, const char *name)
 {
-	return UserlandFS::KernelEmu::notify_listener(op, nsid, vnida, vnidb, vnidc,
-		name);
+	switch (op) {
+		case B_ENTRY_CREATED:
+		case B_ENTRY_REMOVED:
+			if (!name)
+				name = "";
+			return UserlandFS::KernelEmu::notify_listener(op, 0, nsid, 0,
+				vnida, vnidc, NULL, name);
+
+		case B_ENTRY_MOVED:
+			if (!name)
+				name = "";
+			// the old entry name is not available with the old interface
+			return UserlandFS::KernelEmu::notify_listener(op, 0, nsid, vnida,
+				vnidb, vnidc, "", name);
+
+		case B_STAT_CHANGED:
+		{
+			// we don't know what stat field changed, so we mark them all
+			uint32 statFields = B_STAT_MODE | B_STAT_UID | B_STAT_GID
+				| B_STAT_SIZE | B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
+				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME;
+			return UserlandFS::KernelEmu::notify_listener(op, statFields, nsid,
+				0, vnida, vnidc, NULL, NULL);
+		}
+
+		case B_ATTR_CHANGED:
+			if (!name)
+				name = "";
+			return UserlandFS::KernelEmu::notify_listener(op, B_ATTR_CHANGED,
+				nsid, 0, vnida, vnidc, NULL, name);
+
+		default:
+			return B_BAD_VALUE;
+	}
 }
 
 // notify_select_event
 void
 notify_select_event(selectsync *sync, uint32 ref)
 {
-	// TODO: Check what best to supply as event arg!
-	UserlandFS::KernelEmu::notify_select_event(sync, ref, 0);
+	UserlandFS::KernelEmu::notify_select_event(sync, ref, 0, true);
 }
 
 // send_notification
 int
 send_notification(port_id port, long token, ulong what, long op,
-	nspace_id nsida, nspace_id nsidb, vnode_id vnida, vnode_id vnidb,
+	nspace_id nsida, nspace_id /*nsidb*/, vnode_id vnida, vnode_id vnidb,
 	vnode_id vnidc, const char *name)
 {
-	return UserlandFS::KernelEmu::send_notification(port, token, what, op,
-		nsida, nsidb, vnida, vnidb, vnidc, name);
+	if (what != B_QUERY_UPDATE)
+		return B_BAD_VALUE;
+
+	// check the name
+	if (!name)
+		name = "";
+
+	switch (op) {
+		case B_ENTRY_CREATED:
+		case B_ENTRY_REMOVED:
+			return UserlandFS::KernelEmu::notify_query(port, token, op, nsida,
+				vnida, name, vnidc);
+		case B_ENTRY_MOVED:
+		{
+			// translate to a B_ENTRY_REMOVED + B_ENTRY_CREATED pair
+			// We do at least miss the original name though.
+			status_t error = UserlandFS::KernelEmu::notify_query(port, token,
+				B_ENTRY_REMOVED, nsida, vnida, "", vnidc);
+			if (error != B_OK)
+				return error;
+
+			return UserlandFS::KernelEmu::notify_query(port, token,
+				B_ENTRY_CREATED, nsida, vnidb, name, vnidc);
+		}
+
+		default:
+			return B_BAD_VALUE;
+	}
 }
 
 
@@ -106,7 +166,12 @@ unremove_vnode(nspace_id nsid, vnode_id vnid)
 int
 is_vnode_removed(nspace_id nsid, vnode_id vnid)
 {
-	return UserlandFS::KernelEmu::is_vnode_removed(nsid, vnid);
+	bool removed;
+	status_t error = UserlandFS::KernelEmu::get_vnode_removed(nsid, vnid,
+		&removed);
+	if (error != B_OK)
+		return error;
+	return (removed ? 1 : 0);
 }
 
 

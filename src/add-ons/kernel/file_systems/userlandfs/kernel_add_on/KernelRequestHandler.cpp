@@ -62,8 +62,8 @@ KernelRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((NotifyListenerRequest*)request);
 		case NOTIFY_SELECT_EVENT_REQUEST:
 			return _HandleRequest((NotifySelectEventRequest*)request);
-		case SEND_NOTIFICATION_REQUEST:
-			return _HandleRequest((SendNotificationRequest*)request);
+		case NOTIFY_QUERY_REQUEST:
+			return _HandleRequest((NotifyQueryRequest*)request);
 		// vnodes
 		case GET_VNODE_REQUEST:
 			return _HandleRequest((GetVNodeRequest*)request);
@@ -77,8 +77,8 @@ KernelRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((RemoveVNodeRequest*)request);
 		case UNREMOVE_VNODE_REQUEST:
 			return _HandleRequest((UnremoveVNodeRequest*)request);
-		case IS_VNODE_REMOVED_REQUEST:
-			return _HandleRequest((IsVNodeRemovedRequest*)request);
+		case GET_VNODE_REMOVED_REQUEST:
+			return _HandleRequest((GetVNodeRemovedRequest*)request);
 	}
 PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -94,44 +94,109 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 {
 	// check and executed the request
 	status_t result = B_OK;
-	if (fVolume && request->nsid != fVolume->GetID())
+	if (fVolume && request->device != fVolume->GetID())
 		result = B_BAD_VALUE;
-	// check the name
+
+	// get the names
+	// name
 	char* name = (char*)request->name.GetData();
 	int32 nameLen = request->name.GetSize();
-	if (name && (nameLen <= 0 || strnlen(name, nameLen) < 1))
+	if (name && (nameLen <= 0))
 		name = NULL;
 	else if (name)
-		name[nameLen - 1] = '\0';
-	if (!name) {
+		name[nameLen - 1] = '\0';	// NULL-terminate to be safe
+
+	// old name
+	char* oldName = (char*)request->oldName.GetData();
+	int32 oldNameLen = request->oldName.GetSize();
+	if (oldName && (oldNameLen <= 0))
+		oldName = NULL;
+	else if (oldName)
+		oldName[oldNameLen - 1] = '\0';	// NULL-terminate to be safe
+
+	// check the names
+	if (result == B_OK) {
 		switch (request->operation) {
-			case B_ENTRY_CREATED:
 			case B_ENTRY_MOVED:
-			case B_ATTR_CHANGED:
-				ERROR(("notify_listener(): NULL name for opcode: %ld\n",
-					request->operation));
-				result = B_BAD_VALUE; 
-				break;
+				if (!oldName) {
+					ERROR(("NotifyListenerRequest: NULL oldName for "
+						"B_ENTRY_MOVED\n"));
+					result = B_BAD_VALUE; 
+					break;
+				}
+				// fall through...
+			case B_ENTRY_CREATED:
 			case B_ENTRY_REMOVED:
+			case B_ATTR_CHANGED:
+				if (!name) {
+					ERROR(("NotifyListenerRequest: NULL name for opcode: %ld\n",
+						request->operation));
+					result = B_BAD_VALUE; 
+				}
+				break;
 			case B_STAT_CHANGED:
 				break;
 		}
 	}
+
 	// execute the request
 	if (result == B_OK) {
-		PRINT(("notify_listener(%ld, %ld, %Ld, %Ld, %Ld, `%s')\n",
-			request->operation, request->nsid, request->vnida, request->vnidb,
-			request->vnidc, name));
-		result = notify_listener(request->operation, request->nsid,
-			request->vnida, request->vnidb, request->vnidc, name);
+		switch (request->operation) {
+			case B_ENTRY_CREATED:
+				PRINT(("notify_entry_created(%ld, %lld, \"%s\", %lld)\n",
+					request->device, request->directory, name, request->node));
+				result = notify_entry_created(request->device,
+					request->directory, name, request->node);
+				break;
+
+			case B_ENTRY_REMOVED:
+				PRINT(("notify_entry_removed(%ld, %lld, \"%s\", %lld)\n",
+					request->device, request->directory, name, request->node));
+				result = notify_entry_removed(request->device,
+					request->directory, name, request->node);
+				break;
+
+			case B_ENTRY_MOVED:
+				PRINT(("notify_entry_moved(%ld, %lld, \"%s\", %lld, \"%s\", "
+					"%lld)\n", request->device, request->oldDirectory, oldName,
+					request->directory, name, request->node));
+				result = notify_entry_moved(request->device,
+					request->oldDirectory, oldName, request->directory, name,
+					request->node);
+				break;
+
+			case B_STAT_CHANGED:
+				PRINT(("notify_stat_changed(%ld, %lld, 0x%lx)\n",
+					request->device, request->node, request->details));
+				result = notify_stat_changed(request->device, request->node,
+					request->details);
+				break;
+
+			case B_ATTR_CHANGED:
+				PRINT(("notify_attribute_changed(%ld, %lld, \"%s\", 0x%lx)\n",
+					request->device, request->node, name,
+					(int32)request->details));
+				result = notify_attribute_changed(request->device,
+					request->node, name, (int32)request->details);
+				break;
+
+			default:
+				ERROR(("NotifyQueryRequest: unsupported operation: %ld\n",
+					request->operation));
+				result = B_BAD_VALUE; 
+				break;
+		}
 	}
+
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	NotifyListenerReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;
+
 	reply->error = result;
+
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }
@@ -143,67 +208,90 @@ KernelRequestHandler::_HandleRequest(NotifySelectEventRequest* request)
 	// check and executed the request
 	status_t result = B_OK;
 	if (fFileSystem->KnowsSelectSyncEntry(request->sync)) {
-		PRINT(("notify_select_event(%p, %lu)\n", request->sync, request->ref));
-		notify_select_event(request->sync, request->ref, request->event);
+		if (request->unspecifiedEvent) {
+			// old style add-ons can't provide an event argument; we shoot
+			// all events
+			notify_select_event(request->sync, request->ref, B_SELECT_READ);
+			notify_select_event(request->sync, request->ref, B_SELECT_WRITE);
+			notify_select_event(request->sync, request->ref, B_SELECT_ERROR);
+		} else {
+			PRINT(("notify_select_event(%p, %lu, %d)\n", request->sync,
+				request->ref, (int)request->event));
+			notify_select_event(request->sync, request->ref, request->event);
+		}
 	} else
 		result = B_BAD_VALUE;
+
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	NotifySelectEventReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;
+
 	reply->error = result;
+
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }
 
 // _HandleRequest
 status_t
-KernelRequestHandler::_HandleRequest(SendNotificationRequest* request)
+KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 {
 	// check and executed the request
 	status_t result = B_OK;
-	if (fVolume && request->nsida != fVolume->GetID()
-		&& request->nsidb != fVolume->GetID()) {
+	if (fVolume && request->device != fVolume->GetID())
 		result = B_BAD_VALUE;
-	}
+
 	// check the name
 	char* name = (char*)request->name.GetData();
 	int32 nameLen = request->name.GetSize();
-	if (name && (nameLen <= 0 || strnlen(name, nameLen) < 1))
-		name = NULL;
-	else if (name)
-		name[nameLen - 1] = '\0';
-	if (!name) {
+	if (!name || nameLen <= 0) {
+		ERROR(("NotifyQueryRequest: NULL name!\n"));
+		result = B_BAD_VALUE; 
+	} else
+		name[nameLen - 1] = '\0';	// NULL-terminate to be safe
+
+	// execute the request
+	if (result == B_OK) {
 		switch (request->operation) {
 			case B_ENTRY_CREATED:
+				PRINT(("notify_query_entry_created(%ld, %ld, %ld, %lld,"
+					" \"%s\", %lld)\n", request->port, request->token,
+					request->device, request->directory, name, request->node));
+				result = notify_query_entry_created(request->port,
+					request->token, request->device, request->directory, name,
+					request->node);
+				break;
+
+			case B_ENTRY_REMOVED:
+				PRINT(("notify_query_entry_removed(%ld, %ld, %ld, %lld,"
+					" \"%s\", %lld)\n", request->port, request->token,
+					request->device, request->directory, name, request->node));
+				result = notify_query_entry_removed(request->port,
+					request->token, request->device, request->directory, name,
+					request->node);
+				break;
+
 			case B_ENTRY_MOVED:
-				ERROR(("send_notification(): NULL name for opcode: %ld\n",
+			default:
+				ERROR(("NotifyQueryRequest: unsupported operation: %ld\n",
 					request->operation));
 				result = B_BAD_VALUE; 
 				break;
-			case B_ENTRY_REMOVED:
-				break;
 		}
 	}
-	// execute the request
-	if (result == B_OK) {
-		PRINT(("send_notification(%ld, %ld, %lu, %ld, %ld, %ld, %Ld, %Ld, %Ld, "
-			"`%s')\n", request->port, request->token, request->what,
-			request->operation, request->nsida, request->nsidb, request->vnida,
-			request->vnidb, request->vnidc, name));
-		result = send_notification(request->port, request->token, request->what,
-			request->operation, request->nsida, request->nsidb, request->vnida,
-			request->vnidb, request->vnidc, name);
-	}
+
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
-	SendNotificationReply* reply;
+	NotifyQueryReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;
+
 	reply->error = result;
+
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }
@@ -344,22 +432,26 @@ KernelRequestHandler::_HandleRequest(UnremoveVNodeRequest* request)
 
 // _HandleRequest
 status_t
-KernelRequestHandler::_HandleRequest(IsVNodeRemovedRequest* request)
+KernelRequestHandler::_HandleRequest(GetVNodeRemovedRequest* request)
 {
 	// check and executed the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
+	bool removed = false;
 	if (result == B_OK)
-		result = volume->IsVNodeRemoved(request->vnid);
+		result = volume->GetVNodeRemoved(request->vnid, &removed);
+
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
-	IsVNodeRemovedReply* reply;
+	GetVNodeRemovedReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;
-	reply->error = (result < 0 ? result : B_OK);
-	reply->result = result;
+
+	reply->error = result;
+	reply->removed = removed;
+
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }

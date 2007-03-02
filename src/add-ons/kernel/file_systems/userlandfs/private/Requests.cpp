@@ -276,13 +276,14 @@ ReadQueryReply::GetAddressInfos(AddressInfo* infos, int32* count)
 status_t
 NotifyListenerRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
+	ADD_STRING(oldName);
 	ADD_STRING(name);
 	return B_OK;
 }
 
-// SendNotificationRequest
+// NotifyQueryRequest
 status_t
-SendNotificationRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+NotifyQueryRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 {
 	ADD_STRING(name);
 	return B_OK;
@@ -635,11 +636,11 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		// notifications
 		case NOTIFY_LISTENER_REQUEST:
 		case NOTIFY_SELECT_EVENT_REQUEST:
-		case SEND_NOTIFICATION_REQUEST:
+		case NOTIFY_QUERY_REQUEST:
 			return false;
 		case NOTIFY_LISTENER_REPLY:
 		case NOTIFY_SELECT_EVENT_REPLY:
-		case SEND_NOTIFICATION_REPLY:
+		case NOTIFY_QUERY_REPLY:
 			return true;
 		// vnodes
 		case GET_VNODE_REQUEST:
@@ -648,7 +649,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case PUBLISH_VNODE_REQUEST:
 		case REMOVE_VNODE_REQUEST:
 		case UNREMOVE_VNODE_REQUEST:
-		case IS_VNODE_REMOVED_REQUEST:
+		case GET_VNODE_REMOVED_REQUEST:
 			return false;
 		case GET_VNODE_REPLY:
 		case PUT_VNODE_REPLY:
@@ -656,7 +657,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case PUBLISH_VNODE_REPLY:
 		case REMOVE_VNODE_REPLY:
 		case UNREMOVE_VNODE_REPLY:
-		case IS_VNODE_REMOVED_REPLY:
+		case GET_VNODE_REMOVED_REPLY:
 			return true;
 
 		// general reply
@@ -835,11 +836,11 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		// notifications
 		case NOTIFY_LISTENER_REQUEST:
 		case NOTIFY_SELECT_EVENT_REQUEST:
-		case SEND_NOTIFICATION_REQUEST:
+		case NOTIFY_QUERY_REQUEST:
 			return true;
 		case NOTIFY_LISTENER_REPLY:
 		case NOTIFY_SELECT_EVENT_REPLY:
-		case SEND_NOTIFICATION_REPLY:
+		case NOTIFY_QUERY_REPLY:
 			return false;
 		// vnodes
 		case GET_VNODE_REQUEST:
@@ -848,7 +849,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case PUBLISH_VNODE_REQUEST:
 		case REMOVE_VNODE_REQUEST:
 		case UNREMOVE_VNODE_REQUEST:
-		case IS_VNODE_REMOVED_REQUEST:
+		case GET_VNODE_REMOVED_REQUEST:
 			return true;
 		case GET_VNODE_REPLY:
 		case PUT_VNODE_REPLY:
@@ -856,7 +857,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case PUBLISH_VNODE_REPLY:
 		case REMOVE_VNODE_REPLY:
 		case UNREMOVE_VNODE_REPLY:
-		case IS_VNODE_REMOVED_REPLY:
+		case GET_VNODE_REMOVED_REPLY:
 			return false;
 
 		// general reply

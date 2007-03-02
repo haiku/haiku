@@ -41,7 +41,7 @@ public:
 			status_t			PublishVNode(vnode_id vnid, fs_vnode node);
 			status_t			RemoveVNode(vnode_id vnid);
 			status_t			UnremoveVNode(vnode_id vnid);
-			status_t			IsVNodeRemoved(vnode_id vnid);
+			status_t			GetVNodeRemoved(vnode_id vnid, bool* removed);
 
 			// FS
 			status_t			Mount(const char* device, uint32 flags,

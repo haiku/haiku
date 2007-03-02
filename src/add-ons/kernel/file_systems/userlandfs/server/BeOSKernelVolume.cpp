@@ -213,7 +213,7 @@ BeOSKernelVolume::Select(fs_vnode node, fs_cookie cookie, uint8 event,
 	uint32 ref, selectsync* sync)
 {
 	if (!fFSOps->select) {
-		UserlandFS::KernelEmu::notify_select_event(sync, ref, event);
+		UserlandFS::KernelEmu::notify_select_event(sync, ref, event, false);
 		return B_OK;
 	}
 	return fFSOps->select(fVolumeCookie, node, cookie, event, ref, sync);

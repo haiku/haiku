@@ -129,7 +129,7 @@ Volume::IsMounting() const
 status_t
 Volume::GetVNode(vnode_id vnid, fs_vnode* node)
 {
-PRINT(("get_vnode(%ld, %Ld)\n", fID, vnid));
+PRINT(("get_vnode(%ld, %lld)\n", fID, vnid));
 	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
 		ERROR(("Volume::GetVNode(): get_vnode() invoked for unknown vnode "
 			"while mounting!\n"));
@@ -144,7 +144,7 @@ PRINT(("get_vnode(%ld, %Ld)\n", fID, vnid));
 status_t
 Volume::PutVNode(vnode_id vnid)
 {
-PRINT(("put_vnode(%ld, %Ld)\n", fID, vnid));
+PRINT(("put_vnode(%ld, %lld)\n", fID, vnid));
 	status_t error = put_vnode(fID, vnid);
 	if (error == B_OK)
 		_DecrementVNodeCount(vnid);
@@ -155,7 +155,7 @@ PRINT(("put_vnode(%ld, %Ld)\n", fID, vnid));
 status_t
 Volume::NewVNode(vnode_id vnid, fs_vnode node)
 {
-PRINT(("new_vnode(%ld, %Ld)\n", fID, vnid));
+PRINT(("new_vnode(%ld, %lld)\n", fID, vnid));
 	status_t error = new_vnode(fID, vnid, node);
 	if (error == B_OK) {
 		if (IsMounting()) {
@@ -168,7 +168,7 @@ PRINT(("new_vnode(%ld, %Ld)\n", fID, vnid));
 				return error;
 			}
 		}
-// TODO: Check what need to do according to the new semantics.
+// TODO: Check what we need to do according to the new semantics.
 //		_IncrementVNodeCount(vnid);
 	}
 	return error;
@@ -178,7 +178,7 @@ PRINT(("new_vnode(%ld, %Ld)\n", fID, vnid));
 status_t
 Volume::PublishVNode(vnode_id vnid, fs_vnode node)
 {
-PRINT(("publish_vnode(%ld, %Ld)\n", fID, vnid));
+PRINT(("publish_vnode(%ld, %lld)\n", fID, vnid));
 	status_t error = publish_vnode(fID, vnid, node);
 	if (error == B_OK) {
 		if (IsMounting()) {
@@ -199,7 +199,7 @@ PRINT(("publish_vnode(%ld, %Ld)\n", fID, vnid));
 status_t
 Volume::RemoveVNode(vnode_id vnid)
 {
-PRINT(("remove_vnode(%ld, %Ld)\n", fID, vnid));
+PRINT(("remove_vnode(%ld, %lld)\n", fID, vnid));
 	return remove_vnode(fID, vnid);
 }
 
@@ -207,16 +207,16 @@ PRINT(("remove_vnode(%ld, %Ld)\n", fID, vnid));
 status_t
 Volume::UnremoveVNode(vnode_id vnid)
 {
-PRINT(("unremove_vnode(%ld, %Ld)\n", fID, vnid));
+PRINT(("unremove_vnode(%ld, %lld)\n", fID, vnid));
 	return unremove_vnode(fID, vnid);
 }
 
-// IsVNodeRemoved
+// GetVNodeRemoved
 status_t
-Volume::IsVNodeRemoved(vnode_id vnid)
+Volume::GetVNodeRemoved(vnode_id vnid, bool* removed)
 {
-PRINT(("is_vnode_removed(%ld, %Ld)\n", fID, vnid));
-	return is_vnode_removed(fID, vnid);
+PRINT(("get_vnode_removed(%ld, %lld, %p)\n", fID, vnid, removed));
+	return get_vnode_removed(fID, vnid, removed);
 }
 
 
