@@ -2632,18 +2632,17 @@ unremove_vnode(mount_id mountID, vnode_id vnodeID)
 
 
 extern "C" status_t 
-is_vnode_removed(mount_id mountID, vnode_id vnodeID)
+get_vnode_removed(mount_id mountID, vnode_id vnodeID, bool* removed)
 {
-	struct vnode *vnode;
-
 	mutex_lock(&sVnodeMutex);
 
 	status_t result;
 
-	vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode)
-		result = vnode->remove ? 1 : 0;
-	else
+	if (struct vnode* vnode = lookup_vnode(mountID, vnodeID)) {
+		if (removed)
+			*removed = vnode->remove;
+		result = B_OK;
+	} else
 		result = B_BAD_VALUE;
 
 	mutex_unlock(&sVnodeMutex);

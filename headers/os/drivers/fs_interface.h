@@ -266,7 +266,8 @@ extern status_t put_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t remove_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
-extern status_t is_vnode_removed(mount_id mountID, vnode_id vnodeID);
+extern status_t get_vnode_removed(mount_id mountID, vnode_id vnodeID,
+					bool* removed);
 
 extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
 					vnode_id toParentNode, vnode_id node, const char *name);
