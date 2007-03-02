@@ -1784,14 +1784,19 @@ fd_and_path_to_dir_vnode(int fd, char *path, struct vnode **_vnode,
 }
 
 
+/** Returns a vnode's name in the d_name field of a supplied dirent buffer.
+ */
+
 static status_t
-get_vnode_name(struct vnode *vnode, struct vnode *parent,
-	char *name, size_t nameSize)
+get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
+	size_t bufferSize)
 {
-	VNodePutter vnodePutter;
+	if (bufferSize < sizeof(struct dirent))
+		return B_BAD_VALUE;
 
 	// See if vnode is the root of a mount and move to the covered
 	// vnode so we get the underlying file system
+	VNodePutter vnodePutter;
 	if (vnode->mount->root_vnode == vnode && vnode->mount->covers_vnode != NULL) {
 		vnode = vnode->mount->covers_vnode;
 		inc_vnode_ref_count(vnode);
@@ -1801,7 +1806,8 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 	if (FS_CALL(vnode, get_vnode_name)) {
 		// The FS supports getting the name of a vnode.
 		return FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,
-			vnode->private_node, name, nameSize);
+			vnode->private_node, buffer->d_name,
+			(char*)buffer + bufferSize - buffer->d_name);
 	}
 
 	// The FS doesn't support getting the name of a vnode. So we search the
@@ -1815,24 +1821,38 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 	status_t status = FS_CALL(parent, open_dir)(parent->mount->cookie,
 		parent->private_node, &cookie);
 	if (status >= B_OK) {
-		char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
-		struct dirent *dirent = (struct dirent *)buffer;
 		while (true) {
 			uint32 num = 1;
-			status = dir_read(parent, cookie, dirent, sizeof(buffer), &num);
+			status = dir_read(parent, cookie, buffer, bufferSize, &num);
 			if (status < B_OK)
 				break;
 
-			if (vnode->id == dirent->d_ino) {
+			if (vnode->id == buffer->d_ino) {
 				// found correct entry!
-				if (strlcpy(name, dirent->d_name, nameSize) >= nameSize)
-					status = B_BUFFER_OVERFLOW;
 				break;
 			}
 		}
 		FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
 	}
 	return status;
+}
+
+
+static status_t
+get_vnode_name(struct vnode *vnode, struct vnode *parent, char *name,
+	size_t nameSize)
+{
+	char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+	struct dirent *dirent = (struct dirent *)buffer;
+
+	status_t status = get_vnode_name(vnode, parent, buffer, sizeof(buffer));
+	if (status != B_OK)
+		return status;
+
+	if (strlcpy(name, dirent->d_name, nameSize) >= nameSize)
+		return B_BUFFER_OVERFLOW;
+
+	return B_OK;
 }
 
 
@@ -1889,7 +1909,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 		char *name = &((struct dirent *)nameBuffer)->d_name[0];
 		struct vnode *parentVnode;
-		vnode_id parentID, id;
+		vnode_id parentID;
 		int type;
 
 		// lookup the parent vnode
@@ -1909,6 +1929,10 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			goto out;
 		}
 
+		// get the node's name
+		status = get_vnode_name(vnode, parentVnode, (struct dirent*)nameBuffer,
+			sizeof(nameBuffer));
+
 		// resolve a volume root to its mount point
 		mountPoint = resolve_volume_root_to_mount_point(parentVnode);
 		if (mountPoint) {
@@ -1919,23 +1943,18 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 		bool hitRoot = (parentVnode == vnode);
 
-		// Does the file system support getting the name of a vnode?
-		// If so, get it here...
-		if (status == B_OK && FS_CALL(vnode, get_vnode_name)) {
-			status = FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie, vnode->private_node,
-				name, B_FILE_NAME_LENGTH);
-		}
-
-		// ... if not, find it out later (by iterating through
-		// the parent directory, searching for the id)
-		id = vnode->id;
-
 		// release the current vnode, we only need its parent from now on
 		put_vnode(vnode);
 		vnode = parentVnode;
 
 		if (status < B_OK)
 			goto out;
+
+		if (hitRoot) {
+			// we have reached "/", which means we have constructed the full
+			// path
+			break;
+		}
 
 		// ToDo: add an explicit check for loops in about 10 levels to do
 		// real loop detection
@@ -1946,41 +1965,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			goto out;
 		}
 
-		if (hitRoot) {
-			// we have reached "/", which means we have constructed the full
-			// path
-			break;
-		}
-
-		if (!FS_CALL(vnode, get_vnode_name)) {
-			// If we haven't got the vnode's name yet, we have to search for it
-			// in the parent directory now
-			fs_cookie cookie;
-
-			status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node,
-				&cookie);
-			if (status >= B_OK) {
-				struct dirent *dirent = (struct dirent *)nameBuffer;
-				while (true) {
-					uint32 num = 1;
-					status = dir_read(vnode, cookie, dirent, sizeof(nameBuffer),
-						&num);
-
-					if (status < B_OK)
-						break;
-					
-					if (id == dirent->d_ino)
-						// found correct entry!
-						break;
-				}
-				FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
-			}
-
-			if (status < B_OK)
-				goto out;
-		}
-
-		// add the name infront of the current path
+		// add the name in front of the current path
 		name[B_FILE_NAME_LENGTH - 1] = '\0';
 		length = strlen(name);
 		insert -= length;
@@ -6915,14 +6900,15 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 			return B_FILE_ERROR;
 
 		// get the vnode name
-		char name[B_FILE_NAME_LENGTH];
-		status_t status = get_vnode_name(dirVNode, parentVNode,
-			name, sizeof(name));
+		char _buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		struct dirent *buffer = (struct dirent*)_buffer;
+		status_t status = get_vnode_name(dirVNode, parentVNode, buffer,
+			sizeof(_buffer));
 		if (status != B_OK)
 			return status;
 
 		// copy the name to the userland buffer
-		int len = user_strlcpy(userName, name, nameLength);
+		int len = user_strlcpy(userName, buffer->d_name, nameLength);
 		if (len < 0)
 			return len;
 		if (len >= (int)nameLength)
