@@ -1880,7 +1880,7 @@ Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 
 	request->volume = fUserlandVolume;
 	request->node = node;
-	request->attrCookie = node;
+	request->attrCookie = cookie;
 	request->pos = pos;
 	request->size = bufferSize;
 

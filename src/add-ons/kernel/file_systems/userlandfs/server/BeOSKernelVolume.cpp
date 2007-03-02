@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "beos_fs_interface.h"
+#include "Debug.h"
 #include "kernel_emu.h"
 
 
