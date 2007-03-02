@@ -2,6 +2,7 @@
 
 #include <errno.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "AutoLocker.h"
 #include "Compatibility.h"
@@ -178,7 +179,7 @@ PRINT(("new_vnode(%ld, %lld)\n", fID, vnid));
 status_t
 Volume::PublishVNode(vnode_id vnid, fs_vnode node)
 {
-PRINT(("publish_vnode(%ld, %lld)\n", fID, vnid));
+PRINT(("publish_vnode(%ld, %lld, %p)\n", fID, vnid, node));
 	status_t error = publish_vnode(fID, vnid, node);
 	if (error == B_OK) {
 		if (IsMounting()) {
@@ -312,33 +313,23 @@ Volume::Sync()
 status_t
 Volume::ReadFSInfo(fs_info* info)
 {
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
+	// When the connection to the userland server is lost, we serve
+	// read_fs_info() requests manually.
+	status_t error = _ReadFSInfo(info);
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
+		WARN(("Volume::Lookup(): connection lost, emulating lookup `.'\n"));
 
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	ReadFSInfoRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
+		info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
+		info->block_size = 512;
+		info->io_size = 512;
+		info->total_blocks = 0;
+		info->free_blocks = 0;
+		strlcpy(info->volume_name, fFileSystem->GetName(),
+			sizeof(info->volume_name));
+		strlcat(info->volume_name, ":disconnected", sizeof(info->volume_name));
 
-	request->volume = fUserlandVolume;
-
-	// send the request
-	KernelRequestHandler handler(this, READ_FS_INFO_REPLY);
-	ReadFSInfoReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	*info = reply->info;
+		error = B_OK;
+	}
 	return error;
 }
 
@@ -1041,34 +1032,29 @@ Volume::Access(fs_vnode node, int mode)
 status_t
 Volume::ReadStat(fs_vnode node, struct stat* st)
 {
-	// get a free port
-	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
-		return B_ERROR;
-	PortReleaser _(fFileSystem->GetPortPool(), port);
+	// When the connection to the userland server is lost, we serve
+	// read_stat(fRootNode) requests manually to allow clean unmounting.
+	status_t error = _ReadStat(node, st);
+	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()
+		&& node == fRootNode) {
+		WARN(("Volume::ReadStat(): connection lost, emulating stat for the "
+			"root node\n"));
 
-	// prepare the request
-	RequestAllocator allocator(port->GetPort());
-	ReadStatRequest* request;
-	status_t error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
-		return error;
+		st->st_dev = fID;
+		st->st_ino = fRootID;
+		st->st_mode = ACCESSPERMS;
+		st->st_nlink = 1;
+		st->st_uid = 0;
+		st->st_gid = 0;
+		st->st_size = 512;
+		st->st_blksize = 512;
+		st->st_atime = 0;
+		st->st_mtime = 0;
+		st->st_ctime = 0;
+		st->st_crtime = 0;
 
-	request->volume = fUserlandVolume;
-	request->node = node;
-
-	// send the request
-	KernelRequestHandler handler(this, READ_STAT_REPLY);
-	ReadStatReply* reply;
-	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
-		return error;
-	RequestReleaser requestReleaser(port, reply);
-
-	// process the reply
-	if (reply->error != B_OK)
-		return reply->error;
-	*st = reply->st;
+		error = B_OK;
+	}
 	return error;
 }
 
@@ -2570,6 +2556,40 @@ Volume::_Unmount()
 	return error;
 }
 
+// _ReadFSInfo
+status_t
+Volume::_ReadFSInfo(fs_info* info)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	ReadFSInfoRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+
+	// send the request
+	KernelRequestHandler handler(this, READ_FS_INFO_REPLY);
+	ReadFSInfoReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	*info = reply->info;
+	return error;
+}
+
 // _Lookup
 status_t
 Volume::_Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
@@ -2642,6 +2662,41 @@ Volume::_WriteVNode(fs_vnode node, bool reenter)
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
+	return error;
+}
+
+// _ReadStat
+status_t
+Volume::_ReadStat(fs_vnode node, struct stat* st)
+{
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	ReadStatRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+
+	// send the request
+	KernelRequestHandler handler(this, READ_STAT_REPLY);
+	ReadStatReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	*st = reply->st;
 	return error;
 }
 

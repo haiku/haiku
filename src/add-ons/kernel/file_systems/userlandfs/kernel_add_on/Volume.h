@@ -174,9 +174,11 @@ private:
 			status_t			_Mount(const char* device, uint32 flags,
 									const char* parameters);
 			status_t			_Unmount();
+			status_t			_ReadFSInfo(fs_info* info);
 			status_t			_Lookup(fs_vnode dir, const char* entryName,
 									vnode_id* vnid, int* type);
 			status_t			_WriteVNode(fs_vnode node, bool reenter);
+			status_t			_ReadStat(fs_vnode node, struct stat* st);
 			status_t			_Close(fs_vnode node, fs_cookie cookie);
 			status_t			_FreeCookie(fs_vnode node, fs_cookie cookie);
 			status_t			_CloseDir(fs_vnode node, fs_vnode cookie);
