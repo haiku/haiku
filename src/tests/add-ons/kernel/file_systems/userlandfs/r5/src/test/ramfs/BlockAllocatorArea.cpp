@@ -30,10 +30,19 @@ BlockAllocator::Area::Create(size_t size)
 {
 	Area *area = NULL;
 	void *base = NULL;
+#if USER
+	area_id id = create_area("block alloc", &base, B_ANY_ADDRESS,
+							 size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+#else
 	area_id id = create_area("block alloc", &base, B_ANY_KERNEL_ADDRESS,
 							 size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (id >= 0)
+#endif
+	if (id >= 0) {
 		area = new(base) Area(id, size);
+	} else {
+		ERROR(("BlockAllocator::Area::Create(%lu): Failed to create area: %s\n",
+			size, strerror(id)));
+	}
 	return area;
 }
 
