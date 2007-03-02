@@ -14,6 +14,9 @@
 
 status_t set_mime(vnode *node, const char *filename);
 
+
+#ifdef __HAIKU__
+
 status_t fs_open_attrib_dir(void *_vol, void *_node, void **_cookie);
 status_t fs_close_attrib_dir(void *_vol, void *_node, void *_cookie);
 status_t fs_free_attrib_dir_cookie(void *_vol, void *_node, void *_cookie);
@@ -26,4 +29,17 @@ status_t fs_read_attrib_stat(void *_vol, void *_node, fs_cookie _cookie, struct 
 status_t fs_read_attrib(void *_vol, void *_node, fs_cookie _cookie, off_t pos,void *buffer, size_t *_length);
 status_t fs_write_attrib(void *_vol, void *_node, fs_cookie _cookie, off_t pos,	const void *buffer, size_t *_length);
 
+#else
+
+int fs_open_attrib_dir(void *_vol, void *_node, void **_cookie);
+int fs_close_attrib_dir(void *_vol, void *_node, void *_cookie);
+int fs_free_attrib_dir_cookie(void *_vol, void *_node, void *_cookie);
+int fs_rewind_attrib_dir(void *_vol, void *_node, void *_cookie);
+int fs_read_attrib_dir(void *_vol, void *_node, void *_cookie, long *num, struct dirent *buf, size_t bufsize);
+int fs_read_attrib_stat(void *_vol, void *_node, const char *name, struct attr_info *buf);
+int fs_read_attrib(void *_vol, void *_node, const char *name, int type, void *buf, size_t *len, off_t pos);
+int fs_write_attrib(void *_vol, void *_node, const char *name, int type, const void *buf, size_t *len, off_t pos);
+
+#endif //__HAIKU__
+	
 #endif

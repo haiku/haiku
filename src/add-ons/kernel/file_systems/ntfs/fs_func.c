@@ -2,7 +2,7 @@
  * Copyright (c) 2000-2004 Anton Altaparmakov
  * Copyright (c) 2002-2006 Szabolcs Szakacsits
  *
- * Copyright (c) 2006 Troeglazov Gerasim (3dEyes**)
+ * Copyright (c) 2006-2007 Troeglazov Gerasim (3dEyes**)
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published by
@@ -34,84 +34,85 @@
 #include <time.h>
 #include <malloc.h>
 
-#include <KernelExport.h>
-#include <NodeMonitor.h>
-#include <fs_interface.h>
-#include <fs_cache.h>
-#include <fs_attr.h>
-#include <fs_info.h>
-#include <fs_index.h>
-#include <fs_query.h>
-#include <fs_volume.h>
-
 #include "ntfs.h"
 #include "attributes.h"
 #include "lock.h"
 #include "volume_util.h"
-
-status_t	fs_mount( mount_id nsid, const char *device, ulong flags, const char *args, void **data, vnode_id *vnid );
-status_t	fs_unmount(void *_ns);
-status_t	fs_rfsstat(void *_ns, struct fs_info *);
-status_t  	fs_wfsstat(void *_vol, const struct fs_info *fss, uint32 mask);
-status_t 	fs_sync(void *_ns);
-status_t	fs_walk(void *_ns, void *_base, const char *file, vnode_id *vnid,int *_type);
-status_t	fs_get_vnode_name(void *_ns, void *_node, char *buffer, size_t bufferSize);
-status_t	fs_read_vnode(void *_ns, vnode_id vnid, void **_node, bool reenter);
-status_t	fs_write_vnode(void *_ns, void *_node, bool reenter);
-status_t    fs_remove_vnode( void *_ns, void *_node, bool reenter );
-status_t	fs_access( void *ns, void *node, int mode );
-status_t	fs_rstat(void *_ns, void *_node, struct stat *st);
-status_t	fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask);
-status_t   	fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, vnode_id *_vnid);
-status_t	fs_open(void *_ns, void *_node, int omode, void **cookie);
-status_t	fs_close(void *ns, void *node, void *cookie);
-status_t	fs_free_cookie(void *ns, void *node, void *cookie);
-status_t	fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len);
-status_t	fs_write(void *ns, void *node, void *cookie, off_t pos, const void *buf, size_t *len);
-status_t	fs_mkdir(void *_ns, void *_node, const char *name,	int perms, vnode_id *_vnid);
-status_t 	fs_rmdir(void *_ns, void *dir, const char *name);
-status_t	fs_opendir(void* _ns, void* _node, void** cookie);
-status_t  	fs_readdir( void *_ns, void *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
-status_t	fs_rewinddir(void *_ns, void *_node, void *cookie);
-status_t	fs_closedir(void *_ns, void *_node, void *cookie);
-status_t	fs_free_dircookie(void *_ns, void *_node, void *cookie);
-status_t 	fs_readlink(void *_ns, void *_node, char *buf, size_t *bufsize);
-status_t 	fs_fsync(void *_ns, void *_node);
-status_t    fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname);
-status_t    fs_unlink(void *_ns, void *_node, const char *name);
-status_t	fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target, int mode);
-
-void 		fs_free_identify_partition_cookie(partition_data *partition, void *_cookie);
-status_t	fs_scan_partition(int fd, partition_data *partition, void *_cookie);
-float		fs_identify_partition(int fd, partition_data *partition, void **_cookie);
+#include "fs_func.h"
 
 #ifndef _READ_ONLY_
 static status_t do_unlink(nspace *vol, vnode *dir, const char *name, bool isdir);
 #endif
 
-//not emplemented now
+#ifdef __HAIKU__
+
+typedef struct identify_cookie {
+	NTFS_BOOT_SECTOR boot;
+} identify_cookie;
+
 float
 fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	return 0.0f;
+	NTFS_BOOT_SECTOR boot;
+	identify_cookie *cookie;
+	uint8			*buf=(uint8*)&boot;
+	
+	// read in the boot sector
+	ERRPRINT("fs_identify_partition: read in the boot sector\n");
+	if (read_pos(fd, 0, (void*)&boot, 512) != 512) {
+		return -1;
+	}
+
+	// only check boot signature on hard disks to account for broken mtools
+	// behavior
+	
+	// check boot signature
+	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
+		return -1;
+
+	//check boot signature NTFS
+	if (memcmp(buf+3, "NTFS    ", 8)!=0)
+		return -1;
+
+	//allocate identify_cookie
+	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
+	if (!cookie)
+		return -1;
+
+	memcpy(&(cookie->boot),&boot,512);
+
+	*_cookie = cookie;
+
+	return 0.8f;
 }
 
-//not emplemented now
 status_t
 fs_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+	partition->content_size = sle64_to_cpu(cookie->boot.number_of_sectors) * le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
+	partition->block_size = le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
+	partition->content_name = strdup("NTFS Volume");
 	return B_OK;
 }
 
-//not emplemented now
 void
 fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 {
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+	free(cookie);
 }
+#endif //__HAIKU__
 
-
+#ifdef __HAIKU__
 status_t 
 fs_mount( mount_id nsid, const char *device, ulong flags, const char *args, void **data, vnode_id *vnid )
+#else
+int 
+fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t len, void **data, vnode_id *vnid)
+#endif
 {
 	nspace		*ns;
 	vnode		*newNode = NULL;
@@ -119,7 +120,7 @@ fs_mount( mount_id nsid, const char *device, ulong flags, const char *args, void
 	status_t	result = B_NO_ERROR;
 
 	ERRPRINT("fs_mount - ENTER\n");
-			
+				
 	ns = ntfs_malloc(sizeof(nspace));
 	if (!ns) {
 		result = ENOMEM;
@@ -138,11 +139,17 @@ fs_mount( mount_id nsid, const char *device, ulong flags, const char *args, void
 	strcpy(ns->devicePath,device);
 		
 	sprintf(lockname, "ntfs_lock %lx", ns->id);
-	if ((result = recursive_lock_init(&(ns->vlock), lockname)) != 0) {
+	
+#ifdef __HAIKU__	
+	if ((result = recursive_lock_init(&(ns->vlock), lockname)) != 0)
+#else
+	if ((result = new_lock(&(ns->vlock), lockname)) != B_OK)
+#endif		
+	{
 			ERRPRINT("fs_mount - error creating lock (%s)\n", strerror(result));
 			goto exit;
 	}
-	
+		
 	ns->ntvol=utils_mount_volume(device,0,true);
 	if(ns->ntvol!=NULL)
 		result = B_NO_ERROR;
@@ -183,8 +190,13 @@ exit:
 	return result;
 }
 
+#ifdef __HAIKU__
 status_t 
 fs_unmount(void *_ns)
+#else
+int
+fs_unmount(void *_ns)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	status_t	result = B_NO_ERROR;
@@ -192,8 +204,12 @@ fs_unmount(void *_ns)
 	ERRPRINT("fs_unmount - ENTER\n");
 	
 	ntfs_device_umount( ns->ntvol, true );
-	
+
+#ifdef __HAIKU__	
 	recursive_lock_destroy(&(ns->vlock));
+#else
+	free_lock(&(ns->vlock));	
+#endif	
 	
 	free( ns );
 
@@ -202,8 +218,13 @@ fs_unmount(void *_ns)
 	return result;
 }
 
+#ifdef __HAIKU__
 status_t
 fs_rfsstat( void *_ns, struct fs_info * fss )
+#else
+int
+fs_rfsstat( void *_ns, struct fs_info * fss )
+#endif
 {
 	nspace	*ns = (nspace*)_ns;
 	int 	i;
@@ -242,15 +263,24 @@ fs_rfsstat( void *_ns, struct fs_info * fss )
 }
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_wfsstat(void *_vol, const struct fs_info * fss, uint32 mask)
+#else
+int
+fs_wfsstat(void *_vol, struct fs_info *fss, long mask)
+#endif
 {
 	nspace* 	ns = (nspace*)_vol;
 	status_t	result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
+#ifdef __HAIKU__
 	if (mask & FS_WRITE_FSINFO_NAME) {	
+#else
+	if (mask & WFSSTAT_NAME) {
+#endif		
 		result = ntfs_change_label( ns->ntvol,  (char*)fss->volume_name );
 		goto exit;
 	}
@@ -263,8 +293,13 @@ exit:
 }
 #endif
 
+#ifdef __HAIKU__
 status_t
 fs_walk(void *_ns, void *_base, const char *file, vnode_id *vnid,int *_type)
+#else
+int
+fs_walk(void *_ns, void *_base, const char *file, char **newpath, vnode_id *vnid)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*baseNode = (vnode*)_base;
@@ -317,6 +352,9 @@ fs_walk(void *_ns, void *_base, const char *file, vnode_id *vnid,int *_type)
 
 			if( get_vnode( ns->id, *vnid, (void**)&newNode ) !=0 )
 				result = ENOENT;
+				
+			if(newNode!=NULL)
+				newNode->parent_vnid = baseNode->vnid;				
 	}
 
 exit:
@@ -328,7 +366,7 @@ exit:
 	return result;
 }
 
-
+#ifdef __HAIKU__
 status_t
 fs_get_vnode_name(void *_ns, void *_node, char *buffer, size_t bufferSize)
 {
@@ -366,12 +404,17 @@ exit:
 
 	return result;
 }
+#endif
 
 
 
-
+#ifdef __HAIKU__
 status_t 
 fs_read_vnode(void *_ns, vnode_id vnid, void **node, bool reenter)
+#else
+int
+fs_read_vnode(void *_ns, vnode_id vnid, char reenter, void **node)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*newNode = NULL;
@@ -424,8 +467,13 @@ exit:
 	return result;
 }
 
+#ifdef __HAIKU__
 status_t
 fs_write_vnode( void *_ns, void *_node, bool reenter )
+#else
+int
+fs_write_vnode( void *_ns, void *_node, char reenter )
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;
@@ -448,8 +496,13 @@ fs_write_vnode( void *_ns, void *_node, bool reenter )
 }
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_remove_vnode( void *_ns, void *_node, bool reenter )
+#else
+int
+fs_remove_vnode( void *_ns, void *_node, char reenter )
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;
@@ -471,9 +524,14 @@ fs_remove_vnode( void *_ns, void *_node, bool reenter )
 	return result;
 }
 #endif
- 
+
+#ifdef __HAIKU__ 
 status_t
 fs_rstat( void *_ns, void *_node, struct stat *stbuf )
+#else
+int
+fs_rstat( void *_ns, void *_node, struct stat *stbuf )
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;
@@ -570,8 +628,13 @@ exit:
 }
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
+#else
+int
+fs_wstat(void *_vol, void *_node, struct stat *st, long mask)
+#endif
 {
 	nspace		*ns = (nspace*)_vol;
 	vnode		*node = (vnode*)_node;
@@ -588,8 +651,11 @@ fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 			goto exit;
 	}
 
+#ifdef __HAIKU__
 	if ( mask & FS_WRITE_STAT_SIZE ) {
-	
+#else
+	if (mask & WSTAT_SIZE) {
+#endif			
 		ERRPRINT("fs_wstat: setting file size to %Lx\n", st->st_size);
 		
 		if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
@@ -606,22 +672,31 @@ fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 			ntfs_attr_close(na);
 			
 			ntfs_mark_free_space_outdated(ns);
-			
-			//notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
+
+#ifdef __HAIKU__			
 			notify_stat_changed(ns->id, MREF(ni->mft_no), mask);
-			
+#else
+			notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
+#endif			
+
 		}
 	}
 	
+#ifdef __HAIKU__	
 	if (mask & FS_WRITE_STAT_MTIME) {
-
+#else	
+	if (mask & WSTAT_MTIME) {
+#endif	
 		ERRPRINT("fs_wstat: setting modification time\n");
 		
 		ni->last_access_time = st->st_atime;
 		ni->last_data_change_time = st->st_mtime;
 		ni->last_mft_change_time = st->st_ctime;
-		//notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
+#ifdef __HAIKU__			
 		notify_stat_changed(ns->id, MREF(ni->mft_no), mask);
+#else		
+		notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
+#endif		
 	}
 
 exit:
@@ -629,7 +704,7 @@ exit:
 	if(ni)
 		ntfs_inode_close(ni);
 		
-	ERRPRINT("dosfs_wstat: EXIT with (%s)\n", strerror(err));
+	ERRPRINT("dosfs_wstat: EXIT with (%s)\n", strerror(result));
 	
 	UNLOCK_VOL(ns);
 	
@@ -638,16 +713,23 @@ exit:
 #endif
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_sync(void *_ns)
+#else
+int
+fs_sync(void *_ns)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_sync - ENTER\n");
-		
-//	flush_device(DEV_FD(ns->ntvol->dev), 0);
+
+#ifndef __HAIKU__
+	flush_device(DEV_FD(ns->ntvol->dev), 0);
+#endif	
 
 	ERRPRINT("fs_sync - EXIT\n");
 
@@ -658,8 +740,13 @@ fs_sync(void *_ns)
 #endif
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_fsync(void *_ns, void *_node)
+#else
+int
+fs_fsync(void *_ns, void *_node)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;
@@ -696,9 +783,13 @@ exit:
 }
 #endif
 
-
+#ifdef __HAIKU__
 status_t	
 fs_open(void *_ns, void *_node, int omode, void **_cookie)
+#else
+int
+fs_open(void *_ns, void *_node, int omode, void **_cookie)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;
@@ -758,8 +849,13 @@ exit:
 
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t   
 fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, vnode_id *_vnid)
+#else
+int
+fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, vnode_id *_vnid, void **_cookie)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_dir;
@@ -842,9 +938,14 @@ fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **
 			result = B_NO_ERROR;
 			result = publish_vnode(ns->id, *_vnid, (void*)newNode);	
 									
-			ntfs_mark_free_space_outdated(ns);		
+			ntfs_mark_free_space_outdated(ns);	
+
+#ifdef __HAIKU__				
 			notify_entry_created(ns->id, MREF( bi->mft_no ), name, *_vnid);				
-			//notify_listener(B_ENTRY_CREATED, ns->id, MREF( bi->mft_no ), 0, *_vnid, name);		
+#else			
+			notify_listener(B_ENTRY_CREATED, ns->id, MREF( bi->mft_no ), 0, *_vnid, name);		
+#endif
+			
 		} else
 			result = errno;
 	}	
@@ -873,9 +974,13 @@ exit:
 }
 #endif
 
-
+#ifdef __HAIKU__
 status_t
 fs_read( void *_ns, void *_node, void *_cookie, off_t offset, void *buf, size_t *len )
+#else
+int
+fs_read( void *_ns, void *_node, void *_cookie, off_t offset, void *buf, size_t *len )
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;	
@@ -952,8 +1057,13 @@ exit2:
 
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, size_t *len )
+#else
+int
+fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, size_t *len )
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;	
@@ -1005,9 +1115,12 @@ fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, 
 		if(ntfs_attr_truncate(na, offset + size))
 			size = na->data_size - offset;
 		else
+#ifdef __HAIKU__		
 			notify_stat_changed(ns->id, MREF(ni->mft_no), B_STAT_SIZE);	
+#else
+			notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
+#endif			
 	}
-			//notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);	}
 
 	while (size) {
 		result = ntfs_attr_pwrite(na, offset, size, buf);
@@ -1042,8 +1155,13 @@ exit2:
 }
 #endif
 
+#ifdef __HAIKU__
 status_t	
 fs_close(void *ns, void *node, void *cookie)
+#else
+int
+fs_close(void *ns, void *node, void *cookie)
+#endif
 {
 	ERRPRINT("fs_close - ENTER\n");
 	
@@ -1051,8 +1169,13 @@ fs_close(void *ns, void *node, void *cookie)
 	return B_NO_ERROR;
 }
 
+#ifdef __HAIKU__
 status_t
 fs_free_cookie( void *ns, void *node, void *cookie )
+#else
+int
+fs_free_cookie( void *ns, void *node, void *cookie )
+#endif
 {
 	ERRPRINT("fs_free_cookie - ENTER\n");
 	
@@ -1063,9 +1186,13 @@ fs_free_cookie( void *ns, void *node, void *cookie )
 	return B_NO_ERROR;
 }
 
-
+#ifdef __HAIKU__
 status_t
 fs_access( void *ns, void *node, int mode )
+#else
+int
+fs_access( void *ns, void *node, int mode )
+#endif
 {
 	ERRPRINT("fs_access - ENTER\n");	
 	
@@ -1073,8 +1200,13 @@ fs_access( void *ns, void *node, int mode )
 	return B_NO_ERROR;
 }
 
+#ifdef __HAIKU__
 status_t
 fs_readlink(void *_ns, void *_node, char *buff, size_t *buff_size)
+#else
+int
+fs_readlink(void *_ns, void *_node, char *buff, size_t *buff_size)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*node = (vnode*)_node;	
@@ -1169,8 +1301,13 @@ exit:
 }
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target, int mode)
+#else
+int
+fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_dir;
@@ -1231,12 +1368,15 @@ fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target, i
 			set_mime(symnode, name);
 	
 	if ((result = publish_vnode(ns->id, MREF(sym->mft_no), symnode)) != 0)
-		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n", MREF(sym->mft_no), strerror(res));
+		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n", MREF(sym->mft_no), strerror(result));
 
 	put_vnode(ns->id, MREF(sym->mft_no) );
-	
-//	notify_listener(B_ENTRY_CREATED, ns->id, MREF(dir->ntnode->mft_no), 0, MREF(sym->mft_no), name);
+
+#ifdef __HAIKU__	
 	notify_entry_created(ns->id, MREF( bi->mft_no ), name, MREF(sym->mft_no));	
+#else
+	notify_listener(B_ENTRY_CREATED, ns->id, MREF(bi->mft_no), 0, MREF(sym->mft_no), name);
+#endif
 	
 exit:	
 	
@@ -1254,8 +1394,13 @@ exit:
 #endif
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_mkdir(void *_ns, void *_node, const char *name,	int perms, vnode_id *_vnid)
+#else
+int
+fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_node;
@@ -1280,13 +1425,14 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms, vnode_id *_vnid)
 		result = ENOENT;
 		goto exit;
 	}
-	
-//	if (is_vnode_removed(ns->id, MREF(dir->ntnode->mft_no)) > 0)
-//	{
-//		ERRPRINT("fs_mkdir - called in removed directory\n");
-//		result = EPERM;
-//		goto exit;
-//	}
+
+#ifndef __HAIKU__	
+	if (is_vnode_removed(ns->id, MREF(bi->mft_no)) > 0) {
+		ERRPRINT("fs_mkdir - called in removed directory\n");
+		result = EPERM;
+		goto exit;
+	}
+#endif
 	
 	if (! bi->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 		result =  EINVAL;
@@ -1316,15 +1462,19 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms, vnode_id *_vnid)
 		set_mime(newNode, ".***");
 		
 		result = publish_vnode(ns->id, vnid, (void*)newNode);
-		
+#ifdef __HAIKU__		
 		*_vnid = vnid;
-		
+#endif		
 		put_vnode(ns->id, MREF(ni->mft_no));	
 		
 		ntfs_mark_free_space_outdated(ns);	
-		
-//		notify_listener(B_ENTRY_CREATED, ns->id, MREF( bi->mft_no ), 0, vnid, name);
+
+#ifdef __HAIKU__		
 		notify_entry_created(ns->id, MREF( bi->mft_no ), name, vnid);	
+#else
+		notify_listener(B_ENTRY_CREATED, ns->id, MREF( bi->mft_no ), 0, vnid, name);
+#endif
+
 	}
 	else
 		result = errno;
@@ -1345,8 +1495,13 @@ exit:
 #endif
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname)
+#else
+int
+fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*odir = (vnode*)_odir;
@@ -1460,11 +1615,15 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 			ntfs_delete(oi, odi, uoldname, uoldname_len);
 	
 			onode->parent_vnid = MREF( ndi->mft_no );	 
-		
+
+#ifdef __HAIKU__		
 			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( ndi->mft_no ), newname, onode->vnid );
 			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);			
-			//notify_listener(B_ENTRY_MOVED,  ns->id, MREF( odir->ntnode->mft_no ), MREF( ndir->ntnode->mft_no ), MREF( onode->ntnode->mft_no ), newname);
-			//notify_listener(B_ATTR_CHANGED, ns->id, 0, 0, nvnid, "BEOS:TYPE");
+#else
+			notify_listener(B_ENTRY_MOVED,  ns->id, MREF( odi->mft_no ), MREF( ndi->mft_no ), MREF( onode->vnid ), newname);
+			notify_listener(B_ATTR_CHANGED, ns->id, 0, 0, onode->vnid, "BEOS:TYPE");
+#endif
+			
 			put_vnode(ns->id, onode->vnid );			
 			
 	} else { //renaming
@@ -1505,11 +1664,13 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 			}	
 			
 			ntfs_delete(oi, odi, uoldname, uoldname_len);
-	
+#ifdef __HAIKU__
 			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( odi->mft_no ), newname, onode->vnid );
 			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
-			//notify_listener(B_ENTRY_MOVED,  ns->id, MREF( odir->ntnode->mft_no ), MREF( ndir->ntnode->mft_no ), MREF( onode->ntnode->mft_no ), newname);
-			//notify_listener(B_ATTR_CHANGED, ns->id, 0, 0, nvnid, "BEOS:TYPE");			
+#else			
+			notify_listener(B_ENTRY_MOVED,  ns->id, MREF( odi->mft_no ), MREF( odi->mft_no ), MREF( onode->vnid ), newname);
+			notify_listener(B_ATTR_CHANGED, ns->id, 0, 0, onode->vnid, "BEOS:TYPE");			
+#endif			
 			put_vnode(ns->id, onode->vnid );
 	}
 			
@@ -1597,9 +1758,14 @@ do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
 	else
 		ni = NULL;	 	
 		
-	node->parent_vnid = dir->vnid;	
-	//notify_listener(B_ENTRY_REMOVED, vol->id, MREF(dir->ntnode->mft_no), 0, vnid, NULL);	
+	node->parent_vnid = dir->vnid;
+
+#ifdef __HAIKU__		
 	notify_entry_removed(vol->id, dir->vnid, name, vnid);	
+#else
+	notify_listener(B_ENTRY_REMOVED, vol->id, MREF(dir->vnid), 0, vnid, NULL);	
+#endif
+
 	result = remove_vnode(vol->id, vnid);
 exit2:
 	put_vnode(vol->id, vnid);
@@ -1618,8 +1784,13 @@ exit1:
 #endif
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_rmdir(void *_ns, void *_node, const char *name)
+#else
+int
+fs_rmdir(void *_ns, void *_node, const char *name)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_node;
@@ -1659,8 +1830,13 @@ exit1:
 #endif
 
 #ifndef _READ_ONLY_
+#ifdef __HAIKU__
 status_t
 fs_unlink(void *_ns, void *_node, const char *name)
+#else
+int
+fs_unlink(void *_ns, void *_node, const char *name)
+#endif
 {
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_node;

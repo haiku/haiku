@@ -54,8 +54,13 @@ status_t set_mime(vnode *node, const char *filename)
 }
 
 
+#ifdef __HAIKU__
 status_t 
 fs_open_attrib_dir(void *_ns, void *_node, void **_cookie)
+#else
+int 
+fs_open_attrib_dir(void *_ns, void *_node, void **_cookie)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	int	result = B_NO_ERROR;
@@ -80,8 +85,13 @@ exit:
 	return result;
 }
 
+#ifdef __HAIKU__
 status_t 
 fs_close_attrib_dir(void *_ns, void *_node, void *_cookie)
+#else
+int 
+fs_close_attrib_dir(void *_ns, void *_node, void *_cookie)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	
@@ -98,9 +108,13 @@ fs_close_attrib_dir(void *_ns, void *_node, void *_cookie)
 	return B_NO_ERROR;
 }
 
-
+#ifdef __HAIKU__
 status_t 
 fs_free_attrib_dir_cookie(void *_ns, void *_node, void *_cookie)
+#else
+int
+fs_free_attrib_dir_cookie(void *_ns, void *_node, void *_cookie)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	int	result = B_NO_ERROR;
@@ -127,9 +141,13 @@ exit:
 	return result;
 }
 
-
+#ifdef __HAIKU__
 status_t 
 fs_rewind_attrib_dir(void *_ns, void *_node, void *_cookie)
+#else
+int
+fs_rewind_attrib_dir(void *_ns, void *_node, void *_cookie)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	int	result = B_NO_ERROR;
@@ -156,8 +174,13 @@ exit:
 }
 
 
+#ifdef __HAIKU__
 status_t 
 fs_read_attrib_dir(void *_ns, void *_node, void *_cookie, struct dirent *entry, size_t bufsize, uint32 *num)
+#else
+int
+fs_read_attrib_dir(void *_ns, void *_node, void *_cookie, long *num, struct dirent *entry, size_t bufsize)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	vnode *node = (vnode *)_node;
@@ -187,7 +210,28 @@ fs_read_attrib_dir(void *_ns, void *_node, void *_cookie, struct dirent *entry, 
 	return B_NO_ERROR;
 }
 
+#ifndef __HAIKU__
+int
+fs_read_attrib_stat(void *_ns, void *_node, const char *name, struct attr_info *buf)
+{
+	nspace *ns = (nspace *)_ns;
+	vnode *node = (vnode *)_node;
 
+	if (strcmp(name, "BEOS:TYPE"))
+		return ENOENT;
+
+	if (node->mime == NULL) {
+		return ENOENT;
+	}
+	
+	buf->type = MIME_STRING_TYPE;
+	buf->size = strlen(node->mime) + 1;
+
+	return 0;
+}
+#endif
+
+#ifdef __HAIKU__
 status_t
 fs_open_attrib(void *_ns, void *_node, const char *name, int openMode, fs_cookie *_cookie)
 {
@@ -219,22 +263,25 @@ exit:
 		
 	return result;
 }
+#endif
 
-
+#ifdef __HAIKU__
 status_t
 fs_close_attrib(void *_ns, void *_node, fs_cookie cookie)
 {
 	return B_NO_ERROR;
 }
+#endif
 
-
+#ifdef __HAIKU__
 status_t
 fs_free_attrib_cookie(void *_ns, void *_node, fs_cookie cookie)
 {
 	return B_NO_ERROR;
 }
+#endif
 
-
+#ifdef __HAIKU__
 status_t 
 fs_read_attrib_stat(void *_ns, void *_node, fs_cookie _cookie, struct stat *stat)
 {
@@ -267,10 +314,15 @@ exit:
 	
 	return B_NO_ERROR;
 }
+#endif
 
-
+#ifdef __HAIKU__
 status_t 
 fs_read_attrib(void *_ns, void *_node, fs_cookie _cookie, off_t pos, void *buffer, size_t *_length)
+#else
+int
+fs_read_attrib(void *_ns, void *_node, const char *name, int type, void *buffer, size_t *_length, off_t pos)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	vnode *node = (vnode *)_node;
@@ -280,10 +332,12 @@ fs_read_attrib(void *_ns, void *_node, fs_cookie _cookie, off_t pos, void *buffe
 
 	ERRPRINT("fs_read_attr - ENTER\n");
 
+#ifdef __HAIKU_
 	if (_cookie != &kBeOSTypeCookie) {
 		result = ENOENT;
 		goto	exit;
 	}
+#endif
 			
 	if (node->mime == NULL) {
 		result = ENOENT;
@@ -309,9 +363,13 @@ exit:
 }
 
 
+#ifdef __HAIKU__
 status_t
-fs_write_attrib(void *_ns, void *_node, fs_cookie _cookie, off_t pos,
-	const void *buffer, size_t *_length)
+fs_write_attrib(void *_ns, void *_node, fs_cookie _cookie, off_t pos,const void *buffer, size_t *_length)
+#else
+int
+fs_write_attrib(void *_ns, void *_node, const char *name, int type, const void *buffer, size_t *_length, off_t pos)
+#endif
 {
 	nspace *ns = (nspace *)_ns;
 	int	result = B_NO_ERROR;
@@ -321,11 +379,12 @@ fs_write_attrib(void *_ns, void *_node, fs_cookie _cookie, off_t pos,
 	ERRPRINT("fs_write_attr - ENTER\n");
 
 	*_length = 0;
-
+#ifdef __HAIKU_
 	if (_cookie != &kBeOSTypeCookie) {
 		result = ENOSYS;
 		goto	exit;
 	}
+#endif	
 exit:
 	
 	ERRPRINT("fs_write_attrib - EXIT, result is %s\n", strerror(result));

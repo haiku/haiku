@@ -22,19 +22,41 @@
 #define _NTFSDIR_H
 
 
+typedef struct direntry
+{
+	char *name;
+	dev_t dev;
+	ino_t ino;
+	struct direntry *next;
+} direntry;
+
 typedef struct dircookie
 {
+	dev_t				dev;
+	vnode_id			vnid;
+	struct direntry *	root;
+	struct direntry *	last;
+	struct direntry *	walk;
 	u64					pos;
-	int					readed;		
-	ino_t				ino;
-	BOOL 				show_sys_files;	
-	char 				name[MAX_PATH];
 } dircookie;
+
+
+#ifdef __HAIKU__
 
 status_t fs_free_dircookie( void *_ns, void *node, void *cookie );
 status_t fs_opendir( void *_ns, void *_node, void **_cookie );
 status_t fs_closedir( void *_ns, void *node, void *_cookie );
 status_t fs_rewinddir( void *_ns, void *_node, void *_cookie );
 status_t fs_readdir( void *_ns, void *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
+
+#else
+
+int fs_free_dircookie( void *_ns, void *node, void *cookie );
+int fs_opendir( void *_ns, void *_node, void **_cookie );
+int fs_closedir( void *_ns, void *node, void *_cookie );
+int fs_rewinddir( void *_ns, void *_node, void *_cookie );
+int fs_readdir(void *_ns, void *_node, void *cookie, long *num, struct dirent *buf, size_t bufsize);
+
+#endif //__HAIKU__
 
 #endif

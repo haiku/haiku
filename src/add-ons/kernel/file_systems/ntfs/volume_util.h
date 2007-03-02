@@ -1,6 +1,6 @@
 /* volume_util.h - volume functions
  *
- * Copyright (c) 2006 Troeglazov Gerasim (3dEyes**)
+ * Copyright (c) 2006-2007 Troeglazov Gerasim (3dEyes**)
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published

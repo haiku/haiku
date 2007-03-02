@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2006 Troeglazov Gerasim (3dEyes**)
+ * Copyright (c) 2006-2007 Troeglazov Gerasim (3dEyes**)
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -24,15 +24,28 @@
 extern "C" {
 #endif
 
-#include <KernelExport.h>
-#include <NodeMonitor.h>
+#ifdef __HAIKU__
+
 #include <fs_interface.h>
+#include <kernel/lock.h>
+#include <fs_info.h>
 #include <fs_cache.h>
 #include <fs_attr.h>
 #include <fs_info.h>
 #include <fs_index.h>
 #include <fs_query.h>
 #include <fs_volume.h>
+#include <NodeMonitor.h>
+#include <util/kernel_cpp.h>
+
+#else
+
+#include "fsproto.h"
+#include "lock.h"
+
+#define publish_vnode new_vnode
+
+#endif
 
 #include "config.h"
 #include "attrib.h"
@@ -98,7 +111,11 @@ typedef struct nspace
 {
 	ntfs_volume	*ntvol;
 	char		devicePath[MAX_PATH];
+#ifdef __HAIKU__
 	mount_id	id;
+#else
+	nspace_id	id;
+#endif
 	int			free_cluster_count;
 	char		volumeLabel[MAX_PATH];
 	
