@@ -682,9 +682,9 @@ status_t
 userlandfs_free_attr_cookie(fs_volume fs, fs_vnode node, fs_cookie cookie)
 {
 	Volume* volume = (Volume*)fs;
-	PRINT(("userlandfs_close_attr(%p, %p, %p)\n", fs, node, cookie));
+	PRINT(("userlandfs_free_attr_cookie(%p, %p, %p)\n", fs, node, cookie));
 	status_t error = volume->FreeAttrCookie(node, cookie);
-	PRINT(("userlandfs_close_attr() done: %lx\n", error));
+	PRINT(("userlandfs_free_attr_cookie() done: %lx\n", error));
 	return error;
 }
 
