@@ -96,6 +96,8 @@ IndexIterator::Find(const uint8 *const key, size_t keyLength)
 {
 	status_t error = B_ENTRY_NOT_FOUND;
 	if (fIndexWrapper && fIndexWrapper->fIndex) {
+		// TODO: We actually don't want an exact Find() here, but rather a
+		// FindClose().
 		fInitialized = fIndexWrapper->fIndex->Find(key, keyLength, &fIterator);
 		if (fInitialized)
 			error = B_OK;
@@ -110,20 +112,22 @@ IndexIterator::GetNextEntry(uint8 *buffer, uint16 *_keyLength,
 {
 	status_t error = B_ENTRY_NOT_FOUND;
 	if (fIndexWrapper && fIndexWrapper->fIndex) {
-		// get next entry
-		size_t keyLength;
-		if (fInitialized)
-			fIterator.GetNext();
-		else {
+		// init iterator, if not done yet
+		if (!fInitialized) {
 			fIndexWrapper->fIndex->GetIterator(&fIterator);
 			fInitialized = true;
 		}
+
 		// get key
+		size_t keyLength;
 		if (Entry *entry = fIterator.GetCurrent(buffer, &keyLength)) {
 			*_keyLength = keyLength;
 			*_entry = entry;
 			error = B_OK;
 		}
+
+		// get next entry
+		fIterator.GetNext();
 	}
 	return error;
 }

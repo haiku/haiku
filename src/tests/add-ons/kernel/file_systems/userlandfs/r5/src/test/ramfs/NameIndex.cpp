@@ -189,8 +189,21 @@ NameIndex::InternalGetIterator()
 AbstractIndexEntryIterator *
 NameIndex::InternalFind(const uint8 *key, size_t length)
 {
-	if (!key || length == 0 || key[length - 1] != '\0')
+	if (!key || length == 0)
 		return NULL;
+
+	// if the key is not null-terminated, copy it
+	uint8 clonedKey[kMaxIndexKeyLength];
+	if (key[length - 1] != '\0') {
+		if (length >= kMaxIndexKeyLength)
+			length = kMaxIndexKeyLength - 1;
+
+		memcpy(clonedKey, key, length);
+		clonedKey[length] = '\0';
+		length++;
+		key = clonedKey;
+	}
+
 	NameIndexEntryIterator *iterator = new(nothrow) NameIndexEntryIterator;
 	if (iterator) {
 		if (!iterator->SetTo(this, (const char *)key)) {
