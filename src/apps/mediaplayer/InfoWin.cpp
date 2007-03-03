@@ -99,10 +99,13 @@ InfoWin::InfoWin(MainWin *mainWin)
 	fFilenameView = new BStringView(BRect(div+10, 20,
 										  rect.right - 10,
 										  20 + fh.ascent + 5),
-									"filename", "Foo.avi");
+									"filename", "");
 	fFilenameView->SetFont(&bigFont);
 	fFilenameView->SetViewColor(fInfoView->ViewColor());
 	fFilenameView->SetLowColor(fInfoView->ViewColor());
+#ifdef B_BEOS_VERSION_DANO /* maybe we should support that as well ? */
+	fFilenameView->SetTruncation(B_TRUNCATE_END);
+#endif
 	AddChild(fFilenameView);
 									
 	
@@ -158,6 +161,8 @@ InfoWin::ResizeToPreferred()
 void
 InfoWin::Update(uint32 which)
 {
+	status_t err;
+	//char buf[256];
 	printf("InfoWin::Update(0x%08lx)\n", which);
 	rgb_color vFgCol = ui_color(B_DOCUMENT_TEXT_COLOR);
 
@@ -186,10 +191,19 @@ InfoWin::Update(uint32 which)
 		media_format fmt;
 		media_raw_video_format vfmt;
 		float fps;
-		c->fVideoTrack->EncodedFormat(&fmt);
-		if (fmt.type == B_MEDIA_ENCODED_VIDEO) {
+		err = c->fVideoTrack->EncodedFormat(&fmt);
+		//string_for_format(fmt, buf, sizeof(buf));
+		//printf("%s\n", buf);
+		if (err < 0) {
+			s << "(" << strerror(err) << ")";
+		} else if (fmt.type == B_MEDIA_ENCODED_VIDEO) {
 			vfmt = fmt.u.encoded_video.output;
-			s << "(encoded video)"; // TODO: get codec
+			media_codec_info mci;
+			err = c->fVideoTrack->GetCodecInfo(&mci);
+			if (err < 0)
+				s << "(" << strerror(err) << ")";
+			else
+				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (fmt.type == B_MEDIA_RAW_VIDEO) {
 			vfmt = fmt.u.raw_video;
 			s << "raw video";
@@ -208,22 +222,31 @@ InfoWin::Update(uint32 which)
 		BString s;
 		media_format fmt;
 		media_raw_audio_format afmt;
-		c->fAudioTrack->EncodedFormat(&fmt);
-		if (fmt.type == B_MEDIA_ENCODED_AUDIO) {
+		err = c->fAudioTrack->EncodedFormat(&fmt);
+		//string_for_format(fmt, buf, sizeof(buf));
+		//printf("%s\n", buf);
+		if (err < 0) {
+			s << "(" << strerror(err) << ")";
+		} else if (fmt.type == B_MEDIA_ENCODED_AUDIO) {
 			afmt = fmt.u.encoded_audio.output;
-			s << "(encoded audio)"; // TODO: get codec
+			media_codec_info mci;
+			err = c->fAudioTrack->GetCodecInfo(&mci);
+			if (err < 0)
+				s << "(" << strerror(err) << ")";
+			else
+				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (fmt.type == B_MEDIA_RAW_AUDIO) {
 			afmt = fmt.u.raw_audio;
 			s << "raw audio";
 		} else
 			s << "unknown format";
 		s << "\n";
-		// encoded has output as 1st field...
-		uint32 bitps = 8 * afmt.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
+		uint32 bitps = 8 * (afmt.format & media_raw_audio_format::B_AUDIO_SIZE_MASK);
 		uint32 chans = afmt.channel_count;
 		float sr = afmt.frame_rate;
 
-		s << bitps << "Bit ";
+		if (bitps)
+			s << bitps << " Bit ";
 		if (chans == 1)
 			s << "Mono";
 		else if (chans == 2)
@@ -232,14 +255,15 @@ InfoWin::Update(uint32 which)
 			s << chans << "Channels";
 		s << ", ";
 		if (sr)
-			s << (1/sr);
+			s << sr/1000;
 		else
 			s << "?";
 		s<< " kHz";
 		s << "\n";
 		fContentsView->Insert(s.String());
 	}
-	if (which & INFO_STATS) {
+	if (which & INFO_STATS && fMainWin->fHasFile) {
+		// TODO: check for live streams (no duration)
 		fLabelsView->Insert("Duration\n");
 		BString s;
 		bigtime_t d = c->Duration();
@@ -263,6 +287,7 @@ InfoWin::Update(uint32 which)
 			s << "." << d / 10;
 		s << "\n";
 		fContentsView->Insert(s.String());
+		// TODO: demux/video/audio/... perfs (Kb/s)
 	}
 	if (which & INFO_TRANSPORT) {
 	}
@@ -276,8 +301,9 @@ InfoWin::Update(uint32 which)
 			fContentsView->Insert(s.String());
 		}
 		fLabelsView->Insert("Location\n");
+		// TODO: make Controller save the entry_ref (url actually).
 		fContentsView->Insert("file://\n");
-		fFilenameView->SetText("Bar.avi");
+		fFilenameView->SetText(c->fName.String());
 	}
 	if (which & INFO_COPYRIGHT && mf && mf->Copyright()) {
 		
