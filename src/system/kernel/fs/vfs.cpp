@@ -88,6 +88,18 @@ struct vnode_hash_key {
 #define FS_CALL(vnode, op) (vnode->mount->fs->op)
 #define FS_MOUNT_CALL(mount, op) (mount->fs->op)
 
+/**	\brief Structure to manage a mounted file system
+
+	Note: The root_vnode and covers_vnode fields (what others?) are
+	initialized in fs_mount() and not changed afterwards. That is as soon
+	as the mount is mounted and it is made sure it won't be unmounted
+	(e.g. by holding a reference to a vnode of that mount) (read) access
+	to those fields is always safe, even without additional locking. Morever
+	while mounted the mount holds a reference to the covers_vnode, and thus
+	making the access path vnode->mount->covers_vnode->mount->... safe if a
+	reference to vnode is held (note that for the root mount covers_vnode
+	is NULL, though).
+ */
 struct fs_mount {
 	struct fs_mount	*next;
 	file_system_module_info *fs;
@@ -136,12 +148,21 @@ static mutex sMountMutex;
  *	- sMountsTable will not be modified,
  *	- the fields immutable after initialization of the fs_mount structures in
  *	  sMountsTable will not be modified,
- *	- vnode::covered_by of any vnode in sVnodeTable will not be modified,
+ *	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
  *	
  *	The thread trying to lock the lock must not hold sVnodeMutex or
  *	sMountMutex.
  */
 static recursive_lock sMountOpLock;
+
+/**	\brief Guards the vnode::covered_by field of any vnode
+ *
+ *	The holder is allowed to read access the vnode::covered_by field of any
+ *	vnode. Additionally holding sMountOpLock allows for write access.
+ *
+ *	The thread trying to lock the must not hold sVnodeMutex.
+ */
+static mutex sVnodeCoveredByMutex;
 
 /**	\brief Guards sVnodeTable.
  *
@@ -149,7 +170,7 @@ static recursive_lock sMountOpLock;
  *	to any unbusy vnode in that table, save
  *	to the immutable fields (device, id, private_node, mount) to which
  *	only read-only access is allowed, and to the field covered_by, which is
- *	guarded by sMountOpLock.
+ *	guarded by sMountOpLock and sVnodeCoveredByMutex.
  *
  *	The thread trying to lock the mutex must not hold sMountMutex.
  *	You must not have this mutex held when calling create_sem(), as this
@@ -1305,6 +1326,8 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 
 		if (context->cwd != NULL && context->cwd->mount == mount) {
 			put_vnode(context->cwd);
+				// Note: We're only accessing the pointer, not the vnode itself
+				// in the lines below.
 
 			if (context->cwd == mount->root_vnode) {
 				// redirect the current working directory to the covered vnode
@@ -1357,12 +1380,12 @@ resolve_mount_point_to_volume_root(struct vnode *vnode)
 
 	struct vnode *volumeRoot = NULL;
 
-	recursive_lock_lock(&sMountOpLock);
+	mutex_lock(&sVnodeCoveredByMutex);
 	if (vnode->covered_by) {
 		volumeRoot = vnode->covered_by;
 		inc_vnode_ref_count(volumeRoot);
 	}
-	recursive_lock_unlock(&sMountOpLock);
+	mutex_unlock(&sVnodeCoveredByMutex);
 
 	return volumeRoot;
 }
@@ -1422,7 +1445,7 @@ resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
  *	root of a volume. If it is (and if it is not "/"), the function obtains
  *	a reference to the underlying mount point node and returns it.
  *
- *	\param vnode The vnode in question.
+ *	\param vnode The vnode in question (caller must have a reference).
  *	\return The mount point vnode the vnode covers, if it is indeed a volume
  *			root and not "/", or \c NULL otherwise.
  */
@@ -1435,13 +1458,11 @@ resolve_volume_root_to_mount_point(struct vnode *vnode)
 
 	struct vnode *mountPoint = NULL;
 
-	recursive_lock_lock(&sMountOpLock);
 	struct fs_mount *mount = vnode->mount;
 	if (vnode == mount->root_vnode && mount->covers_vnode) {
 		mountPoint = mount->covers_vnode;
 		inc_vnode_ref_count(mountPoint);
 	}
-	recursive_lock_unlock(&sMountOpLock);
 
 	return mountPoint;
 }
@@ -3475,6 +3496,9 @@ vfs_init(kernel_args *args)
 	if (mutex_init(&sMountMutex, "vfs_mount_lock") < 0)
 		panic("vfs_init: error allocating mount lock\n");
 
+	if (mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock") < 0)
+		panic("vfs_init: error allocating vnode::covered_by lock\n");
+
 	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
 		panic("vfs_init: error allocating vnode lock\n");
 
@@ -4016,12 +4040,12 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 		if (status != B_OK)
 			return;
 
-		recursive_lock_lock(&sMountOpLock);
+		mutex_lock(&sVnodeCoveredByMutex);
 		if (vnode->covered_by) {
 			entry->d_dev = vnode->covered_by->device;
 			entry->d_ino = vnode->covered_by->id;
 		}
-		recursive_lock_unlock(&sMountOpLock);
+		mutex_unlock(&sVnodeCoveredByMutex);
 
 		put_vnode(vnode);
 	}
@@ -5422,8 +5446,10 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	// No race here, since fs_mount() is the only function changing
 	// covers_vnode (and holds sMountOpLock at that time).
+	mutex_lock(&sVnodeCoveredByMutex);
 	if (mount->covers_vnode)
 		mount->covers_vnode->covered_by = mount->root_vnode;
+	mutex_unlock(&sVnodeCoveredByMutex);
 
 	if (!sRoot)
 		sRoot = mount->root_vnode;
@@ -5593,7 +5619,9 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	mutex_unlock(&sVnodeMutex);
 
+	mutex_lock(&sVnodeCoveredByMutex);
 	mount->covers_vnode->covered_by = NULL;
+	mutex_unlock(&sVnodeCoveredByMutex);
 	put_vnode(mount->covers_vnode);
 
 	// Free all vnodes associated with this mount.
