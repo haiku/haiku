@@ -46,17 +46,16 @@ int _ntfs_dirent_dot_filler(void *_dirent, const ntfschar *name,
 	char *filename = NULL;
 	dircookie	*cookie = (dircookie*)_dirent;	
 	
-	if (name_type == FILE_NAME_DOS)return 0;
+	if (name_type == FILE_NAME_DOS)
+		return 0;
 	
-	if (ntfs_ucstombs(name, name_len, &filename, 0) < 0)
-	{
+	if (ntfs_ucstombs(name, name_len, &filename, 0) < 0) {
 		ERRPRINT("Skipping unrepresentable filename\n");
 		return 0;
 	}
 	
-	if(strcmp(filename,".")==0 || strcmp(filename,"..")==0)	
-	if (MREF(mref) == FILE_root || MREF(mref) >= FILE_first_user ||	false)
-	 {
+	if(strcmp(filename,".")==0 || strcmp(filename,"..")==0)	{
+		if (MREF(mref) == FILE_root || MREF(mref) >= FILE_first_user ||	false) {
 	 	  struct direntry *ent = (direntry*)ntfs_calloc(sizeof(direntry));
 	 	  ent->name = (char*)ntfs_calloc(strlen(filename)+1);
 		  strcpy(ent->name,filename);
@@ -64,8 +63,7 @@ int _ntfs_dirent_dot_filler(void *_dirent, const ntfschar *name,
 		  ent->ino=MREF(mref);
 		  ent->next = NULL;
 
-		  if(cookie->root==NULL)
-		    {
+		  if(cookie->root==NULL) {
 		  		cookie->root = ent;
 		  		cookie->walk = ent;
 		  	}
@@ -74,12 +72,11 @@ int _ntfs_dirent_dot_filler(void *_dirent, const ntfschar *name,
 		     cookie->last->next = ent;
 
 	      cookie->last = ent;		     
- 	 } else {
- 	 	
-		free(filename);
-		return -1;
-	 }
- 	 
+	 	 } else { 	 	
+			free(filename);
+			return -1;
+	 	}
+	} 	 
 	free(filename);
 	return 0;
 }
@@ -92,19 +89,18 @@ int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 	char *filename = NULL;
 	dircookie	*cookie = (dircookie*)_dirent;	
 	
-	if (name_type == FILE_NAME_DOS)return 0;
+	if (name_type == FILE_NAME_DOS)
+		return 0;
 	
-	if (ntfs_ucstombs(name, name_len, &filename, 0) < 0)
-	{
+	if (ntfs_ucstombs(name, name_len, &filename, 0) < 0) {
 		ERRPRINT("Skipping unrepresentable filename\n");
 		return 0;
 	}
 	
 	if(strcmp(filename,".")==0 || strcmp(filename,"..")==0)
-	return 0;
+		return 0;
 	
-	if (MREF(mref) == FILE_root || MREF(mref) >= FILE_first_user ||	false)
-	 {
+	if (MREF(mref) == FILE_root || MREF(mref) >= FILE_first_user ||	false) {
 	 	  struct direntry *ent = (direntry*)ntfs_calloc(sizeof(direntry));
 	 	  ent->name = (char*)ntfs_calloc(strlen(filename)+1);
 		  strcpy(ent->name,filename);
@@ -112,8 +108,7 @@ int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 		  ent->ino=MREF(mref);
 		  ent->next = NULL;
 
-		  if(cookie->root==NULL)
-		    {
+		  if(cookie->root==NULL) {
 		  		cookie->root = ent;
 		  		cookie->walk = ent;
 		  	}
@@ -163,7 +158,6 @@ fs_opendir( void *_ns, void *_node, void **_cookie )
 	int			result = B_NO_ERROR;
 	ntfs_inode	*ni=NULL;
 	dircookie	*cookie = (dircookie*)ntfs_calloc( sizeof(dircookie) );	
-	u64			pos=0;
 
 	LOCK_VOL(ns);
 
@@ -180,8 +174,7 @@ fs_opendir( void *_ns, void *_node, void **_cookie )
 		goto exit;
 	}
 	
-	if ( cookie != NULL )
-	{
+	if ( cookie != NULL ) {
 		cookie->dev = ns->id;
 		cookie->pos = 0;
 		//cookie->walk_dir = ni;
@@ -190,9 +183,9 @@ fs_opendir( void *_ns, void *_node, void **_cookie )
 		cookie->last = NULL;
 		cookie->walk = NULL;
 		*_cookie = (void*)cookie;
-	}
-	else
+	} else {
 		result = ENOMEM;
+	}
 exit:
 		
 	if(ni)
@@ -222,22 +215,22 @@ fs_closedir( void *_ns, void *node, void *_cookie )
 	ERRPRINT("fs_closedir - ENTER\n");
 	
 	entry=cookie->root;
-	if(entry)
-	for(;;)
-	 {
-	 	entrynext = entry->next;
+	if(entry) {
+		for(;;) {
+	 		entrynext = entry->next;
 
-	 	if(entry->name)
-	 		free(entry->name);
+		 	if(entry->name)
+		 		free(entry->name);
 
-	 	if(entry)
-	 		free(entry);
+		 	if(entry)
+		 		free(entry);
 
-	 	entry = entrynext;
+		 	entry = entrynext;
 
-	 	if(!entry)
-	 		break;
+		 	if(!entry)
+		 		break;
 	 }
+	}
 	
 	ERRPRINT("fs_closedir - EXIT\n");
 	
@@ -266,14 +259,12 @@ fs_readdir(void *_ns, void *_node, void *_cookie, long *num, struct dirent *buf,
 	
 	ERRPRINT("fs_readdir - ENTER:\n");
 	
-	if (!ns || !node || !cookie || !num || bufsize < sizeof(buf))
-	 {
+	if (!ns || !node || !cookie || !num || bufsize < sizeof(buf)) {
 	 	result = -1;
 		goto quit;
 	 }
 
-	if(cookie->pos==0)
-	{
+	if(cookie->pos==0) {
 		ni = ntfs_inode_open(ns->ntvol, node->vnid);		
 		if(ni==NULL) {
 			result = ENOENT;
@@ -281,28 +272,25 @@ fs_readdir(void *_ns, void *_node, void *_cookie, long *num, struct dirent *buf,
 		}		
 		ntfs_readdir(ni, &pos, cookie, (ntfs_filldir_t)_ntfs_dirent_dot_filler);
 		cookie->pos+=2;
-	}
-	else
-	if(cookie->pos==2)
-	{
-		ni = ntfs_inode_open(ns->ntvol, node->vnid);		
+	} else {
+		if(cookie->pos==2) {
+			ni = ntfs_inode_open(ns->ntvol, node->vnid);		
 		if(ni==NULL) {
 			result = ENOENT;
 			goto quit;
 		}		
 		ntfs_readdir(ni, &pos, cookie, (ntfs_filldir_t)_ntfs_dirent_filler);
 		cookie->pos++;
+		}
 	}
 		
 	
-	if(cookie->root==NULL || cookie->last==NULL)
-	 {
+	if(cookie->root==NULL || cookie->last==NULL) {
 		result = -1;
 		goto quit;
 	 }
 	 
-	if(cookie->walk==NULL)
-	  {
+	if(cookie->walk==NULL) {
 	  	result = ENOENT;
 	  	goto quit;
 	  }
@@ -354,9 +342,8 @@ fs_rewinddir( void *_ns, void *_node, void *_cookie )
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_rewinddir - ENTER\n");
-	if ( cookie != NULL )
-	{
-		//cookie->pos = 0;
+	if ( cookie != NULL ) {
+		cookie->pos = 0;
 		cookie->walk = cookie->root;
 		result = B_NO_ERROR;
 	}

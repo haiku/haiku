@@ -122,10 +122,6 @@ typedef struct nspace
 	int state;
 	s64 free_clusters;
 	long free_mft;
-	unsigned int uid;
-	unsigned int gid;
-	unsigned int fmask;
-	unsigned int dmask;
 	BOOL ro;
 	BOOL show_sys_files;
 	BOOL silent;

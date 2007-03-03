@@ -40,10 +40,6 @@
 #include "volume_util.h"
 #include "fs_func.h"
 
-#ifndef _READ_ONLY_
-static status_t do_unlink(nspace *vol, vnode *dir, const char *name, bool isdir);
-#endif
-
 #ifdef __HAIKU__
 
 typedef struct identify_cookie {
@@ -129,10 +125,6 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 			
 	*ns = (nspace) {
 		.state = NF_FreeClustersOutdate | NF_FreeMFTOutdate,
-		.uid = 0,
-		.gid = 0,
-		.fmask = 0177,
-		.dmask = 0777,
 		.show_sys_files = false,
 	};
 		
@@ -558,7 +550,7 @@ fs_rstat( void *_ns, void *_node, struct stat *stbuf )
 	stbuf->st_ino = MREF(ni->mft_no);
 	
 	if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
-		stbuf->st_mode = S_IFDIR | (0777 & ~ns->dmask);
+		stbuf->st_mode = S_IFDIR | 0777;
 		na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, NTFS_INDEX_I30, 4);
 		if (na) {
 			stbuf->st_size = na->data_size;
@@ -606,10 +598,10 @@ fs_rstat( void *_ns, void *_node, struct stat *stbuf )
 			free(intx_file);
 		}
 		ntfs_attr_close(na);
-		stbuf->st_mode |= (0777 & ~ns->fmask);
+		stbuf->st_mode |= 0666;
 	}
-	stbuf->st_uid = ns->uid;
-	stbuf->st_gid = ns->gid;
+	stbuf->st_uid = 0;
+	stbuf->st_gid = 0;
 	stbuf->st_atime = ni->last_access_time;
 	stbuf->st_ctime = ni->last_mft_change_time;
 	stbuf->st_mtime = ni->last_data_change_time;
@@ -704,7 +696,7 @@ exit:
 	if(ni)
 		ntfs_inode_close(ni);
 		
-	ERRPRINT("dosfs_wstat: EXIT with (%s)\n", strerror(result));
+	ERRPRINT("fs_wstat: EXIT with (%s)\n", strerror(result));
 	
 	UNLOCK_VOL(ns);
 	
@@ -1694,7 +1686,6 @@ exit:
 #endif
 
 #ifndef _READ_ONLY_
-static
 status_t
 do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
 {
