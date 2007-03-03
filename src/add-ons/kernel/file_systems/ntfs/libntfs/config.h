@@ -182,7 +182,7 @@
 #undef HAVE_SYSLOG_H
 
 /* Define to 1 if you have the <sys/byteorder.h> header file. */
-#undef HAVE_SYS_BYTEORDER_H 1
+#undef HAVE_SYS_BYTEORDER_H
 
 /* Define to 1 if you have the <sys/endian.h> header file. */
 #undef HAVE_SYS_ENDIAN_H
@@ -203,7 +203,7 @@
 #define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/sysmacros.h> header file. */
-#undef HAVE_SYS_SYSMACROS_H 1
+#undef HAVE_SYS_SYSMACROS_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
