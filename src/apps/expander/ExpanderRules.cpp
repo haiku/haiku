@@ -14,8 +14,8 @@
 #include <unistd.h>
 
 
-ExpanderRule::ExpanderRule(BString mimetype, BString filenameExtension, 
-		BString listingCmd, BString expandCmd)
+ExpanderRule::ExpanderRule(BString mimetype, BString filenameExtension,
+	BString listingCmd, BString expandCmd)
 	:
 	fMimeType(mimetype.String()),
 	fFilenameExtension(filenameExtension),
@@ -26,7 +26,7 @@ ExpanderRule::ExpanderRule(BString mimetype, BString filenameExtension,
 
 
 ExpanderRule::ExpanderRule(const char* mimetype, const char* filenameExtension,
-		const char* listingCmd, const char* expandCmd)
+	const char* listingCmd, const char* expandCmd)
 	:
 	fMimeType(mimetype),
 	fFilenameExtension(filenameExtension),
@@ -58,31 +58,31 @@ ExpanderRules::ExpanderRules()
 
 	char buffer[1024];
 	BString strings[4];
-	while (fgets(buffer, 1024-1, f)!=NULL) {
+	while (fgets(buffer, 1024 - 1, f) != NULL) {
 		int32 i = 0, j = 0;
 		int32 firstQuote = -1;
 		while (buffer[i] != '#' && buffer[i] != '\n' && j < 4) {
 			if ((j == 0 || j > 1) && buffer[i] == '"') {
 				if (firstQuote >= 0) {
-					strings[j++].SetTo(&buffer[firstQuote+1], i-firstQuote-1);
+					strings[j++].SetTo(&buffer[firstQuote+1], i - firstQuote - 1);
 					firstQuote = -1;
 				} else
 					firstQuote = i;
 			} else if (j == 1 && (buffer[i] == ' ' || buffer[i] == '\t')) {
 				if (firstQuote >= 0) {
 					if (firstQuote + 1 != i) {
-						strings[j++].SetTo(&buffer[firstQuote+1], i-firstQuote-1);
+						strings[j++].SetTo(&buffer[firstQuote+1], i - firstQuote - 1);
 						firstQuote = -1;
 					} else
 						firstQuote = i;
 				} else
 					firstQuote = i;
-			}	
+			}
 			i++;
 		}
 		if (j == 4) {
 			fList.AddItem(new ExpanderRule(strings[0], strings[1], strings[2], strings[3]));
-		} 
+		}
 	}
 	fclose(f);
 	close(fd);
@@ -97,7 +97,7 @@ ExpanderRules::~ExpanderRules()
 }
 
 
-status_t 
+status_t
 ExpanderRules::Open(BFile *file)
 {
 	BPath path;
@@ -107,13 +107,13 @@ ExpanderRules::Open(BFile *file)
 	path.Append("etc/expander.rules");
 	if (file->SetTo(path.Path(), B_READ_ONLY) == B_OK)
 		return B_OK;
-	
+
 	if (find_directory(B_COMMON_ETC_DIRECTORY, &path) != B_OK)
 		return B_ERROR;
 
 	path.Append("expander.rules");
 
-	return file->SetTo(path.Path(), B_READ_ONLY);	
+	return file->SetTo(path.Path(), B_READ_ONLY);
 }
 
 
@@ -122,7 +122,7 @@ ExpanderRules::MatchingRule(BString &fileName, const char *filetype)
 {
 	int32 count = fList.CountItems();
 	int32 length = fileName.Length();
-	for (int32 i=0; i<count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		ExpanderRule *rule = (ExpanderRule *)fList.ItemAt(i);
 		if ((rule->MimeType().IsValid() && rule->MimeType() == filetype)
 			|| (fileName.FindLast(rule->FilenameExtension()) == (length - rule->FilenameExtension().Length())))
@@ -141,7 +141,7 @@ ExpanderRules::MatchingRule(const entry_ref *ref)
 	char type[B_MIME_TYPE_LENGTH];
 	nodeInfo.GetType(type);
 	BString fileName(ref->name);
-	return MatchingRule(fileName, type); 
+	return MatchingRule(fileName, type);
 }
 
 
@@ -153,7 +153,7 @@ RuleRefFilter::RuleRefFilter(ExpanderRules &rules)
 
 
 bool
-RuleRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st, 
+RuleRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
 	const char *filetype)
 {
 	if (node->IsDirectory() || node->IsSymLink())

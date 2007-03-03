@@ -22,7 +22,7 @@ DirectoryRefFilter::DirectoryRefFilter()
 
 
 bool
-DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st, 
+DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
 	const char *filetype)
 {
 	return node->IsDirectory();
@@ -32,13 +32,13 @@ DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
 //	#pragma mark -
 
 
-DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger *target, 
-	const entry_ref *startDirectory, uint32 nodeFlavors, 
-	bool allowMultipleSelection, BMessage *message, BRefFilter *filter,	
+DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger *target,
+	const entry_ref *startDirectory, uint32 nodeFlavors,
+	bool allowMultipleSelection, BMessage *message, BRefFilter *filter,
 	bool modal,	bool hideWhenDone)
-	: BFilePanel(mode, target, startDirectory, nodeFlavors, 
+	: BFilePanel(mode, target, startDirectory, nodeFlavors,
 		allowMultipleSelection, message, filter, modal, hideWhenDone),
-		fCurrentButton(NULL)
+	fCurrentButton(NULL)
 {
 }
 
@@ -48,7 +48,7 @@ DirectoryFilePanel::Show()
 {
 	if (fCurrentButton == NULL) {
 		Window()->Lock();
-		BView* background = Window()->ChildAt(0); 
+		BView* background = Window()->ChildAt(0);
 		BView* cancel = background->FindView("cancel button");
 
 		BRect rect;

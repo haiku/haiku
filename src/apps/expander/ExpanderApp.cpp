@@ -37,7 +37,7 @@ ExpanderApp::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 14, &font);
 
 	alert->Go();
@@ -72,14 +72,14 @@ ExpanderApp::ArgvReceived(int32 argc, char **argv)
 
 void
 ExpanderApp::RefsReceived(BMessage *msg)
-{   	
-   	BMessenger messenger(fWindow);
-   	msg->AddBool("fromApp", true);
-   	messenger.SendMessage(msg);
+{
+	BMessenger messenger(fWindow);
+	msg->AddBool("fromApp", true);
+	messenger.SendMessage(msg);
 }
 
 
-void 
+void
 ExpanderApp::UpdateSettingsFrom(BMessage *message)
 {
 	fSettings.UpdateFrom(message);

@@ -14,9 +14,9 @@
 
 class ExpanderRule {
 	public:
-		ExpanderRule(BString mimetype, BString filenameExtension, 
+		ExpanderRule(BString mimetype, BString filenameExtension,
 			BString listingCmd, BString expandCmd);
-		ExpanderRule(const char*  mimetype, const char*  filenameExtension, 
+		ExpanderRule(const char*  mimetype, const char*  filenameExtension,
 			const char*  listingCmd, const char* expandCmd);
 		BMimeType	&MimeType() { return fMimeType;}
 		BString		&FilenameExtension() { return fFilenameExtension;}
@@ -46,7 +46,7 @@ class ExpanderRules {
 class RuleRefFilter : public BRefFilter {
 	public:
 		RuleRefFilter(ExpanderRules &rules);
-		bool Filter(const entry_ref *ref, BNode* node, struct stat *st, 
+		bool Filter(const entry_ref *ref, BNode* node, struct stat *st,
 			const char *filetype);
 	protected:
 		ExpanderRules &fRules;

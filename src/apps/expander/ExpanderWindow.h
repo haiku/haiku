@@ -39,7 +39,7 @@ class ExpanderWindow : public BWindow {
 
 	private:
 		bool CanQuit();
-			// returns true if the window can be closed safely, false if not
+		// returns true if the window can be closed safely, false if not
 		void CloseWindowOrKeepOpen();
 		void OpenDestFolder();
 		void AutoListing();
@@ -57,22 +57,22 @@ class ExpanderWindow : public BWindow {
 		entry_ref fSourceRef;
 		entry_ref fDestRef;
 		bool fSourceChanged;
-	
+
 		BButton *fSourceButton, *fDestButton, *fExpandButton;
-		BMenuItem *fExpandItem, *fShowItem, *fStopItem, 
+		BMenuItem *fExpandItem, *fShowItem, *fStopItem,
 			*fSourceItem, *fDestItem, *fPreferencesItem;
 		BCheckBox *fShowContents;
 		BTextControl *fSourceText, *fDestText;
 		BStringView* fStatusView;
 		BTextView *fListingText;
 		BScrollView *fListingScroll;
-	
+
 		ExpanderThread *fListingThread;
 		bool fListingStarted;
-	
+
 		ExpanderThread *fExpandingThread;
 		bool fExpandingStarted;
-	
+
 		BMessage fSettings;
 		ExpanderPreferences *fPreferences;
 		ExpanderRules fRules;
