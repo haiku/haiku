@@ -224,7 +224,7 @@ NodeChildTable<ParentNode, NodeChild>::GetNodeChild(vnode_id id,
 
 // _FindElement
 template<typename ParentNode, typename NodeChild>
-NodeChildTable<ParentNode, NodeChild>::Element *
+typename NodeChildTable<ParentNode, NodeChild>::Element *
 NodeChildTable<ParentNode, NodeChild>::_FindElement(vnode_id id,
 													const char *name) const
 {

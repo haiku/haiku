@@ -25,11 +25,11 @@
 // dealings in this Software without prior written authorization of the
 // copyright holder.
 
-#include <algobase.h>
 #include <OS.h>
 
 #include "AreaUtils.h"
 #include "Debug.h"
+#include "Misc.h"
 
 #ifndef USE_STANDARD_FUNCTIONS
 #define USE_STANDARD_FUNCTIONS 0

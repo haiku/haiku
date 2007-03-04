@@ -141,6 +141,8 @@ private:
 			GetKey;
 	typedef AVLTree<Value, Key, Node, KeyCompare, GetKey, NodeAllocator,
 					GetValue> BaseClass;
+public:
+	typedef typename BaseClass::Iterator Iterator;
 
 public:
 	TwoKeyAVLTree();
@@ -210,7 +212,7 @@ Value *
 TWO_KEY_AVL_TREE_CLASS_NAME::FindFirst(const PrimaryKey &key,
 									   Iterator *iterator)
 {
-	Node *node = fRoot;
+	Node *node = BaseClass::fRoot;
 	while (node) {
 		int cmp = fPrimaryKeyCompare(key, fGetPrimaryKey(fGetValue(node)));
 		if (cmp == 0) {
@@ -237,7 +239,7 @@ Value *
 TWO_KEY_AVL_TREE_CLASS_NAME::FindLast(const PrimaryKey &key,
 									  Iterator *iterator)
 {
-	Node *node = fRoot;
+	Node *node = BaseClass::fRoot;
 	while (node) {
 		int cmp = fPrimaryKeyCompare(key, fGetPrimaryKey(fGetValue(node)));
 		if (cmp == 0) {
