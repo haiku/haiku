@@ -88,7 +88,7 @@ private:
 
 // sDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t
+typename List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t
 	List<ITEM, DEFAULT_ITEM_SUPPLIER>::sDefaultItem(
 		DEFAULT_ITEM_SUPPLIER::GetItem());
 
@@ -116,7 +116,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::~List()
 // GetDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
-const List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+const typename List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
 {
 	return sDefaultItem;
@@ -125,7 +125,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
 // GetDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+typename List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem()
 {
 	return sDefaultItem;
@@ -264,7 +264,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::IsEmpty() const
 
 // ItemAt
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-const List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+const typename List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
 {
 	if (index >= 0 && index < fItemCount)
@@ -274,7 +274,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
 
 // ItemAt
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+typename List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
 {
 	if (index >= 0 && index < fItemCount)
@@ -284,7 +284,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
 
 // Items
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-const List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t *
+const typename List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t *
 List<ITEM, DEFAULT_ITEM_SUPPLIER>::Items() const
 {
 	return fItems;

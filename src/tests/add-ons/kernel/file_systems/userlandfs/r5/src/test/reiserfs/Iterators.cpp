@@ -313,7 +313,7 @@ TreeIterator::GoTo(uint32 direction)
 	\return \c B_OK, if everything went fine
 */
 status_t
-TreeIterator::GoToPreviousLeaf(LeafNode **node = NULL)
+TreeIterator::GoToPreviousLeaf(LeafNode **node)
 {
 	status_t error = InitCheck();
 	if (error == B_OK) {
@@ -355,7 +355,7 @@ TreeIterator::GoToPreviousLeaf(LeafNode **node = NULL)
 	\return \c B_OK, if everything went fine
 */
 status_t
-TreeIterator::GoToNextLeaf(LeafNode **node = NULL)
+TreeIterator::GoToNextLeaf(LeafNode **node)
 {
 	status_t error = InitCheck();
 	if (error == B_OK) {
@@ -392,7 +392,7 @@ TreeIterator::GoToNextLeaf(LeafNode **node = NULL)
 	\return \c B_OK, if everything went fine.
 */
 status_t
-TreeIterator::FindRightMostLeaf(const VKey *k, LeafNode **node = NULL)
+TreeIterator::FindRightMostLeaf(const VKey *k, LeafNode **node)
 {
 //printf("TreeIterator::FindRightMostLeaf()\n");
 	status_t error = (k ? InitCheck() : B_BAD_VALUE);

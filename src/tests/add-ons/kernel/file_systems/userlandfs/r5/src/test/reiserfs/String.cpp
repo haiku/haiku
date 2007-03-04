@@ -24,6 +24,8 @@
 
 #include "String.h"
 
+using std::nothrow;
+
 /*!
 	\class String
 	\brief A very simple string class.

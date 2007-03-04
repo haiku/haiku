@@ -19,6 +19,8 @@
 // You can alternatively use *this file* under the terms of the the MIT
 // license included in this package.
 
+#include <new>
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -31,6 +33,8 @@
 #include "cache.h"
 #include "Debug.h"
 #include "reiserfs.h"
+
+using std::nothrow;
 
 /*!
 	\class BlockCache

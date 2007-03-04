@@ -36,7 +36,7 @@ public:
 	uint16 GetLen() const { return le2h(ih_item_len); }
 	uint16 GetLocation() const { return le2h(ih_item_location); }
 	uint16 GetVersion() const { return le2h(ih_version); }
-	const Key *GetKey() const { return static_cast<const Key*>(&ih_key); }
+	const Key *GetKey() const { return Key::CastFrom(&ih_key); }
 	VKey *GetKey(VKey *k) const { k->SetTo(GetKey(), GetVersion()); return k; }
 
 	// indirect item only

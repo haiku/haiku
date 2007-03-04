@@ -24,6 +24,8 @@
 #include "Settings.h"
 #include "Debug.h"
 
+using std::nothrow;
+
 /*!
 	\class Settings
 	\brief Manages the ReiserFS settings.

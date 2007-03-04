@@ -26,6 +26,8 @@
 #include "Debug.h"
 #include "SuperBlock.h"
 
+using std::nothrow;
+
 /*!
 	\class DirEntry
 	\brief Represents the on-disk structure for super block of the FS.

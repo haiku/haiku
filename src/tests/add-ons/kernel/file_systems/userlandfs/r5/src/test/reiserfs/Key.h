@@ -49,6 +49,11 @@ public:
 	Key(const Key &k) : key(k) {}
 	~Key() {}
 
+	static Key* CastFrom(key* k)
+		{ return static_cast<Key*>(k); }
+	static const Key* CastFrom(const key* k)
+		{ return static_cast<const Key*>(k); }
+
 	void SetTo(uint32 dirID, uint32 objectID, uint64 offset, uint32 type,
 			   uint16 version)
 	{

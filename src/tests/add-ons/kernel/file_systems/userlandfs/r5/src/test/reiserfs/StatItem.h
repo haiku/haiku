@@ -42,13 +42,13 @@
 */
 class StatData {
 public:
-	StatData() : fVersion(STAT_DATA_V2), fCurrentData(NULL) {}
+	StatData() : fCurrentData(NULL), fVersion(STAT_DATA_V2) {}
 	StatData(const StatData &data)
-		: fVersion(STAT_DATA_V2), fCurrentData(NULL) { *this = data; }
+		: fCurrentData(NULL), fVersion(STAT_DATA_V2) { *this = data; }
 	StatData(stat_data_v1 *data, bool clone = false)
-		: fVersion(STAT_DATA_V2), fCurrentData(NULL) { SetTo(data, clone); }
+		: fCurrentData(NULL), fVersion(STAT_DATA_V2) { SetTo(data, clone); }
 	StatData(stat_data *data, bool clone = false)
-		: fVersion(STAT_DATA_V2), fCurrentData(NULL) { SetTo(data, clone); }
+		: fCurrentData(NULL), fVersion(STAT_DATA_V2) { SetTo(data, clone); }
 	~StatData() { Unset(); }
 
 	status_t SetTo(stat_data_v1 *data, bool clone = false)
