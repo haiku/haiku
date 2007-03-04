@@ -28,7 +28,8 @@ ServerSettings::ShallEnterDebugger() const
 }
 
 // the global settings
-ServerSettings gServerSettings;
+ServerSettings UserlandFS::gServerSettings;
 
-const char* kUserlandFSDispatcherClipboardName = "userland fs dispatcher";
+const char* UserlandFS::kUserlandFSDispatcherClipboardName
+	= "userland fs dispatcher";
 

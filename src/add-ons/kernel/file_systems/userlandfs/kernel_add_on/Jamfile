@@ -4,7 +4,6 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
 	userlandfs  ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-#SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
@@ -12,12 +11,6 @@ SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 DEFINES += DEBUG_APP="\\\"userlandfs\\\"" ;
-
-local kernelC++ ;
-if $(OSPLAT) = X86 {
-	kernelC++ += kernel-cpp.cpp ;
-	SubDirC++Flags -include [ FDirName $(SUBDIR) kernel-cpp.h ] ;
-}
 
 KernelAddon userlandfs
 	: AreaSupport.cpp
@@ -46,7 +39,5 @@ KernelAddon userlandfs
 	  UserlandFS.cpp
 	  Volume.cpp
 
-#	  $(kernelC++)
-
-	: $(TARGET_GCC_LIBGCC)
+	: $(TARGET_GCC_LIBGCC) $(HAIKU_LIBSUPC++)
 ;

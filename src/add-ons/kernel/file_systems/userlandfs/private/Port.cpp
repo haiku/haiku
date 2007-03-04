@@ -6,6 +6,8 @@
 #include "Compatibility.h"
 #include "Port.h"
 
+using std::nothrow;
+
 // minimal and maximal port size
 static const int32 kMinPortSize = 1024;			// 1 kB
 static const int32 kMaxPortSize = 64 * 1024;	// 64 kB

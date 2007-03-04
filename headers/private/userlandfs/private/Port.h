@@ -5,6 +5,8 @@
 
 #include <OS.h>
 
+class KernelDebug;
+
 namespace UserlandFSUtil {
 
 struct PortInfo {
@@ -40,7 +42,7 @@ public:
 			status_t			Receive(bigtime_t timeout = -1);
 
 private:
-			friend class KernelDebug;
+			friend class ::KernelDebug;
 
 			Info				fInfo;
 			uint8*				fBuffer;

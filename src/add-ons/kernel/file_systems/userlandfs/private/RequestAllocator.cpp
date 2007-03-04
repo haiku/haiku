@@ -8,6 +8,8 @@
 #include "Port.h"
 #include "RequestAllocator.h"
 
+using std::nothrow;
+
 // constructor
 RequestAllocator::RequestAllocator(Port* port)
 	: fError(B_NO_INIT),

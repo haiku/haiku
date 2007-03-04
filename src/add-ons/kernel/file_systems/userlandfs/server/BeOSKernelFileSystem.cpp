@@ -6,6 +6,8 @@
 
 #include "BeOSKernelVolume.h"
 
+using std::nothrow;
+
 // constructor
 BeOSKernelFileSystem::BeOSKernelFileSystem(beos_vnode_ops* fsOps)
 	: FileSystem(),

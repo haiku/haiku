@@ -12,6 +12,8 @@
 #include "Port.h"
 #include "String.h"
 
+using std::nothrow;
+
 namespace UserlandFS {
 
 // FSInfo

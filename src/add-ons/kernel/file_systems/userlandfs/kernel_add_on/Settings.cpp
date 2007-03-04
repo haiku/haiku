@@ -2,12 +2,16 @@
 
 #include <new>
 
+#include <stdlib.h>
+
 #include <driver_settings.h>
 
 #include "Debug.h"
 #include "HashMap.h"
 #include "IOCtlInfo.h"
 #include "Settings.h"
+
+using std::nothrow;
 
 static const char *kFSName = "userlandfs";
 

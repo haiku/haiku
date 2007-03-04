@@ -8,6 +8,8 @@
 #include "ServerDefs.h"
 #include "UserlandRequestHandler.h"
 
+using std::nothrow;
+
 static const int32 sTLSVariable = tls_allocate();
 
 // constructor

@@ -1,9 +1,12 @@
 // RequestPortPool.cpp
 
+#include "RequestPortPool.h"
+
+#include <stdlib.h>
+
 #include "AutoLocker.h"
 #include "Debug.h"
 #include "RequestPort.h"
-#include "RequestPortPool.h"
 
 typedef AutoLocker<RequestPortPool> PoolLocker;
 

@@ -41,7 +41,7 @@ private:
 			void				_PopAllocator();
 
 private:
-			friend class KernelDebug;
+			friend class ::KernelDebug;
 			struct AllocatorNode;
 
 			Port				fPort;

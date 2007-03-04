@@ -5,6 +5,7 @@
 
 #include <SupportDefs.h>
 
+#include "AutoLocker.h"
 #include "HashMap.h"
 #include "String.h"
 
@@ -40,6 +41,7 @@ private:
 private:
 			friend class KernelDebug;
 			typedef SynchronizedHashMap<String, FileSystem*> FileSystemMap;
+			typedef AutoLocker<UserlandFS::FileSystemMap> FileSystemLocker;
 
 	static	UserlandFS*			sUserlandFS;
 

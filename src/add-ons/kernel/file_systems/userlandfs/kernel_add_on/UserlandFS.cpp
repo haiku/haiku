@@ -2,7 +2,6 @@
 
 #include <KernelExport.h>
 
-#include "AutoLocker.h"
 #include "Compatibility.h"
 #include "Debug.h"
 #include "DispatcherDefs.h"
@@ -12,7 +11,6 @@
 #include "Requests.h"
 #include "UserlandFS.h"
 
-typedef AutoLocker<UserlandFS::FileSystemMap> FileSystemLocker;
 
 UserlandFS* UserlandFS::sUserlandFS = NULL;
 

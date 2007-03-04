@@ -8,6 +8,8 @@
 #include "RequestHandler.h"
 #include "RequestPort.h"
 
+using std::nothrow;
+
 // TODO: Limit the stacking of requests?
 
 // AllocatorNode
