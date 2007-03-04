@@ -603,14 +603,19 @@ TermWindow::WindowActivated (bool )
 
 
 void
-TermWindow::Quit(void)
+TermWindow::Quit()
 {
 	delete fTermParse;
 	delete fCodeConv;
-	if (fPrefWindow) fPrefWindow->PostMessage (B_QUIT_REQUESTED);
-	if (fFindPanel) fFindPanel->PostMessage(B_QUIT_REQUESTED);
+	if (fPrefWindow) 
+		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
+
+	if (fFindPanel && fFindPanel->Lock()) {
+		fFindPanel->Quit();
+		fFindPanel = NULL;
+	}
 	
-	be_app->PostMessage (B_QUIT_REQUESTED, be_app);
+	be_app->PostMessage(B_QUIT_REQUESTED, be_app);
 	BWindow::Quit ();
 }
 

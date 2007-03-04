@@ -1,68 +1,30 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Copyright 2007, Haiku, Inc.
+ * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
-#include <Window.h>
-#include <Rect.h>
-#include <TextControl.h>
-#include <Box.h>
-#include <CheckBox.h>
-#include <Button.h>
-#include <RadioButton.h>
-#include <Message.h>
-#include <stdio.h>
-#include <File.h>
-#include <String.h>
 
-#include "TermWindow.h"
 #include "FindDlg.h"
-#include "TermApp.h"
-#include "MenuUtil.h"
-#include "PrefHandler.h"
 
-// message define
+#include <Box.h>
+#include <Button.h>
+#include <CheckBox.h>
+#include <RadioButton.h>
+#include <String.h>
+#include <TextControl.h>
+
 
 const uint32 MSG_FIND_HIDE = 'Fhid';
 
-//////////////////////////////////////////////////////////////////////////////
-// FindDlg
-// 	Constructer
-//////////////////////////////////////////////////////////////////////////////
-FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str, 
-				  bool findselection, bool matchword, bool matchcase, bool forwardsearch)
-	: BWindow(frame, "Find",
-		B_FLOATING_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
-{
- 	fWindow = win;
-	SetTitle("Find");
 
-	AddShortcut ((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage (MSG_FIND_HIDE));
+FindDlg::FindDlg (BRect frame, BMessenger messenger , BString &str, 
+	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
+	: BWindow(frame, "Find", B_FLOATING_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
+	fFindDlgMessenger(messenger)
+{
+	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(MSG_FIND_HIDE));
 
 	//Build up view
 	fFindView = new BView(Bounds(), "FindView", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -75,12 +37,12 @@ FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str,
 
 	//These labels are from the bottom up
 	float buttonsTop = frame.Height() - 19 - lineHeight;
-	float matchwordBottom = buttonsTop - 4;
-	float matchwordTop = matchwordBottom - lineHeight - 8;
-	float matchcaseBottom = matchwordTop - 4;
-	float matchcaseTop = matchcaseBottom - lineHeight - 8;
-	float forwardsearchBottom = matchcaseTop - 4;
-	float forwardsearchTop = forwardsearchBottom - lineHeight - 8;
+	float matchWordBottom = buttonsTop - 4;
+	float matchWordTop = matchWordBottom - lineHeight - 8;
+	float matchCaseBottom = matchWordTop - 4;
+	float matchCaseTop = matchCaseBottom - lineHeight - 8;
+	float forwardSearchBottom = matchCaseTop - 4;
+	float forwardSearchTop = forwardSearchBottom - lineHeight - 8;
 
 	//These things are calculated from the top
 	float textRadioTop = 12;
@@ -90,11 +52,11 @@ FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str,
 	float selectionRadioBottom = selectionRadioTop + lineHeight + 8;
 
 	//Divider
-	float dividerHeight = (selectionRadioBottom + forwardsearchTop) / 2;
+	float dividerHeight = (selectionRadioBottom + forwardSearchTop) / 2;
 	
 	//Button Coordinates
-	float searchbuttonLeft = (frame.Width() - fFindView->StringWidth("Find") - 60) / 2;
-	float searchbuttonRight = searchbuttonLeft + fFindView->StringWidth("Find") + 60; 
+	float searchButtonLeft = (frame.Width() - fFindView->StringWidth("Find") - 60) / 2;
+	float searchButtonRight = searchButtonLeft + fFindView->StringWidth("Find") + 60; 
 	
 	//Build the Views
 	fTextRadio = new BRadioButton(BRect(14, textRadioTop, textRadioRight, textRadioBottom),
@@ -105,7 +67,7 @@ FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str,
 		"fFindLabel", "", "", NULL);
 	fFindLabel->SetDivider(0);
 	fFindView->AddChild(fFindLabel);
-	if (!findselection)
+	if (!findSelection)
 		fFindLabel->SetText(str.String());
 	fFindLabel->MakeFocus(true);
 
@@ -113,7 +75,7 @@ FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str,
 		"fSelectionRadio", "Use Selection", NULL);
 	fFindView->AddChild(fSelectionRadio);
 	
-	if (findselection)
+	if (findSelection)
 		fSelectionRadio->SetValue(B_CONTROL_ON);
 	else
 		fTextRadio->SetValue(B_CONTROL_ON);
@@ -121,25 +83,25 @@ FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str,
 	fSeparator = new BBox(BRect(6, dividerHeight, frame.Width() - 6, dividerHeight + 1));
 	fFindView->AddChild(fSeparator);
 	
-	fForwardSearchBox = new BCheckBox(BRect(14, forwardsearchTop, frame.Width() - 14, forwardsearchBottom),
+	fForwardSearchBox = new BCheckBox(BRect(14, forwardSearchTop, frame.Width() - 14, forwardSearchBottom),
 		"fForwardSearchBox", "Search Forward", NULL);
 	fFindView->AddChild(fForwardSearchBox);
-	if (forwardsearch)
+	if (forwardSearch)
 		fForwardSearchBox->SetValue(B_CONTROL_ON);
 	
-	fMatchCaseBox = new BCheckBox(BRect(14, matchcaseTop, frame.Width() - 14, matchcaseBottom),
+	fMatchCaseBox = new BCheckBox(BRect(14, matchCaseTop, frame.Width() - 14, matchCaseBottom),
 		"fMatchCaseBox", "Match Case", NULL);
 	fFindView->AddChild(fMatchCaseBox);
-	if (matchcase)
+	if (matchCase)
 		fMatchCaseBox->SetValue(B_CONTROL_ON);
 	
-	fMatchWordBox = new BCheckBox(BRect(14, matchwordTop, frame.Width() - 14, matchwordBottom),
+	fMatchWordBox = new BCheckBox(BRect(14, matchWordTop, frame.Width() - 14, matchWordBottom),
 		"fMatchWordBox", "Match Word", NULL);
 	fFindView->AddChild(fMatchWordBox);
-	if (matchword)
+	if (matchWord)
 		fMatchWordBox->SetValue(B_CONTROL_ON);
 	
-	fFindButton = new BButton(BRect(searchbuttonLeft, buttonsTop, searchbuttonRight, frame.Height() - 14),
+	fFindButton = new BButton(BRect(searchButtonLeft, buttonsTop, searchButtonRight, frame.Height() - 14),
 		"fFindButton", "Find", new BMessage(MSG_FIND));
 	fFindButton->MakeDefault(true);
 	fFindView->AddChild(fFindButton);
@@ -147,39 +109,45 @@ FindDlg::FindDlg (BRect frame, TermWindow *win , BString &str,
 	Show();
 }
 
-FindDlg::~FindDlg (void)
+
+FindDlg::~FindDlg()
 {
-  
 }
 
+
 void
-FindDlg::MessageReceived (BMessage *msg)
+FindDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case B_QUIT_REQUESTED:
 			Quit();
 			break;
+
 		case MSG_FIND:
-			SendFindMessage();
+			_SendFindMessage();
 			break;
+
 		case MSG_FIND_HIDE:
 			Quit();
 			break;
+
 		default:
 			BWindow::MessageReceived(msg);
 			break;
 	}
 }
 
-void
-FindDlg::Quit (void)
-{
-	fWindow->PostMessage(MSG_FIND_CLOSED);
-	BWindow::Quit ();
-}
 
 void
-FindDlg::SendFindMessage (void)
+FindDlg::Quit()
+{
+	fFindDlgMessenger.SendMessage(MSG_FIND_CLOSED);
+	BWindow::Quit();
+}
+
+
+void
+FindDlg::_SendFindMessage()
 {
 	BMessage message(MSG_FIND);
 
@@ -195,5 +163,5 @@ FindDlg::SendFindMessage (void)
 	message.AddBool("matchcase", fMatchCaseBox->Value() == B_CONTROL_ON);
 	message.AddBool("matchword", fMatchWordBox->Value() == B_CONTROL_ON);
 	
-	fWindow->PostMessage(&message);
+	fFindDlgMessenger.SendMessage(&message);
 }
