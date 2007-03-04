@@ -21,6 +21,10 @@ typedef struct {
 
 #include <size_t.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern wint_t	fgetwc(FILE *);
 extern wchar_t	*fgetws(wchar_t *, int, FILE *);
 extern wint_t	fputwc(wchar_t, FILE *);
@@ -81,6 +85,10 @@ extern int		wcswidth(const wchar_t *, size_t);
 extern size_t	wcsxfrm(wchar_t *, const wchar_t *, size_t);
 extern wctype_t	wctype(const char *);
 extern int		wcwidth(wchar_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #define WEOF ((wint_t)(-1))
 
