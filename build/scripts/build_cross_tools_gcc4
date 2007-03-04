@@ -54,8 +54,7 @@ gccSourceDir=$buildToolsDir/gcc
 
 
 # get gcc version
-gccVersion=$(grep "const char version_string" $gccSourceDir/gcc/version.c \
-	| sed -e 's@.*"\(.*\)".*@\1@')
+gccVersion=$(cat $gccSourceDir/gcc/BASE-VER)
 
 if [ -z "$gccVersion" ]; then
 	echo "Failed to find out gcc version." >&2
