@@ -8,28 +8,23 @@
 #include "LazyInitializable.h"
 #include "Locker.h"
 #include "Referencable.h"
+#include "RequestPort.h"
 #include "RequestPortPool.h"
 #include "String.h"
 #include "Vector.h"
 
-namespace UserlandFSUtil {
-
-class RequestPort;
-
-}
-
-using UserlandFSUtil::RequestPort;
 
 struct IOCtlInfo;
 class Settings;
 class Volume;
 
-class FileSystem : public LazyInitializable, public Referencable {
+class FileSystem {
 public:
-								FileSystem(const char* name,
-									RequestPort* initPort,
-									status_t* error);
+								FileSystem();
 								~FileSystem();
+
+			status_t			Init(const char* name, Port::Info* infos,
+									int32 infoCount);
 
 			const char*			GetName() const;
 
@@ -52,9 +47,6 @@ public:
 
 			bool				IsUserlandServerThread() const;
 
-protected:
-	virtual	status_t			FirstTimeInit();
-
 private:
 	static	int32				_NotificationThreadEntry(void* data);
 			int32				_NotificationThread();
@@ -67,13 +59,13 @@ private:
 			Vector<Volume*>		fVolumes;
 			Locker				fVolumeLock;
 			String				fName;
-			RequestPort*		fInitPort;
 			RequestPort*		fNotificationPort;
 			thread_id			fNotificationThread;
 			RequestPortPool		fPortPool;
 			SelectSyncMap*		fSelectSyncs;
 			Settings*			fSettings;
 			team_id				fUserlandServerTeam;
+			bool				fInitialized;
 	volatile bool				fTerminating;
 };
 

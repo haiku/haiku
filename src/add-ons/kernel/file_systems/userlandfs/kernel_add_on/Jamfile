@@ -32,6 +32,7 @@ KernelAddon userlandfs
 	  userlandfs_ioctl.cpp
 
 	  FileSystem.cpp
+	  FileSystemInitializer.cpp
 	  kernel_interface.cpp
 	  KernelDebug.cpp
 	  KernelRequestHandler.cpp

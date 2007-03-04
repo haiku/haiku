@@ -1,15 +1,17 @@
 // UserlandFS.cpp
 
+#include "UserlandFS.h"
+
 #include <KernelExport.h>
 
 #include "Compatibility.h"
 #include "Debug.h"
 #include "DispatcherDefs.h"
 #include "FileSystem.h"
+#include "FileSystemInitializer.h"
 #include "KernelDebug.h"
 #include "RequestPort.h"
 #include "Requests.h"
-#include "UserlandFS.h"
 
 
 UserlandFS* UserlandFS::sUserlandFS = NULL;
@@ -90,34 +92,34 @@ UserlandFS::RegisterFileSystem(const char* name, FileSystem** _fileSystem)
 		return B_BAD_VALUE;
 
 	// check, if we do already know this file system, and create it, if not
-	FileSystem* fileSystem;
+	FileSystemInitializer* fileSystemInitializer;
 	{
 		FileSystemLocker _(fFileSystems);
-		fileSystem = fFileSystems->Get(name);
-		if (fileSystem) {
-			fileSystem->AddReference();
+		fileSystemInitializer = fFileSystems->Get(name);
+		if (fileSystemInitializer) {
+			fileSystemInitializer->AddReference();
 		} else {
-			status_t error;
-			fileSystem = new(nothrow) FileSystem(name, fPort, &error);
-			if (!fileSystem)
+			fileSystemInitializer = new(nothrow) FileSystemInitializer(name,
+				fPort);
+			if (!fileSystemInitializer)
 				return B_NO_MEMORY;
-			if (error == B_OK)
-				error = fFileSystems->Put(name, fileSystem);
+
+			status_t error = fFileSystems->Put(name, fileSystemInitializer);
 			if (error != B_OK) {
-				delete fileSystem;
+				delete fileSystemInitializer;
 				return error;
 			}
 		}
 	}
 
 	// prepare the file system
-	status_t error = fileSystem->Access();
+	status_t error = fileSystemInitializer->Access();
 	if (error != B_OK) {
-		UnregisterFileSystem(fileSystem);
+		_UnregisterFileSystem(name);
 		return error;
 	}
 
-	*_fileSystem = fileSystem;
+	*_fileSystem = fileSystemInitializer->GetFileSystem();
 	return error;
 }
 
@@ -128,22 +130,7 @@ UserlandFS::UnregisterFileSystem(FileSystem* fileSystem)
 	if (!fileSystem)
 		return B_BAD_VALUE;
 
-	// find the FS and decrement its reference counter
-	bool deleteFS = false;
-	{
-		FileSystemLocker _(fFileSystems);
-		fileSystem = fFileSystems->Get(fileSystem->GetName());
-		if (!fileSystem)
-			return B_BAD_VALUE;
-		deleteFS = fileSystem->RemoveReference();
-		if (deleteFS)
-			fFileSystems->Remove(fileSystem->GetName());
-	}
-
-	// delete the FS, if the last reference has been removed
-	if (deleteFS)
-		delete fileSystem;
-	return B_OK;
+	return _UnregisterFileSystem(fileSystem->GetName());
 }
 
 // CountFileSystems
@@ -205,3 +192,29 @@ UserlandFS::_Init()
 	RETURN_ERROR(error);
 }
 
+// _UnregisterFileSystem
+status_t
+UserlandFS::_UnregisterFileSystem(const char* name)
+{
+	if (!name)
+		return B_BAD_VALUE;
+
+	// find the FS and decrement its reference counter
+	FileSystemInitializer* fileSystemInitializer = NULL;
+	bool deleteFS = false;
+	{
+		FileSystemLocker _(fFileSystems);
+		fileSystemInitializer = fFileSystems->Get(name);
+		if (!fileSystemInitializer)
+			return B_BAD_VALUE;
+
+		deleteFS = fileSystemInitializer->RemoveReference();
+		if (deleteFS)
+			fFileSystems->Remove(name);
+	}
+
+	// delete the FS, if the last reference has been removed
+	if (deleteFS)
+		delete fileSystemInitializer;
+	return B_OK;
+}

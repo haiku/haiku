@@ -18,6 +18,7 @@ class RequestPort;
 using UserlandFSUtil::RequestPort;
 
 class FileSystem;
+class FileSystemInitializer;
 
 class UserlandFS {
 private:
@@ -36,13 +37,16 @@ public:
 			int32				CountFileSystems() const;
 
 private:
-			status_t			_Init();
-
-private:
 			friend class KernelDebug;
-			typedef SynchronizedHashMap<String, FileSystem*> FileSystemMap;
+			typedef SynchronizedHashMap<String, FileSystemInitializer*>
+				FileSystemMap;
 			typedef AutoLocker<UserlandFS::FileSystemMap> FileSystemLocker;
 
+private:
+			status_t			_Init();
+			status_t			_UnregisterFileSystem(const char* name);
+
+private:
 	static	UserlandFS*			sUserlandFS;
 
 			RequestPort*		fPort;

@@ -1,10 +1,12 @@
 // KernelDebug.cpp
 
+#include "KernelDebug.h"
+
 #include <KernelExport.h>
 
 #include "Debug.h"
 #include "FileSystem.h"
-#include "KernelDebug.h"
+#include "FileSystemInitializer.h"
 #include "RequestPort.h"
 #include "RequestPortPool.h"
 #include "UserlandFS.h"
@@ -16,19 +18,23 @@ static vint32 sCommandsAdded = 0;
 int
 KernelDebug::DebugUFS(int argc, char** argv)
 {
-	typedef HashMap<String, FileSystem*> KDebugFSMap;
+	typedef HashMap<String, FileSystemInitializer*> KDebugFSMap;
 	UserlandFS* userlandFS = UserlandFS::GetUserlandFS();
 	KDebugFSMap& fileSystems = userlandFS->fFileSystems->GetUnsynchronizedMap();
+
 	for (KDebugFSMap::Iterator it = fileSystems.GetIterator();
 		 it.HasNext();) {
 		KDebugFSMap::Entry entry = it.Next();
-		FileSystem* fs = entry.value;
-		kprintf("file system %p: %s\n", fs, fs->GetName());
-		kprintf("  port pool %p\n", fs->GetPortPool());
-		int32 volumeCount = fs->fVolumes.Count();
-		for (int32 i = 0; i < volumeCount; i++) {
-			Volume* volume = fs->fVolumes.ElementAt(i);
-			kprintf("  volume %p: %ld\n", volume, volume->GetID());
+		FileSystemInitializer* fsInitializer = entry.value;
+		FileSystem* fs = fsInitializer->GetFileSystem();
+		kprintf("file system %p: %s\n", fs, (fs ? fs->GetName() : NULL));
+		if (fs) {
+			kprintf("  port pool %p\n", fs->GetPortPool());
+			int32 volumeCount = fs->fVolumes.Count();
+			for (int32 i = 0; i < volumeCount; i++) {
+				Volume* volume = fs->fVolumes.ElementAt(i);
+				kprintf("  volume %p: %ld\n", volume, volume->GetID());
+			}
 		}
 	}
 	return 0;
