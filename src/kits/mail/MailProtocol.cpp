@@ -58,6 +58,7 @@ class MessageDeletion : public BMailChainCallback {
 		BEntry *entry;
 };
 
+} // unnamed namspace
 
 inline void
 BMailProtocol::error_alert(const char *process, status_t error)
@@ -72,6 +73,8 @@ BMailProtocol::error_alert(const char *process, status_t error)
 	)
 }
 
+
+namespace {
 
 class DeleteHandler : public BHandler {
 	public:
@@ -149,6 +152,8 @@ class TrashMonitor : public BHandler {
 		int32 messages_for_us;
 		int32 id;
 };
+
+} // unnamed namspace
 
 BMailProtocol::BMailProtocol(BMessage *settings, BMailChainRunner *run)
 	: BMailFilter(settings),
@@ -373,6 +378,4 @@ MessageDeletion::Callback(status_t result)
 	info.GetType(type);
 	if ((always && strcmp(B_MAIL_TYPE,type) == 0) || result == B_MAIL_DISCARD)
 		us->DeleteMessage(message_id);
-}
-
 }

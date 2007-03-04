@@ -112,14 +112,6 @@ private:
 };
 
 
-template<class T>
-inline status_t
-read_helper(BDataIO *stream, T &data)
-{
-	return normalize_err(stream->Read((void *)&data, sizeof(T)));
-}
-
-
 template<>
 inline void
 byte_swap(double &data)

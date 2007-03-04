@@ -172,7 +172,7 @@ protected:
   	void GetVariableSet(vector<QcFloat> &vars)
   		{ fSystem.GetVariableSet(vars); }
 
-	virtual void QcLinEqSolver::Print(ostream &os) const;
+	virtual void Print(ostream &os) const;
 };
 
 inline QcLinEqSolver::QcLinEqSolver()

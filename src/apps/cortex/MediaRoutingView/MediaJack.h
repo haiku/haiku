@@ -24,6 +24,8 @@ class BBitmap;
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
 
+int compareTypeAndID(const void *lValue, const void *rValue);
+
 class MediaJack : public DiagramEndPoint
 {
 

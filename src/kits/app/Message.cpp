@@ -30,6 +30,7 @@
 #include <Rect.h>
 #include <String.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <malloc.h>
 #include <stdio.h>

@@ -4,6 +4,7 @@
 #include "OggVorbisSeekable.h"
 #include "OggFormats.h"
 #include <Autolock.h>
+#include <assert.h>
 #include <stdio.h>
 
 #define TRACE_THIS 1

@@ -694,6 +694,7 @@ BPositionIO *outDestination, color_space fromspace, MSInfoHeader &msheader)
 					break;
 				
 				case B_CMAP8:
+				{
 					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
 					bmppixel = bmpRowData + (i * 3);
 					rgb_color c = pmap->color_list[bitspixel[0]];
@@ -701,6 +702,7 @@ BPositionIO *outDestination, color_space fromspace, MSInfoHeader &msheader)
 					bmppixel[1] = c.green;
 					bmppixel[2] = c.red;
 					break;
+				}
 					
 				case B_GRAY8:
 					bitspixel = bitsRowData + (i * bitsBytesPerPixel);

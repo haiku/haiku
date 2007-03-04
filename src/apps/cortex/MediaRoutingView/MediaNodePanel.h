@@ -22,6 +22,8 @@
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
 
+int compareID(const void *lValue, const void *rValue);
+
 class MediaIcon;
 class NodeRef;
 

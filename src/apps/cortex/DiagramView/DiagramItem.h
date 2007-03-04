@@ -28,6 +28,8 @@ class DiagramItemGroup;
 class DiagramView;
 class DiagramBox;
 
+int compareSelectionTime(const void *lValue, const void *rValue);
+
 class DiagramItem
 {
 	friend class DiagramItemGroup;

@@ -285,6 +285,8 @@ GetSubFolders(BDirectory *of, BStringList *folders, const char *prepend)
 	}
 }
 
+} // unnamed namspace
+
 
 BRemoteMailStorageProtocol::BRemoteMailStorageProtocol(BMessage *settings,
 	BMailChainRunner *runner)
@@ -300,8 +302,6 @@ BRemoteMailStorageProtocol::~BRemoteMailStorageProtocol()
 {
 	delete handler;
 }
-
-}	// empty namespace
 
 
 //----BMailProtocol stuff

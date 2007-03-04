@@ -40,8 +40,8 @@ private:
 	friend class BDiskDeviceList;
 	friend class BDiskDeviceRoster;
 
-	BDiskDevice::BDiskDevice(const BDiskDevice &);
-	BDiskDevice &BDiskDevice::operator=(const BDiskDevice &);
+	BDiskDevice(const BDiskDevice &);
+	BDiskDevice &operator=(const BDiskDevice &);
 
 	static status_t _GetData(partition_id id, bool deviceOnly, bool shadow,
 							 size_t neededSize, user_disk_device_data **data);

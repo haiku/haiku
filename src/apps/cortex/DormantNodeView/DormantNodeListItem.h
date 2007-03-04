@@ -25,6 +25,10 @@ __BEGIN_CORTEX_NAMESPACE
 class DormantNodeView;
 class MediaIcon;
 
+int compareName(const void *lValue, const void *rValue);
+int compareAddOnID(const void *lValue, const void *rValue);
+
+
 class DormantNodeListItem :
 	public	BListItem {
 	typedef	BListItem _inherited;

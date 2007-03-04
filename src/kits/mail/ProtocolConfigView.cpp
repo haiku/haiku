@@ -84,6 +84,8 @@ float FindWidestLabel(BView *view)
 	return width;
 }
 
+} // unnamed namspace
+
 
 //----------------Real code----------------------
 BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) : BView (BRect(0,0,100,20), "protocol_config_view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) {
@@ -326,5 +328,3 @@ void BMailProtocolConfigView::GetPreferredSize(float *width, float *height) {
 	*width = minWidth + 10;
 	*height = (CountChildren() * gItemHeight) + 5;
 }
-
-}	// namespace

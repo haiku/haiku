@@ -43,6 +43,8 @@ All rights reserved.
 
 namespace BPrivate {
 
+bool ShouldShowDesktopPose(dev_t device, const Model *model, const PoseInfo *);
+
 class DesktopPoseView : public BPoseView {
 	// overrides BPoseView to add desktop-view specific code
 public:

@@ -28,7 +28,7 @@ class MonitorView : public BView {
 		void SetResolution(int32 width, int32 height);
 
 	private:
-		BRect MonitorView::MonitorBounds();
+		BRect MonitorBounds();
 
 		rgb_color	fDesktopColor;
 		int32		fWidth;
