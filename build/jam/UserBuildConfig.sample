@@ -75,3 +75,19 @@ AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
 # used, i.e. a variable "rc" referring to the rc command built for the host
 # platform is defined in the script.
 AddTargetVariableToScript test.inc : <build>rc ;
+
+
+# Optimizing Jamfile Parsing Times
+
+# Setting this variable will prevent the root Jamfile to include the Jamfile
+# in the src directory. Instead only the directories required for building the
+# build tools are included. Only useful in combination with DeferredSubInclude.
+HAIKU_DONT_INCLUDE_SRC = 1 ;
+
+# Schedule the given subdirectory for inclusion at the end of the root
+# Jamfile (directly using SubInclude here is not possible). Using this
+# feature together with HAIKU_DONT_INCLUDE_SRC allows developers working
+# only on a subproject to reduce Jamfile parsing times considerably.
+DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
+	userlandfs ;
+

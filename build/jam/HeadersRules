@@ -397,5 +397,44 @@ rule FStandardHeaders
 	return $(headers) ;
 }
 
+rule DeferredSubInclude params
+{
+	# DeferredSubInclude <subdir tokens> ;
+	#
+	# Takes the same parameter as SubInclude. The the subdirectory referred to
+	# by <subdir tokens> will be included when ExecuteDeferredSubIncludes is
+	# invoked, i.e. at the end of the root Jamfile.
+
+	HAIKU_DEFERRED_SUB_INCLUDES += "/" $(params) ;
+}
+
+rule ExecuteDeferredSubIncludes
+{
+	# ExecuteDeferredSubIncludes ;
+	#
+	# Performs the deferred SubIncludes scheduled by DeferredSubInclude.
+
+	local tokensList = $(HAIKU_DEFERRED_SUB_INCLUDES) ;
+	while $(tokensList) {
+		# chop off leading "/"
+		tokensList = $(tokensList[2-]) ;
+
+		# get the tokens for the next include
+		local tokens ;
+		while $(tokensList) && $(tokensList[1]) != "/" {
+			tokens += $(tokensList[1]) ;
+			tokensList = $(tokensList[2-]) ;
+		}
+
+		# perform the include
+		if $(tokens) {
+			SubInclude $(tokens) ;
+		}
+	}
+}
+
+# The variable used to collect the deferred SubIncludes.
+HAIKU_DEFERRED_SUB_INCLUDES = ;
+
 # SUBDIRSYSHDRS shall be reset automatically for each subdir
 SUBDIRRESET += SYSHDRS ;

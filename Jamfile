@@ -132,4 +132,15 @@ Depends ScreenSaverKit :
 	Haiku
 ;
 
-SubInclude HAIKU_TOP src ;
+# Optionally we allow not to include the "src" subdirectory.
+if $(HAIKU_DONT_INCLUDE_SRC) {
+	# Don't include "src", but at least include the stuff needed for the
+	# build.
+	SubInclude HAIKU_TOP src build ;
+	SubInclude HAIKU_TOP src tools ;
+} else {
+	SubInclude HAIKU_TOP src ;
+}
+
+# Perform deferred SubIncludes.
+ExecuteDeferredSubIncludes ;
