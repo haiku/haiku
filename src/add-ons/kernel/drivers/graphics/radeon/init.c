@@ -374,8 +374,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	di->memmgr[mt_AGP] = NULL;
 	
 	// fix AGP settings for IGP chipset
-	if( di->asic == rt_rs100 || di->asic == rt_rs200 || di->asic == rt_rs300)
-		Radeon_Fix_AGP();
+	Radeon_Set_AGP( di, !di->settings.force_pci ); // disable AGP
 
 	if ( di->acc_dma )
 	{

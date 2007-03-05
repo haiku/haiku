@@ -39,7 +39,6 @@ static uint32 getTopOfRam()
 static void Radeon_SetupMCAddresses_Direct( device_info *di )
 {
 	shared_info *si = di->si;
-	uint32 mc_fb_location;
 	uint32 aper0 = INREG( di->regs, RADEON_CONFIG_APER_0_BASE );
 	
 	// bug in asics mean memory must be aligned to memory size... 
@@ -47,13 +46,9 @@ static void Radeon_SetupMCAddresses_Direct( device_info *di )
 		aper0 &= ~( di->local_mem_size - 1 );
 	}
 	
-	mc_fb_location = ( aper0 >> 16 ) || 
-		(aper0 + di->local_mem_size - 1 ) & 0xffff0000;
-	
-	
 	// set address range of video memory;
 	// use the same addresses the CPU sees
-	si->memory[mt_local].virtual_addr_start = mc_fb_location;
+	si->memory[mt_local].virtual_addr_start = aper0;
 	si->memory[mt_local].virtual_size = di->local_mem_size;
 
 	// PCI GART has no corresponding CPU address space, so we must find an unused

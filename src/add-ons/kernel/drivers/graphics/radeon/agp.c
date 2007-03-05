@@ -7,223 +7,184 @@
 	AGP fix. Some motherboard BIOSes enable FastWrite even
 	though the graphics card doesn't support it. Here, we'll
 	fix that (hopefully it is generic enough).
+
+	updated to use AGP_BUS mananager
 */
 
 
 #include "radeon_driver.h"
 
-
-// missing PCI definitions
-#define  PCI_status_cap_list	0x10	/* Support Capability List */
-
-#define  PCI_header_type_normal		0
-#define  PCI_header_type_bridge 	1
-#define  PCI_header_type_cardbus 	2
-
-#define PCI_capability_list		0x34	/* Offset of first capability list entry */
-#define PCI_cb_capability_list	0x14
-
-#define PCI_cap_list_id		0	/* Capability ID */
-#define PCI_cap_id_pm		0x01	/* Power Management */
-#define PCI_cap_id_agp		0x02	/* Accelerated Graphics Port */
-#define PCI_cap_id_vpd		0x03	/* Vital Product Data */
-#define PCI_cap_id_slotid	0x04	/* Slot Identification */
-#define PCI_cap_id_msi		0x05	/* Message Signalled Interrupts */
-#define PCI_cap_id_chswp	0x06	/* CompactPCI HotSwap */
-#define PCI_cap_list_next	1	/* Next capability in the list */
-#define PCI_cap_flags		2	/* Capability defined flags (16 bits) */
-#define PCI_cap_sizeof		4
-
-
-#define PCI_agp_status			4	/* Status register */
-#define PCI_agp_status_rq_mask	0xff000000	/* Maximum number of requests - 1 */
-#define PCI_agp_status_rq_shift	24
-#define PCI_agp_status_sba		0x0200	/* Sideband addressing supported */
-#define PCI_agp_status_64bit	0x0020	/* 64-bit addressing supported */
-#define PCI_agp_status_fw		0x0010	/* FW transfers supported */
-#define PCI_agp_status_rate4	0x0004	/* 4x transfer rate supported */
-#define PCI_agp_status_rate2	0x0002	/* 2x transfer rate supported */
-#define PCI_agp_status_rate1	0x0001	/* 1x transfer rate supported */
-
-#define PCI_agp_command			8	/* Control register */
-#define PCI_agp_command_rq_mask 0xff000000  /* Master: Maximum number of requests */
-#define PCI_agp_command_rq_shift 24
-#define PCI_agp_command_sba		0x0200	/* Sideband addressing enabled */
-#define PCI_agp_command_agp		0x0100	/* Allow processing of AGP transactions */
-#define PCI_agp_command_64bit	0x0020 	/* Allow processing of 64-bit addresses */
-#define PCI_agp_command_fw		0x0010 	/* Force FW transfers */
-#define PCI_agp_command_rate4	0x0004	/* Use 4x rate */
-#define PCI_agp_command_rate2	0x0002	/* Use 2x rate */
-#define PCI_agp_command_rate1	0x0001	/* Use 1x rate */
-
-
-
-// helper macros for easier PCI access
-#define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
-#define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
-
-
-// show AGP capabilities
-static void show_agp_status( uint32 status )
-{
-	SHOW_FLOW( 3, "Status (%08lx): Max Queue Depth=%ld %s%s%s%s%s%s", status,
-		(status & PCI_agp_status_rq_mask) >> PCI_agp_status_rq_shift,
-		(status & PCI_agp_status_sba) != 0 ? "Sideband addressing " : "",
-		(status & PCI_agp_status_64bit) != 0 ? "64-bit " : "",
-		(status & PCI_agp_status_fw) != 0 ? "FastWrite " : "",
-		(status & PCI_agp_status_rate4) != 0 ? "4x " : "",
-		(status & PCI_agp_status_rate2) != 0 ? "2x " : "",
-		(status & PCI_agp_status_rate1) != 0 ? "1x " : "" );
-}		
-
-
-// show AGP settings
-static void show_agp_command( uint32 command )
-{
-	SHOW_FLOW( 3, "Command (%08lx): Queue Depth=%ld %s%s%s%s%s%s%s", command,
-		(command & PCI_agp_command_rq_mask) >> PCI_agp_command_rq_shift,
-		(command & PCI_agp_command_sba) != 0 ? "Sideband addressing " : "",
-		(command & PCI_agp_command_agp) != 0 ? "AGP-Enabled " : "AGP-Disabled ",
-		(command & PCI_agp_command_64bit) != 0 ? "64-bit " : "",
-		(command & PCI_agp_command_fw) != 0 ? "FastWrite " : "",
-		(command & PCI_agp_command_rate4) != 0 ? "4x " : "",
-		(command & PCI_agp_command_rate2) != 0 ? "2x " : "",
-		(command & PCI_agp_command_rate1) != 0 ? "1x " : "" );
-}
-
-
-// find PCI capability
-int find_capability( pci_info *pcii, uint8 capability )
-{
-	int try_count;
-	uint16 status;
-	uint8 pos;
-
-	// check whether PCI capabilities are supported at all	
-	status = get_pci( PCI_status, 2 );
-	
-	if( (status & PCI_status_cap_list) == 0 )
-		return B_NAME_NOT_FOUND;
-		
-	SHOW_FLOW0( 3, "Device supports capabilities" );
-	
-	// get offset of first capability in list	
-	switch( pcii->header_type & PCI_header_type_mask ) {
-	case PCI_header_type_normal:
-	case PCI_header_type_bridge:
-		pos = get_pci( PCI_capability_list, 1 );
-		break;
-	case PCI_header_type_cardbus:
-		pos = get_pci( PCI_cb_capability_list, 1 );
-		break;
-	default:
-		SHOW_FLOW( 3, "Unknown type (%x)", pcii->header_type & PCI_header_type_mask );
-		return B_ERROR;
-	}
-	
-	// search for whished capability in linked list
-	for( try_count = 48; try_count > 0 && pos >= 0x40; --try_count ) {
-		uint8 id;
-		
-		pos &= ~3;
-		
-		id = get_pci( pos + PCI_cap_list_id, 1 );
-		if( id == 0xff )
-			return B_NAME_NOT_FOUND;
-			
-		if( id == capability ) {
-			SHOW_FLOW( 3, "Found capability %d", capability );
-			return pos;
-		}
-		
-		SHOW_FLOW( 3, "Ignored capability %d", id );
-			
-		pos = get_pci( pos + PCI_cap_list_next, 1 );
-	}
-	
-	return B_NAME_NOT_FOUND;
-}
-
+static void agp_list_info(agp_info ai);
+static void agp_list_active(uint32 cmd);
 
 // fix invalid AGP settings
-void Radeon_Fix_AGP(void)
+void Radeon_Set_AGP( device_info *di, bool enable_agp )
 {
-	long pci_index;
-	pci_info pci_data, *pcii;
-	
-	// start with all features enabled, queue depth bits must be 0
-	uint32 common_caps = 
-		PCI_agp_status_sba | PCI_agp_status_64bit | PCI_agp_status_fw |
-		PCI_agp_status_rate4 | PCI_agp_status_rate2 | PCI_agp_status_rate1;
-	uint32 read_queue_depth = PCI_agp_status_rq_mask;
-	
-	SHOW_FLOW0( 4, "Composing common feature list" );
-	
-	// only required to make get_pci/set_pci working
-	pcii = &pci_data;
+	uint8 agp_index = 0;
+	agp_info nth_agp_info;
+	bool found = false;
+	uint32 agp_cmd;
 
-	// find common feature set
-	for( pci_index = 0;
-		(*pci_bus->get_nth_pci_info)(pci_index, &pci_data) == B_NO_ERROR;
-		++pci_index ) 
+	/* abort if no agp busmanager found */
+	if (!agp_bus)
 	{
-		int offset;
+		SHOW_INFO0(1, "Busmanager not installed.\nWarning Card May hang if AGP Fastwrites are Enabled." );
+		return;
+	}
 
-		/*SHOW_FLOW( 3, "Checking bus %d, device %d, function %d (vendor_id=%04x, device_id=%04x):", 
-			pcii->bus, pcii->device, pcii->function,
-			pcii->vendor_id, pcii->device_id );*/
+	/* contact driver and get a pointer to the registers and shared data */
+	/* get nth AGP device info */
+	while((*agp_bus->get_nth_agp_info)(agp_index, &nth_agp_info) == B_NO_ERROR) {
+	
+		/* see if we are this one */
+		if ((nth_agp_info.device_id == di->pcii.device_id) &&
+			(nth_agp_info.vendor_id == di->pcii.vendor_id) &&
+			(nth_agp_info.bus		== di->pcii.bus) &&
+			(nth_agp_info.device	== di->pcii.device) &&
+			(nth_agp_info.function	== di->pcii.function))
+		{
+			SHOW_INFO0(1, "Found AGP capable device" );
+			found = true;
+
+			/* remember our info */
+			di->agpi = nth_agp_info;
 		
-		offset = find_capability( pcii, PCI_cap_id_agp );
-		
-		if( offset > 0 ) {
-			uint32 agp_status, agp_command;
-			
-			agp_status = get_pci( offset + PCI_agp_status, 4 );
-			agp_command = get_pci( offset + PCI_agp_command, 4 );
-			
-			SHOW_FLOW( 3, "bus %d, device %d, function %d (vendor_id=%04x, device_id=%04x):", 
-				pcii->bus, pcii->device, pcii->function,
-				pcii->vendor_id, pcii->device_id );
-			show_agp_status( agp_status );
-			show_agp_command( agp_command );
-			
-			common_caps &= agp_status;
-			read_queue_depth = min( read_queue_depth, agp_status & PCI_agp_status_rq_mask );
+			/* log capabilities */
+			agp_list_info(nth_agp_info);
+
+			break;
+
 		}
+
+		agp_index++;
+	}
+
+	if (!found) {
+		if (agp_index != 0) {
+			SHOW_INFO0(1, "End of AGP capable devices list.");
+		} else {
+			SHOW_INFO0(1, "No AGP capable devices found.");
+		}
+		return;
+	}
+
+	if (di->settings.force_pci | !enable_agp) {
+
+		SHOW_INFO0(1, "Disabling AGP mode...");
+
+		/* we want zero agp features enabled */
+		agp_cmd = 0;
+
+		/* write the stuff */
+		(*agp_bus->enable_agp)(&agp_cmd);
+	} else {
+		/* activate AGP mode */
+		SHOW_INFO0(1, "Activating AGP mode...");
+		agp_cmd = 0xfffffff7;
+
+		/* set agp 3 speed bit is agp is v3 */
+		if (nth_agp_info.interface.agp_stat & AGP_rate_rev) agp_cmd |= AGP_rate_rev;
+
+		/* we want to perma disable fastwrites as they're evil, evil i say */
+		agp_cmd &= ~AGP_FW;
+
+		/* write the stuff */
+		(*agp_bus->enable_agp)(&agp_cmd);
+	}
+
+	/* list mode now activated,
+	 * make sure we have the correct speed scheme for logging */
+	agp_list_active(nth_agp_info.interface.agp_cmd | 
+		(nth_agp_info.interface.agp_stat & AGP_rate_rev));
+
+}
+
+static void agp_list_info(agp_info ai)
+{
+	/*
+		list device
+	*/
+	if (ai.class_base == PCI_display) {
+		SHOW_INFO(4, "Device is a graphics card, subclass ID is $%02x", ai.class_sub);
+	} else {
+		SHOW_INFO(4, "Device is a hostbridge, subclass ID is $%02x", ai.class_sub);
+	}
+
+	SHOW_INFO(4, "Vendor ID $%04x", ai.vendor_id);
+	SHOW_INFO(4, "Device ID $%04x", ai.device_id);
+	SHOW_INFO(4, "Bus %d, device %d, function %d", ai.bus, ai.device, ai.function);
+
+	/*
+		list capabilities
+	*/
+	SHOW_INFO(4, "This device supports AGP specification %ld.%ld;",
+		((ai.interface.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
+		((ai.interface.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift));
+
+	/* the AGP devices determine AGP speed scheme version used on power-up/reset */
+	if (!(ai.interface.agp_stat & AGP_rate_rev))
+	{
+		/* AGP 2.0 scheme applies */
+		if (ai.interface.agp_stat & AGP_2_1x)
+			SHOW_INFO0(4, "AGP 2.0 1x mode is available");
+		if (ai.interface.agp_stat & AGP_2_2x)
+			SHOW_INFO0(4, "AGP 2.0 2x mode is available");
+		if (ai.interface.agp_stat & AGP_2_4x)
+			SHOW_INFO0(41, "AGP 2.0 4x mode is available");
+	}
+	else
+	{
+		/* AGP 3.0 scheme applies */
+		if (ai.interface.agp_stat & AGP_3_4x)
+			SHOW_INFO0(4, "AGP 3.0 4x mode is available");
+		if (ai.interface.agp_stat & AGP_3_8x)
+			SHOW_INFO0(4, "AGP 3.0 8x mode is available");
 	}
 	
-	// explicitely enable AGP - it's not part of status register
-	common_caps |= PCI_agp_command_agp;
-
-	// choose fastest transmission speed and disable lower ones	
-	if( (common_caps & PCI_agp_status_rate4) != 0 )
-		common_caps &= ~(PCI_agp_status_rate2 | PCI_agp_status_rate1);
-	else if( (common_caps & PCI_agp_status_rate2) != 0 )
-		common_caps &= ~PCI_agp_status_rate1;
-	else if( (common_caps & PCI_agp_status_rate1) == 0 )
-		// no speed found - disable AGP
-		common_caps &= ~PCI_agp_command_agp;
+	if (ai.interface.agp_stat & AGP_FW) SHOW_INFO0(4, "Fastwrite transfers are supported");
+	if (ai.interface.agp_stat & AGP_SBA) SHOW_INFO0(4, "Sideband adressing is supported");
 	
-	common_caps |= read_queue_depth;
+	SHOW_INFO(1, "%ld queued AGP requests can be handled.",
+		((ai.interface.agp_stat & AGP_RQ) >> AGP_RQ_shift) + 1);
 
-	SHOW_FLOW0( 3, "Combined:" );
-	show_agp_command( common_caps );
+	/*
+		list current settings,
+		make sure we have the correct speed scheme for logging
+	 */
+	agp_list_active(ai.interface.agp_cmd | (ai.interface.agp_stat & AGP_rate_rev));
+}
 
-	// choose features that all devices support	
-	for( pci_index = 0;
-		(*pci_bus->get_nth_pci_info)(pci_index, &pci_data) == B_NO_ERROR;
-		++pci_index ) 
-	{
-		int offset;
-		
-		offset = find_capability( pcii, PCI_cap_id_agp );
-		
-		if( offset > 0 ) {
-			SHOW_FLOW( 3, "Modifying bus %d, device %d, function %d (vendor_id=%04x, device_id=%04x):", 
-				pcii->bus, pcii->device, pcii->function,
-				pcii->vendor_id, pcii->device_id );
-
-			set_pci( offset + PCI_agp_command, 4, common_caps );
-		}
+static void agp_list_active(uint32 cmd)
+{
+	SHOW_INFO0(4, "listing settings now in use:");
+	if (!(cmd & AGP_rate_rev)) {
+		/* AGP 2.0 scheme applies */
+		if (cmd & AGP_2_1x)
+			SHOW_INFO0(2,"AGP 2.0 1x mode is set");
+		if (cmd & AGP_2_2x)
+			SHOW_INFO0(2,"AGP 2.0 2x mode is set");
+		if (cmd & AGP_2_4x)
+			SHOW_INFO0(2,"AGP 2.0 4x mode is set");
+	} else {
+		/* AGP 3.0 scheme applies */
+		if (cmd & AGP_3_4x)
+			SHOW_INFO0(2,"AGP 3.0 4x mode is set");
+		if (cmd & AGP_3_8x)
+			SHOW_INFO0(2,"AGP 3.0 8x mode is set");
 	}
+	
+	if (cmd & AGP_FW) {
+		SHOW_INFO0(2, "Fastwrite transfers are enabled");
+	} else {
+		SHOW_INFO0(2, "Fastwrite transfers are disabled");
+	}
+	if (cmd & AGP_SBA) SHOW_INFO0(4, "Sideband adressing is enabled");
+	
+	SHOW_INFO(4, "Max. AGP queued request depth is set to %ld",
+		(((cmd & AGP_RQ) >> AGP_RQ_shift) + 1));
+	
+	if (cmd & AGP_enable)
+		SHOW_INFO0(2, "The AGP interface is enabled.");
+	else
+		SHOW_INFO0(2, "The AGP interface is disabled.");
 }

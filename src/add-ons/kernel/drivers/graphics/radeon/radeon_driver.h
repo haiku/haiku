@@ -158,6 +158,7 @@ typedef struct device_info {
 	radeon_settings	settings;	// overrides read from radeon.settings
 
 	pci_info	pcii;
+	agp_info	agpi;
 	char		name[MAX_RADEON_DEVICE_NAME_LENGTH];
 	char		video_name[MAX_RADEON_DEVICE_NAME_LENGTH];
 } device_info;
@@ -174,6 +175,7 @@ typedef struct {
 
 
 extern pci_module_info *pci_bus;
+extern agp_module_info *agp_bus;
 extern radeon_devices *devices;
 
 
@@ -206,7 +208,7 @@ void Radeon_CleanupIRQ( device_info *di );
 
 
 // agp.c
-void Radeon_Fix_AGP(void);
+void Radeon_Set_AGP( device_info *di, bool enable_agp );
 
 
 // mem_controller.c

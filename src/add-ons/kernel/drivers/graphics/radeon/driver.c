@@ -148,6 +148,9 @@ status_t init_driver( void )
 	if( get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK )
 		return B_ERROR;
 
+	/* get a handle for the agp bus if it exists */
+	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
+
 	/* driver private data */
 	devices = (radeon_devices *)calloc( 1, sizeof( radeon_devices ));
 	if( devices == NULL ) {
@@ -173,6 +176,8 @@ void uninit_driver( void )
 	devices = NULL;
 
 	put_module( B_PCI_MODULE_NAME );
+	/* put the agp module away if it's there */
+	if (agp_bus) put_module(B_AGP_MODULE_NAME);
 }
 
 
