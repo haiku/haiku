@@ -6,6 +6,8 @@
 #include <fs_interface.h>
 #include <SupportDefs.h>
 
+#include "FSCapabilities.h"
+
 namespace UserlandFS {
 
 class Volume;
@@ -17,6 +19,13 @@ public:
 
 	virtual	status_t			CreateVolume(Volume** volume, mount_id id) = 0;
 	virtual	status_t			DeleteVolume(Volume* volume) = 0;
+
+			void				GetCapabilities(
+									FSCapabilities& capabilities) const
+									{ capabilities = fCapabilities; }
+
+protected:
+			FSCapabilities		fCapabilities;
 };
 
 }	// namespace UserlandFS

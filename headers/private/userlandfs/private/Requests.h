@@ -9,6 +9,7 @@
 #include <fs_interface.h>
 
 #include "Compatibility.h"
+#include "FSCapabilities.h"
 #include "Request.h"
 
 
@@ -304,8 +305,9 @@ public:
 	FSConnectReply() : ReplyRequest(FS_CONNECT_REPLY) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	Address		portInfos;
-	int32		portInfoCount;
+	Address			portInfos;
+	int32			portInfoCount;
+	FSCapabilities	capabilities;
 };
 
 

@@ -18,6 +18,9 @@ public:
 	virtual	status_t			DeleteVolume(Volume* volume);
 
 private:
+			void				_InitCapabilities(beos_vnode_ops* fsOps);
+
+private:
 			beos_vnode_ops*		fFSOps;
 };
 

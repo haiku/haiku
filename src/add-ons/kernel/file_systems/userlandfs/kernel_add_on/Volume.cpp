@@ -280,6 +280,10 @@ Volume::Unmount()
 status_t
 Volume::Sync()
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_SYNC))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -337,6 +341,10 @@ Volume::ReadFSInfo(fs_info* info)
 status_t
 Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_FS_INFO))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -574,6 +582,10 @@ Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
 		}
 	}
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_IOCTL))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -630,6 +642,10 @@ Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
 status_t
 Volume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_SET_FLAGS))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -667,6 +683,12 @@ status_t
 Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 	selectsync* sync)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_SELECT)) {
+		notify_select_event(sync, ref, event);
+		return B_OK;
+	}
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -714,6 +736,10 @@ Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 status_t
 Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_DESELECT))
+		return B_OK;
+
 	struct SyncRemover {
 		SyncRemover(FileSystem* fs, selectsync* sync)
 			: fs(fs), sync(sync) {}
@@ -760,6 +786,10 @@ Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
 status_t
 Volume::FSync(fs_vnode node)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FSYNC))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -796,6 +826,11 @@ Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
 	*bytesRead = 0;
+
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_SYMLINK))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -841,6 +876,10 @@ status_t
 Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
 	int mode)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_SYMLINK))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -881,6 +920,10 @@ Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
 status_t
 Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_LINK))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -919,6 +962,10 @@ Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
 status_t
 Volume::Unlink(fs_vnode dir, const char* name)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_UNLINK))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -957,6 +1004,10 @@ status_t
 Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 	const char* newName)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_RENAME))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -997,6 +1048,10 @@ Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 status_t
 Volume::Access(fs_vnode node, int mode)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_ACCESS))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1062,6 +1117,10 @@ Volume::ReadStat(fs_vnode node, struct stat* st)
 status_t
 Volume::WriteStat(fs_vnode node, const struct stat* st, uint32 mask)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_STAT))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1102,6 +1161,10 @@ status_t
 Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
 	void** cookie, vnode_id* vnid)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1148,6 +1211,10 @@ Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
 status_t
 Volume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1223,6 +1290,10 @@ Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
 {
 	*bytesRead = 0;
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1272,6 +1343,10 @@ Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
 {
 	*bytesWritten = 0;
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1315,6 +1390,10 @@ Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
 status_t
 Volume::CreateDir(fs_vnode dir, const char* name, int mode, vnode_id *newDir)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1354,6 +1433,10 @@ Volume::CreateDir(fs_vnode dir, const char* name, int mode, vnode_id *newDir)
 status_t
 Volume::RemoveDir(fs_vnode dir, const char* name)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1391,6 +1474,10 @@ Volume::RemoveDir(fs_vnode dir, const char* name)
 status_t
 Volume::OpenDir(fs_vnode node, fs_cookie* cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1466,6 +1553,10 @@ Volume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer, size_t bufferSize,
 {
 	*countRead = 0;
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1521,6 +1612,10 @@ reply->buffer.GetSize()));
 status_t
 Volume::RewindDir(fs_vnode node, fs_vnode cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1560,6 +1655,10 @@ Volume::RewindDir(fs_vnode node, fs_vnode cookie)
 status_t
 Volume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_ATTR_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1635,6 +1734,10 @@ status_t
 Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR_DIR))
+		return B_BAD_VALUE;
+
 	*countRead = 0;
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -1689,6 +1792,10 @@ Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
 status_t
 Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_ATTR_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1728,6 +1835,10 @@ status_t
 Volume::CreateAttr(fs_vnode node, const char* name, uint32 type, int openMode,
 	fs_cookie* cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_ATTR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1771,6 +1882,10 @@ status_t
 Volume::OpenAttr(fs_vnode node, const char* name, int openMode,
 	fs_cookie* cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_ATTR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1851,6 +1966,10 @@ Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 {
 	*bytesRead = 0;
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1900,6 +2019,10 @@ Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 {
 	*bytesWritten = 0;
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_ATTR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1940,6 +2063,10 @@ Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 status_t
 Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR_STAT))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -1977,6 +2104,10 @@ status_t
 Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
 	const char* newName)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_RENAME_ATTR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2017,6 +2148,10 @@ Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
 status_t
 Volume::RemoveAttr(fs_vnode node, const char* name)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_ATTR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2058,6 +2193,10 @@ Volume::RemoveAttr(fs_vnode node, const char* name)
 status_t
 Volume::OpenIndexDir(fs_cookie *cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_INDEX_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2134,6 +2273,10 @@ Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
 {
 	*countRead = 0;
 
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_INDEX_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2186,6 +2329,10 @@ Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
 status_t
 Volume::RewindIndexDir(fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_INDEX_DIR))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2220,6 +2367,10 @@ Volume::RewindIndexDir(fs_cookie cookie)
 status_t
 Volume::CreateIndex(const char* name, uint32 type, uint32 flags)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_INDEX))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2258,6 +2409,10 @@ Volume::CreateIndex(const char* name, uint32 type, uint32 flags)
 status_t
 Volume::RemoveIndex(const char* name)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_INDEX))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2294,6 +2449,10 @@ Volume::RemoveIndex(const char* name)
 status_t
 Volume::ReadIndexStat(const char* name, struct stat *st)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_INDEX_STAT))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2336,6 +2495,10 @@ status_t
 Volume::OpenQuery(const char* queryString, uint32 flags, port_id targetPort,
 	uint32 token, fs_cookie *cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_QUERY))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2416,6 +2579,10 @@ Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
+
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_QUERY))
+		return B_BAD_VALUE;
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -2560,6 +2727,10 @@ Volume::_Unmount()
 status_t
 Volume::_ReadFSInfo(fs_info* info)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_FS_INFO))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2669,6 +2840,10 @@ Volume::_WriteVNode(fs_vnode node, bool reenter)
 status_t
 Volume::_ReadStat(fs_vnode node, struct stat* st)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_STAT))
+		return B_BAD_VALUE;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2704,6 +2879,10 @@ Volume::_ReadStat(fs_vnode node, struct stat* st)
 status_t
 Volume::_Close(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2739,6 +2918,10 @@ Volume::_Close(fs_vnode node, fs_cookie cookie)
 status_t
 Volume::_FreeCookie(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_COOKIE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2774,6 +2957,10 @@ Volume::_FreeCookie(fs_vnode node, fs_cookie cookie)
 status_t
 Volume::_CloseDir(fs_vnode node, fs_vnode cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_DIR))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2809,6 +2996,10 @@ Volume::_CloseDir(fs_vnode node, fs_vnode cookie)
 status_t
 Volume::_FreeDirCookie(fs_vnode node, fs_vnode cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_DIR_COOKIE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2844,6 +3035,10 @@ Volume::_FreeDirCookie(fs_vnode node, fs_vnode cookie)
 status_t
 Volume::_CloseAttrDir(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_ATTR_DIR))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2879,6 +3074,10 @@ Volume::_CloseAttrDir(fs_vnode node, fs_cookie cookie)
 status_t
 Volume::_FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_ATTR_DIR_COOKIE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2914,6 +3113,10 @@ Volume::_FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 status_t
 Volume::_CloseAttr(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_ATTR))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2949,6 +3152,10 @@ Volume::_CloseAttr(fs_vnode node, fs_cookie cookie)
 status_t
 Volume::_FreeAttrCookie(fs_vnode node, fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_ATTR_COOKIE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2984,6 +3191,10 @@ Volume::_FreeAttrCookie(fs_vnode node, fs_cookie cookie)
 status_t
 Volume::_CloseIndexDir(fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_INDEX_DIR))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -3018,6 +3229,10 @@ Volume::_CloseIndexDir(fs_cookie cookie)
 status_t
 Volume::_FreeIndexDirCookie(fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_INDEX_DIR_COOKIE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -3052,6 +3267,10 @@ Volume::_FreeIndexDirCookie(fs_cookie cookie)
 status_t
 Volume::_CloseQuery(fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_QUERY))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -3086,6 +3305,10 @@ Volume::_CloseQuery(fs_cookie cookie)
 status_t
 Volume::_FreeQueryCookie(fs_cookie cookie)
 {
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_QUERY_COOKIE))
+		return B_OK;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)

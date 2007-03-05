@@ -68,7 +68,7 @@ FileSystemInitializer::FirstTimeInit()
 	if (!fFileSystem)
 		return B_NO_MEMORY;
 
-	error = fFileSystem->Init(fName, infos, count);
+	error = fFileSystem->Init(fName, infos, count, reply->capabilities);
 	if (error != B_OK)
 		return B_ERROR;
 

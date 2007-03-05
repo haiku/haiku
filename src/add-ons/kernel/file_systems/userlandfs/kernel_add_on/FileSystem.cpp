@@ -64,9 +64,11 @@ FileSystem::~FileSystem()
 
 // Init
 status_t
-FileSystem::Init(const char* name, Port::Info* infos, int32 count)
+FileSystem::Init(const char* name, Port::Info* infos, int32 count,
+	const FSCapabilities& capabilities)
 {
-	PRINT(("FileSystem::Init(\"%s\", %p, %ld)\n", name, infos, infoCount));
+	PRINT(("FileSystem::Init(\"%s\", %p, %ld)\n", name, infos, count));
+	capabilities.Dump();
 
 	// check parameters
 	if (!name || !infos || count < 2)
@@ -75,6 +77,8 @@ FileSystem::Init(const char* name, Port::Info* infos, int32 count)
 	// set the name
 	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
+
+	fCapabilities = capabilities;
 
 	// create the select sync entry map
 	fSelectSyncs = new(nothrow) SelectSyncMap;
@@ -157,6 +161,13 @@ const char*
 FileSystem::GetName() const
 {
 	return fName.GetString();
+}
+
+// GetCapabilities
+const FSCapabilities&
+FileSystem::GetCapabilities() const
+{
+	return fCapabilities;
 }
 
 // GetPortPool

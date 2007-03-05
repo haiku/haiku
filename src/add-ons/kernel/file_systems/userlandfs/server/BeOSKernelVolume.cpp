@@ -294,7 +294,7 @@ status_t
 BeOSKernelVolume::Access(fs_vnode node, int mode)
 {
 	if (!fFSOps->access)
-		return B_BAD_VALUE;
+		return B_OK;
 	return fFSOps->access(fVolumeCookie, node, mode);
 }
 

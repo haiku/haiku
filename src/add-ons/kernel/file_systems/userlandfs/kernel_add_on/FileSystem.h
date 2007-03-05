@@ -5,6 +5,7 @@
 
 #include <fs_interface.h>
 
+#include "FSCapabilities.h"
 #include "LazyInitializable.h"
 #include "Locker.h"
 #include "Referencable.h"
@@ -24,9 +25,13 @@ public:
 								~FileSystem();
 
 			status_t			Init(const char* name, Port::Info* infos,
-									int32 infoCount);
+									int32 infoCount,
+									const FSCapabilities& capabilities);
 
 			const char*			GetName() const;
+
+			const FSCapabilities& GetCapabilities() const;
+	inline	bool				HasCapability(uint32 capability) const;
 
 			RequestPortPool*	GetPortPool();
 
@@ -59,6 +64,7 @@ private:
 			Vector<Volume*>		fVolumes;
 			Locker				fVolumeLock;
 			String				fName;
+			FSCapabilities		fCapabilities;
 			RequestPort*		fNotificationPort;
 			thread_id			fNotificationThread;
 			RequestPortPool		fPortPool;
@@ -68,5 +74,13 @@ private:
 			bool				fInitialized;
 	volatile bool				fTerminating;
 };
+
+
+// HasCapability
+inline bool
+FileSystem::HasCapability(uint32 capability) const
+{
+	return fCapabilities.Get(capability);
+}
 
 #endif	// USERLAND_FS_FILE_SYSTEM_H

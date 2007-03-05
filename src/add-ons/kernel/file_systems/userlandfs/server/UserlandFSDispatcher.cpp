@@ -319,6 +319,7 @@ UserlandFSDispatcher::_ProcessRequests()
 		if (error != B_OK)
 			RETURN_ERROR(error);
 		RequestReleaser _(fRequestPort, request);
+
 		// check the request type
 		if (request->GetType() == UFS_DISCONNECT_REQUEST)
 			return B_OK;
@@ -326,6 +327,7 @@ UserlandFSDispatcher::_ProcessRequests()
 			RETURN_ERROR(B_BAD_VALUE);
 		PRINT(("UserlandFSDispatcher::_ProcessRequests(): received FS connect "
 			"request\n"));
+
 		// it's an FS connect request
 		FSConnectRequest* connectRequest = (FSConnectRequest*)request;
 		// get the FS name
@@ -338,24 +340,27 @@ UserlandFSDispatcher::_ProcessRequests()
 			fsName.SetTo((const char*)connectRequest->fsName.GetData(), len);
 		if (result == B_OK && fsName.GetLength() == 0)
 			result = B_BAD_DATA;
+
 		// prepare the reply
 		RequestAllocator allocator(fRequestPort->GetPort());
 		FSConnectReply* reply;
 		error = AllocateRequest(allocator, &reply);
 		if (error != B_OK)
 			RETURN_ERROR(error);
+
 		FileSystem* fileSystem = NULL;
 		if (result == B_OK)
 			result = _GetFileSystem(fsName.GetString(), &fileSystem);
 		if (result == B_OK) {
 			const FSInfo* info = fileSystem->GetInfo();
 			result = allocator.AllocateData(reply->portInfos,
-				info->GetInfos(), info->GetSize(), sizeof(Port::Info));
-			if (result == B_OK)
-				reply->portInfoCount = info->CountInfos();
+				info->GetInfos(), info->GetInfosSize(), sizeof(Port::Info));
+			reply->portInfoCount = info->CountInfos();
+			reply->capabilities = info->GetCapabilities();
 			_PutFileSystem(fileSystem);
 		}
 		reply->error = result;
+
 		// send it
 		error = fRequestPort->SendRequest(&allocator);
 		if (error != B_OK)

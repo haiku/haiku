@@ -183,20 +183,29 @@ UserlandFSServer::_RegisterWithDispatcher(const char* fsName)
 		ERROR(("Failed to lock the clipboard.\n"));
 		return B_ERROR;
 	}
+
 	// get the port infos
 	Port::Info infos[kRequestThreadCount + 1];
 	infos[0] = *fNotificationRequestPort->GetPortInfo();
 	for (int32 i = 0; i < kRequestThreadCount; i++)
 		infos[i + 1] = *fRequestThreads[i].GetPortInfo();
+
+	// FS capabilities
+	FSCapabilities capabilities;
+	fFileSystem->GetCapabilities(capabilities);
+
 	// init an FS info
 	FSInfo info;
-	status_t error = info.SetTo(fsName, infos, kRequestThreadCount + 1);
+	status_t error = info.SetTo(fsName, infos, kRequestThreadCount + 1,
+		capabilities);
+
 	// prepare the message
 	BMessage message(UFS_REGISTER_FS);
 	if (error == B_OK)
 		error = message.AddInt32("team", Team());
 	if (error == B_OK)
 		error = info.Archive(&message);
+
 	// send the message
 	BMessage reply;
 	error = messenger.SendMessage(&message, &reply);
