@@ -234,6 +234,11 @@ extern _IMPEXP_KERNEL void		free_path(char *p);
 extern _IMPEXP_KERNEL void		notify_select_event(selectsync *sync, uint32 ref);
 extern _IMPEXP_KERNEL status_t	is_vnode_removed(nspace_id nsid, vnode_id vnid);
 
+extern _IMPEXP_KERNEL status_t	send_notification(port_id port, long token,
+	ulong what, long op, nspace_id device, nspace_id toDevice,
+	vnode_id parentNode, vnode_id toParentNode, vnode_id node,
+	const char *name);
+
 // The missing prototypes can be found in the fs_interface.h file.
 // That part of the VFS is still compatible with BeOS :)
 

@@ -1,12 +1,12 @@
 /* Query - query parsing and evaluation
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** The pattern matching is roughly based on code originally written
-** by J. Kercheval, and on code written by Kenneth Almquist, though
-** it shares no code.
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * The pattern matching is roughly based on code originally written
+ * by J. Kercheval, and on code written by Kenneth Almquist, though
+ * it shares no code.
+ *
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Query.h"
@@ -17,6 +17,8 @@
 #include "Inode.h"
 #include "BPlusTree.h"
 #include "Index.h"
+
+#include "fsproto.h"
 
 #include <util/kernel_cpp.h>
 #include <SupportDefs.h>
