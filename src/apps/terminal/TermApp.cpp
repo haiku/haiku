@@ -148,10 +148,10 @@ TermApp::AboutRequested()
 		"\tupdated by Kian Duffy and others\n\n"
 		"\tCopyright " B_UTF8_COPYRIGHT "2003-2005, Haiku.\n", "Ok");
 	BTextView *view = alert->TextView();
-	BFont font;
-
+	
 	view->SetStylable(true);
 
+	BFont font;
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE); 			

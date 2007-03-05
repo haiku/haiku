@@ -78,11 +78,8 @@ TermParse::~TermParse()
 	delete_sem(fReaderLocker);
 
 	status_t dummy;
-	kill_thread(fParseThread);
-	kill_thread(fReaderThread);	
-	//wait_for_thread(fReaderThread, &dummy);	
-	//wait_for_thread(fParseThread, &dummy);
-	//
+	wait_for_thread(fReaderThread, &dummy);	
+	wait_for_thread(fParseThread, &dummy);
 }
 
 

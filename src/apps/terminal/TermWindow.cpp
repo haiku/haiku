@@ -59,7 +59,7 @@ void SetCoding(int);
 
 
 TermWindow::TermWindow(BRect frame, const char* title, int fd)
-	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE),
+	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fPfd(fd)
 {
 	InitWindow();
@@ -72,6 +72,17 @@ TermWindow::TermWindow(BRect frame, const char* title, int fd)
 
 TermWindow::~TermWindow()
 {
+	close(fPfd);
+	delete fTermParse;
+	delete fCodeConv;
+	if (fPrefWindow) 
+		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
+
+	if (fFindPanel && fFindPanel->Lock()) {
+		fFindPanel->Quit();
+		fFindPanel = NULL;
+	}
+	
 	delete fWindowUpdate;
 }
 
@@ -603,27 +614,17 @@ TermWindow::WindowActivated (bool )
 void
 TermWindow::Quit()
 {
-	delete fTermParse;
-	delete fCodeConv;
-	if (fPrefWindow) 
-		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
-
-	if (fFindPanel && fFindPanel->Lock()) {
-		fFindPanel->Quit();
-		fFindPanel = NULL;
-	}
-	
-	be_app->PostMessage(B_QUIT_REQUESTED, be_app);
-	BWindow::Quit ();
+	BWindow::Quit();
 }
 
 
 bool
 TermWindow::QuitRequested(void)
 {
-  
-  return true;
+	return BWindow::QuitRequested();
 }
+
+
 ////////////////////////////////////////////////////////////////////////////
 // int GetTimeZone (void)
 //  Get Machine Timezone.
