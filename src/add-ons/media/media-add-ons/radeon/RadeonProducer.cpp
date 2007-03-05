@@ -28,6 +28,7 @@
 #include <app/Message.h>
 
 #include "RadeonAddOn.h"
+#include "VideoIn.h"
 
 #define DPRINT(args)	{ PRINT(("\x1b[0;30;35m")); PRINT(args); PRINT(("\x1b[0;30;47m")); }
 
@@ -50,6 +51,8 @@
 // functions to convert to scattered Be-code to the compact video-in-code
 video_in_standard BeToVideoInStandard( int32 be_standard )
 {
+	
+	DPRINT(("BeToVideoInStandard %d \n", be_standard));
 	switch( be_standard ) {
 	case 1:	return C_VIDEO_IN_NTSC;
 	case 2:	return C_VIDEO_IN_NTSC_JAPAN;
@@ -66,14 +69,19 @@ video_in_standard BeToVideoInStandard( int32 be_standard )
 
 int32 VideoInStandardToBe( video_in_standard standard )
 {
-	int32 be_standard[] = {
-		1, 2, 101, 4, 3, 5, 102, 103, 6
-	};
-	
-	if( (uint)standard < sizeof( be_standard ) / sizeof( be_standard[0] ) )
-		return be_standard[(int)standard];
-	else
-		return 1;
+	DPRINT(("VideoInStandardToBe %d \n", standard));
+	switch( standard ) {
+		case C_VIDEO_IN_NTSC:		return 1;
+		case C_VIDEO_IN_NTSC_JAPAN:	return 2;
+		case C_VIDEO_IN_PAL_BDGHI:	return 3;
+		case C_VIDEO_IN_PAL_M:		return 4;
+		case C_VIDEO_IN_PAL_N:		return 5;
+		case C_VIDEO_IN_SECAM:		return 6;
+		case C_VIDEO_IN_NTSC_443:	return 101;
+		case C_VIDEO_IN_PAL_60:		return 102;
+		case C_VIDEO_IN_PAL_NC:		return 103;
+		default: return 1;
+	}
 }
 
 status_t CRadeonProducer::FindInt32( 
@@ -130,7 +138,7 @@ CRadeonProducer::CRadeonProducer(
 		fInitStatus = B_OK;
 		
 	fSource = ((fVideoIn.Capabilities() & C_VIDEO_IN_HAS_TUNER) != 0 ? C_VIDEO_IN_TUNER : C_VIDEO_IN_COMPOSITE);
-	fStandard = 1;
+	fStandard = C_VIDEO_IN_NTSC;
 	fMode = C_VIDEO_IN_WEAVE;
 	fFormat = B_RGB32;
 	fResolution = 4;
@@ -174,6 +182,7 @@ CRadeonProducer::CRadeonProducer(
 		
 		// standard is stored as internal code (which has no "holes" in its numbering);
 		// time to convert it
+		// if this value comes from our setup web is it not already linear?
 		fStandard = VideoInStandardToBe( (video_in_standard)standard );
 		
 		// if there is no tuner, force composite input
@@ -266,11 +275,11 @@ void CRadeonProducer::setupWeb()
 		P_AUDIO_SOURCE, B_MEDIA_RAW_VIDEO, "Audio Input:", "Audio Input:");
 	if ((fVideoIn.Capabilities() & C_VIDEO_IN_HAS_TUNER) != 0)
 		source2->AddItem(C_VIDEO_IN_TUNER, "Tuner");
-	if ((fVideoIn.Capabilities() & C_VIDEO_IN_HAS_COMPOSITE) != 0)
+/*	if ((fVideoIn.Capabilities() & C_VIDEO_IN_HAS_COMPOSITE) != 0)
 		source2->AddItem(C_VIDEO_IN_COMPOSITE, "Composite");
 	if ((fVideoIn.Capabilities() & C_VIDEO_IN_HAS_SVIDEO) != 0)
 		source2->AddItem(C_VIDEO_IN_SVIDEO, "SVideo");
-	
+*/	
 	
 	// Controls.Brightness/Contrast/Saturation/Hue
 	controls2->MakeContinuousParameter(P_BRIGHTNESS, B_MEDIA_RAW_VIDEO,"Brightness", "BRIGHTNESS", "", -100, 100, 1);
@@ -877,11 +886,13 @@ CRadeonProducer::verifySetSize(
 		// our format converters do up to 8 pixels at a time (grey8);
 		// to be absolutely sure we don't get trouble there, refuse
 		// any width that is not a multiple of 8
+		
 		if( (format->u.raw_video.display.line_width & 7) != 0 ) {
 			DPRINT(( "Request image width is not multiple of 8 (%d)\n",
 				format->u.raw_video.display.line_width ));
 			return B_MEDIA_BAD_FORMAT;
 		}
+		
 	} else {
 		switch (fResolution) {
 		case 0:
@@ -1081,8 +1092,7 @@ CRadeonProducer::finalizeFormat( media_format *format )
 		return res;	
 
 	setFormatFlags( format );
-
-	return B_OK;
+	return res;	
 }
 
 
@@ -1118,7 +1128,7 @@ CRadeonProducer::FormatSuggestionRequested(
 	First, the application defines a format with many wildcards in it;
 	this format is passed to us, so we can restrict it if necessary;
 	we should leave as many wildcards as possible, because in the next
-	step the consumer is asked, and he will not be happy if he has to choise left .
+	step the consumer is asked, and he will not be happy if he has no choice left .
 */
 status_t 
 CRadeonProducer::FormatProposal(const media_source &output, media_format *format)
@@ -1373,7 +1383,7 @@ CRadeonProducer::startCapturing()
 		fOutput.destination == media_destination::null )
 		return;
 
-	fVideoIn.SetChannel(fTuner, C_VIDEO_IN_NTSC);
+	fVideoIn.SetChannel(fTuner, C_VIDEO_IN_NTSC); // was hardcoded to NTSC
 	fVideoIn.SetBrightness(fBrightness);
 	fVideoIn.SetContrast(fContrast);
 	fVideoIn.SetSaturation(fSaturation);
@@ -1696,11 +1706,20 @@ CRadeonProducer::SetParameterValue(
 			return;
 		fSource = *((const uint32 *) value);
 		fSourceLastChange = when;
+		
+		// if there is no tuner, force composite input
+		// (eXposer sets source manually to tuner, even if there is none)
+		// if there is no tuner, it isn't in the list and can't be picked!
+		//if( (fVideoIn.Capabilities() & C_VIDEO_IN_HAS_TUNER) == 0 )
+		//	fSource = C_VIDEO_IN_COMPOSITE;
+		
 		break;
 	case P_STANDARD: {
 		if (*((const int32 *) value) == fStandard)
 			return;
-		fStandard = *((const uint32 *) value);
+
+		fStandard = BeToVideoInStandard( *((const int32 *) value) );
+		
 		fStandardLastChange = when;
 
 		media_format new_format = fOutput.format;
@@ -1756,7 +1775,7 @@ CRadeonProducer::SetParameterValue(
 			return;
 		fTuner = *((const uint32 *) value);
 		fTunerLastChange = when;
-		fVideoIn.SetChannel(fTuner, C_VIDEO_IN_NTSC);
+		fVideoIn.SetChannel(fTuner, C_VIDEO_IN_NTSC); // was hardcoded to NTSC
 		break;
 	case P_BRIGHTNESS:
 		if (*((const float *) value) == fBrightness)

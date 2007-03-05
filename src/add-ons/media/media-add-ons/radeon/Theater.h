@@ -7,7 +7,6 @@
 /	Copyright 2001, Carlos Hasan
 /
 *******************************************************************************/
-
 #ifndef __THEATER_H__
 #define __THEATER_H__
 
@@ -15,8 +14,9 @@
 #include "VIPPort.h"
 
 enum theater_identifier {
-	C_THEATER_VIP_VENDOR_ID			= 0x1002,
-	C_THEATER_VIP_DEVICE_ID			= 0x4d54
+//	C_THEATER_VIP_VENDOR_ID			= 0x1002,
+	C_THEATER100_VIP_DEVICE_ID			= 0x4D541002,
+	C_THEATER200_VIP_DEVICE_ID			= 0x4d4a1002
 };
 
 
@@ -39,71 +39,43 @@ enum theater_source {
 	C_THEATER_SVIDEO		= 2
 };
 
-
 class CTheater {
 public:
-	CTheater(CRadeon & radeon);
+	CTheater(CRadeon & radeon, int device);
 	
-	~CTheater();
+	virtual ~CTheater();
 	
-	status_t InitCheck() const;
+	virtual status_t InitCheck() const = 0;
 	
-	void Reset();
+	virtual void Reset() = 0;
 	
-	void SetEnable(bool enable, bool vbi);
+	virtual void SetEnable(bool enable, bool vbi) = 0;
 	
-	void SetStandard(theater_standard standard, theater_source source);
+	virtual void SetStandard(theater_standard standard, theater_source source) = 0;
 	
-	void SetSize(int hactive, int vactive);
+	virtual void SetSize(int hactive, int vactive) = 0;
 
-	void SetDeinterlace(bool deinterlace);
+	virtual void SetDeinterlace(bool deinterlace) = 0;
 	
-	void SetSharpness(int sharpness);
+	virtual void SetSharpness(int sharpness) = 0;
 	
-	void SetBrightness(int brightness);
+	virtual void SetBrightness(int brightness) = 0;
 
-	void SetContrast(int contrast);
+	virtual void SetContrast(int contrast) = 0;
 	
-	void SetSaturation(int saturation);
+	virtual void SetSaturation(int saturation) = 0;
 
-	void SetHue(int hue);
+	virtual void SetHue(int hue) = 0;
 
-	int CurrentLine();
+	virtual int CurrentLine() = 0;
 	
-	void getActiveRange( theater_standard standard, CRadeonRect &rect );
+	virtual void getActiveRange( theater_standard standard, CRadeonRect &rect ) = 0;
 	
-	void getVBIRange( theater_standard standard, CRadeonRect &rect );
+	virtual void getVBIRange( theater_standard standard, CRadeonRect &rect ) = 0;
 		
-	void PrintToStream();
+	virtual void PrintToStream() = 0;
 	
-private:
-	void SetClock(theater_standard standard, radeon_video_clock clock);
-
-	void SetADC(theater_standard standard, theater_source source);
-
-	void SetHSYNC(theater_standard standard);
-
-	void WaitHSYNC();
-	
-	void SetVSYNC(theater_standard standard);
-
-	void WaitVSYNC();
-	
-	void SetSyncGenerator(theater_standard standard);
-
-	void SetCombFilter(theater_standard standard, theater_source source);
-
-	void SetLuminanceProcessor(theater_standard standard);
-	
-	void SetLuminanceLevels(theater_standard standard, int brightness, int contrast);
-
-	void SetChromaProcessor(theater_standard standard);
-		
-	void SetChromaLevels(theater_standard standard, int saturation, int hue);
-
-	void SetClipWindow(theater_standard standard, bool vbi);
-
-	void SetScaler(theater_standard standard, int hactive, int vactive, bool deinterlace);
+	uint32 Capabilities() const;
 
 public:
 	int Register(int index);
@@ -114,7 +86,7 @@ public:
 	
 	void SetRegister(int index, int mask, int value);
 	
-private:
+protected:
 	CVIPPort fPort;
 	int fDevice;
 	radeon_video_clock fClock;

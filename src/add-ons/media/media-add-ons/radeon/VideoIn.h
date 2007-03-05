@@ -19,6 +19,8 @@
 #include "Tuner.h"
 #include "MSP3430.h"
 #include "Theater.h"
+#include "Theater100.h"
+#include "Theater200.h"
 
 enum video_in_source {
 	C_VIDEO_IN_TUNER,
@@ -83,7 +85,7 @@ public:
 	
 	~CVideoIn();
 	
-	status_t InitCheck() const;
+	status_t InitCheck();
 
 	int Capabilities() const;
 	
@@ -126,7 +128,7 @@ private:
 	CRadeon fRadeon;
 	CCapture fCapture;
 	CI2CPort fI2CPort;
-	CTheater fTheater;
+	CTheater* fTheater;
 	CTuner fTuner;
 	CMSP3430 fSound;
 	int32 fBuffer0;

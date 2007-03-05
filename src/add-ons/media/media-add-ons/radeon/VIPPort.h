@@ -58,6 +58,14 @@ public:
 		fRadeon.SetVIPRegister( device, address, value );
 	}
 	
+	int ReadFifo(int device, uint32 address, uint32 count, uint8 *buffer) {
+		return fRadeon.VIPReadFifo( device, address, count, buffer );
+	}
+	
+	int WriteFifo(int device, uint32 address, uint32 count, uint8 *buffer) {
+		return fRadeon.VIPWriteFifo( device, address, count, buffer );
+	}
+	
 	int FindVIPDevice( uint32 device_id ) {
 		return fRadeon.FindVIPDevice( device_id );
 	}

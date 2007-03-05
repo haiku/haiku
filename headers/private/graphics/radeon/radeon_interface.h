@@ -20,6 +20,7 @@
 #include "ddc.h"
 
 // magic code for ioctls
+// changed from TKRA to TKR1 for RADEON_WAITFORFIFO ioctl
 // changed from TKRA to TKR2 for VIP FIFO ioctls
 #define RADEON_PRIVATE_DATA_MAGIC	'TKR2'
 

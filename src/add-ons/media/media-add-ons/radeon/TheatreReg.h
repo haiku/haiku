@@ -1229,7 +1229,132 @@ enum theater_register {
 	VIP_CRT_DTO_INCREMENTS			= 0x0394,
 	VIP_VSYNC_DIFF_CNTL				= 0x03a0,
 	VIP_VSYNC_DIFF_LIMITS			= 0x03a4,
-	VIP_VSYNC_DIFF_RD_DATA			= 0x03a8
+	VIP_VSYNC_DIFF_RD_DATA			= 0x03a8,
+
+	DSP_OK							= 0x21,
+	DSP_INVALID_PARAMETER			= 0x22,
+	DSP_MISSING_PARAMETER			= 0x23,
+	DSP_UNKNOWN_COMMAND				= 0x24,
+	DSP_UNSUCCESS					= 0x25,
+	DSP_BUSY						= 0x26,
+	DSP_RESET_REQUIRED				= 0x27,
+	DSP_UNKNOWN_RESULT				= 0x28,
+	DSP_CRC_ERROR					= 0x29,
+	DSP_AUDIO_GAIN_ADJ_FAIL			= 0x2a,
+	DSP_AUDIO_GAIN_CHK_ERROR		= 0x2b,
+	DSP_WARNING						= 0x2c,
+	DSP_POWERDOWN_MODE				= 0x2d,
+
+	RT200_NTSC_M					= 0x01,
+	RT200_NTSC_433					= 0x03,
+	RT200_NTSC_J					= 0x04,
+	RT200_PAL_B						= 0x05,
+	RT200_PAL_D						= 0x06,
+	RT200_PAL_G						= 0x07,
+	RT200_PAL_H						= 0x08,
+	RT200_PAL_I						= 0x09,
+	RT200_PAL_N						= 0x0a,
+	RT200_PAL_Ncomb					= 0x0b,
+	RT200_PAL_M						= 0x0c,
+	RT200_PAL_60					= 0x0d,
+	RT200_SECAM						= 0x0e,
+	RT200_SECAM_B					= 0x0f,
+	RT200_SECAM_D					= 0x10,
+	RT200_SECAM_G					= 0x11,
+	RT200_SECAM_H					= 0x12,
+	RT200_SECAM_K					= 0x13,
+	RT200_SECAM_K1					= 0x14,
+	RT200_SECAM_L					= 0x15,
+	RT200_SECAM_L1					= 0x16,
+	RT200_480i						= 0x17,
+	RT200_480p						= 0x18,
+	RT200_576i						= 0x19,
+	RT200_720p						= 0x1a,
+	RT200_1080i						= 0x1b
+
+};
+
+
+/* RT200 stuff there's no way I'm converting these to enums...*/
+/* RT200 */
+#define VIP_INT_CNTL__FB_INT0                      0x02000000
+#define VIP_INT_CNTL__FB_INT0_CLR                  0x02000000
+#define VIP_GPIO_INOUT                             0x0030
+#define VIP_GPIO_CNTL                              0x0034
+#define VIP_CLKOUT_GPIO_CNTL                       0x0038
+#define VIP_RIPINTF_PORT_CNTL                      0x003c
+
+/* RT200 */
+#define VIP_GPIO_INOUT                             0x0030
+#define VIP_GPIO_CNTL                              0x0034
+#define VIP_HOSTINTF_PORT_CNTL                     0x003c
+#define VIP_HOSTINTF_PORT_CNTL__HAD_HCTL_SDA_SN    0x00000008
+#define VIP_HOSTINTF_PORT_CNTL__HAD_HCTL_SDA_SP    0x00000080
+#define VIP_HOSTINTF_PORT_CNTL__HAD_HCTL_SDA_SR    0x00000100
+#define VIP_HOSTINTF_PORT_CNTL__SUB_SYS_ID_EN      0x00010000
+#define VIP_HOSTINTF_PORT_CNTL__FIFO_RW_MODE       0x00300000
+#define VIP_HOSTINTF_PORT_CNTL__FIFOA_ENDIAN_SWAP  0x00c00000
+#define VIP_HOSTINTF_PORT_CNTL__FIFOB_ENDIAN_SWAP  0x03000000
+#define VIP_HOSTINTF_PORT_CNTL__FIFOC_ENDIAN_SWAP  0x0c000000
+#define VIP_HOSTINTF_PORT_CNTL__FIFOD_ENDIAN_SWAP  0x30000000
+#define VIP_HOSTINTF_PORT_CNTL__FIFOE_ENDIAN_SWAP  0xc0000000
+
+/* RT200 */
+#define VIP_DSP_PLL_CNTL                           0x0bc
+
+/* RT200 */
+#define VIP_TC_SOURCE                              0x300
+#define VIP_TC_DESTINATION                         0x304
+#define VIP_TC_COMMAND                             0x308
+
+/* RT200 */
+#define VIP_TC_STATUS                              0x030c
+#define VIP_TC_STATUS__TC_CHAN_BUSY                0x00007fff
+#define VIP_TC_STATUS__TC_WRITE_PENDING            0x00008000
+#define VIP_TC_STATUS__TC_FIFO_4_EMPTY             0x00040000
+#define VIP_TC_STATUS__TC_FIFO_6_EMPTY             0x00080000
+#define VIP_TC_STATUS__TC_FIFO_8_EMPTY             0x00100000
+#define VIP_TC_STATUS__TC_FIFO_10_EMPTY            0x00200000
+#define VIP_TC_STATUS__TC_FIFO_4_FULL              0x04000000
+#define VIP_TC_STATUS__TC_FIFO_6_FULL              0x08080000
+#define VIP_TC_STATUS__TC_FIFO_8_FULL              0x10080000
+#define VIP_TC_STATUS__TC_FIFO_10_FULL             0x20080000
+#define VIP_TC_STATUS__DSP_ILLEGAL_OP              0x80080000
+
+/* RT200 */
+#define VIP_TC_DOWNLOAD                            0x0310
+#define VIP_TC_DOWNLOAD__TC_DONE_MASK              0x00003fff
+#define VIP_TC_DOWNLOAD__TC_RESET_MODE             0x00060000
+
+/* RT200 */
+#define VIP_FB_INT                                 0x0314
+#define VIP_FB_INT__INT_7                          0x00000080
+#define VIP_FB_SCRATCH0                            0x0318 
+#define VIP_FB_SCRATCH1                            0x031c 
+
+struct rt200_microc_head
+{
+	unsigned int device_id;
+	unsigned int vendor_id;
+	unsigned int revision_id;
+	unsigned int num_seg;
+};
+
+struct rt200_microc_seg
+{
+	unsigned int num_bytes;
+	unsigned int download_dst;
+	unsigned int crc_val;
+
+	unsigned char* data;
+	struct rt200_microc_seg* next;
+};
+
+
+struct rt200_microc_data
+{
+	struct rt200_microc_head		microc_head;
+	struct rt200_microc_seg*		microc_seg_list;
 };
 
 #endif

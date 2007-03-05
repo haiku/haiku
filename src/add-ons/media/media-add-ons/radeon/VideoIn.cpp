@@ -64,13 +64,14 @@ static const struct {
 	{ {  910, 525 }, { 112, 37, 755, 480 }, {  73, 13, 798, 22 } }	// NTSC-Raw
 };
 
-
+class CTheater100;
+class CTheater200;
 
 CVideoIn::CVideoIn( const char *dev_name )
 	:	fRadeon( dev_name ),
 		fCapture(fRadeon),
 		fI2CPort(fRadeon),
-		fTheater(fRadeon),
+		fTheater(NULL),
 		fTuner(fI2CPort),
 		fSound(fI2CPort),
 		fBuffer0(0),
@@ -84,7 +85,9 @@ CVideoIn::CVideoIn( const char *dev_name )
 		fBufferPeriod(0),
 		started( false )
 {
+
 	Trace("CVideoIn::CVideoIn()");
+
 }
 
 CVideoIn::~CVideoIn()
@@ -94,12 +97,12 @@ CVideoIn::~CVideoIn()
 	FreeBuffers();	
 }
 
-status_t CVideoIn::InitCheck() const
+status_t CVideoIn::InitCheck()
 {
 	status_t res;
+	int device;
 	
 	Trace("CVideoIn::InitCheck()");
-
 	if( (res = fRadeon.InitCheck()) != B_OK )
 		return res;
 		
@@ -109,12 +112,35 @@ status_t CVideoIn::InitCheck() const
 	if( (res = fI2CPort.InitCheck()) != B_OK )
 		return res;
 		
-	return fTheater.InitCheck();
+	//debugger("init");
+	// detect type of theatre and initialise specific theater class
+	if ((device = fRadeon.FindVIPDevice( C_THEATER100_VIP_DEVICE_ID )) != -1)
+	{
+		Trace("CVideoIn::Found Rage Theater 100");
+		fTheater = new CTheater100(fRadeon, device);
+	}
+	else if ((device = fRadeon.FindVIPDevice( C_THEATER200_VIP_DEVICE_ID )) != -1)
+	{
+		Trace("CVideoIn::Found Rage Theater 200");
+		fTheater = new CTheater200(fRadeon, device);
+	}
+	
+	if (fTheater)
+	{
+		res = fTheater->InitCheck();
+	}
+	else
+	{
+		res = B_ERROR;
+	}
+		
+	return res;
 }
 
 int CVideoIn::Capabilities() const
 {
-	return (fTuner.InitCheck() == B_OK ? C_VIDEO_IN_HAS_TUNER + C_VIDEO_IN_HAS_COMPOSITE + C_VIDEO_IN_HAS_SVIDEO : 0) +
+	return  fTheater->Capabilities() +
+			(fTuner.InitCheck() == B_OK ? C_VIDEO_IN_HAS_TUNER : 0) +
 		   (fSound.InitCheck() == B_OK ? C_VIDEO_IN_HAS_SOUND : 0);
 }
 
@@ -166,13 +192,13 @@ void CVideoIn::Start(video_in_source source, video_in_standard standard,
 	if( mode == C_VIDEO_IN_BOB )
 		fBufferPeriod >>= 1;
 
-	fTheater.SetStandard(kStandard[standard], kSource[source]);
-	fTheater.SetSize(width, (mode != C_VIDEO_IN_WEAVE ? 2 * height : height));
+	fTheater->SetStandard(kStandard[standard], kSource[source]);
+	fTheater->SetSize(width, (mode != C_VIDEO_IN_WEAVE ? 2 * height : height));
 
 	fCapture.SetBuffer(C_RADEON_CAPTURE_CCIR656, kMode[mode], fBuffer0, fBuffer1, fBufferLength, fBufferBytesPerRow >> 1);
 	fCapture.SetClip(0, kTiming[standard].vbi.height, width - 1, kTiming[standard].vbi.height + (mode != C_VIDEO_IN_WEAVE ? height : height >> 1) - 1);
 
-	fTheater.SetEnable(true, false);
+	fTheater->SetEnable(true, false);
 	if( fSound.InitCheck() == B_OK )
 		fSound.SetEnable(true);
 	fCapture.SetInterrupts(true);
@@ -190,7 +216,7 @@ void CVideoIn::Stop()
 	fCapture.SetInterrupts(false);
 	if( fSound.InitCheck() == B_OK )
 		fSound.SetEnable(false);	
-	fTheater.SetEnable(false, false);
+	fTheater->SetEnable(false, false);
 	
 	FreeBuffers();
 }
@@ -217,35 +243,35 @@ void CVideoIn::SetBrightness(int brightness)
 {
 	Trace("CVideoIn::SetBrightness()");
 	
-	fTheater.SetBrightness(brightness);
+	fTheater->SetBrightness(brightness);
 }
 
 void CVideoIn::SetContrast(int contrast)
 {
 	Trace("CVideoIn::SetContrast()");
 	
-	fTheater.SetContrast(contrast);
+	fTheater->SetContrast(contrast);
 }
 
 void CVideoIn::SetSaturation(int saturation)
 {
 	Trace("CVideoIn::SetSaturation()");
 	
-	fTheater.SetSaturation(saturation);
+	fTheater->SetSaturation(saturation);
 }
 
 void CVideoIn::SetHue(int hue)
 {
 	Trace("CVideoIn::SetHue()");
 	
-	fTheater.SetHue(hue);
+	fTheater->SetHue(hue);
 }
 
 void CVideoIn::SetSharpness(int sharpness)
 {
 	Trace("CVideoIn::SetSharpness()");
 
-	fTheater.SetSharpness(sharpness);
+	fTheater->SetSharpness(sharpness);
 }
 
 void CVideoIn::SetFrequency(float frequency, float picture)
@@ -360,12 +386,10 @@ int CVideoIn::Capture(color_space colorSpace, void * bits, int bitsLength,
 	// always copy into main memory first, even if it must be converted by CPU - 
 	// reading from graphics mem is incredibly slow
 	if (colorSpace == B_YCbCr422 && bitsLength <= fBufferLength && bytesPerRow == fBufferBytesPerRow) {
-		PRINT(("%d, %p\n", captured_buffer, bits));
-		
 		fRadeon.DMACopy( captured_buffer, bits, bitsLength, true, false );
 	}
-	else if (colorSpace == B_RGB32 && bitsLength <= 2 * fBufferLength && bytesPerRow == 2 * fBufferBytesPerRow) {
-		
+	
+	else if (colorSpace == B_RGB32 && bitsLength <= 2 * fBufferLength && bytesPerRow == 2 * fBufferBytesPerRow) {	
 		fRadeon.DMACopy( captured_buffer, convert_buffer, fBufferLength, true, false );
 
 #define RGB32
@@ -373,6 +397,7 @@ int CVideoIn::Capture(color_space colorSpace, void * bits, int bitsLength,
 #undef RGB32
 
 	}
+	
 	else if (colorSpace == B_RGB16 && bitsLength <= fBufferLength && bytesPerRow == fBufferBytesPerRow) {
 		fRadeon.DMACopy( captured_buffer, convert_buffer, fBufferLength, true, false );
 
@@ -381,6 +406,7 @@ int CVideoIn::Capture(color_space colorSpace, void * bits, int bitsLength,
 #undef RGB16
 
 	}
+	
 	else if (colorSpace == B_RGB15 && bitsLength <= fBufferLength && bytesPerRow == fBufferBytesPerRow) {
 		fRadeon.DMACopy( captured_buffer, convert_buffer, fBufferLength, true, false );
 

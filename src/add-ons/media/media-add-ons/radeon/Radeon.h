@@ -46,7 +46,6 @@ enum radeon_video_decoder {
 	C_RADEON_RAGE_THEATER						= 6
 };
 
-
 enum radeon_register {
 	C_RADEON_VIDEOMUX_CNTL						= 0x0190,
 		C_RADEON_VIPH_INT_SEL					= BITS(0:0),
@@ -56,6 +55,7 @@ enum radeon_register {
 
 	// I2C
     C_RADEON_I2C_CNTL_0                        	= 0x0090,
+    C_RADEON_I2C_CNTL_0_PLUS1					= 0x0091,
         C_RADEON_I2C_DONE                      	= BITS(0:0),
         C_RADEON_I2C_NACK                      	= BITS(1:1),
         C_RADEON_I2C_HALT                      	= BITS(2:2),
@@ -352,6 +352,10 @@ public:
 	
 	void SetVIPRegister(int device, int address, int value);
 	
+	int VIPReadFifo(int device, uint32 address, uint32 count, uint8 *buffer);
+	
+	int VIPWriteFifo(int device, uint32 address, uint32 count, uint8 *buffer);
+	
 	int FindVIPDevice( uint32 device_id );
 	
 public:
@@ -383,6 +387,7 @@ public:
 	status_t CloneArea(const char * name, area_id src_area, 
 		area_id *cloned_area, void ** map);
 	
+	shared_info* GetSharedInfo();
 private:
 	int fHandle;
 	unsigned int * fRegister;
@@ -394,6 +399,8 @@ private:
 	area_id fROMArea;
 	area_id fVirtualCardArea;
 	area_id fSharedInfoArea;
+	
+	uint32 caps_video_in;
 };
 
 template <typename T>

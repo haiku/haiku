@@ -15,15 +15,25 @@ CI2CPort::CI2CPort(CRadeon & radeon, int rate)
 	:	fRadeon(radeon),
 		fNfactor(0),
 		fMfactor(0),
-		fTimeLimit(0)
+		fTimeLimit(0),
+		si(NULL)
 {
+	
 	PRINT(("CI2CPort::CI2CPort()\n"));
 	
 	if( fRadeon.InitCheck() == B_OK ) {
 		int refFreq, refDiv, minFreq, maxFreq, xclock;
+		double n;
+		
 		fRadeon.GetPLLParameters(refFreq, refDiv, minFreq, maxFreq, xclock);
-	
-		double n = (xclock * 10000.0) / (4.0 * rate);
+		si = fRadeon.GetSharedInfo();
+		
+		if ( si->asic == rt_rv200 ) {
+			n = (xclock * 40000.0) / (1.0 * rate);
+		} else {
+			n = (xclock * 10000.0) / (4.0 * rate);
+		}
+		
 		for (fNfactor = 1; fNfactor < 255; fNfactor++) {
 			if (fNfactor * (fNfactor - 1) > n)
 				break;
@@ -62,7 +72,17 @@ CI2CPort::~CI2CPort()
 
 status_t CI2CPort::InitCheck() const
 {
-	return fRadeon.InitCheck();
+	if (fRadeon.InitCheck() != B_OK)
+		return B_ERROR;
+		
+	if ( si == NULL )
+		return B_ERROR;
+	
+	if ( si->has_no_i2c ) {
+		PRINT(("This Chips I2C is BLACKLISTED!"));
+		return B_ERROR;
+	}	
+	return B_OK;
 }
 
 CRadeon & CI2CPort::Radeon() const
@@ -132,16 +152,22 @@ int CI2CPort::Send(int address, const char * buffer, int length, bool start, boo
 		C_RADEON_I2C_HALT |	C_RADEON_I2C_SOFT_RST);
 
 	// write address
-	fRadeon.SetRegister(C_RADEON_I2C_DATA, address & 0xfffffffe);
+	fRadeon.SetRegister(C_RADEON_I2C_DATA, address & ~(1));
 
 	// write data
 	for (int offset = 0; offset < length; offset++)
 		fRadeon.SetRegister(C_RADEON_I2C_DATA, buffer[offset]);
 
 	//
-	fRadeon.SetRegister(C_RADEON_I2C_CNTL_1,
-		(fTimeLimit << 24) | length |
-		C_RADEON_I2C_EN | C_RADEON_I2C_SEL | 0x100);
+	if (si->asic >= rt_r200) {
+		fRadeon.SetRegister(C_RADEON_I2C_CNTL_1,
+			(fTimeLimit << 24) | length |
+			C_RADEON_I2C_EN | C_RADEON_I2C_SEL | 0x010);
+	} else {
+		fRadeon.SetRegister(C_RADEON_I2C_CNTL_1,
+			(fTimeLimit << 24) | length |
+			C_RADEON_I2C_EN | C_RADEON_I2C_SEL | 0x100);
+	}
 	
 	fRadeon.SetRegister(C_RADEON_I2C_CNTL_0,
 		(fNfactor << 24) | (fMfactor << 16) |
@@ -171,9 +197,15 @@ int CI2CPort::Receive(int address, char * buffer, int length, bool start, bool s
 	
 	fRadeon.SetRegister(C_RADEON_I2C_DATA, address | 0x00000001);
 	
-	fRadeon.SetRegister(C_RADEON_I2C_CNTL_1,
-		(fTimeLimit << 24) | C_RADEON_I2C_EN | //C_RADEON_I2C_SEL |
-		length | 0x100);
+	if (si->asic >= rt_r200) {
+		fRadeon.SetRegister(C_RADEON_I2C_CNTL_1,
+			(fTimeLimit << 24) | C_RADEON_I2C_EN | C_RADEON_I2C_SEL |
+			length | 0x010);
+	} else {
+		fRadeon.SetRegister(C_RADEON_I2C_CNTL_1,
+			(fTimeLimit << 24) | C_RADEON_I2C_EN | C_RADEON_I2C_SEL |
+			length | 0x100);
+	}
 		
 	fRadeon.SetRegister(C_RADEON_I2C_CNTL_0,
 		(fNfactor << 24) | (fMfactor << 16) | C_RADEON_I2C_GO |
@@ -222,7 +254,7 @@ void CI2CPort::Stop()
 		C_RADEON_I2C_DONE | C_RADEON_I2C_NACK | C_RADEON_I2C_HALT, 0);
 
 	// issue abort call
-	fRadeon.SetRegister(C_RADEON_I2C_CNTL_0,
+	fRadeon.SetRegister(C_RADEON_I2C_CNTL_0_PLUS1,
 		C_RADEON_I2C_ABORT | C_RADEON_I2C_GO, C_RADEON_I2C_ABORT | C_RADEON_I2C_GO);
 	
 	// wait GO bit to go low

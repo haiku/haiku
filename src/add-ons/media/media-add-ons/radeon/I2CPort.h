@@ -57,6 +57,7 @@ private:
 	int fNfactor;
 	int fMfactor;
 	int fTimeLimit;
+	shared_info* si;
 };
 
 

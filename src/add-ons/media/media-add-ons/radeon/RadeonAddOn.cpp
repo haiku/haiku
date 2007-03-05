@@ -412,9 +412,8 @@ CRadeonAddOn::RecursiveScan(const char* rootPath, BEntry *rootEntry = NULL)
 		
 			// if there is a Rage Theatre, then there should be Video-In	
 			if( vip_port.InitCheck() == B_OK &&
-				vip_port.FindVIPDevice( 
-				(C_THEATER_VIP_VENDOR_ID << 0) |
-				(C_THEATER_VIP_DEVICE_ID << 16)) >= 0 )
+				((vip_port.FindVIPDevice( C_THEATER100_VIP_DEVICE_ID ) >= 0) 
+					|| (vip_port.FindVIPDevice( C_THEATER200_VIP_DEVICE_ID ) >= 0)))
 			{
 				fDevices.AddItem( new CRadeonPlug( this, path, cur_id++ ));
 			}

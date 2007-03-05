@@ -14,6 +14,7 @@
 #include <string.h>
 //#include "Driver.h"
 #include "Radeon.h"
+#include "OS.h"
 
 static const char * const C_RADEON_REGISTER_AREA_NAME = "RadeonRegisters";
 static const char * const C_RADEON_MEMORY_AREA_NAME = "RadeonMemory";
@@ -119,7 +120,8 @@ CRadeon::CRadeon( const char *dev_name )
 		fRegisterArea(0),
 		fROMArea(0),
 		fVirtualCardArea(0),
-		fSharedInfoArea(0)
+		fSharedInfoArea(0),
+		caps_video_in(0)
 {
 	PRINT(("CRadeon::CRadeon()\n"));
 	
@@ -227,6 +229,7 @@ int CRadeon::VIPRegister(int device, int address)
 	vr.magic = RADEON_PRIVATE_DATA_MAGIC;
 	vr.channel = device;
 	vr.address = address;
+	vr.lock = true;
 	
 	res = ioctl( fHandle, RADEON_VIPREAD, &vr, sizeof( vr ));
 	
@@ -244,9 +247,52 @@ void CRadeon::SetVIPRegister(int device, int address, int value)
 	vw.channel = device;
 	vw.address = address;
 	vw.data = value;
+	vw.lock = true;
 	
 	ioctl( fHandle, RADEON_VIPWRITE, &vw, sizeof( vw ));
 }
+
+
+int CRadeon::VIPReadFifo(int device, uint32 address, uint32 count, uint8 *buffer)
+{
+	radeon_vip_fifo_read vr;
+	status_t res;
+	
+	vr.magic = RADEON_PRIVATE_DATA_MAGIC;
+	vr.channel = device;
+	vr.address = address;
+	vr.count = count;
+	vr.data = buffer;
+	vr.lock = true;
+	
+	res = ioctl( fHandle, RADEON_VIPFIFOREAD, &vr, sizeof( vr ));
+	if( res == B_OK )
+		return TRUE;
+	else
+		return FALSE;
+	
+}
+	
+int CRadeon::VIPWriteFifo(int device, uint32 address, uint32 count, uint8 *buffer)
+{
+	radeon_vip_fifo_write vw;
+	status_t res;
+	
+	vw.magic = RADEON_PRIVATE_DATA_MAGIC;
+	vw.channel = device;
+	vw.address = address;
+	vw.count = count;
+	vw.data = buffer;
+	vw.lock = true;
+	
+	res = ioctl( fHandle, RADEON_VIPFIFOWRITE, &vw, sizeof( vw ));
+	
+	if( res == B_OK )
+		return TRUE;
+	else
+		return FALSE;
+}
+
 
 int CRadeon::FindVIPDevice( uint32 device_id )
 {
@@ -262,6 +308,11 @@ int CRadeon::FindVIPDevice( uint32 device_id )
 		return fvd.channel;
 	else
 		return -1;
+}
+
+shared_info* CRadeon::GetSharedInfo()
+{
+	return fSharedInfo;
 }
 
 void CRadeon::GetPLLParameters(int & refFreq, int & refDiv, int & minFreq, int & maxFreq, int & xclock)
@@ -280,12 +331,77 @@ void CRadeon::GetMMParameters(radeon_video_tuner & tuner,
 							  int & compositePort,
 							  int & svideoPort)
 {
-	unsigned char *fVideoBIOS = fROM + fROM[0x48] + (fROM[0x49] << 8);
-	unsigned char * fMMTable = fROM + fVideoBIOS[0x38] + (fVideoBIOS[0x39] << 8);
 
+	unsigned char * fMMTable = NULL;
+
+	PRINT(("CRadeon::GetMMParameters()\n"));
+
+	if (fSharedInfo->is_atombios) {
+		uint16 hdr  = fROM[0x48] + (fROM[0x49] << 8);
+		uint16 PCIR = hdr + fROM[hdr] + (fROM[hdr + 1] << 8);
+		uint16 hdr2 = fROM[PCIR - 4] + (fROM[PCIR - 3] << 8);
+		uint16 hmMedia = fROM[hdr2 + 8] + (fROM[hdr2 + 9] << 8);
+		if(fROM[hmMedia    ] == 0x14
+		&& fROM[hmMedia + 1] == 0x00
+		&& fROM[hmMedia + 2] == 0x01
+		&& fROM[hmMedia + 3] == 0x01
+		&& fROM[hmMedia + 4] == '$'
+		&& fROM[hmMedia + 5] == 'M'
+		&& fROM[hmMedia + 6] == 'M'
+		&& fROM[hmMedia + 7] == 'T') {
+			fMMTable = &fROM[hmMedia + 8];
+			PRINT(("ATOMBIOS MM Table Signiture found\n"));
+		} else {
+			PRINT(("ATOMBIOS MM Table Not Found\n"));
+			return;
+		}
+	} else {
+		unsigned char *fVideoBIOS = fROM + fROM[0x48] + (fROM[0x49] << 8);
+		fMMTable = fROM + fVideoBIOS[0x38] + (fVideoBIOS[0x39] << 8) - 2;
+		
+		if (fMMTable[0] != 0x0c)
+		{
+			PRINT(("MM_TABLE invalid size\n"));
+			return;
+		}
+		else
+		{
+			PRINT(("MM Table Found (non ATOM) \n"));
+			PRINT(("Revision      %02x\n", fMMTable[0]));
+			PRINT(("Size          %02x\n", fMMTable[2]));
+			fMMTable += 2;
+		}
+	}
+
+	
+	// check table:
+	PRINT(( "MM_TABLE:\n"));
+	const char* names[] = {
+			"Tuner Type    %02x\n",
+			"Audio Chip    %02x\n",
+			"Product ID    %02x\n",
+			"Tuner misc    %02x\n",
+			"I2C Config    %02x\n",
+			"Vid Decoder   %02x\n",
+			"..Host config %02x\n",
+			"input 0       %02x\n",
+			"input 1       %02x\n",
+			"input 2       %02x\n",
+			"input 3       %02x\n",
+			"input 4       %02x\n",
+			0
+	};
+	
+	int i = 0;	
+	while(names[i]) {
+		PRINT((names[i], fMMTable[i]));
+		i++;
+	}		
+		
 	switch (fMMTable[0] & 0x1f) {
 	case 0x00:
 		tuner = C_RADEON_NO_TUNER;
+		PRINT(("CRadeon::GetMMParameters() No Tuner\n"));
 		break;
 	case 0x01:
 		tuner = C_RADEON_FI1236_MK1_NTSC;
@@ -328,12 +444,14 @@ void CRadeon::GetMMParameters(radeon_video_tuner & tuner,
 		break;
 	default:
 		tuner = C_RADEON_NO_TUNER;
+		PRINT(("CRadeon::GetMMParameters() No Tuner\n"));
 		break;
 	}
 	
 	switch (fMMTable[5] & 0x0f) {
 	case 0x00:
 		video = C_RADEON_NO_VIDEO;
+		PRINT(("CRadeon::GetMMParameters() No Video\n"));
 		break;
 	case 0x01:
 		video = C_RADEON_BT819;
@@ -352,9 +470,11 @@ void CRadeon::GetMMParameters(radeon_video_tuner & tuner,
 		break;
 	case 0x06:
 		video = C_RADEON_RAGE_THEATER;
+		PRINT(("CRadeon::GetMMParameters() Rage Theater\n"));
 		break;
 	default:
 		video = C_RADEON_NO_VIDEO;
+		PRINT(("CRadeon::GetMMParameters() No Video\n"));
 		break;
 	}
 	
@@ -364,6 +484,7 @@ void CRadeon::GetMMParameters(radeon_video_tuner & tuner,
 	case 0x20:
 	case 0x30:
 		clock = C_RADEON_NO_VIDEO_CLOCK;
+		PRINT(("CRadeon::GetMMParameters() Video No Clock\n"));
 		break;
 	case 0x40:
 		clock = C_RADEON_VIDEO_CLOCK_28_63636_MHZ;
@@ -379,24 +500,29 @@ void CRadeon::GetMMParameters(radeon_video_tuner & tuner,
 		break;
 	default:
 		clock = C_RADEON_NO_VIDEO_CLOCK;
+		PRINT(("CRadeon::GetMMParameters() Video No Clock\n"));
 		break;
 	}
 
-	for (int port = 0; port < 4; port++) {	
+	for (int port = 0; port < 5; port++) {	
 		switch (fMMTable[7 + port] & 0x03) {
 		case 0x00:
 			// Unused or Invalid
+			PRINT(("CRadeon::GetMMParameters() Invalid Port\n"));
 			break;
 		case 0x01:
 			// Tuner Input
+			PRINT(("CRadeon::GetMMParameters() Tuner Port\n"));
 			tunerPort = 0;
 			break;
 		case 0x02:
 			// Front/Rear Composite Input
+			PRINT(("CRadeon::GetMMParameters() Composite Port\n"));
 			compositePort = (fMMTable[7 + port] & 0x04 ? 2 : 1);
 			break;
 		case 0x03:
 			// Front/Rear SVideo Input
+			PRINT(("CRadeon::GetMMParameters() SVideo Port\n"));
 			svideoPort = (fMMTable[7 + port] & 0x04 ? 6 : 5);
 			break;
 		}

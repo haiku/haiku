@@ -16,6 +16,8 @@ Addon radeon.media_addon : media :
 	Tuner.cpp
 	VIPPort.cpp
 	VideoIn.cpp
+	Theater100.cpp
+	Theater200.cpp
 ;
 
 LinkAgainst radeon.media_addon : be media ;
