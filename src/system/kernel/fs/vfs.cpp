@@ -1642,8 +1642,13 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				goto resolve_link_error;
 			}
 
-			status = FS_CALL(nextVnode, read_link)(nextVnode->mount->cookie,
-				nextVnode->private_node, buffer, &bufferSize);
+			if (FS_CALL(nextVnode, read_symlink) != NULL) {
+				status = FS_CALL(nextVnode, read_symlink)(
+					nextVnode->mount->cookie, nextVnode->private_node, buffer,
+					&bufferSize);
+			} else
+				status = B_BAD_VALUE;
+
 			if (status < B_OK) {
 				free(buffer);
 
@@ -4344,8 +4349,8 @@ common_read_link(int fd, char *path, char *buffer, size_t *_bufferSize,
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode, read_link) != NULL) {
-		status = FS_CALL(vnode, read_link)(vnode->mount->cookie,
+	if (FS_CALL(vnode, read_symlink) != NULL) {
+		status = FS_CALL(vnode, read_symlink)(vnode->mount->cookie,
 			vnode->private_node, buffer, _bufferSize);
 	} else
 		status = B_BAD_VALUE;

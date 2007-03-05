@@ -113,7 +113,7 @@ typedef struct file_system_module_info {
 				uint8 event, selectsync *sync);
 	status_t (*fsync)(fs_volume fs, fs_vnode vnode);
 
-	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer,
+	status_t (*read_symlink)(fs_volume fs, fs_vnode link, char *buffer,
 				size_t *_bufferSize);
 	status_t (*create_symlink)(fs_volume fs, fs_vnode dir, const char *name,
 				const char *path, int mode);
