@@ -1226,7 +1226,6 @@ static file_system_module_info sDosFileSystem = {
 	&dosfs_fsync,
 
 	&dosfs_readlink,
-	NULL,						// write link
 	NULL,	//&fs_create_symlink,
 
 	NULL,	//&fs_link,

@@ -149,7 +149,6 @@ extern status_t		_kern_create_dir(int fd, const char *path, int perms);
 extern status_t		_kern_remove_dir(int fd, const char *path);
 extern status_t		_kern_read_link(int fd, const char *path, char *buffer,
 						size_t *_bufferSize);
-extern status_t		_kern_write_link(const char *path, const char *toPath);
 extern status_t		_kern_create_symlink(int fd, const char *path,
 						const char *toPath, int mode);
 extern status_t		_kern_create_link(const char *path, const char *toPath);

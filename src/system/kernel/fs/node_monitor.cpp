@@ -687,78 +687,37 @@ status_t
 notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentNode,
 	vnode_id node, const char *name)
 {
-	monitor_listener *listener;
-	node_monitor *monitor;
-
 	TRACE(("notify_listener(op = %d, device = %ld, node = %Ld, parent = %Ld, toParent = %Ld"
 		", name = \"%s\"\n", op, device, node, parentNode, toParentNode, name));
 
-	mutex_lock(&gMonitorMutex);
+	switch (op) {
+		case B_ENTRY_CREATED:
+			return notify_entry_created(device, parentNode, name, node);
 
-	// check the main "node"
+		case B_ENTRY_REMOVED:
+			return notify_entry_removed(device, parentNode, name, node);
 
-	if ((op == B_ENTRY_MOVED
-		|| op == B_ENTRY_REMOVED
-		|| op == B_STAT_CHANGED
-		|| op == B_ATTR_CHANGED)
-		&& (monitor = get_monitor_for(device, node)) != NULL) {
-		// iterate over all listeners for this monitor, and see
-		// if we have to send anything
-		listener = NULL;
-		while ((listener = (monitor_listener*)list_get_next_item(
-				&monitor->listeners, listener)) != NULL) {
-			// do we have a reason to notify this listener?
-			if (((listener->flags & B_WATCH_NAME) != 0
-				&& (op == B_ENTRY_MOVED || op == B_ENTRY_REMOVED))
-				|| ((listener->flags & B_WATCH_STAT) != 0
-				&& op == B_STAT_CHANGED)
-				|| ((listener->flags & B_WATCH_ATTR) != 0
-				&& op == B_ATTR_CHANGED)) {
-				// then do it!
-				send_notification(listener->port, listener->token, B_NODE_MONITOR,
-					op, device, 0, parentNode, toParentNode, node, name);
-			}
+		case B_ENTRY_MOVED:
+			// no fromName -- use an empty string
+			return notify_entry_moved(device, parentNode, "", toParentNode,
+				name, node);
+
+		case B_STAT_CHANGED:
+		{
+			// no statFields -- consider all stat fields changed
+			uint32 statFields = B_STAT_MODE | B_STAT_UID | B_STAT_GID
+				| B_STAT_SIZE | B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
+				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME;
+			return notify_stat_changed(device, node, statFields);
 		}
+
+		case B_ATTR_CHANGED:
+			// no cause -- use B_ATTR_CHANGED
+			return notify_attribute_changed(device, node, name, B_ATTR_CHANGED);
+
+		default:
+			return B_BAD_VALUE;
 	}
-
-	// check its parent directory
-
-	if ((op == B_ENTRY_MOVED
-		|| op == B_ENTRY_REMOVED
-		|| op == B_ENTRY_CREATED)
-		&& (monitor = get_monitor_for(device, parentNode)) != NULL) {
-		// iterate over all listeners for this monitor, and see
-		// if we have to send anything
-		listener = NULL;
-		while ((listener = (monitor_listener*)list_get_next_item(
-				&monitor->listeners, listener)) != NULL) {
-			// do we have a reason to notify this listener?
-			if ((listener->flags & B_WATCH_DIRECTORY) != 0) {
-				send_notification(listener->port, listener->token, B_NODE_MONITOR,
-					op, device, 0, parentNode, toParentNode, node, name);
-			}
-		}
-	}
-
-	// check its new target parent directory
-
-	if (op == B_ENTRY_MOVED
-		&& (monitor = get_monitor_for(device, toParentNode)) != NULL) {
-		// iterate over all listeners for this monitor, and see
-		// if we have to send anything
-		listener = NULL;
-		while ((listener = (monitor_listener*)list_get_next_item(
-				&monitor->listeners, listener)) != NULL) {
-			// do we have a reason to notify this listener?
-			if ((listener->flags & B_WATCH_DIRECTORY) != 0) {
-				send_notification(listener->port, listener->token, B_NODE_MONITOR,
-					B_ENTRY_MOVED, device, 0, parentNode, toParentNode, node, name);
-			}
-		}
-	}
-
-	mutex_unlock(&gMonitorMutex);
-	return B_OK;
 }
 
 

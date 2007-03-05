@@ -1890,7 +1890,6 @@ file_system_module_info gDeviceFileSystem = {
 	&devfs_fsync,
 
 	&devfs_read_link,
-	NULL,	// write_link
 	NULL,	// symlink
 	NULL,	// link
 	NULL,	// unlink

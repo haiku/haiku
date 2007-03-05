@@ -1066,7 +1066,6 @@ file_system_module_info gRootFileSystem = {
 	&rootfs_fsync,
 
 	&rootfs_read_link,
-	NULL,	// fs_write_link()
 	&rootfs_symlink,
 	NULL,	// fs_link()
 	&rootfs_unlink,

@@ -2460,7 +2460,6 @@ static file_system_module_info sNFSModule = {
 	NULL, 	// &fs_fsync
 
 	&fs_readlink,
-	NULL,	// &fs_write link,
 	&fs_symlink,
 
 	NULL,	// &fs_link,

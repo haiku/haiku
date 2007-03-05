@@ -4356,27 +4356,6 @@ common_read_link(int fd, char *path, char *buffer, size_t *_bufferSize,
 
 
 static status_t
-common_write_link(char *path, char *toPath, bool kernel)
-{
-	struct vnode *vnode;
-	status_t status;
-
-	status = path_to_vnode(path, false, &vnode, NULL, kernel);
-	if (status < B_OK)
-		return status;
-
-	if (FS_CALL(vnode, write_link) != NULL)
-		status = FS_CALL(vnode, write_link)(vnode->mount->cookie, vnode->private_node, toPath);
-	else
-		status = EOPNOTSUPP;
-
-	put_vnode(vnode);
-
-	return status;
-}
-
-
-static status_t
 common_create_symlink(int fd, char *path, const char *toPath, int mode,
 	bool kernel)
 {
@@ -6210,24 +6189,6 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 }
 
 
-status_t
-_kern_write_link(const char *path, const char *toPath)
-{
-	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
-	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
-	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
-
-	char *toBuffer = toPathBuffer.LockBuffer();
-
-	status_t status = check_path(toBuffer);
-	if (status < B_OK)
-		return status;
-
-	return common_write_link(pathBuffer.LockBuffer(), toBuffer, true);
-}
-
-
 /**	\brief Creates a symlink specified by a FD + path pair.
  *
  *	\a path must always be specified (it contains the name of the new symlink
@@ -7068,31 +7029,6 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t *userBuff
 		return B_BAD_ADDRESS;
 
 	return B_OK;
-}
-
-
-status_t
-_user_write_link(const char *userPath, const char *userToPath)
-{
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
-	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
-	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
-
-	char *path = pathBuffer.LockBuffer();
-	char *toPath = toPathBuffer.LockBuffer();
-
-	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userToPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
-		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
-
-	status_t status = check_path(toPath);
-	if (status < B_OK)
-		return status;
-
-	return common_write_link(path, toPath, false);
 }
 
 

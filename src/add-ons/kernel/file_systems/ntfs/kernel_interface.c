@@ -138,9 +138,7 @@ static file_system_module_info sNTFSFileSystem = {
 	NULL,
 	NULL,
 	NULL,
-	NULL,
 #else	
-	NULL,	// write link
 	&fs_create_symlink,
 	NULL, 	// &fs_link,
 	&fs_unlink,

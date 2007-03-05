@@ -1654,7 +1654,6 @@ static file_system_module_info sGoogleFSModule = {
 	NULL, 	// &googlefs_fsync
 
 	NULL,	// &googlefs_read_link,
-	NULL,	// write link
 	NULL, 	// &googlefs_create_symlink,
 
 	NULL, 	// &googlefs_link,

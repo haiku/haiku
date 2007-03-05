@@ -115,7 +115,6 @@ typedef struct file_system_module_info {
 
 	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer,
 				size_t *_bufferSize);
-	status_t (*write_link)(fs_volume fs, fs_vnode link, char *toPath);
 	status_t (*create_symlink)(fs_volume fs, fs_vnode dir, const char *name,
 				const char *path, int mode);
 
@@ -269,10 +268,8 @@ extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t get_vnode_removed(mount_id mountID, vnode_id vnodeID,
 					bool* removed);
 
+// Deprecated! Will disappear soon!
 extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
-					vnode_id toParentNode, vnode_id node, const char *name);
-extern status_t send_notification(port_id port, long token, ulong what, long op,
-					mount_id device, mount_id toDevice, vnode_id parentNode,
 					vnode_id toParentNode, vnode_id node, const char *name);
 
 extern status_t notify_entry_created(mount_id device, vnode_id directory,

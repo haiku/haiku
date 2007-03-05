@@ -54,6 +54,7 @@ SYSHDRS = $(HAIKU_HDRS) ;
 			fstat=build_platform_fstat
 			read_pos=build_platform_read_pos
 			ioctl=build_platform_ioctl
+			"send_notification\\(...\\)="
 		;
 	}
 

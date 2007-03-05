@@ -1006,7 +1006,6 @@ static file_system_module_info sISO660FileSystem = {
 	NULL, 	// &fs_fsync
 
 	&fs_read_link,
-	NULL,	// write link
 	NULL, 	// &fs_create_symlink,
 
 	NULL, 	// &fs_link,

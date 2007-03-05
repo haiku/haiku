@@ -2098,7 +2098,6 @@ static file_system_module_info sBeFileSystem = {
 	&bfs_fsync,
 
 	&bfs_read_link,
-	NULL,						// write link
 	&bfs_create_symlink,
 
 	&bfs_link,

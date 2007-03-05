@@ -1724,7 +1724,6 @@ file_system_module_info gPipeFileSystem = {
 	&pipefs_fsync,
 
 	NULL,	// fs_read_link()
-	NULL,	// fs_write_link()
 	NULL,	// fs_symlink()
 	NULL,	// fs_link()
 	&pipefs_unlink,

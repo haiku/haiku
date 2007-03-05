@@ -1036,7 +1036,6 @@ static file_system_module_info sUserlandFSModuleInfo = {
 	&userlandfs_fsync,
 
 	&userlandfs_read_symlink,
-	NULL,						// write link
 	&userlandfs_create_symlink,
 
 	&userlandfs_link,
