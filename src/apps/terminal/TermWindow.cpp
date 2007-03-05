@@ -58,9 +58,9 @@ extern int gNowCoding;  /* defined TermParce.cpp */
 void SetCoding(int);
 
 
-TermWindow::TermWindow(BRect frame, const char* title, int gPfd)
+TermWindow::TermWindow(BRect frame, const char* title, int fd)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE),
-	fPfd(gPfd)
+	fPfd(fd)
 {
 	InitWindow();
 
@@ -115,7 +115,7 @@ TermWindow::InitWindow(void)
 	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
 	fCodeConv = new CodeConv();
-	fTermView = new TermView(Bounds(), fCodeConv);
+	fTermView = new TermView(Bounds(), fCodeConv, fPfd);
 
 	/*
 	 * MuTerm has two views. BaseView is window base view.
@@ -132,7 +132,6 @@ TermWindow::InitWindow(void)
 		gTermPref->getInt32(PREF_COLS), 1);
 
 	int width, height;
-
 	fTermView->GetFontSize(&width, &height);
 	SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
 		MIN_COLS * height, MAX_COLS * height);
@@ -170,11 +169,10 @@ TermWindow::InitWindow(void)
 	fEditmenu->SetTargetForItems(fTermView);
 
 	// Initialize TermParse
-
 	gNowCoding = longname2op(gTermPref->getString(PREF_TEXT_ENCODING));
-	fTermParse = new TermParse();
-	fTermParse->InitPtyReader(this);
-	fTermParse->InitTermParse(fTermView, fCodeConv);
+	fTermParse = new TermParse(fPfd, this, fTermView, fCodeConv);
+	if (fTermParse->StartThreads() < B_OK)
+		return;
 
 	// Set Coding.
 	

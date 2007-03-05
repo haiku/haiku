@@ -99,7 +99,7 @@ public:
   //
   // Constructor, Destructor, and Initializer.
   //
-  TermView (BRect frame, CodeConv *inCodeConv);
+  TermView (BRect frame, CodeConv *inCodeConv, int fd);
   ~TermView ();
 
   //
@@ -272,6 +272,7 @@ private:
    * DATA Member.
    */
 
+  int fTerminalFd;
   //
   // Font and Width.
   //

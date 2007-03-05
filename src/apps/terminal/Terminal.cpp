@@ -33,8 +33,6 @@
 #include "TermApp.h"
 #include "PrefHandler.h"
 
-/* global varriables */
-int gPfd;	/* pesudo tty fd */
 
 PrefHandler *gTermPref;		/* Preference temporary */
 

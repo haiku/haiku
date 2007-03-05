@@ -63,8 +63,9 @@ const static rgb_color kTermColorTable[16] = {
 };
 
 
-TermView::TermView(BRect frame, CodeConv *inCodeConv)
+TermView::TermView(BRect frame, CodeConv *inCodeConv, int fd)
 	: BView(frame, "termview", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
+	fTerminalFd(fd),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -1119,7 +1120,7 @@ TermView::UpdateSIGWINCH()
 		struct winsize ws;
 		ws.ws_row = fTermRows;
 		ws.ws_col = fTermColumns;
-		ioctl(gPfd, TIOCSWINSZ, &ws);
+		ioctl(fTerminalFd, TIOCSWINSZ, &ws);
 		kill(-sh_pid, SIGWINCH);
 
 		fFrameResized = 0;
@@ -1139,11 +1140,11 @@ TermView::DeviceStatusReport(int n)
 	switch (n) {
 		case 5:
 			len = sprintf(sbuf,"\033[0n") ;
-			write(gPfd, sbuf, len);
+			write(fTerminalFd, sbuf, len);
 			break ;
 		case 6:
 			len = sprintf(sbuf,"\033[%d;%dR", fTermRows, fTermColumns) ;
-			write(gPfd, sbuf, len);
+			write(fTerminalFd, sbuf, len);
 			break ;
 		default:
 			return;
@@ -1316,7 +1317,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 
 	// If bytes[0] equal intr charactor,
 	// send signal to shell process group.
-	tcgetattr(gPfd, &tio);
+	tcgetattr(fTerminalFd, &tio);
 	if (*bytes == tio.c_cc[VINTR]) {
 		if (tio.c_lflag & ISIG)
 			kill(-sh_pid, SIGINT);
@@ -1330,24 +1331,24 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			case B_RETURN:
 				c = 0x0d;
 				if (key == RETURN_KEY || key == ENTER_KEY) {
-					write(gPfd, &c, 1);
+					write(fTerminalFd, &c, 1);
 					return;
 				} else {
-					write(gPfd, bytes, numBytes);
+					write(fTerminalFd, bytes, numBytes);
 					return;
 				}
 				break;
 
 			case B_LEFT_ARROW:
 				if (key == LEFT_ARROW_KEY) {
-					write(gPfd, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE)-1);
+					write(fTerminalFd, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
 
 			case B_RIGHT_ARROW:
 				if (key == RIGHT_ARROW_KEY) {
-					write(gPfd, RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE)-1);
+					write(fTerminalFd, RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
@@ -1362,7 +1363,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				}
 
 				if (key == UP_ARROW_KEY) {
-					write(gPfd, UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE)-1);
+					write(fTerminalFd, UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
@@ -1375,21 +1376,21 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				}
 
 				if (key == DOWN_ARROW_KEY) {
-					write(gPfd, DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE)-1);
+					write(fTerminalFd, DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
 
 			case B_INSERT:
 				if (key == INSERT_KEY) {
-					write(gPfd, INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE)-1);
+					write(fTerminalFd, INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE)-1);
 					return;
 				}
 				break;
 
 			case B_HOME:
 				if (key == HOME_KEY) {
-					write(gPfd, HOME_KEY_CODE, sizeof(HOME_KEY_CODE)-1);
+					write(fTerminalFd, HOME_KEY_CODE, sizeof(HOME_KEY_CODE)-1);
 					return;
 				}
 				break;
@@ -1404,7 +1405,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				}
 
 				if (key == PAGE_UP_KEY) {
-					write(gPfd, PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE)-1);
+					write(fTerminalFd, PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE)-1);
 					return;
 				}
 				break;
@@ -1417,14 +1418,14 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				}
 
 				if (key == PAGE_DOWN_KEY) {
-					write(gPfd, PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE)-1);
+					write(fTerminalFd, PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE)-1);
 					return;
 				}
 				break;
 
 			case B_END:
 				if (key == END_KEY) {
-					write(gPfd, END_KEY_CODE, sizeof(END_KEY_CODE)-1);
+					write(fTerminalFd, END_KEY_CODE, sizeof(END_KEY_CODE)-1);
 					return;
 				}
 				break;
@@ -1432,7 +1433,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			case B_FUNCTION_KEY:
 				for (c = 0; c < 12; c++) {
 					if (key == function_keycode_table[c]) {
-						write(gPfd, function_key_char_table[c], 5);
+						write(fTerminalFd, function_key_char_table[c], 5);
 						return;
 					}
 				}
@@ -1447,12 +1448,12 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		if (gNowCoding != M_UTF8) {
 			int cnum = fCodeConv->ConvertFromInternal(bytes, numBytes,
 				(char *)dstbuf, gNowCoding);
-			write(gPfd, dstbuf, cnum);
+			write(fTerminalFd, dstbuf, cnum);
 			return;
 		}
 	}
 
-	write(gPfd, bytes, numBytes);
+	write(fTerminalFd, bytes, numBytes);
 }
 
 
@@ -1534,7 +1535,7 @@ TermView::MessageReceived(BMessage *msg)
 
 		case MENU_CLEAR_ALL:
 			DoClearAll();
-			write(gPfd, ctrl_l, 1);
+			write(fTerminalFd, ctrl_l, 1);
 			break;
 
 		case MSGRUN_CURSOR:
@@ -1726,10 +1727,10 @@ TermView::WritePTY(const uchar *text, int numBytes)
 		uchar *destBuffer = (uchar *)malloc(numBytes * 3);
 		numBytes = fCodeConv->ConvertFromInternal((char*)text, numBytes,
 			(char*)destBuffer, gNowCoding);
-		write(gPfd, destBuffer, numBytes);
+		write(fTerminalFd, destBuffer, numBytes);
 		free(destBuffer);
 	} else {
-		write(gPfd, text, numBytes);
+		write(fTerminalFd, text, numBytes);
 	}
 }
 

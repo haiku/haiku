@@ -31,8 +31,9 @@
 #ifndef TERMPARSE_H
 #define TERMPARSE_H
 
-#include <kernel/OS.h>
+#include <OS.h>
 #include <MessageRunner.h>
+
 #include "TermConst.h"
 
 class TermView;
@@ -42,56 +43,52 @@ class TermWindow;
 //PtyReader buffer size.
 #define READ_BUF_SIZE 2048
 
-class TermParse : public BHandler
-{
+class TermParse : public BHandler {
 public:
-  TermParse (void);
-  ~TermParse (void);
+	TermParse(int fd, TermWindow *inWinObj, TermView *inViewObj, CodeConv *inConvObj);
+	~TermParse();
 
-  // Initialize TermParse and PtyReader thread.
-  status_t InitTermParse (TermView *inViewObj, CodeConv *inConvObj);
-  thread_id InitPtyReader (TermWindow *inWinObj);
-
-  // Delete TermParse and PtyReader thread.
-  status_t AbortTermParse (void);
-  status_t AbortPtyReader (void);
-  
+	status_t StartThreads();
   
 private:
-  //
-  // Hook Functions.
-  //
+	// Initialize TermParse and PtyReader thread.
+	status_t InitTermParse();
+	status_t InitPtyReader();
 
+	// Delete TermParse and PtyReader thread.
+	status_t AbortTermParse();
+	status_t AbortPtyReader();
 
-  // Escape Sequance parse thread.
-  static int32 EscParse (void *);
+	int32 EscParse();
+	int32 PtyReader();
 
-  // Pty device reader thread.
-  static int32 PtyReader (void *);
+	static int32 _ptyreader_thread(void *);
+	static int32 _escparse_thread(void *);
 
-  // Reading ReadBuf at one Char.
-  uchar GetReaderBuf (void);
+	// Reading ReadBuf at one Char.
+	status_t GetReaderBuf(uchar &c);
   
-  TermView *fViewObj;
-  TermWindow *fWinObj;
-  CodeConv *fConvObj;
+	int fFd;
+
+	TermView *fViewObj;
+	TermWindow *fWinObj;
+	CodeConv *fConvObj;
   
-  thread_id fParseThread;
-  sem_id fParseSem;
+	thread_id fParseThread;
+	sem_id fParseSem;
 
-  thread_id fReaderThread;
-  sem_id fReaderSem;
-  sem_id fReaderLocker;
+	thread_id fReaderThread;
+	sem_id fReaderSem;
+	sem_id fReaderLocker;
 
-  BMessageRunner *fCursorUpdate;
+	BMessageRunner *fCursorUpdate;
 
-  uint fParser_p;	/* EscParse reading buffer pointer */
-  int fLockFlag;	/* PtyReader lock flag */
+	uint fParser_p;	/* EscParse reading buffer pointer */
+	int fLockFlag;	/* PtyReader lock flag */
 
-  bool fQuitting;
+	bool fQuitting;
   
-  uchar fReadBuf[READ_BUF_SIZE]; /* Reading buffer */
-  
+	uchar fReadBuf[READ_BUF_SIZE]; /* Reading buffer */
 };
 
 #endif // TERMPARSE_H
