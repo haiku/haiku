@@ -119,18 +119,21 @@ typedef struct nspace
 	int			free_cluster_count;
 	char		volumeLabel[MAX_PATH];
 	
-	int state;
-	s64 free_clusters;
-	long free_mft;
-	BOOL ro;
-	BOOL show_sys_files;
-	BOOL silent;
-	BOOL force;
-	BOOL debug;
-	BOOL noatime;
-	BOOL no_detach;	
+	ulong 		flags;
+
+	int 		state;
+	s64 		free_clusters;
+	long 		free_mft;
+	BOOL 		ro;
+	BOOL 		show_sys_files;
+	BOOL 		silent;
+	BOOL 		force;
+	BOOL 		debug;
+	BOOL 		noatime;
+	BOOL 		no_detach;	
 	
-	lock 			vlock;
+	
+	lock		vlock;
 		
 } nspace;
 

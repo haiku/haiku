@@ -33,6 +33,7 @@
 #include <KernelExport.h>
 #include <time.h>
 #include <malloc.h>
+#include <driver_settings.h>
 
 #include "ntfs.h"
 #include "attributes.h"
@@ -113,6 +114,8 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 	nspace		*ns;
 	vnode		*newNode = NULL;
 	char 		lockname[32];
+	void 		*handle;	
+	unsigned long mnt_flags = 0;	
 	status_t	result = B_NO_ERROR;
 
 	ERRPRINT("fs_mount - ENTER\n");
@@ -122,11 +125,15 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 		result = ENOMEM;
 		goto	exit;
 	}
+		
 			
 	*ns = (nspace) {
 		.state = NF_FreeClustersOutdate | NF_FreeMFTOutdate,
 		.show_sys_files = false,
+		.ro = false
 	};
+	
+	ns->flags = flags;
 		
 	strcpy(ns->devicePath,device);
 		
@@ -141,8 +148,21 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 			ERRPRINT("fs_mount - error creating lock (%s)\n", strerror(result));
 			goto exit;
 	}
+	
+	handle = load_driver_settings("ntfs");
+	ns->show_sys_files = ! (strcasecmp(get_driver_parameter(handle, "hide_sys_files", "true", "true"), "true") == 0);
+	ns->ro = strcasecmp(get_driver_parameter(handle, "read_only", "false", "false"), "false") != 0;
+	ns->noatime = strcasecmp(get_driver_parameter(handle, "no_atime", "true", "true"), "true") == 0;
+	unload_driver_settings(handle);
+	
+	if (ns->ro || ns->flags & B_MOUNT_READ_ONLY) {
+		mnt_flags |= MS_RDONLY;
+		ns->flags |= B_MOUNT_READ_ONLY;
+	}
+	if (ns->noatime)
+		mnt_flags |= MS_NOATIME;	
 		
-	ns->ntvol=utils_mount_volume(device,0,true);
+	ns->ntvol=utils_mount_volume(device,mnt_flags,true);
 	if(ns->ntvol!=NULL)
 		result = B_NO_ERROR;
 	else
@@ -254,7 +274,6 @@ fs_rfsstat( void *_ns, struct fs_info * fss )
 	return B_NO_ERROR;
 }
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t
 fs_wfsstat(void *_vol, const struct fs_info * fss, uint32 mask)
@@ -266,6 +285,11 @@ fs_wfsstat(void *_vol, struct fs_info *fss, long mask)
 	nspace* 	ns = (nspace*)_vol;
 	status_t	result = B_NO_ERROR;
 
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}
+
 	LOCK_VOL(ns);
 
 #ifdef __HAIKU__
@@ -274,7 +298,7 @@ fs_wfsstat(void *_vol, struct fs_info *fss, long mask)
 	if (mask & WFSSTAT_NAME) {
 #endif		
 		result = ntfs_change_label( ns->ntvol,  (char*)fss->volume_name );
-		goto exit;
+		goto exit;	
 	}
 	
 exit:
@@ -283,7 +307,6 @@ exit:
 
 	return result;
 }
-#endif
 
 #ifdef __HAIKU__
 status_t
@@ -487,7 +510,6 @@ fs_write_vnode( void *_ns, void *_node, char reenter )
 	return result;
 }
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t
 fs_remove_vnode( void *_ns, void *_node, bool reenter )
@@ -515,7 +537,6 @@ fs_remove_vnode( void *_ns, void *_node, char reenter )
 	
 	return result;
 }
-#endif
 
 #ifdef __HAIKU__ 
 status_t
@@ -598,8 +619,13 @@ fs_rstat( void *_ns, void *_node, struct stat *stbuf )
 			free(intx_file);
 		}
 		ntfs_attr_close(na);
-		stbuf->st_mode |= 0666;
+		stbuf->st_mode |= 0666;			
 	}
+
+	if (ns->flags & B_FS_IS_READONLY) {
+			stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+	}
+	
 	stbuf->st_uid = 0;
 	stbuf->st_gid = 0;
 	stbuf->st_atime = ni->last_access_time;
@@ -619,7 +645,6 @@ exit:
 
 }
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t
 fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
@@ -702,9 +727,8 @@ exit:
 	
 	return result;
 }
-#endif
 
-#ifndef _READ_ONLY_
+
 #ifdef __HAIKU__
 status_t
 fs_sync(void *_ns)
@@ -719,19 +743,14 @@ fs_sync(void *_ns)
 
 	ERRPRINT("fs_sync - ENTER\n");
 
-#ifndef __HAIKU__
-	flush_device(DEV_FD(ns->ntvol->dev), 0);
-#endif	
-
 	ERRPRINT("fs_sync - EXIT\n");
 
 	UNLOCK_VOL(ns);
 
 	return B_NO_ERROR;
 }
-#endif
 
-#ifndef _READ_ONLY_
+
 #ifdef __HAIKU__
 status_t
 fs_fsync(void *_ns, void *_node)
@@ -773,7 +792,6 @@ exit:
 	
 	return result;
 }
-#endif
 
 #ifdef __HAIKU__
 status_t	
@@ -840,7 +858,6 @@ exit:
 }
 
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t   
 fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, vnode_id *_vnid)
@@ -859,9 +876,14 @@ fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, vnode_i
 	ntfschar 	*uname = NULL;
 	status_t	result = B_NO_ERROR;	
 	int 		uname_len;
+
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}	
 				
 	LOCK_VOL(ns);
-	
+		
 	ERRPRINT("fs_create - ENTER: name=%s\n",name); 
 	
 	if(_ns==NULL || _dir==NULL) {
@@ -964,7 +986,6 @@ exit:
 	
 	return 		result;
 }
-#endif
 
 #ifdef __HAIKU__
 status_t
@@ -1048,7 +1069,6 @@ exit2:
 }
 
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t
 fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, size_t *len )
@@ -1065,6 +1085,11 @@ fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, 
 	int 		total = 0;
 	size_t 		size=*len;
 	status_t	result = B_NO_ERROR;
+	
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}	
 	
 	LOCK_VOL(ns);
 
@@ -1145,7 +1170,7 @@ exit2:
 	
 	return result;	
 }
-#endif
+
 
 #ifdef __HAIKU__
 status_t	
@@ -1292,7 +1317,6 @@ exit:
 	return result;
 }
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t
 fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target, int mode)
@@ -1383,9 +1407,8 @@ exit:
 	
 	return result;
 }
-#endif
 
-#ifndef _READ_ONLY_
+
 #ifdef __HAIKU__
 status_t
 fs_mkdir(void *_ns, void *_node, const char *name,	int perms, vnode_id *_vnid)
@@ -1402,6 +1425,11 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
 	ntfs_inode	*ni = NULL;
 	ntfs_inode	*bi = NULL;
 	status_t	result = B_NO_ERROR;		
+
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}
 	
 	LOCK_VOL(ns);
 	
@@ -1484,9 +1512,7 @@ exit:
 	
 	return 		result;
 }
-#endif
 
-#ifndef _READ_ONLY_
 #ifdef __HAIKU__
 status_t
 fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname)
@@ -1515,6 +1541,10 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 	
 	status_t	result = B_NO_ERROR;	
 	
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}	
 	
 	LOCK_VOL(ns);
 	
@@ -1683,9 +1713,7 @@ exit:
 	return result;	
 	
 }
-#endif
 
-#ifndef _READ_ONLY_
 status_t
 do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
 {
@@ -1772,9 +1800,8 @@ exit1:
 				
 	return result;
 }
-#endif
 
-#ifndef _READ_ONLY_
+
 #ifdef __HAIKU__
 status_t
 fs_rmdir(void *_ns, void *_node, const char *name)
@@ -1786,6 +1813,11 @@ fs_rmdir(void *_ns, void *_node, const char *name)
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_node;
 	status_t	result = B_NO_ERROR;
+
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}
 
 	LOCK_VOL(ns);
 	
@@ -1818,9 +1850,8 @@ exit1:
 	
 	return result;
 }
-#endif
 
-#ifndef _READ_ONLY_
+
 #ifdef __HAIKU__
 status_t
 fs_unlink(void *_ns, void *_node, const char *name)
@@ -1832,6 +1863,11 @@ fs_unlink(void *_ns, void *_node, const char *name)
 	nspace		*ns = (nspace*)_ns;
 	vnode		*dir = (vnode*)_node;
 	status_t	result = B_NO_ERROR;
+
+	if (ns->flags & B_FS_IS_READONLY) {
+		ERRPRINT("ntfs is read-only\n");
+		return EROFS;
+	}
 
 	LOCK_VOL(ns);
 	
@@ -1864,5 +1900,4 @@ exit:
 	
 	return result;
 }
-#endif
 

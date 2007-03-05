@@ -382,10 +382,8 @@ fs_write_attrib(void *_ns, void *_node, const char *name, int type, const void *
 #ifdef __HAIKU_
 	if (_cookie != &kBeOSTypeCookie) {
 		result = ENOSYS;
-		goto	exit;
 	}
 #endif	
-exit:
 	
 	ERRPRINT("fs_write_attrib - EXIT, result is %s\n", strerror(result));
 

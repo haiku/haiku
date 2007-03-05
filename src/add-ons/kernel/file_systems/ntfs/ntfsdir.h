@@ -22,24 +22,14 @@
 #define _NTFSDIR_H
 
 
-typedef struct direntry
-{
-	char *name;
-	dev_t dev;
-	ino_t ino;
-	struct direntry *next;
-} direntry;
-
 typedef struct dircookie
 {
-	dev_t				dev;
-	vnode_id			vnid;
-	struct direntry *	root;
-	struct direntry *	last;
-	struct direntry *	walk;
 	u64					pos;
+	int					readed;		
+	ino_t				ino;
+	BOOL 				show_sys_files;	
+	char 				name[MAX_PATH];
 } dircookie;
-
 
 #ifdef __HAIKU__
 

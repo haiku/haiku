@@ -95,11 +95,7 @@ static file_system_module_info sNTFSFileSystem = {
 	&fs_mount,
 	&fs_unmount,
 	&fs_rfsstat,
-#ifdef _READ_ONLY_
-	NULL,
-#else
 	&fs_wfsstat,
-#endif
 	NULL,
 
 	/* vnode operations */
@@ -107,11 +103,7 @@ static file_system_module_info sNTFSFileSystem = {
 	&fs_get_vnode_name,
 	&fs_read_vnode,
 	&fs_write_vnode,
-#ifdef _READ_ONLY_
-	NULL,
-#else	
 	&fs_remove_vnode,
-#endif
 
 	/* VM file access */
 	NULL, 	// &fs_can_page
@@ -125,58 +117,29 @@ static file_system_module_info sNTFSFileSystem = {
 	NULL,	// &fs_select
 	NULL,	// &fs_deselect
 
-#ifdef _READ_ONLY_
-	NULL,
-#else		
 	&fs_fsync,
-#endif	
 
-	&fs_readlink,
-	
-#ifdef _READ_ONLY_
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-#else	
+	&fs_readlink,	
 	&fs_create_symlink,
 	NULL, 	// &fs_link,
 	&fs_unlink,
 	&fs_rename,
-#endif
 
 	&fs_access,
 	&fs_rstat,
-#ifdef _READ_ONLY_
-	NULL,
-#else		
 	&fs_wstat,
-#endif
 
 	/* file operations */
-#ifdef _READ_ONLY_
-	NULL,
-#else			
 	&fs_create,
-#endif	
 	&fs_open,
 	&fs_close,
 	&fs_free_cookie,
 	&fs_read,
-#ifdef _READ_ONLY_
-	NULL,
-#else			
 	&fs_write,
-#endif	
 
 	/* directory operations */
-#ifdef _READ_ONLY_
-	NULL,
-	NULL,
-#else			
 	&fs_mkdir,
 	&fs_rmdir,
-#endif	
 	&fs_opendir,
 	&fs_closedir,
 	&fs_free_dircookie,

@@ -116,8 +116,6 @@ int			fs_create_symlink(void *ns, void *_dir, const char *name, const char *path
 
 #endif //__HAIKU__
 
-#ifndef _READ_ONLY_
-status_t do_unlink(nspace *vol, vnode *dir, const char *name, bool isdir);
-#endif
+status_t 	do_unlink(nspace *vol, vnode *dir, const char *name, bool isdir);
 
 #endif
