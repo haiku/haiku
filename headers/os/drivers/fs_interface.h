@@ -264,7 +264,6 @@ extern status_t get_vnode(mount_id mountID, vnode_id vnodeID,
 extern status_t put_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t remove_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
-extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t get_vnode_removed(mount_id mountID, vnode_id vnodeID,
 					bool* removed);
 
