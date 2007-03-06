@@ -21,6 +21,19 @@ HaikuKernelFileSystem::HaikuKernelFileSystem(file_system_module_info* fsModule)
 // destructor
 HaikuKernelFileSystem::~HaikuKernelFileSystem()
 {
+	// call the kernel module uninitialization
+	if (fFSModule->info.std_ops)
+		fFSModule->info.std_ops(B_MODULE_UNINIT);
+}
+
+// Init
+status_t
+HaikuKernelFileSystem::Init()
+{
+	// call the kernel module initialization
+	if (!fFSModule->info.std_ops)
+		return B_OK;
+	return fFSModule->info.std_ops(B_MODULE_INIT);
 }
 
 // CreateVolume

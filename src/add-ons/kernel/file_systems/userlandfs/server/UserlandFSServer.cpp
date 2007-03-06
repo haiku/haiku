@@ -273,8 +273,15 @@ UserlandFSServer::_CreateHaikuKernelInterface(const char* fsName,
 		= new(nothrow) HaikuKernelFileSystem(module);
 	if (!fileSystem)
 		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<HaikuKernelFileSystem> fsDeleter(fileSystem);
+
+	// init the FS
+	error = fileSystem->Init();
+	if (error != B_OK)
+		return error;
 
 	// everything went fine
+	fsDeleter.Detach();
 	*_fileSystem = fileSystem;
 	return B_OK;
 }

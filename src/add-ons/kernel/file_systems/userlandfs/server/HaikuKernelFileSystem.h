@@ -15,6 +15,8 @@ public:
 									file_system_module_info* fsModule);
 	virtual						~HaikuKernelFileSystem();
 
+			status_t			Init();
+
 	virtual	status_t			CreateVolume(Volume** volume, mount_id id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
