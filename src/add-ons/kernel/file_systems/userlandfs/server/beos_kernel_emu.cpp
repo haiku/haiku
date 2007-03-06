@@ -175,7 +175,7 @@ is_vnode_removed(nspace_id nsid, vnode_id vnid)
 }
 
 
-// #pragma mark - Block Cache
+// #pragma mark - Locking
 
 
 int

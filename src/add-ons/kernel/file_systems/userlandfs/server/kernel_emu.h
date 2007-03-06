@@ -17,7 +17,7 @@ void free_path(char *p);
 status_t notify_listener(int32 operation, uint32 details, mount_id device,
 	vnode_id oldDirectory, vnode_id directory, vnode_id node,
 	const char* oldName, const char* name);
-void notify_select_event(selectsync *sync, uint32 ref, uint8 event,
+status_t notify_select_event(selectsync *sync, uint32 ref, uint8 event,
 	bool unspecifiedEvent);
 status_t notify_query(port_id port, int32 token, int32 operation,
 	mount_id device, vnode_id directory, const char* name, vnode_id node);

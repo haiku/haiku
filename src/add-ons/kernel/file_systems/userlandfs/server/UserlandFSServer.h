@@ -4,6 +4,7 @@
 #define USERLAND_FS_SERVER_H
 
 #include <Application.h>
+#include <image.h>
 
 namespace UserlandFSUtil {
 	class RequestPort;
@@ -27,6 +28,11 @@ public:
 
 private:
 			status_t			_RegisterWithDispatcher(const char* fsName);
+			status_t			_CreateBeOSKernelInterface(const char* fsName,
+									image_id image, FileSystem** fileSystem);
+			status_t			_CreateHaikuKernelInterface(const char* fsName,
+									image_id image, FileSystem** fileSystem);
+
 private:
 			image_id			fAddOnImage;
 			FileSystem*			fFileSystem;

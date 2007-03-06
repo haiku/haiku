@@ -10,10 +10,10 @@
 #include <Clipboard.h>
 #include <FindDirectory.h>
 #include <fs_interface.h>
-#include <image.h>
 #include <Locker.h>
 #include <Path.h>
 
+#include "AutoDeleter.h"
 #include "AutoLocker.h"
 #include "beos_fs_cache.h"
 #include "beos_fs_interface.h"
@@ -23,6 +23,7 @@
 #include "DispatcherDefs.h"
 #include "FileSystem.h"
 #include "FSInfo.h"
+#include "HaikuKernelFileSystem.h"
 #include "RequestThread.h"
 #include "ServerDefs.h"
 
@@ -80,32 +81,17 @@ UserlandFSServer::Init(const char* fileSystem)
 	if (fAddOnImage < 0)
 		RETURN_ERROR(fAddOnImage);
 
-	// get the symbols "fs_entry" and "api_version"
-	beos_vnode_ops* fsOps;
-	error = get_image_symbol(fAddOnImage, "fs_entry", B_SYMBOL_TYPE_DATA,
-		(void**)&fsOps);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	int32* apiVersion;
-	error = get_image_symbol(fAddOnImage, "api_version", B_SYMBOL_TYPE_DATA,
-		(void**)&apiVersion);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// check api version
-	if (*apiVersion != BEOS_FS_API_VERSION)
-		RETURN_ERROR(B_ERROR);
-
-	// create the file system
-	fFileSystem = new(nothrow) BeOSKernelFileSystem(fsOps);
-	if (!fileSystem)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	// init the block cache
-	error = beos_init_block_cache(kMaxBlockCacheBlocks, 0);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	fBlockCacheInitialized = true;
+	// create the FileSystem interface
+	// BeOS kernel interface
+	if (_CreateBeOSKernelInterface(fileSystem, fAddOnImage, &fFileSystem)
+			== B_OK) {
+		// BeOS interface
+	} else if (_CreateHaikuKernelInterface(fileSystem, fAddOnImage,
+			&fFileSystem) == B_OK) {
+		// Haiku interface
+	} else {
+		ERROR(("Add-on doesn't has a supported interface.\n"));
+	}
 
 	// create the notification request port
 	fNotificationRequestPort = new(nothrow) RequestPort(kRequestPortSize);
@@ -216,3 +202,79 @@ UserlandFSServer::_RegisterWithDispatcher(const char* fsName)
 	return error;
 }
 
+// _CreateBeOSKernelInterface
+status_t
+UserlandFSServer::_CreateBeOSKernelInterface(const char* fsName, image_id image,
+	FileSystem** _fileSystem)
+{
+	// get the symbols "fs_entry" and "api_version"
+	beos_vnode_ops* fsOps;
+	status_t error = get_image_symbol(image, "fs_entry", B_SYMBOL_TYPE_DATA,
+		(void**)&fsOps);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	int32* apiVersion;
+	error = get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
+		(void**)&apiVersion);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// check api version
+	if (*apiVersion != BEOS_FS_API_VERSION)
+		RETURN_ERROR(B_ERROR);
+
+	// create the file system
+	BeOSKernelFileSystem* fileSystem = new(nothrow) BeOSKernelFileSystem(fsOps);
+	if (!fileSystem)
+		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<BeOSKernelFileSystem> fsDeleter(fileSystem);
+
+	// init the block cache
+	error = beos_init_block_cache(kMaxBlockCacheBlocks, 0);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	fBlockCacheInitialized = true;
+
+	// everything went fine
+	fsDeleter.Detach();
+	*_fileSystem = fileSystem;
+	return B_OK;
+}
+
+// _CreateHaikuKernelInterface
+status_t
+UserlandFSServer::_CreateHaikuKernelInterface(const char* fsName,
+	image_id image, FileSystem** _fileSystem)
+{
+	// get the modules
+	module_info** modules;
+	status_t error = get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
+		(void**)&modules);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// module name must match "file_systems/<name>/v1"
+	char moduleName[B_PATH_NAME_LENGTH];
+	snprintf(moduleName, sizeof(moduleName), "file_systems/%s/v1", fsName);
+
+	// find the module
+	file_system_module_info* module = NULL;
+	for (int32 i = 0; modules[i]->name; i++) {
+		if (strcmp(modules[i]->name, moduleName) == 0) {
+			module = (file_system_module_info*)modules[i];
+			break;
+		}
+	}
+	if (!module)
+		RETURN_ERROR(B_ERROR);
+
+	// create the file system
+	HaikuKernelFileSystem* fileSystem
+		= new(nothrow) HaikuKernelFileSystem(module);
+	if (!fileSystem)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	// everything went fine
+	*_fileSystem = fileSystem;
+	return B_OK;
+}

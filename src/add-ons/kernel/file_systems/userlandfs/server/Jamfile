@@ -40,6 +40,8 @@ Application UserlandFSServer
 	  BeOSKernelVolume.cpp
 	  DispatcherFileSystem.cpp
 	  FileSystem.cpp
+	  HaikuKernelFileSystem.cpp
+	  HaikuKernelVolume.cpp
 	  kernel_emu.cpp
 	  main.cpp
 	  RequestThread.cpp
@@ -54,5 +56,11 @@ Application UserlandFSServer
 # the library providing the BeOS kernel interface for add-ons
 SharedLibrary libuserlandfs_beos_kernel.so
 	: beos_kernel_emu.cpp
+	: <nogrist>UserlandFSServer
+;
+
+# the library providing the Haiku kernel interface for add-ons
+SharedLibrary libuserlandfs_haiku_kernel.so
+	: haiku_kernel_emu.cpp
 	: <nogrist>UserlandFSServer
 ;

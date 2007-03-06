@@ -169,7 +169,7 @@ UserlandFS::KernelEmu::notify_listener(int32 operation, uint32 details,
 }
 
 // notify_select_event
-void
+status_t
 UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 	uint8 event, bool unspecifiedEvent)
 {
@@ -178,14 +178,14 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
-		return;
+		return error;
 
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	NotifySelectEventRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
-		return;
+		return error;
 
 	request->sync = sync;
 	request->ref = ref;
@@ -197,10 +197,13 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 	NotifySelectEventReply* reply;
 	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
-		return;
+		return error;
 	RequestReleaser requestReleaser(port, reply);
 
-	// process the reply: nothing to do
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
 }
 
 // send_notification
