@@ -33,6 +33,7 @@ KernelMergeObject kernel_posix.o :
  	utime.c
  	# locale
 	ctype.c
+	localeconv.c
 	# stdio (this subdir)
 	kernel_vsprintf.c
 	# stdlib
@@ -43,6 +44,7 @@ KernelMergeObject kernel_posix.o :
 	qsort.c
 	rand.c
 	random.c
+	strtod.c
 	strtol.c
 	strtoll.c
 	strtoul.c
