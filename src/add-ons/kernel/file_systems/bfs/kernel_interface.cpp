@@ -68,16 +68,6 @@ fill_stat_buffer(Inode *inode, struct stat &stat)
 }
 
 
-// ToDo: Temporary hack to get it working
-
-
-double
-strtod(const char */*start*/, char **/*end*/)
-{
-	return 0;
-}
-
-
 //	#pragma mark - Scanning
 
 
