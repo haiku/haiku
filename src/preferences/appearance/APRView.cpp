@@ -51,12 +51,15 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	BRect rect(Bounds().InsetByCopy(10,10));
 	
 	#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	
 	fDecorMenu = new BMenu("Window Style");
 	int32 decorCount = BPrivate::count_decorators();
 	if (decorCount > 1) {
 		for (int32 i = 0; i < decorCount; i++) {
 			BString name;
 			BPrivate::get_decorator_name(i, name);
+			if (name.CountChars() < 1)
+				continue;
 			fDecorMenu->AddItem(new BMenuItem(name.String(),
 								new BMessage(DECORATOR_CHANGED)));
 		}
@@ -71,7 +74,16 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 		rect = Bounds().InsetByCopy(10,10);
 		rect.OffsetTo(10, field->Frame().bottom + 10);
 	}
-	fDecorMenu->ItemAt(BPrivate::get_decorator())->SetMarked(true);
+	BMenuItem *marked = fDecorMenu->ItemAt(BPrivate::get_decorator());
+	if (marked)
+		marked->SetMarked(true);
+	else
+	{
+		marked = fDecorMenu->FindItem("Default");
+		if (marked)
+			marked->SetMarked(true);
+	}
+	
 	#endif
 	
 	// Set up list of color fAttributes
@@ -166,7 +178,8 @@ APRView::AttachedToWindow(void)
 
 	fPicker->SetValue(fCurrentSet.StringToColor(fAttrString.String()));
 	
-	fDecorMenu->SetTargetForItems(BMessenger(this));
+	if (fDecorMenu)
+		fDecorMenu->SetTargetForItems(BMessenger(this));
 	
 	Window()->ResizeTo(MAX(fPicker->Frame().right,fPicker->Frame().right) + 10,
 					   fDefaults->Frame().bottom + 10);
