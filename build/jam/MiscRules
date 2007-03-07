@@ -76,3 +76,54 @@ rule MakeLocateDebug
 	}
 }
 
+rule DeferredSubInclude params
+{
+	# DeferredSubInclude <subdir tokens> ;
+	#
+	# Takes the same parameter as SubInclude. The the subdirectory referred to
+	# by <subdir tokens> will be included when ExecuteDeferredSubIncludes is
+	# invoked, i.e. at the end of the root Jamfile.
+
+	HAIKU_DEFERRED_SUB_INCLUDES += "/" $(params) ;
+}
+
+rule ExecuteDeferredSubIncludes
+{
+	# ExecuteDeferredSubIncludes ;
+	#
+	# Performs the deferred SubIncludes scheduled by DeferredSubInclude.
+
+	local tokensList = $(HAIKU_DEFERRED_SUB_INCLUDES) ;
+	while $(tokensList) {
+		# chop off leading "/"
+		tokensList = $(tokensList[2-]) ;
+
+		# get the tokens for the next include
+		local tokens ;
+		while $(tokensList) && $(tokensList[1]) != "/" {
+			tokens += $(tokensList[1]) ;
+			tokensList = $(tokensList[2-]) ;
+		}
+
+		# perform the include
+		if $(tokens) {
+			SubInclude $(tokens) ;
+		}
+	}
+}
+
+rule HaikuSubInclude tokens
+{
+	# HaikuSubInclude <tokens> ;
+	#
+	# Current subdir relative SubInclude.
+	# <tokens> - subdir tokens specifying the subdirectory to be include
+	#            (relative to the current subdir)
+
+	if $(tokens) {
+		SubInclude HAIKU_TOP $(SUBDIR_TOKENS) $(tokens) ;
+	}
+}
+
+# The variable used to collect the deferred SubIncludes.
+HAIKU_DEFERRED_SUB_INCLUDES = ;

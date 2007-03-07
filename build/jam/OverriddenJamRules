@@ -657,7 +657,13 @@ rule SubInclude
 		config = $(HAIKU_INHERITED_SUBDIR_CONFIG) ;
 	}
 
+	# store SUBDIR_TOKENS
+	local oldSubDirTokens = $(SUBDIR_TOKENS) ;
+
 	on $(config) {
 		include [ FDirName $($(1[1])) $(1[2-) $(JAMFILE) ] ;
 	}
+
+	# restore SUBDIR_TOKENS
+	SUBDIR_TOKENS = $(oldSubDirTokens) ;
 }
