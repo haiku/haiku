@@ -71,12 +71,14 @@ Index::Find(const uint8 *key, size_t length, IndexEntryIterator *iterator)
 void
 Index::Dump()
 {
-	PRINT(("Index: `%s', type: %lx\n", GetName(), GetType()));
-	for (IndexEntryIterator it(this); it.GetCurrent(); it.GetNext()) {
-		Entry *entry = it.GetCurrent();
-		PRINT(("  entry: `%s', dir: %Ld\n", entry->GetName(),
-											entry->GetParent()->GetID()));
-	}
+	D(
+		PRINT(("Index: `%s', type: %lx\n", GetName(), GetType()));
+		for (IndexEntryIterator it(this); it.GetCurrent(); it.GetNext()) {
+			Entry *entry = it.GetCurrent();
+			PRINT(("  entry: `%s', dir: %Ld\n", entry->GetName(),
+												entry->GetParent()->GetID()));
+		}
+	)
 }
 
 

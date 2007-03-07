@@ -1,30 +1,14 @@
-SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test
-	ramfs ;
+SubDir HAIKU_TOP src add-ons kernel file_systems ramfs ;
 
-SetSubDirSupportedPlatforms r5 bone dano ;
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
+	file_systems userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
-	file_systems userlandfs r5 ] ;
-local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
-
-DEFINES += USER=1 ;
-
-SubDirC++Flags -include
-	[ FDirName $(userlandFSIncludes) shared Compatibility.h ] ;
-
-SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
-if $(OSPLAT) = X86 {
-#	SubDirC++Flags -include [ FDirName $(UFS_TOP) src kernel_add_on
-#		kernel-cpp.h ] ;
-	SubDirC++Flags -include [ FDirName $(SUBDIR) cpp.h ] ;
-}
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
-SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
-
-Addon <test>ramfs
-	: # relpath - obsolete
+KernelAddon ramfs
 	: Debug.cpp
 	  Locker.cpp
 	  String.cpp
@@ -57,6 +41,6 @@ Addon <test>ramfs
 	  SizeIndex.cpp
 	  SymLink.cpp
 	  Volume.cpp
-	: false		# is executable
-	: <test>UserlandFSServer
+
+	: $(TARGET_GCC_LIBGCC) $(HAIKU_LIBSUPC++)
 ;

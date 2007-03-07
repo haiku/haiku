@@ -55,7 +55,7 @@ private:
 		SIZE_MASK		= 0x7fffffff,
 	};
 
-private:
+protected:
 	BlockHeader();
 	~BlockHeader();
 
@@ -73,7 +73,7 @@ public:
 								  bool hasNext,
 								  BlockReference *reference = NULL);
 
-private:
+protected:
 	Block();
 	~Block();
 };
@@ -94,7 +94,7 @@ public:
 //		Block *previous, size_t size, bool hasNext, TFreeBlock *previousFree,
 //		TFreeBlock *nextFree);
 
-private:
+protected:
 	TFreeBlock();
 	~TFreeBlock();
 
