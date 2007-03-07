@@ -1,0 +1,62 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs r5 src test
+	ramfs ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 ] ;
+local userlandFSIncludes = [ FDirName $(userlandFSTop) headers ] ;
+
+DEFINES += USER=1 ;
+
+SubDirC++Flags -include
+	[ FDirName $(userlandFSIncludes) shared Compatibility.h ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+if $(OSPLAT) = X86 {
+#	SubDirC++Flags -include [ FDirName $(UFS_TOP) src kernel_add_on
+#		kernel-cpp.h ] ;
+	SubDirC++Flags -include [ FDirName $(SUBDIR) cpp.h ] ;
+}
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
+
+Addon <test>ramfs
+	: # relpath - obsolete
+	: Debug.cpp
+	  Locker.cpp
+	  String.cpp
+
+	  AllocationInfo.cpp
+	  AreaUtils.cpp
+	  Attribute.cpp
+	  AttributeIndex.cpp
+	  AttributeIndexImpl.cpp
+	  AttributeIterator.cpp
+	  BlockAllocator.cpp
+	  BlockAllocatorArea.cpp
+	  BlockAllocatorAreaBucket.cpp
+	  BlockReferenceManager.cpp
+	  DataContainer.cpp
+	  Directory.cpp
+	  Entry.cpp
+	  EntryIterator.cpp
+	  EntryListener.cpp
+	  File.cpp
+	  Index.cpp
+	  IndexDirectory.cpp
+	  kernel_interface.cpp
+	  LastModifiedIndex.cpp
+	  NameIndex.cpp
+	  Node.cpp
+	  NodeListener.cpp
+	  NodeTable.cpp
+	  Query.cpp
+	  SizeIndex.cpp
+	  SymLink.cpp
+	  Volume.cpp
+	: false		# is executable
+	: <test>UserlandFSServer
+;
