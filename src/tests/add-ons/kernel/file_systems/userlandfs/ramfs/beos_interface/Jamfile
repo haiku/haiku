@@ -1,18 +1,29 @@
-SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs
+	beos_interface ;
 
 local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 	file_systems userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
-local ramFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems ramfs ] ;
+local ramFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 src test ramfs ] ;
 
 DEFINES += USER=1 ;
 
+# avoid inclusion of <drivers/Select.h>
+DEFINES += _DRIVERS_SELECT_H ;
+
+SubDirC++Flags -include
+	[ FDirName $(userlandFSIncludes) shared Compatibility.h ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
 SEARCH_SOURCE += $(ramFSTop) ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
-Addon <userland>ramfs
+Addon <userland-beos>ramfs
 	: # relpath - obsolete
 	: Debug.cpp
 	  Locker.cpp
@@ -46,10 +57,6 @@ Addon <userland>ramfs
 	  SizeIndex.cpp
 	  SymLink.cpp
 	  Volume.cpp
-
 	: false		# is executable
-	: libuserlandfs_haiku_kernel.so
+	: libuserlandfs_beos_kernel.so
 ;
-
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs
-	beos_interface ;
