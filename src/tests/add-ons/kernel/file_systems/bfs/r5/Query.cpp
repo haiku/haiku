@@ -9,6 +9,8 @@
  */
 
 
+#include "fsproto.h"	// include first for hacky reasons
+
 #include "Query.h"
 #include "bfs.h"
 #include "Debug.h"
@@ -17,8 +19,6 @@
 #include "Inode.h"
 #include "BPlusTree.h"
 #include "Index.h"
-
-#include "fsproto.h"
 
 #include <util/kernel_cpp.h>
 #include <SupportDefs.h>

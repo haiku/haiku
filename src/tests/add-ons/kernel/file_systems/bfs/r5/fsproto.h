@@ -6,6 +6,16 @@
 #ifndef _FSPROTO_H
 #define _FSPROTO_H
 
+// TODO: FIXME! XXX! DANGER! BIOHAZARD!
+// OMG, we're defining COMPILE_FOR_R5 so that <drivers/Select.h> defines the
+// obsolete notify_select_event() prototype. BTW, this happens only on
+// non-BeOS-compatible host platforms. Outright scary!
+#ifdef MEAN_BFS_SHELL_SELECT_HACK
+#	define COMPILE_FOR_R5
+#	include <drivers/Select.h>
+#	undef COMPILE_FOR_R5
+#endif
+
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
