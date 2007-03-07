@@ -559,7 +559,7 @@ ramfs_write_stat(void *ns, void *_node, struct stat *st, long mask)
 				node->SetUID(st->st_uid);
 			// GID
 			if (mask & WSTAT_GID)
-				node->SetUID(st->st_gid);
+				node->SetGID(st->st_gid);
 			// mtime
 			if (mask & WSTAT_MTIME)
 				node->SetMTime(st->st_mtime);
