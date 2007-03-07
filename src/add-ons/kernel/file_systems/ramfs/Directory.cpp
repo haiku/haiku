@@ -108,7 +108,7 @@ Directory::CreateFile(const char *name, File **file)
 status_t
 Directory::CreateSymLink(const char *name, const char *path, SymLink **symLink)
 {
-	status_t error = (name && symlink ? B_OK : B_BAD_VALUE);
+	status_t error = (name && symLink ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		// create symlink
 		if (SymLink *node = new(nothrow) SymLink(GetVolume())) {
@@ -136,7 +136,7 @@ Directory::AddEntry(Entry *entry)
 		entry->SetParent(this);
 		error = GetVolume()->EntryAdded(GetID(), entry);
 		if (error == B_OK) {
-			MarkModified();
+			MarkModified(B_STAT_MODIFICATION_TIME);
 		} else {
 			fEntries.Remove(entry);
 			entry->SetParent(NULL);
@@ -213,7 +213,7 @@ Directory::RemoveEntry(Entry *entry)
 			if (error == B_OK) {
 				fEntries.Remove(entry);
 				entry->SetParent(NULL);
-				MarkModified();
+				MarkModified(B_STAT_MODIFICATION_TIME);
 			}
 		}
 	}

@@ -68,10 +68,7 @@ Entry::SetName(const char *newName)
 {
 	status_t error = (newName ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		if (fName.SetTo(newName)) {
-//			if (fNode)
-//				fNode->MarkModified();
-		} else
+		if (!fName.SetTo(newName))
 			SET_ERROR(error, B_NO_MEMORY);
 	}
 	return error;

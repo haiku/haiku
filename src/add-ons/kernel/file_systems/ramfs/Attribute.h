@@ -28,6 +28,9 @@ public:
 	void SetType(uint32 type);
 	uint32 GetType() const		{ return fType; }
 
+	status_t SetSize(off_t newSize);
+	off_t GetSize() const		{ return DataContainer::GetSize(); }
+
 	virtual status_t WriteAt(off_t offset, const void *buffer, size_t size,
 							 size_t *bytesWritten);
 

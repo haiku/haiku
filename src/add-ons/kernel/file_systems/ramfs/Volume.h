@@ -22,7 +22,7 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include <fsproto.h>
+#include <fs_interface.h>
 #include <SupportDefs.h>
 
 #include "DLList.h"
@@ -93,10 +93,10 @@ public:
 	Volume();
 	~Volume();
 
-	status_t Mount(nspace_id nsid);
+	status_t Mount(mount_id nsid);
 	status_t Unmount();
 
-	nspace_id GetID() const { return fID; }
+	mount_id GetID() const { return fID; }
 
 	off_t GetBlockSize() const;
 	off_t CountBlocks() const;
@@ -108,6 +108,7 @@ public:
 	Directory *GetRootDirectory() const		{ return fRootDirectory; }
 
 	status_t NewVNode(Node *node);
+	status_t PublishVNode(Node *node);
 	status_t GetVNode(vnode_id id, Node **node);
 	status_t GetVNode(Node *node);
 	status_t PutVNode(vnode_id id);
@@ -175,7 +176,7 @@ public:
 private:
 	typedef DLList<Query>	QueryList;
 
-	nspace_id				fID;
+	mount_id				fID;
 	vnode_id				fNextNodeID;
 	NodeTable				*fNodeTable;
 	DirectoryEntryTable		*fDirectoryEntryTable;

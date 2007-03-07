@@ -33,4 +33,4 @@ bucket_containing_min_size(size_t size)
 	{ return (size ? bucket_containing_size(size - 1) + 1 : 0); }
 
 
-#endif BLOCK_ALLOCATOR_MISC_H
+#endif // BLOCK_ALLOCATOR_MISC_H

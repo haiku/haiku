@@ -11,4 +11,4 @@ class Volume;
 typedef AutoLocker<Volume, AutoLockerReadLocking<Volume> >	VolumeReadLocker;
 typedef AutoLocker<Volume, AutoLockerWriteLocking<Volume> >	VolumeWriteLocker;
 
-#endif LOCKING_H
+#endif	// LOCKING_H

@@ -37,7 +37,7 @@ Node::Node(Volume *volume, uint8 type)
 	  fMTime(0),
 	  fCTime(0),
 	  fCrTime(0),
-	  fModified(false),
+	  fModified(0),
 	  fIsKnownToVFS(false),
 	  // attribute management
 	  fAttributes(),
@@ -85,7 +85,7 @@ status_t
 Node::AddReference()
 {
 	if (++fRefCount == 1) {
-		status_t error = GetVolume()->NewVNode(this);
+		status_t error = GetVolume()->PublishVNode(this);
 		if (error != B_OK) {
 			fRefCount--;
 			return error;
@@ -217,7 +217,7 @@ Node::AddAttribute(Attribute *attribute)
 		if (error == B_OK) {
 			fAttributes.Insert(attribute);
 			attribute->SetNode(this);
-			MarkModified();
+			MarkModified(B_STAT_MODIFICATION_TIME);
 		}
 	}
 	return error;
@@ -258,7 +258,7 @@ Node::RemoveAttribute(Attribute *attribute)
 			if (error == B_OK) {
 				fAttributes.Remove(attribute);
 				attribute->SetNode(NULL);
-				MarkModified();
+				MarkModified(B_STAT_MODIFICATION_TIME);
 			}
 		}
 	}

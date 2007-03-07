@@ -3,11 +3,11 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include <SupportDefs.h>
+#include <fs_interface.h>
+#include <NodeMonitor.h>
 
 #include "Attribute.h"
 #include "Entry.h"
-#include "fsproto.h"
 #include "String.h"
 
 class AllocationInfo;
@@ -61,10 +61,10 @@ public:
 		{ fMode = fMode & ~S_IUMSK | mode & S_IUMSK; }
 	inline mode_t GetMode() const	{ return fMode; }
 
-	inline void SetUID(uid_t uid)	{ fUID = uid; }
+	inline void SetUID(uid_t uid)	{ fUID = uid; MarkModified(B_STAT_UID); }
 	inline uid_t GetUID() const		{ return fUID; }
 
-	inline void SetGID(uid_t gid)	{ fGID = gid; }
+	inline void SetGID(uid_t gid)	{ fGID = gid; MarkModified(B_STAT_GID); }
 	inline uid_t GetGID() const		{ return fGID; }
 
 	inline void SetATime(time_t aTime)	{ fATime = aTime; }
@@ -79,9 +79,8 @@ public:
 	inline void SetCrTime(time_t crTime)	{ fCrTime = crTime; }
 	inline time_t GetCrTime() const			{ return fCrTime; }
 
-	inline void MarkModified()				{ fModified = true; }
-	inline void MarkUnmodified();
-	inline void SetModified(bool modified)	{ fModified = modified; }
+	inline void MarkModified(uint32 flags)	{ fModified |= flags; }
+	inline uint32 MarkUnmodified();
 	inline bool IsModified() const			{ return fModified; }
 
 	status_t CheckPermissions(int mode) const;
@@ -118,7 +117,7 @@ private:
 	time_t					fMTime;
 	time_t					fCTime;
 	time_t					fCrTime;
-	bool					fModified;
+	uint32					fModified;
 	bool					fIsKnownToVFS;
 
 	// attribute management
@@ -131,14 +130,16 @@ protected:
 
 // MarkUnmodified
 inline
-void
+uint32
 Node::MarkUnmodified()
 {
-	if (fModified) {
+	uint32 modified = fModified;
+	if (modified) {
 		fCTime = time(NULL);
 		SetMTime(fCTime);
-		fModified = false;
+		fModified = 0;
 	}
+	return modified;
 }
 
 // open_mode_to_access

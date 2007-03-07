@@ -1449,13 +1449,13 @@ Expression::ParseEquation(char **expr)
 {
 	skipWhitespace(expr);
 
-	bool not = false;
+	bool nott = false;	// note: not is a C++ keyword
 	if (**expr == '!') {
 		skipWhitespace(expr, 1);
 		if (**expr != '(')
 			return NULL;
 		
-		not = true;
+		nott = true;
 	}
 
 	if (**expr == ')') {
@@ -1475,7 +1475,7 @@ Expression::ParseEquation(char **expr)
 		
 		// If the term is negated, we just complement the tree, to get
 		// rid of the not, a.k.a. DeMorgan's Law.
-		if (not)
+		if (nott)
 			term->Complement();
 
 		skipWhitespace(expr, 1);
@@ -1686,6 +1686,22 @@ Query::SetLiveMode(port_id port, int32 token)
 }
 
 
+static void
+send_entry_notification(port_id port, int32 token, Volume* volume, Entry* entry,
+	bool created)
+{
+	if (created) {
+		notify_query_entry_created(port, token, volume->GetID(),
+			entry->GetParent()->GetID(), entry->GetName(),
+			entry->GetNode()->GetID());
+	} else {
+		notify_query_entry_removed(port, token, volume->GetID(),
+			entry->GetParent()->GetID(), entry->GetName(),
+			entry->GetNode()->GetID());
+	}
+}
+
+
 void 
 Query::LiveUpdate(Entry *entry, Node* node, const char *attribute, int32 type,
 	const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
@@ -1717,7 +1733,7 @@ this, entry, node, attribute, type, oldKey, oldLength, newKey, newLength));
 		type, newKey, newLength);
 PRINT(("  oldStatus: 0x%lx, newStatus: 0x%lx\n", oldStatus, newStatus));
 
-	int32 op;
+	bool created;
 	if (oldStatus == MATCH_OK && newStatus == MATCH_OK) {
 		// only send out a notification if the name was changed 
 		if (oldKey == NULL || strcmp(attribute,"name"))
@@ -1726,33 +1742,29 @@ PRINT(("  oldStatus: 0x%lx, newStatus: 0x%lx\n", oldStatus, newStatus));
 		if (entry) {
 			// entry should actually always be given, when the changed
 			// attribute is the entry name
-PRINT(("send_notification(): old: B_ENTRY_REMOVED\n"));
-			send_notification(fPort, fToken, B_QUERY_UPDATE, B_ENTRY_REMOVED,
-				fVolume->GetID(), 0, entry->GetParent()->GetID(), 0,
-				entry->GetNode()->GetID(), (const char *)oldKey);
+PRINT(("notification: old: removed\n"));
+			notify_query_entry_removed(fPort, fToken, fVolume->GetID(),
+				entry->GetParent()->GetID(), (const char *)oldKey,
+				entry->GetNode()->GetID());
 		}
-		op = B_ENTRY_CREATED;
+		created = true;
 	} else if (oldStatus != MATCH_OK && newStatus != MATCH_OK) {
 		// nothing has changed
 		return;
 	} else if (oldStatus == MATCH_OK && newStatus != MATCH_OK)
-		op = B_ENTRY_REMOVED;
+		created = false;
 	else
-		op = B_ENTRY_CREATED;
+		created = true;
 
 	// We send a notification for the given entry, if any, or otherwise for
 	// all entries referring to the node;
 	if (entry) {
-PRINT(("send_notification(): new: %s\n", (op == B_ENTRY_REMOVED ? "B_ENTRY_REMOVED" : "B_ENTRY_CREATED")));
-		send_notification(fPort, fToken, B_QUERY_UPDATE, op, fVolume->GetID(),
-			0, entry->GetParent()->GetID(), 0, entry->GetNode()->GetID(),
-			entry->GetName());
+PRINT(("notification: new: %s\n", (created ? "created" : "removed")));
+		send_entry_notification(fPort, fToken, fVolume, entry, created);
 	} else {
 		entry = node->GetFirstReferrer();
 		while (entry) {
-			send_notification(fPort, fToken, B_QUERY_UPDATE, op,
-				fVolume->GetID(), 0, entry->GetParent()->GetID(), 0,
-				entry->GetNode()->GetID(), entry->GetName());
+			send_entry_notification(fPort, fToken, fVolume, entry, created);
 			entry = node->GetNextReferrer(entry);
 		}
 	}

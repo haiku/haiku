@@ -30,9 +30,13 @@
 
 #include <new>
 
+#include <stdio.h>
+
 #include <OS.h>
 
 #include "Misc.h"
+
+using std::nothrow;
 
 // maximal height of a tree
 static const int kMaxAVLTreeHeight = 32;

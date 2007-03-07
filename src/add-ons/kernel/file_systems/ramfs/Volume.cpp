@@ -164,7 +164,7 @@ Volume::~Volume()
 
 // Mount
 status_t
-Volume::Mount(nspace_id id)
+Volume::Mount(mount_id id)
 {
 	Unmount();
 
@@ -348,6 +348,19 @@ Volume::NewVNode(Node *node)
 	status_t error = NodeAdded(node);
 	if (error == B_OK) {
 		error = new_vnode(GetID(), node->GetID(), node);
+		if (error != B_OK)
+			NodeRemoved(node);
+	}
+	return error;
+}
+
+// PublishVNode
+status_t
+Volume::PublishVNode(Node *node)
+{
+	status_t error = NodeAdded(node);
+	if (error == B_OK) {
+		error = publish_vnode(GetID(), node->GetID(), node);
 		if (error != B_OK)
 			NodeRemoved(node);
 	}

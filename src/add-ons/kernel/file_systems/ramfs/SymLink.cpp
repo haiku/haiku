@@ -28,7 +28,7 @@ SymLink::SetSize(off_t newSize)
 	int32 oldSize = GetLinkedPathLength();
 	if (error == B_OK && newSize < oldSize) {
 		fLinkedPath.Truncate(newSize);
-		MarkModified();
+		MarkModified(B_STAT_SIZE);
 		// update the size index
 		if (SizeIndex *index = GetVolume()->GetSizeIndex())
 			index->Changed(this, oldSize);
@@ -50,9 +50,11 @@ SymLink::SetLinkedPath(const char *path)
 	int32 oldLen = GetLinkedPathLength();
 	int32 len = strnlen(path, PATH_MAX - 1);
 	if (fLinkedPath.SetTo(path, len)) {
-		MarkModified();
+		MarkModified(B_STAT_MODIFICATION_TIME);
 		// update the size index, if necessary
 		if (len != oldLen) {
+			MarkModified(B_STAT_SIZE);
+
 			if (SizeIndex *index = GetVolume()->GetSizeIndex())
 				index->Changed(this, oldLen);
 		}

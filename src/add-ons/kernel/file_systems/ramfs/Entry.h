@@ -3,10 +3,10 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
+#include <fs_interface.h>
 #include <SupportDefs.h>
 
 #include "DLList.h"
-#include "fsproto.h"
 #include "String.h"
 
 class AllocationInfo;

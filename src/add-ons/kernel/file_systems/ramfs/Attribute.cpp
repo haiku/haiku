@@ -47,6 +47,21 @@ Attribute::SetType(uint32 type)
 	}
 }
 
+// SetSize
+status_t
+Attribute::SetSize(off_t newSize)
+{
+	status_t error = B_OK;
+	off_t oldSize = DataContainer::GetSize();
+	if (newSize != oldSize) {
+		if (fNode)
+			fNode->MarkModified(B_STAT_MODIFICATION_TIME);
+
+		error = DataContainer::Resize(newSize);
+	}
+	return error;
+}
+
 // WriteAt
 status_t
 Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
@@ -74,7 +89,7 @@ Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
 
 	// node has been changed
 	if (fNode && size > 0)
-		fNode->MarkModified();
+		fNode->MarkModified(B_STAT_MODIFICATION_TIME);
 
 	return error;
 }
