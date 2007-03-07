@@ -147,7 +147,8 @@ HaikuKernelFileSystem::_InitCapabilities()
 	fCapabilities.Set(FS_CAPABILITY_WRITE_ATTR, fFSModule->write_attr);
 
 	fCapabilities.Set(FS_CAPABILITY_READ_ATTR_STAT, fFSModule->read_attr_stat);
-	fCapabilities.Set(FS_CAPABILITY_READ_ATTR_STAT, fFSModule->write_attr_stat);
+	fCapabilities.Set(FS_CAPABILITY_WRITE_ATTR_STAT,
+		fFSModule->write_attr_stat);
 	fCapabilities.Set(FS_CAPABILITY_RENAME_ATTR, fFSModule->rename_attr);
 	fCapabilities.Set(FS_CAPABILITY_REMOVE_ATTR, fFSModule->remove_attr);
 
