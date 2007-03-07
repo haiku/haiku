@@ -108,7 +108,7 @@ Directory::CreateFile(const char *name, File **file)
 status_t
 Directory::CreateSymLink(const char *name, const char *path, SymLink **symLink)
 {
-	status_t error = (name && symlink ? B_OK : B_BAD_VALUE);
+	status_t error = (name && symLink ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		// create symlink
 		if (SymLink *node = new(nothrow) SymLink(GetVolume())) {
