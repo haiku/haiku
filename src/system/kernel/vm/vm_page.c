@@ -136,6 +136,7 @@ dump_free_page_table(int argc, char **argv)
 static int
 dump_page(int argc, char **argv)
 {
+	struct vm_page_mapping *mapping;
 	struct vm_page *page;
 	addr_t address;
 	bool physical = false;
@@ -187,6 +188,13 @@ dump_page(int argc, char **argv)
 	kprintf("state:           %d\n", page->state);
 	kprintf("wired_count:     %u\n", page->wired_count);
 	kprintf("usage_count:     %u\n", page->usage_count);
+	kprintf("area mappings:\n");
+
+	mapping = page->mappings;
+	while (mapping != NULL) {
+		kprintf("  %p\n", mapping->area);
+		mapping = mapping->page_link.next;
+	}
 
 	return 0;
 }

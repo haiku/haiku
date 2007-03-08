@@ -64,6 +64,7 @@ extern vm_address_space *kernel_aspace;
 static area_id sNextAreaID;
 static hash_table *sAreaHash;
 static sem_id sAreaHashLock;
+static spinlock sMappingLock;
 
 static off_t sAvailableMemory;
 static benaphore sAvailableMemoryLock;
@@ -170,6 +171,7 @@ create_area_struct(vm_address_space *addressSpace, const char *name,
 	area->address_space_next = NULL;
 	area->cache_next = area->cache_prev = NULL;
 	area->hash_next = NULL;
+	new (&area->mappings) vm_area_mappings;
 
 	return area;
 }
@@ -1834,6 +1836,40 @@ vm_get_page_mapping(team_id aid, addr_t vaddr, addr_t *paddr)
 }
 
 
+void
+vm_remove_all_page_mappings(vm_page *page)
+{
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sMappingLock);
+
+	vm_page_mappings queue;
+	queue.MoveFrom(&page->mappings);
+
+	vm_page_mappings::Iterator iterator = queue.GetIterator();
+	vm_page_mapping *mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		vm_area *area = mapping->area;
+		vm_translation_map *map = &area->address_space->translation_map;
+
+		map->ops->lock(map);
+		addr_t base = area->base + (page->cache_offset << PAGE_SHIFT);
+		map->ops->unmap(map, base, base + (B_PAGE_SIZE - 1));
+		map->ops->unlock(map);
+
+		area->mappings.Remove(mapping);
+	}
+
+	release_spinlock(&sMappingLock);
+	restore_interrupts(state);
+
+	// free now unused mappings
+
+	while ((mapping = queue.RemoveHead()) != NULL) {
+		free(mapping);
+	}
+}
+
+
 status_t
 vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 {
@@ -1864,6 +1900,37 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 	}
 
 	map->ops->unmap(map, base, base + (size - 1));
+
+	if (area->wiring == B_NO_LOCK) {
+		vm_area_mappings queue;
+		uint32 count = 0;
+
+		cpu_status state = disable_interrupts();
+		acquire_spinlock(&sMappingLock);
+
+		vm_page_mapping *mapping;
+		while ((mapping = area->mappings.RemoveHead()) != NULL) {
+			mapping->page->mappings.Remove(mapping);
+			queue.Add(mapping);
+
+			// temporary unlock to handle interrupts and let others play as well
+			if ((++count % 256) == 0) {
+				release_spinlock(&sMappingLock);
+				restore_interrupts(state);
+
+				state = disable_interrupts();
+				acquire_spinlock(&sMappingLock);
+			}
+		}
+
+		release_spinlock(&sMappingLock);
+		restore_interrupts(state);
+
+		while ((mapping = queue.RemoveHead()) != NULL) {
+			free(mapping);
+		}
+	}
+
 	map->ops->unlock(map);
 	return B_OK;
 }
@@ -1873,16 +1940,37 @@ status_t
 vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 {
 	vm_translation_map *map = &area->address_space->translation_map;
+	vm_page_mapping *mapping = NULL;
+
+	if (area->wiring == B_NO_LOCK) {
+		mapping = (vm_page_mapping *)malloc(sizeof(vm_page_mapping));
+		if (mapping == NULL)
+			return B_NO_MEMORY;
+		
+		mapping->page = page;
+		mapping->area = area;
+	}
 
 	map->ops->lock(map);
 	map->ops->map(map, address, page->physical_page_number * B_PAGE_SIZE,
 		protection);
-	map->ops->unlock(map);
 
 	if (area->wiring != B_NO_LOCK) {
 		page->wired_count++;
 			// TODO: needs to be atomic on all platforms!
+	} else {
+		// insert mapping into lists
+		cpu_status state = disable_interrupts();
+		acquire_spinlock(&sMappingLock);
+
+		page->mappings.Add(mapping);
+		area->mappings.Add(mapping);
+
+		release_spinlock(&sMappingLock);
+		restore_interrupts(state);
 	}
+
+	map->ops->unlock(map);
 
 	vm_page_set_state(page, PAGE_STATE_ACTIVE);
 	return B_OK;
@@ -2211,7 +2299,7 @@ dump_cache(int argc, char **argv)
 
 
 static void
-_dump_area(vm_area *area)
+dump_area_struct(vm_area *area, bool mappings)
 {
 	kprintf("AREA: %p\n", area);
 	kprintf("name:\t\t'%s'\n", area->name);
@@ -2228,39 +2316,62 @@ _dump_area(vm_area *area)
 	kprintf("cache_offset:\t0x%Lx\n", area->cache_offset);
 	kprintf("cache_next:\t%p\n", area->cache_next);
 	kprintf("cache_prev:\t%p\n", area->cache_prev);
+
+	vm_area_mappings::Iterator iterator = area->mappings.GetIterator();
+	if (mappings) {
+		kprintf("page mappings:\n");
+		while (iterator.HasNext()) {
+			vm_page_mapping *mapping = iterator.Next();
+			kprintf("  %p", mapping->page);
+		}
+		kprintf("\n");
+	} else {
+		uint32 count = 0;
+		while (iterator.Next() != NULL) {
+			count++;
+		}
+		kprintf("page mappings:\t%lu\n", count);
+	}
 }
 
 
 static int
 dump_area(int argc, char **argv)
 {
+	bool mappings = false;
 	bool found = false;
+	int32 index = 1;
 	vm_area *area;
 	addr_t num;
 
 	if (argc < 2) {
-		kprintf("usage: area <id|address|name>\n");
+		kprintf("usage: area [-m] <id|address|name>\n");
 		return 0;
 	}
 
-	num = strtoul(argv[1], NULL, 0);
+	if (!strcmp(argv[1], "-m")) {
+		mappings = true;
+		index++;
+	}
+
+	num = strtoul(argv[index], NULL, 0);
 
 	// walk through the area list, looking for the arguments as a name
 	struct hash_iterator iter;
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
-		if ((area->name != NULL && !strcmp(argv[1], area->name))
+		if ((area->name != NULL && !strcmp(argv[index], area->name))
 			|| num != 0
 				&& ((addr_t)area->id == num
 					|| area->base <= num && area->base + area->size > num)) {
-			_dump_area(area);
+			dump_area_struct(area, mappings);
 			found = true;
 		}
 	}
 
 	if (!found)
-		kprintf("could not find area %s (%ld)\n", argv[1], num);
+		kprintf("could not find area %s (%ld)\n", argv[index], num);
 	return 0;
 }
 

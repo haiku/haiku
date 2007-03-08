@@ -61,8 +61,8 @@ class DoublyLinkedAreaLink {
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink> vm_page_mappings;
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink> vm_area_mappings;
 #else	// !__cplusplus
-typedef void *vm_page_mappings;
-typedef void *vm_area_mappings;
+typedef struct vm_page_mapping *vm_page_mappings;
+typedef struct vm_page_mapping *vm_area_mappings;
 #endif
 
 // vm page

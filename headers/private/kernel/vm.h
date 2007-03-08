@@ -62,6 +62,7 @@ status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
 vm_area *vm_area_lookup(vm_address_space *addressSpace, addr_t address);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr);
+void vm_remove_all_page_mappings(vm_page *page);
 status_t vm_unmap_pages(vm_area *area, addr_t base, size_t length);
 status_t vm_map_page(vm_area *area, vm_page *page, addr_t address,
 			uint32 protection);
