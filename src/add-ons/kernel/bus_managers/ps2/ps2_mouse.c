@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006 Haiku, Inc.
+ * Copyright 2001-2007 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 mouse device driver
@@ -46,13 +46,7 @@
  *
  * Interrupts:
  * ~~~~~~~~~~
- * The PS/2 mouse device is connected to interrupt 12, which means that
- * it uses the second interrupt controller (handles INT8 to INT15). In
- * order for this interrupt to be enabled, both the 5th interrupt of
- * the second controller AND the 3rd interrupt of the first controller
- * (cascade mode) should be unmasked.
- * This is all done inside install_io_interrupt_handler(), no need to
- * worry about it anymore
+ * The PS/2 mouse device is connected to interrupt 12.
  * The controller uses 3 consecutive interrupts to inform the computer
  * that it has new data. On the first the data register holds the status
  * byte, on the second the X offset, and on the 3rd the Y offset.
@@ -94,17 +88,17 @@ ps2_reset_mouse(mouse_cookie *cookie)
 	uint8 data[2];
 	status_t status;
 	
-	TRACE(("ps2_reset_mouse()\n"));
+	TRACE("ps2_reset_mouse\n");
 	
 	status = ps2_dev_command(cookie->dev, PS2_CMD_RESET, NULL, 0, data, 2);
 		
 	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
-		TRACE(("reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]));
+		TRACE("reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]);
 		status = B_ERROR;
 	} else if (status != B_OK) {
-		TRACE(("reset mouse failed\n"));
+		TRACE("reset mouse failed\n");
 	} else {
-		TRACE(("reset mouse success\n"));
+		TRACE("reset mouse success\n");
 	}
 	
 	return status;
@@ -151,7 +145,7 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 		}
 	}
 
-// 	dprintf("packet: %02x %02x %02x %02x: xd %d, yd %d, 0x%x (%d), w-xd %d, w-yd %d\n", 
+// 	TRACE("packet: %02x %02x %02x %02x: xd %d, yd %d, 0x%x (%d), w-xd %d, w-yd %d\n", 
 //		packet[0], packet[1], packet[2], packet[3],
 //		xDelta, yDelta, buttons, cookie->click_count, wheel_xdelta, wheel_ydelta);
 
@@ -165,8 +159,8 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 		pos->wheel_ydelta = (int)wheel_ydelta;
 		pos->wheel_xdelta = (int)wheel_xdelta;
 
-		TRACE(("xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
-			xDelta, yDelta, buttons, cookie->click_count, currentTime));
+		TRACE("xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
+			xDelta, yDelta, buttons, cookie->click_count, currentTime);
 	}
 }
 
@@ -179,23 +173,23 @@ mouse_read_event(mouse_cookie *cookie, mouse_movement *movement)
 	uint8 packet[PS2_MAX_PACKET_SIZE];
 	status_t status;
 
-	TRACE(("mouse_read_event()\n"));
+	TRACE("ps2: mouse_read_event\n");
 	status = acquire_sem_etc(cookie->mouse_sem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
 		return status;
 
 	if (!cookie->dev->active) {
-		dprintf("ps2: mouse_read_event: Error device no longer active\n");
+		TRACE("ps2: mouse_read_event: Error device no longer active\n");
 		return B_ERROR;
 	}		
 
 	if (packet_buffer_read(cookie->mouse_buffer, packet, cookie->packet_size) != cookie->packet_size) {
-		TRACE(("error copying buffer\n"));
+		TRACE("ps2: error copying buffer\n");
 		return B_ERROR;
 	}
 	
 	if (!(packet[0] & 8))
-		panic("ps2_hid: got broken data from packet_buffer_read\n");
+		panic("ps2: got broken data from packet_buffer_read\n");
 
 	ps2_packet_to_movement(cookie, packet, movement);
 	return B_OK;
@@ -206,7 +200,7 @@ static void
 ps2_mouse_disconnect(ps2_dev *dev)
 {
 	// the mouse device might not be opened at this point
-	dprintf("ps2: ps2_mouse_disconnect %s\n", dev->name);
+	INFO("ps2: ps2_mouse_disconnect %s\n", dev->name);
 	if (dev->flags & PS2_FLAG_OPEN)
 		release_sem(((mouse_cookie *)dev->cookie)->mouse_sem);
 }
@@ -225,7 +219,7 @@ mouse_handle_int(ps2_dev *dev)
 	const uint8 data = dev->history[0].data;
 		
 	if (cookie->packet_index == 0 && !(data & 8)) {
-		TRACE(("bad mouse data, trying resync\n"));
+		TRACE("bad mouse data, trying resync\n");
 		return B_HANDLED_INTERRUPT;
 	}
 
@@ -259,17 +253,20 @@ probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 	status_t status;
 	uint8 deviceId = 0;
 	
-	
 	status = ps2_reset_mouse(cookie);
+	if (status != B_OK) {
+		INFO("ps2: probe_mouse reset failed\n");
+		return B_ERROR;
+	}
 
 	// get device id
 	status = ps2_dev_command(cookie->dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
 	if (status != B_OK) {
-		TRACE(("probe_mouse(): get device id failed\n"));
+		INFO("ps2: probe_mouse get device id failed\n");
 		return B_ERROR;
 	}
 
-	TRACE(("probe_mouse(): device id: %2x\n", deviceId));		
+	TRACE("ps2: probe_mouse device id: %2x\n", deviceId);		
 
 	// check for MS Intellimouse
 	if (deviceId == 0) {
@@ -279,17 +276,17 @@ probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 		status |= ps2_set_sample_rate(cookie, 80);
 		status |= ps2_dev_command(cookie->dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &alternate_device_id, 1);
 		if (status == 0) {
-			TRACE(("probe_mouse(): alternate device id: %2x\n", alternate_device_id));		
+			TRACE("ps2: probe_mouse alternate device id: %2x\n", alternate_device_id);
 			deviceId = alternate_device_id;
 		}
 	}
 
 	if (deviceId == PS2_DEV_ID_STANDARD) {
-		TRACE(("Standard PS/2 mouse found\n"));
+		INFO("ps2: probe_mouse Standard PS/2 mouse found\n");
 		if (probed_packet_size)
 			*probed_packet_size = PS2_PACKET_STANDARD;
 	} else if (deviceId == PS2_DEV_ID_INTELLIMOUSE) {
-		TRACE(("Extended PS/2 mouse found\n"));
+		INFO("ps2: probe_mouse Extended PS/2 mouse found\n");
 		if (probed_packet_size)
 			*probed_packet_size = PS2_PACKET_INTELLIMOUSE;
 	} else {
@@ -313,7 +310,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	status_t status;
 	int i;
 	
-	dprintf("ps2: mouse_open %s\n", name);
+	TRACE("ps2: mouse_open %s\n", name);
 
 	for (dev = NULL, i = 0; i < PS2_DEVICE_COUNT; i++) {
 		if (0 == strcmp(ps2_device[i].name, name)) {
@@ -323,7 +320,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	}
 	
 	if (dev == NULL) {
-		TRACE(("dev = NULL\n"));
+		TRACE("dev = NULL\n");
 		return B_ERROR;
 	}
 	
@@ -344,14 +341,14 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 		
 	status = probe_mouse(cookie, &cookie->packet_size);
 	if (status != B_OK) {
-		TRACE(("probing mouse failed\n"));
+		INFO("ps2: probing mouse %s failed\n", name);
 		ps2_service_notify_device_removed(dev);
 		goto err1;
 	}
 
 	cookie->mouse_buffer = create_packet_buffer(MOUSE_HISTORY_SIZE * cookie->packet_size);
 	if (cookie->mouse_buffer == NULL) {
-		TRACE(("can't allocate mouse actions buffer\n"));
+		TRACE("can't allocate mouse actions buffer\n");
 		goto err2;
 	}
 
@@ -359,19 +356,19 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	// the interrupt handler and the read operation
 	cookie->mouse_sem = create_sem(0, "ps2_mouse_sem");
 	if (cookie->mouse_sem < 0) {
-		TRACE(("failed creating PS/2 mouse semaphore!\n"));
+		TRACE("failed creating PS/2 mouse semaphore!\n");
 		goto err3;
 	}
 
 	status = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
 	if (status < B_OK) {
-		TRACE(("mouse_open(): cannot enable PS/2 mouse\n"));	
+		INFO("ps2: cannot enable mouse %s\n", name);
 		goto err4;
 	}
 
 	atomic_or(&dev->flags, PS2_FLAG_ENABLED);
 
-	dprintf("ps2: mouse_open %s success\n", name);
+	TRACE("ps2: mouse_open %s success\n", name);
 	return B_OK;
 
 err4:
@@ -383,7 +380,7 @@ err2:
 err1:
 	atomic_and(&dev->flags, ~PS2_FLAG_OPEN);
 	
-	dprintf("ps2: mouse_open %s failed\n", name);
+	TRACE("ps2: mouse_open %s failed\n", name);
 	return B_ERROR;
 }
 
@@ -393,7 +390,7 @@ mouse_close(void *_cookie)
 {
 	mouse_cookie *cookie = _cookie;
 
-	dprintf("ps2: mouse_close %s\n", cookie->dev->name);
+	TRACE("ps2: mouse_close %s\n", cookie->dev->name);
 
 	ps2_dev_command(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
 
@@ -441,7 +438,7 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case MS_NUM_EVENTS:
 		{
 			int32 count;
-			TRACE(("MS_NUM_EVENTS\n"));
+			TRACE("MS_NUM_EVENTS\n");
 			get_sem_count(cookie->mouse_sem, &count);
 			return count;
 		}
@@ -450,36 +447,36 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		{
 			mouse_movement movement;
 			status_t status;
-			TRACE(("MS_READ\n"));
+			TRACE("MS_READ\n");
 			if ((status = mouse_read_event(cookie, &movement)) < B_OK)
 				return status;
-//			dprintf("%s %d %d %d %d\n", cookie->dev->name, 
+//			TRACE("%s %d %d %d %d\n", cookie->dev->name, 
 //				movement.xdelta, movement.ydelta, movement.buttons, movement.clicks);
 			return user_memcpy(buffer, &movement, sizeof(movement));
 		}
 
 		case MS_SET_TYPE:
-			TRACE(("MS_SET_TYPE not implemented\n"));
+			TRACE("MS_SET_TYPE not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_SET_MAP:
-			TRACE(("MS_SET_MAP (set mouse mapping) not implemented\n"));
+			TRACE("MS_SET_MAP (set mouse mapping) not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_GET_ACCEL:
-			TRACE(("MS_GET_ACCEL (get mouse acceleration) not implemented\n"));
+			TRACE("MS_GET_ACCEL (get mouse acceleration) not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_SET_ACCEL:
-			TRACE(("MS_SET_ACCEL (set mouse acceleration) not implemented\n"));
+			TRACE("MS_SET_ACCEL (set mouse acceleration) not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_SET_CLICKSPEED:
-			TRACE(("MS_SETCLICK (set click speed)\n"));
+			TRACE("MS_SETCLICK (set click speed)\n");
 			return user_memcpy(&cookie->click_speed, buffer, sizeof(bigtime_t));
 
 		default:
-			TRACE(("unknown opcode: %ld\n", op));
+			TRACE("unknown opcode: %ld\n", op);
 			return B_BAD_VALUE;
 	}
 }

@@ -1,8 +1,8 @@
 /*
- * Copyright 2004-2006 Haiku, Inc.
+ * Copyright 2004-2007 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * PS/2 hid device driver
+ * PS/2 bus manager
  *
  * Authors (in chronological order):
  *		Elad Lahav (elad@eldarshany.com)
@@ -23,12 +23,18 @@
 #include "ps2_dev.h"
 
 
-// debug defines
-#ifdef DEBUG
-#	define TRACE(x) dprintf x
+#if 1
+#	define INFO(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define INFO(x...)
 #endif
+
+#if 0
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 
 // global variables
 extern isa_module_info *gIsa;

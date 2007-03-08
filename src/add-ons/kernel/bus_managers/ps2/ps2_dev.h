@@ -1,8 +1,8 @@
 /*
- * Copyright 2005 Haiku, Inc.
+ * Copyright 2005-2007 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * PS/2 hid device driver
+ * PS/2 bus manager
  *
  * Authors (in chronological order):
  *		Marcus Overhagen (marcus@overhagen.de)

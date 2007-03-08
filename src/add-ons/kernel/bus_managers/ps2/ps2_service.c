@@ -1,8 +1,8 @@
 /*
- * Copyright 2005 Haiku, Inc.
+ * Copyright 2005-2007 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * PS/2 hid device driver
+ * PS/2 bus manager
  *
  * Authors (in chronological order):
  *		Marcus Overhagen (marcus@overhagen.de)
@@ -33,7 +33,7 @@ ps2_service_notify_device_added(ps2_dev *dev)
 {
 	ps2_service_cmd cmd;
 
-	TRACE(("ps2_service_notify_device_added %s\n", dev->name));
+	TRACE("ps2_service_notify_device_added %s\n", dev->name);
 	
 	cmd.id = PS2_SERVICE_NOTIFY_DEVICE_ADDED;
 	cmd.dev = dev;
@@ -41,7 +41,7 @@ ps2_service_notify_device_added(ps2_dev *dev)
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
 	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
 
-	TRACE(("ps2_service_notify_device_added done\n"));
+	TRACE("ps2_service_notify_device_added done\n");
 }
 
 
@@ -50,7 +50,7 @@ ps2_service_notify_device_removed(ps2_dev *dev)
 {
 	ps2_service_cmd cmd;
 
-	TRACE(("ps2_service_notify_device_removed %s\n", dev->name));
+	TRACE("ps2_service_notify_device_removed %s\n", dev->name);
 
 	cmd.id = PS2_SERVICE_NOTIFY_DEVICE_REMOVED;
 	cmd.dev = dev;
@@ -58,14 +58,14 @@ ps2_service_notify_device_removed(ps2_dev *dev)
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
 	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
 
-	TRACE(("ps2_service_notify_device_removed done\n"));
+	TRACE("ps2_service_notify_device_removed done\n");
 }
 
 
 static int32
 ps2_service_thread(void *arg)
 {
-	TRACE(("ps2_service_thread started\n"));
+	TRACE("ps2_service_thread started\n");
 
 	for (;;) {
 		status_t status;
@@ -79,21 +79,21 @@ ps2_service_thread(void *arg)
 			packet_buffer_read(sServiceCmdBuffer, (uint8 *)&cmd, sizeof(cmd));
 			switch (cmd.id) {
 				case PS2_SERVICE_NOTIFY_DEVICE_ADDED:
-					TRACE(("PS2_SERVICE_NOTIFY_DEVICE_ADDED %s\n", cmd.dev->name));
+					TRACE("PS2_SERVICE_NOTIFY_DEVICE_ADDED %s\n", cmd.dev->name);
 					ps2_dev_publish(cmd.dev);
 					break;
 					
 				case PS2_SERVICE_NOTIFY_DEVICE_REMOVED:
-					TRACE(("PS2_SERVICE_NOTIFY_DEVICE_REMOVED %s\n", cmd.dev->name));
+					TRACE("PS2_SERVICE_NOTIFY_DEVICE_REMOVED %s\n", cmd.dev->name);
 					ps2_dev_unpublish(cmd.dev);
 					break;
 
 				default:
-					TRACE(("PS2_SERVICE: unknown id %lu\n", cmd.id));
+					TRACE("PS2_SERVICE: unknown id %lu\n", cmd.id);
 					break;
 			}
 		} else {
-			dprintf("ps2_service_thread: Error, status 0x%08lx, terminating\n", status);
+			INFO("ps2_service_thread: Error, status 0x%08lx, terminating\n", status);
 			break;
 		}
 	}
@@ -104,7 +104,7 @@ ps2_service_thread(void *arg)
 status_t
 ps2_service_init(void)
 {
-	TRACE(("ps2_service_init\n"));
+	TRACE("ps2_service_init\n");
 	sServiceCmdBuffer = create_packet_buffer(sizeof(ps2_service_cmd) * 50);
 	if (sServiceCmdBuffer == NULL)
 		goto err1;
@@ -116,7 +116,7 @@ ps2_service_init(void)
 		goto err3;
 	sServiceTerminate = false;
 	resume_thread(sServiceThread);
-	TRACE(("ps2_service_init done\n"));
+	TRACE("ps2_service_init done\n");
 	return B_OK;
 	
 err3:
@@ -124,7 +124,7 @@ err3:
 err2:
 	delete_packet_buffer(sServiceCmdBuffer);
 err1:
-	TRACE(("ps2_service_init failed\n"));
+	TRACE("ps2_service_init failed\n");
 	return B_ERROR;
 }
 
@@ -132,7 +132,7 @@ err1:
 void
 ps2_service_exit(void)
 {
-	TRACE(("ps2_service_exit\n"));
+	TRACE("ps2_service_exit\n");
 	sServiceTerminate = true;
 	release_sem(sServiceSem);
 	wait_for_thread(sServiceThread, NULL);

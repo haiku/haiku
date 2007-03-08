@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 Haiku, Inc.
+ * Copyright 2004-2007 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
@@ -43,7 +43,7 @@ set_leds(led_info *ledInfo)
 {
 	uint8 leds = 0;
 
-	TRACE(("ps2_hid: set keyboard LEDs\n"));
+	TRACE("ps2: set keyboard LEDs\n");
 
 	if (ledInfo->scroll_lock)
 		leds |= LED_SCROLL;
@@ -61,7 +61,7 @@ set_typematic(int32 rate, bigtime_t delay)
 {
 	uint8 value;
 	
-	dprintf("ps2: set_typematic rate %ld, delay %Ld\n", rate, delay);
+	TRACE("ps2: set_typematic rate %ld, delay %Ld\n", rate, delay);
 
 	// input server and keyboard preferences *seem* to use a range of 20-300
 	if (rate < 20)
@@ -101,11 +101,11 @@ keyboard_handle_int(ps2_dev *dev)
 
 	if (scancode == EXTENDED_KEY) {
 		sIsExtended = true;
-		TRACE(("Extended key\n"));
+		TRACE("Extended key\n");
 		return B_HANDLED_INTERRUPT;
 	} 
 
-	TRACE(("scancode: %x\n", scancode));
+	TRACE("scancode: %x\n", scancode);
 
 	if (scancode & 0x80) {
 		keyInfo.is_keydown = false;
@@ -138,23 +138,23 @@ read_keyboard_packet(at_kbd_io *packet)
 {
 	status_t status;
 
-	TRACE(("read_keyboard_packet()\n"));
+	TRACE("ps2: read_keyboard_packet\n");
 
 	status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
 		return status;
 		
 	if (!ps2_device[PS2_DEVICE_KEYB].active) {
-		dprintf("ps2: read_keyboard_packet, Error device no longer active\n");
+		TRACE("ps2: read_keyboard_packet, Error device no longer active\n");
 		return B_ERROR;
 	}
 
 	if (packet_buffer_read(sKeyBuffer, (uint8 *)packet, sizeof(*packet)) == 0) {
-		TRACE(("read_keyboard_packet(): error reading packet: %s\n", strerror(status)));
+		TRACE("ps2: read_keyboard_packet, Error reading packet: %s\n", strerror(status));
 		return B_ERROR;
 	}
 
-	TRACE(("scancode: %x, keydown: %s\n", packet->scancode, packet->is_keydown ? "true" : "false"));
+	TRACE("scancode: %x, keydown: %s\n", packet->scancode, packet->is_keydown ? "true" : "false");
 	return B_OK;
 }
 
@@ -163,7 +163,7 @@ static void
 ps2_keyboard_disconnect(ps2_dev *dev)
 {
 	// the keyboard might not be opened at this point
-	dprintf("ps2: ps2_keyboard_disconnect %s\n", dev->name);
+	INFO("ps2: ps2_keyboard_disconnect %s\n", dev->name);
 	if (sKeyboardOpenMask)
 		release_sem(sKeyboardSem);
 }
@@ -180,13 +180,13 @@ probe_keyboard(void)
 //  This test doesn't work relyable on some notebooks (it reports 0x03)
 //	status = ps2_command(PS2_CTRL_KEYBOARD_TEST, NULL, 0, &data, 1);
 //	if (status != B_OK || data != 0x00) {
-//		dprintf("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
+//		INFO("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
 //		return B_ERROR;
 //	}
 
 	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL, 0, &data, 1);
 	if (status != B_OK || data != 0xaa) {
-		dprintf("ps2: keyboard reset failed, status 0x%08lx, data 0x%02x\n", status, data);
+		INFO("ps2: keyboard reset failed, status 0x%08lx, data 0x%02x\n", status, data);
 		return B_ERROR;
 	}
 
@@ -199,7 +199,7 @@ probe_keyboard(void)
 //  On my notebook, the keyboard controller does NACK the echo command.
 //	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_ECHO, NULL, 0, &data, 1);
 //	if (status != B_OK || data != 0xee) {
-//		dprintf("ps2: keyboard echo test failed, status 0x%08lx, data 0x%02x\n", status, data);
+//		INFO("ps2: keyboard echo test failed, status 0x%08lx, data 0x%02x\n", status, data);
 //		return B_ERROR;
 //	}
 
@@ -215,14 +215,14 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 {
 	status_t status;
 
-	dprintf("ps2: keyboard_open %s\n", name);
+	TRACE("ps2: keyboard_open %s\n", name);
 
 	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
 		return B_BUSY;
 		
 	status = probe_keyboard();
 	if (status != B_OK) {
-		dprintf("ps2: keyboard probing failed\n");
+		INFO("ps2: keyboard probing failed\n");
 		ps2_service_notify_device_removed(&ps2_device[PS2_DEVICE_KEYB]);
 		goto err1;
 	}
@@ -245,7 +245,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
 
-	dprintf("ps2: keyboard_open %s success\n", name);
+	TRACE("ps2: keyboard_open %s success\n", name);
 	return B_OK;
 
 err2:
@@ -253,7 +253,7 @@ err2:
 err1:
 	atomic_and(&sKeyboardOpenMask, 0);
 
-	dprintf("ps2: keyboard_open %s failed\n", name);
+	TRACE("ps2: keyboard_open %s failed\n", name);
 	return status;
 }
 
@@ -261,7 +261,7 @@ err1:
 static status_t
 keyboard_close(void *cookie)
 {
-	TRACE(("keyboard_close()\n"));
+	TRACE("ps2: keyboard_close\n");
 
 	delete_packet_buffer(sKeyBuffer);
 	delete_sem(sKeyboardSem);
@@ -284,7 +284,7 @@ keyboard_freecookie(void *cookie)
 static status_t
 keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
-	TRACE(("keyboard read()\n"));
+	TRACE("ps2: keyboard read\n");
 	*_length = 0;
 	return B_NOT_ALLOWED;
 }
@@ -293,7 +293,7 @@ keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 static status_t
 keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 {
-	TRACE(("keyboard write()\n"));
+	TRACE("ps2: keyboard write\n");
 	*_length = 0;
 	return B_NOT_ALLOWED;
 }
@@ -302,13 +302,13 @@ keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 static status_t
 keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
-	TRACE(("keyboard ioctl()\n"));
+	TRACE("ps2: keyboard ioctl\n");
 	switch (op) {
 		case KB_READ:
 		{
 			at_kbd_io packet;
 			status_t status;
-			TRACE(("KB_READ\n"));
+			TRACE("ps2: KB_READ\n");
 			if ((status = read_keyboard_packet(&packet)) < B_OK)
 				return status;
 			return user_memcpy(buffer, &packet, sizeof(packet));
@@ -317,7 +317,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_SET_LEDS:
 		{
 			led_info info;
-			TRACE(("KB_SET_LEDS\n"));
+			TRACE("ps2: KB_SET_LEDS\n");
 			if (user_memcpy(&info, buffer, sizeof(led_info)) < B_OK)
 				return B_BAD_ADDRESS;
 			return set_leds(&info);
@@ -340,7 +340,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			int32 key_repeat_rate;
 			if (user_memcpy(&key_repeat_rate, buffer, sizeof(key_repeat_rate)) < B_OK)
 				return B_BAD_ADDRESS;
-			dprintf("ps2: KB_SET_KEY_REPEAT_RATE %ld\n", key_repeat_rate);
+			TRACE("ps2: KB_SET_KEY_REPEAT_RATE %ld\n", key_repeat_rate);
 			if (set_typematic(key_repeat_rate, sKeyboardRepeatDelay) < B_OK)
 				return B_ERROR;
 			sKeyboardRepeatRate = key_repeat_rate;
@@ -357,7 +357,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			bigtime_t key_repeat_delay;
 			if (user_memcpy(&key_repeat_delay, buffer, sizeof(key_repeat_delay)) < B_OK)
 				return B_BAD_ADDRESS;
-			dprintf("ps2: KB_SET_KEY_REPEAT_DELAY %Ld\n", key_repeat_delay);
+			TRACE("ps2: KB_SET_KEY_REPEAT_DELAY %Ld\n", key_repeat_delay);
 			if (set_typematic(sKeyboardRepeatRate, key_repeat_delay) < B_OK)
 				return B_ERROR;
 			sKeyboardRepeatDelay = key_repeat_delay;
@@ -374,11 +374,11 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_SET_CONTROL_ALT_DEL_TIMEOUT:
 		case KB_CANCEL_CONTROL_ALT_DEL:
 		case KB_DELAY_CONTROL_ALT_DEL:
-			TRACE(("ps2_hid: ioctl 0x%lx not implemented yet, returning B_OK\n", op));
+			INFO("ps2: ioctl 0x%lx not implemented yet, returning B_OK\n", op);
 			return B_OK;
 
 		default:
-			TRACE(("ps2_hid: invalid ioctl 0x%lx\n", op));
+			INFO("ps2: invalid ioctl 0x%lx\n", op);
 			return EINVAL;
 	}
 }

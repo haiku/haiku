@@ -1,8 +1,8 @@
 /*
- * Copyright 2005-2006 Haiku, Inc.
+ * Copyright 2005-2007 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * PS/2 hid device driver
+ * PS/2 bus manager
  *
  * Authors (in chronological order):
  *		Marcus Overhagen (marcus@overhagen.de)
@@ -61,7 +61,7 @@ void
 ps2_dev_publish(ps2_dev *dev)
 {
 	status_t status;
-	TRACE(("ps2_dev_publish %s\n", dev->name));
+	TRACE("ps2_dev_publish %s\n", dev->name);
 	
 	if (dev->active)
 		return;
@@ -71,7 +71,7 @@ ps2_dev_publish(ps2_dev *dev)
 	status = devfs_publish_device(dev->name, NULL, 
 		(atomic_get(&dev->flags) & PS2_FLAG_KEYB) ? &gKeyboardDeviceHooks : &gMouseDeviceHooks);
 
-	dprintf("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
+	INFO("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
 }
 
 
@@ -79,7 +79,7 @@ void
 ps2_dev_unpublish(ps2_dev *dev)
 {
 	status_t status;
-	TRACE(("ps2_dev_unpublish %s\n", dev->name));
+	TRACE("ps2_dev_unpublish %s\n", dev->name);
 
 	if (!dev->active)
 		return;
@@ -91,7 +91,7 @@ ps2_dev_unpublish(ps2_dev *dev)
 	if ((dev->flags & PS2_FLAG_ENABLED) && dev->disconnect)
 		dev->disconnect(dev);
 
-	dprintf("ps2: devfs_unpublish_device %s, status = 0x%08lx\n", dev->name, status);
+	INFO("ps2: devfs_unpublish_device %s, status = 0x%08lx\n", dev->name, status);
 }
 
 
@@ -112,7 +112,7 @@ ps2_dev_handle_int(ps2_dev *dev)
 				atomic_or(&dev->flags, PS2_FLAG_NACK);
 			} else if ((flags & PS2_FLAG_GETID) && (data == 0 || data == 3 || data == 4)) {
 				// workaround for broken mice that don't ack the "get id" command
-				dprintf("ps2: ps2_dev_handle_int: mouse didn't ack the 'get id' command\n");
+				TRACE("ps2: ps2_dev_handle_int: mouse didn't ack the 'get id' command\n");
 				atomic_or(&dev->flags, PS2_FLAG_ACK);
 				if (dev->result_buf_cnt) {
 					dev->result_buf[dev->result_buf_idx] = data;
@@ -124,8 +124,8 @@ ps2_dev_handle_int(ps2_dev *dev)
 					}
 				}
 			} else {
-//				dprintf("ps2: ps2_dev_handle_int unexpected data 0x%02x while waiting for ack\n", data);
-				dprintf("ps2: int1 %02x\n", data);
+//				TRACE("ps2: ps2_dev_handle_int unexpected data 0x%02x while waiting for ack\n", data);
+				TRACE("ps2: int1 %02x\n", data);
 				goto pass_to_handler;
 			}
 			release_sem_etc(dev->result_sem, cnt, B_DO_NOT_RESCHEDULE);
@@ -140,8 +140,8 @@ ps2_dev_handle_int(ps2_dev *dev)
 				return B_INVOKE_SCHEDULER;
 			}
 		} else {
-//			dprintf("ps2: ps2_dev_handle_int unexpected data 0x%02x during command processing\n", data);
-			dprintf("ps2: int2 %02x\n", data);
+//			TRACE("ps2: ps2_dev_handle_int unexpected data 0x%02x during command processing\n", data);
+			TRACE("ps2: int2 %02x\n", data);
 			goto pass_to_handler;
 		}
 		return B_HANDLED_INTERRUPT;
@@ -151,14 +151,14 @@ pass_to_handler:
 
 	if ((flags & PS2_FLAG_KEYB) == 0) {
 		if (dev->history[0].error && data == 0xfd) {
-			dprintf("ps2: hot removal of %s\n", dev->name);
+			INFO("ps2: hot removal of %s\n", dev->name);
 			ps2_service_notify_device_removed(dev);
 			return B_INVOKE_SCHEDULER;
 		}
 		if (data == 0x00 && dev->history[1].data == 0xaa && (dev->history[0].time - dev->history[1].time) < 50000) {
-			dprintf("ps2: hot plugin of %s\n", dev->name);
+			INFO("ps2: hot plugin of %s\n", dev->name);
 			if (dev->active) {
-				dprintf("ps2: device %s still active, removing...\n", dev->name);
+				TRACE("ps2: device %s still active, removing...\n", dev->name);
 				ps2_service_notify_device_removed(dev);
 			}
 			ps2_service_notify_device_added(dev);
@@ -167,9 +167,9 @@ pass_to_handler:
 	}
 
 	if (!dev->active) {
-		dprintf("ps2: %s not active, data 0x%02x dropped\n", dev->name, data);
+		TRACE("ps2: %s not active, data 0x%02x dropped\n", dev->name, data);
 		if (data != 0x00 && data != 0xaa) {
-			dprintf("ps2: possibly a hot plugin of %s\n", dev->name);
+			INFO("ps2: possibly a hot plugin of %s\n", dev->name);
 			ps2_service_notify_device_added(dev);
 			return B_INVOKE_SCHEDULER;
 		}
@@ -177,7 +177,7 @@ pass_to_handler:
 	}
 	
 	if ((flags & PS2_FLAG_ENABLED) == 0) {
-		dprintf("ps2: %s not enabled, data 0x%02x dropped\n", dev->name, data);
+		TRACE("ps2: %s not enabled, data 0x%02x dropped\n", dev->name, data);
 		return B_HANDLED_INTERRUPT;
 	}
 
@@ -193,13 +193,13 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	int32 sem_count;
 	int i;
 
-	dprintf("ps2: ps2_dev_command cmd 0x%02x, out %d, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
+	TRACE("ps2: ps2_dev_command cmd 0x%02x, out %d, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
 	for (i = 0; i < out_count; i++)
-		dprintf("ps2: ps2_dev_command out 0x%02x\n", out[i]);
+		TRACE("ps2: ps2_dev_command out 0x%02x\n", out[i]);
 
 	res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {
-		dprintf("ps2: ps2_dev_command: sem_count %ld, fixing!\n", sem_count);
+		TRACE("ps2: ps2_dev_command: sem_count %ld, fixing!\n", sem_count);
 		if (sem_count > 0)
 			acquire_sem_etc(dev->result_sem, sem_count, 0, 0);
 		else
@@ -245,17 +245,17 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 		start = system_time();
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
-		dprintf("ps2: ps2_dev_command wait for ack res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
+		TRACE("ps2: ps2_dev_command wait for ack res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
 		if (res != B_OK)
 			break;
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_ACK) {
-			dprintf("ps2: ps2_dev_command got ACK\n");
+			TRACE("ps2: ps2_dev_command got ACK\n");
 		}
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_NACK) {
-			dprintf("ps2: ps2_dev_command got NACK\n");
+			TRACE("ps2: ps2_dev_command got NACK\n");
 			res = B_ERROR;
 			break;
 		}
@@ -265,18 +265,18 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	if (res == B_OK && in_count != 0) {
 		start = system_time();
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
-		dprintf("ps2: ps2_dev_command wait for input res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
+		TRACE("ps2: ps2_dev_command wait for input res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
 		if (dev->result_buf_cnt != 0) {
-			dprintf("ps2: ps2_dev_command error: %d input bytes not received\n", dev->result_buf_cnt);
+			TRACE("ps2: ps2_dev_command error: %d input bytes not received\n", dev->result_buf_cnt);
 			dev->result_buf_cnt = 0;
 		}
 		
 		for (i = 0; i < in_count; i++)
-			dprintf("ps2: ps2_dev_command in 0x%02x\n", in[i]);
+			TRACE("ps2: ps2_dev_command in 0x%02x\n", in[i]);
 	}
 
-	dprintf("ps2: ps2_dev_command result 0x%08lx\n", res);
+	TRACE("ps2: ps2_dev_command result 0x%08lx\n", res);
 
 	atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 

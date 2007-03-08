@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 Haiku, Inc.
+ * Copyright 2004-2007 Haiku, Inc.
  * Distributed under the terms of the Haiku License.
  *
  * Authors (in chronological order):
@@ -8,7 +8,7 @@
  *      Marcus Overhagen <marcus@overhagen.de>
  */
 
-/*! PS/2 hid device driver */
+/*! PS/2 bus manager */
 
 #include <string.h>
 
@@ -41,7 +41,7 @@ ps2_read_data(void)
 void
 ps2_write_ctrl(uint8 ctrl)
 {
-	TRACE(("ps2_write_ctrl 0x%02x\n", ctrl));
+	TRACE("ps2_write_ctrl 0x%02x\n", ctrl);
 
 	gIsa->write_io_8(PS2_PORT_CTRL, ctrl);
 }
@@ -50,7 +50,7 @@ ps2_write_ctrl(uint8 ctrl)
 void
 ps2_write_data(uint8 data)
 {
-	TRACE(("ps2_write_data 0x%02x\n", data));
+	TRACE("ps2_write_data 0x%02x\n", data);
 
 	gIsa->write_io_8(PS2_PORT_DATA, data);
 }
@@ -99,7 +99,7 @@ ps2_flush(void)
 		if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 			break;
 		data = ps2_read_data();
-		dprintf("ps2: ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
+		TRACE("ps2: ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		snooze(100);
 	}
 
@@ -115,7 +115,7 @@ ps2_setup_command_byte()
 	uint8 cmdbyte;
 	
 	res = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
-	dprintf("ps2: get command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
+	TRACE("ps2: get command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
 	if (res != B_OK)
 		cmdbyte = 0x47;
 		
@@ -123,7 +123,7 @@ ps2_setup_command_byte()
 	cmdbyte &= ~(PS2_BITS_KEYBOARD_DISABLED | PS2_BITS_MOUSE_DISABLED);
 		
 	res = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
-	dprintf("ps2: set command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
+	TRACE("ps2: set command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
 	
 	return res;	
 }
@@ -165,27 +165,27 @@ ps2_setup_active_multiplexing(bool *enabled)
 	// MS Virtual PC, it's 0xa6. Since current active multiplexing
 	// specification version is 1.1 (0x11), we validate the data.
 	if (in > 0x9f) {
-		dprintf("ps2: active multiplexing v%d.%d detected, but ignored!\n", (in >> 4), in & 0xf);
+		TRACE("ps2: active multiplexing v%d.%d detected, but ignored!\n", (in >> 4), in & 0xf);
 		goto no_support;
 	}
 
-	dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
+	INFO("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
 	*enabled = true;
 	return B_OK;
 
 no_support:	
-	dprintf("ps2: active multiplexing not supported\n");
+	TRACE("ps2: active multiplexing not supported\n");
 	*enabled = false;
 	return B_OK;
 
 fail:
-	dprintf("ps2: testing for active multiplexing failed\n");
+	TRACE("ps2: testing for active multiplexing failed\n");
 	*enabled = false;
 	// this should revert the controller into legacy mode, 
 	// just in case it has switched to multiplexed mode
 	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &out, 1);
 	if (res != B_OK || out != 0x55) {
-		dprintf("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, out);
+		INFO("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, out);
 		return B_ERROR;
 	}
 	return B_OK;
@@ -201,9 +201,9 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
 
-	dprintf("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, out_count, in_count);
+	TRACE("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, out_count, in_count);
 	for (i = 0; i < out_count; i++)
-		dprintf("ps2: ps2_command out 0x%02x\n", out[i]);
+		TRACE("ps2: ps2_command out 0x%02x\n", out[i]);
 
 	res = ps2_wait_write();
 	if (res == B_OK)
@@ -214,7 +214,7 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 		if (res == B_OK)
 			ps2_write_data(out[i]);
 		else
-			dprintf("ps2: ps2_command out byte %d failed\n", i);
+			TRACE("ps2: ps2_command out byte %d failed\n", i);
 	}
 
 	for (i = 0; res == B_OK && i < in_count; i++) {
@@ -222,12 +222,12 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 		if (res == B_OK)
 			in[i] = ps2_read_data();
 		else
-			dprintf("ps2: ps2_command in byte %d failed\n", i);
+			TRACE("ps2: ps2_command in byte %d failed\n", i);
 	}
 
 	for (i = 0; i < in_count; i++)
-		dprintf("ps2: ps2_command in 0x%02x\n", in[i]);
-	dprintf("ps2: ps2_command result 0x%08lx\n", res);
+		TRACE("ps2: ps2_command in 0x%02x\n", in[i]);
+	TRACE("ps2: ps2_command result 0x%08lx\n", res);
 
 	atomic_add(&sIgnoreInterrupts, -1);
 	release_sem(gControllerSem);
@@ -252,7 +252,7 @@ ps2_interrupt(void* cookie)
 		return B_UNHANDLED_INTERRUPT;
 		
 	if (atomic_get(&sIgnoreInterrupts)) {
-		TRACE(("ps2_interrupt: ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb"));
+		TRACE("ps2_interrupt: ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		return B_HANDLED_INTERRUPT;
 	}
 	
@@ -263,15 +263,15 @@ ps2_interrupt(void* cookie)
 		if (gActiveMultiplexingEnabled) {
 			idx = ctrl >> 6;
 			error = (ctrl & 0x04) != 0;
-			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx));
+			TRACE("ps2_interrupt: ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx);
 		} else {
 			idx = 0;
 			error = (ctrl & 0xC0) != 0;
-			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data));
+			TRACE("ps2_interrupt: ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data);
 		}
 		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
 	} else {
-		TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data));
+		TRACE("ps2_interrupt: ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data);
 		dev = &ps2_device[PS2_DEVICE_KEYB];
 		error = (ctrl & 0xC0) != 0;
 
@@ -297,7 +297,7 @@ ps2_init(void)
 {
 	status_t status;
 
-	TRACE(("ps2: init\n"));
+	TRACE("ps2: init\n");
 
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
 	if (status < B_OK)
@@ -325,13 +325,13 @@ ps2_init(void)
 		
 	status = ps2_setup_command_byte();
 	if (status) {
-		dprintf("ps2: setting up command byte failed\n");
+		INFO("ps2: setting up command byte failed\n");
 		goto err5;
 	}
 
 	status = ps2_setup_active_multiplexing(&gActiveMultiplexingEnabled);
 	if (status) {
-		dprintf("ps2: setting up active multiplexing failed\n");
+		INFO("ps2: setting up active multiplexing failed\n");
 		goto err5;
 	}
 
@@ -343,7 +343,7 @@ ps2_init(void)
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
 	}
 		
-	TRACE(("ps2_hid: init_driver done!\n"));
+	TRACE("ps2: init done!\n");
 	
 	return B_OK;
 
@@ -358,7 +358,7 @@ err2:
 err1:
 	delete_sem(gControllerSem);
 	put_module(B_ISA_MODULE_NAME);
-	TRACE(("ps2_hid: init_driver failed!\n"));
+	TRACE("ps2: init failed!\n");
 	return B_ERROR;
 }
 
@@ -366,7 +366,7 @@ err1:
 void
 ps2_uninit(void)
 {
-	TRACE(("ps2: uninit\n"));
+	TRACE("ps2: uninit\n");
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();
