@@ -31,9 +31,6 @@ Where "TARGET" is the target platform that the compiled code should run on:
   * bone
   * dano (also for Zeta)
 
-When building on Linux and other non-BeOS platforms "haiku" is the
-only supported target platform, so you don't need the "--target" parameter.
-
 The configure script generates a file named "BuildConfig" in the "build"
 directory. As long as configure is not modified (!), there is no need to call
 it again. That is for re-building you only need to invoke jam (see below).
