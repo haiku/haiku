@@ -8,5 +8,5 @@ Addon legacy.media_addon : media :
 	LegacyAudioProducer.cpp
 	LegacyMediaAddOn.cpp
 	: false
-	: media
+	: be media
 ;

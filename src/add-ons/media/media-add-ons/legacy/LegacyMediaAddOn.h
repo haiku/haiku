@@ -2,6 +2,7 @@
 #define _LEGACY_MEDIA_ADDON_H
 
 #include <media/MediaAddOn.h>
+#include <List.h>
 
 #include "LegacyAudioConsumer.h"
 //#include "LegacyAudioProducer.h"
@@ -29,14 +30,16 @@ class LegacyMediaAddOn : public BMediaAddOn
 		virtual	status_t	AutoStart( int in_count, BMediaNode **out_node, int32 *out_internal_id, bool *out_has_more )
 								{ return B_ERROR; }
 
+		status_t			RecursiveScanForDevices(const char *path=NULL);
+
 	private:
 		status_t			fInitStatus;
 
 		flavor_info			fFlavorInfo;
 		media_format		fMediaFormat;
 
-		//BList				*consumers;
-		//BList				*producers;
+		BList				fConsumers;
+		BList				fProducers;
 
 		LegacyAudioConsumer	*consumer;
 };
