@@ -3,10 +3,22 @@
 
 #include <media/MediaAddOn.h>
 #include <List.h>
+#include <Locker.h>
+#include <String.h>
 
 #include "LegacyAudioConsumer.h"
 //#include "LegacyAudioProducer.h"
 
+
+class LegacyDevice {
+public:
+	BString name;
+	flavor_info flavor;
+	bool inuse;
+	LegacyAudioConsumer	*consumer;
+	//LegacyAudioProducer	*producer;
+	
+};
 
 class LegacyMediaAddOn : public BMediaAddOn
 {
@@ -34,14 +46,16 @@ class LegacyMediaAddOn : public BMediaAddOn
 
 	private:
 		status_t			fInitStatus;
+		int32				fInternalIds;
 
 		flavor_info			fFlavorInfo;
 		media_format		fMediaFormat;
 
+		BLocker				fListsLock;
 		BList				fConsumers;
 		BList				fProducers;
 
-		LegacyAudioConsumer	*consumer;
+		//OLD:LegacyAudioConsumer	*consumer;
 };
 
 
