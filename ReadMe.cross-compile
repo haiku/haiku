@@ -12,7 +12,18 @@ parent directory of your Haiku repository:
   svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools
 
 You should now have a 'buildtools' folder that contains folders named
-'binutils' and 'gcc' among others.
+'binutils', 'gcc', and 'jam' among others.
+
+Several other tools are required to build these build tools or are used by
+Haiku's build system itself:
+ * gcc and the binutils (as, ld, etc., required by gcc)
+ * make (GNU make)
+ * bison
+ * flex and lex (usually a mini shell script invoking flex)
+ * makeinfo (part of texinfo, needed for building gcc 4 only)
+
+Whether they are installed can be tested for instance by running them in the
+shell with the "--version" parameter.
 
 
 Building Jam
