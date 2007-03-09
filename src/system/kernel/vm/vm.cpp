@@ -3702,8 +3702,9 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 {
 	vm_address_space *addressSpace = NULL;
 	struct vm_translation_map *map;
-	addr_t base = (addr_t)address;
-	addr_t end = base + numBytes;
+	addr_t unalignedBase = (addr_t)address;
+	addr_t end = unalignedBase + numBytes;
+	addr_t base = ROUNDOWN(unalignedBase, B_PAGE_SIZE);
 	bool isUser = IS_USER_ADDRESS(address);
 	bool needsLocking = true;
 
@@ -3756,7 +3757,7 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 		status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
 		if (status != B_OK)	{
 			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) failed: %s\n",
-				address, numBytes, flags, strerror(status));
+				unalignedBase, numBytes, flags, strerror(status));
 			goto out;
 		}
 
@@ -3787,8 +3788,9 @@ unlock_memory(void *address, ulong numBytes, ulong flags)
 {
 	vm_address_space *addressSpace = NULL;
 	struct vm_translation_map *map;
-	addr_t base = (addr_t)address;
-	addr_t end = base + numBytes;
+	addr_t unalignedBase = (addr_t)address;
+	addr_t end = unalignedBase + numBytes;
+	addr_t base = ROUNDOWN(unalignedBase, B_PAGE_SIZE);
 	bool needsLocking = true;
 
 	if (IS_USER_ADDRESS(address))
