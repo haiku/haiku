@@ -1,7 +1,11 @@
-/* Message - the main general purpose mail message class
-**
-** Copyright 2001-2004 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/* 
+ * Copyright 2001-2004 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2007, Haiku Inc. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+//! The main general purpose mail message class
 
 
 #include <List.h>
@@ -685,7 +689,7 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 	if (_body == NULL)
 		return B_MAIL_INVALID_MAIL;
 
-	//------Do real rendering
+	// Do real rendering
 
 	if (From() == NULL)
 		SendViaAccount(_chain_id); //-----Set the from string
@@ -726,28 +730,30 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 		SetHeaderField("Date", date);
 	}
 
-	/* add a message-id */
-	BString message_id;
-	/* empirical evidence indicates message id must be enclosed in
-	** angle brackets and there must be an "at" symbol in it
-	*/
-	message_id << "<";
-	message_id << system_time();
-	message_id << "-BeMail@";
+	// add a message-id
+
+	// empirical evidence indicates message id must be enclosed in
+	// angle brackets and there must be an "at" symbol in it
+	BString messageID;
+	messageID << "<";
+	messageID << system_time();
+	messageID << "-BeMail@";
 
 	char host[255];
-	gethostname(host,255);
-	message_id << host;
+	if (gethostname(host, sizeof(host)) < 0 || !host[0])
+		strcpy(host, "zoidberg");
 
-	message_id << ">";
-	
-	SetHeaderField("Message-Id", message_id.String());
+	messageID << host;
+	messageID << ">";
+
+	SetHeaderField("Message-Id", messageID.String());
 
 	status_t err = BMailComponent::RenderToRFC822(file);
 	if (err < B_OK)
 		return err;
 
-	file->Seek(-2, SEEK_CUR); //-----Remove division between headers
+	file->Seek(-2, SEEK_CUR);
+		// Remove division between headers
 
 	err = _body->RenderToRFC822(file);
 	if (err < B_OK)
@@ -759,7 +765,6 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 	// set to "Pending").
 
 	if (BFile *attributed = dynamic_cast <BFile *>(file)) {
-
 		BNodeInfo(attributed).SetType(B_MAIL_TYPE);
 
 		attributed->WriteAttrString(B_MAIL_ATTR_RECIPIENTS,&recipients);
@@ -800,7 +805,7 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 
 
 status_t
-BEmailMessage::RenderTo(BDirectory *dir,BEntry *msg)
+BEmailMessage::RenderTo(BDirectory *dir, BEntry *msg)
 {
 	time_t		currentTime;
 	char		numericDateString [40];
