@@ -2048,12 +2048,12 @@ ramfs_std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 		{
 			init_debugging();
-			PRINT(("userlandfs_std_ops(): B_MODULE_INIT\n"));
+			PRINT(("ramfs_std_ops(): B_MODULE_INIT\n"));
 			return B_OK;
 		}
 
 		case B_MODULE_UNINIT:
-			PRINT(("userlandfs_std_ops(): B_MODULE_UNINIT\n"));
+			PRINT(("ramfs_std_ops(): B_MODULE_UNINIT\n"));
 			exit_debugging();
 			return B_OK;
 
@@ -2069,7 +2069,7 @@ static file_system_module_info sRamFSModuleInfo = {
 		ramfs_std_ops,
 	},
 
-	"Userland File System",
+	"RAM File System",
 
 	// scanning
 	NULL,	// identify_partition()
