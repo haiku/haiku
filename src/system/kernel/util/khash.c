@@ -1,15 +1,20 @@
-/* Generic hash table
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+//! Generic hash table
+
 
 #include <KernelExport.h>
-#include <malloc.h>
 #include <debug.h>
-#include <Errors.h>
-#include <string.h>
 #include <util/khash.h>
+
+#include <stdlib.h>
+#include <string.h>
 
 #define TRACE_HASH 0
 #if TRACE_HASH
@@ -18,9 +23,9 @@
 #	define TRACE(x) ;
 #endif
 
-// ToDo: the hashtable is not expanded when necessary (no load factor, no nothing)
-//		Could try to use pools instead of malloc() for the elements - might be
-//		faster than the current approach.
+// TODO: the hashtable is not expanded when necessary (no load factor, nothing)
+//		resizing should be optional, though, in case the hash is used at times
+//		that forbid resizing.
 
 struct hash_table {
 	struct hash_element **table;
@@ -123,7 +128,8 @@ hash_remove(struct hash_table *table, void *_element)
 	uint32 hash = table->hash_func(_element, NULL, table->table_size);
 	void *element, *lastElement = NULL;
 
-	for (element = table->table[hash]; element != NULL; lastElement = element, element = NEXT(table, element)) {
+	for (element = table->table[hash]; element != NULL;
+			lastElement = element, element = NEXT(table, element)) {
 		if (element == _element) {
 			if (lastElement != NULL) {
 				// connect the previous entry with the next one
@@ -137,6 +143,40 @@ hash_remove(struct hash_table *table, void *_element)
 	}
 
 	return B_ERROR;
+}
+
+
+void
+hash_remove_current(struct hash_table *table, struct hash_iterator *iterator)
+{
+	uint32 index = iterator->bucket;
+	void *element;
+
+	if (iterator->current == NULL)
+		panic("hash_remove_current() called too early.");
+
+	for (element = table->table[index]; index < table->table_size; index++) {
+		void *lastElement = NULL;
+
+		while (element != NULL) {
+			if (element == iterator->current) {
+				iterator->current = lastElement;
+
+				if (lastElement != NULL) {
+					// connect the previous entry with the next one
+					PUT_IN_NEXT(table, lastElement, NEXT(table, element));
+				} else {
+					table->table[index] = (struct hash_element *)NEXT(table,
+						element);
+				}
+
+				table->num_elements--;
+				return;
+			}
+
+			element = NEXT(table, element);
+		}
+	}
 }
 
 
