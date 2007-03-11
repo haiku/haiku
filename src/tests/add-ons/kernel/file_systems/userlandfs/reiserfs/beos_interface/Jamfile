@@ -1,0 +1,39 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs reiserfs
+	beos_interface ;
+
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
+local reiserFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	file_systems userlandfs r5 src test reiserfs ] ;
+
+DEFINES += USER=1 ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
+
+# avoid inclusion of <drivers/Select.h>
+DEFINES += _DRIVERS_SELECT_H ;
+
+SEARCH_SOURCE += $(reiserFSTop) ;
+
+Addon <userland-beos>reiserfs
+	: # relpath - obsolete
+	: 
+	Block.cpp
+	BlockCache.cpp
+	hashes.cpp
+	Item.cpp
+	Iterators.cpp
+	kernel_interface.cpp
+	Locker.cpp
+	Tree.cpp
+	VNode.cpp
+	Volume.cpp 
+
+	Debug.cpp
+	Settings.cpp
+	String.cpp
+	SuperBlock.cpp
+
+	: false		# is executable
+	: libuserlandfs_beos_kernel.so
+;
