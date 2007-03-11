@@ -10,3 +10,4 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems udf ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel file_systems ntfs ;
+SubIncludeGPL HAIKU_TOP src add-ons kernel file_systems reiserfs ;

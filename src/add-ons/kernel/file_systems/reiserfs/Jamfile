@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems reiserfs ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
+
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
+
+KernelAddon reiserfs
+	: 
+	Debug.cpp
+	Locker.cpp
+	String.cpp
+
+	Block.cpp
+	BlockCache.cpp
+	hashes.cpp
+	Item.cpp
+	Iterators.cpp
+	kernel_interface.cpp
+	Settings.cpp
+	SuperBlock.cpp
+	Tree.cpp
+	VNode.cpp
+	Volume.cpp 
+
+	: $(TARGET_GCC_LIBGCC) $(HAIKU_LIBSUPC++)
+;
