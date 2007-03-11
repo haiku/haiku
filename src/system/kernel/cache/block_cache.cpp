@@ -505,6 +505,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *allocated, bool re
 		int32 blockSize = cache->block_size;
 
 		if (read_pos(cache->fd, blockNumber * blockSize, block->current_data, blockSize) < blockSize) {
+			hash_remove(cache->hash, block);
 			cache->FreeBlock(block);
 			FATAL(("could not read block %Ld\n", blockNumber));
 			return NULL;
