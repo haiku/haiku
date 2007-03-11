@@ -3875,17 +3875,21 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 
 	while (offset < numBytes) {
 		addr_t bytes = min_c(numBytes - offset, B_PAGE_SIZE);
+		uint32 flags;
 
 		if (interrupts) {
-			uint32 flags;
 			status = map->ops->query(map, (addr_t)address + offset,
 				&physicalAddress, &flags);
 		} else {
 			status = map->ops->query_interrupt(map, (addr_t)address + offset,
-				&physicalAddress);
+				&physicalAddress, &flags);
 		}
 		if (status < B_OK)
 			break;
+		if ((flags & PAGE_PRESENT) == 0) {
+			panic("get_memory_map() called on unmapped memory!");
+			return B_BAD_ADDRESS;
+		}
 
 		if (index < 0 && pageOffset > 0) {
 			physicalAddress += pageOffset;

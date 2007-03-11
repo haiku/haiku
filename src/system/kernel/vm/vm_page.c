@@ -165,11 +165,13 @@ dump_page(int argc, char **argv)
 	if (index == 2) {
 		if (!physical) {
 			vm_address_space *addressSpace = vm_kernel_address_space();
+			uint32 flags;
+
 			if (thread_get_current_thread()->team->address_space != NULL)
 				addressSpace = thread_get_current_thread()->team->address_space;
 
 			addressSpace->translation_map.ops->query_interrupt(
-				&addressSpace->translation_map, address, &address);
+				&addressSpace->translation_map, address, &address, &flags);
 
 		}
 		page = vm_lookup_page(address / B_PAGE_SIZE);

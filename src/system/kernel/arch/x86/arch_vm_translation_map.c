@@ -443,7 +443,8 @@ restart:
 
 
 static status_t
-query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical)
+query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
+	uint32 *_flags)
 {
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	page_table_entry *pt;
@@ -476,6 +477,11 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical)
 
 	index = VADDR_TO_PTENT(va);
 	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
+
+	*_flags |= ((pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
+		| (pt[index].dirty ? PAGE_MODIFIED : 0)
+		| (pt[index].accessed ? PAGE_ACCESSED : 0)
+		| (pt[index].present ? PAGE_PRESENT : 0);
 
 	return B_OK;
 }
