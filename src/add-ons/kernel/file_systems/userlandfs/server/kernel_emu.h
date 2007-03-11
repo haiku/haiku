@@ -1,5 +1,7 @@
 // kernel_emu.h
 
+#include <stdarg.h>
+
 #include <OS.h>
 
 struct selectsync;
@@ -31,7 +33,14 @@ status_t unremove_vnode(mount_id nsid, vnode_id vnid);
 status_t get_vnode_removed(mount_id nsid, vnode_id vnid, bool* removed);
 
 void kernel_debugger(const char *message);
-void panic(const char *format, ...);
+void vpanic(const char *format, va_list args);
+void panic(const char *format, ...) __attribute__ ((format (__printf__, 1, 2)));
+
+void vdprintf(const char *format, va_list args);
+void dprintf(const char *format, ...)
+	__attribute__ ((format (__printf__, 1, 2)));
+
+void dump_block(const char *buffer, int size, const char *prefix);
 
 int add_debugger_command(char *name, int (*func)(int argc, char **argv),
 	char *help);

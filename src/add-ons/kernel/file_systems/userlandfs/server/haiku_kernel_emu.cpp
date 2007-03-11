@@ -4,11 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <fs_cache.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
 #include "Debug.h"
+#include "haiku_fs_cache.h"
 #include "kernel_emu.h"
 
 
@@ -154,6 +156,177 @@ status_t
 get_vnode_removed(mount_id mountID, vnode_id vnodeID, bool* removed)
 {
 	return UserlandFS::KernelEmu::get_vnode_removed(mountID, vnodeID, removed);
+}
+
+
+// #pragma mark - Transaction
+
+
+// cache_start_transaction
+int32
+cache_start_transaction(void *_cache)
+{
+	return UserlandFS::HaikuKernelEmu::cache_start_transaction(_cache);
+}
+
+// cache_sync_transaction
+status_t
+cache_sync_transaction(void *_cache, int32 id)
+{
+	return UserlandFS::HaikuKernelEmu::cache_sync_transaction(_cache, id);
+}
+
+// cache_end_transaction
+status_t
+cache_end_transaction(void *_cache, int32 id,
+	transaction_notification_hook hook, void *data)
+{
+	return UserlandFS::HaikuKernelEmu::cache_end_transaction(_cache, id, hook,
+		data);
+}
+
+// cache_abort_transaction
+status_t
+cache_abort_transaction(void *_cache, int32 id)
+{
+	return UserlandFS::HaikuKernelEmu::cache_abort_transaction(_cache, id);
+}
+
+// cache_detach_sub_transaction
+int32
+cache_detach_sub_transaction(void *_cache, int32 id,
+	transaction_notification_hook hook, void *data)
+{
+	return UserlandFS::HaikuKernelEmu::cache_detach_sub_transaction(_cache, id,
+		hook, data);
+}
+
+// cache_abort_sub_transaction
+status_t
+cache_abort_sub_transaction(void *_cache, int32 id)
+{
+	return UserlandFS::HaikuKernelEmu::cache_abort_sub_transaction(_cache, id);
+}
+
+// cache_start_sub_transaction
+status_t
+cache_start_sub_transaction(void *_cache, int32 id)
+{
+	return UserlandFS::HaikuKernelEmu::cache_start_sub_transaction(_cache, id);
+}
+
+// cache_next_block_in_transaction
+status_t
+cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie,
+	off_t *_blockNumber, void **_data, void **_unchangedData)
+{
+	return UserlandFS::HaikuKernelEmu::cache_next_block_in_transaction(_cache,
+		id, _cookie, _blockNumber, _data, _unchangedData);
+}
+
+// cache_blocks_in_transaction
+int32
+cache_blocks_in_transaction(void *_cache, int32 id)
+{
+	return UserlandFS::HaikuKernelEmu::cache_blocks_in_transaction(_cache, id);
+}
+
+// cache_blocks_in_sub_transaction
+int32
+cache_blocks_in_sub_transaction(void *_cache, int32 id)
+{
+	return UserlandFS::HaikuKernelEmu::cache_blocks_in_sub_transaction(_cache,
+		id);
+}
+
+
+// #pragma mark - Block Cache
+
+
+// block_cache_delete
+void
+block_cache_delete(void *_cache, bool allowWrites)
+{
+	UserlandFS::HaikuKernelEmu::block_cache_delete(_cache, allowWrites);
+}
+
+// block_cache_create
+void *
+block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_create(fd, numBlocks,
+		blockSize, readOnly);
+}
+
+// block_cache_sync
+status_t
+block_cache_sync(void *_cache)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_sync(_cache);
+}
+
+// block_cache_make_writable
+status_t
+block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_make_writable(_cache,
+		blockNumber, transaction);
+}
+
+// block_cache_get_writable_etc
+void *
+block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
+	off_t length, int32 transaction)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_get_writable_etc(_cache,
+		blockNumber, base, length, transaction);
+}
+
+// block_cache_get_writable
+void *
+block_cache_get_writable(void *_cache, off_t blockNumber, int32 transaction)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_get_writable(_cache,
+		blockNumber, transaction);
+}
+
+// block_cache_get_empty
+void *
+block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_get_empty(_cache,
+		blockNumber, transaction);
+}
+
+// block_cache_get_etc
+const void *
+block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_get_etc(_cache, blockNumber,
+		base, length);
+}
+
+// block_cache_get
+const void *
+block_cache_get(void *_cache, off_t blockNumber)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_get(_cache, blockNumber);
+}
+
+// block_cache_set_dirty
+status_t
+block_cache_set_dirty(void *_cache, off_t blockNumber, bool isDirty,
+	int32 transaction)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_set_dirty(_cache,
+		blockNumber, isDirty, transaction);
+}
+
+// block_cache_put
+void
+block_cache_put(void *_cache, off_t blockNumber)
+{
+	UserlandFS::HaikuKernelEmu::block_cache_put(_cache, blockNumber);
 }
 
 

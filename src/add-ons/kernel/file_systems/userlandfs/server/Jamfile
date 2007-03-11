@@ -40,6 +40,9 @@ Application UserlandFSServer
 	  BeOSKernelVolume.cpp
 	  DispatcherFileSystem.cpp
 	  FileSystem.cpp
+	  haiku_block_cache.cpp
+	  haiku_hash.cpp
+	  haiku_lock.cpp
 	  HaikuKernelFileSystem.cpp
 	  HaikuKernelVolume.cpp
 	  kernel_emu.cpp
