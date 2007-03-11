@@ -3757,7 +3757,7 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 		status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
 		if (status != B_OK)	{
 			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) failed: %s\n",
-				unalignedBase, numBytes, flags, strerror(status));
+				(void *)unalignedBase, numBytes, flags, strerror(status));
 			goto out;
 		}
 
