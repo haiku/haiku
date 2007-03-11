@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -102,7 +102,6 @@ transaction_hash(void *_transaction, const void *_id, uint32 range)
 static void
 delete_transaction(block_cache *cache, cache_transaction *transaction)
 {
-	hash_remove(cache->transaction_hash, transaction);
 	if (cache->last_transaction == transaction)
 		cache->last_transaction = NULL;
 
@@ -149,7 +148,8 @@ cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
 //	#pragma mark - block_cache
 
 
-block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize, bool readOnly)
+block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
+		bool readOnly)
 	:
 	hash(NULL),
 	fd(_fd),
@@ -165,7 +165,8 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize, bool readOn
 	if (hash == NULL)
 		return;
 
-	transaction_hash = hash_init(16, 0, &transaction_compare, &::transaction_hash);
+	transaction_hash = hash_init(16, 0, &transaction_compare,
+		&::transaction_hash);
 	if (transaction_hash == NULL)
 		return;
 
@@ -281,8 +282,10 @@ block_cache::FreeBlock(cached_block *block)
 	ASSERT(range != NULL);
 	range->Free(this, block);
 
-	if (block->original_data != NULL || block->parent_data != NULL)
-		panic("block_cache::FreeBlock(): %p, %p\n", block->original_data, block->parent_data);
+	if (block->original_data != NULL || block->parent_data != NULL) {
+		panic("block_cache::FreeBlock(): %p, %p\n", block->original_data,
+			block->parent_data);
+	}
 
 #ifdef DEBUG_CHANGED
 	Free(block->compare);
@@ -295,6 +298,7 @@ block_cache::FreeBlock(cached_block *block)
 }
 
 
+/*! Allocates a new block for \a blockNumber, ready for use */
 cached_block *
 block_cache::NewBlock(off_t blockNumber)
 {
@@ -326,8 +330,6 @@ block_cache::NewBlock(off_t blockNumber)
 	block->compare = NULL;
 #endif
 
-	hash_insert(hash, block);
-
 	return block;
 }
 
@@ -338,7 +340,8 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
 
 	cached_block *next = NULL;
-	for (cached_block *block = unused_blocks.First(); block != NULL; block = next) {
+	for (cached_block *block = unused_blocks.First(); block != NULL;
+			block = next) {
 		next = block->next;
 
 		if (maxAccessed < block->accessed)
@@ -404,14 +407,15 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - private block functions
 
 
 static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
 #ifdef DEBUG_CHANGED
-	if (!block->is_dirty && block->compare != NULL && memcmp(block->current_data, block->compare, cache->block_size)) {
+	if (!block->is_dirty && block->compare != NULL
+		&& memcmp(block->current_data, block->compare, cache->block_size)) {
 		dprintf("new block:\n");
 		dump_block((const char *)block->current_data, 256, "  ");
 		dprintf("unchanged block:\n");
@@ -458,23 +462,40 @@ put_cached_block(block_cache *cache, cached_block *block)
 static void
 put_cached_block(block_cache *cache, off_t blockNumber)
 {
-	if (blockNumber < 0 || blockNumber >= cache->max_blocks)
-		panic("put_cached_block: invalid block number %lld (max %lld)", blockNumber, cache->max_blocks - 1);
-	
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
+		panic("put_cached_block: invalid block number %lld (max %lld)",
+			blockNumber, cache->max_blocks - 1);
+	}
+
 	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
 	if (block != NULL)
 		put_cached_block(cache, block);
 }
 
 
-static cached_block *
-get_cached_block(block_cache *cache, off_t blockNumber, bool *allocated, bool readBlock = true)
-{
-	if (blockNumber < 0 || blockNumber >= cache->max_blocks)
-		panic("get_cached_block: invalid block number %lld (max %lld)", blockNumber, cache->max_blocks - 1);
+/*!
+	Retrieves the block \a blockNumber from the hash table, if it's already
+	there, or reads it from the disk.
 
-	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
-	*allocated = false;
+	\param _allocated tells you wether or not a new block has been allocated
+		to satisfy your request.
+	\param readBlock if \c false, the block will not be read in case it was
+		not already in the cache. The block you retrieve may contain random
+		data.
+*/
+static cached_block *
+get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
+	bool readBlock = true)
+{
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
+		panic("get_cached_block: invalid block number %lld (max %lld)",
+			blockNumber, cache->max_blocks - 1);
+		return NULL;
+	}
+
+	cached_block *block = (cached_block *)hash_lookup(cache->hash,
+		&blockNumber);
+	*_allocated = false;
 
 	if (block == NULL) {
 		// read block into cache
@@ -482,8 +503,10 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *allocated, bool re
 		if (block == NULL)
 			return NULL;
 
-		*allocated = true;
+		hash_insert(cache->hash, block);
+		*_allocated = true;
 	} else {
+		// TODO: currently, the data is always mapped in
 /*
 		if (block->ref_count == 0 && block->current_data != NULL) {
 			// see if the old block can be resurrected
@@ -496,15 +519,16 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *allocated, bool re
 			if (block->current_data == NULL)
 				return NULL;
 
-			*allocated = true;
+			*_allocated = true;
 		}
 */
 	}
 
-	if (*allocated && readBlock) {
+	if (*_allocated && readBlock) {
 		int32 blockSize = cache->block_size;
 
-		if (read_pos(cache->fd, blockNumber * blockSize, block->current_data, blockSize) < blockSize) {
+		if (read_pos(cache->fd, blockNumber * blockSize, block->current_data,
+				blockSize) < blockSize) {
 			hash_remove(cache->hash, block);
 			cache->FreeBlock(block);
 			FATAL(("could not read block %Ld\n", blockNumber));
@@ -525,24 +549,29 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *allocated, bool re
 }
 
 
-/**	Returns the writable block data for the requested blockNumber.
- *	If \a cleared is true, the block is not read from disk; an empty block
- *	is returned.
- *	This is the only method to insert a block into a transaction. It makes
- *	sure that the previous block contents are preserved in that case.
- */
+/*!
+	Returns the writable block data for the requested blockNumber.
+	If \a cleared is true, the block is not read from disk; an empty block
+	is returned.
 
+	This is the only method to insert a block into a transaction. It makes
+	sure that the previous block contents are preserved in that case.
+*/
 static void *
-get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off_t length,
-	int32 transactionID, bool cleared)
+get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
+	off_t length, int32 transactionID, bool cleared)
 {
-	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n", blockNumber, transactionID));
+	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n",
+		blockNumber, transactionID));
 
-	if (blockNumber < 0 || blockNumber >= cache->max_blocks)
-		panic("get_writable_cached_block: invalid block number %lld (max %lld)", blockNumber, cache->max_blocks - 1);
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
+		panic("get_writable_cached_block: invalid block number %lld (max %lld)",
+			blockNumber, cache->max_blocks - 1);
+	}
 
 	bool allocated;
-	cached_block *block = get_cached_block(cache, blockNumber, &allocated, !cleared);
+	cached_block *block = get_cached_block(cache, blockNumber, &allocated,
+		!cleared);
 	if (block == NULL)
 		return NULL;
 
@@ -568,7 +597,8 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		// get new transaction
 		cache_transaction *transaction = lookup_transaction(cache, transactionID);
 		if (transaction == NULL) {
-			panic("get_writable_cached_block(): invalid transaction %ld!\n", transactionID);
+			panic("get_writable_cached_block(): invalid transaction %ld!\n",
+				transactionID);
 			put_cached_block(cache, block);
 			return NULL;
 		}
@@ -601,7 +631,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		// remember any previous contents for the parent transaction
 		block->parent_data = cache->Allocate();
 		if (block->parent_data == NULL) {
-			// ToDo: maybe we should just continue the current transaction in this case...
+			// TODO: maybe we should just continue the current transaction in this case...
 			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
 			return NULL;
@@ -621,20 +651,24 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 
 
 static status_t
-write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction)
+write_cached_block(block_cache *cache, cached_block *block,
+	bool deleteTransaction)
 {
 	cache_transaction *previous = block->previous_transaction;
 	int32 blockSize = cache->block_size;
 
-	void *data = previous && block->original_data ? block->original_data : block->current_data;
+	void *data = previous && block->original_data
+		? block->original_data : block->current_data;
 		// we first need to write back changes from previous transactions
 
 	TRACE(("write_cached_block(block %Ld)\n", block->block_number));
 
-	ssize_t written = write_pos(cache->fd, block->block_number * blockSize, data, blockSize);
+	ssize_t written = write_pos(cache->fd, block->block_number * blockSize,
+		data, blockSize);
 
 	if (written < blockSize) {
-		FATAL(("could not write back block %Ld (%s)\n", block->block_number, strerror(errno)));
+		FATAL(("could not write back block %Ld (%s)\n", block->block_number,
+			strerror(errno)));
 		return B_IO_ERROR;
 	}
 
@@ -649,11 +683,15 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 		if (--previous->num_blocks == 0) {
 			TRACE(("cache transaction %ld finished!\n", previous->id));
 
-			if (previous->notification_hook != NULL)
-				previous->notification_hook(previous->id, previous->notification_data);
+			if (previous->notification_hook != NULL) {
+				previous->notification_hook(previous->id,
+					previous->notification_data);
+			}
 
-			if (deleteTransaction)
+			if (deleteTransaction) {
+				hash_remove(cache->transaction_hash, previous);
 				delete_transaction(cache, previous);
+			}
 		}
 	}
 
@@ -677,8 +715,10 @@ cache_start_transaction(void *_cache)
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 
-	if (cache->last_transaction && cache->last_transaction->open)
-		panic("last transaction (%ld) still open!\n", cache->last_transaction->id);
+	if (cache->last_transaction && cache->last_transaction->open) {
+		panic("last transaction (%ld) still open!\n",
+			cache->last_transaction->id);
+	}
 
 	cache_transaction *transaction = new(nothrow) cache_transaction;
 	if (transaction == NULL)
@@ -706,17 +746,21 @@ cache_sync_transaction(void *_cache, int32 id)
 	hash_open(cache->transaction_hash, &iterator);
 
 	cache_transaction *transaction;
-	while ((transaction = (cache_transaction *)hash_next(cache->transaction_hash, &iterator)) != NULL) {
-		// ToDo: fix hash interface to make this easier
+	while ((transaction = (cache_transaction *)hash_next(
+			cache->transaction_hash, &iterator)) != NULL) {
+		// close all earlier transactions which haven't been closed yet
 
 		if (transaction->id <= id && !transaction->open) {
+			// write back all of their remaining dirty blocks
 			while (transaction->num_blocks > 0) {
-				status = write_cached_block(cache, transaction->blocks.Head(), false);
+				status = write_cached_block(cache, transaction->blocks.Head(),
+					false);
 				if (status != B_OK)
 					return status;
 			}
+
+			hash_remove_current(cache->transaction_hash, &iterator);
 			delete_transaction(cache, transaction);
-			hash_rewind(cache->transaction_hash, &iterator);
 		}
 	}
 
@@ -726,7 +770,8 @@ cache_sync_transaction(void *_cache, int32 id)
 
 
 extern "C" status_t
-cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook, void *data)
+cache_end_transaction(void *_cache, int32 id,
+	transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
@@ -814,16 +859,17 @@ cache_abort_transaction(void *_cache, int32 id)
 		block->transaction = NULL;
 	}
 
+	hash_remove(cache->transaction_hash, transaction);
 	delete_transaction(cache, transaction);
 	return B_OK;
 }
 
 
-/**	Acknowledges the current parent transaction, and starts a new transaction
- *	from its sub transaction.
- *	The new transaction also gets a new transaction ID.
- */
-
+/*!
+	Acknowledges the current parent transaction, and starts a new transaction
+	from its sub transaction.
+	The new transaction also gets a new transaction ID.
+*/
 extern "C" int32
 cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction_notification_hook hook, void *data)
@@ -869,7 +915,8 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (block->parent_data != NULL && block->parent_data != block->current_data) {
+		if (block->parent_data != NULL
+			&& block->parent_data != block->current_data) {
 			// we need to move this block over to the new transaction
 			block->original_data = block->parent_data;
 			if (last == NULL)
@@ -924,7 +971,8 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 			if (block->original_data != NULL) {
 				// the parent transaction didn't change the block, but the sub
 				// transaction did - we need to revert from the original data
-				memcpy(block->current_data, block->original_data, cache->block_size);
+				memcpy(block->current_data, block->original_data,
+					cache->block_size);
 			}
 		} else if (block->parent_data != block->current_data) {
 			// the block has been changed and must be restored
@@ -985,8 +1033,8 @@ cache_start_sub_transaction(void *_cache, int32 id)
 
 
 extern "C" status_t
-cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie, off_t *_blockNumber,
-	void **_data, void **_unchangedData)
+cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie,
+	off_t *_blockNumber, void **_data, void **_unchangedData)
 {
 	cached_block *block = (cached_block *)*_cookie;
 	block_cache *cache = (block_cache *)_cache;
@@ -1063,7 +1111,8 @@ block_cache_delete(void *_cache, bool allowWrites)
 
 	uint32 cookie = 0;
 	cached_block *block;
-	while ((block = (cached_block *)hash_remove_first(cache->hash, &cookie)) != NULL) {
+	while ((block = (cached_block *)hash_remove_first(cache->hash,
+			&cookie)) != NULL) {
 		cache->FreeBlock(block);
 	}
 
@@ -1071,7 +1120,8 @@ block_cache_delete(void *_cache, bool allowWrites)
 
 	cookie = 0;
 	cache_transaction *transaction;
-	while ((transaction = (cache_transaction *)hash_remove_first(cache->transaction_hash, &cookie)) != NULL) {
+	while ((transaction = (cache_transaction *)hash_remove_first(
+			cache->transaction_hash, &cookie)) != NULL) {
 		delete transaction;
 	}
 
@@ -1082,7 +1132,8 @@ block_cache_delete(void *_cache, bool allowWrites)
 extern "C" void *
 block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 {
-	block_cache *cache = new(nothrow) block_cache(fd, numBlocks, blockSize, readOnly);
+	block_cache *cache = new(nothrow) block_cache(fd, numBlocks, blockSize,
+		readOnly);
 	if (cache == NULL)
 		return NULL;
 
@@ -1212,12 +1263,20 @@ block_cache_get(void *_cache, off_t blockNumber)
 }
 
 
+/*!
+	Changes the internal status of a writable block to \a dirty. This can be
+	helpful in case you realize you don't need to change that block anymore
+	for whatever reason.
+
+	Note, you must only use this function on blocks that were acquired
+	writable!
+*/
 extern "C" status_t
-block_cache_set_dirty(void *_cache, off_t blockNumber, bool isDirty, int32 transaction)
+block_cache_set_dirty(void *_cache, off_t blockNumber, bool dirty,
+	int32 transaction)
 {
-	// not yet implemented
-	// Note, you must only use this function on blocks that were acquired writable!
-	if (isDirty)
+	// TODO: not yet implemented
+	if (dirty)
 		panic("block_cache_set_dirty(): not yet implemented that way!\n");
 
 	return B_OK;
