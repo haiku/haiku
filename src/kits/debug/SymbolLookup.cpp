@@ -3,10 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "SymbolLookup.h"
+
+#include <new>
+
 #include <string.h>
 #include <runtime_loader.h>
 
-#include "SymbolLookup.h"
 
 using std::nothrow;
 using namespace BPrivate;

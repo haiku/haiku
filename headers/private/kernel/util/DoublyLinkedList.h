@@ -7,7 +7,10 @@
 
 
 #include <SupportDefs.h>
-#include <util/kernel_cpp.h>
+
+#ifdef _KERNEL_MODE
+#	include <util/kernel_cpp.h>
+#endif
 
 
 #ifdef __cplusplus
