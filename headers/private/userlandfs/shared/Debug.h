@@ -1,5 +1,5 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef USERLAND_FS_DEBUG_H
+#define USERLAND_FS_DEBUG_H
 /* Debug - debug stuff
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
@@ -137,4 +137,4 @@ void dbg_printf_end();
 #define TOUCH(var) (void)var
 #endif
 
-#endif	/* DEBUG_H */
+#endif	/* USERLAND_FS_DEBUG_H */
