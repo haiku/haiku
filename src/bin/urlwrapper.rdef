@@ -10,9 +10,11 @@ resource(1, "BEOS:FILE_TYPES") message
 	"types" = "application/x-vnd.Be.URL.finger",
 	"types" = "application/x-vnd.Be.URL.sh",
 	"types" = "application/x-vnd.Be.URL.file",
+	"types" = "application/x-vnd.Be.URL.query",
 	"types" = "application/x-vnd.Be.URL.beshare",
 	"types" = "application/x-vnd.Be.URL.mms",
 	"types" = "application/x-vnd.Be.URL.rtp",
-	"types" = "application/x-vnd.Be.URL.rtsp"
+	"types" = "application/x-vnd.Be.URL.rtsp",
+	"types" = "application/x-vnd.Be.URL.audio"
 };
 

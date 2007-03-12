@@ -11,6 +11,7 @@
 #include <Debug.h>
 
 #define HANDLE_FILE
+#define HANDLE_QUERY
 //#define HANDLE_MID_CID // http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid
 #define HANDLE_SH
 #define HANDLE_BESHARE
@@ -334,6 +335,41 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	}
 #endif
 
+#ifdef HANDLE_QUERY
+	// XXX:TODO
+	if (u.proto == "query") {
+		// mktemp ?
+		BString qname("/tmp/query-url-temp-");
+		qname << getpid() << "-" << system_time();
+		BFile query(qname.String(), O_CREAT|O_EXCL);
+		// XXX: should check for failure
+		
+		BString s;
+		int32 v;
+		
+		// TODO:
+		// UnurlString(full);
+		// TODO: handle options (list of attrs in the column, ...)
+
+		v = 'qybF'; // QuerY By Formula XXX: any #define for that ?
+		query.WriteAttr("_trk/qryinitmode", B_INT32_TYPE, 0LL, &v, sizeof(v));
+		s = "TextControl";
+		query.WriteAttr("_trk/focusedView", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
+		s = u.full;
+		query.WriteAttr("_trk/qryinitstr", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
+		query.WriteAttr("_trk/qrystr", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
+		s = "application/x-vnd.Be-query";
+		query.WriteAttr("BEOS:TYPE", 'MIMS', 0LL, s.String(), s.Length()+1);
+		
+
+		BEntry e(qname.String());
+		entry_ref er;
+		if (e.GetRef(&er) >= B_OK)
+			be_roster->Launch(&er);
+		return;
+	}
+#endif
+
 #ifdef HANDLE_SH
 	if (u.proto == "sh") {
 		BString cmd(u.Full());
@@ -402,7 +438,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #ifdef HANDLE_AUDIO
 	// TODO
 #endif
-	
+
 	// vnc: ?
 	// irc: ?
 	// 
@@ -415,7 +451,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	//
 	// itps: pcast: podcast: s//http/ + parse xml to get url to mp3 stream...
 	// audio: s//http:/ + default MediaPlayer -- see http://forums.winamp.com/showthread.php?threadid=233130
-	// 
+	//
+	// gps: ? I should submit an RFC for that one :)
 
 }
 
