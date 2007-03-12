@@ -45,6 +45,7 @@
 
 typedef struct identify_cookie {
 	NTFS_BOOT_SECTOR boot;
+	char label[256];
 } identify_cookie;
 
 float
@@ -52,16 +53,15 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
 	NTFS_BOOT_SECTOR boot;
 	identify_cookie *cookie;
+	ntfs_volume		*ntVolume;
 	uint8			*buf=(uint8*)&boot;
+	char			devpath[256];
 	
 	// read in the boot sector
 	ERRPRINT("fs_identify_partition: read in the boot sector\n");
 	if (read_pos(fd, 0, (void*)&boot, 512) != 512) {
 		return -1;
 	}
-
-	// only check boot signature on hard disks to account for broken mtools
-	// behavior
 	
 	// check boot signature
 	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
@@ -71,12 +71,28 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	if (memcmp(buf+3, "NTFS    ", 8)!=0)
 		return -1;
 
+	//get path for device
+	if(!ioctl(fd,B_GET_PATH_FOR_DEVICE,devpath))
+		return -1;
+	//try mount
+	ntVolume = utils_mount_volume(devpath,MS_RDONLY|MS_NOATIME,true);
+	if(!ntVolume)
+		return -1;
+		
 	//allocate identify_cookie
 	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
 	if (!cookie)
 		return -1;
 
 	memcpy(&(cookie->boot),&boot,512);
+
+	strcpy(cookie->label,"NTFS Volume");		
+
+	if(ntVolume->vol_name)
+		if(strlen(ntVolume->vol_name)>0)
+			strcpy(cookie->label,ntVolume->vol_name);		
+	
+	ntfs_device_umount( ntVolume, true );
 
 	*_cookie = cookie;
 
@@ -91,7 +107,7 @@ fs_scan_partition(int fd, partition_data *partition, void *_cookie)
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
 	partition->content_size = sle64_to_cpu(cookie->boot.number_of_sectors) * le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
 	partition->block_size = le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
-	partition->content_name = strdup("NTFS Volume");
+	partition->content_name = strdup(cookie->label);
 	return B_OK;
 }
 
