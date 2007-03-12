@@ -902,7 +902,11 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 				// check if the dummy page is still in place
 			restart_dummy_lookup:
 				vm_page *currentPage = vm_cache_lookup_page(cache, offset);
-				if (currentPage->state == PAGE_STATE_BUSY) {
+				if (currentPage == NULL) {
+					// there is no page in place anymore, we'll put ours
+					// into it
+					vm_cache_insert_page(cache, page, offset);
+				} else if (currentPage->state == PAGE_STATE_BUSY) {
 					if (currentPage->type == PAGE_TYPE_DUMMY) {
 						// we let the other party add our page
 						currentPage->queue_next = page;
@@ -913,7 +917,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 						mutex_lock(&cache->lock);
 						goto restart_dummy_lookup;
 					}
-				} else if (currentPage != NULL) {
+				} else {
 					// we need to copy our new page into the old one
 					addr_t destinationAddress;
 					vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
@@ -927,9 +931,6 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 					vm_put_physical_page(virtualAddress);
 
 					vm_page_set_state(page, PAGE_STATE_FREE);
-				} else {
-					// there is no page in place anymore, we'll put ours into it
-					vm_cache_insert_page(cache, page, offset);
 				}
 			}
 
