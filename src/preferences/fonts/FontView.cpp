@@ -85,6 +85,15 @@ FontView::UpdateFonts()
 }
 
 
+void
+FontView::RelayoutIfNeeded()
+{
+	fPlainView->RelayoutIfNeeded();
+	fBoldView->RelayoutIfNeeded();
+	fFixedView->RelayoutIfNeeded();
+}
+
+
 bool
 FontView::IsRevertable()
 {

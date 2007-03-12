@@ -88,10 +88,10 @@ FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	AddChild(fFontsMenuField);
 
 	// size menu
-	rect.right = rect.left + StringWidth("99") + 40;
+	rect.right = rect.left + StringWidth("Size: 99") + 30.0f;
 	fSizesMenuField = new BMenuField(rect, "sizes", "Size:", fSizesMenu, true,
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	fSizesMenuField->SetDivider(StringWidth(fSizesMenuField->Label()) + 5.0);
+		B_FOLLOW_TOP);
+	fSizesMenuField->SetDivider(StringWidth(fSizesMenuField->Label()) + 5.0f);
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fSizesMenuField->ResizeToPreferred();
 	rect = Bounds();
@@ -162,6 +162,20 @@ FontSelectionView::SetDivider(float divider)
 		fPreviewText->ResizeBy(fDivider - divider, 0);
 
 	fDivider = divider;
+}
+
+
+void
+FontSelectionView::RelayoutIfNeeded()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	if (width > Bounds().Width()) {
+		fSizesMenuField->MoveTo(fMaxFontNameWidth + fDivider + 40.0f, 
+				fFontsMenuField->Bounds().top);
+		ResizeTo(width, height);
+	}
 }
 
 

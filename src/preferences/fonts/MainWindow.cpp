@@ -61,6 +61,8 @@ MainWindow::MainWindow()
 
 	tabView->AddTab(fFontsView);
 
+	fFontsView->UpdateFonts();
+	fFontsView->RelayoutIfNeeded();
 	float width, height;
 	fFontsView->GetPreferredSize(&width, &height);
 

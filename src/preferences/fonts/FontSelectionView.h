@@ -30,6 +30,7 @@ class FontSelectionView : public BView {
 		virtual void	MessageReceived(BMessage *msg);
 
 		void			SetDivider(float divider);
+		void			RelayoutIfNeeded();
 
 		void			SetDefaults();
 		void			Revert();

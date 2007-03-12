@@ -23,6 +23,7 @@ class FontView : public BView {
 		void	SetDefaults();
 		void	Revert();
 		void	UpdateFonts();
+		void	RelayoutIfNeeded();
 
 		bool	IsRevertable();
 
