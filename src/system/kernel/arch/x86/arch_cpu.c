@@ -587,6 +587,10 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandl
 	char *tmp = (char *)to;
 	char *s = (char *)from;
 
+	// this check is to trick the gcc4 compiler and have it keep the error label
+	if (to == NULL)
+		goto error;
+
 	*faultHandler = (addr_t)&&error;
 
 	while (size--)
@@ -605,6 +609,10 @@ ssize_t
 arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
 {
 	int fromLength = 0;
+
+	// this check is to trick the gcc4 compiler and have it keep the error label
+	if (to == NULL)
+		goto error;
 
 	*faultHandler = (addr_t)&&error;
 
@@ -634,6 +642,10 @@ status_t
 arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 {
 	char *xs = (char *)s;
+
+	// this check is to trick the gcc4 compiler and have it keep the error label
+	if (s == NULL)
+		goto error;
 
 	*faultHandler = (addr_t)&&error;
 
