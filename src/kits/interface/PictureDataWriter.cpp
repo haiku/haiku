@@ -221,13 +221,102 @@ PictureDataWriter::WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, c
 
 
 status_t
+PictureDataWriter::WriteSetFontFamily(const font_family &family)
+{
+	/*BeginOp(B_PIC_SET_FONT_FAMILY);
+	Write(
+	EndOp();*/
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontStyle(const font_style &style)
+{
+	/*BeginOp(B_PIC_SET_FONT_STYLE);
+	Write(
+	EndOp();*/
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontSpacing(const int32 &spacing)
+{
+	BeginOp(B_PIC_SET_FONT_SPACING);
+	Write<int32>(spacing);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontSize(const float &size)
+{
+	BeginOp(B_PIC_SET_FONT_SIZE);
+	Write<float>(size);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontRotation(const float &rotation)
+{
+	BeginOp(B_PIC_SET_FONT_ROTATE);
+	Write<float>(rotation);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontEncoding(const int32 &encoding)
+{
+	BeginOp(B_PIC_SET_FONT_ENCODING);
+	Write<int32>(encoding);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontFlags(const int32 &flags)
+{
+	BeginOp(B_PIC_SET_FONT_FLAGS);
+	Write<int32>(flags);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontShear(const int32 &shear)
+{
+	BeginOp(B_PIC_SET_FONT_SHEAR);
+	Write<int32>(shear);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetFontFace(const int32 &face)
+{
+	BeginOp(B_PIC_SET_FONT_FACE);
+	Write<int32>(face);
+	EndOp();
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WritePushState()
 {
 	BeginOp(B_PIC_PUSH_STATE);
 	EndOp();
 	return B_OK;
 }
-
 
 
 status_t

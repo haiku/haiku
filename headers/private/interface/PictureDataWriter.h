@@ -46,6 +46,16 @@ public:
 				const int32 &bytesPerRow, const int32 &colorSpace, const int32 &flags,
 				const void *data, const int32 &length);
 	
+	status_t WriteSetFontFamily(const font_family &family);
+	status_t WriteSetFontStyle(const font_style &style);
+	status_t WriteSetFontSpacing(const int32 &spacing);
+	status_t WriteSetFontSize(const float &size);
+	status_t WriteSetFontRotation(const float &rotation);
+	status_t WriteSetFontEncoding(const int32 &encoding);
+	status_t WriteSetFontFlags(const int32 &flags);
+	status_t WriteSetFontShear(const int32 &shear);
+	status_t WriteSetFontFace(const int32 &face);
+
 	status_t WritePushState();
 	status_t WritePopState();	
 	
