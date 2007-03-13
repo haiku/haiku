@@ -78,5 +78,14 @@ extern float	roundf(float value);
 #define INT64_MAX LONGLONG_MAX
 #endif
 
+#define	B_MPEG_2_AUDIO_LAYER_1 (enum mpeg_id)0x201
+#define	B_MPEG_2_AUDIO_LAYER_2 (enum mpeg_id)0x202
+#define	B_MPEG_2_AUDIO_LAYER_3 (enum mpeg_id)0x203
+#define	B_MPEG_2_VIDEO (enum mpeg_id)0x211
+#define	B_MPEG_2_5_AUDIO_LAYER_1 (enum mpeg_id)0x301
+#define	B_MPEG_2_5_AUDIO_LAYER_2 (enum mpeg_id)0x302
+#define	B_MPEG_2_5_AUDIO_LAYER_3 (enum mpeg_id)0x303
+
+
 #endif	// HAIKU_BUILD_COMPATIBILITY_H
 
