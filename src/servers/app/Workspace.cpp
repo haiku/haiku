@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -123,6 +123,28 @@ Workspace::GetNextWindow(WindowLayer*& _window, BPoint& _leftTop)
 		fCurrent = fWorkspace.Windows().FirstWindow();
 	else
 		fCurrent = fCurrent->NextWindow(fWorkspace.Index());
+
+	if (fCurrent == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_window = fCurrent;
+
+	if (fCurrentWorkspace)
+		_leftTop = fCurrent->Frame().LeftTop();
+	else
+		_leftTop = fCurrent->Anchor(fWorkspace.Index()).position;
+
+	return B_OK;
+}
+
+
+status_t
+Workspace::GetPreviousWindow(WindowLayer*& _window, BPoint& _leftTop)
+{
+	if (fCurrent == NULL)
+		fCurrent = fWorkspace.Windows().LastWindow();
+	else
+		fCurrent = fCurrent->PreviousWindow(fWorkspace.Index());
 
 	if (fCurrent == NULL)
 		return B_ENTRY_NOT_FOUND;

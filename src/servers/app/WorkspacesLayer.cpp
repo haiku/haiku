@@ -262,16 +262,16 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 	backgroundRegion.IntersectWith(&workspaceRegion);
 	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
 
+	// We draw from top down and cut the window out of the clipping region
+	// which reduces the flickering
 	WindowLayer* window;
 	BPoint leftTop;
-	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
+	while (workspace.GetPreviousWindow(window, leftTop) == B_OK) {
 		_DrawWindow(drawingEngine, rect, screenFrame, window,
 			leftTop, backgroundRegion, active);
 	}
 
 	// draw background
-
-	//drawingEngine->ConstrainClippingRegion(&backgroundRegion);
 	drawingEngine->FillRect(rect, color);
 
 	drawingEngine->ConstrainClippingRegion(&redraw);
@@ -376,15 +376,14 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 	WindowLayer* window;
 	BRect windowFrame;
 	BPoint leftTop;
-	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
+	while (workspace.GetPreviousWindow(window, leftTop) == B_OK) {
 		BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 			leftTop);
 		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel
 			&& window->Feel() != kWindowScreenFeel) {
-			// We can't exit the loop here, as we traverse the window
-			// list in the wrong direction...
 			fSelectedWindow = window;
 			windowFrame = frame;
+			break;
 		}
 	}
 

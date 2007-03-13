@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,6 +28,7 @@ class Workspace {
 						{ return fCurrentWorkspace; }
 
 		status_t	GetNextWindow(WindowLayer*& _window, BPoint& _leftTop);
+		status_t	GetPreviousWindow(WindowLayer*& _window, BPoint& _leftTop);
 		void		RewindWindows();
 
 		class Private;
