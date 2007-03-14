@@ -32,6 +32,8 @@
 #	define TRACE(x) ;
 #endif
 
+using std::nothrow;
+
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
