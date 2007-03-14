@@ -8,6 +8,7 @@
  */
 
 #include <new>
+#include <ctype.h>
 #include <string.h>
 
 #include <Debug.h>
@@ -2089,7 +2090,8 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 	char trigger;
 	// TODO: Oh great, reinterpret_cast all around
 	while ((trigger = title[0]) != '\0') {
-		if (!chars->HasItem(reinterpret_cast<void *>((uint32)trigger)))	{
+		if (isalpha(trigger) 
+			&& !chars->HasItem(reinterpret_cast<void *>((uint32)trigger))) {
 			chars->AddItem(reinterpret_cast<void *>((uint32)trigger));
 			return title;
 		}
