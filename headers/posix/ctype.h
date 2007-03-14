@@ -37,7 +37,7 @@ enum {
 	_ISxdigit = 0x1000,		/* hexadecimal digit */
 	_ISspace = 0x2000,		/* white space */
 	_ISprint = 0x4000,		/* printing */
-	_ISgraph = 0x8000,		/* graphical */
+	_ISgraph = 0x8000		/* graphical */
 };
 
 /* Characteristics */

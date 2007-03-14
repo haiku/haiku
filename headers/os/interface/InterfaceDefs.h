@@ -184,7 +184,7 @@ enum alignment {
 	B_ALIGN_HORIZONTAL_CENTER	= B_ALIGN_CENTER,
 
 	B_ALIGN_HORIZONTAL_UNSET	= -1L,
-	B_ALIGN_USE_FULL_WIDTH		= -2L,
+	B_ALIGN_USE_FULL_WIDTH		= -2L
 };
 
 enum vertical_alignment {
@@ -196,7 +196,7 @@ enum vertical_alignment {
 
 	B_ALIGN_VERTICAL_UNSET		= -1L,
 	B_ALIGN_NO_VERTICAL			= B_ALIGN_VERTICAL_UNSET,
-	B_ALIGN_USE_FULL_HEIGHT		= -2L,
+	B_ALIGN_USE_FULL_HEIGHT		= -2L
 };
 
 /*----------------------------------------------------------------*/
@@ -347,7 +347,7 @@ enum color_which {
 	B_WINDOW_TAB_COLOR = 3,
 	B_WINDOW_TEXT_COLOR = 22,
 	B_WINDOW_INACTIVE_TAB_COLOR = 23,
-	B_WINDOW_INACTIVE_TEXT_COLOR = 24,
+	B_WINDOW_INACTIVE_TEXT_COLOR = 24
 };
 
 _IMPEXP_BE rgb_color	ui_color(color_which which);

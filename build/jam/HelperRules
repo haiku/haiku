@@ -242,7 +242,7 @@ rule SetIncludePropertiesVariables
 	} else {
 		$(prefix)_INCLUDES_SEPARATOR = ;
 		$(prefix)_LOCAL_INCLUDES_OPTION = "-iquote " ;
-		$(prefix)_SYSTEM_INCLUDES_OPTION = "-idirafter " ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION = "-I " ;
 	}
 }
 

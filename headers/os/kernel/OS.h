@@ -27,7 +27,7 @@ extern "C" {
 enum {
 	B_TIMEOUT			= 8,	/* relative timeout */
 	B_RELATIVE_TIMEOUT	= 8,	/* fails after a relative timeout with B_WOULD_BLOCK */
-	B_ABSOLUTE_TIMEOUT	= 16,	/* fails after an absolute timeout with B_WOULD BLOCK */
+	B_ABSOLUTE_TIMEOUT	= 16	/* fails after an absolute timeout with B_WOULD BLOCK */
 };
 
 /*-------------------------------------------------------------*/
@@ -161,7 +161,7 @@ enum {
 	B_DO_NOT_RESCHEDULE			= 0x02,	// thread is not rescheduled
 	B_RELEASE_ALL				= 0x08,	// all waiting threads will be woken up,
 										// count will be zeroed
-	B_RELEASE_IF_WAITING_ONLY	= 0x10,	// release count only if there are any
+	B_RELEASE_IF_WAITING_ONLY	= 0x10	// release count only if there are any
 										// threads waiting
 };
 
@@ -233,7 +233,7 @@ typedef struct {
 enum {
 	/* compatible to sys/resource.h RUSAGE_SELF and RUSAGE_CHILDREN */
 	B_TEAM_USAGE_SELF		= 0,
-	B_TEAM_USAGE_CHILDREN	= -1,
+	B_TEAM_USAGE_CHILDREN	= -1
 };
 
 /* system private, use macros instead */
@@ -536,7 +536,7 @@ typedef enum cpu_types {
 	B_CPU_M68K,
 	B_CPU_ARM,
 	B_CPU_SH,
-	B_CPU_SPARC,
+	B_CPU_SPARC
 } cpu_type;
 
 #define B_CPU_x86_VENDOR_MASK	0xff00

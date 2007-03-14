@@ -12,7 +12,7 @@
 
 typedef struct _IO_FILE FILE;
 
-#define __PRINTFLIKE(format, varargs) __attribute__ ((__format__ (__printf__, format, varargs)));
+#define __PRINTFLIKE(format, varargs) __attribute__ ((__format__ (__printf__, format, varargs)))
 #define __SCANFLIKE(format, varargs) __attribute__((__format__ (__scanf__, format, varargs)))
 
 #endif	/* _STDIO_PRE_H_ */
