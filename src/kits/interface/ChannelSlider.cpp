@@ -272,6 +272,7 @@ BChannelSlider::MouseDown(BPoint where)
 			// Click was on a slider.
 			if (frame.Contains(where)) {
 				fCurrentChannel = channel;
+				SetCurrentChannel(channel);
 				break;
 			}	
 		}	
@@ -626,18 +627,15 @@ void
 BChannelSlider::FinishChange()
 {
 	if (fInitialValues != NULL) {
-		if (fAllChannels) {
-			// TODO: Iterate through the list of channels, and invoke only
-			// for changed values ?
-			
-			InvokeChannel();
-			
-		} else {
-			if (ValueList()[fCurrentChannel] != fInitialValues[fCurrentChannel]) {
-				SetValueFor(fCurrentChannel, ValueList()[fCurrentChannel]);
-				Invoke();
-			}	
+		bool *inMask = NULL;
+		int32 numChannels = CountChannels();
+		if (!fAllChannels) {
+			inMask = new bool[CountChannels()];
+			for (int i=0; i<numChannels; i++)
+				inMask[i] = false;
+			inMask[fCurrentChannel] = true;
 		}
+		InvokeChannel(NULL, 0, numChannels, inMask);
 	}
 	
 	SetTracking(false);
@@ -822,7 +820,6 @@ BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 	else
 		SetValueFor(fCurrentChannel, value);
 	
-	InvokeNotifyChannel(ModificationMessage());
 	DrawThumbs();
 }
 

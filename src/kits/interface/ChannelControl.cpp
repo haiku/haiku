@@ -263,14 +263,12 @@ BChannelControl::InvokeChannel(BMessage *msg, int32 fromChannel,
 	
 	invokeMessage.AddInt32("be:current_channel", fCurrentChannel);
 	
-	if (channelCount == -1)
+	if (channelCount < 0)
 		channelCount = fChannelCount - fromChannel;
 		
-	for (int32 i = fromChannel; i < fromChannel + channelCount; i++) {
-		invokeMessage.AddInt32("be:channel_value", fChannelValues[i]);
-		// TODO: Fix this: just send "be:channel_changed" = true
-		// for channels which have changed their values.
-		invokeMessage.AddBool("be:channel_changed", true);
+	for (int32 i = 0; i < channelCount; i++) {
+		invokeMessage.AddInt32("be:channel_value", fChannelValues[fromChannel + i]);
+		invokeMessage.AddBool("be:channel_changed", inMask ? inMask[i] : true);
 	}
 	
 	return BControl::Invoke(&invokeMessage);
@@ -417,7 +415,8 @@ BChannelControl::SetAllValue(int32 values)
 	
 	delete[] fChannelValues;
 	fChannelValues = newValues;
-	
+	BControl::SetValue(fChannelValues[fCurrentChannel]);
+
 	return B_OK;
 }
 
