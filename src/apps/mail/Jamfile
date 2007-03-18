@@ -10,7 +10,7 @@ UsePrivateHeaders mail ;
 UsePrivateHeaders textencoding ;
 UsePrivateHeaders shared ;
 
-AddResources Mail : BeMail.rdef pictures.rdef  ;
+AddResources Mail : Mail.rdef pictures.rdef  ;
 Application Mail : 
 	AutoTextControl.cpp
 	BmapButton.cpp
