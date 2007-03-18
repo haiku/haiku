@@ -18,8 +18,8 @@ resource app_version {
 	variety = B_APPV_FINAL,
 	internal = 3,
 
-	short_info = "BeMail",
-	long_info = "BeMail ©2005-2007 Haiku, Inc."
+	short_info = "Mail",
+	long_info = "Mail ©2005-2007 Haiku, Inc."
 };
 
 resource large_icon {

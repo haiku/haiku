@@ -114,7 +114,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	bool *attachAttributes, bool *cquotes, uint32 *account, int32 *replyTo,
 	char **preamble, char **sig, uint32 *encoding, bool *warnUnencodable,
 	bool *spellCheckStartOn, uint8 *buttonBar)
-	:	BWindow(rect, MDR_DIALECT_CHOICE ("BeMail Preferences","BeMailの設定"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	:	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences","Mailの設定"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BMenuField *menu;
 

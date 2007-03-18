@@ -1833,7 +1833,7 @@ TTextView::Open(hyper_text *enclosure)
 
 		case TYPE_MAILTO:
 			if (be_roster->Launch(B_MAIL_TYPE, 1, &enclosure->name) < B_OK) {
-				char *argv[] = {"BeMail", enclosure->name};
+				char *argv[] = {"Mail", enclosure->name};
 				be_app->ArgvReceived(2, argv);
 			}
 			break;

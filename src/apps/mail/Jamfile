@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src apps bemail ;
+SubDir HAIKU_TOP src apps mail ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -10,8 +10,8 @@ UsePrivateHeaders mail ;
 UsePrivateHeaders textencoding ;
 UsePrivateHeaders shared ;
 
-AddResources BeMail : BeMail.rdef pictures.rdef  ;
-Application BeMail : 
+AddResources Mail : BeMail.rdef pictures.rdef  ;
+Application Mail : 
 	AutoTextControl.cpp
 	BmapButton.cpp
 	ButtonBar.cpp
@@ -30,8 +30,8 @@ Application BeMail :
 	Words.cpp
 	KUndoBuffer.cpp ;
 
-LinkAgainst BeMail : be tracker $(TARGET_LIBSTDC++) libmail.so libtextencoding.so ;
+LinkAgainst Mail : be tracker $(TARGET_LIBSTDC++) libmail.so libtextencoding.so ;
 
 Package haiku-maildaemon-cvs :
-	BeMail : 
+	Mail : 
 	boot beos apps ;

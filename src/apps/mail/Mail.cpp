@@ -292,7 +292,7 @@ void
 TMailApp::AboutRequested()
 {
 	(new BAlert("",
-		"BeMail\nBy Robert Polic\n\n"
+		"Mail\nBy Robert Polic\n\n"
 		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
 		"Compiled on " __DATE__ " at " __TIME__ ".",
 		"OK"))->Go();
@@ -312,7 +312,7 @@ TMailApp::ArgvReceived(int32 argc, char **argv)
 	// a "mailto:" with no name should open an empty window
 	// so remember if we got a "mailto:" even if there isn't a name
 	// that goes along with it (this allows deskbar replicant to open
-	// an empty message even when BeMail is already running)
+	// an empty message even when Mail is already running)
 	bool gotmailto = false;
 
 	for (int32 loop = 1; loop < argc; loop++)
@@ -486,7 +486,7 @@ TMailApp::MessageReceived(BMessage *msg)
 		{
 			// Do we need to update the state of the button bars?
 			if (fPreviousShowButtonBar != sShowButtonBar) {
-				// Notify all BeMail windows
+				// Notify all Mail windows
 				TMailWindow	*window;
 				for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i)) != NULL; i++) {
 					window->Lock();
@@ -1204,7 +1204,7 @@ TMailApp::NewWindow(const entry_ref *ref, const char *to, bool resend,
 		}
 	}
 	if (title == "")
-		title = "BeMail";
+		title = "Mail";
 
 	TMailWindow *window = new TMailWindow(r, title.String(), ref, to, &fFont, resend,
 								trackerMessenger);
@@ -1378,7 +1378,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("About BeMail", "A) BeMailについて") B_UTF8_ELLIPSIS,
+		MDR_DIALECT_CHOICE ("About", "A) Mailについて") B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app);
 	
@@ -1428,7 +1428,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	}
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("Preferences","P) BeMailの設定") B_UTF8_ELLIPSIS,
+		MDR_DIALECT_CHOICE ("Preferences","P) Mailの設定") B_UTF8_ELLIPSIS,
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
 	menu_bar->AddItem(menu);
@@ -2015,9 +2015,9 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 			// Update title bar if "subject" has changed
 			if (!fIncoming && fieldMask & FIELD_SUBJECT) {
-				// If no subject, set to "BeMail"
+				// If no subject, set to "Mail"
 				if (!fHeaderView->fSubject->TextView()->TextLength())
-					SetTitle("BeMail");
+					SetTitle("Mail");
 				else
 					SetTitle(fHeaderView->fSubject->Text());
 			}
@@ -3354,7 +3354,7 @@ TMailWindow::Send(bool now)
 
 			char versionString[255];
 			sprintf(versionString,
-				"BeMail - Mail Daemon Replacement %ld.%ld.%ld %s",
+				"Mail - Mail Daemon Replacement %ld.%ld.%ld %s",
 				versionInfo.major, versionInfo.middle, versionInfo.minor, varietyString);
 			fMail->SetHeaderField("X-Mailer", versionString);
 		}
@@ -3672,10 +3672,9 @@ TMailWindow::SetTitleForMessage()
 	//
 	//	Figure out the title of this message and set the title bar
 	//
-	BString title = "BeMail";
+	BString title = "Mail";
 
-	if (fIncoming)
-	{
+	if (fIncoming) {
 		if (fMail->GetName(&title) == B_OK)
 			title << ": \"" << fMail->Subject() << "\"";
 		else

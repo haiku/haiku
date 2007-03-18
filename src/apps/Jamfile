@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src apps ;
 
 SubInclude HAIKU_TOP src apps abouthaiku ;
-SubInclude HAIKU_TOP src apps bemail ;
 SubInclude HAIKU_TOP src apps cdplayer ;
 SubInclude HAIKU_TOP src apps clock ;
 SubInclude HAIKU_TOP src apps codycam ;
@@ -15,6 +14,7 @@ SubInclude HAIKU_TOP src apps glteapot ;
 SubInclude HAIKU_TOP src apps icon-o-matic ;
 SubInclude HAIKU_TOP src apps installer ;
 SubInclude HAIKU_TOP src apps magnify ;
+SubInclude HAIKU_TOP src apps mail ;
 SubInclude HAIKU_TOP src apps mediaplayer ;
 SubInclude HAIKU_TOP src apps midiplayer ;
 SubInclude HAIKU_TOP src apps people ;
