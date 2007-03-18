@@ -439,7 +439,19 @@ status_t
 BChannelControl::SetLimitsFor(int32 fromChannel, int32 channelCount,
 	const int32 *minimum, const int32 *maximum)
 {
-	return B_ERROR;
+	if (fromChannel + channelCount > CountChannels())
+		channelCount = CountChannels() - fromChannel;
+	for (int i=0; i<channelCount; i++) {
+		if (minimum[i] > maximum[i])
+			return B_BAD_VALUE;
+		fChannelMin[fromChannel + i] = minimum[i];
+		fChannelMax[fromChannel + i] = maximum[i];
+		if (fChannelValues[fromChannel + i] < minimum[i])
+			fChannelValues[fromChannel + i] = minimum[i];
+		else if (fChannelValues[fromChannel + i] > maximum[i])
+			fChannelValues[fromChannel + i] = maximum[i];
+	}
+	return B_OK;
 }
 
 
@@ -447,7 +459,19 @@ status_t
 BChannelControl::GetLimitsFor(int32 fromChannel, int32 channelCount,
 	int32 *minimum, int32 *maximum) const
 {
-	return B_ERROR;
+	if (minimum == NULL || maximum == NULL)
+		return B_BAD_VALUE;
+
+	if (fChannelMin == NULL || fChannelMax == NULL)
+		return B_ERROR;
+	if (fromChannel + channelCount > CountChannels())
+		channelCount = CountChannels() - fromChannel;
+	for (int i=0; i<channelCount; i++) {
+		minimum[i] = fChannelMin[fromChannel + i];
+		maximum[i] = fChannelMax[fromChannel + i];
+	}
+	
+	return B_OK;
 }
 
 

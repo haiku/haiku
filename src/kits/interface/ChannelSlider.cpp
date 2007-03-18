@@ -573,7 +573,7 @@ BChannelSlider::ThumbDeltaFor(int32 channel)
 	if (channel >= 0 && channel < MaxChannelCount()) {
 		float range = ThumbRangeFor(channel);
 		int32 limitRange = MaxLimitList()[channel] - MinLimitList()[channel];
-		delta = ValueList()[channel] * range / limitRange;  
+		delta = (ValueList()[channel] - MinLimitList()[channel]) * range / limitRange;  
 			
 		if (Vertical())
 			delta = range - delta;
@@ -814,7 +814,7 @@ BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 	else
 		floatValue = range + (point.x - fMinpoint);
 	
-	int32 value = (int32)(floatValue / range * limitRange);
+	int32 value = (int32)(floatValue / range * limitRange) + MinLimitList()[fCurrentChannel];
 	if (fAllChannels)
 		SetAllValue(value);
 	else
