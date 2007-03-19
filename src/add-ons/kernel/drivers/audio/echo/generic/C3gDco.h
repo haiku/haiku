@@ -132,7 +132,7 @@ protected:
 	//	Returns 3G frequency register
 	//
 	DWORD Get3gFreqReg()
-		{ ASSERT( NULL != m_pDspCommPage );
+		{ ECHO_ASSERT(NULL != m_pDspCommPage );
 		  return SWAP( m_pDspCommPage->dw3gFreqReg ); }
 
 	//

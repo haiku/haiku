@@ -63,7 +63,7 @@ BYTE OsGetRelease()
 //
 DWORD gAllocNonPagedCount = 0;
 
-LIST_HEAD(, _echo_mem) mems;
+LIST_HEAD(mems, _echo_mem) mems;
 
 
 static echo_mem *

@@ -132,7 +132,7 @@ ECHOSTATUS CGina::InitHw()
 	//
 	// Create the DSP comm object
 	//
-	ASSERT( NULL == m_pDspCommObject );
+	ECHO_ASSERT(NULL == m_pDspCommObject );
 	m_pDspCommObject = new CGinaDspCommObject( (PDWORD) m_pvSharedMemory,
 															 m_pOsSupport );
 	if (NULL == m_pDspCommObject)
@@ -272,5 +272,11 @@ ECHOSTATUS CGina::QueryAudioSampleRate
 
 }	// ECHOSTATUS CGina::QueryAudioSampleRate
 
+
+void CGina::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 44100;
+	dwMaxRate = 48000;
+}
 
 // *** CGina.cpp ***

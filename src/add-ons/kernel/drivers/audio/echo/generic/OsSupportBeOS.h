@@ -55,6 +55,12 @@
 #endif
 
 //
+// Assert macro
+//
+//#define ECHO_ASSERT(exp)	ASSERT(exp)
+#define ECHO_ASSERT(exp)
+
+//
 //	Specify OS specific types
 //
 typedef char 		*PCHAR ;

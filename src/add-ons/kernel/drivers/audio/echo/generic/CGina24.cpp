@@ -133,7 +133,7 @@ ECHOSTATUS CGina24::InitHw()
 	//
 	// Create the DSP comm object
 	//
-	ASSERT( NULL == m_pDspCommObject );
+	ECHO_ASSERT(NULL == m_pDspCommObject );
 	m_pDspCommObject = new CGina24DspCommObject( (PDWORD) m_pvSharedMemory,
 																 m_pOsSupport );
 	if (NULL == m_pDspCommObject)
@@ -142,7 +142,7 @@ ECHOSTATUS CGina24::InitHw()
 		return ECHOSTATUS_NO_MEM;
 	}
 
-	ASSERT( GetDspCommObject() );
+	ECHO_ASSERT(GetDspCommObject() );
 
 	//
 	// Load the DSP and the ASIC on the PCI card
@@ -291,6 +291,13 @@ ECHOSTATUS CGina24::QueryAudioSampleRate
 	ECHO_DEBUGPRINTF( ( "CGina24::QueryAudioSampleRate()\n" ) );
 	return ECHOSTATUS_OK;
 }	// ECHOSTATUS CGina24::QueryAudioSampleRate
+
+
+void CGina24::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 8000;
+	dwMaxRate = 96000;
+}
 
 
 //===========================================================================

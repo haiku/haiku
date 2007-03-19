@@ -81,6 +81,8 @@ public:
 		DWORD		dwSampleRate
 	);
 
+	virtual void QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate);
+
 	//
 	//	Start transport for several pipes at once
 	//

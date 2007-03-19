@@ -139,8 +139,9 @@ ECHOSTATUS CEchoGals::OpenAudio
 	
 	if ( m_cmAudioOpen.Test( &cmMask ) )
 	{
-		ECHO_DEBUGPRINTF( ("\tECHOSTATUS_CHANNEL_ALREADY_OPEN\n") );
-		return( ECHOSTATUS_CHANNEL_ALREADY_OPEN );
+		ECHO_DEBUGPRINTF( ("OpenAudio - ECHOSTATUS_CHANNEL_ALREADY_OPEN - m_cmAudioOpen 0x%x   cmMask 0x%x\n",
+							m_cmAudioOpen.GetMask(),cmMask.GetMask()) );
+		return ECHOSTATUS_CHANNEL_ALREADY_OPEN;
 	}
 
 #ifdef AUTO_DUCK_ALLOCATE
@@ -185,7 +186,7 @@ ECHOSTATUS CEchoGals::OpenAudio
 	m_ProcessId[ wPipeIndex ] = pOpenParameters->ProcessId;
 	Reset( wPipeIndex );
 	
-	ECHO_DEBUGPRINTF( ("\tECHOSTATUS_OK\n") );
+	ECHO_DEBUGPRINTF( ("OpenAudio - ECHOSTATUS_OK - m_cmAudioOpen 0x%x\n",m_cmAudioOpen.GetMask()) );
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CEchoGals::OpenAudio
@@ -223,6 +224,7 @@ ECHOSTATUS CEchoGals::CloseAudio
 	{
 		cmMask.SetIndexInMask( wPipeIndex + i );
 	}
+	
 	Reset( wPipeIndex );
 	
 	//
@@ -243,7 +245,7 @@ ECHOSTATUS CEchoGals::CloseAudio
 	m_ProcessId[ wPipeIndex ] = NULL;
 	m_Pipes[ wPipeIndex ].wInterleave = 0;
 	
-	ECHO_DEBUGPRINTF( ("\tECHOSTATUS_OK\n") );
+	ECHO_DEBUGPRINTF( ("CloseAudio - ECHOSTATUS_OK - m_cmAudioOpen 0x%x\n",m_cmAudioOpen.GetMask()) );
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CEchoGals::CloseAudio
@@ -272,7 +274,8 @@ ECHOSTATUS CEchoGals::VerifyAudioOpen
 	cmMask.SetIndexInMask( wPipeIndex );
 	if ( !( m_cmAudioOpen.Test( &cmMask ) ) )
 	{
-		ECHO_DEBUGPRINTF( ("\tECHOSTATUS_CHANNEL_NOT_OPEN\n") );
+		ECHO_DEBUGPRINTF( ("VerifyAudioOpen - ECHOSTATUS_CHANNEL_NOT_OPEN - wPipeIndex %d - m_cmAudioOpen 0x%x - cmMask 0x%x\n",
+							wPipeIndex,m_cmAudioOpen.GetMask(),cmMask.GetMask()) );
 		return ECHOSTATUS_CHANNEL_NOT_OPEN;
 	}
 
@@ -536,14 +539,6 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 	// Set the format
 	//
 	Status = GetDspCommObject()->SetAudioFormat( wPipeIndex, pAudioFormat );
-	if (ECHOSTATUS_OK == Status)
-	{
-		WORD wBytesPerSample;
-		
-		wBytesPerSample = pAudioFormat->wDataInterleave * (pAudioFormat->wBitsPerSample / 8);
-		m_wBytesPerSample[ wPipeIndex ] = wBytesPerSample;
-		m_Pipes[ wPipeIndex ].wInterleave = pAudioFormat->wDataInterleave;
-	}	
 	
 	return Status;
 	
@@ -573,8 +568,6 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 
 	for ( ; ; )
 	{
-		WORD wBytesPerSample;
-
 		wPipeIndex = pChannelMask->GetIndexFromMask( ++wPipeIndex );
 		if ( (WORD) ECHO_INVALID_CHANNEL == wPipeIndex )
 			break;							// We be done!
@@ -606,10 +599,6 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 		Status = GetDspCommObject()->SetAudioFormat( wPipeIndex, pAudioFormat );
 		if ( ECHOSTATUS_OK != Status )
 			return Status;
-
-		wBytesPerSample = pAudioFormat->wDataInterleave * (pAudioFormat->wBitsPerSample / 8);
-		m_wBytesPerSample[ wPipeIndex ] = wBytesPerSample;
-		m_Pipes[ wPipeIndex ].wInterleave = pAudioFormat->wDataInterleave;
 	}
 
 	return ECHOSTATUS_OK;
@@ -1219,4 +1208,5 @@ ECHOSTATUS CEchoGals::GetAudioPositionPtr
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CEchoGals::GetAudioPositionPtr
+
 

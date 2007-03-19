@@ -145,9 +145,9 @@ BOOL C3gDco::LoadASIC()
 		return FALSE;
 
 	//
-	// Give the ASIC a few milliseconds to set up
+	// Give the ASIC a whole second to set up
 	//
-	m_pOsSupport->OsSnooze( 2000 );
+	m_pOsSupport->OsSnooze( 1000000 );
 
 	//
 	// See if it worked
@@ -282,8 +282,6 @@ ECHOSTATUS C3gDco::SetInputClock(WORD wClock)
 // 
 // Set the audio sample rate for 3G
 //
-// fixme - it's pointless to return the sample rate back?
-//
 //===========================================================================
 
 DWORD C3gDco::SetSampleRate( DWORD dwNewSampleRate )
@@ -380,6 +378,12 @@ DWORD C3gDco::SetSampleRate( DWORD dwNewSampleRate )
 		m_pDspCommPage->dwSampleRate = SWAP( dwNewSampleRate );
 
 		ECHO_DEBUGPRINTF( ("C3gDco::SetSampleRate: %ld  clock %lx\n", dwNewSampleRate, dwControlReg) );
+	}
+	else
+	{
+		ECHO_DEBUGPRINTF( ("C3gDco::SetSampleRate: could not set sample rate %ld\n", dwNewSampleRate) );
+
+		dwNewSampleRate = SWAP( m_pDspCommPage->dwSampleRate );
 	}
 
 	return dwNewSampleRate;
@@ -652,7 +656,10 @@ BOOL C3gDco::CheckAsicStatus()
 	DWORD	dwBoxStatus,dwBoxType;
 	
 	if ( !WaitForHandshake() )
+	{
+		ECHO_DEBUGPRINTF(("CheckAsicStatus - no handshake!\n"));
 		return FALSE;
+	}
 		
 	//
 	// Send the vector command
@@ -667,6 +674,7 @@ BOOL C3gDco::CheckAsicStatus()
 	//
 	if ( !WaitForHandshake() )
 	{
+		ECHO_DEBUGPRINTF(("CheckAsicStatus - no handshake after VC\n"));
 		m_pwDspCode = NULL;
 		m_ullLastLoadAttemptTime = 0;	// so LoadFirmware will try again right away
 		return FALSE;
@@ -678,12 +686,14 @@ BOOL C3gDco::CheckAsicStatus()
 	dwBoxStatus = SWAP(m_pDspCommPage->dwExtBoxStatus);
 	if (E3G_ASIC_NOT_LOADED == dwBoxStatus)
 	{
+		ECHO_DEBUGPRINTF(("CheckAsicStatus - ASIC not loaded\n"));
 		dwBoxType = NO3GBOX;
 	}
 	else
 	{
 		dwBoxType = dwBoxStatus & E3G_BOX_TYPE_MASK;
 		m_bASICLoaded = TRUE;
+		ECHO_DEBUGPRINTF(("CheckAsicStatus - read box type %x\n",dwBoxType));
 	}
 		
 	m_dwCurrentBoxType = dwBoxType;
@@ -700,10 +710,11 @@ BOOL C3gDco::CheckAsicStatus()
 		if (	(NO3GBOX == dwBoxType) ||
 				(dwBoxType != m_dwOriginalBoxType) )
 		{
-			//GoComatose();
+			ECHO_DEBUGPRINTF(("CheckAsicStatus - box type mismatch - original %x, got %x\n",m_dwOriginalBoxType,dwBoxType));
 			return FALSE;
 		}
 			
+		ECHO_DEBUGPRINTF(("CheckAsicStatus - ASIC ok\n"));
 		m_bASICLoaded = TRUE;
 		return TRUE;
 	}
@@ -720,7 +731,10 @@ BOOL C3gDco::CheckAsicStatus()
 	// Set the bad board flag if no external box
 	//
 	if (NO3GBOX == dwBoxType)
+	{
+		ECHO_DEBUGPRINTF(("CheckAsicStatus - no external box\n"));
 		m_bBadBoard = TRUE;
+	}
 
 	return m_bASICLoaded;
 

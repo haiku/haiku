@@ -77,6 +77,8 @@ public:
 		DWORD		dwSampleRate
 	);
 
+	virtual void QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate);
+
 	//
 	//	Overload new & delete so memory for this object is allocated from 
 	//	non-paged memory.

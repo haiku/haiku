@@ -172,11 +172,13 @@ ECHOSTATUS CDspCommObjectVmixer::SetPipeOutGain
 		DWORD dwIndex = wBusOut * m_wNumPipesOut + wPipeOut;
 		m_pDspCommPage->byVmixerLevel[ dwIndex ] = (BYTE) iGain;
 
+/*
 		ECHO_DEBUGPRINTF( ("CDspCommObjectVmixer::SetPipeOutGain: Out pipe %d, "
 								 "out bus %d = 0x%lx\n",
 								 wPipeOut,
 								 wBusOut,
 								 iGain) );
+*/
 		
 		if (fImmediate)
 		{
@@ -268,7 +270,7 @@ ECHOSTATUS CDspCommObjectVmixer::SetBusOutGain(WORD wBusOut,INT32 iGain)
 
 ECHOSTATUS CDspCommObjectVmixer::UpdateVmixerLevel()
 {
-	ECHO_DEBUGPRINTF( ( "CDspCommObjectVmixer::UpdateVmixerLevel:\n" ) );
+	//ECHO_DEBUGPRINTF( ( "CDspCommObjectVmixer::UpdateVmixerLevel:\n" ) );
 
 	ClearHandshake();
 	return( SendVector( DSP_VC_SET_VMIXER_GAIN ) );

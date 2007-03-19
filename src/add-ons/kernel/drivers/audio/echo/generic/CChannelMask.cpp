@@ -447,10 +447,7 @@ CChMaskDsp::CChMaskDsp()
 
 BOOL CChMaskDsp::IsEmpty()
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		if ( 0 != m_MaskRegs[ i ] )
+	if (0 != m_Mask)
 			return FALSE;
 
 	return TRUE;
@@ -467,17 +464,25 @@ BOOL CChMaskDsp::IsEmpty()
 // Set driver channel index into DSP mask format
 void CChMaskDsp::SetIndexInMask( WORD wPipeIndex )
 {
+	CH_MASK_DSP bit,temp;
+	
+	temp = SWAP( m_Mask );
+	bit = 1 << wPipeIndex;
+	temp |= bit;
+	m_Mask = SWAP( temp );
 
-	m_MaskRegs[ wPipeIndex / CH_MASK_DSP_BITS ] |=
-		SWAP( (CH_MASK_DSP)(( (CH_MASK_DSP) 1 ) << ( wPipeIndex % CH_MASK_DSP_BITS ) ) );
 }	// void CChMaskDsp::SetIndexInMask( WORD wPipeIndex )
 	
 	
 // Clear driver channel index into DSP mask format
 void CChMaskDsp::ClearIndexInMask( WORD wPipeIndex )
 {
-	m_MaskRegs[ wPipeIndex / CH_MASK_DSP_BITS ] &=
-		SWAP( (CH_MASK_DSP)(~( ( (CH_MASK_DSP) 1 ) << ( wPipeIndex % CH_MASK_DSP_BITS ) ) ) );
+	CH_MASK_DSP bit,temp;
+	
+	temp = SWAP( m_Mask );
+	bit = 1 << wPipeIndex;
+	temp &= ~bit;
+	m_Mask = SWAP( temp );
 		
 }	// void CChMaskDsp::SetIndexInMask( WORD wPipeIndex )
 	
@@ -490,8 +495,11 @@ void CChMaskDsp::ClearIndexInMask( WORD wPipeIndex )
 
 BOOL CChMaskDsp::TestIndexInMask( WORD wPipeIndex )
 {
-	if ( m_MaskRegs[ wPipeIndex / CH_MASK_DSP_BITS ] &
-		  SWAP( (CH_MASK_DSP)( ( (CH_MASK_DSP) 1 ) << ( wPipeIndex % CH_MASK_DSP_BITS ) ) ) )
+	CH_MASK_DSP temp,bit;
+	
+	temp = SWAP(m_Mask);
+	bit = 1 << wPipeIndex;
+	if (0 != (temp & bit))
 		return TRUE;
 		
 	return FALSE;
@@ -507,41 +515,10 @@ BOOL CChMaskDsp::TestIndexInMask( WORD wPipeIndex )
 
 void CChMaskDsp::Clear()
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] = 0;
+	m_Mask = 0;
 }	// void CChMaskDsp::Clear()
 
 	
-//===========================================================================
-//
-//	operator +=    Add channels in source mask to this mask
-//
-//===========================================================================
-
-VOID CChMaskDsp::operator += (CONST CChannelMask & RVal)
-{
-	CH_MASK *	pMask = (CH_MASK *) &m_MaskRegs[ 0 ];
-
-	*pMask |= RVal.m_Mask;
-}	// VOID operator += (CONST CChMaskDsp & RVal)
-
-	
-//===========================================================================
-//
-//	operator -=    Remove channels in source mask from this mask
-//
-//===========================================================================
-
-VOID CChMaskDsp::operator -= (CONST CChannelMask & RVal)
-{
-	CH_MASK *	pMask = (CH_MASK *) &m_MaskRegs[ 0 ];
-
-	*pMask &= ~RVal.m_Mask;
-}	// VOID operator += (CONST CChMaskDsp & RVal)
-
-
 //===========================================================================
 //
 // Operator = just copies from one mask to another.
@@ -550,9 +527,8 @@ VOID CChMaskDsp::operator -= (CONST CChannelMask & RVal)
 
 CChMaskDsp& CChMaskDsp::operator =(CONST CChannelMask & RVal)
 {
-	CH_MASK *	pMask = (CH_MASK *) &m_MaskRegs[ 0 ];
+	m_Mask = SWAP(RVal.m_Mask);
 
-	*pMask = RVal.m_Mask;
 	return *this;
 
 }	// CChMaskDsp& CChMaskDsp::operator =(CONST CChannelMask & RVal)

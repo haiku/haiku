@@ -30,6 +30,8 @@
 
 #include "CEchoGals.h"
 
+#undef ECHO_DEBUGPRINTF
+#define ECHO_DEBUGPRINTF(x)
 
 /****************************************************************************
 
@@ -343,13 +345,14 @@ ECHOSTATUS CEchoGals::MixerControlChanged
 
 ECHOSTATUS CEchoGals::GetControlChanges
 (
-	PMIXER_MULTI_NOTIFY	pNotifies
+	PMIXER_MULTI_NOTIFY	pNotifies,
+	NUINT	MixerCookie
 )
 {
 	//
 	// Match the cookie
 	//
-	ECHO_MIXER_CLIENT *pClient = GetMixerClient(pNotifies->Cookie);
+	ECHO_MIXER_CLIENT *pClient = GetMixerClient(MixerCookie);
 	
 	if (NULL == pClient)
 	{
@@ -830,7 +833,11 @@ ECHOSTATUS CEchoGals::ProcessMixerMultiFunction
 //
 //===========================================================================
 
-ECHOSTATUS CEchoGals::GetPolledStuff(ECHO_POLLED_STUFF *pPolledStuff)
+ECHOSTATUS CEchoGals::GetPolledStuff
+(
+	ECHO_POLLED_STUFF *pPolledStuff,
+	NUINT MixerCookie
+)
 {
 	ECHO_MIXER_CLIENT *pClient;
 	CDspCommObject *pDCO = GetDspCommObject();
@@ -851,7 +858,7 @@ ECHOSTATUS CEchoGals::GetPolledStuff(ECHO_POLLED_STUFF *pPolledStuff)
 	// If there is a matching client, fill out the number
 	// of notifies
 	//
-	pClient = GetMixerClient(pPolledStuff->Cookie);
+	pClient = GetMixerClient(MixerCookie);
 	if (NULL == pClient)
 		pPolledStuff->dwNumPendingNotifies = 0;
 	else	

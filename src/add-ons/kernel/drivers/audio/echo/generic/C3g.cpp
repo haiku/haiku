@@ -137,7 +137,7 @@ ECHOSTATUS C3g::InitHw()
 	//
 	// Create the DSP comm object
 	//
-	ASSERT( NULL == m_pDspCommObject );
+	ECHO_ASSERT(NULL == m_pDspCommObject );
 	m_pDspCommObject = new C3gDco( (PDWORD) m_pvSharedMemory, m_pOsSupport );
 	if (NULL == m_pDspCommObject)
 	{
@@ -309,6 +309,14 @@ ECHOSTATUS C3g::QueryAudioSampleRate
 	return ECHOSTATUS_BAD_FORMAT;
 
 }	// ECHOSTATUS C3g::QueryAudioSampleRate
+
+
+void C3g::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 32000;
+	dwMaxRate = 96000;
+}
+
 
 
 //===========================================================================
@@ -493,9 +501,9 @@ ECHOSTATUS C3g::Start
 		BOOL intersect;
 		
 		//
-		// See if ADAT in 3-8 or out 3-8 have been opened
+		// See if ADAT in 3-8 or out 3-8 are being started
 		//		
-		intersect = m_cmAudioOpen.IsIntersectionOf( pDCO->m_Adat38Mask );
+		intersect = pChannelMask->IsIntersectionOf( pDCO->m_Adat38Mask );
 		if (intersect)
 		{
 			ECHO_DEBUGPRINTF(("Cannot start ADAT channels 3-8 in double speed mode\n"));

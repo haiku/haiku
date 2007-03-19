@@ -199,6 +199,7 @@ echo_create_controls_list(multi_dev *multi)
 	parent = echo_create_group_control(multi, &index, 0, S_OUTPUT, NULL);
 
 	MIXER_AUDIO_CHANNEL channel;
+	channel.wCardId = 0;
 	channel.dwType = ECHO_BUS_OUT;
 	for (i=0; i < card->caps.wNumBussesOut / 2; i++) {
 		channel.wChannel = i * 2;

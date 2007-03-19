@@ -243,6 +243,10 @@ SET_LAYLA24_FREQUENCY_REG command.
 #define	DSP_VC_UPDATE_FLAGS					0x00FB	// Handshke rqd.
 #define 	DSP_VC_GO_COMATOSE					0x00d9
 
+#ifdef SUPERMIX
+#define	DSP_VC_TRIGGER							0x00f3
+#endif
+
 #endif
 
 
@@ -267,6 +271,10 @@ SET_LAYLA24_FREQUENCY_REG command.
 																// status bits.  Clear this flag for audio data;
 																// set it for AC3 or WMA or some such
 #define	DSP_FLAG_PROFESSIONAL_SPDIF	0x0008	// 1 Professional, 0 Consumer
+
+#ifdef SUPERMIX
+#define	DSP_FLAG_SUPERMIX_SRC			0x0080	// Turn on sample rate conversion for supermixer
+#endif
 
 
 
@@ -527,6 +535,21 @@ SET_LAYLA24_FREQUENCY_REG command.
 #define DSP_MIDI_OUT_FIFO_SIZE	64
 
 
+//==================================================================================
+//
+//	Macros for reading and writing DSP registers
+//
+//==================================================================================
+
+#ifndef READ_REGISTER_ULONG
+#define READ_REGISTER_ULONG(ptr)		( *(ptr) )
+#endif
+
+#ifndef WRITE_REGISTER_ULONG
+#define WRITE_REGISTER_ULONG(ptr,val)	*(ptr) = val
+#endif
+
+
 /****************************************************************************
 
 	The comm page.  This structure is read and written by the DSP; the
@@ -611,7 +634,7 @@ typedef struct
 class CDspCommObject
 {
 protected:
-	PDspCommPage	m_pDspCommPage;		// Physical memory seen by DSP
+	volatile PDspCommPage m_pDspCommPage;		// Physical memory seen by DSP
 	PPAGE_BLOCK		m_pDspCommPageBlock;	// Physical memory info for COsSupport
 
  	//
@@ -634,7 +657,7 @@ protected:
 	BOOL				m_bHasASIC;				// Set TRUE if card has an ASIC
 	BOOL				m_bASICLoaded;			// Set TRUE when ASIC loaded
 	DWORD				m_dwCommPagePhys;		// Physical addr of this object
-	PDWORD			m_pdwDspRegBase;		// DSP's register base
+	volatile PDWORD m_pdwDspRegBase;		// DSP's register base
 	CChannelMask	m_cmActive;				// Chs. active mask
 	BOOL				m_bBadBoard;			// Set TRUE if DSP won't load
 													// or punks out
@@ -711,27 +734,34 @@ protected :
 	//	Get/Set handshake Flag
 	//
 	DWORD GetHandshakeFlag()
-		{ ASSERT( NULL != m_pDspCommPage );
+		{ ECHO_ASSERT( NULL != m_pDspCommPage );
 		  return( SWAP( m_pDspCommPage->dwHandshake ) ); }
 	void ClearHandshake()
-		{ ASSERT( NULL != m_pDspCommPage );
+		{ ECHO_ASSERT( NULL != m_pDspCommPage );
 		  m_pDspCommPage->dwHandshake = 0; }
 
 	//
 	//	Get/set DSP registers
 	//
 	DWORD GetDspRegister( DWORD dwIndex )
-		{ ASSERT( NULL != m_pdwDspRegBase );
-		  return( SWAP( m_pdwDspRegBase[ dwIndex ] ) ); }
+	{ 
+		ECHO_ASSERT( NULL != m_pdwDspRegBase );
+		
+		return READ_REGISTER_ULONG( m_pdwDspRegBase + dwIndex); 
+	}
+	
 	void SetDspRegister( DWORD dwIndex, DWORD dwValue )
-		{ ASSERT( NULL != m_pdwDspRegBase );
-		  m_pdwDspRegBase[ dwIndex ] = SWAP( dwValue ); }
+	{ 
+		ECHO_ASSERT( NULL != m_pdwDspRegBase );
+	
+		WRITE_REGISTER_ULONG( m_pdwDspRegBase + dwIndex, dwValue);
+	}
 
 	//
 	//	Set control register in CommPage
 	//
 	void SetControlRegister( DWORD dwControlRegister )
-		{ ASSERT( NULL != m_pDspCommPage );
+		{ ECHO_ASSERT( NULL != m_pDspCommPage );
 		  m_pDspCommPage->dwControlReg = SWAP( dwControlRegister ); }
 
 	//
@@ -886,7 +916,7 @@ public:
 	//	Returns control register
 	//
 	DWORD GetControlRegister()
-		{ ASSERT( NULL != m_pDspCommPage );
+		{ ECHO_ASSERT( NULL != m_pDspCommPage );
 		  return SWAP( m_pDspCommPage->dwControlReg ); }
 
 	//
@@ -895,6 +925,13 @@ public:
 	virtual ECHOSTATUS SetInputClock(WORD wClock);
 	virtual ECHOSTATUS SetOutputClock(WORD wClock);
 	
+	#ifdef COURT8_FAMILY
+	virtual ECHOSTATUS SetPhoneBits(DWORD 	dwPhoneBits)
+	{
+		return ECHOSTATUS_NOT_SUPPORTED;
+	}
+	#endif
+
 	//
 	//	Set digital mode
 	//
@@ -924,7 +961,7 @@ public:
 	//	Return audio channel position in bytes
 	//
 	DWORD GetAudioPosition( WORD wPipeIndex )
-		{ ASSERT( wPipeIndex < ECHO_MAXAUDIOPIPES );
+		{ ECHO_ASSERT( wPipeIndex < ECHO_MAXAUDIOPIPES );
 
 		  return( ( wPipeIndex < ECHO_MAXAUDIOPIPES )
 							? SWAP( m_pDspCommPage->dwPosition[ wPipeIndex ] )
@@ -992,6 +1029,13 @@ public:
 		PCChannelMask	pChannelMask
 	);
 
+#ifdef SUPERMIX	
+	//
+	// Trigger this card for synced transport; used for Supermix mode
+	//
+	ECHOSTATUS TriggerTransport();
+#endif
+
 	//
 	//	See if any pipes are playing or recording
 	// 
@@ -1014,7 +1058,9 @@ public:
 	// Read extended status register from the DSP
 	//
 	DWORD GetStatusReg()
-		{ return( SWAP( m_pdwDspRegBase[ CHI32_STATUS_REG ] ) ); }
+	{ 
+		return READ_REGISTER_ULONG( m_pdwDspRegBase + CHI32_STATUS_REG ); 
+	}
 
 	//
 	// Tell DSP to release the hardware interrupt
@@ -1218,6 +1264,14 @@ public:
 	virtual ECHOSTATUS SetDigitalInputAutoMute(BOOL fAutoMute);
 	
 #endif // DIGITAL_INPUT_AUTO_MUTE_SUPPORT
+	
+#ifdef SUPERMIX
+	//
+	// Set the input gain boost
+	//
+	virtual ECHOSTATUS SetInputGainBoost(WORD wBusIn,BYTE bBoostDb)
+	{ return ECHOSTATUS_NOT_SUPPORTED; }
+#endif	
 	
 };		// class CDspCommObject
 

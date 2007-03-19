@@ -54,7 +54,7 @@ typedef unsigned long	CH_MASK;
 #define	ECHO_INVALID_CHANNEL	((WORD)(-1))
 													// Marks unused channel #
 
-typedef unsigned short		CH_MASK_DSP;
+typedef unsigned long		CH_MASK_DSP;
 #define	CH_MASK_DSP_BITS	(sizeof( CH_MASK_DSP ) * 8)
 													// Max bits per mask entry
 
@@ -78,6 +78,11 @@ public:
 
 	CChannelMask();
 	~CChannelMask() {}
+
+   CH_MASK GetMask()
+   {
+      return m_Mask;
+   }
 
 	// Returns TRUE if no bits set
 	BOOL IsEmpty();
@@ -184,18 +189,9 @@ typedef	CChannelMask *		PCChannelMask;
 
 class CChMaskDsp
 {
-protected:
-
-	enum
-	{
-		CH_MASK_SZ = 4 / sizeof(CH_MASK_DSP)
-	};
-
-	CH_MASK_DSP	m_MaskRegs[ CH_MASK_SZ  ];	// One bit per output or input channel
-														// 32 bits total
-
 public:
-
+	CH_MASK_DSP	m_Mask;		// One bit per output or input channel
+														// 32 bits total
 	CChMaskDsp();
 	~CChMaskDsp() {}
 
@@ -227,17 +223,8 @@ public:
 	//
 	friend class CChannelMask;
 
-	inline CH_MASK_DSP operator []  ( int iNdx )
-		{ return SWAP( m_MaskRegs[ iNdx ] ); }
-
 	// Copy mask bits in source to this mask
 	CChMaskDsp& operator = (CONST CChannelMask & RVal);
-
-	// Add mask bits in source to this mask
-	VOID operator += (CONST CChannelMask & RVal);
-
-	// Subtract mask bits in source to this mask
-	VOID operator -= (CONST CChannelMask & RVal);
 
 protected :
 

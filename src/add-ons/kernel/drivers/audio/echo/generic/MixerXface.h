@@ -313,7 +313,7 @@ typedef struct tMIXER_NOTIFY
 
 typedef struct tMIXER_MULTI_NOTIFY
 {
-	NUINT				Cookie;
+	DWORD				dwUnused;
 	DWORD				dwCount;			// When passed to the generic driver,
 											// dwCount holds the size of the Notifies array.
 											// On returning from the driver, dwCount
@@ -334,15 +334,11 @@ typedef struct tMIXER_MULTI_NOTIFY
 // learned that it's useful to be able to get all the following stuff at
 // once.  Typically the console will run a timer that fetchs this periodically.
 //
-// Cookie is the unique ID for the mixer client; this is obtained by calling
-// CEchoGals::OpenMixer.  The generic driver will maintain a separate notify
-// queue for each client.
-//
 // Meters and dwClockDetectBits are exactly the same as you would get if you
 // did each of those mixer functions separately.
 //
 // dwNumPendingNotifies is how many notifies are in the queue associated with
-// the cookie.  You can use this number to create an array of MIXER_NOTIFY
+// the client.  You can use this number to create an array of MIXER_NOTIFY
 // structures and call CEchoGals::GetControlChanges.  This way you only check
 // for control changes if the controls have actually changed.
 //
@@ -350,7 +346,7 @@ typedef struct tMIXER_MULTI_NOTIFY
 
 typedef struct tECHO_POLLED_STUFF
 {
-	NUINT					Cookie; 	
+	DWORD					dwUnused;
 	ECHOGALS_METERS	Meters;
 	DWORD					dwClockDetectBits;
 	DWORD					dwNumPendingNotifies;

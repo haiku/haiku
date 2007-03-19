@@ -201,16 +201,24 @@ public:
 	// for this client.  dwNumNotifies is the size of the array passed in 
 	// pNotifies; dwNumReturned specifies how many were actually copied in.
 	//
+	// Takes the cookie as a separate parameter; the one in MIXER_MULTI_NOTIFY
+	// is ignored since it's not 64 bits
+	//
 	ECHOSTATUS GetControlChanges
 	(
-		PMIXER_MULTI_NOTIFY	pNotifies
+		PMIXER_MULTI_NOTIFY	pNotifies,
+		NUINT MixerCookie
 	);
 
 	//
 	// Get a bunch of useful polled stuff- audio meters,
 	// clock detect bits, and pending notifies
 	//	
-	ECHOSTATUS GetPolledStuff(ECHO_POLLED_STUFF *pPolledStuff);
+	ECHOSTATUS GetPolledStuff
+	(
+		ECHO_POLLED_STUFF *pPolledStuff,
+		NUINT MixerCookie
+	);
 
 	//
 	// Get the digital mode
@@ -484,9 +492,9 @@ public:
 	virtual ECHOSTATUS QueryAudioSampleRate
 	(
 		DWORD		dwSampleRate
-	)
-	{ return( ECHOSTATUS_NOT_SUPPORTED ); }
-
+	) = 0;
+	
+	virtual void QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate) = 0;
 
 	//
 	// I'm not going to tell you what the next two functions do; you'll just
@@ -717,8 +725,6 @@ protected:
 	ECHOGALS_AUDIO_PIPE
 						m_Pipes[ ECHO_MAXAUDIOPIPES ];
 												// Keep mapping info on open pipes
-	WORD				m_wBytesPerSample[ ECHO_MAXAUDIOPIPES ];
-												// Keep conversion info on open pipes
 	BYTE				m_byPipeState[ ECHO_MAXAUDIOPIPES ];
 												// Track state of all pipes
 	PVOID				m_ProcessId[ ECHO_MAXAUDIOPIPES ];

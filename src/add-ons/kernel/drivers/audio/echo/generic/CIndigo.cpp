@@ -232,6 +232,13 @@ ECHOSTATUS CIndigo::QueryAudioSampleRate
 }	// ECHOSTATUS CIndigo::QueryAudioSampleRate
 
 
+void CIndigo::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 32000;
+	dwMaxRate = 96000;
+}
+
+
 //===========================================================================
 //
 // Indigo & Indigo DJ don't have monitor mixers, so this works differently

@@ -380,7 +380,7 @@ ECHOSTATUS CDaffyDuck::AddDoubleZero()
 
 void CDaffyDuck::Wrap()
 {
-	ASSERT(m_dwCount != MAX_ENTRIES);
+	ECHO_ASSERT(m_dwCount != MAX_ENTRIES);
 	
 	//
 	// Put in the address of the start of the duck entries

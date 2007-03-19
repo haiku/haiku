@@ -75,7 +75,7 @@ ECHOSTATUS CEchoGals::GetBaseCapabilities
 	pCapabilities->wNumMidiIn = GetDspCommObject()->GetNumMidiInChannels();
 
 	pCapabilities->dwOutClockTypes = 0;
-	pCapabilities->dwInClockTypes = ECHO_CLOCK_BIT_INTERNAL;;
+	pCapabilities->dwInClockTypes = ECHO_CLOCK_BIT_INTERNAL;
 
 	//
 	// Add the controls to the output pipes that are 

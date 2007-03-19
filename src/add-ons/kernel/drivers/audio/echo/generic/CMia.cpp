@@ -134,7 +134,7 @@ ECHOSTATUS CMia::InitHw()
 	//
 	// Create the DSP comm object
 	//
-	ASSERT( NULL == m_pDspCommObject );
+	ECHO_ASSERT(NULL == m_pDspCommObject );
 	m_pDspCommObject = new CMiaDspCommObject( (PDWORD) m_pvSharedMemory,
 															 m_pOsSupport );
 	if (NULL == m_pDspCommObject)
@@ -278,6 +278,14 @@ ECHOSTATUS CMia::QueryAudioSampleRate
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CMia::QueryAudioSampleRate
+
+
+void CMia::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 32000;
+	dwMaxRate = 96000;
+}
+
 
 
 //===========================================================================

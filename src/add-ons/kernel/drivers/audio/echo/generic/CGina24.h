@@ -77,6 +77,8 @@ public:
 		DWORD		dwSampleRate
 	);
 
+	virtual void QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate);
+
 	//
 	// Get a bitmask of all the clocks the hardware is currently detecting
 	//

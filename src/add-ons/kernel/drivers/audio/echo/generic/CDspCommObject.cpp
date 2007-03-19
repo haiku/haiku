@@ -96,7 +96,7 @@ CDspCommObject::CDspCommObject
 {
 	INT32	i;
 
-	ASSERT( pOsSupport );
+	ECHO_ASSERT(pOsSupport );
 	
 	//
 	// Init all the basic stuff
@@ -274,6 +274,9 @@ BOOL CDspCommObject::LoadASIC
 )
 {
 	DWORD i;
+#ifdef _WIN32
+	DWORD dwChecksum = 0;
+#endif
 
 	ECHO_DEBUGPRINTF(("CDspCommObject::LoadASIC\n"));
 
@@ -281,7 +284,6 @@ BOOL CDspCommObject::LoadASIC
 		return TRUE;
 
 #ifdef _DEBUG
-	DWORD			dwChecksum = 0;
 	ULONGLONG	ullStartTime, ullCurTime;
 	m_pOsSupport->OsGetSystemTime( &ullStartTime );
 #endif
@@ -296,7 +298,7 @@ BOOL CDspCommObject::LoadASIC
 
 	for ( i = 0; i < dwSize; i++ )
 	{
-#ifdef _DEBUG
+#ifdef _WIN32
 		dwChecksum += pCode[i];
 #endif	
 	
@@ -311,11 +313,15 @@ BOOL CDspCommObject::LoadASIC
 	m_pOsSupport->OsGetSystemTime( &ullCurTime );
 	ECHO_DEBUGPRINTF( ("CDspCommObject::LoadASIC took %ld usec.\n",
 							(ULONG) ( ullCurTime - ullStartTime ) ) );
-	ECHO_DEBUGPRINTF(("\tChecksum is 0x%lx\n",dwChecksum));		
 	ECHO_DEBUGPRINTF(("ASIC load OK\n"));
 #endif
 
+#if defined(_WIN32) && (DBG)
+	DbgPrint("--- ASIC checksum is 0x%lx\n",dwChecksum);
+#endif
+
 	return TRUE;
+
 }	// BOOL CDspCommObject::LoadASIC( DWORD dwCmd, PBYTE pCode, DWORD dwSize )
 
 
@@ -704,6 +710,8 @@ set_dsp_format_bits:
 }	// DWORD	CDspCommObject::LoadDSP
 
 
+
+
 //===========================================================================
 //
 // LoadFirmware takes care of loading the DSP and any ASIC code.
@@ -933,6 +941,8 @@ ECHOSTATUS CDspCommObject::Write_DSP
 }	// ECHOSTATUS CDspCommObject::Write_DSP
 
 
+
+
 //===========================================================================
 //
 // Read_DSP reads a 32-bit value from the DSP; this is used almost 
@@ -970,6 +980,7 @@ ECHOSTATUS CDspCommObject::Read_DSP
 	
 	return ECHOSTATUS_DSP_TIMEOUT;
 }	// ECHOSTATUS CDspCommObject::Read_DSP
+
 
 
 //===========================================================================
@@ -1086,6 +1097,7 @@ ECHOSTATUS CDspCommObject::SendVector
 }	// ECHOSTATUS CDspCommObject::SendVector
 
 
+
 //===========================================================================
 //
 //	Some vector commands involve the DSP reading or writing data to and
@@ -1098,13 +1110,12 @@ ECHOSTATUS CDspCommObject::SendVector
 
 BOOL CDspCommObject::WaitForHandshake()
 {
-	DWORD dwDelta;
+	ULONGLONG ullDelta;
 	ULONGLONG ullStartTime,ullTime;
 	
 	//
 	// Wait up to three milliseconds for the handshake from the DSP 
 	//
-	dwDelta = 0;
 	m_pOsSupport->OsGetSystemTime( &ullStartTime );
 	do
 	{
@@ -1118,8 +1129,8 @@ BOOL CDspCommObject::WaitForHandshake()
 		m_pOsSupport->OsSnooze( 2 );
 		
 		m_pOsSupport->OsGetSystemTime(&ullTime);
-		dwDelta = (DWORD) (ullTime - ullStartTime);
-	} while (dwDelta < HANDSHAKE_TIMEOUT);
+		ullDelta = ullTime - ullStartTime;
+	} while (ullDelta < (ULONGLONG) HANDSHAKE_TIMEOUT);
 
 	ECHO_DEBUGPRINTF( ("CDspCommObject::WaitForHandshake: Timeout waiting "
 								"for DSP\n") );

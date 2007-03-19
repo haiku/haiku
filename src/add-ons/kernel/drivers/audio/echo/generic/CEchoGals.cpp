@@ -87,19 +87,12 @@ CEchoGals::CEchoGals
 	PCOsSupport pOsSupport
 )
 {
-	INT32	i;
-
-	ASSERT( pOsSupport );
+	ECHO_ASSERT(pOsSupport );
 
 	m_pOsSupport = pOsSupport;		// Ptr to OS Support methods & data
 
 	m_wFlags = ECHOGALS_FLAG_BADBOARD;
 				  
-	for ( i = 0; i < ECHO_MAXAUDIOPIPES; i++ )
-	{
-		m_wBytesPerSample[ i ] = 1;
-	}
-
 	m_dwLockedSampleRate	= 44100;
 
 }	// CEchoGals::CEchoGals()
@@ -172,14 +165,14 @@ ECHOSTATUS CEchoGals::AssignResources
 )
 {
 	//
-	//	Use ASSERT to be sure this isn't called twice!
+	//	Use ECHO_ASSERT(to be sure this isn't called twice!
 	//
-	ASSERT( NULL == m_pvSharedMemory );
+	ECHO_ASSERT(NULL == m_pvSharedMemory );
 
 	//
 	//	Check and store the parameters
 	//
-	ASSERT( pvSharedMemory );
+	ECHO_ASSERT(pvSharedMemory );
 	if ( NULL == pszCardName ) 
 	{
 		return( ECHOSTATUS_BAD_CARD_NAME );
@@ -213,9 +206,9 @@ ECHOSTATUS CEchoGals::AssignResources
 ECHOSTATUS CEchoGals::InitHw()
 {
 	//
-	//	Use ASSERT to be sure AssignResources was called!
+	//	Use ECHO_ASSERT to be sure AssignResources was called!
 	//
-	ASSERT( m_pvSharedMemory );
+	ECHO_ASSERT(m_pvSharedMemory );
 
 	return ECHOSTATUS_OK;
 	

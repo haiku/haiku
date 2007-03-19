@@ -129,7 +129,7 @@ ECHOSTATUS CDarla::InitHw()
 	//
 	// Create the DSP comm object 
 	//
-	ASSERT( NULL == m_pDspCommObject );
+	ECHO_ASSERT(NULL == m_pDspCommObject );
 	m_pDspCommObject = new CDarlaDspCommObject( (PDWORD) m_pvSharedMemory,
 																m_pOsSupport );
 	if (NULL == m_pDspCommObject)
@@ -200,6 +200,14 @@ ECHOSTATUS CDarla::QueryAudioSampleRate
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CDarla::QueryAudioSampleRate
+
+
+void CDarla::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 44100;
+	dwMaxRate = 48000;
+}
+
 
 
 // *** CDarla.cpp ***

@@ -136,7 +136,7 @@ ECHOSTATUS CLayla::InitHw()
 	//
 	// Create the DSP comm object
 	//
-	ASSERT( NULL == m_pDspCommObject );
+	ECHO_ASSERT(NULL == m_pDspCommObject );
 	m_pDspCommObject = new CLaylaDspCommObject( (PDWORD) m_pvSharedMemory,
 																m_pOsSupport );
 	if (NULL == m_pDspCommObject)
@@ -291,6 +291,13 @@ ECHOSTATUS CLayla::QueryAudioSampleRate
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CLayla::QueryAudioSampleRate
+
+
+void CLayla::QuerySampleRateRange(DWORD &dwMinRate,DWORD &dwMaxRate)
+{
+	dwMinRate = 8000;
+	dwMaxRate = 50000;
+}
 
 
 //===========================================================================
