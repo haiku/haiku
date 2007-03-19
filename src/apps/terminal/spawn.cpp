@@ -96,15 +96,11 @@ setenv(const char *var, const char *value, bool overwrite)
  *  execute SHELL program.
  */
 
-/* This pipe use handshake on exec. */
-int pc_pipe[2]; /* this pipe is used for parent to child transfer */
-int cp_pipe[2]; /* this pipe is used for child to parent transfer */
-
 /* handshake interface */
 typedef struct 
 {
 	int status;		/* status of child */
-	char msg[256];	/* error message */
+	char msg[128];	/* error message */
 	int row;		/* terminal rows */
 	int col;		/* Terminal columns */
 } handshake_t;
@@ -118,6 +114,22 @@ typedef struct
 
 pid_t sh_pid;
 
+
+static status_t
+send_handshake_message(thread_id target, const handshake_t& handshake)
+{
+	return send_data(target, 0, &handshake, sizeof(handshake_t));
+}
+
+
+static void
+receive_handshake_message(handshake_t& handshake)
+{
+	thread_id sender;
+	receive_data(&sender, &handshake, sizeof(handshake_t));
+}
+
+
 int
 spawn_shell(int row, int col, const char *command, const char *coding)
 {
@@ -128,7 +140,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	signal(SIGTTOU, SIG_IGN);
 	
 	/*
-	 * Get a psuedo-tty. We do this by cycling through files in the
+	 * Get a pseudo-tty. We do this by cycling through files in the
 	 * directory. The oparationg system will not allow us to open a master
 	 * which is already in use, so we simply go until the open succeeds.
 	 */
@@ -160,8 +172,8 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	}
 
 	if (master < 0) {
-    		printf("didn't find any available pesudo ttys.");
-    		return -1;
+    	printf("didn't find any available pesudo ttys.");
+    	return -1;
 	}
 
    /*
@@ -169,11 +181,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	* on the pseudo terminal.
 	*/
 
-	/* Create pipe that be use to handshake */
-	if (pipe(pc_pipe) || pipe(cp_pipe)) {
-		printf ("Could not create handshake pipe.");
-		return -1;
-	}
+	thread_id terminalThread = find_thread(NULL);
 
 	/* Fork a child process. */
 	if ((sh_pid = fork()) < 0) {
@@ -189,15 +197,12 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 * we cleared our original controlling terminal above.
 		 */
 
-		// ToDo: why two of them in the first place?
-		close(cp_pipe[0]);
-		close(pc_pipe[1]);
-
 		/* Set process session leader */
 		if (setsid() < 0) {
 			handshake.status = PTY_NG;
-			sprintf(handshake.msg, "could not set session leader.");
-			write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
+			snprintf(handshake.msg, sizeof(handshake.msg),
+				"could not set session leader.");
+			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
 
@@ -209,8 +214,9 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		int slave = -1;
 		if ((slave = open(tty_name, O_RDWR)) < 0) {
 			handshake.status = PTY_NG;
-			sprintf(handshake.msg, "can't open tty (%s).", tty_name);
-			write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
+			snprintf(handshake.msg, sizeof(handshake.msg),
+				"can't open tty (%s).", tty_name);
+			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
 
@@ -295,8 +301,9 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 */
 		if (tcsetattr (0, TCSANOW, &tio) == -1) {
 			handshake.status = PTY_NG;
-			sprintf(handshake.msg, "failed set terminal interface (TERMIOS).");
-			write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
+			snprintf(handshake.msg, sizeof(handshake.msg),
+				"failed set terminal interface (TERMIOS).");
+			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
 
@@ -305,13 +312,14 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 */
 
 		handshake.status = PTY_WS;
-		write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
-		read(pc_pipe[0], (char *)&handshake, sizeof (handshake));
+		send_handshake_message(terminalThread, handshake);
+		receive_handshake_message(handshake);
 
 		if (handshake.status != PTY_WS) {
 			handshake.status = PTY_NG;
-			sprintf(handshake.msg, "missmatch handshake.");
-			write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
+			snprintf(handshake.msg, sizeof(handshake.msg),
+				"mismatch handshake.");
+			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
 
@@ -328,19 +336,16 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		pid_t processGroup = getpid();
 		if (setpgid(processGroup, processGroup) < 0) {
 			handshake.status = PTY_NG;
-			sprintf(handshake.msg, "can't set process group id.");
-			write(cp_pipe[1], (char *)&handshake, sizeof(handshake));
+			snprintf(handshake.msg, sizeof(handshake.msg),
+				"can't set process group id.");
+			send_handshake_message(terminalThread, handshake);
 			exit(1);		
 		}
 		tcsetpgrp(0, processGroup);
 
-		/* mark the pipes as close on exec */
-		fcntl(cp_pipe[1], F_SETFD, FD_CLOEXEC);
-		fcntl(pc_pipe[0], F_SETFD, FD_CLOEXEC);
-
 		/* pty open and set termios successful. */
 		handshake.status = PTY_OK;
-		write(cp_pipe[1], (char *)&handshake, sizeof (handshake));
+		send_handshake_message(terminalThread, handshake);
 
 		/*
 		 * setenv TERM and TTY.
@@ -415,17 +420,13 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	 * that they can write and read the pseudo terminal.
 	 */
 
-	/* close childs's side of the pipe */
-	close(cp_pipe[1]);
-	close(pc_pipe[0]);
-
 	/*
 	 * close parent control tty.
 	 */
 
 	int done = 0;
 	while (!done) {
-		read (cp_pipe[0], (char *)&handshake, sizeof (handshake));
+		receive_handshake_message(handshake);
 
 		switch (handshake.status) {
 			case PTY_OK:
@@ -441,7 +442,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 				handshake.row = row;
 				handshake.col = col;
 				handshake.status = PTY_WS;
-				write(pc_pipe[1], (char *)&handshake, sizeof (handshake));
+				send_handshake_message(sh_pid, handshake);
 				break;
 		}
 	}
