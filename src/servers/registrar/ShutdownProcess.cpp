@@ -244,18 +244,12 @@ public:
 		// create the views
 
 		// root view
-		BView *rootView = new(nothrow) BView(BRect(0, 0, 100,  15), "app icons",
+		fRootView = new(nothrow) TAlertView(BRect(0, 0, 100,  15), "app icons",
 			B_FOLLOW_NONE, 0);
-		if (!rootView)
+		if (!fRootView)
 			return B_NO_MEMORY;
-		rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		AddChild(rootView);
-
-		// current app icon view
-		fCurrentAppIconView = new(nothrow) CurrentAppIconView;
-		if (!fCurrentAppIconView)
-			return B_NO_MEMORY;
-		rootView->AddChild(fCurrentAppIconView);
+		fRootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		AddChild(fRootView);
 
 		// text view
 		fTextView = new(nothrow) BTextView(BRect(0, 0, 10, 10), "text",
@@ -266,14 +260,14 @@ public:
 		fTextView->MakeEditable(false);
 		fTextView->MakeSelectable(false);
 		fTextView->SetWordWrap(true);
-		rootView->AddChild(fTextView);
+		fRootView->AddChild(fTextView);
 
 		// kill app button
 		fKillAppButton = new(nothrow) BButton(BRect(0, 0, 10, 10), "kill app",
 			"Kill Application", NULL, B_FOLLOW_NONE);
 		if (!fKillAppButton)
 			return B_NO_MEMORY;
-		rootView->AddChild(fKillAppButton);
+		fRootView->AddChild(fKillAppButton);
 
 		BMessage *message = new BMessage(MSG_KILL_APPLICATION);
 		if (!message)
@@ -288,7 +282,7 @@ public:
 			"cancel shutdown", "Cancel Shutdown", NULL, B_FOLLOW_NONE);
 		if (!fCancelShutdownButton)
 			return B_NO_MEMORY;
-		rootView->AddChild(fCancelShutdownButton);
+		fRootView->AddChild(fCancelShutdownButton);
 
 		message = new BMessage(MSG_CANCEL_SHUTDOWN);
 		if (!message)
@@ -302,7 +296,7 @@ public:
 		if (!fRebootSystemButton)
 			return B_NO_MEMORY;
 		fRebootSystemButton->Hide();
-		rootView->AddChild(fRebootSystemButton);
+		fRootView->AddChild(fRebootSystemButton);
 
 		message = new BMessage(MSG_REBOOT_SYSTEM);
 		if (!message)
@@ -316,7 +310,7 @@ public:
 		if (!fAbortedOKButton)
 			return B_NO_MEMORY;
 		fAbortedOKButton->Hide();
-		rootView->AddChild(fAbortedOKButton);
+		fRootView->AddChild(fAbortedOKButton);
 
 		message = new BMessage(MSG_CANCEL_SHUTDOWN);
 		if (!message)
@@ -353,14 +347,8 @@ public:
 		fTextView->SetText("two\nlines");
 		int textHeight = (int)fTextView->TextHeight(0, 1) + 1;
 
-		// current app icon view
-		int currentAppIconWidth = fCurrentAppIconView->Frame().IntegerWidth()
+		int rightPartX = fRootView->Frame().IntegerWidth()
 			+ 1;
-		int currentAppIconHeight = fCurrentAppIconView->Frame().IntegerHeight()
-			+ 1;
-
-		int currentAppIconX = kHSpacing;
-		int rightPartX = currentAppIconX + currentAppIconWidth;
 		int textX = rightPartX + kInnerHSpacing;
 		int textY = kVSpacing;
 		int buttonsY = textY + textHeight + kInnerVSpacing;
@@ -371,10 +359,6 @@ public:
 		int height = buttonsY + defaultButtonHeight + kVSpacing;
 
 		// now layout the views
-
-		// current app icon view
-		fCurrentAppIconView->MoveTo(currentAppIconX,
-			textY + (textHeight - currentAppIconHeight) / 2);
 
 		// text view
 		fTextView->MoveTo(textX, textY);
@@ -400,7 +384,7 @@ public:
 			buttonsY);
 
 		// set the root view and window size
-		rootView->ResizeTo(width - 1, height - 1);
+		fRootView->ResizeTo(width - 1, height - 1);
 		ResizeTo(width - 1, height - 1);
 
 		// move the window to the same position as BAlerts
@@ -452,7 +436,7 @@ public:
 		AppInfo *info = (team >= 0 ? _AppInfoFor(team) : NULL);
 
 		fCurrentApp = team;
-		fCurrentAppIconView->SetAppInfo(info);
+		fRootView->SetAppInfo(info);
 
 		fKillAppMessage->ReplaceInt32("team", team);
 	}
@@ -481,7 +465,6 @@ public:
 
 	void SetWaitForShutdown()
 	{
-		fCurrentAppIconView->Hide();
 		fKillAppButton->Hide();
 		fCancelShutdownButton->Hide();
 		fRebootSystemButton->MakeDefault(true);
@@ -493,7 +476,6 @@ public:
 
 	void SetWaitForAbortedOK()
 	{
-		fCurrentAppIconView->Hide();
 		fKillAppButton->Hide();
 		fCancelShutdownButton->Hide();
 		fAbortedOKButton->MakeDefault(true);
@@ -536,31 +518,29 @@ private:
 		return (index >= 0 ? (AppInfo*)fAppInfos.ItemAt(index) : NULL);
 	}
 
-	class CurrentAppIconView : public BView {
+	class TAlertView : public BView {
 	  public:
-		CurrentAppIconView()
-			: BView(BRect(0, 0, 31,  31), "current app icon", B_FOLLOW_NONE, 
-				B_WILL_DRAW),
+		TAlertView(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
+			: BView(frame, name, resizeMask, flags | B_WILL_DRAW),
 			  fAppInfo(NULL)
 		{
-			SetViewColor(B_TRANSPARENT_32_BIT);
-			fBackground = ui_color(B_PANEL_BACKGROUND_COLOR);
 		}
 
 		virtual void Draw(BRect updateRect)
 		{
-			SetDrawingMode(B_OP_COPY);
-			SetLowColor(fBackground);
-			FillRect(Bounds(), B_SOLID_LOW);
-
+			BRect stripeRect = Bounds();
+			stripeRect.right = 30;
+			SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+			FillRect(stripeRect);
+			
 			if (fAppInfo && fAppInfo->largeIcon) {
 				if (fAppInfo->largeIcon->ColorSpace() == B_RGBA32) {
 					SetDrawingMode(B_OP_ALPHA);
 					SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 				} else
 					SetDrawingMode(B_OP_OVER);
-			
-				DrawBitmap(fAppInfo->largeIcon, BPoint(0, 0));
+				
+				DrawBitmapAsync(fAppInfo->largeIcon, BPoint(18, 6));
 			}
 		}
 
@@ -572,12 +552,11 @@ private:
 
 	  private:
 		const AppInfo	*fAppInfo;
-		rgb_color		fBackground;
 	};
 
 private:
 	BList				fAppInfos;
-	CurrentAppIconView	*fCurrentAppIconView;
+	TAlertView			*fRootView;
 	BTextView			*fTextView;
 	BButton				*fKillAppButton;
 	BButton				*fCancelShutdownButton;
