@@ -1022,9 +1022,12 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-# Beep.h requires __cplusplus to be defined.
+# Beep.h and SupportDefs.h require __cplusplus to be defined.
+# SupportDefs.h defines some things that are also defined in types.h. There's
+#   check whether or not types.h has already been included. There is no need
+#   to put these definitions in our docs.
 
-PREDEFINED             = __cplusplus
+PREDEFINED             = __cplusplus _SYS_TYPES_H
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

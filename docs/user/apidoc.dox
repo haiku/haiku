@@ -1,0 +1,686 @@
+// 
+// Copyright 2007, Haiku Inc. All Rights Reserved.
+//
+// Distributed under the terms of the MIT License.
+//
+//
+// Documentation by: 
+//   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+//
+
+/*!
+  \page apidoc Documenting the API
+  
+  This article explains how to document the API. It's intended audience are the
+  Haiku developers that want to document their own classes, and also the
+  members of the API Documentation team who want to brush up the documentation.
+  
+  This document is divided into three sections. \ref formalrequirements
+  describes the demands that are made from the markup and
+  spacing of the files. \ref commands describes the subset
+  of Doxygen commands the Haiku API documentation uses, and which commands
+  are used in which situation. \ref style describes the
+  writing style that is required. The demands are both on the required sections
+  in the documentation as well as on the wording of that documentation.
+  
+  If you are a developer and you want to prepare the first version of the
+  documentation for the API documentation team to go over, have a good look
+  at the formal requirements and the doxygen commands, and have a quick glance
+  at how to write member and class documentation, since you'll need to know
+  which information should definately be in the documentation. Aspiring members
+  or members of the API documentation team should read the third section
+  carefully, and should also check out some of the finished documentation to
+  get a good grip on the actual tone, style and contents of the documentation.
+  
+  \section formalrequirements Formal Requirements
+
+  This section describes formal requirements, such as location and naming of
+  the files, the header blocks of files, what blocks of documentation look like
+  and how to put delimeters to separate different 'blocks' in your source file.
+  
+  \subsection formalrequirements_location Location of the Documentation Source
+  
+  Doxygen, the tool that we use to generate the marked up documentation with,
+  has an ingenious parser that is able to scan through both header and source
+  files and that makes it possible to document the API directly in the headers
+  or the source. However, the Haiku project decided not to put the
+  documentation in either location, and opt for the third option Doxygen gives:
+  to put the documentation in separate files. 
+  
+  \note The reasons to not put the
+    documentation in the header files are twofold. First of all, it would
+    unnecesarily add much cruft to the headers that the compiler will have to
+    parse unneededly. File access and speed isn't BeOS and Haiku's best quality.
+    The second reason is that the system headers are included throughout the
+    tree. It's a waste of electricity to have everybody recompile the entire tree
+    if someone fixes a typo in the documentation. Likewise, the reason to not put
+    the documentation in the source is that it unnecesarily clutters up that
+    source. By not using direct documentation we lose some advantages, like the
+    fact that developers might be inclined to update the documentation quicker
+    if they change a method, but as you will see we'll have some methods in place
+    to prevent that to a certain extend.
+  
+  There are a few aspects to naming and location of files:
+  -# Most important, documentation files \b mirror header files. This not only
+    means that they get the same name, but also that the order  of the methods,
+    variables, functions, etc. will have to be the same.
+  -# The root directory of the public API headers is at \c /trunk/headers/os.
+    In a similar vein, the root of the documentation files is at
+    \c /trunk/src/documentation/haiku_book. The subdirectory structure, or
+    the division of kits, will also be replicated.
+  -# The name of the files is the same as the base of the header files, with
+    the \c dox extension. So \c Something.h becomes \c Something.dox. Note
+    the case!
+  
+  \subsection formalrequirements_headerblock The Header Block
+  
+  Every documentation file will begin with the header block. It's basically a
+  copyright block, with a reference to the author and with the revision against
+  which the documentaton was written.
+
+  \verbatim
+// 
+// Copyright 2007, Haiku Inc. All Rights Reserved.
+//
+// Distributed under the terms of the MIT License.
+//
+//
+// Documentation by: 
+//   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+// Corresponds to:
+//   /trunk/headers/os/support/String.h  rev 19731
+//   /trunk/src/kits/support/String.cpp  rev 19731
+//
+  \endverbatim
+  
+  The example above has a few elements that you should take note of:
+  -# First of all, every line starts with a C++ single line style comment.
+    So it starts with two slashes: \c //. If there is text on a line, the
+    tokens are followed by \e one space. If the text is part of a category,
+    such as <tt>Documentation by</tt>, put two spaces after the delimeter.
+  -# We start with a copyright notice. The first line is empty, then the 
+    copyright notice, then another empty line, and then the line on \e MIT,
+    followed by two empty lines.
+  -# Then there is a label <tt>Documentation by:</tt>, which is followed by
+    lines with names and email addresses between brackets.
+  -# The final part is underneath the label <tt>Corresponds to:</tt>.
+    Underneath there is a list of files and their svn revisions that the
+    current documentation is known to correspond with.
+  -# The header block ends with an empty C++ comment, and the next block that
+    follows underneath will start after an empty line.
+  
+  \subsection formalrequirements_blocks Blocks
+  
+  Blocks are the basic units of documentation for Doxygen. At first it will
+  feel like overkill to use blocks, but realize that Doxygen was initially
+  designed to operate on header and source files, and then the blocks of
+  documentation would be before the definition or declaration of the
+  methods, functions, etcetera. Doxygen is used to blocks and that's why we
+  need to reproduce them in our \c dox files.
+  
+  Blocks should adhere to the following standards:
+  -# All blocks open with \c /*! and close with \c * /
+  -# The documentation is in between these markers.
+  -# All the contents in between the markers is indended by two spaces.
+  -# The maximum width of contents between blocks is 80 columns. <em>Try not
+    to cross this limit</em>, because it will severely limit readability.
+  
+  Example:
+  \verbatim
+/*!
+  \fn bool BList::AddItem(void *item)
+  \brief Append an item to the list.
+
+  \param item The item to add.
+  \retval true The item was appended.
+  \retval false Item was not appended, since resizing the list failed.
+  \sa AddItem(void *item, int32 index)
+* /
+  \endverbatim
+  
+  \note Doxygen also allows to use single line comments, starting with \c //!,
+    however, we won't use these \b except in case of group markers, which you 
+    can read more about in the next section.
+  
+  \subsection formalrequirements_delimeters Delimeters
+  
+  Many of the header files in the Haiku API just document one class or one
+  group of functions. However, there might want to come a time that you come
+  across a more complex header and for the sake of clarity of your \c dox file
+  you want to mark the sections. Use the standard delimiter marker for this,
+  which consists of five slashes, a space, the title of the section, a space
+  and another five slashes. Like this: <tt>///// Global Functions /////</tt>.
+  
+  \note This is only for the source files and for you as documenter. It will
+    not show up in the actual generated documentation!
+  
+  \section commands Doxygen Commands
+  
+  This section describes all the Doxygen commands that will be used in the
+  Haiku API documentation. As a rule, Doxygen commands start with a backslash
+  (\\) and are followed by whitespace (such as a space or a newline), with the
+  exception of group markers, which will be discussed later on. The commands
+  can be divided into several categories, which will be described in the
+  following subsections.
+  
+  \note This section does not discuss which commands you should actually use
+    in documentation. See the next section on \ref style
+    on that. This section merely explains the different groupings and
+    syntaxes of commands.
+  
+  Most commands accept an argument. Arguments can be either of these three
+  types:
+  - \<single_word\> - The argument is a single word.
+  - (until the end of the line) - The argument runs until the end of the line.
+  - {paragraph} - The argument runs for an entire paragraph. A paragraph is
+    ended by an empty line, or if another command that defines a \ref
+    commands_sections sections is found. Note that if you use commands that
+    work on a paragraph and you split it over multiple lines (because of the
+    maximum line width of 80 characters or because it looks better), you will
+    have to indent subsequent lines that belong to the paragraph with two more
+    spaces, making the total of four. This is to visually distinguish
+    paragraphs for other documenters.
+  
+  \subsection commands_definitions Block Definitions
+  
+  Because our API documentation is not done in the source, nor in the headers,
+  Doxygen needs to be helped with figuring out what the documentation in the
+  different blocks actually are about. That's why the first line in a
+  documentation block would be one of the following commands:
+  
+  - \c \\class \<name\> \n
+    Tells doxygen that the following section is going to be on
+    the class as specified by \a name.
+  - \c \\fn (function declaration) \n
+   This block is going to be about the function that corresponds to the given
+   declaration. Please note that the declaration is what you find in the source
+   file, so if class members are declared, the classname and the scope operator,
+   \c ::, are to be added as well. Modifiers such as \c const should be
+   included.
+  - \c \\var (variable declaration) \n
+    This block is going to be about the variable indicated by the declaration.
+    This means basically that data members of a class should have the classname
+    and the scope operator as well.
+  - \c \\typedef (typedef declaration) \n
+    This block is going to be about the typedef indicated by the declaration.
+    Copy the declaration exactly, including the leading \c typedef keyword.
+  - \c \\struct \<name\> \n
+    Tells doxygen the section is going to be on the \c struct indicated by
+    \a name. 
+  - \c \\def \<name\> \n
+    This block is going to be about the \c \#define with the identifier \a name.
+  - \c \\page \n
+    This block represents a page. See the section on \ref commands_pages for
+    detailed information on pages.
+  
+  \subsection commands_sections Sections in Member Documentation
+  
+  If you have a look at the output that Doxygen generates, you can see that
+  there are recuring sections in the documentation. Documentation that belongs
+  to a certain section should be placed after a command that marks the start
+  of that section. All the commands take a paragraph as answer. A paragraph
+  ends with a whitespace, or with a command that marks a new section. Note that
+  this list only shows the syntax of the commands. For the semantics, have a
+  look at the next section on style. In member documentation you can use the
+  following:
+  
+  - \c \\brief {brief description} \n
+    This is the only \b obligatory section. Every member should have at least
+    a brief description. 
+  - \c \\param \<parameter-name\> {parameter description} \n
+    This section describes a parameter with the name \a parameter-name. The
+    parameter name must match the function declaration, since doxygen will
+    check if all the documented parameters exist.
+  - \c \\return {description of the return value} \n
+    This section describes the return value. This is a totally free form
+    paragraph, whereas \c \\retval has a more structured form.
+  - \c \\retval \<value\> {description} \n
+    This section describes the return value indicated by \a value. 
+  - \c \\see {references} \n
+    This section contains references to other parts of the documentation.
+  
+  There are also a number of things that can be used in pages and member
+  documentation. See the style section to find out which one to use when.
+  
+  - \c \\note {text}
+  - \c \\attention {text}
+  - \c \\warning {text}
+  - \c \\remarks {text}
+  
+  \subsection commands_markup Markup
+  
+  Sometimes you might certain text to have a special markup, to make words
+  stand out, but also if you want to have example code within the documentation
+  you'll need a special markup. Doxygen defines three types of commands.
+  There are commands that work on single words, commands that work on longer
+  phrases and commands that define blocks. Basically, the single letter
+  commands are commands that work on a the next word. If you need to mark
+  multiple words or sentences, use the HTML-style commands. Finally, for
+  blocks of code or blocks of text that need to be in "typewriter" font, use
+  the block commands. Have a look at the listing:
+  
+  - \c \\a \n
+    Use to refer to parameters or arguments in a running text, for example
+    when refering to parameters in method descriptions.
+  - <b>Bold text</b>
+    - For single words, use \c \\b.
+    - For multiple words, enclose between the \c \<b\> and \c \<\\b\> tags.
+  - <tt>Typewriter font</tt> \n
+    This can be used to refer to constants, or anything that needs to be in
+    a monospace, or typewriter, font. There are a few options
+    - \c \\c for single words.
+    - \c \<tt\> and \c \<\\tt\> for multiple words or phrases
+    - The commands \c \\verbatim and \c \\endverbatim. Everything between these two
+    commands will be put in a distinct block that stands out from the rest of the
+    text.
+    - The commands \c \\code and \c \\endcode do the same, but Doxygen will parse the
+    contents and try to mark up the code to make it look just a bit nicer.
+  - <em>Emphasis</em>
+    - \c \\e for single words.
+    - \c \<em\> and \c \<\\em\> for phrases.
+  
+  \subsection commands_pages Page Commands
+  
+  Pages are a very special element of the documentation. They are not 
+  associated with any kind of module, such as files or classes, and therefore,
+  since they're not members, some of the structuring commands won't work.
+  Important to know is that a page is the complete length of the block, so
+  dividing it up in subsections by starting new blocks will not work. Instead,
+  doxygen provides some commands to structure text on a page.
+  
+  First of all, you define a new page by using the \c \\page command. This
+  command takes two arguments: a \c \<name\> and <tt>(a title)</tt>. The name
+  is the internal identifier that can be used in linking between pages (see
+  \ref commands_miscellaneous for \c \\ref). After you've defined the block
+  to be a page, you can start writing the contents. 
+  
+  For more complicated pages,  you might want to divide the page up in sections.
+  Use the \c \\section command to define a new section. It takes the same
+  arguments as \c \\page, namely the \c \<name\> and the <tt>(title)</tt>. If
+  you need a deeper hierarchy you may sue \c \\subsection and 
+  \c \\subsubsection, again, both with the same syntax. If you need to
+  distinguish between sections in subsubsections, you are able to use 
+  \c \\paragraph, which takes the same arguments.
+  
+  \note Before and after each of the commands above, you need to have an empty
+   line for readability. It is not necessary to indent sections and subsections
+   more than the normal two spaces, as long as you keep the section markers
+   clear.
+  
+  \warning If you are entering the realm of subsections and subsubsections,
+    think about the nature of your page. Either it needs to be split up into
+    multiple pages, or what you're writing is too complex and would be better
+    off as a big tutorial on the Haiku website. 
+  
+  If you are creating multiple pages that are related, you will be able to
+  structure them in a tree by using the \c \\subpage command. This will rank
+  the different pages in a tree structure. It will put a link in the place of
+  the command, so you should place it at the top of the parent place and use
+  it as an index.
+  
+  \subsection commands_grouping  Member Grouping Commands
+  
+  Doxygen makes it possible to group certain members together. It is used
+  in the BString class for example, where the members are grouped by what kind
+  of operation they perform, such as appending, finding, etc. Defining groups
+  is currently not as powerful as it could be, but if you use it inside classes,
+  you will be fine if you follow the instructions presented in this section.
+  
+  \note If you are looking on how to add classes to kits, see
+    \ref commands_miscellaneous and have a look at the \c \\ingroup command.
+  
+  Groups of members are preceeded by a block that describes what the group is
+  about. You are required to give each group of members at least a name. Have
+  a look at the example: 
+  
+  \verbatim
+/*!
+  \\name Appending Methods
+  
+  These methods append things to the object.
+* /
+
+//! \@{
+
+... names of the methods ...
+
+//! \@}
+  \endverbatim
+  
+  The block preceeding the block opening marker, <tt>//! \@{</tt>, contains a
+  \c \\name command and a paragraph that gives a description. The header block 
+  can be as long or short as you want, but please don't make it too long. See
+  the \ref style section on how to effectively write group headers. The
+  members that you want to belong to the group are between the group opening
+  and closure markers.
+  
+  \note Group headers don't have a \c \\brief description.
+  
+  \subsection commands_miscellaneous Miscellaneous Commands
+  
+  There are some commands that don't fit into the categories above, but that
+  you will end up using every now and then. This section will describe those
+  commands.
+  
+  The first one is \c \\n. This commands sort of belongs to the category of
+  markup commands. It basically forces a newline. Because doxygen parses
+  paragraphs as continuous, it's not possible to mark up the text using returns
+  in the documentation. \c \\n forces a newline in the output. So in HTML it
+  will be translated into a \c \<br\\\>. 
+  
+  Sometimes there are some parts of the API that you don't want to be visible.
+  Since Doxygen extracts all the public and protected members from a class,
+  and virtually every member from a file, you might want to force it to hide
+  certain things. If so, use the \c \\internal command. If you place this just
+  after the block marker, the command will be hidden from documentation. Any
+  further documentation or remarks you put inside the block will not be visible
+  in the final documentation. 
+  
+  Images can be a valuable addition to documentation. To include ones you made,
+  use the \c \\image command. It has the following prototype:
+  <tt>\\image \<format\> \<file\></tt>. The format is currently fixed at
+  \c html. The file refers to the filename relative to the location of the
+  documentation file. Any images you want to add should be in the same location
+  as the dox file, so only the file name will suffice.
+  
+  Modules are defined in the main book, and you can add classes to them by
+  using the \c \\ingroup command. This commands adds the class to the module
+  and groups it on a separate page. At this moment, the group handling is till
+  to be worked out. For now, add the classes to the kit they belong in. In the
+  future this might change.
+  
+  Finally, it is a good idea to link between parts of the documentation. There
+  are two commands for that. The first one is \c \\ref, which enable you to refer
+  to pages, sections, etc. that you created yourself. The second one is \c \\link 
+  which refers to members. The first one is takes one word as an argument, the
+  name of the section, and it inserts a link with the name of the title. \c \\link
+  is more complex. It should always be accompanied by \c \\endlink. The first
+  word between the two commands is the object that is referred to, and the
+  rest is the link text. 
+  
+  \section style Writing Guidelines
+  
+  This final section will present guidelines for the actual writing of the
+  documentation. Both the structure of the documentation, which sections to
+  use when, and the style of the writing will be discussed. Before diverging
+  into the requirements for file and class descriptions, member descriptions and pages,
+  there are some general remarks that apply to all types of documentation.
+  
+  First of all, everything you write should be in <em>proper English 
+  sentences</em>. Spelling, grammar, punctuation, make sure you adhere to the
+  standards. It also means the following:
+  - It means that every sentence should at least have a
+    subject and a verb (unless it's an imperative statement).
+  - Also use the proper terminology. Remember, you are dealing with C++
+    here, which means you should use the right names. So use \b method instead
+    of function, and data member instead of variable (where appropriate).
+  - Avoid informalism. Avoid constructs like 'if you want to disconnect the 
+    object', but rather use 'to disconnect the object'. Avoid familiarisms, or
+    jokes.
+    
+  \remarks It isn't the goal to create dry, legal-style documentation. Just
+    try to find a balance. Read through documentation that's already been
+    approved to get a hint of what you should be aiming at.
+  \remarks If you are having a problem with phrasing certain things, put it
+    down in such a way that it says everything it needs to. A proofreader might
+    be able to put it in better words.
+  
+  Throughout the documentation you might want to provide hints, warnings or
+  remarks that might interrupt the flow of the text, or that need to visually
+  stand out from the rest. Doxygen provides commands for paragraphs that
+  display remarks, warnings, notes and points of attention. You can use these
+  commands in case you meet one or more of the following requirements:
+  - The point is for a specific audience, such as beginners in
+    the Haiku API. Notes on what to read first, or mistakes that can be made
+    by beginners will not be for the entire audience, and such should be
+    separated. These kinds of notes should be at the end of blocks.
+  - The point needs to visually stand out. This is especially the case with
+    remarks, but could also apply for other types.
+  - The point is not completely relevant to the text and therefore should be
+    separated so that it doesn't interrupt the main flow.
+  
+  This listing shows which one to use when:
+  - \c \\attention
+    - Used when the developer is bound to make a mistake, when the API is
+      ambiguous. The difference to a warning is that warnings warn for things
+      that are the developer's fault, and attention blocks warn for things that
+      might go wrong because of the way the API is structured.
+    - Used to warn for abuse of the API that might be caused by the way the
+      internals of the system are structured. 
+  - \c \\warning
+    - Used to warn developers for using the API in a certain way. Warnings
+      apply especially to new developers that aren't completely familiar with
+      the API and that might want to abuse it. For example, the thread safety
+      of BString requires a warning. 
+  - \c \\note
+    - Used to place references to other documentation that might not be
+      directly related to the text. For example, BLooper will have a direct
+      reference to BHandler in the class description, but BMessenger will be
+      mentioned in a note because it does not directly influence the use of
+      the class.
+    - Can also be used for useful hints or notes that somehow need to stand
+      out from the rest of the text.
+    - Remarks interact with the text, notes add something unmentioned to it. 
+  - \c \\remarks
+    - Remarks are small notes that would interrupt the flow of the text. For
+      example, if you in a text ignore a certain condition that is so extremely
+      rare and uncommon, you can put a remark at the end of the text to tell
+      that you have been lying.
+    - Remarks interact with the text, notes add something unmentioned to it. 
+  
+  \subsection style_files File Descriptions
+  
+  The design of Doxygen makes it very file oriented, and this might come off as
+  inconvenient. At the moment, how to actually group the documentation is still
+  under debate, but it does not change the requirement that a header needs to
+  be documented before the members of that header can be documented. As such,
+  the first documentation block in your \c dox file will be the block that
+  describes the header. Examples:
+  
+  \verbatim
+/*!
+  \file String.h
+  \brief Defines the BString class and global operators and functions for 
+    handling strings.
+* /
+
+/*!
+  \file SupportDefs.h
+  \brief Defines basic types and definitions for the Haiku API.
+* / 
+  \endverbatim
+  
+  The first statement defines what the block is about, namely the header file.
+  The second element is the \c \\brief remark on what it contains. The first
+  file defines the BString class and some global operators. You can see that
+  reflected in the description. SupportDefs.h does not define classes, but
+  rather a range of different functions and defines, so the text refers to
+  that. 
+  
+  \remarks \\brief documentation for files is about what it \e implements, as
+    header files are passive (whereas members and functions are active). Thus,
+    use the third person form of the verb.
+  
+  \subsection style_classes Class Descriptions
+  
+  Classes are the basic building blocks in the Haiku API and as such will have
+  extensive documentation. This section will go over the actual class
+  description. This section will present a list of items you should think about
+  when writing the class description. This doesn't mean you'll have to put
+  every item in, it merely serves as a guiding principle that helps organise
+  your thoughts. Have a look at the list:
+  
+  -# The \c \\brief description is \b obligatory. This description describes
+    what it is. For example, BDataIO: "Abstract interface for objects that
+    provide read and write access to data." Note that this description is not
+    a full sentence, but it does end with a period.
+  -# One or more paragraphs that give a broad overview of what the class can
+    do. Describe things like what it works on, when you want to use it, what
+    advantage it might give over other directly related alternatives. Also
+    describe if a class is made to be derived from, and if so, how. Make
+    sure that a developer in the first few paragraphs can judge if what he
+    wants to do can be done with this class. 
+  -# One or more paragraphs that show how this class ties in with the rest
+    of the kit or the API. What objects does it work with, how does it interact
+    with the servers, etcetera. 
+  -# One or more paragraphs that give a concrete example or use case. Keep it
+    tidy and selfcontained. Remember, an example can tell more than a few
+    paragraphs of text.
+  -# End with a list of references to other classes, functions, pages, etc.
+   might be of interest for the reader. 
+  
+  When documenting classes, don't be to exhaustive. Avoid becoming a tutorial
+  or a complete guide. This documentation is for reference only. If you want to
+  enlighten the reader on bigger subjects, consider writing a separate
+  documentation page that connects the different points you want to make.
+  
+  Also, you don't have to put in any groupings of members in class descriptions.
+  If you want to do that, physically divide the members up in groups. Look at
+  the \ref commands_grouping for the actual commands, and at \ref style_groups
+  for help on writing group headers.
+  
+  \subsection style_members Members and Functions
+  
+  Members and functions share the same basic doxygen syntax, and they can be
+  documented in a similar way. That's why this section deals with them together.
+  Documenting members is probably the main thing you'll do when writing the
+  actual documentation. There are some guidelines as to how, but the actual
+  implementation probably differs per class. Keep the following points in mind:
+  
+  -# To repeat a very important fact, the first line is a \c \\fn line. This
+    line needs to match the declaration, which is in the source file. This
+    means that for members, also the class name and the scope indicator (::)
+    should be present. Also note that this line doesn't have to adhere to
+    the 80 column width limit.
+  -# The first command is always the \c \\brief command. Give a short and
+    clear description. The description starts with a capital letter and ends
+    with a dot. Don't write the description saying what the method does,
+    like "Starts the timer", but rather as what it will do: "Start the timer."
+  -# If the brief description doesn't cover all the method or function does,
+    then you can add a few paragraphs that explain it in more depth. Don't be
+    to verbose, and use an example to illustrate points. Point out any
+    potential misunderstandings or problems you expect developers to have, but
+    don't repeat the class documentation too much.
+  -# You are obliged to then document all the parameters. Use the \c \\param
+    command for that. For the description, use a short phrase such as "The 
+    offset (zero based) where to begin the move." Note the capital and the dot.
+  -# If the function is non-void, then you'll have to specify what it will
+    return. In case of fixed values, have a look at \c \\retval. You'll use
+    this one when the return type is a bool or a status_t. In case of something
+    else, use \c \\return. You can also combine these two. For example, a
+    method that returns a lenght (positive) or an error code (negative). 
+  -# Use \c \\see if you have any references to other methods, classes or
+    global functions. At least document all the overloaded methods. Also add
+    methods that do the opposite of this method, or methods that are intimately
+    related.
+  
+  In case of overloaded members, you'll need to make a decision. If you need
+  to copy too much information, you might resort to put in one paragraph with
+  the text "This is an overloaded member function, and differs from \<name\> only
+  by the type of parameter it takes." That will keep the copying down and will
+  point developers right to the place where they can get more documentation.
+  
+  Again, like class descriptions, you'll have to find a good middle-ground
+  between too much information, and too little. Again, write for the broadest
+  audience possible, and resort to notes and warnings for specialised 
+  audiences.
+  
+  \subsection style_variables Enumerations, Variables and Defines
+  
+  This section helps you document (member) variables and defines that define
+  constant, as well as enumerations and their values. If you need to document
+  a \c \#define macro that takes arguments, have a look at \ref style_members .
+  
+  The \c \\brief description of all these types follow a similar structure. 
+  They are a short phrase that mentions what the variable contains. Example:
+  
+  \verbatim
+/*!
+  \var char* BString::fPrivateData
+  \brief BString's storage for data.
+
+  This member is deprecated and might even go \c private in future releases.
+
+  If you are planning to derive from this object and you want to manipulate the raw
+  string data, please have a look at LockBuffer() and UnlockBuffer().
+* /
+  \endverbatim
+  
+  The variables you are going to encounter are either \c public or 
+  \c protected member variables, or global variables that have a certain
+  significance. In the case of member variables, you'll need to document what
+  they mean and how the developer should manipulate it. If the class is one 
+  that is meant to be derived from, make sure that in the
+  description of the variable you mention how it interacts with the others, and
+  how the developer should make sure that the internal coherence of the data
+  and code members of the inherited class is maintained. 
+  
+  Global variables will mostly be constants. If so, document what they stand
+  for and what they might be used for, as well as which classes and functions
+  depend on that constant. If the variable is meant to be changed by the
+  developer, explain what values are valid and which functions and classes
+  depend on this variable. 
+  
+  Defines are usually used as message constants. Give a short description of
+  what the message constant stands for, and where it might be send from and
+  where it might be received.
+  
+  Enumerations can either be anonymous or named. In case of the latter, you can
+  give a description of the enumeration in a documentation block that starts
+  with an \c \\enum command, followed by the name of the enumeration. If the
+  enumeration is within the scope of a class, prepend the classname and the 
+  scope indicator. In case of an anonymous enum, you can only document the
+  individual members (which you should do for the named enumerations as well),
+  which can be done within code blocks that start with the \c \\var command.
+  Doxygen will know that it's an enumeration value, don't worry about mixups.
+  If the enumeration value is within a class, prepend the classname and scope
+  indicator. Give a short description of the value, which methods react to it, 
+  where it might be used, etcetera. Don't go as far as to copy information too 
+  much. For example, if you use an enumeration in only one class and you
+  document the possible values there, then don't do that again for the
+  enumeration documentation: rather just refer to it. That sort of documentation
+  belongs to the class description, not to the enumeration.
+  
+  \subsection style_groups Groups
+  
+  If you subdivide members of classes into groups, you have the ability to
+  apply some general information that will be listed above the listing of the
+  members in that group. See the section \ref commands_grouping on how to
+  define groups. This section is on what to put in the header block.
+  
+  First of all, it's probably a good idea to give your group a name. This name
+  will be printed as a title and will enhance the clarity of what the group
+  contains. If you put the \c \\name command as the first command of a
+  group, the rest of the words on that line will be used as title. You should
+  chose simple titles, no more than three words.
+  
+  It's possible to add one or two paragraphs of information. These paragraphs
+  should contain some quick notes on which of the members in that group to use
+  for what cause. See it as a quick subdivision which a developer could use
+  as a guide to see which method he actually wants to use. Don't go on
+  describing the methods in detail though, that's what the member documentation
+  is about. Have a look at the example:
+  
+  \verbatim
+/*!
+  \name Comparison Methods
+
+  There are two different comparison methods. First of all there
+  is the whole range of operators that return a boolean value, secondly
+  there are methods that return an integer value, both case sensitive
+  and case insensitive. 
+
+  There are also global comparison operators and global compare functions.
+  You might need these in case you have a sort routine that takes a generic
+  comparison function, such as BList::SortItems().
+  See the String.h documentation file to see the specifics, though basically
+  there are the same as implemented in this class.
+* /
+  \endverbatim
+  
+  Straight, to the point, gives no more information than necessary. Divides
+  the members up into two groups and refers to other functions the developer
+  might be looking for. The hard limit is two (short) paragraphs. Using more
+  will not improve clarity.
+
+*/
