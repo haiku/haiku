@@ -177,6 +177,10 @@ status_t	_user_remove_team_debugger(team_id team);
 status_t	_user_debug_thread(thread_id thread);
 void		_user_wait_for_debugger(void);
 
+status_t	_user_set_debugger_breakpoint(void *address, uint32 type,
+				int32 length, bool watchpoint);
+status_t	_user_clear_debugger_breakpoint(void *address, bool watchpoint);
+
 
 #ifdef __cplusplus
 }	// extern "C"

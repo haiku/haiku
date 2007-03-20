@@ -263,6 +263,10 @@ extern status_t		_kern_remove_team_debugger(team_id team);
 extern status_t		_kern_debug_thread(thread_id thread);
 extern void			_kern_wait_for_debugger(void);
 
+extern status_t		_kern_set_debugger_breakpoint(void *address, uint32 type,
+						int32 length, bool watchpoint);
+extern status_t		_kern_clear_debugger_breakpoint(void *address,
+						bool watchpoint);
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS

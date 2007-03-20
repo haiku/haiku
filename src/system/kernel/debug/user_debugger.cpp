@@ -1786,11 +1786,14 @@ debug_nub_thread(void *)
 
 
 /**	\brief Helper function for install_team_debugger(), that sets up the team
- *		   and thread debug infos.
- *
- *	Interrupts must be enabled and the team debug info lock of the team to be
- *	debugged must be held. The function will release the lock, but leave
- *	interrupts disabled.
+		   and thread debug infos.
+
+	Interrupts must be disabled and the team debug info lock of the team to be
+	debugged must be held. The function will release the lock, but leave
+	interrupts disabled.
+
+	The function also clears the arch specific team and thread debug infos
+	(including among other things formerly set break/watchpoints).
  */
 static void
 install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
@@ -1804,6 +1807,8 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 	team->debug_info.debugger_team = debuggerTeam;
 	team->debug_info.debugger_port = debuggerPort;
 	team->debug_info.debugger_write_lock = debuggerPortWriteLock;
+
+	arch_clear_team_debug_info(&team->debug_info.arch_info);
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
@@ -1822,6 +1827,8 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 				flags | B_THREAD_DEBUG_DEFAULT_FLAGS);
 			thread->debug_info.ignore_signals = 0;
 			thread->debug_info.ignore_signals_once = 0;
+
+			arch_clear_thread_debug_info(&thread->debug_info.arch_info);
 		}
 	}
 
@@ -2229,6 +2236,7 @@ _user_debug_thread(thread_id threadID)
 	return error;
 }
 
+
 void
 _user_wait_for_debugger(void)
 {
@@ -2238,3 +2246,54 @@ _user_wait_for_debugger(void)
 }
 
 
+status_t
+_user_set_debugger_breakpoint(void *address, uint32 type, int32 length,
+	bool watchpoint)
+{
+	// check the address and size
+	if (address == NULL || !IS_USER_ADDRESS(address))
+		return B_BAD_ADDRESS;
+	if (watchpoint && length < 0)
+		return B_BAD_VALUE;
+
+	// check whether a debugger is installed already
+	team_debug_info teamDebugInfo;
+	get_team_debug_info(teamDebugInfo);
+	if (teamDebugInfo.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+		return B_BAD_VALUE;
+
+	// We can't help it, here's a small but relatively harmless race condition,
+	// since a debugger could be installed in the meantime. The worst case is
+	// that we install a break/watchpoint the debugger doesn't know about.
+
+	// set the break/watchpoint
+	if (watchpoint)
+		return arch_set_watchpoint(address, type, length);
+	else
+		return arch_set_breakpoint(address);
+}
+
+
+status_t
+_user_clear_debugger_breakpoint(void *address, bool watchpoint)
+{
+	// check the address
+	if (address == NULL || !IS_USER_ADDRESS(address))
+		return B_BAD_ADDRESS;
+
+	// check whether a debugger is installed already
+	team_debug_info teamDebugInfo;
+	get_team_debug_info(teamDebugInfo);
+	if (teamDebugInfo.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+		return B_BAD_VALUE;
+
+	// We can't help it, here's a small but relatively harmless race condition,
+	// since a debugger could be installed in the meantime. The worst case is
+	// that we clear a break/watchpoint the debugger has just installed.
+
+	// clear the break/watchpoint
+	if (watchpoint)
+		return arch_clear_watchpoint(address);
+	else
+		return arch_clear_breakpoint(address);
+}

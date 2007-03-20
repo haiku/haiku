@@ -29,6 +29,16 @@ extern status_t	remove_team_debugger(team_id team);
 extern status_t	debug_thread(thread_id thread);
 extern void		wait_for_debugger(void);
 
+// EXPERIMENTAL: Self-debugging functions. Will fail when a team debugger is
+// installed. A breakpoint/watchpoint hit will cause the default debugger to
+// be installed for the team.
+extern status_t	set_debugger_breakpoint(void *address);
+extern status_t	clear_debugger_breakpoint(void *address);
+extern status_t	set_debugger_watchpoint(void *address, uint32 type,
+					int32 length);
+extern status_t	clear_debugger_watchpoint(void *address);
+
+
 // team debugging flags
 enum {
 	// event mask: If a flag is set, any of the team's threads will stop when

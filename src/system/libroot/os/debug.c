@@ -114,6 +114,34 @@ wait_for_debugger(void)
 }
 
 
+status_t
+set_debugger_breakpoint(void *address)
+{
+	return _kern_set_debugger_breakpoint(address, 0, 0, false);
+}
+
+
+status_t
+clear_debugger_breakpoint(void *address)
+{
+	return _kern_clear_debugger_breakpoint(address, false);
+}
+
+
+status_t
+set_debugger_watchpoint(void *address, uint32 type, int32 length)
+{
+	return _kern_set_debugger_breakpoint(address, type, length, true);
+}
+
+
+status_t
+clear_debugger_watchpoint(void *address)
+{
+	return _kern_clear_debugger_breakpoint(address, true);
+}
+
+
 static void
 get_debug_string(const debug_string_entry *stringEntries,
 	const char *defaultString, uint32 code, char *buffer, int32 bufferSize)
