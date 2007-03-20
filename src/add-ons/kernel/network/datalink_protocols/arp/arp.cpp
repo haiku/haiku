@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -219,11 +219,13 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 		// Right now, you have to manually purge the ARP entries (or wait some
 		// time) to let us switch to the new address.
 		if (entry->hardware_address.sdl_alen != 0 
-			&& memcmp(LLADDR(&entry->hardware_address), hardwareAddress, ETHER_ADDRESS_LENGTH)) {
+			&& memcmp(LLADDR(&entry->hardware_address),
+				LLADDR(hardwareAddress), ETHER_ADDRESS_LENGTH)) {
 			dprintf("ARP host %08lx updated with different hardware address %02x:%02x:%02x:%02x:%02x:%02x.\n",
-				protocolAddress, hardwareAddress->sdl_data[0] & 0xff, hardwareAddress->sdl_data[1] & 0xff,
-				hardwareAddress->sdl_data[2] & 0xff, hardwareAddress->sdl_data[3] & 0xff,
-				hardwareAddress->sdl_data[4] & 0xff, hardwareAddress->sdl_data[5] & 0xff);
+				protocolAddress,
+				hardwareAddress->sdl_data[0], hardwareAddress->sdl_data[1],
+				hardwareAddress->sdl_data[2], hardwareAddress->sdl_data[3],
+				hardwareAddress->sdl_data[4], hardwareAddress->sdl_data[5]);
 			return B_ERROR;
 		}
 
