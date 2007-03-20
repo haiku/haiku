@@ -404,8 +404,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 		char buffer[2048];
 		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
 			0, NULL, NULL);
-printf("recvfrom returned: %ld, %s\n", bytesReceived, strerror(errno));
-		if (bytesReceived == B_TIMED_OUT) {
+		if (bytesReceived < 0 && errno == B_TIMED_OUT) {
 			// depending on the state, we'll just try again
 			if (!_TimeoutShift(socket, timeout, tries)) {
 				close(socket);
