@@ -972,12 +972,8 @@ BackgroundsView::RefsReceived(BMessage *msg)
 		BNode node(&entry);
 
 		if (node.IsFile()) {
-			BNodeInfo nodeInfo(&node);
-			char fileType[B_MIME_TYPE_LENGTH];
-			if (nodeInfo.GetType(fileType) != B_OK)
-				continue;
-
-			BMimeType refType(fileType);
+			BMimeType refType;
+			BMimeType::GuessMimeType(&ref, &refType);
 			if (!imageType.Contains(&refType))
 				continue;
 
