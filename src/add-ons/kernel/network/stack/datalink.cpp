@@ -539,7 +539,6 @@ interface_protocol_down(net_datalink_protocol *_protocol)
 	interface_protocol *protocol = (interface_protocol *)_protocol;
 	net_device_interface *deviceInterface =
 		((net_interface_private *)protocol->interface)->device_interface;
-	net_device *device = protocol->device;
 
 	// TODO: locking!
 	if (deviceInterface->up_count == 0)
@@ -550,12 +549,7 @@ interface_protocol_down(net_datalink_protocol *_protocol)
 	if (deviceInterface->up_count > 0)
 		return;
 
-	device->flags &= ~IFF_UP;
-	protocol->device_module->down(protocol->device);
-
-	// make sure the reader thread is gone before shutting down the interface
-	status_t status;
-	wait_for_thread(deviceInterface->reader_thread, &status);
+	down_device_interface(deviceInterface);
 }
 
 

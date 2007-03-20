@@ -160,7 +160,7 @@ delete_interface(net_interface_private *interface)
 	if ((interface->flags & IFF_UP) != 0) {
 		// the interface is still up - we need to change that before deleting it
 		interface->flags &= ~IFF_UP;
-		interface->device_interface->module->down(interface->device_interface->device);
+		down_device_interface(interface->device_interface);
 	}
 
 	put_device_interface(interface->device_interface);
@@ -395,6 +395,20 @@ get_device_interface(const char *name)
 	}
 
 	return NULL;
+}
+
+
+void
+down_device_interface(net_device_interface *interface)
+{
+	net_device *device = interface->device;
+
+	device->flags &= ~IFF_UP;
+	interface->module->down(device);
+
+	// make sure the reader thread is gone before shutting down the interface
+	status_t status;
+	wait_for_thread(interface->reader_thread, &status);
 }
 
 

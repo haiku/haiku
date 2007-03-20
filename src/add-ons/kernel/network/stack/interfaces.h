@@ -76,6 +76,7 @@ status_t list_device_interfaces(void *buffer, size_t size);
 void put_device_interface(struct net_device_interface *interface);
 struct net_device_interface *get_device_interface(uint32 index);
 struct net_device_interface *get_device_interface(const char *name);
+void down_device_interface(net_device_interface *interface);
 
 // devices
 status_t unregister_device_deframer(net_device *device);
