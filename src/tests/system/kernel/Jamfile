@@ -3,9 +3,16 @@ SubDir HAIKU_TOP src tests system kernel ;
 UsePrivateHeaders kernel ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
+SimpleTest cow_bug113_test : cow_bug113_test.cpp ;
+
 SimpleTest fibo_load_image : fibo_load_image.cpp ;
 SimpleTest fibo_fork : fibo_fork.cpp ;
 SimpleTest fibo_exec : fibo_exec.cpp ;
+
+SimpleTest lock_node_test :
+	lock_node_test.cpp
+	: be
+;
 
 SimpleTest port_close_test_1 : port_close_test_1.cpp ;
 SimpleTest port_close_test_2 : port_close_test_2.cpp ;
@@ -22,16 +29,11 @@ SimpleTest port_wakeup_test_7 : port_wakeup_test_7.cpp ;
 SimpleTest port_wakeup_test_8 : port_wakeup_test_8.cpp ;
 SimpleTest port_wakeup_test_9 : port_wakeup_test_9.cpp ;
 
-SimpleTest transfer_area_test : transfer_area_test.cpp ;
-
 SimpleTest syscall_time : syscall_time.cpp ;
 
-SimpleTest yield_test : yield_test.cpp ;
+SimpleTest transfer_area_test : transfer_area_test.cpp ;
 
-SimpleTest lock_node_test :
-	lock_node_test.cpp
-	: be
-	;
+SimpleTest yield_test : yield_test.cpp ;
 
 SimpleTest wait_test_1 : wait_test_1.c ;
 SimpleTest wait_test_2 : wait_test_2.cpp ;
