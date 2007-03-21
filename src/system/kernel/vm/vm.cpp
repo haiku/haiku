@@ -3474,7 +3474,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// mapped in read-only, so that we cannot overwrite someone else's data (copy-on-write)
 		uint32 newProtection = area->protection;
 		if (page->cache != topCacheRef->cache && !isWrite)
-			newProtection &= ~(isUser ? B_WRITE_AREA : B_KERNEL_WRITE_AREA);
+			newProtection &= ~(B_WRITE_AREA | B_KERNEL_WRITE_AREA);
 
 		vm_map_page(area, page, address, newProtection);
 	}
