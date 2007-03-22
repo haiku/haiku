@@ -1,0 +1,26 @@
+SubDir HAIKU_TOP src add-ons translators raw ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# Include code from shared translator directory
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+
+Translator RAWTranslator :
+	# RawTranslator classes
+	main.cpp
+	RAWTranslator.cpp
+	ConfigView.cpp
+	RAW.cpp
+
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+
+	: be translation
+;
+
+Package haiku-translationkit-cvs :
+	RAWTranslator
+	: boot home config add-ons Translators
+	;

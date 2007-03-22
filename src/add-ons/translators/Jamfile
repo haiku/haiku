@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src add-ons translators jpeg2000 ;
 SubInclude HAIKU_TOP src add-ons translators libtiff ;
 SubInclude HAIKU_TOP src add-ons translators png ;
 SubInclude HAIKU_TOP src add-ons translators ppm ;
+SubInclude HAIKU_TOP src add-ons translators raw ;
 SubInclude HAIKU_TOP src add-ons translators rtf ;
 SubInclude HAIKU_TOP src add-ons translators sgi ;
 SubInclude HAIKU_TOP src add-ons translators stxt ;
