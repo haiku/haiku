@@ -332,7 +332,7 @@ BMenu::AttachedToWindow()
 	if (!fAttachAborted) {
 		CacheFontInfo();
 		LayoutItems(0);
-		//UpdateWindowViewSize();
+		UpdateWindowViewSize(false);
 	}
 }
 
@@ -365,6 +365,7 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
 			LayoutItems(index);
+			UpdateWindowViewSize(false);
 			Invalidate();
 		} 
 		UnlockLooper();
@@ -483,7 +484,7 @@ BMenu::AddList(BList *list, int32 index)
 	if (locked && Window() != NULL && !Window()->IsHidden()) {	
 		// Make sure we update the layout if needed.
 		LayoutItems(index);
-		//UpdateWindowViewSize();
+		UpdateWindowViewSize(false);
 		Invalidate();		
 	}
 
@@ -1202,7 +1203,7 @@ BMenu::_show(bool selectFirstItem)
 		if (dynamic_cast<BMenuWindow *>(window) != NULL)
 			MoveTo(1, 1);
 	
-		UpdateWindowViewSize();
+		UpdateWindowViewSize(true);
 		window->Show();
 		
 		if (selectFirstItem)
@@ -1485,7 +1486,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 
 	if (invalidateLayout && locked && window != NULL) {
 		LayoutItems(0);
-		//UpdateWindowViewSize();
+		UpdateWindowViewSize(false);
 		Invalidate();
 	}
 
@@ -1655,6 +1656,7 @@ BMenu::ItemLocInRect(BRect frame) const
 }
 
 
+// Assumes the SuperMenu to be locked (due to calling ConvertToScreen())
 BPoint
 BMenu::ScreenLocation()
 {
@@ -2110,8 +2112,12 @@ BMenu::UpdateWindowViewSize(bool upWind)
 	if (window == NULL)
 		return;
 
+	if (dynamic_cast<BMenuBar *>(this) != NULL)
+		return;
+
 	bool scroll;
-	BRect frame = CalcFrame(ScreenLocation(), &scroll);
+	const BPoint screenLocation = upWind ? ScreenLocation() : window->Frame().LeftTop();
+	BRect frame = CalcFrame(screenLocation, &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
 	if (fItems.CountItems() > 0) {
@@ -2139,7 +2145,8 @@ BMenu::UpdateWindowViewSize(bool upWind)
 						fFontHeight + fPad.top + fPad.bottom);
 	}
 	
-	window->MoveTo(frame.LeftTop());
+	if (upWind)
+		window->MoveTo(frame.LeftTop());
 }
 
 
