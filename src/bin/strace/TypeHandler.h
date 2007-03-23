@@ -1,6 +1,10 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ * 		Hugo Santos <hugosantos@gmail.com>
  */
 #ifndef STRACE_TYPE_HANDLER_H
 #define STRACE_TYPE_HANDLER_H
@@ -40,6 +44,7 @@ struct TypeHandlerFactory {
 
 extern TypeHandler *create_pointer_type_handler();
 extern TypeHandler *create_string_type_handler();
+extern TypeHandler *create_fdset_type_handler();
 
 // specialization for "const char*"
 template<>
@@ -47,6 +52,15 @@ struct TypeHandlerFactory<const char*> {
 	static inline TypeHandler *Create()
 	{
 		return create_string_type_handler();
+	}
+};
+
+// specialization for 'struct fdset *'
+template<>
+struct TypeHandlerFactory<struct fd_set *> {
+	static inline TypeHandler *Create()
+	{
+		return create_fdset_type_handler();
 	}
 };
 

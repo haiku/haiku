@@ -1,6 +1,10 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ * 		Hugo Santos <hugosantos@gmail.com>
  */
 
 #include "MemoryReader.h"
@@ -76,6 +80,12 @@ TypeHandler *
 create_string_type_handler()
 {
 	return new TypeHandlerImpl<const char*>();
+}
+
+TypeHandler *
+create_fdset_type_handler()
+{
+	return new TypeHandlerImpl<struct fd_set *>();
 }
 
 
@@ -377,6 +387,43 @@ read_string(MemoryReader &reader, void *data)
 	return get_pointer_value(&data) + " (" + strerror(error) + ")";
 }
 
+static string
+read_fdset(MemoryReader &reader, void *data)
+{
+	/* default FD_SETSIZE is 1024 */
+	unsigned long tmp[1024 / (sizeof(unsigned long) * 8)];
+	int32 bytesRead;
+
+	status_t err = reader.Read(data, &tmp, sizeof(tmp), bytesRead);
+	if (err != B_OK)
+		return get_pointer_value(&data);
+
+	/* implicitly align to unsigned long lower boundary */
+	int count = bytesRead / sizeof(unsigned long);
+	int added = 0;
+
+	string r = "[";
+
+	for (int i = 0; i < count && added < 8; i++) {
+		for (int j = 0;
+			 j < (int)(sizeof(unsigned long) * 8) && added < 8; j++) {
+			if (tmp[i] & (1 << j)) {
+				if (added > 0)
+					r += ", ";
+				r += get_number_value<unsigned long>(
+						i * (sizeof(unsigned long) * 8) + j,
+						"%u");
+				added++;
+			}
+		}
+	}
+
+	if (added >= 8)
+		r += " ...";
+
+	return r + "]";
+}
+
 // const void*
 template<>
 string
@@ -419,3 +466,26 @@ TypeHandlerImpl<const char*>::GetReturnValue(uint64 value,
 	return get_pointer_value(&data);
 }
 
+// struct fd_set *
+template<>
+string
+TypeHandlerImpl<struct fd_set *>::GetParameterValue(const void *address,
+		bool getContents, MemoryReader &reader)
+{
+	void *data = *(void **)address;
+	if (getContents && data)
+		return read_fdset(reader, data);
+	return get_pointer_value(&data);
+}
+
+template<>
+string
+TypeHandlerImpl<struct fd_set *>::GetReturnValue(uint64 value,
+	bool getContents, MemoryReader &reader)
+{
+	void *data = (void *)value;
+	if (getContents && data)
+		return read_fdset(reader, data);
+
+	return get_pointer_value(&data);
+}
