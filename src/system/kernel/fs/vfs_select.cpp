@@ -183,9 +183,16 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 				}
 			}
 			break;
+
 		case B_INTERRUPTED:
 			count = B_INTERRUPTED;
 			break;
+
+		case B_TIMED_OUT:
+			fd_zero(readSet, numfds);
+			fd_zero(writeSet, numfds);
+			fd_zero(errorSet, numfds);
+			// supposed to fall through
 		default:
 			// B_TIMED_OUT, and B_WOULD_BLOCK
 			count = 0;
