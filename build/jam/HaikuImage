@@ -25,12 +25,12 @@ BEOS_BIN = "[" addattr alert arp basename beep cat catattr chgrp chmod chop chow
 	dstcheck du echo eject env error expr factor false fdinfo ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
-	listport listres listsem ln locate logger logname ls lsindex makebootable md5sum mimeset
+	listport listres listsem ln locate logger logname ls lsindex make makebootable md5sum mimeset
 	mkdos mkdir mkindex modifiers mount mount_nfs mountvolume mv netstat open pathchk ping play playfile
 	playsound playwav ps pwd
 	query quit release renice rescan rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
-	tail tar tcpdump tee telnet test top touch tput traceroute translate true tty uname unmount unrar unzip
+	tail tar tcpdump tee telnet test top touch tput tr traceroute translate true tty uname unmount unrar unzip
 	unzipsfx uptime usb_dev_info version vim waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
 	zipcloak zipnote zipsplit zmore znew
 ;
