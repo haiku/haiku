@@ -77,27 +77,35 @@ public:
 	}
 };
 
-// AutoLocker
+
 template<typename Lockable,
 		 typename Locking = AutoLockerStandardLocking<Lockable> >
 class AutoLocker {
 private:
 	typedef AutoLocker<Lockable, Locking>	ThisClass;
 public:
-	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false)
+	inline AutoLocker()
+		: fLockable(NULL),
+		  fLocked(false)
+	{
+	}
+
+	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
 		: fLockable(lockable),
 		  fLocked(fLockable && alreadyLocked)
 	{
-		if (!fLocked)
-			_Lock();
+		if (!alreadyLocked && lockIfNotLocked)
+			Lock();
 	}
 
-	inline AutoLocker(Lockable &lockable, bool alreadyLocked = false)
+	inline AutoLocker(Lockable &lockable, bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
 		: fLockable(&lockable),
 		  fLocked(fLockable && alreadyLocked)
 	{
-		if (!fLocked)
-			_Lock();
+		if (!alreadyLocked && lockIfNotLocked)
+			Lock();
 	}
 
 	inline ~AutoLocker()
@@ -105,23 +113,47 @@ public:
 		Unlock();
 	}
 
-	inline void SetTo(Lockable *lockable, bool alreadyLocked)
+	inline void SetTo(Lockable *lockable, bool alreadyLocked,
+		bool lockIfNotLocked = true)
 	{
 		Unlock();
 		fLockable = lockable;
 		fLocked = alreadyLocked;
-		if (!fLocked)
-			_Lock();
+		if (!alreadyLocked && lockIfNotLocked)
+			Lock();
 	}
 
-	inline void SetTo(Lockable &lockable, bool alreadyLocked)
+	inline void SetTo(Lockable &lockable, bool alreadyLocked,
+		bool lockIfNotLocked = true)
 	{
-		SetTo(&lockable, alreadyLocked);
+		SetTo(&lockable, alreadyLocked, lockIfNotLocked);
 	}
 
 	inline void Unset()
 	{
 		Unlock();
+		Detach();
+	}
+
+	inline bool Lock()
+	{
+		if (fLockable && !fLocked)
+			fLocked = fLocking.Lock(fLockable);
+		return fLocked;
+	}
+
+	inline void Unlock()
+	{
+		if (fLockable && fLocked) {
+			fLocking.Unlock(fLockable);
+			fLocked = false;
+		}
+	}
+
+	inline void Detach()
+	{
+		fLockable = NULL;
+		fLocked = false;
 	}
 
 	inline AutoLocker<Lockable, Locking> &operator=(Lockable *lockable)
@@ -138,22 +170,7 @@ public:
 
 	inline bool IsLocked() const	{ return fLocked; }
 
-	inline void Unlock()
-	{
-		if (fLockable && fLocked) {
-			fLocking.Unlock(fLockable);
-			fLocked = false;
-		}
-	}
-
 	inline operator bool() const	{ return fLocked; }
-
-private:
-	inline void _Lock()
-	{
-		if (fLockable)
-			fLocked = fLocking.Lock(fLockable);
-	}
 
 private:
 	Lockable	*fLockable;

@@ -69,49 +69,64 @@ public:
 	{
 	}
 
-	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false)
+	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
 		: fLockable(lockable),
 		  fLocked(fLockable && alreadyLocked)
 	{
-		if (!fLocked)
-			_Lock();
+		if (!alreadyLocked && lockIfNotLocked)
+			Lock();
 	}
 
-	inline AutoLocker(Lockable &lockable, bool alreadyLocked = false)
+	inline AutoLocker(Lockable &lockable, bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
 		: fLockable(&lockable),
 		  fLocked(fLockable && alreadyLocked)
 	{
-		if (!fLocked)
-			_Lock();
+		if (!alreadyLocked && lockIfNotLocked)
+			Lock();
 	}
 
 	inline ~AutoLocker()
 	{
-		_Unlock();
+		Unlock();
 	}
 
-	inline void SetTo(Lockable *lockable, bool alreadyLocked)
+	inline void SetTo(Lockable *lockable, bool alreadyLocked,
+		bool lockIfNotLocked = true)
 	{
-		_Unlock();
+		Unlock();
 		fLockable = lockable;
 		fLocked = alreadyLocked;
-		if (!fLocked)
-			_Lock();
+		if (!alreadyLocked && lockIfNotLocked)
+			Lock();
 	}
 
-	inline void SetTo(Lockable &lockable, bool alreadyLocked)
+	inline void SetTo(Lockable &lockable, bool alreadyLocked,
+		bool lockIfNotLocked = true)
 	{
-		SetTo(&lockable, alreadyLocked);
+		SetTo(&lockable, alreadyLocked, lockIfNotLocked);
 	}
 
 	inline void Unset()
 	{
-		_Unlock();
+		Unlock();
+		Detach();
+	}
+
+	inline bool Lock()
+	{
+		if (fLockable && !fLocked)
+			fLocked = fLocking.Lock(fLockable);
+		return fLocked;
 	}
 
 	inline void Unlock()
 	{
-		_Unlock();
+		if (fLockable && fLocked) {
+			fLocking.Unlock(fLockable);
+			fLocked = false;
+		}
 	}
 
 	inline void Detach()
@@ -135,21 +150,6 @@ public:
 	inline bool IsLocked() const	{ return fLocked; }
 
 	inline operator bool() const	{ return fLocked; }
-
-private:
-	inline void _Lock()
-	{
-		if (fLockable)
-			fLocked = fLocking.Lock(fLockable);
-	}
-
-	inline void _Unlock()
-	{
-		if (fLockable && fLocked) {
-			fLocking.Unlock(fLockable);
-			fLocked = false;
-		}
-	}
 
 private:
 	Lockable	*fLockable;
