@@ -11,6 +11,9 @@
 
 
 namespace UserlandFS {
+
+class HaikuKernelVolume;
+
 namespace HaikuKernelEmu {
 
 /* transactions */
@@ -67,6 +70,11 @@ extern status_t file_cache_read(void *_cacheRef, off_t offset, void *bufferBase,
 					size_t *_size);
 extern status_t file_cache_write(void *_cacheRef, off_t offset,
 					const void *buffer, size_t *_size);
+
+// interface for the emulation layer
+status_t file_cache_init();
+status_t file_cache_register_volume(HaikuKernelVolume* volume);
+status_t file_cache_unregister_volume(HaikuKernelVolume* volume);
 
 }	// namespace HaikuKernelEmu
 }	// namespace UserlandFS

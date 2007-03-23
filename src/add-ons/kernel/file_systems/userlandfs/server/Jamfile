@@ -41,6 +41,7 @@ Application UserlandFSServer
 	  DispatcherFileSystem.cpp
 	  FileSystem.cpp
 	  haiku_block_cache.cpp
+	  haiku_file_cache.cpp
 	  haiku_hash.cpp
 	  haiku_lock.cpp
 	  HaikuKernelFileSystem.cpp

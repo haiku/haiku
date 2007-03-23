@@ -9,6 +9,7 @@
 
 #include "Debug.h"
 #include "kernel_emu.h"
+#include "haiku_fs_cache.h"
 
 
 // constructor
@@ -35,8 +36,22 @@ HaikuKernelVolume::Mount(const char* device, uint32 flags,
 {
 	if (!fFSModule->mount)
 		return B_BAD_VALUE;
-	return fFSModule->mount(GetID(), device, flags, parameters, &fVolumeCookie,
-		rootID);
+
+	// make the volume know to the file cache emulation
+	status_t error
+		= UserlandFS::HaikuKernelEmu::file_cache_register_volume(this);
+	if (error != B_OK)
+		return error;
+
+	// mount
+	error = fFSModule->mount(GetID(), device, flags, parameters,
+		&fVolumeCookie, rootID);
+	if (error != B_OK) {
+		UserlandFS::HaikuKernelEmu::file_cache_unregister_volume(this);
+		return error;
+	}
+
+	return B_OK;
 }
 
 // Unmount
@@ -45,7 +60,14 @@ HaikuKernelVolume::Unmount()
 {
 	if (!fFSModule->unmount)
 		return B_BAD_VALUE;
-	return fFSModule->unmount(fVolumeCookie);
+
+	// unmount
+	status_t error = fFSModule->unmount(fVolumeCookie);
+
+	// unregister with the file cache emulation
+	UserlandFS::HaikuKernelEmu::file_cache_unregister_volume(this);
+
+	return error;
 }
 
 // Sync
@@ -73,6 +95,21 @@ HaikuKernelVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 	if (!fFSModule->write_fs_info)
 		return B_BAD_VALUE;
 	return fFSModule->write_fs_info(fVolumeCookie, info, mask);
+}
+
+
+// #pragma mark - file cache
+
+
+// GetFileMap
+status_t
+HaikuKernelVolume::GetFileMap(fs_vnode node, off_t offset, size_t size,
+	struct file_io_vec* vecs, size_t* count)
+{
+	if (!fFSModule->get_file_map)
+		return B_BAD_VALUE;
+	return fFSModule->get_file_map(fVolumeCookie, node, offset, size, vecs,
+		count);
 }
 
 

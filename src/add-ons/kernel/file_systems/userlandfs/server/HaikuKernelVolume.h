@@ -25,6 +25,11 @@ public:
 	virtual	status_t			WriteFSInfo(const struct fs_info* info,
 									uint32 mask);
 
+	// file cache
+	virtual	status_t			GetFileMap(fs_vnode node, off_t offset,
+									size_t size, struct file_io_vec* vecs,
+									size_t* count);
+
 	// vnodes
 	virtual	status_t			Lookup(fs_vnode dir, const char* entryName,
 									vnode_id* vnid, int* type);

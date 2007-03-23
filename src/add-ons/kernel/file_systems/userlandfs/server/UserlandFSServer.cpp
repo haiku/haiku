@@ -24,6 +24,7 @@
 #include "FileSystem.h"
 #include "FSInfo.h"
 #include "haiku_block_cache_priv.h"
+#include "haiku_fs_cache.h"
 #include "HaikuKernelFileSystem.h"
 #include "RequestThread.h"
 #include "ServerDefs.h"
@@ -278,6 +279,11 @@ UserlandFSServer::_CreateHaikuKernelInterface(const char* fsName,
 
 	// init block cache
 	error = UserlandFS::HaikuKernelEmu::block_cache_init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// init file cache
+	error = UserlandFS::HaikuKernelEmu::file_cache_init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

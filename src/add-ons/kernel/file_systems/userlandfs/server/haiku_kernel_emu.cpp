@@ -330,6 +330,81 @@ block_cache_put(void *_cache, off_t blockNumber)
 }
 
 
+// #pragma mark - File Cache
+
+// file_cache_create
+void *
+file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_create(mountID, vnodeID,
+		size, fd);
+}
+
+// file_cache_delete
+void
+file_cache_delete(void *_cacheRef)
+{
+	UserlandFS::HaikuKernelEmu::file_cache_delete(_cacheRef);
+}
+
+// file_cache_set_size
+status_t
+file_cache_set_size(void *_cacheRef, off_t size)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_set_size(_cacheRef, size);
+}
+
+// file_cache_sync
+status_t
+file_cache_sync(void *_cache)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_sync(_cache);
+}
+
+// file_cache_invalidate_file_map
+status_t
+file_cache_invalidate_file_map(void *_cacheRef, off_t offset, off_t size)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_invalidate_file_map(
+		_cacheRef, offset, size);
+}
+
+// file_cache_read_pages
+status_t
+file_cache_read_pages(void *_cacheRef, off_t offset, const iovec *vecs,
+	size_t count, size_t *_numBytes)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_read_pages(_cacheRef,
+		offset, vecs, count, _numBytes);
+}
+
+// file_cache_write_pages
+status_t
+file_cache_write_pages(void *_cacheRef, off_t offset, const iovec *vecs,
+	size_t count, size_t *_numBytes)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_write_pages(_cacheRef,
+		offset, vecs, count, _numBytes);
+}
+
+// file_cache_read
+status_t
+file_cache_read(void *_cacheRef, off_t offset, void *bufferBase, size_t *_size)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_read(_cacheRef, offset,
+		bufferBase, _size);
+}
+
+// file_cache_write
+status_t
+file_cache_write(void *_cacheRef, off_t offset, const void *buffer,
+	size_t *_size)
+{
+	return UserlandFS::HaikuKernelEmu::file_cache_write(_cacheRef, offset,
+		buffer, _size);
+}
+
+
 // #pragma mark - Misc
 
 
