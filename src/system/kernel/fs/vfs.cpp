@@ -3244,14 +3244,14 @@ vfs_new_io_context(void *_parentContext)
 
 	// allocate space for FDs and their close-on-exec flag
 	context->fds = (file_descriptor **)malloc(sizeof(struct file_descriptor *) * tableSize
-		+ tableSize / 8);
+		+ (tableSize + 7) / 8);
 	if (context->fds == NULL) {
 		free(context);
 		return NULL;
 	}
 
 	memset(context->fds, 0, sizeof(struct file_descriptor *) * tableSize
-		+ tableSize / 8);
+		+ (tableSize + 7) / 8);
 	context->fds_close_on_exec = (uint8 *)(context->fds + tableSize);
 
 	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
@@ -3330,7 +3330,7 @@ vfs_free_io_context(void *_ioContext)
 static status_t
 vfs_resize_fd_table(struct io_context *context, const int newSize)
 {
-	void *fds;
+	struct file_descriptor **fds;
 	int	status = B_OK;
 
 	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
@@ -3338,42 +3338,57 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 
 	mutex_lock(&context->io_mutex);
 
-	if ((size_t)newSize < context->table_size) {
+	int oldSize = context->table_size;
+	int oldCloseOnExitBitmapSize = (oldSize + 7) / 8;
+	int newCloseOnExitBitmapSize = (newSize + 7) / 8;
+
+	if (newSize < oldSize) {
 		// shrink the fd table
-		int i;
 
 		// Make sure none of the fds being dropped are in use
-		for(i = context->table_size; i-- > newSize;) {
+		for (int i = oldSize; i-- > newSize;) {
 			if (context->fds[i]) {
 				status = EBUSY;
 				goto out;
 			}
 		}
 
-		fds = malloc(sizeof(struct file_descriptor *) * newSize);
+		fds = (struct file_descriptor **)malloc(
+			sizeof(struct file_descriptor *) * newSize
+			+ newCloseOnExitBitmapSize);
 		if (fds == NULL) {
 			status = ENOMEM;
 			goto out;
 		}
 
 		memcpy(fds, context->fds, sizeof(struct file_descriptor *) * newSize);
+
+		// copy close-on-exit bitmap
+		memcpy(fds + newSize, context->fds + oldSize, newCloseOnExitBitmapSize);
 	} else {
 		// enlarge the fd table
 
-		fds = malloc(sizeof(struct file_descriptor *) * newSize);
+		fds = (struct file_descriptor **)malloc(
+			sizeof(struct file_descriptor *) * newSize
+			+ newCloseOnExitBitmapSize);
 		if (fds == NULL) {
 			status = ENOMEM;
 			goto out;
 		}
 
 		// copy the fd array, and zero the additional slots
-		memcpy(fds, context->fds, sizeof(void *) * context->table_size);
-		memset((char *)fds + (sizeof(void *) * context->table_size), 0,
-			sizeof(void *) * (newSize - context->table_size));
+		memcpy(fds, context->fds, sizeof(void *) * oldSize);
+		memset(fds + oldSize, 0, sizeof(void *) * (newSize - oldSize));
+
+		// copy close-on-exit bitmap, and zero out additional bytes
+		memcpy(fds + newSize, context->fds + oldSize, oldCloseOnExitBitmapSize);
+		memset((uint8*)(fds + newSize) + oldCloseOnExitBitmapSize, 0,
+			newCloseOnExitBitmapSize - oldCloseOnExitBitmapSize);
 	}
 
 	free(context->fds);
-	context->fds = (file_descriptor **)fds;
+	context->fds = fds;
+	context->fds_close_on_exec = (uint8 *)(context->fds + newSize);
 	context->table_size = newSize;
 
 out:
