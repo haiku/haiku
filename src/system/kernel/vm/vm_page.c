@@ -1030,16 +1030,23 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 
 
 vm_page *
-vm_lookup_page(addr_t page_num)
+vm_page_at_index(int32 index)
 {
-	if (page_num < sPhysicalPageOffset)
+	return &sPages[index];
+}
+
+
+vm_page *
+vm_lookup_page(addr_t pageNumber)
+{
+	if (pageNumber < sPhysicalPageOffset)
 		return NULL;
 
-	page_num -= sPhysicalPageOffset;
-	if (page_num >= sNumPages)
+	pageNumber -= sPhysicalPageOffset;
+	if (pageNumber >= sNumPages)
 		return NULL;
 
-	return &sPages[page_num];
+	return &sPages[pageNumber];
 }
 
 

@@ -1616,6 +1616,9 @@ vm_copy_on_write_area(vm_area *area)
 	map->ops->unmap(map, area->base, area->base - 1 + area->size);
 	map->ops->flush(map);
 
+	// TODO: does anything guarantee that we remap the same pages here?
+	//	Shouldn't we better introduce a "change mapping"?
+
 	for (page = lowerCache->page_list; page; page = page->cache_next) {
 		map->ops->map(map, area->base + (page->cache_offset << PAGE_SHIFT)
 			- area->cache_offset, page->physical_page_number << PAGE_SHIFT,
@@ -1836,9 +1839,67 @@ vm_get_page_mapping(team_id aid, addr_t vaddr, addr_t *paddr)
 }
 
 
+int32
+vm_test_map_activation(vm_page *page)
+{
+	int32 activation = 0;
+
+	// TODO: this can't work... (we need to lock the map, so this has to be a mutex)
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sMappingLock);
+
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping *mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		vm_area *area = mapping->area;
+		vm_translation_map *map = &area->address_space->translation_map;
+
+		addr_t physicalAddress;
+		uint32 flags;
+//		map->ops->lock(map);
+		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
+		map->ops->query_interrupt(map, address, &physicalAddress, &flags);
+//		map->ops->unlock(map);
+
+		if (flags & PAGE_ACCESSED)
+			activation++;
+	}
+
+	release_spinlock(&sMappingLock);
+	restore_interrupts(state);
+
+	return activation;
+}
+
+
+void
+vm_clear_map_activation(vm_page *page)
+{
+	// TODO: this can't work... (we need to lock the map, so this has to be a mutex)
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sMappingLock);
+
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping *mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		vm_area *area = mapping->area;
+		vm_translation_map *map = &area->address_space->translation_map;
+
+//		map->ops->lock(map);
+		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
+		map->ops->clear_flags(map, address, PAGE_ACCESSED);
+//		map->ops->unlock(map);
+	}
+
+	release_spinlock(&sMappingLock);
+	restore_interrupts(state);
+}
+
+
 void
 vm_remove_all_page_mappings(vm_page *page)
 {
+	// TODO: this can't work... (we need to lock the map, so this has to be a mutex)
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sMappingLock);
 
@@ -1851,10 +1912,10 @@ vm_remove_all_page_mappings(vm_page *page)
 		vm_area *area = mapping->area;
 		vm_translation_map *map = &area->address_space->translation_map;
 
-		map->ops->lock(map);
+//		map->ops->lock(map);
 		addr_t base = area->base + (page->cache_offset << PAGE_SHIFT);
 		map->ops->unmap(map, base, base + (B_PAGE_SIZE - 1));
-		map->ops->unlock(map);
+//		map->ops->unlock(map);
 
 		area->mappings.Remove(mapping);
 	}
@@ -2485,6 +2546,9 @@ vm_area_for(team_id team, addr_t address)
 }
 
 
+/*!
+	Frees physical pages that were used during the boot process.
+*/
 static void
 unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 {
@@ -3470,6 +3534,13 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (status == B_OK) {
 		// All went fine, all there is left to do is to map the page into the address space
 
+		// In case this is a copy-on-write page, we need to unmap it from the area now
+		if (isWrite && page->cache == topCacheRef->cache)
+			vm_unmap_pages(area, address - area->base, B_PAGE_SIZE);
+
+		// TODO: there is currently no mechanism to prevent a page being mapped
+		//	more than once in case of a second page fault!
+
 		// If the page doesn't reside in the area's cache, we need to make sure it's
 		// mapped in read-only, so that we cannot overwrite someone else's data (copy-on-write)
 		uint32 newProtection = area->protection;
@@ -4127,13 +4198,8 @@ resize_area(area_id areaID, size_t newSize)
 		current->size = newSize;
 
 		// we also need to unmap all pages beyond the new size, if the area has shrinked
-		if (newSize < oldSize) {
-			vm_translation_map *map = &current->address_space->translation_map;
-
-			map->ops->lock(map);
-			map->ops->unmap(map, current->base + newSize, current->base + oldSize - 1);
-			map->ops->unlock(map);
-		}
+		if (newSize < oldSize)
+			vm_unmap_pages(current, current->base + newSize, oldSize - newSize);
 	}
 
 	if (status == B_OK)
@@ -4193,6 +4259,11 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	acquire_sem_etc(sourceAddressSpace->sem, WRITE_COUNT, 0, 0);
 
+	// unmap the area in the source address space
+	vm_unmap_pages(area, area->base, area->size);
+
+	// TODO: there might be additional page faults at this point!
+
 	reservedAddress = (void *)area->base;
 	remove_area_from_address_space(sourceAddressSpace, area, true);
 	status = insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS,
@@ -4203,12 +4274,6 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	if (status != B_OK)
 		goto err3;
-
-	// unmap the area in the source address space
-	map = &sourceAddressSpace->translation_map;
-	map->ops->lock(map);
-	map->ops->unmap(map, area->base, area->base + (area->size - 1));
-	map->ops->unlock(map);
 
 	// insert the area into the target address space
 
@@ -4227,6 +4292,8 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	// The area was successfully transferred to the new team when we got here
 	area->address_space = targetAddressSpace;
+
+	// TODO: take area lock/wiring into account!
 
 	release_sem_etc(targetAddressSpace->sem, WRITE_COUNT, 0);
 
