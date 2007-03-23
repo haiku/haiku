@@ -1935,12 +1935,13 @@ status_t
 vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 {
 	vm_translation_map *map = &area->address_space->translation_map;
+	addr_t end = base + (size - 1);
 
 	map->ops->lock(map);
 
 	if (area->wiring != B_NO_LOCK && area->cache_type != CACHE_TYPE_DEVICE) {
 		// iterate through all pages and decrease their wired count
-		for (addr_t virtualAddress = base; virtualAddress < base + (size - 1);
+		for (addr_t virtualAddress = base; virtualAddress < end;
 				virtualAddress += B_PAGE_SIZE) {
 			addr_t physicalAddress;
 			uint32 flags;
@@ -1960,7 +1961,7 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 		}
 	}
 
-	map->ops->unmap(map, base, base + (size - 1));
+	map->ops->unmap(map, base, end);
 
 	if (area->wiring == B_NO_LOCK) {
 		vm_area_mappings queue;
@@ -3536,7 +3537,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		// In case this is a copy-on-write page, we need to unmap it from the area now
 		if (isWrite && page->cache == topCacheRef->cache)
-			vm_unmap_pages(area, address - area->base, B_PAGE_SIZE);
+			vm_unmap_pages(area, address, B_PAGE_SIZE);
 
 		// TODO: there is currently no mechanism to prevent a page being mapped
 		//	more than once in case of a second page fault!
