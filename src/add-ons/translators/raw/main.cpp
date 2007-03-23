@@ -10,8 +10,9 @@
 
 #include <Application.h>
 
-#define TEST_MODE 0
-#if TEST_MODE
+#define TEST_MODE 1
+#define SHOW_MODE 1
+#if SHOW_MODE
 #	include <Bitmap.h>
 #	include <BitmapStream.h>
 #	include <View.h>
@@ -84,7 +85,8 @@ main(int argc, char **argv)
 				printf("  [%ld] %s %lu x %lu (%ld bits per sample, compression %ld)\n",
 					i, data.is_raw ? "RAW " : "JPEG",
 					data.width, data.height, data.bits_per_sample, data.compression);
-				
+
+#if SHOW_MODE
 				if (!data.is_raw) {
 					// write data to file
 					uint8* buffer;
@@ -130,6 +132,7 @@ main(int argc, char **argv)
 						wait_for_thread(window->Thread(), &status);
 					}
 				}
+#endif
 			}
 		}
 		return 0;

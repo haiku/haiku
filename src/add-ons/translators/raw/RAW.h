@@ -71,6 +71,11 @@ class DCRaw {
 		uint16& _Bayer(int32 column, int32 row);
 		int32 _FilterCoefficient(int32 column, int32 row);
 		int32 _FlipIndex(uint32 row, uint32 col, uint32 flip);
+		bool _IsCanon() const;
+		bool _IsKodak() const;
+		bool _IsNikon() const;
+		bool _IsPentax() const;
+		bool _IsSamsung() const;
 
 		// image manipulation and conversion
 		void _ScaleColors();
@@ -88,6 +93,8 @@ class DCRaw {
 		void _ParseThumbTag(off_t baseOffset, uint32 offsetTag, uint32 lengthTag);
 		void _ParseManufacturerTag(off_t baseOffset);
 		void _ParseEXIF(off_t baseOffset);
+		void _ParseLinearTable(uint32 length);
+		void _FixupValues();
 
 		// Lossless JPEG
 		void _InitDecoder();
@@ -99,7 +106,12 @@ class DCRaw {
 		void _LosslessJPEGRow(struct jhead *jh, int jrow);
 
 		// RAW Loader
-		void _LoadRAWPacked12();
+		void _LoadRAWPacked12(const image_data_info& info);
+		void _MakeCanonDecoder(uint32 table);
+		bool _CanonHasLowBits();
+		void _LoadRAWCanonCompressed(const image_data_info& info);
+		void _LoadRAWLosslessJPEG(const image_data_info& image);
+		void _LoadRAW(const image_data_info& info);
 
 		// Image writers
 		void _WriteJPEG(image_data_info& image, uint8* outputBuffer);
@@ -120,6 +132,7 @@ class DCRaw {
 		int32		fRawIndex;
 		int32		fThumbIndex;
 		uint32		fDNGVersion;
+		bool		fIsTIFF;
 
 		uint16		(*fImageData)[4];
 			// output image data
@@ -144,6 +157,8 @@ class DCRaw {
 		uint32		fColors;
 		uint16		fWhite[8][8];
 		float		fUserMultipliers[4];
+		uint16*		fCurve;
+		uint16		fCR2Slice[3];
 		uint32*		fOutputProfile;
 		uint32		fOutputBitsPerSample;
 		int32		(*fHistogram)[4];

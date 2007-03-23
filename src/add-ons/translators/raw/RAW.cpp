@@ -21,6 +21,11 @@
 #include <string.h>
 
 
+//#define TRACE(x) dprintf x
+#define TRACE(x)
+//#define TAG(x) dprintf x
+#define TAG(x)
+
 #define ABS(x) (((int)(x) ^ ((int)(x) >> 31)) - ((int)(x) >> 31))
 #define LIM(x,min,max) MAX(min,MIN(x,max))
 #define ULIM(x,y,z) ((y) < (z) ? LIM(x,y,z) : LIM(x,z,y))
@@ -82,6 +87,7 @@ DCRaw::DCRaw(BPositionIO& stream)
 	fRawIndex(-1),
 	fThumbIndex(-1),
 	fDNGVersion(0),
+	fIsTIFF(false),
 	fThreshold(0),
 	fHalfSize(true),
 	fUseCameraWhiteBalance(true),
@@ -107,6 +113,10 @@ DCRaw::DCRaw(BPositionIO& stream)
 {
 	fImages = new image_data_info[kImageBufferCount];
 	fDecodeBuffer = new decode[kDecodeBufferCount];
+	fCurve = new uint16[0x1000];
+	for (uint32 i = 0; i < 0x1000; i++) {
+		fCurve[i] = i;
+	}
 
 	cbrt = new float[0x10000];
 	fHistogram = (int32 (*)[4])calloc(sizeof(int32) * 0x2000 * 4, 1);
@@ -117,6 +127,7 @@ DCRaw::DCRaw(BPositionIO& stream)
 	memset(fWhite, 0, sizeof(fWhite));
 
 	fMeta.camera_multipliers[0] = -1;
+	fCR2Slice[0] = 0;
 }
 
 
@@ -124,6 +135,7 @@ DCRaw::~DCRaw()
 {
 	delete[] fImages;
 	delete[] fDecodeBuffer;
+	delete[] fCurve;
 
 	delete[] cbrt;
 	free(fHistogram);
@@ -225,6 +237,41 @@ DCRaw::_FlipIndex(uint32 row, uint32 col, uint32 flip)
 		col = fOutputWidth - 1 - col;
 
 	return row * fOutputWidth + col;
+}
+
+
+bool
+DCRaw::_IsCanon() const
+{
+	return !strncasecmp(fMeta.manufacturer, "Canon", 5);
+}
+
+
+bool
+DCRaw::_IsKodak() const
+{
+	return !strncasecmp(fMeta.manufacturer, "Kodak", 5);
+}
+
+
+bool
+DCRaw::_IsNikon() const
+{
+	return !strncasecmp(fMeta.manufacturer, "Nikon", 5);
+}
+
+
+bool
+DCRaw::_IsPentax() const
+{
+	return !strncasecmp(fMeta.manufacturer, "Pentax", 6);
+}
+
+
+bool
+DCRaw::_IsSamsung() const
+{
+	return !strncasecmp(fMeta.manufacturer, "Samsung", 7);
 }
 
 
@@ -375,7 +422,7 @@ DCRaw::_ParseManufacturerTag(off_t baseOffset)
 		off_t nextOffset;
 		tiff_tag tag;
 		_ParseTIFFTag(baseOffset, tag, nextOffset);
-		//printf("got manufacturer tag %u (type %u, length %lu)\n", tag.tag, tag.type, tag.length);
+		TAG(("Manufacturer tag %u (type %u, length %lu)\n", tag.tag, tag.type, tag.length));
 
 		if (strstr(fMeta.manufacturer, "PENTAX")) {
 			if (tag.tag == 0x1b)
@@ -604,9 +651,14 @@ DCRaw::_ParseEXIF(off_t baseOffset)
 		off_t nextOffset;
 		tiff_tag tag;
 		_ParseTIFFTag(baseOffset, tag, nextOffset);
-//printf("got EXIF tag %u (type %u, length %lu)\n", tag.tag, tag.type, tag.length);
+		TAG(("EXIF tag %u (type %u, length %lu)\n", tag.tag, tag.type, tag.length));
 
 		switch (tag.tag) {
+#if 0
+			default:
+				printf("  unhandled EXIF tag %u\n", tag.tag);
+				break;
+#endif
 			case 33434:
 				fMeta.shutter = fRead.NextDouble(TIFF_FRACTION_TYPE);
 				break;
@@ -655,6 +707,160 @@ DCRaw::_ParseEXIF(off_t baseOffset)
 		}
 
 		fRead.Seek(nextOffset, SEEK_SET);
+	}
+}
+
+
+void
+DCRaw::_ParseLinearTable(uint32 length)
+{
+	if (length > 0x1000)
+		length = 0x1000;
+
+	fRead.NextShorts(fCurve, length);
+
+	for (uint32 i = length; i < 0x1000; i++) {
+		fCurve[i] = fCurve[i - 1];
+	}
+
+	fMeta.maximum = fCurve[0xfff];
+}
+
+
+/*!
+	This (lengthy) method contains fixes for the values in the image data to
+	be able to actually read the image data correctly.
+*/
+void
+DCRaw::_FixupValues()
+{
+	// PENTAX and SAMSUNG section
+	// (Samsung sells rebranded Pentax cameras)
+
+	if (_IsPentax() || _IsSamsung()) {
+		if (fInputWidth == 3936 && fInputHeight == 2624) {
+			// Pentax K10D and Samsumg GX10
+			fInputWidth = 3896;
+			fInputHeight = 2616;
+		}
+	}
+
+	// CANON
+
+	if (_IsCanon()) {
+		bool isCR2 = false;
+		if (strstr(fMeta.model, "EOS D2000C")) {
+			fFilters = 0x61616161;
+			fMeta.black = fCurve[200];
+		}
+
+		switch (_Raw().width) {
+			case 2144:
+				fInputHeight = 1550;
+				fInputWidth = 2088;
+				fTopMargin = 8;
+				fLeftMargin = 4;
+				if (!strcmp(fMeta.model, "PowerShot G1")) {
+					fColors = 4;
+					fFilters = 0xb4b4b4b4;
+				}
+				break;
+
+			case 2224:
+				fInputHeight = 1448;
+				fInputWidth = 2176;
+				fTopMargin = 6;
+				fLeftMargin = 48;
+				break;
+
+			case 2376:
+				fInputHeight = 1720;
+				fInputWidth = 2312;
+				fTopMargin = 6;
+				fLeftMargin = 12;
+				break;
+
+			case 2672:
+				fInputHeight = 1960;
+				fInputWidth = 2616;
+				fTopMargin = 6;
+				fLeftMargin = 12;
+				break;
+
+			case 3152:
+				fInputHeight = 2056;
+				fInputWidth = 3088;
+				fTopMargin = 12;
+				fLeftMargin = 64;
+				if (fUniqueID == 0x80000170)
+					_AdobeCoefficients("Canon", "EOS 300D");
+				fMeta.maximum = 0xfa0;
+				break;
+
+			case 3160:
+				fInputHeight = 2328;
+				fInputWidth = 3112;
+				fTopMargin = 12;
+				fLeftMargin = 44;
+				break;
+
+			case 3344:
+				fInputHeight = 2472;
+				fInputWidth = 3288;
+				fTopMargin = 6;
+				fLeftMargin = 4;
+				break;
+
+			case 3516:
+				fTopMargin = 14;
+				fLeftMargin = 42;
+				if (fUniqueID == 0x80000189)
+					_AdobeCoefficients("Canon", "EOS 350D");
+				isCR2 = true;
+				break;
+
+			case 3596:
+				fTopMargin = 12;
+				fLeftMargin = 74;
+				isCR2 = true;
+				break;
+
+			case 3948:
+				fTopMargin = 18;
+				fLeftMargin = 42;
+				fInputHeight -= 2;
+				if (fUniqueID == 0x80000236)
+					_AdobeCoefficients("Canon", "EOS 400D");
+				isCR2 = true;
+				break;
+
+			case 3984:
+				fTopMargin  = 20;
+				fLeftMargin = 76;
+				fInputHeight -= 2;
+				fMeta.maximum = 0x3bb0;
+				isCR2 = true;
+				break;
+
+			case 4476:
+				fTopMargin  = 34;
+				fLeftMargin = 90;
+				fMeta.maximum = 0xe6c;
+				isCR2 = true;
+				break;
+
+			case 5108:
+				fTopMargin  = 13;
+				fLeftMargin = 98;
+				fMeta.maximum = 0xe80;
+				isCR2 = true;
+				break;
+		}
+
+		if (isCR2) {
+			fInputHeight -= fTopMargin;
+			fInputWidth -= fLeftMargin;
+		}
 	}
 }
 
@@ -1848,8 +2054,11 @@ DCRaw::_LosslessJPEGRow(struct jhead *jh, int jrow)
 //	#pragma mark - RAW loaders
 
 
+/*!
+	This is, for example, used in PENTAX RAW images
+*/
 void
-DCRaw::_LoadRAWPacked12()
+DCRaw::_LoadRAWPacked12(const image_data_info& image)
 {
 	uint32 rawWidth = _Raw().width;
 	uint32 column, row;
@@ -1864,6 +2073,298 @@ DCRaw::_LoadRAWPacked12()
 		}
 		for (column = fInputWidth * 3 / 2; column < rawWidth; column++) {
 			_GetDecodeBits(8);
+		}
+	}
+}
+
+
+void
+DCRaw::_MakeCanonDecoder(uint32 table)
+{
+	static const uchar kFirstTree[3][29] = {
+		{ 0,1,4,2,3,1,2,0,0,0,0,0,0,0,0,0,
+			0x04,0x03,0x05,0x06,0x02,0x07,0x01,0x08,0x09,0x00,0x0a,0x0b,0xff },
+		{ 0,2,2,3,1,1,1,1,2,0,0,0,0,0,0,0,
+			0x03,0x02,0x04,0x01,0x05,0x00,0x06,0x07,0x09,0x08,0x0a,0x0b,0xff },
+		{ 0,0,6,3,1,1,2,0,0,0,0,0,0,0,0,0,
+			0x06,0x05,0x07,0x04,0x08,0x03,0x09,0x02,0x00,0x0a,0x01,0x0b,0xff },
+	};
+	static const uchar kSecondTree[3][180] = {
+		{ 0,2,2,2,1,4,2,1,2,5,1,1,0,0,0,139,
+			0x03,0x04,0x02,0x05,0x01,0x06,0x07,0x08,
+			0x12,0x13,0x11,0x14,0x09,0x15,0x22,0x00,0x21,0x16,0x0a,0xf0,
+			0x23,0x17,0x24,0x31,0x32,0x18,0x19,0x33,0x25,0x41,0x34,0x42,
+			0x35,0x51,0x36,0x37,0x38,0x29,0x79,0x26,0x1a,0x39,0x56,0x57,
+			0x28,0x27,0x52,0x55,0x58,0x43,0x76,0x59,0x77,0x54,0x61,0xf9,
+			0x71,0x78,0x75,0x96,0x97,0x49,0xb7,0x53,0xd7,0x74,0xb6,0x98,
+			0x47,0x48,0x95,0x69,0x99,0x91,0xfa,0xb8,0x68,0xb5,0xb9,0xd6,
+			0xf7,0xd8,0x67,0x46,0x45,0x94,0x89,0xf8,0x81,0xd5,0xf6,0xb4,
+			0x88,0xb1,0x2a,0x44,0x72,0xd9,0x87,0x66,0xd4,0xf5,0x3a,0xa7,
+			0x73,0xa9,0xa8,0x86,0x62,0xc7,0x65,0xc8,0xc9,0xa1,0xf4,0xd1,
+			0xe9,0x5a,0x92,0x85,0xa6,0xe7,0x93,0xe8,0xc1,0xc6,0x7a,0x64,
+			0xe1,0x4a,0x6a,0xe6,0xb3,0xf1,0xd3,0xa5,0x8a,0xb2,0x9a,0xba,
+			0x84,0xa4,0x63,0xe5,0xc5,0xf3,0xd2,0xc4,0x82,0xaa,0xda,0xe4,
+			0xf2,0xca,0x83,0xa3,0xa2,0xc3,0xea,0xc2,0xe2,0xe3,0xff,0xff },
+		{ 0,2,2,1,4,1,4,1,3,3,1,0,0,0,0,140,
+			0x02,0x03,0x01,0x04,0x05,0x12,0x11,0x06,
+			0x13,0x07,0x08,0x14,0x22,0x09,0x21,0x00,0x23,0x15,0x31,0x32,
+			0x0a,0x16,0xf0,0x24,0x33,0x41,0x42,0x19,0x17,0x25,0x18,0x51,
+			0x34,0x43,0x52,0x29,0x35,0x61,0x39,0x71,0x62,0x36,0x53,0x26,
+			0x38,0x1a,0x37,0x81,0x27,0x91,0x79,0x55,0x45,0x28,0x72,0x59,
+			0xa1,0xb1,0x44,0x69,0x54,0x58,0xd1,0xfa,0x57,0xe1,0xf1,0xb9,
+			0x49,0x47,0x63,0x6a,0xf9,0x56,0x46,0xa8,0x2a,0x4a,0x78,0x99,
+			0x3a,0x75,0x74,0x86,0x65,0xc1,0x76,0xb6,0x96,0xd6,0x89,0x85,
+			0xc9,0xf5,0x95,0xb4,0xc7,0xf7,0x8a,0x97,0xb8,0x73,0xb7,0xd8,
+			0xd9,0x87,0xa7,0x7a,0x48,0x82,0x84,0xea,0xf4,0xa6,0xc5,0x5a,
+			0x94,0xa4,0xc6,0x92,0xc3,0x68,0xb5,0xc8,0xe4,0xe5,0xe6,0xe9,
+			0xa2,0xa3,0xe3,0xc2,0x66,0x67,0x93,0xaa,0xd4,0xd5,0xe7,0xf8,
+			0x88,0x9a,0xd7,0x77,0xc4,0x64,0xe2,0x98,0xa5,0xca,0xda,0xe8,
+			0xf3,0xf6,0xa9,0xb2,0xb3,0xf2,0xd2,0x83,0xba,0xd3,0xff,0xff },
+		{ 0,0,6,2,1,3,3,2,5,1,2,2,8,10,0,117,
+			0x04,0x05,0x03,0x06,0x02,0x07,0x01,0x08,
+			0x09,0x12,0x13,0x14,0x11,0x15,0x0a,0x16,0x17,0xf0,0x00,0x22,
+			0x21,0x18,0x23,0x19,0x24,0x32,0x31,0x25,0x33,0x38,0x37,0x34,
+			0x35,0x36,0x39,0x79,0x57,0x58,0x59,0x28,0x56,0x78,0x27,0x41,
+			0x29,0x77,0x26,0x42,0x76,0x99,0x1a,0x55,0x98,0x97,0xf9,0x48,
+			0x54,0x96,0x89,0x47,0xb7,0x49,0xfa,0x75,0x68,0xb6,0x67,0x69,
+			0xb9,0xb8,0xd8,0x52,0xd7,0x88,0xb5,0x74,0x51,0x46,0xd9,0xf8,
+			0x3a,0xd6,0x87,0x45,0x7a,0x95,0xd5,0xf6,0x86,0xb4,0xa9,0x94,
+			0x53,0x2a,0xa8,0x43,0xf5,0xf7,0xd4,0x66,0xa7,0x5a,0x44,0x8a,
+			0xc9,0xe8,0xc8,0xe7,0x9a,0x6a,0x73,0x4a,0x61,0xc7,0xf4,0xc6,
+			0x65,0xe9,0x72,0xe6,0x71,0x91,0x93,0xa6,0xda,0x92,0x85,0x62,
+			0xf3,0xc5,0xb2,0xa4,0x84,0xba,0x64,0xa5,0xb3,0xd2,0x81,0xe5,
+			0xd3,0xaa,0xc4,0xca,0xf2,0xb1,0xe4,0xd1,0x83,0x63,0xea,0xc3,
+			0xe2,0x82,0xf1,0xa3,0xc2,0xa1,0xc1,0xe3,0xa2,0xe1,0xff,0xff }
+	};
+
+	if (table > 2)
+		table = 2;
+
+	_InitDecoder();
+
+	_MakeDecoder(kFirstTree[table], 0);
+	fSecondDecode = fFreeDecode;
+	_MakeDecoder(kSecondTree[table], 0);
+}
+
+
+/*!
+	Return 0 if the image starts with compressed data,
+	1 if it starts with uncompressed low-order bits.
+
+	In Canon compressed data, 0xff is always followed by 0x00.
+ */
+bool
+DCRaw::_CanonHasLowBits()
+{
+	bool hasLowBits = true;
+	uchar test[0x4000 - 540];
+
+	fRead.Seek(540, SEEK_SET);
+	fRead(test, sizeof(test));
+
+	for (uint32 i = 0; i < sizeof(test) - 1; i++)
+		if (test[i] == 0xff) {
+			if (test[i + 1])
+				return 1;
+			hasLowBits = 0;
+    }
+
+	return hasLowBits;
+}
+
+void
+dump_to_disk(void* data, size_t length)
+{
+	FILE* file = fopen("/tmp/RAW.out", "wb");
+	if (file == NULL)
+		return;
+
+	fwrite(data, length, 1, file);
+	fclose(file);
+}
+
+void
+DCRaw::_LoadRAWCanonCompressed(const image_data_info& image)
+{
+	uint32 rawWidth = _Raw().width;
+	int carry = 0, pnum = 0, base[2];
+
+	_MakeCanonDecoder(image.compression);
+
+	uint16* pixel = (uint16 *)calloc(rawWidth * 8, sizeof(*pixel));
+	if (pixel == NULL)
+		throw (status_t)B_NO_MEMORY;
+
+	bool hasLowBits = _CanonHasLowBits();
+	if (!hasLowBits)
+		fMeta.maximum = 0x3ff;
+
+	fRead.Seek(540 + (hasLowBits ? _Raw().height * rawWidth / 4 : 0),
+		SEEK_SET);
+
+	fDecodeBitsZeroAfterMax = true;
+	_InitDecodeBits();
+
+	for (uint32 row = 0; row < _Raw().height; row += 8) {
+		for (uint32 block = 0; block < rawWidth >> 3; block++) {
+			int diffbuf[64];
+			memset(diffbuf, 0, sizeof diffbuf);
+			struct decode* decode = fDecodeBuffer;
+
+			for (uint32 i = 0; i < 64; i++) {
+				struct decode* dindex = decode;
+				while (dindex->branch[0]) {
+					dindex = dindex->branch[_GetDecodeBits(1)];
+				}
+				int leaf = dindex->leaf;
+				decode = fSecondDecode;
+				if (leaf == 0 && i)
+					break;
+				if (leaf == 0xff)
+					continue;
+				i += leaf >> 4;
+
+				int len = leaf & 15;
+				if (len == 0)
+					continue;
+				int diff = _GetDecodeBits(len);
+				if ((diff & (1 << (len-1))) == 0)
+					diff -= (1 << len) - 1;
+				if (i < 64)
+					diffbuf[i] = diff;
+			}
+
+			diffbuf[0] += carry;
+			carry = diffbuf[0];
+
+			for (uint32 i = 0; i < 64; i++) {
+				if (pnum++ % _Raw().width == 0)
+					base[0] = base[1] = 512;
+				pixel[(block << 6) + i] = (base[i & 1] += diffbuf[i]);
+			}
+		}
+
+		if (hasLowBits) {
+			off_t savedOffset = fRead.Position();
+			fRead.Seek(26 + row * _Raw().width / 4, SEEK_SET);
+
+			uint16* pixelRow = pixel;
+			for (uint32 i = 0; i < rawWidth * 2; i++) {
+				uint8 c = fRead.Next<uint8>();
+
+				for (uint32 r = 0; r < 8; r += 2, pixelRow++) {
+					uint32 val = (*pixelRow << 2) + ((c >> r) & 3);
+					if (rawWidth == 2672 && val < 512)
+						val += 2;
+					*pixelRow = val;
+				}
+			}
+
+			fRead.Seek(savedOffset, SEEK_SET);
+		}
+
+		for (uint32 r = 0; r < 8; r++) {
+			uint32 irow = row - fTopMargin + r;
+			if (irow >= fInputHeight)
+				continue;
+
+			for (uint32 col = 0; col < rawWidth; col++) {
+				uint32 icol = col - fLeftMargin;
+				if (icol < fInputWidth)
+					_Bayer(icol, irow) = pixel[r * rawWidth + col];
+				else
+					fMeta.black += pixel[r * rawWidth + col];
+			}
+		}
+	}
+
+	free(pixel);
+
+	if (rawWidth > fInputWidth)
+		fMeta.black /= (rawWidth - fInputWidth) * fInputHeight;
+}
+
+
+void
+DCRaw::_LoadRAWLosslessJPEG(const image_data_info& image)
+{
+	int jwide, jrow, jcol, val, jidx, i, j, row = 0, col = 0;
+	uint32 rawWidth = _Raw().width;
+	int min = INT_MAX;
+
+	struct jhead jh;
+	if (_LosslessJPEGInit(&jh, false) != B_OK)
+		throw (status_t)B_NO_TRANSLATOR;
+
+	jwide = jh.wide * jh.clrs;
+
+	for (jrow = 0; jrow < jh.high; jrow++) {
+		_LosslessJPEGRow(&jh, jrow);
+
+		for (jcol = 0; jcol < jwide; jcol++) {
+			val = jh.row[jcol];
+			if (jh.bits <= 12)
+				val = fCurve[val];
+
+			if (fCR2Slice[0]) {
+				jidx = jrow * jwide + jcol;
+				i = jidx / (fCR2Slice[1] * jh.high);
+				if ((j = i >= fCR2Slice[0]))
+					i  = fCR2Slice[0];
+				jidx -= i * (fCR2Slice[1] * jh.high);
+				row = jidx / fCR2Slice[1 + j];
+				col = jidx % fCR2Slice[1 + j] + i * fCR2Slice[1];
+			}
+
+			if (_Raw().width == 3984 && (col -= 2) < 0) {
+				col += rawWidth;
+				row--;
+			}
+
+			if (uint32(row - fTopMargin) < fInputHeight) {
+				if (uint32(col - fLeftMargin) < fInputWidth) {
+					_Bayer(col - fLeftMargin, row - fTopMargin) = val;
+					if (min > val)
+						min = val;
+				} else
+					fMeta.black += val;
+			}
+			if (++col >= (int32)rawWidth) {
+				col = 0;
+				row++;
+			}
+		}
+	}
+
+	dump_to_disk(fImageData, fInputWidth * fColors * 100);
+	free(jh.row);
+
+	if (rawWidth > fInputWidth)
+		fMeta.black /= (rawWidth - fInputWidth) * fInputHeight;
+	if (_IsKodak())
+		fMeta.black = min;
+}
+
+
+void
+DCRaw::_LoadRAW(const image_data_info& image)
+{
+	if (_IsCanon()) {
+		if (fIsTIFF)
+			_LoadRAWLosslessJPEG(image);
+		else
+			_LoadRAWCanonCompressed(image);
+	} else {
+		switch (image.compression) {
+			case 32773:
+				_LoadRAWPacked12(image);
+				break;
+
+			default:
+				printf("unknown compression: %ld\n", image.compression);
+				throw (status_t)B_NO_TRANSLATOR;
+				break;
 		}
 	}
 }
@@ -1898,6 +2399,9 @@ DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 	int32 sourceOffset = _FlipIndex(0, 0, image.flip);
 	int32 colStep = _FlipIndex(0, 1, image.flip) - sourceOffset;
 	int32 rowStep = _FlipIndex(1, 0, image.flip) - _FlipIndex(0, fOutputWidth, image.flip);
+
+	TRACE(("flip = %ld, sourceOffset = %ld, colStep = %ld, rowStep = %ld, input: %lu x %lu, output: %lu x %lu\n",
+		image.flip, sourceOffset, colStep, rowStep, fInputWidth, fInputHeight, fOutputWidth, fOutputHeight));
 
 	if (fOutputBitsPerSample == 8) {
 		for (uint32 row = 0; row < fOutputHeight; row++, sourceOffset += rowStep) {
@@ -2050,7 +2554,6 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 
 	uint16 tags;
 	fRead(tags);
-//printf("%u tags in file\n", tags);
 	if (tags > 512)
 		return B_BAD_DATA;
 
@@ -2060,12 +2563,14 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 		off_t nextOffset;
 		tiff_tag tag;
 		_ParseTIFFTag(baseOffset, tag, nextOffset);
+		TAG(("TIFF tag: %u\n", tag.tag));
 
-//printf("got tag: %u\n", tag.tag);
 		switch (tag.tag) {
+#if 0
 			default:
-				//printf("tag %ld NOT HANDLED!\n", tag.tag);
+				printf("tag %u NOT HANDLED!\n", tag.tag);
 				break;
+#endif
 
 			case 17:
 			case 18:
@@ -2378,12 +2883,10 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 				break;
 #endif
 
-#if 0
 			case 291:	// Linearization Table
 			case 50712:
-				linear_table(tag.length);
+				_ParseLinearTable(tag.length);
 				break;
-#endif
 
 			case 50714:			/* BlackLevel */
 			case 50715:			/* BlackLevelDeltaH */
@@ -2449,10 +2952,11 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 	fseek (ifp, j, SEEK_SET);
 	parse_tiff_ifd (base);
 	break;
-      case 50752:
-	read_shorts (cr2_slice, 3);
-	break;
 #endif
+			case 50752:
+				fRead.NextShorts(fCR2Slice, 3);
+				break;
+
 			case 50829:	// Active Area
 				fTopMargin = fRead.Next(tag.type);
 				fLeftMargin = fRead.Next(tag.type);
@@ -2564,6 +3068,7 @@ DCRaw::_ParseTIFF(off_t baseOffset)
 		// but may vary for RAW images
 
 	_ParseTIFFImageFileDirectory(baseOffset);
+	fIsTIFF = true;
 
 	uint32 maxSamples = 0;
 
@@ -2682,20 +3187,15 @@ DCRaw::Identify()
 
 	// brush up some variables for later use
 
+	fInputWidth = _Raw().width;
+	fInputHeight = _Raw().height;
+
+	_FixupValues();
+
 	if ((_Raw().width | _Raw().height) < 0)
 		_Raw().width = _Raw().height = 0;
 	if (fMeta.maximum == 0)
 		fMeta.maximum = (1 << _Raw().bits_per_sample) - 1;
-	if (fInputWidth == 0)
-		fInputWidth = _Raw().width;
-	if (fInputHeight == 0)
-		fInputHeight = _Raw().height;
-	
-	if (fInputWidth == 3936 && fInputHeight == 2624) {
-		// Pentax K10D and Samsumg GX10
-		fInputWidth = 3896;
-		fInputHeight = 2616;
-	}
 
 	if (fFilters == ~0UL)
 		fFilters = 0x94949494;
@@ -2755,19 +3255,19 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	image_data_info& image = fImages[index];
 
 	fShrink = (fHalfSize || fThreshold) && fFilters;
-	fOutputWidth  = (image.width + fShrink) >> fShrink;
-	fOutputHeight = (image.height + fShrink) >> fShrink;
+	fOutputWidth  = (fInputWidth + fShrink) >> fShrink;
+	fOutputHeight = (fInputHeight + fShrink) >> fShrink;
 	image.output_width = fOutputWidth;
 	image.output_height = fOutputHeight;
 
-	if (image.is_raw)
+	if (image.is_raw) {
 		bufferSize = fOutputWidth * 4 * fOutputHeight;
 
 		fImageData = (uint16 (*)[4])calloc(fOutputWidth * fOutputHeight
 			* sizeof(*fImageData) + 0, 1); //meta_length, 1);
 		if (fImageData == NULL)
 			throw (status_t)B_NO_MEMORY;
-	else {
+	} else {
 		bufferSize = image.bytes + sizeof(tiff_header) + 10;
 			// TIFF header plus EXIF identifier
 	}
@@ -2779,15 +3279,7 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	fRead.Seek(image.data_offset, SEEK_SET);
 
 	if (image.is_raw) {
-		switch (image.compression) {
-			case 32773:
-				_LoadRAWPacked12();
-				break;
-
-			default:
-				printf("unknown compression: %ld\n", image.compression);
-				break;
-		}
+		_LoadRAW(image);
 
 		//bad_pixels();
 		//if (dark_frame) subtract (dark_frame);
@@ -2824,8 +3316,6 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	} else {
 		_WriteJPEG(image, outputBuffer);
 	}
-
-	bufferSize = fOutputWidth * 4 * fOutputHeight;
 
 	return B_OK;
 }
