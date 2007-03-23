@@ -60,11 +60,13 @@ DirectoryFilePanel::Show()
 			rect.top = rect.bottom - 35;
 			rect.bottom -= 10;
 		}
-
+		
+		rect.right = rect.left -= 30;
+		float directory_width = be_plain_font->StringWidth("Select current") + 20;
+		rect.left = (directory_width > 75) ? (rect.right - directory_width) : (rect.right - 75);
 		fCurrentButton = new BButton(rect, "directoryButton", "Select current",
 			new BMessage(MSG_DIRECTORY), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		fCurrentButton->ResizeToPreferred();
-		fCurrentButton->MoveBy(-fCurrentButton->Bounds().Width() - 30, 0);
+				
 		background->AddChild(fCurrentButton);
 		fCurrentButton->SetTarget(Messenger());
 
@@ -96,14 +98,14 @@ DirectoryFilePanel::SelectionChanged(void)
 	Window()->GetSizeLimits(&maxWidth, &dummy, &dummy, &dummy);
 	maxWidth -= Window()->Bounds().Width() + 8 - fCurrentButton->Frame().right;
 
-	float oldWidth = fCurrentButton->Bounds().Width();
+	BRect oldBounds = fCurrentButton->Bounds();
 	fCurrentButton->SetLabel(label);
 	float width, height;
 	fCurrentButton->GetPreferredSize(&width, &height);
 	if (width > maxWidth)
 		width = maxWidth;
-	fCurrentButton->ResizeTo(width, height);
-	fCurrentButton->MoveBy(oldWidth - width, 0);
+	fCurrentButton->ResizeTo(width, oldBounds.Height());
+	fCurrentButton->MoveBy(oldBounds.Width() - width, 0);
 
 	Window()->Unlock();
 
