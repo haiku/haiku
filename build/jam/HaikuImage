@@ -336,6 +336,7 @@ AddTargetVariableToScript $(script) : <build>resattr ;
 	# causes a cyclic dependency
 AddVariableToScript $(script) : imagePath
 	: [ FDirName $(HAIKU_IMAGE_DIR) $(HAIKU_IMAGE_NAME) ] ;
+AddVariableToScript $(script) : sourceDirsToCopy : $(HAIKU_INSTALL_SOURCE_DIRS) ;
 
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;

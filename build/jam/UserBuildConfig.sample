@@ -43,6 +43,10 @@ AddFilesToHaikuImage beos bin : crashing_app ;
 # Make a symlink to home/config/bin/crash.
 AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
 
+# Adds the source directory src/kits/storage (recursively) to the image
+# (as /boot/home/HaikuSources/src/kits/storage).
+AddSourceDirectoryToHaikuImage src kits storage ;
+
 # Specify scripts that shall be run when populating the image/installation
 # directory. The "early" script is run before anything has been copied onto
 # the image/into the installation directory. The "late" script is run after

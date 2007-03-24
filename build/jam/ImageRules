@@ -41,17 +41,26 @@ actions InitScript1
 	echo -n > $(1)
 }
 
-rule AddVariableToScript
+rule AddVariableToScript script : variable : value
 {
 	# AddVariableToScript <script> : <variable> : <value> ;
-	#
-	local script = $(1) ;
-	local variable = $(2) ;
-	local value = $(3) ;
+
+	# interpret an empty variable value as empty string
+	if ! $(value) {
+		value = "" ;
+	}
 
 	InitScript $(script) ;
 
-	VARIABLE_DEFS on $(script) += "echo $(variable)=\\\"$(value)\\\" >> " ;
+	VARIABLE_DEFS on $(script) += "echo $(variable)=\\\"$(value[1])\\\" >> " ;
+
+	# if the value is an array, add the other array elements
+	value = $(value[2-]) ;
+	while $(value) {
+		VARIABLE_DEFS on $(script)
+			+= "echo $(variable)+=\\\" $(value[1])\\\" >> " ;
+		value = $(value[2-]) ;
+	}
 
 	AddVariableToScript1 $(script) ;
 }
@@ -153,6 +162,13 @@ rule AddSymlinkToHaikuImage
 	local link = $(directory)/$(linkName) ;
 	SYMLINK_TARGET on $(link) = $(linkTarget) ;
 	SYMLINKS_TO_INSTALL on $(directory) += $(link) ;
+}
+
+rule AddSourceDirectoryToHaikuImage dirTokens
+{
+	# AddSourceDirectoryToHaikuImage <dirTokens> ;
+
+	HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
 }
 
 rule AddDriversToHaikuImage

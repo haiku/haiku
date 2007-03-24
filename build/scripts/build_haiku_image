@@ -9,6 +9,7 @@
 # imagePath
 # imageSize
 # addBuildCompatibilityLibDir
+# sourceDirsToCopy
 # 
 # bfsShell
 # copyattr
@@ -121,6 +122,36 @@ done
 
 # cleanup tmp dir
 rm -rf $mimeTmpDir
+
+
+# install sources
+
+sourcesDest=${tPrefix}home/HaikuSources
+
+# create sources directory
+if [ -n "${sourceDirsToCopy}" ]; then
+	echo "Installing Haiku Sources ..."
+
+	$mkdir -p ${sourcesDest}
+fi
+
+for sourcesDir in ${sourceDirsToCopy}; do
+	echo "  sources dir:  ${sourcesDir}"
+
+	# create all subdirectories
+	subDirs=$(find ${sourcesDir} -type d | grep -v '.svn' |
+		sed -e "s@^${sourceDir}@${sourcesDest}@")
+	$mkdir -p ${subDirs}
+	
+	# get all files and copy each one individually
+	sourceFiles=$(find $sourcesDir -type f | grep -v '.svn')
+	for sourceFile in $sourceFiles; do
+		destSourceFile=$(echo $sourceFile |
+			sed -e "s@^${sourceDir}@${sourcesDest}@")
+		$cp ${sPrefix}$sourceFile $destSourceFile
+	done
+done
+
 
 # unmount
 if [ $isImage ]; then
