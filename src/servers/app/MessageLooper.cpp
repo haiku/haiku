@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,9 @@
 
 MessageLooper::MessageLooper(const char* name)
 	: BLocker(name),
-	fQuitting(false)
+	fThread(-1),
+	fQuitting(false),
+	fDeathSemaphore(-1)
 {
 }
 
