@@ -71,7 +71,8 @@ struct ipv4_header {
 #define FRAGMENT_TIMEOUT		60000000LL
 	// discard fragment after 60 seconds
 
-typedef DoublyLinkedList<struct net_buffer, DoublyLinkedListCLink<struct net_buffer> > FragmentList;
+typedef DoublyLinkedList<struct net_buffer,
+	DoublyLinkedListCLink<struct net_buffer> > FragmentList;
 
 struct ipv4_packet_key {
 	in_addr_t	source;
@@ -654,6 +655,9 @@ static void
 raw_receive_data(net_buffer *buffer)
 {
 	BenaphoreLocker locker(sRawSocketsLock);
+
+	TRACE(("ipv4:raw_receive_data(): protocol %i\n", buffer->protocol));
+
 	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
 
 	while (iterator.HasNext()) {
@@ -936,9 +940,13 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		source.sin_addr.s_addr = ((sockaddr_in *)route->interface->address)->sin_addr.s_addr;
 	}
 
+	bool headerIncluded = false;
+	if (protocol != NULL)
+		headerIncluded = (protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0;
+
 	// Add IP header (if needed)
 
-	if (protocol == NULL || (protocol->flags & IP_FLAG_HEADER_INCLUDED) == 0) {
+	if (!headerIncluded) {
 		NetBufferPrepend<ipv4_header> bufferHeader(buffer);
 		if (bufferHeader.Status() < B_OK)
 			return bufferHeader.Status();
@@ -962,11 +970,24 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 		header.destination = ((sockaddr_in *)&buffer->destination)->sin_addr.s_addr;
 
-		header.checksum = gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
+		header.checksum = gBufferModule->checksum(buffer, 0,
+			sizeof(ipv4_header), true);
 		//dump_ipv4_header(header);
 
 		bufferHeader.Detach();
-			// make sure the IP-header is already written to the buffer at this point
+			// make sure the IP-header is already written to the
+			// buffer at this point
+	} else {
+		// if IP_HDRINCL, check if the source address is set
+		NetBufferHeader<ipv4_header> bufferHeader(buffer);
+		if (bufferHeader.Status() < B_OK)
+			return bufferHeader.Status();
+
+		ipv4_header &header = bufferHeader.Data();
+		if (header.source == 0)
+			header.source = source.sin_addr.s_addr;
+
+		bufferHeader.Detach();
 	}
 
 	TRACE(("header chksum: %ld, buffer checksum: %ld\n",
@@ -1103,7 +1124,8 @@ ipv4_receive_data(net_buffer *buffer)
 	uint32 matchedAddressType;
 	if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination, 
 		&buffer->interface, &matchedAddressType)) {
-		TRACE(("this packet was not for us\n"));
+		TRACE(("this packet was not for us %lx -> %lx\n",
+			ntohl(header.source), ntohl(header.destination)));
 		return B_ERROR;
 	}
 	if (matchedAddressType != 0) {
