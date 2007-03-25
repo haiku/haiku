@@ -1876,8 +1876,11 @@ rename_thread(thread_id id, const char *name)
 		thread = thread_get_thread_struct_locked(id);
 
 	if (thread != NULL) {
-		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
-		status = B_OK;
+		if (thread->team == thread_get_current_thread()->team) {
+			strlcpy(thread->name, name, B_OS_NAME_LENGTH);
+			status = B_OK;
+		} else
+			status = B_NOT_ALLOWED;
 	}
 
 	RELEASE_THREAD_LOCK();
