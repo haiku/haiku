@@ -68,7 +68,6 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
-		status_t					SubmitTransfer(Transfer *transfer, bool resubmit);
 		status_t					SubmitRequest(Transfer *transfer);
 
 static	status_t					AddTo(Stack *stack);
@@ -98,6 +97,10 @@ static	int32						InterruptHandler(void *data);
 										bool directionIn);
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
+
+		status_t					CreateFilledTransfer(Transfer *transfer,
+										uhci_td **_firstDescriptor,
+										uhci_qh **_transferQueue);
 
 		// Transfer queue functions
 		uhci_qh						*CreateTransferQueue(uhci_td *descriptor);

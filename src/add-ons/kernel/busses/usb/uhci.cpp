@@ -41,7 +41,7 @@ uhci_std_ops(int32 op, ...)
 
 host_controller_info uhci_module = {
 	{
-		"busses/usb/uhci/v1",
+		"busses/usb/uhci",
 		0,
 		uhci_std_ops
 	},
@@ -506,37 +506,15 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
-	return SubmitTransfer(transfer, false);
-}
-
-
-status_t
-UHCI::SubmitTransfer(Transfer *transfer, bool resubmit)
-{
-	Pipe *pipe = transfer->TransferPipe();
-	bool directionIn = (pipe->Direction() == Pipe::In);
-
 	uhci_td *firstDescriptor = NULL;
-	uhci_td *lastDescriptor = NULL;
-	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
-		&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-		transfer->VectorLength());
-
+	uhci_qh *transferQueue = NULL;
+	status_t result = CreateFilledTransfer(transfer, &firstDescriptor,
+		&transferQueue);
 	if (result < B_OK)
 		return result;
-	if (!firstDescriptor || !lastDescriptor)
-		return B_NO_MEMORY;
-
-	lastDescriptor->status |= TD_CONTROL_IOC;
-	lastDescriptor->link_phy = TD_TERMINATE;
-	lastDescriptor->link_log = 0;
-
-	if (!directionIn) {
-		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
-			transfer->VectorCount());
-	}
 
 	Queue *queue = NULL;
+	Pipe *pipe = transfer->TransferPipe();
 	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) {
 		// use interrupt queue
 		queue = fQueues[0];
@@ -545,13 +523,7 @@ UHCI::SubmitTransfer(Transfer *transfer, bool resubmit)
 		queue = fQueues[3];
 	}
 
-	uhci_qh *transferQueue = CreateTransferQueue(firstDescriptor);
-	if (resubmit) {
-		// the transfer is already pending, we just submit another fragment
-		queue->AppendTransfer(transferQueue);
-		return B_OK;
-	}
-
+	bool directionIn = (pipe->Direction() == Pipe::In);
 	result = AddPendingTransfer(transfer, queue, transferQueue,
 		firstDescriptor, firstDescriptor, directionIn);
 	if (result < B_OK) {
@@ -561,6 +533,7 @@ UHCI::SubmitTransfer(Transfer *transfer, bool resubmit)
 		return result;
 	}
 
+	queue->AppendTransfer(transferQueue);
 	return B_OK;
 }
 
@@ -639,6 +612,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 		return result;
 	}
 
+	queue->AppendTransfer(transferQueue);
 	return B_OK;
 }
 
@@ -719,8 +693,6 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 
 	fLastTransfer = data;
 	Unlock();
-
-	queue->AppendTransfer(data->transfer_queue);
 	return B_OK;
 }
 
@@ -865,13 +837,26 @@ UHCI::FinishTransfers()
 					}
 
 					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
+					FreeDescriptorChain(transfer->first_descriptor);
+					FreeTransferQueue(transfer->transfer_queue);
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
+						TRACE(("usb_uhci: advancing fragmented transfer\n"));
 						transfer->transfer->AdvanceByFragment(actualLength);
 						if (transfer->transfer->VectorLength() > 0) {
+							TRACE(("usb_uhci: still %ld bytes left on transfer\n", transfer->transfer->VectorLength()));
 							// resubmit the advanced transfer so the rest
 							// of the buffers are transmitted over the bus
-							SubmitTransfer(transfer->transfer, true);
+							status_t result = CreateFilledTransfer(transfer->transfer,
+								&transfer->first_descriptor,
+								&transfer->transfer_queue);
+							if (result < B_OK) {
+								transfer->transfer->Finished(result, 0);
+								transferDone = true;
+							};
+
+							transfer->data_descriptor = transfer->first_descriptor;
+							transfer->queue->AppendTransfer(transfer->transfer_queue);
 							break;
 						}
 
@@ -880,8 +865,6 @@ UHCI::FinishTransfers()
 						actualLength = 0;
 					}
 
-					FreeDescriptorChain(transfer->first_descriptor);
-					FreeTransferQueue(transfer->transfer_queue);
 					transfer->transfer->Finished(B_OK, actualLength);
 					transferDone = true;
 					break;
@@ -1223,6 +1206,45 @@ UHCI::AddTo(Stack *stack)
 	}
 
 	delete item;
+	return B_OK;
+}
+
+
+status_t
+UHCI::CreateFilledTransfer(Transfer *transfer, uhci_td **_firstDescriptor,
+	uhci_qh **_transferQueue)
+{
+	Pipe *pipe = transfer->TransferPipe();
+	bool directionIn = (pipe->Direction() == Pipe::In);
+
+	uhci_td *firstDescriptor = NULL;
+	uhci_td *lastDescriptor = NULL;
+	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
+		&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
+		transfer->VectorLength());
+
+	if (result < B_OK)
+		return result;
+	if (!firstDescriptor || !lastDescriptor)
+		return B_NO_MEMORY;
+
+	lastDescriptor->status |= TD_CONTROL_IOC;
+	lastDescriptor->link_phy = TD_TERMINATE;
+	lastDescriptor->link_log = 0;
+
+	if (!directionIn) {
+		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
+			transfer->VectorCount());
+	}
+
+	uhci_qh *transferQueue = CreateTransferQueue(firstDescriptor);
+	if (!transferQueue) {
+		FreeDescriptorChain(firstDescriptor);
+		return B_NO_MEMORY;
+	}
+
+	*_firstDescriptor = firstDescriptor;
+	*_transferQueue = transferQueue;
 	return B_OK;
 }
 
