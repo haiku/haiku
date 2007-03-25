@@ -447,18 +447,12 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case RAW_COMMAND_CONTROL_TRANSFER: {
-			if (command->control.length > B_PAGE_SIZE) {
-				command->control.status = RAW_STATUS_FAILED;
-				return B_OK;
-			}
-
 			benaphore_lock(&device->lock);
-			memcpy(device->buffer, command->control.data, command->control.length);
 			if (gUSBModule->queue_request(device->device,
 				command->control.request_type, command->control.request,
 				command->control.value, command->control.index,
-				command->control.length, device->buffer, usb_raw_callback,
-				device) < B_OK) {
+				command->control.length, command->control.data,
+				usb_raw_callback, device) < B_OK) {
 				command->control.status = RAW_STATUS_FAILED;
 				command->control.length = 0;
 				benaphore_unlock(&device->lock);
@@ -466,7 +460,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			acquire_sem(device->notify);
-			memcpy(command->control.data, device->buffer, command->control.length);
 			command->control.status = device->status;
 			command->control.length = device->actual_length;
 			benaphore_unlock(&device->lock);
@@ -475,11 +468,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case RAW_COMMAND_INTERRUPT_TRANSFER:
 		case RAW_COMMAND_BULK_TRANSFER: {
-			if (command->transfer.length > B_PAGE_SIZE) {
-				command->transfer.status = RAW_STATUS_FAILED;
-				return B_OK;
-			}
-
 			const usb_configuration_info *configurationInfo =
 				gUSBModule->get_configuration(device->device);
 			if (!configurationInfo) {
@@ -512,17 +500,16 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			benaphore_lock(&device->lock);
-			memcpy(device->buffer, command->transfer.data, command->transfer.length);
 
 			status_t status;
 			if (op == RAW_COMMAND_INTERRUPT_TRANSFER) {
 				status = gUSBModule->queue_interrupt(endpointInfo->handle,
-					device->buffer, command->transfer.length, usb_raw_callback,
-					device);
+					command->transfer.data, command->transfer.length,
+					usb_raw_callback, device);
 			} else {
 				status = gUSBModule->queue_bulk(endpointInfo->handle,
-					device->buffer, command->transfer.length, usb_raw_callback,
-					device);
+					command->transfer.data, command->transfer.length,
+					usb_raw_callback, device);
 			}
 
 			if (status < B_OK) {
@@ -533,7 +520,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			acquire_sem(device->notify);
-			memcpy(command->transfer.data, device->buffer, command->transfer.length);
 			command->transfer.status = device->status;
 			command->transfer.length = device->actual_length;
 			benaphore_unlock(&device->lock);

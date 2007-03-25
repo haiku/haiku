@@ -141,8 +141,6 @@ typedef struct {
 	sem_id				notify;
 	status_t			status;
 	size_t				actual_length;
-
-	uint8				buffer[B_PAGE_SIZE];
 } raw_device;
 
 #endif // _USB_RAW_H_
