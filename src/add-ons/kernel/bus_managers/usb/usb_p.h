@@ -85,6 +85,7 @@ typedef enum {
 #define USB_OBJECT_DEVICE				0x00000040
 #define USB_OBJECT_HUB					0x00000080
 
+#define USB_MAX_FRAGMENT_SIZE			B_PAGE_SIZE * 96
 
 class Stack {
 public:
@@ -528,6 +529,9 @@ public:
 		size_t						VectorCount() { return fVectorCount; };
 		size_t						VectorLength();
 
+		bool						IsFragmented() { return fFragmented; };
+		void						AdvanceByFragment(size_t actualLength);
+
 		void						SetCallback(usb_callback_func callback,
 										void *cookie);
 
@@ -539,6 +543,9 @@ private:
 		iovec						fData;
 		iovec						*fVector;
 		size_t						fVectorCount;
+		void						*fBaseAddress;
+		bool						fFragmented;
+		size_t						fActualLength;
 
 		usb_callback_func			fCallback;
 		void						*fCallbackCookie;

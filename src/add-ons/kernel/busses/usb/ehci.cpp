@@ -1055,11 +1055,11 @@ EHCI::FinishTransfers()
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 						area_id clonedArea = -1;
+						void *clonedMemory = NULL;
 						if (transfer->user_area >= B_OK) {
 							// we got a userspace output buffer, need to clone
 							// the area for that space first and map the iovecs
 							// to this cloned area.
-							void *clonedMemory = NULL;
 							clonedArea = clone_area("userspace accessor",
 								&clonedMemory, B_ANY_ADDRESS,
 								B_WRITE_AREA | B_KERNEL_WRITE_AREA,
@@ -1076,8 +1076,11 @@ EHCI::FinishTransfers()
 							&nextDataToggle);
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
-						if (clonedArea >= B_OK)
+						if (clonedArea >= B_OK) {
+							for (size_t i = 0; i < vectorCount; i++)
+								(uint8 *)vector[i].iov_base -= (addr_t)clonedMemory;
 							delete_area(clonedArea);
+						}
 #endif // !HAIKU_TARGET_PLATFORM_HAIKU
 					} else {
 						// calculate transfered length
@@ -1086,8 +1089,24 @@ EHCI::FinishTransfers()
 							&nextDataToggle);
 					}
 
-					UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
 					transfer->transfer->TransferPipe()->SetDataToggle(nextDataToggle);
+					if (transfer->transfer->IsFragmented()) {
+						// this transfer may still have data left
+						transfer->transfer->AdvanceByFragment(actualLength);
+						if (transfer->transfer->VectorLength() > 0) {
+							FreeDescriptorChain(transfer->data_descriptor);
+							FillQueueWithData(transfer->transfer,
+								transfer->queue_head,
+								&transfer->data_descriptor, NULL);
+							break;
+						}
+
+						// the transfer is done, but we already set the
+						// actualLength with AdvanceByFragment()
+						actualLength = 0;
+					}
+
+					UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
 					transfer->transfer->Finished(B_OK, actualLength);
 					transferDone = true;
 					break;
@@ -1348,7 +1367,8 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 	queueHead->overlay.alt_next_phy = EHCI_QTD_TERMINATE;
 
 	*_dataDescriptor = firstDescriptor;
-	*_directionIn = directionIn;
+	if (_directionIn)
+		*_directionIn = directionIn;
 	return B_OK;
 }
 

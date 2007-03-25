@@ -14,6 +14,9 @@ Transfer::Transfer(Pipe *pipe)
 	:	fPipe(pipe),
 		fVector(&fData),
 		fVectorCount(0),
+		fBaseAddress(NULL),
+		fFragmented(false),
+		fActualLength(0),
 		fCallback(NULL),
 		fCallbackCookie(NULL),
 		fRequestData(NULL)
@@ -42,6 +45,7 @@ Transfer::SetRequestData(usb_request_data *data)
 void
 Transfer::SetData(uint8 *data, size_t dataLength)
 {
+	fBaseAddress = data;
 	fData.iov_base = data;
 	fData.iov_len = dataLength;
 
@@ -56,6 +60,7 @@ Transfer::SetVector(iovec *vector, size_t vectorCount)
 	fVector = new(std::nothrow) iovec[vectorCount];
 	memcpy(fVector, vector, vectorCount * sizeof(iovec));
 	fVectorCount = vectorCount;
+	fBaseAddress = fVector[0].iov_base;
 }
 
 
@@ -65,7 +70,34 @@ Transfer::VectorLength()
 	size_t length = 0;
 	for (size_t i = 0; i < fVectorCount; i++)
 		length += fVector[i].iov_len;
+
+	// the data is to large and would overflow the allocator
+	if (length > USB_MAX_FRAGMENT_SIZE) {
+		length = USB_MAX_FRAGMENT_SIZE;
+		fFragmented = true;
+	}
+
 	return length;
+}
+
+
+void
+Transfer::AdvanceByFragment(size_t actualLength)
+{
+	size_t length = USB_MAX_FRAGMENT_SIZE;
+	for (size_t i = 0; i < fVectorCount; i++) {
+		if (fVector[i].iov_len <= length) {
+			length -= fVector[i].iov_len;
+			fVector[i].iov_len = 0;
+			continue;
+		}
+
+		(uint8 *)fVector[i].iov_base += length;
+		fVector[i].iov_len -= length;
+		break;
+	}
+
+	fActualLength += actualLength;
 }
 
 
@@ -81,5 +113,6 @@ void
 Transfer::Finished(uint32 status, size_t actualLength)
 {
 	if (fCallback)
-		fCallback(fCallbackCookie, status, fVector[0].iov_base, actualLength);
+		fCallback(fCallbackCookie, status, fBaseAddress,
+			fActualLength + actualLength);
 }

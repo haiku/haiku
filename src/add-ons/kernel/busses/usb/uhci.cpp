@@ -506,6 +506,13 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
+	return SubmitTransfer(transfer, false);
+}
+
+
+status_t
+UHCI::SubmitTransfer(Transfer *transfer, bool resubmit)
+{
 	Pipe *pipe = transfer->TransferPipe();
 	bool directionIn = (pipe->Direction() == Pipe::In);
 
@@ -539,6 +546,12 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	}
 
 	uhci_qh *transferQueue = CreateTransferQueue(firstDescriptor);
+	if (resubmit) {
+		// the transfer is already pending, we just submit another fragment
+		queue->AppendTransfer(transferQueue);
+		return B_OK;
+	}
+
 	result = AddPendingTransfer(transfer, queue, transferQueue,
 		firstDescriptor, firstDescriptor, directionIn);
 	if (result < B_OK) {
@@ -818,11 +831,11 @@ UHCI::FinishTransfers()
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 						area_id clonedArea = -1;
+						void *clonedMemory = NULL;
 						if (transfer->user_area >= B_OK) {
 							// we got a userspace output buffer, need to clone
 							// the area for that space first and map the iovecs
 							// to this cloned area.
-							void *clonedMemory = NULL;
 							clonedArea = clone_area("userspace accessor",
 								&clonedMemory, B_ANY_ADDRESS,
 								B_WRITE_AREA | B_KERNEL_WRITE_AREA,
@@ -839,8 +852,11 @@ UHCI::FinishTransfers()
 							&lastDataToggle);
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
-						if (clonedArea >= B_OK)
+						if (clonedArea >= B_OK) {
+							for (size_t i = 0; i < vectorCount; i++)
+								(uint8 *)vector[i].iov_base -= (addr_t)clonedMemory;
 							delete_area(clonedArea);
+						}
 #endif // !HAIKU_TARGET_PLATFORM_HAIKU
 					} else {
 						// read the actual length that was sent
@@ -848,9 +864,24 @@ UHCI::FinishTransfers()
 							transfer->first_descriptor, &lastDataToggle);
 					}
 
+					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
+					if (transfer->transfer->IsFragmented()) {
+						// this transfer may still have data left
+						transfer->transfer->AdvanceByFragment(actualLength);
+						if (transfer->transfer->VectorLength() > 0) {
+							// resubmit the advanced transfer so the rest
+							// of the buffers are transmitted over the bus
+							SubmitTransfer(transfer->transfer, true);
+							break;
+						}
+
+						// the transfer is done, but we already set the
+						// actualLength with AdvanceByFragment()
+						actualLength = 0;
+					}
+
 					FreeDescriptorChain(transfer->first_descriptor);
 					FreeTransferQueue(transfer->transfer_queue);
-					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
 					transfer->transfer->Finished(B_OK, actualLength);
 					transferDone = true;
 					break;
@@ -873,7 +904,6 @@ UHCI::FinishTransfers()
 					delete transfer->transfer;
 					delete transfer;
 					transfer = next;
-
 					Unlock();
 				}
 			} else {

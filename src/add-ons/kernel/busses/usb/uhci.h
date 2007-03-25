@@ -68,6 +68,7 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
+		status_t					SubmitTransfer(Transfer *transfer, bool resubmit);
 		status_t					SubmitRequest(Transfer *transfer);
 
 static	status_t					AddTo(Stack *stack);
