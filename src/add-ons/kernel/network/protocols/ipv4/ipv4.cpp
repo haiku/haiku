@@ -821,55 +821,56 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 				dprintf("IPv4::control(): get unknown option: %d\n", option);
 				return ENOPROTOOPT;
 		}
-	} else {
-		// set options
-
-		switch (option) {
-			case IP_HDRINCL:
-			{
-				int headerIncluded;
-				if (*_length != sizeof(int))
-					return B_BAD_VALUE;
-				if (user_memcpy(&headerIncluded, value, sizeof(headerIncluded)) < B_OK)
-					return B_BAD_ADDRESS;
-
-				if (headerIncluded)
-					protocol->flags |= IP_FLAG_HEADER_INCLUDED;
-				else
-					protocol->flags &= ~IP_FLAG_HEADER_INCLUDED;
-				break;
-			}
-
-			case IP_TTL:
-			{
-				int timeToLive;
-				if (*_length != sizeof(int))
-					return B_BAD_VALUE;
-				if (user_memcpy(&timeToLive, value, sizeof(timeToLive)) < B_OK)
-					return B_BAD_ADDRESS;
-
-				protocol->time_to_live = timeToLive;
-				break;
-			}
-
-			case IP_TOS:
-			{
-				int serviceType;
-				if (*_length != sizeof(int))
-					return B_BAD_VALUE;
-				if (user_memcpy(&serviceType, value, sizeof(serviceType)) < B_OK)
-					return B_BAD_ADDRESS;
-
-				protocol->service_type = serviceType;
-				break;
-			}
-
-			default:
-				dprintf("IPv4::control(): set unknown option: %d\n", option);
-				return ENOPROTOOPT;
-		}
 	}
 
+	// set options
+
+	switch (option) {
+		case IP_HDRINCL:
+		{
+			int headerIncluded;
+			if (*_length != sizeof(int))
+				return B_BAD_VALUE;
+			if (user_memcpy(&headerIncluded, value, sizeof(headerIncluded)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			if (headerIncluded)
+				protocol->flags |= IP_FLAG_HEADER_INCLUDED;
+			else
+				protocol->flags &= ~IP_FLAG_HEADER_INCLUDED;
+			return B_OK;
+		}
+
+		case IP_TTL:
+		{
+			int timeToLive;
+			if (*_length != sizeof(int))
+				return B_BAD_VALUE;
+			if (user_memcpy(&timeToLive, value, sizeof(timeToLive)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			protocol->time_to_live = timeToLive;
+			return B_OK;
+		}
+
+		case IP_TOS:
+		{
+			int serviceType;
+			if (*_length != sizeof(int))
+				return B_BAD_VALUE;
+			if (user_memcpy(&serviceType, value, sizeof(serviceType)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			protocol->service_type = serviceType;
+			return B_OK;
+		}
+
+		default:
+			dprintf("IPv4::control(): set unknown option: %d\n", option);
+			return ENOPROTOOPT;
+	}
+
+	// never gets here
 	return B_BAD_VALUE;
 }
 
