@@ -441,22 +441,16 @@ format_pointer(Context &context, msghdr *h)
 template<typename Type>
 class SignedIntegerTypeHandler : public TypeHandler {
 public:
-	SignedIntegerTypeHandler(const char *modifier)
-		: fModifier(modifier) {}
-
 	string GetParameterValue(Context &context, Parameter *,
 				 const void *address)
 	{
-		return context.FormatSigned(get_value<Type>(address), fModifier);
+		return context.FormatSigned(get_value<Type>(address), sizeof(Type));
 	}
 
 	string GetReturnValue(Context &context, uint64 value)
 	{
-		return context.FormatSigned(value, fModifier);
+		return context.FormatSigned(value, sizeof(Type));
 	}
-
-private:
-	const char *fModifier;
 };
 
 template<typename Type>
@@ -494,12 +488,12 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 		return new TypeHandlerImpl<type>(); \
 	}
 
-#define SIGNED_INTEGER_TYPE(type, modifier) \
+#define SIGNED_INTEGER_TYPE(type) \
 	template<> \
 	TypeHandler * \
 	TypeHandlerFactory<type>::Create() \
 	{ \
-		return new SignedIntegerTypeHandler<type>(modifier); \
+		return new SignedIntegerTypeHandler<type>(); \
 	}
 
 #define UNSIGNED_INTEGER_TYPE(type) \
@@ -516,11 +510,11 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 		return new SpecializedPointerTypeHandler<type>(); \
 	}
 
-SIGNED_INTEGER_TYPE(char, "hh");
-SIGNED_INTEGER_TYPE(short, "h");
-SIGNED_INTEGER_TYPE(int, "");
-SIGNED_INTEGER_TYPE(long, "l");
-SIGNED_INTEGER_TYPE(long long, "ll");
+SIGNED_INTEGER_TYPE(char);
+SIGNED_INTEGER_TYPE(short);
+SIGNED_INTEGER_TYPE(int);
+SIGNED_INTEGER_TYPE(long);
+SIGNED_INTEGER_TYPE(long long);
 
 UNSIGNED_INTEGER_TYPE(unsigned char);
 UNSIGNED_INTEGER_TYPE(unsigned short);

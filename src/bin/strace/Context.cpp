@@ -9,19 +9,41 @@
 
 #include "Context.h"
 
+#include <stdio.h>
+#include <string.h>
+
 
 string
-Context::FormatSigned(int64 value, const char *type) const
+Context::FormatSigned(int64 value, int bytes) const
 {
-	char modifier[16], tmp[32];
+	char tmp[32];
 
-	if (fDecimal)
-		snprintf(modifier, sizeof(modifier), "%%%si", type);
-	else
-		snprintf(modifier, sizeof(modifier), "0x%%%sx", type);
+	// decimal
 
-	snprintf(tmp, sizeof(tmp), modifier, value);
-	return tmp;
+	if (fDecimal) {
+		snprintf(tmp, sizeof(tmp), "%lld", value);
+		return tmp;
+	}
+
+	// hex
+
+	snprintf(tmp, sizeof(tmp), "0x%llx", value);
+
+	// Negative numbers are expanded when being converted to int64. Hence
+	// we skip all but the last 2 * bytes hex digits to retain the original
+	// type's width.
+	int len = strlen(tmp);
+	int offset = len - min_c(len, bytes * 2);
+
+	// use the existing "0x" prefix or prepend it again
+	if (offset <= 2) {
+		offset = 0;
+	} else {
+		tmp[--offset] = 'x';
+		tmp[--offset] = '0';
+	}
+	
+	return tmp + offset;
 }
 
 string

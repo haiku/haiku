@@ -37,7 +37,7 @@ public:
 	MemoryReader &Reader() { return fReader; }
 	bool GetContents(uint32 what) const { return fFlags & what; }
 
-	string FormatSigned(int64 value, const char *modifier = "ll") const;
+	string FormatSigned(int64 value, int bytes = 8) const;
 	string FormatUnsigned(uint64 value) const;
 	string FormatFlags(uint64 value) const;
 
