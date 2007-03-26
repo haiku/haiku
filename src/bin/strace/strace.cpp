@@ -61,7 +61,8 @@ static const char *kUsage =
 "  -a             - Don't print syscall arguments.\n"
 "  -c             - Don't colorize output.\n"
 "  -d <name>      - Filter the types that have their contents retrieved.\n"
-"                   <name> is one of: strings, enums, simple or complex\n"
+"                   <name> is one of: strings, enums, simple, complex or\n"
+"                                     pointer_values\n"
 "  -f             - Fast mode. Syscall arguments contents aren't retrieved.\n"
 "  -h, --help     - Print this text.\n"
 "  -i             - Print integers in decimal format instead of hexadecimal.\n"
@@ -483,6 +484,8 @@ main(int argc, const char *const *argv)
 					contentsFlags |= Context::SIMPLE_STRUCTS;
 				else if (strcasecmp(what, "complex") == 0)
 					contentsFlags |= Context::COMPLEX_STRUCTS;
+				else if (strcasecmp(what, "pointer_values") == 0)
+					contentsFlags |= Context::POINTER_VALUES;
 				else {
 					fprintf(stderr, "%s: Unknown content filter `%s'\n",
 						kCommandName, what);

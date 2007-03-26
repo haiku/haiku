@@ -27,7 +27,7 @@ struct ioctl_info {
 
 static const ioctl_info kIOCtls[] = {
 	// network stack ioctls
-	IOCTL_INFO_ENTRY(NET_STACK_SOCKET),
+	IOCTL_INFO_ENTRY_TYPE(NET_STACK_SOCKET, struct socket_args *),
 	IOCTL_INFO_ENTRY(NET_STACK_GET_COOKIE),
 	IOCTL_INFO_ENTRY(NET_STACK_CONTROL_NET_MODULE),
 	IOCTL_INFO_ENTRY(NET_STACK_GET_NEXT_STAT),

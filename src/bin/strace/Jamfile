@@ -9,7 +9,8 @@ UsePrivateHeaders net ;
 SubDirHdrs $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
 local straceSources =
-	Context.cpp ioctl.cpp MemoryReader.cpp strace.cpp TypeHandler.cpp
+	Context.cpp ioctl.cpp MemoryReader.cpp NetworkTypes.cpp
+	strace.cpp TypeHandler.cpp
 ;
 
 # Our compiler badly chokes when compiling the generated file. So will

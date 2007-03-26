@@ -101,6 +101,14 @@ DEFINE_FACTORY(fdset_ptr, struct fd_set *);
 DEFINE_FACTORY(sockaddr_args_ptr, struct sockaddr_args *);
 DEFINE_FACTORY(transfer_args_ptr, struct transfer_args *);
 DEFINE_FACTORY(sockopt_args_ptr, struct sockopt_args *);
+DEFINE_FACTORY(socket_args_ptr, struct socket_args *);
+
+DEFINE_FACTORY(int_ptr, int *);
+DEFINE_FACTORY(long_ptr, long *);
+DEFINE_FACTORY(longlong_ptr, long long *);
+DEFINE_FACTORY(uint_ptr, unsigned int *);
+DEFINE_FACTORY(ulong_ptr, unsigned long *);
+DEFINE_FACTORY(ulonglong_ptr, unsigned long long *);
 
 // partial specialization for generic pointers
 template<typename Type>
@@ -109,6 +117,13 @@ struct TypeHandlerFactory<Type*> {
 	{
 		return create_pointer_type_handler();
 	}
+};
+
+template<typename Type>
+class TypeHandlerImpl : public TypeHandler {
+public:
+	string GetParameterValue(Context &, Parameter *, const void *);
+	string GetReturnValue(Context &, uint64 value);
 };
 
 #endif	// STRACE_TYPE_HANDLER_H

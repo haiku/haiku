@@ -18,6 +18,7 @@ public:
 		ENUMERATIONS	= 1 << 1,
 		SIMPLE_STRUCTS	= 1 << 2,
 		COMPLEX_STRUCTS	= 1 << 3,
+		POINTER_VALUES	= 1 << 4,
 		ALL		= 0xffffffff
 	};
 
@@ -40,6 +41,8 @@ public:
 	string FormatSigned(int64 value, int bytes = 8) const;
 	string FormatUnsigned(uint64 value) const;
 	string FormatFlags(uint64 value) const;
+
+	string FormatPointer(const void *address) const;
 
 private:
 	Syscall *fSyscall;

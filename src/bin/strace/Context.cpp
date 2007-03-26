@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 string
 Context::FormatSigned(int64 value, int bytes) const
 {
@@ -42,7 +41,7 @@ Context::FormatSigned(int64 value, int bytes) const
 		tmp[--offset] = 'x';
 		tmp[--offset] = '0';
 	}
-	
+
 	return tmp + offset;
 }
 
@@ -60,4 +59,12 @@ Context::FormatFlags(uint64 value) const
 	char tmp[32];
 	snprintf(tmp, sizeof(tmp), "0x%llx", value);
 	return tmp;
+}
+
+string
+Context::FormatPointer(const void *address) const
+{
+	char buffer[32];
+	sprintf(buffer, "%p", address);
+	return buffer;
 }
