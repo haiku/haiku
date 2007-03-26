@@ -92,7 +92,7 @@ Transfer::AdvanceByFragment(size_t actualLength)
 			continue;
 		}
 
-		(uint8 *)fVector[i].iov_base += length;
+		fVector[i].iov_base = (void *)((uint8 *)fVector[i].iov_base + length);
 		fVector[i].iov_len -= length;
 		break;
 	}
