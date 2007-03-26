@@ -106,50 +106,10 @@ public:
 		return NULL;
 	}
 
-	static Syscall *GetSyscall(const char *);
-
 private:
 	string				fName;
 	Type				*fReturnType;
 	vector<Parameter*>	fParameters;
-};
-
-class Context {
-public:
-	enum {
-		STRINGS		= 1 << 0,
-		ENUMERATIONS	= 1 << 1,
-		SIMPLE_STRUCTS	= 1 << 2,
-		COMPLEX_STRUCTS	= 1 << 3,
-		ALL		= 0xffffffff
-	};
-
-        Context(Syscall *sc, char *data, MemoryReader &reader,
-		uint32 flags, bool decimal)
-                : fSyscall(sc), fData(data), fReader(reader),
-		  fFlags(flags), fDecimal(decimal) {}
-
-	Parameter *GetSibling(int32 index) const {
-		return fSyscall->ParameterAt(index);
-	}
-
-        const void *GetValue(Parameter *param) const {
-		return fData + param->Offset();
-	}
-
-	MemoryReader &Reader() { return fReader; }
-	bool GetContents(uint32 what) const { return fFlags & what; }
-
-	string FormatSigned(int64 value, const char *modifier = "ll") const;
-	string FormatUnsigned(uint64 value) const;
-	string FormatFlags(uint64 value) const;
-
-private:
-	Syscall *fSyscall;
-	char *fData;
-	MemoryReader &fReader;
-	uint32 fFlags;
-	bool fDecimal;
 };
 
 #endif	// STRACE_SYSCALL_H

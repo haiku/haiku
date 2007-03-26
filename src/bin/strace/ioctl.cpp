@@ -9,6 +9,7 @@
 #include <net_stack_driver.h>
 #include <termios.h>
 
+#include "strace.h"
 #include "Syscall.h"
 #include "TypeHandler.h"
 
@@ -80,7 +81,7 @@ patch_ioctl()
 			kIoctlTypeHandlers[kIOCtls[i].index] = kIOCtls[i].handler;
 	}
 
-	Syscall *ioctl = Syscall::GetSyscall("_kern_ioctl");
+	Syscall *ioctl = get_syscall("_kern_ioctl");
 
 	ioctl->GetParameter("cmd")->SetHandler(
 			new EnumTypeHandler(kIoctlNames));

@@ -17,6 +17,7 @@
 #include <image.h>
 #include <syscalls.h>
 
+#include "Context.h"
 #include "MemoryReader.h"
 #include "Syscall.h"
 #include "TypeHandler.h"
@@ -268,6 +269,18 @@ continue_thread(port_id nubPort, thread_id thread)
 	}
 }
 
+// get_syscall
+Syscall *
+get_syscall(const char *name)
+{
+	map<string, Syscall *>::const_iterator i = sSyscallMap.find(name);
+	if (i == sSyscallMap.end())
+		return NULL;
+
+	return i->second;
+}
+
+// patch_syscalls
 static void
 patch_syscalls()
 {
@@ -660,44 +673,4 @@ main(int argc, const char *const *argv)
 		fclose(outputFile);
 
 	return 0;
-}
-
-Syscall *
-Syscall::GetSyscall(const char *name)
-{
-	map<string, Syscall *>::const_iterator i = sSyscallMap.find(name);
-	if (i == sSyscallMap.end())
-		return NULL;
-
-	return i->second;
-}
-
-string
-Context::FormatSigned(int64 value, const char *type) const
-{
-	char modifier[16], tmp[32];
-
-	if (fDecimal)
-		snprintf(modifier, sizeof(modifier), "%%%si", type);
-	else
-		snprintf(modifier, sizeof(modifier), "0x%%%sx", type);
-
-	snprintf(tmp, sizeof(tmp), modifier, value);
-	return tmp;
-}
-
-string
-Context::FormatUnsigned(uint64 value) const
-{
-	char tmp[32];
-	snprintf(tmp, sizeof(tmp), fDecimal ? "%llu" : "0x%llx", value);
-	return tmp;
-}
-
-string
-Context::FormatFlags(uint64 value) const
-{
-	char tmp[32];
-	snprintf(tmp, sizeof(tmp), "0x%llx", value);
-	return tmp;
 }

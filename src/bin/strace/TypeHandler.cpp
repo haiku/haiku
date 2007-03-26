@@ -16,6 +16,7 @@
 
 #include <net_stack_driver.h>
 
+#include "Context.h"
 #include "MemoryReader.h"
 #include "Syscall.h"
 
