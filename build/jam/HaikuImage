@@ -20,18 +20,18 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = ;
 }
 
-BEOS_BIN = "[" addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
-	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
-	dstcheck du echo eject env error expr factor false fdinfo ffm find finddir fortune ftp funzip gawk
+BEOS_BIN = "[" addattr alert arp basename bc beep cat catattr chgrp chmod chop chown cksum clear
+	clockconfig cmp comm cp copyattr csplit cut date dc dd desklink df diff dircolors dirname driveinfo
+	dstcheck du echo eject env error expand expr factor false fdinfo ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
-	listport listres listsem ln locate logger logname ls lsindex make makebootable md5sum mimeset
-	mkdos mkdir mkindex modifiers mount mount_nfs mountvolume mv netstat open pathchk ping play playfile
-	playsound playwav ps pwd
+	listport listres listsem ln locate logger logname ls lsindex m4 make makebootable md5sum mimeset
+	mkdos mkdir mkindex modifiers mount mount_nfs mountvolume mv netstat nl od open
+	paste pathchk ping play playfile playsound playwav pr printenv printf ps ptx pwd
 	query quit release renice rescan rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
-	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
-	tail tar tcpdump tee telnet test top touch tput tr traceroute translate true tty uname unmount unrar unzip
-	unzipsfx uptime usb_dev_info version vim waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
+	setversion setvolume seq sh shutdown sleep sort split strace stty su sum sync sysinfo
+	tac tail tar tcpdump tee telnet test top touch tput tr traceroute translate true tsort tty uname unexpand unmount uniq unrar unzip
+	unzipsfx uptime usb_dev_info vdir version vim waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
 	zipcloak zipnote zipsplit zmore znew
 ;
 
@@ -173,6 +173,11 @@ AddSymlinkToHaikuImage beos bin : gzip : gunzip ;
 AddSymlinkToHaikuImage beos bin : gzip : zcat ;
 AddSymlinkToHaikuImage beos bin : zdiff : zcmp ;
 AddSymlinkToHaikuImage beos bin : unzip : zipinfo ;
+AddSymlinkToHaikuImage beos bin : gawk : awk ;
+AddSymlinkToHaikuImage beos bin : grep : egrep ;
+AddSymlinkToHaikuImage beos bin : grep : fgrep ;
+AddSymlinkToHaikuImage beos bin : vim : vi ;
+AddSymlinkToHaikuImage beos bin : vim : view ;
 
 
 # scripts and data files
