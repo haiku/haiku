@@ -59,8 +59,11 @@ static const char *kUsage =
 "Options:\n"
 "  -a             - Don't print syscall arguments.\n"
 "  -c             - Don't colorize output.\n"
+"  -d <name>      - Filter the types that have their contents retrieved.\n"
+"                   <name> is one of: strings, enums, simple or complex\n"
 "  -f             - Fast mode. Syscall arguments contents aren't retrieved.\n"
 "  -h, --help     - Print this text.\n"
+"  -i             - Print integers in decimal format instead of hexadecimal.\n"
 "  -l             - Also trace loading the excecutable. Only considered when\n"
 "                   an executable is provided.\n"
 "  -r             - Don't print syscall return values.\n"
@@ -87,7 +90,6 @@ static const char *const *sArgv;
 // syscalls
 static vector<Syscall*>			sSyscallVector;
 static map<string, Syscall*>	sSyscallMap;
-
 
 // print_usage
 void
@@ -266,6 +268,17 @@ continue_thread(port_id nubPort, thread_id thread)
 	}
 }
 
+static void
+patch_syscalls()
+{
+	// instead of having this done here manually we should either add the
+	// patching step to gensyscalls also manually or add metadata to
+	// kernel/syscalls.h and have it parsed automatically
+	extern void patch_ioctl();
+
+	patch_ioctl();
+}
+
 // init_syscalls
 static
 void
@@ -299,6 +312,8 @@ init_syscalls()
 		Syscall *syscall = sSyscallVector[i];
 		sSyscallMap[syscall->Name()] = syscall;
 	}
+
+	patch_syscalls();
 }
 
 // print_to_string
@@ -319,13 +334,16 @@ print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 static
 void
 print_syscall(FILE *outputFile, debug_post_syscall &message,
-	MemoryReader &memoryReader, bool printArguments, bool getContents,
-	bool printReturnValue, bool colorize)
+	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
+	bool printReturnValue, bool colorize, bool decimal)
 {
 	char buffer[4096], *string = buffer;
 	int32 length = (int32)sizeof(buffer);
 	int32 syscallNumber = message.syscall;
 	Syscall *syscall = sSyscallVector[syscallNumber];
+
+	Context ctx(syscall, (char *)message.args, memoryReader,
+		    contentsFlags, decimal);
 
 	// print syscall name
 	if (colorize) {
@@ -344,9 +362,9 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 			// get the value
 			Parameter *parameter = syscall->ParameterAt(i);
 			TypeHandler *handler = parameter->Handler();
-			::string value = handler->GetParameterValue(
-				(char*)message.args + parameter->Offset(), getContents,
-				memoryReader);
+			::string value =
+				handler->GetParameterValue(ctx, parameter,
+						ctx.GetValue(parameter));
 
 			print_to_string(&string, &length, (i > 0 ? ", %s" : "%s"),
 				value.c_str());
@@ -359,8 +377,7 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 	if (printReturnValue) {
 		Type *returnType = syscall->ReturnType();
 		TypeHandler *handler = returnType->Handler();
-		::string value = handler->GetReturnValue(message.return_value,
-			getContents, memoryReader);
+		::string value = handler->GetReturnValue(ctx, message.return_value);
 		if (value.length() > 0) {
 			print_to_string(&string, &length, " = %s", value.c_str());
 
@@ -414,6 +431,8 @@ main(int argc, const char *const *argv)
 	int32 programArgCount = 0;
 	bool printArguments = true;
 	bool colorize = true;
+	uint32 contentsFlags = 0;
+	bool decimalFormat = false;
 	bool fastMode = false;
 	bool traceLoading = false;
 	bool printReturnValues = true;
@@ -433,8 +452,33 @@ main(int argc, const char *const *argv)
 				printArguments = false;
 			} else if (strcmp(arg, "-c") == 0) {
 				colorize = false;
+			} else if (strcmp(arg, "-d") == 0) {
+				const char *what = NULL;
+
+				if (arg[2] == '\0'
+					&& argi + 1 < argc && argv[argi + 1][0] != '-') {
+					// next arg is what
+					what = argv[++argi];
+				} else
+					print_usage_and_exit(true);
+
+				if (strcasecmp(what, "strings") == 0)
+					contentsFlags |= Context::STRINGS;
+				else if (strcasecmp(what, "enums") == 0)
+					contentsFlags |= Context::ENUMERATIONS;
+				else if (strcasecmp(what, "simple") == 0)
+					contentsFlags |= Context::SIMPLE_STRUCTS;
+				else if (strcasecmp(what, "complex") == 0)
+					contentsFlags |= Context::COMPLEX_STRUCTS;
+				else {
+					fprintf(stderr, "%s: Unknown content filter `%s'\n",
+						kCommandName, what);
+					exit(1);
+				}
 			} else if (strcmp(arg, "-f") == 0) {
 				fastMode = true;
+			} else if (strcmp(arg, "-i") == 0) {
+				decimalFormat = true;
 			} else if (strcmp(arg, "-l") == 0) {
 				traceLoading = true;
 			} else if (strcmp(arg, "-r") == 0) {
@@ -479,6 +523,11 @@ main(int argc, const char *const *argv)
 	if (!programArgs)
 		print_usage_and_exit(true);
 
+	if (fastMode)
+		contentsFlags = 0;
+	else if (contentsFlags == 0)
+		contentsFlags = Context::ALL;
+
 	// initialize our syscalls vector and map
 	init_syscalls();
 
@@ -500,7 +549,7 @@ main(int argc, const char *const *argv)
 				programArgs[0], strerror(thread));
 			exit(1);
 		}
-	}		
+	}
 
 	// get the team ID, if we have none yet
 	if (team < 0) {
@@ -571,7 +620,8 @@ main(int argc, const char *const *argv)
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
 				print_syscall(outputFile, message.post_syscall, memoryReader,
-					printArguments, !fastMode, printReturnValues, colorize);
+					      printArguments, contentsFlags, printReturnValues,
+					      colorize, decimalFormat);
 
 				break;
 			}
@@ -610,4 +660,44 @@ main(int argc, const char *const *argv)
 		fclose(outputFile);
 
 	return 0;
+}
+
+Syscall *
+Syscall::GetSyscall(const char *name)
+{
+	map<string, Syscall *>::const_iterator i = sSyscallMap.find(name);
+	if (i == sSyscallMap.end())
+		return NULL;
+
+	return i->second;
+}
+
+string
+Context::FormatSigned(int64 value, const char *type) const
+{
+	char modifier[16], tmp[32];
+
+	if (fDecimal)
+		snprintf(modifier, sizeof(modifier), "%%%si", type);
+	else
+		snprintf(modifier, sizeof(modifier), "0x%%%sx", type);
+
+	snprintf(tmp, sizeof(tmp), modifier, value);
+	return tmp;
+}
+
+string
+Context::FormatUnsigned(uint64 value) const
+{
+	char tmp[32];
+	snprintf(tmp, sizeof(tmp), fDecimal ? "%llu" : "0x%llx", value);
+	return tmp;
+}
+
+string
+Context::FormatFlags(uint64 value) const
+{
+	char tmp[32];
+	snprintf(tmp, sizeof(tmp), "0x%llx", value);
+	return tmp;
 }
