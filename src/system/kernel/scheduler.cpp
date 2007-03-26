@@ -204,8 +204,8 @@ scheduler_reschedule(void)
 			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
 				break;
 
-			// skip normal threads sometimes (roughly 4%)
-			if (_rand() > 0x500)
+			// skip normal threads sometimes (roughly 16%)
+			if (_rand() > 0x1500)
 				break;
 
 			// skip until next lower priority
