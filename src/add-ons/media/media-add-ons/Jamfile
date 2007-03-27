@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons media media-add-ons ;
 # SubInclude HAIKU_TOP src add-ons media media-add-ons demultiplexer ;
 # SubInclude HAIKU_TOP src add-ons media media-add-ons reader ;
 # SubInclude HAIKU_TOP src add-ons media media-add-ons writer ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons esound_sink ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons legacy ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons mixer ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons multi_audio ;
