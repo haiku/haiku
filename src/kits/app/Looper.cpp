@@ -12,10 +12,10 @@
 /*!	BLooper class spawns a thread that runs a message loop. */
 
 #include <AppMisc.h>
+#include <AutoLocker.h>
 #include <DirectMessageTarget.h>
 #include <LooperList.h>
 #include <MessagePrivate.h>
-#include <ObjectLocker.h>
 #include <TokenSpace.h>
 
 #include <Autolock.h>
@@ -53,7 +53,6 @@ static BLocker sDebugPrintLocker("BLooper debug print");
 // Globals ---------------------------------------------------------------------
 using BPrivate::gDefaultTokens;
 using BPrivate::gLooperList;
-using BPrivate::BObjectLocker;
 using BPrivate::BLooperList;
 
 port_id _get_looper_port_(const BLooper* looper);
@@ -150,7 +149,7 @@ BLooper::~BLooper()
 	// Clean up our filters
 	SetCommonFilterList(NULL);
 
-	BObjectLocker<BLooperList> ListLock(gLooperList);
+	AutoLocker<BLooperList> ListLock(gLooperList);
 	RemoveHandler(this);
 
 	// Remove all the "child" handlers
@@ -824,7 +823,7 @@ status_t
 BLooper::_PostMessage(BMessage *msg, BHandler *handler,
 	BHandler *replyTo)
 {
-	BObjectLocker<BLooperList> listLocker(gLooperList);
+	AutoLocker<BLooperList> listLocker(gLooperList);
 	if (!listLocker.IsLocked())
 		return B_ERROR;
 
@@ -867,7 +866,7 @@ BLooper::_Lock(BLooper* looper, port_id port, bigtime_t timeout)
 	sem_id sem;
 
 	{
-		BObjectLocker<BLooperList> ListLock(gLooperList);
+		AutoLocker<BLooperList> ListLock(gLooperList);
 		if (!ListLock.IsLocked())
 			return B_BAD_VALUE;
 

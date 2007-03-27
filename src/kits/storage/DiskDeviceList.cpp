@@ -6,20 +6,18 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  */
 
-
-#include <DiskDevice.h>
 #include <DiskDeviceList.h>
+
+#include <AutoLocker.h>
+#include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceRoster.h>
 #include <Locker.h>
 #include <Looper.h>
-#include <ObjectLocker.h>
 #include <Partition.h>
 
 #include <new>
 using namespace std;
-
-using BPrivate::BObjectLocker;
 
 // constructor
 /*!	\brief Creates an empty BDiskDeviceList object.
@@ -48,7 +46,7 @@ BDiskDeviceList::~BDiskDeviceList()
 void
 BDiskDeviceList::MessageReceived(BMessage *message)
 {
-	BObjectLocker<BDiskDeviceList> _(this);
+	AutoLocker<BDiskDeviceList> _(this);
 	switch (message->what) {
 		case B_DEVICE_UPDATE:
 		{
@@ -110,7 +108,7 @@ void
 BDiskDeviceList::SetNextHandler(BHandler *handler)
 {
 	if (!handler) {
-		BObjectLocker<BDiskDeviceList> _(this);
+		AutoLocker<BDiskDeviceList> _(this);
 		if (fSubscribed) 
 			_StopWatching();
 	}
@@ -136,7 +134,7 @@ status_t
 BDiskDeviceList::Fetch()
 {
 	Unset();
-	BObjectLocker<BDiskDeviceList> _(this);
+	AutoLocker<BDiskDeviceList> _(this);
 	// register for notifications
 	status_t error = B_OK;
 	if (Looper())
@@ -172,7 +170,7 @@ BDiskDeviceList::Fetch()
 void
 BDiskDeviceList::Unset()
 {
-	BObjectLocker<BDiskDeviceList> _(this);
+	AutoLocker<BDiskDeviceList> _(this);
 	// unsubscribe from notification services
 	_StopWatching();
 	// empty the list

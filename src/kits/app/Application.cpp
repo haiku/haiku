@@ -11,10 +11,10 @@
 
 #include <AppMisc.h>
 #include <AppServerLink.h>
+#include <AutoLocker.h>
 #include <DraggerPrivate.h>
 #include <LooperList.h>
 #include <MenuWindow.h>
-#include <ObjectLocker.h>
 #include <PortLink.h>
 #include <RosterPrivate.h>
 #include <ServerMemoryAllocator.h>
@@ -810,7 +810,7 @@ BApplication::WindowAt(int32 index) const
 int32
 BApplication::CountLoopers() const
 {
-	BObjectLocker<BLooperList> ListLock(gLooperList);
+	AutoLocker<BLooperList> ListLock(gLooperList);
 	if (ListLock.IsLocked())
 		return gLooperList.CountLoopers();
 
@@ -823,7 +823,7 @@ BLooper *
 BApplication::LooperAt(int32 index) const
 {
 	BLooper *looper = NULL;
-	BObjectLocker<BLooperList> listLock(gLooperList);
+	AutoLocker<BLooperList> listLock(gLooperList);
 	if (listLock.IsLocked())
 		looper = gLooperList.LooperAt(index);
 
@@ -848,7 +848,7 @@ BApplication::GetAppInfo(app_info *info) const
 BResources *
 BApplication::AppResources()
 {
-	BObjectLocker<BLocker> lock(sAppResourcesLock);
+	AutoLocker<BLocker> lock(sAppResourcesLock);
 	
 	// BApplication caches its resources, so check
 	// if it already happened.
@@ -1324,7 +1324,7 @@ BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 {
 	BList looperList;
 	{
-		BObjectLocker<BLooperList> listLock(gLooperList);
+		AutoLocker<BLooperList> listLock(gLooperList);
 		if (listLock.IsLocked()) {
 			gLooperList.GetLooperList(&looperList);
 
@@ -1469,7 +1469,7 @@ BApplication::_GetWindowList(BList *list, bool includeMenus) const
 
 	// Windows are BLoopers, so we can just check each BLooper to see if it's
 	// a BWindow (or BMenuWindow)
-	BObjectLocker<BLooperList> listLock(gLooperList);
+	AutoLocker<BLooperList> listLock(gLooperList);
 	if (!listLock.IsLocked())
 		return B_ERROR;
 

@@ -8,8 +8,8 @@
 
 
 #include <AppMisc.h>
+#include <AutoLocker.h>
 #include <MessageUtils.h>
-#include "ObjectLocker.h"
 #include "TokenSpace.h"
 
 #include <Application.h>
@@ -36,7 +36,6 @@
 using BPrivate::gDefaultTokens;
 using BPrivate::gLooperList;
 using BPrivate::BLooperList;
-using BPrivate::BObjectLocker;
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -114,7 +113,7 @@ BMessenger::BMessenger(const BHandler* handler, const BLooper* looper,
 		}
 		// set port, token,...
 		if (error == B_OK) {
-			BObjectLocker<BLooperList> locker(gLooperList);
+			AutoLocker<BLooperList> locker(gLooperList);
 			if (locker.IsLocked() && gLooperList.IsLooperValid(looper)) {
 				fPort = looper->fMsgPort;
 				fHandlerToken = (handler
