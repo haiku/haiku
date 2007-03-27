@@ -783,6 +783,7 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 uint32
 parse_expression(const char *expression)
 {
+	// TODO: Implement expression parser (cf. BeBook).
 	return strtoul(expression, NULL, 0);
 }
 
