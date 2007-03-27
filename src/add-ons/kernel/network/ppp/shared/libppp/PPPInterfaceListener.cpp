@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,22 +40,22 @@ report_thread(void *data)
 	thread_id sender;
 	BMessage message;
 	
-	while(true) {
+	while (true) {
 		code = receive_data(&sender, &report, sizeof(report));
 		
-		if(code == kCodeQuitReportThread)
+		if (code == kCodeQuitReportThread)
 			break;
-		else if(code != PPP_REPORT_CODE)
+		else if (code != PPP_REPORT_CODE)
 			continue;
 		
 		BMessenger messenger(listener->Target());
-		if(messenger.IsValid()) {
+		if (messenger.IsValid()) {
 			message.MakeEmpty();
 			message.what = PPP_REPORT_MESSAGE;
 			message.AddInt32("type", report.type);
 			message.AddInt32("code", report.code);
 			
-			if(report.length >= sizeof(ppp_interface_id)
+			if (report.length >= sizeof(ppp_interface_id)
 					&& ((report.type == PPP_MANAGER_REPORT
 							&& report.code == PPP_REPORT_INTERFACE_CREATED)
 						|| report.type >= PPP_INTERFACE_REPORT_TYPE_MIN)) {
@@ -121,7 +121,7 @@ PPPInterfaceListener::~PPPInterfaceListener()
 status_t
 PPPInterfaceListener::InitCheck() const
 {
-	if(fReportThread < 0)
+	if (fReportThread < 0)
 		return B_ERROR;
 	
 	return Manager().InitCheck();
@@ -147,20 +147,20 @@ PPPInterfaceListener::SetTarget(BHandler *target)
 bool
 PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
 {
-	if(ID == fInterface)
+	if (ID == fInterface)
 		return true;
 	
 	StopWatchingInterface();
 	
-	if(ID == PPP_UNDEFINED_INTERFACE_ID)
+	if (ID == PPP_UNDEFINED_INTERFACE_ID)
 		return true;
 	
 	// enable reports
 	PPPInterface interface(ID);
-	if(interface.InitCheck() != B_OK)
+	if (interface.InitCheck() != B_OK)
 		return false;
 	
-	if(!interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, PPP_NO_FLAGS))
+	if (!interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, PPP_NO_FLAGS))
 		return false;
 	
 	fIsWatching = true;
@@ -185,7 +185,7 @@ PPPInterfaceListener::WatchManager()
 void
 PPPInterfaceListener::StopWatchingInterface()
 {
-	if(!fIsWatching)
+	if (!fIsWatching)
 		return;
 	
 	PPPInterface interface(fInterface);

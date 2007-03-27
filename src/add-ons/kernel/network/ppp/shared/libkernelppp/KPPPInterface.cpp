@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -77,9 +77,9 @@ status_t interface_deleter_thread(void *data);
 	\param parent (Optional): Interface's parent (only used for multilink interfaces).
 */
 KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
-		ppp_interface_id ID, const driver_settings *settings,
-		KPPPInterface *parent)
-	: KPPPLayer(name, PPP_INTERFACE_LEVEL, 2),
+	ppp_interface_id ID, const driver_settings *settings, KPPPInterface *parent)
+	:
+	KPPPLayer(name, PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
 	fSettings(NULL),
 	fIfnet(NULL),
@@ -111,14 +111,14 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 {
 	entry->interface = this;
 	
-	if(name) {
+	if (name) {
 		// load settings from description file
 		char path[B_PATH_NAME_LENGTH];
 		sprintf(path, "ptpnet/%s", name);
 			// XXX: TODO: change base path to "/etc/ptpnet"
 		
 		void *handle = load_driver_settings(path);
-		if(!handle) {
+		if (!handle) {
 			fInitStatus = B_ERROR;
 			return;
 		}
@@ -129,28 +129,28 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		fSettings = dup_driver_settings(settings);
 			// use the given settings
 	
-	if(!fSettings) {
+	if (!fSettings) {
 		fInitStatus = B_ERROR;
 		return;
 	}
 	
 	// add internal modules
 	// LCP
-	if(!AddProtocol(&LCP())) {
+	if (!AddProtocol(&LCP())) {
 		fInitStatus = B_ERROR;
 		return;
 	}
 	// MRU
 	_KPPPMRUHandler *mruHandler =
 		new _KPPPMRUHandler(*this);
-	if(!LCP().AddOptionHandler(mruHandler) || mruHandler->InitCheck() != B_OK) {
+	if (!LCP().AddOptionHandler(mruHandler) || mruHandler->InitCheck() != B_OK) {
 		ERROR("KPPPInterface: Could not add MRU handler!\n");
 		delete mruHandler;
 	}
 	// authentication
 	_KPPPAuthenticationHandler *authenticationHandler =
 		new _KPPPAuthenticationHandler(*this);
-	if(!LCP().AddOptionHandler(authenticationHandler)
+	if (!LCP().AddOptionHandler(authenticationHandler)
 			|| authenticationHandler->InitCheck() != B_OK) {
 		ERROR("KPPPInterface: Could not add authentication handler!\n");
 		delete authenticationHandler;
@@ -158,7 +158,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	// PFC
 	_KPPPPFCHandler *pfcHandler =
 		new _KPPPPFCHandler(fLocalPFCState, fPeerPFCState, *this);
-	if(!LCP().AddOptionHandler(pfcHandler) || pfcHandler->InitCheck() != B_OK) {
+	if (!LCP().AddOptionHandler(pfcHandler) || pfcHandler->InitCheck() != B_OK) {
 		ERROR("KPPPInterface: Could not add PFC handler!\n");
 		delete pfcHandler;
 	}
@@ -169,11 +169,11 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	fReconnectDelay = 1000;
 		// 1s delay between lost connection and reconnect
 	
-	if(get_module(PPP_INTERFACE_MODULE_NAME, (module_info**) &fManager) != B_OK)
+	if (get_module(PPP_INTERFACE_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		ERROR("KPPPInterface: Manager module not found!\n");
 	
 	// are we a multilink subinterface?
-	if(parent && parent->IsMultilink()) {
+	if (parent && parent->IsMultilink()) {
 		fParent = parent;
 		fParent->AddChild(this);
 		fIsMultilink = true;
@@ -181,7 +181,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	
 	RegisterInterface();
 	
-	if(!fSettings) {
+	if (!fSettings) {
 		fInitStatus = B_ERROR;
 		return;
 	}
@@ -196,17 +196,17 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	
 	// get DisonnectAfterIdleSince settings
 	value = get_settings_value(PPP_DISONNECT_AFTER_IDLE_SINCE_KEY, fSettings);
-	if(!value)
+	if (!value)
 		fDisconnectAfterIdleSince = 0;
 	else
 		fDisconnectAfterIdleSince = atoi(value) * 1000;
 	
-	if(fDisconnectAfterIdleSince < 0)
+	if (fDisconnectAfterIdleSince < 0)
 		fDisconnectAfterIdleSince = 0;
 	
 	// get mode settings
 	value = get_settings_value(PPP_MODE_KEY, fSettings);
-	if(value && !strcasecmp(value, PPP_SERVER_MODE_VALUE))
+	if (value && !strcasecmp(value, PPP_SERVER_MODE_VALUE))
 		fMode = PPP_SERVER_MODE;
 	else
 		fMode = PPP_CLIENT_MODE;
@@ -223,7 +223,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		get_settings_value(PPP_ASK_BEFORE_CONNECTING_KEY, fSettings), false);
 	
 	// load all protocols and the device
-	if(!LoadModules(fSettings, 0, fSettings->parameter_count)) {
+	if (!LoadModules(fSettings, 0, fSettings->parameter_count)) {
 		ERROR("KPPPInterface: Error loading modules!\n");
 		fInitStatus = B_ERROR;
 	}
@@ -237,21 +237,21 @@ KPPPInterface::~KPPPInterface()
 	
 	// tell protocols to uninit (remove routes, etc.)
 	KPPPProtocol *protocol = FirstProtocol();
-	for(; protocol; protocol = protocol->NextProtocol())
+	for (; protocol; protocol = protocol->NextProtocol())
 		protocol->Uninit();
 	
 	// make sure we are not accessible by any thread before we continue
 	UnregisterInterface();
 	
-	if(fManager)
+	if (fManager)
 		fManager->RemoveInterface(ID());
 	
 	// Call Down() until we get a lock on an interface that is down.
 	// This lock is not released until we are actually deleted.
-	while(true) {
+	while (true) {
 		Down();
 		fLock.Lock();
-		if(State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
+		if (State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
 			break;
 		fLock.Unlock();
 	}
@@ -264,30 +264,30 @@ KPPPInterface::~KPPPInterface()
 		// tell thread that we are being destroyed (200ms timeout)
 	wait_for_thread(fReconnectThread, &tmp);
 	
-	while(CountChildren())
+	while (CountChildren())
 		delete ChildAt(0);
 	
 	delete Device();
 	
-	while(FirstProtocol()) {
-		if(FirstProtocol() == &LCP())
+	while (FirstProtocol()) {
+		if (FirstProtocol() == &LCP())
 			fFirstProtocol = fFirstProtocol->NextProtocol();
 		else
 			delete FirstProtocol();
 				// destructor removes protocol from list
 	}
 	
-	for(int32 index = 0; index < fModules.CountItems(); index++) {
+	for (int32 index = 0; index < fModules.CountItems(); index++) {
 		put_module(fModules.ItemAt(index));
 		delete[] fModules.ItemAt(index);
 	}
 	
 	free_driver_settings(fSettings);
 	
-	if(Parent())
+	if (Parent())
 		Parent()->RemoveChild(this);
 	
-	if(fManager)
+	if (fManager)
 		put_module(PPP_INTERFACE_MODULE_NAME);
 }
 
@@ -298,7 +298,7 @@ KPPPInterface::Delete()
 {
 	LockerHelper locker(fLock);
 	
-	if(fDeleteCounter > 0)
+	if (fDeleteCounter > 0)
 		return;
 			// only one thread should delete us!
 	
@@ -314,17 +314,17 @@ KPPPInterface::Delete()
 status_t
 KPPPInterface::InitCheck() const
 {
-	if(fInitStatus != B_OK)
+	if (fInitStatus != B_OK)
 		return fInitStatus;
 	
-	if(!fSettings || !fManager)
+	if (!fSettings || !fManager)
 		return B_ERROR;
 	
 	// sub-interfaces should have a device
-	if(IsMultilink()) {
-		if(Parent() && !fDevice)
+	if (IsMultilink()) {
+		if (Parent() && !fDevice)
 			return B_ERROR;
-	} else if(!fDevice)
+	} else if (!fDevice)
 		return B_ERROR;
 	
 	return B_OK;
@@ -336,7 +336,7 @@ const char*
 KPPPInterface::Username() const
 {
 	// this data is not available before we authenticate
-	if(Phase() < PPP_AUTHENTICATION_PHASE)
+	if (Phase() < PPP_AUTHENTICATION_PHASE)
 		return NULL;
 	
 	return fUsername;
@@ -348,7 +348,7 @@ const char*
 KPPPInterface::Password() const
 {
 	// this data is not available before we authenticate
-	if(Phase() < PPP_AUTHENTICATION_PHASE)
+	if (Phase() < PPP_AUTHENTICATION_PHASE)
 		return NULL;
 	
 	return fPassword;
@@ -361,7 +361,7 @@ KPPPInterface::SetMRU(uint32 MRU)
 {
 	TRACE("KPPPInterface: SetMRU(%ld)\n", MRU);
 	
-	if(Device() && MRU > Device()->MTU() - 2)
+	if (Device() && MRU > Device()->MTU() - 2)
 		return false;
 	
 	LockerHelper locker(fLock);
@@ -380,7 +380,7 @@ KPPPInterface::PacketOverhead() const
 {
 	uint32 overhead = fHeaderLength + 2;
 	
-	if(Device())
+	if (Device())
 		overhead += Device()->Overhead();
 	
 	return overhead;
@@ -406,16 +406,17 @@ KPPPInterface::PacketOverhead() const
 status_t
 KPPPInterface::Control(uint32 op, void *data, size_t length)
 {
-	switch(op) {
-		case PPPC_GET_INTERFACE_INFO: {
-			if(length < sizeof(ppp_interface_info_t) || !data)
+	switch (op) {
+		case PPPC_GET_INTERFACE_INFO:
+		{
+			if (length < sizeof(ppp_interface_info_t) || !data)
 				return B_ERROR;
-			
+
 			ppp_interface_info *info = (ppp_interface_info*) data;
 			memset(info, 0, sizeof(ppp_interface_info_t));
-			if(Name())
+			if (Name())
 				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			if(Ifnet())
+			if (Ifnet())
 				info->if_unit = Ifnet()->if_unit;
 			else
 				info->if_unit = -1;
@@ -447,168 +448,182 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			info->hasDevice = Device();
 			info->isMultilink = IsMultilink();
 			info->hasParent = Parent();
-		} break;
-		
-		case PPPC_SET_USERNAME: {
-			if(!data)
+			break;
+		}
+
+		case PPPC_SET_USERNAME:
+		{
+			if (!data)
 				return B_ERROR;
-			
+
 			LockerHelper locker(fLock);
 			// login information can only be changed before we authenticate
-			if(Phase() >= PPP_AUTHENTICATION_PHASE)
+			if (Phase() >= PPP_AUTHENTICATION_PHASE)
 				return B_NOT_ALLOWED;
-			
+
 			free(fUsername);
 			fUsername = data ? strdup((const char*) data) : strdup("");
-		} break;
-		
-		case PPPC_SET_PASSWORD: {
-			if(!data)
+			break;
+		}
+
+		case PPPC_SET_PASSWORD:
+		{
+			if (!data)
 				return B_ERROR;
 			
 			LockerHelper locker(fLock);
 			// login information can only be changed before we authenticate
-			if(Phase() >= PPP_AUTHENTICATION_PHASE)
+			if (Phase() >= PPP_AUTHENTICATION_PHASE)
 				return B_NOT_ALLOWED;
 			
 			free(fPassword);
 			fPassword = data ? strdup((const char*) data) : strdup("");
-		} break;
-		
+			break;
+		}
+
 		case PPPC_SET_ASK_BEFORE_CONNECTING:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
-			
+
 			SetAskBeforeConnecting(*((uint32*)data));
-		break;
-		
+			break;
+
 		case PPPC_SET_MRU:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
-			
+
 			SetMRU(*((uint32*)data));
-		break;
-		
+			break;
+
 		case PPPC_SET_CONNECT_ON_DEMAND:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
-			
+
 			SetConnectOnDemand(*((uint32*)data));
-		break;
-		
+			break;
+
 		case PPPC_SET_AUTO_RECONNECT:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
 			
 			SetAutoReconnect(*((uint32*)data));
-		break;
-		
+			break;
+
 		case PPPC_HAS_INTERFACE_SETTINGS:
-			if(length < sizeof(driver_settings) || !data)
+			if (length < sizeof(driver_settings) || !data)
 				return B_ERROR;
-			
-			if(equal_interface_settings(Settings(), (driver_settings*) data))
+
+			if (equal_interface_settings(Settings(), (driver_settings*) data))
 				return B_OK;
 			else
 				return B_ERROR;
-		break;
-		
-		case PPPC_ENABLE_REPORTS: {
-			if(length < sizeof(ppp_report_request) || !data)
+			break;
+
+		case PPPC_ENABLE_REPORTS:
+		{
+			if (length < sizeof(ppp_report_request) || !data)
 				return B_ERROR;
-			
+
 			LockerHelper locker(fLock);
 			ppp_report_request *request = (ppp_report_request*) data;
 			// first, we send an initial state report
-			if(request->type == PPP_CONNECTION_REPORT) {
+			if (request->type == PPP_CONNECTION_REPORT) {
 				ppp_report_packet report;
 				report.type = PPP_CONNECTION_REPORT;
 				report.code = StateMachine().fLastConnectionReportCode;
 				report.length = sizeof(fID);
 				KPPPReportManager::SendReport(request->thread, &report);
-				if(request->flags & PPP_REMOVE_AFTER_REPORT)
+				if (request->flags & PPP_REMOVE_AFTER_REPORT)
 					return B_OK;
 			}
 			ReportManager().EnableReports(request->type, request->thread,
 				request->flags);
-		} break;
-		
-		case PPPC_DISABLE_REPORTS: {
-			if(length < sizeof(ppp_report_request) || !data)
+			break;
+		}
+
+		case PPPC_DISABLE_REPORTS:
+		{
+			if (length < sizeof(ppp_report_request) || !data)
 				return B_ERROR;
-			
+
 			ppp_report_request *request = (ppp_report_request*) data;
 			ReportManager().DisableReports(request->type, request->thread);
-		} break;
-		
-		case PPPC_GET_STATISTICS: {
-			if(length < sizeof(ppp_statistics) || !data)
+			break;
+		}
+
+		case PPPC_GET_STATISTICS:
+			if (length < sizeof(ppp_statistics) || !data)
 				return B_ERROR;
-			
+
 			memcpy(data, &fStatistics, sizeof(ppp_statistics));
-		} break;
-		
-		case PPPC_CONTROL_DEVICE: {
-			if(length < sizeof(ppp_control_info) || !data)
+			break;
+
+		case PPPC_CONTROL_DEVICE:
+		{
+			if (length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;
 			
 			ppp_control_info *control = (ppp_control_info*) data;
-			if(control->index != 0 || !Device())
+			if (control->index != 0 || !Device())
 				return B_BAD_INDEX;
-			
+
 			return Device()->Control(control->op, control->data, control->length);
-		} break;
-		
-		case PPPC_CONTROL_PROTOCOL: {
-			if(length < sizeof(ppp_control_info) || !data)
+		}
+
+		case PPPC_CONTROL_PROTOCOL:
+		{
+			if (length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;
 			
 			ppp_control_info *control = (ppp_control_info*) data;
 			KPPPProtocol *protocol = ProtocolAt(control->index);
-			if(!protocol)
+			if (!protocol)
 				return B_BAD_INDEX;
 			
 			return protocol->Control(control->op, control->data, control->length);
-		} break;
-		
-		case PPPC_CONTROL_OPTION_HANDLER: {
-			if(length < sizeof(ppp_control_info) || !data)
+		}
+
+		case PPPC_CONTROL_OPTION_HANDLER:
+		{
+			if (length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;
-			
+
 			ppp_control_info *control = (ppp_control_info*) data;
 			KPPPOptionHandler *optionHandler = LCP().OptionHandlerAt(control->index);
-			if(!optionHandler)
+			if (!optionHandler)
 				return B_BAD_INDEX;
-			
+
 			return optionHandler->Control(control->op, control->data,
 				control->length);
-		} break;
-		
-		case PPPC_CONTROL_LCP_EXTENSION: {
-			if(length < sizeof(ppp_control_info) || !data)
+		}
+
+		case PPPC_CONTROL_LCP_EXTENSION: 
+		{
+			if (length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;
-			
+
 			ppp_control_info *control = (ppp_control_info*) data;
 			KPPPLCPExtension *lcpExtension = LCP().LCPExtensionAt(control->index);
-			if(!lcpExtension)
+			if (!lcpExtension)
 				return B_BAD_INDEX;
-			
+
 			return lcpExtension->Control(control->op, control->data,
 				control->length);
-		} break;
-		
-		case PPPC_CONTROL_CHILD: {
-			if(length < sizeof(ppp_control_info) || !data)
+		}
+
+		case PPPC_CONTROL_CHILD:
+		{
+			if (length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;
-			
+
 			ppp_control_info *control = (ppp_control_info*) data;
 			KPPPInterface *child = ChildAt(control->index);
-			if(!child)
+			if (!child)
 				return B_BAD_INDEX;
-			
+
 			return child->Control(control->op, control->data, control->length);
-		} break;
-		
+		}
+
 		default:
 			return B_BAD_VALUE;
 	}
@@ -634,26 +649,26 @@ KPPPInterface::SetDevice(KPPPDevice *device)
 {
 	TRACE("KPPPInterface: SetDevice(%p)\n", device);
 	
-	if(device && &device->Interface() != this)
+	if (device && &device->Interface() != this)
 		return false;
 	
-	if(IsMultilink() && !Parent())
+	if (IsMultilink() && !Parent())
 		return false;
 			// main interfaces do not have devices
 	
 	LockerHelper locker(fLock);
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if (Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
-	if(fDevice && (IsUp() || fDevice->IsUp()))
+	if (fDevice && (IsUp() || fDevice->IsUp()))
 		Down();
 	
 	fDevice = device;
 	SetNext(device);
 	
-	if(fDevice)
+	if (fDevice)
 		fMRU = fDevice->MTU() - 2;
 	
 	CalculateInterfaceMTU();
@@ -685,28 +700,28 @@ KPPPInterface::AddProtocol(KPPPProtocol *protocol)
 	TRACE("KPPPInterface: AddProtocol(%X)\n",
 		protocol ? protocol->ProtocolNumber() : 0);
 	
-	if(!protocol || &protocol->Interface() != this
+	if (!protocol || &protocol->Interface() != this
 			|| protocol->Level() == PPP_INTERFACE_LEVEL)
 		return false;
 	
 	LockerHelper locker(fLock);
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if (Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
 	KPPPProtocol *current = fFirstProtocol, *previous = NULL;
 	
-	while(current) {
-		if(current->Level() < protocol->Level())
+	while (current) {
+		if (current->Level() < protocol->Level())
 			break;
 		
 		previous = current;
 		current = current->NextProtocol();
 	}
 	
-	if(!current) {
-		if(!previous)
+	if (!current) {
+		if (!previous)
 			fFirstProtocol = protocol;
 		else
 			previous->SetNextProtocol(protocol);
@@ -719,16 +734,16 @@ KPPPInterface::AddProtocol(KPPPProtocol *protocol)
 	} else {
 		protocol->SetNextProtocol(current);
 		
-		if(!previous)
+		if (!previous)
 			fFirstProtocol = protocol;
 		else
 			previous->SetNextProtocol(protocol);
 	}
 	
-	if(protocol->Level() < PPP_PROTOCOL_LEVEL)
+	if (protocol->Level() < PPP_PROTOCOL_LEVEL)
 		CalculateInterfaceMTU();
 	
-	if(IsUp() || Phase() >= protocol->ActivationPhase())
+	if (IsUp() || Phase() >= protocol->ActivationPhase())
 		protocol->Up();
 	
 	return true;
@@ -755,22 +770,22 @@ KPPPInterface::RemoveProtocol(KPPPProtocol *protocol)
 	
 	LockerHelper locker(fLock);
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if (Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
 	KPPPProtocol *current = fFirstProtocol, *previous = NULL;
 	
-	while(current) {
-		if(current == protocol) {
-			if(!protocol->IsDown())
+	while (current) {
+		if (current == protocol) {
+			if (!protocol->IsDown())
 				protocol->Down();
 			
-			if(previous) {
+			if (previous) {
 				previous->SetNextProtocol(current->NextProtocol());
 				
 				// set us as next layer if needed
-				if(!previous->Next())
+				if (!previous->Next())
 					previous->SetNext(this);
 			} else
 				fFirstProtocol = current->NextProtocol();
@@ -799,7 +814,7 @@ KPPPInterface::CountProtocols() const
 	KPPPProtocol *protocol = FirstProtocol();
 	
 	int32 count = 0;
-	for(; protocol; protocol = protocol->NextProtocol())
+	for (; protocol; protocol = protocol->NextProtocol())
 		++count;
 	
 	return count;
@@ -815,7 +830,7 @@ KPPPInterface::ProtocolAt(int32 index) const
 	KPPPProtocol *protocol = FirstProtocol();
 	
 	int32 currentIndex = 0;
-	for(; protocol && currentIndex != index; protocol = protocol->NextProtocol())
+	for (; protocol && currentIndex != index; protocol = protocol->NextProtocol())
 		++currentIndex;
 	
 	return protocol;
@@ -838,8 +853,8 @@ KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start) const
 	
 	KPPPProtocol *current = start ? start : FirstProtocol();
 	
-	for(; current; current = current->NextProtocol()) {
-		if(current->ProtocolNumber() == protocolNumber
+	for (; current; current = current->NextProtocol()) {
+		if (current->ProtocolNumber() == protocolNumber
 				|| (current->Flags() & PPP_INCLUDES_NCP
 					&& (current->ProtocolNumber() & 0x7FFF)
 						== (protocolNumber & 0x7FFF)))
@@ -856,12 +871,12 @@ KPPPInterface::AddChild(KPPPInterface *child)
 {
 	TRACE("KPPPInterface: AddChild(%lX)\n", child ? child->ID() : 0);
 	
-	if(!child)
+	if (!child)
 		return false;
 	
 	LockerHelper locker(fLock);
 	
-	if(fChildren.HasItem(child) || !fChildren.AddItem(child))
+	if (fChildren.HasItem(child) || !fChildren.AddItem(child))
 		return false;
 	
 	child->SetParent(this);
@@ -878,13 +893,13 @@ KPPPInterface::RemoveChild(KPPPInterface *child)
 	
 	LockerHelper locker(fLock);
 	
-	if(!fChildren.RemoveItem(child))
+	if (!fChildren.RemoveItem(child))
 		return false;
 	
 	child->SetParent(NULL);
 	
 	// parents cannot exist without their children
-	if(CountChildren() == 0 && fManager && Ifnet())
+	if (CountChildren() == 0 && fManager && Ifnet())
 		Delete();
 	
 	return true;
@@ -901,7 +916,7 @@ KPPPInterface::ChildAt(int32 index) const
 	
 	KPPPInterface *child = fChildren.ItemAt(index);
 	
-	if(child == fChildren.GetDefaultItem())
+	if (child == fChildren.GetDefaultItem())
 		return NULL;
 	
 	return child;
@@ -914,7 +929,7 @@ KPPPInterface::SetAutoReconnect(bool autoReconnect)
 {
 	TRACE("KPPPInterface: SetAutoReconnect(%s)\n", autoReconnect ? "true" : "false");
 	
-	if(Mode() != PPP_CLIENT_MODE)
+	if (Mode() != PPP_CLIENT_MODE)
 		return;
 	
 	fAutoReconnect = autoReconnect;
@@ -933,11 +948,11 @@ KPPPInterface::SetConnectOnDemand(bool connectOnDemand)
 	LockerHelper locker(fLock);
 	
 	// Only clients support ConnectOnDemand.
-	if(Mode() != PPP_CLIENT_MODE) {
+	if (Mode() != PPP_CLIENT_MODE) {
 		TRACE("KPPPInterface::SetConnectOnDemand(): Wrong mode!\n");
 		fConnectOnDemand = false;
 		return;
-	} else if(DoesConnectOnDemand() == connectOnDemand)
+	} else if (DoesConnectOnDemand() == connectOnDemand)
 		return;
 	
 	fConnectOnDemand = connectOnDemand;
@@ -947,8 +962,8 @@ KPPPInterface::SetConnectOnDemand(bool connectOnDemand)
 	// - enabling: this cannot happen because hidden interfaces are deleted if they
 	//    could not establish a connection (the user cannot access hidden interfaces)
 	// - disabling: the interface disappears as seen from the user, so we delete it
-	if(!Parent() && State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE) {
-		if(!connectOnDemand)
+	if (!Parent() && State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE) {
+		if (!connectOnDemand)
 			Delete();
 				// as long as the protocols were not configured we can just delete us
 		
@@ -956,11 +971,11 @@ KPPPInterface::SetConnectOnDemand(bool connectOnDemand)
 	}
 	
 	// check if we need to set/unset flags
-	if(connectOnDemand) {
-		if(Ifnet())
+	if (connectOnDemand) {
+		if (Ifnet())
 			Ifnet()->if_flags |= IFF_UP;
-	} else if(!connectOnDemand && Phase() < PPP_ESTABLISHED_PHASE) {
-		if(Ifnet())
+	} else if (!connectOnDemand && Phase() < PPP_ESTABLISHED_PHASE) {
+		if (Ifnet())
 			Ifnet()->if_flags &= ~IFF_UP;
 	}
 }
@@ -975,7 +990,7 @@ KPPPInterface::SetAskBeforeConnecting(bool ask)
 	bool old = fAskBeforeConnecting;
 	fAskBeforeConnecting = ask;
 	
-	if(old && fAskBeforeConnecting == false && State() == PPP_STARTING_STATE
+	if (old && fAskBeforeConnecting == false && State() == PPP_STARTING_STATE
 			&& Phase() == PPP_DOWN_PHASE) {
 		locker.UnlockNow();
 		StateMachine().ContinueOpenEvent();
@@ -991,7 +1006,7 @@ KPPPInterface::SetPFCOptions(uint8 pfcOptions)
 	
 	LockerHelper locker(fLock);
 	
-	if(PFCOptions() & PPP_FREEZE_PFC_OPTIONS)
+	if (PFCOptions() & PPP_FREEZE_PFC_OPTIONS)
 		return false;
 	
 	fPFCOptions = pfcOptions;
@@ -1011,10 +1026,10 @@ KPPPInterface::Up()
 {
 	TRACE("KPPPInterface: Up()\n");
 	
-	if(InitCheck() != B_OK || Phase() == PPP_TERMINATION_PHASE)
+	if (InitCheck() != B_OK || Phase() == PPP_TERMINATION_PHASE)
 		return false;
 	
-	if(IsUp())
+	if (IsUp())
 		return true;
 	
 	LockerHelper locker(fLock);
@@ -1036,9 +1051,9 @@ KPPPInterface::Down()
 {
 	TRACE("KPPPInterface: Down()\n");
 	
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return false;
-	else if(State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
+	else if (State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
 		return true;
 	
 	send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
@@ -1057,7 +1072,7 @@ KPPPInterface::WaitForConnection()
 {
 	TRACE("KPPPInterface: WaitForConnection()\n");
 	
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return false;
 	
 	ReportManager().EnableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
@@ -1065,19 +1080,19 @@ KPPPInterface::WaitForConnection()
 	ppp_report_packet report;
 	thread_id sender;
 	bool successful = false;
-	while(true) {
-		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
+	while (true) {
+		if (receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
 			continue;
 		
-		if(report.type == PPP_DESTRUCTION_REPORT)
+		if (report.type == PPP_DESTRUCTION_REPORT)
 			break;
-		else if(report.type != PPP_CONNECTION_REPORT)
+		else if (report.type != PPP_CONNECTION_REPORT)
 			continue;
 		
-		if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
+		if (report.code == PPP_REPORT_UP_SUCCESSFUL) {
 			successful = true;
 			break;
-		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL)
+		} else if (report.code == PPP_REPORT_DOWN_SUCCESSFUL)
 			break;
 	}
 	
@@ -1099,7 +1114,7 @@ KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 {
 	TRACE("KPPPInterface: LoadModules()\n");
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if (Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -1109,11 +1124,11 @@ KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 	const char *name = NULL;
 	
 	// multilink handling
-	for(int32 index = start;
+	for (int32 index = start;
 			index < settings->parameter_count && index < (start + count); index++) {
-		if(!strcasecmp(settings->parameters[index].name, PPP_MULTILINK_KEY)
+		if (!strcasecmp(settings->parameters[index].name, PPP_MULTILINK_KEY)
 				&& settings->parameters[index].value_count > 0) {
-			if(!LoadModule(settings->parameters[index].values[0],
+			if (!LoadModule(settings->parameters[index].values[0],
 					&settings->parameters[index], PPP_MULTILINK_KEY_TYPE))
 				return false;
 			break;
@@ -1121,32 +1136,32 @@ KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 	}
 	
 	// are we a multilink main interface?
-	if(IsMultilink() && !Parent()) {
+	if (IsMultilink() && !Parent()) {
 		// main interfaces only load the multilink module
 		// and create a child using their settings
 		fManager->CreateInterface(settings, ID());
 		return true;
 	}
 	
-	for(int32 index = start;
+	for (int32 index = start;
 			index < settings->parameter_count && index < start + count; index++) {
 		type = PPP_UNDEFINED_KEY_TYPE;
 		
 		name = settings->parameters[index].name;
 		
-		if(!strcasecmp(name, PPP_LOAD_MODULE_KEY))
+		if (!strcasecmp(name, PPP_LOAD_MODULE_KEY))
 			type = PPP_LOAD_MODULE_KEY_TYPE;
-		else if(!strcasecmp(name, PPP_DEVICE_KEY))
+		else if (!strcasecmp(name, PPP_DEVICE_KEY))
 			type = PPP_DEVICE_KEY_TYPE;
-		else if(!strcasecmp(name, PPP_PROTOCOL_KEY))
+		else if (!strcasecmp(name, PPP_PROTOCOL_KEY))
 			type = PPP_PROTOCOL_KEY_TYPE;
-		else if(!strcasecmp(name, PPP_AUTHENTICATOR_KEY))
+		else if (!strcasecmp(name, PPP_AUTHENTICATOR_KEY))
 			type = PPP_AUTHENTICATOR_KEY_TYPE;
 		
-		if(type >= 0)
-			for(int32 value_id = 0; value_id < settings->parameters[index].value_count;
+		if (type >= 0)
+			for (int32 value_id = 0; value_id < settings->parameters[index].value_count;
 					value_id++)
-				if(!LoadModule(settings->parameters[index].values[value_id],
+				if (!LoadModule(settings->parameters[index].values[value_id],
 						&settings->parameters[index], type))
 					return false;
 	}
@@ -1169,11 +1184,11 @@ KPPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 {
 	TRACE("KPPPInterface: LoadModule(%s)\n", name ? name : "XXX: NO NAME");
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if (Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
-	if(!name || strlen(name) > B_FILE_NAME_LENGTH)
+	if (!name || strlen(name) > B_FILE_NAME_LENGTH)
 		return false;
 	
 	char *moduleName = new char[B_PATH_NAME_LENGTH];
@@ -1181,7 +1196,7 @@ KPPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 	sprintf(moduleName, "%s/%s", PPP_MODULES_PATH, name);
 	
 	ppp_module_info *module;
-	if(get_module(moduleName, (module_info**) &module) != B_OK) {
+	if (get_module(moduleName, (module_info**) &module) != B_OK) {
 		delete[] moduleName;
 		return false;
 	}
@@ -1222,13 +1237,13 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 	TRACE("KPPPInterface: Send(0x%X)\n", protocolNumber);
 	
-	if(!packet)
+	if (!packet)
 		return B_ERROR;
 	
 	// we must pass the basic tests like:
 	// do we have a device?
 	// did we load all modules?
-	if(InitCheck() != B_OK) {
+	if (InitCheck() != B_OK) {
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1236,7 +1251,7 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	// go up if ConnectOnDemand is enabled and we are disconnected
 	// TODO: our new netstack will simplify ConnectOnDemand handling, so
 	// we do not have to handle it here
-	if((protocolNumber != PPP_LCP_PROTOCOL && DoesConnectOnDemand()
+	if ((protocolNumber != PPP_LCP_PROTOCOL && DoesConnectOnDemand()
 			&& (Phase() == PPP_DOWN_PHASE
 				|| Phase() == PPP_ESTABLISHMENT_PHASE)
 			&& !Up()) || !WaitForConnection()) {
@@ -1246,25 +1261,25 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	
 	// find the protocol handler for the current protocol number
 	KPPPProtocol *protocol = ProtocolFor(protocolNumber);
-	while(protocol && !protocol->IsEnabled())
+	while (protocol && !protocol->IsEnabled())
 		protocol = protocol->NextProtocol() ?
 			ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL;
 	
 #if DEBUG
-	if(!protocol)
+	if (!protocol)
 		TRACE("KPPPInterface::Send(): no protocol found!\n");
-	else if(!Device()->IsUp())
+	else if (!Device()->IsUp())
 		TRACE("KPPPInterface::Send(): device is not up!\n");
-	else if(!protocol->IsEnabled())
+	else if (!protocol->IsEnabled())
 		TRACE("KPPPInterface::Send(): protocol not enabled!\n");
-	else if(!IsProtocolAllowed(*protocol))
+	else if (!IsProtocolAllowed(*protocol))
 		TRACE("KPPPInterface::Send(): protocol not allowed to send!\n");
 	else
 		TRACE("KPPPInterface::Send(): protocol allowed\n");
 #endif
 	
 	// make sure that protocol is allowed to send and everything is up
-	if(!Device()->IsUp() || !protocol || !protocol->IsEnabled()
+	if (!Device()->IsUp() || !protocol || !protocol->IsEnabled()
 			|| !IsProtocolAllowed(*protocol)) {
 		ERROR("KPPPInterface::Send(): cannot send!\n");
 		m_freem(packet);
@@ -1272,10 +1287,10 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	}
 	
 	// encode in ppp frame and consider using PFC
-	if(UseLocalPFC() && protocolNumber & 0xFF00 == 0) {
+	if (UseLocalPFC() && protocolNumber & 0xFF00 == 0) {
 		M_PREPEND(packet, 1);
 		
-		if(packet == NULL)
+		if (packet == NULL)
 			return B_ERROR;
 		
 		uint8 *header = mtod(packet, uint8*);
@@ -1283,7 +1298,7 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	} else {
 		M_PREPEND(packet, 2);
 		
-		if(packet == NULL)
+		if (packet == NULL)
 			return B_ERROR;
 		
 		// set protocol (the only header field)
@@ -1293,12 +1308,12 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	}
 	
 	// pass to device if we're either not a multilink interface or a child interface
-	if(!IsMultilink() || Parent()) {
+	if (!IsMultilink() || Parent()) {
 		// check if packet is too big for device
 		uint32 length = packet->m_flags & M_PKTHDR ? (uint32) packet->m_pkthdr.len :
 			packet->m_len;
 		
-		if(length > MRU()) {
+		if (length > MRU()) {
 			m_freem(packet);
 			return B_ERROR;
 		}
@@ -1337,7 +1352,7 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	TRACE("KPPPInterface: Receive(0x%X)\n", protocolNumber);
 	
-	if(!packet)
+	if (!packet)
 		return B_ERROR;
 	
 	LockerHelper locker(fLock);
@@ -1350,7 +1365,7 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	// interface is a main interface and at the same time not registered
 	// because then there is no receiver interface.
 	// PPP NCPs should be aware of that!
-	if(packet->m_flags & M_PKTHDR && Ifnet() != NULL)
+	if (packet->m_flags & M_PKTHDR && Ifnet() != NULL)
 		packet->m_pkthdr.rcvif = Ifnet();
 	
 	// Find handler and let it parse the packet.
@@ -1358,17 +1373,17 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	// the handler might be upped by this packet.
 	// If authenticating we only allow authentication phase protocols.
 	KPPPProtocol *protocol = ProtocolFor(protocolNumber);
-	for(; protocol;
+	for (; protocol;
 			protocol = protocol->NextProtocol() ?
 				ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL) {
 		TRACE("KPPPInterface::Receive(): trying protocol\n");
 		
-		if(!protocol->IsEnabled() || !IsProtocolAllowed(*protocol))
+		if (!protocol->IsEnabled() || !IsProtocolAllowed(*protocol))
 			continue;
 				// skip handler if disabled or not allowed
 		
 		result = protocol->Receive(packet, protocolNumber);
-		if(result == PPP_UNHANDLED)
+		if (result == PPP_UNHANDLED)
 			continue;
 		
 		return result;
@@ -1377,10 +1392,10 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	TRACE("KPPPInterface::Receive(): trying parent\n");
 	
 	// maybe the parent interface can handle the packet
-	if(Parent())
+	if (Parent())
 		return Parent()->Receive(packet, protocolNumber);
 	
-	if(result == PPP_UNHANDLED) {
+	if (result == PPP_UNHANDLED) {
 		m_freem(packet);
 		return PPP_DISCARDED;
 	} else {
@@ -1408,10 +1423,10 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 {
 	TRACE("KPPPInterface: ReceiveFromDevice()\n");
 	
-	if(!packet)
+	if (!packet)
 		return B_ERROR;
 	
-	if(InitCheck() != B_OK) {
+	if (InitCheck() != B_OK) {
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1421,7 +1436,7 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 	
 	// decode ppp frame and recognize PFC
 	uint16 protocolNumber = *mtod(packet, uint8*);
-	if(protocolNumber & 1) {
+	if (protocolNumber & 1) {
 		m_adj(packet, 1);
 	} else {
 		protocolNumber = ntohs(*mtod(packet, uint16*));
@@ -1440,21 +1455,21 @@ KPPPInterface::Pulse()
 {
 	LockerHelper locker(fLock);
 	
-	if(Device())
+	if (Device())
 		Device()->Pulse();
 	
 	KPPPProtocol *protocol = FirstProtocol();
-	for(; protocol; protocol = protocol->NextProtocol())
+	for (; protocol; protocol = protocol->NextProtocol())
 		protocol->Pulse();
 	
 	uint32 currentTime = real_time_clock();
-	if(fUpdateIdleSince) {
+	if (fUpdateIdleSince) {
 		fIdleSince = currentTime;
 		fUpdateIdleSince = false;
 	}
 	
 	// check our idle time and disconnect if needed
-	if(fDisconnectAfterIdleSince > 0 && fIdleSince != 0
+	if (fDisconnectAfterIdleSince > 0 && fIdleSince != 0
 			&& fIdleSince - currentTime >= fDisconnectAfterIdleSince)
 		StateMachine().CloseEvent();
 }
@@ -1466,25 +1481,25 @@ KPPPInterface::RegisterInterface()
 {
 	TRACE("KPPPInterface: RegisterInterface()\n");
 	
-	if(fIfnet)
+	if (fIfnet)
 		return true;
 			// we are already registered
 	
 	LockerHelper locker(fLock);
 	
 	// only MainInterfaces get an ifnet
-	if(IsMultilink() && Parent() && Parent()->RegisterInterface())
+	if (IsMultilink() && Parent() && Parent()->RegisterInterface())
 		return true;
 	
-	if(!fManager)
+	if (!fManager)
 		return false;
 	
 	fIfnet = fManager->RegisterInterface(ID());
 	
-	if(!fIfnet)
+	if (!fIfnet)
 		return false;
 	
-	if(DoesConnectOnDemand())
+	if (DoesConnectOnDemand())
 		fIfnet->if_flags |= IFF_UP;
 	
 	CalculateInterfaceMTU();
@@ -1500,17 +1515,17 @@ KPPPInterface::UnregisterInterface()
 {
 	TRACE("KPPPInterface: UnregisterInterface()\n");
 	
-	if(!fIfnet)
+	if (!fIfnet)
 		return true;
 			// we are already unregistered
 	
 	LockerHelper locker(fLock);
 	
 	// only MainInterfaces get an ifnet
-	if(IsMultilink() && Parent())
+	if (IsMultilink() && Parent())
 		return true;
 	
-	if(!fManager)
+	if (!fManager)
 		return false;
 	
 	fManager->UnregisterInterface(ID());
@@ -1527,7 +1542,7 @@ KPPPInterface::StackControl(uint32 op, void *data)
 {
 	TRACE("KPPPInterface: StackControl(0x%lX)\n", op);
 	
-	switch(op) {
+	switch (op) {
 		default:
 			return StackControlEachHandler(op, data);
 	}
@@ -1544,12 +1559,12 @@ class CallStackControl {
 			: fOp(op), fData(data), fResult(result) {}
 		inline void operator() (T *item)
 			{
-				if(!item || !item->IsEnabled())
+				if (!item || !item->IsEnabled())
 					return;
 				status_t tmp = item->StackControl(fOp, fData);
-				if(tmp == B_OK && fResult == B_BAD_VALUE)
+				if (tmp == B_OK && fResult == B_BAD_VALUE)
 					fResult = B_OK;
-				else if(tmp != B_BAD_VALUE)
+				else if (tmp != B_BAD_VALUE)
 					fResult = tmp;
 			}
 	private:
@@ -1575,11 +1590,11 @@ KPPPInterface::StackControlEachHandler(uint32 op, void *data)
 	LockerHelper locker(fLock);
 	
 	KPPPProtocol *protocol = FirstProtocol();
-	for(; protocol; protocol = protocol->NextProtocol()) {
+	for (; protocol; protocol = protocol->NextProtocol()) {
 		tmp = protocol->StackControl(op, data);
-		if(tmp == B_OK && result == B_BAD_VALUE)
+		if (tmp == B_OK && result == B_BAD_VALUE)
 			result = B_OK;
-		else if(tmp != B_BAD_VALUE)
+		else if (tmp != B_BAD_VALUE)
 			result = tmp;
 	}
 	
@@ -1605,19 +1620,19 @@ KPPPInterface::CalculateInterfaceMTU()
 	
 	// sum all headers (the protocol field is not counted)
 	KPPPProtocol *protocol = FirstProtocol();
-	for(; protocol; protocol = protocol->NextProtocol()) {
-		if(protocol->Level() < PPP_PROTOCOL_LEVEL)
+	for (; protocol; protocol = protocol->NextProtocol()) {
+		if (protocol->Level() < PPP_PROTOCOL_LEVEL)
 			fHeaderLength += protocol->Overhead();
 	}
 	
 	fInterfaceMTU -= fHeaderLength;
 	
-	if(Ifnet()) {
+	if (Ifnet()) {
 		Ifnet()->if_mtu = fInterfaceMTU;
 		Ifnet()->if_hdrlen = fHeaderLength;
 	}
 	
-	if(Parent())
+	if (Parent())
 		Parent()->CalculateInterfaceMTU();
 }
 
@@ -1630,16 +1645,16 @@ KPPPInterface::CalculateBaudRate()
 	
 	LockerHelper locker(fLock);
 	
-	if(!Ifnet())
+	if (!Ifnet())
 		return;
 	
-	if(Device())
+	if (Device())
 		fIfnet->if_baudrate = max_c(Device()->InputTransferRate(),
 			Device()->OutputTransferRate());
 	else {
 		fIfnet->if_baudrate = 0;
-		for(int32 index = 0; index < CountChildren(); index++)
-			if(ChildAt(index)->Ifnet())
+		for (int32 index = 0; index < CountChildren(); index++)
+			if (ChildAt(index)->Ifnet())
 				fIfnet->if_baudrate += ChildAt(index)->Ifnet()->if_baudrate;
 	}
 }
@@ -1653,7 +1668,7 @@ KPPPInterface::Reconnect(uint32 delay)
 	
 	LockerHelper locker(fLock);
 	
-	if(fReconnectThread != -1)
+	if (fReconnectThread != -1)
 		return;
 	
 	++fConnectAttempt;
@@ -1683,7 +1698,7 @@ reconnect_thread(void *data)
 	receive_data(&sender, &info, sizeof(reconnect_info));
 	
 	// we try to receive data instead of snooze, so we can quit on destruction
-	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {
+	if (receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {
 		*info.thread = -1;
 		return B_OK;
 	}

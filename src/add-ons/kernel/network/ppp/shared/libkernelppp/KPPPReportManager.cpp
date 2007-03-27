@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -42,7 +42,7 @@ KPPPReportManager::KPPPReportManager(BLocker& lock)
 //!	Deletes all report requests.
 KPPPReportManager::~KPPPReportManager()
 {
-	for(int32 index = 0; index < fReportRequests.CountItems(); index++)
+	for (int32 index = 0; index < fReportRequests.CountItems(); index++)
 		delete fReportRequests.ItemAt(index);
 }
 
@@ -57,10 +57,10 @@ KPPPReportManager::~KPPPReportManager()
 bool
 KPPPReportManager::SendReport(thread_id thread, const ppp_report_packet *report)
 {
-	if(!report)
+	if (!report)
 		return false;
 	
-	if(thread == find_thread(NULL)) {
+	if (thread == find_thread(NULL)) {
 		report_sender_info *info = new report_sender_info;
 		info->thread = thread;
 		memcpy(&info->report, report, sizeof(ppp_report_packet));
@@ -85,7 +85,7 @@ void
 KPPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 	int32 flags)
 {
-	if(thread < 0 || type == PPP_ALL_REPORTS)
+	if (thread < 0 || type == PPP_ALL_REPORTS)
 		return;
 	
 	LockerHelper locker(fLock);
@@ -103,25 +103,25 @@ KPPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 void
 KPPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 {
-	if(thread < 0)
+	if (thread < 0)
 		return;
 	
 	LockerHelper locker(fLock);
 	
 	ppp_report_request *request;
 	
-	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
+	for (int32 i = 0; i < fReportRequests.CountItems(); i++) {
 		request = fReportRequests.ItemAt(i);
 		
-		if(request->thread != thread)
+		if (request->thread != thread)
 			continue;
 		
-		if(request->type == type || type == PPP_ALL_REPORTS)
+		if (request->type == type || type == PPP_ALL_REPORTS)
 			fReportRequests.RemoveItem(request);
 	}
 	
 	// empty message queue
-	while(has_data(thread)) {
+	while (has_data(thread)) {
 		thread_id sender;
 		receive_data(&sender, NULL, 0);
 	}
@@ -132,17 +132,17 @@ KPPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 bool
 KPPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 {
-	if(thread < 0)
+	if (thread < 0)
 		return false;
 	
 	LockerHelper locker(fLock);
 	
 	ppp_report_request *request;
 	
-	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
+	for (int32 i = 0; i < fReportRequests.CountItems(); i++) {
 		request = fReportRequests.ItemAt(i);
 		
-		if(request->thread == thread && request->type == type)
+		if (request->thread == thread && request->type == type)
 			return true;
 	}
 	
@@ -168,13 +168,13 @@ KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 le
 	TRACE("KPPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
 		type, code, length, fReportRequests.CountItems());
 	
-	if(length > PPP_REPORT_DATA_LIMIT)
+	if (length > PPP_REPORT_DATA_LIMIT)
 		return false;
 	
-	if(fReportRequests.CountItems() == 0)
+	if (fReportRequests.CountItems() == 0)
 		return true;
 	
-	if(!data)
+	if (!data)
 		length = 0;
 	
 	LockerHelper locker(fLock);
@@ -190,22 +190,22 @@ KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 le
 	
 	ppp_report_request *request;
 	
-	for(int32 index = 0; index < fReportRequests.CountItems(); index++) {
+	for (int32 index = 0; index < fReportRequests.CountItems(); index++) {
 		request = fReportRequests.ItemAt(index);
 		
 		// do not send to yourself
-		if(request->thread == me)
+		if (request->thread == me)
 			continue;
 		
 		result = send_data_with_timeout(request->thread, PPP_REPORT_CODE, &report,
 			sizeof(report), PPP_REPORT_TIMEOUT);
 		
 #if DEBUG
-		if(result == B_TIMED_OUT)
+		if (result == B_TIMED_OUT)
 			TRACE("KPPPReportManager::Report(): timed out sending\n");
 #endif
 		
-		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY
+		if (result == B_BAD_THREAD_ID || result == B_NO_MEMORY
 				|| request->flags & PPP_REMOVE_AFTER_REPORT) {
 			fReportRequests.RemoveItem(request);
 			--index;

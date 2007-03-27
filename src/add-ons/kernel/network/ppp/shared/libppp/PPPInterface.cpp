@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -45,7 +45,7 @@ PPPInterface::PPPInterface(const PPPInterface& copy)
 //!	Destructor.
 PPPInterface::~PPPInterface()
 {
-	if(fFD >= 0)
+	if (fFD >= 0)
 		close(fFD);
 }
 
@@ -62,9 +62,9 @@ PPPInterface::~PPPInterface()
 status_t
 PPPInterface::InitCheck() const
 {
-	if(fFD < 0)
+	if (fFD < 0)
 		return B_ERROR;
-	if(fID == PPP_UNDEFINED_INTERFACE_ID)
+	if (fID == PPP_UNDEFINED_INTERFACE_ID)
 		return B_BAD_INDEX;
 	
 	return B_OK;
@@ -87,11 +87,11 @@ PPPInterface::InitCheck() const
 status_t
 PPPInterface::SetTo(ppp_interface_id ID)
 {
-	if(fFD < 0)
+	if (fFD < 0)
 		return B_ERROR;
 	
 	ppp_interface_info_t info;
-	if(GetInterfaceInfo(&info)) {
+	if (GetInterfaceInfo(&info)) {
 		fName = info.info.name;
 		fID = ID;
 	} else {
@@ -119,7 +119,7 @@ PPPInterface::SetTo(ppp_interface_id ID)
 status_t
 PPPInterface::Control(uint32 op, void *data, size_t length) const
 {
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return InitCheck();
 	
 	ppp_control_info control;
@@ -143,7 +143,7 @@ PPPInterface::Control(uint32 op, void *data, size_t length) const
 bool
 PPPInterface::SetUsername(const char *username) const
 {
-	if(InitCheck() != B_OK || !username)
+	if (InitCheck() != B_OK || !username)
 		return false;
 	
 	return Control(PPPC_SET_USERNAME, const_cast<char*>(username), strlen(username))
@@ -155,7 +155,7 @@ PPPInterface::SetUsername(const char *username) const
 bool
 PPPInterface::SetPassword(const char *password) const
 {
-	if(InitCheck() != B_OK || !password)
+	if (InitCheck() != B_OK || !password)
 		return false;
 	
 	return Control(PPPC_SET_PASSWORD, const_cast<char*>(password), strlen(password))
@@ -167,7 +167,7 @@ PPPInterface::SetPassword(const char *password) const
 bool
 PPPInterface::SetAskBeforeConnecting(bool askBeforeConnecting) const
 {
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return false;
 	
 	uint32 value = askBeforeConnecting ? 1 : 0;
@@ -188,9 +188,9 @@ PPPInterface::SetAskBeforeConnecting(bool askBeforeConnecting) const
 status_t
 PPPInterface::GetSettingsEntry(BEntry *entry) const
 {
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return InitCheck();
-	else if(!entry || strlen(Name()) == 0)
+	else if (!entry || strlen(Name()) == 0)
 		return B_BAD_VALUE;
 	
 	BDirectory directory(PTP_INTERFACE_SETTINGS_PATH);
@@ -205,7 +205,7 @@ PPPInterface::GetSettingsEntry(BEntry *entry) const
 bool
 PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 {
-	if(InitCheck() != B_OK || !info)
+	if (InitCheck() != B_OK || !info)
 		return false;
 	
 	return Control(PPPC_GET_INTERFACE_INFO, &info, sizeof(ppp_interface_info_t))
@@ -222,7 +222,7 @@ PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 bool
 PPPInterface::GetStatistics(ppp_statistics *statistics) const
 {
-	if(!statistics)
+	if (!statistics)
 		return false;
 	
 	return Control(PPPC_GET_STATISTICS, statistics, sizeof(ppp_statistics)) == B_OK;
@@ -233,10 +233,10 @@ PPPInterface::GetStatistics(ppp_statistics *statistics) const
 bool
 PPPInterface::HasSettings(const driver_settings *settings) const
 {
-	if(InitCheck() != B_OK || !settings)
+	if (InitCheck() != B_OK || !settings)
 		return false;
 	
-	if(Control(PPPC_HAS_INTERFACE_SETTINGS, const_cast<driver_settings*>(settings),
+	if (Control(PPPC_HAS_INTERFACE_SETTINGS, const_cast<driver_settings*>(settings),
 			sizeof(driver_settings)) == B_OK)
 		return true;
 	
@@ -248,7 +248,7 @@ PPPInterface::HasSettings(const driver_settings *settings) const
 bool
 PPPInterface::Up() const
 {
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return false;
 	
 	int32 id = ID();
@@ -266,7 +266,7 @@ PPPInterface::Up() const
 bool
 PPPInterface::Down() const
 {
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return false;
 	
 	int32 id = ID();

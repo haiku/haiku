@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,7 +32,7 @@ _KPPPMRUHandler::_KPPPMRUHandler(KPPPInterface& interface)
 status_t
 _KPPPMRUHandler::AddToRequest(KPPPConfigurePacket& request)
 {
-	if(!Interface().Device() || Interface().MRU() == 1500)
+	if (!Interface().Device() || Interface().MRU() == 1500)
 		return B_OK;
 	
 	// add MRU request
@@ -48,11 +48,11 @@ status_t
 _KPPPMRUHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	mru_item *item = (mru_item*) nak.ItemWithType(kMRUType);
-	if(!item || item->length != 4)
+	if (!item || item->length != 4)
 		return B_OK;
 	
 	uint16 MRU = ntohs(item->MRU);
-	if(MRU < fLocalMRU)
+	if (MRU < fLocalMRU)
 		fLocalMRU = MRU;
 	
 	return B_OK;
@@ -62,7 +62,7 @@ _KPPPMRUHandler::ParseNak(const KPPPConfigurePacket& nak)
 status_t
 _KPPPMRUHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
-	if(reject.ItemWithType(kMRUType))
+	if (reject.ItemWithType(kMRUType))
 		return B_ERROR;
 	
 	return B_OK;
@@ -75,10 +75,10 @@ _KPPPMRUHandler::ParseAck(const KPPPConfigurePacket& ack)
 	uint16 MRU = 1500;
 	mru_item *item = (mru_item*) ack.ItemWithType(kMRUType);
 	
-	if(item)
+	if (item)
 		MRU = ntohs(item->MRU);
 	
-	if(MRU < Interface().MRU())
+	if (MRU < Interface().MRU())
 		fLocalMRU = MRU;
 	
 	return B_OK;
@@ -89,7 +89,7 @@ status_t
 _KPPPMRUHandler::ParseRequest(const KPPPConfigurePacket& request,
 	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
-	if(index == reject.CountItems())
+	if (index == reject.CountItems())
 		return B_OK;
 	
 	return ParseRequestedItem((mru_item*) request.ItemAt(index), Interface());
@@ -111,15 +111,15 @@ ParseRequestedItem(mru_item *item, KPPPInterface& interface)
 {
 	uint16 MRU = 1500;
 	
-	if(item) {
-		if(item->length != 4)
+	if (item) {
+		if (item->length != 4)
 			return B_ERROR;
 				// the request has a corrupted item
 		
 		MRU = ntohs(item->MRU);
 	}
 	
-	if(MRU < interface.MRU())
+	if (MRU < interface.MRU())
 		interface.SetMRU(MRU);
 	
 	return B_OK;
@@ -129,7 +129,7 @@ ParseRequestedItem(mru_item *item, KPPPInterface& interface)
 void
 _KPPPMRUHandler::Reset()
 {
-	if(Interface().Device()) {
+	if (Interface().Device()) {
 		fLocalMRU = Interface().Device()->MTU() - 2;
 		Interface().SetMRU(fLocalMRU);
 	} else {

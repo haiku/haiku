@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,7 +24,7 @@ status_t
 _KPPPPFCHandler::AddToRequest(KPPPConfigurePacket& request)
 {
 	// is PFC not requested or was it rejected?
-	if(fLocalPFCState == PPP_PFC_REJECTED
+	if (fLocalPFCState == PPP_PFC_REJECTED
 			|| (Interface().PFCOptions() & PPP_REQUEST_PFC) == 0)
 		return B_OK;
 	
@@ -40,7 +40,7 @@ status_t
 _KPPPPFCHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	// naks do not contain PFC items
-	if(nak.ItemWithType(kPFCType))
+	if (nak.ItemWithType(kPFCType))
 		return B_ERROR;
 	
 	return B_OK;
@@ -50,10 +50,10 @@ _KPPPPFCHandler::ParseNak(const KPPPConfigurePacket& nak)
 status_t
 _KPPPPFCHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
-	if(reject.ItemWithType(kPFCType)) {
+	if (reject.ItemWithType(kPFCType)) {
 		fLocalPFCState = PPP_PFC_REJECTED;
 		
-		if(Interface().PFCOptions() & PPP_FORCE_PFC_REQUEST)
+		if (Interface().PFCOptions() & PPP_FORCE_PFC_REQUEST)
 			return B_ERROR;
 	}
 	
@@ -64,12 +64,12 @@ _KPPPPFCHandler::ParseReject(const KPPPConfigurePacket& reject)
 status_t
 _KPPPPFCHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
-	if(ack.ItemWithType(kPFCType))
+	if (ack.ItemWithType(kPFCType))
 		fLocalPFCState = PPP_PFC_ACCEPTED;
 	else {
 		fLocalPFCState = PPP_PFC_DISABLED;
 		
-		if(Interface().PFCOptions() & PPP_FORCE_PFC_REQUEST)
+		if (Interface().PFCOptions() & PPP_FORCE_PFC_REQUEST)
 			return B_ERROR;
 	}
 	
@@ -81,10 +81,10 @@ status_t
 _KPPPPFCHandler::ParseRequest(const KPPPConfigurePacket& request,
 	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
-	if(!request.ItemWithType(kPFCType))
+	if (!request.ItemWithType(kPFCType))
 		return B_OK;
 	
-	if((Interface().PFCOptions() & PPP_ALLOW_PFC) == 0) {
+	if ((Interface().PFCOptions() & PPP_ALLOW_PFC) == 0) {
 		ppp_configure_item item;
 		item.type = kPFCType;
 		item.length = 2;
@@ -100,10 +100,10 @@ _KPPPPFCHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	ppp_configure_item *item = ack.ItemWithType(kPFCType);
 	
-	if(item && (Interface().PFCOptions() & PPP_ALLOW_PFC) == 0)
+	if (item && (Interface().PFCOptions() & PPP_ALLOW_PFC) == 0)
 		return B_ERROR;
 	
-	if(item)
+	if (item)
 		fPeerPFCState = PPP_PFC_ACCEPTED;
 	else
 		fPeerPFCState = PPP_PFC_DISABLED;

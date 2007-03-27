@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,11 +39,12 @@
 	\param optionHandler Optional handler associated with this protocol.
 */
 KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
-		uint16 protocolNumber, ppp_level level, int32 addressFamily,
-		uint32 overhead, KPPPInterface& interface,
-		driver_parameter *settings, int32 flags,
-		const char *type, KPPPOptionHandler *optionHandler)
-	: KPPPLayer(name, level, overhead),
+	uint16 protocolNumber, ppp_level level, int32 addressFamily,
+	uint32 overhead, KPPPInterface& interface,
+	driver_parameter *settings, int32 flags,
+	const char *type, KPPPOptionHandler *optionHandler)
+	:
+	KPPPLayer(name, level, overhead),
 	fActivationPhase(activationPhase),
 	fProtocolNumber(protocolNumber),
 	fAddressFamily(addressFamily),
@@ -56,16 +57,16 @@ KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 	fUpRequested(true),
 	fConnectionPhase(PPP_DOWN_PHASE)
 {
-	if(type)
+	if (type)
 		fType = strdup(type);
 	else
 		fType = NULL;
 	
 	const char *sideString = get_parameter_value("side", settings);
-	if(sideString)
+	if (sideString)
 		fSide = get_side_string_value(sideString, PPP_LOCAL_SIDE);
 	else {
-		if(interface.Mode() == PPP_CLIENT_MODE)
+		if (interface.Mode() == PPP_CLIENT_MODE)
 			fSide = PPP_LOCAL_SIDE;
 		else
 			fSide = PPP_PEER_SIDE;
@@ -77,7 +78,6 @@ KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 KPPPProtocol::~KPPPProtocol()
 {
 	Interface().RemoveProtocol(this);
-	
 	free(fType);
 }
 
@@ -100,16 +100,17 @@ KPPPProtocol::Uninit()
 status_t
 KPPPProtocol::Control(uint32 op, void *data, size_t length)
 {
-	switch(op) {
-		case PPPC_GET_PROTOCOL_INFO: {
-			if(length < sizeof(ppp_protocol_info_t) || !data)
+	switch (op) {
+		case PPPC_GET_PROTOCOL_INFO:
+		{
+			if (length < sizeof(ppp_protocol_info_t) || !data)
 				return B_ERROR;
 			
 			ppp_protocol_info *info = (ppp_protocol_info*) data;
 			memset(info, 0, sizeof(ppp_protocol_info_t));
-			if(Name())
+			if (Name())
 				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			if(Type())
+			if (Type())
 				strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->activationPhase = ActivationPhase();
 			info->addressFamily = AddressFamily();
@@ -121,15 +122,16 @@ KPPPProtocol::Control(uint32 op, void *data, size_t length)
 			info->protocolNumber = ProtocolNumber();
 			info->isEnabled = IsEnabled();
 			info->isUpRequested = IsUpRequested();
-		} break;
-		
+			break;
+		}
+
 		case PPPC_ENABLE:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
 			
 			SetEnabled(*((uint32*)data));
-		break;
-		
+			break;
+
 		default:
 			return B_BAD_VALUE;
 	}
@@ -142,7 +144,7 @@ KPPPProtocol::Control(uint32 op, void *data, size_t length)
 status_t
 KPPPProtocol::StackControl(uint32 op, void *data)
 {
-	switch(op) {
+	switch (op) {
 		default:
 			return B_BAD_VALUE;
 	}
@@ -160,10 +162,10 @@ KPPPProtocol::SetEnabled(bool enabled)
 {
 	fEnabled = enabled;
 	
-	if(!enabled) {
-		if(IsUp() || IsGoingUp())
+	if (!enabled) {
+		if (IsUp() || IsGoingUp())
 			Down();
-	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface().IsUp())
+	} else if (!IsUp() && !IsGoingUp() && IsUpRequested() && Interface().IsUp())
 		Up();
 }
 
@@ -207,7 +209,6 @@ void
 KPPPProtocol::UpFailedEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
-	
 	Interface().StateMachine().UpFailedEvent(this);
 }
 
@@ -220,7 +221,6 @@ void
 KPPPProtocol::UpEvent()
 {
 	fConnectionPhase = PPP_ESTABLISHED_PHASE;
-	
 	Interface().StateMachine().UpEvent(this);
 }
 
@@ -233,6 +233,5 @@ void
 KPPPProtocol::DownEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
-	
 	Interface().StateMachine().DownEvent(this);
 }

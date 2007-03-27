@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -58,13 +58,13 @@ KPPPLayer::InitCheck() const
 status_t
 KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 {
-	if(!packet)
+	if (!packet)
 		return B_ERROR;
 	
 	// Find the next possible handler for this packet.
 	// Normal protocols (Level() >= PPP_PROTOCOL_LEVEL) do not encapsulate anything.
-	if(Next()) {
-		if(Next()->IsAllowedToSend() && Next()->Level() < PPP_PROTOCOL_LEVEL)
+	if (Next()) {
+		if (Next()->IsAllowedToSend() && Next()->Level() < PPP_PROTOCOL_LEVEL)
 			return Next()->Send(packet, protocolNumber);
 		else
 			return Next()->SendToNext(packet, protocolNumber);
@@ -93,7 +93,7 @@ KPPPLayer::SetName(const char *name)
 {
 	free(fName);
 	
-	if(name)
+	if (name)
 		fName = strdup(name);
 	else
 		fName = NULL;

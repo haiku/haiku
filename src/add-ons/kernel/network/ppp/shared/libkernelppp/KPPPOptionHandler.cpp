@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,14 +24,15 @@
 	\param settings Settings for this handler.
 */
 KPPPOptionHandler::KPPPOptionHandler(const char *name, uint8 type,
-		KPPPInterface& interface, driver_parameter *settings)
-	: fInitStatus(B_OK),
+	KPPPInterface& interface, driver_parameter *settings)
+	:
+	fInitStatus(B_OK),
 	fType(type),
 	fInterface(interface),
 	fSettings(settings),
 	fEnabled(true)
 {
-	if(name)
+	if (name)
 		fName = strdup(name);
 	else
 		fName = NULL;
@@ -59,29 +60,31 @@ KPPPOptionHandler::InitCheck() const
 status_t
 KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 {
-	switch(op) {
-		case PPPC_GET_SIMPLE_HANDLER_INFO: {
-			if(length < sizeof(ppp_simple_handler_info_t) || !data)
+	switch (op) {
+		case PPPC_GET_SIMPLE_HANDLER_INFO:
+		{
+			if (length < sizeof(ppp_simple_handler_info_t) || !data)
 				return B_ERROR;
-			
+
 			ppp_simple_handler_info *info = (ppp_simple_handler_info*) data;
 			memset(info, 0, sizeof(ppp_simple_handler_info_t));
-			if(Name())
+			if (Name())
 				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->isEnabled = IsEnabled();
-		} break;
-		
+			break;
+		}
+
 		case PPPC_ENABLE:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
-			
+
 			SetEnabled(*((uint32*)data));
-		break;
-		
+			break;
+
 		default:
 			return B_BAD_VALUE;
 	}
-	
+
 	return B_OK;
 }
 
@@ -90,7 +93,7 @@ KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 status_t
 KPPPOptionHandler::StackControl(uint32 op, void *data)
 {
-	switch(op) {
+	switch (op) {
 		default:
 			return B_BAD_VALUE;
 	}
@@ -152,7 +155,7 @@ KPPPOptionHandler::ParseAck(const KPPPConfigurePacket& ack)
 	
 	Index may be behind the last item which means additional values can be
 	appended.
-	
+
 	\param request The requested values.
 	\param index Index of item in \a request.
 	\param nak Values for the nak should be added here.

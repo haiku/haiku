@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -36,7 +36,7 @@ PPPManager::PPPManager()
 //!	Destructor.
 PPPManager::~PPPManager()
 {
-	if(fFD >= 0)
+	if (fFD >= 0)
 		close(fFD);
 }
 
@@ -47,26 +47,26 @@ PPPManager::SetDefaultInterface(const BString name)
 {
 	// load current settings and replace value of "default" with <name>
 	BMessage settings;
-	if(!ReadMessageDriverSettings("ptpnet.settings", &settings))
+	if (!ReadMessageDriverSettings("ptpnet.settings", &settings))
 		settings.MakeEmpty();
 	
 	BMessage parameter;
 	int32 index = 0;
-	if(FindMessageParameter("default", settings, &parameter, &index))
+	if (FindMessageParameter("default", settings, &parameter, &index))
 		settings.RemoveData(MDSU_PARAMETERS, index);
 	
 	parameter.MakeEmpty();
-	if(name != "") {
+	if (name != "") {
 		parameter.AddString(MDSU_NAME, "default");
 		parameter.AddString(MDSU_VALUES, name);
 		settings.AddMessage(MDSU_PARAMETERS, &parameter);
 	}
 	
 	BFile file(PTP_SETTINGS_PATH, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if(file.InitCheck() != B_OK)
+	if (file.InitCheck() != B_OK)
 		return false;
 	
-	if(WriteMessageDriverSettings(file, settings))
+	if (WriteMessageDriverSettings(file, settings))
 		return true;
 	else
 		return false;
@@ -88,12 +88,12 @@ PPPManager::DefaultInterface()
 bool
 PPPManager::GetSettingsDirectory(BDirectory *settingsDirectory)
 {
-	if(settingsDirectory) {
+	if (settingsDirectory) {
 		BDirectory settings(PTP_INTERFACE_SETTINGS_PATH);
-		if(settings.InitCheck() != B_OK) {
+		if (settings.InitCheck() != B_OK) {
 			create_directory(PTP_INTERFACE_SETTINGS_PATH, 0750);
 			settings.SetTo(PTP_INTERFACE_SETTINGS_PATH);
-			if(settings.InitCheck() != B_OK)
+			if (settings.InitCheck() != B_OK)
 				return false;
 		}
 		
@@ -108,7 +108,7 @@ PPPManager::GetSettingsDirectory(BDirectory *settingsDirectory)
 status_t
 PPPManager::InitCheck() const
 {
-	if(fFD < 0)
+	if (fFD < 0)
 		return B_ERROR;
 	else
 		return B_OK;
@@ -129,7 +129,7 @@ PPPManager::InitCheck() const
 status_t
 PPPManager::Control(uint32 op, void *data, size_t length) const
 {
-	if(InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		return B_ERROR;
 	
 	control_net_module_args args;
@@ -165,7 +165,7 @@ status_t
 PPPManager::ControlModule(const char *name, uint32 op, void *data,
 	size_t length) const
 {
-	if(!name)
+	if (!name)
 		return B_ERROR;
 	
 	control_net_module_args args;
@@ -189,7 +189,7 @@ PPPManager::CreateInterface(const driver_settings *settings) const
 	ppp_interface_description_info info;
 	info.u.settings = settings;
 	
-	if(Control(PPPC_CREATE_INTERFACE, &info, sizeof(info)) != B_OK)
+	if (Control(PPPC_CREATE_INTERFACE, &info, sizeof(info)) != B_OK)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	else
 		return info.interface;
@@ -210,7 +210,7 @@ PPPManager::CreateInterfaceWithName(const char *name) const
 	ppp_interface_description_info info;
 	info.u.name = name;
 	
-	if(Control(PPPC_CREATE_INTERFACE_WITH_NAME, &info, sizeof(info)) != B_OK)
+	if (Control(PPPC_CREATE_INTERFACE_WITH_NAME, &info, sizeof(info)) != B_OK)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	else
 		return info.interface;
@@ -221,7 +221,7 @@ PPPManager::CreateInterfaceWithName(const char *name) const
 bool
 PPPManager::DeleteInterface(ppp_interface_id ID) const
 {
-	if(Control(PPPC_DELETE_INTERFACE, &ID, sizeof(ID)) != B_OK)
+	if (Control(PPPC_DELETE_INTERFACE, &ID, sizeof(ID)) != B_OK)
 		return false;
 	else
 		return true;
@@ -251,21 +251,21 @@ PPPManager::Interfaces(int32 *count,
 	ppp_interface_id *interfaces;
 	
 	// loop until we get all interfaces
-	while(true) {
+	while (true) {
 		requestCount = *count = CountInterfaces(filter);
-		if(*count == -1)
+		if (*count == -1)
 			return NULL;
 		
 		requestCount += 10;
 			// request some more interfaces in case some are added in the mean time
 		interfaces = new ppp_interface_id[requestCount];
 		*count = GetInterfaces(interfaces, requestCount, filter);
-		if(*count == -1) {
+		if (*count == -1) {
 			delete interfaces;
 			return NULL;
 		}
 		
-		if(*count < requestCount)
+		if (*count < requestCount)
 			break;
 		
 		delete interfaces;
@@ -285,7 +285,7 @@ PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
 	info.count = count;
 	info.filter = filter;
 	
-	if(Control(PPPC_GET_INTERFACES, &info, sizeof(info)) != B_OK)
+	if (Control(PPPC_GET_INTERFACES, &info, sizeof(info)) != B_OK)
 		return -1;
 	else
 		return info.resultCount;
@@ -313,16 +313,16 @@ PPPManager::InterfaceWithUnit(int32 if_unit) const
 	int32 count;
 	ppp_interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
 	
-	if(!interfaces)
+	if (!interfaces)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
 	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
 	ppp_interface_info_t info;
 	
-	for(int32 index = 0; index < count; index++) {
+	for (int32 index = 0; index < count; index++) {
 		interface.SetTo(interfaces[index]);
-		if(interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
+		if (interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
 				&& info.info.if_unit == if_unit) {
 			id = interface.ID();
 			break;
@@ -339,22 +339,22 @@ PPPManager::InterfaceWithUnit(int32 if_unit) const
 ppp_interface_id
 PPPManager::InterfaceWithName(const char *name) const
 {
-	if(!name)
+	if (!name)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
 	int32 count;
 	ppp_interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
 	
-	if(!interfaces)
+	if (!interfaces)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
 	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
 	ppp_interface_info_t info;
 	
-	for(int32 index = 0; index < count; index++) {
+	for (int32 index = 0; index < count; index++) {
 		interface.SetTo(interfaces[index]);
-		if(interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
+		if (interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
 				&& strlen(info.info.name) > 0 && !strcasecmp(info.info.name, name)) {
 			id = interface.ID();
 			break;
@@ -363,11 +363,11 @@ PPPManager::InterfaceWithName(const char *name) const
 	
 	delete interfaces;
 	
-	if(id != PPP_UNDEFINED_INTERFACE_ID)
+	if (id != PPP_UNDEFINED_INTERFACE_ID)
 		return id;
-	else if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
+	else if (!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
 		return InterfaceWithUnit(atoi(name + 3));
-	else if(isdigit(name[0]))
+	else if (isdigit(name[0]))
 		return atoi(name);
 	else
 		return PPP_UNDEFINED_INTERFACE_ID;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,8 +39,8 @@ _KPPPAuthenticationHandler::NextAuthenticator(const KPPPProtocol *start,
 	// find the next authenticator for side, beginning at start
 	KPPPProtocol *current = start ? start->NextProtocol() : Interface().FirstProtocol();
 	
-	for(; current; current = current->NextProtocol()) {
-		if(current->Type() && !strcasecmp(current->Type(), kAuthenticatorTypeString)
+	for (; current; current = current->NextProtocol()) {
+		if (current->Type() && !strcasecmp(current->Type(), kAuthenticatorTypeString)
 				&& current->OptionHandler() && current->Side() == side)
 			return current;
 	}
@@ -56,14 +56,14 @@ _KPPPAuthenticationHandler::AddToRequest(KPPPConfigurePacket& request)
 	// add an authentication request if needed. This request is added
 	// by the authenticator's OptionHandler.
 	
-	if(fPeerAuthenticator)
+	if (fPeerAuthenticator)
 		fPeerAuthenticator->SetEnabled(false);
-	if(fSuggestedPeerAuthenticator)
+	if (fSuggestedPeerAuthenticator)
 		fSuggestedPeerAuthenticator->SetEnabled(false);
 	
 	KPPPProtocol *authenticator;
-	if(fPeerAuthenticatorRejected) {
-		if(!fSuggestedPeerAuthenticator) {
+	if (fPeerAuthenticatorRejected) {
+		if (!fSuggestedPeerAuthenticator) {
 			// This happens when the protocol is rejected, but no alternative
 			// protocol is supplied to us or the suggested protocol is not supported.
 			// We can use this chance to increase fPeerIndex to the next authenticator.
@@ -73,7 +73,7 @@ _KPPPAuthenticationHandler::AddToRequest(KPPPConfigurePacket& request)
 		
 		fPeerAuthenticatorRejected = false;
 	} else {
-		if(!fPeerAuthenticator) {
+		if (!fPeerAuthenticator) {
 			// there is no authenticator selected, so find one for us
 			authenticator = NextAuthenticator(fPeerAuthenticator, PPP_PEER_SIDE);
 		} else
@@ -81,8 +81,8 @@ _KPPPAuthenticationHandler::AddToRequest(KPPPConfigurePacket& request)
 	}
 	
 	// check if all authenticators were rejected or if no authentication needed
-	if(!authenticator) {
-		if(fPeerAuthenticator)
+	if (!authenticator) {
+		if (fPeerAuthenticator)
 			return B_ERROR;
 				// all authenticators were denied
 		else
@@ -90,7 +90,7 @@ _KPPPAuthenticationHandler::AddToRequest(KPPPConfigurePacket& request)
 				// no peer authentication needed
 	}
 	
-	if(!authenticator || !authenticator->OptionHandler())
+	if (!authenticator || !authenticator->OptionHandler())
 		return B_ERROR;
 	
 	fPeerAuthenticator = authenticator;
@@ -113,17 +113,17 @@ _KPPPAuthenticationHandler::ParseNak(const KPPPConfigurePacket& nak)
 	authentication_item *item =
 		(authentication_item*) nak.ItemWithType(kAuthenticationType);
 	
-	if(!item)
+	if (!item)
 		return B_OK;
 			// the request was not rejected
-	if(item->length < 4)
+	if (item->length < 4)
 		return B_ERROR;
 	
-	if(fSuggestedPeerAuthenticator) {
+	if (fSuggestedPeerAuthenticator) {
 		fSuggestedPeerAuthenticator->SetEnabled(false);
 		// if no alternative protocol is supplied we will choose a new one in
 		// AddToRequest()
-		if(ntohs(item->protocolNumber) ==
+		if (ntohs(item->protocolNumber) ==
 				fSuggestedPeerAuthenticator->ProtocolNumber()) {
 			fSuggestedPeerAuthenticator = NULL;
 			return B_OK;
@@ -132,7 +132,7 @@ _KPPPAuthenticationHandler::ParseNak(const KPPPConfigurePacket& nak)
 	
 	fPeerAuthenticatorRejected = true;
 	KPPPProtocol *authenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
-	if(authenticator && authenticator->Type()
+	if (authenticator && authenticator->Type()
 			&& !strcasecmp(authenticator->Type(), kAuthenticatorTypeString)
 			&& authenticator->OptionHandler())
 		fSuggestedPeerAuthenticator = authenticator;
@@ -147,7 +147,7 @@ status_t
 _KPPPAuthenticationHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	// an authentication request must not be rejected!
-	if(reject.ItemWithType(kAuthenticationType))
+	if (reject.ItemWithType(kAuthenticationType))
 		return B_ERROR;
 	
 	return B_OK;
@@ -160,14 +160,14 @@ _KPPPAuthenticationHandler::ParseAck(const KPPPConfigurePacket& ack)
 	authentication_item *item =
 		(authentication_item*) ack.ItemWithType(kAuthenticationType);
 	
-	if(!item) {
-		if(fPeerAuthenticator)
+	if (!item) {
+		if (fPeerAuthenticator)
 			return B_ERROR;
 				// the ack does not contain our request
 		else
 			return B_OK;
 				// no authentication needed
-	} else if(!fPeerAuthenticator
+	} else if (!fPeerAuthenticator
 			|| ntohs(item->protocolNumber) != fPeerAuthenticator->ProtocolNumber())
 		return B_ERROR;
 			// this item was never requested
@@ -181,11 +181,11 @@ status_t
 _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
-	if(fLocalAuthenticator)
+	if (fLocalAuthenticator)
 		fLocalAuthenticator->SetEnabled(false);
 	
 	authentication_item *item = (authentication_item*) request.ItemAt(index);
-	if(!item)
+	if (!item)
 		return B_OK;
 			// no authentication requested by peer (index > request.CountItems())
 	
@@ -193,7 +193,7 @@ _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 	
 	// try to find the requested protocol
 	fLocalAuthenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
-	if(fLocalAuthenticator && fLocalAuthenticator->Type()
+	if (fLocalAuthenticator && fLocalAuthenticator->Type()
 			&& !strcasecmp(fLocalAuthenticator->Type(), kAuthenticatorTypeString)
 			&& fLocalAuthenticator->OptionHandler())
 		return fLocalAuthenticator->OptionHandler()->ParseRequest(request, index,
@@ -203,8 +203,8 @@ _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 	KPPPProtocol *nextAuthenticator =
 		NextAuthenticator(fSuggestedLocalAuthenticator, PPP_LOCAL_SIDE);
 	
-	if(!nextAuthenticator) {
-		if(!fSuggestedLocalAuthenticator) {
+	if (!nextAuthenticator) {
+		if (!fSuggestedLocalAuthenticator) {
 			// reject the complete authentication option
 			reject.AddItem((ppp_configure_item*) item);
 			return B_OK;
@@ -234,17 +234,17 @@ _KPPPAuthenticationHandler::SendingAck(const KPPPConfigurePacket& ack)
 	authentication_item *item =
 		(authentication_item*) ack.ItemWithType(kAuthenticationType);
 	
-	if(!item)
+	if (!item)
 		return B_OK;
 			// no authentication needed
 	
 	fSuggestedLocalAuthenticator = NULL;
 	
-	if(!fLocalAuthenticator)
+	if (!fLocalAuthenticator)
 		return B_ERROR;
 			// no authenticator selected (our suggestions must be requested, too)
 	
-	if(!fLocalAuthenticator)
+	if (!fLocalAuthenticator)
 		return B_ERROR;
 	
 	fLocalAuthenticator->SetEnabled(true);
@@ -256,15 +256,15 @@ _KPPPAuthenticationHandler::SendingAck(const KPPPConfigurePacket& ack)
 void
 _KPPPAuthenticationHandler::Reset()
 {
-	if(fLocalAuthenticator) {
+	if (fLocalAuthenticator) {
 		fLocalAuthenticator->SetEnabled(false);
 		fLocalAuthenticator->OptionHandler()->Reset();
 	}
-	if(fPeerAuthenticator) {
+	if (fPeerAuthenticator) {
 		fPeerAuthenticator->SetEnabled(false);
 		fPeerAuthenticator->OptionHandler()->Reset();
 	}
-	if(fSuggestedPeerAuthenticator) {
+	if (fSuggestedPeerAuthenticator) {
 		fSuggestedPeerAuthenticator->SetEnabled(false);
 		fSuggestedPeerAuthenticator->OptionHandler()->Reset();
 	}

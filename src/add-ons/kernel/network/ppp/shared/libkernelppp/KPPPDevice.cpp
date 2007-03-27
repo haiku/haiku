@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,7 +40,7 @@ KPPPDevice::KPPPDevice(const char *name, uint32 overhead, KPPPInterface& interfa
 //!	Destructor. Removes device from interface.
 KPPPDevice::~KPPPDevice()
 {
-	if(Interface().Device() == this)
+	if (Interface().Device() == this)
 		Interface().SetDevice(NULL);
 }
 
@@ -52,26 +52,26 @@ KPPPDevice::~KPPPDevice()
 status_t
 KPPPDevice::Control(uint32 op, void *data, size_t length)
 {
-	switch(op) {
-		case PPPC_GET_DEVICE_INFO: {
-			if(length < sizeof(ppp_device_info_t) || !data)
+	switch (op) {
+		case PPPC_GET_DEVICE_INFO: 
+			if (length < sizeof(ppp_device_info_t) || !data)
 				return B_NO_MEMORY;
-			
+
 			ppp_device_info *info = (ppp_device_info*) data;
 			memset(info, 0, sizeof(ppp_device_info_t));
-			if(Name())
+			if (Name())
 				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->MTU = MTU();
 			info->inputTransferRate = InputTransferRate();
 			info->outputTransferRate = OutputTransferRate();
 			info->outputBytesCount = CountOutputBytes();
 			info->isUp = IsUp();
-		} break;
-		
+			break;
+
 		default:
 			return B_BAD_VALUE;
 	}
-	
+
 	return B_OK;
 }
 
@@ -90,7 +90,7 @@ status_t
 KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	// let the interface handle the packet
-	if(protocolNumber == 0)
+	if (protocolNumber == 0)
 		return Interface().ReceiveFromDevice(packet);
 	else
 		return Interface().Receive(packet, protocolNumber);

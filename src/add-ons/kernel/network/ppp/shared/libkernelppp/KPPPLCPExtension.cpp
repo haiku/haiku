@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,7 +10,6 @@
 */
 
 #include <KPPPLCPExtension.h>
-
 #include <PPPControl.h>
 
 
@@ -31,7 +30,7 @@ KPPPLCPExtension::KPPPLCPExtension(const char *name, uint8 code,
 	fCode(code),
 	fEnabled(true)
 {
-	if(name)
+	if (name)
 		fName = strdup(name);
 	else
 		fName = NULL;
@@ -59,29 +58,31 @@ KPPPLCPExtension::InitCheck() const
 status_t
 KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 {
-	switch(op) {
-		case PPPC_GET_SIMPLE_HANDLER_INFO: {
-			if(length < sizeof(ppp_simple_handler_info_t) || !data)
+	switch (op) {
+		case PPPC_GET_SIMPLE_HANDLER_INFO:
+		{
+			if (length < sizeof(ppp_simple_handler_info_t) || !data)
 				return B_ERROR;
 			
 			ppp_simple_handler_info *info = (ppp_simple_handler_info*) data;
 			memset(info, 0, sizeof(ppp_simple_handler_info_t));
-			if(Name())
+			if (Name())
 				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->isEnabled = IsEnabled();
-		} break;
-		
+			break;
+		}
+
 		case PPPC_ENABLE:
-			if(length < sizeof(uint32) || !data)
+			if (length < sizeof(uint32) || !data)
 				return B_ERROR;
-			
+
 			SetEnabled(*((uint32*)data));
-		break;
-		
+			break;
+
 		default:
 			return B_BAD_VALUE;
 	}
-	
+
 	return B_OK;
 }
 
@@ -90,11 +91,11 @@ KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 status_t
 KPPPLCPExtension::StackControl(uint32 op, void *data)
 {
-	switch(op) {
+	switch (op) {
 		default:
 			return B_BAD_VALUE;
 	}
-	
+
 	return B_OK;
 }
 

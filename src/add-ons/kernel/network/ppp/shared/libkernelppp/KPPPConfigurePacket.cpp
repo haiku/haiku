@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2007, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,21 +33,21 @@ KPPPConfigurePacket::KPPPConfigurePacket(struct mbuf *packet)
 	ppp_lcp_packet *header = mtod(packet, ppp_lcp_packet*);
 	
 	SetID(header->id);
-	if(!SetCode(header->code))
+	if (!SetCode(header->code))
 		return;
 	
 	uint16 length = ntohs(header->length);
 	
-	if(length < 6 || length > packet->m_len)
+	if (length < 6 || length > packet->m_len)
 		return;
 			// there are no items (or one corrupted item)
 	
 	int32 position = 0;
 	ppp_configure_item *item;
 	
-	while(position < length - 4) {
+	while (position < length - 4) {
 		item = (ppp_configure_item*) (header->data + position);
-		if(item->length < 2)
+		if (item->length < 2)
 			return;
 				// found a corrupted item
 		
@@ -60,7 +60,7 @@ KPPPConfigurePacket::KPPPConfigurePacket(struct mbuf *packet)
 //!	Frees all items.
 KPPPConfigurePacket::~KPPPConfigurePacket()
 {
-	for(int32 index = 0; index < CountItems(); index++)
+	for (int32 index = 0; index < CountItems(); index++)
 		free(ItemAt(index));
 }
 
@@ -70,7 +70,7 @@ bool
 KPPPConfigurePacket::SetCode(uint8 code)
 {
 	// only configure codes are allowed!
-	if(code < PPP_CONFIGURE_REQUEST || code > PPP_CONFIGURE_REJECT)
+	if (code < PPP_CONFIGURE_REQUEST || code > PPP_CONFIGURE_REJECT)
 		return false;
 	
 	fCode = code;
@@ -94,18 +94,18 @@ KPPPConfigurePacket::SetCode(uint8 code)
 bool
 KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index)
 {
-	if(!item || item->length < 2)
+	if (!item || item->length < 2)
 		return false;
 	
 	ppp_configure_item *add = (ppp_configure_item*) malloc(item->length);
 	memcpy(add, item, item->length);
 	
 	bool status;
-	if(index < 0)
+	if (index < 0)
 		status = fItems.AddItem(add);
 	else
 		status = fItems.AddItem(add, index);
-	if(!status) {
+	if (!status) {
 		free(add);
 		return false;
 	}
@@ -118,7 +118,7 @@ KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index)
 bool
 KPPPConfigurePacket::RemoveItem(ppp_configure_item *item)
 {
-	if(!fItems.HasItem(item))
+	if (!fItems.HasItem(item))
 		return false;
 	
 	fItems.RemoveItem(item);
@@ -134,7 +134,7 @@ KPPPConfigurePacket::ItemAt(int32 index) const
 {
 	ppp_configure_item *item = fItems.ItemAt(index);
 	
-	if(item == fItems.GetDefaultItem())
+	if (item == fItems.GetDefaultItem())
 		return NULL;
 	
 	return item;
@@ -147,9 +147,9 @@ KPPPConfigurePacket::ItemWithType(uint8 type) const
 {
 	ppp_configure_item *item;
 	
-	for(int32 index = 0; index < CountItems(); index++) {
+	for (int32 index = 0; index < CountItems(); index++) {
 		item = ItemAt(index);
-		if(item && item->type == type)
+		if (item && item->type == type)
 			return item;
 	}
 	
@@ -180,11 +180,11 @@ KPPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve)
 	uint16 length = 0;
 	ppp_configure_item *item;
 	
-	for(int32 index = 0; index < CountItems(); index++) {
+	for (int32 index = 0; index < CountItems(); index++) {
 		item = ItemAt(index);
 		
 		// make sure we have enough space left
-		if(MRU - length < item->length) {
+		if (MRU - length < item->length) {
 			m_freem(packet);
 			return NULL;
 		}
