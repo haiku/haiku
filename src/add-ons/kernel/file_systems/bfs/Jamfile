@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 
-# save original optimization level
-oldOPTIM = $(OPTIM) ;
-
 # R5 support has been removed!
 #
 # Have a look in src/tests/add-ons/kernel/file_systems/bfs/r5/
@@ -50,5 +47,3 @@ SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
-# restore original optimization level
-OPTIM = $(oldOPTIM) ;
