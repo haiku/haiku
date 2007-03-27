@@ -53,7 +53,8 @@ status_t
 KPPPDevice::Control(uint32 op, void *data, size_t length)
 {
 	switch (op) {
-		case PPPC_GET_DEVICE_INFO: 
+		case PPPC_GET_DEVICE_INFO:
+		{
 			if (length < sizeof(ppp_device_info_t) || !data)
 				return B_NO_MEMORY;
 
@@ -67,6 +68,7 @@ KPPPDevice::Control(uint32 op, void *data, size_t length)
 			info->outputBytesCount = CountOutputBytes();
 			info->isUp = IsUp();
 			break;
+		}
 
 		default:
 			return B_BAD_VALUE;
