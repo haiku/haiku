@@ -589,6 +589,14 @@ UserlandFS::KernelEmu::remove_debugger_command(char *name,
 	return B_OK;
 }
 
+// parse_expression
+uint32
+UserlandFS::KernelEmu::parse_expression(const char *string)
+{
+	return 0;
+}
+
+
 // kprintf
 //void
 //kprintf(const char *format, ...)

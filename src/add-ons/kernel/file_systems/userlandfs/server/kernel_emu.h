@@ -45,6 +45,7 @@ void dump_block(const char *buffer, int size, const char *prefix);
 int add_debugger_command(char *name, int (*func)(int argc, char **argv),
 	char *help);
 int remove_debugger_command(char *name, int (*func)(int argc, char **argv));
+uint32 parse_expression(const char *string);
 
 thread_id spawn_kernel_thread(thread_entry function, const char *threadName,
 	long priority, void *arg);

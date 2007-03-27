@@ -435,14 +435,21 @@ panic(const char *format, ...)
 int
 add_debugger_command(char *name, debugger_command_hook hook, char *help)
 {
-	return B_OK;
+	return UserlandFS::KernelEmu::add_debugger_command(name, hook, help);
 }
 
 // remove_debugger_command
 int
 remove_debugger_command(char *name, debugger_command_hook hook)
 {
-	return B_OK;
+	return UserlandFS::KernelEmu::remove_debugger_command(name, hook);
+}
+
+// parse_expression
+uint32
+parse_expression(const char *string)
+{
+	return UserlandFS::KernelEmu::parse_expression(string);
 }
 
 // kprintf
