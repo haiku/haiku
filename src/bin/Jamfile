@@ -151,6 +151,7 @@ SubInclude HAIKU_TOP src bin bison ;
 SubInclude HAIKU_TOP src bin chkbfs ;
 SubInclude HAIKU_TOP src bin compress ;
 SubInclude HAIKU_TOP src bin coreutils ;
+SubInclude HAIKU_TOP src bin ctags ;
 SubInclude HAIKU_TOP src bin desklink ;
 SubInclude HAIKU_TOP src bin diffutils ;
 SubInclude HAIKU_TOP src bin findutils ;

@@ -21,7 +21,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 }
 
 BEOS_BIN = "[" addattr alert arp basename bc beep cat catattr chgrp chmod chop chown cksum clear
-	clockconfig cmp comm cp copyattr csplit cut date dc dd desklink df diff dircolors dirname driveinfo
+	clockconfig cmp comm cp copyattr csplit ctags cut date dc dd desklink df diff dircolors dirname driveinfo
 	dstcheck du echo eject env error expand expr factor false fdinfo ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
