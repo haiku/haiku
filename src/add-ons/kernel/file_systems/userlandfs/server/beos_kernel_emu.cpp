@@ -355,7 +355,7 @@ int
 add_debugger_command(char *name,
 	int (*func)(int argc, char **argv), char *help)
 {
-	return UserlandFS::KernelEmu::add_debugger_command(name, hook, help);
+	return UserlandFS::KernelEmu::add_debugger_command(name, func, help);
 }
 
 // remove_debugger_command
@@ -363,7 +363,7 @@ int
 remove_debugger_command(char *name,
 	int (*func)(int argc, char **argv))
 {
-	return UserlandFS::KernelEmu::remove_debugger_command(name, hook);
+	return UserlandFS::KernelEmu::remove_debugger_command(name, func);
 }
 
 // parse_expression
