@@ -160,6 +160,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	fd(_fd),
 	max_blocks(numBlocks),
 	block_size(blockSize),
+	allocated_block_count(0),
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
@@ -284,10 +285,8 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 {
 	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
 
-	cached_block *next = NULL;
-	for (cached_block *block = unused_blocks.First(); block != NULL;
-			block = next) {
-		next = block->next;
+	for (block_list::Iterator it = unused_blocks.GetIterator();
+		 cached_block *block = it.Next();) {
 
 		if (maxAccessed < block->accessed)
 			continue;
@@ -300,7 +299,7 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 			write_cached_block(this, block, false);
 
 		// remove block from lists
-		unused_blocks.Remove(block);
+		it.Remove();
 		hash_remove(hash, block);
 
 		FreeBlock(block);
