@@ -102,6 +102,8 @@ DEFINE_FACTORY(sockaddr_args_ptr, struct sockaddr_args *);
 DEFINE_FACTORY(transfer_args_ptr, struct transfer_args *);
 DEFINE_FACTORY(sockopt_args_ptr, struct sockopt_args *);
 DEFINE_FACTORY(socket_args_ptr, struct socket_args *);
+DEFINE_FACTORY(ifreq_ptr, struct ifreq *);
+DEFINE_FACTORY(ifconf_ptr, struct ifconf *);
 
 DEFINE_FACTORY(int_ptr, int *);
 DEFINE_FACTORY(long_ptr, long *);

@@ -93,6 +93,9 @@ static
 string
 read_string(Context &context, void *data)
 {
+	if (data == NULL || !context.GetContents(Context::STRINGS))
+		return context.FormatPointer(data);
+
 	char buffer[256];
 	int32 bytesRead;
 	status_t error = context.Reader().Read(data, buffer, sizeof(buffer), bytesRead);
@@ -140,19 +143,14 @@ string
 TypeHandlerImpl<const char*>::GetParameterValue(Context &context, Parameter *,
 						const void *address)
 {
-	void *data = *(void **)address;
-	if (data != NULL && context.GetContents(Context::STRINGS))
-		return read_string(context, data);
-
-	return context.FormatPointer(data);
+	return read_string(context, *(void **)address);
 }
 
 template<>
 string
 TypeHandlerImpl<const char*>::GetReturnValue(Context &context, uint64 value)
 {
-	void *ptr = (void *)value;
-	return GetParameterValue(context, NULL, (const void *)&ptr);
+	return read_string(context, (void *)value);
 }
 
 EnumTypeHandler::EnumTypeHandler(const EnumMap &m) : fMap(m) {}

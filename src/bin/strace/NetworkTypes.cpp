@@ -107,7 +107,7 @@ format_pointer_value(Context &context, void *address)
 {
 	Type data;
 
-	if (obtain_pointer_data(context, &data, address,Context::COMPLEX_STRUCTS))
+	if (obtain_pointer_data(context, &data, address, Context::COMPLEX_STRUCTS))
 		return "{" + format_pointer(context, &data) + "}";
 
 	return context.FormatPointer(address);
@@ -129,9 +129,18 @@ static string
 format_socket_family(Context &context, int family)
 {
 	if (context.GetContents(Context::ENUMERATIONS)) {
+#define SOCKET_FAMILY(family) \
+		case family: \
+			return #family
+
 		switch (family) {
-		case AF_INET:
-			return "AF_INET";
+		SOCKET_FAMILY(AF_UNSPEC);
+		SOCKET_FAMILY(AF_INET);
+		SOCKET_FAMILY(AF_APPLETALK);
+		SOCKET_FAMILY(AF_ROUTE);
+		SOCKET_FAMILY(AF_LINK);
+		SOCKET_FAMILY(AF_INET6);
+		SOCKET_FAMILY(AF_LOCAL);
 		}
 	}
 
@@ -378,6 +387,60 @@ format_pointer(Context &context, msghdr *h)
 	return r;
 }
 
+static string
+format_pointer(Context &context, ifreq *ifr)
+{
+	return string(ifr->ifr_name) + ", ...";
+}
+
+static string
+format_pointer(Context &context, ifconf *conf)
+{
+	unsigned char buffer[sizeof(ifreq) * 8];
+	int maxData = sizeof(buffer);
+	int32 bytesRead;
+
+	if (conf->ifc_len < maxData)
+		maxData = conf->ifc_len;
+
+	string r = "len = " + context.FormatSigned(conf->ifc_len);
+
+	if (conf->ifc_len == 0)
+		return r;
+
+	status_t err = context.Reader().Read(conf->ifc_buf, buffer,
+					     maxData, bytesRead);
+	if (err != B_OK)
+		return r + ", buf = " + context.FormatPointer(conf->ifc_buf);
+
+	r += ", [";
+
+	uint8 *current = buffer, *bufferEnd = buffer + bytesRead;
+	for (int i = 0; i < 8; i++) {
+		if ((bufferEnd - current) < (IF_NAMESIZE + 1))
+			break;
+
+		ifreq *ifr = (ifreq *)current;
+		int size = IF_NAMESIZE + ifr->ifr_addr.sa_len;
+
+		if ((bufferEnd - current) < size)
+			break;
+
+		if (i > 0)
+			r += ", ";
+
+		r += "{" + string(ifr->ifr_name) + ", {"
+			 + format_pointer(context, &ifr->ifr_addr) + "}}";
+
+		current += size;
+	}
+
+	if (current < bufferEnd)
+		r += ", ...";
+
+	return r + "]";
+}
+
 template<typename Type>
 class SpecializedPointerTypeHandler : public TypeHandler {
 	string GetParameterValue(Context &context, Parameter *,
@@ -410,3 +473,5 @@ POINTER_TYPE(transfer_args_ptr, struct transfer_args);
 POINTER_TYPE(sockopt_args_ptr, struct sockopt_args);
 POINTER_TYPE(socket_args_ptr, struct socket_args);
 POINTER_TYPE(msghdr_ptr, struct msghdr);
+POINTER_TYPE(ifreq_ptr, struct ifreq);
+POINTER_TYPE(ifconf_ptr, struct ifconf);
