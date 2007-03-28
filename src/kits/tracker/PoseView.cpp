@@ -6759,12 +6759,12 @@ BPoseView::DragSelectionRect(BPoint startPoint, bool shouldExtend)
 
 	// clearing the selection could take a while so poll the mouse again
 	BPoint newMousePoint;
-	uint32	button;
+	uint32 button;
 	GetMouse(&newMousePoint, &button);
 
 	// draw initial empty selection rectangle
-	BRect lastselectionRect;
-	fSelectionRect = lastselectionRect = BRect(startPoint, startPoint - BPoint(1, 1));
+	BRect lastSelectionRect;
+	fSelectionRect = lastSelectionRect = BRect(startPoint, startPoint - BPoint(1, 1));
 
 	if (!fTransparentSelection) {
 		SetDrawingMode(B_OP_INVERT);
@@ -6813,19 +6813,23 @@ BPoseView::DragSelectionRect(BPoint startPoint, bool shouldExtend)
 				BRegion updateRegion1;
 				BRegion updateRegion2;
 
-				bool samewidth = fSelectionRect.Width() == lastselectionRect.Width();
-				bool sameheight = fSelectionRect.Height() == lastselectionRect.Height();
+				bool sameWidth = fSelectionRect.Width() == lastSelectionRect.Width();
+				bool sameHeight = fSelectionRect.Height() == lastSelectionRect.Height();
 
 				updateRegion1.Include(fSelectionRect);
-				updateRegion1.Exclude(lastselectionRect.InsetByCopy(samewidth ? 0 : 1, sameheight ? 0 : 1));
-				updateRegion2.Include(lastselectionRect);
-				updateRegion2.Exclude(fSelectionRect.InsetByCopy(samewidth ? 0 : 1, sameheight ? 0 : 1));
+				updateRegion1.Exclude(lastSelectionRect.InsetByCopy(
+					sameWidth ? 0 : 1, sameHeight ? 0 : 1));
+				updateRegion2.Include(lastSelectionRect);
+				updateRegion2.Exclude(fSelectionRect.InsetByCopy(
+					sameWidth ? 0 : 1, sameHeight ? 0 : 1));
 				updateRegion1.Include(&updateRegion2);
-				BRect unionRect = fSelectionRect & lastselectionRect;
-				updateRegion1.Exclude(unionRect & BRect(-2000, startPoint.y, 2000, startPoint.y));
-				updateRegion1.Exclude(unionRect & BRect(startPoint.x, -2000, startPoint.x, 2000));
+				BRect unionRect = fSelectionRect & lastSelectionRect;
+				updateRegion1.Exclude(unionRect
+					& BRect(-2000, startPoint.y, 2000, startPoint.y));
+				updateRegion1.Exclude(unionRect
+					& BRect(startPoint.x, -2000, startPoint.x, 2000));
 
-				lastselectionRect = fSelectionRect;
+				lastSelectionRect = fSelectionRect;
 
 				Invalidate(&updateRegion1);
 				Window()->UpdateIfNeeded();

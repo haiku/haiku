@@ -623,11 +623,9 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 {
 	const WellKnowEntryList::WellKnownEntry *wellKnownEntry
 		= WellKnowEntryList::MatchEntry(model->NodeRef());
-
 	if (!wellKnownEntry)
 		return NULL;
 
-	
 	IconCacheEntry *entry = NULL;
 
 	BString type("tracker/active_");
@@ -637,7 +635,7 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 	(*resultingOpenCache)->Lock();
 
 	source = kTrackerSupplied;
-	
+
 	entry = fSharedCache.FindItem(type.String());
 	if (entry) {
 		entry = entry->ResolveIfAlias(&fSharedCache, entry);
@@ -646,7 +644,6 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 	}
 
 	if (!entry || !entry->HaveIconBitmap(NORMAL_ICON_ONLY, size)) {
-
 		// match up well known entries in the file system with specialized
 		// icons stored in Tracker's resources
 		int32 resid = -1;
@@ -654,76 +651,75 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 			case B_BOOT_DISK:
 				resid = kResBootVolumeIcon;
 				break;
-				
+
 			case B_BEOS_DIRECTORY:
 				resid = kResBeosFolderIcon;
 				break;
-				
+
 			case B_USER_DIRECTORY:
 				resid = kResHomeDirIcon;
 				break;
-			
+
 			case B_BEOS_FONTS_DIRECTORY:
 			case B_COMMON_FONTS_DIRECTORY:
 			case B_USER_FONTS_DIRECTORY:
 				resid = kResFontDirIcon;
 				break;
-	
+
 			case B_BEOS_APPS_DIRECTORY:
 			case B_APPS_DIRECTORY:
 			case B_USER_DESKBAR_APPS_DIRECTORY:
 				resid = kResAppsDirIcon;
 				break;
-	
+
 			case B_BEOS_PREFERENCES_DIRECTORY:
 			case B_PREFERENCES_DIRECTORY:
 			case B_USER_DESKBAR_PREFERENCES_DIRECTORY:
 				resid = kResPrefsDirIcon;
 				break;
-	
+
 			case B_USER_MAIL_DIRECTORY:
 				resid = kResMailDirIcon;
 				break;
-	
+
 			case B_USER_QUERIES_DIRECTORY:
 				resid = kResQueryDirIcon;
 				break;
-	
+
 			case B_COMMON_DEVELOP_DIRECTORY:
 			case B_USER_DESKBAR_DEVELOP_DIRECTORY:
 				resid = kResDevelopDirIcon;
 				break;
-			
+
 			case B_USER_CONFIG_DIRECTORY:
 				resid = kResConfigDirIcon;
 				break;
-				
+
 			case B_USER_PEOPLE_DIRECTORY:
 				resid = kResPersonDirIcon;
 				break;
-				
+
 			case B_USER_DOWNLOADS_DIRECTORY:
 				resid = kResDownloadDirIcon;
 				break;
-				
+
 			default:
 				return NULL;
 		}
 
 		entry = fSharedCache.AddItem(type.String());
-		
+
 		BBitmap *bitmap = lazyBitmap->Get();
 		GetTrackerResources()->GetIconResource(resid, size, bitmap);
 		entry->SetIcon(lazyBitmap->Adopt(), kNormalIcon, size);
-	
 	}
-	
+
 	if (mode != kNormalIcon
 		&& entry->HaveIconBitmap(NORMAL_ICON_ONLY, size)) {
 		entry->ConstructBitmap(mode, size, lazyBitmap);
 		entry->SetIcon(lazyBitmap->Adopt(), mode, size);
 	}
-	
+
 	ASSERT(entry->HaveIconBitmap(mode, size));
 	return entry;
 }
