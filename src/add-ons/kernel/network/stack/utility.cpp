@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -161,8 +161,10 @@ fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
 					status = B_NO_MEMORY;
 					break;
 				}
-			} else
+			} else {
 				list_remove_item(&fifo->buffers, buffer);
+				fifo->current_bytes -= buffer->size;
+			}
 
 			*_buffer = buffer;
 			status = B_OK;
