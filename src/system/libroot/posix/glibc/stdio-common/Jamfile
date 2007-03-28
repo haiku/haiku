@@ -17,7 +17,7 @@ MergeObject posix_gnu_stdio.o : #_common.o :
 	_itoa.c
 	_itowa.c
 	asprintf.c
-	dprintf.c
+#	dprintf.c
 	fprintf.c
 	fscanf.c
 	getline.c
