@@ -43,5 +43,5 @@ Application Cortex :
 	cortex_support.a
 	be media tracker translation
 	$(TARGET_LIBSTDC++)
-	: ../Resource.rsrc
+	: ../Resource.rdef
 ;
