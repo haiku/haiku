@@ -135,5 +135,8 @@ BinCommand sha512sum : md5sum-sha512sum.c : libfetish.a : $(coreutils_rsrc) ;
 BinCommand vdir : 
 	[ FGristFiles ls.o ] ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;
 
+BinCommand <bin>install : install.c [ FGristFiles copy.o cp-hash.o ]
+	: libfetish.a : $(coreutils_rsrc) ;
+
 MakeLocatePlatform groups ;
 Shell groups : groups.sh ;
