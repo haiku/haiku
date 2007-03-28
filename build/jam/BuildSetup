@@ -639,7 +639,8 @@ if $(TARGET_PLATFORM) != haiku &&  $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
 
 if $(TARGET_PLATFORM) = libbe_test {
 	# headers and flags
-	TARGET_HDRS += [ PublicHeaders app game interface storage support ]
+	TARGET_HDRS +=
+		[ PublicHeaders app drivers game interface kernel storage support ]
 		[ PrivateHeaders $(DOT) ] ;
 	TARGET_DEFINES += __HAIKU__ ;
 

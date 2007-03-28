@@ -30,7 +30,6 @@ SharedLibrary libbe.so :
 	<libbe>app_kit.o
 	<libbe>interface_kit.o
 	<libbe>storage_kit.o
-	<libbe>storage_diskdevice_kit.o
 	<libbe>support_kit.o
 
 	libqoca.so

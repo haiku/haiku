@@ -2,11 +2,16 @@ SubDir HAIKU_TOP src build libhaikucompat ;
 
 SetSubDirSupportedPlatforms libbe_test r5 dano bone ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
+
 StaticLibrary libhaikucompat.a :
 	strcasestr.c
 	strlcat.c
 	strlcpy.c
 	strnlen.c
+
+	misc.cpp
+	syscalls.cpp
 ;
 
 SEARCH on [ FGristFiles strcasestr.c strlcat.c strlcpy.c strnlen.c ]

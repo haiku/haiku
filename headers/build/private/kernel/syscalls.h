@@ -9,6 +9,7 @@
 #include <OS.h>
 #include <image.h>
 //#include <disk_device_manager/ddm_userland_interface.h>
+#include <storage/DiskDeviceDefs.h>
 
 //#include <sys/select.h>
 #include <sys/uio.h>
@@ -290,13 +291,13 @@ extern status_t		_kern_unlock_node(int fd);
 
 
 /* Disk Device Manager syscalls */
-/*
+
 // iterating, retrieving device/partition data
 extern partition_id	_kern_get_next_disk_device_id(int32 *cookie, size_t *neededSize);
 extern partition_id	_kern_find_disk_device(const char *filename, size_t *neededSize);
 extern partition_id	_kern_find_partition(const char *filename, size_t *neededSize);
 extern status_t		_kern_get_disk_device_data(partition_id deviceID, bool deviceOnly,
-						bool shadow, user_disk_device_data *buffer,
+						bool shadow, struct user_disk_device_data *buffer,
 						size_t bufferSize, size_t *neededSize);
 extern partition_id	_kern_register_file_device(const char *filename);
 extern status_t		_kern_unregister_file_device(partition_id deviceID,
@@ -306,10 +307,11 @@ extern status_t		_kern_unregister_file_device(partition_id deviceID,
 
 // disk systems
 extern status_t		_kern_get_disk_system_info(disk_system_id id,
-						user_disk_system_info *info);
+						struct user_disk_system_info *info);
 extern status_t		_kern_get_next_disk_system_info(int32 *cookie,
-						user_disk_system_info *info);
-extern status_t		_kern_find_disk_system(const char *name, user_disk_system_info *info);
+						struct user_disk_system_info *info);
+extern status_t		_kern_find_disk_system(const char *name,
+						struct user_disk_system_info *info);
 extern bool			_kern_supports_defragmenting_partition(partition_id partitionID,
 						int32 changeCounter, bool *whileMounted);
 extern bool			_kern_supports_repairing_partition(partition_id partitionID,
@@ -356,8 +358,9 @@ extern status_t		_kern_validate_create_child_partition(partition_id partitionID,
 						const char *type, const char *parameters,
 						size_t parametersSize);
 extern status_t		_kern_get_partitionable_spaces(partition_id partitionID,
-						int32 changeCounter, partitionable_space_data *buffer,
-						int32 count, int32 *actualCount);
+						int32 changeCounter,
+						struct partitionable_space_data *buffer, int32 count,
+						int32 *actualCount);
 extern status_t		_kern_get_next_supported_partition_type(partition_id partitionID,
 						int32 changeCounter, int32 *cookie, char *type);
 extern status_t		_kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
@@ -403,13 +406,13 @@ extern status_t		_kern_delete_partition(partition_id partitionID, int32 changeCo
 
 // jobs
 extern status_t		_kern_get_next_disk_device_job_info(int32 *cookie,
-						user_disk_device_job_info *info);
+						struct user_disk_device_job_info *info);
 extern status_t		_kern_get_disk_device_job_info(disk_job_id id,
-						user_disk_device_job_info *info);
+						struct user_disk_device_job_info *info);
 extern status_t		_kern_get_disk_device_job_progress_info(disk_job_id id,
-						disk_device_job_progress_info *info);
+						struct disk_device_job_progress_info *info);
 extern status_t		_kern_pause_disk_device_job(disk_job_id id);
-extern status_t		_kern_cancel_disk_device_job(disk_job_id id, bool reverse);*/
+extern status_t		_kern_cancel_disk_device_job(disk_job_id id, bool reverse);
 
 #if 0
 

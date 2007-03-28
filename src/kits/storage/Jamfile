@@ -67,13 +67,8 @@ MergeObject <libbe>storage_kit.o :
 	RPattern.cpp
 	RPatternList.cpp
 	Rule.cpp
-;
 
-# We need to keep the DiskDevice API out of libbe_haiku as long as the
-# Interface Kit is not fully functional (at least the part we are using).
-# So, we build it separately.
-
-MergeObject <libbe>storage_diskdevice_kit.o :
+	# disk device API
 	DiskDevice.cpp
 	DiskDeviceJob.cpp
 	DiskDeviceList.cpp
@@ -85,6 +80,7 @@ MergeObject <libbe>storage_diskdevice_kit.o :
 	Partition.cpp
 	PartitioningInfo.cpp 
 ;
+
 
 # The adapter library we need (Storage Kit).
 #

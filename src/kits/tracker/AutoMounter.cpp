@@ -57,6 +57,7 @@ All rights reserved.
 #include <VolumeRoster.h>
 
 #include <string.h>
+#include <unistd.h>
 
 
 static const char *kAutoMounterSettings = "automounter_settings";
