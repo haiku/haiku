@@ -373,6 +373,16 @@ parse_expression(const char *string)
 	return UserlandFS::KernelEmu::parse_expression(string);
 }
 
+// dprintf
+void
+dprintf(const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	UserlandFS::KernelEmu::vdprintf(format, args);
+	va_end(args);
+}
+
 // kprintf
 void
 kprintf(const char *format, ...)
