@@ -12,11 +12,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include <map>
+#include <utility>
+
 #include <net_stack_driver.h>
 
 #include "Context.h"
 #include "MemoryReader.h"
 #include "TypeHandler.h"
+
+using std::map;
+using std::pair;
 
 template<typename Type>
 static bool
@@ -292,7 +298,7 @@ public:
 	{
 		for (int i = 0; kSocketOptions[i].name != NULL; i++) {
 			fMap.insert(make_pair(
-					make_pair(kSocketOptions[i].level,
+					std::make_pair(kSocketOptions[i].level,
 						  kSocketOptions[i].option),
 					&kSocketOptions[i]));
 		}
@@ -300,7 +306,7 @@ public:
 
 	const socket_option_info *GetEntry(int level, int option) const
 	{
-		ThisMap::const_iterator i = fMap.find(make_pair(level, option));
+		ThisMap::const_iterator i = fMap.find(std::make_pair(level, option));
 		if (i == fMap.end())
 			return NULL;
 
