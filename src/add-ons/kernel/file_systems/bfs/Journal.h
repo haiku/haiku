@@ -11,7 +11,7 @@
 #include <util/DoublyLinkedList.h>
 
 #ifdef USER
-#	include "myfs.h"
+//#	include "myfs.h"
 #	include <stdio.h>
 #endif
 

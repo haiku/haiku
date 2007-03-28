@@ -574,7 +574,7 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 }
 
 #ifdef USER
-extern "C" void kill_device_vnodes(dev_t id);
+//extern "C" void kill_device_vnodes(dev_t id);
 	// This call is only available in the userland fs_shell
 
 status_t
@@ -672,7 +672,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	if (fIndicesNode != NULL)
 		put_vnode(ID(), fIndicesNode->ID());
 
-	kill_device_vnodes(ID());
+//	kill_device_vnodes(ID());
 		// This call is only available in the userland fs_shell
 
 	Sync();
