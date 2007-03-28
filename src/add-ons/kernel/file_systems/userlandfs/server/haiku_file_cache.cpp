@@ -552,6 +552,8 @@ vm_page_set_state(vm_page *page, int state)
 }
 
 
+// cache must be locked
+//
 void
 vm_cache_insert_page(file_cache_ref *cache, vm_page *page, off_t offset)
 {
@@ -581,6 +583,8 @@ vm_cache_insert_page(file_cache_ref *cache, vm_page *page, off_t offset)
 }
 
 
+// cache must be locked
+//
 void
 vm_cache_remove_page(file_cache_ref *cache, vm_page *page)
 {
@@ -829,6 +833,8 @@ vfs_write_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 }
 
 
+// cache must be locked
+//
 status_t
 vfs_get_file_map(file_cache_ref *cache, off_t offset, size_t size,
 	struct file_io_vec *vecs, size_t *_count)
@@ -840,15 +846,10 @@ vfs_get_file_map(file_cache_ref *cache, off_t offset, size_t size,
 		return B_ERROR;
 	}
 
-	// node handle cached?
-	fs_vnode nodeHandle = NULL;
-	{
-		MutexLocker _(cache->lock);
-		nodeHandle = cache->nodeHandle;
-	}
-
-	// if not cached, get the node handle
+	// if node handle is not cached, get it
+	fs_vnode nodeHandle = cache->nodeHandle;
 	if (!nodeHandle) {
+		// TODO: Unlock cache while getting the handle?
 		status_t error = UserlandFS::KernelEmu::get_vnode(cache->mountID,
 			cache->nodeID, &nodeHandle);
 		if (error != B_OK)
@@ -856,7 +857,6 @@ vfs_get_file_map(file_cache_ref *cache, off_t offset, size_t size,
 		UserlandFS::KernelEmu::put_vnode(cache->mountID, cache->nodeID);
 
 		// cache the handle
-		MutexLocker _(cache->lock);
 		cache->nodeHandle = nodeHandle;
 	}
 
@@ -1769,7 +1769,17 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	ref->deviceFD = fd;
 	ref->virtual_size = size;
 
-//	((vnode_store *)ref->cache->cache->store)->file_cache_ref = ref;
+	// create lock
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "file cache %ld:%lld", mountID, vnodeID);
+	status_t error = mutex_init(&ref->lock, buffer);
+	if (error != B_OK) {
+		dprintf("file_cache_create(): Failed to init mutex: %s\n",
+			strerror(error));
+		delete ref;
+		return NULL;
+	}
+
 	return ref;
 }
 
@@ -1790,7 +1800,8 @@ file_cache_delete(void *_cacheRef)
 
 	mutex_lock(&ref->lock);
 	vm_cache_resize(ref, 0);
-	mutex_unlock(&ref->lock);
+
+	mutex_destroy(&ref->lock);
 
 	delete ref;
 }
