@@ -1,20 +1,21 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
+
+#include "vfs_select.h"
 
 #include <vfs.h>
 #include <fd.h>
 #include <syscalls.h>
 #include <fs/select_sync_pool.h>
-#include "vfs_select.h"
 
-#include <sys/select.h>
 #include <new>
 #include <poll.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/select.h>
 
 //#define TRACE_VFS_SELECT
 #ifdef TRACE_VFS_SELECT
@@ -26,10 +27,10 @@
 #endif
 
 
-/** Selects all events in the mask on the specified file descriptor */
-
+/*! Selects all events in the mask on the specified file descriptor */
 static int
-select_events(struct select_sync *sync, int fd, int ref, uint16 selectedEvents, bool kernel)
+select_events(struct select_sync *sync, int fd, int ref, uint16 selectedEvents,
+	bool kernel)
 {
 	uint32 count = 0;
 	uint16 event = 1;
@@ -44,10 +45,10 @@ select_events(struct select_sync *sync, int fd, int ref, uint16 selectedEvents, 
 }
 
 
-/** Deselects all events in the mask on the specified file descriptor */
-
+/*! Deselects all events in the mask on the specified file descriptor */
 static void
-deselect_events(struct select_sync *sync, int fd, uint16 selectedEvents, bool kernel)
+deselect_events(struct select_sync *sync, int fd, uint16 selectedEvents,
+	bool kernel)
 {
 	uint16 event = 1;
 
@@ -59,37 +60,36 @@ deselect_events(struct select_sync *sync, int fd, uint16 selectedEvents, bool ke
 }
 
 
-/** Clears all bits in the fd_set - since we are using variable sized
- *	arrays in the kernel, we can't use the FD_ZERO() macro provided by
- *	sys/select.h for this task.
- *	All other FD_xxx() macros are safe to use, though.
- */
-
+/*!
+	Clears all bits in the fd_set - since we are using variable sized
+	arrays in the kernel, we can't use the FD_ZERO() macro provided by
+	sys/select.h for this task.
+	All other FD_xxx() macros are safe to use, though.
+*/
 static inline void
-fd_zero(fd_set *set, int numfds)
+fd_zero(fd_set *set, int numFDs)
 {
 	if (set != NULL)
-		memset(set, 0, _howmany(numfds, NFDBITS) * sizeof(fd_mask));
+		memset(set, 0, _howmany(numFDs, NFDBITS) * sizeof(fd_mask));
 }
 
 
 static int
-common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask, bool kernel)
 {
 	struct select_sync sync;
 	status_t status = B_OK;
-	int count = 0;
 	int fd;
 
-	FUNCTION(("common_select(%d, %p, %p, %p, %lld, %p, %d)\n", numfds, readSet,
+	FUNCTION(("common_select(%d, %p, %p, %p, %lld, %p, %d)\n", numFDs, readSet,
 		writeSet, errorSet, timeout, sigMask, kernel));
 
-	// ToDo: set sigMask to make pselect() functional different from select()
+	// TODO: set sigMask to make pselect() functional different from select()
 
 	// check if fds are valid before doing anything
 
-	for (fd = 0; fd < numfds; fd++) {
+	for (fd = 0; fd < numFDs; fd++) {
 		if (((readSet && FD_ISSET(fd, readSet))
 			|| (writeSet && FD_ISSET(fd, writeSet))
 			|| (errorSet && FD_ISSET(fd, errorSet)))
@@ -99,24 +99,22 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// allocate resources
 
-	memset(&sync, 0, sizeof(select_sync));
-
 	sync.sem = create_sem(0, "select");
 	if (sync.sem < B_OK)
 		return sync.sem;
 
 	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
 
-	sync.set = (select_info*)malloc(sizeof(select_info) * numfds);
+	sync.set = (select_info *)malloc(sizeof(select_info) * numFDs);
 	if (sync.set == NULL) {
 		delete_sem(sync.sem);
 		return B_NO_MEMORY;
 	}
-	sync.count = numfds;
+	sync.count = numFDs;
 
 	// start selecting file descriptors
 
-	for (fd = 0; fd < numfds; fd++) {
+	for (fd = 0; fd < numFDs; fd++) {
 		sync.set[fd].selected_events = 0;
 		sync.set[fd].events = 0;
 
@@ -127,7 +125,7 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 		if (errorSet && FD_ISSET(fd, errorSet))
 			sync.set[fd].selected_events |= SELECT_FLAG(B_SELECT_ERROR);
 
-		count += select_events(&sync, fd, fd, sync.set[fd].selected_events, kernel);
+		select_events(&sync, fd, fd, sync.set[fd].selected_events, kernel);
 			// array position is the same as the fd for select()
 	}
 
@@ -138,9 +136,9 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// deselect file descriptors
 
-	for (fd = 0; fd < numfds; fd++)
+	for (fd = 0; fd < numFDs; fd++) {
 		deselect_events(&sync, fd, sync.set[fd].selected_events, kernel);
-		// ToDo: Since we're using FD indices instead of FDs (file_descriptors),
+		// TODO: Since we're using FD indices instead of FDs (file_descriptors),
 		// it can happen that the FD index (even the FD) on which we invoked
 		// the select() FS hook is already closed at this point.
 		// This has two main consequences:
@@ -154,49 +152,46 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 		//    second call to notify_select_event() might be too late, since
 		//    select() might already be finished. Dangerous!
 		//    notify_select_event() would operate on already free()d memory!
+	}
 
 	PRINT(("common_select(): events deselected\n"));
 
-	// collect the events that are happened in the meantime
+	// collect the events that happened in the meantime
 
-	switch (status) {
-		case B_OK:
-			// Clear sets to store the received events
-			// (we don't use the macros, because we have variable sized arrays;
-			// the other FD_xxx() macros are safe, though).
-			fd_zero(readSet, numfds);
-			fd_zero(writeSet, numfds);
-			fd_zero(errorSet, numfds);
+	int count = 0;
 
-			for (count = 0, fd = 0;fd < numfds; fd++) {
-				if (readSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_READ)) {
-					FD_SET(fd, readSet);
-					count++;
-				}
-				if (writeSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_WRITE)) {
-					FD_SET(fd, writeSet);
-					count++;
-				}
-				if (errorSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_ERROR)) {
-					FD_SET(fd, errorSet);
-					count++;
-				}
-			}
-			break;
-
-		case B_INTERRUPTED:
-			count = B_INTERRUPTED;
-			break;
-
-		case B_TIMED_OUT:
-			fd_zero(readSet, numfds);
-			fd_zero(writeSet, numfds);
-			fd_zero(errorSet, numfds);
-			// supposed to fall through
-		default:
-			// B_TIMED_OUT, and B_WOULD_BLOCK
-			count = 0;
+	if (status == B_INTERRUPTED) {
+		// We must not clear the sets in this case, as applications may
+		// rely on the contents of them.
+		count = B_INTERRUPTED;
+		goto err;
 	}
+
+	// Clear sets to store the received events
+	// (we can't use the macros, because we have variable sized arrays;
+	// the other FD_xxx() macros are safe, though).
+	fd_zero(readSet, numFDs);
+	fd_zero(writeSet, numFDs);
+	fd_zero(errorSet, numFDs);
+
+	if (status == B_OK) {
+		for (count = 0, fd = 0;fd < numFDs; fd++) {
+			if (readSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_READ)) {
+				FD_SET(fd, readSet);
+				count++;
+			}
+			if (writeSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_WRITE)) {
+				FD_SET(fd, writeSet);
+				count++;
+			}
+			if (errorSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_ERROR)) {
+				FD_SET(fd, errorSet);
+				count++;
+			}
+		}
+	}
+
+	// B_TIMED_OUT and B_WOULD_BLOCK are supposed to return 0
 
 err:
 	delete_sem(sync.sem);
@@ -207,7 +202,7 @@ err:
 
 
 static int
-common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
+common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 {
 	status_t status = B_OK;
 	int count = 0;
@@ -216,24 +211,22 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 	// allocate resources
 
 	select_sync sync;
-	memset(&sync, 0, sizeof(select_sync));
-
 	sync.sem = create_sem(0, "poll");
 	if (sync.sem < B_OK)
 		return sync.sem;
 
 	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
 
-	sync.set = (select_info*)malloc(numfds * sizeof(select_info));
+	sync.set = (select_info*)malloc(numFDs * sizeof(select_info));
 	if (sync.set == NULL) {
 		delete_sem(sync.sem);
 		return B_NO_MEMORY;
 	}
-	sync.count = numfds;
+	sync.count = numFDs;
 
 	// start polling file descriptors (by selecting them)
 
-	for (i = 0; i < numfds; i++) {
+	for (i = 0; i < numFDs; i++) {
 		int fd = fds[i].fd;
 
 		// check if fds are valid
@@ -261,14 +254,16 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 
 	// deselect file descriptors
 
-	for (i = 0; i < numfds; i++)
+	for (i = 0; i < numFDs; i++) {
 		deselect_events(&sync, fds[i].fd, sync.set[i].selected_events, kernel);
+			// TODO: same comments apply as on common_select()
+	}
 
 	// collect the events that are happened in the meantime
 
 	switch (status) {
 		case B_OK:
-			for (count = 0, i = 0; i < numfds; i++) {
+			for (count = 0, i = 0; i < numFDs; i++) {
 				if (fds[i].revents == POLLNVAL)
 					continue;
 
@@ -294,8 +289,7 @@ err:
 }
 
 
-//	#pragma mark -
-//	public functions exported to the kernel
+//	#pragma mark - public kernel API
 
 
 status_t
@@ -321,8 +315,7 @@ notify_select_event(struct selectsync *_sync, uint32 ref, uint8 event)
 }
 
 
-//	#pragma mark -
-//	currently private select sync pool functions exported to the kernel
+//	#pragma mark - private kernel exported API
 
 
 static select_sync_pool_entry *
@@ -462,39 +455,38 @@ notify_select_event_pool(select_sync_pool *pool, uint8 event)
 }
 
 
-//	#pragma mark -
-//	Functions called from the POSIX layer
+//	#pragma mark - Kernel POSIX layer
 
 
 ssize_t
-_kern_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+_kern_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask)
 {
-	return common_select(numfds, readSet, writeSet, errorSet, timeout, sigMask, true);
+	return common_select(numFDs, readSet, writeSet, errorSet, timeout,
+		sigMask, true);
 }
 
 
 ssize_t
-_kern_poll(struct pollfd *fds, int numfds, bigtime_t timeout)
+_kern_poll(struct pollfd *fds, int numFDs, bigtime_t timeout)
 {
-	return common_poll(fds, numfds, timeout, true);
+	return common_poll(fds, numFDs, timeout, true);
 }
 
 
-//	#pragma mark -
-//	User syscalls
+//	#pragma mark - User syscalls
 
 
 ssize_t
-_user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userErrorSet,
-	bigtime_t timeout, const sigset_t *userSigMask)
+_user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
+	fd_set *userErrorSet, bigtime_t timeout, const sigset_t *userSigMask)
 {
 	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
-	uint32 bytes = _howmany(numfds, NFDBITS) * sizeof(fd_mask);
+	uint32 bytes = _howmany(numFDs, NFDBITS) * sizeof(fd_mask);
 	sigset_t sigMask;
 	int result;
 
-	if (numfds < 0)
+	if (numFDs < 0)
 		return B_BAD_VALUE;
 
 	if ((userReadSet != NULL && !IS_USER_ADDRESS(userReadSet))
@@ -543,14 +535,18 @@ _user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *user
 	if (userSigMask != NULL)
 		sigMask = *userSigMask;
 
-	result = common_select(numfds, readSet, writeSet, errorSet, timeout, userSigMask ? &sigMask : NULL, false);
+	result = common_select(numFDs, readSet, writeSet, errorSet, timeout,
+		userSigMask ? &sigMask : NULL, false);
 
 	// copy back results
 
 	if (result >= B_OK
-		&& ((readSet != NULL && user_memcpy(userReadSet, readSet, bytes) < B_OK)
-			|| (writeSet != NULL && user_memcpy(userWriteSet, writeSet, bytes) < B_OK)
-			|| (errorSet != NULL && user_memcpy(userErrorSet, errorSet, bytes) < B_OK)))
+		&& ((readSet != NULL
+				&& user_memcpy(userReadSet, readSet, bytes) < B_OK)
+			|| (writeSet != NULL
+				&& user_memcpy(userWriteSet, writeSet, bytes) < B_OK)
+			|| (errorSet != NULL
+				&& user_memcpy(userErrorSet, errorSet, bytes) < B_OK)))
 		result = B_BAD_ADDRESS;
 
 err:
@@ -563,13 +559,13 @@ err:
 
 
 ssize_t
-_user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
+_user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 {
 	struct pollfd *fds;
 	size_t bytes;
 	int result;
 
-	if (numfds < 0)
+	if (numFDs < 0)
 		return B_BAD_VALUE;
 
 	if (userfds == NULL || !IS_USER_ADDRESS(userfds))
@@ -577,7 +573,7 @@ _user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
 
 	// copy parameters
 
-	fds = (struct pollfd *)malloc(bytes = numfds * sizeof(struct pollfd));
+	fds = (struct pollfd *)malloc(bytes = numFDs * sizeof(struct pollfd));
 	if (fds == NULL)
 		return B_NO_MEMORY;
 
@@ -586,7 +582,7 @@ _user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
 		goto err;
 	}
 
-	result = common_poll(fds, numfds, timeout, false);
+	result = common_poll(fds, numFDs, timeout, false);
 
 	// copy back results
 	if (result >= B_OK && user_memcpy(userfds, fds, bytes) < B_OK)
@@ -597,5 +593,4 @@ err:
 
 	return result;
 }
-
 

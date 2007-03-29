@@ -1,12 +1,15 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef VFS_SELECT_H
 #define VFS_SELECT_H
 
+
 #include <Select.h>
 #include <util/DoublyLinkedList.h>
+
+#include <OS.h>
 
 
 typedef struct select_info {
