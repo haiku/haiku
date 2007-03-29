@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src tests kits opengl ;
 
 SubInclude HAIKU_TOP src tests kits opengl glinfo ;
+SubInclude HAIKU_TOP src tests kits opengl direct_mode ;
