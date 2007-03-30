@@ -3215,8 +3215,7 @@ fault_find_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
 				vm_page_set_state(page, PAGE_STATE_BUSY);
 				break;
 			}
-
-			if (page == NULL)
+			if (page == NULL || page == &dummyPage)
 				break;
 
 			// page must be busy
@@ -3226,14 +3225,14 @@ fault_find_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
 			mutex_lock(&cacheRef->lock);
 		}
 
-		if (page != NULL)
+		if (page != NULL && page != &dummyPage)
 			break;
 
 		// The current cache does not contain the page we're looking for
 
 		// If we're at the top most cache, insert the dummy page here to keep other threads
 		// from faulting on the same address and chasing us up the cache chain
-		if (cacheRef == topCacheRef)
+		if (cacheRef == topCacheRef && dummyPage.state != PAGE_STATE_BUSY)
 			fault_insert_dummy_page(cacheRef, dummyPage, cacheOffset);
 
 		// see if the vm_store has it
