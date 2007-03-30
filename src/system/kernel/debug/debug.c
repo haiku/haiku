@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -75,7 +75,7 @@ static int32 sMessageRepeatCount = 0;
 #define HISTORY_SIZE 16
 
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
-static char sParseLine[LINE_BUFFER_SIZE] = "";
+static char sParseLine[LINE_BUFFER_SIZE];
 static int32 sCurrentLine = 0;
 static char *args[MAX_ARGS] = { NULL, };
 
@@ -267,36 +267,53 @@ kgets(char *buffer, int length)
 
 
 static int
-parse_line(char *buf, char **argv, int *argc, int max_args)
+parse_line(const char *buffer, char **argv, int *_argc, int32 maxArgs)
 {
-	int pos = 0;
+	char *string = sParseLine;
+	int32 index = 0;
 
-	strcpy(sParseLine, buf);
+	strcpy(string, buffer);
 
-	if (sParseLine[0] != '\0' && !isspace(sParseLine[0])) {
-		argv[0] = sParseLine;
-		*argc = 1;
-	} else
-		*argc = 0;
+	for (; index < maxArgs && string[0]; index++) {
+		char quoted;
+		char c;
 
-	while (sParseLine[pos] != '\0') {
-		if (isspace(sParseLine[pos])) {
-			sParseLine[pos] = '\0';
-			// scan all of the whitespace out of this
-			while (isspace(sParseLine[++pos]))
-				;
-			if (sParseLine[pos] == '\0')
-				break;
-			argv[*argc] = &sParseLine[pos];
-			(*argc)++;
-
-			if (*argc >= max_args - 1)
-				break;
+		// skip white space
+		while ((c = string[0]) != '\0' && isspace(c)) {
+			string++;
 		}
-		pos++;
-	}
+		if (!c)
+			break;
 
-	return *argc;
+		if (c == '\'' || c == '"') {
+			argv[index] = ++string;
+			quoted = c;
+		} else {
+			argv[index] = string;
+			quoted = 0;
+		}
+
+		// find end of string
+
+		while (string[0]
+			&& ((quoted && string[0] != quoted)
+				|| (!quoted && !isspace(string[0])))) {
+			if (string[0] == '\\') {
+				// filter out backslashes
+				strcpy(string, string + 1);
+				string++;
+			}
+			string++;
+		}
+
+		if (string[0]) {
+			// terminate string
+			string[0] = '\0';
+			string++;
+		}
+    }
+
+	return *_argc = index;
 }
 
 
