@@ -1,40 +1,40 @@
 /*!
-\file BufferIO.h
-\brief Provides the BBufferIO class.
+  \file BufferIO.h
+  \brief Provides the BBufferIO class.
 */
 
 /*!
-\class BBufferIO
-\ingroup support
-\ingroup libbe
-\brief A buffered adapter for BPositionIO objects.
-\author Stefano Ceccherini \<burton666@freemail.it\>
+  \class BBufferIO
+  \ingroup support
+  \ingroup libbe
+  \brief A buffered adapter for BPositionIO objects.
+  \author Stefano Ceccherini \<burton666@freemail.it\>
 
-This class differs from other classes derived from BPositionIO in a sense that
-it does not actually provide an actual entity to be read or written to, but
-rather acts like a "frontend" to a stream. This class especially comes in
-handy when working with files that are constantly written and rewritten and
-where you want do this writing buffered so that the hard disk or the network
-will not have to be accessed so frequently.
+  This class differs from other classes derived from BPositionIO in a sense that
+  it does not actually provide an actual entity to be read or written to, but
+  rather acts like a "frontend" to a stream. This class especially comes in
+  handy when working with files that are constantly written and rewritten and
+  where you want do this writing buffered so that the hard disk or the network
+  will not have to be accessed so frequently.
 
-This class works as follows. After constructing a BBufferIO object that you
-want to be buffered, you can create this object. The constructor takes a 
-\c stream parameter that points to the object to be buffered. You then use
-this object as a proxy to the resource you want to read of or write to. As
-soon as you use ReadAt(), the buffer will be initialised to the contents
-of the original stream,
-and subsequent calls to the positions within the buffer will not be
-routed to the original stream. In the same way WriteAt() will change
-the data in the buffer, but not in the actual stream. In order to flush
-the changes to the original stream, use the Flush() method. Deleting
-the object when you are done with it will also flush the stream and
-update the original stream.
+  This class works as follows. After constructing a BBufferIO object that you
+  want to be buffered, you can create this object. The constructor takes a 
+  \a stream parameter that points to the object to be buffered. You then use
+  this object as a proxy to the resource you want to read of or write to. As
+  soon as you use ReadAt(), the buffer will be initialised to the contents
+  of the original stream,
+  and subsequent calls to the positions within the buffer will not be
+  routed to the original stream. In the same way WriteAt() will change
+  the data in the buffer, but not in the actual stream. In order to flush
+  the changes to the original stream, use the Flush() method. Deleting
+  the object when you are done with it will also flush the stream and
+  update the original stream.
 
-\note This class is not meant to be used in cases where the 
-original stream requires to be in a consistent state. Neither should this
-class be used as a way to perform 'atomic' writes, because the object 
-might need to do partial writes if it needs to 'move' the buffer. This 
-happens for instance if the original stream is bigger than the buffer. 
+  \note This class is not meant to be used in cases where the 
+  original stream requires to be in a consistent state. Neither should this
+  class be used as a way to perform 'atomic' writes, because the object 
+  might need to do partial writes if it needs to 'move' the buffer. This 
+  happens for instance if the original stream is bigger than the buffer. 
 */
 
 /*!

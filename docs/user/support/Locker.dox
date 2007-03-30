@@ -1,0 +1,127 @@
+/*!
+\file Locker.h
+\brief Provides locking class BLocker.
+*/
+
+/*!
+\class BLocker
+\ingroup support
+\ingroup libbe
+\brief Semaphore-type class for thread safety.
+
+The BLocker interface is not merely a wrapper around a semaphore, but it
+also has two advantages. First of all, it implements a benaphore. 
+A benaphore is in some ways more speed efficient,
+because before it uses the internal semaphore, it first checks against a
+variable that is only operated on with atomic operations. Setting a variable
+is a lot more efficient than acquiring a semaphore, thus this type of locking
+is much prefered. 
+
+It basically works as follows. Whenever you newly created BLocker object
+recieves a locking request, it atomically sets the benaphore variable to 
+\c 1. Then only additional calls from different threads will utilize the
+semaphore. You can imagine that in many cases where you protect
+of data that \em might be accessed by two or more concurrent threads, but
+the chances of it happening being very small, the benaphore benefits the
+most from it's speed. 
+
+The other feature of BLocker that improves basic semaphore handling is that
+it allows for recursive locks. The following piece of code works with a
+BLocker, but block inevitably with a semaphore. Let's pretend I call \c Water():
+
+\code
+status_t
+Flower::Grow(int length)
+{
+  if (fLock->Lock()) {
+    fLength += lenght;
+    fLock->Unlock();
+    return B_OK;
+  } else {
+    return B_ERROR;
+  }
+}
+
+status_t
+Flower::Water(int amount)
+{
+  if (fLock->Lock()) {
+    status_t status = Grow(amount * 2);
+    fLock->Unlock();
+    return status;
+  } else {
+    return B_ERROR;
+  }
+}
+\endcode
+
+This code would work because BLocker keeps track of the amount of lock
+requests from the same thread. A normal semaphore would block in \c Grow()
+because the semaphore would be acquired already. Please do make sure you
+pair every Lock() with an Unlock() though, or you'll create a deadlock.
+*/
+
+/*!
+\fn BLocker::BLocker()
+\brief Constructor.
+*/
+
+/*!
+\fn BLocker::BLocker(const char* name)
+\brief Constructor.
+*/
+
+/*!
+\fn BLocker::BLocker(bool benaphoreStyle)
+\brief Constructor.
+*/
+
+/*!
+\fn BLocker::BLocker(const char* name, bool benaphoreStyle)
+\brief Constructor.
+*/
+
+/*!
+\fn virtual BLocker::~BLocker()
+\brief Destructor.
+*/
+
+/*!
+\fn bool BLocker::Lock(void)
+\brief Add a lock request and block on it until we get it.
+*/
+
+/*!
+\fn status_t BLocker::LockWithTimeout(bigtime_t timeout)
+\brief Add a lock request and block until we get it with a maximum time.
+*/
+
+/*!
+\fn void BLocker::Unlock(void)
+\brief Give up the lock count.
+*/
+
+/*!
+\fn thread_id BLocker::LockingThread(void) const
+\brief Return the \c thread_id of the thread that's currently holding the lock.
+*/
+
+/*!
+\fn bool BLocker::IsLocked(void) const
+\brief Check if your lock succeeded.
+*/
+
+/*!
+\fn int32 BLocker::CountLocks(void) const
+\brief Return the number of recursive locks that are currently held.
+*/
+
+/*!
+\fn nt32 BLocker::CountLockRequests(void) const
+\brief Return the number of pending lock requests.
+*/
+
+/*!
+\fn sem_id BLocker::Sem(void) const
+\brief Return the sem_id of the semaphore this object holds.
+*/

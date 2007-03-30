@@ -42,7 +42,7 @@ information on the elapsed time to standard output.
 
 /*!
 \fn void BStopWatch::Suspend()
-\brief Suspends the timer.
+\brief Suspend the timer.
 \sa Resume()
 */
 

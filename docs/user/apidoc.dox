@@ -40,7 +40,7 @@
   
   \subsection formalrequirements_location Location of the Documentation Source
   
-  Doxygen, the tool that we use to generate the marked up documentation with,
+  Doxygen, the tool that we use to generate the marked up documentation,
   has an ingenious parser that is able to scan through both header and source
   files and that makes it possible to document the API directly in the headers
   or the source. However, the Haiku project decided not to put the
@@ -75,8 +75,8 @@
   \subsection formalrequirements_headerblock The Header Block
   
   Every documentation file will begin with the header block. It's basically a
-  copyright block, with a reference to the author and with the revision against
-  which the documentaton was written.
+  copyright block, with a reference to the author(s) and with the revision 
+  against which the documentaton was written.
 
   \verbatim
 // 

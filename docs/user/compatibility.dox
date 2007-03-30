@@ -33,7 +33,7 @@ some specific examples:
   member, you might notice that it has been renamed to \link BString::fPrivateData
   fPrivateData \endlink.  However, it's use is deprecated, and it might even be 
   made private in the future.
-- The undocumented functions defined in the headers are not implemented.
+- The undocumented functions defined in Alias.h from the storage kit are not implemented.
 - The private Device Map API (used by OpenTracker) has been replaced by a 
   different API (Disk Device API).
 - The application debugging interface is conceptually similar, but nevertheless
