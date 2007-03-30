@@ -182,6 +182,10 @@ vm_cache_release_ref(vm_cache_ref *cacheRef)
 #if 0
 {
 	// count min references to see if everything is okay
+	struct stack_frame {
+		struct stack_frame*	previous;
+		void*				return_address;
+	};
 	int32 min = 0;
 	vm_area *a;
 	vm_cache *c;
@@ -194,8 +198,9 @@ vm_cache_release_ref(vm_cache_ref *cacheRef)
 		min++;
 	for (c = NULL; (c = list_get_next_item(&cacheRef->cache->consumers, c)) != NULL; )
 		min++;
-dprintf("! %ld release cache_ref %p, ref_count is now %ld (min %ld, called from %p)\n", find_thread(NULL), cacheRef, cacheRef->ref_count,
-	min, ((struct stack_frame *)x86_read_ebp())->return_address);
+	dprintf("! %ld release cache_ref %p, ref_count is now %ld (min %ld, called from %p)\n",
+		find_thread(NULL), cacheRef, cacheRef->ref_count,
+		min, ((struct stack_frame *)x86_read_ebp())->return_address);
 	if (cacheRef->ref_count < min)
 		panic("cache_ref %p has too little ref_count!!!!", cacheRef);
 	if (locked)
@@ -222,6 +227,11 @@ dprintf("! %ld release cache_ref %p, ref_count is now %ld (min %ld, called from 
 		int state;
 
 		page = page->cache_next;
+
+		if (oldPage->mappings != NULL || oldPage->wired_count != 0) {
+			panic("remove page %p from cache %p: page still has mappings!\n",
+				oldPage, cacheRef->cache);
+		}
 
 		// remove it from the hash table
 		state = disable_interrupts();
@@ -526,10 +536,8 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 					vm_cache_remove_page(cacheRef, page);
 					vm_cache_insert_page(consumerRef, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
-				}
-
-				// TODO: if we'd remove the pages in the cache, we'd also
-				//	need to remove all of their mappings!
+				} else if (page->mappings != 0 || page->wired_count != 0)
+					panic("page %p has still mappings!", page);
 			}
 
 			newSource = cache->source;

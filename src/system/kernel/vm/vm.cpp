@@ -546,6 +546,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 		}
 
 		newCacheRef = newCache->ref;
+		newCache->type = CACHE_TYPE_RAM;
 		newCache->temporary = 1;
 		newCache->scan_skip = cache->scan_skip;
 
@@ -1474,8 +1475,8 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	vm_address_space *addressSpace;
 	bool removeit = false;
 
-	//TRACE(("_vm_put_area(area = %p, aspaceLocked = %s)\n",
-	//	area, aspaceLocked ? "yes" : "no"));
+	TRACE(("_vm_put_area(area = %p, aspaceLocked = %s)\n",
+		area, aspaceLocked ? "yes" : "no"));
 
 	// we should never get here, but if we do, we can handle it
 	if (area->id == RESERVED_AREA_ID)
@@ -3514,6 +3515,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	dummyPage.cache = NULL;
 	dummyPage.state = PAGE_STATE_INACTIVE;
 	dummyPage.type = PAGE_TYPE_DUMMY;
+	dummyPage.wired_count = 0;
 
 	vm_cache_ref *pageSourceRef;
 	vm_page *page = fault_get_page(map, topCacheRef, cacheOffset, isWrite,

@@ -185,7 +185,6 @@ dump_page(int argc, char **argv)
 	kprintf("cache:           %p\n", page->cache);
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next,prev: %p, %p\n", page->cache_next, page->cache_prev);
-	kprintf("mappings:        %p\n", page->mappings);
 	kprintf("type:            %d\n", page->type);
 	kprintf("state:           %d\n", page->state);
 	kprintf("wired_count:     %u\n", page->wired_count);
@@ -194,7 +193,7 @@ dump_page(int argc, char **argv)
 
 	mapping = page->mappings;
 	while (mapping != NULL) {
-		kprintf("  %p\n", mapping->area);
+		kprintf("  %p (%#lx)\n", mapping->area, mapping->area->id);
 		mapping = mapping->page_link.next;
 	}
 
