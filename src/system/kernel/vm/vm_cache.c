@@ -269,6 +269,9 @@ vm_cache_lookup_page(vm_cache_ref *cacheRef, off_t offset)
 	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
 
+	if (page != NULL && cacheRef->cache != page->cache)
+		panic("page %p not in cache %p\n", page, cacheRef->cache);
+
 	return page;
 }
 
@@ -278,8 +281,14 @@ vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset)
 {
 	cpu_status state;
 
-	TRACE(("vm_cache_insert_page: cacheRef %p, page %p, offset %Ld\n", cacheRef, page, offset));
+	TRACE(("vm_cache_insert_page: cacheRef %p, page %p, offset %Ld\n",
+		cacheRef, page, offset));
 	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
+
+	if (page->cache != NULL) {
+		panic("insert page %p into cache %p: page cache is set to %p\n",
+			page, cacheRef->cache, page->cache);
+	}
 
 	page->cache_offset = (uint32)(offset >> PAGE_SHIFT);
 
@@ -300,7 +309,6 @@ vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset)
 
 	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
-
 }
 
 
@@ -316,6 +324,9 @@ vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page)
 
 	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cacheRef, page));
 	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
+
+	if (page->cache != cacheRef->cache)
+		panic("remove page from %p: page cache is set to %p\n", cacheRef->cache, page->cache);
 
 	state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);

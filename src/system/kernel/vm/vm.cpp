@@ -3511,6 +3511,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	vm_translation_map *map = &addressSpace->translation_map;
 	vm_page dummyPage;
+	dummyPage.cache = NULL;
 	dummyPage.state = PAGE_STATE_INACTIVE;
 	dummyPage.type = PAGE_TYPE_DUMMY;
 

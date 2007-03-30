@@ -349,6 +349,15 @@ set_page_state_nolock(vm_page *page, int pageState)
 			panic("vm_page_set_state: vm_page %p in invalid state %d\n", page, page->state);
 	}
 
+	if (page->state == PAGE_STATE_CLEAR || page->state == PAGE_STATE_FREE) {
+		if (page->cache != NULL)
+			panic("free page %p has cache", page);
+	}
+	if (pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE) {
+		if (page->cache != NULL)
+			panic("to be freed page %p has cache", page);
+	}
+
 	switch (pageState) {
 		case PAGE_STATE_BUSY:
 		case PAGE_STATE_ACTIVE:
@@ -738,6 +747,7 @@ vm_page_init(kernel_args *args)
 		sPages[i].mappings = NULL;
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
+		sPages[i].cache = NULL;
 		enqueue_page(&page_free_queue, &sPages[i]);
 	}
 
@@ -942,6 +952,8 @@ vm_page_allocate_page(int page_state)
 			panic("vm_allocate_page: out of memory! page state = %d\n", page_state);
 		}
 	}
+	if (p->cache != NULL)
+		panic("supposed to be free page %p has cache\n", p);
 
 	old_page_state = p->state;
 	p->state = PAGE_STATE_BUSY;
