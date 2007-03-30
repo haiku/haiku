@@ -72,6 +72,15 @@ dequeue_page(page_queue *q)
 
 		q->tail = page->queue_prev;
 		q->count--;
+
+		#ifdef DEBUG_PAGE_QUEUE
+			if (page->queue != q) {
+				panic("dequeue_page(queue: %p): page %p thinks it is in queue "
+					"%p", q, page, page->queue);
+			}
+
+			page->queue = NULL;
+		#endif	// DEBUG_PAGE_QUEUE
 	}
 
 	return page;
@@ -82,6 +91,13 @@ dequeue_page(page_queue *q)
 static void
 enqueue_page(page_queue *q, vm_page *page)
 {
+	#ifdef DEBUG_PAGE_QUEUE
+		if (page->queue != NULL) {
+			panic("enqueue_page(queue: %p, page: %p): page thinks it is "
+				"already in queue %p", q, page, page->queue);
+		}
+	#endif	// DEBUG_PAGE_QUEUE
+
 	if (q->head != NULL)
 		q->head->queue_prev = page;
 	page->queue_next = q->head;
@@ -90,6 +106,10 @@ enqueue_page(page_queue *q, vm_page *page)
 	if (q->tail == NULL)
 		q->tail = page;
 	q->count++;
+
+	#ifdef DEBUG_PAGE_QUEUE
+		page->queue = q;
+	#endif
 
 	if (q == &page_modified_queue) {
 		if (q->count == 1)
@@ -101,6 +121,13 @@ enqueue_page(page_queue *q, vm_page *page)
 static void
 remove_page_from_queue(page_queue *queue, vm_page *page)
 {
+	#ifdef DEBUG_PAGE_QUEUE
+		if (page->queue != queue) {
+			panic("remove_page_from_queue(queue: %p, page: %p): page thinks it "
+				"is in queue %p", queue, page, page->queue);
+		}
+	#endif	// DEBUG_PAGE_QUEUE
+
 	if (page->queue_prev != NULL)
 		page->queue_prev->queue_next = page->queue_next;
 	else
@@ -112,6 +139,10 @@ remove_page_from_queue(page_queue *queue, vm_page *page)
 		queue->tail = page->queue_prev;
 
 	queue->count--;
+
+	#ifdef DEBUG_PAGE_QUEUE
+		page->queue = NULL;
+	#endif
 }
 
 
@@ -129,6 +160,54 @@ static int
 dump_free_page_table(int argc, char **argv)
 {
 	dprintf("not finished\n");
+	return 0;
+}
+
+
+static int
+find_page(int argc, char **argv)
+{
+	struct vm_page *page;
+	addr_t address;
+	int32 index = 1;
+	int i;
+
+	struct {
+		const char*	name;
+		page_queue*	queue;
+	} pageQueueInfos[] = {
+		{ "free",		&page_free_queue },
+		{ "clear",		&page_clear_queue },
+		{ "modified",	&page_modified_queue },
+		{ "active",		&page_active_queue },
+		{ NULL, NULL }
+	};
+
+	if (argc < 2
+		|| strlen(argv[index]) <= 2
+		|| argv[index][0] != '0'
+		|| argv[index][1] != 'x') {
+		kprintf("usage: find_page <address>\n");
+		return 0;
+	}
+
+	address = strtoul(argv[index], NULL, 0);
+	page = (vm_page*)address;
+
+	for (i = 0; pageQueueInfos[i].name; i++) {
+		vm_page* p = pageQueueInfos[i].queue->head;
+		while (p) {
+			if (p == page) {
+				kprintf("found page %p in queue %p (%s)\n", page,
+					pageQueueInfos[i].queue, pageQueueInfos[i].name);
+				return 0;
+			}
+			p = p->queue_next;
+		}
+	}
+
+	kprintf("page %p isn't in any queue\n", page);
+
 	return 0;
 }
 
@@ -189,6 +268,9 @@ dump_page(int argc, char **argv)
 	kprintf("state:           %d\n", page->state);
 	kprintf("wired_count:     %u\n", page->wired_count);
 	kprintf("usage_count:     %u\n", page->usage_count);
+	#ifdef DEBUG_PAGE_QUEUE
+	kprintf("queue:           %p\n", page->queue);
+	#endif
 	kprintf("area mappings:\n");
 
 	mapping = page->mappings;
@@ -226,7 +308,7 @@ dump_page_queue(int argc, char **argv)
 		return 0;
 	}
 
-	kprintf("queue->head = %p, queue->tail = %p, queue->count = %d\n", queue->head, queue->tail, queue->count);
+	kprintf("queue = %p, queue->head = %p, queue->tail = %p, queue->count = %d\n", queue, queue->head, queue->tail, queue->count);
 
 	if (argc == 3) {
 		struct vm_page *page = queue->head;
@@ -429,6 +511,7 @@ page_scrubber(void *unused)
 				page[i] = dequeue_page(&page_free_queue);
 				if (page[i] == NULL)
 					break;
+				page[i]->state = PAGE_STATE_BUSY;
 			}
 
 			release_spinlock(&sPageLock);
@@ -747,6 +830,9 @@ vm_page_init(kernel_args *args)
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
 		sPages[i].cache = NULL;
+		#ifdef DEBUG_PAGE_QUEUE
+			sPages[i].queue = NULL;
+		#endif
 		enqueue_page(&page_free_queue, &sPages[i]);
 	}
 
@@ -778,6 +864,8 @@ vm_page_init_post_area(kernel_args *args)
 	add_debugger_command("free_pages", &dump_free_page_table, "Dump list of free pages");
 	add_debugger_command("page", &dump_page, "Dump page info");
 	add_debugger_command("page_queue", &dump_page_queue, "Dump page queue");
+	add_debugger_command("find_page", &find_page,
+		"Find out which queue a page is actually in");
 
 	return B_OK;
 }

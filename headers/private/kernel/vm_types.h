@@ -17,6 +17,11 @@
 #include <sys/uio.h>
 
 
+// Enables the vm_page::queue, i.e. it is tracked which queue the page should
+// be in.
+//#define DEBUG_PAGE_QUEUE	1
+
+
 #ifdef __cplusplus
 struct vm_page_mapping;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
@@ -82,6 +87,10 @@ typedef struct vm_page {
 	struct vm_page		*cache_next;
 
 	vm_page_mappings	mappings;
+
+	#ifdef DEBUG_PAGE_QUEUE
+	void*				queue;
+	#endif
 
 	uint8				type : 2;
 	uint8				state : 3;
