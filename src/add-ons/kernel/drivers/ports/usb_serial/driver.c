@@ -24,6 +24,8 @@ static status_t usb_serial_read (void* cookie,
                                  off_t position, void *buf, size_t* num_bytes);
 static status_t usb_serial_write (void* cookie, off_t position,
                                   const void* buffer, size_t* num_bytes);
+static status_t usb_serial_select (void* cookie, uint8 event, uint32 ref, selectsync *_sync);
+static status_t usb_serial_deselect (void* cookie, uint8 event, selectsync *_sync);
 static status_t usb_serial_control (void* cookie, uint32 op, void* arg, size_t len);
 static status_t usb_serial_close (void* cookie);
 static status_t usb_serial_free (void* cookie);
@@ -42,7 +44,13 @@ device_hooks usb_serial_hooks = {
   usb_serial_free,            /* -> free cookie */
   usb_serial_control,         /* -> control entry point */
   usb_serial_read,            /* -> read entry point */
-  usb_serial_write            /* -> write entry point */
+  usb_serial_write,            /* -> write entry point */
+#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
+  usb_serial_select,           /* -> select entry point */
+  usb_serial_deselect         /* -> deselect entry point */
+#endif
+  /* readv / read_pages ??? */
+  /* writev */
 };
 /* USB notify hooks */
 static usb_notify_hooks notify_hooks = {
@@ -126,6 +134,8 @@ usb_serial_hw usb_serial_hw_devices[] = {
            "FTDI 8U232AM serial converter"}, 
 };
 /* supported devices*/
+usb_support_descriptor *supported_devices;
+#if 0
 usb_support_descriptor supported_devices[] = {
   {USB_DEV_CLASS_COMM, 0, 0, 0, 0},
   {0, 0, 0, VND_PROLIFIC, PROD_PROLIFIC_RSAQ2 },
@@ -139,6 +149,7 @@ usb_support_descriptor supported_devices[] = {
   {0, 0, 0, VND_FTDI, PROD_8U100AX },
   {0, 0, 0, VND_FTDI, PROD_8U232AM },
 };
+#endif
 /* main devices table locking semaphore */
 sem_id usb_serial_lock = -1;
 /* array of pointers to device objects */
@@ -195,8 +206,28 @@ status_t init_driver (void){
         usb_serial_names[0] = NULL;  
         load_driver_symbols(DRIVER_NAME);
 
+        /* XXX: needs more error checking! */
+
+        // build the list of usb supported devices from our own hw list,
+        // so it's always up to date.
+        supported_devices = malloc(sizeof(usb_support_descriptor) * SIZEOF(usb_serial_hw_devices));
+        // ACM devices
+        supported_devices[0].dev_class = USB_DEV_CLASS_COMM;
+        supported_devices[0].dev_subclass = 0;
+        supported_devices[0].dev_protocol = 0;
+        supported_devices[0].vendor = 0;
+        supported_devices[0].product = 0;
+        // other devices
+        for (i = 1; i < SIZEOF(usb_serial_hw_devices); i++){
+          supported_devices[i].dev_class = 0;
+          supported_devices[i].dev_subclass = 0;
+          supported_devices[i].dev_protocol = 0;
+          supported_devices[i].vendor = usb_serial_hw_devices[i].vendor_id;
+          supported_devices[i].product = usb_serial_hw_devices[i].product_id;
+        }
+
         (*usb_m->register_driver)(DRIVER_NAME, supported_devices,
-                                        SIZEOF(supported_devices), DRIVER_NAME);
+                                        SIZEOF(usb_serial_hw_devices), DRIVER_NAME);
         (*usb_m->install_notify)(DRIVER_NAME, &notify_hooks);
   
         usb_serial_lock = create_sem(1, DRIVER_NAME"_devices_table_lock");
@@ -204,9 +235,13 @@ status_t init_driver (void){
         status = B_ERROR;
         TRACE_ALWAYS("init_driver failed: tty_m:%08x usb_m:%08x", tty_m, usb_m);
       } 
+      if (status != B_OK)
+        put_module(B_USB_MODULE_NAME);
     }else
       TRACE_ALWAYS("init_driver failed:%lx cannot get a module %s", status,
                                                                B_USB_MODULE_NAME);
+    if (status != B_OK)
+      put_module(B_TTY_MODULE_NAME);
   }else
     TRACE_ALWAYS("init_driver failed:%lx cannot get a module %s", status,
                                                                B_TTY_MODULE_NAME);
@@ -222,6 +257,7 @@ void uninit_driver (void){
   TRACE_FUNCALLS("uninit_driver\n");
 
   (*usb_m->uninstall_notify)(DRIVER_NAME);
+  free(supported_devices);
   acquire_sem(usb_serial_lock);
   
   for(i = 0; i < DEVICES_COUNT; i++)
@@ -617,6 +653,50 @@ static status_t usb_serial_control (void* cookie, uint32 op, void* arg, size_t l
   TRACE_FUNCRET("usb_serial_control returns:%08x\n", status);
   return status;
 }
+
+#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
+
+/* usb_serial_select - handle select start */
+static status_t usb_serial_select (void* cookie, uint8 event, uint32 ref, selectsync *_sync){
+  status_t status = B_BAD_VALUE;
+  TRACE_FUNCALLS("usb_serial_select cookie:%08x event:%08x ref:%08x sync:%p\n",
+                                                           cookie, event, ref, _sync);
+
+  if(cookie){
+    struct ddrover *ddr = (*tty_m->ddrstart)(NULL);
+    if(ddr){
+      status = (*tty_m->ttyselect)(cookie, ddr, event, ref, _sync);
+      (*tty_m->ddrdone)(ddr);
+    }else
+      status = B_NO_MEMORY;
+  }else
+    status = ENODEV;
+
+  TRACE_FUNCRET("usb_serial_select returns:%08x\n", status);
+  return status;
+}
+
+/* usb_serial_deselect - handle select exit */
+static status_t usb_serial_deselect (void* cookie, uint8 event, selectsync *_sync){
+  status_t status = B_BAD_VALUE;
+  TRACE_FUNCALLS("usb_serial_deselect cookie:%08x event:%08x sync:%p\n",
+                                                           cookie, event, _sync);
+
+  if(cookie){
+    struct ddrover *ddr = (*tty_m->ddrstart)(NULL);
+    if(ddr){
+      status = (*tty_m->ttydeselect)(cookie, ddr, event, _sync);
+      (*tty_m->ddrdone)(ddr);
+    }else
+      status = B_NO_MEMORY;
+  }else
+    status = ENODEV;
+
+  TRACE_FUNCRET("usb_serial_deselect returns:%08x\n", status);
+  return status;
+}
+
+#endif
 
 /* usb_serial_close - handle close() calls */
 static status_t usb_serial_close (void* cookie){
