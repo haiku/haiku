@@ -415,37 +415,41 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 
 		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
 
+		// process the complete fileVec
 		while (fileLeft > 0) {
 			iovec tempVecs[MAX_TEMP_IO_VECS];
-			uint32 tempCount = 1;
+			uint32 tempCount = 0;
 
-			size = min_c(vecs[i].iov_len - vecOffset, fileLeft);
+			// size tracks how much of what is left of the current fileVec
+			// (fileLeft) has been assigned to tempVecs 
+			size = 0;
 
-			tempVecs[0].iov_base = (void *)((addr_t)vecs[i].iov_base + vecOffset);
-			tempVecs[0].iov_len = size;
-
-			if (size >= fileLeft)
-				vecOffset += size;
-			else
-				vecOffset = 0;
-
-			while (size < fileLeft && ++i < count
-				&& tempCount < MAX_TEMP_IO_VECS) {
+			// assign what is left of the current fileVec to the tempVecs
+			while (size < fileLeft && i < count
+					&& tempCount < MAX_TEMP_IO_VECS) {
+				// try to satisfy one iovec per iteration (or as much as
+				// possible)
 				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
 					i, vecOffset, size));
 
-				tempVecs[tempCount].iov_base = vecs[i].iov_base;
-
-				// is this iovec larger than the file_io_vec?
-				if (vecs[i].iov_len + size > fileLeft) {
-					size += tempVecs[tempCount].iov_len
-						= vecOffset = fileLeft - size;
-					tempCount++;
-					break;
+				// bytes left of the current iovec
+				size_t vecLeft = vecs[i].iov_len - vecOffset;
+				if (vecLeft == 0) {
+					i++;
+					vecOffset = 0;
+					continue;
 				}
 
-				size += tempVecs[tempCount].iov_len = vecs[i].iov_len;
+				// actually available bytes
+				size_t tempVecSize = min_c(vecLeft, fileLeft - size);
+
+				tempVecs[tempCount].iov_base
+					= (void *)((addr_t)vecs[i].iov_base + vecOffset);
+				tempVecs[tempCount].iov_len = tempVecSize;
 				tempCount++;
+
+				size += tempVecSize;
+				vecOffset += tempVecSize;
 			}
 
 			size_t bytes = size;
@@ -459,20 +463,21 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 			if (status < B_OK)
 				return status;
 
-			totalSize += size;
+			totalSize += bytes;
 			bytesLeft -= size;
 			fileOffset += size;
 			fileLeft -= size;
 			//dprintf("-> file left = %Lu\n", fileLeft);
 
-			if (size != bytes) {
-				// there are no more bytes, let's bail out
+			if (size != bytes || i >= count) {
+				// there are no more bytes or iovecs, let's bail out
 				*_numBytes = totalSize;
 				return B_OK;
 			}
 		}
 	}
 
+	*_numBytes = totalSize;
 	return B_OK;
 }
 
