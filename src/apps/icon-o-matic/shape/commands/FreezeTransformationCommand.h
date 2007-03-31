@@ -12,7 +12,13 @@
 #include "Command.h"
 
 class Shape;
-class Transformable;
+
+namespace BPrivate {
+namespace Icon {
+	class Transformable;
+}
+}
+using BPrivate::Icon::Transformable;
 
 class FreezeTransformationCommand : public Command {
  public:

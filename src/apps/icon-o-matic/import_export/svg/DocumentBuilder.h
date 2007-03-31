@@ -43,7 +43,13 @@
 
 class Icon;
 class SVGImporter;
-class Transformable;
+
+namespace BPrivate {
+namespace Icon {
+	class Transformable;
+}
+}
+using BPrivate::Icon::Transformable;
 
 namespace agg {
 namespace svg {

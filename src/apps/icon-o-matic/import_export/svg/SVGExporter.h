@@ -16,7 +16,13 @@
 class Gradient;
 class Shape;
 class Style;
-class Transformable;
+
+namespace BPrivate {
+namespace Icon {
+	class Transformable;
+}
+}
+using BPrivate::Icon::Transformable;
 
 class SVGExporter : public Exporter {
  public:

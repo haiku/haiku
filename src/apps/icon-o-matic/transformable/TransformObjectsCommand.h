@@ -12,7 +12,12 @@
 #include "TransformBox.h"
 #include "TransformCommand.h"
 
-class Transformable;
+namespace BPrivate {
+namespace Icon {
+	class Transformable;
+}
+}
+using BPrivate::Icon::Transformable;
 
 class TransformObjectsCommand : public TransformCommand,
 								public TransformBoxListener {

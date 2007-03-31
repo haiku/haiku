@@ -12,9 +12,15 @@
 #include "TransformBox.h"
 #include "TransformCommand.h"
 
-class Transformable;
 class VectorPath;
 struct control_point;
+
+namespace BPrivate {
+namespace Icon {
+	class Transformable;
+}
+}
+using BPrivate::Icon::Transformable;
 
 class TransformPointsCommand : public TransformCommand,
 							   public TransformBoxListener {

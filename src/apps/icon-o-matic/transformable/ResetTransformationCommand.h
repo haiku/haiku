@@ -11,7 +11,12 @@
 
 #include "Command.h"
 
-class Transformable;
+namespace BPrivate {
+namespace Icon {
+	class Transformable;
+}
+}
+using BPrivate::Icon::Transformable;
 
 class ResetTransformationCommand : public Command {
  public:
