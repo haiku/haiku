@@ -24,16 +24,6 @@
 
 using std::nothrow;
 
-
-// TODO: put into HaikuBuildCompatibility.h
-#ifndef __HAIKU__
-# define B_BITMAP_NO_SERVER_LINK 0
-# define B_BAD_DATA B_ERROR
-# define B_MINI_ICON_TYPE 'MICN'
-# define B_LARGE_ICON_TYPE 'ICON'
-#endif
-
-
 // GetIcon
 status_t
 BIconUtils::GetIcon(BNode* node,
