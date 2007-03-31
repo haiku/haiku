@@ -18,3 +18,7 @@ SimpleTest BlockMapTest :
 	khash.c
 	: libkernelland_emu.so ;
 
+SimpleTest pages_io_test :
+	pages_io_test.cpp
+	;
+
