@@ -54,8 +54,9 @@ typedef struct elf_linked_image {
 static hash_table *sImagesHash;
 
 static struct elf_image_info *sKernelImage = NULL;
-static mutex sImageMutex;
-static mutex sImageLoadMutex;
+static mutex sImageMutex;		// guards sImagesHash
+static mutex sImageLoadMutex;	// serializes loading/unloading add-ons
+								// locking order sImageLoadMutex -> sImageMutex
 static bool sInitialized = false;
 
 
@@ -1449,19 +1450,18 @@ unload_kernel_add_on(image_id id)
 	struct elf_image_info *image;
 	status_t status;
 
+	mutex_lock(&sImageLoadMutex);
 	mutex_lock(&sImageMutex);
 	
 	image = find_image(id);
-	if (image != NULL) {
-		mutex_lock(&sImageLoadMutex);
-
+	if (image != NULL)
 		status = unload_elf_image(image);
-
-		mutex_unlock(&sImageLoadMutex);
-	} else
+	else
 		status = B_BAD_IMAGE_ID;
 
 	mutex_unlock(&sImageMutex);	
+	mutex_unlock(&sImageLoadMutex);
+
 	return status;
 }
 
