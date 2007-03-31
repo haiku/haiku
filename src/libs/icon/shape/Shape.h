@@ -42,12 +42,12 @@ class ShapeListener {
 
 #ifdef ICON_O_MATIC
 class Shape : public IconObject,
-			  public Transformable,
+			  public BPrivate::Icon::Transformable,
 			  public Observer,	// observing all the paths and the style
 			  public PathContainerListener,
 			  public PathListener {
 #else
-class Shape : public Transformable {
+class Shape : public BPrivate::Icon::Transformable {
 #endif
 
  public:

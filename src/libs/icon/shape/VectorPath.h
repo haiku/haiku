@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,8 @@
 
 #include <agg_path_storage.h>
 
+#include "Transformable.h"
+
 #ifdef ICON_O_MATIC
 # include <Archivable.h>
 # include <List.h>
@@ -24,7 +26,6 @@
 class BBitmap;
 class BMessage;
 class BView;
-class Transformable;
 
 struct control_point {
 	BPoint		point;		// actual point on path
@@ -84,7 +85,7 @@ class VectorPath {
 
 	// VectorPath
 			VectorPath&			operator=(const VectorPath& from);
-//			bool				operator==(const VectorPath& frrom) const;
+//			bool				operator==(const VectorPath& from) const;
 
 			void				MakeEmpty();
 

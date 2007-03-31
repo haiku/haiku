@@ -13,6 +13,9 @@
 
 #include <agg_trans_affine.h>
 
+namespace BPrivate {
+namespace Icon {
+
 class Transformable : public agg::trans_affine {
  public:
 	enum {
@@ -65,6 +68,11 @@ class Transformable : public agg::trans_affine {
 		// hook function that is called when the transformation
 		// is changed for some reason
 };
+
+} // namespace Icon
+} // namespace BPrivate
+
+using namespace BPrivate::Icon;
 
 #endif // TRANSFORMABLE_H
 
