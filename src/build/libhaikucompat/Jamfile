@@ -4,14 +4,18 @@ SetSubDirSupportedPlatforms libbe_test r5 dano bone ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
 
+local libbeTestSources ;
+if $(TARGET_PLATFORM) = libbe_test {
+	libbeTestSources = misc.cpp syscalls.cpp ;
+}
+
 StaticLibrary libhaikucompat.a :
 	strcasestr.c
 	strlcat.c
 	strlcpy.c
 	strnlen.c
 
-	misc.cpp
-	syscalls.cpp
+	$(libbeTestSources)
 ;
 
 SEARCH on [ FGristFiles strcasestr.c strlcat.c strlcpy.c strnlen.c ]
