@@ -133,6 +133,7 @@ struct _s_usb_serial_device{
     struct _spec_acm{ /* ACM-compatible devices */
     }acm;
     struct _spec_prolific{ /* Prolific devices*/
+      bool is_HX; /* Linux handles HX type differently */
     }prolific;
     struct _spec_ftdi{ /* FTDI devices*/
       uint8 hdrlen;
