@@ -17,7 +17,7 @@ SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
 BinCommand traceroute :
-	findsaddr-generic.c
+	findsaddr-haiku.c
 	ifaddrlist.c
 	traceroute.c
 	version.c
