@@ -984,8 +984,11 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 			return bufferHeader.Status();
 
 		ipv4_header &header = bufferHeader.Data();
-		if (header.source == 0)
+		if (header.source == 0) {
 			header.source = source.sin_addr.s_addr;
+			header.checksum = gBufferModule->checksum(buffer,
+				sizeof(ipv4_header), sizeof(ipv4_header), true);
+		}
 
 		bufferHeader.Detach();
 	}
