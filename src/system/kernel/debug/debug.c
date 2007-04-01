@@ -16,6 +16,7 @@
 #include <frame_buffer_console.h>
 #include <int.h>
 #include <smp.h>
+#include <thread.h>
 #include <vm.h>
 
 #include <arch/debug_console.h>
@@ -25,6 +26,7 @@
 #include <syslog_daemon.h>
 
 #include <ctype.h>
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +60,9 @@ static struct ring_buffer *sSyslogBuffer;
 static bool sSyslogDropped = false;
 
 static struct debugger_command *sCommands;
+
+static jmp_buf sInvokeCommandEnv;
+static bool sInvokeCommandDirectly = false;
 
 #define SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
@@ -316,6 +321,46 @@ parse_line(const char *buffer, char **argv, int *_argc, int32 maxArgs)
 	return *_argc = index;
 }
 
+/*!	This function is a safe gate through which debugger commands are invoked.
+	It sets a fault handler before invoking the command, so that an invalid
+	memory access will not result in another KDL session on top of this one
+	(and "cont" not to work anymore). We use setjmp() + longjmp() to "unwind"
+	the stack after catching a fault.
+ */
+static int
+invoke_command(int (*command)(int, char **), int argc, char** argv)
+{
+	struct thread* thread = thread_get_current_thread();
+	addr_t oldFaultHandler = thread->fault_handler;
+
+	// Invoking the command directly might be useful when debugging debugger
+	// commands.
+	if (sInvokeCommandDirectly)
+		return command(argc, argv);
+
+	if (setjmp(sInvokeCommandEnv) == 0) {
+		int result;
+		thread->fault_handler = (addr_t)&&error;
+		// Fake goto to trick the compiler not to optimize the code at the label
+		// away.
+		if (!thread)
+			goto error;
+
+		result = command(argc, argv);
+		thread->fault_handler = oldFaultHandler;
+		return result;
+
+error:
+		longjmp(sInvokeCommandEnv, 1);
+			// jump into the else branch
+	} else {
+		kprintf("\n[*** READ/WRITE FAULT ***]\n");
+	}
+
+	thread->fault_handler = oldFaultHandler;
+	return 0;
+}
+
 
 static void
 kernel_debugger_loop(void)
@@ -347,7 +392,7 @@ kernel_debugger_loop(void)
 		if (cmd == NULL)
 			kprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
 		else {
-			int rc = cmd->func(argc, args);
+			int rc = invoke_command(cmd->func, argc, args);
 
 			if (rc == B_KDEBUG_QUIT)
 				break;	// okay, exit now.

@@ -56,6 +56,7 @@ static status_t
 get_next_frame(addr_t ebp, addr_t *_next, addr_t *_eip)
 {
 	// set fault handler, so that we can safely access user stacks
+	addr_t oldFaultHandler = thread_get_current_thread()->fault_handler;
 	thread_get_current_thread()->fault_handler = (addr_t)&&error;
 	// Fake goto to trick the compiler not to optimize the code at the label
 	// away.
@@ -65,11 +66,11 @@ get_next_frame(addr_t ebp, addr_t *_next, addr_t *_eip)
 	*_eip = ((struct stack_frame *)ebp)->return_address;
 	*_next = (addr_t)((struct stack_frame *)ebp)->previous;
 
-	thread_get_current_thread()->fault_handler = NULL;
+	thread_get_current_thread()->fault_handler = oldFaultHandler;
 	return B_OK;
 
 error:
-	thread_get_current_thread()->fault_handler = NULL;
+	thread_get_current_thread()->fault_handler = oldFaultHandler;
 	return B_BAD_ADDRESS;
 }
 

@@ -151,6 +151,7 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size,
 {
 	char *tmp = (char *)to;
 	char *s = (char *)from;
+	addr_t oldFaultHandler = *faultHandler;
 
 	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
@@ -158,11 +159,11 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size,
 	while (size--)
 		*tmp++ = *s++;
 
-	*faultHandler = 0;
+	*faultHandler = oldFaultHandler;
 	return 0;
 
 error:
-	*faultHandler = 0;
+	*faultHandler = oldFaultHandler;
 	return B_BAD_ADDRESS;
 }
 
@@ -181,6 +182,7 @@ ssize_t
 arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
 {
 	int from_length = 0;
+	addr_t oldFaultHandler = *faultHandler;
 
 	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
@@ -197,11 +199,11 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHand
 	while (*from++ != '\0')
 		from_length++;
 
-	*faultHandler = 0;
+	*faultHandler = oldFaultHandler;
 	return from_length;
 
 error:
-	*faultHandler = 0;
+	*faultHandler = oldFaultHandler;
 	return B_BAD_ADDRESS;
 }
 
@@ -210,6 +212,7 @@ status_t
 arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 {
 	char *xs = (char *)s;
+	addr_t oldFaultHandler = *faultHandler;
 
 	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
@@ -217,11 +220,11 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 	while (count--)
 		*xs++ = c;
 
-	*faultHandler = 0;
+	*faultHandler = oldFaultHandler;
 	return 0;
 
 error:
-	*faultHandler = 0;
+	*faultHandler = oldFaultHandler;
 	return B_BAD_ADDRESS;
 }
 

@@ -65,6 +65,7 @@ static status_t
 get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 {
 	struct thread *thread = thread_get_current_thread();
+	addr_t oldFaultHandler = thread->fault_handler;
 
 	// set fault handler, so that we can safely access user stacks
 	if (thread) {
@@ -76,11 +77,11 @@ get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 	*next = (addr_t)((struct stack_frame *)framePointer)->previous;
 
 	if (thread)
-		thread->fault_handler = NULL;
+		thread->fault_handler = oldFaultHandler;
 	return B_OK;
 
 error:
-	thread->fault_handler = NULL;
+	thread->fault_handler = oldFaultHandler;
 	return B_BAD_ADDRESS;
 }
 
@@ -286,5 +287,4 @@ arch_debug_init(kernel_args *args)
 
 	return B_NO_ERROR;
 }
-
 
