@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,10 @@ enum modes {
 	RTM_LIST = 0,
 	RTM_DELETE,
 	RTM_ADD,
-	
+	RTM_GET,
+
 	// TODO:
 	RTM_CHANGE,
-	RTM_GET,
 	RTM_FLUSH,
 };
 
@@ -295,6 +295,45 @@ add_route(int socket, const char *interface, route_entry &route)
 }
 
 
+void
+get_route(int socket, route_entry &route)
+{
+	union {
+		route_entry request;
+		uint8 buffer[512];
+	};
+
+	request = route;
+
+	if (ioctl(socket, SIOCGETRT, buffer, sizeof(buffer)) < 0) {
+		fprintf(stderr, "%s: Could not get route: %s\n",
+			kProgramName, strerror(errno));
+		return;
+	}
+
+	// find family
+	const address_family *family = NULL;
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		if (route.destination->sa_family == kFamilies[i].family) {
+			family = &kFamilies[i];
+			break;
+		}
+	}
+
+	if (family != NULL) {
+		printf("%s ", family->address_to_string(request.destination));
+		printf("mask %s ", family->address_to_string(request.mask));
+
+		if (request.flags & RTF_GATEWAY)
+			printf("gateway %s ", family->address_to_string(request.gateway));
+
+		printf("source %s\n", family->address_to_string(request.source));
+	} else {
+		printf("unknown family ");
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -322,6 +361,12 @@ main(int argc, char** argv)
 				usage(1);
 
 			mode = RTM_ADD;
+		} else if (!strcmp(argv[1], "get")) {
+			// get route for destination
+			if (argc < 3)
+				usage(1);
+
+			mode = RTM_GET;
 		}
 	}
 
@@ -468,6 +513,10 @@ main(int argc, char** argv)
 					close(socket);
 				}
 			}
+			break;
+
+		case RTM_GET:
+			get_route(socket, route);
 			break;
 	}
 
