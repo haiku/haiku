@@ -50,7 +50,9 @@ class UserRouteBuffer {
 		{
 			sockaddr *target = (sockaddr *)fBuffer;
 
-			if (source == NULL || (fStatus = _Copy(source)) != B_OK)
+			if (fStatus != B_OK
+				|| source == NULL
+				|| (fStatus = _Copy(source)) != B_OK)
 				return NULL;
 
 			return target;
