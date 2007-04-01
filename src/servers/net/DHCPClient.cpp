@@ -126,11 +126,13 @@ struct dhcp_message {
 	message_type Type() const;
 	const uint8* LastOption() const;
 
+	uint8* PrepareMessage(uint8 type);
 	uint8* PutOption(uint8* options, message_option option);
 	uint8* PutOption(uint8* options, message_option option, uint8 data);
 	uint8* PutOption(uint8* options, message_option option, uint16 data);
 	uint8* PutOption(uint8* options, message_option option, uint32 data);
 	uint8* PutOption(uint8* options, message_option option, const uint8* data, uint32 size);
+	uint8* FinishOptions(uint8 *);
 } _PACKED;
 
 #define DHCP_FLAG_BROADCAST		0x8000
@@ -150,10 +152,8 @@ dhcp_message::dhcp_message(message_type type)
 	memset(this, 0, sizeof(*this));
 	options_magic = htonl(OPTION_MAGIC);
 
-	uint8* next = options;
-	next = PutOption(next, OPTION_MESSAGE_TYPE, (uint8)type);
-	next = PutOption(next, OPTION_MESSAGE_SIZE, (uint16)htons(sizeof(dhcp_message)));
-	next = PutOption(next, OPTION_END);
+	uint8* next = PrepareMessage(type);
+	FinishOptions(next);
 }
 
 
@@ -268,6 +268,15 @@ dhcp_message::Size() const
 
 
 uint8*
+dhcp_message::PrepareMessage(uint8 type)
+{
+	uint8 *next = options;
+	next = PutOption(next, OPTION_MESSAGE_TYPE, type);
+	next = PutOption(next, OPTION_MESSAGE_SIZE, (uint16)htons(sizeof(dhcp_message)));
+	return next;
+}
+
+uint8*
 dhcp_message::PutOption(uint8* options, message_option option)
 {
 	options[0] = option;
@@ -304,6 +313,13 @@ dhcp_message::PutOption(uint8* options, message_option option, const uint8* data
 	memcpy(&options[2], data, size);
 
 	return options + 2 + size;
+}
+
+
+uint8*
+dhcp_message::FinishOptions(uint8 *next)
+{
+	return PutOption(next, OPTION_END);
 }
 
 
@@ -653,10 +669,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 		case DHCP_RELEASE:
 		{
 			// add server identifier option
-			uint8* next = message.options;
-			next = message.PutOption(next, OPTION_MESSAGE_TYPE, (uint8)DHCP_REQUEST);
-			next = message.PutOption(next, OPTION_MESSAGE_SIZE,
-				(uint16)htons(sizeof(dhcp_message)));
+			uint8* next = message.PrepareMessage(type);
 			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
 				(uint32)fServer.sin_addr.s_addr);
 
@@ -669,7 +682,16 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 			} else
 				message.client_address = fAssignedAddress;
 
-			next = message.PutOption(next, OPTION_END);
+			message.FinishOptions(next);
+			break;
+		}
+
+		case DHCP_DISCOVER:
+		{
+			uint8 *next = message.PrepareMessage(type);
+			next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
+									 kRequiredParameters, sizeof(kRequiredParameters));
+			message.FinishOptions(next);
 			break;
 		}
 
