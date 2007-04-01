@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -76,6 +76,18 @@ enum message_type {
 	DHCP_INFORM
 };
 
+enum parameter_type {
+	PARAMETER_SUBNET_MASK = 1,
+	PARAMETER_TIME_OFFSET = 2,
+	PARAMETER_ROUTER = 3,
+	PARAMETER_NAME_SERVER = 6,
+	PARAMETER_HOST_NAME = 12,
+	PARAMETER_DOMAIN_NAME = 15,
+	PARAMETER_BROADCAST_ADDRESS = 28,
+	PARAMETER_NETBIOS_NAME_SERVER = 44,
+	PARAMETER_NETBIOS_SCOPE = 47,
+};
+
 struct dhcp_option_cookie {
 	dhcp_option_cookie() : state(0), file_has_options(false), server_name_has_options(false) {}
 
@@ -118,7 +130,7 @@ struct dhcp_message {
 	uint8* PutOption(uint8* options, message_option option, uint8 data);
 	uint8* PutOption(uint8* options, message_option option, uint16 data);
 	uint8* PutOption(uint8* options, message_option option, uint32 data);
-	uint8* PutOption(uint8* options, message_option option, uint8* data, uint32 size);
+	uint8* PutOption(uint8* options, message_option option, const uint8* data, uint32 size);
 } _PACKED;
 
 #define DHCP_FLAG_BROADCAST		0x8000
@@ -126,6 +138,11 @@ struct dhcp_message {
 #define ARP_HARDWARE_TYPE_ETHER	1
 
 const uint32 kMsgLeaseTime = 'lstm';
+
+static const uint8 kRequiredParameters[] = {
+	PARAMETER_SUBNET_MASK, PARAMETER_ROUTER,
+	PARAMETER_NAME_SERVER, PARAMETER_BROADCAST_ADDRESS
+};
 
 
 dhcp_message::dhcp_message(message_type type)
@@ -280,7 +297,7 @@ dhcp_message::PutOption(uint8* options, message_option option, uint32 data)
 
 
 uint8*
-dhcp_message::PutOption(uint8* options, message_option option, uint8* data, uint32 size)
+dhcp_message::PutOption(uint8* options, message_option option, const uint8* data, uint32 size)
 {
 	options[0] = option;
 	options[1] = size;
@@ -645,9 +662,11 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 			// In RENEWAL or REBINDING state, we must set the client_address field, and not
 			// use OPTION_REQUEST_IP_ADDRESS for DHCP_REQUEST messages
-			if (type == DHCP_REQUEST && (state == INIT || state == REQUESTING))
+			if (type == DHCP_REQUEST && (state == INIT || state == REQUESTING)) {
 				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
-			else
+				next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
+										 kRequiredParameters, sizeof(kRequiredParameters));
+			} else
 				message.client_address = fAssignedAddress;
 
 			next = message.PutOption(next, OPTION_END);
