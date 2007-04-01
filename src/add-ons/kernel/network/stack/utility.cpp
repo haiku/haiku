@@ -24,6 +24,30 @@ static thread_id sTimerThread;
 static bigtime_t sTimerTimeout;
 
 
+void *
+UserBuffer::Copy(void *source, size_t length)
+{
+	if (fStatus != B_OK)
+		return NULL;
+
+	if (fAvailable < length) {
+		fStatus = ENOBUFS;
+		return NULL;
+	}
+
+	fStatus = user_memcpy(fBuffer, source, length);
+	if (fStatus < B_OK)
+		return NULL;
+
+	void *current = fBuffer;
+
+	fAvailable -= length;
+	fBuffer += length;
+
+	return current;
+}
+
+
 uint16
 compute_checksum(uint8 *_buffer, size_t length)
 {

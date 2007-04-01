@@ -11,6 +11,42 @@
 
 #include <net_stack.h>
 
+class UserBuffer {
+public:
+	UserBuffer(void *buffer, size_t size);
+
+	void *Copy(void *source, size_t size);
+	status_t Status() const;
+	size_t ConsumedAmount() const;
+
+private:
+	uint8 *fBuffer;
+	size_t fBufferSize, fAvailable;
+	status_t fStatus;
+};
+
+
+inline
+UserBuffer::UserBuffer(void *buffer, size_t size)
+	: fBuffer((uint8 *)buffer), fBufferSize(size),
+	  fAvailable(size), fStatus(B_OK)
+{
+}
+
+
+inline status_t
+UserBuffer::Status() const
+{
+	return fStatus;
+}
+
+
+inline size_t
+UserBuffer::ConsumedAmount() const
+{
+	return fBufferSize - fAvailable;
+}
+
 
 // checksums
 uint16		compute_checksum(uint8 *_buffer, size_t length);
