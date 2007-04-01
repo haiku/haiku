@@ -528,6 +528,19 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 }
 
 
+static inline data_node *
+get_node_at_offset(net_buffer_private *buffer, size_t offset)
+{
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			return NULL;
+	}
+
+	return node;
+}
+
 /*!	Writes into existing allocated memory.
 	\return B_BAD_VALUE if you write outside of the buffers current
 		bounds.
@@ -543,13 +556,9 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 		return B_OK;
 
 	// find first node to write into
-
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < offset) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			return B_BAD_VALUE;
-	}
+	data_node *node = get_node_at_offset(buffer, offset);
+	if (node == NULL)
+		return B_BAD_VALUE;
 
 	offset -= node->offset;
 
@@ -584,13 +593,9 @@ read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 		return B_OK;
 
 	// find first node to read from
-
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < offset) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			return B_BAD_VALUE;
-	}
+	data_node *node = get_node_at_offset(buffer, offset);
+	if (node == NULL)
+		return B_BAD_VALUE;
 
 	offset -= node->offset;
 
@@ -917,14 +922,10 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 		return B_BAD_VALUE;
 
 	// find data_node to start with from the source buffer
-
-	data_node *node = (data_node *)list_get_first_item(&source->buffers);
-	while (node->offset + node->used < offset) {
-		node = (data_node *)list_get_next_item(&source->buffers, node);
-		if (node == NULL) {
-			// trim size greater than buffer size
-			return B_BAD_VALUE;
-		}
+	data_node *node = get_node_at_offset(source, offset);
+	if (node == NULL) {
+		// trim size greater than buffer size
+		return B_BAD_VALUE;
 	}
 
 	while (node != NULL && bytes > 0) {
@@ -987,13 +988,9 @@ direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 		return B_BAD_VALUE;
 
 	// find node to access
-
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < offset) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			return B_BAD_VALUE;
-	}
+	data_node *node = get_node_at_offset(buffer, offset);
+	if (node == NULL)
+		return B_BAD_VALUE;
 
 	offset -= node->offset;
 
@@ -1014,13 +1011,9 @@ checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool finalize)
 		return B_BAD_VALUE;
 
 	// find first node to read from
-
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < offset) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			return B_ERROR;
-	}
+	data_node *node = get_node_at_offset(buffer, offset);
+	if (node == NULL)
+		return B_ERROR;
 
 	offset -= node->offset;
 
