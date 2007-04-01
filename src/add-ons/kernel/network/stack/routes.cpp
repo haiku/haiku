@@ -10,6 +10,7 @@
 #include "domains.h"
 #include "routes.h"
 #include "stack_private.h"
+#include "utility.h"
 
 #include <net_device.h>
 #include <NetUtilities.h>
@@ -33,53 +34,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-
-class UserRouteBuffer {
-	public:
-		UserRouteBuffer(uint8 *buffer, size_t available)
-			:
-			fBuffer(buffer),
-			fAvailable(available),
-			fStatus(B_OK)
-		{
-		}
-
-		sockaddr *
-		Copy(sockaddr *source)
-		{
-			sockaddr *target = (sockaddr *)fBuffer;
-
-			if (fStatus != B_OK
-				|| source == NULL
-				|| (fStatus = _Copy(source)) != B_OK)
-				return NULL;
-
-			return target;
-		}
-
-		status_t Status() const { return fStatus; }
-
-	private:
-		status_t
-		_Copy(sockaddr *source)
-		{
-			if (fAvailable < source->sa_len)
-				return ENOBUFS;
-
-			if (user_memcpy(fBuffer, source, source->sa_len) < B_OK)
-				return B_BAD_ADDRESS;
-
-			fAvailable -= source->sa_len;
-			fBuffer += source->sa_len;
-
-			return B_OK;
-		}
-
-		uint8 *fBuffer;
-		size_t fAvailable;
-		status_t fStatus;
-};
 
 
 net_route_private::net_route_private()
@@ -481,17 +435,26 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 }
 
 
+static sockaddr *
+copy_address(UserBuffer &buffer, sockaddr *address)
+{
+	if (address == NULL)
+		return NULL;
+
+	return (sockaddr *)buffer.Copy(address, address->sa_len);
+}
+
 static status_t
 fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
 		 net_route *route)
 {
-	UserRouteBuffer buffer(((uint8 *)_buffer) + sizeof(route_entry),
+	UserBuffer buffer(((uint8 *)_buffer) + sizeof(route_entry),
 		bufferSize - sizeof(route_entry));
 
-	target->destination = buffer.Copy(route->destination);
-	target->mask = buffer.Copy(route->mask);
-	target->gateway = buffer.Copy(route->gateway);
-	target->source = buffer.Copy(route->interface->address);
+	target->destination = copy_address(buffer, route->destination);
+	target->mask = copy_address(buffer, route->mask);
+	target->gateway = copy_address(buffer, route->gateway);
+	target->source = copy_address(buffer, route->interface->address);
 	target->flags = route->flags;
 	target->mtu = route->mtu;
 
