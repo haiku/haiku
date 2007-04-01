@@ -8,9 +8,19 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
+local defines = [ FDefines HAVE_MALLOC_H=1 HAVE_SYS_SELECT=1 HAVE_NET_ROUTE_H=1
+			   HAVE_STRERROR=1 HAVE_USLEEP=1 HAVE_SETLINEBUF=1
+			   BYTESWAP_IP_HDR=1 HAVE_MALLOC_H=1
+			   HAVE_ICMP_NEXTMTU=1 HAVE_SOCKADDR_SA_LEN=1 ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
 BinCommand traceroute :
-	arc4random.c
+	findsaddr-generic.c
+	ifaddrlist.c
 	traceroute.c
+	version.c
 	: $(NETWORK_LIBS) $(SELECT_UNAME_ETC_LIB) ;
 
 # Installation -- in the test directory for the time being
