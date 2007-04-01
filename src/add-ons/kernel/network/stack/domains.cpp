@@ -9,6 +9,7 @@
 
 #include "domains.h"
 #include "interfaces.h"
+#include "utility.h"
 
 #include <KernelExport.h>
 
@@ -99,12 +100,11 @@ count_domain_interfaces()
 	returned.
 */
 status_t
-list_domain_interfaces(void *buffer, size_t *_bufferSize)
+list_domain_interfaces(void *_buffer, size_t *bufferSize)
 {
 	BenaphoreLocker locker(sDomainLock);
 
-	uint8 *current = (uint8 *)buffer;
-	const uint8 *bufferEnd = current + (*_bufferSize);
+	UserBuffer buffer(_buffer, *bufferSize);
 	net_domain_private *domain = NULL;
 
 	while (true) {
@@ -119,10 +119,6 @@ list_domain_interfaces(void *buffer, size_t *_bufferSize)
 			if (interface == NULL)
 				break;
 
-			size_t size = IF_NAMESIZE + (interface->address ? interface->address->sa_len : 2);
-			if ((current + size) > bufferEnd)
-				return ENOBUFS;
-
 			ifreq request;
 			strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
 			if (interface->address != NULL)
@@ -133,14 +129,13 @@ list_domain_interfaces(void *buffer, size_t *_bufferSize)
 				request.ifr_addr.sa_family = AF_UNSPEC;
 			}
 
-			if (user_memcpy(current, &request, size) < B_OK)
-				return B_BAD_ADDRESS;
-
-			current += size;
+			if (buffer.Copy(&request, IF_NAMESIZE
+									+ request.ifr_addr.sa_len) == NULL)
+					return buffer.Status();
 		}
 	}
 
-	*_bufferSize = current - (uint8 *)buffer;
+	*bufferSize = buffer.ConsumedAmount();
 	return B_OK;
 }
 

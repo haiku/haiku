@@ -10,6 +10,7 @@
 #include "domains.h"
 #include "interfaces.h"
 #include "stack_private.h"
+#include "utility.h"
 
 #include <net_device.h>
 
@@ -258,12 +259,11 @@ count_device_interfaces()
 	returned.
 */
 status_t
-list_device_interfaces(void *buffer, size_t *_bufferSize)
+list_device_interfaces(void *_buffer, size_t *bufferSize)
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
-	uint8 *current = (uint8 *)buffer;
-	const uint8 *bufferEnd = current + (*_bufferSize);
+	UserBuffer buffer(_buffer, *bufferSize);
 	net_device_interface *interface = NULL;
 
 	while (true) {
@@ -276,17 +276,12 @@ list_device_interfaces(void *buffer, size_t *_bufferSize)
 		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
 		get_device_interface_address(interface, &request.ifr_addr);
 
-		size_t size = IF_NAMESIZE + request.ifr_addr.sa_len;
-		if ((current + size) > bufferEnd)
-			return ENOBUFS;
-
-		if (user_memcpy(current, &request, size) < B_OK)
-			return B_BAD_ADDRESS;
-
-		current += size;
+		if (buffer.Copy(&request, IF_NAMESIZE
+								+ request.ifr_addr.sa_len) == NULL)
+				return buffer.Status();
 	}
 
-	*_bufferSize = current - (uint8 *)buffer;;
+	*bufferSize = buffer.ConsumedAmount();
 	return B_OK;
 }
 
