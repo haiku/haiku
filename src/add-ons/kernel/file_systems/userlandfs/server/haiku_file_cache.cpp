@@ -366,6 +366,10 @@ vm_page_allocate_page(int state)
 
 	// no free page
 
+#if 0
+// TODO: Nice idea in principle, but causes a serious locking problem.
+// vm_page_allocate_page() is always invoked with some cached locked at the
+// same time. Thus locking a cache here to steal a page can cause a deadlock.
 	// If the limit for allocated pages has been reached, we try to steal an
 	// unused page.
 	if (sPagePool.allocatedPages >= kMaxAllocatedPages
@@ -431,6 +435,7 @@ vm_page_allocate_page(int state)
 			return page;
 		}
 	}
+#endif	// 0
 
 	// no page yet -- allocate a new one
 
