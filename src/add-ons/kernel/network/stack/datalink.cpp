@@ -305,6 +305,8 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 
 			return list_routes(domain, config.ifc_buf, config.ifc_len);
 		}
+		case SIOCGETRT:
+			return get_route_information(domain, value, *_length);
 
 		default:
 		{

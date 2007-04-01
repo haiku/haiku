@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,6 +33,51 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+class UserRouteBuffer {
+	public:
+		UserRouteBuffer(uint8 *buffer, size_t available)
+			:
+			fBuffer(buffer),
+			fAvailable(available),
+			fStatus(B_OK)
+		{
+		}
+
+		sockaddr *
+		Copy(sockaddr *source)
+		{
+			sockaddr *target = (sockaddr *)fBuffer;
+
+			if (source == NULL || (fStatus = _Copy(source)) != B_OK)
+				return NULL;
+
+			return target;
+		}
+
+		status_t Status() const { return fStatus; }
+
+	private:
+		status_t
+		_Copy(sockaddr *source)
+		{
+			if (fAvailable < source->sa_len)
+				return ENOBUFS;
+
+			if (user_memcpy(fBuffer, source, source->sa_len) < B_OK)
+				return B_BAD_ADDRESS;
+
+			fAvailable -= source->sa_len;
+			fBuffer += source->sa_len;
+
+			return B_OK;
+		}
+
+		uint8 *fBuffer;
+		size_t fAvailable;
+		status_t fStatus;
+};
 
 
 net_route_private::net_route_private()
@@ -77,6 +122,25 @@ user_copy_address(const sockaddr *from, sockaddr **to)
 	return B_OK;
 }
 
+
+static status_t
+user_copy_address(const sockaddr *from, sockaddr_storage *to)
+{
+	if (from == NULL)
+		return B_BAD_ADDRESS;
+
+	if (user_memcpy(to, from, sizeof(sockaddr)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	if (to->ss_len > sizeof(sockaddr)) {
+		if (to->ss_len > sizeof(sockaddr_storage))
+			return B_BAD_VALUE;
+		if (user_memcpy(to, from, to->ss_len) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return B_OK;
+}
 
 static net_route_private *
 find_route(struct net_domain *_domain, const net_route *description)
@@ -412,6 +476,55 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 	put_route_internal(domain, route);
 	update_route_infos(domain);
 	return B_OK;
+}
+
+
+static status_t
+fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
+		 net_route *route)
+{
+	UserRouteBuffer buffer(((uint8 *)_buffer) + sizeof(route_entry),
+		bufferSize - sizeof(route_entry));
+
+	target->destination = buffer.Copy(route->destination);
+	target->mask = buffer.Copy(route->mask);
+	target->gateway = buffer.Copy(route->gateway);
+	target->source = buffer.Copy(route->interface->address);
+	target->flags = route->flags;
+	target->mtu = route->mtu;
+
+	return buffer.Status();
+}
+
+
+status_t
+get_route_information(struct net_domain *_domain, void *value, size_t length)
+{
+	struct net_domain_private *domain = (net_domain_private *)_domain;
+
+	if (length < sizeof(route_entry))
+		return B_BAD_VALUE;
+
+	route_entry entry;
+	if (user_memcpy(&entry, value, sizeof(route_entry)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	sockaddr_storage destination;
+	status_t status = user_copy_address(entry.destination, &destination);
+	if (status != B_OK)
+		return status;
+
+	BenaphoreLocker locker(domain->lock);
+
+	net_route_private *route = find_route(domain, (sockaddr *)&destination);
+	if (route == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	status = fill_route_entry(&entry, value, length, route);
+	if (status != B_OK)
+		return status;
+
+	return user_memcpy(value, &entry, sizeof(route_entry));
 }
 
 

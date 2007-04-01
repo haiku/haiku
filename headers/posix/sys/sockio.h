@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SOCKIO_H
@@ -36,6 +36,7 @@ enum {
 
 	SIOCGRTSIZE,		/* get route table size */
 	SIOCGRTTABLE,		/* get route table */
+	SIOCGETRT,			/* get route information for destination */
 
 	SIOCGIFSTATS,		/* get interface stats */
 	SIOCGIFPARAM,		/* get interface parameter */
@@ -53,4 +54,4 @@ enum {
 	SIOCGPGRP			/* get process group */
 };
 
-#endif /* _SYS_SOCKIO_H */
+#endif	/* _SYS_SOCKIO_H */
