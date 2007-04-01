@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -99,12 +99,13 @@ count_domain_interfaces()
 	returned.
 */
 status_t
-list_domain_interfaces(void *buffer, size_t size)
+list_domain_interfaces(void *buffer, size_t *_bufferSize)
 {
 	BenaphoreLocker locker(sDomainLock);
 
+	uint8 *current = (uint8 *)buffer;
+	const uint8 *bufferEnd = current + (*_bufferSize);
 	net_domain_private *domain = NULL;
-	size_t spaceLeft = size;
 
 	while (true) {
 		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
@@ -118,8 +119,8 @@ list_domain_interfaces(void *buffer, size_t size)
 			if (interface == NULL)
 				break;
 
-			size = IF_NAMESIZE + (interface->address ? interface->address->sa_len : 2);
-			if (spaceLeft < size)
+			size_t size = IF_NAMESIZE + (interface->address ? interface->address->sa_len : 2);
+			if ((current + size) > bufferEnd)
 				return ENOBUFS;
 
 			ifreq request;
@@ -132,14 +133,14 @@ list_domain_interfaces(void *buffer, size_t size)
 				request.ifr_addr.sa_family = AF_UNSPEC;
 			}
 
-			if (user_memcpy(buffer, &request, size) < B_OK)
+			if (user_memcpy(current, &request, size) < B_OK)
 				return B_BAD_ADDRESS;
 
-			buffer = (void *)((addr_t)buffer + size);
-			spaceLeft -= size;
+			current += size;
 		}
 	}
 
+	*_bufferSize = current - (uint8 *)buffer;
 	return B_OK;
 }
 

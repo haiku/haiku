@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -174,12 +174,17 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 
 		case SIOCGIFCONF:
 		{
-			// count number of interfaces
+			// retrieve available interfaces
 			struct ifconf config;
 			if (user_memcpy(&config, value, sizeof(struct ifconf)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			return list_device_interfaces(config.ifc_buf, config.ifc_len);
+			status_t result = list_device_interfaces(config.ifc_buf,
+				(size_t *)&config.ifc_len);
+			if (result != B_OK)
+				return result;
+
+			return user_memcpy(value, &config, sizeof(struct ifconf));
 		}
 
 		case SIOCGIFADDR:

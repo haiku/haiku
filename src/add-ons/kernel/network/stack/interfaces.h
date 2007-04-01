@@ -72,7 +72,7 @@ void delete_interface(net_interface_private *interface);
 void get_device_interface_address(net_device_interface *interface,
 	sockaddr *address);
 uint32 count_device_interfaces();
-status_t list_device_interfaces(void *buffer, size_t size);
+status_t list_device_interfaces(void *buffer, size_t *_bufferSize);
 void put_device_interface(struct net_device_interface *interface);
 struct net_device_interface *get_device_interface(uint32 index);
 struct net_device_interface *get_device_interface(const char *name);

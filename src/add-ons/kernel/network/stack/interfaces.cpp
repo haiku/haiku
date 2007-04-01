@@ -258,12 +258,13 @@ count_device_interfaces()
 	returned.
 */
 status_t
-list_device_interfaces(void *buffer, size_t size)
+list_device_interfaces(void *buffer, size_t *_bufferSize)
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
+	uint8 *current = (uint8 *)buffer;
+	const uint8 *bufferEnd = current + (*_bufferSize);
 	net_device_interface *interface = NULL;
-	size_t spaceLeft = size;
 
 	while (true) {
 		interface = (net_device_interface *)list_get_next_item(&sInterfaces,
@@ -275,17 +276,17 @@ list_device_interfaces(void *buffer, size_t size)
 		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
 		get_device_interface_address(interface, &request.ifr_addr);
 
-		size = IF_NAMESIZE + request.ifr_addr.sa_len;
-		if (spaceLeft < size)
+		size_t size = IF_NAMESIZE + request.ifr_addr.sa_len;
+		if ((current + size) > bufferEnd)
 			return ENOBUFS;
 
-		if (user_memcpy(buffer, &request, size) < B_OK)
+		if (user_memcpy(current, &request, size) < B_OK)
 			return B_BAD_ADDRESS;
 
-		buffer = (void *)((addr_t)buffer + size);
-		spaceLeft -= size;
+		current += size;
 	}
 
+	*_bufferSize = current - (uint8 *)buffer;;
 	return B_OK;
 }
 
