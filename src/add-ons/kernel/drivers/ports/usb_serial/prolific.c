@@ -111,18 +111,18 @@ static struct req_item pl_reset_common_nhx[] = {
 };
 
 static status_t usb_send_requ_list(const usb_device *dev, struct req_item *list, size_t len){
-  char buf[10];
-  int i;
+  uint32 i;
   status_t status;
   for (i = 0; i < len; i++){
+    char buf[10];
     bool o = (list[i].requestType == PLRT_O);
-    size_t len = 1;
+    size_t buflen = 1;
     status = (*usb_m->send_request)(dev, 
                                     list[i].requestType,
                                     list[i].request,
                                     list[i].value,
                                     list[i].index,
-                                    0, o?0:buf, o?0:len, &len);
+                                    0, o?0:buf, o?0:buflen, &buflen);
     TRACE("usb_send_requ_list: reqs[%d]: %08lx\n", i, status);
   }
   return B_OK;
