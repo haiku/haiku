@@ -20,7 +20,7 @@ status_t add_prolific_device(usb_serial_device *usd,
   struct usb_endpoint_info *data_in_epi  = NULL;
   const usb_device_descriptor *ddesc;
   status_t status = ENODEV;
-  int i = 0;
+  uint32 i = 0;
 
   TRACE_FUNCALLS("> add_prolific_device(%08x, %08x)\n", usd, uci);
   
@@ -130,19 +130,15 @@ static status_t usb_send_requ_list(const usb_device *dev, struct req_item *list,
 
 status_t reset_prolific_device(usb_serial_device *usd){
   status_t status;
-  size_t len = 0;
   TRACE_FUNCALLS("> reset_prolific_device(%08x)\n", usd);
-/*  status = (*usb_m->send_request)(usd->dev,
-                                  USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-                                  PROLIFIC_SET_REQUEST, 0, 0, 0, 0, 0, &len);
- */
   
-  usb_send_requ_list(usd->dev, pl_reset_common_reqs, SIZEOF(pl_reset_common_reqs));
+  status = usb_send_requ_list(usd->dev, pl_reset_common_reqs, SIZEOF(pl_reset_common_reqs));
   if (usd->spec.prolific.is_HX)
-    usb_send_requ_list(usd->dev, pl_reset_common_hx, SIZEOF(pl_reset_common_hx));
+    status = usb_send_requ_list(usd->dev, pl_reset_common_hx, SIZEOF(pl_reset_common_hx));
   else
-    usb_send_requ_list(usd->dev, pl_reset_common_nhx, SIZEOF(pl_reset_common_nhx));
-  
+    status = usb_send_requ_list(usd->dev, pl_reset_common_nhx, SIZEOF(pl_reset_common_nhx));
+
+  status = B_OK; /* discard */
   TRACE_FUNCRET("< reset_prolific_device returns:%08x\n", status);
   return status;
 }
