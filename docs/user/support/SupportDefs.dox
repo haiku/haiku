@@ -1,186 +1,187 @@
 /*!
-\file SupportDefs.h
-\ingroup support
-\brief Defines basic types and definitions for the Haiku API.
+  \file SupportDefs.h
+  \ingroup support
+  \brief Defines basic types and definitions for the Haiku API.
 */
 
 /*!
-\name Short byte long Type Formats
+  \name Short byte long Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef	signed char				int8
+  \typedef typedef	signed char				int8
 */
 
 /*!
-\typedef typedef unsigned char			uint8
+  \typedef typedef unsigned char			uint8
 */
 
 /*!
-\typedef typedef volatile signed char   	vint8
+  \typedef typedef volatile signed char   	vint8
 */
 
 /*!
-\typedef typedef volatile unsigned char	vuint8
+  \typedef typedef volatile unsigned char	vuint8
 */
 
 //! @}
 
 /*!
-\name Short 2-byte long Type Formats
+  \name Short 2-byte long Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef	short					int16
+  \typedef typedef	short					int16
 */
 
 /*!
-\typedef typedef unsigned short			uint16
+  \typedef typedef unsigned short			uint16
 */
 
 /*!
-\typedef typedef volatile short			vint16
+  \typedef typedef volatile short			vint16
 */
 
 /*!
-\typedef typedef volatile unsigned short	vuint16
+  \typedef typedef volatile unsigned short	vuint16
 */
 
 //! @}
 
 /*!
-\name Short 4-byte long Type Formats
+  \name Short 4-byte long Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef	long					int32
+  \typedef typedef	long					int32
 */
 
 /*!
-\typedef typedef unsigned long			uint32
+  \typedef typedef unsigned long			uint32
 */
 
 /*!
-\typedef typedef volatile long			vint32
+  \typedef typedef volatile long			vint32
 */
 
 /*!
-\typedef typedef volatile unsigned long	vuint32
+  \typedef typedef volatile unsigned long	vuint32
 */
 
 //! @}
 
 /*!
-\name Short 8-byte long Type Formats
+  \name Short 8-byte long Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef	long long				int64
+  \typedef typedef	long long				int64
 */
 
 /*!
-\typedef typedef unsigned long long		uint64
+  \typedef typedef unsigned long long		uint64
 */
 
 /*!
-\typedef typedef volatile long long		vint64
+  \typedef typedef volatile long long		vint64
 */
 
 /*!
-\typedef typedef volatile unsigned long long	vuint64
+  \typedef typedef volatile unsigned long long	vuint64
 */
 
 //! @}
 
 /*!
-\name Short volatile Type Formats
+  \name Short volatile Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef volatile long			vlong
+  \typedef typedef volatile long			vlong
 */
 
 /*!
-\typedef typedef volatile int			vint
+  \typedef typedef volatile int			vint
 */
 
 /*!
-\typedef typedef volatile short			vshort
+  \typedef typedef volatile short			vshort
 */
 
 /*!
-\typedef typedef volatile char			vchar
+  \typedef typedef volatile char			vchar
 */
 
 /*!
-\typedef typedef volatile unsigned long	vulong
+  \typedef typedef volatile unsigned long	vulong
 */
 
 /*!
-\typedef typedef volatile unsigned int	vuint
+  \typedef typedef volatile unsigned int	vuint
 */
 
 /*!
-\typedef typedef volatile unsigned short	vushort
+  \typedef typedef volatile unsigned short	vushort
 */
 
 /*!
-\typedef typedef volatile unsigned char	vuchar
+  \typedef typedef volatile unsigned char	vuchar
 */
 
 //! @}
 
 /*!
-\name Character Type Formats
+  \name Character Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef unsigned char			uchar
+  \typedef typedef unsigned char			uchar
 */
 
 /*!
-\typedef typedef unsigned short          unichar
+  \typedef typedef unsigned short          unichar
 */
 
 //! @}
 
 /*!
-\name Descriptive Type Formats
+  \name Descriptive Type Formats
 */
 
 //! @{
 
 /*!
-\typedef typedef int32					status_t
-\brief Represents one of the status codes defined in Error.h
+  \typedef typedef int32					status_t
+  \brief Represents one of the status codes defined in Error.h
 */
 
 /*!
-\typedef typedef int64					bigtime_t
-\brief Represents time. The unit depends on the context of the function.
+  \typedef typedef int64					bigtime_t
+  \brief Represents time. The unit depends on the context of the function.
 */
 
 /*!
-\typedef typedef uint32					type_code
-\brief Represents a type code. See TypeCode.h for possible values.
+  \typedef typedef uint32					type_code
+  \brief Represents a certain type of data. See TypeConstants.h for possible
+    values.
 */
 
 /*!
-\typedef typedef uint32					perform_code
-\brief Unused. Defined by Be to support 'hidden' commands or
-  extensions to classes. The Haiku API has none of these.
+  \typedef typedef uint32					perform_code
+  \brief Unused. Defined by Be to support 'hidden' commands or
+    extensions to classes. The Haiku API has none of these.
 */
   
 //! @}
@@ -188,152 +189,152 @@
 //////////////// Odds and ends
   
 /*!
-\var const char *B_EMPTY_STRING
-\brief Defines an empty string. Currently defined as the C-string "".
+  \var const char *B_EMPTY_STRING
+  \brief Defines an empty string. Currently defined as the C-string "".
 */
 
 /*!
-\def min_c(a,b)
-\brief Returns the minimum of the values a and b.
+  \def min_c(a,b)
+  \brief Returns the minimum of the values a and b.
 
-\note When including this header in a C file, use the C equivalent called 
-  \c min(a,b).
+  \note When including this header in a C file, use the C equivalent called 
+    \c min(a,b).
 */
 
 /*!
-\def max_c(a,b)
-\brief Returns the maximum of values a and b.
+  \def max_c(a,b)
+  \brief Returns the maximum of values a and b.
 
-\note When including this header in a C file, use the C equivalent called 
-  \c max(a,b).
+  \note When including this header in a C file, use the C equivalent called 
+    \c max(a,b).
 */
 
 /*!
-\def NULL
-\brief Defines the constant \c NULL if it hasn't been defined anywhere before. 
+  \def NULL
+  \brief Defines the constant \c NULL if it hasn't been defined anywhere before. 
 */
 
 /*!
-\addtogroup support_globals
+  \addtogroup support_globals
 */
 
 //! @{
 
 /*!
-\fn int32	atomic_set(vint32 *value, int32 newValue)
-\brief Undocumented.
-\sa atomic_set64() for a version that works on \c long \c long
-\sa atomic_test_and_set(), atomic_add(), atomic_and(),
-  atomic_or(), atomic_get()
+  \fn int32	atomic_set(vint32 *value, int32 newValue)
+  \brief Undocumented.
+  \sa atomic_set64() for a version that works on \c long \c long
+  \sa atomic_test_and_set(), atomic_add(), atomic_and(),
+    atomic_or(), atomic_get()
 */
 
 /*!
-\fn int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst)
-\brief Undocumented.
-\sa atomic_test_and_set64() for a version that works on \c long \c long
-\sa atomic_set(), atomic_add(), atomic_and(),
-  atomic_or(), atomic_get()
+  \fn int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst)
+  \brief Undocumented.
+  \sa atomic_test_and_set64() for a version that works on \c long \c long
+  \sa atomic_set(), atomic_add(), atomic_and(),
+    atomic_or(), atomic_get()
 */
 
 /*!
-\fn int32	atomic_add(vint32 *value, int32 addValue)
-\brief Undocumented.
-\sa atomic_add64() for a version that works on \c long \c long
-\sa atomic_set(), atomic_test_and_set(), atomic_and(),
-  atomic_or(), atomic_get()
+  \fn int32	atomic_add(vint32 *value, int32 addValue)
+  \brief Undocumented.
+  \sa atomic_add64() for a version that works on \c long \c long
+  \sa atomic_set(), atomic_test_and_set(), atomic_and(),
+    atomic_or(), atomic_get()
 */
 
 /*!
-\fn int32	atomic_and(vint32 *value, int32 andValue)
-\brief Undocumented.
-\sa atomic_and64() for a version that works on \c long \c long
-\sa atomic_set(), atomic_test_and_set(), atomic_add(),
-  atomic_or(), atomic_get()
+  \fn int32	atomic_and(vint32 *value, int32 andValue)
+  \brief Undocumented.
+  \sa atomic_and64() for a version that works on \c long \c long
+  \sa atomic_set(), atomic_test_and_set(), atomic_add(),
+    atomic_or(), atomic_get()
 */
 
 
 /*!
-\fn int32	atomic_or(vint32 *value, int32 orValue)
-\brief Undocumented.
-\sa atomic_or64() for a version that works on \c long \c long
-\sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
-  atomic_get()
+  \fn int32	atomic_or(vint32 *value, int32 orValue)
+  \brief Undocumented.
+  \sa atomic_or64() for a version that works on \c long \c long
+  \sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
+    atomic_get()
 */
 
 /*!
-\fn int32	atomic_get(vint32 *value)
-\brief Undocumented.
-\sa atomic_get64() for a version that works on \c long \c long
-\sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
-  atomic_or()
+  \fn int32	atomic_get(vint32 *value)
+  \brief Undocumented.
+  \sa atomic_get64() for a version that works on \c long \c long
+  \sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
+    atomic_or()
 */
 
 /*!
-\fn int64	atomic_set64(vint64 *value, int64 newValue)
-\brief Undocumented.
-\sa atomic_set() for a version that works on an \c int32
-\sa atomic_test_and_set64(), atomic_add64(), atomic_and64(),
-  atomic_or64(), atomic_get64()
+  \fn int64	atomic_set64(vint64 *value, int64 newValue)
+  \brief Undocumented.
+  \sa atomic_set() for a version that works on an \c int32
+  \sa atomic_test_and_set64(), atomic_add64(), atomic_and64(),
+    atomic_or64(), atomic_get64()
 */
 
 /*!
-\fn int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
-\brief Undocumented.
-\sa atomic_test_and_set() for a version that works on an \c int32
-\sa atomic_set64(), atomic_add64(), atomic_and64(),
-  atomic_or64(), atomic_get64()
+  \fn int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
+  \brief Undocumented.
+  \sa atomic_test_and_set() for a version that works on an \c int32
+  \sa atomic_set64(), atomic_add64(), atomic_and64(),
+    atomic_or64(), atomic_get64()
 */
 
 /*!
-\fn int64	atomic_add64(vint64 *value, int64 addValue)
-\brief Undocumented.
-\sa atomic_add() for a version that works on an \c int32
-\sa atomic_set64(), atomic_test_and_set64(), atomic_and64(),
-  atomic_or64(), atomic_get64()
+  \fn int64	atomic_add64(vint64 *value, int64 addValue)
+  \brief Undocumented.
+  \sa atomic_add() for a version that works on an \c int32
+  \sa atomic_set64(), atomic_test_and_set64(), atomic_and64(),
+    atomic_or64(), atomic_get64()
 */
 
 /*!
-\fn int64	atomic_and64(vint64 *value, int64 andValue)
-\brief Undocumented.
-\sa atomic_and() for a version that works on an \c int32
-\sa atomic_set64(), atomic_test_and_set64(), atomic_add64(),
-  atomic_or64(), atomic_get64()
+  \fn int64	atomic_and64(vint64 *value, int64 andValue)
+  \brief Undocumented.
+  \sa atomic_and() for a version that works on an \c int32
+  \sa atomic_set64(), atomic_test_and_set64(), atomic_add64(),
+    atomic_or64(), atomic_get64()
 */
 
 /*!
-\fn int64	atomic_or64(vint64 *value, int64 orValue)
-\brief Undocumented.
-\sa atomic_or() for a version that works on an \c int32
-\sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
-  atomic_get64()
+  \fn int64	atomic_or64(vint64 *value, int64 orValue)
+  \brief Undocumented.
+  \sa atomic_or() for a version that works on an \c int32
+  \sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
+    atomic_get64()
 */
 
 /*!
-\fn int64	atomic_get64(vint64 *value)
-\brief Undocumented.
-\sa atomic_get() for a version that works on an \c int32
-\sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
-  atomic_or64()
+  \fn int64	atomic_get64(vint64 *value)
+  \brief Undocumented.
+  \sa atomic_get() for a version that works on an \c int32
+  \sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
+    atomic_or64()
 */
 
 //! @}
 
 /*!
-\fn void*	get_stack_frame(void)
-\brief This is internal, I guess. Else this needs to be documented.
-\internal
+  \fn void*	get_stack_frame(void)
+  \brief This is internal, I guess. Else this needs to be documented.
+  \internal
 */
 
 //! @{
 
 /*!
-\def FALSE
-\brief Obsolete. Use \c false.
+  \def FALSE
+  \brief Obsolete. Use \c false.
 */
 
 /*!
-\def TRUE
-\brief Obsolete. Use \c true.
+  \def TRUE
+  \brief Obsolete. Use \c true.
 */
 
 //! @}

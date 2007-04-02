@@ -1,31 +1,32 @@
 /*!
-\mainpage The Haiku Book
+  \mainpage The Haiku Book
 
-\section kits Kits and Servers
+  \section kits Kits and Servers
 
-- \ref midi1
-- \ref midi2 | \link midi2_intro \em Introduction \endlink
-- \ref support | \link support_intro \em Introduction \endlink
+  - \ref midi1
+  - \ref midi2 | \link midi2_intro \em Introduction \endlink
+  - \ref support | \link support_intro \em Introduction \endlink
 
-\section notes General Notes and Information
-- \ref compatibility
+  \section notes General Notes and Information
+  - \ref compatibility
+  - \ref apidoc
 */
 
-// Define main kits
+///// Define main kits /////
 
 /*!
-\defgroup midi2 MIDI 2 Kit
-\brief API for producing and consuming MIDI events.
-\defgroup libmidi2 (libmidi2.so)
-\defgroup support Support Kit
-\brief Collection of utility classes that are used throughout the API.
-\defgroup libbe (libbe.so)
-\defgroup libroot (libroot.so)
+  \defgroup midi2 MIDI 2 Kit
+  \brief API for producing and consuming MIDI events.
+  \defgroup libmidi2 (libmidi2.so)
+  \defgroup support Support Kit
+  \brief Collection of utility classes that are used throughout the API.
+  \defgroup libbe (libbe.so)
+  \defgroup libroot (libroot.so)
 */
 
-// Subgroups
+///// Subgroups /////
 
 /*!
-\defgroup support_globals Global functions in the support kit
-\ingroup support
+  \defgroup support_globals Global functions in the support kit
+  \ingroup support
 */
