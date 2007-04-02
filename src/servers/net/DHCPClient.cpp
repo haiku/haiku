@@ -40,6 +40,7 @@ enum message_option {
 	OPTION_PAD = 0,
 	OPTION_END = 255,
 	OPTION_SUBNET_MASK = 1,
+	OPTION_TIME_OFFSET = 2,
 	OPTION_ROUTER_ADDRESS = 3,
 	OPTION_DOMAIN_NAME_SERVER = 6,
 	OPTION_HOST_NAME = 12,
@@ -48,6 +49,8 @@ enum message_option {
 	OPTION_MTU = 26,
 	OPTION_BROADCAST_ADDRESS = 28,
 	OPTION_NETWORK_TIME_SERVERS = 42,
+	OPTION_NETBIOS_NAME_SERVER = 44,
+	OPTION_NETBIOS_SCOPE = 47,
 
 	// DHCP specific options
 	OPTION_REQUEST_IP_ADDRESS = 50,
@@ -74,18 +77,6 @@ enum message_type {
 	DHCP_NACK,
 	DHCP_RELEASE,
 	DHCP_INFORM
-};
-
-enum parameter_type {
-	PARAMETER_SUBNET_MASK = 1,
-	PARAMETER_TIME_OFFSET = 2,
-	PARAMETER_ROUTER = 3,
-	PARAMETER_NAME_SERVER = 6,
-	PARAMETER_HOST_NAME = 12,
-	PARAMETER_DOMAIN_NAME = 15,
-	PARAMETER_BROADCAST_ADDRESS = 28,
-	PARAMETER_NETBIOS_NAME_SERVER = 44,
-	PARAMETER_NETBIOS_SCOPE = 47,
 };
 
 struct dhcp_option_cookie {
@@ -142,8 +133,8 @@ struct dhcp_message {
 const uint32 kMsgLeaseTime = 'lstm';
 
 static const uint8 kRequiredParameters[] = {
-	PARAMETER_SUBNET_MASK, PARAMETER_ROUTER,
-	PARAMETER_NAME_SERVER, PARAMETER_BROADCAST_ADDRESS
+	OPTION_SUBNET_MASK, OPTION_ROUTER_ADDRESS,
+	OPTION_DOMAIN_NAME_SERVER, OPTION_BROADCAST_ADDRESS
 };
 
 
@@ -275,6 +266,7 @@ dhcp_message::PrepareMessage(uint8 type)
 	next = PutOption(next, OPTION_MESSAGE_SIZE, (uint16)htons(sizeof(dhcp_message)));
 	return next;
 }
+
 
 uint8*
 dhcp_message::PutOption(uint8* options, message_option option)
