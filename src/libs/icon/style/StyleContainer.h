@@ -1,15 +1,19 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef STYLE_MANAGER_H
 #define STYLE_MANAGER_H
 
+
 #include <List.h>
+
+
+namespace BPrivate {
+namespace Icon {
 
 class Style;
 
@@ -62,4 +66,7 @@ class StyleContainer {
 #endif // ICON_O_MATIC
 };
 
-#endif // STYLE_MANAGER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// STYLE_MANAGER_H

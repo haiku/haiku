@@ -1,26 +1,33 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef FLAT_ICON_EXPORTER_H
 #define FLAT_ICON_EXPORTER_H
 
+
 #include "Exporter.h"
+
 
 class BMessage;
 class BNode;
 class BPositionIO;
+
+namespace BPrivate {
+namespace Icon {
+
 class Gradient;
-class Icon;
 class LittleEndianBuffer;
 class PathContainer;
 class ShapeContainer;
 class StyleContainer;
 class VectorPath;
+
+}	// namespace Icon
+}	// namespace BPrivate
 
 #define PRINT_STATISTICS 1
 

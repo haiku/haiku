@@ -1,18 +1,22 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef PERSPECTIVE_TRANSFORMER_H
 #define PERSPECTIVE_TRANSFORMER_H
+
+
+#include "Transformer.h"
 
 #include <agg_conv_transform.h>
 #include <agg_trans_perspective.h>
 
-#include "Transformer.h"
+
+namespace BPrivate {
+namespace Icon {
 
 typedef agg::conv_transform<VertexSource,
 							agg::trans_perspective>	Perspective;
@@ -52,4 +56,7 @@ class PerspectiveTransformer : public Transformer,
 #endif
 };
 
-#endif // PERSPECTIVE_TRANSFORMER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// PERSPECTIVE_TRANSFORMER_H

@@ -1,19 +1,23 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORMER_H
 #define TRANSFORMER_H
 
+
 #ifdef ICON_O_MATIC
-# include "IconObject.h"
+#	include "IconObject.h"
 #else
-# include <SupportDefs.h>
+#	include <SupportDefs.h>
 #endif
+
+
+namespace BPrivate {
+namespace Icon {
 
 class VertexSource {
  public:
@@ -58,4 +62,7 @@ class Transformer : public VertexSource {
 			VertexSource&		fSource;
 };
 
-#endif // TRANSFORMER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// TRANSFORMER_H

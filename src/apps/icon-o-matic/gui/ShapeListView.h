@@ -1,23 +1,30 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SHAPE_LIST_VIEW_H
 #define SHAPE_LIST_VIEW_H
+
 
 #include "ListViews.h"
 #include "ShapeContainer.h"
 
+
 class BMenu;
 class BMenuItem;
 class CommandStack;
-class Shape;
 class ShapeListItem;
 class Selection;
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+}
+}
+using namespace BPrivate::Icon;
 
 enum {
 	MSG_ADD_SHAPE					= 'adsh',

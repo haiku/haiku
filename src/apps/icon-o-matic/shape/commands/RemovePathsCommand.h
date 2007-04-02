@@ -1,20 +1,26 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef REMOVE_PATHS_COMMAND_H
 #define REMOVE_PATHS_COMMAND_H
 
-#include <List.h>
 
 #include "Command.h"
 
-class VectorPath;
-class PathContainer;
+#include <List.h>
+
+
+namespace BPrivate {
+namespace Icon {
+	class VectorPath;
+	class PathContainer;
+}
+}
+using namespace BPrivate::Icon;
 
 class RemovePathsCommand : public Command {
  public:

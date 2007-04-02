@@ -19,7 +19,6 @@ class BMenuBar;
 class BMenuItem;
 class CanvasView;
 class Document;
-class Icon;
 class IconObjectListView;
 class IconEditorApp;
 class IconView;
@@ -29,6 +28,13 @@ class StyleListView;
 class StyleView;
 class SwatchGroup;
 class TransformerListView;
+
+namespace BPrivate {
+namespace Icon {
+	class Icon;
+}
+}
+using namespace BPrivate::Icon;
 
 class MultipleManipulatorState;
 

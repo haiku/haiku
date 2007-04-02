@@ -1,17 +1,22 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef PATH_COMMAND_QUEUE_H
 #define PATH_COMMAND_QUEUE_H
+
 
 #include "LittleEndianBuffer.h"
 
 class BPoint;
+
+
+namespace BPrivate {
+namespace Icon {
+
 class VectorPath;
 
 class PathCommandQueue {
@@ -50,4 +55,7 @@ class PathCommandQueue {
 			uint8				fCommandCount;
 };
 
-#endif // PATH_COMMAND_QUEUE_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// PATH_COMMAND_QUEUE_H

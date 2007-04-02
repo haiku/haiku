@@ -5,27 +5,31 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef VECTOR_PATH_H
 #define VECTOR_PATH_H
+
+
+#include "Transformable.h"
+
+#include <agg_path_storage.h>
 
 #include <Rect.h>
 #include <String.h>
 
-#include <agg_path_storage.h>
-
-#include "Transformable.h"
-
 #ifdef ICON_O_MATIC
-# include <Archivable.h>
-# include <List.h>
+#	include "IconObject.h"
 
-# include "IconObject.h"
+#	include <Archivable.h>
+#	include <List.h>
 #endif // ICON_O_MATIC
 
 class BBitmap;
 class BMessage;
 class BView;
+
+
+namespace BPrivate {
+namespace Icon {
 
 struct control_point {
 	BPoint		point;		// actual point on path
@@ -207,5 +211,7 @@ class VectorPath {
 	mutable	BRect				fCachedBounds;
 };
 
-#endif // VECTOR_PATH_H
+}	// namespace Icon
+}	// namespace BPrivate
 
+#endif	// VECTOR_PATH_H

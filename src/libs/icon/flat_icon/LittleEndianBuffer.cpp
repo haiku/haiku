@@ -1,20 +1,24 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "LittleEndianBuffer.h"
 
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
+#include "LittleEndianBuffer.h"
 
 #include <ByteOrder.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+using namespace BPrivate::Icon;
+
 #define CHUNK_SIZE 256
+
 
 // constructor
 LittleEndianBuffer::LittleEndianBuffer()

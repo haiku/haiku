@@ -1,11 +1,12 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
+
 
 #include "IconUtils.h"
 
@@ -22,7 +23,10 @@
 #include "IconRenderer.h"
 #include "FlatIconImporter.h"
 
+
+using namespace BPrivate::Icon;
 using std::nothrow;
+
 
 // GetIcon
 status_t

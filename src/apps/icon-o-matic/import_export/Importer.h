@@ -5,13 +5,22 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef IMPORTER_H
 #define IMPORTER_H
 
+
 #include <SupportDefs.h>
 
+
+namespace BPrivate {
+namespace Icon {
+
 class Icon;
+
+}	// namespace Icon
+}	// namespace BPrivate
+
+using namespace BPrivate::Icon;
 
 class Importer {
  public:

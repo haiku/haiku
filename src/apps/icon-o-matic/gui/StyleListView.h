@@ -1,27 +1,34 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef STYLE_LIST_VIEW_H
 #define STYLE_LIST_VIEW_H
 
+
 #include "ListViews.h"
 #include "StyleContainer.h"
+
 
 class BMenu;
 class BMenuItem;
 class CommandStack;
 class Selection;
-class Shape;
-class ShapeContainer;
-class ShapeListener;
 class ShapeStyleListener;
-class Style;
 class StyleListItem;
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+	class ShapeContainer;
+	class ShapeListener;
+	class Style;
+}
+}
+using namespace BPrivate::Icon;
 
 class StyleListView : public SimpleListView,
 					  public StyleContainerListener {

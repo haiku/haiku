@@ -1,15 +1,19 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SHAPE_CONTAINER_H
 #define SHAPE_CONTAINER_H
 
+
 #include <List.h>
+
+
+namespace BPrivate {
+namespace Icon {
 
 class Shape;
 
@@ -63,4 +67,7 @@ class ShapeContainer {
 #endif // ICON_O_MATIC
 };
 
-#endif // SHAPE_CONTAINER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// SHAPE_CONTAINER_H

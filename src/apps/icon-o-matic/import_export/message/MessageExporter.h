@@ -1,25 +1,30 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef MESSAGE_EXPORTER_H
 #define MESSAGE_EXPORTER_H
+
 
 #include "Exporter.h"
 
 class BMessage;
 class BPositionIO;
-class Icon;
-class PathContainer;
-class Shape;
-class Style;
-class StyleContainer;
-class Transformer;
-class VectorPath;
+
+namespace BPrivate {
+namespace Icon {
+	class Icon;
+	class PathContainer;
+	class Shape;
+	class Style;
+	class StyleContainer;
+	class Transformer;
+	class VectorPath;
+}
+}
 
 class MessageExporter : public Exporter {
  public:

@@ -1,17 +1,21 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef CONTOUR_TRANSFORMER_H
 #define CONTOUR_TRANSFORMER_H
 
-#include <agg_conv_contour.h>
 
 #include "Transformer.h"
+
+#include <agg_conv_contour.h>
+
+
+namespace BPrivate {
+namespace Icon {
 
 typedef agg::conv_contour<VertexSource>		Contour;
 
@@ -51,4 +55,7 @@ class ContourTransformer : public Transformer,
 #endif
 };
 
-#endif // CONTOUR_TRANSFORMER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// CONTOUR_TRANSFORMER_H

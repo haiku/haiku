@@ -1,26 +1,26 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORM_POINTS_COMMAND_H
 #define TRANSFORM_POINTS_COMMAND_H
+
 
 #include "TransformBox.h"
 #include "TransformCommand.h"
 
-class VectorPath;
-struct control_point;
 
 namespace BPrivate {
 namespace Icon {
+	struct control_point;
 	class Transformable;
+	class VectorPath;
 }
 }
-using BPrivate::Icon::Transformable;
+using namespace BPrivate::Icon;
 
 class TransformPointsCommand : public TransformCommand,
 							   public TransformBoxListener {

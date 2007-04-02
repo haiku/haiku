@@ -1,21 +1,28 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef GRADIENT_CONTROL_H
 #define GRADIENT_CONTROL_H
 
+
 #include <View.h>
 
+
 #if LIB_LAYOUT
-#include <layout.h>
+#	include <layout.h>
 #endif
 
+namespace BPrivate {
+namespace Icon {
+
 class Gradient;
+
+}	// namespace Icon
+}	// namespace BPrivate
 
 enum {
 	MSG_GRADIENT_CONTROL_FOCUS_CHANGED	= 'gcfc',
@@ -54,8 +61,9 @@ class GradientControl :
 	virtual	void				FrameResized(float width, float height);
 
 								// GradientControl
-			void				SetGradient(const ::Gradient* gradient);
-			::Gradient*			Gradient() const
+			void				SetGradient(const BPrivate::Icon::Gradient*
+											gradient);
+			BPrivate::Icon::Gradient* Gradient() const
 									{ return fGradient; }
 
 			void				SetCurrentStop(const rgb_color& color);
@@ -73,7 +81,7 @@ class GradientControl :
 			float				_OffsetFor(BPoint where) const;
 			void				_UpdateCurrentColor() const;
 
- 			::Gradient*			fGradient;
+ 			BPrivate::Icon::Gradient* fGradient;
 			BBitmap*			fGradientBitmap;
 			int32				fDraggingStepIndex;
 			int32				fCurrentStepIndex;

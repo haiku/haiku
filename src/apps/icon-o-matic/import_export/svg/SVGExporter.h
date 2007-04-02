@@ -1,28 +1,28 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SVG_EXPORTER_H
 #define SVG_EXPORTER_H
 
-#include <String.h>
 
 #include "Exporter.h"
 
-class Gradient;
-class Shape;
-class Style;
+#include <String.h>
+
 
 namespace BPrivate {
 namespace Icon {
+	class Gradient;
+	class Shape;
+	class Style;
 	class Transformable;
 }
 }
-using BPrivate::Icon::Transformable;
+using namespace BPrivate::Icon;
 
 class SVGExporter : public Exporter {
  public:

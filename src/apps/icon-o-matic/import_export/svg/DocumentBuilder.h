@@ -41,15 +41,15 @@
 
 #include "PathTokenizer.h"
 
-class Icon;
 class SVGImporter;
 
 namespace BPrivate {
 namespace Icon {
+	class Icon;
 	class Transformable;
 }
 }
-using BPrivate::Icon::Transformable;
+using namespace BPrivate::Icon;
 
 namespace agg {
 namespace svg {

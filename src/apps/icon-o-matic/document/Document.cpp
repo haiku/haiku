@@ -1,29 +1,33 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include "Document.h"
-
-#include <new>
-#include <stdio.h>
-
-#include <Entry.h>
 
 #include "CommandStack.h"
 #include "DocumentSaver.h"
 #include "Icon.h"
 #include "Selection.h"
 
+#include <Entry.h>
+
+#include <new>
+#include <stdio.h>
+
+
 using std::nothrow;
+using namespace BPrivate::Icon;
+
 
 // constructor
 Document::Document(const char* name)
 	: RWLocker("document rw lock"),
-	  fIcon(new (nothrow) ::Icon()),
+	  fIcon(new (nothrow) BPrivate::Icon::Icon()),
 	  fCommandStack(new (nothrow) ::CommandStack()),
 	  fSelection(new (nothrow) ::Selection()),
 
@@ -80,7 +84,7 @@ Document::SetExportSaver(::DocumentSaver* saver)
 
 // SetIcon
 void
-Document::SetIcon(::Icon* icon)
+Document::SetIcon(BPrivate::Icon::Icon* icon)
 {
 	if (fIcon == icon)
 		return;

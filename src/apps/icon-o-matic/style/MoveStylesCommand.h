@@ -1,20 +1,25 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef MOVE_STYLES_COMMAND_H
 #define MOVE_STYLES_COMMAND_H
+
 
 #include "Command.h"
 
 // TODO: make a templated "move items" command?
 
-class Style;
-class StyleContainer;
+namespace BPrivate {
+namespace Icon {
+	class Style;
+	class StyleContainer;
+}
+}
+using namespace BPrivate::Icon;
 
 class MoveStylesCommand : public Command {
  public:

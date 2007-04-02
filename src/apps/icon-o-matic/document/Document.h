@@ -1,24 +1,31 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
 
-#include <String.h>
 
 #include "Observable.h"
 #include "RWLocker.h"
 
+#include <String.h>
+
 struct entry_ref;
+
+namespace BPrivate {
+namespace Icon {
+
+class Icon;
+
+}	// namespace Icon
+}	// namespace BPrivate
 
 class CommandStack;
 class DocumentSaver;
-class Icon;
 class Selection;
 
 class Document : public RWLocker,
@@ -44,14 +51,14 @@ class Document : public RWLocker,
 	inline	::DocumentSaver*	ExportSaver() const
 									{ return fExportSaver; }
 
-			void				SetIcon(::Icon* icon);
-	inline	::Icon*				Icon() const
+			void				SetIcon(BPrivate::Icon::Icon* icon);
+	inline	BPrivate::Icon::Icon* Icon() const
 									{ return fIcon; }
 
 			void				MakeEmpty(bool includingSavers = true);
 
  private:
-			::Icon*				fIcon;
+			BPrivate::Icon::Icon* fIcon;
 			::CommandStack*		fCommandStack;
 			::Selection*		fSelection;
 

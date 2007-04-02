@@ -1,18 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef UNASSIGN_PATH_COMMAND_H
 #define UNASSIGN_PATH_COMMAND_H
 
+
 #include "Command.h"
 
-class Shape;
-class VectorPath;
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+	class VectorPath;
+}
+}
+using namespace BPrivate::Icon;
 
 class UnassignPathCommand : public Command {
  public:

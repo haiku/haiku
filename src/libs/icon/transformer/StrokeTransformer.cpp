@@ -1,14 +1,13 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "StrokeTransformer.h"
 
-#include <new>
+#include "StrokeTransformer.h"
 
 #ifdef ICON_O_MATIC
 # include <Message.h>
@@ -19,7 +18,11 @@
 # include "PropertyObject.h"
 #endif // ICON_O_MATIC
 
+#include <new>
+
+using namespace BPrivate::Icon;
 using std::nothrow;
+
 
 // constructor
 StrokeTransformer::StrokeTransformer(VertexSource& source)

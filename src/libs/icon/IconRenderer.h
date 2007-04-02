@@ -1,13 +1,13 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ICON_RENDERER_H
 #define ICON_RENDERER_H
+
 
 #include <agg_gamma_lut.h>
 #include <agg_pixfmt_rgba.h>
@@ -21,6 +21,11 @@
 
 class BBitmap;
 class BRect;
+
+
+namespace BPrivate {
+namespace Icon {
+
 class Icon;
 
 typedef agg::gamma_lut
@@ -61,7 +66,7 @@ class IconRenderer {
 									// used when no background bitmap
 									// is set
 
-			const ::GammaTable&	GammaTable() const
+			const BPrivate::Icon::GammaTable& GammaTable() const
 									{ return fGammaTable; }
 
 			void				Demultiply();
@@ -74,7 +79,7 @@ class IconRenderer {
 			agg::rgba8			fBackgroundColor;
 			const Icon*			fIcon;
 
-			::GammaTable		fGammaTable;
+			BPrivate::Icon::GammaTable fGammaTable;
 
 			RenderingBuffer		fRenderingBuffer;
 			PixelFormat			fPixelFormat;
@@ -90,5 +95,8 @@ class IconRenderer {
 
 			Transformation		fGlobalTransform;
 };
+
+}	// namespace Icon
+}	// namespace BPrivate
 
 #endif // ICON_RENDERER_H

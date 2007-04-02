@@ -1,20 +1,27 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ICON_VIEW_H
 #define ICON_VIEW_H
 
-#include <View.h>
 
 #include "Icon.h"
 
+#include <View.h>
+
+
 class BBitmap;
-class IconRenderer;
+
+namespace BPrivate {
+namespace Icon {
+	class IconRenderer;
+}
+}
+using namespace BPrivate::Icon;
 
 class IconView : public BView,
 				 public IconListener {

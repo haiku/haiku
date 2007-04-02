@@ -1,22 +1,28 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORMER_LIST_VIEW_H
 #define TRANSFORMER_LIST_VIEW_H
+
 
 #include "ListViews.h"
 #include "Shape.h"
 
+
 class BMenu;
 class CommandStack;
-class Transformer;
 class TransformerItem;
 class Selection;
+
+namespace BPrivate {
+namespace Icon {
+	class Transformer;
+}
+}
 
 class TransformerListView : public SimpleListView,
 							public ShapeListener {

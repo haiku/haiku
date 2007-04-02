@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,19 +8,27 @@
 #ifndef PATH_LIST_VIEW_H
 #define PATH_LIST_VIEW_H
 
+
 #include "ListViews.h"
 #include "PathContainer.h"
 
 class BMenu;
 class BMenuItem;
 
+namespace BPrivate {
+namespace Icon {
+	class VectorPath;
+	class Shape;
+	class ShapeContainer;
+}
+}
+
 class CommandStack;
-class VectorPath;
 class PathListItem;
 class Selection;
-class Shape;
-class ShapeContainer;
 class ShapePathListener;
+
+using namespace BPrivate::Icon;
 
 class PathListView : public SimpleListView,
 					 public PathContainerListener {

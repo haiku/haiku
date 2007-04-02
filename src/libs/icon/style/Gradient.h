@@ -1,16 +1,13 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef GRADIENT_H
 #define GRADIENT_H
 
-#include <GraphicsDefs.h>
-#include <List.h>
 
 #ifdef ICON_O_MATIC
 # include <Archivable.h>
@@ -20,7 +17,14 @@
 
 #include "Transformable.h"
 
+#include <GraphicsDefs.h>
+#include <List.h>
+
 class BMessage;
+
+
+namespace BPrivate {
+namespace Icon {
 
 enum gradient_type {
 	GRADIENT_LINEAR = 0,
@@ -121,5 +125,7 @@ class Gradient : public Transformable {
 			bool				fInheritTransformation;
 };
 
+}	// namespace Icon
+}	// namespace BPrivate
 
-#endif // GRADIENT_H
+#endif	// GRADIENT_H

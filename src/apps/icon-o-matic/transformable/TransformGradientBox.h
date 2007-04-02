@@ -1,19 +1,26 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORM_GRADIENT_BOX_H
 #define TRANSFORM_GRADIENT_BOX_H
 
+
 #include "TransformBox.h"
 
+
 class CanvasView;
-class Gradient;
-class Shape;
+
+namespace BPrivate {
+namespace Icon {
+	class Gradient;
+	class Shape;
+}
+}
+using namespace BPrivate::Icon;
 
 class TransformGradientBox : public TransformBox {
  public:

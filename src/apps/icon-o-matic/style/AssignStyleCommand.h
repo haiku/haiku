@@ -1,20 +1,26 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ASSIGN_STYLE_COMMAND_H
 #define ASSIGN_STYLE_COMMAND_H
 
-#include <InterfaceDefs.h>
 
 #include "Command.h"
 
-class Shape;
-class Style;
+#include <InterfaceDefs.h>
+
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+	class Style;
+}
+}
+using namespace BPrivate::Icon;
 
 class AssignStyleCommand : public Command {
  public:

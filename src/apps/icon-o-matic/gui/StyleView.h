@@ -1,25 +1,32 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef STYLE_VIEW_H
 #define STYLE_VIEW_H
 
-#include <View.h>
 
 #include "Observer.h"
+
+#include <View.h>
+
 
 class BMenu;
 class BMenuField;
 class CommandStack;
 class CurrentColor;
-class Gradient;
 class GradientControl;
-class Style;
+
+namespace BPrivate {
+namespace Icon {
+	class Gradient;
+	class Style;
+}
+}
+using namespace BPrivate::Icon;
 
 // TODO: write lock the document when changing something...
 

@@ -1,17 +1,18 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ADD_POINT_COMMAND_H
 #define ADD_POINT_COMMAND_H
 
-#include <Point.h>
 
 #include "PathCommand.h"
+
+#include <Point.h>
+
 
 class AddPointCommand : public PathCommand {
  public:

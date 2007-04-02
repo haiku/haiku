@@ -1,22 +1,27 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef MESSAGE_IMPORTER_H
 #define MESSAGE_IMPORTER_H
+
 
 #include "Importer.h"
 
 class BMessage;
 class BPositionIO;
-class Icon;
-class PathContainer;
-class ShapeContainer;
-class StyleContainer;
+
+namespace BPrivate {
+namespace Icon {
+	class Icon;
+	class PathContainer;
+	class ShapeContainer;
+	class StyleContainer;
+}
+}
 
 class MessageImporter : public Importer {
  public:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,14 +8,17 @@
 
 #include "TransformerFactory.h"
 
-#ifdef ICON_O_MATIC
-# include <Message.h>
-#endif
-
 #include "AffineTransformer.h"
 #include "ContourTransformer.h"
 #include "PerspectiveTransformer.h"
 #include "StrokeTransformer.h"
+
+#ifdef ICON_O_MATIC
+# include <Message.h>
+#endif
+
+using namespace BPrivate::Icon;
+
 
 // TransformerFor
 Transformer*

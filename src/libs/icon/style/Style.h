@@ -1,25 +1,29 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef STYLE_H
 #define STYLE_H
+
+
+#ifdef ICON_O_MATIC
+#	include "IconObject.h"
+#	include "Observer.h"
+#endif
+
+#include "IconRenderer.h"
+	// TODO: put GammaTable into its own file
 
 #include <GraphicsDefs.h>
 
 #include <agg_color_rgba.h>
 
-#ifdef ICON_O_MATIC
-# include "IconObject.h"
-# include "Observer.h"
-#endif
 
-#include "IconRenderer.h"
-	// TODO: put GammaTable into its own file
+namespace BPrivate {
+namespace Icon {
 
 class Gradient;
 
@@ -55,8 +59,9 @@ class Style {
 	inline	rgb_color			Color() const
 									{ return fColor; }
 
-			void				SetGradient(const ::Gradient* gradient);
-			::Gradient*			Gradient() const
+			void				SetGradient(const BPrivate::Icon::Gradient*
+											gradient);
+			BPrivate::Icon::Gradient* Gradient() const
 									{ return fGradient; }
 
 			const agg::rgba8*	Colors() const
@@ -67,7 +72,7 @@ class Style {
 
  private:
 			rgb_color			fColor;
-			::Gradient*			fGradient;
+			BPrivate::Icon::Gradient* fGradient;
 
 			// hold gradient color array
 			agg::rgba8*			fColors;
@@ -77,4 +82,9 @@ class Style {
 	mutable	bool				fGammaCorrectedColorsValid;
 };
 
-#endif // STYLE_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+using namespace BPrivate::Icon;
+
+#endif	// STYLE_H

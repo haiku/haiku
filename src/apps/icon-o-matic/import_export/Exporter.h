@@ -1,20 +1,29 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef EXPORTER_H
 #define EXPORTER_H
+
 
 #include <Entry.h>
 #include <OS.h>
 
 class BPositionIO;
 class Document;
+
+namespace BPrivate {
+namespace Icon {
+
 class Icon;
+
+}	// namespace Icon
+}	// namespace BPrivate
+
+using namespace BPrivate::Icon;
 
 class Exporter {
  public:

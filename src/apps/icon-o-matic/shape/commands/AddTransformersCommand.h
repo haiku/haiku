@@ -1,18 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ADD_TRANSFORMERS_COMMAND_H
 #define ADD_TRANSFORMERS_COMMAND_H
 
+
 #include "Command.h"
 
-class Shape;
-class Transformer;
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+	class Transformer;
+}
+}
+using namespace BPrivate::Icon;
 
 // TODO: make a templated "add items" command?
 

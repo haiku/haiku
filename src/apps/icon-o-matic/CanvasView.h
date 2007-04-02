@@ -1,20 +1,27 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef CANVAS_VIEW_H
 #define CANVAS_VIEW_H
+
 
 #include "Icon.h"
 #include "Scrollable.h"
 #include "StateView.h"
 
+
 class BBitmap;
-class IconRenderer;
+
+namespace BPrivate {
+namespace Icon {
+	class IconRenderer;
+}
+}
+using namespace BPrivate::Icon;
 
 enum {
 	SNAPPING_OFF	= 0,

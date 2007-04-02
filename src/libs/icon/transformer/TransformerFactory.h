@@ -1,17 +1,22 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORMER_FACTORY_H
 #define TRANSFORMER_FACTORY_H
+
 
 #include <String.h>
 
 class BMessage;
+
+
+namespace BPrivate {
+namespace Icon {
+
 class Transformer;
 class VertexSource;
 
@@ -32,4 +37,7 @@ class TransformerFactory {
 #endif // ICON_O_MATIC
 };
 
-#endif // TRANSFORMER_FACTORY_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// TRANSFORMER_FACTORY_H

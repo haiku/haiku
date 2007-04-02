@@ -1,15 +1,19 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef FLAT_ICON_FORMAT_H
 #define FLAT_ICON_FORMAT_H
 
+
 #include <SupportDefs.h>
+
+
+namespace BPrivate {
+namespace Icon {
 
 extern const uint32 FLAT_ICON_MAGIC;
 
@@ -69,4 +73,7 @@ bool write_coord(LittleEndianBuffer& buffer, float coord);
 bool read_float_24(LittleEndianBuffer& buffer, float& value);
 bool write_float_24(LittleEndianBuffer& buffer, float value);
 
-#endif // FLAT_ICON_FORMAT_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// FLAT_ICON_FORMAT_H

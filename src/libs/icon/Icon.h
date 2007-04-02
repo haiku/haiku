@@ -1,25 +1,31 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ICON_H
 #define ICON_H
 
-#ifdef ICON_O_MATIC
-#include <List.h>
 
-# include "Observer.h"
-# include "Referenceable.h"
-#else
-# include <SupportDefs.h>
-#endif
 #include "ShapeContainer.h"
 
+#ifdef ICON_O_MATIC
+#	include <List.h>
+
+#	include "Observer.h"
+#	include "Referenceable.h"
+#else
+#	include <SupportDefs.h>
+#endif
+
 class BRect;
+
+
+namespace BPrivate {
+namespace Icon {
+
 class PathContainer;
 class StyleContainer;
 
@@ -84,4 +90,7 @@ class Icon {
 #endif
 };
 
-#endif // ICON_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// ICON_H

@@ -1,18 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ADD_PATHS_COMMAND_H
 #define ADD_PATHS_COMMAND_H
 
+
 #include "Command.h"
 
-class VectorPath;
-class PathContainer;
+
+namespace BPrivate {
+namespace Icon {
+	class VectorPath;
+	class PathContainer;
+}
+}
+using namespace BPrivate::Icon;
 
 class AddPathsCommand : public Command {
  public:

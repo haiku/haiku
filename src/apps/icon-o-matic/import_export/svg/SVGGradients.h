@@ -1,22 +1,25 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
-
 #ifndef SVG_GRADIENTS_H
 #define SVG_GRADIENTS_H
 
-#include <Message.h>
-#include <String.h>
 
 #include <agg_color_rgba.h>
 #include <agg_trans_affine.h>
 
-class Gradient;
+#include <Message.h>
+#include <String.h>
+
+namespace BPrivate {
+namespace Icon {
+	class Gradient;
+}
+}
 
 namespace agg {
 namespace svg {

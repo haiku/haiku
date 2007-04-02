@@ -1,15 +1,19 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef LITTLE_ENDIAN_BUFFER_H
 #define LITTLE_ENDIAN_BUFFER_H
 
+
 #include <SupportDefs.h>
+
+
+namespace BPrivate {
+namespace Icon {
 
 class LittleEndianBuffer {
  public:
@@ -54,4 +58,7 @@ class LittleEndianBuffer {
 			bool				fOwnsBuffer;
 };
 
-#endif // LITTLE_ENDIAN_BUFFER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// LITTLE_ENDIAN_BUFFER_H

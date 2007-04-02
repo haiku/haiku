@@ -1,19 +1,23 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef STROKE_TRANSFORMER_H
 #define STROKE_TRANSFORMER_H
 
-#include <agg_conv_stroke.h>
 
 #include "Transformer.h"
 
-typedef agg::conv_stroke<VertexSource>		Stroke;
+#include <agg_conv_stroke.h>
+
+
+namespace BPrivate {
+namespace Icon {
+
+typedef agg::conv_stroke<VertexSource> Stroke;
 
 class StrokeTransformer : public Transformer,
 						  public Stroke {
@@ -53,4 +57,7 @@ class StrokeTransformer : public Transformer,
 #endif
 };
 
-#endif // STROKE_TRANSFORMER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// STROKE_TRANSFORMER_H

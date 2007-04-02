@@ -1,20 +1,26 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef REMOVE_STYLES_COMMAND_H
 #define REMOVE_STYLES_COMMAND_H
 
-#include <List.h>
 
 #include "Command.h"
 
-class Style;
-class StyleContainer;
+#include <List.h>
+
+
+namespace BPrivate {
+namespace Icon {
+	class Style;
+	class StyleContainer;
+}
+}
+using namespace BPrivate::Icon;
 
 class RemoveStylesCommand : public Command {
  public:

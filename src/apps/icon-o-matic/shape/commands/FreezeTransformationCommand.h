@@ -1,24 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef FREEZE_TRANSFORMATION_COMMAND_H
 #define FREEZE_TRANSFORMATION_COMMAND_H
 
+
 #include "Command.h"
 
-class Shape;
 
 namespace BPrivate {
 namespace Icon {
+	class Shape;
 	class Transformable;
 }
 }
-using BPrivate::Icon::Transformable;
+using namespace BPrivate::Icon;
 
 class FreezeTransformationCommand : public Command {
  public:

@@ -1,17 +1,23 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORM_SHAPES_BOX_H
 #define TRANSFORM_SHAPES_BOX_H
 
+
 #include "CanvasTransformBox.h"
 
-class Shape;
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+}
+}
+using namespace BPrivate::Icon;
 
 class TransformShapesBox : public CanvasTransformBox {
  public:

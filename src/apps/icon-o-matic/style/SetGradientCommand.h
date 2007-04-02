@@ -1,18 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SET_GRADIENT_COMMAND_H
 #define SET_GRADIENT_COMMAND_H
 
+
 #include "Command.h"
 
-class Gradient;
-class Style;
+
+namespace BPrivate {
+namespace Icon {
+	class Gradient;
+	class Style;
+}
+}
+using namespace BPrivate::Icon;
 
 class SetGradientCommand : public Command {
  public:

@@ -1,23 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORM_OBJECTS_COMMAND_H
 #define TRANSFORM_OBJECTS_COMMAND_H
 
+
 #include "TransformBox.h"
 #include "TransformCommand.h"
+
 
 namespace BPrivate {
 namespace Icon {
 	class Transformable;
 }
 }
-using BPrivate::Icon::Transformable;
+using namespace BPrivate::Icon;
 
 class TransformObjectsCommand : public TransformCommand,
 								public TransformBoxListener {

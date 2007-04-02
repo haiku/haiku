@@ -1,18 +1,24 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef REMOVE_SHAPES_COMMAND_H
 #define REMOVE_SHAPES_COMMAND_H
 
+
 #include "Command.h"
 
-class Shape;
-class ShapeContainer;
+
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+	class ShapeContainer;
+}
+}
+using namespace BPrivate::Icon;
 
 class RemoveShapesCommand : public Command {
  public:

@@ -1,21 +1,27 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORM_POINTS_BOX_H
 #define TRANSFORM_POINTS_BOX_H
 
+
 #include "CanvasTransformBox.h"
+
 
 class CanvasView;
 class PathManipulator;
-class VectorPath;
 
-struct control_point;
+namespace BPrivate {
+namespace Icon {
+	class VectorPath;
+	struct control_point;
+}
+}
+using namespace BPrivate::Icon;
 
 class TransformPointsBox : public CanvasTransformBox {
  public:

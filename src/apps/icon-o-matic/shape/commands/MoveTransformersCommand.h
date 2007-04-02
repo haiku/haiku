@@ -5,16 +5,21 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef MOVE_TRANSFORMERS_COMMAND_H
 #define MOVE_TRANSFORMERS_COMMAND_H
+
 
 #include "Command.h"
 
 // TODO: make a templated "move items" command?
 
-class Shape;
-class Transformer;
+namespace BPrivate {
+namespace Icon {
+	class Shape;
+	class Transformer;
+}
+}
+using namespace BPrivate::Icon;
 
 class MoveTransformersCommand : public Command {
  public:

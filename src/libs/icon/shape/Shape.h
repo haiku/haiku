@@ -1,25 +1,29 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include <List.h>
-#include <Rect.h>
 
 #ifdef ICON_O_MATIC
-# include "IconObject.h"
-# include "Observer.h"
+#	include "IconObject.h"
+#	include "Observer.h"
 #endif
 #include "PathContainer.h"
 #include "PathSource.h"
 #include "Transformable.h"
 #include "VectorPath.h"
+
+#include <List.h>
+#include <Rect.h>
+
+
+namespace BPrivate {
+namespace Icon {
 
 class Style;
 
@@ -159,4 +163,7 @@ class Shape : public BPrivate::Icon::Transformable {
 #endif
 };
 
-#endif // SHAPE_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// SHAPE_H

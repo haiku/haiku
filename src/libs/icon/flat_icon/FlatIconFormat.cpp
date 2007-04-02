@@ -1,19 +1,25 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include "FlatIconFormat.h"
 
 #include "LittleEndianBuffer.h"
+
+
+namespace BPrivate {
+namespace Icon {
 
 const uint32 FLAT_ICON_MAGIC = 'ficn';
 
 const char* kVectorAttrNodeName = "BEOS:ICON";
 const char* kVectorAttrMimeName = "META:ICON";
+
 
 // read_coord
 bool
@@ -119,3 +125,6 @@ write_float_24(LittleEndianBuffer& buffer, float _value)
 		&& buffer.Write((uint8)((shortValue >> 8) & 0xff))
 		&& buffer.Write((uint8)(shortValue & 0xff));
 }
+
+}	// namespace Icon
+}	// namespace BPrivate

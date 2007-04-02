@@ -1,17 +1,23 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef PATH_COMMAND_H
 #define PATH_COMMAND_H
 
+
 #include "Command.h"
 
-class VectorPath;
+
+namespace BPrivate {
+namespace Icon {
+	class VectorPath;
+}
+}
+using namespace BPrivate::Icon;
 
 class PathCommand : public Command {
  public:

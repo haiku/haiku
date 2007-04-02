@@ -1,19 +1,25 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SET_COLOR_COMMAND_H
 #define SET_COLOR_COMMAND_H
 
-#include <InterfaceDefs.h>
 
 #include "Command.h"
 
-class Style;
+#include <InterfaceDefs.h>
+
+
+namespace BPrivate {
+namespace Icon {
+	class Style;
+}
+}
+using namespace BPrivate::Icon;
 
 class SetColorCommand : public Command {
  public:

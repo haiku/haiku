@@ -1,22 +1,26 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef FLAT_ICON_IMPORTER_H
 #define FLAT_ICON_IMPORTER_H
 
+
 #ifdef ICON_O_MATIC
-# include "Importer.h"
+#	include "Importer.h"
 #else
-# include <SupportDefs.h>
+#	include <SupportDefs.h>
 #endif
 
 class BMessage;
 class BPositionIO;
+
+namespace BPrivate {
+namespace Icon {
+
 class Icon;
 class LittleEndianBuffer;
 class PathContainer;
@@ -58,4 +62,7 @@ class FlatIconImporter {
 											 ShapeContainer* shapes);
 };
 
-#endif // FLAT_ICON_IMPORTER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// FLAT_ICON_IMPORTER_H

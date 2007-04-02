@@ -1,21 +1,26 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef NUDGE_POINTS_ACTION_H
 #define NUDGE_POINTS_ACTION_H
 
-#include <String.h>
 
 #include "TransformCommand.h"
 
-class VectorPath;
+#include <String.h>
 
-struct control_point;
+
+namespace BPrivate {
+namespace Icon {
+	class VectorPath;
+	struct control_point;
+}
+}
+using namespace BPrivate::Icon;
 
 class NudgePointsCommand : public TransformCommand {
  public:

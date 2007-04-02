@@ -1,18 +1,22 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef AFFINE_TRANSFORMER_H
 #define AFFINE_TRANSFORMER_H
+
+
+#include "Transformer.h"
 
 #include <agg_conv_transform.h>
 #include <agg_trans_affine.h>
 
-#include "Transformer.h"
+
+namespace BPrivate {
+namespace Icon {
 
 typedef agg::conv_transform<VertexSource,
 							agg::trans_affine>	Affine;
@@ -54,4 +58,7 @@ class AffineTransformer : public Transformer,
 #endif
 };
 
-#endif // AFFINE_TRANSFORMER_H
+}	// namespace Icon
+}	// namespace BPrivate
+
+#endif	// AFFINE_TRANSFORMER_H

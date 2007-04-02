@@ -1,14 +1,13 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "AffineTransformer.h"
 
-#include <new>
+#include "AffineTransformer.h"
 
 #ifdef ICON_O_MATIC
 # include <Message.h>
@@ -18,8 +17,12 @@
 # include "PropertyObject.h"
 #endif
 
+#include <new>
 
+
+using namespace BPrivate::Icon;
 using std::nothrow;
+
 
 // constructor
 AffineTransformer::AffineTransformer(VertexSource& source)
