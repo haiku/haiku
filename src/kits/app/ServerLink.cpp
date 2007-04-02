@@ -58,10 +58,12 @@ ServerLink::ReadShape(BShape *shape)
 	fReceiver->Read(&ptCount, sizeof(int32));
 	
 	uint32 opList[opCount];
-	fReceiver->Read(opList, opCount * sizeof(uint32));
+	if (opCount > 0)
+		fReceiver->Read(opList, opCount * sizeof(uint32));
 	
 	BPoint ptList[ptCount];
-	fReceiver->Read(ptList, ptCount * sizeof(BPoint));
+	if (ptCount > 0)
+		fReceiver->Read(ptList, ptCount * sizeof(BPoint));
 	
 	shape->SetData(opCount, ptCount, opList, ptList);
 	return B_OK;
@@ -79,8 +81,11 @@ ServerLink::AttachShape(BShape &shape)
 	
 	fSender->Attach(&opCount, sizeof(int32));
 	fSender->Attach(&ptCount, sizeof(int32));
-	fSender->Attach(opList, opCount * sizeof(uint32));
-	return fSender->Attach(ptList, ptCount * sizeof(BPoint));
+	if (opCount > 0)
+		fSender->Attach(opList, opCount * sizeof(uint32));
+	if (ptCount > 0)
+		fSender->Attach(ptList, ptCount * sizeof(BPoint));
+	return B_OK;
 }
 
 
