@@ -1146,6 +1146,8 @@ BFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) c
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_EDGES);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
 	link.Attach<int32>(numChars);
 
 	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
