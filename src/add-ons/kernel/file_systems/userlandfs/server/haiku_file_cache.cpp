@@ -1161,13 +1161,13 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 		vecs[index] = fileExtent->disk;
 		index++;
 
+		if (size <= fileExtent->disk.length)
+			break;
+
 		if (index >= maxVecs) {
 			*_count = index;
 			return B_BUFFER_OVERFLOW;
 		}
-
-		if (size <= fileExtent->disk.length)
-			break;
 
 		size -= fileExtent->disk.length;
 	}
@@ -1185,8 +1185,8 @@ static status_t
 pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t *_numBytes, bool doWrite)
 {
-	TRACE(("pages_io: ref = %p, offset = %Ld, size = %lu, vecCount = %lu, %s\n", ref, offset,
-		*_numBytes, count, doWrite ? "write" : "read"));
+	TRACE(("pages_io: ref = %p, offset = %Ld, size = %lu, vecCount = %lu, %s\n",
+		ref, offset, *_numBytes, count, doWrite ? "write" : "read"));
 
 	// translate the iovecs into direct device accesses
 	file_io_vec fileVecs[MAX_FILE_IO_VECS];
@@ -1195,16 +1195,17 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 
 	status_t status = get_file_map(ref, offset, numBytes, fileVecs,
 		&fileVecCount);
-	if (status < B_OK) {
-		TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed\n", offset,
-			numBytes));
+	if (status < B_OK && status != B_BUFFER_OVERFLOW) {
+		TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed: %s\n",
+			offset, numBytes, strerror(status)));
 		return status;
 	}
 
-	// TODO: handle array overflow gracefully!
+	bool bufferOverflow = status == B_BUFFER_OVERFLOW;
 
 #ifdef TRACE_FILE_CACHE
-	dprintf("got %lu file vecs for %Ld:%lu:\n", fileVecCount, offset, numBytes);
+	dprintf("got %lu file vecs for %Ld:%lu%s:\n", fileVecCount, offset,
+		numBytes, bufferOverflow ? " (array too small)" : "");
 	for (size_t i = 0; i < fileVecCount; i++) {
 		dprintf("  [%lu] offset = %Ld, size = %Ld\n",
 			i, fileVecs[i].offset, fileVecs[i].length);
@@ -1279,75 +1280,100 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t vecOffset = size;
 	size_t bytesLeft = numBytes - size;
 
-	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
-		file_io_vec &fileVec = fileVecs[fileVecIndex];
-		off_t fileOffset = fileVec.offset;
-		off_t fileLeft = fileVec.length;
+	while (true) {
+		for (; fileVecIndex < fileVecCount; fileVecIndex++) {
+			file_io_vec &fileVec = fileVecs[fileVecIndex];
+			off_t fileOffset = fileVec.offset;
+			off_t fileLeft = min_c(fileVec.length, bytesLeft);
 
-		fileLeft = min_c(fileVec.length, bytesLeft);
+			TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
 
-		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
+			// process the complete fileVec
+			while (fileLeft > 0) {
+				iovec tempVecs[MAX_TEMP_IO_VECS];
+				uint32 tempCount = 0;
 
-		// process the complete fileVec
-		while (fileLeft > 0) {
-			iovec tempVecs[MAX_TEMP_IO_VECS];
-			uint32 tempCount = 0;
+				// size tracks how much of what is left of the current fileVec
+				// (fileLeft) has been assigned to tempVecs 
+				size = 0;
 
-			// size tracks how much of what is left of the current fileVec
-			// (fileLeft) has been assigned to tempVecs 
-			size = 0;
+				// assign what is left of the current fileVec to the tempVecs
+				for (size = 0; size < fileLeft && i < count
+						&& tempCount < MAX_TEMP_IO_VECS;) {
+					// try to satisfy one iovec per iteration (or as much as
+					// possible)
 
-			// assign what is left of the current fileVec to the tempVecs
-			while (size < fileLeft && i < count
-					&& tempCount < MAX_TEMP_IO_VECS) {
-				// try to satisfy one iovec per iteration (or as much as
-				// possible)
-				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
-					i, vecOffset, size));
+					// bytes left of the current iovec
+					size_t vecLeft = vecs[i].iov_len - vecOffset;
+					if (vecLeft == 0) {
+						vecOffset = 0;
+						i++;
+						continue;
+					}
 
-				// bytes left of the current iovec
-				size_t vecLeft = vecs[i].iov_len - vecOffset;
-				if (vecLeft == 0) {
-					i++;
-					vecOffset = 0;
-					continue;
+					TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
+						i, vecOffset, size));
+
+					// actually available bytes
+					size_t tempVecSize = min_c(vecLeft, fileLeft - size);
+
+					tempVecs[tempCount].iov_base
+						= (void *)((addr_t)vecs[i].iov_base + vecOffset);
+					tempVecs[tempCount].iov_len = tempVecSize;
+					tempCount++;
+
+					size += tempVecSize;
+					vecOffset += tempVecSize;
 				}
 
-				// actually available bytes
-				size_t tempVecSize = min_c(vecLeft, fileLeft - size);
+				size_t bytes = size;
+				if (doWrite) {
+					status = vfs_write_pages(ref->deviceFD, fileOffset,
+						tempVecs, tempCount, &bytes, false);
+				} else {
+					status = vfs_read_pages(ref->deviceFD, fileOffset,
+						tempVecs, tempCount, &bytes, false);
+				}
+				if (status < B_OK)
+					return status;
 
-				tempVecs[tempCount].iov_base
-					= (void *)((addr_t)vecs[i].iov_base + vecOffset);
-				tempVecs[tempCount].iov_len = tempVecSize;
-				tempCount++;
+				totalSize += bytes;
+				bytesLeft -= size;
+				fileOffset += size;
+				fileLeft -= size;
+				//dprintf("-> file left = %Lu\n", fileLeft);
 
-				size += tempVecSize;
-				vecOffset += tempVecSize;
-			}
-
-			size_t bytes = size;
-			if (doWrite) {
-				status = vfs_write_pages(ref->deviceFD, fileOffset,
-					tempVecs, tempCount, &bytes, false);
-			} else {
-				status = vfs_read_pages(ref->deviceFD, fileOffset,
-					tempVecs, tempCount, &bytes, false);
-			}
-			if (status < B_OK)
-				return status;
-
-			totalSize += bytes;
-			bytesLeft -= size;
-			fileOffset += size;
-			fileLeft -= size;
-			//dprintf("-> file left = %Lu\n", fileLeft);
-
-			if (size != bytes || i >= count) {
-				// there are no more bytes or iovecs, let's bail out
-				*_numBytes = totalSize;
-				return B_OK;
+				if (size != bytes || i >= count) {
+					// there are no more bytes or iovecs, let's bail out
+					*_numBytes = totalSize;
+					return B_OK;
+				}
 			}
 		}
+
+		if (bufferOverflow) {
+			status = get_file_map(ref, offset + totalSize, bytesLeft, fileVecs,
+				&fileVecCount);
+			if (status < B_OK && status != B_BUFFER_OVERFLOW) {
+				TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed: %s\n",
+					offset, numBytes, strerror(status)));
+				return status;
+			}
+
+			bufferOverflow = status == B_BUFFER_OVERFLOW;
+			fileVecIndex = 0;
+
+#ifdef TRACE_FILE_CACHE
+			dprintf("got %lu file vecs for %Ld:%lu%s:\n", fileVecCount,
+				offset + totalSize, numBytes,
+				bufferOverflow ? " (array too small)" : "");
+			for (size_t i = 0; i < fileVecCount; i++) {
+				dprintf("  [%lu] offset = %Ld, size = %Ld\n",
+					i, fileVecs[i].offset, fileVecs[i].length);
+			}
+#endif
+		} else
+			break;
 	}
 
 	*_numBytes = totalSize;
@@ -1361,7 +1387,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	sure that it matches that criterion.
 */
 static inline status_t
-read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
+read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	int32 pageOffset, addr_t buffer, size_t bufferSize)
 {
 	TRACE(("read_chunk(offset = %Ld, size = %lu, pageOffset = %ld, buffer = %#lx, bufferSize = %lu\n",
@@ -1374,7 +1400,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
 	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
-	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
+	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(PAGE_STATE_FREE);
 		if (page == NULL)
 			panic("no more pages!");
@@ -1392,7 +1418,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
 	mutex_unlock(&ref->lock);
 
 	// read file into reserved pages
-	status_t status = pages_io(ref, offset, vecs, vecCount, &size, false);
+	status_t status = pages_io(ref, offset, vecs, vecCount, &numBytes, false);
 	if (status < B_OK) {
 		// reading failed, free allocated pages
 
@@ -1493,7 +1519,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 /**	Like read_chunk_into_cache() but writes data into the cache */
 
 static inline status_t
-write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
+write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	int32 pageOffset, addr_t buffer, size_t bufferSize)
 {
 	iovec vecs[MAX_IO_VECS];
@@ -1506,7 +1532,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 	bool writeThrough = false;
 
 	// allocate pages for the cache and mark them busy
-	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
+	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		// ToDo: if space is becoming tight, and this cache is already grown
 		//	big - shouldn't we better steal the pages directly in that case?
 		//	(a working set like approach for the file cache)
@@ -1552,7 +1578,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 			iovec readVec = { (void *)last, B_PAGE_SIZE };
 			size_t bytesRead = B_PAGE_SIZE;
 
-			status = pages_io(ref, offset + size - B_PAGE_SIZE, &readVec, 1,
+			status = pages_io(ref, offset + numBytes - B_PAGE_SIZE, &readVec, 1,
 				&bytesRead, false);
 			// ToDo: handle errors for real!
 			if (status < B_OK)
@@ -1577,7 +1603,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 
 	if (writeThrough) {
 		// write cached pages back to the file if we were asked to do that
-		status_t status = pages_io(ref, offset, vecs, vecCount, &size, true);
+		status_t status = pages_io(ref, offset, vecs, vecCount, &numBytes, true);
 		if (status < B_OK) {
 			// ToDo: remove allocated pages, ...?
 			panic("file_cache: remove allocated pages! write pages failed: %s\n",
