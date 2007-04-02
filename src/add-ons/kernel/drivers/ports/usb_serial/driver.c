@@ -135,21 +135,6 @@ usb_serial_hw usb_serial_hw_devices[] = {
 };
 /* supported devices*/
 usb_support_descriptor *supported_devices;
-#if 0
-usb_support_descriptor supported_devices[] = {
-  {USB_DEV_CLASS_COMM, 0, 0, 0, 0},
-  {0, 0, 0, VND_PROLIFIC, PROD_PROLIFIC_RSAQ2 },
-  {0, 0, 0, VND_IODATA,   PROD_IODATA_USBRSAQ },
-  {0, 0, 0, VND_ATEN,     PROD_ATEN_UC232A },
-  {0, 0, 0, VND_TDK,      PROD_TDK_UHA6400 },
-  {0, 0, 0, VND_RATOC,    PROD_RATOC_REXUSB60 },
-  {0, 0, 0, VND_PROLIFIC, PROD_PROLIFIC_PL2303 },
-  {0, 0, 0, VND_ELECOM,   PROD_ELECOM_UCSGT },
-  
-  {0, 0, 0, VND_FTDI, PROD_8U100AX },
-  {0, 0, 0, VND_FTDI, PROD_8U232AM },
-};
-#endif
 /* main devices table locking semaphore */
 sem_id usb_serial_lock = -1;
 /* array of pointers to device objects */
