@@ -6,13 +6,6 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-/*!
-	Pure virtual BDataIO and BPositioIO classes provide
-	the protocol for Read()/Write()/Seek().
-
-	BMallocIO and BMemoryIO classes implement the protocol,
-	as does BFile in the Storage Kit.
-*/
 
 #include <DataIO.h>
 

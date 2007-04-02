@@ -6,8 +6,6 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-//! A buffered adapter for BPositionIO objects.
-
 
 #include <BufferIO.h>
 
@@ -16,21 +14,6 @@
 #include <string.h>
 
 
-/*! \class BBufferIO
-	\brief A buffered adapter for BPositionIO objects.
-	\author <a href='mailto:burton666@freemail.it>Stefano Ceccherini</a>
-*/
-
-
-/*! \brief Initializes a BBufferIO object.
-	
-	Initializes the object, creates a buffer of the given size
-	and associates the object with the given BPositionIO stream.
-
-	\param stream A pointer to a BPositionIO object.
-	\param buf_size The size of the buffer that the object will allocate and use.
-	\param owns_stream Specifies if the object will delete the stream on destruction.
-*/
 BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize, bool ownsStream)
 	:
 	fBufferStart(0),
@@ -54,12 +37,6 @@ BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize, bool ownsStream)
 }
 
 
-/*! \brief Frees the resources allocated by the object
-
-	Flushes pending changes to the stream and frees the allocated memory.
-	If the owns_stream property is true, the destructor also
-	deletes the stream associated with the BBufferIO object.
-*/
 BBufferIO::~BBufferIO()
 {
 	if (fBufferIsDirty) {
@@ -74,12 +51,6 @@ BBufferIO::~BBufferIO()
 }
 
 
-/*! \brief Reads the specified amount of bytes at the given position.
-	\param pos The offset into the stream where to read.
-	\param buffer A pointer to a buffer where to copy the read data.
-	\param size The amount of bytes to read.
-	\return The amount of bytes actually read, or an error code.
-*/
 ssize_t
 BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
@@ -124,12 +95,6 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 }
 
 
-/*! \brief Writes the specified amount of bytes at the given position.
-	\param pos The offset into the stream where to write.
-	\param buffer A pointer to a buffer which contains the data to write.
-	\param size The amount of bytes to write.
-	\return The amount of bytes actually written, or an error code.
-*/
 ssize_t
 BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 {
@@ -176,28 +141,6 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 }
 
 
-/*! \brief Sets the position in the stream.
-	
-	 Sets the position in the stream where the Read() and Write() functions
-	 (inherited from BPositionIO) begin reading and writing.
-	 How the position argument is understood depends on the seek_mode flag.
-	 
-	 \param position The position where you want to seek.
-	 \param seek_mode Can have three values:
-
-	 - \c SEEK_SET. The position passed is an offset from the beginning of the stream;
-		in other words, the current position is set to position.
-		For this mode, position should be a positive value. 
-	 
-	 - \c SEEK_CUR. The position argument is an offset from the current position;
-		the value of the argument is added to the current position.
-		
-	 - \c SEEK_END. The position argument is an offset from the end of the stream.
-		In this mode the position argument should be negative (or zero).
-	
-	 \return The current position as an offset in bytes
-		from the beginning of the stream.
-*/
 off_t
 BBufferIO::Seek(off_t position, uint32 seekMode)
 {
@@ -208,10 +151,6 @@ BBufferIO::Seek(off_t position, uint32 seekMode)
 }
 
 
-/*! \brief Return the current position in the stream.
-	\return The current position as an offset in bytes
-		from the beginning of the stream.
-*/
 off_t
 BBufferIO::Position() const
 {
@@ -222,10 +161,6 @@ BBufferIO::Position() const
 }
 
 
-/*! \brief Calls the SetSize() function of the assigned BPositionIO object.
-	\param size The new size of the BPositionIO object.
-	\return An error code.
-*/
 status_t
 BBufferIO::SetSize(off_t size)
 {
@@ -236,9 +171,6 @@ BBufferIO::SetSize(off_t size)
 }
 
 
-/*! \brief Writes pending modifications to the stream.
-	\return An error code.
-*/
 status_t
 BBufferIO::Flush()
 {
@@ -254,9 +186,6 @@ BBufferIO::Flush()
 }
 
 
-/*! \brief Returns a pointer to the stream specified on construction
-	\return A pointer to the BPositionIO stream specified on construction.
-*/
 BPositionIO *
 BBufferIO::Stream() const
 {
@@ -264,9 +193,6 @@ BBufferIO::Stream() const
 }
 
 
-/*! \brief Returns the size of the internal buffer 
-	\return The size of the buffer allocated by the object
-*/
 size_t
 BBufferIO::BufferSize() const
 {
@@ -274,10 +200,6 @@ BBufferIO::BufferSize() const
 }
 
 
-/*! \brief Tells if the BBufferIO object "owns" the specified stream.
-	\return A boolean value, which is true if the object "owns"
-		the stream (and so will delete it upon destruction), false if not.
-*/
 bool
 BBufferIO::OwnsStream() const
 {
@@ -285,10 +207,6 @@ BBufferIO::OwnsStream() const
 }
 
 
-/*! \brief Set the "owns_stream" property of the object.
-	\param owns_stream If it's true, the object will delete the stream
-		upon destruction, if it's false it will not.
-*/
 void
 BBufferIO::SetOwnsStream(bool owns_stream)
 {
@@ -296,8 +214,6 @@ BBufferIO::SetOwnsStream(bool owns_stream)
 }
 
 
-/*! \brief Prints the object to stdout.
-*/
 void
 BBufferIO::PrintToStream() const
 {
