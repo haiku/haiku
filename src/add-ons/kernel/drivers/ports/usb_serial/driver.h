@@ -45,13 +45,17 @@ typedef struct _s_usb_serial_line_coding{
 #define  CLS_LINE_RTS  0x0002
 
 /* "forgotten" attributes etc ...*/
+#ifndef USB_EP_ADDR_DIR_IN
 #define USB_EP_ADDR_DIR_IN   0x80
 #define USB_EP_ADDR_DIR_OUT  0x00
+#endif
 
+#ifndef USB_EP_ATTR_CONTROL
 #define USB_EP_ATTR_CONTROL      0x00
 #define USB_EP_ATTR_ISOCHRONOUS  0x01
 #define USB_EP_ATTR_BULK         0x02 
 #define USB_EP_ATTR_INTERRUPT    0x03 
+#endif
 /* USB class - communication devices */
 #define USB_DEV_CLASS_COMM     0x02
 
