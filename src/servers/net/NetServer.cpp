@@ -873,7 +873,8 @@ NetServer::_ConfigureInterfaces(int socket, BMessage* _missingDevice)
 			}
 		}
 
-		_ConfigureInterface(socket, interface);
+		if (_ConfigureInterface(socket, interface) == B_OK)
+			_UpdateDeviceStatus(device, kStatusConnected);
 	}
 }
 
@@ -962,6 +963,9 @@ NetServer::_AddStatusReplicant(bool force)
 void
 NetServer::_UpdateDeviceStatus(const char *device, int status)
 {
+	if (strcmp(device, "loop") == 0)
+		return;
+
 	StatusMap::iterator it = fStatusMap.find(device);
 	if (it != fStatusMap.end() && it->second == status)
 		return;
