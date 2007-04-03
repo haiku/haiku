@@ -209,7 +209,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 
 	RecursiveLocker locker(&fLock);
 
-	TRACE(("  TCP: Connect(): in state %d\n", fState));
+	TRACE(("  TCP:%p.Connect(): in state %d\n", this, fState));
 
 	// Can only call connect() from CLOSED or LISTEN states
 	// otherwise endpoint is considered already connected
@@ -223,7 +223,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	// TODO: get a net_route_info instead!
 	if (fRoute == NULL) {
 		fRoute = gDatalinkModule->get_route(gDomain, (sockaddr *)address);
-		TRACE(("  TCP: Connect(): Using Route %p\n", fRoute));
+		TRACE(("  TCP:%p.Connect(): Using Route %p\n", this, fRoute));
 		if (fRoute == NULL)
 			return ENETUNREACH;
 	}
@@ -232,7 +232,8 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	status_t status = gEndpointManager->SetConnection(this,
 		(sockaddr *)&socket->address, address, fRoute->interface->address);
 	if (status < B_OK) {
-		TRACE(("  TCP: Connect(): could not add connection: %s!\n", strerror(status)));
+		TRACE(("  TCP:%p.Connect(): could not add connection: %s!\n",
+			  this, strerror(status)));
 		return status;
 	}
 
@@ -246,7 +247,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 		fReceiveWindowShift++;
 	}
 
-	TRACE(("  TCP: Connect(): starting 3-way handshake...\n"));
+	TRACE(("  TCP:%p.Connect(): starting 3-way handshake...\n", this));
 
 	fState = SYNCHRONIZE_SENT;
 	fInitialSendSequence = system_time() >> 4;
@@ -274,7 +275,8 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 
 	status = acquire_sem_etc(fSendLock, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
-	TRACE(("  TCP: Connect(): Connection complete: %s\n", strerror(status)));
+	TRACE(("  TCP:%p.Connect(): Connection complete: %s\n",
+		  this, strerror(status)));
 	return status;
 }
 
@@ -381,7 +383,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 				* fSendMaxSegmentSize;
 
 			chunk = gBufferModule->split(buffer, chunkSize);
-TRACE(("  TCP::Send() split buffer at %lu (buffer size %lu, mss %lu) -> %p\n", chunkSize, socket->send.buffer_size, fSendMaxSegmentSize, chunk));
+TRACE(("  TCP:%p.Send() split buffer at %lu (buffer size %lu, mss %lu) -> %p\n", this, chunkSize, socket->send.buffer_size, fSendMaxSegmentSize, chunk));
 			if (chunk == NULL)
 				return B_NO_MEMORY;
 		} else
@@ -476,7 +478,8 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	RecursiveLocker locker(fLock);
 
-TRACE(("read %lu bytes, %lu are available\n", numBytes, fReceiveQueue.Available()));
+	TRACE(("TCP: %p.ReadData(): read %lu bytes, %lu are available\n",
+		  this, numBytes, fReceiveQueue.Available()));
 	if (numBytes < fReceiveQueue.Available())
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 
@@ -723,7 +726,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			// this is a pure acknowledge segment - we're on the sending end
 			if (fSendUnacknowledged < segment.acknowledge
 				&& fSendMax >= segment.acknowledge) {
-TRACE(("header prediction send!\n"));
+				TRACE(("TCP:%p.Receive(): header prediction send!\n", this));
 				// and it only acknowledges outstanding data
 
 				// TODO: update RTT estimators
@@ -746,11 +749,12 @@ TRACE(("header prediction send!\n"));
 		} else if (segment.acknowledge == fSendUnacknowledged
 			&& fReceiveQueue.IsContiguous()
 			&& fReceiveQueue.Free() >= buffer->size) {
-TRACE(("header prediction receive!\n"));
+			TRACE(("TCP:%p.Receive(): header prediction receive!\n", this));
 			// we're on the receiving end of the connection, and this segment
 			// is the one we were expecting, in-sequence
 			fReceiveNext += buffer->size;
-TRACE(("receive next = %lu!\n", (uint32)fReceiveNext));
+			TRACE(("TCP:%p.Receive(): receive next = %lu!\n",
+				  this, (uint32)fReceiveNext));
 			fReceiveQueue.Add(buffer, segment.sequence);
 
 			release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
@@ -806,7 +810,7 @@ TRACE(("receive next = %lu!\n", (uint32)fReceiveNext));
 		}
 
 		// remove duplicate data at the start
-TRACE(("* remove %ld bytes from the start\n", drop));
+		TRACE(("* remove %ld bytes from the start\n", drop));
 		gBufferModule->remove_header(buffer, drop);
 		segment.sequence += drop;
 	}
@@ -831,7 +835,7 @@ TRACE(("* remove %ld bytes from the start\n", drop));
 		}
 
 		segment.flags &= ~(TCP_FLAG_FINISH | TCP_FLAG_PUSH);
-TRACE(("* remove %ld bytes from the end\n", drop));
+		TRACE(("* remove %ld bytes from the end\n", drop));
 		gBufferModule->remove_trailer(buffer, drop);
 	}
 
@@ -860,7 +864,7 @@ TRACE(("* remove %ld bytes from the end\n", drop));
 			// TODO: handle this!
 			if (buffer->size == 0 && advertisedWindow == fSendWindow
 				&& (segment.flags & TCP_FLAG_FINISH) == 0) {
-TRACE(("duplicate ack!\n"));
+				TRACE(("TCP:%p.Receive(): duplicate ack!\n", this));
 				fDuplicateAcknowledgeCount++;
 
 				gStackModule->cancel_timer(&fRetransmitTimer);
@@ -877,10 +881,10 @@ TRACE(("duplicate ack!\n"));
 				// there is no outstanding data to be acknowledged
 				// TODO: if the transmit timer function is already waiting
 				//	to acquire this endpoint's lock, we should stop it anyway
-TRACE(("all inflight data ack'd!\n"));
+				TRACE(("TCP:%p.Receive(): all inflight data ack'd!\n", this));
 				gStackModule->cancel_timer(&fRetransmitTimer);
 			} else {
-TRACE(("set retransmit timer!\n"));
+				TRACE(("TCP:%p.Receive(): set retransmit timer!\n", this));
 				// TODO: set retransmit timer correctly
 				if (!gStackModule->is_timer_active(&fRetransmitTimer))
 					gStackModule->set_timer(&fRetransmitTimer, 1000000LL);
@@ -894,7 +898,7 @@ TRACE(("set retransmit timer!\n"));
 
 			if (segment.acknowledge > fSendQueue.LastSequence() && fState > ESTABLISHED) {
 				// our TCP_FLAG_FINISH has been acknowledged
-TRACE(("FIN has been acknowledged!\n"));
+				TRACE(("TCP:%p.Receive(): FIN has been acknowledged!\n", this));
 
 				switch (fState) {
 					case FINISH_SENT:
@@ -924,7 +928,7 @@ TRACE(("FIN has been acknowledged!\n"));
 	// TODO: ignore data *after* FIN
 
 	if (segment.flags & TCP_FLAG_FINISH) {
-TRACE(("peer is finishing connection!"));
+		TRACE(("TCP:%p.Receive(): peer is finishing connection!\n", this));
 		fReceiveNext++;
 		fFlags |= FLAG_NO_RECEIVE;
 
@@ -967,7 +971,7 @@ TRACE(("peer is finishing connection!"));
 	if (buffer->size > 0) {
 		fReceiveQueue.Add(buffer, segment.sequence);
 		fReceiveNext = fReceiveQueue.NextSequence();
-TRACE(("adding data, receive next = %lu!\n", (uint32)fReceiveNext));
+		TRACE(("TCP %p.Receive(): adding data, receive next = %lu!\n", this, (uint32)fReceiveNext));
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: real conditional locking needed!
