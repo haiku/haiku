@@ -1,10 +1,11 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andrew Galante, haiku.galante@gmail.com
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 
@@ -177,6 +178,28 @@ TCPEndpoint::Close()
 	}
 
 	TRACE("Close(): Entering state %d", fState);
+
+	if (socket->options & SO_LINGER) {
+		TRACE("Close(): Lingering for %i secs", socket->linger);
+
+		bigtime_t maximum = system_time() + socket->linger * 1000000LL;
+
+		while (fSendQueue.Used() > 0) {
+			lock.Unlock();
+			status = acquire_sem_etc(fSendLock, 1, B_CAN_INTERRUPT
+										| B_ABSOLUTE_TIMEOUT, maximum);
+			if (status == B_TIMED_OUT) {
+				TRACE("Close(): Lingering made me wait, but not all data was sent.");
+				return B_OK;
+			} else if (status < B_OK)
+				return status;
+
+			lock.Lock();
+		}
+
+		TRACE("Close(): Waited for all data to be sent with success");
+	}
+
 	// TODO: do i need to wait until fState returns to CLOSED?
 	return B_OK;
 }
