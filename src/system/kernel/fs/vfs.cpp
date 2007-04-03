@@ -1852,13 +1852,21 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
 			status = dir_read(parent, cookie, buffer, bufferSize, &num);
 			if (status < B_OK)
 				break;
+			if (num == 0) {
+				status = B_ENTRY_NOT_FOUND;
+				break;
+			}
 
 			if (vnode->id == buffer->d_ino) {
 				// found correct entry!
 				break;
 			}
 		}
-		FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
+
+		FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node,
+			cookie);
+		FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie,
+			vnode->private_node, cookie);
 	}
 	return status;
 }
