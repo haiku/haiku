@@ -31,25 +31,26 @@ class StatusReplicant : public BView {
 		virtual ~StatusReplicant();
 
 		static StatusReplicant *Instantiate(BMessage *archive);
-		status_t Archive(BMessage *archive, bool deep) const;
+		virtual status_t Archive(BMessage *archive, bool deep) const;
 
-		void AttachedToWindow();
-		void MessageReceived(BMessage *message);
-
-		void MouseDown(BPoint point);
+		virtual void AttachedToWindow();
+		virtual void MessageReceived(BMessage *message);
+		virtual void Draw(BRect updateRect);
+		virtual void MouseDown(BPoint point);
 
 	private:
 		typedef std::pair<std::string, int> InterfaceStatus;
 		typedef std::vector<InterfaceStatus> InterfaceStatusList;
 
-		void _Init();
+		void _Init(bool isReplicant = true);
 		void _UpdateFromMessage(BMessage *message);
 		void _ShowConfiguration(BMessage *message);
 		void _PrepareMenu(const InterfaceStatusList &list);
 		void _ChangeStatus(int newStatus);
 
-		BPopUpMenu fPopUp;
-		BBitmap *fBitmaps[kStatusCount];
+		BPopUpMenu	fPopUp;
+		BBitmap*	fBitmaps[kStatusCount];
+		int32		fStatus;
 };
 
 #endif	// _STATUS_REPLICANT_H

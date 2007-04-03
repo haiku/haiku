@@ -30,12 +30,12 @@
 const char *kStatusReplicant = "NetStatusView";
 static const uint32 kShowConfiguration = 'shcf';
 
-static const uint8 kStatusColors[kStatusCount][3] = {
-	{ 0,	0,		0 },	// Unknown
-	{ 255,	0,		0 },	// NoLink
-	{ 0,	0,		255 },	// LinkNoConfig
-	{ 0,	255,	0 },	// Connected
-	{ 255,	255,	0 },	// Preparing
+static const rgb_color kStatusColors[kStatusCount] = {
+	{ 0, 0, 0 },		// Unknown
+	{ 255, 0, 0 },		// NoLink
+	{ 0, 0, 255 },		// LinkNoConfig
+	{ 0, 255, 0 },		// Connected
+	{ 255, 255, 0 },	// Preparing
 };
 
 struct information_entry {
@@ -59,17 +59,36 @@ static const char *kStatusDescriptions[] = {
 };
 
 
-StatusReplicant::StatusReplicant()
-	: BView(BRect(0, 0, 15, 15), kStatusReplicant, B_FOLLOW_ALL, 0),
-	fPopUp("", false, false)
+static status_t
+our_image(image_info *image)
 {
-	_Init();
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, image) == B_OK) {
+		if ((char *)our_image >= (char *)image->text &&
+			(char *)our_image <= (char *)image->text + image->text_size)
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+//	#pragma mark -
+
+
+StatusReplicant::StatusReplicant()
+	: BView(BRect(0, 0, 15, 15), kStatusReplicant, B_FOLLOW_ALL, B_WILL_DRAW),
+	fPopUp("", false, false),
+	fStatus(kStatusUnknown)
+{
+	_Init(false);
 }
 
 
 StatusReplicant::StatusReplicant(BMessage *message)
 	: BView(message),
-	fPopUp("", false, false)
+	fPopUp("", false, false),
+	fStatus(kStatusUnknown)
 {
 	_Init();
 }
@@ -137,6 +156,18 @@ StatusReplicant::MessageReceived(BMessage *message)
 
 
 void
+StatusReplicant::Draw(BRect updateRect)
+{
+	if (fBitmaps[fStatus] == NULL)
+		return;
+
+	SetDrawingMode(B_OP_ALPHA);
+	DrawBitmap(fBitmaps[fStatus]);
+	SetDrawingMode(B_OP_COPY);
+}
+
+
+void
 StatusReplicant::MouseDown(BPoint point)
 {
 	uint32 buttons;
@@ -151,31 +182,42 @@ StatusReplicant::MouseDown(BPoint point)
 
 
 void
-StatusReplicant::_Init()
+StatusReplicant::_Init(bool isReplicant)
 {
 	// Load status bitmaps from resources
 
-	BResources* resources = BApplication::AppResources();
-
 	for (int i = 0; i < kStatusCount; i++) {
 		fBitmaps[i] = NULL;
+	}
 
-		if (resources != NULL) {
-			const void* data = NULL;
-			size_t size;
-			data = resources->LoadResource(B_VECTOR_ICON_TYPE,
-				kNetworkStatusNoDevice + i, &size);
-			if (data != NULL) {
-				BBitmap* icon = new BBitmap(Bounds(), B_RGB32);
-				if (icon->InitCheck() == B_OK
-					&& BIconUtils::GetVectorIcon((const uint8 *)data,
-						size, icon) == B_OK) {
-					fBitmaps[i] = icon;
-				} else
-					delete icon;
+	if (!isReplicant)
+		return;
 
-				free((void*)data);
-			}
+	image_info info;
+	if (our_image(&info) != B_OK)
+		return;
+
+	BFile file(info.name, B_READ_ONLY);
+	if (file.InitCheck() < B_OK)
+		return;
+
+	BResources resources(&file);
+	if (resources.InitCheck() < B_OK)
+		return;
+
+	for (int i = 0; i < kStatusCount; i++) {
+		const void* data = NULL;
+		size_t size;
+		data = resources.LoadResource(B_VECTOR_ICON_TYPE,
+			kNetworkStatusNoDevice + i, &size);
+		if (data != NULL) {
+			BBitmap* icon = new BBitmap(Bounds(), B_RGB32);
+			if (icon->InitCheck() == B_OK
+				&& BIconUtils::GetVectorIcon((const uint8 *)data,
+					size, icon) == B_OK) {
+				fBitmaps[i] = icon;
+			} else
+				delete icon;
 		}
 	}
 }
@@ -306,15 +348,15 @@ StatusReplicant::_PrepareMenu(const InterfaceStatusList &status)
 void
 StatusReplicant::_ChangeStatus(int newStatus)
 {
-	if (fBitmaps[newStatus]) {
+	if (fStatus == newStatus)
+		return;
+
+	fStatus = newStatus;
+
+	if (fBitmaps[newStatus])
 		SetViewColor(Parent()->ViewColor());
-		SetViewBitmap(fBitmaps[newStatus]);
-	} else {
-		ClearViewBitmap();
-		SetViewColor(kStatusColors[newStatus][0],
-					 kStatusColors[newStatus][1],
-					 kStatusColors[newStatus][2]);
-	}
+	else
+		SetViewColor(kStatusColors[newStatus]);
 
 	Invalidate();
 }

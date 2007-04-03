@@ -986,7 +986,7 @@ NetServer::_UpdateReplicantStatus()
 	BMessage message(kStatusUpdate);
 
 	for (StatusMap::iterator it = fStatusMap.begin();
-				it != fStatusMap.end(); ++it) {
+			it != fStatusMap.end(); ++it) {
 		if (it->second > prevaling)
 			prevaling = it->second;
 

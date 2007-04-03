@@ -7,7 +7,7 @@ UseLibraryHeaders icon ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net DialUpPreflet ] ;
 
-AddResources net_server : net_server.rdef ;
+AddResources net_server : net_server.rdef NetworkStatusIcons.rdef ;
 
 Server net_server :
 	NetServer.cpp
