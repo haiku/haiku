@@ -528,16 +528,22 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 				cache, cacheRef->ref_count, consumer));
 
 			for (page = cache->page_list; page != NULL; page = nextPage) {
+				vm_page *consumerPage;
 				nextPage = page->cache_next;
 
-				if (vm_cache_lookup_page(consumerRef,
-						(off_t)page->cache_offset << PAGE_SHIFT) == NULL) {
-					// the page already is not yet in the consumer cache - move it upwards
+				consumerPage = vm_cache_lookup_page(consumerRef,
+					(off_t)page->cache_offset << PAGE_SHIFT);
+				if (consumerPage == NULL) {
+					// the page already is not yet in the consumer cache - move
+					// it upwards
 					vm_cache_remove_page(cacheRef, page);
 					vm_cache_insert_page(consumerRef, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
-				} else if (page->mappings != 0 || page->wired_count != 0)
-					panic("page %p has still mappings!", page);
+				} else if (consumerPage->state != PAGE_STATE_BUSY
+					&& (page->mappings != 0 || page->wired_count != 0)) {
+					panic("page %p has still mappings (consumer cache %p)!",
+						page, consumerRef);
+				}
 			}
 
 			newSource = cache->source;

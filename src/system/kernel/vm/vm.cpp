@@ -1586,6 +1586,7 @@ vm_copy_on_write_area(vm_area *area)
 	// we need to hold the cache_ref lock when we want to switch its cache
 	mutex_lock(&lowerCacheRef->lock);
 
+	upperCache->type = CACHE_TYPE_RAM;
 	upperCache->temporary = 1;
 	upperCache->scan_skip = lowerCache->scan_skip;
 	upperCache->virtual_base = lowerCache->virtual_base;
