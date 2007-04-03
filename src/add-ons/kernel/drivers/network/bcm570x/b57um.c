@@ -3,6 +3,10 @@
 #include <malloc.h>
 #include <ether_driver.h>
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <net/if_media.h>
+#endif
+
 #include "mm.h"
 #include "lm.h"
 #include "mempool.h"
@@ -477,6 +481,7 @@ b57_ioctl(void *cookie,uint32 op,void *data,size_t len)
 					pUmDevice->lm_dev.ReceiveMask & ~LM_PROMISCUOUS_MODE);
 			}
 			return B_OK;
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 		case ETHER_GETLINKSTATE: {
 			ether_link_state_t *state_buffer = (ether_link_state_t *)(data);
 			state_buffer->link_speed = pUmDevice->lm_dev.LineSpeed;
@@ -484,6 +489,33 @@ b57_ioctl(void *cookie,uint32 op,void *data,size_t len)
 			state_buffer->duplex_mode = (pUmDevice->lm_dev.DuplexMode == LM_DUPLEX_MODE_FULL);
 			return B_OK;
 		}
+#else
+		case ETHER_GETLINKSTATE:
+		{
+			ether_link_state_t state;
+			state.link_media = (pUmDevice->lm_dev.LinkStatus == LM_STATUS_LINK_DOWN) ? IFM_ACTIVE : 0;
+			switch (pUmDevice->lm_dev.LineSpeed) {
+				case LM_LINE_SPEED_10MBPS:
+					state.link_media |= IFM_10_T;
+					state.link_speed = 10000;
+					break;
+				case LM_LINE_SPEED_100MBPS:
+					state.link_media |= IFM_100_TX;
+					state.link_speed = 100000;
+					break;
+				case LM_LINE_SPEED_1000MBPS:
+					state.link_media |= IFM_1000_T;
+					state.link_speed = 1000000;
+					break;
+				default:
+					state.link_speed = 0;
+			}
+			state.link_media |= (pUmDevice->lm_dev.DuplexMode == LM_DUPLEX_MODE_FULL ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX);
+			state.link_quality = 1000;
+			
+			return user_memcpy(data, &state, sizeof(ether_link_state_t));
+		}
+#endif
 	}
 	return B_ERROR;
 }
