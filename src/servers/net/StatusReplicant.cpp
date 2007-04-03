@@ -192,7 +192,7 @@ StatusReplicant::ShowConfiguration(BMessage *message)
 	memset(&request, 0, sizeof(request));
 	strcpy(request.ifr_name, device);
 
-	string text = device;
+	std::string text = device;
 	text += " information:\n";
 	size_t boldLength = text.size();
 
