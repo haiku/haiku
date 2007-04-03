@@ -181,11 +181,11 @@ StatusReplicant::ShowConfiguration(BMessage *message)
 	if (status != kStatusConnected && status != kStatusLinkNoConfig)
 		return;
 
-	int sock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (sock < 0)
+	if (strlen(device) > IF_NAMESIZE)
 		return;
 
-	if (strlen(device) > IF_NAMESIZE)
+	int sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sock < 0)
 		return;
 
 	ifreq request;

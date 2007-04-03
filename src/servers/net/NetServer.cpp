@@ -366,8 +366,8 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kRegisterStatusReplicant:
 		{
-			message->FindMessenger("messenger", &fStatusMessenger);
-			_UpdateReplicantStatus();
+			if (message->FindMessenger("messenger", &fStatusMessenger) == B_OK)
+				_UpdateReplicantStatus();
 			break;
 		}
 
