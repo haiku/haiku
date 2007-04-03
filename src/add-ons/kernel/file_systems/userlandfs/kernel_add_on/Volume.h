@@ -12,15 +12,18 @@ namespace UserlandFSUtil {
 class Request;
 class RequestAllocator;
 class RequestHandler;
+class RequestPort;
+struct userlandfs_ioctl;
 
 }
 
 using UserlandFSUtil::Request;
 using UserlandFSUtil::RequestAllocator;
 using UserlandFSUtil::RequestHandler;
+using UserlandFSUtil::RequestPort;
+using UserlandFSUtil::userlandfs_ioctl;
 
 class FileSystem;
-struct userlandfs_ioctl;
 
 class Volume : public Referencable {
 public:
@@ -55,6 +58,8 @@ public:
 			// vnodes
 			status_t			Lookup(fs_vnode dir, const char* entryName,
 									vnode_id* vnid, int* type);
+			status_t			GetVNodeName(fs_vnode node, char* buffer,
+									size_t bufferSize);
 			status_t			ReadVNode(vnode_id vnid, bool reenter,
 									fs_vnode* node);
 			status_t			WriteVNode(fs_vnode node, bool reenter);
@@ -141,6 +146,8 @@ public:
 									size_t bufferSize, size_t* bytesWritten);
 			status_t			ReadAttrStat(fs_vnode node, fs_cookie cookie,
 									struct stat *st);
+			status_t			WriteAttrStat(fs_vnode node, fs_cookie cookie,
+									const struct stat *st, int statMask);
 			status_t			RenameAttr(fs_vnode oldNode,
 									const char* oldName, fs_vnode newNode,
 									const char* newName);
@@ -169,6 +176,7 @@ public:
 			status_t			ReadQuery(fs_cookie cookie, void* buffer,
 									size_t bufferSize, uint32 count,
 									uint32* countRead);
+			status_t			RewindQuery(fs_cookie cookie);
 
 private:
 			status_t			_Mount(const char* device, uint32 flags,

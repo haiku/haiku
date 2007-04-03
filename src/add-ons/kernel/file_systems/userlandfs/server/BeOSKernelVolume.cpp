@@ -157,6 +157,16 @@ BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid,
 	return error;
 }
 
+// LookupNoType
+status_t
+BeOSKernelVolume::LookupNoType(fs_vnode dir, const char* entryName,
+	vnode_id* vnid)
+{
+	if (!fFSOps->walk)
+		return B_BAD_VALUE;
+	return fFSOps->walk(fVolumeCookie, dir, entryName, NULL, vnid);
+}
+
 // ReadVNode
 status_t
 BeOSKernelVolume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)

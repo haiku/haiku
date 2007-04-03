@@ -176,7 +176,19 @@ userlandfs_lookup(fs_volume fs, fs_vnode dir, const char *entryName,
 	return error;
 }
 
-// TODO: userlandfs_get_vnode_name()
+// userlandfs_get_vnode_name
+static status_t
+userlandfs_get_vnode_name(fs_volume fs, fs_vnode node, char *buffer,
+	size_t bufferSize)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_get_vnode_name(%p, %p, %p, %lu)\n", fs, node,
+		buffer, bufferSize));
+	status_t error = volume->GetVNodeName(node, buffer, bufferSize);
+	PRINT(("userlandfs_get_vnode_name() done: (%lx, \"%.*s\")\n", error,
+		(int)bufferSize, (error == B_OK ? buffer : NULL)));
+	return error;
+}
 
 // userlandfs_get_vnode
 static status_t
@@ -546,7 +558,7 @@ userlandfs_read_dir(fs_volume fs, fs_vnode node, fs_cookie cookie,
 	PRINT(("userlandfs_read_dir() done: (%lx, %lu)\n", error, *count));
 	#if DEBUG
 		dirent* entry = buffer;
-		for (uint32 i = 0; i < *count; i++) {
+		for (uint32 i = 0; error == B_OK && i < *count; i++) {
 			// R5's kernel vsprintf() doesn't seem to know `%.<number>s', so
 			// we need to work around.
 			char name[B_FILE_NAME_LENGTH];
@@ -722,14 +734,25 @@ userlandfs_read_attr_stat(fs_volume fs, fs_vnode node, fs_cookie cookie,
 	struct stat *st)
 {
 	Volume* volume = (Volume*)fs;
-	PRINT(("userlandfs_read_attr_stat(%p, %p, %p', %p)\n", fs, node, cookie,
+	PRINT(("userlandfs_read_attr_stat(%p, %p, %p, %p)\n", fs, node, cookie,
 		st));
 	status_t error = volume->ReadAttrStat(node, cookie, st);
 	PRINT(("userlandfs_read_attr_stat() done: (%lx)\n", error));
 	return error;
 }
 
-// TODO: userlandfs_write_attr_stat
+// userlandfs_write_attr_stat
+static status_t
+userlandfs_write_attr_stat(fs_volume fs, fs_vnode node, fs_cookie cookie,
+	const struct stat *st, int statMask)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_write_attr_stat(%p, %p, %p, %p, 0x%x)\n", fs, node,
+		cookie, st, statMask));
+	status_t error = volume->WriteAttrStat(node, cookie, st, statMask);
+	PRINT(("userlandfs_write_attr_stat() done: (%lx)\n", error));
+	return error;
+}
 
 // userlandfs_rename_attr
 static status_t
@@ -903,7 +926,7 @@ userlandfs_read_query(fs_volume fs, fs_cookie cookie,
 		count);
 	PRINT(("userlandfs_read_query() done: (%lx, %ld)\n", error, *count));
 	#if DEBUG
-		if (*count > 0) {
+		if (error == B_OK && *count > 0) {
 			// R5's kernel vsprintf() doesn't seem to know `%.<number>s', so
 			// we need to work around.
 			char name[B_FILE_NAME_LENGTH];
@@ -919,7 +942,16 @@ userlandfs_read_query(fs_volume fs, fs_cookie cookie,
 	return error;
 }
 
-// TODO: userlandfs_rewind_query()
+// userlandfs_rewind_query
+static status_t
+userlandfs_rewind_query(fs_volume fs, fs_cookie cookie)
+{
+	Volume* volume = (Volume*)fs;
+	PRINT(("userlandfs_rewind_query(%p, %p)\n", fs, cookie));
+	status_t error = volume->RewindQuery(cookie);
+	PRINT(("userlandfs_rewind_query() done: (%lx)\n", error));
+	return error;
+}
 
 
 // userlandfs_initialize
@@ -1017,7 +1049,7 @@ static file_system_module_info sUserlandFSModuleInfo = {
 
 	/* vnode operations */
 	&userlandfs_lookup,
-	NULL,	// &userlandfs_get_vnode_name,
+	&userlandfs_get_vnode_name,
 	&userlandfs_get_vnode,
 	&userlandfs_put_vnode,
 	&userlandfs_remove_vnode,
@@ -1079,7 +1111,7 @@ static file_system_module_info sUserlandFSModuleInfo = {
 	&userlandfs_write_attr,
 
 	&userlandfs_read_attr_stat,
-	NULL,	// &userlandfs_write_attr_stat,
+	&userlandfs_write_attr_stat,
 	&userlandfs_rename_attr,
 	&userlandfs_remove_attr,
 
@@ -1099,7 +1131,7 @@ static file_system_module_info sUserlandFSModuleInfo = {
 	&userlandfs_close_query,
 	&userlandfs_free_query_cookie,
 	&userlandfs_read_query,
-	NULL,	// &userlandfs_rewind_query,
+	&userlandfs_rewind_query
 };
 
 module_info *modules[] = {

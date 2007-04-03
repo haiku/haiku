@@ -15,6 +15,7 @@ class ReadFSInfoRequest;
 class WriteFSInfoRequest;
 // vnodes
 class LookupRequest;
+class GetVNodeNameRequest;
 class ReadVNodeRequest;
 class WriteVNodeRequest;
 class FSRemoveVNodeRequest;
@@ -61,6 +62,7 @@ class FreeAttrCookieRequest;
 class ReadAttrRequest;
 class WriteAttrRequest;
 class ReadAttrStatRequest;
+class WriteAttrStatRequest;
 class RenameAttrRequest;
 class RemoveAttrRequest;
 // indices
@@ -77,6 +79,7 @@ class OpenQueryRequest;
 class CloseQueryRequest;
 class FreeQueryCookieRequest;
 class ReadQueryRequest;
+class RewindQueryRequest;
 
 class RequestAllocator;
 
@@ -107,6 +110,7 @@ private:
 
 			// vnodes
 			status_t			_HandleRequest(LookupRequest* request);
+			status_t			_HandleRequest(GetVNodeNameRequest* request);
 			status_t			_HandleRequest(ReadVNodeRequest* request);
 			status_t			_HandleRequest(WriteVNodeRequest* request);
 			status_t			_HandleRequest(FSRemoveVNodeRequest* request);
@@ -159,6 +163,7 @@ private:
 			status_t			_HandleRequest(ReadAttrRequest* request);
 			status_t			_HandleRequest(WriteAttrRequest* request);
 			status_t			_HandleRequest(ReadAttrStatRequest* request);
+			status_t			_HandleRequest(WriteAttrStatRequest* request);
 			status_t			_HandleRequest(RenameAttrRequest* request);
 			status_t			_HandleRequest(RemoveAttrRequest* request);
 
@@ -178,6 +183,7 @@ private:
 			status_t			_HandleRequest(CloseQueryRequest* request);
 			status_t			_HandleRequest(FreeQueryCookieRequest* request);
 			status_t			_HandleRequest(ReadQueryRequest* request);
+			status_t			_HandleRequest(RewindQueryRequest* request);
 
 			status_t			_SendReply(RequestAllocator& allocator,
 									bool expectsReceipt);

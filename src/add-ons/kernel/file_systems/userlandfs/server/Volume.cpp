@@ -2,6 +2,12 @@
 
 #include "Volume.h"
 
+#include <dirent.h>
+#include <string.h>
+#include <sys/stat.h>
+
+#include "kernel_emu.h"
+
 // constructor
 Volume::Volume(FileSystem* fileSystem, mount_id id)
 	: fFileSystem(fileSystem),
@@ -77,6 +83,82 @@ status_t
 Volume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
 {
 	return B_BAD_VALUE;
+}
+
+// LookupNoType
+status_t
+Volume::LookupNoType(fs_vnode dir, const char* entryName, vnode_id* vnid)
+{
+	int type;
+	return Lookup(dir, entryName, vnid, &type);
+}
+
+// GetVNodeName
+status_t
+Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
+{
+	// stat the node to get its ID
+	struct stat st;
+	status_t error = ReadStat(node, &st);
+	if (error != B_OK)
+		return error;
+
+	// look up the parent directory
+	vnode_id parentID;
+	error = LookupNoType(node, "..", &parentID);
+	if (error != B_OK)
+		return error;
+
+	// get the parent node handle
+	fs_vnode parentNode;
+	error = UserlandFS::KernelEmu::get_vnode(GetID(), parentID, &parentNode);
+	// Lookup() has already called get_vnode() for us, so we need to put it once
+	UserlandFS::KernelEmu::put_vnode(GetID(), parentID);
+	if (error != B_OK)
+		return error;
+
+	// open the parent dir
+	fs_cookie cookie;
+	error = OpenDir(parentNode, &cookie);
+	if (error == B_OK) {
+
+		while (true) {
+			// read an entry
+			char _entry[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+			struct dirent* entry = (struct dirent*)_entry;
+			uint32 num;
+
+			error = ReadDir(parentNode, cookie, entry, sizeof(_entry), 1, &num);
+
+			if (error != B_OK)
+				break;
+			if (num == 0) {
+				error = B_ENTRY_NOT_FOUND;
+				break;
+			}
+
+			// found an entry for our node?
+			if (st.st_ino == entry->d_ino) {
+				// yep, copy the entry name
+				size_t nameLen = strnlen(entry->d_name, B_FILE_NAME_LENGTH);
+				if (nameLen < bufferSize) {
+					memcpy(buffer, entry->d_name, nameLen);
+					buffer[nameLen] = '\0';
+				} else
+					error = B_BUFFER_OVERFLOW;
+				break;
+			}
+		}
+
+		// close the parent dir
+		CloseDir(parentNode, cookie);
+		FreeDirCookie(parentNode, cookie);
+	}
+
+	// put the parent node
+	UserlandFS::KernelEmu::put_vnode(GetID(), parentID);
+
+	return error;
 }
 
 // ReadVNode
@@ -393,9 +475,17 @@ Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 	return B_BAD_VALUE;
 }
 
-// StatAttr
+// ReadAttrStat
 status_t
 Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
+{
+	return B_BAD_VALUE;
+}
+
+// WriteAttrStat
+status_t
+Volume::WriteAttrStat(fs_vnode node, fs_cookie cookie, const struct stat* st,
+	int statMask)
 {
 	return B_BAD_VALUE;
 }
@@ -506,6 +596,13 @@ Volume::FreeQueryCookie(fs_cookie cookie)
 status_t
 Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
+{
+	return B_BAD_VALUE;
+}
+
+// RewindQuery
+status_t
+Volume::RewindQuery(fs_cookie cookie)
 {
 	return B_BAD_VALUE;
 }

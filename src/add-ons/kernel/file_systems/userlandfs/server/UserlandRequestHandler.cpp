@@ -60,6 +60,8 @@ UserlandRequestHandler::HandleRequest(Request* request)
 		// vnodes
 		case LOOKUP_REQUEST:
 			return _HandleRequest((LookupRequest*)request);
+		case GET_VNODE_NAME_REQUEST:
+			return _HandleRequest((GetVNodeNameRequest*)request);
 		case READ_VNODE_REQUEST:
 			return _HandleRequest((ReadVNodeRequest*)request);
 		case WRITE_VNODE_REQUEST:
@@ -152,6 +154,8 @@ UserlandRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((WriteAttrRequest*)request);
 		case READ_ATTR_STAT_REQUEST:
 			return _HandleRequest((ReadAttrStatRequest*)request);
+		case WRITE_ATTR_STAT_REQUEST:
+			return _HandleRequest((WriteAttrStatRequest*)request);
 		case RENAME_ATTR_REQUEST:
 			return _HandleRequest((RenameAttrRequest*)request);
 		case REMOVE_ATTR_REQUEST:
@@ -184,6 +188,8 @@ UserlandRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((FreeQueryCookieRequest*)request);
 		case READ_QUERY_REQUEST:
 			return _HandleRequest((ReadQueryRequest*)request);
+		case REWIND_QUERY_REQUEST:
+			return _HandleRequest((RewindQueryRequest*)request);
 	}
 PRINT(("UserlandRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -392,6 +398,45 @@ UserlandRequestHandler::_HandleRequest(LookupRequest* request)
 
 	// send the reply
 	return _SendReply(allocator, false);
+}
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(GetVNodeNameRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	void* node = request->node;
+	size_t bufferSize = request->size;
+
+	// allocate the reply
+	RequestAllocator allocator(fPort->GetPort());
+	GetVNodeNameReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	char* buffer;
+	if (result == B_OK) {
+		result = allocator.AllocateAddress(reply->buffer, bufferSize, 1,
+			(void**)&buffer, true);
+	}
+
+	// execute the request
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->GetVNodeName(node, buffer, bufferSize);
+	}
+
+	// reconstruct the reply, in case it has been overwritten
+	reply = new(reply) GetVNodeNameReply;
+
+	// send the reply
+	reply->error = result;
+	return _SendReply(allocator, (result == B_OK));
 }
 
 // _HandleRequest
@@ -1731,6 +1776,35 @@ UserlandRequestHandler::_HandleRequest(ReadAttrStatRequest* request)
 
 // _HandleRequest
 status_t
+UserlandRequestHandler::_HandleRequest(WriteAttrStatRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->WriteAttrStat(request->node, request->attrCookie,
+			&request->st, request->mask);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	WriteAttrStatReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+// _HandleRequest
+status_t
 UserlandRequestHandler::_HandleRequest(RenameAttrRequest* request)
 {
 	// check and execute the request
@@ -2171,6 +2245,34 @@ UserlandRequestHandler::_HandleRequest(ReadQueryRequest* request)
 	reply->error = result;
 	reply->count = countRead;
 	return _SendReply(allocator, (result == B_OK));
+}
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(RewindQueryRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->RewindQuery(request->queryCookie);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	RewindQueryReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
 }
 
 

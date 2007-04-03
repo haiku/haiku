@@ -126,6 +126,17 @@ HaikuKernelVolume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid,
 	return fFSModule->lookup(fVolumeCookie, dir, entryName, vnid, type);
 }
 
+// GetVNodeName
+status_t
+HaikuKernelVolume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
+{
+	// If not implemented by the client file system, we invoke our super class
+	// version, which emulates the functionality.
+	if (!fFSModule->get_vnode_name)
+		return Volume::GetVNodeName(node, buffer, bufferSize);
+	return fFSModule->get_vnode_name(fVolumeCookie, node, buffer, bufferSize);
+}
+
 // ReadVNode
 status_t
 HaikuKernelVolume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
@@ -563,6 +574,17 @@ HaikuKernelVolume::ReadAttrStat(fs_vnode node, fs_cookie cookie,
 	return fFSModule->read_attr_stat(fVolumeCookie, node, cookie, st);
 }
 
+// WriteAttrStat
+status_t
+HaikuKernelVolume::WriteAttrStat(fs_vnode node, fs_cookie cookie,
+	const struct stat* st, int statMask)
+{
+	if (!fFSModule->write_attr_stat)
+		return B_BAD_VALUE;
+	return fFSModule->write_attr_stat(fVolumeCookie, node, cookie, st,
+		statMask);
+}
+
 // RenameAttr
 status_t
 HaikuKernelVolume::RenameAttr(fs_vnode oldNode, const char* oldName,
@@ -710,3 +732,13 @@ HaikuKernelVolume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 	return fFSModule->read_query(fVolumeCookie, cookie, (struct dirent*)buffer,
 		bufferSize, countRead);
 }
+
+// RewindQuery
+status_t
+HaikuKernelVolume::RewindQuery(fs_cookie cookie)
+{
+	if (!fFSModule->rewind_query)
+		return B_BAD_VALUE;
+	return fFSModule->rewind_query(fVolumeCookie, cookie);
+}
+

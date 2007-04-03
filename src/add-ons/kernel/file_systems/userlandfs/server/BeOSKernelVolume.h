@@ -27,6 +27,9 @@ public:
 	// vnodes
 	virtual	status_t			Lookup(fs_vnode dir, const char* entryName,
 									vnode_id* vnid, int* type);
+	virtual	status_t			LookupNoType(fs_vnode dir,
+									const char* entryName, vnode_id* vnid);
+									// not required
 	virtual	status_t			ReadVNode(vnode_id vnid, bool reenter,
 									fs_vnode* node);
 	virtual	status_t			WriteVNode(fs_vnode node, bool reenter);

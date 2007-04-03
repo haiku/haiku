@@ -1,6 +1,9 @@
 // Volume.cpp
 
+#include "Volume.h"
+
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -16,7 +19,6 @@
 #include "RequestPort.h"
 #include "Requests.h"
 #include "userlandfs_ioctl.h"
-#include "Volume.h"
 
 // missing ioctl()s
 // TODO: Place somewhere else.
@@ -399,6 +401,55 @@ Volume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
 		_DecrementVNodeCount(*vnid);
 		return B_OK;
 	}
+	return error;
+}
+
+// GetVNodeName
+status_t
+Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
+{
+	// We don't check the capability -- if not implemented by the client FS,
+	// the functionality is emulated in userland.
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	GetVNodeNameRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->size = bufferSize;
+
+	// send the request
+	KernelRequestHandler handler(this, GET_VNODE_NAME_REPLY);
+	GetVNodeNameReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+
+	char* readBuffer = (char*)reply->buffer.GetData();
+	size_t nameLen = reply->buffer.GetSize();
+	nameLen = strnlen(readBuffer, nameLen);
+	if (nameLen <= 1 || nameLen >= bufferSize)
+		RETURN_ERROR(B_BAD_DATA);
+
+	memcpy(buffer, readBuffer, nameLen);
+	buffer[nameLen] = '\0';
+
+	_SendReceiptAck(port);
 	return error;
 }
 
@@ -2099,6 +2150,48 @@ Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
 	return error;
 }
 
+// WriteAttrStat
+status_t
+Volume::WriteAttrStat(fs_vnode node, fs_cookie cookie, const struct stat *st,
+	int statMask)
+{
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_ATTR_STAT))
+		return B_BAD_VALUE;
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	WriteAttrStatRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = node;
+	request->attrCookie = cookie;
+	request->st = *st;
+	request->mask = statMask;
+
+	// send the request
+	KernelRequestHandler handler(this, WRITE_ATTR_STAT_REPLY);
+	WriteAttrStatReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
+}
+
 // RenameAttr
 status_t
 Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
@@ -2629,6 +2722,44 @@ Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 		memcpy(buffer, reply->buffer.GetData(), copyBytes);
 	}
 	_SendReceiptAck(port);
+	return error;
+}
+
+// RewindQuery
+status_t
+Volume::RewindQuery(fs_cookie cookie)
+{
+	// check capability
+	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_QUERY))
+		return B_BAD_VALUE;
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	RewindQueryRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->queryCookie = cookie;
+
+	// send the request
+	KernelRequestHandler handler(this, REWIND_QUERY_REPLY);
+	RewindQueryReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
 	return error;
 }
 

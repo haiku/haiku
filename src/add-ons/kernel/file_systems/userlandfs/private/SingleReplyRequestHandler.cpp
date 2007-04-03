@@ -1,9 +1,10 @@
 // SingleReplyRequestHandler.cpp
 
+#include "SingleReplyRequestHandler.h"
+
 #include "Compatibility.h"
 #include "Debug.h"
 #include "Request.h"
-#include "SingleReplyRequestHandler.h"
 
 // constructor
 SingleReplyRequestHandler::SingleReplyRequestHandler()

@@ -33,6 +33,8 @@ public:
 	// vnodes
 	virtual	status_t			Lookup(fs_vnode dir, const char* entryName,
 									vnode_id* vnid, int* type);
+	virtual	status_t			GetVNodeName(fs_vnode node, char* buffer,
+									size_t bufferSize);
 	virtual	status_t			ReadVNode(vnode_id vnid, bool reenter,
 									fs_vnode* node);
 	virtual	status_t			WriteVNode(fs_vnode node, bool reenter);
@@ -119,6 +121,8 @@ public:
 									size_t bufferSize, size_t* bytesWritten);
 	virtual	status_t			ReadAttrStat(fs_vnode node, fs_cookie cookie,
 									struct stat *st);
+	virtual	status_t			WriteAttrStat(fs_vnode node, fs_cookie cookie,
+									const struct stat* st, int statMask);
 	virtual	status_t			RenameAttr(fs_vnode oldNode,
 									const char* oldName, fs_vnode newNode,
 									const char* newName);
@@ -147,6 +151,7 @@ public:
 	virtual	status_t			ReadQuery(fs_cookie cookie, void* buffer,
 									size_t bufferSize, uint32 count,
 									uint32* countRead);
+	virtual	status_t			RewindQuery(fs_cookie cookie);
 
 private:
 			file_system_module_info* fFSModule;

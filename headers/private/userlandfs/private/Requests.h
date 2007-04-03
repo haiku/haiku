@@ -43,6 +43,8 @@ enum {
 	// vnodes
 	LOOKUP_REQUEST,
 	LOOKUP_REPLY,
+	GET_VNODE_NAME_REQUEST,
+	GET_VNODE_NAME_REPLY,
 	READ_VNODE_REQUEST,
 	READ_VNODE_REPLY,
 	WRITE_VNODE_REQUEST,
@@ -137,6 +139,8 @@ enum {
 	WRITE_ATTR_REPLY,
 	READ_ATTR_STAT_REQUEST,
 	READ_ATTR_STAT_REPLY,
+	WRITE_ATTR_STAT_REQUEST,
+	WRITE_ATTR_STAT_REPLY,
 	RENAME_ATTR_REQUEST,
 	RENAME_ATTR_REPLY,
 	REMOVE_ATTR_REQUEST,
@@ -169,6 +173,8 @@ enum {
 	FREE_QUERY_COOKIE_REPLY,
 	READ_QUERY_REQUEST,
 	READ_QUERY_REPLY,
+	REWIND_QUERY_REQUEST,
+	REWIND_QUERY_REPLY,
 
 	// userland -> kernel requests
 	// notifications
@@ -426,6 +432,23 @@ public:
 
 	vnode_id	vnid;
 	int			type;
+};
+
+// GetVNodeNameRequest
+class GetVNodeNameRequest : public NodeRequest {
+public:
+	GetVNodeNameRequest() : NodeRequest(GET_VNODE_NAME_REQUEST) {}
+
+	size_t		size;
+};
+
+// GetVNodeNameReply
+class GetVNodeNameReply : public ReplyRequest {
+public:
+	GetVNodeNameReply() : ReplyRequest(GET_VNODE_NAME_REPLY) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
 };
 
 // ReadVNodeRequest
@@ -1085,6 +1108,21 @@ public:
 	struct stat	st;
 };
 
+// WriteAttrStatRequest
+class WriteAttrStatRequest : public AttributeRequest {
+public:
+	WriteAttrStatRequest() : AttributeRequest(WRITE_ATTR_STAT_REQUEST) {}
+
+	struct stat	st;
+	uint32		mask;
+};
+
+// WriteAttrStatReply
+class WriteAttrStatReply : public ReplyRequest {
+public:
+	WriteAttrStatReply() : ReplyRequest(WRITE_ATTR_STAT_REPLY) {}
+};
+
 // RenameAttrRequest
 class RenameAttrRequest : public VolumeRequest {
 public:
@@ -1306,6 +1344,18 @@ public:
 
 	uint32		count;
 	Address		buffer;
+};
+
+// RewindQueryRequest
+class RewindQueryRequest : public QueryRequest {
+public:
+	RewindQueryRequest() : QueryRequest(REWIND_QUERY_REQUEST) {}
+};
+
+// RewindQueryReply
+class RewindQueryReply : public ReplyRequest {
+public:
+	RewindQueryReply() : ReplyRequest(REWIND_QUERY_REPLY) {}
 };
 
 
@@ -1552,6 +1602,10 @@ do_for_request(Request* request, Task& task)
 			return task((LookupRequest*)request);
 		case LOOKUP_REPLY:
 			return task((LookupReply*)request);
+		case GET_VNODE_NAME_REQUEST:
+			return task((GetVNodeNameRequest*)request);
+		case GET_VNODE_NAME_REPLY:
+			return task((GetVNodeNameReply*)request);
 		case READ_VNODE_REQUEST:
 			return task((ReadVNodeRequest*)request);
 		case READ_VNODE_REPLY:
@@ -1721,6 +1775,10 @@ do_for_request(Request* request, Task& task)
 			return task((ReadAttrStatRequest*)request);
 		case READ_ATTR_STAT_REPLY:
 			return task((ReadAttrStatReply*)request);
+		case WRITE_ATTR_STAT_REQUEST:
+			return task((WriteAttrStatRequest*)request);
+		case WRITE_ATTR_STAT_REPLY:
+			return task((WriteAttrStatReply*)request);
 		case RENAME_ATTR_REQUEST:
 			return task((RenameAttrRequest*)request);
 		case RENAME_ATTR_REPLY:
@@ -1779,6 +1837,10 @@ do_for_request(Request* request, Task& task)
 			return task((ReadQueryRequest*)request);
 		case READ_QUERY_REPLY:
 			return task((ReadQueryReply*)request);
+		case REWIND_QUERY_REQUEST:
+			return task((RewindQueryRequest*)request);
+		case REWIND_QUERY_REPLY:
+			return task((RewindQueryReply*)request);
 
 		// userland -> kernel requests
 		// notifications
@@ -1869,6 +1931,8 @@ using UserlandFSUtil::WriteFSInfoReply;
 // vnodes
 using UserlandFSUtil::LookupRequest;
 using UserlandFSUtil::LookupReply;
+using UserlandFSUtil::GetVNodeNameRequest;
+using UserlandFSUtil::GetVNodeNameReply;
 using UserlandFSUtil::ReadVNodeRequest;
 using UserlandFSUtil::ReadVNodeReply;
 using UserlandFSUtil::WriteVNodeRequest;
@@ -1956,6 +2020,8 @@ using UserlandFSUtil::WriteAttrRequest;
 using UserlandFSUtil::WriteAttrReply;
 using UserlandFSUtil::ReadAttrStatRequest;
 using UserlandFSUtil::ReadAttrStatReply;
+using UserlandFSUtil::WriteAttrStatRequest;
+using UserlandFSUtil::WriteAttrStatReply;
 using UserlandFSUtil::RenameAttrRequest;
 using UserlandFSUtil::RenameAttrReply;
 using UserlandFSUtil::RemoveAttrRequest;
@@ -1986,6 +2052,8 @@ using UserlandFSUtil::FreeQueryCookieRequest;
 using UserlandFSUtil::FreeQueryCookieReply;
 using UserlandFSUtil::ReadQueryRequest;
 using UserlandFSUtil::ReadQueryReply;
+using UserlandFSUtil::RewindQueryRequest;
+using UserlandFSUtil::RewindQueryReply;
 
 // userland -> kernel requests
 // notifications

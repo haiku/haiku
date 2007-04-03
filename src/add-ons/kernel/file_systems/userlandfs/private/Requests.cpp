@@ -53,6 +53,14 @@ MountVolumeRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 //	return B_OK;
 //}
 
+// GetVNodeNameReply
+status_t
+GetVNodeNameReply::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_STRING(buffer);
+	return B_OK;
+}
+
 // CreateRequest
 status_t
 CreateRequest::GetAddressInfos(AddressInfo* infos, int32* count)
@@ -496,11 +504,13 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 			return false;
 		// vnodes
 		case LOOKUP_REQUEST:
+		case GET_VNODE_NAME_REQUEST:
 		case READ_VNODE_REQUEST:
 		case WRITE_VNODE_REQUEST:
 		case FS_REMOVE_VNODE_REQUEST:
 			return true;
 		case LOOKUP_REPLY:
+		case GET_VNODE_NAME_REPLY:
 		case READ_VNODE_REPLY:
 		case WRITE_VNODE_REPLY:
 		case FS_REMOVE_VNODE_REPLY:
@@ -587,6 +597,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case READ_ATTR_REQUEST:
 		case WRITE_ATTR_REQUEST:
 		case READ_ATTR_STAT_REQUEST:
+		case WRITE_ATTR_STAT_REQUEST:
 		case RENAME_ATTR_REQUEST:
 		case REMOVE_ATTR_REQUEST:
 			return true;
@@ -594,10 +605,10 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case OPEN_ATTR_REPLY:
 		case CLOSE_ATTR_REPLY:
 		case FREE_ATTR_COOKIE_REPLY:
-
 		case READ_ATTR_REPLY:
 		case WRITE_ATTR_REPLY:
 		case READ_ATTR_STAT_REPLY:
+		case WRITE_ATTR_STAT_REPLY:
 		case RENAME_ATTR_REPLY:
 		case REMOVE_ATTR_REPLY:
 			return false;
@@ -625,11 +636,13 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case CLOSE_QUERY_REQUEST:
 		case FREE_QUERY_COOKIE_REQUEST:
 		case READ_QUERY_REQUEST:
+		case REWIND_QUERY_REQUEST:
 			return true;
 		case OPEN_QUERY_REPLY:
 		case CLOSE_QUERY_REPLY:
 		case FREE_QUERY_COOKIE_REPLY:
 		case READ_QUERY_REPLY:
+		case REWIND_QUERY_REPLY:
 			return false;
 
 		// userland -> kernel requests
@@ -697,11 +710,13 @@ UserlandFSUtil::is_userland_request(uint32 type)
 			return true;
 		// vnodes
 		case LOOKUP_REQUEST:
+		case GET_VNODE_NAME_REQUEST:
 		case READ_VNODE_REQUEST:
 		case WRITE_VNODE_REQUEST:
 		case FS_REMOVE_VNODE_REQUEST:
 			return false;
 		case LOOKUP_REPLY:
+		case GET_VNODE_NAME_REPLY:
 		case READ_VNODE_REPLY:
 		case WRITE_VNODE_REPLY:
 		case FS_REMOVE_VNODE_REPLY:
@@ -789,6 +804,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case WRITE_ATTR_REQUEST:
 		case RENAME_ATTR_REQUEST:
 		case READ_ATTR_STAT_REQUEST:
+		case WRITE_ATTR_STAT_REQUEST:
 		case REMOVE_ATTR_REQUEST:
 			return false;
 		case CREATE_ATTR_REPLY:
@@ -798,6 +814,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case READ_ATTR_REPLY:
 		case WRITE_ATTR_REPLY:
 		case READ_ATTR_STAT_REPLY:
+		case WRITE_ATTR_STAT_REPLY:
 		case RENAME_ATTR_REPLY:
 		case REMOVE_ATTR_REPLY:
 			return true;
@@ -825,11 +842,13 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case CLOSE_QUERY_REQUEST:
 		case FREE_QUERY_COOKIE_REQUEST:
 		case READ_QUERY_REQUEST:
+		case REWIND_QUERY_REQUEST:
 			return false;
 		case OPEN_QUERY_REPLY:
 		case CLOSE_QUERY_REPLY:
 		case FREE_QUERY_COOKIE_REPLY:
 		case READ_QUERY_REPLY:
+		case REWIND_QUERY_REPLY:
 			return true;
 
 		// userland -> kernel requests
