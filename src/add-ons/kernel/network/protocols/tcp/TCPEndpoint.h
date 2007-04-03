@@ -67,6 +67,7 @@ class TCPEndpoint : public net_protocol {
 		status_t _SendQueued(bool force = false);
 		int _GetMSS(const struct sockaddr *) const;
 		ssize_t _AvailableBytesOrDisconnect() const;
+		status_t _ShutdownEgress(bool closing);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
