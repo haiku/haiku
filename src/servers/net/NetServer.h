@@ -15,6 +15,17 @@
 
 
 static const uint32 kMsgConfigureInterface = 'COif';
+extern const char *kSignature;
+
+enum {
+	kStatusUnknown = 0,
+	kStatusNoLink,
+	kStatusLinkNoConfig,
+	kStatusConnected,
+	kStatusPreparing,
+
+	kStatusCount
+};
 
 extern bool get_family_index(const char* name, int32& familyIndex);
 extern int family_at_index(int32 index);

@@ -40,6 +40,11 @@ AutoconfigLooper::~AutoconfigLooper()
 void
 AutoconfigLooper::_ReadyToRun()
 {
+	BMessage interface(kMsgConfigureInterface);
+	interface.AddString("device", fDevice.String());
+	interface.AddInt32("net:status", kStatusPreparing);
+	fTarget.SendMessage(&interface);
+
 	// start with DHCP
 
 	DHCPClient* client = new DHCPClient(fTarget, fDevice.String());
@@ -57,8 +62,7 @@ AutoconfigLooper::_ReadyToRun()
 	// TODO: have a look at zeroconf
 	// TODO: this could also be done add-on based
 
-	BMessage interface;
-	interface.AddString("device", fDevice.String());
+	interface.ReplaceInt32("net:status", kStatusLinkNoConfig);
 
 	uint8 mac[6];
 	uint8 last = 56;
@@ -80,7 +84,7 @@ AutoconfigLooper::_ReadyToRun()
 	address.AddString("gateway", "192.168.0.254");
 	interface.AddMessage("address", &address);
 
-	fTarget.SendMessage(kMsgConfigureInterface, &interface);
+	fTarget.SendMessage(&interface);
 }
 
 

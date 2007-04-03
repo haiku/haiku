@@ -11,12 +11,15 @@
 #include "NetServer.h"
 #include "Services.h"
 #include "Settings.h"
+#include "StatusReplicant.h"
 
 #include <Alert.h>
+#include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Roster.h>
 #include <Server.h>
 #include <TextView.h>
 
@@ -36,7 +39,12 @@
 #include <unistd.h>
 
 
+const char *kSignature = "application/x-vnd.haiku-net_server";
+static const char *kDeskbarSignature = "application/x-vnd.Be-TSKB";
+
+
 typedef std::map<std::string, BLooper*> LooperMap;
+typedef std::map<std::string, int> StatusMap;
 
 
 class NetServer : public BServer {
@@ -61,10 +69,15 @@ class NetServer : public BServer {
 		void _ConfigureInterfaces(int socket, BMessage* _missingDevice = NULL);
 		void _BringUpInterfaces();
 		void _StartServices();
+		status_t _AddStatusReplicant(bool force);
+		void _UpdateDeviceStatus(const char *device, int status);
+		void _UpdateReplicantStatus();
 
 		Settings	fSettings;
 		LooperMap	fDeviceMap;
+		StatusMap	fStatusMap;
 		BMessenger	fServices;
+		BMessenger	fStatusMessenger;
 };
 
 
@@ -236,7 +249,7 @@ get_mac_address(const char* device, uint8* address)
 
 
 NetServer::NetServer(status_t& error)
-	: BServer("application/x-vnd.haiku-net_server", false, &error)
+	: BServer(kSignature, false, &error)
 {
 }
 
@@ -266,6 +279,13 @@ NetServer::ReadyToRun()
 	fSettings.StartMonitoring(this);
 	_BringUpInterfaces();
 	_StartServices();
+
+	// we have to wait for Deskbar to show up before
+	// adding the status replicant
+	be_roster->StartWatching(BMessenger(this), B_REQUEST_LAUNCHED);
+	// but possibly the Deskbar is already running
+	// so add immediatly
+	_AddStatusReplicant(true);
 }
 
 
@@ -305,18 +325,49 @@ NetServer::MessageReceived(BMessage* message)
 				break;
 			}
 
-			// we need a socket to talk to the networking stack
-			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-			if (socket < 0)
-				break;
+			status_t status = B_OK;
+			if (message->GetInfo("address", NULL) != B_NAME_NOT_FOUND) {
+				// we need a socket to talk to the networking stack
+				int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+				if (socket < 0)
+					break;
 
-			status_t status = _ConfigureInterface(socket, *message, true);
+				status = _ConfigureInterface(socket, *message, true);
 
-			BMessage reply(B_REPLY);
-			reply.AddInt32("status", status);
-			message->SendReply(&reply);
+				BMessage reply(B_REPLY);
+				reply.AddInt32("status", status);
+				message->SendReply(&reply);
 
-			close(socket);
+				close(socket);
+			}
+
+			if (status == B_OK) {
+				const char *device;
+				int32 net_status;
+				if (message->FindInt32("net:status", &net_status) == B_OK &&
+					message->FindString("device", &device) == B_OK) {
+					_UpdateDeviceStatus(device, net_status);
+				}
+			}
+
+			break;
+		}
+
+		case B_SOME_APP_LAUNCHED:
+		{
+			// check if Deskbar was launched
+			const char *signature;
+			if (message->FindString("be:signature", &signature) == B_OK) {
+				if (strcmp(signature, kDeskbarSignature) == 0)
+					_AddStatusReplicant(true);
+			}
+			break;
+		}
+
+		case kRegisterStatusReplicant:
+		{
+			message->FindMessenger("messenger", &fStatusMessenger);
+			_UpdateReplicantStatus();
 			break;
 		}
 
@@ -732,6 +783,13 @@ NetServer::_QuitLooperForDevice(const char* device)
 	iterator->second->Quit();
 
 	fDeviceMap.erase(iterator);
+
+	StatusMap::iterator it = fStatusMap.find(device);
+	if (it != fStatusMap.end()) {
+		fStatusMap.erase(it);
+		_UpdateReplicantStatus();
+	}
+
 	return true;
 }
 
@@ -874,6 +932,67 @@ NetServer::_StartServices()
 		AddHandler(services);
 		fServices = BMessenger(services);
 	}
+}
+
+
+status_t
+NetServer::_AddStatusReplicant(bool force)
+{
+	BDeskbar deskbar;
+	status_t status;
+
+	if (deskbar.HasItem(kStatusReplicant)) {
+		if (force) {
+			status = deskbar.RemoveItem(kStatusReplicant);
+			if (status != B_OK)
+				return status;
+		} else {
+			return B_OK;
+		}
+	}
+
+	StatusReplicant *replicant = new StatusReplicant();
+	status = deskbar.AddItem(replicant);
+	delete replicant;
+
+	return status;
+}
+
+
+void
+NetServer::_UpdateDeviceStatus(const char *device, int status)
+{
+	StatusMap::iterator it = fStatusMap.find(device);
+	if (it != fStatusMap.end() && it->second == status)
+		return;
+
+	fStatusMap[device] = status;
+	_UpdateReplicantStatus();
+}
+
+
+void
+NetServer::_UpdateReplicantStatus()
+{
+	if (!fStatusMessenger.IsValid())
+		return;
+
+	int prevaling = kStatusUnknown;
+
+	BMessage message(kStatusUpdate);
+
+	for (StatusMap::iterator it = fStatusMap.begin();
+				it != fStatusMap.end(); ++it) {
+		if (it->second > prevaling)
+			prevaling = it->second;
+
+		message.AddString("intf:name", it->first.c_str());
+		message.AddInt32("intf:status", it->second);
+	}
+
+	message.AddInt32("net:status", prevaling);
+
+	fStatusMessenger.SendMessage(&message);
 }
 
 

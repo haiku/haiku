@@ -14,6 +14,7 @@ Server net_server :
 	AutoconfigLooper.cpp
 	DHCPClient.cpp
 	Services.cpp
+	StatusReplicant.cpp
 
 	: be libnetwork.so $(TARGET_LIBSTDC++)
 	# for PPP
