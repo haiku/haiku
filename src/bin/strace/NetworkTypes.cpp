@@ -91,7 +91,7 @@ read_fdset(Context &context, void *data)
 
 template<>
 string
-TypeHandlerImpl<struct fd_set *>::GetParameterValue(Context &context, Parameter *,
+TypeHandlerImpl<fd_set *>::GetParameterValue(Context &context, Parameter *,
 						    const void *address)
 {
 	void *data = *(void **)address;
@@ -102,7 +102,7 @@ TypeHandlerImpl<struct fd_set *>::GetParameterValue(Context &context, Parameter 
 
 template<>
 string
-TypeHandlerImpl<struct fd_set *>::GetReturnValue(Context &context, uint64 value)
+TypeHandlerImpl<fd_set *>::GetReturnValue(Context &context, uint64 value)
 {
 	return context.FormatPointer((void *)value);
 }
@@ -120,7 +120,7 @@ format_pointer_value(Context &context, void *address)
 }
 
 static string
-get_ipv4_address(struct in_addr *addr)
+get_ipv4_address(in_addr *addr)
 {
 	char tmp[32];
 	snprintf(tmp, sizeof(tmp), "%u.%u.%u.%u",
@@ -196,7 +196,7 @@ format_pointer(Context &context, sockaddr *saddr)
 {
 	string r;
 
-	struct sockaddr_in *sin = (struct sockaddr_in *)saddr;
+	sockaddr_in *sin = (sockaddr_in *)saddr;
 
 	r = format_socket_family(context, saddr->sa_family) + ", ";
 
@@ -220,7 +220,7 @@ format_pointer(Context &context, sockaddr_args *args)
 {
 	string r;
 
-	r  =   "addr = " + format_pointer_value<struct sockaddr>(context, args->address);
+	r  =   "addr = " + format_pointer_value<sockaddr>(context, args->address);
 	r += ", len = " + context.FormatUnsigned(args->address_length);
 
 	return r;
@@ -234,7 +234,7 @@ format_pointer(Context &context, transfer_args *args)
 	r  =   "data = " + context.FormatPointer(args->data);
 	r += ", len = " + context.FormatUnsigned(args->data_length);
 	r += ", flags = " + context.FormatFlags(args->flags);
-	r += ", addr = " + format_pointer_value<struct sockaddr>(context, args->address);
+	r += ", addr = " + format_pointer_value<sockaddr>(context, args->address);
 
 	return r;
 }
@@ -370,7 +370,7 @@ format_pointer(Context &context, socket_args *args)
 }
 
 static string
-get_iovec(Context &context, struct iovec *iov, int iovlen)
+get_iovec(Context &context, iovec *iov, int iovlen)
 {
 	string r = "{";
 	r += context.FormatPointer(iov);
@@ -383,7 +383,7 @@ format_pointer(Context &context, msghdr *h)
 {
 	string r;
 
-	r  =   "name = " + format_pointer_value<struct sockaddr>(context, h->msg_name);
+	r  =   "name = " + format_pointer_value<sockaddr>(context, h->msg_name);
 	r += ", name_len = " + context.FormatUnsigned(h->msg_namelen);
 	r += ", iov = " + get_iovec(context, h->msg_iov, h->msg_iovlen);
 	r += ", control = " + context.FormatPointer(h->msg_control);
@@ -473,11 +473,11 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 		return new SpecializedPointerTypeHandler<type>(); \
 	}
 
-DEFINE_TYPE(fdset_ptr, struct fd_set *);
-POINTER_TYPE(sockaddr_args_ptr, struct sockaddr_args);
-POINTER_TYPE(transfer_args_ptr, struct transfer_args);
-POINTER_TYPE(sockopt_args_ptr, struct sockopt_args);
-POINTER_TYPE(socket_args_ptr, struct socket_args);
-POINTER_TYPE(msghdr_ptr, struct msghdr);
-POINTER_TYPE(ifreq_ptr, struct ifreq);
-POINTER_TYPE(ifconf_ptr, struct ifconf);
+DEFINE_TYPE(fdset_ptr, fd_set *);
+POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
+POINTER_TYPE(transfer_args_ptr, transfer_args);
+POINTER_TYPE(sockopt_args_ptr, sockopt_args);
+POINTER_TYPE(socket_args_ptr, socket_args);
+POINTER_TYPE(msghdr_ptr, msghdr);
+POINTER_TYPE(ifreq_ptr, ifreq);
+POINTER_TYPE(ifconf_ptr, ifconf);

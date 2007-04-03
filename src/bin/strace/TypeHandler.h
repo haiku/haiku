@@ -97,13 +97,21 @@ struct TypeHandlerFactory<const char*> {
 		} \
 	} \
 
-DEFINE_FACTORY(fdset_ptr, struct fd_set *);
-DEFINE_FACTORY(sockaddr_args_ptr, struct sockaddr_args *);
-DEFINE_FACTORY(transfer_args_ptr, struct transfer_args *);
-DEFINE_FACTORY(sockopt_args_ptr, struct sockopt_args *);
-DEFINE_FACTORY(socket_args_ptr, struct socket_args *);
-DEFINE_FACTORY(ifreq_ptr, struct ifreq *);
-DEFINE_FACTORY(ifconf_ptr, struct ifconf *);
+struct fd_set;
+struct ifconf;
+struct ifreq;
+struct sockaddr_args;
+struct socket_args;
+struct sockopt_args;
+struct transfer_args;
+
+DEFINE_FACTORY(fdset_ptr, fd_set *);
+DEFINE_FACTORY(sockaddr_args_ptr, sockaddr_args *);
+DEFINE_FACTORY(transfer_args_ptr, transfer_args *);
+DEFINE_FACTORY(sockopt_args_ptr, sockopt_args *);
+DEFINE_FACTORY(socket_args_ptr, socket_args *);
+DEFINE_FACTORY(ifreq_ptr, ifreq *);
+DEFINE_FACTORY(ifconf_ptr, ifconf *);
 
 DEFINE_FACTORY(int_ptr, int *);
 DEFINE_FACTORY(long_ptr, long *);
