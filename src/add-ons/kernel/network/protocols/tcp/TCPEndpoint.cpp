@@ -430,7 +430,7 @@ TRACE(("  TCP:%p.Send() split buffer at %lu (buffer size %lu, mss %lu) -> %p\n",
 }
 
 
-size_t
+ssize_t
 TCPEndpoint::SendAvailable()
 {
 	TRACE(("TCP:%p.SendAvailable()\n", this));
@@ -487,13 +487,13 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 }
 
 
-size_t
+ssize_t
 TCPEndpoint::ReadAvailable()
 {
 	TRACE(("TCP:%p.ReadAvailable()\n", this));
 
 	RecursiveLocker locker(fLock);
-	return fReceiveQueue.Available();
+	return _AvailableBytesOrDisconnect();
 }
 
 
@@ -934,7 +934,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: real conditional locking needed!
-		gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
+		gSocketModule->notify(socket, B_SELECT_READ, _AvailableBytesOrDisconnect());
 
 		// other side is closing connection; change states
 		switch (fState) {
@@ -1215,6 +1215,20 @@ int
 TCPEndpoint::_GetMSS(const sockaddr *address) const
 {
 	return next->module->get_mtu(next, (sockaddr *)address) - sizeof(tcp_header);
+}
+
+
+ssize_t
+TCPEndpoint::_AvailableBytesOrDisconnect() const
+{
+	size_t availableBytes = fReceiveQueue.Available();
+	if (availableBytes > 0)
+		return availableBytes;
+
+	if ((fFlags & FLAG_NO_RECEIVE) != 0)
+		return ENOTCONN;
+
+	return 0;
 }
 
 

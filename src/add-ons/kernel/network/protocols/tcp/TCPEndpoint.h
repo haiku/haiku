@@ -41,9 +41,9 @@ class TCPEndpoint : public net_protocol {
 		status_t Listen(int count);
 		status_t Shutdown(int direction);
 		status_t SendData(net_buffer *buffer);
-		size_t SendAvailable();
+		ssize_t SendAvailable();
 		status_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
-		size_t ReadAvailable();
+		ssize_t ReadAvailable();
 
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
@@ -66,6 +66,7 @@ class TCPEndpoint : public net_protocol {
 			bool outstandingAcknowledge);
 		status_t _SendQueued(bool force = false);
 		int _GetMSS(const struct sockaddr *) const;
+		ssize_t _AvailableBytesOrDisconnect() const;
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
