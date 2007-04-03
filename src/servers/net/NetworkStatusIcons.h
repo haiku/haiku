@@ -9,7 +9,8 @@ enum {
 	kNetworkStatusNoDevice		= 1000,
 	kNetworkStatusNoConnection	= 1001,
 	kNetworkStatusNoSettings	= 1002,
-	kNetworkStatusReady			= 1003
+	kNetworkStatusConnecting	= 1003,
+	kNetworkStatusReady			= 1004
 };
 
 #endif // NETWORK_STATUS_ICONS_H
