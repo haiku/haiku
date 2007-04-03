@@ -8,6 +8,8 @@ SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
+DEFINES += DEBUG_APP="\\\"ramfs\\\"" ;
+
 KernelAddon ramfs
 	: Debug.cpp
 	  Locker.cpp
