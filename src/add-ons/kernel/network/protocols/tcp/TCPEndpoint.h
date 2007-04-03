@@ -65,6 +65,7 @@ class TCPEndpoint : public net_protocol {
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			bool outstandingAcknowledge);
 		status_t _SendQueued(bool force = false);
+		int _GetMSS(const struct sockaddr *) const;
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);

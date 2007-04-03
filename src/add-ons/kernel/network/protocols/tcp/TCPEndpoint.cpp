@@ -236,8 +236,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 		return status;
 	}
 
-	fReceiveMaxSegmentSize = next->module->get_mtu(next, (sockaddr *)address)
-		- sizeof(tcp_header);
+	fReceiveMaxSegmentSize = _GetMSS(address);
 
 	// Compute the window shift we advertise to our peer - if it doesn't support
 	// this option, this will be reset to 0 (when its SYN is received)
@@ -597,7 +596,7 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	endpoint->fReceiveQueue.SetInitialSequence(segment.sequence + 1);
 	endpoint->fState = SYNCHRONIZE_RECEIVED;
 	endpoint->fAcceptSemaphore = fAcceptSemaphore;
-	endpoint->fReceiveMaxSegmentSize = endpoint->fRoute->mtu - 40;
+	endpoint->fReceiveMaxSegmentSize = _GetMSS((sockaddr *)&newSocket->peer);
 		// 40 bytes for IP and TCP header without any options
 		// TODO: make this depending on the RTF_LOCAL flag?
 	endpoint->fReceiveNext = segment.sequence + 1;
@@ -1205,6 +1204,13 @@ TCPEndpoint::_SendQueued(bool force)
 	}
 
 	return B_OK;
+}
+
+
+int
+TCPEndpoint::_GetMSS(const sockaddr *address) const
+{
+	return next->module->get_mtu(next, (sockaddr *)address) - sizeof(tcp_header);
 }
 
 
