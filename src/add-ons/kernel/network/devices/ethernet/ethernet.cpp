@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,8 +16,9 @@
 
 #include <errno.h>
 #include <net/if.h>
-#include <net/if_types.h>
 #include <net/if_dl.h>
+#include <net/if_media.h>
+#include <net/if_types.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,6 @@ struct ethernet_device : net_device {
 	int		fd;
 	uint32	frame_size;
 };
-
 
 struct net_buffer_module_info *gBufferModule;
 
@@ -57,6 +57,7 @@ ethernet_init(const char *name, net_device **_device)
 	device->flags = IFF_BROADCAST;
 	device->type = IFT_ETHER;
 	device->mtu = 1500;
+	device->media = IFM_ACTIVE;
 	device->header_length = ETHER_HEADER_LENGTH;
 	device->fd = -1;
 
@@ -83,11 +84,6 @@ ethernet_up(net_device *_device)
 	device->fd = open(device->name, O_RDWR);
 	if (device->fd < 0)
 		return errno;
-
-	ether_init_params params;
-	memset(&params, 0, sizeof(ether_init_params));
-	if (ioctl(device->fd, ETHER_INIT, &params, sizeof(ether_init_params)) < 0)
-		goto err;
 
 	if (ioctl(device->fd, ETHER_GETADDR, device->address.data, ETHER_ADDRESS_LENGTH) < 0)
 		goto err;
@@ -243,9 +239,15 @@ ethernet_set_mtu(net_device *_device, size_t mtu)
 
 
 status_t
-ethernet_set_promiscuous(net_device *device, bool promiscuous)
+ethernet_set_promiscuous(net_device *_device, bool promiscuous)
 {
-	return EOPNOTSUPP;
+	ethernet_device *device = (ethernet_device *)_device;
+
+	int32 value = (int32)promiscuous;
+	if (ioctl(device->fd, ETHER_GETADDR, &value, sizeof(value)) < 0)
+		return EOPNOTSUPP;
+
+	return B_OK;
 }
 
 
