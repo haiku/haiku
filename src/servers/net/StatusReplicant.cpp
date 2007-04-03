@@ -6,18 +6,26 @@
  *		Hugo Santos, hugosantos@gmail.com
  */
 
-#include "NetServer.h"
+
 #include "StatusReplicant.h"
 
+#include "NetServer.h"
+#include "NetworkStatusIcons.h"
+
 #include <Alert.h>
+#include <Application.h>
+#include <Bitmap.h>
+#include <IconUtils.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Messenger.h>
+#include <Resources.h>
 #include <TextView.h>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/sockio.h>
+
 
 const char *kStatusReplicant = "NetStatusView";
 static const uint32 kShowConfiguration = 'shcf';
@@ -42,7 +50,6 @@ static const information_entry kInformationEntries[] = {
 	{ NULL }
 };
 
-
 static const char *kStatusDescriptions[] = {
 	"Unknown",
 	"No Link",
@@ -54,22 +61,25 @@ static const char *kStatusDescriptions[] = {
 
 StatusReplicant::StatusReplicant()
 	: BView(BRect(0, 0, 15, 15), kStatusReplicant, B_FOLLOW_ALL, 0),
-	  fPopup("", false, false)
+	fPopUp("", false, false)
 {
+	_Init();
 }
 
 
 StatusReplicant::StatusReplicant(BMessage *message)
-	: BView(message), fPopup("", false, false)
+	: BView(message),
+	fPopUp("", false, false)
 {
-	// TODO: Load status bitmaps from resources
-	for (int i = 0; i < kStatusCount; i++)
-		fBitmaps[i] = NULL;
+	_Init();
 }
 
 
 StatusReplicant::~StatusReplicant()
 {
+	for (int32 i = 0; i < kStatusCount; i++) {
+		delete fBitmaps[i];
+	}
 }
 
 
@@ -78,6 +88,7 @@ StatusReplicant::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, kStatusReplicant))
 		return new StatusReplicant(data);
+
 	return NULL;
 }
 
@@ -102,8 +113,8 @@ StatusReplicant::AttachedToWindow()
 		// TODO: Remove myself from Deskbar
 	}
 
-	ChangeStatus(kStatusUnknown);
-	PrepareMenu(InterfaceStatusList());
+	_ChangeStatus(kStatusUnknown);
+	_PrepareMenu(InterfaceStatusList());
 }
 
 
@@ -111,15 +122,16 @@ void
 StatusReplicant::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-	case kStatusUpdate:
-		UpdateFromMessage(message);
-		break;
-	case kShowConfiguration:
-		ShowConfiguration(message);
-		break;
-	default:
-		BView::MessageReceived(message);
-		break;
+		case kStatusUpdate:
+			_UpdateFromMessage(message);
+			break;
+		case kShowConfiguration:
+			_ShowConfiguration(message);
+			break;
+
+		default:
+			BView::MessageReceived(message);
+			break;
 	}
 }
 
@@ -133,49 +145,79 @@ StatusReplicant::MouseDown(BPoint point)
 	GetMouse(&where, &buttons, true);
 	where = ConvertToScreen(point);
 
-	fPopup.SetTargetForItems(this);
-	fPopup.Go(where, true, true);
+	fPopUp.SetTargetForItems(this);
+	fPopUp.Go(where, true, true);
 }
 
 
 void
-StatusReplicant::UpdateFromMessage(BMessage *message)
+StatusReplicant::_Init()
 {
-	int32 newStatus, intfStatus;
+	// Load status bitmaps from resources
 
+	BResources* resources = BApplication::AppResources();
+
+	for (int i = 0; i < kStatusCount; i++) {
+		fBitmaps[i] = NULL;
+
+		if (resources != NULL) {
+			const void* data = NULL;
+			size_t size;
+			data = resources->LoadResource(B_VECTOR_ICON_TYPE,
+				kNetworkStatusNoDevice + i, &size);
+			if (data != NULL) {
+				BBitmap* icon = new BBitmap(Bounds(), B_RGB32);
+				if (icon->InitCheck() == B_OK
+					&& BIconUtils::GetVectorIcon((const uint8 *)data,
+						size, icon) == B_OK) {
+					fBitmaps[i] = icon;
+				} else
+					delete icon;
+
+				free((void*)data);
+			}
+		}
+	}
+}
+
+
+void
+StatusReplicant::_UpdateFromMessage(BMessage *message)
+{
+	int32 newStatus;
 	if (message->FindInt32("net:status", &newStatus) != B_OK
-			|| newStatus < 0 || newStatus >= kStatusCount)
+		|| newStatus < 0 || newStatus >= kStatusCount)
 		return;
 
 	InterfaceStatusList status;
-	int index = 0;
-	while (message->FindInt32("intf:status", index, &intfStatus) == B_OK) {
-		if (intfStatus < 0 || intfStatus >= kStatusCount)
+	int32 interfaceStatus;
+
+	for (uint32 index = 0; message->FindInt32("interface:status", index,
+			&interfaceStatus) == B_OK; index++) {
+		if (interfaceStatus < 0 || interfaceStatus >= kStatusCount)
 			break;
 
 		const char *name;
-		if (message->FindString("intf:name", index, &name) != B_OK)
+		if (message->FindString("interface:name", index, &name) != B_OK)
 			break;
 
-		status.push_back(InterfaceStatus(name, intfStatus));
-
-		index++;
+		status.push_back(InterfaceStatus(name, interfaceStatus));
 	}
 
-	ChangeStatus(newStatus);
-	PrepareMenu(status);
+	_ChangeStatus(newStatus);
+	_PrepareMenu(status);
 }
 
 
 void
-StatusReplicant::ShowConfiguration(BMessage *message)
+StatusReplicant::_ShowConfiguration(BMessage *message)
 {
 	const char *device;
-	if (message->FindString("intf:name", &device) != B_OK)
+	if (message->FindString("interface:name", &device) != B_OK)
 		return;
 
 	int32 status;
-	if (message->FindInt32("intf:status", &status) != B_OK)
+	if (message->FindInt32("interface:status", &status) != B_OK)
 		return;
 
 	if (status != kStatusConnected && status != kStatusLinkNoConfig)
@@ -233,13 +275,13 @@ StatusReplicant::ShowConfiguration(BMessage *message)
 
 
 void
-StatusReplicant::PrepareMenu(const InterfaceStatusList &status)
+StatusReplicant::_PrepareMenu(const InterfaceStatusList &status)
 {
-	while (fPopup.RemoveItem((int32)0));
+	fPopUp.RemoveItems(0, fPopUp.CountItems(), true);
 
 	if (status.empty()) {
-		fPopup.AddItem(new BMenuItem("No interfaces available.", NULL));
-		fPopup.ItemAt(0)->SetEnabled(false);
+		fPopUp.AddItem(new BMenuItem("No interfaces available.", NULL));
+		fPopUp.ItemAt(0)->SetEnabled(false);
 	} else {
 		for (InterfaceStatusList::const_iterator i = status.begin();
 				i != status.end(); ++i) {
@@ -248,21 +290,21 @@ StatusReplicant::PrepareMenu(const InterfaceStatusList &status)
 			label += kStatusDescriptions[i->second];
 
 			BMessage *message = new BMessage(kShowConfiguration);
-			message->AddString("intf:name", i->first.c_str());
-			message->AddInt32("intf:status", i->second);
+			message->AddString("interface:name", i->first.c_str());
+			message->AddInt32("interface:status", i->second);
 
 			BMenuItem *item = new BMenuItem(label.c_str(), message);
 			if (i->second != kStatusConnected &&
 				i->second != kStatusLinkNoConfig)
 				item->SetEnabled(false);
-			fPopup.AddItem(item);
+			fPopUp.AddItem(item);
 		}
 	}
 }
 
 
 void
-StatusReplicant::ChangeStatus(int newStatus)
+StatusReplicant::_ChangeStatus(int newStatus)
 {
 	if (fBitmaps[newStatus]) {
 		SetViewColor(Parent()->ViewColor());

@@ -5,9 +5,9 @@
  * Authors:
  *		Hugo Santos, hugosantos@gmail.com
  */
-
 #ifndef _STATUS_REPLICANT_H
 #define _STATUS_REPLICANT_H
+
 
 #include "NetServer.h"
 
@@ -18,35 +18,38 @@
 #include <utility>
 #include <vector>
 
+
 static const uint32 kRegisterStatusReplicant = 'rnsr';
 static const uint32 kStatusUpdate = 'stup';
 extern const char *kStatusReplicant;
 
+
 class StatusReplicant : public BView {
-public:
-	StatusReplicant();
-	StatusReplicant(BMessage *);
-	virtual ~StatusReplicant();
+	public:
+		StatusReplicant();
+		StatusReplicant(BMessage *archive);
+		virtual ~StatusReplicant();
 
-	static StatusReplicant *Instantiate(BMessage *);
-	status_t Archive(BMessage *, bool deep) const;
+		static StatusReplicant *Instantiate(BMessage *archive);
+		status_t Archive(BMessage *archive, bool deep) const;
 
-	void AttachedToWindow();
-	void MessageReceived(BMessage *);
+		void AttachedToWindow();
+		void MessageReceived(BMessage *message);
 
-	void MouseDown(BPoint point);
+		void MouseDown(BPoint point);
 
-private:
-	typedef std::pair<std::string, int> InterfaceStatus;
-	typedef std::vector<InterfaceStatus> InterfaceStatusList;
+	private:
+		typedef std::pair<std::string, int> InterfaceStatus;
+		typedef std::vector<InterfaceStatus> InterfaceStatusList;
 
-	void UpdateFromMessage(BMessage *);
-	void ShowConfiguration(BMessage *);
-	void PrepareMenu(const InterfaceStatusList &);
-	void ChangeStatus(int newStatus);
+		void _Init();
+		void _UpdateFromMessage(BMessage *message);
+		void _ShowConfiguration(BMessage *message);
+		void _PrepareMenu(const InterfaceStatusList &list);
+		void _ChangeStatus(int newStatus);
 
-	BPopUpMenu fPopup;
-	BBitmap *fBitmaps[kStatusCount];
+		BPopUpMenu fPopUp;
+		BBitmap *fBitmaps[kStatusCount];
 };
 
-#endif
+#endif	// _STATUS_REPLICANT_H

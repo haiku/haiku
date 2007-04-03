@@ -990,8 +990,8 @@ NetServer::_UpdateReplicantStatus()
 		if (it->second > prevaling)
 			prevaling = it->second;
 
-		message.AddString("intf:name", it->first.c_str());
-		message.AddInt32("intf:status", it->second);
+		message.AddString("interface:name", it->first.c_str());
+		message.AddInt32("interface:status", it->second);
 	}
 
 	message.AddInt32("net:status", prevaling);
