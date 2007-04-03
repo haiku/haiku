@@ -16,13 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <KernelExport.h>
-#include <Errors.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <string.h>
-#include <driver_settings.h>
+
 
 #include "debug.h"
 #include "device.h"
@@ -30,6 +24,17 @@
 #include "util.h"
 #include "if_em.h"
 #include "if_compat.h"
+
+#include <KernelExport.h>
+#include <driver_settings.h>
+
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <net/if_media.h>
+#endif
 
 #undef malloc
 #undef free
@@ -331,11 +336,28 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			DEVICE_DEBUGOUT2("ipro1000_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)", device->maxframesize,  device->maxframesize - ENET_HEADER_SIZE);
 			*(uint32*)arg = device->maxframesize;
 			return B_OK;
-			
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#if 0
+		case ETHER_GETLINKSTATE:
+		{
+			ether_link_state_t state;
+			state.link_media = (info->link ? IFM_ACTIVE : 0)
+				| (info->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
+				| (info->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
+			state.link_speed = info->speed == LINK_SPEED_100_MBIT
+				? 100000 : 10000;
+			state.link_quality = 1000;
+
+			return user_memcpy(buffer, &state, sizeof(ether_link_state_t));
+		}
+#endif
+#endif
+
 		default:
 			DEVICE_DEBUGOUT("ipro1000_control() Invalid command");
 			break;
 	}
-	
-	return B_ERROR;
+
+	return B_BAD_VALUE;
 }

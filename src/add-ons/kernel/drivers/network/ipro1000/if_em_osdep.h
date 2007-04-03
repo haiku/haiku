@@ -34,16 +34,18 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _IF_EM_OSDEP_H_
 #define _IF_EM_OSDEP_H_
 
-#include <OS.h>
-#include <KernelExport.h>
-#include <sys/types.h>
-#include <malloc.h>
-#include <ByteOrder.h>
-#include <string.h>
 #include "driver.h"
 #include "device.h"
 #include "timer.h"
 #include "debug.h"
+
+#include <OS.h>
+#include <KernelExport.h>
+#include <ByteOrder.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 
 #define usec_delay(x) snooze(x)
 #define msec_delay(x) snooze(1000*(x))

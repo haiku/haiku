@@ -38,23 +38,30 @@
 #define IFCAP_TXCSUM			0x0010
 #define IFCAP_RXCSUM			0x0020
 
-#define IFM_ACTIVE	0x0001
-#define IFM_FDX		0x0002
-#define IFM_HDX		0x0004
-#define IFM_10_T	0x0008
-#define IFM_100_TX	0x0010
-#define IFM_1000_T	0x0020
-#define IFM_1000_TX	0x0040
-#define IFM_1000_SX	0x0080
-#define IFM_ETHER	0x0100
-#define IFM_AUTO	0x0200
-#define IFM_AVALID	0x0400
-#define IFM_GMASK	(IFM_FDX | IFM_HDX)
-#define IFM_TYPE_MASK (IFM_ETHER)
-#define IFM_SUBTYPE_MASK (IFM_AUTO | IFM_1000_SX | IFM_1000_TX | IFM_1000_T | IFM_100_TX | IFM_10_T)
-
-#define IFM_TYPE(media)		((media) & IFM_TYPE_MASK)
-#define IFM_SUBTYPE(media)	((media) & IFM_SUBTYPE_MASK)
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	define IFM_FDX		IFM_FULL_DUPLEX
+#	define IFM_HDX		IFM_HALF_DUPLEX
+#	define IFM_1000_TX	17
+#	define IFM_1000_SX	18
+#else
+#	define IFM_ACTIVE	0x0001
+#	define IFM_FDX		0x0002
+#	define IFM_HDX		0x0004
+#	define IFM_10_T		0x0008
+#	define IFM_100_TX	0x0010
+#	define IFM_1000_T	0x0020
+#	define IFM_1000_TX	0x0040
+#	define IFM_1000_SX	0x0080
+#	define IFM_ETHER	0x0100
+#	define IFM_AUTO		0x0200
+#	define IFM_AVALID	0x0400
+#	define IFM_GMASK	(IFM_FDX | IFM_HDX)
+#	define IFM_TYPE_MASK (IFM_ETHER)
+#	define IFM_SUBTYPE_MASK \
+		(IFM_AUTO | IFM_1000_SX | IFM_1000_TX | IFM_1000_T | IFM_100_TX | IFM_10_T)
+#	define IFM_TYPE(media)		((media) & IFM_TYPE_MASK)
+#	define IFM_SUBTYPE(media)	((media) & IFM_SUBTYPE_MASK)
+#endif
 
 #define CSUM_TCP			0x0001 // ifnet::if_hwassist
 #define CSUM_UDP			0x0002 // ifnet::if_hwassist
