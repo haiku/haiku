@@ -434,7 +434,9 @@ sis900_setMode(struct sis_info *info, int32 mode)
 	uint32 address = info->registers + SiS900_MAC_CONFIG;
 	uint32 txFlags = SiS900_Tx_AUTO_PADDING | SiS900_Tx_FILL_THRES;
 	uint32 rxFlags = 0;
-	int32 speed = mode & LINK_SPEED_MASK;
+
+	info->speed = mode & LINK_SPEED_MASK;
+	info->full_duplex = (mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX;
 
 	if (read32(address) & SiS900_MAC_CONFIG_EDB_MASTER) {
 		TRACE((DEVICE_NAME ": EDB master is set!\n"));
@@ -444,7 +446,7 @@ sis900_setMode(struct sis_info *info, int32 mode)
 
 	// link speed FIFO thresholds
 
-	if (speed == LINK_SPEED_HOME || speed == LINK_SPEED_10_MBIT) {
+	if (info->speed == LINK_SPEED_HOME || info->speed == LINK_SPEED_10_MBIT) {
 		rxFlags |= SiS900_Rx_10_MBIT_DRAIN_THRES;
 		txFlags |= SiS900_Tx_10_MBIT_DRAIN_THRES;
 	} else {
@@ -454,7 +456,7 @@ sis900_setMode(struct sis_info *info, int32 mode)
 
 	// duplex mode
 
-	if ((mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX) {
+	if (info->full_duplex) {
 		txFlags |= SiS900_Tx_CS_IGNORE | SiS900_Tx_HB_IGNORE;
 		rxFlags |= SiS900_Rx_ACCEPT_Tx_PACKETS;
 	}

@@ -1,10 +1,12 @@
-/* Kernel driver for SiS 900 networking
- *
- * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+/*
+ * Copyright (c) 2001-2007 pinc Software. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef DRIVER_H
 #define DRIVER_H
+
+
+#include <PCI.h>
 
 
 // PCI Communications

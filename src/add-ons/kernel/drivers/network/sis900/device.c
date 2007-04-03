@@ -1,25 +1,23 @@
-/* Device hooks for SiS 900 networking
- *
- * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+/*
+ * Copyright (c) 2001-2007 pinc Software. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
  */
 
+/*! Device hooks for SiS 900 networking */
 
-#include <OS.h>
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <PCI.h>
-#include <SupportDefs.h>
-#include <image.h>
+#include "device.h"
+
+#include "driver.h"
+#include "interface.h"
+#include "sis900.h"
+
 #include <driver_settings.h>
 
 #include <stdlib.h>
 #include <string.h>
-
-#include "ether_driver.h"
-#include "driver.h"
-#include "device.h"
-#include "sis900.h"
-#include "interface.h"
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <net/if_media.h>
+#endif
 
 
 /* device hooks prototypes */
@@ -362,32 +360,47 @@ device_ioctl(void *data, uint32 msg, void *buffer, size_t bufferLength)
 		case ETHER_GETADDR:
 			TRACE(("ioctl: get MAC address\n"));
 			memcpy(buffer, &info->address, 6);
-			return B_NO_ERROR;
+			return B_OK;
 
 		case ETHER_INIT:
 			TRACE(("ioctl: init\n"));
-			return B_NO_ERROR;
-	
+			return B_OK;
+
 		case ETHER_GETFRAMESIZE:
 			TRACE(("ioctl: get frame size\n"));
 			*(uint32*)buffer = MAX_FRAME_SIZE;
-			return B_NO_ERROR;
-	
+			return B_OK;
+
 		case ETHER_SETPROMISC:
 			TRACE(("ioctl: set promisc\n"));
 			sis900_setPromiscuous(info, *(uint32 *)buffer != 0);
 			return B_OK;
-	
+
 		case ETHER_NONBLOCK:
 			info->blockFlag = *(int32 *)buffer ? B_TIMEOUT : 0;
 			TRACE(("ioctl: non blocking ? %s\n", info->blockFlag ? "yes" : "no"));
-			return B_NO_ERROR;
-	
+			return B_OK;
+
 		case ETHER_ADDMULTI:
 			TRACE(("ioctl: add multicast\n"));
 			/* not yet implemented */
 			break;
-		
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		case ETHER_GETLINKSTATE:
+		{
+			ether_link_state_t state;
+			state.link_media = (info->link ? IFM_ACTIVE : 0)
+				| (info->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
+				| (info->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
+			state.link_speed = info->speed == LINK_SPEED_100_MBIT
+				? 100000 : 10000;
+			state.link_quality = 1000;
+
+			return user_memcpy(buffer, &state, sizeof(ether_link_state_t));
+		}
+#endif
+
 		default:
 			TRACE(("ioctl: unknown message %lu (length = %ld)\n", msg, bufferLength));
 			break;

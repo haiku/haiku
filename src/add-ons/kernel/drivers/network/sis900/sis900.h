@@ -1,13 +1,16 @@
-/* SiS 900 driver/chip specific definitions
- *
- * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+/*
+ * Copyright (c) 2001-2007 pinc Software. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef SIS900_H
 #define SIS900_H
 
+/*! SiS 900 driver/chip specific definitions */
 
-#include "ether_driver.h"
+#include <ether_driver.h>
+
+#include <KernelExport.h>
+#include <PCI.h>
 
 
 #define VENDOR_ID_SiS		0x1039
@@ -98,6 +101,8 @@ struct sis_info {
 	uint16			phy;
 	bool			autoNegotiationComplete;
 	bool			link;
+	bool			full_duplex;
+	uint16			speed;
 	uint16			fixedMode;
 
 	// receive data
