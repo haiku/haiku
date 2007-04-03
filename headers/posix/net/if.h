@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NET_IF_H
@@ -56,16 +56,19 @@ struct ifreq {
 };
 
 /* interface flags */
-#define IFF_UP			0x0001
-#define IFF_BROADCAST	0x0002	/* valid broadcast address */
-#define IFF_LOOPBACK	0x0008
-#define IFF_POINTOPOINT	0x0010	/* point-to-point link */
-#define IFF_NOARP		0x0040	/* no address resolution */
-#define IFF_AUTOUP		0x0080	/* auto dial */
-#define IFF_PROMISC		0x0100	/* receive all packets */
-#define IFF_ALLMULTI	0x0200	/* receive all multicast packets */
-#define IFF_SIMPLEX		0x0800	/* doesn't receive own transmissions */
-#define IFF_MULTICAST	0x8000	/* supports multicast */
+#define IFF_UP				0x0001
+#define IFF_BROADCAST		0x0002	/* valid broadcast address */
+#define IFF_LOOPBACK		0x0008
+#define IFF_POINTOPOINT		0x0010	/* point-to-point link */
+#define IFF_NOARP			0x0040	/* no address resolution */
+#define IFF_AUTOUP			0x0080	/* auto dial */
+#define IFF_PROMISC			0x0100	/* receive all packets */
+#define IFF_ALLMULTI		0x0200	/* receive all multicast packets */
+#define IFF_SIMPLEX			0x0800	/* doesn't receive own transmissions */
+#define IFF_LINK			0x1000	/* has link */
+#define IFF_AUTO_CONFIGURED	0x2000	/* has been automatically configured */
+#define IFF_CONFIGURING		0x4000	/* auto configuration in progress */
+#define IFF_MULTICAST		0x8000	/* supports multicast */
 
 struct ifconf {
 	int			ifc_len;	/* size of buffer */
