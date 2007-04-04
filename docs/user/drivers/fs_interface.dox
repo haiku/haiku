@@ -126,6 +126,118 @@ reference to the vnode exists.
 */
 
 /*!
+\fn status_t (*file_system_module_info::mount)(mount_id id, const char *device,
+	uint32 flags, const char *args, fs_volume *_fs, vnode_id *_rootVnodeID)
+\brief Mount a volume according to the specified parameters.
+
+Invoked by the VFS when it has been requested to mount the volume. The FS is
+supposed to perform whatever one-time initialization is necessary for the
+volume. It is required to create a volume handle for the volume and pass it
+back in \a _fs. Moreover it must invoke publish_vnode() for the root node
+of the volume and pass the ID of the volume back in \a _rootVnodeID.
+
+A disk-based FS will need to check whether \a device is not \c NULL, open
+it, and analyze whether the device or image file actually represents a volume
+of that FS type.
+
+If mounting the volume fails for whatever reason, the hook must return an
+error code other than \c B_OK. In this case all resources allocated by the
+hook must be freed before returning. If and only if \c B_OK is returned, the
+unmount() hook will be invoked at a later point when unmounting the volume.
+
+\param id The ID of the volume to be mounted. It should be saved in the FS's
+	volume private data (volume handle).
+\param device The path to the device (or image file) representing the volume
+	to be mounted. Can be \c NULL.
+\param flags Flags:
+	- \c B_MOUNT_READ_ONLY: Mount the volume read-only.
+\param args Null-terminated string in driver settings format, containing FS
+	specific parameters.
+\param _fs Pointer to a pre-allocated variable the volume handle shall be
+	written to.
+\param _rootVnodeID Pointer to a pre-allocated variable the ID of the volume's
+	root directory shall be written to.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::unmount)(fs_volume fs)
+\brief Unmounts the given volume.
+
+Invoked by the VFS when it is asked to unmount the volume. The function must
+free all resources associated with the mounted volume, including the volume
+handle. Although the mount() hook called publish_vnode() for the root node
+of the volume, unmount() must not invoke put_vnode().
+
+\param fs The volume handle.
+\return \c B_OK if everything went fine, another error code otherwise. The
+	error code will be ignored, though.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::read_fs_info)(fs_volume fs,
+	struct fs_info *info)
+\brief Retrieves general information about the volume.
+
+The following fields of the \c fs_info structure need to be filled in:
+- \c flags: Flags applying to the volume, e.g. \c B_FS_IS_READONLY,
+	\c B_FS_HAS_ATTR, etc.
+- \c block_size: The size of blocks the volume data are organized in.
+	Meaningful mainly for disk-based FSs, other FSs should use some reasonable
+	value for computing \c total_blocks and \c free_blocks.
+- \c io_size: Preferred size of the buffers passed to read() and write().
+- \c total_blocks: Total number of blocks the volume contains.
+- \c free_blocks: Number of free blocks on the volume.
+- \c total_nodes: Maximal number of nodes the volume can contain. If there is
+	no such limitation use \c LONGLONG_MAX.
+- \c free_nodes: Number of additional nodes the volume could contain. If there
+	is no such limitation use \c LONGLONG_MAX.
+- \c device_name: The name of the device or image file containing the volume.
+	Non-disk-based FSs shall fill in an empty string.
+- \c volume_name: The name of the volume.
+
+The other values are filled in by the VFS.
+
+\param fs The volume handle.
+\param info Pointer to a pre-allocated variable the FS info shall be written
+	to.
+\return \c B_OK if everything went fine, another error code otherwise. The
+	error code will be ignored, though.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::lookup)(fs_volume fs, fs_vnode dir,
+	const char *name, vnode_id *_id, int *_type)
+\brief Looks up the node a directory entry refers to.
+
+The VFS uses this hook to resolve path names to vnodes. It is used quite often
+and should be implemented efficiently.
+
+If the parameter \a dir does not specify a directory, the function shall fail.
+It shall also fail, if it is a directory, but does not contain an entry with
+the given name \a name. Otherwise the function shall invoke get_vnode() for
+the node the entry refers to and pass back the ID and the type of the node
+in \a _id and \a _type respectively.
+
+Note that a directory must contain the special entries \c "." and \c "..",
+referring to the same directory and the parent directory respectively.
+lookup() must resolve the nodes accordingly. \c ".." for the root directory
+of the volume shall be resolved to the root directory itself.
+
+\param fs The volume handle.
+\param dir The node handle of the directory.
+\param name The name of the directory entry.
+\param _id Pointer to a pre-allocated variable the ID of the found node
+	shall be written to.
+\param _type Pointer to a pre-allocated variable the type of the found node
+	shall be written to. The type is encoded as in the \c st_mode field of a
+	<tt>struct stat</tt> (bitwise anded with \c S_IFMT).
+\retval B_OK Everything went fine.
+\retval B_ENTRY_NOT_FOUND The given directory does not contain an entry with
+	the given name.
+*/
+
+/*!
 \fn status_t (*file_system_module_info::get_vnode)(fs_volume fs, vnode_id id,
 	fs_vnode *_vnode, bool reenter)
 \brief Creates the private data handle to be associated with the node referred
@@ -135,8 +247,8 @@ Invoked by the VFS when it creates the vnode for the respective node.
 
 \param fs The volume handle.
 \param id The ID of the node.
-\param _vnode Pointer to a pre-allocated variable the private data handle
-	shall be written to.
+\param _vnode Pointer to a pre-allocated variable the node handle shall be
+	written to.
 \param reenter \c true if the hook invocation has been caused by the FS itself,
 	e.g. by invoking ::get_vnode().
 \return \c B_OK if everything went fine, another error code otherwise.
@@ -151,7 +263,7 @@ Invoked by the VFS when it deletes the vnode for the respective node and the
 node is not marked removed.
 
 \param fs The volume handle.
-\param vnode The private data handle for the node.
+\param vnode The node handle.
 \param reenter \c true if the hook invocation has been caused by the FS itself,
 	e.g. by invoking ::put_vnode().
 \return \c B_OK if everything went fine, another error code otherwise.
@@ -159,15 +271,298 @@ node is not marked removed.
 
 /*!
 \fn status_t (*file_system_module_info::remove_vnode)(fs_volume fs,
-	fs_vnode vnode, bool reenter);
+	fs_vnode vnode, bool reenter)
 \brief Deletes the private data handle associated with the specified node.
 
 Invoked by the VFS when it deletes the vnode for the respective node and the
 node is marked removed.
 
 \param fs The volume handle.
-\param vnode The private data handle for the node.
+\param vnode The node handle.
 \param reenter \c true if the hook invocation has been caused by the FS itself,
 	e.g. by invoking ::put_vnode().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::read_symlink)(fs_volume fs,
+	fs_vnode link, char *buffer, size_t *_bufferSize)
+\brief Reads the value of a symlink.
+
+If the function is successful, the string written to the buffer shall be
+null-terminated and the variable \a _bufferSize points to shall be set to
+the length of that string, including the terminating null character.
+
+\param fs The volume handle.
+\param link The node handle.
+\param buffer Pointer to a pre-allocated buffer the link value shall be written
+	to.
+\param buffer Pointer to a pre-allocated variable containing the size of the
+	buffer supplied to the function. Upon successful completion the hook shall
+	store the number of bytes actually written into the buffer in the variable.
+\retval B_OK Everything went fine.
+\retval B_BAD_VALUE \a link does not identify a symbolic link.
+\retval B_BUFFER_OVERFLOW The supplied buffer is not big enough to contain the
+	complete link value.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::access)(fs_volume fs, fs_vnode vnode,
+	int mode)
+\brief Checks whether the current user is allowed to access the node in the
+	specified way.
+
+\a mode is a bitwise combination of:
+- \c R_OK: Read access.
+- \c W_OK: Write access.
+- \c X_OK: Execution.
+
+If the current user does not have any of the access permissions represented
+by the set bits, the function shall return \c B_NOT_ALLOWED. As a special case,
+if the volume is read-only and write access is requested,
+\c B_READ_ONLY_DEVICE shall be returned. If the requested access mode complies
+with the user's access permissions, the function shall return \c B_OK.
+
+For most FSs the permissions a user has are defined by the \c st_mode,
+\c st_uid, and \c st_gid fields of the node's stat data. As a special
+exception, the root user (<tt>geteuid() == 0<\tt>) does always have
+read and write permissions, execution permission only when at least one of the
+execution permission bits are set.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param mode The access mode mask.
+\retval B_OK The user has the permissions to access the node in the requested
+	way.
+\retval B_READ_ONLY_DEVICE The volume is read-only, but the write access has
+	been requested.
+\retval B_NOT_ALLOWED The user does not have all permissions to access the node
+	in the requested way.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::read_stat)(fs_volume fs,
+	fs_vnode vnode, struct stat *stat)
+\brief Retrieves the stat data for a given node.
+
+All values of the <tt>struct stat</tt> save \c st_dev, \c st_ino, \c st_rdev,
+and \c st_type need to be filled in.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param stat Pointer to a pre-allocated variable the stat data shall be written
+	to.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::open)(fs_volume fs, fs_vnode vnode,
+	int openMode, fs_cookie *_cookie)
+\brief Opens the given node.
+
+The function shall check whether it is possible to open the node according to
+the mode specified by \c openMode (also considering the user's access
+permissions), create a node cookie, and store it in the variable
+\a _cookie points to.
+
+The open mode \a openMode is encoded in the same way as the parameter of the
+POSIX function \c open(), i.e. it is either \c O_RDONLY, \c O_WRONLY, or
+\c O_RDWR, bitwise or'ed with flags. The only relevant flags for this hook are
+\c O_TRUNC and \c O_NONBLOCK.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param openMode The open mode.
+\param _cookie Pointer to a pre-allocated variable the node cookie shall be
+	written to.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::close)(fs_volume fs, fs_vnode vnode,
+	fs_cookie cookie)
+\brief Closes the given node cookie.
+
+The hook is invoked, when closing the node has been requested. At this point
+other threads might still use the cookie, i.e. still execute hooks to which
+the cookie has been passed. If the FS supports blocking I/O operations, this
+hook should make sure to unblock all currently blocking threads performing
+an operation using the cookie, and mark the cookie such that no further
+threads will block using it.
+
+For many FSs this hook is a no-op.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The node cookie as returned by open().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::free_cookie)(fs_volume fs,
+	fs_vnode vnode, fs_cookie cookie)
+\brief Frees the given node cookie.
+
+The hook is invoked after close(), when no other thread uses or is going to
+use the cookie. All resources associated with the cookie must be freed.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The node cookie as returned by open().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::read)(fs_volume fs, fs_vnode vnode,
+	fs_cookie cookie, off_t pos, void *buffer, size_t *length)
+\brief Reads data from a file.
+
+The function shall failed if
+- the node is not a file,
+- the cookie has not been opened for reading,
+- \a pos is negative, or
+- some other error occurs while trying to read the data, and no data have been
+	read at all.
+
+The number of bytes to be read is stored in the variable pointed to by
+\a length. If less data are available at file position \a pos, or if \a pos
+if greater than the size of the file, only as many data as available shall
+be read, the function shall store the number of bytes actually read into the
+variable pointed to by \a length, and return \c B_OK.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The node cookie as returned by open().
+\param pos The file position where to start reading data.
+\param buffer Pointer to a pre-allocated buffer the read data shall be
+	written to.
+\param length Pointer to a pre-allocated variable containing the size of the
+	buffer when invoked, and into which the size of the data actually read
+	shall be written.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::open_dir)(fs_volume fs, fs_vnode vnode,
+	fs_cookie *_cookie)
+\brief Opens the given directory node.
+
+If the specified node is not a directory, or if the current user does not have
+the permissions to read the directory, the function shall fail. Otherwise it
+shall allocate a directory cookie and store it in the variable \a _cookie
+points to. A subsequent read_dir() using the cookie shall start reading the
+first entry of the directory.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param _cookie Pointer to a pre-allocated variable the directory cookie shall
+	be written to.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::close_dir)(fs_volume fs,
+	fs_vnode vnode, fs_cookie cookie)
+\brief Closes the given directory cookie.
+
+Generally the situation is similar to the one described for close(). In
+practice it is a bit, though, since directory cookies are exclusively used
+for directory iteration, and it normally doesn't make sense to have multiple
+threads read the same directory concurrently. Furthermore reading a directory
+should not block. Therefore for most FSs this hook is a no-op.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The directory cookie as returned by open_dir().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::free_dir_cookie)(fs_volume fs,
+	fs_vnode vnode, fs_cookie cookie)
+\brief Frees the given directory cookie.
+
+The hook is invoked after close_dir(), when no other thread uses or is going
+to use the cookie. All resources associated with the cookie must be freed.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The directory cookie as returned by open_dir().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::read_dir)(fs_volume fs, fs_vnode vnode,
+	fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
+\brief Reads the next one or more directory entries.
+
+The number of entries to be read at maximum is stored in the variable \a _num
+points to.
+
+Per read \c dirent the following fields have to be filled in:
+- \c d_dev: The volume ID.
+- \c d_ino: The ID of the node the entry refers to.
+- \c d_name: The null-terminated name of the entry.
+- \c d_reclen: The size of the \c dirent structure in bytes, starting from
+	the beginning of the structure, counting all bytes up to and including
+	the null-termination char of the name stored in \c d_name.
+
+If more than one entry is read, the corresponding \c dirent structures are
+tightly packed, i.e. the second entry begins directly after the end of the
+first one (i.e. \c d_reclen bytes after the beginning of the first one).
+Most FSs read only one entry at a time though, even if more are requested.
+
+When the function is invoked after the end of the directory has been reached,
+it shall set the variable \a _num points to to \c 0 and return \c B_OK. If the
+provided buffer is too small to contain even the single next entry,
+\c B_BUFFER_OVERFLOW shall be returned. It shall not fail, if at least one
+entry has been read, and the buffer is just too small to hold as many entries
+as requested.
+
+Note that a directory is expected to contain the special entries \c "." and
+\c "..", referring to the same directory and the parent directory respectively.
+The \c dirent structure returned for the \c ".." entry of the volume's root
+directory shall refer to the root node itself.
+
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The directory cookie as returned by open_dir().
+\param buffer Pointer to a pre-allocated buffer the directory entries shall be
+	written to.
+\param bufferSize The size of \a buffer in bytes.
+\param _num Pointer to a pre-allocated variable, when invoked, containing the
+	number of directory entries to be read, and into which the number of
+	entries actually read shall be written.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::rewind_dir)(fs_volume fs,
+	fs_vnode vnode, fs_cookie cookie)
+\brief Resets the directory cookie to the first entry of the directory.
+\param fs The volume handle.
+\param vnode The node handle.
+\param cookie The directory cookie as returned by open_dir().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+
+/*!
+\fn status_t (*file_system_module_info::read_query)(fs_volume fs,
+	fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
+\brief Reads the next one or more entries matching the query.
+
+This hook function works pretty much the same way as read_dir(), with the
+difference that it doesn't read the entries of a directory, but the entries
+matching the given query.
+
+\param fs The volume handle.
+\param cookie The query cookie as returned by open_query().
+\param buffer Pointer to a pre-allocated buffer the directory entries shall be
+	written to.
+\param bufferSize The size of \a buffer in bytes.
+\param _num Pointer to a pre-allocated variable, when invoked, containing the
+	number of entries to be read, and into which the number of entries
+	actually read shall be written.
 \return \c B_OK if everything went fine, another error code otherwise.
 */

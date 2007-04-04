@@ -119,5 +119,81 @@ handle is passed. When the VFS deletes the vnode, it invokes the FS's
 hook or, if the node was marked removed,
 \link file_system_module_info::remove_vnode remove_vnode() \endlink.
 
-*/
+There are only four FS hooks through which the VFS gains knowledge of the
+existence of a node. The first one is the
+\link file_system_module_info::mount mount() \endlink
+hook. It is supposed to call \c publish_vnode() for the root node of the volume
+and return its ID. The second one is the
+\link file_system_module_info::lookup lookup() \endlink
+hook. Given a node handle of a directory and an entry name, it is supposed to
+call \c get_vnode() for the node the entry refers to and return the node ID.
+The remaining two hooks,
+\link file_system_module_info::read_dir read_dir() \endlink
+and
+\link file_system_module_info::read_query read_query() \endlink,
+both return entries in a <tt>struct dirent</tt> structure, which also contains
+the ID of the node the entry refers to.
 
+
+\section mandatory_hooks Mandatory Hooks
+
+Which hooks a FS module should provide mainly depends on what functionality
+it features. E.g. a FS without support for attribute, indices, and/or queries
+can omit the respective hooks (i.e. set them to \c NULL in the module
+structure). Some hooks are mandatory, though. A minimal read-only FS module
+must implement:
+
+- \link file_system_module_info::mount mount() \endlink and
+  \link file_system_module_info::unmount unmount() \endlink:
+  Mounting and unmounting a volume is required for pretty obvious reasons.
+
+- \link file_system_module_info::lookup lookup() \endlink:
+  The VFS uses this hook to resolve path names. It is probably one of the
+  most frequently invoked hooks.
+
+- \link file_system_module_info::get_vnode get_vnode() \endlink and
+  \link file_system_module_info::put_vnode put_vnode() \endlink:
+  Create respectively destroy the FS's private node handle when
+  the VFS creates/deletes the vnode for a particular node.
+
+- \link file_system_module_info::read_stat read_stat() \endlink:
+  Return a <tt>struct stat</tt> info for the given node, consisting of the
+  type and size of the node, its owner and access permissions, as well as
+  certain access times.
+
+- \link file_system_module_info::open open() \endlink,
+  \link file_system_module_info::close close() \endlink, and
+  \link file_system_module_info::free_cookie free_cookie() \endlink:
+  Open and close a node as explained in \ref concepts.
+
+- \link file_system_module_info::read read() \endlink:
+  Read data from an opened node (file). Even if the FS does not feature files,
+  the hook has to be present anyway; it should return an error in this case.
+
+- \link file_system_module_info::open_dir open_dir() \endlink,
+  \link file_system_module_info::close_dir close_dir() \endlink, and
+  \link file_system_module_info::free_dir_cookie free_dir_cookie() \endlink:
+  Open and close a directory for entry iteration as explained in \ref concepts.
+
+- \link file_system_module_info::read_dir read_dir() \endlink and
+  \link file_system_module_info::rewind_dir rewind_dir() \endlink:
+  Read the next entry/entries from a directory, respectively reset the iterator
+  to the first entry, as explained in \ref concepts.
+
+Although not strictly mandatory, a FS should additionally implement the
+following hooks:
+
+- \link file_system_module_info::read_fs_info read_fs_info() \endlink:
+  Return general information about the volume, e.g. total and free size, and
+  what special features (attributes, MIME types, queries) the volume/FS
+  supports.
+
+- \link file_system_module_info::read_symlink read_symlink() \endlink:
+  Read the value of a symbolic link. Needed only, if the FS and volume support
+  symbolic links at all. If absent symbolic links stored on the volume won't
+  be interpreted.
+
+- \link file_system_module_info::access access() \endlink:
+  Return whether the current user has the given access permissions for a node.
+  If the hook is absent the user is considerd to have all permissions.
+*/
