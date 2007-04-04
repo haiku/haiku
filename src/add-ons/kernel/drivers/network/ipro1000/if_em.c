@@ -52,7 +52,7 @@ static int  em_ioctl(struct ifnet *, u_long, caddr_t);
 static void em_watchdog(struct ifnet *);
 static void em_init(void *);
 static void em_stop(void *);
-//static void em_media_status(struct ifnet *, struct ifmediareq *);
+void em_media_status(struct ifnet *, struct ifmediareq *);
 //static int  em_media_change(struct ifnet *);
 static void em_identify_hardware(struct adapter *);
 static int  em_allocate_pci_resources(struct adapter *);
@@ -808,6 +808,12 @@ event_handler(void *cookie)
 			em_check_for_link(&adapter->hw);
 			em_print_link_status(adapter);
 			adapter->timer_handle =	timeout(em_local_timer, adapter, 2*hz);
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			if (adapter->osdep.dev->linkChangeSem != -1)
+				release_sem_etc(adapter->osdep.dev->linkChangeSem, 1,
+								B_DO_NOT_RESCHEDULE);
+#endif
 		}
 
 	}

@@ -48,6 +48,10 @@ typedef struct device {
 
 	uint32				maxframesize;	// 14 bytes header + MTU
 	uint8				macaddr[6];
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	sem_id				linkChangeSem;
+#endif
 } ipro1000_device;
 
 #endif

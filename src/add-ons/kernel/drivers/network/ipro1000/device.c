@@ -110,6 +110,10 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 	device->pciFunc	= device->pciInfo->function;
 	device->adapter = 0;
 	device->maxframesize = 1514; // XXX is MAXIMUM_ETHERNET_FRAME_SIZE = 1518 too much?
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	device->linkChangeSem = -1;
+#endif
 	
 	ipro1000_read_settings(device);
 
@@ -362,6 +366,15 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			state.quality = 1000;
 
 			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
+		}
+
+		case ETHER_SET_LINK_STATE_SEM:
+		{
+			if (user_memcpy(&device->linkChangeSem, arg, sizeof(sem_id *)) < B_OK) {
+				device->linkChangeSem = -1;
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
 		}
 #endif
 
