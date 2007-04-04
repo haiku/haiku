@@ -808,20 +808,21 @@ socket_recvmsg(net_socket *socket, msghdr *header, int flags)
 	//         full datagram so we can cut it here with MSG_TRUNC
 	//       - returning a NULL buffer when received 0 bytes
 	//         may not make much sense as we still need the address
+	//       - gNetBufferModule.read() uses memcpy() instead of user_memcpy
 
+	size_t nameLen = header->msg_namelen;
 	header->msg_namelen = 0;
 	header->msg_flags = 0;
 
 	if (buffer == NULL)
 		return 0;
 
-	size_t bytesReceived = 0;
-	for (i = 0; i < header->msg_iovlen && bytesReceived < buffer->size; i++) {
-		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) != B_OK)
+	size_t bufferSize = buffer->size, bytesReceived = 0;
+	for (i = 0; i < header->msg_iovlen && bytesReceived < bufferSize; i++) {
+		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
 			break;
 
-		size_t toRead = min_c(buffer->size - bytesReceived, tmp.iov_len);
-
+		size_t toRead = min_c(bufferSize - bytesReceived, tmp.iov_len);
 		if (gNetBufferModule.read(buffer, bytesReceived, tmp.iov_base,
 									toRead) < B_OK)
 			break;
@@ -829,14 +830,11 @@ socket_recvmsg(net_socket *socket, msghdr *header, int flags)
 		bytesReceived += toRead;
 	}
 
-	if (bytesReceived == buffer->size) {
-		if (header->msg_namelen >= buffer->source.ss_len) {
-			memcpy(header->msg_name, &buffer->source, buffer->source.ss_len);
-			header->msg_namelen = buffer->source.ss_len;
-		}
+	if (bytesReceived == buffer->size && header->msg_name != NULL) {
+		header->msg_namelen = min_c(nameLen, buffer->source.ss_len);
+		memcpy(header->msg_name, &buffer->source, header->msg_namelen);
 	}
 
-	size_t bufferSize = buffer->size;
 	gNetBufferModule.free(buffer);
 
 	if (bytesReceived < bufferSize)
@@ -955,18 +953,22 @@ socket_sendmsg(net_socket *socket, msghdr *header, int flags)
 	const sockaddr *address = (const sockaddr *)header->msg_name;
 	socklen_t addressLength = header->msg_namelen;
 
-	if ((address == NULL || addressLength == 0) && socket->peer.ss_len != 0) {
-		// socket is connected, we use that address:
+	if (addressLength == 0)
+		address = NULL;
+	else if (addressLength != 0 && address == NULL)
+		return B_BAD_VALUE;
+
+	if (socket->peer.ss_len != 0) {
+		if (address != NULL)
+			return EISCONN;
+
+		// socket is connected, we use that address
 		address = (struct sockaddr *)&socket->peer;
 		addressLength = socket->peer.ss_len;
 	}
 	if (address == NULL || addressLength == 0) {
 		// don't know where to send to:
 		return EDESTADDRREQ;
-	}
-	if (socket->peer.ss_len != 0) {
-		// an address has been given but socket is connected already:
-		return EISCONN;
 	}
 
 	if (socket->address.ss_len == 0) {
@@ -995,8 +997,9 @@ socket_sendmsg(net_socket *socket, msghdr *header, int flags)
 		length += tmp.iov_len;
 	}
 
+	buffer->flags = flags;
 	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
-	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
+	memcpy(&buffer->destination, address, addressLength);
 
 	status_t status = socket->first_info->send_data(socket->first_protocol,
 		buffer);
