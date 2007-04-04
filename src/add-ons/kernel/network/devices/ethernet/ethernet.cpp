@@ -64,6 +64,11 @@ update_link_state(ethernet_device *device, bool notify = true)
 		device->link_quality = state.quality;
 		device->link_speed = state.speed;
 
+		dprintf("%s: media change, media 0x%0x quality %u speed %u\n",
+				device->name, (unsigned int)device->media,
+				(unsigned int)device->link_quality,
+				(unsigned int)device->link_speed);
+
 		if (notify)
 			sStackModule->device_link_changed(device);
 	}

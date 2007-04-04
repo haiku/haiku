@@ -351,6 +351,8 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			em_media_status(&ifp, &mediareq);
 
 			state.media = mediareq.ifm_active;
+			if (mediareq.ifm_status & IFM_ACTIVE)
+				state.media |= IFM_ACTIVE;
 			if (mediareq.ifm_active & IFM_10_T)
 				state.speed = 10000;
 			else if (mediareq.ifm_active & IFM_100_TX)
