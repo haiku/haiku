@@ -32,3 +32,7 @@ _IO_ftrylockfile(_IO_FILE *stream)
 	//return __libc_lock_trylock_recursive(*stream->_lock);
 	return 1;
 }
+
+weak_alias (_IO_flockfile, flockfile);
+weak_alias (_IO_funlockfile, funlockfile);
+weak_alias (_IO_ftrylockfile, ftrylockfile);
