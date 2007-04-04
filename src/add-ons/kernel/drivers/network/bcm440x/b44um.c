@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Nathan Whitehorn.
+ * Copyright 2006-2007, Nathan Whitehorn.
  * Distributed under the terms of the GPL License.
  */
 
@@ -237,40 +237,45 @@ b44_ioctl(void *cookie,uint32 op,void *data,size_t len)
 		case ETHER_REMMULTI:
 			return (b44_LM_MulticastDel(&pUmDevice->lm_dev,(PLM_UINT8)(data)) == LM_STATUS_SUCCESS) ? B_OK : B_ERROR;
 		case ETHER_SETPROMISC:
-			if (*((uint8 *)(data)))
+			if (*((uint8 *)(data))) {
 				b44_LM_SetReceiveMask(&pUmDevice->lm_dev,
 					pUmDevice->lm_dev.ReceiveMask | LM_PROMISCUOUS_MODE);
-			else
+			} else {
 				 b44_LM_SetReceiveMask(&pUmDevice->lm_dev,
 					pUmDevice->lm_dev.ReceiveMask & ~LM_PROMISCUOUS_MODE);
+			}
 			return B_OK;
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
-		case ETHER_GETLINKSTATE: {
+		case ETHER_GETLINKSTATE:
+		{
 			ether_link_state_t *state_buffer = (ether_link_state_t *)(data);
 			state_buffer->link_speed = (pUmDevice->lm_dev.LineSpeed == LM_LINE_SPEED_10MBPS) ? 10 : 100;
 			state_buffer->link_quality = (pUmDevice->lm_dev.LinkStatus == LM_STATUS_LINK_DOWN) ? 0.0 : 1.0;
 			state_buffer->duplex_mode = (pUmDevice->lm_dev.DuplexMode == LM_DUPLEX_MODE_FULL);
-			} return B_OK;
+			return B_OK;
+		}
 #else
-		case ETHER_GETLINKSTATE:
+		case ETHER_GET_LINK_STATE:
 		{
 			ether_link_state_t state;
-			state.link_media = (pUmDevice->lm_dev.LinkStatus == LM_STATUS_LINK_DOWN) ? IFM_ACTIVE : 0;
+			state.media = (pUmDevice->lm_dev.LinkStatus
+				== LM_STATUS_LINK_DOWN) ? IFM_ACTIVE : 0;
 			switch (pUmDevice->lm_dev.LineSpeed) {
 				case LM_LINE_SPEED_10MBPS:
-					state.link_media |= IFM_10_T;
-					state.link_speed = 10000;
+					state.media |= IFM_10_T;
+					state.speed = 10000;
 					break;
 				case LM_LINE_SPEED_100MBPS:
-					state.link_media |= IFM_100_TX;
-					state.link_speed = 100000;
+					state.media |= IFM_100_TX;
+					state.speed = 100000;
 					break;
 				default:
-					state.link_speed = 0;
+					state.speed = 0;
 			}
-			state.link_media |= (pUmDevice->lm_dev.DuplexMode == LM_DUPLEX_MODE_FULL ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX);
-			state.link_quality = 1000;
-			
+			state.media |= (pUmDevice->lm_dev.DuplexMode
+				== LM_DUPLEX_MODE_FULL ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX);
+			state.quality = 1000;
+
 			return user_memcpy(data, &state, sizeof(ether_link_state_t));
 		}
 #endif

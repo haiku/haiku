@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_STACK_H
@@ -72,6 +72,7 @@ struct net_stack_module_info {
 	status_t (*unregister_device_monitor)(struct net_device *device,
 					net_receive_func receiveFunc, void *cookie);
 
+	status_t (*device_link_changed)(struct net_device *device);
 	status_t (*device_removed)(struct net_device *device);
 
 	// Utility Functions

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,7 +34,7 @@
 
 
 static benaphore sInterfaceLock;
-static list sInterfaces;
+static DeviceInterfaceList sInterfaces;
 static uint32 sInterfaceIndex;
 static uint32 sDeviceIndex;
 
@@ -42,12 +42,10 @@ static uint32 sDeviceIndex;
 static net_device_interface *
 find_device_interface(const char *name)
 {
-	net_device_interface *interface = NULL;
+	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 
-	while (true) {
-		interface = (net_device_interface *)list_get_next_item(&sInterfaces, interface);
-		if (interface == NULL)
-			break;
+	while (iterator.HasNext()) {
+		net_device_interface *interface = iterator.Next();
 
 		if (!strcmp(interface->name, name))
 			return interface;
@@ -237,15 +235,11 @@ count_device_interfaces()
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
-	net_device_interface *interface = NULL;
+	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	uint32 count = 0;
 
-	while (true) {
-		interface = (net_device_interface *)list_get_next_item(&sInterfaces,
-			interface);
-		if (interface == NULL)
-			break;
-
+	while (iterator.HasNext()) {
+		iterator.Next();
 		count++;
 	}
 
@@ -263,22 +257,19 @@ list_device_interfaces(void *_buffer, size_t *bufferSize)
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
+	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	UserBuffer buffer(_buffer, *bufferSize);
-	net_device_interface *interface = NULL;
 
-	while (true) {
-		interface = (net_device_interface *)list_get_next_item(&sInterfaces,
-			interface);
-		if (interface == NULL)
-			break;
+	while (iterator.HasNext()) {
+		net_device_interface *interface = iterator.Next();
 
 		ifreq request;
 		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
 		get_device_interface_address(interface, &request.ifr_addr);
 
 		if (buffer.Copy(&request, IF_NAMESIZE
-								+ request.ifr_addr.sa_len) == NULL)
-				return buffer.Status();
+				+ request.ifr_addr.sa_len) == NULL)
+			return buffer.Status();
 	}
 
 	*bufferSize = buffer.ConsumedAmount();
@@ -300,7 +291,7 @@ put_device_interface(struct net_device_interface *interface)
 
 	{
 		BenaphoreLocker locker(sInterfaceLock);
-		list_remove_item(&sInterfaces, interface);
+		sInterfaces.Remove(interface);
 	}
 
 	interface->module->uninit_device(interface->device);
@@ -315,12 +306,10 @@ struct net_device_interface *
 get_device_interface(uint32 index)
 {
 	BenaphoreLocker locker(sInterfaceLock);
-	net_device_interface *interface = NULL;
+	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 
-	while (true) {
-		interface = (net_device_interface *)list_get_next_item(&sInterfaces, interface);
-		if (interface == NULL)
-			break;
+	while (iterator.HasNext()) {
+		net_device_interface *interface = iterator.Next();
 
 		if (interface->device->index == index) {
 			if (atomic_add(&interface->ref_count, 1) != 0)
@@ -380,7 +369,7 @@ get_device_interface(const char *name)
 					device->index = ++sDeviceIndex;
 					device->module = module;
 
-					list_add_item(&sInterfaces, interface);
+					sInterfaces.Add(interface);
 					return interface;
 				} else
 					module->uninit_device(device);
@@ -590,6 +579,19 @@ unregister_device_monitor(struct net_device *device,
 
 
 /*!
+	This function is called by device modules in case their link
+	state changed, ie. if an ethernet cable was plugged in or
+	removed.
+*/
+status_t
+device_link_changed(net_device *device)
+{
+	domain_interfaces_link_changed(device);
+	return B_OK;
+}
+
+
+/*!
 	This function is called by device modules once their device got
 	physically removed, ie. a USB networking card is unplugged.
 	It is part of the net_manager_module_info API.
@@ -612,7 +614,8 @@ init_interfaces()
 	if (benaphore_init(&sInterfaceLock, "net interfaces") < B_OK)
 		return B_ERROR;
 
-	list_init(&sInterfaces);
+	new (&sInterfaces) DeviceInterfaceList;
+		// static C++ objects are not initialized in the module startup
 	return B_OK;
 }
 

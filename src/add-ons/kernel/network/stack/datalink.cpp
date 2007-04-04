@@ -18,6 +18,7 @@
 #include <util/AutoLock.h>
 
 #include <net/if.h>
+#include <net/if_media.h>
 #include <net/route.h>
 #include <sys/sockio.h>
 
@@ -54,7 +55,8 @@ device_reader_thread(void *_interface)
 
 			// feed device monitors
 			// TODO: locking!
-			DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
+			DeviceMonitorList::Iterator iterator
+				= interface->monitor_funcs.GetIterator();
 			while (iterator.HasNext()) {
 				net_device_monitor *monitor = iterator.Next();
 				monitor->func(monitor->cookie, buffer);
@@ -64,7 +66,8 @@ device_reader_thread(void *_interface)
 			if (type >= 0) {
 				// find handler for this packet
 				// TODO: locking!
-				DeviceHandlerList::Iterator iterator = interface->receive_funcs.GetIterator();
+				DeviceHandlerList::Iterator iterator
+					= interface->receive_funcs.GetIterator();
 				status = B_ERROR;
 
 				while (iterator.HasNext()) {
@@ -135,7 +138,8 @@ remove_default_routes(net_interface_private *interface, int32 option)
 	route.gateway = NULL;
 	route.interface = interface;
 
-	if (interface->mask != NULL && (option == SIOCSIFNETMASK || option == SIOCSIFADDR)) {
+	if (interface->mask != NULL
+		&& (option == SIOCSIFNETMASK || option == SIOCSIFADDR)) {
 		route.mask = interface->mask;
 		route.flags = 0;
 		remove_route(interface->domain, &route);
@@ -157,7 +161,8 @@ add_default_routes(net_interface_private *interface, int32 option)
 	route.gateway = NULL;
 	route.interface = interface;
 
-	if (interface->mask != NULL && (option == SIOCSIFNETMASK || option == SIOCSIFADDR)) {
+	if (interface->mask != NULL
+		&& (option == SIOCSIFNETMASK || option == SIOCSIFADDR)) {
 		route.mask = interface->mask;
 		route.flags = 0;
 		add_route(interface->domain, &route);
@@ -324,16 +329,22 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 			if (interface != NULL) {
 				// filter out bringing the interface up or down 
 				if (option == SIOCSIFFLAGS
-					&& ((uint32)request.ifr_flags & IFF_UP) != (interface->flags & IFF_UP)) {
+					&& ((uint32)request.ifr_flags & IFF_UP)
+						!= (interface->flags & IFF_UP)) {
 					if ((interface->flags & IFF_UP) != 0) {
 						// bring the interface down
-						interface->flags &= ~IFF_UP;
-						interface->first_info->interface_down(interface->first_protocol);
+						interface->flags &= ~(IFF_UP | IFF_LINK);
+						interface->first_info->interface_down(
+							interface->first_protocol);
 					} else {
 						// bring it up
-						status = interface->first_info->interface_up(interface->first_protocol);
-						if (status == B_OK)
-							interface->flags |= IFF_UP;
+						status = interface->first_info->interface_up(
+							interface->first_protocol);
+						if (status == B_OK) {
+							interface->flags |= IFF_UP
+								| (interface->device->media & IFM_ACTIVE
+									? IFF_LINK : 0);
+						}
 					}
 
 					request.ifr_flags = interface->flags;
@@ -341,8 +352,8 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 
 				if (status == B_OK) {
 					// pass the request into the datalink protocol stack
-					status = interface->first_info->control(interface->first_protocol,
-						option, value, *_length);
+					status = interface->first_info->control(
+						interface->first_protocol, option, value, *_length);
 				}
 			} else
 				status = B_BAD_VALUE;
@@ -704,11 +715,32 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 				return B_BAD_ADDRESS;
 
 			// check for valid bounds
-			if (request.ifr_mtu < 100 || (uint32)request.ifr_mtu > interface->device->mtu)
+			if (request.ifr_mtu < 100
+				|| (uint32)request.ifr_mtu > interface->device->mtu)
 				return B_BAD_VALUE;
 
 			interface->mtu = request.ifr_mtu;
 			return B_OK;
+		}
+
+		case SIOCSIFMEDIA:
+		{
+			// set media
+			struct ifreq request;
+			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return interface->device_interface->module->set_media(
+				interface->device, request.ifr_media);
+		}
+		case SIOCGIFMEDIA:
+		{
+			// get media
+			struct ifreq request;
+			request.ifr_media = interface->device->media;
+
+			return user_memcpy(&((struct ifreq *)argument)->ifr_media,
+				&request.ifr_media, sizeof(request.ifr_media));
 		}
 
 		case SIOCGIFMETRIC:

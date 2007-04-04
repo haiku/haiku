@@ -21,21 +21,23 @@ enum {
 	ETHER_REMMULTI,							/* remove multicast address */
 	ETHER_SETPROMISC,						/* set promiscuous mode (int *) */
 	ETHER_GETFRAMESIZE,						/* get frame size (required) (int *) */
-	ETHER_GETLINKSTATE
+	ETHER_SET_LINK_STATE_SEM,
+		/* pass over a semaphore to release on link state changes (sem_id *) */
+	ETHER_GET_LINK_STATE
 		/* get line speed, quality, duplex mode, etc. (ether_link_state_t *) */
 };
 
 
 /* ETHER_GETADDR - MAC address */
-typedef struct {
-	uint8 ebyte[6];
+typedef struct ether_address {
+	uint8	ebyte[6];
 } ether_address_t;
 
 /* ETHER_GETLINKSTATE */
 typedef struct ether_link_state {
-	uint32	link_media;		/* as specified in net/if_media.h */
-	uint32  link_quality;	/* in one tenth of a percent */
-	uint64	link_speed;		/* in Kbit/s */
+	uint32	media;		/* as specified in net/if_media.h */
+	uint32  quality;	/* in one tenth of a percent */
+	uint64	speed;		/* in Kbit/s */
 } ether_link_state_t;
 
 #endif	/* _ETHER_DRIVER_H */

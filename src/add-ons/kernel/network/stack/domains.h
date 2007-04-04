@@ -33,6 +33,7 @@ uint32 count_domain_interfaces();
 status_t list_domain_interfaces(void *buffer, size_t *_bufferSize);
 status_t add_interface_to_domain(net_domain *domain, struct ifreq& request);
 status_t remove_interface_from_domain(net_interface *interface);
+void domain_interfaces_link_changed(net_device *device);
 
 net_domain *get_domain(int family);
 status_t register_domain(int family, const char *name,

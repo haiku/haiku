@@ -7,10 +7,16 @@
  */
 
 
-#include <ether_driver.h>
 #include <ethernet.h>
+
+#include <ether_driver.h>
 #include <net_buffer.h>
 #include <net_device.h>
+#include <net_stack.h>
+
+#include <lock.h>
+#include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 
 #include <KernelExport.h>
 
@@ -24,12 +30,76 @@
 #include <string.h>
 
 
-struct ethernet_device : net_device {
+struct ethernet_device : DoublyLinkedListLinkImpl<ethernet_device>, net_device {
 	int		fd;
 	uint32	frame_size;
 };
 
-struct net_buffer_module_info *gBufferModule;
+static const bigtime_t kLinkCheckInterval = 1000000;
+	// 1 second
+
+net_buffer_module_info *gBufferModule;
+static net_stack_module_info *sStackModule;
+
+static benaphore sListLock;
+static DoublyLinkedList<ethernet_device> sCheckList;
+static sem_id sLinkChangeSemaphore;
+static thread_id sLinkCheckerThread;
+
+
+static status_t
+update_link_state(ethernet_device *device, bool notify = true)
+{
+	ether_link_state state;
+	if (ioctl(device->fd, ETHER_GET_LINK_STATE, &state,
+			sizeof(ether_link_state)) < 0) {
+		// This device does not support retrieving the link
+		return EOPNOTSUPP;
+	}
+
+	if (device->media != state.media
+		|| device->link_quality != state.quality
+		|| device->link_speed != state.speed) {
+		device->media = state.media;
+		device->link_quality = state.quality;
+		device->link_speed = state.speed;
+
+		if (notify)
+			sStackModule->device_link_changed(device);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+ethernet_link_checker(void *)
+{
+	while (true) {
+		status_t status = acquire_sem_etc(sLinkChangeSemaphore, 1,
+			B_RELATIVE_TIMEOUT, kLinkCheckInterval);
+		if (status == B_BAD_SEM_ID)
+			break;
+
+		BenaphoreLocker _(sListLock);
+
+		if (sCheckList.IsEmpty())
+			break;
+
+		// check link state of all existing devices
+
+		DoublyLinkedList<ethernet_device>::Iterator iterator
+			= sCheckList.GetIterator();
+		while (iterator.HasNext()) {
+			update_link_state(iterator.Next());
+		}
+	}
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
 
 
 status_t
@@ -93,6 +163,27 @@ ethernet_up(net_device *_device)
 		device->frame_size = ETHER_MAX_FRAME_SIZE;
 	}
 
+	if (update_link_state(device, false) == B_OK) {
+		// device supports retrieval of the link state
+
+		// Set the change notification semaphore; doesn't matter
+		// if this is supported by the device or not
+		ioctl(device->fd, ETHER_SET_LINK_STATE_SEM, &sLinkChangeSemaphore,
+			sizeof(sem_id *));
+
+		BenaphoreLocker _(&sListLock);
+
+		if (sCheckList.IsEmpty()) {
+			// start thread
+			sLinkCheckerThread = spawn_kernel_thread(ethernet_link_checker,
+				"ethernet link state checker", B_LOW_PRIORITY, NULL);
+			if (sLinkCheckerThread >= B_OK)
+				resume_thread(sLinkCheckerThread);
+		}
+
+		sCheckList.Add(device);
+	}
+
 	device->address.length = ETHER_ADDRESS_LENGTH;
 	device->mtu = device->frame_size - device->header_length;
 	return B_OK;
@@ -108,6 +199,14 @@ void
 ethernet_down(net_device *_device)
 {
 	ethernet_device *device = (ethernet_device *)_device;
+
+	BenaphoreLocker _(sListLock);
+
+	// if the device is still part of the list, remove it
+	if (device->GetDoublyLinkedListLink()->next != NULL
+		|| device->GetDoublyLinkedListLink()->previous != NULL)
+		sCheckList.Remove(device);
+
 	close(device->fd);
 }
 
@@ -262,6 +361,7 @@ status_t
 ethernet_get_multicast_addrs(struct net_device *device,
 	net_hardware_address **addressArray, uint32 count)
 {
+	// TODO: see etherpci driver for details
 	return EOPNOTSUPP;
 }
 
@@ -270,6 +370,7 @@ status_t
 ethernet_set_multicast_addrs(struct net_device *device, 
 	const net_hardware_address **addressArray, uint32 count)
 {
+	// TODO: see etherpci driver for details
 	return EOPNOTSUPP;
 }
 
@@ -279,8 +380,44 @@ ethernet_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
+		{
+			status_t status = get_module(NET_STACK_MODULE_NAME,
+				(module_info **)&sStackModule);
+			if (status < B_OK)
+				return status;
+
+			new (&sCheckList) DoublyLinkedList<ethernet_device>;
+				// static C++ objects are not initialized in the module startup
+
+			sLinkCheckerThread = -1;
+
+			sLinkChangeSemaphore = create_sem(0, "ethernet link change");
+			if (sLinkChangeSemaphore < B_OK) {
+				put_module(NET_STACK_MODULE_NAME);
+				return sLinkChangeSemaphore;
+			}
+
+			status = benaphore_init(&sListLock, "ethernet devices");
+			if (status < B_OK) {
+				put_module(NET_STACK_MODULE_NAME);
+				delete_sem(sLinkChangeSemaphore);
+				return status;
+			}
+
 			return B_OK;
+		}
+
+		case B_MODULE_UNINIT:
+		{
+			delete_sem(sLinkChangeSemaphore);
+
+			status_t status;
+			wait_for_thread(sLinkCheckerThread, &status);
+
+			benaphore_destroy(&sListLock);
+			put_module(NET_STACK_MODULE_NAME);
+			return B_OK;
+		}
 
 		default:
 			return B_ERROR;

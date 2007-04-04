@@ -911,6 +911,7 @@ static net_stack_module_info sNetStackModule = {
 	unregister_device_handler,
 	register_device_monitor,
 	unregister_device_monitor,
+	device_link_changed,
 	device_removed,
 
 	notify_socket,

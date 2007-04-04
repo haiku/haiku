@@ -11,11 +11,14 @@
 #include "interfaces.h"
 #include "utility.h"
 
-#include <KernelExport.h>
+#include <net_device.h>
 
 #include <lock.h>
 #include <util/AutoLock.h>
 
+#include <KernelExport.h>
+
+#include <net/if_media.h>
 #include <new>
 #include <string.h>
 
@@ -112,6 +115,8 @@ list_domain_interfaces(void *_buffer, size_t *bufferSize)
 		if (domain == NULL)
 			break;
 
+		BenaphoreLocker locker(domain->lock);
+
 		net_interface *interface = NULL;
 		while (true) {
 			interface = (net_interface *)list_get_next_item(&domain->interfaces,
@@ -121,17 +126,18 @@ list_domain_interfaces(void *_buffer, size_t *bufferSize)
 
 			ifreq request;
 			strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
-			if (interface->address != NULL)
-				memcpy(&request.ifr_addr, interface->address, interface->address->sa_len);
-			else {
+			if (interface->address != NULL) {
+				memcpy(&request.ifr_addr, interface->address,
+					interface->address->sa_len);
+			} else {
 				// empty address
 				request.ifr_addr.sa_len = 2;
 				request.ifr_addr.sa_family = AF_UNSPEC;
 			}
 
 			if (buffer.Copy(&request, IF_NAMESIZE
-									+ request.ifr_addr.sa_len) == NULL)
-					return buffer.Status();
+					+ request.ifr_addr.sa_len) == NULL)
+				return buffer.Status();
 		}
 	}
 
@@ -184,6 +190,38 @@ remove_interface_from_domain(net_interface *interface)
 	list_remove_item(&domain->interfaces, interface);
 	delete_interface((net_interface_private *)interface);
 	return B_OK;
+}
+
+
+void
+domain_interfaces_link_changed(net_device *device)
+{
+	// TODO: notify listeners about this!
+
+	BenaphoreLocker locker(sDomainLock);
+
+	net_domain_private *domain = NULL;
+	while (true) {
+		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
+		if (domain == NULL)
+			break;
+
+		BenaphoreLocker locker(domain->lock);
+
+		net_interface *interface = NULL;
+		while (true) {
+			interface = (net_interface *)list_get_next_item(&domain->interfaces,
+				interface);
+			if (interface == NULL)
+				break;
+
+			if (interface->device == device) {
+				// update IFF_LINK flag
+				interface->flags = (interface->flags & ~IFF_LINK)
+					| (device->media & IFM_ACTIVE ? IFF_LINK : 0);
+			}
+		}
+	}
 }
 
 

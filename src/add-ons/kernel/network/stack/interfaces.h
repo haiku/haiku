@@ -29,8 +29,8 @@ struct net_device_monitor : public DoublyLinkedListLinkImpl<net_device_monitor> 
 typedef DoublyLinkedList<net_device_handler> DeviceHandlerList;
 typedef DoublyLinkedList<net_device_monitor> DeviceMonitorList;
 
-struct net_device_interface {
-	struct list_link	link;
+struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
+	//struct list_link	link;
 	const char			*name;
 	struct net_device_module_info *module;
 	struct net_device	*device;
@@ -45,6 +45,8 @@ struct net_device_interface {
 	DeviceMonitorList	monitor_funcs;
 	DeviceHandlerList	receive_funcs;
 };
+
+typedef DoublyLinkedList<net_device_interface> DeviceInterfaceList;
 
 struct net_interface_private : net_interface {
 	char				base_name[IF_NAMESIZE];
@@ -90,6 +92,7 @@ status_t register_device_monitor(struct net_device *device,
 	net_receive_func receiveFunc, void *cookie);
 status_t unregister_device_monitor(struct net_device *device,
 	net_receive_func receiveFunc, void *cookie);
+status_t device_link_changed(net_device *device);
 status_t device_removed(net_device *device);
 
 #endif	// INTERFACES_H

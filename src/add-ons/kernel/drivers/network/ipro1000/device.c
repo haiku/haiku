@@ -339,15 +339,15 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #if 0
-		case ETHER_GETLINKSTATE:
+		case ETHER_GET_LINK_STATE:
 		{
 			ether_link_state_t state;
-			state.link_media = (info->link ? IFM_ACTIVE : 0)
+			state.media = (info->link ? IFM_ACTIVE : 0)
 				| (info->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
 				| (info->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
-			state.link_speed = info->speed == LINK_SPEED_100_MBIT
+			state.speed = info->speed == LINK_SPEED_100_MBIT
 				? 100000 : 10000;
-			state.link_quality = 1000;
+			state.quality = 1000;
 
 			return user_memcpy(buffer, &state, sizeof(ether_link_state_t));
 		}
