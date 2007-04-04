@@ -390,7 +390,7 @@ device_ioctl(void *data, uint32 msg, void *buffer, size_t bufferLength)
 		case ETHER_GET_LINK_STATE:
 		{
 			ether_link_state_t state;
-			state.media = (info->link ? IFM_ACTIVE : 0)
+			state.media = (info->link ? IFM_ACTIVE : 0) | IFM_ETHER
 				| (info->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
 				| (info->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
 			state.speed = info->speed == LINK_SPEED_100_MBIT

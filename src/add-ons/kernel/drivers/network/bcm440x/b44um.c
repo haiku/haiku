@@ -259,7 +259,7 @@ b44_ioctl(void *cookie,uint32 op,void *data,size_t len)
 		{
 			ether_link_state_t state;
 			state.media = (pUmDevice->lm_dev.LinkStatus
-				== LM_STATUS_LINK_DOWN) ? IFM_ACTIVE : 0;
+				== LM_STATUS_LINK_DOWN ? IFM_ACTIVE : 0) | IFM_ETHER;
 			switch (pUmDevice->lm_dev.LineSpeed) {
 				case LM_LINE_SPEED_10MBPS:
 					state.media |= IFM_10_T;
