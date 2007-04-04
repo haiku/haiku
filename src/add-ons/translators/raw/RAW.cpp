@@ -2376,12 +2376,6 @@ DCRaw::_LoadRAW(const image_data_info& image)
 void
 DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 {
-	fOutputWidth = fInputWidth;
-	fOutputHeight = fInputHeight;
-
-	if (image.flip & 4)
-		SWAP(fOutputHeight, fOutputWidth);
-
 	uint8* line, lookUpTable[0x10000];
 
 	uint32 outputRow = (4 * fOutputBitsPerSample / 8) * fOutputWidth;
@@ -2398,10 +2392,13 @@ DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 
 	int32 sourceOffset = _FlipIndex(0, 0, image.flip);
 	int32 colStep = _FlipIndex(0, 1, image.flip) - sourceOffset;
-	int32 rowStep = _FlipIndex(1, 0, image.flip) - _FlipIndex(0, fOutputWidth, image.flip);
+	int32 rowStep = _FlipIndex(1, 0, image.flip)
+		- _FlipIndex(0, fOutputWidth, image.flip);
 
-	TRACE(("flip = %ld, sourceOffset = %ld, colStep = %ld, rowStep = %ld, input: %lu x %lu, output: %lu x %lu\n",
-		image.flip, sourceOffset, colStep, rowStep, fInputWidth, fInputHeight, fOutputWidth, fOutputHeight));
+	TRACE(("flip = %ld, sourceOffset = %ld, colStep = %ld, rowStep = %ld, "
+		"input: %lu x %lu, output: %lu x %lu\n", image.flip, sourceOffset,
+		colStep, rowStep, fInputWidth, fInputHeight, fOutputWidth,
+		fOutputHeight));
 
 	if (fOutputBitsPerSample == 8) {
 		for (uint32 row = 0; row < fOutputHeight; row++, sourceOffset += rowStep) {
@@ -3257,6 +3254,9 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	fShrink = (fHalfSize || fThreshold) && fFilters;
 	fOutputWidth  = (fInputWidth + fShrink) >> fShrink;
 	fOutputHeight = (fInputHeight + fShrink) >> fShrink;
+	if (image.flip & 4)
+		SWAP(fOutputHeight, fOutputWidth);
+
 	image.output_width = fOutputWidth;
 	image.output_height = fOutputHeight;
 

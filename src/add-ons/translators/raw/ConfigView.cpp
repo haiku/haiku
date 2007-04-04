@@ -47,25 +47,14 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT "2007 Haiku Inc.");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
-	
-	rect.OffsetBy(0, height + 20);
-	BCheckBox *checkBox = new BCheckBox(rect, "color", "Write 32 bit images on true color input", NULL);
-	checkBox->ResizeToPreferred();
-	AddChild(checkBox);
 
 	rect.OffsetBy(0, height + 10);
-	checkBox = new BCheckBox(rect, "size", "Enforce valid icon sizes", NULL);
-	checkBox->ResizeToPreferred();
-	checkBox->SetValue(1);
-	AddChild(checkBox);
-
-	rect.OffsetBy(0, height + 15);
-	stringView = new BStringView(rect, "valid1", "Valid icon sizes are 16, 32, or 48");
+	stringView = new BStringView(rect, "copyright2", "Based on Dave Coffin's dcraw 8.63");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "valid2", "pixel in either direction.");
+	stringView = new BStringView(rect, "copyright3", B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 }
