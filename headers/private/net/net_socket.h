@@ -92,9 +92,11 @@ struct net_socket_module_info {
 	ssize_t		(*recv)(net_socket *socket, void *data, size_t length, int flags);
 	ssize_t		(*recvfrom)(net_socket *socket, void *data, size_t length, int flags,
 					struct sockaddr *address, socklen_t *_addressLength);
+	ssize_t		(*recvmsg)(net_socket *socket, msghdr *header, int flags);
 	ssize_t		(*send)(net_socket *socket, const void *data, size_t length, int flags);
 	ssize_t		(*sendto)(net_socket *socket, const void *data, size_t length,
 					int flags, const struct sockaddr *address, socklen_t addressLength);
+	ssize_t		(*sendmsg)(net_socket *socket, msghdr *header, int flags);
 	int			(*setsockopt)(net_socket *socket, int level, int option,
 					const void *optionValue, int optionLength);
 	int			(*shutdown)(net_socket *socket, int direction);

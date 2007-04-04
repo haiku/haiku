@@ -341,8 +341,8 @@ recvfrom(int socket, void *data, size_t length, int flags,
 extern "C" ssize_t
 recvmsg(int socket, struct msghdr *message, int flags)
 {
-	// TODO: implement me!
-	return -1;
+	msghdr_args args = { message, flags };
+	return ioctl(socket, NET_STACK_RECVMSG, &args, sizeof(args));
 }
 
 
@@ -386,8 +386,8 @@ sendto(int socket, const void *data, size_t length, int flags,
 extern "C" ssize_t
 sendmsg(int socket, const struct msghdr *message, int flags)
 {
-	// TODO: implement me!
-	return -1;
+	msghdr_args args = { (msghdr *)message, flags };
+	return ioctl(socket, NET_STACK_SENDMSG, &args, sizeof(args));
 }
 
 

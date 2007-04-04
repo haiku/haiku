@@ -783,6 +783,70 @@ socket_recvfrom(net_socket *socket, void *data, size_t length, int flags,
 
 
 ssize_t
+socket_recvmsg(net_socket *socket, msghdr *header, int flags)
+{
+	net_buffer *buffer;
+	iovec tmp;
+	int i;
+
+	size_t length = 0;
+	for (i = 0; i < header->msg_iovlen; i++) {
+		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
+			return B_BAD_ADDRESS;
+		if (tmp.iov_len > 0 && tmp.iov_base == NULL)
+			return B_BAD_ADDRESS;
+		length += tmp.iov_len;
+	}
+
+	status_t status = socket->first_info->read_data(
+		socket->first_protocol, length, flags, &buffer);
+	if (status < B_OK)
+		return status;
+
+	// TODO: - consider the control buffer options
+	//       - datagram based protocols should return the
+	//         full datagram so we can cut it here with MSG_TRUNC
+	//       - returning a NULL buffer when received 0 bytes
+	//         may not make much sense as we still need the address
+
+	header->msg_namelen = 0;
+	header->msg_flags = 0;
+
+	if (buffer == NULL)
+		return 0;
+
+	size_t bytesReceived = 0;
+	for (i = 0; i < header->msg_iovlen && bytesReceived < buffer->size; i++) {
+		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) != B_OK)
+			break;
+
+		size_t toRead = min_c(buffer->size - bytesReceived, tmp.iov_len);
+
+		if (gNetBufferModule.read(buffer, bytesReceived, tmp.iov_base,
+									toRead) < B_OK)
+			break;
+
+		bytesReceived += toRead;
+	}
+
+	if (bytesReceived == buffer->size) {
+		if (header->msg_namelen >= buffer->source.ss_len) {
+			memcpy(header->msg_name, &buffer->source, buffer->source.ss_len);
+			header->msg_namelen = buffer->source.ss_len;
+		}
+	}
+
+	size_t bufferSize = buffer->size;
+	gNetBufferModule.free(buffer);
+
+	if (bytesReceived < bufferSize)
+		return ENOBUFS;
+
+	return bytesReceived;
+}
+
+
+ssize_t
 socket_send(net_socket *socket, const void *data, size_t length, int flags)
 {
 	if (socket->peer.ss_len == 0)
@@ -867,6 +931,72 @@ socket_sendto(net_socket *socket, const void *data, size_t length, int flags,
 	buffer->flags = flags;
 	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
 	memcpy(&buffer->destination, address, addressLength);
+
+	status_t status = socket->first_info->send_data(socket->first_protocol,
+		buffer);
+	if (status < B_OK) {
+		size_t size = buffer->size;
+		gNetBufferModule.free(buffer);
+
+		if (size != length && (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
+			// this appears to be a partial write
+			return length - size;
+		}
+		return status;
+	}
+
+	return length;
+}
+
+
+status_t
+socket_sendmsg(net_socket *socket, msghdr *header, int flags)
+{
+	const sockaddr *address = (const sockaddr *)header->msg_name;
+	socklen_t addressLength = header->msg_namelen;
+
+	if ((address == NULL || addressLength == 0) && socket->peer.ss_len != 0) {
+		// socket is connected, we use that address:
+		address = (struct sockaddr *)&socket->peer;
+		addressLength = socket->peer.ss_len;
+	}
+	if (address == NULL || addressLength == 0) {
+		// don't know where to send to:
+		return EDESTADDRREQ;
+	}
+	if (socket->peer.ss_len != 0) {
+		// an address has been given but socket is connected already:
+		return EISCONN;
+	}
+
+	if (socket->address.ss_len == 0) {
+		// try to bind first
+		status_t status = socket_bind(socket, NULL, 0);
+		if (status < B_OK)
+			return status;
+	}
+
+	// TODO: useful, maybe even computed header space!
+	net_buffer *buffer = gNetBufferModule.create(256);
+	if (buffer == NULL)
+		return ENOBUFS;
+
+	size_t length = 0;
+
+	// copy data into buffer
+	for (int i = 0; i < header->msg_iovlen; i++) {
+		iovec tmp;
+		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK ||
+			gNetBufferModule.append(buffer, tmp.iov_base, tmp.iov_len) < B_OK) {
+			gNetBufferModule.free(buffer);
+			return ENOBUFS;
+		}
+
+		length += tmp.iov_len;
+	}
+
+	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
+	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
 
 	status_t status = socket->first_info->send_data(socket->first_protocol,
 		buffer);
@@ -1080,8 +1210,10 @@ net_socket_module_info gNetSocketModule = {
 	socket_listen,
 	socket_recv,
 	socket_recvfrom,
+	socket_recvmsg,
 	socket_send,
 	socket_sendto,
+	socket_sendmsg,
 	socket_setsockopt,
 	socket_shutdown,
 };

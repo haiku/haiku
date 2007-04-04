@@ -31,8 +31,10 @@ enum {
 	NET_STACK_BIND,								// sockaddr_args *
 	NET_STACK_RECVFROM,							// struct msghdr *
 	NET_STACK_RECV,								// transfer_args *
+	NET_STACK_RECVMSG,							// msghdr_args *
 	NET_STACK_SENDTO,							// struct msghdr *
 	NET_STACK_SEND,								// transfer_args *
+	NET_STACK_SENDMSG,							// msghdr_args *
 	NET_STACK_LISTEN,							// int_args * (value = backlog)
 	NET_STACK_ACCEPT,							// sockaddr_args *
 	NET_STACK_CONNECT,							// sockaddr_args *
@@ -66,6 +68,11 @@ struct transfer_args {	// used by NET_STACK_SEND/_RECV
 	int		flags;
 	struct sockaddr *address;	// only used for recvfrom() and sendto()
 	socklen_t address_length;	// ""
+};
+
+struct msghdr_args {
+	struct msghdr *header;
+	int flags;
 };
 
 struct socket_args {	// used by NET_STACK_SOCKET
