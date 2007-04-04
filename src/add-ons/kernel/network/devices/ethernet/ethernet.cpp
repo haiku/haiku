@@ -132,7 +132,7 @@ ethernet_init(const char *name, net_device **_device)
 	device->flags = IFF_BROADCAST;
 	device->type = IFT_ETHER;
 	device->mtu = 1500;
-	device->media = IFM_ACTIVE;
+	device->media = IFM_ACTIVE | IFM_ETHER;
 	device->header_length = ETHER_HEADER_LENGTH;
 	device->fd = -1;
 
@@ -159,6 +159,10 @@ ethernet_up(net_device *_device)
 	device->fd = open(device->name, O_RDWR);
 	if (device->fd < 0)
 		return errno;
+
+	uint64 dummy;
+	if (ioctl(device->fd, ETHER_INIT, &dummy, sizeof(dummy)) < 0)
+		goto err;
 
 	if (ioctl(device->fd, ETHER_GETADDR, device->address.data, ETHER_ADDRESS_LENGTH) < 0)
 		goto err;
