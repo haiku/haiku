@@ -454,6 +454,10 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 						return B_BAD_ADDRESS;
 				}
 
+				if (user_memcpy(&args.header->msg_flags, &header.msg_flags,
+								sizeof(int)) < B_OK)
+					return B_BAD_ADDRESS;
+
 				return bytesRead;
 			}
 
