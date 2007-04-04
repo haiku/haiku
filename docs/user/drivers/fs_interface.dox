@@ -1,0 +1,173 @@
+/*!
+\file fs_interface.h
+\ingroup drivers
+*/
+
+/*!
+\fn status_t new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+\brief Creates the vnode with ID \a vnodeID and associates it with the private
+	data handle \a privateNode, but leaves is in an unpublished state.
+
+The effect of the function is similar to publish_vnode(), but the vnode
+remains in an unpublished state, with the effect that a subsequent
+remove_vnode() will just delete the vnode and not invoke the file system's
+\link file_system_module_info::remove_vnode remove_vnode() \endlink is not
+invoked.
+
+If the vnode shall be kept, publish_vnode() has to be invoked afterwards to
+mark the vnode published. The combined effect is the same as only invoking
+publish_vnode().
+
+The function fails, if the vnode does already exist.
+
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\param privateNode The private data handle to be associated with the node.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t publish_vnode(mount_id mountID, vnode_id vnodeID,
+	fs_vnode privateNode)
+\brief Creates the vnode with ID \a vnodeID and associates it with the private
+	data handle \a privateNode or just marks it published.
+
+If the vnode does already exist and has been published, the function fails.
+If it has not been published yet (i.e. after a successful new_vnode()), the
+function just marks the vnode published. If the vnode did not exist at all
+before, it is created and published.
+
+If the function is successful, the caller owns a reference to the vnode. A
+sequence of new_vnode() and publish_vnode() results in just one reference as
+well. The reference can be surrendered by calling put_vnode().
+
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\param privateNode The private data handle to be associated with the node.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t get_vnode(mount_id mountID, vnode_id vnodeID,
+	fs_vnode *_privateNode)
+\brief Retrieves the private data handle for the node with the given ID.
+
+If the function is successful, the caller owns a reference to the vnode. The
+reference can be surrendered by calling put_vnode().
+
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\param _privateNode Pointer to a pre-allocated variable the private data
+	handle shall be written to.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t put_vnode(mount_id mountID, vnode_id vnodeID)
+\brief Surrenders a reference to the specified vnode.
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t remove_vnode(mount_id mountID, vnode_id vnodeID)
+\brief Marks the specified vnode removed.
+
+The caller must own a reference to the vnode or at least ensure that a
+reference to the vnode exists. The function does not surrender a reference,
+though.
+
+As soon as the last reference to the vnode has been surrendered, the VFS
+invokes the file system's 
+\link file_system_module_info::remove_vnode remove_vnode() \endlink
+hook.
+
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
+\brief Clears the "removed" mark of the specified vnode.
+
+The caller must own a reference to the vnode or at least ensure that a
+reference to the vnode exists.
+
+The function is usually called when the caller, who has invoked remove_vnode()
+before realizes that it is not possible to remove the node (e.g. due to an
+error).
+
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t get_vnode_removed(mount_id mountID, vnode_id vnodeID,
+	bool* removed);
+\brief Returns whether the specified vnode is marked removed.
+
+The caller must own a reference to the vnode or at least ensure that a
+reference to the vnode exists.
+
+\param mountID The ID of the volume.
+\param vnodeID The ID of the node.
+\param removed Pointer to a pre-allocated variable set to \c true, if the
+	node is marked removed, to \c false otherwise.
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+
+/*!
+\class file_system_module_info
+\brief Kernel module interface for file systems.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::get_vnode)(fs_volume fs, vnode_id id,
+	fs_vnode *_vnode, bool reenter)
+\brief Creates the private data handle to be associated with the node referred
+	to by \a id.
+
+Invoked by the VFS when it creates the vnode for the respective node.
+
+\param fs The volume handle.
+\param id The ID of the node.
+\param _vnode Pointer to a pre-allocated variable the private data handle
+	shall be written to.
+\param reenter \c true if the hook invocation has been caused by the FS itself,
+	e.g. by invoking ::get_vnode().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn \fn status_t (*file_system_module_info::put_vnode)(fs_volume fs,
+	fs_vnode vnode, bool reenter)
+\brief Deletes the private data handle associated with the specified node.
+
+Invoked by the VFS when it deletes the vnode for the respective node and the
+node is not marked removed.
+
+\param fs The volume handle.
+\param vnode The private data handle for the node.
+\param reenter \c true if the hook invocation has been caused by the FS itself,
+	e.g. by invoking ::put_vnode().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+\fn status_t (*file_system_module_info::remove_vnode)(fs_volume fs,
+	fs_vnode vnode, bool reenter);
+\brief Deletes the private data handle associated with the specified node.
+
+Invoked by the VFS when it deletes the vnode for the respective node and the
+node is marked removed.
+
+\param fs The volume handle.
+\param vnode The private data handle for the node.
+\param reenter \c true if the hook invocation has been caused by the FS itself,
+	e.g. by invoking ::put_vnode().
+\return \c B_OK if everything went fine, another error code otherwise.
+*/

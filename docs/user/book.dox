@@ -3,6 +3,7 @@
 
   \section kits Kits and Servers
 
+  - \ref drivers
   - \ref midi1
   - \ref midi2 | \link midi2_intro \em Introduction \endlink
   - \ref support | \link support_intro \em Introduction \endlink
@@ -15,6 +16,7 @@
 ///// Define main kits /////
 
 /*!
+  \defgroup drivers Drivers
   \defgroup midi2 MIDI 2 Kit
   \brief API for producing and consuming MIDI events.
   \defgroup libmidi2 (libmidi2.so)

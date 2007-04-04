@@ -1,0 +1,123 @@
+/*!
+\page fs_modules File System Modules
+
+To support a particular file system (FS), a kernel module implementing a special
+interface (\c file_system_module_info defined in \c <fs_interface.h>) has to be
+provided. As for any other module the
+\c std_ops() hook is invoked with \c B_MODULE_INIT directly after the FS module
+has been loaded by the kernel, and with \c B_MODULE_UNINIT before it is
+unloaded, thus providing a simple mechanism for one-time module initializations.
+The same module is used for accessing any volume of that FS type.
+
+
+\section objects File System Objects
+
+There are several types of objects a FS module has to deal with directly or
+indirectly:
+
+- A \em volume is an instance of a file system. For a disk-based file
+  system it corresponds to a disk, partition, or disk image file. When
+  mounting a volume the virtual file system layer (VFS) assigns a unique number
+  (ID, of type \c mount_id aka \c dev_t) to it and a handle (type
+  \c fs_volume, in fact \c void*) provided by
+  the file system. Whenever the FS requests a volume-related service from the
+  kernel, it has to pass the volume ID, and whenever the VFS asks the FS to
+  perform an operation, it supplies the handle. Normally the handle is a pointer
+  to a data structure the FS allocates to associate data with the volume.
+
+- A \em node is contained by a volume. It can be of type file, directory, or
+  symbolic link (symlink). Just as volumes nodes are associated with an ID
+  (type \c vnode_id aka ino_t) and, if in use, also with a handle
+  (type \c fs_vnode, in fact \c void*).
+  Unlike the volume ID the node ID is defined by the FS. It often
+  has a meaning to the FS, e.g. file systems using inodes might choose the
+  inode number corresponding to the node. As long as the volume is mounted and
+  the node is known to the VFS, its node ID must not change. The node handle is
+  again a pointer to a data structure allocated by the FS.
+  
+- A \em vnode (VFS node) is the VFS representation of a node. A volume may
+  contain a great number of nodes, but at a time only a few are represented by
+  vnodes, usually only those that are currently in use (sometimes a few more).
+
+- An \em entry (directory entry) belongs to a directory, has a name, and refers
+  to a node. It is important to understand the difference between entries and
+  nodes: A node doesn't have a name, only the entries that refer to it have.
+  If a FS supports to have more than one entry refer to a single node, it is
+  also said to support "hard links". It is possible that no entry refers
+  to a node. This happens when a node (e.g. a file) is still open, but the last
+  entry referring to it has been removed (the node will be deleted when the
+  it is closed). While entries are to be understood as independent entities,
+  the FS interface does not use IDs or handles to refer to them; it always uses
+  directory and entry name pairs to do that.
+
+- An \em attribute is a named and typed data container belonging to a node. A
+  node may have any number of attributes; they are organized in a (virtual or
+  actually existing) attribute directory, through which one can iterate.
+
+- An \em index is supposed to provide fast searching capabilities for attributes
+  with a certain name. A volume's index directory allows for iterating through
+  the indices.
+
+- A \em query is a fully virtual object for searching for entries via an
+  expression matching entry name, node size, node modification date, and/or
+  node attributes. The mechanism of retrieving the entries found by a query
+  is similar to that for reading a directory contents. A query can be live
+  in which case the creator of the query is notified by the FS whenever an
+  entry no longer matches the query expression or starts matching.
+
+
+\section concepts Generic Concepts
+
+A FS module has to (or can) provide quite a lot of hook functions. There are
+a few concepts that apply to several groups of them:
+
+- <em>Opening, Closing, and Cookies</em>: Many FS objects can be opened and
+  closed, namely nodes in general, directories, attribute directories,
+  attributes, the index directory, and queries. In each case there are three
+  hook functions: <tt>open*()</tt>, <tt>close*()</tt>, and
+  <tt>free*_cookie()</tt>. The <tt>open*()</tt> hook is passed all that is
+  needed to identify the object to be opened and, in some cases, additional
+  parameters e.g. specifying a particular opening mode. The implementation
+  is required to return a cookie (type \c fs_cookie, in fact \c void*), usually
+  a pointer to a data structure the FS allocates. In some cases (e.g. when an
+  iteration state is associated with the cookie) a new cookie must be allocated
+  for each instance of opening the object. The cookie is passed to all hooks
+  that operate on a thusly opened object. The <tt>close*()</tt> hook is invoked
+  to signal that the cookie is to be closed. At this point the cookie might
+  still be in use. Blocking FS hooks (e.g. blocking read/write operations)
+  using the same cookie have to be unblocked. When the cookie stops being in
+  use the <tt>free*_cookie()</tt> hook is called; it has to free the cookie.
+
+- <em>Entry Iteration</em>: For the FS objects serving as containers for other
+  objects, i.e. directories, attribute directories, the index directory,
+  and queries, the cookie mechanism is used for a stateful iteration through
+  the contained objects. The <tt>read_*()</tt> hook reads the next one or more
+  entries into a <tt>struct dirent</tt> buffer. The <tt>rewind_*()</tt> hook
+  resets the iteration state to the first entry.
+
+- <em>Stat Information</em>: In case of nodes, attributes, and indices
+  detailed information about an object are requested via a <tt>read*_stat()</tt>
+  hook and must be written into a <tt>struct stat</tt> buffer.
+
+
+\section vnodes VNodes
+
+A vnode is the VFS representation of a node. As soon as an access to a node
+is requested, the VFS creates a corresponding vnode. The requesting entity
+gets a reference to the vnode for the time it works with the vnode and
+releases the reference when done. When the last reference to a vnode has been
+surrendered, the vnode is unused and the VFS can decide to destroy it (usually
+it is cached for a while longer).
+
+When the VFS creates a vnode, it invokes the FS's
+\link file_system_module_info::get_vnode get_vnode() \endlink
+hook to let it create the respective node handle (unless the FS requests the
+creation of the vnode explicitely by calling publish_vnode()). That's the only
+hook that specifies a node by ID; to all other node-related hooks the node
+handle is passed. When the VFS deletes the vnode, it invokes the FS's
+\link file_system_module_info::put_vnode put_vnode() \endlink
+hook or, if the node was marked removed,
+\link file_system_module_info::remove_vnode remove_vnode() \endlink.
+
+*/
+
