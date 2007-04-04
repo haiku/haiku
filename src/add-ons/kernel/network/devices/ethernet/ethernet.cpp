@@ -30,7 +30,7 @@
 #include <string.h>
 
 
-struct ethernet_device : DoublyLinkedListLinkImpl<ethernet_device>, net_device {
+struct ethernet_device : net_device, DoublyLinkedListLinkImpl<ethernet_device> {
 	int		fd;
 	uint32	frame_size;
 };
