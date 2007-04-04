@@ -347,10 +347,8 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 						}
 					}
 
-					request.ifr_flags = interface->flags;
-				}
-
-				if (status == B_OK) {
+					interface->flags |= (request.ifr_flags & ~(IFF_UP | IFF_LINK));
+				} else {
 					// pass the request into the datalink protocol stack
 					status = interface->first_info->control(
 						interface->first_protocol, option, value, *_length);
@@ -653,17 +651,6 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 
 			return user_memcpy(&((struct ifreq *)argument)->ifr_flags,
 				&request.ifr_flags, sizeof(request.ifr_flags));
-		}
-		case SIOCSIFFLAGS:
-		{
-			// set flags
-			struct ifreq request;
-			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			// TODO: check flags!
-			interface->flags = request.ifr_flags;
-			return B_OK;
 		}
 
 		case SIOCGIFPARAM:
