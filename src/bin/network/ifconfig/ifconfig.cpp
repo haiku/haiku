@@ -230,8 +230,10 @@ list_interface(int socket, const char* name)
 						type = "100 MBit, 100BASE-TX";
 						break;
 					case IFM_1000_T:
-					case IFM_1000_SX:
 						type = "1 GBit, 1000BASE-T";
+						break;
+					case IFM_1000_SX:
+						type = "1 GBit, 1000BASE-SX";
 						break;
 				}
 				break;
