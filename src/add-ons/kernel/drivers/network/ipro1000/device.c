@@ -43,6 +43,7 @@ static int32 gOpenMask = 0;
 
 int  em_attach(device_t);
 int  em_detach(device_t);
+void em_media_status(struct ifnet *, struct ifmediareq *);
 
 
 static void
@@ -338,20 +339,28 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_OK;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#if 0
 		case ETHER_GET_LINK_STATE:
 		{
+			struct ifnet ifp = { .if_softc = device->adapter };
+			struct ifmediareq mediareq;
 			ether_link_state_t state;
-			state.media = (info->link ? IFM_ACTIVE : 0)
-				| (info->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
-				| (info->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
-			state.speed = info->speed == LINK_SPEED_100_MBIT
-				? 100000 : 10000;
+
+			if (len < sizeof(ether_link_state_t))
+				return ENOBUFS;
+
+			em_media_status(&ifp, &mediareq);
+
+			state.media = mediareq.ifm_active;
+			if (mediareq.ifm_active & IFM_10_T)
+				state.speed = 10000;
+			else if (mediareq.ifm_active & IFM_100_TX)
+				state.speed = 100000;
+			else
+				state.speed = 1000000;
 			state.quality = 1000;
 
-			return user_memcpy(buffer, &state, sizeof(ether_link_state_t));
+			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
 		}
-#endif
 #endif
 
 		default:

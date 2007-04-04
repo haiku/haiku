@@ -814,7 +814,6 @@ event_handler(void *cookie)
 }
 
 
-#if 0
 /*********************************************************************
  *
  *  Media Ioctl callback
@@ -823,7 +822,7 @@ event_handler(void *cookie)
  *  the interface using ifconfig.
  *
  **********************************************************************/
-static void
+void
 em_media_status(struct ifnet *ifp, struct ifmediareq *ifmr)
 {
 	struct adapter * adapter = ifp->if_softc;
@@ -880,6 +879,7 @@ em_media_status(struct ifnet *ifp, struct ifmediareq *ifmr)
 	return;
 }
 
+#if 0
 /*********************************************************************
  *
  *  Media Ioctl callback

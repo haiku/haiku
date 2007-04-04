@@ -20,6 +20,7 @@
 #define __IF_COMPAT_H
 
 #include <OS.h>
+#include <net/if_media.h>
 
 #define __FreeBSD_version	500001
 
@@ -39,10 +40,10 @@
 #define IFCAP_RXCSUM			0x0020
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	define IFM_AVALID	0
 #	define IFM_FDX		IFM_FULL_DUPLEX
 #	define IFM_HDX		IFM_HALF_DUPLEX
-#	define IFM_1000_TX	17
-#	define IFM_1000_SX	18
+#	define IFM_1000_TX	IFM_1000_T
 #else
 #	define IFM_ACTIVE	0x0001
 #	define IFM_FDX		0x0002
