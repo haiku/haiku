@@ -471,17 +471,21 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
 	TRACE("ReadData(%lu bytes)", numBytes);
 
-	//BenaphoreLocker lock(&fReceiveLock);
+	RecursiveLocker locker(fLock);
 
 	if (fState == SYNCHRONIZE_SENT || fState == SYNCHRONIZE_RECEIVED) {
 		// we need to wait until the connection becomes established
 		if (flags & MSG_DONTWAIT)
 			return B_WOULD_BLOCK;
 
+		locker.Unlock();
+
 		status_t status = acquire_sem_etc(fSendLock, 1,
 			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, socket->receive.timeout);
 		if (status < B_OK)
 			return status;
+
+		locker.Lock();
 	}
 
 	if ((fFlags & FLAG_NO_RECEIVE) != 0 && fReceiveQueue.Available() == 0) {
@@ -495,8 +499,6 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	// TODO: wait until enough bytes are available
 
 	bigtime_t timeout = system_time() + socket->receive.timeout;
-
-	RecursiveLocker locker(fLock);
 
 	do {
 		locker.Unlock();
