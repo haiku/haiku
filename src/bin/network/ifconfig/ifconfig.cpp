@@ -214,7 +214,9 @@ list_interface(int socket, const char* name)
 		close(linkSocket);
 	}
 
-	if (ioctl(socket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0) {
+	if (ioctl(socket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0
+		&& (request.ifr_media & IFM_ACTIVE) != 0) {
+		// dump media state in case we're linked
 		const char* type = "unknown";
 		bool show = true;
 
