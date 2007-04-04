@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <net/if_dl.h>
+#include <net/if_media.h>
 #include <net/if_types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -172,7 +173,7 @@ list_interface(int socket, const char* name)
 		printf("\n\t");
 
 	// get link level interface for this interface
-	
+
 	int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
 	if (linkSocket < 0) {
 		printf("No link level: %s\n", strerror(errno));
@@ -211,6 +212,35 @@ list_interface(int socket, const char* name)
 
 		printf("Hardware Type: %s, Address: %s\n", type, address);
 		close(linkSocket);
+	}
+
+	if (ioctl(socket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0) {
+		const char* type = "unknown";
+		bool show = true;
+
+		switch (IFM_TYPE(request.ifr_media)) {
+			case IFM_ETHER:
+				switch (IFM_SUBTYPE(request.ifr_media)) {
+					case IFM_10_T:
+						type = "10 MBit, 10BASE-T";
+						break;
+					case IFM_100_TX:
+						type = "100 MBit, 100BASE-TX";
+						break;
+					case IFM_1000_T:
+					case IFM_1000_SX:
+						type = "1 GBit, 1000BASE-T";
+						break;
+				}
+				break;
+
+			default:
+				show = false;
+				break;
+		}
+
+		if (show)
+			printf("\tMedia Type: %s\n", type);
 	}
 
 	uint32 flags = 0;
@@ -270,7 +300,7 @@ list_interface(int socket, const char* name)
 			{IFF_ALLMULTI, "allmulti"},
 			{IFF_AUTOUP, "autoup"},
 			{IFF_LINK, "link"},
-			{IFF_AUTO_CONFIGURED, "auto-configure"},
+			{IFF_AUTO_CONFIGURED, "auto-configured"},
 			{IFF_CONFIGURING, "configuring"},
 		};
 		bool first = true;
