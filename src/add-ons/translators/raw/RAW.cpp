@@ -21,9 +21,9 @@
 #include <string.h>
 
 
-//#define TRACE(x) dprintf x
+//#define TRACE(x) printf x
 #define TRACE(x)
-//#define TAG(x) dprintf x
+//#define TAG(x) printf x
 #define TAG(x)
 
 #define ABS(x) (((int)(x) ^ ((int)(x) >> 31)) - ((int)(x) >> 31))
@@ -232,11 +232,11 @@ DCRaw::_FlipIndex(uint32 row, uint32 col, uint32 flip)
 	if (flip & 4)
 		SWAP(row, col);
 	if (flip & 2)
-		row = fOutputHeight - 1 - row;
+		row = fInputHeight - 1 - row;
 	if (flip & 1)
-		col = fOutputWidth - 1 - col;
+		col = fInputWidth - 1 - col;
 
-	return row * fOutputWidth + col;
+	return row * fInputWidth + col;
 }
 
 
@@ -2378,7 +2378,9 @@ DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 {
 	uint8* line, lookUpTable[0x10000];
 
-	uint32 outputRow = (4 * fOutputBitsPerSample / 8) * fOutputWidth;
+	uint32 width = image.flip & 4 ? fOutputHeight : fOutputWidth;
+	uint32 height = image.flip & 4 ? fOutputWidth : fOutputHeight;
+	uint32 outputRow = (4 * fOutputBitsPerSample / 8) * width;
 	uint32 outputOffset = 0;
 
 	line = (uint8 *)malloc(outputRow);
@@ -2393,16 +2395,16 @@ DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 	int32 sourceOffset = _FlipIndex(0, 0, image.flip);
 	int32 colStep = _FlipIndex(0, 1, image.flip) - sourceOffset;
 	int32 rowStep = _FlipIndex(1, 0, image.flip)
-		- _FlipIndex(0, fOutputWidth, image.flip);
+		- _FlipIndex(0, width, image.flip);
 
 	TRACE(("flip = %ld, sourceOffset = %ld, colStep = %ld, rowStep = %ld, "
 		"input: %lu x %lu, output: %lu x %lu\n", image.flip, sourceOffset,
-		colStep, rowStep, fInputWidth, fInputHeight, fOutputWidth,
-		fOutputHeight));
+		colStep, rowStep, fInputWidth, fInputHeight, width,
+		height));
 
 	if (fOutputBitsPerSample == 8) {
-		for (uint32 row = 0; row < fOutputHeight; row++, sourceOffset += rowStep) {
-			for (uint32 col = 0; col < fOutputWidth; col++, sourceOffset += colStep) {
+		for (uint32 row = 0; row < height; row++, sourceOffset += rowStep) {
+			for (uint32 col = 0; col < width; col++, sourceOffset += colStep) {
 				line[col * 4 + 2] = lookUpTable[fImageData[sourceOffset][0]];
 				line[col * 4 + 1] = lookUpTable[fImageData[sourceOffset][1]];
 				line[col * 4 + 0] = lookUpTable[fImageData[sourceOffset][2]];
@@ -3252,13 +3254,17 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	image_data_info& image = fImages[index];
 
 	fShrink = (fHalfSize || fThreshold) && fFilters;
-	fOutputWidth  = (fInputWidth + fShrink) >> fShrink;
+	fOutputWidth = (fInputWidth + fShrink) >> fShrink;
 	fOutputHeight = (fInputHeight + fShrink) >> fShrink;
-	if (image.flip & 4)
-		SWAP(fOutputHeight, fOutputWidth);
 
-	image.output_width = fOutputWidth;
-	image.output_height = fOutputHeight;
+	if (image.flip & 4) {
+		// image is rotated
+		image.output_width = fOutputHeight;
+		image.output_height = fOutputWidth;
+	} else {
+		image.output_width = fOutputWidth;
+		image.output_height = fOutputHeight;
+	}
 
 	if (image.is_raw) {
 		bufferSize = fOutputWidth * 4 * fOutputHeight;
