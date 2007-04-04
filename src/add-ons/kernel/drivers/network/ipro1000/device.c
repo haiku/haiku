@@ -370,7 +370,7 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 
 		case ETHER_SET_LINK_STATE_SEM:
 		{
-			if (user_memcpy(&device->linkChangeSem, arg, sizeof(sem_id *)) < B_OK) {
+			if (user_memcpy(&device->linkChangeSem, arg, sizeof(sem_id)) < B_OK) {
 				device->linkChangeSem = -1;
 				return B_BAD_ADDRESS;
 			}

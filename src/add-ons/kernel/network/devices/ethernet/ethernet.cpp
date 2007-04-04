@@ -178,7 +178,7 @@ ethernet_up(net_device *_device)
 		// Set the change notification semaphore; doesn't matter
 		// if this is supported by the device or not
 		ioctl(device->fd, ETHER_SET_LINK_STATE_SEM, &sLinkChangeSemaphore,
-			sizeof(sem_id *));
+			sizeof(sem_id));
 
 		BenaphoreLocker _(&sListLock);
 
