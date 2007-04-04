@@ -328,26 +328,28 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 				request.ifr_name);
 			if (interface != NULL) {
 				// filter out bringing the interface up or down 
-				if (option == SIOCSIFFLAGS
-					&& ((uint32)request.ifr_flags & IFF_UP)
-						!= (interface->flags & IFF_UP)) {
-					if ((interface->flags & IFF_UP) != 0) {
-						// bring the interface down
-						interface->flags &= ~(IFF_UP | IFF_LINK);
-						interface->first_info->interface_down(
-							interface->first_protocol);
-					} else {
-						// bring it up
-						status = interface->first_info->interface_up(
-							interface->first_protocol);
-						if (status == B_OK) {
-							interface->flags |= IFF_UP
-								| (interface->device->media & IFM_ACTIVE
-									? IFF_LINK : 0);
+				if (option == SIOCSIFFLAGS) {
+					if (((uint32)request.ifr_flags & IFF_UP)
+							!= (interface->flags & IFF_UP)) {
+						if ((interface->flags & IFF_UP) != 0) {
+							// bring the interface down
+							interface->flags &= ~(IFF_UP | IFF_LINK);
+							interface->first_info->interface_down(
+								interface->first_protocol);
+						} else {
+							// bring it up
+							status = interface->first_info->interface_up(
+								interface->first_protocol);
+							if (status == B_OK) {
+								interface->flags |= IFF_UP
+									| (interface->device->media & IFM_ACTIVE
+										? IFF_LINK : 0);
+							}
 						}
 					}
 
-					interface->flags |= (request.ifr_flags & ~(IFF_UP | IFF_LINK));
+					if (status == B_OK)
+						interface->flags |= request.ifr_flags & ~(IFF_UP | IFF_LINK);
 				} else {
 					// pass the request into the datalink protocol stack
 					status = interface->first_info->control(
