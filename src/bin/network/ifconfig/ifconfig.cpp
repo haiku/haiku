@@ -269,6 +269,9 @@ list_interface(int socket, const char* name)
 			{IFF_PROMISC, "promiscuous"},
 			{IFF_ALLMULTI, "allmulti"},
 			{IFF_AUTOUP, "autoup"},
+			{IFF_LINK, "link"},
+			{IFF_AUTO_CONFIGURED, "auto-configure"},
+			{IFF_CONFIGURING, "configuring"},
 		};
 		bool first = true;
 
