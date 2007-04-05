@@ -337,11 +337,6 @@ link_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
 	if (status < B_OK)
 		return status;
 
-	if (numBytes < buffer->size) {
-		// discard any data behind the amount requested
-		gNetBufferModule.trim(buffer, numBytes);
-	}
-
 	*_buffer = buffer;
 	return B_OK;
 }

@@ -849,12 +849,6 @@ UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 	if (status < B_OK)
 		return status;
 
-	if (numBytes < buffer->size) {
-		// discard any data behind the amount requested
-		gBufferModule->trim(buffer, numBytes);
-			// TODO: we should indicate MSG_TRUNC to application!
-	}
-
 	TRACE(("FetchData() returns buffer with %ld data bytes\n", buffer->size));
 	*_buffer = buffer;
 	return B_OK;

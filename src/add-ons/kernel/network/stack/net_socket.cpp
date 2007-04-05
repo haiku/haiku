@@ -230,8 +230,18 @@ status_t
 socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 	net_buffer **_buffer)
 {
-	return socket->first_info->read_data(socket->first_protocol,
+	status_t status = socket->first_info->read_data(socket->first_protocol,
 		length, flags, _buffer);
+
+	if (status < B_OK)
+		return status;
+
+	if (*_buffer && length < (*_buffer)->size) {
+		// discard any data behind the amount requested
+		gNetBufferModule.trim(*_buffer, length);
+	}
+
+	return status;
 }
 
 
@@ -761,9 +771,7 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 	if (status < B_OK)
 		return status;
 
-	// TODO: - datagram based protocols should return the
-	//         full datagram so we can cut it here with MSG_TRUNC
-	//       - returning a NULL buffer when received 0 bytes
+	// TODO: - returning a NULL buffer when received 0 bytes
 	//         may not make much sense as we still need the address
 	//       - gNetBufferModule.read() uses memcpy() instead of user_memcpy
 
@@ -814,8 +822,16 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 
 	gNetBufferModule.free(buffer);
 
-	if (bytesCopied < bytesReceived)
+	if (bytesCopied < bytesReceived) {
+		if (flags & MSG_TRUNC) {
+			if (header)
+				header->msg_flags = MSG_TRUNC;
+
+			return bytesReceived;
+		}
+
 		return ENOBUFS;
+	}
 
 	return bytesCopied;
 }

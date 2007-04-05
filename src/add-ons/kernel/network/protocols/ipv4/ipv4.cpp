@@ -187,11 +187,6 @@ RawSocket::Read(size_t numBytes, uint32 flags, bigtime_t timeout,
 	if (status < B_OK)
 		return status;
 
-	if (numBytes < buffer->size) {
-		// discard any data behind the amount requested
-		gBufferModule->trim(buffer, numBytes);
-	}
-
 	*_buffer = buffer;
 	return B_OK;
 }
