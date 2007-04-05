@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -282,11 +282,19 @@ BOutlineListView::RemoveItem(int32 fullIndex)
 
 
 bool
-BOutlineListView::RemoveItems(int32 fullListIndex, int32 count)
+BOutlineListView::RemoveItems(int32 fullIndex, int32 count)
 {
-	printf("BOutlineListView::RemoveItems Not implemented\n");
+	if (fullIndex >= FullListCountItems())
+		fullIndex = -1;
+	if (fullIndex < 0)
+		return false;
 
-	return false;
+	// TODO: very bad for performance!!
+	while (count--) {
+		BOutlineListView::RemoveItem(fullIndex);
+	}
+
+	return true;
 }
 
 
