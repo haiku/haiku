@@ -823,14 +823,11 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 	gNetBufferModule.free(buffer);
 
 	if (bytesCopied < bytesReceived) {
-		if (flags & MSG_TRUNC) {
-			if (header)
-				header->msg_flags = MSG_TRUNC;
+		if (header)
+			header->msg_flags = MSG_TRUNC;
 
+		if (flags & MSG_TRUNC)
 			return bytesReceived;
-		}
-
-		return ENOBUFS;
 	}
 
 	return bytesCopied;
