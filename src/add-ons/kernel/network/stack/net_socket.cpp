@@ -814,7 +814,7 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 			bytesCopied += toRead;
 		}
 
-		if (bytesCopied == bytesReceived && header->msg_name != NULL) {
+		if (header->msg_name != NULL) {
 			header->msg_namelen = min_c(nameLen, buffer->source.ss_len);
 			memcpy(header->msg_name, &buffer->source, header->msg_namelen);
 		}
