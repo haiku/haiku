@@ -860,17 +860,9 @@ UdpEndpoint::StoreData(net_buffer *_buffer)
 {
 	TRACE(("buffer %p passed to endpoint with (%s)\n", _buffer,
 		AddressString(sDomain, (sockaddr *)&socket->address, true).Data()));
-	net_buffer *buffer = gBufferModule->clone(_buffer, false);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
 
-	status_t status = sStackModule->fifo_enqueue_buffer(&fFifo, buffer);
-	if (status >= B_OK)
-		sStackModule->notify_socket(socket, B_SELECT_READ, BytesAvailable());
-	else
-		gBufferModule->free(buffer);
-
-	return status;
+	return sStackModule->fifo_socket_enqueue_buffer(&fFifo, socket,
+			B_SELECT_READ, _buffer);
 }
 
 

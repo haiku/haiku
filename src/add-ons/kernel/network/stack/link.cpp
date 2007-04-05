@@ -40,19 +40,8 @@ link_monitor_data(void *cookie, net_buffer *packet)
 {
 	link_protocol *protocol = (link_protocol *)cookie;
 
-	// we need to make a clone for that buffer and pass it to the socket
-	net_buffer *buffer = gNetBufferModule.clone(packet, false);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	status_t status = fifo_enqueue_buffer(&protocol->fifo, buffer);
-	if (status >= B_OK)
-		notify_socket(protocol->socket, B_SELECT_READ,
-						protocol->fifo.current_bytes);
-	else
-		gNetBufferModule.free(buffer);
-
-	return status;
+	return fifo_socket_enqueue_buffer(&protocol->fifo, protocol->socket,
+						B_SELECT_READ, packet);
 }
 
 

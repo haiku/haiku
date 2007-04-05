@@ -202,19 +202,8 @@ RawSocket::BytesAvailable()
 status_t
 RawSocket::Write(net_buffer *source)
 {
-	// we need to make a clone for that buffer and pass it to the socket
-	net_buffer *buffer = gBufferModule->clone(source, false);
-	TRACE(("ipv4::RawSocket::Write(): cloned buffer %p\n", buffer));
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	status_t status = sStackModule->fifo_enqueue_buffer(&fFifo, buffer);
-	if (status >= B_OK)
-		sStackModule->notify_socket(fSocket, B_SELECT_READ, BytesAvailable());
-	else
-		gBufferModule->free(buffer);
-
-	return status;
+	return sStackModule->fifo_socket_enqueue_buffer(&fFifo, fSocket,
+			B_SELECT_READ, source);
 }
 
 

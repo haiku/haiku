@@ -923,6 +923,7 @@ static net_stack_module_info sNetStackModule = {
 	fifo_enqueue_buffer,
 	fifo_dequeue_buffer,
 	clear_fifo,
+	fifo_socket_enqueue_buffer,
 
 	init_timer,
 	set_timer,

@@ -134,11 +134,9 @@ uninit_fifo(net_fifo *fifo)
 }
 
 
-status_t
-fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
+static status_t
+_fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
 {
-	BenaphoreLocker locker(fifo->lock);
-
 	if (fifo->max_bytes > 0 && fifo->current_bytes + buffer->size > fifo->max_bytes)
 		return ENOBUFS;
 
@@ -153,6 +151,13 @@ fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
 	}
 
 	return B_OK;
+}
+
+status_t
+fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
+{
+	BenaphoreLocker locker(fifo->lock);
+	return _fifo_enqueue_buffer(fifo, buffer);
 }
 
 
@@ -240,6 +245,26 @@ clear_fifo(net_fifo *fifo)
 
 	fifo->current_bytes = 0;
 	return B_OK;
+}
+
+
+status_t
+fifo_socket_enqueue_buffer(net_fifo *fifo, net_socket *socket, uint8 event,
+	net_buffer *_buffer)
+{
+	net_buffer *buffer = gNetBufferModule.clone(_buffer, false);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	BenaphoreLocker locker(fifo->lock);
+
+	status_t status = _fifo_enqueue_buffer(fifo, buffer);
+	if (status < B_OK)
+		gNetBufferModule.free(buffer);
+	else
+		notify_socket(socket, event, fifo->current_bytes);
+
+	return status;
 }
 
 

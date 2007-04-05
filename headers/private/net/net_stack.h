@@ -90,6 +90,8 @@ struct net_stack_module_info {
 	ssize_t (*fifo_dequeue_buffer)(struct net_fifo *fifo, uint32 flags,
 					bigtime_t timeout, struct net_buffer **_buffer);
 	status_t (*clear_fifo)(struct net_fifo *fifo);
+	status_t (*fifo_socket_enqueue_buffer)(struct net_fifo *, struct net_socket *,
+					uint8 event, struct net_buffer *);
 
 	// timer
 	void (*init_timer)(struct net_timer *timer, net_timer_func hook, void *data);
