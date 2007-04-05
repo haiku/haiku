@@ -103,11 +103,9 @@ struct ifreq;
 struct sockaddr_args;
 struct socket_args;
 struct sockopt_args;
-struct transfer_args;
 
 DEFINE_FACTORY(fdset_ptr, fd_set *);
 DEFINE_FACTORY(sockaddr_args_ptr, sockaddr_args *);
-DEFINE_FACTORY(transfer_args_ptr, transfer_args *);
 DEFINE_FACTORY(sockopt_args_ptr, sockopt_args *);
 DEFINE_FACTORY(socket_args_ptr, socket_args *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);

@@ -40,8 +40,6 @@ struct net_socket_private : net_socket {
 
 void socket_delete(net_socket *socket);
 int socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength);
-ssize_t socket_recvmsg(net_socket *, msghdr *header, int flags);
-ssize_t socket_sendmsg(net_socket *, msghdr *header, int flags);
 
 struct list sSocketList;
 benaphore sSocketLock;
@@ -735,179 +733,112 @@ socket_listen(net_socket *socket, int backlog)
 
 
 ssize_t
-socket_recv(net_socket *socket, void *data, size_t length, int flags)
+socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
+	int flags)
 {
-	net_buffer *buffer;
-	status_t status = socket->first_info->read_data(
-		socket->first_protocol, length, flags, &buffer);
-	if (status < B_OK)
-		return status;
-
-	// if 0 bytes we're received, no buffer will be created
-	if (buffer == NULL)
-		return 0;
-
-	ssize_t bytesReceived = buffer->size;
-	gNetBufferModule.read(buffer, 0, data, bytesReceived);
-	gNetBufferModule.free(buffer);
-
-	return bytesReceived;
-}
-
-
-ssize_t
-socket_recvfrom(net_socket *socket, void *data, size_t length, int flags,
-	struct sockaddr *address, socklen_t *_addressLength)
-{
-	iovec iov = { data, length };
-	msghdr header;
-
-	memset(&header, 0, sizeof(header));
-	header.msg_name = (char *)address;
-	header.msg_iov = &iov;
-	header.msg_iovlen = 1;
-
-	if (_addressLength != NULL)
-		header.msg_namelen = *_addressLength;
-
-	ssize_t bytesReceived = socket_recvmsg(socket, &header, flags);
-	if (_addressLength != NULL)
-		*_addressLength = header.msg_namelen;
-
-	return bytesReceived;
-}
-
-
-ssize_t
-socket_recvmsg(net_socket *socket, msghdr *header, int flags)
-{
+	size_t totalLength = length;
 	net_buffer *buffer;
 	iovec tmp;
 	int i;
 
-	size_t length = 0;
-	for (i = 0; i < header->msg_iovlen; i++) {
-		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
-			return B_BAD_ADDRESS;
-		if (tmp.iov_len > 0 && tmp.iov_base == NULL)
-			return B_BAD_ADDRESS;
-		length += tmp.iov_len;
+	// the convention to this function is that have header been
+	// present, { data, length } would have been iovec[0] and is
+	// always considered like that
+
+	if (header) {
+		// calculate the length considering all of the extra buffers
+		for (i = 1; i < header->msg_iovlen; i++) {
+			if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (tmp.iov_len > 0 && tmp.iov_base == NULL)
+				return B_BAD_ADDRESS;
+			totalLength += tmp.iov_len;
+		}
 	}
 
 	status_t status = socket->first_info->read_data(
-		socket->first_protocol, length, flags, &buffer);
+		socket->first_protocol, totalLength, flags, &buffer);
 	if (status < B_OK)
 		return status;
 
-	// TODO: - consider the control buffer options
-	//       - datagram based protocols should return the
+	// TODO: - datagram based protocols should return the
 	//         full datagram so we can cut it here with MSG_TRUNC
 	//       - returning a NULL buffer when received 0 bytes
 	//         may not make much sense as we still need the address
 	//       - gNetBufferModule.read() uses memcpy() instead of user_memcpy
 
-	size_t nameLen = header->msg_namelen;
-	header->msg_namelen = 0;
-	header->msg_flags = 0;
+	size_t nameLen = 0;
+
+	if (header) {
+		// TODO: - consider the control buffer options
+		nameLen = header->msg_namelen;
+		header->msg_namelen = 0;
+		header->msg_flags = 0;
+	}
 
 	if (buffer == NULL)
 		return 0;
 
-	size_t bufferSize = buffer->size, bytesReceived = 0;
-	for (i = 0; i < header->msg_iovlen && bytesReceived < bufferSize; i++) {
-		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
-			break;
+	size_t bytesReceived = buffer->size, bytesCopied = 0;
 
-		size_t toRead = min_c(bufferSize - bytesReceived, tmp.iov_len);
-		if (gNetBufferModule.read(buffer, bytesReceived, tmp.iov_base,
-									toRead) < B_OK)
-			break;
-
-		bytesReceived += toRead;
+	length = min_c(bytesReceived, length);
+	if (gNetBufferModule.read(buffer, 0, data, length) < B_OK) {
+		gNetBufferModule.free(buffer);
+		return ENOBUFS;
 	}
 
-	if (bytesReceived == bufferSize && header->msg_name != NULL) {
-		header->msg_namelen = min_c(nameLen, buffer->source.ss_len);
-		memcpy(header->msg_name, &buffer->source, header->msg_namelen);
+	// if first copy was a success, proceed to following
+	// copies as required
+	bytesCopied += length;
+
+	if (header) {
+		// we only start considering at iovec[1]
+		// as { data, length } is iovec[0]
+		for (i = 1; i < header->msg_iovlen && bytesCopied < bytesReceived; i++) {
+			if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
+				break;
+
+			size_t toRead = min_c(bytesReceived - bytesCopied, tmp.iov_len);
+			if (gNetBufferModule.read(buffer, bytesCopied, tmp.iov_base,
+										toRead) < B_OK)
+				break;
+
+			bytesCopied += toRead;
+		}
+
+		if (bytesCopied == bytesReceived && header->msg_name != NULL) {
+			header->msg_namelen = min_c(nameLen, buffer->source.ss_len);
+			memcpy(header->msg_name, &buffer->source, header->msg_namelen);
+		}
 	}
 
 	gNetBufferModule.free(buffer);
 
-	if (bytesReceived < bufferSize)
+	if (bytesCopied < bytesReceived)
 		return ENOBUFS;
 
-	return bytesReceived;
+	return bytesCopied;
 }
 
 
 ssize_t
-socket_send(net_socket *socket, const void *data, size_t length, int flags)
+socket_send(net_socket *socket, msghdr *header, const void *data,
+	size_t length, int flags)
 {
-	if (socket->peer.ss_len == 0)
-		return EDESTADDRREQ;
+	const sockaddr *address = NULL;
+	socklen_t addressLength = 0;
 
-	if (socket->address.ss_len == 0) {
-		// try to bind first
-		status_t status = socket_bind(socket, NULL, 0);
-		if (status < B_OK)
-			return status;
+	// the convention to this function is that have header been
+	// present, { data, length } would have been iovec[0] and is
+	// always considered like that
+
+	if (header != NULL) {
+		address = (const sockaddr *)header->msg_name;
+		addressLength = header->msg_namelen;
+
+		if (header->msg_iovlen <= 1)
+			header = NULL;
 	}
-
-	// TODO: useful, maybe even computed header space!
-	net_buffer *buffer = gNetBufferModule.create(256);
-	if (buffer == NULL)
-		return ENOBUFS;
-
-	// copy data into buffer
-	if (gNetBufferModule.append(buffer, data, length) < B_OK) {
-		gNetBufferModule.free(buffer);
-		return ENOBUFS;
-	}
-
-	buffer->flags = flags;
-	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
-	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
-
-	status_t status = socket->first_info->send_data(socket->first_protocol,
-		buffer);
-	if (status < B_OK) {
-		size_t size = buffer->size;
-		gNetBufferModule.free(buffer);
-
-		if (size != length && (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
-			// this appears to be a partial write
-			return length - size;
-		}
-
-		return status;
-	}
-
-	return length;
-}
-
-
-ssize_t
-socket_sendto(net_socket *socket, const void *data, size_t length, int flags,
-	const struct sockaddr *address, socklen_t addressLength)
-{
-	iovec iov = { (void *)data, length };
-	msghdr header;
-
-	memset(&header, 0, sizeof(header));
-	header.msg_name = (char *)address;
-	header.msg_namelen = addressLength;
-	header.msg_iov = &iov;
-	header.msg_iovlen = 1;
-
-	return socket_sendmsg(socket, &header, flags);
-}
-
-
-ssize_t
-socket_sendmsg(net_socket *socket, msghdr *header, int flags)
-{
-	const sockaddr *address = (const sockaddr *)header->msg_name;
-	socklen_t addressLength = header->msg_namelen;
 
 	if (addressLength == 0)
 		address = NULL;
@@ -922,6 +853,7 @@ socket_sendmsg(net_socket *socket, msghdr *header, int flags)
 		address = (struct sockaddr *)&socket->peer;
 		addressLength = socket->peer.ss_len;
 	}
+
 	if (address == NULL || addressLength == 0) {
 		// don't know where to send to:
 		return EDESTADDRREQ;
@@ -939,18 +871,23 @@ socket_sendmsg(net_socket *socket, msghdr *header, int flags)
 	if (buffer == NULL)
 		return ENOBUFS;
 
-	size_t length = 0;
+	if (gNetBufferModule.append(buffer, data, length) < B_OK) {
+		gNetBufferModule.free(buffer);
+		return ENOBUFS;
+	}
 
-	// copy data into buffer
-	for (int i = 0; i < header->msg_iovlen; i++) {
-		iovec tmp;
-		if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK ||
-			gNetBufferModule.append(buffer, tmp.iov_base, tmp.iov_len) < B_OK) {
-			gNetBufferModule.free(buffer);
-			return ENOBUFS;
+	if (header) {
+		// copy additional data into buffer
+		for (int i = 1; i < header->msg_iovlen; i++) {
+			iovec tmp;
+			if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK ||
+				gNetBufferModule.append(buffer, tmp.iov_base, tmp.iov_len) < B_OK) {
+				gNetBufferModule.free(buffer);
+				return ENOBUFS;
+			}
+
+			length += tmp.iov_len;
 		}
-
-		length += tmp.iov_len;
 	}
 
 	buffer->flags = flags;
@@ -1167,12 +1104,8 @@ net_socket_module_info gNetSocketModule = {
 	socket_getsockname,
 	socket_getsockopt,
 	socket_listen,
-	socket_recv,
-	socket_recvfrom,
-	socket_recvmsg,
+	socket_receive,
 	socket_send,
-	socket_sendto,
-	socket_sendmsg,
 	socket_setsockopt,
 	socket_shutdown,
 };

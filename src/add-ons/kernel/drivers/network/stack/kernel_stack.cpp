@@ -90,35 +90,40 @@ check_args_and_address(ArgType &args, sockaddr_storage &address, void *data, siz
 
 
 static status_t
-check_msghdr_args(msghdr_args &args, msghdr &header, sockaddr_storage &address,
+check_message_args(message_args &args, msghdr &header, sockaddr_storage &address,
 					void *data, size_t length, sockaddr **originalAddress)
 {
-	if (length < sizeof(msghdr_args))
+	if (length < sizeof(message_args))
 		return B_BAD_VALUE;
 
-	status_t status = user_memcpy(&args, data, sizeof(msghdr_args));
+	status_t status = user_memcpy(&args, data, sizeof(message_args));
 	if (status < B_OK)
 		return status;
 
-	status = user_memcpy(&header, args.header, sizeof(msghdr));
-	if (status < B_OK)
-		return status;
+	if (args.header != NULL) {
+		status = user_memcpy(&header, args.header, sizeof(msghdr));
+		if (status < B_OK)
+			return status;
 
-	if (originalAddress == NULL) {
-		if (header.msg_namelen > sizeof(address))
-			return B_BAD_VALUE;
+		if (header.msg_name == NULL)
+			return B_OK;
 
-		if (header.msg_name != NULL) {
-			status = user_memcpy(&address, header.msg_name, header.msg_namelen);
-			if (status < B_OK)
-				return B_BAD_ADDRESS;
+		if (originalAddress == NULL) {
+			if (header.msg_namelen > sizeof(address))
+				return B_BAD_VALUE;
+
+			if (header.msg_name != NULL) {
+				status = user_memcpy(&address, header.msg_name, header.msg_namelen);
+				if (status < B_OK)
+					return B_BAD_ADDRESS;
+			}
+		} else {
+			*originalAddress = (sockaddr *)header.msg_name;
 		}
-	} else {
-		originalAddress = (sockaddr **)&header.msg_name;
+
+		header.msg_name = (char *)&address;
 	}
 
-	if (header.msg_name != NULL)
-		header.msg_name = (char *)&address;
 	return B_OK;
 }
 
@@ -369,94 +374,49 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 
 			case NET_STACK_SEND:
 			{
-				transfer_args args;
-				status = check_args(args, data, length);
-				if (status < B_OK)
-					return status;
-
-				return sSocket->send(cookie->socket, args.data, args.data_length, args.flags);
-			}
-			case NET_STACK_SENDTO:
-			{
 				sockaddr_storage address;
-				transfer_args args;
-				status = check_args_and_address(args, address, data, length);
-				if (status < B_OK)
-					return status;
-
-				return sSocket->sendto(cookie->socket, args.data, args.data_length,
-					args.flags, args.address, args.address_length);
-			}
-
-			case NET_STACK_SENDMSG:
-			{
-				sockaddr_storage address;
-				msghdr_args args;
+				message_args args;
 				msghdr header;
 
-				status = check_msghdr_args(args, header, address, data,
+				status = check_message_args(args, header, address, data,
 											length, NULL);
 				if (status < B_OK)
 					return status;
 
-				return sSocket->sendmsg(cookie->socket, &header, args.flags);
+				return sSocket->send(cookie->socket,
+						args.header ? &header : NULL,
+						args.data, args.length, args.flags);
 			}
 
-			case NET_STACK_RECV:
+			case NET_STACK_RECEIVE:
 			{
-				transfer_args args;
-				status = check_args(args, data, length);
-				if (status < B_OK)
-					return status;
-
-				return sSocket->recv(cookie->socket, args.data, args.data_length, args.flags);
-			}
-			case NET_STACK_RECVFROM:
-			{
+				sockaddr *originalAddress = NULL;
 				sockaddr_storage address;
-				transfer_args args;
-				status = check_args_and_address(args, address, data, length, false);
-				if (status < B_OK)
-					return status;
-
-				ssize_t bytesRead = sSocket->recvfrom(cookie->socket, args.data,
-					args.data_length, args.flags, args.address, &args.address_length);
-				if (bytesRead < B_OK)
-					return bytesRead;
-
-				status = return_address(args, data);
-				if (status < B_OK)
-					return status;
-
-				return bytesRead;
-			}
-
-			case NET_STACK_RECVMSG:
-			{
-				sockaddr *originalAddress;
-				sockaddr_storage address;
-				msghdr_args args;
+				message_args args;
 				msghdr header;
 
-				status = check_msghdr_args(args, header, address, data,
+				status = check_message_args(args, header, address, data,
 											length, &originalAddress);
 				if (status < B_OK)
 					return status;
 
-				ssize_t bytesRead = sSocket->recvmsg(cookie->socket, &header,
-														args.flags);
+				ssize_t bytesRead = sSocket->receive(cookie->socket,
+						args.header ? &header : NULL, args.data,
+						args.length, args.flags);
 				if (bytesRead < B_OK)
 					return bytesRead;
 
-				if (header.msg_name != NULL) {
-					if (user_memcpy(originalAddress, header.msg_name,
-									header.msg_namelen) < B_OK)
+				if (args.header != NULL) {
+					if (header.msg_name != NULL) {
+						if (user_memcpy(originalAddress, header.msg_name,
+										header.msg_namelen) < B_OK)
+							return B_BAD_ADDRESS;
+					}
+
+					if (user_memcpy(&args.header->msg_flags, &header.msg_flags,
+									sizeof(int)) < B_OK)
 						return B_BAD_ADDRESS;
 				}
-
-				if (user_memcpy(&args.header->msg_flags, &header.msg_flags,
-								sizeof(int)) < B_OK)
-					return B_BAD_ADDRESS;
 
 				return bytesRead;
 			}
@@ -572,7 +532,7 @@ net_stack_read(void *_cookie, off_t /*offset*/, void *buffer, size_t *_length)
 	if (cookie->socket == NULL)
 		return B_BAD_VALUE;
 
-	ssize_t bytesRead = sSocket->recv(cookie->socket, buffer, *_length, 0);
+	ssize_t bytesRead = sSocket->receive(cookie->socket, NULL, buffer, *_length, 0);
 	if (bytesRead < 0) {
 		*_length = 0;
 		return bytesRead;
@@ -608,7 +568,7 @@ net_stack_write(void *_cookie, off_t /*offset*/, const void *buffer, size_t *_le
 	if (cookie->socket == NULL)
 		return B_BAD_VALUE;
 
-	ssize_t bytesWritten = sSocket->send(cookie->socket, buffer, *_length, 0);
+	ssize_t bytesWritten = sSocket->send(cookie->socket, NULL, buffer, *_length, 0);
 	if (bytesWritten < 0) {
 		*_length = 0;
 		return bytesWritten;

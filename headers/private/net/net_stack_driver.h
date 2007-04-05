@@ -29,12 +29,8 @@ enum {
 
 	// ops acting on an existing socket
 	NET_STACK_BIND,								// sockaddr_args *
-	NET_STACK_RECVFROM,							// struct msghdr *
-	NET_STACK_RECV,								// transfer_args *
-	NET_STACK_RECVMSG,							// msghdr_args *
-	NET_STACK_SENDTO,							// struct msghdr *
-	NET_STACK_SEND,								// transfer_args *
-	NET_STACK_SENDMSG,							// msghdr_args *
+	NET_STACK_RECEIVE,							// message_args *
+	NET_STACK_SEND,								// message_args *
 	NET_STACK_LISTEN,							// int_args * (value = backlog)
 	NET_STACK_ACCEPT,							// sockaddr_args *
 	NET_STACK_CONNECT,							// sockaddr_args *
@@ -62,16 +58,10 @@ struct sockopt_args {	// used by NET_STACK_SETSOCKOPT/_GETSOCKOPT
 	int		length;
 };
 
-struct transfer_args {	// used by NET_STACK_SEND/_RECV
-	void	*data;
-	size_t	data_length;
-	int		flags;
-	struct sockaddr *address;	// only used for recvfrom() and sendto()
-	socklen_t address_length;	// ""
-};
-
-struct msghdr_args {
+struct message_args {
 	struct msghdr *header;
+	void *data;
+	size_t length;
 	int flags;
 };
 

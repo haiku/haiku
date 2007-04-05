@@ -15,6 +15,7 @@
 
 #include <net_stack_driver.h>
 
+#include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -113,14 +114,13 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 ssize_t
 recv(int socket, void *data, size_t length, int flags)
 {
-	transfer_args args;
+	message_args args;
 	args.data = data;
-	args.data_length = length;
+	args.length = length;
 	args.flags = flags;
-	args.address = NULL;
-	args.address_length = 0;
+	args.header = NULL;
 
-	return ioctl(socket, NET_STACK_RECV, &args, sizeof(args));
+	return ioctl(socket, NET_STACK_RECEIVE, &args, sizeof(args));
 }
 
 
@@ -128,19 +128,25 @@ ssize_t
 recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *address, socklen_t *_addressLength)
 {
-	transfer_args args;
-	args.data = data;
-	args.data_length = length;
-	args.flags = flags;
-	args.address = address;
-	args.address_length = _addressLength ? *_addressLength : 0;
+	message_args args;
+	msghdr header;
 
-	ssize_t bytesReceived = ioctl(socket, NET_STACK_RECVFROM, &args, sizeof(args));
+	memset(&header, 0, sizeof(header));
+
+	args.data = data;
+	args.length = length;
+	args.flags = flags;
+	args.header = &header;
+
+	header.msg_name = (char *)address;
+	header.msg_namelen = _addressLength ? *_addressLength : 0;
+
+	ssize_t bytesReceived = ioctl(socket, NET_STACK_RECEIVE, &args, sizeof(args));
 	if (bytesReceived < 0)
 		return -1;
 
 	if (_addressLength != NULL)
-		*_addressLength = args.address_length;
+		*_addressLength = header.msg_namelen;
 
 	return bytesReceived;
 }
@@ -149,20 +155,34 @@ recvfrom(int socket, void *data, size_t length, int flags,
 ssize_t
 recvmsg(int socket, struct msghdr *message, int flags)
 {
-	msghdr_args args = { message, flags };
-	return ioctl(socket, NET_STACK_RECVMSG, &args, sizeof(args));
+	message_args args;
+
+	if (message == NULL || (message->msg_iovlen > 0 && message->msg_iov == NULL))
+		return B_BAD_VALUE;
+
+	args.header = message;
+	args.flags = flags;
+
+	if (message->msg_iovlen > 0) {
+		args.data = message->msg_iov[0].iov_base;
+		args.length = message->msg_iov[0].iov_len;
+	} else {
+		args.data = NULL;
+		args.length = 0;
+	}
+
+	return ioctl(socket, NET_STACK_RECEIVE, &args, sizeof(args));
 }
 
 
 ssize_t
 send(int socket, const void *data, size_t length, int flags)
 {
-	transfer_args args;
+	message_args args;
 	args.data = const_cast<void *>(data);
-	args.data_length = length;
+	args.length = length;
 	args.flags = flags;
-	args.address = NULL;
-	args.address_length = 0;
+	args.header = NULL;
 
 	return ioctl(socket, NET_STACK_SEND, &args, sizeof(args));
 }
@@ -172,22 +192,41 @@ ssize_t
 sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *address, socklen_t addressLength)
 {
-	transfer_args args;
-	args.data = const_cast<void *>(data);
-	args.data_length = length;
-	args.flags = flags;
-	args.address = const_cast<sockaddr *>(address);
-	args.address_length = addressLength;
+	message_args args;
+	msghdr header;
+	memset(&header, 0, sizeof(header));
 
-	return ioctl(socket, NET_STACK_SENDTO, &args, sizeof(args));
+	args.data = const_cast<void *>(data);
+	args.length = length;
+	args.flags = flags;
+	args.header = &header;
+	header.msg_name = (char *)const_cast<sockaddr *>(address);
+	header.msg_namelen = addressLength;
+
+	return ioctl(socket, NET_STACK_SEND, &args, sizeof(args));
 }
 
 
 ssize_t
 sendmsg(int socket, const struct msghdr *message, int flags)
 {
-	msghdr_args args = { (msghdr *)message, flags };
-	return ioctl(socket, NET_STACK_SENDMSG, &args, sizeof(args));
+	message_args args;
+
+	if (message == NULL || (message->msg_iovlen > 0 && message->msg_iov == NULL))
+		return B_BAD_VALUE;
+
+	args.header = (msghdr *)message;
+	args.flags = flags;
+
+	if (message->msg_iovlen > 0) {
+		args.data = message->msg_iov[0].iov_base;
+		args.length = message->msg_iov[0].iov_len;
+	} else {
+		args.data = NULL;
+		args.length = 0;
+	}
+
+	return ioctl(socket, NET_STACK_SEND, &args, sizeof(args));
 }
 
 

@@ -226,19 +226,6 @@ format_pointer(Context &context, sockaddr_args *args)
 	return r;
 }
 
-static string
-format_pointer(Context &context, transfer_args *args)
-{
-	string r;
-
-	r  =   "data = " + context.FormatPointer(args->data);
-	r += ", len = " + context.FormatUnsigned(args->data_length);
-	r += ", flags = " + context.FormatFlags(args->flags);
-	r += ", addr = " + format_pointer_value<sockaddr>(context, args->address);
-
-	return r;
-}
-
 struct socket_option_info {
 	int level;
 	int option;
@@ -475,7 +462,6 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 
 DEFINE_TYPE(fdset_ptr, fd_set *);
 POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
-POINTER_TYPE(transfer_args_ptr, transfer_args);
 POINTER_TYPE(sockopt_args_ptr, sockopt_args);
 POINTER_TYPE(socket_args_ptr, socket_args);
 POINTER_TYPE(msghdr_ptr, msghdr);
