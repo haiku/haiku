@@ -240,6 +240,20 @@ remove_data_node(data_node *node)
 }
 
 
+static inline data_node *
+get_node_at_offset(net_buffer_private *buffer, size_t offset)
+{
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node->offset + node->used < offset) {
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		if (node == NULL)
+			return NULL;
+	}
+
+	return node;
+}
+
+
 //	#pragma mark -
 
 
@@ -527,19 +541,6 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 	return B_OK;
 }
 
-
-static inline data_node *
-get_node_at_offset(net_buffer_private *buffer, size_t offset)
-{
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < offset) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			return NULL;
-	}
-
-	return node;
-}
 
 /*!	Writes into existing allocated memory.
 	\return B_BAD_VALUE if you write outside of the buffers current
@@ -870,13 +871,10 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	if (newSize == buffer->size)
 		return B_OK;
 
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < newSize) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL) {
-			// trim size greater than buffer size
-			return B_BAD_VALUE;
-		}
+	data_node *node = get_node_at_offset(buffer, newSize);
+	if (node == NULL) {
+		// trim size greater than buffer size
+		return B_BAD_VALUE;
 	}
 
 	int32 diff = node->used + node->offset - newSize;
