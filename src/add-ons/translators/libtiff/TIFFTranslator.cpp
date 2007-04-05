@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -183,34 +183,34 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 		tiff_size_proc, tiff_map_file_proc, tiff_unmap_file_proc); 
     if (!tif)
     	return B_NO_TRANSLATOR;
-	
+
 	// count number of documents
-	int32 document_count = 0, document_index = 1;
+	int32 documentCount = 0, documentIndex = 1;
 	do {
-		document_count++;
+		documentCount++;
 	} while (TIFFReadDirectory(tif));
-	
+
+	if (ioExtension) {
+		// Check if a document index has been specified
+		if (ioExtension->FindInt32(DOCUMENT_INDEX, &documentIndex) != B_OK)
+			documentIndex = 1;
+
+		if (documentIndex < 1 || documentIndex > documentCount) {
+			// document index is invalid
+			return B_NO_TRANSLATOR;
+		}
+	}
+
+	// identify the document the user specified or the first document
+	// if the user did not specify which document they wanted to identify
+	if (!TIFFSetDirectory(tif, documentIndex - 1))
+		return B_NO_TRANSLATOR;
+
 	if (ioExtension) {
 		// add page count to ioExtension
 		ioExtension->RemoveName(DOCUMENT_COUNT);
-		ioExtension->AddInt32(DOCUMENT_COUNT, document_count);
-		
-		// Check if a document index has been specified
-		status_t fnd = ioExtension->FindInt32(DOCUMENT_INDEX, &document_index);
-		if (fnd == B_OK && (document_index < 1 || document_index > document_count))
-			// If a document index has been supplied, and it is an invalid value,
-			// return failure
-			return B_NO_TRANSLATOR;
-		else if (fnd != B_OK)
-			// If FindInt32 failed, make certain the document index
-			// is the default value
-			document_index = 1;
+		ioExtension->AddInt32(DOCUMENT_COUNT, documentCount);
 	}
-	
-	// identify the document the user specified or the first document
-	// if the user did not specify which document they wanted to identify
-	if (!TIFFSetDirectory(tif, document_index - 1))
-		return B_NO_TRANSLATOR;
 
 	if (outInfo) {
 		outInfo->type = B_TIFF_FORMAT;
@@ -218,17 +218,17 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 		outInfo->quality = TIFF_IN_QUALITY;
 		outInfo->capability = TIFF_IN_CAPABILITY;
 		strcpy(outInfo->MIME, "image/tiff");
-		sprintf(outInfo->name, "TIFF image (page %d of %d)",
-			static_cast<int>(document_index), static_cast<int>(document_count));
+		sprintf(outInfo->name, "TIFF image");
 	}
-	
-	if (!poutTIFF)
+
+	if (!poutTIFF) {
 		// close TIFF if caller is not interested in TIFF handle
 		TIFFClose(tif);
-	else
+	} else {
 		// leave TIFF open and return handle if caller needs it
 		*poutTIFF = tif;
-		
+	}
+
 	return B_OK;
 }
 	
