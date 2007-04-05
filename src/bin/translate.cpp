@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku. All Rights Reserved.
+ * Copyright 2003-2007, Haiku. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -619,7 +619,7 @@ TranslateApp::ListTranslators(uint32 type)
 
 		for (int32 j = 0; j < inCount; j++) {
 			printf("  input:\t");
-			print_translation_format(outputFormats[j]);
+			print_translation_format(inputFormats[j]);
 		}
 
 		for (int32 j = 0; j < outCount; j++) {
