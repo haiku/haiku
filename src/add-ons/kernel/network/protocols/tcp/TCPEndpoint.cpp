@@ -1017,7 +1017,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 	if (buffer->size > 0) {
 		fReceiveQueue.Add(buffer, segment.sequence);
-		fReceiveNext = fReceiveQueue.NextSequence();
+		fReceiveNext += buffer->size;
 		TRACE("Receive(): adding data, receive next = %lu!", (uint32)fReceiveNext);
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
@@ -1027,7 +1027,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 		gBufferModule->free(buffer);
 
 	if (segment.flags & TCP_FLAG_PUSH)
-		fReceiveQueue.SetPushPointer(fReceiveNext);
+		fReceiveQueue.SetPushPointer(fReceiveQueue.LastSequence());
 
 	return action;
 }
