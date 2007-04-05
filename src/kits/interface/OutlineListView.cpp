@@ -25,7 +25,7 @@ static void
 quick_sort_item_array(BListItem** items, int32 first, int32 last,
 	int (*compareFunc)(const BListItem* a, const BListItem* b))
 {
-	if (last == first)
+	if (last <= first)
 		return;
 
 	BListItem* pivot = items[first + (rand() % (last - first))];
@@ -693,11 +693,9 @@ BOutlineListView::_BuildTree(BListItem* underItem, int32& fullIndex)
 		if (item->fLevel < level)
 			break;
 
-		if (item->fLevel == level) {
-			// If the level matches, put them into the list
-			list->AddItem(item);
-		}
-
+		// If the level matches, put them into the list
+		// (we handle the case of a missing sublevel gracefully)
+		list->AddItem(item);
 		fullIndex++;
 
 		if (item->HasSubitems()) {
