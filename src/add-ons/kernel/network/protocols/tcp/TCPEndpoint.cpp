@@ -490,7 +490,8 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	}
 
 	if ((fFlags & FLAG_NO_RECEIVE) != 0 && fReceiveQueue.Available() == 0) {
-		// there is no data left in the queue, and we can't receive anything, anymore
+		// there is no data left in the queue, and we can't receive anything,
+		// anymore
 		*_buffer = NULL;
 		return B_OK;
 	}
@@ -499,6 +500,9 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	// TODO: add support for urgent data (MSG_OOB)
 
 	size_t dataNeeded = socket->receive.low_water_mark;
+
+	// When MSG_WAITALL is set then the function should block
+	// until the full amount of data can be returned.
 	if (flags & MSG_WAITALL)
 		dataNeeded = numBytes;
 
@@ -508,10 +512,6 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			&& fReceiveQueue.Available() < dataNeeded
 			&& (fFlags & FLAG_NO_RECEIVE) == 0) {
 		locker.Unlock();
-
-		// Open Group Base Specification states that when
-		// MSG_WAITALL is set then the function should
-		// block until the full amount of data can be returned.
 
 		status_t status = acquire_sem_etc(fReceiveLock, 1,
 			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
@@ -543,7 +543,7 @@ TCPEndpoint::ReadAvailable()
 	TRACE("ReadAvailable()");
 
 	RecursiveLocker locker(fLock);
-	return _AvailableBytesOrDisconnect();
+	return _AvailableData();
 }
 
 
@@ -740,7 +740,7 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 		release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: this is not enough - we need to use B_RELEASE_ALL
-		gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
+		_NotifyReader();
 	} else {
 		// simultaneous open
 		fState = SYNCHRONIZE_RECEIVED;
@@ -813,23 +813,21 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 				release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 					// TODO: real conditional locking needed!
-				gSocketModule->notify(socket, B_SELECT_READ,
-									  fReceiveQueue.Available());
+				_NotifyReader();
 
 				return KEEP | ACKNOWLEDGE;
 			}
 		}
 	}
 
-	// The fast path was not applicable, so we continue with the standard processing
-	// of the incoming segment
-
-	// First have a look at the data being sent
+	// The fast path was not applicable, so we continue with the standard
+	// processing of the incoming segment
 
 	if (segment.flags & TCP_FLAG_RESET) {
 		// is this a valid reset?
 		if (fLastAcknowledgeSent <= segment.sequence
-			&& tcp_sequence(segment.sequence) < fLastAcknowledgeSent + fReceiveWindow) {
+			&& tcp_sequence(segment.sequence)
+				< (fLastAcknowledgeSent + fReceiveWindow)) {
 			if (fState == SYNCHRONIZE_RECEIVED) {
 				// TODO: if we came from SYN-SENT signal connection refused
 				//       and remove all segments from tx queue
@@ -843,7 +841,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			if (fState != TIME_WAIT && fReceiveQueue.Available() > 0) {
 				release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 					// TODO: real conditional locking needed!
-				gSocketModule->notify(socket, B_SELECT_READ, 1);
+				_NotifyReader();
 			} else {
 				return DELETE | DROP;
 			}
@@ -854,14 +852,15 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 		return DROP;
 	}
+
 	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
 		|| (fState == SYNCHRONIZE_RECEIVED
 			&& (fInitialReceiveSequence > segment.sequence
 				|| (segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
 					&& (fSendUnacknowledged > segment.acknowledge
 						|| fSendMax < segment.acknowledge)))) {
-		// reset the connection - either the initial SYN was faulty, or we received
-		// a SYN within the data stream
+		// reset the connection - either the initial SYN was faulty, or we
+		// received a SYN within the data stream
 		return DROP | RESET;
 	}
 
@@ -872,7 +871,8 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	int32 drop = fReceiveNext - segment.sequence;
 	if (drop > 0) {
 		if ((uint32)drop > buffer->size
-			|| ((uint32)drop == buffer->size && (segment.flags & TCP_FLAG_FINISH) == 0)) {
+			|| ((uint32)drop == buffer->size
+				&& (segment.flags & TCP_FLAG_FINISH) == 0)) {
 			// don't accidently remove a FIN we shouldn't remove
 			segment.flags &= ~TCP_FLAG_FINISH;
 			drop = buffer->size;
@@ -924,7 +924,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
 			release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 				// TODO: real conditional locking needed!
-			gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
+			_NotifyReader();
 		}
 
 		if (fSendMax < segment.acknowledge || fState == TIME_WAIT)
@@ -994,7 +994,15 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	if (advertisedWindow > fSendMaxWindow)
 		fSendMaxWindow = advertisedWindow;
 
-	// TODO: process urgent data!
+	if (segment.flags & TCP_FLAG_URGENT) {
+		if (fState == ESTABLISHED || fState == FINISH_SENT
+			|| fState == FINISH_ACKNOWLEDGED) {
+			// TODO: Handle urgent data:
+			//  - RCV.UP <- max(RCV.UP, SEG.UP)
+			//  - signal the user that urgent data is available (SIGURG)
+		}
+	}
+
 	// TODO: ignore data *after* FIN
 
 	if (segment.flags & TCP_FLAG_FINISH) {
@@ -1003,7 +1011,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: real conditional locking needed!
-		gSocketModule->notify(socket, B_SELECT_READ, _AvailableBytesOrDisconnect());
+		_NotifyReader();
 
 		// other side is closing connection; change states
 		switch (fState) {
@@ -1044,7 +1052,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: real conditional locking needed!
-		gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
+		_NotifyReader();
 	} else
 		gBufferModule->free(buffer);
 
@@ -1293,20 +1301,6 @@ TCPEndpoint::_GetMSS(const sockaddr *address) const
 }
 
 
-ssize_t
-TCPEndpoint::_AvailableBytesOrDisconnect() const
-{
-	size_t availableBytes = fReceiveQueue.Available();
-	if (availableBytes > 0)
-		return availableBytes;
-
-	if ((fFlags & FLAG_NO_RECEIVE) != 0)
-		return ENOTCONN;
-
-	return 0;
-}
-
-
 status_t
 TCPEndpoint::_ShutdownEgress(bool closing)
 {
@@ -1330,6 +1324,27 @@ TCPEndpoint::_ShutdownEgress(bool closing)
 	fFlags |= FLAG_NO_SEND;
 
 	return B_OK;
+}
+
+
+ssize_t
+TCPEndpoint::_AvailableData() const
+{
+	ssize_t availableData = fReceiveQueue.Available();
+
+	// FLAG_NO_RECEIVE is set whenever the socket is in a state
+	// where read() would be non-blocking and return 0.
+	if ((fFlags & FLAG_NO_RECEIVE) && availableData == 0)
+		return ENOTCONN;
+
+	return availableData;
+}
+
+
+void
+TCPEndpoint::_NotifyReader()
+{
+	gSocketModule->notify(socket, B_SELECT_READ, _AvailableData());
 }
 
 

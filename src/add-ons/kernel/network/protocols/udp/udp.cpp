@@ -764,7 +764,7 @@ UdpEndpoint::_Deactivate()
 status_t
 UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 {
-	if (buffer->size > 0xffff)
+	if (buffer->size > (0xffff - sizeof(udp_header)))
 		return EMSGSIZE;
 	
 	buffer->protocol = IPPROTO_UDP;
