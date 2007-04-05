@@ -8,6 +8,8 @@
 #include "ConfigView.h"
 #include "RAW.h"
 
+#include <TranslatorRoster.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -180,8 +182,12 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	image_data_info data;
 	raw.ImageAt(imageIndex, data);
 
-	if (!data.is_raw)
-		return B_NO_TRANSLATOR;
+	if (!data.is_raw) {
+		// let others handle embedded JPEG data
+		BMemoryIO io(buffer, bufferSize);
+		BTranslatorRoster* roster = BTranslatorRoster::Default();
+		return roster->Translate(&io, NULL, settings, target, outType);
+	}
 
 	uint32 dataSize = data.output_width * 4 * data.output_height;
 
