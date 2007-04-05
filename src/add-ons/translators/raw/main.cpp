@@ -15,6 +15,7 @@
 #if SHOW_MODE && TEST_MODE
 #	include <Bitmap.h>
 #	include <BitmapStream.h>
+#	include <String.h>
 #	include <View.h>
 #	include <Window.h>
 #endif

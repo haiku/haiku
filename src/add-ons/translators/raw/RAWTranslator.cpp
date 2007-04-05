@@ -141,6 +141,10 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	if (outType != B_TRANSLATOR_BITMAP || baseType != 0)
 		return B_NO_TRANSLATOR;
 
+	bool headerOnly = false;
+	if (settings != NULL)
+		settings->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
+
 	DCRaw raw(*source);
 
 	int32 imageIndex = 0;
@@ -161,7 +165,7 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 			if (imageIndex < 0 || imageIndex >= (int32)raw.CountImages())
 				status = B_BAD_VALUE;
 		}
-		if (status == B_OK)
+		if (status == B_OK && !headerOnly)
 			status = raw.ReadImageAt(imageIndex, buffer, bufferSize);
 	} catch (status_t error) {
 		status = error;
@@ -191,9 +195,17 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	// write out Be's Bitmap header
 	swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
 		B_SWAP_HOST_TO_BENDIAN);
-	target->Write(&header, sizeof(TranslatorBitmap));
+	ssize_t bytesWritten = target->Write(&header, sizeof(TranslatorBitmap));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
 
-	ssize_t bytesWritten = target->Write(buffer, dataSize);
+	if ((size_t)bytesWritten != sizeof(TranslatorBitmap))
+		return B_IO_ERROR;
+
+	if (headerOnly)
+		return B_OK;
+
+	bytesWritten = target->Write(buffer, dataSize);
 	if (bytesWritten < B_OK)
 		return bytesWritten;
 
