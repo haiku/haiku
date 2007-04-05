@@ -505,14 +505,19 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			&& (fFlags & FLAG_NO_RECEIVE) == 0) {
 		locker.Unlock();
 
+		// Open Group Base Specification states that when
+		// MSG_WAITALL is set then the function should
+		// block until the full amount of data can be returned.
+
 		status_t status = acquire_sem_etc(fReceiveLock, 1,
-			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+			((flags & MSG_WAITALL) ? 0 : B_ABSOLUTE_TIMEOUT)
+			| B_CAN_INTERRUPT, timeout);
 
 		locker.Lock();
 
 		if (status < B_OK) {
 			// TODO: If we are timing out, should we push the
-			//       available data?
+			//       available data to the user?
 			if (status == B_TIMED_OUT && fReceiveQueue.Available() > 0)
 				break;
 			return status;
