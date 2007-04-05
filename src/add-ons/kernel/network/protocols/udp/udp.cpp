@@ -764,7 +764,7 @@ UdpEndpoint::_Deactivate()
 status_t
 UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 {
-	if (buffer->size > socket->send.buffer_size)
+	if (buffer->size > 0xffff)
 		return EMSGSIZE;
 	
 	buffer->protocol = IPPROTO_UDP;
@@ -856,9 +856,6 @@ net_protocol *
 udp_init_protocol(net_socket *socket)
 {
 	socket->protocol = IPPROTO_UDP;
-	socket->send.buffer_size = 65535 - 20 - 8;
-		// subtract lengths of IP and UDP headers (NOTE: IP headers could be 
-		// larger if IP options are used, but we do not currently care for that)
 
 	UdpEndpoint *endpoint = new (std::nothrow) UdpEndpoint(socket);
 	TRACE(("udp_init_protocol(%p) created endpoint %p\n", socket, endpoint));

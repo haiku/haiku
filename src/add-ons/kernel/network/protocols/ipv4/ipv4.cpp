@@ -977,6 +977,9 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		bufferHeader.Detach();
 	}
 
+	if (buffer->size > 0xffff)
+		return EMSGSIZE;
+
 	TRACE(("header chksum: %ld, buffer checksum: %ld\n",
 		gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
 		gBufferModule->checksum(buffer, 0, buffer->size, true)));
