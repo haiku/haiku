@@ -83,7 +83,7 @@ private:
 
 
 class UdpEndpointManager {
-	typedef std::pair<sockaddr *, sockaddr *> HashKey;
+	typedef std::pair<const sockaddr *, const sockaddr *> HashKey;
 
 	class Ephemerals {
 	public:
@@ -108,7 +108,8 @@ public:
 			status_t		ReceiveData(net_buffer *buffer);
 
 	static	int				Compare(void *udpEndpoint, const void *_key);
-	static	uint32			ComputeHash(sockaddr *ourAddress, sockaddr *peerAddress);
+	static	uint32			ComputeHash(const sockaddr *ourAddress,
+										const sockaddr *peerAddress);
 	static	uint32			Hash(void *udpEndpoint, const void *key, uint32 range);
 
 			UdpEndpoint		*FindActiveEndpoint(sockaddr *ourAddress, 
@@ -278,7 +279,8 @@ UdpEndpointManager::Compare(void *_udpEndpoint, const void *_key)
 
 
 /*static*/ inline uint32
-UdpEndpointManager::ComputeHash(sockaddr *ourAddress, sockaddr *peerAddress)
+UdpEndpointManager::ComputeHash(const sockaddr *ourAddress,
+		const sockaddr *peerAddress)
 {
 	return sAddressModule->hash_address_pair(ourAddress, peerAddress);
 }
@@ -287,17 +289,18 @@ UdpEndpointManager::ComputeHash(sockaddr *ourAddress, sockaddr *peerAddress)
 /*static*/ uint32
 UdpEndpointManager::Hash(void *_udpEndpoint, const void *_key, uint32 range)
 {
+	HashKey addresses;
 	uint32 hash;
 
 	if (_udpEndpoint) {
-		struct UdpEndpoint *udpEndpoint = (UdpEndpoint*)_udpEndpoint;
-		sockaddr *ourAddr = (sockaddr*)&udpEndpoint->socket->address;
-		sockaddr *peerAddr = (sockaddr*)&udpEndpoint->socket->peer;
-		hash = ComputeHash(ourAddr, peerAddr);
+		const UdpEndpoint *udpEndpoint = (const UdpEndpoint *)_udpEndpoint;
+		addresses = HashKey((const sockaddr *)&udpEndpoint->socket->address,
+							(const sockaddr *)&udpEndpoint->socket->peer);
 	} else {
-		const HashKey *key = (const HashKey *)_key;
-		hash = ComputeHash(key->first, key->second);
+		addresses = *(const HashKey *)_key;
 	}
+
+	hash = ComputeHash(addresses.first, addresses.second);
 
 	// move the bits into the relevant range (as defined by kNumHashBuckets):
 	hash = (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
@@ -335,9 +338,6 @@ UdpEndpointManager::DemuxBroadcast(net_buffer *buffer)
 
 	TRACE(("demuxing buffer %p as broadcast...\n", buffer));
 
-	sockaddr anyAddr;
-	sAddressModule->set_to_empty_address(&anyAddr);
-	
 	uint16 incomingPort = sAddressModule->get_port(broadcastAddr);
 
 	UdpEndpoint *endpoint;
@@ -369,7 +369,7 @@ UdpEndpointManager::DemuxBroadcast(net_buffer *buffer)
 		}
 
 		if (sAddressModule->equal_masked_addresses(addr, broadcastAddr, mask)
-			|| sAddressModule->equal_addresses(addr, &anyAddr)) {
+			|| sAddressModule->is_empty_address(addr, false)) {
 				// address matches, dispatch to this endpoint:
 			endpoint->StoreData(buffer);
 		}
@@ -394,15 +394,12 @@ UdpEndpointManager::DemuxUnicast(net_buffer *buffer)
 
 	TRACE(("demuxing buffer %p as unicast...\n", buffer));
 
-	struct sockaddr anyAddr;
-	sAddressModule->set_to_empty_address(&anyAddr);
-
 	UdpEndpoint *endpoint;
 	// look for full (most special) match:
 	endpoint = FindActiveEndpoint(localAddr, peerAddr);
 	if (!endpoint) {
 		// look for endpoint matching local address & port:
-		endpoint = FindActiveEndpoint(localAddr, &anyAddr);
+		endpoint = FindActiveEndpoint(localAddr, NULL);
 		if (!endpoint) {
 			// look for endpoint matching peer address & port and local port:
 			sockaddr localPortAddr;
@@ -412,7 +409,7 @@ UdpEndpointManager::DemuxUnicast(net_buffer *buffer)
 			endpoint = FindActiveEndpoint(&localPortAddr, peerAddr);
 			if (!endpoint) {
 				// last chance: look for endpoint matching local port only:
-				endpoint = FindActiveEndpoint(&localPortAddr, &anyAddr);
+				endpoint = FindActiveEndpoint(&localPortAddr, NULL);
 			}
 		}
 	}

@@ -350,11 +350,11 @@ ipv4_set_to_empty_address(sockaddr *address)
 static uint32
 ipv4_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 {
-	int32 hash = (((sockaddr_in *)ourAddress)->sin_port
-						| ((sockaddr_in *)peerAddress)->sin_port << 16)
-					^ ((sockaddr_in *)ourAddress)->sin_addr.s_addr
-					^ ((sockaddr_in *)peerAddress)->sin_addr.s_addr;
-	return hash;
+	const sockaddr_in *our = (const sockaddr_in *)ourAddress;
+	const sockaddr_in *peer = (const sockaddr_in *)peerAddress;
+
+	return ((our ? our->sin_port : 0) | ((peer ? peer->sin_port : 0) << 16))
+		^ (our ? our->sin_addr.s_addr : 0) ^ (peer ? peer->sin_addr.s_addr : 0);
 }
 
 
