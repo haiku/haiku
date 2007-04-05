@@ -496,21 +496,27 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	// read data out of buffer
 	// TODO: add support for urgent data (MSG_OOB)
-	// TODO: wait until enough bytes are available
 
 	bigtime_t timeout = system_time() + socket->receive.timeout;
 
-	do {
+	while (fReceiveQueue.PushedData() == 0
+			&& fReceiveQueue.Available() < numBytes
+			&& (fFlags & FLAG_NO_RECEIVE) == 0) {
 		locker.Unlock();
 
 		status_t status = acquire_sem_etc(fReceiveLock, 1,
 			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
-		if (status < B_OK)
-			return status;
 
 		locker.Lock();
-	} while (fReceiveQueue.Available() < socket->receive.low_water_mark
-			 && (fFlags & FLAG_NO_RECEIVE) == 0);
+
+		if (status < B_OK) {
+			// TODO: If we are timing out, should we push the
+			//       available data?
+			if (status == B_TIMED_OUT && fReceiveQueue.Available() > 0)
+				break;
+			return status;
+		}
+	}
 
 	TRACE("ReadData(): read %lu bytes, %lu are available",
 		  numBytes, fReceiveQueue.Available());
@@ -793,6 +799,8 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				fReceiveNext += buffer->size;
 				TRACE("Receive(): receive next = %lu", (uint32)fReceiveNext);
 				fReceiveQueue.Add(buffer, segment.sequence);
+				if (segment.flags & TCP_FLAG_PUSH)
+					fReceiveQueue.SetPushPointer(fReceiveNext);
 
 				release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 					// TODO: real conditional locking needed!
@@ -1017,6 +1025,9 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 		gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
 	} else
 		gBufferModule->free(buffer);
+
+	if (segment.flags & TCP_FLAG_PUSH)
+		fReceiveQueue.SetPushPointer(fReceiveNext);
 
 	return action;
 }

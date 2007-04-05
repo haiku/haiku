@@ -33,6 +33,9 @@ class BufferQueue {
 		size_t Available() const { return fContiguousBytes; }
 		size_t Available(tcp_sequence sequence) const;
 
+		size_t PushedData() const { return fPushPointer > fFirstSequence ? fPushPointer - fFirstSequence : 0; }
+		void SetPushPointer(tcp_sequence sequence);
+
 		size_t Used() const { return fNumBytes; }
 		size_t Free() const { return fMaxBytes - fNumBytes; }
 
@@ -49,6 +52,7 @@ class BufferQueue {
 		size_t	fContiguousBytes;
 		tcp_sequence fFirstSequence;
 		tcp_sequence fLastSequence;
+		tcp_sequence fPushPointer;
 };
 
 #endif	// BUFFER_QUEUE_H

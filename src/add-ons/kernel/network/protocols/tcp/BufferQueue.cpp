@@ -26,7 +26,8 @@ BufferQueue::BufferQueue(size_t maxBytes)
 	fNumBytes(0),
 	fContiguousBytes(0),
 	fFirstSequence(0),
-	fLastSequence(0)
+	fLastSequence(0),
+	fPushPointer(0)
 {
 }
 
@@ -351,4 +352,10 @@ BufferQueue::Available(tcp_sequence sequence) const
 		return 0;
 
 	return fContiguousBytes + fFirstSequence - sequence;
+}
+
+void
+BufferQueue::SetPushPointer(tcp_sequence sequence)
+{
+	fPushPointer = sequence;
 }
