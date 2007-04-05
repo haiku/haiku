@@ -555,12 +555,6 @@ tcp_receive_data(net_buffer *buffer)
 		TRACE(("Endpoint %p in state %s\n", endpoint, name_for_state(endpoint->State())));
 
 		switch (endpoint->State()) {
-			case TIME_WAIT:
-				segmentAction |= IMMEDIATE_ACKNOWLEDGE;
-			case CLOSED:
-				endpoint->UpdateTimeWait();
-				break;
-
 			case LISTEN:
 				segmentAction = endpoint->ListenReceive(segment, buffer);
 				break;
@@ -576,6 +570,8 @@ tcp_receive_data(net_buffer *buffer)
 			case FINISH_SENT:
 			case FINISH_ACKNOWLEDGED:
 			case CLOSING:
+			case TIME_WAIT:
+			case CLOSED:
 				segmentAction = endpoint->Receive(segment, buffer);
 				break;
 		}
@@ -585,6 +581,8 @@ tcp_receive_data(net_buffer *buffer)
 			endpoint->SendAcknowledge();
 		else if (segmentAction & ACKNOWLEDGE)
 			endpoint->DelayedAcknowledge();
+		else if (segmentAction & DELETE)
+			gSocketModule->delete_socket(endpoint->socket);
 	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 

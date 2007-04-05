@@ -203,6 +203,7 @@ TCPEndpoint::Free()
 	if (fState <= SYNCHRONIZE_SENT || fState == TIME_WAIT)
 		return B_OK;
 
+	// we are only interested in the timer, not in changing state
 	_EnterTimeWait();
 	return B_BUSY;
 		// we'll be freed later when the 2MSL timer expires
@@ -821,13 +822,26 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 		// is this a valid reset?
 		if (fLastAcknowledgeSent <= segment.sequence
 			&& tcp_sequence(segment.sequence) < fLastAcknowledgeSent + fReceiveWindow) {
-			// TODO: close connection depending on state
+			if (fState == SYNCHRONIZE_RECEIVED) {
+				// TODO: if we came from SYN-SENT signal connection refused
+				//       and remove all segments from tx queue
+			} else if (fState == ESTABLISHED || fState == FINISH_SENT
+				|| fState == FINISH_RECEIVED || fState == FINISH_ACKNOWLEDGED) {
+				// TODO: RFC 793 states that on ESTABLISHED, FIN-WAIT{1,2}
+				//       or CLOSE-WAIT "All segment queues should be
+				//       flushed".
+			}
+
+			if (fState != TIME_WAIT && fReceiveQueue.Available() > 0) {
+				release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
+					// TODO: real conditional locking needed!
+				gSocketModule->notify(socket, B_SELECT_READ, 1);
+			} else {
+				return DELETE | DROP;
+			}
+
 			fError = ECONNREFUSED;
 			fState = CLOSED;
-
-			release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-				// TODO: real conditional locking needed!
-			gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
 		}
 
 		return DROP;
@@ -904,7 +918,8 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				// TODO: real conditional locking needed!
 			gSocketModule->notify(socket, B_SELECT_READ, fReceiveQueue.Available());
 		}
-		if (fSendMax < segment.acknowledge)
+
+		if (fSendMax < segment.acknowledge || fState == TIME_WAIT)
 			return DROP | IMMEDIATE_ACKNOWLEDGE;
 		if (fSendUnacknowledged >= segment.acknowledge) {
 			// this is a duplicate acknowledge
@@ -977,7 +992,6 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	if (segment.flags & TCP_FLAG_FINISH) {
 		TRACE("Receive(): peer is finishing connection!");
 		fReceiveNext++;
-		fFlags |= FLAG_NO_RECEIVE;
 
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 			// TODO: real conditional locking needed!
@@ -1015,7 +1029,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	// state machine is done switching states and the data is good.
 	// put it in the receive buffer
 
-	if (buffer->size > 0) {
+	if (buffer->size > 0 && (fFlags & FLAG_NO_RECEIVE) == 0) {
 		fReceiveQueue.Add(buffer, segment.sequence);
 		fReceiveNext += buffer->size;
 		TRACE("Receive(): adding data, receive next = %lu!", (uint32)fReceiveNext);
@@ -1028,6 +1042,9 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 	if (segment.flags & TCP_FLAG_PUSH)
 		fReceiveQueue.SetPushPointer(fReceiveQueue.LastSequence());
+
+	if (segment.flags & TCP_FLAG_FINISH)
+		fFlags |= FLAG_NO_RECEIVE;
 
 	return action;
 }

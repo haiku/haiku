@@ -153,6 +153,7 @@ enum tcp_segment_action {
 	RESET		= 0x02,
 	ACKNOWLEDGE	= 0x04,
 	IMMEDIATE_ACKNOWLEDGE = 0x08,
+	DELETE		= 0x10,
 };
 
 
