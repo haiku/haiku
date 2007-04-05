@@ -498,10 +498,14 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	// read data out of buffer
 	// TODO: add support for urgent data (MSG_OOB)
 
+	size_t dataNeeded = socket->receive.low_water_mark;
+	if (flags & MSG_WAITALL)
+		dataNeeded = numBytes;
+
 	bigtime_t timeout = system_time() + socket->receive.timeout;
 
 	while (fReceiveQueue.PushedData() == 0
-			&& fReceiveQueue.Available() < numBytes
+			&& fReceiveQueue.Available() < dataNeeded
 			&& (fFlags & FLAG_NO_RECEIVE) == 0) {
 		locker.Unlock();
 
@@ -510,8 +514,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		// block until the full amount of data can be returned.
 
 		status_t status = acquire_sem_etc(fReceiveLock, 1,
-			((flags & MSG_WAITALL) ? 0 : B_ABSOLUTE_TIMEOUT)
-			| B_CAN_INTERRUPT, timeout);
+			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
 		locker.Lock();
 
