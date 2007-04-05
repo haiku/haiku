@@ -659,7 +659,10 @@ BTranslatorRoster::Private::Identify(BPositionIO* source,
 	_RescanChanged();
 
 	TranslatorMap::const_iterator iterator = fTranslators.begin();
-	BMessage baseExtension(*ioExtension);
+	BMessage baseExtension;
+	if (ioExtension != NULL)
+		baseExtension = *ioExtension;
+
 	float bestWeight = 0.0f;
 
 	while (iterator != fTranslators.end()) {
@@ -679,7 +682,8 @@ BTranslatorRoster::Private::Identify(BPositionIO* source,
 		if (translator.Identify(source, format, &extension, &info, wantType) == B_OK) {
 			float weight = info.quality * info.capability;
 			if (weight > bestWeight) {
-				*ioExtension = extension;
+				if (ioExtension != NULL)
+					*ioExtension = extension;
 				bestWeight = weight;
 
 				info.translator = iterator->first;
