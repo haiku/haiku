@@ -519,9 +519,12 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		locker.Lock();
 
 		if (status < B_OK) {
-			// TODO: If we are timing out, should we push the
-			//       available data to the user?
-			if (status == B_TIMED_OUT && fReceiveQueue.Available() > 0)
+			// The Open Group base specification mentions that EINTR should be
+			// returned if the recv() is interrupted before _any data_ is
+			// available. So we actually check if there is data, and if so,
+			// push it to the user.
+			if ((status == B_TIMED_OUT || status == B_INTERRUPTED)
+				&& fReceiveQueue.Available() > 0)
 				break;
 			return status;
 		}
