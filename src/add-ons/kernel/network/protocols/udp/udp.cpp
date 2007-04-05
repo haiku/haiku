@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe, zooey@hirschkaefer.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 
@@ -25,6 +26,7 @@
 #include <new>
 #include <stdlib.h>
 #include <string.h>
+#include <utility>
 
 
 //#define TRACE_UDP
@@ -81,14 +83,8 @@ private:
 
 
 class UdpEndpointManager {
+	typedef std::pair<sockaddr *, sockaddr *> HashKey;
 
-	struct hash_key {
-		hash_key(sockaddr *ourAddress, sockaddr *peerAddress);
-
-		sockaddr ourAddress;
-		sockaddr peerAddress;
-	};
-	
 	class Ephemerals {
 	public:
 							Ephemerals();
@@ -150,16 +146,6 @@ static net_address_module_info *sAddressModule;
 net_buffer_module_info *gBufferModule;
 static net_datalink_module_info *sDatalinkModule;
 static net_stack_module_info *sStackModule;
-
-
-// #pragma mark -
-
-
-UdpEndpointManager::hash_key::hash_key(sockaddr *_ourAddress, sockaddr *_peerAddress)
-{
-	memcpy(&ourAddress, _ourAddress, sizeof(sockaddr));
-	memcpy(&peerAddress, _peerAddress, sizeof(sockaddr));
-}
 
 
 // #pragma mark -
@@ -278,13 +264,13 @@ UdpEndpointManager::InitCheck() const
 UdpEndpointManager::Compare(void *_udpEndpoint, const void *_key)
 {
 	struct UdpEndpoint *udpEndpoint = (UdpEndpoint*)_udpEndpoint;
-	hash_key *key = (hash_key *)_key;
+	const HashKey *key = (const HashKey *)_key;
 
 	sockaddr *ourAddr = (sockaddr *)&udpEndpoint->socket->address;
 	sockaddr *peerAddr = (sockaddr *)&udpEndpoint->socket->peer;
 
-	if (sAddressModule->equal_addresses_and_ports(ourAddr, &key->ourAddress)
-		&& sAddressModule->equal_addresses_and_ports(peerAddr, &key->peerAddress))
+	if (sAddressModule->equal_addresses_and_ports(ourAddr, key->first)
+		&& sAddressModule->equal_addresses_and_ports(peerAddr, key->second))
 		return 0;
 
 	return 1;
@@ -309,8 +295,8 @@ UdpEndpointManager::Hash(void *_udpEndpoint, const void *_key, uint32 range)
 		sockaddr *peerAddr = (sockaddr*)&udpEndpoint->socket->peer;
 		hash = ComputeHash(ourAddr, peerAddr);
 	} else {
-		hash_key *key = (hash_key *)_key;
-		hash = ComputeHash(&key->ourAddress, &key->peerAddress);
+		const HashKey *key = (const HashKey *)_key;
+		hash = ComputeHash(key->first, key->second);
 	}
 
 	// move the bits into the relevant range (as defined by kNumHashBuckets):
@@ -332,9 +318,9 @@ UdpEndpointManager::FindActiveEndpoint(sockaddr *ourAddress,
 	TRACE(("trying to find UDP-endpoint for (l:%s p:%s)\n",
 		AddressString(sDomain, ourAddress, true).Data(),
 		AddressString(sDomain, peerAddress, true).Data()));
-	hash_key key(ourAddress, peerAddress);
-	UdpEndpoint *endpoint = (UdpEndpoint *)hash_lookup(fActiveEndpoints, &key);
-	return endpoint;
+
+	HashKey key(ourAddress, peerAddress);
+	return (UdpEndpoint *)hash_lookup(fActiveEndpoints, &key);
 }
 
 
