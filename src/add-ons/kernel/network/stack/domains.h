@@ -16,6 +16,9 @@
 #include <util/DoublyLinkedList.h>
 
 
+struct net_device_interface;
+
+
 struct net_domain_private : net_domain {
 	struct list_link	link;
 
@@ -34,6 +37,8 @@ status_t list_domain_interfaces(void *buffer, size_t *_bufferSize);
 status_t add_interface_to_domain(net_domain *domain, struct ifreq& request);
 status_t remove_interface_from_domain(net_interface *interface);
 void domain_interfaces_link_changed(net_device *device);
+void domain_interface_went_down(net_interface *);
+void domain_removed_device_interface(net_device_interface *);
 
 net_domain *get_domain(int family);
 status_t register_domain(int family, const char *name,

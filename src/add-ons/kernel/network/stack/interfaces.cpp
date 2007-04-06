@@ -63,6 +63,16 @@ domain_receive_adapter(void *cookie, net_buffer *buffer)
 }
 
 
+net_device_interface *
+grab_device_interface(net_device_interface *interface)
+{
+	if (interface == NULL || atomic_add(&interface->ref_count, 1) == 0)
+		return NULL;
+
+	return interface;
+}
+
+
 //	#pragma mark - interfaces
 
 
@@ -135,7 +145,7 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 	interface->type = 0;
 	interface->mtu = deviceInterface->device->mtu;
 	interface->metric = 0;
-	interface->device_interface = deviceInterface;
+	interface->device_interface = grab_device_interface(deviceInterface);
 
 	status_t status = get_domain_datalink_protocols(interface);
 	if (status < B_OK) {
@@ -154,13 +164,32 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 
 
 void
+interface_set_down(net_interface *interface)
+{
+	if ((interface->flags & IFF_UP) == 0)
+		return;
+
+	// TODO: IFF_LINK should belong in device only
+	interface->flags &= ~(IFF_UP | IFF_LINK);
+	interface->first_info->interface_down(interface->first_protocol);
+}
+
+
+void
 delete_interface(net_interface_private *interface)
 {
-	if ((interface->flags & IFF_UP) != 0) {
-		// the interface is still up - we need to change that before deleting it
-		interface->flags &= ~IFF_UP;
-		down_device_interface(interface->device_interface);
-	}
+	// deleting an interface is fairly complex as we need
+	// to clear all references to it throughout the stack
+
+	// this will possibly call (if IFF_UP):
+	//  interface_protocol_down()
+	//   domain_interface_went_down()
+	//    invalidate_routes()
+	//     remove_route()
+	//      update_route_infos()
+	//       get_route_internal()
+	//   down_device_interface() -- if upcount reaches 0
+	interface_set_down(interface);
 
 	put_device_interface(interface->device_interface);
 
@@ -388,8 +417,14 @@ down_device_interface(net_device_interface *interface)
 {
 	net_device *device = interface->device;
 
+	dprintf("down_device_interface(%s)\n", interface->name);
+
 	device->flags &= ~IFF_UP;
 	interface->module->down(device);
+
+	// TODO: there is a race condition between the previous
+	//       ->down and device->module->receive_data which
+	//       locks us here waiting for the reader_thread
 
 	// make sure the reader thread is gone before shutting down the interface
 	status_t status;
@@ -600,7 +635,25 @@ status_t
 device_removed(net_device *device)
 {
 	BenaphoreLocker locker(sInterfaceLock);
-	// TODO: all what this function should do is to clear the IFF_UP flag of the interfaces.
+
+	net_device_interface *interface = find_device_interface(device->name);
+	if (interface == NULL)
+		return ENODEV;
+
+	// Propagate the loss of the device throughout the stack.
+	// This is very complex, refer to delete_interface() for
+	// further details.
+
+	// this will possibly call:
+	//  remove_interface_from_domain() [domain gets locked]
+	//   delete_interface()
+	//    ... [see delete_interface()]
+	domain_removed_device_interface(interface);
+
+	// TODO: make sure all readers are gone
+	//       make sure all watchers are gone
+	//       remove device interface
+
 	return B_OK;
 }
 

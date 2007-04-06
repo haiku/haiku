@@ -225,6 +225,49 @@ domain_interfaces_link_changed(net_device *device)
 }
 
 
+void
+domain_interface_went_down(net_interface *interface)
+{
+	// the domain should be locked here. always check
+	// all callers to be sure. We get here via
+	// interface_set_down().
+
+	dprintf("domain_interface_went_down(%i, %s)\n",
+		interface->domain->family, interface->name);
+
+	// domain might have been locked by:
+	//  - domain_removed_device_interface() <--- here
+	//     remove_interface_from_domain()
+	//      delete_interface()
+	//       interface_set_down()
+	//  - datalink_control() <--- here
+	//     interface_set_down()
+	invalidate_routes(interface->domain, interface);
+}
+
+
+void
+domain_removed_device_interface(net_device_interface *interface)
+{
+	BenaphoreLocker locker(sDomainLock);
+
+	net_domain_private *domain = NULL;
+	while (true) {
+		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
+		if (domain == NULL)
+			break;
+
+		BenaphoreLocker locker(domain->lock);
+
+		net_interface_private *priv = find_interface(domain, interface->name);
+		if (priv == NULL)
+			continue;
+
+		remove_interface_from_domain(priv);
+	}
+}
+
+
 status_t
 register_domain(int family, const char *name,
 	struct net_protocol_module_info *module, 

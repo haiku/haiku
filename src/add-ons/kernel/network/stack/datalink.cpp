@@ -332,10 +332,7 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 					if (((uint32)request.ifr_flags & IFF_UP)
 							!= (interface->flags & IFF_UP)) {
 						if ((interface->flags & IFF_UP) != 0) {
-							// bring the interface down
-							interface->flags &= ~(IFF_UP | IFF_LINK);
-							interface->first_info->interface_down(
-								interface->first_protocol);
+							interface_set_down(interface);
 						} else {
 							// bring it up
 							status = interface->first_info->interface_up(
@@ -563,6 +560,8 @@ interface_protocol_down(net_datalink_protocol *_protocol)
 		return;
 
 	deviceInterface->up_count--;
+
+	domain_interface_went_down(protocol->interface);
 
 	if (deviceInterface->up_count > 0)
 		return;

@@ -69,6 +69,7 @@ status_t create_interface(net_domain *domain, const char *name,
 	const char *baseName, net_device_interface *deviceInterface,
 	struct net_interface_private **_interface);
 void delete_interface(net_interface_private *interface);
+void interface_set_down(net_interface *);
 
 // device interfaces
 void get_device_interface_address(net_device_interface *interface,

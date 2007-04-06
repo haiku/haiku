@@ -493,6 +493,28 @@ get_route_information(struct net_domain *_domain, void *value, size_t length)
 }
 
 
+void
+invalidate_routes(net_domain *_domain, net_interface *interface)
+{
+	// this function is called with the domain locked
+	// (see domain_interface_went_down)
+	net_domain_private *domain = (net_domain_private *)_domain;
+
+	dprintf("invalidate_routes(%i, %s)\n", domain->family, interface->name);
+
+	RouteList::Iterator iterator = domain->routes.GetIterator();
+	while (iterator.HasNext()) {
+		net_route *route = iterator.Next();
+
+		// TODO handle refcounting, if the route needs to linger
+		//      for some reason we should set interface or
+		//      something of the sorts that invalidates it's reference
+		if (route->interface == interface)
+			remove_route(domain, route);
+	}
+}
+
+
 struct net_route *
 get_route(struct net_domain *_domain, const struct sockaddr *address)
 {
