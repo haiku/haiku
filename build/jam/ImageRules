@@ -95,10 +95,10 @@ actions AddTargetVariableToScript1
 }
 
 
-rule AddDirectoryToHaikuImage
+rule AddDirectoryToHaikuImage directoryTokens
 {
-	# AddDirectoryToHaikuImage <directory>
-	local directoryTokens = $(1) ;
+	# AddDirectoryToHaikuImage <directoryTokens>
+
 	local directory = [ FDirName $(directoryTokens) ] ;
 	directory = $(directory:G=HaikuImage) ;
 
@@ -120,6 +120,20 @@ rule AddDirectoryToHaikuImage
 	return $(directory) ;
 }
 
+rule FilterImageUpdateTargets targets
+{
+	# FilterImageUpdateTargets targets
+
+	local filteredTargets ;
+	local target ;
+	for target in $(targets) {
+		if [ on $(target) return $(HAIKU_INCLUDE_IN_IMAGE) ] {
+			filteredTargets += $(target) ;
+		}
+	}
+	return $(filteredTargets) ;
+}
+
 rule AddFilesToHaikuImage
 {
 	# AddFilesToHaikuImage <directory> : <targets> [ : dest name ]
@@ -127,6 +141,12 @@ rule AddFilesToHaikuImage
 	local directory = [ AddDirectoryToHaikuImage $(1) ] ;
 	local targets = $(2) ;
 	local destName = $(3) ;
+
+	# If the image shall only be updated, we filter out all targets not marked
+	# accordingly.
+	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+		targets = [ FilterImageUpdateTargets $(targets) ] ;
+	}
 
 	# We create a unique dummy target per target to install.
 	local target ;
@@ -146,13 +166,17 @@ rule AddFilesToHaikuImage
 	}
 }
 
-rule AddSymlinkToHaikuImage
+rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
 {
 	# AddSymlinkToHaikuImage <directory> : <link target> [ : <link name> ] ;
 	#
-	local directory = [ AddDirectoryToHaikuImage $(1) ] ;
-	local linkTarget = $(2) ;
-	local linkName = $(3) ;
+
+	# If the image shall only be updated, we don't add any symlinks.
+	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+		return ;
+	}
+
+	local directory = [ AddDirectoryToHaikuImage $(directoryTokens) ] ;
 
 	if ! $(linkName) {
 		local path = [ FReverse [ FSplitPath $(linkTarget) ] ] ;
@@ -164,11 +188,15 @@ rule AddSymlinkToHaikuImage
 	SYMLINKS_TO_INSTALL on $(directory) += $(link) ;
 }
 
-rule AddSourceDirectoryToHaikuImage dirTokens
+rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 {
-	# AddSourceDirectoryToHaikuImage <dirTokens> ;
+	# AddSourceDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
 
-	HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
+	# If the image shall only be updated, we update sources only, if explicitely
+	# requested.
+	if ! $(HAIKU_IMAGE_UPDATE_ONLY) || $(alwaysUpdate) {
+		HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
+	}
 }
 
 rule AddDriversToHaikuImage
@@ -181,6 +209,11 @@ rule AddDriversToHaikuImage
 		$(relativeDirectoryTokens) ;
 
 	AddFilesToHaikuImage beos system add-ons kernel drivers bin : $(targets) ;
+
+	# If the image shall only be updated, we don't add any symlinks.
+	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+		return ;
+	}
 
 	# get the relative symlink path prefix
 	local linkPrefix = ;
@@ -204,7 +237,8 @@ rule AddDriverRegistrationToHaikuImage
 	local relativeDirectoryTokens = $(1) ;
 	local target = $(2) ;
 	local links = $(3) ;
-	local directoryTokens = beos system add-ons kernel registration $(relativeDirectoryTokens) ;
+	local directoryTokens = beos system add-ons kernel registration
+		$(relativeDirectoryTokens) ;
 
 	# get the relative symlink path prefix
 	local linkPrefix = ;
@@ -214,14 +248,19 @@ rule AddDriverRegistrationToHaikuImage
 	linkPrefix += .. drivers bin ;
 
 	# add the symlink
-	AddSymlinkToHaikuImage $(directoryTokens) : [ FDirName $(linkPrefix) $(target:BS) ] : $(links) ;
+	AddSymlinkToHaikuImage $(directoryTokens)
+		: [ FDirName $(linkPrefix) $(target:BS) ] : $(links) ;
 }
 
-rule AddBootModuleSymlinks
+rule AddBootModuleSymlinks targets
 {
 	# AddBootModuleSymlinks <targets> ;
 	#
-	local targets = $(1) ;
+
+	# If the image shall only be updated, we don't add any symlinks.
+	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+		return ;
+	}
 
 	# add the symlinks
 	local target ;
@@ -267,7 +306,10 @@ rule CreateHaikuImageMakeDirectoriesScript
 	}
 
 	Depends $(scriptBody) : $(dirsToCreate) ;
-	CreateHaikuImageMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
+	# If the image shall only be updated, we don't create directories.
+	if $(dirsToCreate) && ! $(HAIKU_IMAGE_UPDATE_ONLY) {
+		CreateHaikuImageMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
+	}
 }
 
 actions piecemeal CreateHaikuImageMakeDirectoriesScript1

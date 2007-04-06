@@ -35,6 +35,17 @@ HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
 # Install Haiku in directory /Haiku.
 HAIKU_INSTALL_DIR = /Haiku ;
 
+# Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
+# targets on which the HAIKU_INCLUDE_IN_IMAGE variable has been set will be
+# updated in the image file/installation directory.
+# The update-image, update-vmware-image, and update-install targets always set
+# this variable, so one likely doesn't ever need to set it manually.
+HAIKU_IMAGE_UPDATE_ONLY = 1 ;
+
+# libbe.so and the kernel will be updated on image updates. Note that this
+# doesn't work for pseudo targets like "kernel".
+HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel_x86 = 1 ;
+
 # Add "crashing_app" to the beos/bin directory of the Haiku image/installation.
 # Note, that this also makes the image depend on the target, i.e. it is
 # automatically updated when the image is built.
@@ -43,9 +54,13 @@ AddFilesToHaikuImage beos bin : crashing_app ;
 # Make a symlink to home/config/bin/crash.
 AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
 
-# Adds the source directory src/kits/storage (recursively) to the image
-# (as /boot/home/HaikuSources/src/kits/storage).
-AddSourceDirectoryToHaikuImage src kits storage ;
+# Adds the source directories src/kits/storage and src/tests/servers/debug
+# (recursively) to the image (as /boot/home/HaikuSources/src/kits/storage
+# and /boot/home/HaikuSources/src/tests/servers/debug respectively).
+# Note that the second directory will also be copied, if the image will only
+# be updated; the first one won't in that case.
+AddSourceDirectoryToHaikuImage src/kits/storage ;
+AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
 
 # Specify scripts that shall be run when populating the image/installation
 # directory. The "early" script is run before anything has been copied onto

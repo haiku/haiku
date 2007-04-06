@@ -27,6 +27,22 @@ if $(JAM_TARGETS) {
 	} else if $(JAM_TARGETS[1]) = run && $(JAM_TARGETS[2]) {
 		local run = [ RunCommandLine $(JAM_TARGETS[2-]) ] ;
 		JAM_TARGETS = $(run) ;
+
+	# "update-image", "update-vmware-image", and "update-install" targets allow
+	# for updating only specific targets in the image/installation dir.
+	} else if $(JAM_TARGETS[1]) = update-image
+		|| $(JAM_TARGETS[1]) = update-vmware-image
+		|| $(JAM_TARGETS[1]) = update-install {
+		HAIKU_IMAGE_UPDATE_ONLY = 1 ;
+		HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
+
+		if $(JAM_TARGETS[1]) = update-image {
+			JAM_TARGETS = haiku-image ;
+		} else if $(JAM_TARGETS[1]) = update-vmware-image {
+			JAM_TARGETS = haiku-vmware-image ;
+		} else {
+			JAM_TARGETS = install-haiku ;
+		}
 	}
 }
 

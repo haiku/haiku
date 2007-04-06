@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# The first argument is the shell script that initializes the variables.
+# The first argument is the shell script that initializes the variables:
 # sourceDir
 # outputDir
 # tmpDir
@@ -10,6 +10,7 @@
 # imageSize
 # addBuildCompatibilityLibDir
 # sourceDirsToCopy
+# updateOnly
 # 
 # bfsShell
 # copyattr
@@ -53,16 +54,20 @@ fi
 # create the image and mount it
 if [ $isImage ]; then
 	echo
-	echo "Creating image ..."
-	dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
-	$bfsShell --initialize $imagePath Haiku
-	$makebootable $imagePath
+	if [ ! $updateOnly ]; then
+		echo "Creating image ..."
+		dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
+		$bfsShell --initialize $imagePath Haiku
+		$makebootable $imagePath
+	fi
 	$bfsShell -n $imagePath > /dev/null &
 	sleep 1
 fi
 
-$mkindex BEOS:APP_SIG
-	# needed to launch apps via signature
+# create BEOS:APP_SIG index -- needed to launch apps via signature
+if [ ! $updateOnly ]; then
+	$mkindex BEOS:APP_SIG
+fi
 
 echo "Populating image ..."
 while [ $# -gt 0 ]; do
@@ -73,55 +78,58 @@ done
 
 # install MIME database
 # TODO: It should be possible to do that in the build system too.
-mimeDBSource=$sourceDir/src/data/beos_mime
-mimeDBDest=${tPrefix}home/config/settings/beos_mime
 
-echo "Deleting old MIME database ..."
+if [ ! $updateOnly ]; then
+	mimeDBSource=$sourceDir/src/data/beos_mime
+	mimeDBDest=${tPrefix}home/config/settings/beos_mime
 
-$rm -rf $mimeDBDest
-$mkdir -p $mimeDBDest
-mkdir -p $tmpDir
-mimeTmpDir=$tmpDir/mime
-mimeTmpIndex=0
+	echo "Deleting old MIME database ..."
 
-# create tmp dir for the MIME conversion stuff
-mkdir -p $mimeTmpDir
+	$rm -rf $mimeDBDest
+	$mkdir -p $mimeDBDest
+	mkdir -p $tmpDir
+	mimeTmpDir=$tmpDir/mime
+	mimeTmpIndex=0
 
-echo "Installing MIME database ..."
+	# create tmp dir for the MIME conversion stuff
+	mkdir -p $mimeTmpDir
 
-for inSuperFile in $mimeDBSource/*.super; do
-	superType=$(basename $inSuperFile .super)
-	outSuperDir=$mimeDBDest/$superType
+	echo "Installing MIME database ..."
 
-	# compile rdef to rsrc file and the rsrc file to attributes
-	mimeTmpIndex=$(($mimeTmpIndex + 1))
-	tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
-	tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
-	$rc -o $tmpFile $inSuperFile
-	mkdir -p $tmpFile2
-	$resattr -O -o $tmpFile2 $tmpFile
-	$cp -r ${sPrefix}$tmpFile2 $outSuperDir
+	for inSuperFile in $mimeDBSource/*.super; do
+		superType=$(basename $inSuperFile .super)
+		outSuperDir=$mimeDBDest/$superType
 
-	# iterate through the sub types
-	for inSubFile in $mimeDBSource/$superType/*; do
-		# check, if the type exists
-		if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
-			subType=$(basename $inSubFile)
-			outSubFile=$outSuperDir/$subType
+		# compile rdef to rsrc file and the rsrc file to attributes
+		mimeTmpIndex=$(($mimeTmpIndex + 1))
+		tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
+		tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
+		$rc -o $tmpFile $inSuperFile
+		mkdir -p $tmpFile2
+		$resattr -O -o $tmpFile2 $tmpFile
+		$cp -r ${sPrefix}$tmpFile2 $outSuperDir
 
-			# compile rdef to rsrc file and the rsrc file to attributes
-			mimeTmpIndex=$(($mimeTmpIndex + 1))
-			tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
-			tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
-			$rc -o $tmpFile $inSubFile
-			$resattr -O -o $tmpFile2 $tmpFile
-			$cp ${sPrefix}$tmpFile2 $outSubFile
-		fi
+		# iterate through the sub types
+		for inSubFile in $mimeDBSource/$superType/*; do
+			# check, if the type exists
+			if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
+				subType=$(basename $inSubFile)
+				outSubFile=$outSuperDir/$subType
+
+				# compile rdef to rsrc file and the rsrc file to attributes
+				mimeTmpIndex=$(($mimeTmpIndex + 1))
+				tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
+				tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
+				$rc -o $tmpFile $inSubFile
+				$resattr -O -o $tmpFile2 $tmpFile
+				$cp ${sPrefix}$tmpFile2 $outSubFile
+			fi
+		done
 	done
-done
 
-# cleanup tmp dir
-rm -rf $mimeTmpDir
+	# cleanup tmp dir
+	rm -rf $mimeTmpDir
+fi	# ! updateOnly
 
 
 # install sources
