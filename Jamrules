@@ -19,6 +19,7 @@ LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(HAIKU_BUILD_OUTPUT_DIR) ;
 # At the end include BuildSetup that sets up global variables etc. The
 # optional user-defined UserBuildConfig is included thereafter.
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HelperRules ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) MathRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BeOSRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ConfigRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) DocumentationRules ] ;
