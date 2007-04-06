@@ -29,7 +29,11 @@ rule SubIncludeGPL
 		SubInclude $(1) ;
 	} 
 }
- 
+
+
+# pragma mark - MakeLocate variants
+
+
 rule MakeLocateCommonPlatform
 {
 	MakeLocate $(1) : $(COMMON_PLATFORM_LOCATE_TARGET) ;
@@ -75,6 +79,13 @@ rule MakeLocateDebug
 		}
 	}
 }
+
+
+# pragma mark - Deferred SubIncludes
+
+
+# The variable used to collect the deferred SubIncludes.
+HAIKU_DEFERRED_SUB_INCLUDES = ;
 
 rule DeferredSubInclude params
 {
@@ -125,5 +136,26 @@ rule HaikuSubInclude tokens
 	}
 }
 
-# The variable used to collect the deferred SubIncludes.
-HAIKU_DEFERRED_SUB_INCLUDES = ;
+
+# pragma mark - Unique IDs/targets
+
+
+# private to NextID; incremented with each NextID invocation
+HAIKU_NEXT_ID = 0 ;
+
+rule NextID
+{
+	# NextID ;
+
+	local result = $(HAIKU_NEXT_ID:J=) ;
+	HAIKU_NEXT_ID = [ AddNumAbs $(HAIKU_NEXT_ID) : 1 ] ;
+	return $(result) ;
+}
+
+rule NewUniqueTarget basename
+{
+	# NewUniqueTarget [ basename ] ;
+
+	local id = [ NextID ] ;
+	return $(basename[1]:E=_target:G=unique!target)_$(id) ;
+}
