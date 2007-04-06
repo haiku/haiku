@@ -359,10 +359,26 @@ format_pointer(Context &context, socket_args *args)
 static string
 get_iovec(Context &context, iovec *iov, int iovlen)
 {
+	if (iov == NULL && iovlen == 0)
+		return "(empty)";
+
 	string r = "{";
 	r += context.FormatPointer(iov);
 	r += ", " + context.FormatSigned(iovlen);
 	return r + "}";
+}
+
+static string
+format_pointer(Context &context, message_args *msg)
+{
+	string r;
+
+	r +=   "header = " + format_pointer_value<msghdr>(context, msg->header);
+	r += ", flags = " + context.FormatFlags(msg->flags);
+	r += ", data = " + context.FormatPointer(msg->data);
+	r += ", length = " + context.FormatUnsigned(msg->length);
+
+	return r;
 }
 
 static string
@@ -373,8 +389,10 @@ format_pointer(Context &context, msghdr *h)
 	r  =   "name = " + format_pointer_value<sockaddr>(context, h->msg_name);
 	r += ", name_len = " + context.FormatUnsigned(h->msg_namelen);
 	r += ", iov = " + get_iovec(context, h->msg_iov, h->msg_iovlen);
-	r += ", control = " + context.FormatPointer(h->msg_control);
-	r += ", control_len = " + context.FormatUnsigned(h->msg_controllen);
+	if (h->msg_control != NULL || h->msg_controllen != 0) {
+		r += ", control = " + context.FormatPointer(h->msg_control);
+		r += ", control_len = " + context.FormatUnsigned(h->msg_controllen);
+	}
 	r += ", flags = " + context.FormatFlags(h->msg_flags);
 
 	return r;
@@ -461,9 +479,10 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 	}
 
 DEFINE_TYPE(fdset_ptr, fd_set *);
+POINTER_TYPE(ifconf_ptr, ifconf);
+POINTER_TYPE(ifreq_ptr, ifreq);
+POINTER_TYPE(message_args_ptr, message_args);
+POINTER_TYPE(msghdr_ptr, msghdr);
 POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
 POINTER_TYPE(sockopt_args_ptr, sockopt_args);
 POINTER_TYPE(socket_args_ptr, socket_args);
-POINTER_TYPE(msghdr_ptr, msghdr);
-POINTER_TYPE(ifreq_ptr, ifreq);
-POINTER_TYPE(ifconf_ptr, ifconf);
