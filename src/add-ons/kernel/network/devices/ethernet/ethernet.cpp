@@ -221,6 +221,7 @@ ethernet_down(net_device *_device)
 		sCheckList.Remove(device);
 
 	close(device->fd);
+	device->fd = -1;
 }
 
 
@@ -289,6 +290,9 @@ status_t
 ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 {
 	ethernet_device *device = (ethernet_device *)_device;
+
+	if (device->fd == -1)
+		return B_FILE_ERROR;
 
 	// TODO: better header space
 	net_buffer *buffer = gBufferModule->create(256);

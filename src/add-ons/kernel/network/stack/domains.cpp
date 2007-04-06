@@ -154,27 +154,30 @@ add_interface_to_domain(net_domain *_domain,
 
 	const char *deviceName = request.ifr_parameter.device[0]
 		? request.ifr_parameter.device : request.ifr_name;
+	const char *baseName = request.ifr_parameter.base_name[0]
+		? request.ifr_parameter.base_name : request.ifr_name;
+
 	net_device_interface *deviceInterface = get_device_interface(deviceName);
 	if (deviceInterface == NULL)
 		return ENODEV;
 
 	BenaphoreLocker locker(domain->lock);
 
+	net_interface_private *interface = NULL;
+	status_t status;
+
 	if (find_interface(domain, request.ifr_name) != NULL)
-		return B_NAME_IN_USE;
+		status = B_NAME_IN_USE;
+	else
+		status = create_interface(domain, request.ifr_name,
+			baseName, deviceInterface, &interface);
 
-	net_interface_private *interface;
-	status_t status = create_interface(domain,
-		request.ifr_name, request.ifr_parameter.base_name[0]
-			? request.ifr_parameter.base_name : request.ifr_name,
-		deviceInterface, &interface);
-	if (status < B_OK) {
-		put_device_interface(deviceInterface);
-		return status;
-	}
+	put_device_interface(deviceInterface);
 
-	list_add_item(&domain->interfaces, interface);
-	return B_OK;
+	if (status == B_OK)
+		list_add_item(&domain->interfaces, interface);
+
+	return status;
 }
 
 

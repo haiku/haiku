@@ -652,7 +652,6 @@ device_removed(net_device *device)
 
 	// TODO: make sure all readers are gone
 	//       make sure all watchers are gone
-	//       remove device interface
 
 	return B_OK;
 }

@@ -44,14 +44,12 @@ device_reader_thread(void *_interface)
 	net_device_interface *interface = (net_device_interface *)_interface;
 	net_device *device = interface->device;
 	status_t status = B_OK;
-	int32 tries = 0;
 
 	while ((device->flags & IFF_UP) != 0) {
 		net_buffer *buffer;
 		status = device->module->receive_data(device, &buffer);
 		if (status == B_OK) {
 			//dprintf("received buffer of %ld bytes length\n", buffer->size);
-			tries = 0;
 
 			// feed device monitors
 			// TODO: locking!
@@ -88,18 +86,24 @@ device_reader_thread(void *_interface)
 			}
 
 			gNetBufferModule.free(buffer);
-		}
-
-		if (status < B_OK) {
-			// this is a near real-time thread - don't render the system unusable
-			// in case of a device going down
+		} else {
+			// In case of error, give the other threads some
+			// time to run since this is a near real time thread.
+			//
+			// TODO: can this value be lower? 1000 works fine in
+			//       my system. 10ms seems a bit too much and adds
+			//       as latency.
 			snooze(10000);
-
-			if (++tries > 20) {
-				// TODO: bring down the interface!
-				break;
-			}
 		}
+
+		// if the interface went down IFF_UP was removed
+		// and the receive_data() above should have been
+		// interrupted. One check should be enough, specially
+		// considering the snooze above.
+		//
+		// TODO: make sure that when receive_data() returns
+		//       after closing the new device->flags are
+		//       already visible in all processors.
 	}
 
 	return status;
@@ -254,19 +258,13 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			benaphore_lock(&domain->lock);
-			status_t status;
+			BenaphoreLocker _(domain->lock);
 
 			net_interface *interface = find_interface(domain,
 				request.ifr_name);
-			if (interface != NULL)
-				status = remove_interface_from_domain(interface);
-			else
-				status = ENODEV;
-
-			benaphore_unlock(&domain->lock);
-
-			return status;
+			if (interface == NULL)
+				return ENODEV;
+			return remove_interface_from_domain(interface);
 		}
 
 		case SIOCGIFCOUNT:
@@ -321,7 +319,7 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			benaphore_lock(&domain->lock);
+			BenaphoreLocker _(domain->lock);
 			status_t status = B_OK;
 
 			net_interface *interface = find_interface(domain,
@@ -355,7 +353,6 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 			} else
 				status = B_BAD_VALUE;
 
-			benaphore_unlock(&domain->lock);
 			return status;
 		}
 	}
