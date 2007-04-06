@@ -506,7 +506,9 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	if (flags & MSG_WAITALL)
 		dataNeeded = numBytes;
 
-	bigtime_t timeout = system_time() + socket->receive.timeout;
+	bigtime_t timeout = socket->receive.timeout;
+	if (timeout != B_INFINITE_TIMEOUT)
+		timeout += system_time();
 
 	while (fReceiveQueue.PushedData() == 0
 			&& fReceiveQueue.Available() < dataNeeded
