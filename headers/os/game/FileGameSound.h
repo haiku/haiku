@@ -95,8 +95,6 @@ private:
 			
 			status_t			Init(const entry_ref* file);
 			
-	static	int32				ReadThread(void* arg);
-			
 			bool				Load();
 			bool				Read(void * buffer, size_t bytes);
 				

@@ -24,24 +24,18 @@
 //	Description:	BFileGameSound is a class that streams data out of a file.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <stdlib.h>
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
 #include <Entry.h>
+#include <FileGameSound.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <scheduler.h>
 
-// Project Includes ------------------------------------------------------------
-#include <GameSoundDevice.h>
-#include <GSUtility.h>
+#include "GameSoundDevice.h"
+#include "GSUtility.h"
 
-// Local Includes --------------------------------------------------------------
-#include <FileGameSound.h>
-
-// Local Defines ---------------------------------------------------------------
 const int32 kPages = 20;
 struct _gs_media_tracker
 {
@@ -150,7 +144,8 @@ BFileGameSound::BFileGameSound(const entry_ref *file,
  		fPaused(false),
  		fPauseGain(1.0)
 {
-	if (InitCheck() == B_OK) SetInitError(Init(file));							
+	if (InitCheck() == B_OK) 
+		SetInitError(Init(file));							
 }
 
 
@@ -185,11 +180,9 @@ BFileGameSound::~BFileGameSound()
 	
 	if (fAudioStream)
 	{	
-		if (fAudioStream->stream) fAudioStream->file->ReleaseTrack(fAudioStream->stream);
+		if (fAudioStream->stream) 
+			fAudioStream->file->ReleaseTrack(fAudioStream->stream);
 	
-		fAudioStream->file->CloseFile();
-		
-		//delete fAudioStream->stream;
 		delete fAudioStream->file;
 	}
 	
@@ -209,16 +202,8 @@ status_t
 BFileGameSound::StartPlaying()
 {
 	// restart playback if needed
-	if (IsPlaying()) StopPlaying();
-	
-	fPort = create_port(kPages, "audioque");
-	
-	// create the thread that will read the file
-	fReadThread = spawn_thread(ReadThread, "audiostream", B_NORMAL_PRIORITY, this);
-	if (fReadThread < B_OK) return B_NO_MORE_THREADS;
-		
-	status_t error = resume_thread(fReadThread);
-	if (error != B_OK) return error;
+	if (IsPlaying()) 
+		StopPlaying();
 	
 	// start playing the file
 	return BStreamingGameSound::StartPlaying();
@@ -237,10 +222,6 @@ BFileGameSound::StopPlaying()
 	fStopping = false;
 	fAudioStream->position = 0;
 	fPlayPosition = 0;
-	
-	// we don't need to read any more
-	kill_thread(fReadThread);
-	delete_port(fPort);
 		
 	return error;
 }
@@ -250,9 +231,7 @@ status_t
 BFileGameSound::Preload()
 {
 	if (!IsPlaying())
-	{
-		for(int32 i = 0; i < kPages / 2; i++) Load();
-	}
+		Load();
 	
 	return B_OK;
 }
@@ -262,23 +241,20 @@ void
 BFileGameSound::FillBuffer(void *inBuffer,
 						   size_t inByteCount)
 {
-	int32 cookie;
 	size_t bytes = inByteCount;
 	
-	if (!fPaused || fPausing)
-	{
-		// time to read a new buffer
-		if (fPlayPosition == 0) read_port_etc(fPort, &cookie, fBuffer, fBufferSize, B_TIMEOUT, 0);
-	
-		if (fPausing)
-		{
+	if (!fPaused || fPausing) {
+		if (fPlayPosition == 0 || fPlayPosition + inByteCount >= fBufferSize) {
+			Load();
+		}
+			
+		if (fPausing) {
 			Lock();
 		
 			bool rampDone = false;
 			
-			// Fill the requsted buffer, stopping if the paused flag is set
-			switch(Format().format)
-			{
+			// Fill the requested buffer, stopping if the paused flag is set
+			switch(Format().format) {
 				case gs_audio_format::B_GS_U8:
 					rampDone = ::FillBuffer(fPausing, (uint8*)inBuffer, (uint8*)&fBuffer[fPlayPosition], &bytes);
 					break;
@@ -297,11 +273,9 @@ BFileGameSound::FillBuffer(void *inBuffer,
 			}
 			
 			// We finished ramping
-			if (rampDone)
-			{
-				if (bytes < inByteCount && !fPausing)
-				{
-					// Since are resumming play back, we need to copy any remaining samples
+			if (rampDone) {
+				if (bytes < inByteCount && !fPausing) {
+					// Since we are resuming play back, we need to copy any remaining samples
 					char * buffer = (char*)inBuffer;
 					memcpy(&buffer[bytes], &fBuffer[fPlayPosition + bytes], inByteCount - bytes);
 				}
@@ -311,15 +285,12 @@ BFileGameSound::FillBuffer(void *inBuffer,
 			}
 							
 			Unlock();
-		}
-		else
-		{
+		} else {
 			size_t byte = 0;
 			char * buffer = (char*)inBuffer;
 			
 			// We need to be able to stop asap when the pause flag is flipped.
-			while(byte < bytes && (!fPaused || fPausing))
-			{
+			while(byte < bytes && (!fPaused || fPausing)) {
 				buffer[byte] = fBuffer[fPlayPosition + byte]; 
 				byte++;
 			}
@@ -328,13 +299,7 @@ BFileGameSound::FillBuffer(void *inBuffer,
 		}
 	}
 	
-	fPlayPosition += bytes;
-	if (fPlayPosition >= fBufferSize)
-	{
-		// We have finished reading the buffer. Setup for the next buffer.
-		fPlayPosition = 0;
-		memset(fBuffer, 0, fBufferSize);
-	}				  		
+	fPlayPosition += bytes;				  		
 }
 
 
@@ -394,31 +359,35 @@ BFileGameSound::Init(const entry_ref* file)
 	
 	fAudioStream->file = new BMediaFile(file);
 	status_t error = fAudioStream->file->InitCheck();
-	if (error != B_OK) return error;
+	if (error != B_OK)
+		return error;
 	
 	fAudioStream->stream = fAudioStream->file->TrackAt(0);
 	
 	// is this is an audio file?		
-	media_format mformat;
-	fAudioStream->stream->EncodedFormat(&mformat);
-	if (!mformat.IsAudio()) return B_MEDIA_BAD_FORMAT;
+	media_format playFormat;
+	fAudioStream->stream->EncodedFormat(&playFormat);
+	if (!playFormat.IsAudio()) 
+		return B_MEDIA_BAD_FORMAT;
 	
 	gs_audio_format dformat = Device()->Format();
 	
 	// request the format we want the sound
-	memset(&mformat, 0, sizeof(media_format));
-	mformat.type = B_MEDIA_RAW_AUDIO;
-	fAudioStream->stream->DecodedFormat(&mformat);
+	memset(&playFormat, 0, sizeof(media_format));
+	playFormat.type = B_MEDIA_RAW_AUDIO;
+	if (fAudioStream->stream->DecodedFormat(&playFormat) != B_OK)
+		return B_MEDIA_BAD_FORMAT;
 	
 	// translate the format into a "GameKit" friendly one
 	gs_audio_format gsformat;
-	media_to_gs_format(&gsformat, &mformat.u.raw_audio);	
+	media_to_gs_format(&gsformat, &playFormat.u.raw_audio);	
 	
 	// Since the buffer sized read from the file is most likely differnt
 	// then the buffer used by the audio mixer, we must allocate a buffer
 	// large enough to hold the largest request.
 	fBufferSize = gsformat.buffer_size;
-	if (fBufferSize < dformat.buffer_size) fBufferSize = dformat.buffer_size;
+	if (fBufferSize < dformat.buffer_size)
+		fBufferSize = dformat.buffer_size;
 	
 	// create the buffer
 	fBuffer = new char[fBufferSize * 2];
@@ -430,57 +399,28 @@ BFileGameSound::Init(const entry_ref* file)
 	// Ask the device to attach our sound to it
 	gs_id sound;
 	error = Device()->CreateBuffer(&sound, this, &gsformat);
-	if (error != B_OK) return error;
+	if (error != B_OK)
+		return error;
 	
 	return BGameSound::Init(sound);
-}
-
-
-int32
-BFileGameSound::ReadThread(void* arg)
-{
-	BFileGameSound* obj = (BFileGameSound*)arg;
-	
-	while(true) obj->Load();			
-	
-	return 0;
 }
 
 
 bool
 BFileGameSound::Load()
 {
-	int64 frames;
-	char * buffer = &fBuffer[fBufferSize + fAudioStream->position];
-	status_t err = fAudioStream->stream->ReadFrames(buffer, &frames);
-	if (err < B_OK) {
-		StopPlaying(); // XXX this is a hack, the whole class design is broken
+	
+	if (fPlayPosition != 0) {
+		memcpy(fBuffer, fBuffer + fPlayPosition, fBufferSize - fPlayPosition);
+		fPlayPosition = fBufferSize - fPlayPosition;
 	}
 	
-	int32 frame = fAudioStream->stream->CurrentFrame();
-	
-	fAudioStream->position += fFrameSize * frames;
-	if (fAudioStream->position >= fBufferSize) 
-	{
-		// we have filled the enter buffer, time to send
-		write_port(fPort, fBufferSize, &fBuffer[fBufferSize], fBufferSize);	
-		fAudioStream->position = 0;
-	}
-	
-	if (frame >= fAudioStream->frames) 
-	{
-		if (fLooping)
-		{
-			// since we are looping, we need to start reading from 
-			// the begining of the file again. 
-			int64 firstFrame = 0;
-			fAudioStream->stream->SeekToFrame(&firstFrame);
-			
-			fStopping = true;
-		}
-		else fStopping = true;
-	}
-	
+	// time to read a new buffer
+	int64 frames = 0;
+	fAudioStream->stream->ReadFrames(fBuffer + fPlayPosition, &frames);
+	fBufferSize = fPlayPosition + frames * fFrameSize;
+	fPlayPosition = 0;
+		
 	return true;
 }
 

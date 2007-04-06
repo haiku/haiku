@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src kits game ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders app ;

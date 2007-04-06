@@ -24,21 +24,14 @@
 //	Description:	BPushGameSound class
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
 #include <List.h>
-
-// Project Includes ------------------------------------------------------------
-#include <GSUtility.h>
-
-// Local Includes --------------------------------------------------------------
 #include <PushGameSound.h>
 
-// Local Defines ---------------------------------------------------------------
+#include "GSUtility.h"
 
-// BPushGameSound --------------------------------------------------------------
+
 BPushGameSound::BPushGameSound(size_t inBufferFrameCount,
 							   const gs_audio_format *format,
 							   size_t inBufferCount,

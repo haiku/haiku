@@ -33,7 +33,7 @@
 #include <GameSoundDefs.h>
 
 // Local Includes --------------------------------------------------------------
-#include <GSUtility.h>
+#include "GSUtility.h"
 
 // Local Defines ---------------------------------------------------------------
 

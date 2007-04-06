@@ -42,12 +42,12 @@
 #include <MediaDefs.h>
 
 // Project Includes ------------------------------------------------------------
-#include <GameSoundBuffer.h>
-#include <GameSoundDevice.h>
-#include <GSUtility.h>
+#include "GameSoundBuffer.h"
+#include "GameSoundDevice.h"
+#include "GSUtility.h"
 
 // Local Includes --------------------------------------------------------------
-#include <GameProducer.h>
+#include "GameProducer.h"
 
 // Local Defines ---------------------------------------------------------------
 struct _gs_play 

@@ -43,7 +43,8 @@ BSimpleGameSound::BSimpleGameSound(const entry_ref *inFile,
 								   BGameSoundDevice *device)
  		:	BGameSound(device)
 {
-	if (InitCheck() == B_OK) SetInitError(Init(inFile));	
+	if (InitCheck() == B_OK) 
+		SetInitError(Init(inFile));	
 }
 
 
@@ -69,7 +70,8 @@ BSimpleGameSound::BSimpleGameSound(const void *inData,
 								   BGameSoundDevice *device)
  	:	BGameSound(device)
 {
-	if (InitCheck() == B_OK) SetInitError(Init(inData, inFrameCount, format));
+	if (InitCheck() == B_OK) 
+	SetInitError(Init(inData, inFrameCount, format));
 }
 
 

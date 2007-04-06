@@ -30,10 +30,10 @@
 // System Includes -------------------------------------------------------------
 
 // Project Includes ------------------------------------------------------------
-#include <GameSoundDevice.h>
+#include "GameSoundDevice.h"
 
 // Local Includes --------------------------------------------------------------
-#include <StreamingGameSound.h>
+#include "StreamingGameSound.h"
 
 // Local Defines ---------------------------------------------------------------
 BStreamingGameSound::BStreamingGameSound(size_t inBufferFrameCount,

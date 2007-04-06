@@ -25,18 +25,14 @@
 //					of the rest of it's childern.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
-
-// Project Includes ------------------------------------------------------------
-#include <GameSoundBuffer.h>
-#include <GameSoundDevice.h>
-
-// Local Includes --------------------------------------------------------------
 #include <GameSound.h>
+
+#include "GameSoundBuffer.h"
+#include "GameSoundDevice.h"
+
 
 using std::nothrow;
 
