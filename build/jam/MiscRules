@@ -159,3 +159,61 @@ rule NewUniqueTarget basename
 	local id = [ NextID ] ;
 	return $(basename[1]:E=_target:G=unique!target)_$(id) ;
 }
+
+
+# pragma mark - RunCommandLine
+
+
+rule RunCommandLine commandLine
+{
+	# RunCommandLine <commandLine>
+	#
+	# Creates a pseudo target that, when made by jam, causes the supplied shell
+	# command line to be executed. Elements of <commandLine> with the prefix ":"
+	# are replaced by the rule. After stripping the prefix such a string specifies
+	# a build system target and the finally executed command line will contain
+	# a path to the target instead.
+	# The pseudo target will depend on all targets thus identified. Each
+	# invocation of this rule creates a different pseudo target, which is
+	# returned to the caller.
+
+	# collect the targets in the command line and replace them by $targetX*
+	# variables
+	local substitutedCommandLine ;
+	local targets ;
+
+	local targetVarName = target ;
+	local i ;
+	for i in $(commandLine)  {
+		# targets are marked by the ":" prefix
+		local target = [ Match :(.*) : $(i) ] ;
+		if $(target) {
+			targets += $(target) ;
+			targetVarName = $(targetVarName)X ;
+			i = "$"$(targetVarName) ;
+		}
+
+		substitutedCommandLine += $(i) ;
+	}
+
+	# define the "run" target
+	local run = [ NewUniqueTarget run ] ;
+	COMMAND_LINE on $(run) = $(substitutedCommandLine) ;
+	NotFile $(run) ;
+	Always $(run) ;
+	Depends $(run) : $(targets) ;
+	RunCommandLine1 $(run) : $(targets) ;
+
+	return $(run) ;
+}
+
+actions RunCommandLine1 {
+	target=target;
+	for t in $(2) ; do
+		target+=X
+		eval "${target}=${t}"
+	done
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(COMMAND_LINE)
+}
+

@@ -11,13 +11,22 @@
 #			directory paths and the like.
 
 
-# If the target to be built is "all" (i.e. the default) and we're in the output
-# directory, the root directory of the build system, or in "src/", we change the
-# target to be built to "haiku-image".
+# analyze an optionally replace jam's target parameters
 HAIKU_ORIGINAL_JAM_TARGETS = $(JAM_TARGETS) ;
-if $(JAM_TARGETS) = all {
-	if ! $(INVOCATION_SUBDIR) || $(INVOCATION_SUBDIR) = src {
-		JAM_TARGETS = haiku-image ;
+if $(JAM_TARGETS) {
+	# If the target to be built is "all" (i.e. the default) and we're in the
+	# output directory, the root directory of the build system, or in "src/", we
+	# change the target to be built to "haiku-image".
+	if $(JAM_TARGETS) = all {
+		if ! $(INVOCATION_SUBDIR) || $(INVOCATION_SUBDIR) = src {
+			JAM_TARGETS = haiku-image ;
+		}
+
+	# The "run" target allows for running arbitrary command lines containing
+	# build system targets, which are built and replaced accordingly.
+	} else if $(JAM_TARGETS[1]) = run && $(JAM_TARGETS[2]) {
+		local run = [ RunCommandLine $(JAM_TARGETS[2-]) ] ;
+		JAM_TARGETS = $(run) ;
 	}
 }
 
