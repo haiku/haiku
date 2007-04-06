@@ -216,7 +216,8 @@ ethernet_down(net_device *_device)
 
 	// if the device is still part of the list, remove it
 	if (device->GetDoublyLinkedListLink()->next != NULL
-		|| device->GetDoublyLinkedListLink()->previous != NULL)
+		|| device->GetDoublyLinkedListLink()->previous != NULL
+		|| device == sCheckList.Head())
 		sCheckList.Remove(device);
 
 	close(device->fd);
