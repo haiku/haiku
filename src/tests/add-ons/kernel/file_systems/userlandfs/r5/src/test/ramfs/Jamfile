@@ -24,7 +24,6 @@ if $(OSPLAT) = X86 {
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
 
 Addon <test>ramfs
-	: # relpath - obsolete
 	: Debug.cpp
 	  Locker.cpp
 	  String.cpp
@@ -57,6 +56,5 @@ Addon <test>ramfs
 	  SizeIndex.cpp
 	  SymLink.cpp
 	  Volume.cpp
-	: false		# is executable
 	: <test>UserlandFSServer
 ;

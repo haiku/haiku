@@ -16,7 +16,7 @@ if $(USESSL) {
 	SubDirHdrs [ FDirName / boot home config include ] ;
 }
 
-Addon POP3 : mail_daemon inbound_protocols :
+Addon POP3 :
 	MessageIO.cpp
 	pop3.cpp
 	SimpleMailProtocol.cpp

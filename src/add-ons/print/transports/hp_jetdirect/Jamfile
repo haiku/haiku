@@ -4,13 +4,12 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
-Addon HP\ JetDirect : Print transport : 
+Addon HP\ JetDirect :
 	print_transport.cpp 
 	HPJetDirectTransport.cpp
 	SetupWindow.cpp
+	: be $(NETAPI_LIB)
 ;
-
-LinkAgainst HP\ JetDirect : be $(NETAPI_LIB) ;
 
 Package haiku-printingkit-cvs :
 	HP\ JetDirect :

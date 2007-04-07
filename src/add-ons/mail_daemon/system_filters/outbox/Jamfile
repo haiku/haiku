@@ -11,7 +11,7 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-Addon Outbox : mail_daemon system_filters :
+Addon Outbox :
 	filter.cpp ;
 
 LinkAgainst Outbox :

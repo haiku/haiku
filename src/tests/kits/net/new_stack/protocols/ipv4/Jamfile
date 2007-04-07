@@ -2,8 +2,7 @@ SubDir HAIKU_TOP src tests kits net new_stack protocols ipv4 ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
-Addon <v2>ipv4 : userland network_v2 protocols :	
+Addon <v2>ipv4 :
 	ipv4.c
+	: <installed>new_stack_tester be
 ;
-
-LinkAgainst <v2>ipv4 : <installed>new_stack_tester be ;

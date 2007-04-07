@@ -16,7 +16,7 @@ if $(USESSL) {
 	SubDirHdrs [ FDirName / boot home config include ] ;
 }
 
-Addon SMTP : mail_daemon outbound_protocols :
+Addon SMTP :
 	smtp.cpp
 	md5c.c ;
 

@@ -2,8 +2,7 @@ SubDir HAIKU_TOP src tests kits net new_stack interfaces loopback ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
-Addon <v2>loopback : userland network_v2 interfaces  :	
+Addon <v2>loopback :
 	loopback.c
+	: <installed>new_stack_tester be
 ;
-
-LinkAgainst <v2>loopback : <installed>new_stack_tester be ;

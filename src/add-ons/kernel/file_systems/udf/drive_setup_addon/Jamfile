@@ -31,16 +31,13 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
 # Note that the add-on is named "i-udf-ds" to put it alphabetically
 # before the standard iso9660 add-on, thus giving it first dibs at
 # iso9660/UDF hybrid discs.
-Addon i-udf-ds : [ FDirName drive_setup fs ] :
+Addon i-udf-ds :
 	udf-ds.cpp
 	Recognition.cpp
 	UdfDebug.cpp
 	UdfString.cpp
 	UdfStructures.cpp
 	Utils.cpp
-	
-	: false
-	:
 ;
 
 SEARCH on [ FGristFiles

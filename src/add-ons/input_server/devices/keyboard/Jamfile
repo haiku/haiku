@@ -5,14 +5,13 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders input kernel tracker ;
 UseArchHeaders $(TARGET_ARCH) ;
 
-Addon <input>keyboard : input_server/devices : 
+Addon <input>keyboard : 
 	KeyboardInputDevice.cpp
 	Keymap.cpp
 
 	TMWindow.cpp
 	TMListItem.cpp
 
-	: false 
 	: input_server be ;
 
 Package haiku-inputkit-cvs :

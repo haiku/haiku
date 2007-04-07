@@ -13,7 +13,7 @@ KernelAddon intel :
 
 # Also build a userland version
 # ToDo: it's probably not a good idea to build them into the same directory
-#Addon <partitioning_system>intel : userland partitioning_systems :
+#Addon <partitioning_system>intel :
 #	intel.cpp
 #	PartitionMap.cpp
 #	PartitionMapParser.cpp

@@ -13,7 +13,6 @@ SEARCH_SOURCE += $(ramFSTop) ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 Addon <userland>ramfs
-	: # relpath - obsolete
 	: Debug.cpp
 	  Locker.cpp
 	  String.cpp
@@ -47,7 +46,6 @@ Addon <userland>ramfs
 	  SymLink.cpp
 	  Volume.cpp
 
-	: false		# is executable
 	: libuserlandfs_haiku_kernel.so
 ;
 

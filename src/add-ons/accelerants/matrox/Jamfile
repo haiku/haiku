@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
-Addon mga.accelerant : accelerants :
+Addon mga.accelerant :
 	Cursor.c
 	EngineManagment.c
 	GetAccelerantHook.c
@@ -17,7 +17,7 @@ Addon mga.accelerant : accelerants :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false : libmatrox_engine.a
+	: libmatrox_engine.a
 ;
 
 Package haiku-matrox-cvs :

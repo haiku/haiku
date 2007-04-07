@@ -6,10 +6,8 @@ UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(SUBDIR) libMP4 ] ;
 
-Addon mp4_reader : media plugins :
+Addon mp4_reader :
 	mp4_reader.cpp
-	:
-	false
 	:
 	libmp4reader.a
 	libz.a

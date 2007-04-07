@@ -4,8 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-Addon mp3_reader : media plugins :
+Addon mp3_reader :
 	MP3ReaderPlugin.cpp
-	: false
 	: be libmedia.so
 ;

@@ -8,9 +8,8 @@ SubDirHdrs $(SUBDIR) .. ogg ;
 SubDirSysHdrs $(SUBDIR) .. ogg libogg ;
 SubDirHdrs $(SUBDIR) libvorbis vorbis ;
 
-Addon vorbis : media plugins :
+Addon vorbis :
 	vorbisCodecPlugin.cpp
-	: false
 	: libvorbis.a libogg.a be libmedia.so
 ;
 

@@ -8,7 +8,7 @@ KernelAddon amiga_rdb :
 	amiga_rdb.cpp
 	;
 
-#Addon <partitioning_system>amiga_rdb : userland partitioning_systems :
+#Addon <partitioning_system>amiga_rdb :
 #	amiga_rdb.cpp
 #	;
 #

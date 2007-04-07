@@ -20,7 +20,7 @@ SubDir HAIKU_TOP src tests add-ons kernel disk_scanner ;
 #	SubDirC++Flags $(defines) ;
 #}
 #
-#Addon <userland>disk_scanner : userland disk_scanner :
+#Addon <userland>disk_scanner :
 #	disk_scanner.c
 #;
 #LinkAgainst <userland>disk_scanner : libkernelland_emu.so ;

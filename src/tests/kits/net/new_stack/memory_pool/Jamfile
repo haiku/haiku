@@ -2,8 +2,7 @@ SubDir HAIKU_TOP src tests kits net new_stack memory_pool ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
-Addon <userland>memory_pool : userland generic :
+Addon <userland>memory_pool :
 	memory_pool.c
+	: <installed>new_stack_tester
 ;
-
-LinkAgainst <userland>memory_pool : <installed>new_stack_tester ;

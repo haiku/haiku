@@ -8,11 +8,11 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network interfaces ethernet ] ;
 
-Addon <userland>ethernet : userland obos_network interfaces : 
+Addon <userland>ethernet :
 	ethernet.c
+	: <installed-userland-networking>net_stack_tester
 ;
 
-LinkAgainst <userland>ethernet : <installed-userland-networking>net_stack_tester ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-userland-networking 

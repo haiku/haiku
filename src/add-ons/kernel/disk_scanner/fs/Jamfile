@@ -5,7 +5,7 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 # For now build a userland version only.
-Addon <file_system>bfs : userland file_systems :
+Addon <file_system>bfs :
 	bfs.c
 ;
 

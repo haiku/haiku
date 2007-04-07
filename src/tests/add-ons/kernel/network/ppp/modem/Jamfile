@@ -9,13 +9,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkern
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp modem ] ;
 
-Addon <userland>modem : userland obos_network ppp :
+Addon <userland>modem :
 	modem.cpp
 	ModemDevice.cpp
 	ACFCHandler.cpp
-;
-
-LinkAgainst <userland>modem 
 	: <userland>libkernelppp.a 
 	  <installed-userland-networking>net_stack_tester 
 	  be 

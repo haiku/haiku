@@ -16,7 +16,7 @@ if $(USESSL) {
 	SubDirHdrs [ FDirName / boot home config include ] ;
 }
 
-Addon IMAP : mail_daemon inbound_protocols :
+Addon IMAP :
 	imap_client.cpp
 	imap_config.cpp
 	NestedString.cpp ;

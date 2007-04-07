@@ -8,11 +8,10 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network interfaces loopback ] ;
 
-Addon <userland>loopback : userland obos_network interfaces : 
+Addon <userland>loopback :
 	loopback.c
+	: <installed-userland-networking>net_stack_tester
 ;
-
-LinkAgainst <userland>loopback : <installed-userland-networking>net_stack_tester ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-userland-networking 

@@ -11,13 +11,12 @@ if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon canna : input_server/methods : 
+Addon canna : 
 	CannaInterface.cpp
 	CannaLooper.cpp
 	CannaMethod.cpp
 	KouhoWindow.cpp
 	PaletteWindow.cpp
-	: false
 	: be textencoding input_server libcanna.a librk.a ;
 
 Package haiku-cannaIM-cvs :

@@ -9,12 +9,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkern
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] ;
 
-Addon <userland>ipcp : userland obos_network ppp :
+Addon <userland>ipcp :
 	ipcp.cpp
 	Protocol.cpp
-;
-
-LinkAgainst <userland>ipcp : 
+	:
 	<userland>libkernelppp.a 
 	<installed-userland-networking>net_stack_tester 
 	be 

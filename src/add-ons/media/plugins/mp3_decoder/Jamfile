@@ -6,10 +6,8 @@ UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(SUBDIR) mpglib ] ;
 
-Addon mp3_decoder : media plugins :
+Addon mp3_decoder :
 	mp3DecoderPlugin.cpp
-	: 
-	false
 	:  
 	libmpglib.a
 	be

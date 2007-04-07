@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
-Addon radeon.accelerant : accelerants :
+Addon radeon.accelerant :
 	Acceleration.c
 	CP.c
 	Cursor.c
@@ -33,7 +33,6 @@ Addon radeon.accelerant : accelerants :
 	settings.cpp
 	theatre_out.c
 	vesa_modes.c
-	: false
 	: libaccelerantscommon.a libradeon.a be
 ;
 

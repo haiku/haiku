@@ -9,12 +9,9 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkern
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pap ] ;
 
-Addon <userland>pap : userland obos_network ppp :
+Addon <userland>pap :
 	pap.cpp
 	Protocol.cpp
-;
-
-LinkAgainst <userland>pap 
 	: <userland>libkernelppp.a 
 	  <installed-userland-networking>net_stack_tester 
 	  be 

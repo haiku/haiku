@@ -6,10 +6,8 @@ UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(SUBDIR) libMOV ] ;
 
-Addon mov_reader : media plugins :
+Addon mov_reader :
 	mov_reader.cpp
-	:
-	false
 	:
 	libmovreader.a
 	libz.a be libmedia.so $(TARGET_LIBSTDC++)

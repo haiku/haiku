@@ -4,7 +4,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 
-Addon radeon.media_addon : media :
+Addon radeon.media_addon :
 	RadeonAddOn.cpp
 	RadeonProducer.cpp
 	CC.cpp

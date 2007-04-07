@@ -64,7 +64,7 @@ USBWebcamHeaderGen [ FGristFiles CamInternalSensors.h ]
 USBWebcamHeaderGen [ FGristFiles CamInternalColorSpaceTransforms.h ]
 	: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
 
-Addon usb_webcam.media_addon : media :
+Addon usb_webcam.media_addon :
 	$(addonSources)
 	$(csTransformsSources)
 	$(sensorsSources)
@@ -79,9 +79,8 @@ Addon usb_webcam.media_addon : media :
 	CamRoster.cpp
 	CamSensor.cpp
 	CamStreamingDeframer.cpp
+	: be media $(usbKitLibraryName)
 ;
-
-LinkAgainst usb_webcam.media_addon : be media $(usbKitLibraryName) ;
 
 # force dependancies
 Includes [ FGristFiles CamRoster.cpp ] : [ FGristFiles CamInternalAddons.h ] ;

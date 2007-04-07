@@ -98,46 +98,42 @@ rule Server
 	Executable $(1) : $(2) : $(3) : $(4) ;
 }
 
-rule Addon
+rule Addon target : sources : libraries : isExecutable
 {
-	# Addon <name> : <relpath> : <sources> : <is executable> : <libraries> ;
-	# <name>: Name of the add-on.
-	# <relpath>: Path where the add-on shall live relative to the add-on dir.
+	# Addon <target> : <sources> : <is executable> : <libraries> ;
+	# <target>: The add-on.
 	# <sources>: Source files.
-	# <is executable>: true, if the target shall be executable as well.
 	# <libraries>: Libraries to be linked against.
-# TODO: <relpath> is no longer needed
+	# <isExecutable>: true, if the target shall be executable as well.
 
-	if ! [ IsPlatformSupportedForTarget $(1) ] {
+	if ! [ IsPlatformSupportedForTarget $(target) ] {
 		return ;
 	}
 
-	local isExecutable = $(4) ;
-	
-	Main $(1) : $(3) ;
+	Main $(target) : $(sources) ;
 
-	local linkFlags = -Xlinker -soname=\"$(1:G=)\" ;
+	local linkFlags = -Xlinker -soname=\"$(target:G=)\" ;
 	if $(isExecutable) != true {
 		linkFlags = -nostart $(linkFlags) ;
 	}
-	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] $(linkFlags) ;
-	LinkAgainst $(1) : $(5) ;
+	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
+	LinkAgainst $(target) : $(libraries) ;
 
-	AddSharedObjectGlueCode $(1) : $(isExecutable) ;
+	AddSharedObjectGlueCode $(target) : $(isExecutable) ;
 }
 
-rule Translator
+rule Translator target : sources : libraries
 {
-	# Translator <name> : <sources> : <libraries> ;
+	# Translator <target> : <sources> : <libraries> ;
 	# TODO: Although they currently all are, translators don't need to be
 	# executable. Introduce a flag as for Addon.
-	Addon $(1) : Translators : $(2) : true : $(3) ;
+	Addon $(target) : $(sources) : $(libraries) : true ;
 }
 
-rule ScreenSaver
+rule ScreenSaver target : sources : libraries
 {
-	# ScreenSaver <name> : <sources> : <libraries> ;
-	Addon $(1) : screen_savers : $(2) : false : $(3) ;
+	# ScreenSaver <target> : <sources> : <libraries> ;
+	Addon $(target) : $(sources) : $(libraries) : false ;
 }
 
 rule StaticLibrary

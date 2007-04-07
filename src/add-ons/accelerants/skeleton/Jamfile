@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics skeleton ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
-Addon skel.accelerant : accelerants :
+Addon skel.accelerant :
 	Acceleration.c
 	Cursor.c
 	EngineManagement.c
@@ -18,7 +18,7 @@ Addon skel.accelerant : accelerants :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false : libskeleton_engine.a
+	: libskeleton_engine.a
 ;
 
 Package haiku-skeleton-cvs :

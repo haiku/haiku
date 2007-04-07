@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons media media-add-ons mixer ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-Addon mixer.media_addon : media :
+Addon mixer.media_addon :
 	AudioMixer.cpp
 	ByteSwap.cpp
 	MixerAddOn.cpp
@@ -12,7 +12,6 @@ Addon mixer.media_addon : media :
 	MixerSettings.cpp
 	MixerUtils.cpp
 	Resampler.cpp
-	: false
 	: be media
 ;
 

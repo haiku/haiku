@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
-Addon nv.accelerant : accelerants :
+Addon nv.accelerant :
 	Acceleration.c
 	Cursor.c
 	EngineManagment.c
@@ -18,7 +18,7 @@ Addon nv.accelerant : accelerants :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false : libnvidia_engine.a
+	: libnvidia_engine.a
 ;
 
 Package haiku-nvidia-cvs :

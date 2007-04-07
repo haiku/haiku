@@ -4,8 +4,7 @@ UseFreeTypeHeaders ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app server ] ;
 UsePrivateHeaders [ FDirName servers app ] ;
 
-Addon MacDecorator : decorators :
+Addon MacDecorator :
 	MacDecorator.cpp
-	: false
 	: be libappserver.so
 ;

@@ -8,7 +8,7 @@ KernelAddon apple :
 	apple.cpp
 	;
 
-#Addon <partitioning_system>apple : userland partitioning_systems :
+#Addon <partitioning_system>apple :
 #	apple.cpp
 #	;
 #

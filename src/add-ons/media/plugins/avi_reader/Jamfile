@@ -6,10 +6,8 @@ UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(SUBDIR) libOpenDML ] ;
 
-Addon avi_reader : media plugins :
+Addon avi_reader :
 	avi_reader.cpp
-	:
-	false
 	:
 	libopendml.a
 	be libmedia.so

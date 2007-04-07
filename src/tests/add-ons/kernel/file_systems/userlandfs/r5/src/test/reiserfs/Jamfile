@@ -13,7 +13,6 @@ SubDirHdrs [ FDirName $(userlandFSIncludes) public ] ;
 SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
 
 Addon <test>reiserfs
-	: # relpath - obsolete
 	: 
 	Block.cpp
 	BlockCache.cpp
@@ -32,6 +31,5 @@ Addon <test>reiserfs
 	String.cpp
 	SuperBlock.cpp
 
-	: false		# is executable
 	: <test>UserlandFSServer
 ;

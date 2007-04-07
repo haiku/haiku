@@ -6,11 +6,10 @@ if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon ESDSink.media_addon : media :
+Addon ESDSink.media_addon :
 	ESDEndpoint.cpp
 	ESDSinkAddOn.cpp
 	ESDSinkNode.cpp
-	: false
 	: be media network
 ;
 

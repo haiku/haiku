@@ -4,8 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 
-Addon <input>easypen : input_server/devices : 
+Addon <input>easypen : 
 	EasyPenInputDevice.cpp 
-	: false 
 	: be device input_server ;
 

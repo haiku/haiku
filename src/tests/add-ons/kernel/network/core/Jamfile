@@ -8,7 +8,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network core ] ;
 
-Addon <userland>core : userland obos_network :
+Addon <userland>core :
 	cksum.c
 	core.c
 	if.c
@@ -24,9 +24,9 @@ Addon <userland>core : userland obos_network :
 	route.c
 	sockbuf.c
 	socket.c
+	: <installed-userland-networking>net_stack_tester
 ;
 
-LinkAgainst <userland>core : <installed-userland-networking>net_stack_tester ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-userland-networking 

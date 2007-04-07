@@ -4,8 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-Addon au_reader : media plugins :
+Addon au_reader :
 	au_reader.cpp
-	: false
 	: be libmedia.so
 ;

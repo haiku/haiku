@@ -4,7 +4,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics tdfx ] ;
 
 
-Addon tdfx.accelerant : accelerants :
+Addon tdfx.accelerant :
 	voodoo3_accelerant.c
 	Acceleration.c
 	Cursor.c

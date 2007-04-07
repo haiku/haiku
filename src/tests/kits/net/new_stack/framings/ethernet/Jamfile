@@ -2,8 +2,7 @@ SubDir HAIKU_TOP src tests kits net new_stack framings ethernet ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
-Addon <v2>ethernet_frame : userland network_v2 framings  :	
+Addon <v2>ethernet_frame :
 	ethernet_frame.c
+	: <installed>new_stack_tester be
 ;
-
-LinkAgainst <v2>ethernet_frame : <installed>new_stack_tester be ;

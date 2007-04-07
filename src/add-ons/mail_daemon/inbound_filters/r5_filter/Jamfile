@@ -11,7 +11,7 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-Addon R5\ Daemon\ Filter : mail_daemon inbound_filters :
+Addon R5\ Daemon\ Filter :
 	filter.cpp ;
 
 LinkAgainst R5\ Daemon\ Filter :

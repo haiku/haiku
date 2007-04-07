@@ -10,7 +10,7 @@ AddResources PDF\ Writer :
 	PDFWriter.rdef
 ;
 
-Addon PDF\ Writer : Print :
+Addon PDF\ Writer :
 	AboutText.cpp
 	AdvancedSettingsWindow.cpp
 	Bezier.cpp
@@ -42,10 +42,8 @@ Addon PDF\ Writer : Print :
 	Scanner.cpp
 	StatusWindow.cpp
 	SubPath.cpp
-	XReferences.cpp	
-;
-
-LinkAgainst PDF\ Writer : 
+	XReferences.cpp
+	:
 	be 
 	textencoding 
 	translation

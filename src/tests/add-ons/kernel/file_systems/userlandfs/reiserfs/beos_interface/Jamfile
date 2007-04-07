@@ -16,7 +16,6 @@ DEFINES += _DRIVERS_SELECT_H ;
 SEARCH_SOURCE += $(reiserFSTop) ;
 
 Addon <userland-beos>reiserfs
-	: # relpath - obsolete
 	: 
 	Block.cpp
 	BlockCache.cpp
@@ -34,6 +33,5 @@ Addon <userland-beos>reiserfs
 	String.cpp
 	SuperBlock.cpp
 
-	: false		# is executable
 	: libuserlandfs_beos_kernel.so
 ;

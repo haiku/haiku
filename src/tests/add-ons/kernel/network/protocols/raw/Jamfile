@@ -8,11 +8,10 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols raw ] ;
 
-Addon <userland>raw : userland obos_network protocols : 
+Addon <userland>raw :
 	raw.c
+	: <installed-userland-networking>net_stack_tester
 ;
-
-LinkAgainst <userland>raw : <installed-userland-networking>net_stack_tester ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-userland-networking 

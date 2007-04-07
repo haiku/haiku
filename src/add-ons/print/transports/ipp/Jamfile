@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
-Addon IPP : Print transport : 
+Addon IPP : 
 	Ipp.cpp
 	IppSetupDlg.cpp
 	IppTransport.cpp
@@ -15,6 +15,7 @@ Addon IPP : Print transport :
 	Socket.o
 	SocketStream.o
 	DbgMsg.o
+	: be $(NETWORK_LIBS) $(TARGET_LIBSTDC++)
 ;
 
 ObjectReferences
@@ -22,8 +23,6 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>SocketStream.o
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
-
-LinkAgainst IPP : be $(NETWORK_LIBS) $(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	IPP :

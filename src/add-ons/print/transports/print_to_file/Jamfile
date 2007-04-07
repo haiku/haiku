@@ -2,12 +2,11 @@ SubDir HAIKU_TOP src add-ons print transports print_to_file ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-Addon Print\ To\ File : Print transport : 
+Addon Print\ To\ File : 
 	print_transport.cpp
 	FileSelector.cpp
+	: be tracker
 ;
-
-LinkAgainst Print\ To\ File : be tracker ;
 
 Package haiku-printingkit-cvs :
 	Print\ To\ File :

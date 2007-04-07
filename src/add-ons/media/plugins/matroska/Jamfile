@@ -8,12 +8,10 @@ UsePrivateHeaders media ;
 SubDirHdrs [ FDirName $(SUBDIR) libMatroskaParser ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ogg libogg ] ;
 
-Addon matroska : media plugins :
+Addon matroska :
 	matroska_codecs.cpp
 	matroska_reader.cpp
 	matroska_util.cpp
-	:
-	false
 	:
 #	libebml.a
 #	libmatroska.a

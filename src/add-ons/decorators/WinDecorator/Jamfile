@@ -4,8 +4,7 @@ UseFreeTypeHeaders ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app server ] ;
 UsePrivateHeaders [ FDirName servers app ] ;
 
-Addon WinDecorator : decorators :
+Addon WinDecorator :
 	WinDecorator.cpp
-	: false
 	: be libappserver.so
 ;

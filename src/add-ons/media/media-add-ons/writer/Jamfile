@@ -2,13 +2,12 @@ SubDir HAIKU_TOP src add-ons media media-add-ons writer ;
 
 UsePrivateHeaders media ;
 
-Addon writer.media_addon : media :
+Addon writer.media_addon :
 	../AbstractFileInterfaceNode.cpp
 	../AbstractFileInterfaceAddOn.cpp
 	MediaWriter.cpp
 	MediaWriterAddOn.cpp
 	misc.cpp
+	: be media
 	: true
 ;
-
-LinkAgainst writer.media_addon : be media ;

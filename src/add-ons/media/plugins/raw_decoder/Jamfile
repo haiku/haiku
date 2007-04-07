@@ -4,10 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-Addon raw_decoder : media plugins :
+Addon raw_decoder :
 	AudioConversion.cpp
 	RawDecoderPlugin.cpp
-	: false
 	: be libmedia.so
 ;
 

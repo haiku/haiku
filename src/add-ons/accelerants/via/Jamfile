@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics via ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
-Addon via.accelerant : accelerants :
+Addon via.accelerant :
 	Acceleration.c
 	Cursor.c
 	EngineManagement.c
@@ -18,7 +18,7 @@ Addon via.accelerant : accelerants :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false : libvia_engine.a
+	: libvia_engine.a
 ;
 
 Package haiku-via_gfx-cvs :

@@ -8,10 +8,9 @@ SubDirHdrs $(SUBDIR) .. ogg ;
 SubDirSysHdrs $(SUBDIR) .. ogg libogg ;
 SubDirHdrs $(SUBDIR) libspeex ;
 
-Addon speex : media plugins :
+Addon speex :
 	speexCodecPlugin.cpp
 	speexCodecDefaults.cpp
-	: false
 	: libspeex.a be libmedia.so
 ;
 

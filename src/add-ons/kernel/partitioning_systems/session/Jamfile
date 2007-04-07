@@ -22,7 +22,7 @@ KernelAddon session :
 ;
 
 # also build a userland version
-#Addon <partitioning_system>session : userland partitioning_systems :
+#Addon <partitioning_system>session :
 #	[ FGristFiles $(session_files:S=$(SUFOBJ)) ]
 #;
 #

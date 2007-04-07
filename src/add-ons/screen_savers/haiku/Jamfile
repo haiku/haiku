@@ -2,9 +2,10 @@ SubDir HAIKU_TOP src add-ons screen_savers haiku ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-Addon Haiku : "Screen Savers" :
-	ScreenSaver.cpp : false
-	: libbe.so libscreensaver.so ;
+Addon Haiku :
+	ScreenSaver.cpp
+	: be screensaver
+;
 
 Package haiku-screensaverkit-cvs :
 	Haiku :

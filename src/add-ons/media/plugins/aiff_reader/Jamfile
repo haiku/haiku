@@ -4,7 +4,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-Addon aiff_reader : media plugins :
+Addon aiff_reader :
 	aiff_reader.cpp
-	: false
 	: be libmedia.so ;

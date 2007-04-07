@@ -2,11 +2,10 @@ SubDir HAIKU_TOP src add-ons media media-add-ons legacy ;
 
 UsePrivateHeaders media ;
 
-Addon legacy.media_addon : media :
+Addon legacy.media_addon : 
 	LegacyAudioConsumer.cpp
 	LegacyAudioDevice.cpp
 	LegacyAudioProducer.cpp
 	LegacyMediaAddOn.cpp
-	: false
 	: be media
 ;

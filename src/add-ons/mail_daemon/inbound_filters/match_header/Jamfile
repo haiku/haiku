@@ -11,7 +11,7 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-Addon Match\ Header : mail_daemon inbound_filters :
+Addon Match\ Header : 
 	ConfigView.cpp
 	RuleFilter.cpp
 	StringMatcher.cpp ;

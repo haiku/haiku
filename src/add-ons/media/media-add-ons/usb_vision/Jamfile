@@ -4,10 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders usb_vision ;
 
-Addon usb_vision.media_addon : media :
+Addon usb_vision.media_addon :
 	AddOn.cpp
 	Producer.cpp
 	TunerLocale.cpp
+	: be media $(TARGET_LIBSTDC++)
 ;
-
-LinkAgainst usb_vision.media_addon : be media $(TARGET_LIBSTDC++) ;

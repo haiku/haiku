@@ -27,7 +27,6 @@ if $(NETFS_ADD_SERVER_LOCALHOST) {
 }
 
 Addon <test>netfs
-	: # relpath - obsolete
 	: Debug.cpp
 	  Locker.cpp
 	  ObjectTracker.cpp
@@ -87,7 +86,6 @@ Addon <test>netfs
 	  VolumeEvent.cpp
 	  VolumeManager.cpp
 
-	: false		# is executable
 	: <test>UserlandFSServer
 	  $(NETWORK_LIBS)
 ;

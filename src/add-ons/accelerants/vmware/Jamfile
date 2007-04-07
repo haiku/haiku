@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders [ FDirName graphics vmware ] ;
 UsePrivateHeaders graphics ;
 
-Addon vmware.accelerant : accelerants :
+Addon vmware.accelerant :
 	Acceleration.c
 	Cursor.c
 	EngineManagment.c
@@ -16,7 +16,6 @@ Addon vmware.accelerant : accelerants :
 	InitAccelerant.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false
 ;
 
 Package haiku-vmware-video-svn :

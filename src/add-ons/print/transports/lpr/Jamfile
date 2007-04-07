@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
-Addon LPR : Print transport : 
+Addon LPR :
 	Lpr.cpp
 	LprSetupDlg.cpp
 	LprTransport.cpp
@@ -13,6 +13,7 @@ Addon LPR : Print transport :
 	Socket.o
 	SocketStream.o
 	DbgMsg.o
+	: be $(NETWORK_LIBS) $(TARGET_LIBSTDC++)
 ;
 
 ObjectReferences
@@ -20,8 +21,6 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>SocketStream.o
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
-
-LinkAgainst LPR : be $(NETWORK_LIBS) $(TARGET_LIBSTDC++) ;
 
 Package haiku-printingkit-cvs :
 	LPR :

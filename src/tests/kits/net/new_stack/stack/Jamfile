@@ -2,13 +2,12 @@ SubDir HAIKU_TOP src tests kits net new_stack stack ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
-Addon <v2>stack : userland network_v2 :	
+Addon <v2>stack :
 	stack.c
 	attribute.c
 	layers_manager.c 
 	buffer.c
 	timer.c
 	dump.c
+	: <installed>new_stack_tester be
 ;
-
-LinkAgainst <v2>stack : <installed>new_stack_tester be ;

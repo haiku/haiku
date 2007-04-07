@@ -4,10 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 
-Addon <input>serial_mouse : input_server/devices : 
+Addon <input>serial_mouse : 
 	MouseInputDevice.cpp 
 	SerialMouse.cpp
-	: false 
 	: be device input_server ;
 
 Package haiku-inputkit-cvs :

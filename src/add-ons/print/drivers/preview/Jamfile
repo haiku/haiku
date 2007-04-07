@@ -9,7 +9,7 @@ UsePrivateHeaders interface ;
 
 AddResources Preview : Preview.rsrc ;
 
-Addon Preview : Print :
+Addon Preview :
 	PrinterSetupWindow.cpp
 	PageSetupWindow.cpp
 	JobSetupWindow.cpp
@@ -17,12 +17,11 @@ Addon Preview : Print :
 	Preview.cpp
 	PrinterDriver.cpp
 	PreviewDriver.cpp
-;
-
-LinkAgainst Preview : 
+	:
 	be 
 	root 
-	libprintutils.a  ;
+	libprintutils.a
+;
 
 Package haiku-printingkit-cvs :
 	Preview :

@@ -13,7 +13,7 @@ UsePrivateHeaders $(DOT) ;
 
 # intel
 
-Addon <userland>intel : userland disk_scanner partition :
+Addon <userland>intel :
 	intel.cpp intel_parameters.cpp intel_partition_map.cpp
+	: libkernelland_emu.so
 ;
-LinkAgainst <userland>intel : libkernelland_emu.so ;

@@ -13,15 +13,15 @@ UsePrivateHeaders $(DOT) ;
 
 # bfs
 
-Addon <userland>bfs : userland disk_scanner fs :
+Addon <userland>bfs :
 	bfs.c
+	: libkernelland_emu.so
 ;
-LinkAgainst <userland>bfs : libkernelland_emu.so ;
 
 # iso9660
 
-Addon <userland>iso9660 : userland disk_scanner fs :
+Addon <userland>iso9660 :
 	iso9660.cpp
+	: libkernelland_emu.so
 ;
-LinkAgainst <userland>iso9660 : libkernelland_emu.so ;
 

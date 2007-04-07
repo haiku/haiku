@@ -6,7 +6,7 @@ UsePrivateHeaders media ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) libogg ] ;
 
-Addon ogg : media plugins :
+Addon ogg :
 	OggReaderPlugin.cpp
 	OggTrack.cpp
 	OggStream.cpp
@@ -18,7 +18,6 @@ Addon ogg : media plugins :
 	OggTobiasSeekable.cpp
 	OggVorbisStream.cpp
 	OggVorbisSeekable.cpp
-	: false
 	: libogg.a be libmedia.so $(TARGET_LIBSTDC++)
 ;
 

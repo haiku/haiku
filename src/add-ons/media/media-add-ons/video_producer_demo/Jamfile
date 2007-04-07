@@ -1,8 +1,7 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons video_producer_demo ;
 
-Addon video_producer_demo.media_addon : media :
+Addon video_producer_demo.media_addon :
 	AddOn.cpp
 	Producer.cpp
+	: be media
 ;
-
-LinkAgainst video_producer_demo.media_addon : be media ;

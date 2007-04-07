@@ -5,8 +5,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UsePrivateHeaders app shared interface graphics ;
 
-Addon ClassicBe : decorators :
+Addon ClassicBe :
 	BeDecorator.cpp
-	: false
 	: be <nogrist>app_server
 ;

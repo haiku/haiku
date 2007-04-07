@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
-Addon intel_extreme.accelerant : accelerants :
+Addon intel_extreme.accelerant :
 	accelerant.cpp
 	cursor.cpp
 	dpms.cpp
@@ -15,7 +15,6 @@ Addon intel_extreme.accelerant : accelerants :
 	memory.cpp
 	mode.cpp
 	overlay.cpp
-	: false
 	: be
 ;
 

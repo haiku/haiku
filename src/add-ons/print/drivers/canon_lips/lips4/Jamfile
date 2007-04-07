@@ -7,17 +7,16 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ;
 
 AddResources Canon\ LIPS4\ Compatible : Lips4.rdef ;
 
-Addon Canon\ LIPS4\ Compatible : Print :
+Addon Canon\ LIPS4\ Compatible :
 	Lips4Entry.cpp
 	Lips4.cpp
 	Lips4Cap.cpp
-;
-
-LinkAgainst Canon\ LIPS4\ Compatible : 
+	:
 	be 
 	libprint.a 
 	libprintutils.a
-	$(TARGET_LIBSTDC++) ;
+	$(TARGET_LIBSTDC++)
+;
 
 Package haiku-printingkit-cvs :
 	Canon\ LIPS4\ Compatible :

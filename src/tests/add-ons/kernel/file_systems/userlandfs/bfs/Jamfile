@@ -26,7 +26,6 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 Addon <userland>bfs
-	: # relpath - obsolete
 	: 
 	BlockAllocator.cpp
 	BPlusTree.cpp
@@ -41,6 +40,5 @@ Addon <userland>bfs
 
 	kernel_interface.cpp
 
-	: false		# is executable
 	: libuserlandfs_haiku_kernel.so
 ;

@@ -4,9 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddResources FileType-F : FileType.rdef ;
 
-Addon FileType-F : Tracker :
+Addon FileType-F :
 	FileType.cpp
 
-	: false
 	: be tracker
-	;
+;

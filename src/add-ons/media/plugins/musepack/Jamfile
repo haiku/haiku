@@ -6,11 +6,10 @@ UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(SUBDIR) mpc ] ;
 
-Addon musepack : media plugins :
+Addon musepack :
 	MusePack.cpp
 	MusePackReader.cpp
 	MusePackDecoder.cpp
-	: false
 	: libmusepack.a be libmedia.so
 ;
 

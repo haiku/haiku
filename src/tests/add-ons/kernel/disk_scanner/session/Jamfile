@@ -13,7 +13,7 @@ UsePrivateHeaders $(DOT) ;
 
 # cdrom
 
-Addon <userland>cdrom : userland disk_scanner session :
+Addon <userland>cdrom :
 	cdrom.cpp
+	: libkernelland_emu.so
 ;
-LinkAgainst <userland>cdrom : libkernelland_emu.so ;

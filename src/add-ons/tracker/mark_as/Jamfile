@@ -5,17 +5,13 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddResources MarkAsNew-N : MarkAsNew.rdef ;
 AddResources MarkAsRead-R : MarkAsRead.rdef ;
 
-Addon MarkAsNew-N : Tracker :
+Addon MarkAsNew-N :
 	MarkAsNew.cpp
-
-	: false
 	: be tracker
-	;
+;
 
-Addon MarkAsRead-R : Tracker :
+Addon MarkAsRead-R :
 	MarkAsRead.cpp
-
-	: false
 	: be tracker
-	;
+;
 

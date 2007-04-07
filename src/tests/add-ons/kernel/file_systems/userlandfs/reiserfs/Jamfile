@@ -14,7 +14,6 @@ SEARCH_SOURCE += $(reiserFSTop) ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 Addon <userland>reiserfs
-	: # relpath - obsolete
 	: 
 	Debug.cpp
 	Locker.cpp
@@ -32,7 +31,6 @@ Addon <userland>reiserfs
 	VNode.cpp
 	Volume.cpp 
 
-	: false		# is executable
 	: libuserlandfs_haiku_kernel.so
 ;
 

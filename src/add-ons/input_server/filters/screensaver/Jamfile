@@ -4,9 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders screen_saver ;
 
-Addon screen_saver : input_server/filters : 
+Addon screen_saver : 
 	ScreenSaverFilter.cpp 
-	: false 
 	: be libscreensaver.so input_server ;
 
 Package haiku-screensaverkit-cvs :

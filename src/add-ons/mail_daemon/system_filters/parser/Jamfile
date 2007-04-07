@@ -11,7 +11,7 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-Addon Message\ Parser : mail_daemon system_filters :
+Addon Message\ Parser :
 	filter.cpp ;
 
 LinkAgainst Message\ Parser :

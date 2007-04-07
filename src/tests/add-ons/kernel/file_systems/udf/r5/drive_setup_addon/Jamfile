@@ -33,16 +33,13 @@ SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 # Note that the add-on is named "i-udf-ds" to put it alphabetically
 # before the standard iso9660 add-on, thus giving it first dibs at
 # iso9660/UDF hybrid discs.
-Addon <r5>i-udf-ds : [ FDirName drive_setup fs ] :
+Addon <r5>i-udf-ds :
 	udf-ds.cpp
 	Recognition.cpp
 	UdfDebug.cpp
 	UdfString.cpp
 	UdfStructures.cpp
 	Utils.cpp
-	
-	: false
-	:
 ;
 
 SEARCH on [ FGristFiles

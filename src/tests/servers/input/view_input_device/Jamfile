@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src tests servers input view_input_device ;
 
 SetSubDirSupportedPlatforms libbe_test ;
 
-Addon ViewInputDevice : input_server devices : ViewInputDevice.cpp ;
-LinkAgainst ViewInputDevice : be <nogrist>input_server be ;
+Addon ViewInputDevice : ViewInputDevice.cpp : be <nogrist>input_server be ;
 
 MakeLocate ViewInputDevice : [ FDirName $(HAIKU_TEST_DIR) servers input view_input_device input_server devices ] ;

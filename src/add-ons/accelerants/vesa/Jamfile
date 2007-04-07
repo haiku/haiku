@@ -5,11 +5,10 @@ UsePrivateHeaders [ FDirName graphics vesa ] ;
 
 #AddResources vesa.accelerant : vesa.accelerant.rdef ;
 
-Addon vesa.accelerant : accelerants :
+Addon vesa.accelerant :
 	accelerant.cpp
 	dpms.cpp
 	engine.cpp
 	hooks.cpp
 	mode.cpp
-	: false		# this add-on is not executable
-	;
+;
