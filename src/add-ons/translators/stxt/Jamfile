@@ -21,6 +21,7 @@ Translator STXTTranslator :
 	STXTView.cpp
 
 	: be translation libtextencoding.so
+	: true
 ;
 
 Package haiku-translationkit-cvs :

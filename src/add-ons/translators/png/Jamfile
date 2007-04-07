@@ -20,6 +20,7 @@ Translator PNGTranslator :
 	PNGView.cpp
 
 	: be translation libpng.a z
+	: true
 ;
 
 Package haiku-translationkit-cvs :

@@ -18,6 +18,7 @@ Translator RAWTranslator :
 	TranslatorWindow.cpp
 
 	: be translation
+	: true
 ;
 
 Package haiku-translationkit-cvs :

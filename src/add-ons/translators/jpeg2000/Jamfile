@@ -67,6 +67,7 @@ Translator JPEG2000Translator :
 	$(jasper_files)
 
 	: be translation
+	: true
 ;
 
 Package haiku-translationkit-cvs :

@@ -87,6 +87,7 @@ Translator JPEGTranslator :
 	$(jpeg_files)
 
 	: be translation
+	: true
 ;
 
 Package haiku-translationkit-cvs :

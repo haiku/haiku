@@ -30,6 +30,7 @@ Translator WonderBrushTranslator :
 	lab_convert.cpp
 
 	: be translation z
+	: true
 ;
 
 Package haiku-translationkit-cvs :

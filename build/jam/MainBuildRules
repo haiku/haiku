@@ -122,12 +122,10 @@ rule Addon target : sources : libraries : isExecutable
 	AddSharedObjectGlueCode $(target) : $(isExecutable) ;
 }
 
-rule Translator target : sources : libraries
+rule Translator target : sources : libraries : isExecutable
 {
-	# Translator <target> : <sources> : <libraries> ;
-	# TODO: Although they currently all are, translators don't need to be
-	# executable. Introduce a flag as for Addon.
-	Addon $(target) : $(sources) : $(libraries) : true ;
+	# Translator <target> : <sources> : <libraries> : <isExecutable> ;
+	Addon $(target) : $(sources) : $(libraries) : $(isExecutable) ;
 }
 
 rule ScreenSaver target : sources : libraries

@@ -18,4 +18,5 @@ Translator TIFFTranslator :
 	TIFFWindow.cpp
 
 	: be translation
+	: true
 ;

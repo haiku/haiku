@@ -17,6 +17,7 @@ Translator GIFTranslator :
 	SFHash.cpp
 	:
 	be translation
+	: true
 ;
 
 Package haiku-translationkit-cvs :

@@ -60,7 +60,8 @@ Translator TIFFTranslator :
 	TIFFTranslator.cpp
 	TIFFView.cpp
 
-	:  be translation z
+	: be translation z
+	: true
 ;
 
 Package haiku-translationkit-cvs :
