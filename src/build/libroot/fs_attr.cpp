@@ -9,11 +9,6 @@
 #	include <syscalls.h>
 #endif
 
-// Defined, if the host platform has extended attribute support.
-// Unfortunately I don't seem to have extended attribute support under
-// SuSE Linux 9.2 (kernel 2.6.8-...) with ReiserFS 3.6.
-//#define HAS_EXTENDED_ATTRIBUTE_SUPPORT 1
-
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -26,13 +21,9 @@
 
 #include <fs_attr.h>
 
-#include "fs_attr_impl.h"
+#include "fs_impl.h"
+#include "fs_descriptors.h"
 
-#ifdef HAS_EXTENDED_ATTRIBUTE_SUPPORT
-#include <sys/xattr.h>
-
-static const char *kAttributeDirMarkAttributeName = "_has_haiku_attr_dir";
-#endif
 
 using namespace std;
 using namespace BPrivate;
@@ -133,87 +124,6 @@ get_attribute_dir_path(NodeRef ref)
 	return attrDirPath;
 }
 
-// has_attribute_dir_mark
-static bool
-has_attribute_dir_mark(const char *path, int fd)
-{
-	#ifdef HAS_EXTENDED_ATTRIBUTE_SUPPORT
-
-		uint8 value;
-		if (path) {
-			return (lgetxattr(path, kAttributeDirMarkAttributeName, &value, 1)
-				> 0);
-		} else {
-			return (fgetxattr(fd, kAttributeDirMarkAttributeName, &value, 1)
-				> 0);
-		}
-	
-	#else	// !HAS_EXTENDED_ATTRIBUTE_SUPPORT
-
-		// No extended attribute support. We can't mark the file and thus
-		// have to handle it as marked.
-		return true;
-
-	#endif
-}
-
-// set_attribute_dir_mark
-static status_t
-set_attribute_dir_mark(const char *path, int fd)
-{
-	#ifdef HAS_EXTENDED_ATTRIBUTE_SUPPORT
-
-		uint8 value = 1;
-		if (path) {
-			if (lsetxattr(path, kAttributeDirMarkAttributeName, &value, 1, 0)
-				< 0) {
-				fprintf(stderr, "set_attribute_dir_mark(): lsetxattr() "
-					"failed on \"%s\"\n", path);
-				return errno;
-			}
-		} else {
-			if (fsetxattr(fd, kAttributeDirMarkAttributeName, &value, 1, 0)
-				< 0) {
-				fprintf(stderr, "set_attribute_dir_mark(): fsetxattr() "
-					"failed on FD \"%d\"\n", fd);
-				return errno;
-			}
-		}
-	
-	#endif
-
-	return B_OK;
-}
-
-// empty_attribute_dir
-static status_t
-empty_attribute_dir(const char *path)
-{
-	DIR *dir = opendir(path);
-	if (!dir)
-		return errno;
-
-	while (dirent *entry = readdir(dir)) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-
-		string entryPath(path);
-		entryPath += '/';
-		entryPath += entry->d_name;
-
-		// We assume the attribute dir contains files only (we only create
-		// files) and thus use unlink().
-		if (unlink(entryPath.c_str()) < 0) {
-			status_t error = errno;
-			closedir(dir);
-			return error;
-		}
-	}
-
-	closedir(dir);
-	return B_OK;
-}
-
 // ensure_attribute_dir_exists
 static status_t
 ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
@@ -235,37 +145,19 @@ ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
 			return B_FILE_ERROR;
 		}
 
-		// already exists: Check whether the file is marked. If not, this
-		// is a stale attribute directory from a deleted node that had the
-		// same node ID as this one.
-		if (has_attribute_dir_mark(path, fd))
-			return B_OK;
-
-		// empty the attribute dir
-		error = empty_attribute_dir(attrDirPath.c_str());
-		if (error != B_OK) {
-			fprintf(stderr, "ensure_attribute_dir_exists(): Attribute "
-				"directory for node %lld exists, the node has no mark, and "
-				"emptying the attribute directory failed\n",
-				ref.node);
-			return error;
-		}
-
-		// mark the file
-		return set_attribute_dir_mark(path, fd);
+		return B_OK;
 	}
 
 	// doesn't exist yet: create it
 	if (mkdir(attrDirPath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) < 0)
 		return errno;
 
-	// mark the file
-	return set_attribute_dir_mark(path, fd);
+	return B_OK;
 }
 
 // open_attr_dir
-DIR *
-BPrivate::open_attr_dir(NodeRef ref, const char *path, int fd)
+static DIR *
+open_attr_dir(NodeRef ref, const char *path, int fd)
 {
 	// make sure the directory exists
 	status_t error = ensure_attribute_dir_exists(ref, path, fd);
@@ -280,8 +172,8 @@ BPrivate::open_attr_dir(NodeRef ref, const char *path, int fd)
 }
 
 // get_attribute_path
-status_t
-BPrivate::get_attribute_path(NodeRef ref, const char *path, int fd,
+static status_t
+get_attribute_path(NodeRef ref, const char *path, int fd,
 	const char *attribute, string &attrPath, string &typePath)
 {
 	if (!attribute || strlen(attribute) == 0)
@@ -316,6 +208,37 @@ get_attribute_path(int fd, const char *attribute, string &attrPath,
 
 	return get_attribute_path(ref, NULL, fd, attribute, attrPath, typePath);
 }
+
+
+#ifndef BUILDING_FS_SHELL
+
+// get_attribute_path_virtual_fd
+static status_t
+get_attribute_path_virtual_fd(int fd, const char *attribute, string &attrPath,
+	string &typePath)
+{
+	// stat the file to get a NodeRef
+	struct stat st;
+	status_t error = _kern_read_stat(fd, NULL, false, &st, sizeof(st));
+	if (error != B_OK)
+		return error;
+	NodeRef ref(st);
+
+	// Try to get a path. If we can't get a path, this is must be a "real"
+	// (i.e. system) file descriptor, which is just as well.
+	string path;
+	bool pathValid = (get_path(fd, NULL, path) == B_OK);
+	
+	// get the attribute path
+	return get_attribute_path(ref, (pathValid ? path.c_str() : NULL),
+		(pathValid ? -1 : fd), attribute, attrPath, typePath);
+}
+
+#endif	// ! BUILDING_FS_SHELL
+
+
+// # pragma mark - Public API
+
 
 // fs_open_attr_dir
 DIR *
@@ -586,3 +509,106 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 	return 0;					
 }
 
+
+// #pragma mark - Private Syscalls
+
+
+#ifndef BUILDING_FS_SHELL
+
+// _kern_open_attr_dir
+int
+_kern_open_attr_dir(int fd, const char *path)
+{
+	// get node ref for the node
+	struct stat st;
+	status_t error = _kern_read_stat(fd, path, false, &st,
+		sizeof(struct stat));
+	if (error != B_OK) {
+		errno = error;
+		return -1;
+	}
+	NodeRef ref(st);
+
+	// If a path was given, get a usable path.
+	string realPath;
+	if (path) {
+		error = get_path(fd, path, realPath);
+		if (error != B_OK)
+			return error;
+	}
+	
+	// open the attr dir
+	DIR *dir = open_attr_dir(ref, (path ? realPath.c_str() : NULL),
+		(path ? -1 : fd));
+	if (!dir)
+		return errno;
+
+	// create descriptor	
+	AttrDirDescriptor *descriptor = new AttrDirDescriptor(dir, ref);
+	return add_descriptor(descriptor);
+}
+
+// _kern_rename_attr
+status_t
+_kern_rename_attr(int fromFile, const char *fromName, int toFile,
+	const char *toName)
+{
+	if (!fromName || !toName)
+		return B_BAD_VALUE;
+
+	// get the attribute paths
+	string fromAttrPath;
+	string fromTypePath;
+	status_t error = get_attribute_path_virtual_fd(fromFile, fromName,
+		fromAttrPath, fromTypePath);
+	if (error != B_OK)
+		return error;
+
+	string toAttrPath;
+	string toTypePath;
+	error = get_attribute_path_virtual_fd(toFile, toName, toAttrPath,
+		toTypePath);
+	if (error != B_OK)
+		return error;
+
+	// rename the attribute and type files
+	if (rename(fromAttrPath.c_str(), toAttrPath.c_str()) < 0)
+		return errno;
+
+	if (rename(fromTypePath.c_str(), toTypePath.c_str()) < 0) {
+		// renaming the type file failed: try to rename back the attribute file
+		error = errno;
+
+		rename(toAttrPath.c_str(), fromAttrPath.c_str());
+
+		return error;
+	}
+	
+	return B_OK;
+}
+
+// _kern_remove_attr
+status_t
+_kern_remove_attr(int fd, const char *name)
+{
+	if (!name)
+		return B_BAD_VALUE;
+
+	// get the attribute path
+	string attrPath;
+	string typePath;
+	status_t error = get_attribute_path_virtual_fd(fd, name, attrPath,
+		typePath);
+	if (error != B_OK)
+		return error;
+
+	// remove the attribute
+	if (unlink(attrPath.c_str()) < 0)
+		return errno;
+
+	unlink(typePath.c_str());
+
+	return B_OK;
+}
+
+#endif	// ! BUILDING_FS_SHELL

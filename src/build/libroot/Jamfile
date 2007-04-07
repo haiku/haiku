@@ -26,6 +26,7 @@ BuildPlatformSharedLibrary libroot_build.so :
 	errors.cpp
 	fs.cpp
 	fs_attr.cpp
+	fs_descriptors.cpp
 	misc.cpp
 	sem.cpp
 	thread.cpp
