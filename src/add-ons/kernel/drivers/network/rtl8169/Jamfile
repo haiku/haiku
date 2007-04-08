@@ -15,15 +15,13 @@ KernelAddon rtl8169 :
 	util.c
 	;
 
-# Package haiku-rtl8169-cvs :
-#	rtl8169 : 
-#	boot home config add-ons kernel drivers bin ;
-# Package haiku-rtl8169-cvs :
-#	<kernel!drivers!dev!net>rtl8169 :
-#	boot home config add-ons kernel drivers dev net ;
-# Package haiku-rtl8169-cvs :
-#	rtl8169.settings :
-#	boot home config settings kernel drivers sample ;
+Package haiku-rtl8169-svn :
+	rtl8169 : 
+	boot home config add-ons kernel drivers bin ;
+Package haiku-rtl8169-svn :
+	rtl8169.settings :
+	boot home config settings kernel drivers sample ;
+PackageDriverSymLink haiku-rtl8169-svn : net rtl8169 ;
 
 Package haiku-networkingkit-cvs :
 	rtl8169 :
