@@ -1132,6 +1132,11 @@ void
 BView::DrawAfterChildren(BRect r)
 {
 	// HOOK function
+
+	// NOTE: DrawAfterChildren is called if the corresponding
+	// flag is set, but it will currently not work as expected,
+	// since the app_server does not allow views to draw *on*
+	// their children
 	STRACE(("\tHOOK: BView(%s)::DrawAfterChildren()\n", Name()));
 }
 
@@ -3048,7 +3053,19 @@ BView::EndLineArray()
 
 
 void
-BView::BeginPicture(BPicture *picture)
+BView::SetDiskMode(char* filename, long offset) 
+{ 
+	// TODO: implement
+	// One BeBook version has this to say about SetDiskMode():
+	// 
+	// "Begins recording a picture to the file with the given filename
+	// at the given offset. Subsequent drawing commands sent to the view
+	// will be written to the file until EndPicture() is called. The
+	// stored commands may be played from the file with DrawPicture()."
+} 
+
+
+void BView::BeginPicture(BPicture *picture)
 {
 	if (do_owner_check() && picture && picture->usurped == NULL) {
 		picture->usurp(cpicture);
@@ -4949,8 +4966,3 @@ BView::PrintTree()
 }
 
 
-/* TODO:
- 	-implement SetDiskMode(). What's with this method? What does it do? test!
- 		does it has something to do with DrawPictureAsync( filename* .. )?
-	-implement DrawAfterChildren()
-*/
