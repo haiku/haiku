@@ -39,6 +39,8 @@ status_t remove_interface_from_domain(net_interface *interface);
 void domain_interfaces_link_changed(net_device *device);
 void domain_interface_went_down(net_interface *);
 void domain_removed_device_interface(net_device_interface *);
+status_t domain_interface_control(net_domain_private *domain, int32 option,
+	struct ifreq *request);
 
 net_domain *get_domain(int family);
 status_t register_domain(int family, const char *name,

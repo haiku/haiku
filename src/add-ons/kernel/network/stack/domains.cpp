@@ -10,6 +10,7 @@
 #include "domains.h"
 #include "interfaces.h"
 #include "utility.h"
+#include "stack_private.h"
 
 #include <net_device.h>
 
@@ -21,6 +22,7 @@
 #include <net/if_media.h>
 #include <new>
 #include <string.h>
+#include <sys/sockio.h>
 
 
 #define TRACE_DOMAINS
@@ -193,6 +195,64 @@ remove_interface_from_domain(net_interface *interface)
 	list_remove_item(&domain->interfaces, interface);
 	delete_interface((net_interface_private *)interface);
 	return B_OK;
+}
+
+
+status_t
+domain_interface_control(net_domain_private *domain, int32 option,
+	ifreq *request)
+{
+	const char *name = request->ifr_name;
+	status_t status = B_OK;
+
+	net_device_interface *device = get_device_interface(name, false);
+	if (device == NULL)
+		return ENODEV;
+	else {
+		// The locking protocol dictates that if both the RX lock
+		// and domain locks are required, we MUST obtain the RX
+		// lock before the domain lock. This order MUST NOT ever
+		// be reversed under the penalty of deadlock.
+		BenaphoreLocker _1(device->rx_lock);
+		BenaphoreLocker _2(domain->lock);
+
+		net_interface *interface = find_interface(domain, name);
+		if (interface != NULL) {
+			switch (option) {
+			case SIOCDIFADDR:
+				remove_interface_from_domain(interface);
+				break;
+
+			case SIOCSIFFLAGS:
+				if (((uint32)request->ifr_flags & IFF_UP)
+					!= (interface->flags & IFF_UP)) {
+					if (interface->flags & IFF_UP) {
+						interface_set_down(interface);
+					} else {
+						status = interface->first_info->interface_up(
+							interface->first_protocol);
+						if (status == B_OK) {
+							interface->flags |= IFF_UP;
+							// TODO this doesn't belong here
+							if (interface->device->media & IFM_ACTIVE)
+								interface->flags |= IFF_LINK;
+						}
+					}
+				}
+
+				if (status == B_OK)
+					interface->flags |= request->ifr_flags & ~(IFF_UP | IFF_LINK);
+				break;
+			}
+		}
+	}
+
+	// If the SIOCDIFADDR call above removed the last interface
+	// associated with the device interface, this put_() will
+	// effectively remove the interface
+	put_device_interface(device);
+
+	return status;
 }
 
 

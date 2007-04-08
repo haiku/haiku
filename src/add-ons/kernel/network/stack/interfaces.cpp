@@ -325,6 +325,9 @@ put_device_interface(struct net_device_interface *interface)
 
 	interface->module->uninit_device(interface->device);
 	put_module(interface->module->info.name);
+
+	benaphore_destroy(&interface->rx_lock);
+	delete interface;
 }
 
 
@@ -355,7 +358,7 @@ get_device_interface(uint32 index)
 	If the interface does not yet exist, a new one is created.
 */
 struct net_device_interface *
-get_device_interface(const char *name)
+get_device_interface(const char *name, bool create)
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
@@ -366,6 +369,9 @@ get_device_interface(const char *name)
 
 		// try to recreate interface - it just got removed
 	}
+
+	if (!create)
+		return NULL;
 
 	void *cookie = open_module_list("network/devices");
 	if (cookie == NULL)
@@ -387,23 +393,25 @@ get_device_interface(const char *name)
 				// create new module interface for this
 				interface = new (std::nothrow) net_device_interface;
 				if (interface != NULL) {
-					interface->name = device->name;
-					interface->module = module;
-					interface->device = device;
-					interface->up_count = 0;
-					interface->ref_count = 1;
-					interface->deframe_func = NULL;
-					interface->deframe_ref_count = 0;
+					if (benaphore_init(&interface->rx_lock, "rx lock") >= B_OK) {
+						interface->name = device->name;
+						interface->module = module;
+						interface->device = device;
+						interface->up_count = 0;
+						interface->ref_count = 1;
+						interface->deframe_func = NULL;
+						interface->deframe_ref_count = 0;
 
-					device->index = ++sDeviceIndex;
-					device->module = module;
+						device->index = ++sDeviceIndex;
+						device->module = module;
 
-					sInterfaces.Add(interface);
-					return interface;
-				} else
-					module->uninit_device(device);
+						sInterfaces.Add(interface);
+						return interface;
+					}
+					delete interface;
+				}
+				module->uninit_device(device);
 			}
-
 			put_module(moduleName);
 		}
 	}
@@ -415,6 +423,19 @@ get_device_interface(const char *name)
 void
 down_device_interface(net_device_interface *interface)
 {
+	// RX lock must be held when calling down_device_interface.
+	// Known callers are `interface_protocol_down' which gets
+	// here via one of the following paths:
+	//
+	// - domain_interface_control() [rx lock held, domain lock held]
+	//    interface_set_down()
+	//     interface_protocol_down()
+	//
+	// - domain_interface_control() [rx lock held, domain lock held]
+	//    remove_interface_from_domain()
+	//     delete_interface()
+	//      interface_set_down()
+
 	net_device *device = interface->device;
 
 	dprintf("down_device_interface(%s)\n", interface->name);
@@ -422,13 +443,17 @@ down_device_interface(net_device_interface *interface)
 	device->flags &= ~IFF_UP;
 	interface->module->down(device);
 
-	// TODO: there is a race condition between the previous
-	//       ->down and device->module->receive_data which
-	//       locks us here waiting for the reader_thread
+	thread_id reader_thread = interface->reader_thread;
+
+	// one of the callers must hold a reference to the net_device_interface
+	// usually it is one of the net_interfaces.
+	benaphore_unlock(&interface->rx_lock);
 
 	// make sure the reader thread is gone before shutting down the interface
 	status_t status;
-	wait_for_thread(interface->reader_thread, &status);
+	wait_for_thread(reader_thread, &status);
+
+	benaphore_lock(&interface->rx_lock);
 }
 
 
@@ -448,6 +473,8 @@ unregister_device_deframer(net_device *device)
 	net_device_interface *interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
+
+	BenaphoreLocker _(interface->rx_lock);
 
 	if (--interface->deframe_ref_count == 0)
 		interface->deframe_func = NULL;
@@ -475,6 +502,8 @@ register_device_deframer(net_device *device, net_deframe_func deframeFunc)
 	net_device_interface *interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
+
+	BenaphoreLocker _(interface->rx_lock);
 
 	if (interface->deframe_func != NULL && interface->deframe_func != deframeFunc)
 		return B_ERROR;
@@ -507,6 +536,8 @@ register_device_handler(struct net_device *device, int32 type,
 	net_device_interface *interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
+
+	BenaphoreLocker _(interface->rx_lock);
 
 	// see if such a handler already for this device
 
@@ -542,6 +573,8 @@ unregister_device_handler(struct net_device *device, int32 type)
 	if (interface == NULL)
 		return ENODEV;
 
+	BenaphoreLocker _(interface->rx_lock);
+
 	// search for the handler
 
 	DeviceHandlerList::Iterator iterator = interface->receive_funcs.GetIterator();
@@ -571,6 +604,8 @@ register_device_monitor(struct net_device *device,
 	if (interface == NULL)
 		return ENODEV;
 
+	BenaphoreLocker _(interface->rx_lock);
+
 	// Add new monitor
 
 	net_device_monitor *monitor = new (std::nothrow) net_device_monitor;
@@ -594,6 +629,8 @@ unregister_device_monitor(struct net_device *device,
 	net_device_interface *interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
+
+	BenaphoreLocker _(interface->rx_lock);
 
 	// search for the monitor
 
@@ -643,6 +680,8 @@ device_removed(net_device *device)
 	// Propagate the loss of the device throughout the stack.
 	// This is very complex, refer to delete_interface() for
 	// further details.
+
+	BenaphoreLocker _(interface->rx_lock);
 
 	// this will possibly call:
 	//  remove_interface_from_domain() [domain gets locked]

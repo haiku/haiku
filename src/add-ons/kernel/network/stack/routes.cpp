@@ -506,9 +506,19 @@ invalidate_routes(net_domain *_domain, net_interface *interface)
 	while (iterator.HasNext()) {
 		net_route *route = iterator.Next();
 
-		// TODO handle refcounting, if the route needs to linger
-		//      for some reason we should set interface or
-		//      something of the sorts that invalidates it's reference
+		// TODO If we are removing the interface this will bork.
+		//      Consider the following case:
+		//      [thread 1] ipv4_send_data()
+		//      [thread 1]  get_route() [domain locked, unlocked] <- route
+		//      [thread 2] ... [domain locked]
+		//      [thread 2]  invalidate_routes()
+		//      [thread 2]   remove_route() <- route
+		//      [thread 1] ... ipv4_send_data() accesses `route'. Bork bork.
+		//
+		//      We could either add per-route locks (expensive) or
+		//      lock the domain throughout the send_data() routine.
+		//      These are the easy solutions, need to think about this. -hugo
+
 		if (route->interface == interface)
 			remove_route(domain, route);
 	}

@@ -44,6 +44,8 @@ struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 
 	DeviceMonitorList	monitor_funcs;
 	DeviceHandlerList	receive_funcs;
+
+	benaphore			rx_lock;
 };
 
 typedef DoublyLinkedList<net_device_interface> DeviceInterfaceList;
@@ -78,7 +80,8 @@ uint32 count_device_interfaces();
 status_t list_device_interfaces(void *buffer, size_t *_bufferSize);
 void put_device_interface(struct net_device_interface *interface);
 struct net_device_interface *get_device_interface(uint32 index);
-struct net_device_interface *get_device_interface(const char *name);
+struct net_device_interface *get_device_interface(const char *name,
+	bool create = true);
 void down_device_interface(net_device_interface *interface);
 
 // devices

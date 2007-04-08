@@ -45,9 +45,13 @@ device_reader_thread(void *_interface)
 	net_device *device = interface->device;
 	status_t status = B_OK;
 
-	while ((device->flags & IFF_UP) != 0) {
+	BenaphoreLocker rx_lock(interface->rx_lock);
+
+	while (device->flags & IFF_UP) {
 		net_buffer *buffer;
+		rx_lock.Unlock();
 		status = device->module->receive_data(device, &buffer);
+		rx_lock.Lock();
 		if (status == B_OK) {
 			//dprintf("received buffer of %ld bytes length\n", buffer->size);
 
@@ -100,10 +104,6 @@ device_reader_thread(void *_interface)
 		// and the receive_data() above should have been
 		// interrupted. One check should be enough, specially
 		// considering the snooze above.
-		//
-		// TODO: make sure that when receive_data() returns
-		//       after closing the new device->flags are
-		//       already visible in all processors.
 	}
 
 	return status;
@@ -180,6 +180,52 @@ add_default_routes(net_interface_private *interface, int32 option)
 }
 
 
+static status_t
+datalink_control_interface(net_domain_private *domain, int32 option,
+	void *value, size_t *_length, size_t expected, bool getByName)
+{
+	if (*_length < expected)
+		return B_BAD_VALUE;
+
+	ifreq request;
+	memset(&request, 0, sizeof(request));
+
+	if (user_memcpy(&request, value, expected) < B_OK)
+		return B_BAD_ADDRESS;
+
+	BenaphoreLocker _(domain->lock);
+	net_interface *interface = NULL;
+
+	if (getByName)
+		interface = find_interface(domain, request.ifr_name);
+	else
+		interface = find_interface(domain, request.ifr_index);
+
+	status_t status = (interface == NULL) ? ENODEV : B_OK;
+
+	switch (option) {
+	case SIOCGIFINDEX:
+		if (interface)
+			request.ifr_index = interface->index;
+		else
+			request.ifr_index = 0;
+		break;
+
+	case SIOCGIFNAME:
+		if (interface)
+			strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
+		else
+			status = B_BAD_VALUE; // TODO should be ENXIO?
+		break;
+	}
+
+	if (status < B_OK)
+		return status;
+
+	return user_memcpy(value, &request, sizeof(ifreq));
+}
+
+
 //	#pragma mark - datalink module
 
 
@@ -195,51 +241,20 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 
 	switch (option) {
 		case SIOCGIFINDEX:
-		{
-			// get index of interface
-			struct ifreq request;
-			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
-				return B_BAD_ADDRESS;
-
-			benaphore_lock(&domain->lock);
-
-			net_interface *interface = find_interface(domain,
-				request.ifr_name);
-			if (interface != NULL)
-				request.ifr_index = interface->index;
-			else
-				request.ifr_index = 0;
-
-			benaphore_unlock(&domain->lock);
-			
-			if (request.ifr_index == 0)
-				return ENODEV;
-
-			return user_memcpy(value, &request, sizeof(struct ifreq));
-		}
+			return datalink_control_interface(domain, option, value, _length,
+				IF_NAMESIZE, true);
 		case SIOCGIFNAME:
+			return datalink_control_interface(domain, option, value, _length,
+				sizeof(ifreq), false);
+
+		case SIOCDIFADDR:
+		case SIOCSIFFLAGS:
 		{
-			// get name of interface via index
 			struct ifreq request;
 			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			benaphore_lock(&domain->lock);
-			status_t status = B_OK;
-
-			net_interface *interface = find_interface(domain,
-				request.ifr_index);
-			if (interface != NULL)
-				strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
-			else
-				status = B_BAD_VALUE;
-
-			benaphore_unlock(&domain->lock);
-
-			if (status < B_OK)
-				return status;
-
-			return user_memcpy(value, &request, sizeof(struct ifreq));
+			return domain_interface_control(domain, option, &request);
 		}
 
 		case SIOCAIFADDR:
@@ -250,21 +265,6 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 				return B_BAD_ADDRESS;
 
 			return add_interface_to_domain(domain, request);
-		}
-		case SIOCDIFADDR:
-		{
-			// remove interface address
-			struct ifreq request;
-			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			BenaphoreLocker _(domain->lock);
-
-			net_interface *interface = find_interface(domain,
-				request.ifr_name);
-			if (interface == NULL)
-				return ENODEV;
-			return remove_interface_from_domain(interface);
 		}
 
 		case SIOCGIFCOUNT:
@@ -314,46 +314,20 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 		default:
 		{
 			// try to pass the request to an existing interface
-
 			struct ifreq request;
 			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
 			BenaphoreLocker _(domain->lock);
-			status_t status = B_OK;
 
 			net_interface *interface = find_interface(domain,
 				request.ifr_name);
-			if (interface != NULL) {
-				// filter out bringing the interface up or down 
-				if (option == SIOCSIFFLAGS) {
-					if (((uint32)request.ifr_flags & IFF_UP)
-							!= (interface->flags & IFF_UP)) {
-						if ((interface->flags & IFF_UP) != 0) {
-							interface_set_down(interface);
-						} else {
-							// bring it up
-							status = interface->first_info->interface_up(
-								interface->first_protocol);
-							if (status == B_OK) {
-								interface->flags |= IFF_UP
-									| (interface->device->media & IFM_ACTIVE
-										? IFF_LINK : 0);
-							}
-						}
-					}
+			if (interface == NULL)
+				return B_BAD_VALUE;
 
-					if (status == B_OK)
-						interface->flags |= request.ifr_flags & ~(IFF_UP | IFF_LINK);
-				} else {
-					// pass the request into the datalink protocol stack
-					status = interface->first_info->control(
-						interface->first_protocol, option, value, *_length);
-				}
-			} else
-				status = B_BAD_VALUE;
-
-			return status;
+			// pass the request into the datalink protocol stack
+			return interface->first_info->control(
+				interface->first_protocol, option, value, *_length);
 		}
 	}
 	return B_BAD_VALUE;
