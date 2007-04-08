@@ -2,4 +2,5 @@ SubDir HAIKU_TOP src add-ons kernel network datalink_protocols ;
 
 SubInclude HAIKU_TOP src add-ons kernel network datalink_protocols arp ;
 SubInclude HAIKU_TOP src add-ons kernel network datalink_protocols ethernet_frame ;
+SubInclude HAIKU_TOP src add-ons kernel network datalink_protocols ipv4_datagram ;
 SubInclude HAIKU_TOP src add-ons kernel network datalink_protocols loopback_frame ;

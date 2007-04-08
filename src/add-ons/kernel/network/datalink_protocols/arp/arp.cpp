@@ -782,13 +782,6 @@ arp_init_protocol(struct net_interface *interface, net_datalink_protocol **_prot
 
 	status_t status = sStackModule->register_device_handler(interface->device,
 		ETHER_FRAME_TYPE | ETHER_TYPE_ARP, &arp_receive, NULL);
-	if (status == B_OK) {
-		// We also register the domain as a handler for deframed packets;
-		// while the ethernet_frame module is not really connected to our
-		// domain, we are.
-		status = sStackModule->register_domain_device_handler(interface->device,
-			ETHER_FRAME_TYPE | ETHER_TYPE_IP, interface->domain);
-	}
 
 	if (status < B_OK)
 		return status;
