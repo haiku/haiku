@@ -159,8 +159,24 @@ _haiku_build_strerror(int errnum)
 int *
 _haiku_build_errno()
 {
+	static int previousErrno = 0;
 	static int localErrno = 0;
-	localErrno = to_haiku_error(errno);
+	static int previousLocalErrno = 0;
+
+	// If the localErrno has been changed and the real errno has not changed
+	// in the meantime, we update errno itself, so that the local update will
+	// be reflected. If errno has changed we always update localErrno.
+	int currentErrno = errno;
+	if (currentErrno == previousErrno) {
+		if (localErrno != previousLocalErrno) {
+			errno = previousErrno = to_host_error(localErrno);
+			previousLocalErrno = localErrno;
+		}
+	} else {
+		previousErrno = currentErrno;
+		previousLocalErrno = localErrno = to_haiku_error(errno);
+	}
+
 	return &localErrno;
 }
 
