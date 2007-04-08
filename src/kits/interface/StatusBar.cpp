@@ -587,7 +587,7 @@ BStatusBar::Perform(perform_code d, void* arg)
 }
 
 
-void
+extern "C" void
 _ReservedStatusBar1__10BStatusBar(BStatusBar* self, float value,
 	const char* text, const char* trailingText)
 {
