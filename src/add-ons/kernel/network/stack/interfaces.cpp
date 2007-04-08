@@ -659,7 +659,9 @@ device_removed(net_device *device)
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
-	net_device_interface *interface = find_device_interface(device->name);
+	// hold a reference to the device interface being removed
+	// so our put_() will (eventually) do the final cleanup
+	net_device_interface *interface = get_device_interface(device->name, false);
 	if (interface == NULL)
 		return ENODEV;
 
@@ -675,8 +677,22 @@ device_removed(net_device *device)
 	//    ... [see delete_interface()]
 	domain_removed_device_interface(interface);
 
+	DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
+	while (iterator.HasNext()) {
+		// when we call Next() the next item in the list is obtained
+		// so it's safe for the "current" item to remove itself.
+		net_device_monitor *monitor = iterator.Next();
+
+		monitor->event(monitor, B_DEVICE_BEING_REMOVED);
+	}
+
+	// By now all of the monitors must have removed themselves. If they
+	// didn't, they'll probably wait forever to be callback'ed again.
+	interface->monitor_funcs.RemoveAll();
+
 	// TODO: make sure all readers are gone
-	//       make sure all watchers are gone
+
+	put_device_interface(interface);
 
 	return B_OK;
 }
