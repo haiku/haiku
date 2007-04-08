@@ -16,6 +16,9 @@
 
 #include <net_device.h>
 
+#include <lock.h>
+#include <util/AutoLock.h>
+
 #include <KernelExport.h>
 
 #include <net/if_types.h>
@@ -25,23 +28,173 @@
 #include <sys/sockio.h>
 
 
-struct link_protocol : net_protocol {
-	net_fifo	fifo;
-	char		registered_interface[IF_NAMESIZE];
-	bool		registered_monitor;
+class LinkProtocol : public net_protocol {
+public:
+	LinkProtocol();
+	~LinkProtocol();
+
+	status_t InitCheck() const;
+
+	status_t StartMonitoring(const char *);
+	status_t StopMonitoring();
+
+	ssize_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
+	ssize_t ReadAvail() const;
+
+private:
+	status_t _Enqueue(net_buffer *buffer);
+	status_t _Unregister();
+
+	mutable benaphore	fLock;
+	Fifo				fFifo;
+
+	net_device_monitor	fMonitor;
+	net_device_interface *fMonitoredDevice;
+
+	static status_t _MonitorData(net_device_monitor *monitor, net_buffer *buffer);
+	static void _MonitorEvent(net_device_monitor *monitor, int32 event);
 };
 
 
 struct net_domain *sDomain;
 
 
-static status_t
-link_monitor_data(void *cookie, net_buffer *packet)
+LinkProtocol::LinkProtocol()
+	: fFifo("packet monitor fifo", 65536)
 {
-	link_protocol *protocol = (link_protocol *)cookie;
+	benaphore_init(&fLock, "packet monitor lock");
 
-	return fifo_socket_enqueue_buffer(&protocol->fifo, protocol->socket,
-						B_SELECT_READ, packet);
+	fMonitor.cookie = this;
+	fMonitor.receive = _MonitorData;
+	fMonitor.event = _MonitorEvent;
+	fMonitoredDevice = NULL;
+}
+
+
+LinkProtocol::~LinkProtocol()
+{
+	if (fMonitoredDevice) {
+		unregister_device_monitor(fMonitoredDevice->device, &fMonitor);
+		put_device_interface(fMonitoredDevice);
+	}
+
+	benaphore_destroy(&fLock);
+}
+
+
+status_t
+LinkProtocol::InitCheck() const
+{
+	return fLock.sem >= 0 && fFifo.InitCheck();
+}
+
+
+status_t
+LinkProtocol::StartMonitoring(const char *deviceName)
+{
+	BenaphoreLocker _(fLock);
+
+	if (fMonitoredDevice)
+		return B_BUSY;
+
+	net_device_interface *interface = get_device_interface(deviceName);
+	if (interface == NULL)
+		return ENODEV;
+
+	status_t status = register_device_monitor(interface->device, &fMonitor);
+	if (status < B_OK) {
+		put_device_interface(interface);
+		return status;
+	}
+
+	fMonitoredDevice = interface;
+	return B_OK;
+}
+
+
+status_t
+LinkProtocol::StopMonitoring()
+{
+	BenaphoreLocker _(fLock);
+
+	// TODO compare our device with the supplied device name?
+	return _Unregister();
+}
+
+
+ssize_t
+LinkProtocol::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
+{
+	BenaphoreLocker _(fLock);
+
+	if (fMonitoredDevice == NULL) {
+		if (fFifo.current_bytes == 0)
+			return ENODEV;
+	}
+
+	net_buffer *buffer;
+	status_t status = fFifo.Dequeue(&fLock, flags, socket->receive.timeout,
+		&buffer);
+	if (status < B_OK)
+		return status;
+
+	*_buffer = buffer;
+	return B_OK;
+}
+
+
+ssize_t
+LinkProtocol::ReadAvail() const
+{
+	BenaphoreLocker _(fLock);
+	if (fMonitoredDevice == NULL)
+		return ECONNRESET;
+	return fFifo.current_bytes;
+}
+
+
+status_t
+LinkProtocol::_Unregister()
+{
+	if (fMonitoredDevice == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = unregister_device_monitor(fMonitoredDevice->device,
+		&fMonitor);
+	put_device_interface(fMonitoredDevice);
+	fMonitoredDevice = NULL;
+
+	return status;
+}
+
+
+status_t
+LinkProtocol::_Enqueue(net_buffer *buffer)
+{
+	BenaphoreLocker _(fLock);
+	return fFifo.EnqueueAndNotify(buffer, socket, B_SELECT_READ);
+}
+
+
+status_t
+LinkProtocol::_MonitorData(net_device_monitor *monitor, net_buffer *packet)
+{
+	return ((LinkProtocol *)monitor->cookie)->_Enqueue(packet);
+}
+
+
+void
+LinkProtocol::_MonitorEvent(net_device_monitor *monitor, int32 event)
+{
+	LinkProtocol *protocol = (LinkProtocol *)monitor->cookie;
+
+	// We currently maintain the monitor while the device is down
+	if (event == B_DEVICE_BEING_REMOVED) {
+		BenaphoreLocker _(protocol->fLock);
+
+		protocol->_Unregister();
+		notify_socket(protocol->socket, B_SELECT_READ, ECONNRESET);
+	}
 }
 
 
@@ -51,35 +204,20 @@ link_monitor_data(void *cookie, net_buffer *packet)
 net_protocol *
 link_init_protocol(net_socket *socket)
 {
-	link_protocol *protocol = new (std::nothrow) link_protocol;
-	if (protocol == NULL)
-		return NULL;
-
-	if (init_fifo(&protocol->fifo, "packet monitor socket", 65536) < B_OK) {
+	LinkProtocol *protocol = new (std::nothrow) LinkProtocol();
+	if (protocol && protocol->InitCheck() < B_OK) {
 		delete protocol;
 		return NULL;
 	}
 
-	protocol->registered_monitor = false;
 	return protocol;
 }
 
 
 status_t
-link_uninit_protocol(net_protocol *_protocol)
+link_uninit_protocol(net_protocol *protocol)
 {
-	link_protocol *protocol = (link_protocol *)_protocol;
-
-	if (protocol->registered_monitor) {
-		net_device_interface *interface = get_device_interface(protocol->registered_interface);
-		if (interface != NULL) {
-			unregister_device_monitor(interface->device, link_monitor_data, protocol);
-			put_device_interface(interface);
-		}
-	}
-
-	uninit_fifo(&protocol->fifo);
-	delete protocol;
+	delete (LinkProtocol *)protocol;
 	return B_OK;
 }
 
@@ -123,7 +261,9 @@ status_t
 link_control(net_protocol *_protocol, int level, int option, void *value,
 	size_t *_length)
 {
-	link_protocol *protocol = (link_protocol *)_protocol;
+	LinkProtocol *protocol = (LinkProtocol *)_protocol;
+
+	// TODO All of this common functionality should be elsewhere
 
 	switch (option) {
 		case SIOCGIFINDEX:
@@ -203,58 +343,15 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 
 		case SIOCSPACKETCAP:
 		{
-			// start packet monitoring
-
-			if (protocol->registered_monitor)
-				return B_BUSY;
-
 			struct ifreq request;
 			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
 				return B_BAD_ADDRESS;
 
-			net_device_interface *interface = get_device_interface(request.ifr_name);
-			status_t status;
-			if (interface != NULL) {
-				status = register_device_monitor(interface->device,
-					link_monitor_data, protocol);
-				if (status == B_OK) {
-					// we're now registered
-					strlcpy(protocol->registered_interface, request.ifr_name, IF_NAMESIZE);
-					protocol->registered_monitor = true;
-				}
-				put_device_interface(interface);
-			} else
-				status = ENODEV;
-
-			return status;
+			return protocol->StartMonitoring(request.ifr_name);
 		}
 
 		case SIOCCPACKETCAP:
-		{
-			// stop packet monitoring
-
-			if (!protocol->registered_monitor)
-				return B_BAD_VALUE;
-
-			struct ifreq request;
-			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
-				return B_BAD_ADDRESS;
-
-			net_device_interface *interface = get_device_interface(request.ifr_name);
-			status_t status;
-			if (interface != NULL) {
-				status = unregister_device_monitor(interface->device,
-					link_monitor_data, protocol);
-				if (status == B_OK) {
-					// we're now no longer registered
-					protocol->registered_monitor = false;
-				}
-				put_device_interface(interface);
-			} else
-				status = ENODEV;
-
-			return status;
-		}
+			return protocol->StopMonitoring();
 	}
 
 	return datalink_control(sDomain, option, value, _length);
@@ -313,29 +410,17 @@ link_send_avail(net_protocol *protocol)
 
 
 status_t
-link_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
+link_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
-	link_protocol *protocol = (link_protocol *)_protocol;
-
-	dprintf("link_read is waiting for data...\n");
-
-	net_buffer *buffer;
-	status_t status = fifo_dequeue_buffer(&protocol->fifo,
-		flags, protocol->socket->receive.timeout, &buffer);
-	if (status < B_OK)
-		return status;
-
-	*_buffer = buffer;
-	return B_OK;
+	return ((LinkProtocol *)protocol)->ReadData(numBytes, flags, _buffer);
 }
 
 
 ssize_t
-link_read_avail(net_protocol *_protocol)
+link_read_avail(net_protocol *protocol)
 {
-	link_protocol *protocol = (link_protocol *)_protocol;
-	return protocol->fifo.current_bytes;
+	return ((LinkProtocol *)protocol)->ReadAvail();
 }
 
 

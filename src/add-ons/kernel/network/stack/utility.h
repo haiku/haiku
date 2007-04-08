@@ -26,6 +26,33 @@ private:
 };
 
 
+// internal Fifo class which doesn't maintain it's own lock
+class Fifo {
+public:
+	Fifo(const char *name, size_t maxBytes);
+	~Fifo();
+
+	status_t InitCheck() const;
+
+	status_t Enqueue(net_buffer *buffer);
+	status_t EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event);
+
+	ssize_t Dequeue(benaphore *lock, uint32 flags, bigtime_t timeout,
+		net_buffer **_buffer);
+	status_t Clear();
+
+	bool IsEmpty() const { return current_bytes == 0; }
+
+//private:
+	// these field names are kept so we can use templatized
+	// functions together with net_fifo
+	sem_id		notify;
+	int32		waiting;
+	size_t		max_bytes;
+	size_t		current_bytes;
+	struct list	buffers;
+};
+
 inline
 UserBuffer::UserBuffer(void *buffer, size_t size)
 	: fBuffer((uint8 *)buffer), fBufferSize(size),

@@ -60,7 +60,7 @@ device_reader_thread(void *_interface)
 				= interface->monitor_funcs.GetIterator();
 			while (iterator.HasNext()) {
 				net_device_monitor *monitor = iterator.Next();
-				monitor->func(monitor->cookie, buffer);
+				monitor->receive(monitor, buffer);
 			}
 
 			int32 type = interface->deframe_func(device, buffer);
@@ -478,7 +478,7 @@ interface_protocol_send_data(net_datalink_protocol *_protocol,
 		interface->device_interface->monitor_funcs.GetIterator();
 	while (iterator.HasNext()) {
 		net_device_monitor *monitor = iterator.Next();
-		monitor->func(monitor->cookie, buffer);
+		monitor->receive(monitor, buffer);
 	}
 
 	return protocol->device_module->send_data(protocol->device, buffer);

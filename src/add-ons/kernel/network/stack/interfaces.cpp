@@ -593,9 +593,11 @@ unregister_device_handler(struct net_device *device, int32 type)
 
 
 status_t
-register_device_monitor(struct net_device *device,
-	net_receive_func receiveFunc, void *cookie)
+register_device_monitor(net_device *device, net_device_monitor *monitor)
 {
+	if (monitor->receive == NULL || monitor->event == NULL)
+		return B_BAD_VALUE;
+
 	BenaphoreLocker locker(sInterfaceLock);
 
 	// find device interface for this device
@@ -604,23 +606,13 @@ register_device_monitor(struct net_device *device,
 		return ENODEV;
 
 	BenaphoreLocker _(interface->rx_lock);
-
-	// Add new monitor
-
-	net_device_monitor *monitor = new (std::nothrow) net_device_monitor;
-	if (monitor == NULL)
-		return B_NO_MEMORY;
-
-	monitor->func = receiveFunc;
-	monitor->cookie = cookie;
 	interface->monitor_funcs.Add(monitor);
 	return B_OK;
 }
 
 
 status_t
-unregister_device_monitor(struct net_device *device,
-	net_receive_func receiveFunc, void *cookie)
+unregister_device_monitor(net_device *device, net_device_monitor *monitor)
 {
 	BenaphoreLocker locker(sInterfaceLock);
 
@@ -635,12 +627,8 @@ unregister_device_monitor(struct net_device *device,
 
 	DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
 	while (iterator.HasNext()) {
-		net_device_monitor *monitor = iterator.Next();
-
-		if (monitor->cookie == cookie && monitor->func == receiveFunc) {
-			// found it
+		if (iterator.Next() == monitor) {
 			iterator.Remove();
-			delete monitor;
 			return B_OK;
 		}
 	}

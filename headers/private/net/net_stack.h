@@ -37,6 +37,21 @@ struct net_timer {
 typedef int32 (*net_deframe_func)(struct net_device *device, struct net_buffer *buffer);
 typedef status_t (*net_receive_func)(void *cookie, struct net_buffer *buffer);
 
+enum {
+	B_DEVICE_GOING_UP = 1,
+	B_DEVICE_GOING_DOWN,
+	B_DEVICE_BEING_REMOVED,
+};
+
+struct net_device_monitor {
+	struct list_link link;
+	void *cookie;
+
+	status_t (*receive)(struct net_device_monitor *monitor,
+		struct net_buffer *buffer);
+	void (*event)(struct net_device_monitor *monitor, int32 event);
+};
+
 struct net_stack_module_info {
 	module_info info;
 
@@ -68,9 +83,9 @@ struct net_stack_module_info {
 	status_t (*unregister_device_handler)(struct net_device *device, int32 type);
 
 	status_t (*register_device_monitor)(struct net_device *device,
-					net_receive_func receiveFunc, void *cookie);
+		struct net_device_monitor *monitor);
 	status_t (*unregister_device_monitor)(struct net_device *device,
-					net_receive_func receiveFunc, void *cookie);
+		struct net_device_monitor *monitor);
 
 	status_t (*device_link_changed)(struct net_device *device);
 	status_t (*device_removed)(struct net_device *device);

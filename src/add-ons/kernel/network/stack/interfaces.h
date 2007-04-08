@@ -21,13 +21,10 @@ struct net_device_handler : public DoublyLinkedListLinkImpl<net_device_handler> 
 	void				*cookie;
 };
 
-struct net_device_monitor : public DoublyLinkedListLinkImpl<net_device_monitor> {
-	net_receive_func	func;
-	void				*cookie;
-};
-
 typedef DoublyLinkedList<net_device_handler> DeviceHandlerList;
-typedef DoublyLinkedList<net_device_monitor> DeviceMonitorList;
+
+typedef DoublyLinkedList<net_device_monitor,
+	DoublyLinkedListCLink<net_device_monitor> > DeviceMonitorList;
 
 struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 	//struct list_link	link;
@@ -93,9 +90,9 @@ status_t register_device_handler(struct net_device *device, int32 type,
 	net_receive_func receiveFunc, void *cookie);
 status_t unregister_device_handler(struct net_device *device, int32 type);
 status_t register_device_monitor(struct net_device *device,
-	net_receive_func receiveFunc, void *cookie);
+	struct net_device_monitor *monitor);
 status_t unregister_device_monitor(struct net_device *device,
-	net_receive_func receiveFunc, void *cookie);
+	struct net_device_monitor *monitor);
 status_t device_link_changed(net_device *device);
 status_t device_removed(net_device *device);
 
