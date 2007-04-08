@@ -186,7 +186,7 @@ rule RunCommandLine commandLine
 	local i ;
 	for i in $(commandLine)  {
 		# targets are marked by the ":" prefix
-		local target = [ Match :(.*) : $(i) ] ;
+		local target = [ Match ^:(.*) : $(i) ] ;
 		if $(target) {
 			targets += $(target) ;
 			targetVarName = $(targetVarName)X ;
