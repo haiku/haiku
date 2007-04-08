@@ -1,5 +1,11 @@
 
-#include <BeOSBuildCompatibility.h>
+#ifdef BUILDING_FS_SHELL
+#	include "compat.h"
+#	define B_OK			0
+#	define B_FILE_ERROR	EBADF
+#else
+#	include <BeOSBuildCompatibility.h>
+#endif
 
 #include "fs_descriptors.h"
 
@@ -28,6 +34,20 @@ namespace BPrivate {
 // constructor
 Descriptor::~Descriptor()
 {
+}
+
+// IsSystemFD
+bool
+Descriptor::IsSystemFD() const
+{
+	return false;
+}
+
+// GetPath
+status_t
+Descriptor::GetPath(string& path) const
+{
+	return get_path(fd, NULL, path);
 }
 
 // GetNodeRef
@@ -93,6 +113,13 @@ FileDescriptor::GetStat(bool traverseLink, struct stat *st)
 	if (fstat(fd, st) < 0)
 		return errno;
 	return B_OK;
+}
+
+// IsSystemFD
+bool
+FileDescriptor::IsSystemFD() const
+{
+	return true;
 }
 
 
@@ -211,6 +238,14 @@ SymlinkDescriptor::GetStat(bool traverseLink, struct stat *st)
 	if (result < 0)
 		return errno;
 
+	return B_OK;
+}
+
+// GetPath
+status_t
+SymlinkDescriptor::GetPath(string& path) const
+{
+	path = this->path;
 	return B_OK;
 }
 

@@ -482,6 +482,12 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_DEFINES +=
 		_LARGEFILE_SOURCE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64
 	;
+
+	# On Linux with xattr support we can use it for our attribute emulation,
+	# which is somewhat more robust.
+	if $(HAIKU_HOST_USE_XATTR) = 1 {
+		HOST_DEFINES += HAIKU_HOST_USE_XATTR ;
+	}
 }
 
 # define the executable MIME type

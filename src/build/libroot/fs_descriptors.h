@@ -24,7 +24,10 @@ struct Descriptor {
 	virtual status_t Close() = 0;
 	virtual status_t Dup(Descriptor *&clone) = 0;
 	virtual status_t GetStat(bool traverseLink, struct stat *st) = 0;
-	
+
+	virtual bool IsSystemFD() const;
+	virtual status_t GetPath(string& path) const;
+
 	virtual status_t GetNodeRef(NodeRef &ref);
 };
 
@@ -36,6 +39,8 @@ struct FileDescriptor : Descriptor {
 	virtual status_t Close();
 	virtual status_t Dup(Descriptor *&clone);
 	virtual status_t GetStat(bool traverseLink, struct stat *st);
+
+	virtual bool IsSystemFD() const;
 };
 
 // DirectoryDescriptor
@@ -62,6 +67,8 @@ struct SymlinkDescriptor : Descriptor {
 	virtual status_t Close();
 	virtual status_t Dup(Descriptor *&clone);
 	virtual status_t GetStat(bool traverseLink, struct stat *st);
+
+	virtual status_t GetPath(string& path) const;
 };
 
 // AttrDirDescriptor

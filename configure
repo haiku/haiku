@@ -39,6 +39,10 @@ options:
                               valid targets=r5,bone,dano,haiku
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
+  --use-xattr                 Use Linux xattr support for BeOS attribute
+                              emulation. Warning: Make sure your file system
+                              supports sufficient attribute sizes (4 KB per
+                              file for all attributes won't suffice).
 
 environment variables:
   HAIKU_AR                    The static library archiver. Defaults to "ar".
@@ -207,6 +211,7 @@ bochs_debug=0
 include_gpl_addons=0
 target=haiku
 use_gcc_pipe=0
+use_xattr=0
 crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
@@ -248,6 +253,7 @@ while [ $# -gt 0 ] ; do
 		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	use_gcc_pipe=1; shift 1;;
+		--use-xattr)	use_xattr=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -318,9 +324,10 @@ cat << EOF > "$buildOutputDir/BuildConfig"
 TARGET_PLATFORM 	?= "${target}" ;
 HOST_PLATFORM		?= "${buildPlatform}" ;
 
-BOCHS_DEBUG_HACK	?= "${bochs_debug}" ;
-INCLUDE_GPL_ADDONS	?= "${include_gpl_addons}" ;
-HAIKU_USE_GCC_PIPE	?= "${use_gcc_pipe}" ;
+BOCHS_DEBUG_HACK		?= "${bochs_debug}" ;
+INCLUDE_GPL_ADDONS		?= "${include_gpl_addons}" ;
+HAIKU_USE_GCC_PIPE		?= "${use_gcc_pipe}" ;
+HAIKU_HOST_USE_XATTR	?= "${use_xattr}" ;
 
 HAIKU_GCC_RAW_VERSION	?= ${haikuGCCVersion} ;
 HAIKU_GCC_MACHINE		?= ${haikuGCCMachine} ;
