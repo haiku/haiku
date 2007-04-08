@@ -67,6 +67,11 @@ update_link_state(ethernet_device *device, bool notify = true)
 		device->link_quality = state.quality;
 		device->link_speed = state.speed;
 
+		if (device->media & IFM_ACTIVE)
+			device->flags |= IFF_LINK;
+		else
+			device->flags &= ~IFF_LINK;
+
 		dprintf("%s: media change, media 0x%0x quality %u speed %u\n",
 				device->name, (unsigned int)device->media,
 				(unsigned int)device->link_quality,
@@ -132,7 +137,7 @@ ethernet_init(const char *name, net_device **_device)
 	memset(device, 0, sizeof(ethernet_device));
 
 	strcpy(device->name, name);
-	device->flags = IFF_BROADCAST;
+	device->flags = IFF_BROADCAST | IFF_LINK;
 	device->type = IFT_ETHER;
 	device->mtu = 1500;
 	device->media = IFM_ACTIVE | IFM_ETHER;

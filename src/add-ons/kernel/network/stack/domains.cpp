@@ -219,30 +219,30 @@ domain_interface_control(net_domain_private *domain, int32 option,
 		net_interface *interface = find_interface(domain, name);
 		if (interface != NULL) {
 			switch (option) {
-			case SIOCDIFADDR:
-				remove_interface_from_domain(interface);
-				break;
+				case SIOCDIFADDR:
+					remove_interface_from_domain(interface);
+					break;
 
-			case SIOCSIFFLAGS:
-				if (((uint32)request->ifr_flags & IFF_UP)
-					!= (interface->flags & IFF_UP)) {
-					if (interface->flags & IFF_UP) {
-						interface_set_down(interface);
-					} else {
-						status = interface->first_info->interface_up(
-							interface->first_protocol);
-						if (status == B_OK) {
-							interface->flags |= IFF_UP;
-							// TODO this doesn't belong here
-							if (interface->device->media & IFM_ACTIVE)
-								interface->flags |= IFF_LINK;
+				case SIOCSIFFLAGS:
+				{
+					uint32 requestFlags = request->ifr_flags;
+					request->ifr_flags &= ~(IFF_UP | IFF_LINK | IFF_BROADCAST);
+
+					if ((requestFlags & IFF_UP) != (interface->flags & IFF_UP)) {
+						if (requestFlags & IFF_UP) {
+							status = interface->first_info->interface_up(
+								interface->first_protocol);
+							if (status == B_OK)
+								interface->flags |= IFF_UP;
+						} else {
+							interface_set_down(interface);
 						}
 					}
-				}
 
-				if (status == B_OK)
-					interface->flags |= request->ifr_flags & ~(IFF_UP | IFF_LINK);
-				break;
+					if (status == B_OK)
+						interface->flags |= request->ifr_flags;
+					break;
+				}
 			}
 		}
 	}
@@ -253,38 +253,6 @@ domain_interface_control(net_domain_private *domain, int32 option,
 	put_device_interface(device);
 
 	return status;
-}
-
-
-void
-domain_interfaces_link_changed(net_device *device)
-{
-	// TODO: notify listeners about this!
-
-	BenaphoreLocker locker(sDomainLock);
-
-	net_domain_private *domain = NULL;
-	while (true) {
-		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
-		if (domain == NULL)
-			break;
-
-		BenaphoreLocker locker(domain->lock);
-
-		net_interface *interface = NULL;
-		while (true) {
-			interface = (net_interface *)list_get_next_item(&domain->interfaces,
-				interface);
-			if (interface == NULL)
-				break;
-
-			if (interface->device == device) {
-				// update IFF_LINK flag
-				interface->flags = (interface->flags & ~IFF_LINK)
-					| (device->media & IFM_ACTIVE ? IFF_LINK : 0);
-			}
-		}
-	}
 }
 
 

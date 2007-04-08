@@ -619,7 +619,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 		{
 			// get flags
 			struct ifreq request;
-			request.ifr_flags = interface->flags;
+			request.ifr_flags = interface->flags | interface->device->flags;
 
 			return user_memcpy(&((struct ifreq *)argument)->ifr_flags,
 				&request.ifr_flags, sizeof(request.ifr_flags));

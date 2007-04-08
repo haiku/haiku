@@ -15,6 +15,7 @@
 
 #include <net/if.h>
 #include <net/if_types.h>
+#include <net/if_media.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -85,9 +86,10 @@ loopback_init(const char *name, net_device **_device)
 	memset(device, 0, sizeof(loopback_device));
 
 	strcpy(device->name, name);
-	device->flags = IFF_LOOPBACK;
+	device->flags = IFF_LOOPBACK | IFF_LINK;
 	device->type = IFT_LOOP;
 	device->mtu = 16384;
+	device->media = IFM_ACTIVE;
 
 	*_device = device;
 	return B_OK;

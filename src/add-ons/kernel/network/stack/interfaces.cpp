@@ -141,7 +141,7 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 	interface->mask = NULL;
 
 	interface->index = ++sInterfaceIndex;
-	interface->flags = deviceInterface->device->flags & ~IFF_UP;
+	interface->flags = 0;
 	interface->type = 0;
 	interface->mtu = deviceInterface->device->mtu;
 	interface->metric = 0;
@@ -169,8 +169,7 @@ interface_set_down(net_interface *interface)
 	if ((interface->flags & IFF_UP) == 0)
 		return;
 
-	// TODO: IFF_LINK should belong in device only
-	interface->flags &= ~(IFF_UP | IFF_LINK);
+	interface->flags &= ~IFF_UP;
 	interface->first_info->interface_down(interface->first_protocol);
 }
 
@@ -658,7 +657,6 @@ unregister_device_monitor(struct net_device *device,
 status_t
 device_link_changed(net_device *device)
 {
-	domain_interfaces_link_changed(device);
 	return B_OK;
 }
 
