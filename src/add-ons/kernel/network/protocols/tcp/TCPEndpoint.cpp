@@ -470,7 +470,7 @@ TCPEndpoint::SendAvailable()
 status_t
 TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
-	TRACE("ReadData(%lu bytes)", numBytes);
+	TRACE("ReadData(%lu bytes, flags 0x%x)", numBytes, (unsigned int)flags);
 
 	RecursiveLocker locker(fLock);
 
@@ -510,9 +510,10 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	if (timeout != B_INFINITE_TIMEOUT)
 		timeout += system_time();
 
-	while (fReceiveQueue.PushedData() == 0
+	while ((fFlags & FLAG_NO_RECEIVE) == 0
 			&& fReceiveQueue.Available() < dataNeeded
-			&& (fFlags & FLAG_NO_RECEIVE) == 0) {
+			&& (fReceiveQueue.PushedData() == 0
+				|| fReceiveQueue.Available() < fReceiveQueue.PushedData())) {
 		locker.Unlock();
 
 		status_t status = acquire_sem_etc(fReceiveLock, 1,
@@ -532,8 +533,8 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		}
 	}
 
-	TRACE("ReadData(): read %lu bytes, %lu are available",
-		  numBytes, fReceiveQueue.Available());
+	TRACE("ReadData(): read %lu bytes, %lu are available (flags 0x%x)",
+		  numBytes, fReceiveQueue.Available(), (unsigned int)fFlags);
 
 	if (numBytes < fReceiveQueue.Available())
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
