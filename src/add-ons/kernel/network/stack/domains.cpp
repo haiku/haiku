@@ -213,7 +213,7 @@ domain_interface_control(net_domain_private *domain, int32 option,
 		// and domain locks are required, we MUST obtain the RX
 		// lock before the domain lock. This order MUST NOT ever
 		// be reversed under the penalty of deadlock.
-		BenaphoreLocker _1(device->rx_lock);
+		RecursiveLocker _1(device->rx_lock);
 		BenaphoreLocker _2(domain->lock);
 
 		net_interface *interface = find_interface(domain, name);

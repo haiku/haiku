@@ -45,7 +45,7 @@ device_reader_thread(void *_interface)
 	net_device *device = interface->device;
 	status_t status = B_OK;
 
-	BenaphoreLocker rx_lock(interface->rx_lock);
+	RecursiveLocker rx_lock(interface->rx_lock);
 
 	while (device->flags & IFF_UP) {
 		net_buffer *buffer;

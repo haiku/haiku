@@ -190,6 +190,12 @@ delete_interface(net_interface_private *interface)
 	//   down_device_interface() -- if upcount reaches 0
 	interface_set_down(interface);
 
+	// This call requires the RX Lock to be a recursive
+	// lock since each uninit_protocol() call may call
+	// again into the stack to unregister a reader for
+	// instance, which tries to obtain the RX lock again.
+	put_domain_datalink_protocols(interface);
+
 	put_device_interface(interface->device_interface);
 
 	free(interface->address);
@@ -325,7 +331,7 @@ put_device_interface(struct net_device_interface *interface)
 	interface->module->uninit_device(interface->device);
 	put_module(interface->module->info.name);
 
-	benaphore_destroy(&interface->rx_lock);
+	recursive_lock_destroy(&interface->rx_lock);
 	delete interface;
 }
 
@@ -392,7 +398,8 @@ get_device_interface(const char *name, bool create)
 				// create new module interface for this
 				interface = new (std::nothrow) net_device_interface;
 				if (interface != NULL) {
-					if (benaphore_init(&interface->rx_lock, "rx lock") >= B_OK) {
+					if (recursive_lock_init(&interface->rx_lock,
+							"rx lock") >= B_OK) {
 						interface->name = device->name;
 						interface->module = module;
 						interface->device = device;
@@ -446,13 +453,13 @@ down_device_interface(net_device_interface *interface)
 
 	// one of the callers must hold a reference to the net_device_interface
 	// usually it is one of the net_interfaces.
-	benaphore_unlock(&interface->rx_lock);
+	recursive_lock_unlock(&interface->rx_lock);
 
 	// make sure the reader thread is gone before shutting down the interface
 	status_t status;
 	wait_for_thread(reader_thread, &status);
 
-	benaphore_lock(&interface->rx_lock);
+	recursive_lock_lock(&interface->rx_lock);
 }
 
 
@@ -473,7 +480,7 @@ unregister_device_deframer(net_device *device)
 	if (interface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 
 	if (--interface->deframe_ref_count == 0)
 		interface->deframe_func = NULL;
@@ -502,7 +509,7 @@ register_device_deframer(net_device *device, net_deframe_func deframeFunc)
 	if (interface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 
 	if (interface->deframe_func != NULL && interface->deframe_func != deframeFunc)
 		return B_ERROR;
@@ -536,7 +543,7 @@ register_device_handler(struct net_device *device, int32 type,
 	if (interface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 
 	// see if such a handler already for this device
 
@@ -572,7 +579,7 @@ unregister_device_handler(struct net_device *device, int32 type)
 	if (interface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 
 	// search for the handler
 
@@ -605,7 +612,7 @@ register_device_monitor(net_device *device, net_device_monitor *monitor)
 	if (interface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 	interface->monitor_funcs.Add(monitor);
 	return B_OK;
 }
@@ -621,7 +628,7 @@ unregister_device_monitor(net_device *device, net_device_monitor *monitor)
 	if (interface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 
 	// search for the monitor
 
@@ -669,7 +676,7 @@ device_removed(net_device *device)
 	// This is very complex, refer to delete_interface() for
 	// further details.
 
-	BenaphoreLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->rx_lock);
 
 	// this will possibly call:
 	//  remove_interface_from_domain() [domain gets locked]
@@ -690,7 +697,9 @@ device_removed(net_device *device)
 	// didn't, they'll probably wait forever to be callback'ed again.
 	interface->monitor_funcs.RemoveAll();
 
-	// TODO: make sure all readers are gone
+	// All of the readers should be gone as well since we are out of
+	// interfaces and `put_domain_datalink_protocols' is called for
+	// each delete_interface().
 
 	put_device_interface(interface);
 

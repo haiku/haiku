@@ -42,7 +42,7 @@ struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 	DeviceMonitorList	monitor_funcs;
 	DeviceHandlerList	receive_funcs;
 
-	benaphore			rx_lock;
+	recursive_lock		rx_lock;
 };
 
 typedef DoublyLinkedList<net_device_interface> DeviceInterfaceList;
