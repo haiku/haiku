@@ -56,7 +56,6 @@ device_reader_thread(void *_interface)
 			//dprintf("received buffer of %ld bytes length\n", buffer->size);
 
 			// feed device monitors
-			// TODO: locking!
 			DeviceMonitorList::Iterator iterator
 				= interface->monitor_funcs.GetIterator();
 			while (iterator.HasNext()) {
@@ -67,7 +66,6 @@ device_reader_thread(void *_interface)
 			int32 type = interface->deframe_func(device, buffer);
 			if (type >= 0) {
 				// find handler for this packet
-				// TODO: locking!
 				DeviceHandlerList::Iterator iterator
 					= interface->receive_funcs.GetIterator();
 				status = B_ERROR;
@@ -470,8 +468,12 @@ interface_protocol_send_data(net_datalink_protocol *_protocol,
 	interface_protocol *protocol = (interface_protocol *)_protocol;
 	net_interface_private *interface = (net_interface_private *)protocol->interface;
 
-	// feed device monitors
-	// TODO: locking!
+	// TODO: Need to think about this locking. We can't obtain the
+	//       RX Lock here (nor would it make sense) as the ARP
+	//       module calls send_data() with it's lock held (similiar
+	//       to the domain lock, which would violate the locking
+	//       protocol).
+
 	DeviceMonitorList::Iterator iterator =
 		interface->device_interface->monitor_funcs.GetIterator();
 	while (iterator.HasNext()) {
@@ -491,7 +493,7 @@ interface_protocol_up(net_datalink_protocol *_protocol)
 		((net_interface_private *)protocol->interface)->device_interface;
 	net_device *device = protocol->device;
 
-	// TODO: locking!
+	// This function is called with the RX lock held.
 
 	if (deviceInterface->up_count != 0) {
 		deviceInterface->up_count++;
@@ -526,7 +528,7 @@ interface_protocol_down(net_datalink_protocol *_protocol)
 	net_device_interface *deviceInterface =
 		((net_interface_private *)protocol->interface)->device_interface;
 
-	// TODO: locking!
+	// This function is called with the RX lock held.
 	if (deviceInterface->up_count == 0)
 		return;
 
