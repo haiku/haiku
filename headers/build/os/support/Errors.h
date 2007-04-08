@@ -224,6 +224,7 @@ enum {
 #define HAIKU_ELOOP			B_LINK_LIMIT
 #define HAIKU_ENOEXEC			B_NOT_AN_EXECUTABLE
 #define HAIKU_EPIPE			B_BUSTED_PIPE
+#define HAIKU_ENOATTR		B_ENTRY_NOT_FOUND
 
 #ifndef BUILDING_HAIKU_ERROR_MAPPER
 	#undef E2BIG
@@ -395,6 +396,7 @@ enum {
 	#define ELOOP HAIKU_ELOOP
 	#define ENOEXEC HAIKU_ENOEXEC
 	#define EPIPE HAIKU_EPIPE
+	#define ENOATTR HAIKU_ENOATTR
 
 	#undef errno
 	#define errno (*_haiku_build_errno())
