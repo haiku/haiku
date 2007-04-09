@@ -292,7 +292,7 @@ EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 			TCPEndpoint *other = _LookupEndpoint(port);
 			if (other == NULL) {
 				// found a port
-				gAddressModule->set_to_empty_address((sockaddr *)&endpoint->socket->address);
+				gAddressModule->set_to((sockaddr *)&endpoint->socket->address, address);
 				gAddressModule->set_port((sockaddr *)&endpoint->socket->address, port);
 				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n", endpoint,
 					AddressString(gDomain, (sockaddr *)&endpoint->socket->address, true).Data()));
