@@ -29,7 +29,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
 	idestatus ifconfig <bin>install installsound iroster isvolume join keymap
 	kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex m4 make
-	makebootable md5sum merge mimeset mkdos mkdir mkindex modifiers mount
+	makebootable nc md5sum merge mimeset mkdos mkdir mkindex modifiers mount
 	mount_nfs mountvolume mv netstat nl od open pack_cis paste patch pathchk pc
 	ping play playfile playsound playwav pr prio printenv printf ps ptx pwd
 	query quit release renice rescan rlog rm rmattr rmindex rmdir roster route
