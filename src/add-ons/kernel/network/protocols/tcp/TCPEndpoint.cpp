@@ -32,8 +32,12 @@
 #include <string.h>
 
 
+// References:
+//  - RFC 793 - Transmission Control Protocol
+//  - RFC 813 - Window and Acknowledgement Strategy in TCP
+//
 // Things this implementation currently doesn't implement:
-// TCP, RFC 793
+//
 // TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery, RFC 2001, RFC 2581, RFC 3042
 // NewReno Modification to TCP's Fast Recovery, RFC 2582
 // Explicit Congestion Notification (ECN), RFC 3168
@@ -62,17 +66,6 @@ enum {
 };
 
 
-static status_t
-wait_on_locker(RecursiveLocker &locker, sem_id sem, bigtime_t timeout)
-{
-	locker.Unlock();
-	status_t status = acquire_sem_etc(sem, 1, B_ABSOLUTE_TIMEOUT |
-		B_CAN_INTERRUPT, timeout);
-	locker.Lock();
-	return status;
-}
-
-
 static inline bigtime_t
 absolute_timeout(bigtime_t timeout)
 {
@@ -83,8 +76,59 @@ absolute_timeout(bigtime_t timeout)
 }
 
 
+WaitList::WaitList(const char *name)
+	: fWaiting(0)
+{
+	fSem = create_sem(0, name);
+}
+
+
+WaitList::~WaitList()
+{
+	delete_sem(fSem);
+}
+
+
+status_t
+WaitList::InitCheck() const
+{
+	return fSem;
+}
+
+
+status_t
+WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout)
+{
+	// this function is called with `locker' held.
+	fWaiting++;
+	locker.Unlock();
+	status_t status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT |
+		B_CAN_INTERRUPT, timeout);
+	locker.Lock();
+	if (status == B_OK)
+		Signal();
+	return status;
+}
+
+
+void
+WaitList::Signal()
+{
+	// the same locker used with Wait() must be held
+	// when calling this function.
+
+	if (fWaiting == 0)
+		return;
+
+	fWaiting--;
+	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
 TCPEndpoint::TCPEndpoint(net_socket *socket)
 	:
+	fReceiveList("tcp receive"),
+	fSendList("tcp send"),
 	fOptions(0),
 	fSendWindowShift(0),
 	fReceiveWindowShift(0),
@@ -111,10 +155,6 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 
 	recursive_lock_init(&fLock, "tcp lock");
 		// TODO: to be replaced with a real locking strategy!
-	//benaphore_init(&fReceiveLock, "tcp receive");
-	//benaphore_init(&fSendLock, "tcp send");
-	fSendLock = create_sem(0, "tcp send");
-	fReceiveLock = create_sem(0, "tcp receive");
 
 	gStackModule->init_timer(&fPersistTimer, TCPEndpoint::_PersistTimer, this);
 	gStackModule->init_timer(&fRetransmitTimer, TCPEndpoint::_RetransmitTimer, this);
@@ -136,10 +176,6 @@ TCPEndpoint::~TCPEndpoint()
 	gEndpointManager->Unbind(this);
 
 	recursive_lock_destroy(&fLock);
-	//benaphore_destroy(&fReceiveLock);
-	//benaphore_destroy(&fSendLock);
-	delete_sem(fReceiveLock);
-	delete_sem(fSendLock);
 }
 
 
@@ -148,10 +184,12 @@ TCPEndpoint::InitCheck() const
 {
 	if (fLock.sem < B_OK)
 		return fLock.sem;
-	if (fReceiveLock < B_OK)
-		return fReceiveLock;
-	if (fSendLock < B_OK)
-		return fSendLock;
+
+	if (fReceiveList.InitCheck() < B_OK)
+		return fReceiveList.InitCheck();
+
+	if (fSendList.InitCheck() < B_OK)
+		return fSendList.InitCheck();
 
 	return B_OK;
 }
@@ -195,8 +233,8 @@ TCPEndpoint::Close()
 		bigtime_t maximum = absolute_timeout(socket->linger * 1000000LL);
 
 		while (fSendQueue.Used() > 0) {
-			status = wait_on_locker(lock, fSendLock, maximum);
-			if (status == B_TIMED_OUT)
+			status = fSendList.Wait(lock, maximum);
+			if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 				break;
 			else if (status < B_OK)
 				return status;
@@ -294,19 +332,23 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 		return status;
 	}
 
-	// wait until 3-way handshake is complete (if needed)
+	// If we are running over Loopback, after _SendQueued() returns we
+	// may be in ESTABLISHED already.
+	if (fState == ESTABLISHED)
+		return B_OK;
 
+	// wait until 3-way handshake is complete (if needed)
 	bigtime_t timeout = min_c(socket->send.timeout, TCP_CONNECTION_TIMEOUT);
 	if (timeout == 0) {
 		// we're a non-blocking socket
 		return EINPROGRESS;
 	}
 
-	locker.Unlock();
-
-	status = acquire_sem_etc(fSendLock, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+	while (status == B_OK && fState != ESTABLISHED)
+		status = fSendList.Wait(locker, absolute_timeout(timeout));
 
 	TRACE("  Connect(): Connection complete: %s", strerror(status));
+
 	return status;
 }
 
@@ -316,12 +358,12 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 {
 	TRACE("Accept()");
 
-	// TODO: test for pending sockets
-	// TODO: test for non-blocking I/O
 	status_t status;
+	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+
 	do {
-		status = acquire_sem_etc(fAcceptSemaphore, 1, B_RELATIVE_TIMEOUT,
-			socket->receive.timeout);
+		status = acquire_sem_etc(fAcceptSemaphore, 1, B_ABSOLUTE_TIMEOUT |
+			B_CAN_INTERRUPT, timeout);
 		if (status < B_OK)
 			return status;
 
@@ -352,9 +394,13 @@ TCPEndpoint::Bind(sockaddr *address)
 		return status;
 
 	if (gAddressModule->get_port(address) == 0)
-		status = gEndpointManager->BindToEphemeral(this, address);
+		status = gEndpointManager->BindToEphemeral(this);
 	else
-		status = gEndpointManager->Bind(this, address);
+		status = gEndpointManager->Bind(this);
+
+	TRACE("  Bind() bound to %s (status %i)",
+		  AddressString(gDomain, (sockaddr *)&socket->address, true).Data(),
+		  (int)status);
 
 	return status;
 }
@@ -450,7 +496,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 			chunk = buffer;
 
 		while (fSendQueue.Free() < chunk->size) {
-			status_t status = wait_on_locker(lock, fSendLock, timeout);
+			status_t status = fSendList.Wait(lock, timeout);
 			if (status < B_OK)
 				return status;
 		}
@@ -514,7 +560,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 		while (fState != ESTABLISHED) {
 			// we need to wait until the connection becomes established
-			status_t status = wait_on_locker(locker, fSendLock, timeout);
+			status_t status = fSendList.Wait(locker, timeout);
 			if (status < B_OK)
 				return status;
 		}
@@ -550,7 +596,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		if (flags & MSG_DONTWAIT)
 			return B_WOULD_BLOCK;
 
-		status_t status = wait_on_locker(locker, fReceiveLock, timeout);
+		status_t status = fReceiveList.Wait(locker, timeout);
 		if (status < B_OK) {
 			// The Open Group base specification mentions that EINTR should be
 			// returned if the recv() is interrupted before _any data_ is
@@ -568,7 +614,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		  numBytes, fReceiveQueue.Available());
 
 	if (numBytes < fReceiveQueue.Available())
-		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
+		fReceiveList.Signal();
 
 	ssize_t receivedBytes = fReceiveQueue.Get(numBytes,
 		(flags & MSG_PEEK) == 0, _buffer);
@@ -654,6 +700,9 @@ TCPEndpoint::UpdateTimeWait()
 int32
 TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 {
+	TRACE("ListenReceive(): Connection in state %s received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
+		  name_for_state(fState), buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
+
 	// Essentially, we accept only TCP_FLAG_SYNCHRONIZE in this state,
 	// but the error behaviour differs
 	if (segment.flags & TCP_FLAG_RESET)
@@ -780,7 +829,7 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 			release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
 		}
 
-		release_sem_etc(fSendLock, 0, B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
+		fSendList.Signal();
 		_NotifyReader();
 	} else {
 		// simultaneous open
@@ -829,7 +878,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				gStackModule->cancel_timer(&fRetransmitTimer);
 
 				// notify threads waiting on the socket to become writable again
-				release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
+				fSendList.Signal();
 					// TODO: real conditional locking needed!
 				gSocketModule->notify(socket, B_SELECT_WRITE, fSendWindow);
 
@@ -956,7 +1005,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 			fState = ESTABLISHED;
 
-			release_sem_etc(fSendLock, 0, B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
+			fSendList.Signal();
 			_NotifyReader();
 		}
 
@@ -1000,7 +1049,6 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 				fSendNext = fSendUnacknowledged;
 
 			if (segment.acknowledge > fSendQueue.LastSequence() && fState > ESTABLISHED) {
-				// our TCP_FLAG_FINISH has been acknowledged
 				TRACE("Receive(): FIN has been acknowledged!");
 
 				switch (fState) {
@@ -1367,9 +1415,7 @@ TCPEndpoint::_AvailableData() const
 void
 TCPEndpoint::_NotifyReader()
 {
-	// TODO maintain a waiting receiver count so we know whether
-	//      we should release or not.
-	release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
+	fReceiveList.Signal();
 	gSocketModule->notify(socket, B_SELECT_READ, _AvailableData());
 }
 

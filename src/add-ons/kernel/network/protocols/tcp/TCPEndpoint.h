@@ -15,12 +15,29 @@
 
 #include <net_protocol.h>
 #include <net_stack.h>
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 
 #include <stddef.h>
 
 
 class EndpointManager;
+
+class WaitList {
+public:
+	WaitList(const char *name);
+	~WaitList();
+
+	status_t InitCheck() const;
+
+	status_t Wait(RecursiveLocker &, bigtime_t timeout);
+	void Signal();
+
+private:
+	sem_id fSem;
+	int32 fWaiting;
+};
+
 
 class TCPEndpoint : public net_protocol {
 	public:
@@ -81,8 +98,8 @@ class TCPEndpoint : public net_protocol {
 		TCPEndpoint		*fEndpointNextWithSamePort;
 
 		recursive_lock	fLock;
-		sem_id			fReceiveLock;
-		sem_id			fSendLock;
+		WaitList		fReceiveList;
+		WaitList		fSendList;
 		sem_id			fAcceptSemaphore;
 		uint8			fOptions;
 

@@ -30,8 +30,8 @@ class EndpointManager {
 			const sockaddr *peer, const sockaddr *interfaceLocal);
 		TCPEndpoint *FindConnection(sockaddr *local, sockaddr *peer);
 
-		status_t Bind(TCPEndpoint *endpoint, sockaddr *address);
-		status_t BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address);
+		status_t Bind(TCPEndpoint *endpoint);
+		status_t BindToEphemeral(TCPEndpoint *endpoint);
 		status_t Unbind(TCPEndpoint *endpoint);
 
 	private:

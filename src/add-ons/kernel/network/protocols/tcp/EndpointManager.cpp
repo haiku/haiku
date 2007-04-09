@@ -212,9 +212,12 @@ EndpointManager::_LookupEndpoint(uint16 port)
 
 
 status_t
-EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
+EndpointManager::Bind(TCPEndpoint *endpoint)
 {
-	TRACE(("EndpointManager::Bind(%p, %s)\n", endpoint, AddressString(gDomain, address, true).Data()));
+	sockaddr *address = (sockaddr *)&endpoint->socket->address;
+
+	TRACE(("EndpointManager::Bind(%p, %s)\n", endpoint,
+		AddressString(gDomain, address, true).Data()));
 
 	if (gAddressModule->is_empty_address(address, true))
 		return B_BAD_VALUE;
@@ -259,8 +262,6 @@ EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
 	} else
 		hash_insert(fEndpointHash, endpoint);
 
-	gAddressModule->set_to((sockaddr *)&endpoint->socket->address, address);
-
 	endpoint->fEndpointNextWithSamePort = NULL;
 	hash_insert(fConnectionHash, endpoint);
 
@@ -269,7 +270,7 @@ EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
 
 
 status_t
-EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
+EndpointManager::BindToEphemeral(TCPEndpoint *endpoint)
 {
 	TRACE(("EndpointManager::BindToEphemeral(%p)\n", endpoint));
 
@@ -292,7 +293,6 @@ EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 			TCPEndpoint *other = _LookupEndpoint(port);
 			if (other == NULL) {
 				// found a port
-				gAddressModule->set_to((sockaddr *)&endpoint->socket->address, address);
 				gAddressModule->set_port((sockaddr *)&endpoint->socket->address, port);
 				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n", endpoint,
 					AddressString(gDomain, (sockaddr *)&endpoint->socket->address, true).Data()));
@@ -319,7 +319,8 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 
 	RecursiveLocker locker(&fLock);
 
-	TCPEndpoint *other = _LookupEndpoint(gAddressModule->get_port((sockaddr *)&endpoint->socket->address));
+	TCPEndpoint *other = _LookupEndpoint(gAddressModule->get_port(
+		(sockaddr *)&endpoint->socket->address));
 	if (other != endpoint) {
 		// remove endpoint from the list of endpoints with the same port
 		while (other != NULL && other->fEndpointNextWithSamePort != endpoint) {
