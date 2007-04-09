@@ -127,19 +127,27 @@ LinkProtocol::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
 	BenaphoreLocker _(fLock);
 
-	if (fMonitoredDevice == NULL) {
-		if (fFifo.current_bytes == 0)
+	bigtime_t timeout = socket->receive.timeout;
+
+	if (timeout == 0)
+		flags |= MSG_DONTWAIT;
+	else if (timeout != B_INFINITE_TIMEOUT)
+		timeout += system_time();
+
+	while (fFifo.IsEmpty()) {
+		if (fMonitoredDevice == NULL)
 			return ENODEV;
+
+		status_t status = B_WOULD_BLOCK;
+		if ((flags & MSG_DONTWAIT) == 0)
+			status = fFifo.Wait(&fLock, timeout);
+
+		if (status < B_OK)
+			return status;
 	}
 
-	net_buffer *buffer;
-	status_t status = fFifo.Dequeue(&fLock, flags, socket->receive.timeout,
-		&buffer);
-	if (status < B_OK)
-		return status;
-
-	*_buffer = buffer;
-	return B_OK;
+	*_buffer = fFifo.Dequeue(flags & MSG_PEEK);
+	return *_buffer ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -148,7 +156,7 @@ LinkProtocol::ReadAvail() const
 {
 	BenaphoreLocker _(fLock);
 	if (fMonitoredDevice == NULL)
-		return ECONNRESET;
+		return ENODEV;
 	return fFifo.current_bytes;
 }
 
@@ -188,12 +196,14 @@ LinkProtocol::_MonitorEvent(net_device_monitor *monitor, int32 event)
 {
 	LinkProtocol *protocol = (LinkProtocol *)monitor->cookie;
 
-	// We currently maintain the monitor while the device is down
-	if (event == B_DEVICE_BEING_REMOVED) {
+	if (event == B_DEVICE_GOING_DOWN) {
 		BenaphoreLocker _(protocol->fLock);
 
 		protocol->_Unregister();
-		notify_socket(protocol->socket, B_SELECT_READ, ECONNRESET);
+		if (protocol->fFifo.IsEmpty()) {
+			protocol->fFifo.WakeAll();
+			notify_socket(protocol->socket, B_SELECT_READ, ENODEV);
+		}
 	}
 }
 

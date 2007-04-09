@@ -36,10 +36,11 @@ public:
 
 	status_t Enqueue(net_buffer *buffer);
 	status_t EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event);
-
-	ssize_t Dequeue(benaphore *lock, uint32 flags, bigtime_t timeout,
-		net_buffer **_buffer);
+	status_t Wait(benaphore *lock, bigtime_t timeout);
+	net_buffer *Dequeue(bool clone);
 	status_t Clear();
+
+	void WakeAll();
 
 	bool IsEmpty() const { return current_bytes == 0; }
 

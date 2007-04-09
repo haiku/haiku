@@ -519,7 +519,7 @@ invalidate_routes(net_domain *_domain, net_interface *interface)
 		//      lock the domain throughout the send_data() routine.
 		//      These are the easy solutions, need to think about this. -hugo
 
-		if (route->interface == interface)
+		if (route->interface->index == interface->index)
 			remove_route(domain, route);
 	}
 }

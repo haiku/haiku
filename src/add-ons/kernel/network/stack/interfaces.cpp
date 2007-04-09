@@ -73,6 +73,20 @@ grab_device_interface(net_device_interface *interface)
 }
 
 
+static void
+notify_device_monitors(net_device_interface *interface, int32 event)
+{
+	DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
+	while (iterator.HasNext()) {
+		// when we call Next() the next item in the list is obtained
+		// so it's safe for the "current" item to remove itself.
+		net_device_monitor *monitor = iterator.Next();
+
+		monitor->event(monitor, event);
+	}
+}
+
+
 //	#pragma mark - interfaces
 
 
@@ -449,6 +463,8 @@ down_device_interface(net_device_interface *interface)
 	device->flags &= ~IFF_UP;
 	interface->module->down(device);
 
+	notify_device_monitors(interface, B_DEVICE_GOING_DOWN);
+
 	thread_id reader_thread = interface->reader_thread;
 
 	// one of the callers must hold a reference to the net_device_interface
@@ -684,14 +700,7 @@ device_removed(net_device *device)
 	//    ... [see delete_interface()]
 	domain_removed_device_interface(interface);
 
-	DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
-	while (iterator.HasNext()) {
-		// when we call Next() the next item in the list is obtained
-		// so it's safe for the "current" item to remove itself.
-		net_device_monitor *monitor = iterator.Next();
-
-		monitor->event(monitor, B_DEVICE_BEING_REMOVED);
-	}
+	notify_device_monitors(interface, B_DEVICE_BEING_REMOVED);
 
 	// By now all of the monitors must have removed themselves. If they
 	// didn't, they'll probably wait forever to be callback'ed again.

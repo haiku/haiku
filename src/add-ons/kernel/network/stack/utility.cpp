@@ -24,10 +24,20 @@ static thread_id sTimerThread;
 static bigtime_t sTimerTimeout;
 
 
+static inline void
+fifo_notify_one_reader(int32 &waiting, sem_id sem)
+{
+	if (waiting > 0) {
+		waiting--;
+		release_sem_etc(sem, 1, B_DO_NOT_RESCHEDULE);
+	}
+}
+
+
 template<typename FifoType> static inline status_t
 base_fifo_init(FifoType *fifo, const char *name, size_t maxBytes)
 {
-	fifo->notify = create_sem(1, name);
+	fifo->notify = create_sem(0, name);
 	fifo->max_bytes = maxBytes;
 	fifo->current_bytes = 0;
 	fifo->waiting = 0;
@@ -45,83 +55,9 @@ base_fifo_enqueue_buffer(FifoType *fifo, net_buffer *buffer)
 
 	list_add_item(&fifo->buffers, buffer);
 	fifo->current_bytes += buffer->size;
-
-	if (fifo->waiting > 0) {
-		fifo->waiting--;
-		release_sem_etc(fifo->notify, 1, B_DO_NOT_RESCHEDULE);
-			// we still hold the benaphore lock, so it makes no sense
-			// to reschedule after having released the sync semaphore
-	}
+	fifo_notify_one_reader(fifo->waiting, fifo->notify);
 
 	return B_OK;
-}
-
-
-/*!
-	Gets the first buffer from the FIFO. If there is no buffer, it
-	will wait depending on the \a flags and \a timeout.
-	The following flags are supported (the rest is ignored):
-		MSG_DONTWAIT - ignores the timeout and never wait for a buffer; if your
-			socket is O_NONBLOCK, you should specify this flag. A \a timeout of
-			zero is equivalent to this flag, though.
-		MSG_PEEK - returns a clone of the buffer and keep the original
-			in the FIFO.
-*/
-template<typename FifoType> static inline ssize_t
-base_fifo_dequeue_buffer(FifoType *fifo, benaphore *lock, uint32 flags,
-	bigtime_t timeout, net_buffer **_buffer)
-{
-	// this function is called with `lock' held.
-	bool dontWait = (flags & MSG_DONTWAIT) != 0 || timeout == 0;
-	status_t status;
-
-	while (true) {
-		net_buffer *buffer = (net_buffer *)list_get_first_item(&fifo->buffers);
-		if (buffer != NULL) {
-			if ((flags & MSG_PEEK) != 0) {
-				// we need to clone the buffer for inspection; we can't give a
-				// handle to a buffer that we're still using
-				buffer = gNetBufferModule.clone(buffer, false);
-				if (buffer == NULL) {
-					status = B_NO_MEMORY;
-					break;
-				}
-			} else {
-				list_remove_item(&fifo->buffers, buffer);
-				fifo->current_bytes -= buffer->size;
-			}
-
-			*_buffer = buffer;
-			status = B_OK;
-			break;
-		}
-
-		if (!dontWait)
-			fifo->waiting++;
-
-		// we need to wait until a new buffer becomes available
-		benaphore_unlock(lock);
-
-		if (dontWait)
-			return B_WOULD_BLOCK;
-
-		status = acquire_sem_etc(fifo->notify, 1,
-			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, timeout);
-		if (status < B_OK)
-			return status;
-
-		// try again
-		benaphore_lock(lock);
-	}
-
-	if ((flags & MSG_PEEK) != 0 && fifo->waiting > 0) {
-		// another thread is waiting for data, since we didn't eat the
-		// buffer, it gets it
-		fifo->waiting--;
-		release_sem_etc(fifo->notify, 1, B_DO_NOT_RESCHEDULE);
-	}
-
-	return status;
 }
 
 
@@ -265,11 +201,34 @@ Fifo::EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event)
 }
 
 
-ssize_t
-Fifo::Dequeue(benaphore *lock, uint32 flags, bigtime_t timeout,
-	net_buffer **_buffer)
+status_t
+Fifo::Wait(benaphore *lock, bigtime_t timeout)
 {
-	return base_fifo_dequeue_buffer(this, lock, flags, timeout, _buffer);
+	waiting++;
+	benaphore_unlock(lock);
+	status_t status = acquire_sem_etc(notify, 1,
+		B_CAN_INTERRUPT | B_ABSOLUTE_TIMEOUT, timeout);
+	benaphore_lock(lock);
+	return status;
+}
+
+
+net_buffer *
+Fifo::Dequeue(bool clone)
+{
+	net_buffer *buffer = (net_buffer *)list_get_first_item(&buffers);
+
+	// assert(buffer != NULL);
+
+	if (clone) {
+		buffer = gNetBufferModule.clone(buffer, false);
+		fifo_notify_one_reader(waiting, notify);
+	}else {
+		list_remove_item(&buffers, buffer);
+		current_bytes -= buffer->size;
+	}
+
+	return buffer;
 }
 
 
@@ -277,6 +236,13 @@ ssize_t
 Fifo::Clear()
 {
 	return base_fifo_clear(this);
+}
+
+
+void
+Fifo::WakeAll()
+{
+	release_sem_etc(notify, 0, B_RELEASE_ALL);
 }
 
 
@@ -313,11 +279,68 @@ fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
 }
 
 
-ssize_t fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
-	struct net_buffer **_buffer)
+/*!
+	Gets the first buffer from the FIFO. If there is no buffer, it
+	will wait depending on the \a flags and \a timeout.
+	The following flags are supported (the rest is ignored):
+		MSG_DONTWAIT - ignores the timeout and never wait for a buffer; if your
+			socket is O_NONBLOCK, you should specify this flag. A \a timeout of
+			zero is equivalent to this flag, though.
+		MSG_PEEK - returns a clone of the buffer and keep the original
+			in the FIFO.
+*/
+ssize_t
+fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
+	net_buffer **_buffer)
 {
 	BenaphoreLocker locker(fifo->lock);
-	return base_fifo_dequeue_buffer(fifo, &fifo->lock, flags, timeout, _buffer);
+	bool dontWait = (flags & MSG_DONTWAIT) != 0 || timeout == 0;
+	status_t status;
+
+	while (true) {
+		net_buffer *buffer = (net_buffer *)list_get_first_item(&fifo->buffers);
+		if (buffer != NULL) {
+			if ((flags & MSG_PEEK) != 0) {
+				// we need to clone the buffer for inspection; we can't give a
+				// handle to a buffer that we're still using
+				buffer = gNetBufferModule.clone(buffer, false);
+				if (buffer == NULL) {
+					status = B_NO_MEMORY;
+					break;
+				}
+			} else {
+				list_remove_item(&fifo->buffers, buffer);
+				fifo->current_bytes -= buffer->size;
+			}
+
+			*_buffer = buffer;
+			status = B_OK;
+			break;
+		}
+
+		if (!dontWait)
+			fifo->waiting++;
+
+		locker.Unlock();
+
+		if (dontWait)
+			return B_WOULD_BLOCK;
+
+		// we need to wait until a new buffer becomes available
+		status = acquire_sem_etc(fifo->notify, 1,
+			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, timeout);
+		if (status < B_OK)
+			return status;
+
+		locker.Lock();
+	}
+
+	// if another thread is waiting for data, since we didn't
+	// eat the buffer, it will get it
+	if (flags & MSG_PEEK)
+		fifo_notify_one_reader(fifo->waiting, fifo->notify);
+
+	return status;
 }
 
 
