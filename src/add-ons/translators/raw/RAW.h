@@ -63,6 +63,8 @@ class DCRaw {
 		uint32 CountImages() const;
 		status_t ImageAt(uint32 index, image_data_info& info) const;
 
+		status_t GetEXIFTag(off_t& offset, size_t& length) const;
+
 	private:
 		int32 _AllocateImage();
 		image_data_info& _Raw();
@@ -178,6 +180,8 @@ class DCRaw {
 
 		uint32		fFilters;
 		uint32		fEXIFFilters;
+		off_t		fEXIFOffset;
+		uint32		fEXIFLength;
 
 		off_t		fCurveOffset;
 };

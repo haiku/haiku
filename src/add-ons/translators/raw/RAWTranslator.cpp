@@ -189,6 +189,19 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 		return roster->Translate(&io, NULL, settings, target, outType);
 	}
 
+	// retrieve EXIF data
+	off_t exifOffset;
+	size_t exifLength;
+	if (settings != NULL && raw.GetEXIFTag(exifOffset, exifLength) == B_OK) {
+		void* exifBuffer = malloc(exifLength);
+		if (exifBuffer != NULL) {
+			if (source->ReadAt(exifOffset, exifBuffer, exifLength)
+					== (ssize_t)exifLength)
+				settings->AddData("exif", B_RAW_TYPE, exifBuffer, exifLength);
+
+			free(exifBuffer);
+		}
+	}
 	uint32 dataSize = data.output_width * 4 * data.output_height;
 
 	TranslatorBitmap header;

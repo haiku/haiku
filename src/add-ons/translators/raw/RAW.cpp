@@ -109,7 +109,8 @@ DCRaw::DCRaw(BPositionIO& stream)
 	fOutputBitsPerSample(8),
 	fDecodeLeaf(0),
 	fDecodeBitsZeroAfterMax(false),
-	fFilters(~0)
+	fFilters(~0),
+	fEXIFOffset(-1)
 {
 	fImages = new image_data_info[kImageBufferCount];
 	fDecodeBuffer = new decode[kDecodeBufferCount];
@@ -2792,6 +2793,10 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 
 			case 34665:	// EXIF tag
 				fRead.Seek(fRead.Next<uint32>() + baseOffset, SEEK_SET);
+
+				fEXIFOffset = fRead.Position();
+				fEXIFLength = tag.length;
+
 				_ParseEXIF(baseOffset);
 				break;
 
@@ -3350,6 +3355,18 @@ DCRaw::ImageAt(uint32 index, image_data_info& info) const
 	_CorrectIndex(index);
 
 	info = fImages[index];
+	return B_OK;
+}
+
+
+status_t
+DCRaw::GetEXIFTag(off_t& offset, size_t& length) const
+{
+	if (fEXIFOffset < 0)
+		return B_ENTRY_NOT_FOUND;
+
+	offset = fEXIFOffset;
+	length = fEXIFLength;
 	return B_OK;
 }
 
