@@ -58,6 +58,13 @@ Command::GetName(BString& name)
 	name << "Name of action goes here.";
 }
 
+// UndoesPrevious
+bool
+Command::UndoesPrevious(const Command* previous)
+{
+	return false;
+}
+
 // CombineWithNext
 bool
 Command::CombineWithNext(const Command* next)

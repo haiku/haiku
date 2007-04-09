@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -78,7 +78,8 @@ if (dynamic_cast<GradientControl*>(*target))
 					float y;
 					if (message->FindFloat("be:wheel_delta_x", &x) >= B_OK
 						&& message->FindFloat("be:wheel_delta_y", &y) >= B_OK) {
-						if (fTarget->MouseWheelChanged(x, y))
+						if (fTarget->MouseWheelChanged(
+								fTarget->MouseInfo()->position, x, y))
 							result = B_SKIP_MESSAGE;
 					}
 					break;
@@ -330,6 +331,15 @@ StateView::SetState(ViewState* state)
 		fCurrentState->Init();
 }
 
+// UpdateStateCursor
+void
+StateView::UpdateStateCursor()
+{
+	if (!fCurrentState || !fCurrentState->UpdateCursor()) {
+		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT, true);
+	}
+}
+
 // Draw
 void
 StateView::Draw(BView* into, BRect updateRect)
@@ -350,7 +360,7 @@ StateView::Draw(BView* into, BRect updateRect)
 
 // MouseWheelChanged
 bool
-StateView::MouseWheelChanged(float x, float y)
+StateView::MouseWheelChanged(BPoint where, float x, float y)
 {
 	return false;
 }
@@ -359,6 +369,11 @@ StateView::MouseWheelChanged(float x, float y)
 bool
 StateView::HandleKeyDown(uint32 key, uint32 modifiers)
 {
+	// down't allow key events if mouse already pressed
+	// (central place to prevent command stack mix up)
+	if (fMouseInfo.buttons != 0)
+		return false;
+
 	AutoWriteLocker locker(fLocker);
 	if (fLocker && !locker.IsLocked())
 		return false;
@@ -380,6 +395,11 @@ StateView::HandleKeyDown(uint32 key, uint32 modifiers)
 bool
 StateView::HandleKeyUp(uint32 key, uint32 modifiers)
 {
+	// down't allow key events if mouse already pressed
+	// (central place to prevent command stack mix up)
+	if (fMouseInfo.buttons != 0)
+		return false;
+
 	AutoWriteLocker locker(fLocker);
 	if (fLocker && !locker.IsLocked())
 		return false;

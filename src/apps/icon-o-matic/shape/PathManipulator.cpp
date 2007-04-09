@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,6 +26,7 @@
 #include "ChangePointCommand.h"
 //#include "CloseCommand.h"
 #include "InsertPointCommand.h"
+#include "FlipPointsCommand.h"
 //#include "NewPathCommand.h"
 #include "NudgePointsCommand.h"
 //#include "RemovePathCommand.h"
@@ -74,6 +75,7 @@ enum {
 	MSG_UPDATE_SHAPE_UI			= 'udsi',
 
 	MSG_SPLIT_POINTS			= 'splt',
+	MSG_FLIP_POINTS				= 'flip',
 };
 
 inline const char*
@@ -773,6 +775,11 @@ PathManipulator::ShowContextMenu(BPoint where)
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 
+	message = new BMessage(MSG_FLIP_POINTS);
+	item = new BMenuItem("Flip", message);
+	item->SetEnabled(hasSelection);
+	menu->AddItem(item);
+
 	message = new BMessage(MSG_REMOVE_POINTS);
 	item = new BMenuItem("Remove", message, 'A');
 	item->SetEnabled(hasSelection);
@@ -828,6 +835,11 @@ PathManipulator::MessageReceived(BMessage* message, Command** _command)
 			*_command = new SplitPointsCommand(fPath,
 											   fSelection->Items(),
 											   fSelection->CountItems());
+			break;
+		case MSG_FLIP_POINTS:
+			*_command = new FlipPointsCommand(fPath,
+											  fSelection->Items(),
+											  fSelection->CountItems());
 			break;
 		case B_SELECT_ALL: {
 			*fOldSelection = *fSelection;
@@ -958,13 +970,12 @@ PathManipulator::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 }
 
 // UpdateCursor
-void
+bool
 PathManipulator::UpdateCursor()
 {
-	if (fTransformBox) {
-		fTransformBox->UpdateCursor();
-		return;
-	}
+	if (fTransformBox)
+		return fTransformBox->UpdateCursor();
+
 	const uchar* cursorData;
 	switch (fMode) {
 		case ADD_POINT:
@@ -1008,6 +1019,8 @@ PathManipulator::UpdateCursor()
 	BCursor cursor(cursorData);
 	fCanvasView->SetViewCursor(&cursor, true);
 	fCanvasView->Sync();
+
+	return true;
 }
 
 // AttachedToView

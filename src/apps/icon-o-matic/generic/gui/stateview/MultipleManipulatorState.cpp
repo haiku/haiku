@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -172,6 +172,10 @@ bool
 MultipleManipulatorState::HandleKeyDown(uint32 key, uint32 modifiers,
 										Command** _command)
 {
+	// TODO: somehow this looks suspicious, because it doesn't
+	// seem guaranteed that the manipulator having indicated to
+	// handle the key down handles the matching key up event...
+	// maybe there should be the concept of the "focused manipulator"
 	int32 count = fManipulators.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Manipulator* manipulator =
@@ -194,6 +198,15 @@ MultipleManipulatorState::HandleKeyUp(uint32 key, uint32 modifiers,
 		if (manipulator->HandleKeyUp(key, modifiers, _command))
 			return true;
 	}
+	return false;
+}
+
+// UpdateCursor
+bool
+MultipleManipulatorState::UpdateCursor()
+{
+	if (fPreviousManipulator && fManipulators.HasItem(fPreviousManipulator))
+		return fPreviousManipulator->UpdateCursor();
 	return false;
 }
 

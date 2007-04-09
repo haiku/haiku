@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,7 +44,7 @@ class Manipulator : public Observer {
 	virtual	bool				HandleKeyUp(uint32 key, uint32 modifiers,
 											Command** _command);
 
-	virtual	void				UpdateCursor();
+	virtual	bool				UpdateCursor();
 
 	virtual	BRect				Bounds() = 0;
 		// the area that the manipulator is

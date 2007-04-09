@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -106,9 +106,10 @@ Manipulator::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 }
 
 // UpdateCursor
-void
+bool
 Manipulator::UpdateCursor()
 {
+	return false;
 }
 
 // #pragma mark -

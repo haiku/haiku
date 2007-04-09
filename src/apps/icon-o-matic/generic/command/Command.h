@@ -27,6 +27,7 @@ class Command {
 
 	virtual void				GetName(BString& name);
 
+	virtual	bool				UndoesPrevious(const Command* previous);
 	virtual	bool				CombineWithNext(const Command* next);
 	virtual	bool				CombineWithPrevious(const Command* previous);
 

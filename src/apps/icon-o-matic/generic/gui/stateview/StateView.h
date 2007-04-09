@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,10 +40,12 @@ class StateView : public BView {
 
 	// StateView interface
 			void				SetState(ViewState* state);
+			void				UpdateStateCursor();
 
 			void				Draw(BView* into, BRect updateRect);
 
-	virtual	bool				MouseWheelChanged(float x, float y);
+	virtual	bool				MouseWheelChanged(BPoint where,
+												  float x, float y);
 
 			bool				HandleKeyDown(uint32 key, uint32 modifiers);
 			bool				HandleKeyUp(uint32 key, uint32 modifiers);

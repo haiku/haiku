@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -299,15 +299,18 @@ TransformBox::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 	return false;
 }
 
-// #pragma mark -
-
 // UpdateCursor
-void
+bool
 TransformBox::UpdateCursor()
 {
-	if (fCurrentState)
+	if (fCurrentState) {
 		fCurrentState->UpdateViewCursor(fView, fMousePos);
+		return true;
+	}
+	return false;
 }
+
+// #pragma mark -
 
 // AttachedToView
 void

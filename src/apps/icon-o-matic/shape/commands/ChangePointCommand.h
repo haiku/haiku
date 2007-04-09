@@ -21,6 +21,8 @@ class ChangePointCommand : public PathCommand {
 												   int32 count);
 	virtual						~ChangePointCommand();
 
+	virtual	status_t			InitCheck();
+
 	virtual	status_t			Perform();
 	virtual status_t			Undo();
 	virtual status_t			Redo();

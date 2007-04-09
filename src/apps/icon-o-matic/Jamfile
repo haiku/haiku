@@ -243,6 +243,7 @@ Application Icon-O-Matic :
 	AddTransformersCommand.cpp
 	ChangePointCommand.cpp
 	CleanUpPathCommand.cpp
+	FlipPointsCommand.cpp
 	FreezeTransformationCommand.cpp
 	InsertPointCommand.cpp
 	MoveShapesCommand.cpp

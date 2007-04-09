@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,10 +9,14 @@
 #include "CanvasView.h"
 
 #include <Bitmap.h>
+#include <Cursor.h>
+#include <Message.h>
 #include <Region.h>
+#include <Window.h>
 
 #include <stdio.h>
 
+#include "cursors.h"
 #include "ui_defines.h"
 
 #include "CommandStack.h"
@@ -32,6 +36,10 @@ CanvasView::CanvasView(BRect frame)
 
 	  fCanvasOrigin(0.0, 0.0),
 	  fZoomLevel(1.0),
+
+	  fSpaceHeldDown(false),
+	  fScrollTracking(false),
+	  fScrollTrackingStart(0.0, 0.0),
 
 	  fMouseFilterMode(SNAPPING_OFF),
 
@@ -136,7 +144,66 @@ CanvasView::MouseDown(BPoint where)
 	if (!IsFocus())
 		MakeFocus(true);
 
-	StateView::MouseDown(where);
+	uint32 buttons;
+	if (Window()->CurrentMessage()->FindInt32("buttons",
+		(int32*)&buttons) < B_OK)
+		buttons = 0;
+
+	// handle clicks of the third mouse button ourselves (panning),
+	// otherwise have StateView handle it (normal clicks)
+	if (fSpaceHeldDown || buttons & B_TERTIARY_MOUSE_BUTTON) {
+		// switch into scrolling mode and update cursor
+		fScrollTracking = true;
+		where.x = roundf(where.x);
+		where.y = roundf(where.y);
+		fScrollOffsetStart = ScrollOffset();
+		fScrollTrackingStart = where - fScrollOffsetStart;
+		_UpdateToolCursor();
+		SetMouseEventMask(B_POINTER_EVENTS,
+						  B_LOCK_WINDOW_FOCUS | B_SUSPEND_VIEW_FOCUS);
+	} else {
+		StateView::MouseDown(where);
+	}
+}
+
+// MouseUp
+void
+CanvasView::MouseUp(BPoint where)
+{
+	if (fScrollTracking) {
+		// stop scroll tracking and update cursor
+		fScrollTracking = false;
+		_UpdateToolCursor();
+		// update StateView mouse position
+		uint32 transit = Bounds().Contains(where) ?
+			B_INSIDE_VIEW : B_OUTSIDE_VIEW;
+		StateView::MouseMoved(where, transit, NULL);
+	} else {
+		StateView::MouseUp(where);
+	}
+}
+
+// MouseMoved
+void
+CanvasView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+{
+	if (fScrollTracking) {
+		uint32 buttons;
+		GetMouse(&where, &buttons, false);
+		if (!buttons) {
+			MouseUp(where);
+			return;
+		}
+		where.x = roundf(where.x);
+		where.y = roundf(where.y);
+		where -= ScrollOffset();
+		BPoint offset = where - fScrollTrackingStart;
+		SetScrollOffset(fScrollOffsetStart - offset);
+	} else {
+		// normal mouse movement handled by StateView
+		if (!fSpaceHeldDown)
+			StateView::MouseMoved(where, transit, dragMessage);
+	}
 }
 
 // FilterMouse
@@ -180,6 +247,23 @@ CanvasView::FilterMouse(BPoint* where) const
 	}
 }
 
+// MouseWheelChanged
+bool
+CanvasView::MouseWheelChanged(BPoint where, float x, float y)
+{
+	if (!Bounds().Contains(where))
+		return false;
+
+	if (y > 0.0) {
+		_SetZoom(_NextZoomOutLevel(fZoomLevel));
+		return true;
+	} else if (y < 0.0) {
+		_SetZoom(_NextZoomInLevel(fZoomLevel));
+		return true;
+	}
+	return false;
+}
+
 // #pragma mark -
 
 // ScrollOffsetChanged
@@ -187,9 +271,15 @@ void
 CanvasView::ScrollOffsetChanged(BPoint oldOffset, BPoint newOffset)
 {
 	BPoint offset = newOffset - oldOffset;
+
+	if (offset == B_ORIGIN)
+		// prevent circular code (MouseMoved might call ScrollBy...)
+		return;
+
 	ScrollBy(offset.x, offset.y);
 
-	MouseMoved(fMouseInfo.position + offset, fMouseInfo.transit, NULL);
+	if (!fScrollTracking)
+		MouseMoved(fMouseInfo.position + offset, fMouseInfo.transit, NULL);
 }
 
 // VisibleSizeChanged
@@ -308,8 +398,30 @@ CanvasView::_HandleKeyDown(uint32 key, uint32 modifiers)
 			_SetZoom(_NextZoomOutLevel(fZoomLevel));
 			break;
 
+		case B_SPACE:
+			fSpaceHeldDown = true;
+			_UpdateToolCursor();
+			break;
+
 		default:
 			return StateView::_HandleKeyDown(key, modifiers);
+	}
+
+	return true;
+}
+
+// _HandleKeyUp
+bool
+CanvasView::_HandleKeyUp(uint32 key, uint32 modifiers)
+{
+	switch (key) {
+		case B_SPACE:
+			fSpaceHeldDown = false;
+			_UpdateToolCursor();
+			break;
+
+		default:
+			return StateView::_HandleKeyUp(key, modifiers);
 	}
 
 	return true;
@@ -470,6 +582,26 @@ CanvasView::_MakeBackground()
 			p += 4;
 		}
 		row += bpr;
+	}
+}
+
+// _UpdateToolCursor
+void
+CanvasView::_UpdateToolCursor()
+{
+	if (fIcon) {
+		if (fScrollTracking || fSpaceHeldDown) {
+			// indicate scrolling mode
+			const uchar* cursorData = fScrollTracking ? kGrabCursor : kHandCursor;
+			BCursor cursor(cursorData);
+			SetViewCursor(&cursor, true);
+		} else {
+			// pass on to current state of StateView
+			UpdateStateCursor();
+		}
+	} else {
+		BCursor cursor(kStopCursor);
+		SetViewCursor(&cursor, true);
 	}
 }
 

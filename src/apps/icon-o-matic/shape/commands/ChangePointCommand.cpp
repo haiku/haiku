@@ -39,6 +39,32 @@ ChangePointCommand::~ChangePointCommand()
 	delete[] fOldSelection;
 }
 
+// InitCheck
+status_t
+ChangePointCommand::InitCheck()
+{
+	// TODO: figure out if selection changed!!!
+	// (this command is also used to undo changes to the selection)
+	// (but tracking the selection does not yet work in Icon-O-Matic)
+	
+	status_t ret = PathCommand::InitCheck();
+	if (ret < B_OK)
+		return ret;
+
+	BPoint point;
+	BPoint pointIn;
+	BPoint pointOut;
+	bool connected;
+	if (!fPath->GetPointsAt(fIndex, point, pointIn, pointOut, &connected))
+		return B_ERROR;
+
+	if (point != fPoint || pointIn != fPointIn
+		|| pointOut != fPointOut || connected != fConnected)
+		return B_OK;
+
+	return B_ERROR;
+}
+
 // Perform
 status_t
 ChangePointCommand::Perform()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,7 +54,7 @@ class TransformBox : public ChannelTransform,
 	virtual	bool				HandleKeyUp(uint32 key, uint32 modifiers,
 											Command** _command);
 
-	virtual	void				UpdateCursor();
+	virtual	bool				UpdateCursor();
 
 	virtual	void				AttachedToView(BView* view);
 	virtual	void				DetachedFromView(BView* view);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -72,8 +72,8 @@ TransformCommand::InitCheck()
 		 || fNewXScale != fOldXScale
 		 || fNewYScale != fOldYScale))
 		return B_OK;
-	else
-		return B_NO_INIT;
+	
+	return B_NO_INIT;
 }
 
 // Perform
@@ -88,30 +88,24 @@ TransformCommand::Perform()
 status_t
 TransformCommand::Undo()
 {
-	status_t status = InitCheck();
-	if (status >= B_OK) {
-		_SetTransformation(fOldPivot,
-						   fOldTranslation,
-						   fOldRotation,
-						   fOldXScale,
-						   fOldYScale);
-	}
-	return status;
+	_SetTransformation(fOldPivot,
+					   fOldTranslation,
+					   fOldRotation,
+					   fOldXScale,
+					   fOldYScale);
+	return B_OK;
 }
 
 // Redo
 status_t
 TransformCommand::Redo()
 {
-	status_t status = InitCheck();
-	if (status >= B_OK) {
-		_SetTransformation(fNewPivot,
-						   fNewTranslation,
-						   fNewRotation,
-						   fNewXScale,
-						   fNewYScale);
-	}
-	return status;
+	_SetTransformation(fNewPivot,
+					   fNewTranslation,
+					   fNewRotation,
+					   fNewXScale,
+					   fNewYScale);
+	return B_OK;
 }
 
 // GetName

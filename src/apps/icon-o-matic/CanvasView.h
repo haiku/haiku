@@ -43,7 +43,13 @@ class CanvasView : public StateView,
 	virtual	void				Draw(BRect updateRect);
 
 	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+										   const BMessage* dragMessage);
 	virtual	void				FilterMouse(BPoint* where) const;
+
+	virtual	bool				MouseWheelChanged(BPoint where,
+												  float x, float y);
 
 	// Scrollable interface
  protected:
@@ -76,6 +82,7 @@ class CanvasView : public StateView,
  protected:
 	// StateView interface
 	virtual	bool				_HandleKeyDown(uint32 key, uint32 modifiers);
+	virtual	bool				_HandleKeyUp(uint32 key, uint32 modifiers);
 
 	// CanvasView
 			BRect				_CanvasRect() const;
@@ -87,6 +94,8 @@ class CanvasView : public StateView,
 										  BRect updateRect);
 
 			void				_MakeBackground();
+
+			void				_UpdateToolCursor();
 
  private:
 			double				_NextZoomInLevel(double zoom) const;
@@ -104,6 +113,11 @@ class CanvasView : public StateView,
 
 			BPoint				fCanvasOrigin;
 			double				fZoomLevel;
+
+			bool				fSpaceHeldDown;
+			bool				fScrollTracking;
+			BPoint				fScrollTrackingStart;
+			BPoint				fScrollOffsetStart;
 
 			uint32				fMouseFilterMode;
 
