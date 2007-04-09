@@ -132,6 +132,8 @@ status_t
 EndpointManager::SetConnection(TCPEndpoint *endpoint,
 	const sockaddr *local, const sockaddr *peer, const sockaddr *interfaceLocal)
 {
+	TRACE(("EndpointManager::SetConnection(%p)\n", endpoint));
+
 	RecursiveLocker locker(&fLock);
 	sockaddr localBuffer;
 
@@ -212,6 +214,8 @@ EndpointManager::_LookupEndpoint(uint16 port)
 status_t
 EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
 {
+	TRACE(("EndpointManager::Bind(%p, %s)\n", endpoint, AddressString(gDomain, address, true).Data()));
+
 	if (gAddressModule->is_empty_address(address, true))
 		return B_BAD_VALUE;
 
@@ -255,6 +259,8 @@ EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
 	} else
 		hash_insert(fEndpointHash, endpoint);
 
+	gAddressModule->set_to((sockaddr *)&endpoint->socket->address, address);
+
 	endpoint->fEndpointNextWithSamePort = NULL;
 	hash_insert(fConnectionHash, endpoint);
 
@@ -265,6 +271,8 @@ EndpointManager::Bind(TCPEndpoint *endpoint, sockaddr *address)
 status_t
 EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 {
+	TRACE(("EndpointManager::BindToEphemeral(%p)\n", endpoint));
+
 	RecursiveLocker locker(&fLock);
 
 	uint32 max = kFirstEphemeralPort + 65536;
@@ -284,7 +292,10 @@ EndpointManager::BindToEphemeral(TCPEndpoint *endpoint, sockaddr *address)
 			TCPEndpoint *other = _LookupEndpoint(port);
 			if (other == NULL) {
 				// found a port
+				gAddressModule->set_to_empty_address((sockaddr *)&endpoint->socket->address);
 				gAddressModule->set_port((sockaddr *)&endpoint->socket->address, port);
+				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n", endpoint,
+					AddressString(gDomain, (sockaddr *)&endpoint->socket->address, true).Data()));
 				endpoint->fEndpointNextWithSamePort = NULL;
 				hash_insert(fEndpointHash, endpoint);
 				hash_insert(fConnectionHash, endpoint);
@@ -307,9 +318,6 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 		return B_BAD_VALUE;
 
 	RecursiveLocker locker(&fLock);
-
-	if (!endpoint->IsBound())
-		return B_BAD_VALUE;
 
 	TCPEndpoint *other = _LookupEndpoint(gAddressModule->get_port((sockaddr *)&endpoint->socket->address));
 	if (other != endpoint) {

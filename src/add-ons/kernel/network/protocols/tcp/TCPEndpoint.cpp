@@ -59,8 +59,28 @@ enum {
 	FLAG_OPTION_WINDOW_SHIFT	= 0x01,
 	FLAG_OPTION_TIMESTAMP		= 0x02,
 	FLAG_NO_RECEIVE				= 0x04,
-	FLAG_NO_SEND				= 0x08,
 };
+
+
+static status_t
+wait_on_locker(RecursiveLocker &locker, sem_id sem, bigtime_t timeout)
+{
+	locker.Unlock();
+	status_t status = acquire_sem_etc(sem, 1, B_ABSOLUTE_TIMEOUT |
+		B_CAN_INTERRUPT, timeout);
+	locker.Lock();
+	return status;
+}
+
+
+static inline bigtime_t
+absolute_timeout(bigtime_t timeout)
+{
+	if (timeout == 0 || timeout == B_INFINITE_TIMEOUT)
+		return timeout;
+
+	return timeout + system_time();
+}
 
 
 TCPEndpoint::TCPEndpoint(net_socket *socket)
@@ -167,27 +187,23 @@ TCPEndpoint::Close()
 	if (status != B_OK)
 		return status;
 
-	TRACE("Close(): Entering state %d", fState);
+	TRACE("Close(): Entering state %s", name_for_state(fState));
 
 	if (socket->options & SO_LINGER) {
 		TRACE("Close(): Lingering for %i secs", socket->linger);
 
-		bigtime_t maximum = system_time() + socket->linger * 1000000LL;
+		bigtime_t maximum = absolute_timeout(socket->linger * 1000000LL);
 
 		while (fSendQueue.Used() > 0) {
-			lock.Unlock();
-			status = acquire_sem_etc(fSendLock, 1, B_CAN_INTERRUPT
-										| B_ABSOLUTE_TIMEOUT, maximum);
-			if (status == B_TIMED_OUT) {
-				TRACE("Close(): Lingering made me wait, but not all data was sent.");
-				return B_OK;
-			} else if (status < B_OK)
+			status = wait_on_locker(lock, fSendLock, maximum);
+			if (status == B_TIMED_OUT)
+				break;
+			else if (status < B_OK)
 				return status;
-
-			lock.Lock();
 		}
 
-		TRACE("Close(): Waited for all data to be sent with success");
+		TRACE("Close(): after waiting, the SendQ was left with %lu bytes.",
+			fSendQueue.Used());
 	}
 
 	// TODO: do i need to wait until fState returns to CLOSED?
@@ -225,7 +241,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 
 	RecursiveLocker locker(&fLock);
 
-	TRACE("  Connect(): in state %d", fState);
+	TRACE("  Connect(): in state %s", name_for_state(fState));
 
 	// Can only call connect() from CLOSED or LISTEN states
 	// otherwise endpoint is considered already connected
@@ -319,6 +335,9 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 status_t
 TCPEndpoint::Bind(sockaddr *address)
 {
+	if (address == NULL)
+		return B_BAD_VALUE;
+
 	TRACE("Bind() on address %s",
 		  AddressString(gDomain, address, true).Data());
 
@@ -376,9 +395,8 @@ TCPEndpoint::Shutdown(int direction)
 
 	RecursiveLocker lock(fLock);
 
-	if (direction == SHUT_RD || direction == SHUT_RDWR) {
+	if (direction == SHUT_RD || direction == SHUT_RDWR)
 		fFlags |= FLAG_NO_RECEIVE;
-	}
 
 	if (direction == SHUT_WR || direction == SHUT_RDWR)
 		_ShutdownEgress(false);
@@ -398,14 +416,25 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	RecursiveLocker lock(fLock);
 
-	if (fFlags & FLAG_NO_SEND) {
+	if (fState == CLOSED)
+		return ENOTCONN;
+	else if (fState == LISTEN) {
+		// TODO change socket from passive to active.
+		return EOPNOTSUPP;
+	} else if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
+				|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
+				|| fState == TIME_WAIT) {
 		// TODO: send SIGPIPE signal to app?
 		return EPIPE;
 	}
 
 	size_t bytesLeft = buffer->size;
 
+	bigtime_t timeout = absolute_timeout(socket->send.timeout);
+
 	do {
+		// TODO we should not segment here, but on TX.
+
 		net_buffer *chunk;
 		if (bytesLeft > socket->send.buffer_size) {
 			// divide the buffer in multiple of the maximum segment size
@@ -421,14 +450,9 @@ TCPEndpoint::SendData(net_buffer *buffer)
 			chunk = buffer;
 
 		while (fSendQueue.Free() < chunk->size) {
-			lock.Unlock();
-
-			status_t status = acquire_sem_etc(fSendLock, 1,
-				B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, socket->send.timeout);
+			status_t status = wait_on_locker(lock, fSendLock, timeout);
 			if (status < B_OK)
 				return status;
-
-			lock.Lock();
 		}
 
 		// TODO: check state!
@@ -441,7 +465,10 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		size_t chunkSize = chunk->size;
 		fSendQueue.Add(chunk);
 
-		status_t status = _SendQueued();
+		status_t status = B_OK;
+
+		if (fState == ESTABLISHED || fState == FINISH_RECEIVED)
+			status = _SendQueued();
 
 		if (buffer != chunk) {
 			// as long as we didn't eat the buffer, we can still return an error code
@@ -474,30 +501,24 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	RecursiveLocker locker(fLock);
 
+	*_buffer = NULL;
+
+	if (fState == CLOSED)
+		return ENOTCONN;
+
+	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+
 	if (fState == SYNCHRONIZE_SENT || fState == SYNCHRONIZE_RECEIVED) {
-		// we need to wait until the connection becomes established
 		if (flags & MSG_DONTWAIT)
 			return B_WOULD_BLOCK;
 
-		locker.Unlock();
-
-		status_t status = acquire_sem_etc(fSendLock, 1,
-			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, socket->receive.timeout);
-		if (status < B_OK)
-			return status;
-
-		locker.Lock();
+		while (fState != ESTABLISHED) {
+			// we need to wait until the connection becomes established
+			status_t status = wait_on_locker(locker, fSendLock, timeout);
+			if (status < B_OK)
+				return status;
+		}
 	}
-
-	if ((fFlags & FLAG_NO_RECEIVE) != 0 && fReceiveQueue.Available() == 0) {
-		// there is no data left in the queue, and we can't receive anything,
-		// anymore
-		*_buffer = NULL;
-		return B_OK;
-	}
-
-	// read data out of buffer
-	// TODO: add support for urgent data (MSG_OOB)
 
 	size_t dataNeeded = socket->receive.low_water_mark;
 
@@ -506,49 +527,65 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	if (flags & MSG_WAITALL)
 		dataNeeded = numBytes;
 
-	bigtime_t timeout = socket->receive.timeout;
-	if (timeout != B_INFINITE_TIMEOUT)
-		timeout += system_time();
+	// TODO: add support for urgent data (MSG_OOB)
 
-	while ((fFlags & FLAG_NO_RECEIVE) == 0
-			&& fReceiveQueue.Available() < dataNeeded
-			&& (fReceiveQueue.PushedData() == 0
-				|| fReceiveQueue.Available() < fReceiveQueue.PushedData())) {
-		locker.Unlock();
+	while (true) {
+		if (fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
+				|| fState == TIME_WAIT) {
+			// ``Connection closing''.
+			return B_OK;
+		}
 
-		status_t status = acquire_sem_etc(fReceiveLock, 1,
-			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+		if (fReceiveQueue.Available() > dataNeeded ||
+				(fReceiveQueue.PushedData() > 0
+					&& (fReceiveQueue.PushedData() >= fReceiveQueue.Available())))
+			break;
 
-		locker.Lock();
+		if (fState == FINISH_RECEIVED) {
+			// ``If no text is awaiting delivery, the RECEIVE will
+			//   get a Connection closing''.
+			return B_OK;
+		}
 
+		if (flags & MSG_DONTWAIT)
+			return B_WOULD_BLOCK;
+
+		status_t status = wait_on_locker(locker, fReceiveLock, timeout);
 		if (status < B_OK) {
 			// The Open Group base specification mentions that EINTR should be
 			// returned if the recv() is interrupted before _any data_ is
 			// available. So we actually check if there is data, and if so,
 			// push it to the user.
 			if ((status == B_TIMED_OUT || status == B_INTERRUPTED)
-				&& fReceiveQueue.Available() > 0)
+					&& fReceiveQueue.Available() > 0)
 				break;
+
 			return status;
 		}
 	}
 
-	TRACE("ReadData(): read %lu bytes, %lu are available (flags 0x%x)",
-		  numBytes, fReceiveQueue.Available(), (unsigned int)fFlags);
+	TRACE("  ReadData(): read %lu bytes, %lu are available.",
+		  numBytes, fReceiveQueue.Available());
 
 	if (numBytes < fReceiveQueue.Available())
 		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 
-	return fReceiveQueue.Get(numBytes, (flags & MSG_PEEK) == 0, _buffer);
+	ssize_t receivedBytes = fReceiveQueue.Get(numBytes,
+		(flags & MSG_PEEK) == 0, _buffer);
+
+	TRACE("  ReadData(): %lu bytes kept.", fReceiveQueue.Available());
+
+	return receivedBytes;
 }
 
 
 ssize_t
 TCPEndpoint::ReadAvailable()
 {
-	TRACE("ReadAvailable()");
-
 	RecursiveLocker locker(fLock);
+
+	TRACE("ReadAvailable(): %li", _AvailableData());
+
 	return _AvailableData();
 }
 
@@ -743,9 +780,7 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 			release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
 		}
 
-		release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
-		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-			// TODO: this is not enough - we need to use B_RELEASE_ALL
+		release_sem_etc(fSendLock, 0, B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
 		_NotifyReader();
 	} else {
 		// simultaneous open
@@ -762,8 +797,8 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 int32
 TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 {
-	TRACE("Receive(): Connection in state %d received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
-		  fState, buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
+	TRACE("Receive(): Connection in state %s received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
+		  name_for_state(fState), buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
 
 	// TODO: rethink locking!
 
@@ -804,25 +839,21 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			}
 		} else if (segment.acknowledge == fSendUnacknowledged
 			&& fReceiveQueue.IsContiguous()
-			&& fReceiveQueue.Free() >= buffer->size) {
+			&& fReceiveQueue.Free() >= buffer->size
+			&& !(fFlags & FLAG_NO_RECEIVE)) {
 			TRACE("Receive(): header prediction receive!");
 			// we're on the receiving end of the connection, and this segment
 			// is the one we were expecting, in-sequence
-			if (fFlags & FLAG_NO_RECEIVE) {
-				return DROP;
-			} else {
-				fReceiveNext += buffer->size;
-				TRACE("Receive(): receive next = %lu", (uint32)fReceiveNext);
-				fReceiveQueue.Add(buffer, segment.sequence);
-				if (segment.flags & TCP_FLAG_PUSH)
-					fReceiveQueue.SetPushPointer(fReceiveNext);
+			fReceiveNext += buffer->size;
+			TRACE("Receive(): receive next = %lu", (uint32)fReceiveNext);
+			fReceiveQueue.Add(buffer, segment.sequence);
+			if (segment.flags & TCP_FLAG_PUSH)
+				fReceiveQueue.SetPushPointer();
 
-				release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-					// TODO: real conditional locking needed!
-				_NotifyReader();
+			_NotifyReader();
 
-				return KEEP | ACKNOWLEDGE;
-			}
+			return KEEP | (segment.flags & TCP_FLAG_PUSH ?
+					IMMEDIATE_ACKNOWLEDGE : ACKNOWLEDGE);
 		}
 	}
 
@@ -845,8 +876,6 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 			}
 
 			if (fState != TIME_WAIT && fReceiveQueue.Available() > 0) {
-				release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-					// TODO: real conditional locking needed!
 				_NotifyReader();
 			} else {
 				return DELETE | DROP;
@@ -927,9 +956,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 			fState = ESTABLISHED;
 
-			release_sem_etc(fSendLock, 1, B_DO_NOT_RESCHEDULE);
-			release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-				// TODO: real conditional locking needed!
+			release_sem_etc(fSendLock, 0, B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
 			_NotifyReader();
 		}
 
@@ -1009,64 +1036,60 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 		}
 	}
 
-	// TODO: ignore data *after* FIN
+	bool notify = false;
+
+	if (buffer->size > 0 &&	_ShouldReceive()) {
+		fReceiveQueue.Add(buffer, segment.sequence);
+		fReceiveNext += buffer->size;
+		notify = true;
+		TRACE("Receive(): adding data, receive next = %lu. Now have %lu bytes.",
+				(uint32)fReceiveNext, fReceiveQueue.Available());
+
+		if (segment.flags & TCP_FLAG_PUSH)
+			fReceiveQueue.SetPushPointer();
+	} else {
+		action = (action & ~KEEP) | DROP;
+	}
 
 	if (segment.flags & TCP_FLAG_FINISH) {
-		TRACE("Receive(): peer is finishing connection!");
-		fReceiveNext++;
+		if (fState != CLOSED && fState != LISTEN && fState != SYNCHRONIZE_SENT) {
+			TRACE("Receive(): peer is finishing connection!");
+			fReceiveNext++;
+			notify = true;
 
-		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-			// TODO: real conditional locking needed!
-		_NotifyReader();
+			// FIN implies PSH
+			fReceiveQueue.SetPushPointer();
 
-		// other side is closing connection; change states
-		switch (fState) {
-			case ESTABLISHED:
-			case SYNCHRONIZE_RECEIVED:
-				fState = FINISH_RECEIVED;
-				action |= IMMEDIATE_ACKNOWLEDGE;
-				break;
-			case FINISH_ACKNOWLEDGED:
-				fState = TIME_WAIT;
-				_EnterTimeWait();
-				break;
-			case FINISH_RECEIVED:
-				// a second FIN?
-				break;
-			case FINISH_SENT:
-				// simultaneous close
-				fState = CLOSING;
-				break;
+			// RFC 793 states that we must send an ACK to FIN
+			action |= IMMEDIATE_ACKNOWLEDGE;
 
-			default:
-				break;
+			// other side is closing connection; change states
+			switch (fState) {
+				case ESTABLISHED:
+				case SYNCHRONIZE_RECEIVED:
+					fState = FINISH_RECEIVED;
+					break;
+				case FINISH_SENT:
+					// simultaneous close
+					fState = CLOSING;
+					break;
+				case FINISH_ACKNOWLEDGED:
+					fState = TIME_WAIT;
+					_EnterTimeWait();
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
-	if (buffer->size > 0 || (segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH)) != 0)
+	if (notify)
+		_NotifyReader();
+
+	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
 		action |= ACKNOWLEDGE;
 
-	TRACE("Receive():Entering state %d, segment action %ld", fState, action);
-
-	// state machine is done switching states and the data is good.
-	// put it in the receive buffer
-
-	if (buffer->size > 0 && (fFlags & FLAG_NO_RECEIVE) == 0) {
-		fReceiveQueue.Add(buffer, segment.sequence);
-		fReceiveNext += buffer->size;
-		TRACE("Receive(): adding data, receive next = %lu!", (uint32)fReceiveNext);
-
-		release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
-			// TODO: real conditional locking needed!
-		_NotifyReader();
-	} else
-		gBufferModule->free(buffer);
-
-	if (segment.flags & TCP_FLAG_PUSH)
-		fReceiveQueue.SetPushPointer(fReceiveQueue.LastSequence());
-
-	if (segment.flags & TCP_FLAG_FINISH)
-		fFlags |= FLAG_NO_RECEIVE;
+	TRACE("Receive():Entering state %s, segment action %ld", name_for_state(fState), action);
 
 	return action;
 }
@@ -1316,8 +1339,6 @@ TCPEndpoint::_ShutdownEgress(bool closing)
 		fState = FINISH_SENT;
 	else if (fState == FINISH_RECEIVED)
 		fState = WAIT_FOR_FINISH_ACKNOWLEDGE;
-	else if (closing)
-		fState = CLOSED;
 	else
 		return B_OK;
 
@@ -1326,8 +1347,6 @@ TCPEndpoint::_ShutdownEgress(bool closing)
 		fState = previousState;
 		return status;
 	}
-
-	fFlags |= FLAG_NO_SEND;
 
 	return B_OK;
 }
@@ -1338,9 +1357,7 @@ TCPEndpoint::_AvailableData() const
 {
 	ssize_t availableData = fReceiveQueue.Available();
 
-	// FLAG_NO_RECEIVE is set whenever the socket is in a state
-	// where read() would be non-blocking and return 0.
-	if ((fFlags & FLAG_NO_RECEIVE) && availableData == 0)
+	if (availableData == 0 && !_ShouldReceive())
 		return ENOTCONN;
 
 	return availableData;
@@ -1350,7 +1367,21 @@ TCPEndpoint::_AvailableData() const
 void
 TCPEndpoint::_NotifyReader()
 {
+	// TODO maintain a waiting receiver count so we know whether
+	//      we should release or not.
+	release_sem_etc(fReceiveLock, 1, B_DO_NOT_RESCHEDULE);
 	gSocketModule->notify(socket, B_SELECT_READ, _AvailableData());
+}
+
+
+bool
+TCPEndpoint::_ShouldReceive() const
+{
+	if (fFlags & FLAG_NO_RECEIVE)
+		return false;
+
+	return fState == ESTABLISHED || fState == FINISH_SENT
+			|| fState == FINISH_ACKNOWLEDGED;
 }
 
 

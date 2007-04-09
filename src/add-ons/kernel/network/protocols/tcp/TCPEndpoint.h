@@ -69,6 +69,7 @@ class TCPEndpoint : public net_protocol {
 		status_t _ShutdownEgress(bool closing);
 		ssize_t _AvailableData() const;
 		void _NotifyReader();
+		bool _ShouldReceive() const;
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);

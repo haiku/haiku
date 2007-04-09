@@ -168,4 +168,6 @@ extern EndpointManager *gEndpointManager;
 
 status_t add_tcp_header(tcp_segment_header &segment, net_buffer *buffer);
 
+const char *name_for_state(tcp_state state);
+
 #endif	// TCP_H

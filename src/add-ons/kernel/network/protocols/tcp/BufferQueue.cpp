@@ -355,7 +355,10 @@ BufferQueue::Available(tcp_sequence sequence) const
 }
 
 void
-BufferQueue::SetPushPointer(tcp_sequence sequence)
+BufferQueue::SetPushPointer()
 {
-	fPushPointer = sequence;
+	if (fList.IsEmpty())
+		fPushPointer = 0;
+	else
+		fPushPointer = fList.Tail()->sequence + fList.Tail()->size;
 }

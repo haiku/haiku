@@ -260,7 +260,7 @@ reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
 }
 
 
-static const char *
+const char *
 name_for_state(tcp_state state)
 {
 	switch (state) {
