@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -216,8 +216,8 @@ int
 BNetEndpoint::SetOption(int32 option, int32 level,
 	const void* data, unsigned int length)
 {
-	if (fSocket < 0)
-		return B_ERROR;
+	if (fInit < B_OK)
+		return fInit;
 
 	if (setsockopt(fSocket, level, option, data, length) < 0) {
 		fLastError = errno;
@@ -297,6 +297,9 @@ BNetEndpoint::Close()
 status_t
 BNetEndpoint::Bind(const BNetAddress& address)
 {
+	if (fInit < B_OK)
+		return fInit;
+
 	struct sockaddr_in addr;
 	status_t status = address.GetAddr(addr);
 	if (status != B_OK)
@@ -316,6 +319,7 @@ BNetEndpoint::Bind(const BNetAddress& address)
 	}
 
 	if (addr.sin_addr.s_addr == 0) {
+		// TODO: does this still apply?
 		// Grrr, buggy getsockname!
 		char hostname[MAXHOSTNAMELEN];
 		gethostname(hostname, sizeof(hostname));
@@ -340,6 +344,9 @@ BNetEndpoint::Bind(int port)
 status_t
 BNetEndpoint::Connect(const BNetAddress& address)
 {
+	if (fInit < B_OK)
+		return fInit;
+
 	sockaddr_in addr;
 	if (address.GetAddr(addr) != B_OK)
 		return B_ERROR;
@@ -353,6 +360,7 @@ BNetEndpoint::Connect(const BNetAddress& address)
 	socklen_t addrSize = sizeof(addr);
 	if (getpeername(fSocket, (sockaddr *) &addr, &addrSize) < 0) {
 		Close();
+		fLastError = errno;
 		return B_ERROR;
 	}
 
@@ -372,6 +380,9 @@ BNetEndpoint::Connect(const char *hostname, int port)
 status_t
 BNetEndpoint::Listen(int backlog)
 {
+	if (fInit < B_OK)
+		return fInit;
+
 	if (listen(fSocket, backlog) < 0) {
 		Close();
 		fLastError = errno;
@@ -408,8 +419,8 @@ BNetEndpoint::Accept(int32 timeout)
 	endpoint->fPeer.SetTo(addr);
 
 	if (getsockname(socket, (struct sockaddr *)&addr, &addrSize) < 0) {
-		endpoint->Close();
 		delete endpoint;
+		fLastError = errno;
 		return NULL;
 	}
 
