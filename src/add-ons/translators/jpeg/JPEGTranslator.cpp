@@ -193,15 +193,48 @@ LoadSettings(jpeg_settings *settings)
 }
 
 
-//	#pragma mark - conversion routines
+static bool
+x_flipped(int32 orientation)
+{
+	return orientation == 2 || orientation == 3
+		|| orientation == 6 || orientation == 7;
+}
+
+
+static bool
+y_flipped(int32 orientation)
+{
+	return orientation == 3 || orientation == 4
+		|| orientation == 7 || orientation == 8;
+}
+
+
+static int32
+dest_index(uint32 width, uint32 height, uint32 x, uint32 y, int32 orientation)
+{
+	if (orientation > 4) {
+		uint32 temp = x;
+		x = y;
+		y = temp;
+	}
+	if (y_flipped(orientation))
+		y = height - 1 - y;
+	if (x_flipped(orientation))
+		x = width - 1 - x;
+
+	return y * width + x;
+}
+
+
+//	#pragma mark - conversion for compression
 
 
 inline void
-convert_from_gray1_to_gray8(uchar *in, uchar *out, int in_bytes)
+convert_from_gray1_to_gray8(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		unsigned char c = in[index++];
 		for (int b = 128; b; b = b>>1) {
 			unsigned char color;
@@ -216,11 +249,11 @@ convert_from_gray1_to_gray8(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_gray1_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_gray1_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		unsigned char c = in[index++];
 		for (int b = 128; b; b = b>>1) {
 			unsigned char color;
@@ -237,12 +270,12 @@ convert_from_gray1_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_cmap8_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_cmap8_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	const color_map * map = system_colors();
 	int32 index = 0;
 	int32 index2 = 0;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		rgb_color color = map->color_list[in[index++]];
 		
 		out[index2++] = color.red;
@@ -253,12 +286,12 @@ convert_from_cmap8_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_15_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_15_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
 	int16 in_pixel;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		in_pixel = in[index] | (in[index+1] << 8);
 		index += 2;
 		
@@ -270,12 +303,12 @@ convert_from_15_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_15b_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_15b_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
 	int16 in_pixel;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		in_pixel = in[index+1] | (in[index] << 8);
 		index += 2;
 		
@@ -287,12 +320,12 @@ convert_from_15b_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_16_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_16_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
 	int16 in_pixel;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		in_pixel = in[index] | (in[index+1] << 8);
 		index += 2;
 		
@@ -304,12 +337,12 @@ convert_from_16_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_16b_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_16b_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
 	int16 in_pixel;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		in_pixel = in[index+1] | (in[index] << 8);
 		index += 2;
 		
@@ -321,11 +354,11 @@ convert_from_16b_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_24_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_24_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
 	int32 index = 0;
 	int32 index2 = 0;
-	while (index < in_bytes) {
+	while (index < inRowBytes) {
 		out[index2++] = in[index+2];
 		out[index2++] = in[index+1];
 		out[index2++] = in[index];
@@ -335,80 +368,94 @@ convert_from_24_to_24(uchar *in, uchar *out, int in_bytes)
 
 
 inline void
-convert_from_32_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_32_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
-	int32 index = 0;
-	int32 index2 = 0;
-	while (index < in_bytes) {
-		out[index2++] = in[index+2];
-		out[index2++] = in[index+1];
-		out[index2++] = in[index];
-		index+=4;
+	for (int32 i = 0; i < inRowBytes; i++) {
+		out[0] = in[2];
+		out[1] = in[1];
+		out[2] = in[0];
+
+		in += 4;
+		out += 3;
 	}
 }
 
 
 inline void
-convert_from_32b_to_24(uchar *in, uchar *out, int in_bytes)
+convert_from_32b_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
-	int32 index = 0;
-	int32 index2 = 0;
-	while (index < in_bytes) {
-		index++;
-		out[index2++] = in[index++];
-		out[index2++] = in[index++];
-		out[index2++] = in[index++];
+	for (int32 i = 0; i < inRowBytes; i++) {
+		out[1] = in[0];
+		out[2] = in[1];
+		out[3] = in[2];
+
+		in += 4;
+		out += 3;
 	}
 }
 
 
+//	#pragma mark - conversion for decompression
+
+
 inline void
-convert_from_CMYK_to_32_photoshop(uchar *in, uchar *out, int out_bytes)
+convert_from_CMYK_to_32_photoshop(uint8* in, uint8* out, int32 inRowBytes, int32 xStep)
 {
-	int32 index = 0;
-	int32 index2 = 0;
-	int32 black = 0;
-	while (index < out_bytes) {
-		black = in[index2+3];
-		out[index++] = in[index2+2]*black/255;
-		out[index++] = in[index2+1]*black/255;
-		out[index++] = in[index2]*black/255;
-		out[index++] = 255;
-		index2 += 4;
+	for (int32 i = 0; i < inRowBytes; i += 4) {
+		int32 black = in[3];
+		out[0] = in[2] * black / 255;
+		out[1] = in[1] * black / 255;
+		out[2] = in[0] * black / 255;
+		out[3] = 255;
+
+		in += 4;
+		out += xStep;
 	}
 }
 
 
 //!	!!! UNTESTED !!!
 inline void
-convert_from_CMYK_to_32(uchar *in, uchar *out, int out_bytes)
+convert_from_CMYK_to_32(uint8* in, uint8* out, int32 inRowBytes, int32 xStep)
 {
-	int32 index = 0;
-	int32 index2 = 0;
-	int32 black = 0;
-	while (index < out_bytes) {
-		black = 255 - in[index2+3];
-		out[index++] = ((255-in[index2+2])*black)/255;
-		out[index++] = ((255-in[index2+1])*black)/255;
-		out[index++] = ((255-in[index2])*black)/255;
-		out[index++] = 255;
-		index2 += 4;
+	for (int32 i = 0; i < inRowBytes; i += 4) {
+		int32 black = 255 - in[3];
+		out[0] = ((255 - in[2]) * black) / 255;
+		out[1] = ((255 - in[1]) * black) / 255;
+		out[2] = ((255 - in[0]) * black) / 255;
+		out[3] = 255;
+
+		in += 4;
+		out += xStep;
 	}
 }
 
 
 //!	RGB24 8:8:8 to xRGB 8:8:8:8
 inline void
-convert_from_24_to_32(uchar *in, uchar *out, int out_bytes)
+convert_from_24_to_32(uint8* in, uint8* out, int32 inRowBytes, int32 xStep)
 {
-	int32 index = 0;
-	int32 index2 = 0;
-	while (index < out_bytes) {
-		out[index++] = in[index2+2];
-		out[index++] = in[index2+1];
-		out[index++] = in[index2];
-		out[index++] = 255;
-		index2 += 3;
+	for (int32 i = 0; i < inRowBytes; i += 3) {
+		out[0] = in[2];
+		out[1] = in[1];
+		out[2] = in[0];
+		out[3] = 255;
+
+		in += 3;
+		out += xStep;
+	}
+}
+
+
+//! 8-bit to 8-bit, only need when rotating the image
+void
+translate_8(uint8* in, uint8* out, int32 inRowBytes, int32 xStep)
+{
+	for (int32 i = 0; i < inRowBytes; i++) {
+		out[0] = in[0];
+
+		in++;
+		out += xStep;
 	}
 }
 
@@ -1134,7 +1181,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	// Function pointer to convert function
 	// It will point to proper function if needed
-	void (*converter)(uchar *inscanline, uchar *outscanline, int inrow_bytes) = NULL;
+	void (*converter)(uchar *inscanline, uchar *outscanline,
+		int32 inRowBytes) = NULL;
 
 	// Default color info
 	J_COLOR_SPACE jpg_color_space = JCS_RGB;
@@ -1304,7 +1352,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 		// Convert if needed
 		if (converter != NULL)
-			converter(in_scanline, out_scanline, in_row_bytes-padding);
+			converter(in_scanline, out_scanline, in_row_bytes - padding);
 
 		// Write scanline
 	   	jpeg_write_scanlines(&cinfo, &writeline, 1);
@@ -1331,8 +1379,10 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 	jpeg_create_decompress(&cinfo);
 	be_jpeg_stdio_src(&cinfo, in);
 
+#if 1
 	jpeg_save_markers(&cinfo, MARKER_EXIF, 131072);
 		// make sure the EXIF tag is stored
+#endif
 
 	// Read info about image
 	jpeg_read_header(&cinfo, TRUE);
@@ -1363,7 +1413,7 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 	// Function pointer to convert function
 	// It will point to proper function if needed
 	void (*converter)(uchar *inScanLine, uchar *outScanLine,
-		int inRowBytes) = convert_from_24_to_32;
+		int32 inRowBytes, int32 xStep) = convert_from_24_to_32;
 
 	// If color space isn't rgb
 	if (cinfo.out_color_space != JCS_RGB) {
@@ -1377,7 +1427,7 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 					// Grayscale
 					outColorSpace = B_GRAY8;
 					outColorComponents = 1;
-					converter = NULL;
+					converter = translate_8;
 				} else {
 					// RGB
 					cinfo.out_color_space = JCS_RGB;
@@ -1409,20 +1459,42 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 	// Initialize decompression
 	jpeg_start_decompress(&cinfo);
 
+	// retrieve orientation from settings/EXIF
 	int32 orientation;
-	if (exif.FindInt32("Orientation", &orientation) != B_OK)
-		orientation = 1;
-
-	// Initialize this bounds rect to the size of your image
-	BRect bounds(0, 0, cinfo.output_width - 1, cinfo.output_height - 1);
-	if (orientation & 4) {
-		// image is rotated
-		bounds.right = cinfo.output_height - 1;
-		bounds.bottom = cinfo.output_width - 1;
+	if (ioExtension == NULL
+		|| ioExtension->FindInt32("exif:orientation", &orientation) != B_OK) {
+		if (exif.FindInt32("Orientation", &orientation) != B_OK)
+			orientation = 1;
 	}
 
+	if (orientation != 1 && converter == NULL)
+		converter = translate_8;
+
+	int32 outputWidth = orientation > 4 ? cinfo.output_height : cinfo.output_width;
+	int32 outputHeight = orientation > 4 ? cinfo.output_width : cinfo.output_height;
+
+	int32 destOffset = dest_index(outputWidth, outputHeight,
+		0, 0, orientation) * outColorComponents;
+	int32 xStep = dest_index(outputWidth, outputHeight,
+		1, 0, orientation) * outColorComponents - destOffset;
+	int32 yStep = dest_index(outputWidth, outputHeight,
+		0, 1, orientation) * outColorComponents - destOffset;
+	bool needAll = orientation != 1;
+
+	// Initialize this bounds rect to the size of your image
+	BRect bounds(0, 0, outputWidth - 1, outputHeight - 1);
+
+#if 0
+printf("destOffset = %ld, xStep = %ld, yStep = %ld, input: %ld x %ld, output: %ld x %ld, orientation %ld\n",
+	destOffset, xStep, yStep, (int32)cinfo.output_width, (int32)cinfo.output_height,
+	bounds.IntegerWidth() + 1, bounds.IntegerHeight() + 1, orientation);
+#endif
+
 	// Bytes count in one line of image (scanline)
-	int64 rowBytes = cinfo.output_width * outColorComponents;
+	int32 inRowBytes = cinfo.output_width * cinfo.output_components;
+	int32 rowBytes = (bounds.IntegerWidth() + 1) * outColorComponents;
+	int32 dataSize = cinfo.output_width * cinfo.output_height
+		* outColorComponents;
 
 	// Fill out the B_TRANSLATOR_BITMAP's header
 	TranslatorBitmap header;
@@ -1433,7 +1505,7 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 	header.bounds.bottom = B_HOST_TO_BENDIAN_FLOAT(bounds.bottom);
 	header.colors = (color_space)B_HOST_TO_BENDIAN_INT32(outColorSpace);
 	header.rowBytes = B_HOST_TO_BENDIAN_INT32(rowBytes);
-	header.dataSize = B_HOST_TO_BENDIAN_INT32(rowBytes * cinfo.output_height);
+	header.dataSize = B_HOST_TO_BENDIAN_INT32(dataSize);
 
 	// Write out the header
 	status_t err = out->Write(&header, sizeof(TranslatorBitmap));
@@ -1443,39 +1515,53 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 		return Error((j_common_ptr)&cinfo, B_ERROR);
 
 	// Declare scanlines
-	JSAMPROW in_scanline = NULL;
-	JSAMPROW out_scanline = NULL;
-	JSAMPROW writeline;	// Pointer to in_scanline or out_scanline (if there will be conversion)
+	JSAMPROW inScanLine = NULL;
+	uint8* dest = NULL;
+	uint8* destLine = NULL;
 
 	// Allocate scanline
 	// Use libjpeg memory allocation functions, so in case of error it will free them itself
-    in_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
-    	JPOOL_PERMANENT, rowBytes);
+    inScanLine = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
+    	JPOOL_PERMANENT, inRowBytes);
 
 	// We need 2nd scanline storage only for conversion
 	if (converter != NULL) {
 		// There will be conversion, allocate second scanline...
-		// Use libjpeg memory allocation functions, so in case of error it will free them itself
-	    out_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
-	    	JPOOL_PERMANENT, rowBytes);
-		// ... and make it the one to write to file
-		writeline = out_scanline;
+		// Use libjpeg memory allocation functions, so in case of error it will free
+		// them itself
+	    dest = (uint8*)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
+	    	JPOOL_PERMANENT, needAll ? dataSize : rowBytes);
+	    destLine = dest + destOffset;
 	} else
-		writeline = in_scanline;
+		destLine = inScanLine;
 
 	while (cinfo.output_scanline < cinfo.output_height) {
 		// Read scanline
-		jpeg_read_scanlines(&cinfo, &in_scanline, 1);
+		jpeg_read_scanlines(&cinfo, &inScanLine, 1);
 
 		// Convert if needed
 		if (converter != NULL)
-			converter(in_scanline, out_scanline, rowBytes);
+			converter(inScanLine, destLine, inRowBytes, xStep);
 
-  		// Write the scanline buffer to the output stream
-		err = out->Write(writeline, rowBytes);
-		if (err < rowBytes)
-			return err < B_OK ? Error((j_common_ptr)&cinfo, err)
+		if (!needAll) {
+	  		// Write the scanline buffer to the output stream
+			ssize_t bytesWritten = out->Write(destLine, rowBytes);
+			if (bytesWritten < rowBytes) {
+				return bytesWritten < B_OK
+					? Error((j_common_ptr)&cinfo, bytesWritten)
+					: Error((j_common_ptr)&cinfo, B_ERROR);
+			}
+		} else
+			destLine += yStep;
+	}
+
+	if (needAll) {
+		ssize_t bytesWritten = out->Write(dest, dataSize);
+		if (bytesWritten < dataSize) {
+			return bytesWritten < B_OK
+				? Error((j_common_ptr)&cinfo, bytesWritten)
 				: Error((j_common_ptr)&cinfo, B_ERROR);
+		}
 	}
 
 	jpeg_finish_decompress(&cinfo);
