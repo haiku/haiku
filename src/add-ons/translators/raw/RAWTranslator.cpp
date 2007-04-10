@@ -185,6 +185,14 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	if (!data.is_raw) {
 		// let others handle embedded JPEG data
 		BMemoryIO io(buffer, bufferSize);
+		BMessage buffer;
+		if (meta.flip != 1) {
+			// preserve orientation
+			if (settings == NULL)
+				settings = &buffer;
+			settings->AddInt32("exif:orientation", meta.flip);
+		}
+
 		BTranslatorRoster* roster = BTranslatorRoster::Default();
 		return roster->Translate(&io, NULL, settings, target, outType);
 	}

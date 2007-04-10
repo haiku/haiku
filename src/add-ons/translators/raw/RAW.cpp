@@ -77,6 +77,22 @@ square(const T& value)
 }
 
 
+static inline bool
+x_flipped(int32 orientation)
+{
+	return orientation == 2 || orientation == 3
+		|| orientation == 7 || orientation == 8;
+}
+
+
+static inline bool
+y_flipped(int32 orientation)
+{
+	return orientation == 3 || orientation == 4
+		|| orientation == 6 || orientation == 7;
+}
+
+
 //	#pragma mark -
 
 
@@ -230,11 +246,11 @@ DCRaw::_FilterCoefficient(int32 x, int32 y)
 inline int32
 DCRaw::_FlipIndex(uint32 row, uint32 col, uint32 flip)
 {
-	if (flip & 4)
+	if (flip > 4)
 		SWAP(row, col);
-	if (flip & 2)
+	if (y_flipped(flip))
 		row = fInputHeight - 1 - row;
-	if (flip & 1)
+	if (x_flipped(flip))
 		col = fInputWidth - 1 - col;
 
 	return row * fInputWidth + col;
@@ -2379,8 +2395,8 @@ DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 {
 	uint8* line, lookUpTable[0x10000];
 
-	uint32 width = image.flip & 4 ? fOutputHeight : fOutputWidth;
-	uint32 height = image.flip & 4 ? fOutputWidth : fOutputHeight;
+	uint32 width = image.flip > 4 ? fOutputHeight : fOutputWidth;
+	uint32 height = image.flip > 4 ? fOutputWidth : fOutputHeight;
 	uint32 outputRow = (4 * fOutputBitsPerSample / 8) * width;
 	uint32 outputOffset = 0;
 
@@ -2646,7 +2662,7 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 				break;
 
 			case 274:	// Orientation
-				image.flip = "50132467"[fRead.Next<uint16>() & 7] - '0';
+				image.flip = fRead.Next<uint16>();
 				break;
 
 			case 277:	// Samples Per Pixel
@@ -3244,6 +3260,7 @@ DCRaw::Identify()
 	if (rawCount == 0)
 		return B_NO_TRANSLATOR;
 
+	fMeta.flip = _Raw().flip;
 	return B_OK;
 }
 
@@ -3262,7 +3279,7 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	fOutputWidth = (fInputWidth + fShrink) >> fShrink;
 	fOutputHeight = (fInputHeight + fShrink) >> fShrink;
 
-	if (image.flip & 4) {
+	if (image.flip > 4) {
 		// image is rotated
 		image.output_width = fOutputHeight;
 		image.output_height = fOutputWidth;
