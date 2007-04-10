@@ -632,13 +632,47 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	if (node->header_space < size) {
 		// we need to prepend a new buffer
 
-		// TODO: implement me!
-		panic("prepending buffer not implemented\n");
+		size_t bytesLeft = size;
+		do {
+			if (node->header_space == 0) {
+				size_t headerSpace = BUFFER_SIZE - sizeof(data_header);
+				// no more space, need another data node
+				data_header *header = create_data_header(headerSpace);
+				if (header == NULL) {
+					// TODO: free up headers we already allocated!
+					return B_NO_MEMORY;
+				}
+
+				data_node *previous = node;
+				node = (data_node *)add_data_node(header);
+
+				init_data_node(node, headerSpace);
+				node->header_space = header->data_space;
+				header->first_node = node;
+
+				list_insert_item_before(&buffer->buffers, previous, node);
+			} else {
+				size_t willConsume = min_c(size, node->header_space);
+
+				node->header_space -= willConsume;
+				node->start -= willConsume;
+				node->used += willConsume;
+				bytesLeft -= willConsume;
+			}
+		} while (bytesLeft > 0);
+
+		size_t offset = 0;
+		for (node = (data_node *)list_get_first_item(&buffer->buffers);
+				node != NULL; node = (data_node *)
+					list_get_next_item(&buffer->buffers, node)) {
+			node->offset = offset;
+			offset += node->used;
+		}
 
 		if (_contiguousBuffer)
 			*_contiguousBuffer = NULL;
 
-		return B_ERROR;
+		return B_OK;
 	}
 
 	// the data fits into this buffer

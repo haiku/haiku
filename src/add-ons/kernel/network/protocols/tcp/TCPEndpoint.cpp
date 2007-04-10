@@ -49,8 +49,9 @@
 //#define TRACE_TCP
 
 #ifdef TRACE_TCP
-// the space after 'this' is important in order for this to work with cpp 2.95
-#	define TRACE(format, args...)	dprintf("TCP:%p:" format "\n", this , ##args)
+// the space before ', ##args' is important in order for this to work with cpp 2.95
+#	define TRACE(format, args...)	dprintf("TCP [%llu] %p (%12s) " format "\n", \
+		system_time(), this, name_for_state(fState) , ##args)
 #else
 #	define TRACE(args...)			do { } while (0)
 #endif
@@ -79,8 +80,17 @@ absolute_timeout(bigtime_t timeout)
 }
 
 
+static inline status_t
+posix_error(status_t error)
+{
+	if (error == B_TIMED_OUT)
+		return B_WOULD_BLOCK;
+
+	return error;
+}
+
+
 WaitList::WaitList(const char *name)
-	: fWaiting(0)
 {
 	fSem = create_sem(0, name);
 }
@@ -100,15 +110,13 @@ WaitList::InitCheck() const
 
 
 status_t
-WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout)
+WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout, bool wakeNext)
 {
-	// this function is called with `locker' held.
-	fWaiting++;
 	locker.Unlock();
-	status_t status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT |
-		B_CAN_INTERRUPT, timeout);
+	status_t status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT
+		| B_CAN_INTERRUPT, timeout);
 	locker.Lock();
-	if (status == B_OK)
+	if (wakeNext && status == B_OK)
 		Signal();
 	return status;
 }
@@ -117,14 +125,8 @@ WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout)
 void
 WaitList::Signal()
 {
-	// the same locker used with Wait() must be held
-	// when calling this function.
-
-	if (fWaiting == 0)
-		return;
-
-	fWaiting--;
-	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE
+		| B_RELEASE_IF_WAITING_ONLY);
 }
 
 
@@ -152,7 +154,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fRoundTripTime(TCP_INITIAL_RTT),
 	fState(CLOSED),
 	fFlags(0), //FLAG_OPTION_WINDOW_SHIFT),
-	fError(B_OK)
+	fError(B_OK),
+	fSpawned(false)
 {
 	//gStackModule->init_timer(&fTimer, _TimeWait, this);
 
@@ -228,7 +231,7 @@ TCPEndpoint::Close()
 	if (status != B_OK)
 		return status;
 
-	TRACE("Close(): Entering state %s", name_for_state(fState));
+	TRACE("Close() after Shutdown()");
 
 	if (socket->options & SO_LINGER) {
 		TRACE("Close(): Lingering for %i secs", socket->linger);
@@ -277,12 +280,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	TRACE("Connect() on address %s",
 		  AddressString(gDomain, address, true).Data());
 
-	if (address->sa_family != AF_INET)
-		return EAFNOSUPPORT;
-
 	RecursiveLocker locker(&fLock);
-
-	TRACE("  Connect(): in state %s", name_for_state(fState));
 
 	// Can only call connect() from CLOSED or LISTEN states
 	// otherwise endpoint is considered already connected
@@ -355,7 +353,7 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 
 	TRACE("  Connect(): Connection complete: %s", strerror(status));
 
-	return status;
+	return posix_error(status);
 }
 
 
@@ -506,7 +504,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		while (fSendQueue.Free() < chunk->size) {
 			status_t status = fSendList.Wait(lock, timeout);
 			if (status < B_OK)
-				return status;
+				return posix_error(status);
 		}
 
 		// TODO: check state!
@@ -569,7 +567,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			// we need to wait until the connection becomes established
 			status_t status = fSendList.Wait(locker, timeout);
 			if (status < B_OK)
-				return status;
+				return posix_error(status);
 		}
 	}
 
@@ -589,8 +587,8 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			return B_OK;
 		}
 
-		if (fReceiveQueue.Available() > dataNeeded ||
-				(fReceiveQueue.PushedData() > 0
+		if (fReceiveQueue.Available() >= dataNeeded ||
+				((fReceiveQueue.PushedData() > 0)
 					&& (fReceiveQueue.PushedData() >= fReceiveQueue.Available())))
 			break;
 
@@ -603,7 +601,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		if (flags & MSG_DONTWAIT)
 			return B_WOULD_BLOCK;
 
-		status_t status = fReceiveList.Wait(locker, timeout);
+		status_t status = fReceiveList.Wait(locker, timeout, false);
 		if (status < B_OK) {
 			// The Open Group base specification mentions that EINTR should be
 			// returned if the recv() is interrupted before _any data_ is
@@ -613,7 +611,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 					&& fReceiveQueue.Available() > 0)
 				break;
 
-			return status;
+			return posix_error(status);
 		}
 	}
 
@@ -707,8 +705,8 @@ TCPEndpoint::UpdateTimeWait()
 int32
 TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 {
-	TRACE("ListenReceive(): Connection in state %s received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
-		  name_for_state(fState), buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
+	TRACE("ListenReceive(): packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
+		  buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
 
 	// Essentially, we accept only TCP_FLAG_SYNCHRONIZE in this state,
 	// but the error behaviour differs
@@ -732,6 +730,8 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 		(sockaddr *)&buffer->source);
 
 	TCPEndpoint *endpoint = (TCPEndpoint *)newSocket->first_protocol;
+
+	endpoint->fSpawned = true;
 
 	// TODO: proper error handling!
 
@@ -796,6 +796,9 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 int32
 TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buffer)
 {
+	TRACE("SynchronizeReceive(): packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
+		buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
+
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
 		&& (fInitialSendSequence >= segment.acknowledge
 			|| fSendMax < segment.acknowledge))
@@ -855,8 +858,8 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 int32
 TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 {
-	TRACE("Receive(): Connection in state %s received packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
-		  name_for_state(fState), buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
+	TRACE("Receive(): packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
+		buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
 
 	// TODO: rethink locking!
 
@@ -1146,7 +1149,7 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
 		action |= ACKNOWLEDGE;
 
-	TRACE("Receive():Entering state %s, segment action %ld", name_for_state(fState), action);
+	TRACE("Receive() Action %ld", action);
 
 	return action;
 }

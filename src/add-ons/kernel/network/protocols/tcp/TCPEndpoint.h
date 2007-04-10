@@ -30,12 +30,11 @@ public:
 
 	status_t InitCheck() const;
 
-	status_t Wait(RecursiveLocker &, bigtime_t timeout);
+	status_t Wait(RecursiveLocker &, bigtime_t timeout, bool wakeNext = true);
 	void Signal();
 
 private:
 	sem_id fSem;
-	int32 fWaiting;
 };
 
 
@@ -142,6 +141,8 @@ class TCPEndpoint : public net_protocol {
 		tcp_state		fState;
 		uint32			fFlags;
 		status_t		fError;
+
+		bool			fSpawned;
 
 		// timer
 		net_timer		fRetransmitTimer;
