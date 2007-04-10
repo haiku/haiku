@@ -63,11 +63,11 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 RAWTranslator::RAWTranslator()
-	: BaseTranslator("Raw Images", "Raw Image Translator",
+	: BaseTranslator("RAW Images", "RAW Image Translator",
 		RAW_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
-		"RawTranslator_Settings",
+		"RAWTranslator_Settings",
 		sDefaultSettings, kNumDefaultSettings,
 		B_TRANSLATOR_BITMAP, RAW_IMAGE_FORMAT)
 {
@@ -192,12 +192,26 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	// retrieve EXIF data
 	off_t exifOffset;
 	size_t exifLength;
-	if (settings != NULL && raw.GetEXIFTag(exifOffset, exifLength) == B_OK) {
-		void* exifBuffer = malloc(exifLength);
+	bool bigEndian;
+	if (settings != NULL && raw.GetEXIFTag(exifOffset, exifLength, bigEndian) == B_OK) {
+		uint8* exifBuffer = (uint8*)malloc(exifLength + 16);
 		if (exifBuffer != NULL) {
-			if (source->ReadAt(exifOffset, exifBuffer, exifLength)
+			// add fake TIFF header to EXIF data
+			struct {
+				uint16	endian;
+				uint16	tiff_marker;
+				uint32	offset;
+				uint16	null;
+			} _PACKED header;
+			header.endian = bigEndian ? 'MM' : 'II';
+			header.tiff_marker = 42;
+			header.offset = 16;
+			header.null = 0;
+			memcpy(exifBuffer, &header, sizeof(header));
+
+			if (source->ReadAt(exifOffset, exifBuffer + 16, exifLength)
 					== (ssize_t)exifLength)
-				settings->AddData("exif", B_RAW_TYPE, exifBuffer, exifLength);
+				settings->AddData("exif", B_RAW_TYPE, exifBuffer, exifLength + 16);
 
 			free(exifBuffer);
 		}

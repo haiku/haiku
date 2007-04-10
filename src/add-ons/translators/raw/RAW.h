@@ -63,7 +63,8 @@ class DCRaw {
 		uint32 CountImages() const;
 		status_t ImageAt(uint32 index, image_data_info& info) const;
 
-		status_t GetEXIFTag(off_t& offset, size_t& length) const;
+		status_t GetEXIFTag(off_t& offset, size_t& length,
+			bool& bigEndian) const;
 
 	private:
 		int32 _AllocateImage();

@@ -173,16 +173,16 @@ class TReadHelper {
 			throw fError;
 		}
 
-		status_t Status()
+		status_t Status() const
 			{ return fError >= B_OK ? B_OK : fError; };
 
 		off_t Seek(off_t offset, int32 mode)
 			{ return fStream.Seek(offset, mode); }
-		off_t Position()
+		off_t Position() const
 			{ return fStream.Position(); }
 
 		void SetSwap(bool yesNo) { fSwap = yesNo; };
-		bool IsSwapping() { return fSwap; };
+		bool IsSwapping() const { return fSwap; };
 
 		BPositionIO& Stream() { return fStream; }
 

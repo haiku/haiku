@@ -3360,13 +3360,19 @@ DCRaw::ImageAt(uint32 index, image_data_info& info) const
 
 
 status_t
-DCRaw::GetEXIFTag(off_t& offset, size_t& length) const
+DCRaw::GetEXIFTag(off_t& offset, size_t& length, bool& bigEndian) const
 {
 	if (fEXIFOffset < 0)
 		return B_ENTRY_NOT_FOUND;
 
 	offset = fEXIFOffset;
 	length = fEXIFLength;
+
+#if B_HOST_IS_LENDIAN
+	bigEndian = fRead.IsSwapping();
+#else
+	bigEndian = !fRead.IsSwapping();
+#endif
 	return B_OK;
 }
 
