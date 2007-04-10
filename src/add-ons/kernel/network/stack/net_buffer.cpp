@@ -651,14 +651,14 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 				header->first_node = node;
 
 				list_insert_item_before(&buffer->buffers, previous, node);
-			} else {
-				size_t willConsume = min_c(size, node->header_space);
-
-				node->header_space -= willConsume;
-				node->start -= willConsume;
-				node->used += willConsume;
-				bytesLeft -= willConsume;
 			}
+
+			size_t willConsume = min_c(bytesLeft, node->header_space);
+
+			node->header_space -= willConsume;
+			node->start -= willConsume;
+			node->used += willConsume;
+			bytesLeft -= willConsume;
 		} while (bytesLeft > 0);
 
 		size_t offset = 0;
