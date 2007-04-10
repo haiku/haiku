@@ -279,9 +279,9 @@ void cs4299_amp_enable(device_config *config, bool yesno)
 }
 
 const ac97_source_info source_info[] = {
-	{ "Record", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO|B_MIX_RECORDMUX, 100, AC97_RECORD_GAIN, 0x8000, 4, 0, 1, 0, 0.0, 22.5, 1.5 },
+	{ "Recording", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO|B_MIX_RECORDMUX, 100, AC97_RECORD_GAIN, 0x8000, 4, 0, 1, 0, 0.0, 22.5, 1.5 },
 	{ "Master", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO, 101, AC97_MASTER_VOLUME, 0x8000, 5, 0, 1, 1,-46.5, 0.0, 1.5 },
-	//{ "Bass/Trebble", B_MIX_GAIN|B_MIX_STEREO, 102, AC97_MASTER_TONE, 0x0f0f, 4, 0, 1, 1,-12.0, 10.5, 1.5 },
+	//{ "Bass/Treble", B_MIX_GAIN|B_MIX_STEREO, 102, AC97_MASTER_TONE, 0x0f0f, 4, 0, 1, 1,-12.0, 10.5, 1.5 },
 	//{ "Aux Out", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO, 103, AC97_AUX_OUT_VOLUME, 0x8000, 5, 0, 1, 1,-46.5, 0.0, 1.5 },
 	{ "PCM Out", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO, 104, AC97_PCM_OUT_VOLUME, 0x8808, 5, 0, 1, 1,-34.5, 12.0, 1.5 },
 	{ "CD", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO, 105, AC97_CD_VOLUME, 0x8808, 5, 0, 1, 1,-34.5, 12.0, 1.5 },

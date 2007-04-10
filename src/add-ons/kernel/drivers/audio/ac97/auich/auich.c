@@ -659,7 +659,6 @@ auich_setup(auich_dev * card)
 	snooze(50000); // 50 ms
 
 	ac97_init(&card->config);
-	ac97_amp_enable(&card->config, true);
 	
 	rv = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
 	if (!(rv & STA_S0CR)) { /* reset failure */
@@ -698,6 +697,7 @@ auich_setup(auich_dev * card)
 	PRINT(("codec record gain   = %#04x\n",auich_codec_read(&card->config, 0x1c)));*/
 	
 	PRINT(("writing codec registers\n"));
+
 	// TODO : to move with AC97
 	/* enable master output */
 	auich_codec_write(&card->config, AC97_MASTER_VOLUME, 0x0000);
@@ -713,6 +713,8 @@ auich_setup(auich_dev * card)
 	auich_codec_write(&card->config, AC97_RECORD_SELECT, 0x0404);
 	/* set record gain */
 	//auich_codec_write(&card->config, AC97_RECORD_GAIN, 0x0000);
+
+	ac97_amp_enable(&card->config, true);
 
 	PRINT(("codec master output = %#04x\n",auich_codec_read(&card->config, AC97_MASTER_VOLUME)));
 	PRINT(("codec aux output    = %#04x\n",auich_codec_read(&card->config, AC97_AUX_OUT_VOLUME)));
@@ -830,6 +832,7 @@ static void
 auich_shutdown(auich_dev *card)
 {
 	PRINT(("shutdown(%p)\n", card));
+	ac97_amp_enable(&card->config, false);
 	card->interrupt_mask = 0;
 	
 	if (current_settings.use_thread) {

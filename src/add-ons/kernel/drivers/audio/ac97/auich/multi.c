@@ -194,10 +194,82 @@ auich_create_controls_list(multi_dev *multi)
 {
 	uint32 	i = 0, index = 0, count, id, parent, parent2, parent3;
 	const ac97_source_info *info;
+
+	/* AC97 Mixer */
+	parent = auich_create_group_control(multi, &index, 0, 0, "AC97 Mixer");
+	
+	count = source_info_size;
+	//Note that we ignore first item in source_info
+	//It's for recording, but do match this with ac97.c's source_info
+	for(i=1; i < count ; i++) {
+		info = &source_info[i];
+		PRINT(("name : %s\n", info->name));
 			
-	parent = auich_create_group_control(multi, &index, 0, 0, "Record");
+		parent2 = auich_create_group_control(multi, &index, parent, 0, info->name);
+				
+		if(info->type & B_MIX_GAIN) {
+			if(info->type & B_MIX_MUTE) {
+				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
+				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
+				multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
+				multi->controls[index].mix_control.parent = parent2;
+				multi->controls[index].mix_control.string = S_MUTE;
+				multi->controls[index].cookie = info;
+				multi->controls[index].type = B_MIX_MUTE;
+				multi->controls[index].get = &auich_ac97_get_mix;
+				multi->controls[index].set = &auich_ac97_set_mix;
+				index++;
+			}
 		
+			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
+			multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
+			multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
+			multi->controls[index].mix_control.parent = parent2;
+			strcpy(multi->controls[index].mix_control.name, info->name);
+			multi->controls[index].mix_control.u.gain.min_gain = info->min_gain;
+			multi->controls[index].mix_control.u.gain.max_gain = info->max_gain;
+			multi->controls[index].mix_control.u.gain.granularity = info->granularity;
+			multi->controls[index].cookie = info;
+			multi->controls[index].type = B_MIX_GAIN;
+			multi->controls[index].get = &auich_ac97_get_mix;
+			multi->controls[index].set = &auich_ac97_set_mix;
+			id = multi->controls[index].mix_control.id;
+			index++;
+			
+			if(info->type & B_MIX_STEREO) {
+				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
+				multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
+				multi->controls[index].mix_control.master = id;
+				multi->controls[index].mix_control.parent = parent2;
+				strcpy(multi->controls[index].mix_control.name, info->name);
+				multi->controls[index].mix_control.u.gain.min_gain = info->min_gain;
+				multi->controls[index].mix_control.u.gain.max_gain = info->max_gain;
+				multi->controls[index].mix_control.u.gain.granularity = info->granularity;
+				multi->controls[index].cookie = info;
+				multi->controls[index].type = B_MIX_GAIN;
+				multi->controls[index].get = &auich_ac97_get_mix;
+				multi->controls[index].set = &auich_ac97_set_mix;
+				index++;
+			}
+			
+			if(info->type & B_MIX_MICBOOST) {
+				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
+				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
+				multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
+				multi->controls[index].mix_control.parent = parent2;
+				strcpy(multi->controls[index].mix_control.name, "+20 dB");
+				multi->controls[index].cookie = info;
+				multi->controls[index].type = B_MIX_MICBOOST;
+				multi->controls[index].get = &auich_ac97_get_mix;
+				multi->controls[index].set = &auich_ac97_set_mix;
+				index++;
+			}
+		}
+	}
+
 	/* AC97 Record */
+	parent = auich_create_group_control(multi, &index, 0, 0, "Recording");
+		
 	info = &source_info[0];
 	PRINT(("name : %s\n", info->name));
 	
@@ -302,83 +374,7 @@ auich_create_controls_list(multi_dev *multi)
 			index++;
 		}
 	} 	
-	
-	parent = auich_create_group_control(multi, &index, 0, 0, "AC97 Mixer");
-	
-	count = source_info_size;
-	count--;	
-	
-	for(i=1; i < count ; i++) {
-		info = &source_info[i];
-		PRINT(("name : %s\n", info->name));
-			
-		parent2 = auich_create_group_control(multi, &index, parent, 0, info->name);
-				
-		if(info->type & B_MIX_GAIN) {
-			if(info->type & B_MIX_MUTE) {
-				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
-				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
-				multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
-				multi->controls[index].mix_control.parent = parent2;
-				multi->controls[index].mix_control.string = S_MUTE;
-				multi->controls[index].cookie = info;
-				multi->controls[index].type = B_MIX_MUTE;
-				multi->controls[index].get = &auich_ac97_get_mix;
-				multi->controls[index].set = &auich_ac97_set_mix;
-				index++;
-			}
 		
-			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
-			multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
-			multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
-			multi->controls[index].mix_control.parent = parent2;
-			strcpy(multi->controls[index].mix_control.name, info->name);
-			multi->controls[index].mix_control.u.gain.min_gain = info->min_gain;
-			multi->controls[index].mix_control.u.gain.max_gain = info->max_gain;
-			multi->controls[index].mix_control.u.gain.granularity = info->granularity;
-			multi->controls[index].cookie = info;
-			multi->controls[index].type = B_MIX_GAIN;
-			multi->controls[index].get = &auich_ac97_get_mix;
-			multi->controls[index].set = &auich_ac97_set_mix;
-			id = multi->controls[index].mix_control.id;
-			index++;
-			
-			if(info->type & B_MIX_STEREO) {
-				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
-				multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
-				multi->controls[index].mix_control.master = id;
-				multi->controls[index].mix_control.parent = parent2;
-				strcpy(multi->controls[index].mix_control.name, info->name);
-				multi->controls[index].mix_control.u.gain.min_gain = info->min_gain;
-				multi->controls[index].mix_control.u.gain.max_gain = info->max_gain;
-				multi->controls[index].mix_control.u.gain.granularity = info->granularity;
-				multi->controls[index].cookie = info;
-				multi->controls[index].type = B_MIX_GAIN;
-				multi->controls[index].get = &auich_ac97_get_mix;
-				multi->controls[index].set = &auich_ac97_set_mix;
-				index++;
-			}
-		} 	
-	}
-	
-	parent = auich_create_group_control(multi, &index, 0, S_SETUP, NULL);
-	
-	/* AC97 20db Boost Mic */
-	info = &source_info[6];
-		
-	if(info->type & B_MIX_GAIN && info->type & B_MIX_MICBOOST) {
-		multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
-		multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
-		multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
-		multi->controls[index].mix_control.parent = parent;
-		strcpy(multi->controls[index].mix_control.name, "Mic +20dB");
-		multi->controls[index].cookie = info;
-		multi->controls[index].type = B_MIX_MICBOOST;
-		multi->controls[index].get = &auich_ac97_get_mix;
-		multi->controls[index].set = &auich_ac97_set_mix;
-		index++;
-	}
-				
 	multi->control_count = index;
 	PRINT(("multi->control_count %lu\n", multi->control_count));
 	return B_OK;
