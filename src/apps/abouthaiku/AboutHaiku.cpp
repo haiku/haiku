@@ -409,6 +409,7 @@ AboutView::AboutView(const BRect &rect)
 		"Michael Paine\n"
 		"Michael Phipps\n"
 		"Jeremy Rand\n"
+		"Hartmut Reh\n"
 		"David Reid\n"
 		"Daniel Reinhold\n"
 		"François Revol\n"
