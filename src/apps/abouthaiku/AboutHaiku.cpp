@@ -364,6 +364,7 @@ AboutView::AboutView(const BRect &rect)
 		"Ryan Leavengood\n"
 		"Michael Lotz\n"
 		"Niels Reedijk\n"
+		"Hugo Santos\n"
 		"Bryan Varner\n"
 		"\n");
 
