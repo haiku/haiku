@@ -81,21 +81,24 @@ template<typename Type, typename Module = NetBufferModuleGetter > class NetBuffe
 		Type		fDataBuffer;
 };
 
-//! A class to add a header to a buffer
-template<typename Type, typename Module = NetBufferModuleGetter > class NetBufferPrepend {
+//! A class to access a header safely across data node boundaries
+template<typename Type, typename Module = NetBufferModuleGetter>
+class NetBufferSafeHeader {
 	public:
-		NetBufferPrepend(net_buffer *buffer, size_t size = 0)
+		NetBufferSafeHeader(net_buffer *buffer)
 			:
-			fBuffer(buffer),
-			fData(NULL)
+			fBuffer(buffer)
 		{
-			if (size == 0)
-				size = sizeof(Type);
-
-			fStatus = Module::Get()->prepend_size(buffer, size, (void **)&fData);
+			fStatus = Module::Get()->direct_access(fBuffer, 0,
+				sizeof(Type), (void **)&fData);
+			if (fStatus != B_OK) {
+				fData = NULL;
+				fStatus = Module::Get()->read(fBuffer, 0, &fDataBuffer,
+					sizeof(Type));
+			}
 		}
 
-		~NetBufferPrepend()
+		~NetBufferSafeHeader()
 		{
 			if (fBuffer != NULL)
 				Detach();
@@ -116,8 +119,6 @@ template<typename Type, typename Module = NetBufferModuleGetter > class NetBuffe
 			return fDataBuffer;
 		}
 
-		// TODO: I'm not sure it's a good idea to have Detach() routines
-		//	in NetBufferHeader and here with such a different outcome...
 		void
 		Detach()
 		{
@@ -126,11 +127,29 @@ template<typename Type, typename Module = NetBufferModuleGetter > class NetBuffe
 			fBuffer = NULL;
 		}
 
-	private:
+	protected:
+		NetBufferSafeHeader() {}
+
 		net_buffer	*fBuffer;
 		status_t	fStatus;
 		Type		*fData;
 		Type		fDataBuffer;
+};
+
+//! A class to add a header to a buffer
+template<typename Type, typename Module = NetBufferModuleGetter>
+class NetBufferPrepend : public NetBufferSafeHeader<Type, Module> {
+	public:
+		NetBufferPrepend(net_buffer *buffer, size_t size = 0)
+		{
+			fBuffer = buffer;
+			fData = NULL;
+
+			if (size == 0)
+				size = sizeof(Type);
+
+			fStatus = Module::Get()->prepend_size(buffer, size, (void **)&fData);
+		}
 };
 
 #endif	// NET_BUFFER_UTILITIES_H

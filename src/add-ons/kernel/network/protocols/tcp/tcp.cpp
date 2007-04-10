@@ -148,6 +148,10 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 	header.urgent_offset = 0;
 		// TODO: urgent pointer not yet supported
 
+	// we must detach before calculating the checksum as we may
+	// not have a contiguous buffer.
+	bufferHeader.Detach();
+
 	if (optionsLength > 0)
 		gBufferModule->write(buffer, sizeof(tcp_header), optionsBuffer, optionsLength);
 
@@ -162,7 +166,10 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 		<< (uint16)htons(IPPROTO_TCP)
 		<< (uint16)htons(buffer->size)
 		<< Checksum::BufferHelper(buffer, gBufferModule);
-	header.checksum = checksum;
+
+	// we are pretty sure the header is there.
+	NetBufferSafeHeader<tcp_header> headerRef(buffer);
+	headerRef.Data().checksum = checksum;
 
 	return B_OK;
 }
