@@ -138,10 +138,10 @@ main(int argc, char *argv[])
 	int ch;
 #ifndef __BEOS__
 	u_long ultmp;
-# if	defined(IPPROTO_IP) && defined(IP_TOS)
-	int tos = -1;
-# endif
 	char *ep;
+#endif
+#if	defined(IPPROTO_IP) && defined(IP_TOS)
+	int tos = -1;
 #endif
 
 	pfrontp = pbackp = ptyobuf;
