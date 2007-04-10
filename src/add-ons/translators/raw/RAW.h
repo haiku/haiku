@@ -50,6 +50,8 @@ struct image_data_info {
 	bool	is_raw;
 };
 
+typedef void (*monitor_hook)(const char* message, float percentage, void* data);
+
 class DCRaw {
 	public:
 		DCRaw(BPositionIO& stream);
@@ -65,6 +67,9 @@ class DCRaw {
 
 		status_t GetEXIFTag(off_t& offset, size_t& length,
 			bool& bigEndian) const;
+		void SetProgressMonitor(monitor_hook hook, void* data);
+
+		void SetHalfSize(bool half);
 
 	private:
 		int32 _AllocateImage();
@@ -185,6 +190,9 @@ class DCRaw {
 		uint32		fEXIFLength;
 
 		off_t		fCurveOffset;
+
+		monitor_hook fProgressMonitor;
+		void*		fProgressData;
 };
 
 #endif	// RAW_H

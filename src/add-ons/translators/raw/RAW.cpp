@@ -93,6 +93,20 @@ y_flipped(int32 orientation)
 }
 
 
+#if 0
+void
+dump_to_disk(void* data, size_t length)
+{
+	FILE* file = fopen("/tmp/RAW.out", "wb");
+	if (file == NULL)
+		return;
+
+	fwrite(data, length, 1, file);
+	fclose(file);
+}
+#endif
+
+
 //	#pragma mark -
 
 
@@ -105,7 +119,7 @@ DCRaw::DCRaw(BPositionIO& stream)
 	fDNGVersion(0),
 	fIsTIFF(false),
 	fThreshold(0),
-	fHalfSize(true),
+	fHalfSize(false),
 	fUseCameraWhiteBalance(true),
 	fUseAutoWhiteBalance(true),
 	fRawColor(true),
@@ -126,7 +140,8 @@ DCRaw::DCRaw(BPositionIO& stream)
 	fDecodeLeaf(0),
 	fDecodeBitsZeroAfterMax(false),
 	fFilters(~0),
-	fEXIFOffset(-1)
+	fEXIFOffset(-1),
+	fProgressMonitor(NULL)
 {
 	fImages = new image_data_info[kImageBufferCount];
 	fDecodeBuffer = new decode[kDecodeBufferCount];
@@ -888,6 +903,9 @@ DCRaw::_FixupValues()
 void
 DCRaw::_ScaleColors()
 {
+	if (fProgressMonitor != NULL)
+		fProgressMonitor("Scale Colors", 5, fProgressData);
+
 	int dblack, c, val, sum[8];
 	uint32 row, col, x, y;
 	double dsum[8], dmin, dmax;
@@ -1008,6 +1026,9 @@ DCRaw::_WaveletDenoise()
 void
 DCRaw::_PreInterpolate()
 {
+	if (fProgressMonitor != NULL)
+		fProgressMonitor("Pre-Interpolate", 10, fProgressData);
+
 	uint32 row, col;
 
 	if (fShrink) {
@@ -1488,6 +1509,9 @@ DCRaw::_BorderInterpolate(uint32 border)
 void
 DCRaw::_AHDInterpolate()
 {
+	if (fProgressMonitor != NULL)
+		fProgressMonitor("Interpolate", 30, fProgressData);
+
 #define TS 256		/* Tile Size */
 
 	int i, j, tr, tc, fc, c, d, val, hm[2];
@@ -1508,8 +1532,15 @@ DCRaw::_AHDInterpolate()
 	rgb = (ushort(*)[TS][TS][3])buffer;
 	lab = (short (*)[TS][TS][3])(buffer + 12*TS*TS);
 	homo = (char (*)[TS][TS])(buffer + 24*TS*TS);
+	float percentage = 30;
+	float percentageStep = 55.0f / (fInputHeight / (TS - 6));
 
 	for (top = 0; top < fInputHeight; top += TS - 6) {
+		if (fProgressMonitor) {
+			fProgressMonitor("Interpolate", percentage, fProgressData);
+			percentage += percentageStep;
+		}
+
 		for (left = 0; left < fInputWidth; left += TS - 6) {
 			memset(rgb, 0, 12 * TS * TS);
 
@@ -1677,6 +1708,9 @@ DCRaw::_PseudoInverse(double (*in)[3], double (*out)[3], uint32 size)
 void
 DCRaw::_ConvertToRGB()
 {
+	if (fProgressMonitor != NULL)
+		fProgressMonitor("Convert to RGB", 85, fProgressData);
+
 	uint32 row, col, c, i, j, k;
 	float out[3], out_cam[3][4];
 	double num, inverse[3][3];
@@ -2190,16 +2224,6 @@ DCRaw::_CanonHasLowBits()
 	return hasLowBits;
 }
 
-void
-dump_to_disk(void* data, size_t length)
-{
-	FILE* file = fopen("/tmp/RAW.out", "wb");
-	if (file == NULL)
-		return;
-
-	fwrite(data, length, 1, file);
-	fclose(file);
-}
 
 void
 DCRaw::_LoadRAWCanonCompressed(const image_data_info& image)
@@ -2354,7 +2378,7 @@ DCRaw::_LoadRAWLosslessJPEG(const image_data_info& image)
 		}
 	}
 
-	dump_to_disk(fImageData, fInputWidth * fColors * 100);
+	//dump_to_disk(fImageData, fInputWidth * fColors * 100);
 	free(jh.row);
 
 	if (rawWidth > fInputWidth)
@@ -2393,6 +2417,9 @@ DCRaw::_LoadRAW(const image_data_info& image)
 void
 DCRaw::_WriteRGB32(image_data_info& image, uint8* outputBuffer)
 {
+	if (fProgressMonitor != NULL)
+		fProgressMonitor("Write RGB", 95, fProgressData);
+
 	uint8* line, lookUpTable[0x10000];
 
 	uint32 width = image.flip > 4 ? fOutputHeight : fOutputWidth;
@@ -3393,3 +3420,17 @@ DCRaw::GetEXIFTag(off_t& offset, size_t& length, bool& bigEndian) const
 	return B_OK;
 }
 
+
+void
+DCRaw::SetProgressMonitor(monitor_hook hook, void* data)
+{
+	fProgressMonitor = hook;
+	fProgressData = data;
+}
+
+
+void
+DCRaw::SetHalfSize(bool half)
+{
+	fHalfSize = half;
+}

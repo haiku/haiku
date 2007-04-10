@@ -16,8 +16,10 @@
 
 
 // Extensions that ShowImage supports
-const char *kDocumentCount = "/documentCount";
-const char *kDocumentIndex = "/documentIndex";
+const char* kDocumentCount = "/documentCount";
+const char* kDocumentIndex = "/documentIndex";
+const char* kProgressMonitor = "/progressMonitor";
+
 
 // The input formats that this translator supports.
 translation_format sInputFormats[] = {
@@ -60,6 +62,10 @@ static TranSetting sDefaultSettings[] = {
 const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
 const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
+
+
+
+//	#pragma mark -
 
 
 RAWTranslator::RAWTranslator()
@@ -133,6 +139,37 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 }
 
 
+bigtime_t gStart;
+
+
+/*static*/ void
+RAWTranslator::_ProgressMonitor(const char* message, float percentage,
+	void* data)
+{
+	BMessenger& messenger = *(BMessenger*)data;
+
+	BMessage update;
+	update.AddString("message", message);
+	update.AddFloat("percent", percentage);
+	update.AddInt64("time", system_time());
+
+#if 1
+	static bigtime_t last;
+	static int32 lastHash;
+	int32 hash = *(int32*)message;
+
+	if (system_time() - last > 500000 || hash != lastHash) {
+		printf("%6.3fs: %3.1f%% %s\n",
+			(system_time() - gStart) / 1000000.0, percentage, message);
+		last = system_time();
+		lastHash = hash;
+	}
+#endif
+
+	messenger.SendMessage(&update);
+}
+
+
 status_t
 RAWTranslator::DerivedTranslate(BPositionIO* source,
 	const translator_info* info, BMessage* settings,
@@ -143,16 +180,26 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	if (outType != B_TRANSLATOR_BITMAP || baseType != 0)
 		return B_NO_TRANSLATOR;
 
+	DCRaw raw(*source);
+
 	bool headerOnly = false;
-	if (settings != NULL)
+	BMessenger monitor;
+
+	if (settings != NULL) {
 		settings->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
 
-	DCRaw raw(*source);
+		if (settings->FindMessenger(kProgressMonitor, &monitor) == B_OK) {
+			raw.SetProgressMonitor(&_ProgressMonitor, &monitor);
+			_ProgressMonitor("Reading Image Data", 0, &monitor);
+		}
+	}
 
 	int32 imageIndex = 0;
 	uint8* buffer = NULL;
 	size_t bufferSize;
 	status_t status;
+
+	gStart = system_time();
 
 	try {
 		status = raw.Identify();
@@ -175,6 +222,8 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 
 	if (status < B_OK)
 		return B_NO_TRANSLATOR;
+
+	printf("TOTAL: %6.3fs\n", (system_time() - gStart) / 1000000.0);
 
 	image_meta_info meta;
 	raw.GetMetaInfo(meta);

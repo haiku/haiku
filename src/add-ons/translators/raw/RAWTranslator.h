@@ -18,11 +18,11 @@
 #include <ByteOrder.h>
 
 
-#define RAW_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0, 1, 0)
+#define RAW_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0, 5, 0)
 #define RAW_IMAGE_FORMAT	'RAWI'
 
-#define RAW_IN_QUALITY		0.95
-#define RAW_IN_CAPABILITY	0.95
+#define RAW_IN_QUALITY		0.90
+#define RAW_IN_CAPABILITY	0.90
 #define BITS_IN_QUALITY		1
 #define BITS_IN_CAPABILITY	1
 
@@ -45,7 +45,11 @@ class RAWTranslator : public BaseTranslator {
 			const translator_info *inInfo, BMessage *ioExtension,
 			uint32 outType, BPositionIO *outDestination, int32 baseType);
 
-		virtual BView *NewConfigView(TranslatorSettings *settings);	
+		virtual BView *NewConfigView(TranslatorSettings *settings);
+
+	private:
+		static void _ProgressMonitor(const char* message, float percentage,
+			void* data);
 };
 
 #endif	// RAW_TRANSLATOR_H
