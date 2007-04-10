@@ -52,7 +52,7 @@
 // the space after 'this' is important in order for this to work with cpp 2.95
 #	define TRACE(format, args...)	dprintf("TCP:%p:" format "\n", this , ##args)
 #else
-#	define TRACE(args...)
+#	define TRACE(args...)			do { } while (0)
 #endif
 
 // Initial estimate for packet round trip time (RTT)
@@ -62,6 +62,9 @@
 enum {
 	FLAG_OPTION_WINDOW_SHIFT	= 0x01,
 	FLAG_OPTION_TIMESTAMP		= 0x02,
+	// TODO: Should FLAG_NO_RECEIVE apply as well to received connections?
+	//       That is, what is excepected from accept() after a shutdown()
+	//       is performed on a listen()ing socket.
 	FLAG_NO_RECEIVE				= 0x04,
 };
 
@@ -334,13 +337,16 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 
 	// If we are running over Loopback, after _SendQueued() returns we
 	// may be in ESTABLISHED already.
-	if (fState == ESTABLISHED)
+	if (fState == ESTABLISHED) {
+		TRACE("  Connect() completed after _SendQueued()");
 		return B_OK;
+	}
 
 	// wait until 3-way handshake is complete (if needed)
 	bigtime_t timeout = min_c(socket->send.timeout, TCP_CONNECTION_TIMEOUT);
 	if (timeout == 0) {
 		// we're a non-blocking socket
+		TRACE("  Connect() delayed, return EINPROGRESS");
 		return EINPROGRESS;
 	}
 
@@ -368,6 +374,8 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 			return status;
 
 		status = gSocketModule->dequeue_connected(socket, _acceptedSocket);
+		if (status == B_OK)
+			TRACE("  Accept() returning %p", (*_acceptedSocket)->first_protocol);
 	} while (status < B_OK);
 
 	return status;
@@ -533,9 +541,8 @@ TCPEndpoint::SendData(net_buffer *buffer)
 ssize_t
 TCPEndpoint::SendAvailable()
 {
-	TRACE("SendAvailable()");
-
 	RecursiveLocker locker(fLock);
+	TRACE("SendAvailable(): %li", fSendQueue.Free());
 	return fSendQueue.Free();
 }
 
@@ -766,6 +773,8 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 			endpoint->fReceiveWindowShift = 0;
 		}
 	}
+
+	TRACE("  ListenReceive() created new endpoint %p", endpoint);
 
 	// send SYN+ACK
 	status_t status = endpoint->_SendQueued();
@@ -1403,6 +1412,14 @@ TCPEndpoint::_ShutdownEgress(bool closing)
 ssize_t
 TCPEndpoint::_AvailableData() const
 {
+	// TODO: Refer to the FLAG_NO_RECEIVE comment above regarding
+	//       the application of FLAG_NO_RECEIVE in listen()ing
+	//       sockets.
+	if (fState == LISTEN)
+		return gSocketModule->count_connected(socket);
+	else if (fState == SYNCHRONIZE_SENT)
+		return 0;
+
 	ssize_t availableData = fReceiveQueue.Available();
 
 	if (availableData == 0 && !_ShouldReceive())

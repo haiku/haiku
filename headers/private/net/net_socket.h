@@ -65,6 +65,7 @@ struct net_socket_module_info {
 	status_t	(*spawn_pending_socket)(net_socket *parent, net_socket **_socket);
 	void		(*delete_socket)(net_socket *socket);
 	status_t	(*dequeue_connected)(net_socket *parent, net_socket **_socket);
+	ssize_t		(*count_connected)(net_socket *parent);
 	status_t	(*set_max_backlog)(net_socket *socket, uint32 backlog);
 	status_t	(*set_connected)(net_socket *socket);
 

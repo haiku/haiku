@@ -372,6 +372,22 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 }
 
 
+ssize_t
+socket_count_connected(net_socket *_parent)
+{
+	net_socket_private *parent = (net_socket_private *)_parent;
+
+	BenaphoreLocker _(parent->lock);
+
+	int count = 0;
+	for (void *it = list_get_first_item(&parent->connected_children);
+			it != NULL; it = list_get_next_item(&parent->connected_children, it))
+		count++;
+
+	return count;
+}
+
+
 status_t
 socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 {
@@ -1101,6 +1117,7 @@ net_socket_module_info gNetSocketModule = {
 	socket_spawn_pending,
 	socket_delete,
 	socket_dequeue_connected,
+	socket_count_connected,
 	socket_set_max_backlog,
 	socket_connected,
 
