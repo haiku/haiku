@@ -796,7 +796,7 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 int32
 TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buffer)
 {
-	TRACE("SynchronizeReceive(): packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
+	TRACE("SynchronizeSentReceive(): packet %p (%lu bytes) with flags 0x%x, seq %lu, ack %lu!",
 		buffer, buffer->size, segment.flags, segment.sequence, segment.acknowledge);
 
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
@@ -1306,10 +1306,6 @@ TCPEndpoint::_SendQueued(bool force)
 
 		gAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
 		gAddressModule->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
-		TRACE("SendQueued() flags %x, buffer %p, size %lu, from address %s to %s",
-			segment.flags, buffer, buffer->size,
-			AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
-			AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data());
 
 		uint32 size = buffer->size;
 		if (length > 0 && fSendNext + segmentLength == fSendQueue.LastSequence()) {
@@ -1328,6 +1324,11 @@ TCPEndpoint::_SendQueued(bool force)
 				segment.window_shift = fReceiveWindowShift;
 			}
 		}
+
+		TRACE("SendQueued() flags %x, buffer %p, size %lu, from address %s to %s",
+			segment.flags, buffer, buffer->size,
+			AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
+			AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data());
 
 		status = add_tcp_header(segment, buffer);
 		if (status != B_OK) {

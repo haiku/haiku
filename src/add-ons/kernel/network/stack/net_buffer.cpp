@@ -626,17 +626,17 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 
-	TRACE(("prepend_size(buffer %p, size %ld)\n", buffer, size));
+	TRACE(("prepend_size(buffer %p, size %ld) [has %ld]\n", buffer, size,
+		node->header_space));
 	//dump_buffer(buffer);
 
 	if (node->header_space < size) {
-		// we need to prepend a new buffer
+		// we need to prepend new buffers
 
 		size_t bytesLeft = size;
 		do {
 			if (node->header_space == 0) {
 				size_t headerSpace = BUFFER_SIZE - sizeof(data_header);
-				// no more space, need another data node
 				data_header *header = create_data_header(headerSpace);
 				if (header == NULL) {
 					// TODO: free up headers we already allocated!
@@ -671,21 +671,19 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 		if (_contiguousBuffer)
 			*_contiguousBuffer = NULL;
+	} else {
+		// the data fits into this buffer
+		node->header_space -= size;
+		node->start -= size;
+		node->used += size;
 
-		return B_OK;
-	}
+		if (_contiguousBuffer)
+			*_contiguousBuffer = node->start;
 
-	// the data fits into this buffer
-	node->header_space -= size;
-	node->start -= size;
-	node->used += size;
-
-	if (_contiguousBuffer)
-		*_contiguousBuffer = node->start;
-
-	// adjust offset of following nodes	
-	while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
-		node->offset += size;
+		// adjust offset of following nodes	
+		while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
+			node->offset += size;
+		}
 	}
 
 	buffer->size += size;
