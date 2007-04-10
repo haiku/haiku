@@ -26,13 +26,25 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include <DirectWindow.h>
 #include <GLView.h>
 #include <GLRenderer.h>
+
 #include "GLRendererRoster.h"
+
+struct glview_direct_info {
+	direct_buffer_info *direct_info;
+	bool direct_connected;
+
+	glview_direct_info();
+	~glview_direct_info();
+};
+
 
 BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong options)
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
-		fRenderer(NULL)
+	m_clip_info(NULL),	
+	fRenderer(NULL)
 {
 	fRoster = new GLRendererRoster(this, options);
 }
@@ -40,11 +52,14 @@ BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong o
 
 BGLView::~BGLView()
 {
+	delete (glview_direct_info *)m_clip_info;
 	if (fRenderer)
 		fRenderer->Release();
 }
 
-void BGLView::LockGL()
+
+void
+BGLView::LockGL()
 {
 	// TODO: acquire the OpenGL API lock it on this glview
 
@@ -52,7 +67,9 @@ void BGLView::LockGL()
 		fRenderer->LockGL();
 }
 
-void BGLView::UnlockGL()
+
+void
+BGLView::UnlockGL()
 {
 	if (fRenderer)
 		fRenderer->UnlockGL();
@@ -60,23 +77,31 @@ void BGLView::UnlockGL()
 	// TODO: release the GL API lock to others glviews
 }
 
-void BGLView::SwapBuffers()
+
+void
+BGLView::SwapBuffers()
 {
 	SwapBuffers(false);
 }
 
-void BGLView::SwapBuffers(bool vSync)
+
+void
+BGLView::SwapBuffers(bool vSync)
 {
 	if (fRenderer)
 		fRenderer->SwapBuffers(vSync);
 }
 
-BView *	BGLView::EmbeddedView()
+
+BView *
+BGLView::EmbeddedView()
 {
 	return NULL;
 }
 
-status_t BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
+
+status_t
+BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
 {
 	if (!fRenderer)
 		return B_ERROR;
@@ -87,7 +112,9 @@ status_t BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
 	return fRenderer->CopyPixelsOut(source, dest);
 }
 
-status_t BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
+
+status_t
+BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
 {
 	if (!fRenderer)
 		return B_ERROR;
@@ -98,12 +125,14 @@ status_t BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
 	return fRenderer->CopyPixelsIn(source, dest);
 }
 
+
 /* Mesa's GLenum is not ulong but uint, so we can't use GLenum
    without breaking this method signature.
    Instead, we have to use the effective BeOS's SGI OpenGL GLenum type:
    unsigned long.
  */
-void BGLView::ErrorCallback(unsigned long errorCode) 
+void
+BGLView::ErrorCallback(unsigned long errorCode) 
 {
 	char msg[32];
 	sprintf(msg, "GL: Error code $%04lx.", errorCode);
@@ -111,7 +140,9 @@ void BGLView::ErrorCallback(unsigned long errorCode)
 	fprintf(stderr, "%s\n", msg);
 }
 
-void BGLView::Draw(BRect updateRect)
+
+void
+BGLView::Draw(BRect updateRect)
 {
 	if (fRenderer)
 		return fRenderer->Draw(updateRect);
@@ -121,7 +152,9 @@ void BGLView::Draw(BRect updateRect)
 	DrawString("No OpenGL renderer available!");
 }
 
-void BGLView::AttachedToWindow()
+
+void
+BGLView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
@@ -143,12 +176,16 @@ void BGLView::AttachedToWindow()
 	// SetFontSize(16);
 }
 
-void BGLView::AllAttached()
+
+void
+BGLView::AllAttached()
 {
 	BView::AllAttached();
 }
 
-void BGLView::DetachedFromWindow()
+
+void
+BGLView::DetachedFromWindow()
 {
 	if (fRenderer)
 		fRenderer->Release();
@@ -157,106 +194,155 @@ void BGLView::DetachedFromWindow()
 	BView::DetachedFromWindow();
 }
 
-void BGLView::AllDetached()
+
+void
+BGLView::AllDetached()
 {
 	BView::AllDetached();
 }
 
-void BGLView::FrameResized(float width, float height)
+
+void
+BGLView::FrameResized(float width, float height)
 {
+	m_bounds.Set(0, 0, width, height);
 	if (fRenderer)
 		fRenderer->FrameResized(width, height);
 
    	BView::FrameResized(width, height);
 }
 
-status_t BGLView::Perform(perform_code d, void *arg)
+
+status_t
+BGLView::Perform(perform_code d, void *arg)
 {
    	return BView::Perform(d, arg);
 }
 
 
-status_t BGLView::Archive(BMessage *data, bool deep) const
+status_t
+BGLView::Archive(BMessage *data, bool deep) const
 {
 	return BView::Archive(data, deep);
 }
 
-void BGLView::MessageReceived(BMessage *msg)
+
+void
+BGLView::MessageReceived(BMessage *msg)
 {
 	BView::MessageReceived(msg);
 }
 
-void BGLView::SetResizingMode(uint32 mode)
+
+void
+BGLView::SetResizingMode(uint32 mode)
 {
 	BView::SetResizingMode(mode);
 }
 
-void BGLView::Show()
+
+void
+BGLView::Show()
 {
 	BView::Show();
 }
 
-void BGLView::Hide()
+
+void
+BGLView::Hide()
 {
 	BView::Hide();
 }
 
-BHandler *BGLView::ResolveSpecifier(BMessage *msg, int32 index,
+
+BHandler *
+BGLView::ResolveSpecifier(BMessage *msg, int32 index,
                                     BMessage *specifier, int32 form,
                                     const char *property)
 {
 	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
-status_t BGLView::GetSupportedSuites(BMessage *data)
+
+status_t
+BGLView::GetSupportedSuites(BMessage *data)
 {
 	return BView::GetSupportedSuites(data);
 }
 
-void BGLView::DirectConnected( direct_buffer_info *info )
+
+void
+BGLView::DirectConnected(direct_buffer_info *info)
 {
-	/* TODO:
-         - update local copy of caller's BDirectWindow's direct_buffer_info
-         - clip it against BGLView's visible region
-         - pass the view's clipped direct_buffer_info to renderer's DirectConnect()  
-	 */
-	
-#if 0
-	if (! m_direct_connected && m_direct_connection_disabled) 
+	// TODO: Locking !!!!!
+	// TODO: We should probably prevent the renderer to draw anything
+	// (lock_draw() ??) while we are in this method
+
+	if (!m_clip_info/* && m_direct_connection_disabled*/) 
 		return; 
 
-	direct_info_locker->Lock(); 
+	glview_direct_info *glviewDirectInfo = (glview_direct_info *)m_clip_info;
+	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
+	//direct_info_locker->Lock(); 
 	switch(info->buffer_state & B_DIRECT_MODE_MASK) { 
-	case B_DIRECT_START: 
-		m_direct_connected = true;
-	case B_DIRECT_MODIFY: 
-		// Get clipping information 
-		if (m_clip_list)
-			free(m_clip_list); 
-		m_clip_list_count = info->clip_list_count; 
-		m_clip_list = (clipping_rect *) malloc(m_clip_list_count*sizeof(clipping_rect)); 
-		if (m_clip_list) { 
-			memcpy(m_clip_list, info->clip_list, m_clip_list_count*sizeof(clipping_rect));
-			fBits = (uint8 *) info->bits; 
-			fRowBytes = info->bytes_per_row; 
-			fFormat = info->pixel_format; 
-			fBounds = info->window_bounds; 
-			fDirty = true; 
-		} 
-		break; 
-	case B_DIRECT_STOP: 
-		fConnected = false; 
-		break; 
+		case B_DIRECT_START: 
+			glviewDirectInfo->direct_connected = true;
+		case B_DIRECT_MODIFY:
+		{
+			localInfo->buffer_state = info->buffer_state;
+			localInfo->driver_state = info->driver_state;
+			localInfo->bits = info->bits;
+			localInfo->pci_bits = info->pci_bits;
+			localInfo->bytes_per_row = info->bytes_per_row;
+			localInfo->bits_per_pixel = info->bits_per_pixel;
+			localInfo->pixel_format = info->pixel_format;
+			localInfo->layout = info->layout;
+			localInfo->orientation = info->orientation;
+			//memcpy(&localInfo->_reserved, info->_reserved, sizeof(info->_reserved));
+			//localInfo->_dd_type_ = info->_dd_type_;
+			//localInfo->_dd_token_ = info->_dd_token_;
+
+			localInfo->window_bounds = info->window_bounds;
+			
+			// Collect the rects into a BRegion, then clip to the view's bounds
+			BRegion region;
+			for (uint32 c = 0; c < info->clip_list_count; c++)
+				region.Include(info->clip_list[c]);
+			// TODO: I have the feeling that this Bounds() call won't work here.
+			// Probably m_bounds should be used, but it should then be maintained correctly
+			// on view resizing/moving...		
+			BRegion boundsRegion = Bounds();		
+			region.IntersectWith(&boundsRegion);
+				
+			localInfo->clip_list_count = region.CountRects();
+			localInfo->clip_bounds = region.FrameInt();
+			
+			for (uint32 c = 0; c < localInfo->clip_list_count; c++)
+				localInfo->clip_list[c] = region.RectAtInt(c);
+			
+			break; 
+		}		
+		case B_DIRECT_STOP: 
+			glviewDirectInfo->direct_connected = false; 
+			break; 
 	} 
-	direct_info_locker->Unlock(); 
-#endif
+	//direct_info_locker->Unlock(); 
 
 	if (fRenderer)
-		fRenderer->DirectConnected(info);
+		fRenderer->DirectConnected(localInfo);
 }
 
-void BGLView::EnableDirectMode( bool enabled )
+
+void
+BGLView::EnableDirectMode(bool enabled)
 {
+	if (!m_clip_info && enabled)
+		m_clip_info = new glview_direct_info();
+	else if (m_clip_info && !enabled) {
+		delete (glview_direct_info *)m_clip_info;
+		m_clip_info = NULL;		
+	}
+
 	if (fRenderer)
 		fRenderer->EnableDirectMode(enabled);
 }
@@ -412,4 +498,17 @@ const char * color_space_name(color_space space)
 #undef C2N
 };
 
+
+glview_direct_info::glview_direct_info()
+{
+	// TODO: See direct_window_data() in app_server's ServerWindow.cpp
+	direct_info = (direct_buffer_info *)malloc(sizeof(B_PAGE_SIZE));
+	direct_connected = false;
+}
+
+
+glview_direct_info::~glview_direct_info()
+{
+	free(direct_info);
+}
 
