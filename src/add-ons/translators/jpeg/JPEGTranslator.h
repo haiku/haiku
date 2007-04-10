@@ -215,10 +215,4 @@ EXTERN(void) be_jpeg_stdio_dest(j_compress_ptr cinfo, BPositionIO *outfile);	// 
 EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings * settings); // from "be_jerror.cpp"
 
 
-// Main functions of translator :)
-status_t Copy(BPositionIO *in, BPositionIO *out);
-status_t Compress(BPositionIO *in, BPositionIO *out);
-status_t Decompress(BPositionIO *in, BPositionIO *out);
-status_t Error(j_common_ptr cinfo, status_t error = B_ERROR);
-
 #endif // _JPEGTRANSLATOR_H_

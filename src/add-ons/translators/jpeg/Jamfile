@@ -9,6 +9,9 @@ SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) libjpeg ] ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) raw ] ;
+	# for TIFF.h and ReadHelper.h
+
 local jpeg_files = 
 	# libjpeg
 	jcapimin.c
@@ -82,6 +85,7 @@ Translator JPEGTranslator :
 	be_jdatadst.cpp
 	be_jdatasrc.cpp
 	be_jerror.cpp
+	exif_parser.cpp
 	JPEGTranslator.cpp
 
 	$(jpeg_files)

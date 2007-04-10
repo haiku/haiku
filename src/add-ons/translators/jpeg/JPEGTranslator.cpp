@@ -32,8 +32,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "JPEGTranslator.h"
 
+#include "exif_parser.h"
+
 #include <TabView.h>
 
+
+#define MARKER_EXIF	0xe1
 
 // Set these accordingly
 #define JPEG_ACRONYM "JPEG"
@@ -78,6 +82,12 @@ translation_format outputFormats[] = {
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
 	{}
 };
+
+// Main functions of translator :)
+static status_t Copy(BPositionIO *in, BPositionIO *out);
+static status_t Compress(BPositionIO *in, BPositionIO *out);
+static status_t Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension);
+static status_t Error(j_common_ptr cinfo, status_t error = B_ERROR);
 
 
 bool gAreSettingsRunning = false;
@@ -1054,14 +1064,14 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 	} else if (inInfo->type == B_TRANSLATOR_BITMAP && outType == JPEG_FORMAT) {
 		return Compress(inSource, outDestination);
 	} else if (inInfo->type == JPEG_FORMAT && outType == B_TRANSLATOR_BITMAP) {
-		return Decompress(inSource, outDestination);
+		return Decompress(inSource, outDestination, ioExtension);
 	}
 
 	return B_NO_TRANSLATOR;
 }
 
 /*!	The user has requested the same format for input and output, so just copy */
-status_t
+static status_t
 Copy(BPositionIO *in, BPositionIO *out)
 {
 	int block_size = 65536;
@@ -1095,7 +1105,7 @@ Copy(BPositionIO *in, BPositionIO *out)
 
 
 /*!	Encode into the native format */
-status_t
+static status_t
 Compress(BPositionIO *in, BPositionIO *out)
 {
 	// Load Settings
@@ -1307,8 +1317,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 
 /*!	Decode the native format */
-status_t
-Decompress(BPositionIO *in, BPositionIO *out)
+static status_t
+Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 {
 	// Load Settings
 	jpeg_settings settings;
@@ -1321,16 +1331,39 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	jpeg_create_decompress(&cinfo);
 	be_jpeg_stdio_src(&cinfo, in);
 
+	jpeg_save_markers(&cinfo, MARKER_EXIF, 131072);
+		// make sure the EXIF tag is stored
+
 	// Read info about image
 	jpeg_read_header(&cinfo, TRUE);
 
+	BMessage exif;
+
+	if (ioExtension != NULL) {
+		// add EXIF data to message, if any
+		jpeg_marker_struct* marker = cinfo.marker_list;
+		while (marker != NULL) {
+			if (marker->marker == MARKER_EXIF
+				&& !strncmp((char*)marker->data, "Exif", 4)) {
+				// Strip EXIF header from TIFF data
+				ioExtension->AddData("exif", B_RAW_TYPE,
+					(uint8 *)marker->data + 6, marker->data_length - 6);
+
+				BMemoryIO io(marker->data + 6, marker->data_length - 6);
+				convert_exif_to_message(io, exif);
+			}
+			marker = marker->next;
+		}
+	}
+
 	// Default color info
-	color_space out_color_space = B_RGB32;
-	int out_color_components = 4;
+	color_space outColorSpace = B_RGB32;
+	int outColorComponents = 4;
 
 	// Function pointer to convert function
 	// It will point to proper function if needed
-	void (*converter)(uchar *inscanline, uchar *outscanline, int inrow_bytes) = convert_from_24_to_32;
+	void (*converter)(uchar *inScanLine, uchar *outScanLine,
+		int inRowBytes) = convert_from_24_to_32;
 
 	// If color space isn't rgb
 	if (cinfo.out_color_space != JCS_RGB) {
@@ -1342,8 +1375,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 				// Check if user wants to read only as RGB32 or not
 				if (!settings.Always_B_RGB32) {
 					// Grayscale
-					out_color_space = B_GRAY8;
-					out_color_components = 1;
+					outColorSpace = B_GRAY8;
+					outColorComponents = 1;
 					converter = NULL;
 				} else {
 					// RGB
@@ -1376,12 +1409,21 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	// Initialize decompression
 	jpeg_start_decompress(&cinfo);
 
-	// !!! Initialize this bounds rect to the size of your image
-	BRect bounds(0, 0, cinfo.output_width-1, cinfo.output_height-1);
+	int32 orientation;
+	if (exif.FindInt32("Orientation", &orientation) != B_OK)
+		orientation = 1;
+
+	// Initialize this bounds rect to the size of your image
+	BRect bounds(0, 0, cinfo.output_width - 1, cinfo.output_height - 1);
+	if (orientation & 4) {
+		// image is rotated
+		bounds.right = cinfo.output_height - 1;
+		bounds.bottom = cinfo.output_width - 1;
+	}
 
 	// Bytes count in one line of image (scanline)
-	int64 row_bytes = cinfo.output_width * out_color_components;
-	
+	int64 rowBytes = cinfo.output_width * outColorComponents;
+
 	// Fill out the B_TRANSLATOR_BITMAP's header
 	TranslatorBitmap header;
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_TRANSLATOR_BITMAP);
@@ -1389,9 +1431,9 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	header.bounds.top = B_HOST_TO_BENDIAN_FLOAT(bounds.top);
 	header.bounds.right = B_HOST_TO_BENDIAN_FLOAT(bounds.right);
 	header.bounds.bottom = B_HOST_TO_BENDIAN_FLOAT(bounds.bottom);
-	header.colors = (color_space)B_HOST_TO_BENDIAN_INT32(out_color_space);
-	header.rowBytes = B_HOST_TO_BENDIAN_INT32(row_bytes);
-	header.dataSize = B_HOST_TO_BENDIAN_INT32(row_bytes * cinfo.output_height);
+	header.colors = (color_space)B_HOST_TO_BENDIAN_INT32(outColorSpace);
+	header.rowBytes = B_HOST_TO_BENDIAN_INT32(rowBytes);
+	header.dataSize = B_HOST_TO_BENDIAN_INT32(rowBytes * cinfo.output_height);
 
 	// Write out the header
 	status_t err = out->Write(&header, sizeof(TranslatorBitmap));
@@ -1408,14 +1450,14 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	// Allocate scanline
 	// Use libjpeg memory allocation functions, so in case of error it will free them itself
     in_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
-    	JPOOL_PERMANENT, row_bytes);
+    	JPOOL_PERMANENT, rowBytes);
 
 	// We need 2nd scanline storage only for conversion
 	if (converter != NULL) {
 		// There will be conversion, allocate second scanline...
 		// Use libjpeg memory allocation functions, so in case of error it will free them itself
 	    out_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
-	    	JPOOL_PERMANENT, row_bytes);
+	    	JPOOL_PERMANENT, rowBytes);
 		// ... and make it the one to write to file
 		writeline = out_scanline;
 	} else
@@ -1427,11 +1469,11 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 		// Convert if needed
 		if (converter != NULL)
-			converter(in_scanline, out_scanline, row_bytes);
+			converter(in_scanline, out_scanline, rowBytes);
 
   		// Write the scanline buffer to the output stream
-		err = out->Write(writeline, row_bytes);
-		if (err < row_bytes)
+		err = out->Write(writeline, rowBytes);
+		if (err < rowBytes)
 			return err < B_OK ? Error((j_common_ptr)&cinfo, err)
 				: Error((j_common_ptr)&cinfo, B_ERROR);
 	}
@@ -1445,7 +1487,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	Frees jpeg alocated memory
 	Returns given error (B_ERROR by default)
 */
-status_t
+static status_t
 Error(j_common_ptr cinfo, status_t error)
 {
 	jpeg_destroy(cinfo);
