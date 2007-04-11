@@ -16,92 +16,24 @@ class NetBufferModuleGetter {
 		static net_buffer_module_info *Get() { return gBufferModule; }
 };
 
-//! A class to retrieve and remove a header from a buffer
-template<typename Type, typename Module = NetBufferModuleGetter > class NetBufferHeader {
+//! A class to access a field safely across node boundaries
+template<typename Type, int Offset, typename Module = NetBufferModuleGetter>
+class NetBufferFieldReader {
 	public:
-		NetBufferHeader(net_buffer *buffer)
+		NetBufferFieldReader(net_buffer *buffer)
 			:
-			fBuffer(buffer)
+			fBuffer(buffer),
+			fStatus(B_BAD_VALUE)
 		{
-		}
-
-		~NetBufferHeader()
-		{
-			Remove();
-		}
-
-		status_t
-		Status()
-		{
-			return fBuffer->size < sizeof(Type) ? B_BAD_VALUE : B_OK;
-		}
-
-		status_t
-		SetTo(net_buffer *buffer)
-		{
-			fBuffer = buffer;
-			return Status();
-		}
-
-		Type &
-		Data()
-		{
-			Type *data;
-			if (Module::Get()->direct_access(fBuffer, 0, sizeof(Type),
-					(void **)&data) == B_OK)
-				return *data;
-
-			Module::Get()->read(fBuffer, 0, &fDataBuffer, sizeof(Type));
-			return fDataBuffer;
-		}
-
-		void
-		Remove()
-		{
-			Remove(sizeof(Type));
-		}
-
-		void
-		Remove(size_t bytes)
-		{
-			if (fBuffer != NULL) {
-				Module::Get()->remove_header(fBuffer, bytes);
-				fBuffer = NULL;
+			if ((Offset + sizeof(Type)) <= buffer->size) {
+				fStatus = Module::Get()->direct_access(fBuffer, Offset,
+					sizeof(Type), (void **)&fData);
+				if (fStatus != B_OK) {
+					fData = NULL;
+					fStatus = Module::Get()->read(fBuffer, Offset,
+						&fDataBuffer, sizeof(Type));
+				}
 			}
-		}
-
-		void
-		Detach()
-		{
-			fBuffer = NULL;
-		}
-
-	private:
-		net_buffer	*fBuffer;
-		Type		fDataBuffer;
-};
-
-//! A class to access a header safely across data node boundaries
-template<typename Type, typename Module = NetBufferModuleGetter>
-class NetBufferSafeHeader {
-	public:
-		NetBufferSafeHeader(net_buffer *buffer)
-			:
-			fBuffer(buffer)
-		{
-			fStatus = Module::Get()->direct_access(fBuffer, 0,
-				sizeof(Type), (void **)&fData);
-			if (fStatus != B_OK) {
-				fData = NULL;
-				fStatus = Module::Get()->read(fBuffer, 0, &fDataBuffer,
-					sizeof(Type));
-			}
-		}
-
-		~NetBufferSafeHeader()
-		{
-			if (fBuffer != NULL)
-				Detach();
 		}
 
 		status_t
@@ -119,16 +51,33 @@ class NetBufferSafeHeader {
 			return fDataBuffer;
 		}
 
-		void
-		Detach()
+		Type *
+		operator->()
 		{
+			return &Data();
+		}
+
+		Type &
+		operator*()
+		{
+			return Data();
+		}
+
+		void
+		Sync()
+		{
+			if (fBuffer == NULL)
+				return;
+
 			if (fData == NULL)
-				Module::Get()->write(fBuffer, 0, &fDataBuffer, sizeof(Type));
+				Module::Get()->write(fBuffer, Offset, &fDataBuffer,
+					sizeof(Type));
+
 			fBuffer = NULL;
 		}
 
 	protected:
-		NetBufferSafeHeader() {}
+		NetBufferFieldReader() {}
 
 		net_buffer	*fBuffer;
 		status_t	fStatus;
@@ -136,9 +85,58 @@ class NetBufferSafeHeader {
 		Type		fDataBuffer;
 };
 
+template<typename Type, int Offset, typename Module = NetBufferModuleGetter>
+class NetBufferField : public NetBufferFieldReader<Type, Offset, Module> {
+	public:
+		NetBufferField(net_buffer *buffer)
+			: NetBufferFieldReader<Type, Offset, Module>(buffer)
+		{}
+
+		~NetBufferField()
+		{
+			Sync();
+		}
+};
+
+template<typename Type, typename Module = NetBufferModuleGetter>
+class NetBufferHeaderReader : public NetBufferFieldReader<Type, 0, Module> {
+	public:
+		NetBufferHeaderReader(net_buffer *buffer)
+			: NetBufferFieldReader<Type, 0, Module>(buffer)
+		{}
+
+		void
+		Remove()
+		{
+			Remove(sizeof(Type));
+		}
+
+		void
+		Remove(size_t bytes)
+		{
+			if (fBuffer != NULL) {
+				Module::Get()->remove_header(fBuffer, bytes);
+				fBuffer = NULL;
+			}
+		}
+};
+
+template<typename Type, typename Module = NetBufferModuleGetter>
+class NetBufferHeaderRemover : public NetBufferHeaderReader<Type, Module> {
+	public:
+		NetBufferHeaderRemover(net_buffer *buffer)
+			: NetBufferHeaderReader<Type, Module>(buffer)
+		{}
+
+		~NetBufferHeaderRemover()
+		{
+			Remove();
+		}
+};
+
 //! A class to add a header to a buffer
 template<typename Type, typename Module = NetBufferModuleGetter>
-class NetBufferPrepend : public NetBufferSafeHeader<Type, Module> {
+class NetBufferPrepend : public NetBufferFieldReader<Type, 0, Module> {
 	public:
 		NetBufferPrepend(net_buffer *buffer, size_t size = 0)
 		{
@@ -149,6 +147,11 @@ class NetBufferPrepend : public NetBufferSafeHeader<Type, Module> {
 				size = sizeof(Type);
 
 			fStatus = Module::Get()->prepend_size(buffer, size, (void **)&fData);
+		}
+
+		~NetBufferPrepend()
+		{
+			Sync();
 		}
 };
 

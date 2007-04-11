@@ -48,6 +48,8 @@ struct icmp_header {
 	};
 };
 
+typedef NetBufferField<uint16, offsetof(icmp_header, checksum)> ICMPChecksumField;
+
 #define ICMP_TYPE_ECHO_REPLY	0
 #define ICMP_TYPE_UNREACH		3
 #define ICMP_TYPE_REDIRECT		5
@@ -211,13 +213,11 @@ icmp_receive_data(net_buffer *buffer)
 {
 	TRACE(("ICMP received some data, buffer length %lu\n", buffer->size));
 
-	NetBufferHeader<icmp_header> bufferHeader(buffer);
+	NetBufferHeaderReader<icmp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
 	icmp_header &header = bufferHeader.Data();
-	bufferHeader.Detach();
-		// the pointer stays valid after this
 
 	TRACE(("  got type %u, code %u, checksum %u\n", header.type, header.code,
 		ntohs(header.checksum)));
@@ -249,19 +249,18 @@ icmp_receive_data(net_buffer *buffer)
 			memcpy(&reply->destination, &buffer->source, buffer->source.ss_len);
 
 			// There already is an ICMP header, and we'll reuse it
-			icmp_header *header;
-			status_t status = gBufferModule->direct_access(reply,
-				0, sizeof(icmp_header), (void **)&header);
-			if (status == B_OK) {
-				header->type = ICMP_TYPE_ECHO_REPLY;
-				header->code = 0;
-				header->checksum = 0;
-				header->checksum = gBufferModule->checksum(reply, 0, reply->size, true);
-			}
+			NetBufferHeaderReader<icmp_header> header(reply);
 
-			if (status == B_OK)
-				status = domain->module->send_data(NULL, reply);
+			header->type = ICMP_TYPE_ECHO_REPLY;
+			header->code = 0;
+			header->checksum = 0;
 
+			header.Sync();
+
+			ICMPChecksumField checksum(reply);
+			*checksum = gBufferModule->checksum(reply, 0, reply->size, true);
+
+			status_t status = domain->module->send_data(NULL, reply);
 			if (status < B_OK) {
 				gBufferModule->free(reply);
 				return status;

@@ -74,6 +74,8 @@ struct ipv4_header {
 typedef DoublyLinkedList<struct net_buffer,
 	DoublyLinkedListCLink<struct net_buffer> > FragmentList;
 
+typedef NetBufferField<uint16, offsetof(ipv4_header, checksum)> IPChecksumField;
+
 struct ipv4_packet_key {
 	in_addr_t	source;
 	in_addr_t	destination;
@@ -560,14 +562,11 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	TRACE(("ipv4 needs to fragment (size %lu, MTU %lu)...\n",
 		buffer->size, mtu));
 
-	NetBufferHeader<ipv4_header> bufferHeader(buffer);
-	if (bufferHeader.Status() < B_OK)
-		return bufferHeader.Status();
+	NetBufferHeaderReader<ipv4_header> originalHeader(buffer);
+	if (originalHeader.Status() < B_OK)
+		return originalHeader.Status();
 
-	ipv4_header *header = &bufferHeader.Data();
-	bufferHeader.Detach();
-
-	uint16 headerLength = header->HeaderLength();
+	uint16 headerLength = originalHeader->HeaderLength();
 	uint32 bytesLeft = buffer->size - headerLength;
 	uint32 fragmentOffset = 0;
 	status_t status = B_OK;
@@ -576,9 +575,10 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	if (headerBuffer == NULL)
 		return B_NO_MEMORY;
 
-	bufferHeader.SetTo(headerBuffer);
-	header = &bufferHeader.Data();
-	bufferHeader.Detach();
+	// TODO we need to make sure ipv4_header is contiguous or
+	//      use another construct.
+	NetBufferHeaderReader<ipv4_header> bufferHeader(headerBuffer);
+	ipv4_header *header = &bufferHeader.Data();
 
 	// adapt MTU to be a multiple of 8 (fragment offsets can only be specified this way)
 	mtu -= headerLength;
@@ -668,6 +668,15 @@ receiving_protocol(uint8 protocol)
 		sReceivingProtocol[protocol] = module;
 
 	return module;
+}
+
+
+static void
+update_checksum(net_buffer *buffer)
+{
+	IPChecksumField checksum(buffer);
+
+	*checksum = gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
 }
 
 
@@ -955,27 +964,27 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 		header.destination = ((sockaddr_in *)&buffer->destination)->sin_addr.s_addr;
 
-		header.checksum = gBufferModule->checksum(buffer, 0,
-			sizeof(ipv4_header), true);
-		//dump_ipv4_header(header);
-
-		bufferHeader.Detach();
+		bufferHeader.Sync();
 			// make sure the IP-header is already written to the
 			// buffer at this point
+
+		update_checksum(buffer);
+		//dump_ipv4_header(header);
+
 	} else {
 		// if IP_HDRINCL, check if the source address is set
-		NetBufferHeader<ipv4_header> bufferHeader(buffer);
-		if (bufferHeader.Status() < B_OK)
-			return bufferHeader.Status();
+		NetBufferHeaderReader<ipv4_header> header(buffer);
+		if (header.Status() < B_OK)
+			return header.Status();
 
-		ipv4_header &header = bufferHeader.Data();
-		if (header.source == 0) {
-			header.source = source.sin_addr.s_addr;
-			header.checksum = gBufferModule->checksum(buffer,
-				sizeof(ipv4_header), sizeof(ipv4_header), true);
+		if (header->source == 0) {
+			header->source = source.sin_addr.s_addr;
+			header->checksum = 0;
+
+			header.Sync();
+
+			update_checksum(buffer);
 		}
-
-		bufferHeader.Detach();
 	}
 
 	if (buffer->size > 0xffff)
@@ -1079,12 +1088,11 @@ ipv4_receive_data(net_buffer *buffer)
 {
 	TRACE(("IPv4 received a packet (%p) of %ld size!\n", buffer, buffer->size));
 
-	NetBufferHeader<ipv4_header> bufferHeader(buffer);
+	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
 	ipv4_header &header = bufferHeader.Data();
-	bufferHeader.Detach();
 	//dump_ipv4_header(header);
 
 	if (header.version != IP_VERSION)

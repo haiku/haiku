@@ -464,9 +464,10 @@ split_buffer(net_buffer *from, uint32 offset)
 
 	TRACE(("split_buffer(buffer %p -> %p, offset %ld)\n", from, buffer, offset));
 
-	if (remove_header(from, offset) == B_OK
-		&& trim_data(buffer, offset) == B_OK)
-		return buffer;
+	if (trim_data(buffer, offset) == B_OK) {
+		if (remove_header(from, offset) == B_OK)
+			return buffer;
+	}
 
 	free_buffer(buffer);
 	return NULL;

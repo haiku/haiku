@@ -39,6 +39,9 @@
 #endif
 
 
+typedef NetBufferField<uint16, offsetof(tcp_header, checksum)> TCPChecksumField;
+
+
 net_domain *gDomain;
 net_address_module_info *gAddressModule;
 net_buffer_module_info *gBufferModule;
@@ -150,7 +153,7 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 
 	// we must detach before calculating the checksum as we may
 	// not have a contiguous buffer.
-	bufferHeader.Detach();
+	bufferHeader.Sync();
 
 	if (optionsLength > 0)
 		gBufferModule->write(buffer, sizeof(tcp_header), optionsBuffer, optionsLength);
@@ -167,9 +170,8 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 		<< (uint16)htons(buffer->size)
 		<< Checksum::BufferHelper(buffer, gBufferModule);
 
-	// we are pretty sure the header is there.
-	NetBufferSafeHeader<tcp_header> headerRef(buffer);
-	headerRef.Data().checksum = checksum;
+	TCPChecksumField checksumField(buffer);
+	*checksumField = checksum;
 
 	return B_OK;
 }
@@ -507,7 +509,7 @@ tcp_receive_data(net_buffer *buffer)
 	if (gDomain == NULL && set_domain(buffer->interface) != B_OK)
 		return B_ERROR;
 
-	NetBufferHeader<tcp_header> bufferHeader(buffer);
+	NetBufferHeaderReader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 

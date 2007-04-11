@@ -440,7 +440,7 @@ UdpEndpointManager::DemuxIncomingBuffer(net_buffer *buffer)
 status_t
 UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
-	NetBufferHeader<udp_header> bufferHeader(buffer);
+	NetBufferHeaderReader<udp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 

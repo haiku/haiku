@@ -353,7 +353,7 @@ arp_receive(void *cookie, net_buffer *buffer)
 {
 	TRACE(("ARP receive\n"));
 
-	NetBufferHeader<arp_header> bufferHeader(buffer);
+	NetBufferHeaderReader<arp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
@@ -382,8 +382,6 @@ arp_receive(void *cookie, net_buffer *buffer)
 	if (header.hardware_length != ETHER_ADDRESS_LENGTH
 		|| header.protocol_length != sizeof(in_addr_t))
 		return B_BAD_DATA;
-
-	bufferHeader.Detach();
 
 	// handle packet
 

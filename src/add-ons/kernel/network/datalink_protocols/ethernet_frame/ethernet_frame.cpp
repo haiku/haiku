@@ -38,7 +38,7 @@ ethernet_deframe(net_device *device, net_buffer *buffer)
 {
 	//dprintf("asked to deframe buffer for device %s\n", device->name);
 
-	NetBufferHeader<ether_header> bufferHeader(buffer);
+	NetBufferHeaderRemover<ether_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
@@ -138,7 +138,7 @@ ethernet_frame_send_data(net_datalink_protocol *protocol,
 	else
 		memcpy(header.destination, destination.sdl_data, ETHER_ADDRESS_LENGTH);
 
-	bufferHeader.Detach();
+	bufferHeader.Sync();
 		// make sure the framing is already written to the buffer at this point
 
 	return protocol->next->module->send_data(protocol->next, buffer);
