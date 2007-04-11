@@ -15,6 +15,23 @@
 #include <string.h>
 
 
+class FreeAllocation {
+	public:
+		FreeAllocation(void* buffer)
+			:
+			fBuffer(buffer)
+		{
+		}
+
+		~FreeAllocation()
+		{
+			free(fBuffer);
+		}
+
+	private:
+		void*	fBuffer;
+};
+
 // Extensions that ShowImage supports
 const char* kDocumentCount = "/documentCount";
 const char* kDocumentIndex = "/documentIndex";
@@ -63,7 +80,6 @@ static TranSetting sDefaultSettings[] = {
 const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
 const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
-
 
 
 //	#pragma mark -
@@ -140,9 +156,6 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 }
 
 
-bigtime_t gStart;
-
-
 /*static*/ void
 RAWTranslator::_ProgressMonitor(const char* message, float percentage,
 	void* data)
@@ -153,19 +166,6 @@ RAWTranslator::_ProgressMonitor(const char* message, float percentage,
 	update.AddString("message", message);
 	update.AddFloat("percent", percentage);
 	update.AddInt64("time", system_time());
-
-#if 1
-	static bigtime_t last;
-	static int32 lastHash;
-	int32 hash = *(int32*)message;
-
-	if (system_time() - last > 500000 || hash != lastHash) {
-		printf("%6.3fs: %3.1f%% %s\n",
-			(system_time() - gStart) / 1000000.0, percentage, message);
-		last = system_time();
-		lastHash = hash;
-	}
-#endif
 
 	messenger.SendMessage(&update);
 }
@@ -200,8 +200,6 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	size_t bufferSize;
 	status_t status;
 
-	gStart = system_time();
-
 	try {
 		status = raw.Identify();
 
@@ -211,7 +209,7 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 				imageIndex--;
 			else
 				imageIndex = 0;
-	
+
 			if (imageIndex < 0 || imageIndex >= (int32)raw.CountImages())
 				status = B_BAD_VALUE;
 		}
@@ -224,7 +222,8 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	if (status < B_OK)
 		return B_NO_TRANSLATOR;
 
-	printf("TOTAL: %6.3fs\n", (system_time() - gStart) / 1000000.0);
+	FreeAllocation _(buffer);
+		// frees the buffer on destruction
 
 	image_meta_info meta;
 	raw.GetMetaInfo(meta);

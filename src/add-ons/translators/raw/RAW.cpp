@@ -118,6 +118,7 @@ DCRaw::DCRaw(BPositionIO& stream)
 	fThumbIndex(-1),
 	fDNGVersion(0),
 	fIsTIFF(false),
+	fImageData(NULL),
 	fThreshold(0),
 	fHalfSize(false),
 	fUseCameraWhiteBalance(true),
@@ -170,7 +171,9 @@ DCRaw::~DCRaw()
 	delete[] fCurve;
 
 	delete[] cbrt;
+
 	free(fHistogram);
+	free(fImageData);
 }
 
 
@@ -3328,8 +3331,11 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	}
 
 	outputBuffer = (uint8*)malloc(bufferSize);
-	if (outputBuffer == NULL)
+	if (outputBuffer == NULL) {
+		free(fImageData);
+		fImageData = NULL;
 		throw (status_t)B_NO_MEMORY;
+	}
 
 	fRead.Seek(image.data_offset, SEEK_SET);
 
@@ -3371,6 +3377,9 @@ DCRaw::ReadImageAt(uint32 index, uint8*& outputBuffer, size_t& bufferSize)
 	} else {
 		_WriteJPEG(image, outputBuffer);
 	}
+
+	free(fImageData);
+	fImageData = NULL;
 
 	return B_OK;
 }
