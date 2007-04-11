@@ -23,6 +23,10 @@
 #include "IconRenderer.h"
 #include "FlatIconImporter.h"
 
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#	define B_MINI_ICON_TYPE		'MICN'
+#	define B_LARGE_ICON_TYPE	'ICON'
+#endif
 
 using namespace BPrivate::Icon;
 using std::nothrow;
@@ -72,8 +76,12 @@ BIconUtils::GetIcon(BNode* node,
 							   size, result);
 			if (ret < B_OK) {
 				// try to fallback to vector icon
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 				BBitmap temp(result->Bounds(),
 							 B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+#else
+				BBitmap temp(result->Bounds(), B_RGBA32);
+#endif
 				ret = temp.InitCheck();
 				if (ret < B_OK)
 					break;
