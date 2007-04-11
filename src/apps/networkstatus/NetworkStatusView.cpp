@@ -403,7 +403,7 @@ NetworkStatusView::_DetermineInterfaceStatus(const char* name)
 
 	if (flags & IFF_CONFIGURING)
 		status = kStatusConnecting;
-	else if (flags & (IFF_UP | IFF_LINK) == IFF_UP | IFF_LINK)
+	else if ((flags & (IFF_UP | IFF_LINK)) == (IFF_UP | IFF_LINK))
 		status = kStatusReady;
 
 	return status;
