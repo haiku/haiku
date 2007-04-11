@@ -52,6 +52,10 @@ class SettingsView : public BBox {
 		BSlider		*fClickSpeedSlider, *fMouseSpeedSlider, *fAccelerationSlider;
 
 		BBitmap 	*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
+
+		BRect 		fLeftArea, fRightArea;
+		BPoint		fLeft, fRight;
+		BPoint		fDoubleClickBmpPoint, fSpeedBmpPoint, fAccelerationBmpPoint;
 };
 
 #endif	/* SETTINGS_VIEW_H */

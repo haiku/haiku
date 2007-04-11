@@ -71,16 +71,55 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	fTypeMenu->AddItem(new BMenuItem("3-Button", new BMessage(kMsgMouseType)));
 
 	BMenuField *field = new BMenuField(BRect(7, 8, 155, 190), "mouse_type", "Mouse type:", fTypeMenu);
-	field->ResizeToPreferred();
+	field->SetDivider(field->StringWidth(field->Label()) + kItemSpace);
 	field->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(field);
 
-	fMouseView = new MouseView(BRect(7, 28, 155, 190), fSettings);
-	fMouseView->ResizeToPreferred();
-	fMouseView->MoveBy((142 - fMouseView->Bounds().Width()) / 2,
-		(108 - fMouseView->Bounds().Height()) / 2);
-	AddChild(fMouseView);
+	BFont font = be_plain_font;
+	float length = font.StringWidth("Mouse type: [3-Button]") + 20;
+	fLeftArea.Set(8, 7, length + 8, 198);
+	if (fLeftArea.Width() < 125)
+		fLeftArea.right = fLeftArea.left + 125;
 
+	fRightArea.Set(fLeftArea.right + 10, 11, 200, 7);
+
+	// Create the "Double-click speed slider...
+	fClickSpeedSlider = new BSlider(fRightArea, "double_click_speed", "Double-click speed", 
+		new BMessage(kMsgDoubleClickSpeed), 0, 1000);
+	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fClickSpeedSlider->SetHashMarkCount(5);
+	fClickSpeedSlider->SetLimitLabels("Slow", "Fast");
+	AddChild(fClickSpeedSlider);
+
+	length = fClickSpeedSlider->Bounds().Height() + 6;
+	fDoubleClickBmpPoint.y = fRightArea.top + 
+		(length - fDoubleClickBitmap->Bounds().Height()) / 2;
+	fRightArea.top += length;
+
+	// Create the "Mouse Speed" slider...
+	fMouseSpeedSlider = new BSlider(fRightArea, "mouse_speed", "Mouse Speed", 
+		new BMessage(kMsgMouseSpeed), 0, 1000);
+	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fMouseSpeedSlider->SetHashMarkCount(7);
+	fMouseSpeedSlider->SetLimitLabels("Slow", "Fast");
+	AddChild(fMouseSpeedSlider);
+
+	fSpeedBmpPoint.y = fRightArea.top + 
+		(length - fSpeedBitmap->Bounds().Height()) / 2;
+	fRightArea.top += length;
+
+	// Create the "Mouse Acceleration" slider...
+	fAccelerationSlider = new BSlider(fRightArea, "mouse_acceleration", "Mouse Acceleration", 
+		new BMessage(kMsgAccelerationFactor), 0, 1000);
+	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fAccelerationSlider->SetHashMarkCount(5);
+	fAccelerationSlider->SetLimitLabels("Slow", "Fast");
+	AddChild(fAccelerationSlider);
+
+	fAccelerationBmpPoint.y = fRightArea.top + 
+		(length - fAccelerationBitmap->Bounds().Height()) / 2;
+	fRightArea.top += length - 3;
+	
 	// Add the "Focus follows mouse" pop up menu
 	fFocusMenu = new BPopUpMenu("Disabled");
 	
@@ -95,48 +134,52 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 		fFocusMenu->AddItem(new BMenuItem(focusLabels[i], message));
 	}
 
-	BRect frame(165, 208, 440, 200);
-	field = new BMenuField(frame, "ffm", "Focus follows mouse:", fFocusMenu);
+	BRect frame(fRightArea.left, fRightArea.top + 10, fRightArea.left +
+			font.StringWidth("Focus follows mouse:") + 
+			font.StringWidth(focusLabels[0]) + 30, 200);
+	field = new BMenuField(frame, "ffm", "Focus follows mouse:", fFocusMenu, true);
 	field->SetDivider(field->StringWidth(field->Label()) + kItemSpace);
 	field->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(field);
 
-	// Create the "Double-click speed slider...
-	frame.Set(166, 11, 328, 50);
-	fClickSpeedSlider = new BSlider(frame, "double_click_speed", "Double-click speed", 
-		new BMessage(kMsgDoubleClickSpeed), 0, 1000);
-	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fClickSpeedSlider->SetHashMarkCount(5);
-	fClickSpeedSlider->SetLimitLabels("Slow", "Fast");
-	AddChild(fClickSpeedSlider);
+	// Finalize the areas
+	fRightArea.bottom = fRightArea.top;
+	fRightArea.top = 11;
+	fRightArea.right = frame.right + 8;
+	if (fRightArea.Width() < 200)
+		fRightArea.right = fRightArea.left + 200;
+	fLeftArea.bottom = fRightArea.bottom;
 
-	// Create the "Mouse Speed" slider...
-	frame.Set(166,76,328,125);
-	fMouseSpeedSlider = new BSlider(frame, "mouse_speed", "Mouse Speed", 
-		new BMessage(kMsgMouseSpeed), 0, 1000);
-	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fMouseSpeedSlider->SetHashMarkCount(7);
-	fMouseSpeedSlider->SetLimitLabels("Slow", "Fast");
-	AddChild(fMouseSpeedSlider);
+	// Position mouse bitmaps
+	fDoubleClickBmpPoint.x = fRightArea.right - fDoubleClickBitmap->Bounds().right - 15; 
+	fSpeedBmpPoint.x = fRightArea.right - fSpeedBitmap->Bounds().right - 15;
+	fAccelerationBmpPoint.x = fRightArea.right - fAccelerationBitmap->Bounds().right - 15;
 
-	// Create the "Mouse Acceleration" slider...
-	frame.Set(166, 141, 328, 190);
-	fAccelerationSlider = new BSlider(frame, "mouse_acceleration", "Mouse Acceleration", 
-		new BMessage(kMsgAccelerationFactor), 0, 1000);
-	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fAccelerationSlider->SetHashMarkCount(5);
-	fAccelerationSlider->SetLimitLabels("Slow", "Fast");
-	AddChild(fAccelerationSlider);
+	// Resize sliders to equal size
+	length = fRightArea.left - 5;
+	fClickSpeedSlider->ResizeTo(fDoubleClickBmpPoint.x - length - 11, 
+			fClickSpeedSlider->Bounds().Height());
+	fMouseSpeedSlider->ResizeTo(fSpeedBmpPoint.x - length, 
+			fMouseSpeedSlider->Bounds().Height());
+	fAccelerationSlider->ResizeTo(fAccelerationBmpPoint.x - length, 
+			fAccelerationSlider->Bounds().Height());
+
+	// Mouse image...
+	frame.Set(0, 0, 148, 162);
+	fMouseView = new MouseView(frame, fSettings);
+	fMouseView->ResizeToPreferred();
+	fMouseView->MoveBy((fLeftArea.right - fMouseView->Bounds().Width()) / 2,
+		(fLeftArea.bottom - fMouseView->Bounds().Height()) / 2);
+	AddChild(fMouseView);
 
 	// Create the "Double-click test area" text box...
-	frame = Bounds();
-	frame.left = frame.left + 9;
-	frame.right = frame.right - 230;
-	frame.top = frame.bottom - 30;
+	frame.Set(fLeftArea.left, fLeftArea.bottom + 10, fLeftArea.right, 0);
 	BTextControl *textControl = new BTextControl(frame, "double_click_test_area", NULL,
 		"Double-click test area", NULL);
 	textControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 	AddChild(textControl);
+
+	ResizeTo(fRightArea.right + 5, fLeftArea.bottom + 60);
 }
 
 
@@ -158,11 +201,10 @@ SettingsView::AttachedToWindow()
 void 
 SettingsView::GetPreferredSize(float *_width, float *_height)
 {
-	// ToDo: fixed values for now
 	if (_width)
-		*_width = 397 - 22;
+		*_width = fRightArea.right + 5;
 	if (_height)
-		*_height = 293 - 55;
+		*_height = fLeftArea.bottom + 60;
 }
 
 
@@ -173,36 +215,47 @@ SettingsView::Draw(BRect updateFrame)
 
 	SetHighColor(120, 120, 120);
 	SetLowColor(255, 255, 255);
+	
 	// Line above the test area
-	StrokeLine(BPoint(8, 198), BPoint(149, 198), B_SOLID_HIGH);
-	StrokeLine(BPoint(8, 199), BPoint(149, 199), B_SOLID_LOW);
+	fLeft = fLeftArea.LeftBottom();
+	fRight = fLeftArea.RightBottom();
+	StrokeLine(fLeft, fRight, B_SOLID_HIGH);
+	fLeft.y++; fRight.y++;
+	StrokeLine(fLeft, fRight, B_SOLID_LOW);
+	
 	// Line above focus follows mouse
-	StrokeLine(BPoint(164, 198), BPoint(367, 198), B_SOLID_HIGH);
-	StrokeLine(BPoint(164, 199), BPoint(367, 199), B_SOLID_LOW);
+	fLeft = fRightArea.LeftBottom();
+	fRight = fRightArea.RightBottom();
+	StrokeLine(fLeft, fRight, B_SOLID_HIGH);
+	fLeft.y++; fRight.y++;
+	StrokeLine(fLeft, fRight, B_SOLID_LOW);
+	
 	// Line in the middle
-	StrokeLine(BPoint(156, 10), BPoint(156, 230), B_SOLID_HIGH);
-	StrokeLine(BPoint(157, 11), BPoint(157, 230), B_SOLID_LOW);
+	fLeft = fLeftArea.RightTop();
+	fRight = fLeftArea.RightBottom();
+	fLeft.x += 5;
+	fRight.x += 5;
+	StrokeLine(fLeft, fRight, B_SOLID_HIGH);
+	fLeft.x++; fRight.x++;
+	StrokeLine(fLeft, fRight, B_SOLID_LOW);
 
 	SetDrawingMode(B_OP_OVER);
 
 	// Draw the icons
-	BPoint doubleClickBmpPoint(344, 16);
 	if (fDoubleClickBitmap != NULL 
-		&& updateFrame.Intersects(BRect(doubleClickBmpPoint,
-			doubleClickBmpPoint + fDoubleClickBitmap->Bounds().RightBottom())))
-		DrawBitmapAsync(fDoubleClickBitmap, doubleClickBmpPoint);
+		&& updateFrame.Intersects(BRect(fDoubleClickBmpPoint,
+			fDoubleClickBmpPoint + fDoubleClickBitmap->Bounds().RightBottom())))
+		DrawBitmapAsync(fDoubleClickBitmap, fDoubleClickBmpPoint);
 
-	BPoint speedBmpPoint(333, 90);
 	if (fSpeedBitmap != NULL 
-		&& updateFrame.Intersects(BRect(speedBmpPoint,
-			speedBmpPoint + fSpeedBitmap->Bounds().RightBottom())))
-		DrawBitmapAsync(fSpeedBitmap, speedBmpPoint);
+		&& updateFrame.Intersects(BRect(fSpeedBmpPoint,
+			fSpeedBmpPoint + fSpeedBitmap->Bounds().RightBottom())))
+		DrawBitmapAsync(fSpeedBitmap, fSpeedBmpPoint);
 	
-	BPoint accelerationBmpPoint(333, 155);
 	if (fAccelerationBitmap != NULL 
-		&& updateFrame.Intersects(BRect(accelerationBmpPoint,
-			accelerationBmpPoint + fAccelerationBitmap->Bounds().RightBottom())))
-		DrawBitmapAsync(fAccelerationBitmap, accelerationBmpPoint);
+		&& updateFrame.Intersects(BRect(fAccelerationBmpPoint,
+			fAccelerationBmpPoint + fAccelerationBitmap->Bounds().RightBottom())))
+		DrawBitmapAsync(fAccelerationBitmap, fAccelerationBmpPoint);
 	
 
 	SetDrawingMode(B_OP_COPY);

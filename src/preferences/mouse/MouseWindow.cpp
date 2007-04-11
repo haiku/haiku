@@ -56,6 +56,7 @@ MouseWindow::MouseWindow(BRect _rect)
 	rect.OffsetBy(button->Bounds().Width() + kItemSpace, 0);
 	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
+	fRevertButton->ResizeToPreferred();
 	view->AddChild(fRevertButton);
 
 	SetPulseRate(100000);
@@ -72,10 +73,15 @@ MouseWindow::MouseWindow(BRect _rect)
 	rect.bottom -= 20;
 
 	BPoint position = fSettings.WindowPosition();
-	if (!rect.Contains(position)) {
+	if (!rect.Contains(BRect(position, 
+					Bounds().OffsetBySelf(position).RightBottom()))) {
 		// center window on screen as it doesn't fit on the saved position
 		position.x = (rect.Width() - Bounds().Width()) / 2;
 		position.y = (rect.Height() - Bounds().Height()) / 2;
+		if (position.x < 0)
+			position.x = 0;
+		if (position.y < 0)
+			position.y = 15;
 	}
 	MoveTo(position);
 }
