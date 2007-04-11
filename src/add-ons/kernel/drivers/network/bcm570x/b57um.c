@@ -303,11 +303,12 @@ init_driver(void)
 
 	while (pci->get_nth_pci_info(i++, &dev_info) == 0) {
 		is_detected = 0;
-		for (j = 0; bcm5700_pci_tbl[j].vendor != 0; j++) {
-			if ((dev_info.class_base == PCI_network) && (dev_info.class_sub == PCI_ethernet)
-				&& (dev_info.vendor_id == bcm5700_pci_tbl[j].vendor) && (dev_info.device_id == bcm5700_pci_tbl[j].device)) {
-				is_detected = 1;
-				break;
+		if ((dev_info.class_base == PCI_network) && (dev_info.class_sub == PCI_ethernet)) {
+			for (j = 0; bcm5700_pci_tbl[j].vendor != 0; j++) {
+				if ((dev_info.vendor_id == bcm5700_pci_tbl[j].vendor) && (dev_info.device_id == bcm5700_pci_tbl[j].device)) {
+					is_detected = 1;
+					break;
+				}
 			}
 		}
 
