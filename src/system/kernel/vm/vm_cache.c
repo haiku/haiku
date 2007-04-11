@@ -539,10 +539,12 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 					vm_cache_remove_page(cacheRef, page);
 					vm_cache_insert_page(consumerRef, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
+#if 0
 				} else if (consumerPage->state != PAGE_STATE_BUSY
 					&& (page->mappings != 0 || page->wired_count != 0)) {
 					panic("page %p has still mappings (consumer cache %p)!",
 						page, consumerRef);
+#endif
 				}
 			}
 
