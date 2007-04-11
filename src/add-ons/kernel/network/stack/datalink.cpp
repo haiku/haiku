@@ -749,6 +749,7 @@ net_datalink_module_info gNetDatalinkModule = {
 	add_route,
 	remove_route,
 	get_route,
+	get_buffer_route,
 	put_route,
 	register_route_info,
 	unregister_route_info,

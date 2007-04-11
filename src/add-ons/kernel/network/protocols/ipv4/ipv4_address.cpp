@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -251,24 +251,35 @@ ipv4_check_mask(const sockaddr *_mask)
 	\return B_NO_MEMORY if the buffer could not be allocated
 */
 static status_t
-ipv4_print_address(const sockaddr *address, char **_buffer, bool printPort)
+ipv4_print_address(const sockaddr *_address, char **_buffer, bool printPort)
 {
+	const sockaddr_in *address = (const sockaddr_in *)_address;
+
 	if (_buffer == NULL)
 		return B_BAD_VALUE;
 
-	int bufLen = printPort ? 15 : 9;
-	char *buffer  = (char *)malloc(bufLen);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
+	char tmp[64];
 
 	if (address == NULL)
-		strcpy(buffer, "<none>");
-	else if (printPort) {
-		sprintf(buffer, "%08lx:%u", ntohl(((sockaddr_in *)address)->sin_addr.s_addr),
-			ntohs(((sockaddr_in *)address)->sin_port));
-	} else
-		sprintf(buffer, "%08lx", ntohl(((sockaddr_in *)address)->sin_addr.s_addr));
-	*_buffer = buffer;
+		strcpy(tmp, "<none>");
+	else {
+		unsigned int addr = ntohl(address->sin_addr.s_addr);
+
+		if (printPort)
+			sprintf(tmp, "%u.%u.%u.%u:%u", (addr >> 24) & 0xff,
+				(addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff,
+				ntohs(address->sin_port));
+		else
+			sprintf(tmp, "%u.%u.%u.%u", (addr >> 24) & 0xff,
+				(addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff);
+	}
+
+	*_buffer = strdup(tmp);
+	if (*_buffer == NULL)
+		return B_NO_MEMORY;
+
+
+
 	return B_OK;
 }
 
@@ -320,6 +331,31 @@ ipv4_set_to(sockaddr *address, const sockaddr *from)
 
 	memcpy(address, from, sizeof(sockaddr_in));
 	address->sa_len = sizeof(sockaddr_in);
+	return B_OK;
+}
+
+
+static status_t
+ipv4_update_to(sockaddr *_address, const sockaddr *_from)
+{
+	sockaddr_in *address = (sockaddr_in *)_address;
+	const sockaddr_in *from = (const sockaddr_in *)_from;
+
+	if (address == NULL || from == NULL)
+		return B_BAD_VALUE;
+
+	if (from->sin_family != AF_INET)
+		return B_BAD_VALUE;
+
+	address->sin_family = AF_INET;
+	address->sin_len = sizeof(sockaddr_in);
+
+	if (address->sin_port == 0)
+		address->sin_port = from->sin_port;
+
+	if (address->sin_addr.s_addr == INADDR_ANY)
+		address->sin_addr.s_addr = from->sin_addr.s_addr;
+
 	return B_OK;
 }
 
@@ -394,6 +430,7 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_set_port,
 	ipv4_set_to,
 	ipv4_set_to_empty_address,
+	ipv4_update_to,
 	ipv4_hash_address_pair,
 	ipv4_checksum_address,
 	NULL // ipv4_matches_broadcast_address,

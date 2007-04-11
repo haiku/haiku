@@ -671,15 +671,6 @@ receiving_protocol(uint8 protocol)
 }
 
 
-static void
-update_checksum(net_buffer *buffer)
-{
-	IPChecksumField checksum(buffer);
-
-	*checksum = gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true);
-}
-
-
 //	#pragma mark -
 
 
@@ -928,49 +919,31 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	TRACE(("someone tries to send some actual routed data!\n"));
 
 	sockaddr_in &source = *(sockaddr_in *)&buffer->source;
-	if (source.sin_addr.s_addr == INADDR_ANY && route->interface->address != NULL) {
-		// replace an unbound source address with the address of the interface
-		// TODO: couldn't we replace all addresses here?
-		source.sin_addr.s_addr = ((sockaddr_in *)route->interface->address)->sin_addr.s_addr;
-	}
+	sockaddr_in &destination = *(sockaddr_in *)&buffer->destination;
 
-	bool headerIncluded = false;
+	bool headerIncluded = false, checksumNeeded = true;
 	if (protocol != NULL)
 		headerIncluded = (protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0;
 
 	// Add IP header (if needed)
 
 	if (!headerIncluded) {
-		NetBufferPrepend<ipv4_header> bufferHeader(buffer);
-		if (bufferHeader.Status() < B_OK)
-			return bufferHeader.Status();
+		NetBufferPrepend<ipv4_header> header(buffer);
+		if (header.Status() < B_OK)
+			return header.Status();
 
-		ipv4_header &header = bufferHeader.Data();
+		header->version = IP_VERSION;
+		header->header_length = sizeof(ipv4_header) / 4;
+		header->service_type = protocol ? protocol->service_type : 0;
+		header->total_length = htons(buffer->size);
+		header->id = htons(atomic_add(&sPacketID, 1));
+		header->fragment_offset = 0;
+		header->time_to_live = protocol ? protocol->time_to_live : 254;
+		header->protocol = protocol ? protocol->socket->protocol : buffer->protocol;
+		header->checksum = 0;
 
-		header.version = IP_VERSION;
-		header.header_length = sizeof(ipv4_header) >> 2;
-		header.service_type = protocol ? protocol->service_type : 0;
-		header.total_length = htons(buffer->size);
-		header.id = htons(atomic_add(&sPacketID, 1));
-		header.fragment_offset = 0;
-		header.time_to_live = protocol ? protocol->time_to_live : 254;
-		header.protocol = protocol ? protocol->socket->protocol : buffer->protocol;
-		header.checksum = 0;
-		if (route->interface->address != NULL) {
-			header.source = ((sockaddr_in *)route->interface->address)->sin_addr.s_addr;
-				// always use the actual used source address
-		} else
-			header.source = 0;
-
-		header.destination = ((sockaddr_in *)&buffer->destination)->sin_addr.s_addr;
-
-		bufferHeader.Sync();
-			// make sure the IP-header is already written to the
-			// buffer at this point
-
-		update_checksum(buffer);
-		//dump_ipv4_header(header);
-
+		header->source = source.sin_addr.s_addr;
+		header->destination = destination.sin_addr.s_addr;
 	} else {
 		// if IP_HDRINCL, check if the source address is set
 		NetBufferHeaderReader<ipv4_header> header(buffer);
@@ -980,22 +953,24 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		if (header->source == 0) {
 			header->source = source.sin_addr.s_addr;
 			header->checksum = 0;
-
 			header.Sync();
-
-			update_checksum(buffer);
-		}
+		} else
+			checksumNeeded = false;
 	}
 
 	if (buffer->size > 0xffff)
 		return EMSGSIZE;
+
+	if (checksumNeeded)
+		*IPChecksumField(buffer) = gBufferModule->checksum(buffer, 0,
+			sizeof(ipv4_header), true);
 
 	TRACE(("header chksum: %ld, buffer checksum: %ld\n",
 		gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
 		gBufferModule->checksum(buffer, 0, buffer->size, true)));
 
 	TRACE(("destination-IP: buffer=%p addr=%p %08lx\n", buffer, &buffer->destination,
-		ntohl(((sockaddr_in *)&buffer->destination)->sin_addr.s_addr)));
+		ntohl(destination->sin_addr.s_addr)));
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
@@ -1012,14 +987,13 @@ ipv4_send_data(net_protocol *protocol, net_buffer *buffer)
 {
 	TRACE(("someone tries to send some actual data!\n"));
 
-	// find route
-	struct net_route *route = sDatalinkModule->get_route(sDomain,
-		(sockaddr *)&buffer->destination);
-	if (route == NULL)
-		return ENETUNREACH;
-
-	status_t status = ipv4_send_routed_data(protocol, route, buffer);
-	sDatalinkModule->put_route(sDomain, route);
+	net_route *route = NULL;
+	status_t status = sDatalinkModule->get_buffer_route(sDomain, buffer,
+		&route);
+	if (status >= B_OK) {
+		status = ipv4_send_routed_data(protocol, route, buffer);
+		sDatalinkModule->put_route(sDomain, route);
+	}
 
 	return status;
 }

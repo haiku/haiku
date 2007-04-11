@@ -257,8 +257,8 @@ icmp_receive_data(net_buffer *buffer)
 
 			header.Sync();
 
-			ICMPChecksumField checksum(reply);
-			*checksum = gBufferModule->checksum(reply, 0, reply->size, true);
+			*ICMPChecksumField(reply) = gBufferModule->checksum(reply, 0,
+					reply->size, true);
 
 			status_t status = domain->module->send_data(NULL, reply);
 			if (status < B_OK) {

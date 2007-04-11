@@ -22,56 +22,49 @@ class NetBufferFieldReader {
 	public:
 		NetBufferFieldReader(net_buffer *buffer)
 			:
-			fBuffer(buffer),
-			fStatus(B_BAD_VALUE)
+			fBuffer(buffer)
 		{
-			if ((Offset + sizeof(Type)) <= buffer->size) {
-				fStatus = Module::Get()->direct_access(fBuffer, Offset,
-					sizeof(Type), (void **)&fData);
-				if (fStatus != B_OK) {
-					fData = NULL;
-					fStatus = Module::Get()->read(fBuffer, Offset,
-						&fDataBuffer, sizeof(Type));
-				}
+			fStatus = Module::Get()->direct_access(fBuffer, Offset,
+				sizeof(Type), (void **)&fData);
+			if (fStatus != B_OK) {
+				fStatus = Module::Get()->read(fBuffer, Offset,
+					&fDataBuffer, sizeof(Type));
+				fData = &fDataBuffer;
 			}
 		}
 
 		status_t
-		Status()
+		Status() const
 		{
 			return fStatus;
 		}
 
 		Type &
-		Data()
+		Data() const
 		{
-			if (fData != NULL)
-				return *fData;
-
-			return fDataBuffer;
+			return *fData;
 		}
 
 		Type *
-		operator->()
+		operator->() const
 		{
-			return &Data();
+			return fData;
 		}
 
 		Type &
-		operator*()
+		operator*() const
 		{
-			return Data();
+			return *fData;
 		}
 
 		void
 		Sync()
 		{
-			if (fBuffer == NULL)
+			if (fBuffer == NULL || fStatus < B_OK)
 				return;
 
-			if (fData == NULL)
-				Module::Get()->write(fBuffer, Offset, &fDataBuffer,
-					sizeof(Type));
+			if (fData == &fDataBuffer)
+				Module::Get()->write(fBuffer, Offset, fData, sizeof(Type));
 
 			fBuffer = NULL;
 		}
@@ -138,15 +131,14 @@ class NetBufferHeaderRemover : public NetBufferHeaderReader<Type, Module> {
 template<typename Type, typename Module = NetBufferModuleGetter>
 class NetBufferPrepend : public NetBufferFieldReader<Type, 0, Module> {
 	public:
-		NetBufferPrepend(net_buffer *buffer, size_t size = 0)
+		NetBufferPrepend(net_buffer *buffer, size_t size = sizeof(Type))
 		{
 			fBuffer = buffer;
-			fData = NULL;
 
-			if (size == 0)
-				size = sizeof(Type);
-
-			fStatus = Module::Get()->prepend_size(buffer, size, (void **)&fData);
+			fStatus = Module::Get()->prepend_size(buffer, size,
+				(void **)&fData);
+			if (fStatus == B_OK && fData == NULL)
+				fData = &fDataBuffer;
 		}
 
 		~NetBufferPrepend()

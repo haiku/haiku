@@ -42,6 +42,8 @@ status_t get_route_information(struct net_domain *domain, void *buffer,
 void invalidate_routes(net_domain *, net_interface *);
 struct net_route *get_route(struct net_domain *domain,
 				const struct sockaddr *address);
+status_t get_buffer_route(struct net_domain *domain,
+	struct net_buffer *buffer, struct net_route **_route);
 void put_route(struct net_domain *domain, struct net_route *route);
 
 status_t register_route_info(struct net_domain *domain,

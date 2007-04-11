@@ -170,8 +170,7 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 		<< (uint16)htons(buffer->size)
 		<< Checksum::BufferHelper(buffer, gBufferModule);
 
-	TCPChecksumField checksumField(buffer);
-	*checksumField = checksum;
+	*TCPChecksumField(buffer) = checksum;
 
 	return B_OK;
 }

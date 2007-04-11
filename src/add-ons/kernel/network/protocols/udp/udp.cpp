@@ -47,6 +47,10 @@ struct udp_header {
 } _PACKED;
 
 
+typedef NetBufferField<uint16, offsetof(udp_header, udp_checksum)>
+	UDPChecksumField;
+
+
 class UdpEndpoint : public net_protocol {
 public:
 	UdpEndpoint(net_socket *socket);
@@ -766,43 +770,44 @@ UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 {
 	if (buffer->size > (0xffff - sizeof(udp_header)))
 		return EMSGSIZE;
-	
+
 	buffer->protocol = IPPROTO_UDP;
 
-	{	// scope for lifetime of bufferHeader
+	// add and fill UDP-specific header:
+	NetBufferPrepend<udp_header> header(buffer);
+	if (header.Status() < B_OK)
+		return header.Status();
 
-		// add and fill UDP-specific header:
-		NetBufferPrepend<udp_header> bufferHeader(buffer);
-		if (bufferHeader.Status() < B_OK)
-			return bufferHeader.Status();
-	
-		udp_header &header = bufferHeader.Data();
-	
-		header.source_port = sAddressModule->get_port((sockaddr *)&buffer->source);
-		header.destination_port = sAddressModule->get_port(
-			(sockaddr *)&buffer->destination);
-		header.udp_length = htons(buffer->size);
-			// the udp-header is already included in the buffer-size
-		header.udp_checksum = 0;
+	header->source_port = sAddressModule->get_port((sockaddr *)&buffer->source);
+	header->destination_port = sAddressModule->get_port(
+		(sockaddr *)&buffer->destination);
+	header->udp_length = htons(buffer->size);
+		// the udp-header is already included in the buffer-size
+	header->udp_checksum = 0;
 
-		// generate UDP-checksum (simulating a so-called "pseudo-header"):
-		Checksum udpChecksum;
-		sAddressModule->checksum_address(&udpChecksum, 
-			(sockaddr *)route->interface->address);
-		sAddressModule->checksum_address(&udpChecksum, 
-			(sockaddr *)&buffer->destination);
-		udpChecksum 
-			<< (uint16)htons(IPPROTO_UDP)
-			<< (uint16)htons(buffer->size)
-					// peculiar but correct: UDP-len is used twice for checksum
-					// (as it is already contained in udp_header)
-			<< Checksum::BufferHelper(buffer, gBufferModule);
-		header.udp_checksum = udpChecksum;
-		if (header.udp_checksum == 0)
-			header.udp_checksum = 0xFFFF;
-	
-		TRACE_BLOCK(((char*)&header, sizeof(udp_header), "udp-hdr: "));
-	}
+	header.Sync();
+
+	// generate UDP-checksum (simulating a so-called "pseudo-header"):
+	Checksum udpChecksum;
+	sAddressModule->checksum_address(&udpChecksum,
+		(sockaddr *)route->interface->address);
+	sAddressModule->checksum_address(&udpChecksum,
+		(sockaddr *)&buffer->destination);
+	udpChecksum
+		<< (uint16)htons(IPPROTO_UDP)
+		<< (uint16)htons(buffer->size)
+				// peculiar but correct: UDP-len is used twice for checksum
+				// (as it is already contained in udp_header)
+		<< Checksum::BufferHelper(buffer, gBufferModule);
+
+	uint16 calculatedChecksum = udpChecksum;
+	if (calculatedChecksum == 0)
+		calculatedChecksum = 0xffff;
+
+	*UDPChecksumField(buffer) = calculatedChecksum;
+
+	TRACE_BLOCK(((char*)&header, sizeof(udp_header), "udp-hdr: "));
+
 	return next->module->send_routed_data(next, route, buffer);
 }
 
@@ -966,8 +971,8 @@ udp_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
 	TRACE(("udp_send_routed_data(%p) size=%lu\n", protocol, buffer->size));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->SendData(buffer, route);
+
+	return ((UdpEndpoint *)protocol)->SendData(buffer, route);
 }
 
 
@@ -976,14 +981,14 @@ udp_send_data(net_protocol *protocol, net_buffer *buffer)
 {
 	TRACE(("udp_send_data(%p) size=%lu\n", protocol, buffer->size));
 
-	struct net_route *route = sDatalinkModule->get_route(sDomain,
-		(sockaddr *)&buffer->destination);
-	if (route == NULL)
-		return ENETUNREACH;
+	net_route *route = NULL;
+	status_t status = sDatalinkModule->get_buffer_route(sDomain, buffer,
+		&route);
+	if (status >= B_OK) {
+		status = udp_send_routed_data(protocol, route, buffer);
+		sDatalinkModule->put_route(sDomain, route);
+	}
 
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	status_t status = udpEndpoint->SendData(buffer, route);
-	sDatalinkModule->put_route(sDomain, route);
 	return status;
 }
 

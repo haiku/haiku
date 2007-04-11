@@ -79,6 +79,8 @@ struct net_datalink_module_info {
 					const struct net_route *route);
 	struct net_route *(*get_route)(struct net_domain *domain,
 					const struct sockaddr *address);
+	status_t (*get_buffer_route)(struct net_domain *domain,
+		struct net_buffer *buffer, struct net_route **_route);
 	void (*put_route)(struct net_domain *domain, struct net_route *route);
 
 	status_t (*register_route_info)(struct net_domain *domain,
@@ -117,6 +119,8 @@ struct net_address_module_info {
 
 	status_t (*set_to)(sockaddr *address, const sockaddr *from);
 	status_t (*set_to_empty_address)(sockaddr *address);
+
+	status_t (*update_to)(sockaddr *address, const sockaddr *from);
 
 	uint32 (*hash_address_pair)(const sockaddr *ourAddress, 
 					const sockaddr *peerAddress);
