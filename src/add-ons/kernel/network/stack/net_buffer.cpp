@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,6 +54,8 @@ struct data_header {
 	size_t		data_space;
 	data_node	*first_node;
 };
+
+#define MAX_FREE_BUFFER_SIZE (BUFFER_SIZE - sizeof(data_header))
 
 struct net_buffer_private : net_buffer {
 	struct list	buffers;
@@ -140,6 +142,9 @@ free_data_header_space(data_header *header, uint8 *data, size_t size)
 }
 
 
+/*!
+	Tries to allocate \a size bytes from the free space in the header.
+*/
 static uint8 *
 alloc_data_header_space(data_header *header, size_t size)
 {
@@ -184,14 +189,22 @@ alloc_data_header_space(data_header *header, size_t size)
 }
 
 
+/*!
+	Initializes the first data_node of a data_header.
+	The node must have been assigned to the header already.
+*/
 static void
-init_data_node(data_node *node, size_t headerSpace)
+init_first_data_node(data_node *node)
 {
+	data_header *header = node->header;
+
 	node->offset = 0;
-	node->start = (uint8 *)node->header + sizeof(data_header) + headerSpace;
+	node->start = header->data_end + header->data_space;
 	node->used = 0;
-	node->header_space = headerSpace;
-	node->tail_space = BUFFER_SIZE - headerSpace - sizeof(data_header);
+	node->header_space = header->data_space;
+	node->tail_space = MAX_FREE_BUFFER_SIZE - header->data_space;
+
+	header->first_node = node;
 }
 
 
@@ -201,7 +214,8 @@ add_data_node(data_header *header, data_header *located = NULL)
 	if (located == NULL)
 		located = header;
 
-	data_node *node = (data_node *)alloc_data_header_space(located, sizeof(data_node));
+	data_node *node = (data_node *)alloc_data_header_space(located,
+		sizeof(data_node));
 	if (node == NULL)
 		return NULL;
 
@@ -222,7 +236,8 @@ remove_data_node(data_node *node)
 {
 	data_header *located = node->located;
 
-	TRACE(("  remove data node %p from header %p (located %p)\n", node, node->header, located));
+	TRACE(("  remove data node %p from header %p (located %p)\n",
+		node, node->header, located));
 
 	if (located != node->header)
 		release_data_header(node->header);
@@ -260,7 +275,8 @@ get_node_at_offset(net_buffer_private *buffer, size_t offset)
 static net_buffer *
 create_buffer(size_t headerSpace)
 {
-	net_buffer_private *buffer = (net_buffer_private *)malloc(sizeof(struct net_buffer_private));
+	net_buffer_private *buffer = (net_buffer_private *)malloc(
+		sizeof(struct net_buffer_private));
 	if (buffer == NULL)
 		return NULL;
 
@@ -274,8 +290,7 @@ create_buffer(size_t headerSpace)
 
 	buffer->first_node.header = header;
 	buffer->first_node.located = NULL;
-	init_data_node(&buffer->first_node, headerSpace);
-	header->first_node = &buffer->first_node;
+	init_first_data_node(&buffer->first_node);
 
 	list_init(&buffer->buffers);
 	list_add_item(&buffer->buffers, &buffer->first_node);
@@ -365,7 +380,8 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 	TRACE(("clone_buffer(buffer %p)\n", buffer));
 
-	net_buffer_private *clone = (net_buffer_private *)malloc(sizeof(struct net_buffer_private));
+	net_buffer_private *clone = (net_buffer_private *)malloc(
+		sizeof(struct net_buffer_private));
 	if (clone == NULL)
 		return NULL;
 
@@ -636,7 +652,7 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		size_t bytesLeft = size;
 		do {
 			if (node->header_space == 0) {
-				size_t headerSpace = BUFFER_SIZE - sizeof(data_header);
+				size_t headerSpace = MAX_FREE_BUFFER_SIZE;
 				data_header *header = create_data_header(headerSpace);
 				if (header == NULL) {
 					// TODO: free up headers we already allocated!
@@ -644,11 +660,9 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 				}
 
 				data_node *previous = node;
-				node = (data_node *)add_data_node(header);
 
-				init_data_node(node, headerSpace);
-				node->header_space = header->data_space;
-				header->first_node = node;
+				node = (data_node *)add_data_node(header);
+				init_first_data_node(node);
 
 				list_insert_item_before(&buffer->buffers, previous, node);
 			}
@@ -661,10 +675,12 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 			bytesLeft -= willConsume;
 		} while (bytesLeft > 0);
 
+		// correct data offset in all nodes
+
 		size_t offset = 0;
-		for (node = (data_node *)list_get_first_item(&buffer->buffers);
-				node != NULL; node = (data_node *)
-					list_get_next_item(&buffer->buffers, node)) {
+		node = NULL;
+		while ((node = (data_node *)list_get_next_item(&buffer->buffers,
+				node)) != NULL) {
 			node->offset = offset;
 			offset += node->used;
 		}
@@ -734,7 +750,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		uint32 count = (sizeNeeded + BUFFER_SIZE - minimalHeaderSpace - 1)
 			/ (BUFFER_SIZE - minimalHeaderSpace);
 		uint32 headerSpace = BUFFER_SIZE - sizeNeeded / count - sizeof(data_header);
-		uint32 sizeUsed = BUFFER_SIZE - sizeof(data_header) - headerSpace;
+		uint32 sizeUsed = MAX_FREE_BUFFER_SIZE - headerSpace;
 		uint32 sizeAdded = tailSpace;
 
 		// allocate space left in the node
@@ -748,7 +764,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 			if (i == count - 1) {
 				// last data_header - compensate rounding errors
 				sizeUsed = size - sizeAdded;
-				headerSpace = BUFFER_SIZE - sizeof(data_header) - sizeUsed;
+				headerSpace = MAX_FREE_BUFFER_SIZE - sizeUsed;
 			}
 
 			data_header *header = create_data_header(headerSpace);
@@ -760,13 +776,11 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 			node = (data_node *)add_data_node(header);
 				// this can't fail as we made sure there will be enough header space
 
-			init_data_node(node, headerSpace);
-			node->header_space = header->data_space;
+			init_first_data_node(node);
 			node->tail_space -= sizeUsed;
 			node->used = sizeUsed;
 			node->offset = buffer->size;
 
-			header->first_node = node;
 			buffer->size += sizeUsed;
 			sizeAdded += sizeUsed;
 
