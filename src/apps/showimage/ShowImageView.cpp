@@ -14,6 +14,7 @@
  */
 
 
+#include "ProgressWindow.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
@@ -174,8 +175,9 @@ PopUpMenu::~PopUpMenu()
 
 
 ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
-	uint32 flags)
-	: BView(rect, name, resizingMode, flags)
+		uint32 flags)
+	: BView(rect, name, resizingMode, flags),
+	fProgressWindow(NULL)
 {
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
@@ -214,7 +216,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 		fScaleBilinear = settings->GetBool("ScaleBilinear", fScaleBilinear);
 		settings->Unlock();
 	}
-	
+
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kBorderColor);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -488,17 +490,28 @@ ShowImageView::SetImage(const entry_ref *ref)
 		// if new image, reset to first document
 		fDocumentIndex = 1;
 	}
+
 	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
 		return B_ERROR;
-	if (roster->Identify(&file, &ioExtension, &info, 0, NULL,
-			B_TRANSLATOR_BITMAP) != B_OK)
-		return B_ERROR;
+
+	if (ioExtension.AddMessenger("/progressMonitor", fProgressWindow) == B_OK)
+		fProgressWindow->Start();
 
 	// Translate image data and create a new ShowImage window
+
 	BBitmapStream outstream;
-	if (roster->Translate(&file, &info, &ioExtension, &outstream,
-			B_TRANSLATOR_BITMAP) != B_OK)
-		return B_ERROR;
+
+	status_t status = roster->Identify(&file, &ioExtension, &info, 0, NULL,
+		B_TRANSLATOR_BITMAP);
+	if (status == B_OK) {
+		status = roster->Translate(&file, &info, &ioExtension, &outstream,
+			B_TRANSLATOR_BITMAP);
+	}
+
+	fProgressWindow->Stop();
+
+	if (status != B_OK)
+		return status;
 
 	BBitmap *newBitmap = NULL;
 	if (outstream.DetachBitmap(&newBitmap) != B_OK)
@@ -565,8 +578,8 @@ ShowImageView::SetImage(const entry_ref *ref)
 
 	// get the number of documents (pages) if it has been supplied
 	int32 documentCount = 0;
-	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK &&
-			documentCount > 0)
+	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK
+		&& documentCount > 0)
 		fDocumentCount = documentCount;
 	else
 		fDocumentCount = 1;
@@ -719,6 +732,16 @@ ShowImageView::AttachedToWindow()
 {
 	fUndo.SetWindow(Window());
 	FixupScrollBars();
+
+	fProgressWindow = new ProgressWindow(Window());
+}
+
+
+void
+ShowImageView::DetachedFromWindow()
+{
+	fProgressWindow->Lock();
+	fProgressWindow->Quit();
 }
 
 

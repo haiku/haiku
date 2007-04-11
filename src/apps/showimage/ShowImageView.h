@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -36,6 +36,8 @@
 // the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
 #define HIDE_CURSOR_DELAY_TIME 20
 
+class ProgressWindow;
+
 class ShowImageView : public BView {
 	public:
 		ShowImageView(BRect rect, const char *name, uint32 resizingMode,
@@ -43,6 +45,7 @@ class ShowImageView : public BView {
 		virtual ~ShowImageView();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 		virtual void Draw(BRect updateRect);
 		virtual void FrameResized(float width, float height);
 		virtual void MouseDown(BPoint point);
@@ -248,6 +251,8 @@ class ShowImageView : public BView {
 
 		int fHideCursorCountDown;	// Hides the cursor when it reaches zero
 		bool fIsActiveWin;			// Is the parent window the active window?
+
+		ProgressWindow* fProgressWindow;
 
 		enum image_orientation fImageOrientation;
 		static enum image_orientation fTransformation[

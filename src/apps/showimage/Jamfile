@@ -4,7 +4,8 @@ UsePrivateHeaders tracker ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-Application ShowImage : ShowImageApp.cpp
+Application ShowImage :
+	ShowImageApp.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp
 	ShowImageUndo.cpp
@@ -14,6 +15,7 @@ Application ShowImage : ShowImageApp.cpp
 	Filter.cpp
 	EntryMenuItem.cpp
 	BackgroundImage.cpp
+	ProgressWindow.cpp
 	ResizerWindow.cpp
 	: be tracker translation
 	: ShowImage.rdef
