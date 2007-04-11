@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src apps networkstatus ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared ;
+UseLibraryHeaders agg icon ;
+
+local icon_libs ;
+if $(TARGET) != haiku {
+	icon_libs = libicon.a libagg.a ;
+}
+
+Application NetworkStatus :
+	NetworkStatusWindow.cpp
+	NetworkStatusView.cpp
+	NetworkStatus.cpp
+	: be $(icon_libs) $(NETWORK_LIBS)
+	: NetworkStatus.rdef NetworkStatusIcons.rdef
+	;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,10 +40,22 @@ AutoconfigLooper::~AutoconfigLooper()
 void
 AutoconfigLooper::_ReadyToRun()
 {
-	BMessage interface(kMsgConfigureInterface);
-	interface.AddString("device", fDevice.String());
-	interface.AddInt32("net:status", kStatusPreparing);
-	fTarget.SendMessage(&interface);
+	ifreq request;
+	if (!prepare_request(request, fDevice.String()))
+		return;
+
+	// set IFF_CONFIGURING flag on interface
+
+	int socket = ::socket(AF_LINK, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return;
+
+	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0) {
+		request.ifr_flags |= IFF_CONFIGURING;
+		ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq));
+	}
+
+	close(socket);
 
 	// start with DHCP
 
@@ -62,7 +74,9 @@ AutoconfigLooper::_ReadyToRun()
 	// TODO: have a look at zeroconf
 	// TODO: this could also be done add-on based
 
-	interface.ReplaceInt32("net:status", kStatusLinkNoConfig);
+	BMessage interface(kMsgConfigureInterface);
+	interface.AddString("device", fDevice.String());
+	interface.AddBool("auto", true);
 
 	uint8 mac[6];
 	uint8 last = 56;

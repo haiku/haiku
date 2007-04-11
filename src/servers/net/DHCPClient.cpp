@@ -474,7 +474,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 				fConfiguration.MakeEmpty();
 				fConfiguration.AddString("device", fDevice.String());
-				fConfiguration.AddInt32("net:status", kStatusConnected);
+				fConfiguration.AddBool("auto", true);
 
 				BMessage address;
 				address.AddString("family", "inet");

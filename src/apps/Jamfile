@@ -17,6 +17,7 @@ SubInclude HAIKU_TOP src apps magnify ;
 SubInclude HAIKU_TOP src apps mail ;
 SubInclude HAIKU_TOP src apps mediaplayer ;
 SubInclude HAIKU_TOP src apps midiplayer ;
+SubInclude HAIKU_TOP src apps networkstatus ;
 SubInclude HAIKU_TOP src apps people ;
 SubInclude HAIKU_TOP src apps poorman ;
 SubInclude HAIKU_TOP src apps powerstatus ;
