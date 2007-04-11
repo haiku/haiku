@@ -64,7 +64,7 @@ enum {
 	FLAG_OPTION_WINDOW_SHIFT	= 0x01,
 	FLAG_OPTION_TIMESTAMP		= 0x02,
 	// TODO: Should FLAG_NO_RECEIVE apply as well to received connections?
-	//       That is, what is excepected from accept() after a shutdown()
+	//       That is, what is expected from accept() after a shutdown()
 	//       is performed on a listen()ing socket.
 	FLAG_NO_RECEIVE				= 0x04,
 };
@@ -540,8 +540,18 @@ ssize_t
 TCPEndpoint::SendAvailable()
 {
 	RecursiveLocker locker(fLock);
-	TRACE("SendAvailable(): %li", fSendQueue.Free());
-	return fSendQueue.Free();
+
+	ssize_t available;
+
+	if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
+		|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
+		|| fState == TIME_WAIT || fState == LISTEN || fState == CLOSED)
+		available = EPIPE;
+	else
+		available = fSendQueue.Free();
+
+	TRACE("SendAvailable(): %li", available);
+	return available;
 }
 
 
