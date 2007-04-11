@@ -20,6 +20,7 @@ const char* kDocumentCount = "/documentCount";
 const char* kDocumentIndex = "/documentIndex";
 const char* kProgressMonitor = "/progressMonitor";
 
+const uint32 kMsgProgressMonitorUpdate = 'SIup';
 
 // The input formats that this translator supports.
 translation_format sInputFormats[] = {
@@ -148,7 +149,7 @@ RAWTranslator::_ProgressMonitor(const char* message, float percentage,
 {
 	BMessenger& messenger = *(BMessenger*)data;
 
-	BMessage update;
+	BMessage update(kMsgProgressMonitorUpdate);
 	update.AddString("message", message);
 	update.AddFloat("percent", percentage);
 	update.AddInt64("time", system_time());

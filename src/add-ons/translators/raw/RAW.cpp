@@ -1510,7 +1510,7 @@ void
 DCRaw::_AHDInterpolate()
 {
 	if (fProgressMonitor != NULL)
-		fProgressMonitor("Interpolate", 30, fProgressData);
+		fProgressMonitor("Interpolate", 20, fProgressData);
 
 #define TS 256		/* Tile Size */
 
@@ -1532,8 +1532,8 @@ DCRaw::_AHDInterpolate()
 	rgb = (ushort(*)[TS][TS][3])buffer;
 	lab = (short (*)[TS][TS][3])(buffer + 12*TS*TS);
 	homo = (char (*)[TS][TS])(buffer + 24*TS*TS);
-	float percentage = 30;
-	float percentageStep = 55.0f / (fInputHeight / (TS - 6));
+	float percentage = 20;
+	float percentageStep = 70.0f / (fInputHeight / (TS - 6));
 
 	for (top = 0; top < fInputHeight; top += TS - 6) {
 		if (fProgressMonitor) {
@@ -1709,7 +1709,7 @@ void
 DCRaw::_ConvertToRGB()
 {
 	if (fProgressMonitor != NULL)
-		fProgressMonitor("Convert to RGB", 85, fProgressData);
+		fProgressMonitor("Convert to RGB", 90, fProgressData);
 
 	uint32 row, col, c, i, j, k;
 	float out[3], out_cam[3][4];
