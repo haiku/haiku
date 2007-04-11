@@ -29,13 +29,13 @@ BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
 	idestatus ifconfig <bin>install installsound iroster isvolume join keymap
 	kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex m4 make
-	makebootable nc md5sum merge mimeset mkdos mkdir mkindex modifiers mount
-	mount_nfs mountvolume mv netstat nl od open pack_cis paste patch pathchk pc
+	makebootable md5sum merge mimeset mkdos mkdir mkindex modifiers mount
+	mount_nfs mountvolume mv nc netstat nl od open pack_cis paste patch pathchk pc
 	ping play playfile playsound playwav pr prio printenv printf ps ptx pwd
 	query quit release renice rescan rlog rm rmattr rmindex rmdir roster route
 	safemode screen_blanker sed settype setversion setvolume seq sh shar
 	shutdown sleep sort split strace stty su sum sync sysinfo tac tail tar
-	tcpdump tee telnet test top touch tput tr traceroute translate true tsort
+	tcpdump tee telnet telnetd test top touch tput tr traceroute translate true tsort
 	tty uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx updatedb
 	uptime usb_dev_info uudecode uuencode vdir version vim waitfor wc wget
 	whoami xargs xres yes zdiff zforce zgrep zip zipcloak zipgrep zipnote
@@ -45,7 +45,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
 BEOS_APPS = Terminal Expander People ShowImage Pulse ProcessController
 	SoundRecorder Magnify DiskProbe AboutHaiku StyledEdit Installer Workspaces
 	$(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost MediaPlayer DeskCalc MidiPlayer
-	Icon-O-Matic Mail CDPlayer
+	Icon-O-Matic Mail CDPlayer NetworkStatus
 ;
 BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail FileTypes
 	Fonts Media Menu Mouse Keyboard Keymap Printers Screen ScreenSaver Sounds
