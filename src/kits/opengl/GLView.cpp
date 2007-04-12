@@ -326,7 +326,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			glviewDirectInfo->direct_connected = false; 
 			break; 
 	} 
-	//direct_info_locker->Unlock(); 
+	//direct_info_locker->Unlock();
 
 	if (fRenderer)
 		fRenderer->DirectConnected(localInfo);
@@ -502,7 +502,7 @@ const char * color_space_name(color_space space)
 glview_direct_info::glview_direct_info()
 {
 	// TODO: See direct_window_data() in app_server's ServerWindow.cpp
-	direct_info = (direct_buffer_info *)malloc(sizeof(B_PAGE_SIZE));
+	direct_info = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
 	direct_connected = false;
 }
 
