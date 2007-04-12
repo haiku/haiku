@@ -1105,10 +1105,13 @@ Desktop::_UpdateFronts(bool updateFloating)
 EventTarget*
 Desktop::KeyboardEventTarget()
 {
+	// TODO: Not yet useful, and prevents a crashing application
+	// which has opened menu windows to be debugged (ticket #1152)
+#if 0
 	WindowLayer* window = _CurrentWindows().LastWindow();
 	if (window != NULL && window->Feel() == kMenuWindowFeel)
 		return &window->EventTarget();
-
+#endif
 	if (FocusWindow() != NULL)
 		return &FocusWindow()->EventTarget();
 
