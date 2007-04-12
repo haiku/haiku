@@ -15,6 +15,7 @@
 
 #include <lock.h>
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/khash.h>
 
 #include <KernelExport.h>
@@ -28,14 +29,25 @@
 #include <string.h>
 #include <utility>
 
+// TODO move the locking from the FIFO to the whole Endpoint
+//      much like we did with the LinkProtocol.
 
 //#define TRACE_UDP
 #ifdef TRACE_UDP
-#	define TRACE(x) dprintf x
 #	define TRACE_BLOCK(x) dump_block x
+// do not remove the space before ', ##args' if you want this
+// to compile with gcc 2.95
+#	define TRACE_EP(format, args...)	dprintf("UDP [%llu] %p " format "\n", \
+		system_time(), this , ##args)
+#	define TRACE_EPM(format, args...)	dprintf("UDP [%llu] " format "\n", \
+		system_time() , ##args)
+#	define TRACE_DOMAIN(format, args...)	dprintf("UDP [%llu] (%d) " format \
+		"\n", system_time(), Domain()->family , ##args)
 #else
-#	define TRACE(x)
 #	define TRACE_BLOCK(x)
+#	define TRACE_EP(args...)	do { } while (0)
+#	define TRACE_EPM(args...)	do { } while (0)
+#	define TRACE_DOMAIN(args...)	do { } while (0)
 #endif
 
 
@@ -50,11 +62,14 @@ struct udp_header {
 typedef NetBufferField<uint16, offsetof(udp_header, udp_checksum)>
 	UDPChecksumField;
 
+class UdpDomainSupport;
 
 class UdpEndpoint : public net_protocol {
 public:
 	UdpEndpoint(net_socket *socket);
 	~UdpEndpoint();
+
+	status_t				InitCheck() const;
 
 	status_t				Bind(sockaddr *newAddr);
 	status_t				Unbind(sockaddr *newAddr);
@@ -64,21 +79,35 @@ public:
 	status_t				Close();
 	status_t				Free();
 
-	status_t				SendData(net_buffer *buffer, net_route *route);
+	status_t				SendRoutedData(net_buffer *buffer, net_route *route);
+	status_t				SendData(net_buffer *buffer);
 
 	ssize_t					BytesAvailable();
-	status_t				FetchData(size_t numBytes, uint32 flags, 
+	status_t				FetchData(size_t numBytes, uint32 flags,
 								net_buffer **_buffer);
 
 	status_t				StoreData(net_buffer *buffer);
 
-	UdpEndpoint 			*hash_link;
+	net_domain *			Domain() const
+	{
+		return socket->first_protocol->module->get_domain(socket->first_protocol);
+	}
+
+	net_address_module_info *AddressModule() const
+	{
+		return Domain()->address_module;
+	}
+
+	UdpDomainSupport		*DomainSupport() const { return fDomain; }
+
+	UdpEndpoint				*hash_link;
 								// link required by hash_table (see khash.h)
 private:
 	status_t				_Activate();
 	status_t				_Deactivate();
-	
-	bool 					fActive;
+
+	UdpDomainSupport		*fDomain;
+	bool					fActive;
 								// an active UdpEndpoint is part of the endpoint 
 								// hash (and it is bound and optionally connected)
 	net_fifo				fFifo;
@@ -86,68 +115,99 @@ private:
 };
 
 
-class UdpEndpointManager {
-	typedef std::pair<const sockaddr *, const sockaddr *> HashKey;
+class UdpDomainSupport : public DoublyLinkedListLinkImpl<UdpDomainSupport> {
+public:
+	UdpDomainSupport(net_domain *domain);
+	~UdpDomainSupport();
 
-	class Ephemerals {
-	public:
-							Ephemerals();
-							~Ephemerals();
-		
-			uint16			GetNext(hash_table *activeEndpoints);
-	static 	const uint16	kFirst = 49152;
-	static 	const uint16	kLast = 65535;
-	private:
-			uint16			fLastUsed;
+	status_t InitCheck() const;
+
+	net_domain *Domain() const { return fDomain; }
+
+	void Ref() { fEndpointCount++; }
+	void Put() { fEndpointCount--; }
+
+	bool IsEmpty() const { return fEndpointCount == 0; }
+
+	status_t DemuxIncomingBuffer(net_buffer *buffer);
+	status_t CheckBindRequest(sockaddr *address, int socketOptions);
+	status_t ActivateEndpoint(UdpEndpoint *endpoint);
+	status_t DeactivateEndpoint(UdpEndpoint *endpoint);
+
+	uint16 GetEphemeralPort();
+
+private:
+	struct HashKey {
+		HashKey() {}
+		HashKey(net_address_module_info *module, const sockaddr *_local,
+			const sockaddr *_peer)
+			: address_module(module), local(_local), peer(_peer) {}
+
+		net_address_module_info *address_module;
+		const sockaddr *local;
+		const sockaddr *peer;
 	};
-	
+
+	UdpEndpoint *_FindActiveEndpoint(sockaddr *ourAddress,
+		sockaddr *peerAddress);
+	status_t _DemuxBroadcast(net_buffer *buffer);
+	status_t _DemuxMulticast(net_buffer *buffer);
+	status_t _DemuxUnicast(net_buffer *buffer);
+
+	uint16 _GetNextEphemeral();
+
+	static int _Compare(void *udpEndpoint, const void *_key);
+	static uint32 _Hash(void *udpEndpoint, const void *key, uint32 range);
+
+	net_address_module_info *AddressModule() const
+	{
+		return fDomain->address_module;
+	}
+
+	net_domain		*fDomain;
+	uint16			fLastUsedEphemeral;
+	hash_table		*fActiveEndpoints;
+	uint32			fEndpointCount;
+
+	static const uint16		kFirst = 49152;
+	static const uint16		kLast = 65535;
+	static const uint32		kNumHashBuckets = 0x800;
+							// if you change this, adjust the shifting in
+							// Hash() accordingly!
+};
+
+
+typedef DoublyLinkedList<UdpDomainSupport> UdpDomainList;
+
+
+class UdpEndpointManager {
 public:
 	UdpEndpointManager();
 	~UdpEndpointManager();
 
-			status_t		DemuxBroadcast(net_buffer *buffer);
-			status_t		DemuxMulticast(net_buffer *buffer);
-			status_t		DemuxUnicast(net_buffer *buffer);
-			status_t		DemuxIncomingBuffer(net_buffer *buffer);
-			status_t		ReceiveData(net_buffer *buffer);
+	status_t		DemuxIncomingBuffer(net_domain *domain,
+		net_buffer *buffer);
+	status_t		ReceiveData(net_buffer *buffer);
 
-	static	int				Compare(void *udpEndpoint, const void *_key);
-	static	uint32			ComputeHash(const sockaddr *ourAddress,
-										const sockaddr *peerAddress);
-	static	uint32			Hash(void *udpEndpoint, const void *key, uint32 range);
+	UdpDomainSupport *OpenEndpoint(UdpEndpoint *endpoint);
+	status_t FreeEndpoint(UdpDomainSupport *domain);
 
-			UdpEndpoint		*FindActiveEndpoint(sockaddr *ourAddress, 
-								sockaddr *peerAddress);
-			status_t		CheckBindRequest(sockaddr *address, int socketOptions);
+	uint16			GetEphemeralPort();
 
-			status_t		ActivateEndpoint(UdpEndpoint *endpoint);
-			status_t		DeactivateEndpoint(UdpEndpoint *endpoint);
+	benaphore		*Locker() { return &fLock; }
+	status_t		InitCheck() const;
 
-			status_t		OpenEndpoint(UdpEndpoint *endpoint);
-			status_t		CloseEndpoint(UdpEndpoint *endpoint);
-			status_t		FreeEndpoint(UdpEndpoint *endpoint);
-	
-			uint16			GetEphemeralPort();
-
-			benaphore		*Locker();
-			status_t		InitCheck() const;
 private:
-			benaphore		fLock;
-			hash_table		*fActiveEndpoints;
-	static	const uint32 	kNumHashBuckets = 0x800;
-								// if you change this, adjust the shifting in 
-								// Hash() accordingly!
-			Ephemerals		fEphemerals;
-			status_t		fStatus;
-			uint32			fEndpointCount;
+	UdpDomainSupport *_GetDomain(net_domain *domain, bool create);
+
+	benaphore		fLock;
+	status_t		fStatus;
+	UdpDomainList	fDomains;
 };
 
 
 static UdpEndpointManager *sUdpEndpointManager;
 
-static net_domain *sDomain;
-
-static net_address_module_info *sAddressModule;
 net_buffer_module_info *gBufferModule;
 static net_datalink_module_info *sDatalinkModule;
 static net_stack_module_info *sStackModule;
@@ -156,183 +216,126 @@ static net_stack_module_info *sStackModule;
 // #pragma mark -
 
 
-UdpEndpointManager::Ephemerals::Ephemerals()
+UdpDomainSupport::UdpDomainSupport(net_domain *domain)
 	:
-	fLastUsed(kLast)
-{
-}
-
-
-UdpEndpointManager::Ephemerals::~Ephemerals()
-{
-}
-
-
-uint16
-UdpEndpointManager::Ephemerals::GetNext(hash_table *activeEndpoints)
-{
-	uint16 stop, curr, ncurr;
-	if (fLastUsed < kLast) {
-		stop = fLastUsed;
-		curr = fLastUsed + 1;
-	} else {
-		stop = kLast;
-		curr = kFirst;
-	}
-
-	TRACE(("UdpEndpointManager::Ephemerals::GetNext()...\n"));
-	// TODO: a free list could be used to avoid the impact of these
-	//       two nested loops most of the time... let's see how bad this really is
-	UdpEndpoint *endpoint;
-	struct hash_iterator endpointIterator;
-	hash_open(activeEndpoints, &endpointIterator);
-	bool found = false;
-	uint16 endpointPort;
-	while(!found && curr != stop) {
-		TRACE(("...trying port %u...\n", curr));
-		ncurr = htons(curr);
-		for(hash_rewind(activeEndpoints, &endpointIterator); !found; ) {
-			endpoint = (UdpEndpoint *)hash_next(activeEndpoints, &endpointIterator);
-			if (!endpoint) {
-				found = true;
-				break;
-			}
-			endpointPort = sAddressModule->get_port(
-				(sockaddr *)&endpoint->socket->address);
-			TRACE(("...checking endpoint %p (port=%u)...\n", endpoint, 
-				ntohs(endpointPort)));
-			if (endpointPort == ncurr)
-				break;
-		}
-		if (!found) {
-			if (curr < kLast)
-				curr++;
-			else
-				curr = kFirst;
-		}
-	}
-	hash_close(activeEndpoints, &endpointIterator, false);
-	if (!found)
-		return 0;
-	TRACE(("...using port %u\n", curr));
-	fLastUsed = curr;
-	return curr;
-}
-
-
-// #pragma mark -
-
-
-UdpEndpointManager::UdpEndpointManager()
-	:
-	fStatus(B_NO_INIT),
+	fDomain(domain),
+	fLastUsedEphemeral(kLast),
 	fEndpointCount(0)
 {
-	fActiveEndpoints = hash_init(kNumHashBuckets, offsetof(UdpEndpoint, hash_link), 
-		&Compare, &Hash);
-	if (fActiveEndpoints == NULL) {
-		fStatus = B_NO_MEMORY;
-		return;
-	}
+	fActiveEndpoints = hash_init(kNumHashBuckets, offsetof(UdpEndpoint, hash_link),
+		&_Compare, &_Hash);
+}
 
-	fStatus = benaphore_init(&fLock, "UDP endpoints");
-	if (fStatus < B_OK)
+
+UdpDomainSupport::~UdpDomainSupport()
+{
+	if (fActiveEndpoints)
 		hash_uninit(fActiveEndpoints);
 }
 
 
-UdpEndpointManager::~UdpEndpointManager()
+status_t
+UdpDomainSupport::InitCheck() const
 {
-	benaphore_destroy(&fLock);
-	hash_uninit(fActiveEndpoints);
+	return fActiveEndpoints ? B_OK : B_NO_MEMORY;
 }
 
 
-inline benaphore *
-UdpEndpointManager::Locker()
+status_t
+UdpDomainSupport::DemuxIncomingBuffer(net_buffer *buffer)
 {
-	return &fLock;
+	if (buffer->flags & MSG_BCAST)
+		return _DemuxBroadcast(buffer);
+	else if (buffer->flags & MSG_MCAST)
+		return _DemuxMulticast(buffer);
+
+	return _DemuxUnicast(buffer);
 }
 
 
-inline status_t
-UdpEndpointManager::InitCheck() const
-{
-	return fStatus;
-}
+status_t
+UdpDomainSupport::CheckBindRequest(sockaddr *address, int socketOptions)
+{		// sUdpEndpointManager->Locker() must be locked!
+	status_t status = B_OK;
+	UdpEndpoint *otherEndpoint;
+	sockaddr *otherAddr;
+	struct hash_iterator endpointIterator;
 
-
-// #pragma mark - hashing
-
-
-/*static*/ int
-UdpEndpointManager::Compare(void *_udpEndpoint, const void *_key)
-{
-	struct UdpEndpoint *udpEndpoint = (UdpEndpoint*)_udpEndpoint;
-	const HashKey *key = (const HashKey *)_key;
-
-	sockaddr *ourAddr = (sockaddr *)&udpEndpoint->socket->address;
-	sockaddr *peerAddr = (sockaddr *)&udpEndpoint->socket->peer;
-
-	if (sAddressModule->equal_addresses_and_ports(ourAddr, key->first)
-		&& sAddressModule->equal_addresses_and_ports(peerAddr, key->second))
-		return 0;
-
-	return 1;
-}
-
-
-/*static*/ inline uint32
-UdpEndpointManager::ComputeHash(const sockaddr *ourAddress,
-		const sockaddr *peerAddress)
-{
-	return sAddressModule->hash_address_pair(ourAddress, peerAddress);
-}
-
-
-/*static*/ uint32
-UdpEndpointManager::Hash(void *_udpEndpoint, const void *_key, uint32 range)
-{
-	HashKey addresses;
-	uint32 hash;
-
-	if (_udpEndpoint) {
-		const UdpEndpoint *udpEndpoint = (const UdpEndpoint *)_udpEndpoint;
-		addresses = HashKey((const sockaddr *)&udpEndpoint->socket->address,
-							(const sockaddr *)&udpEndpoint->socket->peer);
-	} else {
-		addresses = *(const HashKey *)_key;
+	// Iterate over all active UDP-endpoints and check if the requested bind
+	// is allowed (see figure 22.24 in [Stevens - TCP2, p735]):
+	hash_open(fActiveEndpoints, &endpointIterator);
+	TRACE_DOMAIN("CheckBindRequest() for %s...",
+		AddressString(fDomain, address, true).Data());
+	while(1) {
+		otherEndpoint = (UdpEndpoint *)hash_next(fActiveEndpoints, &endpointIterator);
+		if (!otherEndpoint)
+			break;
+		otherAddr = (sockaddr *)&otherEndpoint->socket->address;
+		TRACE_DOMAIN("  ...checking endpoint %p (port=%u)...", otherEndpoint,
+			ntohs(AddressModule()->get_port(otherAddr)));
+		if (AddressModule()->equal_ports(otherAddr, address)) {
+			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
+			if (otherEndpoint->socket->options & (SO_REUSEADDR | SO_REUSEPORT) == 0
+				|| socketOptions & (SO_REUSEADDR | SO_REUSEPORT) == 0) {
+				status = EADDRINUSE;
+				break;
+			}
+			// if both addresses are the same, SO_REUSEPORT is required:
+			if (AddressModule()->equal_addresses(otherAddr, address)
+				&& (otherEndpoint->socket->options & SO_REUSEPORT == 0
+					|| socketOptions & SO_REUSEPORT == 0)) {
+				status = EADDRINUSE;
+				break;
+			}
+		}
 	}
+	hash_close(fActiveEndpoints, &endpointIterator, false);
 
-	hash = ComputeHash(addresses.first, addresses.second);
-
-	// move the bits into the relevant range (as defined by kNumHashBuckets):
-	hash = (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
-			^ (hash & 0xFFC00000UL) >> 22;
-
-	TRACE(("UDP-endpoint hash is %lx\n", hash % range));
-	return hash % range;
+	TRACE_DOMAIN("  CheckBindRequest done (status=%lx)", status);
+	return status;
 }
 
 
-// #pragma mark - inbound
+status_t
+UdpDomainSupport::ActivateEndpoint(UdpEndpoint *endpoint)
+{		// sUdpEndpointManager->Locker() must be locked!
+	TRACE_DOMAIN("Endpoint(%s) was activated",
+		AddressString(fDomain, (sockaddr *)&endpoint->socket->address, true).Data());
+	return hash_insert(fActiveEndpoints, endpoint);
+}
+
+
+status_t
+UdpDomainSupport::DeactivateEndpoint(UdpEndpoint *endpoint)
+{		// sUdpEndpointManager->Locker() must be locked!
+	TRACE_DOMAIN("Endpoint(%s) was deactivated",
+		AddressString(fDomain, (sockaddr *)&endpoint->socket->address, true).Data());
+	return hash_remove(fActiveEndpoints, endpoint);
+}
+
+
+uint16
+UdpDomainSupport::GetEphemeralPort()
+{
+	return _GetNextEphemeral();
+}
 
 
 UdpEndpoint *
-UdpEndpointManager::FindActiveEndpoint(sockaddr *ourAddress,
+UdpDomainSupport::_FindActiveEndpoint(sockaddr *ourAddress,
 	sockaddr *peerAddress)
 {
-	TRACE(("trying to find UDP-endpoint for (l:%s p:%s)\n",
-		AddressString(sDomain, ourAddress, true).Data(),
-		AddressString(sDomain, peerAddress, true).Data()));
+	TRACE_DOMAIN("finding Endpoint for %s -> %s",
+		AddressString(fDomain, ourAddress, true).Data(),
+		AddressString(fDomain, peerAddress, true).Data());
 
-	HashKey key(ourAddress, peerAddress);
+	HashKey key(AddressModule(), ourAddress, peerAddress);
 	return (UdpEndpoint *)hash_lookup(fActiveEndpoints, &key);
 }
 
 
 status_t
-UdpEndpointManager::DemuxBroadcast(net_buffer *buffer)
+UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 {
 	sockaddr *peerAddr = (sockaddr *)&buffer->source;
 	sockaddr *broadcastAddr = (sockaddr *)&buffer->destination;
@@ -340,40 +343,37 @@ UdpEndpointManager::DemuxBroadcast(net_buffer *buffer)
 	if (buffer->interface)
 		mask = (sockaddr *)buffer->interface->mask;
 
-	TRACE(("demuxing buffer %p as broadcast...\n", buffer));
+	TRACE_DOMAIN("_DemuxBroadcast(%p)", buffer);
 
-	uint16 incomingPort = sAddressModule->get_port(broadcastAddr);
+	uint16 incomingPort = AddressModule()->get_port(broadcastAddr);
 
 	UdpEndpoint *endpoint;
-	sockaddr *addr, *connectAddr;
-	struct hash_iterator endpointIterator;
-	for(hash_open(fActiveEndpoints, &endpointIterator); ; ) {
-		endpoint = (UdpEndpoint *)hash_next(fActiveEndpoints, &endpointIterator);
-		if (!endpoint)
-			break;
+	hash_iterator endpointIterator;
+	hash_open(fActiveEndpoints, &endpointIterator);
+	while ((endpoint = (UdpEndpoint *)hash_next(fActiveEndpoints,
+		&endpointIterator)) != NULL) {
+		sockaddr *addr = (sockaddr *)&endpoint->socket->address;
+		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
+			AddressString(fDomain, addr, true).Data());
 
-		addr = (sockaddr *)&endpoint->socket->address;
-		TRACE(("UDP-DemuxBroadcast() is checking endpoint %s...\n",
-			AddressString(sDomain, addr, true).Data()));
-
-		if (incomingPort != sAddressModule->get_port(addr)) {
+		if (incomingPort != AddressModule()->get_port(addr)) {
 			// ports don't match, so we do not dispatch to this endpoint...
 			continue;
 		}
 
-		connectAddr = (sockaddr *)&endpoint->socket->peer;
-		if (!sAddressModule->is_empty_address(connectAddr, true)) {
+		sockaddr *connectAddr = (sockaddr *)&endpoint->socket->peer;
+		if (!AddressModule()->is_empty_address(connectAddr, true)) {
 			// endpoint is connected to a specific destination, we check if
 			// this datagram is from there:
-			if (!sAddressModule->equal_addresses_and_ports(connectAddr, peerAddr)) {
+			if (!AddressModule()->equal_addresses_and_ports(connectAddr, peerAddr)) {
 				// no, datagram is from another peer, so we do not dispatch to
 				// this endpoint...
 				continue;
 			}
 		}
 
-		if (sAddressModule->equal_masked_addresses(addr, broadcastAddr, mask)
-			|| sAddressModule->is_empty_address(addr, false)) {
+		if (AddressModule()->equal_masked_addresses(addr, broadcastAddr, mask)
+			|| AddressModule()->is_empty_address(addr, false)) {
 				// address matches, dispatch to this endpoint:
 			endpoint->StoreData(buffer);
 		}
@@ -384,39 +384,42 @@ UdpEndpointManager::DemuxBroadcast(net_buffer *buffer)
 
 
 status_t
-UdpEndpointManager::DemuxMulticast(net_buffer *buffer)
+UdpDomainSupport::_DemuxMulticast(net_buffer *buffer)
 {	// TODO: implement!
+	TRACE_DOMAIN("_DemuxMulticast(%p)", buffer);
+
 	return B_ERROR;
 }
 
 
 status_t
-UdpEndpointManager::DemuxUnicast(net_buffer *buffer)
+UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
 {
 	struct sockaddr *peerAddr = (struct sockaddr *)&buffer->source;
 	struct sockaddr *localAddr = (struct sockaddr *)&buffer->destination;
 
-	TRACE(("demuxing buffer %p as unicast...\n", buffer));
+	TRACE_DOMAIN("_DemuxUnicast(%p)", buffer);
 
 	UdpEndpoint *endpoint;
 	// look for full (most special) match:
-	endpoint = FindActiveEndpoint(localAddr, peerAddr);
+	endpoint = _FindActiveEndpoint(localAddr, peerAddr);
 	if (!endpoint) {
 		// look for endpoint matching local address & port:
-		endpoint = FindActiveEndpoint(localAddr, NULL);
+		endpoint = _FindActiveEndpoint(localAddr, NULL);
 		if (!endpoint) {
 			// look for endpoint matching peer address & port and local port:
 			sockaddr localPortAddr;
-			sAddressModule->set_to_empty_address(&localPortAddr);
-			uint16 localPort = sAddressModule->get_port(localAddr);
-			sAddressModule->set_port(&localPortAddr, localPort);
-			endpoint = FindActiveEndpoint(&localPortAddr, peerAddr);
+			AddressModule()->set_to_empty_address(&localPortAddr);
+			uint16 localPort = AddressModule()->get_port(localAddr);
+			AddressModule()->set_port(&localPortAddr, localPort);
+			endpoint = _FindActiveEndpoint(&localPortAddr, peerAddr);
 			if (!endpoint) {
 				// last chance: look for endpoint matching local port only:
-				endpoint = FindActiveEndpoint(&localPortAddr, NULL);
+				endpoint = _FindActiveEndpoint(&localPortAddr, NULL);
 			}
 		}
 	}
+
 	if (!endpoint)
 		return B_NAME_NOT_FOUND;
 
@@ -425,25 +428,148 @@ UdpEndpointManager::DemuxUnicast(net_buffer *buffer)
 }
 
 
-status_t
-UdpEndpointManager::DemuxIncomingBuffer(net_buffer *buffer)
+uint16
+UdpDomainSupport::_GetNextEphemeral()
 {
-	status_t status;
+	uint16 stop, curr, ncurr;
+	if (fLastUsedEphemeral < kLast) {
+		stop = fLastUsedEphemeral;
+		curr = fLastUsedEphemeral + 1;
+	} else {
+		stop = kLast;
+		curr = kFirst;
+	}
 
-	if (buffer->flags & MSG_BCAST)
-		status = DemuxBroadcast(buffer);
-	else if (buffer->flags & MSG_MCAST)
-		status = DemuxMulticast(buffer);
-	else
-		status = DemuxUnicast(buffer);
+	TRACE_DOMAIN("_GetNextEphemeral()");
+	// TODO: a free list could be used to avoid the impact of these
+	//       two nested loops most of the time... let's see how bad this really is
+	bool found = false;
+	uint16 endpointPort;
+	hash_iterator endpointIterator;
+	hash_open(fActiveEndpoints, &endpointIterator);
+	while(!found && curr != stop) {
+		TRACE_DOMAIN("  _GetNextEphemeral(): trying port %hu...", curr);
+		ncurr = htons(curr);
+		hash_rewind(fActiveEndpoints, &endpointIterator);
+		while (!found) {
+			UdpEndpoint *endpoint = (UdpEndpoint *)hash_next(fActiveEndpoints,
+				&endpointIterator);
+			if (!endpoint) {
+				found = true;
+				break;
+			}
+			endpointPort = AddressModule()->get_port(
+				(sockaddr *)&endpoint->socket->address);
+			TRACE_DOMAIN("  _GetNextEphemeral(): checking endpoint %p (port %hu)...",
+				endpoint, ntohs(endpointPort));
+			if (endpointPort == ncurr)
+				break;
+		}
+		if (!found) {
+			if (curr < kLast)
+				curr++;
+			else
+				curr = kFirst;
+		}
+	}
+	hash_close(fActiveEndpoints, &endpointIterator, false);
+	if (!found)
+		return 0;
+	TRACE_DOMAIN("  _GetNextEphemeral(): ...using port %hu", curr);
+	fLastUsedEphemeral = curr;
+	return curr;
+}
 
-	return status;
+
+int
+UdpDomainSupport::_Compare(void *_udpEndpoint, const void *_key)
+{
+	struct UdpEndpoint *udpEndpoint = (UdpEndpoint*)_udpEndpoint;
+	const HashKey *key = (const HashKey *)_key;
+
+	sockaddr *ourAddr = (sockaddr *)&udpEndpoint->socket->address;
+	sockaddr *peerAddr = (sockaddr *)&udpEndpoint->socket->peer;
+
+	net_address_module_info *addressModule = key->address_module;
+
+	if (addressModule->equal_addresses_and_ports(ourAddr, key->local)
+		&& addressModule->equal_addresses_and_ports(peerAddr, key->peer))
+		return 0;
+
+	return 1;
+}
+
+
+uint32
+UdpDomainSupport::_Hash(void *_udpEndpoint, const void *_key, uint32 range)
+{
+	const HashKey *key = (const HashKey *)_key;
+	HashKey key_storage;
+	uint32 hash;
+
+	if (_udpEndpoint) {
+		const UdpEndpoint *udpEndpoint = (const UdpEndpoint *)_udpEndpoint;
+		key_storage = HashKey(udpEndpoint->DomainSupport()->AddressModule(),
+			(const sockaddr *)&udpEndpoint->socket->address,
+			(const sockaddr *)&udpEndpoint->socket->peer);
+		key = &key_storage;
+	}
+
+	hash = key->address_module->hash_address_pair(key->local, key->peer);
+
+	// move the bits into the relevant range (as defined by kNumHashBuckets):
+	hash = (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
+			^ (hash & 0xFFC00000UL) >> 22;
+
+	return hash % range;
+}
+
+
+// #pragma mark -
+
+
+UdpEndpointManager::UdpEndpointManager()
+{
+	fStatus = benaphore_init(&fLock, "UDP endpoints");
+}
+
+
+UdpEndpointManager::~UdpEndpointManager()
+{
+	benaphore_destroy(&fLock);
+}
+
+
+status_t
+UdpEndpointManager::InitCheck() const
+{
+	return fStatus;
+}
+
+
+// #pragma mark - inbound
+
+
+status_t
+UdpEndpointManager::DemuxIncomingBuffer(net_domain *domain, net_buffer *buffer)
+{
+	UdpDomainSupport *domainSupport = _GetDomain(domain, false);
+	if (domainSupport == NULL) {
+		// we don't instantiate domain supports in the
+		// RX path as we are only interested in delivering
+		// data to existing sockets.
+		return B_BAD_VALUE;
+	}
+
+	return domainSupport->DemuxIncomingBuffer(buffer);
 }
 
 
 status_t
 UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
+	TRACE_EPM("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
+
 	NetBufferHeaderReader<udp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
@@ -453,44 +579,40 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	struct sockaddr *source = (struct sockaddr *)&buffer->source;
 	struct sockaddr *destination = (struct sockaddr *)&buffer->destination;
 
-	BenaphoreLocker locker(sUdpEndpointManager->Locker());
-	if (!sDomain) {
-		// domain and address module are not known yet, we copy them from
-		// the buffer's interface (if any):
-		if (buffer->interface == NULL || buffer->interface->domain == NULL)
-			sDomain = sStackModule->get_domain(AF_INET);
-		else
-			sDomain = buffer->interface->domain;
-		if (sDomain == NULL) {
-			// this shouldn't occur, of course, but who knows...
-			return B_BAD_VALUE;
-		}
-		sAddressModule = sDomain->address_module;
+	if (buffer->interface == NULL || buffer->interface->domain == NULL) {
+		TRACE_EPM("  ReceiveData(): UDP packed dropped as there was no domain "
+			"specified (interface %p).", buffer->interface);
+		return B_BAD_VALUE;
 	}
-	sAddressModule->set_port(source, header.source_port);
-	sAddressModule->set_port(destination, header.destination_port);
-	TRACE(("UDP received data from source %s for destination %s\n",
-		AddressString(sDomain, source, true).Data(),
-		AddressString(sDomain, destination, true).Data()));
+
+	net_domain *domain = buffer->interface->domain;
+	net_address_module_info *addressModule = domain->address_module;
+
+	BenaphoreLocker _(fLock);
+
+	addressModule->set_port(source, header.source_port);
+	addressModule->set_port(destination, header.destination_port);
+
+	TRACE_EPM("  ReceiveData(): data from %s to %s",
+		AddressString(domain, source, true).Data(),
+		AddressString(domain, destination, true).Data());
 
 	uint16 udpLength = ntohs(header.udp_length);
 	if (udpLength > buffer->size) {
-		TRACE(("buffer %p is too short (%lu instead of %u), we drop it!\n", 
-			buffer, buffer->size, udpLength));
+		TRACE_EPM("  ReceiveData(): buffer is too short, expected %hu.",
+			udpLength);
 		return B_MISMATCHED_VALUES;
 	}
-	if (buffer->size > udpLength) {
-		TRACE(("buffer %p is too long (%lu instead of %u), trimming it.\n", 
-			buffer, buffer->size, udpLength));
+
+	if (buffer->size > udpLength)
 		gBufferModule->trim(buffer, udpLength);
-	}
 
 	if (header.udp_checksum != 0) {
 		// check UDP-checksum (simulating a so-called "pseudo-header"):
 		Checksum udpChecksum;
-		sAddressModule->checksum_address(&udpChecksum, source);
-		sAddressModule->checksum_address(&udpChecksum, destination);
-		udpChecksum 
+		addressModule->checksum_address(&udpChecksum, source);
+		addressModule->checksum_address(&udpChecksum, destination);
+		udpChecksum
 			<< (uint16)htons(IPPROTO_UDP)
 			<< header.udp_length
 					// peculiar but correct: UDP-len is used twice for checksum
@@ -498,7 +620,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 			<< Checksum::BufferHelper(buffer, gBufferModule);
 		uint16 sum = udpChecksum;
 		if (sum != 0) {
-			TRACE(("buffer %p has bad checksum (%u), we drop it!\n", buffer, sum));
+			TRACE_EPM("  ReceiveData(): bad checksum 0x%hx.", sum);
 			return B_BAD_VALUE;
 		}
 	}
@@ -506,9 +628,9 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	bufferHeader.Remove();
 		// remove UDP-header from buffer before passing it on
 
-	status_t status = DemuxIncomingBuffer(buffer);
+	status_t status = DemuxIncomingBuffer(domain, buffer);
 	if (status < B_OK) {
-		TRACE(("no matching endpoint found for buffer %p, we drop it!", buffer));
+		TRACE_EPM("  ReceiveData(): no endpoint.");
 		// TODO: send ICMP-error
 		return B_ERROR;
 	}
@@ -517,105 +639,66 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 }
 
 
-// #pragma mark - activation
-
-
-status_t
-UdpEndpointManager::CheckBindRequest(sockaddr *address, int socketOptions)
-{		// sUdpEndpointManager->Locker() must be locked!
-	status_t status = B_OK;
-	UdpEndpoint *otherEndpoint;
-	sockaddr *otherAddr;
-	struct hash_iterator endpointIterator;
-
-	// Iterate over all active UDP-endpoints and check if the requested bind
-	// is allowed (see figure 22.24 in [Stevens - TCP2, p735]):
-	hash_open(fActiveEndpoints, &endpointIterator);
-	TRACE(("UdpEndpointManager::CheckBindRequest() for %s...\n",
-		AddressString(sDomain, address, true).Data()));
-	while(1) {
-		otherEndpoint = (UdpEndpoint *)hash_next(fActiveEndpoints, &endpointIterator);
-		if (!otherEndpoint)
-			break;
-		otherAddr = (sockaddr *)&otherEndpoint->socket->address;
-		TRACE(("...checking endpoint %p (port=%u)...\n", otherEndpoint, 
-			ntohs(sAddressModule->get_port(otherAddr))));
-		if (sAddressModule->equal_ports(otherAddr, address)) {
-			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
-			if (otherEndpoint->socket->options & (SO_REUSEADDR | SO_REUSEPORT) == 0
-				|| socketOptions & (SO_REUSEADDR | SO_REUSEPORT) == 0) {
-				status = EADDRINUSE;
-				break;
-			}
-			// if both addresses are the same, SO_REUSEPORT is required:
-			if (sAddressModule->equal_addresses(otherAddr, address)
-				&& (otherEndpoint->socket->options & SO_REUSEPORT == 0
-					|| socketOptions & SO_REUSEPORT == 0)) {
-				status = EADDRINUSE;
-				break;
-			}
-		}
-	}
-	hash_close(fActiveEndpoints, &endpointIterator, false);
-
-	TRACE(("UdpEndpointManager::CheckBindRequest done (status=%lx)\n", status));
-	return status;
-}
-
-
-status_t
-UdpEndpointManager::ActivateEndpoint(UdpEndpoint *endpoint)
-{		// sUdpEndpointManager->Locker() must be locked!
-	TRACE(("UDP-endpoint(%s) is activated\n", 
-		AddressString(sDomain, (sockaddr *)&endpoint->socket->address, true).Data()));
-	return hash_insert(fActiveEndpoints, endpoint);
-}
-
-
-status_t
-UdpEndpointManager::DeactivateEndpoint(UdpEndpoint *endpoint)
-{		// sUdpEndpointManager->Locker() must be locked!
-	TRACE(("UDP-endpoint(%s) is deactivated\n", 
-		AddressString(sDomain, (sockaddr *)&endpoint->socket->address, true).Data()));
-	return hash_remove(fActiveEndpoints, endpoint);
-}
-
-
-status_t
+UdpDomainSupport *
 UdpEndpointManager::OpenEndpoint(UdpEndpoint *endpoint)
-{		// sUdpEndpointManager->Locker() must be locked!
-	if (fEndpointCount++ == 0) {
-		sDomain = sStackModule->get_domain(AF_INET);
-		sAddressModule = sDomain->address_module;
-		TRACE(("udp: setting domain-pointer to %p.\n", sDomain));
-	}
-	return B_OK;
-}
-
-
-status_t
-UdpEndpointManager::CloseEndpoint(UdpEndpoint *endpoint)
-{		// sUdpEndpointManager->Locker() must be locked!
-	return B_OK;
-}
-
-
-status_t
-UdpEndpointManager::FreeEndpoint(UdpEndpoint *endpoint)
-{		// sUdpEndpointManager->Locker() must be locked!
-	if (--fEndpointCount == 0) {
-		TRACE(("udp: clearing domain-pointer and address-module.\n"));
-		sDomain = NULL;
-		sAddressModule = NULL;
-	}
-	return B_OK;
-}
-
-
-uint16
-UdpEndpointManager::GetEphemeralPort()
 {
-	return fEphemerals.GetNext(fActiveEndpoints);
+	BenaphoreLocker _(fLock);
+
+	UdpDomainSupport *domain = _GetDomain(endpoint->Domain(), true);
+	if (domain)
+		domain->Ref();
+	return domain;
+}
+
+
+status_t
+UdpEndpointManager::FreeEndpoint(UdpDomainSupport *domain)
+{
+	BenaphoreLocker _(fLock);
+
+	domain->Put();
+
+	if (domain->IsEmpty()) {
+		fDomains.Remove(domain);
+		delete domain;
+	}
+
+	return B_OK;
+}
+
+
+// #pragma mark -
+
+
+UdpDomainSupport *
+UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
+{
+	UdpDomainList::Iterator it = fDomains.GetIterator();
+
+	// TODO convert this into a Hashtable or install per-domain
+	//      receiver handlers that forward the requests to the
+	//      appropriate DemuxIncomingBuffer(). For instance, while
+	//      being constructed UdpDomainSupport could call
+	//      register_domain_receiving_protocol() with the right
+	//      family.
+	while (it.HasNext()) {
+		UdpDomainSupport *domainSupport = it.Next();
+		if (domainSupport->Domain() == domain)
+			return domainSupport;
+	}
+
+	if (!create)
+		return NULL;
+
+	UdpDomainSupport *domainSupport =
+		new (std::nothrow) UdpDomainSupport(domain);
+	if (domainSupport == NULL || domainSupport->InitCheck() < B_OK) {
+		delete domainSupport;
+		return NULL;
+	}
+
+	fDomains.Add(domainSupport);
+	return domainSupport;
 }
 
 
@@ -624,6 +707,7 @@ UdpEndpointManager::GetEphemeralPort()
 
 UdpEndpoint::UdpEndpoint(net_socket *socket)
 	:
+	fDomain(NULL),
 	fActive(false)
 {
 	status_t status = sStackModule->init_fifo(&fFifo, "UDP endpoint fifo", 
@@ -640,16 +724,23 @@ UdpEndpoint::~UdpEndpoint()
 }
 
 
+status_t
+UdpEndpoint::InitCheck() const
+{
+	return fFifo.notify;
+}
+
+
 // #pragma mark - activation
 
 
 status_t
 UdpEndpoint::Bind(sockaddr *address)
 {
-	if (address->sa_family != AF_INET)
-		return EAFNOSUPPORT;
+	TRACE_EP("Bind(%s)", AddressString(Domain(), address, true).Data());
 
-	// let IP check whether there is an interface that supports the given address:
+	// let the underlying protocol check whether there is an interface that
+	// supports the given address
 	status_t status = next->module->bind(next, address);
 	if (status < B_OK)
 		return status;
@@ -660,15 +751,15 @@ UdpEndpoint::Bind(sockaddr *address)
 		// socket module should have called unbind() before!
 		return EINVAL;
 	}
-	
-	if (sAddressModule->get_port(address) == 0) {
-		uint16 port = htons(sUdpEndpointManager->GetEphemeralPort());
+
+	if (AddressModule()->get_port(address) == 0) {
+		uint16 port = htons(fDomain->GetEphemeralPort());
 		if (port == 0)
 			return ENOBUFS;
 				// whoa, no more ephemeral port available!?!
-		sAddressModule->set_port((sockaddr *)&socket->address, port);
+		AddressModule()->set_port((sockaddr *)&socket->address, port);
 	} else {
-		status = sUdpEndpointManager->CheckBindRequest((sockaddr *)&socket->address, 
+		status = fDomain->CheckBindRequest((sockaddr *)&socket->address,
 			socket->options);
 		if (status < B_OK)
 			return status;
@@ -681,8 +772,7 @@ UdpEndpoint::Bind(sockaddr *address)
 status_t
 UdpEndpoint::Unbind(sockaddr *address)
 {
-	if (address->sa_family != AF_INET)
-		return EAFNOSUPPORT;
+	TRACE_EP("Unbind()");
 
 	BenaphoreLocker locker(sUdpEndpointManager->Locker());
 
@@ -693,8 +783,7 @@ UdpEndpoint::Unbind(sockaddr *address)
 status_t
 UdpEndpoint::Connect(const sockaddr *address)
 {
-	if (address->sa_family != AF_INET && address->sa_family != AF_UNSPEC)
-		return EAFNOSUPPORT;
+	TRACE_EP("Connect(%s)", AddressString(Domain(), address, true).Data());
 
 	BenaphoreLocker locker(sUdpEndpointManager->Locker());
 
@@ -704,9 +793,11 @@ UdpEndpoint::Connect(const sockaddr *address)
 	if (address->sa_family == AF_UNSPEC) {
 		// [Stevens-UNP1, p226]: specifying AF_UNSPEC requests a "disconnect",
 		// so we reset the peer address:
-		sAddressModule->set_to_empty_address((sockaddr *)&socket->peer);
-	} else
-		sAddressModule->set_to((sockaddr *)&socket->peer, address);
+		AddressModule()->set_to_empty_address((sockaddr *)&socket->peer);
+	} else {
+		// TODO check if `address' is compatible with AddressModule()
+		AddressModule()->set_to((sockaddr *)&socket->peer, address);
+	}
 
 	// we need to activate no matter whether or not we have just disconnected,
 	// as calling connect() always triggers an implicit bind():
@@ -717,26 +808,44 @@ UdpEndpoint::Connect(const sockaddr *address)
 status_t
 UdpEndpoint::Open()
 {
-	BenaphoreLocker locker(sUdpEndpointManager->Locker());
-	return sUdpEndpointManager->OpenEndpoint(this);
+	TRACE_EP("Open()");
+
+	// we can't be the first protocol, there must an underlying
+	// network protocol that supplies us with an address module.
+	if (socket->first_protocol == NULL)
+		return EAFNOSUPPORT;
+
+	if (Domain() == NULL || Domain()->address_module == NULL)
+		return EAFNOSUPPORT;
+
+	fDomain = sUdpEndpointManager->OpenEndpoint(this);
+
+	if (fDomain == NULL)
+		return EAFNOSUPPORT;
+
+	return B_OK;
 }
 
 
 status_t
 UdpEndpoint::Close()
 {
-	BenaphoreLocker locker(sUdpEndpointManager->Locker());
+	TRACE_EP("Close()");
+
+	BenaphoreLocker _(sUdpEndpointManager->Locker());
 	if (fActive)
 		_Deactivate();
-	return sUdpEndpointManager->CloseEndpoint(this);
+
+	return B_OK;
 }
 
 
 status_t
 UdpEndpoint::Free()
 {
-	BenaphoreLocker locker(sUdpEndpointManager->Locker());
-	return sUdpEndpointManager->FreeEndpoint(this);
+	TRACE_EP("Free()");
+
+	return sUdpEndpointManager->FreeEndpoint(fDomain);
 }
 
 
@@ -745,7 +854,7 @@ UdpEndpoint::_Activate()
 {
 	if (fActive)
 		return B_ERROR;
-	status_t status = sUdpEndpointManager->ActivateEndpoint(this);
+	status_t status = fDomain->ActivateEndpoint(this);
 	fActive = (status == B_OK);
 	return status;
 }
@@ -756,9 +865,8 @@ UdpEndpoint::_Deactivate()
 {
 	if (!fActive)
 		return B_ERROR;
-	status_t status = sUdpEndpointManager->DeactivateEndpoint(this);
 	fActive = false;
-	return status;
+	return fDomain->DeactivateEndpoint(this);
 }
 
 
@@ -766,8 +874,10 @@ UdpEndpoint::_Deactivate()
 
 
 status_t
-UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
+UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 {
+	TRACE_EP("SendRoutedData(%p [%lu bytes], %p)", buffer, buffer->size, route);
+
 	if (buffer->size > (0xffff - sizeof(udp_header)))
 		return EMSGSIZE;
 
@@ -778,8 +888,8 @@ UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 	if (header.Status() < B_OK)
 		return header.Status();
 
-	header->source_port = sAddressModule->get_port((sockaddr *)&buffer->source);
-	header->destination_port = sAddressModule->get_port(
+	header->source_port = AddressModule()->get_port((sockaddr *)&buffer->source);
+	header->destination_port = AddressModule()->get_port(
 		(sockaddr *)&buffer->destination);
 	header->udp_length = htons(buffer->size);
 		// the udp-header is already included in the buffer-size
@@ -789,9 +899,9 @@ UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 
 	// generate UDP-checksum (simulating a so-called "pseudo-header"):
 	Checksum udpChecksum;
-	sAddressModule->checksum_address(&udpChecksum,
+	AddressModule()->checksum_address(&udpChecksum,
 		(sockaddr *)route->interface->address);
-	sAddressModule->checksum_address(&udpChecksum,
+	AddressModule()->checksum_address(&udpChecksum,
 		(sockaddr *)&buffer->destination);
 	udpChecksum
 		<< (uint16)htons(IPPROTO_UDP)
@@ -812,12 +922,31 @@ UdpEndpoint::SendData(net_buffer *buffer, net_route *route)
 }
 
 
+status_t
+UdpEndpoint::SendData(net_buffer *buffer)
+{
+	TRACE_EP("SendData(%p [%lu bytes])", buffer, buffer->size);
+
+	net_route *route = NULL;
+	status_t status = sDatalinkModule->get_buffer_route(Domain(), buffer,
+		&route);
+	if (status >= B_OK) {
+		status = SendRoutedData(buffer, route);
+		sDatalinkModule->put_route(Domain(), route);
+	}
+
+	return status;
+}
+
+
 // #pragma mark - inbound
 
 
 ssize_t
 UdpEndpoint::BytesAvailable()
 {
+	// TODO protect this call
+	TRACE_EP("BytesAvailable(): %lu", fFifo.current_bytes);
 	return fFifo.current_bytes;
 }
 
@@ -825,32 +954,29 @@ UdpEndpoint::BytesAvailable()
 status_t
 UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
+	TRACE_EP("FetchData(%ld, 0x%lx)", numBytes, flags);
+
 	net_buffer *buffer;
-	AddressString addressString(sDomain, (sockaddr *)&socket->address, true);
-	TRACE(("FetchData() with size=%ld called for endpoint with (%s)\n",	
-		numBytes, addressString.Data()));
 
 	status_t status = sStackModule->fifo_dequeue_buffer(&fFifo,	flags,
 		socket->receive.timeout, &buffer);
-	TRACE(("Endpoint with (%s) returned from fifo status=%lx\n", 
-		addressString.Data(), status));
+	TRACE_EP("  FetchData(): returned from fifo status=0x%lx", status);
 	if (status < B_OK)
 		return status;
 
-	TRACE(("FetchData() returns buffer with %ld data bytes\n", buffer->size));
+	TRACE_EP("  FetchData(): returns buffer with %ld bytes", buffer->size);
 	*_buffer = buffer;
 	return B_OK;
 }
 
 
 status_t
-UdpEndpoint::StoreData(net_buffer *_buffer)
+UdpEndpoint::StoreData(net_buffer *buffer)
 {
-	TRACE(("buffer %p passed to endpoint with (%s)\n", _buffer,
-		AddressString(sDomain, (sockaddr *)&socket->address, true).Data()));
+	TRACE_EP("StoreData(%p [%ld bytes])", buffer, buffer->size);
 
 	return sStackModule->fifo_socket_enqueue_buffer(&fFifo, socket,
-			B_SELECT_READ, _buffer);
+			B_SELECT_READ, buffer);
 }
 
 
@@ -863,7 +989,11 @@ udp_init_protocol(net_socket *socket)
 	socket->protocol = IPPROTO_UDP;
 
 	UdpEndpoint *endpoint = new (std::nothrow) UdpEndpoint(socket);
-	TRACE(("udp_init_protocol(%p) created endpoint %p\n", socket, endpoint));
+	if (endpoint == NULL || endpoint->InitCheck() < B_OK) {
+		delete endpoint;
+		return NULL;
+	}
+
 	return endpoint;
 }
 
@@ -871,9 +1001,7 @@ udp_init_protocol(net_socket *socket)
 status_t
 udp_uninit_protocol(net_protocol *protocol)
 {
-	TRACE(("udp_uninit_protocol(%p)\n", protocol));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	delete udpEndpoint;
+	delete (UdpEndpoint *)protocol;
 	return B_OK;
 }
 
@@ -881,37 +1009,28 @@ udp_uninit_protocol(net_protocol *protocol)
 status_t
 udp_open(net_protocol *protocol)
 {
-	TRACE(("udp_open(%p)\n", protocol));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->Open();
+	return ((UdpEndpoint *)protocol)->Open();
 }
 
 
 status_t
 udp_close(net_protocol *protocol)
 {
-	TRACE(("udp_close(%p)\n", protocol));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->Close();
+	return ((UdpEndpoint *)protocol)->Close();
 }
 
 
 status_t
 udp_free(net_protocol *protocol)
 {
-	TRACE(("udp_free(%p)\n", protocol));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->Free();
+	return ((UdpEndpoint *)protocol)->Free();
 }
 
 
 status_t
 udp_connect(net_protocol *protocol, const struct sockaddr *address)
 {
-	TRACE(("udp_connect(%p) on address %s\n", protocol,
-		AddressString(sDomain, address, true).Data()));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->Connect(address);
+	return ((UdpEndpoint *)protocol)->Connect(address);
 }
 
 
@@ -926,7 +1045,6 @@ status_t
 udp_control(net_protocol *protocol, int level, int option, void *value,
 	size_t *_length)
 {
-	TRACE(("udp_control(%p)\n", protocol));
 	return protocol->next->module->control(protocol->next, level, option,
 		value, _length);
 }
@@ -935,20 +1053,14 @@ udp_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 udp_bind(net_protocol *protocol, struct sockaddr *address)
 {
-	TRACE(("udp_bind(%p) on address %s\n", protocol,
-		AddressString(sDomain, address, true).Data()));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->Bind(address);
+	return ((UdpEndpoint *)protocol)->Bind(address);
 }
 
 
 status_t
 udp_unbind(net_protocol *protocol, struct sockaddr *address)
 {
-	TRACE(("udp_unbind(%p) on address %s\n", protocol, 
-		AddressString(sDomain, address, true).Data()));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->Unbind(address);
+	return ((UdpEndpoint *)protocol)->Unbind(address);
 }
 
 
@@ -970,35 +1082,21 @@ status_t
 udp_send_routed_data(net_protocol *protocol, struct net_route *route,
 	net_buffer *buffer)
 {
-	TRACE(("udp_send_routed_data(%p) size=%lu\n", protocol, buffer->size));
-
-	return ((UdpEndpoint *)protocol)->SendData(buffer, route);
+	return ((UdpEndpoint *)protocol)->SendRoutedData(buffer, route);
 }
 
 
 status_t
 udp_send_data(net_protocol *protocol, net_buffer *buffer)
 {
-	TRACE(("udp_send_data(%p) size=%lu\n", protocol, buffer->size));
-
-	net_route *route = NULL;
-	status_t status = sDatalinkModule->get_buffer_route(sDomain, buffer,
-		&route);
-	if (status >= B_OK) {
-		status = udp_send_routed_data(protocol, route, buffer);
-		sDatalinkModule->put_route(sDomain, route);
-	}
-
-	return status;
+	return ((UdpEndpoint *)protocol)->SendData(buffer);
 }
 
 
 ssize_t
 udp_send_avail(net_protocol *protocol)
 {
-	ssize_t avail = protocol->socket->send.buffer_size;
-	TRACE(("udp_send_avail(%p) result=%lu\n", protocol, avail));
-	return avail;
+	return protocol->socket->send.buffer_size;
 }
 
 
@@ -1006,17 +1104,14 @@ status_t
 udp_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
-	TRACE(("udp_read_data(%p) size=%lu flags=%lx\n", protocol, numBytes, flags));
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->FetchData(numBytes, flags, _buffer);
+	return ((UdpEndpoint *)protocol)->FetchData(numBytes, flags, _buffer);
 }
 
 
 ssize_t
 udp_read_avail(net_protocol *protocol)
 {
-	UdpEndpoint *udpEndpoint = (UdpEndpoint *)protocol;
-	return udpEndpoint->BytesAvailable();
+	return ((UdpEndpoint *)protocol)->BytesAvailable();
 }
 
 
@@ -1037,7 +1132,6 @@ udp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 udp_receive_data(net_buffer *buffer)
 {
-	TRACE(("udp_receive_data() size=%lu\n", buffer->size));
 	return sUdpEndpointManager->ReceiveData(buffer);
 }
 
@@ -1064,7 +1158,7 @@ static status_t
 init_udp()
 {
 	status_t status;
-	TRACE(("init_udp()\n"));
+	TRACE_EPM("init_udp()");
 
 	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
@@ -1114,7 +1208,7 @@ err2:
 err1:
 	put_module(NET_STACK_MODULE_NAME);
 
-	TRACE(("init_udp() fails with %lx (%s)\n", status, strerror(status)));
+	TRACE_EPM("init_udp() fails with %lx (%s)", status, strerror(status));
 	return status;
 }
 
@@ -1122,7 +1216,7 @@ err1:
 static status_t
 uninit_udp()
 {
-	TRACE(("uninit_udp()\n"));
+	TRACE_EPM("uninit_udp()");
 	delete sUdpEndpointManager;
 	put_module(NET_DATALINK_MODULE_NAME);
 	put_module(NET_BUFFER_MODULE_NAME);
