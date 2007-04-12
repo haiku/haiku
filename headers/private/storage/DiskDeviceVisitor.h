@@ -22,4 +22,4 @@ public:
 	virtual bool Visit(BPartition *partition, int32 level);
 };
 
-#endif _DISK_DEVICE_VISITOR_H
+#endif	// _DISK_DEVICE_VISITOR_H
