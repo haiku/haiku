@@ -32,20 +32,18 @@
 #include "GSUtility.h"
 
 
-BPushGameSound::BPushGameSound(size_t inBufferFrameCount,
-							   const gs_audio_format *format,
-							   size_t inBufferCount,
-							   BGameSoundDevice *device)
+BPushGameSound::BPushGameSound(size_t inBufferFrameCount, const gs_audio_format *format,
+			size_t inBufferCount, BGameSoundDevice *device)
  	:	BStreamingGameSound(inBufferFrameCount, format, inBufferCount, device)
 {
-	if (InitCheck() == B_OK)
-	{
-		status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
-		if (error != B_OK)
-			fPageLocked = new BList;
-		else
-			SetInitError(error);
-	}				
+	if (InitCheck() != B_OK)
+		return;
+	
+	status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
+	if (error != B_OK)
+		fPageLocked = new BList;
+	else
+		SetInitError(error);
 }
 
 
@@ -69,14 +67,16 @@ BPushGameSound::~BPushGameSound()
 
 
 BPushGameSound::lock_status
-BPushGameSound::LockNextPage(void **out_pagePtr,
-							 size_t *out_pageSize)
+BPushGameSound::LockNextPage(void **out_pagePtr, size_t *out_pageSize)
 {	
 	// the user can not lock every page
-	if (fPageLocked->CountItems() > fPageCount - 3) return lock_failed;
+	if (fPageLocked->CountItems() > fPageCount - 3) 
+		return lock_failed;
 	
 	// the user cann't lock a page being played
-	if (fLockPos < fPlayPos && fLockPos + fPageSize > fPlayPos) return lock_failed;
+	if (fLockPos < fPlayPos
+		&& fLockPos + fPageSize > fPlayPos) 
+		return lock_failed;
 	
 	// lock the page
 	char * lockPage = &fBuffer[fLockPos];
@@ -84,7 +84,8 @@ BPushGameSound::LockNextPage(void **out_pagePtr,
 	
 	// move the locker to the next page
 	fLockPos += fPageSize;
-	if (fLockPos > fBufferSize) fLockPos = 0;
+	if (fLockPos > fBufferSize) 
+		fLockPos = 0;
 	
 	*out_pagePtr = lockPage;
 	*out_pageSize = fPageSize;
@@ -101,8 +102,7 @@ BPushGameSound::UnlockPage(void *in_pagePtr)
 
 
 BPushGameSound::lock_status
-BPushGameSound::LockForCyclic(void **out_basePtr,
-							  size_t *out_size)
+BPushGameSound::LockForCyclic(void **out_basePtr, size_t *out_size)
 {
 	*out_basePtr = fBuffer;
 	*out_size = fBufferSize;
@@ -136,8 +136,7 @@ BPushGameSound::Clone() const
 
 
 status_t
-BPushGameSound::Perform(int32 selector,
-						void *data)
+BPushGameSound::Perform(int32 selector, void *data)
 {
 	return B_ERROR;
 }
@@ -149,7 +148,8 @@ BPushGameSound::SetParameters(size_t inBufferFrameCount,
 							  size_t inBufferCount)
 {
 	status_t error = BStreamingGameSound::SetParameters(inBufferFrameCount, format, inBufferCount);
-	if (error != B_OK) return error;
+	if (error != B_OK)
+		return error;
 	
 	size_t frameSize = get_sample_size(format->format) * format->channel_count;
 	
@@ -172,67 +172,61 @@ BPushGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, siz
 
 
 void
-BPushGameSound::FillBuffer(void *inBuffer,
-						   size_t inByteCount)
+BPushGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
 {	
 	size_t bytes = inByteCount;
 	
-	if (BytesReady(&bytes))
-	{
-		if (fPlayPos + bytes > fBufferSize)
-		{
-			size_t remainder = fPlayPos + bytes - fBufferSize;
-			char * buffer = (char*)inBuffer;
-			
-			// fill the buffer with the samples left at the end of our buffer
-			memcpy(buffer, &fBuffer[fPlayPos], remainder);
-			fPlayPos = 0;
-			
-			// fill the remainder of the buffer by looping to the start
-			// of the buffer if it isn't locked
-			bytes -= remainder;
-			if (BytesReady(&bytes))
-			{
-				memcpy(&buffer[remainder], fBuffer, bytes);
-				fPlayPos += bytes;
-			}	
-		}
-		else
-		{
-			memcpy(inBuffer, &fBuffer[fPlayPos], bytes);
-			fPlayPos += bytes;
-		}
+	if (!BytesReady(&bytes))
+		return;
+	
+	if (fPlayPos + bytes > fBufferSize) {
+		size_t remainder = fPlayPos + bytes - fBufferSize;
+		char * buffer = (char*)inBuffer;
 		
-		BStreamingGameSound::FillBuffer(inBuffer, inByteCount);
-	}					
+		// fill the buffer with the samples left at the end of our buffer
+		memcpy(buffer, &fBuffer[fPlayPos], remainder);
+		fPlayPos = 0;
+		
+		// fill the remainder of the buffer by looping to the start
+		// of the buffer if it isn't locked
+		bytes -= remainder;
+		if (BytesReady(&bytes)) {
+			memcpy(&buffer[remainder], fBuffer, bytes);
+			fPlayPos += bytes;
+		}	
+	} else {
+		memcpy(inBuffer, &fBuffer[fPlayPos], bytes);
+		fPlayPos += bytes;
+	}
+	
+	BStreamingGameSound::FillBuffer(inBuffer, inByteCount);
 }
 
 
 bool
 BPushGameSound::BytesReady(size_t * bytes)
 {	
-	if (fPageLocked->CountItems() > 0)
-	{
-		size_t start = fPlayPos;
-		size_t ready = fPlayPos;
-		int32 page = int32(start / fPageSize);
+	if (fPageLocked->CountItems() <= 0)
+		return true;
 	
-		// return if there is nothing to do
-		if (fPageLocked->HasItem(&fBuffer[page * fPageSize])) return false;
+	size_t start = fPlayPos;
+	size_t ready = fPlayPos;
+	int32 page = int32(start / fPageSize);
 	
-		while (ready < *bytes)
-		{	
-			ready += fPageSize;
-			page = int32(ready / fPageSize);
+	// return if there is nothing to do
+	if (fPageLocked->HasItem(&fBuffer[page * fPageSize])) 
+		return false;
+	
+	while (ready < *bytes) {
+		ready += fPageSize;
+		page = int32(ready / fPageSize);
 		
-			if (fPageLocked->HasItem(&fBuffer[page * fPageSize]))
-			{
-				// we have found a locked page
-				*bytes = ready - start - (ready - page * fPageSize);
-				return true;
-			}
-		}	
-	}
+		if (fPageLocked->HasItem(&fBuffer[page * fPageSize])) {
+			// we have found a locked page
+			*bytes = ready - start - (ready - page * fPageSize);
+			return true;
+		}
+	}	
 	
 	// all of the bytes are ready
 	return true;

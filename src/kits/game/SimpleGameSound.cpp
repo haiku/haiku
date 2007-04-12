@@ -39,8 +39,7 @@
 
 #include <SimpleGameSound.h>
 
-BSimpleGameSound::BSimpleGameSound(const entry_ref *inFile,
-								   BGameSoundDevice *device)
+BSimpleGameSound::BSimpleGameSound(const entry_ref *inFile, BGameSoundDevice *device)
  		:	BGameSound(device)
 {
 	if (InitCheck() == B_OK) 
@@ -48,8 +47,7 @@ BSimpleGameSound::BSimpleGameSound(const entry_ref *inFile,
 }
 
 
-BSimpleGameSound::BSimpleGameSound(const char *inFile,
-								   BGameSoundDevice *device)
+BSimpleGameSound::BSimpleGameSound(const char *inFile, BGameSoundDevice *device)
  		:	BGameSound(device)
 {
 	if (InitCheck() == B_OK)
@@ -71,7 +69,7 @@ BSimpleGameSound::BSimpleGameSound(const void *inData,
  	:	BGameSound(device)
 {
 	if (InitCheck() == B_OK) 
-	SetInitError(Init(inData, inFrameCount, format));
+		SetInitError(Init(inData, inFrameCount, format));
 }
 
 
@@ -155,11 +153,13 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 	media_format mformat;
 	int64 framesRead, framesTotal = 0;
 		
-	if (file.InitCheck() != B_OK) return file.InitCheck();
+	if (file.InitCheck() != B_OK) 
+		return file.InitCheck();
 	
 	BMediaTrack* audioStream = file.TrackAt(0);
 	audioStream->EncodedFormat(&mformat);
-	if (!mformat.IsAudio()) return B_ERROR;
+	if (!mformat.IsAudio())
+		return B_ERROR;
 	
 	int64 frames = audioStream->CountFrames();
 	
@@ -172,15 +172,13 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 	memset(&gsformat, 0, sizeof(gs_audio_format));
 	media_to_gs_format(&gsformat, &mformat.u.raw_audio); 
 	
-	if (mformat.u.raw_audio.format == media_raw_audio_format::B_AUDIO_CHAR)
-	{
+	if (mformat.u.raw_audio.format == media_raw_audio_format::B_AUDIO_CHAR) {
 		// The GameKit doesnt support this format so we will have to reformat
 		// the data into something the GameKit does support.
 		char * buffer = new char[gsformat.buffer_size];
 		uchar * data = new uchar[frames * gsformat.channel_count];
 		
-		while (framesTotal < frames)
-		{
+		while (framesTotal < frames) {
 			// read the next chunck from the stream
 			memset(buffer, 0, gsformat.buffer_size);
 			audioStream->ReadFrames(buffer, &framesRead);
@@ -200,17 +198,14 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 		// free the buffers we no longer need
 		delete [] buffer;
 		delete [] data;
-	}
-	else
-	{
+	} else {
 		// We need to detriman the size, in bytes, of a single sample.
 		// At the same time, we will store the format of the audio buffer		
 		size_t frameSize = get_sample_size(gsformat.format) * gsformat.channel_count;
 		char * data = new char[frames * frameSize]; 
 		gsformat.buffer_size = frames * frameSize;
 	
-		while(framesTotal < frames)
-		{
+		while(framesTotal < frames) {
 			char * position = &data[framesTotal * frameSize];
 			audioStream->ReadFrames(position, &framesRead);
 		
@@ -228,14 +223,14 @@ BSimpleGameSound::Init(const entry_ref* inFile)
  
 
 status_t 
-BSimpleGameSound::Init(const void* inData, 
-						int64 inFrameCount,
+BSimpleGameSound::Init(const void* inData, int64 inFrameCount,
 						const gs_audio_format* format)
 {
 	gs_id sound;
 	
 	status_t error = Device()->CreateBuffer(&sound, format, inData, inFrameCount);
-	if (error != B_OK) return error;	
+	if (error != B_OK)
+		return error;	
 	
 	BGameSound::Init(sound);
 	
