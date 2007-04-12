@@ -67,8 +67,10 @@ be_error_exit (j_common_ptr cinfo)
 	/* Create the message */
 	(*cinfo->err->format_message) (cinfo, buffer);
 
+#if 0
 	/* show error message */
 	(new BAlert("JPEG Library Error", buffer, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+#endif
 
 	/* Let the memory manager delete any temp files before we die */
 	jpeg_destroy(cinfo);
@@ -88,10 +90,12 @@ be_output_message (j_common_ptr cinfo)
 	/* Create the message */
 	(*cinfo->err->format_message) (cinfo, buffer);
 
+#if 0
 	/* If it's compressing or decompressing and user turned messages on */
 	if (!cinfo->is_decompressor || cinfo->err->ShowReadWarnings)
 		/* show warning message */
 		(new BAlert("JPEG Library Warning", buffer, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+#endif
 }
 
 

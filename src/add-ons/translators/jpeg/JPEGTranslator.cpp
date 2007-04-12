@@ -53,7 +53,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 char translatorName[] = "JPEG Images";
 char translatorInfo[] =
 	"©2002-2003, Marcin Konicki\n"
-	"©2005-2006, Haiku\n"
+	"©2005-2007, Haiku\n"
 	"\n"
 	"Based on IJG library © 1991-1998, Thomas G. Lane\n"
 	"          http://www.ijg.org/files/\n"
@@ -63,7 +63,7 @@ char translatorInfo[] =
 	"With some colorspace conversion routines by Magnus Hellman\n"
 	"          http://www.bebits.com/app/802\n";
 
-int32 translatorVersion = 0x111;
+int32 translatorVersion = 0x120;
 
 // Define the formats we know how to read
 translation_format inputFormats[] = {
@@ -1379,31 +1379,29 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 	jpeg_create_decompress(&cinfo);
 	be_jpeg_stdio_src(&cinfo, in);
 
-#if 1
 	jpeg_save_markers(&cinfo, MARKER_EXIF, 131072);
 		// make sure the EXIF tag is stored
-#endif
 
 	// Read info about image
 	jpeg_read_header(&cinfo, TRUE);
 
 	BMessage exif;
 
-	if (ioExtension != NULL) {
-		// add EXIF data to message, if any
-		jpeg_marker_struct* marker = cinfo.marker_list;
-		while (marker != NULL) {
-			if (marker->marker == MARKER_EXIF
-				&& !strncmp((char*)marker->data, "Exif", 4)) {
+	// parse EXIF data and add it ioExtension, if any
+	jpeg_marker_struct* marker = cinfo.marker_list;
+	while (marker != NULL) {
+		if (marker->marker == MARKER_EXIF
+			&& !strncmp((char*)marker->data, "Exif", 4)) {
+			if (ioExtension != NULL) {
 				// Strip EXIF header from TIFF data
 				ioExtension->AddData("exif", B_RAW_TYPE,
 					(uint8 *)marker->data + 6, marker->data_length - 6);
-
-				BMemoryIO io(marker->data + 6, marker->data_length - 6);
-				convert_exif_to_message(io, exif);
 			}
-			marker = marker->next;
+
+			BMemoryIO io(marker->data + 6, marker->data_length - 6);
+			convert_exif_to_message(io, exif);
 		}
+		marker = marker->next;
 	}
 
 	// Default color info
