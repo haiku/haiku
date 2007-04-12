@@ -87,7 +87,7 @@ class NetBufferField : public NetBufferFieldReader<Type, Offset, Module> {
 
 		~NetBufferField()
 		{
-			Sync();
+			this->Sync();
 		}
 };
 
@@ -101,15 +101,15 @@ class NetBufferHeaderReader : public NetBufferFieldReader<Type, 0, Module> {
 		void
 		Remove()
 		{
-			Remove(sizeof(Type));
+			this->Remove(sizeof(Type));
 		}
 
 		void
 		Remove(size_t bytes)
 		{
-			if (fBuffer != NULL) {
-				Module::Get()->remove_header(fBuffer, bytes);
-				fBuffer = NULL;
+			if (this->fBuffer != NULL) {
+				Module::Get()->remove_header(this->fBuffer, bytes);
+				this->fBuffer = NULL;
 			}
 		}
 };
@@ -123,7 +123,7 @@ class NetBufferHeaderRemover : public NetBufferHeaderReader<Type, Module> {
 
 		~NetBufferHeaderRemover()
 		{
-			Remove();
+			this->Remove();
 		}
 };
 
@@ -133,17 +133,17 @@ class NetBufferPrepend : public NetBufferFieldReader<Type, 0, Module> {
 	public:
 		NetBufferPrepend(net_buffer *buffer, size_t size = sizeof(Type))
 		{
-			fBuffer = buffer;
+			this->fBuffer = buffer;
 
-			fStatus = Module::Get()->prepend_size(buffer, size,
-				(void **)&fData);
-			if (fStatus == B_OK && fData == NULL)
-				fData = &fDataBuffer;
+			this->fStatus = Module::Get()->prepend_size(buffer, size,
+				(void **)&(this->fData));
+			if (this->fStatus == B_OK && this->fData == NULL)
+				this->fData = &this->fDataBuffer;
 		}
 
 		~NetBufferPrepend()
 		{
-			Sync();
+			this->Sync();
 		}
 };
 
