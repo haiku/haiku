@@ -40,7 +40,7 @@ BPushGameSound::BPushGameSound(size_t inBufferFrameCount, const gs_audio_format 
 		return;
 	
 	status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
-	if (error != B_OK)
+	if (error == B_OK)
 		fPageLocked = new BList;
 	else
 		SetInitError(error);
