@@ -24,6 +24,7 @@
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
+#include <Roster.h>
 #include <String.h>
 #include <TextView.h>
 
@@ -68,7 +69,7 @@ const bigtime_t kUpdateInterval = 1000000;
 NetworkStatusView::NetworkStatusView(BRect frame, int32 resizingMode,
 		bool inDeskbar)
 	: BView(frame, kDeskbarItemName, resizingMode,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
+		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
 	fStatus(kStatusUnknown)
 {
@@ -88,8 +89,14 @@ NetworkStatusView::NetworkStatusView(BRect frame, int32 resizingMode,
 
 
 NetworkStatusView::NetworkStatusView(BMessage* archive)
-	: BView(archive)
+	: BView(archive),
+	fInDeskbar(false)
 {
+	app_info info;
+	if (be_app->GetAppInfo(&info) == B_OK
+		&& !strcasecmp(info.signature, "application/x-vnd.Be-TSKB"))
+		fInDeskbar = true;
+
 	_Init();
 }
 
@@ -243,6 +250,7 @@ void
 NetworkStatusView::FrameResized(float width, float height)
 {
 	_UpdateBitmaps();
+	Invalidate();
 }
 
 
