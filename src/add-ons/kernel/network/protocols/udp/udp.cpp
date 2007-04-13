@@ -22,15 +22,13 @@
 
 #include <NetBufferUtilities.h>
 #include <NetUtilities.h>
+#include <ProtocolUtilities.h>
 
 #include <netinet/in.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
 #include <utility>
-
-// TODO move the locking from the FIFO to the whole Endpoint
-//      much like we did with the LinkProtocol.
 
 //#define TRACE_UDP
 #ifdef TRACE_UDP
@@ -64,12 +62,9 @@ typedef NetBufferField<uint16, offsetof(udp_header, udp_checksum)>
 
 class UdpDomainSupport;
 
-class UdpEndpoint : public net_protocol {
+class UdpEndpoint : public net_protocol, public DatagramSocket<> {
 public:
 	UdpEndpoint(net_socket *socket);
-	~UdpEndpoint();
-
-	status_t				InitCheck() const;
 
 	status_t				Bind(sockaddr *newAddr);
 	status_t				Unbind(sockaddr *newAddr);
@@ -110,8 +105,6 @@ private:
 	bool					fActive;
 								// an active UdpEndpoint is part of the endpoint 
 								// hash (and it is bound and optionally connected)
-	net_fifo				fFifo;
-								// storage space for incoming data
 };
 
 
@@ -208,9 +201,9 @@ private:
 
 static UdpEndpointManager *sUdpEndpointManager;
 
+net_stack_module_info *gStackModule;
 net_buffer_module_info *gBufferModule;
 static net_datalink_module_info *sDatalinkModule;
-static net_stack_module_info *sStackModule;
 
 
 // #pragma mark -
@@ -707,27 +700,10 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 
 UdpEndpoint::UdpEndpoint(net_socket *socket)
 	:
+	DatagramSocket<>("udp endpoint", socket),
 	fDomain(NULL),
 	fActive(false)
 {
-	status_t status = sStackModule->init_fifo(&fFifo, "UDP endpoint fifo", 
-		socket->receive.buffer_size);
-	if (status < B_OK)
-		fFifo.notify = status;
-}
-
-
-UdpEndpoint::~UdpEndpoint()
-{
-	if (fFifo.notify >= B_OK)
-		sStackModule->uninit_fifo(&fFifo);
-}
-
-
-status_t
-UdpEndpoint::InitCheck() const
-{
-	return fFifo.notify;
 }
 
 
@@ -945,9 +921,9 @@ UdpEndpoint::SendData(net_buffer *buffer)
 ssize_t
 UdpEndpoint::BytesAvailable()
 {
-	// TODO protect this call
-	TRACE_EP("BytesAvailable(): %lu", fFifo.current_bytes);
-	return fFifo.current_bytes;
+	size_t bytes = AvailableData();
+	TRACE_EP("BytesAvailable(): %lu", bytes);
+	return bytes;
 }
 
 
@@ -956,16 +932,12 @@ UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
 	TRACE_EP("FetchData(%ld, 0x%lx)", numBytes, flags);
 
-	net_buffer *buffer;
-
-	status_t status = sStackModule->fifo_dequeue_buffer(&fFifo,	flags,
-		socket->receive.timeout, &buffer);
+	status_t status = SocketDequeue(flags, _buffer);
 	TRACE_EP("  FetchData(): returned from fifo status=0x%lx", status);
 	if (status < B_OK)
 		return status;
 
-	TRACE_EP("  FetchData(): returns buffer with %ld bytes", buffer->size);
-	*_buffer = buffer;
+	TRACE_EP("  FetchData(): returns buffer with %ld bytes", (*_buffer)->size);
 	return B_OK;
 }
 
@@ -975,8 +947,7 @@ UdpEndpoint::StoreData(net_buffer *buffer)
 {
 	TRACE_EP("StoreData(%p [%ld bytes])", buffer, buffer->size);
 
-	return sStackModule->fifo_socket_enqueue_buffer(&fFifo, socket,
-			B_SELECT_READ, buffer);
+	return EnqueueClone(buffer);
 }
 
 
@@ -1160,7 +1131,7 @@ init_udp()
 	status_t status;
 	TRACE_EPM("init_udp()");
 
-	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
+	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
 	if (status < B_OK)
 		return status;
 	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
@@ -1179,20 +1150,20 @@ init_udp()
 	if (status != B_OK)
 		goto err3;
 
-	status = sStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_IP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_IP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err4;
-	status = sStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err4;
 
-	status = sStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_UDP,
+	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_UDP,
 		"network/protocols/udp/v1");
 	if (status < B_OK)
 		goto err4;

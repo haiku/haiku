@@ -20,6 +20,7 @@
 #include <util/AutoLock.h>
 
 #include <KernelExport.h>
+#include <ProtocolUtilities.h>
 
 #include <net/if_types.h>
 #include <new>
@@ -28,12 +29,18 @@
 #include <sys/sockio.h>
 
 
-class LinkProtocol : public net_protocol {
+class LocalStackBundle {
 public:
-	LinkProtocol();
-	~LinkProtocol();
+	static net_stack_module_info *Stack() { return &gNetStackModule; }
+	static net_buffer_module_info *Buffer() { return &gNetBufferModule; }
+};
 
-	status_t InitCheck() const;
+typedef DatagramSocket<BenaphoreLocking, LocalStackBundle> LocalDatagramSocket;
+
+class LinkProtocol : public net_protocol, public LocalDatagramSocket {
+public:
+	LinkProtocol(net_socket *socket);
+	~LinkProtocol();
 
 	status_t StartMonitoring(const char *);
 	status_t StopMonitoring();
@@ -42,11 +49,7 @@ public:
 	ssize_t ReadAvail() const;
 
 private:
-	status_t _Enqueue(net_buffer *buffer);
 	status_t _Unregister();
-
-	mutable benaphore	fLock;
-	Fifo				fFifo;
 
 	net_device_monitor	fMonitor;
 	net_device_interface *fMonitoredDevice;
@@ -59,11 +62,9 @@ private:
 struct net_domain *sDomain;
 
 
-LinkProtocol::LinkProtocol()
-	: fFifo("packet monitor fifo", 65536)
+LinkProtocol::LinkProtocol(net_socket *socket)
+	: LocalDatagramSocket("packet capture", socket)
 {
-	benaphore_init(&fLock, "packet monitor lock");
-
 	fMonitor.cookie = this;
 	fMonitor.receive = _MonitorData;
 	fMonitor.event = _MonitorEvent;
@@ -77,15 +78,6 @@ LinkProtocol::~LinkProtocol()
 		unregister_device_monitor(fMonitoredDevice->device, &fMonitor);
 		put_device_interface(fMonitoredDevice);
 	}
-
-	benaphore_destroy(&fLock);
-}
-
-
-status_t
-LinkProtocol::InitCheck() const
-{
-	return fLock.sem >= 0 && fFifo.InitCheck();
 }
 
 
@@ -127,26 +119,24 @@ LinkProtocol::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
 	BenaphoreLocker _(fLock);
 
-	bigtime_t timeout = socket->receive.timeout;
+	bool clone = flags & MSG_PEEK;
+	bigtime_t timeout = _SocketTimeout(flags);
 
-	if (timeout == 0)
-		flags |= MSG_DONTWAIT;
-	else if (timeout != B_INFINITE_TIMEOUT)
-		timeout += system_time();
-
-	while (fFifo.IsEmpty()) {
+	bool waited = false;
+	while (_IsEmpty()) {
 		if (fMonitoredDevice == NULL)
 			return ENODEV;
 
-		status_t status = B_WOULD_BLOCK;
-		if ((flags & MSG_DONTWAIT) == 0)
-			status = fFifo.Wait(&fLock, timeout);
-
+		status_t status = _Wait(timeout);
 		if (status < B_OK)
 			return status;
+		waited = true;
 	}
 
-	*_buffer = fFifo.Dequeue(flags & MSG_PEEK);
+	*_buffer = _Dequeue(clone);
+	if (clone && waited)
+		_NotifyOneReader(false);
+
 	return *_buffer ? B_OK : B_NO_MEMORY;
 }
 
@@ -157,7 +147,7 @@ LinkProtocol::ReadAvail() const
 	BenaphoreLocker _(fLock);
 	if (fMonitoredDevice == NULL)
 		return ENODEV;
-	return fFifo.current_bytes;
+	return fCurrentBytes;
 }
 
 
@@ -177,17 +167,9 @@ LinkProtocol::_Unregister()
 
 
 status_t
-LinkProtocol::_Enqueue(net_buffer *buffer)
-{
-	BenaphoreLocker _(fLock);
-	return fFifo.EnqueueAndNotify(buffer, socket, B_SELECT_READ);
-}
-
-
-status_t
 LinkProtocol::_MonitorData(net_device_monitor *monitor, net_buffer *packet)
 {
-	return ((LinkProtocol *)monitor->cookie)->_Enqueue(packet);
+	return ((LinkProtocol *)monitor->cookie)->EnqueueClone(packet);
 }
 
 
@@ -200,8 +182,8 @@ LinkProtocol::_MonitorEvent(net_device_monitor *monitor, int32 event)
 		BenaphoreLocker _(protocol->fLock);
 
 		protocol->_Unregister();
-		if (protocol->fFifo.IsEmpty()) {
-			protocol->fFifo.WakeAll();
+		if (protocol->_IsEmpty()) {
+			protocol->WakeAll();
 			notify_socket(protocol->socket, B_SELECT_READ, ENODEV);
 		}
 	}
@@ -214,7 +196,7 @@ LinkProtocol::_MonitorEvent(net_device_monitor *monitor, int32 event)
 net_protocol *
 link_init_protocol(net_socket *socket)
 {
-	LinkProtocol *protocol = new (std::nothrow) LinkProtocol();
+	LinkProtocol *protocol = new (std::nothrow) LinkProtocol(socket);
 	if (protocol && protocol->InitCheck() < B_OK) {
 		delete protocol;
 		return NULL;

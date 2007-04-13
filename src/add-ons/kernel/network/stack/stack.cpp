@@ -888,7 +888,7 @@ stack_std_ops(int32 op, ...)
 }
 
 
-static net_stack_module_info sNetStackModule = {
+net_stack_module_info gNetStackModule = {
 	{
 		NET_STACK_MODULE_NAME,
 		0,
@@ -939,7 +939,7 @@ static module_info sNetStarterModule = {
 };
 
 module_info *modules[] = {
-	(module_info *)&sNetStackModule,
+	(module_info *)&gNetStackModule,
 	(module_info *)&sNetStarterModule,
 	(module_info *)&gNetBufferModule,
 	(module_info *)&gNetSocketModule,

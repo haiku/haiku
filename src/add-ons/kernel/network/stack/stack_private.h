@@ -14,10 +14,12 @@
 #include <net_datalink_protocol.h>
 #include <net_protocol.h>
 #include <net_socket.h>
+#include <net_stack.h>
 
 
 #define NET_STARTER_MODULE_NAME "network/stack/starter/v1"
 
+extern net_stack_module_info gNetStackModule;
 extern net_buffer_module_info gNetBufferModule;
 extern net_socket_module_info gNetSocketModule;
 extern net_datalink_module_info gNetDatalinkModule;

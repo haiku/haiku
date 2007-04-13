@@ -13,6 +13,7 @@
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <NetBufferUtilities.h>
+#include <ProtocolUtilities.h>
 
 #include <ByteOrder.h>
 #include <KernelExport.h>
@@ -110,22 +111,9 @@ class FragmentPacket {
 
 typedef DoublyLinkedList<class RawSocket> RawSocketList;
 
-class RawSocket : public DoublyLinkedListLinkImpl<RawSocket> {
+class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
 	public:
 		RawSocket(net_socket *socket);
-		~RawSocket();
-
-		status_t InitCheck();
-
-		status_t Read(size_t numBytes, uint32 flags, bigtime_t timeout,
-					net_buffer **_buffer);
-		ssize_t BytesAvailable();
-
-		status_t Write(net_buffer *buffer);
-
-	private:
-		net_socket	*fSocket;
-		net_fifo	fFifo;
 };
 
 struct ipv4_protocol : net_protocol {
@@ -142,10 +130,11 @@ struct ipv4_protocol : net_protocol {
 extern net_protocol_module_info gIPv4Module;
 	// we need this in ipv4_std_ops() for registering the AF_INET domain
 
+net_stack_module_info *gStackModule;
+net_buffer_module_info *gBufferModule;
+
 static struct net_domain *sDomain;
 static net_datalink_module_info *sDatalinkModule;
-static net_stack_module_info *sStackModule;
-struct net_buffer_module_info *gBufferModule;
 static int32 sPacketID;
 static RawSocketList sRawSockets;
 static benaphore sRawSocketsLock;
@@ -156,56 +145,8 @@ static benaphore sReceivingProtocolLock;
 
 
 RawSocket::RawSocket(net_socket *socket)
-	:
-	fSocket(socket)
+	: DatagramSocket<>("ipv4 raw socket", socket)
 {
-	status_t status = sStackModule->init_fifo(&fFifo, "ipv4 raw socket", 65536);
-	if (status < B_OK)
-		fFifo.notify = status;
-}
-
-
-RawSocket::~RawSocket()
-{
-	if (fFifo.notify >= B_OK)
-		sStackModule->uninit_fifo(&fFifo);
-}
-
-
-status_t
-RawSocket::InitCheck()
-{
-	return fFifo.notify >= B_OK ? B_OK : fFifo.notify;
-}
-
-
-status_t
-RawSocket::Read(size_t numBytes, uint32 flags, bigtime_t timeout,
-	net_buffer **_buffer)
-{
-	net_buffer *buffer;
-	status_t status = sStackModule->fifo_dequeue_buffer(&fFifo,
-		flags, timeout, &buffer);
-	if (status < B_OK)
-		return status;
-
-	*_buffer = buffer;
-	return B_OK;
-}
-
-
-ssize_t
-RawSocket::BytesAvailable()
-{
-	return fFifo.current_bytes;
-}
-
-
-status_t
-RawSocket::Write(net_buffer *source)
-{
-	return sStackModule->fifo_socket_enqueue_buffer(&fFifo, fSocket,
-			B_SELECT_READ, source);
 }
 
 
@@ -218,14 +159,14 @@ FragmentPacket::FragmentPacket(const ipv4_packet_key &key)
 	fReceivedLastFragment(false),
 	fBytesLeft(IP_MAXPACKET)
 {
-	sStackModule->init_timer(&fTimer, StaleTimer, this);
+	gStackModule->init_timer(&fTimer, StaleTimer, this);
 }
 
 
 FragmentPacket::~FragmentPacket()
 {
 	// cancel the kill timer
-	sStackModule->set_timer(&fTimer, -1);
+	gStackModule->set_timer(&fTimer, -1);
 
 	// delete all fragments
 	net_buffer *buffer;
@@ -240,7 +181,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 	bool lastFragment)
 {
 	// restart the timer
-	sStackModule->set_timer(&fTimer, FRAGMENT_TIMEOUT);
+	gStackModule->set_timer(&fTimer, FRAGMENT_TIMEOUT);
 
 	if (start >= end) {
 		// invalid fragment
@@ -595,7 +536,7 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 		header->fragment_offset = htons((lastFragment ? 0 : IP_MORE_FRAGMENTS)
 			| (fragmentOffset >> 3));
 		header->checksum = 0;
-		header->checksum = sStackModule->checksum((uint8 *)header, headerLength);
+		header->checksum = gStackModule->checksum((uint8 *)header, headerLength);
 			// TODO: compute the checksum only for those parts that changed?
 
 		dprintf("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
@@ -644,10 +585,8 @@ raw_receive_data(net_buffer *buffer)
 
 	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
 
-	while (iterator.HasNext()) {
-		RawSocket *raw = iterator.Next();
-		raw->Write(buffer);
-	}
+	while (iterator.HasNext())
+		iterator.Next()->EnqueueClone(buffer);
 }
 
 
@@ -664,7 +603,7 @@ receiving_protocol(uint8 protocol)
 	if (module != NULL)
 		return module;
 
-	if (sStackModule->get_domain_receiving_protocol(sDomain, protocol, &module) == B_OK)
+	if (gStackModule->get_domain_receiving_protocol(sDomain, protocol, &module) == B_OK)
 		sReceivingProtocol[protocol] = module;
 
 	return module;
@@ -1016,7 +955,7 @@ ipv4_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
 		return B_ERROR;
 
 	TRACE(("read is waiting for data...\n"));
-	return raw->Read(numBytes, flags, protocol->socket->receive.timeout, _buffer);
+	return raw->SocketDequeue(flags, _buffer);
 }
 
 
@@ -1028,7 +967,7 @@ ipv4_read_avail(net_protocol *_protocol)
 	if (raw == NULL)
 		return B_ERROR;
 
-	return raw->BytesAvailable();
+	return raw->AvailableData();
 }
 
 
@@ -1175,7 +1114,7 @@ ipv4_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 status_t
 init_ipv4()
 {
-	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
+	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
 	if (status < B_OK)
 		return status;
 	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
@@ -1209,12 +1148,12 @@ init_ipv4()
 		// so we have to do it here, manually
 		// TODO: for modules, this shouldn't be required
 
-	status = sStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
 		"network/protocols/ipv4/v1", NULL);
 	if (status < B_OK)
 		goto err7;
 
-	status = sStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
+	status = gStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
 		&gIPv4AddressModule, &sDomain);
 	if (status < B_OK)
 		goto err7;
@@ -1247,10 +1186,10 @@ uninit_ipv4()
 	// put all the domain receiving protocols we gathered so far
 	for (uint32 i = 0; i < 256; i++) {
 		if (sReceivingProtocol[i] != NULL)
-			sStackModule->put_domain_receiving_protocol(sDomain, i);
+			gStackModule->put_domain_receiving_protocol(sDomain, i);
 	}
 
-	sStackModule->unregister_domain(sDomain);
+	gStackModule->unregister_domain(sDomain);
 	benaphore_unlock(&sReceivingProtocolLock);
 
 	hash_uninit(sFragmentHash);
