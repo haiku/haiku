@@ -938,7 +938,7 @@ UdpEndpoint::StoreData(net_buffer *buffer)
 {
 	TRACE_EP("StoreData(%p [%ld bytes])", buffer, buffer->size);
 
-	return EnqueueClone(buffer);
+	return SocketEnqueue(buffer);
 }
 
 

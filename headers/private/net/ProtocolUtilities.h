@@ -50,12 +50,13 @@ public:
 	status_t InitCheck() const;
 
 	status_t Enqueue(net_buffer *buffer);
-	status_t EnqueueClone(net_buffer *buffer);
 	net_buffer *Dequeue(bool clone);
 	status_t BlockingDequeue(bool clone, bigtime_t timeout,
 		net_buffer **_buffer);
-	status_t SocketDequeue(uint32 flags, net_buffer **_buffer);
 	void Clear();
+
+	status_t SocketEnqueue(net_buffer *buffer);
+	status_t SocketDequeue(uint32 flags, net_buffer **_buffer);
 
 	size_t AvailableData() const;
 
@@ -65,7 +66,7 @@ public:
 
 protected:
 	status_t _Enqueue(net_buffer *buffer);
-	status_t _EnqueueClone(net_buffer *buffer);
+	status_t _SocketEnqueue(net_buffer *buffer);
 	net_buffer *_Dequeue(bool clone);
 	void _Clear();
 
@@ -141,15 +142,22 @@ DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer *buffer)
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::EnqueueClone(net_buffer *_buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer *_buffer)
 {
 	AutoLocker _(fLock);
-	return _EnqueueClone(_buffer);
+	return _SocketEnqueue(_buffer);
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::_EnqueueClone(net_buffer *_buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::_SocketEnqueue(net_buffer *_buffer)
 {
+	if (_buffer->flags & MSG_BCAST) {
+		// only deliver datagrams sent to a broadcast address
+		// to sockets with SO_BROADCAST on.
+		if (!(fSocket->options & SO_BROADCAST))
+			return B_OK;
+	}
+
 	net_buffer *buffer = ModuleBundle::Buffer()->clone(_buffer, false);
 	if (buffer == NULL)
 		return B_NO_MEMORY;

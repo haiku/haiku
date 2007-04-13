@@ -31,9 +31,14 @@
 
 //#define TRACE_IPV4
 #ifdef TRACE_IPV4
-#	define TRACE(x) dprintf x
+#	define TRACE(format, args...) \
+		dprintf("IPv4 [%llu] " format "\n", system_time() , ##args)
+#	define TRACE_SK(protocol, format, args...) \
+		dprintf("IPv4 [%llu] %p " format "\n", system_time(), \
+			protocol , ##args)
 #else
-#	define TRACE(x) ;
+#	define TRACE(args...)		do { } while (0)
+#	define TRACE_SK(args...)	do { } while (0)
 #endif
 
 struct ipv4_header {
@@ -211,17 +216,17 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		return B_OK;
 	}
 
-	TRACE(("    previous: %p, next: %p\n", previous, next));
+	TRACE("    previous: %p, next: %p", previous, next);
 
 	// If we have parts of the data already, truncate as needed
 
 	if (previous != NULL && previous->fragment.end > start) {
-		TRACE(("    remove header %d bytes\n", previous->fragment.end - start));
+		TRACE("    remove header %d bytes", previous->fragment.end - start);
 		gBufferModule->remove_header(buffer, previous->fragment.end - start);
 		start = previous->fragment.end;
 	}
 	if (next != NULL && next->fragment.start < end) {
-		TRACE(("    remove trailer %d bytes\n", next->fragment.start - end));
+		TRACE("    remove trailer %d bytes", next->fragment.start - end);
 		gBufferModule->remove_trailer(buffer, next->fragment.start - end);
 		end = next->fragment.start;
 	}
@@ -238,7 +243,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		buffer->fragment.end = end;
 
 		status_t status = gBufferModule->merge(buffer, previous, false);
-		TRACE(("    merge previous: %s\n", strerror(status)));
+		TRACE("    merge previous: %s", strerror(status));
 		if (status < B_OK) {
 			fFragments.Insert(next, previous);
 			return status;
@@ -254,7 +259,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 			fBytesLeft -= IP_MAXPACKET - end;
 		}
 
-		TRACE(("    hole length: %d\n", (int)fBytesLeft));
+		TRACE("    hole length: %d", (int)fBytesLeft);
 
 		return B_OK;
 	} else if (next != NULL && next->fragment.start == end) {
@@ -264,7 +269,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		buffer->fragment.end = next->fragment.end;
 
 		status_t status = gBufferModule->merge(buffer, next, true);
-		TRACE(("    merge next: %s\n", strerror(status)));
+		TRACE("    merge next: %s", strerror(status));
 		if (status < B_OK) {
 			fFragments.Insert((net_buffer *)previous->link.next, next);
 			return status;
@@ -280,14 +285,14 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 			fBytesLeft -= IP_MAXPACKET - end;
 		}
 
-		TRACE(("    hole length: %d\n", (int)fBytesLeft));
+		TRACE("    hole length: %d", (int)fBytesLeft);
 
 		return B_OK;
 	}
 
 	// We couldn't merge the fragments, so we need to add it as is
 
-	TRACE(("    new fragment: %p, bytes %d-%d\n", buffer, start, end));
+	TRACE("    new fragment: %p, bytes %d-%d", buffer, start, end);
 
 	buffer->fragment.start = start;
 	buffer->fragment.end = end;
@@ -301,7 +306,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		fBytesLeft -= IP_MAXPACKET - end;
 	}
 
-	TRACE(("    hole length: %d\n", (int)fBytesLeft));
+	TRACE("    hole length: %d", (int)fBytesLeft);
 
 	return B_OK;
 }
@@ -373,7 +378,7 @@ FragmentPacket::Hash(void *_packet, const void *_key, uint32 range)
 FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
 {
 	FragmentPacket *packet = (FragmentPacket *)data;
-	TRACE(("Assembling FragmentPacket %p timed out!\n", packet));
+	TRACE("Assembling FragmentPacket %p timed out!", packet);
 
 	BenaphoreLocker locker(&sFragmentLock);
 
@@ -464,8 +469,8 @@ reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
 	uint16 end = start + header.TotalLength() - header.HeaderLength();
 	bool lastFragment = (fragmentOffset & IP_MORE_FRAGMENTS) == 0;
 
-	TRACE(("   Received IPv4 %sfragment of size %d, offset %d.\n",
-		lastFragment ? "last ": "", end - start, start));
+	TRACE("   Received IPv4 %sfragment of size %d, offset %d.",
+		lastFragment ? "last ": "", end - start, start);
 
 	// Remove header unless this is the first fragment
 	if (start != 0)
@@ -500,8 +505,7 @@ static status_t
 send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	net_buffer *buffer, uint32 mtu)
 {
-	TRACE(("ipv4 needs to fragment (size %lu, MTU %lu)...\n",
-		buffer->size, mtu));
+	TRACE_SK(protocol, "SendFragments(%lu bytes, mtu %lu)", buffer->size, mtu);
 
 	NetBufferHeaderReader<ipv4_header> originalHeader(buffer);
 	if (originalHeader.Status() < B_OK)
@@ -581,7 +585,7 @@ raw_receive_data(net_buffer *buffer)
 {
 	BenaphoreLocker locker(sRawSocketsLock);
 
-	TRACE(("ipv4:raw_receive_data(): protocol %i\n", buffer->protocol));
+	TRACE("RawReceiveData(%i)", buffer->protocol);
 
 	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
 
@@ -589,7 +593,7 @@ raw_receive_data(net_buffer *buffer)
 		RawSocket *raw = iterator.Next();
 
 		if (raw->Socket()->protocol == buffer->protocol)
-			raw->EnqueueClone(buffer);
+			raw->SocketEnqueue(buffer);
 	}
 }
 
@@ -662,6 +666,8 @@ ipv4_open(net_protocol *_protocol)
 		return status;
 	}
 
+	TRACE_SK(protocol, "Open()");
+
 	protocol->raw = raw;
 
 	BenaphoreLocker locker(sRawSocketsLock);
@@ -677,6 +683,8 @@ ipv4_close(net_protocol *_protocol)
 	RawSocket *raw = protocol->raw;
 	if (raw == NULL)
 		return B_ERROR;
+
+	TRACE_SK(protocol, "Close()");
 
 	BenaphoreLocker locker(sRawSocketsLock);
 	sRawSockets.Remove(raw);
@@ -859,7 +867,8 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
 	net_interface *interface = route->interface;
 
-	TRACE(("someone tries to send some actual routed data!\n"));
+	TRACE_SK(protocol, "SendRoutedData(%p, %p [%ld bytes])", route, buffer,
+		buffer->size);
 
 	sockaddr_in &source = *(sockaddr_in *)&buffer->source;
 	sockaddr_in &destination = *(sockaddr_in *)&buffer->destination;
@@ -908,12 +917,12 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		*IPChecksumField(buffer) = gBufferModule->checksum(buffer, 0,
 			sizeof(ipv4_header), true);
 
-	TRACE(("header chksum: %ld, buffer checksum: %ld\n",
+	TRACE_SK(protocol, "  SendRoutedData(): header chksum: %ld, buffer checksum: %ld",
 		gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
-		gBufferModule->checksum(buffer, 0, buffer->size, true)));
+		gBufferModule->checksum(buffer, 0, buffer->size, true));
 
-	TRACE(("destination-IP: buffer=%p addr=%p %08lx\n", buffer, &buffer->destination,
-		ntohl(destination.sin_addr.s_addr)));
+	TRACE_SK(protocol, "  SendRoutedData(): destination: %08lx",
+		ntohl(destination.sin_addr.s_addr));
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
@@ -928,7 +937,17 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 status_t
 ipv4_send_data(net_protocol *protocol, net_buffer *buffer)
 {
-	TRACE(("someone tries to send some actual data!\n"));
+	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
+
+	sockaddr_in &destination = *(sockaddr_in *)&buffer->destination;
+
+	if (destination.sin_len == 0 || destination.sin_addr.s_addr == INADDR_ANY)
+		return EDESTADDRREQ;
+	else if (destination.sin_addr.s_addr == INADDR_BROADCAST) {
+		// TODO check for local broadcast addresses as well?
+		if (protocol && !(protocol->socket->options & SO_BROADCAST))
+			return B_BAD_VALUE;
+	}
 
 	net_route *route = NULL;
 	status_t status = sDatalinkModule->get_buffer_route(sDomain, buffer,
@@ -958,7 +977,8 @@ ipv4_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
 	if (raw == NULL)
 		return B_ERROR;
 
-	TRACE(("read is waiting for data...\n"));
+	TRACE_SK(protocol, "ReadData(%lu, 0x%lx)", numBytes, flags);
+
 	return raw->SocketDequeue(flags, _buffer);
 }
 
@@ -1003,7 +1023,7 @@ ipv4_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 ipv4_receive_data(net_buffer *buffer)
 {
-	TRACE(("IPv4 received a packet (%p) of %ld size!\n", buffer, buffer->size));
+	TRACE("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
@@ -1038,10 +1058,10 @@ ipv4_receive_data(net_buffer *buffer)
 
 	// test if the packet is really for us
 	uint32 matchedAddressType;
-	if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination, 
+	if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
 		&buffer->interface, &matchedAddressType)) {
-		TRACE(("this packet was not for us %lx -> %lx\n",
-			ntohl(header.source), ntohl(header.destination)));
+		TRACE("  ReceiveData(): packet was not for us %lx -> %lx",
+			ntohl(header.source), ntohl(header.destination));
 		return B_ERROR;
 	}
 	if (matchedAddressType != 0) {
@@ -1061,15 +1081,15 @@ ipv4_receive_data(net_buffer *buffer)
 	if ((fragmentOffset & IP_MORE_FRAGMENTS) != 0
 		|| (fragmentOffset & IP_FRAGMENT_OFFSET_MASK) != 0) {
 		// this is a fragment
-		TRACE(("   Found a Fragment!\n"));
+		TRACE("  ReceiveData(): Found a Fragment!");
 		status = reassemble_fragments(header, &buffer);
-		TRACE(("   -> %s!\n", strerror(status)));
+		TRACE("  ReceiveData():  -> %s", strerror(status));
 		if (status != B_OK)
 			return status;
 
 		if (buffer == NULL) {
 			// buffer was put into fragment packet
-			TRACE(("   Not yet assembled...\n"));
+			TRACE("  ReceiveData(): Not yet assembled.");
 			return B_OK;
 		}
 	}

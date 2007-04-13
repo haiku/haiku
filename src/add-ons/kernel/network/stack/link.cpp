@@ -169,7 +169,7 @@ LinkProtocol::_Unregister()
 status_t
 LinkProtocol::_MonitorData(net_device_monitor *monitor, net_buffer *packet)
 {
-	return ((LinkProtocol *)monitor->cookie)->EnqueueClone(packet);
+	return ((LinkProtocol *)monitor->cookie)->SocketEnqueue(packet);
 }
 
 
