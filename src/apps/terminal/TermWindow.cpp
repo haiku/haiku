@@ -317,7 +317,7 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 		case MENU_PREF_OPEN: {
 			if (!fPrefWindow)
-				fPrefWindow = new PrefDlg(this);
+				fPrefWindow = new PrefWindow(this);
 			else
 				fPrefWindow->Activate();
 			break;
@@ -333,7 +333,7 @@ TermWindow::MessageReceived(BMessage *message)
 				r.top += 20;
 				r.right = r.left + 260;
 				r.bottom = r.top + 190;
-				fFindPanel = new FindDlg(r, this, fFindString, fFindSelection, fMatchWord, fMatchCase, fForwardSearch);
+				fFindPanel = new FindWindow(r, this, fFindString, fFindSelection, fMatchWord, fMatchCase, fForwardSearch);
 			}
 			else
 				fFindPanel->Activate();

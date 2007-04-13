@@ -17,11 +17,11 @@ const ulong MSG_FIND_START = 'msac';
 const ulong MSG_FIND_CLOSED = 'mfcl';
 
 
-class FindDlg : public BWindow {
+class FindWindow : public BWindow {
 	public:
-		FindDlg (BRect frame, BMessenger messenger, BString &str, 
+		FindWindow (BRect frame, BMessenger messenger, BString &str, 
 			bool findSelection, bool matchWord, bool matchCase, bool forwardSearch);
-		virtual ~FindDlg();
+		virtual ~FindWindow();
 
 		virtual void Quit();
 		virtual void MessageReceived(BMessage *msg);

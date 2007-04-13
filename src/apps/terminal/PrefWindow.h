@@ -28,11 +28,11 @@ class BTextControl;
 class PrefHandler;
 
 
-class PrefDlg : public BWindow
+class PrefWindow : public BWindow
 {
 	public:
-		PrefDlg(BMessenger messenger);
-		virtual ~PrefDlg();
+		PrefWindow(BMessenger messenger);
+		virtual ~PrefWindow();
 
 		virtual void Quit();
 		virtual bool QuitRequested();

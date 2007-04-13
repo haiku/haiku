@@ -19,7 +19,7 @@
 const uint32 MSG_FIND_HIDE = 'Fhid';
 
 
-FindDlg::FindDlg (BRect frame, BMessenger messenger , BString &str, 
+FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str, 
 	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	: BWindow(frame, "Find", B_FLOATING_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
 	fFindDlgMessenger(messenger)
@@ -110,13 +110,13 @@ FindDlg::FindDlg (BRect frame, BMessenger messenger , BString &str,
 }
 
 
-FindDlg::~FindDlg()
+FindWindow::~FindWindow()
 {
 }
 
 
 void
-FindDlg::MessageReceived(BMessage *msg)
+FindWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case B_QUIT_REQUESTED:
@@ -139,7 +139,7 @@ FindDlg::MessageReceived(BMessage *msg)
 
 
 void
-FindDlg::Quit()
+FindWindow::Quit()
 {
 	fFindDlgMessenger.SendMessage(MSG_FIND_CLOSED);
 	BWindow::Quit();
@@ -147,7 +147,7 @@ FindDlg::Quit()
 
 
 void
-FindDlg::_SendFindMessage()
+FindWindow::_SendFindMessage()
 {
 	BMessage message(MSG_FIND);
 

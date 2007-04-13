@@ -27,7 +27,7 @@
 extern PrefHandler *gTermPref;
 	// Global Preference Handler
 
-PrefDlg::PrefDlg(BMessenger messenger)
+PrefWindow::PrefWindow(BMessenger messenger)
 	: BWindow(_CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
@@ -78,13 +78,13 @@ PrefDlg::PrefDlg(BMessenger messenger)
 }
 
 
-PrefDlg::~PrefDlg()
+PrefWindow::~PrefWindow()
 {
 }
 
 
 void
-PrefDlg::Quit()
+PrefWindow::Quit()
 {
 	fPrefDlgMessenger.SendMessage(MSG_PREF_CLOSED);
 	delete fPrefTemp;
@@ -94,7 +94,7 @@ PrefDlg::Quit()
 
 
 bool
-PrefDlg::QuitRequested()
+PrefWindow::QuitRequested()
 {
 	if (!fDirty)
 		return true;
@@ -119,7 +119,7 @@ PrefDlg::QuitRequested()
 
 
 void
-PrefDlg::_SaveAs()
+PrefWindow::_SaveAs()
 {
 	if (!fSavePanel)
 		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this));
@@ -129,7 +129,7 @@ PrefDlg::_SaveAs()
 
 
 void
-PrefDlg::_SaveRequested(BMessage *msg)
+PrefWindow::_SaveRequested(BMessage *msg)
 {
 	entry_ref dirref;
 	const char *filename;
@@ -145,7 +145,7 @@ PrefDlg::_SaveRequested(BMessage *msg)
 
 
 void
-PrefDlg::_Save()
+PrefWindow::_Save()
 {
 	delete fPrefTemp;
 	fPrefTemp = new PrefHandler(gTermPref);
@@ -159,7 +159,7 @@ PrefDlg::_Save()
 
 
 void
-PrefDlg::_Revert()
+PrefWindow::_Revert()
 {
 	delete gTermPref;
 	gTermPref = new PrefHandler(fPrefTemp);
@@ -173,7 +173,7 @@ PrefDlg::_Revert()
 
 
 void
-PrefDlg::MessageReceived(BMessage *msg)
+PrefWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MSG_SAVE_PRESSED:
@@ -206,7 +206,7 @@ PrefDlg::MessageReceived(BMessage *msg)
 
 
 BRect
-PrefDlg::_CenteredRect(BRect rect)
+PrefWindow::_CenteredRect(BRect rect)
 {
 	BRect screenRect = BScreen().Frame();
 	

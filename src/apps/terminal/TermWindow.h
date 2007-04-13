@@ -40,9 +40,8 @@ class BFont;
 class TermView;
 class TermParse;
 class CodeConv;
-class PrefDlg;
-class PrefDlg2;
-class FindDlg;
+class PrefWindow;
+class FindWindow;
 
 
 class TermWindow : public BWindow {
@@ -82,8 +81,8 @@ private:
   BView		*fBaseView;
   CodeConv	*fCodeConv;
   BMessage	*fPrintSettings;
-  PrefDlg	*fPrefWindow;
-  FindDlg	*fFindPanel;
+  PrefWindow	*fPrefWindow;
+  FindWindow	*fFindPanel;
   BMessageRunner *fWindowUpdate;
   BMenuItem *item;
   BRect		fSavedFrame;
