@@ -55,6 +55,10 @@ struct net_device_monitor {
 struct net_stack_module_info {
 	module_info info;
 
+	struct net_buffer_module_info *buffer_module;
+	struct net_datalink_module_info *datalink_module;
+	struct net_socket_module_info *socket_module;
+
 	status_t (*register_domain)(int family, const char *name,
 					struct net_protocol_module_info *module,
 					struct net_address_module_info *addressModule,

@@ -1117,31 +1117,28 @@ init_ipv4()
 	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
-	if (status < B_OK)
-		goto err1;
-	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);
-	if (status < B_OK)
-		goto err2;
+
+	gBufferModule = gStackModule->buffer_module;
+	sDatalinkModule = gStackModule->datalink_module;
 
 	sPacketID = (int32)system_time();
 
 	status = benaphore_init(&sRawSocketsLock, "raw sockets");
 	if (status < B_OK)
-		goto err3;
+		goto err1;
 
 	status = benaphore_init(&sFragmentLock, "IPv4 Fragments");
 	if (status < B_OK)
-		goto err4;
+		goto err2;
 
 	status = benaphore_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
 	if (status < B_OK)
-		goto err5;
+		goto err3;
 
 	sFragmentHash = hash_init(MAX_HASH_FRAGMENTS, FragmentPacket::NextOffset(),
 		&FragmentPacket::Compare, &FragmentPacket::Hash);
 	if (sFragmentHash == NULL)
-		goto err6;
+		goto err4;
 
 	new (&sRawSockets) RawSocketList;
 		// static initializers do not work in the kernel,
@@ -1151,27 +1148,23 @@ init_ipv4()
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
 		"network/protocols/ipv4/v1", NULL);
 	if (status < B_OK)
-		goto err7;
+		goto err5;
 
 	status = gStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
 		&gIPv4AddressModule, &sDomain);
 	if (status < B_OK)
-		goto err7;
+		goto err5;
 
 	return B_OK;
 
-err7:
-	hash_uninit(sFragmentHash);
-err6:
-	benaphore_destroy(&sReceivingProtocolLock);
 err5:
-	benaphore_destroy(&sFragmentLock);
+	hash_uninit(sFragmentHash);
 err4:
-	benaphore_destroy(&sRawSocketsLock);
+	benaphore_destroy(&sReceivingProtocolLock);
 err3:
-	put_module(NET_DATALINK_MODULE_NAME);
+	benaphore_destroy(&sFragmentLock);
 err2:
-	put_module(NET_BUFFER_MODULE_NAME);
+	benaphore_destroy(&sRawSocketsLock);
 err1:
 	put_module(NET_STACK_MODULE_NAME);
 	return status;
@@ -1198,8 +1191,6 @@ uninit_ipv4()
 	benaphore_destroy(&sRawSocketsLock);
 	benaphore_destroy(&sReceivingProtocolLock);
 
-	put_module(NET_DATALINK_MODULE_NAME);
-	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }

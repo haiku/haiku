@@ -31,17 +31,16 @@ public:
 
 
 extern net_stack_module_info *gStackModule;
-extern net_buffer_module_info *gBufferModule;
 
-class NetModuleBundle {
+class NetModuleBundleGetter {
 public:
 	static net_stack_module_info *Stack() { return gStackModule; }
-	static net_buffer_module_info *Buffer() { return gBufferModule; }
+	static net_buffer_module_info *Buffer() { return gStackModule->buffer_module; }
 };
 
 
 template<typename LockingBase = BenaphoreLocking,
-	typename ModuleBundle = NetModuleBundle>
+	typename ModuleBundle = NetModuleBundleGetter>
 class DatagramSocket {
 public:
 	DatagramSocket(const char *name, net_socket *socket);
@@ -78,7 +77,6 @@ protected:
 	typedef DoublyLinkedListCLink<net_buffer> NetBufferLink;
 	typedef DoublyLinkedList<net_buffer, NetBufferLink> BufferList;
 
-	status_t fStatus;
 	net_socket *fSocket;
 	sem_id fNotify;
 	BufferList fBuffers;
@@ -96,8 +94,10 @@ DECL_DATAGRAM_SOCKET(inline)::DatagramSocket(const char *name,
 	net_socket *socket)
 	: fSocket(socket), fCurrentBytes(0)
 {
-	fStatus = LockingBase::Init(&fLock, name);
-	if (fStatus >= B_OK)
+	status_t status = LockingBase::Init(&fLock, name);
+	if (status < B_OK)
+		fNotify = status;
+	else
 		fNotify = create_sem(0, name);
 }
 
@@ -105,18 +105,13 @@ DECL_DATAGRAM_SOCKET(inline)::DatagramSocket(const char *name,
 DECL_DATAGRAM_SOCKET(inline)::~DatagramSocket()
 {
 	_Clear();
-
-	if (fStatus >= B_OK) {
-		delete_sem(fNotify);
-		LockingBase::Destroy(&fLock);
-	}
+	delete_sem(fNotify);
+	LockingBase::Destroy(&fLock);
 }
 
 
 DECL_DATAGRAM_SOCKET(inline status_t)::InitCheck() const
 {
-	if (fStatus < 0)
-		return fStatus;
 	return fNotify;
 }
 

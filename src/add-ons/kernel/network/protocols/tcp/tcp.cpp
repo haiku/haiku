@@ -634,54 +634,43 @@ tcp_init()
 	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
-	if (status < B_OK)
-		goto err1;
-	status = get_module(NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule);
-	if (status < B_OK)
-		goto err2;
-	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule);
-	if (status < B_OK)
-		goto err3;
+
+	gBufferModule = gStackModule->buffer_module;
+	gSocketModule = gStackModule->socket_module;
+	gDatalinkModule = gStackModule->datalink_module;
 
 	gEndpointManager = new (std::nothrow) EndpointManager();
 	if (gEndpointManager == NULL) {
 		status = B_NO_MEMORY;
-		goto err4;
+		goto err1;
 	}
 	status = gEndpointManager->InitCheck();
 	if (status < B_OK)
-		goto err5;
+		goto err2;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, 0,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err5;
+		goto err2;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err5;
+		goto err2;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
 		"network/protocols/tcp/v1");
 	if (status < B_OK)
-		goto err5;
+		goto err2;
 
 	return B_OK;
 
-err5:
-	delete gEndpointManager;
-err4:
-	put_module(NET_DATALINK_MODULE_NAME);
-err3:
-	put_module(NET_SOCKET_MODULE_NAME);
 err2:
-	put_module(NET_BUFFER_MODULE_NAME);
+	delete gEndpointManager;
 err1:
 	put_module(NET_STACK_MODULE_NAME);
 
@@ -694,12 +683,7 @@ static status_t
 tcp_uninit()
 {
 	delete gEndpointManager;
-
-	put_module(NET_DATALINK_MODULE_NAME);
-	put_module(NET_SOCKET_MODULE_NAME);
-	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);
-
 	return B_OK;
 }
 

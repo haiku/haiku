@@ -728,28 +728,25 @@ arp_init()
 	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
-	if (status < B_OK)
-		goto err1;
+
+	gBufferModule = sStackModule->buffer_module;
 
 	status = benaphore_init(&sCacheLock, "arp cache");
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	sCache = hash_init(64, offsetof(struct arp_entry, next),
 		&arp_entry::Compare, &arp_entry::Hash);
 	if (sCache == NULL) {
 		status = B_NO_MEMORY;
-		goto err3;
+		goto err2;
 	}
 
 	register_generic_syscall(ARP_SYSCALLS, arp_control, 1, 0);
 	return B_OK;
 
-err3:
-	benaphore_destroy(&sCacheLock);
 err2:
-	put_module(NET_BUFFER_MODULE_NAME);
+	benaphore_destroy(&sCacheLock);
 err1:
 	put_module(NET_STACK_MODULE_NAME);
 	return status;
@@ -761,7 +758,6 @@ arp_uninit()
 {
 	unregister_generic_syscall(ARP_SYSCALLS, 1);
 
-	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }

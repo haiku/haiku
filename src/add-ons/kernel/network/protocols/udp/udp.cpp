@@ -178,8 +178,6 @@ public:
 	UdpEndpointManager();
 	~UdpEndpointManager();
 
-	status_t		DemuxIncomingBuffer(net_domain *domain,
-		net_buffer *buffer);
 	status_t		ReceiveData(net_buffer *buffer);
 
 	UdpDomainSupport *OpenEndpoint(UdpEndpoint *endpoint);
@@ -203,7 +201,6 @@ static UdpEndpointManager *sUdpEndpointManager;
 
 net_stack_module_info *gStackModule;
 net_buffer_module_info *gBufferModule;
-static net_datalink_module_info *sDatalinkModule;
 
 
 // #pragma mark -
@@ -544,21 +541,6 @@ UdpEndpointManager::InitCheck() const
 
 
 status_t
-UdpEndpointManager::DemuxIncomingBuffer(net_domain *domain, net_buffer *buffer)
-{
-	UdpDomainSupport *domainSupport = _GetDomain(domain, false);
-	if (domainSupport == NULL) {
-		// we don't instantiate domain supports in the
-		// RX path as we are only interested in delivering
-		// data to existing sockets.
-		return B_BAD_VALUE;
-	}
-
-	return domainSupport->DemuxIncomingBuffer(buffer);
-}
-
-
-status_t
 UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
 	TRACE_EPM("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
@@ -621,7 +603,15 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	bufferHeader.Remove();
 		// remove UDP-header from buffer before passing it on
 
-	status_t status = DemuxIncomingBuffer(domain, buffer);
+	UdpDomainSupport *domainSupport = _GetDomain(domain, false);
+	if (domainSupport == NULL) {
+		// we don't instantiate domain supports in the
+		// RX path as we are only interested in delivering
+		// data to existing sockets.
+		return B_ERROR;
+	}
+
+	status_t status = domainSupport->DemuxIncomingBuffer(buffer);
 	if (status < B_OK) {
 		TRACE_EPM("  ReceiveData(): no endpoint.");
 		// TODO: send ICMP-error
@@ -904,11 +894,11 @@ UdpEndpoint::SendData(net_buffer *buffer)
 	TRACE_EP("SendData(%p [%lu bytes])", buffer, buffer->size);
 
 	net_route *route = NULL;
-	status_t status = sDatalinkModule->get_buffer_route(Domain(), buffer,
-		&route);
+	status_t status = gStackModule->datalink_module->get_buffer_route(Domain(),
+		buffer,	&route);
 	if (status >= B_OK) {
 		status = SendRoutedData(buffer, route);
-		sDatalinkModule->put_route(Domain(), route);
+		gStackModule->datalink_module->put_route(Domain(), route);
 	}
 
 	return status;
@@ -1134,48 +1124,39 @@ init_udp()
 	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
 	if (status < B_OK)
 		return status;
-	status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
-	if (status < B_OK)
-		goto err1;
-	status = get_module(NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule);
-	if (status < B_OK)
-		goto err2;
+	gBufferModule = gStackModule->buffer_module;
 
 	sUdpEndpointManager = new (std::nothrow) UdpEndpointManager;
 	if (sUdpEndpointManager == NULL) {
 		status = ENOBUFS;
-		goto err3;
+		goto err1;
 	}
 	status = sUdpEndpointManager->InitCheck();
 	if (status != B_OK)
-		goto err3;
+		goto err1;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_IP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err4;
+		goto err2;
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err4;
+		goto err2;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_UDP,
 		"network/protocols/udp/v1");
 	if (status < B_OK)
-		goto err4;
+		goto err2;
 
 	return B_OK;
 
-err4:
-	delete sUdpEndpointManager;
-err3:
-	put_module(NET_DATALINK_MODULE_NAME);
 err2:
-	put_module(NET_BUFFER_MODULE_NAME);
+	delete sUdpEndpointManager;
 err1:
 	put_module(NET_STACK_MODULE_NAME);
 
@@ -1189,8 +1170,6 @@ uninit_udp()
 {
 	TRACE_EPM("uninit_udp()");
 	delete sUdpEndpointManager;
-	put_module(NET_DATALINK_MODULE_NAME);
-	put_module(NET_BUFFER_MODULE_NAME);
 	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }

@@ -300,11 +300,8 @@ icmp_std_ops(int32 op, ...)
 			status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
 			if (status < B_OK)
 				return status;
-			status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
-			if (status < B_OK) {
-				put_module(NET_STACK_MODULE_NAME);
-				return status;
-			}
+
+			gBufferModule = sStackModule->buffer_module;
 
 			sStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_ICMP,
 				"network/protocols/icmp/v1",
@@ -317,7 +314,6 @@ icmp_std_ops(int32 op, ...)
 		}
 
 		case B_MODULE_UNINIT:
-			put_module(NET_BUFFER_MODULE_NAME);
 			put_module(NET_STACK_MODULE_NAME);
 			return B_OK;
 
