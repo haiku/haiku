@@ -631,48 +631,37 @@ tcp_init()
 	gDomain = NULL;
 	gAddressModule = NULL;
 
-	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
-	if (status < B_OK)
-		return status;
-
-	gBufferModule = gStackModule->buffer_module;
-	gSocketModule = gStackModule->socket_module;
-	gDatalinkModule = gStackModule->datalink_module;
-
 	gEndpointManager = new (std::nothrow) EndpointManager();
-	if (gEndpointManager == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
+	if (gEndpointManager == NULL)
+		return B_NO_MEMORY;
+
 	status = gEndpointManager->InitCheck();
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, 0,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
 		"network/protocols/tcp/v1");
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	return B_OK;
 
-err2:
-	delete gEndpointManager;
 err1:
-	put_module(NET_STACK_MODULE_NAME);
+	delete gEndpointManager;
 
 	TRACE(("init_tcp() fails with %lx (%s)\n", status, strerror(status)));
 	return status;
@@ -683,7 +672,6 @@ static status_t
 tcp_uninit()
 {
 	delete gEndpointManager;
-	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }
 
@@ -732,6 +720,14 @@ net_protocol_module_info sTCPModule = {
 	tcp_receive_data,
 	tcp_error,
 	tcp_error_reply,
+};
+
+module_dependency module_dependencies[] = {
+	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule},
+	{NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule},
+	{}
 };
 
 module_info *modules[] = {

@@ -895,10 +895,6 @@ net_stack_module_info gNetStackModule = {
 		stack_std_ops
 	},
 
-	&gNetBufferModule,
-	&gNetDatalinkModule,
-	&gNetSocketModule,
-
 	register_domain,
 	unregister_domain,
 	get_domain,

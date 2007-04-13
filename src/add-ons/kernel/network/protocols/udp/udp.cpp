@@ -199,8 +199,9 @@ private:
 
 static UdpEndpointManager *sUdpEndpointManager;
 
-net_stack_module_info *gStackModule;
 net_buffer_module_info *gBufferModule;
+net_datalink_module_info *gDatalinkModule;
+net_stack_module_info *gStackModule;
 
 
 // #pragma mark -
@@ -894,11 +895,11 @@ UdpEndpoint::SendData(net_buffer *buffer)
 	TRACE_EP("SendData(%p [%lu bytes])", buffer, buffer->size);
 
 	net_route *route = NULL;
-	status_t status = gStackModule->datalink_module->get_buffer_route(Domain(),
+	status_t status = gDatalinkModule->get_buffer_route(Domain(),
 		buffer,	&route);
 	if (status >= B_OK) {
 		status = SendRoutedData(buffer, route);
-		gStackModule->datalink_module->put_route(Domain(), route);
+		gDatalinkModule->put_route(Domain(), route);
 	}
 
 	return status;
@@ -1121,16 +1122,10 @@ init_udp()
 	status_t status;
 	TRACE_EPM("init_udp()");
 
-	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
-	if (status < B_OK)
-		return status;
-	gBufferModule = gStackModule->buffer_module;
-
 	sUdpEndpointManager = new (std::nothrow) UdpEndpointManager;
-	if (sUdpEndpointManager == NULL) {
-		status = ENOBUFS;
-		goto err1;
-	}
+	if (sUdpEndpointManager == NULL)
+		return B_NO_MEMORY;
+
 	status = sUdpEndpointManager->InitCheck();
 	if (status != B_OK)
 		goto err1;
@@ -1140,25 +1135,23 @@ init_udp()
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_UDP,
 		"network/protocols/udp/v1");
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	return B_OK;
 
-err2:
-	delete sUdpEndpointManager;
 err1:
-	put_module(NET_STACK_MODULE_NAME);
+	delete sUdpEndpointManager;
 
 	TRACE_EPM("init_udp() fails with %lx (%s)", status, strerror(status));
 	return status;
@@ -1170,7 +1163,6 @@ uninit_udp()
 {
 	TRACE_EPM("uninit_udp()");
 	delete sUdpEndpointManager;
-	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }
 
@@ -1219,6 +1211,13 @@ net_protocol_module_info sUDPModule = {
 	udp_receive_data,
 	udp_error,
 	udp_error_reply,
+};
+
+module_dependency module_dependencies[] = {
+	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule},
+	{}
 };
 
 module_info *modules[] = {

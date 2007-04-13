@@ -98,7 +98,7 @@ struct arp_protocol : net_datalink_protocol {
 
 static void arp_timer(struct net_timer *timer, void *data);
 
-struct net_buffer_module_info *gBufferModule;
+net_buffer_module_info *gBufferModule;
 static net_stack_module_info *sStackModule;
 static hash_table *sCache;
 static benaphore sCacheLock;
@@ -725,31 +725,19 @@ arp_control(const char *subsystem, uint32 function,
 static status_t
 arp_init()
 {
-	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
+	status_t status = benaphore_init(&sCacheLock, "arp cache");
 	if (status < B_OK)
 		return status;
-
-	gBufferModule = sStackModule->buffer_module;
-
-	status = benaphore_init(&sCacheLock, "arp cache");
-	if (status < B_OK)
-		goto err1;
 
 	sCache = hash_init(64, offsetof(struct arp_entry, next),
 		&arp_entry::Compare, &arp_entry::Hash);
 	if (sCache == NULL) {
-		status = B_NO_MEMORY;
-		goto err2;
+		benaphore_destroy(&sCacheLock);
+		return B_NO_MEMORY;
 	}
 
 	register_generic_syscall(ARP_SYSCALLS, arp_control, 1, 0);
 	return B_OK;
-
-err2:
-	benaphore_destroy(&sCacheLock);
-err1:
-	put_module(NET_STACK_MODULE_NAME);
-	return status;
 }
 
 
@@ -757,8 +745,6 @@ static status_t
 arp_uninit()
 {
 	unregister_generic_syscall(ARP_SYSCALLS, 1);
-
-	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }
 
@@ -964,6 +950,13 @@ static net_datalink_protocol_module_info sARPModule = {
 	arp_up,
 	arp_down,
 	arp_control,
+};
+
+
+module_dependency module_dependencies[] = {
+	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{}
 };
 
 module_info *modules[] = {

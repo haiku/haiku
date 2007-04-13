@@ -30,12 +30,13 @@ public:
 };
 
 
+extern net_buffer_module_info *gBufferModule;
 extern net_stack_module_info *gStackModule;
 
 class NetModuleBundleGetter {
 public:
 	static net_stack_module_info *Stack() { return gStackModule; }
-	static net_buffer_module_info *Buffer() { return gStackModule->buffer_module; }
+	static net_buffer_module_info *Buffer() { return gBufferModule; }
 };
 
 

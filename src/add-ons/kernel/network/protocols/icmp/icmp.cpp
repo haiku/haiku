@@ -62,8 +62,8 @@ struct icmp_protocol : net_protocol {
 };
 
 
+net_buffer_module_info *gBufferModule;
 static net_stack_module_info *sStackModule;
-struct net_buffer_module_info *gBufferModule;
 
 
 net_protocol *
@@ -297,12 +297,6 @@ icmp_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&sStackModule);
-			if (status < B_OK)
-				return status;
-
-			gBufferModule = sStackModule->buffer_module;
-
 			sStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_ICMP,
 				"network/protocols/icmp/v1",
 				"network/protocols/ipv4/v1",
@@ -314,7 +308,6 @@ icmp_std_ops(int32 op, ...)
 		}
 
 		case B_MODULE_UNINIT:
-			put_module(NET_STACK_MODULE_NAME);
 			return B_OK;
 
 		default:
@@ -351,6 +344,12 @@ net_protocol_module_info sICMPModule = {
 	icmp_receive_data,
 	icmp_error,
 	icmp_error_reply,
+};
+
+module_dependency module_dependencies[] = {
+	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{}
 };
 
 module_info *modules[] = {

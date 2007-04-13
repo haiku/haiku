@@ -1115,31 +1115,24 @@ ipv4_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 status_t
 init_ipv4()
 {
-	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStackModule);
+	sPacketID = (int32)system_time();
+
+	status_t status = benaphore_init(&sRawSocketsLock, "raw sockets");
 	if (status < B_OK)
 		return status;
 
-	gBufferModule = gStackModule->buffer_module;
-	sDatalinkModule = gStackModule->datalink_module;
-
-	sPacketID = (int32)system_time();
-
-	status = benaphore_init(&sRawSocketsLock, "raw sockets");
+	status = benaphore_init(&sFragmentLock, "IPv4 Fragments");
 	if (status < B_OK)
 		goto err1;
 
-	status = benaphore_init(&sFragmentLock, "IPv4 Fragments");
-	if (status < B_OK)
-		goto err2;
-
 	status = benaphore_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
 	if (status < B_OK)
-		goto err3;
+		goto err2;
 
 	sFragmentHash = hash_init(MAX_HASH_FRAGMENTS, FragmentPacket::NextOffset(),
 		&FragmentPacket::Compare, &FragmentPacket::Hash);
 	if (sFragmentHash == NULL)
-		goto err4;
+		goto err3;
 
 	new (&sRawSockets) RawSocketList;
 		// static initializers do not work in the kernel,
@@ -1149,25 +1142,23 @@ init_ipv4()
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
 		"network/protocols/ipv4/v1", NULL);
 	if (status < B_OK)
-		goto err5;
+		goto err4;
 
 	status = gStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
 		&gIPv4AddressModule, &sDomain);
 	if (status < B_OK)
-		goto err5;
+		goto err4;
 
 	return B_OK;
 
-err5:
-	hash_uninit(sFragmentHash);
 err4:
-	benaphore_destroy(&sReceivingProtocolLock);
+	hash_uninit(sFragmentHash);
 err3:
-	benaphore_destroy(&sFragmentLock);
+	benaphore_destroy(&sReceivingProtocolLock);
 err2:
-	benaphore_destroy(&sRawSocketsLock);
+	benaphore_destroy(&sFragmentLock);
 err1:
-	put_module(NET_STACK_MODULE_NAME);
+	benaphore_destroy(&sRawSocketsLock);
 	return status;
 }
 
@@ -1240,6 +1231,13 @@ net_protocol_module_info gIPv4Module = {
 	ipv4_receive_data,
 	ipv4_error,
 	ipv4_error_reply,
+};
+
+module_dependency module_dependencies[] = {
+	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule},
+	{}
 };
 
 module_info *modules[] = {
