@@ -9,12 +9,12 @@ Application Terminal :
 	AppearPrefView.cpp
 	CodeConv.cpp
 	CurPos.cpp
-	FindDlg.cpp
+	FindWindow.cpp
 	MenuUtil.cpp
 	Terminal.cpp
-	PrefDlg.cpp
 	PrefHandler.cpp
 	PrefView.cpp
+	PrefWindow.cpp
 	spawn.cpp
 	TermApp.cpp
 	TermBaseView.cpp

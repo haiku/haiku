@@ -9,7 +9,7 @@
 #include "AppearPrefView.h"
 #include "MenuUtil.h"
 #include "PrefHandler.h"
-#include "PrefDlg.h"
+#include "PrefWindow.h"
 #include "PrefView.h"
 #include "spawn.h"
 #include "TermConst.h"

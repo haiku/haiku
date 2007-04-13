@@ -6,7 +6,7 @@
  */
 
 
-#include "FindDlg.h"
+#include "FindWindow.h"
 
 #include <Box.h>
 #include <Button.h>
