@@ -480,57 +480,20 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return EPIPE;
 	}
 
-	size_t bytesLeft = buffer->size;
+	if (buffer->size > 0) {
+		bigtime_t timeout = absolute_timeout(socket->send.timeout);
 
-	bigtime_t timeout = absolute_timeout(socket->send.timeout);
-
-	do {
-		// TODO we should not segment here, but on TX.
-
-		net_buffer *chunk;
-		if (bytesLeft > socket->send.buffer_size) {
-			// divide the buffer in multiple of the maximum segment size
-			size_t chunkSize = ((socket->send.buffer_size >> 1) / fSendMaxSegmentSize)
-				* fSendMaxSegmentSize;
-
-			chunk = gBufferModule->split(buffer, chunkSize);
-			TRACE("  Send() split buffer at %lu (buffer size %lu, mss %lu) -> %p",
-				  chunkSize, socket->send.buffer_size, fSendMaxSegmentSize, chunk);
-			if (chunk == NULL)
-				return B_NO_MEMORY;
-		} else
-			chunk = buffer;
-
-		while (fSendQueue.Free() < chunk->size) {
+		while (fSendQueue.Free() < buffer->size) {
 			status_t status = fSendList.Wait(lock, timeout);
 			if (status < B_OK)
 				return posix_error(status);
 		}
 
-		// TODO: check state!
+		fSendQueue.Add(buffer);
+	}
 
-		if (chunk->size == 0) {
-			gBufferModule->free(chunk);
-			return B_OK;
-		}
-
-		size_t chunkSize = chunk->size;
-		fSendQueue.Add(chunk);
-
-		status_t status = B_OK;
-
-		if (fState == ESTABLISHED || fState == FINISH_RECEIVED)
-			status = _SendQueued();
-
-		if (buffer != chunk) {
-			// as long as we didn't eat the buffer, we can still return an error code
-			// (we don't own the buffer if we return an error code)
-			if (status < B_OK)
-				return status;
-		}
-
-		bytesLeft -= chunkSize;
-	} while (bytesLeft > 0);
+	if (fState == ESTABLISHED || fState == FINISH_RECEIVED)
+		_SendQueued();
 
 	return B_OK;
 }
