@@ -60,6 +60,8 @@ public:
 
 	void WakeAll();
 
+	net_socket *Socket() const { return fSocket; }
+
 protected:
 	status_t _Enqueue(net_buffer *buffer);
 	status_t _EnqueueClone(net_buffer *buffer);

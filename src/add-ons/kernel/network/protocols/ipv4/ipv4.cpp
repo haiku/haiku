@@ -585,8 +585,12 @@ raw_receive_data(net_buffer *buffer)
 
 	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
 
-	while (iterator.HasNext())
-		iterator.Next()->EnqueueClone(buffer);
+	while (iterator.HasNext()) {
+		RawSocket *raw = iterator.Next();
+
+		if (raw->Socket()->protocol == buffer->protocol)
+			raw->EnqueueClone(buffer);
+	}
 }
 
 
@@ -909,7 +913,7 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		gBufferModule->checksum(buffer, 0, buffer->size, true)));
 
 	TRACE(("destination-IP: buffer=%p addr=%p %08lx\n", buffer, &buffer->destination,
-		ntohl(destination->sin_addr.s_addr)));
+		ntohl(destination.sin_addr.s_addr)));
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
@@ -1074,10 +1078,7 @@ ipv4_receive_data(net_buffer *buffer)
 	// we must no longer access bufferHeader or header anymore after
 	// this point
 
-	if (protocol != IPPROTO_TCP && protocol != IPPROTO_UDP) {
-		// SOCK_RAW doesn't get all packets
-		raw_receive_data(buffer);
-	}
+	raw_receive_data(buffer);
 
 	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options
