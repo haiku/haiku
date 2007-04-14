@@ -1,29 +1,16 @@
 /*
- * Copyright 2001-2002, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *      Erik Jaesler (erik@cgsoftware.com)
  */
-
 #ifndef _APP_DEFS_H
 #define _APP_DEFS_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-
-// Global Cursors --------------------------------------------------------------
 
 // Old-style cursors
 extern const unsigned char B_HAND_CURSOR[];
@@ -36,8 +23,8 @@ extern const BCursor *B_CURSOR_SYSTEM_DEFAULT;
 extern const BCursor *B_CURSOR_I_BEAM;
 #endif
 
-// System Message Codes --------------------------------------------------------
 
+// System Message Codes
 enum {
 	B_ABOUT_REQUESTED			= '_ABR',
 	B_WINDOW_ACTIVATED			= '_ACT',
@@ -46,6 +33,7 @@ enum {
 	B_QUIT_REQUESTED 			= '_QRQ',
 	B_CLOSE_REQUESTED 			= '_QRQ',	// Obsolete; use B_QUIT_REQUESTED
 	B_CANCEL					= '_CNC',
+	B_INVALIDATE				= '_IVL',
 	B_KEY_DOWN 					= '_KYD',
 	B_KEY_UP 					= '_KYU',
 	B_UNMAPPED_KEY_DOWN 		= '_UKD',
@@ -76,8 +64,10 @@ enum {
 	B_WORKSPACES_CHANGED		= '_WCG',
 	B_WORKSPACE_ACTIVATED		= '_WAC',
 	B_ZOOM						= '_WZM',
-	_COLORS_UPDATED				= '_CLU',	// Currently internal-use only. Later, public as B_COLORS_UPDATED
-	_FONTS_UPDATED				= '_FNU',	// Currently internal-use only. Later, public as B_FONTS_UPDATED
+	_COLORS_UPDATED				= '_CLU',
+		// Currently internal-use only. Later, public as B_COLORS_UPDATED
+	_FONTS_UPDATED				= '_FNU',
+		// Currently internal-use only. Later, public as B_FONTS_UPDATED
 	_APP_MENU_					= '_AMN',
 	_BROWSER_MENUS_				= '_BRM',
 	_MENU_EVENT_ 				= '_MEV',
@@ -99,8 +89,7 @@ enum {
 };
 
 
-// Other Commands --------------------------------------------------------------
-
+// Other Commands
 enum {
 	B_SET_PROPERTY				= 'PSET',
 	B_GET_PROPERTY				= 'PGET',
@@ -142,7 +131,5 @@ enum {
 
 	// Media Kit reserves all reserved codes starting in 'TRI'
 };
-//------------------------------------------------------------------------------
 
 #endif	// _APP_DEFS_H
-

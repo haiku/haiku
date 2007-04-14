@@ -962,6 +962,19 @@ FrameMoved(origin);
 				target->MessageReceived(msg);
 			break;
 
+		case B_INVALIDATE:
+		{
+			if (BView* view = dynamic_cast<BView*>(target)) {
+				BRect rect;
+				if (msg->FindRect("be:area", &rect) == B_OK)
+					view->Invalidate(rect);
+				else
+					view->Invalidate();
+			} else
+				target->MessageReceived(msg);
+			break;
+		}
+
 		case B_KEY_DOWN:
 		{
 			if (!_HandleKeyDown(msg)) {
