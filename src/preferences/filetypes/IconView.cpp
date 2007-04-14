@@ -1053,13 +1053,32 @@ IconView::ShowIconHeap(bool show)
 
 	if (show) {
 		BResources* resources = be_app->AppResources();
-		const void* data = NULL;
-		// TODO: get vector heap icon!
-		if (resources != NULL)
-			data = resources->LoadResource('ICON', "icon heap", NULL);
-		if (data != NULL) {
-			fHeapIcon = Icon::AllocateBitmap(B_LARGE_ICON, B_CMAP8);
-			memcpy(fHeapIcon->Bits(), data, fHeapIcon->BitsLength());
+		if (resources != NULL) {
+			const void* data = NULL;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			size_t size;
+			data = resources->LoadResource('VICN', "icon heap", &size);
+			if (data != NULL) {
+				// got vector icon data
+				fHeapIcon = Icon::AllocateBitmap(B_LARGE_ICON, B_RGBA32);
+				if (BIconUtils::GetVectorIcon((const uint8*)data,
+						size, fHeapIcon) != B_OK) {
+					// bad data
+					delete fHeapIcon;
+					fHeapIcon = NULL;
+					data = NULL;
+				}
+			}
+#endif // HAIKU_TARGET_PLATFORM_HAIKU
+			if (data == NULL) {
+				// no vector icon or failed to get bitmap
+				// try bitmap icon
+				data = resources->LoadResource('ICON', "icon heap", NULL);
+				if (data != NULL) {
+					fHeapIcon = Icon::AllocateBitmap(B_LARGE_ICON, B_CMAP8);
+					memcpy(fHeapIcon->Bits(), data, fHeapIcon->BitsLength());
+				}
+			}
 		}
 	} else {
 		delete fHeapIcon;
