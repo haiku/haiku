@@ -1,28 +1,11 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		GameSound.cpp
-//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
-//	Description:	BPushGameSound class
-//------------------------------------------------------------------------------
+/* 
+ * Copyright 2001-2007, Haiku Inc.
+ * Authors:
+ *		Christopher ML Zumwalt May (zummy@users.sf.net)
+ *		Jérôme Duval
+ * 
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <string.h>
 
@@ -36,14 +19,15 @@ BPushGameSound::BPushGameSound(size_t inBufferFrameCount, const gs_audio_format 
 			size_t inBufferCount, BGameSoundDevice *device)
  	:	BStreamingGameSound(inBufferFrameCount, format, inBufferCount, device)
 {
-	if (InitCheck() != B_OK)
-		return;
+	fPageLocked = new BList;
+
+	size_t frameSize = get_sample_size(format->format) * format->channel_count;
 	
-	status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
-	if (error == B_OK)
-		fPageLocked = new BList;
-	else
-		SetInitError(error);
+	fPageCount = inBufferCount;
+	fPageSize = frameSize * inBufferFrameCount;	
+	fBufferSize = fPageSize * fPageCount;
+	
+	fBuffer = new char[fBufferSize];
 }
 
 
@@ -58,7 +42,8 @@ BPushGameSound::BPushGameSound(BGameSoundDevice * device)
 {
 	fPageLocked = new BList;
 }
-		
+
+
 BPushGameSound::~BPushGameSound()
 {
 	delete [] fBuffer;
@@ -70,12 +55,12 @@ BPushGameSound::lock_status
 BPushGameSound::LockNextPage(void **out_pagePtr, size_t *out_pageSize)
 {	
 	// the user can not lock every page
-	if (fPageLocked->CountItems() > fPageCount - 3) 
+	if (fPageLocked->CountItems() > fPageCount - 3)
 		return lock_failed;
 	
 	// the user cann't lock a page being played
 	if (fLockPos < fPlayPos
-		&& fLockPos + fPageSize > fPlayPos) 
+		&& fLockPos + fPageSize > fPlayPos)
 		return lock_failed;
 	
 	// lock the page
@@ -84,7 +69,7 @@ BPushGameSound::LockNextPage(void **out_pagePtr, size_t *out_pageSize)
 	
 	// move the locker to the next page
 	fLockPos += fPageSize;
-	if (fLockPos > fBufferSize) 
+	if (fLockPos > fBufferSize)
 		fLockPos = 0;
 	
 	*out_pagePtr = lockPage;
@@ -138,7 +123,7 @@ BPushGameSound::Clone() const
 status_t
 BPushGameSound::Perform(int32 selector, void *data)
 {
-	return B_ERROR;
+	return BStreamingGameSound::Perform(selector, data);
 }
 
 
@@ -147,19 +132,7 @@ BPushGameSound::SetParameters(size_t inBufferFrameCount,
 							  const gs_audio_format *format,
 							  size_t inBufferCount)
 {
-	status_t error = BStreamingGameSound::SetParameters(inBufferFrameCount, format, inBufferCount);
-	if (error != B_OK)
-		return error;
-	
-	size_t frameSize = get_sample_size(format->format) * format->channel_count;
-	
-	fPageCount = inBufferCount;
-	fPageSize = frameSize * inBufferFrameCount;	
-	fBufferSize = fPageSize * fPageCount;
-	
-	fBuffer = new char[fBufferSize];
-	
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -167,7 +140,7 @@ status_t
 BPushGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
 							  void * cookie)
 {
-	return B_ERROR;
+	return B_UNSUPPORTED;
 }
 
 

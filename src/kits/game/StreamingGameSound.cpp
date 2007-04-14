@@ -25,17 +25,10 @@
 //					(data not known beforehand) game sounds.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
-
-// Project Includes ------------------------------------------------------------
 #include "GameSoundDevice.h"
-
-// Local Includes --------------------------------------------------------------
 #include "StreamingGameSound.h"
 
-// Local Defines ---------------------------------------------------------------
+
 BStreamingGameSound::BStreamingGameSound(size_t inBufferFrameCount,
 										 const gs_audio_format *format,
 										 size_t inBufferCount,
@@ -44,8 +37,7 @@ BStreamingGameSound::BStreamingGameSound(size_t inBufferFrameCount,
  		fStreamHook(NULL),
  		fStreamCookie(NULL)
 {
-	if (InitCheck() == B_OK)
-	{
+	if (InitCheck() == B_OK) {
 		status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
 		SetInitError(error);
 	}	
