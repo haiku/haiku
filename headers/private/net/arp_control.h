@@ -16,6 +16,7 @@
 #define ARP_FLAG_REJECT		0x02
 #define ARP_FLAG_PERMANENT	0x04
 #define ARP_FLAG_PUBLISH	0x08
+#define ARP_FLAG_VALID		0x10
 
 
 // generic syscall interface

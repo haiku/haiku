@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 //! Ethernet Address Resolution Protocol, see RFC 826.
@@ -18,6 +19,7 @@
 
 #include <generic_syscall.h>
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/khash.h>
 
 #include <ByteOrder.h>
@@ -65,18 +67,28 @@ struct arp_entry {
 	in_addr_t	protocol_address;
 	sockaddr_dl	hardware_address;
 	uint32		flags;
-	sem_id		resolved_sem;
 	net_buffer	*request_buffer;
 	net_timer	timer;
 	uint32		timer_state;
 	bigtime_t	timestamp;
 	net_datalink_protocol *protocol;
 
+	typedef DoublyLinkedListCLink<net_buffer> NetBufferLink;
+	typedef DoublyLinkedList<net_buffer, NetBufferLink> BufferList;
+
+	BufferList  queue;
+
 	static int Compare(void *_entry, const void *_key);
 	static uint32 Hash(void *_entry, const void *_key, uint32 range);
 	static arp_entry *Lookup(in_addr_t protocolAddress);
 	static arp_entry *Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 		uint32 flags);
+
+	~arp_entry();
+
+	void ClearQueue();
+	void MarkFailed();
+	void MarkValid();
 };
 
 // see arp_control.h for flags
@@ -109,9 +121,9 @@ static bool sIgnoreReplies;
 arp_entry::Compare(void *_entry, const void *_key)
 {
 	arp_entry *entry = (arp_entry *)_entry;
-	in_addr_t key = (in_addr_t)_key;
+	in_addr_t *key = (in_addr_t *)_key;
 
-	if (entry->protocol_address == key)
+	if (entry->protocol_address == *key)
 		return 0;
 
 	return 1;
@@ -122,13 +134,13 @@ arp_entry::Compare(void *_entry, const void *_key)
 arp_entry::Hash(void *_entry, const void *_key, uint32 range)
 {
 	arp_entry *entry = (arp_entry *)_entry;
-	in_addr_t key = (in_addr_t)_key;
+	const in_addr_t *key = (const in_addr_t *)_key;
 
 // TODO: check if this makes a good hash...
-#define HASH(o) (((o >> 24) ^ (o >> 16) ^ (o >> 8) ^ o) % range)
+#define HASH(o) ((((o) >> 24) ^ ((o) >> 16) ^ ((o) >> 8) ^ (o)) % range)
 
 #ifdef TRACE_ARP
-	in_addr_t a = entry ? entry->protocol_address : key; 
+	in_addr_t a = entry ? entry->protocol_address : *key; 
 	dprintf("%ld.%ld.%ld.%ld: Hash: %lu\n", a >> 24, (a >> 16) & 0xff,
 		(a >> 8) & 0xff, a & 0xff, HASH(a));
 #endif
@@ -136,7 +148,7 @@ arp_entry::Hash(void *_entry, const void *_key, uint32 range)
 	if (entry != NULL)
 		return HASH(entry->protocol_address);
 
-	return HASH(key);
+	return HASH(*key);
 #undef HASH
 }
 
@@ -144,7 +156,7 @@ arp_entry::Hash(void *_entry, const void *_key, uint32 range)
 /*static*/ arp_entry *
 arp_entry::Lookup(in_addr_t address)
 {
-	return (arp_entry *)hash_lookup(sCache, (void *)address);
+	return (arp_entry *)hash_lookup(sCache, &address);
 }
 
 
@@ -168,18 +180,9 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 		// this entry is already resolved
 		entry->hardware_address = *hardwareAddress;
 		entry->hardware_address.sdl_e_type = ETHER_TYPE_IP;
-		entry->resolved_sem = -1;
 	} else {
 		// this entry still needs to be resolved
 		entry->hardware_address.sdl_alen = 0;
-
-		char name[32];
-		snprintf(name, sizeof(name), "arp %08lx", protocolAddress);
-		entry->resolved_sem = create_sem(0, name);
-		if (entry->resolved_sem < B_OK) {
-			delete entry;
-			return NULL;
-		}
 	}
 	if (entry->hardware_address.sdl_len != sizeof(sockaddr_dl)) {
 		// explicitly set correct length in case our caller hasn't...
@@ -192,6 +195,55 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	}
 
 	return entry;
+}
+
+
+arp_entry::~arp_entry()
+{
+	ClearQueue();
+}
+
+
+void
+arp_entry::ClearQueue()
+{
+	BufferList::Iterator iterator = queue.GetIterator();
+	while (iterator.HasNext()) {
+		gBufferModule->free(iterator.Next());
+		iterator.Remove();
+	}
+}
+
+
+void
+arp_entry::MarkFailed()
+{
+	TRACE(("ARP entry %p Marked as FAILED\n", this));
+
+	flags = (flags & ~ARP_FLAG_VALID) | ARP_FLAG_REJECT;
+	ClearQueue();
+}
+
+
+void
+arp_entry::MarkValid()
+{
+	TRACE(("ARP entry %p Marked as VALID, have %li packets queued.\n", this,
+		queue.Size()));
+
+	flags = (flags & ~ARP_FLAG_REJECT) | ARP_FLAG_VALID;
+
+	BufferList::Iterator iterator = queue.GetIterator();
+	while (iterator.HasNext()) {
+		net_buffer *buffer = iterator.Next();
+		iterator.Remove();
+
+		TRACE(("  ARP Dequeing packet %p...\n", buffer));
+
+		memcpy(&buffer->destination, &hardware_address,
+			hardware_address.sdl_len);
+		protocol->next->module->send_data(protocol->next, buffer);
+	}
 }
 
 
@@ -237,12 +289,6 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 			return B_NO_MEMORY;
 	}
 
-	// if someone was waiting for this ARP request to be resolved
-	if (entry->resolved_sem >= B_OK) {
-		delete_sem(entry->resolved_sem);
-		entry->resolved_sem = -1;
-	}
-
 	if (entry->request_buffer != NULL) {
 		gBufferModule->free(entry->request_buffer);
 		entry->request_buffer = NULL;
@@ -253,6 +299,11 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 		entry->timer_state = ARP_STATE_STALE;
 		sStackModule->set_timer(&entry->timer, ARP_STALE_TIMEOUT);
 	}
+
+	if (entry->flags & ARP_FLAG_REJECT)
+		entry->MarkFailed();
+	else
+		entry->MarkValid();
 
 	if (_entry)
 		*_entry = entry;
@@ -424,7 +475,7 @@ arp_timer(struct net_timer *timer, void *data)
 			// so that we won't try to request the same address again too soon.
 			TRACE(("  requesting ARP entry %p failed!\n", entry));
 			entry->timer_state = ARP_STATE_REMOVE_FAILED;
-			entry->flags |= ARP_FLAG_REJECT;
+			entry->MarkFailed();
 			sStackModule->set_timer(&entry->timer, ARP_REJECT_TIMEOUT);
 			break;
 
@@ -476,59 +527,13 @@ arp_timer(struct net_timer *timer, void *data)
 
 
 /*!
-	Checks if the ARP \a entry has already been resolved. If it wasn't yet,
-	and MSG_DONTWAIT is not set in \a flags, it will wait for the entry to
-	become resolved.
-	You need to have the sCacheLock held when calling this function - but
-	note that the lock may be interrupted (in which case entry is updated).
-*/
-static status_t
-arp_check_resolved(arp_entry **_entry, uint32 flags)
-{
-	arp_entry *entry = *_entry;
-
-	if ((entry->flags & ARP_FLAG_REJECT) != 0)
-		return EHOSTUNREACH;
-
-	if (entry->resolved_sem < B_OK)
-		return B_OK;
-
-	// we need to wait for this entry to become resolved
-
-	if ((flags & MSG_DONTWAIT) != 0)
-		return B_ERROR;
-
-	// store information we cannot access anymore after having unlocked the cache
-	sem_id waitSem = entry->resolved_sem;
-	in_addr_t address = entry->protocol_address;
-
-	benaphore_unlock(&sCacheLock);
-	
-	status_t status = acquire_sem_etc(waitSem, 1, B_RELATIVE_TIMEOUT, 5 * 1000000);
-
-	benaphore_lock(&sCacheLock);
-
-	if (status == B_TIMED_OUT)
-		return EHOSTUNREACH;
-
-	// retrieve the entry again, as we reacquired the cache lock
-	entry = arp_entry::Lookup(address);
-	if (entry == NULL)
-		return B_ERROR;
-
-	*_entry = entry;	
-	return B_OK;
-}
-
-
-/*!
 	Address resolver function: prepares and sends the ARP request necessary
 	to retrieve the hardware address for \a address.
 	You need to have the sCacheLock held when calling this function - but
 	note that the lock will be interrupted here if everything goes well.
 */
 static status_t
-arp_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry **_entry)
+arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry **_entry)
 {
 	// create an unresolved ARP entry as a placeholder
 	arp_entry *entry = arp_entry::Add(address, NULL, 0);
@@ -590,26 +595,6 @@ arp_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry **_ent
 	sStackModule->set_timer(&entry->timer, 0);
 		// start request timer
 
-	sem_id waitSem = entry->resolved_sem;
-	benaphore_unlock(&sCacheLock);
-
-	status = acquire_sem_etc(waitSem, 1, B_RELATIVE_TIMEOUT, 5 * 1000000);
-		// wait for the entry to become resolved
-
-	benaphore_lock(&sCacheLock);
-
-	// retrieve the entry again, as we reacquired the cache lock
-	entry = arp_entry::Lookup(address);
-	if (entry == NULL)
-		return B_ERROR;
-
-	if (status == B_TIMED_OUT) {
-		// we didn't get a response, mark ARP entry as non-existant
-		entry->flags = ARP_FLAG_REJECT;
-		// TODO: remove the ARP entry after some time
-		return EHOSTUNREACH;
-	}
-
 	*_entry = entry;
 	return B_OK;
 }
@@ -646,7 +631,7 @@ arp_control(const char *subsystem, uint32 function,
 		case ARP_GET_ENTRY:
 		{
 			arp_entry *entry = arp_entry::Lookup(control.address);
-			if (entry == NULL || entry->resolved_sem < B_OK)
+			if (entry == NULL || !(entry->flags & ARP_FLAG_VALID))
 				return B_ENTRY_NOT_FOUND;
 
 			memcpy(control.ethernet_address, entry->hardware_address.sdl_data,
@@ -683,7 +668,7 @@ arp_control(const char *subsystem, uint32 function,
 		case ARP_DELETE_ENTRY:
 		{
 			arp_entry *entry = arp_entry::Lookup(control.address);
-			if (entry == NULL || entry->resolved_sem < B_OK)
+			if (entry == NULL)
 				return B_ENTRY_NOT_FOUND;
 			if ((entry->flags & ARP_FLAG_LOCAL) != 0)
 				return B_BAD_VALUE;
@@ -832,23 +817,20 @@ arp_send_data(net_datalink_protocol *protocol,
 			entry = arp_entry::Lookup(
 				((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr);
 			if (entry == NULL) {
-				// The ARP entry does not yet exist, if we're allowed to wait,
-				// we'll send an ARP request and try to change that.
-				if ((buffer->flags & MSG_DONTWAIT) != 0) {
-					// TODO: implement delaying packet send after ARP response!
-					return B_ERROR;
-				}
-
-				status_t status = arp_resolve(protocol,
+				status_t status = arp_start_resolve(protocol,
 					((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr, &entry);
 				if (status < B_OK)
 					return status;
-			} else {
-				// The entry exists, but we have to check if it has already been
-				// resolved and is valid.
-				status_t status = arp_check_resolved(&entry, buffer->flags);
-				if (status < B_OK)
-					return status;
+			}
+
+			if (entry->flags & ARP_FLAG_REJECT)
+				return EHOSTUNREACH;
+			else if (!(entry->flags & ARP_FLAG_VALID)) {
+				// entry is still being resolved.
+				TRACE(("ARP Queuing packet %p, entry still being resolved.\n",
+					buffer));
+				entry->queue.Add(buffer);
+				return B_OK;
 			}
 
 			memcpy(&buffer->destination, &entry->hardware_address,
@@ -896,7 +878,7 @@ arp_down(net_datalink_protocol *protocol)
 		}
 	}
 
-	protocol->next->module->interface_down(protocol->next);	
+	protocol->next->module->interface_down(protocol->next);
 }
 
 
