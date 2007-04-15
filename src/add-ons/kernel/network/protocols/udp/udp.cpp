@@ -894,15 +894,10 @@ UdpEndpoint::SendData(net_buffer *buffer)
 {
 	TRACE_EP("SendData(%p [%lu bytes])", buffer, buffer->size);
 
-	net_route *route = NULL;
-	status_t status = gDatalinkModule->get_buffer_route(Domain(),
-		buffer,	&route);
-	if (status >= B_OK) {
-		status = SendRoutedData(buffer, route);
-		gDatalinkModule->put_route(Domain(), route);
-	}
-
-	return status;
+	// This will call into IPv4 which will do all of the obtaining
+	// routes and other datagram related dirty work and eventually
+	// call back into our send_routed_data.
+	return next->module->send_data(next, buffer);
 }
 
 

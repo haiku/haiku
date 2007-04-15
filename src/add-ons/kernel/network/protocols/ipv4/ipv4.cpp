@@ -1260,7 +1260,11 @@ ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
 	status_t status = sDatalinkModule->get_buffer_route(sDomain, buffer,
 		&route);
 	if (status >= B_OK) {
-		status = ipv4_send_routed_data(protocol, route, buffer);
+		if (protocol)
+			status = protocol->socket->first_protocol->module->send_routed_data(
+				protocol->socket->first_protocol, route, buffer);
+		else
+			status = ipv4_send_routed_data(NULL, route, buffer);
 		sDatalinkModule->put_route(sDomain, route);
 	}
 
