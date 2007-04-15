@@ -2,13 +2,13 @@
 //
 //	Copyright (c) 2004, Haiku
 //
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the Haiku license.
 //
 //
 //  File:			MethodReplicant.cpp
 //  Authors:		Jérôme Duval,
-//	
+//
 //  Description:	Input Server
 //  Created:		October 13, 2004
 //
@@ -33,29 +33,29 @@
 #ifdef DEBUG
 	#define CALLED() PRINT(("CALLED %s \n", __PRETTY_FUNCTION__));
 #else
-	#define CALLED() 
+	#define CALLED()
 #endif
 
 
 MethodReplicant::MethodReplicant(const char* signature)
 	:	BView(BRect(0, 0, 15, 15), REPLICANT_CTL_NAME, B_FOLLOW_ALL, B_WILL_DRAW),
-		fMenu("", false, false)
+	fMenu("", false, false)
 {
 	// Background Bitmap
 	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1), kRemoteColorSpace);
 	fSegments->SetBits(kRemoteBits, kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
 	// Background Color
-	SetViewColor(184,184,184);
+	SetViewColor(184, 184, 184);
 
 	//add dragger
 	BRect rect(Bounds());
-	rect.left = rect.right-7.0; 
-	rect.top = rect.bottom-7.0;
+	rect.left = rect.right - 7.0;
+	rect.top = rect.bottom - 7.0;
 	BDragger *dragger = new BDragger(rect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
 	dragger->SetViewColor(B_TRANSPARENT_32_BIT);
-	
-	ASSERT(signature!=NULL);
+
+	ASSERT(signature != NULL);
 	fSignature = strdup(signature);
 
 	fMenu.SetFont(be_plain_font);
@@ -65,15 +65,15 @@ MethodReplicant::MethodReplicant(const char* signature)
 
 MethodReplicant::MethodReplicant(BMessage *message)
 	:	BView(message),
-		fMenu("", false, false)
+	fMenu("", false, false)
 {
 	// Background Bitmap
 	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1), kRemoteColorSpace);
 	fSegments->SetBits(kRemoteBits, kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
-	
+
 	const char *signature = NULL;
 	message->FindString("add_on", &signature);
-	ASSERT(signature!=NULL);
+	ASSERT(signature != NULL);
 	fSignature = strdup(signature);
 
 	fMenu.SetFont(be_plain_font);
@@ -99,7 +99,7 @@ MethodReplicant::Instantiate(BMessage *data)
 }
 
 
-status_t 
+status_t
 MethodReplicant::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data, deep);
@@ -118,7 +118,7 @@ MethodReplicant::AttachedToWindow()
 	msg.AddMessenger("address", messenger);
 
 	BMessenger inputMessenger(fSignature);
-	if (inputMessenger.SendMessage(&msg)!=B_OK) {
+	if (inputMessenger.SendMessage(&msg) != B_OK) {
 		printf("error when contacting input_server\n");
 	}
 }
@@ -127,45 +127,45 @@ MethodReplicant::AttachedToWindow()
 void
 MethodReplicant::MessageReceived(BMessage *message)
 {
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24, message->what >> 16, message->what >> 8, message->what));
 	PRINT_OBJECT(*message);
 	switch (message->what) {
-	case B_ABOUT_REQUESTED:
-		(new BAlert("About Method Replicant", "Method Replicant (Replicant)\n"
-			    "  Brought to you by Jérôme DUVAL.\n\n"
-			    "Haiku, 2004","OK"))->Go();
-		break;
-	case IS_UPDATE_NAME:
-		UpdateMethodName(message);
-		break;
-	case IS_UPDATE_ICON:
-		UpdateMethodIcon(message);
-		break;
-	case IS_UPDATE_MENU:
-		UpdateMethodMenu(message);
-		break;
-	case IS_UPDATE_METHOD:
-		UpdateMethod(message);
-		break;
-	case IS_ADD_METHOD:
-		AddMethod(message);
-		break;
-	case IS_REMOVE_METHOD:
-		RemoveMethod(message);
-		break;
+		case B_ABOUT_REQUESTED:
+			(new BAlert("About Method Replicant", "Method Replicant (Replicant)\n"
+				"  Brought to you by Jérôme DUVAL.\n\n"
+				"Haiku, 2004", "OK"))->Go();
+			break;
+		case IS_UPDATE_NAME:
+			UpdateMethodName(message);
+			break;
+		case IS_UPDATE_ICON:
+			UpdateMethodIcon(message);
+			break;
+		case IS_UPDATE_MENU:
+			UpdateMethodMenu(message);
+			break;
+		case IS_UPDATE_METHOD:
+			UpdateMethod(message);
+			break;
+		case IS_ADD_METHOD:
+			AddMethod(message);
+			break;
+		case IS_REMOVE_METHOD:
+			RemoveMethod(message);
+			break;
 
-	default:
-		BView::MessageReceived(message);
-		break;		
+		default:
+			BView::MessageReceived(message);
+			break;
 	}
 }
 
 
-void 
+void
 MethodReplicant::Draw(BRect rect)
 {
 	BView::Draw(rect);
-	
+
 	SetDrawingMode(B_OP_OVER);
 	DrawBitmap(fSegments);
 }
@@ -178,13 +178,13 @@ MethodReplicant::MouseDown(BPoint point)
 	uint32 mouseButtons;
 	BPoint where;
 	GetMouse(&where, &mouseButtons, true);
-	
+
 	where = ConvertToScreen(point);
-	
+
 	fMenu.SetTargetForItems(this);
-	BMenuItem *item = fMenu.Go(where, true, true, 
+	BMenuItem *item = fMenu.Go(where, true, true,
 		BRect(where - BPoint(4, 4), where + BPoint(4, 4)));
-		
+
 	if (item && dynamic_cast<MethodMenuItem *>(item)) {
 		BMessage msg(IS_SET_METHOD);
 		msg.AddInt32("cookie", ((MethodMenuItem*)item)->Cookie());
@@ -201,12 +201,12 @@ MethodReplicant::MouseUp(BPoint point)
 }
 
 
-void 
+void
 MethodReplicant::UpdateMethod(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+	if (message->FindInt32("cookie", &cookie) != B_OK) {
 		fprintf(stderr, "can't find cookie in message\n");
 		return;
 	}
@@ -223,19 +223,19 @@ MethodReplicant::UpdateMethod(BMessage *message)
 }
 
 
-void 
+void
 MethodReplicant::UpdateMethodIcon(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+	if (message->FindInt32("cookie", &cookie) != B_OK) {
 		fprintf(stderr, "can't find cookie in message\n");
 		return;
 	}
 
 	const uchar *data;
 	ssize_t numBytes;
-	if (message->FindData("icon", B_ANY_TYPE, (const void**)&data, &numBytes)!=B_OK) {
+	if (message->FindData("icon", B_ANY_TYPE, (const void**)&data, &numBytes) != B_OK) {
 		fprintf(stderr, "can't find icon in message\n");
 		return;
 	}
@@ -250,25 +250,25 @@ MethodReplicant::UpdateMethodIcon(BMessage *message)
 }
 
 
-void 
+void
 MethodReplicant::UpdateMethodMenu(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+	if (message->FindInt32("cookie", &cookie) != B_OK) {
 		fprintf(stderr, "can't find cookie in message\n");
 		return;
 	}
 
 	BMessage msg;
-	if (message->FindMessage("menu", &msg)!=B_OK) {
+	if (message->FindMessage("menu", &msg) != B_OK) {
 		fprintf(stderr, "can't find menu in message\n");
 		return;
 	}
 	PRINT_OBJECT(msg);
 
 	BMessenger messenger;
-	if (message->FindMessenger("target", &messenger)!=B_OK) {
+	if (message->FindMessenger("target", &messenger) != B_OK) {
 		fprintf(stderr, "can't find target in message\n");
 		return;
 	}
@@ -288,7 +288,7 @@ MethodReplicant::UpdateMethodMenu(BMessage *message)
 
 	MethodMenuItem *item2 = NULL;
 	if (menu)
-		item2 = new MethodMenuItem(cookie, item->Label(), item->Icon(), 
+		item2 = new MethodMenuItem(cookie, item->Label(), item->Icon(),
 			menu, messenger);
 	else
 		item2 = new MethodMenuItem(cookie, item->Label(), item->Icon());
@@ -299,18 +299,18 @@ MethodReplicant::UpdateMethodMenu(BMessage *message)
 }
 
 
-void 
+void
 MethodReplicant::UpdateMethodName(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+	if (message->FindInt32("cookie", &cookie) != B_OK) {
 		fprintf(stderr, "can't find cookie in message\n");
 		return;
 	}
 
 	const char *name;
-	if (message->FindString("name", &name)!=B_OK) {
+	if (message->FindString("name", &name) != B_OK) {
 		fprintf(stderr, "can't find name in message\n");
 		return;
 	}
@@ -328,36 +328,36 @@ MethodReplicant::UpdateMethodName(BMessage *message)
 MethodMenuItem *
 MethodReplicant::FindItemByCookie(int32 cookie)
 {
-	for (int32 i=0; i<fMenu.CountItems(); i++) {
+	for (int32 i = 0; i < fMenu.CountItems(); i++) {
 		MethodMenuItem *item = (MethodMenuItem *)fMenu.ItemAt(i);
 		PRINT(("cookie : 0x%lx\n", item->Cookie()));
-		if (item->Cookie()==cookie)
+		if (item->Cookie() == cookie)
 			return item;
-	}	
+	}
 
 	return NULL;
 }
 
 
-void 
+void
 MethodReplicant::AddMethod(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+	if (message->FindInt32("cookie", &cookie) != B_OK) {
 		fprintf(stderr, "can't find cookie in message\n");
 		return;
 	}
 
 	const char *name;
-	if (message->FindString("name", &name)!=B_OK) {
+	if (message->FindString("name", &name) != B_OK) {
 		fprintf(stderr, "can't find name in message\n");
 		return;
 	}
-	
+
 	const uchar *icon;
 	ssize_t numBytes;
-	if (message->FindData("icon", B_ANY_TYPE, (const void**)&icon, &numBytes)!=B_OK) {
+	if (message->FindData("icon", B_ANY_TYPE, (const void**)&icon, &numBytes) != B_OK) {
 		fprintf(stderr, "can't find icon in message\n");
 		return;
 	}
@@ -377,12 +377,12 @@ MethodReplicant::AddMethod(BMessage *message)
 }
 
 
-void 
+void
 MethodReplicant::RemoveMethod(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+	if (message->FindInt32("cookie", &cookie) != B_OK) {
 		fprintf(stderr, "can't find cookie in message\n");
 		return;
 	}

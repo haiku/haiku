@@ -2,13 +2,13 @@
 //
 //	Copyright (c) 2004, Haiku
 //
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the Haiku license.
 //
 //
 //  File:			MethodMenuItem.h
 //  Authors:		Jérôme Duval,
-//	
+//
 //  Description:	Input Server
 //  Created:		October 19, 2004
 //
@@ -23,27 +23,26 @@
 #define MENUITEM_ICON_SIZE 16
 
 class MethodMenuItem : public BMenuItem {
-public:
-	MethodMenuItem(int32 cookie, const char *label, const uchar *icon, BMenu *subMenu, BMessenger &messenger);
-	MethodMenuItem(int32 cookie, const char *label, const uchar *icon);
-		
-	virtual ~MethodMenuItem();
+	public:
+		MethodMenuItem(int32 cookie, const char *label, const uchar *icon, BMenu *subMenu, BMessenger &messenger);
+		MethodMenuItem(int32 cookie, const char *label, const uchar *icon);
 
-	virtual void DrawContent();
-	virtual void GetContentSize(float *width, float *height);
+		virtual ~MethodMenuItem();
 
-	void SetName(const char *name);
-	const char *Name() { return Label(); }; 
+		virtual void DrawContent();
+		virtual void GetContentSize(float *width, float *height);
 
-	void SetIcon(const uchar *icon);
-	const uchar *Icon() { return (uchar *)fIcon.Bits(); };
+		void SetName(const char *name);
+		const char *Name() { return Label(); };
 
-	const int32 Cookie() { return fCookie; };
-private:
-	BBitmap fIcon;
-	int32 fCookie;
-	BMessenger fMessenger;
+		void SetIcon(const uchar *icon);
+		const uchar *Icon() { return(uchar *)fIcon.Bits(); };
+
+		const int32 Cookie() { return fCookie; };
+	private:
+		BBitmap fIcon;
+		int32 fCookie;
+		BMessenger fMessenger;
 };
 
-#endif 
-
+#endif

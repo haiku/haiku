@@ -24,7 +24,7 @@ MethodMenuItem::MethodMenuItem(int32 cookie, const char* name, const uchar* icon
 {
 	SetLabel(name);
 	fIcon.SetBits(icon, MENUITEM_ICON_SIZE * MENUITEM_ICON_SIZE, 0, B_CMAP8);
-	fMessenger = messenger;	
+	fMessenger = messenger;
 }
 
 
