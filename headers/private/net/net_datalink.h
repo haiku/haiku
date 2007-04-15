@@ -71,6 +71,8 @@ struct net_datalink_module_info {
 					const struct sockaddr *address,
 					net_interface **_interface, 
 					uint32 *_matchedType);
+	net_interface *(*get_interface_with_address)(struct net_domain *domain,
+		const struct sockaddr *address);
 
 	// routes
 	status_t (*add_route)(struct net_domain *domain,

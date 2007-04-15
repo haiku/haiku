@@ -80,6 +80,30 @@ struct sockaddr_in {
 };
 /* the address is therefore at sin_addr.s_addr */
 
+/* RFC 3678 - Socket Interface Extensions for Multicast Source Filters */
+
+struct ip_mreq {
+	struct in_addr imr_multiaddr; /* IP address of group */
+	struct in_addr imr_interface; /* IP address of interface */
+};
+
+struct ip_mreq_source {
+	struct in_addr imr_multiaddr;	/* IP address of group */
+	struct in_addr imr_sourceaddr;	/* IP address of source */
+	struct in_addr imr_interface;	/* IP address of interface */
+};
+
+struct group_req {
+	uint32_t                gr_interface; /* interface index */
+	struct sockaddr_storage gr_group;     /* group address */
+};
+
+struct group_source_req {
+	uint32_t                gsr_interface; /* interface index */
+	struct sockaddr_storage gsr_group;     /* group address */
+	struct sockaddr_storage gsr_source;    /* source address */
+};
+
 /*
  * Options for use with [gs]etsockopt at the IP level.
  * First word of comment is data type; bool is stored in int.
@@ -97,6 +121,16 @@ struct sockaddr_in {
 #define IP_MULTICAST_LOOP       11   /* u_char; set/get IP multicast loopback */
 #define IP_ADD_MEMBERSHIP       12   /* ip_mreq; add an IP group membership */
 #define IP_DROP_MEMBERSHIP      13   /* ip_mreq; drop an IP group membership */ 
+#define IP_BLOCK_SOURCE         14   /* ip_mreq_source */
+#define IP_UNBLOCK_SOURCE       15   /* ip_mreq_source */
+#define IP_ADD_SOURCE_MEMBERSHIP	16 /* ip_mreq_source */
+#define IP_DROP_SOURCE_MEMBERSHIP	17 /* ip_mreq_source */
+#define MCAST_JOIN_GROUP            18 /* group_req */
+#define MCAST_BLOCK_SOURCE          19 /* group_source_req */
+#define MCAST_UNBLOCK_SOURCE        20 /* group_source_req */
+#define MCAST_LEAVE_GROUP           21 /* group_req */
+#define MCAST_JOIN_SOURCE_GROUP     22 /* group_source_req */
+#define MCAST_LEAVE_SOURCE_GROUP    23 /* group_source_req */
 
 #define __IPADDR(x)     ((uint32_t)htonl((uint32_t)(x)))
 

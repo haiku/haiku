@@ -8,6 +8,7 @@
 
 
 #include "ipv4_address.h"
+#include "multicast.h"
 
 #include <net_datalink.h>
 #include <net_protocol.h>
@@ -126,6 +127,8 @@ struct ipv4_protocol : net_protocol {
 	uint8		service_type;
 	uint8		time_to_live;
 	uint32		flags;
+
+	MulticastFilter<in_addr> multicast_filter;
 };
 
 // protocol flags
@@ -618,6 +621,86 @@ receiving_protocol(uint8 protocol)
 }
 
 
+static status_t
+ipv4_delta_group(MulticastFilter<in_addr>::GroupState *group, int option,
+	net_interface *interface, in_addr *sourceAddr)
+{
+	switch (option) {
+		case IP_ADD_MEMBERSHIP:
+			return group->Add(interface);
+		case IP_DROP_MEMBERSHIP:
+			return group->Drop(interface);
+		case IP_BLOCK_SOURCE:
+			return group->BlockSource(interface, *sourceAddr);
+		case IP_UNBLOCK_SOURCE:
+			return group->UnblockSource(interface, *sourceAddr);
+		case IP_ADD_SOURCE_MEMBERSHIP:
+			return group->AddSSM(interface, *sourceAddr);
+		case IP_DROP_SOURCE_MEMBERSHIP:
+			return group->DropSSM(interface, *sourceAddr);
+	}
+
+	return B_ERROR;
+}
+
+
+static status_t
+ipv4_delta_membership(ipv4_protocol *protocol, int option,
+	in_addr *interfaceAddr, in_addr *groupAddr, in_addr *sourceAddr)
+{
+	net_interface *interface = NULL;
+
+	if (interfaceAddr->s_addr == INADDR_ANY) {
+		interface = sDatalinkModule->get_interface_with_address(sDomain, NULL);
+	} else {
+		sockaddr_in address;
+
+		memset(&address, 0, sizeof(address));
+		address.sin_family = AF_INET;
+		address.sin_len = sizeof(address);
+		address.sin_addr = *interfaceAddr;
+
+		interface = sDatalinkModule->get_interface_with_address(sDomain,
+			(sockaddr *)&address);
+	}
+
+	if (interface == NULL)
+		return ENODEV;
+
+	MulticastFilter<in_addr> &filter = protocol->multicast_filter;
+	MulticastFilter<in_addr>::GroupState *group = NULL;
+
+	switch (option) {
+		case IP_ADD_MEMBERSHIP:
+		case IP_ADD_SOURCE_MEMBERSHIP:
+			group = filter.GetGroup(*groupAddr, true);
+			if (group == NULL)
+				return ENOBUFS;
+			break;
+
+		case IP_DROP_MEMBERSHIP:
+		case IP_BLOCK_SOURCE:
+		case IP_UNBLOCK_SOURCE:
+		case IP_DROP_SOURCE_MEMBERSHIP:
+			group = filter.GetGroup(*groupAddr, false);
+			if (group == NULL) {
+				if (option == IP_DROP_SOURCE_MEMBERSHIP
+					|| option == IP_DROP_SOURCE_MEMBERSHIP)
+					return EADDRNOTAVAIL;
+				else
+					return EINVAL;
+			}
+			break;
+	}
+
+	status_t status = ipv4_delta_group(group, option, interface, sourceAddr);
+
+	filter.ReturnGroup(group);
+
+	return status;
+}
+
+
 //	#pragma mark -
 
 
@@ -756,6 +839,17 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 				return user_memcpy(value, &serviceType, sizeof(serviceType));
 			}
 
+			case IP_ADD_MEMBERSHIP:
+			case IP_DROP_MEMBERSHIP:
+			case IP_BLOCK_SOURCE:
+			case IP_UNBLOCK_SOURCE:
+			case IP_ADD_SOURCE_MEMBERSHIP:
+			case IP_DROP_SOURCE_MEMBERSHIP:
+				// RFC 3678, Section 4.1:
+				// ``An error of EOPNOTSUPP is returned if these options are
+				// used with getsockopt().''
+				return EOPNOTSUPP;
+
 			default:
 				dprintf("IPv4::control(): get unknown option: %d\n", option);
 				return ENOPROTOOPT;
@@ -802,6 +896,34 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 
 			protocol->service_type = serviceType;
 			return B_OK;
+		}
+
+		case IP_ADD_MEMBERSHIP:
+		case IP_DROP_MEMBERSHIP:
+		{
+			ip_mreq mreq;
+			if (*_length != sizeof(ip_mreq))
+				return B_BAD_VALUE;
+			if (user_memcpy(&mreq, value, sizeof(ip_mreq)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
+				&mreq.imr_multiaddr, NULL);
+		}
+
+		case IP_BLOCK_SOURCE:
+		case IP_UNBLOCK_SOURCE:
+		case IP_ADD_SOURCE_MEMBERSHIP:
+		case IP_DROP_SOURCE_MEMBERSHIP:
+		{
+			ip_mreq_source mreq;
+			if (*_length != sizeof(ip_mreq_source))
+				return B_BAD_VALUE;
+			if (user_memcpy(&mreq, value, sizeof(ip_mreq_source)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
+				&mreq.imr_multiaddr, &mreq.imr_sourceaddr);
 		}
 
 		default:

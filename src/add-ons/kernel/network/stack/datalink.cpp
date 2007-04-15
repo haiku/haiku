@@ -419,6 +419,36 @@ datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 }
 
 
+net_interface *
+datalink_get_interface_with_address(net_domain *_domain,
+	const sockaddr *address)
+{
+	net_domain_private *domain = (net_domain_private *)_domain;
+	if (domain == NULL)
+		return NULL;
+
+	BenaphoreLocker _(domain->lock);
+
+	net_interface *interface = NULL;
+
+	while (true) {
+		interface = (net_interface *)list_get_next_item(
+			&domain->interfaces, interface);
+		if (interface == NULL)
+			break;
+
+		if (address == NULL)
+			return interface;
+
+		if (domain->address_module->equal_addresses(interface->address,
+				address))
+			return interface;
+	}
+
+	return NULL;
+}
+
+
 static status_t
 datalink_std_ops(int32 op, ...)
 {
@@ -745,6 +775,7 @@ net_datalink_module_info gNetDatalinkModule = {
 	datalink_control,
 	datalink_send_data,
 	datalink_is_local_address,
+	datalink_get_interface_with_address,
 
 	add_route,
 	remove_route,
