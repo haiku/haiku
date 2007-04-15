@@ -121,7 +121,8 @@ public:
 
 	MulticastGroup(const in_addr &address);
 
-	status_t Deliver(net_protocol_module_info *module, net_buffer *buffer);
+	status_t Deliver(net_protocol_module_info *module, net_buffer *buffer,
+		bool raw);
 
 	void Add(Link *link);
 	void Remove(Link *link);
@@ -436,7 +437,8 @@ MulticastGroup::MulticastGroup(const in_addr &address)
 
 
 status_t
-MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer)
+MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer,
+	bool deliverToRaw)
 {
 	if (module->deliver_data == NULL)
 		return B_OK;
@@ -446,8 +448,25 @@ MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer)
 	while (iterator.HasNext()) {
 		Link *link = iterator.Next();
 
-		if (link->group->FilterAccepts(buffer))
-			module->deliver_data(link->group->Socket(), buffer);
+		// we are pretty sure of this cast since multicast filters
+		// are installed with the IPv4 protocol reference
+		ipv4_protocol *protocol = (ipv4_protocol *)link->group->Socket();
+
+		if (deliverToRaw && protocol->raw == NULL)
+			continue;
+
+		if (link->group->FilterAccepts(buffer)) {
+			// as Multicast filters are installed with an IPv4 protocol
+			// reference, we need to go and find the appropriate instance
+			// related to the 'receiving protocol' with module 'module'.
+			net_protocol *proto = link->group->Socket();
+
+			while (proto && proto->module != module)
+				proto = proto->next;
+
+			if (proto)
+				module->deliver_data(proto, buffer);
+		}
 	}
 
 	return B_OK;
@@ -688,26 +707,9 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 }
 
 
-static void
-raw_receive_data(net_buffer *buffer)
-{
-	BenaphoreLocker locker(sRawSocketsLock);
-
-	TRACE("RawReceiveData(%i)", buffer->protocol);
-
-	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
-
-	while (iterator.HasNext()) {
-		RawSocket *raw = iterator.Next();
-
-		if (raw->Socket()->protocol == buffer->protocol)
-			raw->SocketEnqueue(buffer);
-	}
-}
-
-
 static status_t
-deliver_multicast(net_protocol_module_info *module, net_buffer *buffer)
+deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
+	bool deliverToRaw)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
@@ -716,10 +718,37 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer)
 	if (group == NULL)
 		return B_OK;
 
-	// TODO fix sending multicast to RAW sockets, right now
-	//      they are receiving the frames without the IP header
+	return group->Deliver(module, buffer, deliverToRaw);
+}
 
-	return group->Deliver(module, buffer);
+
+static void
+raw_receive_data(net_buffer *buffer)
+{
+	BenaphoreLocker locker(sRawSocketsLock);
+
+	if (sRawSockets.IsEmpty())
+		return;
+
+	TRACE("RawReceiveData(%i)", buffer->protocol);
+
+	if (buffer->flags & MSG_MCAST) {
+		// we need to call deliver_multicast here separately as
+		// buffer still has the IP header, and it won't in the
+		// next call. This isn't very optimized but works for now.
+		// A better solution would be to hold separate hash tables
+		// and lists for RAW and non-RAW sockets.
+		deliver_multicast(&gIPv4Module, buffer, true);
+	} else {
+		RawSocketList::Iterator iterator = sRawSockets.GetIterator();
+
+		while (iterator.HasNext()) {
+			RawSocket *raw = iterator.Next();
+
+			if (raw->Socket()->protocol == buffer->protocol)
+				raw->SocketEnqueue(buffer);
+		}
+	}
 }
 
 
@@ -1499,8 +1528,7 @@ ipv4_receive_data(net_buffer *buffer)
 	// we must no longer access bufferHeader or header anymore after
 	// this point
 
-	if (!(buffer->flags & MSG_MCAST))
-		raw_receive_data(buffer);
+	raw_receive_data(buffer);
 
 	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options
@@ -1517,7 +1545,7 @@ ipv4_receive_data(net_buffer *buffer)
 		// model be a little different from the unicast one. We deliver
 		// this frame directly to all sockets registered with interest
 		// for this multicast group.
-		return deliver_multicast(module, buffer);
+		return deliver_multicast(module, buffer, false);
 	}
 
 	return module->receive_data(buffer);
