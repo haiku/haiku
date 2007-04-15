@@ -11,6 +11,7 @@ namespace BPrivate { namespace media {
 
 class ChunkProvider {
 public:
+	virtual			~ChunkProvider() {};
 	virtual status_t	GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 						             media_header *mediaHeader) = 0;
 };
