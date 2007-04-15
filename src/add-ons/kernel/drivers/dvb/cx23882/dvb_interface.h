@@ -25,6 +25,8 @@
 #ifndef __DVB_INTERFACE_H
 #define __DVB_INTERFACE_H
 
+#include <PCI.h>
+
 status_t	interface_attach(void **cookie, const pci_info *info);
 void		interface_detach(void *cookie);
 status_t	interface_ioctl(void *cookie, uint32 op, void *arg, size_t len);

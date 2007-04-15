@@ -22,8 +22,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "i2c.h"
-#include "i2c-core.h"
+#include "cx23882_i2c.h"
+#include "i2c_core.h"
 
 
 static void

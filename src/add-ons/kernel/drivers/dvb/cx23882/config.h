@@ -25,10 +25,10 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#define REVISION		"unknown"
 #define VERSION			"1.0"
 #define BUILD			__DATE__ " "__TIME__
-#define INFO1			"cx23882: DVB-T Driver. Version " VERSION ", Revision " REVISION ", Build " BUILD
-#define INFO2			"cx23882: Copyright (c) 2004-2006 Marcus Overhagen. All rights reserved.\n"
+#define INFO			"cx23882: DVB-T Driver. Version " VERSION ", Revision " REVISION ", Build " BUILD "\n"
 
 #define MAX_CARDS 		8
 

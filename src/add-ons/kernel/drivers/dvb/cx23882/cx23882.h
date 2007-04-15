@@ -28,7 +28,7 @@
 #include <SupportDefs.h>
 #include "driver.h"
 #include "cx23882_regs.h"
-#include "i2c-core.h"
+#include "i2c_core.h"
 
 typedef struct {
 	const pci_info *	pci_info;

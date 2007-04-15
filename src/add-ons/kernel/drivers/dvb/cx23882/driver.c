@@ -29,10 +29,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "version.h"
 #include "config.h"
 #include "driver.h"
-#include "mktime.h"
+#include "dvb_interface.h"
 
 #define TRACE_DRIVER
 #ifdef TRACE_DRIVER
@@ -126,7 +125,7 @@ init_driver(void)
 	load_driver_symbols("cx23882");
 #endif
 	
-	dprintf(gBanner);
+	dprintf(INFO);
 	
 	item = (pci_info *)malloc(sizeof(pci_info));
 	if (!item)

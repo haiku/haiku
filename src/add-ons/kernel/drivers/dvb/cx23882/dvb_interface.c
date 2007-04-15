@@ -24,14 +24,15 @@
 
 #include <KernelExport.h>
 #include <stdlib.h>
-#include "interface.h"
+#include <string.h>
+#include "dvb_interface.h"
 #include "cx23882.h"
+#include "cx23882_i2c.h"
 #include "cx22702.h"
 #include "dtt7592.h"
 #include "driver.h"
 #include "config.h"
 #include "util.h"
-#include "i2c.h"
 
 #define TRACE_INTERFACE
 #ifdef TRACE_INTERFACE
@@ -40,9 +41,8 @@
   #define TRACE(a...)
 #endif
 
-static inline status_t user_memcpy(void *d, const void *s, size_t z) { memcpy(d, s, z); return B_OK; }
-#define B_BAD_ADDRESS B_ERROR
 
+#if 0
 static void
 dump_eeprom(cx23882_device *device)
 {
@@ -62,6 +62,7 @@ dump_eeprom(cx23882_device *device)
 		TRACE("EEPROM %02x: %02x %02x %02x %02x %02x %02x %02x %02x\n", i * 8, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 		
 }
+#endif
 
 
 status_t

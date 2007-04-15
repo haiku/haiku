@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers dvb cx23882 ;
+
+UsePrivateHeaders drivers ;
+
+KernelAddon cx23882 :
+	cx22702.c
+	cx23882.c
+	cx23882_i2c.c
+	driver.c
+	dtt7592.c
+	dvb_interface.c
+	i2c_core.c
+	util.c
+;
+

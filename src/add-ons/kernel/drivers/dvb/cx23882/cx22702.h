@@ -25,7 +25,7 @@
 #ifndef __CX22702_H
 #define __CX22702_H
 
-#include "i2c-core.h"
+#include "i2c_core.h"
 #include "dvb.h"
 
 status_t cx22702_reg_write(i2c_bus *bus, uint8 reg, uint8 data);

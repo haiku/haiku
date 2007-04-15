@@ -25,7 +25,7 @@
 #ifndef __DTT7592_H
 #define __DTT7592_H
 
-#include "i2c-core.h"
+#include "i2c_core.h"
 #include "dvb.h"
 
 status_t dtt7592_write(i2c_bus *bus, const uint8 data[4]);

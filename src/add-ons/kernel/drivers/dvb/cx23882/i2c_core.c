@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <KernelExport.h>
-#include "i2c-core.h"
+#include "i2c_core.h"
 
 #define TRACE_I2C
 #ifdef TRACE_I2C

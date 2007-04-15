@@ -131,6 +131,7 @@ dtt7592_set_frequency(i2c_bus *bus, uint32 frequency, dvb_bandwidth_t bandwidth)
 }
 
 
+#if 0
 void
 dtt7582_dump(i2c_bus *bus)
 {
@@ -163,6 +164,4 @@ dtt7582_test(i2c_bus *bus)
 	dtt7592_set_frequency(bus, 333000000, DVB_BANDWIDTH_7_MHZ);
 	dtt7582_dump(bus);
 }
-
-
-
+#endif

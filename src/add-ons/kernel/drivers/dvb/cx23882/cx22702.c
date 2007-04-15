@@ -23,6 +23,7 @@
  */
 
 #include <KernelExport.h>
+#include <string.h>
 #include "cx22702.h"
 #include "dtt7592.h"
 #include "config.h"
@@ -36,6 +37,7 @@
 #endif
 
 
+#if 0
 static void
 cx22702_reg_dump(i2c_bus *bus)
 {
@@ -48,6 +50,7 @@ cx22702_reg_dump(i2c_bus *bus)
 			dprintf("cx22702_reg 0x%02x value 0x%02x\n", i, data);
 	}
 }
+#endif
 
 
 status_t
