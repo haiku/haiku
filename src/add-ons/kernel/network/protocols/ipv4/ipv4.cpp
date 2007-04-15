@@ -115,12 +115,29 @@ class FragmentPacket {
 		net_timer		fTimer;
 };
 
-typedef DoublyLinkedList<class RawSocket> RawSocketList;
+class MulticastGroup {
+public:
+	MulticastGroup(const in_addr &address);
+
+	status_t Deliver(net_buffer *buffer);
+
+	static uint32 Hash(void *address, const void *key, uint32 range);
+	static int Compare(void *address, const void *key);
+	static int32 NextOffset() { return offsetof(MulticastGroup, fNext); }
+
+	static const int kMaxGroups = 64;
+
+private:
+	MulticastGroup *fNext;
+	in_addr fMulticastAddress;
+};
 
 class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
 	public:
 		RawSocket(net_socket *socket);
 };
+
+typedef DoublyLinkedList<RawSocket> RawSocketList;
 
 struct ipv4_protocol : net_protocol {
 	ipv4_protocol(net_socket *socket)
@@ -151,6 +168,8 @@ static RawSocketList sRawSockets;
 static benaphore sRawSocketsLock;
 static benaphore sFragmentLock;
 static hash_table *sFragmentHash;
+static benaphore sMulticastGroupsLock;
+static hash_table *sMulticastGroups;
 static net_protocol_module_info *sReceivingProtocol[256];
 static benaphore sReceivingProtocolLock;
 
@@ -393,6 +412,46 @@ FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
 }
 
 
+MulticastGroup::MulticastGroup(const in_addr &address)
+	: fMulticastAddress(address)
+{
+}
+
+
+status_t
+MulticastGroup::Deliver(net_buffer *buffer)
+{
+	return B_ERROR;
+}
+
+
+int
+MulticastGroup::Compare(void *_group, const void *_key)
+{
+	MulticastGroup *group = (MulticastGroup *)_group;
+
+	return memcmp(&group->fMulticastAddress, _key, sizeof(in_addr));
+}
+
+
+uint32
+MulticastGroup::Hash(void *_group, const void *_key, uint32 range)
+{
+	const in_addr *address = (const in_addr *)_key;
+	if (_group != NULL)
+		address = &((MulticastGroup *)_group)->fMulticastAddress;
+
+	union {
+		in_addr_t address;
+		uint8 data[4];
+	} addr;
+
+	addr.address = address->s_addr & IN_CLASSD_HOST;
+
+	return (addr.data[0] ^ addr.data[1] ^ addr.data[2] ^ addr.data[3]) % range;
+}
+
+
 //	#pragma mark -
 
 
@@ -601,6 +660,22 @@ raw_receive_data(net_buffer *buffer)
 		if (raw->Socket()->protocol == buffer->protocol)
 			raw->SocketEnqueue(buffer);
 	}
+}
+
+
+static status_t
+deliver_multicast(net_buffer *buffer)
+{
+	BenaphoreLocker _(sMulticastGroupsLock);
+
+	MulticastGroup *group = (MulticastGroup *)hash_lookup(sMulticastGroups,
+		&buffer->destination);
+	if (group == NULL)
+		return B_OK;
+
+	// RAW sockets will be registered just like any other
+
+	return group->Deliver(buffer);
 }
 
 
@@ -1252,15 +1327,27 @@ ipv4_receive_data(net_buffer *buffer)
 	destination.sin_family = AF_INET;
 	destination.sin_addr.s_addr = header.destination;
 
-	// test if the packet is really for us
-	uint32 matchedAddressType;
-	if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
-		&buffer->interface, &matchedAddressType)) {
-		TRACE("  ReceiveData(): packet was not for us %lx -> %lx",
-			ntohl(header.source), ntohl(header.destination));
-		return B_ERROR;
-	}
-	if (matchedAddressType != 0) {
+	// lower layers notion of Broadcast or Multicast have no relevance to us
+	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+
+	if (header.destination == INADDR_BROADCAST) {
+		buffer->flags |= MSG_BCAST;
+		// TODO set incoming interface. we should have some notion from which
+		//      device interface this buffer is coming from.
+		buffer->interface = NULL;
+	} else if (IN_MULTICAST(header.destination)) {
+		buffer->flags |= MSG_MCAST;
+		buffer->interface = NULL;
+	} else {
+		uint32 matchedAddressType = 0;
+		// test if the packet is really for us
+		if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
+			&buffer->interface, &matchedAddressType)) {
+			TRACE("  ReceiveData(): packet was not for us %lx -> %lx",
+				ntohl(header.source), ntohl(header.destination));
+			return B_ERROR;
+		}
+
 		// copy over special address types (MSG_BCAST or MSG_MCAST):
 		buffer->flags |= matchedAddressType;
 	}
@@ -1288,6 +1375,14 @@ ipv4_receive_data(net_buffer *buffer)
 			TRACE("  ReceiveData(): Not yet assembled.");
 			return B_OK;
 		}
+	}
+
+	if (buffer->flags & MSG_MCAST) {
+		// Unfortunely historical reasons dictate that the IP multicast
+		// model be a little different from the unicast one. We deliver
+		// this frame directly to all sockets registered with interest
+		// for this multicast group.
+		return deliver_multicast(buffer);
 	}
 
 	// Since the buffer might have been changed (reassembled fragment)
@@ -1341,14 +1436,24 @@ init_ipv4()
 	if (status < B_OK)
 		goto err1;
 
-	status = benaphore_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
+	status = benaphore_init(&sMulticastGroupsLock, "IPv4 multicast groups");
 	if (status < B_OK)
 		goto err2;
+
+	status = benaphore_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
+	if (status < B_OK)
+		goto err3;
+
+	sMulticastGroups = hash_init(MulticastGroup::kMaxGroups,
+		MulticastGroup::NextOffset(), &MulticastGroup::Compare,
+		&MulticastGroup::Hash);
+	if (sMulticastGroups == NULL)
+		goto err4;
 
 	sFragmentHash = hash_init(MAX_HASH_FRAGMENTS, FragmentPacket::NextOffset(),
 		&FragmentPacket::Compare, &FragmentPacket::Hash);
 	if (sFragmentHash == NULL)
-		goto err3;
+		goto err5;
 
 	new (&sRawSockets) RawSocketList;
 		// static initializers do not work in the kernel,
@@ -1358,19 +1463,23 @@ init_ipv4()
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_RAW, 0,
 		"network/protocols/ipv4/v1", NULL);
 	if (status < B_OK)
-		goto err4;
+		goto err6;
 
 	status = gStackModule->register_domain(AF_INET, "internet", &gIPv4Module,
 		&gIPv4AddressModule, &sDomain);
 	if (status < B_OK)
-		goto err4;
+		goto err6;
 
 	return B_OK;
 
-err4:
+err6:
 	hash_uninit(sFragmentHash);
-err3:
+err5:
+	hash_uninit(sMulticastGroups);
+err4:
 	benaphore_destroy(&sReceivingProtocolLock);
+err3:
+	benaphore_destroy(&sMulticastGroupsLock);
 err2:
 	benaphore_destroy(&sFragmentLock);
 err1:
@@ -1393,8 +1502,10 @@ uninit_ipv4()
 	gStackModule->unregister_domain(sDomain);
 	benaphore_unlock(&sReceivingProtocolLock);
 
+	hash_uninit(sMulticastGroups);
 	hash_uninit(sFragmentHash);
 
+	benaphore_destroy(&sMulticastGroupsLock);
 	benaphore_destroy(&sFragmentLock);
 	benaphore_destroy(&sRawSocketsLock);
 	benaphore_destroy(&sReceivingProtocolLock);
