@@ -90,6 +90,32 @@ posix_error(status_t error)
 }
 
 
+static inline bool
+in_window(const tcp_sequence &sequence, const tcp_sequence &rcvNext,
+	uint32 rcvWindow)
+{
+	return sequence >= rcvNext && sequence < (rcvNext + rcvWindow);
+}
+
+
+static inline bool
+segment_in_sequence(const tcp_segment_header &segment, int size,
+	const tcp_sequence &rcvNext, uint32 rcvWindow)
+{
+	tcp_sequence sequence(segment.sequence);
+	if (size == 0) {
+		if (rcvWindow == 0)
+			return sequence == rcvNext;
+		return in_window(sequence, rcvNext, rcvWindow);
+	} else {
+		if (rcvWindow == 0)
+			return false;
+		return in_window(sequence, rcvNext, rcvWindow)
+			|| in_window(sequence + size - 1, rcvNext, rcvWindow);
+	}
+}
+
+
 WaitList::WaitList(const char *name)
 {
 	fSem = create_sem(0, name);
@@ -761,7 +787,7 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	segment.flags &= ~TCP_FLAG_SYNCHRONIZE;
 		// we handled this flag now, it must not be set for further processing
 
-	return endpoint->Receive(segment, buffer);
+	return endpoint->_Receive(segment, buffer);
 		// TODO: here, the ack/delayed ack call will be made on the parent socket!
 }
 
@@ -894,237 +920,19 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 	// The fast path was not applicable, so we continue with the standard
 	// processing of the incoming segment
 
-	if (segment.flags & TCP_FLAG_RESET) {
-		// is this a valid reset?
-		if (fLastAcknowledgeSent <= segment.sequence
-			&& tcp_sequence(segment.sequence)
-				< (fLastAcknowledgeSent + fReceiveWindow)) {
-			if (fState == SYNCHRONIZE_RECEIVED) {
-				// TODO: if we came from SYN-SENT signal connection refused
-				//       and remove all segments from tx queue
-			} else if (fState == ESTABLISHED || fState == FINISH_SENT
-				|| fState == FINISH_RECEIVED || fState == FINISH_ACKNOWLEDGED) {
-				// TODO: RFC 793 states that on ESTABLISHED, FIN-WAIT{1,2}
-				//       or CLOSE-WAIT "All segment queues should be
-				//       flushed".
-			}
-
-			if (fState != TIME_WAIT && fReceiveQueue.Available() > 0) {
-				_NotifyReader();
-			} else {
-				return DELETE | DROP;
-			}
-
-			fError = ECONNREFUSED;
-			fState = CLOSED;
-		}
-
-		return DROP;
-	}
-
-	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
-		|| (fState == SYNCHRONIZE_RECEIVED
-			&& (fInitialReceiveSequence > segment.sequence
-				|| (segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
-					&& (fSendUnacknowledged > segment.acknowledge
-						|| fSendMax < segment.acknowledge)))) {
-		// reset the connection - either the initial SYN was faulty, or we
-		// received a SYN within the data stream
-		return DROP | RESET;
-	}
-
-	fReceiveWindow = max_c(fReceiveQueue.Free(), fReceiveWindow);
-		// the window must not shrink
-
-	// trim buffer to be within the receive window
-	int32 drop = fReceiveNext - segment.sequence;
-	if (drop > 0) {
-		if ((uint32)drop > buffer->size
-			|| ((uint32)drop == buffer->size
-				&& (segment.flags & TCP_FLAG_FINISH) == 0)) {
-			// don't accidently remove a FIN we shouldn't remove
-			segment.flags &= ~TCP_FLAG_FINISH;
-			drop = buffer->size;
-		}
-
-		// remove duplicate data at the start
-		TRACE("* remove %ld bytes from the start", drop);
-		gBufferModule->remove_header(buffer, drop);
-		segment.sequence += drop;
-	}
-
-	int32 action = KEEP;
-
-	drop = segment.sequence + buffer->size - (fReceiveNext + fReceiveWindow);
-	if (drop > 0) {
-		// remove data exceeding our window
-		if ((uint32)drop >= buffer->size) {
-			// if we can accept data, or the segment is not what we'd expect,
-			// drop the segment (an immediate acknowledge is always triggered)
-			if (fReceiveWindow != 0 || segment.sequence != fReceiveNext)
-				return DROP | IMMEDIATE_ACKNOWLEDGE;
-
-			action |= IMMEDIATE_ACKNOWLEDGE;
-		}
-
-		if ((segment.flags & TCP_FLAG_FINISH) != 0) {
-			// we need to remove the finish, too, as part of the data
-			drop--;
-		}
-
-		segment.flags &= ~(TCP_FLAG_FINISH | TCP_FLAG_PUSH);
-		TRACE("* remove %ld bytes from the end", drop);
-		gBufferModule->remove_trailer(buffer, drop);
-	}
-
-	// Then look at the acknowledgement for any updates
-
-	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0) {
-		// process acknowledged data
-		if (fState == SYNCHRONIZE_RECEIVED) {
-			// TODO: window scaling!
-			if (socket->parent != NULL) {
-				gSocketModule->set_connected(socket);
-				release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
-			}
-
-			fState = ESTABLISHED;
-
-			fSendList.Signal();
-			_NotifyReader();
-		}
-
-		if (fSendMax < segment.acknowledge || fState == TIME_WAIT)
-			return DROP | IMMEDIATE_ACKNOWLEDGE;
-		if (fSendUnacknowledged >= segment.acknowledge) {
-			// this is a duplicate acknowledge
-			// TODO: handle this!
-			if (buffer->size == 0 && advertisedWindow == fSendWindow
-				&& (segment.flags & TCP_FLAG_FINISH) == 0) {
-				TRACE("Receive(): duplicate ack!");
-				fDuplicateAcknowledgeCount++;
-
-				gStackModule->cancel_timer(&fRetransmitTimer);
-
-				fSendNext = segment.acknowledge;
-				_SendQueued();
+	if (fState != SYNCHRONIZE_SENT && fState != LISTEN && fState != CLOSED) {
+		// 1. check sequence number
+		if (!segment_in_sequence(segment, buffer->size, fReceiveNext,
+				fReceiveWindow)) {
+			TRACE("  Receive(): segment out of window, next: %lu wnd: %lu",
+				(uint32)fReceiveNext, fReceiveWindow);
+			if (segment.flags & TCP_FLAG_RESET)
 				return DROP;
-			}
-		} else {
-			// this segment acknowledges in flight data
-			fDuplicateAcknowledgeCount = 0;
-
-			if (fSendMax == segment.acknowledge) {
-				// there is no outstanding data to be acknowledged
-				// TODO: if the transmit timer function is already waiting
-				//	to acquire this endpoint's lock, we should stop it anyway
-				TRACE("Receive(): all inflight data ack'd!");
-				gStackModule->cancel_timer(&fRetransmitTimer);
-			} else {
-				TRACE("Receive(): set retransmit timer!");
-				// TODO: set retransmit timer correctly
-				if (!gStackModule->is_timer_active(&fRetransmitTimer))
-					gStackModule->set_timer(&fRetransmitTimer, 1000000LL);
-			}
-
-			fSendUnacknowledged = segment.acknowledge;
-			fSendQueue.RemoveUntil(segment.acknowledge);
-
-			if (fSendNext < fSendUnacknowledged)
-				fSendNext = fSendUnacknowledged;
-
-			if (segment.acknowledge > fSendQueue.LastSequence() && fState > ESTABLISHED) {
-				TRACE("Receive(): FIN has been acknowledged!");
-
-				switch (fState) {
-					case FINISH_SENT:
-						fState = FINISH_ACKNOWLEDGED;
-						break;
-					case CLOSING:
-						fState = TIME_WAIT;
-						_EnterTimeWait();
-						break;
-					case WAIT_FOR_FINISH_ACKNOWLEDGE:
-						fState = CLOSED;
-						break;
-
-					default:
-						break;
-				}
-			}
+			return DROP | IMMEDIATE_ACKNOWLEDGE;
 		}
 	}
 
-	// TODO: update window
-	fSendWindow = advertisedWindow;
-	if (advertisedWindow > fSendMaxWindow)
-		fSendMaxWindow = advertisedWindow;
-
-	if (segment.flags & TCP_FLAG_URGENT) {
-		if (fState == ESTABLISHED || fState == FINISH_SENT
-			|| fState == FINISH_ACKNOWLEDGED) {
-			// TODO: Handle urgent data:
-			//  - RCV.UP <- max(RCV.UP, SEG.UP)
-			//  - signal the user that urgent data is available (SIGURG)
-		}
-	}
-
-	bool notify = false;
-
-	if (buffer->size > 0 &&	_ShouldReceive()) {
-		fReceiveQueue.Add(buffer, segment.sequence);
-		fReceiveNext += buffer->size;
-		notify = true;
-		TRACE("Receive(): adding data, receive next = %lu. Now have %lu bytes.",
-				(uint32)fReceiveNext, fReceiveQueue.Available());
-
-		if (segment.flags & TCP_FLAG_PUSH)
-			fReceiveQueue.SetPushPointer();
-	} else {
-		action = (action & ~KEEP) | DROP;
-	}
-
-	if (segment.flags & TCP_FLAG_FINISH) {
-		if (fState != CLOSED && fState != LISTEN && fState != SYNCHRONIZE_SENT) {
-			TRACE("Receive(): peer is finishing connection!");
-			fReceiveNext++;
-			notify = true;
-
-			// FIN implies PSH
-			fReceiveQueue.SetPushPointer();
-
-			// RFC 793 states that we must send an ACK to FIN
-			action |= IMMEDIATE_ACKNOWLEDGE;
-
-			// other side is closing connection; change states
-			switch (fState) {
-				case ESTABLISHED:
-				case SYNCHRONIZE_RECEIVED:
-					fState = FINISH_RECEIVED;
-					break;
-				case FINISH_SENT:
-					// simultaneous close
-					fState = CLOSING;
-					break;
-				case FINISH_ACKNOWLEDGED:
-					fState = TIME_WAIT;
-					_EnterTimeWait();
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-	if (notify)
-		_NotifyReader();
-
-	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
-		action |= ACKNOWLEDGE;
-
-	TRACE("Receive() Action %ld", action);
-
-	return action;
+	return _Receive(segment, buffer);
 }
 
 
@@ -1422,6 +1230,246 @@ TCPEndpoint::_ShouldReceive() const
 
 	return fState == ESTABLISHED || fState == FINISH_SENT
 			|| fState == FINISH_ACKNOWLEDGED;
+}
+
+
+int32
+TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
+{
+	uint32 advertisedWindow = (uint32)segment.advertised_window << fSendWindowShift;
+
+	if (segment.flags & TCP_FLAG_RESET) {
+		// is this a valid reset?
+		if (fLastAcknowledgeSent <= segment.sequence
+			&& tcp_sequence(segment.sequence)
+				< (fLastAcknowledgeSent + fReceiveWindow)) {
+			if (fState == SYNCHRONIZE_RECEIVED) {
+				// TODO: if we came from SYN-SENT signal connection refused
+				//       and remove all segments from tx queue
+			} else if (fState == ESTABLISHED || fState == FINISH_SENT
+				|| fState == FINISH_RECEIVED || fState == FINISH_ACKNOWLEDGED) {
+				// TODO: RFC 793 states that on ESTABLISHED, FIN-WAIT{1,2}
+				//       or CLOSE-WAIT "All segment queues should be
+				//       flushed".
+			}
+
+			if (fState != TIME_WAIT && fReceiveQueue.Available() > 0) {
+				_NotifyReader();
+			} else {
+				return DELETE | DROP;
+			}
+
+			fError = ECONNREFUSED;
+			fState = CLOSED;
+		}
+
+		return DROP;
+	}
+
+	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
+		|| (fState == SYNCHRONIZE_RECEIVED
+			&& (fInitialReceiveSequence > segment.sequence
+				|| (segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
+					&& (fSendUnacknowledged > segment.acknowledge
+						|| fSendMax < segment.acknowledge)))) {
+		// reset the connection - either the initial SYN was faulty, or we
+		// received a SYN within the data stream
+		return DROP | RESET;
+	}
+
+	fReceiveWindow = max_c(fReceiveQueue.Free(), fReceiveWindow);
+		// the window must not shrink
+
+	// trim buffer to be within the receive window
+	int32 drop = fReceiveNext - segment.sequence;
+	if (drop > 0) {
+		if ((uint32)drop > buffer->size
+			|| ((uint32)drop == buffer->size
+				&& (segment.flags & TCP_FLAG_FINISH) == 0)) {
+			// don't accidently remove a FIN we shouldn't remove
+			segment.flags &= ~TCP_FLAG_FINISH;
+			drop = buffer->size;
+		}
+
+		// remove duplicate data at the start
+		TRACE("* remove %ld bytes from the start", drop);
+		gBufferModule->remove_header(buffer, drop);
+		segment.sequence += drop;
+	}
+
+	int32 action = KEEP;
+
+	drop = segment.sequence + buffer->size - (fReceiveNext + fReceiveWindow);
+	if (drop > 0) {
+		// remove data exceeding our window
+		if ((uint32)drop >= buffer->size) {
+			// if we can accept data, or the segment is not what we'd expect,
+			// drop the segment (an immediate acknowledge is always triggered)
+			if (fReceiveWindow != 0 || segment.sequence != fReceiveNext)
+				return DROP | IMMEDIATE_ACKNOWLEDGE;
+
+			action |= IMMEDIATE_ACKNOWLEDGE;
+		}
+
+		if ((segment.flags & TCP_FLAG_FINISH) != 0) {
+			// we need to remove the finish, too, as part of the data
+			drop--;
+		}
+
+		segment.flags &= ~(TCP_FLAG_FINISH | TCP_FLAG_PUSH);
+		TRACE("* remove %ld bytes from the end", drop);
+		gBufferModule->remove_trailer(buffer, drop);
+	}
+
+	// Then look at the acknowledgement for any updates
+
+	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0) {
+		// process acknowledged data
+		if (fState == SYNCHRONIZE_RECEIVED) {
+			// TODO: window scaling!
+			if (socket->parent != NULL) {
+				gSocketModule->set_connected(socket);
+				release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
+			}
+
+			fState = ESTABLISHED;
+
+			fSendList.Signal();
+			_NotifyReader();
+		}
+
+		if (fSendMax < segment.acknowledge || fState == TIME_WAIT)
+			return DROP | IMMEDIATE_ACKNOWLEDGE;
+		if (fSendUnacknowledged >= segment.acknowledge) {
+			// this is a duplicate acknowledge
+			// TODO: handle this!
+			if (buffer->size == 0 && advertisedWindow == fSendWindow
+				&& (segment.flags & TCP_FLAG_FINISH) == 0) {
+				TRACE("Receive(): duplicate ack!");
+				fDuplicateAcknowledgeCount++;
+
+				gStackModule->cancel_timer(&fRetransmitTimer);
+
+				fSendNext = segment.acknowledge;
+				_SendQueued();
+				return DROP;
+			}
+		} else {
+			// this segment acknowledges in flight data
+			fDuplicateAcknowledgeCount = 0;
+
+			if (fSendMax == segment.acknowledge) {
+				// there is no outstanding data to be acknowledged
+				// TODO: if the transmit timer function is already waiting
+				//	to acquire this endpoint's lock, we should stop it anyway
+				TRACE("Receive(): all inflight data ack'd!");
+				gStackModule->cancel_timer(&fRetransmitTimer);
+			} else {
+				TRACE("Receive(): set retransmit timer!");
+				// TODO: set retransmit timer correctly
+				if (!gStackModule->is_timer_active(&fRetransmitTimer))
+					gStackModule->set_timer(&fRetransmitTimer, 1000000LL);
+			}
+
+			fSendUnacknowledged = segment.acknowledge;
+			fSendQueue.RemoveUntil(segment.acknowledge);
+
+			if (fSendNext < fSendUnacknowledged)
+				fSendNext = fSendUnacknowledged;
+
+			if (segment.acknowledge > fSendQueue.LastSequence()
+					&& fState > ESTABLISHED) {
+				TRACE("Receive(): FIN has been acknowledged!");
+
+				switch (fState) {
+					case FINISH_SENT:
+						fState = FINISH_ACKNOWLEDGED;
+						break;
+					case CLOSING:
+						fState = TIME_WAIT;
+						_EnterTimeWait();
+						break;
+					case WAIT_FOR_FINISH_ACKNOWLEDGE:
+						fState = CLOSED;
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+	}
+
+	// TODO: update window
+	fSendWindow = advertisedWindow;
+	if (advertisedWindow > fSendMaxWindow)
+		fSendMaxWindow = advertisedWindow;
+
+	if (segment.flags & TCP_FLAG_URGENT) {
+		if (fState == ESTABLISHED || fState == FINISH_SENT
+			|| fState == FINISH_ACKNOWLEDGED) {
+			// TODO: Handle urgent data:
+			//  - RCV.UP <- max(RCV.UP, SEG.UP)
+			//  - signal the user that urgent data is available (SIGURG)
+		}
+	}
+
+	bool notify = false;
+
+	if (buffer->size > 0 &&	_ShouldReceive()) {
+		fReceiveQueue.Add(buffer, segment.sequence);
+		fReceiveNext += buffer->size;
+		notify = true;
+		TRACE("Receive(): adding data, receive next = %lu. Now have %lu bytes.",
+				(uint32)fReceiveNext, fReceiveQueue.Available());
+
+		if (segment.flags & TCP_FLAG_PUSH)
+			fReceiveQueue.SetPushPointer();
+	} else {
+		action = (action & ~KEEP) | DROP;
+	}
+
+	if (segment.flags & TCP_FLAG_FINISH) {
+		if (fState != CLOSED && fState != LISTEN && fState != SYNCHRONIZE_SENT) {
+			TRACE("Receive(): peer is finishing connection!");
+			fReceiveNext++;
+			notify = true;
+
+			// FIN implies PSH
+			fReceiveQueue.SetPushPointer();
+
+			// RFC 793 states that we must send an ACK to FIN
+			action |= IMMEDIATE_ACKNOWLEDGE;
+
+			// other side is closing connection; change states
+			switch (fState) {
+				case ESTABLISHED:
+				case SYNCHRONIZE_RECEIVED:
+					fState = FINISH_RECEIVED;
+					break;
+				case FINISH_SENT:
+					// simultaneous close
+					fState = CLOSING;
+					break;
+				case FINISH_ACKNOWLEDGED:
+					fState = TIME_WAIT;
+					_EnterTimeWait();
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	if (notify)
+		_NotifyReader();
+
+	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
+		action |= ACKNOWLEDGE;
+
+	TRACE("Receive() Action %ld", action);
+
+	return action;
 }
 
 

@@ -86,6 +86,7 @@ class TCPEndpoint : public net_protocol {
 		ssize_t _AvailableData() const;
 		void _NotifyReader();
 		bool _ShouldReceive() const;
+		int32 _Receive(tcp_segment_header& segment, net_buffer *buffer);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
