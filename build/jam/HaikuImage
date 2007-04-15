@@ -24,7 +24,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
 	chmod chop chown cksum clear clockconfig cmp comm compress cp copyattr
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	driveinfo dstcheck du dump_cis dump_cisreg echo eject env error expand
-	expr factor false fdinfo ffm find finddir fmt fold fortune ftp funzip gawk
+	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident ideinfo
 	idestatus ifconfig <bin>install installsound iroster isvolume join keymap
 	kill less lessecho lesskey link listarea listattr listdev listimage
@@ -36,7 +36,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
 	safemode screen_blanker sed settype setversion setvolume seq sh shar
 	shutdown sleep sort split strace stty su sum sync sysinfo tac tail tar
 	tcpdump tee telnet telnetd test top touch tput tr traceroute translate true tsort
-	tty uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx updatedb
+	tty uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
 	uptime usb_dev_info uudecode uuencode vdir version vim waitfor wc wget
 	whoami xargs xres yes zdiff zforce zgrep zip zipcloak zipgrep zipnote
 	zipsplit zmore znew
