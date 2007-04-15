@@ -146,13 +146,18 @@ struct ipv4_protocol : net_protocol {
 	RawSocket	*raw;
 	uint8		service_type;
 	uint8		time_to_live;
+	uint8		multicast_time_to_live;
 	uint32		flags;
 
-	MulticastFilter<in_addr> multicast_filter;
+	MulticastFilter<in_addr>	multicast_filter;
 };
 
 // protocol flags
 #define IP_FLAG_HEADER_INCLUDED	0x01
+
+
+static const int kDefaultTTL = 254;
+static const int kDefaultMulticastTTL = 1;
 
 
 extern net_protocol_module_info gIPv4Module;
@@ -699,6 +704,16 @@ receiving_protocol(uint8 protocol)
 }
 
 
+static inline void
+fill_sockaddr_in(sockaddr_in *target, in_addr_t address)
+{
+	memset(target, 0, sizeof(sockaddr_in));
+	target->sin_family = AF_INET;
+	target->sin_len = sizeof(sockaddr_in);
+	target->sin_addr.s_addr = address;
+}
+
+
 static status_t
 ipv4_delta_group(MulticastFilter<in_addr>::GroupState *group, int option,
 	net_interface *interface, const in_addr *sourceAddr)
@@ -771,11 +786,7 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 		interface = sDatalinkModule->get_interface_with_address(sDomain, NULL);
 	} else {
 		sockaddr_in address;
-
-		memset(&address, 0, sizeof(address));
-		address.sin_family = AF_INET;
-		address.sin_len = sizeof(address);
-		address.sin_addr = *interfaceAddr;
+		fill_sockaddr_in(&address, interfaceAddr->s_addr);
 
 		interface = sDatalinkModule->get_interface_with_address(sDomain,
 			(sockaddr *)&address);
@@ -828,7 +839,8 @@ ipv4_init_protocol(net_socket *socket)
 
 	protocol->raw = NULL;
 	protocol->service_type = 0;
-	protocol->time_to_live = 254;
+	protocol->time_to_live = kDefaultTTL;
+	protocol->multicast_time_to_live = kDefaultMulticastTTL;
 	protocol->flags = 0;
 	return protocol;
 }
@@ -914,6 +926,32 @@ ipv4_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
 }
 
 
+static status_t
+get_int_option(void *target, size_t length, int value)
+{
+	if (length != sizeof(int))
+		return B_BAD_VALUE;
+
+	return user_memcpy(target, &value, sizeof(int));
+}
+
+
+template<typename Type> static status_t
+set_int_option(Type &target, void *_value, size_t length)
+{
+	int value;
+
+	if (length != sizeof(int))
+		return B_BAD_VALUE;
+
+	if (user_memcpy(&value, _value, sizeof(int)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	target = value;
+	return B_OK;
+}
+
+
 status_t
 ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 	size_t *_length)
@@ -928,31 +966,18 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 
 		switch (option) {
 			case IP_HDRINCL:
-			{
-				if (*_length != sizeof(int))
-					return B_BAD_VALUE;
-
-				int headerIncluded = (protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0;
-				return user_memcpy(value, &headerIncluded, sizeof(headerIncluded));
-			}
+				return get_int_option(value, *_length,
+					(protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0);
 
 			case IP_TTL:
-			{
-				if (*_length != sizeof(int))
-					return B_BAD_VALUE;
-
-				int timeToLive = protocol->time_to_live;
-				return user_memcpy(value, &timeToLive, sizeof(timeToLive));
-			}
+				return get_int_option(value, *_length, protocol->time_to_live);
 
 			case IP_TOS:
-			{
-				if (*_length != sizeof(int))
-					return B_BAD_VALUE;
+				return get_int_option(value, *_length, protocol->service_type);
 
-				int serviceType = protocol->service_type;
-				return user_memcpy(value, &serviceType, sizeof(serviceType));
-			}
+			case IP_MULTICAST_TTL:
+				return get_int_option(value, *_length,
+					protocol->multicast_time_to_live);
 
 			case IP_ADD_MEMBERSHIP:
 			case IP_DROP_MEMBERSHIP:
@@ -996,28 +1021,14 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 		}
 
 		case IP_TTL:
-		{
-			int timeToLive;
-			if (*_length != sizeof(int))
-				return B_BAD_VALUE;
-			if (user_memcpy(&timeToLive, value, sizeof(timeToLive)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			protocol->time_to_live = timeToLive;
-			return B_OK;
-		}
+			return set_int_option(protocol->time_to_live, value, *_length);
 
 		case IP_TOS:
-		{
-			int serviceType;
-			if (*_length != sizeof(int))
-				return B_BAD_VALUE;
-			if (user_memcpy(&serviceType, value, sizeof(serviceType)) < B_OK)
-				return B_BAD_ADDRESS;
+			return set_int_option(protocol->service_type, value, *_length);
 
-			protocol->service_type = serviceType;
-			return B_OK;
-		}
+		case IP_MULTICAST_TTL:
+			return set_int_option(protocol->multicast_time_to_live, value,
+				*_length);
 
 		case IP_ADD_MEMBERSHIP:
 		case IP_DROP_MEMBERSHIP:
@@ -1148,6 +1159,19 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	if (protocol != NULL)
 		headerIncluded = (protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0;
 
+	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+
+	if (destination.sin_addr.s_addr == INADDR_ANY)
+		return EDESTADDRREQ;
+	else if (destination.sin_addr.s_addr == INADDR_BROADCAST) {
+		// TODO check for local broadcast addresses as well?
+		if (protocol && !(protocol->socket->options & SO_BROADCAST))
+			return B_BAD_VALUE;
+		buffer->flags |= MSG_BCAST;
+	} else if (IN_MULTICAST(destination.sin_addr.s_addr)) {
+		buffer->flags |= MSG_MCAST;
+	}
+
 	// Add IP header (if needed)
 
 	if (!headerIncluded) {
@@ -1161,7 +1185,12 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		header->total_length = htons(buffer->size);
 		header->id = htons(atomic_add(&sPacketID, 1));
 		header->fragment_offset = 0;
-		header->time_to_live = protocol ? protocol->time_to_live : 254;
+		if (protocol)
+			header->time_to_live = (buffer->flags & MSG_MCAST) ?
+				protocol->multicast_time_to_live : protocol->time_to_live;
+		else
+			header->time_to_live = (buffer->flags & MSG_MCAST) ?
+				kDefaultMulticastTTL : kDefaultTTL;
 		header->protocol = protocol ? protocol->socket->protocol : buffer->protocol;
 		header->checksum = 0;
 
@@ -1206,18 +1235,25 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 
 status_t
-ipv4_send_data(net_protocol *protocol, net_buffer *buffer)
+ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
 {
+	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+
 	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
 
-	sockaddr_in &destination = *(sockaddr_in *)&buffer->destination;
+	if (protocol) {
+		if (protocol->flags & IP_FLAG_HEADER_INCLUDED) {
+			if (buffer->size < sizeof(ipv4_header))
+				return EINVAL;
 
-	if (destination.sin_len == 0 || destination.sin_addr.s_addr == INADDR_ANY)
-		return EDESTADDRREQ;
-	else if (destination.sin_addr.s_addr == INADDR_BROADCAST) {
-		// TODO check for local broadcast addresses as well?
-		if (protocol && !(protocol->socket->options & SO_BROADCAST))
-			return B_BAD_VALUE;
+			sockaddr_in *source = (sockaddr_in *)&buffer->source;
+			sockaddr_in *destination = (sockaddr_in *)&buffer->destination;
+
+			fill_sockaddr_in(source, *NetBufferField<in_addr_t,
+				offsetof(ipv4_header, source)>(buffer));
+			fill_sockaddr_in(destination, *NetBufferField<in_addr_t,
+				offsetof(ipv4_header, destination)>(buffer));
+		}
 	}
 
 	net_route *route = NULL;
@@ -1319,13 +1355,8 @@ ipv4_receive_data(net_buffer *buffer)
 	struct sockaddr_in &source = *(struct sockaddr_in *)&buffer->source;
 	struct sockaddr_in &destination = *(struct sockaddr_in *)&buffer->destination;
 
-	source.sin_len = sizeof(sockaddr_in);
-	source.sin_family = AF_INET;
-	source.sin_addr.s_addr = header.source;
-
-	destination.sin_len = sizeof(sockaddr_in);
-	destination.sin_family = AF_INET;
-	destination.sin_addr.s_addr = header.destination;
+	fill_sockaddr_in(&source, header.source);
+	fill_sockaddr_in(&destination, header.destination);
 
 	// lower layers notion of Broadcast or Multicast have no relevance to us
 	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);

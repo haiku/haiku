@@ -780,8 +780,6 @@ arp_uninit_protocol(net_datalink_protocol *protocol)
 {
 	sStackModule->unregister_device_handler(protocol->interface->device,
 		ETHER_FRAME_TYPE | ETHER_TYPE_ARP);
-	sStackModule->unregister_device_handler(protocol->interface->device,
-		ETHER_FRAME_TYPE | ETHER_TYPE_IP);
 
 	delete protocol;
 	return B_OK;
@@ -806,7 +804,30 @@ arp_send_data(net_datalink_protocol *protocol,
 		memcpy(&buffer->source, &entry->hardware_address,
 			entry->hardware_address.sdl_len);
 
-		if ((buffer->flags & MSG_BCAST) == 0) {
+		if (buffer->flags & MSG_MCAST) {
+			// RFC 1112 - Host extensions for IP multicasting
+			//
+			//   ``An IP host group address is mapped to an Ethernet multicast
+			//   address by placing the low-order 23-bits of the IP address into
+			//   the low-order 23 bits of the Ethernet multicast address
+			//   01-00-5E-00-00-00 (hex).''
+
+			sockaddr_dl *destination = (sockaddr_dl *)&buffer->destination;
+
+			memmove(((uint8 *)destination->sdl_data) + 2,
+				&((sockaddr_in *)&buffer->destination)->sin_addr, sizeof(in_addr));
+
+			destination->sdl_len = sizeof(sockaddr_dl);
+			destination->sdl_family = AF_DLI;
+			destination->sdl_index = 0;
+			destination->sdl_type = IFT_ETHER;
+			destination->sdl_e_type = ETHER_TYPE_IP;
+			destination->sdl_nlen = destination->sdl_slen = 0;
+			destination->sdl_alen = ETHER_ADDRESS_LENGTH;
+
+			uint32 *data = (uint32 *)destination->sdl_data;
+			data[0] = (data[0] & htonl(0x7f)) | htonl(0x01005e00);
+		} else if ((buffer->flags & MSG_BCAST) == 0) {
 			// Lookup destination (we may need to wait for this)
 			entry = arp_entry::Lookup(
 				((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr);
