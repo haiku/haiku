@@ -170,6 +170,7 @@ list_entry(arp_control &control)
 			{ARP_FLAG_LOCAL, "local"},
 			{ARP_FLAG_PUBLISH, "publish"},
 			{ARP_FLAG_REJECT, "reject"},
+			{ARP_FLAG_VALID, "valid"},
 		};
 		bool first = true;
 
