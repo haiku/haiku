@@ -14,10 +14,6 @@
 
 #include <new>
 
-template class MulticastFilter<IPv4Multicast>;
-template class MulticastGroupState<IPv4Multicast>;
-template class MulticastGroupInterfaceState<in_addr>;
-
 static inline bool
 operator==(const in_addr &a1, const in_addr &a2)
 {
@@ -38,7 +34,7 @@ MulticastGroupInterfaceState<AddressType>::MulticastGroupInterfaceState(
 template<typename AddressType>
 MulticastGroupInterfaceState<AddressType>::~MulticastGroupInterfaceState()
 {
-	SourceList::Iterator iterator = fSources.GetIterator();
+	typename SourceList::Iterator iterator = fSources.GetIterator();
 	while (iterator.HasNext()) {
 		_Remove(iterator.Next());
 	}
@@ -64,11 +60,11 @@ MulticastGroupInterfaceState<AddressType>::Remove(const AddressType &address)
 }
 
 
-template<typename AddressType> MulticastGroupInterfaceState<AddressType>::Source *
+template<typename AddressType> typename MulticastGroupInterfaceState<AddressType>::Source *
 MulticastGroupInterfaceState<AddressType>::_Get(const AddressType &address,
 	bool create)
 {
-	SourceList::Iterator iterator = fSources.GetIterator();
+	typename SourceList::Iterator iterator = fSources.GetIterator();
 	while (iterator.HasNext()) {
 		Source *state = iterator.Next();
 		if (state->address == address)
@@ -201,7 +197,7 @@ MulticastGroupState<Addressing>::DropSSM(net_interface *interface,
 template<typename Addressing> void
 MulticastGroupState<Addressing>::Clear()
 {
-	InterfaceList::Iterator iterator = fInterfaces.GetIterator();
+	typename InterfaceList::Iterator iterator = fInterfaces.GetIterator();
 	while (iterator.HasNext())
 		_RemoveInterface(iterator.Next());
 }
@@ -221,11 +217,11 @@ MulticastGroupState<Addressing>::FilterAccepts(net_buffer *buffer)
 }
 
 
-template<typename Addressing> MulticastGroupState<Addressing>::InterfaceState *
+template<typename Addressing> typename MulticastGroupState<Addressing>::InterfaceState *
 MulticastGroupState<Addressing>::_GetInterface(net_interface *interface,
 	bool create)
 {
-	InterfaceList::Iterator iterator = fInterfaces.GetIterator();
+	typename InterfaceList::Iterator iterator = fInterfaces.GetIterator();
 	while (iterator.HasNext()) {
 		InterfaceState *state = iterator.Next();
 		if (state->Interface() == interface)
@@ -261,7 +257,7 @@ MulticastFilter<Addressing>::MulticastFilter(net_protocol *socket)
 template<typename Addressing>
 MulticastFilter<Addressing>::~MulticastFilter()
 {
-	States::Iterator iterator = fStates.GetIterator();
+	typename States::Iterator iterator = fStates.GetIterator();
 	while (iterator.HasNext()) {
 		GroupState *state = iterator.Next();
 		state->Clear();
@@ -270,11 +266,11 @@ MulticastFilter<Addressing>::~MulticastFilter()
 }
 
 
-template<typename Addressing> MulticastFilter<Addressing>::GroupState *
+template<typename Addressing> typename MulticastFilter<Addressing>::GroupState *
 MulticastFilter<Addressing>::GetGroup(const AddressType &groupAddress,
 	bool create)
 {
-	States::Iterator iterator = fStates.GetIterator();
+	typename States::Iterator iterator = fStates.GetIterator();
 
 	while (iterator.HasNext()) {
 		GroupState *state = iterator.Next();
@@ -310,3 +306,7 @@ MulticastFilter<Addressing>::ReturnGroup(GroupState *group)
 	}
 }
 
+// IPv4 explicit template instantiation
+template class MulticastFilter<IPv4Multicast>;
+template class MulticastGroupState<IPv4Multicast>;
+template class MulticastGroupInterfaceState<in_addr>;
