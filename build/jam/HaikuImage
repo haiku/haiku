@@ -147,6 +147,7 @@ AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi		: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus		: usb_raw ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
+AddDriversToHaikuImage dvb			: cx23882 ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid ;
 AddDriversToHaikuImage misc			: <driver>poke ;
