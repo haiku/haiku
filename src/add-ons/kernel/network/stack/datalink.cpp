@@ -362,6 +362,30 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 }
 
 
+status_t
+datalink_send_datagram(net_protocol *protocol, net_domain *domain,
+	net_buffer *buffer)
+{
+	if (protocol == NULL && domain == NULL)
+		return B_BAD_VALUE;
+
+	net_protocol_module_info *module = protocol ? protocol->module
+		: domain->module;
+
+	if (domain == NULL)
+		domain = protocol->module->get_domain(protocol);
+
+	net_route *route = NULL;
+	status_t status = get_buffer_route(domain, buffer, &route);
+	if (status < B_OK)
+		return status;
+
+	status = module->send_routed_data(protocol, route, buffer);
+	put_route(domain, route);
+	return status;
+}
+
+
 /*!
 	Tests if \a address is a local address in the domain.
 	\param _interface will be set to the interface belonging to that address
@@ -784,6 +808,7 @@ net_datalink_module_info gNetDatalinkModule = {
 
 	datalink_control,
 	datalink_send_data,
+	datalink_send_datagram,
 	datalink_is_local_address,
 	datalink_get_interface,
 	datalink_get_interface_with_address,

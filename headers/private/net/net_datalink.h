@@ -66,10 +66,12 @@ struct net_datalink_module_info {
 	status_t (*control)(struct net_domain *domain, int32 option, void *value,
 					size_t *_length);
 	status_t (*send_data)(struct net_route *route, struct net_buffer *buffer);
+	status_t (*send_datagram)(struct net_protocol *protocol,
+		struct net_domain *domain, struct net_buffer *buffer);
 
-	bool (*is_local_address)(struct net_domain *domain, 
+	bool (*is_local_address)(struct net_domain *domain,
 					const struct sockaddr *address,
-					net_interface **_interface, 
+					net_interface **_interface,
 					uint32 *_matchedType);
 	net_interface *(*get_interface)(struct net_domain *domain, uint32 index);
 	net_interface *(*get_interface_with_address)(struct net_domain *domain,

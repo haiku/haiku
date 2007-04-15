@@ -911,10 +911,7 @@ UdpEndpoint::SendData(net_buffer *buffer)
 {
 	TRACE_EP("SendData(%p [%lu bytes])", buffer, buffer->size);
 
-	// This will call into IPv4 which will do all of the obtaining
-	// routes and other datagram related dirty work and eventually
-	// call back into our send_routed_data.
-	return next->module->send_data(next, buffer);
+	return gDatalinkModule->send_datagram(this, NULL, buffer);
 }
 
 

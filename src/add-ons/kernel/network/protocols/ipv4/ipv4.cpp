@@ -1353,34 +1353,20 @@ ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
 
 	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
 
-	if (protocol) {
-		if (protocol->flags & IP_FLAG_HEADER_INCLUDED) {
-			if (buffer->size < sizeof(ipv4_header))
-				return EINVAL;
+	if (protocol && (protocol->flags & IP_FLAG_HEADER_INCLUDED)) {
+		if (buffer->size < sizeof(ipv4_header))
+			return EINVAL;
 
-			sockaddr_in *source = (sockaddr_in *)&buffer->source;
-			sockaddr_in *destination = (sockaddr_in *)&buffer->destination;
+		sockaddr_in *source = (sockaddr_in *)&buffer->source;
+		sockaddr_in *destination = (sockaddr_in *)&buffer->destination;
 
-			fill_sockaddr_in(source, *NetBufferField<in_addr_t,
-				offsetof(ipv4_header, source)>(buffer));
-			fill_sockaddr_in(destination, *NetBufferField<in_addr_t,
-				offsetof(ipv4_header, destination)>(buffer));
-		}
+		fill_sockaddr_in(source, *NetBufferField<in_addr_t,
+			offsetof(ipv4_header, source)>(buffer));
+		fill_sockaddr_in(destination, *NetBufferField<in_addr_t,
+			offsetof(ipv4_header, destination)>(buffer));
 	}
 
-	net_route *route = NULL;
-	status_t status = sDatalinkModule->get_buffer_route(sDomain, buffer,
-		&route);
-	if (status >= B_OK) {
-		if (protocol)
-			status = protocol->socket->first_protocol->module->send_routed_data(
-				protocol->socket->first_protocol, route, buffer);
-		else
-			status = ipv4_send_routed_data(NULL, route, buffer);
-		sDatalinkModule->put_route(sDomain, route);
-	}
-
-	return status;
+	return sDatalinkModule->send_datagram(protocol, sDomain, buffer);
 }
 
 
