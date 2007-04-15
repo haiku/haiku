@@ -51,6 +51,8 @@ class MMediaFilesManager
 
 		void TimerMessage();
 
+		void HandleSystemBeepEvent(BMessage *msg);
+
 	private:
 		static int32 ReadPascalString(BFile &file, char **str);
 		static int32 WritePascalString(BFile &file, const char *str);

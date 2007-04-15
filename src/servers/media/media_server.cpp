@@ -802,7 +802,10 @@ ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_MAKE_FORMAT_FOR:
 			gFormatManager->MakeFormatFor(*msg);
 			break;
-
+		
+		case MEDIA_SERVER_SYSTEM_BEEP_EVENT:
+			gMMediaFilesManager->HandleSystemBeepEvent(msg);
+			break;
 		default:
 			inherited::MessageReceived(msg);
 			printf("\nmedia_server: unknown message received:\n");

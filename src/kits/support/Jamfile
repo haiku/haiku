@@ -8,7 +8,7 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 #		# addr_t.
 #}
 
-UsePrivateHeaders shared app ;
+UsePrivateHeaders shared app media ;
 
 MergeObject <libbe>support_kit.o :
 	Archivable.cpp

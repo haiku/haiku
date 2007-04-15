@@ -4,6 +4,7 @@
  */
 #include <Application.h>
 #include <Autolock.h>
+#include <MediaFiles.h>
 #include <string.h>
 #include <storage/FindDirectory.h>
 #include <storage/Path.h>
@@ -361,5 +362,39 @@ MMediaFilesManager::TimerMessage()
 	SaveState();
 	delete fRunner;
 	fRunner = NULL;
+}
+
+
+void
+MMediaFilesManager::HandleSystemBeepEvent(BMessage *msg)
+{
+	int32 action, flags;
+	BString event;
+	status_t err = B_OK;
+	if ((msg->FindString("event", &event) != B_OK)
+		|| (msg->FindInt32("action", &action) != B_OK)) {
+		err = B_BAD_VALUE;
+	}
+
+	if (action == SYSTEM_BEEP_EVENT_ADD) {
+		if (msg->FindInt32("flags", &flags) != B_OK)
+			err = B_BAD_VALUE;
+	}
+
+	if (err != B_OK) {
+		msg->SendReply(err);
+		return;
+	}
+
+	switch (action) {
+		case SYSTEM_BEEP_EVENT_ADD: {
+			entry_ref ref;
+			SetRefFor(BMediaFiles::B_SOUNDS, event.String(), ref);
+			break;
+		}
+		case SYSTEM_BEEP_EVENT_INVOKE: {
+			// TODO play the sound			
+		}
+	} 
 }
 

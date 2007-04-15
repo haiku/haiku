@@ -74,6 +74,8 @@ enum {
 
 	MEDIA_SERVER_GET_FORMATS,
 	MEDIA_SERVER_MAKE_FORMAT_FOR,
+
+	MEDIA_SERVER_SYSTEM_BEEP_EVENT
 };
 
 // Raw port based communication
@@ -1012,4 +1014,10 @@ struct controllable_set_parameter_data_reply : public reply_data
 {
 };
 
+
+
+enum {
+	SYSTEM_BEEP_EVENT_INVOKE = 1,
+	SYSTEM_BEEP_EVENT_ADD
+};
 #endif // _DATA_EXCHANGE_H

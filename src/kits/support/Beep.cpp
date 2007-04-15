@@ -7,13 +7,24 @@
 #include <Beep.h>
 #include <stdio.h>
 
+#include "DataExchange.h"
+
 
 status_t
 system_beep(const char *eventName)
 {
-	printf("beep event \"%s\" requested.\n", eventName);
-	// ToDo: ask media server to beep around
-	return B_ERROR;
+	BMessenger messenger("application/x-vnd.Be.media-server");
+	if (!messenger.IsValid())
+		return B_ERROR;
+	BMessage msg(MEDIA_SERVER_SYSTEM_BEEP_EVENT), reply;
+	msg.AddInt32("action", SYSTEM_BEEP_EVENT_INVOKE);
+	msg.AddString("event", eventName);
+	
+	status_t err = messenger.SendMessage(&msg, &reply);
+	if ((err != B_OK)
+		|| (reply.FindInt32("error", &err) != B_OK))
+		err = B_BAD_REPLY;
+	return err;
 }
 
 
@@ -27,7 +38,18 @@ beep()
 status_t
 add_system_beep_event(const char *eventName, uint32 flags)
 {
-	// ToDo: ask media server to add beep event
-	return B_ERROR;
+	BMessenger messenger("application/x-vnd.Be.media-server");
+	if (!messenger.IsValid())
+		return B_ERROR;
+	BMessage msg(MEDIA_SERVER_SYSTEM_BEEP_EVENT), reply;
+	msg.AddInt32("action", SYSTEM_BEEP_EVENT_ADD);
+	msg.AddString("event", eventName);
+	msg.AddInt32("flags", flags);
+	
+	status_t err = messenger.SendMessage(&msg, &reply);
+	if ((err != B_OK)
+		|| (reply.FindInt32("error", &err) != B_OK))
+		err = B_BAD_REPLY;
+	return err;
 }
 
