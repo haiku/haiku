@@ -12,10 +12,30 @@
 #include <util/DoublyLinkedList.h>
 #include <util/list.h>
 
-struct net_interface;
-struct net_socket;
+#include <netinet/in.h>
 
-template<typename AddressType> class MulticastFilter;
+struct net_buffer;
+struct net_interface;
+struct net_protocol;
+
+// This code is template'ized as it is reusable for IPv6
+
+template<typename Addressing> class MulticastFilter;
+template<typename Addressing> struct MulticastGroupLink;
+template<typename Addressing> class MulticastGroupState;
+
+// TODO move this elsewhere...
+struct IPv4Multicast {
+	typedef struct in_addr AddressType;
+
+	static status_t JoinGroup(const in_addr &, MulticastGroupLink<IPv4Multicast> *);
+	static status_t LeaveGroup(const in_addr &, MulticastGroupLink<IPv4Multicast> *);
+
+	static in_addr *AddressFromSockAddr(sockaddr *sockaddr)
+	{
+		return &((sockaddr_in *)sockaddr)->sin_addr;
+	}
+};
 
 template<typename AddressType>
 struct MulticastSource {
@@ -34,6 +54,9 @@ public:
 	status_t Add(const AddressType &address);
 	status_t Remove(const AddressType &address);
 
+	bool Contains(const AddressType &address)
+		{ return _Get(address, false) != NULL; }
+
 	list_link link;
 private:
 	typedef MulticastSource<AddressType> Source;
@@ -48,12 +71,21 @@ private:
 	SourceList fSources;
 };
 
-template<typename AddressType>
+template<typename Addressing>
+struct MulticastGroupLink {
+	MulticastGroupState<Addressing> *group;
+	list_link link;
+};
+
+template<typename Addressing>
 class MulticastGroupState {
 public:
-	MulticastGroupState(MulticastFilter<AddressType> *parent,
-		const AddressType &address);
+	typedef typename Addressing::AddressType AddressType;
+
+	MulticastGroupState(net_protocol *parent, const AddressType &address);
 	~MulticastGroupState();
+
+	net_protocol *Socket() const { return fSocket; }
 
 	const AddressType &Address() const { return fMulticastAddress; }
 	bool IsEmpty() const
@@ -70,6 +102,12 @@ public:
 	status_t DropSSM(net_interface *interface,
 		const AddressType &sourceAddress);
 
+	void Clear();
+
+	bool FilterAccepts(net_buffer *buffer);
+
+	MulticastGroupLink<Addressing> *ProtocolLink() { return &fInternalLink; }
+
 	list_link link;
 private:
 	typedef MulticastGroupInterfaceState<AddressType> InterfaceState;
@@ -84,21 +122,23 @@ private:
 		kExclude
 	};
 
-	MulticastFilter<AddressType> *fParent;
+	net_protocol *fSocket;
 	AddressType fMulticastAddress;
 	FilterMode fFilterMode;
 	InterfaceList fInterfaces;
+	MulticastGroupLink<Addressing> fInternalLink;
 };
 
-template<typename AddressType>
+template<typename Addressing>
 class MulticastFilter {
 public:
-	typedef MulticastGroupState<AddressType> GroupState;
+	typedef typename Addressing::AddressType AddressType;
+	typedef MulticastGroupState<Addressing> GroupState;
 
-	MulticastFilter(net_socket *parent);
+	MulticastFilter(net_protocol *parent);
 	~MulticastFilter();
 
-	net_socket *Parent() const { return fParent; }
+	net_protocol *Parent() const { return fParent; }
 
 	GroupState *GetGroup(const AddressType &groupAddress, bool create);
 	void ReturnGroup(GroupState *group);
@@ -107,7 +147,7 @@ private:
 	typedef DoublyLinkedListCLink<GroupState> GroupStateLink;
 	typedef DoublyLinkedList<GroupState, GroupStateLink> States;
 
-	net_socket *fParent;
+	net_protocol *fParent;
 
 	// TODO change this into an hash table or tree
 	States fStates;

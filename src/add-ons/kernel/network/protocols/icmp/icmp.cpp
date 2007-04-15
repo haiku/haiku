@@ -342,6 +342,7 @@ net_protocol_module_info sICMPModule = {
 	icmp_get_domain,
 	icmp_get_mtu,
 	icmp_receive_data,
+	NULL,
 	icmp_error,
 	icmp_error_reply,
 };

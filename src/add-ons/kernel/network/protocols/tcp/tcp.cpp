@@ -718,6 +718,7 @@ net_protocol_module_info sTCPModule = {
 	tcp_get_domain,
 	tcp_get_mtu,
 	tcp_receive_data,
+	NULL,
 	tcp_error,
 	tcp_error_reply,
 };

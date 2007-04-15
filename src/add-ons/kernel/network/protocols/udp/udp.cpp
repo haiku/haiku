@@ -82,6 +82,7 @@ public:
 								net_buffer **_buffer);
 
 	status_t				StoreData(net_buffer *buffer);
+	status_t				DeliverData(net_buffer *buffer);
 
 	net_domain *			Domain() const
 	{
@@ -179,6 +180,7 @@ public:
 	~UdpEndpointManager();
 
 	status_t		ReceiveData(net_buffer *buffer);
+	status_t		Deframe(net_buffer *buffer);
 
 	UdpDomainSupport *OpenEndpoint(UdpEndpoint *endpoint);
 	status_t FreeEndpoint(UdpDomainSupport *domain);
@@ -544,7 +546,39 @@ UdpEndpointManager::InitCheck() const
 status_t
 UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
+	status_t status = Deframe(buffer);
+	if (status < B_OK)
+		return status;
+
 	TRACE_EPM("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
+
+	net_domain *domain = buffer->interface->domain;
+
+	BenaphoreLocker _(fLock);
+
+	UdpDomainSupport *domainSupport = _GetDomain(domain, false);
+	if (domainSupport == NULL) {
+		// we don't instantiate domain supports in the
+		// RX path as we are only interested in delivering
+		// data to existing sockets.
+		return B_ERROR;
+	}
+
+	status = domainSupport->DemuxIncomingBuffer(buffer);
+	if (status < B_OK) {
+		TRACE_EPM("  ReceiveData(): no endpoint.");
+		// TODO: send ICMP-error
+		return B_ERROR;
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
+UdpEndpointManager::Deframe(net_buffer *buffer)
+{
+	TRACE_EPM("Deframe(%p [%ld bytes])", buffer, buffer->size);
 
 	NetBufferHeaderReader<udp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
@@ -556,7 +590,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	struct sockaddr *destination = (struct sockaddr *)&buffer->destination;
 
 	if (buffer->interface == NULL || buffer->interface->domain == NULL) {
-		TRACE_EPM("  ReceiveData(): UDP packed dropped as there was no domain "
+		TRACE_EPM("  Deframe(): UDP packed dropped as there was no domain "
 			"specified (interface %p).", buffer->interface);
 		return B_BAD_VALUE;
 	}
@@ -564,18 +598,16 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	net_domain *domain = buffer->interface->domain;
 	net_address_module_info *addressModule = domain->address_module;
 
-	BenaphoreLocker _(fLock);
-
 	addressModule->set_port(source, header.source_port);
 	addressModule->set_port(destination, header.destination_port);
 
-	TRACE_EPM("  ReceiveData(): data from %s to %s",
+	TRACE_EPM("  Deframe(): data from %s to %s",
 		AddressString(domain, source, true).Data(),
 		AddressString(domain, destination, true).Data());
 
 	uint16 udpLength = ntohs(header.udp_length);
 	if (udpLength > buffer->size) {
-		TRACE_EPM("  ReceiveData(): buffer is too short, expected %hu.",
+		TRACE_EPM("  Deframe(): buffer is too short, expected %hu.",
 			udpLength);
 		return B_MISMATCHED_VALUES;
 	}
@@ -596,7 +628,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 			<< Checksum::BufferHelper(buffer, gBufferModule);
 		uint16 sum = udpChecksum;
 		if (sum != 0) {
-			TRACE_EPM("  ReceiveData(): bad checksum 0x%hx.", sum);
+			TRACE_EPM("  Deframe(): bad checksum 0x%hx.", sum);
 			return B_BAD_VALUE;
 		}
 	}
@@ -604,22 +636,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	bufferHeader.Remove();
 		// remove UDP-header from buffer before passing it on
 
-	UdpDomainSupport *domainSupport = _GetDomain(domain, false);
-	if (domainSupport == NULL) {
-		// we don't instantiate domain supports in the
-		// RX path as we are only interested in delivering
-		// data to existing sockets.
-		return B_ERROR;
-	}
-
-	status_t status = domainSupport->DemuxIncomingBuffer(buffer);
-	if (status < B_OK) {
-		TRACE_EPM("  ReceiveData(): no endpoint.");
-		// TODO: send ICMP-error
-		return B_ERROR;
-	}
-
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -937,6 +954,25 @@ UdpEndpoint::StoreData(net_buffer *buffer)
 }
 
 
+status_t
+UdpEndpoint::DeliverData(net_buffer *_buffer)
+{
+	net_buffer *buffer = gBufferModule->clone(_buffer, false);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = sUdpEndpointManager->Deframe(buffer);
+	if (status < B_OK) {
+		gBufferModule->free(buffer);
+		return status;
+	}
+
+	// we call Enqueue() instead of SocketEnqueue() as there is
+	// no need to clone the buffer again.
+	return Enqueue(buffer);
+}
+
+
 // #pragma mark - protocol interface
 
 
@@ -1094,6 +1130,13 @@ udp_receive_data(net_buffer *buffer)
 
 
 status_t
+udp_deliver_data(net_protocol *protocol, net_buffer *buffer)
+{
+	return ((UdpEndpoint *)protocol)->DeliverData(buffer);
+}
+
+
+status_t
 udp_error(uint32 code, net_buffer *data)
 {
 	return B_ERROR;
@@ -1204,6 +1247,7 @@ net_protocol_module_info sUDPModule = {
 	udp_get_domain,
 	udp_get_mtu,
 	udp_receive_data,
+	udp_deliver_data,
 	udp_error,
 	udp_error_reply,
 };

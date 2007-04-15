@@ -510,6 +510,7 @@ net_protocol_module_info gLinkModule = {
 	link_get_domain,
 	link_get_mtu,
 	link_receive_data,
+	NULL,
 	link_error,
 	link_error_reply,
 };

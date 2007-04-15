@@ -117,9 +117,15 @@ class FragmentPacket {
 
 class MulticastGroup {
 public:
+	typedef MulticastGroupLink<IPv4Multicast> Link;
+
 	MulticastGroup(const in_addr &address);
 
-	status_t Deliver(net_buffer *buffer);
+	status_t Deliver(net_protocol_module_info *module, net_buffer *buffer);
+
+	void Add(Link *link);
+	void Remove(Link *link);
+	bool IsEmpty() const { return fLinks.IsEmpty(); }
 
 	static uint32 Hash(void *address, const void *key, uint32 range);
 	static int Compare(void *address, const void *key);
@@ -128,8 +134,12 @@ public:
 	static const int kMaxGroups = 64;
 
 private:
+	typedef DoublyLinkedListCLink<Link> LinkLink;
+	typedef DoublyLinkedList<Link, LinkLink> Links;
+
 	MulticastGroup *fNext;
 	in_addr fMulticastAddress;
+	Links fLinks;
 };
 
 class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
@@ -139,9 +149,11 @@ class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSoc
 
 typedef DoublyLinkedList<RawSocket> RawSocketList;
 
+typedef MulticastFilter<IPv4Multicast> IPv4MulticastFilter;
+
 struct ipv4_protocol : net_protocol {
-	ipv4_protocol(net_socket *socket)
-		: multicast_filter(socket) {}
+	ipv4_protocol()
+		: multicast_filter(this) {}
 
 	RawSocket	*raw;
 	uint8		service_type;
@@ -149,7 +161,7 @@ struct ipv4_protocol : net_protocol {
 	uint8		multicast_time_to_live;
 	uint32		flags;
 
-	MulticastFilter<in_addr>	multicast_filter;
+	IPv4MulticastFilter multicast_filter;
 };
 
 // protocol flags
@@ -424,9 +436,35 @@ MulticastGroup::MulticastGroup(const in_addr &address)
 
 
 status_t
-MulticastGroup::Deliver(net_buffer *buffer)
+MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer)
 {
-	return B_ERROR;
+	if (module->deliver_data == NULL)
+		return B_OK;
+
+	Links::Iterator iterator = fLinks.GetIterator();
+
+	while (iterator.HasNext()) {
+		Link *link = iterator.Next();
+
+		if (link->group->FilterAccepts(buffer))
+			module->deliver_data(link->group->Socket(), buffer);
+	}
+
+	return B_OK;
+}
+
+
+void
+MulticastGroup::Add(Link *link)
+{
+	fLinks.Add(link);
+}
+
+
+void
+MulticastGroup::Remove(Link *link)
+{
+	fLinks.Remove(link);
 }
 
 
@@ -669,7 +707,7 @@ raw_receive_data(net_buffer *buffer)
 
 
 static status_t
-deliver_multicast(net_buffer *buffer)
+deliver_multicast(net_protocol_module_info *module, net_buffer *buffer)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
@@ -678,9 +716,54 @@ deliver_multicast(net_buffer *buffer)
 	if (group == NULL)
 		return B_OK;
 
-	// RAW sockets will be registered just like any other
+	// TODO fix sending multicast to RAW sockets, right now
+	//      they are receiving the frames without the IP header
 
-	return group->Deliver(buffer);
+	return group->Deliver(module, buffer);
+}
+
+
+status_t
+IPv4Multicast::JoinGroup(const in_addr &groupAddr, MulticastGroup::Link *link)
+{
+	BenaphoreLocker _(sMulticastGroupsLock);
+
+	MulticastGroup *group = (MulticastGroup *)hash_lookup(sMulticastGroups,
+		&groupAddr);
+	if (group == NULL) {
+		group = new (std::nothrow) MulticastGroup(groupAddr);
+		if (group == NULL)
+			return B_NO_MEMORY;
+
+		status_t status = hash_insert(sMulticastGroups, group);
+		if (status < B_OK) {
+			delete group;
+			return status;
+		}
+	}
+
+	group->Add(link);
+	return B_OK;
+}
+
+
+status_t
+IPv4Multicast::LeaveGroup(const in_addr &groupAddr, MulticastGroup::Link *link)
+{
+	BenaphoreLocker _(sMulticastGroupsLock);
+
+	MulticastGroup *group = (MulticastGroup *)hash_lookup(sMulticastGroups,
+		&groupAddr);
+	if (group == NULL)
+		return ENOENT;
+
+	group->Remove(link);
+	if (group->IsEmpty()) {
+		hash_remove(sMulticastGroups, group);
+		delete group;
+	}
+
+	return B_OK;
 }
 
 
@@ -715,7 +798,7 @@ fill_sockaddr_in(sockaddr_in *target, in_addr_t address)
 
 
 static status_t
-ipv4_delta_group(MulticastFilter<in_addr>::GroupState *group, int option,
+ipv4_delta_group(IPv4MulticastFilter::GroupState *group, int option,
 	net_interface *interface, const in_addr *sourceAddr)
 {
 	switch (option) {
@@ -742,8 +825,8 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 	net_interface *interface, const in_addr *groupAddr,
 	const in_addr *sourceAddr)
 {
-	MulticastFilter<in_addr> &filter = protocol->multicast_filter;
-	MulticastFilter<in_addr>::GroupState *group = NULL;
+	IPv4MulticastFilter &filter = protocol->multicast_filter;
+	IPv4MulticastFilter::GroupState *group = NULL;
 
 	switch (option) {
 		case IP_ADD_MEMBERSHIP:
@@ -833,7 +916,7 @@ ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
 net_protocol *
 ipv4_init_protocol(net_socket *socket)
 {
-	ipv4_protocol *protocol = new (std::nothrow) ipv4_protocol(socket);
+	ipv4_protocol *protocol = new (std::nothrow) ipv4_protocol();
 	if (protocol == NULL)
 		return NULL;
 
@@ -1412,19 +1495,12 @@ ipv4_receive_data(net_buffer *buffer)
 		}
 	}
 
-	if (buffer->flags & MSG_MCAST) {
-		// Unfortunely historical reasons dictate that the IP multicast
-		// model be a little different from the unicast one. We deliver
-		// this frame directly to all sockets registered with interest
-		// for this multicast group.
-		return deliver_multicast(buffer);
-	}
-
 	// Since the buffer might have been changed (reassembled fragment)
 	// we must no longer access bufferHeader or header anymore after
 	// this point
 
-	raw_receive_data(buffer);
+	if (!(buffer->flags & MSG_MCAST))
+		raw_receive_data(buffer);
 
 	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options
@@ -1436,7 +1512,27 @@ ipv4_receive_data(net_buffer *buffer)
 		return EAFNOSUPPORT;
 	}
 
+	if (buffer->flags & MSG_MCAST) {
+		// Unfortunely historical reasons dictate that the IP multicast
+		// model be a little different from the unicast one. We deliver
+		// this frame directly to all sockets registered with interest
+		// for this multicast group.
+		return deliver_multicast(module, buffer);
+	}
+
 	return module->receive_data(buffer);
+}
+
+
+status_t
+ipv4_deliver_data(net_protocol *_protocol, net_buffer *buffer)
+{
+	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+
+	if (protocol->raw == NULL)
+		return B_ERROR;
+
+	return protocol->raw->SocketEnqueue(buffer);
 }
 
 
@@ -1591,6 +1687,7 @@ net_protocol_module_info gIPv4Module = {
 	ipv4_get_domain,
 	ipv4_get_mtu,
 	ipv4_receive_data,
+	ipv4_deliver_data,
 	ipv4_error,
 	ipv4_error_reply,
 };
