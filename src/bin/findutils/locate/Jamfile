@@ -20,26 +20,10 @@ BinCommand locate :
 	locate.c
 	: libfindutils.a : $(findutils_rsrc) ;
 
-BinCommand bigram :
-	bigram.c
-	: libfindutils.a : $(findutils_rsrc) ;
-
-# TODO: Must be done in HaikuImage.
-#MakeLocate bigram : [ FDirName $(HAIKU_ETC_DIR) libexec locate ] ;
-
 BinCommand frcode :
 	frcode.c
 	: libfindutils.a : $(findutils_rsrc) ;
 
-# TODO: Must be done in HaikuImage.
-#MakeLocate frcode : [ FDirName $(HAIKU_ETC_DIR) libexec locate ] ;
-
-BinCommand code :
-	code.c
-	: libfindutils.a : $(findutils_rsrc) ;
-
-# TODO: Must be done in HaikuImage.
-#MakeLocate code : [ FDirName $(HAIKU_ETC_DIR) libexec locate ] ;
 
 rule MkUpdateDb
 {
