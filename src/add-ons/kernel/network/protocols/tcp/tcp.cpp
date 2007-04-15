@@ -161,16 +161,8 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, win %u\n", buffer,
 		segment.flags, segment.sequence, segment.acknowledge, segment.advertised_window));
 
-	// compute and store checksum
-	Checksum checksum;
-	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
-	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
-	checksum
-		<< (uint16)htons(IPPROTO_TCP)
-		<< (uint16)htons(buffer->size)
-		<< Checksum::BufferHelper(buffer, gBufferModule);
-
-	*TCPChecksumField(buffer) = checksum;
+	*TCPChecksumField(buffer) = Checksum::PseudoHeader(gAddressModule,
+		gBufferModule, buffer, IPPROTO_TCP);
 
 	return B_OK;
 }
@@ -518,15 +510,8 @@ tcp_receive_data(net_buffer *buffer)
 	if (headerLength < sizeof(tcp_header))
 		return B_BAD_DATA;
 
-	// compute checksum using a pseudo IP header
-	Checksum checksum;
-	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
-	gAddressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
-	checksum << (uint16)htons(IPPROTO_TCP)
-		<< (uint16)htons(buffer->size)
-		<< Checksum::BufferHelper(buffer, gBufferModule);
-
-	if (checksum != 0)
+	if (Checksum::PseudoHeader(gAddressModule, gBufferModule, buffer,
+			IPPROTO_TCP) != 0)
 		return B_BAD_DATA;
 
 	gAddressModule->set_port((struct sockaddr *)&buffer->source, header.source_port);

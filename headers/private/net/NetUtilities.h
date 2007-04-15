@@ -9,6 +9,8 @@
 #include <net_buffer.h>
 #include <net_datalink.h>
 
+#include <netinet/in.h> // for htons
+
 #include <stdlib.h>
 
 class Checksum {
@@ -31,6 +33,10 @@ class Checksum {
 		Checksum& operator<<(const BufferHelper &bufferHelper);
 	
 		operator uint16();
+
+		static uint16 PseudoHeader(net_address_module_info *addressModule,
+			net_buffer_module_info *bufferModule, net_buffer *buffer,
+			uint16 protocol);
 
 	private:	
 		uint32 fSum;
@@ -74,6 +80,19 @@ inline Checksum::operator uint16() {
 	uint16 result = (uint16)fSum;
 	result ^= 0xFFFF;
 	return result;
+}
+
+
+inline uint16
+Checksum::PseudoHeader(net_address_module_info *addressModule,
+	net_buffer_module_info *bufferModule, net_buffer *buffer, uint16 protocol)
+{
+	Checksum checksum;
+	addressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
+	addressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
+	checksum << (uint16)htons(protocol) << (uint16)htons(buffer->size)
+		<< Checksum::BufferHelper(buffer, bufferModule);
+	return checksum;
 }
 
 

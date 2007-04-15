@@ -617,16 +617,8 @@ UdpEndpointManager::Deframe(net_buffer *buffer)
 
 	if (header.udp_checksum != 0) {
 		// check UDP-checksum (simulating a so-called "pseudo-header"):
-		Checksum udpChecksum;
-		addressModule->checksum_address(&udpChecksum, source);
-		addressModule->checksum_address(&udpChecksum, destination);
-		udpChecksum
-			<< (uint16)htons(IPPROTO_UDP)
-			<< header.udp_length
-					// peculiar but correct: UDP-len is used twice for checksum
-					// (as it is already contained in udp_header)
-			<< Checksum::BufferHelper(buffer, gBufferModule);
-		uint16 sum = udpChecksum;
+		uint16 sum = Checksum::PseudoHeader(addressModule, gBufferModule,
+			buffer, IPPROTO_UDP);
 		if (sum != 0) {
 			TRACE_EPM("  Deframe(): bad checksum 0x%hx.", sum);
 			return B_BAD_VALUE;
@@ -881,20 +873,8 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 
 	header.Sync();
 
-	// generate UDP-checksum (simulating a so-called "pseudo-header"):
-	Checksum udpChecksum;
-	AddressModule()->checksum_address(&udpChecksum,
-		(sockaddr *)route->interface->address);
-	AddressModule()->checksum_address(&udpChecksum,
-		(sockaddr *)&buffer->destination);
-	udpChecksum
-		<< (uint16)htons(IPPROTO_UDP)
-		<< (uint16)htons(buffer->size)
-				// peculiar but correct: UDP-len is used twice for checksum
-				// (as it is already contained in udp_header)
-		<< Checksum::BufferHelper(buffer, gBufferModule);
-
-	uint16 calculatedChecksum = udpChecksum;
+	uint16 calculatedChecksum = Checksum::PseudoHeader(AddressModule(),
+		gBufferModule, buffer, IPPROTO_UDP);
 	if (calculatedChecksum == 0)
 		calculatedChecksum = 0xffff;
 
