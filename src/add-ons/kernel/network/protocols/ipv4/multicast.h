@@ -13,6 +13,9 @@
 #include <util/list.h>
 
 struct net_interface;
+struct net_socket;
+
+template<typename AddressType> class MulticastFilter;
 
 template<typename AddressType>
 struct MulticastSource {
@@ -48,7 +51,8 @@ private:
 template<typename AddressType>
 class MulticastGroupState {
 public:
-	MulticastGroupState(const AddressType &address);
+	MulticastGroupState(MulticastFilter<AddressType> *parent,
+		const AddressType &address);
 	~MulticastGroupState();
 
 	const AddressType &Address() const { return fMulticastAddress; }
@@ -80,6 +84,7 @@ private:
 		kExclude
 	};
 
+	MulticastFilter<AddressType> *fParent;
 	AddressType fMulticastAddress;
 	FilterMode fFilterMode;
 	InterfaceList fInterfaces;
@@ -90,7 +95,10 @@ class MulticastFilter {
 public:
 	typedef MulticastGroupState<AddressType> GroupState;
 
+	MulticastFilter(net_socket *parent);
 	~MulticastFilter();
+
+	net_socket *Parent() const { return fParent; }
 
 	GroupState *GetGroup(const AddressType &groupAddress, bool create);
 	void ReturnGroup(GroupState *group);
@@ -98,6 +106,8 @@ public:
 private:
 	typedef DoublyLinkedListCLink<GroupState> GroupStateLink;
 	typedef DoublyLinkedList<GroupState, GroupStateLink> States;
+
+	net_socket *fParent;
 
 	// TODO change this into an hash table or tree
 	States fStates;

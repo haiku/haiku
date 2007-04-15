@@ -123,6 +123,9 @@ class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSoc
 };
 
 struct ipv4_protocol : net_protocol {
+	ipv4_protocol(net_socket *socket)
+		: multicast_filter(socket) {}
+
 	RawSocket	*raw;
 	uint8		service_type;
 	uint8		time_to_live;
@@ -623,7 +626,7 @@ receiving_protocol(uint8 protocol)
 
 static status_t
 ipv4_delta_group(MulticastFilter<in_addr>::GroupState *group, int option,
-	net_interface *interface, in_addr *sourceAddr)
+	net_interface *interface, const in_addr *sourceAddr)
 {
 	switch (option) {
 		case IP_ADD_MEMBERSHIP:
@@ -646,27 +649,9 @@ ipv4_delta_group(MulticastFilter<in_addr>::GroupState *group, int option,
 
 static status_t
 ipv4_delta_membership(ipv4_protocol *protocol, int option,
-	in_addr *interfaceAddr, in_addr *groupAddr, in_addr *sourceAddr)
+	net_interface *interface, const in_addr *groupAddr,
+	const in_addr *sourceAddr)
 {
-	net_interface *interface = NULL;
-
-	if (interfaceAddr->s_addr == INADDR_ANY) {
-		interface = sDatalinkModule->get_interface_with_address(sDomain, NULL);
-	} else {
-		sockaddr_in address;
-
-		memset(&address, 0, sizeof(address));
-		address.sin_family = AF_INET;
-		address.sin_len = sizeof(address);
-		address.sin_addr = *interfaceAddr;
-
-		interface = sDatalinkModule->get_interface_with_address(sDomain,
-			(sockaddr *)&address);
-	}
-
-	if (interface == NULL)
-		return ENODEV;
-
 	MulticastFilter<in_addr> &filter = protocol->multicast_filter;
 	MulticastFilter<in_addr>::GroupState *group = NULL;
 
@@ -701,13 +686,68 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 }
 
 
+static status_t
+ipv4_delta_membership(ipv4_protocol *protocol, int option,
+	in_addr *interfaceAddr, in_addr *groupAddr, in_addr *sourceAddr)
+{
+	net_interface *interface = NULL;
+
+	if (interfaceAddr->s_addr == INADDR_ANY) {
+		interface = sDatalinkModule->get_interface_with_address(sDomain, NULL);
+	} else {
+		sockaddr_in address;
+
+		memset(&address, 0, sizeof(address));
+		address.sin_family = AF_INET;
+		address.sin_len = sizeof(address);
+		address.sin_addr = *interfaceAddr;
+
+		interface = sDatalinkModule->get_interface_with_address(sDomain,
+			(sockaddr *)&address);
+	}
+
+	if (interface == NULL)
+		return ENODEV;
+
+	return ipv4_delta_membership(protocol, option, interface, groupAddr,
+		sourceAddr);
+}
+
+
+static status_t
+ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
+	uint32 index, const sockaddr_storage *_groupAddr,
+	const sockaddr_storage *_sourceAddr)
+{
+	if (_groupAddr->ss_family != AF_INET)
+		return EINVAL;
+
+	if (_sourceAddr && _sourceAddr->ss_family != AF_INET)
+		return EINVAL;
+
+	net_interface *interface = sDatalinkModule->get_interface(sDomain, index);
+	if (interface == NULL)
+		return ENODEV;
+
+	const in_addr *groupAddr, *sourceAddr = NULL;
+
+	groupAddr = &((const sockaddr_in *)_groupAddr)->sin_addr;
+
+	if (_sourceAddr)
+		sourceAddr = &((const sockaddr_in *)_sourceAddr)->sin_addr;
+
+	return ipv4_delta_membership(protocol, option, interface, groupAddr,
+		sourceAddr);
+}
+
+
 //	#pragma mark -
 
 
 net_protocol *
 ipv4_init_protocol(net_socket *socket)
 {
-	ipv4_protocol *protocol = new (std::nothrow) ipv4_protocol;
+	ipv4_protocol *protocol = new (std::nothrow) ipv4_protocol(socket);
 	if (protocol == NULL)
 		return NULL;
 
@@ -845,6 +885,12 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 			case IP_UNBLOCK_SOURCE:
 			case IP_ADD_SOURCE_MEMBERSHIP:
 			case IP_DROP_SOURCE_MEMBERSHIP:
+			case MCAST_JOIN_GROUP:
+			case MCAST_LEAVE_GROUP:
+			case MCAST_BLOCK_SOURCE:
+			case MCAST_UNBLOCK_SOURCE:
+			case MCAST_JOIN_SOURCE_GROUP:
+			case MCAST_LEAVE_SOURCE_GROUP:
 				// RFC 3678, Section 4.1:
 				// ``An error of EOPNOTSUPP is returned if these options are
 				// used with getsockopt().''
@@ -924,6 +970,34 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 
 			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
 				&mreq.imr_multiaddr, &mreq.imr_sourceaddr);
+		}
+
+		case MCAST_JOIN_GROUP:
+		case MCAST_LEAVE_GROUP:
+		{
+			group_req greq;
+			if (*_length != sizeof(group_req))
+				return B_BAD_VALUE;
+			if (user_memcpy(&greq, value, sizeof(group_req)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return ipv4_generic_delta_membership(protocol, option,
+				greq.gr_interface, &greq.gr_group, NULL);
+		}
+
+		case MCAST_BLOCK_SOURCE:
+		case MCAST_UNBLOCK_SOURCE:
+		case MCAST_JOIN_SOURCE_GROUP:
+		case MCAST_LEAVE_SOURCE_GROUP:
+		{
+			group_source_req greq;
+			if (*_length != sizeof(group_source_req))
+				return B_BAD_VALUE;
+			if (user_memcpy(&greq, value, sizeof(group_source_req)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return ipv4_generic_delta_membership(protocol, option,
+				greq.gsr_interface, &greq.gsr_group, &greq.gsr_source);
 		}
 
 		default:

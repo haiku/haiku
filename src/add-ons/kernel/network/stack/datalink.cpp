@@ -449,6 +449,16 @@ datalink_get_interface_with_address(net_domain *_domain,
 }
 
 
+net_interface *
+datalink_get_interface(net_domain *domain, uint32 index)
+{
+	if (index == 0)
+		return datalink_get_interface_with_address(domain, NULL);
+
+	return find_interface(domain, index);
+}
+
+
 static status_t
 datalink_std_ops(int32 op, ...)
 {
@@ -775,6 +785,7 @@ net_datalink_module_info gNetDatalinkModule = {
 	datalink_control,
 	datalink_send_data,
 	datalink_is_local_address,
+	datalink_get_interface,
 	datalink_get_interface_with_address,
 
 	add_route,

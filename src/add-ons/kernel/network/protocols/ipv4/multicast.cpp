@@ -95,8 +95,9 @@ MulticastGroupInterfaceState<AddressType>::_Remove(Source *state)
 
 
 template<typename AddressType>
-MulticastGroupState<AddressType>::MulticastGroupState(const AddressType &address)
-	: fMulticastAddress(address), fFilterMode(kInclude)
+MulticastGroupState<AddressType>::MulticastGroupState(
+	MulticastFilter<AddressType> *parent, const AddressType &address)
+	: fParent(parent), fMulticastAddress(address), fFilterMode(kInclude)
 {
 }
 
@@ -228,6 +229,13 @@ MulticastGroupState<AddressType>::_RemoveInterface(InterfaceState *state)
 
 
 template<typename AddressType>
+MulticastFilter<AddressType>::MulticastFilter(net_socket *socket)
+	: fParent(socket)
+{
+}
+
+
+template<typename AddressType>
 MulticastFilter<AddressType>::~MulticastFilter()
 {
 	States::Iterator iterator = fStates.GetIterator();
@@ -254,7 +262,7 @@ MulticastFilter<AddressType>::GetGroup(const AddressType &groupAddress,
 	if (!create)
 		return NULL;
 
-	GroupState *state = new (nothrow) GroupState(groupAddress);
+	GroupState *state = new (nothrow) GroupState(this, groupAddress);
 	if (state)
 		fStates.Add(state);
 	return state;
