@@ -325,7 +325,7 @@ with the user's access permissions, the function shall return \c B_OK.
 
 For most FSs the permissions a user has are defined by the \c st_mode,
 \c st_uid, and \c st_gid fields of the node's stat data. As a special
-exception, the root user (<tt>geteuid() == 0<\tt>) does always have
+exception, the root user (<tt>geteuid() == 0</tt>) does always have
 read and write permissions, execution permission only when at least one of the
 execution permission bits are set.
 

@@ -1,0 +1,172 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Corresponds to:
+ * /trunk/headers/os/support/Archivable.h rev 19972
+ * /trunk/src/kits/support/Archivable.cpp rev 19095
+ */
+
+/*!
+  \file Archivable.h
+  \brief Provides the BArchivable interface.
+*/
+
+/*!
+  \class BArchivable
+  \ingroup support
+  \ingroup libbe
+  \brief Interfaced for objects that can be archived into a BMessage.
+  
+  BArchivable provides an interface for objects that can be archived into
+  messages and unarchived to objects in another location. By these means you
+  are able to send objects between applications, or even between computers over
+  networks.
+  
+  BArchivable differs from BFlattenable in way that BFlattenable is designed to
+  store objects to flat streams of data, where the main objective is storing it
+  to disk. The objective of this interface is to archive objects that will be
+  restored as objects. To illustrate that point, BArchivable messages know how
+  to restore itself, whereas BFlattenables have a datatype which you manually
+  need to map to classes. 
+  
+  Archiving is done with the Archive() method. If your class support it, the
+  caller can request your class to to a deep archivation, which means that all
+  child objects should be stored. Unarchiving works with the Instantiate()
+  method, which is static. However, since the interface is designed to
+  unarchive objects without the caller knowing what kind of object it
+  actually is, the global function #instantiate_object() instantiates a message
+  without you manually having to determine the class the message is from. This
+  adds considerable flexibility and allows BArchivable to be used in
+  combination with add-ons.
+  
+  To provide this interface in your classes, you should publicly inherit this
+  class. You should reimplement Archive() and Instantiate(), and provide one
+  constructor that takes one BMessage argument. 
+*/
+
+/*!
+  \fn BArchivable::BArchivable(BMessage* from)
+  \brief Constructor. Does nothing.
+  
+  If you inherit this interface, you should at least provide one constructor
+  that takes one BMessage argument.
+*/
+
+/*!
+  \fn BArchivable::BArchivable()
+  \brief Constructor. Does nothing.
+*/
+
+/*!
+  \fn BArchivable::~BArchivable()
+  \brief Destructor. Does nothing.
+*/
+
+/*!
+  \fn virtual	status_t BArchivable::Archive(BMessage* into, bool deep = true) const
+  \brief Archive the object into a BMessage.
+  
+  You should call this method from your derived implementation, as it finishes
+  the message to contain data to instantiate your object. 
+  
+  \param into The message you may store your object in.
+  \param deep If \c true, all child object of this object should be stored as
+    well. Naturally, only pay attention of this parameter if you actually have
+    child objects.
+  \retval B_OK The archiving succeeded.
+  \retval "error codes" The archiving did not succeed.
+*/
+
+/*!
+  \fn static BArchivable* BArchivable::Instantiate(BMessage* archive)
+  \brief Static member to restore objects from messages.
+  
+  You should always check that the \a archive argument actually corresponds to
+  your class. The automatic functions, such as #instantiate_object() will not
+  choose the wrong class, but some manual calls to this member might be faulty.
+  
+  \param archive The message with the data to restore an object.
+  \retval You should return a pointer to your object, or \c NULL if you 
+    failed to succeed.
+  \warning The default implementation will always return \c NULL. Even though
+    it is possible to store plain BArchive objects, it is impossible to restore
+    them. 
+  \see instantiate_object(BMessage *from)
+*/
+
+/*!
+  \fn virtual status_t BArchivable::Perform(perform_code d, void* arg)
+  \brief Internal method.
+  \internal This method is used to extend the API or to provide 'hidden'
+    features. Currently nothing of interest is implemented.
+*/
+
+///////////////////// Global methods
+/*!
+  \addtogroup support_globals
+  @{
+*/
+
+/*!
+  \typedef typedef BArchivable* (*instantiation_func)(BMessage*)
+  \brief Internal definition of a function that can instantiate objects that
+    have been created with the BArchivable API.
+*/
+
+/*!
+  \fn BArchivable* instantiate_object(BMessage *from, image_id *id)
+  \brief Instantiate an archived object with the object being defined in a
+    different application or library.
+  
+  This function is similar to instantiate_object(BMessage *from), except that
+  it takes the \a id argument that refers to an image where the object might
+  come from. 
+  
+  \note Images are names for executable files. Image ids refer to these
+    executable files that have been loaded by your application. Have a look
+    at the kernel API.
+*/
+
+/*!
+  \fn BArchivable* instantiate_object(BMessage *from)
+  \brief Instantiate an archived object.
+  
+  This global function will determine the base class based on the \a from 
+  argument, and it will call the Instantiate() function of that object to
+  restore it. 
+  
+  \param from The archived object.
+  \return The object returns a pointer to the instantiated object, or \c NULL
+    if the instantiation failed. The global \c errno variable will contain the
+    reason it failed.
+  \see instantiate_object(BMessage *from, image_id *id)
+*/
+
+/*!
+  \fn bool validate_instantiation(BMessage* from, const char* className)
+  \brief Internal function that checks if the \a className is the same as the
+    one stored in the \a from message.
+*/
+
+/*!
+  \fn instantiation_func find_instantiation_func(const char* className,	const char* signature)
+  \brief Internal function that searches for the instantiation func with a
+    specific signature. Use instantiate_object() instead.
+*/
+
+/*!
+  \fn instantiation_func find_instantiation_func(const char* className)
+  \brief Internal function that searches for the instantiation func of a 
+    specific class. Use instantiate_object() instead.
+*/
+
+/*!
+  \fn instantiation_func find_instantiation_func(BMessage* archive)
+  \brief Internal function that searches for the instantiation func that
+    works on the specified \a archive. Use instantiate_object() instead.
+*/
+
+//! @}

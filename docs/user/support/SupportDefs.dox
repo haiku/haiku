@@ -1,3 +1,13 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Corresponds to:
+ * /trunk/headers/os/support/SupportDefs.h rev 19972
+ */
+
 /*!
   \file SupportDefs.h
   \ingroup support

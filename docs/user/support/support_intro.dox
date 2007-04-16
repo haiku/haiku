@@ -1,3 +1,11 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ */
+
 /*!
   \page support_intro Introduction to the Support Kit
 
@@ -11,7 +19,7 @@
     - BAutolock
     - Thread Local Storage
   - Archiving and IO:
-    - BArchivable (\link support_archiving tutorial\endlink)
+    - BArchivable
     - BFlattenable
     - BDataIO
       - BPositionIO
@@ -34,8 +42,8 @@
 // the todo list on this.
 
 /*!
-\addtogroup support
+  \addtogroup support
 
-For a better overview, have a look at \ref support_intro .
+  For a better overview, have a look at \ref support_intro .
 */
 

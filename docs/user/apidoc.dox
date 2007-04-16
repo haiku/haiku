@@ -79,35 +79,33 @@
   against which the documentaton was written.
 
   \verbatim
-// 
-// Copyright 2007, Haiku Inc. All Rights Reserved.
-//
-// Distributed under the terms of the MIT License.
-//
-//
-// Documentation by: 
-//   Niels Sascha Reedijk <niels.reedijk@gmail.com>
-// Corresponds to:
-//   /trunk/headers/os/support/String.h  rev 19731
-//   /trunk/src/kits/support/String.cpp  rev 19731
-//
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Corresponds to:
+ *   /trunk/headers/os/support/String.h  rev 19731
+ *   /trunk/src/kits/support/String.cpp  rev 19731
+ * /
   \endverbatim
   
   The example above has a few elements that you should take note of:
-  -# First of all, every line starts with a C++ single line style comment.
-    So it starts with two slashes: \c //. If there is text on a line, the
-    tokens are followed by \e one space. If the text is part of a category,
-    such as <tt>Documentation by</tt>, put two spaces after the delimeter.
+  -# The header is put in a standard C comment, which are enclosed between
+    \c /* and \c *\/.
+  -# Every line starts with a whitespace and an asterix, followed by another
+    space. If the text is part of a category, such as <tt>Documentation 
+    by</tt>, put three spaces after the delimeter.
   -# We start with a copyright notice. The first line is empty, then the 
-    copyright notice, then another empty line, and then the line on \e MIT,
-    followed by two empty lines.
+    copyright notice, then the line on \e MIT, followed by an empty line.
   -# Then there is a label <tt>Documentation by:</tt>, which is followed by
     lines with names and email addresses between brackets.
   -# The final part is underneath the label <tt>Corresponds to:</tt>.
     Underneath there is a list of files and their svn revisions that the
     current documentation is known to correspond with.
-  -# The header block ends with an empty C++ comment, and the next block that
-    follows underneath will start after an empty line.
+  -# The header block ends with the \c *\/, where the asterix is alligned with
+    with the ones above it.
   
   \subsection formalrequirements_blocks Blocks
   

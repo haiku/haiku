@@ -1,0 +1,18 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ */
+
+/*!
+  \page usb_modules Writing drivers for USB devices
+
+  This page will describe how the Haiku USB stack is structured.
+*/
+  
+  
+  
+  
+  
