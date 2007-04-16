@@ -580,32 +580,6 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 	}
 }
 
-
-status_t
-arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler)
-{
-	char *tmp = (char *)to;
-	char *s = (char *)from;
-	addr_t oldFaultHandler = *faultHandler;
-
-	// this check is to trick the gcc4 compiler and have it keep the error label
-	if (to == NULL)
-		goto error;
-
-	*faultHandler = (addr_t)&&error;
-
-	while (size--)
-		*tmp++ = *s++;
-
-	*faultHandler = oldFaultHandler;
-	return 0;
-
-error:
-	*faultHandler = oldFaultHandler;
-	return B_BAD_ADDRESS;
-}
-
-
 ssize_t
 arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
 {

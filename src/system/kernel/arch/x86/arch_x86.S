@@ -219,3 +219,46 @@ FUNCTION(arch_debug_save_registers):
 	popl	%eax
 	popl	%esi
 	ret
+
+/* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
+FUNCTION(arch_cpu_user_memcpy):
+	pushl	%esi
+	pushl	%edi
+	movl	12(%esp),%edi	/* dest */
+	movl	16(%esp),%esi	/* source */
+	movl	20(%esp),%ecx	/* count */
+
+	/* set the fault handler */
+	movl	24(%esp),%edx	/* fault handler */
+	movl	(%edx),%eax
+	movl	$.L_user_memcpy_error, (%edx)	
+
+	/* move by words */
+	cld
+	shrl	$2,%ecx
+	rep
+	movsl
+
+	/* move any remaining data by bytes */
+	movl	20(%esp),%ecx
+	andl	$3,%ecx
+	rep
+	movsb
+
+	/* restore the old fault handler */
+	movl	%eax,(%edx)
+	xor		%eax,%eax
+
+	popl	%edi
+	popl	%esi
+	ret
+
+	/* error condition */
+.L_user_memcpy_error:
+	/* restore the old fault handler */
+	movl	%eax,(%edx)
+	movl	$-1,%eax	/* return a generic error, the wrapper routine will deal with it */
+	popl	%edi
+	popl	%esi
+	ret
+

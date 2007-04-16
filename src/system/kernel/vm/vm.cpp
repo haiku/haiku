@@ -3741,7 +3741,9 @@ test_lock_memory(vm_address_space *addressSpace, addr_t address,
 status_t
 user_memcpy(void *to, const void *from, size_t size)
 {
-	return arch_cpu_user_memcpy(to, from, size, &thread_get_current_thread()->fault_handler);
+	if (arch_cpu_user_memcpy(to, from, size, &thread_get_current_thread()->fault_handler) < B_OK)
+		return B_BAD_ADDRESS;
+	return B_OK;
 }
 
 
@@ -3765,9 +3767,10 @@ user_strlcpy(char *to, const char *from, size_t size)
 status_t
 user_memset(void *s, char c, size_t count)
 {
-	return arch_cpu_user_memset(s, c, count, &thread_get_current_thread()->fault_handler);
+	if (arch_cpu_user_memset(s, c, count, &thread_get_current_thread()->fault_handler) < B_OK)
+		return B_BAD_ADDRESS;
+	return B_OK;
 }
-
 
 //	#pragma mark - kernel public API
 
