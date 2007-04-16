@@ -209,8 +209,9 @@ arp_entry::ClearQueue()
 {
 	BufferList::Iterator iterator = queue.GetIterator();
 	while (iterator.HasNext()) {
-		gBufferModule->free(iterator.Next());
+		net_buffer *buffer = iterator.Next();
 		iterator.Remove();
+		gBufferModule->free(buffer);
 	}
 }
 
