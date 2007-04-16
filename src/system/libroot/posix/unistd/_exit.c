@@ -8,8 +8,7 @@
 #include <syscalls.h>
 
 
-extern void (*_IO_cleanup)(void);
-
+extern void _IO_cleanup(void);
 
 void
 _exit(int status)
