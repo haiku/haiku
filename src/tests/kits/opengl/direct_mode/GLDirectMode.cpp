@@ -102,8 +102,8 @@ SampleGLView::SampleGLView(BRect frame, uint32 type)
 
 void SampleGLView::AttachedToWindow(void)
 {
-   LockGL();
    BGLView::AttachedToWindow();
+   LockGL();
    gInit();
    gReshape(width, height);
    UnlockGL();
