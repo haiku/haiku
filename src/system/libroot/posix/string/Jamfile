@@ -36,3 +36,10 @@ MergeObject posix_string.o :
 	strtok.c
 	strxfrm.c
 ;
+
+SubDir HAIKU_TOP src system libroot posix string arch $(TARGET_ARCH) ;
+
+MergeObject posix_string_arch_$(TARGET_ARCH).o :
+	arch_string.S
+;
+

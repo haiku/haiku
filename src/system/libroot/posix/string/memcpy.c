@@ -6,8 +6,8 @@
 #include <sys/types.h>
 #include <string.h>
 
-
-#if !_ASM_MEMCPY
+/* do not build for for arches that have overridden this with an assembly version */
+#if !defined(ARCH_x86)
 
 typedef int word;
 
@@ -46,3 +46,4 @@ void *memcpy(void *dest, const void *src, size_t count)
 }
 
 #endif
+

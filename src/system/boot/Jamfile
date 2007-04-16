@@ -22,6 +22,7 @@ local librootFunctions =
 	strchr.o
 	strrchr.o
 	strtol.o
+	arch_string.o
 ;
 
 local platformObjects = ;

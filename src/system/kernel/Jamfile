@@ -101,6 +101,7 @@ KernelLd kernel.so :
 	kernel_os_main.o
 	kernel_os_arch_$(TARGET_ARCH).o
 	kernel_posix.o
+	kernel_posix_arch_$(TARGET_ARCH).o
 
 	$(HAIKU_STATIC_LIBSUPC++)
 

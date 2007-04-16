@@ -32,6 +32,7 @@ local librootObjects =
 	posix_gnu_wctype.o
 	posix_stdlib.o
 	posix_string.o
+	posix_string_arch_$(TARGET_ARCH).o
 	posix_sys.o
 	posix_time.o
 	posix_unistd.o

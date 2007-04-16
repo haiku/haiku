@@ -46,6 +46,7 @@ StaticLibrary libruntime_loader.a :
 	<src!system!libroot!posix!string>strrchr.o
 	<src!system!libroot!posix!string>strspn.o
 	<src!system!libroot!posix!string>strstr.o
+	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
 
 	[ FGristFiles kernel_vsprintf.o ]
 ;

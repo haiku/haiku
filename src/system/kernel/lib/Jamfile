@@ -104,7 +104,7 @@ KernelMergeObject kernel_posix.o :
 	strspn.c
 	strstr.c
 	strtok.c
-
+	
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
@@ -120,12 +120,14 @@ KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
 ;
 
 SEARCH_SOURCE += [ FDirName $(posixSources) arch $(TARGET_ARCH) ] ;
+SEARCH_SOURCE += [ FDirName $(posixSources) string arch $(TARGET_ARCH) ] ;
 
 KernelMergeObject kernel_posix_arch_$(TARGET_ARCH).o :
 	setjmp.S
 	siglongjmp.S
 	sigsetjmp.S
 	kernel_setjmp_save_sigs.c
+	arch_string.S
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
