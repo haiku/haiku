@@ -39,20 +39,9 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 /* diagnostic debug flags - compile in here or set while running with debugger "AcmeRoadRunner" command */
 #define DEFAULT_DEBUG_FLAGS ( ERR | INFO | WARN | FUNCTION )
 
-//void ETHER_DEBUG(int32 debug_mask, int32 enabled, char * format, ...);
-
-static void
-ETHER_DEBUG(int32 debug_mask, int32 enabled, char * format, ...)
-{
-	if (debug_mask & enabled) {
-		va_list		args;
-		char		s[4096];
-		va_start(args, format);
-		vsprintf( s, format, args );
-		va_end(args);
-		dprintf("%s",s);
-	}
-}
+#define ETHER_DEBUG(mask, enabled, format, args...) \
+	do { if (mask & enabled) \
+		dprintf(format , ##args); } while (0)
 
 
 static pci_module_info		*gPCIModInfo;
