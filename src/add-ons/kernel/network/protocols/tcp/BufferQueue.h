@@ -45,6 +45,7 @@ class BufferQueue {
 
 		size_t Used() const { return fNumBytes; }
 		size_t Free() const { return fMaxBytes - fNumBytes; }
+		size_t Size() const { return fMaxBytes; }
 
 		bool IsContiguous() const { return fNumBytes == fContiguousBytes; }
 

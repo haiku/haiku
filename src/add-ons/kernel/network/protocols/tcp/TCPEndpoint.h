@@ -45,8 +45,6 @@ class TCPEndpoint : public net_protocol {
 
 		status_t InitCheck() const;
 
-		recursive_lock &Lock() { return fLock; }
-
 		status_t Open();
 		status_t Close();
 		status_t Free();
@@ -69,10 +67,10 @@ class TCPEndpoint : public net_protocol {
 		status_t DelayedAcknowledge();
 		status_t SendAcknowledge();
 		status_t UpdateTimeWait();
-		int32 ListenReceive(tcp_segment_header& segment, net_buffer *buffer);
-		int32 SynchronizeSentReceive(tcp_segment_header& segment,
+
+		int32 SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
+		int32 Spawn(TCPEndpoint *parent, tcp_segment_header& segment,
 			net_buffer *buffer);
-		int32 Receive(tcp_segment_header& segment, net_buffer *buffer);
 
 		net_domain *Domain() const
 			{ return socket->first_protocol->module->get_domain(
@@ -94,9 +92,15 @@ class TCPEndpoint : public net_protocol {
 		ssize_t _AvailableData() const;
 		void _NotifyReader();
 		bool _ShouldReceive() const;
+		int32 _ListenReceive(tcp_segment_header& segment, net_buffer *buffer);
+		int32 _SynchronizeSentReceive(tcp_segment_header& segment,
+			net_buffer *buffer);
+		int32 _SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
 		int32 _Receive(tcp_segment_header& segment, net_buffer *buffer);
 		void _UpdateTimestamps(tcp_segment_header& segment,
 			size_t segmentLength, bool checkSequence);
+		void _MarkEstablished();
+		status_t _WaitForEstablished(RecursiveLocker &lock, bigtime_t timeout);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);

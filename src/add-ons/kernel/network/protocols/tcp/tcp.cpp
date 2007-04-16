@@ -53,7 +53,7 @@ net_stack_module_info *gStackModule;
 //      protocol cookie, so we don't have to go through the list
 //      for each segment.
 typedef DoublyLinkedList<EndpointManager> EndpointManagerList;
-static benaphore sEndpointManagersLock;
+static recursive_lock sEndpointManagersLock;
 static EndpointManagerList sEndpointManagers;
 
 
@@ -536,7 +536,7 @@ tcp_receive_data(net_buffer *buffer)
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around
 
-	BenaphoreLocker _(sEndpointManagersLock);
+	RecursiveLocker _(sEndpointManagersLock);
 
 	EndpointManager *endpointManager = endpoint_manager_for(domain);
 	if (endpointManager == NULL)
@@ -547,40 +547,9 @@ tcp_receive_data(net_buffer *buffer)
 
 	TCPEndpoint *endpoint = endpointManager->FindConnection(
 		(sockaddr *)&buffer->destination, (sockaddr *)&buffer->source);
-	if (endpoint != NULL) {
-		RecursiveLocker locker(endpoint->Lock());
-		TRACE(("Endpoint %p in state %s\n", endpoint, name_for_state(endpoint->State())));
-
-		switch (endpoint->State()) {
-			case LISTEN:
-				segmentAction = endpoint->ListenReceive(segment, buffer);
-				break;
-
-			case SYNCHRONIZE_SENT:
-				segmentAction = endpoint->SynchronizeSentReceive(segment, buffer);
-				break;
-
-			case SYNCHRONIZE_RECEIVED:
-			case ESTABLISHED:
-			case FINISH_RECEIVED:
-			case WAIT_FOR_FINISH_ACKNOWLEDGE:
-			case FINISH_SENT:
-			case FINISH_ACKNOWLEDGED:
-			case CLOSING:
-			case TIME_WAIT:
-			case CLOSED:
-				segmentAction = endpoint->Receive(segment, buffer);
-				break;
-		}
-
-		// process acknowledge action as asked for by the *Receive() method
-		if (segmentAction & IMMEDIATE_ACKNOWLEDGE)
-			endpoint->SendAcknowledge();
-		else if (segmentAction & ACKNOWLEDGE)
-			endpoint->DelayedAcknowledge();
-		else if (segmentAction & DELETE)
-			endpoint->DeleteSocket();
-	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
+	if (endpoint != NULL)
+		segmentAction = endpoint->SegmentReceived(segment, buffer);
+	else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 
 	if (segmentAction & RESET) {
@@ -615,7 +584,7 @@ tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 static status_t
 tcp_init()
 {
-	status_t status = benaphore_init(&sEndpointManagersLock,
+	status_t status = recursive_lock_init(&sEndpointManagersLock,
 		"endpoint managers lock");
 
 	if (status < B_OK)
@@ -647,7 +616,7 @@ tcp_init()
 static status_t
 tcp_uninit()
 {
-	benaphore_destroy(&sEndpointManagersLock);
+	recursive_lock_destroy(&sEndpointManagersLock);
 	return B_OK;
 }
 
