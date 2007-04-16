@@ -120,11 +120,26 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		option->max_segment_size = htons(segment.max_segment_size);
 		bump_option(option, length);
 	}
+
+	if (segment.has_timestamps && length + 12 < bufferSize) {
+		// two NOPs so the timestamps get aligned to a 4 byte boundary
+		option->kind = TCP_OPTION_NOP;
+		bump_option(option, length);
+		option->kind = TCP_OPTION_NOP;
+		bump_option(option, length);
+		option->kind = TCP_OPTION_TIMESTAMP;
+		option->length = 10;
+		option->timestamp.TSval = htonl(segment.TSval);
+		// TSecr is opaque to us, we send it as we received it.
+		option->timestamp.TSecr = segment.TSecr;
+		bump_option(option, length);
+	}
+
 	if (segment.has_window_shift && length + 4 < bufferSize) {
 		// insert one NOP so that the subsequent data is aligned on a 4 byte boundary
 		option->kind = TCP_OPTION_NOP;
 		bump_option(option, length);
-		
+
 		option->kind = TCP_OPTION_WINDOW_SHIFT;
 		option->length = 3;
 		option->window_shift = segment.window_shift;
@@ -171,8 +186,7 @@ add_tcp_header(net_address_module_info *addressModule,
 	header.flags = segment.flags;
 	header.advertised_window = htons(segment.advertised_window);
 	header.checksum = 0;
-	header.urgent_offset = 0;
-		// TODO: urgent pointer not yet supported
+	header.urgent_offset = segment.urgent_offset;
 
 	// we must detach before calculating the checksum as we may
 	// not have a contiguous buffer.
@@ -226,7 +240,9 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 				length = 3;
 				break;
 			case TCP_OPTION_TIMESTAMP:
-				// TODO: support timestamp!
+				segment.has_timestamps = true;
+				segment.TSval = option->timestamp.TSval;
+				segment.TSecr = ntohl(option->timestamp.TSecr);
 				length = 10;
 				break;
 
@@ -515,11 +531,7 @@ tcp_receive_data(net_buffer *buffer)
 	segment.advertised_window = header.AdvertisedWindow();
 	segment.urgent_offset = header.UrgentOffset();
 	segment.flags = header.flags;
-	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0) {
-		// for now, we only process the options in the SYN segment
-		// TODO: when we support timestamps, they could be handled specifically
-		process_options(segment, buffer, headerLength - sizeof(tcp_header));
-	}
+	process_options(segment, buffer, headerLength - sizeof(tcp_header));
 
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around

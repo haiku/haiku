@@ -112,9 +112,11 @@ struct tcp_option {
 	union {
 		uint8	window_shift;
 		uint16	max_segment_size;
-		uint32	timestamp;
+		struct {
+			uint32	TSval;
+			uint32	TSecr;
+		} timestamp;
 	};
-	uint32	timestamp_reply;
 } _PACKED;
 
 enum tcp_option_kind {
@@ -128,17 +130,27 @@ enum tcp_option_kind {
 #define TCP_MAX_WINDOW_SHIFT	14
 
 struct tcp_segment_header {
-	tcp_segment_header() : has_window_shift(false), window_shift(0), max_segment_size(0) {}
-		// constructor zeros options
+	tcp_segment_header()
+		:
+		window_shift(0),
+		max_segment_size(0),
+		has_window_shift(false),
+		has_timestamps(false)
+	{}
 
 	uint32	sequence;
 	uint32	acknowledge;
 	uint16	advertised_window;
 	uint16	urgent_offset;
 	uint8	flags;
-	uint8	has_window_shift : 1;
-	uint8	window_shift : 7;
+	uint8	window_shift;
 	uint16	max_segment_size;
+
+	uint32	TSval;
+	uint32	TSecr;
+
+	bool	has_window_shift : 1;
+	bool	has_timestamps : 1;
 
 	bool AcknowledgeOnly() const
 	{

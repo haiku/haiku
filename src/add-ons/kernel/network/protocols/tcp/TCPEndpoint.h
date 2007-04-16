@@ -95,6 +95,8 @@ class TCPEndpoint : public net_protocol {
 		void _NotifyReader();
 		bool _ShouldReceive() const;
 		int32 _Receive(tcp_segment_header& segment, net_buffer *buffer);
+		void _UpdateTimestamps(tcp_segment_header& segment,
+			size_t segmentLength, bool checkSequence);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
@@ -145,6 +147,9 @@ class TCPEndpoint : public net_protocol {
 		bigtime_t		fTrackingTimeStamp;
 		uint32			fTrackingSequence;
 		bool			fTracking;
+
+		uint32			fReceivedTSval;
+		bool			fUsingTimestamps;
 
 		uint32			fCongestionWindow;
 		uint32			fSlowStartThreshold;

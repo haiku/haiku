@@ -179,6 +179,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fReceiveMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fReceiveQueue(socket->receive.buffer_size),
 	fRoundTripTime(TCP_INITIAL_RTT),
+	fReceivedTSval(0),
+	fUsingTimestamps(false),
 	fState(CLOSED),
 	fFlags(0), //FLAG_OPTION_WINDOW_SHIFT),
 	fError(B_OK),
@@ -362,6 +364,10 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	fSendUnacknowledged = fInitialSendSequence;
 	fSendMax = fInitialSendSequence;
 	fSendQueue.SetInitialSequence(fSendNext + 1);
+
+	// try to use timestamps, if the peer doesn't reply with the TS
+	// option as well we'll stop using them.
+	fUsingTimestamps = true;
 
 	// send SYN
 	status = _SendQueued();
@@ -794,6 +800,8 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 
 	TRACE("  ListenReceive() created new endpoint %p", endpoint);
 
+	endpoint->_UpdateTimestamps(segment, 0, false);
+
 	// send SYN+ACK
 	status_t status = endpoint->_SendQueued();
 
@@ -866,10 +874,12 @@ TCPEndpoint::SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buf
 		fState = SYNCHRONIZE_RECEIVED;
 	}
 
+	_UpdateTimestamps(segment, 0, false);
+
 	segment.flags &= ~TCP_FLAG_SYNCHRONIZE;
 		// we handled this flag now, it must not be set for further processing
 
-	return Receive(segment, buffer) | IMMEDIATE_ACKNOWLEDGE;
+	return _Receive(segment, buffer) | IMMEDIATE_ACKNOWLEDGE;
 }
 
 
@@ -892,6 +902,9 @@ TCPEndpoint::Receive(tcp_segment_header &segment, net_buffer *buffer)
 		&& fReceiveNext == segment.sequence
 		&& advertisedWindow > 0 && advertisedWindow == fSendWindow
 		&& fSendNext == fSendMax) {
+
+		_UpdateTimestamps(segment, buffer->size, true);
+
 		if (buffer->size == 0) {
 			// this is a pure acknowledge segment - we're on the sending end
 			if (fSendUnacknowledged < segment.acknowledge
@@ -1047,6 +1060,13 @@ TCPEndpoint::_SendQueued(bool force)
 
 	tcp_segment_header segment;
 	segment.flags = _CurrentFlags();
+	segment.urgent_offset = 0;
+
+	if (fUsingTimestamps) {
+		segment.has_timestamps = true;
+		segment.TSecr = fReceivedTSval;
+		segment.TSval = system_time();
+	}
 
 	uint32 sendWindow = fSendWindow;
 	uint32 available = fSendQueue.Available(fSendNext);
@@ -1172,6 +1192,9 @@ TCPEndpoint::_SendQueued(bool force)
 			return status;
 		}
 
+		if (segment.flags & TCP_FLAG_ACKNOWLEDGE)
+			fLastAcknowledgeSent = segment.acknowledge;
+
 		length -= segmentLength;
 		if (length == 0)
 			break;
@@ -1256,6 +1279,8 @@ int32
 TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 {
 	uint32 advertisedWindow = (uint32)segment.advertised_window << fSendWindowShift;
+
+	size_t segmentLength = buffer->size;
 
 	if (segment.flags & TCP_FLAG_RESET) {
 		// is this a valid reset?
@@ -1449,6 +1474,7 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 	}
 
 	if (segment.flags & TCP_FLAG_FINISH) {
+		segmentLength++;
 		if (fState != CLOSED && fState != LISTEN && fState != SYNCHRONIZE_SENT) {
 			TRACE("Receive(): peer is finishing connection!");
 			fReceiveNext++;
@@ -1486,9 +1512,27 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
 		action |= ACKNOWLEDGE;
 
+	_UpdateTimestamps(segment, segmentLength, true);
+
 	TRACE("Receive() Action %ld", action);
 
 	return action;
+}
+
+
+void
+TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment, size_t segmentLength,
+	bool checkSequence)
+{
+	fUsingTimestamps = segment.has_timestamps;
+
+	if (fUsingTimestamps) {
+		tcp_sequence sequence(segment.sequence);
+
+		if (!checkSequence || (fLastAcknowledgeSent >= sequence
+				&& fLastAcknowledgeSent < (sequence + segmentLength)))
+			fReceivedTSval = segment.TSval;
+	}
 }
 
 
