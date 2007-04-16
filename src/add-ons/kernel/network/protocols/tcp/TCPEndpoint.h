@@ -64,6 +64,8 @@ class TCPEndpoint : public net_protocol {
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
 
+		void DeleteSocket();
+
 		status_t DelayedAcknowledge();
 		status_t SendAcknowledge();
 		status_t UpdateTimeWait();
@@ -71,6 +73,12 @@ class TCPEndpoint : public net_protocol {
 		int32 SynchronizeSentReceive(tcp_segment_header& segment,
 			net_buffer *buffer);
 		int32 Receive(tcp_segment_header& segment, net_buffer *buffer);
+
+		net_domain *Domain() const
+			{ return socket->first_protocol->module->get_domain(
+				socket->first_protocol); }
+		net_address_module_info *AddressModule() const
+			{ return Domain()->address_module; }
 
 	private:
 		friend class EndpointManager;
@@ -92,6 +100,8 @@ class TCPEndpoint : public net_protocol {
 		static void _RetransmitTimer(net_timer *timer, void *data);
 		static void _PersistTimer(net_timer *timer, void *data);
 		static void _DelayedAcknowledgeTimer(net_timer *timer, void *data);
+
+		EndpointManager *fManager;
 
 		TCPEndpoint		*fConnectionHashNext;
 		TCPEndpoint		*fEndpointHashNext;

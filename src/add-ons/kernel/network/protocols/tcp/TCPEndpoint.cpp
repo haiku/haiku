@@ -158,6 +158,7 @@ WaitList::Signal()
 
 TCPEndpoint::TCPEndpoint(net_socket *socket)
 	:
+	fManager(NULL),
 	fReceiveList("tcp receive"),
 	fSendList("tcp send"),
 	fOptions(0),
@@ -205,7 +206,10 @@ TCPEndpoint::~TCPEndpoint()
 	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
 	gStackModule->cancel_timer(&fTimeWaitTimer);
 
-	gEndpointManager->Unbind(this);
+	if (fManager) {
+		fManager->Unbind(this);
+		return_endpoint_manager(fManager);
+	}
 
 	recursive_lock_destroy(&fLock);
 }
@@ -234,7 +238,14 @@ status_t
 TCPEndpoint::Open()
 {
 	TRACE("Open()");
-	// nothing to do here...
+
+	if (Domain() == NULL || AddressModule() == NULL)
+		return EAFNOSUPPORT;
+
+	fManager = create_endpoint_manager(Domain());
+	if (fManager == NULL)
+		return EAFNOSUPPORT;
+
 	return B_OK;
 }
 
@@ -304,7 +315,7 @@ status_t
 TCPEndpoint::Connect(const struct sockaddr *address)
 {
 	TRACE("Connect() on address %s",
-		  AddressString(gDomain, address, true).Data());
+		AddressString(Domain(), address, true).Data());
 
 	RecursiveLocker locker(&fLock);
 
@@ -319,14 +330,14 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	// get a net_route if there isn't one
 	// TODO: get a net_route_info instead!
 	if (fRoute == NULL) {
-		fRoute = gDatalinkModule->get_route(gDomain, (sockaddr *)address);
+		fRoute = gDatalinkModule->get_route(Domain(), (sockaddr *)address);
 		TRACE("  Connect(): Using Route %p", fRoute);
 		if (fRoute == NULL)
 			return ENETUNREACH;
 	}
 
 	// make sure connection does not already exist
-	status_t status = gEndpointManager->SetConnection(this,
+	status_t status = fManager->SetConnection(this,
 		(sockaddr *)&socket->address, address, fRoute->interface->address);
 	if (status < B_OK) {
 		TRACE("  Connect(): could not add connection: %s!", strerror(status));
@@ -413,7 +424,7 @@ TCPEndpoint::Bind(sockaddr *address)
 		return B_BAD_VALUE;
 
 	TRACE("Bind() on address %s",
-		  AddressString(gDomain, address, true).Data());
+		  AddressString(Domain(), address, true).Data());
 
 	RecursiveLocker lock(fLock);
 
@@ -425,13 +436,13 @@ TCPEndpoint::Bind(sockaddr *address)
 	if (status < B_OK)
 		return status;
 
-	if (gAddressModule->get_port(address) == 0)
-		status = gEndpointManager->BindToEphemeral(this);
+	if (AddressModule()->get_port(address) == 0)
+		status = fManager->BindToEphemeral(this);
 	else
-		status = gEndpointManager->Bind(this);
+		status = fManager->Bind(this);
 
 	TRACE("  Bind() bound to %s (status %i)",
-		  AddressString(gDomain, (sockaddr *)&socket->address, true).Data(),
+		  AddressString(Domain(), (sockaddr *)&socket->address, true).Data(),
 		  (int)status);
 
 	return status;
@@ -444,7 +455,7 @@ TCPEndpoint::Unbind(struct sockaddr *address)
 	TRACE("Unbind()");
 
 	RecursiveLocker lock(fLock);
-	return gEndpointManager->Unbind(this);
+	return fManager->Unbind(this);
 }
 
 
@@ -646,7 +657,15 @@ TCPEndpoint::ReadAvailable()
 bool
 TCPEndpoint::IsBound() const
 {
-	return !gAddressModule->is_empty_address((sockaddr *)&socket->address, true);
+	return !AddressModule()->is_empty_address((sockaddr *)&socket->address, true);
+}
+
+
+void
+TCPEndpoint::DeleteSocket()
+{
+	// the next call will delete `this'.
+	gSocketModule->delete_socket(socket);
 }
 
 
@@ -723,9 +742,9 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK)
 		return DROP;
 
-	gAddressModule->set_to((sockaddr *)&newSocket->address,
+	AddressModule()->set_to((sockaddr *)&newSocket->address,
 		(sockaddr *)&buffer->destination);
-	gAddressModule->set_to((sockaddr *)&newSocket->peer,
+	AddressModule()->set_to((sockaddr *)&newSocket->peer,
 		(sockaddr *)&buffer->source);
 
 	TCPEndpoint *endpoint = (TCPEndpoint *)newSocket->first_protocol;
@@ -734,12 +753,12 @@ TCPEndpoint::ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 
 	// TODO: proper error handling!
 
-	endpoint->fRoute = gDatalinkModule->get_route(gDomain,
+	endpoint->fRoute = gDatalinkModule->get_route(Domain(),
 		(sockaddr *)&newSocket->peer);
 	if (endpoint->fRoute == NULL)
 		return DROP;
 
-	if (gEndpointManager->SetConnection(endpoint, (sockaddr *)&buffer->destination,
+	if (fManager->SetConnection(endpoint, (sockaddr *)&buffer->destination,
 			(sockaddr *)&buffer->source, NULL) < B_OK)
 		return DROP;
 
@@ -1085,8 +1104,8 @@ TCPEndpoint::_SendQueued(bool force)
 			return status;
 		}
 
-		gAddressModule->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
-		gAddressModule->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
+		AddressModule()->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
+		AddressModule()->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
 
 		uint32 size = buffer->size;
 		if (length > 0 && fSendNext + segmentLength == fSendQueue.LastSequence()) {
@@ -1108,10 +1127,10 @@ TCPEndpoint::_SendQueued(bool force)
 
 		TRACE("SendQueued() flags %x, buffer %p, size %lu, from address %s to %s",
 			segment.flags, buffer, buffer->size,
-			AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
-			AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data());
+			AddressString(Domain(), (sockaddr *)&buffer->source, true).Data(),
+			AddressString(Domain(), (sockaddr *)&buffer->destination, true).Data());
 
-		status = add_tcp_header(segment, buffer);
+		status = add_tcp_header(AddressModule(), segment, buffer);
 		if (status != B_OK) {
 			gBufferModule->free(buffer);
 			return status;
@@ -1525,6 +1544,6 @@ TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 	if (recursive_lock_lock(&endpoint->Lock()) < B_OK)
 		return;
 
-	gSocketModule->delete_socket(endpoint->socket);
+	endpoint->DeleteSocket();
 }
 

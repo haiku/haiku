@@ -42,34 +42,56 @@
 typedef NetBufferField<uint16, offsetof(tcp_header, checksum)> TCPChecksumField;
 
 
-net_domain *gDomain;
-net_address_module_info *gAddressModule;
 net_buffer_module_info *gBufferModule;
 net_datalink_module_info *gDatalinkModule;
 net_socket_module_info *gSocketModule;
 net_stack_module_info *gStackModule;
-EndpointManager *gEndpointManager;
 
 
-status_t
-set_domain(net_interface *interface = NULL)
+// TODO we need to think of a better way to do this. It would be
+//      nice if we registered a per EndpointManager receiving
+//      protocol cookie, so we don't have to go through the list
+//      for each segment.
+typedef DoublyLinkedList<EndpointManager> EndpointManagerList;
+static benaphore sEndpointManagersLock;
+static EndpointManagerList sEndpointManagers;
+
+
+static EndpointManager *
+endpoint_manager_for(net_domain *domain)
 {
-	if (gDomain == NULL) {
-		// domain and address module are not known yet, we copy them from
-		// the buffer's interface (if any):
-		if (interface == NULL || interface->domain == NULL)
-			gDomain = gStackModule->get_domain(AF_INET);
-		else
-			gDomain = interface->domain;
-
-		if (gDomain == NULL) {
-			// this shouldn't occur, of course, but who knows...
-			return B_BAD_VALUE;
-		}
-		gAddressModule = gDomain->address_module;
+	EndpointManagerList::Iterator iterator = sEndpointManagers.GetIterator();
+	while (iterator.HasNext()) {
+		EndpointManager *endpointManager = iterator.Next();
+		if (endpointManager->Domain() == domain)
+			return endpointManager;
 	}
 
-	return B_OK;
+	return NULL;
+}
+
+
+EndpointManager *
+create_endpoint_manager(net_domain *domain)
+{
+	EndpointManager *endpointManager = endpoint_manager_for(domain);
+	if (endpointManager)
+		return endpointManager;
+
+	endpointManager = new (std::nothrow) EndpointManager(domain);
+	if (endpointManager)
+		sEndpointManagers.Add(endpointManager);
+
+	return endpointManager;
+}
+
+
+void
+return_endpoint_manager(EndpointManager *endpointManager)
+{
+	// TODO when the connection and endpoint count reach zero
+	//      we should remove the endpoint manager from the endpoints
+	//      list and delete it.
 }
 
 
@@ -125,7 +147,8 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 	for \a flags, \a seq \a ack and \a advertisedWindow.
 */
 status_t
-add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
+add_tcp_header(net_address_module_info *addressModule,
+	tcp_segment_header &segment, net_buffer *buffer)
 {
 	buffer->protocol = IPPROTO_TCP;
 
@@ -138,8 +161,8 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 
 	tcp_header &header = bufferHeader.Data();
 
-	header.source_port = gAddressModule->get_port((sockaddr *)&buffer->source);
-	header.destination_port = gAddressModule->get_port((sockaddr *)&buffer->destination);
+	header.source_port = addressModule->get_port((sockaddr *)&buffer->source);
+	header.destination_port = addressModule->get_port((sockaddr *)&buffer->destination);
 	header.sequence = htonl(segment.sequence);
 	header.acknowledge = (segment.flags & TCP_FLAG_ACKNOWLEDGE)
 		? htonl(segment.acknowledge) : 0;
@@ -161,7 +184,7 @@ add_tcp_header(tcp_segment_header &segment, net_buffer *buffer)
 	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, win %u\n", buffer,
 		segment.flags, segment.sequence, segment.acknowledge, segment.advertised_window));
 
-	*TCPChecksumField(buffer) = Checksum::PseudoHeader(gAddressModule,
+	*TCPChecksumField(buffer) = Checksum::PseudoHeader(addressModule,
 		gBufferModule, buffer, IPPROTO_TCP);
 
 	return B_OK;
@@ -219,44 +242,6 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 		option = (tcp_option *)((uint8 *)option + length);
 	}
 	// TODO: check if options are valid!
-}
-
-
-status_t
-reply_with_reset(tcp_segment_header &segment, net_buffer *buffer)
-{
-	TRACE(("TCP: Sending RST...\n"));
-
-	net_buffer *reply = gBufferModule->create(512);
-	if (reply == NULL)
-		return B_NO_MEMORY;
-
-	gAddressModule->set_to((sockaddr *)&reply->source,
-		(sockaddr *)&buffer->destination);
-	gAddressModule->set_to((sockaddr *)&reply->destination,
-		(sockaddr *)&buffer->source);
-
-	tcp_segment_header outSegment;
-	outSegment.flags = TCP_FLAG_RESET;
-	outSegment.sequence = 0;
-	outSegment.acknowledge = 0;
-	outSegment.advertised_window = 0;
-	outSegment.urgent_offset = 0;
-
-	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) == 0) {
-		outSegment.flags |= TCP_FLAG_ACKNOWLEDGE;
-		outSegment.acknowledge = segment.sequence + buffer->size;
-	} else
-		outSegment.sequence = segment.acknowledge;
-
-	status_t status = add_tcp_header(outSegment, reply);
-	if (status == B_OK)
-		status = gDomain->module->send_data(NULL, reply);
-
-	if (status != B_OK)
-		gBufferModule->free(reply);
-
-	return status;
 }
 
 
@@ -350,9 +335,6 @@ tcp_uninit_protocol(net_protocol *protocol)
 status_t
 tcp_open(net_protocol *protocol)
 {
-	if (gDomain == NULL && set_domain() != B_OK)
-		return B_ERROR;
-
 	return ((TCPEndpoint *)protocol)->Open();
 }
 
@@ -497,8 +479,11 @@ tcp_receive_data(net_buffer *buffer)
 {
 	TRACE(("TCP: Received buffer %p\n", buffer));
 
-	if (gDomain == NULL && set_domain(buffer->interface) != B_OK)
+	if (buffer->interface == NULL || buffer->interface->domain == NULL)
 		return B_ERROR;
+
+	net_domain *domain = buffer->interface->domain;
+	net_address_module_info *addressModule = domain->address_module;
 
 	NetBufferHeaderReader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
@@ -510,16 +495,17 @@ tcp_receive_data(net_buffer *buffer)
 	if (headerLength < sizeof(tcp_header))
 		return B_BAD_DATA;
 
-	if (Checksum::PseudoHeader(gAddressModule, gBufferModule, buffer,
+	if (Checksum::PseudoHeader(addressModule, gBufferModule, buffer,
 			IPPROTO_TCP) != 0)
 		return B_BAD_DATA;
 
-	gAddressModule->set_port((struct sockaddr *)&buffer->source, header.source_port);
-	gAddressModule->set_port((struct sockaddr *)&buffer->destination, header.destination_port);
+	addressModule->set_port((sockaddr *)&buffer->source, header.source_port);
+	addressModule->set_port((sockaddr *)&buffer->destination,
+		header.destination_port);
 
 	TRACE(("  Looking for: peer %s, local %s\n",
-		AddressString(gDomain, (sockaddr *)&buffer->source, true).Data(),
-		AddressString(gDomain, (sockaddr *)&buffer->destination, true).Data()));
+		AddressString(domain, (sockaddr *)&buffer->source, true).Data(),
+		AddressString(domain, (sockaddr *)&buffer->destination, true).Data()));
 	//dump_tcp_header(header);
 	//gBufferModule->dump(buffer);
 
@@ -538,11 +524,17 @@ tcp_receive_data(net_buffer *buffer)
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around
 
-	RecursiveLocker locker(gEndpointManager->Locker());
+	BenaphoreLocker _(sEndpointManagersLock);
+
+	EndpointManager *endpointManager = endpoint_manager_for(domain);
+	if (endpointManager == NULL)
+		return B_ERROR;
+
+	RecursiveLocker locker(endpointManager->Locker());
 	int32 segmentAction = DROP;
 
-	TCPEndpoint *endpoint = gEndpointManager->FindConnection(
-		(struct sockaddr *)&buffer->destination, (struct sockaddr *)&buffer->source);
+	TCPEndpoint *endpoint = endpointManager->FindConnection(
+		(sockaddr *)&buffer->destination, (sockaddr *)&buffer->source);
 	if (endpoint != NULL) {
 		RecursiveLocker locker(endpoint->Lock());
 		TRACE(("Endpoint %p in state %s\n", endpoint, name_for_state(endpoint->State())));
@@ -575,13 +567,13 @@ tcp_receive_data(net_buffer *buffer)
 		else if (segmentAction & ACKNOWLEDGE)
 			endpoint->DelayedAcknowledge();
 		else if (segmentAction & DELETE)
-			gSocketModule->delete_socket(endpoint->socket);
+			endpoint->DeleteSocket();
 	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 
 	if (segmentAction & RESET) {
 		// send reset
-		reply_with_reset(segment, buffer);
+		endpointManager->ReplyWithReset(segment, buffer);
 	}
 	if (segmentAction & DROP)
 		gBufferModule->free(buffer);
@@ -611,52 +603,39 @@ tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 static status_t
 tcp_init()
 {
-	status_t status;
+	status_t status = benaphore_init(&sEndpointManagersLock,
+		"endpoint managers lock");
 
-	gDomain = NULL;
-	gAddressModule = NULL;
-
-	gEndpointManager = new (std::nothrow) EndpointManager();
-	if (gEndpointManager == NULL)
-		return B_NO_MEMORY;
-
-	status = gEndpointManager->InitCheck();
 	if (status < B_OK)
-		goto err1;
+		return status;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, 0,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err1;
+		return status;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
-		goto err1;
+		return status;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
 		"network/protocols/tcp/v1");
 	if (status < B_OK)
-		goto err1;
+		return status;
 
 	return B_OK;
-
-err1:
-	delete gEndpointManager;
-
-	TRACE(("init_tcp() fails with %lx (%s)\n", status, strerror(status)));
-	return status;
 }
 
 
 static status_t
 tcp_uninit()
 {
-	delete gEndpointManager;
+	benaphore_destroy(&sEndpointManagersLock);
 	return B_OK;
 }
 

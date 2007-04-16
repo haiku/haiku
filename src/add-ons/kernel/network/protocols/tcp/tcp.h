@@ -157,17 +157,18 @@ enum tcp_segment_action {
 };
 
 
-extern net_domain *gDomain;
-extern net_address_module_info *gAddressModule;
 extern net_buffer_module_info *gBufferModule;
 extern net_datalink_module_info *gDatalinkModule;
 extern net_socket_module_info *gSocketModule;
 extern net_stack_module_info *gStackModule;
-extern EndpointManager *gEndpointManager;
 
 
-status_t add_tcp_header(tcp_segment_header &segment, net_buffer *buffer);
+status_t add_tcp_header(net_address_module_info *addressModule,
+	tcp_segment_header &segment, net_buffer *buffer);
 
 const char *name_for_state(tcp_state state);
+
+EndpointManager *create_endpoint_manager(net_domain *domain);
+void return_endpoint_manager(EndpointManager *);
 
 #endif	// TCP_H
