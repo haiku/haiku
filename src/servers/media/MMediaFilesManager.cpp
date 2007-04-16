@@ -9,6 +9,7 @@
 #include <storage/FindDirectory.h>
 #include <storage/Path.h>
 #include "MMediaFilesManager.h"
+#include "MediaSounds.h"
 #include "debug.h"
 
 
@@ -18,6 +19,21 @@ MMediaFilesManager::MMediaFilesManager()
 	fRunner(NULL)
 {
 	CALLED();
+	entry_ref ref;
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_BEEP, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_STARTUP, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_DOWN, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_REPEAT, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_UP, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_MOUSE_DOWN, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_MOUSE_UP, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ACTIVATED, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_CLOSE, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_MINIMIZED, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_OPEN, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_RESTORED, ref, false);
+	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ZOOMED, ref, false);
+	
 	LoadState();
 #if DEBUG >=3
 	Dump();
@@ -366,35 +382,21 @@ MMediaFilesManager::TimerMessage()
 
 
 void
-MMediaFilesManager::HandleSystemBeepEvent(BMessage *msg)
+MMediaFilesManager::HandleAddSystemBeepEvent(BMessage *msg)
 {
-	int32 action, flags;
-	BString event;
-	status_t err = B_OK;
-	if ((msg->FindString("event", &event) != B_OK)
-		|| (msg->FindInt32("action", &action) != B_OK)) {
-		err = B_BAD_VALUE;
-	}
-
-	if (action == SYSTEM_BEEP_EVENT_ADD) {
-		if (msg->FindInt32("flags", &flags) != B_OK)
-			err = B_BAD_VALUE;
-	}
-
-	if (err != B_OK) {
-		msg->SendReply(err);
+	uint32 flags;
+	const char *name, *type;
+	if ((msg->FindString(MEDIA_NAME_KEY, &name) != B_OK)
+		|| (msg->FindString(MEDIA_TYPE_KEY, &type) != B_OK)
+		|| (msg->FindInt32(MEDIA_FLAGS_KEY, (int32 *) &flags) != B_OK)) {
+		msg->SendReply(B_BAD_VALUE);
 		return;
 	}
 
-	switch (action) {
-		case SYSTEM_BEEP_EVENT_ADD: {
-			entry_ref ref;
-			SetRefFor(BMediaFiles::B_SOUNDS, event.String(), ref);
-			break;
-		}
-		case SYSTEM_BEEP_EVENT_INVOKE: {
-			// TODO play the sound			
-		}
-	} 
+	entry_ref *pRef = NULL;
+	if (GetRefFor(type, name, &pRef) == B_ENTRY_NOT_FOUND) {
+		entry_ref ref;
+		SetRefFor(type, name, ref);
+	}
 }
 

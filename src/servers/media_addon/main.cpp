@@ -43,6 +43,7 @@
 #include "Notifications.h"
 #include "MediaMisc.h"
 #include "MediaRosterEx.h"
+#include "MediaSounds.h"
 #include "SystemTimeSource.h"
 #include "MediaFilePlayer.h"
 
@@ -627,9 +628,15 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) 
 	{
-		case '_TRU':
+		case MEDIA_ADDON_SERVER_PLAY_MEDIA:
 		{
-			PlayMediaFile(msg->FindString("be:media_type"), msg->FindString("be:media_name"));
+			const char *name, *type;
+			if ((msg->FindString(MEDIA_NAME_KEY, &name) != B_OK)
+				|| (msg->FindString(MEDIA_TYPE_KEY, &type) != B_OK)) {
+				msg->SendReply(B_ERROR);
+			}
+			
+			PlayMediaFile(type, name);
 			msg->SendReply(B_OK); // XXX don't know which reply is expected
 			return;
 		}

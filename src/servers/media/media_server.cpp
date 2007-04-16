@@ -803,8 +803,8 @@ ServerApp::MessageReceived(BMessage *msg)
 			gFormatManager->MakeFormatFor(*msg);
 			break;
 		
-		case MEDIA_SERVER_SYSTEM_BEEP_EVENT:
-			gMMediaFilesManager->HandleSystemBeepEvent(msg);
+		case MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT:
+			gMMediaFilesManager->HandleAddSystemBeepEvent(msg);
 			break;
 		default:
 			inherited::MessageReceived(msg);

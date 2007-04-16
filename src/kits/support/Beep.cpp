@@ -8,17 +8,18 @@
 #include <stdio.h>
 
 #include "DataExchange.h"
+#include "MediaSounds.h"
 
 
 status_t
 system_beep(const char *eventName)
 {
-	BMessenger messenger("application/x-vnd.Be.media-server");
+	BMessenger messenger("application/x-vnd.Be.addon-host");
 	if (!messenger.IsValid())
 		return B_ERROR;
-	BMessage msg(MEDIA_SERVER_SYSTEM_BEEP_EVENT), reply;
-	msg.AddInt32("action", SYSTEM_BEEP_EVENT_INVOKE);
-	msg.AddString("event", eventName);
+	BMessage msg(MEDIA_ADDON_SERVER_PLAY_MEDIA), reply;
+	msg.AddString(MEDIA_NAME_KEY, eventName ? eventName : MEDIA_SOUNDS_BEEP);
+	msg.AddString(MEDIA_TYPE_KEY, MEDIA_TYPE_SOUNDS);
 	
 	status_t err = messenger.SendMessage(&msg, &reply);
 	if ((err != B_OK)
@@ -36,15 +37,15 @@ beep()
 
 
 status_t
-add_system_beep_event(const char *eventName, uint32 flags)
+add_system_beep_event(const char *name, uint32 flags)
 {
 	BMessenger messenger("application/x-vnd.Be.media-server");
 	if (!messenger.IsValid())
 		return B_ERROR;
-	BMessage msg(MEDIA_SERVER_SYSTEM_BEEP_EVENT), reply;
-	msg.AddInt32("action", SYSTEM_BEEP_EVENT_ADD);
-	msg.AddString("event", eventName);
-	msg.AddInt32("flags", flags);
+	BMessage msg(MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT), reply;
+	msg.AddString(MEDIA_NAME_KEY, name);
+	msg.AddString(MEDIA_TYPE_KEY, MEDIA_TYPE_SOUNDS);
+	msg.AddInt32(MEDIA_FLAGS_KEY, flags);
 	
 	status_t err = messenger.SendMessage(&msg, &reply);
 	if ((err != B_OK)
