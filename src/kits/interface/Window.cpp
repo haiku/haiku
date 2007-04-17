@@ -3052,7 +3052,7 @@ BWindow::_StealMouseMessage(BMessage* message, bool& deleteMessage)
 		// just prevent it from being sent to the preferred handler
 		// again (if it should have gotten it at all).
 		bool feedFocus;
-		if (message->FindBool("_feed_focus", &feedFocus) == B_OK && feedFocus)
+		if (message->FindBool("_feed_focus", &feedFocus) != B_OK || !feedFocus)
 			return false;
 
 		message->RemoveName("_feed_focus");
