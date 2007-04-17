@@ -15,5 +15,5 @@ Server media_addon_server :
 	MediaFilePlayer.cpp
 	SystemTimeSource.cpp
 	:
-	be libmedia.so
+	be libmedia.so game
 ;
