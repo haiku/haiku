@@ -3,10 +3,10 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-.globl memcpy
+#define FUNCTION(x) .global x; .type x,@function; x
 
 .align 4
-memcpy:
+FUNCTION(memcpy):
 	pushl	%esi
 	pushl	%edi
 	movl	12(%esp),%edi	/* dest */
