@@ -186,15 +186,16 @@ AppInfoList::It()
 // Sort
 /*!	\brief Sorts the infos in ascending order according to the given compare
 		   function.
-	\param cmpFunc The compare function to be used.
+	\param lessFunc The compare function (less than) to be used.
 */
 void
-AppInfoList::Sort(int (*cmpFunc)(const RosterAppInfo *, const RosterAppInfo *))
+AppInfoList::Sort(
+	bool (*lessFunc)(const RosterAppInfo *, const RosterAppInfo *))
 {
 	int32 count = CountInfos();
 	if (count > 1) {
 		RosterAppInfo **infos = (RosterAppInfo **)fInfos.Items();
-		std::sort(infos, infos + count, cmpFunc);
+		std::sort(infos, infos + count, lessFunc);
 	}
 }
 

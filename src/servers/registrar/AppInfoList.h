@@ -57,7 +57,7 @@ public:
 
 	Iterator It();
 
-	void Sort(int (*cmpFunc)(const RosterAppInfo *, const RosterAppInfo *));
+	void Sort(bool (*lessFunc)(const RosterAppInfo *, const RosterAppInfo *));
 
 private:
 	RosterAppInfo *RemoveInfo(int32 index);

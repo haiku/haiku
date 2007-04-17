@@ -95,14 +95,11 @@ enum {
 
 // inverse_compare_by_registration_time
 static
-int
+bool
 inverse_compare_by_registration_time(const RosterAppInfo *info1,
 	const RosterAppInfo *info2)
 {
-	bigtime_t cmp = info1->registration_time - info2->registration_time;
-	if (cmp < 0)
-		return 1;
-	return (cmp > 0 ? -1 : 0);
+	return (info2->registration_time < info1->registration_time);
 }
 
 // throw_error
