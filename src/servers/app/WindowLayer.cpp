@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -853,7 +853,8 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 					fDesktop->ActivateWindow(this);
 
 				// eat the click if we don't accept first click
-				if ((Flags() & (B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS)) == 0)
+				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
+					|| (Flags() & B_AVOID_FOCUS) != 0)
 					return;
 			}
 
