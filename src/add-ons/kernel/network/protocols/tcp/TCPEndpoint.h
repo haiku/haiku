@@ -101,6 +101,7 @@ class TCPEndpoint : public net_protocol {
 			size_t segmentLength, bool checkSequence);
 		void _MarkEstablished();
 		status_t _WaitForEstablished(RecursiveLocker &lock, bigtime_t timeout);
+		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
@@ -153,7 +154,6 @@ class TCPEndpoint : public net_protocol {
 		bool			fTracking;
 
 		uint32			fReceivedTSval;
-		bool			fUsingTimestamps;
 
 		uint32			fCongestionWindow;
 		uint32			fSlowStartThreshold;

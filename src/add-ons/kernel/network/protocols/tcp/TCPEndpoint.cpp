@@ -61,7 +61,7 @@
 
 // constants for the fFlags field
 enum {
-	FLAG_OPTION_WINDOW_SHIFT	= 0x01,
+	FLAG_OPTION_WINDOW_SCALE	= 0x01,
 	FLAG_OPTION_TIMESTAMP		= 0x02,
 	// TODO: Should FLAG_NO_RECEIVE apply as well to received connections?
 	//       That is, what is expected from accept() after a shutdown()
@@ -180,9 +180,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fReceiveQueue(socket->receive.buffer_size),
 	fRoundTripTime(TCP_INITIAL_RTT),
 	fReceivedTSval(0),
-	fUsingTimestamps(false),
 	fState(CLOSED),
-	fFlags(0), //FLAG_OPTION_WINDOW_SHIFT),
+	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP),
 	fError(B_OK),
 	fSpawned(false)
 {
@@ -365,10 +364,6 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	fSendUnacknowledged = fInitialSendSequence;
 	fSendMax = fInitialSendSequence;
 	fSendQueue.SetInitialSequence(fSendNext + 1);
-
-	// try to use timestamps, if the peer doesn't reply with the TS
-	// option as well we'll stop using them.
-	fUsingTimestamps = true;
 
 	// send SYN
 	status = _SendQueued();
@@ -693,7 +688,7 @@ TCPEndpoint::DelayedAcknowledge()
 	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
 		// timer was active, send an ACK now (with the exception above,
 		// we send every other ACK)
-		return _SendQueued();
+		return SendAcknowledge();
 	}
 
 	gStackModule->set_timer(&fDelayedAcknowledgeTimer, TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
@@ -808,10 +803,10 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 		else
 			fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
 		if (segment.has_window_shift) {
-			fFlags |= FLAG_OPTION_WINDOW_SHIFT;
+			fFlags |= FLAG_OPTION_WINDOW_SCALE;
 			fSendWindowShift = segment.window_shift;
 		} else {
-			fFlags &= ~FLAG_OPTION_WINDOW_SHIFT;
+			fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
 			fReceiveWindowShift = 0;
 		}
 	}
@@ -865,10 +860,10 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *bu
 	else
 		fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
 	if (segment.has_window_shift) {
-		fFlags |= FLAG_OPTION_WINDOW_SHIFT;
+		fFlags |= FLAG_OPTION_WINDOW_SCALE;
 		fSendWindowShift = segment.window_shift;
 	} else {
-		fFlags &= ~FLAG_OPTION_WINDOW_SHIFT;
+		fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
 		fReceiveWindowShift = 0;
 	}
 
@@ -975,19 +970,10 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 			&& fReceiveQueue.IsContiguous()
 			&& fReceiveQueue.Free() >= buffer->size
 			&& !(fFlags & FLAG_NO_RECEIVE)) {
-			TRACE("Receive(): header prediction receive!");
-			// we're on the receiving end of the connection, and this segment
-			// is the one we were expecting, in-sequence
-			fReceiveNext += buffer->size;
-			TRACE("Receive(): receive next = %lu", (uint32)fReceiveNext);
-			fReceiveQueue.Add(buffer, segment.sequence);
-			if (segment.flags & TCP_FLAG_PUSH)
-				fReceiveQueue.SetPushPointer();
-
+			_AddData(segment, buffer);
 			_NotifyReader();
-
-			return KEEP | (segment.flags & TCP_FLAG_PUSH ?
-					IMMEDIATE_ACKNOWLEDGE : ACKNOWLEDGE);
+			return KEEP | ((segment.flags & TCP_FLAG_PUSH) ?
+				IMMEDIATE_ACKNOWLEDGE : ACKNOWLEDGE);
 		}
 	}
 
@@ -1104,10 +1090,10 @@ TCPEndpoint::_SendQueued(bool force)
 	segment.flags = _CurrentFlags();
 	segment.urgent_offset = 0;
 
-	if (fUsingTimestamps) {
+	if (fOptions & FLAG_OPTION_TIMESTAMP) {
 		segment.has_timestamps = true;
 		segment.TSecr = fReceivedTSval;
-		segment.TSval = system_time();
+		segment.TSval = 0;
 	}
 
 	uint32 sendWindow = fSendWindow;
@@ -1138,8 +1124,13 @@ TCPEndpoint::_SendQueued(bool force)
 		segment.flags &= ~TCP_FLAG_FINISH;
 	}
 
-	segment.advertised_window = min_c(65535, fReceiveQueue.Free());
-		// TODO: support shift option!
+	size_t availableBytes = fReceiveQueue.Free();
+
+	if (fOptions & FLAG_OPTION_WINDOW_SCALE)
+		segment.advertised_window = availableBytes >> fReceiveWindowShift;
+	else
+		segment.advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
+
 	segment.acknowledge = fReceiveNext;
 	segment.urgent_offset = 0;
 
@@ -1150,7 +1141,6 @@ TCPEndpoint::_SendQueued(bool force)
 				&& !gStackModule->is_timer_active(&fPersistTimer)
 				&& !gStackModule->is_timer_active(&fRetransmitTimer))
 				_StartPersistTimer();
-
 			return B_OK;
 		}
 
@@ -1181,7 +1171,7 @@ TCPEndpoint::_SendQueued(bool force)
 			&& (fOptions & TCP_NOOPT) == 0) {
 			// add connection establishment options
 			segment.max_segment_size = fReceiveMaxSegmentSize;
-			if ((fFlags & FLAG_OPTION_WINDOW_SHIFT) != 0) {
+			if (fFlags & FLAG_OPTION_WINDOW_SCALE) {
 				segment.has_window_shift = true;
 				segment.window_shift = fReceiveWindowShift;
 			}
@@ -1487,17 +1477,10 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 	bool notify = false;
 
 	if (buffer->size > 0 &&	_ShouldReceive()) {
-		fReceiveQueue.Add(buffer, segment.sequence);
-		fReceiveNext += buffer->size;
+		_AddData(segment, buffer);
 		notify = true;
-		TRACE("Receive(): adding data, receive next = %lu. Now have %lu bytes.",
-				(uint32)fReceiveNext, fReceiveQueue.Available());
-
-		if (segment.flags & TCP_FLAG_PUSH)
-			fReceiveQueue.SetPushPointer();
-	} else {
+	} else
 		action = (action & ~KEEP) | DROP;
-	}
 
 	if (segment.flags & TCP_FLAG_FINISH) {
 		segmentLength++;
@@ -1550,9 +1533,12 @@ void
 TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment, size_t segmentLength,
 	bool checkSequence)
 {
-	fUsingTimestamps = segment.has_timestamps;
+	if (segment.has_timestamps)
+		fOptions |= FLAG_OPTION_TIMESTAMP;
+	else
+		fOptions &= ~FLAG_OPTION_TIMESTAMP;
 
-	if (fUsingTimestamps) {
+	if (fOptions & FLAG_OPTION_TIMESTAMP) {
 		tcp_sequence sequence(segment.sequence);
 
 		if (!checkSequence || (fLastAcknowledgeSent >= sequence
@@ -1586,6 +1572,20 @@ TCPEndpoint::_WaitForEstablished(RecursiveLocker &locker, bigtime_t timeout)
 	}
 
 	return B_OK;
+}
+
+
+void
+TCPEndpoint::_AddData(tcp_segment_header &segment, net_buffer *buffer)
+{
+	fReceiveNext += buffer->size;
+	fReceiveQueue.Add(buffer, segment.sequence);
+
+	TRACE("  _AddData(): adding data, receive next = %lu. Now have %lu bytes.",
+		(uint32)fReceiveNext, fReceiveQueue.Available());
+
+	if (segment.flags & TCP_FLAG_PUSH)
+		fReceiveQueue.SetPushPointer();
 }
 
 
@@ -1629,7 +1629,7 @@ TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 	if (!locker.IsLocked())
 		return;
 
-	endpoint->_SendQueued(true);
+	endpoint->SendAcknowledge();
 }
 
 
