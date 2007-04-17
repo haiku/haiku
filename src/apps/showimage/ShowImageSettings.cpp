@@ -169,7 +169,7 @@ ShowImageSettings::OpenSettingsFile(BFile* file, bool forReading)
 	BPath path;
 	uint32 openMode;
 	
-	st = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path);
+	st = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (st != B_OK) return false;
 	
 	path.Append("ShowImage_settings");
