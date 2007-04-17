@@ -98,11 +98,13 @@ class TCPEndpoint : public net_protocol {
 		int32 _SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
 		int32 _Receive(tcp_segment_header& segment, net_buffer *buffer);
 		void _UpdateTimestamps(tcp_segment_header& segment,
-			size_t segmentLength, bool checkSequence);
+			size_t segmentLength);
 		void _MarkEstablished();
 		status_t _WaitForEstablished(RecursiveLocker &lock, bigtime_t timeout);
 		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
-		void _CheckWindowScale(tcp_segment_header &segment);
+		void _PrepareReceivePath(TCPEndpoint *parent,
+			tcp_segment_header &segment);
+		status_t _PrepareSendPath(const sockaddr *peer);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);

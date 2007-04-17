@@ -314,7 +314,7 @@ TCPEndpoint::Free()
 	until the connection has been established or refused.
 */
 status_t
-TCPEndpoint::Connect(const struct sockaddr *address)
+TCPEndpoint::Connect(const sockaddr *address)
 {
 	TRACE("Connect() on address %s",
 		AddressString(Domain(), address, true).Data());
@@ -329,41 +329,13 @@ TCPEndpoint::Connect(const struct sockaddr *address)
 	} else if (fState != CLOSED)
 		return EISCONN;
 
-	// get a net_route if there isn't one
-	// TODO: get a net_route_info instead!
-	if (fRoute == NULL) {
-		fRoute = gDatalinkModule->get_route(Domain(), (sockaddr *)address);
-		TRACE("  Connect(): Using Route %p", fRoute);
-		if (fRoute == NULL)
-			return ENETUNREACH;
-	}
-
-	// make sure connection does not already exist
-	status_t status = fManager->SetConnection(this,
-		(sockaddr *)&socket->address, address, fRoute->interface->address);
-	if (status < B_OK) {
-		TRACE("  Connect(): could not add connection: %s!", strerror(status));
+	status_t status = _PrepareSendPath(address);
+	if (status < B_OK)
 		return status;
-	}
-
-	fReceiveMaxSegmentSize = _GetMSS(address);
-
-	// Compute the window shift we advertise to our peer - if it doesn't support
-	// this option, this will be reset to 0 (when its SYN is received)
-	fReceiveWindowShift = 0;
-	while (fReceiveWindowShift < TCP_MAX_WINDOW_SHIFT
-		&& (0xffffUL << fReceiveWindowShift) < socket->receive.buffer_size) {
-		fReceiveWindowShift++;
-	}
 
 	TRACE("  Connect(): starting 3-way handshake...");
 
 	fState = SYNCHRONIZE_SENT;
-	fInitialSendSequence = system_time() >> 4;
-	fSendNext = fInitialSendSequence;
-	fSendUnacknowledged = fInitialSendSequence;
-	fSendMax = fInitialSendSequence;
-	fSendQueue.SetInitialSequence(fSendNext + 1);
 
 	// send SYN
 	status = _SendQueued();
@@ -515,8 +487,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	if (fState == CLOSED)
 		return ENOTCONN;
 	else if (fState == LISTEN) {
-		// TODO change socket from passive to active.
-		return EOPNOTSUPP;
+		return EDESTADDRREQ;
 	} else if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
 				|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
 				|| fState == TIME_WAIT) {
@@ -753,7 +724,8 @@ TCPEndpoint::_ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	AddressModule()->set_to((sockaddr *)&newSocket->peer,
 		(sockaddr *)&buffer->source);
 
-	return ((TCPEndpoint *)newSocket->first_protocol)->Spawn(this, segment, buffer);
+	return ((TCPEndpoint *)newSocket->first_protocol)->Spawn(this,
+		segment, buffer);
 }
 
 
@@ -765,55 +737,18 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 
 	fState = SYNCHRONIZE_RECEIVED;
 	fManager = parent->fManager;
+	fSpawned = true;
 
 	TRACE("Spawn()");
 
-	fSpawned = true;
-
-	sockaddr *local = (sockaddr *)&socket->address;
-	sockaddr *peer = (sockaddr *)&socket->peer;
-
 	// TODO: proper error handling!
-
-	fRoute = gDatalinkModule->get_route(Domain(), peer);
-	if (fRoute == NULL)
+	if (_PrepareSendPath((sockaddr *)&socket->peer) < B_OK)
 		return DROP;
 
-	if (fManager->SetConnection(this, local, peer, NULL) < B_OK)
-		return DROP;
-
-	fInitialReceiveSequence = segment.sequence;
-	fReceiveQueue.SetInitialSequence(segment.sequence + 1);
-	fAcceptSemaphore = parent->fAcceptSemaphore;
-	fReceiveMaxSegmentSize = _GetMSS(peer);
-		// 40 bytes for IP and TCP header without any options
-		// TODO: make this depending on the RTF_LOCAL flag?
-	fReceiveNext = segment.sequence + 1;
-		// account for the extra sequence number for the synchronization
-
-	fInitialSendSequence = system_time() >> 4;
-	fSendNext = fInitialSendSequence;
-	fSendUnacknowledged = fSendNext;
-	fSendMax = fSendNext;
-
-	// set options
-	if ((parent->fOptions & TCP_NOOPT) == 0) {
-		if (segment.max_segment_size > 0)
-			fSendMaxSegmentSize = segment.max_segment_size;
-		else
-			fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
-		_CheckWindowScale(segment);
-	}
-
-	_UpdateTimestamps(segment, 0, false);
+	_PrepareReceivePath(parent, segment);
 
 	// send SYN+ACK
-	status_t status = _SendQueued();
-
-	fInitialSendSequence = fSendNext;
-	fSendQueue.SetInitialSequence(fSendNext);
-
-	if (status < B_OK)
+	if (_SendQueued() < B_OK)
 		return DROP;
 
 	segment.flags &= ~TCP_FLAG_SYNCHRONIZE;
@@ -842,19 +777,7 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *bu
 	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) == 0)
 		return DROP;
 
-	fInitialReceiveSequence = segment.sequence;
-	segment.sequence++;
-
-	fSendUnacknowledged = segment.acknowledge;
-	fReceiveNext = segment.sequence;
-	fReceiveQueue.SetInitialSequence(fReceiveNext);
-
-	if (segment.max_segment_size > 0)
-		fSendMaxSegmentSize = segment.max_segment_size;
-	else
-		fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
-
-	_CheckWindowScale(segment);
+	_PrepareReceivePath(NULL, segment);
 
 	if (segment.flags & TCP_FLAG_ACKNOWLEDGE) {
 		_MarkEstablished();
@@ -862,8 +785,6 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *bu
 		// simultaneous open
 		fState = SYNCHRONIZE_RECEIVED;
 	}
-
-	_UpdateTimestamps(segment, 0, false);
 
 	segment.flags &= ~TCP_FLAG_SYNCHRONIZE;
 		// we handled this flag now, it must not be set for further processing
@@ -929,7 +850,7 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 		&& advertisedWindow > 0 && advertisedWindow == fSendWindow
 		&& fSendNext == fSendMax) {
 
-		_UpdateTimestamps(segment, buffer->size, true);
+		_UpdateTimestamps(segment, buffer->size);
 
 		if (buffer->size == 0) {
 			// this is a pure acknowledge segment - we're on the sending end
@@ -1079,7 +1000,7 @@ TCPEndpoint::_SendQueued(bool force)
 	segment.flags = _CurrentFlags();
 	segment.urgent_offset = 0;
 
-	if (fOptions & FLAG_OPTION_TIMESTAMP) {
+	if (fFlags & FLAG_OPTION_TIMESTAMP) {
 		segment.has_timestamps = true;
 		segment.TSecr = fReceivedTSval;
 		segment.TSval = 0;
@@ -1115,7 +1036,7 @@ TCPEndpoint::_SendQueued(bool force)
 
 	size_t availableBytes = fReceiveQueue.Free();
 
-	if (fOptions & FLAG_OPTION_WINDOW_SCALE)
+	if (fFlags & FLAG_OPTION_WINDOW_SCALE)
 		segment.advertised_window = availableBytes >> fReceiveWindowShift;
 	else
 		segment.advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
@@ -1166,10 +1087,13 @@ TCPEndpoint::_SendQueued(bool force)
 			}
 		}
 
-		TRACE("SendQueued() flags %x, buffer %p, size %lu, from address %s to %s",
-			segment.flags, buffer, buffer->size,
-			AddressString(Domain(), (sockaddr *)&buffer->source, true).Data(),
-			AddressString(Domain(), (sockaddr *)&buffer->destination, true).Data());
+		TRACE("SendQueued() buffer %p (%lu bytes) address %s to %s",
+			buffer, buffer->size, AddressString(Domain(),
+			(sockaddr *)&buffer->source, true).Data(), AddressString(Domain(),
+			(sockaddr *)&buffer->destination, true).Data());
+		TRACE("             flags 0x%x, seq %lu, ack %lu, rwnd %hu",
+			  segment.flags, segment.sequence, segment.acknowledge,
+			  segment.advertised_window);
 
 		status = add_tcp_header(AddressModule(), segment, buffer);
 		if (status != B_OK) {
@@ -1382,10 +1306,8 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0) {
 		// process acknowledged data
-		if (fState == SYNCHRONIZE_RECEIVED) {
+		if (fState == SYNCHRONIZE_RECEIVED)
 			_MarkEstablished();
-			_CheckWindowScale(segment);
-		}
 
 		if (fSendMax < segment.acknowledge || fState == TIME_WAIT)
 			return DROP | IMMEDIATE_ACKNOWLEDGE;
@@ -1510,7 +1432,7 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
 		action |= ACKNOWLEDGE;
 
-	_UpdateTimestamps(segment, segmentLength, true);
+	_UpdateTimestamps(segment, segmentLength);
 
 	TRACE("Receive() Action %ld", action);
 
@@ -1519,18 +1441,13 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 
 void
-TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment, size_t segmentLength,
-	bool checkSequence)
+TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment,
+	size_t segmentLength)
 {
-	if (segment.has_timestamps)
-		fOptions |= FLAG_OPTION_TIMESTAMP;
-	else
-		fOptions &= ~FLAG_OPTION_TIMESTAMP;
-
-	if (fOptions & FLAG_OPTION_TIMESTAMP) {
+	if (fFlags & FLAG_OPTION_TIMESTAMP) {
 		tcp_sequence sequence(segment.sequence);
 
-		if (!checkSequence || (fLastAcknowledgeSent >= sequence
+		if ((fLastAcknowledgeSent >= sequence
 				&& fLastAcknowledgeSent < (sequence + segmentLength)))
 			fReceivedTSval = segment.TSval;
 	}
@@ -1579,15 +1496,78 @@ TCPEndpoint::_AddData(tcp_segment_header &segment, net_buffer *buffer)
 
 
 void
-TCPEndpoint::_CheckWindowScale(tcp_segment_header &segment)
+TCPEndpoint::_PrepareReceivePath(TCPEndpoint *parent,
+	tcp_segment_header &segment)
 {
-	if (segment.has_window_shift) {
-		fFlags |= FLAG_OPTION_WINDOW_SCALE;
-		fSendWindowShift = segment.window_shift;
-	} else {
-		fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
-		fReceiveWindowShift = 0;
+	fInitialReceiveSequence = segment.sequence;
+
+	// count the received SYN
+	segment.sequence++;
+
+	if (parent == NULL)
+		fSendUnacknowledged = segment.acknowledge;
+	fReceiveNext = segment.sequence;
+	fReceiveQueue.SetInitialSequence(segment.sequence);
+
+	if (parent) {
+		fOptions = parent->fOptions;
+		fAcceptSemaphore = parent->fAcceptSemaphore;
 	}
+
+	if ((fOptions & TCP_NOOPT) == 0) {
+		if (segment.max_segment_size > 0)
+			fSendMaxSegmentSize = segment.max_segment_size;
+
+		if (segment.has_window_shift) {
+			fFlags |= FLAG_OPTION_WINDOW_SCALE;
+			fSendWindowShift = segment.window_shift;
+		} else {
+			fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
+			fReceiveWindowShift = 0;
+		}
+
+		if (segment.has_timestamps)
+			fFlags |= FLAG_OPTION_TIMESTAMP;
+		else
+			fFlags &= ~FLAG_OPTION_TIMESTAMP;
+	}
+}
+
+
+status_t
+TCPEndpoint::_PrepareSendPath(const sockaddr *peer)
+{
+	if (fRoute == NULL) {
+		fRoute = gDatalinkModule->get_route(Domain(), peer);
+		if (fRoute == NULL)
+			return ENETUNREACH;
+	}
+
+	// make sure connection does not already exist
+	status_t status = fManager->SetConnection(this,
+		(sockaddr *)&socket->address, peer, fRoute->interface->address);
+	if (status < B_OK)
+		return status;
+
+	fInitialSendSequence = system_time() >> 4;
+	fSendNext = fInitialSendSequence;
+	fSendUnacknowledged = fInitialSendSequence;
+	fSendMax = fInitialSendSequence;
+
+	// we are counting the SYN here
+	fSendQueue.SetInitialSequence(fSendNext + 1);
+
+	fReceiveMaxSegmentSize = _GetMSS(peer);
+
+	// Compute the window shift we advertise to our peer - if it doesn't support
+	// this option, this will be reset to 0 (when its SYN is received)
+	fReceiveWindowShift = 0;
+	while (fReceiveWindowShift < TCP_MAX_WINDOW_SHIFT
+		&& (0xffffUL << fReceiveWindowShift) < socket->receive.buffer_size) {
+		fReceiveWindowShift++;
+	}
+
+	return B_OK;
 }
 
 
