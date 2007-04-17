@@ -1037,13 +1037,11 @@ TCPEndpoint::_SendQueued(bool force)
 	}
 
 	uint32 segmentLength = min_c((uint32)length, fSendMaxSegmentSize);
-	if (tcp_sequence(fSendNext + segmentLength) > fSendUnacknowledged + available) {
-		// we'll still have data in the queue after the next write, so remove the FIN
-		segment.flags &= ~TCP_FLAG_FINISH;
-	}
+
+	bool wantsFinish = segment.flags & TCP_FLAG_FINISH;
+	segment.flags &= ~TCP_FLAG_FINISH;
 
 	size_t availableBytes = fReceiveQueue.Free();
-
 	if (fFlags & FLAG_OPTION_WINDOW_SCALE)
 		segment.advertised_window = availableBytes >> fReceiveWindowShift;
 	else
@@ -1054,7 +1052,8 @@ TCPEndpoint::_SendQueued(bool force)
 
 	while (true) {
 		// Determine if we should really send this segment
-		if (!force && !_ShouldSendSegment(segment, segmentLength, outstandingAcknowledge)) {
+		if (!force && !wantsFinish && !_ShouldSendSegment(segment,
+			segmentLength, outstandingAcknowledge)) {
 			if (fSendQueue.Available()
 				&& !gStackModule->is_timer_active(&fPersistTimer)
 				&& !gStackModule->is_timer_active(&fRetransmitTimer))
@@ -1078,9 +1077,11 @@ TCPEndpoint::_SendQueued(bool force)
 		AddressModule()->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
 
 		uint32 size = buffer->size;
-		if (length > 0 && fSendNext + segmentLength == fSendQueue.LastSequence()) {
-			// if we've emptied our send queue, set the PUSH flag
-			segment.flags |= TCP_FLAG_PUSH;
+		if (fSendNext + segmentLength == fSendQueue.LastSequence()) {
+			if (wantsFinish)
+				segment.flags |= TCP_FLAG_FINISH;
+			if (length > 0)
+				segment.flags |= TCP_FLAG_PUSH;
 		}
 
 		segment.sequence = fSendNext;
@@ -1351,8 +1352,6 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 					gStackModule->set_timer(&fRetransmitTimer, 1000000LL);
 			}
 
-			_Acknowledged(segment.acknowledge);
-
 			if (segment.acknowledge > fSendQueue.LastSequence()
 					&& fState > ESTABLISHED) {
 				TRACE("Receive(): FIN has been acknowledged!");
@@ -1364,7 +1363,7 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 					case CLOSING:
 						fState = TIME_WAIT;
 						_EnterTimeWait();
-						break;
+						return DROP;
 					case WAIT_FOR_FINISH_ACKNOWLEDGE:
 						fState = CLOSED;
 						break;
@@ -1373,6 +1372,9 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 						break;
 				}
 			}
+
+			if (fState != CLOSED)
+				_Acknowledged(segment.acknowledge);
 		}
 	}
 
@@ -1408,7 +1410,8 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 			// FIN implies PSH
 			fReceiveQueue.SetPushPointer();
 
-			// RFC 793 states that we must send an ACK to FIN
+			// we'll reply immediatly to the FIN if we are not
+			// transitioning to TIME WAIT so we immediatly ACK it.
 			action |= IMMEDIATE_ACKNOWLEDGE;
 
 			// other side is closing connection; change states
