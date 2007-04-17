@@ -102,6 +102,7 @@ class TCPEndpoint : public net_protocol {
 		void _MarkEstablished();
 		status_t _WaitForEstablished(RecursiveLocker &lock, bigtime_t timeout);
 		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
+		void _CheckWindowScale(tcp_segment_header &segment);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);

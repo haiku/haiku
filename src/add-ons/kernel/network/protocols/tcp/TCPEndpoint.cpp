@@ -802,13 +802,7 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 			fSendMaxSegmentSize = segment.max_segment_size;
 		else
 			fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
-		if (segment.has_window_shift) {
-			fFlags |= FLAG_OPTION_WINDOW_SCALE;
-			fSendWindowShift = segment.window_shift;
-		} else {
-			fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
-			fReceiveWindowShift = 0;
-		}
+		_CheckWindowScale(segment);
 	}
 
 	_UpdateTimestamps(segment, 0, false);
@@ -859,13 +853,8 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *bu
 		fSendMaxSegmentSize = segment.max_segment_size;
 	else
 		fReceiveMaxSegmentSize = TCP_DEFAULT_MAX_SEGMENT_SIZE;
-	if (segment.has_window_shift) {
-		fFlags |= FLAG_OPTION_WINDOW_SCALE;
-		fSendWindowShift = segment.window_shift;
-	} else {
-		fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
-		fReceiveWindowShift = 0;
-	}
+
+	_CheckWindowScale(segment);
 
 	if (segment.flags & TCP_FLAG_ACKNOWLEDGE) {
 		_MarkEstablished();
@@ -1394,8 +1383,8 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0) {
 		// process acknowledged data
 		if (fState == SYNCHRONIZE_RECEIVED) {
-			// TODO: window scaling!
 			_MarkEstablished();
+			_CheckWindowScale(segment);
 		}
 
 		if (fSendMax < segment.acknowledge || fState == TIME_WAIT)
@@ -1586,6 +1575,19 @@ TCPEndpoint::_AddData(tcp_segment_header &segment, net_buffer *buffer)
 
 	if (segment.flags & TCP_FLAG_PUSH)
 		fReceiveQueue.SetPushPointer();
+}
+
+
+void
+TCPEndpoint::_CheckWindowScale(tcp_segment_header &segment)
+{
+	if (segment.has_window_shift) {
+		fFlags |= FLAG_OPTION_WINDOW_SCALE;
+		fSendWindowShift = segment.window_shift;
+	} else {
+		fFlags &= ~FLAG_OPTION_WINDOW_SCALE;
+		fReceiveWindowShift = 0;
+	}
 }
 
 
