@@ -678,6 +678,7 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 
 ServerPicture::~ServerPicture()
 {
+	gTokenSpace.RemoveToken(fToken);
 }
 
 
