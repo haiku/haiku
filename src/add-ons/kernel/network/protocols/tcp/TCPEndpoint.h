@@ -102,9 +102,10 @@ class TCPEndpoint : public net_protocol {
 		void _MarkEstablished();
 		status_t _WaitForEstablished(RecursiveLocker &lock, bigtime_t timeout);
 		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
-		void _PrepareReceivePath(TCPEndpoint *parent,
-			tcp_segment_header &segment);
+		void _PrepareReceivePath(tcp_segment_header &segment);
 		status_t _PrepareSendPath(const sockaddr *peer);
+		void _Acknowledged(tcp_sequence acknowledge);
+		void _Retransmit();
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
