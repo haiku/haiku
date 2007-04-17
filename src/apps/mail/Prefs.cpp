@@ -304,10 +304,9 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 
 TPrefsWindow::~TPrefsWindow()
 {
-	BMessage	msg(WINDOW_CLOSED);
-
 	prefs_window = Frame().LeftTop();
 
+	BMessage msg(WINDOW_CLOSED);
 	msg.AddInt32("kind", PREFS_WINDOW);
 	be_app->PostMessage(&msg);
 }
@@ -331,8 +330,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 	BMenuItem	*item;
 	BMessage	message;
 
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case P_OK:
 			if (strcmp(fReplyPreamble->Text(), *fNewPreamble))
 			{
@@ -356,19 +354,19 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 				|| old_size != new_size)
 			{
 				fNewFont->SetFamilyAndStyle(old_family, old_style);
-				if (revert)
-				{
+				if (revert) {
 					sprintf(label, "%s %s", old_family, old_style);
 					item = fFontMenu->FindItem(label);
-					item->SetMarked(true);
+					if (item != NULL)
+						item->SetMarked(true);
 				}
-			
+
 				fNewFont->SetSize(old_size);
-				if (revert)
-				{
+				if (revert) {
 					sprintf(label, "%ld", old_size);
 					item = fSizeMenu->FindItem(label);
-					item->SetMarked(true);
+					if (item != NULL)
+						item->SetMarked(true);
 				}
 				message.what = M_FONT;
 				be_app->PostMessage(&message);
@@ -376,8 +374,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			*fNewWrap = fWrap;
 			*fNewAttachAttributes = fAttachAttributes;
 
-			if (strcmp(fSignature, *fNewSignature))
-			{
+			if (strcmp(fSignature, *fNewSignature)) {
 				free(*fNewSignature);
 				*fNewSignature = (char *)malloc(strlen(fSignature) + 1);
 				strcpy(*fNewSignature, fSignature);
@@ -390,17 +387,15 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 
 			be_app->PostMessage(PREFS_CHANGED);
 
-			if (revert)
-			{
-				for (int i = fAccountMenu->CountItems();i-- > 0;)
-				{
+			if (revert) {
+				for (int i = fAccountMenu->CountItems();i-- > 0;) {
 					if (BMenuItem *item = fAccountMenu->ItemAt(i))
 						if (item->Message()->FindInt32("id") == *(int32 *)&fAccount)
 							item->SetMarked(true);
 				}
 
-				strcpy(label,fReplyTo == ACCOUNT_USE_DEFAULT ? REPLYTO_USE_DEFAULT_TEXT
-															 : REPLYTO_FROM_MAIL_TEXT);
+				strcpy(label,fReplyTo == ACCOUNT_USE_DEFAULT
+					? REPLYTO_USE_DEFAULT_TEXT : REPLYTO_FROM_MAIL_TEXT);
 				if ((item = fReplyToMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -408,7 +403,8 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 				if ((item = fWrapMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
-				strcpy(label, fAttachAttributes ? ATTRIBUTE_ON_TEXT : ATTRIBUTE_OFF_TEXT);
+				strcpy(label, fAttachAttributes
+					? ATTRIBUTE_ON_TEXT : ATTRIBUTE_OFF_TEXT);
 				if ((item = fAttachAttributesMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -426,12 +422,12 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 				uint32 index = 0;
 				while ((item = fEncodingMenu->ItemAt(index++)) != NULL) {
 					BMessage * message = item->Message();
-					if (message == NULL) {
+					if (message == NULL)
 						continue;
-					}
+
 					int32 encoding;
-					if ((message->FindInt32("encoding", &encoding) == B_OK) &&
-					    ((uint32)encoding == *fNewEncoding)) {
+					if (message->FindInt32("encoding", &encoding) == B_OK
+						&& (uint32)encoding == *fNewEncoding) {
 						item->SetMarked(true);
 						break;
 					}
@@ -444,8 +440,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 				strcpy(label, fSpellCheckStartOn ? "On" : "Off");
 				if ((item = fSpellCheckStartOnMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
-			}
-			else
+			} else
 				Quit();
 			break;
 
@@ -453,8 +448,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			family = NULL;
 			style = NULL;
 			int32 family_menu_index;
-			if (msg->FindString("font", &family) == B_OK)
-			{
+			if (msg->FindString("font", &family) == B_OK) {
 				msg->FindString("style", &style);
 				fNewFont->SetFamilyAndStyle(family, style);
 				message.what = M_FONT;
@@ -469,8 +463,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 		case P_SIZE:
 			old_size = (int32) fNewFont->Size();
 			msg->FindInt32("size", &new_size);
-			if (old_size != new_size)
-			{
+			if (old_size != new_size) {
 				fNewFont->SetSize(new_size);
 				message.what = M_FONT;
 				be_app->PostMessage(&message);
