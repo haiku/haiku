@@ -1636,7 +1636,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	// TODO: Cleanup.
 	
 	BPoint result;
-	int32 textLength = fText->Length();
+	const int32 textLength = fText->Length();
 	int32 lineNum = LineAt(inOffset);
 	STELine* line = (*fLines)[lineNum];
 	float height = 0;
@@ -1662,11 +1662,8 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	
 		// special case: go down one line if inOffset is a newline
 		if (inOffset == textLength && (*fText)[inOffset - 1] == B_ENTER) {
-			float ascent, descent;
-			StyledWidthUTF8Safe(inOffset, 1, &ascent, &descent);
-			
 			result.y += height;
-			height = ascent + descent;
+			height = LineHeight(CountLines() - 1);
 	
 		} else {
 			int32 offset = line->offset;
@@ -1894,7 +1891,7 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	
 	float height = (*fLines)[endLine + 1]->origin - (*fLines)[startLine]->origin;
 				
-	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == B_ENTER)
+	if (startLine != endLine && endLine == numLines - 1 && (*fText)[fText->Length() - 1] == B_ENTER)
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
 	
 	return ceilf(height);
@@ -3363,18 +3360,13 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 			bool foundNewline = done;
 			done = true;
 			int32 pos = delta - 1;
-			if ((*fText)[offset + pos] != B_SPACE &&
-				(*fText)[offset + pos] != B_TAB &&
-				(*fText)[offset + pos] != B_ENTER)
+			if (!CanEndLine(offset + pos))
 				break;
 			
 			strWidth -= (deltaWidth + tabWidth);
 			
 			for ( ; ((offset + pos) > offset); pos--) {
-				uchar theChar = (*fText)[offset + pos];
-				if (theChar != B_SPACE &&
-					theChar != B_TAB &&
-					theChar != B_ENTER)
+				if (!CanEndLine(offset + pos))
 					break;
 			}
 
