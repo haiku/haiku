@@ -63,6 +63,7 @@ enum {
 	MSG_OPEN_RESIZER_WINDOW		= 'mORS',
 	MSG_RESIZER_WINDOW_QUIT		= 'mRSQ',
 	MSG_RESIZE					= 'mRSZ',
+	kMsgProgressStatusUpdate	= 'SIup'
 };
 
 #endif	// SHOW_IMAGE_CONSTANTS_H

@@ -5,6 +5,7 @@
 
 
 #include "ProgressWindow.h"
+#include "ShowImageConstants.h"
 
 #include <Autolock.h>
 #include <MessageRunner.h>
@@ -15,7 +16,6 @@
 
 
 static const uint32 kMsgShow = 'show';
-static const uint32 kMsgStatusUpdate = 'SIup';
 
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow)
@@ -92,7 +92,7 @@ ProgressWindow::MessageReceived(BMessage *message)
 			fRetrievedShow = true;
 			break;
 
-		case kMsgStatusUpdate:
+		case kMsgProgressStatusUpdate:
 			float percent;
 			if (message->FindFloat("percent", &percent) == B_OK)
 				fStatusBar->Update(percent - fStatusBar->CurrentValue());

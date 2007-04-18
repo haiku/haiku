@@ -8,6 +8,7 @@
 #include "ConfigView.h"
 #include "RAW.h"
 
+#include <Messenger.h>
 #include <TranslatorRoster.h>
 
 #include <stdlib.h>
@@ -32,12 +33,16 @@ class FreeAllocation {
 		void*	fBuffer;
 };
 
+struct progress_data {
+	BMessenger	monitor;
+	BMessage	message;
+};
+
 // Extensions that ShowImage supports
 const char* kDocumentCount = "/documentCount";
 const char* kDocumentIndex = "/documentIndex";
 const char* kProgressMonitor = "/progressMonitor";
-
-const uint32 kMsgProgressMonitorUpdate = 'SIup';
+const char* kProgressMessage = "/progressMessage";
 
 // The input formats that this translator supports.
 translation_format sInputFormats[] = {
@@ -158,16 +163,16 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 
 /*static*/ void
 RAWTranslator::_ProgressMonitor(const char* message, float percentage,
-	void* data)
+	void* _data)
 {
-	BMessenger& messenger = *(BMessenger*)data;
+	progress_data& data = *(progress_data*)_data;
 
-	BMessage update(kMsgProgressMonitorUpdate);
+	BMessage update(data.message);
 	update.AddString("message", message);
 	update.AddFloat("percent", percentage);
 	update.AddInt64("time", system_time());
 
-	messenger.SendMessage(&update);
+	data.monitor.SendMessage(&update);
 }
 
 
@@ -184,14 +189,19 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	DCRaw raw(*source);
 
 	bool headerOnly = false;
+
+	progress_data progressData;	
 	BMessenger monitor;
 
 	if (settings != NULL) {
 		settings->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
 
-		if (settings->FindMessenger(kProgressMonitor, &monitor) == B_OK) {
-			raw.SetProgressMonitor(&_ProgressMonitor, &monitor);
-			_ProgressMonitor("Reading Image Data", 0, &monitor);
+		if (settings->FindMessenger(kProgressMonitor,
+				&progressData.monitor) == B_OK
+			&& settings->FindMessage(kProgressMessage,
+				&progressData.message) == B_OK) {
+			raw.SetProgressMonitor(&_ProgressMonitor, &progressData);
+			_ProgressMonitor("Reading Image Data", 0, &progressData);
 		}
 	}
 

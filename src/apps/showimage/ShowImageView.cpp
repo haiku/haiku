@@ -494,7 +494,9 @@ ShowImageView::SetImage(const entry_ref *ref)
 	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
 		return B_ERROR;
 
-	if (ioExtension.AddMessenger("/progressMonitor", fProgressWindow) == B_OK)
+	BMessage progress(kMsgProgressStatusUpdate);
+	if (ioExtension.AddMessenger("/progressMonitor", fProgressWindow) == B_OK
+		&& ioExtension.AddMessage("/progressMessage", &progress) == B_OK)
 		fProgressWindow->Start();
 
 	// Translate image data and create a new ShowImage window
@@ -1228,7 +1230,7 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 	}
 
 	BBitmapStream stream(bitmap);
-	
+
 	bool loop = true;
 	while (loop) {
 		BTranslatorRoster *roster = BTranslatorRoster::Default();
