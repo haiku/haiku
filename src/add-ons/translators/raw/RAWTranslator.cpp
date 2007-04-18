@@ -195,6 +195,10 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 
 	if (settings != NULL) {
 		settings->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
+		
+		bool half;
+		if (settings->FindBool("raw:half_size", &half) == B_OK && half)
+			raw.SetHalfSize(true);
 
 		if (settings->FindMessenger(kProgressMonitor,
 				&progressData.monitor) == B_OK
