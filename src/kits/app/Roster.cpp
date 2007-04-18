@@ -1923,9 +1923,9 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 
 	// send "on launch" messages
 	if (error == B_OK) {
-		// If the target app is B_ARGV_ONLY almost no messages are sent to it.
-		// More precisely, the launched app gets at least B_ARGV_RECEIVED and
-		// B_READY_TO_RUN, an already running app gets nothing.
+		// If the target app is B_ARGV_ONLY, only if it is newly launched
+		// messages are sent to it (namely B_ARGV_RECEIVED and B_READY_TO_RUN).
+		// An already running B_ARGV_ONLY app won't get any messages.
 		bool argvOnly = (appFlags & B_ARGV_ONLY)
 			|| (alreadyRunning && (otherAppFlags & B_ARGV_ONLY));
 		const BList *_messageList = (argvOnly ? NULL : messageList);
@@ -1935,7 +1935,7 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 			|| argVector.Count() > 1 ? NULL : docRef;
 		if (!(argvOnly && alreadyRunning)) {
 			_SendToRunning(team, argVector.Count(), argVector.Args(),
-				_messageList, _ref, !alreadyRunning);
+				_messageList, _ref, alreadyRunning);
 		}
 	}
 
@@ -2357,8 +2357,9 @@ BRoster::_SniffFile(const entry_ref *file, BNodeInfo *nodeInfo,
 	\param messageList List of BMessages to be sent to the target. May be
 		   \c NULL or empty.
 	\param ref entry_ref to be sent to the target. May be \c NULL.
-	\param readyToRun \c true, if a \c B_READY_TO_RUN message shall be sent,
-		   \c false otherwise.
+	\param alreadyRunning \c true, if the target app is not newly launched,
+		   but was already running, \c false otherwise (a \c B_READY_TO_RUN
+		   message will be sent in this case).
 	\return
 	- \c B_OK: Everything went fine.
 	- an error code otherwise
@@ -2366,7 +2367,7 @@ BRoster::_SniffFile(const entry_ref *file, BNodeInfo *nodeInfo,
 status_t
 BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 	const BList *messageList, const entry_ref *ref,
-	bool readyToRun) const
+	bool alreadyRunning) const
 {
 	status_t error = B_OK;
 	// Construct a messenger to the app: We can't use the public constructor,
@@ -2375,7 +2376,9 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 	error = GetRunningAppInfo(team, &info);
 	if (error == B_OK) {
 		BMessenger messenger;
-		BMessenger::Private(messenger).SetTo(team, info.port, B_PREFERRED_TOKEN);
+		BMessenger::Private(messenger).SetTo(team, info.port,
+			B_PREFERRED_TOKEN);
+
 		// send messages from the list
 		if (messageList) {
 			for (int32 i = 0;
@@ -2384,22 +2387,26 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 				messenger.SendMessage(message);
 			}
 		}
-		// send B_ARGV_RECEIVED
+
+		// send B_ARGV_RECEIVED or B_SILENT_RELAUNCH (if already running)
 		if (args && argc > 1) {
 			BMessage message(B_ARGV_RECEIVED);
 			message.AddInt32("argc", argc);
 			for (int32 i = 0; i < argc; i++)
 				message.AddString("argv", args[i]);
 			messenger.SendMessage(&message);
-		}
+		} else if (alreadyRunning)
+			messenger.SendMessage(B_SILENT_RELAUNCH);
+
 		// send B_REFS_RECEIVED
 		if (ref) {
 			BMessage message(B_REFS_RECEIVED);
 			message.AddRef("refs", ref);
 			messenger.SendMessage(&message);
 		}
+
 		// send B_READY_TO_RUN
-		if (readyToRun)
+		if (!alreadyRunning)
 			messenger.SendMessage(B_READY_TO_RUN);
 	}
 	return error;
