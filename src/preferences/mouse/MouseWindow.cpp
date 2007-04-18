@@ -69,15 +69,14 @@ MouseWindow::MouseWindow(BRect _rect)
 	// check if the window is on screen
 
 	rect = BScreen().Frame();
-	rect.right -= 20;
-	rect.bottom -= 20;
+	rect.InsetBySelf(20, 20);
 
 	BPoint position = fSettings.WindowPosition();
-	if (!rect.Contains(BRect(position, 
-					Bounds().OffsetBySelf(position).RightBottom()))) {
+	BRect windowFrame = Frame().OffsetToSelf(position);
+	if (!rect.Contains(windowFrame)) {
 		// center window on screen as it doesn't fit on the saved position
-		position.x = (rect.Width() - Bounds().Width()) / 2;
-		position.y = (rect.Height() - Bounds().Height()) / 2;
+		position.x = (rect.Width() - windowFrame.Width()) / 2;
+		position.y = (rect.Height() - windowFrame.Height()) / 2;
 		if (position.x < 0)
 			position.x = 0;
 		if (position.y < 0)
