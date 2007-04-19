@@ -65,6 +65,8 @@ Stack::Stack()
 		TRACE(("USB Stack: module %s successfully loaded\n", moduleName));
 	}
 
+	close_module_list(moduleList);
+
 	if (fBusManagers.Count() == 0) {
 		TRACE_ERROR(("USB Stack: no bus managers available\n"));
 		return;
