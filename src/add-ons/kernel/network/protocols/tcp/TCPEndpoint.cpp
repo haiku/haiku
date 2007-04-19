@@ -46,7 +46,11 @@
 // SACK, Selective Acknowledgment - RFC 2018, RFC 2883, RFC 3517
 // Forward RTO-Recovery, RFC 4138
 
+#define PrintAddress(address) \
+	AddressString(Domain(), (const sockaddr *)(address), true).Data()
+
 //#define TRACE_TCP
+//#define PROBE_TCP
 
 #ifdef TRACE_TCP
 // the space before ', ##args' is important in order for this to work with cpp 2.95
@@ -54,6 +58,18 @@
 		system_time(), this, name_for_state(fState) , ##args)
 #else
 #	define TRACE(args...)			do { } while (0)
+#endif
+
+#ifdef PROBE_TCP
+#	define PROBE(buffer, window) \
+	dprintf("TCP PROBE %llu %s %s %ld %lu %lu %lu %lu %lu %lu %lu %lu %llu\n", \
+		system_time(), PrintAddress(&buffer->source), \
+		PrintAddress(&buffer->destination), buffer->size, (uint32)fSendNext, \
+		(uint32)fSendUnacknowledged, fCongestionWindow, fSlowStartThreshold, \
+		window, fSendWindow, (uint32)(fSendMax - fSendUnacknowledged), \
+		fSendQueue.Used(), fRetransmitTimeout)
+#else
+#	define PROBE(buffer, window)	do { } while (0)
 #endif
 
 // Initial estimate for packet round trip time (RTT)
@@ -201,7 +217,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fSendWindowShift(0),
 	fReceiveWindowShift(0),
 	fSendUnacknowledged(0),
-	fSendNext(fSendUnacknowledged),
+	fSendNext(0),
+	fSendMax(0),
 	fSendWindow(0),
 	fSendMaxWindow(0),
 	fSendMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
@@ -214,8 +231,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fReceiveWindow(socket->receive.buffer_size),
 	fReceiveMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fReceiveQueue(socket->receive.buffer_size),
-	fRoundTripTime(0),
-	fRoundTripDeviation(0),
+	fRoundTripTime(TCP_INITIAL_RTT / kTimestampFactor),
+	fRoundTripDeviation(TCP_INITIAL_RTT / kTimestampFactor),
 	fRetransmitTimeout(TCP_INITIAL_RTT),
 	fReceivedTSval(0),
 	fCongestionWindow(0),
@@ -356,8 +373,7 @@ TCPEndpoint::Free()
 status_t
 TCPEndpoint::Connect(const sockaddr *address)
 {
-	TRACE("Connect() on address %s",
-		AddressString(Domain(), address, true).Data());
+	TRACE("Connect() on address %s", PrintAddress(address));
 
 	RecursiveLocker locker(fLock);
 
@@ -444,8 +460,7 @@ TCPEndpoint::Bind(sockaddr *address)
 
 	RecursiveLocker lock(fLock);
 
-	TRACE("Bind() on address %s",
-		  AddressString(Domain(), address, true).Data());
+	TRACE("Bind() on address %s", PrintAddress(address));
 
 	if (fState != CLOSED)
 		return EISCONN;
@@ -460,9 +475,8 @@ TCPEndpoint::Bind(sockaddr *address)
 	else
 		status = fManager->Bind(this);
 
-	TRACE("  Bind() bound to %s (status %i)",
-		  AddressString(Domain(), (sockaddr *)&socket->address, true).Data(),
-		  (int)status);
+	TRACE("  Bind() bound to %s (status %i)", PrintAddress(&socket->address),
+	  (int)status);
 
 	return status;
 }
@@ -849,9 +863,8 @@ TCPEndpoint::SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 	RecursiveLocker locker(fLock);
 
 	TRACE("SegmentReceived(): buffer %p (%lu bytes) address %s to %s",
-		buffer, buffer->size, AddressString(Domain(),
-		(sockaddr *)&buffer->source, true).Data(), AddressString(Domain(),
-		(sockaddr *)&buffer->destination, true).Data());
+		buffer, buffer->size, PrintAddress(&buffer->source),
+		PrintAddress(&buffer->destination));
 	TRACE("                   flags 0x%x, seq %lu, ack %lu, wnd %lu",
 		segment.flags, segment.sequence, segment.acknowledge,
 		(uint32)segment.advertised_window << fSendWindowShift);
@@ -1063,23 +1076,23 @@ TCPEndpoint::_SendQueued(bool force)
 	if (fCongestionWindow > 0)
 		sendWindow = min_c(sendWindow, fCongestionWindow);
 
+	// a TCP may not send more data to the network than the
+	// currently unacknowledged sequence (SND.UNA) plus the
+	// calculated send window.
+
+	uint32 flightSize = fSendMax - fSendUnacknowledged;
+	if (flightSize > sendWindow) {
+		sendWindow = 0;
+		// TODO enter persist state? try to get a window update.
+	} else
+		sendWindow -= flightSize;
+
 	if (force && sendWindow == 0 && fSendNext <= fSendQueue.LastSequence()) {
 		// send one byte of data to ask for a window update
 		// (triggered by the persist timer)
 		sendWindow = 1;
 	}
 
-	// a TCP may not send more data to the network than the
-	// currently unacknowledged sequence (SND.UNA) plus the
-	// calculated send window.
-
-	if ((fSendNext - fSendUnacknowledged) > sendWindow) {
-		sendWindow = 0;
-		// TODO enter persist state? try to get a window update.
-	} else
-		sendWindow -= (fSendNext - fSendUnacknowledged);
-
-	uint32 flightSize = fSendMax - fSendUnacknowledged;
 	uint32 length = min_c(fSendQueue.Available(fSendNext), sendWindow);
 	tcp_sequence previousSendNext = fSendNext;
 
@@ -1124,13 +1137,15 @@ TCPEndpoint::_SendQueued(bool force)
 		segment.sequence = fSendNext;
 
 		TRACE("SendQueued(): buffer %p (%lu bytes) address %s to %s",
-			buffer, buffer->size, AddressString(Domain(),
-			(sockaddr *)&buffer->source, true).Data(), AddressString(Domain(),
-			(sockaddr *)&buffer->destination, true).Data());
+			buffer, buffer->size, PrintAddress(&buffer->source),
+			PrintAddress(&buffer->destination));
 		TRACE("              flags 0x%x, seq %lu, ack %lu, rwnd %hu, cwnd %lu"
 			  ", ssthresh %lu", segment.flags, segment.sequence,
 			  segment.acknowledge, segment.advertised_window,
 			  fCongestionWindow, fSlowStartThreshold);
+
+		PROBE(buffer, sendWindow);
+		sendWindow -= buffer->size;
 
 		status = add_tcp_header(AddressModule(), segment, buffer);
 		if (status != B_OK) {
