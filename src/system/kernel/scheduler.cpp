@@ -189,12 +189,14 @@ scheduler_reschedule(void)
 	} else {
 		// select next thread from the run queue
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+#if 0
 			if (oldThread == nextThread && nextThread->was_yielded) {
 				// ignore threads that called thread_yield() once
 				nextThread->was_yielded = false;
 				prevThread = nextThread;
 				nextThread = nextThread->queue_next;
 			}
+#endif
 
 			// always extract real time threads
 			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
@@ -205,7 +207,7 @@ scheduler_reschedule(void)
 				break;
 
 			// skip normal threads sometimes (roughly 16%)
-			if (_rand() > 0x1500)
+			if (_rand() > 0x2000)
 				break;
 
 			// skip until next lower priority

@@ -1307,7 +1307,8 @@ thread_yield(void)
 	GRAB_THREAD_LOCK();
 
 	// mark the thread as yielded, so it will not be scheduled next
-	thread->was_yielded = true;
+	//thread->was_yielded = true;
+	thread->next_priority = B_LOWEST_ACTIVE_PRIORITY;
 	scheduler_reschedule();
 
 	RELEASE_THREAD_LOCK();
