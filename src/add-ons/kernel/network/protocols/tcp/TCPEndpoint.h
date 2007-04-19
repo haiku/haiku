@@ -85,8 +85,9 @@ class TCPEndpoint : public net_protocol {
 		void _EnterTimeWait();
 		uint8 _CurrentFlags();
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
-			bool outstandingAcknowledge);
+			uint32 segmentMaxSize, uint32 flightSize);
 		status_t _SendQueued(bool force = false);
+		status_t _SendQueued(tcp_sequence sendNext);
 		int _GetMSS(const struct sockaddr *) const;
 		status_t _ShutdownEgress(bool closing);
 		ssize_t _AvailableData() const;
@@ -104,8 +105,11 @@ class TCPEndpoint : public net_protocol {
 		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
 		void _PrepareReceivePath(tcp_segment_header &segment);
 		status_t _PrepareSendPath(const sockaddr *peer);
-		void _Acknowledged(tcp_sequence acknowledge);
+		void _Acknowledged(tcp_segment_header &segment);
 		void _Retransmit();
+		void _UpdateSRTT(int32 roundTripTime);
+		void _ResetSlowStart();
+		void _DuplicateAcknowledge(tcp_segment_header &segment);
 
 		static void _TimeWaitTimer(net_timer *timer, void *data);
 		static void _RetransmitTimer(net_timer *timer, void *data);
@@ -150,12 +154,8 @@ class TCPEndpoint : public net_protocol {
 
 		// round trip time and retransmit timeout computation
 		int32			fRoundTripTime;
-		int32			fRetransmitTimeoutBase;
-		bigtime_t		fRetransmitTimeout;
 		int32			fRoundTripDeviation;
-		bigtime_t		fTrackingTimeStamp;
-		uint32			fTrackingSequence;
-		bool			fTracking;
+		bigtime_t		fRetransmitTimeout;
 
 		uint32			fReceivedTSval;
 

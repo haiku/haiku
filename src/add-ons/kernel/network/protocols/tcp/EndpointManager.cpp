@@ -367,8 +367,7 @@ EndpointManager::ReplyWithReset(tcp_segment_header &segment,
 	AddressModule()->set_to((sockaddr *)&reply->destination,
 		(sockaddr *)&buffer->source);
 
-	tcp_segment_header outSegment;
-	outSegment.flags = TCP_FLAG_RESET;
+	tcp_segment_header outSegment(TCP_FLAG_RESET);
 	outSegment.sequence = 0;
 	outSegment.acknowledge = 0;
 	outSegment.advertised_window = 0;

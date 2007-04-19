@@ -130,8 +130,9 @@ enum tcp_option_kind {
 #define TCP_MAX_WINDOW_SHIFT	14
 
 struct tcp_segment_header {
-	tcp_segment_header()
+	tcp_segment_header(uint8 _flags)
 		:
+		flags(_flags),
 		window_shift(0),
 		max_segment_size(0),
 		has_window_shift(false),
@@ -176,6 +177,7 @@ extern net_stack_module_info *gStackModule;
 
 status_t add_tcp_header(net_address_module_info *addressModule,
 	tcp_segment_header &segment, net_buffer *buffer);
+size_t tcp_options_length(tcp_segment_header &segment);
 
 const char *name_for_state(tcp_state state);
 

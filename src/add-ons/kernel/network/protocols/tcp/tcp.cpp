@@ -205,6 +205,27 @@ add_tcp_header(net_address_module_info *addressModule,
 }
 
 
+size_t
+tcp_options_length(tcp_segment_header &segment)
+{
+	size_t length = 0;
+
+	if (segment.max_segment_size > 0)
+		length += 4;
+
+	if (segment.has_timestamps)
+		length += 12;
+
+	if (segment.has_window_shift)
+		length += 4;
+
+	if ((length & 3) == 0)
+		return length;
+
+	return (length + 3) & ~3;
+}
+
+
 void
 process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 {
@@ -525,12 +546,11 @@ tcp_receive_data(net_buffer *buffer)
 	//dump_tcp_header(header);
 	//gBufferModule->dump(buffer);
 
-	tcp_segment_header segment;
+	tcp_segment_header segment(header.flags);
 	segment.sequence = header.Sequence();
 	segment.acknowledge = header.Acknowledge();
 	segment.advertised_window = header.AdvertisedWindow();
 	segment.urgent_offset = header.UrgentOffset();
-	segment.flags = header.flags;
 	process_options(segment, buffer, headerLength - sizeof(tcp_header));
 
 	bufferHeader.Remove(headerLength);
