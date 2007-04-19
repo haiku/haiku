@@ -2,9 +2,6 @@
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include "TList.h"
-#include "TMap.h"
-#include "TStack.h"
 #include "DataExchange.h"
 
 #include <Message.h>
