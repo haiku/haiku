@@ -60,11 +60,15 @@ extern float	roundf(float value);
 #	define B_TRANSLATION_MAJOR_VERSION(v) (v >> 8)
 #	define B_TRANSLATION_MINOR_VERSION(v) ((v >> 4) & 0xf)
 #	define B_TRANSLATION_REVISION_VERSION(v) (v & 0xf)
-#endif	// HAIKU_TARGET_PLATFORM_HAIKU
+#	define B_LARGE_ICON_TYPE		'ICON'
+#	define B_MINI_ICON_TYPE			'MICN'
+#	define B_VECTOR_ICON_TYPE		'VICN'
+#	define B_BITMAP_NO_SERVER_LINK	0
+#endif	// HAIKU_TARGET_PLATFORM_LIBBE_TEST
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-#	define B_REDO 'REDO'
-#	define B_BAD_DATA	(B_NOT_ALLOWED + 1)
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
+#	define B_REDO					'REDO'
+#	define B_BAD_DATA				(B_NOT_ALLOWED + 1)
 #endif
 
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
