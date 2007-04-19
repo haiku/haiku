@@ -766,9 +766,11 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 		GRAB_THREAD_LOCK();
 		while ((thread = thread_dequeue(&releaseQueue)) != NULL) {
+#if 0
 			// temporarily place thread in a run queue with a higher priority to boost it up
 			thread->next_priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
 				thread->priority : thread->priority + 1;
+#endif
 			scheduler_enqueue_in_run_queue(thread);
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
