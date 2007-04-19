@@ -1,5 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2007, Jérôme Duval. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
 
