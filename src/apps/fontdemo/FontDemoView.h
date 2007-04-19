@@ -62,6 +62,7 @@ class FontDemoView : public BView {
 		float		fFontSize;
 		float 		fSpacing;
 		int8		fOutLineLevel;
+		drawing_mode	fDrawingMode;
 
 		BRegion 	fBoxRegion;
 		BFont 		fFont;

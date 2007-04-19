@@ -27,6 +27,7 @@ FontDemoView::FontDemoView(BRect rect)
 	fBufferView(NULL),
 	fString(NULL),
 	fOutLineLevel(0),
+	fDrawingMode(B_OP_COPY),
 	fBoundingBoxes(false),
 	fDrawShapes(false)
 {
@@ -76,6 +77,9 @@ FontDemoView::_DrawView(BView* view)
 {
 	if (!view)
 		return;
+		
+	view->SetDrawingMode(B_OP_COPY);
+			
 
 	BRect rect = view->Bounds();
 	view->SetHighColor(255, 255, 255);
@@ -152,12 +156,15 @@ FontDemoView::_DrawView(BView* view)
 			view->StrokeShape(fShapes[i]);
 		} else {
 			view->SetHighColor(0, 0, 0);
-			view->SetDrawingMode(B_OP_OVER);
+			view->SetDrawingMode(fDrawingMode);
 			view->DrawChar(fString[i], BPoint(xCoordArray[i], yCoordArray[i]));
 		}
 
 		if (BoundingBoxes() && !OutLineLevel()) {
-			view->SetHighColor(255, 0, 0);
+			if (i % 2)
+				view->SetHighColor(0, 255, 0);
+			else
+				view->SetHighColor(255, 0, 0);
 			view->SetDrawingMode(B_OP_COPY);
 			view->StrokeRect(boundBoxes[i]);
 		}
@@ -167,7 +174,7 @@ FontDemoView::_DrawView(BView* view)
 
 		xCoord += (escapementArray[i] /*+ escapeDeltas[i].nonspace + escapeDeltas[i].space*/)
 			* FontSize() + Spacing();
-		printf("xCoord %f\n", xCoord);
+		//printf("xCoord %f\n", xCoord);
 	}
 }
 
@@ -276,6 +283,14 @@ FontDemoView::MessageReceived(BMessage* msg)
 			bool aliased = false;
 			if (msg->FindBool("_aliased", &aliased) == B_OK) {
 				SetAntialiasing(aliased);
+				Invalidate(/*&fBoxRegion*/);
+			}
+			break;
+		}
+		
+		case DRAWINGMODE_CHANGED_MSG:
+		{
+			if (msg->FindInt32("_mode", (int32 *)&fDrawingMode) == B_OK) {
 				Invalidate(/*&fBoxRegion*/);
 			}
 			break;

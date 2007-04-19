@@ -40,6 +40,7 @@ ControlView::ControlView(BRect rect)
 	fBoundingboxesCheckBox(NULL),
 	fCyclingFontButton(NULL),
 	fFontFamilyMenu(NULL),
+	fDrawingModeMenu(NULL),
 	fCycleFonts(false),
 	fFontStyleindex(0)
 {
@@ -111,6 +112,51 @@ ControlView::AttachedToWindow()
 		new BMessage(ALIASING_MSG));
 	fAliasingCheckBox->SetValue(B_CONTROL_ON);
 	AddChild(fAliasingCheckBox);
+	
+	rect.OffsetBy(0.0, offsetX);
+	fDrawingModeMenu = new BMenu("drawingmodemenu");
+	
+	BMessage* drawingMsg = NULL;
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_COPY);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_COPY", drawingMsg));
+	fDrawingModeMenu->ItemAt(0)->SetMarked(true);
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_OVER);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_OVER", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_ERASE);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ERASE", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_INVERT);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_INVERT", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_ADD);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ADD", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_SUBTRACT);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_SUBTRACT", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_BLEND);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_BLEND", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_MIN);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_MIN", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_MAX);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_MAX", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_SELECT);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_SELECT", drawingMsg));
+	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
+	drawingMsg->AddInt32("_mode", B_OP_ALPHA);
+	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ALPHA", drawingMsg));
+	
+	fDrawingModeMenu->SetLabelFromMarked(true);
+	
+	BMenuField *drawingModeMenuField = new BMenuField(rect, "FontMenuField", "Drawing mode:", fDrawingModeMenu, true);
+	drawingModeMenuField->SetDivider(5+StringWidth("Drawing mode:"));
+	AddChild(drawingModeMenuField);
 
 	rect.OffsetBy(0.0, 22);
 	fBoundingboxesCheckBox = new BCheckBox(rect, "BoundingBoxes", "Bounding boxes",
@@ -327,7 +373,8 @@ void
 ControlView::SetTarget(BHandler* handler)
 {
 	delete fMessenger;
-	fMessenger = new BMessenger(handler); 	
+	fMessenger = new BMessenger(handler);
+	fDrawingModeMenu->SetTargetForItems(handler);
 }
 
 

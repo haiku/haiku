@@ -55,6 +55,7 @@ class ControlView : public BView {
 		BCheckBox*		fBoundingboxesCheckBox;
 		BButton*		fCyclingFontButton;
 		BMenu*			fFontFamilyMenu;
+		BMenu*			fDrawingModeMenu;
 		bool 			fCycleFonts;	
 		int32 			fFontStyleindex;
 };

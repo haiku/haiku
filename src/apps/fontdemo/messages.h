@@ -19,6 +19,7 @@ const uint32 CYCLING_FONTS_MSG 			= 'cycl';
 const uint32 CYCLING_FONTS_UPDATE_MSG 	= 'cycU';
 const uint32 FONTSTYLE_CHANGED_MSG		= 'fonS';
 const uint32 FONTFAMILY_CHANGED_MSG		= 'fonF';
+const uint32 DRAWINGMODE_CHANGED_MSG	= 'drmF';
 const uint32 TEXT_CHANGED_MSG 			= 'text';
 
 #endif	// MESSAGES_H
