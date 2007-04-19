@@ -331,7 +331,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert(string);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.haiku-os.org\n\n");
+	fCreditsView->Insert("haiku-os.org\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Team Leads:\n");
