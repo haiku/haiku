@@ -965,6 +965,12 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 void
 ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
+	if (!fVisible || !fWindow) {
+		fScrollingOffset.x += x;
+		fScrollingOffset.y += y;
+		return;
+	}
+
 	// blitting version, invalidates
 	// old contents
 
@@ -1412,13 +1418,13 @@ ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
 	if (!fVisible)
 		return;
 
-//	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 	IntRect screenBounds(Bounds());
 	ConvertToScreen(&screenBounds);
 	if (!region.Intersects((clipping_rect)screenBounds))
 		return;
 
-	link.Attach<int32>(fToken);
+	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
+		link.Attach<int32>(fToken);
 
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->AddTokensForLayersInRegion(link, region,
