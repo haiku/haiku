@@ -1,12 +1,11 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              DarkWyrm <bpmagic@columbus.rr.com>
- *              Jérôme Duval, jerome.duval@free.fr
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
-
 #ifndef _APPSERVER_PROTOCOL_
 #define _APPSERVER_PROTOCOL_
 
