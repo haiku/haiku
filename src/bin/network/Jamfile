@@ -11,6 +11,7 @@ SubInclude HAIKU_TOP src bin network netstat ;
 SubInclude HAIKU_TOP src bin network ping ;
 SubInclude HAIKU_TOP src bin network route ;
 SubInclude HAIKU_TOP src bin network tcpdump ;
+SubInclude HAIKU_TOP src bin network tcptester ;
 SubInclude HAIKU_TOP src bin network telnet ;
 SubInclude HAIKU_TOP src bin network telnetd ;
 SubInclude HAIKU_TOP src bin network traceroute ;

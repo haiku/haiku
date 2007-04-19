@@ -35,11 +35,11 @@ BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
 	query quit release renice rescan rlog rm rmattr rmindex rmdir roster route
 	safemode screen_blanker sed settype setversion setvolume seq sh shar
 	shutdown sleep sort split strace stty su sum sync sysinfo tac tail tar
-	tcpdump tee telnet telnetd test top touch tput tr traceroute translate true tsort
-	tty uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
-	uptime usb_dev_info uudecode uuencode vdir version vim waitfor wc wget
-	whoami xargs xres yes zdiff zforce zgrep zip zipcloak zipgrep zipnote
-	zipsplit zmore znew
+	tcpdump tcptester tee telnet telnetd test top touch tput tr traceroute
+	translate true tsort tty uname unchop unexpand unmount uniq unrar unshar
+	unzip unzipsfx <bin>updatedb uptime usb_dev_info uudecode uuencode vdir
+	version vim waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
+	zipcloak zipgrep zipnote zipsplit zmore znew
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Pulse ProcessController

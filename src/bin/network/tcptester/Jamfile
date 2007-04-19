@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src bin network tcptester ;
+
+BinCommand tcptester :
+	tcptester.cpp
+	: libnetwork.so
+;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
+	: tcptester ;
+
+HaikuInstall install-userland-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
+	: tcptester
+	: installed-userland-networking
+;
