@@ -236,49 +236,49 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 	uint8 optionsBuffer[32];
 	if (gBufferModule->direct_access(buffer, sizeof(tcp_header), size,
 			(void **)&option) != B_OK) {
-		if (size > 32) {
-			dprintf("options too large to take into account (%ld bytes)\n", size);
-			return;
-		}
+		if (size > 32)
+			panic("UNIMPLEMENTED: TCP option processing across data nodes");
 
 		gBufferModule->read(buffer, sizeof(tcp_header), optionsBuffer, size);
 		option = (tcp_option *)optionsBuffer;
 	}
 
 	while (size > 0) {
-		uint32 length = 1;
+		int32 length = -1;
+
 		switch (option->kind) {
 			case TCP_OPTION_END:
 			case TCP_OPTION_NOP:
+				length = 1;
 				break;
 			case TCP_OPTION_MAX_SEGMENT_SIZE:
-				segment.max_segment_size = ntohs(option->max_segment_size);
-				length = 4;
+				if (option->length == 4 && (size - 4) >= 0)
+					segment.max_segment_size = ntohs(option->max_segment_size);
 				break;
 			case TCP_OPTION_WINDOW_SHIFT:
-				segment.has_window_shift = true;
-				segment.window_shift = option->window_shift;
-				length = 3;
+				if (option->length == 3 && (size - 3) >= 0) {
+					segment.has_window_shift = true;
+					segment.window_shift = option->window_shift;
+				}
 				break;
 			case TCP_OPTION_TIMESTAMP:
-				segment.has_timestamps = true;
-				segment.TSval = option->timestamp.TSval;
-				segment.TSecr = ntohl(option->timestamp.TSecr);
-				length = 10;
+				if (option->length == 10 && (size - 10) >= 0) {
+					segment.has_timestamps = true;
+					segment.TSval = option->timestamp.TSval;
+					segment.TSecr = ntohl(option->timestamp.TSecr);
+				}
 				break;
+		}
 
-			default:
-				length = option->length;
-				// make sure we don't end up in an endless loop
-				if (length == 0)
-					return;
+		if (length < 0) {
+			length = option->length;
+			if (length == 0)
 				break;
 		}
 
 		size -= length;
 		option = (tcp_option *)((uint8 *)option + length);
 	}
-	// TODO: check if options are valid!
 }
 
 
