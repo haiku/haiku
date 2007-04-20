@@ -23,8 +23,10 @@
 
 //old
 //#define G_BEGIN_URL "<p class=g><a class=l href=\""
-#define G_BEGIN_URL "<div class=g><a class=l href=\""
-#define G_END_URL "\">"
+//#define G_BEGIN_URL "<div class=g><a class=l href=\""
+#define G_BEGIN_URL "<div class=g><a href=\""
+//#define G_END_URL "\">"
+#define G_END_URL "\" class=l>"
 //#define G_BEGIN_NAME 
 #define G_END_NAME "</a>"
 #define G_BEGIN_SNIPSET /*"<td class=j>"*/"<font size=-1>"
