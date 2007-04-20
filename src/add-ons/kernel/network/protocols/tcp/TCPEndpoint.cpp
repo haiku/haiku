@@ -62,12 +62,12 @@
 
 #ifdef PROBE_TCP
 #	define PROBE(buffer, window) \
-	dprintf("TCP PROBE %llu %s %s %ld %lu %lu %lu %lu %lu %lu %lu %lu %llu\n", \
+	dprintf("TCP PROBE %llu %s %s %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %llu\n", \
 		system_time(), PrintAddress(&buffer->source), \
 		PrintAddress(&buffer->destination), buffer->size, (uint32)fSendNext, \
 		(uint32)fSendUnacknowledged, fCongestionWindow, fSlowStartThreshold, \
 		window, fSendWindow, (uint32)(fSendMax - fSendUnacknowledged), \
-		fSendQueue.Used(), fRetransmitTimeout)
+		fSendQueue.Available(fSendNext), fSendQueue.Used(), fRetransmitTimeout)
 #else
 #	define PROBE(buffer, window)	do { } while (0)
 #endif
@@ -1016,10 +1016,9 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 		// - the buffer is at least larger than half of the maximum send window, or
 		// - we're retransmitting data
 		if (length == segmentMaxSize
-			|| ((flightSize == 0 || (fOptions & TCP_NODELAY) != 0)
-				&& tcp_sequence(fSendNext + length) == fSendQueue.LastSequence())
-			|| (fSendMaxWindow > 0 && length >= fSendMaxWindow / 2)
-			|| fSendNext < fSendMax)
+			|| (fOptions & TCP_NODELAY) != 0
+			|| tcp_sequence(fSendNext + length) == fSendQueue.LastSequence()
+			|| (fSendMaxWindow > 0 && length >= fSendMaxWindow / 2))
 			return true;
 	}
 
@@ -1091,16 +1090,27 @@ TCPEndpoint::_SendQueued(bool force)
 	if (fCongestionWindow > 0)
 		sendWindow = min_c(sendWindow, fCongestionWindow);
 
-	// a TCP may not send more data to the network than the
-	// currently unacknowledged sequence (SND.UNA) plus the
-	// calculated send window.
+	// SND.UNA  SND.NXT        SND.MAX
+	//  |        |              |
+	//  v        v              v
+	//  -----------------------------------
+	//  | effective window           |
+	//  -----------------------------------
+
+	// Flight size represents the window of data which is currently in the
+	// ether. We should never send data such as the flight size becomes larger
+	// than the effective window. Note however that the effective window may be
+	// reduced (by congestion for instance), so at some point in time flight
+	// size may be larger than the currently calculated window.
 
 	uint32 flightSize = fSendMax - fSendUnacknowledged;
-	if (flightSize > sendWindow) {
+	uint32 consumedWindow = fSendNext - fSendUnacknowledged;
+
+	if (consumedWindow > sendWindow) {
 		sendWindow = 0;
 		// TODO enter persist state? try to get a window update.
 	} else
-		sendWindow -= flightSize;
+		sendWindow -= consumedWindow;
 
 	if (force && sendWindow == 0 && fSendNext <= fSendQueue.LastSequence()) {
 		// send one byte of data to ask for a window update
@@ -1155,9 +1165,12 @@ TCPEndpoint::_SendQueued(bool force)
 			buffer, buffer->size, PrintAddress(&buffer->source),
 			PrintAddress(&buffer->destination));
 		TRACE("              flags 0x%x, seq %lu, ack %lu, rwnd %hu, cwnd %lu"
-			  ", ssthresh %lu", segment.flags, segment.sequence,
-			  segment.acknowledge, segment.advertised_window,
-			  fCongestionWindow, fSlowStartThreshold);
+			", ssthresh %lu", segment.flags, segment.sequence,
+			segment.acknowledge, segment.advertised_window,
+			fCongestionWindow, fSlowStartThreshold);
+		TRACE("              len %lu first %lu last %lu", segmentLength,
+			(uint32)fSendQueue.FirstSequence(),
+			(uint32)fSendQueue.LastSequence());
 
 		PROBE(buffer, sendWindow);
 		sendWindow -= buffer->size;
@@ -1216,17 +1229,6 @@ TCPEndpoint::_SendQueued(bool force)
 	}
 
 	return B_OK;
-}
-
-
-status_t
-TCPEndpoint::_SendQueued(tcp_sequence sendNext)
-{
-	tcp_sequence previousSendNext = fSendNext;
-	fSendNext = sendNext;
-	status_t status = _SendQueued();
-	fSendNext = previousSendNext;
-	return status;
 }
 
 
@@ -1693,7 +1695,8 @@ TCPEndpoint::_Retransmit()
 {
 	TRACE("Retransmit()");
 	_ResetSlowStart();
-	_SendQueued(fSendUnacknowledged);
+	fSendNext = fSendUnacknowledged;
+	_SendQueued();
 }
 
 
@@ -1738,10 +1741,11 @@ TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 		_ResetSlowStart();
 		fCongestionWindow = fSlowStartThreshold + 3
 			* fSendMaxSegmentSize;
+		fSendNext = segment.acknowledge;
 	} else if (fDuplicateAcknowledgeCount > 3)
 		fCongestionWindow += fSendMaxSegmentSize;
 
-	_SendQueued(segment.acknowledge);
+	_SendQueued();
 }
 
 

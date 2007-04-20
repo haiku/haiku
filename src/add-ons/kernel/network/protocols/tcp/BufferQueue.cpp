@@ -183,17 +183,12 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 {
 	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this, (uint32)sequence));
 
-	fFirstSequence = sequence;
+	if (sequence < fFirstSequence)
+		return B_OK;
 
 	SegmentList::Iterator iterator = fList.GetIterator();
 	net_buffer *buffer = NULL;
-	while ((buffer = iterator.Next()) != NULL) {
-		if (sequence <= buffer->sequence) {
-			fFirstSequence = buffer->sequence;
-				// just in case there is a hole, how unlikely this may ever be
-			break;
-		}
-
+	while ((buffer = iterator.Next()) != NULL && buffer->sequence < sequence) {
 		if (sequence >= buffer->sequence + buffer->size) {
 			// remove this buffer completely
 			iterator.Remove();
@@ -209,8 +204,14 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 			buffer->sequence += size;
 			fNumBytes -= size;
 			fContiguousBytes -= size;
+			break;
 		}
 	}
+
+	if (fList.IsEmpty())
+		fFirstSequence = fLastSequence;
+	else
+		fFirstSequence = fList.Head()->sequence;
 
 	return B_OK;
 }

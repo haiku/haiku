@@ -90,7 +90,6 @@ class TCPEndpoint : public net_protocol {
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			uint32 segmentMaxSize, uint32 flightSize);
 		status_t _SendQueued(bool force = false);
-		status_t _SendQueued(tcp_sequence sendNext);
 		int _GetMSS(const struct sockaddr *) const;
 		status_t _ShutdownEgress(bool closing);
 		ssize_t _AvailableData() const;
