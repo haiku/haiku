@@ -45,10 +45,8 @@ public:
 	status_t StartMonitoring(const char *);
 	status_t StopMonitoring();
 
-	ssize_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
-	ssize_t ReadAvail() const;
-
 private:
+	status_t _SocketStatus() const;
 	status_t _Unregister();
 
 	net_device_monitor	fMonitor;
@@ -114,42 +112,13 @@ LinkProtocol::StopMonitoring()
 }
 
 
-ssize_t
-LinkProtocol::ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer)
+status_t
+LinkProtocol::_SocketStatus() const
 {
-	BenaphoreLocker _(fLock);
-
-	bool clone = flags & MSG_PEEK;
-	bigtime_t timeout = _SocketTimeout(flags);
-
-	bool waited = false;
-	while (_IsEmpty()) {
-		if (fMonitoredDevice == NULL)
-			return ENODEV;
-
-		status_t status = _Wait(timeout);
-		if (status < B_OK)
-			return status;
-		waited = true;
-	}
-
-	*_buffer = _Dequeue(clone);
-	if (clone && waited)
-		_NotifyOneReader(false);
-
-	return *_buffer ? B_OK : B_NO_MEMORY;
-}
-
-
-ssize_t
-LinkProtocol::ReadAvail() const
-{
-	BenaphoreLocker _(fLock);
 	if (fMonitoredDevice == NULL)
 		return ENODEV;
-	return fCurrentBytes;
+	return LocalDatagramSocket::_SocketStatus();
 }
-
 
 status_t
 LinkProtocol::_Unregister()
@@ -405,14 +374,14 @@ status_t
 link_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
-	return ((LinkProtocol *)protocol)->ReadData(numBytes, flags, _buffer);
+	return ((LinkProtocol *)protocol)->SocketDequeue(flags, _buffer);
 }
 
 
 ssize_t
 link_read_avail(net_protocol *protocol)
 {
-	return ((LinkProtocol *)protocol)->ReadAvail();
+	return ((LinkProtocol *)protocol)->AvailableData();
 }
 
 

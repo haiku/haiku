@@ -45,7 +45,7 @@ template<typename LockingBase = BenaphoreLocking,
 class DatagramSocket {
 public:
 	DatagramSocket(const char *name, net_socket *socket);
-	~DatagramSocket();
+	virtual ~DatagramSocket();
 
 	status_t InitCheck() const;
 
@@ -58,13 +58,15 @@ public:
 	status_t SocketEnqueue(net_buffer *buffer);
 	status_t SocketDequeue(uint32 flags, net_buffer **_buffer);
 
-	size_t AvailableData() const;
+	ssize_t AvailableData() const;
 
 	void WakeAll();
 
 	net_socket *Socket() const { return fSocket; }
 
 protected:
+	virtual status_t _SocketStatus() const;
+
 	status_t _Enqueue(net_buffer *buffer);
 	status_t _SocketEnqueue(net_buffer *buffer);
 	net_buffer *_Dequeue(bool clone);
@@ -198,10 +200,12 @@ DECL_DATAGRAM_SOCKET(inline status_t)::BlockingDequeue(bool clone,
 	AutoLocker _(fLock);
 
 	bool waited = false;
-
 	while (fBuffers.IsEmpty()) {
-		status_t status = _Wait(timeout);
+		status_t status = _SocketStatus();
 		if (status < B_OK)
+			return status;
+
+		if ((status = _Wait(timeout)) < B_OK)
 			return status;
 		waited = true;
 	}
@@ -244,10 +248,20 @@ DECL_DATAGRAM_SOCKET(inline void)::_Clear()
 }
 
 
-DECL_DATAGRAM_SOCKET(inline size_t)::AvailableData() const
+DECL_DATAGRAM_SOCKET(inline ssize_t)::AvailableData() const
 {
 	AutoLocker _(fLock);
+	status_t status = _SocketStatus();
+	if (status < B_OK)
+		return status;
+
 	return fCurrentBytes;
+}
+
+
+DECL_DATAGRAM_SOCKET(inline status_t)::_SocketStatus() const
+{
+	return B_OK;
 }
 
 
