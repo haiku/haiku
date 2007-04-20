@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
@@ -55,9 +55,6 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_TEXT_ENCODING,		"UTF-8" },
 
-	{ PREF_SELECT_MBUTTON,		"Button 1"},
-	{ PREF_PASTE_MBUTTON,		"Button 2"},
-	{ PREF_SUBMENU_MBUTTON,		"Button 3"},
 	{ PREF_MOUSE_IMAGE,			"Hand cursor"},
 	{ PREF_DRAGN_COPY,			"0"},
 

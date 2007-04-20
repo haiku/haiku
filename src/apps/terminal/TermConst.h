@@ -1,4 +1,5 @@
 /*
+ * Copyright 2001-2007, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -30,27 +31,16 @@
 #ifndef TERMCONST_H_INCLUDED
 #define TERMCONST_H_INCLUDED
 
-#ifndef NODEBUG
-#define MALLOC_DEBUG
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 // Application signature (Must same in Muterminal.rsrc)//
-//////////////////////////////////////////////////////////////////////////////
 #define TERM_SIGNATURE "application/x-vnd.Haiku-Terminal"
 #define PREFFILE_MIMETYPE "text/x-terminal-pref"
 
-//////////////////////////////////////////////////////////////////////////////
 // Signature of R5's Terminal. Needed for proper drop-in window count support
-//////////////////////////////////////////////////////////////////////////////
 #define R5_TERM_SIGNATURE "application/x-vnd.Be-SHEL"
 
-//////////////////////////////////////////////////////////////////////////////
-// Message constants for menu items.
-//////////////////////////////////////////////////////////////////////////////
+// Message constants for menu items
 
-// Menu Message.
-//
+// Menu Message
 const uint32 MENU_SWITCH_TERM   = 'MSWT';
 const uint32 MENU_NEW_TERM      = 'MNTE';
 const uint32 MENU_PREF_OPEN     = 'MPre';
@@ -69,13 +59,11 @@ const uint32 MENU_SHOW_COLOR	= 'Mcol';
 
 const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
-// Message Runner.
-
+// Message Runner
 const uint32 MSGRUN_CURSOR	= 'Rcur';
 const uint32 MSGRUN_WINDOW	= 'Rwin';
 
-// Preference Message.
-//
+// Preference Message
 const ulong PSET__COLS		= 'pcol';
 const ulong PSET__ROWS		= 'prow';
 const ulong PSET__HFONT		= 'phfn';
@@ -95,52 +83,43 @@ const uint32 ONETHREETWOTWENTYFIVE 	= 'hunv';
 const uint32 FULLSCREEN			= 'fscr';
 
 const uint32 MSG_FONT_CHANGED		= 'fntc';
-
 const uint32 SAVE_AS_DEFAULT 		= 'sadf';
 
-////////////////////////////////////////////////////////////////////////////
 // Preference Read/Write Keys
-////////////////////////////////////////////////////////////////////////////
-const char * const PREF_HALF_FONT_FAMILY = "Half Font Famly";
-const char * const PREF_HALF_FONT_STYLE = "Half Font Style";
-const char * const PREF_HALF_FONT_SIZE = "Half Font Size";
+const char* const PREF_HALF_FONT_FAMILY = "Half Font Famly";
+const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
+const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
-const char * const PREF_FULL_FONT_FAMILY = "Full Font Famly";
-const char * const PREF_FULL_FONT_STYLE = "Full Font Style";
-const char * const PREF_FULL_FONT_SIZE = "Full Font Size";
+const char* const PREF_FULL_FONT_FAMILY = "Full Font Famly";
+const char* const PREF_FULL_FONT_STYLE = "Full Font Style";
+const char* const PREF_FULL_FONT_SIZE = "Full Font Size";
 
-const char * const PREF_TEXT_FORE_COLOR = "Text Foreground Color";
-const char * const PREF_TEXT_BACK_COLOR = "Text Background Color";
-const char * const PREF_SELECT_FORE_COLOR = "Selection Foreground Color";
-const char * const PREF_SELECT_BACK_COLOR = "Selection Background Color";
-const char * const PREF_CURSOR_FORE_COLOR = "Cursor Foreground Color";
-const char * const PREF_CURSOR_BACK_COLOR = "Cursor Background Color";
+const char* const PREF_TEXT_FORE_COLOR = "Text Foreground Color";
+const char* const PREF_TEXT_BACK_COLOR = "Text Background Color";
+const char* const PREF_SELECT_FORE_COLOR = "Selection Foreground Color";
+const char* const PREF_SELECT_BACK_COLOR = "Selection Background Color";
+const char* const PREF_CURSOR_FORE_COLOR = "Cursor Foreground Color";
+const char* const PREF_CURSOR_BACK_COLOR = "Cursor Background Color";
 
-const char * const PREF_IM_FORE_COLOR = "IM Foreground Color";
-const char * const PREF_IM_BACK_COLOR = "IM Background Color";
-const char * const PREF_IM_SELECT_COLOR = "IM Selection Color";
-const char * const PREF_DRAGN_COPY = "Drag'n Copy";
+const char* const PREF_IM_FORE_COLOR = "IM Foreground Color";
+const char* const PREF_IM_BACK_COLOR = "IM Background Color";
+const char* const PREF_IM_SELECT_COLOR = "IM Selection Color";
+const char* const PREF_DRAGN_COPY = "Drag'n Copy";
 
-const char * const PREF_HISTORY_SIZE = "Histry Size";
-const char * const PREF_CURSOR_BLINKING = "Cursor Blinking rate";
+const char* const PREF_HISTORY_SIZE = "Histry Size";
+const char* const PREF_CURSOR_BLINKING = "Cursor Blinking rate";
 
-const char * const PREF_IM_AWARE = "Input Method Aware";
-const char * const PREF_MOUSE_IMAGE = "Cursor Image";
+const char* const PREF_IM_AWARE = "Input Method Aware";
+const char* const PREF_MOUSE_IMAGE = "Cursor Image";
 
-const char * const PREF_SELECT_MBUTTON = "Select Region Buttion";
-const char * const PREF_SUBMENU_MBUTTON = "Submenu Mouse Button";
-const char * const PREF_PASTE_MBUTTON = "Paste Mouse Button";
+const char* const PREF_COLS = "Cols";
+const char* const PREF_ROWS = "Rows";
+const char* const PREF_SHELL = "Shell";
 
-const char * const PREF_COLS = "Cols";
-const char * const PREF_ROWS = "Rows";
-const char * const PREF_SHELL = "Shell";
+const char* const PREF_TEXT_ENCODING = "Text encoding";
+const char* const PREF_GUI_LANGUAGE = "Language";
 
-const char * const PREF_TEXT_ENCODING = "Text encoding";
-const char * const PREF_GUI_LANGUAGE = "Language";
-
-////////////////////////////////////////////////////////////////////////////
 // Color type
-////////////////////////////////////////////////////////////////////////////
 enum {
   TEXT_FOREGROUND_COLOR,
   TEXT_BACKGROUND_COLOR,
@@ -148,26 +127,21 @@ enum {
   SELECTION_BACKGROUND_COLOR
 };
 
-////////////////////////////////////////////////////////////////////////////
 // Preference Folder and setting path
-////////////////////////////////////////////////////////////////////////////
 
 const int32 DEFAULT = -1;
 
-////////////////////////////////////////////////////////////////////////////
-// 
-////////////////////////////////////////////////////////////////////////////
-/* Font Width */
+// Font Width
 const int  HALF_WIDTH = 1;
 const int  FULL_WIDTH = 2;
 
-/* Scroll direction flag */
+// Scroll direction flag
 enum{
   SCRUP,
   SCRDOWN
 };
 
-/* Insert mode flag */
+// Insert mode flag
 #define MODE_OVER 0
 #define MODE_INSERT 1
 
@@ -179,15 +153,12 @@ const float VIEW_OFFSET = 3;
 		 fFontWidth * (fCurPos.x + 1) - 1, \
 		 fFontHeight * fCurPos.y + fTop + fCursorHeight - 1)
 
-////////////////////////////////////////////////////////////////////////////
-// 
-////////////////////////////////////////////////////////////////////////////
-/* Define TermBuffer internal code */
+// Define TermBuffer internal code
 #define NO_CHAR 0x00
 #define A_CHAR 0x01
 #define IN_STRING 0xFF
 
-/* TermBuffer extended attribute */
+// TermBuffer extended attribute
 #define A_WIDTH		0x8000
 #define BOLD		0x4000
 #define UNDERLINE	0x2000
@@ -216,20 +187,14 @@ const float VIEW_OFFSET = 3;
 #define FORECOLORED(x) ((x) << 3)
 #define BACKCOLORED(x) ((x) << 0)
 
-////////////////////////////////////////////////////////////////////////////
 // TypeDefs
-////////////////////////////////////////////////////////////////////////////
 typedef unsigned short ushort;
 
-typedef struct
-{
+typedef struct {
   int x1;
   int y1;
   int x2;
   int y2;
-}
-sDrawRect;
-  
+} sDrawRect;
 
-
-#endif //TERMCONST_H_INCLUDED
+#endif	// TERMCONST_H_INCLUDED

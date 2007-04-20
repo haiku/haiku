@@ -10,6 +10,20 @@
  */
 
 
+#include "TermView.h"
+
+#include "TermWindow.h"
+#include "TermApp.h"
+#include "TermParse.h"
+#include "TermBuffer.h"
+#include "CodeConv.h"
+#include "VTkeymap.h"
+#include "TermConst.h"
+#include "PrefHandler.h"
+#include "MenuUtil.h"
+#include "PrefView.h"
+#include "spawn.h"
+
 #include <Autolock.h>
 #include <Beep.h>
 #include <Clipboard.h>
@@ -28,19 +42,6 @@
 #include <termios.h>
 
 #include <new>
-
-#include "TermView.h"
-#include "TermWindow.h"
-#include "TermApp.h"
-#include "TermParse.h"
-#include "TermBuffer.h"
-#include "CodeConv.h"
-#include "VTkeymap.h"
-#include "TermConst.h"
-#include "PrefHandler.h"
-#include "MenuUtil.h"
-#include "PrefView.h"
-#include "spawn.h"
 
 using std::nothrow;
 
@@ -93,9 +94,6 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv, int fd)
 	fScrBot(fTermRows - 1),
 	fScrBufSize(gTermPref->getInt32(PREF_HISTORY_SIZE)),
 	fScrRegionSet(0),
-	fPopMenu(NULL),
-	fPopEncoding(NULL),
-	fPopSize(NULL),
 	fSelected(false),
 	fMouseTracking(false),
 	fViewThread(-1),
@@ -105,20 +103,19 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv, int fd)
 	fDrawRect_p(0),
 	fIMflag(false)
 {
-	// Cursor reset.
+	// Reset cursor
 	fCurPos.Set(0, 0);
 	fCurStack.Set(0, 0);
 	fPreviousMousePoint.Set(0, 0);
 	fSelStart.Set(-1, -1);
 	fSelEnd.Set(-1, -1);
 
-	SetMouseButton();
 	SetMouseCursor();	
-	
+
 	SetTermFont(be_plain_font, be_plain_font);	
 	//SetIMAware(gTermPref->getInt32(PREF_IM_AWARE));
-	
-	InitViewThread();
+
+	_InitViewThread();
 }
 
 
@@ -163,16 +160,6 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	Invalidate(Frame());
 
 	return rect;
-}
-
-
-//! Set mouse button assignments
-void
-TermView::SetMouseButton()
-{
-	mSelectButton = SetupMouseButton(gTermPref->getString(PREF_SELECT_MBUTTON));
-	mSubMenuButton = SetupMouseButton(gTermPref->getString(PREF_SUBMENU_MBUTTON));
-	mPasteMenuButton = SetupMouseButton(gTermPref->getString(PREF_PASTE_MBUTTON));
 }
 
 
@@ -744,7 +731,7 @@ TermView::ScrollAtCursor()
 
 
 thread_id
-TermView::InitViewThread()
+TermView::_InitViewThread()
 {
 	// spwan Draw Engine thread.
 	if (fViewThread < 0) {
@@ -1735,91 +1722,50 @@ TermView::WritePTY(const uchar *text, int numBytes)
 }
 
 
-//! Make encoding pop up menu (make copy of window's one.)
-void
-TermView::SetupPop(void)
-{
-	fPopMenu = new BPopUpMenu("");
-	MakeEncodingMenu(fPopMenu, gNowCoding, true);
-	fPopMenu->SetTargetForItems(Window());
-}
-
-// convert button name to number.
-int32
-TermView::SetupMouseButton(const char *bname)
-{
-	if (!strcmp(bname, "Disable"))
-		return 0;
-	
-	if (!strcmp(bname, "Button 1"))
-		return B_PRIMARY_MOUSE_BUTTON;
-
-	if (!strcmp(bname, "Button 2"))
-		return B_SECONDARY_MOUSE_BUTTON;
-	
-	if (!strcmp(bname, "Button 3"))
-		return B_TERTIARY_MOUSE_BUTTON;
-		
-	return 0; //Disable
-}
-
 void
 TermView::MouseDown(BPoint where)
 {
-	int32 buttons = 0, clicks = 0;
-	int32 mod;
-	BPoint inPoint;
-	ssize_t num_bytes;
-	
+	int32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons); 
-	
+
 	// paste button
-	if (buttons == mPasteMenuButton) {
-		
+	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
 		if (fSelected) {
-			// If selected region, copy text from region.
-			BString copyStr("");
-			
-			fTextBuffer->GetStringFromRegion(copyStr);
-			
-			num_bytes = copyStr.Length();
-			WritePTY((uchar *)copyStr.String(), num_bytes);
+			// copy text from region
+			BString copy;
+			fTextBuffer->GetStringFromRegion(copy);
+			WritePTY((uchar *)copy.String(), copy.Length());
 		} else {
-			// If don't selected, copy text from clipboard.
+			// copy text from clipboard.
 			DoPaste();
 		}
 		return;
 	}
-  
+
 	// Select Region
-	if (buttons == mSelectButton) {
-	
+	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+		int32 mod, clicks;
 		Window()->CurrentMessage()->FindInt32("modifiers", &mod);
 		Window()->CurrentMessage()->FindInt32("clicks", &clicks);
-		
+
 		if (fSelected) {
 			CurPos inPos, stPos, edPos;
-			
 			if (fSelStart < fSelEnd) {
 				stPos = fSelStart;
 				edPos = fSelEnd;
-			
 			} else {
 				stPos = fSelEnd;
 				edPos = fSelStart;
 			}
-		
+
 			inPos = BPointToCurPos(where);
-		
+
 			// If mouse pointer is avove selected Region, start Drag'n Copy.
 			if (inPos > stPos && inPos < edPos) {
 				if (mod & B_CONTROL_KEY || gTermPref->getInt32(PREF_DRAGN_COPY)) {
-			
 					BPoint p;
 					uint32 bt;
-				
 					do {
-					
 						GetMouse(&p, &bt);
 					
 						if (bt == 0) {
@@ -1861,7 +1807,7 @@ TermView::MouseDown(BPoint where)
 		}
 
 		// If mouse has a lot of movement, disable double/triple click.
-		inPoint = fPreviousMousePoint - where;
+		BPoint inPoint = fPreviousMousePoint - where;
 		if (abs((int)inPoint.x) > 16 || abs((int)inPoint.y) > 16)
 			clicks = 1;
 	
@@ -1894,16 +1840,7 @@ TermView::MouseDown(BPoint where)
 		}
 		return;
   	}
-  
-	// Sub menu(coding popup menu)
-	if (buttons == mSubMenuButton){
-		ConvertToScreen(&where); 
-		SetupPop();
-		fPopMenu->Go(where, true); 
-		delete fPopMenu;
-		return;
-	}
-	
+
 	BView::MouseDown(where);
 }
 
