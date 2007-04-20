@@ -1,4 +1,5 @@
 /*
+ * Copyright 2001-2007, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -30,11 +31,13 @@
 #ifndef TERMWIN_H
 #define TERMWIN_H
 
+
+#include "PrefHandler.h"
+
 #include <Menu.h>
 #include <Window.h>
 #include <MessageRunner.h>
-
-#include "PrefHandler.h"
+#include <String.h>
 
 class BFont;
 class TermView;
