@@ -106,6 +106,11 @@ class tcp_sequence {
 #define TCP_MAX_WINDOW					65535
 #define TCP_MAX_SEGMENT_LIFETIME		60000000	// 60 secs
 
+struct tcp_sack {
+	uint32 left_edge;
+	uint32 right_edge;
+} _PACKED;
+
 struct tcp_option {
 	uint8	kind;
 	uint8	length;
@@ -116,6 +121,7 @@ struct tcp_option {
 			uint32	TSval;
 			uint32	TSecr;
 		} timestamp;
+		tcp_sack sack[0];
 	};
 } _PACKED;
 
@@ -124,10 +130,18 @@ enum tcp_option_kind {
 	TCP_OPTION_NOP				= 1,
 	TCP_OPTION_MAX_SEGMENT_SIZE	= 2,
 	TCP_OPTION_WINDOW_SHIFT		= 3,
+	TCP_OPTION_SACK_PERMITTED	= 4,
+	TCP_OPTION_SACK				= 5,
 	TCP_OPTION_TIMESTAMP		= 8,
 };
 
 #define TCP_MAX_WINDOW_SHIFT	14
+
+enum {
+	TCP_HAS_WINDOW_SCALE	= 1 << 0,
+	TCP_HAS_TIMESTAMPS		= 1 << 1,
+	TCP_SACK_PERMITTED		= 1 << 2,
+};
 
 struct tcp_segment_header {
 	tcp_segment_header(uint8 _flags)
@@ -135,8 +149,8 @@ struct tcp_segment_header {
 		flags(_flags),
 		window_shift(0),
 		max_segment_size(0),
-		has_window_shift(false),
-		has_timestamps(false)
+		sack_count(0),
+		options(0)
 	{}
 
 	uint32	sequence;
@@ -150,8 +164,10 @@ struct tcp_segment_header {
 	uint32	TSval;
 	uint32	TSecr;
 
-	bool	has_window_shift : 1;
-	bool	has_timestamps : 1;
+	tcp_sack	*sacks;
+	int			sack_count;
+
+	uint32	options;
 
 	bool AcknowledgeOnly() const
 	{

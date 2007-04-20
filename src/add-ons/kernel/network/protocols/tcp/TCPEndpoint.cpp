@@ -1061,7 +1061,7 @@ TCPEndpoint::_SendQueued(bool force)
 
 	if ((fOptions & TCP_NOOPT) == 0) {
 		if (fFlags & FLAG_OPTION_TIMESTAMP) {
-			segment.has_timestamps = true;
+			segment.options |= TCP_HAS_TIMESTAMPS;
 			segment.TSecr = fReceivedTSval;
 			segment.TSval = htonl(tcp_now());
 		}
@@ -1071,7 +1071,7 @@ TCPEndpoint::_SendQueued(bool force)
 			// add connection establishment options
 			segment.max_segment_size = fReceiveMaxSegmentSize;
 			if (fFlags & FLAG_OPTION_WINDOW_SCALE) {
-				segment.has_window_shift = true;
+				segment.options |= TCP_HAS_WINDOW_SCALE;
 				segment.window_shift = fReceiveWindowShift;
 			}
 		}
@@ -1185,7 +1185,7 @@ TCPEndpoint::_SendQueued(bool force)
 		// for local connections as the answer is directly handled
 
 		if (segment.flags & TCP_FLAG_SYNCHRONIZE) {
-			segment.has_window_shift = false;
+			segment.options &= ~TCP_HAS_WINDOW_SCALE;
 			segment.max_segment_size = 0;
 			size++;
 		}
@@ -1583,7 +1583,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header &segment)
 		if (segment.max_segment_size > 0)
 			fSendMaxSegmentSize = segment.max_segment_size;
 
-		if (segment.has_window_shift) {
+		if (segment.options & TCP_HAS_WINDOW_SCALE) {
 			fFlags |= FLAG_OPTION_WINDOW_SCALE;
 			fSendWindowShift = segment.window_shift;
 		} else {
@@ -1591,7 +1591,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header &segment)
 			fReceiveWindowShift = 0;
 		}
 
-		if (segment.has_timestamps) {
+		if (segment.options & TCP_HAS_TIMESTAMPS) {
 			fFlags |= FLAG_OPTION_TIMESTAMP;
 			fReceivedTSval = segment.TSval;
 		} else
@@ -1654,7 +1654,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header &segment)
 	if (fSendUnacknowledged == fSendMax)
 		gStackModule->cancel_timer(&fRetransmitTimer);
 
-	if (segment.has_timestamps)
+	if (segment.options & TCP_HAS_TIMESTAMPS)
 		_UpdateSRTT(tcp_diff_timestamp(ntohl(segment.TSecr)));
 	else {
 		// TODO Fallback to RFC 793 type estimation

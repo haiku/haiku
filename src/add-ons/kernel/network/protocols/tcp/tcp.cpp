@@ -57,6 +57,10 @@ static recursive_lock sEndpointManagersLock;
 static EndpointManagerList sEndpointManagers;
 
 
+// The TCP header length is at most 64 bytes.
+static const int kMaxOptionSize = 64 - sizeof(tcp_header);
+
+
 static EndpointManager *
 endpoint_manager_for(net_domain *domain)
 {
@@ -114,14 +118,15 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 	tcp_option *option = (tcp_option *)buffer;
 	size_t length = 0;
 
-	if (segment.max_segment_size > 0 && length + 8 < bufferSize) {
+	if (segment.max_segment_size > 0 && length + 8 <= bufferSize) {
 		option->kind = TCP_OPTION_MAX_SEGMENT_SIZE;
 		option->length = 4;
 		option->max_segment_size = htons(segment.max_segment_size);
 		bump_option(option, length);
 	}
 
-	if (segment.has_timestamps && length + 12 < bufferSize) {
+	if ((segment.options & TCP_HAS_TIMESTAMPS)
+		&& length + 12 <= bufferSize) {
 		// two NOPs so the timestamps get aligned to a 4 byte boundary
 		option->kind = TCP_OPTION_NOP;
 		bump_option(option, length);
@@ -135,7 +140,8 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		bump_option(option, length);
 	}
 
-	if (segment.has_window_shift && length + 4 < bufferSize) {
+	if ((segment.options & TCP_HAS_WINDOW_SCALE)
+		&& length + 4 <= bufferSize) {
 		// insert one NOP so that the subsequent data is aligned on a 4 byte boundary
 		option->kind = TCP_OPTION_NOP;
 		bump_option(option, length);
@@ -144,6 +150,30 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		option->length = 3;
 		option->window_shift = segment.window_shift;
 		bump_option(option, length);
+	}
+
+	if ((segment.options & TCP_SACK_PERMITTED)
+		&& length + 2 <= bufferSize) {
+		option->kind = TCP_OPTION_SACK_PERMITTED;
+		option->length = 2;
+		bump_option(option, length);
+	}
+
+	if (segment.sack_count > 0) {
+		int sackCount = ((int)(bufferSize - length) - 4) / sizeof(tcp_sack);
+		if (sackCount > segment.sack_count)
+			sackCount = segment.sack_count;
+
+		if (sackCount > 0) {
+			option->kind = TCP_OPTION_NOP;
+			bump_option(option, length);
+			option->kind = TCP_OPTION_NOP;
+			bump_option(option, length);
+			option->kind = TCP_OPTION_SACK;
+			option->length = 2 + sackCount * sizeof(tcp_sack);
+			memcpy(option->sack, segment.sacks, sackCount * sizeof(tcp_sack));
+			bump_option(option, length);
+		}
 	}
 
 	if ((length & 3) == 0) {
@@ -167,7 +197,7 @@ add_tcp_header(net_address_module_info *addressModule,
 {
 	buffer->protocol = IPPROTO_TCP;
 
-	uint8 optionsBuffer[32];
+	uint8 optionsBuffer[kMaxOptionSize];
 	uint32 optionsLength = add_options(segment, optionsBuffer, sizeof(optionsBuffer));
 
 	NetBufferPrepend<tcp_header> bufferHeader(buffer, sizeof(tcp_header) + optionsLength);
@@ -213,11 +243,21 @@ tcp_options_length(tcp_segment_header &segment)
 	if (segment.max_segment_size > 0)
 		length += 4;
 
-	if (segment.has_timestamps)
+	if (segment.options & TCP_HAS_TIMESTAMPS)
 		length += 12;
 
-	if (segment.has_window_shift)
+	if (segment.options & TCP_HAS_WINDOW_SCALE)
 		length += 4;
+
+	if (segment.options & TCP_SACK_PERMITTED)
+		length += 2;
+
+	if (segment.sack_count > 0) {
+		int sackCount = min_c((int)((kMaxOptionSize - length - 4)
+			/ sizeof(tcp_sack)), segment.sack_count);
+		if (sackCount > 0)
+			length += 4 + sackCount * sizeof(tcp_sack);
+	}
 
 	if ((length & 3) == 0)
 		return length;
@@ -227,17 +267,20 @@ tcp_options_length(tcp_segment_header &segment)
 
 
 void
-process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
+process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
 {
 	if (size == 0)
 		return;
 
 	tcp_option *option;
-	uint8 optionsBuffer[32];
+
+	uint8 optionsBuffer[kMaxOptionSize];
 	if (gBufferModule->direct_access(buffer, sizeof(tcp_header), size,
 			(void **)&option) != B_OK) {
-		if (size > 32)
-			panic("UNIMPLEMENTED: TCP option processing across data nodes");
+		if (size > sizeof(optionsBuffer)) {
+			dprintf("Ignoring TCP options larger than expected.\n");
+			return;
+		}
 
 		gBufferModule->read(buffer, sizeof(tcp_header), optionsBuffer, size);
 		option = (tcp_option *)optionsBuffer;
@@ -257,17 +300,20 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, int32 size)
 				break;
 			case TCP_OPTION_WINDOW_SHIFT:
 				if (option->length == 3 && (size - 3) >= 0) {
-					segment.has_window_shift = true;
+					segment.options |= TCP_HAS_WINDOW_SCALE;
 					segment.window_shift = option->window_shift;
 				}
 				break;
 			case TCP_OPTION_TIMESTAMP:
 				if (option->length == 10 && (size - 10) >= 0) {
-					segment.has_timestamps = true;
+					segment.options |= TCP_HAS_TIMESTAMPS;
 					segment.TSval = option->timestamp.TSval;
 					segment.TSecr = ntohl(option->timestamp.TSecr);
 				}
 				break;
+			case TCP_OPTION_SACK_PERMITTED:
+				if (option->length == 2 && (size - 2) >= 0)
+					segment.options |= TCP_SACK_PERMITTED;
 		}
 
 		if (length < 0) {
