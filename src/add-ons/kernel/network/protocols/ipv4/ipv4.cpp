@@ -181,6 +181,7 @@ net_buffer_module_info *gBufferModule;
 
 static struct net_domain *sDomain;
 static net_datalink_module_info *sDatalinkModule;
+static net_socket_module_info *sSocketModule;
 static int32 sPacketID;
 static RawSocketList sRawSockets;
 static benaphore sRawSocketsLock;
@@ -1049,7 +1050,7 @@ get_int_option(void *target, size_t length, int value)
 
 
 template<typename Type> static status_t
-set_int_option(Type &target, void *_value, size_t length)
+set_int_option(Type &target, const void *_value, size_t length)
 {
 	int value;
 
@@ -1071,56 +1072,80 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 	if ((level & LEVEL_MASK) != IPPROTO_IP)
 		return sDatalinkModule->control(sDomain, option, value, _length);
 
+	return B_BAD_VALUE;
+}
+
+
+status_t
+ipv4_getsockopt(net_protocol *_protocol, int level, int option, void *value,
+	int *_length)
+{
 	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
 
-	if (level & LEVEL_GET_OPTION) {
-		// get options
+	// as we are the last protocol in the chain (i.e. no socket protocol
+	// below) we must call into the socket module directly.
+	if (level == SOL_SOCKET)
+		return sSocketModule->get_option(protocol->socket, option, value,
+			_length);
+	else if (level != IPPROTO_IP)
+		return B_BAD_VALUE;
 
-		switch (option) {
-			case IP_HDRINCL:
-				return get_int_option(value, *_length,
-					(protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0);
+	switch (option) {
+		case IP_HDRINCL:
+			return get_int_option(value, *_length,
+				(protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0);
 
-			case IP_TTL:
-				return get_int_option(value, *_length, protocol->time_to_live);
+		case IP_TTL:
+			return get_int_option(value, *_length, protocol->time_to_live);
 
-			case IP_TOS:
-				return get_int_option(value, *_length, protocol->service_type);
+		case IP_TOS:
+			return get_int_option(value, *_length, protocol->service_type);
 
-			case IP_MULTICAST_TTL:
-				return get_int_option(value, *_length,
-					protocol->multicast_time_to_live);
+		case IP_MULTICAST_TTL:
+			return get_int_option(value, *_length,
+				protocol->multicast_time_to_live);
 
-			case IP_ADD_MEMBERSHIP:
-			case IP_DROP_MEMBERSHIP:
-			case IP_BLOCK_SOURCE:
-			case IP_UNBLOCK_SOURCE:
-			case IP_ADD_SOURCE_MEMBERSHIP:
-			case IP_DROP_SOURCE_MEMBERSHIP:
-			case MCAST_JOIN_GROUP:
-			case MCAST_LEAVE_GROUP:
-			case MCAST_BLOCK_SOURCE:
-			case MCAST_UNBLOCK_SOURCE:
-			case MCAST_JOIN_SOURCE_GROUP:
-			case MCAST_LEAVE_SOURCE_GROUP:
-				// RFC 3678, Section 4.1:
-				// ``An error of EOPNOTSUPP is returned if these options are
-				// used with getsockopt().''
-				return EOPNOTSUPP;
+		case IP_ADD_MEMBERSHIP:
+		case IP_DROP_MEMBERSHIP:
+		case IP_BLOCK_SOURCE:
+		case IP_UNBLOCK_SOURCE:
+		case IP_ADD_SOURCE_MEMBERSHIP:
+		case IP_DROP_SOURCE_MEMBERSHIP:
+		case MCAST_JOIN_GROUP:
+		case MCAST_LEAVE_GROUP:
+		case MCAST_BLOCK_SOURCE:
+		case MCAST_UNBLOCK_SOURCE:
+		case MCAST_JOIN_SOURCE_GROUP:
+		case MCAST_LEAVE_SOURCE_GROUP:
+			// RFC 3678, Section 4.1:
+			// ``An error of EOPNOTSUPP is returned if these options are
+			// used with getsockopt().''
+			return EOPNOTSUPP;
 
-			default:
-				dprintf("IPv4::control(): get unknown option: %d\n", option);
-				return ENOPROTOOPT;
-		}
+		default:
+			dprintf("IPv4::getsockopt(): get unknown option: %d\n", option);
+			return ENOPROTOOPT;
 	}
+}
 
-	// set options
+
+status_t
+ipv4_setsockopt(net_protocol *_protocol, int level, int option,
+	const void *value, int length)
+{
+	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+
+	if (level == SOL_SOCKET)
+		return sSocketModule->set_option(protocol->socket, option, value,
+			length);
+	else if (level != IPPROTO_IP)
+		return B_BAD_VALUE;
 
 	switch (option) {
 		case IP_HDRINCL:
 		{
 			int headerIncluded;
-			if (*_length != sizeof(int))
+			if (length != sizeof(int))
 				return B_BAD_VALUE;
 			if (user_memcpy(&headerIncluded, value, sizeof(headerIncluded)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -1133,20 +1158,20 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 		}
 
 		case IP_TTL:
-			return set_int_option(protocol->time_to_live, value, *_length);
+			return set_int_option(protocol->time_to_live, value, length);
 
 		case IP_TOS:
-			return set_int_option(protocol->service_type, value, *_length);
+			return set_int_option(protocol->service_type, value, length);
 
 		case IP_MULTICAST_TTL:
 			return set_int_option(protocol->multicast_time_to_live, value,
-				*_length);
+				length);
 
 		case IP_ADD_MEMBERSHIP:
 		case IP_DROP_MEMBERSHIP:
 		{
 			ip_mreq mreq;
-			if (*_length != sizeof(ip_mreq))
+			if (length != sizeof(ip_mreq))
 				return B_BAD_VALUE;
 			if (user_memcpy(&mreq, value, sizeof(ip_mreq)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -1161,7 +1186,7 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 		case IP_DROP_SOURCE_MEMBERSHIP:
 		{
 			ip_mreq_source mreq;
-			if (*_length != sizeof(ip_mreq_source))
+			if (length != sizeof(ip_mreq_source))
 				return B_BAD_VALUE;
 			if (user_memcpy(&mreq, value, sizeof(ip_mreq_source)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -1174,7 +1199,7 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 		case MCAST_LEAVE_GROUP:
 		{
 			group_req greq;
-			if (*_length != sizeof(group_req))
+			if (length != sizeof(group_req))
 				return B_BAD_VALUE;
 			if (user_memcpy(&greq, value, sizeof(group_req)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -1189,7 +1214,7 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 		case MCAST_LEAVE_SOURCE_GROUP:
 		{
 			group_source_req greq;
-			if (*_length != sizeof(group_source_req))
+			if (length != sizeof(group_source_req))
 				return B_BAD_VALUE;
 			if (user_memcpy(&greq, value, sizeof(group_source_req)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -1199,12 +1224,9 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 		}
 
 		default:
-			dprintf("IPv4::control(): set unknown option: %d\n", option);
+			dprintf("IPv4::setsockopt(): set unknown option: %d\n", option);
 			return ENOPROTOOPT;
 	}
-
-	// never gets here
-	return B_BAD_VALUE;
 }
 
 
@@ -1689,6 +1711,8 @@ net_protocol_module_info gIPv4Module = {
 	ipv4_connect,
 	ipv4_accept,
 	ipv4_control,
+	ipv4_getsockopt,
+	ipv4_setsockopt,
 	ipv4_bind,
 	ipv4_unbind,
 	ipv4_listen,
@@ -1710,6 +1734,7 @@ module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
 	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
 	{NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule},
+	{NET_SOCKET_MODULE_NAME, (module_info **)&sSocketModule},
 	{}
 };
 

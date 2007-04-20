@@ -498,6 +498,8 @@ net_protocol_module_info gLinkModule = {
 	link_connect,
 	link_accept,
 	link_control,
+	NULL, // getsockopt
+	NULL, // setsockopt
 	link_bind,
 	link_unbind,
 	link_listen,

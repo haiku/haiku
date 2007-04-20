@@ -639,15 +639,9 @@ socket_getsockname(net_socket *socket, struct sockaddr *address, socklen_t *_add
 }
 
 
-int
-socket_getsockopt(net_socket *socket, int level, int option, void *value,
-	int *_length)
+status_t
+socket_get_option(net_socket *socket, int option, void *value, int *_length)
 {
-	if (level != SOL_SOCKET) {
-		return socket->first_info->control(socket->first_protocol,
-			level | LEVEL_GET_OPTION, option, value, (size_t *)_length);
-	}
-
 	switch (option) {
 		case SO_SNDBUF:
 		{
@@ -744,6 +738,23 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 
 	dprintf("socket_getsockopt: unknown option %d\n", option);
 	return ENOPROTOOPT;
+}
+
+
+int
+socket_getsockopt(net_socket *socket, int level, int option, void *value,
+	int *_length)
+{
+	status_t status = (level == SOL_SOCKET) ? B_OK : B_BAD_VALUE;
+
+	if (socket->first_info->getsockopt)
+		status = socket->first_info->getsockopt(socket->first_protocol, level,
+			option, value, _length);
+
+	if (status < B_OK)
+		return status;
+
+	return socket_get_option(socket, option, value, _length);
 }
 
 
@@ -940,15 +951,10 @@ socket_send(net_socket *socket, msghdr *header, const void *data,
 }
 
 
-int
-socket_setsockopt(net_socket *socket, int level, int option, const void *value,
+status_t
+socket_set_option(net_socket *socket, int option, const void *value,
 	int length)
 {
-	if (level != SOL_SOCKET) {
-		return socket->first_info->control(socket->first_protocol,
-			level | LEVEL_SET_OPTION, option, (void *)value, (size_t *)&length);
-	}
-
 	switch (option) {
 		// TODO: implement other options!
 		case SO_LINGER:
@@ -968,8 +974,6 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 		}
 
 		case SO_SNDBUF:
-			// TODO: should be handled in the protocol modules - they can actually
-			//	check if setting the value is allowed and within valid bounds.
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
@@ -977,7 +981,6 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 			return B_OK;
 
 		case SO_RCVBUF:
-			// TODO: see above (SO_SNDBUF)
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
@@ -985,7 +988,6 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 			return B_OK;
 
 		case SO_SNDLOWAT:
-			// TODO: see above (SO_SNDBUF)
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
@@ -993,7 +995,6 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 			return B_OK;
 
 		case SO_RCVLOWAT:
-			// TODO: see above (SO_SNDBUF)
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
@@ -1058,6 +1059,23 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 
 
 int
+socket_setsockopt(net_socket *socket, int level, int option, const void *value,
+	int length)
+{
+	status_t status = (level == SOL_SOCKET) ? B_OK : B_BAD_VALUE;
+
+	if (socket->first_info->setsockopt)
+		status = socket->first_info->setsockopt(socket->first_protocol, level,
+			option, value, length);
+
+	if (status < B_OK)
+		return status;
+
+	return socket_set_option(socket, option, value, length);
+}
+
+
+int
 socket_shutdown(net_socket *socket, int direction)
 {
 	return socket->first_info->shutdown(socket->first_protocol, direction);
@@ -1110,6 +1128,9 @@ net_socket_module_info gNetSocketModule = {
 
 	socket_send_data,
 	socket_receive_data,
+
+	socket_get_option,
+	socket_set_option,
 
 	socket_get_next_stat,
 

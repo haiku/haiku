@@ -59,6 +59,11 @@ struct net_socket_module_info {
 	status_t	(*receive_data)(net_socket *socket, size_t length, uint32 flags,
 					net_buffer **_buffer);
 
+	status_t	(*get_option)(net_socket *socket, int option, void *value,
+					int *_length);
+	status_t	(*set_option)(net_socket *socket, int option,
+					const void *value, int length);
+
 	status_t	(*get_next_stat)(uint32 *cookie, int family, struct net_stat *stat);
 
 	// connections

@@ -385,9 +385,6 @@ TCPEndpoint::Connect(const sockaddr *address)
 	} else if (fState != CLOSED)
 		return EISCONN;
 
-	fSendQueue.SetMaxBytes(socket->send.buffer_size);
-	fReceiveQueue.SetMaxBytes(socket->receive.buffer_size);
-
 	status_t status = _PrepareSendPath(address);
 	if (status < B_OK)
 		return status;
@@ -686,6 +683,24 @@ TCPEndpoint::ReadAvailable()
 	TRACE("ReadAvailable(): %li", _AvailableData());
 
 	return _AvailableData();
+}
+
+
+status_t
+TCPEndpoint::SetSendBufferSize(size_t length)
+{
+	RecursiveLocker _(fLock);
+	fSendQueue.SetMaxBytes(length);
+	return B_OK;
+}
+
+
+status_t
+TCPEndpoint::SetReceiveBufferSize(size_t length)
+{
+	RecursiveLocker _(fLock);
+	fReceiveQueue.SetMaxBytes(length);
+	return B_OK;
 }
 
 

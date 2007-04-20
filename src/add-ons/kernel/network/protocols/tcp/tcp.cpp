@@ -410,24 +410,46 @@ tcp_control(net_protocol *_protocol, int level, int option, void *value,
 {
 	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
 
-	switch (level & LEVEL_MASK) {
-		case IPPROTO_TCP:
-			if (option == NET_STAT_SOCKET) {
-				net_stat *stat = (net_stat *)value;
-				strlcpy(stat->state, name_for_state(protocol->State()),
-					sizeof(stat->state));
-				return B_OK;
-			}
-			break;
-		case SOL_SOCKET:
-			break;
-
-		default:
-			return protocol->next->module->control(protocol->next, level, option,
-				value, _length);
+	if ((level & LEVEL_MASK) == IPPROTO_TCP) {
+		if (option == NET_STAT_SOCKET) {
+			net_stat *stat = (net_stat *)value;
+			strlcpy(stat->state, name_for_state(protocol->State()),
+				sizeof(stat->state));
+			return B_OK;
+		}
 	}
 
-	return B_BAD_VALUE;
+	return protocol->next->module->control(protocol->next, level, option,
+		value, _length);
+}
+
+
+status_t
+tcp_setsockopt(net_protocol *_protocol, int level, int option,
+	const void *_value, int length)
+{
+	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
+
+	if (level == SOL_SOCKET) {
+		if (option == SO_SNDBUF || option == SO_RCVBUF) {
+			if (length != sizeof(int))
+				return B_BAD_VALUE;
+
+			status_t status;
+			const int *value = (const int *)_value;
+
+			if (option == SO_SNDBUF)
+				status = protocol->SetSendBufferSize(*value);
+			else
+				status = protocol->SetReceiveBufferSize(*value);
+
+			if (status < B_OK)
+				return status;
+		}
+	}
+
+	return protocol->next->module->setsockopt(protocol, level, option, _value,
+		length);
 }
 
 
@@ -671,6 +693,8 @@ net_protocol_module_info sTCPModule = {
 	tcp_connect,
 	tcp_accept,
 	tcp_control,
+	NULL, // getsockopt
+	tcp_setsockopt,
 	tcp_bind,
 	tcp_unbind,
 	tcp_listen,

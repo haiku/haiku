@@ -59,6 +59,9 @@ class TCPEndpoint : public net_protocol {
 		status_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
 		ssize_t ReadAvailable();
 
+		status_t SetSendBufferSize(size_t length);
+		status_t SetReceiveBufferSize(size_t length);
+
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
 

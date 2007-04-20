@@ -1212,6 +1212,8 @@ net_protocol_module_info sUDPModule = {
 	udp_connect,
 	udp_accept,
 	udp_control,
+	NULL, // getsockopt
+	NULL, // setsockopt
 	udp_bind,
 	udp_unbind,
 	udp_listen,

@@ -36,6 +36,10 @@ struct net_protocol_module_info {
 	status_t	(*accept)(net_protocol *self, struct net_socket **_acceptedSocket);
 	status_t	(*control)(net_protocol *self, int level, int option, void *value,
 					size_t *_length);
+	status_t	(*getsockopt)(net_protocol *self, int level, int option,
+					void *value, int *_length);
+	status_t	(*setsockopt)(net_protocol *self, int level, int option,
+					const void *value, int length);
 
 	status_t	(*bind)(net_protocol *self, struct sockaddr *address);
 	status_t	(*unbind)(net_protocol *self, struct sockaddr *address);

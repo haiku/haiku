@@ -330,6 +330,8 @@ net_protocol_module_info sICMPModule = {
 	icmp_connect,
 	icmp_accept,
 	icmp_control,
+	NULL, // getsockopt
+	NULL, // setsockopt
 	icmp_bind,
 	icmp_unbind,
 	icmp_listen,
