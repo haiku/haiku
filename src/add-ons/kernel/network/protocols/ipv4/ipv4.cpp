@@ -1487,12 +1487,8 @@ ipv4_receive_data(net_buffer *buffer)
 
 	if (header.destination == INADDR_BROADCAST) {
 		buffer->flags |= MSG_BCAST;
-		// TODO set incoming interface. we should have some notion from which
-		//      device interface this buffer is coming from.
-		buffer->interface = NULL;
 	} else if (IN_MULTICAST(header.destination)) {
 		buffer->flags |= MSG_MCAST;
-		buffer->interface = NULL;
 	} else {
 		uint32 matchedAddressType = 0;
 		// test if the packet is really for us

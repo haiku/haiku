@@ -74,7 +74,7 @@ device_reader_thread(void *_interface)
 					net_device_handler *handler = iterator.Next();
 
 					if (handler->type == type) {
-						status = handler->func(handler->cookie, buffer);
+						status = handler->func(handler->cookie, device, buffer);
 						if (status == B_OK)
 							break;
 					}

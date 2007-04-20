@@ -35,7 +35,8 @@ struct net_timer {
 };
 
 typedef int32 (*net_deframe_func)(struct net_device *device, struct net_buffer *buffer);
-typedef status_t (*net_receive_func)(void *cookie, struct net_buffer *buffer);
+typedef status_t (*net_receive_func)(void *cookie, struct net_device *,
+	struct net_buffer *buffer);
 
 enum {
 	B_DEVICE_GOING_UP = 1,

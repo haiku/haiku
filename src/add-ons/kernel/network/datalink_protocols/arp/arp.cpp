@@ -401,7 +401,7 @@ handle_arp_reply(net_buffer *buffer, arp_header &header)
 
 
 static status_t
-arp_receive(void *cookie, net_buffer *buffer)
+arp_receive(void *cookie, net_device *device, net_buffer *buffer)
 {
 	TRACE(("ARP receive\n"));
 

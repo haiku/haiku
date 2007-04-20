@@ -56,9 +56,11 @@ find_device_interface(const char *name)
 
 
 static status_t
-domain_receive_adapter(void *cookie, net_buffer *buffer)
+domain_receive_adapter(void *cookie, net_device *device, net_buffer *buffer)
 {
 	net_domain_private *domain = (net_domain_private *)cookie;
+
+	buffer->interface = find_interface(domain, device->index);
 	return domain->module->receive_data(buffer);
 }
 
