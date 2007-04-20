@@ -686,7 +686,7 @@ vm_cache_resize(file_cache_ref *cache, off_t newSize)
 			// the page is busy -- wait a while and try again
 			poolLocker.Unlock();
 			mutex_unlock(&cache->lock);
-			sleep(20000);
+			snooze(20000);
 			mutex_lock(&cache->lock);
 			poolLocker.Lock();
 		} else {
@@ -734,7 +734,7 @@ vm_cache_write_modified(file_cache_ref *cache, bool fsReenter)
 			vm_page_put_page(page);
 			poolLocker.Unlock();
 			locker.Unlock();
-			sleep(20000);
+			snooze(20000);
 			locker.Lock();
 		}
 
