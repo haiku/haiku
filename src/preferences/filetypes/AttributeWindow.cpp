@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -26,6 +26,7 @@
 
 const uint32 kMsgAttributeUpdated = 'atup';
 const uint32 kMsgTypeChosen = 'typc';
+const uint32 kMsgDisplayAsChosen = 'dach';
 const uint32 kMsgVisibilityChanged = 'vsch';
 const uint32 kMsgAlignmentChosen = 'alnc';
 const uint32 kMsgAccept = 'acpt';
@@ -42,6 +43,40 @@ compare_attributes(const void* _a, const void* _b)
 		return compare;
 
 	return strcmp(a->Name(), b->Name());
+}
+
+
+static bool
+compare_display_as(const char* a, const char* b)
+{
+	bool emptyA = a == NULL || !a[0];
+	bool emptyB = b == NULL || !b[0];
+
+	if (emptyA && emptyB)
+		return true;
+	if (emptyA || emptyB)
+		return false;
+
+	const char* end = strstr(a, ": ");
+	int32 lengthA = end ? end - a : strlen(a);
+	end = strstr(b, ": ");
+	int32 lengthB = end ? end - b : strlen(b);
+
+	if (lengthA != lengthB)
+		return false;
+
+	return !strncasecmp(a, b, lengthA);
+}
+
+
+static const char*
+display_as_parameter(const char* special)
+{
+	const char* parameter = strstr(special, ": ");
+	if (parameter != NULL)
+		return parameter + 2;
+
+	return NULL;
 }
 
 
@@ -96,7 +131,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	topView->AddChild(fAttributeControl);
 
 	fTypeMenu = new BPopUpMenu("type");
-	BMenuItem* item;
+	BMenuItem* item = NULL;
 	for (int32 i = 0; kTypeMap[i].name != NULL; i++) {
 		BMessage* message = new BMessage(kMsgTypeChosen);
 		message->AddInt32("type", kTypeMap[i].type);
@@ -131,9 +166,21 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	labelWidth -= 8.0f;
 
 	BMenu* menu = new BPopUpMenu("display as");
-	// TODO!
-	menu->AddItem(item = new BMenuItem("Default", NULL));
-	item->SetMarked(true);
+	for (int32 i = 0; kDisplayAsMap[i].name != NULL; i++) {
+		BMessage* message = new BMessage(kMsgDisplayAsChosen);
+		if (kDisplayAsMap[i].identifier != NULL) {
+			message->AddString("identifier", kDisplayAsMap[i].identifier);
+			for (int32 j = 0; kDisplayAsMap[i].supported[j]; j++) {
+				message->AddInt32("supports", kDisplayAsMap[i].supported[j]);
+			}
+		}
+
+		item = new BMenuItem(kDisplayAsMap[i].name, message);
+		menu->AddItem(item);
+
+		if (compare_display_as(kDisplayAsMap[i].identifier, fAttribute.DisplayAs()))
+			item->SetMarked(true);
+	}
 
 	rect.OffsetTo(8.0f, fVisibleCheckBox->Bounds().Height());
 	rect.right -= 18.0f;
@@ -156,7 +203,8 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	rect.OffsetBy(0.0f, menuField->Bounds().Height() + 4.0f);
 	rect.bottom = rect.top + fPublicNameControl->Bounds().Height();
 	fSpecialControl = new BTextControl(rect, "special", "Special:",
-		NULL, NULL, B_FOLLOW_LEFT_RIGHT);
+		display_as_parameter(fAttribute.DisplayAs()), NULL,
+		B_FOLLOW_LEFT_RIGHT);
 	fSpecialControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
 	fSpecialControl->SetDivider(labelWidth);
 	fSpecialControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -248,6 +296,58 @@ AttributeWindow::~AttributeWindow()
 }
 
 
+type_code
+AttributeWindow::_CurrentType() const
+{
+	type_code type = B_STRING_TYPE;
+	BMenuItem* item = fTypeMenu->FindMarked();
+	if (item != NULL && item->Message() != NULL) {
+		int32 value;
+		if (item->Message()->FindInt32("type", &value) == B_OK)
+			type = value;
+	}
+
+	return type;
+}
+
+
+BMenuItem*
+AttributeWindow::_DefaultDisplayAs() const
+{
+	return fDisplayAsMenuField->Menu()->ItemAt(0);
+}
+
+
+void
+AttributeWindow::_CheckDisplayAs()
+{
+	// check display as suported types
+
+	type_code currentType = _CurrentType();
+
+	BMenu* menu = fDisplayAsMenuField->Menu();
+	for (int32 i = menu->CountItems(); i-- > 0;) {
+		BMenuItem* item = menu->ItemAt(i);
+		bool supported = item == _DefaultDisplayAs();
+			// the default type is always supported
+		type_code type;
+		for (int32 j = 0; item->Message()->FindInt32("supports",
+				j, (int32*)&type) == B_OK; j++) {
+			if (type == currentType) {
+				supported = true;
+				break;
+			}
+		}
+
+		item->SetEnabled(supported);
+		if (item->IsMarked() && !supported)
+			menu->ItemAt(0)->SetMarked(true);
+	}
+
+	fSpecialControl->SetEnabled(!_DefaultDisplayAs()->IsMarked());
+}
+
+
 void
 AttributeWindow::_CheckAcceptable()
 {
@@ -275,16 +375,10 @@ AttributeWindow::_NewItemFromCurrent()
 {
 	const char* newAttribute = fAttributeControl->Text();
 
-	type_code type = B_STRING_TYPE;
-	BMenuItem* item = fTypeMenu->FindMarked();
-	if (item != NULL && item->Message() != NULL) {
-		int32 value;
-		if (item->Message()->FindInt32("type", &value) == B_OK)
-			type = value;
-	}
+	type_code type = _CurrentType();
 
 	int32 alignment = B_ALIGN_LEFT;
-	item = fAlignmentMenuField->Menu()->FindMarked();
+	BMenuItem* item = fAlignmentMenuField->Menu()->FindMarked();
 	if (item != NULL && item->Message() != NULL) {
 		int32 value;
 		if (item->Message()->FindInt32("alignment", &value) == B_OK)
@@ -295,12 +389,22 @@ AttributeWindow::_NewItemFromCurrent()
 	if (width < 0)
 		width = 0;
 
-	char displayAs[512];
-	displayAs[0] = '\0';
-	//strlcpy(displayAs, fSpecialControl->Text(), sizeof(displayAs));
+	BString displayAs;
+	item = fDisplayAsMenuField->Menu()->FindMarked();
+	if (item != NULL) {
+		const char* identifier;
+		if (item->Message()->FindString("identifier", &identifier) == B_OK) {
+			displayAs = identifier;
+
+			if (fSpecialControl->Text() && fSpecialControl->Text()[0]) {
+				displayAs += ": ";
+				displayAs += fSpecialControl->Text();
+			}
+		}
+	}
 
 	return new AttributeItem(newAttribute,
-		fPublicNameControl->Text(), type, displayAs, alignment,
+		fPublicNameControl->Text(), type, displayAs.String(), alignment,
 		width, fVisibleCheckBox->Value() == B_CONTROL_ON,
 		fEditableCheckBox->Value() == B_CONTROL_ON);
 }
@@ -313,7 +417,12 @@ AttributeWindow::MessageReceived(BMessage* message)
 		case kMsgAttributeUpdated:
 		case kMsgAlignmentChosen:
 		case kMsgTypeChosen:
+			_CheckDisplayAs();
 			_CheckAcceptable();
+			break;
+
+		case kMsgDisplayAsChosen:
+			fSpecialControl->SetEnabled(!_DefaultDisplayAs()->IsMarked());
 			break;
 
 		case kMsgVisibilityChanged:
@@ -321,11 +430,11 @@ AttributeWindow::MessageReceived(BMessage* message)
 			bool enabled = fVisibleCheckBox->Value() != B_CONTROL_OFF;
 
 			fDisplayAsMenuField->SetEnabled(enabled);
-			//fSpecialControl->SetEnabled(enabled);
 			fWidthControl->SetEnabled(enabled);
 			fAlignmentMenuField->SetEnabled(enabled);
 			fEditableCheckBox->SetEnabled(enabled);
 
+			_CheckDisplayAs();
 			_CheckAcceptable();
 			break;
 		}

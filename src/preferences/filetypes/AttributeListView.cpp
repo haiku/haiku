@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,13 +22,43 @@ const struct type_map kTypeMap[] = {
 	{NULL,				0}
 };
 
+// TODO: in the future, have a (private) Tracker API that exports these
+//	as well as a nice GUI for them.
+const struct display_as_map kDisplayAsMap[] = {
+	{"Default",		NULL,		{}},
+	{"Rating",		"rating",	{B_INT32_TYPE, B_INT8_TYPE, B_INT16_TYPE}},
+	{NULL,			NULL,		{}}
+};
+
 
 static void
-name_for_type(BString& string, type_code type)
+add_display_as(BString& string, const char* displayAs)
+{
+	if (displayAs == NULL || !displayAs[0])
+		return;
+
+	BString base(displayAs);
+	int32 end = base.FindFirst(": ");
+	if (end > 0)
+		base.Truncate(end);
+
+	for (int32 i = 0; kDisplayAsMap[i].name != NULL; i++) {
+		if (base.ICompare(kDisplayAsMap[i].identifier) == 0) {
+			string += ", ";
+			string += base;
+			return;
+		}
+	}
+}
+
+
+static void
+name_for_type(BString& string, type_code type, const char* displayAs)
 {
 	for (int32 i = 0; kTypeMap[i].name != NULL; i++) {
 		if (kTypeMap[i].type == type) {
 			string = kTypeMap[i].name;
+			add_display_as(string, displayAs);
 			return;
 		}
 	}
@@ -152,7 +182,7 @@ AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
 	owner->MovePenTo(frame.left + frame.Width() / 2.0f + 5.0f, owner->PenLocation().y);
 
 	BString type;
-	name_for_type(type, fType);
+	name_for_type(type, fType, fDisplayAs.String());
 	owner->DrawString(type.String());
 
 	owner->SetHighColor(tint_color(owner->ViewColor(), B_DARKEN_1_TINT));

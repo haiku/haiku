@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ATTRIBUTE_WINDOW_H
@@ -32,6 +32,9 @@ class AttributeWindow : public BWindow {
 		virtual bool QuitRequested();
 
 	private:
+		type_code _CurrentType() const;
+		BMenuItem* _DefaultDisplayAs() const;
+		void _CheckDisplayAs();
 		void _CheckAcceptable();
 		AttributeItem* _NewItemFromCurrent();
 

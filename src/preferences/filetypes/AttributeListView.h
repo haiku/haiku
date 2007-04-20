@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ATTRIBUTE_LIST_VIEW_H
@@ -67,6 +67,14 @@ struct type_map {
 };
 
 extern const struct type_map kTypeMap[];
+
+struct display_as_map {
+	const char* name;
+	const char* identifier;
+	type_code	supported[8];
+};
+
+extern const struct display_as_map kDisplayAsMap[];
 
 AttributeItem *create_attribute_item(BMessage& attributes, int32 index);
 

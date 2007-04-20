@@ -23,7 +23,7 @@ resource app_version {
 	internal = 1,
 
 	short_info = "FileTypes",
-	long_info = "FileTypes ©2006 Haiku Inc."
+	long_info = "FileTypes ©2006-2007 Haiku Inc."
 };
 
 
