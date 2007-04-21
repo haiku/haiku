@@ -68,7 +68,7 @@ class TCPEndpoint : public net_protocol {
 		void DeleteSocket();
 
 		status_t DelayedAcknowledge();
-		status_t SendAcknowledge();
+		status_t SendAcknowledge(bool force);
 		status_t UpdateTimeWait();
 
 		int32 SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
@@ -90,6 +90,7 @@ class TCPEndpoint : public net_protocol {
 		bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			uint32 segmentMaxSize, uint32 flightSize);
 		status_t _SendQueued(bool force = false);
+		status_t _SendQueued(bool force, uint32 sendWindow);
 		int _GetMSS(const struct sockaddr *) const;
 		status_t _ShutdownEgress(bool closing);
 		ssize_t _AvailableData() const;

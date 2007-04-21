@@ -672,10 +672,9 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	TRACE("  ReadData(): %lu bytes kept.", fReceiveQueue.Available());
 
-	if (!clone) {
-		// we are opening the window, check if we should send an ACK
-		_SendQueued();
-	}
+	// if we are opening the window, check if we should send an ACK
+	if (!clone)
+		SendAcknowledge(false);
 
 	return receivedBytes;
 }
@@ -740,7 +739,7 @@ TCPEndpoint::DelayedAcknowledge()
 	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
 		// timer was active, send an ACK now (with the exception above,
 		// we send every other ACK)
-		return SendAcknowledge();
+		return SendAcknowledge(true);
 	}
 
 	gStackModule->set_timer(&fDelayedAcknowledgeTimer, TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
@@ -749,9 +748,9 @@ TCPEndpoint::DelayedAcknowledge()
 
 
 status_t
-TCPEndpoint::SendAcknowledge()
+TCPEndpoint::SendAcknowledge(bool force)
 {
-	return _SendQueued(true);
+	return _SendQueued(force, 0);
 }
 
 
@@ -916,7 +915,7 @@ TCPEndpoint::SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 
 	// process acknowledge action as asked for by the *Receive() method
 	if (segmentAction & IMMEDIATE_ACKNOWLEDGE)
-		SendAcknowledge();
+		SendAcknowledge(true);
 	else if (segmentAction & ACKNOWLEDGE)
 		DelayedAcknowledge();
 
@@ -1049,12 +1048,19 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 }
 
 
+status_t
+TCPEndpoint::_SendQueued(bool force)
+{
+	return _SendQueued(force, fSendWindow);
+}
+
+
 /*!
 	Sends one or more TCP segments with the data waiting in the queue, or some
 	specific flags that need to be sent.
 */
 status_t
-TCPEndpoint::_SendQueued(bool force)
+TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 {
 	if (fRoute == NULL)
 		return B_ERROR;
@@ -1092,9 +1098,8 @@ TCPEndpoint::_SendQueued(bool force)
 	segment.acknowledge = fReceiveNext;
 	segment.urgent_offset = 0;
 
-	uint32 sendWindow = fSendWindow;
-	if (fCongestionWindow > 0)
-		sendWindow = min_c(sendWindow, fCongestionWindow);
+	if (fCongestionWindow > 0 && fCongestionWindow < sendWindow)
+		sendWindow = fCongestionWindow;
 
 	// SND.UNA  SND.NXT        SND.MAX
 	//  |        |              |
@@ -1793,7 +1798,7 @@ TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 	if (!locker.IsLocked())
 		return;
 
-	endpoint->SendAcknowledge();
+	endpoint->SendAcknowledge(true);
 }
 
 
